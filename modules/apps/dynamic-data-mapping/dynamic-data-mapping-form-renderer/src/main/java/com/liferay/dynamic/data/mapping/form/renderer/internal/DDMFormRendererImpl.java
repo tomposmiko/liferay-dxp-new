@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal;
 
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingException;
@@ -40,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = DDMFormRenderer.class)
+@Component(immediate = true, service = DDMFormRenderer.class)
 public class DDMFormRendererImpl implements DDMFormRenderer {
 
 	@Override
@@ -64,8 +65,11 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		ddmFormTemplateContext.put(
-			"spritemap", themeDisplay.getPathThemeSpritemap());
+		String pathThemeImages = themeDisplay.getPathThemeImages();
+
+		String spriteMap = pathThemeImages.concat("/clay/icons.svg");
+
+		ddmFormTemplateContext.put("spritemap", spriteMap);
 
 		return ddmFormTemplateContext;
 	}
@@ -77,7 +81,7 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 		throws DDMFormRenderingException {
 
 		try {
-			return _render(ddmForm, ddmFormLayout, ddmFormRenderingContext);
+			return doRender(ddmForm, ddmFormLayout, ddmFormRenderingContext);
 		}
 		catch (DDMFormRenderingException ddmFormRenderingException) {
 			throw ddmFormRenderingException;
@@ -93,7 +97,7 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 		throws DDMFormRenderingException {
 
 		try {
-			return _render(
+			return doRender(
 				ddmForm, _ddm.getDefaultDDMFormLayout(ddmForm),
 				ddmFormRenderingContext);
 		}
@@ -105,7 +109,7 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 		}
 	}
 
-	private String _render(
+	protected String doRender(
 			DDMForm ddmForm, DDMFormLayout ddmFormLayout,
 			DDMFormRenderingContext ddmFormRenderingContext)
 		throws Exception {
@@ -133,6 +137,9 @@ public class DDMFormRendererImpl implements DDMFormRenderer {
 
 	@Reference
 	private DDM _ddm;
+
+	@Reference
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	private DDMFormTemplateContextFactory _ddmFormTemplateContextFactory;

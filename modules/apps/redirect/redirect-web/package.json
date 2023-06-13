@@ -1,7 +1,12 @@
 {
 	"dependencies": {
+		"@clayui/form": "3.37.0",
+		"@clayui/icon": "3.37.0",
+		"@clayui/loading-indicator": "3.37.0",
 		"frontend-js-web": "*",
-		"uuid": "9.0.0"
+		"metal-state": "2.16.8",
+		"prop-types": "15.7.2",
+		"react": "16.12.0"
 	},
 	"name": "redirect-web",
 	"scripts": {
@@ -10,5 +15,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "2.0.59"
+	"version": "2.0.15"
 }

@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see JournalFeedServiceSoap
  * @generated
  */
 public class JournalFeedServiceHttp {
@@ -53,7 +54,7 @@ public class JournalFeedServiceHttp {
 	public static com.liferay.journal.model.JournalFeed addFeed(
 			HttpPrincipal httpPrincipal, long groupId, String feedId,
 			boolean autoFeedId, String name, String description,
-			long ddmStructureId, String ddmTemplateKey,
+			String ddmStructureKey, String ddmTemplateKey,
 			String ddmRendererTemplateKey, int delta, String orderByCol,
 			String orderByType, String targetLayoutFriendlyUrl,
 			String targetPortletId, String contentField, String feedType,
@@ -68,7 +69,7 @@ public class JournalFeedServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, feedId, autoFeedId, name, description,
-				ddmStructureId, ddmTemplateKey, ddmRendererTemplateKey, delta,
+				ddmStructureKey, ddmTemplateKey, ddmRendererTemplateKey, delta,
 				orderByCol, orderByType, targetLayoutFriendlyUrl,
 				targetPortletId, contentField, feedType, feedVersion,
 				serviceContext);
@@ -252,7 +253,7 @@ public class JournalFeedServiceHttp {
 
 	public static com.liferay.journal.model.JournalFeed updateFeed(
 			HttpPrincipal httpPrincipal, long groupId, String feedId,
-			String name, String description, long ddmStructureId,
+			String name, String description, String ddmStructureKey,
 			String ddmTemplateKey, String ddmRendererTemplateKey, int delta,
 			String orderByCol, String orderByType,
 			String targetLayoutFriendlyUrl, String targetPortletId,
@@ -266,7 +267,7 @@ public class JournalFeedServiceHttp {
 				_updateFeedParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, groupId, feedId, name, description, ddmStructureId,
+				methodKey, groupId, feedId, name, description, ddmStructureKey,
 				ddmTemplateKey, ddmRendererTemplateKey, delta, orderByCol,
 				orderByType, targetLayoutFriendlyUrl, targetPortletId,
 				contentField, feedType, feedVersion, serviceContext);
@@ -304,7 +305,7 @@ public class JournalFeedServiceHttp {
 
 	private static final Class<?>[] _addFeedParameterTypes0 = new Class[] {
 		long.class, String.class, boolean.class, String.class, String.class,
-		long.class, String.class, String.class, int.class, String.class,
+		String.class, String.class, String.class, int.class, String.class,
 		String.class, String.class, String.class, String.class, String.class,
 		double.class, com.liferay.portal.kernel.service.ServiceContext.class
 	};
@@ -321,7 +322,7 @@ public class JournalFeedServiceHttp {
 		long.class, String.class
 	};
 	private static final Class<?>[] _updateFeedParameterTypes5 = new Class[] {
-		long.class, String.class, String.class, String.class, long.class,
+		long.class, String.class, String.class, String.class, String.class,
 		String.class, String.class, int.class, String.class, String.class,
 		String.class, String.class, String.class, String.class, double.class,
 		com.liferay.portal.kernel.service.ServiceContext.class

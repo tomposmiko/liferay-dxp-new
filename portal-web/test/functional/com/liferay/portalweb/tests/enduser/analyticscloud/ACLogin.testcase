@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -21,19 +19,17 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8534 | Test Summary: Sign out of AC"
-	@priority = 5
+	@priority = "5"
 	test CanSignOutAC {
 		task ("Navigate to AC workspace") {
 			ACUtils.launchAC();

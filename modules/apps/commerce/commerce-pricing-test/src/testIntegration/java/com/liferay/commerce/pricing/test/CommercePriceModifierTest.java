@@ -38,12 +38,12 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.test.util.CPTestUtil;
-import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
-import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -60,6 +60,7 @@ import org.frutilla.FrutillaRule;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,14 +80,17 @@ public class CommercePriceModifierTest {
 			PermissionCheckerMethodTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
-
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
-			_group.getCompanyId());
+			_company.getCompanyId());
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			_user.getCompanyId(), _user.getGroupId(), _user.getUserId());
@@ -388,12 +392,14 @@ public class CommercePriceModifierTest {
 			commercePriceModifier.getCommercePriceModifierId(),
 			CPDefinition.class.getName(), cpDefinition.getCPDefinitionId());
 
+		CommerceMoney priceCommerceMoney =
+			commercePriceEntry.getPriceCommerceMoney(
+				_commerceCurrency.getCommerceCurrencyId());
+
 		BigDecimal finalPrice =
 			_commercePriceModifierHelper.applyCommercePriceModifier(
 				commercePriceList.getCommercePriceListId(),
-				cpInstance.getCPDefinitionId(),
-				commercePriceEntry.getPriceCommerceMoney(
-					_commerceCurrency.getCommerceCurrencyId()));
+				cpInstance.getCPDefinitionId(), priceCommerceMoney);
 
 		RoundingMode roundingMode = RoundingMode.valueOf(
 			_commerceCurrency.getRoundingMode());
@@ -420,13 +426,16 @@ public class CommercePriceModifierTest {
 			CommercePriceListLocalServiceUtil.getCommercePriceList(
 				commercePriceListId);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				commercePriceList.getGroupId());
+
 		return CommercePriceEntryLocalServiceUtil.addCommercePriceEntry(
 			externalReferenceCode, cpProductId, cpInstanceUuid,
-			commercePriceListId, price, BigDecimal.ZERO,
-			ServiceContextTestUtil.getServiceContext(
-				commercePriceList.getGroupId()));
+			commercePriceListId, price, BigDecimal.ZERO, serviceContext);
 	}
 
+	private static Company _company;
 	private static User _user;
 
 	@Inject
@@ -447,7 +456,6 @@ public class CommercePriceModifierTest {
 	@Inject
 	private CommercePricingClassLocalService _commercePricingClassLocalService;
 
-	private Group _group;
 	private ServiceContext _serviceContext;
 
 }

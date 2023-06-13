@@ -1,8 +1,5 @@
-definition {
-
-	@disable-webdriver = "true"
-	test TestAssertStatusCode {
-		HttpRequester.getGoogleResponse();
-	}
-
-}
+<definition>
+	<command name="testAssertStatusCode">
+		<execute macro="HttpRequester#getGoogleResponse" />
+	</command>
+</definition>

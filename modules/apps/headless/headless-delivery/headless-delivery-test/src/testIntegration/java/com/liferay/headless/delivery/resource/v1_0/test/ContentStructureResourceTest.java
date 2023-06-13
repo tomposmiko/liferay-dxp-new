@@ -113,7 +113,7 @@ public class ContentStructureResourceTest
 
 	@Override
 	protected ContentStructure
-			testPutAssetLibraryContentStructurePermissionsPage_addContentStructure()
+			testPutAssetLibraryContentStructurePermission_addContentStructure()
 		throws Exception {
 
 		return testGetContentStructure_addContentStructure();
@@ -121,7 +121,7 @@ public class ContentStructureResourceTest
 
 	@Override
 	protected ContentStructure
-			testPutContentStructurePermissionsPage_addContentStructure()
+			testPutContentStructurePermission_addContentStructure()
 		throws Exception {
 
 		return testGetContentStructure_addContentStructure();
@@ -129,7 +129,7 @@ public class ContentStructureResourceTest
 
 	@Override
 	protected ContentStructure
-			testPutSiteContentStructurePermissionsPage_addContentStructure()
+			testPutSiteContentStructurePermission_addContentStructure()
 		throws Exception {
 
 		return testGetContentStructure_addContentStructure();

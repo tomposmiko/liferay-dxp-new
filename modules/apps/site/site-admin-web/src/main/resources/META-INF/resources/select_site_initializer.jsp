@@ -22,12 +22,8 @@ SelectSiteInitializerDisplayContext selectSiteInitializerDisplayContext = new Se
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(selectSiteInitializerDisplayContext.getBackURL());
 
-renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
+renderResponse.setTitle(LanguageUtil.get(request, "select-site-template"));
 %>
-
-<clay:navigation-bar
-	navigationItems="<%= selectSiteInitializerDisplayContext.getNavigationItems() %>"
-/>
 
 <aui:form cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<liferay-ui:search-container
@@ -58,8 +54,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 		<portlet:param name="parentGroupId" value="<%= String.valueOf(selectSiteInitializerDisplayContext.getParentGroupId()) %>" />
 	</portlet:actionURL>
 
-	<aui:script require="frontend-js-web/index as frontendJsWeb">
-		var {delegate, openSimpleInputModal} = frontendJsWeb;
+	<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as openSimpleInputModal">
+		var delegate = delegateModule.default;
 
 		var addSiteActionOptionQueryClickHandler = delegate(
 			document.body,
@@ -69,14 +65,20 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 				var data = event.delegateTarget.querySelector('.add-site-action-card')
 					.dataset;
 
-				Liferay.Util.openModal({
-					disableAutoClose: true,
-					height: '60vh',
-					id: '<portlet:namespace />addSiteDialog',
-					iframeBodyCssClass: '',
-					size: 'md',
-					title: '<liferay-ui:message key="add-site" />',
-					url: data.addSiteUrl,
+				openSimpleInputModal.default({
+					checkboxFieldLabel:
+						'<liferay-ui:message key="create-default-pages-as-private-available-only-to-members-if-unchecked-they-will-be-public-available-to-anyone" />',
+					checkboxFieldName: data.checkboxFieldName,
+					checkboxFieldValue: false,
+					dialogTitle: '<liferay-ui:message key="add-site" />',
+					formSubmitURL: data.addSiteUrl,
+					idFieldName: 'layoutSetPrototypeId',
+					idFieldValue: data.layoutSetPrototypeId,
+					mainFieldName: 'name',
+					mainFieldLabel: '<liferay-ui:message key="name" />',
+					namespace: '<portlet:namespace />',
+					spritemap:
+						'<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 				});
 			}
 		);

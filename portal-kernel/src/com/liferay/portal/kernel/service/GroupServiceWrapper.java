@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.model.Group;
 public class GroupServiceWrapper
 	implements GroupService, ServiceWrapper<GroupService> {
 
-	public GroupServiceWrapper() {
-		this(null);
-	}
-
 	public GroupServiceWrapper(GroupService groupService) {
 		_groupService = groupService;
 	}

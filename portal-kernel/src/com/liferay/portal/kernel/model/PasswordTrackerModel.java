@@ -161,8 +161,4 @@ public interface PasswordTrackerModel
 	@Override
 	public PasswordTracker cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

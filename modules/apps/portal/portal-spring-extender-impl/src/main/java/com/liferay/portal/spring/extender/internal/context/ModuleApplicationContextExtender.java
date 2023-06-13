@@ -18,7 +18,6 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -26,6 +25,7 @@ import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.configurator.ConfigurableApplicationContextConfigurator;
+import com.liferay.portal.spring.extender.internal.configuration.ConfigurationUtil;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,7 +52,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 /**
  * @author Miguel Pastor
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ModuleApplicationContextExtender
 	implements BundleTrackerCustomizer
 		<ModuleApplicationContextExtender.ModuleApplicationContextExtension> {
@@ -78,7 +78,7 @@ public class ModuleApplicationContextExtender
 			return moduleApplicationContextExtension;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return null;
@@ -153,9 +153,7 @@ public class ModuleApplicationContextExtender
 		private void _generateConfigurationDependency(
 			ClassLoader classLoader, String name) {
 
-			if (ConfigurationFactoryUtil.getConfiguration(classLoader, name) !=
-					null) {
-
+			if (ConfigurationUtil.hasConfiguration(classLoader, name)) {
 				ServiceDependency serviceDependency =
 					_dependencyManager.createServiceDependency();
 
@@ -243,7 +241,7 @@ public class ModuleApplicationContextExtender
 		_bundleContext = bundleContext;
 
 		_bundleTracker = new BundleTracker<>(
-			bundleContext, Bundle.ACTIVE, this);
+			bundleContext, Bundle.ACTIVE | Bundle.STARTING, this);
 
 		_bundleTracker.open();
 	}

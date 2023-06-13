@@ -1,4 +1,0 @@
-dependencies {
-	testIntegrationCompile project(":apps:portal-language:portal-language-override-api")
-	testIntegrationCompile project(":test:arquillian-extension-junit-bridge")
-}

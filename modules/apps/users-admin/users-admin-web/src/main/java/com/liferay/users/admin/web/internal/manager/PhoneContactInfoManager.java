@@ -47,14 +47,14 @@ public class PhoneContactInfoManager extends BaseContactInfoManager<Phone> {
 
 		String number = ParamUtil.getString(actionRequest, "phoneNumber");
 		String extension = ParamUtil.getString(actionRequest, "phoneExtension");
-		long listTypeId = ParamUtil.getLong(actionRequest, "phoneListTypeId");
+		long typeId = ParamUtil.getLong(actionRequest, "phoneTypeId");
 		boolean primary = ParamUtil.getBoolean(actionRequest, "phonePrimary");
 
 		Phone phone = _phoneLocalService.createPhone(phoneId);
 
 		phone.setNumber(number);
 		phone.setExtension(extension);
-		phone.setListTypeId(listTypeId);
+		phone.setTypeId(typeId);
 		phone.setPrimary(primary);
 
 		return phone;
@@ -64,7 +64,7 @@ public class PhoneContactInfoManager extends BaseContactInfoManager<Phone> {
 	public Phone doAdd(Phone phone) throws Exception {
 		return _phoneService.addPhone(
 			_className, _classPK, phone.getNumber(), phone.getExtension(),
-			phone.getListTypeId(), phone.isPrimary(), new ServiceContext());
+			phone.getTypeId(), phone.isPrimary(), new ServiceContext());
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class PhoneContactInfoManager extends BaseContactInfoManager<Phone> {
 	public void doUpdate(Phone phone) throws Exception {
 		_phoneService.updatePhone(
 			phone.getPhoneId(), phone.getNumber(), phone.getExtension(),
-			phone.getListTypeId(), phone.isPrimary());
+			phone.getTypeId(), phone.isPrimary());
 	}
 
 	@Override

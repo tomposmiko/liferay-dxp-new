@@ -82,7 +82,7 @@ public class LayoutPageTemplateStructureRelCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -110,16 +110,6 @@ public class LayoutPageTemplateStructureRelCacheModel
 		sb.append(segmentsExperienceId);
 		sb.append(", data=");
 		sb.append(data);
-		sb.append(", lastPublishDate=");
-		sb.append(lastPublishDate);
-		sb.append(", status=");
-		sb.append(status);
-		sb.append(", statusByUserId=");
-		sb.append(statusByUserId);
-		sb.append(", statusByUserName=");
-		sb.append(statusByUserName);
-		sb.append(", statusDate=");
-		sb.append(statusDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -181,33 +171,6 @@ public class LayoutPageTemplateStructureRelCacheModel
 			layoutPageTemplateStructureRelImpl.setData(data);
 		}
 
-		if (lastPublishDate == Long.MIN_VALUE) {
-			layoutPageTemplateStructureRelImpl.setLastPublishDate(null);
-		}
-		else {
-			layoutPageTemplateStructureRelImpl.setLastPublishDate(
-				new Date(lastPublishDate));
-		}
-
-		layoutPageTemplateStructureRelImpl.setStatus(status);
-		layoutPageTemplateStructureRelImpl.setStatusByUserId(statusByUserId);
-
-		if (statusByUserName == null) {
-			layoutPageTemplateStructureRelImpl.setStatusByUserName("");
-		}
-		else {
-			layoutPageTemplateStructureRelImpl.setStatusByUserName(
-				statusByUserName);
-		}
-
-		if (statusDate == Long.MIN_VALUE) {
-			layoutPageTemplateStructureRelImpl.setStatusDate(null);
-		}
-		else {
-			layoutPageTemplateStructureRelImpl.setStatusDate(
-				new Date(statusDate));
-		}
-
 		layoutPageTemplateStructureRelImpl.resetOriginalValues();
 
 		return layoutPageTemplateStructureRelImpl;
@@ -237,13 +200,6 @@ public class LayoutPageTemplateStructureRelCacheModel
 
 		segmentsExperienceId = objectInput.readLong();
 		data = (String)objectInput.readObject();
-		lastPublishDate = objectInput.readLong();
-
-		status = objectInput.readInt();
-
-		statusByUserId = objectInput.readLong();
-		statusByUserName = objectInput.readUTF();
-		statusDate = objectInput.readLong();
 	}
 
 	@Override
@@ -287,21 +243,6 @@ public class LayoutPageTemplateStructureRelCacheModel
 		else {
 			objectOutput.writeObject(data);
 		}
-
-		objectOutput.writeLong(lastPublishDate);
-
-		objectOutput.writeInt(status);
-
-		objectOutput.writeLong(statusByUserId);
-
-		if (statusByUserName == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(statusByUserName);
-		}
-
-		objectOutput.writeLong(statusDate);
 	}
 
 	public long mvccVersion;
@@ -317,10 +258,5 @@ public class LayoutPageTemplateStructureRelCacheModel
 	public long layoutPageTemplateStructureId;
 	public long segmentsExperienceId;
 	public String data;
-	public long lastPublishDate;
-	public int status;
-	public long statusByUserId;
-	public String statusByUserName;
-	public long statusDate;
 
 }

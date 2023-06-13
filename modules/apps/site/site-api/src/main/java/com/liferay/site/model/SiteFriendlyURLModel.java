@@ -269,8 +269,4 @@ public interface SiteFriendlyURLModel
 	@Override
 	public SiteFriendlyURL cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -1,31 +1,35 @@
 @component-name = "portal-publications"
 definition {
 
-	property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config";
-	property osgi.module.configurations = "enabled=B\"true\"";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.component.names = "Calendar";
 	property testray.main.component.name = "Publications";
 
 	setUp {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
+
+		JSONPublications.enablePublications();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
+			ApplicationsMenu.gotoPortlet(
+				category = "Publications",
+				panel = "Applications",
+				portlet = "Publications");
+
 			Publications.disablePublications();
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddCalendarEventPublication {
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
@@ -50,9 +54,10 @@ definition {
 
 		CalendarNavigator.gotoAddEvent();
 
-		CalendarEvent.editTitle(eventTitle = "Publication Calendar Event Title");
-
-		CalendarEvent.publish();
+		CalendarEvent.addRegularInCustomSite(
+			eventTitle = "Publication Calendar Event Title",
+			pageName = "Calendar Page",
+			siteName = "Site Name");
 
 		Navigator.openSitePage(
 			pageName = "Calendar Page",
@@ -60,19 +65,26 @@ definition {
 
 		CalendarEvent.view(eventTitle = "Publication Calendar Event Title");
 
-		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name");
+		Publications.gotoReviewChanges(publicationName = "Publication Name");
 
-		PublicationsChanges.viewChanges(
+		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Calendar",
 			changeSite = "Site Name",
 			changeTitle = "Site Name",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChanges(
+		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Calendar Event",
 			changeSite = "Site Name",
 			changeTitle = "Publication Calendar Event Title",
+			changeType = "Added",
+			changeUser = "Test Test");
+
+		PublicationsChanges.viewChangesViaChangesStyle(
+			changeCategory = "Calendar Resource",
+			changeSite = "Site Name",
+			changeTitle = "Site Name",
 			changeType = "Added",
 			changeUser = "Test Test");
 
@@ -88,38 +100,31 @@ definition {
 	}
 
 	@description = "Assert the conflict can be manually resovled on Calendar by discarding within Publications."
-	@priority = 4
+	@priority = "4"
 	test ResolveConflictingPublicationsByDiscarding {
-		JSONGroup.addGroup(groupName = "Site Name");
-
 		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
+			groupName = "Guest",
 			layoutName = "Calendar Page");
 
 		JSONLayout.updateLayoutTemplateOfPublicLayout(
-			groupName = "Site Name",
+			groupName = "Guest",
 			layoutName = "Calendar Page",
 			layoutTemplate = "1 Column");
 
-		Navigator.gotoSitePage(
-			pageName = "Calendar Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Calendar Page");
 
 		Portlet.addPG(portletName = "Calendar");
 
 		CalendarNavigator.gotoAddEvent();
 
-		CalendarEvent.editTitle(eventTitle = "Publication Calendar Event Title");
-
-		CalendarEvent.publish();
+		CalendarEvent.add(
+			eventTitle = "Publication Calendar Event Title",
+			eventType = "All Day",
+			pageName = "Calendar Page");
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
-
-		Navigator.gotoSitePage(
-			pageName = "Calendar Page",
-			siteName = "Site Name");
 
 		CalendarNavigator.gotoEditEvent(eventTitle = "Publication Calendar Event Title");
 
@@ -129,11 +134,11 @@ definition {
 
 		IFrame.closeFrame();
 
-		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name");
+		Publications.gotoReviewChanges(publicationName = "Publication Name");
 
-		PublicationsChanges.viewChanges(
+		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Calendar Event",
-			changeSite = "Site Name",
+			changeSite = "Guest",
 			changeTitle = "Publication Calendar Event Title Edit",
 			changeType = "Modified",
 			changeUser = "Test Test");
@@ -142,23 +147,21 @@ definition {
 
 		JSONPublications.selectPublication(publicationName = "Publication Name 2");
 
-		Navigator.gotoSitePage(
-			pageName = "Calendar Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Calendar Page");
 
 		CalendarEvent.delete();
 
-		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
+		RecycleBin.openRecycleBinAdmin(siteURLKey = "guest");
 
 		RecycleBin.deleteCP(
 			assetName = "Publication Calendar Event Title",
 			assetType = "Calendar Event");
 
-		PublicationsNavigator.gotoReviewChanges(publicationName = "Publication Name 2");
+		Publications.gotoReviewChanges(publicationName = "Publication Name 2");
 
-		PublicationsChanges.viewChanges(
+		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Calendar Event",
-			changeSite = "Site Name",
+			changeSite = "Guest",
 			changeTitle = "Publication Calendar Event Title",
 			changeType = "Deleted",
 			changeUser = "Test Test");
@@ -167,25 +170,27 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name 2");
 
-		PublicationsNavigator.gotoPublish(
-			gotoPublicationsAdmin = "true",
+		Publications.gotoPublish(
+			gotoManagePublications = "true",
 			publicationName = "Publication Name");
 
 		Publications.viewNeedsManualResolution(
 			entryTitle = "Publication Calendar Event Title Edit",
 			warningMessage = "Deletion Modification Conflict: Modification conflicts with a deletion.");
 
-		PublicationsNavigator.gotoViewConflictingChangeDetails(entryTitle = "Publication Calendar Event Title Edit");
+		Publications.gotoViewChangeDiffInConflictingPublications(entryTitle = "Publication Calendar Event Title Edit");
 
-		PublicationsChangeDetails.viewConflictingChangeDetails(
+		Publications.viewChangeDiff(
 			columnName = "Title",
 			columnValueInPublication = "Publication Calendar Event Title Edit",
-			deletionModificationConflict = "true",
+			entryDeletedInProduction = "true",
 			publicationName = "Publication Name");
 
 		IFrame.closeFrame();
 
-		PublicationsChanges.discardChanges(
+		Pause(locator1 = "3000");
+
+		Publications.discardChanges(
 			changeCategory = "Asset",
 			changeTitle = "Publication Calendar Event Title Edit",
 			conflictingChanges = "true",

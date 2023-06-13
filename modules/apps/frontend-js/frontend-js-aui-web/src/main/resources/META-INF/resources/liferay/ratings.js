@@ -18,40 +18,40 @@
 AUI.add(
 	'liferay-ratings',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const CSS_ICON_STAR = 'icon-star-on';
+		var CSS_ICON_STAR = 'icon-star-on';
 
-		const CSS_ICON_STAR_EMPTY = 'icon-star-off';
+		var CSS_ICON_STAR_EMPTY = 'icon-star-off';
 
-		const EMPTY_FN = Lang.emptyFn;
+		var EMPTY_FN = Lang.emptyFn;
 
-		const EVENT_INTERACTIONS_RENDER = ['focus', 'mousemove', 'touchstart'];
+		var EVENT_INTERACTIONS_RENDER = ['focus', 'mousemove', 'touchstart'];
 
-		const SELECTOR_RATING_ELEMENT = '.rating-element';
+		var SELECTOR_RATING_ELEMENT = '.rating-element';
 
-		const STR_INITIAL_FOCUS = 'initialFocus';
+		var STR_INITIAL_FOCUS = 'initialFocus';
 
-		const STR_NAMESPACE = 'namespace';
+		var STR_NAMESPACE = 'namespace';
 
-		const STR_SIZE = 'size';
+		var STR_SIZE = 'size';
 
-		const STR_URI = 'uri';
+		var STR_URI = 'uri';
 
-		const STR_YOUR_SCORE = 'yourScore';
+		var STR_YOUR_SCORE = 'yourScore';
 
-		const TPL_LABEL_SCORE = '{description} ({totalEntries} {voteLabel})';
-		const TPL_LABEL_SCORE_STACKED = '({totalEntries} {voteLabel})';
+		var TPL_LABEL_SCORE = '{description} ({totalEntries} {voteLabel})';
+		var TPL_LABEL_SCORE_STACKED = '({totalEntries} {voteLabel})';
 
-		const buffer = [];
+		var buffer = [];
 
-		const Ratings = A.Component.create({
+		var Ratings = A.Component.create({
 			_INSTANCES: {},
 
 			_registerRating(config) {
-				const instance = this;
+				var instance = this;
 
-				let ratings = null;
+				var ratings = null;
 
 				if (config.type === 'like') {
 					ratings = Liferay.Ratings.LikeRating;
@@ -66,7 +66,7 @@ AUI.add(
 					ratings = Liferay.Ratings.ThumbRating;
 				}
 
-				let ratingInstance = null;
+				var ratingInstance = null;
 
 				if (ratings && document.getElementById(config.containerId)) {
 					ratingInstance = new ratings(config);
@@ -81,12 +81,12 @@ AUI.add(
 
 			_registerTask: A.debounce(() => {
 				buffer.forEach((item) => {
-					const handle = item.container.on(
+					var handle = item.container.on(
 						EVENT_INTERACTIONS_RENDER,
 						(event) => {
 							handle.detach();
 
-							const config = item.config;
+							var config = item.config;
 
 							config.initialFocus = event.type === 'focus';
 
@@ -100,8 +100,8 @@ AUI.add(
 
 			_thumbScoreMap: {
 				'-1': -1,
-				'down': 0,
-				'up': 1,
+				down: 0,
+				up: 1,
 			},
 
 			ATTRS: {
@@ -127,9 +127,9 @@ AUI.add(
 
 				yourScore: {
 					getter(value) {
-						const instance = this;
+						var instance = this;
 
-						let yourScore = value;
+						var yourScore = value;
 
 						if (
 							(instance.get('type') === 'stars' ||
@@ -148,7 +148,7 @@ AUI.add(
 
 			prototype: {
 				_bindRatings() {
-					const instance = this;
+					var instance = this;
 
 					instance.ratings.after(
 						'itemSelect',
@@ -158,7 +158,7 @@ AUI.add(
 				},
 
 				_convertToIndex(score) {
-					let scoreIndex = -1;
+					var scoreIndex = -1;
 
 					if (score === 1.0) {
 						scoreIndex = 0;
@@ -171,7 +171,7 @@ AUI.add(
 				},
 
 				_fixScore(score) {
-					let prefix = '';
+					var prefix = '';
 
 					if (score > 0) {
 						prefix = '+';
@@ -181,9 +181,9 @@ AUI.add(
 				},
 
 				_getLabel(description, totalEntries) {
-					const instance = this;
+					var instance = this;
 
-					let tplLabel = '';
+					var tplLabel = '';
 
 					if (instance.get('type') === 'stacked-stars') {
 						tplLabel = TPL_LABEL_SCORE_STACKED;
@@ -192,7 +192,7 @@ AUI.add(
 						tplLabel = TPL_LABEL_SCORE;
 					}
 
-					let voteLabel = '';
+					var voteLabel = '';
 
 					if (totalEntries === 1) {
 						voteLabel = Liferay.Language.get('vote');
@@ -213,7 +213,7 @@ AUI.add(
 				_renderRatings: EMPTY_FN,
 
 				_sendVoteRequest(url, score, callback) {
-					const instance = this;
+					var instance = this;
 
 					Liferay.fire('ratings:vote', {
 						className: instance.get('className'),
@@ -222,7 +222,7 @@ AUI.add(
 						score,
 					});
 
-					const data = {
+					var data = {
 						className: instance.get('className'),
 						classPK: instance.get('classPK'),
 						p_auth: Liferay.authToken,
@@ -239,11 +239,11 @@ AUI.add(
 				},
 
 				_showScoreTooltip(event) {
-					const instance = this;
+					var instance = this;
 
-					let message = '';
+					var message = '';
 
-					const stars = instance._ratingScoreNode
+					var stars = instance._ratingScoreNode
 						.all('.icon-star-on')
 						.size();
 
@@ -254,20 +254,20 @@ AUI.add(
 						message = Liferay.Language.get('stars');
 					}
 
-					const currentTarget = event.currentTarget.getDOM();
+					var currentTarget = event.currentTarget.getDOM();
 
 					currentTarget.setAttribute('title', stars + ' ' + message);
 				},
 
 				_updateAverageScoreText(averageScore) {
-					const instance = this;
+					var instance = this;
 
-					const firstNode = instance._ratingScoreNode.one(
+					var firstNode = instance._ratingScoreNode.one(
 						SELECTOR_RATING_ELEMENT
 					);
 
 					if (firstNode) {
-						let message = '';
+						var message = '';
 
 						if (averageScore === 1.0) {
 							message = Liferay.Language.get(
@@ -280,7 +280,7 @@ AUI.add(
 							);
 						}
 
-						const averageRatingText = Lang.sub(message, [
+						var averageRatingText = Lang.sub(message, [
 							averageScore,
 							instance.get(STR_SIZE),
 						]);
@@ -290,15 +290,13 @@ AUI.add(
 				},
 
 				_updateScoreText(score) {
-					const instance = this;
+					var instance = this;
 
-					const nodes = instance._ratingStarNode.all(
-						'.rating-element'
-					);
+					var nodes = instance._ratingStarNode.all('.rating-element');
 
 					nodes.each((node, i) => {
-						let ratingMessage = '';
-						let ratingScore = '';
+						var ratingMessage = '';
+						var ratingScore = '';
 
 						if (score === i + 1) {
 							ratingMessage =
@@ -334,18 +332,18 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._renderRatings();
 				},
 			},
 
 			register(config) {
-				const instance = this;
+				var instance = this;
 
-				const containerId = config.containerId;
+				var containerId = config.containerId;
 
-				const container =
+				var container =
 					containerId && document.getElementById(config.containerId);
 
 				if (container) {
@@ -362,7 +360,7 @@ AUI.add(
 			},
 		});
 
-		const StarRating = A.Component.create({
+		var StarRating = A.Component.create({
 			ATTRS: {
 				initialFocus: {
 					validator: Lang.isBoolean,
@@ -373,12 +371,12 @@ AUI.add(
 
 			prototype: {
 				_itemSelect() {
-					const instance = this;
+					var instance = this;
 
-					const score =
+					var score =
 						(instance.ratings.get('selectedIndex') + 1) /
 						instance.get(STR_SIZE);
-					const uri = instance.get(STR_URI);
+					var uri = instance.get(STR_URI);
 
 					instance._sendVoteRequest(
 						uri,
@@ -388,9 +386,9 @@ AUI.add(
 				},
 
 				_renderRatings() {
-					const instance = this;
+					var instance = this;
 
-					const namespace = instance.get(STR_NAMESPACE);
+					var namespace = instance.get(STR_NAMESPACE);
 
 					instance._ratingScoreNode = A.one(
 						'#' + namespace + 'ratingScoreContent'
@@ -400,7 +398,7 @@ AUI.add(
 					);
 
 					if (themeDisplay.isSignedIn()) {
-						const yourScore =
+						var yourScore =
 							instance.get(STR_YOUR_SCORE) *
 							instance.get(STR_SIZE);
 
@@ -432,35 +430,35 @@ AUI.add(
 				},
 
 				_saveCallback(response) {
-					const instance = this;
+					var instance = this;
 
-					const description = Liferay.Language.get('average');
+					var description = Liferay.Language.get('average');
 
-					const averageScore =
+					var averageScore =
 						response.averageScore * instance.get(STR_SIZE);
 
-					const score = response.score * instance.get(STR_SIZE);
+					var score = response.score * instance.get(STR_SIZE);
 
-					const label = instance._getLabel(
+					var label = instance._getLabel(
 						description,
 						response.totalEntries
 					);
 
-					const formattedAverageScore = averageScore.toFixed(1);
+					var formattedAverageScore = averageScore.toFixed(1);
 
-					const averageIndex = instance.get('round')
+					var averageIndex = instance.get('round')
 						? Math.round(formattedAverageScore)
 						: Math.floor(formattedAverageScore);
 
-					const ratingScore = instance._ratingScoreNode;
+					var ratingScore = instance._ratingScoreNode;
 
 					ratingScore.one('.rating-label').html(label);
 
 					ratingScore
 						.all(SELECTOR_RATING_ELEMENT)
 						.each((item, index) => {
-							let fromCssClass = CSS_ICON_STAR;
-							let toCssClass = CSS_ICON_STAR_EMPTY;
+							var fromCssClass = CSS_ICON_STAR;
+							var toCssClass = CSS_ICON_STAR_EMPTY;
 
 							if (index < averageIndex) {
 								fromCssClass = CSS_ICON_STAR_EMPTY;
@@ -476,7 +474,7 @@ AUI.add(
 			},
 		});
 
-		const ThumbRating = A.Component.create({
+		var ThumbRating = A.Component.create({
 			ATTRS: {
 				initialFocus: {
 					validator: Lang.isBoolean,
@@ -487,9 +485,9 @@ AUI.add(
 
 			prototype: {
 				_createRating() {
-					const instance = this;
+					var instance = this;
 
-					const namespace = instance.get(STR_NAMESPACE);
+					var namespace = instance.get(STR_NAMESPACE);
 
 					instance.ratings = new A.ThumbRating({
 						boundingBox: '#' + namespace + 'ratingThumb',
@@ -506,9 +504,9 @@ AUI.add(
 				},
 
 				_getThumbScores(entries, score) {
-					const positiveVotes = Math.floor(score);
+					var positiveVotes = Math.floor(score);
 
-					const negativeVotes = entries - positiveVotes;
+					var negativeVotes = entries - positiveVotes;
 
 					return {
 						negativeVotes,
@@ -517,12 +515,12 @@ AUI.add(
 				},
 
 				_itemSelect() {
-					const instance = this;
+					var instance = this;
 
-					const uri = instance.get(STR_URI);
-					const value = instance.ratings.get('value');
+					var uri = instance.get(STR_URI);
+					var value = instance.ratings.get('value');
 
-					const score = Liferay.Ratings._thumbScoreMap[value];
+					var score = Liferay.Ratings._thumbScoreMap[value];
 
 					instance._sendVoteRequest(
 						uri,
@@ -532,16 +530,16 @@ AUI.add(
 				},
 
 				_renderRatings() {
-					const instance = this;
+					var instance = this;
 
 					if (themeDisplay.isSignedIn()) {
-						const yourScore = instance.get(STR_YOUR_SCORE);
+						var yourScore = instance.get(STR_YOUR_SCORE);
 
-						const yourScoreIndex = instance._convertToIndex(
+						var yourScoreIndex = instance._convertToIndex(
 							yourScore
 						);
 
-						const namespace = instance.get(STR_NAMESPACE);
+						var namespace = instance.get(STR_NAMESPACE);
 
 						instance._createRating();
 
@@ -556,9 +554,9 @@ AUI.add(
 				},
 
 				_saveCallback(response) {
-					const instance = this;
+					var instance = this;
 
-					const thumbScore = instance._getThumbScores(
+					var thumbScore = instance._getThumbScores(
 						response.totalEntries,
 						response.totalScore
 					);
@@ -567,15 +565,15 @@ AUI.add(
 				},
 
 				_updateScores(thumbScore) {
-					const instance = this;
+					var instance = this;
 
-					const ratings = instance.ratings;
+					var ratings = instance.ratings;
 
-					const cssClasses = ratings.get('cssClasses');
-					const elements = ratings.get('elements');
+					var cssClasses = ratings.get('cssClasses');
+					var elements = ratings.get('elements');
 
-					const ratingThumbDown = elements.item(1);
-					const ratingThumbUp = elements.item(0);
+					var ratingThumbDown = elements.item(1);
+					var ratingThumbUp = elements.item(0);
 
 					if (
 						isNaN(thumbScore.negativeVotes) &&
@@ -603,9 +601,9 @@ AUI.add(
 						ratings.set('disabled', true);
 					}
 					else {
-						const cssClassesOn = cssClasses.on;
+						var cssClassesOn = cssClasses.on;
 
-						let ratingThumbDownCssClassOn = false;
+						var ratingThumbDownCssClassOn = false;
 
 						if (ratingThumbDown) {
 							ratingThumbDownCssClassOn = ratingThumbDown.hasClass(
@@ -613,7 +611,7 @@ AUI.add(
 							);
 						}
 
-						let ratingThumbUpCssClassOn = false;
+						var ratingThumbUpCssClassOn = false;
 
 						if (ratingThumbUp) {
 							ratingThumbUpCssClassOn = ratingThumbUp.hasClass(
@@ -621,8 +619,8 @@ AUI.add(
 							);
 						}
 
-						let thumbDownMessage = '';
-						let thumbUpMessage = '';
+						var thumbDownMessage = '';
+						var thumbUpMessage = '';
 
 						if (ratingThumbDown) {
 							if (ratingThumbDownCssClassOn) {
@@ -683,20 +681,20 @@ AUI.add(
 			},
 		});
 
-		const LikeRatingImpl = A.Component.create({
+		var LikeRatingImpl = A.Component.create({
 			EXTENDS: A.ThumbRating,
 
 			NAME: 'LikeRatingImpl',
 
 			prototype: {
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
-					const cssClasses = instance.get('cssClasses');
+					var cssClasses = instance.get('cssClasses');
 
 					A.ThumbRating.superclass.renderUI.apply(this, arguments);
 
-					const elements = instance.get('elements');
+					var elements = instance.get('elements');
 
 					elements.addClass(cssClasses.off);
 					elements.item(0).addClass(cssClasses.up);
@@ -704,16 +702,16 @@ AUI.add(
 			},
 		});
 
-		const LikeRating = A.Component.create({
+		var LikeRating = A.Component.create({
 			EXTENDS: ThumbRating,
 
 			NAME: 'LikeRating',
 
 			prototype: {
 				_createRating() {
-					const instance = this;
+					var instance = this;
 
-					const namespace = instance.get(STR_NAMESPACE);
+					var namespace = instance.get(STR_NAMESPACE);
 
 					instance.ratings = new LikeRatingImpl({
 						boundingBox: '#' + namespace + 'ratingLike',

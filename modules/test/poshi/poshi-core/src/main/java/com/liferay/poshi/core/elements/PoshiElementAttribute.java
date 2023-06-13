@@ -73,27 +73,15 @@ public class PoshiElementAttribute
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(getName());
+		sb.append(" = \"");
 
 		String value = getValue();
 
-		PoshiElement parentPoshiElement = (PoshiElement)getParent();
-
-		if ((parentPoshiElement instanceof CommandPoshiElement ||
-			 parentPoshiElement instanceof DefinitionPoshiElement) &&
-			value.equals("")) {
-
-			return sb.toString();
-		}
-
-		sb.append(" = ");
-
-		value = value.replace("\"", "\\\"");
-
-		if (parentPoshiElement.isQuotedContent(value)) {
-			value = "\"" + value + "\"";
-		}
+		value = value.replaceAll("\"", "&quot;");
 
 		sb.append(value);
+
+		sb.append("\"");
 
 		return sb.toString();
 	}
@@ -104,25 +92,7 @@ public class PoshiElementAttribute
 			return;
 		}
 
-		String originalPoshiScript = getPoshiScript();
-
-		originalPoshiScript = originalPoshiScript.replaceAll("\\s+", "");
-
-		String generatedPoshiScript = toPoshiScript();
-
-		generatedPoshiScript = generatedPoshiScript.replaceAll("\\s+", "");
-
-		if (!originalPoshiScript.equals(generatedPoshiScript)) {
-			originalPoshiScript = originalPoshiScript.replaceFirst("\"", "");
-
-			originalPoshiScript = originalPoshiScript.substring(
-				0, originalPoshiScript.length() - 1);
-
-			if (!originalPoshiScript.equals(generatedPoshiScript)) {
-				throw new PoshiScriptParserException(
-					PoshiScriptParserException.TRANSLATION_LOSS_MESSAGE, this);
-			}
-		}
+		PoshiNode.super.validatePoshiScript();
 	}
 
 	private String _poshiScript;

@@ -43,7 +43,6 @@ long previewClassNameId = ParamUtil.getLong(request, "previewClassNameId");
 long previewClassPK = ParamUtil.getLong(request, "previewClassPK");
 
 boolean print = GetterUtil.getBoolean(request.getAttribute("view.jsp-print"));
-boolean viewSingleAsset = ParamUtil.getBoolean(request, "viewSingleAsset", true);
 
 assetPublisherDisplayContext.setLayoutAssetEntry(assetEntry);
 
@@ -57,7 +56,7 @@ if (print) {
 	viewFullContentURL.setParameter("viewMode", Constants.PRINT);
 }
 
-String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletRequest, liferayPortletResponse, HttpComponentsUtil.setParameter(viewFullContentURL.toString(), "redirect", currentURL));
+String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletRequest, liferayPortletResponse, HttpUtil.setParameter(viewFullContentURL.toString(), "redirect", currentURL));
 
 Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 	"fragments-editor-item-id", PortalUtil.getClassNameId(assetRenderer.getClassName()) + "-" + assetRenderer.getClassPK()
@@ -96,12 +95,11 @@ Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 		<div class="align-items-center d-flex mb-2">
 			<p class="component-title h4">
 				<c:if test="<%= showBackURL && Validator.isNotNull(redirect) %>">
-					<clay:link
-						aria-label='<%= LanguageUtil.get(request, "back") %>'
-						cssClass="header-back-to lfr-portal-tooltip"
-						href="<%= redirect %>"
+					<liferay-ui:icon
+						cssClass="header-back-to"
 						icon="angle-left"
-						title='<%= LanguageUtil.get(request, "back") %>'
+						markupView="lexicon"
+						url="<%= redirect %>"
 					/>
 				</c:if>
 
@@ -257,20 +255,12 @@ Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 	</c:if>
 
 	<%
-	boolean showContextLink = false;
-
-	if (viewSingleAsset) {
-		showContextLink = assetPublisherDisplayContext.isShowContextLink(assetRenderer.getGroupId(), assetRendererFactory.getPortletId()) && !print && assetEntry.isVisible();
-	}
-	else {
-		showContextLink = assetPublisherDisplayContext.isShowContextLink() && !print && assetEntry.isVisible();
-	}
-
+	boolean showContextLink = assetPublisherDisplayContext.isShowContextLink() && !print && assetEntry.isVisible();
 	boolean showRatings = assetPublisherDisplayContext.isEnableRatings() && assetRenderer.isRatable();
 	%>
 
 	<c:if test="<%= showContextLink || showRatings || assetPublisherDisplayContext.isEnableFlags() || assetPublisherDisplayContext.isEnablePrint() || Validator.isNotNull(assetPublisherDisplayContext.getSocialBookmarksTypes()) %>">
-		<hr class="separator" />
+		<div class="separator"><!-- --></div>
 
 		<clay:content-row
 			cssClass="asset-details"
@@ -323,21 +313,14 @@ Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 				<clay:content-col
 					cssClass="component-subtitle mr-3 print-action"
 				>
-
-					<%
-					String label = LanguageUtil.format(request, "print-x", HtmlUtil.escape(title));
-					%>
-
 					<c:choose>
 						<c:when test="<%= print %>">
-							<clay:button
-								aria-label="<%= label %>"
-								borderless="<%= true %>"
-								displayType="secondary"
+							<liferay-ui:icon
 								icon="print"
-								onClick="javascript:print();"
-								small="<%= true %>"
-								type="button"
+								linkCssClass="btn btn-monospaced btn-outline-borderless btn-outline-secondary btn-sm"
+								markupView="lexicon"
+								message='<%= LanguageUtil.format(request, "print-x-x", new Object[] {"hide-accessible", HtmlUtil.escape(title)}, false) %>'
+								url="javascript:print();"
 							/>
 
 							<aui:script>
@@ -350,14 +333,12 @@ Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 							String id = assetEntry.getEntryId() + StringUtil.randomId();
 							%>
 
-							<clay:button
-								aria-label="<%= label %>"
-								borderless="<%= true %>"
-								displayType="secondary"
+							<liferay-ui:icon
 								icon="print"
-								onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "printPage_" + id + "();" %>'
-								small="<%= true %>"
-								type="button"
+								linkCssClass="btn btn-monospaced btn-outline-borderless btn-outline-secondary btn-sm"
+								markupView="lexicon"
+								message='<%= LanguageUtil.format(request, "print-x-x", new Object[] {"hide-accessible", HtmlUtil.escape(title)}, false) %>'
+								url='<%= "javascript:" + liferayPortletResponse.getNamespace() + "printPage_" + id + "();" %>'
 							/>
 
 							<aui:script>
@@ -399,7 +380,7 @@ Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 						target="_blank"
 						title="<%= title %>"
 						types="<%= assetPublisherDisplayContext.getSocialBookmarksTypes() %>"
-						url="<%= assetPublisherHelper.getAssetSocialURL(liferayPortletRequest, liferayPortletResponse, assetEntry) %>"
+						urlImpl="<%= viewFullContentURL %>"
 					/>
 				</clay:content-col>
 			</c:if>
@@ -412,7 +393,7 @@ Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 	%>
 
 	<c:if test="<%= showConversions || showLocalization %>">
-		<hr class="separator" />
+		<div class="separator"><!-- --></div>
 
 		<clay:content-row
 			cssClass="asset-details"

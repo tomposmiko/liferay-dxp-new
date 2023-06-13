@@ -30,6 +30,7 @@ import com.liferay.social.kernel.model.SocialRelationModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -240,93 +241,100 @@ public class SocialRelationModelImpl
 	public Map<String, Function<SocialRelation, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<SocialRelation, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, SocialRelation>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<SocialRelation, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SocialRelation.class.getClassLoader(), SocialRelation.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<SocialRelation, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<SocialRelation, Object>>();
+		try {
+			Constructor<SocialRelation> constructor =
+				(Constructor<SocialRelation>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", SocialRelation::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", SocialRelation::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", SocialRelation::getUuid);
-			attributeGetterFunctions.put(
-				"relationId", SocialRelation::getRelationId);
-			attributeGetterFunctions.put(
-				"companyId", SocialRelation::getCompanyId);
-			attributeGetterFunctions.put(
-				"createDate", SocialRelation::getCreateDate);
-			attributeGetterFunctions.put("userId1", SocialRelation::getUserId1);
-			attributeGetterFunctions.put("userId2", SocialRelation::getUserId2);
-			attributeGetterFunctions.put("type", SocialRelation::getType);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<SocialRelation, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<SocialRelation, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<SocialRelation, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<SocialRelation, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<SocialRelation, Object>>();
+		Map<String, BiConsumer<SocialRelation, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<SocialRelation, ?>>();
 
-		static {
-			Map<String, BiConsumer<SocialRelation, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<SocialRelation, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", SocialRelation::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<SocialRelation, Long>)SocialRelation::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SocialRelation::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<SocialRelation, Long>)
+				SocialRelation::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", SocialRelation::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<SocialRelation, String>)SocialRelation::setUuid);
+		attributeGetterFunctions.put(
+			"relationId", SocialRelation::getRelationId);
+		attributeSetterBiConsumers.put(
+			"relationId",
+			(BiConsumer<SocialRelation, Long>)SocialRelation::setRelationId);
+		attributeGetterFunctions.put("companyId", SocialRelation::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<SocialRelation, Long>)SocialRelation::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", SocialRelation::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<SocialRelation, Long>)SocialRelation::setCreateDate);
+		attributeGetterFunctions.put("userId1", SocialRelation::getUserId1);
+		attributeSetterBiConsumers.put(
+			"userId1",
+			(BiConsumer<SocialRelation, Long>)SocialRelation::setUserId1);
+		attributeGetterFunctions.put("userId2", SocialRelation::getUserId2);
+		attributeSetterBiConsumers.put(
+			"userId2",
+			(BiConsumer<SocialRelation, Long>)SocialRelation::setUserId2);
+		attributeGetterFunctions.put("type", SocialRelation::getType);
+		attributeSetterBiConsumers.put(
+			"type",
+			(BiConsumer<SocialRelation, Integer>)SocialRelation::setType);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<SocialRelation, Long>)
-					SocialRelation::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<SocialRelation, Long>)
-					SocialRelation::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<SocialRelation, String>)SocialRelation::setUuid);
-			attributeSetterBiConsumers.put(
-				"relationId",
-				(BiConsumer<SocialRelation, Long>)
-					SocialRelation::setRelationId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<SocialRelation, Long>)SocialRelation::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<SocialRelation, Long>)
-					SocialRelation::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"userId1",
-				(BiConsumer<SocialRelation, Long>)SocialRelation::setUserId1);
-			attributeSetterBiConsumers.put(
-				"userId2",
-				(BiConsumer<SocialRelation, Long>)SocialRelation::setUserId2);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<SocialRelation, Integer>)SocialRelation::setType);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -752,12 +760,41 @@ public class SocialRelationModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<SocialRelation, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<SocialRelation, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<SocialRelation, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((SocialRelation)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SocialRelation>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SocialRelation.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -775,8 +812,7 @@ public class SocialRelationModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<SocialRelation, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

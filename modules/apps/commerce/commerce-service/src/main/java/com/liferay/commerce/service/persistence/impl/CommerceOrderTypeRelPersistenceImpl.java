@@ -14,17 +14,13 @@
 
 package com.liferay.commerce.service.persistence.impl;
 
-import com.liferay.commerce.exception.DuplicateCommerceOrderTypeRelExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderTypeRelException;
 import com.liferay.commerce.model.CommerceOrderTypeRel;
 import com.liferay.commerce.model.CommerceOrderTypeRelTable;
 import com.liferay.commerce.model.impl.CommerceOrderTypeRelImpl;
 import com.liferay.commerce.model.impl.CommerceOrderTypeRelModelImpl;
 import com.liferay.commerce.service.persistence.CommerceOrderTypeRelPersistence;
-import com.liferay.commerce.service.persistence.CommerceOrderTypeRelUtil;
-import com.liferay.commerce.service.persistence.impl.constants.CommercePersistenceConstants;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -32,7 +28,6 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -44,28 +39,19 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the commerce order type rel service.
@@ -77,7 +63,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(service = CommerceOrderTypeRelPersistence.class)
 public class CommerceOrderTypeRelPersistenceImpl
 	extends BasePersistenceImpl<CommerceOrderTypeRel>
 	implements CommerceOrderTypeRelPersistence {
@@ -99,1133 +84,6 @@ public class CommerceOrderTypeRelPersistenceImpl
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
-	private FinderPath _finderPathWithPaginationFindByUuid;
-	private FinderPath _finderPathWithoutPaginationFindByUuid;
-	private FinderPath _finderPathCountByUuid;
-
-	/**
-	 * Returns all the commerce order type rels where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid(String uuid) {
-		return findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-	}
-
-	/**
-	 * Returns a range of all the commerce order type rels where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderTypeRelModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce order type rels
-	 * @param end the upper bound of the range of commerce order type rels (not inclusive)
-	 * @return the range of matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid(
-		String uuid, int start, int end) {
-
-		return findByUuid(uuid, start, end, null);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce order type rels where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderTypeRelModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce order type rels
-	 * @param end the upper bound of the range of commerce order type rels (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator) {
-
-		return findByUuid(uuid, start, end, orderByComparator, true);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce order type rels where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderTypeRelModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of commerce order type rels
-	 * @param end the upper bound of the range of commerce order type rels (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator,
-		boolean useFinderCache) {
-
-		uuid = Objects.toString(uuid, "");
-
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
-
-		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
-			if (useFinderCache) {
-				finderPath = _finderPathWithoutPaginationFindByUuid;
-				finderArgs = new Object[] {uuid};
-			}
-		}
-		else if (useFinderCache) {
-			finderPath = _finderPathWithPaginationFindByUuid;
-			finderArgs = new Object[] {uuid, start, end, orderByComparator};
-		}
-
-		List<CommerceOrderTypeRel> list = null;
-
-		if (useFinderCache) {
-			list = (List<CommerceOrderTypeRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
-
-			if ((list != null) && !list.isEmpty()) {
-				for (CommerceOrderTypeRel commerceOrderTypeRel : list) {
-					if (!uuid.equals(commerceOrderTypeRel.getUuid())) {
-						list = null;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (list == null) {
-			StringBundler sb = null;
-
-			if (orderByComparator != null) {
-				sb = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
-			}
-			else {
-				sb = new StringBundler(3);
-			}
-
-			sb.append(_SQL_SELECT_COMMERCEORDERTYPEREL_WHERE);
-
-			boolean bindUuid = false;
-
-			if (uuid.isEmpty()) {
-				sb.append(_FINDER_COLUMN_UUID_UUID_3);
-			}
-			else {
-				bindUuid = true;
-
-				sb.append(_FINDER_COLUMN_UUID_UUID_2);
-			}
-
-			if (orderByComparator != null) {
-				appendOrderByComparator(
-					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
-			}
-			else {
-				sb.append(CommerceOrderTypeRelModelImpl.ORDER_BY_JPQL);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindUuid) {
-					queryPos.add(uuid);
-				}
-
-				list = (List<CommerceOrderTypeRel>)QueryUtil.list(
-					query, getDialect(), start, end);
-
-				cacheResult(list);
-
-				if (useFinderCache) {
-					finderCache.putResult(finderPath, finderArgs, list);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return list;
-	}
-
-	/**
-	 * Returns the first commerce order type rel in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce order type rel
-	 * @throws NoSuchOrderTypeRelException if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel findByUuid_First(
-			String uuid,
-			OrderByComparator<CommerceOrderTypeRel> orderByComparator)
-		throws NoSuchOrderTypeRelException {
-
-		CommerceOrderTypeRel commerceOrderTypeRel = fetchByUuid_First(
-			uuid, orderByComparator);
-
-		if (commerceOrderTypeRel != null) {
-			return commerceOrderTypeRel;
-		}
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("uuid=");
-		sb.append(uuid);
-
-		sb.append("}");
-
-		throw new NoSuchOrderTypeRelException(sb.toString());
-	}
-
-	/**
-	 * Returns the first commerce order type rel in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel fetchByUuid_First(
-		String uuid,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator) {
-
-		List<CommerceOrderTypeRel> list = findByUuid(
-			uuid, 0, 1, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the last commerce order type rel in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce order type rel
-	 * @throws NoSuchOrderTypeRelException if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel findByUuid_Last(
-			String uuid,
-			OrderByComparator<CommerceOrderTypeRel> orderByComparator)
-		throws NoSuchOrderTypeRelException {
-
-		CommerceOrderTypeRel commerceOrderTypeRel = fetchByUuid_Last(
-			uuid, orderByComparator);
-
-		if (commerceOrderTypeRel != null) {
-			return commerceOrderTypeRel;
-		}
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("uuid=");
-		sb.append(uuid);
-
-		sb.append("}");
-
-		throw new NoSuchOrderTypeRelException(sb.toString());
-	}
-
-	/**
-	 * Returns the last commerce order type rel in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel fetchByUuid_Last(
-		String uuid,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator) {
-
-		int count = countByUuid(uuid);
-
-		if (count == 0) {
-			return null;
-		}
-
-		List<CommerceOrderTypeRel> list = findByUuid(
-			uuid, count - 1, count, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the commerce order type rels before and after the current commerce order type rel in the ordered set where uuid = &#63;.
-	 *
-	 * @param commerceOrderTypeRelId the primary key of the current commerce order type rel
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next commerce order type rel
-	 * @throws NoSuchOrderTypeRelException if a commerce order type rel with the primary key could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel[] findByUuid_PrevAndNext(
-			long commerceOrderTypeRelId, String uuid,
-			OrderByComparator<CommerceOrderTypeRel> orderByComparator)
-		throws NoSuchOrderTypeRelException {
-
-		uuid = Objects.toString(uuid, "");
-
-		CommerceOrderTypeRel commerceOrderTypeRel = findByPrimaryKey(
-			commerceOrderTypeRelId);
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			CommerceOrderTypeRel[] array = new CommerceOrderTypeRelImpl[3];
-
-			array[0] = getByUuid_PrevAndNext(
-				session, commerceOrderTypeRel, uuid, orderByComparator, true);
-
-			array[1] = commerceOrderTypeRel;
-
-			array[2] = getByUuid_PrevAndNext(
-				session, commerceOrderTypeRel, uuid, orderByComparator, false);
-
-			return array;
-		}
-		catch (Exception exception) {
-			throw processException(exception);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	protected CommerceOrderTypeRel getByUuid_PrevAndNext(
-		Session session, CommerceOrderTypeRel commerceOrderTypeRel, String uuid,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator,
-		boolean previous) {
-
-		StringBundler sb = null;
-
-		if (orderByComparator != null) {
-			sb = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
-					(orderByComparator.getOrderByFields().length * 3));
-		}
-		else {
-			sb = new StringBundler(3);
-		}
-
-		sb.append(_SQL_SELECT_COMMERCEORDERTYPEREL_WHERE);
-
-		boolean bindUuid = false;
-
-		if (uuid.isEmpty()) {
-			sb.append(_FINDER_COLUMN_UUID_UUID_3);
-		}
-		else {
-			bindUuid = true;
-
-			sb.append(_FINDER_COLUMN_UUID_UUID_2);
-		}
-
-		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
-
-			if (orderByConditionFields.length > 0) {
-				sb.append(WHERE_AND);
-			}
-
-			for (int i = 0; i < orderByConditionFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByConditionFields[i]);
-
-				if ((i + 1) < orderByConditionFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN);
-					}
-				}
-			}
-
-			sb.append(ORDER_BY_CLAUSE);
-
-			String[] orderByFields = orderByComparator.getOrderByFields();
-
-			for (int i = 0; i < orderByFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByFields[i]);
-
-				if ((i + 1) < orderByFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC_HAS_NEXT);
-					}
-					else {
-						sb.append(ORDER_BY_DESC_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC);
-					}
-					else {
-						sb.append(ORDER_BY_DESC);
-					}
-				}
-			}
-		}
-		else {
-			sb.append(CommerceOrderTypeRelModelImpl.ORDER_BY_JPQL);
-		}
-
-		String sql = sb.toString();
-
-		Query query = session.createQuery(sql);
-
-		query.setFirstResult(0);
-		query.setMaxResults(2);
-
-		QueryPos queryPos = QueryPos.getInstance(query);
-
-		if (bindUuid) {
-			queryPos.add(uuid);
-		}
-
-		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						commerceOrderTypeRel)) {
-
-				queryPos.add(orderByConditionValue);
-			}
-		}
-
-		List<CommerceOrderTypeRel> list = query.list();
-
-		if (list.size() == 2) {
-			return list.get(1);
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
-	 * Removes all the commerce order type rels where uuid = &#63; from the database.
-	 *
-	 * @param uuid the uuid
-	 */
-	@Override
-	public void removeByUuid(String uuid) {
-		for (CommerceOrderTypeRel commerceOrderTypeRel :
-				findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
-			remove(commerceOrderTypeRel);
-		}
-	}
-
-	/**
-	 * Returns the number of commerce order type rels where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the number of matching commerce order type rels
-	 */
-	@Override
-	public int countByUuid(String uuid) {
-		uuid = Objects.toString(uuid, "");
-
-		FinderPath finderPath = _finderPathCountByUuid;
-
-		Object[] finderArgs = new Object[] {uuid};
-
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(2);
-
-			sb.append(_SQL_COUNT_COMMERCEORDERTYPEREL_WHERE);
-
-			boolean bindUuid = false;
-
-			if (uuid.isEmpty()) {
-				sb.append(_FINDER_COLUMN_UUID_UUID_3);
-			}
-			else {
-				bindUuid = true;
-
-				sb.append(_FINDER_COLUMN_UUID_UUID_2);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindUuid) {
-					queryPos.add(uuid);
-				}
-
-				count = (Long)query.uniqueResult();
-
-				finderCache.putResult(finderPath, finderArgs, count);
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String _FINDER_COLUMN_UUID_UUID_2 =
-		"commerceOrderTypeRel.uuid = ?";
-
-	private static final String _FINDER_COLUMN_UUID_UUID_3 =
-		"(commerceOrderTypeRel.uuid IS NULL OR commerceOrderTypeRel.uuid = '')";
-
-	private FinderPath _finderPathWithPaginationFindByUuid_C;
-	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
-	private FinderPath _finderPathCountByUuid_C;
-
-	/**
-	 * Returns all the commerce order type rels where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid_C(
-		String uuid, long companyId) {
-
-		return findByUuid_C(
-			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-	}
-
-	/**
-	 * Returns a range of all the commerce order type rels where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderTypeRelModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce order type rels
-	 * @param end the upper bound of the range of commerce order type rels (not inclusive)
-	 * @return the range of matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
-		return findByUuid_C(uuid, companyId, start, end, null);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce order type rels where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderTypeRelModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce order type rels
-	 * @param end the upper bound of the range of commerce order type rels (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator) {
-
-		return findByUuid_C(
-			uuid, companyId, start, end, orderByComparator, true);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce order type rels where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderTypeRelModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of commerce order type rels
-	 * @param end the upper bound of the range of commerce order type rels (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching commerce order type rels
-	 */
-	@Override
-	public List<CommerceOrderTypeRel> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator,
-		boolean useFinderCache) {
-
-		uuid = Objects.toString(uuid, "");
-
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
-
-		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
-			if (useFinderCache) {
-				finderPath = _finderPathWithoutPaginationFindByUuid_C;
-				finderArgs = new Object[] {uuid, companyId};
-			}
-		}
-		else if (useFinderCache) {
-			finderPath = _finderPathWithPaginationFindByUuid_C;
-			finderArgs = new Object[] {
-				uuid, companyId, start, end, orderByComparator
-			};
-		}
-
-		List<CommerceOrderTypeRel> list = null;
-
-		if (useFinderCache) {
-			list = (List<CommerceOrderTypeRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
-
-			if ((list != null) && !list.isEmpty()) {
-				for (CommerceOrderTypeRel commerceOrderTypeRel : list) {
-					if (!uuid.equals(commerceOrderTypeRel.getUuid()) ||
-						(companyId != commerceOrderTypeRel.getCompanyId())) {
-
-						list = null;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (list == null) {
-			StringBundler sb = null;
-
-			if (orderByComparator != null) {
-				sb = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
-			}
-			else {
-				sb = new StringBundler(4);
-			}
-
-			sb.append(_SQL_SELECT_COMMERCEORDERTYPEREL_WHERE);
-
-			boolean bindUuid = false;
-
-			if (uuid.isEmpty()) {
-				sb.append(_FINDER_COLUMN_UUID_C_UUID_3);
-			}
-			else {
-				bindUuid = true;
-
-				sb.append(_FINDER_COLUMN_UUID_C_UUID_2);
-			}
-
-			sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
-
-			if (orderByComparator != null) {
-				appendOrderByComparator(
-					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
-			}
-			else {
-				sb.append(CommerceOrderTypeRelModelImpl.ORDER_BY_JPQL);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindUuid) {
-					queryPos.add(uuid);
-				}
-
-				queryPos.add(companyId);
-
-				list = (List<CommerceOrderTypeRel>)QueryUtil.list(
-					query, getDialect(), start, end);
-
-				cacheResult(list);
-
-				if (useFinderCache) {
-					finderCache.putResult(finderPath, finderArgs, list);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return list;
-	}
-
-	/**
-	 * Returns the first commerce order type rel in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce order type rel
-	 * @throws NoSuchOrderTypeRelException if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel findByUuid_C_First(
-			String uuid, long companyId,
-			OrderByComparator<CommerceOrderTypeRel> orderByComparator)
-		throws NoSuchOrderTypeRelException {
-
-		CommerceOrderTypeRel commerceOrderTypeRel = fetchByUuid_C_First(
-			uuid, companyId, orderByComparator);
-
-		if (commerceOrderTypeRel != null) {
-			return commerceOrderTypeRel;
-		}
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("uuid=");
-		sb.append(uuid);
-
-		sb.append(", companyId=");
-		sb.append(companyId);
-
-		sb.append("}");
-
-		throw new NoSuchOrderTypeRelException(sb.toString());
-	}
-
-	/**
-	 * Returns the first commerce order type rel in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel fetchByUuid_C_First(
-		String uuid, long companyId,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator) {
-
-		List<CommerceOrderTypeRel> list = findByUuid_C(
-			uuid, companyId, 0, 1, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the last commerce order type rel in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce order type rel
-	 * @throws NoSuchOrderTypeRelException if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel findByUuid_C_Last(
-			String uuid, long companyId,
-			OrderByComparator<CommerceOrderTypeRel> orderByComparator)
-		throws NoSuchOrderTypeRelException {
-
-		CommerceOrderTypeRel commerceOrderTypeRel = fetchByUuid_C_Last(
-			uuid, companyId, orderByComparator);
-
-		if (commerceOrderTypeRel != null) {
-			return commerceOrderTypeRel;
-		}
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("uuid=");
-		sb.append(uuid);
-
-		sb.append(", companyId=");
-		sb.append(companyId);
-
-		sb.append("}");
-
-		throw new NoSuchOrderTypeRelException(sb.toString());
-	}
-
-	/**
-	 * Returns the last commerce order type rel in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel fetchByUuid_C_Last(
-		String uuid, long companyId,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator) {
-
-		int count = countByUuid_C(uuid, companyId);
-
-		if (count == 0) {
-			return null;
-		}
-
-		List<CommerceOrderTypeRel> list = findByUuid_C(
-			uuid, companyId, count - 1, count, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the commerce order type rels before and after the current commerce order type rel in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param commerceOrderTypeRelId the primary key of the current commerce order type rel
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next commerce order type rel
-	 * @throws NoSuchOrderTypeRelException if a commerce order type rel with the primary key could not be found
-	 */
-	@Override
-	public CommerceOrderTypeRel[] findByUuid_C_PrevAndNext(
-			long commerceOrderTypeRelId, String uuid, long companyId,
-			OrderByComparator<CommerceOrderTypeRel> orderByComparator)
-		throws NoSuchOrderTypeRelException {
-
-		uuid = Objects.toString(uuid, "");
-
-		CommerceOrderTypeRel commerceOrderTypeRel = findByPrimaryKey(
-			commerceOrderTypeRelId);
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			CommerceOrderTypeRel[] array = new CommerceOrderTypeRelImpl[3];
-
-			array[0] = getByUuid_C_PrevAndNext(
-				session, commerceOrderTypeRel, uuid, companyId,
-				orderByComparator, true);
-
-			array[1] = commerceOrderTypeRel;
-
-			array[2] = getByUuid_C_PrevAndNext(
-				session, commerceOrderTypeRel, uuid, companyId,
-				orderByComparator, false);
-
-			return array;
-		}
-		catch (Exception exception) {
-			throw processException(exception);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	protected CommerceOrderTypeRel getByUuid_C_PrevAndNext(
-		Session session, CommerceOrderTypeRel commerceOrderTypeRel, String uuid,
-		long companyId,
-		OrderByComparator<CommerceOrderTypeRel> orderByComparator,
-		boolean previous) {
-
-		StringBundler sb = null;
-
-		if (orderByComparator != null) {
-			sb = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
-					(orderByComparator.getOrderByFields().length * 3));
-		}
-		else {
-			sb = new StringBundler(4);
-		}
-
-		sb.append(_SQL_SELECT_COMMERCEORDERTYPEREL_WHERE);
-
-		boolean bindUuid = false;
-
-		if (uuid.isEmpty()) {
-			sb.append(_FINDER_COLUMN_UUID_C_UUID_3);
-		}
-		else {
-			bindUuid = true;
-
-			sb.append(_FINDER_COLUMN_UUID_C_UUID_2);
-		}
-
-		sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
-
-		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
-
-			if (orderByConditionFields.length > 0) {
-				sb.append(WHERE_AND);
-			}
-
-			for (int i = 0; i < orderByConditionFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByConditionFields[i]);
-
-				if ((i + 1) < orderByConditionFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN);
-					}
-				}
-			}
-
-			sb.append(ORDER_BY_CLAUSE);
-
-			String[] orderByFields = orderByComparator.getOrderByFields();
-
-			for (int i = 0; i < orderByFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByFields[i]);
-
-				if ((i + 1) < orderByFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC_HAS_NEXT);
-					}
-					else {
-						sb.append(ORDER_BY_DESC_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC);
-					}
-					else {
-						sb.append(ORDER_BY_DESC);
-					}
-				}
-			}
-		}
-		else {
-			sb.append(CommerceOrderTypeRelModelImpl.ORDER_BY_JPQL);
-		}
-
-		String sql = sb.toString();
-
-		Query query = session.createQuery(sql);
-
-		query.setFirstResult(0);
-		query.setMaxResults(2);
-
-		QueryPos queryPos = QueryPos.getInstance(query);
-
-		if (bindUuid) {
-			queryPos.add(uuid);
-		}
-
-		queryPos.add(companyId);
-
-		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						commerceOrderTypeRel)) {
-
-				queryPos.add(orderByConditionValue);
-			}
-		}
-
-		List<CommerceOrderTypeRel> list = query.list();
-
-		if (list.size() == 2) {
-			return list.get(1);
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
-	 * Removes all the commerce order type rels where uuid = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 */
-	@Override
-	public void removeByUuid_C(String uuid, long companyId) {
-		for (CommerceOrderTypeRel commerceOrderTypeRel :
-				findByUuid_C(
-					uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
-
-			remove(commerceOrderTypeRel);
-		}
-	}
-
-	/**
-	 * Returns the number of commerce order type rels where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the number of matching commerce order type rels
-	 */
-	@Override
-	public int countByUuid_C(String uuid, long companyId) {
-		uuid = Objects.toString(uuid, "");
-
-		FinderPath finderPath = _finderPathCountByUuid_C;
-
-		Object[] finderArgs = new Object[] {uuid, companyId};
-
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append(_SQL_COUNT_COMMERCEORDERTYPEREL_WHERE);
-
-			boolean bindUuid = false;
-
-			if (uuid.isEmpty()) {
-				sb.append(_FINDER_COLUMN_UUID_C_UUID_3);
-			}
-			else {
-				bindUuid = true;
-
-				sb.append(_FINDER_COLUMN_UUID_C_UUID_2);
-			}
-
-			sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindUuid) {
-					queryPos.add(uuid);
-				}
-
-				queryPos.add(companyId);
-
-				count = (Long)query.uniqueResult();
-
-				finderCache.putResult(finderPath, finderArgs, count);
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
-		"commerceOrderTypeRel.uuid = ? AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
-		"(commerceOrderTypeRel.uuid IS NULL OR commerceOrderTypeRel.uuid = '') AND ";
-
-	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
-		"commerceOrderTypeRel.companyId = ?";
-
 	private FinderPath _finderPathWithPaginationFindByCommerceOrderTypeId;
 	private FinderPath _finderPathWithoutPaginationFindByCommerceOrderTypeId;
 	private FinderPath _finderPathCountByCommerceOrderTypeId;
@@ -1328,7 +186,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceOrderTypeRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceOrderTypeRel commerceOrderTypeRel : list) {
@@ -1701,7 +559,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {commerceOrderTypeId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1849,7 +707,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceOrderTypeRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceOrderTypeRel commerceOrderTypeRel : list) {
@@ -2245,7 +1103,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {classNameId, commerceOrderTypeId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2378,8 +1236,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C_C, finderArgs);
 		}
 
 		if (result instanceof CommerceOrderTypeRel) {
@@ -2492,7 +1349,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 			classNameId, classPK, commerceOrderTypeId
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -2546,35 +1403,35 @@ public class CommerceOrderTypeRelPersistenceImpl
 	private static final String _FINDER_COLUMN_C_C_C_COMMERCEORDERTYPEID_2 =
 		"commerceOrderTypeRel.commerceOrderTypeId = ?";
 
-	private FinderPath _finderPathFetchByERC_C;
-	private FinderPath _finderPathCountByERC_C;
+	private FinderPath _finderPathFetchByC_ERC;
+	private FinderPath _finderPathCountByC_ERC;
 
 	/**
-	 * Returns the commerce order type rel where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchOrderTypeRelException</code> if it could not be found.
+	 * Returns the commerce order type rel where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchOrderTypeRelException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching commerce order type rel
 	 * @throws NoSuchOrderTypeRelException if a matching commerce order type rel could not be found
 	 */
 	@Override
-	public CommerceOrderTypeRel findByERC_C(
-			String externalReferenceCode, long companyId)
+	public CommerceOrderTypeRel findByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws NoSuchOrderTypeRelException {
 
-		CommerceOrderTypeRel commerceOrderTypeRel = fetchByERC_C(
-			externalReferenceCode, companyId);
+		CommerceOrderTypeRel commerceOrderTypeRel = fetchByC_ERC(
+			companyId, externalReferenceCode);
 
 		if (commerceOrderTypeRel == null) {
 			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			sb.append("externalReferenceCode=");
-			sb.append(externalReferenceCode);
-
-			sb.append(", companyId=");
+			sb.append("companyId=");
 			sb.append(companyId);
+
+			sb.append(", externalReferenceCode=");
+			sb.append(externalReferenceCode);
 
 			sb.append("}");
 
@@ -2589,54 +1446,53 @@ public class CommerceOrderTypeRelPersistenceImpl
 	}
 
 	/**
-	 * Returns the commerce order type rel where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the commerce order type rel where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
 	 */
 	@Override
-	public CommerceOrderTypeRel fetchByERC_C(
-		String externalReferenceCode, long companyId) {
+	public CommerceOrderTypeRel fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return fetchByERC_C(externalReferenceCode, companyId, true);
+		return fetchByC_ERC(companyId, externalReferenceCode, true);
 	}
 
 	/**
-	 * Returns the commerce order type rel where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the commerce order type rel where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
 	 */
 	@Override
-	public CommerceOrderTypeRel fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
+	public CommerceOrderTypeRel fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		Object[] finderArgs = null;
 
 		if (useFinderCache) {
-			finderArgs = new Object[] {externalReferenceCode, companyId};
+			finderArgs = new Object[] {companyId, externalReferenceCode};
 		}
 
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByERC_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_ERC, finderArgs);
 		}
 
 		if (result instanceof CommerceOrderTypeRel) {
 			CommerceOrderTypeRel commerceOrderTypeRel =
 				(CommerceOrderTypeRel)result;
 
-			if (!Objects.equals(
+			if ((companyId != commerceOrderTypeRel.getCompanyId()) ||
+				!Objects.equals(
 					externalReferenceCode,
-					commerceOrderTypeRel.getExternalReferenceCode()) ||
-				(companyId != commerceOrderTypeRel.getCompanyId())) {
+					commerceOrderTypeRel.getExternalReferenceCode())) {
 
 				result = null;
 			}
@@ -2647,18 +1503,18 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 			sb.append(_SQL_SELECT_COMMERCEORDERTYPEREL_WHERE);
 
+			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
+
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
 			}
-
-			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -2671,21 +1527,38 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
+				queryPos.add(companyId);
+
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
-
-				queryPos.add(companyId);
 
 				List<CommerceOrderTypeRel> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache) {
 						finderCache.putResult(
-							_finderPathFetchByERC_C, finderArgs, list);
+							_finderPathFetchByC_ERC, finderArgs, list);
 					}
 				}
 				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, externalReferenceCode
+								};
+							}
+
+							_log.warn(
+								"CommerceOrderTypeRelPersistenceImpl.fetchByC_ERC(long, String, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
 					CommerceOrderTypeRel commerceOrderTypeRel = list.get(0);
 
 					result = commerceOrderTypeRel;
@@ -2710,57 +1583,57 @@ public class CommerceOrderTypeRelPersistenceImpl
 	}
 
 	/**
-	 * Removes the commerce order type rel where externalReferenceCode = &#63; and companyId = &#63; from the database.
+	 * Removes the commerce order type rel where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the commerce order type rel that was removed
 	 */
 	@Override
-	public CommerceOrderTypeRel removeByERC_C(
-			String externalReferenceCode, long companyId)
+	public CommerceOrderTypeRel removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws NoSuchOrderTypeRelException {
 
-		CommerceOrderTypeRel commerceOrderTypeRel = findByERC_C(
-			externalReferenceCode, companyId);
+		CommerceOrderTypeRel commerceOrderTypeRel = findByC_ERC(
+			companyId, externalReferenceCode);
 
 		return remove(commerceOrderTypeRel);
 	}
 
 	/**
-	 * Returns the number of commerce order type rels where externalReferenceCode = &#63; and companyId = &#63;.
+	 * Returns the number of commerce order type rels where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching commerce order type rels
 	 */
 	@Override
-	public int countByERC_C(String externalReferenceCode, long companyId) {
+	public int countByC_ERC(long companyId, String externalReferenceCode) {
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
-		FinderPath finderPath = _finderPathCountByERC_C;
+		FinderPath finderPath = _finderPathCountByC_ERC;
 
-		Object[] finderArgs = new Object[] {externalReferenceCode, companyId};
+		Object[] finderArgs = new Object[] {companyId, externalReferenceCode};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
 
 			sb.append(_SQL_COUNT_COMMERCEORDERTYPEREL_WHERE);
 
+			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
+
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
 			}
-
-			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -2773,11 +1646,11 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
+				queryPos.add(companyId);
+
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
-
-				queryPos.add(companyId);
 
 				count = (Long)query.uniqueResult();
 
@@ -2794,22 +1667,16 @@ public class CommerceOrderTypeRelPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
-		"commerceOrderTypeRel.externalReferenceCode = ? AND ";
+	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
+		"commerceOrderTypeRel.companyId = ? AND ";
 
-	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
-		"(commerceOrderTypeRel.externalReferenceCode IS NULL OR commerceOrderTypeRel.externalReferenceCode = '') AND ";
+	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
+		"commerceOrderTypeRel.externalReferenceCode = ?";
 
-	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
-		"commerceOrderTypeRel.companyId = ?";
+	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
+		"(commerceOrderTypeRel.externalReferenceCode IS NULL OR commerceOrderTypeRel.externalReferenceCode = '')";
 
 	public CommerceOrderTypeRelPersistenceImpl() {
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-
-		setDBColumnNames(dbColumnNames);
-
 		setModelClass(CommerceOrderTypeRel.class);
 
 		setModelImplClass(CommerceOrderTypeRelImpl.class);
@@ -2839,10 +1706,10 @@ public class CommerceOrderTypeRelPersistenceImpl
 			commerceOrderTypeRel);
 
 		finderCache.putResult(
-			_finderPathFetchByERC_C,
+			_finderPathFetchByC_ERC,
 			new Object[] {
-				commerceOrderTypeRel.getExternalReferenceCode(),
-				commerceOrderTypeRel.getCompanyId()
+				commerceOrderTypeRel.getCompanyId(),
+				commerceOrderTypeRel.getExternalReferenceCode()
 			},
 			commerceOrderTypeRel);
 	}
@@ -2937,13 +1804,13 @@ public class CommerceOrderTypeRelPersistenceImpl
 			_finderPathFetchByC_C_C, args, commerceOrderTypeRelModelImpl);
 
 		args = new Object[] {
-			commerceOrderTypeRelModelImpl.getExternalReferenceCode(),
-			commerceOrderTypeRelModelImpl.getCompanyId()
+			commerceOrderTypeRelModelImpl.getCompanyId(),
+			commerceOrderTypeRelModelImpl.getExternalReferenceCode()
 		};
 
-		finderCache.putResult(_finderPathCountByERC_C, args, Long.valueOf(1));
+		finderCache.putResult(_finderPathCountByC_ERC, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByERC_C, args, commerceOrderTypeRelModelImpl);
+			_finderPathFetchByC_ERC, args, commerceOrderTypeRelModelImpl);
 	}
 
 	/**
@@ -2959,10 +1826,6 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 		commerceOrderTypeRel.setNew(true);
 		commerceOrderTypeRel.setPrimaryKey(commerceOrderTypeRelId);
-
-		String uuid = _portalUUID.generate();
-
-		commerceOrderTypeRel.setUuid(uuid);
 
 		commerceOrderTypeRel.setCompanyId(CompanyThreadLocal.getCompanyId());
 
@@ -3083,44 +1946,6 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 		CommerceOrderTypeRelModelImpl commerceOrderTypeRelModelImpl =
 			(CommerceOrderTypeRelModelImpl)commerceOrderTypeRel;
-
-		if (Validator.isNull(commerceOrderTypeRel.getUuid())) {
-			String uuid = _portalUUID.generate();
-
-			commerceOrderTypeRel.setUuid(uuid);
-		}
-
-		if (Validator.isNull(commerceOrderTypeRel.getExternalReferenceCode())) {
-			commerceOrderTypeRel.setExternalReferenceCode(
-				commerceOrderTypeRel.getUuid());
-		}
-		else {
-			CommerceOrderTypeRel ercCommerceOrderTypeRel = fetchByERC_C(
-				commerceOrderTypeRel.getExternalReferenceCode(),
-				commerceOrderTypeRel.getCompanyId());
-
-			if (isNew) {
-				if (ercCommerceOrderTypeRel != null) {
-					throw new DuplicateCommerceOrderTypeRelExternalReferenceCodeException(
-						"Duplicate commerce order type rel with external reference code " +
-							commerceOrderTypeRel.getExternalReferenceCode() +
-								" and company " +
-									commerceOrderTypeRel.getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceOrderTypeRel != null) &&
-					(commerceOrderTypeRel.getCommerceOrderTypeRelId() !=
-						ercCommerceOrderTypeRel.getCommerceOrderTypeRelId())) {
-
-					throw new DuplicateCommerceOrderTypeRelExternalReferenceCodeException(
-						"Duplicate commerce order type rel with external reference code " +
-							commerceOrderTypeRel.getExternalReferenceCode() +
-								" and company " +
-									commerceOrderTypeRel.getCompanyId());
-				}
-			}
-		}
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -3318,7 +2143,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceOrderTypeRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3388,7 +2213,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3416,11 +2241,6 @@ public class CommerceOrderTypeRelPersistenceImpl
 	}
 
 	@Override
-	public Set<String> getBadColumnNames() {
-		return _badColumnNames;
-	}
-
-	@Override
 	protected EntityCache getEntityCache() {
 		return entityCache;
 	}
@@ -3443,8 +2263,7 @@ public class CommerceOrderTypeRelPersistenceImpl
 	/**
 	 * Initializes the commerce order type rel persistence.
 	 */
-	@Activate
-	public void activate() {
+	public void afterPropertiesSet() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
@@ -3459,43 +2278,6 @@ public class CommerceOrderTypeRelPersistenceImpl
 		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
-
-		_finderPathWithPaginationFindByUuid = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
-			new String[] {
-				String.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			},
-			new String[] {"uuid_"}, true);
-
-		_finderPathWithoutPaginationFindByUuid = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
-			new String[] {String.class.getName()}, new String[] {"uuid_"},
-			true);
-
-		_finderPathCountByUuid = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
-			new String[] {String.class.getName()}, new String[] {"uuid_"},
-			false);
-
-		_finderPathWithPaginationFindByUuid_C = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
-			new String[] {
-				String.class.getName(), Long.class.getName(),
-				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			},
-			new String[] {"uuid_", "companyId"}, true);
-
-		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"uuid_", "companyId"}, true);
-
-		_finderPathCountByUuid_C = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"uuid_", "companyId"}, false);
 
 		_finderPathWithPaginationFindByCommerceOrderTypeId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCommerceOrderTypeId",
@@ -3550,72 +2332,25 @@ public class CommerceOrderTypeRelPersistenceImpl
 			new String[] {"classNameId", "classPK", "commerceOrderTypeId"},
 			false);
 
-		_finderPathFetchByERC_C = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "companyId"}, true);
+		_finderPathFetchByC_ERC = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "externalReferenceCode"}, true);
 
-		_finderPathCountByERC_C = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "companyId"}, false);
-
-		_setCommerceOrderTypeRelUtilPersistence(this);
+		_finderPathCountByC_ERC = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "externalReferenceCode"}, false);
 	}
 
-	@Deactivate
-	public void deactivate() {
-		_setCommerceOrderTypeRelUtilPersistence(null);
-
+	public void destroy() {
 		entityCache.removeCache(CommerceOrderTypeRelImpl.class.getName());
 	}
 
-	private void _setCommerceOrderTypeRelUtilPersistence(
-		CommerceOrderTypeRelPersistence commerceOrderTypeRelPersistence) {
-
-		try {
-			Field field = CommerceOrderTypeRelUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceOrderTypeRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
 
-	@Reference
+	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
 
 	private static final String _SQL_SELECT_COMMERCEORDERTYPEREL =
@@ -3642,15 +2377,9 @@ public class CommerceOrderTypeRelPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceOrderTypeRelPersistenceImpl.class);
 
-	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid"});
-
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
-
-	@Reference
-	private PortalUUID _portalUUID;
 
 }

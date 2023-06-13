@@ -30,6 +30,7 @@ import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Field;
@@ -41,15 +42,15 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
+import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -79,14 +80,33 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 			PermissionCheckerMethodTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
+	public FileEntry addFileEntry(String fileName) throws IOException {
+		Class<?> clazz = getClass();
+
+		try (InputStream inputStream = clazz.getResourceAsStream(
+				"dependencies/" + fileName)) {
+
+			return fileEntrySearchFixture.addFileEntry(
+				new FileEntryBlueprint() {
+					{
+						setFileName(fileName);
+						setGroupId(dlFixture.getGroupId());
+						setInputStream(inputStream);
+						setTitle(fileName);
+						setUserId(dlFixture.getUserId());
+					}
+				});
+		}
+	}
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_fileEntrySearchFixture = new FileEntrySearchFixture(dlAppLocalService);
+		fileEntrySearchFixture = new FileEntrySearchFixture(dlAppLocalService);
 
-		_fileEntrySearchFixture.setUp();
+		fileEntrySearchFixture.setUp();
 
 		setGroup(dlFixture.addGroup());
 		setIndexerClass(DLFileEntry.class);
@@ -98,7 +118,7 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 	public void tearDown() throws Exception {
 		super.tearDown();
 
-		_fileEntrySearchFixture.tearDown();
+		fileEntrySearchFixture.tearDown();
 	}
 
 	@Test
@@ -109,64 +129,30 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 
 		String searchTerm = "新規";
 
-		long fileEntryId = _addFileEntry(fileName_jp);
+		FileEntry fileEntry = addFileEntry(fileName_jp);
 
-		SearchResponse searchResponse =
-			dlSearchFixture.searchOnlyOneSearchResponse(
-				searchTerm, LocaleUtil.JAPAN);
+		Document document = dlSearchFixture.searchOnlyOneSearchHit(
+			searchTerm, LocaleUtil.JAPAN);
+
+		document = indexedFieldsFixture.postProcessDocument(document);
 
 		Map<String, String> map = new HashMap<>();
 
-		_populateExpectedFieldValues(
-			dlAppLocalService.getFileEntry(fileEntryId), map);
+		populateExpectedFieldValues(fileEntry, map);
 
-		FieldValuesAssert.assertFieldValues(
-			map, name -> !name.equals("score"), searchResponse);
+		FieldValuesAssert.assertFieldValues(searchTerm, document, map);
 	}
 
-	private long _addFileEntry(String fileName) throws Exception {
-		Class<?> clazz = getClass();
-
-		try (InputStream inputStream = clazz.getResourceAsStream(
-				"dependencies/" + fileName)) {
-
-			FileEntry fileEntry = _fileEntrySearchFixture.addFileEntry(
-				new FileEntryBlueprint() {
-					{
-						setFileName(fileName);
-						setGroupId(dlFixture.getGroupId());
-						setInputStream(inputStream);
-						setTitle(fileName);
-						setUserId(dlFixture.getUserId());
-					}
-				});
-
-			return fileEntry.getFileEntryId();
-		}
-	}
-
-	private AssetEntry _getAssetEntry(FileEntry fileEntry) {
-		return _assetEntryLocalService.fetchEntry(
-			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
-	}
-
-	private long _getAssetEntryId(AssetEntry assetEntry) {
-		if (assetEntry == null) {
-			return 0;
-		}
-
-		return assetEntry.getEntryId();
-	}
-
-	private String _getContents(FileEntry fileEntry) throws Exception {
+	protected String getContents(FileEntry fileEntry) throws Exception {
 		String contents = FileUtil.extractText(
 			_dlFileEntryLocalService.getFileAsStream(
-				fileEntry.getFileEntryId(), fileEntry.getVersion(), false));
+				fileEntry.getFileEntryId(), fileEntry.getVersion(), false),
+			fileEntry.getTitle());
 
 		return contents.trim();
 	}
 
-	private long _getDDMStructureId(FileEntry fileEntry) throws Exception {
+	protected long getDDMStructureId(FileEntry fileEntry) throws Exception {
 		long ddmStructureId = 0;
 
 		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
@@ -186,7 +172,7 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		return ddmStructureId;
 	}
 
-	private void _legacyPopulateHttpHeader(
+	protected void legacyPopulateHttpHeader(
 		String fieldName, String value, String ddmStructureId,
 		Map<String, String> map) {
 
@@ -199,39 +185,35 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 			StringUtil.toLowerCase(value));
 	}
 
-	private void _legacyPopulateHttpHeaders(
+	protected void legacyPopulateHttpHeaders(
 			FileEntry fileEntry, Map<String, String> map)
 		throws Exception {
 
-		String ddmStructureId = String.valueOf(_getDDMStructureId(fileEntry));
+		String ddmStructureId = String.valueOf(getDDMStructureId(fileEntry));
 
-		_legacyPopulateHttpHeader(
+		legacyPopulateHttpHeader(
 			"CONTENT_ENCODING", "UTF-8", ddmStructureId, map);
-		_legacyPopulateHttpHeader(
+		legacyPopulateHttpHeader(
 			"CONTENT_TYPE", "text/plain; charset=UTF-8", ddmStructureId, map);
 	}
 
-	private void _populateDates(FileEntry fileEntry, Map<String, String> map) {
-		Date createDate = fileEntry.getCreateDate();
-
-		indexedFieldsFixture.populateDate(Field.CREATE_DATE, createDate, map);
-
+	protected void populateDates(FileEntry fileEntry, Map<String, String> map) {
+		indexedFieldsFixture.populateDate(
+			Field.CREATE_DATE, fileEntry.getCreateDate(), map);
 		indexedFieldsFixture.populateDate(
 			Field.MODIFIED_DATE, fileEntry.getModifiedDate(), map);
-		indexedFieldsFixture.populateDate(Field.PUBLISH_DATE, createDate, map);
+		indexedFieldsFixture.populateDate(
+			Field.PUBLISH_DATE, fileEntry.getCreateDate(), map);
+
 		indexedFieldsFixture.populateExpirationDateWithForever(map);
 	}
 
-	private void _populateExpectedFieldValues(
+	protected void populateExpectedFieldValues(
 			FileEntry fileEntry, Map<String, String> map)
 		throws Exception {
 
-		long assetEntryId = _getAssetEntryId(_getAssetEntry(fileEntry));
-
-		map.put(Field.ASSET_ENTRY_ID, String.valueOf(assetEntryId));
 		map.put(
-			Field.ASSET_ENTRY_ID + "_sortable", String.valueOf(assetEntryId));
-
+			Field.ASSET_ENTRY_ID, String.valueOf(_getAssetEntryId(fileEntry)));
 		map.put(Field.CLASS_NAME_ID, "0");
 		map.put(Field.CLASS_PK, "0");
 		map.put(Field.COMPANY_ID, String.valueOf(fileEntry.getCompanyId()));
@@ -249,10 +231,11 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		map.put(Field.USER_ID, String.valueOf(fileEntry.getUserId()));
 		map.put(
 			Field.USER_NAME, StringUtil.toLowerCase(fileEntry.getUserName()));
+		map.put(
+			"assetEntryId_sortable",
+			String.valueOf(_getAssetEntryId(fileEntry)));
 		map.put("classTypeId", "0");
-		map.put("content_ja_JP", _getContents(fileEntry));
-		map.put("contentLength_ja_JP", "5");
-		map.put("contentLength_ja_JP_sortable", "5");
+		map.put("content_ja_JP", getContents(fileEntry));
 		map.put(
 			"dataRepositoryId", String.valueOf(fileEntry.getRepositoryId()));
 		map.put("ddmContent", "text/plain; charset=UTF-8 UTF-8");
@@ -273,25 +256,21 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		map.put("readCount", String.valueOf(fileEntry.getReadCount()));
 		map.put("size", String.valueOf(fileEntry.getSize()));
 		map.put("size_sortable", String.valueOf(fileEntry.getSize()));
-		map.put("title_ja_JP", fileEntry.getTitle());
-		map.put("versionCount", String.valueOf(fileEntry.getVersion()));
-		map.put(
-			"versionCount_sortable", String.valueOf(fileEntry.getVersion()));
 		map.put("visible", "true");
 
-		_populateDates(fileEntry, map);
+		populateDates(fileEntry, map);
 
 		if (_ddmIndexer.isLegacyDDMIndexFieldsEnabled()) {
-			_legacyPopulateHttpHeaders(fileEntry, map);
+			legacyPopulateHttpHeaders(fileEntry, map);
 		}
 		else {
-			_populateHttpHeaders(fileEntry, map);
+			populateHttpHeaders(fileEntry, map);
 		}
 
-		_populateLocalizedTitles(fileEntry, map);
-		_populateViewCount(fileEntry, map);
+		populateLocalizedTitles(fileEntry, map);
+		populateViewCount(fileEntry, map);
 
-		indexedFieldsFixture.populatePriority("0.0", map);
+		indexedFieldsFixture.populatePriority("0.0", map, true);
 		indexedFieldsFixture.populateRoleIdFields(
 			fileEntry.getCompanyId(), DLFileEntry.class.getName(),
 			fileEntry.getPrimaryKey(), fileEntry.getGroupId(), null, map);
@@ -299,9 +278,9 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 			DLFileEntry.class.getName(), fileEntry.getFileEntryId(), map);
 	}
 
-	private String _populateHttpHeader(
+	protected String populateHttpHeader(
 			long ddmStructureId, String fieldName, String value)
-		throws Exception {
+		throws PortalException {
 
 		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(
 			ddmStructureId);
@@ -361,17 +340,17 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		return sb.toString();
 	}
 
-	private void _populateHttpHeaders(
+	protected void populateHttpHeaders(
 			FileEntry fileEntry, Map<String, String> map)
 		throws Exception {
 
 		String[] ddmFieldArray = new String[2];
 
-		ddmFieldArray[0] = _populateHttpHeader(
-			_getDDMStructureId(fileEntry), "CONTENT_TYPE",
+		ddmFieldArray[0] = populateHttpHeader(
+			getDDMStructureId(fileEntry), "CONTENT_TYPE",
 			"text/plain; charset=UTF-8");
-		ddmFieldArray[1] = _populateHttpHeader(
-			_getDDMStructureId(fileEntry), "CONTENT_ENCODING", "UTF-8");
+		ddmFieldArray[1] = populateHttpHeader(
+			getDDMStructureId(fileEntry), "CONTENT_ENCODING", "UTF-8");
 
 		map.put(
 			"ddmFieldArray",
@@ -381,7 +360,7 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 				StringPool.CLOSE_BRACKET));
 	}
 
-	private void _populateLocalizedTitles(
+	protected void populateLocalizedTitles(
 		FileEntry fileEntry, Map<String, String> map) {
 
 		String title = fileEntry.getTitle();
@@ -398,11 +377,24 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		}
 	}
 
-	private void _populateViewCount(
+	protected void populateViewCount(
 		FileEntry fileEntry, Map<String, String> map) {
 
 		map.put("viewCount", String.valueOf(fileEntry.getReadCount()));
 		map.put("viewCount_sortable", String.valueOf(fileEntry.getReadCount()));
+	}
+
+	protected FileEntrySearchFixture fileEntrySearchFixture;
+
+	private long _getAssetEntryId(FileEntry fileEntry) {
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			DLFileEntry.class.getName(), fileEntry.getFileEntryId());
+
+		if (assetEntry == null) {
+			return 0;
+		}
+
+		return assetEntry.getEntryId();
 	}
 
 	@Inject
@@ -413,7 +405,5 @@ public class DLFileEntryIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 
 	@Inject
 	private DLFileEntryLocalService _dlFileEntryLocalService;
-
-	private FileEntrySearchFixture _fileEntrySearchFixture;
 
 }

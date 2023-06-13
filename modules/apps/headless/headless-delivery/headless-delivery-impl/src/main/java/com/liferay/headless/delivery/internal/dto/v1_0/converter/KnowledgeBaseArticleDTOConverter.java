@@ -30,18 +30,18 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.TaxonomyCategoryBrie
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.service.KBArticleService;
 import com.liferay.knowledge.base.service.KBFolderService;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -51,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.knowledge.base.model.KBArticle",
-	service = DTOConverter.class
+	service = {DTOConverter.class, KnowledgeBaseArticleDTOConverter.class}
 )
 public class KnowledgeBaseArticleDTOConverter
 	implements DTOConverter<KBArticle, KnowledgeBaseArticle> {
@@ -82,7 +82,7 @@ public class KnowledgeBaseArticleDTOConverter
 						kbArticle.getResourcePrimKey()));
 				articleBody = kbArticle.getContent();
 				creator = CreatorUtil.toCreator(
-					_portal, dtoConverterContext.getUriInfo(),
+					_portal, dtoConverterContext.getUriInfoOptional(),
 					_userLocalService.fetchUser(kbArticle.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
 					dtoConverterContext.isAcceptAllLanguages(),
@@ -99,6 +99,13 @@ public class KnowledgeBaseArticleDTOConverter
 					_assetTagLocalService.getTags(
 						KBArticle.class.getName(), kbArticle.getClassPK()),
 					AssetTag.NAME_ACCESSOR);
+				numberOfAttachments = Optional.ofNullable(
+					kbArticle.getAttachmentsFileEntries()
+				).map(
+					List::size
+				).orElse(
+					0
+				);
 				numberOfKnowledgeBaseArticles =
 					_kbArticleService.getKBArticlesCount(
 						kbArticle.getGroupId(), kbArticle.getResourcePrimKey(),
@@ -125,17 +132,6 @@ public class KnowledgeBaseArticleDTOConverter
 					TaxonomyCategoryBrief.class);
 				title = kbArticle.getTitle();
 
-				setNumberOfAttachments(
-					() -> {
-						List<FileEntry> fileEntries =
-							kbArticle.getAttachmentsFileEntries();
-
-						if (fileEntries != null) {
-							return fileEntries.size();
-						}
-
-						return 0;
-					});
 				setParentKnowledgeBaseFolder(
 					() -> {
 						if (kbArticle.getKbFolderId() <= 0) {

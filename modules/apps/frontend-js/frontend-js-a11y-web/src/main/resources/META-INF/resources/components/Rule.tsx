@@ -46,16 +46,13 @@ function Rule({
 				{ruleTitle && (
 					<ClayList.ItemTitle>{ruleTitle}</ClayList.ItemTitle>
 				)}
-
 				{ruleSubtext && (
 					<ClayList.ItemText className="text-capitalize" subtext>
 						{ruleSubtext}
 					</ClayList.ItemText>
 				)}
-
 				{ruleText && <ClayList.ItemText>{ruleText}</ClayList.ItemText>}
 			</ClayList.ItemField>
-
 			{quantity && (
 				<ClayList.ItemField className="align-self-center">
 					<ClayLayout.ContentSection>
@@ -63,7 +60,6 @@ function Rule({
 					</ClayLayout.ContentSection>
 				</ClayList.ItemField>
 			)}
-
 			<ClayList.ItemField className="align-self-center">
 				<ClayLayout.ContentSection>
 					<ClayIcon symbol="angle-right-small" />

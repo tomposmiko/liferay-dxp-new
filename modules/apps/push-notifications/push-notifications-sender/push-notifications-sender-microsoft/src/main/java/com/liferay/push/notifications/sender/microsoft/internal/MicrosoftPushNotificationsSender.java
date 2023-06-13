@@ -17,7 +17,7 @@ package com.liferay.push.notifications.sender.microsoft.internal;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.push.notifications.constants.PushNotificationsConstants;
 import com.liferay.push.notifications.sender.PushNotificationsSender;
@@ -35,13 +35,13 @@ import org.jboss.aerogear.windows.mpns.notifications.ToastNotification;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Javier Gamarra
  * @author Salva Tejero
  */
 @Component(
+	immediate = true,
 	property = "platform=" + MicrosoftPushNotificationsSender.PLATFORM,
 	service = PushNotificationsSender.class
 )
@@ -64,7 +64,7 @@ public class MicrosoftPushNotificationsSender
 		String body = payloadJSONObject.getString(
 			PushNotificationsConstants.KEY_BODY);
 
-		JSONObject newPayloadJSONObject = _jsonFactory.createJSONObject();
+		JSONObject newPayloadJSONObject = JSONFactoryUtil.createJSONObject();
 
 		Iterator<String> iterator = payloadJSONObject.keys();
 
@@ -78,11 +78,11 @@ public class MicrosoftPushNotificationsSender
 			}
 		}
 
-		String attributes = _getAttributes(newPayloadJSONObject);
+		String attributes = getAttributes(newPayloadJSONObject);
 
-		TileNotification tileNotification = _buildTileNotification(
+		TileNotification tileNotification = buildTileNotification(
 			from, body, attributes);
-		ToastNotification toastNotification = _buildToastNotification(
+		ToastNotification toastNotification = buildToastNotification(
 			from, body, attributes);
 
 		for (String token : tokens) {
@@ -98,12 +98,7 @@ public class MicrosoftPushNotificationsSender
 		_mpnsService = mpnsServiceBuilder.build();
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_mpnsService = null;
-	}
-
-	private TileNotification _buildTileNotification(
+	protected TileNotification buildTileNotification(
 		String from, String body, String attributes) {
 
 		MpnsNotificationBuilder mpnsNotificationBuilder =
@@ -120,7 +115,7 @@ public class MicrosoftPushNotificationsSender
 		return builder.build();
 	}
 
-	private ToastNotification _buildToastNotification(
+	protected ToastNotification buildToastNotification(
 		String from, String body, String attributes) {
 
 		MpnsNotificationBuilder mpnsNotificationBuilder =
@@ -135,7 +130,12 @@ public class MicrosoftPushNotificationsSender
 		return builder.build();
 	}
 
-	private String _getAttributes(JSONObject payloadJSONObject) {
+	@Deactivate
+	protected void deactivate() {
+		_mpnsService = null;
+	}
+
+	protected String getAttributes(JSONObject payloadJSONObject) {
 		StringBundler sb = new StringBundler();
 
 		Iterator<String> iterator = payloadJSONObject.keys();
@@ -151,9 +151,6 @@ public class MicrosoftPushNotificationsSender
 
 		return sb.toString();
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	private volatile MpnsService _mpnsService;
 

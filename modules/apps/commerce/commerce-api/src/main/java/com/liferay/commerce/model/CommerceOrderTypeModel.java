@@ -16,11 +16,10 @@ package com.liferay.commerce.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.LocaleException;
+import com.liferay.portal.kernel.model.AuditedModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LocalizedModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.StagedAuditedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
 
 import java.util.Date;
@@ -42,8 +41,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommerceOrderTypeModel
-	extends BaseModel<CommerceOrderType>, LocalizedModel, MVCCModel,
-			ShardedModel, StagedAuditedModel, WorkflowedModel {
+	extends AuditedModel, BaseModel<CommerceOrderType>, LocalizedModel,
+			ShardedModel, WorkflowedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -64,39 +63,6 @@ public interface CommerceOrderTypeModel
 	 * @param primaryKey the primary key of this commerce order type
 	 */
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this commerce order type.
-	 *
-	 * @return the mvcc version of this commerce order type
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this commerce order type.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce order type
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the uuid of this commerce order type.
-	 *
-	 * @return the uuid of this commerce order type
-	 */
-	@AutoEscape
-	@Override
-	public String getUuid();
-
-	/**
-	 * Sets the uuid of this commerce order type.
-	 *
-	 * @param uuid the uuid of this commerce order type
-	 */
-	@Override
-	public void setUuid(String uuid);
 
 	/**
 	 * Returns the external reference code of this commerce order type.
@@ -661,9 +627,5 @@ public interface CommerceOrderTypeModel
 
 	@Override
 	public CommerceOrderType cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -69,12 +69,12 @@ const getLayoutedElements = (elements) => {
 	let transitions = elements.filter((element) => isEdge(element));
 
 	transitions = transitions.map((transition) => {
-		const sourceNode = nodes.find((node) => node.id === transition.source);
+		const sourceNode = nodes.find((node) => node.id == transition.source);
 
 		const sourceX = sourceNode.position.x;
 		const sourceY = sourceNode.position.y;
 
-		const targetNode = nodes.find((node) => node.id === transition.target);
+		const targetNode = nodes.find((node) => node.id == transition.target);
 
 		const targetX = targetNode.position.x;
 		const targetY = targetNode.position.y;
@@ -181,23 +181,11 @@ const getNodeType = (type) => {
 };
 
 const isCurrent = (currentNodes = [], node) => {
-	return node.type === 'TASK' && currentNodes.includes(node.name);
+	return currentNodes.includes(node.name);
 };
 
-const isVisited = (visitedNodes = [], transitionElements = [], node) => {
-	if (node.type === 'JOIN') {
-		const transitionsToJoin = transitionElements.filter(
-			(element) => element.targetNodeName === node.name
-		).length;
-		const visitedNodesJoin = visitedNodes.filter(
-			(element) => element === node.name
-		).length;
-
-		return transitionsToJoin === visitedNodesJoin;
-	}
-	else {
-		return visitedNodes.includes(node.name);
-	}
+const isVisited = (visitedNodes = [], node) => {
+	return visitedNodes.includes(node.name);
 };
 
 const nodeTypes = {

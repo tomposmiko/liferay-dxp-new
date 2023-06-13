@@ -14,7 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.designer.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
@@ -41,12 +41,12 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jeyvison Nascimento
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + KaleoDesignerPortletKeys.KALEO_DESIGNER,
 		"mvc.command.name=/kaleo_designer/revert_kaleo_definition_version"
@@ -135,7 +135,7 @@ public class RevertKaleoDefinitionVersionMVCActionCommand
 				WorkflowWebKeys.WORKFLOW_DEFINITION_MODIFIED_DATE),
 			dateFormat);
 
-		return _language.format(
+		return LanguageUtil.format(
 			resourceBundle, "restored-to-revision-from-x",
 			dateFormat.format(workflowDefinitionModifiedDate));
 	}
@@ -151,7 +151,7 @@ public class RevertKaleoDefinitionVersionMVCActionCommand
 		catch (WorkflowException workflowException) {
 			DateFormat dateFormat = _getDateFormat(locale);
 
-			String message = _language.format(
+			String message = LanguageUtil.format(
 				getResourceBundle(actionRequest),
 				"the-version-from-x-is-not-valid-for-publication",
 				dateFormat.format(previousDateModification));
@@ -170,8 +170,5 @@ public class RevertKaleoDefinitionVersionMVCActionCommand
 		return DateFormatFactoryUtil.getSimpleDateFormat(
 			"MMM d, yyyy, HH:mm", locale);
 	}
-
-	@Reference
-	private Language _language;
 
 }

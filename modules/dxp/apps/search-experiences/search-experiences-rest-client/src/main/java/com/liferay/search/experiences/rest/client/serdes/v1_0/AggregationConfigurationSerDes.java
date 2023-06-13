@@ -64,14 +64,11 @@ public class AggregationConfigurationSerDes {
 
 			sb.append("\"aggs\": ");
 
-			if (aggregationConfiguration.getAggs() instanceof String) {
-				sb.append("\"");
-				sb.append((String)aggregationConfiguration.getAggs());
-				sb.append("\"");
-			}
-			else {
-				sb.append(aggregationConfiguration.getAggs());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(aggregationConfiguration.getAggs()));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");

@@ -14,7 +14,7 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.resource.v2_0;
 
-import com.liferay.account.service.AccountGroupService;
+import com.liferay.commerce.account.service.CommerceAccountGroupService;
 import com.liferay.commerce.discount.exception.NoSuchDiscountException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountCommerceAccountGroupRel;
@@ -22,6 +22,7 @@ import com.liferay.commerce.discount.service.CommerceDiscountCommerceAccountGrou
 import com.liferay.commerce.discount.service.CommerceDiscountService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Discount;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountAccountGroup;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountAccountGroupDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v2_0.DiscountAccountGroupUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountAccountGroupResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -49,6 +49,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/discount-account-group.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {DiscountAccountGroupResource.class, NestedFieldSupport.class}
@@ -138,11 +139,12 @@ public class DiscountAccountGroupResourceImpl
 
 		CommerceDiscountCommerceAccountGroupRel
 			commerceDiscountCommerceAccountGroupRel =
-				DiscountAccountGroupUtil.addCommerceDiscountAccountGroupRel(
-					_accountGroupService,
-					_commerceDiscountCommerceAccountGroupRelService,
-					discountAccountGroup, commerceDiscount,
-					_serviceContextHelper);
+				DiscountAccountGroupUtil.
+					addCommerceDiscountCommerceAccountGroupRel(
+						_commerceAccountGroupService,
+						_commerceDiscountCommerceAccountGroupRelService,
+						discountAccountGroup, commerceDiscount,
+						_serviceContextHelper);
 
 		return _toDiscountAccountGroup(
 			commerceDiscountCommerceAccountGroupRel.
@@ -156,12 +158,13 @@ public class DiscountAccountGroupResourceImpl
 
 		CommerceDiscountCommerceAccountGroupRel
 			commerceDiscountCommerceAccountGroupRel =
-				DiscountAccountGroupUtil.addCommerceDiscountAccountGroupRel(
-					_accountGroupService,
-					_commerceDiscountCommerceAccountGroupRelService,
-					discountAccountGroup,
-					_commerceDiscountService.getCommerceDiscount(id),
-					_serviceContextHelper);
+				DiscountAccountGroupUtil.
+					addCommerceDiscountCommerceAccountGroupRel(
+						_commerceAccountGroupService,
+						_commerceDiscountCommerceAccountGroupRelService,
+						discountAccountGroup,
+						_commerceDiscountService.getCommerceDiscount(id),
+						_serviceContextHelper);
 
 		return _toDiscountAccountGroup(
 			commerceDiscountCommerceAccountGroupRel.
@@ -225,7 +228,7 @@ public class DiscountAccountGroupResourceImpl
 	}
 
 	@Reference
-	private AccountGroupService _accountGroupService;
+	private CommerceAccountGroupService _commerceAccountGroupService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.discount.model.CommerceDiscountCommerceAccountGroupRel)"
@@ -240,12 +243,8 @@ public class DiscountAccountGroupResourceImpl
 	@Reference
 	private CommerceDiscountService _commerceDiscountService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountAccountGroupDTOConverter)"
-	)
-	private DTOConverter
-		<CommerceDiscountCommerceAccountGroupRel, DiscountAccountGroup>
-			_discountAccountGroupDTOConverter;
+	@Reference
+	private DiscountAccountGroupDTOConverter _discountAccountGroupDTOConverter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

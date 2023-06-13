@@ -25,10 +25,11 @@ import com.liferay.commerce.order.CommerceOrderValidatorResult;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.util.CPInstanceHelper;
 import com.liferay.commerce.service.CommerceOrderItemService;
+import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -39,6 +40,8 @@ import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+
+import java.io.IOException;
 
 import java.util.List;
 
@@ -55,6 +58,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_CART_CONTENT,
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_CART_CONTENT_MINI,
@@ -115,21 +119,23 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 			CommerceOrderItem commerceOrderItem =
 				_commerceOrderItemService.addOrUpdateCommerceOrderItem(
 					commerceOrder.getCommerceOrderId(), cpInstanceId,
-					ddmFormValues, quantity, 0, 0, commerceContext,
+					ddmFormValues, quantity, 0, commerceContext,
 					serviceContext);
+
+			int commerceOrderItemsQuantity =
+				_commerceOrderItemService.getCommerceOrderItemsQuantity(
+					commerceOrder.getCommerceOrderId());
 
 			jsonObject.put(
 				"commerceOrderItemId",
 				commerceOrderItem.getCommerceOrderItemId()
 			).put(
-				"commerceOrderItemsQuantity",
-				_commerceOrderItemService.getCommerceOrderItemsQuantity(
-					commerceOrder.getCommerceOrderId())
+				"commerceOrderItemsQuantity", commerceOrderItemsQuantity
 			).put(
 				"success", true
 			).put(
 				"successMessage",
-				_language.get(
+				LanguageUtil.get(
 					httpServletRequest,
 					"the-product-was-successfully-added-to-the-cart")
 			);
@@ -162,7 +168,7 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 			);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			jsonObject.put(
 				"error", exception.getMessage()
@@ -175,11 +181,11 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 
 		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
-		_writeJSON(actionResponse, jsonObject);
+		writeJSON(actionResponse, jsonObject);
 	}
 
-	private void _writeJSON(ActionResponse actionResponse, Object object)
-		throws Exception {
+	protected void writeJSON(ActionResponse actionResponse, Object object)
+		throws IOException {
 
 		HttpServletResponse httpServletResponse =
 			_portal.getHttpServletResponse(actionResponse);
@@ -201,13 +207,13 @@ public class AddCommerceOrderItemMVCActionCommand extends BaseMVCActionCommand {
 	private CommerceOrderItemService _commerceOrderItemService;
 
 	@Reference
+	private CommerceOrderService _commerceOrderService;
+
+	@Reference
 	private CPInstanceHelper _cpInstanceHelper;
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

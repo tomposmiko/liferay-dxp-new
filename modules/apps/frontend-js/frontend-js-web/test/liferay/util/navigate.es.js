@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import navigate from '../../../src/main/resources/META-INF/resources/liferay/util/navigate.es';
 
 describe('Liferay.Util.navigate', () => {

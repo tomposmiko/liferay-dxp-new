@@ -37,14 +37,6 @@ import org.json.JSONObject;
  */
 public class JenkinsCohort {
 
-	public static synchronized JenkinsCohort getInstance(String cohortName) {
-		if (!_jenkinsCohorts.containsKey(cohortName)) {
-			_jenkinsCohorts.put(cohortName, new JenkinsCohort(cohortName));
-		}
-
-		return _jenkinsCohorts.get(cohortName);
-	}
-
 	public JenkinsCohort(String name) {
 		_name = name;
 
@@ -59,10 +51,6 @@ public class JenkinsCohort {
 		}
 
 		return idleJenkinsSlaveCount;
-	}
-
-	public List<JenkinsMaster> getJenkinsMasters() {
-		return new ArrayList<>(_jenkinsMastersMap.values());
 	}
 
 	public String getName() {
@@ -412,18 +400,12 @@ public class JenkinsCohort {
 
 		String jobName = jobNameMatcher.group(1);
 
-		String downstreamJobName = null;
+		String batchJobName = null;
 
 		if (jobName.contains("-batch")) {
-			downstreamJobName = jobName;
+			batchJobName = jobName;
 
 			jobName = jobName.replace("-batch", "");
-		}
-
-		if (jobName.contains("-downstream")) {
-			downstreamJobName = jobName;
-
-			jobName = jobName.replace("-downstream", "");
 		}
 
 		if (!_jenkinsCohortJobsMap.containsKey(jobName)) {
@@ -432,7 +414,7 @@ public class JenkinsCohort {
 
 		JenkinsCohortJob jenkinsCohortJob = _jenkinsCohortJobsMap.get(jobName);
 
-		if (downstreamJobName == null) {
+		if (batchJobName == null) {
 			jenkinsCohortJob.addTopLevelBuildURL(buildURL);
 		}
 		else {
@@ -456,18 +438,12 @@ public class JenkinsCohort {
 
 				String jobName = jobNameMatcher.group(1);
 
-				String downstreamJobName = null;
+				String batchJobName = null;
 
 				if (jobName.contains("-batch")) {
-					downstreamJobName = jobName;
+					batchJobName = jobName;
 
 					jobName = jobName.replace("-batch", "");
-				}
-
-				if (jobName.contains("-downstream")) {
-					downstreamJobName = jobName;
-
-					jobName = jobName.replace("-downstream", "");
 				}
 
 				if (!_jenkinsCohortJobsMap.containsKey(jobName)) {
@@ -478,7 +454,7 @@ public class JenkinsCohort {
 				JenkinsCohortJob jenkinsCohortJob = _jenkinsCohortJobsMap.get(
 					jobName);
 
-				if (downstreamJobName == null) {
+				if (batchJobName == null) {
 					jenkinsCohortJob.addQueuedTopLevelBuildJsonMapEntry(
 						queuedBuildURL);
 				}
@@ -492,8 +468,6 @@ public class JenkinsCohort {
 
 	private static final Pattern _buildNumberPattern = Pattern.compile(
 		".*\\/([0-9]+)");
-	private static final Map<String, JenkinsCohort> _jenkinsCohorts =
-		new HashMap<>();
 	private static final Pattern _jobNamePattern = Pattern.compile(
 		"https?:.*job\\/(.*?)\\/");
 

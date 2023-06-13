@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.trash.helper.TrashHelper;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portlet.documentlibrary.util.RepositoryModelUtil;
@@ -227,12 +226,6 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	}
 
 	@Override
-	public List<FileVersion> getFileVersions(int status, int start, int end) {
-		return RepositoryModelUtil.toFileVersions(
-			_dlFileEntry.getFileVersions(status, start, end));
-	}
-
-	@Override
 	public int getFileVersionsCount(int status) {
 		return _dlFileEntry.getFileVersionsCount(status);
 	}
@@ -244,7 +237,7 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -310,7 +303,7 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return ContentTypes.APPLICATION_OCTET_STREAM;
@@ -448,11 +441,11 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	@Override
 	public boolean isInTrashContainer() {
 		try {
-			return _trashHelper.isInTrashContainer(_dlFileEntry);
+			return _dlFileEntry.isInTrashContainer();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -589,9 +582,6 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 				ModelResourcePermission.class, LiferayFileEntry.class,
 				"_dlFileEntryModelResourcePermission",
 				"(model.class.name=" + DLFileEntry.class.getName() + ")", true);
-	private static volatile TrashHelper _trashHelper =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			TrashHelper.class, LiferayFileEntry.class, "_trashHelper", false);
 
 	private final DLFileEntry _dlFileEntry;
 	private DLFileVersion _dlFileVersion;

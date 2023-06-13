@@ -27,29 +27,40 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class GroupModelListener extends BaseModelListener<Group> {
 
 	@Override
 	public void onBeforeRemove(Group group) throws ModelListenerException {
 		try {
-			_onBeforeRemove(group);
+			doOnBeforeRemove(group);
 		}
 		catch (Exception exception) {
 			throw new ModelListenerException(exception);
 		}
 	}
 
-	private void _onBeforeRemove(Group group) throws Exception {
+	protected void doOnBeforeRemove(Group group) throws Exception {
 		_kbArticleLocalService.deleteGroupKBArticles(group.getGroupId());
 
 		_kbTemplateLocalService.deleteGroupKBTemplates(group.getGroupId());
 	}
 
-	@Reference
-	private KBArticleLocalService _kbArticleLocalService;
+	@Reference(unbind = "-")
+	protected void setKBArticleLocalService(
+		KBArticleLocalService kbArticleLocalService) {
 
-	@Reference
+		_kbArticleLocalService = kbArticleLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKBTemplateLocalService(
+		KBTemplateLocalService kbTemplateLocalService) {
+
+		_kbTemplateLocalService = kbTemplateLocalService;
+	}
+
+	private KBArticleLocalService _kbArticleLocalService;
 	private KBTemplateLocalService _kbTemplateLocalService;
 
 }

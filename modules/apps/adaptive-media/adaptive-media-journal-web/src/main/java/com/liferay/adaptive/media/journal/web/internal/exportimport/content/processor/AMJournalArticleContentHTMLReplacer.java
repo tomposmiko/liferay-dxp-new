@@ -14,7 +14,6 @@
 
 package com.liferay.adaptive.media.journal.web.internal.exportimport.content.processor;
 
-import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,7 +31,9 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = AMJournalArticleContentHTMLReplacer.class)
+@Component(
+	immediate = true, service = AMJournalArticleContentHTMLReplacer.class
+)
 public class AMJournalArticleContentHTMLReplacer {
 
 	public String replace(String content, Replace replace) throws Exception {
@@ -40,8 +41,7 @@ public class AMJournalArticleContentHTMLReplacer {
 			Document document = SAXReaderUtil.read(content);
 
 			XPath xPath = SAXReaderUtil.createXPath(
-				"//dynamic-element[@type='" +
-					DDMFormFieldTypeConstants.RICH_TEXT + "']");
+				"//dynamic-element[@type='text_area']");
 
 			List<Node> ddmJournalArticleNodes = xPath.selectNodes(document);
 

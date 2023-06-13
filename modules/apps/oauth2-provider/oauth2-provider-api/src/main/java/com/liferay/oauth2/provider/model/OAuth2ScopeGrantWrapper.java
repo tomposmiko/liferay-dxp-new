@@ -285,11 +285,6 @@ public class OAuth2ScopeGrantWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected OAuth2ScopeGrantWrapper wrap(OAuth2ScopeGrant oAuth2ScopeGrant) {
 		return new OAuth2ScopeGrantWrapper(oAuth2ScopeGrant);
 	}

@@ -618,11 +618,6 @@ public class LayoutSEOSiteWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<LayoutSEOSite, Object>>
 		getAttributeGetterFunctions() {
 

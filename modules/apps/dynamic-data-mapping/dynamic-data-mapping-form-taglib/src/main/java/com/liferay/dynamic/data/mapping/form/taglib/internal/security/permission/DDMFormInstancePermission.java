@@ -15,14 +15,17 @@
 package com.liferay.dynamic.data.mapping.form.taglib.internal.security.permission;
 
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Pedro Queiroz
  */
+@Component(immediate = true, service = {})
 public class DDMFormInstancePermission {
 
 	public static boolean contains(
@@ -30,18 +33,21 @@ public class DDMFormInstancePermission {
 			DDMFormInstance ddmFormInstance, String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DDMFormInstance> modelResourcePermission =
-			_ddmFormInstanceModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ddmFormInstanceModelResourcePermission.contains(
 			permissionChecker, ddmFormInstance, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<DDMFormInstance>>
-		_ddmFormInstanceModelResourcePermissionSnapshot = new Snapshot<>(
-			DDMFormInstancePermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.dynamic.data.mapping.model." +
-				"DDMFormInstance)");
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<DDMFormInstance> modelResourcePermission) {
+
+		_ddmFormInstanceModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<DDMFormInstance>
+		_ddmFormInstanceModelResourcePermission;
 
 }

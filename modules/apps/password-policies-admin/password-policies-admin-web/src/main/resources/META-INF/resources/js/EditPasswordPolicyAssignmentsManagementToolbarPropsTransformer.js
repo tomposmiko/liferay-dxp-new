@@ -12,12 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	openSelectionModal,
-	sub,
-} from 'frontend-js-web';
+import {openSelectionModal} from 'frontend-js-web';
 
 function addEntity(portletNamespace, inputName, entity) {
 	const addUserIdsInput = document.getElementById(
@@ -36,30 +31,25 @@ function addEntity(portletNamespace, inputName, entity) {
 }
 
 function deleteEntities(portletNamespace, inputName) {
-	openConfirmModal({
-		message: Liferay.Language.get('are-you-sure-you-want-to-delete-this'),
-		onConfirm: (isConfirmed) => {
-			if (isConfirmed) {
-				const form = document.getElementById(`${portletNamespace}fm`);
+	if (confirm(Liferay.Language.get('are-you-sure-you-want-to-delete-this'))) {
+		const form = document.getElementById(`${portletNamespace}fm`);
 
-				const input = document.getElementById(
-					`${portletNamespace}${inputName}`
-				);
+		const input = document.getElementById(
+			`${portletNamespace}${inputName}`
+		);
 
-				if (form && input) {
-					input.setAttribute(
-						'value',
-						getCheckedCheckboxes(
-							form,
-							`${portletNamespace}allRowIds`
-						)
-					);
+		if (form && input) {
+			input.setAttribute(
+				'value',
+				Liferay.Util.listCheckedExcept(
+					form,
+					`${portletNamespace}allRowIds`
+				)
+			);
 
-					submitForm(form);
-				}
-			}
-		},
-	});
+			submitForm(form);
+		}
+	}
 }
 
 const ACTIONS = {
@@ -102,7 +92,7 @@ export default function propsTransformer({
 					}
 				},
 				selectEventName: `${portletNamespace}selectMember`,
-				title: sub(
+				title: Liferay.Util.sub(
 					Liferay.Language.get('add-assignees-to-x'),
 					passwordPolicyName
 				),

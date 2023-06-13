@@ -14,7 +14,7 @@
 
 package com.liferay.segments.web.internal.field.customizer;
 
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -24,6 +24,8 @@ import com.liferay.segments.field.customizer.SegmentsFieldCustomizer;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -32,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = {
 		"segments.field.customizer.entity.name=Organization",
 		"segments.field.customizer.key=" + CountrySegmentsFieldCustomizer.KEY,
@@ -56,12 +59,18 @@ public class CountrySegmentsFieldCustomizer
 
 	@Override
 	public List<Field.Option> getOptions(Locale locale) {
-		return TransformUtil.transform(
-			_countryService.getCompanyCountries(
-				CompanyThreadLocal.getCompanyId()),
+		List<Country> countries = _countryService.getCompanyCountries(
+			CompanyThreadLocal.getCompanyId());
+
+		Stream<Country> stream = countries.stream();
+
+		return stream.map(
 			country -> new Field.Option(
 				country.getName(locale),
-				StringUtil.toLowerCase(String.valueOf(country.getName()))));
+				StringUtil.toLowerCase(String.valueOf(country.getName())))
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private static final List<String> _fieldNames = ListUtil.fromArray(

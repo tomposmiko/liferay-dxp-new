@@ -61,7 +61,7 @@ public class SiteNavigationMenuLocalServiceImpl
 
 		// Site navigation menu
 
-		_validate(groupId, name);
+		validate(groupId, name);
 
 		User user = _userLocalService.getUser(userId);
 
@@ -160,12 +160,8 @@ public class SiteNavigationMenuLocalServiceImpl
 	}
 
 	@Override
-	public void deleteSiteNavigationMenus(long groupId) throws PortalException {
-		for (SiteNavigationMenu siteNavigationMenu :
-				getSiteNavigationMenus(groupId)) {
-
-			deleteSiteNavigationMenu(siteNavigationMenu);
-		}
+	public void deleteSiteNavigationMenus(long groupId) {
+		siteNavigationMenuPersistence.removeByGroupId(groupId);
 	}
 
 	@Override
@@ -292,7 +288,7 @@ public class SiteNavigationMenuLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		_validate(siteNavigationMenu.getGroupId(), name);
+		validate(siteNavigationMenu.getGroupId(), name);
 
 		siteNavigationMenu.setUserId(userId);
 		siteNavigationMenu.setUserName(user.getFullName());
@@ -301,6 +297,27 @@ public class SiteNavigationMenuLocalServiceImpl
 		siteNavigationMenu.setName(name);
 
 		return siteNavigationMenuPersistence.update(siteNavigationMenu);
+	}
+
+	protected void validate(long groupId, String name) throws PortalException {
+		if (Validator.isNull(name)) {
+			throw new SiteNavigationMenuNameException();
+		}
+
+		int nameMaxLength = ModelHintsUtil.getMaxLength(
+			SiteNavigationMenu.class.getName(), "name");
+
+		if (name.length() > nameMaxLength) {
+			throw new SiteNavigationMenuNameException(
+				"Maximum length of name exceeded");
+		}
+
+		SiteNavigationMenu siteNavigationMenu =
+			siteNavigationMenuPersistence.fetchByG_N(groupId, name);
+
+		if (siteNavigationMenu != null) {
+			throw new DuplicateSiteNavigationMenuException(name);
+		}
 	}
 
 	private void _updateOldSiteNavigationMenuType(
@@ -332,27 +349,6 @@ public class SiteNavigationMenuLocalServiceImpl
 			SiteNavigationConstants.TYPE_DEFAULT);
 
 		siteNavigationMenuPersistence.update(actualTypeSiteNavigationMenu);
-	}
-
-	private void _validate(long groupId, String name) throws PortalException {
-		if (Validator.isNull(name)) {
-			throw new SiteNavigationMenuNameException();
-		}
-
-		int nameMaxLength = ModelHintsUtil.getMaxLength(
-			SiteNavigationMenu.class.getName(), "name");
-
-		if (name.length() > nameMaxLength) {
-			throw new SiteNavigationMenuNameException(
-				"Maximum length of name exceeded");
-		}
-
-		SiteNavigationMenu siteNavigationMenu =
-			siteNavigationMenuPersistence.fetchByG_N(groupId, name);
-
-		if (siteNavigationMenu != null) {
-			throw new DuplicateSiteNavigationMenuException(name);
-		}
 	}
 
 	@Reference

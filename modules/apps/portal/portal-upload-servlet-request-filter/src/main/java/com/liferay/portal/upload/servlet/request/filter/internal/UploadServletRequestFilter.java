@@ -25,12 +25,13 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.upload.LiferayInputStream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Preston Crary
  */
 @Component(
+	immediate = true,
 	property = {
 		"dispatcher=FORWARD", "dispatcher=REQUEST", "servlet-context-name=",
 		"servlet-filter-name=Upload Servlet Request Filter", "url-pattern=/*"
@@ -76,17 +78,20 @@ public class UploadServletRequestFilter extends BasePortalFilter {
 
 		int fileSizeThreshold = 0;
 		String location = null;
+		long maxRequestSize = 0;
+		long maxFileSize = 0;
 
 		if (Validator.isNotNull(portletId)) {
 			Portlet portlet = _portletLocalService.getPortletById(
 				_portal.getCompanyId(httpServletRequest), portletId);
 
 			if (portlet != null) {
-				FilterConfig filterConfig = getFilterConfig();
+				ServletContext servletContext =
+					(ServletContext)httpServletRequest.getAttribute(
+						WebKeys.CTX);
 
 				InvokerPortlet invokerPortlet =
-					PortletInstanceFactoryUtil.create(
-						portlet, filterConfig.getServletContext());
+					PortletInstanceFactoryUtil.create(portlet, servletContext);
 
 				LiferayPortletConfig liferayPortletConfig =
 					(LiferayPortletConfig)invokerPortlet.getPortletConfig();
@@ -101,12 +106,15 @@ public class UploadServletRequestFilter extends BasePortalFilter {
 
 				fileSizeThreshold = portlet.getMultipartFileSizeThreshold();
 				location = portlet.getMultipartLocation();
+				maxRequestSize = portlet.getMultipartMaxRequestSize();
+				maxFileSize = portlet.getMultipartMaxFileSize();
 			}
 		}
 
 		UploadServletRequest uploadServletRequest =
 			_portal.getUploadServletRequest(
-				httpServletRequest, fileSizeThreshold, location);
+				httpServletRequest, fileSizeThreshold, location, maxRequestSize,
+				maxFileSize);
 
 		try {
 			processFilter(

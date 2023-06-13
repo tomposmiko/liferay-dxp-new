@@ -80,11 +80,11 @@ public class JournalContentTest {
 
 	@Before
 	public void setUp() throws PortalException {
-		MockHttpServletRequest mockHttpServletRequest =
+		MockHttpServletRequest httpServletRequest =
 			new MockHttpServletRequest();
 
-		setUpPortletRequestModel(mockHttpServletRequest);
-		setUpServiceContext(mockHttpServletRequest);
+		setUpPortletRequestModel(httpServletRequest);
+		setUpServiceContext(httpServletRequest);
 	}
 
 	@After
@@ -183,8 +183,8 @@ public class JournalContentTest {
 		themeDisplay.setResponse(new MockHttpServletResponse());
 		themeDisplay.setScopeGroupId(TestPropsValues.getGroupId());
 		themeDisplay.setSiteGroupId(TestPropsValues.getGroupId());
-		themeDisplay.setTimeZone(TimeZoneUtil.getDefault());
 		themeDisplay.setUser(TestPropsValues.getUser());
+		themeDisplay.setTimeZone(TimeZoneUtil.getDefault());
 
 		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 
@@ -192,22 +192,22 @@ public class JournalContentTest {
 	}
 
 	protected void setUpPortletRequestModel(
-			MockHttpServletRequest mockHttpServletRequest)
+			MockHttpServletRequest httpServletRequest)
 		throws PortalException {
 
 		RenderRequest renderRequest = getRenderRequest(
-			mockHttpServletRequest, getThemeDisplay(mockHttpServletRequest));
+			httpServletRequest, getThemeDisplay(httpServletRequest));
 
 		_portletRequestModel = new PortletRequestModel(
 			renderRequest, new MockPortletResponse());
 	}
 
 	protected void setUpServiceContext(
-			MockHttpServletRequest mockHttpServletRequest)
+			MockHttpServletRequest httpServletRequest)
 		throws PortalException {
 
 		ServiceContextThreadLocal.pushServiceContext(
-			getServiceContext(mockHttpServletRequest));
+			getServiceContext(httpServletRequest));
 	}
 
 	protected void tearDownServiceContext() {

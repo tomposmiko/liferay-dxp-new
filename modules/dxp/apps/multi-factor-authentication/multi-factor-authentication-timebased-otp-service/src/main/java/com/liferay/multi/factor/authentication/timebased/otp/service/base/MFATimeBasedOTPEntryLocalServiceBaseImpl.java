@@ -32,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -340,11 +338,6 @@ public abstract class MFATimeBasedOTPEntryLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement MFATimeBasedOTPEntryLocalServiceImpl#deleteMFATimeBasedOTPEntry(MFATimeBasedOTPEntry) to avoid orphaned data");
-		}
-
 		return mfaTimeBasedOTPEntryLocalService.deleteMFATimeBasedOTPEntry(
 			(MFATimeBasedOTPEntry)persistedModel);
 	}
@@ -499,8 +492,5 @@ public abstract class MFATimeBasedOTPEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MFATimeBasedOTPEntryLocalServiceBaseImpl.class);
 
 }

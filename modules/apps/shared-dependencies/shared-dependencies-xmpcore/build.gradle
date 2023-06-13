@@ -1,3 +1,0 @@
-dependencies {
-	compileInclude group: "com.adobe.xmp", name: "xmpcore", version: "6.1.11"
-}

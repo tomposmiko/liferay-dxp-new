@@ -32,18 +32,17 @@ export default function Undo({onRedo = () => {}, onUndo = () => {}}) {
 					disabled={!undoHistory || !undoHistory.length}
 					displayType="secondary"
 					onClick={onUndo}
-					size="sm"
+					small
 					symbol="undo"
 					title={Liferay.Language.get('undo')}
 				/>
-
 				<ClayButtonWithIcon
 					aria-label={Liferay.Language.get('redo')}
 					className="btn-monospaced"
 					disabled={!redoHistory || !redoHistory.length}
 					displayType="secondary"
 					onClick={onRedo}
-					size="sm"
+					small
 					symbol="redo"
 					title={Liferay.Language.get('redo')}
 				/>

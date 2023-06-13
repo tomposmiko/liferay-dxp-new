@@ -34,22 +34,4 @@ public interface DataRemovalConfiguration {
 	)
 	public boolean removeExpiredJournalArticles();
 
-	@Meta.AD(
-		deflt = "false", name = "remove-dl-preview-cts-content-data",
-		required = false
-	)
-	public boolean removeDLPreviewCTSContentData();
-
-	@Meta.AD(
-		deflt = "false", name = "remove-publications-older-than-6-months",
-		required = false
-	)
-	public boolean removeOutdatedPublishedCTCollections();
-
-	@Meta.AD(
-		deflt = "false", name = "remove-published-cts-content-data",
-		required = false
-	)
-	public boolean removePublishedCTSContentData();
-
 }

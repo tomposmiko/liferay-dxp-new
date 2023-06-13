@@ -22,18 +22,17 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "model.class.name=com.liferay.commerce.shop.by.diagram.model.CSDiagramPin",
 	service = AopService.class
 )
@@ -46,7 +45,7 @@ public class CSDiagramPinLocalServiceImpl
 			double positionY, String sequence)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		long csDiagramPinId = counterLocalService.increment();
 
@@ -109,8 +108,5 @@ public class CSDiagramPinLocalServiceImpl
 
 		return csDiagramPinPersistence.update(csDiagramPin);
 	}
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"model.class.name=com.liferay.portal.kernel.model.Subscription",
 		"model.class.name=com.liferay.subscription.model.Subscription"

@@ -16,8 +16,6 @@ package com.liferay.dynamic.data.mapping.expression;
 
 import com.liferay.dynamic.data.mapping.expression.model.Expression;
 
-import java.util.Map;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -28,13 +26,8 @@ public interface DDMExpression<T> {
 
 	public T evaluate() throws DDMExpressionException;
 
-	public com.liferay.petra.sql.dsl.expression.Expression<?> getDSLExpression()
-		throws DDMExpressionException;
-
 	public Expression getModel();
 
 	public void setVariable(String name, Object value);
-
-	public void setVariables(Map<String, Object> variables);
 
 }

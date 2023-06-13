@@ -14,12 +14,11 @@
 
 package com.liferay.headless.commerce.machine.learning.internal.resource.v1_0;
 
-import com.liferay.commerce.machine.learning.forecast.SkuCommerceMLForecast;
 import com.liferay.commerce.machine.learning.forecast.SkuCommerceMLForecastManager;
 import com.liferay.headless.commerce.machine.learning.dto.v1_0.SkuForecast;
 import com.liferay.headless.commerce.machine.learning.internal.constants.CommerceMLForecastConstants;
+import com.liferay.headless.commerce.machine.learning.internal.dto.v1_0.converter.SkuForecastDTOConverter;
 import com.liferay.headless.commerce.machine.learning.resource.v1_0.SkuForecastResource;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -33,6 +32,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Riccardo Ferrari
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/sku-forecast.properties",
 	scope = ServiceScope.PROTOTYPE, service = SkuForecastResource.class
 )
@@ -79,10 +79,7 @@ public class SkuForecastResourceImpl extends BaseSkuForecastResourceImpl {
 	@Reference
 	private SkuCommerceMLForecastManager _skuCommerceMLForecastManager;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.machine.learning.internal.dto.v1_0.converter.SkuForecastDTOConverter)"
-	)
-	private DTOConverter<SkuCommerceMLForecast, SkuForecast>
-		_skuForecastDTOConverter;
+	@Reference
+	private SkuForecastDTOConverter _skuForecastDTOConverter;
 
 }

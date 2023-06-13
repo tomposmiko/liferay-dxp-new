@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
-import com.liferay.segments.service.SegmentsExperienceLocalServiceUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,20 +50,6 @@ public class LayoutInfoItemFieldValuesProviderHelper {
 	public InfoItemFieldValues getInfoItemFieldValues(
 		Layout layout, long segmentsExperienceId) {
 
-		long defaultSegmentsExperienceId =
-			SegmentsExperienceLocalServiceUtil.fetchDefaultSegmentsExperienceId(
-				layout.getPlid());
-
-		if (segmentsExperienceId != defaultSegmentsExperienceId) {
-			return InfoItemFieldValues.builder(
-			).infoFieldValues(
-				_getLayoutInfoFieldValues(layout, segmentsExperienceId)
-			).infoItemReference(
-				_getInfoItemReference(
-					defaultSegmentsExperienceId, layout, segmentsExperienceId)
-			).build();
-		}
-
 		return InfoItemFieldValues.builder(
 		).infoFieldValue(
 			new InfoFieldValue<>(
@@ -77,16 +63,14 @@ public class LayoutInfoItemFieldValuesProviderHelper {
 		).infoFieldValues(
 			_getLayoutInfoFieldValues(layout, segmentsExperienceId)
 		).infoItemReference(
-			_getInfoItemReference(
-				defaultSegmentsExperienceId, layout, segmentsExperienceId)
+			_getInfoItemReference(layout, segmentsExperienceId)
 		).build();
 	}
 
 	private InfoItemReference _getInfoItemReference(
-		long defaultSegmentsExperienceId, Layout layout,
-		long segmentsExperienceId) {
+		Layout layout, long segmentsExperienceId) {
 
-		if (segmentsExperienceId == defaultSegmentsExperienceId) {
+		if (segmentsExperienceId == SegmentsExperienceConstants.ID_DEFAULT) {
 			return new InfoItemReference(
 				Layout.class.getName(), layout.getPlid());
 		}
@@ -121,15 +105,11 @@ public class LayoutInfoItemFieldValuesProviderHelper {
 				}
 			}
 
-			Locale defaultLocale = LocaleUtil.fromLanguageId(defaultLanguageId);
-
 			valuesMap.computeIfAbsent(
-				defaultLocale,
+				LocaleUtil.fromLanguageId(defaultLanguageId),
 				locale -> valuesJSONObject.getString("defaultValue"));
 
 			return InfoLocalizedValue.<String>builder(
-			).defaultLocale(
-				defaultLocale
 			).values(
 				valuesMap
 			).build();

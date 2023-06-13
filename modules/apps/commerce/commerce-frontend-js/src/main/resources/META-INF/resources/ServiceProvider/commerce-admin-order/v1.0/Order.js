@@ -22,10 +22,7 @@ function resolveCatalogPath(basePath = '') {
 	return `${basePath}${VERSION}${ORDERS_PATH}`;
 }
 
-export default function Order(basePath) {
-	return {
-		baseURL: resolveCatalogPath(basePath),
-		getOrders: (...params) =>
-			AJAX.GET(resolveCatalogPath(basePath), ...params),
-	};
-}
+export default (basePath) => ({
+	baseURL: resolveCatalogPath(basePath),
+	getOrders: (...params) => AJAX.GET(resolveCatalogPath(basePath), ...params),
+});

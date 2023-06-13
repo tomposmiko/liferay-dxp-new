@@ -22,32 +22,29 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Pedro Queiroz
  */
-public class DocumentLibraryDDMFormFieldValueAccessorTest {
+@RunWith(PowerMockRunner.class)
+public class DocumentLibraryDDMFormFieldValueAccessorTest extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		_setUpDocumentLibraryDDMFormFieldValueAccessor();
-		_setUpFileEntry();
+	@Before
+	public void setUp() throws Exception {
+		setUpDocumentLibraryDDMFormFieldValueAccessor();
+		setUpFileEntry();
 	}
 
 	@Test
@@ -85,34 +82,37 @@ public class DocumentLibraryDDMFormFieldValueAccessorTest {
 				ddmFormFieldValue, LocaleUtil.US));
 	}
 
-	private static void _setUpDocumentLibraryDDMFormFieldValueAccessor()
+	protected void setUpDocumentLibraryDDMFormFieldValueAccessor()
 		throws Exception {
-
-		DLAppService dlAppService = Mockito.mock(DLAppService.class);
 
 		_documentLibraryDDMFormFieldValueAccessor =
 			new DocumentLibraryDDMFormFieldValueAccessor();
 
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldValueAccessor, "jsonFactory",
-			_jsonFactory);
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldValueAccessor, "_dlAppService",
-			dlAppService);
+		field(
+			DocumentLibraryDDMFormFieldValueAccessor.class, "jsonFactory"
+		).set(
+			_documentLibraryDDMFormFieldValueAccessor, _jsonFactory
+		);
 
-		Mockito.when(
-			dlAppService.getFileEntryByUuidAndGroupId(
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldValueAccessor.class, "_dlAppService"
+		).set(
+			_documentLibraryDDMFormFieldValueAccessor, _dlAppService
+		);
+
+		PowerMockito.when(
+			_dlAppService.getFileEntryByUuidAndGroupId(
 				_FILE_ENTRY_UUID, _GROUP_ID)
 		).thenReturn(
 			_fileEntry
 		);
 	}
 
-	private static void _setUpFileEntry() {
+	protected void setUpFileEntry() {
 		_fileEntry.setUuid(_FILE_ENTRY_UUID);
 		_fileEntry.setGroupId(_GROUP_ID);
 
-		Mockito.when(
+		PowerMockito.when(
 			_fileEntry.isInTrash()
 		).thenReturn(
 			false
@@ -124,9 +124,15 @@ public class DocumentLibraryDDMFormFieldValueAccessorTest {
 
 	private static final long _GROUP_ID = 32964;
 
-	private static DocumentLibraryDDMFormFieldValueAccessor
+	@Mock
+	private DLAppService _dlAppService;
+
+	private DocumentLibraryDDMFormFieldValueAccessor
 		_documentLibraryDDMFormFieldValueAccessor;
-	private static final FileEntry _fileEntry = Mockito.mock(FileEntry.class);
-	private static final JSONFactory _jsonFactory = new JSONFactoryImpl();
+
+	@Mock
+	private FileEntry _fileEntry;
+
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 }

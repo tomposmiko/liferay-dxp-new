@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Preston Crary
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + AssetPublisherPortletKeys.RELATED_ASSETS,
 	service = PortletFilter.class
 )
@@ -66,7 +67,7 @@ public class RelatedAssetsRenderParametersPortletFilter
 		if (httpServletRequest.getAttribute(WebKeys.LAYOUT_ASSET_ENTRY) ==
 				null) {
 
-			_clearDynamicServletRequestParameters(httpServletRequest);
+			clearDynamicServletRequestParameters(httpServletRequest);
 
 			clearRenderRequestParameters(httpServletRequest, renderRequest);
 		}
@@ -78,18 +79,7 @@ public class RelatedAssetsRenderParametersPortletFilter
 	public void init(FilterConfig filterConfig) {
 	}
 
-	protected void clearRenderRequestParameters(
-		HttpServletRequest httpServletRequest, RenderRequest renderRequest) {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		RenderParametersPool.clear(
-			httpServletRequest, themeDisplay.getPlid(),
-			_portal.getPortletId(renderRequest));
-	}
-
-	private void _clearDynamicServletRequestParameters(
+	protected void clearDynamicServletRequestParameters(
 		HttpServletRequest httpServletRequest) {
 
 		DynamicServletRequest dynamicServletRequest = null;
@@ -115,6 +105,17 @@ public class RelatedAssetsRenderParametersPortletFilter
 
 			dynamicParameterMap.clear();
 		}
+	}
+
+	protected void clearRenderRequestParameters(
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		RenderParametersPool.clear(
+			httpServletRequest, themeDisplay.getPlid(),
+			_portal.getPortletId(renderRequest));
 	}
 
 	@Reference

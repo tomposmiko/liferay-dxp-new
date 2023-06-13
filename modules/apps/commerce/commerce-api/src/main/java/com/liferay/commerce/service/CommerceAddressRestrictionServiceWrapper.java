@@ -27,10 +27,6 @@ public class CommerceAddressRestrictionServiceWrapper
 	implements CommerceAddressRestrictionService,
 			   ServiceWrapper<CommerceAddressRestrictionService> {
 
-	public CommerceAddressRestrictionServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAddressRestrictionServiceWrapper(
 		CommerceAddressRestrictionService commerceAddressRestrictionService) {
 

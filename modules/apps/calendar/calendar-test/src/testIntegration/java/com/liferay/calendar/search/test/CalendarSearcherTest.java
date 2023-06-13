@@ -243,11 +243,12 @@ public class CalendarSearcherTest {
 	}
 
 	protected boolean isExactPhraseQueryImplementedForSearchEngine() {
-		SearchEngine searchEngine = SearchEngineHelperUtil.getSearchEngine();
+		SearchEngine searchEngine = SearchEngineHelperUtil.getSearchEngine(
+			SearchEngineHelperUtil.getDefaultSearchEngineId());
 
 		String vendor = searchEngine.getVendor();
 
-		if (vendor.equals("Elasticsearch") || vendor.equals("Solr")) {
+		if (vendor.equals("Elasticsearch")) {
 			return false;
 		}
 

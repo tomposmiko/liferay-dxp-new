@@ -1,5 +1,4 @@
 create table CPDAvailabilityEstimate (
-	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	CPDAvailabilityEstimateId LONG not null primary key,
 	companyId LONG,
@@ -13,10 +12,8 @@ create table CPDAvailabilityEstimate (
 );
 
 create table CPDefinitionInventory (
-	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	CPDefinitionInventoryId LONG not null,
+	CPDefinitionInventoryId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -33,26 +30,10 @@ create table CPDefinitionInventory (
 	minOrderQuantity INTEGER,
 	maxOrderQuantity INTEGER,
 	allowedOrderQuantities VARCHAR(75) null,
-	multipleOrderQuantity INTEGER,
-	primary key (CPDefinitionInventoryId, ctCollectionId)
-);
-
-create table CSOptionAccountEntryRel (
-	mvccVersion LONG default 0 not null,
-	CSOptionAccountEntryRelId LONG not null primary key,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	modifiedDate DATE null,
-	accountEntryId LONG,
-	commerceChannelId LONG,
-	commerceShippingMethodKey VARCHAR(75) null,
-	commerceShippingOptionKey VARCHAR(75) null
+	multipleOrderQuantity INTEGER
 );
 
 create table CommerceAddressRestriction (
-	mvccVersion LONG default 0 not null,
 	commerceAddressRestrictionId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -66,7 +47,6 @@ create table CommerceAddressRestriction (
 );
 
 create table CommerceAvailabilityEstimate (
-	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	commerceAvailabilityEstimateId LONG not null primary key,
 	companyId LONG,
@@ -80,7 +60,6 @@ create table CommerceAvailabilityEstimate (
 );
 
 create table CommerceOrder (
-	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commerceOrderId LONG not null primary key,
@@ -90,54 +69,30 @@ create table CommerceOrder (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
-	billingAddressId LONG,
 	commerceAccountId LONG,
 	commerceCurrencyId LONG,
 	commerceOrderTypeId LONG,
-	commerceShippingMethodId LONG,
-	deliveryCommerceTermEntryId LONG,
-	paymentCommerceTermEntryId LONG,
+	billingAddressId LONG,
 	shippingAddressId LONG,
-	advanceStatus VARCHAR(75) null,
 	commercePaymentMethodKey VARCHAR(75) null,
-	couponCode VARCHAR(75) null,
-	deliveryCTermEntryDescription TEXT null,
-	deliveryCommerceTermEntryName VARCHAR(75) null,
-	lastPriceUpdateDate DATE null,
-	manuallyAdjusted BOOLEAN,
-	orderDate DATE null,
-	orderStatus INTEGER,
-	paymentCTermEntryDescription TEXT null,
-	paymentCommerceTermEntryName VARCHAR(75) null,
-	paymentStatus INTEGER,
-	printedNote STRING null,
-	purchaseOrderNumber VARCHAR(75) null,
-	requestedDeliveryDate DATE null,
-	shippingAmount DECIMAL(30, 16) null,
-	shippingDiscountAmount DECIMAL(30, 16) null,
-	shippingDiscountPercentLevel1 DECIMAL(30, 16) null,
-	shippingDiscountPercentLevel2 DECIMAL(30, 16) null,
-	shippingDiscountPercentLevel3 DECIMAL(30, 16) null,
-	shippingDiscountPercentLevel4 DECIMAL(30, 16) null,
-	shippingDiscountPctLev1WithTax DECIMAL(30, 16) null,
-	shippingDiscountPctLev2WithTax DECIMAL(30, 16) null,
-	shippingDiscountPctLev3WithTax DECIMAL(30, 16) null,
-	shippingDiscountPctLev4WithTax DECIMAL(30, 16) null,
-	shippingDiscountWithTaxAmount DECIMAL(30, 16) null,
+	transactionId TEXT null,
+	commerceShippingMethodId LONG,
 	shippingOptionName VARCHAR(255) null,
-	shippingWithTaxAmount DECIMAL(30, 16) null,
+	purchaseOrderNumber VARCHAR(75) null,
+	couponCode VARCHAR(75) null,
+	lastPriceUpdateDate DATE null,
 	subtotal DECIMAL(30, 16) null,
 	subtotalDiscountAmount DECIMAL(30, 16) null,
 	subtotalDiscountPercentLevel1 DECIMAL(30, 16) null,
 	subtotalDiscountPercentLevel2 DECIMAL(30, 16) null,
 	subtotalDiscountPercentLevel3 DECIMAL(30, 16) null,
 	subtotalDiscountPercentLevel4 DECIMAL(30, 16) null,
-	subtotalDiscountPctLev1WithTax DECIMAL(30, 16) null,
-	subtotalDiscountPctLev2WithTax DECIMAL(30, 16) null,
-	subtotalDiscountPctLev3WithTax DECIMAL(30, 16) null,
-	subtotalDiscountPctLev4WithTax DECIMAL(30, 16) null,
-	subtotalDiscountWithTaxAmount DECIMAL(30, 16) null,
-	subtotalWithTaxAmount DECIMAL(30, 16) null,
+	shippingAmount DECIMAL(30, 16) null,
+	shippingDiscountAmount DECIMAL(30, 16) null,
+	shippingDiscountPercentLevel1 DECIMAL(30, 16) null,
+	shippingDiscountPercentLevel2 DECIMAL(30, 16) null,
+	shippingDiscountPercentLevel3 DECIMAL(30, 16) null,
+	shippingDiscountPercentLevel4 DECIMAL(30, 16) null,
 	taxAmount DECIMAL(30, 16) null,
 	total DECIMAL(30, 16) null,
 	totalDiscountAmount DECIMAL(30, 16) null,
@@ -145,13 +100,31 @@ create table CommerceOrder (
 	totalDiscountPercentageLevel2 DECIMAL(30, 16) null,
 	totalDiscountPercentageLevel3 DECIMAL(30, 16) null,
 	totalDiscountPercentageLevel4 DECIMAL(30, 16) null,
+	subtotalWithTaxAmount DECIMAL(30, 16) null,
+	subtotalDiscountWithTaxAmount DECIMAL(30, 16) null,
+	subtotalDiscountPctLev1WithTax DECIMAL(30, 16) null,
+	subtotalDiscountPctLev2WithTax DECIMAL(30, 16) null,
+	subtotalDiscountPctLev3WithTax DECIMAL(30, 16) null,
+	subtotalDiscountPctLev4WithTax DECIMAL(30, 16) null,
+	shippingWithTaxAmount DECIMAL(30, 16) null,
+	shippingDiscountWithTaxAmount DECIMAL(30, 16) null,
+	shippingDiscountPctLev1WithTax DECIMAL(30, 16) null,
+	shippingDiscountPctLev2WithTax DECIMAL(30, 16) null,
+	shippingDiscountPctLev3WithTax DECIMAL(30, 16) null,
+	shippingDiscountPctLev4WithTax DECIMAL(30, 16) null,
+	totalWithTaxAmount DECIMAL(30, 16) null,
+	totalDiscountWithTaxAmount DECIMAL(30, 16) null,
 	totalDiscountPctLev1WithTax DECIMAL(30, 16) null,
 	totalDiscountPctLev2WithTax DECIMAL(30, 16) null,
 	totalDiscountPctLev3WithTax DECIMAL(30, 16) null,
 	totalDiscountPctLev4WithTax DECIMAL(30, 16) null,
-	totalDiscountWithTaxAmount DECIMAL(30, 16) null,
-	totalWithTaxAmount DECIMAL(30, 16) null,
-	transactionId TEXT null,
+	advanceStatus VARCHAR(75) null,
+	paymentStatus INTEGER,
+	orderDate DATE null,
+	orderStatus INTEGER,
+	printedNote STRING null,
+	requestedDeliveryDate DATE null,
+	manuallyAdjusted BOOLEAN,
 	status INTEGER,
 	statusByUserId LONG,
 	statusByUserName VARCHAR(75) null,
@@ -159,8 +132,6 @@ create table CommerceOrder (
 );
 
 create table CommerceOrderItem (
-	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commerceOrderItemId LONG not null primary key,
 	groupId LONG,
@@ -173,11 +144,9 @@ create table CommerceOrderItem (
 	commerceOrderId LONG,
 	commercePriceListId LONG,
 	CPInstanceId LONG,
-	CPMeasurementUnitId LONG,
 	CProductId LONG,
 	parentCommerceOrderItemId LONG,
 	shippingAddressId LONG,
-	decimalQuantity DECIMAL(30, 16) null,
 	deliveryGroup VARCHAR(75) null,
 	deliveryMaxSubscriptionCycles LONG,
 	deliverySubscriptionLength INTEGER,
@@ -185,7 +154,6 @@ create table CommerceOrderItem (
 	deliverySubTypeSettings VARCHAR(75) null,
 	depth DOUBLE,
 	discountAmount DECIMAL(30, 16) null,
-	discountManuallyAdjusted BOOLEAN,
 	discountPercentageLevel1 DECIMAL(30, 16) null,
 	discountPercentageLevel2 DECIMAL(30, 16) null,
 	discountPercentageLevel3 DECIMAL(30, 16) null,
@@ -203,13 +171,10 @@ create table CommerceOrderItem (
 	manuallyAdjusted BOOLEAN,
 	maxSubscriptionCycles LONG,
 	name STRING null,
-	priceManuallyAdjusted BOOLEAN,
 	printedNote STRING null,
 	promoPrice DECIMAL(30, 16) null,
 	promoPriceWithTaxAmount DECIMAL(30, 16) null,
 	quantity INTEGER,
-	replacedCPInstanceId LONG,
-	replacedSku VARCHAR(75) null,
 	requestedDeliveryDate DATE null,
 	shipSeparately BOOLEAN,
 	shippable BOOLEAN,
@@ -227,8 +192,6 @@ create table CommerceOrderItem (
 );
 
 create table CommerceOrderNote (
-	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commerceOrderNoteId LONG not null primary key,
 	groupId LONG,
@@ -243,7 +206,6 @@ create table CommerceOrderNote (
 );
 
 create table CommerceOrderPayment (
-	mvccVersion LONG default 0 not null,
 	commerceOrderPaymentId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -258,8 +220,6 @@ create table CommerceOrderPayment (
 );
 
 create table CommerceOrderType (
-	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commerceOrderTypeId LONG not null primary key,
 	companyId LONG,
@@ -281,8 +241,6 @@ create table CommerceOrderType (
 );
 
 create table CommerceOrderTypeRel (
-	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commerceOrderTypeRelId LONG not null primary key,
 	companyId LONG,
@@ -296,9 +254,6 @@ create table CommerceOrderTypeRel (
 );
 
 create table CommerceShipment (
-	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
-	externalReferenceCode VARCHAR(75) null,
 	commerceShipmentId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -309,19 +264,15 @@ create table CommerceShipment (
 	commerceAccountId LONG,
 	commerceAddressId LONG,
 	commerceShippingMethodId LONG,
-	carrier VARCHAR(75) null,
-	expectedDate DATE null,
-	shippingDate DATE null,
 	shippingOptionName TEXT null,
+	carrier VARCHAR(75) null,
 	trackingNumber VARCHAR(75) null,
-	trackingURL STRING null,
+	shippingDate DATE null,
+	expectedDate DATE null,
 	status INTEGER
 );
 
 create table CommerceShipmentItem (
-	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
-	externalReferenceCode VARCHAR(75) null,
 	commerceShipmentItemId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -336,7 +287,6 @@ create table CommerceShipmentItem (
 );
 
 create table CommerceShippingMethod (
-	mvccVersion LONG default 0 not null,
 	commerceShippingMethodId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
@@ -346,15 +296,13 @@ create table CommerceShippingMethod (
 	modifiedDate DATE null,
 	name STRING null,
 	description STRING null,
-	active_ BOOLEAN,
-	engineKey VARCHAR(75) null,
 	imageId LONG,
+	engineKey VARCHAR(75) null,
 	priority DOUBLE,
-	trackingURL STRING null
+	active_ BOOLEAN
 );
 
 create table CommerceSubscriptionEntry (
-	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	commerceSubscriptionEntryId LONG not null primary key,
 	groupId LONG,

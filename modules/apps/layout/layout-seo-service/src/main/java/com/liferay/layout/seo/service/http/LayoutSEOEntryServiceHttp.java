@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see LayoutSEOEntryServiceSoap
  * @generated
  */
 public class LayoutSEOEntryServiceHttp {
@@ -53,7 +54,7 @@ public class LayoutSEOEntryServiceHttp {
 	public static com.liferay.layout.seo.model.LayoutSEOEntry
 			copyLayoutSEOEntry(
 				HttpPrincipal httpPrincipal, long userId, long groupId,
-				boolean privateLayout, long sourceLayoutId,
+				boolean privateLayout, long layoutId,
 				boolean canonicalURLEnabled,
 				java.util.Map<java.util.Locale, String> canonicalURLMap,
 				long copyDDMStorageId, boolean openGraphDescriptionEnabled,
@@ -70,7 +71,7 @@ public class LayoutSEOEntryServiceHttp {
 				_copyLayoutSEOEntryParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, userId, groupId, privateLayout, sourceLayoutId,
+				methodKey, userId, groupId, privateLayout, layoutId,
 				canonicalURLEnabled, canonicalURLMap, copyDDMStorageId,
 				openGraphDescriptionEnabled, openGraphDescriptionMap,
 				openGraphImageAltMap, openGraphImageFileEntryId,

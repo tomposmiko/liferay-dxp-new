@@ -16,17 +16,14 @@ package com.liferay.user.associated.data.exporter;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
+import com.liferay.petra.xml.XMLUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.user.associated.data.util.UADDynamicQueryUtil;
@@ -72,7 +69,9 @@ public abstract class DynamicQueryUADExporter<T extends BaseModel>
 		ActionableDynamicQuery actionableDynamicQuery =
 			getActionableDynamicQuery(userId);
 
-		ZipWriter zipWriter = getZipWriter(userId, getTypeKey());
+		Class<T> clazz = getTypeClass();
+
+		ZipWriter zipWriter = getZipWriter(userId, clazz.getName());
 
 		actionableDynamicQuery.setPerformActionMethod(
 			(T baseModel) -> {
@@ -80,7 +79,7 @@ public abstract class DynamicQueryUADExporter<T extends BaseModel>
 					writeToZip(baseModel, zipWriter);
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			});
 
@@ -117,15 +116,7 @@ public abstract class DynamicQueryUADExporter<T extends BaseModel>
 	protected abstract String[] doGetUserIdFieldNames();
 
 	protected String formatXML(String xml) {
-		try {
-			Document document = SAXReaderUtil.read(
-				_escapeCDATAClosingCharacters(xml));
-
-			return document.formattedString();
-		}
-		catch (Exception exception) {
-			throw new SystemException(exception);
-		}
+		return XMLUtil.formatXML(xml);
 	}
 
 	/**
@@ -166,7 +157,9 @@ public abstract class DynamicQueryUADExporter<T extends BaseModel>
 	 * @param  baseModel the base model to be converted into an XML string
 	 * @return an XML string representation of the base model
 	 */
-	protected abstract String toXmlString(T baseModel);
+	protected String toXmlString(T baseModel) {
+		return baseModel.toXmlString();
+	}
 
 	/**
 	 * Converts the type {@code T} base model to a byte array and writes it to
@@ -182,20 +175,6 @@ public abstract class DynamicQueryUADExporter<T extends BaseModel>
 		byte[] data = export(baseModel);
 
 		zipWriter.addEntry(baseModel.getPrimaryKeyObj() + ".xml", data);
-	}
-
-	private String _escapeCDATAClosingCharacters(String xml) {
-
-		// If the closing token of a CDATA container is found inside the CDATA
-		// container, split the CDATA container into two separate CDATA
-		// containers. This is generally accepted method of "escaping" for this
-		// case since there is no real way to escape those characters. See
-		// LPS-85393 for more information.
-
-		xml = StringUtil.replace(xml, "]]><", "[$SPECIAL_CHARACTER$]");
-		xml = StringUtil.replace(xml, "]]>", "]]]]><![CDATA[>");
-
-		return StringUtil.replace(xml, "[$SPECIAL_CHARACTER$]", "]]><");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

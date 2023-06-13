@@ -14,13 +14,16 @@
 
 package com.liferay.fragment.collection.filter.keyword.display.context;
 
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Víctor Galán
@@ -34,13 +37,15 @@ public class FragmentCollectionFilterKeywordDisplayContext {
 
 		_configuration = configuration;
 		_fragmentEntryConfigurationParser = fragmentEntryConfigurationParser;
+
 		_fragmentRendererContext = fragmentRendererContext;
 
-		_fragmentEntryLink = fragmentRendererContext.getFragmentEntryLink();
+		_fragmentEntryLink = _fragmentRendererContext.getFragmentEntryLink();
 	}
 
 	public String getFragmentEntryLinkNamespace() {
-		return _fragmentRendererContext.getFragmentElementId();
+		return _fragmentEntryLink.getFragmentEntryLinkId() +
+			StringPool.UNDERLINE + _fragmentEntryLink.getNamespace();
 	}
 
 	public String getLabel() {
@@ -59,7 +64,9 @@ public class FragmentCollectionFilterKeywordDisplayContext {
 	}
 
 	public boolean isDisabled() {
-		return _fragmentRendererContext.isEditMode();
+		return Objects.equals(
+			_fragmentRendererContext.getMode(),
+			FragmentEntryLinkConstants.EDIT);
 	}
 
 	public boolean isShowLabel() {

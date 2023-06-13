@@ -19,8 +19,7 @@ import {MockRouter} from '../../mock/MockRouter.es';
 import '@testing-library/jest-dom/extend-expect';
 
 describe('The PerformanceByStepPage component having data should', () => {
-	let getAllByRole;
-	let rows;
+	let getAllByRole, rows;
 
 	const items = [
 		{
@@ -63,17 +62,17 @@ describe('The PerformanceByStepPage component having data should', () => {
 		totalCount: 2,
 	};
 
-	const wrapper = ({children}) => <MockRouter>{children}</MockRouter>;
+	const clientMock = {
+		get: jest.fn().mockResolvedValue({data}),
+		request: jest.fn().mockResolvedValue({data}),
+	};
+
+	const wrapper = ({children}) => (
+		<MockRouter client={clientMock}>{children}</MockRouter>
+	);
 
 	beforeAll(async () => {
 		jsonSessionStorage.set('timeRanges', timeRangeData);
-
-		fetch.mockResolvedValue({
-			json: () => Promise.resolve(data),
-			ok: true,
-			text: () => Promise.resolve(),
-		});
-
 		const renderResult = render(
 			<PerformanceByStepPage routeParams={{processId: '1234'}} />,
 			{wrapper}

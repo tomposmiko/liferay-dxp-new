@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -269,23 +267,6 @@ public abstract class SXPElementLocalServiceBaseImpl
 		return sxpElementPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
-	@Override
-	public SXPElement fetchSXPElementByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
-
-		return sxpElementPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
-	}
-
-	@Override
-	public SXPElement getSXPElementByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return sxpElementPersistence.findByERC_C(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the sxp element with the primary key.
 	 *
@@ -422,11 +403,6 @@ public abstract class SXPElementLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement SXPElementLocalServiceImpl#deleteSXPElement(SXPElement) to avoid orphaned data");
-		}
 
 		return sxpElementLocalService.deleteSXPElement(
 			(SXPElement)persistedModel);
@@ -591,8 +567,5 @@ public abstract class SXPElementLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPElementLocalServiceBaseImpl.class);
 
 }

@@ -29,10 +29,6 @@ public class LayoutFriendlyURLLocalServiceWrapper
 	implements LayoutFriendlyURLLocalService,
 			   ServiceWrapper<LayoutFriendlyURLLocalService> {
 
-	public LayoutFriendlyURLLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutFriendlyURLLocalServiceWrapper(
 		LayoutFriendlyURLLocalService layoutFriendlyURLLocalService) {
 

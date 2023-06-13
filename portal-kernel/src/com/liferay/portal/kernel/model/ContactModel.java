@@ -300,32 +300,32 @@ public interface ContactModel
 	public void setLastName(String lastName);
 
 	/**
-	 * Returns the prefix list type ID of this contact.
+	 * Returns the prefix ID of this contact.
 	 *
-	 * @return the prefix list type ID of this contact
+	 * @return the prefix ID of this contact
 	 */
-	public long getPrefixListTypeId();
+	public long getPrefixId();
 
 	/**
-	 * Sets the prefix list type ID of this contact.
+	 * Sets the prefix ID of this contact.
 	 *
-	 * @param prefixListTypeId the prefix list type ID of this contact
+	 * @param prefixId the prefix ID of this contact
 	 */
-	public void setPrefixListTypeId(long prefixListTypeId);
+	public void setPrefixId(long prefixId);
 
 	/**
-	 * Returns the suffix list type ID of this contact.
+	 * Returns the suffix ID of this contact.
 	 *
-	 * @return the suffix list type ID of this contact
+	 * @return the suffix ID of this contact
 	 */
-	public long getSuffixListTypeId();
+	public long getSuffixId();
 
 	/**
-	 * Sets the suffix list type ID of this contact.
+	 * Sets the suffix ID of this contact.
 	 *
-	 * @param suffixListTypeId the suffix list type ID of this contact
+	 * @param suffixId the suffix ID of this contact
 	 */
-	public void setSuffixListTypeId(long suffixListTypeId);
+	public void setSuffixId(long suffixId);
 
 	/**
 	 * Returns the male of this contact.
@@ -514,9 +514,5 @@ public interface ContactModel
 
 	@Override
 	public Contact cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -14,14 +14,10 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.document;
 
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
-import com.liferay.portal.search.elasticsearch7.internal.helper.SearchLogHelperUtil;
-import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.document.configuration.BulkDocumentRequestRetryConfiguration;
+import com.liferay.portal.search.elasticsearch7.internal.util.SearchLogHelperUtil;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentItemResponse;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentResponse;
@@ -30,7 +26,7 @@ import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
 
-import java.util.Map;
+import java.io.IOException;
 
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -44,18 +40,13 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.rest.RestStatus;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
  */
-@Component(
-	configurationPid = "com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.document.configuration.BulkDocumentRequestRetryConfiguration",
-	service = BulkDocumentRequestExecutor.class
-)
+@Component(service = BulkDocumentRequestExecutor.class)
 public class BulkDocumentRequestExecutorImpl
 	implements BulkDocumentRequestExecutor {
 
@@ -65,7 +56,7 @@ public class BulkDocumentRequestExecutorImpl
 
 		BulkRequest bulkRequest = createBulkRequest(bulkDocumentRequest);
 
-		BulkResponse bulkResponse = _getBulkResponse(
+		BulkResponse bulkResponse = getBulkResponse(
 			bulkRequest, bulkDocumentRequest);
 
 		SearchLogHelperUtil.logActionResponse(_log, bulkResponse);
@@ -108,18 +99,6 @@ public class BulkDocumentRequestExecutorImpl
 		}
 
 		return bulkDocumentResponse;
-	}
-
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		BulkDocumentRequestRetryConfiguration
-			bulkDocumentRequestRetryConfiguration =
-				ConfigurableUtil.createConfigurable(
-					BulkDocumentRequestRetryConfiguration.class, properties);
-
-		_numberOfTries = bulkDocumentRequestRetryConfiguration.numberOfTries();
-		_waitInSeconds = bulkDocumentRequestRetryConfiguration.waitInSeconds();
 	}
 
 	protected BulkRequest createBulkRequest(
@@ -167,7 +146,7 @@ public class BulkDocumentRequestExecutorImpl
 		return bulkRequest;
 	}
 
-	private BulkResponse _getBulkResponse(
+	protected BulkResponse getBulkResponse(
 		BulkRequest bulkRequest, BulkDocumentRequest bulkDocumentRequest) {
 
 		RestHighLevelClient restHighLevelClient =
@@ -175,59 +154,36 @@ public class BulkDocumentRequestExecutorImpl
 				bulkDocumentRequest.getConnectionId(),
 				bulkDocumentRequest.isPreferLocalCluster());
 
-		for (int i = 0;;) {
-			try {
-				return restHighLevelClient.bulk(
-					bulkRequest, RequestOptions.DEFAULT);
-			}
-			catch (Exception exception) {
-				if (i++ >= _numberOfTries) {
-					if (_numberOfTries == 1) {
-						_log.error("The retry failed to get a bulk response");
-					}
-					else if (_numberOfTries == 2) {
-						_log.error(
-							"Both retries failed to get a bulk response");
-					}
-					else if (_numberOfTries > 2) {
-						_log.error(
-							"All " + _numberOfTries +
-								" retries failed to get a bulk response");
-					}
-
-					throw new RuntimeException(exception);
-				}
-
-				_log.error(
-					StringBundler.concat(
-						"There was an exception while getting a response from ",
-						"the search engine, will retry in ", _waitInSeconds,
-						" seconds (", i, "/", _numberOfTries, "). ",
-						exception));
-
-				try {
-					Thread.sleep(_waitInSeconds * Time.SECOND);
-				}
-				catch (InterruptedException interruptedException) {
-					_log.error(interruptedException);
-
-					throw new RuntimeException(exception);
-				}
-			}
+		try {
+			return restHighLevelClient.bulk(
+				bulkRequest, RequestOptions.DEFAULT);
 		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+	}
+
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setElasticsearchBulkableDocumentRequestTranslator(
+		ElasticsearchBulkableDocumentRequestTranslator
+			elasticsearchBulkableDocumentRequestTranslator) {
+
+		_elasticsearchBulkableDocumentRequestTranslator =
+			elasticsearchBulkableDocumentRequestTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BulkDocumentRequestExecutorImpl.class);
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
 	private ElasticsearchBulkableDocumentRequestTranslator
 		_elasticsearchBulkableDocumentRequestTranslator;
-
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
-
-	private volatile int _numberOfTries;
-	private volatile int _waitInSeconds;
 
 }

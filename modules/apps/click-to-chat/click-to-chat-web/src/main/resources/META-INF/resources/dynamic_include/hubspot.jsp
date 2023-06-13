@@ -34,7 +34,7 @@ if (themeDisplay.isSignedIn() && (parts.length > 1)) {
 				"firstName", user.getFirstName()
 			).put(
 				"lastName", user.getLastName()
-			).toString(),
+			).toJSONString(),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 		options.setLocation("https://api.hubspot.com/conversations/v3/visitor-identification/tokens/create?hapikey=" + parts[1]);
 		options.setPost(true);
@@ -49,7 +49,7 @@ if (themeDisplay.isSignedIn() && (parts.length > 1)) {
 	}
 	catch (Exception exception) {
 		if (_log.isWarnEnabled()) {
-			_log.warn(exception);
+			_log.warn(exception, exception);
 		}
 	}
 }

@@ -20,50 +20,17 @@ import React, {
 	useMemo,
 	useReducer,
 	useRef,
-	useState,
 } from 'react';
 
 import useUndo from '../components/undo/useUndo';
 
+const StoreDispatchContext = React.createContext(() => {});
+const StoreGetStateContext = React.createContext(null);
+const StoreSubscriptionContext = React.createContext([() => {}, () => {}]);
+
 const DEFAULT_COMPARE_EQUAL = (a, b) => a === b;
 const DEFAULT_DISPATCH = () => {};
 const DEFAULT_GET_STATE = () => ({});
-
-const StoreDispatchContext = React.createContext(DEFAULT_DISPATCH);
-const StoreGetStateContext = React.createContext(DEFAULT_GET_STATE);
-const StoreSubscriptionContext = React.createContext(() => {});
-
-class EventEmitter {
-	constructor() {
-		this._listeners = new Map();
-		this._nextListenerId = 0;
-	}
-
-	addListener(callback) {
-		const id = this._nextListenerId++;
-
-		this._listeners.set(id, callback);
-
-		return {
-			removeListener: () => {
-				this._listeners.delete(id);
-			},
-		};
-	}
-
-	emit(data) {
-		for (const listener of this._listeners.values()) {
-			try {
-				listener(data);
-			}
-			catch (error) {
-				if (process.env.NODE_ENV === 'development') {
-					console.error(error);
-				}
-			}
-		}
-	}
-}
 
 /**
  * Although StoreContextProvider creates a full functional store,
@@ -74,25 +41,33 @@ class EventEmitter {
  * that calls dispatch and getState methods instead of using a real
  * reducer internally.
  */
-export function StoreAPIContextProvider({
+export const StoreAPIContextProvider = ({
 	children,
 	dispatch = DEFAULT_DISPATCH,
 	getState = DEFAULT_GET_STATE,
-}) {
-	const [emitter] = useState(() => new EventEmitter());
+}) => {
 	const state = getState();
 
-	const subscribe = useCallback(
-		(subscriber) => emitter.addListener(subscriber),
-		[emitter]
-	);
+	const subscribers = useRef([]);
+
+	const subscribe = useCallback((subscriber) => {
+		subscribers.current = [...subscribers.current, subscriber];
+	}, []);
+
+	const unsubscribe = useCallback((subscriber) => {
+		subscribers.current = subscribers.current.filter(
+			(_subscriber) => _subscriber !== subscriber
+		);
+	}, []);
+
+	const subscriptionContext = useRef([subscribe, unsubscribe]);
 
 	useEffect(() => {
-		emitter.emit(state);
-	}, [emitter, state]);
+		subscribers.current.forEach((subscriber) => subscriber(state));
+	}, [state]);
 
 	return (
-		<StoreSubscriptionContext.Provider value={subscribe}>
+		<StoreSubscriptionContext.Provider value={subscriptionContext.current}>
 			<StoreDispatchContext.Provider value={dispatch}>
 				<StoreGetStateContext.Provider value={getState}>
 					{children}
@@ -100,7 +75,7 @@ export function StoreAPIContextProvider({
 			</StoreDispatchContext.Provider>
 		</StoreSubscriptionContext.Provider>
 	);
-}
+};
 
 /**
  * StoreContext is a black box for components: they should
@@ -110,7 +85,7 @@ export function StoreAPIContextProvider({
  * That's why we only provide a custom StoreContextProvider instead
  * of the raw React context.
  */
-export function StoreContextProvider({children, initialState, reducer}) {
+export const StoreContextProvider = ({children, initialState, reducer}) => {
 	const [state, dispatch] = useThunk(
 		useUndo(useReducer(reducer, initialState))
 	);
@@ -125,26 +100,24 @@ export function StoreContextProvider({children, initialState, reducer}) {
 			{children}
 		</StoreAPIContextProvider>
 	);
-}
+};
 
 /**
  * @see https://react-redux.js.org/api/hooks#usedispatch
  */
-export function useDispatch() {
-	return useContext(StoreDispatchContext);
-}
+export const useDispatch = () => useContext(StoreDispatchContext);
 
-export function useGetState() {
+export const useGetState = () => {
 	return useContext(StoreGetStateContext);
-}
+};
 
-export function useSelectorCallback(
+export const useSelectorCallback = (
 	selector,
 	dependencies,
 	compareEqual = DEFAULT_COMPARE_EQUAL
-) {
+) => {
 	const getState = useContext(StoreGetStateContext);
-	const subscribe = useContext(StoreSubscriptionContext);
+	const [subscribe, unsubscribe] = useContext(StoreSubscriptionContext);
 
 	const initialState = useMemo(
 		() => selector(getState()),
@@ -156,55 +129,36 @@ export function useSelectorCallback(
 		[]
 	);
 
-	const [selectorState, setSelectorState] = useReducer((state, nextState) => {
-
-		// If nextState is undefined, we consider this an accidental
-		// outdated-props issue. If you need to use an empty real state,
-		// use null instead.
-
-		if (nextState === undefined) {
-			return state;
-		}
-
-		return compareEqual(state, nextState) ? state : nextState;
-	}, initialState);
+	const [selectorState, setSelectorState] = useReducer(
+		(state, nextState) =>
+			compareEqual(state, nextState) ? state : nextState,
+		initialState
+	);
 
 	/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	const selectorCallback = useCallback(selector, dependencies);
 
 	useEffect(() => {
-		setSelectorState(selectorCallback(getState()));
-
-		const handler = subscribe((nextState) => {
+		const onStoreChange = (nextState) => {
 			setSelectorState(selectorCallback(nextState));
-		});
+		};
+
+		setSelectorState(selectorCallback(getState()));
+		subscribe(onStoreChange);
 
 		return () => {
-			if (handler) {
-				handler.removeListener();
-			}
+			unsubscribe(onStoreChange);
 		};
-	}, [getState, selectorCallback, subscribe]);
+	}, [getState, selectorCallback, subscribe, unsubscribe]);
 
 	return selectorState;
-}
+};
 
 /**
  * @see https://react-redux.js.org/api/hooks#useselector
  */
-export function useSelector(selector, compareEqual = DEFAULT_COMPARE_EQUAL) {
-	return useSelectorCallback(selector, [], compareEqual);
-}
-
-export function useSelectorRef(selector) {
-	const ref = useRef(null);
-
-	useSelector((state) => {
-		ref.current = selector(state);
-	});
-
-	return ref;
-}
+export const useSelector = (selector, compareEqual = DEFAULT_COMPARE_EQUAL) =>
+	useSelectorCallback(selector, [], compareEqual);
 
 function useThunk([state, dispatch]) {
 	const isMounted = useIsMounted();
@@ -212,7 +166,7 @@ function useThunk([state, dispatch]) {
 
 	stateRef.current = state;
 
-	const thunkDispatchRef = useRef((action) => {
+	const thunkDispatch = useRef((action) => {
 		if (isMounted()) {
 			if (typeof action === 'function') {
 				return action(
@@ -232,5 +186,5 @@ function useThunk([state, dispatch]) {
 		}
 	});
 
-	return [state, thunkDispatchRef.current];
+	return [state, thunkDispatch.current];
 }

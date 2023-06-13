@@ -33,7 +33,7 @@ const LanguagesList = ({
 	onItemDrop = noop,
 	moveItem = noop,
 }) => {
-	const managerRef = useRef(createDndContext(HTML5Backend));
+	const manager = useRef(createDndContext(HTML5Backend));
 
 	return (
 		<ClayTable borderless headVerticalAlignment="middle" hover={false}>
@@ -58,7 +58,7 @@ const LanguagesList = ({
 			</ClayTable.Head>
 
 			<ClayTable.Body>
-				<DndProvider manager={managerRef.current.dragDropManager}>
+				<DndProvider manager={manager.current.dragDropManager}>
 					{locales.map((locale, index) => {
 						const baseProps = {
 							...locale,

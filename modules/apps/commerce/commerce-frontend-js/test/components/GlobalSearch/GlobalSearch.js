@@ -12,31 +12,30 @@
  * details.
  */
 
-import '../../tests_utilities/polyfills';
+import '../../utils/polyfills';
 
 import '@testing-library/jest-dom/extend-expect';
-import {fireEvent, render} from '@testing-library/react';
+import {
+	cleanup,
+	fireEvent,
+	render,
+	waitForElement,
+} from '@testing-library/react';
 import fetchMock from 'fetch-mock';
 import React from 'react';
 
 import ServiceProvider from '../../../src/main/resources/META-INF/resources/ServiceProvider/index';
 import GlobalSearch from '../../../src/main/resources/META-INF/resources/components/global_search/GlobalSearch';
-import {
-	accountTemplate,
-	getAccounts,
-} from '../../tests_utilities/fake_data/accounts';
-import {getOrders, orderTemplate} from '../../tests_utilities/fake_data/orders';
-import {
-	getProducts,
-	productTemplate,
-} from '../../tests_utilities/fake_data/products';
+import {accountTemplate, getAccounts} from '../../utils/fake_data/accounts';
+import {getOrders, orderTemplate} from '../../utils/fake_data/orders';
+import {getProducts, productTemplate} from '../../utils/fake_data/products';
 
 const accountsEndpointRegexp = new RegExp(
 	ServiceProvider.AdminAccountAPI('v1').baseURL
 );
 
-const cartsEndpointRegexp = new RegExp(
-	'/o/headless-commerce-delivery-cart/v1.0/channels/'
+const ordersEndpointRegexp = new RegExp(
+	ServiceProvider.AdminOrderAPI('v1').baseURL
 );
 
 const productsEndpointRegexp = new RegExp(
@@ -51,26 +50,27 @@ describe('Global Search', () => {
 
 		beforeEach(() => {
 			fetchMock.mock(accountsEndpointRegexp, (url) => getAccounts(url));
-			fetchMock.mock(cartsEndpointRegexp, (url) => getOrders(url));
+			fetchMock.mock(ordersEndpointRegexp, (url) => getOrders(url));
 			fetchMock.mock(productsEndpointRegexp, (url) => getProducts(url));
 
 			renderedComponent = render(
 				<GlobalSearch
-					accountId={11111}
 					accountURLTemplate="/account-page/{id}"
 					accountsSearchURLTemplate="/accounts?search={query}"
-					cartURLTemplate="/cart-page/{id}"
-					cartsSearchURLTemplate="/carts?search={query}"
 					channelId={11111}
 					globalSearchURLTemplate="/global?search={query}"
+					orderURLTemplate="/order-page/{id}"
+					ordersSearchURLTemplate="/orders?search={query}"
 					productURLTemplate="/product-page/{id}"
 					productsSearchURLTemplate="/products?search={query}"
+					spritemap="./assets/icons.svg"
 				/>
 			);
 		});
 
 		afterEach(() => {
 			fetchMock.restore();
+			cleanup();
 		});
 
 		describe('When input is empty', () => {
@@ -98,14 +98,18 @@ describe('Global Search', () => {
 
 			describe('after the results are loaded', () => {
 				beforeEach(async () => {
-					await renderedComponent.findByText(
-						`search-${query}-in-accounts`
+					await waitForElement(() =>
+						renderedComponent.getByText(
+							`search-${query}-in-accounts`
+						)
 					);
-					await renderedComponent.findByText(
-						`search-${query}-in-catalog`
+					await waitForElement(() =>
+						renderedComponent.getByText(
+							`search-${query}-in-catalog`
+						)
 					);
-					await renderedComponent.findByText(
-						`search-${query}-in-orders`
+					await waitForElement(() =>
+						renderedComponent.getByText(`search-${query}-in-orders`)
 					);
 				});
 
@@ -113,7 +117,7 @@ describe('Global Search', () => {
 					expect(
 						renderedComponent.getByText(`search-${query}-in-orders`)
 							.href
-					).toContain(`/carts?search=${query}`);
+					).toContain(`/orders?search=${query}`);
 
 					expect(
 						renderedComponent.getByText(
@@ -158,18 +162,18 @@ describe('Global Search', () => {
 					expect(firstProduct.text).toBe(productTemplate.name);
 				});
 
-				it('must show a orders list', () => {
-					const carts = renderedComponent.baseElement.querySelectorAll(
+				it('must show an order list', () => {
+					const orders = renderedComponent.baseElement.querySelectorAll(
 						'.order-item'
 					);
-					const firstCart = carts[0];
+					const firstOrder = orders[0];
 
-					expect(carts.length).toBe(4);
+					expect(orders.length).toBe(4);
 
-					expect(firstCart.text).toContain(orderTemplate.id);
+					expect(firstOrder.text).toContain(orderTemplate.id);
 
-					expect(firstCart.href).toContain(
-						`/cart-page/${orderTemplate.id}`
+					expect(firstOrder.href).toContain(
+						`/order-page/${orderTemplate.id}`
 					);
 				});
 
@@ -197,6 +201,90 @@ describe('Global Search', () => {
 					);
 
 					expect(firstAccount.text).toBe(accountTemplate.name);
+				});
+			});
+		});
+	});
+
+	describe('When responses are not ok', () => {
+		let renderedComponent;
+		const toastErrorMessages = [];
+
+		beforeEach(() => {
+			window.Liferay.staticEnvTestUtils.print = (message) => {
+				toastErrorMessages.push(message);
+			};
+
+			fetchMock.mock(accountsEndpointRegexp, () => {
+				return Promise.reject({message: 'Error - accounts'});
+			});
+			fetchMock.mock(ordersEndpointRegexp, () => {
+				return Promise.reject({message: 'Error - orders'});
+			});
+			fetchMock.mock(productsEndpointRegexp, () => {
+				return Promise.reject({message: 'Error - products'});
+			});
+
+			renderedComponent = render(
+				<GlobalSearch
+					accountURLTemplate="/account-page/{id}"
+					accountsSearchURLTemplate="/accounts?search={query}"
+					channelId={11111}
+					globalSearchURLTemplate="/global?search={query}"
+					orderURLTemplate="/order-page/{id}"
+					ordersSearchURLTemplate="/orders?search={query}"
+					productURLTemplate="/product-page/{id}"
+					productsSearchURLTemplate="/products?search={query}"
+					spritemap="./assets/icons.svg"
+				/>
+			);
+		});
+
+		afterEach(() => {
+			fetchMock.restore();
+			cleanup();
+		});
+
+		describe('When input is filled', () => {
+			beforeEach(() => {
+				const input = renderedComponent.getByPlaceholderText(/search/);
+
+				fireEvent.change(input, {target: {value: query}});
+			});
+
+			describe('after the results are loaded', () => {
+				it('must show coherent messages', async () => {
+					expect(
+						await waitForElement(() =>
+							renderedComponent.getByText(`no-orders-were-found`)
+						)
+					).toBeInTheDocument();
+
+					expect(
+						await waitForElement(() =>
+							renderedComponent.getByText(
+								`no-products-were-found`
+							)
+						)
+					).toBeInTheDocument();
+
+					expect(
+						await waitForElement(() =>
+							renderedComponent.getByText(
+								`no-accounts-were-found`
+							)
+						)
+					).toBeInTheDocument();
+
+					expect(
+						renderedComponent.getByText(`more-global-results`).href
+					).toContain(`/global?search=${query}`);
+				});
+
+				it('must notify the user', () => {
+					expect(toastErrorMessages).toContain('Error - accounts');
+					expect(toastErrorMessages).toContain('Error - orders');
+					expect(toastErrorMessages).toContain('Error - products');
 				});
 			});
 		});

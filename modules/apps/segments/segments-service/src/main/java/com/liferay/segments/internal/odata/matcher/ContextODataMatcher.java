@@ -15,12 +15,13 @@
 package com.liferay.segments.internal.odata.matcher;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.Filter;
 import com.liferay.portal.odata.filter.FilterParser;
-import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.filter.InvalidFilterException;
 import com.liferay.segments.context.Context;
 import com.liferay.segments.internal.odata.entity.ContextEntityModel;
@@ -30,11 +31,14 @@ import java.util.function.Predicate;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = "target.class.name=com.liferay.segments.context.Context",
 	service = ODataMatcher.class
 )
@@ -55,12 +59,54 @@ public class ContextODataMatcher implements ODataMatcher<Context> {
 		}
 	}
 
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(entity.model.name=" + ContextEntityModel.NAME + ")",
+		unbind = "unbindFilterParser"
+	)
+	public void setFilterParser(FilterParser filterParser) {
+		if (_log.isInfoEnabled()) {
+			_log.info("Binding " + filterParser);
+		}
+
+		_filterParser = filterParser;
+	}
+
+	public void unbindFilterParser(FilterParser filterParser) {
+		if (_log.isInfoEnabled()) {
+			_log.info("Unbinding " + filterParser);
+		}
+
+		_filterParser = null;
+	}
+
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(entity.model.name=" + ContextEntityModel.NAME + ")",
+		unbind = "unbindEntityModel"
+	)
+	protected void setEntityModel(EntityModel entityModel) {
+		if (_log.isInfoEnabled()) {
+			_log.info("Binding " + entityModel);
+		}
+
+		_entityModel = entityModel;
+	}
+
+	protected void unbindEntityModel(EntityModel entityModel) {
+		if (_log.isInfoEnabled()) {
+			_log.info("Unbinding " + entityModel);
+		}
+
+		_entityModel = null;
+	}
+
 	private Predicate<Context> _getPredicate(String filterString)
 		throws Exception {
 
-		FilterParser filterParser = _filterParserProvider.provide(_entityModel);
-
-		Filter filter = new Filter(filterParser.parse(filterString));
+		Filter filter = new Filter(_filterParser.parse(filterString));
 
 		try {
 			return _expressionConvert.convert(
@@ -72,13 +118,14 @@ public class ContextODataMatcher implements ODataMatcher<Context> {
 		}
 	}
 
-	@Reference(target = "(entity.model.name=" + ContextEntityModel.NAME + ")")
-	private EntityModel _entityModel;
+	private static final Log _log = LogFactoryUtil.getLog(
+		ContextODataMatcher.class);
+
+	private volatile EntityModel _entityModel;
 
 	@Reference(target = "(result.class.name=java.util.function.Predicate)")
 	private ExpressionConvert<Predicate<Context>> _expressionConvert;
 
-	@Reference
-	private FilterParserProvider _filterParserProvider;
+	private FilterParser _filterParser;
 
 }

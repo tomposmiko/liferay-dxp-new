@@ -94,23 +94,6 @@ public class AccountEntryOrganizationRelWrapper
 		return wrap(model.cloneWithOriginalValues());
 	}
 
-	@Override
-	public AccountEntry fetchAccountEntry() {
-		return model.fetchAccountEntry();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.Organization fetchOrganization() {
-		return model.fetchOrganization();
-	}
-
-	@Override
-	public AccountEntry getAccountEntry()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getAccountEntry();
-	}
-
 	/**
 	 * Returns the account entry ID of this account entry organization rel.
 	 *
@@ -149,13 +132,6 @@ public class AccountEntryOrganizationRelWrapper
 	@Override
 	public long getMvccVersion() {
 		return model.getMvccVersion();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.Organization getOrganization()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getOrganization();
 	}
 
 	/**
@@ -243,11 +219,6 @@ public class AccountEntryOrganizationRelWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

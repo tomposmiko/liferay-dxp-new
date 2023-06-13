@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pedro Queiroz
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.description=document-library-field-type-description",
 		"ddm.form.field.type.display.order:Integer=8",

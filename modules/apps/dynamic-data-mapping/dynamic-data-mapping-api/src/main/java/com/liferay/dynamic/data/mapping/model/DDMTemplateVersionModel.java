@@ -664,8 +664,4 @@ public interface DDMTemplateVersionModel
 	@Override
 	public DDMTemplateVersion cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -15,11 +15,9 @@
 package com.liferay.dynamic.data.mapping.internal.util;
 
 import com.liferay.dynamic.data.mapping.configuration.DDMIndexerConfiguration;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
-import com.liferay.dynamic.data.mapping.internal.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.internal.io.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.internal.test.util.DDMFixture;
-import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -27,14 +25,13 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureImpl;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
@@ -44,311 +41,293 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.engine.ConnectionInformation;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.MockedStatic;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Lino Alves
  * @author André de Oliveira
  */
+@PrepareOnlyThisForTest(
+	{DDMStructureLocalServiceUtil.class, ResourceBundleUtil.class}
+)
+@RunWith(PowerMockRunner.class)
+@SuppressStaticInitializationFor(
+	"com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil"
+)
 public class DDMIndexerImplTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		Mockito.when(
-			FrameworkUtil.getBundle(Mockito.any())
-		).thenReturn(
-			bundleContext.getBundle()
-		);
-
-		Dictionary<String, Object> properties = new Hashtable<>();
-
-		properties.put("ddm.form.deserializer.type", "json");
-
-		_ddmFormDeserializerServiceRegistration = bundleContext.registerService(
-			DDMFormDeserializer.class, _ddmFormDeserializer, properties);
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		_ddmFormDeserializerServiceRegistration.unregister();
-
-		_frameworkUtilMockedStatic.close();
-	}
 
 	@Before
 	public void setUp() throws Exception {
-		_ddmFixture.setUp();
-		_documentFixture.setUp();
+		ddmFixture.setUp();
+		documentFixture.setUp();
+		setUpPortalUtil();
+		setUpPropsUtil();
 
-		_setUpPortalUtil();
-		_setUpPropsUtil();
-
-		_ddmIndexer = _createDDMIndexer();
+		ddmIndexer = createDDMIndexer();
 	}
 
 	@After
-	public void tearDown() {
-		_ddmFixture.tearDown();
-		_documentFixture.tearDown();
-	}
+	public void tearDown() throws Exception {
+		ddmFixture.tearDown();
 
-	@Test
-	public void testExtractIndexableAttributes() {
-		_testExtractIndexableAttributes(
-			_createDDMFormField(), StringPool.BLANK);
-		_testExtractIndexableAttributes(_createDDMFormField(), "Create New");
-		_testExtractIndexableAttributes(_createDDMFormField(), "null");
-
-		DDMFormField ddmFormField = _createDDMFormField();
-
-		ddmFormField.setRepeatable(true);
-
-		_testExtractIndexableAttributes(ddmFormField, StringPool.BLANK);
+		documentFixture.tearDown();
 	}
 
 	@Test
 	public void testFormWithOneAvailableLocaleSameAsDefaultLocale() {
-		Document document = _createDocument();
+		Locale defaultLocale = LocaleUtil.JAPAN;
+		Locale translationLocale = LocaleUtil.JAPAN;
+
+		Set<Locale> availableLocales = Collections.singleton(defaultLocale);
 
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			SetUtil.fromArray(LocaleUtil.JAPAN), LocaleUtil.JAPAN);
+			availableLocales, defaultLocale);
 
-		ddmForm.addDDMFormField(_createDDMFormField());
+		String fieldName = "text1";
+		String indexType = "text";
 
-		LocalizedValue localizedValue = new LocalizedValue(LocaleUtil.JAPAN);
+		ddmForm.addDDMFormField(createDDMFormField(fieldName, indexType));
 
-		localizedValue.addString(LocaleUtil.JAPAN, "新規作成");
+		String fieldValue = "新規作成";
 
-		_ddmIndexer.addAttributes(
-			document, _createDDMStructure(ddmForm),
-			_createDDMFormValues(
-				ddmForm,
-				DDMFormValuesTestUtil.createDDMFormFieldValue(
-					_FIELD_NAME, localizedValue)));
+		DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(
+			fieldName, translationLocale, fieldValue, defaultLocale);
+
+		Document document = createDocument();
+
+		DDMStructure ddmStructure = createDDMStructure(ddmForm);
+
+		DDMFormValues ddmFormValues = createDDMFormValues(
+			ddmForm, ddmFormFieldValue);
+
+		ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
+
+		Map<String, String> map = _withSortableValues(
+			Collections.singletonMap(
+				"ddmFieldArray.ddmFieldValueText_ja_JP", fieldValue));
 
 		FieldValuesAssert.assertFieldValues(
-			_getSortableValues(
-				Collections.singletonMap(
-					"ddmFieldArray.ddmFieldValueText_ja_JP", "新規作成")),
-			"ddmFieldArray.ddmFieldValueText", document, "新規作成");
+			map, "ddmFieldArray.ddmFieldValueText", document, fieldValue);
 	}
 
 	@Test
 	public void testFormWithTwoAvailableLocalesAndFieldWithNondefaultLocale() {
-		Document document = _createDocument();
+		Locale defaultLocale = LocaleUtil.US;
+		Locale translationLocale = LocaleUtil.JAPAN;
+
+		Set<Locale> availableLocales = new HashSet<>(
+			Arrays.asList(defaultLocale, translationLocale));
 
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			SetUtil.fromArray(LocaleUtil.US, LocaleUtil.JAPAN), LocaleUtil.US);
+			availableLocales, defaultLocale);
 
-		ddmForm.addDDMFormField(_createDDMFormField());
+		String fieldName = "text1";
+		String indexType = "text";
 
-		LocalizedValue localizedValue = new LocalizedValue(LocaleUtil.US);
+		ddmForm.addDDMFormField(createDDMFormField(fieldName, indexType));
 
-		localizedValue.addString(LocaleUtil.JAPAN, "新規作成");
+		String fieldValue = "新規作成";
 
-		_ddmIndexer.addAttributes(
-			document, _createDDMStructure(ddmForm),
-			_createDDMFormValues(
-				ddmForm,
-				DDMFormValuesTestUtil.createDDMFormFieldValue(
-					_FIELD_NAME, localizedValue)));
+		DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(
+			fieldName, translationLocale, fieldValue, defaultLocale);
+
+		Document document = createDocument();
+
+		DDMStructure ddmStructure = createDDMStructure(ddmForm);
+
+		DDMFormValues ddmFormValues = createDDMFormValues(
+			ddmForm, ddmFormFieldValue);
+
+		ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
+
+		Map<String, String> map = _withSortableValues(
+			Collections.singletonMap(
+				"ddmFieldArray.ddmFieldValueText_ja_JP", fieldValue));
 
 		FieldValuesAssert.assertFieldValues(
-			_getSortableValues(
-				Collections.singletonMap(
-					"ddmFieldArray.ddmFieldValueText_ja_JP", "新規作成")),
-			"ddmFieldArray.ddmFieldValueText", document, "新規作成");
+			map, "ddmFieldArray.ddmFieldValueText", document, fieldValue);
 	}
 
 	@Test
 	public void testFormWithTwoAvailableLocalesAndFieldWithTwoLocales() {
-		Document document = _createDocument();
+		Locale defaultLocale = LocaleUtil.JAPAN;
+		Locale translationLocale = LocaleUtil.US;
+
+		Set<Locale> availableLocales = new HashSet<>(
+			Arrays.asList(defaultLocale, translationLocale));
 
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			SetUtil.fromArray(LocaleUtil.JAPAN, LocaleUtil.US),
-			LocaleUtil.JAPAN);
+			availableLocales, defaultLocale);
 
-		ddmForm.addDDMFormField(_createDDMFormField());
+		String fieldName = "text1";
+		String indexType = "text";
 
-		LocalizedValue localizedValue = new LocalizedValue(LocaleUtil.JAPAN);
+		DDMFormField ddmFormField = createDDMFormField(fieldName, indexType);
 
-		localizedValue.addString(LocaleUtil.JAPAN, "新規作成");
-		localizedValue.addString(LocaleUtil.US, "Create New");
+		ddmForm.addDDMFormField(ddmFormField);
 
-		_ddmIndexer.addAttributes(
-			document, _createDDMStructure(ddmForm),
-			_createDDMFormValues(
-				ddmForm,
-				DDMFormValuesTestUtil.createDDMFormFieldValue(
-					_FIELD_NAME, localizedValue)));
+		String fieldValueJP = "新規作成";
+		String fieldValueUS = "Create New";
+
+		DDMFormFieldValue ddmFormFieldValueJP = createDDMFormFieldValue(
+			fieldName, defaultLocale, fieldValueJP, defaultLocale);
+
+		DDMFormFieldValue ddmFormFieldValueUS = createDDMFormFieldValue(
+			fieldName, translationLocale, fieldValueUS, defaultLocale);
+
+		Document document = createDocument();
+
+		DDMStructure ddmStructure = createDDMStructure(ddmForm);
+
+		DDMFormValues ddmFormValues = createDDMFormValues(
+			ddmForm, ddmFormFieldValueJP, ddmFormFieldValueUS);
+
+		ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
+
+		Map<String, String> map = _withSortableValues(
+			HashMapBuilder.put(
+				"ddmFieldArray.ddmFieldValueText_en_US", fieldValueUS
+			).put(
+				"ddmFieldArray.ddmFieldValueText_ja_JP", fieldValueJP
+			).build());
 
 		FieldValuesAssert.assertFieldValues(
-			_getSortableValues(
-				HashMapBuilder.put(
-					"ddmFieldArray.ddmFieldValueText_en_US", "Create New"
-				).put(
-					"ddmFieldArray.ddmFieldValueText_ja_JP", "新規作成"
-				).build()),
-			"ddmFieldArray.ddmFieldValueText", document, "新規作成");
+			map, "ddmFieldArray.ddmFieldValueText", document, fieldValueJP);
 	}
 
-	private DDMFormField _createDDMFormField() {
-		DDMFormField ddmFormField = DDMFormTestUtil.createTextDDMFormField(
-			_FIELD_NAME, true, false, true);
+	protected DDMFormField createDDMFormField(
+		String fieldName, String indexType) {
 
-		ddmFormField.setIndexType("text");
+		DDMFormField ddmFormField = DDMFormTestUtil.createTextDDMFormField(
+			fieldName, true, false, true);
+
+		ddmFormField.setIndexType(indexType);
 
 		return ddmFormField;
 	}
 
-	private DDMFormJSONSerializer _createDDMFormJSONSerializer() {
+	protected DDMFormFieldValue createDDMFormFieldValue(
+		String name, Locale locale, String valueString, Locale defaultLocale) {
+
+		LocalizedValue localizedValue = new LocalizedValue(defaultLocale);
+
+		localizedValue.addString(locale, valueString);
+
+		return DDMFormValuesTestUtil.createDDMFormFieldValue(
+			name, localizedValue);
+	}
+
+	protected DDMFormJSONSerializer createDDMFormJSONSerializer() {
 		return new DDMFormJSONSerializer() {
 			{
-				ReflectionTestUtil.setFieldValue(
-					this, "_ddmFormFieldTypeServicesRegistry",
-					Mockito.mock(DDMFormFieldTypeServicesRegistry.class));
-				ReflectionTestUtil.setFieldValue(
-					this, "_jsonFactory", new JSONFactoryImpl());
+				setDDMFormFieldTypeServicesTracker(
+					Mockito.mock(DDMFormFieldTypeServicesTracker.class));
+
+				setJSONFactory(new JSONFactoryImpl());
 			}
 		};
 	}
 
-	private DDMFormValues _createDDMFormValues(
-		DDMForm ddmForm, DDMFormFieldValue ddmFormFieldValue) {
+	protected DDMFormValues createDDMFormValues(
+		DDMForm ddmForm, DDMFormFieldValue... ddmFormFieldValues) {
 
 		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
 			ddmForm);
 
-		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
+		}
 
 		return ddmFormValues;
 	}
 
-	private DDMIndexer _createDDMIndexer() {
+	protected DDMIndexer createDDMIndexer() {
 		return new DDMIndexerImpl() {
 			{
-				DDMIndexerConfiguration ddmIndexerConfiguration = () -> false;
+				DDMIndexerConfiguration ddmIndexerConfiguration =
+					new DDMIndexerConfiguration() {
 
-				ReflectionTestUtil.setFieldValue(
-					this, "_ddmFormValuesToFieldsConverter",
-					new DDMFormValuesToFieldsConverterImpl());
+						public boolean enableLegacyDDMIndexFields() {
+							return false;
+						}
+
+					};
+
 				ReflectionTestUtil.setFieldValue(
 					this, "_ddmIndexerConfiguration", ddmIndexerConfiguration);
 
-				searchEngineInformation = new SearchEngineInformation() {
-
-					public String getClientVersionString() {
-						return null;
-					}
-
-					public List<ConnectionInformation>
-						getConnectionInformationList() {
-
-						return null;
-					}
-
-					public String getNodesString() {
-						return null;
-					}
-
-					public String getVendorString() {
-						return null;
-					}
-
-				};
+				setDDMFormValuesToFieldsConverter(
+					new DDMFormValuesToFieldsConverterImpl());
 			}
 		};
 	}
 
-	private DDMStructure _createDDMStructure(DDMForm ddmForm) {
+	protected DDMStructure createDDMStructure(DDMForm ddmForm) {
 		DDMStructure ddmStructure = new DDMStructureImpl();
 
-		DDMFormSerializerSerializeRequest.Builder builder =
-			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
-
-		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
-			_ddmFormJSONSerializer.serialize(builder.build());
-
-		ddmStructure.setDefinition(
-			ddmFormSerializerSerializeResponse.getContent());
+		ddmStructure.setDefinition(serialize(ddmForm));
 
 		ddmStructure.setDDMForm(ddmForm);
 
 		ddmStructure.setStructureId(RandomTestUtil.randomLong());
 		ddmStructure.setName(RandomTestUtil.randomString());
 
-		_ddmFixture.whenDDMStructureLocalServiceFetchStructure(ddmStructure);
+		ddmFixture.whenDDMStructureLocalServiceFetchStructure(ddmStructure);
 
 		return ddmStructure;
 	}
 
-	private Document _createDocument() {
+	protected Document createDocument() {
 		return DocumentFixture.newDocument(
 			RandomTestUtil.randomLong(), RandomTestUtil.randomLong(),
 			DDMForm.class.getName());
 	}
 
-	private Map<String, String> _getSortableValues(Map<String, String> map) {
-		Map<String, String> sortableValues = new HashMap<>();
+	protected String serialize(DDMForm ddmForm) {
+		DDMFormSerializerSerializeRequest.Builder builder =
+			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
 
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			sortableValues.put(
-				entry.getKey() + "_String_sortable",
-				StringUtil.toLowerCase(entry.getValue()));
-		}
+		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
+			ddmFormJSONSerializer.serialize(builder.build());
 
-		sortableValues.putAll(map);
-
-		return sortableValues;
+		return ddmFormSerializerSerializeResponse.getContent();
 	}
 
-	private void _setUpPortalUtil() {
+	protected void setUpPortalUtil() {
 		PortalUtil portalUtil = new PortalUtil();
 
-		Portal portal = Mockito.mock(Portal.class);
+		Portal portal = PowerMockito.mock(Portal.class);
 
-		ResourceBundle resourceBundle = Mockito.mock(ResourceBundle.class);
+		ResourceBundle resourceBundle = PowerMockito.mock(ResourceBundle.class);
 
-		Mockito.when(
-			portal.getResourceBundle(Mockito.any(Locale.class))
+		PowerMockito.when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
 		).thenReturn(
 			resourceBundle
 		);
@@ -356,45 +335,30 @@ public class DDMIndexerImplTest {
 		portalUtil.setPortal(portal);
 	}
 
-	private void _setUpPropsUtil() {
+	protected void setUpPropsUtil() {
 		PropsTestUtil.setProps(
 			PropsKeys.INDEX_SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH, "255");
 	}
 
-	private void _testExtractIndexableAttributes(
-		DDMFormField ddmFormField, String fieldValue) {
+	protected final DDMFixture ddmFixture = new DDMFixture();
+	protected final DDMFormJSONSerializer ddmFormJSONSerializer =
+		createDDMFormJSONSerializer();
+	protected DDMIndexer ddmIndexer;
+	protected final DocumentFixture documentFixture = new DocumentFixture();
 
-		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			SetUtil.fromArray(LocaleUtil.US), LocaleUtil.US);
+	private Map<String, String> _withSortableValues(Map<String, String> map) {
+		Set<Map.Entry<String, String>> entrySet = map.entrySet();
 
-		ddmForm.addDDMFormField(ddmFormField);
+		Stream<Map.Entry<String, String>> entries = entrySet.stream();
 
-		Assert.assertEquals(
-			fieldValue,
-			_ddmIndexer.extractIndexableAttributes(
-				_createDDMStructure(ddmForm),
-				_createDDMFormValues(
-					ddmForm,
-					DDMFormValuesTestUtil.createDDMFormFieldValue(
-						_FIELD_NAME,
-						DDMFormValuesTestUtil.createLocalizedValue(
-							fieldValue, LocaleUtil.US))),
-				LocaleUtil.US));
+		Map<String, String> map2 = entries.collect(
+			Collectors.toMap(
+				entry -> entry.getKey() + "_String_sortable",
+				entry -> StringUtil.toLowerCase(entry.getValue())));
+
+		map2.putAll(map);
+
+		return map2;
 	}
-
-	private static final String _FIELD_NAME = RandomTestUtil.randomString();
-
-	private static final DDMFormDeserializer _ddmFormDeserializer =
-		new DDMFormJSONDeserializer();
-	private static ServiceRegistration<DDMFormDeserializer>
-		_ddmFormDeserializerServiceRegistration;
-	private static final MockedStatic<FrameworkUtil>
-		_frameworkUtilMockedStatic = Mockito.mockStatic(FrameworkUtil.class);
-
-	private final DDMFixture _ddmFixture = new DDMFixture();
-	private final DDMFormJSONSerializer _ddmFormJSONSerializer =
-		_createDDMFormJSONSerializer();
-	private DDMIndexer _ddmIndexer;
-	private final DocumentFixture _documentFixture = new DocumentFixture();
 
 }

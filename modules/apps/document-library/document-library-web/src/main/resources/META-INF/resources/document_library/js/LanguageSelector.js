@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
 function getLanguage(id) {
-	const text = id.replaceAll('_', '-');
+	const text = id.replace('_', '-');
 	const icon = text.toLowerCase();
 
 	return {
@@ -41,7 +41,6 @@ function LanguageSelector({languageIds, onChange, selectedLanguageId}) {
 					<span className="inline-item">
 						<ClayIcon symbol={selectedLanguage.icon} />
 					</span>
-
 					<span className="btn-section">{selectedLanguage.text}</span>
 				</ClayButton>
 			}
@@ -62,7 +61,6 @@ function LanguageSelector({languageIds, onChange, selectedLanguageId}) {
 							<span className="inline-item inline-item-before">
 								<ClayIcon symbol={icon} />
 							</span>
-
 							{text}
 						</ClayDropDown.Item>
 					);

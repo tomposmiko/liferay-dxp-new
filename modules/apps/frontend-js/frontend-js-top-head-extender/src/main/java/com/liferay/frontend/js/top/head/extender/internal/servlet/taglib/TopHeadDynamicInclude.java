@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilder;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilderFactory;
-import com.liferay.portal.url.builder.ComboRequestAbsolutePortalURLBuilder;
 import com.liferay.portal.util.JavaScriptBundleUtil;
 
 import java.io.IOException;
@@ -51,7 +50,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 /**
  * @author Iván Zaera Avellón
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class TopHeadDynamicInclude implements DynamicInclude {
 
 	@Override
@@ -65,22 +64,30 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 				WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay.isThemeJsFastLoad()) {
+			boolean cdnDynamicResourcesEnabled =
+				_portal.isCDNDynamicResourcesEnabled(
+					themeDisplay.getCompanyId());
+
 			if (themeDisplay.isThemeJsBarebone()) {
 				_renderBundleComboURLs(
-					httpServletRequest, httpServletResponse, _jsResourceURLs);
+					httpServletRequest, httpServletResponse, _jsResourceURLs,
+					cdnDynamicResourcesEnabled);
 			}
 			else {
 				_renderBundleComboURLs(
-					httpServletRequest, httpServletResponse,
-					_allJsResourceURLs);
+					httpServletRequest, httpServletResponse, _allJsResourceURLs,
+					cdnDynamicResourcesEnabled);
 			}
 		}
 		else {
 			if (themeDisplay.isThemeJsBarebone()) {
-				_renderBundleURLs(httpServletResponse, _jsResourceURLs);
+				_renderBundleURLs(
+					httpServletRequest, httpServletResponse, _jsResourceURLs);
 			}
 			else {
-				_renderBundleURLs(httpServletResponse, _allJsResourceURLs);
+				_renderBundleURLs(
+					httpServletRequest, httpServletResponse,
+					_allJsResourceURLs);
 			}
 		}
 	}
@@ -89,6 +96,13 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
 		dynamicIncludeRegistry.register(
 			"/html/common/themes/top_js.jspf#resources");
+	}
+
+	@Reference(unbind = "-")
+	public void setPortal(Portal portal) {
+		_portal = portal;
+
+		_rebuild();
 	}
 
 	@Activate
@@ -152,6 +166,12 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 		_rebuild();
 	}
 
+	protected void updatedTopHeadResources(
+		ServiceReference<TopHeadResources> topHeadResourcesServiceReference) {
+
+		_rebuild();
+	}
+
 	private void _addPortalBundles(List<String> urls, String propsKey) {
 		String[] fileNames = JavaScriptBundleUtil.getFileNames(propsKey);
 
@@ -185,20 +205,18 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 					topHeadResourcesServiceReference);
 
 				try {
-					String bundleContextPath = _portal.getPathContext(
+					String portalPathContext = _portal.getPathContext();
+
+					String servletPathContext = _portal.getPathContext(
 						topHeadResources.getServletContextPath());
 
-					String proxyPath = _portal.getPathProxy();
-
-					String unproxiedBundleContextPath =
-						bundleContextPath.substring(proxyPath.length());
-
-					String urlPrefix = proxyPath + unproxiedBundleContextPath;
+					String servletContextPath = servletPathContext.substring(
+						portalPathContext.length());
 
 					for (String jsResourcePath :
 							topHeadResources.getJsResourcePaths()) {
 
-						String url = urlPrefix + jsResourcePath;
+						String url = servletContextPath.concat(jsResourcePath);
 
 						_allJsResourceURLs.add(url);
 						_jsResourceURLs.add(url);
@@ -208,7 +226,8 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 							topHeadResources.
 								getAuthenticatedJsResourcePaths()) {
 
-						_allJsResourceURLs.add(urlPrefix + jsResourcePath);
+						_allJsResourceURLs.add(
+							servletContextPath.concat(jsResourcePath));
 					}
 				}
 				finally {
@@ -221,30 +240,34 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 
 	private void _renderBundleComboURLs(
 			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, List<String> urls)
+			HttpServletResponse httpServletResponse, List<String> urls,
+			boolean cdnDynamicResourcesEnabled)
 		throws IOException {
+
+		PrintWriter printWriter = httpServletResponse.getWriter();
+
+		StringBundler sb = new StringBundler();
+
+		long jsLastModified = -1;
+
+		if (_portalWebResources != null) {
+			jsLastModified = _portalWebResources.getLastModified();
+		}
+
+		String comboPath = _portal.getStaticResourceURL(
+			httpServletRequest, "/combo", "minifierType=js", jsLastModified);
 
 		AbsolutePortalURLBuilder absolutePortalURLBuilder =
 			_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
 				httpServletRequest);
 
-		ComboRequestAbsolutePortalURLBuilder
-			comboRequestAbsolutePortalURLBuilder =
-				absolutePortalURLBuilder.forComboRequest();
-
-		long timestamp = -1;
-
-		if (_portalWebResources != null) {
-			timestamp = _portalWebResources.getLastModified();
+		if (!cdnDynamicResourcesEnabled) {
+			absolutePortalURLBuilder.ignoreCDNHost();
 		}
 
-		comboRequestAbsolutePortalURLBuilder.setTimestamp(timestamp);
-
-		String comboURL = comboRequestAbsolutePortalURLBuilder.build();
-
-		PrintWriter printWriter = httpServletResponse.getWriter();
-
-		StringBundler sb = new StringBundler();
+		String comboURL = absolutePortalURLBuilder.forResource(
+			comboPath
+		).build();
 
 		for (String url : urls) {
 			if ((sb.length() + url.length() + 1) >= 2000) {
@@ -267,12 +290,21 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 	}
 
 	private void _renderBundleURLs(
+			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, List<String> urls)
 		throws IOException {
 
 		PrintWriter printWriter = httpServletResponse.getWriter();
 
 		for (String url : urls) {
+			AbsolutePortalURLBuilder absolutePortalURLBuilder =
+				_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
+					httpServletRequest);
+
+			url = absolutePortalURLBuilder.forResource(
+				url
+			).build();
+
 			_renderScriptURL(printWriter, url);
 		}
 	}
@@ -289,10 +321,7 @@ public class TopHeadDynamicInclude implements DynamicInclude {
 	private volatile List<String> _allJsResourceURLs = new ArrayList<>();
 	private BundleContext _bundleContext;
 	private volatile List<String> _jsResourceURLs = new ArrayList<>();
-
-	@Reference
 	private Portal _portal;
-
 	private PortalWebResources _portalWebResources;
 	private final Collection<ServiceReference<TopHeadResources>>
 		_topHeadResourcesServiceReferences = new TreeSet<>();

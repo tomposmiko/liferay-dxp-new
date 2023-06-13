@@ -15,6 +15,7 @@
 package com.liferay.asset.kernel.service.persistence;
 
 import com.liferay.asset.kernel.model.AssetLink;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -1229,9 +1230,14 @@ public class AssetLinkUtil {
 	}
 
 	public static AssetLinkPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (AssetLinkPersistence)PortalBeanLocatorUtil.locate(
+				AssetLinkPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile AssetLinkPersistence _persistence;
+	private static AssetLinkPersistence _persistence;
 
 }

@@ -15,6 +15,7 @@
 package com.liferay.message.boards.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.model.MVCCModel;
@@ -400,6 +401,15 @@ public interface MBCategoryModel
 	public void setStatusDate(Date statusDate);
 
 	/**
+	 * Returns the trash entry created when this message boards category was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message boards category.
+	 *
+	 * @return the trash entry created when this message boards category was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws PortalException;
+
+	/**
 	 * Returns the class primary key of the trash entry for this message boards category.
 	 *
 	 * @return the class primary key of the trash entry for this message boards category
@@ -408,12 +418,36 @@ public interface MBCategoryModel
 	public long getTrashEntryClassPK();
 
 	/**
+	 * Returns the trash handler for this message boards category.
+	 *
+	 * @return the trash handler for this message boards category
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler();
+
+	/**
 	 * Returns <code>true</code> if this message boards category is in the Recycle Bin.
 	 *
 	 * @return <code>true</code> if this message boards category is in the Recycle Bin; <code>false</code> otherwise
 	 */
 	@Override
 	public boolean isInTrash();
+
+	/**
+	 * Returns <code>true</code> if the parent of this message boards category is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this message boards category is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer();
+
+	@Override
+	public boolean isInTrashExplicitly();
+
+	@Override
+	public boolean isInTrashImplicitly();
 
 	/**
 	 * Returns <code>true</code> if this message boards category is approved.
@@ -521,9 +555,5 @@ public interface MBCategoryModel
 
 	@Override
 	public MBCategory cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

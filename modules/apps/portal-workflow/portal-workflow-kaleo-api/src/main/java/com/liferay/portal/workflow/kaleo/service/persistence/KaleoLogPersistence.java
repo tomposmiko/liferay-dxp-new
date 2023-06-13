@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchLogException;
 import com.liferay.portal.workflow.kaleo.model.KaleoLog;
 
@@ -33,8 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-public interface KaleoLogPersistence
-	extends BasePersistence<KaleoLog>, CTPersistence<KaleoLog> {
+public interface KaleoLogPersistence extends BasePersistence<KaleoLog> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

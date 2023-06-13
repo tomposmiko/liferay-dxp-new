@@ -17,11 +17,9 @@
 <%@ include file="/deletions/init.jsp" %>
 
 <c:if test="<%= cmd.equals(Constants.EXPORT) || cmd.equals(Constants.IMPORT) || cmd.equals(Constants.PUBLISH) %>">
-	<div aria-labelledby="<portlet:namespace />deletions" class="options-group" role="group">
+	<aui:fieldset cssClass="options-group" markupView="lexicon">
 		<clay:sheet-section>
-			<span class="sheet-subtitle" id="<portlet:namespace />deletions">
-				<liferay-ui:message key="deletions" />
-			</span>
+			<h3 class="sheet-subtitle"><liferay-ui:message key="deletions" /></h3>
 
 			<c:if test="<%= !cmd.equals(Constants.EXPORT) %>">
 				<liferay-staging:checkbox
@@ -46,5 +44,5 @@
 				name="<%= PortletDataHandlerKeys.DELETIONS %>"
 			/>
 		</clay:sheet-section>
-	</div>
+	</aui:fieldset>
 </c:if>

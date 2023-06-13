@@ -25,7 +25,6 @@ import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.internal.helper.v1_0.CategoryHelper;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.CategoryResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -47,11 +46,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/category.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {CategoryResource.class, NestedFieldSupport.class}
 )
-@CTAware
 public class CategoryResourceImpl
 	extends BaseCategoryResourceImpl implements NestedFieldSupport {
 

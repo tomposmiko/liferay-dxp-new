@@ -21,15 +21,14 @@ import com.liferay.object.admin.rest.client.dto.v1_0.ObjectLayoutColumn;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectLayoutRow;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectLayoutTab;
 import com.liferay.object.constants.ObjectDefinitionConstants;
-import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.rule.Inject;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Collections;
 
@@ -46,7 +45,6 @@ import org.junit.runner.RunWith;
 public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -54,24 +52,19 @@ public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 
 		_objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), false, false,
+				TestPropsValues.getUserId(),
 				LocalizedMapUtil.getLocalizedMap(value), value, null, null,
 				LocalizedMapUtil.getLocalizedMap(value),
 				ObjectDefinitionConstants.SCOPE_COMPANY,
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 				Collections.emptyList());
 
 		_objectField = _objectFieldLocalService.addCustomObjectField(
-			null, TestPropsValues.getUserId(), 0,
-			_objectDefinition.getObjectDefinitionId(),
-			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, false, false, null,
-			LocalizedMapUtil.getLocalizedMap("Able"), false, "able", true,
-			false, Collections.emptyList());
+			TestPropsValues.getUserId(), 0,
+			_objectDefinition.getObjectDefinitionId(), false, false, null,
+			LocalizedMapUtil.getLocalizedMap("Able"), "able", true, "String");
 	}
 
 	@After
-	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
 
@@ -100,8 +93,6 @@ public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 		objectLayout.setDefaultObjectLayout(false);
 		objectLayout.setName(
 			Collections.singletonMap("en-US", RandomTestUtil.randomString()));
-		objectLayout.setObjectDefinitionExternalReferenceCode(
-			_objectDefinition.getExternalReferenceCode());
 		objectLayout.setObjectDefinitionId(
 			_objectDefinition.getObjectDefinitionId());
 		objectLayout.setObjectLayoutTabs(
@@ -116,26 +107,6 @@ public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 
 		return objectLayoutResource.postObjectDefinitionObjectLayout(
 			_objectDefinition.getObjectDefinitionId(), randomObjectLayout());
-	}
-
-	@Override
-	protected ObjectLayout
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-				String objectDefinitionExternalReferenceCode,
-				ObjectLayout objectLayout)
-		throws Exception {
-
-		return objectLayoutResource.
-			postObjectDefinitionByExternalReferenceCodeObjectLayout(
-				objectDefinitionExternalReferenceCode, objectLayout);
-	}
-
-	@Override
-	protected String
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getExternalReferenceCode()
-		throws Exception {
-
-		return _objectDefinition.getExternalReferenceCode();
 	}
 
 	@Override
@@ -163,17 +134,6 @@ public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 	}
 
 	@Override
-	protected ObjectLayout
-			testPostObjectDefinitionByExternalReferenceCodeObjectLayout_addObjectLayout(
-				ObjectLayout objectLayout)
-		throws Exception {
-
-		return objectLayoutResource.
-			postObjectDefinitionByExternalReferenceCodeObjectLayout(
-				_objectDefinition.getExternalReferenceCode(), objectLayout);
-	}
-
-	@Override
 	protected ObjectLayout testPutObjectLayout_addObjectLayout()
 		throws Exception {
 
@@ -191,7 +151,6 @@ public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 					_randomObjectLayoutRow()
 				};
 				priority = RandomTestUtil.randomInt();
-				type = Type.REGULAR;
 			}
 		};
 	}
@@ -199,7 +158,7 @@ public class ObjectLayoutResourceTest extends BaseObjectLayoutResourceTestCase {
 	private ObjectLayoutColumn _randomObjectLayoutColumn() {
 		return new ObjectLayoutColumn() {
 			{
-				objectFieldName = _objectField.getName();
+				objectFieldId = _objectField.getObjectFieldId();
 				priority = RandomTestUtil.randomInt();
 				size = RandomTestUtil.randomInt(1, 12);
 			}

@@ -29,8 +29,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.portal.kernel.model.UserGroupRole",
-	service = DTOConverter.class
+	service = {AccountRoleDTOConverter.class, DTOConverter.class}
 )
 public class AccountRoleDTOConverter
 	implements DTOConverter<UserGroupRole, AccountRole> {

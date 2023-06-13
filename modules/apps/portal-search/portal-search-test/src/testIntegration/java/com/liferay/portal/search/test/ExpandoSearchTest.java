@@ -26,7 +26,6 @@ import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
@@ -298,10 +297,13 @@ public class ExpandoSearchTest {
 	protected FileEntry addDLFileEntry(String columnName, String columnValue)
 		throws Exception {
 
+		ServiceContext serviceContext = getServiceContext(
+			columnName, columnValue);
+
 		FileEntry fileEntry = DLAppTestUtil.addFileEntryWithWorkflow(
 			TestPropsValues.getUserId(), TestPropsValues.getGroupId(), 0,
 			StringPool.BLANK, RandomTestUtil.randomString(), true,
-			getServiceContext(columnName, columnValue));
+			serviceContext);
 
 		_fileEntries.add(fileEntry);
 
@@ -357,8 +359,8 @@ public class ExpandoSearchTest {
 		String firstName = RandomTestUtil.randomString();
 		String middleName = RandomTestUtil.randomString();
 		String lastName = RandomTestUtil.randomString();
-		long prefixListTypeId = 0;
-		long suffixListTypeId = 0;
+		long prefixId = 0;
+		long suffixId = 0;
 		boolean male = false;
 		int birthdayMonth = Calendar.JANUARY;
 		int birthdayDay = 1;
@@ -372,9 +374,8 @@ public class ExpandoSearchTest {
 		User user = _userLocalService.addUser(
 			creatorUserId, TestPropsValues.getCompanyId(), autoPassword,
 			password1, password2, autoScreenName, screenName, emailAddress,
-			locale, firstName, middleName, lastName, prefixListTypeId,
-			suffixListTypeId, male, birthdayMonth, birthdayDay, birthdayYear,
-			jobTitle, UserConstants.TYPE_REGULAR,
+			locale, firstName, middleName, lastName, prefixId, suffixId, male,
+			birthdayMonth, birthdayDay, birthdayYear, jobTitle,
 			new long[] {TestPropsValues.getGroupId()}, organizationIds, roleIds,
 			userGroupIds, sendMail, serviceContext);
 
@@ -386,7 +387,10 @@ public class ExpandoSearchTest {
 	protected User addUser(String columnName, String columnValue)
 		throws Exception {
 
-		return addUser(getServiceContext(columnName, columnValue));
+		ServiceContext serviceContext = getServiceContext(
+			columnName, columnValue);
+
+		return addUser(serviceContext);
 	}
 
 	protected void assertNoHits(String keywords) throws Exception {

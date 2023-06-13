@@ -14,10 +14,8 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.search.elasticsearch7.internal.util.ClassLoaderUtil;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import java.nio.file.Files;
@@ -26,28 +24,17 @@ import java.nio.file.Paths;
 
 import java.security.KeyStore;
 
-import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.concurrent.BasicFuture;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.nio.protocol.HttpAsyncRequestProducer;
-import org.apache.http.nio.protocol.HttpAsyncResponseConsumer;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 
@@ -66,11 +53,11 @@ public class RestHighLevelClientFactory {
 
 	public RestHighLevelClient newRestHighLevelClient() {
 		RestClientBuilder restClientBuilder = RestClient.builder(
-			_getHttpHosts()
+			getHttpHosts()
 		).setHttpClientConfigCallback(
-			this::_customizeHttpClient
+			this::customizeHttpClient
 		).setRequestConfigCallback(
-			this::_customizeRequestConfig
+			this::customizeRequestConfig
 		);
 
 		return ClassLoaderUtil.getWithContextClassLoader(
@@ -92,19 +79,6 @@ public class RestHighLevelClientFactory {
 
 		public Builder httpSSLEnabled(boolean httpSSLEnabled) {
 			_restHighLevelClientFactory._httpSSLEnabled = httpSSLEnabled;
-
-			return this;
-		}
-
-		public Builder maxConnections(int maxConnections) {
-			_restHighLevelClientFactory._maxConnections = maxConnections;
-
-			return this;
-		}
-
-		public Builder maxConnectionsPerRoute(int maxConnectionsPerRoute) {
-			_restHighLevelClientFactory._maxConnectionsPerRoute =
-				maxConnectionsPerRoute;
 
 			return this;
 		}
@@ -158,29 +132,7 @@ public class RestHighLevelClientFactory {
 
 	}
 
-	private RestHighLevelClientFactory() {
-	}
-
-	private RestHighLevelClientFactory(
-		RestHighLevelClientFactory restHighLevelClientFactory) {
-
-		_authenticationEnabled =
-			restHighLevelClientFactory._authenticationEnabled;
-		_httpSSLEnabled = restHighLevelClientFactory._httpSSLEnabled;
-		_maxConnections = restHighLevelClientFactory._maxConnections;
-		_maxConnectionsPerRoute =
-			restHighLevelClientFactory._maxConnectionsPerRoute;
-		_networkHostAddresses =
-			restHighLevelClientFactory._networkHostAddresses;
-		_password = restHighLevelClientFactory._password;
-		_truststorePassword = restHighLevelClientFactory._truststorePassword;
-		_truststorePath = restHighLevelClientFactory._truststorePath;
-		_truststoreType = restHighLevelClientFactory._truststoreType;
-		_proxyConfig = restHighLevelClientFactory._proxyConfig;
-		_userName = restHighLevelClientFactory._userName;
-	}
-
-	private CredentialsProvider _createCredentialsProvider() {
+	protected CredentialsProvider createCredentialsProvider() {
 		CredentialsProvider credentialsProvider =
 			new BasicCredentialsProvider();
 
@@ -198,7 +150,7 @@ public class RestHighLevelClientFactory {
 		return credentialsProvider;
 	}
 
-	private SSLContext _createSSLContext() {
+	protected SSLContext createSSLContext() {
 		try {
 			Path path = Paths.get(_truststorePath);
 
@@ -221,115 +173,64 @@ public class RestHighLevelClientFactory {
 		}
 	}
 
-	private HttpAsyncClientBuilder _customizeHttpClient(
+	protected HttpAsyncClientBuilder customizeHttpClient(
 		HttpAsyncClientBuilder httpAsyncClientBuilder) {
 
-		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-
 		if (_authenticationEnabled) {
-			httpClientBuilder.setDefaultCredentialsProvider(
-				_createCredentialsProvider());
+			httpAsyncClientBuilder.setDefaultCredentialsProvider(
+				createCredentialsProvider());
 		}
 
 		if (_httpSSLEnabled) {
-			httpClientBuilder.setSSLContext(_createSSLContext());
+			httpAsyncClientBuilder.setSSLContext(createSSLContext());
 		}
 
 		if ((_proxyConfig != null) && _proxyConfig.shouldApplyConfig()) {
-			httpClientBuilder.setProxy(
+			httpAsyncClientBuilder.setProxy(
 				new HttpHost(
 					_proxyConfig.getHost(), _proxyConfig.getPort(), "http"));
 		}
 
-		httpClientBuilder.disableAuthCaching();
-		httpClientBuilder.disableAutomaticRetries();
-		httpClientBuilder.disableConnectionState();
-		httpClientBuilder.disableContentCompression();
-		httpClientBuilder.disableCookieManagement();
-		httpClientBuilder.disableDefaultUserAgent();
-		httpClientBuilder.disableRedirectHandling();
-
-		httpClientBuilder.setMaxConnPerRoute(_maxConnectionsPerRoute);
-		httpClientBuilder.setMaxConnTotal(_maxConnections);
-
-		CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
-
-		CloseableHttpAsyncClient closeableHttpAsyncClient =
-			new CloseableHttpAsyncClient() {
-
-				@Override
-				public void close() throws IOException {
-					closeableHttpClient.close();
-				}
-
-				@Override
-				public <T> Future<T> execute(
-					HttpAsyncRequestProducer httpAsyncRequestProducer,
-					HttpAsyncResponseConsumer<T> httpAsyncResponseConsumer,
-					HttpContext httpContext, FutureCallback<T> futureCallback) {
-
-					BasicFuture<T> basicFuture = new BasicFuture<>(
-						futureCallback);
-
-					try (CloseableHttpResponse closeableHttpResponse =
-							closeableHttpClient.execute(
-								httpAsyncRequestProducer.getTarget(),
-								httpAsyncRequestProducer.generateRequest(),
-								httpContext)) {
-
-						HttpEntity httpEntity =
-							closeableHttpResponse.getEntity();
-
-						if (httpEntity != null) {
-							closeableHttpResponse.setEntity(
-								new BufferedHttpEntity(httpEntity));
-						}
-
-						basicFuture.completed((T)closeableHttpResponse);
-					}
-					catch (Exception exception) {
-						basicFuture.failed(exception);
-					}
-
-					return basicFuture;
-				}
-
-				@Override
-				public boolean isRunning() {
-					return true;
-				}
-
-				@Override
-				public void start() {
-				}
-
-			};
-
-		return new HttpAsyncClientBuilder() {
-
-			@Override
-			public CloseableHttpAsyncClient build() {
-				return closeableHttpAsyncClient;
-			}
-
-		};
+		return httpAsyncClientBuilder;
 	}
 
-	private RequestConfig.Builder _customizeRequestConfig(
+	protected RequestConfig.Builder customizeRequestConfig(
 		RequestConfig.Builder requestConfigBuilder) {
 
 		return requestConfigBuilder.setSocketTimeout(120000);
 	}
 
-	private HttpHost[] _getHttpHosts() {
-		return TransformUtil.transform(
-			_networkHostAddresses, HttpHost::create, HttpHost.class);
+	protected HttpHost[] getHttpHosts() {
+		return Stream.of(
+			_networkHostAddresses
+		).map(
+			HttpHost::create
+		).toArray(
+			HttpHost[]::new
+		);
+	}
+
+	private RestHighLevelClientFactory() {
+	}
+
+	private RestHighLevelClientFactory(
+		RestHighLevelClientFactory restHighLevelClientFactory) {
+
+		_authenticationEnabled =
+			restHighLevelClientFactory._authenticationEnabled;
+		_httpSSLEnabled = restHighLevelClientFactory._httpSSLEnabled;
+		_networkHostAddresses =
+			restHighLevelClientFactory._networkHostAddresses;
+		_password = restHighLevelClientFactory._password;
+		_truststorePassword = restHighLevelClientFactory._truststorePassword;
+		_truststorePath = restHighLevelClientFactory._truststorePath;
+		_truststoreType = restHighLevelClientFactory._truststoreType;
+		_proxyConfig = restHighLevelClientFactory._proxyConfig;
+		_userName = restHighLevelClientFactory._userName;
 	}
 
 	private boolean _authenticationEnabled;
 	private boolean _httpSSLEnabled;
-	private int _maxConnections;
-	private int _maxConnectionsPerRoute;
 	private String[] _networkHostAddresses;
 	private String _password;
 	private ProxyConfig _proxyConfig;

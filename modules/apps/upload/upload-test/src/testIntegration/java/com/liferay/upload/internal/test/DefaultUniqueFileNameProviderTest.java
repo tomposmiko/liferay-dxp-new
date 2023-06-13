@@ -17,7 +17,7 @@ package com.liferay.upload.internal.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.upload.configuration.UploadServletRequestConfigurationProviderUtil;
+import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.upload.UniqueFileNameProvider;
@@ -50,7 +50,7 @@ public class DefaultUniqueFileNameProviderTest {
 		String originalFileName = "filename.extension";
 
 		for (int i = 1;
-			 i <= UploadServletRequestConfigurationProviderUtil.getMaxTries();
+			 i <= UploadServletRequestConfigurationHelperUtil.getMaxTries();
 			 i++) {
 
 			String uniqueFileName = _uniqueFileNameProvider.provide(
@@ -78,8 +78,7 @@ public class DefaultUniqueFileNameProviderTest {
 		_uniqueFileNameProvider.provide(
 			"filename.extension",
 			_existsUntil(
-				UploadServletRequestConfigurationProviderUtil.getMaxSize() +
-					1));
+				UploadServletRequestConfigurationHelperUtil.getMaxSize() + 1));
 	}
 
 	@Test

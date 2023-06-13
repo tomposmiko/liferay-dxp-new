@@ -16,8 +16,10 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.util.DLAppHelperThreadLocal;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
@@ -193,8 +195,7 @@ public class TempFileEntryUtil {
 		throws PortalException {
 
 		Repository repository = RepositoryLocalServiceUtil.fetchRepository(
-			groupId, TempFileEntryUtil.class.getName(),
-			TempFileEntryUtil.class.getName());
+			groupId, TempFileEntryUtil.class.getName(), StringPool.BLANK);
 
 		if (repository != null) {
 			return RepositoryProviderUtil.getLocalRepository(
@@ -203,7 +204,7 @@ public class TempFileEntryUtil {
 
 		Group group = GroupLocalServiceUtil.getGroup(groupId);
 
-		User user = UserLocalServiceUtil.getGuestUser(group.getCompanyId());
+		User user = UserLocalServiceUtil.getDefaultUser(group.getCompanyId());
 
 		long classNameId = PortalUtil.getClassNameId(
 			"com.liferay.portal.repository.temporaryrepository." +
@@ -214,15 +215,17 @@ public class TempFileEntryUtil {
 
 		boolean dlAppHelperEnabled = DLAppHelperThreadLocal.isEnabled();
 
-		try {
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(0)) {
+
 			DLAppHelperThreadLocal.setEnabled(false);
 
 			repository = RepositoryLocalServiceUtil.addRepository(
 				user.getUserId(), groupId, classNameId,
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				TempFileEntryUtil.class.getName(), StringPool.BLANK,
-				TempFileEntryUtil.class.getName(),
-				typeSettingsUnicodeProperties, true, serviceContext);
+				StringPool.BLANK, typeSettingsUnicodeProperties, true,
+				serviceContext);
 
 			return RepositoryProviderUtil.getLocalRepository(
 				repository.getRepositoryId());

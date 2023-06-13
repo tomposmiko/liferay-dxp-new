@@ -17,6 +17,8 @@
 <%@ include file="/wiki/init.jsp" %>
 
 <%
+String tabs2 = ParamUtil.getString(request, "tabs2");
+
 String redirect = ParamUtil.getString(request, "redirect");
 
 String uploadProgressId = PortalUtil.generateRandomKey(request, "portlet_wiki_import_pages_uploadProgressId");
@@ -25,6 +27,14 @@ String importProgressId = PortalUtil.generateRandomKey(request, "portlet_wiki_im
 WikiNode node = (WikiNode)request.getAttribute(WikiWebKeys.WIKI_NODE);
 
 long nodeId = BeanParamUtil.getLong(node, request, "nodeId");
+
+WikiImporterTracker wikiImporterTracker = (WikiImporterTracker)request.getAttribute(WikiWebKeys.WIKI_IMPORTER_TRACKER);
+
+String[] importers = ArrayUtil.toStringArray(wikiImporterTracker.getImporters());
+
+if (Validator.isNull(tabs2)) {
+	tabs2 = importers[0];
+}
 
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	renderResponse
@@ -57,27 +67,26 @@ renderResponse.setTitle(LanguageUtil.get(request, "import-pages"));
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="importProgressId" type="hidden" value="<%= importProgressId %>" />
 		<aui:input name="nodeId" type="hidden" value="<%= nodeId %>" />
+		<aui:input name="importer" type="hidden" value="<%= tabs2 %>" />
 
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<liferay-ui:tabs
-					names="MediaWiki"
-					param="tabs2"
-					url="<%= portletURL.toString() %>"
-				/>
+		<aui:fieldset-group markupView="lexicon">
+			<liferay-ui:tabs
+				names="<%= StringUtil.merge(importers) %>"
+				param="tabs2"
+				url="<%= portletURL.toString() %>"
+			/>
 
-				<liferay-ui:error exception="<%= ImportFilesException.class %>" message="please-provide-all-mandatory-files-and-make-sure-the-file-types-are-valid" />
-				<liferay-ui:error exception="<%= NoSuchNodeException.class %>" message="the-node-could-not-be-found" />
+			<liferay-ui:error exception="<%= ImportFilesException.class %>" message="please-provide-all-mandatory-files-and-make-sure-the-file-types-are-valid" />
+			<liferay-ui:error exception="<%= NoSuchNodeException.class %>" message="the-node-could-not-be-found" />
 
-				<liferay-util:include page="/wiki/import/mediawiki.jsp" servletContext="<%= application %>" />
+			<liferay-util:include page='<%= wikiImporterTracker.getProperty(tabs2, "page") %>' servletContext="<%= application %>" />
 
-				<div class="sheet-footer">
-					<aui:button type="submit" value="import" />
+			<div class="sheet-footer">
+				<aui:button type="submit" value="import" />
 
-					<aui:button href="<%= redirect %>" type="cancel" />
-				</div>
+				<aui:button href="<%= redirect %>" type="cancel" />
 			</div>
-		</div>
+		</aui:fieldset-group>
 	</aui:form>
 
 	<liferay-ui:upload-progress

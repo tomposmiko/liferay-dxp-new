@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-my-sites",
 		"com.liferay.portlet.display-category=category.community",
@@ -63,8 +64,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + MySitesPortletKeys.MY_SITES,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )
@@ -116,12 +116,12 @@ public class MySitesPortlet extends MVCPortlet {
 		long[] addUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "addUserIds"), 0L);
 
-		addUserIds = _filterAddUserIds(groupId, addUserIds);
+		addUserIds = filterAddUserIds(groupId, addUserIds);
 
 		long[] removeUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "removeUserIds"), 0L);
 
-		removeUserIds = _filterRemoveUserIds(groupId, removeUserIds);
+		removeUserIds = filterRemoveUserIds(groupId, removeUserIds);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
@@ -132,6 +132,34 @@ public class MySitesPortlet extends MVCPortlet {
 		LiveUsers.joinGroup(themeDisplay.getCompanyId(), groupId, addUserIds);
 		LiveUsers.leaveGroup(
 			themeDisplay.getCompanyId(), groupId, removeUserIds);
+	}
+
+	protected long[] filterAddUserIds(long groupId, long[] userIds)
+		throws Exception {
+
+		Set<Long> filteredUserIds = new HashSet<>();
+
+		for (long userId : userIds) {
+			if (!_userLocalService.hasGroupUser(groupId, userId)) {
+				filteredUserIds.add(userId);
+			}
+		}
+
+		return ArrayUtil.toArray(filteredUserIds.toArray(new Long[0]));
+	}
+
+	protected long[] filterRemoveUserIds(long groupId, long[] userIds)
+		throws Exception {
+
+		Set<Long> filteredUserIds = new HashSet<>();
+
+		for (long userId : userIds) {
+			if (_userLocalService.hasGroupUser(groupId, userId)) {
+				filteredUserIds.add(userId);
+			}
+		}
+
+		return ArrayUtil.toArray(filteredUserIds.toArray(new Long[0]));
 	}
 
 	@Override
@@ -146,46 +174,32 @@ public class MySitesPortlet extends MVCPortlet {
 		return false;
 	}
 
-	private long[] _filterAddUserIds(long groupId, long[] userIds)
-		throws Exception {
+	@Reference(unbind = "-")
+	protected void setMembershipRequestLocalService(
+		MembershipRequestLocalService membershipRequestLocalService) {
 
-		Set<Long> filteredUserIds = new HashSet<>();
-
-		for (long userId : userIds) {
-			if (!_userLocalService.hasGroupUser(groupId, userId)) {
-				filteredUserIds.add(userId);
-			}
-		}
-
-		return ArrayUtil.toArray(filteredUserIds.toArray(new Long[0]));
+		_membershipRequestLocalService = membershipRequestLocalService;
 	}
-
-	private long[] _filterRemoveUserIds(long groupId, long[] userIds)
-		throws Exception {
-
-		Set<Long> filteredUserIds = new HashSet<>();
-
-		for (long userId : userIds) {
-			if (_userLocalService.hasGroupUser(groupId, userId)) {
-				filteredUserIds.add(userId);
-			}
-		}
-
-		return ArrayUtil.toArray(filteredUserIds.toArray(new Long[0]));
-	}
-
-	@Reference
-	private MembershipRequestLocalService _membershipRequestLocalService;
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.site.my.sites.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
+		target = "(&(release.bundle.symbolic.name=com.liferay.site.my.sites.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
 	)
-	private Release _release;
+	protected void setRelease(Release release) {
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserService(UserService userService) {
+		_userService = userService;
+	}
+
+	private MembershipRequestLocalService _membershipRequestLocalService;
 	private UserLocalService _userLocalService;
-
-	@Reference
 	private UserService _userService;
 
 }

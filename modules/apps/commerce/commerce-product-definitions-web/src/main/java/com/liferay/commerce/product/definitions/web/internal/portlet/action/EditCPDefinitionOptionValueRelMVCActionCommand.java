@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.math.BigDecimal;
@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_definition_option_value_rel"
@@ -56,6 +57,21 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditCPDefinitionOptionValueRelMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected CPDefinitionOptionValueRel deleteCPDefinitionOptionValueRels(
+			ActionRequest actionRequest)
+		throws Exception {
+
+		long cpDefinitionOptionValueRelId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionOptionValueRelId");
+
+		if (cpDefinitionOptionValueRelId > 0) {
+			return _cpDefinitionOptionValueRelService.
+				deleteCPDefinitionOptionValueRel(cpDefinitionOptionValueRelId);
+		}
+
+		return null;
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -66,16 +82,16 @@ public class EditCPDefinitionOptionValueRelMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCPDefinitionOptionValueRel(actionRequest);
+				updateCPDefinitionOptionValueRel(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCPDefinitionOptionValueRels(actionRequest);
+				deleteCPDefinitionOptionValueRels(actionRequest);
 			}
 			else if (cmd.equals("deleteSku")) {
-				_resetCPInstanceAndQuantity(actionRequest);
+				resetCPInstanceAndQuantity(actionRequest);
 			}
 			else if (cmd.equals("updatePreselected")) {
-				_updatePreselected(actionRequest);
+				updatePreselected(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -95,27 +111,12 @@ public class EditCPDefinitionOptionValueRelMVCActionCommand
 					"/cp_definitions/edit_cp_definition_option_value_rel");
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
 
-	private CPDefinitionOptionValueRel _deleteCPDefinitionOptionValueRels(
-			ActionRequest actionRequest)
-		throws Exception {
-
-		long cpDefinitionOptionValueRelId = ParamUtil.getLong(
-			actionRequest, "cpDefinitionOptionValueRelId");
-
-		if (cpDefinitionOptionValueRelId > 0) {
-			return _cpDefinitionOptionValueRelService.
-				deleteCPDefinitionOptionValueRel(cpDefinitionOptionValueRelId);
-		}
-
-		return null;
-	}
-
-	private CPDefinitionOptionValueRel _resetCPInstanceAndQuantity(
+	protected CPDefinitionOptionValueRel resetCPInstanceAndQuantity(
 			ActionRequest actionRequest)
 		throws PortalException {
 
@@ -127,14 +128,14 @@ public class EditCPDefinitionOptionValueRelMVCActionCommand
 				cpDefinitionOptionValueRelId);
 	}
 
-	private CPDefinitionOptionValueRel _updateCPDefinitionOptionValueRel(
+	protected CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
 			ActionRequest actionRequest)
 		throws Exception {
 
 		long cpDefinitionOptionValueRelId = ParamUtil.getLong(
 			actionRequest, "cpDefinitionOptionValueRelId");
 
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 		String key = ParamUtil.getString(actionRequest, "key");
@@ -170,7 +171,7 @@ public class EditCPDefinitionOptionValueRelMVCActionCommand
 				cpInstanceId, quantity, preselected, price, serviceContext);
 	}
 
-	private CPDefinitionOptionValueRel _updatePreselected(
+	protected CPDefinitionOptionValueRel updatePreselected(
 			ActionRequest actionRequest)
 		throws PortalException {
 
@@ -198,8 +199,5 @@ public class EditCPDefinitionOptionValueRelMVCActionCommand
 	@Reference
 	private CPDefinitionOptionValueRelService
 		_cpDefinitionOptionValueRelService;
-
-	@Reference
-	private Localization _localization;
 
 }

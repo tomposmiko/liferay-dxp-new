@@ -46,7 +46,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -75,6 +74,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import javax.ccpp.Profile;
 
 import javax.portlet.PortalContext;
 import javax.portlet.PortletConfig;
@@ -177,10 +178,9 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 		return _httpServletRequest.getAuthType();
 	}
 
-	public Object getCCPPProfile() {
+	public Profile getCCPPProfile() {
 		if (_profile == null) {
-			_profile = _portalProfileFactory.getCCPPProfile(
-				_httpServletRequest);
+			_profile = PortalProfileFactory.getCCPPProfile(_httpServletRequest);
 		}
 
 		return _profile;
@@ -629,7 +629,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 
@@ -1264,11 +1264,6 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortletRequestImpl.class);
 
-	private static volatile PortalProfileFactory _portalProfileFactory =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			PortalProfileFactory.class, PortletRequestImpl.class,
-			"_portalProfileFactory", false);
-
 	private HttpServletRequest _httpServletRequest;
 	private boolean _invalidSession;
 	private Locale _locale;
@@ -1283,7 +1278,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 	private PortletSessionImpl _portletSessionImpl;
 	private int _portletSpecMajorVersion;
 	private PortletPreferences _preferences;
-	private Object _profile;
+	private Profile _profile;
 	private String _remoteUser;
 	private long _remoteUserId;
 	private RenderParameters _renderParameters;

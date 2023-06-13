@@ -1,11 +1,10 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
 	property custom.properties = "default.layout.template.id=1_column${line.separator}jsonws.web.service.paths.excludes=";
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.component.names = "Document Management";
+	property testray.component.names = "Mentions";
 	property testray.main.component.name = "Mentions";
 
 	setUp {
@@ -35,19 +34,19 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			DMDocument.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 
 			JSONUser.tearDownNonAdminUsers();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewMentionViaDMComment {
 		JSONLayout.addPublicLayout(
@@ -55,7 +54,7 @@ definition {
 			layoutName = "Documents and Media Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Documents and Media Page",
 			widgetName = "Documents and Media");
@@ -86,7 +85,7 @@ definition {
 			mentionsUserScreenName = "test");
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewReplyMentionViaDMComment {
 		JSONLayout.addPublicLayout(
@@ -94,7 +93,7 @@ definition {
 			layoutName = "Documents and Media Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Documents and Media Page",
 			widgetName = "Documents and Media");

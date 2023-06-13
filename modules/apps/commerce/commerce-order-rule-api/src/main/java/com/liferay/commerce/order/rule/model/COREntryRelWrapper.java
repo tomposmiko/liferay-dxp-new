@@ -42,7 +42,6 @@ public class COREntryRelWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("COREntryRelId", getCOREntryRelId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -58,12 +57,6 @@ public class COREntryRelWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		Long COREntryRelId = (Long)attributes.get("COREntryRelId");
 
 		if (COREntryRelId != null) {
@@ -212,16 +205,6 @@ public class COREntryRelWrapper
 	}
 
 	/**
-	 * Returns the mvcc version of this cor entry rel.
-	 *
-	 * @return the mvcc version of this cor entry rel
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
 	 * Returns the primary key of this cor entry rel.
 	 *
 	 * @return the primary key of this cor entry rel
@@ -342,16 +325,6 @@ public class COREntryRelWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this cor entry rel.
-	 *
-	 * @param mvccVersion the mvcc version of this cor entry rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the primary key of this cor entry rel.
 	 *
 	 * @param primaryKey the primary key of this cor entry rel
@@ -389,11 +362,6 @@ public class COREntryRelWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

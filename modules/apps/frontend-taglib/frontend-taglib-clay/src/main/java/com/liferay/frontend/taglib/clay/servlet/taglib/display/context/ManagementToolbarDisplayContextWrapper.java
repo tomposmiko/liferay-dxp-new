@@ -115,11 +115,6 @@ public class ManagementToolbarDisplayContextWrapper
 	}
 
 	@Override
-	public List<DropdownItem> getOrderDropdownItems() {
-		return _managementToolbarDisplayContext.getOrderDropdownItems();
-	}
-
-	@Override
 	public String getSearchActionURL() {
 		return _managementToolbarDisplayContext.getSearchActionURL();
 	}

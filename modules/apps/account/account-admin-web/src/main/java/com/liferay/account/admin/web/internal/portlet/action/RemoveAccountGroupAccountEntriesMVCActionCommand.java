@@ -17,7 +17,7 @@ package com.liferay.account.admin.web.internal.portlet.action;
 import com.liferay.account.constants.AccountPortletKeys;
 import com.liferay.account.exception.NoSuchGroupAccountEntryRelException;
 import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountGroupRelService;
+import com.liferay.account.service.AccountGroupRelLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Albert Lee
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_GROUPS_ADMIN,
 		"mvc.command.name=/account_admin/remove_account_group_account_entries"
@@ -54,7 +55,7 @@ public class RemoveAccountGroupAccountEntriesMVCActionCommand
 			long[] accountEntryIds = ParamUtil.getLongValues(
 				actionRequest, "accountEntryIds");
 
-			_accountGroupRelService.deleteAccountGroupRels(
+			_accountGroupRelLocalService.deleteAccountGroupRels(
 				accountGroupId, AccountEntry.class.getName(), accountEntryIds);
 
 			String redirect = ParamUtil.getString(actionRequest, "redirect");
@@ -77,6 +78,6 @@ public class RemoveAccountGroupAccountEntriesMVCActionCommand
 	}
 
 	@Reference
-	private AccountGroupRelService _accountGroupRelService;
+	private AccountGroupRelLocalService _accountGroupRelLocalService;
 
 }

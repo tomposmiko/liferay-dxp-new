@@ -25,10 +25,6 @@ public class PasswordPolicyLocalServiceWrapper
 	implements PasswordPolicyLocalService,
 			   ServiceWrapper<PasswordPolicyLocalService> {
 
-	public PasswordPolicyLocalServiceWrapper() {
-		this(null);
-	}
-
 	public PasswordPolicyLocalServiceWrapper(
 		PasswordPolicyLocalService passwordPolicyLocalService) {
 

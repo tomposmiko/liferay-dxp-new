@@ -14,10 +14,7 @@
 
 package com.liferay.commerce.shop.by.diagram.service;
 
-import com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link CSDiagramEntryLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class CSDiagramEntryLocalServiceWrapper
 	implements CSDiagramEntryLocalService,
 			   ServiceWrapper<CSDiagramEntryLocalService> {
-
-	public CSDiagramEntryLocalServiceWrapper() {
-		this(null);
-	}
 
 	public CSDiagramEntryLocalServiceWrapper(
 		CSDiagramEntryLocalService csDiagramEntryLocalService) {
@@ -51,16 +44,21 @@ public class CSDiagramEntryLocalServiceWrapper
 	 * @return the cs diagram entry that was added
 	 */
 	@Override
-	public CSDiagramEntry addCSDiagramEntry(CSDiagramEntry csDiagramEntry) {
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+		addCSDiagramEntry(
+			com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+				csDiagramEntry) {
+
 		return _csDiagramEntryLocalService.addCSDiagramEntry(csDiagramEntry);
 	}
 
 	@Override
-	public CSDiagramEntry addCSDiagramEntry(
-			long userId, long cpDefinitionId, long cpInstanceId,
-			long cProductId, boolean diagram, int quantity, String sequence,
-			String sku,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			addCSDiagramEntry(
+				long userId, long cpDefinitionId, long cpInstanceId,
+				long cProductId, boolean diagram, int quantity, String sequence,
+				String sku,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryLocalService.addCSDiagramEntry(
@@ -75,7 +73,9 @@ public class CSDiagramEntryLocalServiceWrapper
 	 * @return the new cs diagram entry
 	 */
 	@Override
-	public CSDiagramEntry createCSDiagramEntry(long CSDiagramEntryId) {
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+		createCSDiagramEntry(long CSDiagramEntryId) {
+
 		return _csDiagramEntryLocalService.createCSDiagramEntry(
 			CSDiagramEntryId);
 	}
@@ -92,9 +92,7 @@ public class CSDiagramEntryLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteCSDiagramEntries(long cpDefinitionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public void deleteCSDiagramEntries(long cpDefinitionId) {
 		_csDiagramEntryLocalService.deleteCSDiagramEntries(cpDefinitionId);
 	}
 
@@ -107,11 +105,12 @@ public class CSDiagramEntryLocalServiceWrapper
 	 *
 	 * @param csDiagramEntry the cs diagram entry
 	 * @return the cs diagram entry that was removed
-	 * @throws PortalException
 	 */
 	@Override
-	public CSDiagramEntry deleteCSDiagramEntry(CSDiagramEntry csDiagramEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+		deleteCSDiagramEntry(
+			com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+				csDiagramEntry) {
 
 		return _csDiagramEntryLocalService.deleteCSDiagramEntry(csDiagramEntry);
 	}
@@ -128,7 +127,8 @@ public class CSDiagramEntryLocalServiceWrapper
 	 * @throws PortalException if a cs diagram entry with the primary key could not be found
 	 */
 	@Override
-	public CSDiagramEntry deleteCSDiagramEntry(long CSDiagramEntryId)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			deleteCSDiagramEntry(long CSDiagramEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryLocalService.deleteCSDiagramEntry(
@@ -250,14 +250,16 @@ public class CSDiagramEntryLocalServiceWrapper
 	}
 
 	@Override
-	public CSDiagramEntry fetchCSDiagramEntry(long CSDiagramEntryId) {
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+		fetchCSDiagramEntry(long CSDiagramEntryId) {
+
 		return _csDiagramEntryLocalService.fetchCSDiagramEntry(
 			CSDiagramEntryId);
 	}
 
 	@Override
-	public CSDiagramEntry fetchCSDiagramEntry(
-		long cpDefinitionId, String sequence) {
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+		fetchCSDiagramEntry(long cpDefinitionId, String sequence) {
 
 		return _csDiagramEntryLocalService.fetchCSDiagramEntry(
 			cpDefinitionId, sequence);
@@ -268,25 +270,6 @@ public class CSDiagramEntryLocalServiceWrapper
 		getActionableDynamicQuery() {
 
 		return _csDiagramEntryLocalService.getActionableDynamicQuery();
-	}
-
-	@Override
-	public java.util.List<CSDiagramEntry>
-		getCPDefinitionRelatedCSDiagramEntries(long cpDefinitionId) {
-
-		return _csDiagramEntryLocalService.
-			getCPDefinitionRelatedCSDiagramEntries(cpDefinitionId);
-	}
-
-	@Override
-	public java.util.List<CSDiagramEntry> getCProductCSDiagramEntries(
-			long cProductId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator<CSDiagramEntry>
-				orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _csDiagramEntryLocalService.getCProductCSDiagramEntries(
-			cProductId, start, end, orderByComparator);
 	}
 
 	/**
@@ -301,15 +284,17 @@ public class CSDiagramEntryLocalServiceWrapper
 	 * @return the range of cs diagram entries
 	 */
 	@Override
-	public java.util.List<CSDiagramEntry> getCSDiagramEntries(
-		int start, int end) {
+	public java.util.List
+		<com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry>
+			getCSDiagramEntries(int start, int end) {
 
 		return _csDiagramEntryLocalService.getCSDiagramEntries(start, end);
 	}
 
 	@Override
-	public java.util.List<CSDiagramEntry> getCSDiagramEntries(
-		long cpDefinitionId, int start, int end) {
+	public java.util.List
+		<com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry>
+			getCSDiagramEntries(long cpDefinitionId, int start, int end) {
 
 		return _csDiagramEntryLocalService.getCSDiagramEntries(
 			cpDefinitionId, start, end);
@@ -339,15 +324,16 @@ public class CSDiagramEntryLocalServiceWrapper
 	 * @throws PortalException if a cs diagram entry with the primary key could not be found
 	 */
 	@Override
-	public CSDiagramEntry getCSDiagramEntry(long CSDiagramEntryId)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			getCSDiagramEntry(long CSDiagramEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryLocalService.getCSDiagramEntry(CSDiagramEntryId);
 	}
 
 	@Override
-	public CSDiagramEntry getCSDiagramEntry(
-			long cpDefinitionId, String sequence)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			getCSDiagramEntry(long cpDefinitionId, String sequence)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryLocalService.getCSDiagramEntry(
@@ -393,40 +379,25 @@ public class CSDiagramEntryLocalServiceWrapper
 	 * @return the cs diagram entry that was updated
 	 */
 	@Override
-	public CSDiagramEntry updateCSDiagramEntry(CSDiagramEntry csDiagramEntry) {
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+		updateCSDiagramEntry(
+			com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+				csDiagramEntry) {
+
 		return _csDiagramEntryLocalService.updateCSDiagramEntry(csDiagramEntry);
 	}
 
 	@Override
-	public CSDiagramEntry updateCSDiagramEntry(
-			long csDiagramEntryId, long cpInstanceId, long cProductId,
-			boolean diagram, int quantity, String sequence, String sku,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			updateCSDiagramEntry(
+				long csDiagramEntryId, long cpInstanceId, long cProductId,
+				boolean diagram, int quantity, String sequence, String sku,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryLocalService.updateCSDiagramEntry(
 			csDiagramEntryId, cpInstanceId, cProductId, diagram, quantity,
 			sequence, sku, serviceContext);
-	}
-
-	@Override
-	public CTPersistence<CSDiagramEntry> getCTPersistence() {
-		return _csDiagramEntryLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<CSDiagramEntry> getModelClass() {
-		return _csDiagramEntryLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CSDiagramEntry>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _csDiagramEntryLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

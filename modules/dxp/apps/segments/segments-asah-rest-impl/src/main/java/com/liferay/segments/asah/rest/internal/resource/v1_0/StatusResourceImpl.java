@@ -23,6 +23,8 @@ import com.liferay.segments.constants.SegmentsExperimentConstants;
 import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.service.SegmentsExperimentService;
 
+import java.util.Optional;
+
 import javax.ws.rs.ClientErrorException;
 
 import org.osgi.service.component.annotations.Component;
@@ -54,18 +56,19 @@ public class StatusResourceImpl extends BaseStatusResourceImpl {
 
 		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
-		SegmentsExperimentConstants.Status segmentsExperimentConstantsStatus =
+		Optional<SegmentsExperimentConstants.Status> statusOptional =
 			SegmentsExperimentConstants.Status.parse(status.getStatus());
-
-		if (segmentsExperimentConstantsStatus == null) {
-			throw new ClientErrorException("Experiment status is invalid", 422);
-		}
 
 		return _toExperiment(
 			_segmentsExperimentService.updateSegmentsExperimentStatus(
 				String.valueOf(segmentsExperimentKey),
 				status.getWinnerVariantId(),
-				segmentsExperimentConstantsStatus.getValue()));
+				statusOptional.map(
+					SegmentsExperimentConstants.Status::getValue
+				).orElseThrow(
+					() -> new ClientErrorException(
+						"Experiment status is invalid", 422)
+				)));
 	}
 
 	private Experiment _toExperiment(SegmentsExperiment segmentsExperiment) {

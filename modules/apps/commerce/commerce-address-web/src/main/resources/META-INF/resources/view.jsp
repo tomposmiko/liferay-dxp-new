@@ -21,10 +21,61 @@ CommerceCountriesDisplayContext commerceCountriesDisplayContext = (CommerceCount
 %>
 
 <c:if test="<%= commerceCountriesDisplayContext.hasPermission(ActionKeys.MANAGE_COUNTRIES) %>">
-	<clay:management-toolbar
-		managementToolbarDisplayContext="<%= new CommerceCountriesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, commerceCountriesDisplayContext.getSearchContainer()) %>"
-		propsTransformer="js/CommerceCountriesManagementToolbarPropsTransformer"
-	/>
+	<liferay-frontend:management-bar
+		includeCheckBox="<%= true %>"
+		searchContainerId="commerceCountries"
+	>
+		<liferay-frontend:management-bar-filters>
+			<liferay-frontend:management-bar-navigation
+				navigationKeys='<%= new String[] {"all", "active", "inactive"} %>'
+				portletURL="<%= commerceCountriesDisplayContext.getPortletURL() %>"
+			/>
+
+			<liferay-frontend:management-bar-sort
+				orderByCol="<%= commerceCountriesDisplayContext.getOrderByCol() %>"
+				orderByType="<%= commerceCountriesDisplayContext.getOrderByType() %>"
+				orderColumns='<%= new String[] {"name", "priority"} %>'
+				portletURL="<%= commerceCountriesDisplayContext.getPortletURL() %>"
+			/>
+
+			<li>
+				<liferay-commerce:search-input
+					actionURL="<%= commerceCountriesDisplayContext.getPortletURL() %>"
+					formName="searchFm"
+				/>
+			</li>
+		</liferay-frontend:management-bar-filters>
+
+		<liferay-frontend:management-bar-buttons>
+			<liferay-frontend:management-bar-display-buttons
+				displayViews='<%= new String[] {"list"} %>'
+				portletURL="<%= commerceCountriesDisplayContext.getPortletURL() %>"
+				selectedDisplayStyle="list"
+			/>
+
+			<portlet:renderURL var="addCommerceCountryURL">
+				<portlet:param name="mvcRenderCommandName" value="/commerce_country/edit_commerce_country" />
+				<portlet:param name="redirect" value="<%= currentURL %>" />
+			</portlet:renderURL>
+
+			<liferay-frontend:add-menu
+				inline="<%= true %>"
+			>
+				<liferay-frontend:add-menu-item
+					title='<%= LanguageUtil.get(request, "add-country") %>'
+					url="<%= addCommerceCountryURL.toString() %>"
+				/>
+			</liferay-frontend:add-menu>
+		</liferay-frontend:management-bar-buttons>
+
+		<liferay-frontend:management-bar-action-buttons>
+			<liferay-frontend:management-bar-button
+				href='<%= "javascript:" + liferayPortletResponse.getNamespace() + "deleteCountries();" %>'
+				icon="times"
+				label="delete"
+			/>
+		</liferay-frontend:management-bar-action-buttons>
+	</liferay-frontend:management-bar>
 
 	<div class="container-fluid container-fluid-max-xl">
 		<portlet:actionURL name="/commerce_country/edit_commerce_country" var="editCommerceCountryActionURL" />
@@ -32,6 +83,7 @@ CommerceCountriesDisplayContext commerceCountriesDisplayContext = (CommerceCount
 		<aui:form action="<%= editCommerceCountryActionURL %>" method="post" name="fm">
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.DELETE %>" />
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+			<aui:input name="deleteCountryIds" type="hidden" />
 
 			<liferay-ui:search-container
 				id="commerceCountries"
@@ -43,7 +95,7 @@ CommerceCountriesDisplayContext commerceCountriesDisplayContext = (CommerceCount
 					modelVar="country"
 				>
 					<liferay-ui:search-container-column-text
-						cssClass="font-weight-bold important table-cell-expand"
+						cssClass="important table-cell-expand"
 						href='<%=
 							PortletURLBuilder.createRenderURL(
 								renderResponse
@@ -150,24 +202,22 @@ CommerceCountriesDisplayContext commerceCountriesDisplayContext = (CommerceCount
 
 	<aui:script>
 		function <portlet:namespace />deleteCommerceCountries() {
-			Liferay.Util.openConfirmModal({
-				message:
-					'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-countries" />',
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						var form = window.document['<portlet:namespace />fm'];
+			if (
+				confirm(
+					'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-countries" />'
+				)
+			) {
+				var form = window.document['<portlet:namespace />fm'];
 
-						form[
-							'<portlet:namespace />deleteCountryIds'
-						].value = Liferay.Util.getCheckedCheckboxes(
-							form,
-							'<portlet:namespace />allRowIds'
-						);
+				form[
+					'<portlet:namespace />deleteCountryIds'
+				].value = Liferay.Util.listCheckedExcept(
+					form,
+					'<portlet:namespace />allRowIds'
+				);
 
-						submitForm(form);
-					}
-				},
-			});
+				submitForm(form);
+			}
 		}
 	</aui:script>
 </c:if>

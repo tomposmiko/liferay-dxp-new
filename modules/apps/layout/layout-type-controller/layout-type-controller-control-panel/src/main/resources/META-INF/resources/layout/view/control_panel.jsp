@@ -20,4 +20,4 @@
 	portletId="<%= themeDisplay.getPpid() %>"
 />
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />

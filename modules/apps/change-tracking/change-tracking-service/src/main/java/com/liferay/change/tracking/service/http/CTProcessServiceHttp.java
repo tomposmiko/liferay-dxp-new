@@ -46,56 +46,10 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see CTProcessServiceSoap
  * @generated
  */
 public class CTProcessServiceHttp {
-
-	public static java.util.List<com.liferay.change.tracking.model.CTProcess>
-			getCTProcesses(
-				HttpPrincipal httpPrincipal, long companyId, long userId,
-				String keywords, int status, int type, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.change.tracking.model.CTProcess>
-						orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				CTProcessServiceUtil.class, "getCTProcesses",
-				_getCTProcessesParameterTypes0);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, userId, keywords, status, type, start,
-				end, orderByComparator);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return (java.util.List<com.liferay.change.tracking.model.CTProcess>)
-				returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
 
 	public static java.util.List<com.liferay.change.tracking.model.CTProcess>
 			getCTProcesses(
@@ -109,7 +63,7 @@ public class CTProcessServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CTProcessServiceUtil.class, "getCTProcesses",
-				_getCTProcessesParameterTypes1);
+				_getCTProcessesParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, userId, keywords, status, start, end,
@@ -151,43 +105,10 @@ public class CTProcessServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CTProcessServiceUtil.class, "getCTProcessesCount",
-				_getCTProcessesCountParameterTypes2);
+				_getCTProcessesCountParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, userId, keywords, status);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return ((Integer)returnObj).intValue();
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static int getCTProcessesCount(
-		HttpPrincipal httpPrincipal, long companyId, long userId,
-		String keywords, int status, int type) {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				CTProcessServiceUtil.class, "getCTProcessesCount",
-				_getCTProcessesCountParameterTypes3);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, companyId, userId, keywords, status, type);
 
 			Object returnObj = null;
 
@@ -215,19 +136,9 @@ public class CTProcessServiceHttp {
 	private static final Class<?>[] _getCTProcessesParameterTypes0 =
 		new Class[] {
 			long.class, long.class, String.class, int.class, int.class,
-			int.class, int.class,
-			com.liferay.portal.kernel.util.OrderByComparator.class
-		};
-	private static final Class<?>[] _getCTProcessesParameterTypes1 =
-		new Class[] {
-			long.class, long.class, String.class, int.class, int.class,
 			int.class, com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getCTProcessesCountParameterTypes2 =
+	private static final Class<?>[] _getCTProcessesCountParameterTypes1 =
 		new Class[] {long.class, long.class, String.class, int.class};
-	private static final Class<?>[] _getCTProcessesCountParameterTypes3 =
-		new Class[] {
-			long.class, long.class, String.class, int.class, int.class
-		};
 
 }

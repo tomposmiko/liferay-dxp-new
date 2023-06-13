@@ -23,6 +23,8 @@ import com.liferay.reading.time.service.base.ReadingTimeEntryLocalServiceBaseImp
 
 import java.time.Duration;
 
+import java.util.Optional;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -120,17 +122,19 @@ public class ReadingTimeEntryLocalServiceImpl
 
 	@Override
 	public ReadingTimeEntry updateReadingTimeEntry(GroupedModel groupedModel) {
-		Duration readingTimeDuration = _readingTimeCalculator.calculate(
-			groupedModel);
+		Optional<Duration> readingTimeOptional =
+			_readingTimeCalculator.calculate(groupedModel);
 
-		if (readingTimeDuration == null) {
-			return null;
+		if (readingTimeOptional.isPresent()) {
+			return updateReadingTimeEntry(
+				groupedModel.getGroupId(),
+				_classNameLocalService.getClassNameId(
+					groupedModel.getModelClass()),
+				(Long)groupedModel.getPrimaryKeyObj(),
+				readingTimeOptional.get());
 		}
 
-		return updateReadingTimeEntry(
-			groupedModel.getGroupId(),
-			_classNameLocalService.getClassNameId(groupedModel.getModelClass()),
-			(Long)groupedModel.getPrimaryKeyObj(), readingTimeDuration);
+		return null;
 	}
 
 	@Override

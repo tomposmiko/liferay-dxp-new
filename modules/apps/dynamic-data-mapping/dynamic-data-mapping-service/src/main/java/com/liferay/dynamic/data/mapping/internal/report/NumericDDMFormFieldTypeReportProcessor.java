@@ -24,7 +24,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -36,12 +36,12 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -49,18 +49,11 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcos Martins
  */
 @Component(
-	property = "ddm.form.field.type.name=numeric",
+	immediate = true, property = "ddm.form.field.type.name=numeric",
 	service = DDMFormFieldTypeReportProcessor.class
 )
 public class NumericDDMFormFieldTypeReportProcessor
 	extends TextDDMFormFieldTypeReportProcessor {
-
-	public NumericDDMFormFieldTypeReportProcessor() {
-	}
-
-	public NumericDDMFormFieldTypeReportProcessor(JSONFactory jsonFactory) {
-		super(jsonFactory);
-	}
 
 	@Override
 	public JSONObject process(
@@ -81,7 +74,7 @@ public class NumericDDMFormFieldTypeReportProcessor
 		JSONObject summaryJSONObject = jsonObject.getJSONObject("summary");
 
 		if (summaryJSONObject == null) {
-			summaryJSONObject = jsonFactory.createJSONObject();
+			summaryJSONObject = JSONFactoryUtil.createJSONObject();
 		}
 
 		BigDecimal sumBigDecimal = new BigDecimal(
@@ -130,34 +123,42 @@ public class NumericDDMFormFieldTypeReportProcessor
 				ddmFormInstanceRecord.getFormInstance();
 
 			List<DDMFormInstanceRecord> ddmFormInstanceRecords =
-				new ArrayList<>();
+				ddmFormInstance.getFormInstanceRecords();
 
-			for (DDMFormInstanceRecord currentDDMFormInstanceRecord :
-					ddmFormInstance.getFormInstanceRecords()) {
+			Supplier<Stream<DDMFormInstanceRecord>> streamSupplier = () -> {
+				Stream<DDMFormInstanceRecord> stream =
+					ddmFormInstanceRecords.stream();
 
-				if (formInstanceRecordId !=
-						currentDDMFormInstanceRecord.
-							getFormInstanceRecordId()) {
+				return stream.filter(
+					currentDDMFormInstanceRecord ->
+						formInstanceRecordId !=
+							currentDDMFormInstanceRecord.
+								getFormInstanceRecordId());
+			};
 
-					ddmFormInstanceRecords.add(currentDDMFormInstanceRecord);
-				}
-			}
+			Stream<DDMFormInstanceRecord> stream = streamSupplier.get();
 
-			if (ddmFormInstanceRecords.isEmpty()) {
+			if (stream.count() == 0) {
 				jsonObject.remove("summary");
 
 				return jsonObject;
 			}
 
-			List<BigDecimal> valueBigDecimals = _getValueBigDecimals(
-				ddmFormFieldValue.getName(), ddmFormInstanceRecords);
+			Comparator<Number> comparator =
+				(number1, number2) -> Double.compare(
+					number1.doubleValue(), number2.doubleValue());
 
-			BigDecimal maxValueBigDecimal = Collections.max(
-				valueBigDecimals,
-				Comparator.comparingDouble(Number::doubleValue));
-			BigDecimal minValueBigDecimal = Collections.min(
-				valueBigDecimals,
-				Comparator.comparingDouble(Number::doubleValue));
+			BigDecimal maxValueBigDecimal = _getValueBigDecimalsStream(
+				ddmFormFieldValue.getName(), streamSupplier.get()
+			).max(
+				comparator
+			).get();
+
+			BigDecimal minValueBigDecimal = _getValueBigDecimalsStream(
+				ddmFormFieldValue.getName(), streamSupplier.get()
+			).min(
+				comparator
+			).get();
 
 			summaryJSONObject.put(
 				"max", maxValueBigDecimal.toString()
@@ -242,47 +243,49 @@ public class NumericDDMFormFieldTypeReportProcessor
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return null;
 		}
 	}
 
-	private List<BigDecimal> _getValueBigDecimals(
+	private Stream<BigDecimal> _getValueBigDecimalsStream(
 		String ddmFormFieldValueName,
-		List<DDMFormInstanceRecord> ddmFormInstanceRecords) {
+		Stream<DDMFormInstanceRecord> ddmFormInstanceRecordsStream) {
 
-		List<BigDecimal> values = new ArrayList<>();
+		return ddmFormInstanceRecordsStream.map(
+			ddmFormInstanceRecord -> {
+				try {
+					DDMFormValues ddmFormValues =
+						ddmFormInstanceRecord.getDDMFormValues();
 
-		for (DDMFormInstanceRecord ddmFormInstanceRecord :
-				ddmFormInstanceRecords) {
+					Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
+						ddmFormValues.getDDMFormFieldValuesMap(false);
 
-			try {
-				DDMFormValues ddmFormValues =
-					ddmFormInstanceRecord.getDDMFormValues();
+					List<DDMFormFieldValue> ddmFormFieldValues =
+						ddmFormFieldValuesMap.get(ddmFormFieldValueName);
 
-				Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
-					ddmFormValues.getDDMFormFieldValuesMap(true);
+					Stream<DDMFormFieldValue> ddmFormFieldValuesStream =
+						ddmFormFieldValues.stream();
 
-				List<DDMFormFieldValue> ddmFormFieldValues =
-					ddmFormFieldValuesMap.get(ddmFormFieldValueName);
+					return ddmFormFieldValuesStream.map(
+						ddmFormFieldValue -> getValueBigDecimal(
+							ddmFormFieldValue)
+					).findFirst(
+					).get();
+				}
+				catch (PortalException portalException) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(portalException, portalException);
+					}
 
-				BigDecimal value = getValueBigDecimal(
-					ddmFormFieldValues.get(0));
-
-				if (value != null) {
-					values.add(value);
+					return null;
 				}
 			}
-			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
-				}
-			}
-		}
-
-		return values;
+		).filter(
+			value -> value != null
+		);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -21,11 +21,9 @@ import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.model.impl.DispatchLogModelImpl;
 import com.liferay.dispatch.service.base.DispatchLogLocalServiceBaseImpl;
-import com.liferay.dispatch.service.persistence.DispatchTriggerPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 
@@ -33,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
@@ -57,9 +54,9 @@ public class DispatchLogLocalServiceImpl
 		_checkDispatchTaskStatus(dispatchTaskStatus);
 
 		DispatchTrigger dispatchTrigger =
-			_dispatchTriggerPersistence.findByPrimaryKey(dispatchTriggerId);
+			dispatchTriggerPersistence.findByPrimaryKey(dispatchTriggerId);
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		DispatchLog dispatchLog = dispatchLogPersistence.create(
 			counterLocalService.increment());
@@ -79,23 +76,6 @@ public class DispatchLogLocalServiceImpl
 	}
 
 	@Override
-	public DispatchLog deleteDispatchLog(long dispatchLogId)
-		throws PortalException {
-
-		DispatchLog dispatchLog = dispatchLogPersistence.findByPrimaryKey(
-			dispatchLogId);
-
-		if (DispatchTaskStatus.valueOf(dispatchLog.getStatus()) ==
-				DispatchTaskStatus.IN_PROGRESS) {
-
-			throw new DispatchLogStatusException(
-				"Dispatch log cannot be deleted while task is in progress");
-		}
-
-		return dispatchLogPersistence.remove(dispatchLogId);
-	}
-
-	@Override
 	public void deleteDispatchLogs(long dispatchTriggerId) {
 		dispatchLogPersistence.removeByDispatchTriggerId(dispatchTriggerId);
 	}
@@ -103,9 +83,7 @@ public class DispatchLogLocalServiceImpl
 	@Override
 	public DispatchLog fetchLatestDispatchLog(long dispatchTriggerId) {
 		return dispatchLogPersistence.fetchByDispatchTriggerId_First(
-			dispatchTriggerId,
-			OrderByComparatorFactoryUtil.create(
-				DispatchLogModelImpl.TABLE_NAME, "startDate", "false"));
+			dispatchTriggerId, null);
 	}
 
 	@Override
@@ -187,11 +165,5 @@ public class DispatchLogLocalServiceImpl
 				"Dispatch task status is required");
 		}
 	}
-
-	@Reference
-	private DispatchTriggerPersistence _dispatchTriggerPersistence;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

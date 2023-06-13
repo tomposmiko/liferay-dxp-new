@@ -162,8 +162,4 @@ public interface PushNotificationsDeviceModel
 	@Override
 	public PushNotificationsDevice cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

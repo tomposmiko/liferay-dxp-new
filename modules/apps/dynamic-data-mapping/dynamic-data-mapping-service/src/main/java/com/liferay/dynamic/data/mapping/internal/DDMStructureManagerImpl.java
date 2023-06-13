@@ -49,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Leonardo Barros
  */
-@Component(service = DDMStructureManager.class)
+@Component(immediate = true, service = DDMStructureManager.class)
 public class DDMStructureManagerImpl implements DDMStructureManager {
 
 	@Override
@@ -183,7 +183,7 @@ public class DDMStructureManagerImpl implements DDMStructureManager {
 		for (com.liferay.dynamic.data.mapping.model.DDMStructure ddmStructure :
 				_ddmStructureLocalService.getClassStructures(
 					companyId, classNameId,
-					_getStructureOrderByComparator(structureComparator))) {
+					getStructureOrderByComparator(structureComparator))) {
 
 			ddmStructures.add(new DDMStructureImpl(ddmStructure));
 		}
@@ -211,8 +211,10 @@ public class DDMStructureManagerImpl implements DDMStructureManager {
 	public JSONArray getDDMFormFieldsJSONArray(long structureId, String script)
 		throws PortalException {
 
-		return _ddm.getDDMFormFieldsJSONArray(
-			_ddmStructureLocalService.fetchDDMStructure(structureId), script);
+		com.liferay.dynamic.data.mapping.model.DDMStructure ddmStructure =
+			_ddmStructureLocalService.fetchDDMStructure(structureId);
+
+		return _ddm.getDDMFormFieldsJSONArray(ddmStructure, script);
 	}
 
 	@Override
@@ -347,6 +349,48 @@ public class DDMStructureManagerImpl implements DDMStructureManager {
 		_ddmStructureLocalService.updateDDMStructure(ddmStructure);
 	}
 
+	protected OrderByComparator
+		<com.liferay.dynamic.data.mapping.model.DDMStructure>
+			getStructureOrderByComparator(int structureComparator) {
+
+		if (structureComparator ==
+				DDMStructureManager.STRUCTURE_COMPARATOR_STRUCTURE_KEY) {
+
+			return StructureStructureKeyComparator.INSTANCE_DESCENDING;
+		}
+
+		return new StructureIdComparator();
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDM(DDM ddm) {
+		_ddm = ddm;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMBeanTranslator(DDMBeanTranslator ddmBeanTranslator) {
+		_ddmBeanTranslator = ddmBeanTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMIndexer(DDMIndexer ddmIndexer) {
+		_ddmIndexer = ddmIndexer;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStorageLinkLocalService(
+		DDMStorageLinkLocalService ddmStorageLinkLocalService) {
+
+		_ddmStorageLinkLocalService = ddmStorageLinkLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureLocalService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		_ddmStructureLocalService = ddmStructureLocalService;
+	}
+
 	protected PortalException translate(PortalException portalException) {
 		if (portalException instanceof
 				com.liferay.dynamic.data.mapping.exception.
@@ -383,32 +427,10 @@ public class DDMStructureManagerImpl implements DDMStructureManager {
 		return portalException;
 	}
 
-	private OrderByComparator
-		<com.liferay.dynamic.data.mapping.model.DDMStructure>
-			_getStructureOrderByComparator(int structureComparator) {
-
-		if (structureComparator ==
-				DDMStructureManager.STRUCTURE_COMPARATOR_STRUCTURE_KEY) {
-
-			return StructureStructureKeyComparator.INSTANCE_DESCENDING;
-		}
-
-		return new StructureIdComparator();
-	}
-
-	@Reference
 	private DDM _ddm;
-
-	@Reference
 	private DDMBeanTranslator _ddmBeanTranslator;
-
-	@Reference
 	private DDMIndexer _ddmIndexer;
-
-	@Reference
 	private DDMStorageLinkLocalService _ddmStorageLinkLocalService;
-
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
 
 }

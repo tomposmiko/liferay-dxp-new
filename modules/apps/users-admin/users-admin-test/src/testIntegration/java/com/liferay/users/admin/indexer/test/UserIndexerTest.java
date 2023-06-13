@@ -340,8 +340,8 @@ public class UserIndexerTest {
 	}
 
 	@Test
-	public void testNoGuestUser() throws Exception {
-		User user = userLocalService.getGuestUser(_group.getCompanyId());
+	public void testNoDefaultUser() throws Exception {
+		User user = userLocalService.getDefaultUser(_group.getCompanyId());
 
 		assertNoHits(byQueryString(user.getScreenName()));
 	}
@@ -804,8 +804,6 @@ public class UserIndexerTest {
 			searchRequestBuilderFactory.builder(
 			).companyId(
 				_group.getCompanyId()
-			).emptySearchEnabled(
-				true
 			).fields(
 				StringPool.STAR
 			).groupIds(
@@ -837,7 +835,7 @@ public class UserIndexerTest {
 			organization.getCompanyId(), organization.getOrganizationId(),
 			organization.getParentOrganizationId(), organization.getName(),
 			organization.getType(), organization.getRegionId(),
-			organization.getCountryId(), organization.getStatusListTypeId(),
+			organization.getCountryId(), organization.getStatusId(),
 			organization.getComments(), false, null, site, null);
 	}
 

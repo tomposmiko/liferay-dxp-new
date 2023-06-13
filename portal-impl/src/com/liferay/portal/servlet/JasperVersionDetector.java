@@ -112,7 +112,7 @@ public class JasperVersionDetector {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class JasperVersionDetector {
 				method.getReturnType());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 

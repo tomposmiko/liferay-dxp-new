@@ -20,7 +20,6 @@ import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.GroupLocalService;
 
@@ -31,18 +30,13 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  * @author Lino Alves
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
 public class AddLayoutPrototypePortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
-		Layout layout = searchLayoutFactory.createSearchLayoutPrototype(
-			company);
-
-		if (layout == null) {
-			return;
-		}
+		searchLayoutFactory.createSearchLayoutPrototype(company);
 
 		Group guestGroup = groupLocalService.getGroup(
 			company.getCompanyId(), GroupConstants.GUEST);
@@ -57,13 +51,17 @@ public class AddLayoutPrototypePortalInstanceLifecycleListener
 		}
 	}
 
+	@Reference(
+		target = ModuleServiceLifecycle.PORTLETS_INITIALIZED, unbind = "-"
+	)
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
 	@Reference
 	protected GroupLocalService groupLocalService;
 
 	@Reference
 	protected SearchLayoutFactory searchLayoutFactory;
-
-	@Reference(target = ModuleServiceLifecycle.PORTLETS_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 }

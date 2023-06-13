@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the journal folder service. This utility wraps <code>com.liferay.journal.service.persistence.impl.JournalFolderPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -2334,74 +2338,6 @@ public class JournalFolderUtil {
 	}
 
 	/**
-	 * Returns the journal folder where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchFolderException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching journal folder
-	 * @throws NoSuchFolderException if a matching journal folder could not be found
-	 */
-	public static JournalFolder findByERC_G(
-			String externalReferenceCode, long groupId)
-		throws com.liferay.journal.exception.NoSuchFolderException {
-
-		return getPersistence().findByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
-	 * Returns the journal folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching journal folder, or <code>null</code> if a matching journal folder could not be found
-	 */
-	public static JournalFolder fetchByERC_G(
-		String externalReferenceCode, long groupId) {
-
-		return getPersistence().fetchByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
-	 * Returns the journal folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching journal folder, or <code>null</code> if a matching journal folder could not be found
-	 */
-	public static JournalFolder fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache) {
-
-		return getPersistence().fetchByERC_G(
-			externalReferenceCode, groupId, useFinderCache);
-	}
-
-	/**
-	 * Removes the journal folder where externalReferenceCode = &#63; and groupId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the journal folder that was removed
-	 */
-	public static JournalFolder removeByERC_G(
-			String externalReferenceCode, long groupId)
-		throws com.liferay.journal.exception.NoSuchFolderException {
-
-		return getPersistence().removeByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
-	 * Returns the number of journal folders where externalReferenceCode = &#63; and groupId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the number of matching journal folders
-	 */
-	public static int countByERC_G(String externalReferenceCode, long groupId) {
-		return getPersistence().countByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
 	 * Caches the journal folder in the entity cache if it is enabled.
 	 *
 	 * @param journalFolder the journal folder
@@ -2550,9 +2486,25 @@ public class JournalFolderUtil {
 	}
 
 	public static JournalFolderPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile JournalFolderPersistence _persistence;
+	private static ServiceTracker
+		<JournalFolderPersistence, JournalFolderPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(JournalFolderPersistence.class);
+
+		ServiceTracker<JournalFolderPersistence, JournalFolderPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<JournalFolderPersistence, JournalFolderPersistence>(
+						bundle.getBundleContext(),
+						JournalFolderPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

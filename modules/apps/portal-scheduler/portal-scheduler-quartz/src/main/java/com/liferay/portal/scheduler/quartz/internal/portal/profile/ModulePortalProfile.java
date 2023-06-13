@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.scheduler.SchedulerEngine;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ProxyFactory;
@@ -27,10 +26,11 @@ import com.liferay.portal.profile.PortalProfile;
 import com.liferay.portal.scheduler.quartz.internal.QuartzSchedulerEngine;
 import com.liferay.portal.scheduler.quartz.internal.QuartzSchemaManager;
 import com.liferay.portal.scheduler.quartz.internal.QuartzTriggerFactory;
+import com.liferay.portal.scheduler.quartz.internal.messaging.proxy.QuartzSchedulerProxyMessageListener;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -43,15 +43,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Tina Tian
  */
-@Component(service = PortalProfile.class)
+@Component(immediate = true, service = PortalProfile.class)
 public class ModulePortalProfile extends BaseDSModulePortalProfile {
 
 	@Activate
 	protected void activate(ComponentContext componentContext) {
-		List<String> supportedPortalProfileNames = null;
+		Set<String> supportedPortalProfileNames = null;
 
 		if (GetterUtil.getBoolean(_props.get(PropsKeys.SCHEDULER_ENABLED))) {
-			supportedPortalProfileNames = new ArrayList<>();
+			supportedPortalProfileNames = new HashSet<>();
 
 			supportedPortalProfileNames.add(
 				PortalProfile.PORTAL_PROFILE_NAME_CE);
@@ -59,15 +59,14 @@ public class ModulePortalProfile extends BaseDSModulePortalProfile {
 				PortalProfile.PORTAL_PROFILE_NAME_DXP);
 		}
 		else {
-			supportedPortalProfileNames = Collections.emptyList();
+			supportedPortalProfileNames = Collections.emptySet();
 
 			BundleContext bundleContext = componentContext.getBundleContext();
 
 			_schedulerEngineServiceRegistration = bundleContext.registerService(
 				SchedulerEngine.class,
 				ProxyFactory.newDummyInstance(SchedulerEngine.class),
-				MapUtil.singletonDictionary(
-					"scheduler.engine.proxy", Boolean.FALSE));
+				new HashMapDictionary<>());
 
 			_triggerFactoryServiceRegistration = bundleContext.registerService(
 				TriggerFactory.class,
@@ -78,6 +77,7 @@ public class ModulePortalProfile extends BaseDSModulePortalProfile {
 		init(
 			componentContext, supportedPortalProfileNames,
 			QuartzSchedulerEngine.class.getName(),
+			QuartzSchedulerProxyMessageListener.class.getName(),
 			QuartzSchemaManager.class.getName(),
 			QuartzTriggerFactory.class.getName());
 	}
@@ -93,9 +93,12 @@ public class ModulePortalProfile extends BaseDSModulePortalProfile {
 		}
 	}
 
-	@Reference
-	private Props _props;
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+	}
 
+	private Props _props;
 	private ServiceRegistration<SchedulerEngine>
 		_schedulerEngineServiceRegistration;
 	private ServiceRegistration<TriggerFactory>

@@ -251,20 +251,6 @@ public interface ObjectRelationshipModel
 	public void setObjectFieldId2(long objectFieldId2);
 
 	/**
-	 * Returns the parameter object field ID of this object relationship.
-	 *
-	 * @return the parameter object field ID of this object relationship
-	 */
-	public long getParameterObjectFieldId();
-
-	/**
-	 * Sets the parameter object field ID of this object relationship.
-	 *
-	 * @param parameterObjectFieldId the parameter object field ID of this object relationship
-	 */
-	public void setParameterObjectFieldId(long parameterObjectFieldId);
-
-	/**
 	 * Returns the deletion type of this object relationship.
 	 *
 	 * @return the deletion type of this object relationship
@@ -459,9 +445,5 @@ public interface ObjectRelationshipModel
 
 	@Override
 	public ObjectRelationship cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

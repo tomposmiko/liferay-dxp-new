@@ -16,7 +16,6 @@ package com.liferay.frontend.js.loader.modules.extender.internal.npm.flat;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.JSBundle;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSPackage;
-import com.liferay.petra.concurrent.DCLSingleton;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 
@@ -24,7 +23,6 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Consumer;
 
 import org.osgi.framework.Bundle;
 
@@ -40,9 +38,8 @@ public class FlatJSBundle implements JSBundle {
 	 *
 	 * @param bundle the OSGi bundle to which this object refers
 	 */
-	public FlatJSBundle(Bundle bundle, Consumer<FlatJSBundle> initConsumer) {
+	public FlatJSBundle(Bundle bundle) {
 		_bundle = bundle;
-		_initConsumer = initConsumer;
 	}
 
 	/**
@@ -61,7 +58,7 @@ public class FlatJSBundle implements JSBundle {
 
 	@Override
 	public Collection<JSPackage> getJSPackages() {
-		return _jsPackagesDCLSingleton.getSingleton(this::_init);
+		return _jsPackages;
 	}
 
 	@Override
@@ -85,16 +82,7 @@ public class FlatJSBundle implements JSBundle {
 			getId(), StringPool.COLON, getName(), StringPool.AT, getVersion());
 	}
 
-	private Collection<JSPackage> _init() {
-		_initConsumer.accept(this);
-
-		return _jsPackages;
-	}
-
 	private final Bundle _bundle;
-	private final Consumer<FlatJSBundle> _initConsumer;
 	private final Collection<JSPackage> _jsPackages = new ArrayList<>();
-	private final DCLSingleton<Collection<JSPackage>> _jsPackagesDCLSingleton =
-		new DCLSingleton<>();
 
 }

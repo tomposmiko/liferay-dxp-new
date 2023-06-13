@@ -19,10 +19,9 @@
 AUI.add(
 	'liferay-dd-proxy',
 	(A) => {
-		// eslint-disable-next-line @liferay/aui/no-get-body
-		const body = A.getBody();
+		var body = A.getBody();
 
-		const DDM = A.DD.DDM;
+		var DDM = A.DD.DDM;
 
 		A.mix(
 			DDM,
@@ -31,7 +30,7 @@ AUI.add(
 					if (!DDM._proxy) {
 						DDM._proxy = true;
 
-						const proxyNode = A.Node.create('<div></div>');
+						var proxyNode = A.Node.create('<div></div>');
 
 						proxyNode.setStyles({
 							display: 'none',
@@ -52,12 +51,14 @@ AUI.add(
 				},
 
 				_setFrame(drag) {
-					let cursor = 'auto';
+					var activeHandle;
 
-					let dragNode = drag.get('dragNode');
-					const node = drag.get('node');
+					var cursor = 'auto';
 
-					const activeHandle = DDM.activeDrag.get('activeHandle');
+					var dragNode = drag.get('dragNode');
+					var node = drag.get('node');
+
+					activeHandle = DDM.activeDrag.get('activeHandle');
 
 					if (activeHandle) {
 						cursor = activeHandle.getStyle('cursor');
@@ -79,7 +80,7 @@ AUI.add(
 					}
 
 					if (drag.proxy.get('resizeFrame')) {
-						const size = node.invoke('getBoundingClientRect');
+						var size = node.invoke('getBoundingClientRect');
 
 						dragNode.setStyles({
 							height: Math.ceil(size.height),

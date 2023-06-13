@@ -37,80 +37,114 @@ import org.osgi.framework.Bundle;
 public interface AbsolutePortalURLBuilder {
 
 	/**
-	 * Returns a URL builder for AMD JavaScript files.
+	 * Returns a URL builder for Portal images. Image resources live in {@code
+	 * com.liferay.portal.kernel.util.Portal#PATH_IMAGE}.
 	 *
-	 * @param  browserModulePath the browser module path (e.g.
-	 *         /o/js/resolved-module/... or a legacy config generator module
-	 *         path too)
-	 * @return a URL builder for AMD JavaScript files
-	 * @review
+	 * <p>
+	 * Image resources are retrieved from a CDN host if present or from Portal
+	 * otherwise.
+	 * </p>
+	 *
+	 * @param  relativeURL the image's relative URL
+	 * @return a URL builder for Portal images
 	 */
-	public BrowserModuleAbsolutePortalURLBuilder forBrowserModule(
-		String browserModulePath);
+	public ImageAbsolutePortalURLBuilder forImage(String relativeURL);
 
 	/**
-	 * Returns a URL builder for bundle JavaScript files.
+	 * Returns a URL builder for Portal's main resources. Main resources live in
+	 * {@code com.liferay.portal.kernel.util.Portal#PATH_MAIN}.
+	 *
+	 * <p>
+	 * Main resources are always retrieved from the Portal, even if a CDN host
+	 * is present.
+	 * </p>
+	 *
+	 * @param  relativeURL the resource's relative URL
+	 * @return a URL builder for Portal's main resources
+	 */
+	public MainAbsolutePortalURLBuilder forMain(String relativeURL);
+
+	/**
+	 * Returns a URL builder for module resources. Module resources live in
+	 * {@code com.liferay.portal.kernel.util.Portal#PATH_MODULE} + the bundle's
+	 * web context path.
+	 *
+	 * <p>
+	 * If the requested module resource is a JavaScript file or a stylesheet,
+	 * use {@link #forModuleScript(Bundle, String)} or {@link
+	 * #forModuleStylesheet(Bundle, String)} instead.
+	 * </p>
+	 *
+	 * <p>
+	 * Module resources are retrieved from a CDN host if present or from the
+	 * Portal otherwise.
+	 * </p>
+	 *
+	 * @param  bundle the bundle that contains the resource
+	 * @param  relativeURL the resource's relative URL
+	 * @return a URL builder for module resources
+	 * @review
+	 */
+	public ModuleAbsolutePortalURLBuilder forModule(
+		Bundle bundle, String relativeURL);
+
+	/**
+	 * Returns a URL builder for module JavaScript files. Module scripts live in
+	 * {@code com.liferay.portal.kernel.util.Portal#PATH_MODULE} + the bundle's
+	 * web context path.
+	 *
+	 * <p>
+	 * Module scripts are retrieved from a CDN host if present or from the
+	 * Portal otherwise.
+	 * </p>
 	 *
 	 * @param  bundle the bundle that contains the resource
 	 * @param  relativeURL the JavaScript file relative URL
 	 * @return a URL builder for module scripts
 	 * @review
 	 */
-	public BundleScriptAbsolutePortalURLBuilder forBundleScript(
+	public ModuleAbsolutePortalURLBuilder forModuleScript(
 		Bundle bundle, String relativeURL);
 
 	/**
-	 * Returns a URL builder for bundle stylesheets.
+	 * Returns a URL builder for module stylesheets. Module stylesheets live in
+	 * {@code com.liferay.portal.kernel.util.Portal#PATH_MODULE} + the bundle's
+	 * web context path.
+	 *
+	 * <p>
+	 * Module stylesheets are retrieved from a CDN host if present or from the
+	 * Portal otherwise.
+	 * </p>
+	 *
+	 * <p>
+	 * Module stylesheets are retrieved as standard module resources, but
+	 * additional parameters to account for RTL support, cache, etc. are added
+	 * to the request.
+	 * </p>
 	 *
 	 * @param  bundle the bundle that contains the resource
 	 * @param  relativeURL the stylesheets relative URL
 	 * @return a URL builder for module stylesheets
 	 * @review
 	 */
-	public BundleStylesheetAbsolutePortalURLBuilder forBundleStylesheet(
+	public ModuleAbsolutePortalURLBuilder forModuleStylesheet(
 		Bundle bundle, String relativeURL);
-
-	/**
-	 * Returns a URL builder for JavaScript combo servlet requests.
-	 *
-	 * @return a URL builder for combo servlet requests
-	 */
-	public ComboRequestAbsolutePortalURLBuilder forComboRequest();
-
-	/**
-	 * Returns a URL builder for an ECMAScript module.
-	 *
-	 * @param  webContextPath the context path where the module lives
-	 * @param  esModulePath the module path (e.g. /js/index.js)
-	 * @return a URL builder for ESM scripts
-	 * @review
-	 */
-	public ESModuleAbsolutePortalURLBuilder forESModule(
-		String webContextPath, String esModulePath);
-
-	/**
-	 * Returns a URL builder for portal images. Image resources live in {@code
-	 * com.liferay.portal.kernel.util.Portal#PATH_IMAGE}.
-	 *
-	 * @param  relativeURL the image's relative URL
-	 * @return a URL builder for portal images
-	 */
-	public PortalImageAbsolutePortalURLBuilder forPortalImage(
-		String relativeURL);
-
-	/**
-	 * Returns a URL builder for portal's main resources. Main resources live in
-	 * {@code com.liferay.portal.kernel.util.Portal#PATH_MAIN}.
-	 *
-	 * @param  relativeURL the resource's relative URL
-	 * @return a URL builder for portal's main resources
-	 */
-	public PortalMainResourceAbsolutePortalURLBuilder forPortalMainResource(
-		String relativeURL);
 
 	/**
 	 * Returns a URL builder for portlet dependency resources. Portlet
 	 * dependency resources live in the portal's root path.
+	 *
+	 * <p>
+	 * Portlet dependency resources are retrieved from a configured CSS URN or
+	 * JS URN if present. (See
+	 * <code>com.liferay.portal.kernel.util.PropsKeys#PORTLET_DEPENDENCY_CSS_URN</code>
+	 * and <code>PropsKeys#PORTLET_DEPENDENCY_JAVASCRIPT_URN</code>).
+	 * </p>
+	 *
+	 * <p>
+	 * If neither are present, the resource is retrieved from a CDN host if
+	 * present, or Portal otherwise.
+	 * </p>
 	 *
 	 * @param  portletDependency the portlet dependency resource
 	 * @param  cssURN the URN for CSS portlet dependency resources
@@ -122,12 +156,58 @@ public interface AbsolutePortalURLBuilder {
 		String javaScriptURN);
 
 	/**
-	 * Returns a URL builder for requests to dynamic content returned by
-	 * servlets.
+	 * Returns a URL builder for arbitrary resources. Arbitrary resources live
+	 * in Portal's root path. It can be {@code /} if Portal installed as the
+	 * root web app, or {@code /some-other-path} based on its context). See
+	 * {@code
+	 * com.liferay.portal.spring.context.PortalContextLoaderListener#getPortalServletContextPath(
+	 * )} for more details.
 	 *
-	 * @param  requestURL the API's request URL
-	 * @return a URL builder for API requests
+	 * <p>
+	 * <b>Warning:</b> Only use this method if none of the other methods meet
+	 * your needs. Otherwise, you may end up hard coding configurable paths.
+	 * </p>
+	 *
+	 * <p>
+	 * Arbitrary resources are retrieved from a CDN host if present or from the
+	 * Portal otherwise.
+	 * </p>
+	 *
+	 * @param  relativeURL the resource's relative URL
+	 * @return a URL builder for arbitrary resources
 	 */
-	public ServletAbsolutePortalURLBuilder forServlet(String requestURL);
+	public ResourceAbsolutePortalURLBuilder forResource(String relativeURL);
+
+	/**
+	 * Returns a URL builder for OSGi whiteboard servlet instances. This method
+	 * requires the servlet class to be annotated with the OSGi {@code
+	 * @Component}. OSGi whiteboard servlets live in {@code
+	 * com.liferay.portal.kernel.util.Portal#PATH_MODULE}.
+	 *
+	 * @param  servletPattern the value of the {@code
+	 *         osgi.http.whiteboard.servlet.pattern} property
+	 * @return a URL builder for OSGi whiteboard servlet instances
+	 */
+	public WhiteboardAbsolutePortalURLBuilder forWhiteboard(
+		String servletPattern);
+
+	/**
+	 * Returns a version of this URL builder that ignores the CDN part. See
+	 * {@code
+	 * com.liferay.portal.kernel.util.Portal#getCDNHost(
+	 * javax.servlet.http.HttpServletRequest)} for details.
+	 *
+	 * @return a version of this URL builder that ignores the CDN part
+	 */
+	public AbsolutePortalURLBuilder ignoreCDNHost();
+
+	/**
+	 * Returns a version of this URL builder that ignores the path proxy part.
+	 * See {@code com.liferay.portal.kernel.util.Portal#getPathProxy()} for
+	 * details.
+	 *
+	 * @return a version of this URL builder that ignores the path proxy part
+	 */
+	public AbsolutePortalURLBuilder ignorePathProxy();
 
 }

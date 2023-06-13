@@ -18,9 +18,7 @@
  * @param {Number} n - The position in Fibonnaci sequence.
  * @returns {Number} - Fibonnaci value at nth position.
  */
-export function fib(n) {
-	return n <= 1 ? 1 : fib(n - 1) + fib(n - 2);
-}
+export const fib = (n) => (n <= 1 ? 1 : fib(n - 1) + fib(n - 2));
 
 /**
  * Calculate retry delay in milliseconds, bounded
@@ -30,6 +28,6 @@ export function fib(n) {
  * @param {Number} maxAttempts - The maximum number of attempts to limit delay increase.
  * @returns {Number} - Retry delay in milliseconds.
  */
-export function getRetryDelay(attemptNumber, maxAttempts) {
+export const getRetryDelay = (attemptNumber, maxAttempts) => {
 	return fib(Math.min(attemptNumber, maxAttempts)) * 1000;
-}
+};

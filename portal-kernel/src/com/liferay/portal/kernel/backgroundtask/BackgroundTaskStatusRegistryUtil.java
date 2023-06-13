@@ -29,12 +29,10 @@ public class BackgroundTaskStatusRegistryUtil {
 	}
 
 	public static BackgroundTaskStatus registerBackgroundTaskStatus(
-		long backgroundTaskId,
-		BackgroundTaskStatusMessageTranslator
-			backgroundTaskStatusMessageTranslator) {
+		long backgroundTaskId) {
 
 		return _backgroundTaskStatusRegistry.registerBackgroundTaskStatus(
-			backgroundTaskId, backgroundTaskStatusMessageTranslator);
+			backgroundTaskId);
 	}
 
 	public static BackgroundTaskStatus unregisterBackgroundTaskStatus(

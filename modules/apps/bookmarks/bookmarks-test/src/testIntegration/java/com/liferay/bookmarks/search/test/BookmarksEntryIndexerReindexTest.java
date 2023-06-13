@@ -154,7 +154,8 @@ public class BookmarksEntryIndexerReindexTest {
 	}
 
 	protected void deleteDocument(long companyId, String uid) throws Exception {
-		indexWriterHelper.deleteDocument(companyId, uid, true);
+		indexWriterHelper.deleteDocument(
+			indexer.getSearchEngineId(), companyId, uid, true);
 	}
 
 	protected void reindexAllIndexerModels() throws Exception {

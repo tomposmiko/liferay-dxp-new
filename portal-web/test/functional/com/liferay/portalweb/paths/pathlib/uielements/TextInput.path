@@ -21,11 +21,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ALERT_MESSAGE</td>
-	<td>//div[label[contains(.,'${key_fieldLabel}')]]//div[contains(@class,'text-danger')][normalize-space()='${key_alertMessage}']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>ANSWER</td>
 	<td>//div[label[contains(.,'Answer')]]/input[@type='password']</td>
 	<td></td>
@@ -41,23 +36,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ANY_SPECIFIC</td>
-	<td>//div/label[text()='${key_text}']/..//input[not(contains(@type,'checkbox'))]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>ANY_DISABLED</td>
-	<td>//div[contains(@class,'input-text-wrapper')]/label[contains(.,'${key_selectFieldLabel}')]//following-sibling::input[contains(@class,'disabled')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ANY_PLACEHOLDER</td>
-	<td>//input[contains(@placeholder,'${key_placeHolder}') and not(contains(@class,'disabled'))]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ANY_WITH_AIRA_LABEL</td>
-	<td>//input[@aria-label='${ariaLabel}']</td>
+	<td>//div[contains(@class,'input-text-wrapper')][2]/label[contains(.,'${key_selectFieldLabel}')]//following-sibling::input[contains(@class,'disabled')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -72,7 +52,7 @@
 </tr>
 <tr>
 	<td>BORDER_BOTTOM_INPUT_FIELD</td>
-	<td>//button[contains(@class,'collapse-icon')][normalize-space()='${key_borderBottom}']/following-sibling::div[1]//div[label[normalize-space(text())='${key_fieldLabel}']]//input</td>
+	<td>//div[contains(@class,'label')][normalize-space()='${key_borderBottom}']/following-sibling::div[1]//div[label[normalize-space(text())='${key_fieldLabel}']]/input</td>
 	<td></td>
 </tr>
 <tr>
@@ -136,6 +116,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CUSTOM_TITLE</td>
+	<td>//input[contains(@id,'customTitle')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DATA_DEFINITION</td>
 	<td>//div[label[contains(.,'Data Definition')]]/input[@type='text']</td>
 	<td></td>
@@ -161,23 +146,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DESTINATION_URL</td>
-	<td>//input[contains(@name,'destinationURL_${key_index}')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>INPUT_CONTAINS_TITLE</td>
 	<td>//input[contains(@title,'${key_titleName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISCONTINUED_DATE</td>
-	<td>//input[not(contains(@type,'disabled')) and contains(@id,'discontinuedDate')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISCONTINUED_DATE_DISABLED</td>
-	<td>//input[contains(@class,'disabled') and contains(@id,'discontinuedDate')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -213,11 +183,6 @@
 <tr>
 	<td>DISPLAY_DATE_TIME</td>
 	<td>//input[contains(@id,'displayDateTime')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISPLAY_DATE_TIME_TIMEPICKER</td>
-	<td>//div[contains(@class,'timepicker')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -316,6 +281,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FRIENDLY_URL</td>
+	<td>//input[contains(@id,'friendlyURL')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FRIENDLY_URL_SITE_SETTINGS</td>
 	<td>//input[contains(@id,'FriendlyURL')]</td>
 	<td></td>
@@ -331,23 +301,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>GENERIC_NUMBER_INPUT_N</td>
-	<td>xpath=(//div[label[contains(.,'${key_fieldLabel}')]]//input[@type='number'])[${key_indexNumber}]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>GENERIC_TEXT_INPUT</td>
 	<td>//div[label[contains(.,'${key_fieldLabel}')]]//input[@type='text'] | //div[contains(@class,'ddm-field') and contains(.,'${key_fieldLabel}')]//input[@type='text']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>GENERIC_TEXT_INPUT_WITH_ICON</td>
-	<td>//div[label[*[name()='svg'][contains(@class,'lexicon-icon-${key_text}')]]]//preceding-sibling::input</td>
-	<td></td>
-</tr>
-<tr>
-	<td>GENERIC_TEXT_INPUT_N</td>
-	<td>xpath=(//div[label[contains(.,'${key_fieldLabel}')]]//input[@type='text'] | //div[contains(@class,'ddm-field') and contains(.,'${key_fieldLabel}')]//input[@type='text'])[${key_indexNumber}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -386,13 +341,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>INPUT_ID_N</td>
-	<td>xpath=(//input[contains(@id,'${inputFieldId}')])[${key_indexNumber}]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>KEY</td>
-	<td>//div[label[normalize-space(text())='Key']]//input[@type='text']</td>
+	<td>//div[label[contains(.,'Key')]]//input[@type='text']</td>
 	<td></td>
 </tr>
 <tr>
@@ -413,31 +363,6 @@
 <tr>
 	<td>MAIL_DOMAIN</td>
 	<td>//input[contains(@id,'mx') and contains(@class,'input-text')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>VIRTUAL_INSTANCE_SCREEN_NAME</td>
-	<td>//input[contains(@id,'screenNameAdmin')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>VIRTUAL_INSTANCE_EMAIL</td>
-	<td>//input[contains(@id,'emailAdmin')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>VIRTUAL_INSTANCE_PASSWORD</td>
-	<td>//input[contains(@id,'passwordAdmin')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>VIRTUAL_INSTANCE_FIRST_NAME</td>
-	<td>//input[contains(@id,'firstNameAdmin')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>VIRTUAL_INSTANCE_LAST_NAME</td>
-	<td>//input[contains(@id,'lastNameAdmin')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -492,7 +417,7 @@
 </tr>
 <tr>
 	<td>NUMERIC</td>
-	<td>//label[contains(.,'${key_fieldLabel}')]/following-sibling::input[1] | //label[contains(.,'${key_fieldLabel}')]//..//input[1]</td>
+	<td>//label[contains(.,'${key_fieldLabel}')]/following-sibling::input[1]</td>
 	<td></td>
 </tr>
 <tr>
@@ -527,7 +452,7 @@
 </tr>
 <tr>
 	<td>PASSWORD</td>
-	<td>//div[label[contains(.,'Password') and not(contains(.,'One-Time Password'))]]/input | //div[label[contains(.,"parola d'ordine")]]/input | //div[label[contains(.,'Contraseña')]]/input | //div[label[contains(.,'パスワード')]]/input | //div[label[contains(.,'密码')]]/input | //div[contains(.,'Kennwort')]//input[@type='password']</td>
+	<td>//div[label[contains(.,'Password')]]/input | //div[label[contains(.,"parola d'ordine")]]/input | //div[label[contains(.,'Contraseña')]]/input | //div[label[contains(.,'パスワード')]]/input | //div[label[contains(.,'密码')]]/input | //div[contains(.,'Kennwort')]//input[@type='password']</td>
 	<td></td>
 </tr>
 <tr>
@@ -551,13 +476,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PATTERN</td>
-	<td>//input[contains(@name,'pattern_${key_index}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>MATOMO</td>
-	<td>//textarea[contains(@id,'matomo')]</td>
+	<td>PIWIK</td>
+	<td>//textarea[contains(@id,'piwik')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -606,11 +526,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>REPLACEMENT</td>
-	<td>//input[contains(@id,'replacement')]/following-sibling::input[contains(@type,'text')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>REVIEW_DATE</td>
 	<td>//span[contains(@id,'displayDate')]//input[contains(@id,'reviewDate')][1]</td>
 	<td></td>
@@ -646,6 +561,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SEO_META_TAGS_DESCRIPTION</td>
+	<td>//div[label[contains(.,'Description')]]//input</td>
+	<td></td>
+</tr>
+<tr>
 	<td>STRUCTURE_KEY_FIELD</td>
 	<td>//input[contains(@id,'structureKey')]</td>
 	<td></td>
@@ -653,11 +573,6 @@
 <tr>
 	<td>REQUIRED_ALERT</td>
 	<td>//div[contains(@class,'has-error')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SPECIFIC_REQUIRED_ALERT</td>
-	<td>//div[contains(@class,'has-error')][contains(.,'${key_fieldName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -676,13 +591,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>SEARCH_DISABLED</td>
-	<td>//input[@disabled and contains(@name,'keywords')]</td>
+	<td>SEARCH_2</td>
+	<td>xpath=(//input[@title='Search'])[2]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>SEARCH_2</td>
-	<td>xpath=(//input[@title='Search'])[2]</td>
+	<td>SEO_HTML_TITLE</td>
+	<td>//div[label[contains(.,'HTML')]]//input</td>
 	<td></td>
 </tr>
 <tr>
@@ -747,7 +662,7 @@
 </tr>
 <tr>
 	<td>TEXT_SPECIFIC</td>
-	<td>//label[contains(.,'Text')]/following-sibling::input[1] | //label[contains(.,'Text')]//..//input[1]</td>
+	<td>//label[contains(.,'Text')]/following-sibling::input[1]</td>
 	<td></td>
 </tr>
 <tr>

@@ -15,7 +15,6 @@
 package com.liferay.dynamic.data.mapping.internal.search.spi.model.query.contributor;
 
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -38,6 +37,8 @@ import java.io.Serializable;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord",
 	service = ModelPreFilterContributor.class
 )
@@ -82,26 +84,36 @@ public class DDMFormInstanceRecordModelPreFilterContributor
 		if ((languageIds.length > 0) && (notEmptyFields.length > 0) &&
 			(structureId > 0)) {
 
-			List<Locale> locales = TransformUtil.transformToList(
-				languageIds, LocaleUtil::fromLanguageId);
+			List<Locale> locales = Stream.of(
+				languageIds
+			).map(
+				languageId -> LocaleUtil.fromLanguageId(languageId)
+			).collect(
+				Collectors.toList()
+			);
 
-			for (String notEmptyField : notEmptyFields) {
-				BooleanFilter notEmptyFieldBooleanFilter = new BooleanFilter();
+			Stream.of(
+				notEmptyFields
+			).forEach(
+				notEmptyField -> {
+					BooleanFilter notEmptyFieldBooleanFilter =
+						new BooleanFilter();
 
-				for (Locale locale : locales) {
-					notEmptyFieldBooleanFilter.add(
-						new ExistsFilter(
-							ddmIndexer.encodeName(
-								structureId, notEmptyField, locale)),
-						BooleanClauseOccur.MUST);
+					locales.forEach(
+						locale -> notEmptyFieldBooleanFilter.add(
+							new ExistsFilter(
+								ddmIndexer.encodeName(
+									structureId, notEmptyField, locale)),
+							BooleanClauseOccur.MUST));
+
+					booleanFilter.add(
+						notEmptyFieldBooleanFilter,
+						BooleanClauseOccur.MUST_NOT);
 				}
-
-				booleanFilter.add(
-					notEmptyFieldBooleanFilter, BooleanClauseOccur.MUST_NOT);
-			}
+			);
 		}
 
-		_addSearchClassTypeIds(booleanFilter, searchContext);
+		addSearchClassTypeIds(booleanFilter, searchContext);
 
 		String ddmStructureFieldName = (String)searchContext.getAttribute(
 			"ddmStructureFieldName");
@@ -121,16 +133,13 @@ public class DDMFormInstanceRecordModelPreFilterContributor
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
 	}
 
-	@Reference
-	protected DDMIndexer ddmIndexer;
-
-	private Filter _addSearchClassTypeIds(
+	protected Filter addSearchClassTypeIds(
 		BooleanFilter contextBooleanFilter, SearchContext searchContext) {
 
 		long[] classTypeIds = searchContext.getClassTypeIds();
@@ -148,6 +157,9 @@ public class DDMFormInstanceRecordModelPreFilterContributor
 		return contextBooleanFilter.add(
 			classTypeIdsTermsFilter, BooleanClauseOccur.MUST);
 	}
+
+	@Reference
+	protected DDMIndexer ddmIndexer;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceRecordModelPreFilterContributor.class);

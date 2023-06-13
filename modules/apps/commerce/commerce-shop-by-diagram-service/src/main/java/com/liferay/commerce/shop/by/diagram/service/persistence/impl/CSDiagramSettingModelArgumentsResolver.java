@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.commerce.shop.by.diagram.model.impl.CSDiagramSettingImpl",
-		"table.name=CSDiagramSetting"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		CSDiagramSettingModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class CSDiagramSettingModelArgumentsResolver
 	implements ArgumentsResolver {

@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.price.list.model.impl;
 
-import com.liferay.account.model.AccountGroup;
-import com.liferay.account.service.AccountGroupLocalServiceUtil;
+import com.liferay.commerce.account.model.CommerceAccountGroup;
+import com.liferay.commerce.account.service.CommerceAccountGroupLocalServiceUtil;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.service.CommercePriceListLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -27,8 +27,10 @@ public class CommercePriceListCommerceAccountGroupRelImpl
 	extends CommercePriceListCommerceAccountGroupRelBaseImpl {
 
 	@Override
-	public AccountGroup getAccountGroup() throws PortalException {
-		return AccountGroupLocalServiceUtil.getAccountGroup(
+	public CommerceAccountGroup getCommerceAccountGroup()
+		throws PortalException {
+
+		return CommerceAccountGroupLocalServiceUtil.getCommerceAccountGroup(
 			getCommerceAccountGroupId());
 	}
 

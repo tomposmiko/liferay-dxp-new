@@ -30,9 +30,6 @@ import java.net.URL;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.Servlet;
 
@@ -50,12 +47,12 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 /**
  * @author Preston Crary
  */
-@Component(service = JSPServletFactory.class)
+@Component(immediate = true, service = JSPServletFactory.class)
 public class JSPServletFactoryImpl implements JSPServletFactory {
 
 	@Override
 	public Servlet createJSPServlet() {
-		return new JspServlet(_fragmentCounts.keySet());
+		return new JspServlet();
 	}
 
 	@Activate
@@ -81,32 +78,8 @@ public class JSPServletFactoryImpl implements JSPServletFactory {
 		JSPServletFactoryImpl.class);
 
 	private BundleTracker<Tracked> _bundleTracker;
-	private final Map<String, AtomicInteger> _fragmentCounts = new HashMap<>();
 
-	private static class Tracked {
-
-		public boolean match(Bundle bundle) {
-			if (_symbolicName.equals(bundle.getSymbolicName()) &&
-				((_versionRange == null) ||
-				 _versionRange.includes(bundle.getVersion()))) {
-
-				return true;
-			}
-
-			return false;
-		}
-
-		private Tracked(String symbolicName, VersionRange versionRange) {
-			_symbolicName = symbolicName;
-			_versionRange = versionRange;
-		}
-
-		private final String _symbolicName;
-		private final VersionRange _versionRange;
-
-	}
-
-	private class JspFragmentBundleTrackerCustomizer
+	private static class JspFragmentBundleTrackerCustomizer
 		implements BundleTrackerCustomizer<Tracked> {
 
 		@Override
@@ -144,7 +117,7 @@ public class JSPServletFactoryImpl implements JSPServletFactory {
 
 			Tracked tracked = new Tracked(symbolicName, versionRange);
 
-			_deleteJSPServletClasses(tracked, true);
+			_deleteJSPServletClasses(tracked);
 
 			return tracked;
 		}
@@ -158,7 +131,7 @@ public class JSPServletFactoryImpl implements JSPServletFactory {
 		public void removedBundle(
 			Bundle bundle, BundleEvent event, Tracked tracked) {
 
-			_deleteJSPServletClasses(tracked, false);
+			_deleteJSPServletClasses(tracked);
 		}
 
 		private JspFragmentBundleTrackerCustomizer(
@@ -167,31 +140,11 @@ public class JSPServletFactoryImpl implements JSPServletFactory {
 			_bundleContext = bundleContext;
 		}
 
-		private void _deleteJSPServletClasses(Tracked tracked, boolean add) {
+		private void _deleteJSPServletClasses(Tracked tracked) {
 			for (Bundle bundle : _bundleContext.getBundles()) {
 				if (!tracked.match(bundle)) {
 					continue;
 				}
-
-				_fragmentCounts.compute(
-					tracked._symbolicName,
-					(symbolicName, count) -> {
-						if (add) {
-							if (count == null) {
-								return new AtomicInteger(1);
-							}
-
-							count.incrementAndGet();
-
-							return count;
-						}
-
-						if (count.decrementAndGet() == 0) {
-							return null;
-						}
-
-						return count;
-					});
 
 				String scratchDir = StringBundler.concat(
 					_WORK_DIR, bundle.getSymbolicName(), StringPool.DASH,
@@ -213,6 +166,29 @@ public class JSPServletFactoryImpl implements JSPServletFactory {
 		}
 
 		private final BundleContext _bundleContext;
+
+	}
+
+	private static class Tracked {
+
+		public boolean match(Bundle bundle) {
+			if (_symbolicName.equals(bundle.getSymbolicName()) &&
+				((_versionRange == null) ||
+				 _versionRange.includes(bundle.getVersion()))) {
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private Tracked(String symbolicName, VersionRange versionRange) {
+			_symbolicName = symbolicName;
+			_versionRange = versionRange;
+		}
+
+		private final String _symbolicName;
+		private final VersionRange _versionRange;
 
 	}
 

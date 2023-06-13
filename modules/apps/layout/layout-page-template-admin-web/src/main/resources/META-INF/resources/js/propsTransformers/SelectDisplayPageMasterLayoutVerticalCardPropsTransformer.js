@@ -12,8 +12,6 @@
  * details.
  */
 
-import {getSpritemap} from '@liferay/frontend-icons-web';
-
 import openDisplayPageModal from '../modal/openDisplayPageModal.es';
 
 export default function SelectDisplayPageMasterLayoutVerticalCardPropsTransformer({
@@ -30,7 +28,7 @@ export default function SelectDisplayPageMasterLayoutVerticalCardPropsTransforme
 				formSubmitURL: addDisplayPageUrl,
 				mappingTypes,
 				namespace,
-				spritemap: getSpritemap(),
+				spritemap: `${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg`,
 				title,
 			});
 		},

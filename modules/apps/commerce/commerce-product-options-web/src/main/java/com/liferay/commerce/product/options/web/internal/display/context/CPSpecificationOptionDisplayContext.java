@@ -16,18 +16,20 @@ package com.liferay.commerce.product.options.web.internal.display.context;
 
 import com.liferay.commerce.product.model.CPOptionCategory;
 import com.liferay.commerce.product.model.CPSpecificationOption;
-import com.liferay.commerce.product.options.web.internal.portlet.action.helper.ActionHelper;
+import com.liferay.commerce.product.options.web.internal.portlet.action.ActionHelper;
 import com.liferay.commerce.product.options.web.internal.util.CPOptionsPortletUtil;
 import com.liferay.commerce.product.service.CPOptionCategoryService;
 import com.liferay.commerce.product.service.CPSpecificationOptionService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -55,10 +57,10 @@ public class CPSpecificationOptionDisplayContext
 			CPSpecificationOption.class.getSimpleName(),
 			portletResourcePermission);
 
+		setDefaultOrderByCol("label");
+
 		_cpOptionCategoryService = cpOptionCategoryService;
 		_cpSpecificationOptionService = cpSpecificationOptionService;
-
-		setDefaultOrderByCol("label");
 	}
 
 	public List<CPOptionCategory> getCPOptionCategories()
@@ -97,7 +99,7 @@ public class CPSpecificationOptionDisplayContext
 		return PortletURLBuilder.create(
 			super.getPortletURL()
 		).setNavigation(
-			_getNavigation()
+			getNavigation()
 		).buildPortletURL();
 	}
 
@@ -110,18 +112,26 @@ public class CPSpecificationOptionDisplayContext
 		}
 
 		searchContainer = new SearchContainer<>(
-			liferayPortletRequest, getPortletURL(), null,
+			liferayPortletRequest, getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage(
 			"no-specification-labels-were-found");
 
-		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
+		OrderByComparator<CPSpecificationOption> orderByComparator =
 			CPOptionsPortletUtil.getCPSpecificationOptionOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+				getOrderByCol(), getOrderByType());
+
+		searchContainer.setOrderByCol(getOrderByCol());
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
+		searchContainer.setRowChecker(getRowChecker());
+
+		Sort sort = CPOptionsPortletUtil.getCPSpecificationOptionSort(
+			getOrderByCol(), getOrderByType());
 
 		Boolean facetable = null;
 
-		String navigation = _getNavigation();
+		String navigation = getNavigation();
 
 		if (navigation.equals("no")) {
 			facetable = false;
@@ -130,18 +140,21 @@ public class CPSpecificationOptionDisplayContext
 			facetable = true;
 		}
 
-		searchContainer.setResultsAndTotal(
-			_cpSpecificationOptionService.searchCPSpecificationOptions(
-				cpRequestHelper.getCompanyId(), facetable, getKeywords(),
-				searchContainer.getStart(), searchContainer.getEnd(),
-				CPOptionsPortletUtil.getCPSpecificationOptionSort(
-					getOrderByCol(), getOrderByType())));
-		searchContainer.setRowChecker(getRowChecker());
+		BaseModelSearchResult<CPSpecificationOption>
+			cpSpecificationOptionBaseModelSearchResult =
+				_cpSpecificationOptionService.searchCPSpecificationOptions(
+					cpRequestHelper.getCompanyId(), facetable, getKeywords(),
+					searchContainer.getStart(), searchContainer.getEnd(), sort);
+
+		searchContainer.setTotal(
+			cpSpecificationOptionBaseModelSearchResult.getLength());
+		searchContainer.setResults(
+			cpSpecificationOptionBaseModelSearchResult.getBaseModels());
 
 		return searchContainer;
 	}
 
-	private String _getNavigation() {
+	protected String getNavigation() {
 		return ParamUtil.getString(httpServletRequest, "navigation");
 	}
 

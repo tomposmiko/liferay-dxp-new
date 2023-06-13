@@ -44,7 +44,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -72,22 +74,20 @@ public class PredicateExpressionVisitorImpl<T extends Map>
 	public Predicate<T> visitBinaryExpressionOperation(
 		BinaryExpression.Operation operation, Object left, Object right) {
 
-		Predicate<T> predicate = null;
+		Optional<Predicate<T>> predicateOptional = Optional.empty();
 
 		if (_lambdaCollectionEntityField != null) {
-			predicate = _getLambdaPredicate(operation, left, right);
+			predicateOptional = _getLambdaPredicateOptional(
+				operation, left, right);
 		}
 		else {
-			predicate = _getPredicate(operation, left, right);
+			predicateOptional = _getPredicateOptional(operation, left, right);
 		}
 
-		if (predicate != null) {
-			return predicate;
-		}
-
-		throw new UnsupportedOperationException(
-			"Unsupported method visitBinaryExpressionOperation with " +
-				"operation " + operation);
+		return predicateOptional.orElseThrow(
+			() -> new UnsupportedOperationException(
+				"Unsupported method visitBinaryExpressionOperation with " +
+					"operation " + operation));
 	}
 
 	@Override
@@ -324,8 +324,9 @@ public class PredicateExpressionVisitorImpl<T extends Map>
 				_normalizeStringLiteral(
 					String.valueOf(p.get(entityField.getName()))));
 		}
-
-		return p -> fieldValue.equals(p.get(entityField.getName()));
+		else {
+			return p -> fieldValue.equals(p.get(entityField.getName()));
+		}
 	}
 
 	private Predicate<T> _getGEPredicate(
@@ -373,42 +374,29 @@ public class PredicateExpressionVisitorImpl<T extends Map>
 	private Predicate<T> _getINPredicate(
 		EntityField entityField, List<Object> fieldValues) {
 
-		return p -> {
-			for (Object fieldValue : fieldValues) {
-				if (StringUtils.containsIgnoreCase(
-						String.valueOf(p.get(entityField.getName())),
-						String.valueOf(fieldValue))) {
+		Stream<Object> stream = fieldValues.stream();
 
-					return true;
-				}
-			}
-
-			return false;
-		};
+		return p -> stream.anyMatch(
+			fieldValue -> StringUtils.containsIgnoreCase(
+				String.valueOf(p.get(entityField.getName())),
+				String.valueOf(fieldValue)));
 	}
 
 	private Predicate<T> _getLambdaContainsPredicate(
 		EntityField entityField, Object fieldValue) {
 
-		if (!Objects.equals(entityField.getType(), EntityField.Type.STRING)) {
-			throw new UnsupportedOperationException(
-				"Unsupported method _lambdaContains with entity field type " +
-					entityField.getType());
+		if (Objects.equals(entityField.getType(), EntityField.Type.STRING)) {
+			return p -> Stream.of(
+				(String[])p.get(_lambdaCollectionEntityField.getName())
+			).anyMatch(
+				c -> StringUtils.containsIgnoreCase(
+					String.valueOf(c), String.valueOf(fieldValue))
+			);
 		}
 
-		return p -> {
-			for (String name :
-					(String[])p.get(_lambdaCollectionEntityField.getName())) {
-
-				if (StringUtils.containsIgnoreCase(
-						String.valueOf(name), String.valueOf(fieldValue))) {
-
-					return true;
-				}
-			}
-
-			return false;
-		};
+		throw new UnsupportedOperationException(
+			"Unsupported method _lambdaContains with entity field type " +
+				entityField.getType());
 	}
 
 	private EntityModel _getLambdaEntityModel(
@@ -433,35 +421,28 @@ public class PredicateExpressionVisitorImpl<T extends Map>
 	private Predicate<T> _getLambdaEQPredicate(
 		EntityField entityField, Object fieldValue) {
 
-		if (!Objects.equals(entityField.getType(), EntityField.Type.STRING)) {
-			throw new UnsupportedOperationException(
-				"Unsupported method _getLambdaEQPredicate with entity field " +
-					entityField.getType());
+		if (Objects.equals(entityField.getType(), EntityField.Type.STRING)) {
+			return p -> Stream.of(
+				(String[])p.get(_lambdaCollectionEntityField.getName())
+			).anyMatch(
+				c -> fieldValue.equals(
+					_normalizeStringLiteral(String.valueOf(c)))
+			);
 		}
 
-		return p -> {
-			for (String name :
-					(String[])p.get(_lambdaCollectionEntityField.getName())) {
-
-				if (fieldValue.equals(
-						_normalizeStringLiteral(String.valueOf(name)))) {
-
-					return true;
-				}
-			}
-
-			return false;
-		};
+		throw new UnsupportedOperationException(
+			"Unsupported method _getLambdaEQPredicate with entity field type " +
+				entityField.getType());
 	}
 
-	private Predicate<T> _getLambdaPredicate(
+	private Optional<Predicate<T>> _getLambdaPredicateOptional(
 		BinaryExpression.Operation operation, Object left, Object right) {
 
-		if (!Objects.equals(BinaryExpression.Operation.EQ, operation)) {
-			return null;
+		if (Objects.equals(BinaryExpression.Operation.EQ, operation)) {
+			return Optional.of(_getLambdaEQPredicate((EntityField)left, right));
 		}
 
-		return _getLambdaEQPredicate((EntityField)left, right);
+		return Optional.empty();
 	}
 
 	private Predicate<T> _getLEPredicate(
@@ -516,32 +497,39 @@ public class PredicateExpressionVisitorImpl<T extends Map>
 		return leftPredicate.or(rightPredicate);
 	}
 
-	private Predicate<T> _getPredicate(
+	private Optional<Predicate<T>> _getPredicateOptional(
 		BinaryExpression.Operation operation, Object left, Object right) {
 
+		Predicate<T> predicate = null;
+
 		if (Objects.equals(BinaryExpression.Operation.AND, operation)) {
-			return _getANDPredicate((Predicate<T>)left, (Predicate<T>)right);
+			predicate = _getANDPredicate(
+				(Predicate<T>)left, (Predicate<T>)right);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.EQ, operation)) {
-			return _getEQPredicate((EntityField)left, right);
+			predicate = _getEQPredicate((EntityField)left, right);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.GE, operation)) {
-			return _getGEPredicate((EntityField)left, right);
+			predicate = _getGEPredicate((EntityField)left, right);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.GT, operation)) {
-			return _getGTPredicate((EntityField)left, right);
+			predicate = _getGTPredicate((EntityField)left, right);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.LE, operation)) {
-			return _getLEPredicate((EntityField)left, right);
+			predicate = _getLEPredicate((EntityField)left, right);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.LT, operation)) {
-			return _getLTPredicate((EntityField)left, right);
+			predicate = _getLTPredicate((EntityField)left, right);
 		}
 		else if (Objects.equals(BinaryExpression.Operation.OR, operation)) {
-			return _getORPredicate((Predicate<T>)left, (Predicate<T>)right);
+			predicate = _getORPredicate(
+				(Predicate<T>)left, (Predicate<T>)right);
+		}
+		else {
+			return Optional.empty();
 		}
 
-		return null;
+		return Optional.of(predicate);
 	}
 
 	private Object _normalizeStringLiteral(String literal) {

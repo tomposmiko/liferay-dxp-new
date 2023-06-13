@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -47,8 +45,6 @@ public class CPAttachmentFileEntryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("CPAttachmentFileEntryId", getCPAttachmentFileEntryId());
@@ -80,18 +76,6 @@ public class CPAttachmentFileEntryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -342,16 +326,6 @@ public class CPAttachmentFileEntryWrapper
 		return model.getCreateDate();
 	}
 
-	/**
-	 * Returns the ct collection ID of this cp attachment file entry.
-	 *
-	 * @return the ct collection ID of this cp attachment file entry
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
 	@Override
 	public String getDefaultLanguageId() {
 		return model.getDefaultLanguageId();
@@ -435,16 +409,6 @@ public class CPAttachmentFileEntryWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this cp attachment file entry.
-	 *
-	 * @return the mvcc version of this cp attachment file entry
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -829,16 +793,6 @@ public class CPAttachmentFileEntryWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this cp attachment file entry.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp attachment file entry
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the display date of this cp attachment file entry.
 	 *
 	 * @param displayDate the display date of this cp attachment file entry
@@ -916,16 +870,6 @@ public class CPAttachmentFileEntryWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
-	 * Sets the mvcc version of this cp attachment file entry.
-	 *
-	 * @param mvccVersion the mvcc version of this cp attachment file entry
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -1110,25 +1054,6 @@ public class CPAttachmentFileEntryWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CPAttachmentFileEntry, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CPAttachmentFileEntry, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

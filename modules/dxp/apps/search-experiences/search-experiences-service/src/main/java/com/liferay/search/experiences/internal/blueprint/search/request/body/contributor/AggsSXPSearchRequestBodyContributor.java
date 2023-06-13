@@ -29,6 +29,7 @@ import com.liferay.search.experiences.internal.blueprint.query.QueryConverter;
 import com.liferay.search.experiences.internal.blueprint.script.ScriptConverter;
 import com.liferay.search.experiences.rest.dto.v1_0.AggregationConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
+import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
 import java.util.Iterator;
 
@@ -51,8 +52,10 @@ public class AggsSXPSearchRequestBodyContributor
 
 	@Override
 	public void contribute(
-		Configuration configuration, SearchRequestBuilder searchRequestBuilder,
+		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint,
 		SXPParameterData sxpParameterData) {
+
+		Configuration configuration = sxpBlueprint.getConfiguration();
 
 		AggregationConfiguration aggregationConfiguration =
 			configuration.getAggregationConfiguration();
@@ -141,10 +144,6 @@ public class AggsSXPSearchRequestBodyContributor
 	private void _processAggregations(
 		JSONObject jsonObject, AggregationWrapper parentAggregationWrapper,
 		SearchRequestBuilder searchRequestBuilder) {
-
-		if (jsonObject == null) {
-			return;
-		}
 
 		for (String name : jsonObject.keySet()) {
 			_processAggregation(

@@ -65,18 +65,13 @@ public class DefinitionPoshiElement extends PoshiElement {
 
 	@Override
 	public String getFileExtension() {
-		URL filePathURL = getFilePathURL();
+		URL url = getURL();
 
-		String filePath = filePathURL.getPath();
+		String filePath = url.getPath();
 
 		int index = filePath.lastIndexOf(".");
 
 		return filePath.substring(index + 1);
-	}
-
-	@Override
-	public URL getFilePathURL() {
-		return _filePathURL;
 	}
 
 	@Override
@@ -85,19 +80,24 @@ public class DefinitionPoshiElement extends PoshiElement {
 	}
 
 	@Override
+	public URL getURL() {
+		return _url;
+	}
+
+	@Override
 	public boolean isValidPoshiXML() throws PoshiScriptParserException {
 		if (_validPoshiXML == null) {
 			_validPoshiXML = false;
 
-			URL filePathURL = getFilePathURL();
+			URL url = getURL();
 
 			PoshiNode<?, ?> poshiNode = PoshiNodeFactory.newPoshiNodeFromFile(
-				filePathURL);
+				url);
 
 			String poshiScript = poshiNode.toPoshiScript();
 
 			PoshiNode<?, ?> generatedPoshiNode = PoshiNodeFactory.newPoshiNode(
-				poshiScript, filePathURL);
+				poshiScript, url);
 
 			if (Dom4JUtil.elementsEqual(poshiNode, generatedPoshiNode)) {
 				_validPoshiXML = true;
@@ -128,11 +128,6 @@ public class DefinitionPoshiElement extends PoshiElement {
 		for (String poshiScriptSnippet : getPoshiScriptSnippets(blockContent)) {
 			add(PoshiNodeFactory.newPoshiNode(this, poshiScriptSnippet));
 		}
-	}
-
-	@Override
-	public void setFilePathURL(URL filePathURL) {
-		_filePathURL = filePathURL;
 	}
 
 	@Override
@@ -210,6 +205,11 @@ public class DefinitionPoshiElement extends PoshiElement {
 		return isValidPoshiScriptBlock(_blockNamePattern, poshiScript);
 	}
 
+	@Override
+	protected void setFilePath(URL url) {
+		_url = url;
+	}
+
 	private static final String _ELEMENT_NAME = "definition";
 
 	private static final String _POSHI_SCRIPT_KEYWORD = _ELEMENT_NAME;
@@ -218,7 +218,7 @@ public class DefinitionPoshiElement extends PoshiElement {
 		"^" + BLOCK_NAME_ANNOTATION_REGEX + _POSHI_SCRIPT_KEYWORD,
 		Pattern.DOTALL);
 
-	private URL _filePathURL;
+	private URL _url;
 	private Boolean _validPoshiXML;
 
 }

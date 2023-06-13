@@ -32,8 +32,10 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 
 import java.io.InputStream;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -158,7 +160,7 @@ public class AMImageEntryLocalServiceImpl
 					fileVersion, amImageEntry.getConfigurationUuid());
 			}
 			catch (AMRuntimeException.IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 	}
@@ -266,13 +268,15 @@ public class AMImageEntryLocalServiceImpl
 	 */
 	@Override
 	public int getExpectedAMImageEntriesCount(long companyId) {
-		int count = 0;
+		Collection<AMImageCounter> amImageCounters =
+			_serviceTrackerMap.values();
 
-		for (AMImageCounter amImageCounter : _serviceTrackerMap.values()) {
-			count += amImageCounter.countExpectedAMImageEntries(companyId);
-		}
+		Stream<AMImageCounter> amImageCountersStream = amImageCounters.stream();
 
-		return count;
+		return amImageCountersStream.mapToInt(
+			amImageCounter -> amImageCounter.countExpectedAMImageEntries(
+				companyId)
+		).sum();
 	}
 
 	/**
@@ -302,13 +306,6 @@ public class AMImageEntryLocalServiceImpl
 			(actualAMImageEntriesCount * 100) / expectedAMImageEntriesCount;
 
 		return Math.min(percentage, 100);
-	}
-
-	@Override
-	public boolean hasAMImageEntryContent(
-		String configurationUuid, FileVersion fileVersion) {
-
-		return _imageStorage.hasContent(fileVersion, configurationUuid);
 	}
 
 	@Activate

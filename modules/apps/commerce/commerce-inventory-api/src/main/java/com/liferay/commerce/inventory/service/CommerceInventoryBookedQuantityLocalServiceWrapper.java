@@ -27,10 +27,6 @@ public class CommerceInventoryBookedQuantityLocalServiceWrapper
 	implements CommerceInventoryBookedQuantityLocalService,
 			   ServiceWrapper<CommerceInventoryBookedQuantityLocalService> {
 
-	public CommerceInventoryBookedQuantityLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceInventoryBookedQuantityLocalServiceWrapper(
 		CommerceInventoryBookedQuantityLocalService
 			commerceInventoryBookedQuantityLocalService) {
@@ -332,19 +328,6 @@ public class CommerceInventoryBookedQuantityLocalServiceWrapper
 			getCommerceInventoryBookedQuantities(companyId, sku, start, end);
 	}
 
-	@Override
-	public java.util.List
-		<com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantity>
-				getCommerceInventoryBookedQuantities(
-					long companyId, String keywords, String sku, int start,
-					int end)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceInventoryBookedQuantityLocalService.
-			getCommerceInventoryBookedQuantities(
-				companyId, keywords, sku, start, end);
-	}
-
 	/**
 	 * Returns the number of commerce inventory booked quantities.
 	 *
@@ -362,15 +345,6 @@ public class CommerceInventoryBookedQuantityLocalServiceWrapper
 
 		return _commerceInventoryBookedQuantityLocalService.
 			getCommerceInventoryBookedQuantitiesCount(companyId, sku);
-	}
-
-	@Override
-	public int getCommerceInventoryBookedQuantitiesCount(
-			long companyId, String keywords, String sku)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceInventoryBookedQuantityLocalService.
-			getCommerceInventoryBookedQuantitiesCount(companyId, keywords, sku);
 	}
 
 	/**
@@ -434,39 +408,6 @@ public class CommerceInventoryBookedQuantityLocalServiceWrapper
 			resetCommerceBookedQuantity(
 				commerceBookedQuantityId, userId, sku, quantity, expirationDate,
 				context);
-	}
-
-	@Override
-	public com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantity
-			restockCommerceInventoryBookedQuantity(
-				long userId, long commerceInventoryBookedQuantityId,
-				java.util.Map<String, String> context)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceInventoryBookedQuantityLocalService.
-			restockCommerceInventoryBookedQuantity(
-				userId, commerceInventoryBookedQuantityId, context);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.search.BaseModelSearchResult
-		<com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantity>
-				searchCommerceInventoryBookedQuantities(
-					com.liferay.portal.kernel.search.SearchContext
-						searchContext)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceInventoryBookedQuantityLocalService.
-			searchCommerceInventoryBookedQuantities(searchContext);
-	}
-
-	@Override
-	public int searchCommerceInventoryBookedQuantitiesCount(
-			com.liferay.portal.kernel.search.SearchContext searchContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceInventoryBookedQuantityLocalService.
-			searchCommerceInventoryBookedQuantitiesCount(searchContext);
 	}
 
 	/**

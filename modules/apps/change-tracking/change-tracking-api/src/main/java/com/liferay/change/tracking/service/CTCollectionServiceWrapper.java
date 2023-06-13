@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CTCollectionServiceWrapper
 	implements CTCollectionService, ServiceWrapper<CTCollectionService> {
 
-	public CTCollectionServiceWrapper() {
-		this(null);
-	}
-
 	public CTCollectionServiceWrapper(CTCollectionService ctCollectionService) {
 		_ctCollectionService = ctCollectionService;
 	}
@@ -116,15 +112,6 @@ public class CTCollectionServiceWrapper
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _ctCollectionService.getOSGiServiceIdentifier();
-	}
-
-	@Override
-	public com.liferay.change.tracking.model.CTProcess moveCTEntries(
-			long fromCTCollectionId, long toCTCollectionId, long[] ctEntryIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ctCollectionService.moveCTEntries(
-			fromCTCollectionId, toCTCollectionId, ctEntryIds);
 	}
 
 	@Override

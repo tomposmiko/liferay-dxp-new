@@ -67,8 +67,7 @@ public class SynonymSetIndexReindexer implements IndexReindexer {
 			catch (RuntimeException runtimeException) {
 				_log.error(
 					"Unable to delete index " +
-						synonymSetIndexName.getIndexName(),
-					runtimeException);
+						synonymSetIndexName.getIndexName());
 			}
 
 			synonymSetIndexCreator.create(synonymSetIndexName);

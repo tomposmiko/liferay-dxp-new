@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -25,24 +23,22 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
+
+			ACUtils.tearDownAC();
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8370 | Test Summary: 180 Days time period filter in Interests List"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test CanTimeFilterUse180DaysInInterestsList {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-8884
@@ -68,7 +64,7 @@ definition {
 		}
 
 		task ("Navigate to Interests tab in Sites") {
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
 
@@ -99,9 +95,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8372 | Test Summary: Custom Range time period filter in Interests List"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CanTimeFilterUseCustomRangeInInterestsList {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-8885
@@ -127,7 +123,7 @@ definition {
 		}
 
 		task ("Navigate to Interests tab in Sites") {
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
 
@@ -145,12 +141,12 @@ definition {
 
 		task ("Set time filter use Custom Range") {
 			ACTimeFilter.setCustomRange(
-				endDay = 13,
+				endDay = "13",
 				endMonth = "July",
-				endYear = 2020,
-				startDay = 1,
+				endYear = "2020",
+				startDay = "1",
 				startMonth = "July",
-				startYear = 2020);
+				startYear = "2020");
 		}
 
 		task ("Assert result returns") {
@@ -162,9 +158,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8371 | Test Summary: Last Year time period filter in Interests List"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test CanTimeFilterUseLastYearInInterestsList {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-8886
@@ -190,7 +186,7 @@ definition {
 		}
 
 		task ("Navigate to Interests tab in Sites") {
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
 

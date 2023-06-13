@@ -95,12 +95,11 @@ public class AssetPublisherServiceTest {
 		PortletPreferences portletPreferences =
 			getAssetPublisherPortletPreferences();
 
-		Assert.assertEquals(
-			_assetEntries,
-			_assetPublisherHelper.getAssetEntries(
-				new MockPortletRequest(), portletPreferences,
-				_permissionChecker, new long[] {_group.getGroupId()}, false,
-				false));
+		List<AssetEntry> assetEntries = _assetPublisherHelper.getAssetEntries(
+			new MockPortletRequest(), portletPreferences, _permissionChecker,
+			new long[] {_group.getGroupId()}, false, false);
+
+		Assert.assertEquals(_assetEntries, assetEntries);
 	}
 
 	@Test

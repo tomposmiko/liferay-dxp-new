@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_commerce_inventory_warehouse_item"
@@ -56,7 +57,7 @@ public class EditCommerceInventoryWarehouseItemMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommerceInventoryWarehouseItem(actionRequest);
+				updateCommerceInventoryWarehouseItem(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -73,8 +74,8 @@ public class EditCommerceInventoryWarehouseItemMVCActionCommand
 		}
 	}
 
-	private CommerceInventoryWarehouseItem
-			_updateCommerceInventoryWarehouseItem(ActionRequest actionRequest)
+	protected CommerceInventoryWarehouseItem
+			updateCommerceInventoryWarehouseItem(ActionRequest actionRequest)
 		throws PortalException {
 
 		long commerceInventoryWarehouseItemId = ParamUtil.getLong(

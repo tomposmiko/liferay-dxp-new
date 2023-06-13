@@ -16,8 +16,6 @@ package com.liferay.portal.workflow.metrics.internal.background.task;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.petra.concurrent.NoticeableFuture;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
@@ -29,20 +27,17 @@ import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstant
 import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplay;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.workflow.metrics.internal.background.task.constants.WorkflowMetricsReindexBackgroundTaskConstants;
 import com.liferay.portal.workflow.metrics.internal.petra.executor.WorkflowMetricsPortalExecutor;
 import com.liferay.portal.workflow.metrics.internal.search.index.WorkflowMetricsIndex;
 import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsReindexStatusMessageSender;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexer;
-import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexerRegistry;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -54,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "background.task.executor.class.name=com.liferay.portal.workflow.metrics.internal.background.task.WorkflowMetricsReindexBackgroundTaskExecutor",
 	service = BackgroundTaskExecutor.class
 )
@@ -87,38 +83,29 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 
 		for (String indexEntityName : indexEntityNames) {
 			WorkflowMetricsIndex workflowMetricsIndex =
-				_serviceTrackerMap.getService(indexEntityName);
+				_workflowMetricsIndexes.getService(indexEntityName);
 
 			workflowMetricsIndex.removeIndex(backgroundTask.getCompanyId());
 
 			workflowMetricsIndex.createIndex(backgroundTask.getCompanyId());
 		}
 
-		List<NoticeableFuture<?>> noticeableFutures = new ArrayList<>();
-
 		for (int i = 0; i < indexEntityNames.length; i++) {
 			int count = i + 1;
 			String indexEntityName = indexEntityNames[i];
 
-			noticeableFutures.add(
-				_workflowMetricsPortalExecutor.execute(
-					() -> {
-						WorkflowMetricsReindexer workflowMetricsReindexer =
-							_workflowMetricsReindexerRegistry.
-								getWorkflowMetricsReindexer(indexEntityName);
+			_workflowMetricsPortalExecutor.execute(
+				() -> {
+					WorkflowMetricsReindexer workflowMetricsReindexer =
+						_workflowMetricsReindexers.getService(indexEntityName);
 
-						workflowMetricsReindexer.reindex(
-							backgroundTask.getCompanyId());
+					workflowMetricsReindexer.reindex(
+						backgroundTask.getCompanyId());
 
-						_workflowMetricsReindexStatusMessageSender.
-							sendStatusMessage(
-								count, indexEntityNames.length,
-								StringPool.BLANK);
-					}));
-		}
-
-		for (NoticeableFuture<?> noticeableFuture : noticeableFutures) {
-			noticeableFuture.get();
+					_workflowMetricsReindexStatusMessageSender.
+						sendStatusMessage(
+							count, indexEntityNames.length, StringPool.BLANK);
+				});
 		}
 
 		_sendStatusMessage(
@@ -137,37 +124,37 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+		_workflowMetricsIndexes = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, WorkflowMetricsIndex.class,
 			"workflow.metrics.index.entity.name");
+		_workflowMetricsReindexers =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, WorkflowMetricsReindexer.class,
+				"workflow.metrics.index.entity.name");
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_workflowMetricsIndexes.close();
+		_workflowMetricsReindexers.close();
 	}
 
 	private String[] _getIndexEntityNames(BackgroundTask backgroundTask) {
 		Map<String, Serializable> taskContextMap =
 			backgroundTask.getTaskContextMap();
 
-		List<String> indexEntityNames = ListUtil.sort(
-			TransformUtil.transformToList(
-				(String[])taskContextMap.get(
-					"workflow.metrics.index.entity.names"),
-				name -> {
-					if (_serviceTrackerMap.containsKey(name) &&
-						_workflowMetricsReindexerRegistry.containsKey(name)) {
-
-						return name;
-					}
-
-					return null;
-				}),
+		return Stream.of(
+			(String[])taskContextMap.get("workflow.metrics.index.entity.names")
+		).filter(
+			_workflowMetricsIndexes::containsKey
+		).filter(
+			_workflowMetricsReindexers::containsKey
+		).sorted(
 			Comparator.comparing(
-				indexEntityName -> indexEntityName.startsWith("sla")));
-
-		return indexEntityNames.toArray(new String[0]);
+				indexEntityName -> indexEntityName.startsWith("sla"))
+		).toArray(
+			String[]::new
+		);
 	}
 
 	private void _sendStatusMessage(
@@ -203,13 +190,14 @@ public class WorkflowMetricsReindexBackgroundTaskExecutor
 	private BackgroundTaskStatusMessageSender
 		_backgroundTaskStatusMessageSender;
 
-	private ServiceTrackerMap<String, WorkflowMetricsIndex> _serviceTrackerMap;
+	private ServiceTrackerMap<String, WorkflowMetricsIndex>
+		_workflowMetricsIndexes;
 
 	@Reference
 	private WorkflowMetricsPortalExecutor _workflowMetricsPortalExecutor;
 
-	@Reference
-	private WorkflowMetricsReindexerRegistry _workflowMetricsReindexerRegistry;
+	private ServiceTrackerMap<String, WorkflowMetricsReindexer>
+		_workflowMetricsReindexers;
 
 	@Reference
 	private WorkflowMetricsReindexStatusMessageSender

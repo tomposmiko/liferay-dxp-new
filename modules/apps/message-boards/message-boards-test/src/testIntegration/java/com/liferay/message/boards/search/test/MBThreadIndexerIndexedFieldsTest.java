@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -100,7 +99,7 @@ public class MBThreadIndexerIndexedFieldsTest {
 
 	protected void setUpIndexedFieldsFixture() {
 		indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper);
+			resourcePermissionLocalService);
 	}
 
 	protected void setUpMBFixture() {
@@ -139,9 +138,6 @@ public class MBThreadIndexerIndexedFieldsTest {
 	@Inject
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
 	protected UserSearchFixture userSearchFixture;
 
 	private Map<String, String> _expectedFieldValues(
@@ -178,8 +174,6 @@ public class MBThreadIndexerIndexedFieldsTest {
 		).put(
 			"participantUserIds",
 			String.valueOf(_getValues(mbThread.getParticipantUserIds()))
-		).put(
-			"statusByUserId", String.valueOf(mbThread.getStatusByUserId())
 		).build();
 
 		indexedFieldsFixture.populateUID(
@@ -211,11 +205,9 @@ public class MBThreadIndexerIndexedFieldsTest {
 		MBThread mbThread, MBMessage mbMessage, Map<String, String> map) {
 
 		indexedFieldsFixture.populateDate(
-			Field.CREATE_DATE, mbThread.getCreateDate(), map);
-		indexedFieldsFixture.populateDate(
 			Field.MODIFIED_DATE, mbMessage.getModifiedDate(), map);
 		indexedFieldsFixture.populateDate(
-			"lastPostDate", mbThread.getLastPostDate(), map);
+			Field.CREATE_DATE, mbThread.getCreateDate(), map);
 	}
 
 	private void _populateRoles(MBThread mbThread, Map<String, String> map)

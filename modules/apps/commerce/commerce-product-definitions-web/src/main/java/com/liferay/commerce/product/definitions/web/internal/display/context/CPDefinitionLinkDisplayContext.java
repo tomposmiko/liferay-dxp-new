@@ -26,12 +26,12 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -133,10 +133,10 @@ public class CPDefinitionLinkDisplayContext
 				"cpDefinitionId", String.valueOf(cpDefinitionId));
 
 			String checkedCPDefinitionIds = StringUtil.merge(
-				_getCheckedCPDefinitionIds(cpDefinitionId, type));
+				getCheckedCPDefinitionIds(cpDefinitionId, type));
 
 			String disabledCPDefinitionIds = StringUtil.merge(
-				_getDisabledCPDefinitionIds(cpDefinitionId, type));
+				getDisabledCPDefinitionIds(cpDefinitionId, type));
 
 			itemSelectorURL.setParameter(
 				"checkedCPDefinitionIds", checkedCPDefinitionIds);
@@ -176,12 +176,12 @@ public class CPDefinitionLinkDisplayContext
 			getCPDefinitionLinkId(), null);
 	}
 
-	private long[] _getCheckedCPDefinitionIds(long cpDefinitionId, String type)
+	protected long[] getCheckedCPDefinitionIds(long cpDefinitionId, String type)
 		throws PortalException {
 
 		List<Long> cpDefinitionIdsList = new ArrayList<>();
 
-		List<CPDefinitionLink> cpDefinitionLinks = _getCPDefinitionLinks(
+		List<CPDefinitionLink> cpDefinitionLinks = getCPDefinitionLinks(
 			cpDefinitionId, type);
 
 		for (CPDefinitionLink cpDefinitionLink : cpDefinitionLinks) {
@@ -197,7 +197,7 @@ public class CPDefinitionLinkDisplayContext
 		return new long[0];
 	}
 
-	private List<CPDefinitionLink> _getCPDefinitionLinks(
+	protected List<CPDefinitionLink> getCPDefinitionLinks(
 			long cpDefinitionId, String type)
 		throws PortalException {
 
@@ -205,12 +205,13 @@ public class CPDefinitionLinkDisplayContext
 			cpDefinitionId, type);
 	}
 
-	private long[] _getDisabledCPDefinitionIds(long cpDefinitionId, String type)
+	protected long[] getDisabledCPDefinitionIds(
+			long cpDefinitionId, String type)
 		throws PortalException {
 
 		List<Long> cpDefinitionIdsList = new ArrayList<>();
 
-		List<CPDefinitionLink> cpDefinitionLinks = _getCPDefinitionLinks(
+		List<CPDefinitionLink> cpDefinitionLinks = getCPDefinitionLinks(
 			cpDefinitionId, type);
 
 		for (CPDefinitionLink cpDefinitionLink : cpDefinitionLinks) {

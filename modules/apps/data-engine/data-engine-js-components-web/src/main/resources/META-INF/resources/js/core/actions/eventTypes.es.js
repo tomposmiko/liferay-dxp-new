@@ -36,6 +36,12 @@ const FIELD = {
 	REPEATED: 'field_repeated',
 };
 
+const DATA_DEFINITION = {
+	ADD: 'data_definition_add',
+	CHANGE: 'data_definition_change',
+	DELETE: 'data_definition_delete',
+};
+
 const DATA_LAYOUT = {
 	NAME: 'data_layout_name',
 };
@@ -57,11 +63,11 @@ const LANGUAGE = {
 	ADD: 'language_add',
 	CHANGE: 'language_change',
 	DELETE: 'language_delete',
-	UPDATE: 'language_update',
 };
 
 export const EVENT_TYPES = {
 	...LEGACY_EVENTS,
+	DATA_DEFINITION,
 	DATA_LAYOUT,
 	DND,
 	FIELD,

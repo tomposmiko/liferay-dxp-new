@@ -14,7 +14,6 @@
 
 package com.liferay.knowledge.base.web.internal.upload;
 
-import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.knowledge.base.constants.KBActionKeys;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.service.KBArticleLocalService;
@@ -27,7 +26,6 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.upload.UniqueFileNameProvider;
@@ -64,57 +62,21 @@ public class KBArticleAttachmentKBUploadFileEntryHandler
 			themeDisplay.getPermissionChecker(), kbArticle,
 			KBActionKeys.UPDATE);
 
-		String fileName = uploadPortletRequest.getFileName(
-			"imageSelectorFileName");
-
-		if (Validator.isNotNull(fileName)) {
-			try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
-					"imageSelectorFileName")) {
-
-				return _addKBAttachment(
-					fileName, inputStream, kbArticle, "imageSelectorFileName",
-					resourcePrimKey, uploadPortletRequest, themeDisplay);
-			}
-		}
-
-		return _addKBAttachment(
-			kbArticle, resourcePrimKey, uploadPortletRequest, themeDisplay);
-	}
-
-	private FileEntry _addKBAttachment(
-			KBArticle kbArticle, long resourcePrimKey,
-			UploadPortletRequest uploadPortletRequest,
-			ThemeDisplay themeDisplay)
-		throws IOException, PortalException {
+		String fileName = uploadPortletRequest.getFileName(_PARAMETER_NAME);
+		String contentType = uploadPortletRequest.getContentType(
+			_PARAMETER_NAME);
 
 		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
-				"imageBlob")) {
+				_PARAMETER_NAME)) {
 
-			long fileEntryId = ParamUtil.getLong(
-				uploadPortletRequest, "fileEntryId");
+			String uniqueFileName = _uniqueFileNameProvider.provide(
+				fileName,
+				curFileName -> _exists(themeDisplay, kbArticle, curFileName));
 
-			FileEntry fileEntry = _dlAppService.getFileEntry(fileEntryId);
-
-			return _addKBAttachment(
-				fileEntry.getFileName(), inputStream, kbArticle, "imageBlob",
-				resourcePrimKey, uploadPortletRequest, themeDisplay);
+			return _kbArticleLocalService.addAttachment(
+				themeDisplay.getUserId(), resourcePrimKey, uniqueFileName,
+				inputStream, contentType);
 		}
-	}
-
-	private FileEntry _addKBAttachment(
-			String fileName, InputStream inputStream, KBArticle kbArticle,
-			String parameterName, long resourcePrimKey,
-			UploadPortletRequest uploadPortletRequest,
-			ThemeDisplay themeDisplay)
-		throws PortalException {
-
-		String uniqueFileName = _uniqueFileNameProvider.provide(
-			fileName,
-			curFileName -> _exists(themeDisplay, kbArticle, curFileName));
-
-		return _kbArticleLocalService.addAttachment(
-			themeDisplay.getUserId(), resourcePrimKey, uniqueFileName,
-			inputStream, uploadPortletRequest.getContentType(parameterName));
 	}
 
 	private boolean _exists(
@@ -136,18 +98,17 @@ public class KBArticleAttachmentKBUploadFileEntryHandler
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
 		}
 	}
 
+	private static final String _PARAMETER_NAME = "imageSelectorFileName";
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleAttachmentKBUploadFileEntryHandler.class);
-
-	@Reference
-	private DLAppService _dlAppService;
 
 	@Reference
 	private KBArticleLocalService _kbArticleLocalService;

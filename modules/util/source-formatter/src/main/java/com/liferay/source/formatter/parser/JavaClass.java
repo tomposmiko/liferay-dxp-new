@@ -25,8 +25,7 @@ import java.util.List;
 public class JavaClass extends BaseJavaTerm {
 
 	public JavaClass(
-		String name, String packageName, List<String> importNames,
-		String content, String accessModifier, int lineNumber,
+		String name, String content, String accessModifier, int lineNumber,
 		boolean isAbstract, boolean isFinal, boolean isStatic,
 		boolean isInterface, boolean anonymous) {
 
@@ -34,8 +33,6 @@ public class JavaClass extends BaseJavaTerm {
 			name, content, accessModifier, lineNumber, isAbstract, isFinal,
 			isStatic);
 
-		_packageName = packageName;
-		_importNames = importNames;
 		_isInterface = isInterface;
 		_anonymous = anonymous;
 	}
@@ -48,20 +45,18 @@ public class JavaClass extends BaseJavaTerm {
 
 	public void addExtendedClassNames(String... extendedClassNames) {
 		for (String extendedClassName : extendedClassNames) {
-			_extendedClassTypes.add(
-				new JavaClassType(
-					StringUtil.trim(extendedClassName), _packageName,
-					_importNames));
+			_extendedClassNames.add(StringUtil.trim(extendedClassName));
 		}
 	}
 
 	public void addImplementedClassNames(String... implementedClassNames) {
 		for (String implementedClassName : implementedClassNames) {
-			_implementedClassTypes.add(
-				new JavaClassType(
-					StringUtil.trim(implementedClassName), _packageName,
-					_importNames));
+			_implementedClassNames.add(StringUtil.trim(implementedClassName));
 		}
+	}
+
+	public void addImport(String importName) {
+		_imports.add(importName);
 	}
 
 	public List<JavaTerm> getChildJavaTerms() {
@@ -72,39 +67,30 @@ public class JavaClass extends BaseJavaTerm {
 		return getExtendedClassNames(false);
 	}
 
-	public List<String> getExtendedClassNames(boolean fullyQualifiedName) {
-		List<String> extendedClassNames = new ArrayList<>();
-
-		for (JavaClassType extendedClassType : _extendedClassTypes) {
-			extendedClassNames.add(
-				extendedClassType.toString(fullyQualifiedName));
+	public List<String> getExtendedClassNames(boolean fullyQualifiedClassName) {
+		if (!fullyQualifiedClassName || _extendedClassNames.isEmpty()) {
+			return _extendedClassNames;
 		}
 
-		return extendedClassNames;
+		return _getFullyQualifiedClassNames(_extendedClassNames);
 	}
 
 	public List<String> getImplementedClassNames() {
 		return getImplementedClassNames(false);
 	}
 
-	public List<String> getImplementedClassNames(boolean fullyQualifiedName) {
-		List<String> implementedClassNames = new ArrayList<>();
+	public List<String> getImplementedClassNames(
+		boolean fullyQualifiedClassName) {
 
-		for (JavaClassType implementedClassType : _implementedClassTypes) {
-			implementedClassNames.add(
-				implementedClassType.toString(fullyQualifiedName));
+		if (!fullyQualifiedClassName || _implementedClassNames.isEmpty()) {
+			return _implementedClassNames;
 		}
 
-		return implementedClassNames;
+		return _getFullyQualifiedClassNames(_implementedClassNames);
 	}
 
-	public List<JavaClassType> getImplementedClassTypes() {
-		return _implementedClassTypes;
-	}
-
-	@Override
-	public List<String> getImportNames() {
-		return _importNames;
+	public List<String> getImports() {
+		return _imports;
 	}
 
 	public String getName(boolean fullyQualifiedClassName) {
@@ -115,7 +101,6 @@ public class JavaClass extends BaseJavaTerm {
 		return _packageName + "." + getName();
 	}
 
-	@Override
 	public String getPackageName() {
 		return _packageName;
 	}
@@ -128,13 +113,41 @@ public class JavaClass extends BaseJavaTerm {
 		return _isInterface;
 	}
 
+	public void setPackageName(String packageName) {
+		_packageName = packageName;
+	}
+
+	private List<String> _getFullyQualifiedClassNames(List<String> classNames) {
+		List<String> fullyQualifiedClassNames = new ArrayList<>();
+
+		outerLoop:
+		for (String className : classNames) {
+			if (className.matches("([a-z]\\w*\\.){2,}[A-Z]\\w*")) {
+				fullyQualifiedClassNames.add(className);
+
+				continue;
+			}
+
+			for (String importName : _imports) {
+				if (importName.endsWith("." + className)) {
+					fullyQualifiedClassNames.add(importName);
+
+					continue outerLoop;
+				}
+			}
+
+			fullyQualifiedClassNames.add(_packageName + "." + className);
+		}
+
+		return fullyQualifiedClassNames;
+	}
+
 	private final boolean _anonymous;
 	private final List<JavaTerm> _childJavaTerms = new ArrayList<>();
-	private final List<JavaClassType> _extendedClassTypes = new ArrayList<>();
-	private final List<JavaClassType> _implementedClassTypes =
-		new ArrayList<>();
-	private final List<String> _importNames;
+	private final List<String> _extendedClassNames = new ArrayList<>();
+	private final List<String> _implementedClassNames = new ArrayList<>();
+	private final List<String> _imports = new ArrayList<>();
 	private final boolean _isInterface;
-	private final String _packageName;
+	private String _packageName;
 
 }

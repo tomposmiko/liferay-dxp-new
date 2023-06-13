@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.workflow;
 
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
-
 import java.io.Serializable;
 
 import java.util.Map;
@@ -26,6 +24,10 @@ import java.util.Map;
  */
 public class WorkflowStatusManagerUtil {
 
+	public static WorkflowStatusManager getWorkflowStatusManager() {
+		return _workflowStatusManager;
+	}
+
 	public static void updateStatus(
 			int status, Map<String, Serializable> workflowContext)
 		throws WorkflowException {
@@ -33,9 +35,12 @@ public class WorkflowStatusManagerUtil {
 		_workflowStatusManager.updateStatus(status, workflowContext);
 	}
 
-	private static volatile WorkflowStatusManager _workflowStatusManager =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			WorkflowStatusManager.class, WorkflowStatusManagerUtil.class,
-			"_workflowStatusManager", true);
+	public void setWorkflowStatusManager(
+		WorkflowStatusManager workflowStatusManager) {
+
+		_workflowStatusManager = workflowStatusManager;
+	}
+
+	private static WorkflowStatusManager _workflowStatusManager;
 
 }

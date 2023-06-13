@@ -42,7 +42,7 @@ public class StateTopHeadJSPDynamicInclude implements DynamicInclude {
 		ScriptData scriptData = new ScriptData();
 
 		String initModuleName = _npmResolver.resolveModuleName(
-			"@liferay/frontend-js-state-web");
+			"@liferay/frontend-js-state-web/State");
 
 		scriptData.append(
 			null, StringPool.BLANK, initModuleName + " as FrontendJsState",

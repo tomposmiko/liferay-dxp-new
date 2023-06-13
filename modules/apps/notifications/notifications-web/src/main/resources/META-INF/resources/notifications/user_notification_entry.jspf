@@ -78,7 +78,21 @@ if (notificationUnread) {
 				<liferay-ui:search-container-column-text
 					colspan="<%= 2 %>"
 				>
-					<%@ include file="/notifications/user_notification_entry_body.jspf" %>
+					<c:if test="<%= notificationUnread %>">
+						<h4>
+					</c:if>
+						<a data-senna-off="true" href="<%= markNotificationAsReadURL.toString() %>">
+							<%= userNotificationFeedEntry.getBody() %>
+						</a>
+					<c:if test="<%= notificationUnread %>">
+						</h4>
+					</c:if>
+
+					<h5 class="text-default">
+						<span title="<%= dateFormatDateTime.format(userNotificationEvent.getTimestamp()) %>">
+							<%= Time.getRelativeTimeDescription(userNotificationEvent.getTimestamp(), themeDisplay.getLocale(), themeDisplay.getTimeZone(), dateFormatDateTime) %>
+						</span>
+					</h5>
 				</liferay-ui:search-container-column-text>
 
 				<liferay-ui:search-container-column-jsp

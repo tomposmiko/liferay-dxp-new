@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class BackgroundTaskServiceWrapper
 	implements BackgroundTaskService, ServiceWrapper<BackgroundTaskService> {
 
-	public BackgroundTaskServiceWrapper() {
-		this(null);
-	}
-
 	public BackgroundTaskServiceWrapper(
 		BackgroundTaskService backgroundTaskService) {
 

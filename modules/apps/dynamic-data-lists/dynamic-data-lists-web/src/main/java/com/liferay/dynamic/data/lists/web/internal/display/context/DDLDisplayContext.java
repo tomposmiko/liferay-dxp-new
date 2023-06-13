@@ -26,7 +26,7 @@ import com.liferay.dynamic.data.lists.util.comparator.DDLRecordSetCreateDateComp
 import com.liferay.dynamic.data.lists.util.comparator.DDLRecordSetModifiedDateComparator;
 import com.liferay.dynamic.data.lists.util.comparator.DDLRecordSetNameComparator;
 import com.liferay.dynamic.data.lists.web.internal.configuration.DDLWebConfiguration;
-import com.liferay.dynamic.data.lists.web.internal.display.context.helper.DDLRequestHelper;
+import com.liferay.dynamic.data.lists.web.internal.display.context.util.DDLRequestHelper;
 import com.liferay.dynamic.data.lists.web.internal.search.RecordSetSearch;
 import com.liferay.dynamic.data.lists.web.internal.security.permission.resource.DDLPermission;
 import com.liferay.dynamic.data.lists.web.internal.security.permission.resource.DDLRecordSetPermission;
@@ -48,6 +48,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBu
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -57,8 +58,6 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
@@ -108,13 +107,15 @@ public class DDLDisplayContext {
 		_storageEngine = storageEngine;
 
 		_ddlRequestHelper = new DDLRequestHelper(
-			PortalUtil.getHttpServletRequest(renderRequest));
+			PortalUtil.getHttpServletRequest(_renderRequest));
 
-		if (Validator.isNotNull(_getPortletResource())) {
+		if (Validator.isNotNull(getPortletResource())) {
 			return;
 		}
 
-		if ((getRecordSet() == null) || !_hasViewPermission()) {
+		DDLRecordSet recordSet = getRecordSet();
+
+		if ((recordSet == null) || !hasViewPermission()) {
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
 		}
@@ -137,7 +138,7 @@ public class DDLDisplayContext {
 	}
 
 	public String getAddDDMTemplateTitle() throws PortalException {
-		DDMDisplay ddmDisplay = _getDDMDisplay();
+		DDMDisplay ddmDisplay = getDDMDisplay();
 
 		return ddmDisplay.getEditTemplateTitle(
 			_recordSet.getDDMStructure(), null, getLocale());
@@ -178,6 +179,7 @@ public class DDLDisplayContext {
 					_renderResponse.createRenderURL(), "mvcPath",
 					"/edit_record_set.jsp", "redirect",
 					PortalUtil.getCurrentURL(_ddlRequestHelper.getRequest()));
+
 				dropdownItem.setLabel(
 					LanguageUtil.get(_ddlRequestHelper.getRequest(), "add"));
 			}
@@ -267,10 +269,10 @@ public class DDLDisplayContext {
 			return StringPool.BLANK;
 		}
 
-		DDMDisplay ddmDisplay = _getDDMDisplay();
+		DDMDisplay ddmDisplay = getDDMDisplay();
 
 		return ddmDisplay.getEditTemplateTitle(
-			recordSet.getDDMStructure(), _fetchDisplayDDMTemplate(),
+			recordSet.getDDMStructure(), fetchDisplayDDMTemplate(),
 			getLocale());
 	}
 
@@ -281,10 +283,10 @@ public class DDLDisplayContext {
 			return LanguageUtil.get(getLocale(), "add-list");
 		}
 
-		DDMDisplay ddmDisplay = _getDDMDisplay();
+		DDMDisplay ddmDisplay = getDDMDisplay();
 
 		return ddmDisplay.getEditTemplateTitle(
-			recordSet.getDDMStructure(), _fetchFormDDMTemplate(), getLocale());
+			recordSet.getDDMStructure(), fetchFormDDMTemplate(), getLocale());
 	}
 
 	public List<DropdownItem> getFilterItemsDropdownItems() {
@@ -329,25 +331,14 @@ public class DDLDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
-		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_renderRequest, DDLPortletKeys.DYNAMIC_DATA_LISTS, "modified-date");
-
-		return _orderByCol;
+		return ParamUtil.getString(
+			_ddlRequestHelper.getRenderRequest(), "orderByCol",
+			"modified-date");
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
-		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_renderRequest, DDLPortletKeys.DYNAMIC_DATA_LISTS, "asc");
-
-		return _orderByType;
+		return ParamUtil.getString(
+			_ddlRequestHelper.getRenderRequest(), "orderByType", "asc");
 	}
 
 	public PortletURL getPortletURL() {
@@ -463,6 +454,16 @@ public class DDLDisplayContext {
 		RecordSetSearch recordSetSearch = new RecordSetSearch(
 			_renderRequest, portletURL);
 
+		String orderByCol = getOrderByCol();
+		String orderByType = getOrderByType();
+
+		OrderByComparator<DDLRecordSet> orderByComparator =
+			getDDLRecordSetOrderByComparator(orderByCol, orderByType);
+
+		recordSetSearch.setOrderByCol(orderByCol);
+		recordSetSearch.setOrderByComparator(orderByComparator);
+		recordSetSearch.setOrderByType(orderByType);
+
 		if (recordSetSearch.isSearch()) {
 			recordSetSearch.setEmptyResultsMessage("no-lists-were-found");
 		}
@@ -470,22 +471,8 @@ public class DDLDisplayContext {
 			recordSetSearch.setEmptyResultsMessage("there-are-no-lists");
 		}
 
-		recordSetSearch.setOrderByCol(getOrderByCol());
-		recordSetSearch.setOrderByComparator(
-			getDDLRecordSetOrderByComparator(
-				getOrderByCol(), getOrderByType()));
-		recordSetSearch.setOrderByType(getOrderByType());
-		recordSetSearch.setResultsAndTotal(
-			() -> _ddlRecordSetLocalService.search(
-				_ddlRequestHelper.getCompanyId(),
-				_ddlRequestHelper.getScopeGroupId(), getKeywords(),
-				DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS,
-				recordSetSearch.getStart(), recordSetSearch.getEnd(),
-				recordSetSearch.getOrderByComparator()),
-			_ddlRecordSetLocalService.searchCount(
-				_ddlRequestHelper.getCompanyId(),
-				_ddlRequestHelper.getScopeGroupId(), getKeywords(),
-				DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS));
+		setDDLRecordSetSearchResults(recordSetSearch);
+		setDDLRecordSetSearchTotal(recordSetSearch);
 
 		return recordSetSearch;
 	}
@@ -570,7 +557,7 @@ public class DDLDisplayContext {
 	}
 
 	public boolean isShowAddDDMDisplayTemplateIcon() throws PortalException {
-		if (_isShowAddDDMTemplateIcon() && !isFormView()) {
+		if (isShowAddDDMTemplateIcon() && !isFormView()) {
 			return true;
 		}
 
@@ -578,7 +565,7 @@ public class DDLDisplayContext {
 	}
 
 	public boolean isShowAddDDMFormTemplateIcon() throws PortalException {
-		return _isShowAddDDMTemplateIcon();
+		return isShowAddDDMTemplateIcon();
 	}
 
 	public boolean isShowAddRecordButton() throws PortalException {
@@ -586,7 +573,7 @@ public class DDLDisplayContext {
 			return false;
 		}
 
-		if (isEditable() && _hasAddRecordPermission()) {
+		if (isEditable() && hasAddRecordPermission()) {
 			return true;
 		}
 
@@ -599,7 +586,7 @@ public class DDLDisplayContext {
 		}
 
 		_hasAddRecordSetPermission = DDLPermission.contains(
-			getPermissionChecker(), _getScopeGroupId(),
+			getPermissionChecker(), getScopeGroupId(),
 			DDLActionKeys.ADD_RECORD_SET);
 
 		return _hasAddRecordSetPermission;
@@ -619,7 +606,7 @@ public class DDLDisplayContext {
 		}
 
 		_showConfigurationIcon = PortletPermissionUtil.contains(
-			getPermissionChecker(), _getLayout(), _getPortletId(),
+			getPermissionChecker(), getLayout(), getPortletId(),
 			ActionKeys.CONFIGURATION);
 
 		return _showConfigurationIcon;
@@ -632,7 +619,7 @@ public class DDLDisplayContext {
 
 		_hasEditDisplayDDMTemplatePermission = Boolean.FALSE;
 
-		DDMTemplate displayDDMTemplate = _fetchDisplayDDMTemplate();
+		DDMTemplate displayDDMTemplate = fetchDisplayDDMTemplate();
 
 		if (displayDDMTemplate == null) {
 			return _hasEditDisplayDDMTemplatePermission;
@@ -708,7 +695,7 @@ public class DDLDisplayContext {
 	}
 
 	public boolean isShowPublishRecordButton() throws PortalException {
-		if (isEditable() && _hasAddRecordPermission()) {
+		if (isEditable() && hasAddRecordPermission()) {
 			return true;
 		}
 
@@ -720,7 +707,7 @@ public class DDLDisplayContext {
 			return false;
 		}
 
-		if (isEditable() && _hasAddRecordPermission()) {
+		if (isEditable() && hasAddRecordPermission()) {
 			return true;
 		}
 
@@ -733,11 +720,40 @@ public class DDLDisplayContext {
 			_ddlRequestHelper.getRenderRequest(), "spreadsheet");
 	}
 
+	protected DDMTemplate fetchDisplayDDMTemplate() {
+		if (_displayDDMTemplate != null) {
+			return _displayDDMTemplate;
+		}
+
+		_displayDDMTemplate = _ddmTemplateLocalService.fetchDDMTemplate(
+			getDisplayDDMTemplateId());
+
+		return _displayDDMTemplate;
+	}
+
+	protected DDMTemplate fetchFormDDMTemplate() {
+		if (_formDDMTemplate != null) {
+			return _formDDMTemplate;
+		}
+
+		_formDDMTemplate = _ddmTemplateLocalService.fetchDDMTemplate(
+			getFormDDMTemplateId());
+
+		return _formDDMTemplate;
+	}
+
+	protected DDMDisplay getDDMDisplay() {
+		return _ddmDisplayRegistry.getDDMDisplay(
+			DDLPortletKeys.DYNAMIC_DATA_LISTS);
+	}
+
 	protected List<DropdownItem> getFilterNavigationDropdownItems() {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.setActive(true);
+
 				dropdownItem.setHref(getPortletURL(), "navigation", "all");
+
 				dropdownItem.setLabel(
 					LanguageUtil.get(_ddlRequestHelper.getRequest(), "all"));
 			}
@@ -746,6 +762,10 @@ public class DDLDisplayContext {
 
 	protected String getKeywords() {
 		return ParamUtil.getString(_renderRequest, "keywords");
+	}
+
+	protected Layout getLayout() {
+		return _ddlRequestHelper.getLayout();
 	}
 
 	protected Locale getLocale() {
@@ -777,80 +797,33 @@ public class DDLDisplayContext {
 		return _ddlRequestHelper.getPermissionChecker();
 	}
 
+	protected String getPortletId() {
+		return _ddlRequestHelper.getPortletId();
+	}
+
 	protected String getPortletName() {
 		return _ddlRequestHelper.getPortletName();
+	}
+
+	protected String getPortletResource() {
+		return _ddlRequestHelper.getPortletResource();
+	}
+
+	protected long getScopeGroupId() {
+		return _ddlRequestHelper.getScopeGroupId();
+	}
+
+	protected long getStructureTypeClassNameId() {
+		DDMDisplay ddmDisplay = getDDMDisplay();
+
+		return PortalUtil.getClassNameId(ddmDisplay.getStructureType());
 	}
 
 	protected ThemeDisplay getThemeDisplay() {
 		return _ddlRequestHelper.getThemeDisplay();
 	}
 
-	protected boolean hasResults() {
-		if (getTotalItems() > 0) {
-			return true;
-		}
-
-		return false;
-	}
-
-	protected boolean isSearch() {
-		if (Validator.isNotNull(getKeywords())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private DDMTemplate _fetchDisplayDDMTemplate() {
-		if (_displayDDMTemplate != null) {
-			return _displayDDMTemplate;
-		}
-
-		_displayDDMTemplate = _ddmTemplateLocalService.fetchDDMTemplate(
-			getDisplayDDMTemplateId());
-
-		return _displayDDMTemplate;
-	}
-
-	private DDMTemplate _fetchFormDDMTemplate() {
-		if (_formDDMTemplate != null) {
-			return _formDDMTemplate;
-		}
-
-		_formDDMTemplate = _ddmTemplateLocalService.fetchDDMTemplate(
-			getFormDDMTemplateId());
-
-		return _formDDMTemplate;
-	}
-
-	private DDMDisplay _getDDMDisplay() {
-		return _ddmDisplayRegistry.getDDMDisplay(
-			DDLPortletKeys.DYNAMIC_DATA_LISTS);
-	}
-
-	private Layout _getLayout() {
-		return _ddlRequestHelper.getLayout();
-	}
-
-	private String _getPortletId() {
-		return _ddlRequestHelper.getPortletId();
-	}
-
-	private String _getPortletResource() {
-		return _ddlRequestHelper.getPortletResource();
-	}
-
-	private long _getScopeGroupId() {
-		return _ddlRequestHelper.getScopeGroupId();
-	}
-
-	private long _getStructureTypeClassNameId() {
-		DDMDisplay ddmDisplay = _getDDMDisplay();
-
-		return PortalUtil.getClassNameId(ddmDisplay.getStructureType());
-	}
-
-	private boolean _hasAddRecordPermission() throws PortalException {
+	protected boolean hasAddRecordPermission() throws PortalException {
 		if (_hasAddRecordPermission != null) {
 			return _hasAddRecordPermission;
 		}
@@ -867,7 +840,15 @@ public class DDLDisplayContext {
 		return _hasAddRecordPermission;
 	}
 
-	private boolean _hasViewPermission() throws PortalException {
+	protected boolean hasResults() {
+		if (getTotalItems() > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	protected boolean hasViewPermission() throws PortalException {
 		if (_hasViewPermission != null) {
 			return _hasViewPermission;
 		}
@@ -882,7 +863,15 @@ public class DDLDisplayContext {
 		return _hasViewPermission;
 	}
 
-	private boolean _isShowAddDDMTemplateIcon() throws PortalException {
+	protected boolean isSearch() {
+		if (Validator.isNotNull(getKeywords())) {
+			return true;
+		}
+
+		return false;
+	}
+
+	protected boolean isShowAddDDMTemplateIcon() throws PortalException {
 		if (_hasAddDDMTemplatePermission != null) {
 			return _hasAddDDMTemplatePermission;
 		}
@@ -897,10 +886,32 @@ public class DDLDisplayContext {
 
 		_hasAddDDMTemplatePermission =
 			_ddmPermissionSupport.containsAddTemplatePermission(
-				getPermissionChecker(), _getScopeGroupId(),
-				_getStructureTypeClassNameId(), _getStructureTypeClassNameId());
+				getPermissionChecker(), getScopeGroupId(),
+				getStructureTypeClassNameId(), getStructureTypeClassNameId());
 
 		return _hasAddDDMTemplatePermission;
+	}
+
+	protected void setDDLRecordSetSearchResults(
+		RecordSetSearch recordSetSearch) {
+
+		List<DDLRecordSet> results = _ddlRecordSetLocalService.search(
+			_ddlRequestHelper.getCompanyId(),
+			_ddlRequestHelper.getScopeGroupId(), getKeywords(),
+			DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS,
+			recordSetSearch.getStart(), recordSetSearch.getEnd(),
+			recordSetSearch.getOrderByComparator());
+
+		recordSetSearch.setResults(results);
+	}
+
+	protected void setDDLRecordSetSearchTotal(RecordSetSearch recordSetSearch) {
+		int total = _ddlRecordSetLocalService.searchCount(
+			_ddlRequestHelper.getCompanyId(),
+			_ddlRequestHelper.getScopeGroupId(), getKeywords(),
+			DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS);
+
+		recordSetSearch.setTotal(total);
 	}
 
 	private static final String[] _DISPLAY_VIEWS = {"descriptive", "list"};
@@ -922,8 +933,6 @@ public class DDLDisplayContext {
 	private Boolean _hasEditFormDDMTemplatePermission;
 	private Boolean _hasShowIconsActionPermission;
 	private Boolean _hasViewPermission;
-	private String _orderByCol;
-	private String _orderByType;
 	private DDLRecordSet _recordSet;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;

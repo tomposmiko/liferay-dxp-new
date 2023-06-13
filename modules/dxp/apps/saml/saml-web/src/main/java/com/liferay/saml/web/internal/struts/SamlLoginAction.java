@@ -15,17 +15,14 @@
 package com.liferay.saml.web.internal.struts;
 
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.saml.constants.SamlWebKeys;
 import com.liferay.saml.persistence.model.SamlSpIdpConnection;
@@ -36,6 +33,8 @@ import com.liferay.saml.runtime.servlet.profile.SamlSpIdpConnectionsProfile;
 import com.liferay.saml.util.JspUtil;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,16 +48,28 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Stian Sigvartsen
  */
-@Component(property = "path=/portal/saml/login", service = StrutsAction.class)
+@Component(
+	immediate = true, property = "path=/portal/saml/login",
+	service = StrutsAction.class
+)
 public class SamlLoginAction extends BaseSamlStrutsAction {
 
 	@Override
 	public boolean isEnabled() {
-		if (_samlProviderConfigurationHelper.isRoleSp()) {
-			return _samlProviderConfigurationHelper.isEnabled();
+		if (samlProviderConfigurationHelper.isRoleSp()) {
+			return super.isEnabled();
 		}
 
 		return false;
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		super.setSamlProviderConfigurationHelper(
+			samlProviderConfigurationHelper);
 	}
 
 	@Override
@@ -73,10 +84,12 @@ public class SamlLoginAction extends BaseSamlStrutsAction {
 		long companyId = _portal.getCompanyId(httpServletRequest);
 
 		if (Validator.isNotNull(entityId)) {
-			httpServletRequest.setAttribute(
-				SamlWebKeys.SAML_SP_IDP_CONNECTION,
+			SamlSpIdpConnection samlSpIdpConnection =
 				_samlSpIdpConnectionLocalService.getSamlSpIdpConnection(
-					companyId, entityId));
+					companyId, entityId);
+
+			httpServletRequest.setAttribute(
+				SamlWebKeys.SAML_SP_IDP_CONNECTION, samlSpIdpConnection);
 
 			if (GetterUtil.getBoolean(
 					ParamUtil.getBoolean(httpServletRequest, "forceAuthn"))) {
@@ -91,40 +104,42 @@ public class SamlLoginAction extends BaseSamlStrutsAction {
 			return null;
 		}
 
-		List<SamlSpIdpConnection> samlSpIdpConnections = ListUtil.filter(
-			_samlSpIdpConnectionLocalService.getSamlSpIdpConnections(companyId),
+		List<SamlSpIdpConnection> samlSpIdpConnections =
+			_samlSpIdpConnectionLocalService.getSamlSpIdpConnections(companyId);
+
+		Stream<SamlSpIdpConnection> stream = samlSpIdpConnections.stream();
+
+		samlSpIdpConnections = stream.filter(
 			samlSpIdpConnection -> isEnabled(
-				samlSpIdpConnection, httpServletRequest));
+				samlSpIdpConnection, httpServletRequest)
+		).collect(
+			Collectors.toList()
+		);
 
 		if (samlSpIdpConnections.isEmpty()) {
 			SamlProviderConfiguration samlProviderConfiguration =
-				_samlProviderConfigurationHelper.getSamlProviderConfiguration();
+				samlProviderConfigurationHelper.getSamlProviderConfiguration();
 
 			if (samlProviderConfiguration.allowShowingTheLoginPortlet()) {
 				return null;
 			}
 		}
-
-		boolean samlIdpRedirectMessageEnabled = GetterUtil.getBoolean(
-			_props.get("saml.idp.redirect.message.enabled"), true);
-
-		if (samlIdpRedirectMessageEnabled) {
+		else if (samlSpIdpConnections.size() == 1) {
 			httpServletRequest.setAttribute(
-				SamlWebKeys.SAML_IDP_REDIRECT_MESSAGE,
-				_language.get(
-					httpServletRequest,
-					"redirecting-to-your-identity-provider"));
+				SamlWebKeys.SAML_SP_IDP_CONNECTION,
+				samlSpIdpConnections.get(0));
+
+			return null;
 		}
 
 		httpServletRequest.setAttribute(
 			SamlWebKeys.SAML_SSO_LOGIN_CONTEXT,
-			_toJSONObject(samlSpIdpConnections));
+			toJSONObject(samlSpIdpConnections));
 
 		JspUtil.dispatch(
 			httpServletRequest, httpServletResponse,
 			"/portal/saml/select_idp.jsp",
-			"please-select-your-identity-provider",
-			!samlIdpRedirectMessageEnabled);
+			"please-select-your-identity-provider", false);
 
 		return null;
 	}
@@ -141,10 +156,10 @@ public class SamlLoginAction extends BaseSamlStrutsAction {
 		return samlSpIdpConnection.isEnabled();
 	}
 
-	private JSONObject _toJSONObject(
+	protected JSONObject toJSONObject(
 		List<SamlSpIdpConnection> samlSpIdpConnections) {
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (SamlSpIdpConnection samlSpIdpConnection : samlSpIdpConnections) {
 			jsonArray.put(
@@ -161,19 +176,7 @@ public class SamlLoginAction extends BaseSamlStrutsAction {
 	}
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
-
-	@Reference
-	private Props _props;
-
-	@Reference
-	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
 
 	@Reference
 	private SamlSpIdpConnectionLocalService _samlSpIdpConnectionLocalService;

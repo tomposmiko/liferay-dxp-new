@@ -34,7 +34,8 @@ import org.osgi.service.component.annotations.Component;
  * @author Roberto Díaz
  */
 @Component(
-	property = "service.ranking:Integer=1", service = RoleMembershipPolicy.class
+	immediate = true, property = "service.ranking:Integer=1",
+	service = RoleMembershipPolicy.class
 )
 public class TestRoleMembershipPolicy extends BaseRoleMembershipPolicy {
 

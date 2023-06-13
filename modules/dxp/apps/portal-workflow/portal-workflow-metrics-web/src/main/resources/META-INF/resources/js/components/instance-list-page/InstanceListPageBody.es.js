@@ -27,15 +27,9 @@ import SingleTransitionModal from './modal/transition/single/SingleTransitionMod
 import BulkUpdateDueDateModal from './modal/update-due-date/BulkUpdateDueDateModal.es';
 import SingleUpdateDueDateModal from './modal/update-due-date/SingleUpdateDueDateModal.es';
 
-function Body({
-	data: {items, totalCount} = {},
-	fetchData,
-	filtered,
-	routeParams,
-}) {
+function Body({data: {items, totalCount}, fetchData, filtered, routeParams}) {
 	const {fetchOnClose, visibleModal} = useContext(ModalContext);
 	const previousFetchData = usePrevious(fetchData);
-
 	const promises = useMemo(() => {
 		if (
 			(previousFetchData !== fetchData || fetchOnClose) &&
@@ -45,9 +39,8 @@ function Body({
 		}
 
 		return [];
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [routeParams, visibleModal]);
+	}, [fetchData, visibleModal]);
 
 	const statesProps = {
 		emptyProps: {

@@ -15,12 +15,11 @@
 package com.liferay.portlet.internal;
 
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.petra.encryptor.Encryptor;
+import com.liferay.petra.encryptor.EncryptorException;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.encryptor.EncryptorException;
-import com.liferay.portal.kernel.encryptor.EncryptorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -42,11 +41,12 @@ import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.URLCodec;
@@ -965,7 +965,7 @@ public class PortletURLImpl
 						PortalUtil.getLayoutFriendlyURL(layout, themeDisplay));
 
 					if (_secure) {
-						_layoutFriendlyURL = HttpComponentsUtil.protocolize(
+						_layoutFriendlyURL = HttpUtil.protocolize(
 							_layoutFriendlyURL,
 							PropsValues.WEB_SERVER_HTTPS_PORT, true);
 					}
@@ -973,7 +973,7 @@ public class PortletURLImpl
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		StringBundler sb = new StringBundler(64);
@@ -1194,7 +1194,7 @@ public class PortletURLImpl
 
 		String result = sb.toString();
 
-		if (!CookiesManagerUtil.hasSessionId(_httpServletRequest)) {
+		if (!CookieKeys.hasSessionId(_httpServletRequest)) {
 			HttpSession httpSession = _httpServletRequest.getSession();
 
 			result = PortalUtil.getURLWithSessionId(
@@ -1202,7 +1202,7 @@ public class PortletURLImpl
 		}
 
 		if (!_escapeXml) {
-			result = HttpComponentsUtil.shortenURL(result);
+			result = HttpUtil.shortenURL(result);
 		}
 
 		if (PropsValues.PORTLET_URL_ANCHOR_ENABLE && _anchor &&
@@ -1224,7 +1224,7 @@ public class PortletURLImpl
 		if (_escapeXml) {
 			result = HtmlUtil.escape(result);
 
-			result = HttpComponentsUtil.shortenURL(result);
+			result = HttpUtil.shortenURL(result);
 		}
 
 		return result;
@@ -1257,11 +1257,11 @@ public class PortletURLImpl
 		}
 
 		try {
-			return URLCodec.encodeURL(EncryptorUtil.encrypt(key, value));
+			return URLCodec.encodeURL(Encryptor.encrypt(key, value));
 		}
 		catch (EncryptorException encryptorException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(encryptorException);
+				_log.debug(encryptorException, encryptorException);
 			}
 
 			return value;
@@ -1383,7 +1383,7 @@ public class PortletURLImpl
 				}
 			}
 			catch (PortletException portletException) {
-				_log.error(portletException);
+				_log.error(portletException, portletException);
 			}
 		}
 	}

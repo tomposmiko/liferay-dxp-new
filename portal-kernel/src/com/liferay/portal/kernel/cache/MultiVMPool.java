@@ -30,11 +30,16 @@ public interface MultiVMPool {
 	public PortalCache<? extends Serializable, ? extends Serializable>
 		getPortalCache(String portalCacheName);
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getPortalCache(String)}
+	 */
+	@Deprecated
 	public PortalCache<? extends Serializable, ? extends Serializable>
-		getPortalCache(String portalCacheName, boolean mvcc);
+		getPortalCache(String portalCacheName, boolean blocking);
 
 	public PortalCache<? extends Serializable, ? extends Serializable>
-		getPortalCache(String portalCacheName, boolean mvcc, boolean sharded);
+		getPortalCache(String portalCacheName, boolean blocking, boolean mvcc);
 
 	public PortalCacheManager<? extends Serializable, ? extends Serializable>
 		getPortalCacheManager();

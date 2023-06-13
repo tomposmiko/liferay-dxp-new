@@ -12,8 +12,6 @@
  * details.
  */
 
-import {getOpener, setFormValues} from 'frontend-js-web';
-
 export default function ({itemSelectorURL, portletNamespace, selectEventName}) {
 	const openRecordSetModalButton = document.querySelector(
 		'.open-record-set-modal'
@@ -21,10 +19,9 @@ export default function ({itemSelectorURL, portletNamespace, selectEventName}) {
 
 	if (openRecordSetModalButton) {
 		openRecordSetModalButton.addEventListener('click', () => {
-			const openerWindow = getOpener();
+			const openerWindow = Liferay.Util.getOpener();
 
 			openerWindow.Liferay.Util.openSelectionModal({
-				iframeBodyCssClass: '',
 				onSelect: (selectedItem) => {
 					const form = document.getElementById(
 						`${portletNamespace}fm`
@@ -34,7 +31,7 @@ export default function ({itemSelectorURL, portletNamespace, selectEventName}) {
 						return;
 					}
 
-					setFormValues(form, {
+					Liferay.Util.setFormValues(form, {
 						ddmStructureId: selectedItem.ddmstructureid,
 						ddmStructureNameDisplay: Liferay.Util.unescape(
 							selectedItem.name

@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Peter Fellwock
  */
 @Component(
-	property = "service.ranking:Integer=" + Integer.MAX_VALUE,
+	immediate = true, property = "service.ranking:Integer=" + Integer.MAX_VALUE,
 	service = TrashHandler.class
 )
 public class TestTrashHandler implements TrashHandler {
@@ -188,6 +188,11 @@ public class TestTrashHandler implements TrashHandler {
 	}
 
 	@Override
+	public TrashEntry getTrashEntry(long classPK) {
+		return null;
+	}
+
+	@Override
 	public int getTrashModelsCount(long classPK) {
 		return 0;
 	}
@@ -210,6 +215,15 @@ public class TestTrashHandler implements TrashHandler {
 		return false;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #isDeletable(long)}
+	 */
+	@Deprecated
+	@Override
+	public boolean isDeletable() {
+		return false;
+	}
+
 	@Override
 	public boolean isDeletable(long classPK) {
 		return false;
@@ -217,6 +231,20 @@ public class TestTrashHandler implements TrashHandler {
 
 	@Override
 	public boolean isInTrash(long classPK) {
+		return false;
+	}
+
+	@Override
+	public boolean isInTrashContainer(long classPK) {
+		return false;
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #isMovable(long)}
+	 */
+	@Deprecated
+	@Override
+	public boolean isMovable() {
 		return false;
 	}
 

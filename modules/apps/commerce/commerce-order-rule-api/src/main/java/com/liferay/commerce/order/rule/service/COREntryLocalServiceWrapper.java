@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class COREntryLocalServiceWrapper
 	implements COREntryLocalService, ServiceWrapper<COREntryLocalService> {
 
-	public COREntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public COREntryLocalServiceWrapper(
 		COREntryLocalService corEntryLocalService) {
 
@@ -262,28 +258,33 @@ public class COREntryLocalServiceWrapper
 		return _corEntryLocalService.fetchCOREntry(COREntryId);
 	}
 
-	@Override
-	public com.liferay.commerce.order.rule.model.COREntry
-		fetchCOREntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return _corEntryLocalService.fetchCOREntryByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the cor entry with the matching UUID and company.
+	 * Returns the cor entry with the matching external reference code and company.
 	 *
-	 * @param uuid the cor entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cor entry's external reference code
 	 * @return the matching cor entry, or <code>null</code> if a matching cor entry could not be found
 	 */
 	@Override
 	public com.liferay.commerce.order.rule.model.COREntry
-		fetchCOREntryByUuidAndCompanyId(String uuid, long companyId) {
+		fetchCOREntryByExternalReferenceCode(
+			long companyId, String externalReferenceCode) {
 
-		return _corEntryLocalService.fetchCOREntryByUuidAndCompanyId(
-			uuid, companyId);
+		return _corEntryLocalService.fetchCOREntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCOREntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.commerce.order.rule.model.COREntry
+		fetchCOREntryByReferenceCode(
+			long companyId, String externalReferenceCode) {
+
+		return _corEntryLocalService.fetchCOREntryByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	@Override
@@ -467,41 +468,22 @@ public class COREntryLocalServiceWrapper
 		return _corEntryLocalService.getCOREntry(COREntryId);
 	}
 
-	@Override
-	public com.liferay.commerce.order.rule.model.COREntry
-			getCOREntryByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _corEntryLocalService.getCOREntryByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the cor entry with the matching UUID and company.
+	 * Returns the cor entry with the matching external reference code and company.
 	 *
-	 * @param uuid the cor entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cor entry's external reference code
 	 * @return the matching cor entry
 	 * @throws PortalException if a matching cor entry could not be found
 	 */
 	@Override
 	public com.liferay.commerce.order.rule.model.COREntry
-			getCOREntryByUuidAndCompanyId(String uuid, long companyId)
+			getCOREntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _corEntryLocalService.getCOREntryByUuidAndCompanyId(
-			uuid, companyId);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return _corEntryLocalService.getExportActionableDynamicQuery(
-			portletDataContext);
+		return _corEntryLocalService.getCOREntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	@Override
@@ -530,13 +512,6 @@ public class COREntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _corEntryLocalService.getPersistedModel(primaryKeyObj);
-	}
-
-	@Override
-	public java.util.List<com.liferay.commerce.order.rule.model.COREntry>
-		getUnqualifiedCOREntries(long companyId) {
-
-		return _corEntryLocalService.getUnqualifiedCOREntries(companyId);
 	}
 
 	/**

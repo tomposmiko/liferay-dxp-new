@@ -22,6 +22,7 @@ import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 /**
  * @author Eudaldo Alonso
@@ -39,7 +40,7 @@ public class PortletLayoutDisplayContext {
 			layoutPageTemplateStructureLocalService;
 	}
 
-	public LayoutStructure getLayoutStructure(Layout layout) {
+	public LayoutStructure getLayoutStructure(long groupId, Layout layout) {
 		if (_layoutStructure != null) {
 			return _layoutStructure;
 		}
@@ -61,9 +62,8 @@ public class PortletLayoutDisplayContext {
 					masterLayoutPageTemplateEntry.getGroupId(),
 					masterLayoutPageTemplateEntry.getPlid());
 
-		String data =
-			masterLayoutPageTemplateStructure.
-				getDefaultSegmentsExperienceData();
+		String data = masterLayoutPageTemplateStructure.getData(
+			SegmentsExperienceConstants.ID_DEFAULT);
 
 		if (Validator.isNull(data)) {
 			_layoutStructure = _getDefaultMasterLayoutStructure();

@@ -14,11 +14,9 @@
 
 import * as EditorVariant from '../components/PageRenderer/EditorVariant.es';
 
-export function mergeVariants(editable, {defaults, overrides, variant}) {
-	return {
-		...defaults,
-		...(editable ? EditorVariant : {}),
-		...variant,
-		...overrides,
-	};
-}
+export const mergeVariants = (editable, {defaults, overrides, variant}) => ({
+	...defaults,
+	...(editable ? EditorVariant : {}),
+	...variant,
+	...overrides,
+});

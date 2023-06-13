@@ -12,11 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	postForm,
-} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
 
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	return {
@@ -27,30 +23,29 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 			const action = data?.action;
 
 			if (action === 'deleteSelectedTranslationEntries') {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-delete-the-selected-translations'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							const form = document.getElementById(
-								`${portletNamespace}fm`
-							);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-delete-the-selected-translations'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}fm`
+					);
 
-							if (form) {
-								postForm(form, {
-									data: {
-										deleteEntryIds: getCheckedCheckboxes(
-											form,
-											`${portletNamespace}allRowIds`
-										),
-									},
-									url: data['delete-translation-entries-url'],
-								});
-							}
-						}
-					},
-				});
+					if (form) {
+						postForm(form, {
+							data: {
+								deleteEntryIds: Liferay.Util.listCheckedExcept(
+									form,
+									`${portletNamespace}allRowIds`
+								),
+							},
+							url: data['delete-translation-entries-url'],
+						});
+					}
+				}
 			}
 		},
 	};

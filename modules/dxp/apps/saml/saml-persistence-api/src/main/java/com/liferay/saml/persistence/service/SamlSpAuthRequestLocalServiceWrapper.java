@@ -27,10 +27,6 @@ public class SamlSpAuthRequestLocalServiceWrapper
 	implements SamlSpAuthRequestLocalService,
 			   ServiceWrapper<SamlSpAuthRequestLocalService> {
 
-	public SamlSpAuthRequestLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SamlSpAuthRequestLocalServiceWrapper(
 		SamlSpAuthRequestLocalService samlSpAuthRequestLocalService) {
 

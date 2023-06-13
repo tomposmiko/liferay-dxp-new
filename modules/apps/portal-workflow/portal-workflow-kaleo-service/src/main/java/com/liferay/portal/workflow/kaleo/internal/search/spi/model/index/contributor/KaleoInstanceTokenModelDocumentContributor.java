@@ -14,19 +14,29 @@
 
 package com.liferay.portal.workflow.kaleo.internal.search.spi.model.index.contributor;
 
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRenderer;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowHandler;
+import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 import com.liferay.portal.workflow.kaleo.internal.search.KaleoInstanceTokenField;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
 import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
+
+import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,11 +45,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author István András Dézsi
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken",
 	service = ModelDocumentContributor.class
 )
 public class KaleoInstanceTokenModelDocumentContributor
-	extends BaseKaleoModelDocumentContributor
 	implements ModelDocumentContributor<KaleoInstanceToken> {
 
 	@Override
@@ -87,19 +97,89 @@ public class KaleoInstanceTokenModelDocumentContributor
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 
-		addAssetEntryAttributes(
-			kaleoInstanceToken.getClassName(), kaleoInstanceToken.getClassPK(),
-			document, kaleoInstanceToken.getGroupId());
+		AssetEntry assetEntry = getAssetEntry(kaleoInstanceToken);
+
+		if (assetEntry != null) {
+			document.addLocalizedText(
+				KaleoInstanceTokenField.ASSET_DESCRIPTION,
+				LocalizationUtil.populateLocalizationMap(
+					assetEntry.getDescriptionMap(),
+					assetEntry.getDefaultLanguageId(),
+					assetEntry.getGroupId()));
+			document.addLocalizedText(
+				KaleoInstanceTokenField.ASSET_TITLE,
+				LocalizationUtil.populateLocalizationMap(
+					assetEntry.getTitleMap(), assetEntry.getDefaultLanguageId(),
+					assetEntry.getGroupId()));
+		}
+		else {
+			WorkflowHandler<?> workflowHandler =
+				WorkflowHandlerRegistryUtil.getWorkflowHandler(
+					kaleoInstanceToken.getClassName());
+
+			for (Locale availableLocale :
+					LanguageUtil.getAvailableLocales(
+						kaleoInstanceToken.getGroupId())) {
+
+				document.addText(
+					LocalizationUtil.getLocalizedName(
+						KaleoInstanceTokenField.ASSET_TITLE,
+						availableLocale.getLanguage()),
+					workflowHandler.getTitle(
+						kaleoInstanceToken.getClassPK(), availableLocale));
+			}
+		}
+	}
+
+	protected AssetEntry getAssetEntry(KaleoInstanceToken kaleoInstanceToken) {
+		try {
+			AssetRenderer<?> assetRenderer = getAssetRenderer(
+				kaleoInstanceToken.getClassName(),
+				kaleoInstanceToken.getClassPK());
+
+			if (assetRenderer != null) {
+				return assetEntryLocalService.getEntry(
+					assetRenderer.getClassName(), assetRenderer.getClassPK());
+			}
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
+
+		return null;
+	}
+
+	protected AssetRenderer<?> getAssetRenderer(String className, long classPK)
+		throws PortalException {
+
+		AssetRendererFactory<?> assetRendererFactory = getAssetRendererFactory(
+			className);
+
+		if (assetRendererFactory != null) {
+			return assetRendererFactory.getAssetRenderer(classPK);
+		}
+
+		return null;
+	}
+
+	protected AssetRendererFactory<?> getAssetRendererFactory(
+		String className) {
+
+		return AssetRendererFactoryRegistryUtil.
+			getAssetRendererFactoryByClassName(className);
 	}
 
 	protected String[] getLanguageIds(
 		String defaultLanguageId, String content) {
 
-		String[] languageIds = _localization.getAvailableLanguageIds(content);
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
+			content);
 
 		if (languageIds.length == 0) {
 			languageIds = new String[] {defaultLanguageId};
@@ -107,6 +187,9 @@ public class KaleoInstanceTokenModelDocumentContributor
 
 		return languageIds;
 	}
+
+	@Reference
+	protected AssetEntryLocalService assetEntryLocalService;
 
 	@Reference
 	protected ClassNameLocalService classNameLocalService;
@@ -119,8 +202,5 @@ public class KaleoInstanceTokenModelDocumentContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KaleoInstanceTokenModelDocumentContributor.class);
-
-	@Reference
-	private Localization _localization;
 
 }

@@ -56,7 +56,8 @@ create table LayoutPageTemplateStructure (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
-	plid LONG,
+	classNameId LONG,
+	classPK LONG,
 	primary key (layoutPageTemplateStructureId, ctCollectionId)
 );
 
@@ -74,10 +75,5 @@ create table LayoutPageTemplateStructureRel (
 	layoutPageTemplateStructureId LONG,
 	segmentsExperienceId LONG,
 	data_ TEXT null,
-	lastPublishDate DATE null,
-	status INTEGER,
-	statusByUserId LONG,
-	statusByUserName VARCHAR(75) null,
-	statusDate DATE null,
 	primary key (lPageTemplateStructureRelId, ctCollectionId)
 );

@@ -77,12 +77,10 @@ public class EmailAddressCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(29);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", emailAddressId=");
@@ -103,8 +101,8 @@ public class EmailAddressCacheModel
 		sb.append(classPK);
 		sb.append(", address=");
 		sb.append(address);
-		sb.append(", listTypeId=");
-		sb.append(listTypeId);
+		sb.append(", typeId=");
+		sb.append(typeId);
 		sb.append(", primary=");
 		sb.append(primary);
 		sb.append("}");
@@ -117,7 +115,6 @@ public class EmailAddressCacheModel
 		EmailAddressImpl emailAddressImpl = new EmailAddressImpl();
 
 		emailAddressImpl.setMvccVersion(mvccVersion);
-		emailAddressImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			emailAddressImpl.setUuid("");
@@ -161,7 +158,7 @@ public class EmailAddressCacheModel
 			emailAddressImpl.setAddress(address);
 		}
 
-		emailAddressImpl.setListTypeId(listTypeId);
+		emailAddressImpl.setTypeId(typeId);
 		emailAddressImpl.setPrimary(primary);
 
 		emailAddressImpl.resetOriginalValues();
@@ -172,8 +169,6 @@ public class EmailAddressCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
-
-		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		emailAddressId = objectInput.readLong();
@@ -190,7 +185,7 @@ public class EmailAddressCacheModel
 		classPK = objectInput.readLong();
 		address = objectInput.readUTF();
 
-		listTypeId = objectInput.readLong();
+		typeId = objectInput.readLong();
 
 		primary = objectInput.readBoolean();
 	}
@@ -198,8 +193,6 @@ public class EmailAddressCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -235,13 +228,12 @@ public class EmailAddressCacheModel
 			objectOutput.writeUTF(address);
 		}
 
-		objectOutput.writeLong(listTypeId);
+		objectOutput.writeLong(typeId);
 
 		objectOutput.writeBoolean(primary);
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public String uuid;
 	public long emailAddressId;
 	public long companyId;
@@ -252,7 +244,7 @@ public class EmailAddressCacheModel
 	public long classNameId;
 	public long classPK;
 	public String address;
-	public long listTypeId;
+	public long typeId;
 	public boolean primary;
 
 }

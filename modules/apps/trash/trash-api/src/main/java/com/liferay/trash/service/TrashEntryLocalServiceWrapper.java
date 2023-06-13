@@ -29,10 +29,6 @@ import com.liferay.trash.model.TrashEntry;
 public class TrashEntryLocalServiceWrapper
 	implements ServiceWrapper<TrashEntryLocalService>, TrashEntryLocalService {
 
-	public TrashEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public TrashEntryLocalServiceWrapper(
 		TrashEntryLocalService trashEntryLocalService) {
 

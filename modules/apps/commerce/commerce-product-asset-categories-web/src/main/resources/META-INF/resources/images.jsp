@@ -17,24 +17,33 @@
 <%@ include file="/init.jsp" %>
 
 <%
+AssetCategory assetCategory = (AssetCategory)request.getAttribute(WebKeys.ASSET_CATEGORY);
+
+CPAttachmentFileEntryService cpAttachmentFileEntryService = (CPAttachmentFileEntryService)request.getAttribute("cpAttachmentFileEntryService");
+
 PortletURL portletURL = PortletURLBuilder.create(
 	currentURLObj
 ).setParameter(
 	"historyKey", liferayPortletResponse.getNamespace() + "images"
 ).buildPortletURL();
 
-CategoryCPAttachmentFileEntriesManagementToolbarDisplayContext categoryCPAttachmentFileEntriesManagementToolbarDisplayContext = new CategoryCPAttachmentFileEntriesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, portletURL);
+SearchContainer<CPAttachmentFileEntry> cpAttachmentFileEntrySearchContainer = new SearchContainer<>(liferayPortletRequest, portletURL, null, null);
+
+List<CPAttachmentFileEntry> cpAttachmentFileEntries = cpAttachmentFileEntryService.getCPAttachmentFileEntries(PortalUtil.getClassNameId(AssetCategory.class), assetCategory.getCategoryId(), CPAttachmentFileEntryConstants.TYPE_IMAGE, WorkflowConstants.STATUS_ANY, cpAttachmentFileEntrySearchContainer.getStart(), cpAttachmentFileEntrySearchContainer.getEnd());
+
+cpAttachmentFileEntrySearchContainer.setTotal(cpAttachmentFileEntryService.getCPAttachmentFileEntriesCount(PortalUtil.getClassNameId(AssetCategory.class), assetCategory.getCategoryId(), CPAttachmentFileEntryConstants.TYPE_IMAGE, WorkflowConstants.STATUS_ANY));
+cpAttachmentFileEntrySearchContainer.setResults(cpAttachmentFileEntries);
 %>
 
 <clay:management-toolbar
-	managementToolbarDisplayContext="<%= categoryCPAttachmentFileEntriesManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= new CategoryCPAttachmentFileEntriesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, cpAttachmentFileEntrySearchContainer) %>"
 />
 
 <clay:container-fluid>
 	<liferay-ui:search-container
 		emptyResultsMessage="there-are-no-images"
 		id="cpAttachmentFileEntries"
-		searchContainer="<%= categoryCPAttachmentFileEntriesManagementToolbarDisplayContext.getSearchContainer() %>"
+		searchContainer="<%= cpAttachmentFileEntrySearchContainer %>"
 	>
 		<liferay-ui:search-container-row
 			className="com.liferay.commerce.product.model.CPAttachmentFileEntry"
@@ -51,7 +60,7 @@ CategoryCPAttachmentFileEntriesManagementToolbarDisplayContext categoryCPAttachm
 				thumbnailSrc = cpAttachmentFileEntry.getCDNURL();
 			}
 			else {
-				thumbnailSrc = CommerceMediaResolverUtil.getThumbnailURL(AccountConstants.ACCOUNT_ENTRY_ID_GUEST, cpAttachmentFileEntry.getCPAttachmentFileEntryId());
+				thumbnailSrc = CommerceMediaResolverUtil.getThumbnailURL(CommerceAccountConstants.ACCOUNT_ID_GUEST, cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 			}
 			%>
 

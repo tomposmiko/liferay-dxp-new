@@ -1,14 +1,11 @@
-const simulationToggle = document.getElementById('${portletNamespace}simulationToggleId');
+var simulationToggle = document.getElementById('${portletNamespace}simulationToggleId');
 
-const sidenavInstance = Liferay.SideNavigation.initialize(simulationToggle);
+var sidenavInstance = Liferay.SideNavigation.initialize(simulationToggle);
 
 sidenavInstance.on(
 	'open.lexicon.sidenav',
 	function(event) {
 		Liferay.fire('SimulationMenu:openSimulationPanel');
-
-		const simulationPanel = document.getElementById('${portletNamespace}simulationPanelId');
-		simulationPanel.focus();
 	}
 );
 

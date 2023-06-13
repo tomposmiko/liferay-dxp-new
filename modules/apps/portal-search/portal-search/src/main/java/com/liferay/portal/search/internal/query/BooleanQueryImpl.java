@@ -35,7 +35,6 @@ public class BooleanQueryImpl extends BaseQueryImpl implements BooleanQuery {
 		return queryVisitor.visit(this);
 	}
 
-	@Override
 	public BooleanQuery addFilterQueryClauses(Query... clauses) {
 		if (ArrayUtil.isEmpty(clauses)) {
 			return this;
@@ -46,7 +45,6 @@ public class BooleanQueryImpl extends BaseQueryImpl implements BooleanQuery {
 		return this;
 	}
 
-	@Override
 	public BooleanQuery addMustNotQueryClauses(Query... clauses) {
 		if (ArrayUtil.isEmpty(clauses)) {
 			return this;
@@ -57,7 +55,6 @@ public class BooleanQueryImpl extends BaseQueryImpl implements BooleanQuery {
 		return this;
 	}
 
-	@Override
 	public BooleanQuery addMustQueryClauses(Query... clauses) {
 		if (ArrayUtil.isEmpty(clauses)) {
 			return this;
@@ -68,7 +65,6 @@ public class BooleanQueryImpl extends BaseQueryImpl implements BooleanQuery {
 		return this;
 	}
 
-	@Override
 	public BooleanQuery addShouldQueryClauses(Query... clauses) {
 		if (ArrayUtil.isEmpty(clauses)) {
 			return this;

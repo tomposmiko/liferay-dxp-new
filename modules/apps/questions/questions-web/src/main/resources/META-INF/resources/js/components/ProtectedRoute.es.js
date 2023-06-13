@@ -15,19 +15,17 @@
 import React from 'react';
 import {Redirect, Route} from 'react-router-dom';
 
-export default function ProtectedRoute({component: Component, ...rest}) {
-	return (
-		<Route
-			{...rest}
-			render={(props) =>
-				themeDisplay.isSignedIn() &&
-				(!Liferay.Session ||
-					Liferay.Session.get('sessionState') === 'active') ? (
-					<Component {...props} />
-				) : (
-					<Redirect to={{pathname: '/'}} />
-				)
-			}
-		/>
-	);
-}
+export default ({component: Component, ...rest}) => (
+	<Route
+		{...rest}
+		render={(props) =>
+			themeDisplay.isSignedIn() &&
+			(!Liferay.Session ||
+				Liferay.Session.get('sessionState') === 'active') ? (
+				<Component {...props} />
+			) : (
+				<Redirect to={{pathname: '/'}} />
+			)
+		}
+	/>
+);

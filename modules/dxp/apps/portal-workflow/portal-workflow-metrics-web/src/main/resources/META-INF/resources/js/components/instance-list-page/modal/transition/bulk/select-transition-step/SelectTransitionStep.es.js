@@ -47,9 +47,8 @@ function SelectTransitionStep({setErrorToast}) {
 		}
 
 		return [];
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [retry]);
+	}, [postData, retry]);
 
 	return (
 		<div className="fixed-height modal-metrics-content">

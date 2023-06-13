@@ -14,12 +14,14 @@
 
 package com.liferay.commerce.product.internal.permission;
 
-import com.liferay.account.model.AccountGroupRel;
-import com.liferay.account.service.AccountGroupRelLocalService;
+import com.liferay.commerce.account.model.CommerceAccountGroupRel;
+import com.liferay.commerce.account.service.CommerceAccountGroupRelService;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.product.model.CPDefinition;
+import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelRel;
+import com.liferay.commerce.product.permission.CommerceCatalogPermission;
 import com.liferay.commerce.product.permission.CommerceProductViewPermission;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
@@ -40,9 +42,11 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
- * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceProductViewPermission.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceProductViewPermission.class
+)
 public class CommerceProductViewPermissionImpl
 	implements CommerceProductViewPermission {
 
@@ -85,9 +89,17 @@ public class CommerceProductViewPermissionImpl
 			long cpDefinitionId)
 		throws PortalException {
 
-		return _isAccountEnabled(
-			commerceAccountId,
-			_cpDefinitionLocalService.getCPDefinition(cpDefinitionId));
+		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
+			cpDefinitionId);
+
+		if (_viewCatalog(
+				permissionChecker, cpDefinition.getCommerceCatalog()) ||
+			_accountEnabled(commerceAccountId, cpDefinition)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -99,34 +111,21 @@ public class CommerceProductViewPermissionImpl
 		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
 			cpDefinitionId);
 
-		if (!_isChannelEnabled(groupId, cpDefinition)) {
+		if (!_channelEnabled(groupId, cpDefinition)) {
 			return false;
 		}
 
-		return _isAccountEnabled(commerceAccountId, cpDefinition);
-	}
+		if (_viewCatalog(
+				permissionChecker, cpDefinition.getCommerceCatalog()) ||
+			_accountEnabled(commerceAccountId, cpDefinition)) {
 
-	private long _getCommerceChannelId(long groupId) {
-		Group group = _groupLocalService.fetchGroup(groupId);
-
-		String className = group.getClassName();
-
-		if (className.equals(CommerceChannel.class.getName())) {
-			return group.getClassPK();
+			return true;
 		}
 
-		CommerceChannel commerceChannel =
-			_commerceChannelLocalService.fetchCommerceChannelBySiteGroupId(
-				groupId);
-
-		if (commerceChannel != null) {
-			return commerceChannel.getCommerceChannelId();
-		}
-
-		return 0;
+		return false;
 	}
 
-	private boolean _isAccountEnabled(
+	private boolean _accountEnabled(
 			long commerceAccountId, CPDefinition cpDefinition)
 		throws PortalException {
 
@@ -134,18 +133,21 @@ public class CommerceProductViewPermissionImpl
 			return true;
 		}
 
-		List<AccountGroupRel> accountGroupRels =
-			_accountGroupRelLocalService.getAccountGroupRels(
+		List<CommerceAccountGroupRel> commerceAccountGroupRels =
+			_commerceAccountGroupRelService.getCommerceAccountGroupRels(
 				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId(),
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
-		long[] accountGroupIds =
+		long[] commerceAccountGroupIds =
 			_commerceAccountHelper.getCommerceAccountGroupIds(
 				commerceAccountId);
 
-		for (AccountGroupRel accountGroupRel : accountGroupRels) {
+		for (CommerceAccountGroupRel commerceAccountGroupRel :
+				commerceAccountGroupRels) {
+
 			if (ArrayUtil.contains(
-					accountGroupIds, accountGroupRel.getAccountGroupId())) {
+					commerceAccountGroupIds,
+					commerceAccountGroupRel.getCommerceAccountGroupId())) {
 
 				return true;
 			}
@@ -154,7 +156,7 @@ public class CommerceProductViewPermissionImpl
 		return false;
 	}
 
-	private boolean _isChannelEnabled(long groupId, CPDefinition cpDefinition) {
+	private boolean _channelEnabled(long groupId, CPDefinition cpDefinition) {
 		if (!cpDefinition.isChannelFilterEnabled()) {
 			return true;
 		}
@@ -177,11 +179,43 @@ public class CommerceProductViewPermissionImpl
 		return false;
 	}
 
+	private long _getCommerceChannelId(long groupId) {
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		String className = group.getClassName();
+
+		if (className.equals(CommerceChannel.class.getName())) {
+			return group.getClassPK();
+		}
+
+		CommerceChannel commerceChannel =
+			_commerceChannelLocalService.fetchCommerceChannelBySiteGroupId(
+				groupId);
+
+		if (commerceChannel != null) {
+			return commerceChannel.getCommerceChannelId();
+		}
+
+		return 0;
+	}
+
+	private boolean _viewCatalog(
+			PermissionChecker permissionChecker,
+			CommerceCatalog commerceCatalog)
+		throws PortalException {
+
+		return _commerceCatalogPermission.contains(
+			permissionChecker, commerceCatalog, ActionKeys.VIEW);
+	}
+
 	@Reference
-	private AccountGroupRelLocalService _accountGroupRelLocalService;
+	private CommerceAccountGroupRelService _commerceAccountGroupRelService;
 
 	@Reference
 	private CommerceAccountHelper _commerceAccountHelper;
+
+	@Reference
+	private CommerceCatalogPermission _commerceCatalogPermission;
 
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;

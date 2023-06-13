@@ -46,6 +46,7 @@ import com.liferay.site.navigation.service.SiteNavigationMenuServiceUtil;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see SiteNavigationMenuServiceSoap
  * @generated
  */
 public class SiteNavigationMenuServiceHttp {

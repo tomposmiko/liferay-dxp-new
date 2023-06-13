@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 
-import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -90,20 +90,31 @@ public class CalendarIndexerLocalizedContentTest
 			"description_ja_JP", description
 		).build();
 
-		for (String keyword : Arrays.asList("新規", "作成", "新", "作")) {
-			Document document = searchOnlyOne(keyword, LocaleUtil.JAPAN);
+		String word1 = "新規";
+		String word2 = "作成";
+		String prefix1 = "新";
+		String prefix2 = "作";
 
-			FieldValuesAssert.assertFieldValues(
-				nameMap, "name", document, keyword);
+		Stream.of(
+			word1, word2, prefix1, prefix2
+		).forEach(
+			keywords -> {
+				Document document = searchOnlyOne(keywords, LocaleUtil.JAPAN);
 
-			FieldValuesAssert.assertFieldValues(
-				descriptionMap, "description", document, keyword);
-		}
+				FieldValuesAssert.assertFieldValues(
+					nameMap, "name", document, keywords);
+
+				FieldValuesAssert.assertFieldValues(
+					descriptionMap, "description", document, keywords);
+			}
+		);
 	}
 
 	@Test
 	public void testJapaneseNameFullWordOnly() throws Exception {
 		String full = "新規作成";
+		String partial1 = "新大阪";
+		String partial2 = "作戦大成功";
 
 		String originalName = StringUtil.toLowerCase(
 			RandomTestUtil.randomString());
@@ -111,8 +122,10 @@ public class CalendarIndexerLocalizedContentTest
 		String description = StringUtil.toLowerCase(
 			RandomTestUtil.randomString());
 
-		for (String name : Arrays.asList(full, "新大阪", "作戦大成功")) {
-			addCalendar(
+		Stream.of(
+			full, partial1, partial2
+		).forEach(
+			name -> addCalendar(
 				new LocalizedValuesMap() {
 					{
 						put(LocaleUtil.US, originalName);
@@ -124,8 +137,8 @@ public class CalendarIndexerLocalizedContentTest
 						put(LocaleUtil.US, description);
 						put(LocaleUtil.JAPAN, description);
 					}
-				});
-		}
+				})
+		);
 
 		Map<String, String> nameMap = HashMapBuilder.put(
 			"name", originalName
@@ -135,12 +148,19 @@ public class CalendarIndexerLocalizedContentTest
 			"name_ja_JP", full
 		).build();
 
-		for (String keyword : Arrays.asList("新規", "作成")) {
-			Document document = searchOnlyOne(keyword, LocaleUtil.JAPAN);
+		String word1 = "新規";
+		String word2 = "作成";
 
-			FieldValuesAssert.assertFieldValues(
-				nameMap, "name", document, keyword);
-		}
+		Stream.of(
+			word1, word2
+		).forEach(
+			keywords -> {
+				Document document = searchOnlyOne(keywords, LocaleUtil.JAPAN);
+
+				FieldValuesAssert.assertFieldValues(
+					nameMap, "name", document, keywords);
+			}
+		);
 	}
 
 	protected Calendar addCalendar(

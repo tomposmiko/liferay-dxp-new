@@ -18,14 +18,14 @@ import com.liferay.dynamic.data.mapping.internal.util.ResourceBundleLoaderProvid
 import com.liferay.dynamic.data.mapping.kernel.DDMTemplateManager;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
-import com.liferay.osgi.service.tracker.collections.EagerServiceTrackerCustomizer;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.resource.bundle.AggregateResourceBundleLoader;
@@ -63,11 +63,12 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Michael C. Han
  */
-@Component(service = TemplateHandlerRegistry.class)
+@Component(immediate = true, service = TemplateHandlerRegistry.class)
 public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 
 	@Override
@@ -111,6 +112,8 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 					bundleContext.ungetService(serviceReference);
 				});
 
+		_ddmTemplateMapsThreadLocal.set(new HashMap<>());
+
 		_classNameTemplateHandlersServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, TemplateHandler.class, null,
@@ -123,6 +126,8 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 					bundleContext.ungetService(serviceReference);
 				},
 				new TemplateHandlerServiceTrackerCustomizer());
+
+		_ddmTemplateMapsThreadLocal.remove();
 	}
 
 	@Deactivate
@@ -134,8 +139,36 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 		_bundleContext = null;
 	}
 
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMTemplate)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<DDMTemplate> modelResourcePermission) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	@Reference
 	protected ResourceBundleLoaderProvider resourceBundleLoaderProvider;
+
+	private static final ThreadLocal<Map<Long, Map<String, DDMTemplate>>>
+		_ddmTemplateMapsThreadLocal = new CentralizedThreadLocal<>(
+			TemplateHandlerRegistryImpl.class.getName() +
+				"._ddmTemplateMapsThreadLocal");
 
 	private BundleContext _bundleContext;
 	private ServiceTrackerMap<Long, TemplateHandler>
@@ -146,48 +179,17 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
 
-	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMTemplate)"
-	)
-	private ModelResourcePermission<DDMTemplate> _modelResourcePermission;
-
-	@Reference
 	private Portal _portal;
-
 	private final Map<TemplateHandler, ServiceRegistration<?>>
 		_serviceRegistrations = new ConcurrentHashMap<>();
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 	private class TemplateHandlerPortalInstanceLifecycleListener
 		extends BasePortalInstanceLifecycleListener {
 
 		@Override
-		public long getLastModifiedTime() {
-			return _lastModifiedTime;
-		}
-
-		@Override
-		public String getName() {
-			return _name;
-		}
-
-		@Override
 		public void portalInstanceRegistered(Company company) throws Exception {
-			List<Element> templateElements =
-				_templateHandler.getDefaultTemplateElements();
-
-			if (templateElements.isEmpty()) {
-				return;
-			}
-
 			long classNameId = _portal.getClassNameId(
 				_templateHandler.getClassName());
 
@@ -200,18 +202,59 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 
 			serviceContext.setScopeGroupId(group.getGroupId());
 
-			long userId = _userLocalService.getGuestUserId(
+			long userId = _userLocalService.getDefaultUserId(
 				company.getCompanyId());
 
 			serviceContext.setUserId(userId);
+
+			List<Element> templateElements =
+				_templateHandler.getDefaultTemplateElements();
+
+			Map<Long, Map<String, DDMTemplate>> ddmTemplateMaps =
+				_ddmTemplateMapsThreadLocal.get();
+
+			Map<String, DDMTemplate> ddmTemplateMap = null;
+
+			if (ddmTemplateMaps != null) {
+				ddmTemplateMap = ddmTemplateMaps.computeIfAbsent(
+					group.getGroupId(),
+					groupId -> {
+						Map<String, DDMTemplate> ddmTemplates = new HashMap<>();
+
+						for (DDMTemplate ddmTemplate :
+								_ddmTemplateLocalService.getTemplatesByGroupId(
+									groupId)) {
+
+							ddmTemplates.put(
+								StringBundler.concat(
+									ddmTemplate.getClassNameId(),
+									StringPool.POUND,
+									StringUtil.toUpperCase(
+										ddmTemplate.getTemplateKey())),
+								ddmTemplate);
+						}
+
+						return ddmTemplates;
+					});
+			}
 
 			for (Element templateElement : templateElements) {
 				String templateKey = templateElement.elementText(
 					"template-key");
 
-				DDMTemplate ddmTemplate =
-					_ddmTemplateLocalService.fetchTemplate(
+				DDMTemplate ddmTemplate = null;
+
+				if (ddmTemplateMap != null) {
+					ddmTemplate = ddmTemplateMap.get(
+						StringBundler.concat(
+							classNameId, StringPool.POUND,
+							StringUtil.toUpperCase(templateKey)));
+				}
+
+				if (ddmTemplate == null) {
+					ddmTemplate = _ddmTemplateLocalService.fetchTemplate(
 						group.getGroupId(), classNameId, templateKey);
+				}
 
 				if ((ddmTemplate != null) &&
 					((ddmTemplate.getUserId() != userId) ||
@@ -297,11 +340,11 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 
 			Map<Locale, String> map = new HashMap<>();
 
-			for (Locale locale : _language.getAvailableLocales(groupId)) {
+			for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
 				ResourceBundle resourceBundle =
 					resourceBundleLoader.loadResourceBundle(locale);
 
-				map.put(locale, _language.get(resourceBundle, key));
+				map.put(locale, LanguageUtil.get(resourceBundle, key));
 			}
 
 			return map;
@@ -311,29 +354,17 @@ public class TemplateHandlerRegistryImpl implements TemplateHandlerRegistry {
 			TemplateHandler templateHandler) {
 
 			_templateHandler = templateHandler;
-
-			Class<?> clazz = templateHandler.getClass();
-
-			Bundle bundle = FrameworkUtil.getBundle(clazz);
-
-			_lastModifiedTime = bundle.getLastModified();
-
-			_name = StringBundler.concat(
-				super.getName(), StringPool.POUND, clazz.getName());
 		}
 
 		private static final String _CLASS_NAME_PORTLET_DISPLAY_TEMPLATE =
 			"com.liferay.portlet.display.template.PortletDisplayTemplate";
 
-		private final long _lastModifiedTime;
-		private final String _name;
 		private final TemplateHandler _templateHandler;
 
 	}
 
 	private class TemplateHandlerServiceTrackerCustomizer
-		implements EagerServiceTrackerCustomizer
-			<TemplateHandler, TemplateHandler> {
+		implements ServiceTrackerCustomizer<TemplateHandler, TemplateHandler> {
 
 		@Override
 		public TemplateHandler addingService(

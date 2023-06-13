@@ -22,7 +22,7 @@ import com.liferay.commerce.order.status.CommerceOrderStatus;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.order.status.key=" + ShippedCommerceOrderStatusImpl.KEY,
 		"commerce.order.status.priority:Integer=" + ShippedCommerceOrderStatusImpl.PRIORITY
@@ -69,7 +70,7 @@ public class ShippedCommerceOrderStatusImpl implements CommerceOrderStatus {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			locale, CommerceOrderConstants.getOrderStatusLabel(KEY));
 	}
 
@@ -142,8 +143,5 @@ public class ShippedCommerceOrderStatusImpl implements CommerceOrderStatus {
 
 	@Reference
 	private CommerceShippingHelper _commerceShippingHelper;
-
-	@Reference
-	private Language _language;
 
 }

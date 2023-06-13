@@ -1,7 +1,6 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Blogs";
@@ -18,7 +17,7 @@ definition {
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -29,7 +28,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -43,7 +42,7 @@ definition {
 				pageName = "Blogs Page",
 				portletName = "Blogs");
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 
 			Site.tearDownCP();
 
@@ -56,7 +55,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-106613. It ensures that the custom abstract field cannot be reset to empty after typing in the content field."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test AbstractDescriptionPersistsWhenTypingInContentField {
 		property test.name.skip.portal.instance = "BlogsPage#AbstractDescriptionPersistsWhenTypingInContentField";
@@ -71,7 +70,7 @@ definition {
 
 		BlogsEntry.addCustomAbstract(entryAbstractDescription = "Blogs Entry Abstract Description");
 
-		Click.clickAt(
+		Click.pauseClickAt(
 			key_editor = "content",
 			locator1 = "AlloyEditor#EDITOR");
 
@@ -83,11 +82,9 @@ definition {
 	}
 
 	@description = "This checks that a comment can be deleted from a blog entry."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanDeleteComment {
-		property testray.component.names = "Comment";
-
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
@@ -108,7 +105,7 @@ definition {
 	}
 
 	@description = "This checks that the view count for a blog can be displayed once enabled."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanDisplayViewCountForEntry {
 		property test.name.skip.portal.instance = "BlogsPage#CanDisplayViewCountForEntry";
@@ -135,10 +132,10 @@ definition {
 	}
 
 	@description = "This checks that a comment can be edited in a blog entry."
-	@priority = 5
-	@refactorneeded
+	@priority = "5"
+	@@refactorneeded
 	test CanEditComment {
-		property testray.component.names = "Comment";
+		property portal.acceptance = "true";
 
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
@@ -161,16 +158,18 @@ definition {
 			entryCommentEdit = "Blogs Entry Comment Edit");
 
 		Comments.viewPG(
-			commentCount = 1,
+			commentCount = "1",
 			entryComment = "Blogs Entry Comment Edit",
 			userFullName = "Test Test (You)");
 	}
 
 	@description = "This checks that the title and content fields of a blog entry can be edited."
-	@e2etest
-	@priority = 5
+	@priority = "5"
 	@refactordone
+	@uitest
 	test CanEditEntry {
+		property portal.acceptance = "true";
+
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
@@ -195,11 +194,9 @@ definition {
 	}
 
 	@description = "This checks that multiple comments can be edited in a blog entry."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanEditMultipleComments {
-		property testray.component.names = "Comment";
-
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
@@ -238,7 +235,7 @@ definition {
 	}
 
 	@description = "This checks that Blogs added and scoped to a page will not be seen in other pages."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CannotViewBlogEntryScopedToAnotherPage {
 		task ("Set up a blog widget on another page scoped to that page") {
@@ -247,7 +244,7 @@ definition {
 				layoutName = "Blogs Page2");
 
 			JSONLayout.addWidgetToPublicLayout(
-				column = 1,
+				column = "1",
 				groupName = "Guest",
 				layoutName = "Blogs Page2",
 				widgetName = "Blogs");
@@ -290,11 +287,11 @@ definition {
 		task ("Check that the entry scoped to the second blog page disappears if the scope is changed to the site") {
 			Navigator.gotoPage(pageName = "Blogs Page2");
 
-			var siteName = TestCase.getSiteName(siteName = ${siteName});
+			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			Portlet.selectScopePG(
 				portletName = "Blogs",
-				scope = ${siteName});
+				scope = "${siteName}");
 
 			Navigator.gotoPage(pageName = "Blogs Page2");
 
@@ -309,7 +306,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-69240. It checks that the custom URL can be remembered after changing to auto."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanRememberCustomURLAfterSwitchingBackFromAuto {
 		BlogsNavigator.openToAddEntry(
@@ -349,7 +346,7 @@ definition {
 	}
 
 	@description = "This checks that exact content search returns an entry when it includes the entire phrase being queried."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForExactStringInContent {
 		JSONLayout.addPublicLayout(
@@ -360,33 +357,30 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Entry Title");
 
-		Navigator.gotoPage(pageName = "Search Page");
+		Navigator.gotoPage(pageName = "Blogs Page");
 
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs\"");
+		for (var searchTerm : list ""Blogs","Blogs Entry Content"") {
+			Navigator.gotoPage(pageName = "Search Page");
 
-		SearchResultPortlet.viewSearchResults(
-			searchAssetTitle = "Entry Title",
-			searchAssetType = "Blogs Entry",
-			searchTerm = "\"Blogs\"");
+			SearchPortlets.searchEmbedded(searchTerm = "${searchTerm}");
 
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs Entry Content\"");
+			SearchResultPortlet.viewSearchResults(
+				searchAssetTitle = "Entry Title",
+				searchAssetType = "Blogs Entry",
+				searchTerm = "${searchTerm}");
+		}
 
-		SearchResultPortlet.viewSearchResults(
-			searchAssetTitle = "Entry Title",
-			searchAssetType = "Blogs Entry",
-			searchTerm = "\"Blogs Entry Content\"");
+		for (var searchTerm : list ""Blogs1","Blogs1 Entry1 Content1"") {
+			Navigator.gotoPage(pageName = "Search Page");
 
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs1\"");
+			SearchPortlets.searchEmbedded(searchTerm = "${searchTerm}");
 
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "\"Blogs1\"");
-
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs1 Entry1 Content1\"");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "\"Blogs1 Entry1 Content1\"");
+			SearchResultPortlet.viewNoSearchResults(searchTerm = "${searchTerm}");
+		}
 	}
 
 	@description = "This checks that exact title search returns an entry when it includes the entire phrase being queried."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForExactStringInTitle {
 		JSONLayout.addPublicLayout(
@@ -397,37 +391,33 @@ definition {
 			entryContent = "Entry Content",
 			entryTitle = "Blogs Entry Title");
 
-		Navigator.gotoPage(pageName = "Search Page");
+		Navigator.gotoPage(pageName = "Blogs Page");
 
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs\"");
+		for (var searchTerm : list ""Blogs","Blogs Entry Title"") {
+			Navigator.gotoPage(pageName = "Search Page");
 
-		SearchResultPortlet.viewSearchResults(
-			searchAssetTitle = "Blogs Entry Title",
-			searchAssetType = "Blogs Entry",
-			searchTerm = "\"Blogs\"");
+			SearchPortlets.searchEmbedded(searchTerm = "${searchTerm}");
 
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs Entry Title\"");
+			SearchResultPortlet.viewSearchResults(
+				searchAssetTitle = "Blogs Entry Title",
+				searchAssetType = "Blogs Entry",
+				searchTerm = "${searchTerm}");
+		}
 
-		SearchResultPortlet.viewSearchResults(
-			searchAssetTitle = "Blogs Entry Title",
-			searchAssetType = "Blogs Entry",
-			searchTerm = "\"Blogs Entry Title\"");
+		for (var searchTerm : list ""Blogs1","Blogs Entry Title1"") {
+			Navigator.gotoPage(pageName = "Search Page");
 
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs1\"");
+			SearchPortlets.searchEmbedded(searchTerm = "${searchTerm}");
 
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "\"Blogs1\"");
-
-		SearchPortlets.searchEmbedded(searchTerm = "\"Blogs Entry Title1\"");
-
-		SearchResultPortlet.viewNoSearchResults(searchTerm = "\"Blogs Entry Title1\"");
+			SearchResultPortlet.viewNoSearchResults(searchTerm = "${searchTerm}");
+		}
 	}
 
 	@description = "This checks that a blog comment can be subscribed to."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanSubscribeToComment {
 		property test.name.skip.portal.instance = "BlogsPage#CanSubscribeToComment";
-		property testray.component.names = "Comment";
 
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
@@ -444,7 +434,7 @@ definition {
 	}
 
 	@description = "This is a usecase for LPS-82025"
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test CanUpdateFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
@@ -499,7 +489,7 @@ definition {
 	}
 
 	@description = "This checks that the default abstract (appends to 400 characters) can display properly in the UI."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewAbstractDisplayingFirst400Characters {
 		property test.name.skip.portal.instance = "BlogsPage#CanViewAbstractDisplayingFirst400Characters";
@@ -514,12 +504,12 @@ definition {
 		Navigator.gotoPage(pageName = "Blogs Page");
 
 		BlogsEntry.viewAbstractDisplay(
-			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares...",
+			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares represent...",
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
 
 		BlogsNavigator.gotoEntryWithAbstractPG(
-			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares...",
+			entryAbstractDescription = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares represent...",
 			entryTitle = "Blogs Entry Title");
 
 		BlogsEntry.viewEntryPG(
@@ -527,19 +517,19 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test CanViewEntriesOnMultiplePagesWithDifferentScopes {
 		property test.name.skip.portal.instance = "BlogsPage#CanViewEntriesOnMultiplePagesWithDifferentScopes";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Blogs Page2");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Blogs Page2",
 			widgetName = "Blogs");
@@ -563,7 +553,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoScopedPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Blogs",
 			scope = "Blogs Page2");
 
@@ -597,7 +587,7 @@ definition {
 
 		BlogsNavigator.gotoConfigurationScopePG();
 
-		BlogsConfiguration.viewScopeSelection(scopeSelection = ${siteName});
+		BlogsConfiguration.viewScopeSelection(scopeSelection = "${siteName}");
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
@@ -615,55 +605,8 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@description = "This is a test for LPS-94990. It checks that a blog entry can be viewed when using a display page template."
-	@priority = 5
-	test CanViewEntryUsingDisplayPageTemplate {
-		JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
-			contentType = "Web Content Article",
-			displayPageTemplateEntryName = "Display Page Template Name",
-			groupName = "Guest",
-			subType = "Basic Web Content");
-
-		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "guest");
-
-		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Template Name");
-
-		PageEditor.addWidget(portletName = "Blogs");
-
-		PageEditor.addWidget(
-			portletName = "Asset Publisher",
-			targetFragmentName = "Blogs");
-
-		PageEditor.publish();
-
-		JSONBlog.addEntry(
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title");
-
-		JSONWebcontent.addWebContent(
-			content = "Web Content Content",
-			groupName = "Guest",
-			title = "Web Content Title");
-
-		DisplayPageTemplate.selectDisplayPageTemplateForAsset(
-			assetType = "Web Content",
-			entryTitle = "Web Content Title",
-			groupName = "Guest",
-			pageName = "Display Page Template Name",
-			siteURLKey = "guest");
-
-		Navigator.openWithAppendToBaseURL(urlAppend = "web/guest/w/web-content-title");
-
-		BlogsEntry.viewEntryViaAPPG(
-			assetTitle = "Blogs Entry Title",
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title");
-
-		AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
-	}
-
 	@description = "This test checks that blog entry can be added with special charaters."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewEntryWithSpecialCharacters {
 		BlogsNavigator.openToAddEntry(
@@ -688,9 +631,10 @@ definition {
 	}
 
 	@description = "Basic test that ensures reading time displays when enabled."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewReadingTime {
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "BlogsPage#CanViewReadingTime";
 
 		BlogsConfiguration.enableReadingTime();
@@ -713,7 +657,7 @@ definition {
 	}
 
 	@description = "This is a usecase for LPS-66970. It checks that both the old and new blog URLs lead to the current entry."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test ViewBlogEntryViaEditedCustomURL {
 		JSONBlog.addEntry(
@@ -755,8 +699,8 @@ definition {
 	}
 
 	@description = "View the related assets in Blogs."
-	@e2etest
-	@priority = 4
+	@priority = "4"
+	@uitest
 	test ViewRelatedAssetsInBlogs {
 		task ("Add the first blogs entry") {
 			JSONBlog.addEntry(
@@ -793,19 +737,19 @@ definition {
 
 			AssertElementPresent(
 				locator1 = "Relatedassets#ASSET_ENTRY_STICKER",
-				rowNumber = 1);
+				rowNumber = "1");
 
 			AssertElementNotPresent(
 				locator1 = "Relatedassets#ASSET_ENTRY_STICKER",
-				rowNumber = 2);
+				rowNumber = "2");
 
 			AssertElementNotPresent(
 				locator1 = "Relatedassets#ASSET_TITLE",
-				rowNumber = 2);
+				rowNumber = "2");
 
 			AssertElementNotPresent(
 				locator1 = "Relatedassets#ASSET_EDIT",
-				rowNumber = 2);
+				rowNumber = "2");
 
 			Navigator.gotoPage(pageName = "Blogs Page");
 
@@ -824,38 +768,20 @@ definition {
 
 			AssertElementPresent(
 				locator1 = "Relatedassets#ASSET_ENTRY_STICKER",
-				rowNumber = 1);
+				rowNumber = "1");
 
 			AssertElementNotPresent(
 				locator1 = "Relatedassets#ASSET_ENTRY_STICKER",
-				rowNumber = 2);
+				rowNumber = "2");
 
 			AssertElementNotPresent(
 				locator1 = "Relatedassets#ASSET_TITLE",
-				rowNumber = 2);
+				rowNumber = "2");
 
 			AssertElementNotPresent(
 				locator1 = "Relatedassets#ASSET_EDIT",
-				rowNumber = 2);
+				rowNumber = "2");
 		}
-	}
-
-	@description = "This test checks that the javascript in the user name will not be executed when viewing an entry on page."
-	@priority = 3
-	test XSSIsNotExecutedWhenViewingUsernameInBlog {
-		Navigator.openURL();
-
-		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
-
-		User.editUserInformation(userLastNameEdit = '''Test<script>alert('hello!')</script>''');
-
-		Navigator.gotoPage(pageName = "Blogs Page");
-
-		Blogs.addEntry(
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title");
-
-		AssertAlertNotPresent();
 	}
 
 }

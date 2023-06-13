@@ -17,22 +17,18 @@ package com.liferay.headless.delivery.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.delivery.client.dto.v1_0.SitePage;
 import com.liferay.headless.delivery.client.pagination.Page;
-import com.liferay.headless.delivery.client.problem.Problem;
-import com.liferay.layout.importer.LayoutsImporter;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporter;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureRelLocalService;
-import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.layout.util.structure.LayoutStructure;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -41,13 +37,11 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.odata.entity.EntityField;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.segments.constants.SegmentsEntryConstants;
-import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsEntryLocalService;
@@ -55,9 +49,7 @@ import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.io.InputStream;
 
-import java.net.URLEncoder;
-
-import java.util.Collection;
+import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -73,7 +65,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	@Override
 	@Test
 	public void testGetSiteSitePage() throws Exception {
-		Layout layout = _addLayout(testGroup);
+		Layout layout = _addLayout(testGroup.getGroupId());
 
 		String friendlyURL = layout.getFriendlyURL();
 
@@ -83,30 +75,20 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		Assert.assertNotNull(sitePage);
 		Assert.assertEquals(
 			layout.getName(LocaleUtil.getDefault()), sitePage.getTitle());
-
-		try {
-			sitePageResource.getSiteSitePage(
-				testGroup.getGroupId(), URLEncoder.encode("aaa/bbb"));
-
-			Assert.fail();
-		}
-		catch (Problem.ProblemException problemException) {
-			Assert.assertNotNull(problemException);
-		}
 	}
 
 	@Override
 	@Test
 	public void testGetSiteSitePageExperienceExperienceKey() throws Exception {
 		Layout layout = _addLayout(
-			testGroup, true, RandomTestUtil.randomString());
+			testGroup.getGroupId(), true, RandomTestUtil.randomString());
 
 		String friendlyURL = layout.getFriendlyURL();
 
 		SitePage sitePage =
 			sitePageResource.getSiteSitePageExperienceExperienceKey(
 				testGroup.getGroupId(), friendlyURL.substring(1),
-				SegmentsExperienceConstants.KEY_DEFAULT);
+				String.valueOf(SegmentsEntryConstants.ID_DEFAULT));
 
 		Assert.assertNotNull(sitePage);
 		Assert.assertNotNull(sitePage.getExperience());
@@ -118,41 +100,34 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		throws Exception {
 
 		Layout layout = _addLayout(
-			testGroup, true, RandomTestUtil.randomString());
+			testGroup.getGroupId(), true, RandomTestUtil.randomString());
 
 		String friendlyURL = layout.getFriendlyURL();
 		SegmentsExperience segmentsExperience = _addSegmentsExperience(
 			layout,
 			ServiceContextTestUtil.getServiceContext(testGroup.getGroupId()));
 
-		Assert.assertNotNull(
+		String siteSitePageExperienceExperienceKeyRenderedPage =
 			sitePageResource.getSiteSitePageExperienceExperienceKeyRenderedPage(
 				testGroup.getGroupId(), friendlyURL.substring(1),
-				segmentsExperience.getSegmentsExperienceKey()));
-	}
+				segmentsExperience.getSegmentsExperienceKey());
 
-	@Override
-	@Test
-	public void testGetSiteSitePageRenderedPage() throws Exception {
-		Layout layout = _addLayout(testGroup);
-
-		String friendlyURL = layout.getFriendlyURL();
-
-		Assert.assertNotNull(
-			sitePageResource.getSiteSitePageRenderedPage(
-				testGroup.getGroupId(), friendlyURL.substring(1)));
+		Assert.assertNotNull(siteSitePageExperienceExperienceKeyRenderedPage);
 	}
 
 	@Ignore
 	@Override
 	@Test
-	public void testGetSiteSitePagesExperiencesPage() throws Exception {
-		Layout layout = _addLayout(testGroup);
+	public void testGetSiteSitePageFriendlyUrlPathExperiencesPage()
+		throws Exception {
+
+		Layout layout = _addLayout(testGroup.getGroupId());
 
 		String friendlyURL = layout.getFriendlyURL();
 
-		Page<SitePage> page = sitePageResource.getSiteSitePagesExperiencesPage(
-			testGroup.getGroupId(), friendlyURL.substring(1));
+		Page<SitePage> page =
+			sitePageResource.getSiteSitePageFriendlyUrlPathExperiencesPage(
+				testGroup.getGroupId(), friendlyURL.substring(1));
 
 		long originalPageCount = page.getTotalCount();
 
@@ -160,10 +135,24 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			layout,
 			ServiceContextTestUtil.getServiceContext(testGroup.getGroupId()));
 
-		page = sitePageResource.getSiteSitePagesExperiencesPage(
+		page = sitePageResource.getSiteSitePageFriendlyUrlPathExperiencesPage(
 			testGroup.getGroupId(), friendlyURL.substring(1));
 
 		Assert.assertEquals(originalPageCount + 1, page.getTotalCount());
+	}
+
+	@Override
+	@Test
+	public void testGetSiteSitePageRenderedPage() throws Exception {
+		Layout layout = _addLayout(testGroup.getGroupId());
+
+		String friendlyURL = layout.getFriendlyURL();
+
+		String siteSitePageRenderedPage =
+			sitePageResource.getSiteSitePageRenderedPage(
+				testGroup.getGroupId(), friendlyURL.substring(1));
+
+		Assert.assertNotNull(siteSitePageRenderedPage);
 	}
 
 	@Override
@@ -182,7 +171,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	public void testGraphQLGetSiteSitePagesPage() throws Exception {
 		Long siteId = testGetSiteSitePagesPage_getSiteId();
 
-		_addLayout(_groupLocalService.fetchGroup(siteId));
+		_addLayout(siteId);
 
 		BaseSitePageResourceTestCase.GraphQLField graphQLField =
 			new BaseSitePageResourceTestCase.GraphQLField(
@@ -206,52 +195,56 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {"friendlyUrlPath", "title"};
+		return new String[] {"title"};
 	}
 
 	@Override
-	protected Collection<EntityField> getEntityFields() throws Exception {
-		return super.getEntityFields();
-	}
-
-	@Override
-	protected SitePage randomSitePage() {
-		return new SitePage() {
-			{
-				dateCreated = RandomTestUtil.nextDate();
-				dateModified = RandomTestUtil.nextDate();
-				datePublished = RandomTestUtil.nextDate();
-				friendlyUrlPath =
-					StringPool.FORWARD_SLASH +
-						StringUtil.toLowerCase(RandomTestUtil.randomString());
-				id = RandomTestUtil.randomLong();
-				pageType = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				siteId = testGroup.getGroupId();
-				title = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				uuid = StringUtil.toLowerCase(RandomTestUtil.randomString());
-			}
-		};
-	}
-
-	@Override
-	protected String
-			testGraphQLGetSiteSitePageExperienceExperienceKey_getExperienceKey()
+	protected SitePage testGetSiteSitePagesPage_addSitePage(
+			Long siteId, SitePage sitePage)
 		throws Exception {
 
-		return SegmentsEntryConstants.KEY_DEFAULT;
+		Layout layout = _addLayout(siteId, false, sitePage.getTitle());
+
+		sitePage.setDateCreated(layout.getCreateDate());
+		sitePage.setDateModified(layout.getModifiedDate());
+		sitePage.setDatePublished(layout.getPublishDate());
+
+		String friendlyURL = layout.getFriendlyURL();
+
+		sitePage.setFriendlyUrlPath(friendlyURL.substring(1));
+
+		sitePage.setSiteId(siteId);
+		sitePage.setUuid(layout.getUuid());
+
+		return sitePage;
 	}
 
-	private Layout _addLayout(Group group) throws Exception {
-		return _addLayout(group, false, RandomTestUtil.randomString());
+	private Layout _addLayout(long groupId) throws Exception {
+		return _addLayout(groupId, false, RandomTestUtil.randomString());
 	}
 
 	private Layout _addLayout(
-			Group group, boolean importPageDefinition, String title)
+			long groupId, boolean importPageDefinition, String title)
 		throws Exception {
 
-		Layout layout = LayoutTestUtil.addTypeContentPublishedLayout(
-			group, title, WorkflowConstants.STATUS_APPROVED);
+		Layout layout = _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), groupId, false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			HashMapBuilder.put(
+				LocaleUtil.getSiteDefault(), title
+			).build(),
+			RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(),
+			RandomTestUtil.randomLocaleStringMap(),
+			LayoutConstants.TYPE_CONTENT,
+			UnicodePropertiesBuilder.create(
+				true
+			).put(
+				"published", Boolean.TRUE.toString()
+			).buildString(),
+			false, new HashMap<>(),
+			ServiceContextTestUtil.getServiceContext(groupId));
 
 		if (importPageDefinition) {
 			String name = PrincipalThreadLocal.getName();
@@ -259,22 +252,23 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			try {
 				PrincipalThreadLocal.setName(TestPropsValues.getUserId());
 
-				ServiceContextThreadLocal.pushServiceContext(
+				ServiceContext serviceContext =
 					ServiceContextTestUtil.getServiceContext(
-						testGroup.getGroupId()));
+						testGroup.getGroupId());
+
+				ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 				LayoutPageTemplateStructure layoutPageTemplateStructure =
 					_layoutPageTemplateStructureLocalService.
 						fetchLayoutPageTemplateStructure(
-							testGroup.getGroupId(), layout.getPlid());
+							testGroup.getGroupId(), layout.getPlid(), true);
 
 				LayoutStructure layoutStructure = LayoutStructure.of(
-					layoutPageTemplateStructure.
-						getDefaultSegmentsExperienceData());
+					layoutPageTemplateStructure.getData(0));
 
 				layoutStructure.addRootLayoutStructureItem();
 
-				_layoutsImporter.importPageElement(
+				_layoutPageTemplatesImporter.importPageElement(
 					layout, layoutStructure, layoutStructure.getMainItemId(),
 					_read("test-page-element.json"), 0);
 			}
@@ -302,12 +296,13 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 
 		SegmentsExperience segmentsExperience =
 			_segmentsExperienceLocalService.addSegmentsExperience(
-				TestPropsValues.getUserId(), layout.getGroupId(),
-				segmentsEntry.getSegmentsEntryId(), layout.getPlid(),
+				segmentsEntry.getSegmentsEntryId(),
+				_portal.getClassNameId(Layout.class.getName()),
+				layout.getPlid(),
 				HashMapBuilder.put(
 					LocaleUtil.getDefault(), RandomTestUtil.randomString()
 				).build(),
-				true, new UnicodeProperties(true), serviceContext);
+				true, serviceContext);
 
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			_layoutPageTemplateStructureLocalService.
@@ -319,8 +314,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 				fetchLayoutPageTemplateStructureRel(
 					layoutPageTemplateStructure.
 						getLayoutPageTemplateStructureId(),
-					_segmentsExperienceLocalService.
-						fetchDefaultSegmentsExperienceId(layout.getPlid()));
+					SegmentsEntryConstants.ID_DEFAULT);
 
 		layoutPageTemplateStructureRel.setSegmentsExperienceId(
 			segmentsExperience.getSegmentsExperienceId());
@@ -342,10 +336,10 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 	}
 
 	@Inject
-	private GroupLocalService _groupLocalService;
+	private LayoutLocalService _layoutLocalService;
 
 	@Inject
-	private LayoutLocalService _layoutLocalService;
+	private LayoutPageTemplatesImporter _layoutPageTemplatesImporter;
 
 	@Inject
 	private LayoutPageTemplateStructureLocalService
@@ -356,7 +350,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_layoutPageTemplateStructureRelLocalService;
 
 	@Inject
-	private LayoutsImporter _layoutsImporter;
+	private Portal _portal;
 
 	@Inject
 	private SegmentsEntryLocalService _segmentsEntryLocalService;

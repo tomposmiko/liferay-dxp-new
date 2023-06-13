@@ -20,10 +20,8 @@ import com.liferay.commerce.shop.by.diagram.model.CSDiagramSettingTable;
 import com.liferay.commerce.shop.by.diagram.model.impl.CSDiagramSettingImpl;
 import com.liferay.commerce.shop.by.diagram.model.impl.CSDiagramSettingModelImpl;
 import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramSettingPersistence;
-import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramSettingUtil;
 import com.liferay.commerce.shop.by.diagram.service.persistence.impl.constants.CommercePersistenceConstants;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -38,7 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -47,20 +45,14 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -83,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(service = CSDiagramSettingPersistence.class)
+@Component(service = {CSDiagramSettingPersistence.class, BasePersistence.class})
 public class CSDiagramSettingPersistenceImpl
 	extends BasePersistenceImpl<CSDiagramSetting>
 	implements CSDiagramSettingPersistence {
@@ -180,30 +172,27 @@ public class CSDiagramSettingPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
-
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache && productionMode) {
+			if (useFinderCache) {
 				finderPath = _finderPathWithoutPaginationFindByUuid;
 				finderArgs = new Object[] {uuid};
 			}
 		}
-		else if (useFinderCache && productionMode) {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUuid;
 			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<CSDiagramSetting> list = null;
 
-		if (useFinderCache && productionMode) {
+		if (useFinderCache) {
 			list = (List<CSDiagramSetting>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CSDiagramSetting csDiagramSetting : list) {
@@ -268,7 +257,7 @@ public class CSDiagramSettingPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache && productionMode) {
+				if (useFinderCache) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -584,21 +573,11 @@ public class CSDiagramSettingPersistenceImpl
 	public int countByUuid(String uuid) {
 		uuid = Objects.toString(uuid, "");
 
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
+		FinderPath finderPath = _finderPathCountByUuid;
 
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
+		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = null;
-
-		if (productionMode) {
-			finderPath = _finderPathCountByUuid;
-
-			finderArgs = new Object[] {uuid};
-
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-		}
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -633,9 +612,7 @@ public class CSDiagramSettingPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				if (productionMode) {
-					finderCache.putResult(finderPath, finderArgs, count);
-				}
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -737,21 +714,18 @@ public class CSDiagramSettingPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
-
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache && productionMode) {
+			if (useFinderCache) {
 				finderPath = _finderPathWithoutPaginationFindByUuid_C;
 				finderArgs = new Object[] {uuid, companyId};
 			}
 		}
-		else if (useFinderCache && productionMode) {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
 				uuid, companyId, start, end, orderByComparator
@@ -760,9 +734,9 @@ public class CSDiagramSettingPersistenceImpl
 
 		List<CSDiagramSetting> list = null;
 
-		if (useFinderCache && productionMode) {
+		if (useFinderCache) {
 			list = (List<CSDiagramSetting>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CSDiagramSetting csDiagramSetting : list) {
@@ -833,7 +807,7 @@ public class CSDiagramSettingPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache && productionMode) {
+				if (useFinderCache) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -1175,21 +1149,11 @@ public class CSDiagramSettingPersistenceImpl
 	public int countByUuid_C(String uuid, long companyId) {
 		uuid = Objects.toString(uuid, "");
 
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
+		FinderPath finderPath = _finderPathCountByUuid_C;
 
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
+		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = null;
-
-		if (productionMode) {
-			finderPath = _finderPathCountByUuid_C;
-
-			finderArgs = new Object[] {uuid, companyId};
-
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-		}
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1228,9 +1192,7 @@ public class CSDiagramSettingPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				if (productionMode) {
-					finderCache.putResult(finderPath, finderArgs, count);
-				}
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -1311,20 +1273,17 @@ public class CSDiagramSettingPersistenceImpl
 	public CSDiagramSetting fetchByCPDefinitionId(
 		long CPDefinitionId, boolean useFinderCache) {
 
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
-
 		Object[] finderArgs = null;
 
-		if (useFinderCache && productionMode) {
+		if (useFinderCache) {
 			finderArgs = new Object[] {CPDefinitionId};
 		}
 
 		Object result = null;
 
-		if (useFinderCache && productionMode) {
+		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByCPDefinitionId, finderArgs, this);
+				_finderPathFetchByCPDefinitionId, finderArgs);
 		}
 
 		if (result instanceof CSDiagramSetting) {
@@ -1358,7 +1317,7 @@ public class CSDiagramSettingPersistenceImpl
 				List<CSDiagramSetting> list = query.list();
 
 				if (list.isEmpty()) {
-					if (useFinderCache && productionMode) {
+					if (useFinderCache) {
 						finderCache.putResult(
 							_finderPathFetchByCPDefinitionId, finderArgs, list);
 					}
@@ -1411,21 +1370,11 @@ public class CSDiagramSettingPersistenceImpl
 	 */
 	@Override
 	public int countByCPDefinitionId(long CPDefinitionId) {
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
+		FinderPath finderPath = _finderPathCountByCPDefinitionId;
 
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
+		Object[] finderArgs = new Object[] {CPDefinitionId};
 
-		Long count = null;
-
-		if (productionMode) {
-			finderPath = _finderPathCountByCPDefinitionId;
-
-			finderArgs = new Object[] {CPDefinitionId};
-
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-		}
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1449,9 +1398,7 @@ public class CSDiagramSettingPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				if (productionMode) {
-					finderCache.putResult(finderPath, finderArgs, count);
-				}
+				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -1490,10 +1437,6 @@ public class CSDiagramSettingPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(CSDiagramSetting csDiagramSetting) {
-		if (csDiagramSetting.getCtCollectionId() != 0) {
-			return;
-		}
-
 		entityCache.putResult(
 			CSDiagramSettingImpl.class, csDiagramSetting.getPrimaryKey(),
 			csDiagramSetting);
@@ -1522,10 +1465,6 @@ public class CSDiagramSettingPersistenceImpl
 		}
 
 		for (CSDiagramSetting csDiagramSetting : csDiagramSettings) {
-			if (csDiagramSetting.getCtCollectionId() != 0) {
-				continue;
-			}
-
 			if (entityCache.getResult(
 					CSDiagramSettingImpl.class,
 					csDiagramSetting.getPrimaryKey()) == null) {
@@ -1604,7 +1543,7 @@ public class CSDiagramSettingPersistenceImpl
 		csDiagramSetting.setNew(true);
 		csDiagramSetting.setPrimaryKey(CSDiagramSettingId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		csDiagramSetting.setUuid(uuid);
 
@@ -1681,9 +1620,7 @@ public class CSDiagramSettingPersistenceImpl
 					csDiagramSetting.getPrimaryKeyObj());
 			}
 
-			if ((csDiagramSetting != null) &&
-				ctPersistenceHelper.isRemove(csDiagramSetting)) {
-
+			if (csDiagramSetting != null) {
 				session.delete(csDiagramSetting);
 			}
 		}
@@ -1726,7 +1663,7 @@ public class CSDiagramSettingPersistenceImpl
 			(CSDiagramSettingModelImpl)csDiagramSetting;
 
 		if (Validator.isNull(csDiagramSetting.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			csDiagramSetting.setUuid(uuid);
 		}
@@ -1761,13 +1698,7 @@ public class CSDiagramSettingPersistenceImpl
 		try {
 			session = openSession();
 
-			if (ctPersistenceHelper.isInsert(csDiagramSetting)) {
-				if (!isNew) {
-					session.evict(
-						CSDiagramSettingImpl.class,
-						csDiagramSetting.getPrimaryKeyObj());
-				}
-
+			if (isNew) {
 				session.save(csDiagramSetting);
 			}
 			else {
@@ -1780,16 +1711,6 @@ public class CSDiagramSettingPersistenceImpl
 		}
 		finally {
 			closeSession(session);
-		}
-
-		if (csDiagramSetting.getCtCollectionId() != 0) {
-			if (isNew) {
-				csDiagramSetting.setNew(false);
-			}
-
-			csDiagramSetting.resetOriginalValues();
-
-			return csDiagramSetting;
 		}
 
 		entityCache.putResult(
@@ -1848,143 +1769,12 @@ public class CSDiagramSettingPersistenceImpl
 	/**
 	 * Returns the cs diagram setting with the primary key or returns <code>null</code> if it could not be found.
 	 *
-	 * @param primaryKey the primary key of the cs diagram setting
-	 * @return the cs diagram setting, or <code>null</code> if a cs diagram setting with the primary key could not be found
-	 */
-	@Override
-	public CSDiagramSetting fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				CSDiagramSetting.class, primaryKey)) {
-
-			return super.fetchByPrimaryKey(primaryKey);
-		}
-
-		CSDiagramSetting csDiagramSetting = null;
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			csDiagramSetting = (CSDiagramSetting)session.get(
-				CSDiagramSettingImpl.class, primaryKey);
-
-			if (csDiagramSetting != null) {
-				cacheResult(csDiagramSetting);
-			}
-		}
-		catch (Exception exception) {
-			throw processException(exception);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return csDiagramSetting;
-	}
-
-	/**
-	 * Returns the cs diagram setting with the primary key or returns <code>null</code> if it could not be found.
-	 *
 	 * @param CSDiagramSettingId the primary key of the cs diagram setting
 	 * @return the cs diagram setting, or <code>null</code> if a cs diagram setting with the primary key could not be found
 	 */
 	@Override
 	public CSDiagramSetting fetchByPrimaryKey(long CSDiagramSettingId) {
 		return fetchByPrimaryKey((Serializable)CSDiagramSettingId);
-	}
-
-	@Override
-	public Map<Serializable, CSDiagramSetting> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		if (ctPersistenceHelper.isProductionMode(CSDiagramSetting.class)) {
-			return super.fetchByPrimaryKeys(primaryKeys);
-		}
-
-		if (primaryKeys.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		Map<Serializable, CSDiagramSetting> map =
-			new HashMap<Serializable, CSDiagramSetting>();
-
-		if (primaryKeys.size() == 1) {
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			Serializable primaryKey = iterator.next();
-
-			CSDiagramSetting csDiagramSetting = fetchByPrimaryKey(primaryKey);
-
-			if (csDiagramSetting != null) {
-				map.put(primaryKey, csDiagramSetting);
-			}
-
-			return map;
-		}
-
-		if ((databaseInMaxParameters > 0) &&
-			(primaryKeys.size() > databaseInMaxParameters)) {
-
-			Iterator<Serializable> iterator = primaryKeys.iterator();
-
-			while (iterator.hasNext()) {
-				Set<Serializable> page = new HashSet<>();
-
-				for (int i = 0;
-					 (i < databaseInMaxParameters) && iterator.hasNext(); i++) {
-
-					page.add(iterator.next());
-				}
-
-				map.putAll(fetchByPrimaryKeys(page));
-			}
-
-			return map;
-		}
-
-		StringBundler sb = new StringBundler((primaryKeys.size() * 2) + 1);
-
-		sb.append(getSelectSQL());
-		sb.append(" WHERE ");
-		sb.append(getPKDBName());
-		sb.append(" IN (");
-
-		for (Serializable primaryKey : primaryKeys) {
-			sb.append((long)primaryKey);
-
-			sb.append(",");
-		}
-
-		sb.setIndex(sb.index() - 1);
-
-		sb.append(")");
-
-		String sql = sb.toString();
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			Query query = session.createQuery(sql);
-
-			for (CSDiagramSetting csDiagramSetting :
-					(List<CSDiagramSetting>)query.list()) {
-
-				map.put(csDiagramSetting.getPrimaryKeyObj(), csDiagramSetting);
-
-				cacheResult(csDiagramSetting);
-			}
-		}
-		catch (Exception exception) {
-			throw processException(exception);
-		}
-		finally {
-			closeSession(session);
-		}
-
-		return map;
 	}
 
 	/**
@@ -2052,30 +1842,27 @@ public class CSDiagramSettingPersistenceImpl
 		OrderByComparator<CSDiagramSetting> orderByComparator,
 		boolean useFinderCache) {
 
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
-
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache && productionMode) {
+			if (useFinderCache) {
 				finderPath = _finderPathWithoutPaginationFindAll;
 				finderArgs = FINDER_ARGS_EMPTY;
 			}
 		}
-		else if (useFinderCache && productionMode) {
+		else if (useFinderCache) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<CSDiagramSetting> list = null;
 
-		if (useFinderCache && productionMode) {
+		if (useFinderCache) {
 			list = (List<CSDiagramSetting>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2111,7 +1898,7 @@ public class CSDiagramSettingPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache && productionMode) {
+				if (useFinderCache) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -2144,15 +1931,8 @@ public class CSDiagramSettingPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			CSDiagramSetting.class);
-
-		Long count = null;
-
-		if (productionMode) {
-			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
-		}
+		Long count = (Long)finderCache.getResult(
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2164,10 +1944,8 @@ public class CSDiagramSettingPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				if (productionMode) {
-					finderCache.putResult(
-						_finderPathCountAll, FINDER_ARGS_EMPTY, count);
-				}
+				finderCache.putResult(
+					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -2201,71 +1979,8 @@ public class CSDiagramSettingPersistenceImpl
 	}
 
 	@Override
-	public Set<String> getCTColumnNames(
-		CTColumnResolutionType ctColumnResolutionType) {
-
-		return _ctColumnNamesMap.getOrDefault(
-			ctColumnResolutionType, Collections.emptySet());
-	}
-
-	@Override
-	public List<String> getMappingTableNames() {
-		return _mappingTableNames;
-	}
-
-	@Override
-	public Map<String, Integer> getTableColumnsMap() {
+	protected Map<String, Integer> getTableColumnsMap() {
 		return CSDiagramSettingModelImpl.TABLE_COLUMNS_MAP;
-	}
-
-	@Override
-	public String getTableName() {
-		return "CSDiagramSetting";
-	}
-
-	@Override
-	public List<String[]> getUniqueIndexColumnNames() {
-		return _uniqueIndexColumnNames;
-	}
-
-	private static final Map<CTColumnResolutionType, Set<String>>
-		_ctColumnNamesMap = new EnumMap<CTColumnResolutionType, Set<String>>(
-			CTColumnResolutionType.class);
-	private static final List<String> _mappingTableNames =
-		new ArrayList<String>();
-	private static final List<String[]> _uniqueIndexColumnNames =
-		new ArrayList<String[]>();
-
-	static {
-		Set<String> ctControlColumnNames = new HashSet<String>();
-		Set<String> ctIgnoreColumnNames = new HashSet<String>();
-		Set<String> ctStrictColumnNames = new HashSet<String>();
-
-		ctControlColumnNames.add("mvccVersion");
-		ctControlColumnNames.add("ctCollectionId");
-		ctStrictColumnNames.add("uuid_");
-		ctStrictColumnNames.add("companyId");
-		ctStrictColumnNames.add("userId");
-		ctStrictColumnNames.add("userName");
-		ctStrictColumnNames.add("createDate");
-		ctIgnoreColumnNames.add("modifiedDate");
-		ctStrictColumnNames.add("CPAttachmentFileEntryId");
-		ctStrictColumnNames.add("CPDefinitionId");
-		ctStrictColumnNames.add("color");
-		ctStrictColumnNames.add("radius");
-		ctStrictColumnNames.add("type_");
-
-		_ctColumnNamesMap.put(
-			CTColumnResolutionType.CONTROL, ctControlColumnNames);
-		_ctColumnNamesMap.put(
-			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
-		_ctColumnNamesMap.put(
-			CTColumnResolutionType.PK,
-			Collections.singleton("CSDiagramSettingId"));
-		_ctColumnNamesMap.put(
-			CTColumnResolutionType.STRICT, ctStrictColumnNames);
-
-		_uniqueIndexColumnNames.add(new String[] {"CPDefinitionId"});
 	}
 
 	/**
@@ -2334,31 +2049,11 @@ public class CSDiagramSettingPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCPDefinitionId",
 			new String[] {Long.class.getName()},
 			new String[] {"CPDefinitionId"}, false);
-
-		_setCSDiagramSettingUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCSDiagramSettingUtilPersistence(null);
-
 		entityCache.removeCache(CSDiagramSettingImpl.class.getName());
-	}
-
-	private void _setCSDiagramSettingUtilPersistence(
-		CSDiagramSettingPersistence csDiagramSettingPersistence) {
-
-		try {
-			Field field = CSDiagramSettingUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, csDiagramSettingPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2386,9 +2081,6 @@ public class CSDiagramSettingPersistenceImpl
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		super.setSessionFactory(sessionFactory);
 	}
-
-	@Reference
-	protected CTPersistenceHelper ctPersistenceHelper;
 
 	@Reference
 	protected EntityCache entityCache;
@@ -2428,6 +2120,7 @@ public class CSDiagramSettingPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private CSDiagramSettingModelArgumentsResolver
+		_csDiagramSettingModelArgumentsResolver;
 
 }

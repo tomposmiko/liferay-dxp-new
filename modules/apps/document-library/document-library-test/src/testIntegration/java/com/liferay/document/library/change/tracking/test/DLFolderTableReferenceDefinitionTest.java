@@ -60,17 +60,15 @@ public class DLFolderTableReferenceDefinitionTest
 			ServiceContextTestUtil.getServiceContext(group.getGroupId());
 
 		DLFolder parentFolder = _dlFolderLocalService.addFolder(
-			null, group.getCreatorUserId(), group.getGroupId(),
-			group.getGroupId(), false,
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			group.getCreatorUserId(), group.getGroupId(), group.getGroupId(),
+			false, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(), false,
 			serviceContext);
 
 		DLFolder childFolder = _dlFolderLocalService.addFolder(
-			null, group.getCreatorUserId(), group.getGroupId(),
-			group.getGroupId(), false, parentFolder.getFolderId(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), false,
-			serviceContext);
+			group.getCreatorUserId(), group.getGroupId(), group.getGroupId(),
+			false, parentFolder.getFolderId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), false, serviceContext);
 
 		byte[] bytes = TestDataConstants.TEST_BYTE_ARRAY;
 
@@ -80,8 +78,7 @@ public class DLFolderTableReferenceDefinitionTest
 			null, childFolder.getUserId(), childFolder.getGroupId(),
 			childFolder.getRepositoryId(), childFolder.getFolderId(),
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK,
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT, null,
 			null, inputStream, bytes.length, null, null, serviceContext);
 

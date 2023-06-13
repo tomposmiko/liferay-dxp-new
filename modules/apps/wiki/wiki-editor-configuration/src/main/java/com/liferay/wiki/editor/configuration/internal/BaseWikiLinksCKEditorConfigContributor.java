@@ -32,6 +32,8 @@ import com.liferay.wiki.item.selector.criterion.WikiPageItemSelectorCriterion;
 import java.util.List;
 import java.util.Map;
 
+import javax.portlet.PortletURL;
+
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -77,16 +79,14 @@ public abstract class BaseWikiLinksCKEditorConfigContributor
 
 		if (nodeId != 0) {
 			itemSelectorCriteria.add(
-				0, _getWikiPageItemSelectorCriterion(nodeId));
+				0, getWikiPageItemSelectorCriterion(nodeId));
 		}
 
-		jsonObject.put(
-			"filebrowserBrowseUrl",
-			String.valueOf(
-				itemSelector.getItemSelectorURL(
-					requestBackedPortletURLFactory, itemSelectedEventName,
-					itemSelectorCriteria.toArray(
-						new ItemSelectorCriterion[0]))));
+		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, itemSelectedEventName,
+			itemSelectorCriteria.toArray(new ItemSelectorCriterion[0]));
+
+		jsonObject.put("filebrowserBrowseUrl", itemSelectorURL.toString());
 	}
 
 	protected abstract ItemSelectorReturnType getItemSelectorReturnType();
@@ -103,16 +103,7 @@ public abstract class BaseWikiLinksCKEditorConfigContributor
 		return itemSelectorCriterion;
 	}
 
-	@Reference
-	protected ItemSelector itemSelector;
-
-	@Reference(
-		target = "(item.selector.view.key=" + WikiItemSelectorViewConstants.ITEM_SELECTOR_VIEW_KEY + ")"
-	)
-	protected ItemSelectorViewReturnTypeProvider
-		itemSelectorViewReturnTypeProvider;
-
-	private ItemSelectorCriterion _getWikiPageItemSelectorCriterion(
+	protected ItemSelectorCriterion getWikiPageItemSelectorCriterion(
 		long nodeId) {
 
 		ItemSelectorCriterion itemSelectorCriterion =
@@ -124,5 +115,14 @@ public abstract class BaseWikiLinksCKEditorConfigContributor
 
 		return itemSelectorCriterion;
 	}
+
+	@Reference
+	protected ItemSelector itemSelector;
+
+	@Reference(
+		target = "(item.selector.view.key=" + WikiItemSelectorViewConstants.ITEM_SELECTOR_VIEW_KEY + ")"
+	)
+	protected ItemSelectorViewReturnTypeProvider
+		itemSelectorViewReturnTypeProvider;
 
 }

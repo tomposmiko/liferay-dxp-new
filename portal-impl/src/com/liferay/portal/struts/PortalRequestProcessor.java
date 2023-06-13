@@ -44,7 +44,7 @@ import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.struts.LastPath;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -469,7 +469,7 @@ public class PortalRequestProcessor {
 				}
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 
 			String fullPathWithoutQueryString = fullPath;
@@ -514,7 +514,7 @@ public class PortalRequestProcessor {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -546,17 +546,11 @@ public class PortalRequestProcessor {
 				if (lastPath == null) {
 					lastPath = new LastPath(
 						themeDisplay.getPathMain(), path,
-						HttpComponentsUtil.parameterMapToString(
+						HttpUtil.parameterMapToString(
 							httpServletRequest.getParameterMap()));
 				}
 
-				String lastPathPath = lastPath.getPath();
-
-				// Ignore files that end with .map. See LPS-141963.
-
-				if (!lastPathPath.endsWith(".map")) {
-					httpSession.setAttribute(WebKeys.LAST_PATH, lastPath);
-				}
+				httpSession.setAttribute(WebKeys.LAST_PATH, lastPath);
 			}
 		}
 
@@ -661,7 +655,7 @@ public class PortalRequestProcessor {
 						}
 					}
 					catch (Exception exception) {
-						_log.error(exception);
+						_log.error(exception, exception);
 
 						return _PATH_PORTAL_UPDATE_PASSWORD;
 					}
@@ -678,7 +672,7 @@ public class PortalRequestProcessor {
 
 				// Authenticated users should have a reminder query
 
-				if (!user.isGuestUser() && !user.isReminderQueryComplete()) {
+				if (!user.isDefaultUser() && !user.isReminderQueryComplete()) {
 					return _PATH_PORTAL_UPDATE_REMINDER_QUERY;
 				}
 			}
@@ -724,7 +718,7 @@ public class PortalRequestProcessor {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -790,7 +784,7 @@ public class PortalRequestProcessor {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				SessionErrors.add(

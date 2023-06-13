@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the depot entry group rel service. This utility wraps <code>com.liferay.depot.service.persistence.impl.DepotEntryGroupRelPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1491,9 +1495,29 @@ public class DepotEntryGroupRelUtil {
 	}
 
 	public static DepotEntryGroupRelPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile DepotEntryGroupRelPersistence _persistence;
+	private static ServiceTracker
+		<DepotEntryGroupRelPersistence, DepotEntryGroupRelPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			DepotEntryGroupRelPersistence.class);
+
+		ServiceTracker
+			<DepotEntryGroupRelPersistence, DepotEntryGroupRelPersistence>
+				serviceTracker =
+					new ServiceTracker
+						<DepotEntryGroupRelPersistence,
+						 DepotEntryGroupRelPersistence>(
+							 bundle.getBundleContext(),
+							 DepotEntryGroupRelPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

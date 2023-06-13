@@ -23,28 +23,25 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Pedro Queiroz
  */
-public class GridDDMFormFieldValueValidatorTest {
+@RunWith(PowerMockRunner.class)
+public class GridDDMFormFieldValueValidatorTest extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		_setUpGridDDMFormFieldValueValidator();
+	@Before
+	public void setUp() throws Exception {
+		setUpGridDDMFormFieldValueValidator();
 	}
 
 	@Test(expected = DDMFormFieldValueValidationException.class)
@@ -143,17 +140,17 @@ public class GridDDMFormFieldValueValidatorTest {
 			ddmFormField, ddmFormFieldValue.getValue());
 	}
 
-	private static void _setUpGridDDMFormFieldValueValidator()
-		throws Exception {
-
+	protected void setUpGridDDMFormFieldValueValidator() throws Exception {
 		_gridDDMFormFieldValueValidator = new GridDDMFormFieldValueValidator();
 
-		ReflectionTestUtil.setFieldValue(
-			_gridDDMFormFieldValueValidator, "jsonFactory",
-			new JSONFactoryImpl());
+		field(
+			GridDDMFormFieldValueValidator.class, "jsonFactory"
+		).set(
+			_gridDDMFormFieldValueValidator, _jsonFactory
+		);
 	}
 
-	private static GridDDMFormFieldValueValidator
-		_gridDDMFormFieldValueValidator;
+	private GridDDMFormFieldValueValidator _gridDDMFormFieldValueValidator;
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 }

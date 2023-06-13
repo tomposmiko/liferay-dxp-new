@@ -17,12 +17,12 @@ package com.liferay.data.engine.rest.internal.resource.v2_0;
 import com.liferay.data.engine.constants.DataActionKeys;
 import com.liferay.data.engine.model.DEDataListView;
 import com.liferay.data.engine.rest.dto.v2_0.DataRecord;
-import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeRegistry;
+import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeTracker;
 import com.liferay.data.engine.rest.internal.odata.entity.v2_0.DataRecordEntityModel;
 import com.liferay.data.engine.rest.internal.security.permission.resource.DataRecordCollectionModelResourcePermission;
 import com.liferay.data.engine.rest.internal.security.permission.resource.DataRecordModelResourcePermission;
 import com.liferay.data.engine.rest.internal.storage.DataRecordExporter;
-import com.liferay.data.engine.rest.internal.storage.DataStorageRegistry;
+import com.liferay.data.engine.rest.internal.storage.DataStorageTracker;
 import com.liferay.data.engine.rest.resource.v2_0.DataRecordResource;
 import com.liferay.data.engine.service.DEDataListViewLocalService;
 import com.liferay.data.engine.storage.DataStorage;
@@ -31,7 +31,7 @@ import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
 import com.liferay.dynamic.data.lists.service.DDLRecordLocalService;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalService;
@@ -44,10 +44,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
@@ -66,10 +67,13 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.StringEntityField;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
+import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.ArrayList;
@@ -94,7 +98,8 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = DataRecordResource.class
 )
 @CTAware
-public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
+public class DataRecordResourceImpl
+	extends BaseDataRecordResourceImpl implements EntityModelResource {
 
 	@Override
 	public void deleteDataRecord(Long dataRecordId) throws Exception {
@@ -146,7 +151,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 
 		if (pagination.getPageSize() > 250) {
 			throw new ValidationException(
-				_language.format(
+				LanguageUtil.format(
 					contextAcceptLanguage.getPreferredLocale(),
 					"page-size-is-greater-than-x", 250));
 		}
@@ -156,8 +161,8 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 			dataRecordCollectionId, DataActionKeys.EXPORT_DATA_RECORDS);
 
 		DataRecordExporter dataRecordExporter = new DataRecordExporter(
-			_dataDefinitionContentTypeRegistry, _ddlRecordSetLocalService,
-			_ddmFormFieldTypeServicesRegistry, _ddmStructureLayoutLocalService,
+			_dataDefinitionContentTypeTracker, _ddlRecordSetLocalService,
+			_ddmFormFieldTypeServicesTracker, _ddmStructureLayoutLocalService,
 			_spiDDMFormRuleConverter);
 
 		return dataRecordExporter.export(
@@ -176,7 +181,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 
 		if (pagination.getPageSize() > 250) {
 			throw new ValidationException(
-				_language.format(
+				LanguageUtil.format(
 					contextAcceptLanguage.getPreferredLocale(),
 					"page-size-is-greater-than-x", 250));
 		}
@@ -406,11 +411,11 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 		DEDataListView deDataListView =
 			_deDataListViewLocalService.getDEDataListView(dataListViewId);
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			deDataListView.getAppliedFilters());
 
 		String[] fieldNames = JSONUtil.toStringArray(
-			_jsonFactory.createJSONArray(deDataListView.getFieldNames()));
+			JSONFactoryUtil.createJSONArray(deDataListView.getFieldNames()));
 
 		for (String fieldName : fieldNames) {
 			JSONArray jsonArray = (JSONArray)jsonObject.get(fieldName);
@@ -452,7 +457,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 			throw new ValidationException("Data storage type is null");
 		}
 
-		DataStorage dataStorage = _dataStorageRegistry.getDataStorage(
+		DataStorage dataStorage = _dataStorageTracker.getDataStorage(
 			dataStorageType);
 
 		if (dataStorage == null) {
@@ -524,8 +529,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 	}
 
 	@Reference
-	private DataDefinitionContentTypeRegistry
-		_dataDefinitionContentTypeRegistry;
+	private DataDefinitionContentTypeTracker _dataDefinitionContentTypeTracker;
 
 	@Reference
 	private DataRecordCollectionModelResourcePermission
@@ -536,7 +540,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 		_dataRecordModelResourcePermission;
 
 	@Reference
-	private DataStorageRegistry _dataStorageRegistry;
+	private DataStorageTracker _dataStorageTracker;
 
 	@Reference
 	private DDLRecordLocalService _ddlRecordLocalService;
@@ -545,7 +549,7 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 	private DDLRecordSetLocalService _ddlRecordSetLocalService;
 
 	@Reference
-	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	private DDMIndexer _ddmIndexer;
@@ -563,16 +567,19 @@ public class DataRecordResourceImpl extends BaseDataRecordResourceImpl {
 	private DEDataListViewLocalService _deDataListViewLocalService;
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
 	private Language _language;
 
 	@Reference
 	private Portal _portal;
 
 	@Reference
+	private Queries _queries;
+
+	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+
+	@Reference
+	private Sorts _sorts;
 
 	@Reference
 	private SPIDDMFormRuleConverter _spiDDMFormRuleConverter;

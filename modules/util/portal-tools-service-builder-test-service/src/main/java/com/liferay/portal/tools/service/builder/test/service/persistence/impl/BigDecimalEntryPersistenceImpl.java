@@ -44,12 +44,10 @@ import com.liferay.portal.tools.service.builder.test.model.BigDecimalEntryTable;
 import com.liferay.portal.tools.service.builder.test.model.impl.BigDecimalEntryImpl;
 import com.liferay.portal.tools.service.builder.test.model.impl.BigDecimalEntryModelImpl;
 import com.liferay.portal.tools.service.builder.test.service.persistence.BigDecimalEntryPersistence;
-import com.liferay.portal.tools.service.builder.test.service.persistence.BigDecimalEntryUtil;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryPersistence;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.math.BigDecimal;
@@ -192,7 +190,7 @@ public class BigDecimalEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BigDecimalEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BigDecimalEntry bigDecimalEntry : list) {
@@ -585,7 +583,7 @@ public class BigDecimalEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {bigDecimalValue};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -731,7 +729,7 @@ public class BigDecimalEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BigDecimalEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BigDecimalEntry bigDecimalEntry : list) {
@@ -1124,7 +1122,7 @@ public class BigDecimalEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {bigDecimalValue};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1270,7 +1268,7 @@ public class BigDecimalEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BigDecimalEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BigDecimalEntry bigDecimalEntry : list) {
@@ -1663,7 +1661,7 @@ public class BigDecimalEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {bigDecimalValue};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2108,7 +2106,7 @@ public class BigDecimalEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BigDecimalEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2178,7 +2176,7 @@ public class BigDecimalEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2623,32 +2621,12 @@ public class BigDecimalEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByLtBigDecimalValue",
 			new String[] {BigDecimal.class.getName()},
 			new String[] {"bigDecimalValue"}, false);
-
-		_setBigDecimalEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setBigDecimalEntryUtilPersistence(null);
-
 		entityCache.removeCache(BigDecimalEntryImpl.class.getName());
 
 		TableMapperFactory.removeTableMapper("BigDecimalEntries_LVEntries");
-	}
-
-	private void _setBigDecimalEntryUtilPersistence(
-		BigDecimalEntryPersistence bigDecimalEntryPersistence) {
-
-		try {
-			Field field = BigDecimalEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, bigDecimalEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@ServiceReference(type = EntityCache.class)

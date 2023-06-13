@@ -385,11 +385,6 @@ public class AccountGroupRelWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected AccountGroupRelWrapper wrap(AccountGroupRel accountGroupRel) {
 		return new AccountGroupRelWrapper(accountGroupRel);
 	}

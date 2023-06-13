@@ -213,11 +213,6 @@ public class ResourceActionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected ResourceActionWrapper wrap(ResourceAction resourceAction) {
 		return new ResourceActionWrapper(resourceAction);
 	}

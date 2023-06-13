@@ -19,12 +19,11 @@ import com.liferay.dynamic.data.mapping.service.DDMFieldLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
+import com.liferay.journal.internal.upgrade.v4_0_0.util.JournalArticleTable;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.Portal;
 
 /**
@@ -82,13 +81,8 @@ public class JournalArticleDDMFieldsUpgradeProcess extends UpgradeProcess {
 					ddmStructure.getStructureId(), id, ddmFormValues);
 			},
 			null);
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns("JournalArticle", "content")
-		};
+		alter(JournalArticleTable.class, new AlterTableDropColumn("content"));
 	}
 
 	private final ClassNameLocalService _classNameLocalService;

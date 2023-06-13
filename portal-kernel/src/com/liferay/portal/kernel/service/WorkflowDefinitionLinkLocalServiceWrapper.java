@@ -29,10 +29,6 @@ public class WorkflowDefinitionLinkLocalServiceWrapper
 	implements ServiceWrapper<WorkflowDefinitionLinkLocalService>,
 			   WorkflowDefinitionLinkLocalService {
 
-	public WorkflowDefinitionLinkLocalServiceWrapper() {
-		this(null);
-	}
-
 	public WorkflowDefinitionLinkLocalServiceWrapper(
 		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
 

@@ -1,8 +1,5 @@
-@default = "typeScreen"
-definition {
-
-	function typeScreen {
-		selenium.typeScreen();
-	}
-
-}
+<definition default="typeScreen">
+	<command name="typeScreen">
+		<execute selenium="typeScreen" />
+	</command>
+</definition>

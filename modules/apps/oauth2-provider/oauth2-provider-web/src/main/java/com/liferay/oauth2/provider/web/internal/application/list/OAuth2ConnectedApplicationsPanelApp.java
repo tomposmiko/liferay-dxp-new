@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jonathan McCann
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=400",
 		"panel.category.key=" + PanelCategoryKeys.USER_MY_ACCOUNT
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class OAuth2ConnectedApplicationsPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return OAuth2ProviderPortletKeys.OAUTH2_CONNECTED_APPLICATIONS;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_CONNECTED_APPLICATIONS + ")"
+		target = "(javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_CONNECTED_APPLICATIONS + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

@@ -39,8 +39,8 @@ public class LayoutSEOEntryServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.layout.seo.service.impl.LayoutSEOEntryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static LayoutSEOEntry copyLayoutSEOEntry(
-			long userId, long groupId, boolean privateLayout,
-			long sourceLayoutId, boolean canonicalURLEnabled,
+			long userId, long groupId, boolean privateLayout, long layoutId,
+			boolean canonicalURLEnabled,
 			Map<java.util.Locale, String> canonicalURLMap,
 			long copyDDMStorageId, boolean openGraphDescriptionEnabled,
 			Map<java.util.Locale, String> openGraphDescriptionMap,
@@ -51,7 +51,7 @@ public class LayoutSEOEntryServiceUtil {
 		throws PortalException {
 
 		return getService().copyLayoutSEOEntry(
-			userId, groupId, privateLayout, sourceLayoutId, canonicalURLEnabled,
+			userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
 			canonicalURLMap, copyDDMStorageId, openGraphDescriptionEnabled,
 			openGraphDescriptionMap, openGraphImageAltMap,
 			openGraphImageFileEntryId, openGraphTitleEnabled, openGraphTitleMap,

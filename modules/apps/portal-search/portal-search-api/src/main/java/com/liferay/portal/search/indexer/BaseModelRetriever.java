@@ -16,6 +16,8 @@ package com.liferay.portal.search.indexer;
 
 import com.liferay.portal.kernel.model.BaseModel;
 
+import java.util.Optional;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -24,6 +26,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface BaseModelRetriever {
 
-	public BaseModel<?> fetchBaseModel(String className, long classPK);
+	public Optional<BaseModel<?>> fetchBaseModel(
+		String className, long classPK);
 
 }

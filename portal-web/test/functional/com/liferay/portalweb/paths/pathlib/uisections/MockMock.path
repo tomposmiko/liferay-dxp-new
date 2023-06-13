@@ -21,11 +21,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>MOCKMOCK_HTML_BODY_FORMATTED_FIELD_DIFF</td>
-	<td>//div[@name='bodyHTML_Formatted']//div[@class='well']//span[contains(@changeid,'${changeType}-diff')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>MOCKMOCK_NO_EMAIL_IN_QUEUE</td>
 	<td>//h2[contains(.,'No emails in queue')]</td>
 	<td></td>
@@ -47,7 +42,7 @@
 </tr>
 <tr>
 	<td>MOCKMOCK_SPECIFIC_RECIPIENT_SUBJECT_FIELD_LINK</td>
-	<td>//tr['${key_counter}'][contains(.,'${key_recipient}')]/td[3]//a</td>
+	<td>//tr[contains(.,'${key_recipient}')]/td[3]//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -78,11 +73,6 @@
 <tr>
 	<td>MOCKMOCK_HTML_BODY_LINK</td>
 	<td>//div[@name='bodyHTML_Formatted']//a[contains(.,'${key_bodyLink}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>MOCKMOCK_HTML_BODY_UNFORMATTED_FIELD</td>
-	<td>//div[@name='bodyHTML_Unformatted']//div[contains(@class,'well')]</td>
 	<td></td>
 </tr>
 </tbody>

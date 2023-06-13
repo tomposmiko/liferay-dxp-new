@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.type.grouped.service.impl;
 
-import com.liferay.commerce.product.exception.CPDefinitionProductTypeNameException;
 import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CProduct;
@@ -22,65 +21,94 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CProductLocalService;
 import com.liferay.commerce.product.type.grouped.constants.GroupedCPTypeConstants;
 import com.liferay.commerce.product.type.grouped.exception.CPDefinitionGroupedEntryQuantityException;
-import com.liferay.commerce.product.type.grouped.exception.DuplicateCPDefinitionGroupedEntryException;
 import com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry;
 import com.liferay.commerce.product.type.grouped.service.base.CPDefinitionGroupedEntryLocalServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Andrea Di Giorgi
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry",
-	service = AopService.class
-)
 public class CPDefinitionGroupedEntryLocalServiceImpl
 	extends CPDefinitionGroupedEntryLocalServiceBaseImpl {
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public void addCPDefinitionGroupedEntries(
+			long cpDefinitionId, long[] entryCPDefinitionIds,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		for (long entryCPDefinitionId : entryCPDefinitionIds) {
+			CPDefinition cpDefinition =
+				_cpDefinitionLocalService.getCPDefinition(entryCPDefinitionId);
+
+			cpDefinitionGroupedEntryLocalService.
+				addCPDefinitionGroupedEntryByEntryCProductId(
+					cpDefinitionId, cpDefinition.getCProductId(), 0, 1,
+					serviceContext);
+		}
+	}
+
+	@Override
+	public void addCPDefinitionGroupedEntriesByEntryCProductIds(
 			long cpDefinitionId, long[] entryCProductIds,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		for (long entryCProductId : entryCProductIds) {
-			cpDefinitionGroupedEntryLocalService.addCPDefinitionGroupedEntry(
-				cpDefinitionId, entryCProductId, 0, 1, serviceContext);
+			cpDefinitionGroupedEntryLocalService.
+				addCPDefinitionGroupedEntryByEntryCProductId(
+					cpDefinitionId, entryCProductId, 0, 1, serviceContext);
 		}
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public CPDefinitionGroupedEntry addCPDefinitionGroupedEntry(
-			long cpDefinitionId, long entryCProductId, double priority,
+			long cpDefinitionId, long entryCPDefinitionId, double priority,
 			int quantity, ServiceContext serviceContext)
 		throws PortalException {
 
-		CPDefinitionGroupedEntry cpDefinitionGroupedEntry =
-			cpDefinitionGroupedEntryPersistence.fetchByC_E(
-				cpDefinitionId, entryCProductId);
+		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
+			entryCPDefinitionId);
 
-		if (cpDefinitionGroupedEntry != null) {
-			throw new DuplicateCPDefinitionGroupedEntryException();
-		}
+		return cpDefinitionGroupedEntryLocalService.
+			addCPDefinitionGroupedEntryByEntryCProductId(
+				cpDefinitionId, cpDefinition.getCProductId(), priority,
+				quantity, serviceContext);
+	}
 
-		_validate(cpDefinitionId, entryCProductId, quantity);
-
-		cpDefinitionGroupedEntry = cpDefinitionGroupedEntryPersistence.create(
-			counterLocalService.increment());
+	@Override
+	public CPDefinitionGroupedEntry
+			addCPDefinitionGroupedEntryByEntryCProductId(
+				long cpDefinitionId, long entryCProductId, double priority,
+				int quantity, ServiceContext serviceContext)
+		throws PortalException {
 
 		CPDefinition cpDefinition = null;
+		User user = userLocalService.getUser(serviceContext.getUserId());
+
+		validate(cpDefinitionId, entryCProductId, quantity);
+
+		long cpDefinitionGroupedEntryId = counterLocalService.increment();
+
+		CPDefinitionGroupedEntry cpDefinitionGroupedEntry =
+			cpDefinitionGroupedEntryPersistence.create(
+				cpDefinitionGroupedEntryId);
 
 		if (_cpDefinitionLocalService.isVersionable(cpDefinitionId)) {
 			cpDefinition = _cpDefinitionLocalService.copyCPDefinition(
@@ -92,13 +120,9 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 		}
 
 		cpDefinitionGroupedEntry.setGroupId(cpDefinition.getGroupId());
-
-		User user = _userLocalService.getUser(serviceContext.getUserId());
-
 		cpDefinitionGroupedEntry.setCompanyId(user.getCompanyId());
 		cpDefinitionGroupedEntry.setUserId(user.getUserId());
 		cpDefinitionGroupedEntry.setUserName(user.getFullName());
-
 		cpDefinitionGroupedEntry.setCPDefinitionId(
 			cpDefinition.getCPDefinitionId());
 		cpDefinitionGroupedEntry.setEntryCProductId(entryCProductId);
@@ -123,9 +147,10 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 			CPDefinitionGroupedEntry newCPDefinitionGroupedEntry =
 				(CPDefinitionGroupedEntry)cpDefinitionGroupedEntry.clone();
 
-			newCPDefinitionGroupedEntry.setUuid(_portalUUID.generate());
+			newCPDefinitionGroupedEntry.setUuid(PortalUUIDUtil.generate());
 			newCPDefinitionGroupedEntry.setCPDefinitionGroupedEntryId(
 				counterLocalService.increment());
+
 			newCPDefinitionGroupedEntry.setCPDefinitionId(newCPDefinitionId);
 
 			cpDefinitionGroupedEntryLocalService.addCPDefinitionGroupedEntry(
@@ -157,6 +182,26 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 
 		return cpDefinitionGroupedEntryPersistence.fetchByC_E(
 			cpDefinitionId, entryCProductId);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	@Override
+	public CPDefinitionGroupedEntry fetchCPDefinitionGroupedEntryByC_E(
+		long cpDefinitionId, long entryCPDefinitionId) {
+
+		CPDefinition entryCPDefinition =
+			_cpDefinitionLocalService.fetchCPDefinition(entryCPDefinitionId);
+
+		if (entryCPDefinition == null) {
+			return null;
+		}
+
+		return cpDefinitionGroupedEntryLocalService.
+			fetchCPDefinitionGroupedEntry(
+				cpDefinitionId, entryCPDefinition.getCProductId());
 	}
 
 	@Override
@@ -191,17 +236,6 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 	}
 
 	@Override
-	public List<CPDefinitionGroupedEntry>
-			getEntryCProductCPDefinitionGroupedEntries(
-				long entryCProductId, int start, int end,
-				OrderByComparator<CPDefinitionGroupedEntry> orderByComparator)
-		throws PortalException {
-
-		return cpDefinitionGroupedEntryPersistence.findByEntryCProductId(
-			entryCProductId, start, end, orderByComparator);
-	}
-
-	@Override
 	public CPDefinitionGroupedEntry updateCPDefinitionGroupedEntry(
 			long cpDefinitionGroupedEntryId, double priority, int quantity)
 		throws PortalException {
@@ -223,7 +257,7 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 					cpDefinitionGroupedEntry.getEntryCProductId());
 		}
 
-		_validate(
+		validate(
 			cpDefinitionGroupedEntry.getCPDefinitionId(),
 			cpDefinitionGroupedEntry.getEntryCProductId(), quantity);
 
@@ -234,18 +268,9 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 			cpDefinitionGroupedEntry);
 	}
 
-	private void _validate(
+	protected void validate(
 			long cpDefinitionId, long entryCProductId, int quantity)
 		throws PortalException {
-
-		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
-			cpDefinitionId);
-
-		if (!GroupedCPTypeConstants.NAME.equals(
-				cpDefinition.getProductTypeName())) {
-
-			throw new CPDefinitionProductTypeNameException();
-		}
 
 		CProduct entryCProduct = _cProductLocalService.getCProduct(
 			entryCProductId);
@@ -266,16 +291,10 @@ public class CPDefinitionGroupedEntryLocalServiceImpl
 		}
 	}
 
-	@Reference
+	@ServiceReference(type = CPDefinitionLocalService.class)
 	private CPDefinitionLocalService _cpDefinitionLocalService;
 
-	@Reference
+	@ServiceReference(type = CProductLocalService.class)
 	private CProductLocalService _cProductLocalService;
-
-	@Reference
-	private PortalUUID _portalUUID;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

@@ -17,11 +17,11 @@ package com.liferay.site.my.sites.web.internal.servlet.taglib.util;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.MembershipRequestConstants;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicyUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutServiceUtil;
@@ -181,10 +181,7 @@ public class SiteActionDropdownItemsProvider {
 		return dropdownItem -> {
 			dropdownItem.setHref(_group.getDisplayURL(_themeDisplay, true));
 			dropdownItem.setLabel(
-				LanguageUtil.format(
-					_httpServletRequest, "go-to-x",
-					_group.getLayoutRootNodeName(
-						true, _themeDisplay.getLocale())));
+				LanguageUtil.get(_httpServletRequest, "go-to-private-pages"));
 			dropdownItem.setTarget("_blank");
 		};
 	}
@@ -195,10 +192,7 @@ public class SiteActionDropdownItemsProvider {
 		return dropdownItem -> {
 			dropdownItem.setHref(_group.getDisplayURL(_themeDisplay, false));
 			dropdownItem.setLabel(
-				LanguageUtil.format(
-					_httpServletRequest, "go-to-x",
-					_group.getLayoutRootNodeName(
-						false, _themeDisplay.getLocale())));
+				LanguageUtil.get(_httpServletRequest, "go-to-public-pages"));
 			dropdownItem.setTarget("_blank");
 		};
 	}

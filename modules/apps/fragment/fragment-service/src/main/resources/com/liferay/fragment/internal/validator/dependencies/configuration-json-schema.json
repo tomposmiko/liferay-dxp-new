@@ -10,24 +10,24 @@
 					"if": {
 						"properties": {
 							"type": {
-								"const": "checkbox"
+								"const": "select"
 							}
 						}
 					},
 					"then": {
-						"$ref": "#/definitions/fieldCheckbox"
+						"$ref": "#/definitions/fieldSelect"
 					}
 				},
 				{
 					"if": {
 						"properties": {
 							"type": {
-								"const": "collectionSelector"
+								"const": "checkbox"
 							}
 						}
 					},
 					"then": {
-						"$ref": "#/definitions/fieldCollectionSelector"
+						"$ref": "#/definitions/fieldCheckbox"
 					}
 				},
 				{
@@ -58,36 +58,24 @@
 					"if": {
 						"properties": {
 							"type": {
+								"const": "collectionSelector"
+							}
+						}
+					},
+					"then": {
+						"$ref": "#/definitions/fieldCollectionSelector"
+					}
+				},
+				{
+					"if": {
+						"properties": {
+							"type": {
 								"const": "itemSelector"
 							}
 						}
 					},
 					"then": {
 						"$ref": "#/definitions/fieldItemSelector"
-					}
-				},
-				{
-					"if": {
-						"properties": {
-							"type": {
-								"const": "length"
-							}
-						}
-					},
-					"then": {
-						"$ref": "#/definitions/fieldLength"
-					}
-				},
-				{
-					"if": {
-						"properties": {
-							"type": {
-								"const": "select"
-							}
-						}
-					},
-					"then": {
-						"$ref": "#/definitions/fieldSelect"
 					}
 				},
 				{
@@ -153,11 +141,9 @@
 						"colorPicker",
 						"collectionSelector",
 						"itemSelector",
-						"length",
 						"navigationMenuSelector",
 						"select",
 						"text",
-						"url",
 						"videoSelector"
 					],
 					"title": "The Type Schema",
@@ -189,21 +175,6 @@
 						"boolean",
 						"string"
 					]
-				},
-				"typeOptions": {
-					"additionalProperties": false,
-					"properties": {
-						"displayType": {
-							"enum": [
-								"checkbox",
-								"toggle"
-							],
-							"title": "The DisplayType Schema",
-							"type": "string"
-						}
-					},
-					"title": "The Typeoptions Schema",
-					"type": "object"
 				}
 			}
 		},
@@ -326,15 +297,6 @@
 				}
 			}
 		},
-		"fieldLength": {
-			"properties": {
-				"typeOptions": {
-					"additionalProperties": false,
-					"title": "The Typeoptions Schema",
-					"type": "object"
-				}
-			}
-		},
 		"fieldSelect": {
 			"properties": {
 				"typeOptions": {
@@ -386,7 +348,6 @@
 				"configurationRole": {
 					"default": "",
 					"enum": [
-						"advanced",
 						"style"
 					],
 					"title": "The Configuration Role Schema",

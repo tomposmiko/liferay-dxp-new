@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Dylan Rebelak
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.data.domain=list",
 		"ddm.form.field.type.description=checkbox-multiple-field-type-description",

@@ -21,6 +21,9 @@ import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_4_1.util.KaleoDefinitionTable;
+
+import java.io.IOException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,15 +38,7 @@ import java.util.List;
  */
 public class KaleoDefinitionVersionUpgradeProcess extends UpgradeProcess {
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_upgradeKaleoDefinitionVersion();
-
-		_removeDuplicateKaleoDefinitions();
-		_removeStartKaleoNodeId();
-	}
-
-	private void _addBatch(
+	protected void addBatch(
 			PreparedStatement preparedStatement, long kaleoDefinitionId,
 			long kaleoDefinitionVersionId)
 		throws SQLException {
@@ -54,11 +49,21 @@ public class KaleoDefinitionVersionUpgradeProcess extends UpgradeProcess {
 		preparedStatement.addBatch();
 	}
 
-	private String _getVersion(int version) {
+	@Override
+	protected void doUpgrade() throws Exception {
+		upgradeKaleoDefinitionVersion();
+
+		removeDuplicateKaleoDefinitions();
+		removeStartKaleoNodeId();
+	}
+
+	protected String getVersion(int version) {
 		return version + StringPool.PERIOD + 0;
 	}
 
-	private void _removeDuplicateKaleoDefinitions() throws Exception {
+	protected void removeDuplicateKaleoDefinitions()
+		throws IOException, SQLException {
+
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select companyId, name, MAX(version) as version from " +
@@ -86,11 +91,15 @@ public class KaleoDefinitionVersionUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _removeStartKaleoNodeId() throws Exception {
-		alterTableDropColumn("KaleoDefinition", "startKaleoNodeId");
+	protected void removeStartKaleoNodeId() throws Exception {
+		if (hasColumn("KaleoDefinition", "startKaleoNodeId")) {
+			alter(
+				KaleoDefinitionTable.class,
+				new AlterTableDropColumn("startKaleoNodeId"));
+		}
 	}
 
-	private void _upgradeKaleoDefinitionVersion() throws Exception {
+	protected void upgradeKaleoDefinitionVersion() throws Exception {
 		List<PreparedStatement> preparedStatements = new ArrayList<>(17);
 
 		try (LoggingTimer loggingTimer = new LoggingTimer();
@@ -156,7 +165,7 @@ public class KaleoDefinitionVersionUpgradeProcess extends UpgradeProcess {
 				preparedStatement2.setString(12, title);
 				preparedStatement2.setString(13, description);
 				preparedStatement2.setString(14, content);
-				preparedStatement2.setString(15, _getVersion(version));
+				preparedStatement2.setString(15, getVersion(version));
 				preparedStatement2.setLong(16, startKaleoNodeId);
 				preparedStatement2.setInt(
 					17, WorkflowConstants.STATUS_APPROVED);
@@ -164,7 +173,7 @@ public class KaleoDefinitionVersionUpgradeProcess extends UpgradeProcess {
 				preparedStatement2.addBatch();
 
 				for (PreparedStatement preparedStatement : preparedStatements) {
-					_addBatch(
+					addBatch(
 						preparedStatement, kaleoDefinitionId,
 						kaleoDefinitionVersionId);
 				}

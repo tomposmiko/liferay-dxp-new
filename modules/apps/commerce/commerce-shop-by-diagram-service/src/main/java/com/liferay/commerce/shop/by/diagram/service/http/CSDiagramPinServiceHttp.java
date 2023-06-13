@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Alessio Antonio Rendina
+ * @see CSDiagramPinServiceSoap
  * @generated
  */
 public class CSDiagramPinServiceHttp {
@@ -94,9 +95,7 @@ public class CSDiagramPinServiceHttp {
 	}
 
 	public static void deleteCSDiagramPin(
-			HttpPrincipal httpPrincipal,
-			com.liferay.commerce.shop.by.diagram.model.CSDiagramPin
-				csDiagramPin)
+			HttpPrincipal httpPrincipal, long csDiagramPinId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -105,7 +104,7 @@ public class CSDiagramPinServiceHttp {
 				_deleteCSDiagramPinParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, csDiagramPin);
+				methodKey, csDiagramPinId);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
@@ -375,9 +374,7 @@ public class CSDiagramPinServiceHttp {
 	private static final Class<?>[] _addCSDiagramPinParameterTypes0 =
 		new Class[] {long.class, double.class, double.class, String.class};
 	private static final Class<?>[] _deleteCSDiagramPinParameterTypes1 =
-		new Class[] {
-			com.liferay.commerce.shop.by.diagram.model.CSDiagramPin.class
-		};
+		new Class[] {long.class};
 	private static final Class<?>[] _deleteCSDiagramPinsParameterTypes2 =
 		new Class[] {long.class};
 	private static final Class<?>[] _fetchCSDiagramPinParameterTypes3 =

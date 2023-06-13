@@ -17,15 +17,16 @@ package com.liferay.configuration.admin.web.internal.portlet.action;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.configuration.admin.menu.ConfigurationMenuItem;
 import com.liferay.configuration.admin.web.internal.constants.ConfigurationAdminWebKeys;
+import com.liferay.configuration.admin.web.internal.display.ConfigurationCategoryMenuDisplay;
 import com.liferay.configuration.admin.web.internal.display.ConfigurationEntry;
 import com.liferay.configuration.admin.web.internal.display.ConfigurationModelConfigurationEntry;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContextFactory;
-import com.liferay.configuration.admin.web.internal.helper.DDMFormRendererHelper;
 import com.liferay.configuration.admin.web.internal.model.ConfigurationModel;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationEntryRetriever;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationFormRendererRetriever;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationModelRetriever;
+import com.liferay.configuration.admin.web.internal.util.DDMFormRendererHelper;
 import com.liferay.configuration.admin.web.internal.util.ResourceBundleLoaderProvider;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
@@ -52,13 +53,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jorge Ferrer
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
@@ -108,16 +109,23 @@ public class EditConfigurationMVCRenderCommand implements MVCRenderCommand {
 			}
 
 			configurationModel = new ConfigurationModel(
-				configuration, configurationModel);
+				configurationModel.getBundleLocation(),
+				configurationModel.getBundleSymbolicName(),
+				configurationModel.getClassLoader(), configuration,
+				configurationModel.getExtendedObjectClassDefinition(),
+				configurationModel.isFactory());
 
-			renderRequest.setAttribute(
-				ConfigurationAdminWebKeys.CONFIGURATION_CATEGORY_MENU_DISPLAY,
+			ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay =
 				_configurationEntryRetriever.
 					getConfigurationCategoryMenuDisplay(
 						configurationModel.getCategory(),
 						themeDisplay.getLanguageId(),
 						configurationScopeDisplayContext.getScope(),
-						configurationScopeDisplayContext.getScopePK()));
+						configurationScopeDisplayContext.getScopePK());
+
+			renderRequest.setAttribute(
+				ConfigurationAdminWebKeys.CONFIGURATION_CATEGORY_MENU_DISPLAY,
+				configurationCategoryMenuDisplay);
 
 			ConfigurationEntry configurationEntry =
 				new ConfigurationModelConfigurationEntry(
@@ -131,12 +139,16 @@ public class EditConfigurationMVCRenderCommand implements MVCRenderCommand {
 			renderRequest.setAttribute(
 				ConfigurationAdminWebKeys.CONFIGURATION_FORM_RENDERER,
 				_configurationFormRendererRetriever.
-					getConfigurationFormRenderer(
-						configurationModel.getBaseID()));
+					getConfigurationFormRenderer(pid));
 
 			List<ConfigurationMenuItem> configurationMenuItems =
-				_configurationMenuItemsServiceTrackerMap.getService(
-					configurationModel.getBaseID());
+				_configurationMenuItemsServiceTrackerMap.getService(pid);
+
+			if (configurationMenuItems == null) {
+				configurationMenuItems =
+					_configurationMenuItemsServiceTrackerMap.getService(
+						factoryPid);
+			}
 
 			if (configurationMenuItems != null) {
 				renderRequest.setAttribute(
@@ -184,7 +196,6 @@ public class EditConfigurationMVCRenderCommand implements MVCRenderCommand {
 				"configuration.pid");
 	}
 
-	@Deactivate
 	protected void deactivate() {
 		_configurationMenuItemsServiceTrackerMap.close();
 	}

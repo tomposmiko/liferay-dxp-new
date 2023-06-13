@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.atom.AtomCollectionAdapterRegistryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.access.control.AccessControlThreadLocal;
 import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
@@ -83,9 +84,10 @@ public class AtomServlet extends AbderaServlet {
 			AuthVerifierResult authVerifierResult =
 				accessControlContext.getAuthVerifierResult();
 
-			AtomUtil.saveUserInRequest(
-				httpServletRequest,
-				UserLocalServiceUtil.getUser(authVerifierResult.getUserId()));
+			User user = UserLocalServiceUtil.getUser(
+				authVerifierResult.getUserId());
+
+			AtomUtil.saveUserInRequest(httpServletRequest, user);
 
 			AccessControlThreadLocal.setRemoteAccess(true);
 

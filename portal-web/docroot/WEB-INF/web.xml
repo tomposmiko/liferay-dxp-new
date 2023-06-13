@@ -59,10 +59,8 @@
 			<url-pattern>/ca/c/portal/protected</url-pattern>
 			<url-pattern>/ca-AD/c/portal/protected</url-pattern>
 			<url-pattern>/ca-ES/c/portal/protected</url-pattern>
-			<url-pattern>/ca-ES-VALENCIA/c/portal/protected</url-pattern>
 			<url-pattern>/ca_AD/c/portal/protected</url-pattern>
 			<url-pattern>/ca_ES/c/portal/protected</url-pattern>
-			<url-pattern>/ca_ES_VALENCIA/c/portal/protected</url-pattern>
 			<url-pattern>/cs/c/portal/protected</url-pattern>
 			<url-pattern>/cs-CZ/c/portal/protected</url-pattern>
 			<url-pattern>/cs_CZ/c/portal/protected</url-pattern>
@@ -83,14 +81,8 @@
 			<url-pattern>/en_GB/c/portal/protected</url-pattern>
 			<url-pattern>/en_US/c/portal/protected</url-pattern>
 			<url-pattern>/es/c/portal/protected</url-pattern>
-			<url-pattern>/es-AR/c/portal/protected</url-pattern>
-			<url-pattern>/es-CO/c/portal/protected</url-pattern>
 			<url-pattern>/es-ES/c/portal/protected</url-pattern>
-			<url-pattern>/es-MX/c/portal/protected</url-pattern>
-			<url-pattern>/es_AR/c/portal/protected</url-pattern>
-			<url-pattern>/es_CO/c/portal/protected</url-pattern>
 			<url-pattern>/es_ES/c/portal/protected</url-pattern>
-			<url-pattern>/es_MX/c/portal/protected</url-pattern>
 			<url-pattern>/et/c/portal/protected</url-pattern>
 			<url-pattern>/et-EE/c/portal/protected</url-pattern>
 			<url-pattern>/et_EE/c/portal/protected</url-pattern>
@@ -135,9 +127,6 @@
 			<url-pattern>/kk/c/portal/protected</url-pattern>
 			<url-pattern>/kk-KZ/c/portal/protected</url-pattern>
 			<url-pattern>/kk_KZ/c/portal/protected</url-pattern>
-			<url-pattern>/km/c/portal/protected</url-pattern>
-			<url-pattern>/km-KH/c/portal/protected</url-pattern>
-			<url-pattern>/km_KH/c/portal/protected</url-pattern>
 			<url-pattern>/ko/c/portal/protected</url-pattern>
 			<url-pattern>/ko-KR/c/portal/protected</url-pattern>
 			<url-pattern>/ko_KR/c/portal/protected</url-pattern>
@@ -180,7 +169,7 @@
 			<url-pattern>/sl_SI/c/portal/protected</url-pattern>
 			<url-pattern>/sr/c/portal/protected</url-pattern>
 			<url-pattern>/sr-RS/c/portal/protected</url-pattern>
-			<url-pattern>/sr-RS-latin/c/portal/protected</url-pattern>
+			<url-pattern>/sr-RS_latin/c/portal/protected</url-pattern>
 			<url-pattern>/sr_RS/c/portal/protected</url-pattern>
 			<url-pattern>/sr_RS_latin/c/portal/protected</url-pattern>
 			<url-pattern>/sv/c/portal/protected</url-pattern>

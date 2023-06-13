@@ -20,7 +20,6 @@ import com.liferay.document.library.opener.onedrive.web.internal.background.task
 import com.liferay.document.library.opener.onedrive.web.internal.configuration.DLOneDriveCompanyConfiguration;
 import com.liferay.document.library.opener.onedrive.web.internal.constants.DLOpenerOneDriveConstants;
 import com.liferay.document.library.opener.onedrive.web.internal.constants.OneDriveBackgroundTaskConstants;
-import com.liferay.document.library.opener.onedrive.web.internal.exception.GraphServicePortalException;
 import com.liferay.document.library.opener.onedrive.web.internal.exception.mapper.GraphServiceExceptionPortalExceptionMapper;
 import com.liferay.document.library.opener.onedrive.web.internal.graph.IAuthenticationProviderImpl;
 import com.liferay.document.library.opener.onedrive.web.internal.oauth.AccessToken;
@@ -29,9 +28,9 @@ import com.liferay.document.library.opener.service.DLOpenerFileEntryReferenceLoc
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
-import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
@@ -62,6 +61,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -138,20 +138,8 @@ public class DLOpenerOneDriveManager {
 					fileEntry);
 		}
 		catch (GraphServiceException graphServiceException) {
-			GraphServicePortalException graphServicePortalException =
-				GraphServiceExceptionPortalExceptionMapper.map(
-					graphServiceException);
-
-			if (graphServicePortalException instanceof
-					GraphServicePortalException.ItemNotFound) {
-
-				_dlOpenerFileEntryReferenceLocalService.
-					deleteDLOpenerFileEntryReference(
-						DLOpenerOneDriveConstants.ONE_DRIVE_REFERENCE_TYPE,
-						fileEntry);
-			}
-
-			throw graphServicePortalException;
+			throw GraphServiceExceptionPortalExceptionMapper.map(
+				graphServiceException);
 		}
 	}
 
@@ -298,17 +286,14 @@ public class DLOpenerOneDriveManager {
 	private AccessToken _getAccessToken(long companyId, long userId)
 		throws PortalException {
 
-		AccessToken accessToken = _oAuth2Manager.getAccessToken(
-			companyId, userId);
+		Optional<AccessToken> accessTokenOptional =
+			_oAuth2Manager.getAccessTokenOptional(companyId, userId);
 
-		if (accessToken == null) {
-			throw new PrincipalException(
+		return accessTokenOptional.orElseThrow(
+			() -> new PrincipalException(
 				StringBundler.concat(
 					"User ", userId,
-					" does not have a valid OneDrive access token"));
-		}
-
-		return accessToken;
+					" does not have a valid OneDrive access token")));
 	}
 
 	private File _getContentFile(long userId, FileEntry fileEntry)

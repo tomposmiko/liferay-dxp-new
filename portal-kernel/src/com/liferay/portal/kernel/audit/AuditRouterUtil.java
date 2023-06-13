@@ -36,6 +36,7 @@ public class AuditRouterUtil {
 
 	private static volatile AuditRouter _auditRouter =
 		ServiceProxyFactory.newServiceTrackedInstance(
-			AuditRouter.class, AuditRouterUtil.class, "_auditRouter", false);
+			AuditRouter.class, AuditRouterUtil.class, "_auditRouter",
+			"(audit.router.proxy=true)", false);
 
 }

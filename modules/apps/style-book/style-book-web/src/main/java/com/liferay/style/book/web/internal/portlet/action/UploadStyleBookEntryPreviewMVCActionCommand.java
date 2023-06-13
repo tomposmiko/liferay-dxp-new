@@ -18,7 +18,7 @@ import com.liferay.item.selector.ItemSelectorUploadResponseHandler;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.style.book.constants.StyleBookPortletKeys;
-import com.liferay.style.book.web.internal.upload.StyleBookEntryPreviewImageEditorUploadFileEntryHandler;
+import com.liferay.style.book.web.internal.upload.StyleBookEntryPreviewUploadFileEntryHandler;
 import com.liferay.upload.UploadHandler;
 
 import javax.portlet.ActionRequest;
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StyleBookPortletKeys.STYLE_BOOK,
 		"mvc.command.name=/style_book/upload_style_book_entry_preview"
@@ -46,7 +47,7 @@ public class UploadStyleBookEntryPreviewMVCActionCommand
 		throws Exception {
 
 		_uploadHandler.upload(
-			_styleBookEntryPreviewImageEditorUploadFileEntryHandler,
+			_styleBookEntryPreviewUploadFileEntryHandler,
 			_itemSelectorUploadResponseHandler, actionRequest, actionResponse);
 	}
 
@@ -55,8 +56,8 @@ public class UploadStyleBookEntryPreviewMVCActionCommand
 		_itemSelectorUploadResponseHandler;
 
 	@Reference
-	private StyleBookEntryPreviewImageEditorUploadFileEntryHandler
-		_styleBookEntryPreviewImageEditorUploadFileEntryHandler;
+	private StyleBookEntryPreviewUploadFileEntryHandler
+		_styleBookEntryPreviewUploadFileEntryHandler;
 
 	@Reference
 	private UploadHandler _uploadHandler;

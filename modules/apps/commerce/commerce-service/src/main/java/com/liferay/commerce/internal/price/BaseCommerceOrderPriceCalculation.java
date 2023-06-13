@@ -37,13 +37,19 @@ import java.math.RoundingMode;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Riccardo Alberti
  */
 public abstract class BaseCommerceOrderPriceCalculation
 	implements CommerceOrderPriceCalculation {
+
+	public BaseCommerceOrderPriceCalculation(
+		CommerceChannelLocalService commerceChannelLocalService,
+		CommerceMoneyFactory commerceMoneyFactory) {
+
+		this.commerceChannelLocalService = commerceChannelLocalService;
+		this.commerceMoneyFactory = commerceMoneyFactory;
+	}
 
 	@Override
 	public CommerceOrderItemPrice getCommerceOrderItemPrice(
@@ -116,10 +122,6 @@ public abstract class BaseCommerceOrderPriceCalculation
 					getSubtotalDiscountPercentageLevel4WithTaxAmount());
 
 		BigDecimal total = commerceOrder.getTotal();
-
-		if (CommerceBigDecimalUtil.gte(total, commerceOrder.getTaxAmount())) {
-			total = total.subtract(commerceOrder.getTaxAmount());
-		}
 
 		BigDecimal totalDiscountAmount = BigDecimal.ZERO;
 
@@ -315,11 +317,8 @@ public abstract class BaseCommerceOrderPriceCalculation
 		}
 	}
 
-	@Reference
-	protected CommerceChannelLocalService commerceChannelLocalService;
-
-	@Reference
-	protected CommerceMoneyFactory commerceMoneyFactory;
+	protected final CommerceChannelLocalService commerceChannelLocalService;
+	protected final CommerceMoneyFactory commerceMoneyFactory;
 
 	private CommerceDiscountValue _createCommerceDiscountValue(
 		BigDecimal amount, CommerceCurrency commerceCurrency,
@@ -533,13 +532,13 @@ public abstract class BaseCommerceOrderPriceCalculation
 	}
 
 	private boolean _greaterThanZero(BigDecimal value) {
-		if ((value == null) ||
-			CommerceBigDecimalUtil.lte(value, BigDecimal.ZERO)) {
+		if ((value != null) ||
+			CommerceBigDecimalUtil.gt(value, BigDecimal.ZERO)) {
 
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private void _updateDiscounts(
@@ -568,11 +567,13 @@ public abstract class BaseCommerceOrderPriceCalculation
 
 		commerceOrderItemPrice.setDiscountAmount(
 			commerceMoneyFactory.create(commerceCurrency, discountAmount));
-		commerceOrderItemPrice.setDiscountPercentage(
-			_getDiscountPercentage(
-				activePrice.multiply(BigDecimal.valueOf(quantity)),
-				discountAmount,
-				RoundingMode.valueOf(commerceCurrency.getRoundingMode())));
+
+		BigDecimal discountPercentage = _getDiscountPercentage(
+			activePrice.multiply(BigDecimal.valueOf(quantity)), discountAmount,
+			RoundingMode.valueOf(commerceCurrency.getRoundingMode()));
+
+		commerceOrderItemPrice.setDiscountPercentage(discountPercentage);
+
 		commerceOrderItemPrice.setDiscountPercentageLevel1(
 			discountPercentageLevel1);
 		commerceOrderItemPrice.setDiscountPercentageLevel2(

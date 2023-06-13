@@ -33,21 +33,21 @@
 				<dependencies>
 					<dependency>
 						<groupId>com.liferay.portal</groupId>
-						<artifactId>release.${liferayProduct}.bom</artifactId>
+						<artifactId>release.${product}.bom</artifactId>
 						<version>${liferay.bom.version}</version>
 						<type>pom</type>
 						<scope>import</scope>
 					</dependency>
 					<dependency>
 						<groupId>com.liferay.portal</groupId>
-						<artifactId>release.${liferayProduct}.bom.compile.only</artifactId>
+						<artifactId>release.${product}.bom.compile.only</artifactId>
 						<version>${liferay.bom.version}</version>
 						<type>pom</type>
 						<scope>import</scope>
 					</dependency>
 					<dependency>
 						<groupId>com.liferay.portal</groupId>
-						<artifactId>release.${liferayProduct}.bom.third.party</artifactId>
+						<artifactId>release.${product}.bom.third.party</artifactId>
 						<version>${liferay.bom.version}</version>
 						<type>pom</type>
 						<scope>import</scope>
@@ -70,11 +70,49 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
+#if (${liferayVersion.startsWith("7.0")} || ${liferayVersion.startsWith("7.1")} || ${liferayVersion.startsWith("7.2")})
 		<dependency>
-			<groupId>com.liferay.portal</groupId>
-			<artifactId>release.${liferayProduct}.api</artifactId>
+			<groupId>com.liferay</groupId>
+			<artifactId>com.liferay.frontend.js.loader.modules.extender.api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>com.liferay.portal.kernel</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>com.liferay.util.taglib</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.portlet</groupId>
+			<artifactId>portlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>jstl</groupId>
+			<artifactId>jstl</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.service.component.annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+#else
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>release.${product}.api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+#end
 	</dependencies>
 	<build>
 		<plugins>
@@ -84,28 +122,28 @@
 				<version>1.6</version>
 				<configuration>
 					<installDirectory>${project.build.directory}</installDirectory>
-					<nodeVersion>v16.13.0</nodeVersion>
-					<yarnVersion>v1.13.0</yarnVersion>
+					<nodeVersion>v10.15.1</nodeVersion>
+					<npmVersion>6.4.1</npmVersion>
 				</configuration>
 				<executions>
 					<execution>
-						<id>install-node-and-yarn</id>
+						<id>install-node-and-npm</id>
 						<phase>initialize</phase>
 						<goals>
-							<goal>install-node-and-yarn</goal>
+							<goal>install-node-and-npm</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>yarn-install</id>
+						<id>npm-install</id>
 						<phase>initialize</phase>
 						<goals>
-							<goal>yarn</goal>
+							<goal>npm</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>yarn-run-build</id>
+						<id>npm-run-build</id>
 						<goals>
-							<goal>yarn</goal>
+							<goal>npm</goal>
 						</goals>
 						<phase>generate-resources</phase>
 						<configuration>

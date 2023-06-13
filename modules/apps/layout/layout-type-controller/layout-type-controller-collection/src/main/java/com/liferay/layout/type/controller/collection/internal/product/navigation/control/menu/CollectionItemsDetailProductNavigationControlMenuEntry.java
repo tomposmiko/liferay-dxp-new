@@ -16,13 +16,14 @@ package com.liferay.layout.type.controller.collection.internal.product.navigatio
 
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.layout.type.controller.collection.internal.constants.CollectionPageLayoutTypeControllerWebKeys;
 import com.liferay.layout.type.controller.collection.internal.display.context.CollectionItemsDetailDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletPreferencesIds;
 import com.liferay.portal.kernel.portlet.InvokerPortlet;
 import com.liferay.portal.kernel.portlet.LiferayRenderRequest;
 import com.liferay.portal.kernel.portlet.LiferayRenderResponse;
@@ -64,6 +65,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.TOOLS,
 		"product.navigation.control.menu.entry.order:Integer=140"
@@ -102,7 +104,7 @@ public class CollectionItemsDetailProductNavigationControlMenuEntry
 				collectionItemsDetailDisplayContext =
 					new CollectionItemsDetailDisplayContext(
 						_assetListEntryLocalService,
-						_assetListAssetEntryProvider, _infoItemServiceRegistry,
+						_assetListAssetEntryProvider, _infoItemServiceTracker,
 						liferayRenderRequest, liferayRenderResponse,
 						themeDisplay);
 
@@ -148,8 +150,12 @@ public class CollectionItemsDetailProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.collection)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	private LiferayRenderRequest _createLiferayRenderRequest(
@@ -166,10 +172,13 @@ public class CollectionItemsDetailProductNavigationControlMenuEntry
 		InvokerPortlet invokerPortlet = PortletInstanceFactoryUtil.create(
 			portlet, servletContext);
 
+		PortletPreferencesIds portletPreferencesIds =
+			PortletPreferencesFactoryUtil.getPortletPreferencesIds(
+				httpServletRequest, portlet.getPortletId());
+
 		PortletPreferences portletPreferences =
 			_portletPreferencesLocalService.getStrictPreferences(
-				PortletPreferencesFactoryUtil.getPortletPreferencesIds(
-					httpServletRequest, portlet.getPortletId()));
+				portletPreferencesIds);
 
 		PortletConfig portletConfig = PortletConfigFactoryUtil.create(
 			portlet, servletContext);
@@ -214,17 +223,12 @@ public class CollectionItemsDetailProductNavigationControlMenuEntry
 	private AssetListEntryLocalService _assetListEntryLocalService;
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private PortletLocalService _portletLocalService;
 
 	@Reference
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.collection)"
-	)
-	private ServletContext _servletContext;
 
 }

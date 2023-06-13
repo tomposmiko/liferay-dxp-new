@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Tina Tian
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ComponentEnabler {
 
 	@Activate

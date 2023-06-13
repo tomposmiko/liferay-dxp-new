@@ -33,11 +33,8 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.document.library.content.model.impl.DLContentImpl",
-		"table.name=DLContent"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {DLContentModelArgumentsResolver.class, ArgumentsResolver.class}
 )
 public class DLContentModelArgumentsResolver implements ArgumentsResolver {
 

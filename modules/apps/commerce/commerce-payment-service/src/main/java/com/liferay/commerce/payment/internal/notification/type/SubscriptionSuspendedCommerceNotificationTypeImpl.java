@@ -17,17 +17,19 @@ package com.liferay.commerce.payment.internal.notification.type;
 import com.liferay.commerce.constants.CommerceSubscriptionNotificationConstants;
 import com.liferay.commerce.model.CommerceSubscriptionEntry;
 import com.liferay.commerce.notification.type.CommerceNotificationType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.notification.type.key=" + CommerceSubscriptionNotificationConstants.SUBSCRIPTION_SUSPENDED,
 		"commerce.notification.type.order:Integer=220"
@@ -65,12 +67,12 @@ public class SubscriptionSuspendedCommerceNotificationTypeImpl
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
-			locale,
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return LanguageUtil.get(
+			resourceBundle,
 			CommerceSubscriptionNotificationConstants.SUBSCRIPTION_SUSPENDED);
 	}
-
-	@Reference
-	private Language _language;
 
 }

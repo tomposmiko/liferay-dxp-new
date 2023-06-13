@@ -14,7 +14,7 @@
 
 import React, {useEffect, useRef} from 'react';
 
-const FieldDragPreview = ({className = 'ddm-drag dragging', containerRef}) => {
+const FieldDragPreview = ({containerRef}) => {
 	const ref = useRef(null);
 
 	/**
@@ -42,7 +42,7 @@ const FieldDragPreview = ({className = 'ddm-drag dragging', containerRef}) => {
 	}, [containerRef, ref]);
 
 	return (
-		<div className={className}>
+		<div className="ddm-drag dragging">
 			<div ref={ref} />
 		</div>
 	);

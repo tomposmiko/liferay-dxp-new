@@ -16,15 +16,19 @@ package com.liferay.commerce.item.selector.web.internal.display.context;
 
 import com.liferay.commerce.item.selector.web.internal.search.CommerceCountryItemSelectorChecker;
 import com.liferay.commerce.util.CommerceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Country;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -53,7 +57,7 @@ public class CommerceCountryItemSelectorViewDisplayContext
 		return PortletURLBuilder.create(
 			super.getPortletURL()
 		).setParameter(
-			"checkedCountryIds", StringUtil.merge(_getCheckedCountryIds())
+			"checkedCountryIds", StringUtil.merge(getCheckedCountryIds())
 		).buildPortletURL();
 	}
 
@@ -70,29 +74,40 @@ public class CommerceCountryItemSelectorViewDisplayContext
 				WebKeys.THEME_DISPLAY);
 
 		searchContainer = new SearchContainer<>(
-			cpRequestHelper.getRenderRequest(), getPortletURL(), null,
-			"there-are-no-countries");
+			cpRequestHelper.getRenderRequest(), getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage("there-are-no-countries");
 
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
+
+		OrderByComparator<Country> orderByComparator =
 			CommerceUtil.getCountryOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+				getOrderByCol(), getOrderByType());
+
+		searchContainer.setOrderByComparator(orderByComparator);
+
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			() -> _countryService.getCompanyCountries(
-				themeDisplay.getCompanyId(), true, searchContainer.getStart(),
-				searchContainer.getEnd(),
-				searchContainer.getOrderByComparator()),
-			_countryService.getCompanyCountriesCount(
-				themeDisplay.getCompanyId()));
-		searchContainer.setRowChecker(
-			new CommerceCountryItemSelectorChecker(
-				cpRequestHelper.getRenderResponse(), _getCheckedCountryIds()));
+
+		RowChecker rowChecker = new CommerceCountryItemSelectorChecker(
+			cpRequestHelper.getRenderResponse(), getCheckedCountryIds());
+
+		searchContainer.setRowChecker(rowChecker);
+
+		List<Country> results = _countryService.getCompanyCountries(
+			themeDisplay.getCompanyId(), true, searchContainer.getStart(),
+			searchContainer.getEnd(), orderByComparator);
+
+		searchContainer.setResults(results);
+
+		int total = _countryService.getCompanyCountriesCount(
+			themeDisplay.getCompanyId());
+
+		searchContainer.setTotal(total);
 
 		return searchContainer;
 	}
 
-	private long[] _getCheckedCountryIds() {
+	protected long[] getCheckedCountryIds() {
 		return ParamUtil.getLongValues(
 			cpRequestHelper.getRenderRequest(), "checkedCountryIds");
 	}

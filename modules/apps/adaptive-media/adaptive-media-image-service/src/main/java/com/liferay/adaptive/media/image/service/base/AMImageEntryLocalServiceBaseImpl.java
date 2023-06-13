@@ -18,7 +18,6 @@ import com.liferay.adaptive.media.image.model.AMImageEntry;
 import com.liferay.adaptive.media.image.service.AMImageEntryLocalService;
 import com.liferay.adaptive.media.image.service.AMImageEntryLocalServiceUtil;
 import com.liferay.adaptive.media.image.service.persistence.AMImageEntryPersistence;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -33,17 +32,13 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -337,11 +332,6 @@ public abstract class AMImageEntryLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement AMImageEntryLocalServiceImpl#deleteAMImageEntry(AMImageEntry) to avoid orphaned data");
-		}
-
 		return amImageEntryLocalService.deleteAMImageEntry(
 			(AMImageEntry)persistedModel);
 	}
@@ -461,7 +451,7 @@ public abstract class AMImageEntryLocalServiceBaseImpl
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			AMImageEntryLocalService.class, IdentifiableOSGiService.class,
-			CTService.class, PersistedModelLocalService.class
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -482,23 +472,8 @@ public abstract class AMImageEntryLocalServiceBaseImpl
 		return AMImageEntryLocalService.class.getName();
 	}
 
-	@Override
-	public CTPersistence<AMImageEntry> getCTPersistence() {
-		return amImageEntryPersistence;
-	}
-
-	@Override
-	public Class<AMImageEntry> getModelClass() {
+	protected Class<?> getModelClass() {
 		return AMImageEntry.class;
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<AMImageEntry>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return updateUnsafeFunction.apply(amImageEntryPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -553,8 +528,5 @@ public abstract class AMImageEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AMImageEntryLocalServiceBaseImpl.class);
 
 }

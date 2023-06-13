@@ -1,6 +1,6 @@
 Bundle-Name: Liferay SAML OpenSAML Integration
 Bundle-SymbolicName: com.liferay.saml.opensaml.integration
-Bundle-Version: 6.1.4
+Bundle-Version: 5.3.8
 Export-Package:\
 	com.liferay.saml.opensaml.integration.field.expression.handler,\
 	com.liferay.saml.opensaml.integration.field.expression.handler.registry,\
@@ -48,13 +48,8 @@ Import-Package:\
 	!org.apache.oro.*,\
 	!org.apache.poi.*,\
 	!org.apache.tools.ant.*,\
-	!org.apache.xml.dtm.*,\
-	!org.apache.xml.utils.*,\
-	!org.apache.xpath.*,\
 	\
 	!org.checkerframework.*,\
-	\
-	!org.jdom.*,\
 	\
 	!org.joda.convert,\
 	\
@@ -67,7 +62,6 @@ Import-Package:\
 	!sun.io,\
 	\
 	*
--dsannotations-options: inherit
 -fixupmessages: Classes found in the wrong directory: ...;is:=ignore
 -includeresource:\
 	opensaml-core-*;lib:=true,\

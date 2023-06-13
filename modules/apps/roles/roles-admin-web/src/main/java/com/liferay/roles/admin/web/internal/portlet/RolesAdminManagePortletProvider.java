@@ -14,10 +14,10 @@
 
 package com.liferay.roles.admin.web.internal.portlet;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.BasePortletProvider;
 import com.liferay.portal.kernel.portlet.ManagePortletProvider;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.roles.admin.constants.RolesAdminPortletKeys;
 
 import javax.portlet.PortletURL;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.Role",
 	service = ManagePortletProvider.class
 )

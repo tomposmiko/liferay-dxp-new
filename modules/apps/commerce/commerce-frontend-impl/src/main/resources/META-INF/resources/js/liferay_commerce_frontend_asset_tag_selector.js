@@ -15,11 +15,11 @@
 AUI.add(
 	'liferay-commerce-frontend-asset-tag-selector',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const AArray = A.Array;
+		var AArray = A.Array;
 
-		const MAP_INVALID_CHARACTERS = AArray.hash([
+		var MAP_INVALID_CHARACTERS = AArray.hash([
 			'"',
 			'#',
 			'%',
@@ -48,10 +48,10 @@ AUI.add(
 			'~',
 		]);
 
-		const TPL_DUPLICATE_ALERT =
+		var TPL_DUPLICATE_ALERT =
 			'<div class="help-block">{duplicate} {tag}: {tagName}</div>';
 
-		const TPL_MAX_LENGTH_ALERT = '<div class="help-block">{message}</div>';
+		var TPL_MAX_LENGTH_ALERT = '<div class="help-block">{message}</div>';
 
 		/**
 		 * OPTIONS
@@ -62,7 +62,7 @@ AUI.add(
 		 *
 		 */
 
-		const AssetTaglibTagsSelector = A.Component.create({
+		var AssetTaglibTagsSelector = A.Component.create({
 			ATTRS: {
 				allowAddEntry: {
 					value: true,
@@ -78,7 +78,7 @@ AUI.add(
 
 				dataSource: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
 						return instance._getTagsDataSource();
 					},
@@ -99,7 +99,7 @@ AUI.add(
 
 				hiddenInput: {
 					setter(value) {
-						const instance = this;
+						var instance = this;
 
 						return A.one(value + instance.get('guid'));
 					},
@@ -141,15 +141,15 @@ AUI.add(
 
 			prototype: {
 				_addEntries() {
-					const instance = this;
+					var instance = this;
 
-					const text = Lang.String.escapeHTML(
+					var text = Lang.String.escapeHTML(
 						instance.inputNode.val()
 					).trim();
 
 					if (text) {
 						if (text.indexOf(',') > -1) {
-							const items = text.split(',');
+							var items = text.split(',');
 
 							items.forEach((item) => {
 								instance.entries.add(item, {});
@@ -164,9 +164,9 @@ AUI.add(
 				},
 
 				_bindTagsSelector() {
-					const instance = this;
+					var instance = this;
 
-					const form = instance.inputNode.get('form');
+					var form = instance.inputNode.get('form');
 
 					instance._submitFormListener = A.Do.before(
 						instance._addEntries,
@@ -185,15 +185,15 @@ AUI.add(
 				},
 
 				_checkDuplicateTag(object) {
-					const instance = this;
+					var instance = this;
 
-					const tag = !object.value ? object : object.value;
+					var tag = !object.value ? object : object.value;
 
 					if (!instance.entries.containsKey(tag)) {
 						return;
 					}
 
-					const message = Lang.sub(TPL_DUPLICATE_ALERT, {
+					var message = Lang.sub(TPL_DUPLICATE_ALERT, {
 						duplicate: Liferay.Language.get('duplicate'),
 						tag: Liferay.Language.get('tag'),
 						tagName: tag,
@@ -203,17 +203,17 @@ AUI.add(
 				},
 
 				_checkMaxLengthTag(object) {
-					const instance = this;
+					var instance = this;
 
-					const tag = !object.value ? object : object.value;
+					var tag = !object.value ? object : object.value;
 
-					const maxLength = instance.get('maxLength');
+					var maxLength = instance.get('maxLength');
 
 					if (!tag.length || tag.length <= maxLength) {
 						return;
 					}
 
-					const message = Lang.sub(TPL_MAX_LENGTH_ALERT, {
+					var message = Lang.sub(TPL_MAX_LENGTH_ALERT, {
 						message: Lang.sub(
 							Liferay.Language.get(
 								'please-enter-no-more-than-x-characters'
@@ -228,28 +228,28 @@ AUI.add(
 				},
 
 				_getTagsDataSource() {
-					const instance = this;
+					var instance = this;
 
-					const AssetTagSearch = Liferay.Service.bind(
+					var AssetTagSearch = Liferay.Service.bind(
 						'/assettag/search'
 					);
 
 					AssetTagSearch._serviceQueryCache = {};
 
-					const serviceQueryCache = AssetTagSearch._serviceQueryCache;
+					var serviceQueryCache = AssetTagSearch._serviceQueryCache;
 
-					const dataSource = new Liferay.Service.DataSource({
+					var dataSource = new Liferay.Service.DataSource({
 						on: {
 							request(event) {
-								let term = decodeURIComponent(event.request);
+								var term = decodeURIComponent(event.request);
 
-								const key = term;
+								var key = term;
 
-								if (term === '*') {
+								if (term == '*') {
 									term = '';
 								}
 
-								let serviceQueryObj = serviceQueryCache[key];
+								var serviceQueryObj = serviceQueryCache[key];
 
 								if (!serviceQueryObj) {
 									serviceQueryObj = {
@@ -275,7 +275,7 @@ AUI.add(
 				},
 
 				_onAddEntryClick(event) {
-					const instance = this;
+					var instance = this;
 
 					event.domEvent.preventDefault();
 
@@ -283,12 +283,12 @@ AUI.add(
 				},
 
 				_onKeyPress(event) {
-					const instance = this;
+					var instance = this;
 
-					const charCode = event.charCode;
+					var charCode = event.charCode;
 
 					if (!A.UA.gecko || event._event.charCode) {
-						if (charCode === '44') {
+						if (charCode == '44') {
 							event.preventDefault();
 
 							instance._addEntries();
@@ -304,9 +304,9 @@ AUI.add(
 				},
 
 				_onPaste(event) {
-					const instance = this;
+					var instance = this;
 
-					const pastedText = (
+					var pastedText = (
 						event._event.clipboardData || window.clipboardData
 					).getData('text');
 
@@ -318,11 +318,11 @@ AUI.add(
 				},
 
 				_renderIcons() {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance.get('contentBox');
+					var contentBox = instance.get('contentBox');
 
-					const buttonGroup = [];
+					var buttonGroup = [];
 
 					if (instance.get('portletURL')) {
 						buttonGroup.unshift({
@@ -348,7 +348,7 @@ AUI.add(
 						children: [buttonGroup],
 					}).render(contentBox);
 
-					const iconsBoundingBox = instance.icons.get('boundingBox');
+					var iconsBoundingBox = instance.icons.get('boundingBox');
 
 					instance.entryHolder.placeAfter(iconsBoundingBox);
 				},
@@ -358,15 +358,15 @@ AUI.add(
 				},
 
 				_showError(message) {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance.get('contentBox');
+					var contentBox = instance.get('contentBox');
 
-					const toolbar = instance.icons.get('contentBox');
+					var toolbar = instance.icons.get('contentBox');
 
 					contentBox.addClass('has-error');
 
-					const alertNode = toolbar.insertBefore(message, toolbar);
+					var alertNode = toolbar.insertBefore(message, toolbar);
 
 					A.later(
 						5000,
@@ -382,11 +382,11 @@ AUI.add(
 				},
 
 				_showSelectPopup(event) {
-					const instance = this;
+					var instance = this;
 
 					event.domEvent.preventDefault();
 
-					const uri = Lang.sub(
+					var uri = Lang.sub(
 						decodeURIComponent(instance.get('portletURL')),
 						{
 							selectedTagNames: instance.entries.keys.join(),
@@ -415,21 +415,21 @@ AUI.add(
 				},
 
 				_updateHiddenInput(_event) {
-					const instance = this;
+					var instance = this;
 
-					const hiddenInput = instance.get('hiddenInput');
+					var hiddenInput = instance.get('hiddenInput');
 
 					hiddenInput.val(instance.entries.keys.join());
 				},
 
 				addEntries() {
-					const instance = this;
+					var instance = this;
 
 					instance._addEntries();
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					AssetTaglibTagsSelector.superclass.bindUI.apply(
 						instance,
@@ -438,7 +438,7 @@ AUI.add(
 
 					instance._bindTagsSelector();
 
-					const entries = instance.entries;
+					var entries = instance.entries;
 
 					entries.after('add', instance._updateHiddenInput, instance);
 					entries.after(
@@ -462,7 +462,7 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					AssetTaglibTagsSelector.superclass.renderUI.apply(
 						instance,
@@ -477,14 +477,14 @@ AUI.add(
 				},
 
 				syncUI() {
-					const instance = this;
+					var instance = this;
 
 					AssetTaglibTagsSelector.superclass.syncUI.apply(
 						instance,
 						arguments
 					);
 
-					const tagNames = instance.get('tagNames');
+					var tagNames = instance.get('tagNames');
 
 					tagNames.forEach(instance.add, instance);
 				},

@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
@@ -29,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * @author David Arques
@@ -130,7 +129,7 @@ public class TrafficSource {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		if (ListUtil.isNotEmpty(_countrySearchKeywordsList)) {
+		if (!ListUtil.isEmpty(_countrySearchKeywordsList)) {
 			jsonObject.put(
 				"countryKeywords", _getCountryKeywordsJSONArray(locale));
 		}
@@ -159,7 +158,7 @@ public class TrafficSource {
 		JSONObject jsonObject = toJSONObject(
 			null, LocaleUtil.getDefault(), _name);
 
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
 	}
 
 	private JSONArray _getCountryKeywordsJSONArray(Locale locale) {
@@ -167,14 +166,15 @@ public class TrafficSource {
 			return JSONFactoryUtil.createJSONArray();
 		}
 
-		return JSONUtil.toJSONArray(
-			_countrySearchKeywordsList,
-			countrySearchKeywords -> countrySearchKeywords.toJSONObject(locale),
-			_log);
-	}
+		Stream<CountrySearchKeywords> stream =
+			_countrySearchKeywordsList.stream();
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		TrafficSource.class.getName());
+		return JSONUtil.putAll(
+			stream.map(
+				countrySearchKeywords -> countrySearchKeywords.toJSONObject(
+					locale)
+			).toArray());
+	}
 
 	private List<CountrySearchKeywords> _countrySearchKeywordsList;
 	private boolean _error;

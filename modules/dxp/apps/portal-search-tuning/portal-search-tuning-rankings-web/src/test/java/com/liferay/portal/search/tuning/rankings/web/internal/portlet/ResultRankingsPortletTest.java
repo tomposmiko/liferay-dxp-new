@@ -17,7 +17,6 @@ package com.liferay.portal.search.tuning.rankings.web.internal.portlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCCommandCache;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
@@ -35,6 +34,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -49,11 +50,11 @@ public class ResultRankingsPortletTest extends BaseRankingsWebTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_resultRankingsPortlet = new ResultRankingsPortlet();
 
 		_setUpMVCCommanCache();
-
-		setUpPortletPreferencesFactoryUtil();
 
 		ReflectionTestUtil.setFieldValue(
 			_resultRankingsPortlet, "documentToRankingTranslator",
@@ -71,9 +72,6 @@ public class ResultRankingsPortletTest extends BaseRankingsWebTestCase {
 			rankingIndexNameBuilder);
 		ReflectionTestUtil.setFieldValue(
 			_resultRankingsPortlet, "searchEngineAdapter", searchEngineAdapter);
-		ReflectionTestUtil.setFieldValue(
-			_resultRankingsPortlet, "searchEngineInformation",
-			_searchEngineInformation);
 		ReflectionTestUtil.setFieldValue(
 			_resultRankingsPortlet, "searchRequestBuilderFactory",
 			_searchRequestBuilderFactory);
@@ -109,7 +107,7 @@ public class ResultRankingsPortletTest extends BaseRankingsWebTestCase {
 		).when(
 			mvcCommandCache
 		).getMVCCommand(
-			Mockito.anyString()
+			Matchers.anyString()
 		);
 
 		ReflectionTestUtil.setFieldValue(
@@ -124,19 +122,24 @@ public class ResultRankingsPortletTest extends BaseRankingsWebTestCase {
 		).getWindowState();
 	}
 
-	private final DocumentToRankingTranslator _documentToRankingTranslator =
-		Mockito.mock(DocumentToRankingTranslator.class);
-	private final IndexNameBuilder _indexNameBuilder = Mockito.mock(
-		IndexNameBuilder.class);
-	private final RenderRequest _renderRequest = Mockito.mock(
-		RenderRequest.class);
-	private final RenderResponse _renderResponse = Mockito.mock(
-		RenderResponse.class);
+	@Mock
+	private DocumentToRankingTranslator _documentToRankingTranslator;
+
+	@Mock
+	private IndexNameBuilder _indexNameBuilder;
+
+	@Mock
+	private RenderRequest _renderRequest;
+
+	@Mock
+	private RenderResponse _renderResponse;
+
 	private ResultRankingsPortlet _resultRankingsPortlet;
-	private final SearchEngineInformation _searchEngineInformation =
-		Mockito.mock(SearchEngineInformation.class);
-	private final SearchRequestBuilderFactory _searchRequestBuilderFactory =
-		Mockito.mock(SearchRequestBuilderFactory.class);
-	private final Sorts _sorts = Mockito.mock(Sorts.class);
+
+	@Mock
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+
+	@Mock
+	private Sorts _sorts;
 
 }

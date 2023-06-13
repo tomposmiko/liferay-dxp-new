@@ -19,13 +19,13 @@ import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.constants.BookmarksWebKeys;
 import com.liferay.bookmarks.model.BookmarksEntry;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -176,15 +176,6 @@ public class BookmarksEntryAssetRenderer
 	}
 
 	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
-
-		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect, "/bookmarks/find_entry",
-			"entryId", _entry.getEntryId());
-	}
-
-	@Override
 	public long getUserId() {
 		return _entry.getUserId();
 	}
@@ -207,7 +198,7 @@ public class BookmarksEntryAssetRenderer
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -222,7 +213,7 @@ public class BookmarksEntryAssetRenderer
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;

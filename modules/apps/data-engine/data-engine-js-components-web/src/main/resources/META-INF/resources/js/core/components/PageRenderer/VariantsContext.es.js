@@ -16,12 +16,12 @@ import React, {createContext} from 'react';
 
 export const VariantsContext = createContext({});
 
-export function VariantsProvider({children, components}) {
+export const VariantsProvider = ({children, components}) => {
 	return (
 		<VariantsContext.Provider value={components}>
 			{children}
 		</VariantsContext.Provider>
 	);
-}
+};
 
 VariantsContext.displayName = 'VariantsContext';

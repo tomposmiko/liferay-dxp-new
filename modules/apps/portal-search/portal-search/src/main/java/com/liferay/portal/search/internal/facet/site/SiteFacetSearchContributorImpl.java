@@ -54,7 +54,11 @@ public class SiteFacetSearchContributorImpl
 			facetContext -> facetContext.addFacet(facet));
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setSiteFacetFactory(SiteFacetFactory siteFacetFactory) {
+		_siteFacetFactory = siteFacetFactory;
+	}
+
 	private SiteFacetFactory _siteFacetFactory;
 
 	private class SiteFacetBuilderImpl implements SiteFacetBuilder {

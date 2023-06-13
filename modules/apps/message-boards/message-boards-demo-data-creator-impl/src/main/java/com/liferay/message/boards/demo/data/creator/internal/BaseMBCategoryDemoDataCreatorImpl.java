@@ -63,7 +63,7 @@ public abstract class BaseMBCategoryDemoDataCreatorImpl
 			}
 			catch (NoSuchMessageException noSuchMessageException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchMessageException);
+					_log.warn(noSuchMessageException, noSuchMessageException);
 				}
 			}
 
@@ -71,9 +71,14 @@ public abstract class BaseMBCategoryDemoDataCreatorImpl
 		}
 	}
 
-	protected final List<Long> categoryIds = new CopyOnWriteArrayList<>();
+	@Reference(unbind = "-")
+	protected void setMBCategoryLocalService(
+		MBCategoryLocalService mbCategoryLocalService) {
 
-	@Reference
+		this.mbCategoryLocalService = mbCategoryLocalService;
+	}
+
+	protected final List<Long> categoryIds = new CopyOnWriteArrayList<>();
 	protected MBCategoryLocalService mbCategoryLocalService;
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -14,7 +14,6 @@
 
 package com.liferay.segments.internal.exportimport.data.handler;
 
-import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -22,6 +21,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.segments.internal.exportimport.content.processor.SegmentsEntryExportImportContentProcessor;
 import com.liferay.segments.model.SegmentsEntry;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class SegmentsEntryStagedModelDataHandler
 	extends BaseStagedModelDataHandler<SegmentsEntry> {
 
@@ -116,11 +116,14 @@ public class SegmentsEntryStagedModelDataHandler
 
 		importedSegmentsEntry.setGroupId(portletDataContext.getScopeGroupId());
 		importedSegmentsEntry.setCompanyId(portletDataContext.getCompanyId());
-		importedSegmentsEntry.setCriteria(
+
+		String criteria =
 			_segmentsEntryExportImportContentProcessor.
 				replaceImportContentReferences(
 					portletDataContext, segmentsEntry,
-					segmentsEntry.getCriteria()));
+					segmentsEntry.getCriteria());
+
+		importedSegmentsEntry.setCriteria(criteria);
 
 		SegmentsEntry existingSegmentsEntry =
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
@@ -151,10 +154,8 @@ public class SegmentsEntryStagedModelDataHandler
 		return _stagedModelRepository;
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.segments.model.SegmentsEntry)"
-	)
-	private ExportImportContentProcessor<String>
+	@Reference
+	private SegmentsEntryExportImportContentProcessor
 		_segmentsEntryExportImportContentProcessor;
 
 	@Reference(

@@ -28,7 +28,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	enabled = false, property = "name=portalSummaryStatistics",
+	enabled = false, immediate = true,
+	property = "name=portalSummaryStatistics",
 	service = ServerSummaryStatistics.class
 )
 public class ServerSummaryStatistics implements SummaryStatistics {
@@ -297,7 +298,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setServerStatistics(ServerStatistics serverStatistics) {
+		_serverStatistics = serverStatistics;
+	}
+
 	private ServerStatistics _serverStatistics;
 
 }

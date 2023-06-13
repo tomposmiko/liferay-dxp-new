@@ -19,6 +19,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.knowledge.base.model.KBTemplate;
 import com.liferay.knowledge.base.model.KBTemplateModel;
+import com.liferay.knowledge.base.model.KBTemplateSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -37,15 +38,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -74,13 +78,12 @@ public class KBTemplateModelImpl
 	public static final String TABLE_NAME = "KBTemplate";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
-		{"uuid_", Types.VARCHAR}, {"kbTemplateId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"title", Types.VARCHAR}, {"content", Types.CLOB},
-		{"lastPublishDate", Types.TIMESTAMP}
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"kbTemplateId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP}, {"title", Types.VARCHAR},
+		{"content", Types.CLOB}, {"lastPublishDate", Types.TIMESTAMP}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -88,7 +91,6 @@ public class KBTemplateModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("kbTemplateId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -103,7 +105,7 @@ public class KBTemplateModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table KBTemplate (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,kbTemplateId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title STRING null,content TEXT null,lastPublishDate DATE null,primary key (kbTemplateId, ctCollectionId))";
+		"create table KBTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,kbTemplateId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title STRING null,content TEXT null,lastPublishDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table KBTemplate";
 
@@ -156,6 +158,59 @@ public class KBTemplateModelImpl
 	 */
 	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static KBTemplate toModel(KBTemplateSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		KBTemplate model = new KBTemplateImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setKbTemplateId(soapModel.getKbTemplateId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setTitle(soapModel.getTitle());
+		model.setContent(soapModel.getContent());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<KBTemplate> toModels(KBTemplateSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<KBTemplate> models = new ArrayList<KBTemplate>(soapModels.length);
+
+		for (KBTemplateSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public KBTemplateModelImpl() {
@@ -233,100 +288,105 @@ public class KBTemplateModelImpl
 	public Map<String, Function<KBTemplate, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<KBTemplate, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, KBTemplate>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<KBTemplate, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KBTemplate.class.getClassLoader(), KBTemplate.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<KBTemplate, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<KBTemplate, Object>>();
+		try {
+			Constructor<KBTemplate> constructor =
+				(Constructor<KBTemplate>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", KBTemplate::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", KBTemplate::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", KBTemplate::getUuid);
-			attributeGetterFunctions.put(
-				"kbTemplateId", KBTemplate::getKbTemplateId);
-			attributeGetterFunctions.put("groupId", KBTemplate::getGroupId);
-			attributeGetterFunctions.put("companyId", KBTemplate::getCompanyId);
-			attributeGetterFunctions.put("userId", KBTemplate::getUserId);
-			attributeGetterFunctions.put("userName", KBTemplate::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", KBTemplate::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", KBTemplate::getModifiedDate);
-			attributeGetterFunctions.put("title", KBTemplate::getTitle);
-			attributeGetterFunctions.put("content", KBTemplate::getContent);
-			attributeGetterFunctions.put(
-				"lastPublishDate", KBTemplate::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<KBTemplate, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<KBTemplate, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<KBTemplate, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<KBTemplate, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<KBTemplate, Object>>();
+		Map<String, BiConsumer<KBTemplate, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<KBTemplate, ?>>();
 
-		static {
-			Map<String, BiConsumer<KBTemplate, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<KBTemplate, ?>>();
+		attributeGetterFunctions.put("mvccVersion", KBTemplate::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<KBTemplate, Long>)KBTemplate::setMvccVersion);
+		attributeGetterFunctions.put("uuid", KBTemplate::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<KBTemplate, String>)KBTemplate::setUuid);
+		attributeGetterFunctions.put(
+			"kbTemplateId", KBTemplate::getKbTemplateId);
+		attributeSetterBiConsumers.put(
+			"kbTemplateId",
+			(BiConsumer<KBTemplate, Long>)KBTemplate::setKbTemplateId);
+		attributeGetterFunctions.put("groupId", KBTemplate::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId", (BiConsumer<KBTemplate, Long>)KBTemplate::setGroupId);
+		attributeGetterFunctions.put("companyId", KBTemplate::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<KBTemplate, Long>)KBTemplate::setCompanyId);
+		attributeGetterFunctions.put("userId", KBTemplate::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<KBTemplate, Long>)KBTemplate::setUserId);
+		attributeGetterFunctions.put("userName", KBTemplate::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<KBTemplate, String>)KBTemplate::setUserName);
+		attributeGetterFunctions.put("createDate", KBTemplate::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<KBTemplate, Date>)KBTemplate::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", KBTemplate::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<KBTemplate, Date>)KBTemplate::setModifiedDate);
+		attributeGetterFunctions.put("title", KBTemplate::getTitle);
+		attributeSetterBiConsumers.put(
+			"title", (BiConsumer<KBTemplate, String>)KBTemplate::setTitle);
+		attributeGetterFunctions.put("content", KBTemplate::getContent);
+		attributeSetterBiConsumers.put(
+			"content", (BiConsumer<KBTemplate, String>)KBTemplate::setContent);
+		attributeGetterFunctions.put(
+			"lastPublishDate", KBTemplate::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<KBTemplate, Date>)KBTemplate::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<KBTemplate, Long>)KBTemplate::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<KBTemplate, Long>)KBTemplate::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<KBTemplate, String>)KBTemplate::setUuid);
-			attributeSetterBiConsumers.put(
-				"kbTemplateId",
-				(BiConsumer<KBTemplate, Long>)KBTemplate::setKbTemplateId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<KBTemplate, Long>)KBTemplate::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<KBTemplate, Long>)KBTemplate::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<KBTemplate, Long>)KBTemplate::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<KBTemplate, String>)KBTemplate::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<KBTemplate, Date>)KBTemplate::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<KBTemplate, Date>)KBTemplate::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"title", (BiConsumer<KBTemplate, String>)KBTemplate::setTitle);
-			attributeSetterBiConsumers.put(
-				"content",
-				(BiConsumer<KBTemplate, String>)KBTemplate::setContent);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<KBTemplate, Date>)KBTemplate::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -342,21 +402,6 @@ public class KBTemplateModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
-	}
-
-	@JSON
-	@Override
-	public long getCtCollectionId() {
-		return _ctCollectionId;
-	}
-
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_ctCollectionId = ctCollectionId;
 	}
 
 	@JSON
@@ -657,7 +702,6 @@ public class KBTemplateModelImpl
 		KBTemplateImpl kbTemplateImpl = new KBTemplateImpl();
 
 		kbTemplateImpl.setMvccVersion(getMvccVersion());
-		kbTemplateImpl.setCtCollectionId(getCtCollectionId());
 		kbTemplateImpl.setUuid(getUuid());
 		kbTemplateImpl.setKbTemplateId(getKbTemplateId());
 		kbTemplateImpl.setGroupId(getGroupId());
@@ -681,8 +725,6 @@ public class KBTemplateModelImpl
 
 		kbTemplateImpl.setMvccVersion(
 			this.<Long>getColumnOriginalValue("mvccVersion"));
-		kbTemplateImpl.setCtCollectionId(
-			this.<Long>getColumnOriginalValue("ctCollectionId"));
 		kbTemplateImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
 		kbTemplateImpl.setKbTemplateId(
 			this.<Long>getColumnOriginalValue("kbTemplateId"));
@@ -780,8 +822,6 @@ public class KBTemplateModelImpl
 		KBTemplateCacheModel kbTemplateCacheModel = new KBTemplateCacheModel();
 
 		kbTemplateCacheModel.mvccVersion = getMvccVersion();
-
-		kbTemplateCacheModel.ctCollectionId = getCtCollectionId();
 
 		kbTemplateCacheModel.uuid = getUuid();
 
@@ -902,17 +942,45 @@ public class KBTemplateModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<KBTemplate, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<KBTemplate, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<KBTemplate, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((KBTemplate)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KBTemplate>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KBTemplate.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
-	private long _ctCollectionId;
 	private String _uuid;
 	private long _kbTemplateId;
 	private long _groupId;
@@ -929,9 +997,8 @@ public class KBTemplateModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<KBTemplate, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<KBTemplate, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -957,7 +1024,6 @@ public class KBTemplateModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
-		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put("kbTemplateId", _kbTemplateId);
 		_columnOriginalValues.put("groupId", _groupId);
@@ -994,29 +1060,27 @@ public class KBTemplateModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("ctCollectionId", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("uuid_", 4L);
+		columnBitmasks.put("kbTemplateId", 4L);
 
-		columnBitmasks.put("kbTemplateId", 8L);
+		columnBitmasks.put("groupId", 8L);
 
-		columnBitmasks.put("groupId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("companyId", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("userId", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("userName", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("createDate", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("modifiedDate", 512L);
+		columnBitmasks.put("title", 512L);
 
-		columnBitmasks.put("title", 1024L);
+		columnBitmasks.put("content", 1024L);
 
-		columnBitmasks.put("content", 2048L);
-
-		columnBitmasks.put("lastPublishDate", 4096L);
+		columnBitmasks.put("lastPublishDate", 2048L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

@@ -21,11 +21,8 @@ import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.osgi.service.component.annotations.Component;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The arguments resolver class for retrieving value from CommerceOrderItem.
@@ -33,13 +30,6 @@ import org.osgi.service.component.annotations.Component;
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.model.impl.CommerceOrderItemImpl",
-		"table.name=CommerceOrderItem"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommerceOrderItemModelArgumentsResolver
 	implements ArgumentsResolver {
 
@@ -61,11 +51,36 @@ public class CommerceOrderItemModelArgumentsResolver
 		CommerceOrderItemModelImpl commerceOrderItemModelImpl =
 			(CommerceOrderItemModelImpl)baseModel;
 
-		if (!checkColumn ||
-			_hasModifiedColumns(commerceOrderItemModelImpl, columnNames) ||
-			_hasModifiedColumns(
-				commerceOrderItemModelImpl, _ORDER_BY_COLUMNS)) {
+		long columnBitmask = commerceOrderItemModelImpl.getColumnBitmask();
 
+		if (!checkColumn || (columnBitmask == 0)) {
+			return _getValue(commerceOrderItemModelImpl, columnNames, original);
+		}
+
+		Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
+			finderPath);
+
+		if (finderPathColumnBitmask == null) {
+			finderPathColumnBitmask = 0L;
+
+			for (String columnName : columnNames) {
+				finderPathColumnBitmask |=
+					commerceOrderItemModelImpl.getColumnBitmask(columnName);
+			}
+
+			if (finderPath.isBaseModelResult() &&
+				(CommerceOrderItemPersistenceImpl.
+					FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
+						finderPath.getCacheName())) {
+
+				finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
+			}
+
+			_finderPathColumnBitmasksCache.put(
+				finderPath, finderPathColumnBitmask);
+		}
+
+		if ((columnBitmask & finderPathColumnBitmask) != 0) {
 			return _getValue(commerceOrderItemModelImpl, columnNames, original);
 		}
 
@@ -105,35 +120,18 @@ public class CommerceOrderItemModelArgumentsResolver
 		return arguments;
 	}
 
-	private static boolean _hasModifiedColumns(
-		CommerceOrderItemModelImpl commerceOrderItemModelImpl,
-		String[] columnNames) {
+	private static final Map<FinderPath, Long> _finderPathColumnBitmasksCache =
+		new ConcurrentHashMap<>();
 
-		if (columnNames.length == 0) {
-			return false;
-		}
-
-		for (String columnName : columnNames) {
-			if (!Objects.equals(
-					commerceOrderItemModelImpl.getColumnOriginalValue(
-						columnName),
-					commerceOrderItemModelImpl.getColumnValue(columnName))) {
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private static final String[] _ORDER_BY_COLUMNS;
+	private static final long _ORDER_BY_COLUMNS_BITMASK;
 
 	static {
-		List<String> orderByColumns = new ArrayList<String>();
+		long orderByColumnsBitmask = 0;
 
-		orderByColumns.add("createDate");
+		orderByColumnsBitmask |= CommerceOrderItemModelImpl.getColumnBitmask(
+			"createDate");
 
-		_ORDER_BY_COLUMNS = orderByColumns.toArray(new String[0]);
+		_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
 	}
 
 }

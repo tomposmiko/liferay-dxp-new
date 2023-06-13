@@ -41,7 +41,7 @@ class BaseQueue {
 	addItem(item) {
 		this._enqueue(item);
 
-		verifyStorageLimitForKey(this.name, this.maxSize);
+		return verifyStorageLimitForKey(this.name, this.maxSize);
 	}
 
 	/**

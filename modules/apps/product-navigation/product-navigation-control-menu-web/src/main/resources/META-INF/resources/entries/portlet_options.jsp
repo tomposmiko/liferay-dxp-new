@@ -18,8 +18,9 @@
 
 <li class="control-menu-nav-item" data-qa-id="headerOptions">
 	<div class="control-menu-icon">
-		<liferay-frontend:icon-options
-			monospaced="<%= true %>"
+		<liferay-portlet:icon-options
+			direction="right"
+			markupView="lexicon"
 		/>
 	</div>
 </li>

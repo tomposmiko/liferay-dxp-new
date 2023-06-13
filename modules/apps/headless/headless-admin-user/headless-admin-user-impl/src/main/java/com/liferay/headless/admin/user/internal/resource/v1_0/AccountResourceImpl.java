@@ -17,15 +17,13 @@ package com.liferay.headless.admin.user.internal.resource.v1_0;
 import com.liferay.account.constants.AccountActionKeys;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
-import com.liferay.account.service.AccountEntryService;
 import com.liferay.headless.admin.user.dto.v1_0.Account;
 import com.liferay.headless.admin.user.internal.dto.v1_0.converter.AccountResourceDTOConverter;
 import com.liferay.headless.admin.user.internal.dto.v1_0.converter.OrganizationResourceDTOConverter;
-import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.odata.entity.v1_0.AccountEntityModel;
 import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
-import com.liferay.headless.common.spi.service.context.ServiceContextRequestUtil;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -37,7 +35,6 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -55,13 +52,12 @@ import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.component.annotations.ServiceScope;
 
 /**
@@ -77,7 +73,7 @@ public class AccountResourceImpl
 
 	@Override
 	public void deleteAccount(Long accountId) throws Exception {
-		_accountEntryService.deleteAccountEntry(accountId);
+		_accountEntryLocalService.deleteAccountEntry(accountId);
 	}
 
 	@Override
@@ -90,7 +86,6 @@ public class AccountResourceImpl
 				externalReferenceCode));
 	}
 
-	@Override
 	public void deleteOrganizationAccounts(
 			Long organizationId, Long[] accountIds)
 		throws Exception {
@@ -101,7 +96,6 @@ public class AccountResourceImpl
 		}
 	}
 
-	@Override
 	public void deleteOrganizationAccountsByExternalReferenceCode(
 			Long organizationId, String[] externalReferenceCodes)
 		throws Exception {
@@ -117,7 +111,7 @@ public class AccountResourceImpl
 
 	@Override
 	public Account getAccount(Long accountId) throws Exception {
-		return _toAccount(_accountEntryService.getAccountEntry(accountId));
+		return _toAccount(_accountEntryLocalService.getAccountEntry(accountId));
 	}
 
 	@Override
@@ -170,7 +164,7 @@ public class AccountResourceImpl
 					document.get(Field.ENTRY_CLASS_PK));
 
 				return _toAccount(
-					_accountEntryService.getAccountEntry(accountEntryId));
+					_accountEntryLocalService.getAccountEntry(accountEntryId));
 			});
 	}
 
@@ -209,7 +203,6 @@ public class AccountResourceImpl
 			search, filter, pagination, sorts);
 	}
 
-	@Override
 	public void patchOrganizationMoveAccounts(
 			Long sourceOrganizationId, Long targetOrganizationId,
 			Long[] accountIds)
@@ -219,7 +212,6 @@ public class AccountResourceImpl
 		postOrganizationAccounts(targetOrganizationId, accountIds);
 	}
 
-	@Override
 	public void patchOrganizationMoveAccountsByExternalReferenceCode(
 			Long sourceOrganizationId, Long targetOrganizationId,
 			String[] externalReferenceCodes)
@@ -233,15 +225,10 @@ public class AccountResourceImpl
 
 	@Override
 	public Account postAccount(Account account) throws Exception {
-		AccountEntry accountEntry = _accountEntryService.addAccountEntry(
+		AccountEntry accountEntry = _accountEntryLocalService.addAccountEntry(
 			contextUser.getUserId(), _getParentAccountId(account),
 			account.getName(), account.getDescription(), _getDomains(account),
-			null, null, null, _getType(account), _getStatus(account),
-			_getServiceContext(account));
-
-		accountEntry = _accountEntryService.updateExternalReferenceCode(
-			accountEntry.getAccountEntryId(),
-			account.getExternalReferenceCode());
+			null, null, null, _getType(account), _getStatus(account), null);
 
 		_accountEntryOrganizationRelLocalService.
 			setAccountEntryOrganizationRels(
@@ -250,7 +237,6 @@ public class AccountResourceImpl
 		return _toAccount(accountEntry);
 	}
 
-	@Override
 	public void postOrganizationAccounts(Long organizationId, Long[] accountIds)
 		throws Exception {
 
@@ -260,7 +246,6 @@ public class AccountResourceImpl
 		}
 	}
 
-	@Override
 	public void postOrganizationAccountsByExternalReferenceCode(
 			Long organizationId, String[] externalReferenceCodes)
 		throws Exception {
@@ -278,18 +263,15 @@ public class AccountResourceImpl
 	public Account putAccount(Long accountId, Account account)
 		throws Exception {
 
-		_accountEntryService.updateExternalReferenceCode(
-			accountId, account.getExternalReferenceCode());
-
 		_accountEntryOrganizationRelLocalService.
 			setAccountEntryOrganizationRels(
 				accountId, _getOrganizationIds(account));
 
 		return _toAccount(
-			_accountEntryService.updateAccountEntry(
+			_accountEntryLocalService.updateAccountEntry(
 				accountId, _getParentAccountId(account), account.getName(),
 				account.getDescription(), false, _getDomains(account), null,
-				null, null, _getStatus(account), _getServiceContext(account)));
+				null, null, _getStatus(account), null));
 	}
 
 	@Override
@@ -298,22 +280,19 @@ public class AccountResourceImpl
 		throws Exception {
 
 		return _toAccount(
-			_accountEntryService.addOrUpdateAccountEntry(
+			_accountEntryLocalService.addOrUpdateAccountEntry(
 				externalReferenceCode, contextUser.getUserId(),
 				_getParentAccountId(account), account.getName(),
 				account.getDescription(), _getDomains(account), null, null,
-				null, _getType(account), _getStatus(account),
-				_getServiceContext(account)));
+				null, _getType(account), _getStatus(account), null));
 	}
 
 	private String[] _getDomains(Account account) {
-		String[] domains = account.getDomains();
-
-		if (domains == null) {
-			return new String[0];
-		}
-
-		return domains;
+		return Optional.ofNullable(
+			account.getDomains()
+		).orElse(
+			new String[0]
+		);
 	}
 
 	private DTOConverterContext _getDTOConverterContext(long accountEntryId) {
@@ -420,65 +399,42 @@ public class AccountResourceImpl
 				contextCompany.getCompanyId()),
 			sorts,
 			document -> _toAccount(
-				_accountEntryService.getAccountEntry(
+				_accountEntryLocalService.getAccountEntry(
 					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
 	private long[] _getOrganizationIds(Account account) {
-		Long[] organizationIds = account.getOrganizationIds();
-
-		if (organizationIds == null) {
-			return new long[0];
-		}
-
-		return ArrayUtil.toArray(organizationIds);
+		return Optional.ofNullable(
+			account.getOrganizationIds()
+		).map(
+			ArrayUtil::toArray
+		).orElse(
+			new long[0]
+		);
 	}
 
 	private long _getParentAccountId(Account account) {
-		Long parentAccountId = account.getParentAccountId();
-
-		if (parentAccountId == null) {
-			return AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT;
-		}
-
-		return parentAccountId;
-	}
-
-	private ServiceContext _getServiceContext(Account account)
-		throws Exception {
-
-		ServiceContext serviceContext =
-			ServiceContextRequestUtil.createServiceContext(
-				CustomFieldsUtil.toMap(
-					AccountEntry.class.getName(), contextCompany.getCompanyId(),
-					account.getCustomFields(),
-					contextAcceptLanguage.getPreferredLocale()),
-				contextCompany.getGroupId(), contextHttpServletRequest, null);
-
-		serviceContext.setCompanyId(contextCompany.getCompanyId());
-		serviceContext.setUserId(contextUser.getUserId());
-
-		return serviceContext;
+		return Optional.ofNullable(
+			account.getParentAccountId()
+		).orElse(
+			AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT
+		);
 	}
 
 	private int _getStatus(Account account) {
-		Integer status = account.getStatus();
-
-		if (status == null) {
-			return WorkflowConstants.STATUS_APPROVED;
-		}
-
-		return status;
+		return Optional.ofNullable(
+			account.getStatus()
+		).orElse(
+			WorkflowConstants.STATUS_APPROVED
+		);
 	}
 
 	private String _getType(Account account) {
-		String type = account.getTypeAsString();
-
-		if (type == null) {
-			return AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS;
-		}
-
-		return type;
+		return Optional.ofNullable(
+			account.getTypeAsString()
+		).orElse(
+			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS
+		);
 	}
 
 	private Account _toAccount(AccountEntry accountEntry) throws Exception {
@@ -486,20 +442,18 @@ public class AccountResourceImpl
 			_getDTOConverterContext(accountEntry.getAccountEntryId()));
 	}
 
+	@Reference
+	private AccountEntryLocalService _accountEntryLocalService;
+
 	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(model.class.name=com.liferay.account.model.AccountEntry)"
 	)
-	private volatile ModelResourcePermission<AccountEntry>
+	private ModelResourcePermission<AccountEntry>
 		_accountEntryModelResourcePermission;
 
 	@Reference
 	private AccountEntryOrganizationRelLocalService
 		_accountEntryOrganizationRelLocalService;
-
-	@Reference
-	private AccountEntryService _accountEntryService;
 
 	@Reference
 	private AccountResourceDTOConverter _accountResourceDTOConverter;

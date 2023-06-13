@@ -20,7 +20,7 @@ import com.liferay.commerce.pricing.service.CommercePricingClassService;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Alberti
  */
-@Component(service = ItemSelectorView.class)
+@Component(enabled = false, immediate = true, service = ItemSelectorView.class)
 public class CommercePricingClassItemSelectorView
 	implements ItemSelectorView<CommercePricingClassItemSelectorCriterion> {
 
@@ -67,7 +67,7 @@ public class CommercePricingClassItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "product-groups");
+		return LanguageUtil.get(locale, "product-groups");
 	}
 
 	@Override
@@ -106,9 +106,6 @@ public class CommercePricingClassItemSelectorView
 
 	@Reference
 	private CommercePricingClassService _commercePricingClassService;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.item.selector.web)"

@@ -17,18 +17,15 @@ package com.liferay.portal.search.elasticsearch7.internal.index;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
-import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.test.util.AssertUtils;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -67,16 +64,11 @@ public class ElasticsearchIndexInformationTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_companyIndexFactoryFixture = _createCompanyIndexFactoryFixture(
+		_companyIndexFactoryFixture = createCompanyIndexFactoryFixture(
 			_elasticsearchConnectionFixture);
 
-		_elasticsearchIndexInformation = _createElasticsearchIndexInformation(
+		_elasticsearchIndexInformation = createElasticsearchIndexInformation(
 			_elasticsearchConnectionFixture);
-	}
-
-	@After
-	public void tearDown() {
-		_companyIndexFactoryFixture.tearDown();
 	}
 
 	@Test
@@ -86,7 +78,7 @@ public class ElasticsearchIndexInformationTest {
 		long companyId = RandomTestUtil.randomLong();
 
 		Assert.assertEquals(
-			_getIndexNameBuilder(companyId),
+			getIndexNameBuilder(companyId),
 			_elasticsearchIndexInformation.getCompanyIndexName(companyId));
 	}
 
@@ -94,11 +86,12 @@ public class ElasticsearchIndexInformationTest {
 	public void testGetFieldMappings() throws Exception {
 		_companyIndexFactoryFixture.createIndices();
 
+		String fieldMappings = _elasticsearchIndexInformation.getFieldMappings(
+			_companyIndexFactoryFixture.getIndexName());
+
 		AssertUtils.assertEquals(
-			"", _loadJSONObject(testName.getMethodName()),
-			_jsonFactory.createJSONObject(
-				_elasticsearchIndexInformation.getFieldMappings(
-					_companyIndexFactoryFixture.getIndexName())));
+			"", loadJSONObject(testName.getMethodName()),
+			_jsonFactory.createJSONObject(fieldMappings));
 	}
 
 	@Test
@@ -113,34 +106,31 @@ public class ElasticsearchIndexInformationTest {
 	@Rule
 	public TestName testName = new TestName();
 
-	private CompanyIndexFactoryFixture _createCompanyIndexFactoryFixture(
+	protected static ElasticsearchIndexInformation
+		createElasticsearchIndexInformation(
+			ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		return new ElasticsearchIndexInformation() {
+			{
+				setElasticsearchClientResolver(elasticsearchClientResolver);
+				setIndexNameBuilder(
+					ElasticsearchIndexInformationTest::getIndexNameBuilder);
+			}
+		};
+	}
+
+	protected static String getIndexNameBuilder(long companyId) {
+		return "test-" + companyId;
+	}
+
+	protected CompanyIndexFactoryFixture createCompanyIndexFactoryFixture(
 		ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		return new CompanyIndexFactoryFixture(
 			elasticsearchClientResolver, testName.getMethodName());
 	}
 
-	private ElasticsearchIndexInformation _createElasticsearchIndexInformation(
-		ElasticsearchClientResolver elasticsearchClientResolver) {
-
-		ElasticsearchIndexInformation elasticsearchIndexInformation =
-			new ElasticsearchIndexInformation();
-
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchIndexInformation, "_elasticsearchClientResolver",
-			elasticsearchClientResolver);
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchIndexInformation, "_indexNameBuilder",
-			(IndexNameBuilder)companyId -> _getIndexNameBuilder(companyId));
-
-		return elasticsearchIndexInformation;
-	}
-
-	private String _getIndexNameBuilder(long companyId) {
-		return "test-" + companyId;
-	}
-
-	private JSONObject _loadJSONObject(String suffix) throws Exception {
+	protected JSONObject loadJSONObject(String suffix) throws Exception {
 		String json = ResourceUtil.getResourceAsString(
 			getClass(),
 			"ElasticsearchIndexInformationTest-" + suffix + ".json");

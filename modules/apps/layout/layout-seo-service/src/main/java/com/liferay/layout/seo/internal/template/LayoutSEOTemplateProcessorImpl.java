@@ -68,7 +68,6 @@ public class LayoutSEOTemplateProcessorImpl
 		return sb.toString();
 	}
 
-	private static final Pattern _pattern = Pattern.compile(
-		"\\$\\{([^:}]+)(?::[^}]*)?\\}");
+	private static final Pattern _pattern = Pattern.compile("\\$\\{([^}]+)\\}");
 
 }

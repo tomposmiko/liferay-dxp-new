@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.internal.upgrade.v2_4_0;
 
+import com.liferay.fragment.internal.upgrade.v2_4_0.util.FragmentEntryLinkTable;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
 /**
@@ -24,8 +25,9 @@ public class FragmentEntryLinkUpgradeProcess extends UpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 		if (!hasColumn("FragmentEntryLink", "segmentsExperienceId")) {
-			alterTableAddColumn(
-				"FragmentEntryLink", "segmentsExperienceId", "LONG");
+			alter(
+				FragmentEntryLinkTable.class,
+				new AlterTableAddColumn("segmentsExperienceId", "LONG"));
 
 			runSQL("update FragmentEntryLink set segmentsExperienceId = 0");
 		}

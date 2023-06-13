@@ -20,13 +20,12 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.UserGroup;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
@@ -37,7 +36,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.usergroupsadmin.search.UserGroupChecker;
 import com.liferay.portlet.usergroupsadmin.search.UserGroupDisplayTerms;
 import com.liferay.portlet.usergroupsadmin.search.UserGroupSearch;
-import com.liferay.user.groups.admin.constants.UserGroupsAdminPortletKeys;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -93,7 +91,7 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 					"/edit_user_group.jsp", "redirect",
 					_renderResponse.createRenderURL());
 				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "add-user-group"));
+					LanguageUtil.get(_httpServletRequest, "add"));
 			}
 		).build();
 	}
@@ -125,25 +123,19 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
+		if (Validator.isNull(_orderByCol)) {
+			_orderByCol = ParamUtil.getString(
+				_httpServletRequest, "orderByCol", "name");
 		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, UserGroupsAdminPortletKeys.USER_GROUPS_ADMIN,
-			"view-user-groups-order-by-col", "name");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
+		if (Validator.isNull(_orderByType)) {
+			_orderByType = ParamUtil.getString(
+				_httpServletRequest, "orderByType", "asc");
 		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, UserGroupsAdminPortletKeys.USER_GROUPS_ADMIN,
-			"view-user-groups-order-by-type", "asc");
 
 		return _orderByType;
 	}
@@ -207,6 +199,8 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 		UserGroupSearch userGroupSearch = new UserGroupSearch(
 			_renderRequest, getPortletURL());
 
+		userGroupSearch.setRowChecker(new UserGroupChecker(_renderResponse));
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -222,15 +216,16 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 			userGroupParams.put("expandoAttributes", keywords);
 		}
 
-		userGroupSearch.setResultsAndTotal(
-			() -> UserGroupLocalServiceUtil.search(
-				themeDisplay.getCompanyId(), keywords, userGroupParams,
-				userGroupSearch.getStart(), userGroupSearch.getEnd(),
-				userGroupSearch.getOrderByComparator()),
-			UserGroupLocalServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), keywords, userGroupParams));
+		List<UserGroup> results = UserGroupLocalServiceUtil.search(
+			themeDisplay.getCompanyId(), keywords, userGroupParams,
+			userGroupSearch.getStart(), userGroupSearch.getEnd(),
+			userGroupSearch.getOrderByComparator());
 
-		userGroupSearch.setRowChecker(new UserGroupChecker(_renderResponse));
+		int total = UserGroupLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), keywords, userGroupParams);
+
+		userGroupSearch.setResults(results);
+		userGroupSearch.setTotal(total);
 
 		_userGroupSearch = userGroupSearch;
 

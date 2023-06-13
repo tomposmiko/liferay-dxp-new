@@ -68,13 +68,13 @@ FullNameDefinition fullNameDefinition = FullNameDefinitionFactory.getInstance(us
 				</aui:input>
 			</c:when>
 			<c:otherwise>
-				<aui:select disabled="<%= !UsersAdminUtil.hasUpdateFieldPermission(permissionChecker, user, selUser, fieldName) %>" label="<%= fieldName %>" name='<%= fieldName.concat("ListTypeValue") %>' showEmptyOption="<%= true %>">
+				<aui:select disabled="<%= !UsersAdminUtil.hasUpdateFieldPermission(permissionChecker, user, selUser, fieldName) %>" label="<%= fieldName %>" name='<%= fieldName.concat("Value") %>' showEmptyOption="<%= true %>">
 
 					<%
 					String listTypeName = StringPool.BLANK;
 
 					if (selContact != null) {
-						int listTypeId = BeanParamUtil.getInteger(selContact, request, fieldName.concat("ListTypeId"));
+						int listTypeId = BeanParamUtil.getInteger(selContact, request, fieldName.concat("Id"));
 
 						try {
 							ListType listType = ListTypeServiceUtil.getListType(listTypeId);

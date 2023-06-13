@@ -33,11 +33,8 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.dispatch.model.impl.DispatchLogImpl",
-		"table.name=DispatchLog"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {DispatchLogModelArgumentsResolver.class, ArgumentsResolver.class}
 )
 public class DispatchLogModelArgumentsResolver implements ArgumentsResolver {
 

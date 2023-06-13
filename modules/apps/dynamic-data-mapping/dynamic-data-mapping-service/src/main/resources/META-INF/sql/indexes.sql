@@ -21,7 +21,6 @@ create index IX_5C0B8AE5 on DDMField (structureVersionId, ctCollectionId);
 
 create index IX_52703248 on DDMFieldAttribute (attributeName[$COLUMN_LENGTH:255$], smallAttributeValue[$COLUMN_LENGTH:255$], ctCollectionId);
 create unique index IX_22EEBF0C on DDMFieldAttribute (fieldId, attributeName[$COLUMN_LENGTH:255$], languageId[$COLUMN_LENGTH:75$], ctCollectionId);
-create index IX_36E78464 on DDMFieldAttribute (storageId, attributeName[$COLUMN_LENGTH:255$], ctCollectionId);
 create index IX_EC62446F on DDMFieldAttribute (storageId, ctCollectionId);
 create index IX_1E90C536 on DDMFieldAttribute (storageId, languageId[$COLUMN_LENGTH:75$], ctCollectionId);
 
@@ -43,7 +42,6 @@ create index IX_EA8F43DE on DDMFormInstanceRecordVersion (formInstanceId, formIn
 create index IX_46C6B23E on DDMFormInstanceRecordVersion (formInstanceRecordId, ctCollectionId);
 create index IX_EB3C8524 on DDMFormInstanceRecordVersion (formInstanceRecordId, status, ctCollectionId);
 create unique index IX_272BBC86 on DDMFormInstanceRecordVersion (formInstanceRecordId, version[$COLUMN_LENGTH:75$], ctCollectionId);
-create index IX_F4924F07 on DDMFormInstanceRecordVersion (userId, formInstanceId, ctCollectionId);
 create index IX_CABC7FCA on DDMFormInstanceRecordVersion (userId, formInstanceId, formInstanceVersion[$COLUMN_LENGTH:75$], status, ctCollectionId);
 
 create index IX_4F6D9746 on DDMFormInstanceReport (formInstanceId, ctCollectionId);

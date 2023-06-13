@@ -30,10 +30,6 @@ public class CalendarResourceLocalServiceWrapper
 	implements CalendarResourceLocalService,
 			   ServiceWrapper<CalendarResourceLocalService> {
 
-	public CalendarResourceLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CalendarResourceLocalServiceWrapper(
 		CalendarResourceLocalService calendarResourceLocalService) {
 

@@ -15,26 +15,25 @@
 AUI.add(
 	'liferay-calendar-recurrence-dialog',
 	(A) => {
-		const DAYS_OF_WEEK = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+		var DAYS_OF_WEEK = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
-		const FREQUENCY_MONTHLY = 'MONTHLY';
+		var FREQUENCY_MONTHLY = 'MONTHLY';
 
-		const FREQUENCY_WEEKLY = 'WEEKLY';
+		var FREQUENCY_WEEKLY = 'WEEKLY';
 
-		const FREQUENCY_YEARLY = 'YEARLY';
+		var FREQUENCY_YEARLY = 'YEARLY';
 
-		const LIMIT_COUNT = 'after';
+		var LIMIT_COUNT = 'after';
 
-		const LIMIT_DATE = 'on';
+		var LIMIT_DATE = 'on';
 
-		const LIMIT_UNLIMITED = 'never';
+		var LIMIT_UNLIMITED = 'never';
 
-		const WEEK_LENGTH = A.DataType.DateMath.WEEK_LENGTH;
+		var WEEK_LENGTH = A.DataType.DateMath.WEEK_LENGTH;
 
-		const RecurrenceDialogController = A.Component.create({
+		var RecurrenceDialogController = A.Component.create({
 			ATTRS: {
 				container: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -44,7 +43,6 @@ AUI.add(
 				},
 
 				dayOfWeekInput: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -64,7 +62,6 @@ AUI.add(
 				},
 
 				frequencySelect: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -75,13 +72,11 @@ AUI.add(
 				},
 
 				intervalSelect: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
 
 				lastPositionCheckbox: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -92,13 +87,11 @@ AUI.add(
 				},
 
 				limitCountInput: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
 
 				limitCountRadioButton: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -114,7 +107,6 @@ AUI.add(
 				},
 
 				limitDateRadioButton: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -129,13 +121,11 @@ AUI.add(
 				},
 
 				monthlyRecurrenceOptions: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
 
 				noLimitRadioButton: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -145,13 +135,11 @@ AUI.add(
 				},
 
 				positionInput: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
 
 				positionSelect: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -162,7 +150,6 @@ AUI.add(
 				},
 
 				positionalDayOfWeekOptions: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -173,19 +160,16 @@ AUI.add(
 				},
 
 				repeatCheckbox: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
 
 				repeatOnDayOfMonthRadioButton: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
 
 				repeatOnDayOfWeekRadioButton: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -211,13 +195,11 @@ AUI.add(
 				},
 
 				summaryNode: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
 
 				weeklyRecurrenceOptions: {
-					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -227,16 +209,16 @@ AUI.add(
 
 			prototype: {
 				_afterVisibilityChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const recurrenceDialog =
+					var recurrenceDialog =
 						window[instance._namespace + 'recurrenceDialog'];
 
 					if (instance._confirmChanges) {
 						instance.saveState();
 					}
 					else {
-						const currentRecurrence = instance.get(
+						var currentRecurrence = instance.get(
 							'currentSavedState'
 						);
 
@@ -259,13 +241,13 @@ AUI.add(
 				},
 
 				_calculatePosition() {
-					const instance = this;
+					var instance = this;
 
-					const lastPositionCheckbox = instance.get(
+					var lastPositionCheckbox = instance.get(
 						'lastPositionCheckbox'
 					);
 
-					let position = instance.get('startDatePosition');
+					var position = instance.get('startDatePosition');
 
 					if (instance._isLastDayOfWeekInMonth()) {
 						if (
@@ -280,9 +262,9 @@ AUI.add(
 				},
 
 				_canChooseLastDayOfWeek() {
-					const instance = this;
+					var instance = this;
 
-					const mandatoryLastDay =
+					var mandatoryLastDay =
 						instance.get('startDatePosition') > 4;
 
 					return (
@@ -291,9 +273,9 @@ AUI.add(
 				},
 
 				_getDaysOfWeek() {
-					const instance = this;
+					var instance = this;
 
-					const dayOfWeekNodes = instance
+					var dayOfWeekNodes = instance
 						.get('daysOfWeekCheckboxes')
 						.filter(':checked');
 
@@ -301,9 +283,9 @@ AUI.add(
 				},
 
 				_getDaysOfWeekCheckboxes() {
-					const instance = this;
+					var instance = this;
 
-					const weeklyRecurrenceOptions = instance.get(
+					var weeklyRecurrenceOptions = instance.get(
 						'weeklyRecurrenceOptions'
 					);
 
@@ -311,33 +293,33 @@ AUI.add(
 				},
 
 				_getFrequency() {
-					const instance = this;
+					var instance = this;
 
-					const frequencySelect = instance.get('frequencySelect');
+					var frequencySelect = instance.get('frequencySelect');
 
 					return frequencySelect.val();
 				},
 
 				_getInterval() {
-					const instance = this;
+					var instance = this;
 
-					const intervalSelect = instance.get('intervalSelect');
+					var intervalSelect = instance.get('intervalSelect');
 
 					return intervalSelect.val();
 				},
 
 				_getLimitCount() {
-					const instance = this;
+					var instance = this;
 
-					const limitCountInput = instance.get('limitCountInput');
+					var limitCountInput = instance.get('limitCountInput');
 
 					return parseInt(limitCountInput.val(), 10);
 				},
 
 				_getLimitDate() {
-					const instance = this;
+					var instance = this;
 
-					const limitDateDatePicker = instance.get(
+					var limitDateDatePicker = instance.get(
 						'limitDateDatePicker'
 					);
 
@@ -345,7 +327,7 @@ AUI.add(
 				},
 
 				_getLimitRadioButtons() {
-					const instance = this;
+					var instance = this;
 
 					return [
 						instance.get('limitCountRadioButton'),
@@ -355,9 +337,9 @@ AUI.add(
 				},
 
 				_getLimitType() {
-					const instance = this;
+					var instance = this;
 
-					const checkedLimitRadioButton = A.Array.find(
+					var checkedLimitRadioButton = A.Array.find(
 						instance.get('limitRadioButtons'),
 						(item) => {
 							return item.get('checked');
@@ -370,25 +352,25 @@ AUI.add(
 				},
 
 				_getPosition() {
-					const instance = this;
+					var instance = this;
 
-					const positionInput = instance.get('positionInput');
+					var positionInput = instance.get('positionInput');
 
 					return positionInput.val();
 				},
 
 				_getPositionalDayOfWeek() {
-					const instance = this;
+					var instance = this;
 
-					const dayOfWeekInput = instance.get('dayOfWeekInput');
+					var dayOfWeekInput = instance.get('dayOfWeekInput');
 
-					let positionalDayOfWeek = null;
+					var positionalDayOfWeek = null;
 
-					const repeatOnDayOfWeek = instance
+					var repeatOnDayOfWeek = instance
 						.get('repeatOnDayOfWeekRadioButton')
 						.get('checked');
 
-					const startDate = instance.get('startDate');
+					var startDate = instance.get('startDate');
 
 					if (
 						instance._isPositionalFrequency() &&
@@ -405,7 +387,7 @@ AUI.add(
 				},
 
 				_getRecurrence() {
-					const instance = this;
+					var instance = this;
 
 					return {
 						count: instance.get('limitCount'),
@@ -419,9 +401,9 @@ AUI.add(
 				},
 
 				_getStartDate() {
-					const instance = this;
+					var instance = this;
 
-					const startDateDatePicker = instance.get(
+					var startDateDatePicker = instance.get(
 						'startDateDatePicker'
 					);
 
@@ -429,21 +411,21 @@ AUI.add(
 				},
 
 				_getStartDatePosition() {
-					const instance = this;
+					var instance = this;
 
-					const startDateDatePicker = instance.get(
+					var startDateDatePicker = instance.get(
 						'startDateDatePicker'
 					);
 
-					const startDate = startDateDatePicker.getDate();
+					var startDate = startDateDatePicker.getDate();
 
 					return Math.ceil(startDate.getDate() / WEEK_LENGTH);
 				},
 
 				_getStartTimeDayOfWeekInput() {
-					const instance = this;
+					var instance = this;
 
-					const weeklyRecurrenceOptions = instance.get(
+					var weeklyRecurrenceOptions = instance.get(
 						'weeklyRecurrenceOptions'
 					);
 
@@ -451,15 +433,15 @@ AUI.add(
 				},
 
 				_getSummary() {
-					const instance = this;
+					var instance = this;
 
-					const recurrence = instance.get('recurrence');
+					var recurrence = instance.get('recurrence');
 
 					return Liferay.RecurrenceUtil.getSummary(recurrence);
 				},
 
 				_hideModal(event, confirmed) {
-					const instance = this;
+					var instance = this;
 
 					if (confirmed) {
 						instance._confirmChanges = true;
@@ -469,13 +451,11 @@ AUI.add(
 				},
 
 				_isLastDayOfWeekInMonth() {
-					const instance = this;
+					var instance = this;
 
-					const startDate = instance.get('startDate');
+					var startDate = instance.get('startDate');
 
-					const lastDate = A.DataType.DateMath.findMonthEnd(
-						startDate
-					);
+					var lastDate = A.DataType.DateMath.findMonthEnd(startDate);
 
 					return (
 						lastDate.getDate() - startDate.getDate() < WEEK_LENGTH
@@ -483,9 +463,9 @@ AUI.add(
 				},
 
 				_isPositionalFrequency() {
-					const instance = this;
+					var instance = this;
 
-					const frequency = instance.get('frequency');
+					var frequency = instance.get('frequency');
 
 					return (
 						frequency === FREQUENCY_MONTHLY ||
@@ -494,9 +474,9 @@ AUI.add(
 				},
 
 				_onInputChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const currentTarget = event.currentTarget;
+					var currentTarget = event.currentTarget;
 
 					if (currentTarget === instance.get('frequencySelect')) {
 						instance._toggleViewWeeklyRecurrence();
@@ -524,27 +504,45 @@ AUI.add(
 				},
 
 				_onStartDateDatePickerChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const date = event.newSelection[0];
+					var date = event.newSelection[0];
 
-					const dayOfWeek = DAYS_OF_WEEK[date.getDay()];
+					var dayOfWeek = DAYS_OF_WEEK[date.getDay()];
 
-					const dayOfWeekInput = instance.get('dayOfWeekInput');
+					var dayOfWeekInput = instance.get('dayOfWeekInput');
 
-					const positionInput = instance.get('positionInput');
+					var daysOfWeekCheckboxes = instance.get(
+						'daysOfWeekCheckboxes'
+					);
 
-					const repeatCheckbox = instance.get('repeatCheckbox');
+					var positionInput = instance.get('positionInput');
 
-					const repeatOnDayOfWeekRadioButton = instance.get(
+					var repeatCheckbox = instance.get('repeatCheckbox');
+
+					var repeatOnDayOfWeekRadioButton = instance.get(
 						'repeatOnDayOfWeekRadioButton'
 					);
 
-					const startTimeDayOfWeekInput = instance.get(
+					var startTimeDayOfWeekInput = instance.get(
 						'startTimeDayOfWeekInput'
 					);
 
 					startTimeDayOfWeekInput.val(dayOfWeek);
+
+					daysOfWeekCheckboxes.each((item) => {
+						if (item.val() == dayOfWeek) {
+							item.set('checked', true);
+							item.set('disabled', true);
+						}
+						else if (item.get('disabled')) {
+							item.set('disabled', false);
+
+							if (!repeatCheckbox.get('checked')) {
+								item.set('checked', false);
+							}
+						}
+					});
 
 					dayOfWeekInput.val(dayOfWeek);
 
@@ -563,7 +561,7 @@ AUI.add(
 				},
 
 				_setDatePicker(datePicker) {
-					const popover = datePicker.get('popover');
+					var popover = datePicker.get('popover');
 
 					if (popover) {
 						popover.zIndex = Liferay.zIndex.POPOVER;
@@ -573,14 +571,14 @@ AUI.add(
 				},
 
 				_setDaysOfWeek(value) {
-					const instance = this;
+					var instance = this;
 
-					const dayOfWeekNodes = instance
+					var dayOfWeekNodes = instance
 						.get('daysOfWeekCheckboxes')
 						.filter(':not([disabled])');
 
 					dayOfWeekNodes.each((node) => {
-						const check = value.indexOf(node.get('value')) > -1;
+						var check = value.indexOf(node.get('value')) > -1;
 
 						node.set('checked', check);
 					});
@@ -589,9 +587,9 @@ AUI.add(
 				},
 
 				_setFrequency(value) {
-					const instance = this;
+					var instance = this;
 
-					const frequencySelect = instance.get('frequencySelect');
+					var frequencySelect = instance.get('frequencySelect');
 
 					frequencySelect.set('value', value);
 
@@ -599,9 +597,9 @@ AUI.add(
 				},
 
 				_setInterval(value) {
-					const instance = this;
+					var instance = this;
 
-					const intervalSelect = instance.get('intervalSelect');
+					var intervalSelect = instance.get('intervalSelect');
 
 					intervalSelect.set('value', value);
 
@@ -609,7 +607,7 @@ AUI.add(
 				},
 
 				_setLimitCount(value) {
-					const instance = this;
+					var instance = this;
 
 					instance.get('limitCountInput').set('value', value || '');
 
@@ -617,9 +615,9 @@ AUI.add(
 				},
 
 				_setLimitDate(value) {
-					const instance = this;
+					var instance = this;
 
-					const limitDateDatePicker = instance.get(
+					var limitDateDatePicker = instance.get(
 						'limitDateDatePicker'
 					);
 
@@ -632,7 +630,7 @@ AUI.add(
 				},
 
 				_setLimitType(value) {
-					const instance = this;
+					var instance = this;
 
 					A.each(instance.get('limitRadioButtons'), (node) => {
 						if (node.get('value') === value) {
@@ -644,23 +642,23 @@ AUI.add(
 				},
 
 				_setPositionInputValue() {
-					const instance = this;
+					var instance = this;
 
-					const positionInput = instance.get('positionInput');
+					var positionInput = instance.get('positionInput');
 
 					positionInput.val(instance._calculatePosition());
 				},
 
 				_setPositionalDayOfWeek(value) {
-					const instance = this;
+					var instance = this;
 
-					const lastPositionCheckbox = instance.get(
+					var lastPositionCheckbox = instance.get(
 						'lastPositionCheckbox'
 					);
-					const repeatOnDayOfMonthRadioButton = instance.get(
+					var repeatOnDayOfMonthRadioButton = instance.get(
 						'repeatOnDayOfMonthRadioButton'
 					);
-					const repeatOnDayOfWeekRadioButton = instance.get(
+					var repeatOnDayOfWeekRadioButton = instance.get(
 						'repeatOnDayOfWeekRadioButton'
 					);
 
@@ -675,7 +673,7 @@ AUI.add(
 				},
 
 				_setRecurrence(data) {
-					const instance = this;
+					var instance = this;
 
 					if (data) {
 						instance.set('daysOfWeek', data.weekdays);
@@ -694,13 +692,13 @@ AUI.add(
 				},
 
 				_toggleDisabledLimitCountInput() {
-					const instance = this;
+					var instance = this;
 
-					const limitCountInput = instance.get('limitCountInput');
+					var limitCountInput = instance.get('limitCountInput');
 
-					const limitType = instance.get('limitType');
+					var limitType = instance.get('limitType');
 
-					const disableLimitCountInput =
+					var disableLimitCountInput =
 						limitType === LIMIT_UNLIMITED ||
 						limitType === LIMIT_DATE;
 
@@ -713,11 +711,11 @@ AUI.add(
 				},
 
 				_toggleDisabledLimitDateDatePicker() {
-					const instance = this;
+					var instance = this;
 
-					const limitType = instance.get('limitType');
+					var limitType = instance.get('limitType');
 
-					const disableLimitDateDatePicker =
+					var disableLimitDateDatePicker =
 						limitType === LIMIT_UNLIMITED ||
 						limitType === LIMIT_COUNT;
 
@@ -727,9 +725,9 @@ AUI.add(
 				},
 
 				_toggleView(viewName, show) {
-					const instance = this;
+					var instance = this;
 
-					const viewNode = instance.get(viewName);
+					var viewNode = instance.get(viewName);
 
 					if (viewNode) {
 						viewNode.toggle(show);
@@ -737,9 +735,9 @@ AUI.add(
 				},
 
 				_toggleViewPositionalDayOfWeek() {
-					const instance = this;
+					var instance = this;
 
-					const repeatOnDayOfWeek = instance
+					var repeatOnDayOfWeek = instance
 						.get('repeatOnDayOfWeekRadioButton')
 						.get('checked');
 
@@ -750,7 +748,7 @@ AUI.add(
 				},
 
 				_toggleViewWeeklyRecurrence() {
-					const instance = this;
+					var instance = this;
 
 					instance._toggleView(
 						'weeklyRecurrenceOptions',
@@ -763,7 +761,7 @@ AUI.add(
 				},
 
 				_updateUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._setPositionInputValue();
 					instance._toggleDisabledLimitCountInput();
@@ -775,15 +773,15 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const limitDateDatePicker = instance.get(
+					var limitDateDatePicker = instance.get(
 						'limitDateDatePicker'
 					);
 
-					const startDateDatePicker = instance.get(
+					var startDateDatePicker = instance.get(
 						'startDateDatePicker'
 					);
 
@@ -809,7 +807,7 @@ AUI.add(
 				},
 
 				initializer(config) {
-					const instance = this;
+					var instance = this;
 
 					instance._namespace = config.namespace;
 
@@ -817,9 +815,9 @@ AUI.add(
 				},
 
 				saveState() {
-					const instance = this;
+					var instance = this;
 
-					const currentSavedState = instance.get('recurrence');
+					var currentSavedState = instance.get('recurrence');
 
 					currentSavedState.repeatable = instance
 						.get('repeatCheckbox')

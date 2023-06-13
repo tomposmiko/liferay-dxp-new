@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -38,13 +37,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class XLSBatchEngineImportTaskItemReaderImpl
 	implements BatchEngineImportTaskItemReader {
 
-	public XLSBatchEngineImportTaskItemReaderImpl(
-			List<String> includeFieldNames, InputStream inputStream)
+	public XLSBatchEngineImportTaskItemReaderImpl(InputStream inputStream)
 		throws IOException {
-
-		if (!includeFieldNames.isEmpty()) {
-			_fieldNameFilter = new FieldNameFilterFunction(includeFieldNames);
-		}
 
 		_inputStream = inputStream;
 
@@ -103,21 +97,30 @@ public class XLSBatchEngineImportTaskItemReaderImpl
 				}
 			}
 			else {
-				FieldNameValueMapHandlerFactory.FieldNameValueMapHandler
-					fieldNameValueMapHandler =
-						FieldNameValueMapHandlerFactory.
-							getFieldNameValueMapHandler(fieldName);
+				String value = cell.getStringCellValue();
 
-				fieldNameValueMapHandler.handle(
-					fieldName, fieldNameValueMap, cell.getStringCellValue());
+				value = value.trim();
+
+				if (value.isEmpty()) {
+					value = null;
+				}
+
+				int lastDelimiterIndex = fieldName.lastIndexOf('_');
+
+				if (lastDelimiterIndex == -1) {
+					fieldNameValueMap.put(fieldName, value);
+				}
+				else {
+					BatchEngineImportTaskItemReaderUtil.handleMapField(
+						fieldName, fieldNameValueMap, lastDelimiterIndex,
+						value);
+				}
 			}
 		}
 
-		return _fieldNameFilter.apply(fieldNameValueMap);
+		return fieldNameValueMap;
 	}
 
-	private Function<Map<String, Object>, Map<String, Object>>
-		_fieldNameFilter = map -> map;
 	private final String[] _fieldNames;
 	private final InputStream _inputStream;
 	private final Iterator<Row> _iterator;

@@ -339,11 +339,6 @@ public class PluginSettingWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected PluginSettingWrapper wrap(PluginSetting pluginSetting) {
 		return new PluginSettingWrapper(pluginSetting);
 	}

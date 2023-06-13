@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class PortalServiceWrapper
 	implements PortalService, ServiceWrapper<PortalService> {
 
-	public PortalServiceWrapper() {
-		this(null);
-	}
-
 	public PortalServiceWrapper(PortalService portalService) {
 		_portalService = portalService;
 	}
@@ -65,6 +61,32 @@ public class PortalServiceWrapper
 	@Override
 	public void testAddClassName_Success(java.lang.String classNameValue) {
 		_portalService.testAddClassName_Success(classNameValue);
+	}
+
+	@Override
+	public void testAddClassNameAndTestTransactionPortletBar_PortalRollback(
+		java.lang.String transactionPortletBarText) {
+
+		_portalService.
+			testAddClassNameAndTestTransactionPortletBar_PortalRollback(
+				transactionPortletBarText);
+	}
+
+	@Override
+	public void testAddClassNameAndTestTransactionPortletBar_PortletRollback(
+		java.lang.String transactionPortletBarText) {
+
+		_portalService.
+			testAddClassNameAndTestTransactionPortletBar_PortletRollback(
+				transactionPortletBarText);
+	}
+
+	@Override
+	public void testAddClassNameAndTestTransactionPortletBar_Success(
+		java.lang.String transactionPortletBarText) {
+
+		_portalService.testAddClassNameAndTestTransactionPortletBar_Success(
+			transactionPortletBarText);
 	}
 
 	@Override

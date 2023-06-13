@@ -29,6 +29,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -43,6 +45,8 @@ public class SynonymSetIndexWriterImplTest extends BaseSynonymsWebTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_synonymSetIndexWriterImpl = new SynonymSetIndexWriterImpl();
 
 		ReflectionTestUtil.setFieldValue(
@@ -74,7 +78,7 @@ public class SynonymSetIndexWriterImplTest extends BaseSynonymsWebTestCase {
 		Mockito.verify(
 			searchEngineAdapter, Mockito.times(1)
 		).execute(
-			Mockito.any(DeleteDocumentRequest.class)
+			Matchers.any(DeleteDocumentRequest.class)
 		);
 	}
 
@@ -87,7 +91,7 @@ public class SynonymSetIndexWriterImplTest extends BaseSynonymsWebTestCase {
 		Mockito.verify(
 			searchEngineAdapter, Mockito.times(1)
 		).execute(
-			Mockito.any(IndexDocumentRequest.class)
+			Matchers.any(IndexDocumentRequest.class)
 		);
 	}
 
@@ -110,13 +114,13 @@ public class SynonymSetIndexWriterImplTest extends BaseSynonymsWebTestCase {
 		).when(
 			_synonymSetToDocumentTranslator
 		).translate(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 	}
 
 	private SynonymSetIndexWriterImpl _synonymSetIndexWriterImpl;
-	private final SynonymSetToDocumentTranslator
-		_synonymSetToDocumentTranslator = Mockito.mock(
-			SynonymSetToDocumentTranslator.class);
+
+	@Mock
+	private SynonymSetToDocumentTranslator _synonymSetToDocumentTranslator;
 
 }

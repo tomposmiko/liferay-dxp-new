@@ -1,8 +1,0 @@
-@default = "executeJavaScript"
-definition {
-
-	function executeJavaScript {
-		selenium.executeJavaScript();
-	}
-
-}

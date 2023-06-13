@@ -32,7 +32,6 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -72,7 +71,7 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 
 	@Before
 	public void setUp() {
-		_elasticsearchEngineAdapterFixture =
+		ElasticsearchEngineAdapterFixture elasticsearchEngineAdapterFixture =
 			new ElasticsearchEngineAdapterFixture() {
 				{
 					setElasticsearchClientResolver(
@@ -80,17 +79,12 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 				}
 			};
 
-		_elasticsearchEngineAdapterFixture.setUp();
+		elasticsearchEngineAdapterFixture.setUp();
 
-		_waitForElasticsearchToStart(_elasticsearchConnectionFixture);
+		waitForElasticsearchToStart(_elasticsearchConnectionFixture);
 
 		_searchEngineAdapter =
-			_elasticsearchEngineAdapterFixture.getSearchEngineAdapter();
-	}
-
-	@After
-	public void tearDown() {
-		_elasticsearchEngineAdapterFixture.tearDown();
+			elasticsearchEngineAdapterFixture.getSearchEngineAdapter();
 	}
 
 	@ExpectedLog(
@@ -146,7 +140,7 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 			});
 	}
 
-	private void _waitForElasticsearchToStart(
+	protected void waitForElasticsearchToStart(
 		ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		ClusterHealthResponseUtil.getClusterHealthResponse(
@@ -166,8 +160,6 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 	private static ElasticsearchConnectionFixture
 		_elasticsearchConnectionFixture;
 
-	private ElasticsearchEngineAdapterFixture
-		_elasticsearchEngineAdapterFixture;
 	private SearchEngineAdapter _searchEngineAdapter;
 
 }

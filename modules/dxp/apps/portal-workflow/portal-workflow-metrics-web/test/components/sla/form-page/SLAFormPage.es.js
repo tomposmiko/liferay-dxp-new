@@ -18,7 +18,6 @@ import {SLAContext} from '../../../../src/main/resources/META-INF/resources/js/c
 import SLAFormPage from '../../../../src/main/resources/META-INF/resources/js/components/sla/form-page/SLAFormPage.es';
 import ToasterProvider from '../../../../src/main/resources/META-INF/resources/js/shared/components/toaster/ToasterProvider.es';
 import {MockRouter} from '../../../mock/MockRouter.es';
-import FetchMock, {fetchMockResponse} from '../../../mock/fetch.es';
 
 describe('The SLAFormPage component should', () => {
 	const calendars = [
@@ -70,19 +69,18 @@ describe('The SLAFormPage component should', () => {
 	];
 
 	describe('Create a new SLA', () => {
-		let alertMessage;
-		let container;
-		let durationDaysField;
-		let durationHoursField;
-		let durationHoursInput;
-		let fetchMock;
-		let getByText;
-		let nameField;
-		let nameInput;
-		let renderResult;
-		let saveButton;
-		let startField;
-		let stopField;
+		let alertMessage,
+			container,
+			durationDaysField,
+			durationHoursField,
+			durationHoursInput,
+			getByText,
+			nameField,
+			nameInput,
+			renderResult,
+			saveButton,
+			startField,
+			stopField;
 
 		const data = {
 			calendarKey: '',
@@ -113,6 +111,28 @@ describe('The SLAFormPage component should', () => {
 			},
 		};
 
+		const clientMock = {
+			get: jest
+				.fn()
+				.mockResolvedValueOnce({data: {items: calendars}})
+				.mockResolvedValue({data: {items: nodes}}),
+			post: jest
+				.fn()
+				.mockRejectedValueOnce({})
+				.mockRejectedValueOnce({
+					response: {
+						data: [
+							{
+								fieldName: 'name',
+								message:
+									'An SLA with the same name already exists.',
+							},
+						],
+					},
+				})
+				.mockResolvedValue({data}),
+		};
+
 		const historyMock = {
 			goBack: jest.fn(),
 		};
@@ -120,35 +140,8 @@ describe('The SLAFormPage component should', () => {
 		beforeAll(async () => {
 			cleanup();
 
-			fetchMock = new FetchMock({
-				GET: {
-					'/o/portal-workflow-metrics/v1.0/calendars': fetchMockResponse(
-						{
-							items: calendars,
-						}
-					),
-					'default': fetchMockResponse({items: nodes}),
-				},
-				POST: {
-					'/o/portal-workflow-metrics/v1.0/processes/5678/slas': [
-						fetchMockResponse({}, false),
-						fetchMockResponse(
-							[
-								{
-									fieldName: 'name',
-									message:
-										'An SLA with the same name already exists.',
-								},
-							],
-							false
-						),
-						fetchMockResponse(data),
-					],
-				},
-			});
-
 			renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<ToasterProvider>
 						<SLAContext.Provider value={{}}>
 							<SLAFormPage
@@ -167,14 +160,6 @@ describe('The SLAFormPage component should', () => {
 			await act(async () => {
 				jest.runAllTimers();
 			});
-		});
-
-		beforeEach(() => {
-			fetchMock.mock();
-		});
-
-		afterEach(() => {
-			fetchMock.reset();
 		});
 
 		it('Be rendered correctly', () => {
@@ -341,10 +326,7 @@ describe('The SLAFormPage component should', () => {
 	});
 
 	describe('Edit a SLA', () => {
-		let container;
-		let fetchMock;
-		let getByText;
-		let renderResult;
+		let container, getByText, renderResult;
 
 		const data = {
 			calendarKey: 'default',
@@ -375,6 +357,15 @@ describe('The SLAFormPage component should', () => {
 			},
 		};
 
+		const clientMock = {
+			get: jest
+				.fn()
+				.mockResolvedValueOnce({data: {items: calendars}})
+				.mockResolvedValueOnce({data: {items: nodes}})
+				.mockResolvedValue({data}),
+			put: jest.fn().mockResolvedValue({}),
+		};
+
 		const historyMock = {
 			goBack: jest.fn(),
 		};
@@ -384,27 +375,8 @@ describe('The SLAFormPage component should', () => {
 		beforeAll(async () => {
 			cleanup();
 
-			fetchMock = new FetchMock({
-				GET: {
-					'/o/portal-workflow-metrics/v1.0/calendars': fetchMockResponse(
-						{
-							items: calendars,
-						}
-					),
-					'/o/portal-workflow-metrics/v1.0/processes/5678/nodes': fetchMockResponse(
-						{
-							items: nodes,
-						}
-					),
-					'default': fetchMockResponse(data),
-				},
-				PUT: {
-					default: fetchMockResponse({}),
-				},
-			});
-
 			renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<ToasterProvider>
 						<SLAContext.Provider value={contextMock}>
 							<SLAFormPage
@@ -423,14 +395,6 @@ describe('The SLAFormPage component should', () => {
 			await act(async () => {
 				jest.runAllTimers();
 			});
-		});
-
-		beforeEach(() => {
-			fetchMock.mock();
-		});
-
-		afterEach(() => {
-			fetchMock.reset();
 		});
 
 		it('Render form in edit mode with correct data', async () => {
@@ -467,16 +431,14 @@ describe('The SLAFormPage component should', () => {
 			});
 		});
 
-		it.skip('Redirect to SLAListPage after successful submit', async () => {
+		it('Redirect to SLAListPage after successful submit', async () => {
 			expect(historyMock.goBack).toHaveBeenCalled();
 			expect(contextMock.setSLAUpdated).toHaveBeenCalledWith(true);
 		});
 	});
 
 	describe('Edit a Blocked SLA', () => {
-		let fetchMock;
-		let getByText;
-		let renderResult;
+		let getByText, renderResult;
 
 		const nodes = [
 			{
@@ -525,27 +487,19 @@ describe('The SLAFormPage component should', () => {
 			status: 2,
 		};
 
+		const clientMock = {
+			get: jest
+				.fn()
+				.mockResolvedValueOnce({data: {items: calendars}})
+				.mockResolvedValueOnce({data: {items: nodes}})
+				.mockResolvedValueOnce({data}),
+		};
+
 		beforeAll(async () => {
 			cleanup();
 
-			fetchMock = new FetchMock({
-				GET: {
-					'/o/portal-workflow-metrics/v1.0/calendars': fetchMockResponse(
-						{
-							items: calendars,
-						}
-					),
-					'/o/portal-workflow-metrics/v1.0/processes/35901/nodes': fetchMockResponse(
-						{
-							items: nodes,
-						}
-					),
-					'default': fetchMockResponse(data),
-				},
-			});
-
 			renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<ToasterProvider>
 						<SLAContext.Provider value={{}}>
 							<SLAFormPage id="37741" processId="35901" />
@@ -559,14 +513,6 @@ describe('The SLAFormPage component should', () => {
 			await act(async () => {
 				jest.runAllTimers();
 			});
-		});
-
-		beforeEach(() => {
-			fetchMock.mock();
-		});
-
-		afterEach(() => {
-			fetchMock.reset();
 		});
 
 		it('Handle errors at start and stop node keys', () => {

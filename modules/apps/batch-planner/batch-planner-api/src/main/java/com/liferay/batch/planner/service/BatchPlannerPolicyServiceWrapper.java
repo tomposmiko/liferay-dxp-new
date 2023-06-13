@@ -27,10 +27,6 @@ public class BatchPlannerPolicyServiceWrapper
 	implements BatchPlannerPolicyService,
 			   ServiceWrapper<BatchPlannerPolicyService> {
 
-	public BatchPlannerPolicyServiceWrapper() {
-		this(null);
-	}
-
 	public BatchPlannerPolicyServiceWrapper(
 		BatchPlannerPolicyService batchPlannerPolicyService) {
 

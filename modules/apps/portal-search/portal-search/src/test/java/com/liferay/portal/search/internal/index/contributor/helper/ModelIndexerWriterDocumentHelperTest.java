@@ -22,11 +22,15 @@ import com.liferay.portal.search.indexer.IndexerDocumentBuilder;
 import com.liferay.portal.search.spi.model.index.contributor.helper.ModelIndexerWriterDocumentHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Adam Brandizzi
@@ -38,9 +42,14 @@ public class ModelIndexerWriterDocumentHelperTest {
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+	}
+
 	@Test
 	public void testException() throws PortalException {
-		_throwIndexNameBuilderException(new SystemException());
+		throwIndexNameBuilderException(new SystemException());
 
 		ModelIndexerWriterDocumentHelper modelIndexerWriterDocumentHelper =
 			new ModelIndexerWriterDocumentHelperImpl(
@@ -49,16 +58,18 @@ public class ModelIndexerWriterDocumentHelperTest {
 		modelIndexerWriterDocumentHelper.getDocument(baseModel);
 	}
 
-	protected BaseModel<?> baseModel = Mockito.mock(BaseModel.class);
-	protected IndexerDocumentBuilder indexDocumentBuilder = Mockito.mock(
-		IndexerDocumentBuilder.class);
-
-	private void _throwIndexNameBuilderException(Exception exception) {
+	protected void throwIndexNameBuilderException(Exception exception) {
 		Mockito.when(
-			indexDocumentBuilder.getDocument(Mockito.any())
+			indexDocumentBuilder.getDocument(Matchers.any())
 		).thenThrow(
 			exception
 		);
 	}
+
+	@Mock
+	protected BaseModel<?> baseModel;
+
+	@Mock
+	protected IndexerDocumentBuilder indexDocumentBuilder;
 
 }

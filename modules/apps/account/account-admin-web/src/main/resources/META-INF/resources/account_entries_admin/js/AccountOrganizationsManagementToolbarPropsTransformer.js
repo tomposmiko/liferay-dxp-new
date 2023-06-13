@@ -12,13 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	openSelectionModal,
-	postForm,
-	sub,
-} from 'frontend-js-web';
+import {openSelectionModal, postForm} from 'frontend-js-web';
 
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	return {
@@ -29,30 +23,29 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 			const action = data?.action;
 
 			if (action === 'removeOrganizations') {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-remove-the-selected-organizations'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							const form = document.getElementById(
-								`${portletNamespace}fm`
-							);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-remove-the-selected-organizations'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}fm`
+					);
 
-							if (form) {
-								postForm(form, {
-									data: {
-										accountOrganizationIds: getCheckedCheckboxes(
-											form,
-											`${portletNamespace}allRowIds`
-										),
-									},
-									url: data?.removeOrganizationsURL,
-								});
-							}
-						}
-					},
-				});
+					if (form) {
+						postForm(form, {
+							data: {
+								accountOrganizationIds: Liferay.Util.listCheckedExcept(
+									form,
+									`${portletNamespace}allRowIds`
+								),
+							},
+							url: data?.removeOrganizationsURL,
+						});
+					}
+				}
 			}
 		},
 		onCreateButtonClick: (event, {item}) => {
@@ -60,10 +53,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 
 			openSelectionModal({
 				buttonAddLabel: Liferay.Language.get('assign'),
-				containerProps: {
-					className: '',
-				},
-				iframeBodyCssClass: '',
 				multiple: true,
 				onSelect: (selectedItems) => {
 					if (!selectedItems?.length) {
@@ -85,7 +74,7 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 						});
 					}
 				},
-				title: sub(
+				title: Liferay.Util.sub(
 					Liferay.Language.get('assign-organizations-to-x'),
 					data?.accountEntryName
 				),

@@ -263,8 +263,4 @@ public interface CTCollectionModel
 	@Override
 	public CTCollection cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

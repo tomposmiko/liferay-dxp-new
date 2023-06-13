@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -41,6 +42,13 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @AccessControlled
 @JSONWebService
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=commerce",
+		"json.web.service.context.path=CommerceShipment"
+	},
+	service = CommerceShipmentService.class
+)
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
@@ -54,13 +62,13 @@ public interface CommerceShipmentService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.commerce.service.impl.CommerceShipmentServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the commerce shipment remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link CommerceShipmentServiceUtil} if injection and service tracking are not available.
 	 */
 	public CommerceShipment addCommerceShipment(
-			long commerceOrderId, ServiceContext serviceContext)
+			long groupId, long commerceAccountId, long commerceAddressId,
+			long commerceShippingMethodId, String commerceShippingOptionName,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public CommerceShipment addCommerceShipment(
-			String externalReferenceCode, long groupId, long commerceAccountId,
-			long commerceAddressId, long commerceShippingMethodId,
-			String commerceShippingOptionName, ServiceContext serviceContext)
+			long commerceOrderId, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -72,11 +80,6 @@ public interface CommerceShipmentService extends BaseService {
 
 	public void deleteCommerceShipment(
 			long commerceShipmentId, boolean restoreStockQuantity)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceShipment fetchCommerceShipmentByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -163,42 +166,31 @@ public interface CommerceShipmentService extends BaseService {
 		throws PortalException;
 
 	public CommerceShipment updateCarrierDetails(
-			long commerceShipmentId, long commerceShippingMethodId,
-			String carrier, String trackingNumber, String trackingURL)
+			long commerceShipmentId, String carrier, String trackingNumber)
 		throws PortalException;
 
 	public CommerceShipment updateCommerceShipment(
-			CommerceShipment commerceShipment)
+			long commerceShipmentId, String carrier, String trackingNumber,
+			int status, int shippingDateMonth, int shippingDateDay,
+			int shippingDateYear, int shippingDateHour, int shippingDateMinute,
+			int expectedDateMonth, int expectedDateDay, int expectedDateYear,
+			int expectedDateHour, int expectedDateMinute)
 		throws PortalException;
 
 	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, long commerceShippingMethodId,
-			String carrier, int expectedDateMonth, int expectedDateDay,
-			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
-			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
-			int shippingDateHour, int shippingDateMinute, String trackingNumber,
-			String trackingURL, int status, ServiceContext serviceContext)
-		throws PortalException;
-
-	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, long commerceShippingMethodId,
-			String carrier, int expectedDateMonth, int expectedDateDay,
-			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
-			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
-			int shippingDateHour, int shippingDateMinute, String trackingNumber,
-			String trackingURL, int status, String name, String description,
+			long commerceShipmentId, String name, String description,
 			String street1, String street2, String street3, String city,
 			String zip, long regionId, long countryId, String phoneNumber,
-			ServiceContext serviceContext)
+			String carrier, String trackingNumber, int status,
+			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
+			int shippingDateHour, int shippingDateMinute, int expectedDateMonth,
+			int expectedDateDay, int expectedDateYear, int expectedDateHour,
+			int expectedDateMinute)
 		throws PortalException;
 
 	public CommerceShipment updateExpectedDate(
 			long commerceShipmentId, int expectedDateMonth, int expectedDateDay,
 			int expectedDateYear, int expectedDateHour, int expectedDateMinute)
-		throws PortalException;
-
-	public CommerceShipment updateExternalReferenceCode(
-			long commerceShipmentId, String externalReferenceCode)
 		throws PortalException;
 
 	public CommerceShipment updateShippingDate(

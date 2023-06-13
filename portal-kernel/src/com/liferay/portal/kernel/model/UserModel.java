@@ -200,6 +200,27 @@ public interface UserModel
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
+	 * Returns the default user of this user.
+	 *
+	 * @return the default user of this user
+	 */
+	public boolean getDefaultUser();
+
+	/**
+	 * Returns <code>true</code> if this user is default user.
+	 *
+	 * @return <code>true</code> if this user is default user; <code>false</code> otherwise
+	 */
+	public boolean isDefaultUser();
+
+	/**
+	 * Sets whether this user is default user.
+	 *
+	 * @param defaultUser the default user of this user
+	 */
+	public void setDefaultUser(boolean defaultUser);
+
+	/**
 	 * Returns the contact ID of this user.
 	 *
 	 * @return the contact ID of this user
@@ -729,20 +750,6 @@ public interface UserModel
 	public void setEmailAddressVerified(boolean emailAddressVerified);
 
 	/**
-	 * Returns the type of this user.
-	 *
-	 * @return the type of this user
-	 */
-	public int getType();
-
-	/**
-	 * Sets the type of this user.
-	 *
-	 * @param type the type of this user
-	 */
-	public void setType(int type);
-
-	/**
 	 * Returns the status of this user.
 	 *
 	 * @return the status of this user
@@ -758,9 +765,5 @@ public interface UserModel
 
 	@Override
 	public User cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -23,6 +23,7 @@ import com.liferay.dispatch.service.DispatchTriggerLocalService;
 import com.liferay.dispatch.web.internal.display.context.DispatchTriggerDisplayContext;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -56,8 +57,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view_dispatch_trigger.jsp",
 		"javax.portlet.name=" + DispatchPortletKeys.DISPATCH,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -101,5 +101,8 @@ public class DispatchPortlet extends MVCPortlet {
 
 	@Reference
 	private DispatchTriggerMetadataProvider _dispatchTriggerMetadataProvider;
+
+	@Reference
+	private Portal _portal;
 
 }

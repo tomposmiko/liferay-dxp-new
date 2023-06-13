@@ -206,12 +206,14 @@ public class ManagementService implements CacheManagerEventListener {
 		}
 		catch (InstanceAlreadyExistsException instanceAlreadyExistsException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(instanceAlreadyExistsException);
+				_log.debug(
+					instanceAlreadyExistsException,
+					instanceAlreadyExistsException);
 			}
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 	}
@@ -225,7 +227,7 @@ public class ManagementService implements CacheManagerEventListener {
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(exception);
+					_log.warn(exception, exception);
 				}
 			}
 		}

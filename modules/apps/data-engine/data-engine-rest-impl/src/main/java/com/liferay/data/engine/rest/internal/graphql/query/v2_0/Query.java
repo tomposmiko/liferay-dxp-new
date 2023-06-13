@@ -239,10 +239,10 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataDefinitionDataDefinitionFieldLinks(dataDefinitionId: ___, fieldName: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataDefinitionDataDefinitionFieldLink(dataDefinitionId: ___, fieldName: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
-	public DataDefinitionFieldLinkPage dataDefinitionDataDefinitionFieldLinks(
+	public DataDefinitionFieldLinkPage dataDefinitionDataDefinitionFieldLink(
 			@GraphQLName("dataDefinitionId") Long dataDefinitionId,
 			@GraphQLName("fieldName") String fieldName)
 		throws Exception {
@@ -252,7 +252,7 @@ public class Query {
 			this::_populateResourceContext,
 			dataDefinitionFieldLinkResource -> new DataDefinitionFieldLinkPage(
 				dataDefinitionFieldLinkResource.
-					getDataDefinitionDataDefinitionFieldLinksPage(
+					getDataDefinitionDataDefinitionFieldLinkPage(
 						dataDefinitionId, fieldName)));
 	}
 
@@ -593,34 +593,6 @@ public class Query {
 	}
 
 	@GraphQLTypeExtension(DataDefinition.class)
-	public class GetDataDefinitionDataDefinitionFieldLinksPageTypeExtension {
-
-		public GetDataDefinitionDataDefinitionFieldLinksPageTypeExtension(
-			DataDefinition dataDefinition) {
-
-			_dataDefinition = dataDefinition;
-		}
-
-		@GraphQLField
-		public DataDefinitionFieldLinkPage dataDefinitionFieldLinks(
-				@GraphQLName("fieldName") String fieldName)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_dataDefinitionFieldLinkResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				dataDefinitionFieldLinkResource ->
-					new DataDefinitionFieldLinkPage(
-						dataDefinitionFieldLinkResource.
-							getDataDefinitionDataDefinitionFieldLinksPage(
-								_dataDefinition.getId(), fieldName)));
-		}
-
-		private DataDefinition _dataDefinition;
-
-	}
-
-	@GraphQLTypeExtension(DataDefinition.class)
 	public class GetDataDefinitionDataRecordCollectionTypeExtension {
 
 		public GetDataDefinitionDataRecordCollectionTypeExtension(
@@ -690,6 +662,34 @@ public class Query {
 		}
 
 		private DataRecordCollection _dataRecordCollection;
+
+	}
+
+	@GraphQLTypeExtension(DataDefinition.class)
+	public class GetDataDefinitionDataDefinitionFieldLinkPageTypeExtension {
+
+		public GetDataDefinitionDataDefinitionFieldLinkPageTypeExtension(
+			DataDefinition dataDefinition) {
+
+			_dataDefinition = dataDefinition;
+		}
+
+		@GraphQLField
+		public DataDefinitionFieldLinkPage dataDefinitionFieldLink(
+				@GraphQLName("fieldName") String fieldName)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_dataDefinitionFieldLinkResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				dataDefinitionFieldLinkResource ->
+					new DataDefinitionFieldLinkPage(
+						dataDefinitionFieldLinkResource.
+							getDataDefinitionDataDefinitionFieldLinkPage(
+								_dataDefinition.getId(), fieldName)));
+		}
+
+		private DataDefinition _dataDefinition;
 
 	}
 
@@ -937,7 +937,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataDefinition> items;
@@ -970,7 +970,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataDefinitionFieldLink> items;
@@ -1003,7 +1003,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataLayout> items;
@@ -1036,7 +1036,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataListView> items;
@@ -1069,7 +1069,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataRecord> items;
@@ -1102,7 +1102,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataRecordCollection> items;

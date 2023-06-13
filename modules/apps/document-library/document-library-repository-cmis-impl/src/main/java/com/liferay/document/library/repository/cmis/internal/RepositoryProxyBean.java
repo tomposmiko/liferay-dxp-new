@@ -54,14 +54,14 @@ public class RepositoryProxyBean
 	public FileEntry addFileEntry(
 			String externalReferenceCode, long userId, long folderId,
 			String sourceFileName, String mimeType, String title,
-			String urlTitle, String description, String changeLog, File file,
+			String description, String changeLog, File file,
 			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		FileEntry fileEntry = _repository.addFileEntry(
 			externalReferenceCode, userId, folderId, sourceFileName, mimeType,
-			title, urlTitle, description, changeLog, file, expirationDate,
-			reviewDate, serviceContext);
+			title, description, changeLog, file, expirationDate, reviewDate,
+			serviceContext);
 
 		return newFileEntryProxyBean(fileEntry);
 	}
@@ -70,15 +70,15 @@ public class RepositoryProxyBean
 	public FileEntry addFileEntry(
 			String externalReferenceCode, long userId, long folderId,
 			String sourceFileName, String mimeType, String title,
-			String urlTitle, String description, String changeLog,
-			InputStream inputStream, long size, Date expirationDate,
-			Date reviewDate, ServiceContext serviceContext)
+			String description, String changeLog, InputStream inputStream,
+			long size, Date expirationDate, Date reviewDate,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		FileEntry fileEntry = _repository.addFileEntry(
 			externalReferenceCode, userId, folderId, sourceFileName, mimeType,
-			title, urlTitle, description, changeLog, inputStream, size,
-			expirationDate, reviewDate, serviceContext);
+			title, description, changeLog, inputStream, size, expirationDate,
+			reviewDate, serviceContext);
 
 		return newFileEntryProxyBean(fileEntry);
 	}
@@ -97,13 +97,12 @@ public class RepositoryProxyBean
 
 	@Override
 	public Folder addFolder(
-			String externalReferenceCode, long userId, long parentFolderId,
-			String name, String description, ServiceContext serviceContext)
+			long userId, long parentFolderId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		Folder folder = _repository.addFolder(
-			externalReferenceCode, userId, parentFolderId, name, description,
-			serviceContext);
+			userId, parentFolderId, name, description, serviceContext);
 
 		return newFolderProxyBean(folder);
 	}
@@ -234,9 +233,10 @@ public class RepositoryProxyBean
 			OrderByComparator<FileEntry> orderByComparator)
 		throws PortalException {
 
-		return toFileEntryProxyBeans(
-			_repository.getFileEntries(
-				folderId, status, start, end, orderByComparator));
+		List<FileEntry> fileEntries = _repository.getFileEntries(
+			folderId, status, start, end, orderByComparator);
+
+		return toFileEntryProxyBeans(fileEntries);
 	}
 
 	@Override
@@ -245,9 +245,10 @@ public class RepositoryProxyBean
 			OrderByComparator<FileEntry> orderByComparator)
 		throws PortalException {
 
-		return toFileEntryProxyBeans(
-			_repository.getFileEntries(
-				folderId, start, end, orderByComparator));
+		List<FileEntry> fileEntries = _repository.getFileEntries(
+			folderId, start, end, orderByComparator);
+
+		return toFileEntryProxyBeans(fileEntries);
 	}
 
 	@Override
@@ -256,9 +257,10 @@ public class RepositoryProxyBean
 			OrderByComparator<FileEntry> orderByComparator)
 		throws PortalException {
 
-		return toFileEntryProxyBeans(
-			_repository.getFileEntries(
-				folderId, fileEntryTypeId, start, end, orderByComparator));
+		List<FileEntry> fileEntries = _repository.getFileEntries(
+			folderId, fileEntryTypeId, start, end, orderByComparator);
+
+		return toFileEntryProxyBeans(fileEntries);
 	}
 
 	@Override
@@ -267,9 +269,10 @@ public class RepositoryProxyBean
 			OrderByComparator<FileEntry> orderByComparator)
 		throws PortalException {
 
-		return toFileEntryProxyBeans(
-			_repository.getFileEntries(
-				folderId, mimeTypes, status, start, end, orderByComparator));
+		List<FileEntry> fileEntries = _repository.getFileEntries(
+			folderId, mimeTypes, status, start, end, orderByComparator);
+
+		return toFileEntryProxyBeans(fileEntries);
 	}
 
 	@Override
@@ -278,9 +281,10 @@ public class RepositoryProxyBean
 			OrderByComparator<FileEntry> orderByComparator)
 		throws PortalException {
 
-		return toFileEntryProxyBeans(
-			_repository.getFileEntries(
-				folderId, mimeTypes, start, end, orderByComparator));
+		List<FileEntry> fileEntries = _repository.getFileEntries(
+			folderId, mimeTypes, start, end, orderByComparator);
+
+		return toFileEntryProxyBeans(fileEntries);
 	}
 
 	@Override
@@ -288,9 +292,11 @@ public class RepositoryProxyBean
 			long folderId, int status, int start, int end)
 		throws PortalException {
 
-		return toObjectProxyBeans(
+		List<RepositoryEntry> fileEntriesAndFileShortcuts =
 			_repository.getFileEntriesAndFileShortcuts(
-				folderId, status, start, end));
+				folderId, status, start, end);
+
+		return toObjectProxyBeans(fileEntriesAndFileShortcuts);
 	}
 
 	@Override
@@ -395,10 +401,10 @@ public class RepositoryProxyBean
 			int end, OrderByComparator<Folder> orderByComparator)
 		throws PortalException {
 
-		return toFolderProxyBeans(
-			_repository.getFolders(
-				parentFolderId, includeMountFolders, start, end,
-				orderByComparator));
+		List<Folder> folders = _repository.getFolders(
+			parentFolderId, includeMountFolders, start, end, orderByComparator);
+
+		return toFolderProxyBeans(folders);
 	}
 
 	@Override
@@ -407,10 +413,11 @@ public class RepositoryProxyBean
 			int start, int end, OrderByComparator<Folder> orderByComparator)
 		throws PortalException {
 
-		return toFolderProxyBeans(
-			_repository.getFolders(
-				parentFolderId, status, includeMountFolders, start, end,
-				orderByComparator));
+		List<Folder> folders = _repository.getFolders(
+			parentFolderId, status, includeMountFolders, start, end,
+			orderByComparator);
+
+		return toFolderProxyBeans(folders);
 	}
 
 	@Override
@@ -419,10 +426,12 @@ public class RepositoryProxyBean
 			int end, OrderByComparator<?> orderByComparator)
 		throws PortalException {
 
-		return toObjectProxyBeans(
+		List<RepositoryEntry> foldersAndFileEntriesAndFileShortcuts =
 			_repository.getFoldersAndFileEntriesAndFileShortcuts(
 				folderId, status, includeMountFolders, start, end,
-				orderByComparator));
+				orderByComparator);
+
+		return toObjectProxyBeans(foldersAndFileEntriesAndFileShortcuts);
 	}
 
 	@Override
@@ -432,10 +441,12 @@ public class RepositoryProxyBean
 			OrderByComparator<?> orderByComparator)
 		throws PortalException {
 
-		return toObjectProxyBeans(
+		List<RepositoryEntry> foldersAndFileEntriesAndFileShortcuts =
 			_repository.getFoldersAndFileEntriesAndFileShortcuts(
 				folderId, status, mimetypes, includeMountFolders, start, end,
-				orderByComparator));
+				orderByComparator);
+
+		return toObjectProxyBeans(foldersAndFileEntriesAndFileShortcuts);
 	}
 
 	@Override
@@ -486,9 +497,10 @@ public class RepositoryProxyBean
 			OrderByComparator<Folder> orderByComparator)
 		throws PortalException {
 
-		return toFolderProxyBeans(
-			_repository.getMountFolders(
-				parentFolderId, start, end, orderByComparator));
+		List<Folder> mountFolders = _repository.getMountFolders(
+			parentFolderId, start, end, orderByComparator);
+
+		return toFolderProxyBeans(mountFolders);
 	}
 
 	@Override
@@ -504,9 +516,11 @@ public class RepositoryProxyBean
 			OrderByComparator<FileEntry> orderByComparator)
 		throws PortalException {
 
-		return toFileEntryProxyBeans(
+		List<FileEntry> repositoryFileEntries =
 			_repository.getRepositoryFileEntries(
-				userId, rootFolderId, start, end, orderByComparator));
+				userId, rootFolderId, start, end, orderByComparator);
+
+		return toFileEntryProxyBeans(repositoryFileEntries);
 	}
 
 	@Override
@@ -515,10 +529,12 @@ public class RepositoryProxyBean
 			int start, int end, OrderByComparator<FileEntry> orderByComparator)
 		throws PortalException {
 
-		return toFileEntryProxyBeans(
+		List<FileEntry> repositoryFileEntries =
 			_repository.getRepositoryFileEntries(
 				userId, rootFolderId, mimeTypes, status, start, end,
-				orderByComparator));
+				orderByComparator);
+
+		return toFileEntryProxyBeans(repositoryFileEntries);
 	}
 
 	@Override
@@ -676,16 +692,15 @@ public class RepositoryProxyBean
 	@Override
 	public FileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog, DLVersionNumberIncrease dlVersionNumberIncrease,
-			File file, Date expirationDate, Date reviewDate,
-			ServiceContext serviceContext)
+			String mimeType, String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease, File file,
+			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		FileEntry fileEntry = _repository.updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, urlTitle,
-			description, changeLog, dlVersionNumberIncrease, file,
-			expirationDate, reviewDate, serviceContext);
+			userId, fileEntryId, sourceFileName, mimeType, title, description,
+			changeLog, dlVersionNumberIncrease, file, expirationDate,
+			reviewDate, serviceContext);
 
 		return newFileEntryProxyBean(fileEntry);
 	}
@@ -693,15 +708,15 @@ public class RepositoryProxyBean
 	@Override
 	public FileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog, DLVersionNumberIncrease dlVersionNumberIncrease,
+			String mimeType, String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease,
 			InputStream inputStream, long size, Date expirationDate,
 			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		FileEntry fileEntry = _repository.updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, urlTitle,
-			description, changeLog, dlVersionNumberIncrease, inputStream, size,
+			userId, fileEntryId, sourceFileName, mimeType, title, description,
+			changeLog, dlVersionNumberIncrease, inputStream, size,
 			expirationDate, reviewDate, serviceContext);
 
 		return newFileEntryProxyBean(fileEntry);

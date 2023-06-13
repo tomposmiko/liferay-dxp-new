@@ -278,8 +278,4 @@ public interface WorkflowInstanceLinkModel
 	@Override
 	public WorkflowInstanceLink cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

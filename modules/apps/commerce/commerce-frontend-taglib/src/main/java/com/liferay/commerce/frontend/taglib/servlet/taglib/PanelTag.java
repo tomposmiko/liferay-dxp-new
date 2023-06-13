@@ -49,7 +49,7 @@ public class PanelTag extends IncludeTag {
 				(ThemeDisplay)httpServletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
 
-			_spritemap = themeDisplay.getPathThemeSpritemap();
+			_spritemap = themeDisplay.getPathThemeImages() + "/clay/icons.svg";
 		}
 
 		String randomNamespace =

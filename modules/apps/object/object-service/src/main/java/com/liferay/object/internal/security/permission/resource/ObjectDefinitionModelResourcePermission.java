@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gabriel Albuquerque
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.object.model.ObjectDefinition",
 	service = ModelResourcePermission.class
 )
@@ -68,11 +69,11 @@ public class ObjectDefinitionModelResourcePermission
 			String actionId)
 		throws PortalException {
 
-		return contains(
-			permissionChecker,
+		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.getObjectDefinition(
-				objectDefinitionId),
-			actionId);
+				objectDefinitionId);
+
+		return contains(permissionChecker, objectDefinition, actionId);
 	}
 
 	@Override
@@ -86,6 +87,7 @@ public class ObjectDefinitionModelResourcePermission
 				ObjectDefinition.class.getName(),
 				objectDefinition.getObjectDefinitionId(),
 				objectDefinition.getUserId(), actionId) ||
+			(permissionChecker.getUserId() == objectDefinition.getUserId()) ||
 			permissionChecker.hasPermission(
 				null, ObjectDefinition.class.getName(),
 				objectDefinition.getPrimaryKey(), actionId)) {

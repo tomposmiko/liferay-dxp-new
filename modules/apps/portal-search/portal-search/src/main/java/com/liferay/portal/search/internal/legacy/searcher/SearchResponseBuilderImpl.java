@@ -30,6 +30,7 @@ import java.io.Serializable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -46,7 +47,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	public SearchResponseBuilder addFederatedSearchResponse(
 		SearchResponse searchResponse) {
 
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.addFederatedSearchResponse(
 				searchResponse));
 
@@ -57,7 +58,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	public SearchResponseBuilder aggregationResultsMap(
 		Map<String, AggregationResult> aggregationResultsMap) {
 
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setAggregationResultsMap(
 				aggregationResultsMap));
 
@@ -66,12 +67,12 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 	@Override
 	public SearchResponse build() {
-		return _withSearchResponseGet(Function.identity());
+		return withSearchResponseGet(Function.identity());
 	}
 
 	@Override
 	public SearchResponseBuilder count(long count) {
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setCount(count));
 
 		return this;
@@ -79,7 +80,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 	@Override
 	public SearchResponseBuilder federatedSearchKey(String key) {
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setFederatedSearchKey(
 				key));
 
@@ -90,7 +91,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	public SearchResponseBuilder groupByResponses(
 		List<GroupByResponse> groupByResponses) {
 
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setGroupByResponses(
 				groupByResponses));
 
@@ -99,7 +100,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 	@Override
 	public SearchResponseBuilder hits(Hits hits) {
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setHits(hits));
 
 		return this;
@@ -107,7 +108,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 	@Override
 	public SearchResponseBuilder request(SearchRequest searchRequest) {
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setRequest(searchRequest));
 
 		return this;
@@ -117,7 +118,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	public SearchResponseBuilder requestString(String requestString) {
 		_searchContext.setAttribute(_QUERY_STRING, requestString);
 
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setRequestString(
 				requestString));
 
@@ -126,7 +127,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 	@Override
 	public SearchResponseBuilder responseString(String responseString) {
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setResponseString(
 				responseString));
 
@@ -135,7 +136,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 	@Override
 	public SearchResponseBuilder searchHits(SearchHits searchHits) {
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setSearchHits(searchHits));
 
 		return this;
@@ -145,7 +146,7 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	public SearchResponseBuilder searchTimeValue(
 		SearchTimeValue searchTimeValue) {
 
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setSearchTimeValue(
 				searchTimeValue));
 
@@ -156,10 +157,23 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	public SearchResponseBuilder statsResponseMap(
 		Map<String, StatsResponse> map) {
 
-		_withSearchResponseImpl(
+		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setStatsResponseMap(map));
 
 		return this;
+	}
+
+	protected static SearchResponseImpl getSearchResponseImpl(
+		SearchContext searchContext) {
+
+		return Optional.ofNullable(
+			(SearchResponseImpl)searchContext.getAttribute(
+				_SEARCH_CONTEXT_KEY_SEARCH_RESPONSE)
+		).orElseGet(
+			() -> setAttribute(
+				searchContext, _SEARCH_CONTEXT_KEY_SEARCH_RESPONSE,
+				new SearchResponseImpl(searchContext))
+		);
 	}
 
 	protected static <T extends Serializable> T setAttribute(
@@ -170,33 +184,19 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 		return value;
 	}
 
-	private SearchResponseImpl _getSearchResponseImpl(
-		SearchContext searchContext) {
+	protected <T> T withSearchResponseGet(
+		Function<SearchResponse, T> function) {
 
-		SearchResponseImpl searchResponseImpl =
-			(SearchResponseImpl)searchContext.getAttribute(
-				_SEARCH_CONTEXT_KEY_SEARCH_RESPONSE);
-
-		if (searchResponseImpl != null) {
-			return searchResponseImpl;
-		}
-
-		return setAttribute(
-			searchContext, _SEARCH_CONTEXT_KEY_SEARCH_RESPONSE,
-			new SearchResponseImpl(searchContext));
-	}
-
-	private <T> T _withSearchResponseGet(Function<SearchResponse, T> function) {
 		synchronized (_searchContext) {
-			return function.apply(_getSearchResponseImpl(_searchContext));
+			return function.apply(getSearchResponseImpl(_searchContext));
 		}
 	}
 
-	private void _withSearchResponseImpl(
+	protected void withSearchResponseImpl(
 		Consumer<SearchResponseImpl> consumer) {
 
 		synchronized (_searchContext) {
-			consumer.accept(_getSearchResponseImpl(_searchContext));
+			consumer.accept(getSearchResponseImpl(_searchContext));
 		}
 	}
 

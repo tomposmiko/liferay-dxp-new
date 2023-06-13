@@ -27,18 +27,11 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Preston Crary
  */
-@Component(service = CTCollectionIdSupplier.class)
+@Component(immediate = true, service = CTCollectionIdSupplier.class)
 public class CTCollectionIdSupplierImpl implements CTCollectionIdSupplier {
 
 	@Override
 	public long getCTCollectionId() {
-		long ctCollectionId =
-			CTCollectionPreviewThreadLocal.getCTCollectionId();
-
-		if (ctCollectionId > -1) {
-			return ctCollectionId;
-		}
-
 		CTPreferences ctPreferences =
 			_ctPreferencesLocalService.fetchCTPreferences(
 				CompanyThreadLocal.getCompanyId(),

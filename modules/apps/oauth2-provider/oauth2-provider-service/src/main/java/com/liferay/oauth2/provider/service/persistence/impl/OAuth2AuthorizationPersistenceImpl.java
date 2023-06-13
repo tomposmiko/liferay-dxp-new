@@ -21,7 +21,6 @@ import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationImpl;
 import com.liferay.oauth2.provider.model.impl.OAuth2AuthorizationModelImpl;
 import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationPersistence;
-import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationUtil;
 import com.liferay.oauth2.provider.service.persistence.impl.constants.OAuthTwoPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapper;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -80,7 +79,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = OAuth2AuthorizationPersistence.class)
+@Component(
+	service = {OAuth2AuthorizationPersistence.class, BasePersistence.class}
+)
 public class OAuth2AuthorizationPersistenceImpl
 	extends BasePersistenceImpl<OAuth2Authorization>
 	implements OAuth2AuthorizationPersistence {
@@ -197,7 +198,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Authorization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Authorization oAuth2Authorization : list) {
@@ -560,7 +561,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -702,7 +703,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Authorization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Authorization oAuth2Authorization : list) {
@@ -1075,7 +1076,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		Object[] finderArgs = new Object[] {oAuth2ApplicationId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1224,7 +1225,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Authorization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Authorization oAuth2Authorization : list) {
@@ -1619,7 +1620,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, accessTokenContentHash};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1775,7 +1776,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Authorization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Authorization oAuth2Authorization : list) {
@@ -2170,7 +2171,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, refreshTokenContentHash};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2339,7 +2340,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Authorization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Authorization oAuth2Authorization : list) {
@@ -2793,7 +2794,7 @@ public class OAuth2AuthorizationPersistenceImpl
 			userId, oAuth2ApplicationId, rememberDeviceContent
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3280,7 +3281,7 @@ public class OAuth2AuthorizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Authorization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3350,7 +3351,7 @@ public class OAuth2AuthorizationPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3863,34 +3864,14 @@ public class OAuth2AuthorizationPersistenceImpl
 				"userId", "oAuth2ApplicationId", "rememberDeviceContent"
 			},
 			false);
-
-		_setOAuth2AuthorizationUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setOAuth2AuthorizationUtilPersistence(null);
-
 		entityCache.removeCache(OAuth2AuthorizationImpl.class.getName());
 
 		TableMapperFactory.removeTableMapper(
 			"OA2Auths_OA2ScopeGrants#oAuth2AuthorizationId");
-	}
-
-	private void _setOAuth2AuthorizationUtilPersistence(
-		OAuth2AuthorizationPersistence oAuth2AuthorizationPersistence) {
-
-		try {
-			Field field = OAuth2AuthorizationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, oAuth2AuthorizationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3958,5 +3939,9 @@ public class OAuth2AuthorizationPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private OAuth2AuthorizationModelArgumentsResolver
+		_oAuth2AuthorizationModelArgumentsResolver;
 
 }

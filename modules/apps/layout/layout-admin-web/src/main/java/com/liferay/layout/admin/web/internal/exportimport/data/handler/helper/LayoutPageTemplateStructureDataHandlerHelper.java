@@ -16,13 +16,20 @@ package com.liferay.layout.admin.web.internal.exportimport.data.handler.helper;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureRelLocalService;
+import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
+import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 
@@ -35,7 +42,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = LayoutPageTemplateStructureDataHandlerHelper.class)
+@Component(
+	immediate = true,
+	service = LayoutPageTemplateStructureDataHandlerHelper.class
+)
 public class LayoutPageTemplateStructureDataHandlerHelper {
 
 	public void importLayoutPageTemplateStructure(
@@ -84,14 +94,82 @@ public class LayoutPageTemplateStructureDataHandlerHelper {
 				existingLayoutPageTemplateStructureRel :
 					existingLayoutPageTemplateStructureRels) {
 
+			_importLayoutPageTemplateStructureRel(
+				portletDataContext, existingLayoutPageTemplateStructureRel);
+
 			_updateSegmentsExperiences(
-				classPK, existingLayoutPageTemplateStructureRel);
+				classNameId, classPK, existingLayoutPageTemplateStructureRel);
 		}
 	}
 
-	private void _updateSegmentsExperiences(
-		long classPK,
+	private void _importLayoutPageTemplateStructureRel(
+		PortletDataContext portletDataContext,
 		LayoutPageTemplateStructureRel existingLayoutPageTemplateStructureRel) {
+
+		String data = existingLayoutPageTemplateStructureRel.getData();
+
+		if (Validator.isNull(data)) {
+			return;
+		}
+
+		JSONObject dataJSONObject = _processDataJSONObject(
+			data, portletDataContext);
+
+		existingLayoutPageTemplateStructureRel.setData(
+			dataJSONObject.toString());
+
+		_layoutPageTemplateStructureRelLocalService.
+			updateLayoutPageTemplateStructureRel(
+				existingLayoutPageTemplateStructureRel);
+	}
+
+	private JSONObject _processDataJSONObject(
+		String data, PortletDataContext portletDataContext) {
+
+		LayoutStructure layoutStructure = LayoutStructure.of(data);
+
+		Map<Long, Long> fragmentEntryLinkIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				FragmentEntryLink.class);
+
+		for (LayoutStructureItem layoutStructureItem :
+				layoutStructure.getLayoutStructureItems()) {
+
+			if (!(layoutStructureItem instanceof
+					FragmentStyledLayoutStructureItem)) {
+
+				continue;
+			}
+
+			FragmentStyledLayoutStructureItem
+				fragmentStyledLayoutStructureItem =
+					(FragmentStyledLayoutStructureItem)layoutStructureItem;
+
+			long fragmentEntryLinkId = MapUtil.getLong(
+				fragmentEntryLinkIds,
+				fragmentStyledLayoutStructureItem.getFragmentEntryLinkId(),
+				fragmentStyledLayoutStructureItem.getFragmentEntryLinkId());
+
+			if (fragmentEntryLinkId <= 0) {
+				continue;
+			}
+
+			fragmentStyledLayoutStructureItem.setFragmentEntryLinkId(
+				fragmentEntryLinkId);
+		}
+
+		return layoutStructure.toJSONObject();
+	}
+
+	private void _updateSegmentsExperiences(
+		long classNameId, long classPK,
+		LayoutPageTemplateStructureRel existingLayoutPageTemplateStructureRel) {
+
+		if (existingLayoutPageTemplateStructureRel.getSegmentsExperienceId() ==
+				SegmentsExperienceConstants.ID_DEFAULT) {
+
+			return;
+		}
 
 		SegmentsExperience existingSegmentsExperience =
 			_segmentsExperienceLocalService.fetchSegmentsExperience(
@@ -102,7 +180,8 @@ public class LayoutPageTemplateStructureDataHandlerHelper {
 			return;
 		}
 
-		existingSegmentsExperience.setPlid(classPK);
+		existingSegmentsExperience.setClassNameId(classNameId);
+		existingSegmentsExperience.setClassPK(classPK);
 
 		_segmentsExperienceLocalService.updateSegmentsExperience(
 			existingSegmentsExperience);

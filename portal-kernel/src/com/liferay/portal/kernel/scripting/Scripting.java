@@ -41,7 +41,4 @@ public interface Scripting {
 
 	public Set<String> getSupportedLanguages();
 
-	public void validate(String language, String script)
-		throws ScriptingException;
-
 }

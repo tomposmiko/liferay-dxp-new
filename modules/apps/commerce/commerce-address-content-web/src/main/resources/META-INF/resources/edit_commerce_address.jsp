@@ -33,7 +33,7 @@ long commerceAddressId = commerceAddressDisplayContext.getCommerceAddressId();
 long countryId = commerceAddressDisplayContext.getCountryId();
 long regionId = commerceAddressDisplayContext.getRegionId();
 
-AccountEntry accountEntry = commerceAddressDisplayContext.getAccountEntry();
+CommerceAccount commerceAccount = commerceAddressDisplayContext.getCommerceAccount();
 %>
 
 <portlet:actionURL name="/commerce_address_content/edit_commerce_address" var="editCommerceAddressActionURL" />
@@ -43,7 +43,7 @@ AccountEntry accountEntry = commerceAddressDisplayContext.getAccountEntry();
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="commerceAddressId" type="hidden" value="<%= commerceAddressId %>" />
-	<aui:input name="commerceAccountId" type="hidden" value="<%= (commerceAddress == null) ? accountEntry.getAccountEntryId() : commerceAddress.getClassPK() %>" />
+	<aui:input name="commerceAccountId" type="hidden" value="<%= (commerceAddress == null) ? commerceAccount.getCommerceAccountId() : commerceAddress.getClassPK() %>" />
 
 	<aui:model-context bean="<%= commerceAddress %>" model="<%= CommerceAddress.class %>" />
 

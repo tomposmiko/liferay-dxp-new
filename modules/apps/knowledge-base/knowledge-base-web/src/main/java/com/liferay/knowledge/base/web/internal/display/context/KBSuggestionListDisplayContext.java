@@ -33,24 +33,28 @@ import javax.servlet.http.HttpServletRequest;
 public class KBSuggestionListDisplayContext {
 
 	public KBSuggestionListDisplayContext(
-		HttpServletRequest httpServletRequest, KBArticle kbArticle) {
+		HttpServletRequest httpServletRequest, String templatePath,
+		KBArticle kbArticle) {
 
 		_httpServletRequest = httpServletRequest;
+		_templatePath = templatePath;
 		_kbArticle = kbArticle;
 
 		_groupId = kbArticle.getGroupId();
 		_navigation = ParamUtil.getString(
-			httpServletRequest, "navigation", "all");
+			_httpServletRequest, "navigation", "all");
 	}
 
 	public KBSuggestionListDisplayContext(
-		HttpServletRequest httpServletRequest, long groupId) {
+		HttpServletRequest httpServletRequest, String templatePath,
+		long groupId) {
 
 		_httpServletRequest = httpServletRequest;
+		_templatePath = templatePath;
 		_groupId = groupId;
 
 		_navigation = ParamUtil.getString(
-			httpServletRequest, "navigation", "all");
+			_httpServletRequest, "navigation", "all");
 	}
 
 	public int getCompletedKBCommentsCount() throws PortalException {
@@ -61,12 +65,10 @@ public class KBSuggestionListDisplayContext {
 		if (_navigation.equals("new")) {
 			return "there-are-no-new-suggestions";
 		}
-
-		if (_navigation.equals("in-progress")) {
+		else if (_navigation.equals("in-progress")) {
 			return "there-are-no-suggestions-in-progress";
 		}
-
-		if (_navigation.equals("resolved")) {
+		else if (_navigation.equals("resolved")) {
 			return "there-are-no-resolved-suggestions";
 		}
 
@@ -111,50 +113,56 @@ public class KBSuggestionListDisplayContext {
 
 		if (_kbArticle == null) {
 			if (status == KBCommentConstants.STATUS_ANY) {
-				searchContainer.setResultsAndTotal(
-					() -> KBCommentServiceUtil.getKBComments(
+				searchContainer.setTotal(
+					KBCommentServiceUtil.getKBCommentsCount(_groupId));
+
+				searchContainer.setResults(
+					KBCommentServiceUtil.getKBComments(
 						_groupId, searchContainer.getStart(),
 						searchContainer.getEnd(),
 						KBUtil.getKBCommentOrderByComparator(
 							searchContainer.getOrderByCol(),
-							searchContainer.getOrderByType())),
-					KBCommentServiceUtil.getKBCommentsCount(_groupId));
+							searchContainer.getOrderByType())));
 			}
 			else {
-				searchContainer.setResultsAndTotal(
-					() -> KBCommentServiceUtil.getKBComments(
+				searchContainer.setTotal(getKBCommentsCount(status));
+
+				searchContainer.setResults(
+					KBCommentServiceUtil.getKBComments(
 						_groupId, status, searchContainer.getStart(),
 						searchContainer.getEnd(),
 						KBUtil.getKBCommentOrderByComparator(
 							searchContainer.getOrderByCol(),
-							searchContainer.getOrderByType())),
-					getKBCommentsCount(status));
+							searchContainer.getOrderByType())));
 			}
 		}
 		else {
 			if (status == KBCommentConstants.STATUS_ANY) {
-				searchContainer.setResultsAndTotal(
-					() -> KBCommentServiceUtil.getKBComments(
+				searchContainer.setTotal(
+					KBCommentServiceUtil.getKBCommentsCount(
+						_groupId, KBArticleConstants.getClassName(),
+						_kbArticle.getResourcePrimKey()));
+
+				searchContainer.setResults(
+					KBCommentServiceUtil.getKBComments(
 						_groupId, KBArticleConstants.getClassName(),
 						_kbArticle.getResourcePrimKey(),
 						searchContainer.getStart(), searchContainer.getEnd(),
 						KBUtil.getKBCommentOrderByComparator(
 							searchContainer.getOrderByCol(),
-							searchContainer.getOrderByType())),
-					KBCommentServiceUtil.getKBCommentsCount(
-						_groupId, KBArticleConstants.getClassName(),
-						_kbArticle.getResourcePrimKey()));
+							searchContainer.getOrderByType())));
 			}
 			else {
-				searchContainer.setResultsAndTotal(
-					() -> KBCommentServiceUtil.getKBComments(
+				searchContainer.setTotal(getKBCommentsCount(status));
+
+				searchContainer.setResults(
+					KBCommentServiceUtil.getKBComments(
 						_groupId, KBArticleConstants.getClassName(),
 						_kbArticle.getResourcePrimKey(), status,
 						searchContainer.getStart(), searchContainer.getEnd(),
 						KBUtil.getKBCommentOrderByComparator(
 							searchContainer.getOrderByCol(),
-							searchContainer.getOrderByType())),
-					getKBCommentsCount(status));
+							searchContainer.getOrderByType())));
 			}
 		}
 	}
@@ -163,12 +171,10 @@ public class KBSuggestionListDisplayContext {
 		if (_navigation.equals("new")) {
 			return KBCommentConstants.STATUS_NEW;
 		}
-
-		if (_navigation.equals("in-progress")) {
+		else if (_navigation.equals("in-progress")) {
 			return KBCommentConstants.STATUS_IN_PROGRESS;
 		}
-
-		if (_navigation.equals("resolved")) {
+		else if (_navigation.equals("resolved")) {
 			return KBCommentConstants.STATUS_COMPLETED;
 		}
 
@@ -179,5 +185,6 @@ public class KBSuggestionListDisplayContext {
 	private final HttpServletRequest _httpServletRequest;
 	private KBArticle _kbArticle;
 	private final String _navigation;
+	private final String _templatePath;
 
 }

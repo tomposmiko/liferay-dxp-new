@@ -14,23 +14,24 @@
 
 package com.liferay.site.memberships.web.internal.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portlet.sitesadmin.search.UserGroupSiteMembershipChecker;
 import com.liferay.portlet.usergroupsadmin.search.UserGroupDisplayTerms;
 import com.liferay.portlet.usergroupsadmin.search.UserGroupSearch;
 import com.liferay.site.memberships.constants.SiteMembershipsPortletKeys;
-import com.liferay.site.memberships.web.internal.search.UserGroupSiteMembershipChecker;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -104,27 +105,22 @@ public class SelectUserGroupsDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
-			"order-by-col-usergroups", "name");
+		_orderByCol = ParamUtil.getString(_renderRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN,
-			"order-by-type-usergroups", "asc");
+		_orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -196,25 +192,28 @@ public class SelectUserGroupsDisplayContext {
 		UserGroupSearch userGroupSearch = new UserGroupSearch(
 			_renderRequest, getPortletURL());
 
+		Group group = GroupLocalServiceUtil.fetchGroup(getGroupId());
+
+		userGroupSearch.setRowChecker(
+			new UserGroupSiteMembershipChecker(_renderResponse, group));
+
 		UserGroupDisplayTerms searchTerms =
 			(UserGroupDisplayTerms)userGroupSearch.getSearchTerms();
 
 		LinkedHashMap<String, Object> userGroupParams = new LinkedHashMap<>();
 
-		userGroupSearch.setResultsAndTotal(
-			() -> UserGroupLocalServiceUtil.search(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				userGroupParams, userGroupSearch.getStart(),
-				userGroupSearch.getEnd(),
-				userGroupSearch.getOrderByComparator()),
-			UserGroupLocalServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				userGroupParams));
+		int userGroupsCount = UserGroupLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			userGroupParams);
 
-		userGroupSearch.setRowChecker(
-			new UserGroupSiteMembershipChecker(
-				_renderResponse,
-				GroupLocalServiceUtil.fetchGroup(getGroupId())));
+		userGroupSearch.setTotal(userGroupsCount);
+
+		List<UserGroup> userGroups = UserGroupLocalServiceUtil.search(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			userGroupParams, userGroupSearch.getStart(),
+			userGroupSearch.getEnd(), userGroupSearch.getOrderByComparator());
+
+		userGroupSearch.setResults(userGroups);
 
 		_userGroupSearch = userGroupSearch;
 

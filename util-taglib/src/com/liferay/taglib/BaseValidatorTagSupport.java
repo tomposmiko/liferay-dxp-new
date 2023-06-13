@@ -34,12 +34,8 @@ import javax.servlet.jsp.JspException;
 public abstract class BaseValidatorTagSupport extends IncludeTag {
 
 	public void addRequiredValidatorTag() {
-		addRequiredValidatorTag(null);
-	}
-
-	public void addRequiredValidatorTag(String errorMessage) {
 		ValidatorTag validatorTag = new ValidatorTagImpl(
-			"required", errorMessage, null, false);
+			"required", null, null, false);
 
 		addValidatorTag("required", validatorTag);
 	}

@@ -18,12 +18,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.knowledge.base.constants.KBActionKeys;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
-import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.model.KBArticle;
+import com.liferay.knowledge.base.model.KBArticleSearchDisplay;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.model.KBTemplate;
 import com.liferay.knowledge.base.service.KBArticleServiceUtil;
@@ -36,6 +34,7 @@ import com.liferay.knowledge.base.web.internal.security.permission.resource.Admi
 import com.liferay.knowledge.base.web.internal.security.permission.resource.KBArticlePermission;
 import com.liferay.knowledge.base.web.internal.security.permission.resource.KBFolderPermission;
 import com.liferay.knowledge.base.web.internal.util.comparator.KBOrderByComparatorAdapter;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -43,9 +42,8 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -58,7 +56,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -91,7 +88,7 @@ public class KBAdminManagementToolbarDisplayContext {
 		_renderResponse = renderResponse;
 		_portletConfig = portletConfig;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		_createSearchContainer();
@@ -101,7 +98,7 @@ public class KBAdminManagementToolbarDisplayContext {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "deleteEntries");
-				dropdownItem.setIcon("trash");
+				dropdownItem.setIcon("times-circle");
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "delete"));
 				dropdownItem.setQuickAction(true);
@@ -112,30 +109,36 @@ public class KBAdminManagementToolbarDisplayContext {
 	public List<String> getAvailableActions(KBArticle kbArticle)
 		throws PortalException {
 
+		List<String> availableActions = new ArrayList<>();
+
 		if (KBArticlePermission.contains(
 				_themeDisplay.getPermissionChecker(), kbArticle,
 				ActionKeys.DELETE)) {
 
-			return Collections.singletonList("deleteEntries");
+			availableActions.add("deleteEntries");
 		}
 
-		return Collections.emptyList();
+		return availableActions;
 	}
 
 	public List<String> getAvailableActions(KBFolder kbFolder)
 		throws PortalException {
 
+		List<String> availableActions = new ArrayList<>();
+
 		if (KBFolderPermission.contains(
 				_themeDisplay.getPermissionChecker(), kbFolder,
 				ActionKeys.DELETE)) {
 
-			return Collections.singletonList("deleteEntries");
+			availableActions.add("deleteEntries");
 		}
 
-		return Collections.emptyList();
+		return availableActions;
 	}
 
 	public CreationMenu getCreationMenu() throws PortalException {
+		CreationMenu creationMenu = null;
+
 		long kbFolderClassNameId = PortalUtil.getClassNameId(
 			KBFolderConstants.getClassName());
 
@@ -147,19 +150,38 @@ public class KBAdminManagementToolbarDisplayContext {
 			_httpServletRequest, "parentResourcePrimKey",
 			KBFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 
-		boolean hasAddKBArticlePermission = _hasAddKBArticlePermission();
-		boolean hasAddKBFolderPermission = _hasAddKBFolderPermission();
+		boolean hasAddKBArticlePermission = false;
+		boolean hasAddKBFolderPermission = false;
 
-		CreationMenu creationMenu = new CreationMenu();
+		PermissionChecker permissionChecker =
+			_themeDisplay.getPermissionChecker();
+
+		if (parentResourceClassNameId == kbFolderClassNameId) {
+			hasAddKBArticlePermission = KBFolderPermission.contains(
+				permissionChecker, _themeDisplay.getScopeGroupId(),
+				parentResourcePrimKey, KBActionKeys.ADD_KB_ARTICLE);
+			hasAddKBFolderPermission = KBFolderPermission.contains(
+				permissionChecker, _themeDisplay.getScopeGroupId(),
+				parentResourcePrimKey, KBActionKeys.ADD_KB_FOLDER);
+		}
+		else {
+			hasAddKBArticlePermission = AdminPermission.contains(
+				permissionChecker, _themeDisplay.getScopeGroupId(),
+				KBActionKeys.ADD_KB_ARTICLE);
+		}
 
 		if (hasAddKBFolderPermission) {
+			if (creationMenu == null) {
+				creationMenu = new CreationMenu();
+			}
+
 			creationMenu.addDropdownItem(
 				dropdownItem -> {
 					dropdownItem.setHref(
 						PortletURLBuilder.createRenderURL(
 							_liferayPortletResponse
 						).setMVCPath(
-							"/admin/common/edit_kb_folder.jsp"
+							"/admin/common/edit_folder.jsp"
 						).setRedirect(
 							PortalUtil.getCurrentURL(_httpServletRequest)
 						).setParameter(
@@ -169,20 +191,26 @@ public class KBAdminManagementToolbarDisplayContext {
 						).setParameter(
 							"parentResourcePrimKey", parentResourcePrimKey
 						).buildPortletURL());
-					dropdownItem.setIcon("folder");
+
 					dropdownItem.setLabel(
 						LanguageUtil.get(_httpServletRequest, "folder"));
 				});
 		}
 
 		if (hasAddKBArticlePermission) {
+			if (creationMenu == null) {
+				creationMenu = new CreationMenu();
+			}
+
+			String templatePath = _getTemplatePath();
+
 			creationMenu.addDropdownItem(
 				dropdownItem -> {
 					dropdownItem.setHref(
 						PortletURLBuilder.createRenderURL(
 							_liferayPortletResponse
 						).setMVCPath(
-							"/admin/common/edit_kb_article.jsp"
+							templatePath + "edit_article.jsp"
 						).setRedirect(
 							PortalUtil.getCurrentURL(_httpServletRequest)
 						).setParameter(
@@ -191,17 +219,19 @@ public class KBAdminManagementToolbarDisplayContext {
 						).setParameter(
 							"parentResourcePrimKey", parentResourcePrimKey
 						).buildPortletURL());
-					dropdownItem.setIcon("document-text");
+
 					dropdownItem.setLabel(
 						LanguageUtil.get(_httpServletRequest, "basic-article"));
 				});
 
+			OrderByComparator<KBTemplate> orderByComparator =
+				OrderByComparatorFactoryUtil.create(
+					"KBTemplate", "title", false);
+
 			List<KBTemplate> kbTemplates =
 				KBTemplateServiceUtil.getGroupKBTemplates(
 					_themeDisplay.getScopeGroupId(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS,
-					OrderByComparatorFactoryUtil.create(
-						"KBTemplate", "title", false));
+					QueryUtil.ALL_POS, orderByComparator);
 
 			if (!kbTemplates.isEmpty()) {
 				for (KBTemplate kbTemplate : kbTemplates) {
@@ -211,7 +241,7 @@ public class KBAdminManagementToolbarDisplayContext {
 								PortletURLBuilder.createRenderURL(
 									_liferayPortletResponse
 								).setMVCPath(
-									"/admin/common/edit_kb_article.jsp"
+									templatePath + "edit_article.jsp"
 								).setRedirect(
 									PortalUtil.getCurrentURL(
 										_httpServletRequest)
@@ -224,7 +254,7 @@ public class KBAdminManagementToolbarDisplayContext {
 									"parentResourcePrimKey",
 									parentResourcePrimKey
 								).buildPortletURL());
-							dropdownItem.setIcon("document-text");
+
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest,
@@ -236,8 +266,12 @@ public class KBAdminManagementToolbarDisplayContext {
 
 		if ((parentResourceClassNameId == kbFolderClassNameId) &&
 			AdminPermission.contains(
-				_themeDisplay.getPermissionChecker(),
-				_themeDisplay.getScopeGroupId(), KBActionKeys.ADD_KB_ARTICLE)) {
+				permissionChecker, _themeDisplay.getScopeGroupId(),
+				KBActionKeys.ADD_KB_ARTICLE)) {
+
+			if (creationMenu == null) {
+				creationMenu = new CreationMenu();
+			}
 
 			creationMenu.addDropdownItem(
 				dropdownItem -> {
@@ -251,106 +285,13 @@ public class KBAdminManagementToolbarDisplayContext {
 						).setParameter(
 							"parentKBFolderId", parentResourcePrimKey
 						).buildPortletURL());
-					dropdownItem.setIcon("import");
+
 					dropdownItem.setLabel(
 						LanguageUtil.get(_httpServletRequest, "import"));
 				});
 		}
 
-		if (creationMenu.isEmpty()) {
-			return null;
-		}
-
 		return creationMenu;
-	}
-
-	public String getDisplayStyle() {
-		if (Validator.isNotNull(_displayStyle)) {
-			return _displayStyle;
-		}
-
-		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
-			_httpServletRequest, KBPortletKeys.KNOWLEDGE_BASE_ADMIN,
-			"entries-display-style", "descriptive", true);
-
-		return _displayStyle;
-	}
-
-	public List<DropdownItem> getEmptyStateActionDropdownItems() {
-		long kbFolderClassNameId = PortalUtil.getClassNameId(
-			KBFolderConstants.getClassName());
-
-		long parentResourceClassNameId = ParamUtil.getLong(
-			_httpServletRequest, "parentResourceClassNameId",
-			kbFolderClassNameId);
-
-		long parentResourcePrimKey = ParamUtil.getLong(
-			_httpServletRequest, "parentResourcePrimKey",
-			KBFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-
-		return DropdownItemListBuilder.add(
-			() -> _hasAddKBFolderPermission(),
-			dropdownItem -> {
-				dropdownItem.setHref(
-					PortletURLBuilder.createRenderURL(
-						_liferayPortletResponse
-					).setMVCPath(
-						"/admin/common/edit_kb_folder.jsp"
-					).setRedirect(
-						PortalUtil.getCurrentURL(_httpServletRequest)
-					).setParameter(
-						"parentResourceClassNameId",
-						PortalUtil.getClassNameId(
-							KBFolderConstants.getClassName())
-					).setParameter(
-						"parentResourcePrimKey", parentResourcePrimKey
-					).buildPortletURL());
-				dropdownItem.setIcon("folder");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "folder"));
-			}
-		).add(
-			() -> _hasAddKBArticlePermission(),
-			dropdownItem -> {
-				dropdownItem.setHref(
-					PortletURLBuilder.createRenderURL(
-						_liferayPortletResponse
-					).setMVCPath(
-						"/admin/common/edit_kb_article.jsp"
-					).setRedirect(
-						PortalUtil.getCurrentURL(_httpServletRequest)
-					).setParameter(
-						"parentResourceClassNameId", parentResourceClassNameId
-					).setParameter(
-						"parentResourcePrimKey", parentResourcePrimKey
-					).buildPortletURL());
-				dropdownItem.setIcon("document-text");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "basic-article"));
-			}
-		).add(
-			() ->
-				(parentResourceClassNameId == kbFolderClassNameId) &&
-				AdminPermission.contains(
-					_themeDisplay.getPermissionChecker(),
-					_themeDisplay.getScopeGroupId(),
-					KBActionKeys.ADD_KB_ARTICLE),
-			dropdownItem -> {
-				dropdownItem.setHref(
-					PortletURLBuilder.createRenderURL(
-						_liferayPortletResponse
-					).setMVCPath(
-						"/admin/import.jsp"
-					).setRedirect(
-						PortalUtil.getCurrentURL(_httpServletRequest)
-					).setParameter(
-						"parentKBFolderId", parentResourcePrimKey
-					).buildPortletURL());
-				dropdownItem.setIcon("import");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "import"));
-			}
-		).build();
 	}
 
 	public List<DropdownItem> getFilterDropdownItems() {
@@ -374,8 +315,8 @@ public class KBAdminManagementToolbarDisplayContext {
 	public PortletURL getSearchURL() {
 		return PortletURLBuilder.createRenderURL(
 			_liferayPortletResponse
-		).setMVCRenderCommandName(
-			"/knowledge_base/search"
+		).setMVCPath(
+			"/admin/search.jsp"
 		).setRedirect(
 			_getRedirect()
 		).buildPortletURL();
@@ -394,40 +335,12 @@ public class KBAdminManagementToolbarDisplayContext {
 		return _searchContainer.getTotal();
 	}
 
-	public List<ViewTypeItem> getViewTypeItems() {
-		PortletURL portletURL = PortletURLBuilder.createRenderURL(
-			_liferayPortletResponse
-		).setMVCPath(
-			"/admin/view.jsp"
-		).setParameter(
-			"parentResourcePrimKey",
-			ParamUtil.getLong(
-				_httpServletRequest, "parentResourcePrimKey",
-				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID)
-		).buildPortletURL();
-
-		return new ViewTypeItemList(portletURL, getDisplayStyle()) {
-			{
-				addListViewTypeItem();
-				addTableViewTypeItem();
-			}
-		};
-	}
-
 	public boolean isDisabled() {
 		return !_searchContainer.hasResults();
 	}
 
-	public boolean isSearch() {
-		if (Validator.isNotNull(_getKeywords())) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public boolean isShowInfoButton() {
-		return !isSearch();
+		return Validator.isNull(_getKeywords());
 	}
 
 	private SearchContainer<Object> _createSearchContainer()
@@ -468,29 +381,30 @@ public class KBAdminManagementToolbarDisplayContext {
 			_searchContainer.setOrderByComparator(
 				new KBOrderByComparatorAdapter<>(kbArticleOrderByComparator));
 
-			_searchContainer.setResultsAndTotal(
-				() -> new ArrayList<>(
-					KBArticleServiceUtil.getKBArticlesByKeywords(
-						_themeDisplay.getScopeGroupId(), keywords,
-						WorkflowConstants.STATUS_ANY,
-						_searchContainer.getStart(),
-						_searchContainer.getEnd())),
-				KBArticleServiceUtil.countKBArticlesByKeywords(
-					_themeDisplay.getScopeGroupId(), keywords,
-					WorkflowConstants.STATUS_ANY));
+			KBArticleSearchDisplay kbArticleSearchDisplay =
+				KBArticleServiceUtil.getKBArticleSearchDisplay(
+					_themeDisplay.getScopeGroupId(), keywords, keywords,
+					WorkflowConstants.STATUS_ANY, null, null, false, new int[0],
+					_searchContainer.getCur(), _searchContainer.getDelta(),
+					kbArticleOrderByComparator);
+
+			_searchContainer.setResults(
+				new ArrayList<>(kbArticleSearchDisplay.getResults()));
+			_searchContainer.setTotal(kbArticleSearchDisplay.getTotal());
 		}
 		else if (kbFolderView) {
-			_searchContainer.setResultsAndTotal(
-				() -> KBFolderServiceUtil.getKBFoldersAndKBArticles(
+			_searchContainer.setTotal(
+				KBFolderServiceUtil.getKBFoldersAndKBArticlesCount(
+					_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
+					WorkflowConstants.STATUS_ANY));
+			_searchContainer.setResults(
+				KBFolderServiceUtil.getKBFoldersAndKBArticles(
 					_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
 					WorkflowConstants.STATUS_ANY, _searchContainer.getStart(),
 					_searchContainer.getEnd(),
 					KBUtil.getKBObjectsOrderByComparator(
 						_searchContainer.getOrderByCol(),
-						_searchContainer.getOrderByType())),
-				KBFolderServiceUtil.getKBFoldersAndKBArticlesCount(
-					_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
-					WorkflowConstants.STATUS_ANY));
+						_searchContainer.getOrderByType())));
 		}
 		else {
 			OrderByComparator<KBArticle> kbArticleOrderByComparator =
@@ -501,24 +415,22 @@ public class KBAdminManagementToolbarDisplayContext {
 			_searchContainer.setOrderByComparator(
 				new KBOrderByComparatorAdapter<>(kbArticleOrderByComparator));
 
-			_searchContainer.setResultsAndTotal(
-				() -> new ArrayList<>(
+			_searchContainer.setTotal(
+				KBArticleServiceUtil.getKBArticlesCount(
+					_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
+					WorkflowConstants.STATUS_ANY));
+			_searchContainer.setResults(
+				new ArrayList<>(
 					KBArticleServiceUtil.getKBArticles(
 						_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
 						WorkflowConstants.STATUS_ANY,
 						_searchContainer.getStart(), _searchContainer.getEnd(),
-						kbArticleOrderByComparator)),
-				KBArticleServiceUtil.getKBArticlesCount(
-					_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
-					WorkflowConstants.STATUS_ANY));
+						kbArticleOrderByComparator)));
 		}
 
-		EntriesChecker entriesChecker = new EntriesChecker(
-			_liferayPortletRequest, _liferayPortletResponse);
-
-		entriesChecker.setRememberCheckBoxState(false);
-
-		_searchContainer.setRowChecker(entriesChecker);
+		_searchContainer.setRowChecker(
+			new EntriesChecker(
+				_liferayPortletRequest, _liferayPortletResponse));
 
 		return _searchContainer;
 	}
@@ -529,15 +441,13 @@ public class KBAdminManagementToolbarDisplayContext {
 				_liferayPortletRequest, _liferayPortletResponse),
 			_liferayPortletResponse);
 
-		if (Validator.isNull(_getKeywords())) {
-			return sortingURL;
+		String keywords = _getKeywords();
+
+		if (Validator.isNotNull(keywords)) {
+			sortingURL.setParameter("keywords", keywords);
 		}
 
-		return PortletURLBuilder.create(
-			sortingURL
-		).setKeywords(
-			_getKeywords()
-		).buildPortletURL();
+		return sortingURL;
 	}
 
 	private String _getKeywords() {
@@ -552,17 +462,17 @@ public class KBAdminManagementToolbarDisplayContext {
 		return new DropdownItemList() {
 			{
 				final Map<String, String> orderColumnsMap = HashMapBuilder.put(
-					"modified-date", "modified-date"
+					"modifiedDate", "modified-date"
 				).put(
 					"priority", "priority"
 				).put(
 					"title", "title"
 				).put(
-					"view-count", "view-count"
+					"viewCount", "view-count"
 				).build();
 
 				String[] orderColumns = {
-					"priority", "modified-date", "title", "view-count"
+					"priority", "modifiedDate", "title", "viewCount"
 				};
 
 				for (String orderByCol : orderColumns) {
@@ -590,53 +500,10 @@ public class KBAdminManagementToolbarDisplayContext {
 				PortalUtil.getCurrentURL(_httpServletRequest)));
 	}
 
-	private boolean _hasAddKBArticlePermission() throws PortalException {
-		long kbFolderClassNameId = PortalUtil.getClassNameId(
-			KBFolderConstants.getClassName());
-
-		long parentResourceClassNameId = ParamUtil.getLong(
-			_httpServletRequest, "parentResourceClassNameId",
-			kbFolderClassNameId);
-
-		if (parentResourceClassNameId == kbFolderClassNameId) {
-			long parentResourcePrimKey = ParamUtil.getLong(
-				_httpServletRequest, "parentResourcePrimKey",
-				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-
-			return KBFolderPermission.contains(
-				_themeDisplay.getPermissionChecker(),
-				_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
-				KBActionKeys.ADD_KB_ARTICLE);
-		}
-
-		return AdminPermission.contains(
-			_themeDisplay.getPermissionChecker(),
-			_themeDisplay.getScopeGroupId(), KBActionKeys.ADD_KB_ARTICLE);
+	private String _getTemplatePath() {
+		return _portletConfig.getInitParameter("template-path");
 	}
 
-	private boolean _hasAddKBFolderPermission() throws PortalException {
-		long kbFolderClassNameId = PortalUtil.getClassNameId(
-			KBFolderConstants.getClassName());
-
-		long parentResourceClassNameId = ParamUtil.getLong(
-			_httpServletRequest, "parentResourceClassNameId",
-			kbFolderClassNameId);
-
-		if (parentResourceClassNameId != kbFolderClassNameId) {
-			return false;
-		}
-
-		long parentResourcePrimKey = ParamUtil.getLong(
-			_httpServletRequest, "parentResourcePrimKey",
-			KBFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-
-		return KBFolderPermission.contains(
-			_themeDisplay.getPermissionChecker(),
-			_themeDisplay.getScopeGroupId(), parentResourcePrimKey,
-			KBActionKeys.ADD_KB_FOLDER);
-	}
-
-	private String _displayStyle;
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;

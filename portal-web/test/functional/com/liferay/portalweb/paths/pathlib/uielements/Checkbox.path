@@ -72,7 +72,7 @@
 </tr>
 <tr>
 	<td>ADD_SHIPMENT_ITEMS_CHECKBOX</td>
-	<td>//div[contains(text(), '${key_productSku}')]/preceding-sibling::div[@class='dnd-td item-selector']//input[@type='checkbox']</td>
+	<td>//div[contains(text(), '${key_productSKU}')]/preceding-sibling::div[@class='dnd-td item-selector']//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -88,11 +88,6 @@
 <tr>
 	<td>CHECKBOX_LABEL</td>
 	<td>//label[input]//*[normalize-space(text())='${key_fieldLabel}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CHECKBOX_NAME</td>
-	<td>//input[@name='${key_fieldName}'][@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -186,8 +181,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ENABLE_DESCRIPTION_CHECKBOX</td>
-	<td>//label[contains(@for,'enableKBArticleDescription')]//input[@type='checkbox']</td>
+	<td>ENABLE_DIRECTORY_INDEXING</td>
+	<td>//label[contains(.,'Enable Directory Indexing')]//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -281,11 +276,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>FDS_SELECT_ALL</td>
-	<td>//input[contains(@name,'table-head-selector') and (@type='checkbox')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>HISTORY_ENABLED</td>
 	<td>//label[contains(.,'History Enabled')]/input[@type='checkbox']</td>
 	<td></td>
@@ -301,23 +291,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>LEXICON_SELECT_ALL_CONTAINER_DISABLED</td>
-	<td>//nav[contains(@class,'management-bar')]//div[contains(@class,'custom-checkbox')]/label/input[@disabled]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>LEXICON_SELECT_ALL_CONTAINER_SPECIFIC</td>
-	<td>//div[contains(@class,'portlet-boundary')][${key_position}]//nav[contains(@class,'management-bar')]//div[contains(@class,'custom-checkbox')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>LEXICON_SELECT_ALL_INPUT</td>
 	<td>//nav[contains(@class,'management-bar')]//input[@type='checkbox']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>LEXICON_SELECT_ALL_INPUT_SPECIFIC</td>
-	<td>//div[contains(@class,'portlet-boundary')][${key_position}]//nav[contains(@class,'management-bar')]//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -347,7 +322,7 @@
 </tr>
 <tr>
 	<td>MERGE_WITH_PARENT_FOLDER</td>
-	<td>//label[contains(.,'Merge with Parent Folder')]//input[@type='checkbox']</td>
+	<td>//label[contains(.,'Merge with Parent Folder')]/input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -513,11 +488,6 @@
 <tr>
 	<td>UPLOAD_FILE_ENTRY</td>
 	<td>//li[contains(@class,'upload-file')]//input[@type='checkbox' and contains(@data-title,'${key_fileName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SPECIFIC_CHECKBOX_IN_TABLE</td>
-	<td>//tr[contains(.,'${key_checkboxOption}')]//input</td>
 	<td></td>
 </tr>
 </tbody>

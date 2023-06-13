@@ -46,7 +46,6 @@ public class CommerceDiscountCommerceAccountGroupRelWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put(
 			"commerceDiscountCommerceAccountGroupRelId",
 			getCommerceDiscountCommerceAccountGroupRelId());
@@ -63,12 +62,6 @@ public class CommerceDiscountCommerceAccountGroupRelWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		Long commerceDiscountCommerceAccountGroupRelId = (Long)attributes.get(
 			"commerceDiscountCommerceAccountGroupRelId");
 
@@ -127,10 +120,11 @@ public class CommerceDiscountCommerceAccountGroupRelWrapper
 	}
 
 	@Override
-	public com.liferay.account.model.AccountGroup getAccountGroup()
+	public com.liferay.commerce.account.model.CommerceAccountGroup
+			getCommerceAccountGroup()
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return model.getAccountGroup();
+		return model.getCommerceAccountGroup();
 	}
 
 	/**
@@ -198,16 +192,6 @@ public class CommerceDiscountCommerceAccountGroupRelWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this commerce discount commerce account group rel.
-	 *
-	 * @return the mvcc version of this commerce discount commerce account group rel
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -319,16 +303,6 @@ public class CommerceDiscountCommerceAccountGroupRelWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce discount commerce account group rel.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce discount commerce account group rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the primary key of this commerce discount commerce account group rel.
 	 *
 	 * @param primaryKey the primary key of this commerce discount commerce account group rel
@@ -366,11 +340,6 @@ public class CommerceDiscountCommerceAccountGroupRelWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

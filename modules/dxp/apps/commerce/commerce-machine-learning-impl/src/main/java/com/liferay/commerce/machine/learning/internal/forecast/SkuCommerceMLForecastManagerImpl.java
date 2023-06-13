@@ -38,7 +38,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = SkuCommerceMLForecastManager.class)
+@Component(
+	enabled = false, immediate = true,
+	service = SkuCommerceMLForecastManager.class
+)
 public class SkuCommerceMLForecastManagerImpl
 	extends BaseCommerceMLForecastServiceImpl<SkuCommerceMLForecast>
 	implements SkuCommerceMLForecastManager {

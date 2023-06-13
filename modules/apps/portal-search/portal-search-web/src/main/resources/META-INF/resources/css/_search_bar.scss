@@ -1,70 +1,11 @@
 .portlet-search-bar {
+	.alert {
+		margin-bottom: 0;
+	}
+
 	.search-bar {
 		.form-group.input-group-item {
 			margin-bottom: 0;
-		}
-	}
-
-	.search-bar-configuration-options-container {
-		.form-group {
-			margin-bottom: 0;
-		}
-	}
-
-	.search-bar-configuration-suggestions-root {
-		.input-sets-item-root {
-			.contributor-input-set-item-header-root {
-				.contributor-name {
-					border-color: var(--gray-400, $secondary-l2);
-					color: var(--gray-600, $secondary);
-					text-transform: none;
-				}
-			}
-		}
-
-		.has-error {
-			.select-sxp-blueprint {
-				.form-control {
-					background-color: var(--danger-l2, $danger-l2);
-					border-color: var(--danger-l1, $danger-l1);
-				}
-			}
-		}
-
-		.select-sxp-blueprint {
-			display: flex;
-			width: 100%;
-
-			.form-control {
-				background-color: var(--white, $white);
-				border-bottom-right-radius: 0;
-				border-color: var(--gray-400, $secondary-l2);
-				border-right: 0;
-				border-top-right-radius: 0;
-				caret-color: transparent;
-				opacity: 1;
-				padding-right: 0;
-
-				&:focus {
-					box-shadow: none;
-				}
-			}
-
-			.btn {
-				border-bottom-left-radius: 0;
-				border-top-left-radius: 0;
-
-				&:focus {
-					box-shadow: none;
-				}
-
-				&.remove-sxp-blueprint {
-					border-bottom-right-radius: 0;
-					border-left: 0;
-					border-right: 0;
-					border-top-right-radius: 0;
-				}
-			}
 		}
 	}
 
@@ -74,35 +15,5 @@
 
 	.search-bar-search-select-wrapper {
 		max-width: 9.375rem;
-	}
-}
-
-.search-bar-suggestions-dropdown-menu {
-	max-height: 25rem;
-	max-width: none;
-
-	.search-bar-suggestions-results-list {
-		.dropdown-subheader {
-			color: var(--gray-600, $secondary);
-		}
-
-		.suggestion-item-title {
-			color: var(--dark, $dark);
-
-			+ .suggestion-item-description {
-				color: var(--gray-600, $secondary);
-				font-size: 0.75rem;
-			}
-		}
-	}
-
-	.search-bar-suggestions-show-more {
-		color: var(--primary, $primary);
-
-		&:hover {
-			background-color: var(--white, $white);
-			color: var(--primary-d2, $primary-d2);
-			text-decoration: underline;
-		}
 	}
 }

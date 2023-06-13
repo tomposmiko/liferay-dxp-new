@@ -30,10 +30,6 @@ public class MBThreadFlagLocalServiceWrapper
 	implements MBThreadFlagLocalService,
 			   ServiceWrapper<MBThreadFlagLocalService> {
 
-	public MBThreadFlagLocalServiceWrapper() {
-		this(null);
-	}
-
 	public MBThreadFlagLocalServiceWrapper(
 		MBThreadFlagLocalService mbThreadFlagLocalService) {
 

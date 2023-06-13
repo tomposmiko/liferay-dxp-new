@@ -12,37 +12,22 @@
  * details.
  */
 
-import {
-	DefaultEventHandler,
-	openConfirmModal,
-	openWindow,
-} from 'frontend-js-web';
+import {DefaultEventHandler} from 'frontend-js-web';
+import {Config} from 'metal-state';
 
 class ElementsDefaultEventHandler extends DefaultEventHandler {
-	created(props) {
-		this.trashEnabled = props.trashEnabled;
-	}
-
 	delete(itemData) {
-		if (this.trashEnabled) {
+		const message = Liferay.Language.get(
+			'are-you-sure-you-want-to-delete-this'
+		);
+
+		if (this.trashEnabled || confirm(message)) {
 			this._send(itemData.deleteURL);
-		}
-		else {
-			openConfirmModal({
-				message: Liferay.Language.get(
-					'are-you-sure-you-want-to-delete-this'
-				),
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						this._send(itemData.deleteURL);
-					}
-				},
-			});
 		}
 	}
 
 	permissions(itemData) {
-		openWindow({
+		Liferay.Util.openWindow({
 			dialog: {
 				destroyOnHide: true,
 				modal: true,
@@ -56,21 +41,22 @@ class ElementsDefaultEventHandler extends DefaultEventHandler {
 	}
 
 	publishToLive(itemData) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-publish-to-live'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					this._send(itemData.publishEntryURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-publish-to-live')
+			)
+		) {
+			this._send(itemData.publishEntryURL);
+		}
 	}
 
 	_send(url) {
 		submitForm(document.hrefFm, url);
 	}
 }
+
+ElementsDefaultEventHandler.STATE = {
+	trashEnabled: Config.bool(),
+};
 
 export default ElementsDefaultEventHandler;

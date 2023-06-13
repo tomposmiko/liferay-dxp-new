@@ -12,7 +12,7 @@
  * details.
  */
 
-import {fetch, openConfirmModal, sub} from 'frontend-js-web';
+import {fetch} from 'frontend-js-web';
 
 const CONFIRM_DISCARD_IMAGES = Liferay.Language.get(
 	'uploads-are-in-progress-confirmation'
@@ -132,27 +132,22 @@ class WikiPortlet {
 			formatSelect.selectedIndex
 		].text.trim();
 
-		const confirmMessage = sub(
+		const confirmMessage = Liferay.Util.sub(
 			this._strings.confirmLoseFormatting,
 			this._currentFormatLabel,
 			newFormat
 		);
 
-		openConfirmModal({
-			message: confirmMessage,
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const form = this.rootNode.querySelector(
-						`[name="${this._namespace}fm"]`
-					);
-					form.setAttribute('action', this._renderUrl);
-					this._save();
-				}
-				else {
-					formatSelect.selectedIndex = this.currentFormatIndex;
-				}
-			},
-		});
+		if (confirm(confirmMessage)) {
+			const form = this.rootNode.querySelector(
+				`[name="${this._namespace}fm"]`
+			);
+			form.setAttribute('action', this._renderUrl);
+			this._save();
+		}
+		else {
+			formatSelect.selectedIndex = this.currentFormatIndex;
+		}
 	}
 
 	/**
@@ -185,30 +180,25 @@ class WikiPortlet {
 	 * confirmation to the user.
 	 *
 	 * @protected
-	 * @return {void} Call the callback if there aren't temporal
-	 * images, and the user does not confirm she wants to lose them.
-	 * Otherwise, the callback will not be called.
+	 * @return {Boolean} False if there are temporal images and
+	 * user does not confirm she wants to lose them. True in other case.
 	 */
-	_maybeRemoveTempImages(callback) {
+	_removeTempImages() {
 		const tempImages = this.rootNode.querySelector('img[data-random-id]');
+		let discardTempImages = true;
 
-		if (tempImages && !!tempImages.length) {
-			openConfirmModal({
-				message: this._strings.confirmDiscardImages,
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						tempImages.forEach((node) => {
-							node.parentElement.remove();
-						});
+		if (tempImages && tempImages.length > 0) {
+			if (confirm(this._strings.confirmDiscardImages)) {
+				tempImages.forEach((node) => {
+					node.parentElement.remove();
+				});
+			}
+			else {
+				discardTempImages = false;
+			}
+		}
 
-						callback();
-					}
-				},
-			});
-		}
-		else {
-			callback();
-		}
+		return discardTempImages;
 	}
 
 	/**
@@ -219,7 +209,7 @@ class WikiPortlet {
 	_save() {
 		const namespace = this._namespace;
 
-		this._maybeRemoveTempImages(() => {
+		if (this._removeTempImages()) {
 			document.getElementById(
 				namespace + this._constants.CMD
 			).value = this._currentAction;
@@ -233,7 +223,7 @@ class WikiPortlet {
 			}
 
 			submitForm(document[`${namespace}fm`]);
-		});
+		}
 	}
 }
 

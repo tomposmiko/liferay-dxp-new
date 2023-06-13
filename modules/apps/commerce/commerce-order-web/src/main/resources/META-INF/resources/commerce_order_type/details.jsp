@@ -50,15 +50,15 @@ if ((commerceOrderType != null) && (commerceOrderType.getExpirationDate() != nul
 			>
 				<div class="row">
 					<div class="col">
-						<aui:input label="name" localized="<%= true %>" name="name" required="<%= true %>" />
+						<aui:input autoFocus="<%= true %>" label="name" localized="<%= true %>" name="name" required="<%= true %>" />
 					</div>
 
 					<div class="col-auto">
-						<aui:input label="display-order" name="displayOrder" value="<%= String.valueOf(commerceOrderType.getDisplayOrder()) %>" />
+						<aui:input label='<%= HtmlUtil.escape("order") %>' name="displayOrder" value="<%= String.valueOf(commerceOrderType.getDisplayOrder()) %>" />
 					</div>
 
 					<div class="col-auto">
-						<aui:input label="active" name="active" type="toggle-switch" value="<%= commerceOrderType.isActive() %>" />
+						<aui:input label='<%= HtmlUtil.escape("active") %>' name="active" type="toggle-switch" value="<%= commerceOrderType.isActive() %>" />
 					</div>
 				</div>
 

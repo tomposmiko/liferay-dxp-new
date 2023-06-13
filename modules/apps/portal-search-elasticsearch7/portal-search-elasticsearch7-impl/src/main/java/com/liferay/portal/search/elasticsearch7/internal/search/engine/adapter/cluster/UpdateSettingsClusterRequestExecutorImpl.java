@@ -35,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Bryan Engler
  */
-@Component(service = UpdateSettingsClusterRequestExecutor.class)
+@Component(
+	immediate = true, service = UpdateSettingsClusterRequestExecutor.class
+)
 public class UpdateSettingsClusterRequestExecutorImpl
 	implements UpdateSettingsClusterRequestExecutor {
 
@@ -44,10 +46,10 @@ public class UpdateSettingsClusterRequestExecutorImpl
 		UpdateSettingsClusterRequest updateSettingsClusterRequest) {
 
 		ClusterUpdateSettingsRequest clusterUpdateSettingsRequest =
-			_createClusterUpdateSettingsRequest(updateSettingsClusterRequest);
+			createClusterUpdateSettingsRequest(updateSettingsClusterRequest);
 
 		ClusterUpdateSettingsResponse clusterUpdateSettingsResponse =
-			_getClusterUpdateSettingsResponse(
+			getClusterUpdateSettingsResponse(
 				clusterUpdateSettingsRequest, updateSettingsClusterRequest);
 
 		Settings persistentSettings =
@@ -59,7 +61,7 @@ public class UpdateSettingsClusterRequestExecutorImpl
 			persistentSettings.toString(), transientSettings.toString());
 	}
 
-	private ClusterUpdateSettingsRequest _createClusterUpdateSettingsRequest(
+	protected ClusterUpdateSettingsRequest createClusterUpdateSettingsRequest(
 		UpdateSettingsClusterRequest updateSettingsClusterRequest) {
 
 		ClusterUpdateSettingsRequest clusterUpdateSettingsRequest =
@@ -92,7 +94,7 @@ public class UpdateSettingsClusterRequestExecutorImpl
 		return clusterUpdateSettingsRequest;
 	}
 
-	private ClusterUpdateSettingsResponse _getClusterUpdateSettingsResponse(
+	protected ClusterUpdateSettingsResponse getClusterUpdateSettingsResponse(
 		ClusterUpdateSettingsRequest clusterUpdateSettingsRequest,
 		UpdateSettingsClusterRequest updateSettingsClusterRequest) {
 
@@ -112,7 +114,13 @@ public class UpdateSettingsClusterRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

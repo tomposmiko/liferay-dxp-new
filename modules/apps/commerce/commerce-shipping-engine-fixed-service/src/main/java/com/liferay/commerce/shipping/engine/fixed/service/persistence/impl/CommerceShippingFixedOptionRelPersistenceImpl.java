@@ -20,10 +20,7 @@ import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOpt
 import com.liferay.commerce.shipping.engine.fixed.model.impl.CommerceShippingFixedOptionRelImpl;
 import com.liferay.commerce.shipping.engine.fixed.model.impl.CommerceShippingFixedOptionRelModelImpl;
 import com.liferay.commerce.shipping.engine.fixed.service.persistence.CommerceShippingFixedOptionRelPersistence;
-import com.liferay.commerce.shipping.engine.fixed.service.persistence.CommerceShippingFixedOptionRelUtil;
-import com.liferay.commerce.shipping.engine.fixed.service.persistence.impl.constants.CommercePersistenceConstants;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -31,7 +28,6 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -44,10 +40,10 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -55,13 +51,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the commerce shipping fixed option rel service.
@@ -73,7 +62,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(service = CommerceShippingFixedOptionRelPersistence.class)
 public class CommerceShippingFixedOptionRelPersistenceImpl
 	extends BasePersistenceImpl<CommerceShippingFixedOptionRel>
 	implements CommerceShippingFixedOptionRelPersistence {
@@ -201,7 +189,7 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceShippingFixedOptionRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceShippingFixedOptionRel
@@ -590,7 +578,7 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {commerceShippingMethodId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -744,7 +732,7 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceShippingFixedOptionRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceShippingFixedOptionRel
@@ -1145,7 +1133,7 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {commerceShippingFixedOptionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1648,7 +1636,7 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceShippingFixedOptionRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1721,7 +1709,7 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1776,8 +1764,7 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 	/**
 	 * Initializes the commerce shipping fixed option rel persistence.
 	 */
-	@Activate
-	public void activate() {
+	public void afterPropertiesSet() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
@@ -1838,66 +1825,17 @@ public class CommerceShippingFixedOptionRelPersistenceImpl
 			"countByCommerceShippingFixedOptionId",
 			new String[] {Long.class.getName()},
 			new String[] {"commerceShippingFixedOptionId"}, false);
-
-		_setCommerceShippingFixedOptionRelUtilPersistence(this);
 	}
 
-	@Deactivate
-	public void deactivate() {
-		_setCommerceShippingFixedOptionRelUtilPersistence(null);
-
+	public void destroy() {
 		entityCache.removeCache(
 			CommerceShippingFixedOptionRelImpl.class.getName());
 	}
 
-	private void _setCommerceShippingFixedOptionRelUtilPersistence(
-		CommerceShippingFixedOptionRelPersistence
-			commerceShippingFixedOptionRelPersistence) {
-
-		try {
-			Field field =
-				CommerceShippingFixedOptionRelUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceShippingFixedOptionRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
 
-	@Reference
+	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
 
 	private static final String _SQL_SELECT_COMMERCESHIPPINGFIXEDOPTIONREL =

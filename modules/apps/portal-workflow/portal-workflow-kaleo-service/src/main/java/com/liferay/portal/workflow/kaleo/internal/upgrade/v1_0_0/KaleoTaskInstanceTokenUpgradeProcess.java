@@ -31,14 +31,7 @@ import java.util.Set;
  */
 public class KaleoTaskInstanceTokenUpgradeProcess extends UpgradeProcess {
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_updateKaleoTaskInstanceTokens();
-
-		_deleteKaleoInstanceTokens();
-	}
-
-	private void _deleteKaleoInstanceTokens() throws Exception {
+	protected void deleteKaleoInstanceTokens() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			if (_kaleoInstanceTokenIds.isEmpty()) {
 				return;
@@ -64,7 +57,14 @@ public class KaleoTaskInstanceTokenUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private long _getKaleoInstanceTokenId(long kaleoInstanceTokenId)
+	@Override
+	protected void doUpgrade() throws Exception {
+		updateKaleoTaskInstanceTokens();
+
+		deleteKaleoInstanceTokens();
+	}
+
+	protected long getKaleoInstanceTokenId(long kaleoInstanceTokenId)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -92,7 +92,7 @@ public class KaleoTaskInstanceTokenUpgradeProcess extends UpgradeProcess {
 
 					_kaleoInstanceTokenIds.add(kaleoInstanceTokenId);
 
-					return _getKaleoInstanceTokenId(parentKaleoInstanceTokenId);
+					return getKaleoInstanceTokenId(parentKaleoInstanceTokenId);
 				}
 
 				return kaleoInstanceTokenId;
@@ -100,7 +100,7 @@ public class KaleoTaskInstanceTokenUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateKaleoTaskInstanceTokens() throws Exception {
+	protected void updateKaleoTaskInstanceTokens() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement = connection.prepareStatement(
 				"select kaleoTaskInstanceTokenId, kaleoInstanceTokenId from " +
@@ -111,7 +111,7 @@ public class KaleoTaskInstanceTokenUpgradeProcess extends UpgradeProcess {
 				long oldKaleoInstanceTokenId = resultSet.getLong(
 					"kaleoInstanceTokenId");
 
-				long newKaleoInstanceTokenId = _getKaleoInstanceTokenId(
+				long newKaleoInstanceTokenId = getKaleoInstanceTokenId(
 					oldKaleoInstanceTokenId);
 
 				if (oldKaleoInstanceTokenId == newKaleoInstanceTokenId) {

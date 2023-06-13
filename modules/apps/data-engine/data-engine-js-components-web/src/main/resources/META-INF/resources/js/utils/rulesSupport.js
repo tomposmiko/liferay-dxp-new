@@ -12,53 +12,54 @@
  * details.
  */
 
+import {Tokenizer} from 'dynamic-data-mapping-form-builder';
+
 import {getFieldProperty} from '../core/utils/fields';
-import {Tokenizer} from './Tokenizer';
 import {PagesVisitor} from './visitors.es';
 
 const DEFAULT_FIELD_NAMES_REGEX_FOR_EXPRESSION = /[a-zA-Z]+\d{8}/g;
 
-export function clearTargetValue(actions, index) {
+export const clearTargetValue = (actions, index) => {
 	if (actions[index]) {
 		actions[index].target = '';
 	}
 
 	return actions;
-}
+};
 
-export function clearFirstOperandValue(condition) {
+export const clearFirstOperandValue = (condition) => {
 	if (condition && condition.operands[0]) {
 		condition.operands[0].type = '';
 		condition.operands[0].value = '';
 	}
 
 	return condition;
-}
+};
 
-export function clearOperatorValue(condition) {
+export const clearOperatorValue = (condition) => {
 	if (condition) {
 		condition.operator = '';
 	}
 
 	return condition;
-}
+};
 
-export function clearSecondOperandValue(condition) {
+export const clearSecondOperandValue = (condition) => {
 	if (condition && condition.operands[1]) {
 		condition.operands[1].type = '';
 		condition.operands[1].value = '';
 	}
 
 	return condition;
-}
+};
 
-export function clearAllConditionFieldValues(condition) {
+export const clearAllConditionFieldValues = (condition) => {
 	condition = clearFirstOperandValue(condition);
 	condition = clearOperatorValue(condition);
 	condition = clearSecondOperandValue(condition);
 
 	return condition;
-}
+};
 
 const fieldWithOptions = (fieldType) => {
 	return (
@@ -68,7 +69,7 @@ const fieldWithOptions = (fieldType) => {
 	);
 };
 
-export function getFieldOptions(fieldName, pages) {
+export const getFieldOptions = (fieldName, pages) => {
 	let options = [];
 	const visitor = new PagesVisitor(pages);
 
@@ -79,11 +80,11 @@ export function getFieldOptions(fieldName, pages) {
 	options = field ? field.options : [];
 
 	return options;
-}
+};
 
-export function getFieldType(fieldName, pages) {
+export const getFieldType = (fieldName, pages) => {
 	return getFieldProperty(pages, fieldName, 'type');
-}
+};
 
 const optionBelongsToRule = (condition, options) => {
 	return options.some(
@@ -116,7 +117,7 @@ const targetFieldExists = (target, pages) => {
 	return targetFieldExists;
 };
 
-export function syncActions(pages, actions) {
+export const syncActions = (pages, actions) => {
 	actions.forEach((action) => {
 		if (action.action === 'auto-fill') {
 			const {inputs, outputs} = action;
@@ -136,7 +137,7 @@ export function syncActions(pages, actions) {
 		else if (action.action === 'calculate') {
 			const expressionFields = getExpressionFields(action);
 
-			if (expressionFields && !!expressionFields.length) {
+			if (expressionFields && expressionFields.length > 0) {
 				expressionFields.forEach((field) => {
 					if (!targetFieldExists(field, pages)) {
 						const inexistentField = new RegExp(field, 'g');
@@ -166,9 +167,9 @@ export function syncActions(pages, actions) {
 	});
 
 	return actions;
-}
+};
 
-export function formatRules(pages, rules) {
+export const formatRules = (pages, rules) => {
 	const visitor = new PagesVisitor(pages);
 
 	const formattedRules = (rules || []).map((rule) => {
@@ -202,7 +203,7 @@ export function formatRules(pages, rules) {
 			if (
 				firstOperandFieldExists &&
 				fieldWithOptions(firstOperandFieldType) &&
-				condition.operands[1]?.type !== 'field'
+				condition.operands[1]?.type != 'field'
 			) {
 				const fieldName = condition.operands[0].value;
 				const options = getFieldOptions(fieldName, pages);
@@ -263,13 +264,13 @@ export function formatRules(pages, rules) {
 	});
 
 	return formattedRules;
-}
+};
 
 const expressionHasNonNumericFields = (action, fields) => {
 	const expressionFields = getExpressionFields(action);
 	let hasNonNumericFields = false;
 
-	if (expressionFields && !!expressionFields.length) {
+	if (expressionFields && expressionFields.length > 0) {
 		expressionFields.forEach((value) => {
 			const field = fields.find(({fieldName}) => fieldName === value);
 			if (field?.type !== 'numeric') {
@@ -281,7 +282,7 @@ const expressionHasNonNumericFields = (action, fields) => {
 	return hasNonNumericFields;
 };
 
-export function fieldNameBelongsToAction(actions, fieldName, fields) {
+export const fieldNameBelongsToAction = (actions, fieldName, fields) => {
 	const emptyField = '[]';
 
 	return actions
@@ -318,9 +319,9 @@ export function fieldNameBelongsToAction(actions, fieldName, fields) {
 			}
 		})
 		.some((fieldFound) => fieldFound === true);
-}
+};
 
-export function fieldNameBelongsToCondition(conditions, fieldName) {
+export const fieldNameBelongsToCondition = (conditions, fieldName) => {
 	return conditions
 		.map((condition) => {
 			return condition.operands
@@ -328,21 +329,21 @@ export function fieldNameBelongsToCondition(conditions, fieldName) {
 				.some((fieldFound) => fieldFound === true);
 		})
 		.some((fieldFound) => fieldFound === true);
-}
+};
 
-export function findRuleByFieldName(fieldName, pages, rules) {
+export const findRuleByFieldName = (fieldName, pages, rules) => {
 	return rules.some(
 		(rule) =>
 			fieldNameBelongsToAction(rule.actions, fieldName, pages) ||
 			fieldNameBelongsToCondition(rule.conditions, fieldName)
 	);
-}
+};
 
 const isOperandValid = (operand) =>
 	operand && Boolean(operand.type) && Boolean(operand.value);
 
-export function isConditionsValid(conditions) {
-	return conditions
+export const isConditionsValid = (conditions) =>
+	conditions
 		.map(({operator, operands: [left, right]}) => {
 			if (['is-empty', 'not-is-empty'].includes(operator)) {
 				return isOperandValid(left);
@@ -355,10 +356,9 @@ export function isConditionsValid(conditions) {
 			);
 		})
 		.every((result) => result === true);
-}
 
-export function isActionsValid(actions, dataProviders) {
-	return actions
+export const isActionsValid = (actions, dataProviders) =>
+	actions
 		.map(({action, target, ...payload}) => {
 			switch (action) {
 				case 'calculate': {
@@ -400,13 +400,12 @@ export function isActionsValid(actions, dataProviders) {
 			}
 		})
 		.every((result) => result === true);
-}
 
-export function findInvalidRule(pages, rule) {
+export const findInvalidRule = (pages, rule) => {
 	return findRuleByFieldName('', pages, [rule]);
-}
+};
 
-export function replaceFieldNameByFieldLabel(expression, fields) {
+export const replaceFieldNameByFieldLabel = (expression, fields) => {
 	const operands = expression.match(DEFAULT_FIELD_NAMES_REGEX_FOR_EXPRESSION);
 
 	if (!operands) {
@@ -424,4 +423,4 @@ export function replaceFieldNameByFieldLabel(expression, fields) {
 	});
 
 	return newExpression;
-}
+};

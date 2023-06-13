@@ -75,7 +75,13 @@ public class PasswordPolicyModelListener
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setSAPEntryLocalService(
+		SAPEntryLocalService sapEntryLocalService) {
+
+		this.sapEntryLocalService = sapEntryLocalService;
+	}
+
 	protected SAPEntryLocalService sapEntryLocalService;
 
 }

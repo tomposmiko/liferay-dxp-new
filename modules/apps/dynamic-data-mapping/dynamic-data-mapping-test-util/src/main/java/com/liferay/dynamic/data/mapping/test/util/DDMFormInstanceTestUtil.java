@@ -40,18 +40,9 @@ public class DDMFormInstanceTestUtil {
 		throws Exception {
 
 		return addDDMFormInstance(
-			ddmForm, group, settingsDDMFormValues,
-			DDMFormInstance.class.getName(), userId);
-	}
-
-	public static DDMFormInstance addDDMFormInstance(
-			DDMForm ddmForm, Group group, DDMFormValues settingsDDMFormValues,
-			String className, long userId)
-		throws Exception {
-
-		return addDDMFormInstance(
 			DDMStructureTestUtil.addStructure(
-				group.getGroupId(), className, ddmForm, LocaleUtil.US),
+				group.getGroupId(), DDMFormInstance.class.getName(), ddmForm,
+				LocaleUtil.US),
 			group, settingsDDMFormValues, userId);
 	}
 
@@ -61,14 +52,6 @@ public class DDMFormInstanceTestUtil {
 
 		return addDDMFormInstance(
 			ddmForm, group, createSettingsDDMFormValues(), userId);
-	}
-
-	public static DDMFormInstance addDDMFormInstance(
-			DDMForm ddmForm, Group group, String className, long userId)
-		throws Exception {
-
-		return addDDMFormInstance(
-			ddmForm, group, createSettingsDDMFormValues(), className, userId);
 	}
 
 	public static DDMFormInstance addDDMFormInstance(
@@ -144,10 +127,8 @@ public class DDMFormInstanceTestUtil {
 		return ddmFormValues;
 	}
 
-	public static void deleteFormInstance(DDMFormInstance ddmFormInstance)
-		throws PortalException {
-
-		DDMFormInstanceLocalServiceUtil.deleteFormInstance(ddmFormInstance);
+	public static void deleteDDMFormInstance(DDMFormInstance ddmFormInstance) {
+		DDMFormInstanceLocalServiceUtil.deleteDDMFormInstance(ddmFormInstance);
 	}
 
 	public static DDMFormInstance updateDDMFormInstance(

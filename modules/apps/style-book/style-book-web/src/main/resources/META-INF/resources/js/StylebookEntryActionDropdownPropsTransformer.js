@@ -12,14 +12,7 @@
  * details.
  */
 
-import {
-	openConfirmModal,
-	openSelectionModal,
-	openSimpleInputModal,
-	setFormValues,
-} from 'frontend-js-web';
-
-import openDeleteStyleBookModal from './openDeleteStyleBookModal';
+import {openSelectionModal, openSimpleInputModal} from 'frontend-js-web';
 
 const ACTIONS = {
 	copyStyleBookEntry({copyStyleBookEntryURL}) {
@@ -27,11 +20,13 @@ const ACTIONS = {
 	},
 
 	deleteStyleBookEntry({deleteStyleBookEntryURL}) {
-		openDeleteStyleBookModal({
-			onDelete: () => {
-				submitForm(document.hrefFm, deleteStyleBookEntryURL);
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, deleteStyleBookEntryURL);
+		}
 	},
 
 	deleteStyleBookEntryPreview({deleteStyleBookEntryPreviewURL}) {
@@ -43,14 +38,14 @@ const ACTIONS = {
 	},
 
 	markAsDefaultStyleBookEntry({markAsDefaultStyleBookEntryURL, message}) {
-		openConfirmModal({
-			message,
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, markAsDefaultStyleBookEntryURL);
-				}
-			},
-		});
+		if (message !== '') {
+			if (confirm(message)) {
+				submitForm(document.hrefFm, markAsDefaultStyleBookEntryURL);
+			}
+		}
+		else {
+			submitForm(document.hrefFm, markAsDefaultStyleBookEntryURL);
+		}
 	},
 
 	renameStyleBookEntry(
@@ -84,7 +79,7 @@ const ACTIONS = {
 					);
 
 					if (form) {
-						setFormValues(form, {
+						Liferay.Util.setFormValues(form, {
 							fileEntryId: itemValue.fileEntryId,
 							styleBookEntryId,
 						});
@@ -105,30 +100,25 @@ export default function propsTransformer({
 	portletNamespace,
 	...otherProps
 }) {
-	const onClick = (event, item) => {
-		const action = item.data?.action;
-
-		if (action) {
-			event.preventDefault();
-
-			ACTIONS[action](item.data, portletNamespace);
-		}
-	};
-
 	return {
 		...otherProps,
-		actions: (actions || []).map((item) => {
+		actions: actions.map((item) => {
 			return {
 				...item,
 				items: item.items?.map((child) => {
 					return {
 						...child,
-						onClick: (event) => onClick(event, child),
+						onClick(event) {
+							const action = child.data?.action;
+
+							if (action) {
+								event.preventDefault();
+
+								ACTIONS[action](child.data, portletNamespace);
+							}
+						},
 					};
 				}),
-				onClick: item.items
-					? () => {}
-					: (event) => onClick(event, item),
 			};
 		}),
 	};

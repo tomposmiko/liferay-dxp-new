@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class BookmarksFolderStagedModelDataHandler
 	extends BaseStagedModelDataHandler<BookmarksFolder> {
 

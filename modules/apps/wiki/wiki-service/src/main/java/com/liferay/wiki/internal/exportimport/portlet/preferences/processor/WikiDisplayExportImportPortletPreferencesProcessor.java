@@ -49,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + WikiPortletKeys.WIKI_DISPLAY,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -63,11 +64,6 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 	@Override
 	public List<Capability> getImportCapabilities() {
 		return ListUtil.fromArray(_capability);
-	}
-
-	@Override
-	public boolean isPublishDisplayedContent() {
-		return false;
 	}
 
 	@Override
@@ -125,7 +121,7 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 			portletDataContext, portletId, node);
 
 		ActionableDynamicQuery actionableDynamicQuery =
-			_getPageActionableDynamicQuery(
+			getPageActionableDynamicQuery(
 				portletDataContext, node.getNodeId(), portletId);
 
 		try {
@@ -177,7 +173,7 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
-	private ActionableDynamicQuery _getPageActionableDynamicQuery(
+	protected ActionableDynamicQuery getPageActionableDynamicQuery(
 		PortletDataContext portletDataContext, long nodeId, String portletId) {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -204,13 +200,19 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 		return actionableDynamicQuery;
 	}
 
+	@Reference(unbind = "-")
+	protected void setWikiPageLocalService(
+		WikiPageLocalService wikiPageLocalService) {
+
+		_wikiPageLocalService = wikiPageLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		WikiDisplayExportImportPortletPreferencesProcessor.class);
 
 	@Reference(target = "(name=ReferencedStagedModelImporter)")
 	private Capability _capability;
 
-	@Reference
 	private WikiPageLocalService _wikiPageLocalService;
 
 }

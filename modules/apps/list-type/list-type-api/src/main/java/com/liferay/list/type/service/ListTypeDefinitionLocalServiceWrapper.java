@@ -27,10 +27,6 @@ public class ListTypeDefinitionLocalServiceWrapper
 	implements ListTypeDefinitionLocalService,
 			   ServiceWrapper<ListTypeDefinitionLocalService> {
 
-	public ListTypeDefinitionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ListTypeDefinitionLocalServiceWrapper(
 		ListTypeDefinitionLocalService listTypeDefinitionLocalService) {
 
@@ -57,23 +53,11 @@ public class ListTypeDefinitionLocalServiceWrapper
 
 	@Override
 	public com.liferay.list.type.model.ListTypeDefinition addListTypeDefinition(
-			String externalReferenceCode, long userId)
+			long userId, java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeDefinitionLocalService.addListTypeDefinition(
-			externalReferenceCode, userId);
-	}
-
-	@Override
-	public com.liferay.list.type.model.ListTypeDefinition addListTypeDefinition(
-			String externalReferenceCode, long userId,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.List<com.liferay.list.type.model.ListTypeEntry>
-				listTypeEntries)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _listTypeDefinitionLocalService.addListTypeDefinition(
-			externalReferenceCode, userId, nameMap, listTypeEntries);
+			userId, nameMap);
 	}
 
 	/**
@@ -267,16 +251,6 @@ public class ListTypeDefinitionLocalServiceWrapper
 			listTypeDefinitionId);
 	}
 
-	@Override
-	public com.liferay.list.type.model.ListTypeDefinition
-		fetchListTypeDefinitionByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return _listTypeDefinitionLocalService.
-			fetchListTypeDefinitionByExternalReferenceCode(
-				externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the list type definition with the matching UUID and company.
 	 *
@@ -331,17 +305,6 @@ public class ListTypeDefinitionLocalServiceWrapper
 
 		return _listTypeDefinitionLocalService.getListTypeDefinition(
 			listTypeDefinitionId);
-	}
-
-	@Override
-	public com.liferay.list.type.model.ListTypeDefinition
-			getListTypeDefinitionByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _listTypeDefinitionLocalService.
-			getListTypeDefinitionByExternalReferenceCode(
-				externalReferenceCode, companyId);
 	}
 
 	/**
@@ -433,15 +396,12 @@ public class ListTypeDefinitionLocalServiceWrapper
 	@Override
 	public com.liferay.list.type.model.ListTypeDefinition
 			updateListTypeDefinition(
-				String externalReferenceCode, long listTypeDefinitionId,
-				long userId, java.util.Map<java.util.Locale, String> nameMap,
-				java.util.List<com.liferay.list.type.model.ListTypeEntry>
-					listTypeEntries)
+				long listTypeDefinitionId,
+				java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeDefinitionLocalService.updateListTypeDefinition(
-			externalReferenceCode, listTypeDefinitionId, userId, nameMap,
-			listTypeEntries);
+			listTypeDefinitionId, nameMap);
 	}
 
 	@Override

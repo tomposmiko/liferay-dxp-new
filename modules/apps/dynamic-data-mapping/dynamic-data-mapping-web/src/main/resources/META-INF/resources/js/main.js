@@ -15,37 +15,33 @@
 AUI.add(
 	'liferay-portlet-dynamic-data-mapping',
 	(A) => {
-		const AArray = A.Array;
-		const Lang = A.Lang;
+		var AArray = A.Array;
+		var Lang = A.Lang;
 
-		const BODY = document.body;
+		var BODY = A.getBody();
 
-		const instanceOf = A.instanceOf;
-		const isArray = Array.isArray;
+		var instanceOf = A.instanceOf;
+		var isArray = Array.isArray;
 
-		const isFormBuilderField = function (value) {
+		var isFormBuilderField = function (value) {
 			return value instanceof A.FormBuilderField;
 		};
 
-		const isObject = Lang.isObject;
-		const isString = Lang.isString;
-		const isUndefined = Lang.isUndefined;
+		var isObject = Lang.isObject;
+		var isString = Lang.isString;
+		var isUndefined = Lang.isUndefined;
 
-		const DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
+		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
-		const ICON_ASTERISK_TPL =
-			'<label>' +
-			'<span class="reference-mark">' +
-			Liferay.Util.getLexiconIconTpl('asterisk') +
-			'</span>' +
-			'</label>';
+		var ICON_ASTERISK_TPL =
+			'<span>' + Liferay.Util.getLexiconIconTpl('asterisk') + '</span>';
 
-		const ICON_QUESTION_TPL =
+		var ICON_QUESTION_TPL =
 			'<span>' +
 			Liferay.Util.getLexiconIconTpl('question-circle-full') +
 			'</span>';
 
-		const MAP_HIDDEN_FIELD_ATTRS = {
+		var MAP_HIDDEN_FIELD_ATTRS = {
 			DEFAULT: ['readOnly', 'width'],
 
 			checkbox: ['readOnly'],
@@ -59,15 +55,15 @@ AUI.add(
 			],
 		};
 
-		const REGEX_HYPHEN = /[-–—]/i;
+		var REGEX_HYPHEN = /[-–—]/i;
 
-		const SETTINGS_TAB_INDEX = 1;
+		var SETTINGS_TAB_INDEX = 1;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const STR_SPACE = ' ';
+		var STR_SPACE = ' ';
 
-		const STR_UNDERSCORE = '_';
+		var STR_UNDERSCORE = '_';
 
 		DEFAULTS_FORM_VALIDATOR.STRINGS.structureFieldName = Liferay.Language.get(
 			'please-enter-only-alphanumeric-characters'
@@ -88,7 +84,7 @@ AUI.add(
 			'{cssClass}'
 		);
 
-		const LiferayAvailableField = A.Component.create({
+		var LiferayAvailableField = A.Component.create({
 			ATTRS: {
 				localizationMap: {
 					validator: isObject,
@@ -104,7 +100,7 @@ AUI.add(
 			NAME: 'availableField',
 		});
 
-		const ReadOnlyFormBuilderSupport = function () {};
+		var ReadOnlyFormBuilderSupport = function () {};
 
 		ReadOnlyFormBuilderSupport.ATTRS = {
 			readOnly: {
@@ -114,10 +110,10 @@ AUI.add(
 
 		A.mix(ReadOnlyFormBuilderSupport.prototype, {
 			_afterFieldRender(event) {
-				const field = event.target;
+				var field = event.target;
 
 				if (instanceOf(field, A.FormBuilderField)) {
-					const readOnlyAttributes = AArray.map(
+					var readOnlyAttributes = AArray.map(
 						field.getPropertyModel(),
 						(item) => {
 							return item.attributeName;
@@ -129,7 +125,7 @@ AUI.add(
 			},
 
 			_afterRenderReadOnlyFormBuilder() {
-				const instance = this;
+				var instance = this;
 
 				instance.tabView.enableTab(1);
 				instance.openEditProperties(instance.get('fields').item(0));
@@ -137,7 +133,7 @@ AUI.add(
 			},
 
 			_onMouseOverFieldReadOnlyFormBuilder(event) {
-				const field = A.Widget.getByNode(event.currentTarget);
+				var field = A.Widget.getByNode(event.currentTarget);
 
 				field.controlsToolbar.hide();
 
@@ -147,7 +143,7 @@ AUI.add(
 			},
 
 			initializer() {
-				const instance = this;
+				var instance = this;
 
 				if (instance.get('readOnly')) {
 					instance.set('allowRemoveRequiredFields', false);
@@ -172,7 +168,7 @@ AUI.add(
 
 		A.LiferayAvailableField = LiferayAvailableField;
 
-		const LiferayFormBuilder = A.Component.create({
+		var LiferayFormBuilder = A.Component.create({
 			ATTRS: {
 				availableFields: {
 					validator: isObject,
@@ -261,22 +257,24 @@ AUI.add(
 
 				validator: {
 					setter(val) {
-						const config = {
-							fieldStrings: {
-								name: {
-									required: Liferay.Language.get(
-										'this-field-is-required'
-									),
+						var config = A.merge(
+							{
+								fieldStrings: {
+									name: {
+										required: Liferay.Language.get(
+											'this-field-is-required'
+										),
+									},
+								},
+								rules: {
+									name: {
+										required: true,
+										structureFieldName: true,
+									},
 								},
 							},
-							rules: {
-								name: {
-									required: true,
-									structureFieldName: true,
-								},
-							},
-							...val,
-						};
+							val
+						);
 
 						return config;
 					},
@@ -317,25 +315,23 @@ AUI.add(
 
 			prototype: {
 				_afterEditingLocaleChange(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._toggleInputDirection(event.newVal);
 				},
 
 				_afterFieldsChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const tabs = instance.tabView.getTabs();
+					var tabs = instance.tabView.getTabs();
 
-					const activeTabIndex = tabs.indexOf(
+					var activeTabIndex = tabs.indexOf(
 						instance.tabView.getActiveTab()
 					);
 
 					if (activeTabIndex === SETTINGS_TAB_INDEX) {
 						instance.editField(event.newVal.item(0));
 					}
-
-					this._handleAlertMessages(instance.get('fields'));
 				},
 
 				_beforeGetEditor(record, column) {
@@ -343,13 +339,13 @@ AUI.add(
 						return;
 					}
 
-					const instance = this;
+					var instance = this;
 
-					const columnEditor = column.editor;
+					var columnEditor = column.editor;
 
-					const recordEditor = record.get('editor');
+					var recordEditor = record.get('editor');
 
-					const editor = recordEditor || columnEditor;
+					var editor = recordEditor || columnEditor;
 
 					if (instanceOf(editor, A.BaseOptionsCellEditor)) {
 						if (editor.get('rendered')) {
@@ -365,7 +361,7 @@ AUI.add(
 					editor.after('render', () => {
 						editor.set('visible', true);
 
-						const boundingBox = editor.get('boundingBox');
+						var boundingBox = editor.get('boundingBox');
 
 						if (boundingBox) {
 							boundingBox.show();
@@ -374,9 +370,9 @@ AUI.add(
 				},
 
 				_deserializeField(fieldJSON, availableLanguageIds) {
-					const instance = this;
+					var instance = this;
 
-					const fields = fieldJSON.fields;
+					var fields = fieldJSON.fields;
 
 					if (isArray(fields)) {
 						fields.forEach((item) => {
@@ -395,18 +391,18 @@ AUI.add(
 				},
 
 				_deserializeFieldLocalizableAttributes(fieldJSON) {
-					const instance = this;
+					var instance = this;
 
-					const defaultLocale = instance.translationManager.get(
+					var defaultLocale = instance.translationManager.get(
 						'defaultLocale'
 					);
-					const editingLocale = instance.translationManager.get(
+					var editingLocale = instance.translationManager.get(
 						'editingLocale'
 					);
 
 					LiferayFormBuilder.LOCALIZABLE_FIELD_ATTRS.forEach(
 						(item) => {
-							const localizedValue = fieldJSON[item];
+							var localizedValue = fieldJSON[item];
 
 							if (item !== 'options' && localizedValue) {
 								fieldJSON[item] =
@@ -421,7 +417,7 @@ AUI.add(
 					fieldJSON,
 					availableLanguageIds
 				) {
-					const instance = this;
+					var instance = this;
 
 					availableLanguageIds.forEach((languageId) => {
 						fieldJSON.localizationMap =
@@ -430,7 +426,7 @@ AUI.add(
 
 						LiferayFormBuilder.LOCALIZABLE_FIELD_ATTRS.forEach(
 							(attribute) => {
-								const attributeMap = fieldJSON[attribute];
+								var attributeMap = fieldJSON[attribute];
 
 								if (attributeMap && attributeMap[languageId]) {
 									fieldJSON.localizationMap[languageId][
@@ -453,14 +449,14 @@ AUI.add(
 					fieldJSON,
 					availableLanguageIds
 				) {
-					const instance = this;
+					var instance = this;
 
-					let labels;
+					var labels;
 
-					const defaultLocale = instance.translationManager.get(
+					var defaultLocale = instance.translationManager.get(
 						'defaultLocale'
 					);
-					const editingLocale = instance.translationManager.get(
+					var editingLocale = instance.translationManager.get(
 						'editingLocale'
 					);
 
@@ -481,16 +477,16 @@ AUI.add(
 				},
 
 				_getGeneratedFieldName(label) {
-					const normalizedLabel = LiferayFormBuilder.Util.normalizeKey(
+					var normalizedLabel = LiferayFormBuilder.Util.normalizeKey(
 						label
 					);
 
-					let generatedName = normalizedLabel;
+					var generatedName = normalizedLabel;
 
 					if (
 						LiferayFormBuilder.Util.validateFieldName(generatedName)
 					) {
-						let counter = 1;
+						var counter = 1;
 
 						while (
 							LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.has(
@@ -505,9 +501,9 @@ AUI.add(
 				},
 
 				_getSerializedFields() {
-					const instance = this;
+					var instance = this;
 
-					const fields = [];
+					var fields = [];
 
 					instance.get('fields').each((field) => {
 						fields.push(field.serialize());
@@ -516,26 +512,8 @@ AUI.add(
 					return fields;
 				},
 
-				_handleAlertMessages(fields) {
-					const hasDocumentLibrary = fields.some(
-						(field) => field.name === 'ddm-documentlibrary'
-					);
-					const documentsAndMediaField = document.querySelector(
-						'.ddm-documents-and-media-field'
-					);
-					const isHidden = documentsAndMediaField.classList.contains(
-						'hide'
-					);
-					if (hasDocumentLibrary && isHidden) {
-						documentsAndMediaField.classList.remove('hide');
-					}
-					else if (!hasDocumentLibrary) {
-						documentsAndMediaField.classList.add('hide');
-					}
-				},
-
 				_onDataTableRender(event) {
-					const instance = this;
+					var instance = this;
 
 					A.on(
 						instance._beforeGetEditor,
@@ -546,20 +524,20 @@ AUI.add(
 				},
 
 				_onDefaultLocaleChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const fields = instance.get('fields');
+					var fields = instance.get('fields');
 
-					const newVal = event.newVal;
+					var newVal = event.newVal;
 
-					const translationManager = instance.translationManager;
+					var translationManager = instance.translationManager;
 
-					const availableLanguageIds = translationManager.get(
+					var availableLanguageIds = translationManager.get(
 						'availableLocales'
 					);
 
 					if (availableLanguageIds.indexOf(newVal) < 0) {
-						const config = {
+						var config = {
 							fields,
 							newVal,
 							prevVal: event.prevVal,
@@ -572,9 +550,9 @@ AUI.add(
 				},
 
 				_onMouseOutField(event) {
-					const instance = this;
+					var instance = this;
 
-					const field = A.Widget.getByNode(event.currentTarget);
+					var field = A.Widget.getByNode(event.currentTarget);
 
 					instance._setInvalidDDHandles(field, 'remove');
 
@@ -585,9 +563,9 @@ AUI.add(
 				},
 
 				_onMouseOverField(event) {
-					const instance = this;
+					var instance = this;
 
-					const field = A.Widget.getByNode(event.currentTarget);
+					var field = A.Widget.getByNode(event.currentTarget);
 
 					instance._setInvalidDDHandles(field, 'add');
 
@@ -598,19 +576,19 @@ AUI.add(
 				},
 
 				_onPropertyModelChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const fieldNameEditionDisabled = instance.get(
+					var fieldNameEditionDisabled = instance.get(
 						'fieldNameEditionDisabled'
 					);
 
-					const changed = event.changed;
+					var changed = event.changed;
 
-					const attributeName = event.target.get('attributeName');
+					var attributeName = event.target.get('attributeName');
 
-					const editingField = instance.editingField;
+					var editingField = instance.editingField;
 
-					const readOnlyAttributes = editingField.get(
+					var readOnlyAttributes = editingField.get(
 						'readOnlyAttributes'
 					);
 
@@ -632,14 +610,14 @@ AUI.add(
 							editingField.get('autoGeneratedName') &&
 							!fieldNameEditionDisabled
 						) {
-							const translationManager =
+							var translationManager =
 								instance.translationManager;
 
 							if (
 								translationManager.get('editingLocale') ===
 								translationManager.get('defaultLocale')
 							) {
-								const generatedName = instance._getGeneratedFieldName(
+								var generatedName = instance._getGeneratedFieldName(
 									changed.value.newVal
 								);
 
@@ -648,7 +626,7 @@ AUI.add(
 										generatedName
 									)
 								) {
-									const nameModel = instance.propertyList
+									var nameModel = instance.propertyList
 										.get('data')
 										.filter((item) => {
 											return (
@@ -693,41 +671,29 @@ AUI.add(
 								);
 							}
 						}
-						else if (
-							attributeName === 'multiple' &&
-							changed.value.newVal === 'false'
-						) {
-							editingField.set('multiple', changed.value.newVal);
-							editingField.set('predefinedValue', ['']);
-
-							instance.editField(editingField);
-						}
 					}
 				},
 
 				_renderSettings() {
-					const instance = this;
+					var instance = this;
 
 					instance._renderPropertyList();
 
 					// Dynamically removes unnecessary icons from editor toolbar buttons
 
-					const defaultGetEditorFn = instance.propertyList.getEditor;
+					var defaultGetEditorFn = instance.propertyList.getEditor;
 
 					instance.propertyList.getEditor = function () {
-						const editor = defaultGetEditorFn.apply(
-							this,
-							arguments
-						);
+						var editor = defaultGetEditorFn.apply(this, arguments);
 
 						if (editor) {
-							const defaultSetToolbarFn = A.bind(
+							var defaultSetToolbarFn = A.bind(
 								editor._setToolbar,
 								editor
 							);
 
 							editor._setToolbar = function (val) {
-								const toolbar = defaultSetToolbarFn(val);
+								var toolbar = defaultSetToolbarFn(val);
 
 								if (toolbar && toolbar.children) {
 									toolbar.children = toolbar.children.map(
@@ -752,7 +718,7 @@ AUI.add(
 				},
 
 				_setAvailableFields(val) {
-					const fields = val.map((item) => {
+					var fields = val.map((item) => {
 						return instanceOf(item, A.PropertyBuilderAvailableField)
 							? item
 							: new A.LiferayAvailableField(item);
@@ -769,7 +735,7 @@ AUI.add(
 				},
 
 				_setFields() {
-					const instance = this;
+					var instance = this;
 
 					LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.clear();
 
@@ -780,9 +746,9 @@ AUI.add(
 				},
 
 				_setFieldsSortableListConfig() {
-					const instance = this;
+					var instance = this;
 
-					const config = LiferayFormBuilder.superclass._setFieldsSortableListConfig.apply(
+					var config = LiferayFormBuilder.superclass._setFieldsSortableListConfig.apply(
 						instance,
 						arguments
 					);
@@ -807,19 +773,19 @@ AUI.add(
 				},
 
 				_setInvalidDDHandles(field, type) {
-					const instance = this;
+					var instance = this;
 
-					const methodName = type + 'Invalid';
+					var methodName = type + 'Invalid';
 
 					instance.eachParentField(field, (parent) => {
-						const parentBB = parent.get('boundingBox');
+						var parentBB = parent.get('boundingBox');
 
 						parentBB.dd[methodName]('#' + parentBB.attr('id'));
 					});
 				},
 
 				_toggleImageDescriptionAsterisk(field, state) {
-					const requiredNode = field
+					var requiredNode = field
 						._getFieldNode()
 						.one('.lexicon-icon-asterisk');
 
@@ -829,26 +795,26 @@ AUI.add(
 				},
 
 				_toggleInputDirection(locale) {
-					const rtl = Liferay.Language.direction[locale] === 'rtl';
+					var rtl = Liferay.Language.direction[locale] === 'rtl';
 
-					BODY.classList.toggle('form-builder-ltr-inputs', !rtl);
-					BODY.classList.toggle('form-builder-rtl-inputs', rtl);
+					BODY.toggleClass('form-builder-ltr-inputs', !rtl);
+					BODY.toggleClass('form-builder-rtl-inputs', rtl);
 				},
 
 				_toggleOptionsEditorInputs(editor) {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = editor.get('boundingBox');
+					var boundingBox = editor.get('boundingBox');
 
 					if (boundingBox.hasClass('radiocelleditor')) {
-						const defaultLocale = instance.translationManager.get(
+						var defaultLocale = instance.translationManager.get(
 							'defaultLocale'
 						);
-						const editingLocale = instance.translationManager.get(
+						var editingLocale = instance.translationManager.get(
 							'editingLocale'
 						);
 
-						const inputs = boundingBox.all(
+						var inputs = boundingBox.all(
 							'.celleditor-edit-input-value'
 						);
 
@@ -860,9 +826,9 @@ AUI.add(
 				},
 
 				_toggleRequiredDescriptionPropertyModel(field, state) {
-					const instance = this;
+					var instance = this;
 
-					const modelList = instance.propertyList.get('data');
+					var modelList = instance.propertyList.get('data');
 
 					if (state) {
 						modelList.add(
@@ -886,17 +852,17 @@ AUI.add(
 				},
 
 				_updateLocalizationMaps(config) {
-					const instance = this;
+					var instance = this;
 
-					const fields = config.fields;
-					const newVal = config.newVal;
-					const prevVal = config.prevVal;
+					var fields = config.fields;
+					var newVal = config.newVal;
+					var prevVal = config.prevVal;
 
 					fields._items.forEach((field) => {
-						const childFields = field.get('fields');
-						const localizationMap = field.get('localizationMap');
+						var childFields = field.get('fields');
+						var localizationMap = field.get('localizationMap');
 
-						const config = {
+						var config = {
 							fields: childFields,
 							newVal,
 							prevVal,
@@ -909,7 +875,7 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					LiferayFormBuilder.superclass.bindUI.apply(
 						instance,
@@ -944,9 +910,9 @@ AUI.add(
 				},
 
 				createField() {
-					const instance = this;
+					var instance = this;
 
-					const field = LiferayFormBuilder.superclass.createField.apply(
+					var field = LiferayFormBuilder.superclass.createField.apply(
 						instance,
 						arguments
 					);
@@ -979,13 +945,13 @@ AUI.add(
 
 					field.set('tipFlagNode', A.Node.create(ICON_QUESTION_TPL));
 
-					const defaultGetToolbarItemsFn = A.bind(
+					var defaultGetToolbarItemsFn = A.bind(
 						field._getToolbarItems,
 						field
 					);
 
 					field._getToolbarItems = function () {
-						const toolbarItems = defaultGetToolbarItemsFn();
+						var toolbarItems = defaultGetToolbarItemsFn();
 
 						return (
 							toolbarItems &&
@@ -1005,14 +971,14 @@ AUI.add(
 
 					field.set('strings', instance.get('strings'));
 
-					const fieldHiddenAttributeMap = {
-						'checkbox': instance.MAP_HIDDEN_FIELD_ATTRS.checkbox,
+					var fieldHiddenAttributeMap = {
+						checkbox: instance.MAP_HIDDEN_FIELD_ATTRS.checkbox,
 						'ddm-separator':
 							instance.MAP_HIDDEN_FIELD_ATTRS.separator,
-						'default': instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
+						default: instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
 					};
 
-					let hiddenAtributes =
+					var hiddenAtributes =
 						fieldHiddenAttributeMap[field.get('type')];
 
 					if (!hiddenAtributes) {
@@ -1025,11 +991,11 @@ AUI.add(
 				},
 
 				deserializeDefinitionFields(content) {
-					const instance = this;
+					var instance = this;
 
-					const availableLanguageIds = content.availableLanguageIds;
+					var availableLanguageIds = content.availableLanguageIds;
 
-					const fields = content.fields;
+					var fields = content.fields;
 
 					fields.forEach((fieldJSON) => {
 						instance._deserializeField(
@@ -1042,9 +1008,9 @@ AUI.add(
 				},
 
 				eachParentField(field, fn) {
-					const instance = this;
+					var instance = this;
 
-					let parent = field.get('parent');
+					var parent = field.get('parent');
 
 					while (isFormBuilderField(parent)) {
 						fn.call(instance, parent);
@@ -1054,11 +1020,11 @@ AUI.add(
 				},
 
 				getContent() {
-					const instance = this;
+					var instance = this;
 
-					const definition = {};
+					var definition = {};
 
-					const translationManager = instance.translationManager;
+					var translationManager = instance.translationManager;
 
 					definition.availableLanguageIds = translationManager.get(
 						'availableLocales'
@@ -1073,7 +1039,7 @@ AUI.add(
 				},
 
 				getContentValue() {
-					const instance = this;
+					var instance = this;
 
 					return window[
 						instance.get('portletResourceNamespace') +
@@ -1082,13 +1048,13 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.MAP_HIDDEN_FIELD_ATTRS = A.clone(
 						MAP_HIDDEN_FIELD_ATTRS
 					);
 
-					const translationManager = (instance.translationManager = new Liferay.TranslationManager(
+					var translationManager = (instance.translationManager = new Liferay.TranslationManager(
 						instance.get('translationManager')
 					));
 
@@ -1108,7 +1074,7 @@ AUI.add(
 				},
 
 				plotField(field) {
-					const instance = this;
+					var instance = this;
 
 					LiferayFormBuilder.UNIQUE_FIELD_NAMES_MAP.put(
 						field.get('name'),
@@ -1125,7 +1091,7 @@ AUI.add(
 
 		LiferayFormBuilder.Util = {
 			getFileEntry(fileJSON, callback) {
-				const instance = this;
+				var instance = this;
 
 				fileJSON = instance.parseJSON(fileJSON);
 
@@ -1140,7 +1106,7 @@ AUI.add(
 			},
 
 			getFileEntryURL(fileEntry) {
-				const buffer = [
+				var buffer = [
 					themeDisplay.getPathContext(),
 					'documents',
 					fileEntry.groupId,
@@ -1154,14 +1120,14 @@ AUI.add(
 			normalizeKey(key) {
 				key = key.trim();
 
-				for (let i = 0; i < key.length; i++) {
-					const item = key[i];
+				for (var i = 0; i < key.length; i++) {
+					var item = key[i];
 
 					if (
 						!A.Text.Unicode.test(item, 'L') &&
 						!A.Text.Unicode.test(item, 'N') &&
 						!A.Text.Unicode.test(item, 'Pd') &&
-						item !== STR_UNDERSCORE
+						item != STR_UNDERSCORE
 					) {
 						key = key.replace(item, STR_SPACE);
 					}
@@ -1181,7 +1147,7 @@ AUI.add(
 			},
 
 			parseJSON(value) {
-				let data = {};
+				var data = {};
 
 				try {
 					data = JSON.parse(value);
@@ -1192,7 +1158,7 @@ AUI.add(
 			},
 
 			validateFieldName(fieldName) {
-				let valid = true;
+				var valid = true;
 
 				if (REGEX_HYPHEN.test(fieldName)) {
 					valid = false;
@@ -1200,14 +1166,14 @@ AUI.add(
 					return valid;
 				}
 
-				for (let i = 0; i < fieldName.length; i++) {
-					const item = fieldName[i];
+				for (var i = 0; i < fieldName.length; i++) {
+					var item = fieldName[i];
 
 					if (
 						!A.Text.Unicode.test(item, 'L') &&
 						!A.Text.Unicode.test(item, 'N') &&
 						!A.Text.Unicode.test(item, 'Pd') &&
-						item !== STR_UNDERSCORE
+						item != STR_UNDERSCORE
 					) {
 						valid = false;
 
@@ -1221,7 +1187,7 @@ AUI.add(
 
 		LiferayFormBuilder.DEFAULT_ICON_CLASS = 'text';
 
-		const AVAILABLE_FIELDS = {
+		var AVAILABLE_FIELDS = {
 			DDM_STRUCTURE: [
 				{
 					hiddenAttributes: MAP_HIDDEN_FIELD_ATTRS.checkbox,

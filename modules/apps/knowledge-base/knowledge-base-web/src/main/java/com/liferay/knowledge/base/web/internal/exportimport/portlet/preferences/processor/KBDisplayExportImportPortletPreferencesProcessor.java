@@ -28,8 +28,6 @@ import com.liferay.knowledge.base.service.KBArticleLocalService;
 import com.liferay.knowledge.base.service.KBFolderLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -50,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sorin Pop
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_DISPLAY,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -129,19 +128,17 @@ public class KBDisplayExportImportPortletPreferencesProcessor
 					resourcePrimKey);
 
 				if (rootFolder == null) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							StringBundler.concat(
-								"Portlet ", portletDataContext.getPortletId(),
-								" refers to an invalid root folder ID ",
-								resourcePrimKey));
-					}
+					throw new PortletDataException(
+						StringBundler.concat(
+							"KB Display portlet with ID ",
+							portletDataContext.getPortletId(),
+							" refers to an inexistent root folder: ",
+							resourcePrimKey));
 				}
-				else {
-					StagedModelDataHandlerUtil.exportReferenceStagedModel(
-						portletDataContext, portletDataContext.getPortletId(),
-						rootFolder);
-				}
+
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, portletDataContext.getPortletId(),
+					rootFolder);
 			}
 		}
 
@@ -210,16 +207,24 @@ public class KBDisplayExportImportPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		KBDisplayExportImportPortletPreferencesProcessor.class);
+	@Reference(unbind = "-")
+	protected void seKBArticleLocalService(
+		KBArticleLocalService kbArticleLocalService) {
+
+		_kbArticleLocalService = kbArticleLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void seKBFolderLocalService(
+		KBFolderLocalService kbFolderLocalService) {
+
+		_kbFolderLocalService = kbFolderLocalService;
+	}
 
 	@Reference(target = "(name=ReferencedStagedModelImporter)")
 	private Capability _capability;
 
-	@Reference
 	private KBArticleLocalService _kbArticleLocalService;
-
-	@Reference
 	private KBFolderLocalService _kbFolderLocalService;
 
 	@Reference

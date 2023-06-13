@@ -46,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_TAX_METHODS,
 		"mvc.command.name=/commerce_tax_methods/edit_commerce_tax_fixed_rate"
@@ -92,7 +93,8 @@ public class EditCommerceTaxFixedRateMVCRenderCommand
 				return "/error.jsp";
 			}
 
-			throw new PortletException(exception);
+			throw new PortletException(
+				"Unable to include edit_tax_rate.jsp", exception);
 		}
 
 		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;

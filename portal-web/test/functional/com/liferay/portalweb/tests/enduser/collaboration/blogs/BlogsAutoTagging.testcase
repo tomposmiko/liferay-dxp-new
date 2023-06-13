@@ -1,4 +1,4 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
 	property portal.release = "true";
@@ -10,14 +10,14 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
 			layoutName = "Blogs Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Site Name",
 			layoutName = "Blogs Page",
 			widgetName = "Blogs");
@@ -30,7 +30,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -39,7 +39,7 @@ definition {
 	}
 
 	@description = "This test ensures that a blog entry can be auto tagged after publishing from draft status."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test BlogEntryCanBeAutoTaggedAfterPublishingFromDraftStatus {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#BlogEntryCanBeAutoTaggedAfterPublishingFromDraftStatus";
@@ -55,7 +55,7 @@ definition {
 			siteURLKey = "site-name");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewNoTag(
@@ -73,7 +73,7 @@ definition {
 			siteName = "Site Name");
 
 		BlogsNavigator.gotoEntryPG(
-			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial...",
+			entryContent = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in...",
 			entryTitle = "Digital Transformation or Digital Experience?");
 
 		BlogsEntry.viewAutoTag(
@@ -82,7 +82,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-98324. It ensures that Auto tags can be added and removed via Gogo Shell."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanAddAndRemoveAutoTagViaGogoShell {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#CanAddAndRemoveAutoTagViaGogoShell";
@@ -135,7 +135,7 @@ definition {
 	}
 
 	@description = "This test asserts that a blog entry is auto tagged when OpenNLP Text Auto Tagging is enabled."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanAddAutoTag {
 		property portal.acceptance = "true";
@@ -157,7 +157,7 @@ definition {
 	}
 
 	@description = "This test ensures that a blog entry can get autotagged on a staging site and that the tags will be published to live successfully."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanAssertAutoTagAfterPublishToLive {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#CanAssertAutoTagAfterPublishToLive";
@@ -194,20 +194,20 @@ definition {
 	}
 
 	@description = "This test ensures that when autotagging is disabled while adding a site, Blog entries will not be autotagged."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDisableAutoTaggingForSite {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "BlogsAutoTagging#CanDisableAutoTaggingForSite";
 
-		HeadlessSite.addSite(siteName = "Site AutoTag Disabled");
+		JSONGroup.addGroup(groupName = "Site AutoTag Disabled");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site AutoTag Disabled",
 			layoutName = "AutoTag Disabled Site Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Site AutoTag Disabled",
 			layoutName = "AutoTag Disabled Site Page",
 			widgetName = "Blogs");
@@ -232,7 +232,7 @@ definition {
 	}
 
 	@description = "This test ensures that if a user manual adds a tag when adding a blog entry, the entry will not be autotagged."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CannotAutoTagForManuallyAddedEntry {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#CannotAutoTagForManuallyAddedEntry";
@@ -258,7 +258,7 @@ definition {
 	}
 
 	@description = "This test ensures that autotags generated for a blog entry can be removed."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanRemoveAutoTag {
 		property test.name.skip.portal.instance = "BlogsAutoTagging#CanRemoveAutoTag";
@@ -287,133 +287,6 @@ definition {
 		BlogsEntry.viewNoTag(
 			entryTitle = "Digital Transformation or Digital Experience?",
 			tagName = "DXP");
-	}
-
-	@description = "This test asserts that no duplicate tags are added when autotagging assets are updated multiple times using similar text with Update Auto Tags checked."
-	@priority = 3
-	test NoDuplicateTagAddedAfterEnablingUpdateAutoTags {
-		property test.name.skip.portal.instance = "BlogsAutoTagging#NoDuplicateTagAddedAfterEnablingUpdateAutoTags";
-
-		AutoTagging.enableUpdateAutoTags(enableUpdateAutoTagsFor = "Instance Settings");
-
-		JSONBlog.addEntry(
-			entryContent = "Alice Adventures in Wonderland.",
-			entryTitle = "Alice Adventures in Wonderland",
-			groupName = "Site Name");
-
-		BlogsNavigator.openToEditEntryInSite(
-			entryTitle = "Alice Adventures in Wonderland",
-			groupName = "Site Name",
-			siteURLKey = "site-name");
-
-		BlogsEntry.editContent(
-			entryContent = "Alice Adventures in Wonderland.",
-			entryContentEdit = "Alice's Adventures in Wonderland (commonly shortened to Alice in Wonderland) is an 1865 fantasy novel written by English mathematician Charles Lutwidge Dodgson under the pseudonym Lewis Carroll. It tells of a girl named Alice falling through a rabbit hole into a fantasy world populated by peculiar, anthropomorphic creatures. The tale plays with logic, giving the story lasting popularity with adults as well as with children. It is considered to be one of the best examples of the literary nonsense genre.");
-
-		PortletEntry.publish();
-
-		BlogsNavigator.openToEditEntryInSite(
-			entryTitle = "Alice Adventures in Wonderland",
-			groupName = "Site Name",
-			siteURLKey = "site-name");
-
-		BlogsEntry.editContent(
-			entryContent = "Alice's Adventures in Wonderland (commonly shortened to Alice in Wonderland) is an 1865 fantasy novel written by English mathematician Charles Lutwidge Dodgson under the pseudonym Lewis Carroll. It tells of a girl named Alice falling through a rabbit hole into a fantasy world populated by peculiar, anthropomorphic creatures. The tale plays with logic, giving the story lasting popularity with adults as well as with children. It is considered to be one of the best examples of the literary nonsense genre.",
-			entryContentEdit = "Alice's Adventures in Wonderland (commonly shortened to Alice in Wonderland) is an 1865 fantasy novel written by English mathematician Charles Lutwidge Dodgson under the pseudonym Lewis Carroll. It tells of a girl named Alice falling through a rabbit hole into a fantasy world populated by peculiar, anthropomorphic creatures.");
-
-		PortletEntry.publish();
-
-		BlogsNavigator.openToBlogEntry(
-			entryTitle = "Alice Adventures in Wonderland",
-			layoutName = "blogs-page",
-			siteURLKey = "site-name");
-
-		BlogsEntry.viewAutoTag(
-			entryTitle = "Alice Adventures in Wonderland",
-			tagName = "adventures");
-
-		BlogsEntry.viewNoTag(
-			duplicate = "true",
-			entryTitle = "Alice Adventures in Wonderland",
-			tagName = "adventures");
-	}
-
-	@description = "This test asserts that tags are not updated if user unchecked Update Auto Tags when updating a blog entry."
-	@priority = 4
-	test NoTagUpdatesAfterDisablingUpdateAutoTags {
-		property test.name.skip.portal.instance = "BlogsAutoTagging#NoTagUpdatesAfterDisablingUpdateAutoTags";
-
-		AutoTagging.enableUpdateAutoTags(enableUpdateAutoTagsFor = "Instance Settings");
-
-		JSONBlog.addEntry(
-			entryContent = "Alice Adventures in Wonderland.",
-			entryTitle = "Alice Adventures in Wonderland",
-			groupName = "Site Name");
-
-		BlogsNavigator.openToEditEntryInSite(
-			entryTitle = "Alice Adventures in Wonderland",
-			groupName = "Site Name",
-			siteURLKey = "site-name");
-
-		Panel.expandPanel(panel = "Categorization");
-
-		FormFields.disableCheckbox(fieldName = "Update Auto Tags");
-
-		BlogsEntry.editContent(
-			entryContent = "Alice Adventures in Wonderland.",
-			entryContentEdit = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in customer experience require processes to be re-optimized with the customer in mind. In a Forrester presentation, analyst Liz Herbert notes that real digital transformation spans both the experience layer and the operations core. Having an attractive website or mobile app is good, but more substantial gains in customer experience require processes to be re-optimized with the customer in mind. This responsiveness to customer needs can be achieved in a number of ways, from basic personalization of experience, to more advanced configurable workflows, to full modularization of business services that can be quickly re-assembled in new ways. However, not all companies are prepared for that level of change, and may in the meantime want to start segmenting audiences in order to target personalized offers. Some vendors, particularly those that have had content management systems, can do this well. Ideally, your platform will have both operational and marketing capabilities, so that even if you start with digital marketing, you won’t have to go through a second vendor selection process when you are ready for operational transformation. Also, there isn’t just one way to achieve these goals. Using any category heritage of DXP in combination with an overall architecture for integration and modular services can get you there.");
-
-		PortletEntry.publish();
-
-		BlogsNavigator.openToBlogEntry(
-			entryTitle = "Alice Adventures in Wonderland",
-			layoutName = "blogs-page",
-			siteURLKey = "site-name");
-
-		BlogsEntry.viewAutoTag(
-			entryTitle = "Alice Adventures in Wonderland",
-			tagName = "adventures");
-
-		for (var tagName : list "dxp,herbert") {
-			BlogsEntry.viewNoTag(
-				entryTitle = "Alice Adventures in Wonderland",
-				tagName = ${tagName});
-		}
-	}
-
-	@description = "This test asserts that new tags detected are added if user checked Update Auto Tags when updating a blog entry."
-	@priority = 4
-	test TagUpdatesAfterEnablingUpdateAutoTags {
-		property test.name.skip.portal.instance = "BlogsAutoTagging#TagUpdatesAfterEnablingUpdateAutoTags";
-
-		AutoTagging.enableUpdateAutoTags(enableUpdateAutoTagsFor = "System Settings");
-
-		JSONBlog.addEntry(
-			entryContent = "Alice Adventures in Wonderland.",
-			entryTitle = "Alice Adventures in Wonderland",
-			groupName = "Site Name");
-
-		BlogsNavigator.openToEditEntryInSite(
-			entryTitle = "Alice Adventures in Wonderland",
-			groupName = "Site Name",
-			siteURLKey = "site-name");
-
-		BlogsEntry.editContent(
-			entryContent = "Alice Adventures in Wonderland.",
-			entryContentEdit = "Digital Transformation or Digital Experience? When selecting a DXP, companies should decide whether they are ready for deep transformation of their business operations, or are focused primarily on marketing and brand awareness, as these priorities tend to reflect the different strengths among the DXP vendors. Having an attractive website or mobile app is good, but more substantial gains in customer experience require processes to be re-optimized with the customer in mind. In a Forrester presentation, analyst Liz Herbert notes that real digital transformation spans both the experience layer and the operations core. Having an attractive website or mobile app is good, but more substantial gains in customer experience require processes to be re-optimized with the customer in mind. This responsiveness to customer needs can be achieved in a number of ways, from basic personalization of experience, to more advanced configurable workflows, to full modularization of business services that can be quickly re-assembled in new ways. However, not all companies are prepared for that level of change, and may in the meantime want to start segmenting audiences in order to target personalized offers. Some vendors, particularly those that have had content management systems, can do this well. Ideally, your platform will have both operational and marketing capabilities, so that even if you start with digital marketing, you won’t have to go through a second vendor selection process when you are ready for operational transformation. Also, there isn’t just one way to achieve these goals. Using any category heritage of DXP in combination with an overall architecture for integration and modular services can get you there.");
-
-		PortletEntry.publish();
-
-		BlogsNavigator.openToBlogEntry(
-			entryTitle = "Alice Adventures in Wonderland",
-			layoutName = "blogs-page",
-			siteURLKey = "site-name");
-
-		for (var tagName : list "adventures,dxp,herbert") {
-			BlogsEntry.viewAutoTag(
-				entryTitle = "Alice Adventures in Wonderland",
-				tagName = ${tagName});
-		}
 	}
 
 }

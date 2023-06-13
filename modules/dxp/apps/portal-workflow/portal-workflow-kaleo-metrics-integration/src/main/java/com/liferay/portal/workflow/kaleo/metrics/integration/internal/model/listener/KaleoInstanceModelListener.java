@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class KaleoInstanceModelListener
 	extends BaseKaleoModelListener<KaleoInstance> {
 
@@ -90,7 +90,6 @@ public class KaleoInstanceModelListener
 		}
 		else {
 			_instanceWorkflowMetricsIndexer.updateInstance(
-				kaleoInstance.isActive(),
 				_indexerHelper.createAssetTitleLocalizationMap(
 					kaleoInstance.getClassName(), kaleoInstance.getClassPK(),
 					kaleoInstance.getGroupId()),

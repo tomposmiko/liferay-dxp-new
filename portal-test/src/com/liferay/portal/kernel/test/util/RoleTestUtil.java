@@ -68,10 +68,10 @@ public class RoleTestUtil {
 			String actionId)
 		throws Exception {
 
-		addResourcePermission(
-			RoleLocalServiceUtil.getRole(
-				TestPropsValues.getCompanyId(), roleName),
-			resourceName, scope, primKey, actionId);
+		Role role = RoleLocalServiceUtil.getRole(
+			TestPropsValues.getCompanyId(), roleName);
+
+		addResourcePermission(role, resourceName, scope, primKey, actionId);
 	}
 
 	public static Role addRole(int roleType) throws Exception {
@@ -91,7 +91,7 @@ public class RoleTestUtil {
 		}
 		catch (NoSuchRoleException noSuchRoleException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchRoleException);
+				_log.debug(noSuchRoleException, noSuchRoleException);
 			}
 
 			role = RoleLocalServiceUtil.addRole(

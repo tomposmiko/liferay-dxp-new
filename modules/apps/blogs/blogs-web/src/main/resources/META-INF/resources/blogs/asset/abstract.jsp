@@ -21,10 +21,19 @@ BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
 %>
 
 <div class="asset-summary">
-	<liferay-util:include page="/blogs/entry_cover_image_caption.jsp" servletContext="<%= application %>">
-		<liferay-util:param name="coverImageCaption" value="<%= entry.getCoverImageCaption() %>" />
-		<liferay-util:param name="coverImageURL" value="<%= entry.getCoverImageURL(themeDisplay) %>" />
-	</liferay-util:include>
+
+	<%
+	String coverImageURL = entry.getCoverImageURL(themeDisplay);
+	%>
+
+	<c:if test="<%= Validator.isNotNull(coverImageURL) %>">
+
+		<%
+		String coverImageCaption = HtmlUtil.escapeAttribute(HtmlUtil.stripHtml(entry.getCoverImageCaption()));
+		%>
+
+		<div <c:if test="<%= Validator.isNotNull(coverImageCaption) %>">aria-label="<%= coverImageCaption %>" role="img"</c:if> class="aspect-ratio aspect-ratio-8-to-3 aspect-ratio-bg-cover cover-image mb-4" style="background-image: url(<%= coverImageURL %>);"></div>
+	</c:if>
 
 	<%
 	AssetRenderer<?> assetRenderer = (AssetRenderer<?>)request.getAttribute(WebKeys.ASSET_RENDERER);

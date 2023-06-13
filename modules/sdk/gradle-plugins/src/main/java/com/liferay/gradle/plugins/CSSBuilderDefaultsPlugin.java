@@ -98,9 +98,10 @@ public class CSSBuilderDefaultsPlugin
 			buildCSSTask.setPrecision(precision);
 		}
 
-		buildCSSTask.setSassCompilerClassName(
-			GradleUtil.getProperty(
-				project, "sass.compiler.class.name", (String)null));
+		String sassCompilerClassName = GradleUtil.getProperty(
+			project, "sass.compiler.class.name", (String)null);
+
+		buildCSSTask.setSassCompilerClassName(sassCompilerClassName);
 	}
 
 	private static final String _FRONTEND_COMMON_CSS_NAME =

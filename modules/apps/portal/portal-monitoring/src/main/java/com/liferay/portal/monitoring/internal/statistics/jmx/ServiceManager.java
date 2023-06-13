@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	enabled = false,
+	enabled = false, immediate = true,
 	property = {
 		"jmx.objectname=com.liferay.portal.monitoring:classification=service_statistic,name=ServiceManager",
 		"jmx.objectname.cache.key=ServiceManager"
@@ -73,7 +73,11 @@ public class ServiceManager
 			className, methodName, parameterTypes);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setServerStatistics(ServerStatistics serverStatistics) {
+		_serverStatistics = serverStatistics;
+	}
+
 	private ServerStatistics _serverStatistics;
 
 }

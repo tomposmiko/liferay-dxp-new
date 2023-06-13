@@ -16,7 +16,7 @@ const FIELD_NAME_REGEX = /(_\w+_)ddm\$\$(.+)\$(\w+)\$(\d+)\$\$(\w+)/;
 
 const NESTED_FIELD_NAME_REGEX = /(_\w+_)ddm\$\$(.+)\$(\w+)\$(\d+)#(.+)\$(\w+)\$(\d+)\$\$(\w+)/;
 
-export function parseName(name) {
+export const parseName = (name) => {
 	const result = FIELD_NAME_REGEX.exec(name);
 
 	return result
@@ -28,13 +28,9 @@ export function parseName(name) {
 				repeatedIndex: Number(result[4]),
 		  }
 		: {};
-}
+};
 
-export function isNestedFieldName(name) {
-	return NESTED_FIELD_NAME_REGEX.test(name);
-}
-
-export function generateName(name, props = {}) {
+export const generateName = (name, props = {}) => {
 	const parsedName = parseName(name);
 	const {
 		editingLanguageId = parsedName.editingLanguageId,
@@ -45,9 +41,9 @@ export function generateName(name, props = {}) {
 	} = props;
 
 	return `${portletNamespace}ddm$$${fieldName}$${instanceId}$${repeatedIndex}$$${editingLanguageId}`;
-}
+};
 
-export function parseNestedFieldName(name) {
+export const parseNestedFieldName = (name) => {
 	let parsed = {};
 	const result = NESTED_FIELD_NAME_REGEX.exec(name);
 
@@ -65,33 +61,9 @@ export function parseNestedFieldName(name) {
 	}
 
 	return parsed;
-}
+};
 
-export function updateNestedFieldNameIndex(name, repeatedIndex) {
-	const parsedName = parseNestedFieldName(name);
-
-	const {fieldName, instanceId, portletNamespace} = parsedName;
-
-	return [
-		portletNamespace,
-		'ddm$$',
-		parsedName.parentFieldName,
-		'$',
-		parsedName.parentInstanceId,
-		'$',
-		parsedName.parentRepeatedIndex,
-		'#',
-		fieldName,
-		'$',
-		instanceId,
-		'$',
-		repeatedIndex,
-		'$$',
-		parsedName.locale || parsedName.editingLanguageId,
-	].join('');
-}
-
-export function generateNestedFieldName(name, parentFieldName) {
+export const generateNestedFieldName = (name, parentFieldName) => {
 	const parsedParentFieldName = parseName(parentFieldName);
 	let parsedName = parseNestedFieldName(name);
 
@@ -118,9 +90,9 @@ export function generateNestedFieldName(name, parentFieldName) {
 		'$$',
 		parsedName.locale || parsedName.editingLanguageId,
 	].join('');
-}
+};
 
-export function getRepeatedIndex(name) {
+export const getRepeatedIndex = (name) => {
 	let parsedName;
 
 	if (NESTED_FIELD_NAME_REGEX.test(name)) {
@@ -131,4 +103,4 @@ export function getRepeatedIndex(name) {
 	}
 
 	return parsedName.repeatedIndex;
-}
+};

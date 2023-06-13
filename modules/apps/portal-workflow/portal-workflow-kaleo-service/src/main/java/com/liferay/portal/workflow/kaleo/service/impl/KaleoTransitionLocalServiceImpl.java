@@ -18,7 +18,6 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.workflow.kaleo.definition.Timer;
 import com.liferay.portal.workflow.kaleo.definition.Transition;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
@@ -51,8 +50,7 @@ public class KaleoTransitionLocalServiceImpl
 
 		// Kaleo transition
 
-		User user = _userLocalService.getUser(
-			serviceContext.getGuestOrUserId());
+		User user = userLocalService.getUser(serviceContext.getGuestOrUserId());
 		Date date = new Date();
 
 		long kaleoTransitionId = counterLocalService.increment();
@@ -69,7 +67,6 @@ public class KaleoTransitionLocalServiceImpl
 		kaleoTransition.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		kaleoTransition.setKaleoNodeId(kaleoNodeId);
 		kaleoTransition.setName(transition.getName());
-		kaleoTransition.setLabelMap(transition.getLabelMap());
 		kaleoTransition.setSourceKaleoNodeId(sourceKaleoNode.getKaleoNodeId());
 		kaleoTransition.setSourceKaleoNodeName(sourceKaleoNode.getName());
 		kaleoTransition.setTargetKaleoNodeId(targetKaleoNode.getKaleoNodeId());
@@ -139,8 +136,5 @@ public class KaleoTransitionLocalServiceImpl
 
 	@Reference
 	private KaleoTimerLocalService _kaleoTimerLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

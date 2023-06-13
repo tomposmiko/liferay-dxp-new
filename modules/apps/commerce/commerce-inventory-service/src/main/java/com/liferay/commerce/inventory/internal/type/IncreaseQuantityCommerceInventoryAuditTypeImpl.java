@@ -17,7 +17,7 @@ package com.liferay.commerce.inventory.internal.type;
 import com.liferay.commerce.inventory.constants.CommerceInventoryConstants;
 import com.liferay.commerce.inventory.type.CommerceInventoryAuditType;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.inventory.audit.type.key=" + CommerceInventoryConstants.AUDIT_TYPE_INCREASE_QUANTITY,
 	service = CommerceInventoryAuditType.class
 )
@@ -43,7 +44,7 @@ public class IncreaseQuantityCommerceInventoryAuditTypeImpl
 
 		User user = _userLocalService.getUserById(userId);
 
-		return _language.format(
+		return LanguageUtil.format(
 			locale, "x-increased-the-quantity-on-hand", user.getFullName());
 	}
 
@@ -61,9 +62,6 @@ public class IncreaseQuantityCommerceInventoryAuditTypeImpl
 	public String getType() {
 		return CommerceInventoryConstants.AUDIT_TYPE_INCREASE_QUANTITY;
 	}
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private UserLocalService _userLocalService;

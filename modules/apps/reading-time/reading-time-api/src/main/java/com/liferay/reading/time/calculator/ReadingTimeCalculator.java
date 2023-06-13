@@ -19,15 +19,16 @@ import com.liferay.portal.kernel.model.GroupedModel;
 import java.time.Duration;
 
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * @author Alejandro Tardín
  */
 public interface ReadingTimeCalculator {
 
-	public Duration calculate(GroupedModel groupedModel);
+	public Optional<Duration> calculate(GroupedModel groupedModel);
 
-	public Duration calculate(
+	public Optional<Duration> calculate(
 		String content, String contentType, Locale locale);
 
 }

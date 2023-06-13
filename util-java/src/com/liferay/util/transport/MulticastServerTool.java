@@ -15,8 +15,6 @@
 package com.liferay.util.transport;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.net.DatagramPacket;
@@ -34,15 +32,8 @@ public class MulticastServerTool {
 
 	public static void main(String[] args) {
 		try {
-			String multicastAddress = args[0];
 			int port = GetterUtil.getInteger(args[1]);
 			long interval = GetterUtil.getLong(args[2]);
-
-			String bindAddress = null;
-
-			if (args.length > 3) {
-				bindAddress = args[3];
-			}
 
 			DatagramHandler handler = new DatagramHandler() {
 
@@ -62,7 +53,7 @@ public class MulticastServerTool {
 			};
 
 			MulticastTransport transport = new MulticastTransport(
-				handler, multicastAddress, port, bindAddress);
+				handler, args[0], port);
 
 			transport.connect();
 
@@ -82,17 +73,14 @@ public class MulticastServerTool {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 
 			System.err.println(
 				"Usage: java MulticastServerTool multicastAddress port " +
-					"interval bindAddress");
+					"interval");
 
 			System.exit(1);
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MulticastServerTool.class);
 
 }

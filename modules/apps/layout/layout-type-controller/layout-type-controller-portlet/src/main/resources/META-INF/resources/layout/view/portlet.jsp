@@ -17,27 +17,43 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String ppid = ParamUtil.getString(request, "p_p_id");
+String portletResource = ParamUtil.getString(request, "portletResource");
 %>
 
+<c:if test="<%= Validator.isNotNull(portletResource) %>">
+	<liferay-ui:success key='<%= portletResource + "requestProcessed" %>' message="your-request-completed-successfully" />
+</c:if>
+
 <c:choose>
-	<c:when test="<%= themeDisplay.isStatePopUp() || themeDisplay.isWidget() %>">
+	<c:when test="<%= themeDisplay.isStatePopUp() || themeDisplay.isWidget() || layoutTypePortlet.hasStateMax() %>">
 
 		<%
-		String templateContent = LayoutTemplateLocalServiceUtil.getContent("pop_up", true, theme.getThemeId());
+		String ppid = ParamUtil.getString(request, "p_p_id");
+
+		String templateId = null;
+		String templateContent = null;
+		String langType = null;
+
+		if (themeDisplay.isStatePopUp() || themeDisplay.isWidget()) {
+			templateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "pop_up";
+			templateContent = LayoutTemplateLocalServiceUtil.getContent("pop_up", true, theme.getThemeId());
+			langType = LayoutTemplateLocalServiceUtil.getLangType("pop_up", true, theme.getThemeId());
+		}
+		else {
+			ppid = StringUtil.split(layoutTypePortlet.getStateMax())[0];
+
+			templateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "max";
+			templateContent = LayoutTemplateLocalServiceUtil.getContent("max", true, theme.getThemeId());
+			langType = LayoutTemplateLocalServiceUtil.getLangType("max", true, theme.getThemeId());
+		}
 
 		if (Validator.isNotNull(templateContent)) {
-			HttpServletRequest originalHttpServletRequest = (HttpServletRequest)request.getAttribute(PortletLayoutTypeControllerWebKeys.ORIGINAL_HTTP_SERVLET_REQUEST);
+			HttpServletRequest originalServletRequest = (HttpServletRequest)request.getAttribute(PortletLayoutTypeControllerWebKeys.ORIGINAL_HTTP_SERVLET_REQUEST);
 
-			String templateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "pop_up";
-
-			RuntimePageUtil.processTemplate(originalHttpServletRequest, response, ppid, templateId, templateContent, LayoutTemplateLocalServiceUtil.getLangType("pop_up", true, theme.getThemeId()));
+			RuntimePageUtil.processTemplate(originalServletRequest, response, ppid, new StringTemplateResource(templateId, templateContent), langType);
 		}
 		%>
 
-	</c:when>
-	<c:when test="<%= layoutTypePortlet.hasStateMax() && Validator.isNotNull(ppid) %>">
-		<liferay-layout:render-state-max-layout-structure />
 	</c:when>
 	<c:otherwise>
 		<style type="text/css">
@@ -51,9 +67,9 @@ String ppid = ParamUtil.getString(request, "p_p_id");
 		%>
 
 		<liferay-layout:render-layout-structure
-			layoutStructure="<%= portletLayoutDisplayContext.getLayoutStructure(themeDisplay.getLayout()) %>"
+			layoutStructure="<%= portletLayoutDisplayContext.getLayoutStructure(themeDisplay.getScopeGroupId(), themeDisplay.getLayout()) %>"
 		/>
 	</c:otherwise>
 </c:choose>
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />

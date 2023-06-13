@@ -341,11 +341,6 @@ public class SocialActivitySettingWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<SocialActivitySetting, Object>>
 		getAttributeGetterFunctions() {
 

@@ -120,8 +120,10 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 			return null;
 		}
 
-		return LocaleUtil.fromLanguageId(
-			LocalizationUtil.getDefaultLanguageId(getData()));
+		String defaultLanguageId = LocalizationUtil.getDefaultLanguageId(
+			getData());
+
+		return LocaleUtil.fromLanguageId(defaultLanguageId);
 	}
 
 	@Override
@@ -420,7 +422,7 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 
 		validate(ExpandoColumnConstants.GEOLOCATION);
 
-		setData(dataJSONObject.toString());
+		setData(dataJSONObject.toJSONString());
 	}
 
 	@Override
@@ -563,10 +565,10 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 			return;
 		}
 
-		setData(
-			LocalizationUtil.updateLocalization(
-				dataMap, getData(), "Data",
-				LocaleUtil.toLanguageId(defaultLocale)));
+		String data = LocalizationUtil.updateLocalization(
+			dataMap, getData(), "Data", LocaleUtil.toLanguageId(defaultLocale));
+
+		setData(data);
 	}
 
 	protected String getData(String languageId) {
@@ -619,10 +621,12 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 			return;
 		}
 
-		throw new ValueDataException.MismatchColumnType(
-			getColumnId(),
-			ExpandoColumnConstants.getTypeLabel(column.getType()),
-			ExpandoColumnConstants.getTypeLabel(type));
+		throw new ValueDataException(
+			StringBundler.concat(
+				"Column ", getColumnId(), " has type ",
+				ExpandoColumnConstants.getTypeLabel(column.getType()),
+				" and is not compatible with type ",
+				ExpandoColumnConstants.getTypeLabel(type)));
 	}
 
 	private static final String _EXPANDO_COMMA = "[$LIFERAY_EXPANDO_COMMA$]";

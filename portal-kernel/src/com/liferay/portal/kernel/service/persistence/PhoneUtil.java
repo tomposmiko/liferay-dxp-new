@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.Phone;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1543,9 +1544,14 @@ public class PhoneUtil {
 	}
 
 	public static PhonePersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (PhonePersistence)PortalBeanLocatorUtil.locate(
+				PhonePersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile PhonePersistence _persistence;
+	private static PhonePersistence _persistence;
 
 }

@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-AssetDisplayPageUsagesDisplayContext assetDisplayPageUsagesDisplayContext = (AssetDisplayPageUsagesDisplayContext)request.getAttribute(LayoutPageTemplateAdminWebKeys.ASSET_DISPLAY_PAGE_USAGES_DISPLAY_CONTEXT);
+AssetDisplayPageUsagesDisplayContext assetDisplayPageUsagesDisplayContext = new AssetDisplayPageUsagesDisplayContext(request, renderRequest, renderResponse);
 
 AssetDisplayPageUsagesManagementToolbarDisplayContext assetDisplayPageUsagesManagementToolbarDisplayContext = new AssetDisplayPageUsagesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetDisplayPageUsagesDisplayContext.getSearchContainer());
 

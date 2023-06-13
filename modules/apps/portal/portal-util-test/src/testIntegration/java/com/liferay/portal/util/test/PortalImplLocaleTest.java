@@ -82,7 +82,7 @@ public class PortalImplLocaleTest {
 
 		_group = GroupTestUtil.addGroup();
 
-		_layout = LayoutTestUtil.addTypePortletLayout(_group);
+		_layout = LayoutTestUtil.addLayout(_group);
 
 		CompanyTestUtil.resetCompanyLocales(
 			_group.getCompanyId(),
@@ -112,13 +112,11 @@ public class PortalImplLocaleTest {
 
 	@Test
 	public void testInvalidResourceWithLocale() throws Exception {
-		MockHttpServletResponse mockHttpServletResponse =
-			_testLocaleForLanguageId(
-				"/en", "/WEB-INF/web.xml;.js", LocaleUtil.GERMANY);
+		MockHttpServletResponse httpServletResponse = _testLocaleForLanguageId(
+			"/en", "/WEB-INF/web.xml;.js", LocaleUtil.GERMANY);
 
 		Assert.assertEquals(
-			HttpServletResponse.SC_NOT_FOUND,
-			mockHttpServletResponse.getStatus());
+			HttpServletResponse.SC_NOT_FOUND, httpServletResponse.getStatus());
 	}
 
 	@Test

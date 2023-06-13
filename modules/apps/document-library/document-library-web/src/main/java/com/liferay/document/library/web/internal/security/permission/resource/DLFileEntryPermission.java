@@ -15,15 +15,20 @@
 package com.liferay.document.library.web.internal.security.permission.resource;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
+
 /**
  * @author Preston Crary
  */
+@Component(service = {})
 public class DLFileEntryPermission {
 
 	public static void check(
@@ -31,10 +36,8 @@ public class DLFileEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DLFileEntry> modelResourcePermission =
-			_dlFileEntryModelResourcePermissionSnapshot.get();
-
-		modelResourcePermission.check(permissionChecker, fileEntry, actionId);
+		_dlFileEntryModelResourcePermission.check(
+			permissionChecker, fileEntry, actionId);
 	}
 
 	public static boolean contains(
@@ -42,10 +45,7 @@ public class DLFileEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DLFileEntry> modelResourcePermission =
-			_dlFileEntryModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _dlFileEntryModelResourcePermission.contains(
 			permissionChecker, dlFileEntry, actionId);
 	}
 
@@ -54,10 +54,7 @@ public class DLFileEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<FileEntry> modelResourcePermission =
-			_fileEntryModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _fileEntryModelResourcePermission.contains(
 			permissionChecker, fileEntry, actionId);
 	}
 
@@ -66,25 +63,38 @@ public class DLFileEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<FileEntry> modelResourcePermission =
-			_fileEntryModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _fileEntryModelResourcePermission.contains(
 			permissionChecker, fileEntryId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<DLFileEntry>>
-		_dlFileEntryModelResourcePermissionSnapshot = new Snapshot<>(
-			DLFileEntryPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.document.library.kernel.model." +
-				"DLFileEntry)",
-			true);
-	private static final Snapshot<ModelResourcePermission<FileEntry>>
-		_fileEntryModelResourcePermissionSnapshot = new Snapshot<>(
-			DLFileEntryPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.portal.kernel.repository.model." +
-				"FileEntry)");
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(model.class.name=com.liferay.document.library.kernel.model.DLFileEntry)"
+	)
+	protected void setDLFileEntryModelResourcePermission(
+		ModelResourcePermission<DLFileEntry> modelResourcePermission) {
+
+		_dlFileEntryModelResourcePermission = modelResourcePermission;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.portal.kernel.repository.model.FileEntry)",
+		unbind = "-"
+	)
+	protected void setFileEntryModelResourcePermission(
+		ModelResourcePermission<FileEntry> modelResourcePermission) {
+
+		_fileEntryModelResourcePermission = modelResourcePermission;
+	}
+
+	protected void unsetDLFileEntryModelResourcePermission(
+		ModelResourcePermission<DLFileEntry> modelResourcePermission) {
+	}
+
+	private static ModelResourcePermission<DLFileEntry>
+		_dlFileEntryModelResourcePermission;
+	private static ModelResourcePermission<FileEntry>
+		_fileEntryModelResourcePermission;
 
 }

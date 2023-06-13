@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
 public class KaleoPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
@@ -41,20 +41,30 @@ public class KaleoPortalInstanceLifecycleListener
 		_portalKaleoManager.deployKaleoDefaults(company.getCompanyId());
 	}
 
-	@Reference
-	private KaleoConditionLocalService _kaleoConditionLocalService;
+	@Reference(unbind = "-")
+	protected void setKaleoConditionLocalService(
+		KaleoConditionLocalService kaleoConditionLocalService) {
+	}
 
-	@Reference
-	private KaleoDefinitionLocalService _kaleoDefinitionLocalService;
+	@Reference(unbind = "-")
+	protected void setKaleoDefinitionLocalService(
+		KaleoDefinitionLocalService kaleoDefinitionLocalService) {
+	}
 
-	@Reference
-	private KaleoNodeLocalService _kaleoNodeLocalService;
+	@Reference(unbind = "-")
+	protected void setKaleoNodeLocalService(
+		KaleoNodeLocalService kaleoNodeLocalService) {
+	}
 
-	@Reference
-	private KaleoTaskLocalService _kaleoTaskLocalService;
+	@Reference(unbind = "-")
+	protected void setKaleoTaskLocalService(
+		KaleoTaskLocalService kaleoTaskLocalService) {
+	}
 
-	@Reference
-	private KaleoTransitionLocalService _kaleoTransitionLocalService;
+	@Reference(unbind = "-")
+	protected void setKaleoTransitionLocalService(
+		KaleoTransitionLocalService kaleoTransitionLocalService) {
+	}
 
 	@Reference
 	private KaleoWorkflowMessagingConfigurator

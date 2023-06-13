@@ -14,27 +14,25 @@
 
 package com.liferay.asset.publisher.web.internal.servlet.taglib.util;
 
+import com.liferay.asset.kernel.action.AssetEntryAction;
 import com.liferay.asset.kernel.model.AssetRenderer;
-import com.liferay.asset.publisher.action.AssetEntryAction;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.RenderLayoutContentThreadLocal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletURL;
@@ -66,10 +64,6 @@ public class AssetEntryActionDropdownItemsProvider {
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {
-		if (RenderLayoutContentThreadLocal.isRenderLayoutContent()) {
-			return Collections.emptyList();
-		}
-
 		return new DropdownItemList() {
 			{
 				PortletURL editAssetEntryURL = _getEditAssetEntryURL();
@@ -77,6 +71,8 @@ public class AssetEntryActionDropdownItemsProvider {
 				if (editAssetEntryURL != null) {
 					add(
 						dropdownItem -> {
+							dropdownItem.putData(
+								"useDialog", Boolean.FALSE.toString());
 							dropdownItem.setHref(editAssetEntryURL.toString());
 							dropdownItem.setIcon("pencil");
 							dropdownItem.setLabel(
@@ -101,7 +97,7 @@ public class AssetEntryActionDropdownItemsProvider {
 						}
 						catch (Exception exception) {
 							if (_log.isDebugEnabled()) {
-								_log.debug(exception);
+								_log.debug(exception, exception);
 							}
 
 							continue;
@@ -113,16 +109,14 @@ public class AssetEntryActionDropdownItemsProvider {
 						add(
 							dropdownItem -> {
 								dropdownItem.putData(
-									"action", "assetEntryAction");
+									"destroyOnHide", Boolean.TRUE.toString());
+								dropdownItem.putData("title", title);
 								dropdownItem.putData(
-									"assetEntryActionTitle", title);
-								dropdownItem.putData(
-									"assetEntryActionURL",
+									"useDialog", Boolean.TRUE.toString());
+								dropdownItem.setHref(
 									objectAssetEntryAction.getDialogURL(
 										_httpServletRequest,
 										(AssetRenderer<Object>)_assetRenderer));
-								dropdownItem.putData(
-									"useDialog", Boolean.TRUE.toString());
 								dropdownItem.setIcon(
 									objectAssetEntryAction.getIcon());
 								dropdownItem.setLabel(title);
@@ -169,7 +163,7 @@ public class AssetEntryActionDropdownItemsProvider {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.ResourcePermissionModel;
+import com.liferay.portal.kernel.model.ResourcePermissionSoap;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -31,15 +32,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -179,6 +183,62 @@ public class ResourcePermissionModelImpl
 	@Deprecated
 	public static final long RESOURCEPERMISSIONID_COLUMN_BITMASK = 128L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static ResourcePermission toModel(ResourcePermissionSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		ResourcePermission model = new ResourcePermissionImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setResourcePermissionId(soapModel.getResourcePermissionId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setName(soapModel.getName());
+		model.setScope(soapModel.getScope());
+		model.setPrimKey(soapModel.getPrimKey());
+		model.setPrimKeyId(soapModel.getPrimKeyId());
+		model.setRoleId(soapModel.getRoleId());
+		model.setOwnerId(soapModel.getOwnerId());
+		model.setActionIds(soapModel.getActionIds());
+		model.setViewActionId(soapModel.isViewActionId());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<ResourcePermission> toModels(
+		ResourcePermissionSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<ResourcePermission> models = new ArrayList<ResourcePermission>(
+			soapModels.length);
+
+		for (ResourcePermissionSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.portal.kernel.model.ResourcePermission"));
@@ -259,120 +319,130 @@ public class ResourcePermissionModelImpl
 	public Map<String, Function<ResourcePermission, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ResourcePermission, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ResourcePermission>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ResourcePermission, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ResourcePermission.class.getClassLoader(), ResourcePermission.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ResourcePermission, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<ResourcePermission, Object>>();
+		try {
+			Constructor<ResourcePermission> constructor =
+				(Constructor<ResourcePermission>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", ResourcePermission::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", ResourcePermission::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"resourcePermissionId",
-				ResourcePermission::getResourcePermissionId);
-			attributeGetterFunctions.put(
-				"companyId", ResourcePermission::getCompanyId);
-			attributeGetterFunctions.put("name", ResourcePermission::getName);
-			attributeGetterFunctions.put("scope", ResourcePermission::getScope);
-			attributeGetterFunctions.put(
-				"primKey", ResourcePermission::getPrimKey);
-			attributeGetterFunctions.put(
-				"primKeyId", ResourcePermission::getPrimKeyId);
-			attributeGetterFunctions.put(
-				"roleId", ResourcePermission::getRoleId);
-			attributeGetterFunctions.put(
-				"ownerId", ResourcePermission::getOwnerId);
-			attributeGetterFunctions.put(
-				"actionIds", ResourcePermission::getActionIds);
-			attributeGetterFunctions.put(
-				"viewActionId", ResourcePermission::getViewActionId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ResourcePermission, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ResourcePermission, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ResourcePermission, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ResourcePermission, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<ResourcePermission, Object>>();
+		Map<String, BiConsumer<ResourcePermission, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<ResourcePermission, ?>>();
 
-		static {
-			Map<String, BiConsumer<ResourcePermission, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<ResourcePermission, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", ResourcePermission::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", ResourcePermission::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"resourcePermissionId",
+			ResourcePermission::getResourcePermissionId);
+		attributeSetterBiConsumers.put(
+			"resourcePermissionId",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setResourcePermissionId);
+		attributeGetterFunctions.put(
+			"companyId", ResourcePermission::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setCompanyId);
+		attributeGetterFunctions.put("name", ResourcePermission::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<ResourcePermission, String>)
+				ResourcePermission::setName);
+		attributeGetterFunctions.put("scope", ResourcePermission::getScope);
+		attributeSetterBiConsumers.put(
+			"scope",
+			(BiConsumer<ResourcePermission, Integer>)
+				ResourcePermission::setScope);
+		attributeGetterFunctions.put("primKey", ResourcePermission::getPrimKey);
+		attributeSetterBiConsumers.put(
+			"primKey",
+			(BiConsumer<ResourcePermission, String>)
+				ResourcePermission::setPrimKey);
+		attributeGetterFunctions.put(
+			"primKeyId", ResourcePermission::getPrimKeyId);
+		attributeSetterBiConsumers.put(
+			"primKeyId",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setPrimKeyId);
+		attributeGetterFunctions.put("roleId", ResourcePermission::getRoleId);
+		attributeSetterBiConsumers.put(
+			"roleId",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setRoleId);
+		attributeGetterFunctions.put("ownerId", ResourcePermission::getOwnerId);
+		attributeSetterBiConsumers.put(
+			"ownerId",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setOwnerId);
+		attributeGetterFunctions.put(
+			"actionIds", ResourcePermission::getActionIds);
+		attributeSetterBiConsumers.put(
+			"actionIds",
+			(BiConsumer<ResourcePermission, Long>)
+				ResourcePermission::setActionIds);
+		attributeGetterFunctions.put(
+			"viewActionId", ResourcePermission::getViewActionId);
+		attributeSetterBiConsumers.put(
+			"viewActionId",
+			(BiConsumer<ResourcePermission, Boolean>)
+				ResourcePermission::setViewActionId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"resourcePermissionId",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setResourcePermissionId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<ResourcePermission, String>)
-					ResourcePermission::setName);
-			attributeSetterBiConsumers.put(
-				"scope",
-				(BiConsumer<ResourcePermission, Integer>)
-					ResourcePermission::setScope);
-			attributeSetterBiConsumers.put(
-				"primKey",
-				(BiConsumer<ResourcePermission, String>)
-					ResourcePermission::setPrimKey);
-			attributeSetterBiConsumers.put(
-				"primKeyId",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setPrimKeyId);
-			attributeSetterBiConsumers.put(
-				"roleId",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setRoleId);
-			attributeSetterBiConsumers.put(
-				"ownerId",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setOwnerId);
-			attributeSetterBiConsumers.put(
-				"actionIds",
-				(BiConsumer<ResourcePermission, Long>)
-					ResourcePermission::setActionIds);
-			attributeSetterBiConsumers.put(
-				"viewActionId",
-				(BiConsumer<ResourcePermission, Boolean>)
-					ResourcePermission::setViewActionId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -910,12 +980,41 @@ public class ResourcePermissionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ResourcePermission, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ResourcePermission, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ResourcePermission, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ResourcePermission)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ResourcePermission>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ResourcePermission.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -934,8 +1033,7 @@ public class ResourcePermissionModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<ResourcePermission, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

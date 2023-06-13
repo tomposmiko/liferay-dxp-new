@@ -38,7 +38,9 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.net.URI;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = LayoutAdaptiveMediaProcessor.class)
+@Component(immediate = true, service = LayoutAdaptiveMediaProcessor.class)
 public class LayoutAdaptiveMediaProcessorImpl
 	implements LayoutAdaptiveMediaProcessor {
 
@@ -65,12 +67,16 @@ public class LayoutAdaptiveMediaProcessorImpl
 		Document document = Jsoup.parse(processedContent);
 
 		try {
-			for (ViewportSize viewportSize : _viewportSizes) {
+			for (ViewportSize viewportSize : ViewportSize.values()) {
 				Elements elements = document.getElementsByAttribute(
 					"data-" + viewportSize.getViewportSizeId() +
 						"-configuration");
 
-				for (Element element : elements) {
+				Iterator<Element> iterator = elements.iterator();
+
+				while (iterator.hasNext()) {
+					Element element = iterator.next();
+
 					if (!StringUtil.equalsIgnoreCase(
 							element.tagName(), "img")) {
 
@@ -92,14 +98,18 @@ public class LayoutAdaptiveMediaProcessorImpl
 					FileEntry fileEntry = _dlAppService.getFileEntry(
 						fileEntryId);
 
-					AMImageConfigurationEntry amImageConfigurationEntry =
-						_amImageConfigurationHelper.
-							getAMImageConfigurationEntry(
-								fileEntry.getCompanyId(), configuration);
+					Optional<AMImageConfigurationEntry>
+						amImageConfigurationEntryOptional =
+							_amImageConfigurationHelper.
+								getAMImageConfigurationEntry(
+									fileEntry.getCompanyId(), configuration);
 
-					if (amImageConfigurationEntry == null) {
+					if (!amImageConfigurationEntryOptional.isPresent()) {
 						continue;
 					}
+
+					AMImageConfigurationEntry amImageConfigurationEntry =
+						amImageConfigurationEntryOptional.get();
 
 					URI uri = _amImageURLFactory.createFileEntryURL(
 						fileEntry.getFileVersion(), amImageConfigurationEntry);
@@ -227,7 +237,6 @@ public class LayoutAdaptiveMediaProcessorImpl
 
 	private static final Pattern _cssPropertyPattern = Pattern.compile(
 		"--background-image-file-entry-id:\\s*(\\d+);");
-	private static final ViewportSize[] _viewportSizes = ViewportSize.values();
 
 	@Reference
 	private AMImageConfigurationHelper _amImageConfigurationHelper;

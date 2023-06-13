@@ -548,8 +548,4 @@ public interface AssetCategoryModel
 	@Override
 	public AssetCategory cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

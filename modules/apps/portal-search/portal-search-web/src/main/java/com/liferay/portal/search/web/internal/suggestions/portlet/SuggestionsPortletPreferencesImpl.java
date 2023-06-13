@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.web.internal.suggestions.portlet;
 
-import com.liferay.portal.search.web.internal.portlet.preferences.BasePortletPreferences;
+import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
 
 import java.util.Optional;
 
@@ -24,50 +24,57 @@ import javax.portlet.PortletPreferences;
  * @author Adam Brandizzi
  */
 public class SuggestionsPortletPreferencesImpl
-	extends BasePortletPreferences implements SuggestionsPortletPreferences {
+	implements SuggestionsPortletPreferences {
 
 	public SuggestionsPortletPreferencesImpl(
 		Optional<PortletPreferences> portletPreferencesOptional) {
 
-		super(portletPreferencesOptional.orElse(null));
+		_portletPreferencesHelper = new PortletPreferencesHelper(
+			portletPreferencesOptional);
 	}
 
 	@Override
 	public int getQueryIndexingThreshold() {
-		return getInteger(PREFERENCE_KEY_QUERY_INDEXING_THRESHOLD, 50);
+		return _portletPreferencesHelper.getInteger(
+			PREFERENCE_KEY_QUERY_INDEXING_THRESHOLD, 50);
 	}
 
 	@Override
 	public int getRelatedQueriesSuggestionsDisplayThreshold() {
-		return getInteger(
+		return _portletPreferencesHelper.getInteger(
 			PREFERENCE_KEY_RELATED_QUERIES_SUGGESTIONS_DISPLAY_THRESHOLD, 50);
 	}
 
 	@Override
 	public int getRelatedQueriesSuggestionsMax() {
-		return getInteger(PREFERENCE_KEY_RELATED_QUERIES_SUGGESTIONS_MAX, 10);
+		return _portletPreferencesHelper.getInteger(
+			PREFERENCE_KEY_RELATED_QUERIES_SUGGESTIONS_MAX, 10);
 	}
 
 	@Override
 	public int getSpellCheckSuggestionDisplayThreshold() {
-		return getInteger(
+		return _portletPreferencesHelper.getInteger(
 			PREFERENCE_KEY_SPELL_CHECK_SUGGESTION_DISPLAY_THRESHOLD, 50);
 	}
 
 	@Override
 	public boolean isQueryIndexingEnabled() {
-		return getBoolean(PREFERENCE_KEY_QUERY_INDEXING_ENABLED, false);
+		return _portletPreferencesHelper.getBoolean(
+			PREFERENCE_KEY_QUERY_INDEXING_ENABLED, false);
 	}
 
 	@Override
 	public boolean isRelatedQueriesSuggestionsEnabled() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			PREFERENCE_KEY_RELATED_QUERIES_SUGGESTIONS_ENABLED, false);
 	}
 
 	@Override
 	public boolean isSpellCheckSuggestionEnabled() {
-		return getBoolean(PREFERENCE_KEY_SPELL_CHECK_SUGGESTION_ENABLED, false);
+		return _portletPreferencesHelper.getBoolean(
+			PREFERENCE_KEY_SPELL_CHECK_SUGGESTION_ENABLED, false);
 	}
+
+	private final PortletPreferencesHelper _portletPreferencesHelper;
 
 }

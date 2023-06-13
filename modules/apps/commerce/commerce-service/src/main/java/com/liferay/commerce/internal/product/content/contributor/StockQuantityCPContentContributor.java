@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.product.content.contributor.name=" + CPContentContributorConstants.STOCK_QUANTITY_NAME,
 	service = CPContentContributor.class
 )
@@ -84,8 +85,8 @@ public class StockQuantityCPContentContributor implements CPContentContributor {
 			jsonObject.put(
 				CPContentContributorConstants.STOCK_QUANTITY_NAME,
 				_commerceInventoryEngine.getStockQuantity(
-					cpInstance.getCompanyId(), cpInstance.getGroupId(),
-					commerceChannel.getGroupId(), cpInstance.getSku()));
+					cpInstance.getCompanyId(), commerceChannel.getGroupId(),
+					cpInstance.getSku()));
 		}
 
 		return jsonObject;

@@ -14,36 +14,24 @@
 
 package com.liferay.headless.delivery.internal.dto.v1_0.converter;
 
-import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
-import com.liferay.client.extension.model.ClientExtensionEntryRel;
-import com.liferay.client.extension.service.ClientExtensionEntryRelLocalService;
-import com.liferay.client.extension.type.CET;
-import com.liferay.client.extension.type.manager.CETManager;
-import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.headless.delivery.dto.v1_0.ClientExtension;
 import com.liferay.headless.delivery.dto.v1_0.MasterPage;
 import com.liferay.headless.delivery.dto.v1_0.PageDefinition;
 import com.liferay.headless.delivery.dto.v1_0.Settings;
 import com.liferay.headless.delivery.dto.v1_0.StyleBook;
-import com.liferay.headless.delivery.dto.v1_0.util.ContentDocumentUtil;
-import com.liferay.headless.delivery.internal.dto.v1_0.mapper.LayoutStructureItemMapperRegistry;
+import com.liferay.headless.delivery.internal.dto.v1_0.mapper.LayoutStructureItemMapperTracker;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.PageElementUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.util.constants.LayoutStructureConstants;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ColorScheme;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Theme;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -52,6 +40,7 @@ import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.StyleBookEntryLocalService;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -62,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.layout.util.structure.LayoutStructure",
-	service = DTOConverter.class
+	service = {DTOConverter.class, PageDefinitionDTOConverter.class}
 )
 public class PageDefinitionDTOConverter
 	implements DTOConverter<LayoutStructure, PageDefinition> {
@@ -78,14 +67,15 @@ public class PageDefinitionDTOConverter
 			LayoutStructure layoutStructure)
 		throws Exception {
 
-		Layout layout = (Layout)dtoConverterContext.getAttribute("layout");
-
-		if (layout == null) {
-			throw new IllegalArgumentException(
+		Layout layout = Optional.ofNullable(
+			dtoConverterContext.getAttribute("layout")
+		).map(
+			Layout.class::cast
+		).orElseThrow(
+			() -> new IllegalArgumentException(
 				"Layout is not defined for layout structure item " +
-					layoutStructure.getMainItemId());
-		}
-
+					layoutStructure.getMainItemId())
+		);
 		LayoutStructureItem mainLayoutStructureItem =
 			layoutStructure.getMainLayoutStructureItem();
 		boolean saveInlineContent = GetterUtil.getBoolean(
@@ -97,100 +87,21 @@ public class PageDefinitionDTOConverter
 			{
 				pageElement = PageElementUtil.toPageElement(
 					layout.getGroupId(), layoutStructure,
-					mainLayoutStructureItem, _layoutStructureItemMapperRegistry,
+					mainLayoutStructureItem, _layoutStructureItemMapperTracker,
 					saveInlineContent, saveMappingConfiguration);
-				settings = _toSettings(dtoConverterContext, layout);
+				settings = _toSettings(layout);
 				version =
 					LayoutStructureConstants.LATEST_PAGE_DEFINITION_VERSION;
 			}
 		};
 	}
 
-	private CET _getCET(
-		long classNameId, long classPK, long companyId, String type) {
-
-		ClientExtensionEntryRel clientExtensionEntryRel =
-			_clientExtensionEntryRelLocalService.fetchClientExtensionEntryRel(
-				classNameId, classPK, type);
-
-		if (clientExtensionEntryRel == null) {
-			return null;
-		}
-
-		return _cetManager.getCET(
-			companyId, clientExtensionEntryRel.getCETExternalReferenceCode());
-	}
-
-	private ClientExtension[] _getClientExtensions(
-		long classNameId, DTOConverterContext dtoConverterContext,
-		Layout layout, String type) {
-
-		ClientExtension[] clientExtensions = TransformUtil.transformToArray(
-			_clientExtensionEntryRelLocalService.getClientExtensionEntryRels(
-				classNameId, layout.getPlid(), type),
-			clientExtensionEntryRel -> {
-				CET cet = _cetManager.getCET(
-					layout.getCompanyId(),
-					clientExtensionEntryRel.getCETExternalReferenceCode());
-
-				if (cet == null) {
-					return null;
-				}
-
-				return new ClientExtension() {
-					{
-						externalReferenceCode = cet.getExternalReferenceCode();
-						name = cet.getName(dtoConverterContext.getLocale());
-					}
-				};
-			},
-			ClientExtension.class);
-
-		if (ArrayUtil.isEmpty(clientExtensions)) {
-			return null;
-		}
-
-		return clientExtensions;
-	}
-
-	private ClientExtension _getThemeCSSClientExtension(
-		long classNameId, Layout layout,
-		DTOConverterContext dtoConverterContext) {
-
-		CET cet = _getCET(
-			classNameId, layout.getPlid(), layout.getCompanyId(),
-			ClientExtensionEntryConstants.TYPE_THEME_CSS);
-
-		if (cet == null) {
-			return null;
-		}
-
-		return new ClientExtension() {
-			{
-				externalReferenceCode = cet.getExternalReferenceCode();
-				name = cet.getName(dtoConverterContext.getLocale());
-			}
-		};
-	}
-
-	private Settings _toSettings(
-		DTOConverterContext dtoConverterContext, Layout layout) {
-
-		long classNameId = _portal.getClassNameId(Layout.class.getName());
+	private Settings _toSettings(Layout layout) {
 		UnicodeProperties unicodeProperties =
 			layout.getTypeSettingsProperties();
 
 		return new Settings() {
 			{
-				globalCSSClientExtensions = _getClientExtensions(
-					classNameId, dtoConverterContext, layout,
-					ClientExtensionEntryConstants.TYPE_GLOBAL_CSS);
-				globalJSClientExtensions = _getClientExtensions(
-					classNameId, dtoConverterContext, layout,
-					ClientExtensionEntryConstants.TYPE_GLOBAL_JS);
-				themeCSSClientExtension = _getThemeCSSClientExtension(
-					classNameId, layout, dtoConverterContext);
-
 				setColorSchemeName(
 					() -> {
 						ColorScheme colorScheme = null;
@@ -200,7 +111,7 @@ public class PageDefinitionDTOConverter
 						}
 						catch (PortalException portalException) {
 							if (_log.isWarnEnabled()) {
-								_log.warn(portalException);
+								_log.warn(portalException, portalException);
 							}
 						}
 
@@ -217,36 +128,6 @@ public class PageDefinitionDTOConverter
 						}
 
 						return layout.getCss();
-					});
-				setFavIcon(
-					() -> {
-						CET cet = _getCET(
-							classNameId, layout.getPlid(),
-							layout.getCompanyId(),
-							ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
-
-						if (cet != null) {
-							return new ClientExtension() {
-								{
-									externalReferenceCode =
-										cet.getExternalReferenceCode();
-									name = cet.getName(
-										dtoConverterContext.getLocale());
-								}
-							};
-						}
-
-						long faviconFileEntryId =
-							layout.getFaviconFileEntryId();
-
-						if (faviconFileEntryId != 0) {
-							return ContentDocumentUtil.toContentDocument(
-								_dlURLHelper, "settings.favIcon.image",
-								_dlAppService.getFileEntry(faviconFileEntryId),
-								dtoConverterContext.getUriInfo());
-						}
-
-						return null;
 					});
 				setJavascript(
 					() -> {
@@ -338,28 +219,11 @@ public class PageDefinitionDTOConverter
 		PageDefinitionDTOConverter.class);
 
 	@Reference
-	private CETManager _cetManager;
-
-	@Reference
-	private ClientExtensionEntryRelLocalService
-		_clientExtensionEntryRelLocalService;
-
-	@Reference
-	private DLAppService _dlAppService;
-
-	@Reference
-	private DLURLHelper _dlURLHelper;
-
-	@Reference
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
 
 	@Reference
-	private LayoutStructureItemMapperRegistry
-		_layoutStructureItemMapperRegistry;
-
-	@Reference
-	private Portal _portal;
+	private LayoutStructureItemMapperTracker _layoutStructureItemMapperTracker;
 
 	@Reference
 	private StyleBookEntryLocalService _styleBookEntryLocalService;

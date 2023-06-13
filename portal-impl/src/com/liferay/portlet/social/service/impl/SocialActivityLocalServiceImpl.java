@@ -248,8 +248,10 @@ public class SocialActivityLocalServiceImpl
 		}
 
 		if (isLogActivity(activity)) {
-			activity.setActivityId(
-				counterLocalService.increment(SocialActivity.class.getName()));
+			long activityId = counterLocalService.increment(
+				SocialActivity.class.getName());
+
+			activity.setActivityId(activityId);
 
 			activity = socialActivityPersistence.update(activity);
 
@@ -598,6 +600,31 @@ public class SocialActivityLocalServiceImpl
 	}
 
 	/**
+	 * @param      className the target asset's class name
+	 * @param      start the lower bound of the range of results
+	 * @param      end the upper bound of the range of results (not inclusive)
+	 * @return     the range of matching activities
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getActivities(long, String, int, int)}  Returns a range of
+	 *             all the activities done on assets identified by the class
+	 *             name.  <p> Useful when paginating results. Returns a maximum
+	 *             of <code>end - start</code> instances. <code>start</code> and
+	 *             <code>end</code> are not primary keys, they are indexes in
+	 *             the result set. Thus, <code>0</code> refers to the first
+	 *             result in the set. Setting both <code>start</code> and
+	 *             <code>end</code> to {@link QueryUtil#ALL_POS} will return the
+	 *             full result set.</p>
+	 */
+	@Deprecated
+	@Override
+	public List<SocialActivity> getActivities(
+		String className, int start, int end) {
+
+		return getActivities(
+			_classNameLocalService.getClassNameId(className), start, end);
+	}
+
+	/**
 	 * @param      classNameId the target asset's class name ID
 	 * @return     the number of matching activities
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
@@ -692,6 +719,19 @@ public class SocialActivityLocalServiceImpl
 	}
 
 	/**
+	 * @param      className the target asset's class name
+	 * @return     the number of matching activities
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getActivitiesCount(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public int getActivitiesCount(String className) {
+		return getActivitiesCount(
+			_classNameLocalService.getClassNameId(className));
+	}
+
+	/**
 	 * Returns the activity identified by its primary key.
 	 *
 	 * @param  activityId the primary key of the activity
@@ -708,41 +748,6 @@ public class SocialActivityLocalServiceImpl
 
 		return socialActivityPersistence.findByActivitySetId(
 			activitySetId, start, end);
-	}
-
-	@Override
-	public List<SocialActivity> getApprovedActivities(
-		long classPK, double version) {
-
-		String versionString = String.valueOf(version);
-
-		if (Math.floor(version) == version) {
-			versionString = String.valueOf((int)version);
-		}
-
-		return dslQuery(
-			DSLQueryFactoryUtil.select(
-				SocialActivityTable.INSTANCE
-			).from(
-				SocialActivityTable.INSTANCE
-			).where(
-				SocialActivityTable.INSTANCE.classPK.eq(
-					classPK
-				).and(
-					SocialActivityTable.INSTANCE.type.notIn(
-						new Integer[] {
-							SocialActivityConstants.TYPE_ADD_ATTACHMENT,
-							SocialActivityConstants.
-								TYPE_MOVE_ATTACHMENT_TO_TRASH,
-							SocialActivityConstants.
-								TYPE_RESTORE_ATTACHMENT_FROM_TRASH
-						}
-					).or(
-						SocialActivityTable.INSTANCE.extraData.notLike(
-							"%version\":" + versionString + ",%")
-					).withParentheses()
-				)
-			));
 	}
 
 	/**

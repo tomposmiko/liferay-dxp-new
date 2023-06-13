@@ -22,7 +22,6 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentTemplateUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.ContentTemplateEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.ContentTemplateResource;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -35,14 +34,12 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.Collections;
-import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -57,7 +54,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/content-template.properties",
 	scope = ServiceScope.PROTOTYPE, service = ContentTemplateResource.class
 )
-@CTAware
 public class ContentTemplateResourceImpl
 	extends BaseContentTemplateResourceImpl {
 
@@ -67,23 +63,12 @@ public class ContentTemplateResourceImpl
 			Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception {
 
-		return _getContentTemplatesPage(
-			Collections.singletonMap(
-				"get",
-				addAction(
-					ActionKeys.MANAGE_LAYOUTS,
-					"getAssetLibraryContentTemplatesPage",
-					Group.class.getName(), assetLibraryId)),
+		return getSiteContentTemplatesPage(
 			assetLibraryId, search, aggregation, filter, pagination, sorts);
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
-		return _entityModel;
-	}
-
-	@Override
-	public ContentTemplate getSiteContentTemplate(
+	public ContentTemplate getContentTemplate(
 			Long siteId, String contentTemplateId)
 		throws Exception {
 
@@ -92,8 +77,13 @@ public class ContentTemplateResourceImpl
 			contentTemplateId);
 
 		return ContentTemplateUtil.toContentTemplate(
-			ddmTemplate, _getDTOConverterContext(ddmTemplate),
+			ddmTemplate, _getDtoConverterContext(ddmTemplate),
 			groupLocalService, _portal, _userLocalService);
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
+		return _entityModel;
 	}
 
 	@Override
@@ -102,23 +92,12 @@ public class ContentTemplateResourceImpl
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
-		return _getContentTemplatesPage(
+		return SearchUtil.search(
 			Collections.singletonMap(
 				"get",
 				addAction(
 					ActionKeys.MANAGE_LAYOUTS, "getSiteContentTemplatesPage",
 					Group.class.getName(), siteId)),
-			siteId, search, aggregation, filter, pagination, sorts);
-	}
-
-	private Page<ContentTemplate> _getContentTemplatesPage(
-			Map<String, Map<String, String>> actions, Long assetLibraryId,
-			String search, Aggregation aggregation, Filter filter,
-			Pagination pagination, Sort[] sorts)
-		throws Exception {
-
-		return SearchUtil.search(
-			actions,
 			booleanQuery -> {
 			},
 			filter, DDMTemplate.class.getName(), search, pagination,
@@ -133,7 +112,7 @@ public class ContentTemplateResourceImpl
 					_classNameLocalService.getClassNameId(
 						JournalArticle.class));
 				searchContext.setCompanyId(contextCompany.getCompanyId());
-				searchContext.setGroupIds(new long[] {assetLibraryId});
+				searchContext.setGroupIds(new long[] {siteId});
 			},
 			sorts,
 			document -> {
@@ -141,12 +120,12 @@ public class ContentTemplateResourceImpl
 					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)));
 
 				return ContentTemplateUtil.toContentTemplate(
-					ddmTemplate, _getDTOConverterContext(ddmTemplate),
+					ddmTemplate, _getDtoConverterContext(ddmTemplate),
 					groupLocalService, _portal, _userLocalService);
 			});
 	}
 
-	private DTOConverterContext _getDTOConverterContext(
+	private DefaultDTOConverterContext _getDtoConverterContext(
 		DDMTemplate ddmTemplate) {
 
 		return new DefaultDTOConverterContext(
@@ -155,7 +134,7 @@ public class ContentTemplateResourceImpl
 				"get",
 				addAction(
 					ActionKeys.VIEW, ddmTemplate.getTemplateId(),
-					"getSiteContentTemplate", ddmTemplate.getUserId(),
+					"getContentTemplate", ddmTemplate.getUserId(),
 					DDMTemplate.class.getName() + "-" +
 						JournalArticle.class.getName(),
 					ddmTemplate.getGroupId())),

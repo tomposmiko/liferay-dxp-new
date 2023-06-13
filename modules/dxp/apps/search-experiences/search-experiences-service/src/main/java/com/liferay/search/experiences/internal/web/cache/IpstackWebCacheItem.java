@@ -18,20 +18,12 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.webcache.WebCacheItem;
 import com.liferay.portal.kernel.webcache.WebCachePoolUtil;
-import com.liferay.search.experiences.blueprint.exception.InvalidWebCacheItemException;
-import com.liferay.search.experiences.blueprint.exception.PrivateIPAddressException;
 import com.liferay.search.experiences.internal.configuration.IpstackConfiguration;
-
-import java.beans.ExceptionListener;
-
-import java.net.Inet4Address;
-import java.net.InetAddress;
 
 /**
  * @author Brian Wing Shun Chan
@@ -39,32 +31,11 @@ import java.net.InetAddress;
 public class IpstackWebCacheItem implements WebCacheItem {
 
 	public static JSONObject get(
-		ExceptionListener exceptionListener, String ipAddress,
-		IpstackConfiguration ipstackConfiguration) {
+		String ipAddress, IpstackConfiguration ipstackConfiguration) {
 
-		try {
-			if (!ipstackConfiguration.enabled() ||
-				_isPrivateIPAddress(ipAddress)) {
-
-				return JSONFactoryUtil.createJSONObject();
-			}
-
-			return (JSONObject)WebCachePoolUtil.get(
-				StringBundler.concat(
-					IpstackWebCacheItem.class.getName(), StringPool.POUND,
-					ipstackConfiguration.apiKey(), StringPool.POUND,
-					ipstackConfiguration.apiURL(), StringPool.POUND, ipAddress),
-				new IpstackWebCacheItem(ipAddress, ipstackConfiguration));
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			exceptionListener.exceptionThrown(exception);
-
-			return JSONFactoryUtil.createJSONObject();
-		}
+		return (JSONObject)WebCachePoolUtil.get(
+			IpstackWebCacheItem.class.getName() + StringPool.POUND + ipAddress,
+			new IpstackWebCacheItem(ipAddress, ipstackConfiguration));
 	}
 
 	public IpstackWebCacheItem(
@@ -77,6 +48,10 @@ public class IpstackWebCacheItem implements WebCacheItem {
 	@Override
 	public JSONObject convert(String key) {
 		try {
+			if (!_ipstackConfiguration.enabled()) {
+				return JSONFactoryUtil.createJSONObject();
+			}
+
 			String apiURL = _ipstackConfiguration.apiURL();
 
 			if (!apiURL.endsWith("/")) {
@@ -91,15 +66,14 @@ public class IpstackWebCacheItem implements WebCacheItem {
 				_log.debug("Reading " + url);
 			}
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-				HttpUtil.URLtoString(url));
-
-			_validateResponse(jsonObject);
-
-			return jsonObject;
+			return JSONFactoryUtil.createJSONObject(HttpUtil.URLtoString(url));
 		}
 		catch (Exception exception) {
-			throw new InvalidWebCacheItemException(exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			return JSONFactoryUtil.createJSONObject();
 		}
 	}
 
@@ -110,43 +84,6 @@ public class IpstackWebCacheItem implements WebCacheItem {
 		}
 
 		return 0;
-	}
-
-	private static boolean _isPrivateIPAddress(String ipAddress)
-		throws Exception {
-
-		Inet4Address inet4Address = (Inet4Address)InetAddress.getByName(
-			ipAddress);
-
-		if (inet4Address.isAnyLocalAddress() ||
-			inet4Address.isLinkLocalAddress() ||
-			inet4Address.isLoopbackAddress() ||
-			inet4Address.isMulticastAddress() ||
-			inet4Address.isSiteLocalAddress()) {
-
-			throw new PrivateIPAddressException(
-				"Unable to resolve private IP address " + ipAddress);
-		}
-
-		return false;
-	}
-
-	private void _validateResponse(JSONObject jsonObject) {
-		boolean success = jsonObject.getBoolean("success", true);
-
-		if (success) {
-			return;
-		}
-
-		throw new InvalidWebCacheItemException(
-			StringBundler.concat(
-				"IPStack: ",
-				JSONUtil.getValueAsString(
-					jsonObject, "JSONObject/error", "Object/info"),
-				" (",
-				JSONUtil.getValueAsString(
-					jsonObject, "JSONObject/error", "Object/code"),
-				")"));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

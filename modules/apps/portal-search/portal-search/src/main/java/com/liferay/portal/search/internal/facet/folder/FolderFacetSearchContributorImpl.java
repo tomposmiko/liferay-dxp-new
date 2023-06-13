@@ -54,7 +54,13 @@ public class FolderFacetSearchContributorImpl
 			facetContext -> facetContext.addFacet(facet));
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setFolderFacetFactory(
+		FolderFacetFactory folderFacetFactory) {
+
+		_folderFacetFactory = folderFacetFactory;
+	}
+
 	private FolderFacetFactory _folderFacetFactory;
 
 	private class FolderFacetBuilderImpl implements FolderFacetBuilder {
@@ -109,6 +115,7 @@ public class FolderFacetSearchContributorImpl
 
 			facetConfiguration.setFieldName(facet.getFieldName());
 			facetConfiguration.setLabel("any-folder");
+			facetConfiguration.setOrder("OrderHitsDesc");
 			facetConfiguration.setStatic(false);
 			facetConfiguration.setWeight(1.4);
 

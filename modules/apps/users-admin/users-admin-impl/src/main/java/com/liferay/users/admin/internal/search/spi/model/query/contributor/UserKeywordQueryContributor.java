@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.User",
 	service = KeywordQueryContributor.class
 )
@@ -49,7 +50,7 @@ public class UserKeywordQueryContributor implements KeywordQueryContributor {
 		SearchContext searchContext =
 			keywordQueryContributorHelper.getSearchContext();
 
-		_addHighlightFieldNames(searchContext);
+		addHighlightFieldNames(searchContext);
 
 		queryHelper.addSearchTerm(booleanQuery, searchContext, "city", false);
 		queryHelper.addSearchTerm(
@@ -67,8 +68,6 @@ public class UserKeywordQueryContributor implements KeywordQueryContributor {
 		queryHelper.addSearchTerm(booleanQuery, searchContext, "region", false);
 		queryHelper.addSearchTerm(
 			booleanQuery, searchContext, "screenName", false);
-		queryHelper.addSearchTerm(
-			booleanQuery, searchContext, "screenName.text", false);
 		queryHelper.addSearchTerm(booleanQuery, searchContext, "street", false);
 		queryHelper.addSearchTerm(booleanQuery, searchContext, "zip", false);
 
@@ -83,7 +82,7 @@ public class UserKeywordQueryContributor implements KeywordQueryContributor {
 					_getTrailingWildcardQuery("emailAddressDomain", keywords),
 					BooleanClauseOccur.SHOULD);
 				booleanQuery.add(
-					_getTrailingWildcardQuery("screenName.text", keywords),
+					_getTrailingWildcardQuery("screenName", keywords),
 					BooleanClauseOccur.SHOULD);
 			}
 			catch (ParseException parseException) {
@@ -92,10 +91,7 @@ public class UserKeywordQueryContributor implements KeywordQueryContributor {
 		}
 	}
 
-	@Reference
-	protected QueryHelper queryHelper;
-
-	private void _addHighlightFieldNames(SearchContext searchContext) {
+	protected void addHighlightFieldNames(SearchContext searchContext) {
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 
 		if (!queryConfig.isHighlightEnabled()) {
@@ -104,6 +100,9 @@ public class UserKeywordQueryContributor implements KeywordQueryContributor {
 
 		queryConfig.addHighlightFieldNames("fullName");
 	}
+
+	@Reference
+	protected QueryHelper queryHelper;
 
 	private WildcardQuery _getTrailingWildcardQuery(
 		String field, String value) {

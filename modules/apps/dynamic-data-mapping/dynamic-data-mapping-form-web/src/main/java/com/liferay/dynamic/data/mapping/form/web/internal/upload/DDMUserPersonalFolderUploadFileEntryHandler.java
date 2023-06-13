@@ -20,9 +20,6 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.util.DLValidator;
 import com.liferay.expando.kernel.model.ExpandoBridge;
-import com.liferay.object.exception.ObjectEntryValuesException;
-import com.liferay.object.model.ObjectFieldSetting;
-import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -36,11 +33,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.upload.UniqueFileNameProvider;
 import com.liferay.upload.UploadFileEntryHandler;
@@ -54,7 +48,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = DDMUserPersonalFolderUploadFileEntryHandler.class)
+@Component(
+	immediate = true,
+	service = DDMUserPersonalFolderUploadFileEntryHandler.class
+)
 public class DDMUserPersonalFolderUploadFileEntryHandler
 	implements UploadFileEntryHandler {
 
@@ -72,100 +69,33 @@ public class DDMUserPersonalFolderUploadFileEntryHandler
 			_folderModelResourcePermission, themeDisplay.getPermissionChecker(),
 			themeDisplay.getScopeGroupId(), folderId, ActionKeys.ADD_DOCUMENT);
 
-		FileEntry fileEntry = null;
+		String fileName = uploadPortletRequest.getFileName(_PARAMETER_NAME);
+		long size = uploadPortletRequest.getSize(_PARAMETER_NAME);
 
-		long fileEntryId = GetterUtil.getLong(
-			uploadPortletRequest.getParameter("fileEntryId"));
-
-		if (fileEntryId > 0) {
-			try {
-				fileEntry = _dlAppService.getFileEntry(fileEntryId);
-			}
-			catch (NoSuchFileEntryException noSuchFileEntryException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchFileEntryException);
-				}
-			}
-		}
-
-		String fileName = uploadPortletRequest.getFileName(
-			"imageSelectorFileName");
-
-		if (Validator.isNotNull(fileName)) {
-			try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
-					"imageSelectorFileName")) {
-
-				return _addFileEntry(
-					fileEntry, fileName, folderId, inputStream,
-					"imageSelectorFileName", themeDisplay,
-					uploadPortletRequest);
-			}
-		}
+		_dlValidator.validateFileSize(fileName, size);
 
 		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
-				"imageBlob")) {
+				_PARAMETER_NAME)) {
 
-			return _addFileEntry(
-				fileEntry, fileEntry.getFileName(), folderId, inputStream,
-				"imageBlob", themeDisplay, uploadPortletRequest);
+			long repositoryId = ParamUtil.getLong(
+				uploadPortletRequest, "repositoryId");
+			String uniqueFileName = _uniqueFileNameProvider.provide(
+				fileName,
+				curFileName -> _exists(
+					themeDisplay.getScopeGroupId(), folderId, curFileName));
+
+			return _dlAppService.addFileEntry(
+				null, repositoryId, folderId, uniqueFileName,
+				uploadPortletRequest.getContentType(_PARAMETER_NAME),
+				uniqueFileName, _getDescription(uploadPortletRequest),
+				StringPool.BLANK, inputStream, size, null, null,
+				_getServiceContext(uploadPortletRequest));
 		}
 	}
 
-	private FileEntry _addFileEntry(
-			FileEntry fileEntry, String fileName, long folderId,
-			InputStream inputStream, String parameterName,
-			ThemeDisplay themeDisplay,
-			UploadPortletRequest uploadPortletRequest)
-		throws PortalException {
-
-		long size = uploadPortletRequest.getSize(parameterName);
-
-		_dlValidator.validateFileSize(
-			themeDisplay.getScopeGroupId(), fileName,
-			uploadPortletRequest.getContentType(parameterName), size);
-
-		long objectFieldId = ParamUtil.getLong(
-			uploadPortletRequest, "objectFieldId");
-
-		if (objectFieldId > 0) {
-			_validateAttachmentObjectField(fileName, objectFieldId);
-		}
-
-		long repositoryId = ParamUtil.getLong(
-			uploadPortletRequest, "repositoryId");
-
-		String uniqueFileName = _uniqueFileNameProvider.provide(
-			fileName,
-			curFileName -> _exists(repositoryId, folderId, curFileName));
-
-		String description = StringPool.BLANK;
-
-		if (fileEntry != null) {
-			description = fileEntry.getDescription();
-		}
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DLFileEntry.class.getName(), uploadPortletRequest);
-
-		if ((fileEntry != null) &&
-			(fileEntry.getModel() instanceof DLFileEntry)) {
-
-			ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
-
-			serviceContext.setExpandoBridgeAttributes(
-				expandoBridge.getAttributes());
-		}
-
-		return _dlAppService.addFileEntry(
-			null, repositoryId, folderId, uniqueFileName,
-			uploadPortletRequest.getContentType(parameterName), uniqueFileName,
-			uniqueFileName, description, StringPool.BLANK, inputStream, size,
-			null, null, serviceContext);
-	}
-
-	private boolean _exists(long repositoryId, long folderId, String fileName) {
+	private boolean _exists(long groupId, long folderId, String fileName) {
 		try {
-			if (_dlAppService.getFileEntry(repositoryId, folderId, fileName) !=
+			if (_dlAppService.getFileEntry(groupId, folderId, fileName) !=
 					null) {
 
 				return true;
@@ -175,31 +105,72 @@ public class DDMUserPersonalFolderUploadFileEntryHandler
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
 		}
 	}
 
-	private void _validateAttachmentObjectField(
-			String fileName, long objectFieldId)
+	private FileEntry _fetchFileEntry(UploadPortletRequest uploadPortletRequest)
 		throws PortalException {
 
-		ObjectFieldSetting objectFieldSetting =
-			_objectFieldSettingLocalService.fetchObjectFieldSetting(
-				objectFieldId, "acceptedFileExtensions");
+		try {
+			long fileEntryId = GetterUtil.getLong(
+				uploadPortletRequest.getParameter("fileEntryId"));
 
-		String value = objectFieldSetting.getValue();
+			if (fileEntryId == 0) {
+				return null;
+			}
 
-		if (!ArrayUtil.contains(
-				value.split("\\s*,\\s*"), FileUtil.getExtension(fileName),
-				true)) {
+			return _dlAppService.getFileEntry(fileEntryId);
+		}
+		catch (NoSuchFileEntryException noSuchFileEntryException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
+			}
 
-			throw new ObjectEntryValuesException.InvalidFileExtension(
-				FileUtil.getExtension(fileName), fileName);
+			return null;
 		}
 	}
+
+	private String _getDescription(UploadPortletRequest uploadPortletRequest)
+		throws PortalException {
+
+		FileEntry fileEntry = _fetchFileEntry(uploadPortletRequest);
+
+		if (fileEntry == null) {
+			return StringPool.BLANK;
+		}
+
+		return fileEntry.getDescription();
+	}
+
+	private ServiceContext _getServiceContext(
+			UploadPortletRequest uploadPortletRequest)
+		throws PortalException {
+
+		FileEntry fileEntry = _fetchFileEntry(uploadPortletRequest);
+
+		if ((fileEntry == null) ||
+			!(fileEntry.getModel() instanceof DLFileEntry)) {
+
+			return ServiceContextFactory.getInstance(
+				DLFileEntry.class.getName(), uploadPortletRequest);
+		}
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DLFileEntry.class.getName(), uploadPortletRequest);
+
+		ExpandoBridge expandoBridge = fileEntry.getExpandoBridge();
+
+		serviceContext.setExpandoBridgeAttributes(
+			expandoBridge.getAttributes());
+
+		return serviceContext;
+	}
+
+	private static final String _PARAMETER_NAME = "imageSelectorFileName";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMUserPersonalFolderUploadFileEntryHandler.class);
@@ -217,9 +188,6 @@ public class DDMUserPersonalFolderUploadFileEntryHandler
 		target = "(model.class.name=com.liferay.portal.kernel.repository.model.Folder)"
 	)
 	private ModelResourcePermission<Folder> _folderModelResourcePermission;
-
-	@Reference
-	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 	@Reference
 	private UniqueFileNameProvider _uniqueFileNameProvider;

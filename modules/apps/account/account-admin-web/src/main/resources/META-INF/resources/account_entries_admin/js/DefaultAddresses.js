@@ -12,11 +12,7 @@
  * details.
  */
 
-import {
-	createPortletURL,
-	delegate,
-	openSelectionModal as openSelectionModalUtil,
-} from 'frontend-js-web';
+import {delegate} from 'frontend-js-web';
 
 export default function ({
 	baseSelectDefaultAddressURL,
@@ -28,11 +24,11 @@ export default function ({
 	);
 
 	const getTitle = (type) => {
-		if (type === 'billing') {
+		if (type == 'billing') {
 			return Liferay.Language.get('set-default-billing-address');
 		}
 
-		if (type === 'shipping') {
+		if (type == 'shipping') {
 			return Liferay.Language.get('set-default-shipping-address');
 		}
 
@@ -40,20 +36,16 @@ export default function ({
 	};
 
 	const openSelectionModal = (title, type) => {
-		openSelectionModalUtil({
+		Liferay.Util.openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('save'),
-			containerProps: {
-				className: '',
-			},
 			id: '<portlet:namespace />selectDefaultAddress',
-			iframeBodyCssClass: '',
 			multiple: true,
 			onSelect: (selectedItem) => {
 				if (!selectedItem) {
 					return;
 				}
 
-				const updateAccountEntryDefaultAddressesURL = createPortletURL(
+				const updateAccountEntryDefaultAddressesURL = Liferay.Util.PortletURL.createPortletURL(
 					baseUpdateAccountEntryDefaultAddressesURL,
 					{addressId: selectedItem.entityid, type}
 				);
@@ -65,7 +57,10 @@ export default function ({
 			},
 			selectEventName: '<portlet:namespace />selectDefaultAddress',
 			title,
-			url: createPortletURL(baseSelectDefaultAddressURL, {type}),
+			url: Liferay.Util.PortletURL.createPortletURL(
+				baseSelectDefaultAddressURL,
+				{type}
+			),
 		});
 	};
 

@@ -15,11 +15,9 @@
 package com.liferay.commerce.product.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.model.AuditedModel;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.StagedAuditedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -38,8 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommerceChannelModel
-	extends BaseModel<CommerceChannel>, CTModel<CommerceChannel>, MVCCModel,
-			ShardedModel, StagedAuditedModel {
+	extends AuditedModel, BaseModel<CommerceChannel>, ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -52,7 +49,6 @@ public interface CommerceChannelModel
 	 *
 	 * @return the primary key of this commerce channel
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -60,57 +56,7 @@ public interface CommerceChannelModel
 	 *
 	 * @param primaryKey the primary key of this commerce channel
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this commerce channel.
-	 *
-	 * @return the mvcc version of this commerce channel
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this commerce channel.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce channel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this commerce channel.
-	 *
-	 * @return the ct collection ID of this commerce channel
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this commerce channel.
-	 *
-	 * @param ctCollectionId the ct collection ID of this commerce channel
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
-
-	/**
-	 * Returns the uuid of this commerce channel.
-	 *
-	 * @return the uuid of this commerce channel
-	 */
-	@AutoEscape
-	@Override
-	public String getUuid();
-
-	/**
-	 * Sets the uuid of this commerce channel.
-	 *
-	 * @param uuid the uuid of this commerce channel
-	 */
-	@Override
-	public void setUuid(String uuid);
 
 	/**
 	 * Returns the external reference code of this commerce channel.
@@ -350,9 +296,5 @@ public interface CommerceChannelModel
 
 	@Override
 	public CommerceChannel cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

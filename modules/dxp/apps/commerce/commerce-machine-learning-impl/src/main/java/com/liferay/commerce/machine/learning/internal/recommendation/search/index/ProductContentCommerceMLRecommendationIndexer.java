@@ -15,7 +15,7 @@
 package com.liferay.commerce.machine.learning.internal.recommendation.search.index;
 
 import com.liferay.commerce.machine.learning.internal.search.api.CommerceMLIndexer;
-import com.liferay.commerce.machine.learning.internal.search.index.helper.CommerceMLSearchEngineHelper;
+import com.liferay.commerce.machine.learning.internal.search.index.CommerceMLSearchEngineHelper;
 import com.liferay.portal.search.index.IndexNameBuilder;
 
 import org.osgi.service.component.annotations.Component;
@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = CommerceMLIndexer.class)
+@Component(enabled = false, immediate = true, service = CommerceMLIndexer.class)
 public class ProductContentCommerceMLRecommendationIndexer
 	implements CommerceMLIndexer {
 

@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
-	enabled = false,
+	enabled = false, immediate = true,
 	property = {
 		"panel.app.order:Integer=600",
 		"panel.category.key=" + PanelCategoryKeys.USER_MY_ACCOUNT
@@ -37,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class MySubscriptionPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return MySubscriptionsPortletKeys.MY_SUBSCRIPTIONS;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + MySubscriptionsPortletKeys.MY_SUBSCRIPTIONS + ")"
+		target = "(javax.portlet.name=" + MySubscriptionsPortletKeys.MY_SUBSCRIPTIONS + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

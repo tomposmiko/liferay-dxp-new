@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.GroupCapabilityContributor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Alejandro Tardín
@@ -59,20 +60,19 @@ public class GroupCapabilityUtil {
 		for (GroupCapabilityContributor groupCapabilityContributor :
 				_groupCapabilityContributors) {
 
-			GroupCapability capability =
-				groupCapabilityContributor.getGroupCapability(group);
+			Optional<GroupCapability> capabilityOptional =
+				groupCapabilityContributor.getGroupCapabilityOptional(group);
 
-			if (capability != null) {
-				groupCapabilities.add(capability);
-			}
+			capabilityOptional.ifPresent(groupCapabilities::add);
 		}
 
 		return groupCapabilities;
 	}
 
-	private static final ServiceTrackerList<GroupCapabilityContributor>
-		_groupCapabilityContributors = ServiceTrackerListFactory.open(
-			SystemBundleUtil.getBundleContext(),
-			GroupCapabilityContributor.class);
+	private static final ServiceTrackerList
+		<GroupCapabilityContributor, GroupCapabilityContributor>
+			_groupCapabilityContributors = ServiceTrackerListFactory.open(
+				SystemBundleUtil.getBundleContext(),
+				GroupCapabilityContributor.class);
 
 }

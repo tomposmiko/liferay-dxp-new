@@ -126,10 +126,11 @@ export default function formatXML(content, options = {}) {
 		else if (
 			REGEX_ELEMENT.exec(items[index - 1]) &&
 			REGEX_ELEMENT_CLOSE.exec(item) &&
-			REGEX_ELEMENT_NAMESPACED.exec(items[index - 1]).toString() ===
-				REGEX_ELEMENT_NAMESPACED_CLOSE.exec(item)[0]
-					.replace('/', STR_BLANK)
-					.toString()
+			REGEX_ELEMENT_NAMESPACED.exec(items[index - 1]) ==
+				REGEX_ELEMENT_NAMESPACED_CLOSE.exec(item)[0].replace(
+					'/',
+					STR_BLANK
+				)
 		) {
 			result += item;
 

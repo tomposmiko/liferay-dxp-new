@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -38,8 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoLogModel
-	extends BaseModel<KaleoLog>, CTModel<KaleoLog>, GroupedModel, MVCCModel,
-			ShardedModel {
+	extends BaseModel<KaleoLog>, GroupedModel, MVCCModel, ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -52,7 +50,6 @@ public interface KaleoLogModel
 	 *
 	 * @return the primary key of this kaleo log
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -60,7 +57,6 @@ public interface KaleoLogModel
 	 *
 	 * @param primaryKey the primary key of this kaleo log
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -78,22 +74,6 @@ public interface KaleoLogModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this kaleo log.
-	 *
-	 * @return the ct collection ID of this kaleo log
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this kaleo log.
-	 *
-	 * @param ctCollectionId the ct collection ID of this kaleo log
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the kaleo log ID of this kaleo log.
@@ -577,9 +557,5 @@ public interface KaleoLogModel
 
 	@Override
 	public KaleoLog cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

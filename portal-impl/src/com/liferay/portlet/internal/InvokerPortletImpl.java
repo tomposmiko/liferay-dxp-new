@@ -37,9 +37,11 @@ import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.tools.deploy.PortletDeployer;
 import com.liferay.portlet.InvokerPortletResponse;
 import com.liferay.portlet.InvokerPortletUtil;
 
@@ -118,9 +120,7 @@ public class InvokerPortletImpl
 
 		Class<? extends Portlet> portletClass = portlet.getClass();
 
-		if (ClassUtil.isSubclass(
-				portletClass, "javax.portlet.faces.GenericFacesPortlet")) {
-
+		if (ClassUtil.isSubclass(portletClass, PortletDeployer.JSF_STANDARD)) {
 			facesPortlet = true;
 		}
 		else if (portlet instanceof InvokerPortlet) {
@@ -193,23 +193,15 @@ public class InvokerPortletImpl
 
 	@Override
 	public ClassLoader getPortletClassLoader() {
-		if (_portlet instanceof InvokerPortlet) {
-			InvokerPortlet invokerPortlet = (InvokerPortlet)_portlet;
-
-			return invokerPortlet.getPortletClassLoader();
-		}
-
 		ClassLoader classLoader =
 			(ClassLoader)_liferayPortletContext.getAttribute(
 				PluginContextListener.PLUGIN_CLASS_LOADER);
 
-		if (classLoader != null) {
-			return classLoader;
+		if (classLoader == null) {
+			classLoader = PortalClassLoaderUtil.getClassLoader();
 		}
 
-		Class<?> portletClass = _portlet.getClass();
-
-		return portletClass.getClassLoader();
+		return classLoader;
 	}
 
 	@Override
@@ -539,8 +531,7 @@ public class InvokerPortletImpl
 				INIT_INVOKER_PORTLET_NAME);
 
 			if (invokerPortletName == null) {
-				invokerPortletName = PortalUtil.getJsSafePortletId(
-					_liferayPortletConfig.getPortletName());
+				invokerPortletName = _liferayPortletConfig.getPortletName();
 			}
 
 			String path = StringPool.SLASH + invokerPortletName + "/invoke";

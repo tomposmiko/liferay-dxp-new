@@ -14,23 +14,20 @@
 
 package com.liferay.journal.internal.transformer;
 
-import com.liferay.dynamic.data.mapping.model.Value;
-import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
-import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.XMLUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.templateparser.BaseTransformerListener;
 import com.liferay.portal.kernel.templateparser.TransformerListener;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
@@ -44,7 +41,6 @@ import java.util.Map;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -52,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.journal.configuration.JournalServiceConfiguration",
+	immediate = true,
 	property = "javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 	service = TransformerListener.class
 )
@@ -71,7 +68,7 @@ public class ContentTransformerListener extends BaseTransformerListener {
 			_log.debug("onScript");
 		}
 
-		return _injectEditInPlace(script, document);
+		return injectEditInPlace(script, document);
 	}
 
 	@Override
@@ -82,7 +79,7 @@ public class ContentTransformerListener extends BaseTransformerListener {
 			_log.debug("onXml");
 		}
 
-		replace(document, languageId, tokens);
+		replace(document, tokens);
 
 		return document;
 	}
@@ -94,121 +91,31 @@ public class ContentTransformerListener extends BaseTransformerListener {
 			JournalServiceConfiguration.class, properties);
 	}
 
-	protected void replace(
-		Document document, String languageId, Map<String, String> tokens) {
+	protected String getDynamicContent(Document document, String elementName) {
+		String content = null;
 
 		try {
 			Element rootElement = document.getRootElement();
 
-			long articleGroupId = GetterUtil.getLong(
-				tokens.get("article_group_id"));
+			for (Element element : rootElement.elements()) {
+				String curElementName = element.attributeValue(
+					"name", StringPool.BLANK);
 
-			replace(rootElement, articleGroupId, languageId);
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
-			}
-		}
-	}
+				if (curElementName.equals(elementName)) {
+					content = element.elementText("dynamic-content");
 
-	protected void replace(Element root, long articleGroupId, String languageId)
-		throws Exception {
-
-		for (Element element : root.elements()) {
-			List<Element> dynamicContentElements = element.elements(
-				"dynamic-content");
-
-			for (Element dynamicContentElement : dynamicContentElements) {
-				String text = dynamicContentElement.getText();
-
-				text = _html.stripComments(text);
-				text = _html.stripHtml(text);
-				text = text.trim();
-
-				// [@articleId;elementName@]
-
-				if (Validator.isNotNull(text) && (text.length() >= 7) &&
-					text.startsWith("[@") && text.endsWith("@]")) {
-
-					text = text.substring(2, text.length() - 2);
-
-					int pos = text.indexOf(";");
-
-					if (pos != -1) {
-						String articleId = text.substring(0, pos);
-						String elementName = text.substring(pos + 1);
-
-						dynamicContentElement.clearContent();
-						dynamicContentElement.addCDATA(
-							_getContent(
-								JournalArticleLocalServiceUtil.getArticle(
-									articleGroupId, articleId),
-								elementName, languageId));
-					}
-				}
-				else if ((text != null) &&
-						 text.startsWith("/image/journal/article?img_id")) {
-
-					// Make sure to point images to the full path
-
-					dynamicContentElement.setText(
-						"@cdn_host@@root_path@" + text);
+					break;
 				}
 			}
-
-			replace(element, articleGroupId, languageId);
-		}
-	}
-
-	/**
-	 * Fill one article with content from another approved article. See the
-	 * article DOCUMENTATION-INSTALLATION-BORLAND for a sample use case.
-	 *
-	 * @return the processed string
-	 */
-	protected String replace(
-		String xml, String languageId, Map<String, String> tokens) {
-
-		try {
-			Document document = SAXReaderUtil.read(xml);
-
-			replace(document, languageId, tokens);
-
-			document.formattedString(StringPool.DOUBLE_SPACE);
 		}
 		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
-			}
+			_log.error(exception, exception);
 		}
 
-		return xml;
+		return GetterUtil.getString(content);
 	}
 
-	private String _getContent(
-		JournalArticle article, String elementName, String languageId) {
-
-		DDMFormValues ddmFormValues = article.getDDMFormValues();
-
-		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
-			ddmFormValues.getDDMFormFieldValuesMap(true);
-
-		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
-			elementName);
-
-		if (ddmFormFieldValues.isEmpty()) {
-			return null;
-		}
-
-		DDMFormFieldValue ddmFormFieldValue = ddmFormFieldValues.get(0);
-
-		Value value = ddmFormFieldValue.getValue();
-
-		return value.getString(_language.getLocale(languageId));
-	}
-
-	private String _injectEditInPlace(String script, Document document) {
+	protected String injectEditInPlace(String script, Document document) {
 		if (!script.contains("$editInPlace(")) {
 			return script;
 		}
@@ -228,22 +135,110 @@ public class ContentTransformerListener extends BaseTransformerListener {
 					(type.equals("text") || type.equals("text_area") ||
 					 type.equals("text_box"))) {
 
-					script = _wrapEditInPlaceField(script, name, type, "data");
-					script = _wrapEditInPlaceField(
+					script = wrapEditInPlaceField(script, name, type, "data");
+					script = wrapEditInPlaceField(
 						script, name, type, "getData()");
 				}
 			}
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception.getMessage());
 			}
 		}
 
 		return script;
 	}
 
-	private String _wrapEditInPlaceField(
+	protected void replace(Document document, Map<String, String> tokens) {
+		try {
+			Element rootElement = document.getRootElement();
+
+			long articleGroupId = GetterUtil.getLong(
+				tokens.get("article_group_id"));
+
+			replace(rootElement, articleGroupId);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception.getMessage());
+			}
+		}
+	}
+
+	protected void replace(Element root, long articleGroupId) throws Exception {
+		for (Element element : root.elements()) {
+			List<Element> dynamicContentElements = element.elements(
+				"dynamic-content");
+
+			for (Element dynamicContentElement : dynamicContentElements) {
+				String text = dynamicContentElement.getText();
+
+				text = HtmlUtil.stripComments(text);
+				text = HtmlUtil.stripHtml(text);
+				text = text.trim();
+
+				// [@articleId;elementName@]
+
+				if (Validator.isNotNull(text) && (text.length() >= 7) &&
+					text.startsWith("[@") && text.endsWith("@]")) {
+
+					text = text.substring(2, text.length() - 2);
+
+					int pos = text.indexOf(";");
+
+					if (pos != -1) {
+						String articleId = text.substring(0, pos);
+						String elementName = text.substring(pos + 1);
+
+						JournalArticle article =
+							JournalArticleLocalServiceUtil.getArticle(
+								articleGroupId, articleId);
+
+						dynamicContentElement.clearContent();
+						dynamicContentElement.addCDATA(
+							getDynamicContent(
+								article.getDocument(), elementName));
+					}
+				}
+				else if ((text != null) &&
+						 text.startsWith("/image/journal/article?img_id")) {
+
+					// Make sure to point images to the full path
+
+					dynamicContentElement.setText(
+						"@cdn_host@@root_path@" + text);
+				}
+			}
+
+			replace(element, articleGroupId);
+		}
+	}
+
+	/**
+	 * Fill one article with content from another approved article. See the
+	 * article DOCUMENTATION-INSTALLATION-BORLAND for a sample use case.
+	 *
+	 * @return the processed string
+	 */
+	protected String replace(String xml, Map<String, String> tokens) {
+		try {
+			Document document = SAXReaderUtil.read(xml);
+
+			replace(document, tokens);
+
+			xml = XMLUtil.formatXML(document);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception.getMessage());
+			}
+		}
+
+		return xml;
+	}
+
+	protected String wrapEditInPlaceField(
 		String script, String name, String type, String call) {
 
 		String field = StringBundler.concat("$", name, ".", call);
@@ -259,12 +254,6 @@ public class ContentTransformerListener extends BaseTransformerListener {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ContentTransformerListener.class);
 
-	@Reference
-	private Html _html;
-
 	private volatile JournalServiceConfiguration _journalServiceConfiguration;
-
-	@Reference
-	private Language _language;
 
 }

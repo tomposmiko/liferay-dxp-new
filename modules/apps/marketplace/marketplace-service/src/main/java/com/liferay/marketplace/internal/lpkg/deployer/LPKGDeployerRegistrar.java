@@ -57,7 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shuyang Zhou
  * @author Ryan Park
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class LPKGDeployerRegistrar {
 
 	@Activate
@@ -66,10 +66,6 @@ public class LPKGDeployerRegistrar {
 
 		Map<Bundle, List<Bundle>> deployedLPKGBundles =
 			_lpkgDeployer.getDeployedLPKGBundles();
-
-		if (deployedLPKGBundles.isEmpty()) {
-			return;
-		}
 
 		Map<Long, App> apps = new HashMap<>();
 
@@ -100,6 +96,13 @@ public class LPKGDeployerRegistrar {
 	@Deactivate
 	protected void deactivate(BundleContext bundleContext) {
 		bundleContext.removeBundleListener(_bundleListener);
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.marketplace.service)(release.schema.version=2.0.3))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	private void _doRegister(
@@ -258,11 +261,6 @@ public class LPKGDeployerRegistrar {
 
 	@Reference
 	private ModuleLocalService _moduleLocalService;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.marketplace.service)(release.schema.version=2.0.3))"
-	)
-	private Release _release;
 
 	private static class Tuple {
 

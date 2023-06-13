@@ -29,10 +29,6 @@ public class SystemEventLocalServiceWrapper
 	implements ServiceWrapper<SystemEventLocalService>,
 			   SystemEventLocalService {
 
-	public SystemEventLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SystemEventLocalServiceWrapper(
 		SystemEventLocalService systemEventLocalService) {
 

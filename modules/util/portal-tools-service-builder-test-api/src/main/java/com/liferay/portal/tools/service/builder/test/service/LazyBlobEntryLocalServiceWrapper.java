@@ -27,10 +27,6 @@ public class LazyBlobEntryLocalServiceWrapper
 	implements LazyBlobEntryLocalService,
 			   ServiceWrapper<LazyBlobEntryLocalService> {
 
-	public LazyBlobEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LazyBlobEntryLocalServiceWrapper(
 		LazyBlobEntryLocalService lazyBlobEntryLocalService) {
 

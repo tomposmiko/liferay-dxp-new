@@ -55,7 +55,7 @@ public interface OrgLabor extends OrgLaborModel, PersistedModel {
 
 		};
 
-	public ListType getListType()
+	public ListType getType()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 }

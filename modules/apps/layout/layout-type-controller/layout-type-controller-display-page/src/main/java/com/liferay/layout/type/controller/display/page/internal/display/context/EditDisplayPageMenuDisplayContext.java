@@ -21,16 +21,19 @@ import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -49,14 +52,14 @@ public class EditDisplayPageMenuDisplayContext {
 		_layoutDisplayPageObjectProvider =
 			(LayoutDisplayPageObjectProvider<?>)httpServletRequest.getAttribute(
 				LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER);
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
 	public List<DropdownItem> getDropdownItems() {
 		UnsafeConsumer<DropdownItem, Exception>
 			editURLDropdownItemUnsafeConsumer =
-				_getEditURLDropdownItemUnsafeConsumer(_infoEditURLProvider);
+				getEditURLDropdownItemUnsafeConsumer(_infoEditURLProvider);
 
 		return DropdownItemListBuilder.add(
 			() -> editURLDropdownItemUnsafeConsumer != null,
@@ -66,30 +69,33 @@ public class EditDisplayPageMenuDisplayContext {
 				_themeDisplay.getPermissionChecker(), _themeDisplay.getLayout(),
 				ActionKeys.UPDATE),
 			dropdownItem -> {
-				String editLayoutURL = PortalUtil.getLayoutFullURL(
-					LayoutLocalServiceUtil.fetchDraftLayout(
-						_themeDisplay.getPlid()),
-					_themeDisplay);
+				Layout draftLayout = LayoutLocalServiceUtil.fetchDraftLayout(
+					_themeDisplay.getPlid());
 
-				editLayoutURL = HttpComponentsUtil.setParameter(
+				String editLayoutURL = PortalUtil.getLayoutFullURL(
+					draftLayout, _themeDisplay);
+
+				editLayoutURL = HttpUtil.setParameter(
 					editLayoutURL, "p_l_back_url",
 					_themeDisplay.getURLCurrent());
 
-				editLayoutURL = HttpComponentsUtil.setParameter(
+				editLayoutURL = HttpUtil.setParameter(
 					editLayoutURL, "p_l_mode", Constants.EDIT);
 
 				dropdownItem.setHref(editLayoutURL);
 
+				ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+					"content.Language", _themeDisplay.getLocale(), getClass());
+
 				dropdownItem.setLabel(
 					LanguageUtil.get(
-						_themeDisplay.getLocale(),
-						"edit-display-page-template"));
+						resourceBundle, "edit-display-page-template"));
 			}
 		).build();
 	}
 
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getEditURLDropdownItemUnsafeConsumer(
+	protected UnsafeConsumer<DropdownItem, Exception>
+		getEditURLDropdownItemUnsafeConsumer(
 			InfoEditURLProvider<Object> infoEditURLProvider) {
 
 		if (infoEditURLProvider == null) {

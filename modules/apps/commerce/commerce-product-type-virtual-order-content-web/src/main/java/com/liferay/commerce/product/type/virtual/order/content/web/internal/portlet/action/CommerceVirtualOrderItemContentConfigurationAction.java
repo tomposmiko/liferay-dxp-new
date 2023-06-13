@@ -14,12 +14,12 @@
 
 package com.liferay.commerce.product.type.virtual.order.content.web.internal.portlet.action;
 
+import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.type.virtual.order.constants.CommerceVirtualOrderPortletKeys;
 import com.liferay.commerce.product.type.virtual.order.content.web.internal.display.context.CommerceVirtualOrderItemContentDisplayContext;
-import com.liferay.commerce.product.type.virtual.order.content.web.internal.security.resource.permission.CommerceVirtualOrderItemPermission;
 import com.liferay.commerce.product.type.virtual.order.service.CommerceVirtualOrderItemLocalService;
-import com.liferay.commerce.product.type.virtual.service.CPDefinitionVirtualSettingLocalService;
+import com.liferay.commerce.product.type.virtual.service.CPDefinitionVirtualSettingService;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.product.util.CPInstanceHelper;
 import com.liferay.portal.kernel.log.Log;
@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "javax.portlet.name=" + CommerceVirtualOrderPortletKeys.COMMERCE_VIRTUAL_ORDER_ITEM_CONTENT,
 	service = ConfigurationAction.class
 )
@@ -63,24 +65,35 @@ public class CommerceVirtualOrderItemContentConfigurationAction
 					new CommerceVirtualOrderItemContentDisplayContext(
 						_commerceChannelLocalService,
 						_commerceVirtualOrderItemLocalService,
-						_commerceVirtualOrderItemPermission,
-						_cpDefinitionHelper,
-						_cpDefinitionVirtualSettingLocalService,
-						_cpInstanceHelper, httpServletRequest);
+						_cpDefinitionHelper, _commerceAccountHelper,
+						_cpDefinitionVirtualSettingService, _cpInstanceHelper,
+						httpServletRequest);
 
 			httpServletRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
 				commerceVirtualOrderItemContentDisplayContext);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.type.virtual.order.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceVirtualOrderItemContentConfigurationAction.class);
+
+	@Reference
+	private CommerceAccountHelper _commerceAccountHelper;
 
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
@@ -90,15 +103,11 @@ public class CommerceVirtualOrderItemContentConfigurationAction
 		_commerceVirtualOrderItemLocalService;
 
 	@Reference
-	private CommerceVirtualOrderItemPermission
-		_commerceVirtualOrderItemPermission;
-
-	@Reference
 	private CPDefinitionHelper _cpDefinitionHelper;
 
 	@Reference
-	private CPDefinitionVirtualSettingLocalService
-		_cpDefinitionVirtualSettingLocalService;
+	private CPDefinitionVirtualSettingService
+		_cpDefinitionVirtualSettingService;
 
 	@Reference
 	private CPInstanceHelper _cpInstanceHelper;

@@ -16,24 +16,20 @@ package com.liferay.style.book.web.internal.display.context;
 
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.style.book.constants.StyleBookActionKeys;
-import com.liferay.style.book.constants.StyleBookPortletKeys;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.StyleBookEntryLocalServiceUtil;
 import com.liferay.style.book.util.comparator.StyleBookEntryCreateDateComparator;
 import com.liferay.style.book.util.comparator.StyleBookEntryNameComparator;
 import com.liferay.style.book.web.internal.security.permissions.resource.StyleBookPermission;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -97,48 +93,13 @@ public class StyleBookDisplayContext {
 				"there-are-no-style-books");
 
 		styleBookEntriesSearchContainer.setOrderByCol(_getOrderByCol());
-		styleBookEntriesSearchContainer.setOrderByComparator(
-			_getStyleBookEntryOrderByComparator());
+
+		OrderByComparator<StyleBookEntry> orderByComparator =
+			_getStyleBookEntryOrderByComparator();
+
+		styleBookEntriesSearchContainer.setOrderByComparator(orderByComparator);
+
 		styleBookEntriesSearchContainer.setOrderByType(_getOrderByType());
-
-		if (_isSearch()) {
-			styleBookEntriesSearchContainer.setResultsAndTotal(
-				() -> StyleBookEntryLocalServiceUtil.getStyleBookEntries(
-					themeDisplay.getScopeGroupId(), _getKeywords(),
-					styleBookEntriesSearchContainer.getStart(),
-					styleBookEntriesSearchContainer.getEnd(),
-					styleBookEntriesSearchContainer.getOrderByComparator()),
-				StyleBookEntryLocalServiceUtil.getStyleBookEntriesCount(
-					themeDisplay.getScopeGroupId(), _getKeywords()));
-		}
-		else {
-			List<StyleBookEntry> styleBookEntries = new ArrayList<>();
-
-			int styleBookEntriesCount =
-				StyleBookEntryLocalServiceUtil.getStyleBookEntriesCount(
-					themeDisplay.getScopeGroupId());
-
-			int start = styleBookEntriesSearchContainer.getStart();
-			int end = styleBookEntriesSearchContainer.getEnd();
-
-			if (start == 0) {
-				end -= 1;
-				styleBookEntries.add(
-					_getStyleFromThemeStyleBookEntry(
-						themeDisplay.getScopeGroupId()));
-			}
-			else {
-				start -= 1;
-			}
-
-			styleBookEntries.addAll(
-				StyleBookEntryLocalServiceUtil.getStyleBookEntries(
-					themeDisplay.getScopeGroupId(), start, end,
-					styleBookEntriesSearchContainer.getOrderByComparator()));
-
-			styleBookEntriesSearchContainer.setResultsAndTotal(
-				() -> styleBookEntries, styleBookEntriesCount + 1);
-		}
 
 		if (StyleBookPermission.contains(
 				themeDisplay.getPermissionChecker(),
@@ -148,6 +109,37 @@ public class StyleBookDisplayContext {
 			styleBookEntriesSearchContainer.setRowChecker(
 				new EmptyOnClickRowChecker(_liferayPortletResponse));
 		}
+
+		List<StyleBookEntry> styleBookEntries = null;
+		int styleBookEntriesCount = 0;
+
+		if (_isSearch()) {
+			styleBookEntries =
+				StyleBookEntryLocalServiceUtil.getStyleBookEntries(
+					themeDisplay.getScopeGroupId(), _getKeywords(),
+					styleBookEntriesSearchContainer.getStart(),
+					styleBookEntriesSearchContainer.getEnd(),
+					orderByComparator);
+
+			styleBookEntriesCount =
+				StyleBookEntryLocalServiceUtil.getStyleBookEntriesCount(
+					themeDisplay.getScopeGroupId(), _getKeywords());
+		}
+		else {
+			styleBookEntries =
+				StyleBookEntryLocalServiceUtil.getStyleBookEntries(
+					themeDisplay.getScopeGroupId(),
+					styleBookEntriesSearchContainer.getStart(),
+					styleBookEntriesSearchContainer.getEnd(),
+					orderByComparator);
+
+			styleBookEntriesCount =
+				StyleBookEntryLocalServiceUtil.getStyleBookEntriesCount(
+					themeDisplay.getScopeGroupId());
+		}
+
+		styleBookEntriesSearchContainer.setResults(styleBookEntries);
+		styleBookEntriesSearchContainer.setTotal(styleBookEntriesCount);
 
 		_styleBookEntriesSearchContainer = styleBookEntriesSearchContainer;
 
@@ -169,9 +161,8 @@ public class StyleBookDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, StyleBookPortletKeys.STYLE_BOOK,
-			"create-date");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}
@@ -181,8 +172,8 @@ public class StyleBookDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, StyleBookPortletKeys.STYLE_BOOK, "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -207,26 +198,6 @@ public class StyleBookDisplayContext {
 		}
 
 		return orderByComparator;
-	}
-
-	private StyleBookEntry _getStyleFromThemeStyleBookEntry(long groupId) {
-		StyleBookEntry styleFromThemeStyleBookEntry =
-			StyleBookEntryLocalServiceUtil.create();
-
-		styleFromThemeStyleBookEntry.setHeadId(-1);
-		styleFromThemeStyleBookEntry.setStyleBookEntryId(0);
-		styleFromThemeStyleBookEntry.setGroupId(groupId);
-		styleFromThemeStyleBookEntry.setName(
-			LanguageUtil.get(_httpServletRequest, "styles-from-theme"));
-
-		StyleBookEntry defaultStyleBookEntry =
-			StyleBookEntryLocalServiceUtil.fetchDefaultStyleBookEntry(groupId);
-
-		if (defaultStyleBookEntry == null) {
-			styleFromThemeStyleBookEntry.setDefaultStyleBookEntry(true);
-		}
-
-		return styleFromThemeStyleBookEntry;
 	}
 
 	private boolean _isSearch() {

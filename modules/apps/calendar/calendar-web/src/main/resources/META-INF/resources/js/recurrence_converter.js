@@ -15,35 +15,35 @@
 AUI.add(
 	'liferay-calendar-recurrence-converter',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const LString = Lang.String;
+		var LString = Lang.String;
 
-		const EXDATE = 'EXDATE';
+		var EXDATE = 'EXDATE';
 
-		const RRULE = 'RRULE';
+		var RRULE = 'RRULE';
 
-		const STR_COLON = ':';
+		var STR_COLON = ':';
 
-		const STR_COMMA = ',';
+		var STR_COMMA = ',';
 
-		const STR_EMPTY = '';
+		var STR_EMPTY = '';
 
-		const STR_EQUALS = '=';
+		var STR_EQUALS = '=';
 
-		const STR_SEMICOLON = ';';
+		var STR_SEMICOLON = ';';
 
-		const WEEKLY = 'WEEKLY';
+		var WEEKLY = 'WEEKLY';
 
-		const padNumber = A.rbind('padNumber', LString, 2);
+		var padNumber = A.rbind('padNumber', LString, 2);
 
-		const RecurrenceConverter = function () {};
+		var RecurrenceConverter = function () {};
 
 		A.mix(RecurrenceConverter.prototype, {
 			_encode(value) {
-				const instance = this;
+				var instance = this;
 
-				let result = value;
+				var result = value;
 
 				if (Lang.isDate(value)) {
 					result = instance._encodeDate(value);
@@ -59,8 +59,8 @@ AUI.add(
 			},
 
 			_encodeDate(date) {
-				const day = padNumber(date.getDate());
-				const month = padNumber(date.getMonth() + 1);
+				var day = padNumber(date.getDate());
+				var month = padNumber(date.getMonth() + 1);
 
 				return [date.getFullYear(), month, day].join(STR_EMPTY);
 			},
@@ -76,10 +76,9 @@ AUI.add(
 			},
 
 			_encodeRRule(rrule) {
-				const instance = this;
+				var instance = this;
 
-				// eslint-disable-next-line @liferay/aui/no-object
-				const components = A.Object.map(rrule, (item, index) => {
+				var components = A.Object.map(rrule, (item, index) => {
 					return (
 						index.toUpperCase() +
 						STR_EQUALS +
@@ -87,7 +86,7 @@ AUI.add(
 					);
 				});
 
-				let string = '';
+				var string = '';
 
 				if (components.length) {
 					string = RRULE + STR_COLON + components.join(STR_SEMICOLON);
@@ -97,17 +96,17 @@ AUI.add(
 			},
 
 			_parseDate(string) {
-				const year = Lang.toInt(string.slice(0, 4));
+				var year = Lang.toInt(string.slice(0, 4));
 
-				const month = Lang.toInt(string.slice(4, 6)) - 1;
+				var month = Lang.toInt(string.slice(4, 6)) - 1;
 
-				const day = Lang.toInt(string.slice(6, 8));
+				var day = Lang.toInt(string.slice(6, 8));
 
 				return new Date(year, month, day);
 			},
 
 			_parseExDate(string) {
-				let exDate = null;
+				var exDate = null;
 
 				if (
 					string &&
@@ -120,9 +119,9 @@ AUI.add(
 			},
 
 			_parsePositionalByDay(string) {
-				const position = string.slice(0, -2);
+				var position = string.slice(0, -2);
 
-				const dayOfWeek = string.slice(-2);
+				var dayOfWeek = string.slice(-2);
 
 				return {
 					dayOfWeek,
@@ -131,19 +130,19 @@ AUI.add(
 			},
 
 			_parseRRule(string) {
-				const instance = this;
+				var instance = this;
 
-				let rrule = null;
+				var rrule = null;
 
 				if (string && LString.startsWith(string, RRULE + STR_COLON)) {
 					string = string.slice(6);
 
-					const params = string.split(STR_SEMICOLON);
+					var params = string.split(STR_SEMICOLON);
 
 					rrule = {};
 
-					for (const i in params) {
-						const pair = params[i].split(STR_EQUALS);
+					for (var i in params) {
+						var pair = params[i].split(STR_EQUALS);
 
 						rrule[pair[0].toLowerCase()] = pair[1];
 					}
@@ -178,12 +177,12 @@ AUI.add(
 			},
 
 			encodeRecurrence(recurrence) {
-				const instance = this;
+				var instance = this;
 
-				let string = null;
+				var string = null;
 
 				if (recurrence) {
-					const components = [];
+					var components = [];
 
 					components.push(instance._encodeRRule(recurrence.rrule));
 
@@ -200,21 +199,21 @@ AUI.add(
 			},
 
 			parseRecurrence(string) {
-				const instance = this;
+				var instance = this;
 
-				let recurrence = null;
+				var recurrence = null;
 
 				if (string) {
-					const parts = string.split('\n');
+					var parts = string.split('\n');
 
-					const rrule = instance._parseRRule(parts[0]);
+					var rrule = instance._parseRRule(parts[0]);
 
 					if (rrule) {
 						recurrence = {
 							rrule,
 						};
 
-						const exdate = instance._parseExDate(parts[1]);
+						var exdate = instance._parseExDate(parts[1]);
 
 						if (exdate) {
 							recurrence.exdate = exdate;

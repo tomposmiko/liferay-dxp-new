@@ -36,9 +36,6 @@ public class CPDefinitionLocalizationTable
 	public final Column<CPDefinitionLocalizationTable, Long> mvccVersion =
 		createColumn(
 			"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<CPDefinitionLocalizationTable, Long> ctCollectionId =
-		createColumn(
-			"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<CPDefinitionLocalizationTable, Long>
 		cpDefinitionLocalizationId = createColumn(
 			"cpDefinitionLocalizationId", Long.class, Types.BIGINT,

@@ -71,7 +71,7 @@ public class MBMessageUtil {
 		return messages;
 	}
 
-	public static MBMessage updateAnswer(
+	public static void updateAnswer(
 		MBMessagePersistence mbMessagePersistence, MBMessage message,
 		boolean answer, boolean cascade) {
 
@@ -89,8 +89,6 @@ public class MBMessageUtil {
 				updateAnswer(mbMessagePersistence, curMessage, answer, cascade);
 			}
 		}
-
-		return message;
 	}
 
 	private MBMessageUtil() {

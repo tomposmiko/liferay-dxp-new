@@ -16,8 +16,6 @@ package com.liferay.source.formatter.parser;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +28,11 @@ public class JavaSignature {
 
 	public void addParameter(
 		String parameterName, String parameterType,
-		Set<String> parameterAnnotations, boolean isFinal, String packageName,
-		List<String> importNames) {
+		Set<String> parameterAnnotations, boolean isFinal) {
 
 		_parameters.add(
 			new JavaParameter(
-				parameterName,
-				new JavaClassType(parameterType, packageName, importNames),
-				parameterAnnotations, isFinal));
+				parameterName, parameterType, parameterAnnotations, isFinal));
 	}
 
 	public List<JavaParameter> getParameters() {
@@ -45,38 +40,21 @@ public class JavaSignature {
 	}
 
 	public String getReturnType() {
-		return getReturnType(false);
+		return _returnType;
 	}
 
-	public String getReturnType(boolean fullyQualifiedName) {
-		if (_returnType != null) {
-			return _returnType.toString(fullyQualifiedName);
-		}
-
-		return StringPool.BLANK;
-	}
-
-	public void setReturnType(
-		String returnTypeString, String packageName, List<String> importNames) {
-
-		if (Validator.isNotNull(returnTypeString)) {
-			_returnType = new JavaClassType(
-				returnTypeString, packageName, importNames);
-		}
+	public void setReturnType(String returnType) {
+		_returnType = returnType;
 	}
 
 	@Override
 	public String toString() {
-		return toString(false);
-	}
-
-	public String toString(boolean fullyQualifiedName) {
 		StringBundler sb = new StringBundler((_parameters.size() * 2) + 1);
 
 		sb.append(CharPool.OPEN_PARENTHESIS);
 
 		for (JavaParameter parameter : _parameters) {
-			sb.append(parameter.getParameterType(fullyQualifiedName));
+			sb.append(parameter.getParameterType());
 			sb.append(CharPool.COMMA);
 		}
 
@@ -90,6 +68,6 @@ public class JavaSignature {
 	}
 
 	private final List<JavaParameter> _parameters = new ArrayList<>();
-	private JavaClassType _returnType;
+	private String _returnType;
 
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.segments.simulation.web.internal.simulator;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
@@ -26,6 +25,7 @@ import com.liferay.segments.simulator.SegmentsEntrySimulator;
 
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.User",
 	service = SegmentsEntrySimulator.class
 )
@@ -61,11 +62,13 @@ public class PortalPreferencesUserSegmentsEntrySimulator
 						concurrentModificationException) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(concurrentModificationException);
+					_log.debug(
+						concurrentModificationException,
+						concurrentModificationException);
 				}
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				break;
 			}
@@ -85,8 +88,11 @@ public class PortalPreferencesUserSegmentsEntrySimulator
 			return new long[0];
 		}
 
-		return TransformUtil.transformToLongArray(
-			Arrays.asList(simulatedSegmentsEntryIds), Long::parseLong);
+		Stream<String> stream = Arrays.stream(simulatedSegmentsEntryIds);
+
+		return stream.mapToLong(
+			Long::valueOf
+		).toArray();
 	}
 
 	@Override
@@ -123,11 +129,13 @@ public class PortalPreferencesUserSegmentsEntrySimulator
 						concurrentModificationException) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(concurrentModificationException);
+					_log.debug(
+						concurrentModificationException,
+						concurrentModificationException);
 				}
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				break;
 			}

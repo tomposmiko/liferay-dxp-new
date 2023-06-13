@@ -71,8 +71,9 @@ public class ProjectTemplatesModulesExtTest
 
 		File workspaceProjectDir = buildTemplateWithGradle(
 			new File(workspaceDir, "ext"), "modules-ext", "loginExt",
-			"--dependency-management-enabled", "--original-module-name",
-			"com.liferay.login.web", "--original-module-version", "1.0.0");
+			"--original-module-name", "com.liferay.login.web",
+			"--original-module-version", "1.0.0",
+			"--dependency-management-enabled");
 
 		writeGradlePropertiesInWorkspace(
 			workspaceDir, "liferay.workspace.product=portal-7.3-ga7");

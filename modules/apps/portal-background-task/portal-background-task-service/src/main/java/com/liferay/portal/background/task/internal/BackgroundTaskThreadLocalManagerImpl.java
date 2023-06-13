@@ -17,14 +17,12 @@ package com.liferay.portal.background.task.internal;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocalManager;
 import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
@@ -44,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = BackgroundTaskThreadLocalManager.class)
+@Component(immediate = true, service = BackgroundTaskThreadLocalManager.class)
 public class BackgroundTaskThreadLocalManagerImpl
 	implements BackgroundTaskThreadLocalManager {
 
@@ -110,7 +108,7 @@ public class BackgroundTaskThreadLocalManagerImpl
 		long companyId = GetterUtil.getLong(threadLocalValues.get("companyId"));
 
 		if (companyId > 0) {
-			CompanyThreadLocal.setCompanyId(_requireCompany(companyId));
+			CompanyThreadLocal.setCompanyId(requireCompany(companyId));
 		}
 
 		Boolean clusterInvoke = (Boolean)threadLocalValues.get("clusterInvoke");
@@ -128,26 +126,20 @@ public class BackgroundTaskThreadLocalManagerImpl
 		long groupId = GetterUtil.getLong(threadLocalValues.get("groupId"));
 
 		if (groupId > 0) {
-			Group group = _groupLocalService.fetchGroup(groupId);
-
-			if ((group != null) && (group.getCompanyId() == companyId)) {
-				GroupThreadLocal.setGroupId(groupId);
-			}
+			GroupThreadLocal.setGroupId(groupId);
 		}
 
 		String principalName = GetterUtil.getString(
 			threadLocalValues.get("principalName"));
 
 		if (Validator.isNotNull(principalName)) {
+			PrincipalThreadLocal.setName(principalName);
+
 			User user = _userLocalService.fetchUser(
-				GetterUtil.getLong(principalName));
+				PrincipalThreadLocal.getUserId());
 
-			if ((user != null) && (user.getCompanyId() == companyId)) {
-				PrincipalThreadLocal.setName(principalName);
-
-				PermissionThreadLocal.setPermissionChecker(
-					_permissionCheckerFactory.create(user));
-			}
+			PermissionThreadLocal.setPermissionChecker(
+				_permissionCheckerFactory.create(user));
 		}
 
 		Locale siteDefaultLocale = (Locale)threadLocalValues.get(
@@ -165,12 +157,7 @@ public class BackgroundTaskThreadLocalManagerImpl
 		}
 	}
 
-	protected static final String KEY_THREAD_LOCAL_VALUES = "threadLocalValues";
-
-	@Reference
-	protected CompanyLocalService companyLocalService;
-
-	private long _requireCompany(long companyId) {
+	protected long requireCompany(long companyId) {
 		Company company = companyLocalService.fetchCompany(companyId);
 
 		if (company != null) {
@@ -181,13 +168,24 @@ public class BackgroundTaskThreadLocalManagerImpl
 			"Unable to find company " + companyId);
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
+	@Reference(unbind = "-")
+	protected void setPermissionCheckerFactory(
+		PermissionCheckerFactory permissionCheckerFactory) {
+
+		_permissionCheckerFactory = permissionCheckerFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	protected static final String KEY_THREAD_LOCAL_VALUES = "threadLocalValues";
 
 	@Reference
+	protected CompanyLocalService companyLocalService;
+
 	private PermissionCheckerFactory _permissionCheckerFactory;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

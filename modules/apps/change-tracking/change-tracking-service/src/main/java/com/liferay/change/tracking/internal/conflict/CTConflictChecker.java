@@ -309,10 +309,8 @@ public class CTConflictChecker<T extends CTModel<T>> {
 					" and CTEntry.modelClassNameId = ", _modelClassNameId,
 					" and CTEntry.changeType = ",
 					CTConstants.CT_CHANGE_TYPE_DELETION,
-					" and (publication.ctCollectionId = ",
-					_targetCTCollectionId, " or publication.ctCollectionId = ",
-					CTConstants.CT_COLLECTION_ID_PRODUCTION,
-					") and CTEntry.modelMvccVersion != ",
+					" and publication.ctCollectionId = ", _targetCTCollectionId,
+					" and CTEntry.modelMvccVersion != ",
 					"publication.mvccVersion"));
 			ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -514,13 +512,11 @@ public class CTConflictChecker<T extends CTModel<T>> {
 				StringBundler.concat(
 					"select CTEntry.modelClassPK from CTEntry left join ",
 					ctPersistence.getTableName(), " publication on ",
-					"publication.", primaryKeyName, " = CTEntry.modelClassPK ",
-					"and (publication.ctCollectionId = ", _targetCTCollectionId,
-					" or publication.ctCollectionId = ",
-					CTConstants.CT_COLLECTION_ID_PRODUCTION,
-					") where CTEntry.ctCollectionId = ", _sourceCTCollectionId,
-					" and CTEntry.modelClassNameId = ", _modelClassNameId,
-					" and CTEntry.changeType = ",
+					"publication.", primaryKeyName,
+					" = CTEntry.modelClassPK and publication.ctCollectionId = ",
+					_targetCTCollectionId, " where CTEntry.ctCollectionId = ",
+					_sourceCTCollectionId, " and CTEntry.modelClassNameId = ",
+					_modelClassNameId, " and CTEntry.changeType = ",
 					CTConstants.CT_CHANGE_TYPE_MODIFICATION, " and ",
 					"publication.", primaryKeyName, " is null"));
 			ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -570,19 +566,9 @@ public class CTConflictChecker<T extends CTModel<T>> {
 						"ctCollectionId", Long.class);
 
 					if (ctCollectionIdColumn != null) {
-						if (_targetCTCollectionId ==
-								CTConstants.CT_COLLECTION_ID_PRODUCTION) {
-
-							return ctCollectionIdColumn.in(
-								new Long[] {
-									_sourceCTCollectionId, _targetCTCollectionId
-								});
-						}
-
 						return ctCollectionIdColumn.in(
 							new Long[] {
-								_sourceCTCollectionId, _targetCTCollectionId,
-								CTConstants.CT_COLLECTION_ID_PRODUCTION
+								_sourceCTCollectionId, _targetCTCollectionId
 							});
 					}
 
@@ -934,6 +920,7 @@ public class CTConflictChecker<T extends CTModel<T>> {
 				CTEntry ctEntry = _modificationCTEntries.get(pk);
 
 				ctEntry.setModifiedDate(ctEntry.getModifiedDate());
+
 				ctEntry.setModelMvccVersion(mvccVersion);
 
 				_ctEntryLocalService.updateCTEntry(ctEntry);

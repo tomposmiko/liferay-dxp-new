@@ -81,7 +81,7 @@ public abstract class JSONAction implements Action {
 			}
 		}
 		catch (PrincipalException principalException) {
-			_log.error(principalException);
+			_log.error(principalException.getMessage());
 
 			PortalUtil.sendError(
 				HttpServletResponse.SC_FORBIDDEN, principalException,
@@ -91,7 +91,7 @@ public abstract class JSONAction implements Action {
 		}
 		catch (SecurityException securityException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(securityException);
+				_log.warn(securityException.getMessage());
 			}
 
 			if (PropsValues.JSON_SERVICE_SERIALIZE_THROWABLE) {
@@ -106,7 +106,7 @@ public abstract class JSONAction implements Action {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception.getMessage());
 
 			PortalUtil.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception,

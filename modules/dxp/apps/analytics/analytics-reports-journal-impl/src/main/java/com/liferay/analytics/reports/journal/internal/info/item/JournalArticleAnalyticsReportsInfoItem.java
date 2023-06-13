@@ -19,22 +19,25 @@ import com.liferay.analytics.reports.layout.display.page.info.item.LayoutDisplay
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.type.WebImage;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,24 +57,24 @@ public class JournalArticleAnalyticsReportsInfoItem
 
 	@Override
 	public String getAuthorName(JournalArticle journalArticle) {
-		User user = _getUser(journalArticle);
-
-		if (user == null) {
-			return StringPool.BLANK;
-		}
-
-		return user.getFullName();
+		return _getUser(
+			journalArticle
+		).map(
+			User::getFullName
+		).orElse(
+			StringPool.BLANK
+		);
 	}
 
 	@Override
 	public long getAuthorUserId(JournalArticle journalArticle) {
-		User user = _getUser(journalArticle);
-
-		if (user == null) {
-			return 0L;
-		}
-
-		return user.getUserId();
+		return _getUser(
+			journalArticle
+		).map(
+			User::getUserId
+		).orElse(
+			0L
+		);
 	}
 
 	@Override
@@ -79,7 +82,7 @@ public class JournalArticleAnalyticsReportsInfoItem
 		JournalArticle journalArticle, Locale locale) {
 
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class,
 				JournalArticle.class.getName());
 
@@ -138,7 +141,7 @@ public class JournalArticleAnalyticsReportsInfoItem
 		_getLayoutDisplayPageObjectProvider(JournalArticle journalArticle) {
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			_layoutDisplayPageProviderRegistry.
+			_layoutDisplayPageProviderTracker.
 				getLayoutDisplayPageProviderByClassName(
 					JournalArticle.class.getName());
 
@@ -153,20 +156,18 @@ public class JournalArticleAnalyticsReportsInfoItem
 					journalArticle.getResourcePrimKey()));
 	}
 
-	private User _getUser(JournalArticle journalArticle) {
-		JournalArticle latestArticle =
+	private Optional<User> _getUser(JournalArticle journalArticle) {
+		return Optional.ofNullable(
 			_journalArticleLocalService.fetchLatestArticle(
-				journalArticle.getResourcePrimKey());
-
-		if (latestArticle == null) {
-			return null;
-		}
-
-		return _userLocalService.fetchUser(latestArticle.getUserId());
+				journalArticle.getResourcePrimKey())
+		).map(
+			latestArticle -> _userLocalService.fetchUser(
+				latestArticle.getUserId())
+		);
 	}
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
@@ -176,8 +177,13 @@ public class JournalArticleAnalyticsReportsInfoItem
 		_layoutDisplayPageObjectProviderAnalyticsReportsInfoItem;
 
 	@Reference
-	private LayoutDisplayPageProviderRegistry
-		_layoutDisplayPageProviderRegistry;
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private UserLocalService _userLocalService;

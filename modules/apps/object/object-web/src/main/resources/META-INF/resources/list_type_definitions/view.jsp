@@ -20,12 +20,16 @@
 ViewListTypeDefinitionsDisplayContext viewListTypeDefinitionsDisplayContext = (ViewListTypeDefinitionsDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
-<frontend-data-set:headless-display
+<clay:headless-data-set-display
 	apiURL="<%= viewListTypeDefinitionsDisplayContext.getAPIURL() %>"
+	clayDataSetActionDropdownItems="<%= viewListTypeDefinitionsDisplayContext.getClayDataSetActionDropdownItems() %>"
 	creationMenu="<%= viewListTypeDefinitionsDisplayContext.getCreationMenu() %>"
-	fdsActionDropdownItems="<%= viewListTypeDefinitionsDisplayContext.getFDSActionDropdownItems() %>"
-	formName="fm"
-	id="<%= ListTypeFDSNames.LIST_TYPE_DEFINITIONS %>"
+	formId="fm"
+	id="<%= ListTypeClayDataSetDisplayNames.LIST_TYPE_DEFINITIONS %>"
+	itemsPerPage="<%= 20 %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+	pageNumber="<%= 1 %>"
+	portletURL="<%= liferayPortletResponse.createRenderURL() %>"
 	style="fluid"
 />
 
@@ -37,11 +41,5 @@ ViewListTypeDefinitionsDisplayContext viewListTypeDefinitionsDisplayContext = (V
 				"apiURL", viewListTypeDefinitionsDisplayContext.getAPIURL()
 			).build()
 		%>'
-	/>
-</div>
-
-<div>
-	<react:component
-		module="js/components/ListTypeDefinition/ListTypeEntriesModal"
 	/>
 </div>

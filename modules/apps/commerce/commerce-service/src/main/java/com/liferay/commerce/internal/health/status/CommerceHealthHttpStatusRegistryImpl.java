@@ -39,7 +39,10 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceHealthHttpStatusRegistry.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceHealthHttpStatusRegistry.class
+)
 public class CommerceHealthHttpStatusRegistryImpl
 	implements CommerceHealthHttpStatusRegistry {
 
@@ -50,8 +53,8 @@ public class CommerceHealthHttpStatusRegistryImpl
 		}
 
 		ServiceWrapper<CommerceHealthHttpStatus>
-			commerceHealthStatusServiceWrapper = _serviceTrackerMap.getService(
-				key);
+			commerceHealthStatusServiceWrapper =
+				_commerceHealthStatusRegistryMap.getService(key);
 
 		if (commerceHealthStatusServiceWrapper == null) {
 			if (_log.isDebugEnabled()) {
@@ -72,7 +75,7 @@ public class CommerceHealthHttpStatusRegistryImpl
 
 		List<ServiceWrapper<CommerceHealthHttpStatus>>
 			commerceHealthStatusServiceWrappers = ListUtil.fromCollection(
-				_serviceTrackerMap.values());
+				_commerceHealthStatusRegistryMap.values());
 
 		Collections.sort(
 			commerceHealthStatusServiceWrappers,
@@ -95,16 +98,17 @@ public class CommerceHealthHttpStatusRegistryImpl
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, CommerceHealthHttpStatus.class,
-			"commerce.health.status.key",
-			ServiceTrackerCustomizerFactory.
-				<CommerceHealthHttpStatus>serviceWrapper(bundleContext));
+		_commerceHealthStatusRegistryMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, CommerceHealthHttpStatus.class,
+				"commerce.health.status.key",
+				ServiceTrackerCustomizerFactory.
+					<CommerceHealthHttpStatus>serviceWrapper(bundleContext));
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_commerceHealthStatusRegistryMap.close();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -115,6 +119,6 @@ public class CommerceHealthHttpStatusRegistryImpl
 			new CommerceHealthStatusServiceWrapperDisplayOrderComparator();
 
 	private ServiceTrackerMap<String, ServiceWrapper<CommerceHealthHttpStatus>>
-		_serviceTrackerMap;
+		_commerceHealthStatusRegistryMap;
 
 }

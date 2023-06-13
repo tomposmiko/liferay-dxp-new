@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Alberti
  */
-@Component(service = ModelListener.class)
+@Component(enabled = false, immediate = true, service = ModelListener.class)
 public class CommerceChannelModelListener
 	extends BaseModelListener<CommerceChannel> {
 
@@ -40,7 +40,7 @@ public class CommerceChannelModelListener
 					commerceChannel.getGroupId());
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 	}
 

@@ -15,8 +15,8 @@
 (function () {
 	CKEDITOR.plugins.add('tab', {
 		init(editor) {
-			let tabSpaces = editor.config.tabSpaces || 0;
-			let tabText = '';
+			let tabSpaces = editor.config.tabSpaces || 0,
+				tabText = '';
 
 			while (tabSpaces--) {
 				tabText += '\xa0';

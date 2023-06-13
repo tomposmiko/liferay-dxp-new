@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/add_fragment_collection_resource"
@@ -79,7 +80,7 @@ public class AddFragmentCollectionResourceMVCActionCommand
 				serviceContext, fragmentCollection, curFileName));
 
 		PortletFileRepositoryUtil.addPortletFileEntry(
-			null, serviceContext.getScopeGroupId(), serviceContext.getUserId(),
+			serviceContext.getScopeGroupId(), serviceContext.getUserId(),
 			FragmentCollection.class.getName(),
 			fragmentCollection.getFragmentCollectionId(),
 			FragmentPortletKeys.FRAGMENT,
@@ -111,7 +112,7 @@ public class AddFragmentCollectionResourceMVCActionCommand
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;

@@ -22,18 +22,16 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
-import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.kernel.service.StagingLocalService;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.kernel.staging.Staging;
-import com.liferay.fragment.constants.FragmentConstants;
-import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntry;
-import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalFolderConstants;
@@ -43,8 +41,6 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.layout.util.LayoutCopyHelper;
-import com.liferay.layout.util.structure.LayoutStructure;
-import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -77,7 +73,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.io.Closeable;
@@ -92,7 +87,6 @@ import java.nio.file.StandardOpenOption;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -126,8 +120,7 @@ public class ExportImportPerformanceTest {
 		Class<?> clazz = ExportImportPerformanceTest.class;
 
 		Properties properties = PropertiesUtil.load(
-			clazz.getResourceAsStream(
-				"dependencies/export-import-performance.properties"),
+			clazz.getResourceAsStream("export-import-performance.properties"),
 			"UTF-8");
 
 		_fragmentEntryLinksPerLayout = GetterUtil.getInteger(
@@ -147,7 +140,7 @@ public class ExportImportPerformanceTest {
 			"Properties:",
 			StreamUtil.toString(
 				clazz.getResourceAsStream(
-					"dependencies/export-import-performance.properties")),
+					"export-import-performance.properties")),
 			"\nResults:");
 	}
 
@@ -271,7 +264,7 @@ public class ExportImportPerformanceTest {
 
 			_layoutLocalService.updateLayout(layoutPrototypeLayout);
 
-			_layoutCopyHelper.copyLayoutContent(layout, layoutPrototypeLayout);
+			_layoutCopyHelper.copyLayout(layout, layoutPrototypeLayout);
 
 			layout.setLayoutPrototypeUuid(layoutPrototype.getUuid());
 			layout.setLayoutPrototypeLinkEnabled(true);
@@ -337,21 +330,16 @@ public class ExportImportPerformanceTest {
 			return;
 		}
 
-		long defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				draftLayout.getPlid());
-
 		for (int i = 0; i < _fragmentEntryLinksPerLayout; i++) {
 			FragmentEntry fragmentEntry =
-				_fragmentCollectionContributorRegistry.getFragmentEntry(
+				_fragmentCollectionContributorTracker.getFragmentEntry(
 					"FEATURED_CONTENT-highlights-circle");
 
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
-				fragmentEntry.getFragmentEntryId(), defaultSegmentsExperienceId,
-				draftLayout.getPlid(), fragmentEntry.getCss(),
-				fragmentEntry.getHtml(), fragmentEntry.getJs(),
-				fragmentEntry.getConfiguration(),
+				fragmentEntry.getFragmentEntryId(), 0, draftLayout.getPlid(),
+				fragmentEntry.getCss(), fragmentEntry.getHtml(),
+				fragmentEntry.getJs(), fragmentEntry.getConfiguration(),
 				StringUtil.replace(
 					_TMPL_FRAGMENT_EDITABLE_VALUES, "${", "}",
 					HashMapBuilder.put(
@@ -386,8 +374,7 @@ public class ExportImportPerformanceTest {
 								journalArticle3.getResourcePrimKey());
 						}
 					).build()),
-				StringPool.BLANK, 0, null, fragmentEntry.getType(),
-				_serviceContext);
+				StringPool.BLANK, 0, null, _serviceContext);
 		}
 
 		for (int i = 0; i < _portletsPerContentLayout; i++) {
@@ -398,10 +385,9 @@ public class ExportImportPerformanceTest {
 				PortletIdCodec.encode(JournalPortletKeys.JOURNAL, instanceId));
 
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(), 0, 0,
-				defaultSegmentsExperienceId, draftLayout.getPlid(),
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-				StringPool.BLANK,
+				TestPropsValues.getUserId(), _group.getGroupId(), 0, 0, 0,
+				draftLayout.getPlid(), StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK,
 				StringUtil.replace(
 					_TMPL_FRAGMENT_PORTLET, "${", "}",
 					HashMapBuilder.put(
@@ -409,17 +395,14 @@ public class ExportImportPerformanceTest {
 					).put(
 						"portletName", JournalPortletKeys.JOURNAL
 					).build()),
-				StringPool.BLANK, 0, null, FragmentConstants.TYPE_COMPONENT,
-				_serviceContext);
+				StringPool.BLANK, 0, null, _serviceContext);
 		}
 
 		_layoutPageTemplateStructureLocalService.
-			updateLayoutPageTemplateStructureData(
-				_group.getGroupId(), draftLayout.getPlid(),
-				defaultSegmentsExperienceId,
-				_generateContentLayoutStructureJSONObject(draftLayout));
+			rebuildLayoutPageTemplateStructure(
+				_group.getGroupId(), draftLayout.getPlid());
 
-		_layoutCopyHelper.copyLayoutContent(draftLayout, layout);
+		_layoutCopyHelper.copyLayout(draftLayout, layout);
 	}
 
 	private JournalArticle _addJournalArticle() throws Exception {
@@ -438,7 +421,7 @@ public class ExportImportPerformanceTest {
 			RandomTestUtil.randomLocaleStringMap(defaultLocale),
 			RandomTestUtil.randomLocaleStringMap(defaultLocale),
 			RandomTestUtil.randomLocaleStringMap(defaultLocale), content,
-			_ddmStructure.getStructureId(), _ddmTemplate.getTemplateKey(),
+			_ddmStructure.getStructureKey(), _ddmTemplate.getTemplateKey(),
 			StringPool.BLANK, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0,
 			true, true, false, null, null, null, null, _serviceContext);
 	}
@@ -491,39 +474,18 @@ public class ExportImportPerformanceTest {
 		_layoutLocalService.updateLayout(layout);
 	}
 
-	private String _generateContentLayoutStructureJSONObject(Layout layout) {
-		LayoutStructure layoutStructure = new LayoutStructure();
+	private String _getInvokerName() {
+		Thread thread = Thread.currentThread();
 
-		LayoutStructureItem rootLayoutStructureItem =
-			layoutStructure.addRootLayoutStructureItem();
+		StackTraceElement stackTraceElement = thread.getStackTrace()[3];
 
-		LayoutStructureItem containerStyledLayoutStructureItem =
-			layoutStructure.addContainerStyledLayoutStructureItem(
-				rootLayoutStructureItem.getItemId(), 0);
-
-		List<FragmentEntryLink> fragmentEntryLinks =
-			_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
-				_group.getGroupId(), layout.getPlid());
-
-		for (int i = 0; i < fragmentEntryLinks.size(); i++) {
-			FragmentEntryLink fragmentEntryLink = fragmentEntryLinks.get(i);
-
-			layoutStructure.addFragmentStyledLayoutStructureItem(
-				fragmentEntryLink.getFragmentEntryLinkId(),
-				containerStyledLayoutStructureItem.getItemId(), i);
-		}
-
-		return layoutStructure.toString();
+		return StringBundler.concat(
+			stackTraceElement.getClassName(), StringPool.POUND,
+			stackTraceElement.getMethodName());
 	}
 
 	private Closeable _startTimer() {
-		Thread thread = Thread.currentThread();
-
-		StackTraceElement stackTraceElement = thread.getStackTrace()[2];
-
-		String invokerName = StringBundler.concat(
-			stackTraceElement.getClassName(), StringPool.POUND,
-			stackTraceElement.getMethodName());
+		String invokerName = _getInvokerName();
 
 		long startTime = System.currentTimeMillis();
 
@@ -557,16 +519,13 @@ public class ExportImportPerformanceTest {
 
 	private static final String _TMPL_FRAGMENT_EDITABLE_VALUES =
 		StringUtil.read(
-			ExportImportPerformanceTest.class,
-			"dependencies/fragment-editable-values.tmpl");
+			ExportImportPerformanceTest.class, "fragment-editable-values.tmpl");
 
 	private static final String _TMPL_FRAGMENT_PORTLET = StringUtil.read(
-		ExportImportPerformanceTest.class,
-		"dependencies/fragment-portlet.tmpl");
+		ExportImportPerformanceTest.class, "fragment-portlet.tmpl");
 
 	private static final String _TMPL_PORTLET_PREFERENCES = StringUtil.read(
-		ExportImportPerformanceTest.class,
-		"dependencies/portlet-preferences.tmpl");
+		ExportImportPerformanceTest.class, "portlet-preferences.tmpl");
 
 	private static int _fragmentEntryLinksPerLayout;
 	private static int _layoutsCount;
@@ -597,8 +556,8 @@ public class ExportImportPerformanceTest {
 	private ExportImportLocalService _exportImportLocalService;
 
 	@Inject
-	private FragmentCollectionContributorRegistry
-		_fragmentCollectionContributorRegistry;
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Inject
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
@@ -625,9 +584,6 @@ public class ExportImportPerformanceTest {
 
 	@Inject
 	private Portal _portal;
-
-	@Inject
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	private ServiceContext _serviceContext;
 

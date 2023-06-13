@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.json.JsonObject;
 
@@ -50,11 +51,14 @@ public class LiferayWriter
 		LiferayOutputProperties liferayOutputProperties) {
 
 		_liferayWriteOperation = liferayWriteOperation;
+
 		_liferayOutputProperties = liferayOutputProperties;
 
-		_dieOnError = liferayOutputProperties.getDieOnError();
-		_finalEndpointUrl = _getFinalEndpointUrl(liferayOutputProperties);
-		_liferaySink = liferayWriteOperation.getSink();
+		_dieOnError = _liferayOutputProperties.getDieOnError();
+
+		_finalEndpointUrl = _getFinalEndpointUrl(_liferayOutputProperties);
+
+		_liferaySink = _liferayWriteOperation.getSink();
 
 		_indexedRecordJsonObjectConverter =
 			new IndexedRecordJsonObjectConverter(
@@ -82,61 +86,66 @@ public class LiferayWriter
 	}
 
 	public void doDelete(IndexedRecord indexedRecord) {
-		JsonObject jsonObject = _liferaySink.doDeleteRequest(_getEndpointUrl());
+		Optional<JsonObject> jsonObjectOptional = _liferaySink.doDeleteRequest(
+			_getEndpointUrl());
 
-		if (jsonObject == null) {
+		if (!jsonObjectOptional.isPresent()) {
 			_handleSuccessRecord(indexedRecord);
 
 			return;
 		}
 
 		_handleSuccessRecord(
-			_jsonObjectIndexedRecordConverter.toIndexedRecord(jsonObject));
+			_jsonObjectIndexedRecordConverter.toIndexedRecord(
+				jsonObjectOptional.get()));
 	}
 
 	public void doInsert(IndexedRecord indexedRecord) throws IOException {
-		JsonObject jsonObject = _liferaySink.doPostRequest(
+		Optional<JsonObject> jsonObjectOptional = _liferaySink.doPostRequest(
 			_getEndpointUrl(),
 			_indexedRecordJsonObjectConverter.toJsonValue(indexedRecord));
 
-		if (jsonObject == null) {
+		if (!jsonObjectOptional.isPresent()) {
 			_handleSuccessRecord(indexedRecord);
 
 			return;
 		}
 
 		_handleSuccessRecord(
-			_jsonObjectIndexedRecordConverter.toIndexedRecord(jsonObject));
+			_jsonObjectIndexedRecordConverter.toIndexedRecord(
+				jsonObjectOptional.get()));
 	}
 
 	public void doReplace(IndexedRecord indexedRecord) throws IOException {
-		JsonObject jsonObject = _liferaySink.doPutRequest(
+		Optional<JsonObject> jsonObjectOptional = _liferaySink.doPutRequest(
 			_getEndpointUrl(),
 			_indexedRecordJsonObjectConverter.toJsonValue(indexedRecord));
 
-		if (jsonObject == null) {
+		if (!jsonObjectOptional.isPresent()) {
 			_handleSuccessRecord(indexedRecord);
 
 			return;
 		}
 
 		_handleSuccessRecord(
-			_jsonObjectIndexedRecordConverter.toIndexedRecord(jsonObject));
+			_jsonObjectIndexedRecordConverter.toIndexedRecord(
+				jsonObjectOptional.get()));
 	}
 
 	public void doUpdate(IndexedRecord indexedRecord) throws IOException {
-		JsonObject jsonObject = _liferaySink.doPatchRequest(
+		Optional<JsonObject> jsonObjectOptional = _liferaySink.doPatchRequest(
 			_getEndpointUrl(),
 			_indexedRecordJsonObjectConverter.toJsonValue(indexedRecord));
 
-		if (jsonObject == null) {
+		if (!jsonObjectOptional.isPresent()) {
 			_handleSuccessRecord(indexedRecord);
 
 			return;
 		}
 
 		_handleSuccessRecord(
-			_jsonObjectIndexedRecordConverter.toIndexedRecord(jsonObject));
+			_jsonObjectIndexedRecordConverter.toIndexedRecord(
+				jsonObjectOptional.get()));
 	}
 
 	@Override

@@ -20,14 +20,16 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.reports.engine.console.model.Source;
 import com.liferay.portal.reports.engine.console.service.SourceService;
 import com.liferay.portal.reports.engine.console.service.SourceServiceUtil;
+import com.liferay.portal.reports.engine.console.service.persistence.DefinitionFinder;
+import com.liferay.portal.reports.engine.console.service.persistence.DefinitionPersistence;
+import com.liferay.portal.reports.engine.console.service.persistence.EntryFinder;
+import com.liferay.portal.reports.engine.console.service.persistence.EntryPersistence;
 import com.liferay.portal.reports.engine.console.service.persistence.SourceFinder;
 import com.liferay.portal.reports.engine.console.service.persistence.SourcePersistence;
 
@@ -133,6 +135,18 @@ public abstract class SourceServiceBaseImpl
 	}
 
 	@Reference
+	protected DefinitionPersistence definitionPersistence;
+
+	@Reference
+	protected DefinitionFinder definitionFinder;
+
+	@Reference
+	protected EntryPersistence entryPersistence;
+
+	@Reference
+	protected EntryFinder entryFinder;
+
+	@Reference
 	protected
 		com.liferay.portal.reports.engine.console.service.SourceLocalService
 			sourceLocalService;
@@ -149,7 +163,23 @@ public abstract class SourceServiceBaseImpl
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		SourceServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameService
+		classNameService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserService userService;
 
 }

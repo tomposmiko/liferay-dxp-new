@@ -20,8 +20,7 @@ import java.net.URL;
 /**
  * @author Michael Hashimoto
  */
-public class PortalAppReleaseTopLevelBuild
-	extends PortalTopLevelBuild implements PortalWorkspaceBuild {
+public class PortalAppReleaseTopLevelBuild extends PortalTopLevelBuild {
 
 	public PortalAppReleaseTopLevelBuild(
 		String url, TopLevelBuild topLevelBuild) {
@@ -86,69 +85,6 @@ public class PortalAppReleaseTopLevelBuild
 		}
 
 		return null;
-	}
-
-	@Override
-	public PortalWorkspace getPortalWorkspace() {
-		Workspace workspace = getWorkspace();
-
-		if (!(workspace instanceof PortalWorkspace)) {
-			return null;
-		}
-
-		return (PortalWorkspace)workspace;
-	}
-
-	@Override
-	public Workspace getWorkspace() {
-		Workspace workspace = WorkspaceFactory.newWorkspace(
-			getBaseGitRepositoryName(), getBranchName(), getJobName());
-
-		if (workspace instanceof PortalWorkspace) {
-			PortalWorkspace portalWorkspace = (PortalWorkspace)workspace;
-
-			portalWorkspace.setBuildProfile(getBuildProfile());
-		}
-
-		String portalGitHubURL = _getPortalGitHubURL();
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(portalGitHubURL)) {
-			WorkspaceGitRepository workspaceGitRepository =
-				workspace.getPrimaryWorkspaceGitRepository();
-
-			workspaceGitRepository.setGitHubURL(portalGitHubURL);
-		}
-
-		return workspace;
-	}
-
-	private String _getPortalGitHubURL() {
-		String portalBranchName = getParameterValue("TEST_PORTAL_RELEASE_TAG");
-		String portalBranchUsername = getParameterValue(
-			"TEST_PORTAL_RELEASE_USERNAME");
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(portalBranchName) ||
-			JenkinsResultsParserUtil.isNullOrEmpty(portalBranchUsername)) {
-
-			return null;
-		}
-
-		String branchName = getBranchName();
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("https://github.com/");
-		sb.append(portalBranchUsername);
-		sb.append("/liferay-portal");
-
-		if (!branchName.equals("master")) {
-			sb.append("-ee");
-		}
-
-		sb.append("/tree/");
-		sb.append(portalBranchName);
-
-		return sb.toString();
 	}
 
 }

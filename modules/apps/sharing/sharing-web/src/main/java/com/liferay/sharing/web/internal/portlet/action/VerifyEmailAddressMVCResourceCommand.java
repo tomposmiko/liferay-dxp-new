@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Ambrín Chaudhary
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SharingPortletKeys.SHARING,
 		"mvc.command.name=/sharing/verify_email_address"

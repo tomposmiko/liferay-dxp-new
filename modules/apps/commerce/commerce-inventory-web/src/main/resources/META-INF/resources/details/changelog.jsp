@@ -23,15 +23,18 @@ CommerceInventoryDisplayContext commerceInventoryDisplayContext = (CommerceInven
 <commerce-ui:panel
 	title='<%= LanguageUtil.get(request, "change-logs") %>'
 >
-	<frontend-data-set:classic-display
+	<clay:data-set-display
 		contextParams='<%=
 			HashMapBuilder.<String, String>put(
 				"sku", commerceInventoryDisplayContext.getSku()
 			).build()
 		%>'
-		dataProviderKey="<%= CommerceInventoryFDSNames.INVENTORY_AUDIT %>"
-		id="<%= CommerceInventoryFDSNames.INVENTORY_AUDIT %>"
+		dataProviderKey="<%= CommerceInventoryDataSetConstants.COMMERCE_DATA_SET_KEY_INVENTORY_AUDIT %>"
+		id="<%= CommerceInventoryDataSetConstants.COMMERCE_DATA_SET_KEY_INVENTORY_AUDIT %>"
 		itemsPerPage="<%= 10 %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= commerceInventoryDisplayContext.getPortletURL() %>"
 		showManagementBar="<%= false %>"
 	/>
 </commerce-ui:panel>

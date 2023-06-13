@@ -17,7 +17,6 @@ import ClayLabel from '@clayui/label';
 import ClayPanel from '@clayui/panel';
 import classNames from 'classnames';
 import {useFormState} from 'data-engine-js-components-web';
-import {openConfirmModal} from 'frontend-js-web';
 import React from 'react';
 
 import {
@@ -39,7 +38,7 @@ const ACTION_LABELS = {
 
 const OPERATOR_LABELS = {
 	'belongs-to': Liferay.Language.get('belongs-to'),
-	'contains': Liferay.Language.get('contains'),
+	contains: Liferay.Language.get('contains'),
 	'does-not-contain': Liferay.Language.get('does-not-contain'),
 	'equals-to': Liferay.Language.get('equals-to'),
 	'is-empty': Liferay.Language.get('is-empty'),
@@ -70,16 +69,13 @@ export default function RuleItem({loc, onDeleteRule, onEditRule, rule}) {
 		},
 		{
 			action: () => {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-delete-this'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							onDeleteRule(loc);
-						}
-					},
-				});
+				const confirmed = confirm(
+					Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+				);
+
+				if (confirmed) {
+					onDeleteRule(loc);
+				}
 			},
 			name: Liferay.Language.get('delete'),
 		},

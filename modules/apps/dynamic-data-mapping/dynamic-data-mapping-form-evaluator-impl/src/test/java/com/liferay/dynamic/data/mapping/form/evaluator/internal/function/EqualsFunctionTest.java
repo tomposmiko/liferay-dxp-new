@@ -34,21 +34,31 @@ public class EqualsFunctionTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
-	public void testApply() {
+	public void testApplyFalse1() {
 		EqualsFunction equalsFunction = new EqualsFunction();
 
 		Assert.assertFalse(equalsFunction.apply("FORMS", "forms"));
-		Assert.assertFalse(equalsFunction.apply("forms&#39;", "forms'"));
-		Assert.assertFalse(equalsFunction.apply(2, new BigDecimal(1)));
-		Assert.assertFalse(equalsFunction.apply(2.0D, new BigDecimal(1)));
-		Assert.assertFalse(equalsFunction.apply(2L, new BigDecimal(1)));
+	}
+
+	@Test
+	public void testApplyFalse2() {
+		EqualsFunction equalsFunction = new EqualsFunction();
+
 		Assert.assertFalse(equalsFunction.apply(null, "forms"));
-		Assert.assertFalse(equalsFunction.apply(null, new BigDecimal(1)));
+	}
+
+	@Test
+	public void testApplyTrue1() {
+		EqualsFunction equalsFunction = new EqualsFunction();
+
 		Assert.assertTrue(equalsFunction.apply("1", new BigDecimal(1)));
+	}
+
+	@Test
+	public void testApplyTrue2() {
+		EqualsFunction equalsFunction = new EqualsFunction();
+
 		Assert.assertTrue(equalsFunction.apply("forms", "forms"));
-		Assert.assertTrue(equalsFunction.apply(1, new BigDecimal(1)));
-		Assert.assertTrue(equalsFunction.apply(1.0D, new BigDecimal(1)));
-		Assert.assertTrue(equalsFunction.apply(1L, new BigDecimal(1)));
 	}
 
 }

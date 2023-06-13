@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -38,8 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoTimerInstanceTokenModel
-	extends BaseModel<KaleoTimerInstanceToken>,
-			CTModel<KaleoTimerInstanceToken>, GroupedModel, MVCCModel,
+	extends BaseModel<KaleoTimerInstanceToken>, GroupedModel, MVCCModel,
 			ShardedModel {
 
 	/*
@@ -53,7 +51,6 @@ public interface KaleoTimerInstanceTokenModel
 	 *
 	 * @return the primary key of this kaleo timer instance token
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -61,7 +58,6 @@ public interface KaleoTimerInstanceTokenModel
 	 *
 	 * @param primaryKey the primary key of this kaleo timer instance token
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -79,22 +75,6 @@ public interface KaleoTimerInstanceTokenModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this kaleo timer instance token.
-	 *
-	 * @return the ct collection ID of this kaleo timer instance token
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this kaleo timer instance token.
-	 *
-	 * @param ctCollectionId the ct collection ID of this kaleo timer instance token
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the kaleo timer instance token ID of this kaleo timer instance token.
@@ -452,9 +432,5 @@ public interface KaleoTimerInstanceTokenModel
 
 	@Override
 	public KaleoTimerInstanceToken cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.custom.facet.configuration.CustomFacetPortletInstanceConfiguration;
-import com.liferay.portal.search.web.internal.facet.display.context.BucketDisplayContext;
-import com.liferay.portal.search.web.internal.facet.display.context.FacetDisplayContext;
 
 import java.util.List;
 
@@ -29,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Wade Cao
  */
-public class CustomFacetDisplayContext implements FacetDisplayContext {
+public class CustomFacetDisplayContext {
 
 	public CustomFacetDisplayContext(HttpServletRequest httpServletRequest)
 		throws ConfigurationException {
@@ -45,10 +43,6 @@ public class CustomFacetDisplayContext implements FacetDisplayContext {
 		_customFacetPortletInstanceConfiguration =
 			portletDisplay.getPortletInstanceConfiguration(
 				CustomFacetPortletInstanceConfiguration.class);
-	}
-
-	public List<BucketDisplayContext> getBucketDisplayContexts() {
-		return _bucketDisplayContexts;
 	}
 
 	public CustomFacetPortletInstanceConfiguration
@@ -92,18 +86,16 @@ public class CustomFacetDisplayContext implements FacetDisplayContext {
 		return _parameterValues;
 	}
 
+	public List<CustomFacetTermDisplayContext> getTermDisplayContexts() {
+		return _customFacetTermDisplayContexts;
+	}
+
 	public boolean isNothingSelected() {
 		return _nothingSelected;
 	}
 
 	public boolean isRenderNothing() {
 		return _renderNothing;
-	}
-
-	public void setBucketDisplayContexts(
-		List<BucketDisplayContext> bucketDisplayContexts) {
-
-		_bucketDisplayContexts = bucketDisplayContexts;
 	}
 
 	public void setDisplayCaption(String displayCaption) {
@@ -136,9 +128,15 @@ public class CustomFacetDisplayContext implements FacetDisplayContext {
 		_renderNothing = renderNothing;
 	}
 
-	private List<BucketDisplayContext> _bucketDisplayContexts;
+	public void setTermDisplayContexts(
+		List<CustomFacetTermDisplayContext> customFacetTermDisplayContexts) {
+
+		_customFacetTermDisplayContexts = customFacetTermDisplayContexts;
+	}
+
 	private final CustomFacetPortletInstanceConfiguration
 		_customFacetPortletInstanceConfiguration;
+	private List<CustomFacetTermDisplayContext> _customFacetTermDisplayContexts;
 	private String _displayCaption;
 	private long _displayStyleGroupId;
 	private boolean _nothingSelected;

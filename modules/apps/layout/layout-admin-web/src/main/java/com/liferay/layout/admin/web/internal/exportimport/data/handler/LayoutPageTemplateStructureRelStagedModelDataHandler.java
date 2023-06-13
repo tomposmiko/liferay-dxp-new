@@ -14,31 +14,35 @@
 
 package com.liferay.layout.admin.web.internal.exportimport.data.handler;
 
+import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
-import com.liferay.fragment.model.FragmentEntryLink;
-import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
-import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
-import com.liferay.layout.util.structure.FormStyledLayoutStructureItem;
-import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
-import com.liferay.layout.util.structure.LayoutStructure;
-import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class LayoutPageTemplateStructureRelStagedModelDataHandler
 	extends BaseStagedModelDataHandler<LayoutPageTemplateStructureRel> {
 
@@ -69,45 +73,45 @@ public class LayoutPageTemplateStructureRelStagedModelDataHandler
 			portletDataContext.getExportDataElement(
 				layoutPageTemplateStructureRel);
 
-		SegmentsExperience segmentsExperience =
-			_segmentsExperienceLocalService.fetchSegmentsExperience(
-				layoutPageTemplateStructureRel.getSegmentsExperienceId());
+		if (layoutPageTemplateStructureRel.getSegmentsExperienceId() !=
+				SegmentsExperienceConstants.ID_DEFAULT) {
 
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, layoutPageTemplateStructureRel,
-			segmentsExperience, PortletDataContext.REFERENCE_TYPE_STRONG);
+			SegmentsExperience segmentsExperience =
+				_segmentsExperienceLocalService.fetchSegmentsExperience(
+					layoutPageTemplateStructureRel.getSegmentsExperienceId());
 
-		LayoutPageTemplateStructure layoutPageTemplateStructure =
-			_layoutPageTemplateStructureLocalService.
-				fetchLayoutPageTemplateStructure(
-					layoutPageTemplateStructureRel.
-						getLayoutPageTemplateStructureId());
-
-		List<FragmentEntryLink> fragmentEntryLinks =
-			_fragmentEntryLinkLocalService.
-				getFragmentEntryLinksBySegmentsExperienceId(
-					segmentsExperience.getGroupId(),
-					segmentsExperience.getSegmentsExperienceId(),
-					layoutPageTemplateStructure.getPlid());
-
-		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, layoutPageTemplateStructureRel,
-				fragmentEntryLink,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+				segmentsExperience, PortletDataContext.REFERENCE_TYPE_STRONG);
 		}
 
-		String data =
+		Consumer<JSONObject> consumer = jsonObject -> {
+			long classPK = jsonObject.getLong("classPK");
+
+			AssetListEntry assetListEntry =
+				_assetListEntryLocalService.fetchAssetListEntry(classPK);
+
+			if (assetListEntry != null) {
+				try {
+					StagedModelDataHandlerUtil.exportReferenceStagedModel(
+						portletDataContext, assetListEntry,
+						layoutPageTemplateStructureRel,
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+				}
+				catch (PortletDataException portletDataException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(portletDataException, portletDataException);
+					}
+				}
+			}
+		};
+
+		String data = _processReferenceStagedModels(
+			consumer,
 			_dlReferencesExportImportContentProcessor.
 				replaceExportContentReferences(
 					portletDataContext, layoutPageTemplateStructureRel,
-					layoutPageTemplateStructureRel.getData(), true, false);
-
-		data =
-			_layoutPageTemplateStructureRelReferencesExportImportContentProcessor.
-				replaceExportContentReferences(
-					portletDataContext, layoutPageTemplateStructureRel, data,
-					true, false);
+					layoutPageTemplateStructureRel.getData(), false, false));
 
 		layoutPageTemplateStructureRel.setData(data);
 
@@ -154,31 +158,41 @@ public class LayoutPageTemplateStructureRelStagedModelDataHandler
 		importedLayoutPageTemplateStructureRel.setSegmentsExperienceId(
 			segmentsExperienceId);
 
-		String data = layoutPageTemplateStructureRel.getData();
+		Consumer<JSONObject> consumer = jsonObject -> {
+			long classPK = jsonObject.getLong("classPK");
 
-		if (Validator.isNotNull(data)) {
-			data =
-				_dlReferencesExportImportContentProcessor.
-					replaceImportContentReferences(
-						portletDataContext, layoutPageTemplateStructureRel,
-						data);
+			Map<Long, Long> assetListEntryNewPrimaryKeys =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					AssetListEntry.class.getName());
 
-			data =
-				_layoutPageTemplateStructureRelReferencesExportImportContentProcessor.
-					replaceImportContentReferences(
-						portletDataContext, layoutPageTemplateStructureRel,
-						data);
+			long newClassPK = MapUtil.getLong(
+				assetListEntryNewPrimaryKeys, classPK, classPK);
 
-			LayoutStructure layoutStructure = LayoutStructure.of(data);
+			AssetListEntry assetListEntry =
+				_assetListEntryLocalService.fetchAssetListEntry(newClassPK);
 
-			_processImportFormLayoutStructureItemsData(
-				layoutStructure, portletDataContext);
+			if (assetListEntry != null) {
+				jsonObject.put(
+					"classNameId",
+					_portal.getClassNameId(assetListEntry.getAssetEntryType())
+				).put(
+					"classPK", String.valueOf(newClassPK)
+				).put(
+					"itemSubtype", assetListEntry.getAssetEntrySubtype()
+				).put(
+					"itemType", assetListEntry.getAssetEntryType()
+				).put(
+					"title", assetListEntry.getTitle()
+				);
+			}
+		};
 
-			_processImportFragmentLayoutStructureItemsData(
-				layoutStructure, portletDataContext);
-
-			data = layoutStructure.toString();
-		}
+		String data = _processReferenceStagedModels(
+			consumer,
+			_dlReferencesExportImportContentProcessor.
+				replaceImportContentReferences(
+					portletDataContext, layoutPageTemplateStructureRel,
+					layoutPageTemplateStructureRel.getData()));
 
 		importedLayoutPageTemplateStructureRel.setData(data);
 
@@ -219,85 +233,73 @@ public class LayoutPageTemplateStructureRelStagedModelDataHandler
 		return _stagedModelRepository;
 	}
 
-	private void _processImportFormLayoutStructureItemsData(
-		LayoutStructure layoutStructure,
-		PortletDataContext portletDataContext) {
+	private String _processReferenceStagedModels(
+			Consumer<JSONObject> consumer, String data)
+		throws Exception {
 
-		List<FormStyledLayoutStructureItem> formStyledLayoutStructureItems =
-			layoutStructure.getFormStyledLayoutStructureItems();
-
-		for (FormStyledLayoutStructureItem formStyledLayoutStructureItem :
-				formStyledLayoutStructureItems) {
-
-			JSONObject successMessageJSONObject =
-				formStyledLayoutStructureItem.getSuccessMessageJSONObject();
-
-			if (successMessageJSONObject == null) {
-				continue;
-			}
-
-			JSONObject layoutJSONObject =
-				successMessageJSONObject.getJSONObject("layout");
-
-			if ((layoutJSONObject == null) ||
-				(layoutJSONObject.length() == 0)) {
-
-				continue;
-			}
-
-			layoutJSONObject.put(
-				"groupId", portletDataContext.getScopeGroupId());
+		if (!JSONUtil.isValid(data)) {
+			return data;
 		}
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(data);
+
+		if (!jsonObject.has("items")) {
+			return data;
+		}
+
+		JSONObject itemsJSONObject = jsonObject.getJSONObject("items");
+
+		if (itemsJSONObject == null) {
+			return data;
+		}
+
+		for (String key : itemsJSONObject.keySet()) {
+			JSONObject itemJSONObject = itemsJSONObject.getJSONObject(key);
+
+			if (!Objects.equals(
+					itemJSONObject.get("type"),
+					LayoutDataItemTypeConstants.TYPE_COLLECTION) ||
+				!itemJSONObject.has("config")) {
+
+				continue;
+			}
+
+			JSONObject configJSONObject = itemJSONObject.getJSONObject(
+				"config");
+
+			if (!configJSONObject.has("collection")) {
+				continue;
+			}
+
+			JSONObject collectionJSONObject = configJSONObject.getJSONObject(
+				"collection");
+
+			String type = collectionJSONObject.getString("type");
+
+			if (!Objects.equals(
+					type, InfoListItemSelectorReturnType.class.getName())) {
+
+				continue;
+			}
+
+			consumer.accept(collectionJSONObject);
+		}
+
+		return jsonObject.toString();
 	}
 
-	private void _processImportFragmentLayoutStructureItemsData(
-		LayoutStructure layoutStructure,
-		PortletDataContext portletDataContext) {
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutPageTemplateStructureRelStagedModelDataHandler.class);
 
-		Map<Long, Long> fragmentEntryLinkIds =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				FragmentEntryLink.class);
-
-		Map<Long, LayoutStructureItem> fragmentLayoutStructureItems =
-			layoutStructure.getFragmentLayoutStructureItems();
-
-		for (Map.Entry<Long, LayoutStructureItem> fragmentLayoutStructureItem :
-				fragmentLayoutStructureItems.entrySet()) {
-
-			long fragmentEntryLinkId = MapUtil.getLong(
-				fragmentEntryLinkIds, fragmentLayoutStructureItem.getKey(),
-				fragmentLayoutStructureItem.getKey());
-
-			if (fragmentEntryLinkId <= 0) {
-				continue;
-			}
-
-			FragmentStyledLayoutStructureItem
-				fragmentStyledLayoutStructureItem =
-					(FragmentStyledLayoutStructureItem)
-						fragmentLayoutStructureItem.getValue();
-
-			fragmentStyledLayoutStructureItem.setFragmentEntryLinkId(
-				fragmentEntryLinkId);
-		}
-	}
+	@Reference
+	private AssetListEntryLocalService _assetListEntryLocalService;
 
 	@Reference(target = "(content.processor.type=DLReferences)")
 	private ExportImportContentProcessor<String>
 		_dlReferencesExportImportContentProcessor;
 
 	@Reference
-	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
-
-	@Reference
-	private LayoutPageTemplateStructureLocalService
-		_layoutPageTemplateStructureLocalService;
-
-	@Reference(
-		target = "(content.processor.type=LayoutPageTemplateStructureRelReferences)"
-	)
-	private ExportImportContentProcessor<String>
-		_layoutPageTemplateStructureRelReferencesExportImportContentProcessor;
+	private Portal _portal;
 
 	@Reference
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;

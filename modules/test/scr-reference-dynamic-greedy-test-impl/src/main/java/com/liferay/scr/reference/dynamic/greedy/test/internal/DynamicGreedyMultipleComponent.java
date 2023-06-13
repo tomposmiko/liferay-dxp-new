@@ -29,7 +29,8 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Preston Crary
  */
 @Component(
-	enabled = false, property = "reference.cardinality=multiple",
+	enabled = false, immediate = true,
+	property = "reference.cardinality=multiple",
 	service = DynamicGreedyComponent.class
 )
 public class DynamicGreedyMultipleComponent implements DynamicGreedyComponent {

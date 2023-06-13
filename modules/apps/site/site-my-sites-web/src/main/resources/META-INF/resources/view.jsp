@@ -72,7 +72,7 @@
 					<liferay-ui:search-container-column-text
 						colspan="<%= 2 %>"
 					>
-						<div>
+						<h5>
 							<c:choose>
 								<c:when test="<%= Validator.isNotNull(rowURL) %>">
 									<a href="<%= rowURL %>" target="_blank">
@@ -83,70 +83,35 @@
 									<strong><%= HtmlUtil.escape(group.getDescriptiveName(locale)) %></strong>
 								</c:otherwise>
 							</c:choose>
-						</div>
+						</h5>
 
 						<c:if test='<%= !Objects.equals(siteMySitesDisplayContext.getTabs1(), "my-sites") && Validator.isNotNull(group.getDescription(locale)) %>'>
-							<div class="text-default">
+							<h6 class="text-default">
 								<%= HtmlUtil.escape(group.getDescription(locale)) %>
-							</div>
+							</h6>
 						</c:if>
 
-						<liferay-util:buffer
-							var="assetTagsSummary"
-						>
+						<h6 class="text-default">
 							<liferay-asset:asset-tags-summary
 								className="<%= Group.class.getName() %>"
 								classPK="<%= group.getGroupId() %>"
 							/>
-						</liferay-util:buffer>
+						</h6>
 
-						<c:if test="<%= Validator.isNotNull(assetTagsSummary) %>">
-							<div class="text-default">
-								<%= assetTagsSummary %>
-							</div>
-						</c:if>
-
-						<%
-						int usersCount = siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId());
-						%>
-
-						<c:if test="<%= usersCount > 0 %>">
-							<div class="text-default">
-								<strong><liferay-ui:message arguments="<%= usersCount %>" key='<%= (usersCount > 1) ? "x-users" : "x-user" %>' /></strong>
-							</div>
-						</c:if>
-
-						<%
-						int organizationsCount = siteMySitesDisplayContext.getGroupOrganizationsCount(group.getGroupId());
-						%>
-
-						<c:if test="<%= organizationsCount > 0 %>">
-							<div class="text-default">
-								<strong><liferay-ui:message arguments="<%= organizationsCount %>" key='<%= (organizationsCount > 1) ? "x-organizations" : "x-organization" %>' /></strong>
-							</div>
-						</c:if>
-
-						<%
-						int userGroupsCount = siteMySitesDisplayContext.getGroupUserGroupsCount(group.getGroupId());
-						%>
-
-						<c:if test="<%= userGroupsCount > 0 %>">
-							<div class="text-default">
-								<strong><liferay-ui:message arguments="<%= userGroupsCount %>" key='<%= (userGroupsCount > 1) ? "x-user-groups" : "x-user-group" %>' /></strong>
-							</div>
-						</c:if>
+						<h6 class="text-default">
+							<strong><liferay-ui:message key="members" /></strong>: <%= siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId()) %>
+						</h6>
 
 						<c:if test='<%= Objects.equals(siteMySitesDisplayContext.getTabs1(), "my-sites") && PropsValues.LIVE_USERS_ENABLED %>'>
-							<div class="text-default">
+							<h6 class="text-default">
 								<strong><liferay-ui:message key="online-now" /></strong>: <%= String.valueOf(LiveUsers.getGroupUsersCount(company.getCompanyId(), group.getGroupId())) %>
-							</div>
+							</h6>
 						</c:if>
 					</liferay-ui:search-container-column-text>
 
 					<c:if test="<%= ListUtil.isNotEmpty(dropdownItems) %>">
 						<liferay-ui:search-container-column-text>
 							<clay:dropdown-actions
-								aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 								dropdownItems="<%= dropdownItems %>"
 								propsTransformer="js/SiteDropdownDefaultPropsTransformer"
 							/>
@@ -156,7 +121,7 @@
 				<c:when test='<%= Objects.equals(siteMySitesDisplayContext.getDisplayStyle(), "icon") %>'>
 					<liferay-ui:search-container-column-text>
 						<clay:vertical-card
-							verticalCard="<%= new SiteVerticalCard(group, siteMySitesDisplayContext.getGroupOrganizationsCount(group.getGroupId()), siteMySitesDisplayContext.getGroupUserGroupsCount(group.getGroupId()), siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId()), renderRequest, renderResponse, siteMySitesDisplayContext.getTabs1()) %>"
+							verticalCard="<%= new SiteVerticalCard(group, renderRequest, renderResponse, siteMySitesDisplayContext.getTabs1(), siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId())) %>"
 						/>
 					</liferay-ui:search-container-column-text>
 				</c:when>
@@ -185,48 +150,9 @@
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand-small table-cell-minw-100"
 						name="members"
-					>
-						<span onmouseover="Liferay.Portal.ToolTip.show(this, '<liferay-ui:message key="inherited-memberships-are-not-included-in-members-count" unicode="<%= true %>" />');">
-							<div>
-
-								<%
-								int usersCount = siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId());
-								%>
-
-								<c:if test="<%= usersCount > 0 %>">
-									<div class="user-count">
-										<%= LanguageUtil.format(request, usersCount > 1 ? "x-users" : "x-user", usersCount, false) %>
-									</div>
-								</c:if>
-
-								<%
-								int organizationsCount = siteMySitesDisplayContext.getGroupOrganizationsCount(group.getGroupId());
-								%>
-
-								<c:if test="<%= organizationsCount > 0 %>">
-									<div class="organization-count">
-										<%= LanguageUtil.format(request, organizationsCount > 1 ? "x-organizations" : "x-organization", organizationsCount, false) %>
-									</div>
-								</c:if>
-
-								<%
-								int userGroupsCount = siteMySitesDisplayContext.getGroupUserGroupsCount(group.getGroupId());
-								%>
-
-								<c:if test="<%= userGroupsCount > 0 %>">
-									<div class="user-group-count">
-										<%= LanguageUtil.format(request, userGroupsCount > 1 ? "x-user-groups" : "x-user-group", userGroupsCount, false) %>
-									</div>
-								</c:if>
-
-								<c:if test="<%= (usersCount + organizationsCount + userGroupsCount) <= 0 %>">
-									0
-								</c:if>
-							</div>
-						</span>
-					</liferay-ui:search-container-column-text>
+						value="<%= String.valueOf(siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId())) %>"
+					/>
 
 					<c:if test='<%= Objects.equals(siteMySitesDisplayContext.getTabs1(), "my-sites") && PropsValues.LIVE_USERS_ENABLED %>'>
 						<liferay-ui:search-container-column-text
@@ -247,7 +173,6 @@
 					<c:if test="<%= ListUtil.isNotEmpty(dropdownItems) %>">
 						<liferay-ui:search-container-column-text>
 							<clay:dropdown-actions
-								aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 								dropdownItems="<%= dropdownItems %>"
 								propsTransformer="js/SiteDropdownDefaultPropsTransformer"
 							/>

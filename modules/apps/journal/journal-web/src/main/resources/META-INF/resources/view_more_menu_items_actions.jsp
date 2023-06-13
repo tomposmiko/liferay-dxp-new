@@ -23,20 +23,20 @@ DDMStructure ddmStructure = (DDMStructure)row.getObject();
 %>
 
 <c:choose>
-	<c:when test="<%= ArrayUtil.contains(journalDisplayContext.getAddMenuFavItems(), ddmStructure.getStructureId()) %>">
+	<c:when test="<%= ArrayUtil.contains(journalDisplayContext.getAddMenuFavItems(), ddmStructure.getStructureKey()) %>">
 		<portlet:actionURL name="/journal/remove_menu_fav_item" var="removeAddMenuFavItemURL">
 			<portlet:param name="mvcPath" value="/view_more_menu_items.jsp" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="folderId" value="<%= String.valueOf(journalDisplayContext.getFolderId()) %>" />
-			<portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructure.getStructureId()) %>" />
+			<portlet:param name="ddmStructureKey" value="<%= ddmStructure.getStructureKey() %>" />
 		</portlet:actionURL>
 
-		<clay:link
-			aria-label='<%= LanguageUtil.get(request, "remove-favorite") %>'
-			cssClass="icon-monospaced lfr-portal-tooltip text-default"
-			href="<%= removeAddMenuFavItemURL %>"
+		<liferay-ui:icon
 			icon="star"
-			title='<%= LanguageUtil.get(request, "remove-favorite") %>'
+			linkCssClass="icon-monospaced text-default"
+			markupView="lexicon"
+			message="remove-favorite"
+			url="<%= removeAddMenuFavItemURL %>"
 		/>
 	</c:when>
 	<c:otherwise>
@@ -46,23 +46,23 @@ DDMStructure ddmStructure = (DDMStructure)row.getObject();
 					<portlet:param name="mvcPath" value="/view_more_menu_items.jsp" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 					<portlet:param name="folderId" value="<%= String.valueOf(journalDisplayContext.getFolderId()) %>" />
-					<portlet:param name="ddmStructureId" value="<%= String.valueOf(ddmStructure.getStructureId()) %>" />
+					<portlet:param name="ddmStructureKey" value="<%= ddmStructure.getStructureKey() %>" />
 				</portlet:actionURL>
 
-				<clay:link
-					aria-label='<%= LanguageUtil.get(request, "add-favorite") %>'
-					cssClass="icon-monospaced lfr-portal-tooltip text-default"
-					href="<%= addAddMenuFavItemURL %>"
+				<liferay-ui:icon
 					icon="star-o"
-					title='<%= LanguageUtil.get(request, "add-favorite") %>'
+					linkCssClass="icon-monospaced text-default"
+					markupView="lexicon"
+					message="add-favorite"
+					url="<%= addAddMenuFavItemURL %>"
 				/>
 			</c:when>
 			<c:otherwise>
-				<clay:icon
-					aria-label='<%= LanguageUtil.get(request, "add-favorite") %>'
-					cssClass="icon-monospaced lfr-portal-tooltip text-muted"
-					symbol="star-o"
-					title='<%= LanguageUtil.get(request, "add-favorite") %>'
+				<liferay-ui:icon
+					cssClass="icon-monospaced text-muted"
+					icon="star-o"
+					markupView="lexicon"
+					message="add-favorite"
 				/>
 			</c:otherwise>
 		</c:choose>

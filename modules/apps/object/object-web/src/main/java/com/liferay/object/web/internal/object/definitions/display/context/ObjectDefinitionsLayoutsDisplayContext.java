@@ -14,46 +14,54 @@
 
 package com.liferay.object.web.internal.object.definitions.display.context;
 
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.web.internal.util.ObjectFieldBusinessTypeUtil;
-import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.object.web.internal.constants.ObjectWebKeys;
+import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+
+import javax.portlet.PortletException;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Gabriel Albuquerque
  */
-public class ObjectDefinitionsLayoutsDisplayContext
-	extends BaseObjectDefinitionsDisplayContext {
+public class ObjectDefinitionsLayoutsDisplayContext {
 
 	public ObjectDefinitionsLayoutsDisplayContext(
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
-			objectDefinitionModelResourcePermission,
-		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry) {
+			objectDefinitionModelResourcePermission) {
 
-		super(httpServletRequest, objectDefinitionModelResourcePermission);
+		_objectDefinitionModelResourcePermission =
+			objectDefinitionModelResourcePermission;
 
-		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
+		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 	}
 
-	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
+	public String getAPIURL() {
+		return "/o/object-admin/v1.0/object-definitions/" +
+			getObjectDefinitionId() + "/object-layouts";
+	}
+
+	public List<ClayDataSetActionDropdownItem>
+			getClayDataSetActionDropdownItems()
 		throws Exception {
 
 		return Arrays.asList(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				PortletURLBuilder.create(
 					getPortletURL()
 				).setMVCRenderCommandName(
@@ -64,41 +72,61 @@ public class ObjectDefinitionsLayoutsDisplayContext
 					LiferayWindowState.POP_UP
 				).buildString(),
 				"view", "view",
-				LanguageUtil.get(objectRequestHelper.getRequest(), "view"),
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				"/o/object-admin/v1.0/object-layouts/{id}", "trash", "delete",
-				LanguageUtil.get(objectRequestHelper.getRequest(), "delete"),
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", "async"));
 	}
 
-	public List<Map<String, String>> getObjectFieldBusinessTypeMaps(
-		Locale locale) {
+	public CreationMenu getCreationMenu() throws PortalException {
+		CreationMenu creationMenu = new CreationMenu();
 
-		return ObjectFieldBusinessTypeUtil.getObjectFieldBusinessTypeMaps(
-			locale,
-			_objectFieldBusinessTypeRegistry.getObjectFieldBusinessTypes());
+		if (!_hasAddObjectLayoutPermission()) {
+			return creationMenu;
+		}
+
+		creationMenu.addDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref("addObjectLayout");
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						_objectRequestHelper.getRequest(),
+						"add-object-layout"));
+				dropdownItem.setTarget("event");
+			});
+
+		return creationMenu;
 	}
 
-	@Override
-	protected String getAPIURI() {
-		return "/object-layouts";
+	public long getObjectDefinitionId() {
+		HttpServletRequest httpServletRequest =
+			_objectRequestHelper.getRequest();
+
+		ObjectDefinition objectDefinition =
+			(ObjectDefinition)httpServletRequest.getAttribute(
+				ObjectWebKeys.OBJECT_DEFINITION);
+
+		return objectDefinition.getObjectDefinitionId();
 	}
 
-	@Override
-	protected UnsafeConsumer<DropdownItem, Exception>
-		getCreationMenuDropdownItemUnsafeConsumer() {
-
-		return dropdownItem -> {
-			dropdownItem.setHref("addObjectLayout");
-			dropdownItem.setLabel(
-				LanguageUtil.get(
-					objectRequestHelper.getRequest(), "add-object-layout"));
-			dropdownItem.setTarget("event");
-		};
+	public PortletURL getPortletURL() throws PortletException {
+		return PortletURLUtil.clone(
+			PortletURLUtil.getCurrent(
+				_objectRequestHelper.getLiferayPortletRequest(),
+				_objectRequestHelper.getLiferayPortletResponse()),
+			_objectRequestHelper.getLiferayPortletResponse());
 	}
 
-	private final ObjectFieldBusinessTypeRegistry
-		_objectFieldBusinessTypeRegistry;
+	private boolean _hasAddObjectLayoutPermission() throws PortalException {
+		return _objectDefinitionModelResourcePermission.contains(
+			_objectRequestHelper.getPermissionChecker(),
+			getObjectDefinitionId(), ActionKeys.UPDATE);
+	}
+
+	private final ModelResourcePermission<ObjectDefinition>
+		_objectDefinitionModelResourcePermission;
+	private final ObjectRequestHelper _objectRequestHelper;
 
 }

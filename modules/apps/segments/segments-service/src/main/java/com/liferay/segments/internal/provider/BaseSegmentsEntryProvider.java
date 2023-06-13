@@ -15,14 +15,12 @@
 package com.liferay.segments.internal.provider;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -41,6 +39,7 @@ import com.liferay.segments.service.SegmentsEntryLocalService;
 import com.liferay.segments.service.SegmentsEntryRelLocalService;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -66,10 +65,15 @@ public abstract class BaseSegmentsEntryProvider
 			segmentsEntry, Criteria.Type.MODEL);
 
 		if (Validator.isNull(filterString)) {
-			return TransformUtil.transformToLongArray(
+			List<SegmentsEntryRel> segmentsEntryRels =
 				segmentsEntryRelLocalService.getSegmentsEntryRels(
-					segmentsEntryId, start, end, null),
-				SegmentsEntryRel::getClassPK);
+					segmentsEntryId, start, end, null);
+
+			Stream<SegmentsEntryRel> stream = segmentsEntryRels.stream();
+
+			return stream.mapToLong(
+				SegmentsEntryRel::getClassPK
+			).toArray();
 		}
 
 		ODataRetriever<BaseModel<?>> oDataRetriever =
@@ -79,11 +83,15 @@ public abstract class BaseSegmentsEntryProvider
 			return new long[0];
 		}
 
-		return TransformUtil.transformToLongArray(
-			oDataRetriever.getResults(
-				segmentsEntry.getCompanyId(), filterString,
-				LocaleUtil.getDefault(), start, end),
-			baseModel -> (Long)baseModel.getPrimaryKeyObj());
+		List<BaseModel<?>> results = oDataRetriever.getResults(
+			segmentsEntry.getCompanyId(), filterString, LocaleUtil.getDefault(),
+			start, end);
+
+		Stream<BaseModel<?>> stream = results.stream();
+
+		return stream.mapToLong(
+			baseModel -> (Long)baseModel.getPrimaryKeyObj()
+		).toArray();
 	}
 
 	@Override
@@ -122,14 +130,13 @@ public abstract class BaseSegmentsEntryProvider
 			long groupId, String className, long classPK, Context context)
 		throws PortalException {
 
-		return getSegmentsEntryIds(
-			groupId, className, classPK, context, new long[0], new long[0]);
+		return getSegmentsEntryIds(groupId, className, classPK, context, null);
 	}
 
 	@Override
 	public long[] getSegmentsEntryIds(
 		long groupId, String className, long classPK, Context context,
-		long[] filterSegmentsEntryIds, long[] segmentsEntryIds) {
+		long[] segmentsEntryIds) {
 
 		List<SegmentsEntry> segmentsEntries =
 			segmentsEntryLocalService.getSegmentsEntries(
@@ -140,22 +147,14 @@ public abstract class BaseSegmentsEntryProvider
 			return new long[0];
 		}
 
-		return TransformUtil.transformToLongArray(
-			segmentsEntries,
-			segmentsEntry -> {
-				if ((!ArrayUtil.isEmpty(filterSegmentsEntryIds) &&
-					 !ArrayUtil.contains(
-						 filterSegmentsEntryIds,
-						 segmentsEntry.getSegmentsEntryId())) ||
-					!isMember(
-						className, classPK, context, segmentsEntry,
-						segmentsEntryIds)) {
+		Stream<SegmentsEntry> stream = segmentsEntries.stream();
 
-					return null;
-				}
-
-				return segmentsEntry.getSegmentsEntryId();
-			});
+		return stream.filter(
+			segmentsEntry -> isMember(
+				className, classPK, context, segmentsEntry, segmentsEntryIds)
+		).mapToLong(
+			SegmentsEntry::getSegmentsEntryId
+		).toArray();
 	}
 
 	protected Criteria.Conjunction getConjunction(
@@ -232,11 +231,11 @@ public abstract class BaseSegmentsEntryProvider
 			segmentsEntry, Criteria.Type.MODEL);
 
 		if (context != null) {
-			boolean guestUser = !GetterUtil.getBoolean(
+			boolean defaultUser = !GetterUtil.getBoolean(
 				context.get(Context.SIGNED_IN), true);
 
 			if (contextConjunction.equals(Criteria.Conjunction.AND) &&
-				guestUser && Validator.isNotNull(modelFilterString)) {
+				defaultUser && Validator.isNotNull(modelFilterString)) {
 
 				return false;
 			}
@@ -249,8 +248,11 @@ public abstract class BaseSegmentsEntryProvider
 						contextFilterString, context);
 				}
 				catch (PortalException portalException) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(portalException);
+					if (_log.isDebugEnabled()) {
+						_log.debug(portalException, portalException);
+					}
+					else if (_log.isWarnEnabled()) {
+						_log.warn(portalException.getMessage());
 					}
 				}
 
@@ -267,7 +269,7 @@ public abstract class BaseSegmentsEntryProvider
 				}
 			}
 
-			if (guestUser) {
+			if (defaultUser) {
 				return matchesContext;
 			}
 		}
@@ -293,7 +295,7 @@ public abstract class BaseSegmentsEntryProvider
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 
 			Criteria.Conjunction modelConjunction = getConjunction(

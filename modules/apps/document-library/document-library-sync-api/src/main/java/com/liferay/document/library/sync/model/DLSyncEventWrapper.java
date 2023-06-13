@@ -241,11 +241,6 @@ public class DLSyncEventWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected DLSyncEventWrapper wrap(DLSyncEvent dlSyncEvent) {
 		return new DLSyncEventWrapper(dlSyncEvent);
 	}

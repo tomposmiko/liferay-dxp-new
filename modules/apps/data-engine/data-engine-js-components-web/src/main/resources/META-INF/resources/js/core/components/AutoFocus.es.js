@@ -16,7 +16,7 @@ import React, {useLayoutEffect, useRef, useState} from 'react';
 
 import {usePage} from '../hooks/usePage.es';
 
-export function AutoFocus({children}) {
+export const AutoFocus = ({children}) => {
 	const childRef = useRef();
 	const {activePage, containerElement} = usePage();
 	const [increment, setIncrement] = useState(0);
@@ -34,7 +34,7 @@ export function AutoFocus({children}) {
 				setTimeout(() => setIncrement((value) => value + 1), 5);
 			}
 			else {
-				if (!document.activeElement) {
+				if (!document.activeElement.id) {
 					const firstInput = childRef.current.querySelector('input');
 					const sidebarOpen = document.querySelector(
 						'.ddm-form-builder--sidebar-open'
@@ -67,4 +67,4 @@ export function AutoFocus({children}) {
 			childRef.current = node;
 		},
 	});
-}
+};

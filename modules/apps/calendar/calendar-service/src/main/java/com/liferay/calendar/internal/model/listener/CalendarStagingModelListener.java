@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Akos Thurzo
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class CalendarStagingModelListener extends BaseModelListener<Calendar> {
 
 	@Override
@@ -69,7 +69,7 @@ public class CalendarStagingModelListener extends BaseModelListener<Calendar> {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 

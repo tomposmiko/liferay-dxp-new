@@ -19,7 +19,7 @@ import com.liferay.headless.admin.content.dto.v1_0.DisplayPageTemplateSettings;
 import com.liferay.headless.admin.content.dto.v1_0.OpenGraphSettingsMapping;
 import com.liferay.headless.admin.content.dto.v1_0.SEOSettingsMapping;
 import com.liferay.info.item.InfoItemFormVariation;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.portal.kernel.model.Layout;
@@ -37,13 +37,13 @@ public class DisplayPageTemplateSettingsUtil {
 
 	public static DisplayPageTemplateSettings getDisplayPageTemplateSettings(
 		DTOConverterContext dtoConverterContext,
-		InfoItemServiceRegistry infoItemServiceRegistry, Layout layout,
+		InfoItemServiceTracker infoItemServiceTracker, Layout layout,
 		LayoutPageTemplateEntry layoutPageTemplateEntry, Portal portal) {
 
 		return new DisplayPageTemplateSettings() {
 			{
 				contentAssociation = _getContentAssociation(
-					dtoConverterContext, infoItemServiceRegistry,
+					dtoConverterContext, infoItemServiceTracker,
 					layoutPageTemplateEntry, portal);
 				openGraphSettingsMapping = _getOpenGraphSettingsMapping(layout);
 				seoSettingsMapping = _getSEOSettingsMapping(
@@ -54,7 +54,7 @@ public class DisplayPageTemplateSettingsUtil {
 
 	private static ContentAssociation _getContentAssociation(
 		DTOConverterContext dtoConverterContext,
-		InfoItemServiceRegistry infoItemServiceRegistry,
+		InfoItemServiceTracker infoItemServiceTracker,
 		LayoutPageTemplateEntry layoutPageTemplateEntry, Portal portal) {
 
 		String className = portal.getClassName(
@@ -63,7 +63,7 @@ public class DisplayPageTemplateSettingsUtil {
 		return new ContentAssociation() {
 			{
 				contentSubtype = _getContentSubtype(
-					dtoConverterContext, infoItemServiceRegistry,
+					dtoConverterContext, infoItemServiceTracker,
 					layoutPageTemplateEntry);
 				contentType = _contentTypes.getOrDefault(className, className);
 			}
@@ -72,11 +72,11 @@ public class DisplayPageTemplateSettingsUtil {
 
 	private static String _getContentSubtype(
 		DTOConverterContext dtoConverterContext,
-		InfoItemServiceRegistry infoItemServiceRegistry,
+		InfoItemServiceTracker infoItemServiceTracker,
 		LayoutPageTemplateEntry layoutPageTemplateEntry) {
 
 		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
-			infoItemServiceRegistry.getFirstInfoItemService(
+			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormVariationsProvider.class,
 				layoutPageTemplateEntry.getClassName());
 

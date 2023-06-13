@@ -46,13 +46,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Stian Sigvartsen
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class SamlBottomJSPDynamicInclude extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -124,6 +119,14 @@ public class SamlBottomJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.saml.web)", unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final String[] _ERRORS = {
 		AuthnAgeException.class.getSimpleName(),
 		ContactNameException.class.getSimpleName(),
@@ -142,8 +145,5 @@ public class SamlBottomJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Reference
 	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.saml.web)")
-	private ServletContext _servletContext;
 
 }

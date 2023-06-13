@@ -98,21 +98,6 @@ public interface ObjectFieldModel
 	public void setUuid(String uuid);
 
 	/**
-	 * Returns the external reference code of this object field.
-	 *
-	 * @return the external reference code of this object field
-	 */
-	@AutoEscape
-	public String getExternalReferenceCode();
-
-	/**
-	 * Sets the external reference code of this object field.
-	 *
-	 * @param externalReferenceCode the external reference code of this object field
-	 */
-	public void setExternalReferenceCode(String externalReferenceCode);
-
-	/**
 	 * Returns the object field ID of this object field.
 	 *
 	 * @return the object field ID of this object field
@@ -252,21 +237,6 @@ public interface ObjectFieldModel
 	public void setObjectDefinitionId(long objectDefinitionId);
 
 	/**
-	 * Returns the business type of this object field.
-	 *
-	 * @return the business type of this object field
-	 */
-	@AutoEscape
-	public String getBusinessType();
-
-	/**
-	 * Sets the business type of this object field.
-	 *
-	 * @param businessType the business type of this object field
-	 */
-	public void setBusinessType(String businessType);
-
-	/**
 	 * Returns the db column name of this object field.
 	 *
 	 * @return the db column name of this object field
@@ -295,21 +265,6 @@ public interface ObjectFieldModel
 	 * @param dbTableName the db table name of this object field
 	 */
 	public void setDBTableName(String dbTableName);
-
-	/**
-	 * Returns the db type of this object field.
-	 *
-	 * @return the db type of this object field
-	 */
-	@AutoEscape
-	public String getDBType();
-
-	/**
-	 * Sets the db type of this object field.
-	 *
-	 * @param dbType the db type of this object field
-	 */
-	public void setDBType(String dbType);
 
 	/**
 	 * Returns the indexed of this object field.
@@ -468,27 +423,6 @@ public interface ObjectFieldModel
 	public void setLabelMap(Map<Locale, String> labelMap, Locale defaultLocale);
 
 	/**
-	 * Returns the localized of this object field.
-	 *
-	 * @return the localized of this object field
-	 */
-	public boolean getLocalized();
-
-	/**
-	 * Returns <code>true</code> if this object field is localized.
-	 *
-	 * @return <code>true</code> if this object field is localized; <code>false</code> otherwise
-	 */
-	public boolean isLocalized();
-
-	/**
-	 * Sets whether this object field is localized.
-	 *
-	 * @param localized the localized of this object field
-	 */
-	public void setLocalized(boolean localized);
-
-	/**
 	 * Returns the name of this object field.
 	 *
 	 * @return the name of this object field
@@ -540,46 +474,19 @@ public interface ObjectFieldModel
 	public void setRequired(boolean required);
 
 	/**
-	 * Returns the state of this object field.
+	 * Returns the type of this object field.
 	 *
-	 * @return the state of this object field
+	 * @return the type of this object field
 	 */
-	public boolean getState();
+	@AutoEscape
+	public String getType();
 
 	/**
-	 * Returns <code>true</code> if this object field is state.
+	 * Sets the type of this object field.
 	 *
-	 * @return <code>true</code> if this object field is state; <code>false</code> otherwise
+	 * @param type the type of this object field
 	 */
-	public boolean isState();
-
-	/**
-	 * Sets whether this object field is state.
-	 *
-	 * @param state the state of this object field
-	 */
-	public void setState(boolean state);
-
-	/**
-	 * Returns the system of this object field.
-	 *
-	 * @return the system of this object field
-	 */
-	public boolean getSystem();
-
-	/**
-	 * Returns <code>true</code> if this object field is system.
-	 *
-	 * @return <code>true</code> if this object field is system; <code>false</code> otherwise
-	 */
-	public boolean isSystem();
-
-	/**
-	 * Sets whether this object field is system.
-	 *
-	 * @param system the system of this object field
-	 */
-	public void setSystem(boolean system);
+	public void setType(String type);
 
 	@Override
 	public String[] getAvailableLanguageIds();
@@ -596,9 +503,5 @@ public interface ObjectFieldModel
 
 	@Override
 	public ObjectField cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

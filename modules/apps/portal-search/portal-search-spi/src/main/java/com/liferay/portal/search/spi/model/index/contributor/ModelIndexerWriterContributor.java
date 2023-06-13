@@ -36,9 +36,6 @@ public interface ModelIndexerWriterContributor<T extends BaseModel<?>> {
 		return null;
 	}
 
-	public default void modelDeleted(T baseModel) {
-	}
-
 	public default void modelIndexed(T baseModel) {
 	}
 

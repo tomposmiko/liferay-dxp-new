@@ -308,8 +308,4 @@ public interface SiteNavigationMenuModel
 	@Override
 	public SiteNavigationMenu cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

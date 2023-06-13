@@ -23,9 +23,6 @@ import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskInstanceTokenLocalService;
-import com.liferay.portal.workflow.metrics.model.CompleteTaskRequest;
-import com.liferay.portal.workflow.metrics.model.DeleteTaskRequest;
-import com.liferay.portal.workflow.metrics.model.UpdateTaskRequest;
 import com.liferay.portal.workflow.metrics.search.index.TaskWorkflowMetricsIndexer;
 
 import java.time.Duration;
@@ -40,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class KaleoTaskInstanceTokenModelListener
 	extends BaseKaleoModelListener<KaleoTaskInstanceToken> {
 
@@ -58,10 +55,33 @@ public class KaleoTaskInstanceTokenModelListener
 					return null;
 				}
 
+				List<KaleoTaskAssignmentInstance> kaleoTaskAssignmentInstances =
+					_kaleoTaskAssignmentInstanceLocalService.
+						getKaleoTaskAssignmentInstances(
+							kaleoTaskInstanceToken.
+								getKaleoTaskInstanceTokenId());
+
 				_taskWorkflowMetricsIndexer.addTask(
-					_indexerHelper.createAddTaskRequest(
-						null, kaleoTaskInstanceToken,
-						kaleoDefinitionVersion.getVersion()));
+					_indexerHelper.createAssetTitleLocalizationMap(
+						kaleoTaskInstanceToken.getClassName(),
+						kaleoTaskInstanceToken.getClassPK(),
+						kaleoTaskInstanceToken.getGroupId()),
+					_indexerHelper.createAssetTypeLocalizationMap(
+						kaleoTaskInstanceToken.getClassName(),
+						kaleoTaskInstanceToken.getGroupId()),
+					_indexerHelper.toAssignments(kaleoTaskAssignmentInstances),
+					kaleoTaskInstanceToken.getClassName(),
+					kaleoTaskInstanceToken.getClassPK(),
+					kaleoTaskInstanceToken.getCompanyId(), false, null, null,
+					kaleoTaskInstanceToken.getCreateDate(), false, null,
+					kaleoTaskInstanceToken.getKaleoInstanceId(),
+					kaleoTaskInstanceToken.getModifiedDate(),
+					kaleoTaskInstanceToken.getKaleoTaskName(),
+					kaleoTaskInstanceToken.getKaleoTaskId(),
+					kaleoTaskInstanceToken.getKaleoDefinitionId(),
+					kaleoDefinitionVersion.getVersion(),
+					kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(),
+					kaleoTaskInstanceToken.getUserId());
 
 				return null;
 			});
@@ -82,31 +102,20 @@ public class KaleoTaskInstanceTokenModelListener
 								getKaleoTaskInstanceTokenId());
 
 				if (!kaleoTaskAssignmentInstances.isEmpty()) {
-					UpdateTaskRequest.Builder updateTaskRequestBuilder =
-						new UpdateTaskRequest.Builder();
-
 					_taskWorkflowMetricsIndexer.updateTask(
-						updateTaskRequestBuilder.assetTitleMap(
-							_indexerHelper.createAssetTitleLocalizationMap(
-								kaleoTaskInstanceToken.getClassName(),
-								kaleoTaskInstanceToken.getClassPK(),
-								kaleoTaskInstanceToken.getGroupId())
-						).assetTypeMap(
-							_indexerHelper.createAssetTypeLocalizationMap(
-								kaleoTaskInstanceToken.getClassName(),
-								kaleoTaskInstanceToken.getGroupId())
-						).assignments(
-							_indexerHelper.toAssignments(
-								kaleoTaskAssignmentInstances)
-						).companyId(
-							kaleoTaskInstanceToken.getCompanyId()
-						).modifiedDate(
-							kaleoTaskInstanceToken.getModifiedDate()
-						).taskId(
-							kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId()
-						).userId(
-							kaleoTaskInstanceToken.getUserId()
-						).build());
+						_indexerHelper.createAssetTitleLocalizationMap(
+							kaleoTaskInstanceToken.getClassName(),
+							kaleoTaskInstanceToken.getClassPK(),
+							kaleoTaskInstanceToken.getGroupId()),
+						_indexerHelper.createAssetTypeLocalizationMap(
+							kaleoTaskInstanceToken.getClassName(),
+							kaleoTaskInstanceToken.getGroupId()),
+						_indexerHelper.toAssignments(
+							kaleoTaskAssignmentInstances),
+						kaleoTaskInstanceToken.getCompanyId(),
+						kaleoTaskInstanceToken.getModifiedDate(),
+						kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(),
+						kaleoTaskInstanceToken.getUserId());
 				}
 
 				return null;
@@ -117,15 +126,9 @@ public class KaleoTaskInstanceTokenModelListener
 	public void onBeforeRemove(KaleoTaskInstanceToken kaleoTaskInstanceToken)
 		throws ModelListenerException {
 
-		DeleteTaskRequest.Builder deleteTaskRequestBuilder =
-			new DeleteTaskRequest.Builder();
-
 		_taskWorkflowMetricsIndexer.deleteTask(
-			deleteTaskRequestBuilder.companyId(
-				kaleoTaskInstanceToken.getCompanyId()
-			).taskId(
-				kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId()
-			).build());
+			kaleoTaskInstanceToken.getCompanyId(),
+			kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId());
 	}
 
 	@Override
@@ -144,34 +147,18 @@ public class KaleoTaskInstanceTokenModelListener
 			return;
 		}
 
-		CompleteTaskRequest.Builder completeTaskRequestBuilder =
-			new CompleteTaskRequest.Builder();
+		Date createDate = kaleoTaskInstanceToken.getCreateDate();
+		Date completionDate = kaleoTaskInstanceToken.getCompletionDate();
+
+		Duration duration = Duration.between(
+			createDate.toInstant(), completionDate.toInstant());
 
 		_taskWorkflowMetricsIndexer.completeTask(
-			completeTaskRequestBuilder.companyId(
-				kaleoTaskInstanceToken.getCompanyId()
-			).completionDate(
-				kaleoTaskInstanceToken.getCompletionDate()
-			).completionUserId(
-				kaleoTaskInstanceToken.getCompletionUserId()
-			).duration(
-				() -> {
-					Date createDate = kaleoTaskInstanceToken.getCreateDate();
-					Date completionDate =
-						kaleoTaskInstanceToken.getCompletionDate();
-
-					Duration duration = Duration.between(
-						createDate.toInstant(), completionDate.toInstant());
-
-					return duration.toMillis();
-				}
-			).modifiedDate(
-				kaleoTaskInstanceToken.getModifiedDate()
-			).taskId(
-				kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId()
-			).userId(
-				kaleoTaskInstanceToken.getUserId()
-			).build());
+			kaleoTaskInstanceToken.getCompanyId(), completionDate,
+			kaleoTaskInstanceToken.getCompletionUserId(), duration.toMillis(),
+			kaleoTaskInstanceToken.getModifiedDate(),
+			kaleoTaskInstanceToken.getKaleoTaskInstanceTokenId(),
+			kaleoTaskInstanceToken.getUserId());
 	}
 
 	@Reference

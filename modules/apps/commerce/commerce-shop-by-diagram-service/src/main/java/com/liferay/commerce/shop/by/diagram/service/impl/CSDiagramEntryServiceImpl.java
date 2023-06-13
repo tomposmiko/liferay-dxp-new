@@ -15,26 +15,24 @@
 package com.liferay.commerce.shop.by.diagram.service.impl;
 
 import com.liferay.commerce.product.model.CPDefinition;
-import com.liferay.commerce.product.model.CProduct;
-import com.liferay.commerce.product.service.CProductLocalService;
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry;
 import com.liferay.commerce.shop.by.diagram.service.base.CSDiagramEntryServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = {
 		"json.web.service.context.name=commerce",
 		"json.web.service.context.path=CSDiagramEntry"
@@ -69,8 +67,11 @@ public class CSDiagramEntryServiceImpl extends CSDiagramEntryServiceBaseImpl {
 	}
 
 	@Override
-	public void deleteCSDiagramEntry(CSDiagramEntry csDiagramEntry)
+	public void deleteCSDiagramEntry(long csDiagramEntryId)
 		throws PortalException {
+
+		CSDiagramEntry csDiagramEntry =
+			csDiagramEntryLocalService.getCSDiagramEntry(csDiagramEntryId);
 
 		_cpDefinitionModelResourcePermission.check(
 			getPermissionChecker(), csDiagramEntry.getCPDefinitionId(),
@@ -89,35 +90,6 @@ public class CSDiagramEntryServiceImpl extends CSDiagramEntryServiceBaseImpl {
 
 		return csDiagramEntryLocalService.fetchCSDiagramEntry(
 			cpDefinitionId, sequence);
-	}
-
-	@Override
-	public List<CSDiagramEntry> getCProductCSDiagramEntries(
-			long cProductId, int start, int end,
-			OrderByComparator<CSDiagramEntry> orderByComparator)
-		throws PortalException {
-
-		CProduct cProduct = _cProductLocalService.getCProduct(cProductId);
-
-		_cpDefinitionModelResourcePermission.check(
-			getPermissionChecker(), cProduct.getPublishedCPDefinitionId(),
-			ActionKeys.VIEW);
-
-		return csDiagramEntryPersistence.findByCProductId(
-			cProductId, start, end, orderByComparator);
-	}
-
-	@Override
-	public int getCProductCSDiagramEntriesCount(long cProductId)
-		throws PortalException {
-
-		CProduct cProduct = _cProductLocalService.getCProduct(cProductId);
-
-		_cpDefinitionModelResourcePermission.check(
-			getPermissionChecker(), cProduct.getPublishedCPDefinitionId(),
-			ActionKeys.VIEW);
-
-		return csDiagramEntryPersistence.countByCProductId(cProductId);
 	}
 
 	@Override
@@ -188,13 +160,10 @@ public class CSDiagramEntryServiceImpl extends CSDiagramEntryServiceBaseImpl {
 			sequence, sku, serviceContext);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CPDefinition)"
-	)
-	private ModelResourcePermission<CPDefinition>
-		_cpDefinitionModelResourcePermission;
-
-	@Reference
-	private CProductLocalService _cProductLocalService;
+	private static volatile ModelResourcePermission<CPDefinition>
+		_cpDefinitionModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CSDiagramEntryServiceImpl.class,
+				"_cpDefinitionModelResourcePermission", CPDefinition.class);
 
 }

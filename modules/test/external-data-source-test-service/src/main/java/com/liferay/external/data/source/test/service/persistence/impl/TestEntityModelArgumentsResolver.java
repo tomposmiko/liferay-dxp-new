@@ -20,7 +20,6 @@ import com.liferay.external.data.source.test.model.impl.TestEntityModelImpl;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.external.data.source.test.model.impl.TestEntityImpl",
-		"table.name=TestEntity"
-	},
-	service = ArgumentsResolver.class
-)
 public class TestEntityModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

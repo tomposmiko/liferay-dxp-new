@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -37,6 +35,7 @@ import com.liferay.ratings.kernel.service.RatingsEntryLocalServiceUtil;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalServiceUtil;
 import com.liferay.ratings.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
+import com.liferay.trash.kernel.util.TrashUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
@@ -52,10 +51,6 @@ public class RatingsTag extends IncludeTag {
 
 	public long getClassPK() {
 		return _classPK;
-	}
-
-	public String getContentTitle() {
-		return _contentTitle;
 	}
 
 	public int getNumberOfStars() {
@@ -88,10 +83,6 @@ public class RatingsTag extends IncludeTag {
 
 	public void setClassPK(long classPK) {
 		_classPK = classPK;
-	}
-
-	public void setContentTitle(String contentTitle) {
-		_contentTitle = contentTitle;
 	}
 
 	public void setInTrash(boolean inTrash) {
@@ -135,7 +126,6 @@ public class RatingsTag extends IncludeTag {
 
 		_className = null;
 		_classPK = 0;
-		_contentTitle = null;
 		_inTrash = null;
 		_numberOfStars = _NUMBER_OF_STARS;
 		_ratingsEntry = null;
@@ -192,8 +182,6 @@ public class RatingsTag extends IncludeTag {
 				).put(
 					"classPK", _classPK
 				).put(
-					"contentTitle", _contentTitle
-				).put(
 					"enabled", _isEnabled(themeDisplay, inTrash)
 				).put(
 					"initialAverageScore", _getInitialAverageScore(ratingsStats)
@@ -238,7 +226,7 @@ public class RatingsTag extends IncludeTag {
 			httpServletRequest.setAttribute("liferay-ratings:ratings:url", url);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -358,14 +346,7 @@ public class RatingsTag extends IncludeTag {
 
 	private boolean _isInTrash() throws PortalException {
 		if (_inTrash == null) {
-			TrashHandler trashHandler =
-				TrashHandlerRegistryUtil.getTrashHandler(_className);
-
-			if (trashHandler == null) {
-				return false;
-			}
-
-			return trashHandler.isInTrash(_classPK);
+			return TrashUtil.isInTrash(_className, _classPK);
 		}
 
 		return _inTrash;
@@ -396,7 +377,6 @@ public class RatingsTag extends IncludeTag {
 
 	private String _className;
 	private long _classPK;
-	private String _contentTitle;
 	private Boolean _inTrash;
 	private int _numberOfStars = _NUMBER_OF_STARS;
 	private RatingsEntry _ratingsEntry;

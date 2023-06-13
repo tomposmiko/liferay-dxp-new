@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AssetListPortletKeys.ASSET_LIST,
 		"mvc.command.name=/asset_list/update_asset_list_entry_dynamic"
@@ -85,7 +86,7 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 					assetListEntry.getTypeSettings(segmentsEntryId)
 				).build();
 
-			_updateQueryLogic(actionRequest, unicodeProperties);
+			updateQueryLogic(actionRequest, unicodeProperties);
 
 			UnicodeProperties typeSettingsUnicodeProperties =
 				PropertiesParamUtil.getProperties(
@@ -99,7 +100,8 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 		}
 		catch (DuplicateQueryRuleException duplicateQueryRuleException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(duplicateQueryRuleException);
+				_log.debug(
+					duplicateQueryRuleException, duplicateQueryRuleException);
 			}
 
 			SessionErrors.add(
@@ -108,7 +110,7 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 		}
 	}
 
-	private AssetQueryRule _getQueryRule(
+	protected AssetQueryRule getQueryRule(
 		ActionRequest actionRequest, int index) {
 
 		boolean contains = ParamUtil.getBoolean(
@@ -142,7 +144,7 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 		return new AssetQueryRule(contains, andOperator, name, values);
 	}
 
-	private void _updateQueryLogic(
+	protected void updateQueryLogic(
 			ActionRequest actionRequest, UnicodeProperties unicodeProperties)
 		throws Exception {
 
@@ -160,10 +162,10 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 		List<AssetQueryRule> queryRules = new ArrayList<>();
 
 		for (int queryRulesIndex : queryRulesIndexes) {
-			AssetQueryRule queryRule = _getQueryRule(
+			AssetQueryRule queryRule = getQueryRule(
 				actionRequest, queryRulesIndex);
 
-			_validateQueryRule(userId, groupId, queryRules, queryRule);
+			validateQueryRule(userId, groupId, queryRules, queryRule);
 
 			queryRules.add(queryRule);
 
@@ -195,7 +197,7 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 		}
 	}
 
-	private void _validateQueryRule(
+	protected void validateQueryRule(
 			long userId, long groupId, List<AssetQueryRule> queryRules,
 			AssetQueryRule queryRule)
 		throws Exception {

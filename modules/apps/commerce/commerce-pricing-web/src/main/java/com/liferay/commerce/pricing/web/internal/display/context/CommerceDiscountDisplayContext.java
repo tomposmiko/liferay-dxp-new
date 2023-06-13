@@ -30,10 +30,11 @@ import com.liferay.commerce.frontend.model.HeaderActionModel;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.pricing.constants.CommercePricingPortletKeys;
 import com.liferay.commerce.pricing.model.CommercePricingClass;
-import com.liferay.commerce.pricing.web.internal.constants.CommerceDiscountScreenNavigationConstants;
+import com.liferay.commerce.pricing.web.internal.servlet.taglib.ui.constants.CommerceDiscountScreenNavigationConstants;
 import com.liferay.commerce.product.model.CPDefinition;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
@@ -232,15 +232,50 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 				"/discount-categories?nestedFields=category";
 	}
 
-	public List<FDSActionDropdownItem>
-			getDiscountCategoryFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountCategoryClayDataSetActionDropdownItems()
 		throws PortalException {
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "delete",
 				LanguageUtil.get(httpServletRequest, "delete"), "delete",
 				"delete", "headless"));
+	}
+
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountClayDataSetActionDropdownItems()
+		throws PortalException {
+
+		return ListUtil.fromArray(
+			new ClayDataSetActionDropdownItem(
+				PortletURLBuilder.create(
+					PortletProviderUtil.getPortletURL(
+						httpServletRequest, CommerceDiscount.class.getName(),
+						PortletProvider.Action.MANAGE)
+				).setMVCRenderCommandName(
+					"/commerce_discount/edit_commerce_discount"
+				).setRedirect(
+					commercePricingRequestHelper.getCurrentURL()
+				).setParameter(
+					"commerceDiscountId", "{id}"
+				).setParameter(
+					"screenNavigationCategoryKey",
+					CommerceDiscountScreenNavigationConstants.
+						CATEGORY_KEY_DETAILS
+				).setParameter(
+					"usePercentage", "{usePercentage}"
+				).buildString(),
+				"pencil", "edit", LanguageUtil.get(httpServletRequest, "edit"),
+				"get", null, null),
+			new ClayDataSetActionDropdownItem(
+				null, "trash", "delete",
+				LanguageUtil.get(httpServletRequest, "delete"), "delete",
+				"delete", "headless"),
+			new ClayDataSetActionDropdownItem(
+				_getManageDiscountPermissionsURL(), null, "permissions",
+				LanguageUtil.get(httpServletRequest, "permissions"), "get",
+				"permissions", "modal-permissions"));
 	}
 
 	public String getDiscountCPDefinitionApiURL() throws PortalException {
@@ -248,11 +283,11 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getCommerceDiscountId() + "/discount-products?nestedFields=product";
 	}
 
-	public List<FDSActionDropdownItem>
-			getDiscountCPDefinitionFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountCPDefinitionClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionTemplates(
+		return getClayDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
 					httpServletRequest, CPDefinition.class.getName(),
@@ -274,17 +309,17 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getCommerceDiscountId() + "/discount-skus?nestedFields=sku";
 	}
 
-	public List<FDSActionDropdownItem>
-			getDiscountCPInstanceFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountCPInstanceClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionTemplates(
+		return getClayDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
 					httpServletRequest, CPDefinition.class.getName(),
 					PortletProvider.Action.MANAGE)
 			).setMVCRenderCommandName(
-				"/cp_definitions/edit_cp_definition"
+				"/cp_definitions/edit_cp_instance"
 			).setRedirect(
 				commercePricingRequestHelper.getCurrentURL()
 			).setParameter(
@@ -292,7 +327,7 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			).setParameter(
 				"cpInstanceId", "{sku.id}"
 			).setParameter(
-				"screenNavigationCategoryKey", "skus"
+				"screenNavigationCategoryKey", "details"
 			).buildString(),
 			false);
 	}
@@ -315,51 +350,11 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 		return creationMenu;
 	}
 
-	public List<FDSActionDropdownItem> getDiscountFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountPricingClassClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
-				PortletURLBuilder.create(
-					PortletProviderUtil.getPortletURL(
-						httpServletRequest, CommerceDiscount.class.getName(),
-						PortletProvider.Action.MANAGE)
-				).setMVCRenderCommandName(
-					"/commerce_discount/edit_commerce_discount"
-				).setRedirect(
-					commercePricingRequestHelper.getCurrentURL()
-				).setParameter(
-					"commerceDiscountId", "{id}"
-				).setParameter(
-					"screenNavigationCategoryKey",
-					CommerceDiscountScreenNavigationConstants.
-						CATEGORY_KEY_DETAILS
-				).setParameter(
-					"usePercentage", "{usePercentage}"
-				).buildString(),
-				"pencil", "edit", LanguageUtil.get(httpServletRequest, "edit"),
-				"get", null, null),
-			new FDSActionDropdownItem(
-				null, "trash", "delete",
-				LanguageUtil.get(httpServletRequest, "delete"), "delete",
-				"delete", "headless"),
-			new FDSActionDropdownItem(
-				_getManageDiscountPermissionsURL(), null, "permissions",
-				LanguageUtil.get(httpServletRequest, "permissions"), "get",
-				"permissions", "modal-permissions"));
-	}
-
-	public String getDiscountPricingClassesApiURL() throws PortalException {
-		return "/o/headless-commerce-admin-pricing/v2.0/discounts/" +
-			getCommerceDiscountId() +
-				"/discount-product-groups?nestedFields=productGroup";
-	}
-
-	public List<FDSActionDropdownItem>
-			getDiscountPricingClassFDSActionDropdownItems()
-		throws PortalException {
-
-		return getFDSActionTemplates(
+		return getClayDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
 					httpServletRequest, CommercePricingClass.class.getName(),
@@ -374,6 +369,12 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 				"screenNavigationCategoryKey", "details"
 			).buildString(),
 			false);
+	}
+
+	public String getDiscountPricingClassesApiURL() throws PortalException {
+		return "/o/headless-commerce-admin-pricing/v2.0/discounts/" +
+			getCommerceDiscountId() +
+				"/discount-product-groups?nestedFields=productGroup";
 	}
 
 	public CreationMenu getDiscountRuleCreationMenu() throws Exception {
@@ -399,7 +400,8 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getCommerceDiscountId() + "/discount-rules";
 	}
 
-	public List<FDSActionDropdownItem> getDiscountRulesFDSActionDropdownItem()
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountRulesClayDataSetActionDropdownItem()
 		throws PortalException {
 
 		PortletURL portletURL = PortletURLBuilder.create(
@@ -421,10 +423,10 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
 		}
 		catch (WindowStateException windowStateException) {
-			_log.error(windowStateException);
+			_log.error(windowStateException, windowStateException);
 		}
 
-		return getFDSActionTemplates(portletURL.toString(), true);
+		return getClayDataSetActionTemplates(portletURL.toString(), true);
 	}
 
 	public String getEditCommerceDiscountActionURL() throws Exception {
@@ -502,7 +504,7 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 				commercePricingRequestHelper.getScopeGroupId(),
 				CommerceDiscount.class.getName())) {
 
-			publishButtonLabel = "submit-for-workflow";
+			publishButtonLabel = "submit-for-publication";
 		}
 
 		String additionalClasses = "btn-primary";
@@ -533,11 +535,13 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			_commerceCurrencyLocalService.fetchPrimaryCommerceCurrency(
 				commercePricingRequestHelper.getCompanyId());
 
-		return StringUtil.removeSubstring(
+		String localizedPercentage =
 			_percentageFormatter.getLocalizedPercentage(
 				locale, commerceCurrency.getMaxFractionDigits(),
-				commerceCurrency.getMinFractionDigits(), percentage),
-			StringPool.PERCENT);
+				commerceCurrency.getMinFractionDigits(), percentage);
+
+		return StringUtil.removeSubstring(
+			localizedPercentage, StringPool.PERCENT);
 	}
 
 	public PortletURL getPortletDiscountRuleURL() {
@@ -630,28 +634,31 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 		return commerceCurrency.round(value);
 	}
 
-	protected List<FDSActionDropdownItem> getFDSActionTemplates(
+	protected List<ClayDataSetActionDropdownItem> getClayDataSetActionTemplates(
 		String portletURL, boolean sidePanel) {
 
-		List<FDSActionDropdownItem> fdsActionDropdownItems = new ArrayList<>();
+		List<ClayDataSetActionDropdownItem> clayDataSetActionDropdownItems =
+			new ArrayList<>();
 
-		FDSActionDropdownItem fdsActionDropdownItem = new FDSActionDropdownItem(
-			portletURL, "pencil", "edit",
-			LanguageUtil.get(httpServletRequest, "edit"), "get", null, null);
+		ClayDataSetActionDropdownItem clayDataSetActionDropdownItem =
+			new ClayDataSetActionDropdownItem(
+				portletURL, "pencil", "edit",
+				LanguageUtil.get(httpServletRequest, "edit"), "get", null,
+				null);
 
 		if (sidePanel) {
-			fdsActionDropdownItem.setTarget("sidePanel");
+			clayDataSetActionDropdownItem.setTarget("sidePanel");
 		}
 
-		fdsActionDropdownItems.add(fdsActionDropdownItem);
+		clayDataSetActionDropdownItems.add(clayDataSetActionDropdownItem);
 
-		fdsActionDropdownItems.add(
-			new FDSActionDropdownItem(
+		clayDataSetActionDropdownItems.add(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "remove",
 				LanguageUtil.get(httpServletRequest, "remove"), "delete",
 				"delete", "headless"));
 
-		return fdsActionDropdownItems;
+		return clayDataSetActionDropdownItems;
 	}
 
 	protected final Portal portal;

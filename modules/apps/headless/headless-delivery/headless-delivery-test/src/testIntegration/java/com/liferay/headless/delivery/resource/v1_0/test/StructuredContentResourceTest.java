@@ -34,7 +34,9 @@ import com.liferay.headless.delivery.client.dto.v1_0.ContentFieldValue;
 import com.liferay.headless.delivery.client.dto.v1_0.Geo;
 import com.liferay.headless.delivery.client.dto.v1_0.StructuredContent;
 import com.liferay.headless.delivery.client.dto.v1_0.StructuredContentLink;
+import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.resource.v1_0.StructuredContentResource;
+import com.liferay.headless.delivery.client.serdes.v1_0.StructuredContentSerDes;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
@@ -42,15 +44,17 @@ import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
-import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -62,23 +66,27 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
+import com.liferay.portal.vulcan.jaxrs.context.EntityExtensionContext;
+import com.liferay.portal.vulcan.jaxrs.context.ExtensionContext;
 
 import java.io.InputStream;
 
 import java.text.SimpleDateFormat;
 
+import java.util.Collections;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import javax.ws.rs.ext.ContextResolver;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -86,6 +94,11 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Javier Gamarra
@@ -104,8 +117,10 @@ public class StructuredContentResourceTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_complexDDMStructure = _addDDMStructure(
-			testGroup, "test-complex-ddm-structure.json");
+		_ddmComplexStructure = _addDDMStructure(
+			testGroup, "test-ddm-complex-structure.json");
+		_ddmLocalizedStructure = _addDDMStructure(
+			testGroup, "test-ddm-localized-structure.json");
 
 		_ddmStructure = _addDDMStructure(testGroup, "test-ddm-structure.json");
 
@@ -127,38 +142,14 @@ public class StructuredContentResourceTest
 			irrelevantGroup.getGroupId(), RandomTestUtil.randomString());
 		_journalFolder = JournalTestUtil.addFolder(
 			testGroup.getGroupId(), RandomTestUtil.randomString());
-		_layout = LayoutTestUtil.addTypeContentLayout(testGroup);
-		_localizedDDMStructure = _addDDMStructure(
-			testGroup, "test-localized-ddm-structure.json");
-	}
 
-	@Override
-	@Test
-	public void testDeleteStructuredContentMyRating() throws Exception {
-		super.testDeleteStructuredContentMyRating();
-
-		StructuredContent structuredContent =
-			testDeleteStructuredContentMyRating_addStructuredContent();
-
-		assertHttpResponseStatusCode(
-			204,
-			structuredContentResource.
-				deleteStructuredContentMyRatingHttpResponse(
-					structuredContent.getId()));
-		assertHttpResponseStatusCode(
-			404,
-			structuredContentResource.
-				deleteStructuredContentMyRatingHttpResponse(
-					structuredContent.getId()));
-
-		StructuredContent irrelevantStructuredContent =
-			randomIrrelevantStructuredContent();
-
-		assertHttpResponseStatusCode(
-			404,
-			structuredContentResource.
-				deleteStructuredContentMyRatingHttpResponse(
-					irrelevantStructuredContent.getId()));
+		_layout = LayoutLocalServiceUtil.addLayout(
+			TestPropsValues.getUserId(), testGroup.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK,
+			ServiceContextTestUtil.getServiceContext(testGroup.getGroupId()));
 	}
 
 	@Override
@@ -171,39 +162,23 @@ public class StructuredContentResourceTest
 
 		// Complete structured content with all types of content fields
 
-		StructuredContent postStructuredContent =
+		StructuredContent completeStructuredContent =
 			structuredContentResource.postSiteStructuredContent(
 				testGroup.getGroupId(), _randomCompleteStructuredContent());
 
-		StructuredContent getStructuredContent =
+		StructuredContent structuredContent =
 			structuredContentResource.getStructuredContent(
-				postStructuredContent.getId());
+				completeStructuredContent.getId());
 
-		assertEquals(postStructuredContent, getStructuredContent);
-		assertValid(getStructuredContent);
-
-		// Different folder
-
-		postStructuredContent =
-			structuredContentResource.
-				postStructuredContentFolderStructuredContent(
-					_journalFolder.getFolderId(),
-					_randomCompleteStructuredContent());
-
-		getStructuredContent = structuredContentResource.getStructuredContent(
-			postStructuredContent.getId());
-
-		Assert.assertEquals(
-			_journalFolder.getFolderId(),
-			(long)getStructuredContent.getStructuredContentFolderId());
+		assertEquals(completeStructuredContent, structuredContent);
+		assertValid(structuredContent);
 
 		// Different locale
 
-		postStructuredContent =
-			structuredContentResource.postSiteStructuredContent(
-				testGroup.getGroupId(), randomStructuredContent());
+		structuredContent = structuredContentResource.postSiteStructuredContent(
+			testGroup.getGroupId(), randomStructuredContent());
 
-		String title = postStructuredContent.getTitle();
+		String title = structuredContent.getTitle();
 
 		StructuredContentResource.Builder builder =
 			StructuredContentResource.builder();
@@ -217,28 +192,64 @@ public class StructuredContentResourceTest
 
 		String frenchTitle = RandomTestUtil.randomString();
 
-		postStructuredContent.setTitle(frenchTitle);
+		structuredContent.setTitle(frenchTitle);
 
 		frenchStructuredContentResource.putStructuredContent(
-			postStructuredContent.getId(), postStructuredContent);
+			structuredContent.getId(), structuredContent);
 
-		getStructuredContent =
+		structuredContent =
 			frenchStructuredContentResource.getStructuredContent(
-				postStructuredContent.getId());
+				structuredContent.getId());
 
-		Assert.assertEquals(frenchTitle, getStructuredContent.getTitle());
+		Assert.assertEquals(frenchTitle, structuredContent.getTitle());
 
-		getStructuredContent = structuredContentResource.getStructuredContent(
-			getStructuredContent.getId());
+		structuredContent = structuredContentResource.getStructuredContent(
+			structuredContent.getId());
 
-		Assert.assertEquals(title, getStructuredContent.getTitle());
+		Assert.assertEquals(title, structuredContent.getTitle());
+
+		// Extension
+
+		Bundle bundle = FrameworkUtil.getBundle(
+			StructuredContentResourceTest.class);
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		ServiceRegistration<?> serviceRegistration =
+			bundleContext.registerService(
+				ContextResolver.class, new ExtensionContextResolver(),
+				HashMapDictionaryBuilder.put(
+					"osgi.jaxrs.application.select",
+					"(osgi.jaxrs.name=Liferay.Headless.Delivery)"
+				).put(
+					"osgi.jaxrs.extension", "true"
+				).build());
+
+		structuredContent = structuredContentResource.postSiteStructuredContent(
+			testGroup.getGroupId(), randomStructuredContent());
+
+		HttpInvoker.HttpResponse httpResponse =
+			structuredContentResource.getStructuredContentHttpResponse(
+				structuredContent.getId());
+
+		String content = httpResponse.getContent();
+
+		Assert.assertTrue(content.contains("version"));
+
+		structuredContent = StructuredContentSerDes.toDTO(content);
+
+		Assert.assertNull(structuredContent.getTitle());
+
+		serviceRegistration.unregister();
 
 		// Role admin user
 
-		postStructuredContent = testGetStructuredContent_addStructuredContent();
+		StructuredContent postStructuredContent =
+			testGetStructuredContent_addStructuredContent();
 
-		getStructuredContent = structuredContentResource.getStructuredContent(
-			postStructuredContent.getId());
+		StructuredContent getStructuredContent =
+			structuredContentResource.getStructuredContent(
+				postStructuredContent.getId());
 
 		Map<String, Map<String, String>> actions =
 			getStructuredContent.getActions();
@@ -379,16 +390,19 @@ public class StructuredContentResourceTest
 				ServiceContextTestUtil.getServiceContext(
 					testGroup.getGroupId()));
 
-		Assert.assertNotNull(
+		String structuredContentRenderedContentByDisplayPageDisplayPageKey =
 			structuredContentResource.
 				getStructuredContentRenderedContentByDisplayPageDisplayPageKey(
 					journalArticle.getResourcePrimKey(),
-					layoutPageTemplateEntry.getLayoutPageTemplateEntryKey()));
+					layoutPageTemplateEntry.getLayoutPageTemplateEntryKey());
+
+		Assert.assertNotNull(
+			structuredContentRenderedContentByDisplayPageDisplayPageKey);
 	}
 
 	@Override
 	@Test
-	public void testGetStructuredContentRenderedContentContentTemplate()
+	public void testGetStructuredContentRenderedContentTemplate()
 		throws Exception {
 
 		StructuredContent structuredContent =
@@ -402,34 +416,8 @@ public class StructuredContentResourceTest
 		Assert.assertEquals(
 			"<div>" + contentFieldValue.getData() + "</div>",
 			structuredContentResource.
-				getStructuredContentRenderedContentContentTemplate(
+				getStructuredContentRenderedContentTemplate(
 					structuredContent.getId(), _ddmTemplate.getTemplateKey()));
-	}
-
-	@Override
-	@Test
-	public void testPatchStructuredContent() throws Exception {
-		super.testPatchStructuredContent();
-
-		StructuredContent structuredContent = randomStructuredContent();
-
-		structuredContent.setPriority(1.0);
-
-		StructuredContent postStructuredContent =
-			structuredContentResource.postSiteStructuredContent(
-				testGroup.getGroupId(), structuredContent);
-
-		StructuredContent patchStructuredContent =
-			structuredContentResource.patchStructuredContent(
-				postStructuredContent.getId(),
-				new StructuredContent() {
-					{
-						title = RandomTestUtil.randomString();
-					}
-				});
-
-		Assert.assertEquals(
-			Double.valueOf(1.0), patchStructuredContent.getPriority());
 	}
 
 	@Override
@@ -437,63 +425,58 @@ public class StructuredContentResourceTest
 	public void testPostSiteStructuredContent() throws Exception {
 		super.testPostSiteStructuredContent();
 
-		// Localized structured content with the default language
+		StructuredContent randomLocalizedStructuredContent =
+			_randomLocalizedStructuredContent();
 
-		Locale locale = LocaleUtil.getDefault();
+		StructuredContent postStructuredContent =
+			testPostSiteStructuredContent_addStructuredContent(
+				randomLocalizedStructuredContent);
 
-		StructuredContent randomLocalizedStructuredContent1 =
-			_randomStructuredContent(locale);
-
-		StructuredContentResource englishStructuredContentResource =
-			_buildStructureContentResource(locale);
-
-		StructuredContent postStructuredContent1 =
-			englishStructuredContentResource.postSiteStructuredContent(
-				testGetSiteStructuredContentsPage_getSiteId(),
-				randomLocalizedStructuredContent1);
-
-		_assertLocalizedValues(
-			postStructuredContent1, LocaleUtil.toW3cLanguageId(locale));
-		assertEquals(randomLocalizedStructuredContent1, postStructuredContent1);
-		assertValid(postStructuredContent1);
-
-		// Localized structured content with a different language from the
-		// default language
-
-		locale = LocaleUtil.fromLanguageId("es-ES");
-
-		StructuredContent randomLocalizedStructuredContent2 =
-			_randomStructuredContent(locale);
-
-		StructuredContentResource spanishStructuredContentResource =
-			_buildStructureContentResource(locale);
-
-		StructuredContent postStructuredContent2 =
-			spanishStructuredContentResource.postSiteStructuredContent(
-				testGetSiteStructuredContentsPage_getSiteId(),
-				randomLocalizedStructuredContent2);
-
-		_assertLocalizedValues(
-			postStructuredContent2, LocaleUtil.toW3cLanguageId(locale));
-		assertEquals(randomLocalizedStructuredContent2, postStructuredContent2);
-		assertValid(postStructuredContent2);
+		assertEquals(randomLocalizedStructuredContent, postStructuredContent);
+		assertValid(postStructuredContent);
 	}
 
-	@Override
-	@Test
-	public void testPutAssetLibraryStructuredContentByExternalReferenceCode()
-		throws Exception {
+	public static class ExtensionContextResolver
+		implements ContextResolver<ExtensionContext> {
 
-		_useDepotDDMStructureStructureId = true;
+		@Override
+		public ExtensionContext getContext(Class<?> type) {
+			if (com.liferay.headless.delivery.dto.v1_0.StructuredContent.class.
+					isAssignableFrom(type)) {
 
-		super.testPutAssetLibraryStructuredContentByExternalReferenceCode();
+				return new EntityExtensionContext
+					<com.liferay.headless.delivery.dto.v1_0.
+						StructuredContent>() {
+
+					@Override
+					public Map<String, Object> getEntityExtendedProperties(
+						com.liferay.headless.delivery.dto.v1_0.StructuredContent
+							structuredContent) {
+
+						return HashMapBuilder.<String, Object>put(
+							"version", "1.0"
+						).build();
+					}
+
+					@Override
+					public Set<String> getEntityFilteredPropertyKeys(
+						com.liferay.headless.delivery.dto.v1_0.StructuredContent
+							structuredContent) {
+
+						return Collections.singleton("title");
+					}
+
+				};
+			}
+
+			return null;
+		}
+
 	}
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {
-			"contentStructureId", "description", "priority", "title"
-		};
+		return new String[] {"contentStructureId", "description", "title"};
 	}
 
 	@Override
@@ -532,65 +515,9 @@ public class StructuredContentResourceTest
 					}
 				}
 			});
-		structuredContent.setContentStructureId(
-			_useDepotDDMStructureStructureId ?
-				_depotDDMStructure.getStructureId() :
-					_ddmStructure.getStructureId());
+		structuredContent.setContentStructureId(_ddmStructure.getStructureId());
 
 		return structuredContent;
-	}
-
-	@Override
-	protected StructuredContent
-			testDeleteAssetLibraryStructuredContentByExternalReferenceCode_addStructuredContent()
-		throws Exception {
-
-		StructuredContent structuredContent = randomStructuredContent();
-
-		structuredContent.setContentStructureId(
-			_depotDDMStructure.getStructureId());
-
-		return structuredContentResource.postAssetLibraryStructuredContent(
-			testDepotEntry.getDepotEntryId(), structuredContent);
-	}
-
-	@Override
-	protected Long
-			testDeleteAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
-	}
-
-	@Override
-	protected StructuredContent
-			testDeleteStructuredContentMyRating_addStructuredContent()
-		throws Exception {
-
-		StructuredContent structuredContent =
-			super.testDeleteStructuredContentMyRating_addStructuredContent();
-
-		structuredContentResource.putStructuredContentMyRatingHttpResponse(
-			structuredContent.getId(), randomRating());
-
-		return structuredContent;
-	}
-
-	@Override
-	protected StructuredContent
-			testGetAssetLibraryStructuredContentByExternalReferenceCode_addStructuredContent()
-		throws Exception {
-
-		return testPostAssetLibraryStructuredContent_addStructuredContent(
-			randomStructuredContent());
-	}
-
-	@Override
-	protected Long
-			testGetAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
 	}
 
 	@Override
@@ -639,25 +566,6 @@ public class StructuredContentResourceTest
 
 	@Override
 	protected StructuredContent
-			testGraphQLGetAssetLibraryStructuredContentByExternalReferenceCode_addStructuredContent()
-		throws Exception {
-
-		_useDepotDDMStructureStructureId = true;
-
-		return testPostAssetLibraryStructuredContent_addStructuredContent(
-			randomStructuredContent());
-	}
-
-	@Override
-	protected Long
-			testGraphQLGetAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
-	}
-
-	@Override
-	protected StructuredContent
 			testGraphQLStructuredContent_addStructuredContent()
 		throws Exception {
 
@@ -680,24 +588,7 @@ public class StructuredContentResourceTest
 
 	@Override
 	protected StructuredContent
-			testPutAssetLibraryStructuredContentByExternalReferenceCode_addStructuredContent()
-		throws Exception {
-
-		return testPostAssetLibraryStructuredContent_addStructuredContent(
-			randomStructuredContent());
-	}
-
-	@Override
-	protected Long
-			testPutAssetLibraryStructuredContentByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
-	}
-
-	@Override
-	protected StructuredContent
-			testPutAssetLibraryStructuredContentPermissionsPage_addStructuredContent()
+			testPutAssetLibraryStructuredContentPermission_addStructuredContent()
 		throws Exception {
 
 		StructuredContent structuredContent = randomStructuredContent();
@@ -730,62 +621,7 @@ public class StructuredContentResourceTest
 			ddmStructure.getGroupId(), ddmStructure.getStructureId(),
 			PortalUtil.getClassNameId(JournalArticle.class),
 			TemplateConstants.LANG_TYPE_VM,
-			_read("test-structured-content-template.vm"), LocaleUtil.US);
-	}
-
-	private void _assertLocalizedValue(
-		Map<String, String> localizedValues, String value, String w3cLanguageId,
-		Set<String> w3cLanguageIds) {
-
-		Assert.assertEquals(w3cLanguageIds, localizedValues.keySet());
-		Assert.assertEquals(value, localizedValues.get(w3cLanguageId));
-	}
-
-	private void _assertLocalizedValues(
-		StructuredContent structuredContent, String w3cLanguageId) {
-
-		Set<String> w3cLanguageIds = SetUtil.fromArray("es-ES", "en-US");
-
-		Assert.assertEquals(
-			w3cLanguageIds,
-			SetUtil.fromArray(structuredContent.getAvailableLanguages()));
-
-		_assertLocalizedValue(
-			structuredContent.getDescription_i18n(),
-			structuredContent.getDescription(), w3cLanguageId, w3cLanguageIds);
-		_assertLocalizedValue(
-			structuredContent.getTitle_i18n(), structuredContent.getTitle(),
-			w3cLanguageId, w3cLanguageIds);
-		_assertLocalizedValue(
-			structuredContent.getFriendlyUrlPath_i18n(),
-			structuredContent.getFriendlyUrlPath(), w3cLanguageId,
-			w3cLanguageIds);
-		_assertLocalizedValue(
-			structuredContent.getDescription_i18n(),
-			structuredContent.getDescription(), w3cLanguageId, w3cLanguageIds);
-
-		for (ContentField contentField : structuredContent.getContentFields()) {
-			Map<String, ContentFieldValue> contentFieldValue_i18n =
-				contentField.getContentFieldValue_i18n();
-
-			Assert.assertEquals(
-				w3cLanguageIds, contentFieldValue_i18n.keySet());
-		}
-	}
-
-	private StructuredContentResource _buildStructureContentResource(
-		Locale locale) {
-
-		StructuredContentResource.Builder builder =
-			StructuredContentResource.builder();
-
-		return builder.authentication(
-			"test@liferay.com", "test"
-		).locale(
-			locale
-		).header(
-			"X-Accept-All-Languages", "true"
-		).build();
+			_read("test-structured-content-template.xsl"), LocaleUtil.US);
 	}
 
 	private DDMForm _deserialize(String content) {
@@ -808,15 +644,18 @@ public class StructuredContentResourceTest
 	private StructuredContent _randomCompleteStructuredContent()
 		throws Exception {
 
+		JournalFolder journalFolder = JournalTestUtil.addFolder(
+			testGroup.getGroupId(), RandomTestUtil.randomString());
+
 		JournalArticle journalArticle = JournalTestUtil.addArticle(
-			testGroup.getGroupId(), _journalFolder.getFolderId());
+			testGroup.getGroupId(), journalFolder.getFolderId());
 
 		StructuredContent structuredContent = super.randomStructuredContent();
 
 		structuredContent.setContentFields(
 			_randomContentFields(journalArticle));
 		structuredContent.setContentStructureId(
-			_complexDDMStructure.getStructureId());
+			_ddmComplexStructure.getStructureId());
 
 		return structuredContent;
 	}
@@ -1011,73 +850,41 @@ public class StructuredContentResourceTest
 			"}");
 	}
 
-	private StructuredContent _randomStructuredContent(Locale locale)
+	private StructuredContent _randomLocalizedStructuredContent()
 		throws Exception {
 
 		StructuredContent structuredContent = super.randomStructuredContent();
 
-		String w3cLanguageId = LocaleUtil.toW3cLanguageId(locale);
-
-		Map<String, ContentFieldValue> contentFieldValues = HashMapBuilder.put(
-			"en-US",
-			(ContentFieldValue)new ContentFieldValue() {
-
+		ContentFieldValue randomEnglishContentFieldValue =
+			new ContentFieldValue() {
 				{
 					data = RandomTestUtil.randomString(10);
 				}
-			}
-		).put(
-			"es-ES",
-			(ContentFieldValue)new ContentFieldValue() {
-
+			};
+		ContentFieldValue randomSpanishContentFieldValue =
+			new ContentFieldValue() {
 				{
 					data = RandomTestUtil.randomString(10);
 				}
-			}
-		).build();
+			};
 
 		structuredContent.setContentFields(
 			new ContentField[] {
 				new ContentField() {
 					{
-						contentFieldValue = contentFieldValues.get(
-							w3cLanguageId);
-						contentFieldValue_i18n = contentFieldValues;
+						contentFieldValue = randomEnglishContentFieldValue;
+						contentFieldValue_i18n = HashMapBuilder.put(
+							"en-US", randomEnglishContentFieldValue
+						).put(
+							"es-ES", randomSpanishContentFieldValue
+						).build();
 						name = "MyText";
 					}
 				}
 			});
 
 		structuredContent.setContentStructureId(
-			_localizedDDMStructure.getStructureId());
-
-		Map<String, String> description_i18n = HashMapBuilder.put(
-			"en-US", RandomTestUtil.randomString()
-		).put(
-			"es-ES", RandomTestUtil.randomString()
-		).build();
-
-		structuredContent.setDescription(description_i18n.get(w3cLanguageId));
-		structuredContent.setDescription_i18n(description_i18n);
-
-		Map<String, String> friendlyUrlPath_i18n = HashMapBuilder.put(
-			"en-US", RandomTestUtil.randomString()
-		).put(
-			"es-ES", RandomTestUtil.randomString()
-		).build();
-
-		structuredContent.setFriendlyUrlPath(
-			friendlyUrlPath_i18n.get(w3cLanguageId));
-		structuredContent.setFriendlyUrlPath_i18n(friendlyUrlPath_i18n);
-
-		Map<String, String> title_i18n = HashMapBuilder.put(
-			"en-US", RandomTestUtil.randomString()
-		).put(
-			"es-ES", RandomTestUtil.randomString()
-		).build();
-
-		structuredContent.setTitle(title_i18n.get(w3cLanguageId));
-		structuredContent.setTitle_i18n(title_i18n);
+			_ddmLocalizedStructure.getStructureId());
 
 		return structuredContent;
 	}
@@ -1098,7 +905,8 @@ public class StructuredContentResourceTest
 	@Inject(filter = "ddm.form.deserializer.type=json")
 	private static DDMFormDeserializer _jsonDDMFormDeserializer;
 
-	private DDMStructure _complexDDMStructure;
+	private DDMStructure _ddmComplexStructure;
+	private DDMStructure _ddmLocalizedStructure;
 	private DDMStructure _ddmStructure;
 	private DDMTemplate _ddmTemplate;
 	private DDMStructure _depotDDMStructure;
@@ -1112,15 +920,11 @@ public class StructuredContentResourceTest
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
 
-	private DDMStructure _localizedDDMStructure;
-
 	@Inject
 	private Portal _portal;
 
 	@Inject
 	private RoleLocalService _roleLocalService;
-
-	private boolean _useDepotDDMStructureStructureId;
 
 	@Inject
 	private UserLocalService _userLocalService;

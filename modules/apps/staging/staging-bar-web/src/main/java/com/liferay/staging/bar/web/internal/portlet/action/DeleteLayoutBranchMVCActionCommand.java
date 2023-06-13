@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StagingBarPortletKeys.STAGING_BAR,
 		"mvc.command.name=/staging_bar/delete_layout_branch"
@@ -74,7 +75,13 @@ public class DeleteLayoutBranchMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setLayoutBranchService(
+		LayoutBranchService layoutBranchService) {
+
+		_layoutBranchService = layoutBranchService;
+	}
+
 	private LayoutBranchService _layoutBranchService;
 
 	@Reference

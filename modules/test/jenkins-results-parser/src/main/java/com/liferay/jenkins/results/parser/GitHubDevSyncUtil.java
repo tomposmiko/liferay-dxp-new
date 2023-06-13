@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -922,23 +921,11 @@ public class GitHubDevSyncUtil {
 						gitRemote.getGitWorkingDirectory();
 
 					RemoteGitBranch remoteGitBranch =
-						gitWorkingDirectory.getRemoteGitBranch(
-							remoteGitBranchName, gitRemote);
+						gitWorkingDirectory.pushToRemoteGitRepository(
+							force, localGitBranch, remoteGitBranchName,
+							gitRemote);
 
-					if ((remoteGitBranch == null) ||
-						!Objects.equals(
-							remoteGitBranch.getSHA(),
-							localGitBranch.getSHA())) {
-
-						remoteGitBranch =
-							gitWorkingDirectory.pushToRemoteGitRepository(
-								force, localGitBranch, remoteGitBranchName,
-								gitRemote);
-
-						return Boolean.valueOf(remoteGitBranch != null);
-					}
-
-					return true;
+					return Boolean.valueOf(remoteGitBranch != null);
 				}
 
 			};
@@ -993,7 +980,7 @@ public class GitHubDevSyncUtil {
 			callables, _threadPoolExecutor);
 
 		for (Boolean bool : parallelExecutor.execute()) {
-			if ((bool == null) || !bool) {
+			if (!bool) {
 				return false;
 			}
 		}
@@ -1579,7 +1566,7 @@ public class GitHubDevSyncUtil {
 	private static final Pattern _lockedCacheBranchPattern = Pattern.compile(
 		"(cache-.*)-LOCK");
 	private static final ThreadPoolExecutor _threadPoolExecutor =
-		JenkinsResultsParserUtil.getNewThreadPoolExecutor(8, true);
+		JenkinsResultsParserUtil.getNewThreadPoolExecutor(16, true);
 
 	private abstract static class SafeCallable<T> implements Callable<T> {
 

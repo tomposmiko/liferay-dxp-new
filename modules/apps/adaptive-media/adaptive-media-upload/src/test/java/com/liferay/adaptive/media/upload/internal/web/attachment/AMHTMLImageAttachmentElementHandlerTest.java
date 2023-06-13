@@ -20,41 +20,43 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.upload.AttachmentElementReplacer;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
 
+import org.powermock.api.mockito.PowerMockito;
+
 /**
  * @author Alejandro Tardín
  */
-public class AMHTMLImageAttachmentElementHandlerTest {
+public class AMHTMLImageAttachmentElementHandlerTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
-	@BeforeClass
-	public static void setUpClass() {
-		_fileEntry = Mockito.mock(FileEntry.class);
+	@Before
+	public void setUp() {
+		_fileEntry = mock(FileEntry.class);
 
-		Mockito.when(
+		when(
 			_fileEntry.getFileEntryId()
 		).thenReturn(
 			_IMAGE_FILE_ENTRY_ID
 		);
 
-		_defaultAttachmentElementReplacer = Mockito.mock(
+		_defaultAttachmentElementReplacer = mock(
 			AttachmentElementReplacer.class);
 
-		Mockito.when(
+		when(
 			_defaultAttachmentElementReplacer.replace(
 				Mockito.anyString(), Mockito.eq(_fileEntry))
 		).thenAnswer(
-			arguments -> arguments.getArgument(0, String.class)
+			arguments -> arguments.getArgumentAt(0, String.class)
 		);
 
 		_amHTMLImageAttachmentElementReplacer =
@@ -63,7 +65,7 @@ public class AMHTMLImageAttachmentElementHandlerTest {
 	}
 
 	@Test
-	public void testGetBlogsEntryAttachmentFileEntryImgTag() {
+	public void testGetBlogsEntryAttachmentFileEntryImgTag() throws Exception {
 		String originalImgTag = String.format(
 			"<img src=\"%s\" />", _FILE_ENTRY_IMAGE_URL);
 		String expectedImgTag = String.format(
@@ -77,7 +79,9 @@ public class AMHTMLImageAttachmentElementHandlerTest {
 	}
 
 	@Test
-	public void testGetBlogsEntryAttachmentFileEntryImgTagWithCustomAttribute() {
+	public void testGetBlogsEntryAttachmentFileEntryImgTagWithCustomAttribute()
+		throws Exception {
+
 		String originalImgTag = String.format(
 			"<img class=\"custom\" src=\"%s\" />", _FILE_ENTRY_IMAGE_URL);
 		String expectedImgTag = String.format(
@@ -96,9 +100,9 @@ public class AMHTMLImageAttachmentElementHandlerTest {
 	private static final long _IMAGE_FILE_ENTRY_ID =
 		RandomTestUtil.randomLong();
 
-	private static AMHTMLImageAttachmentElementReplacer
+	private AMHTMLImageAttachmentElementReplacer
 		_amHTMLImageAttachmentElementReplacer;
-	private static AttachmentElementReplacer _defaultAttachmentElementReplacer;
-	private static FileEntry _fileEntry;
+	private AttachmentElementReplacer _defaultAttachmentElementReplacer;
+	private FileEntry _fileEntry;
 
 }

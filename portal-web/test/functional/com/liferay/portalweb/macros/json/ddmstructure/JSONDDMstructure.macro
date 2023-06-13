@@ -5,27 +5,27 @@ definition {
 		Variables.assertDefined(parameterList = "${classNameId},${groupId},${structureName}");
 
 		var portalURL = JSONCompany.getPortalURL();
+
 		var companyId = JSONCompany.getCompanyId();
-		var userLoginInfo = JSONUtil2.formatJSONUser();
 
 		var curl = '''
 			${portalURL}/api/jsonws/ddm.ddmstructure/get-structures \
-				-u ${userLoginInfo} \
-				-d companyId=${companyId} \
-				-d groupIds=[${groupId}] \
-				-d classNameId=${classNameId} \
-				-d "start=-1" \
-				-d "end=-1" \
-				-d -orderByComparator=
+			  -u test@liferay.com:test \
+			  -d companyId=${companyId} \
+			  -d groupIds=[${groupId}] \
+			  -d classNameId=${classNameId} \
+			  -d "start=-1" \
+			  -d "end=-1" \
+			  -d -orderByComparator=
 		''';
 
-		var structureId = JSONCurlUtil.post(${curl}, "$.[?(@['nameCurrentValue'] == '${structureName}')]['structureId']");
+		var structureId = JSONCurlUtil.post("${curl}", "$.[?(@['nameCurrentValue'] == '${structureName}')]['structureId']");
 
-		if (${structureId} == "") {
+		if ("${structureId}" == "") {
 			fail("FAIL. Cannot find structureId.");
 		}
 
-		return ${structureId};
+		return "${structureId}";
 	}
 
 	@summary = "Get structureId of ddmStructures in specific group."
@@ -33,23 +33,23 @@ definition {
 		Variables.assertDefined(parameterList = "${classNameId},${groupId}");
 
 		var portalURL = JSONCompany.getPortalURL();
+
 		var companyId = JSONCompany.getCompanyId();
-		var userLoginInfo = JSONUtil2.formatJSONUser();
 
 		var curl = '''
 			${portalURL}/api/jsonws/ddm.ddmstructure/get-structures \
-				-u ${userLoginInfo} \
-				-d companyId=${companyId} \
-				-d groupIds=[${groupId}] \
-				-d classNameId=${classNameId} \
-				-d "start=-1" \
-				-d "end=-1" \
-				-d -orderByComparator=
+			  -u test@liferay.com:test \
+			  -d companyId=${companyId} \
+			  -d groupIds=[${groupId}] \
+			  -d classNameId=${classNameId} \
+			  -d "start=-1" \
+			  -d "end=-1" \
+			  -d -orderByComparator=
 		''';
 
-		var structureIds = JSONCurlUtil.post(${curl}, "$..structureId");
+		var structureIds = JSONCurlUtil.post("${curl}", "$..structureId");
 
-		return ${structureIds};
+		return "${structureIds}";
 	}
 
 }

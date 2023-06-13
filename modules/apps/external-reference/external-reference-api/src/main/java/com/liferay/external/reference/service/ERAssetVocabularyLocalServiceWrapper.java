@@ -27,10 +27,6 @@ public class ERAssetVocabularyLocalServiceWrapper
 	implements ERAssetVocabularyLocalService,
 			   ServiceWrapper<ERAssetVocabularyLocalService> {
 
-	public ERAssetVocabularyLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ERAssetVocabularyLocalServiceWrapper(
 		ERAssetVocabularyLocalService erAssetVocabularyLocalService) {
 

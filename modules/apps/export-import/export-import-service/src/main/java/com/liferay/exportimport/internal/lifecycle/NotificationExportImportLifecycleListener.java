@@ -22,6 +22,7 @@ import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
@@ -38,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Akos Thurzo
  */
-@Component(service = ExportImportLifecycleListener.class)
+@Component(immediate = true, service = ExportImportLifecycleListener.class)
 public class NotificationExportImportLifecycleListener
 	implements ProcessAwareExportImportLifecycleListener {
 
@@ -52,7 +53,7 @@ public class NotificationExportImportLifecycleListener
 			ExportImportLifecycleEvent exportImportLifecycleEvent)
 		throws Exception {
 
-		_sendNotification(BackgroundTaskConstants.STATUS_FAILED);
+		sendNotification(BackgroundTaskConstants.STATUS_FAILED);
 	}
 
 	@Override
@@ -66,10 +67,10 @@ public class NotificationExportImportLifecycleListener
 			ExportImportLifecycleEvent exportImportLifecycleEvent)
 		throws Exception {
 
-		_sendNotification(BackgroundTaskConstants.STATUS_SUCCESSFUL);
+		sendNotification(BackgroundTaskConstants.STATUS_SUCCESSFUL);
 	}
 
-	private JSONObject _getPayloadJSONObject(
+	protected JSONObject getPayloadJSONObject(
 		long backgroundTaskId, long exportImportConfigurationId, int status) {
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject();
@@ -85,7 +86,7 @@ public class NotificationExportImportLifecycleListener
 		return jsonObject;
 	}
 
-	private void _sendNotification(int status) throws Exception {
+	protected void sendNotification(int status) throws PortalException {
 		long backgroundTaskId = BackgroundTaskThreadLocal.getBackgroundTaskId();
 
 		BackgroundTask backgroundTask =
@@ -100,7 +101,7 @@ public class NotificationExportImportLifecycleListener
 		_userNotificationEventLocalService.sendUserNotificationEvents(
 			backgroundTask.getUserId(), ExportImportPortletKeys.EXPORT_IMPORT,
 			UserNotificationDeliveryConstants.TYPE_WEBSITE,
-			_getPayloadJSONObject(
+			getPayloadJSONObject(
 				backgroundTaskId, exportImportConfigurationId, status));
 	}
 

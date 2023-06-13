@@ -19,17 +19,14 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionOptionRel;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CommerceCatalog;
-import com.liferay.commerce.product.service.CPDefinitionLocalService;
-import com.liferay.commerce.product.service.CPInstanceLocalService;
-import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.service.base.CPDefinitionOptionRelServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
@@ -37,20 +34,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @author Igor Beslic
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CPDefinitionOptionRel"
-	},
-	service = AopService.class
-)
 public class CPDefinitionOptionRelServiceImpl
 	extends CPDefinitionOptionRelServiceBaseImpl {
 
@@ -176,7 +163,7 @@ public class CPDefinitionOptionRelServiceImpl
 				long cpInstanceId)
 		throws PortalException {
 
-		CPInstance cpInstance = _cpInstanceLocalService.getCPInstance(
+		CPInstance cpInstance = cpInstanceLocalService.getCPInstance(
 			cpInstanceId);
 
 		_checkCommerceCatalog(cpInstance.getCPDefinitionId(), ActionKeys.VIEW);
@@ -239,6 +226,34 @@ public class CPDefinitionOptionRelServiceImpl
 
 		return cpDefinitionOptionRelLocalService.getCPDefinitionOptionRelsCount(
 			cpDefinitionId, skuContributor);
+	}
+
+	/**
+	 * @param      companyId
+	 * @param      groupId
+	 * @param      cpDefinitionId
+	 * @param      keywords
+	 * @param      start
+	 * @param      end
+	 * @param      sort
+	 * @return
+	 *
+	 * @throws     PortalException
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 * 			   #searchCPDefinitionOptionRels(long, long, long, String, int,
+	 * 			   int, Sort[])}
+	 */
+	@Deprecated
+	@Override
+	public BaseModelSearchResult<CPDefinitionOptionRel>
+			searchCPDefinitionOptionRels(
+				long companyId, long groupId, long cpDefinitionId,
+				String keywords, int start, int end, Sort sort)
+		throws PortalException {
+
+		return cpDefinitionOptionRelService.searchCPDefinitionOptionRels(
+			companyId, groupId, cpDefinitionId, keywords, start, end,
+			new Sort[] {sort});
 	}
 
 	@Override
@@ -313,7 +328,7 @@ public class CPDefinitionOptionRelServiceImpl
 	private void _checkCommerceCatalog(long cpDefinitionId, String actionId)
 		throws PortalException {
 
-		CPDefinition cpDefinition = _cpDefinitionLocalService.fetchCPDefinition(
+		CPDefinition cpDefinition = cpDefinitionLocalService.fetchCPDefinition(
 			cpDefinitionId);
 
 		if (cpDefinition == null) {
@@ -321,7 +336,7 @@ public class CPDefinitionOptionRelServiceImpl
 		}
 
 		CommerceCatalog commerceCatalog =
-			_commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
+			commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
 				cpDefinition.getGroupId());
 
 		if (commerceCatalog == null) {
@@ -332,19 +347,11 @@ public class CPDefinitionOptionRelServiceImpl
 			getPermissionChecker(), commerceCatalog, actionId);
 	}
 
-	@Reference
-	private CommerceCatalogLocalService _commerceCatalogLocalService;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CommerceCatalog)"
-	)
-	private ModelResourcePermission<CommerceCatalog>
-		_commerceCatalogModelResourcePermission;
-
-	@Reference
-	private CPDefinitionLocalService _cpDefinitionLocalService;
-
-	@Reference
-	private CPInstanceLocalService _cpInstanceLocalService;
+	private static volatile ModelResourcePermission<CommerceCatalog>
+		_commerceCatalogModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CPDefinitionOptionRelServiceImpl.class,
+				"_commerceCatalogModelResourcePermission",
+				CommerceCatalog.class);
 
 }

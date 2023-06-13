@@ -15,8 +15,6 @@
 package com.liferay.portal.tools.propertiesdoc;
 
 import com.liferay.portal.freemarker.FreeMarkerUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -104,17 +102,14 @@ public class PropertiesDocIndexBuilder {
 					context, writer);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				exception.printStackTrace();
 			}
 
 			writer.flush();
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			ioException.printStackTrace();
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PropertiesDocIndexBuilder.class);
 
 }

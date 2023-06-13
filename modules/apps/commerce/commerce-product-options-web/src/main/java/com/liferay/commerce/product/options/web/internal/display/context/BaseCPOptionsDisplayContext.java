@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.product.options.web.internal.display.context;
 
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
-import com.liferay.commerce.product.options.web.internal.portlet.action.helper.ActionHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
+import com.liferay.commerce.product.options.web.internal.portlet.action.ActionHelper;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -64,35 +62,59 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 	}
 
 	public String getDisplayStyle() {
-		if (Validator.isNotNull(_displayStyle)) {
-			return _displayStyle;
+		if (_displayStyle == null) {
+			_displayStyle = getDisplayStyle(
+				httpServletRequest, portalPreferences);
 		}
-
-		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
-			httpServletRequest, _portalPreferenceNamespace, "list", true);
 
 		return _displayStyle;
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			httpServletRequest, _portalPreferenceNamespace, _defaultOrderByCol);
+		_orderByCol = ParamUtil.getString(httpServletRequest, "orderByCol");
+
+		if (Validator.isNull(_orderByCol)) {
+			_orderByCol = portalPreferences.getValue(
+				_portalPreferenceNamespace, "order-by-col", _defaultOrderByCol);
+		}
+		else {
+			boolean saveOrderBy = ParamUtil.getBoolean(
+				httpServletRequest, "saveOrderBy");
+
+			if (saveOrderBy) {
+				portalPreferences.setValue(
+					_portalPreferenceNamespace, "order-by-col", _orderByCol);
+			}
+		}
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			httpServletRequest, _portalPreferenceNamespace,
-			_defaultOrderByType);
+		_orderByType = ParamUtil.getString(httpServletRequest, "orderByType");
+
+		if (Validator.isNull(_orderByType)) {
+			_orderByType = portalPreferences.getValue(
+				_portalPreferenceNamespace, "order-by-type",
+				_defaultOrderByType);
+		}
+		else {
+			boolean saveOrderBy = ParamUtil.getBoolean(
+				httpServletRequest, "saveOrderBy");
+
+			if (saveOrderBy) {
+				portalPreferences.setValue(
+					_portalPreferenceNamespace, "order-by-type", _orderByType);
+			}
+		}
 
 		return _orderByType;
 	}
@@ -163,6 +185,28 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 		return true;
 	}
 
+	protected String getDisplayStyle(
+		HttpServletRequest httpServletRequest,
+		PortalPreferences portalPreferences) {
+
+		String displayStyle = ParamUtil.getString(
+			httpServletRequest, "displayStyle");
+
+		if (Validator.isNull(displayStyle)) {
+			displayStyle = portalPreferences.getValue(
+				_portalPreferenceNamespace, "display-style", "list");
+		}
+		else {
+			portalPreferences.setValue(
+				_portalPreferenceNamespace, "display-style", displayStyle);
+
+			httpServletRequest.setAttribute(
+				WebKeys.SINGLE_PAGE_APPLICATION_CLEAR_CACHE, Boolean.TRUE);
+		}
+
+		return displayStyle;
+	}
+
 	protected String getKeywords() {
 		if (_keywords != null) {
 			return _keywords;
@@ -181,8 +225,20 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 		return _rowChecker;
 	}
 
+	protected long getScopeGroupId() {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return themeDisplay.getScopeGroupId();
+	}
+
 	protected void setDefaultOrderByCol(String defaultOrderByCol) {
 		_defaultOrderByCol = defaultOrderByCol;
+	}
+
+	protected void setDefaultOrderByType(String defaultOrderByType) {
+		_defaultOrderByType = defaultOrderByType;
 	}
 
 	protected final ActionHelper actionHelper;
@@ -194,7 +250,7 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 	protected SearchContainer<T> searchContainer;
 
 	private String _defaultOrderByCol;
-	private final String _defaultOrderByType;
+	private String _defaultOrderByType;
 	private String _displayStyle;
 	private String _keywords;
 	private String _orderByCol;

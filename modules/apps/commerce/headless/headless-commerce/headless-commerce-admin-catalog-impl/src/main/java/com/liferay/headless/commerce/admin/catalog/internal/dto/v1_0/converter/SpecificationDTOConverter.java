@@ -19,7 +19,6 @@ import com.liferay.commerce.product.model.CPSpecificationOption;
 import com.liferay.commerce.product.service.CPSpecificationOptionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.OptionCategory;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Specification;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
@@ -32,8 +31,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.product.model.CPSpecificationOption",
-	service = DTOConverter.class
+	service = {DTOConverter.class, SpecificationDTOConverter.class}
 )
 public class SpecificationDTOConverter
 	implements DTOConverter<CPSpecificationOption, Specification> {
@@ -67,11 +67,12 @@ public class SpecificationDTOConverter
 		};
 
 		if (cpOptionCategory != null) {
-			specification.setOptionCategory(
-				_optionCategoryDTOConverter.toDTO(
-					new DefaultDTOConverterContext(
-						cpOptionCategory.getCPOptionCategoryId(),
-						dtoConverterContext.getLocale())));
+			OptionCategory optionCategory = _optionCategoryDTOConverter.toDTO(
+				new DefaultDTOConverterContext(
+					cpOptionCategory.getCPOptionCategoryId(),
+					dtoConverterContext.getLocale()));
+
+			specification.setOptionCategory(optionCategory);
 		}
 
 		return specification;
@@ -80,8 +81,7 @@ public class SpecificationDTOConverter
 	@Reference
 	private CPSpecificationOptionService _cpSpecificationOptionService;
 
-	@Reference(target = DTOConverterConstants.OPTION_CATEGORY_DTO_CONVERTER)
-	private DTOConverter<CPOptionCategory, OptionCategory>
-		_optionCategoryDTOConverter;
+	@Reference
+	private OptionCategoryDTOConverter _optionCategoryDTOConverter;
 
 }

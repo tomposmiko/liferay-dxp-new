@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -239,102 +240,106 @@ public class ChangesetEntryModelImpl
 	public Map<String, Function<ChangesetEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ChangesetEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ChangesetEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ChangesetEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ChangesetEntry.class.getClassLoader(), ChangesetEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ChangesetEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<ChangesetEntry, Object>>();
+		try {
+			Constructor<ChangesetEntry> constructor =
+				(Constructor<ChangesetEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"changesetEntryId", ChangesetEntry::getChangesetEntryId);
-			attributeGetterFunctions.put("groupId", ChangesetEntry::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", ChangesetEntry::getCompanyId);
-			attributeGetterFunctions.put("userId", ChangesetEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", ChangesetEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", ChangesetEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", ChangesetEntry::getModifiedDate);
-			attributeGetterFunctions.put(
-				"changesetCollectionId",
-				ChangesetEntry::getChangesetCollectionId);
-			attributeGetterFunctions.put(
-				"classNameId", ChangesetEntry::getClassNameId);
-			attributeGetterFunctions.put("classPK", ChangesetEntry::getClassPK);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ChangesetEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ChangesetEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ChangesetEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ChangesetEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ChangesetEntry, Object>>();
+		Map<String, BiConsumer<ChangesetEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<ChangesetEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<ChangesetEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<ChangesetEntry, ?>>();
+		attributeGetterFunctions.put(
+			"changesetEntryId", ChangesetEntry::getChangesetEntryId);
+		attributeSetterBiConsumers.put(
+			"changesetEntryId",
+			(BiConsumer<ChangesetEntry, Long>)
+				ChangesetEntry::setChangesetEntryId);
+		attributeGetterFunctions.put("groupId", ChangesetEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", ChangesetEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", ChangesetEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setUserId);
+		attributeGetterFunctions.put("userName", ChangesetEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<ChangesetEntry, String>)ChangesetEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", ChangesetEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<ChangesetEntry, Date>)ChangesetEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", ChangesetEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<ChangesetEntry, Date>)ChangesetEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"changesetCollectionId", ChangesetEntry::getChangesetCollectionId);
+		attributeSetterBiConsumers.put(
+			"changesetCollectionId",
+			(BiConsumer<ChangesetEntry, Long>)
+				ChangesetEntry::setChangesetCollectionId);
+		attributeGetterFunctions.put(
+			"classNameId", ChangesetEntry::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", ChangesetEntry::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setClassPK);
 
-			attributeSetterBiConsumers.put(
-				"changesetEntryId",
-				(BiConsumer<ChangesetEntry, Long>)
-					ChangesetEntry::setChangesetEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<ChangesetEntry, String>)
-					ChangesetEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<ChangesetEntry, Date>)
-					ChangesetEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<ChangesetEntry, Date>)
-					ChangesetEntry::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"changesetCollectionId",
-				(BiConsumer<ChangesetEntry, Long>)
-					ChangesetEntry::setChangesetCollectionId);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<ChangesetEntry, Long>)
-					ChangesetEntry::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<ChangesetEntry, Long>)ChangesetEntry::setClassPK);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -839,12 +844,41 @@ public class ChangesetEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ChangesetEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ChangesetEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ChangesetEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ChangesetEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ChangesetEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ChangesetEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -862,8 +896,7 @@ public class ChangesetEntryModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<ChangesetEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

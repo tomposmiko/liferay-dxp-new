@@ -38,7 +38,9 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CSDiagramTypeRegistry.class)
+@Component(
+	enabled = false, immediate = true, service = CSDiagramTypeRegistry.class
+)
 public class CSDiagramTypeRegistryImpl implements CSDiagramTypeRegistry {
 
 	@Override

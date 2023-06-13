@@ -18,10 +18,11 @@ import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPort
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
 import com.liferay.analytics.reports.web.internal.model.HistoricalMetric;
 import com.liferay.analytics.reports.web.internal.model.TimeSpan;
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.layout.seo.kernel.LayoutSEOLinkManager;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -43,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author David Arques
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AnalyticsReportsPortletKeys.ANALYTICS_REPORTS,
 		"mvc.command.name=/analytics_reports/get_historical_reads"
@@ -57,12 +59,11 @@ public class GetHistoricalReadsMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		try {
 			AnalyticsReportsDataProvider analyticsReportsDataProvider =
-				new AnalyticsReportsDataProvider(
-					_analyticsSettingsManager, _http);
+				new AnalyticsReportsDataProvider(_http);
 
 			String timeSpanKey = ParamUtil.getString(
 				resourceRequest, "timeSpanKey", TimeSpan.defaultTimeSpanKey());
@@ -85,7 +86,7 @@ public class GetHistoricalReadsMVCResourceCommand
 				historicalMetric.toJSONObject());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)resourceRequest.getAttribute(
@@ -93,7 +94,7 @@ public class GetHistoricalReadsMVCResourceCommand
 
 			jsonObject.put(
 				"error",
-				_language.get(
+				LanguageUtil.get(
 					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
 		}
 
@@ -105,16 +106,13 @@ public class GetHistoricalReadsMVCResourceCommand
 		GetHistoricalReadsMVCResourceCommand.class);
 
 	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
-
-	@Reference
 	private Http _http;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private Language _language;
 
 	@Reference
-	private Language _language;
+	private LayoutSEOLinkManager _layoutSEOLinkManager;
 
 	@Reference
 	private Portal _portal;

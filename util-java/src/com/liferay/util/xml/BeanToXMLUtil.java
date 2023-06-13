@@ -34,8 +34,10 @@ public class BeanToXMLUtil {
 	public static void addBean(Object object, Element parentEl) {
 		Class<?> clazz = object.getClass();
 
-		Element el = parentEl.addElement(
-			getClassNameWithoutPackage(clazz.getName()));
+		String classNameWithoutPackage = getClassNameWithoutPackage(
+			clazz.getName());
+
+		Element el = parentEl.addElement(classNameWithoutPackage);
 
 		addFields(object, el);
 	}
@@ -75,7 +77,7 @@ public class BeanToXMLUtil {
 				}
 				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(exception);
+						_log.warn(exception.getMessage());
 					}
 				}
 			}

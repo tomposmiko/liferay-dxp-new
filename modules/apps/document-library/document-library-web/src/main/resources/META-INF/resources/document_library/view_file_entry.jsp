@@ -41,8 +41,6 @@ if (portletTitleBasedNavigation) {
 }
 %>
 
-<liferay-ui:success key='<%= portletDisplay.getId() + "requestProcessed" %>' message="your-request-completed-successfully" />
-
 <div class="<%= portletTitleBasedNavigation ? StringPool.BLANK : "closed sidenav-container sidenav-right" %>" id="<%= liferayPortletResponse.getNamespace() + (portletTitleBasedNavigation ? "FileEntry" : ("infoPanelId_" + fileEntry.getFileEntryId())) %>">
 	<c:if test="<%= portletTitleBasedNavigation %>">
 		<liferay-util:include page="/document_library/file_entry_upper_tbar.jsp" servletContext="<%= application %>" />
@@ -59,6 +57,14 @@ if (portletTitleBasedNavigation) {
 		<aui:input name="rowIdsFileEntry" type="hidden" />
 		<aui:input name="rowIdsFolder" type="hidden" />
 	</aui:form>
+
+	<c:if test="<%= !portletTitleBasedNavigation && dlViewFileEntryDisplayContext.isShowHeader() %>">
+		<liferay-ui:header
+			backURL="<%= dlViewFileEntryDisplayContext.getRedirect() %>"
+			localizeTitle="<%= false %>"
+			title="<%= dlViewFileEntryDisplayContext.getDocumentTitle() %>"
+		/>
+	</c:if>
 
 	<c:choose>
 		<c:when test="<%= portletTitleBasedNavigation %>">
@@ -91,36 +97,24 @@ if (portletTitleBasedNavigation) {
 			<div class="alert alert-danger hide" id="<portlet:namespace />openMSOfficeError"></div>
 
 			<c:if test="<%= !portletTitleBasedNavigation %>">
-				<div class="file-entry-actions management-bar management-bar-light navbar navbar-expand-md">
-					<ul class="navbar-nav navbar-nav-expand">
-						<li class="nav-item nav-item-expand">
-							<clay:link
-								aria-label='<%= LanguageUtil.get(request, "back") %>'
-								borderless="<%= true %>"
-								displayType="secondary"
-								href="<%= dlViewFileEntryDisplayContext.getRedirect() %>"
-								icon="angle-left"
-								monospaced="<%= true %>"
-								type="button"
-							/>
+				<div class="file-entry-actions">
+					<liferay-frontend:management-bar-sidenav-toggler-button
+						label="info"
+						sidenavId='<%= liferayPortletResponse.getNamespace() + "infoPanelId_" + fileEntry.getFileEntryId() %>'
+					/>
 
-							<h3 class="mb-1 text-secondary"><%= dlViewFileEntryDisplayContext.getDocumentTitle() %></h3>
-						</li>
-						<li class="nav-item">
-							<liferay-frontend:sidebar-toggler-button
-								cssClass="btn btn-monospaced btn-secondary btn-sm btn-unstyled"
-								icon="info-circle-open"
-								sidenavId='<%= liferayPortletResponse.getNamespace() + "infoPanelId_" + fileEntry.getFileEntryId() %>'
-							/>
-						</li>
-						<li class="nav-item">
-							<clay:dropdown-actions
-								aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-								dropdownItems="<%= dlViewFileEntryDisplayContext.getActionDropdownItems() %>"
-								propsTransformer="document_library/js/DLFileEntryDropdownPropsTransformer"
-							/>
-						</li>
-					</ul>
+					<%
+					for (ToolbarItem toolbarItem : dlViewFileEntryDisplayContext.getToolbarItems()) {
+					%>
+
+						<liferay-ui:toolbar-item
+							toolbarItem="<%= toolbarItem %>"
+						/>
+
+					<%
+					}
+					%>
+
 				</div>
 			</c:if>
 
@@ -178,19 +172,10 @@ if (portletTitleBasedNavigation) {
 	/>
 </div>
 
-<%
-ItemSelector itemSelector = (ItemSelector)request.getAttribute(ItemSelector.class.getName());
-
-FolderItemSelectorCriterion folderItemSelectorCriterion = new FolderItemSelectorCriterion();
-
-folderItemSelectorCriterion.setDesiredItemSelectorReturnTypes(new FolderItemSelectorReturnType());
-folderItemSelectorCriterion.setFolderId(fileEntry.getFolderId());
-folderItemSelectorCriterion.setRepositoryId(fileEntry.getRepositoryId());
-folderItemSelectorCriterion.setSelectedFolderId(fileEntry.getFolderId());
-folderItemSelectorCriterion.setSelectedRepositoryId(fileEntry.getRepositoryId());
-
-PortletURL selectFolderURL = itemSelector.getItemSelectorURL(RequestBackedPortletURLFactoryUtil.create(request), portletDisplay.getNamespace() + "folderSelected", folderItemSelectorCriterion);
-%>
+<portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+	<portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" />
+	<portlet:param name="folderId" value="<%= String.valueOf(fileEntry.getFolderId()) %>" />
+</portlet:renderURL>
 
 <portlet:actionURL name="/document_library/edit_entry" var="editEntryURL" />
 
@@ -203,13 +188,8 @@ PortletURL selectFolderURL = itemSelector.getItemSelectorURL(RequestBackedPortle
 		var namespace = '<portlet:namespace />';
 
 		Liferay.Util.openSelectionModal({
-			selectEventName: '<portlet:namespace />folderSelected',
-			multiple: false,
+			id: namespace + 'selectFolder',
 			onSelect: function (selectedItem) {
-				if (!selectedItem) {
-					return;
-				}
-
 				var form = document.getElementById(namespace + 'fm');
 
 				if (parameterName && parameterValue) {
@@ -227,9 +207,10 @@ PortletURL selectFolderURL = itemSelector.getItemSelectorURL(RequestBackedPortle
 
 				submitForm(form, actionUrl, false);
 			},
+			selectEventName: namespace + 'selectFolder',
 			title:
 				'<liferay-ui:message arguments="<%= 1 %>" key="select-destination-folder-for-x-items" translateArguments="<%= false %>" />',
-			url: '<%= HtmlUtil.escapeJS(selectFolderURL.toString()) %>',
+			url: '<%= selectFolderURL.toString() %>',
 		});
 	}
 </aui:script>
@@ -253,5 +234,3 @@ PortletURL selectFolderURL = itemSelector.getItemSelectorURL(RequestBackedPortle
 </c:if>
 
 <liferay-util:dynamic-include key="com.liferay.document.library.web#/document_library/view_file_entry.jsp#post" />
-
-<%@ include file="/document_library/friendly_url_changed_message.jspf" %>

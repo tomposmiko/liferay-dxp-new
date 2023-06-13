@@ -46,24 +46,24 @@ public class AppDockerExtension {
 
 			@Override
 			public String call() throws Exception {
-				return project.getName();
+				return _project.getName();
 			}
 
 		};
 
-		_inputDir = project.getName() + "-docker";
+		_inputDir = _project.getName() + "-docker";
 
 		_imageUser = new Callable<Object>() {
 
 			@Override
 			public Object call() throws Exception {
-				return project.getGroup();
+				return _project.getGroup();
 			}
 
 		};
 
 		_subprojects = CollectionUtils.filter(
-			project.getSubprojects(),
+			_project.getSubprojects(),
 			new Spec<Project>() {
 
 				@Override

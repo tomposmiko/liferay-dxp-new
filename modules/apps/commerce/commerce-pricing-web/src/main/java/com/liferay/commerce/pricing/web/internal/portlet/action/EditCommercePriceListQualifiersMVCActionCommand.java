@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePricingPortletKeys.COMMERCE_PRICE_LIST,
 		"javax.portlet.name=" + CommercePricingPortletKeys.COMMERCE_PROMOTION,
@@ -55,13 +56,44 @@ public class EditCommercePriceListQualifiersMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommercePriceListQualifiers(actionRequest);
+				updateCommercePriceListQualifiers(actionRequest);
 			}
 		}
 		catch (Exception exception) {
 			SessionErrors.add(actionRequest, exception.getClass());
 
 			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+		}
+	}
+
+	protected void updateCommercePriceListQualifiers(
+			ActionRequest actionRequest)
+		throws Exception {
+
+		long commercePriceListId = ParamUtil.getLong(
+			actionRequest, "commercePriceListId");
+
+		String accountQualifiers = ParamUtil.getString(
+			actionRequest, "accountQualifiers");
+
+		String channelQualifiers = ParamUtil.getString(
+			actionRequest, "channelQualifiers");
+
+		if (Objects.equals(accountQualifiers, "all")) {
+			_deleteCommercePriceListAccountRels(commercePriceListId);
+			_deleteCommercePriceListAccountGroupRels(commercePriceListId);
+		}
+		else if (Objects.equals(accountQualifiers, "accounts")) {
+			_deleteCommercePriceListAccountGroupRels(commercePriceListId);
+		}
+		else {
+			_deleteCommercePriceListAccountRels(commercePriceListId);
+		}
+
+		if (Objects.equals(channelQualifiers, "all")) {
+			_commercePriceListChannelRelService.
+				deleteCommercePriceListChannelRelsByCommercePriceListId(
+					commercePriceListId);
 		}
 	}
 
@@ -97,36 +129,6 @@ public class EditCommercePriceListQualifiersMVCActionCommand
 		_commercePriceListAccountRelService.
 			deleteCommercePriceListAccountRelsByCommercePriceListId(
 				commercePriceListId);
-	}
-
-	private void _updateCommercePriceListQualifiers(ActionRequest actionRequest)
-		throws Exception {
-
-		long commercePriceListId = ParamUtil.getLong(
-			actionRequest, "commercePriceListId");
-
-		String accountQualifiers = ParamUtil.getString(
-			actionRequest, "accountQualifiers");
-
-		String channelQualifiers = ParamUtil.getString(
-			actionRequest, "channelQualifiers");
-
-		if (Objects.equals(accountQualifiers, "all")) {
-			_deleteCommercePriceListAccountRels(commercePriceListId);
-			_deleteCommercePriceListAccountGroupRels(commercePriceListId);
-		}
-		else if (Objects.equals(accountQualifiers, "accounts")) {
-			_deleteCommercePriceListAccountGroupRels(commercePriceListId);
-		}
-		else {
-			_deleteCommercePriceListAccountRels(commercePriceListId);
-		}
-
-		if (Objects.equals(channelQualifiers, "all")) {
-			_commercePriceListChannelRelService.
-				deleteCommercePriceListChannelRelsByCommercePriceListId(
-					commercePriceListId);
-		}
 	}
 
 	@Reference

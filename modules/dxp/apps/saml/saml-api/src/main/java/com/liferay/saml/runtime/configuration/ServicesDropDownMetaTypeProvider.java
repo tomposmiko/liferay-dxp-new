@@ -14,7 +14,6 @@
 
 package com.liferay.saml.runtime.configuration;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.saml.runtime.credential.KeyStoreManager;
 
@@ -22,8 +21,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -102,9 +104,15 @@ public class ServicesDropDownMetaTypeProvider
 
 	@Override
 	public String[] getLocales() {
-		return TransformUtil.transformToArray(
-			LanguageUtil.getAvailableLocales(), Locale::toLanguageTag,
-			String.class);
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
+
+		Stream<Locale> stream = availableLocales.stream();
+
+		return stream.map(
+			Locale::toLanguageTag
+		).toArray(
+			String[]::new
+		);
 	}
 
 	public String getMetatypePID() {
@@ -150,20 +158,26 @@ public class ServicesDropDownMetaTypeProvider
 
 							@Override
 							public String[] getOptionLabels() {
-								return (String[])TransformUtil.transform(
-									_getServiceReferences(),
-									serviceReference -> _labelFunction.apply(
-										serviceReference),
-									String.class);
+								Stream<ServiceReference<?>> stream =
+									_getServiceReferences();
+
+								return stream.map(
+									_labelFunction
+								).toArray(
+									String[]::new
+								);
 							}
 
 							@Override
 							public String[] getOptionValues() {
-								return TransformUtil.transform(
-									_getServiceReferences(),
-									serviceReference -> _valuesFunction.apply(
-										serviceReference),
-									String.class);
+								Stream<ServiceReference<?>> stream =
+									_getServiceReferences();
+
+								return stream.map(
+									_valuesFunction
+								).toArray(
+									String[]::new
+								);
 							}
 
 							@Override
@@ -206,15 +220,15 @@ public class ServicesDropDownMetaTypeProvider
 		};
 	}
 
-	private ServiceReference<KeyStoreManager>[] _getServiceReferences() {
+	private Stream<ServiceReference<?>> _getServiceReferences() {
 		ServiceReference<KeyStoreManager>[] serviceReferences =
 			_serviceTracker.getServiceReferences();
 
 		if (serviceReferences == null) {
-			return null;
+			return Stream.empty();
 		}
 
-		return serviceReferences;
+		return Arrays.stream(serviceReferences);
 	}
 
 	private String _attributeDescription;

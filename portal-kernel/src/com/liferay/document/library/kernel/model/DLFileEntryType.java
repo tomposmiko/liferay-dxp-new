@@ -58,11 +58,6 @@ public interface DLFileEntryType extends DLFileEntryTypeModel, PersistedModel {
 
 		};
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 DLFileEntryTypeUtil#getDDMStructures(DLFileEntryType)}
-	 */
-	@Deprecated
 	public java.util.List<com.liferay.dynamic.data.mapping.kernel.DDMStructure>
 		getDDMStructures();
 

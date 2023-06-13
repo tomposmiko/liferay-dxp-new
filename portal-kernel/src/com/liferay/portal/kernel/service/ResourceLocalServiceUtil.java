@@ -190,16 +190,6 @@ public class ResourceLocalServiceUtil {
 			addGroupPermissions, addGuestPermissions);
 	}
 
-	public static void addResources(
-			long companyId, long groupId, long userId, String name,
-			long primKey, boolean portletActions, ServiceContext serviceContext)
-		throws PortalException {
-
-		getService().addResources(
-			companyId, groupId, userId, name, primKey, portletActions,
-			serviceContext);
-	}
-
 	/**
 	 * Adds resources for the entity with the name and primary key string,
 	 * always creating a resource at the individual scope and only creating
@@ -248,11 +238,11 @@ public class ResourceLocalServiceUtil {
 	}
 
 	public static void copyModelResources(
-			long companyId, String name, long sourcePrimKey, long targetPrimKey)
+			long companyId, String name, long oldPrimKey, long newPrimKey)
 		throws PortalException {
 
 		getService().copyModelResources(
-			companyId, name, sourcePrimKey, targetPrimKey);
+			companyId, name, oldPrimKey, newPrimKey);
 	}
 
 	/**

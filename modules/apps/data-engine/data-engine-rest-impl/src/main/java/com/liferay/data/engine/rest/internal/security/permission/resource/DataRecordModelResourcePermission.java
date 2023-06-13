@@ -15,7 +15,7 @@
 package com.liferay.data.engine.rest.internal.security.permission.resource;
 
 import com.liferay.data.engine.content.type.DataDefinitionContentType;
-import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeRegistry;
+import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeTracker;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.service.DDLRecordLocalService;
@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Inácio Nery
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.dynamic.data.lists.model.DDLRecord",
 	service = DataRecordModelResourcePermission.class
 )
@@ -84,7 +85,7 @@ public class DataRecordModelResourcePermission
 		DDMStructure ddmStructure = recordSet.getDDMStructure();
 
 		DataDefinitionContentType dataDefinitionContentType =
-			_dataDefinitionContentTypeRegistry.getDataDefinitionContentType(
+			_dataDefinitionContentTypeTracker.getDataDefinitionContentType(
 				ddmStructure.getClassNameId());
 
 		if (dataDefinitionContentType == null) {
@@ -131,8 +132,7 @@ public class DataRecordModelResourcePermission
 	}
 
 	@Reference
-	private DataDefinitionContentTypeRegistry
-		_dataDefinitionContentTypeRegistry;
+	private DataDefinitionContentTypeTracker _dataDefinitionContentTypeTracker;
 
 	@Reference
 	private DataRecordCollectionModelResourcePermission

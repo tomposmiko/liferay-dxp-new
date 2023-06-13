@@ -18,17 +18,6 @@
 	<div class="ddm-form-web__exception-container ddm-form-web__exception-container--sidebar-open">
 		<%@ include file="/admin/error_model_listener_exception.jspf" %>
 
-		<div>
-			<react:component
-				module="admin/js/util/ShowPartialResultsAlert"
-				props='<%=
-					HashMapBuilder.<String, Object>put(
-						"showPartialResultsToRespondents", ddmFormAdminDisplayContext.isShowPartialResultsToRespondents(ddmFormAdminDisplayContext.getDDMFormInstance())
-					).build()
-				%>'
-			/>
-		</div>
-
 		<liferay-ui:error exception="<%= DDMFormLayoutValidationException.class %>" message="please-enter-a-valid-form-layout" />
 
 		<liferay-ui:error exception="<%= DDMFormLayoutValidationException.MustNotDuplicateFieldName.class %>">
@@ -91,34 +80,6 @@
 			<liferay-ui:message arguments="<%= new Object[] {HtmlUtil.escape(msvve.getVisibilityExpression()), HtmlUtil.escape(msvve.getFieldName())} %>" key="the-visibility-expression-x-set-for-field-x-is-invalid" translateArguments="<%= false %>" />
 		</liferay-ui:error>
 
-		<%
-		boolean showExpirationDateError = false;
-		%>
-
-		<liferay-ui:error exception="<%= DDMFormValuesValidationException.MustSetValidValue.class %>">
-
-			<%
-			DDMFormValuesValidationException.MustSetValidValue msvv = (DDMFormValuesValidationException.MustSetValidValue)errorException;
-
-			String fieldLabelValue = msvv.getFieldLabelValue(themeDisplay.getLocale());
-
-			if (Validator.isNull(fieldLabelValue)) {
-				fieldLabelValue = msvv.getFieldName();
-			}
-
-			showExpirationDateError = Objects.equals(msvv.getFieldName(), "expirationDate");
-			%>
-
-			<c:choose>
-				<c:when test="<%= showExpirationDateError %>">
-					<liferay-ui:message key="please-enter-a-valid-expiration-date-only-future-dates-are-accepted" />
-				</c:when>
-				<c:otherwise>
-					<liferay-ui:message arguments="<%= HtmlUtil.escape(fieldLabelValue) %>" key="validation-failed-for-field-x" translateArguments="<%= false %>" />
-				</c:otherwise>
-			</c:choose>
-		</liferay-ui:error>
-
 		<liferay-ui:error exception="<%= FormInstanceFieldSettingsException.MustSetValidValueForProperties.class %>">
 
 			<%
@@ -162,21 +123,9 @@
 			<%= formInstanceSettingsStorageTypeException.getMessage() %>
 		</liferay-ui:error>
 
-		<liferay-ui:error exception="<%= LiferayFileItemException.class %>">
-			<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(FileItem.THRESHOLD_SIZE, locale) %>" key="please-enter-valid-content-with-valid-content-size-no-larger-than-x" translateArguments="<%= false %>" />
-		</liferay-ui:error>
-
 		<liferay-ui:error exception="<%= StorageException.class %>" message="please-enter-a-valid-form-settings" />
 		<liferay-ui:error exception="<%= StructureDefinitionException.class %>" message="please-enter-a-valid-form-definition" />
 		<liferay-ui:error exception="<%= StructureLayoutException.class %>" message="please-enter-a-valid-form-layout" />
 		<liferay-ui:error exception="<%= StructureNameException.class %>" message="please-enter-a-valid-form-name" />
-
-		<c:if test="<%= !showExpirationDateError && DDMFormInstanceExpirationStatusUtil.isFormExpired(ddmFormAdminDisplayContext.getDDMFormInstance(), timeZone) %>">
-			<clay:alert
-				dismissible="<%= true %>"
-				displayType="warning"
-				message="the-form-is-expired-and-is-no-longer-available-for-editing-or-submitting-new-answers"
-			/>
-		</c:if>
 	</div>
 </clay:container-fluid>

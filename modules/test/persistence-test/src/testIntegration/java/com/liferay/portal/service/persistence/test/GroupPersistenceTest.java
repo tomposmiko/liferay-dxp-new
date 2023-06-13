@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
@@ -133,8 +132,6 @@ public class GroupPersistenceTest {
 
 		newGroup.setCreatorUserId(RandomTestUtil.nextLong());
 
-		newGroup.setModifiedDate(RandomTestUtil.nextDate());
-
 		newGroup.setClassNameId(RandomTestUtil.nextLong());
 
 		newGroup.setClassPK(RandomTestUtil.nextLong());
@@ -184,9 +181,6 @@ public class GroupPersistenceTest {
 			existingGroup.getCompanyId(), newGroup.getCompanyId());
 		Assert.assertEquals(
 			existingGroup.getCreatorUserId(), newGroup.getCreatorUserId());
-		Assert.assertEquals(
-			Time.getShortTimestamp(existingGroup.getModifiedDate()),
-			Time.getShortTimestamp(newGroup.getModifiedDate()));
 		Assert.assertEquals(
 			existingGroup.getClassNameId(), newGroup.getClassNameId());
 		Assert.assertEquals(existingGroup.getClassPK(), newGroup.getClassPK());
@@ -284,15 +278,6 @@ public class GroupPersistenceTest {
 		_persistence.countByC_GK(0L, "null");
 
 		_persistence.countByC_GK(0L, (String)null);
-	}
-
-	@Test
-	public void testCountByC_GKArrayable() throws Exception {
-		_persistence.countByC_GK(
-			RandomTestUtil.nextLong(),
-			new String[] {
-				RandomTestUtil.randomString(), "", "null", null, null
-			});
 	}
 
 	@Test
@@ -506,12 +491,12 @@ public class GroupPersistenceTest {
 		return OrderByComparatorFactoryUtil.create(
 			"Group_", "mvccVersion", true, "ctCollectionId", true, "uuid", true,
 			"groupId", true, "companyId", true, "creatorUserId", true,
-			"modifiedDate", true, "classNameId", true, "classPK", true,
-			"parentGroupId", true, "liveGroupId", true, "treePath", true,
-			"groupKey", true, "name", true, "description", true, "type", true,
-			"manualMembership", true, "membershipRestriction", true,
-			"friendlyURL", true, "site", true, "remoteStagingGroupCount", true,
-			"inheritContent", true, "active", true);
+			"classNameId", true, "classPK", true, "parentGroupId", true,
+			"liveGroupId", true, "treePath", true, "groupKey", true, "name",
+			true, "description", true, "type", true, "manualMembership", true,
+			"membershipRestriction", true, "friendlyURL", true, "site", true,
+			"remoteStagingGroupCount", true, "inheritContent", true, "active",
+			true);
 	}
 
 	@Test
@@ -868,8 +853,6 @@ public class GroupPersistenceTest {
 		group.setCompanyId(RandomTestUtil.nextLong());
 
 		group.setCreatorUserId(RandomTestUtil.nextLong());
-
-		group.setModifiedDate(RandomTestUtil.nextDate());
 
 		group.setClassNameId(RandomTestUtil.nextLong());
 

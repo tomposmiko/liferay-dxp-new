@@ -3,7 +3,6 @@
 exports[`Field Checkbox Multiple has a helptext 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -65,6 +64,7 @@ exports[`Field Checkbox Multiple has a helptext 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -74,21 +74,17 @@ exports[`Field Checkbox Multiple has a helptext 1`] = `
       type="hidden"
       value="false"
     />
-    <div
-      aria-hidden="true"
-      class="form-feedback-group lfr-de__field-feedback"
-    >
-      <div
-        id="undefined_fieldHelp"
-      >
-        Type something
-      </div>
-    </div>
     <span
-      class="sr-only"
-      id="undefined_fieldDetails"
+      aria-hidden="true"
+      class="form-text"
     >
       Type something
+    </span>
+    <span
+      class="sr-only"
+    >
+      Type something
+      <br />
     </span>
   </div>
 </div>
@@ -97,7 +93,6 @@ exports[`Field Checkbox Multiple has a helptext 1`] = `
 exports[`Field Checkbox Multiple has a key 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -159,6 +154,7 @@ exports[`Field Checkbox Multiple has a key 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -168,6 +164,7 @@ exports[`Field Checkbox Multiple has a key 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -178,7 +175,6 @@ exports[`Field Checkbox Multiple has a label 1`] = `
     class="form-group hide"
   >
     <label
-      aria-labelledby="undefined_fieldDetails"
       class="ddm-label"
       tabindex="0"
     >
@@ -242,6 +238,7 @@ exports[`Field Checkbox Multiple has a label 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -251,12 +248,7 @@ exports[`Field Checkbox Multiple has a label 1`] = `
       type="hidden"
       value="false"
     />
-    <span
-      class="sr-only"
-      id="undefined_fieldDetails"
-    >
-      label
-    </span>
+    
   </div>
 </div>
 `;
@@ -264,7 +256,6 @@ exports[`Field Checkbox Multiple has a label 1`] = `
 exports[`Field Checkbox Multiple has a predefined Value 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -326,6 +317,7 @@ exports[`Field Checkbox Multiple has a predefined Value 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -335,6 +327,7 @@ exports[`Field Checkbox Multiple has a predefined Value 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -342,7 +335,6 @@ exports[`Field Checkbox Multiple has a predefined Value 1`] = `
 exports[`Field Checkbox Multiple has a spritemap 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -404,6 +396,7 @@ exports[`Field Checkbox Multiple has a spritemap 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -413,6 +406,7 @@ exports[`Field Checkbox Multiple has a spritemap 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -420,7 +414,6 @@ exports[`Field Checkbox Multiple has a spritemap 1`] = `
 exports[`Field Checkbox Multiple has a value 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -482,6 +475,7 @@ exports[`Field Checkbox Multiple has a value 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value="true"
       />
@@ -491,6 +485,7 @@ exports[`Field Checkbox Multiple has a value 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -498,7 +493,7 @@ exports[`Field Checkbox Multiple has a value 1`] = `
 exports[`Field Checkbox Multiple has an id 1`] = `
 <div>
   <div
-    aria-labelledby="ID_fieldDetails"
+    aria-labelledby="ID"
     class="form-group hide"
     tabindex="0"
   >
@@ -560,6 +555,7 @@ exports[`Field Checkbox Multiple has an id 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -569,6 +565,7 @@ exports[`Field Checkbox Multiple has an id 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -576,7 +573,6 @@ exports[`Field Checkbox Multiple has an id 1`] = `
 exports[`Field Checkbox Multiple is not editable 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -640,6 +636,7 @@ exports[`Field Checkbox Multiple is not editable 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -649,6 +646,7 @@ exports[`Field Checkbox Multiple is not editable 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -656,7 +654,6 @@ exports[`Field Checkbox Multiple is not editable 1`] = `
 exports[`Field Checkbox Multiple is not required 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -718,6 +715,7 @@ exports[`Field Checkbox Multiple is not required 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -727,6 +725,7 @@ exports[`Field Checkbox Multiple is not required 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -734,7 +733,6 @@ exports[`Field Checkbox Multiple is not required 1`] = `
 exports[`Field Checkbox Multiple is shown as a switcher 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -796,6 +794,7 @@ exports[`Field Checkbox Multiple is shown as a switcher 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -805,6 +804,7 @@ exports[`Field Checkbox Multiple is shown as a switcher 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -812,7 +812,6 @@ exports[`Field Checkbox Multiple is shown as a switcher 1`] = `
 exports[`Field Checkbox Multiple is shown as checkbox 1`] = `
 <div>
   <div
-    aria-labelledby="undefined_fieldDetails"
     class="form-group hide"
     tabindex="0"
   >
@@ -862,6 +861,7 @@ exports[`Field Checkbox Multiple is shown as checkbox 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -871,6 +871,7 @@ exports[`Field Checkbox Multiple is shown as checkbox 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;
@@ -881,7 +882,6 @@ exports[`Field Checkbox Multiple renders Label if showLabel is true 1`] = `
     class="form-group hide"
   >
     <label
-      aria-labelledby="undefined_fieldDetails"
       class="ddm-label"
       tabindex="0"
     >
@@ -945,6 +945,7 @@ exports[`Field Checkbox Multiple renders Label if showLabel is true 1`] = `
         </label>
       </div>
       <input
+        class="form-control"
         type="hidden"
         value=""
       />
@@ -954,12 +955,7 @@ exports[`Field Checkbox Multiple renders Label if showLabel is true 1`] = `
       type="hidden"
       value="false"
     />
-    <span
-      class="sr-only"
-      id="undefined_fieldDetails"
-    >
-      text
-    </span>
+    
   </div>
 </div>
 `;

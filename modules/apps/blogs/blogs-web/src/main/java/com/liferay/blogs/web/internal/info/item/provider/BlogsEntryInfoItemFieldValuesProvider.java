@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
 
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
-	property = Constants.SERVICE_RANKING + ":Integer=10",
+	immediate = true, property = Constants.SERVICE_RANKING + ":Integer=10",
 	service = InfoItemFieldValuesProvider.class
 )
 public class BlogsEntryInfoItemFieldValuesProvider
@@ -128,11 +127,8 @@ public class BlogsEntryInfoItemFieldValuesProvider
 						BlogsEntryInfoItemFields.smallImageInfoField,
 						smallWebImage));
 
-				String coverImageURL = blogsEntry.getCoverImageURL(
-					themeDisplay);
-
 				WebImage coverWebImage = new WebImage(
-					coverImageURL,
+					blogsEntry.getCoverImageURL(themeDisplay),
 					new InfoItemReference(
 						FileEntry.class.getName(),
 						new ClassPKInfoItemIdentifier(
@@ -144,19 +140,6 @@ public class BlogsEntryInfoItemFieldValuesProvider
 					new InfoFieldValue<>(
 						BlogsEntryInfoItemFields.coverImageInfoField,
 						coverWebImage));
-
-				if (Validator.isNotNull(coverImageURL)) {
-					blogsEntryFieldValues.add(
-						new InfoFieldValue<>(
-							BlogsEntryInfoItemFields.previewImageInfoField,
-							coverWebImage));
-				}
-				else {
-					blogsEntryFieldValues.add(
-						new InfoFieldValue<>(
-							BlogsEntryInfoItemFields.previewImageInfoField,
-							smallWebImage));
-				}
 			}
 
 			blogsEntryFieldValues.add(

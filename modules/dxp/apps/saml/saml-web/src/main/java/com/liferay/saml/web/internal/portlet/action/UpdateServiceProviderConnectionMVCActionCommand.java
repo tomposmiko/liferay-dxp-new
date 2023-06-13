@@ -27,8 +27,6 @@ import com.liferay.saml.persistence.service.SamlIdpSpConnectionLocalService;
 
 import java.io.InputStream;
 
-import java.util.Objects;
-
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
@@ -39,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
 		"mvc.command.name=/admin/update_service_provider_connection"
@@ -70,24 +69,10 @@ public class UpdateServiceProviderConnectionMVCActionCommand
 		boolean enabled = ParamUtil.getBoolean(uploadPortletRequest, "enabled");
 		boolean encryptionForced = ParamUtil.getBoolean(
 			uploadPortletRequest, "encryptionForced");
-
-		String metadataUrl = null;
-		InputStream metadataXmlInputStream = null;
-
-		if (Objects.equals(
-				ParamUtil.getString(uploadPortletRequest, "metadataDelivery"),
-				"metadataXml")) {
-
-			metadataUrl = null;
-			metadataXmlInputStream = uploadPortletRequest.getFileAsStream(
-				"metadataXml");
-		}
-		else {
-			metadataUrl = ParamUtil.getString(
-				uploadPortletRequest, "metadataUrl");
-			metadataXmlInputStream = null;
-		}
-
+		String metadataUrl = ParamUtil.getString(
+			uploadPortletRequest, "metadataUrl");
+		InputStream metadataXmlInputStream =
+			uploadPortletRequest.getFileAsStream("metadataXml");
 		String name = ParamUtil.getString(uploadPortletRequest, "name");
 		String nameIdAttribute = ParamUtil.getString(
 			uploadPortletRequest, "nameIdAttribute");

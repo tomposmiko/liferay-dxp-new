@@ -184,8 +184,4 @@ public interface JournalArticleLocalizationModel
 	@Override
 	public JournalArticleLocalization cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -17,7 +17,6 @@ package com.liferay.document.library.document.conversion.internal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 import com.liferay.portal.util.FileImpl;
 
@@ -26,25 +25,23 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Sergio González
  */
+@PrepareForTest(ImageRequestTokenUtil.class)
+@RunWith(PowerMockRunner.class)
 public class DocumentHTMLProcessorTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
@@ -58,16 +55,13 @@ public class DocumentHTMLProcessorTest {
 
 		fileUtil.setFile(new FileImpl());
 
-		Mockito.when(
-			ImageRequestTokenUtil.createToken(Mockito.anyLong())
+		PowerMockito.mockStatic(ImageRequestTokenUtil.class);
+
+		PowerMockito.when(
+			ImageRequestTokenUtil.createToken(Matchers.anyLong())
 		).thenReturn(
 			"authtoken"
 		);
-	}
-
-	@After
-	public void tearDown() {
-		_imageRequestTokenUtilMockedStatic.close();
 	}
 
 	@Test
@@ -292,9 +286,5 @@ public class DocumentHTMLProcessorTest {
 
 		Assert.assertEquals(expectedHTML, processedHTML);
 	}
-
-	private final MockedStatic<ImageRequestTokenUtil>
-		_imageRequestTokenUtilMockedStatic = Mockito.mockStatic(
-			ImageRequestTokenUtil.class);
 
 }

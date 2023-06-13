@@ -9,87 +9,85 @@
  * distribution rights of the Software.
  */
 
-import {act, fireEvent} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
+import React, {useState} from 'react';
 
-// import React, {useState} from 'react';
-
-// import {InstanceListContext} from '../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/InstanceListPageProvider.es';
-// import {ModalContext} from '../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/modal/ModalProvider.es';
-// import SingleUpdateDueDateModal from '../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/modal/update-due-date/SingleUpdateDueDateModal.es';
-// import ToasterProvider from '../../../../../src/main/resources/META-INF/resources/js/shared/components/toaster/ToasterProvider.es';
-// import {MockRouter} from '../../../../mock/MockRouter.es';
+import {InstanceListContext} from '../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/InstanceListPageProvider.es';
+import {ModalContext} from '../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/modal/ModalProvider.es';
+import SingleUpdateDueDateModal from '../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/modal/update-due-date/SingleUpdateDueDateModal.es';
+import ToasterProvider from '../../../../../src/main/resources/META-INF/resources/js/shared/components/toaster/ToasterProvider.es';
+import {MockRouter} from '../../../../mock/MockRouter.es';
 
 import '@testing-library/jest-dom/extend-expect';
 
-// const ContainerMock = ({children}) => {
-// 	const selectedInstance = {
-// 		assetTitle: 'Blog1',
-// 		assetType: 'Blogs Entry',
-// 		assignees: [{id: 2, name: 'Test Test'}],
-// 		id: 1,
-// 		status: 'In Progress',
-// 		taskNames: ['Review'],
-// 	};
-// 	const [updateDueDate, setUpdateDueDate] = useState({
-// 		comment: undefined,
-// 		dueDate: undefined,
-// 	});
+const ContainerMock = ({children}) => {
+	const selectedInstance = {
+		assetTitle: 'Blog1',
+		assetType: 'Blogs Entry',
+		assignees: [{id: 2, name: 'Test Test'}],
+		id: 1,
+		status: 'In Progress',
+		taskNames: ['Review'],
+	};
+	const [updateDueDate, setUpdateDueDate] = useState({
+		comment: undefined,
+		dueDate: undefined,
+	});
 
-// 	return (
-// 		<InstanceListContext.Provider
-// 			value={{
-// 				selectedInstance,
-// 			}}
-// 		>
-// 			<ModalContext.Provider
-// 				value={{
-// 					setUpdateDueDate,
-// 					updateDueDate,
-// 					visibleModal: 'updateDueDate',
-// 				}}
-// 			>
-// 				<ToasterProvider>{children}</ToasterProvider>
-// 			</ModalContext.Provider>
-// 		</InstanceListContext.Provider>
-// 	);
-// };
+	return (
+		<InstanceListContext.Provider
+			value={{
+				selectedInstance,
+			}}
+		>
+			<ModalContext.Provider
+				value={{
+					setUpdateDueDate,
+					updateDueDate,
+					visibleModal: 'updateDueDate',
+				}}
+			>
+				<ToasterProvider>{children}</ToasterProvider>
+			</ModalContext.Provider>
+		</InstanceListContext.Provider>
+	);
+};
 
 describe('The SingleUpdateDueDateModal component should', () => {
-	let getByPlaceholderText;
-	let getByText;
+	let getByPlaceholderText, getByText;
 
-	// const items = [{dateDue: '2020-02-01T10:00:00', id: 1}];
+	const items = [{dateDue: '2020-02-01T10:00:00', id: 1}];
 
-	// const clientMock = {
-	// 	get: jest
-	// 		.fn()
-	// 		.mockRejectedValueOnce(new Error('Request failed'))
-	// 		.mockResolvedValue({data: {items}}),
-	// 	post: jest
-	// 		.fn()
-	// 		.mockRejectedValueOnce(new Error('Request failed'))
-	// 		.mockResolvedValue({data: {items: []}}),
-	// };
+	const clientMock = {
+		get: jest
+			.fn()
+			.mockRejectedValueOnce(new Error('Request failed'))
+			.mockResolvedValue({data: {items}}),
+		post: jest
+			.fn()
+			.mockRejectedValueOnce(new Error('Request failed'))
+			.mockResolvedValue({data: {items: []}}),
+	};
 
-	// beforeAll(async () => {
-	// 	const renderResult = render(
-	// 		<MockRouter client={clientMock} isAmPm>
-	// 			<SingleUpdateDueDateModal />
-	// 		</MockRouter>,
-	// 		{
-	// 			wrapper: ContainerMock,
-	// 		}
-	// 	);
+	beforeAll(async () => {
+		const renderResult = render(
+			<MockRouter client={clientMock} isAmPm>
+				<SingleUpdateDueDateModal />
+			</MockRouter>,
+			{
+				wrapper: ContainerMock,
+			}
+		);
 
-	// 	getByPlaceholderText = renderResult.getByPlaceholderText;
-	// 	getByText = renderResult.getByText;
+		getByPlaceholderText = renderResult.getByPlaceholderText;
+		getByText = renderResult.getByText;
 
-	// 	await act(async () => {
-	// 		jest.runAllTimers();
-	// 	});
-	// });
+		await act(async () => {
+			jest.runAllTimers();
+		});
+	});
 
-	xit('Render modal with error message and retry', async () => {
+	it('Render modal with error message and retry', async () => {
 		const alertError = getByText('your-request-has-failed');
 		const emptyStateMessage = getByText('unable-to-retrieve-data');
 		const retryBtn = getByText('retry');
@@ -104,7 +102,7 @@ describe('The SingleUpdateDueDateModal component should', () => {
 		});
 	});
 
-	xit('Render modal with form inputs with defaultValues', async () => {
+	it('Render modal with form inputs with defaultValues', async () => {
 		const cancelBtn = getByText('cancel');
 		const commentInput = getByPlaceholderText('write-a-note');
 		const dateInput = getByPlaceholderText('MM/DD/YYYY');
@@ -142,7 +140,7 @@ describe('The SingleUpdateDueDateModal component should', () => {
 		});
 	});
 
-	xit('Render modal reassign error and retry', async () => {
+	it('Render modal reassign error and retry', async () => {
 		const alertError = getByText(
 			'your-request-has-failed select-done-to-retry'
 		);
@@ -158,7 +156,7 @@ describe('The SingleUpdateDueDateModal component should', () => {
 		});
 	});
 
-	xit('Render alert with success message and close modal', () => {
+	it('Render alert with success message and close modal', () => {
 		const alertToast = document.querySelector('.alert-dismissible');
 		const alertClose = alertToast.children[1];
 

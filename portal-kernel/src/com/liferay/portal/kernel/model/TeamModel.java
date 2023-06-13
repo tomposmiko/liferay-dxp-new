@@ -284,8 +284,4 @@ public interface TeamModel
 	@Override
 	public Team cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

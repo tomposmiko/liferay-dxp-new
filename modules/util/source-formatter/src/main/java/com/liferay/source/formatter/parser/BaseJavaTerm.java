@@ -15,9 +15,8 @@
 package com.liferay.source.formatter.parser;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.source.formatter.check.util.SourceUtil;
+import com.liferay.source.formatter.checks.util.SourceUtil;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,17 +50,6 @@ public abstract class BaseJavaTerm implements JavaTerm {
 	}
 
 	@Override
-	public List<String> getImportNames() {
-		JavaClass parentJavaClass = _parentJavaClass;
-
-		while (parentJavaClass.getParentJavaClass() != null) {
-			parentJavaClass = parentJavaClass.getParentJavaClass();
-		}
-
-		return parentJavaClass.getImportNames();
-	}
-
-	@Override
 	public int getLineNumber() {
 		return _lineNumber;
 	}
@@ -74,17 +62,6 @@ public abstract class BaseJavaTerm implements JavaTerm {
 	@Override
 	public String getName() {
 		return _name;
-	}
-
-	@Override
-	public String getPackageName() {
-		JavaClass parentJavaClass = _parentJavaClass;
-
-		while (parentJavaClass.getParentJavaClass() != null) {
-			parentJavaClass = parentJavaClass.getParentJavaClass();
-		}
-
-		return parentJavaClass.getPackageName();
 	}
 
 	@Override

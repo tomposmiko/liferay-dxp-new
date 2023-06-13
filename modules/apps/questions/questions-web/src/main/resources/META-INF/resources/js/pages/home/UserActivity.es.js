@@ -122,7 +122,7 @@ export default withRouter(
 		return (
 			<section className="questions-section questions-section-list">
 				<div className="c-p-5 questions-container row">
-					<div className="c-mt-3 c-mx-auto c-px-0 w-100">
+					<div className="c-mt-3 c-mx-auto c-px-0 col-xl-10">
 						<div className="d-flex flex-row">
 							<div className="c-mt-3">
 								<UserIcon
@@ -132,43 +132,32 @@ export default withRouter(
 									userId={String(userInfo.id)}
 								/>
 							</div>
-
 							<div className="c-ml-4 flex-column">
 								<div>
 									<span className="small">
-										{Liferay.Language.get('rank') +
-											':' +
-											' '}
-
+										{Liferay.Language.get('rank')}:{' '}
 										{userInfo.rank}
 									</span>
 								</div>
-
 								<div>
 									<strong className="h2">
 										{userInfo.name}
 									</strong>
 								</div>
-
 								<div>
 									<span className="small">
-										{Liferay.Language.get('posts') +
-											':' +
-											' '}
-
+										{Liferay.Language.get('posts')}:{' '}
 										{userInfo.postsNumber}
 									</span>
 								</div>
 							</div>
 						</div>
-
 						<div className="border-bottom c-mt-5">
 							<h2>
 								{Liferay.Language.get('latest-questions-asked')}
 							</h2>
 						</div>
 					</div>
-
 					<div className="c-mx-auto c-px-0 col-xl-10">
 						<PaginatedList
 							activeDelta={pageSize}
@@ -181,7 +170,7 @@ export default withRouter(
 							emptyState={
 								<ClayEmptyState
 									description={Liferay.Language.get(
-										'sorry,-no-results-were-found'
+										'sorry-there-are-no-results-found'
 									)}
 									imgSrc={
 										context.includeContextPath +
@@ -197,7 +186,6 @@ export default withRouter(
 						>
 							{(question) => (
 								<QuestionRow
-									context={context}
 									currentSection={
 										context.useTopicNamesInURL
 											? question.messageBoardThread

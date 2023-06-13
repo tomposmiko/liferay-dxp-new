@@ -73,8 +73,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 /**
  * @author Peter Shin
@@ -207,7 +209,7 @@ public class RESTBuilder {
 				_checkOpenAPIYAMLFile(freeMarkerTool, file);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				throw new RuntimeException(
 					StringBundler.concat(
@@ -332,7 +334,6 @@ public class RESTBuilder {
 
 				_createBaseResourceImplFile(
 					context, escapedVersion, schemaName);
-				_createLiberalPermissionCheckerFile(context);
 				_createPropertiesFile(
 					context, escapedVersion,
 					String.valueOf(context.get("schemaPath")));
@@ -389,12 +390,12 @@ public class RESTBuilder {
 	private String _addClientVersionDescription(String yamlString) {
 		String clientMavenGroupId = _getClientMavenGroupId(
 			_configYAML.getApiPackagePath());
-		String clientVersion = _getClientVersion();
+		Optional<String> clientVersionOptional = _getClientVersionOptional();
 
 		int licenseIndex = yamlString.indexOf("    license:");
 
-		if ((clientMavenGroupId == null) || (clientVersion == null) ||
-			(licenseIndex == -1)) {
+		if ((clientMavenGroupId == null) ||
+			!clientVersionOptional.isPresent() || (licenseIndex == -1)) {
 
 			return yamlString;
 		}
@@ -408,6 +409,8 @@ public class RESTBuilder {
 		if (description == null) {
 			return yamlString;
 		}
+
+		String clientVersion = clientVersionOptional.get();
 
 		String clientMessage = StringBundler.concat(
 			"A Java client JAR is available for use with the group ID '",
@@ -886,24 +889,6 @@ public class RESTBuilder {
 			file,
 			FreeMarkerUtil.processTemplate(
 				_copyrightFile, "graphql_servlet_data", context));
-	}
-
-	private void _createLiberalPermissionCheckerFile(
-			Map<String, Object> context)
-		throws Exception {
-
-		File file = new File(
-			StringBundler.concat(
-				_configYAML.getImplDir(), "/",
-				StringUtil.replace(_configYAML.getApiPackagePath(), '.', '/'),
-				"/internal/security/permission/LiberalPermissionChecker.java"));
-
-		_files.add(file);
-
-		FileUtil.write(
-			file,
-			FreeMarkerUtil.processTemplate(
-				_copyrightFile, "liberal_permission_checker", context));
 	}
 
 	private void _createOpenAPIResourceFile(
@@ -1654,31 +1639,26 @@ public class RESTBuilder {
 		return _configYAML.getClientMavenGroupId();
 	}
 
-	private String _getClientVersion() {
+	private Optional<String> _getClientVersionOptional() {
 		try {
 			String directory = StringUtil.removeSubstring(
 				_configYAML.getClientDir(), "src/main/java");
 
-			for (String line :
-					Files.readAllLines(
-						Paths.get(directory + "/bnd.bnd"),
-						StandardCharsets.UTF_8)) {
+			Stream<String> stream = Files.lines(
+				Paths.get(directory + "/bnd.bnd"), StandardCharsets.UTF_8);
 
-				if (!line.startsWith("Bundle-Version: ")) {
-					continue;
-				}
-
-				return StringUtil.removeSubstring(line, "Bundle-Version: ");
-			}
-
-			return null;
+			return stream.filter(
+				line -> line.startsWith("Bundle-Version: ")
+			).map(
+				line -> StringUtil.removeSubstring(line, "Bundle-Version: ")
+			).findFirst();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
-			return null;
+			return Optional.empty();
 		}
 	}
 

@@ -16,8 +16,7 @@ package com.liferay.commerce.product.subscription.type.web.internal;
 
 import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.util.CPSubscriptionType;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
@@ -27,12 +26,12 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.product.subscription.type.name=" + CPConstants.DAILY_SUBSCRIPTION_TYPE,
 		"commerce.product.subscription.type.order:Integer=10"
@@ -42,17 +41,8 @@ import org.osgi.service.component.annotations.Reference;
 public class DailyCPSubscriptionTypeImpl implements CPSubscriptionType {
 
 	@Override
-	public UnicodeProperties
-			getDeliverySubscriptionTypeSettingsUnicodeProperties(
-				UnicodeProperties subscriptionTypeSettingsUnicodeProperties)
-		throws PortalException {
-
-		return null;
-	}
-
-	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "day");
+		return LanguageUtil.get(locale, "day");
 	}
 
 	@Override
@@ -87,16 +77,5 @@ public class DailyCPSubscriptionTypeImpl implements CPSubscriptionType {
 
 		return new Date();
 	}
-
-	@Override
-	public UnicodeProperties getSubscriptionTypeSettingsUnicodeProperties(
-			UnicodeProperties subscriptionTypeSettingsUnicodeProperties)
-		throws PortalException {
-
-		return null;
-	}
-
-	@Reference
-	private Language _language;
 
 }

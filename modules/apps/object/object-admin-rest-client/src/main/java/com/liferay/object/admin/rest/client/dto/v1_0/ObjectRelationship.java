@@ -145,58 +145,6 @@ public class ObjectRelationship implements Cloneable, Serializable {
 
 	protected String name;
 
-	public String getObjectDefinitionExternalReferenceCode1() {
-		return objectDefinitionExternalReferenceCode1;
-	}
-
-	public void setObjectDefinitionExternalReferenceCode1(
-		String objectDefinitionExternalReferenceCode1) {
-
-		this.objectDefinitionExternalReferenceCode1 =
-			objectDefinitionExternalReferenceCode1;
-	}
-
-	public void setObjectDefinitionExternalReferenceCode1(
-		UnsafeSupplier<String, Exception>
-			objectDefinitionExternalReferenceCode1UnsafeSupplier) {
-
-		try {
-			objectDefinitionExternalReferenceCode1 =
-				objectDefinitionExternalReferenceCode1UnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String objectDefinitionExternalReferenceCode1;
-
-	public String getObjectDefinitionExternalReferenceCode2() {
-		return objectDefinitionExternalReferenceCode2;
-	}
-
-	public void setObjectDefinitionExternalReferenceCode2(
-		String objectDefinitionExternalReferenceCode2) {
-
-		this.objectDefinitionExternalReferenceCode2 =
-			objectDefinitionExternalReferenceCode2;
-	}
-
-	public void setObjectDefinitionExternalReferenceCode2(
-		UnsafeSupplier<String, Exception>
-			objectDefinitionExternalReferenceCode2UnsafeSupplier) {
-
-		try {
-			objectDefinitionExternalReferenceCode2 =
-				objectDefinitionExternalReferenceCode2UnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String objectDefinitionExternalReferenceCode2;
-
 	public Long getObjectDefinitionId1() {
 		return objectDefinitionId1;
 	}
@@ -259,71 +207,6 @@ public class ObjectRelationship implements Cloneable, Serializable {
 	}
 
 	protected String objectDefinitionName2;
-
-	public Long getParameterObjectFieldId() {
-		return parameterObjectFieldId;
-	}
-
-	public void setParameterObjectFieldId(Long parameterObjectFieldId) {
-		this.parameterObjectFieldId = parameterObjectFieldId;
-	}
-
-	public void setParameterObjectFieldId(
-		UnsafeSupplier<Long, Exception> parameterObjectFieldIdUnsafeSupplier) {
-
-		try {
-			parameterObjectFieldId = parameterObjectFieldIdUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long parameterObjectFieldId;
-
-	public String getParameterObjectFieldName() {
-		return parameterObjectFieldName;
-	}
-
-	public void setParameterObjectFieldName(String parameterObjectFieldName) {
-		this.parameterObjectFieldName = parameterObjectFieldName;
-	}
-
-	public void setParameterObjectFieldName(
-		UnsafeSupplier<String, Exception>
-			parameterObjectFieldNameUnsafeSupplier) {
-
-		try {
-			parameterObjectFieldName =
-				parameterObjectFieldNameUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String parameterObjectFieldName;
-
-	public Boolean getReverse() {
-		return reverse;
-	}
-
-	public void setReverse(Boolean reverse) {
-		this.reverse = reverse;
-	}
-
-	public void setReverse(
-		UnsafeSupplier<Boolean, Exception> reverseUnsafeSupplier) {
-
-		try {
-			reverse = reverseUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Boolean reverse;
 
 	public Type getType() {
 		return type;
@@ -418,8 +301,7 @@ public class ObjectRelationship implements Cloneable, Serializable {
 
 	public static enum Type {
 
-		ONE_TO_MANY("oneToMany"), ONE_TO_ONE("oneToOne"),
-		MANY_TO_MANY("manyToMany");
+		ONE_TO_MANY("oneToMany"), MANY_TO_MANY("manyToMany");
 
 		public static Type create(String value) {
 			for (Type type : values()) {

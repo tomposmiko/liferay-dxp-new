@@ -1,7 +1,7 @@
 @component-name = "portal-document-management"
 definition {
 
-	property custom.properties = "default.layout.template.id=1_column${line.separator}dl.actions.visible=true";
+	property custom.properties = "default.layout.template.id=1_column";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Document Management";
@@ -19,12 +19,14 @@ definition {
 			layoutName = "Documents and Media Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Documents and Media Page",
 			widgetName = "Documents and Media");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 	}
@@ -32,7 +34,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -42,39 +44,13 @@ definition {
 
 			DMDocumentType.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@description = "This is a test for LPS-98063. It checks that a user can search for document by synonyms."
-	@priority = 4
-	test CanSearchForDocumentBySynonyms {
-		property test.run.environment = "EE";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "apple",
-			groupName = "Guest",
-			mimeType = "image/png",
-			sourceFileName = "Document_1.png");
-
-		SearchTuning.openSynonymsAdmin();
-
-		SearchTuning.addSynonymSet(synonyms = "apple,fruit");
-
-		Navigator.openURL();
-
-		SearchPortlets.searchEmbedded(searchTerm = "fruit");
-
-		SearchResultPortlet.viewSearchResults(
-			searchAssetTitle = "apple",
-			searchAssetType = "Document");
-	}
-
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForDocumentInFolder {
-		property portal.acceptance = "true";
-
 		JSONFolder.addFolder(
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name",
@@ -99,11 +75,9 @@ definition {
 			searchAssetType = "Document");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForDocumentThroughContent {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -122,11 +96,9 @@ definition {
 	}
 
 	@description = "This test covers LPS-129887. It ensures that the user can search for documents using file name."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanSearchForDocumentThroughFileName {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -139,17 +111,15 @@ definition {
 		for (var searchTermList : list "Document_1.doc,Document_1") {
 			Search.searchPG(
 				portletName = "Documents and Media",
-				searchTerm = ${searchTermList});
+				searchTerm = "${searchTermList}");
 
 			DMDocument.viewSearchResultsPG(dmDocumentTitle = "DM Document Title");
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForDocumentThroughTitle {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -164,32 +134,6 @@ definition {
 		SearchResultPortlet.viewSearchResults(
 			searchAssetTitle = "DM Document Title",
 			searchAssetType = "Document");
-	}
-
-	@description = "This is a test for LPS-80203. It checks that the users will remain in the current context after clearing the search."
-	@priority = 4
-	test UserRemainsInCurrentContextAfterClearingSearch {
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest");
-
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM SubFolder Description",
-			dmFolderName = "DM SubFolder Name",
-			groupName = "Guest",
-			parentFolderName = "DM Folder Name");
-
-		DMNavigator.openToFolderInAdmin(
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		Search.searchCP(searchTerm = "DM SubFolder Name");
-
-		Click(locator1 = "Link#CLEAR");
-
-		Breadcrumb.viewActiveEntry(breadcrumbName = "DM Folder Name");
 	}
 
 }

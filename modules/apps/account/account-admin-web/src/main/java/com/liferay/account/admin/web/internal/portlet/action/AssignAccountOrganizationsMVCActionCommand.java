@@ -15,7 +15,7 @@
 package com.liferay.account.admin.web.internal.portlet.action;
 
 import com.liferay.account.constants.AccountPortletKeys;
-import com.liferay.account.service.AccountEntryOrganizationRelService;
+import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_MANAGEMENT,
@@ -50,12 +51,13 @@ public class AssignAccountOrganizationsMVCActionCommand
 		long[] accountOrganizationIds = ParamUtil.getLongValues(
 			actionRequest, "accountOrganizationIds");
 
-		_accountEntryOrganizationRelService.addAccountEntryOrganizationRels(
-			accountEntryId, accountOrganizationIds);
+		_accountEntryOrganizationRelLocalService.
+			addAccountEntryOrganizationRels(
+				accountEntryId, accountOrganizationIds);
 	}
 
 	@Reference
-	private AccountEntryOrganizationRelService
-		_accountEntryOrganizationRelService;
+	private AccountEntryOrganizationRelLocalService
+		_accountEntryOrganizationRelLocalService;
 
 }

@@ -85,6 +85,20 @@ public class FindPageStrutsAction extends FindStrutsAction {
 		return portletURL;
 	}
 
+	@Reference(unbind = "-")
+	protected void setWikiNodeLocalService(
+		WikiNodeLocalService wikiNodeLocalService) {
+
+		_wikiNodeLocalService = wikiNodeLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWikiPageResourceLocalService(
+		WikiPageResourceLocalService wikiPageResourceLocalService) {
+
+		_wikiPageResourceLocalService = wikiPageResourceLocalService;
+	}
+
 	private String _getStrutsAction(String portletId) {
 		if (portletId.equals(WikiPortletKeys.WIKI) ||
 			portletId.equals(WikiPortletKeys.WIKI_ADMIN)) {
@@ -98,10 +112,7 @@ public class FindPageStrutsAction extends FindStrutsAction {
 	@Reference(target = "(model.class.name=com.liferay.wiki.model.WikiPage)")
 	private PortletLayoutFinder _portletLayoutFinder;
 
-	@Reference
 	private WikiNodeLocalService _wikiNodeLocalService;
-
-	@Reference
 	private WikiPageResourceLocalService _wikiPageResourceLocalService;
 
 }

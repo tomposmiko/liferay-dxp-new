@@ -105,7 +105,7 @@
 
 			const transferFiles = nativeEvent.dataTransfer.files;
 
-			if (transferFiles.length) {
+			if (transferFiles.length > 0) {
 				new CKEDITOR.dom.event(nativeEvent).preventDefault();
 
 				const editor = event.listenerData.editor;
@@ -360,7 +360,7 @@
 				);
 			});
 
-			AUI().use('aui-progressbar', 'uploader', (A) => {
+			AUI().use('aui-progressbar,uploader', (A) => {
 				const ATTR_DATA_RANDOM_ID = 'data-random-id';
 				const CSS_UPLOADING_IMAGE = 'uploading-image';
 
@@ -370,7 +370,7 @@
 				const TPL_PROGRESS_BAR = '<div class="progressbar"></div>';
 
 				const _onUploadError = () => {
-					const image = this._tempImage;
+					var image = this._tempImage;
 
 					if (image) {
 						image.parentElement.remove();
@@ -453,11 +453,11 @@
 				};
 
 				const _onUploadProgress = (event) => {
-					const percentLoaded = Math.round(event.percentLoaded);
+					var percentLoaded = Math.round(event.percentLoaded);
 
-					const target = event.details[0].target;
+					var target = event.details[0].target;
 
-					const progressbar = target.progressbar;
+					var progressbar = target.progressbar;
 
 					if (progressbar) {
 						progressbar.set('label', percentLoaded + ' %');
@@ -487,7 +487,7 @@
 					const eventData = event.data;
 
 					let file = eventData.file;
-					const image = eventData.element.$;
+					const image = eventData.el.$;
 
 					const randomId = eventData.randomId || A.guid();
 

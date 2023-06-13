@@ -17,6 +17,7 @@ package com.liferay.commerce.theme.minium.site.initializer.internal;
 import com.liferay.commerce.product.importer.CPFileImporter;
 import com.liferay.commerce.theme.minium.SiteInitializerDependencyResolver;
 import com.liferay.commerce.theme.minium.SiteInitializerDependencyResolverThreadLocal;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -26,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = MiniumLayoutsInitializer.class)
+@Component(enabled = false, service = MiniumLayoutsInitializer.class)
 public class MiniumLayoutsInitializer {
 
 	public void initialize(ServiceContext serviceContext) throws Exception {
@@ -51,10 +52,13 @@ public class MiniumLayoutsInitializer {
 	private void _createLayouts(ServiceContext serviceContext)
 		throws Exception {
 
+		String json = _siteInitializerDependencyResolver.getJSON(
+			"layouts.json");
+
+		JSONArray jsonArray = _jsonFactory.createJSONArray(json);
+
 		_cpFileImporter.createLayouts(
-			_jsonFactory.createJSONArray(
-				_siteInitializerDependencyResolver.getJSON("layouts.json")),
-			_siteInitializerDependencyResolver.getImageClassLoader(),
+			jsonArray, _siteInitializerDependencyResolver.getImageClassLoader(),
 			_siteInitializerDependencyResolver.getImageDependencyPath(),
 			serviceContext);
 	}

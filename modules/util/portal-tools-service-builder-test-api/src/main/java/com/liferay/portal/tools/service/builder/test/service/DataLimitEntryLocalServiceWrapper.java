@@ -27,10 +27,6 @@ public class DataLimitEntryLocalServiceWrapper
 	implements DataLimitEntryLocalService,
 			   ServiceWrapper<DataLimitEntryLocalService> {
 
-	public DataLimitEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DataLimitEntryLocalServiceWrapper(
 		DataLimitEntryLocalService dataLimitEntryLocalService) {
 

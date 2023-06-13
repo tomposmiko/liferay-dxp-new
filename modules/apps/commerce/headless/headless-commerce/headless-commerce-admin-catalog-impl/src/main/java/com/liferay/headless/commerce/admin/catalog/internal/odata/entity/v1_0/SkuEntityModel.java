@@ -21,6 +21,9 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.IntegerEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Matija Petanjek
@@ -28,11 +31,14 @@ import java.util.Map;
 public class SkuEntityModel implements EntityModel {
 
 	public SkuEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = Stream.of(
 			new IntegerEntityField("catalogId", locale -> "commerceCatalogId"),
 			new BooleanEntityField(
 				CPField.HAS_CHILD_CP_DEFINITIONS,
-				locale -> CPField.HAS_CHILD_CP_DEFINITIONS));
+				locale -> CPField.HAS_CHILD_CP_DEFINITIONS)
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

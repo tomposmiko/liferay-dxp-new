@@ -35,7 +35,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -48,7 +47,6 @@ import org.osgi.framework.FrameworkUtil;
  * @author Tom Wang
  * @author Shuyang Zhou
  */
-@Ignore
 @RunWith(Arquillian.class)
 public class SplitPackagesTest {
 

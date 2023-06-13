@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.service.CountryLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.sql.ResultSet;
@@ -105,14 +103,9 @@ public class CommerceCountryUpgradeProcess extends UpgradeProcess {
 					}
 				}
 			}
-		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropTables("CommerceCountry")
-		};
+			runSQL("drop table CommerceCountry");
+		}
 	}
 
 	private Country _addCountry(
@@ -129,8 +122,6 @@ public class CommerceCountryUpgradeProcess extends UpgradeProcess {
 
 		Country country = _countryLocalService.createCountry(countryId);
 
-		country.setDefaultLanguageId(
-			LocalizationUtil.getDefaultLanguageId(name));
 		country.setCompanyId(companyId);
 		country.setUserId(userId);
 		country.setUserName(userName);
@@ -140,6 +131,8 @@ public class CommerceCountryUpgradeProcess extends UpgradeProcess {
 		country.setA3(a3);
 		country.setActive(active);
 		country.setBillingAllowed(billingAllowed);
+		country.setDefaultLanguageId(
+			LocalizationUtil.getDefaultLanguageId(name));
 		country.setGroupFilterEnabled(groupFilterEnabled);
 		country.setName(
 			LocalizationUtil.getLocalization(
@@ -170,12 +163,12 @@ public class CommerceCountryUpgradeProcess extends UpgradeProcess {
 			boolean subjectToVAT, Date lastPublishDate)
 		throws Exception {
 
-		country.setDefaultLanguageId(
-			LocalizationUtil.getDefaultLanguageId(name));
 		country.setA2(a2);
 		country.setA3(a3);
 		country.setActive(active);
 		country.setBillingAllowed(billingAllowed);
+		country.setDefaultLanguageId(
+			LocalizationUtil.getDefaultLanguageId(name));
 		country.setGroupFilterEnabled(groupFilterEnabled);
 		country.setName(
 			LocalizationUtil.getLocalization(

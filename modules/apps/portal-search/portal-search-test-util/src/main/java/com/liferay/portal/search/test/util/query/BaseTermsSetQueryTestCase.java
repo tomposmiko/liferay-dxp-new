@@ -93,8 +93,8 @@ public abstract class BaseTermsSetQueryTestCase extends BaseIndexingTestCase {
 					searchResponse ->
 						DocumentsAssert.assertValuesIgnoreRelevance(
 							searchResponse.getRequestString(),
-							searchResponse.getDocuments(), Field.USER_NAME,
-							expected));
+							searchResponse.getDocumentsStream(),
+							Field.USER_NAME, expected));
 			});
 	}
 

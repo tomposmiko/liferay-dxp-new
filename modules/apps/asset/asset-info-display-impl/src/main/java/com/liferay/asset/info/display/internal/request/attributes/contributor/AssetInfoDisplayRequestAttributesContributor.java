@@ -16,16 +16,15 @@ package com.liferay.asset.info.display.internal.request.attributes.contributor;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
-import com.liferay.asset.util.LinkedAssetEntryIdsUtil;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.request.attributes.contributor.InfoDisplayRequestAttributesContributor;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -40,7 +39,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = InfoDisplayRequestAttributesContributor.class)
+@Component(
+	immediate = true, service = InfoDisplayRequestAttributesContributor.class
+)
 public class AssetInfoDisplayRequestAttributesContributor
 	implements InfoDisplayRequestAttributesContributor {
 
@@ -69,7 +70,7 @@ public class AssetInfoDisplayRequestAttributesContributor
 		}
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			_layoutDisplayPageProviderRegistry.
+			_layoutDisplayPageProviderTracker.
 				getLayoutDisplayPageProviderByClassName(
 					assetEntry.getClassName());
 
@@ -91,7 +92,7 @@ public class AssetInfoDisplayRequestAttributesContributor
 			}
 
 			InfoItemObjectProvider<?> infoItemObjectProvider =
-				_infoItemServiceRegistry.getFirstInfoItemService(
+				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemObjectProvider.class, assetEntry.getClassName());
 
 			if (infoItemObjectProvider != null) {
@@ -102,7 +103,7 @@ public class AssetInfoDisplayRequestAttributesContributor
 					InfoDisplayWebKeys.INFO_ITEM, infoItem);
 
 				InfoItemDetailsProvider infoItemDetailsProvider =
-					_infoItemServiceRegistry.getFirstInfoItemService(
+					_infoItemServiceTracker.getFirstInfoItemService(
 						InfoItemDetailsProvider.class,
 						assetEntry.getClassName());
 
@@ -116,9 +117,6 @@ public class AssetInfoDisplayRequestAttributesContributor
 		}
 
 		httpServletRequest.setAttribute(WebKeys.LAYOUT_ASSET_ENTRY, assetEntry);
-
-		LinkedAssetEntryIdsUtil.addLinkedAssetEntryId(
-			httpServletRequest, assetEntry.getEntryId());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -128,10 +126,9 @@ public class AssetInfoDisplayRequestAttributesContributor
 	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
-	private LayoutDisplayPageProviderRegistry
-		_layoutDisplayPageProviderRegistry;
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
 
 }

@@ -20,14 +20,16 @@ import com.liferay.adaptive.media.image.configuration.AMImageConfigurationHelper
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.PrefsProps;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.util.PrefsPropsUtil;
 
 import java.io.IOException;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,15 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = AMCompanyThumbnailConfigurationInitializer.class)
+@Component(
+	immediate = true, service = AMCompanyThumbnailConfigurationInitializer.class
+)
 public class AMCompanyThumbnailConfigurationInitializer {
 
 	public void initializeCompany(Company company)
 		throws AMImageConfigurationException, IOException {
 
-		int dlFileEntryPreviewMaxHeight = _prefsProps.getInteger(
+		int dlFileEntryPreviewMaxHeight = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT);
-		int dlFileEntryPreviewMaxWidth = _prefsProps.getInteger(
+		int dlFileEntryPreviewMaxWidth = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH);
 
 		if ((dlFileEntryPreviewMaxHeight > 0) ||
@@ -54,9 +58,9 @@ public class AMCompanyThumbnailConfigurationInitializer {
 				dlFileEntryPreviewMaxWidth);
 		}
 
-		int dlFileEntryThumbnailMaxHeight = _prefsProps.getInteger(
+		int dlFileEntryThumbnailMaxHeight = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_HEIGHT);
-		int dlFileEntryThumbnailMaxWidth = _prefsProps.getInteger(
+		int dlFileEntryThumbnailMaxWidth = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_MAX_WIDTH);
 
 		if ((dlFileEntryThumbnailMaxHeight > 0) &&
@@ -67,9 +71,9 @@ public class AMCompanyThumbnailConfigurationInitializer {
 				dlFileEntryThumbnailMaxWidth);
 		}
 
-		int dlFileEntryThumbnailCustom1MaxHeight = _prefsProps.getInteger(
+		int dlFileEntryThumbnailCustom1MaxHeight = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT);
-		int dlFileEntryThumbnailCustom1MaxWidth = _prefsProps.getInteger(
+		int dlFileEntryThumbnailCustom1MaxWidth = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_WIDTH);
 
 		if ((dlFileEntryThumbnailCustom1MaxHeight > 0) &&
@@ -80,9 +84,9 @@ public class AMCompanyThumbnailConfigurationInitializer {
 				dlFileEntryThumbnailCustom1MaxWidth);
 		}
 
-		int dlFileEntryThumbnailCustom2MaxHeight = _prefsProps.getInteger(
+		int dlFileEntryThumbnailCustom2MaxHeight = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_HEIGHT);
-		int dlFileEntryThumbnailCustom2MaxWidth = _prefsProps.getInteger(
+		int dlFileEntryThumbnailCustom2MaxWidth = PrefsPropsUtil.getInteger(
 			PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_WIDTH);
 
 		if ((dlFileEntryThumbnailCustom2MaxHeight > 0) &&
@@ -138,18 +142,20 @@ public class AMCompanyThumbnailConfigurationInitializer {
 
 		Collection<AMImageConfigurationEntry> amImageConfigurationEntries =
 			_amImageConfigurationHelper.getAMImageConfigurationEntries(
-				companyId,
-				amImageConfigurationEntry -> {
-					if (name.equals(amImageConfigurationEntry.getName()) ||
-						uuid.equals(amImageConfigurationEntry.getUUID())) {
+				companyId, amImageConfigurationEntry -> true);
 
-						return true;
-					}
+		Stream<AMImageConfigurationEntry> amImageConfigurationEntryStream =
+			amImageConfigurationEntries.stream();
 
-					return false;
-				});
+		Optional<AMImageConfigurationEntry>
+			duplicateNameAMImageConfigurationEntryOptional =
+				amImageConfigurationEntryStream.filter(
+					amImageConfigurationEntry ->
+						name.equals(amImageConfigurationEntry.getName()) ||
+						uuid.equals(amImageConfigurationEntry.getUUID())
+				).findFirst();
 
-		return !amImageConfigurationEntries.isEmpty();
+		return duplicateNameAMImageConfigurationEntryOptional.isPresent();
 	}
 
 	private String _normalize(String str) {
@@ -162,8 +168,5 @@ public class AMCompanyThumbnailConfigurationInitializer {
 
 	@Reference
 	private AMImageConfigurationHelper _amImageConfigurationHelper;
-
-	@Reference
-	private PrefsProps _prefsProps;
 
 }

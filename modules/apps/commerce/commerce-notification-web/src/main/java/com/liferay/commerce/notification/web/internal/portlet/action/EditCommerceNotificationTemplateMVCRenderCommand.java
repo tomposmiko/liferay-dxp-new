@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"mvc.command.name=/commerce_channels/edit_commerce_notification_template"
@@ -91,7 +92,9 @@ public class EditCommerceNotificationTemplateMVCRenderCommand
 				return "/error.jsp";
 			}
 
-			throw new PortletException(exception);
+			throw new PortletException(
+				"Unable to include edit_commerce_notification_template.jsp",
+				exception);
 		}
 
 		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;

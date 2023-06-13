@@ -15,28 +15,28 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@priority = 4
-	@refactorneeded
+	@priority = "4"
 	test WebProxyDemo {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(
+		SitePages.addPublicPage(
 			columnName = "1 Column",
 			pageName = "Web Proxy Page");
 
-		PagesAdmin.configurePage(
+		SitePages.configurePage(
 			columnName = "1 Column",
-			pageName = "Web Proxy Page");
+			pageName = "Web Proxy Page",
+			privacy = "Public Pages");
 
 		Navigator.gotoPage(pageName = "Web Proxy Page");
 
@@ -54,7 +54,7 @@ definition {
 
 		takeScreenshot();
 
-		AssertElementPresent(locator1 = "WebProxy#SCREENSHOTS_GOOGLE_IMAGES_PNG");
+		SikuliAssertElementPresent(locator1 = "WebProxy#SCREENSHOTS_GOOGLE_IMAGES_PNG");
 	}
 
 }

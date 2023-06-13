@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.account.model.AccountEntry",
 	service = ModelPreFilterContributor.class
 )
@@ -45,7 +46,6 @@ public class AccountEntryModelPreFilterContributor
 
 		_filterByAccountGroupIds(booleanFilter, searchContext);
 		_filterByAccountUserIds(booleanFilter, searchContext);
-		_filterByAllowNewUserMembership(booleanFilter, searchContext);
 		_filterByDomains(booleanFilter, searchContext);
 		_filterByOrganizationIds(booleanFilter, searchContext);
 		_filterByParentAccountEntryId(booleanFilter, searchContext);
@@ -80,18 +80,6 @@ public class AccountEntryModelPreFilterContributor
 			termsFilter.addValues(ArrayUtil.toStringArray(accountUserIds));
 
 			booleanFilter.add(termsFilter, BooleanClauseOccur.MUST);
-		}
-	}
-
-	private void _filterByAllowNewUserMembership(
-		BooleanFilter booleanFilter, SearchContext searchContext) {
-
-		Boolean allowNewUserMembership = (Boolean)searchContext.getAttribute(
-			"allowNewUserMembership");
-
-		if (allowNewUserMembership != null) {
-			booleanFilter.addRequiredTerm(
-				"allowNewUserMembership", allowNewUserMembership);
 		}
 	}
 

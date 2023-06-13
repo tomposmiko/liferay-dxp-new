@@ -67,7 +67,7 @@ public class UserGroupFixture {
 		String name, String description,
 		Map<String, Serializable> expandoValues) {
 
-		ServiceContext serviceContext = _getServiceContext();
+		ServiceContext serviceContext = getServiceContext();
 
 		serviceContext.setExpandoBridgeAttributes(expandoValues);
 
@@ -104,7 +104,7 @@ public class UserGroupFixture {
 		}
 	}
 
-	private ServiceContext _getServiceContext() {
+	protected ServiceContext getServiceContext() {
 		try {
 			return ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId());

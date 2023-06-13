@@ -14,29 +14,29 @@
 
 package com.liferay.portal.dao.orm.hibernate;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.io.Serializable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.engine.SessionImplementor;
 import org.hibernate.type.StandardBasicTypes;
-import org.hibernate.usertype.UserType;
+import org.hibernate.type.Type;
+import org.hibernate.usertype.CompositeUserType;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Bruno Farache
  */
-public class IntegerType implements Serializable, UserType {
+public class IntegerType implements CompositeUserType, Serializable {
 
 	public static final Integer DEFAULT_VALUE = Integer.valueOf(0);
 
 	@Override
-	public Object assemble(Serializable cached, Object owner) {
+	public Object assemble(
+		Serializable cached, SessionImplementor session, Object owner) {
+
 		return cached;
 	}
 
@@ -46,7 +46,7 @@ public class IntegerType implements Serializable, UserType {
 	}
 
 	@Override
-	public Serializable disassemble(Object value) {
+	public Serializable disassemble(Object value, SessionImplementor session) {
 		return (Serializable)value;
 	}
 
@@ -63,6 +63,21 @@ public class IntegerType implements Serializable, UserType {
 	}
 
 	@Override
+	public String[] getPropertyNames() {
+		return new String[0];
+	}
+
+	@Override
+	public Type[] getPropertyTypes() {
+		return new Type[] {StandardBasicTypes.INTEGER};
+	}
+
+	@Override
+	public Object getPropertyValue(Object component, int property) {
+		return component;
+	}
+
+	@Override
 	public int hashCode(Object x) {
 		return x.hashCode();
 	}
@@ -74,20 +89,16 @@ public class IntegerType implements Serializable, UserType {
 
 	@Override
 	public Object nullSafeGet(
-		ResultSet resultSet, String[] names,
-		SharedSessionContractImplementor sharedSessionContractImplementor,
+		ResultSet resultSet, String[] names, SessionImplementor session,
 		Object owner) {
 
 		Integer value = null;
 
 		try {
 			value = StandardBasicTypes.INTEGER.nullSafeGet(
-				resultSet, names[0], sharedSessionContractImplementor);
+				resultSet, names[0], session);
 		}
 		catch (SQLException sqlException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(sqlException);
-			}
 		}
 
 		if (value == null) {
@@ -100,7 +111,7 @@ public class IntegerType implements Serializable, UserType {
 	@Override
 	public void nullSafeSet(
 			PreparedStatement preparedStatement, Object target, int index,
-			SharedSessionContractImplementor sharedSessionContractImplementor)
+			SessionImplementor session)
 		throws SQLException {
 
 		if (target == null) {
@@ -111,7 +122,10 @@ public class IntegerType implements Serializable, UserType {
 	}
 
 	@Override
-	public Object replace(Object original, Object target, Object owner) {
+	public Object replace(
+		Object original, Object target, SessionImplementor session,
+		Object owner) {
+
 		return original;
 	}
 
@@ -121,10 +135,7 @@ public class IntegerType implements Serializable, UserType {
 	}
 
 	@Override
-	public int[] sqlTypes() {
-		return new int[] {StandardBasicTypes.INTEGER.sqlType()};
+	public void setPropertyValue(Object component, int property, Object value) {
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(IntegerType.class);
 
 }

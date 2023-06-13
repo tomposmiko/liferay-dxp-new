@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Sergio González
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class MBCategoryPermissionRegistrar {
 
 	@Activate

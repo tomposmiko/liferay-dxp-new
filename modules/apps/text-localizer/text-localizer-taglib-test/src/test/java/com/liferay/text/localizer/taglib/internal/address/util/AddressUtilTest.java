@@ -14,23 +14,26 @@
 
 package com.liferay.text.localizer.taglib.internal.address.util;
 
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.AddressWrapper;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.CountryWrapper;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.model.RegionWrapper;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -49,17 +52,19 @@ public class AddressUtilTest {
 
 	@BeforeClass
 	public static void setUpClass() {
-		_locale = LocaleThreadLocal.getThemeDisplayLocale();
+		LanguageUtil languageUtil = new LanguageUtil();
 
-		LocaleThreadLocal.setThemeDisplayLocale(LocaleUtil.getDefault());
+		languageUtil.setLanguage(
+			(Language)ProxyUtil.newProxyInstance(
+				Language.class.getClassLoader(),
+				new Class<?>[] {Language.class},
+				(proxy, method, args) -> {
+					if (Objects.equals(method.getName(), "isAvailableLocale")) {
+						return true;
+					}
 
-		_localeStringMap = RandomTestUtil.randomLocaleStringMap(
-			LocaleThreadLocal.getThemeDisplayLocale());
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		LocaleThreadLocal.setThemeDisplayLocale(_locale);
+					return null;
+				}));
 	}
 
 	@After
@@ -68,90 +73,54 @@ public class AddressUtilTest {
 	}
 
 	@Test
-	public void testGetCountryNameOptional() {
-		_testGetCountryNameOptional(null, null);
-		_testGetCountryNameOptional(
-			new AddressWrapper(null) {
+	public void testGetCountryNameOptionalEmptyWithNoCountry() {
+		Optional<String> countryNameOptional =
+			AddressUtil.getCountryNameOptional(
+				new AddressWrapper(null) {
 
-				@Override
-				public Country getCountry() {
-					return null;
-				}
+					@Override
+					public Country getCountry() {
+						return null;
+					}
 
-			},
-			null);
-		_testGetCountryNameOptional(
-			new AddressWrapper(null) {
+				});
 
-				@Override
-				public Country getCountry() {
-					return new CountryWrapper(null) {
+		Assert.assertFalse(countryNameOptional.isPresent());
+	}
 
-						@Override
-						public boolean isNew() {
-							return true;
-						}
+	@Test
+	public void testGetCountryNameOptionalEmptyWithNullAddress() {
+		Optional<String> countryNameOptional =
+			AddressUtil.getCountryNameOptional(null);
 
-					};
-				}
+		Assert.assertFalse(countryNameOptional.isPresent());
+	}
 
-			},
-			null);
-		_testGetCountryNameOptional(
-			new AddressWrapper(null) {
+	@Test
+	public void testGetCountryNameOptionalLocalized() {
+		ServiceContext serviceContext = new ServiceContext();
 
-				@Override
-				public Country getCountry() {
-					return new CountryWrapper(null) {
+		serviceContext.setLanguageId(LocaleUtil.toLanguageId(LocaleUtil.US));
 
-						@Override
-						public String getTitle(Locale locale) {
-							return _localeStringMap.get(locale);
-						}
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
-						@Override
-						public boolean isNew() {
-							return false;
-						}
+		Optional<String> countryNameOptional =
+			AddressUtil.getCountryNameOptional(_getAddressWithCountry());
 
-					};
-				}
+		Assert.assertEquals(_COUNTRY_NAME_LOCALIZED, countryNameOptional.get());
+	}
 
-			},
-			_localeStringMap.get(LocaleUtil.getDefault()));
+	@Test
+	public void testGetCountryNameOptionalNotLocalized() {
+		Optional<String> countryNameOptional =
+			AddressUtil.getCountryNameOptional(_getAddressWithCountry());
+
+		Assert.assertEquals(_COUNTRY_NAME, countryNameOptional.get());
 	}
 
 	@Test
 	public void testGetRegionNameOptional() {
-		_testGetRegionNameOptional(null, null);
-		_testGetRegionNameOptional(
-			new AddressWrapper(null) {
-
-				@Override
-				public Region getRegion() {
-					return null;
-				}
-
-			},
-			null);
-		_testGetRegionNameOptional(
-			new AddressWrapper(null) {
-
-				@Override
-				public Region getRegion() {
-					return new RegionWrapper(null) {
-
-						@Override
-						public boolean isNew() {
-							return true;
-						}
-
-					};
-				}
-
-			},
-			null);
-		_testGetRegionNameOptional(
+		Optional<String> regionNameOptional = AddressUtil.getRegionNameOptional(
 			new AddressWrapper(null) {
 
 				@Override
@@ -160,35 +129,78 @@ public class AddressUtilTest {
 
 						@Override
 						public String getName() {
-							return _localeStringMap.get(
-								LocaleUtil.getDefault());
+							return _REGION_NAME;
 						}
 
 						@Override
-						public boolean isNew() {
-							return false;
+						public long getRegionId() {
+							return RandomTestUtil.randomLong();
 						}
 
 					};
 				}
 
-			},
-			_localeStringMap.get(LocaleUtil.getDefault()));
+			});
+
+		Assert.assertEquals(_REGION_NAME, regionNameOptional.get());
 	}
 
-	private void _testGetCountryNameOptional(
-		Address address, String expectedName) {
+	@Test
+	public void testGetRegionNameOptionalEmptyWithNoRegion() {
+		Optional<String> regionNameOptional = AddressUtil.getRegionNameOptional(
+			new AddressWrapper(null) {
 
-		Assert.assertEquals(expectedName, AddressUtil.getCountryName(address));
+				@Override
+				public Region getRegion() {
+					return null;
+				}
+
+			});
+
+		Assert.assertFalse(regionNameOptional.isPresent());
 	}
 
-	private void _testGetRegionNameOptional(
-		Address address, String expectedName) {
+	@Test
+	public void testGetRegionNameOptionalEmptyWithNullAddress() {
+		Optional<String> regionNameOptional = AddressUtil.getRegionNameOptional(
+			null);
 
-		Assert.assertEquals(expectedName, AddressUtil.getRegionName(address));
+		Assert.assertFalse(regionNameOptional.isPresent());
 	}
 
-	private static Locale _locale;
-	private static Map<Locale, String> _localeStringMap;
+	private Address _getAddressWithCountry() {
+		return new AddressWrapper(null) {
+
+			@Override
+			public Country getCountry() {
+				return new CountryWrapper(null) {
+
+					@Override
+					public long getCountryId() {
+						return RandomTestUtil.randomLong();
+					}
+
+					@Override
+					public String getName() {
+						return _COUNTRY_NAME;
+					}
+
+					@Override
+					public String getName(Locale locale) {
+						return _COUNTRY_NAME_LOCALIZED;
+					}
+
+				};
+			}
+
+		};
+	}
+
+	private static final String _COUNTRY_NAME = RandomTestUtil.randomString();
+
+	private static final String _COUNTRY_NAME_LOCALIZED =
+		RandomTestUtil.randomString();
+
+	private static final String _REGION_NAME = RandomTestUtil.randomString();
 
 }

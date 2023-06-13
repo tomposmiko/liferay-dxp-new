@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -21,30 +19,30 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		JSONUser.tearDownNonAdminUsers();
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8351 | Test Summary: Page profile audience card shows known and anonymous individuals as well as segmented/unsegmented individuals"
-	@priority = 5
+	@priority = "5"
 	test ShowsKnownAnonymousIndividualsAsWellAsSegmentedUnsegmentedIndividuals {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Timing issues may happen on this test case
 		// AC Refactor ticket: LRAC-9409
 
-		property portal.upstream = "quarantine";
-
 		var usernameList = "ac,liferay";
+
 		var emailList = "ac@liferay.com,liferay@liferay.com";
 
 		task ("Add page and Blog for interaction with the AC") {
@@ -56,18 +54,18 @@ definition {
 		task ("Add users and interact with the page to get data from known and unsegmented users") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-			for (var name : list ${usernameList}) {
+			for (var name : list "${usernameList}") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 			}
 
 			ACDXPSettings.syncNewContactData();
 
 			ACUtils.navigateToSitePageWithUser(
-				emailList = ${emailList},
+				emailList = "${emailList}",
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -87,13 +85,13 @@ definition {
 		task ("Go to AC and create segment for the user") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSegments();
 
 			ACSegments.createStaticSegment();
 
-			ACUtils.setItemName(itemName = "Static Segment Test");
+			ACSegments.nameSegment(segmentName = "Static Segment Test");
 
 			ACSegments.addStaticMember(tableMember = "ac ac");
 
@@ -135,10 +133,8 @@ definition {
 			ACTimeFilter.setLast24Hours();
 
 			var portalURL = PropsUtil.get("portal.url");
-
-			var portalURL = StringUtil.replace(${portalURL}, "http://", "");
-
-			var portalURL = StringUtil.replace(${portalURL}, ":8080", "");
+			var portalURL = StringUtil.replace("${portalURL}", "http://", "");
+			var portalURL = StringUtil.replace("${portalURL}", ":8080", "");
 
 			ACNavigation.openItem(itemName = "AC Page - Site Name - ${portalURL}");
 
@@ -148,11 +144,11 @@ definition {
 
 		task ("Assert that Known, Anonymous, Segmented and Unsegmented Individuals are displayed") {
 			ACUtils.assertAudienceCard(
-				index = 1,
+				index = "1",
 				percentageList = "66.67%,33.33%");
 
 			ACUtils.assertAudienceCard(
-				index = 2,
+				index = "2",
 				percentageList = "66.67%,33.33%");
 		}
 	}

@@ -25,10 +25,6 @@ public class RecentLayoutRevisionLocalServiceWrapper
 	implements RecentLayoutRevisionLocalService,
 			   ServiceWrapper<RecentLayoutRevisionLocalService> {
 
-	public RecentLayoutRevisionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public RecentLayoutRevisionLocalServiceWrapper(
 		RecentLayoutRevisionLocalService recentLayoutRevisionLocalService) {
 

@@ -14,9 +14,9 @@
 
 package com.liferay.commerce.product.internal.search;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountGroupRel;
-import com.liferay.account.service.AccountGroupRelLocalService;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccountGroupRel;
+import com.liferay.commerce.account.service.CommerceAccountGroupRelService;
 import com.liferay.commerce.media.CommerceMediaResolver;
 import com.liferay.commerce.price.list.constants.CommercePriceListConstants;
 import com.liferay.commerce.price.list.model.CommercePriceEntry;
@@ -35,6 +35,7 @@ import com.liferay.commerce.product.model.CPSpecificationOption;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
+import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.CPDefinitionLinkLocalService;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
@@ -43,13 +44,11 @@ import com.liferay.commerce.product.service.CommerceChannelRelLocalService;
 import com.liferay.commerce.util.CommerceBigDecimalUtil;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BaseIndexer;
@@ -59,7 +58,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.facet.util.RangeParserUtil;
@@ -68,17 +66,12 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.RangeTermFilter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
-import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.search.generic.MultiMatchQuery;
-import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.search.expando.ExpandoBridgeIndexer;
 
 import java.io.Serializable;
 
@@ -92,6 +85,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -103,7 +97,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 
 	public static final String CLASS_NAME = CPDefinition.class.getName();
@@ -215,83 +209,79 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			long commerceChannelId = GetterUtil.getLong(
 				attributes.get("commerceChannelGroupId"));
 
-			BooleanFilter commerceChannelBooleanFilter = new BooleanFilter();
+			BooleanFilter channelBooleanFilter = new BooleanFilter();
 
-			BooleanFilter commerceChannelFilterEnableBooleanFilter =
+			BooleanFilter channelFilterEnableBooleanFilter =
 				new BooleanFilter();
 
-			commerceChannelFilterEnableBooleanFilter.addTerm(
+			channelFilterEnableBooleanFilter.addTerm(
 				CPField.CHANNEL_FILTER_ENABLED, Boolean.TRUE.toString(),
 				BooleanClauseOccur.MUST);
 
 			if (commerceChannelId > 0) {
-				commerceChannelFilterEnableBooleanFilter.addTerm(
+				channelFilterEnableBooleanFilter.addTerm(
 					CPField.COMMERCE_CHANNEL_GROUP_IDS,
 					String.valueOf(commerceChannelId), BooleanClauseOccur.MUST);
 			}
 			else {
-				commerceChannelFilterEnableBooleanFilter.addTerm(
+				channelFilterEnableBooleanFilter.addTerm(
 					CPField.COMMERCE_CHANNEL_GROUP_IDS, "-1",
 					BooleanClauseOccur.MUST);
 			}
 
-			commerceChannelBooleanFilter.add(
-				commerceChannelFilterEnableBooleanFilter,
-				BooleanClauseOccur.SHOULD);
-			commerceChannelBooleanFilter.addTerm(
+			channelBooleanFilter.add(
+				channelFilterEnableBooleanFilter, BooleanClauseOccur.SHOULD);
+			channelBooleanFilter.addTerm(
 				CPField.CHANNEL_FILTER_ENABLED, Boolean.FALSE.toString(),
 				BooleanClauseOccur.SHOULD);
 
 			contextBooleanFilter.add(
-				commerceChannelBooleanFilter, BooleanClauseOccur.MUST);
+				channelBooleanFilter, BooleanClauseOccur.MUST);
 
-			long[] accountGroupIds = GetterUtil.getLongValues(
+			long[] commerceAccountGroupIds = GetterUtil.getLongValues(
 				searchContext.getAttribute("commerceAccountGroupIds"), null);
 
 			BooleanFilter accountGroupsBooleanFilter = new BooleanFilter();
 
-			BooleanFilter accountGroupsFilterEnableBooleanFilter =
+			BooleanFilter accountGroupsFilteEnableBooleanFilter =
 				new BooleanFilter();
 
-			accountGroupsFilterEnableBooleanFilter.addTerm(
+			accountGroupsFilteEnableBooleanFilter.addTerm(
 				CPField.ACCOUNT_GROUP_FILTER_ENABLED, Boolean.TRUE.toString(),
 				BooleanClauseOccur.MUST);
 
-			if ((accountGroupIds != null) && (accountGroupIds.length > 0)) {
+			if ((commerceAccountGroupIds != null) &&
+				(commerceAccountGroupIds.length > 0)) {
+
 				BooleanFilter accountGroupIdsBooleanFilter =
 					new BooleanFilter();
 
-				for (long accountGroupId : accountGroupIds) {
+				for (long commerceAccountGroupId : commerceAccountGroupIds) {
 					Filter termFilter = new TermFilter(
 						"commerceAccountGroupIds",
-						String.valueOf(accountGroupId));
+						String.valueOf(commerceAccountGroupId));
 
 					accountGroupIdsBooleanFilter.add(
 						termFilter, BooleanClauseOccur.SHOULD);
 				}
 
-				accountGroupsFilterEnableBooleanFilter.add(
+				accountGroupsFilteEnableBooleanFilter.add(
 					accountGroupIdsBooleanFilter, BooleanClauseOccur.MUST);
 			}
 			else {
-				accountGroupsFilterEnableBooleanFilter.addTerm(
+				accountGroupsFilteEnableBooleanFilter.addTerm(
 					"commerceAccountGroupIds", "-1", BooleanClauseOccur.MUST);
 			}
 
 			accountGroupsBooleanFilter.add(
-				accountGroupsFilterEnableBooleanFilter,
+				accountGroupsFilteEnableBooleanFilter,
 				BooleanClauseOccur.SHOULD);
 			accountGroupsBooleanFilter.addTerm(
 				CPField.ACCOUNT_GROUP_FILTER_ENABLED, Boolean.FALSE.toString(),
 				BooleanClauseOccur.SHOULD);
 
-			boolean ignoreAccountGroup = GetterUtil.getBoolean(
-				attributes.get("ignoreCommerceAccountGroup"));
-
-			if (!ignoreAccountGroup) {
-				contextBooleanFilter.add(
-					accountGroupsBooleanFilter, BooleanClauseOccur.MUST);
-			}
+			contextBooleanFilter.add(
+				accountGroupsBooleanFilter, BooleanClauseOccur.MUST);
 		}
 		else {
 			long[] commerceCatalogIds = _getUserCommerceCatalogIds(
@@ -318,22 +308,22 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			SearchContext searchContext)
 		throws Exception {
 
-		addSearchTerm(
-			searchQuery, searchContext, CPField.EXTERNAL_REFERENCE_CODE, false);
-		addSearchLocalizedTerm(
-			searchQuery, searchContext, CPField.SHORT_DESCRIPTION, false);
-		addSearchTerm(searchQuery, searchContext, CPField.SKUS, false);
-		addSearchLocalizedTerm(
-			searchQuery, searchContext, CPField.SPECIFICATION_VALUES_NAMES,
-			false);
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, Field.CONTENT, false);
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, Field.DESCRIPTION, false);
+		addSearchLocalizedTerm(
+			searchQuery, searchContext, CPField.SHORT_DESCRIPTION, false);
 		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		addSearchTerm(searchQuery, searchContext, Field.NAME, false);
 		addSearchLocalizedTerm(searchQuery, searchContext, Field.NAME, false);
+		addSearchTerm(searchQuery, searchContext, CPField.SKUS, false);
+		addSearchTerm(
+			searchQuery, searchContext, CPField.EXTERNAL_REFERENCE_CODE, false);
 		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
+		addSearchLocalizedTerm(
+			searchQuery, searchContext, CPField.SPECIFICATION_VALUES_NAMES,
+			false);
 
 		LinkedHashMap<String, Object> params =
 			(LinkedHashMap<String, Object>)searchContext.getAttribute("params");
@@ -343,38 +333,6 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 
 			if (Validator.isNotNull(expandoAttributes)) {
 				addSearchExpando(searchQuery, searchContext, expandoAttributes);
-			}
-		}
-
-		String keywords = searchContext.getKeywords();
-
-		if (Validator.isNotNull(keywords)) {
-			try {
-				keywords = StringUtil.toLowerCase(keywords);
-
-				BooleanQuery booleanQuery = new BooleanQueryImpl();
-
-				booleanQuery.add(
-					new TermQueryImpl(CPField.SKUS + ".1_10_ngram", keywords),
-					BooleanClauseOccur.SHOULD);
-
-				MultiMatchQuery multiMatchQuery = new MultiMatchQuery(keywords);
-
-				multiMatchQuery.addFields(
-					CPField.SKUS, CPField.SKUS + ".reverse");
-				multiMatchQuery.setType(MultiMatchQuery.Type.PHRASE_PREFIX);
-
-				booleanQuery.add(multiMatchQuery, BooleanClauseOccur.SHOULD);
-
-				if (searchContext.isAndSearch()) {
-					searchQuery.add(booleanQuery, BooleanClauseOccur.MUST);
-				}
-				else {
-					searchQuery.add(booleanQuery, BooleanClauseOccur.SHOULD);
-				}
-			}
-			catch (ParseException parseException) {
-				throw new SystemException(parseException);
 			}
 		}
 	}
@@ -396,7 +354,11 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 		Document document = getBaseModelDocument(CLASS_NAME, cpDefinition);
 
 		String cpDefinitionDefaultLanguageId =
-			_localization.getDefaultLanguageId(cpDefinition.getName());
+			LocalizationUtil.getDefaultLanguageId(cpDefinition.getName());
+
+		List<String> languageIds =
+			_cpDefinitionLocalService.getCPDefinitionLocalizationLanguageIds(
+				cpDefinition.getCPDefinitionId());
 
 		long classNameId = _classNameLocalService.getClassNameId(
 			CProduct.class);
@@ -413,215 +375,111 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
-		document.addKeyword(
-			CPField.ACCOUNT_GROUP_FILTER_ENABLED,
-			cpDefinition.isAccountGroupFilterEnabled());
-
-		BigDecimal basePrice = _getBasePrice(cpDefinition.getCPInstances());
-
-		if (basePrice != null) {
-			document.addNumber(CPField.BASE_PRICE, basePrice);
-		}
-
-		document.addKeyword(
-			CPField.CHANNEL_FILTER_ENABLED,
-			cpDefinition.isChannelFilterEnabled());
-		document.addNumber(
-			CPField.COMMERCE_CHANNEL_GROUP_IDS,
-			TransformUtil.transformToLongArray(
-				_commerceChannelRelLocalService.getCommerceChannelRels(
-					cpDefinition.getModelClassName(),
-					cpDefinition.getCPDefinitionId(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null),
-				commerceChannelRel -> {
-					CommerceChannel commerceChannel =
-						commerceChannelRel.getCommerceChannel();
-
-					return commerceChannel.getGroupId();
-				}));
-
-		long cpAttachmentFileEntryId = 0;
-
-		CPAttachmentFileEntry cpAttachmentFileEntry =
-			_cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
-				cpDefinition.getCPDefinitionId());
-
-		if (cpAttachmentFileEntry != null) {
-			document.addNumber(
-				CPField.DEFAULT_IMAGE_FILE_ENTRY_ID,
-				cpAttachmentFileEntry.getFileEntryId());
-
-			cpAttachmentFileEntryId =
-				cpAttachmentFileEntry.getCPAttachmentFileEntryId();
-		}
-
-		if (cpAttachmentFileEntryId == 0) {
-			document.addKeyword(
-				CPField.DEFAULT_IMAGE_FILE_URL,
-				_commerceMediaResolver.getDefaultURL(
-					cpDefinition.getGroupId()));
-		}
-		else {
-			document.addKeyword(
-				CPField.DEFAULT_IMAGE_FILE_URL,
-				_commerceMediaResolver.getURL(
-					AccountConstants.ACCOUNT_ENTRY_ID_GUEST,
-					cpAttachmentFileEntryId, false, false, false));
-		}
-
-		document.addNumber(CPField.DEPTH, cpDefinition.getDepth());
-		document.addDateSortable(
-			CPField.DISPLAY_DATE, cpDefinition.getDisplayDate());
-
-		CProduct cProduct = cpDefinition.getCProduct();
-
-		document.addKeyword(
-			CPField.EXTERNAL_REFERENCE_CODE,
-			cProduct.getExternalReferenceCode());
-
-		document.addNumber(CPField.HEIGHT, cpDefinition.getHeight());
-		document.addKeyword(
-			CPField.IS_IGNORE_SKU_COMBINATIONS,
-			cpDefinition.isIgnoreSKUCombinations());
-		document.addText(
-			CPField.META_DESCRIPTION,
-			cpDefinition.getMetaDescription(cpDefinitionDefaultLanguageId));
-		document.addText(
-			CPField.META_KEYWORDS,
-			cpDefinition.getMetaKeywords(cpDefinitionDefaultLanguageId));
-		document.addText(
-			CPField.META_TITLE,
-			cpDefinition.getMetaTitle(cpDefinitionDefaultLanguageId));
-
-		List<CPDefinitionOptionRel> cpDefinitionOptionRels =
-			cpDefinition.getCPDefinitionOptionRels();
-
-		document.addNumber(
-			CPField.OPTION_IDS,
-			TransformUtil.transformToArray(
-				_getCPOptions(cpDefinitionOptionRels), CPOption::getCPOptionId,
-				Long.class));
-		document.addText(
-			CPField.OPTION_NAMES,
-			TransformUtil.transformToArray(
-				_getCPOptions(cpDefinitionOptionRels), CPOption::getKey,
-				String.class));
-
-		document.addKeyword(CPField.PRODUCT_ID, cpDefinition.getCProductId());
-		document.addKeyword(
-			CPField.PRODUCT_TYPE_NAME, cpDefinition.getProductTypeName());
-		document.addKeyword(CPField.PUBLISHED, cpDefinition.isPublished());
-		document.addText(
-			CPField.SHORT_DESCRIPTION,
-			cpDefinition.getShortDescription(cpDefinitionDefaultLanguageId));
-
-		List<CPDefinitionSpecificationOptionValue>
-			cpDefinitionSpecificationOptionValues =
-				_getFilteredCPDefinitionSpecificationOptionValues(
-					cpDefinition.getCPDefinitionSpecificationOptionValues());
-
-		document.addNumber(
-			CPField.SPECIFICATION_IDS,
-			TransformUtil.transformToArray(
-				cpDefinitionSpecificationOptionValues,
-				CPDefinitionSpecificationOptionValue::
-					getCPSpecificationOptionId,
-				Long.class));
-		document.addText(
-			CPField.SPECIFICATION_NAMES,
-			TransformUtil.transformToArray(
-				cpDefinitionSpecificationOptionValues,
-				CPDefinitionSpecificationOptionValue ->
-					_getCPSpecificationOptionKey(
-						CPDefinitionSpecificationOptionValue.
-							getCPSpecificationOption()),
-				String.class));
-		document.addText(
-			CPField.SPECIFICATION_VALUES_NAMES,
-			TransformUtil.transformToArray(
-				_getFilteredCPDefinitionSpecificationOptionValues(
-					cpDefinitionSpecificationOptionValues),
-				CPDefinitionSpecificationOptionValue ->
-					CPDefinitionSpecificationOptionValue.getValue(
-						cpDefinitionDefaultLanguageId),
-				String.class));
-
-		document.addText(
-			CPField.SKUS,
-			_cpInstanceLocalService.getSKUs(cpDefinition.getCPDefinitionId()));
-		document.addKeyword(
-			CPField.SUBSCRIPTION_ENABLED, cpDefinition.isSubscriptionEnabled());
-
-		List<String> languageIds =
-			_cpDefinitionLocalService.getCPDefinitionLocalizationLanguageIds(
-				cpDefinition.getCPDefinitionId());
-
 		for (String languageId : languageIds) {
 			String description = cpDefinition.getDescription(languageId);
+			String name = cpDefinition.getName(languageId);
+			String urlTitle = languageIdToUrlTitleMap.get(languageId);
 			String metaDescription = cpDefinition.getMetaDescription(
 				languageId);
 			String metaKeywords = cpDefinition.getMetaKeywords(languageId);
 			String metaTitle = cpDefinition.getMetaTitle(languageId);
-			String name = cpDefinition.getName(languageId);
 			String shortDescription = cpDefinition.getShortDescription(
 				languageId);
-			String urlTitle = languageIdToUrlTitleMap.get(languageId);
+
+			if (languageId.equals(cpDefinitionDefaultLanguageId)) {
+				document.addText(Field.DESCRIPTION, description);
+				document.addText(Field.NAME, name);
+				document.addText(Field.URL, urlTitle);
+				document.addText(CPField.META_DESCRIPTION, metaDescription);
+				document.addText(CPField.META_KEYWORDS, metaKeywords);
+				document.addText(CPField.META_TITLE, metaTitle);
+				document.addText(CPField.SHORT_DESCRIPTION, shortDescription);
+				document.addText("defaultLanguageId", languageId);
+			}
 
 			document.addText(
-				_localization.getLocalizedName(
+				LocalizationUtil.getLocalizedName(Field.NAME, languageId),
+				name);
+			document.addText(
+				LocalizationUtil.getLocalizedName(
+					Field.DESCRIPTION, languageId),
+				description);
+			document.addText(
+				LocalizationUtil.getLocalizedName(Field.URL, languageId),
+				urlTitle);
+			document.addText(
+				LocalizationUtil.getLocalizedName(
 					CPField.META_DESCRIPTION, languageId),
 				metaDescription);
 			document.addText(
-				_localization.getLocalizedName(
+				LocalizationUtil.getLocalizedName(
 					CPField.META_KEYWORDS, languageId),
 				metaKeywords);
 			document.addText(
-				_localization.getLocalizedName(CPField.META_TITLE, languageId),
+				LocalizationUtil.getLocalizedName(
+					CPField.META_TITLE, languageId),
 				metaTitle);
 			document.addText(
-				_localization.getLocalizedName(
+				LocalizationUtil.getLocalizedName(
 					CPField.SHORT_DESCRIPTION, languageId),
 				shortDescription);
+
 			document.addText(Field.CONTENT, description);
-			document.addText(
-				_localization.getLocalizedName(Field.DESCRIPTION, languageId),
-				description);
-			document.addText(
-				_localization.getLocalizedName(Field.NAME, languageId), name);
-			document.addText(
-				_localization.getLocalizedName(Field.URL, languageId),
-				urlTitle);
 		}
 
 		document.addText(
+			Field.NAME, cpDefinition.getName(cpDefinitionDefaultLanguageId));
+		document.addText(
 			Field.DESCRIPTION,
 			cpDefinition.getDescription(cpDefinitionDefaultLanguageId));
-		document.addKeyword(Field.HIDDEN, _isHidden(cpDefinition, cProduct));
-		document.addText(
-			Field.NAME, cpDefinition.getName(cpDefinitionDefaultLanguageId));
 		document.addText(
 			Field.URL,
 			languageIdToUrlTitleMap.get(cpDefinitionDefaultLanguageId));
+		document.addText(
+			CPField.SHORT_DESCRIPTION,
+			cpDefinition.getShortDescription(cpDefinitionDefaultLanguageId));
+
+		List<Long> commerceChannelGroupIds = new ArrayList<>();
+
+		for (CommerceChannelRel commerceChannelRel :
+				_commerceChannelRelLocalService.getCommerceChannelRels(
+					cpDefinition.getModelClassName(),
+					cpDefinition.getCPDefinitionId(), QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
+			CommerceChannel commerceChannel =
+				commerceChannelRel.getCommerceChannel();
+
+			commerceChannelGroupIds.add(commerceChannel.getGroupId());
+		}
 
 		document.addNumber(
-			"commerceAccountGroupIds",
-			TransformUtil.transformToLongArray(
-				_accountGroupRelLocalService.getAccountGroupRels(
-					CPDefinition.class.getName(),
-					cpDefinition.getCPDefinitionId(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null),
-				AccountGroupRel::getAccountGroupId));
+			CPField.COMMERCE_CHANNEL_GROUP_IDS,
+			ArrayUtil.toLongArray(commerceChannelGroupIds));
 
-		CommerceCatalog commerceCatalog = cpDefinition.getCommerceCatalog();
+		List<CommerceAccountGroupRel> commerceAccountGroupRels =
+			_commerceAccountGroupRelService.getCommerceAccountGroupRels(
+				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId(),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
-		document.addKeyword(
-			"commerceCatalogId", commerceCatalog.getCommerceCatalogId());
+		Stream<CommerceAccountGroupRel> stream =
+			commerceAccountGroupRels.stream();
 
-		document.addText("defaultLanguageId", cpDefinitionDefaultLanguageId);
+		long[] commerceAccountGroupIds = stream.mapToLong(
+			CommerceAccountGroupRel::getCommerceAccountGroupId
+		).toArray();
+
+		document.addNumber("commerceAccountGroupIds", commerceAccountGroupIds);
+
+		List<String> optionNames = new ArrayList<>();
+		List<Long> optionIds = new ArrayList<>();
+
+		List<CPDefinitionOptionRel> cpDefinitionOptionRels =
+			cpDefinition.getCPDefinitionOptionRels();
 
 		for (CPDefinitionOptionRel cpDefinitionOptionRel :
 				cpDefinitionOptionRels) {
@@ -632,16 +490,19 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 
 			CPOption cpOption = cpDefinitionOptionRel.getCPOption();
 
+			optionNames.add(cpOption.getKey());
+			optionIds.add(cpOption.getCPOptionId());
+
 			List<CPDefinitionOptionValueRel> cpDefinitionOptionValueRels =
 				cpDefinitionOptionRel.getCPDefinitionOptionValueRels();
 
 			List<String> optionValueIds = new ArrayList<>();
 
-			Set<Locale> availableLocales = _language.getAvailableLocales(
+			Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(
 				cpDefinitionOptionRel.getGroupId());
 
 			for (Locale locale : availableLocales) {
-				String languageId = _language.getLanguageId(locale);
+				String languageId = LanguageUtil.getLanguageId(locale);
 
 				List<String> localizedOptionValues = new ArrayList<>();
 
@@ -674,6 +535,54 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 				ArrayUtil.toStringArray(optionValueIds));
 		}
 
+		document.addKeyword(
+			CPField.PRODUCT_TYPE_NAME, cpDefinition.getProductTypeName());
+		document.addKeyword(CPField.PUBLISHED, cpDefinition.isPublished());
+		document.addKeyword(
+			CPField.SUBSCRIPTION_ENABLED, cpDefinition.isSubscriptionEnabled());
+		document.addDateSortable(
+			CPField.DISPLAY_DATE, cpDefinition.getDisplayDate());
+
+		document.addNumber(CPField.DEPTH, cpDefinition.getDepth());
+		document.addNumber(CPField.HEIGHT, cpDefinition.getHeight());
+
+		CProduct cProduct = cpDefinition.getCProduct();
+
+		document.addKeyword(
+			CPField.EXTERNAL_REFERENCE_CODE,
+			cProduct.getExternalReferenceCode());
+
+		document.addKeyword(
+			CPField.ACCOUNT_GROUP_FILTER_ENABLED,
+			cpDefinition.isAccountGroupFilterEnabled());
+		document.addKeyword(
+			CPField.CHANNEL_FILTER_ENABLED,
+			cpDefinition.isChannelFilterEnabled());
+
+		document.addKeyword(
+			CPField.IS_IGNORE_SKU_COMBINATIONS,
+			cpDefinition.isIgnoreSKUCombinations());
+
+		document.addKeyword(CPField.PRODUCT_ID, cpDefinition.getCProductId());
+
+		document.addText(
+			CPField.OPTION_NAMES, ArrayUtil.toStringArray(optionNames));
+		document.addNumber(
+			CPField.OPTION_IDS, ArrayUtil.toLongArray(optionIds));
+
+		String[] skus = _cpInstanceLocalService.getSKUs(
+			cpDefinition.getCPDefinitionId());
+
+		document.addText(CPField.SKUS, skus);
+
+		List<String> specificationOptionNames = new ArrayList<>();
+		List<Long> specificationOptionIds = new ArrayList<>();
+		List<String> specificationOptionValuesNames = new ArrayList<>();
+
+		List<CPDefinitionSpecificationOptionValue>
+			cpDefinitionSpecificationOptionValues =
+				cpDefinition.getCPDefinitionSpecificationOptionValues();
+
 		for (CPDefinitionSpecificationOptionValue
 				cpDefinitionSpecificationOptionValue :
 					cpDefinitionSpecificationOptionValues) {
@@ -681,15 +590,25 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			CPSpecificationOption cpSpecificationOption =
 				cpDefinitionSpecificationOptionValue.getCPSpecificationOption();
 
+			if (!cpSpecificationOption.isFacetable()) {
+				continue;
+			}
+
+			specificationOptionNames.add(cpSpecificationOption.getKey());
+			specificationOptionIds.add(
+				cpSpecificationOption.getCPSpecificationOptionId());
+
 			String specificationOptionValue =
 				cpDefinitionSpecificationOptionValue.getValue(
 					cpDefinitionDefaultLanguageId);
 
-			Set<Locale> availableLocales = _language.getAvailableLocales(
+			specificationOptionValuesNames.add(specificationOptionValue);
+
+			Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(
 				cpDefinitionSpecificationOptionValue.getGroupId());
 
 			for (Locale locale : availableLocales) {
-				String languageId = _language.getLanguageId(locale);
+				String languageId = LanguageUtil.getLanguageId(locale);
 
 				String localizedSpecificationOptionValue =
 					cpDefinitionSpecificationOptionValue.getValue(languageId);
@@ -777,6 +696,16 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			}
 		}
 
+		document.addText(
+			CPField.SPECIFICATION_NAMES,
+			ArrayUtil.toStringArray(specificationOptionNames));
+		document.addNumber(
+			CPField.SPECIFICATION_IDS,
+			ArrayUtil.toLongArray(specificationOptionIds));
+		document.addText(
+			CPField.SPECIFICATION_VALUES_NAMES,
+			ArrayUtil.toStringArray(specificationOptionValuesNames));
+
 		List<String> types = _cpDefinitionLinkTypeRegistry.getTypes();
 
 		for (String type : types) {
@@ -784,14 +713,110 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 				continue;
 			}
 
-			String[] linkedProductIds = _getReverseCPDefinitionIds(
+			String[] linkedProductIds = getReverseCPDefinitionIds(
 				cProduct.getCProductId(), type);
 
 			document.addKeyword(type, linkedProductIds);
 		}
 
-		_expandoBridgeIndexer.addAttributes(
-			document, cpDefinition.getExpandoBridge());
+		long cpAttachmentFileEntryId = 0;
+
+		CPAttachmentFileEntry cpAttachmentFileEntry =
+			_cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
+				cpDefinition.getCPDefinitionId());
+
+		if (cpAttachmentFileEntry != null) {
+			document.addNumber(
+				CPField.DEFAULT_IMAGE_FILE_ENTRY_ID,
+				cpAttachmentFileEntry.getFileEntryId());
+
+			cpAttachmentFileEntryId =
+				cpAttachmentFileEntry.getCPAttachmentFileEntryId();
+		}
+
+		if (cpAttachmentFileEntryId == 0) {
+			document.addKeyword(
+				CPField.DEFAULT_IMAGE_FILE_URL,
+				_commerceMediaResolver.getDefaultURL(
+					cpDefinition.getGroupId()));
+		}
+		else {
+			document.addKeyword(
+				CPField.DEFAULT_IMAGE_FILE_URL,
+				_commerceMediaResolver.getURL(
+					CommerceAccountConstants.ACCOUNT_ID_GUEST,
+					cpAttachmentFileEntryId, false, false, false));
+		}
+
+		if ((cpDefinition.getStatus() != WorkflowConstants.STATUS_APPROVED) &&
+			(cpDefinition.getCPDefinitionId() !=
+				cProduct.getPublishedCPDefinitionId()) &&
+			_cpDefinitionLocalService.isVersionable(
+				cpDefinition.getCPDefinitionId())) {
+
+			document.addKeyword(Field.HIDDEN, true);
+		}
+		else {
+			document.addKeyword(Field.HIDDEN, false);
+		}
+
+		CommerceCatalog commerceCatalog = cpDefinition.getCommerceCatalog();
+
+		document.addKeyword(
+			"commerceCatalogId", commerceCatalog.getCommerceCatalogId());
+
+		List<CPInstance> cpInstances = cpDefinition.getCPInstances();
+
+		if (cpInstances.size() == 1) {
+			CPInstance cpInstance = cpInstances.get(0);
+
+			BigDecimal price = cpInstance.getPrice();
+			BigDecimal promoPrice = cpInstance.getPromoPrice();
+
+			if ((promoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+				CommerceBigDecimalUtil.lt(promoPrice, price)) {
+
+				document.addNumber(CPField.BASE_PRICE, promoPrice);
+			}
+			else {
+				document.addNumber(CPField.BASE_PRICE, price);
+			}
+		}
+		else if (!cpInstances.isEmpty()) {
+			CPInstance firstCPInstance = cpInstances.get(0);
+
+			CommercePriceEntry commercePriceEntry =
+				_commercePriceEntryLocalService.
+					getInstanceBaseCommercePriceEntry(
+						firstCPInstance.getCPInstanceUuid(),
+						CommercePriceListConstants.TYPE_PRICE_LIST);
+
+			BigDecimal lowestPrice = commercePriceEntry.getPrice();
+
+			for (CPInstance cpInstance : cpInstances) {
+				commercePriceEntry =
+					_commercePriceEntryLocalService.
+						getInstanceBaseCommercePriceEntry(
+							cpInstance.getCPInstanceUuid(),
+							CommercePriceListConstants.TYPE_PRICE_LIST);
+
+				BigDecimal price = commercePriceEntry.getPrice();
+
+				BigDecimal promoPrice = cpInstance.getPromoPrice();
+
+				if ((promoPrice.compareTo(BigDecimal.ZERO) > 0) &&
+					CommerceBigDecimalUtil.lt(promoPrice, price)) {
+
+					price = promoPrice;
+				}
+
+				if (CommerceBigDecimalUtil.lt(price, lowestPrice)) {
+					lowestPrice = price;
+				}
+			}
+
+			document.addNumber(CPField.BASE_PRICE, lowestPrice);
+		}
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + cpDefinition + " indexed successfully");
@@ -816,7 +841,8 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 	@Override
 	protected void doReindex(CPDefinition cpDefinition) throws Exception {
 		_indexWriterHelper.updateDocument(
-			cpDefinition.getCompanyId(), getDocument(cpDefinition));
+			getSearchEngineId(), cpDefinition.getCompanyId(),
+			getDocument(cpDefinition), isCommitImmediately());
 	}
 
 	@Override
@@ -828,132 +854,10 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPDefinitions(companyId);
+		reindexCPDefinitions(companyId);
 	}
 
-	private void _addCommerceCatalogIdFilters(
-		BooleanFilter contextBooleanFilter, long[] commerceCatalogIds) {
-
-		TermsFilter termsFilter = new TermsFilter("commerceCatalogId");
-
-		termsFilter.addValues(ArrayUtil.toStringArray(commerceCatalogIds));
-
-		contextBooleanFilter.add(termsFilter, BooleanClauseOccur.MUST);
-	}
-
-	private BigDecimal _getBasePrice(List<CPInstance> cpInstances) {
-		if (cpInstances.size() == 1) {
-			CPInstance cpInstance = cpInstances.get(0);
-
-			BigDecimal price = cpInstance.getPrice();
-			BigDecimal promoPrice = cpInstance.getPromoPrice();
-
-			if ((promoPrice.compareTo(BigDecimal.ZERO) > 0) &&
-				CommerceBigDecimalUtil.lt(promoPrice, price)) {
-
-				return promoPrice;
-			}
-
-			return price;
-		}
-		else if (!cpInstances.isEmpty()) {
-			BigDecimal lowestPrice = BigDecimal.ZERO;
-
-			CommercePriceEntry commercePriceEntry = null;
-
-			for (CPInstance cpInstance : cpInstances) {
-				if (!cpInstance.isApproved()) {
-					continue;
-				}
-
-				commercePriceEntry =
-					_commercePriceEntryLocalService.
-						getInstanceBaseCommercePriceEntry(
-							cpInstance.getCPInstanceUuid(),
-							CommercePriceListConstants.TYPE_PRICE_LIST);
-
-				if (commercePriceEntry == null) {
-					continue;
-				}
-
-				BigDecimal price = commercePriceEntry.getPrice();
-
-				if (lowestPrice.compareTo(BigDecimal.ZERO) == 0) {
-					lowestPrice = price;
-				}
-
-				BigDecimal promoPrice = cpInstance.getPromoPrice();
-
-				if ((promoPrice.compareTo(BigDecimal.ZERO) > 0) &&
-					CommerceBigDecimalUtil.lt(promoPrice, price)) {
-
-					price = promoPrice;
-				}
-
-				if (CommerceBigDecimalUtil.lt(price, lowestPrice)) {
-					lowestPrice = price;
-				}
-			}
-
-			return lowestPrice;
-		}
-
-		return null;
-	}
-
-	private List<CPOption> _getCPOptions(
-			List<CPDefinitionOptionRel> cpDefinitionOptionRels)
-		throws Exception {
-
-		List<CPOption> cpOptions = new ArrayList<>();
-
-		for (CPDefinitionOptionRel cpDefinitionOptionRel :
-				cpDefinitionOptionRels) {
-
-			if (!cpDefinitionOptionRel.isFacetable()) {
-				continue;
-			}
-
-			cpOptions.add(cpDefinitionOptionRel.getCPOption());
-		}
-
-		return cpOptions;
-	}
-
-	private String _getCPSpecificationOptionKey(
-		CPSpecificationOption cpSpecificationOption) {
-
-		return cpSpecificationOption.getKey();
-	}
-
-	private List<CPDefinitionSpecificationOptionValue>
-			_getFilteredCPDefinitionSpecificationOptionValues(
-				List<CPDefinitionSpecificationOptionValue>
-					cpDefinitionSpecificationOptionValues)
-		throws Exception {
-
-		List<CPDefinitionSpecificationOptionValue>
-			filteredCPDefinitionSpecificationOptionValues = new ArrayList<>();
-
-		for (CPDefinitionSpecificationOptionValue
-				cpDefinitionSpecificationOptionValue :
-					cpDefinitionSpecificationOptionValues) {
-
-			CPSpecificationOption cpSpecificationOption =
-				cpDefinitionSpecificationOptionValue.getCPSpecificationOption();
-
-			if (!cpSpecificationOption.isFacetable()) {
-				continue;
-			}
-
-			filteredCPDefinitionSpecificationOptionValues.add(
-				cpDefinitionSpecificationOptionValue);
-		}
-
-		return filteredCPDefinitionSpecificationOptionValues;
-	}
-
-	private String[] _getReverseCPDefinitionIds(long cProductId, String type) {
+	protected String[] getReverseCPDefinitionIds(long cProductId, String type) {
 		List<CPDefinitionLink> cpDefinitionLinks =
 			_cpDefinitionLinkLocalService.getReverseCPDefinitionLinks(
 				cProductId, type);
@@ -971,27 +875,7 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 		return reverseCPDefinitionIds.toArray(reverseCPDefinitionIdsArray);
 	}
 
-	private long[] _getUserCommerceCatalogIds(SearchContext searchContext) {
-		return TransformUtil.transformToLongArray(
-			_commerceCatalogService.getCommerceCatalogs(
-				searchContext.getCompanyId(), QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS),
-			CommerceCatalog::getCommerceCatalogId);
-	}
-
-	private boolean _isHidden(CPDefinition cpDefinition, CProduct cProduct) {
-		if ((cpDefinition.getCPDefinitionId() !=
-				cProduct.getPublishedCPDefinitionId()) &&
-			_cpDefinitionLocalService.isVersionable(
-				cpDefinition.getCPDefinitionId())) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private void _reindexCPDefinitions(long companyId) throws Exception {
+	protected void reindexCPDefinitions(long companyId) throws PortalException {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpDefinitionLocalService.getIndexableActionableDynamicQuery();
 
@@ -1011,18 +895,46 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
+	}
+
+	private void _addCommerceCatalogIdFilters(
+		BooleanFilter contextBooleanFilter, long[] commerceCatalogIds) {
+
+		TermsFilter termsFilter = new TermsFilter("commerceCatalogId");
+
+		termsFilter.addValues(ArrayUtil.toStringArray(commerceCatalogIds));
+
+		contextBooleanFilter.add(termsFilter, BooleanClauseOccur.MUST);
+	}
+
+	private long[] _getUserCommerceCatalogIds(SearchContext searchContext) {
+		List<CommerceCatalog> commerceCatalogs =
+			_commerceCatalogService.getCommerceCatalogs(
+				searchContext.getCompanyId(), QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		if (commerceCatalogs.isEmpty()) {
+			return new long[0];
+		}
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		return stream.mapToLong(
+			commerceCatalog -> commerceCatalog.getCommerceCatalogId()
+		).toArray();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CPDefinitionIndexer.class);
 
 	@Reference
-	private AccountGroupRelLocalService _accountGroupRelLocalService;
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
-	private ClassNameLocalService _classNameLocalService;
+	private CommerceAccountGroupRelService _commerceAccountGroupRelService;
 
 	@Reference
 	private CommerceCatalogService _commerceCatalogService;
@@ -1049,18 +961,9 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 	private CPInstanceLocalService _cpInstanceLocalService;
 
 	@Reference
-	private ExpandoBridgeIndexer _expandoBridgeIndexer;
-
-	@Reference
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private Localization _localization;
 
 }

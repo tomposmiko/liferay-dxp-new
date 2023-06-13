@@ -59,7 +59,7 @@ public class FileUtil {
 		}
 		catch (FileNotFoundException fileNotFoundException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(fileNotFoundException);
+				_log.debug(fileNotFoundException, fileNotFoundException);
 			}
 
 			return null;

@@ -28,6 +28,8 @@ import com.liferay.saml.constants.SamlProviderConfigurationKeys;
 import com.liferay.saml.runtime.configuration.SamlProviderConfiguration;
 import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
 
+import java.io.IOException;
+
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -46,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  */
 @Component(
+	immediate = true,
 	property = Constants.SERVICE_PID + "=" + SamlProviderConfigurationHelperImpl.FACTORY_PID,
 	service = {
 		ManagedServiceFactory.class, SamlProviderConfigurationHelper.class
@@ -159,19 +162,7 @@ public class SamlProviderConfigurationHelperImpl
 			samlProviderConfiguration, pid);
 
 		_configurationHolderByCompanyId.put(companyId, configurationHolder);
-
-		ConfigurationHolder oldConfigurationHolder =
-			_configurationHolderByPid.put(pid, configurationHolder);
-
-		if (oldConfigurationHolder != null) {
-			SamlProviderConfiguration oldSamlProviderConfiguration =
-				oldConfigurationHolder.getSamlProviderConfiguration();
-
-			if (oldSamlProviderConfiguration.companyId() != companyId) {
-				_configurationHolderByCompanyId.remove(
-					oldSamlProviderConfiguration.companyId());
-			}
-		}
+		_configurationHolderByPid.put(pid, configurationHolder);
 	}
 
 	@Override
@@ -192,7 +183,7 @@ public class SamlProviderConfigurationHelperImpl
 
 			configurationProperties = new HashMapDictionary<>();
 
-			Dictionary<String, ?> systemProperties = _getSystemProperties();
+			Dictionary<String, ?> systemProperties = getSystemProperties();
 
 			if (systemProperties != null) {
 				Enumeration<String> enumeration = systemProperties.keys();
@@ -224,10 +215,7 @@ public class SamlProviderConfigurationHelperImpl
 		updated(configuration.getPid(), configuration.getProperties());
 	}
 
-	protected static final String FACTORY_PID =
-		"com.liferay.saml.runtime.configuration.SamlProviderConfiguration";
-
-	private Dictionary<String, ?> _getSystemProperties() throws Exception {
+	protected Dictionary<String, ?> getSystemProperties() throws IOException {
 		ConfigurationHolder configurationHolder =
 			_configurationHolderByCompanyId.get(CompanyConstants.SYSTEM);
 
@@ -240,6 +228,9 @@ public class SamlProviderConfigurationHelperImpl
 
 		return configuration.getProperties();
 	}
+
+	protected static final String FACTORY_PID =
+		"com.liferay.saml.runtime.configuration.SamlProviderConfiguration";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SamlProviderConfigurationHelperImpl.class);

@@ -96,6 +96,12 @@ public interface ReleaseLocalService
 	public Release createRelease(long releaseId);
 
 	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public void createTablesAndPopulate();
+
+	/**
 	 * @throws PortalException
 	 */
 	@Override
@@ -210,6 +216,13 @@ public interface ReleaseLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Transactional
+	public int getBuildNumberOrCreate() throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
@@ -281,6 +294,16 @@ public interface ReleaseLocalService
 	public void updateRelease(
 			String servletContextName, List<UpgradeProcess> upgradeProcesses,
 			int buildNumber, int previousBuildNumber)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateRelease(String, List, int, int)}
+	 */
+	@Deprecated
+	public void updateRelease(
+			String servletContextName, List<UpgradeProcess> upgradeProcesses,
+			int buildNumber, int previousBuildNumber, boolean indexOnUpgrade)
 		throws PortalException;
 
 	public void updateRelease(

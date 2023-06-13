@@ -77,12 +77,10 @@ public class CPDefinitionLocalizationCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(25);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", cpDefinitionLocalizationId=");
 		sb.append(cpDefinitionLocalizationId);
 		sb.append(", companyId=");
@@ -114,7 +112,6 @@ public class CPDefinitionLocalizationCacheModel
 			new CPDefinitionLocalizationImpl();
 
 		cpDefinitionLocalizationImpl.setMvccVersion(mvccVersion);
-		cpDefinitionLocalizationImpl.setCtCollectionId(ctCollectionId);
 		cpDefinitionLocalizationImpl.setCpDefinitionLocalizationId(
 			cpDefinitionLocalizationId);
 		cpDefinitionLocalizationImpl.setCompanyId(companyId);
@@ -180,8 +177,6 @@ public class CPDefinitionLocalizationCacheModel
 
 		mvccVersion = objectInput.readLong();
 
-		ctCollectionId = objectInput.readLong();
-
 		cpDefinitionLocalizationId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
@@ -199,8 +194,6 @@ public class CPDefinitionLocalizationCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		objectOutput.writeLong(cpDefinitionLocalizationId);
 
@@ -259,7 +252,6 @@ public class CPDefinitionLocalizationCacheModel
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public long cpDefinitionLocalizationId;
 	public long companyId;
 	public long CPDefinitionId;

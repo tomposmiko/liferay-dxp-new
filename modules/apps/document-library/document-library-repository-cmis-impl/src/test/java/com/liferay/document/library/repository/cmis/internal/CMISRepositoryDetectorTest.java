@@ -23,12 +23,12 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Iván Zaera
  */
-public class CMISRepositoryDetectorTest {
+public class CMISRepositoryDetectorTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -97,15 +97,15 @@ public class CMISRepositoryDetectorTest {
 	protected RepositoryInfo getRepositoryInfo(
 		String productName, String productVersion) {
 
-		RepositoryInfo repositoryInfo = Mockito.mock(RepositoryInfo.class);
+		RepositoryInfo repositoryInfo = mock(RepositoryInfo.class);
 
-		Mockito.when(
+		when(
 			repositoryInfo.getProductName()
 		).thenReturn(
 			productName
 		);
 
-		Mockito.when(
+		when(
 			repositoryInfo.getProductVersion()
 		).thenReturn(
 			productVersion

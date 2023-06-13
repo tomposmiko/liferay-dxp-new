@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -30,12 +30,12 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Víctor Galán
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
 		"mvc.command.name=/layout_admin/edit_layout_set"
@@ -55,13 +55,13 @@ public class EditLayoutSetMVCRenderCommand implements MVCRenderCommand {
 				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 			try {
-				_groupPermission.check(
+				GroupPermissionUtil.check(
 					themeDisplay.getPermissionChecker(), groupId,
 					ActionKeys.VIEW);
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 
 				SessionErrors.add(renderRequest, portalException.getClass());
@@ -73,8 +73,5 @@ public class EditLayoutSetMVCRenderCommand implements MVCRenderCommand {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditLayoutSetMVCRenderCommand.class);
-
-	@Reference
-	private GroupPermission _groupPermission;
 
 }

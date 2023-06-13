@@ -22,10 +22,10 @@ CommercePriceEntryDisplayContext commercePriceEntryDisplayContext = (CommercePri
 CommercePriceList commercePriceList = commercePriceEntryDisplayContext.getCommercePriceList();
 long commercePriceListId = commercePriceEntryDisplayContext.getCommercePriceListId();
 
-String datasetId = CommercePricingFDSNames.PRICE_LIST_ENTRIES;
+String datasetId = CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_LIST_ENTRIES;
 
 if (CommercePriceListConstants.TYPE_PROMOTION.equals(commercePriceEntryDisplayContext.getCommercePriceListType(portletName))) {
-	datasetId = CommercePricingFDSNames.PROMOTION_ENTRIES;
+	datasetId = CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PROMOTION_ENTRIES;
 }
 %>
 
@@ -90,7 +90,7 @@ if (CommercePriceListConstants.TYPE_PROMOTION.equals(commercePriceEntryDisplayCo
 							fieldName: ['productName', 'LANG'],
 						},
 					],
-					spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 					titleLabel: '<%= LanguageUtil.get(request, "add-existing-sku") %>',
 				});
 			</aui:script>
@@ -101,12 +101,15 @@ if (CommercePriceListConstants.TYPE_PROMOTION.equals(commercePriceEntryDisplayCo
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "entries") %>'
 			>
-				<frontend-data-set:headless-display
+				<clay:headless-data-set-display
 					apiURL="<%= commercePriceEntryDisplayContext.getPriceEntryApiURL() %>"
-					fdsActionDropdownItems="<%= commercePriceEntryDisplayContext.getPriceEntriesFDSActionDropdownItems() %>"
-					formName="fm"
+					clayDataSetActionDropdownItems="<%= commercePriceEntryDisplayContext.getPriceEntriesClayDataSetActionDropdownItems() %>"
+					formId="fm"
 					id="<%= datasetId %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= currentURLObj %>"
 					selectedItemsKey="priceEntryId"
 				/>
 			</commerce-ui:panel>

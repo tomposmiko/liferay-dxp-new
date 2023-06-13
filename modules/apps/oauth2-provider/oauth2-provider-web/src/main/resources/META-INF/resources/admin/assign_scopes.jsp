@@ -56,7 +56,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 
 			<aui:form action="<%= assignScopesURL %>" name="fm">
 				<div class="sheet">
-					<ul class="hidden nav nav-tabs" id="<portlet:namespace />navScopeTypes" role="tablist">
+					<ul class="hidden nav nav-underline" id="<portlet:namespace />navScopeTypes" role="tablist">
 						<li class="nav-item">
 							<a aria-controls="<portlet:namespace />navResourceScopes" aria-expanded="true" class="active nav-link" data-toggle="liferay-tab" href="#<portlet:namespace />navResourceScopes" id="<portlet:namespace />navResourceScopesTab" role="tab">
 								<liferay-ui:message key="resource-scopes" />
@@ -215,7 +215,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 		'input[data-slave], a[data-slave]'
 	);
 
-	window.<portlet:namespace />recalculateDependants = function (checkboxElement) {
+	<portlet:namespace />recalculateDependants = function (checkboxElement) {
 		var checkbox = A.one(checkboxElement);
 
 		var value = checkbox.val();
@@ -285,7 +285,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 			});
 	};
 
-	window.<portlet:namespace />recalculateAll = function () {
+	<portlet:namespace />recalculateAll = function () {
 		A.all('input[name="<portlet:namespace />scopeAliases"]').each(function () {
 			<portlet:namespace />recalculateDependants(this);
 		});
@@ -293,7 +293,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 
 	var <portlet:namespace />stickyScopeAliases = [];
 
-	window.<portlet:namespace />changeScopeAliasStickyStatus = function (
+	<portlet:namespace />changeScopeAliasStickyStatus = function (
 		scopeAlias,
 		sticky
 	) {
@@ -313,9 +313,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 		}
 	};
 
-	window.<portlet:namespace />getArrayIndexOfStickyScopeAlias = function (
-		scopeAlias
-	) {
+	<portlet:namespace />getArrayIndexOfStickyScopeAlias = function (scopeAlias) {
 		for (var i = 0; i < <portlet:namespace />stickyScopeAliases.length; i++) {
 			if (<portlet:namespace />stickyScopeAliases[i] == scopeAlias) {
 				return i;

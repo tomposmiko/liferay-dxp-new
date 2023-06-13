@@ -76,24 +76,13 @@ public class ReinvokeRule {
 		Matcher matcher = null;
 
 		if (axisVariablePattern != null) {
-			String axisVariable = null;
-
-			if (build instanceof AxisBuild) {
-				AxisBuild axisBuild = (AxisBuild)build;
-
-				axisVariable = axisBuild.getAxisVariable();
-			}
-			else if (build instanceof DownstreamBuild) {
-				DownstreamBuild downstreamBuild = (DownstreamBuild)build;
-
-				axisVariable = downstreamBuild.getAxisVariable();
-			}
-
-			if (JenkinsResultsParserUtil.isNullOrEmpty(axisVariable)) {
+			if (!(build instanceof AxisBuild)) {
 				return false;
 			}
 
-			matcher = axisVariablePattern.matcher(axisVariable);
+			AxisBuild axisBuild = (AxisBuild)build;
+
+			matcher = axisVariablePattern.matcher(axisBuild.getAxisVariable());
 
 			if (!matcher.find()) {
 				return false;
@@ -111,22 +100,6 @@ public class ReinvokeRule {
 
 			if (!matcher.find()) {
 				return false;
-			}
-		}
-
-		if (testSuiteNamePattern != null) {
-			TopLevelBuild topLevelBuild = build.getTopLevelBuild();
-
-			if (topLevelBuild != null) {
-				String testSuiteName = topLevelBuild.getTestSuiteName();
-
-				if (!JenkinsResultsParserUtil.isNullOrEmpty(testSuiteName)) {
-					matcher = testSuiteNamePattern.matcher(testSuiteName);
-
-					if (!matcher.find()) {
-						return false;
-					}
-				}
 			}
 		}
 
@@ -192,12 +165,6 @@ public class ReinvokeRule {
 			sb.append("\n");
 		}
 
-		if (testSuiteNamePattern != null) {
-			sb.append("testSuiteName=");
-			sb.append(testSuiteNamePattern.pattern());
-			sb.append("\n");
-		}
-
 		if (topLevelBuildJobNamePattern != null) {
 			sb.append("topLevelJobName=");
 			sb.append(topLevelBuildJobNamePattern.pattern());
@@ -212,7 +179,6 @@ public class ReinvokeRule {
 	protected Pattern jobVariantPattern;
 	protected String name;
 	protected String notificationRecipients;
-	protected Pattern testSuiteNamePattern;
 	protected Pattern topLevelBuildJobNamePattern;
 
 	private ReinvokeRule(String configurations, String ruleName) {
@@ -255,10 +221,6 @@ public class ReinvokeRule {
 				jobVariantPattern = pattern;
 
 				continue;
-			}
-
-			if (name.equals("testSuiteName")) {
-				testSuiteNamePattern = pattern;
 			}
 
 			if (name.equals("topLevelJobName")) {

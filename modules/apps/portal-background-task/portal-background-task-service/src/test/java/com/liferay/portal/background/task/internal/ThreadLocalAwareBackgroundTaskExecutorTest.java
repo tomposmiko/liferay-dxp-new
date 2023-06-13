@@ -82,7 +82,7 @@ public class ThreadLocalAwareBackgroundTaskExecutorTest
 
 		Assert.assertTrue(backgroundTaskResult.isSuccessful());
 
-		Mockito.verifyNoInteractions(backgroundTaskExecutor);
+		Mockito.verifyZeroInteractions(backgroundTaskExecutor);
 	}
 
 }

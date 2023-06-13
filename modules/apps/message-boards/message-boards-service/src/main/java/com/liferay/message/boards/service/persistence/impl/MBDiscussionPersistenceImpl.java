@@ -20,7 +20,6 @@ import com.liferay.message.boards.model.MBDiscussionTable;
 import com.liferay.message.boards.model.impl.MBDiscussionImpl;
 import com.liferay.message.boards.model.impl.MBDiscussionModelImpl;
 import com.liferay.message.boards.service.persistence.MBDiscussionPersistence;
-import com.liferay.message.boards.service.persistence.MBDiscussionUtil;
 import com.liferay.message.boards.service.persistence.impl.constants.MBPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = MBDiscussionPersistence.class)
+@Component(service = {MBDiscussionPersistence.class, BasePersistence.class})
 public class MBDiscussionPersistenceImpl
 	extends BasePersistenceImpl<MBDiscussion>
 	implements MBDiscussionPersistence {
@@ -203,7 +202,7 @@ public class MBDiscussionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBDiscussion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBDiscussion mbDiscussion : list) {
@@ -592,7 +591,7 @@ public class MBDiscussionPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -728,7 +727,7 @@ public class MBDiscussionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof MBDiscussion) {
@@ -848,7 +847,7 @@ public class MBDiscussionPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1020,7 +1019,7 @@ public class MBDiscussionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBDiscussion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBDiscussion mbDiscussion : list) {
@@ -1443,7 +1442,7 @@ public class MBDiscussionPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1576,7 +1575,7 @@ public class MBDiscussionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByThreadId, finderArgs, this);
+				_finderPathFetchByThreadId, finderArgs);
 		}
 
 		if (result instanceof MBDiscussion) {
@@ -1675,7 +1674,7 @@ public class MBDiscussionPersistenceImpl
 
 			finderArgs = new Object[] {threadId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1794,8 +1793,7 @@ public class MBDiscussionPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C, finderArgs);
 		}
 
 		if (result instanceof MBDiscussion) {
@@ -1902,7 +1900,7 @@ public class MBDiscussionPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2111,7 +2109,7 @@ public class MBDiscussionPersistenceImpl
 		mbDiscussion.setNew(true);
 		mbDiscussion.setPrimaryKey(discussionId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		mbDiscussion.setUuid(uuid);
 
@@ -2232,7 +2230,7 @@ public class MBDiscussionPersistenceImpl
 			(MBDiscussionModelImpl)mbDiscussion;
 
 		if (Validator.isNull(mbDiscussion.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			mbDiscussion.setUuid(uuid);
 		}
@@ -2357,9 +2355,7 @@ public class MBDiscussionPersistenceImpl
 	 */
 	@Override
 	public MBDiscussion fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				MBDiscussion.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(MBDiscussion.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2575,7 +2571,7 @@ public class MBDiscussionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBDiscussion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2651,7 +2647,7 @@ public class MBDiscussionPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2857,31 +2853,11 @@ public class MBDiscussionPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
-
-		_setMBDiscussionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMBDiscussionUtilPersistence(null);
-
 		entityCache.removeCache(MBDiscussionImpl.class.getName());
-	}
-
-	private void _setMBDiscussionUtilPersistence(
-		MBDiscussionPersistence mbDiscussionPersistence) {
-
-		try {
-			Field field = MBDiscussionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mbDiscussionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2951,6 +2927,7 @@ public class MBDiscussionPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private MBDiscussionModelArgumentsResolver
+		_mbDiscussionModelArgumentsResolver;
 
 }

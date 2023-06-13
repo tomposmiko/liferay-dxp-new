@@ -63,7 +63,7 @@ String[] metadataFields = (String[])request.getAttribute("liferay-asset:asset-me
 			<c:if test="<%= Validator.isNotNull(metadataPanelContent) %>">
 				<liferay-ui:panel
 					collapsible="<%= true %>"
-					cssClass="asset-metadata-panel mb-0"
+					cssClass="asset-metadata-panel"
 					defaultState="closed"
 					extended="<%= false %>"
 					id='<%= "metadataPanel" + assetEntry.getEntryId() %>'

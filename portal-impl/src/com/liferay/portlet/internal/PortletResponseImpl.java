@@ -615,7 +615,7 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 				Writer writer = new UnsyncStringWriter();
 
 				TransformerFactory transformerFactory =
-					SecureXMLFactoryProviderUtil.newTransformerFactory();
+					TransformerFactory.newInstance();
 
 				Transformer transformer = transformerFactory.newTransformer();
 
@@ -629,15 +629,10 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(exception);
+					_log.warn(exception, exception);
 				}
 			}
 		}
-	}
-
-	protected void clearHeaders() {
-		_headers.clear();
-		_markupHeadElements.clear();
 	}
 
 	protected Layout getLayout(

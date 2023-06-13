@@ -13,6 +13,23 @@
  */
 
 import type {A11yCheckerOptions} from './A11yChecker';
-export default function main(
+declare global {
+	var Liferay: {
+		Language: {
+			get(value: string): string;
+		};
+		Util: {
+			sub(...value: string[]): string;
+		};
+	};
+	interface ThemeDisplay {
+		isStatePopUp(): boolean;
+	}
+	interface Window {
+		themeDisplay: ThemeDisplay;
+	}
+}
+declare const _default: (
 	props: Omit<A11yCheckerOptions, 'callback' | 'targets'>
-): void;
+) => void;
+export default _default;

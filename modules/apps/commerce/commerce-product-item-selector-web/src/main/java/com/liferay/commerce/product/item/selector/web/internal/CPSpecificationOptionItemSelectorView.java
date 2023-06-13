@@ -20,7 +20,7 @@ import com.liferay.commerce.product.service.CPSpecificationOptionService;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Andrea Di Giorgi
  */
-@Component(service = ItemSelectorView.class)
+@Component(enabled = false, immediate = true, service = ItemSelectorView.class)
 public class CPSpecificationOptionItemSelectorView
 	implements ItemSelectorView<CPSpecificationOptionItemSelectorCriterion> {
 
@@ -67,7 +67,7 @@ public class CPSpecificationOptionItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "specifications");
+		return LanguageUtil.get(locale, "specifications");
 	}
 
 	@Override
@@ -106,9 +106,6 @@ public class CPSpecificationOptionItemSelectorView
 
 	@Reference
 	private CPSpecificationOptionService _cpSpecificationOptionService;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.product.item.selector.web)"

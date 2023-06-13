@@ -29,54 +29,58 @@
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 	<liferay-frontend:edit-form-body>
-		<liferay-frontend:fieldset>
-			<div class="display-template">
-
-				<%
-				List<String> displayStyles = new ArrayList<String>();
-
-				displayStyles.add("number");
-				displayStyles.add("cloud");
-				%>
-
-				<liferay-template:template-selector
-					className="<%= AssetTag.class.getName() %>"
-					displayStyle="<%= displayStyle %>"
-					displayStyleGroupId="<%= displayStyleGroupId %>"
-					displayStyles="<%= displayStyles %>"
-					refreshURL="<%= configurationRenderURL %>"
-				/>
-			</div>
-
-			<aui:input label="max-num-of-tags" name="preferences--maxAssetTags--" type="text" value="<%= maxAssetTags %>" />
-
-			<aui:input inlineLabel="right" label="show-unused-tags" labelCssClass="simple-toggle-switch" name="preferences--showZeroAssetCount--" type="toggle-switch" value="<%= showZeroAssetCount %>" />
-
-			<aui:input inlineLabel="right" labelCssClass="simple-toggle-switch" name="preferences--showAssetCount--" type="toggle-switch" value="<%= showAssetCount %>" />
-
-			<div class="<%= showAssetCount ? "" : "hide" %>" id="<portlet:namespace />assetCountOptions">
-				<aui:select helpMessage="asset-type-asset-count-help" label="asset-type" name="preferences--classNameId--">
-					<aui:option label="any" value="<%= classNameId == 0 %>" />
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset>
+				<div class="display-template">
 
 					<%
-					List<AssetRendererFactory<?>> assetRendererFactories = ListUtil.sort(AssetRendererFactoryRegistryUtil.getAssetRendererFactories(company.getCompanyId(), true), new AssetRendererFactoryTypeNameComparator(locale));
+					List<String> displayStyles = new ArrayList<String>();
 
-					for (AssetRendererFactory<?> assetRendererFactory : assetRendererFactories) {
+					displayStyles.add("number");
+					displayStyles.add("cloud");
 					%>
 
-						<aui:option label="<%= ResourceActionsUtil.getModelResource(locale, assetRendererFactory.getClassName()) %>" selected="<%= classNameId == assetRendererFactory.getClassNameId() %>" value="<%= assetRendererFactory.getClassNameId() %>" />
+					<liferay-template:template-selector
+						className="<%= AssetTag.class.getName() %>"
+						displayStyle="<%= displayStyle %>"
+						displayStyleGroupId="<%= displayStyleGroupId %>"
+						displayStyles="<%= displayStyles %>"
+						refreshURL="<%= configurationRenderURL %>"
+					/>
+				</div>
 
-					<%
-					}
-					%>
+				<aui:input label="max-num-of-tags" name="preferences--maxAssetTags--" type="text" value="<%= maxAssetTags %>" />
 
-				</aui:select>
-			</div>
-		</liferay-frontend:fieldset>
+				<aui:input inlineLabel="right" label="show-unused-tags" labelCssClass="simple-toggle-switch" name="preferences--showZeroAssetCount--" type="toggle-switch" value="<%= showZeroAssetCount %>" />
+
+				<aui:input inlineLabel="right" labelCssClass="simple-toggle-switch" name="preferences--showAssetCount--" type="toggle-switch" value="<%= showAssetCount %>" />
+
+				<div class="<%= showAssetCount ? "" : "hide" %>" id="<portlet:namespace />assetCountOptions">
+					<aui:select helpMessage="asset-type-asset-count-help" label="asset-type" name="preferences--classNameId--">
+						<aui:option label="any" value="<%= classNameId == 0 %>" />
+
+						<%
+						List<AssetRendererFactory<?>> assetRendererFactories = ListUtil.sort(AssetRendererFactoryRegistryUtil.getAssetRendererFactories(company.getCompanyId(), true), new AssetRendererFactoryTypeNameComparator(locale));
+
+						for (AssetRendererFactory<?> assetRendererFactory : assetRendererFactories) {
+						%>
+
+							<aui:option label="<%= ResourceActionsUtil.getModelResource(locale, assetRendererFactory.getClassName()) %>" selected="<%= classNameId == assetRendererFactory.getClassNameId() %>" value="<%= assetRendererFactory.getClassNameId() %>" />
+
+						<%
+						}
+						%>
+
+					</aui:select>
+				</div>
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 

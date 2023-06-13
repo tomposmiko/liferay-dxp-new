@@ -12,21 +12,17 @@
  * details.
  */
 
-import {
-	openSelectionModal,
-	openSimpleInputModal,
-	setFormValues,
-} from 'frontend-js-web';
-
-import openDeleteFragmentModal from './openDeleteFragmentModal';
+import {openSelectionModal, openSimpleInputModal} from 'frontend-js-web';
 
 const ACTIONS = {
 	deleteFragmentComposition({deleteFragmentCompositionURL}) {
-		openDeleteFragmentModal({
-			onDelete: () => {
-				submitForm(document.hrefFm, deleteFragmentCompositionURL);
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, deleteFragmentCompositionURL);
+		}
 	},
 
 	deleteFragmentCompositionPreview({deleteFragmentCompositionPreviewURL}) {
@@ -49,7 +45,7 @@ const ACTIONS = {
 					);
 
 					if (form) {
-						setFormValues(form, {
+						Liferay.Util.setFormValues(form, {
 							fragmentCollectionId: selectedItem.id,
 							fragmentCompositionId,
 						});
@@ -59,7 +55,7 @@ const ACTIONS = {
 				}
 			},
 			selectEventName: `${portletNamespace}selectFragmentCollection`,
-			title: Liferay.Language.get('select-fragment-set'),
+			title: Liferay.Language.get('select-collection'),
 			url: selectFragmentCollectionURL,
 		});
 	},
@@ -99,7 +95,7 @@ const ACTIONS = {
 					);
 
 					if (form) {
-						setFormValues(form, {
+						Liferay.Util.setFormValues(form, {
 							fileEntryId: itemValue.fileEntryId,
 							fragmentCompositionId,
 						});
@@ -144,6 +140,6 @@ export default function propsTransformer({
 
 	return {
 		...props,
-		actions: (actions || []).map(transformAction),
+		actions: actions.map(transformAction),
 	};
 }

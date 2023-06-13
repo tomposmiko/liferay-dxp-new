@@ -21,13 +21,13 @@ import com.liferay.commerce.internal.search.CommerceOrderItemIndexer;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.product.model.CPInstance;
-import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.test.util.CPTestUtil;
 import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
@@ -36,11 +36,13 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.SortFactoryUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -58,6 +60,7 @@ import org.frutilla.FrutillaRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,11 +82,17 @@ public class CommerceOrderItemIndexerTest {
 			PermissionCheckerMethodTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
 			_group.getCompanyId());
@@ -108,11 +117,11 @@ public class CommerceOrderItemIndexerTest {
 
 	@Test
 	public void testSkuPrefix() throws Exception {
-		CommerceChannel commerceChannel = CommerceTestUtil.addCommerceChannel(
+		CommerceTestUtil.addCommerceChannel(
 			_group.getGroupId(), _commerceCurrency.getCode());
 
 		CommerceOrder commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
-			_user.getUserId(), commerceChannel.getGroupId(),
+			_user.getUserId(), _group.getGroupId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		CPInstance cpInstance = CPTestUtil.addCPInstance(
@@ -147,6 +156,16 @@ public class CommerceOrderItemIndexerTest {
 	@Rule
 	public FrutillaRule frutillaRule = new FrutillaRule();
 
+	protected Hits search(String keywords, long commerceOrderId)
+		throws SearchException {
+
+		SearchContext searchContext = _getSearchContext(commerceOrderId);
+
+		searchContext.setKeywords(keywords);
+
+		return _indexer.search(searchContext);
+	}
+
 	private CommerceOrderItem[] _addCommerceOrderItems(int count)
 		throws Exception {
 
@@ -154,11 +173,11 @@ public class CommerceOrderItemIndexerTest {
 
 		CommerceOrderItem[] commerceOrderItems = new CommerceOrderItem[count];
 
-		CommerceChannel commerceChannel = CommerceTestUtil.addCommerceChannel(
+		CommerceTestUtil.addCommerceChannel(
 			_group.getGroupId(), _commerceCurrency.getCode());
 
 		CommerceOrder commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
-			user.getUserId(), commerceChannel.getGroupId(),
+			user.getUserId(), _group.getGroupId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		for (int i = 0; i < count; i++) {
@@ -218,7 +237,7 @@ public class CommerceOrderItemIndexerTest {
 			CommerceOrderItem... expectedCommerceOrderItems)
 		throws Exception {
 
-		Hits hits = _search(keywords, commerceOrderId);
+		Hits hits = search(keywords, commerceOrderId);
 
 		_assertSearch(hits, expectedCommerceOrderItems);
 	}
@@ -276,18 +295,10 @@ public class CommerceOrderItemIndexerTest {
 		return searchContext;
 	}
 
-	private Hits _search(String keywords, long commerceOrderId)
-		throws Exception {
-
-		SearchContext searchContext = _getSearchContext(commerceOrderId);
-
-		searchContext.setKeywords(keywords);
-
-		return _indexer.search(searchContext);
-	}
-
 	@Inject
 	private static CommerceOrderItemLocalService _commerceOrderItemLocalService;
+
+	private static Company _company;
 
 	@Inject
 	private static IndexerRegistry _indexerRegistry;

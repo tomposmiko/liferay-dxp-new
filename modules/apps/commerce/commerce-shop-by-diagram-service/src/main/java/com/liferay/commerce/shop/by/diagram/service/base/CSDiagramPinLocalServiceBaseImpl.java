@@ -17,8 +17,9 @@ package com.liferay.commerce.shop.by.diagram.service.base;
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramPin;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramPinLocalService;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramPinLocalServiceUtil;
+import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramEntryPersistence;
 import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramPinPersistence;
-import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.commerce.shop.by.diagram.service.persistence.CSDiagramSettingPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -33,17 +34,13 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -323,11 +320,6 @@ public abstract class CSDiagramPinLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement CSDiagramPinLocalServiceImpl#deleteCSDiagramPin(CSDiagramPin) to avoid orphaned data");
-		}
-
 		return csDiagramPinLocalService.deleteCSDiagramPin(
 			(CSDiagramPin)persistedModel);
 	}
@@ -398,7 +390,7 @@ public abstract class CSDiagramPinLocalServiceBaseImpl
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			CSDiagramPinLocalService.class, IdentifiableOSGiService.class,
-			CTService.class, PersistedModelLocalService.class
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -419,23 +411,8 @@ public abstract class CSDiagramPinLocalServiceBaseImpl
 		return CSDiagramPinLocalService.class.getName();
 	}
 
-	@Override
-	public CTPersistence<CSDiagramPin> getCTPersistence() {
-		return csDiagramPinPersistence;
-	}
-
-	@Override
-	public Class<CSDiagramPin> getModelClass() {
+	protected Class<?> getModelClass() {
 		return CSDiagramPin.class;
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CSDiagramPin>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return updateUnsafeFunction.apply(csDiagramPinPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -482,16 +459,31 @@ public abstract class CSDiagramPinLocalServiceBaseImpl
 		}
 	}
 
+	@Reference
+	protected CSDiagramEntryPersistence csDiagramEntryPersistence;
+
 	protected CSDiagramPinLocalService csDiagramPinLocalService;
 
 	@Reference
 	protected CSDiagramPinPersistence csDiagramPinPersistence;
 
 	@Reference
+	protected CSDiagramSettingPersistence csDiagramSettingPersistence;
+
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CSDiagramPinLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.layout.page.template.model.LayoutPageTemplateEntry",
 	service = StagedModelRepository.class
 )
@@ -69,9 +70,9 @@ public class LayoutPageTemplateEntryStagedModelRepository
 			layoutPageTemplateEntry.getClassTypeId(),
 			layoutPageTemplateEntry.getName(),
 			layoutPageTemplateEntry.getType(),
-			layoutPageTemplateEntry.getPreviewFileEntryId(),
 			layoutPageTemplateEntry.isDefaultTemplate(),
-			layoutPageTemplateEntry.getLayoutPrototypeId(), plid, 0,
+			layoutPageTemplateEntry.getLayoutPrototypeId(),
+			layoutPageTemplateEntry.getPreviewFileEntryId(), plid,
 			layoutPageTemplateEntry.getStatus(), serviceContext);
 	}
 

@@ -53,81 +53,234 @@ public class ParameterSerDes {
 
 		sb.append("{");
 
-		if (parameter.getDefaultValue() != null) {
+		if (parameter.getDateFormat() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"defaultValue\": ");
-
-			if (parameter.getDefaultValue() instanceof String) {
-				sb.append("\"");
-				sb.append((String)parameter.getDefaultValue());
-				sb.append("\"");
-			}
-			else {
-				sb.append(parameter.getDefaultValue());
-			}
-		}
-
-		if (parameter.getFormat() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"format\": ");
+			sb.append("\"dateFormat\": ");
 
 			sb.append("\"");
 
-			sb.append(_escape(parameter.getFormat()));
+			sb.append(_escape(parameter.getDateFormat()));
 
 			sb.append("\"");
 		}
 
-		if (parameter.getMax() != null) {
+		if (parameter.getDefaultValueDouble() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"max\": ");
+			sb.append("\"defaultValueDouble\": ");
 
-			if (parameter.getMax() instanceof String) {
-				sb.append("\"");
-				sb.append((String)parameter.getMax());
-				sb.append("\"");
-			}
-			else {
-				sb.append(parameter.getMax());
-			}
+			sb.append(parameter.getDefaultValueDouble());
 		}
 
-		if (parameter.getMin() != null) {
+		if (parameter.getDefaultValueFloat() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"min\": ");
+			sb.append("\"defaultValueFloat\": ");
 
-			if (parameter.getMin() instanceof String) {
-				sb.append("\"");
-				sb.append((String)parameter.getMin());
-				sb.append("\"");
-			}
-			else {
-				sb.append(parameter.getMin());
-			}
+			sb.append(parameter.getDefaultValueFloat());
 		}
 
-		if (parameter.getType() != null) {
+		if (parameter.getDefaultValueInteger() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"type\": ");
+			sb.append("\"defaultValueInteger\": ");
+
+			sb.append(parameter.getDefaultValueInteger());
+		}
+
+		if (parameter.getDefaultValueLong() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"defaultValueLong\": ");
+
+			sb.append(parameter.getDefaultValueLong());
+		}
+
+		if (parameter.getDefaultValueString() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"defaultValueString\": ");
 
 			sb.append("\"");
 
-			sb.append(parameter.getType());
+			sb.append(_escape(parameter.getDefaultValueString()));
+
+			sb.append("\"");
+		}
+
+		if (parameter.getDefaultValuesIntegerArray() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"defaultValuesIntegerArray\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < parameter.getDefaultValuesIntegerArray().length;
+				 i++) {
+
+				sb.append(parameter.getDefaultValuesIntegerArray()[i]);
+
+				if ((i + 1) < parameter.getDefaultValuesIntegerArray().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (parameter.getDefaultValuesLongArray() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"defaultValuesLongArray\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < parameter.getDefaultValuesLongArray().length;
+				 i++) {
+
+				sb.append(parameter.getDefaultValuesLongArray()[i]);
+
+				if ((i + 1) < parameter.getDefaultValuesLongArray().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (parameter.getDefaultValuesStringArray() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"defaultValuesStringArray\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < parameter.getDefaultValuesStringArray().length;
+				 i++) {
+
+				sb.append("\"");
+
+				sb.append(_escape(parameter.getDefaultValuesStringArray()[i]));
+
+				sb.append("\"");
+
+				if ((i + 1) < parameter.getDefaultValuesStringArray().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (parameter.getMaxValueDouble() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"maxValueDouble\": ");
+
+			sb.append(parameter.getMaxValueDouble());
+		}
+
+		if (parameter.getMaxValueFloat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"maxValueFloat\": ");
+
+			sb.append(parameter.getMaxValueFloat());
+		}
+
+		if (parameter.getMaxValueInteger() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"maxValueInteger\": ");
+
+			sb.append(parameter.getMaxValueInteger());
+		}
+
+		if (parameter.getMaxValueLong() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"maxValueLong\": ");
+
+			sb.append(parameter.getMaxValueLong());
+		}
+
+		if (parameter.getMinValueDouble() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"minValueDouble\": ");
+
+			sb.append(parameter.getMinValueDouble());
+		}
+
+		if (parameter.getMinValueFloat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"minValueFloat\": ");
+
+			sb.append(parameter.getMinValueFloat());
+		}
+
+		if (parameter.getMinValueInteger() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"minValueInteger\": ");
+
+			sb.append(parameter.getMinValueInteger());
+		}
+
+		if (parameter.getMinValueLong() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"minValueLong\": ");
+
+			sb.append(parameter.getMinValueLong());
+		}
+
+		if (parameter.getParameterType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parameterType\": ");
+
+			sb.append("\"");
+
+			sb.append(parameter.getParameterType());
 
 			sb.append("\"");
 		}
@@ -150,40 +303,159 @@ public class ParameterSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (parameter.getDefaultValue() == null) {
-			map.put("defaultValue", null);
+		if (parameter.getDateFormat() == null) {
+			map.put("dateFormat", null);
+		}
+		else {
+			map.put("dateFormat", String.valueOf(parameter.getDateFormat()));
+		}
+
+		if (parameter.getDefaultValueDouble() == null) {
+			map.put("defaultValueDouble", null);
 		}
 		else {
 			map.put(
-				"defaultValue", String.valueOf(parameter.getDefaultValue()));
+				"defaultValueDouble",
+				String.valueOf(parameter.getDefaultValueDouble()));
 		}
 
-		if (parameter.getFormat() == null) {
-			map.put("format", null);
+		if (parameter.getDefaultValueFloat() == null) {
+			map.put("defaultValueFloat", null);
 		}
 		else {
-			map.put("format", String.valueOf(parameter.getFormat()));
+			map.put(
+				"defaultValueFloat",
+				String.valueOf(parameter.getDefaultValueFloat()));
 		}
 
-		if (parameter.getMax() == null) {
-			map.put("max", null);
+		if (parameter.getDefaultValueInteger() == null) {
+			map.put("defaultValueInteger", null);
 		}
 		else {
-			map.put("max", String.valueOf(parameter.getMax()));
+			map.put(
+				"defaultValueInteger",
+				String.valueOf(parameter.getDefaultValueInteger()));
 		}
 
-		if (parameter.getMin() == null) {
-			map.put("min", null);
+		if (parameter.getDefaultValueLong() == null) {
+			map.put("defaultValueLong", null);
 		}
 		else {
-			map.put("min", String.valueOf(parameter.getMin()));
+			map.put(
+				"defaultValueLong",
+				String.valueOf(parameter.getDefaultValueLong()));
 		}
 
-		if (parameter.getType() == null) {
-			map.put("type", null);
+		if (parameter.getDefaultValueString() == null) {
+			map.put("defaultValueString", null);
 		}
 		else {
-			map.put("type", String.valueOf(parameter.getType()));
+			map.put(
+				"defaultValueString",
+				String.valueOf(parameter.getDefaultValueString()));
+		}
+
+		if (parameter.getDefaultValuesIntegerArray() == null) {
+			map.put("defaultValuesIntegerArray", null);
+		}
+		else {
+			map.put(
+				"defaultValuesIntegerArray",
+				String.valueOf(parameter.getDefaultValuesIntegerArray()));
+		}
+
+		if (parameter.getDefaultValuesLongArray() == null) {
+			map.put("defaultValuesLongArray", null);
+		}
+		else {
+			map.put(
+				"defaultValuesLongArray",
+				String.valueOf(parameter.getDefaultValuesLongArray()));
+		}
+
+		if (parameter.getDefaultValuesStringArray() == null) {
+			map.put("defaultValuesStringArray", null);
+		}
+		else {
+			map.put(
+				"defaultValuesStringArray",
+				String.valueOf(parameter.getDefaultValuesStringArray()));
+		}
+
+		if (parameter.getMaxValueDouble() == null) {
+			map.put("maxValueDouble", null);
+		}
+		else {
+			map.put(
+				"maxValueDouble",
+				String.valueOf(parameter.getMaxValueDouble()));
+		}
+
+		if (parameter.getMaxValueFloat() == null) {
+			map.put("maxValueFloat", null);
+		}
+		else {
+			map.put(
+				"maxValueFloat", String.valueOf(parameter.getMaxValueFloat()));
+		}
+
+		if (parameter.getMaxValueInteger() == null) {
+			map.put("maxValueInteger", null);
+		}
+		else {
+			map.put(
+				"maxValueInteger",
+				String.valueOf(parameter.getMaxValueInteger()));
+		}
+
+		if (parameter.getMaxValueLong() == null) {
+			map.put("maxValueLong", null);
+		}
+		else {
+			map.put(
+				"maxValueLong", String.valueOf(parameter.getMaxValueLong()));
+		}
+
+		if (parameter.getMinValueDouble() == null) {
+			map.put("minValueDouble", null);
+		}
+		else {
+			map.put(
+				"minValueDouble",
+				String.valueOf(parameter.getMinValueDouble()));
+		}
+
+		if (parameter.getMinValueFloat() == null) {
+			map.put("minValueFloat", null);
+		}
+		else {
+			map.put(
+				"minValueFloat", String.valueOf(parameter.getMinValueFloat()));
+		}
+
+		if (parameter.getMinValueInteger() == null) {
+			map.put("minValueInteger", null);
+		}
+		else {
+			map.put(
+				"minValueInteger",
+				String.valueOf(parameter.getMinValueInteger()));
+		}
+
+		if (parameter.getMinValueLong() == null) {
+			map.put("minValueLong", null);
+		}
+		else {
+			map.put(
+				"minValueLong", String.valueOf(parameter.getMinValueLong()));
+		}
+
+		if (parameter.getParameterType() == null) {
+			map.put("parameterType", null);
+		}
+		else {
+			map.put(
+				"parameterType", String.valueOf(parameter.getParameterType()));
 		}
 
 		return map;
@@ -206,30 +478,124 @@ public class ParameterSerDes {
 			Parameter parameter, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "defaultValue")) {
+			if (Objects.equals(jsonParserFieldName, "dateFormat")) {
 				if (jsonParserFieldValue != null) {
-					parameter.setDefaultValue((Object)jsonParserFieldValue);
+					parameter.setDateFormat((String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "format")) {
+			else if (Objects.equals(
+						jsonParserFieldName, "defaultValueDouble")) {
+
 				if (jsonParserFieldValue != null) {
-					parameter.setFormat((String)jsonParserFieldValue);
+					parameter.setDefaultValueDouble(
+						Double.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "max")) {
+			else if (Objects.equals(jsonParserFieldName, "defaultValueFloat")) {
 				if (jsonParserFieldValue != null) {
-					parameter.setMax((Object)jsonParserFieldValue);
+					parameter.setDefaultValueFloat(
+						Float.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "min")) {
+			else if (Objects.equals(
+						jsonParserFieldName, "defaultValueInteger")) {
+
 				if (jsonParserFieldValue != null) {
-					parameter.setMin((Object)jsonParserFieldValue);
+					parameter.setDefaultValueInteger(
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "type")) {
+			else if (Objects.equals(jsonParserFieldName, "defaultValueLong")) {
 				if (jsonParserFieldValue != null) {
-					parameter.setType(
-						Parameter.Type.create((String)jsonParserFieldValue));
+					parameter.setDefaultValueLong(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "defaultValueString")) {
+
+				if (jsonParserFieldValue != null) {
+					parameter.setDefaultValueString(
+						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "defaultValuesIntegerArray")) {
+
+				if (jsonParserFieldValue != null) {
+					parameter.setDefaultValuesIntegerArray(
+						toIntegers((Object[])jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "defaultValuesLongArray")) {
+
+				if (jsonParserFieldValue != null) {
+					parameter.setDefaultValuesLongArray(
+						toLongs((Object[])jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "defaultValuesStringArray")) {
+
+				if (jsonParserFieldValue != null) {
+					parameter.setDefaultValuesStringArray(
+						toStrings((Object[])jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "maxValueDouble")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMaxValueDouble(
+						Double.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "maxValueFloat")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMaxValueFloat(
+						Float.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "maxValueInteger")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMaxValueInteger(
+						Integer.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "maxValueLong")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMaxValueLong(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "minValueDouble")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMinValueDouble(
+						Double.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "minValueFloat")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMinValueFloat(
+						Float.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "minValueInteger")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMinValueInteger(
+						Integer.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "minValueLong")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setMinValueLong(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "parameterType")) {
+				if (jsonParserFieldValue != null) {
+					parameter.setParameterType(
+						Parameter.ParameterType.create(
+							(String)jsonParserFieldValue));
 				}
 			}
 		}

@@ -14,15 +14,14 @@
 
 package com.liferay.commerce.dashboard.web.internal.display.context;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.permission.CommerceAccountPermission;
 import com.liferay.commerce.dashboard.web.internal.configuration.CommerceDashboardForecastPortletInstanceConfiguration;
-import com.liferay.commerce.dashboard.web.internal.display.context.helper.CommerceDashboardForecastRequestHelper;
+import com.liferay.commerce.dashboard.web.internal.display.context.util.CommerceDashboardForecastRequestHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,13 +32,11 @@ import javax.servlet.http.HttpServletRequest;
 public class CommerceDashboardForecastDisplayContext {
 
 	public CommerceDashboardForecastDisplayContext(
-			ModelResourcePermission<AccountEntry>
-				accountEntryModelResourcePermission,
+			CommerceAccountPermission commerceAccountPermission,
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		_accountEntryModelResourcePermission =
-			accountEntryModelResourcePermission;
+		_commerceAccountPermission = commerceAccountPermission;
 
 		_commerceDashboardForecastRequestHelper =
 			new CommerceDashboardForecastRequestHelper(httpServletRequest);
@@ -62,14 +59,14 @@ public class CommerceDashboardForecastDisplayContext {
 			_commerceDashboardForecastRequestHelper.getPermissionChecker();
 
 		try {
-			return _accountEntryModelResourcePermission.contains(
+			return _commerceAccountPermission.contains(
 				permissionChecker,
-				_commerceDashboardForecastRequestHelper.getAccountEntryId(),
+				_commerceDashboardForecastRequestHelper.getCommerceAccountId(),
 				ActionKeys.VIEW);
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -79,8 +76,7 @@ public class CommerceDashboardForecastDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceDashboardForecastDisplayContext.class);
 
-	private final ModelResourcePermission<AccountEntry>
-		_accountEntryModelResourcePermission;
+	private final CommerceAccountPermission _commerceAccountPermission;
 	private final CommerceDashboardForecastPortletInstanceConfiguration
 		_commerceDashboardForecastPortletInstanceConfiguration;
 	private final CommerceDashboardForecastRequestHelper

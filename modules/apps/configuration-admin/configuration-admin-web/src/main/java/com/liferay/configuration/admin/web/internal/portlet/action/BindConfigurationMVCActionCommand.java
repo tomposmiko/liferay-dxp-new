@@ -71,6 +71,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
@@ -115,7 +116,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 			configurationModel = configurationModels.get(pid);
 		}
 
-		configurationModel = new ConfigurationModel(
+		configurationModel = _getConfigurationModel(
 			_configurationModelRetriever.getConfiguration(
 				pid, configurationScopeDisplayContext.getScope(),
 				configurationScopeDisplayContext.getScopePK()),
@@ -126,7 +127,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 				_log.debug("Writing a new factory instance for service " + pid);
 			}
 
-			configurationModel = new ConfigurationModel(
+			configurationModel = _getConfigurationModel(
 				null, configurationModel);
 		}
 
@@ -143,17 +144,17 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 						configurationScopeDisplayContext.getScopePK()));
 			}
 
-			configurationModel = new ConfigurationModel(
+			configurationModel = _getConfigurationModel(
 				null, configurationModel);
 		}
 
 		Dictionary<String, Object> properties = null;
 
-		Map<String, Object> requestParameters = _getRequestParameters(
-			actionRequest, configurationModel.getBaseID());
+		Map<String, Object> requestParameters = getRequestParameters(
+			actionRequest, pid);
 
 		if (requestParameters != null) {
-			properties = _toDictionary(requestParameters);
+			properties = toDictionary(requestParameters);
 		}
 		else {
 			ResourceBundleLoader resourceBundleLoader =
@@ -164,7 +165,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 				resourceBundleLoader.loadResourceBundle(
 					themeDisplay.getLocale());
 
-			properties = _getDDMRequestParameters(
+			properties = getDDMRequestParameters(
 				actionRequest, configurationModel, resourceBundle);
 		}
 
@@ -175,7 +176,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		}
 
 		try {
-			_configureTargetService(
+			configureTargetService(
 				configurationModel, properties,
 				configurationScopeDisplayContext.getScope(),
 				configurationScopeDisplayContext.getScopePK());
@@ -204,7 +205,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		return true;
 	}
 
-	private void _configureTargetService(
+	protected void configureTargetService(
 			ConfigurationModel configurationModel,
 			Dictionary<String, Object> properties,
 			ExtendedObjectClassDefinition.Scope scope, Serializable scopePK)
@@ -298,13 +299,13 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		}
 	}
 
-	private DDMFormValues _getDDMFormValues(
+	protected DDMFormValues getDDMFormValues(
 		ActionRequest actionRequest, DDMForm ddmForm) {
 
 		return _ddmFormValuesFactory.create(actionRequest, ddmForm);
 	}
 
-	private Dictionary<String, Object> _getDDMRequestParameters(
+	protected Dictionary<String, Object> getDDMRequestParameters(
 		ActionRequest actionRequest, ConfigurationModel configurationModel,
 		ResourceBundle resourceBundle) {
 
@@ -317,7 +318,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 					configurationModel, themeDisplay.getLocale(),
 					resourceBundle);
 
-		DDMFormValues ddmFormValues = _getDDMFormValues(
+		DDMFormValues ddmFormValues = getDDMFormValues(
 			actionRequest, configurationModelToDDMFormConverter.getDDMForm());
 
 		LocationVariableResolver locationVariableResolver =
@@ -334,7 +335,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		return ddmFormValuesToPropertiesConverter.getProperties();
 	}
 
-	private Map<String, Object> _getRequestParameters(
+	protected Map<String, Object> getRequestParameters(
 		ActionRequest actionRequest, String pid) {
 
 		ConfigurationFormRenderer configurationFormRenderer =
@@ -345,7 +346,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 			_portal.getHttpServletRequest(actionRequest));
 	}
 
-	private Dictionary<String, Object> _toDictionary(
+	protected Dictionary<String, Object> toDictionary(
 		Map<String, Object> requestParameters) {
 
 		Dictionary<String, Object> properties = new Hashtable<>();
@@ -355,6 +356,17 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		}
 
 		return properties;
+	}
+
+	private ConfigurationModel _getConfigurationModel(
+		Configuration configuration, ConfigurationModel configurationModel) {
+
+		return new ConfigurationModel(
+			configurationModel.getBundleLocation(),
+			configurationModel.getBundleSymbolicName(),
+			configurationModel.getClassLoader(), configuration,
+			configurationModel.getExtendedObjectClassDefinition(),
+			configurationModel.isFactory());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

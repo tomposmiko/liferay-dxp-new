@@ -45,10 +45,10 @@ CommerceShipmentDisplayContext commerceShipmentDisplayContext = (CommerceShipmen
 		<aui:select id="commerceAccountId" label="account" name="commerceAccountId" required="<%= true %>" showEmptyOption="<%= true %>">
 
 			<%
-			for (AccountEntry accountEntry : commerceShipmentDisplayContext.getCommerceAccountsWithShippableOrders()) {
+			for (CommerceAccount commerceAccount : commerceShipmentDisplayContext.getCommerceAccountsWithShippableOrders()) {
 			%>
 
-				<aui:option label="<%= accountEntry.getName() %>" value="<%= accountEntry.getAccountEntryId() %>" />
+				<aui:option label="<%= commerceAccount.getName() %>" value="<%= commerceAccount.getCommerceAccountId() %>" />
 
 			<%
 			}
@@ -75,7 +75,7 @@ CommerceShipmentDisplayContext commerceShipmentDisplayContext = (CommerceShipmen
 					'/accountAddresses/',
 				{
 					headers: new Headers({
-						'Accept': 'application/json',
+						Accept: 'application/json',
 						'Content-Type': 'application/json',
 					}),
 					method: 'GET',

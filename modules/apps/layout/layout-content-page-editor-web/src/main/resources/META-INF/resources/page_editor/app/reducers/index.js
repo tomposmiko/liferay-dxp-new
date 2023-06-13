@@ -24,12 +24,10 @@ import masterLayoutReducer from './masterLayoutReducer';
 import networkReducer from './networkReducer';
 import pageContentsReducer from './pageContentsReducer';
 import permissionsReducer from './permissionsReducer';
-import restrictedItemIdsReducer from './restrictedItemIdsReducer';
 import selectedViewportSizeReducer from './selectedViewportSizeReducer';
 import showResolvedCommentsReducer from './showResolvedCommentsReducer';
 import sidebarReducer from './sidebarReducer';
 import undoReducer from './undoReducer';
-import widgetsReducer from './widgetsReducer';
 
 const combinedReducer = (state, action) =>
 	Object.entries({
@@ -44,11 +42,9 @@ const combinedReducer = (state, action) =>
 		pageContents: pageContentsReducer,
 		permissions: permissionsReducer,
 		reducers: baseReducer,
-		restrictedItemIds: restrictedItemIdsReducer,
 		selectedViewportSize: selectedViewportSizeReducer,
 		showResolvedComments: showResolvedCommentsReducer,
 		sidebar: sidebarReducer,
-		widgets: widgetsReducer,
 	}).reduce(
 		(nextState, [namespace, reducer]) => ({
 			...nextState,

@@ -54,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author David Mendez Gonzalez
  * @author Michael C. Han
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class RoleStagedModelDataHandler
 	extends BaseStagedModelDataHandler<Role> {
 
@@ -96,6 +96,44 @@ public class RoleStagedModelDataHandler
 	@Override
 	public String getDisplayName(Role role) {
 		return role.getName();
+	}
+
+	protected void deleteRolePermissions(
+		PortletDataContext portletDataContext, Role importedRole) {
+
+		List<ResourcePermission> resourcePermissions =
+			_resourcePermissionLocalService.getRoleResourcePermissions(
+				importedRole.getRoleId(),
+				new int[] {
+					ResourceConstants.SCOPE_COMPANY,
+					ResourceConstants.SCOPE_GROUP_TEMPLATE
+				},
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (ResourcePermission resourcePermission : resourcePermissions) {
+			_resourcePermissionLocalService.deleteResourcePermission(
+				resourcePermission);
+		}
+
+		List<ResourcePermission> groupResourcePermissions =
+			_resourcePermissionLocalService.getRoleResourcePermissions(
+				importedRole.getRoleId(),
+				new int[] {ResourceConstants.SCOPE_GROUP}, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		for (ResourcePermission groupResourcePermission :
+				groupResourcePermissions) {
+
+			long groupId = GetterUtil.getLong(
+				groupResourcePermission.getPrimKey());
+
+			if ((groupId == portletDataContext.getCompanyGroupId()) ||
+				(groupId == portletDataContext.getUserPersonalSiteGroupId())) {
+
+				_resourcePermissionLocalService.deleteResourcePermission(
+					groupResourcePermission);
+			}
+		}
 	}
 
 	@Override
@@ -160,7 +198,7 @@ public class RoleStagedModelDataHandler
 				existingRole.getRoleId(), role.getName(), role.getTitleMap(),
 				role.getDescriptionMap(), role.getSubtype(), serviceContext);
 
-			_deleteRolePermissions(portletDataContext, importedRole);
+			deleteRolePermissions(portletDataContext, importedRole);
 		}
 
 		String permissionsPath = ExportImportPathUtil.getModelPath(
@@ -172,7 +210,7 @@ public class RoleStagedModelDataHandler
 
 		for (Permission permission : permissions) {
 			try {
-				_importResourcePermissions(
+				importResourcePermissions(
 					portletDataContext, importedRole, permission);
 			}
 			catch (NoSuchResourceActionException
@@ -206,45 +244,7 @@ public class RoleStagedModelDataHandler
 		portletDataContext.importClassedModel(role, importedRole);
 	}
 
-	private void _deleteRolePermissions(
-		PortletDataContext portletDataContext, Role importedRole) {
-
-		List<ResourcePermission> resourcePermissions =
-			_resourcePermissionLocalService.getRoleResourcePermissions(
-				importedRole.getRoleId(),
-				new int[] {
-					ResourceConstants.SCOPE_COMPANY,
-					ResourceConstants.SCOPE_GROUP_TEMPLATE
-				},
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		for (ResourcePermission resourcePermission : resourcePermissions) {
-			_resourcePermissionLocalService.deleteResourcePermission(
-				resourcePermission);
-		}
-
-		List<ResourcePermission> groupResourcePermissions =
-			_resourcePermissionLocalService.getRoleResourcePermissions(
-				importedRole.getRoleId(),
-				new int[] {ResourceConstants.SCOPE_GROUP}, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
-
-		for (ResourcePermission groupResourcePermission :
-				groupResourcePermissions) {
-
-			long groupId = GetterUtil.getLong(
-				groupResourcePermission.getPrimKey());
-
-			if ((groupId == portletDataContext.getCompanyGroupId()) ||
-				(groupId == portletDataContext.getUserPersonalSiteGroupId())) {
-
-				_resourcePermissionLocalService.deleteResourcePermission(
-					groupResourcePermission);
-			}
-		}
-	}
-
-	private void _importResourcePermissions(
+	protected void importResourcePermissions(
 			PortletDataContext portletDataContext, Role importedRole,
 			Permission permission)
 		throws PortalException {
@@ -299,22 +299,38 @@ public class RoleStagedModelDataHandler
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setResourcePermissionLocalService(
+		ResourcePermissionLocalService resourcePermissionLocalService) {
+
+		_resourcePermissionLocalService = resourcePermissionLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setResourcePermissionService(
+		ResourcePermissionService resourcePermissionService) {
+
+		_resourcePermissionService = resourcePermissionService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setRoleLocalService(RoleLocalService roleLocalService) {
+		_roleLocalService = roleLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		RoleStagedModelDataHandler.class);
 
-	@Reference
 	private GroupLocalService _groupLocalService;
-
 	private final PermissionConversionFilter _permissionConversionFilter =
 		new ImportExportPermissionConversionFilter();
-
-	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
-
-	@Reference
 	private ResourcePermissionService _resourcePermissionService;
-
-	@Reference
 	private RoleLocalService _roleLocalService;
 
 }

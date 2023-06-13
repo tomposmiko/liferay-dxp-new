@@ -55,26 +55,26 @@ public class In implements Cloneable, Serializable {
 
 	protected String parameterName;
 
-	public Object getValue() {
-		return value;
+	public Object[] getValues() {
+		return values;
 	}
 
-	public void setValue(Object value) {
-		this.value = value;
+	public void setValues(Object[] values) {
+		this.values = values;
 	}
 
-	public void setValue(
-		UnsafeSupplier<Object, Exception> valueUnsafeSupplier) {
+	public void setValues(
+		UnsafeSupplier<Object[], Exception> valuesUnsafeSupplier) {
 
 		try {
-			value = valueUnsafeSupplier.get();
+			values = valuesUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Object value;
+	protected Object[] values;
 
 	@Override
 	public In clone() throws CloneNotSupportedException {

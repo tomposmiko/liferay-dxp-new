@@ -235,24 +235,29 @@ public class COREntryLocalServiceUtil {
 		return getService().fetchCOREntry(COREntryId);
 	}
 
+	/**
+	 * Returns the cor entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cor entry's external reference code
+	 * @return the matching cor entry, or <code>null</code> if a matching cor entry could not be found
+	 */
 	public static COREntry fetchCOREntryByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchCOREntryByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the cor entry with the matching UUID and company.
-	 *
-	 * @param uuid the cor entry's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching cor entry, or <code>null</code> if a matching cor entry could not be found
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCOREntryByExternalReferenceCode(long, String)}
 	 */
-	public static COREntry fetchCOREntryByUuidAndCompanyId(
-		String uuid, long companyId) {
+	@Deprecated
+	public static COREntry fetchCOREntryByReferenceCode(
+		long companyId, String externalReferenceCode) {
 
-		return getService().fetchCOREntryByUuidAndCompanyId(uuid, companyId);
+		return getService().fetchCOREntryByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static List<COREntry>
@@ -400,35 +405,20 @@ public class COREntryLocalServiceUtil {
 		return getService().getCOREntry(COREntryId);
 	}
 
-	public static COREntry getCOREntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getCOREntryByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the cor entry with the matching UUID and company.
+	 * Returns the cor entry with the matching external reference code and company.
 	 *
-	 * @param uuid the cor entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cor entry's external reference code
 	 * @return the matching cor entry
 	 * @throws PortalException if a matching cor entry could not be found
 	 */
-	public static COREntry getCOREntryByUuidAndCompanyId(
-			String uuid, long companyId)
+	public static COREntry getCOREntryByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return getService().getCOREntryByUuidAndCompanyId(uuid, companyId);
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return getService().getExportActionableDynamicQuery(portletDataContext);
+		return getService().getCOREntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static
@@ -454,10 +444,6 @@ public class COREntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
-	}
-
-	public static List<COREntry> getUnqualifiedCOREntries(long companyId) {
-		return getService().getUnqualifiedCOREntries(companyId);
 	}
 
 	/**

@@ -14,7 +14,6 @@
 
 package com.liferay.portal.reports.engine.console.service.impl;
 
-import com.liferay.document.library.kernel.store.DLStoreRequest;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -25,9 +24,7 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,7 +45,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Gavin Wan
@@ -69,10 +65,10 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 
 		// Definition
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 		Date date = new Date();
 
-		_validate(nameMap);
+		validate(nameMap);
 
 		long definitionId = counterLocalService.increment();
 
@@ -96,12 +92,12 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.addModelResources(definition, serviceContext);
+		resourceLocalService.addModelResources(definition, serviceContext);
 
 		// Attachments
 
 		if (Validator.isNotNull(fileName) && (inputStream != null)) {
-			_addDefinitionFile(
+			addDefinitionFile(
 				user.getCompanyId(), definition, fileName, inputStream);
 		}
 		else {
@@ -123,7 +119,7 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.deleteResource(
+		resourceLocalService.deleteResource(
 			definition.getCompanyId(), Definition.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL, definition.getDefinitionId());
 
@@ -198,7 +194,7 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 		Definition definition = definitionPersistence.findByPrimaryKey(
 			definitionId);
 
-		_validate(nameMap);
+		validate(nameMap);
 
 		definition.setModifiedDate(serviceContext.getModifiedDate(null));
 		definition.setNameMap(nameMap);
@@ -240,7 +236,7 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 				companyId, CompanyConstants.SYSTEM,
 				definition.getAttachmentsDir());
 
-			_addDefinitionFile(companyId, definition, fileName, inputStream);
+			addDefinitionFile(companyId, definition, fileName, inputStream);
 		}
 
 		return definition;
@@ -252,13 +248,13 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 			String[] guestPermissions)
 		throws PortalException {
 
-		_resourceLocalService.updateResources(
+		resourceLocalService.updateResources(
 			definition.getCompanyId(), definition.getGroupId(),
 			Definition.class.getName(), definition.getDefinitionId(),
 			communityPermissions, guestPermissions);
 	}
 
-	private void _addDefinitionFile(
+	protected void addDefinitionFile(
 			long companyId, Definition definition, String fileName,
 			InputStream inputStream)
 		throws PortalException {
@@ -269,15 +265,13 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 			directoryName, StringPool.SLASH, fileName);
 
 		DLStoreUtil.addFile(
-			DLStoreRequest.builder(
-				companyId, CompanyConstants.SYSTEM, fileLocation
-			).className(
-				this
-			).build(),
+			companyId, CompanyConstants.SYSTEM, fileLocation, false,
 			inputStream);
 	}
 
-	private void _validate(Map<Locale, String> nameMap) throws PortalException {
+	protected void validate(Map<Locale, String> nameMap)
+		throws PortalException {
+
 		Locale locale = LocaleUtil.getDefault();
 
 		String name = nameMap.get(locale);
@@ -286,11 +280,5 @@ public class DefinitionLocalServiceImpl extends DefinitionLocalServiceBaseImpl {
 			throw new DefinitionNameException.NullDefinitionFileName();
 		}
 	}
-
-	@Reference
-	private ResourceLocalService _resourceLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

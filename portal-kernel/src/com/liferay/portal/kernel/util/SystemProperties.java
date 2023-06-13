@@ -14,27 +14,16 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
-import com.liferay.portal.kernel.model.CompanyConstants;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,8 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Shuyang Zhou
  */
 public class SystemProperties {
-
-	public static final String SYSTEM_ENV_OVERRIDE_PREFIX = "SYSTEM_LIFERAY_";
 
 	public static final String SYSTEM_PROPERTIES_QUIET =
 		"system.properties.quiet";
@@ -64,45 +51,17 @@ public class SystemProperties {
 	}
 
 	public static String get(String key) {
-		return get(key, null);
-	}
-
-	public static String get(String key, String defaultValue) {
 		String value = _properties.get(key);
 
 		if (value == null) {
-			value = System.getProperty(key, defaultValue);
+			value = System.getProperty(key);
 		}
 
-		return _resolveReference(value);
+		return value;
 	}
 
-	public static String[] getArray(String key) {
-		return StringUtil.split(get(key));
-	}
-
-	public static Map<String, String> getProperties(
-		String prefix, boolean removePrefix) {
-
-		Map<String, String> properties = new HashMap<>();
-
-		for (Map.Entry<String, String> entry : _properties.entrySet()) {
-			String key = entry.getKey();
-
-			if (key.startsWith(prefix)) {
-				if (removePrefix) {
-					key = key.substring(prefix.length());
-				}
-
-				properties.put(key, _resolveReference(entry.getValue()));
-			}
-		}
-
-		return properties;
-	}
-
-	public static Set<String> getPropertyNames() {
-		return Collections.unmodifiableSet(_properties.keySet());
+	public static Properties getProperties() {
+		return PropertiesUtil.fromMap(_properties);
 	}
 
 	public static void load(ClassLoader classLoader) {
@@ -125,7 +84,9 @@ public class SystemProperties {
 			while (enumeration.hasMoreElements()) {
 				URL url = enumeration.nextElement();
 
-				_load(url, properties);
+				try (InputStream inputStream = url.openStream()) {
+					properties.load(inputStream);
+				}
 
 				if (urls != null) {
 					urls.add(url);
@@ -145,7 +106,9 @@ public class SystemProperties {
 			while (enumeration.hasMoreElements()) {
 				URL url = enumeration.nextElement();
 
-				_load(url, properties);
+				try (InputStream inputStream = url.openStream()) {
+					properties.load(inputStream);
+				}
 
 				if (urls != null) {
 					urls.add(url);
@@ -198,10 +161,6 @@ public class SystemProperties {
 
 		PropertiesUtil.fromProperties(properties, _properties);
 
-		EnvPropertiesUtil.loadEnvOverrides(
-			SYSTEM_ENV_OVERRIDE_PREFIX, CompanyConstants.SYSTEM,
-			SystemProperties::set);
-
 		if (urls != null) {
 			for (URL url : urls) {
 				System.out.println("Loading " + url);
@@ -213,93 +172,6 @@ public class SystemProperties {
 		System.setProperty(key, value);
 
 		_properties.put(key, value);
-	}
-
-	private static void _load(URL url, Properties properties)
-		throws IOException {
-
-		try (InputStream inputStream = url.openStream();
-			InputStreamReader inputStreamReader = new InputStreamReader(
-				inputStream);
-			UnsyncBufferedReader unsyncBufferedReader =
-				new UnsyncBufferedReader(inputStreamReader)) {
-
-			String line = null;
-			StringBundler sb = new StringBundler();
-
-			while ((line = unsyncBufferedReader.readLine()) != null) {
-				line = line.trim();
-
-				// Empty line, Comment line or "\"
-
-				if (line.isEmpty() || (line.charAt(0) == CharPool.POUND) ||
-					line.equals(StringPool.BACK_SLASH)) {
-
-					continue;
-				}
-
-				sb.append(line);
-				sb.append(StringPool.NEW_LINE);
-			}
-
-			if (sb.index() != 0) {
-				try (UnsyncStringReader unsyncStringReader =
-						new UnsyncStringReader(sb.toString())) {
-
-					properties.load(unsyncStringReader);
-				}
-			}
-		}
-	}
-
-	private static String _resolveReference(String value) {
-		if (value == null) {
-			return null;
-		}
-
-		StringBundler sb = new StringBundler();
-
-		int startIndex = 0;
-
-		while ((startIndex = value.indexOf(
-					StringPool.DOLLAR_AND_OPEN_CURLY_BRACE)) != -1) {
-
-			int endIndex = value.indexOf(
-				StringPool.CLOSE_CURLY_BRACE, startIndex);
-
-			if (endIndex == -1) {
-				break;
-			}
-
-			String placeholderKey = value.substring(
-				startIndex + StringPool.DOLLAR_AND_OPEN_CURLY_BRACE.length(),
-				endIndex);
-
-			if (StringPool.BLANK.equals(placeholderKey)) {
-				sb.append(value.substring(0, endIndex + 1));
-			}
-			else {
-				String placeholderValue = get(placeholderKey);
-
-				if (placeholderValue == null) {
-					sb.append(value.substring(0, endIndex + 1));
-				}
-				else {
-					sb.append(value.substring(0, startIndex));
-					sb.append(placeholderValue);
-				}
-			}
-
-			value = value.substring(endIndex + 1);
-		}
-
-		if (sb.index() > 0) {
-			sb.append(value);
-
-			return sb.toString();
-		}
-
-		return value;
 	}
 
 	private static final Map<String, String> _properties =

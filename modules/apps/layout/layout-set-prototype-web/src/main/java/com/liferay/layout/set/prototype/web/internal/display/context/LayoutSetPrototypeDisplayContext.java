@@ -21,19 +21,19 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.layout.set.prototype.constants.LayoutSetPrototypePortletKeys;
-import com.liferay.layout.set.prototype.web.internal.servlet.taglib.util.LayoutSetPrototypeActionDropdownItemsProvider;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
-import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.portlet.PortalPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -120,9 +120,13 @@ public class LayoutSetPrototypeDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
-			_httpServletRequest,
-			LayoutSetPrototypePortletKeys.LAYOUT_SET_PROTOTYPE, "list");
+		PortalPreferences portalPreferences =
+			PortletPreferencesFactoryUtil.getPortalPreferences(
+				_httpServletRequest);
+
+		_displayStyle = portalPreferences.getValue(
+			LayoutSetPrototypePortletKeys.LAYOUT_SET_PROTOTYPE, "display-style",
+			"list");
 
 		return _displayStyle;
 	}
@@ -144,27 +148,13 @@ public class LayoutSetPrototypeDisplayContext {
 		).build();
 	}
 
-	public List<DropdownItem> getLayoutSetPrototypeActionDropdownItems(
-			LayoutSetPrototype layoutSetPrototype)
-		throws Exception {
-
-		LayoutSetPrototypeActionDropdownItemsProvider
-			layoutSetPrototypeActionDropdownItemsProvider =
-				new LayoutSetPrototypeActionDropdownItemsProvider(
-					layoutSetPrototype, _renderRequest, _renderResponse);
-
-		return layoutSetPrototypeActionDropdownItemsProvider.
-			getActionDropdownItems();
-	}
-
 	public String getOrderByCol() {
 		if (Validator.isNotNull(_orderByCol)) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			LayoutSetPrototypePortletKeys.LAYOUT_SET_PROTOTYPE, "create-date");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}
@@ -174,9 +164,8 @@ public class LayoutSetPrototypeDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			LayoutSetPrototypePortletKeys.LAYOUT_SET_PROTOTYPE, "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -206,25 +195,31 @@ public class LayoutSetPrototypeDisplayContext {
 				"there-are-no-site-templates");
 
 		searchContainer.setId("layoutSetPrototype");
-		searchContainer.setOrderByCol(getOrderByCol());
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
 
 		boolean orderByAsc = false;
 
-		if (Objects.equals(getOrderByType(), "asc")) {
+		if (getOrderByType().equals("asc")) {
 			orderByAsc = true;
 		}
 
-		searchContainer.setOrderByComparator(
-			new LayoutSetPrototypeCreateDateComparator(orderByAsc));
+		OrderByComparator<LayoutSetPrototype> orderByComparator =
+			new LayoutSetPrototypeCreateDateComparator(orderByAsc);
+
+		searchContainer.setOrderByCol(getOrderByCol());
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			() -> LayoutSetPrototypeLocalServiceUtil.search(
+
+		searchContainer.setTotal(getTotal());
+
+		List<LayoutSetPrototype> results =
+			LayoutSetPrototypeLocalServiceUtil.search(
 				themeDisplay.getCompanyId(), getActive(),
 				searchContainer.getStart(), searchContainer.getEnd(),
-				searchContainer.getOrderByComparator()),
-			_getTotal());
-		searchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(_renderResponse));
+				searchContainer.getOrderByComparator());
+
+		searchContainer.setResults(results);
 
 		return searchContainer;
 	}
@@ -275,6 +270,14 @@ public class LayoutSetPrototypeDisplayContext {
 		return false;
 	}
 
+	public boolean isDisabledManagementBar() {
+		if ((getTotal() > 0) || !Objects.equals(getNavigation(), "all")) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public boolean isIconView() {
 		if (Objects.equals(getDisplayStyle(), "icon")) {
 			return true;
@@ -304,6 +307,25 @@ public class LayoutSetPrototypeDisplayContext {
 		}
 
 		return false;
+	}
+
+	protected String getNavigation() {
+		if (Validator.isNotNull(_navigation)) {
+			return _navigation;
+		}
+
+		_navigation = ParamUtil.getString(_httpServletRequest, "navigation");
+
+		return _navigation;
+	}
+
+	protected int getTotal() {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return LayoutSetPrototypeLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), getActive());
 	}
 
 	private List<DropdownItem> _getFilterNavigationDropdownItems() {
@@ -354,18 +376,10 @@ public class LayoutSetPrototypeDisplayContext {
 		).build();
 	}
 
-	private int _getTotal() {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return LayoutSetPrototypeLocalServiceUtil.searchCount(
-			themeDisplay.getCompanyId(), getActive());
-	}
-
 	private String _displayStyle;
 	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
+	private String _navigation;
 	private String _orderByCol;
 	private String _orderByType;
 	private final RenderRequest _renderRequest;

@@ -147,9 +147,9 @@ public class ContactPersistenceTest {
 
 		newContact.setLastName(RandomTestUtil.randomString());
 
-		newContact.setPrefixListTypeId(RandomTestUtil.nextLong());
+		newContact.setPrefixId(RandomTestUtil.nextLong());
 
-		newContact.setSuffixListTypeId(RandomTestUtil.nextLong());
+		newContact.setSuffixId(RandomTestUtil.nextLong());
 
 		newContact.setMale(RandomTestUtil.randomBoolean());
 
@@ -212,11 +212,9 @@ public class ContactPersistenceTest {
 		Assert.assertEquals(
 			existingContact.getLastName(), newContact.getLastName());
 		Assert.assertEquals(
-			existingContact.getPrefixListTypeId(),
-			newContact.getPrefixListTypeId());
+			existingContact.getPrefixId(), newContact.getPrefixId());
 		Assert.assertEquals(
-			existingContact.getSuffixListTypeId(),
-			newContact.getSuffixListTypeId());
+			existingContact.getSuffixId(), newContact.getSuffixId());
 		Assert.assertEquals(existingContact.isMale(), newContact.isMale());
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingContact.getBirthday()),
@@ -250,21 +248,6 @@ public class ContactPersistenceTest {
 		_persistence.countByCompanyId(RandomTestUtil.nextLong());
 
 		_persistence.countByCompanyId(0L);
-	}
-
-	@Test
-	public void testCountByUserId() throws Exception {
-		_persistence.countByUserId(RandomTestUtil.nextLong());
-
-		_persistence.countByUserId(0L);
-	}
-
-	@Test
-	public void testCountByC_U() throws Exception {
-		_persistence.countByC_U(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
-
-		_persistence.countByC_U(0L, 0L);
 	}
 
 	@Test
@@ -304,11 +287,11 @@ public class ContactPersistenceTest {
 			true, "userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "classNameId", true, "classPK", true,
 			"parentContactId", true, "emailAddress", true, "firstName", true,
-			"middleName", true, "lastName", true, "prefixListTypeId", true,
-			"suffixListTypeId", true, "male", true, "birthday", true, "smsSn",
-			true, "facebookSn", true, "jabberSn", true, "skypeSn", true,
-			"twitterSn", true, "employeeStatusId", true, "employeeNumber", true,
-			"jobTitle", true, "jobClass", true, "hoursOfOperation", true);
+			"middleName", true, "lastName", true, "prefixId", true, "suffixId",
+			true, "male", true, "birthday", true, "smsSn", true, "facebookSn",
+			true, "jabberSn", true, "skypeSn", true, "twitterSn", true,
+			"employeeStatusId", true, "employeeNumber", true, "jobTitle", true,
+			"jobClass", true, "hoursOfOperation", true);
 	}
 
 	@Test
@@ -545,9 +528,9 @@ public class ContactPersistenceTest {
 
 		contact.setLastName(RandomTestUtil.randomString());
 
-		contact.setPrefixListTypeId(RandomTestUtil.nextLong());
+		contact.setPrefixId(RandomTestUtil.nextLong());
 
-		contact.setSuffixListTypeId(RandomTestUtil.nextLong());
+		contact.setSuffixId(RandomTestUtil.nextLong());
 
 		contact.setMale(RandomTestUtil.randomBoolean());
 

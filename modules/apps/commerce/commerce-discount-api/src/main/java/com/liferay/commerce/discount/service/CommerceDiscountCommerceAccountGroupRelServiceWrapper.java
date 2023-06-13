@@ -27,10 +27,6 @@ public class CommerceDiscountCommerceAccountGroupRelServiceWrapper
 	implements CommerceDiscountCommerceAccountGroupRelService,
 			   ServiceWrapper<CommerceDiscountCommerceAccountGroupRelService> {
 
-	public CommerceDiscountCommerceAccountGroupRelServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceDiscountCommerceAccountGroupRelServiceWrapper(
 		CommerceDiscountCommerceAccountGroupRelService
 			commerceDiscountCommerceAccountGroupRelService) {

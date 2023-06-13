@@ -60,6 +60,8 @@ public class CPWebKeys {
 
 	public static final String CP_INSTANCE = "CP_INSTANCE";
 
+	public static final String CP_INSTANCES = "CP_INSTANCES";
+
 	public static final String CP_OPTION = "CP_OPTION";
 
 	public static final String CP_OPTION_CATEGORIES = "CP_OPTION_CATEGORIES";

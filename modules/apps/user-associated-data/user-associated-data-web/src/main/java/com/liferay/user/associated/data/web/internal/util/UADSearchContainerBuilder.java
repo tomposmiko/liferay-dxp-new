@@ -14,11 +14,11 @@
 
 package com.liferay.user.associated.data.web.internal.util;
 
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.petra.string.StringPool;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -26,18 +26,14 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.user.associated.data.constants.UserAssociatedDataPortletKeys;
 import com.liferay.user.associated.data.display.UADDisplay;
 import com.liferay.user.associated.data.web.internal.constants.UADConstants;
 import com.liferay.user.associated.data.web.internal.display.UADApplicationSummaryDisplay;
@@ -53,7 +49,8 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -65,7 +62,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Samuel Trong Tran
  */
-@Component(service = UADSearchContainerBuilder.class)
+@Component(immediate = true, service = UADSearchContainerBuilder.class)
 public class UADSearchContainerBuilder {
 
 	public SearchContainer<UADEntity<?>>
@@ -81,29 +78,45 @@ public class UADSearchContainerBuilder {
 				renderRequest, currentURL, "name",
 				new String[] {"name", "count"});
 
-		searchContainer.setResultsAndTotal(
-			ListUtil.sort(
-				TransformUtil.transform(
-					uadApplicationSummaryDisplays,
-					uadApplicationSummaryDisplay -> {
-						if (Objects.equals(
-								uadApplicationSummaryDisplay.
-									getApplicationKey(),
-								UADConstants.ALL_APPLICATIONS) ||
-							(uadApplicationSummaryDisplay.getCount() == 0)) {
+		List<UADEntity<?>> uadEntities = new ArrayList<>();
 
-							return null;
-						}
+		for (UADApplicationSummaryDisplay uadApplicationSummaryDisplay :
+				uadApplicationSummaryDisplays) {
 
-						return _constructApplicationSummaryUADEntity(
-							liferayPortletResponse, renderRequest, currentURL,
-							uadApplicationSummaryDisplay);
-					}),
-				_getComparator(
-					searchContainer.getOrderByCol(),
-					searchContainer.getOrderByType())));
+			String applicationKey =
+				uadApplicationSummaryDisplay.getApplicationKey();
+
+			if (applicationKey.equals(UADConstants.ALL_APPLICATIONS) ||
+				(uadApplicationSummaryDisplay.getCount() == 0)) {
+
+				continue;
+			}
+
+			uadEntities.add(
+				_constructApplicationSummaryUADEntity(
+					liferayPortletResponse, renderRequest, currentURL,
+					uadApplicationSummaryDisplay));
+		}
+
+		Stream<UADEntity<?>> uadEntitiesStream = uadEntities.stream();
+
+		List<UADEntity<?>> results = uadEntitiesStream.sorted(
+			_getComparator(
+				searchContainer.getOrderByCol(),
+				searchContainer.getOrderByType())
+		).skip(
+			searchContainer.getStart()
+		).limit(
+			searchContainer.getDelta()
+		).collect(
+			Collectors.toList()
+		);
+
+		searchContainer.setResults(results);
+
 		searchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(liferayPortletResponse));
+		searchContainer.setTotal(uadEntities.size());
 
 		return searchContainer;
 	}
@@ -111,7 +124,7 @@ public class UADSearchContainerBuilder {
 	public SearchContainer<UADEntity<?>> getHierarchyUADEntitySearchContainer(
 		LiferayPortletResponse liferayPortletResponse,
 		RenderRequest renderRequest, String applicationKey,
-		PortletURL currentURL, long[] groupIds, String parentContainerKey,
+		PortletURL currentURL, long[] groupIds, Class<?> parentContainerClass,
 		Serializable parentContainerId, User selectedUser,
 		UADHierarchyDisplay uadHierarchyDisplay) {
 
@@ -127,15 +140,17 @@ public class UADSearchContainerBuilder {
 
 			entities.addAll(
 				uadHierarchyDisplay.search(
-					parentContainerKey, parentContainerId,
+					parentContainerClass, parentContainerId,
 					selectedUser.getUserId(), groupIds,
 					displayTerms.getKeywords(), null, null, QueryUtil.ALL_POS,
 					QueryUtil.ALL_POS));
 
-			if (Objects.equals(String.valueOf(parentContainerId), "0")) {
+			String parentContainerIdString = String.valueOf(parentContainerId);
+
+			if (parentContainerIdString.equals("0")) {
 				entities.addAll(
 					uadHierarchyDisplay.search(
-						parentContainerKey, -1L, selectedUser.getUserId(),
+						parentContainerClass, -1L, selectedUser.getUserId(),
 						groupIds, displayTerms.getKeywords(), null, null,
 						QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 			}
@@ -143,29 +158,47 @@ public class UADSearchContainerBuilder {
 			LiferayPortletRequest liferayPortletRequest =
 				_portal.getLiferayPortletRequest(renderRequest);
 
-			searchContainer.setResultsAndTotal(
-				ListUtil.sort(
-					TransformUtil.transform(
-						entities,
-						entity -> _constructHierarchyUADEntity(
-							liferayPortletRequest, liferayPortletResponse,
-							applicationKey, entity, selectedUser.getUserId(),
-							uadHierarchyDisplay)),
-					_getComparator(
-						searchContainer.getOrderByCol(),
-						searchContainer.getOrderByType())));
+			List<UADEntity<?>> uadEntities = new ArrayList<>();
+
+			for (Object entity : entities) {
+				uadEntities.add(
+					_constructHierarchyUADEntity(
+						liferayPortletRequest, liferayPortletResponse,
+						applicationKey, entity, selectedUser.getUserId(),
+						uadHierarchyDisplay));
+			}
+
+			Stream<UADEntity<?>> uadEntitiesStream = uadEntities.stream();
+
+			List<UADEntity<?>> results = uadEntitiesStream.sorted(
+				_getComparator(
+					searchContainer.getOrderByCol(),
+					searchContainer.getOrderByType())
+			).skip(
+				searchContainer.getStart()
+			).limit(
+				searchContainer.getDelta()
+			).collect(
+				Collectors.toList()
+			);
+
+			searchContainer.setResults(results);
+
+			searchContainer.setTotal(entities.size());
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
-			searchContainer.setResultsAndTotal(Collections::emptyList, 0);
+			searchContainer.setResults(Collections.emptyList());
+			searchContainer.setTotal(0);
 		}
 
-		searchContainer.setRowChecker(
-			new UADHierarchyChecker(
-				liferayPortletResponse, uadHierarchyDisplay.getUADDisplays()));
+		RowChecker rowChecker = new UADHierarchyChecker(
+			liferayPortletResponse, uadHierarchyDisplay.getUADDisplays());
+
+		searchContainer.setRowChecker(rowChecker);
 
 		return searchContainer;
 	}
@@ -201,23 +234,26 @@ public class UADSearchContainerBuilder {
 						uadDisplay));
 			}
 
-			searchContainer.setResultsAndTotal(
-				() -> uadEntities,
+			searchContainer.setResults(uadEntities);
+
+			searchContainer.setTotal(
 				(int)uadDisplay.searchCount(
 					selectedUser.getUserId(), groupIds,
 					displayTerms.getKeywords()));
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
-			searchContainer.setResultsAndTotal(Collections::emptyList, 0);
+			searchContainer.setResults(Collections.emptyList());
+			searchContainer.setTotal(0);
 		}
 
-		searchContainer.setRowChecker(
-			new UADHierarchyChecker(
-				liferayPortletResponse, new UADDisplay[] {uadDisplay}));
+		RowChecker rowChecker = new UADHierarchyChecker(
+			liferayPortletResponse, new UADDisplay[] {uadDisplay});
+
+		searchContainer.setRowChecker(rowChecker);
 
 		return searchContainer;
 	}
@@ -246,6 +282,7 @@ public class UADSearchContainerBuilder {
 			UADLanguageUtil.getApplicationName(
 				uadApplicationSummaryDisplay.getApplicationKey(),
 				themeDisplay.getLocale()));
+
 		uadEntity.addColumnEntry(
 			"count", uadApplicationSummaryDisplay.getCount());
 
@@ -259,17 +296,19 @@ public class UADSearchContainerBuilder {
 			UADHierarchyDisplay uadHierarchyDisplay)
 		throws Exception {
 
+		String editURL = uadHierarchyDisplay.getEditURL(
+			liferayPortletRequest, liferayPortletResponse, entity);
+
+		String viewURL = uadHierarchyDisplay.getViewURL(
+			liferayPortletRequest, liferayPortletResponse, applicationKey,
+			entity, selectedUserId);
+
 		UADEntity<T> uadEntity = new UADEntity(
 			uadHierarchyDisplay.unwrap(entity),
-			uadHierarchyDisplay.getPrimaryKey(entity),
-			uadHierarchyDisplay.getEditURL(
-				liferayPortletRequest, liferayPortletResponse, entity),
+			uadHierarchyDisplay.getPrimaryKey(entity), editURL,
 			uadHierarchyDisplay.isInTrash(entity),
-			uadHierarchyDisplay.getTypeKey(entity),
-			uadHierarchyDisplay.isUserOwned(entity, selectedUserId),
-			uadHierarchyDisplay.getViewURL(
-				liferayPortletRequest, liferayPortletResponse, applicationKey,
-				entity, selectedUserId));
+			uadHierarchyDisplay.getTypeClass(entity),
+			uadHierarchyDisplay.isUserOwned(entity, selectedUserId), viewURL);
 
 		Map<String, Object> columnFieldValues =
 			uadHierarchyDisplay.getFieldValues(
@@ -289,31 +328,20 @@ public class UADSearchContainerBuilder {
 
 		DisplayTerms displayTerms = new DisplayTerms(renderRequest);
 
+		int cur = ParamUtil.getInteger(
+			renderRequest, SearchContainer.DEFAULT_CUR_PARAM,
+			SearchContainer.DEFAULT_CUR);
+
 		SearchContainer<UADEntity<?>> searchContainer = new SearchContainer<>(
 			renderRequest, displayTerms, displayTerms,
-			SearchContainer.DEFAULT_CUR_PARAM,
-			ParamUtil.getInteger(
-				renderRequest, SearchContainer.DEFAULT_CUR_PARAM,
-				SearchContainer.DEFAULT_CUR),
+			SearchContainer.DEFAULT_CUR_PARAM, cur,
 			SearchContainer.DEFAULT_DELTA, currentURL, null,
 			"no-entities-remain-of-this-type", null);
 
-		searchContainer.setId("uadEntities_" + StringUtil.randomId());
-		searchContainer.setOrderableHeaders(
-			new LinkedHashMap<String, String>() {
-				{
-					for (String orderByColumn : sortingFieldNames) {
-						put(
-							TextFormatter.format(
-								orderByColumn, TextFormatter.K),
-							orderByColumn);
-					}
-				}
-			});
+		searchContainer.setId("UADEntities_" + StringUtil.randomId());
 
-		String orderByCol = SearchOrderByUtil.getOrderByCol(
-			renderRequest, UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
-			StringPool.BLANK);
+		String orderByCol = ParamUtil.getString(
+			renderRequest, SearchContainer.DEFAULT_ORDER_BY_COL_PARAM);
 
 		if (!ArrayUtil.contains(sortingFieldNames, orderByCol)) {
 			orderByCol = defaultOrderByCol;
@@ -321,10 +349,20 @@ public class UADSearchContainerBuilder {
 
 		searchContainer.setOrderByCol(orderByCol);
 
-		searchContainer.setOrderByType(
-			SearchOrderByUtil.getOrderByType(
-				renderRequest,
-				UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA, "asc"));
+		String orderByType = ParamUtil.getString(
+			renderRequest, SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM, "asc");
+
+		searchContainer.setOrderByType(orderByType);
+
+		Map<String, String> orderableHeaders = new LinkedHashMap<>();
+
+		for (String orderByColumn : sortingFieldNames) {
+			orderableHeaders.put(
+				TextFormatter.format(orderByColumn, TextFormatter.K),
+				orderByColumn);
+		}
+
+		searchContainer.setOrderableHeaders(orderableHeaders);
 
 		return searchContainer;
 	}
@@ -339,7 +377,8 @@ public class UADSearchContainerBuilder {
 			entity, uadDisplay.getPrimaryKey(entity),
 			uadDisplay.getEditURL(
 				entity, liferayPortletRequest, liferayPortletResponse),
-			uadDisplay.isInTrash(entity), uadDisplay.getTypeKey(), true, null);
+			uadDisplay.isInTrash(entity), uadDisplay.getTypeClass(), true,
+			null);
 
 		Map<String, Object> columnFieldValues = uadDisplay.getFieldValues(
 			entity, uadDisplay.getColumnFieldNames(),
@@ -372,13 +411,15 @@ public class UADSearchContainerBuilder {
 		if (orderByColumn.equals("count")) {
 			comparator = Comparator.comparingLong(
 				uadEntity -> {
+					Object entry = uadEntity.getColumnEntry(orderByColumn);
+
 					try {
-						return Long.valueOf(
-							(String)uadEntity.getColumnEntry(orderByColumn));
+						return Long.valueOf((String)entry);
 					}
 					catch (NumberFormatException numberFormatException) {
 						if (_log.isDebugEnabled()) {
-							_log.debug(numberFormatException);
+							_log.debug(
+								numberFormatException, numberFormatException);
 						}
 
 						return 0L;

@@ -14,17 +14,12 @@
  */
 --%>
 
-<%@ taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
-taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <liferay-theme:defineObjects />
 
-<%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
-
 <div class="alert alert-info text-center">
-	<clay:link
-		href="javascript:void(0);"
-		label='<%= LanguageUtil.get(request, "low-level-search-options-help") %>'
-		onClick="<%= portletDisplay.getURLConfigurationJS() %>"
-	/>
+	<aui:a href="javascript:;" onClick="<%= portletDisplay.getURLConfigurationJS() %>"><liferay-ui:message key="low-level-search-options-help" /></aui:a>
 </div>

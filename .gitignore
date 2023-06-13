@@ -5,7 +5,6 @@
 **/TEST-frontend-js.xml
 **/liferay/logs/*.log
 **/liferay/logs/*.xml
-**/liferay/logs/companies/*
 **/pmd-reports
 *.bak
 *.iml
@@ -38,10 +37,8 @@
 /baseline-reports
 /benchmarks/*.csv
 /benchmarks/*.sql
-/benchmarks/benchmarks-actual.properties
-/benchmarks/benchmarks.*.properties
-/benchmarks/liferay
-/benchmarks/output
+/benchmarks/lib
+/benchmarks/log
 /bin
 /build
 /build.*.properties
@@ -53,6 +50,12 @@
 /modules/private/node_modules_cache
 /nbproject/private
 /out
+/portal-client/*.ipr
+/portal-client/*.iws
+/portal-client/classes
+/portal-client/portal-client*.asc
+/portal-client/portal-client*.jar
+/portal-client/src
 /portal-impl/*.ipr
 /portal-impl/*.iws
 /portal-impl/ServiceBuilder.temp
@@ -90,7 +93,6 @@
 /portal-web/*.iws
 /portal-web/ROOT.war
 /portal-web/build
-/portal-web/poshi-ext.properties
 /portal-web/classes
 /portal-web/docroot/WEB-INF/classes
 /portal-web/docroot/WEB-INF/lib
@@ -108,14 +110,12 @@
 /portal-web/liferay-portal.war
 /portal-web/portal-web.war
 /portal-web/portal-web.war.asc
-/portal-web/poshi-ext.properties
 /portal-web/test-ant-scripts
 /portal-web/test-classes
 /portal-web/test-output
 /portal-web/test-results
 /portal-web/test/functional-generated
 /portal-web/test/test-portal-web-ext.properties
-/portal-web/tests
 /rebel.xml
 /release.*.properties
 /selenium-output
@@ -155,7 +155,8 @@
 /tools/sdk/dependencies/*/ivy.xml.MD5
 /tools/sdk/dependencies/*/lib
 /tools/sdk/dist
-/tools/selenium
+/tools/selenium/*.exe
+/tools/selenium/extensions/ide.*.js
 /tools/zip_tmpl
 /tunnel-web/docroot/WEB-INF/classes
 /tunnel-web/docroot/WEB-INF/lib
@@ -195,4 +196,3 @@
 /util-taglib/util-taglib*.jar
 /working.dir.properties
 _sass_cache_*.css
-poshi-warnings.xml

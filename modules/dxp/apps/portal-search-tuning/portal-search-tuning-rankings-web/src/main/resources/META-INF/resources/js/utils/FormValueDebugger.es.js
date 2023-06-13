@@ -51,7 +51,6 @@ const FormValueDebugger = ({values}) => (
 			<thead>
 				<tr>
 					<th>Name</th>
-
 					<th>Value</th>
 				</tr>
 			</thead>
@@ -60,7 +59,6 @@ const FormValueDebugger = ({values}) => (
 				{values.map(({name, value}) => (
 					<tr key={name}>
 						<td>{name}</td>
-
 						<td>
 							{Array.isArray(value) ? (
 								<PrettyPrintArray value={value} />

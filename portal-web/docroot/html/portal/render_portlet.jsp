@@ -136,10 +136,10 @@ try {
 	ue.printStackTrace();
 }*/
 catch (PortletException pe) {
-	_log.error(pe);
+	_log.error(pe, pe);
 }
 catch (RuntimeException re) {
-	_log.error(re);
+	_log.error(re, re);
 }
 
 LiferayRenderRequest liferayRenderRequest = RenderRequestFactory.create(request, portlet, invokerPortlet, portletCtx, windowState, portletMode, portletPreferences, plid);
@@ -742,7 +742,7 @@ portletDisplay.setURLPrint(urlPrint.toString());
 
 // URL refresh
 
-String urlRefresh = "javascript:void(0);";
+String urlRefresh = "javascript:;";
 
 portletDisplay.setURLRefresh(urlRefresh);
 

@@ -21,7 +21,7 @@ import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 
@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
-	property = "service.ranking:Integer=100",
+	immediate = true, property = "service.ranking:Integer=100",
 	service = PortalInstanceLifecycleListener.class
 )
 public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
@@ -53,7 +53,7 @@ public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
 			return;
 		}
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			company.getCompanyId());
 
 		String content = StringUtil.read(
@@ -62,8 +62,8 @@ public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
 			"dependencies/message-boards-moderation-workflow-definition.xml");
 
 		_workflowDefinitionManager.deployWorkflowDefinition(
-			company.getCompanyId(), guestUserId,
-			_localization.getXml(
+			company.getCompanyId(), defaultUserId,
+			LocalizationUtil.getXml(
 				_getTitleMap(company.getCompanyId()),
 				_language.getLanguageId(company.getLocale()), "title"),
 			MBModerationConstants.WORKFLOW_DEFINITION_NAME,
@@ -87,12 +87,9 @@ public class AddMBModerationWorkflowDefinitionPortalInstanceLifecycleListener
 	private Language _language;
 
 	@Reference
-	private Localization _localization;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
-	@Reference
+	@Reference(target = "(proxy.bean=false)")
 	private WorkflowDefinitionManager _workflowDefinitionManager;
 
 }

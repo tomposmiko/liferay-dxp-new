@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Jeyvison Nascimento
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.data.engine.model.DEDataListView",
 	service = ModelPreFilterContributor.class
 )

@@ -34,6 +34,6 @@ CPPublisherConfigurationDisplayContext cpPublisherConfigurationDisplayContext = 
 
 		form['<portlet:namespace /><%= Constants.CMD %>'].value = 'selection-style';
 
-		form.submit();
+		submitForm(form);
 	}
 </aui:script>

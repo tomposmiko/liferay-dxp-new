@@ -19,15 +19,15 @@ import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemFieldValues;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.info.item.provider.InfoItemPermissionProvider;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
@@ -39,7 +39,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.translation.constants.TranslationActionKeys;
 import com.liferay.translation.constants.TranslationConstants;
 import com.liferay.translation.constants.TranslationPortletKeys;
@@ -48,26 +48,38 @@ import com.liferay.translation.info.item.provider.InfoItemLanguagesProvider;
 import com.liferay.translation.model.TranslationEntry;
 import com.liferay.translation.service.TranslationEntryLocalService;
 import com.liferay.translation.translator.Translator;
-import com.liferay.translation.translator.TranslatorRegistry;
+import com.liferay.translation.web.internal.configuration.FFLayoutExperienceSelectorConfiguration;
 import com.liferay.translation.web.internal.display.context.TranslateDisplayContext;
-import com.liferay.translation.web.internal.helper.TranslationRequestHelper;
+import com.liferay.translation.web.internal.util.TranslationRequestUtil;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Ambrín Chaudhary
  */
 @Component(
+	configurationPid = "com.liferay.translation.web.internal.configuration.FFLayoutExperienceSelectorConfiguration",
 	property = {
 		"javax.portlet.name=" + TranslationPortletKeys.TRANSLATION,
 		"mvc.command.name=/translation/translate"
@@ -83,41 +95,27 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 
 		try {
 			long segmentsExperienceId = ParamUtil.getLong(
-				renderRequest, "segmentsExperienceId");
+				renderRequest, "segmentsExperienceId",
+				SegmentsExperienceConstants.ID_DEFAULT);
 
-			TranslationRequestHelper translationRequestHelper =
-				new TranslationRequestHelper(
-					_infoItemServiceRegistry, renderRequest,
-					_segmentsExperienceLocalService);
+			String className = TranslationRequestUtil.getClassName(
+				renderRequest, segmentsExperienceId);
 
-			String className = translationRequestHelper.getClassName(
-				segmentsExperienceId);
-
-			long classPK = translationRequestHelper.getClassPK(
-				segmentsExperienceId);
-
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-			_translator = _translatorRegistry.getCompanyTranslator(
-				themeDisplay.getCompanyId());
+			long classPK = TranslationRequestUtil.getClassPK(
+				renderRequest, segmentsExperienceId);
 
 			Object object = _getInfoItem(className, classPK);
 
 			if (object == null) {
-				return _getErrorJSP(
-					renderRequest, renderResponse, segmentsExperienceId,
-					translationRequestHelper);
+				return _getErrorJSP(renderRequest, renderResponse);
 			}
 
 			InfoItemLanguagesProvider<Object> infoItemLanguagesProvider =
-				_infoItemServiceRegistry.getFirstInfoItemService(
+				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemLanguagesProvider.class, className);
 
 			if (infoItemLanguagesProvider == null) {
-				return _getErrorJSP(
-					renderRequest, renderResponse, segmentsExperienceId,
-					translationRequestHelper);
+				return _getErrorJSP(renderRequest, renderResponse);
 			}
 
 			List<String> availableSourceLanguageIds = Arrays.asList(
@@ -127,18 +125,19 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 				renderRequest, "sourceLanguageId",
 				infoItemLanguagesProvider.getDefaultLanguageId(object));
 
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
 			List<String> availableTargetLanguageIds =
 				_getAvailableTargetLanguageIds(
 					className, object, sourceLanguageId, themeDisplay);
 
 			InfoItemFormProvider<Object> infoItemFormProvider =
-				_infoItemServiceRegistry.getFirstInfoItemService(
+				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemFormProvider.class, className);
 
 			if (infoItemFormProvider == null) {
-				return _getErrorJSP(
-					renderRequest, renderResponse, segmentsExperienceId,
-					translationRequestHelper);
+				return _getErrorJSP(renderRequest, renderResponse);
 			}
 
 			InfoForm infoForm = infoItemFormProvider.getInfoForm(object);
@@ -147,9 +146,7 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 				_getSourceInfoItemFieldValues(className, object);
 
 			if (sourceInfoItemFieldValues == null) {
-				return _getErrorJSP(
-					renderRequest, renderResponse, segmentsExperienceId,
-					translationRequestHelper);
+				return _getErrorJSP(renderRequest, renderResponse);
 			}
 
 			String targetLanguageId = ParamUtil.getString(
@@ -165,9 +162,12 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 				TranslateDisplayContext.class.getName(),
 				new TranslateDisplayContext(
 					availableSourceLanguageIds, availableTargetLanguageIds,
-					() -> _translator != null,
-					translationRequestHelper.getModelClassName(),
-					translationRequestHelper.getModelClassPK(), infoForm,
+					() ->
+						(_translator != null) &&
+						_translator.isEnabled(themeDisplay.getCompanyId()),
+					TranslationRequestUtil.getModelClassName(renderRequest),
+					TranslationRequestUtil.getModelClassPK(renderRequest),
+					_ffLayoutExperienceSelectorConfiguration, infoForm,
 					_portal.getLiferayPortletRequest(renderRequest),
 					_portal.getLiferayPortletResponse(renderResponse), object,
 					segmentsExperienceId, sourceInfoItemFieldValues,
@@ -181,13 +181,21 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 		}
 	}
 
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_ffLayoutExperienceSelectorConfiguration =
+			ConfigurableUtil.createConfigurable(
+				FFLayoutExperienceSelectorConfiguration.class, properties);
+	}
+
 	private <T> List<String> _getAvailableTargetLanguageIds(
 			String className, T object, String sourceLanguageId,
 			ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		InfoItemPermissionProvider infoItemPermissionProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemPermissionProvider.class, className);
 
 		if (infoItemPermissionProvider == null) {
@@ -197,20 +205,21 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 		boolean hasUpdatePermission = infoItemPermissionProvider.hasPermission(
 			themeDisplay.getPermissionChecker(), object, ActionKeys.UPDATE);
 
-		return TransformUtil.transform(
-			_language.getAvailableLocales(themeDisplay.getSiteGroupId()),
-			locale -> {
-				String languageId = LocaleUtil.toLanguageId(locale);
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(
+			themeDisplay.getSiteGroupId());
 
-				if (!Objects.equals(languageId, sourceLanguageId) &&
-					(hasUpdatePermission ||
-					 _hasTranslatePermission(languageId, themeDisplay))) {
+		Stream<Locale> stream = availableLocales.stream();
 
-					return languageId;
-				}
-
-				return null;
-			});
+		return stream.map(
+			LocaleUtil::toLanguageId
+		).filter(
+			languageId ->
+				!Objects.equals(languageId, sourceLanguageId) &&
+				(hasUpdatePermission ||
+				 _hasTranslatePermission(languageId, themeDisplay))
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private String _getDefaultTargetLanguageId(
@@ -224,21 +233,24 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	private String _getErrorJSP(
-			RenderRequest renderRequest, RenderResponse renderResponse,
-			long segmentsExperienceId,
-			TranslationRequestHelper translationRequestHelper)
-		throws PortalException {
+		RenderRequest renderRequest, RenderResponse renderResponse) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		renderRequest.setAttribute(
 			TranslateDisplayContext.class.getName(),
 			new TranslateDisplayContext(
 				Collections.emptyList(), Collections.emptyList(),
-				() -> _translator != null,
-				translationRequestHelper.getModelClassName(),
-				translationRequestHelper.getModelClassPK(), null,
+				() ->
+					(_translator != null) &&
+					_translator.isEnabled(themeDisplay.getCompanyId()),
+				TranslationRequestUtil.getModelClassName(renderRequest),
+				TranslationRequestUtil.getModelClassPK(renderRequest),
+				_ffLayoutExperienceSelectorConfiguration, null,
 				_portal.getLiferayPortletRequest(renderRequest),
 				_portal.getLiferayPortletResponse(renderResponse), null,
-				segmentsExperienceId, null, null, null, null,
+				SegmentsExperienceConstants.ID_DEFAULT, null, null, null, null,
 				_translationInfoFieldChecker));
 
 		return "/translate.jsp";
@@ -247,7 +259,7 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 	private Object _getInfoItem(String className, long classPK) {
 		try {
 			InfoItemObjectProvider<Object> infoItemObjectProvider =
-				_infoItemServiceRegistry.getFirstInfoItemService(
+				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemObjectProvider.class, className);
 
 			if (infoItemObjectProvider == null) {
@@ -258,7 +270,7 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 		}
 		catch (NoSuchInfoItemException noSuchInfoItemException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchInfoItemException);
+				_log.debug(noSuchInfoItemException, noSuchInfoItemException);
 			}
 
 			return null;
@@ -269,7 +281,7 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 		String className, T object) {
 
 		InfoItemFieldValuesProvider<T> infoItemFieldValuesProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class, className);
 
 		if (infoItemFieldValuesProvider == null) {
@@ -297,19 +309,26 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 				translationEntry.getGroupId(), translationEntry.getClassName(),
 				translationEntry.getClassPK(), translationEntry.getContent());
 
+		Collection<InfoFieldValue<Object>> infoFieldValues =
+			infoItemFieldValues.getInfoFieldValues();
+
+		Stream<InfoFieldValue<Object>> stream = infoFieldValues.stream();
+
 		return InfoItemFieldValues.builder(
 		).infoItemReference(
 			infoItemFieldValues.getInfoItemReference()
 		).infoFieldValues(
-			TransformUtil.transform(
-				infoItemFieldValues.getInfoFieldValues(),
+			stream.map(
 				infoFieldValue -> new InfoFieldValue<>(
 					infoFieldValue.getInfoField(),
 					GetterUtil.getObject(
 						_getValue(
 							translationEntryInfoItemFieldValues,
 							infoFieldValue.getInfoField()),
-						infoFieldValue.getValue())))
+						infoFieldValue.getValue()))
+			).collect(
+				Collectors.toList()
+			)
 		).build();
 	}
 
@@ -319,7 +338,7 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 
 		InfoFieldValue<Object> infoFieldValue =
 			translationEntryInfoItemFieldValues.getInfoFieldValue(
-				infoField.getUniqueId());
+				infoField.getName());
 
 		if (infoFieldValue != null) {
 			return infoFieldValue.getValue();
@@ -344,17 +363,14 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 	private static final Log _log = LogFactoryUtil.getLog(
 		TranslateMVCRenderCommand.class);
 
-	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private volatile FFLayoutExperienceSelectorConfiguration
+		_ffLayoutExperienceSelectorConfiguration;
 
 	@Reference
-	private Language _language;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@Reference
 	private TranslationEntryLocalService _translationEntryLocalService;
@@ -362,9 +378,11 @@ public class TranslateMVCRenderCommand implements MVCRenderCommand {
 	@Reference
 	private TranslationInfoFieldChecker _translationInfoFieldChecker;
 
-	private Translator _translator;
-
-	@Reference
-	private TranslatorRegistry _translatorRegistry;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile Translator _translator;
 
 }

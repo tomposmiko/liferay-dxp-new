@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Sites Administration";
+	property testray.main.component.name = "Site Administration";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -14,7 +14,7 @@ definition {
 
 		task ("Add two sites via JSON") {
 			for (var n : list "1,2") {
-				HeadlessSite.addSite(siteName = "Test Site Name ${n}");
+				JSONGroup.addGroup(groupName = "Test Site Name ${n}");
 			}
 		}
 
@@ -50,7 +50,7 @@ definition {
 		}
 
 		task ("Add a content page from the page template to the first site") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-1-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-1-staging");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -59,11 +59,11 @@ definition {
 		}
 
 		task ("Publish the content page") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a content page with a Title fragment to the first site") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-1-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-1-staging");
 
 			ContentPages.addPage(pageName = "Test Regular Content Page");
 
@@ -73,7 +73,7 @@ definition {
 		}
 
 		task ("Publish the content page") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a navigation menu to the first site") {
@@ -85,7 +85,7 @@ definition {
 		task ("Add both content pages to the navigation menu") {
 			NavigationMenusAdmin.addItem(
 				item = "Page",
-				pageNameList = "Test Template Content Page,Test Regular Content Page");
+				pageNames = "Test Template Content Page,Test Regular Content Page");
 		}
 
 		task ("Add a URL item to the navigation menu") {
@@ -134,6 +134,7 @@ definition {
 				contributed = "false",
 				field = "Title",
 				fragmentName = "Title",
+				id = "title",
 				source = "Basic Web Content (Default)");
 		}
 
@@ -142,6 +143,7 @@ definition {
 				contributed = "false",
 				field = "Content",
 				fragmentName = "Rich Text",
+				id = "rich-text",
 				source = "Basic Web Content (Default)");
 		}
 
@@ -175,7 +177,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -186,11 +188,10 @@ definition {
 	}
 
 	@description = "Export a live site into a different staging site. This test is focused on modern site building features. The high level steps of this test are outlined in LRQA-44517."
-	@priority = 5
+	@priority = "5"
 	test ImportLiveSiteToStagingSite {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SitesExportImportWithStaging#ImportLiveSiteToStagingSite";
-		property timeout.explicit.wait = "30";
 
 		task ("Export the first site") {
 			LAR.openExportAdmin(siteScopeName = "test-site-name-1");
@@ -203,11 +204,6 @@ definition {
 		}
 
 		task ("Import the first site's lar into the staging site for the second site") {
-			JSONLayoututilitypage.deleteLayoutUtilityPage(
-				groupName = "Test Site Name 2 (Staging)",
-				layoutUtilityPageName = "404 Error",
-				site = "false");
-
 			LAR.openImportAdmin(siteName = "test-site-name-2-staging");
 
 			LexiconEntry.gotoAdd();
@@ -254,16 +250,13 @@ definition {
 
 			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Page Template Name");
 
-			var n = 1;
+			AssertVisible(
+				key_content = "Submit",
+				key_fragmentClass = "footer",
+				locator1 = "Fragment#FRAGMENT");
 
-			for (var text : list "Submit,Cancel") {
-				PageEditor.viewFragmentEditableText(
-					contributed = "false",
-					editableText = ${text},
-					fragmentName = "Button",
-					position = ${n});
-
-				var n = ${n} + 1;
+			for (var button : list "Submit,Cancel") {
+				Button.viewPresent(button = "${button}");
 			}
 		}
 
@@ -274,26 +267,23 @@ definition {
 				key_pageName = "Test Template Content Page",
 				locator1 = "Home#PAGE");
 
-			var n = 1;
+			AssertVisible(
+				key_content = "Submit",
+				key_fragmentClass = "footer",
+				locator1 = "Fragment#FRAGMENT");
 
-			for (var text : list "Submit,Cancel") {
-				ContentPages.viewFragmentText(
-					contributed = "false",
-					fragmentName = "button",
-					position = ${n},
-					text = ${text});
-
-				var n = ${n} + 1;
+			for (var button : list "Submit,Cancel") {
+				Button.viewPresent(button = "${button}");
 			}
 
 			Click(
 				key_pageName = "Test Regular Content Page",
 				locator1 = "Home#PAGE");
 
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "title",
-				text = "Lorem ipsum dolor sit amet");
+			AssertVisible(
+				key_content = "Lorem ipsum dolor sit amet",
+				key_fragmentClass = "header",
+				locator1 = "Fragment#FRAGMENT");
 
 			AssertVisible(
 				key_href = "https://www.liferay.com/",
@@ -318,15 +308,15 @@ definition {
 		task ("Assert the web content article and its reference to its display page survived the import") {
 			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name-2-staging/w/webcontent-title");
 
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "title",
-				text = "Webcontent Title");
+			AssertVisible(
+				key_content = "Webcontent Title",
+				key_fragmentClass = "header",
+				locator1 = "Fragment#FRAGMENT");
 
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "rich-text",
-				text = "Webcontent Content");
+			AssertVisible(
+				key_content = "Webcontent Content",
+				key_fragmentClass = "rich-text",
+				locator1 = "Fragment#FRAGMENT");
 		}
 	}
 

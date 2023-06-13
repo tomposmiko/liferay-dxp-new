@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
-	property = "workflow.metrics.index.entity.name=process",
+	immediate = true, property = "workflow.metrics.index.entity.name=process",
 	service = WorkflowMetricsIndex.class
 )
 public class ProcessWorkflowMetricsIndexImpl

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -62,7 +61,7 @@ public class Error implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Error.class, json);
 	}
 
-	@Schema(description = "Internal error code mapping", example = "996")
+	@Schema(description = "Internal error code mapping")
 	public Integer getErrorCode() {
 		return errorCode;
 	}
@@ -91,9 +90,7 @@ public class Error implements Serializable {
 	@NotNull
 	protected Integer errorCode;
 
-	@Schema(
-		example = "Unable to find currency. Currency code should be expressed with 3-letter ISO 4217 format."
-	)
+	@Schema
 	public String getErrorDescription() {
 		return errorDescription;
 	}
@@ -122,9 +119,7 @@ public class Error implements Serializable {
 	@NotEmpty
 	protected String errorDescription;
 
-	@Schema(
-		example = "No CommerceCurrency exists with the key {catalogId=41811, code=US Dollar}"
-	)
+	@Schema
 	public String getMessage() {
 		return message;
 	}
@@ -153,7 +148,7 @@ public class Error implements Serializable {
 	@NotEmpty
 	protected String message;
 
-	@Schema(description = "HTTP Status code", example = "404")
+	@Schema(description = "HTTP Status code")
 	public Integer getStatus() {
 		return status;
 	}
@@ -270,9 +265,9 @@ public class Error implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -298,7 +293,7 @@ public class Error implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -330,7 +325,7 @@ public class Error implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -346,10 +341,5 @@ public class Error implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

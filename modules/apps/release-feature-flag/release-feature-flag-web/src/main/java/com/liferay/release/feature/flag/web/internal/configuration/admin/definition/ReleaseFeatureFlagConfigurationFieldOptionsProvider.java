@@ -15,20 +15,21 @@
 package com.liferay.release.feature.flag.web.internal.configuration.admin.definition;
 
 import com.liferay.configuration.admin.definition.ConfigurationFieldOptionsProvider;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.release.feature.flag.ReleaseFeatureFlag;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"configuration.field.name=disabledReleaseFeatureFlags",
 		"configuration.pid=com.liferay.release.feature.flag.web.internal.configuration.ReleaseFeatureFlagConfiguration"
@@ -40,13 +41,14 @@ public class ReleaseFeatureFlagConfigurationFieldOptionsProvider
 
 	@Override
 	public List<Option> getOptions() {
-		return TransformUtil.transformToList(
-			ReleaseFeatureFlag.values(),
+		return Stream.of(
+			ReleaseFeatureFlag.values()
+		).map(
 			releaseFeatureFlag -> new Option() {
 
 				@Override
 				public String getLabel(Locale locale) {
-					return _language.get(
+					return LanguageUtil.get(
 						locale,
 						"release-feature-flag[" + releaseFeatureFlag + "]");
 				}
@@ -56,10 +58,10 @@ public class ReleaseFeatureFlagConfigurationFieldOptionsProvider
 					return releaseFeatureFlag.toString();
 				}
 
-			});
+			}
+		).collect(
+			Collectors.toList()
+		);
 	}
-
-	@Reference
-	private Language _language;
 
 }

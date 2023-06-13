@@ -3,122 +3,108 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testcase.url = "http://localhost:8080";
 	property testray.main.component.name = "Content Pages";
 
-	static var randomSiteName = StringUtil.randomString(8);
-
-	var siteURLKey = StringUtil.toLowerCase(${randomSiteName});
-
 	setUp {
-		task ("Sign in") {
+		task ("Set up instance and sign in") {
+			TestCase.setUpPortalInstance();
+
 			User.firstLoginPG();
 		}
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = ${randomSiteName});
+		task ("Add a site via JSON") {
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				layoutName = "Test Content Page Name",
 				type = "content");
 		}
 	}
 
-	@description = "This is a test for LPS-154530. The page designer can add negative values on spacing from style books."
-	@priority = 4
-	test AddNegativeValueOnSpacing {
-		task ("Given a page designer has a content page with selected custom style books") {
-			task ("Add a style book") {
-				StyleBooksAdmin.openStyleBooksAdmin(siteURLKey = ${siteURLKey});
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-				StyleBooksAdmin.addStyleBooks(styleBookName = "Test Style Book Name");
-			}
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
 
-			task ("Add negative value on Spacing") {
-				StyleBooks.selectForm(formName = "Spacing");
-
-				StyleBooks.expandSection(sectionName = "Spacing");
-
-				StyleBooks.configureUnit(
-					fieldLabel = "Spacer 1",
-					unit = "PX");
-
-				Type(
-					ariaLabel = "Spacer 1",
-					locator1 = "TextInput#ANY_WITH_AIRA_LABEL",
-					value1 = "-32");
-
-				StyleBooks.clickManagementBar();
-
-				StyleBooks.waitForAutoSave();
-
-				StyleBooks.clickPublish();
-			}
-
-			task ("Add a Button fragment to content page") {
-				ContentPagesNavigator.openEditContentPage(
-					pageName = "Test Content Page Name",
-					siteName = ${randomSiteName});
-
-				PageEditor.addFragment(
-					collectionName = "Basic Components",
-					fragmentName = "Button");
-			}
-
-			task ("Apply the new style book to content page") {
-				PageEditor.gotoTab(tabName = "Page Design Options");
-
-				Navigator.gotoNavTab(navTab = "Style Book");
-
-				StyleBooks.selectStyleBookViaPageDesignOptions(styleBookName = "Test Style Book Name");
-			}
+	@description = "This is a test for LPS-134599. The fragmentElementId variable will have the same value with the id of wrapping div in a fragment on page."
+	@priority = "4"
+	test AddFragmentWithFreemarkerVariableToContentPage {
+		task ("Add a fragment collection") {
+			JSONFragment.addFragmentCollection(
+				groupName = "Test Site Name",
+				name = "Collection Name");
 		}
 
-		task ("When the page designer selects a negative value on spacing") {
-			PageEditor.gotoStyle(fragmentName = "Button");
+		task ("Add a fragment with fragmentElementId and fragmentEntryLinkNamespace freemarker variables") {
+			var newLine = '''
+''';
 
-			PageEditor.configureFragment(marginTop = 1);
+			var htmlSnippet = '''
+<div class="gf-1">
+	<h1>${fragmentElementId}</h1>
+	<h1>${fragmentEntryLinkNamespace}</h1>
+</div>
+			''';
+			var htmlSnippet = StringUtil.regexReplaceAll("${htmlSnippet}", "${newLine}", "");
+
+			var fragmentEntryId = JSONFragment.addSection(
+				collectionName = "Collection Name",
+				fragmentStatus = "Approved",
+				groupName = "Test Site Name",
+				html = "${htmlSnippet}",
+				name = "Fragment Name");
 		}
 
-		task ("Then the page designer can see negative style on button fragment at edit mode") {
-			AssertCssValue(
-				index = 1,
-				key_fragmentName = "Button",
-				locator1 = "Fragment#FRAGMENT_LABEL",
-				locator2 = "margin-top",
-				value1 = "-32px");
-		}
-
-		task ("When the page designer accesses published content page at view mode") {
-			PageEditor.publish();
-
-			ContentPagesNavigator.openViewContentPage(
+		task ("Add a new fragment to page") {
+			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
+
+			PageEditor.addFragment(
+				collectionName = "Collection Name",
+				fragmentName = "Fragment Name");
 		}
 
-		task ("Then the page designer can see negative style on button fragment at view mode") {
-			AssertCssValue(
-				fragmentName = "layout-content",
-				index = 1,
-				locator1 = "PageEditor#COMMON_STYLES_CLASS",
-				locator2 = "margin-top",
-				value1 = "-32px");
+		task ("Get the fragmentEntryLinkNamespace") {
+			var fragmentEntryLinkNamespace = selenium.getText("xpath=(//div[@class='gf-1']/h1)[2]");
+
+			TestUtils.assertNotEquals(
+				actual = "${fragmentEntryLinkNamespace}",
+				expected = "");
+		}
+
+		task ("View the id of wrapping div equals fragment-fragmentEntryId-fragmentEntryLinkNamespace equals the fragmentElementId") {
+			AssertAttributeValue(
+				attribute1 = "id",
+				locator1 = "//div[@class='gf-1']/parent::div",
+				value1 = "fragment-${fragmentEntryId}-${fragmentEntryLinkNamespace}");
+
+			var fragmentElementId = selenium.getText("xpath=(//div[@class='gf-1']/h1)[1]");
+
+			TestUtils.assertEquals(
+				actual = "${fragmentElementId}",
+				expected = "fragment-${fragmentEntryId}-${fragmentEntryLinkNamespace}");
 		}
 	}
 
 	@description = "Users can only edit content pages in edit mode."
-	@priority = 5
+	@priority = "5"
 	test CannotEditInViewMode {
 		property portal.acceptance = "true";
 
 		task ("Navigate to the content page") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 		}
 
 		task ("Assert the page cannot be edited in 'View Mode' by asserting the fragments side bar is not present") {
@@ -143,21 +129,19 @@ definition {
 	}
 
 	@description = "This is a test for LPS-125985. The Page Creater can configure configuration template of widget in page editor."
-	@priority = 5
+	@priority = "5"
 	test ConfigureConfigurationTemplateOfAssetPublisherInPageEditor {
-		property portal.acceptance = "true";
-
 		task ("Add a web content") {
 			JSONWebcontent.addWebContent(
 				content = "Web Content Content",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				title = "Web Content Title");
 		}
 
 		task ("Add an Asset Publisher widget to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addWidget(portletName = "Asset Publisher");
 		}
@@ -240,14 +224,14 @@ definition {
 	}
 
 	@description = "This is a test for LPS-106813. Can set permissions for widgets in content page."
-	@priority = 5
+	@priority = "5"
 	test ConfigurePermissionsOfAssetPublisher {
 		property portal.acceptance = "true";
 
 		task ("Add an Asset Publisher widget to the content page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addWidget(portletName = "Asset Publisher");
 		}
@@ -269,11 +253,11 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked.assertCheckedNotVisible(
+			AssertChecked(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			Uncheck.uncheckNotVisible(
+			Uncheck(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -285,13 +269,13 @@ definition {
 		}
 
 		task ("Publish the content page") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the ellipsis button of Asset Publisher is unavailable in view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertElementNotPresent(
 				key_portletName = "Asset Publisher",
@@ -299,399 +283,239 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-137155. The page creator can configure content page via header ellipsis icon at edit mode."
-	@priority = 3
-	test ConfigureViaHeaderEllipsisIcon {
-		task ("Given a page designer has content page in pages admin") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			PagesAdmin.viewPageItemPresent(pageName = "Test Content Page Name");
-		}
-
-		task ("When the page designer renames page via header ellipsis icon at edit mode") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
-
-			LexiconEntry.gotoHeaderMenuItem(menuItem = "Configure");
-
-			SelectWindow.selectPopUp(locator1 = "null");
-
-			PortletEntry.inputName(name = "Test Page Name Edited");
-
-			PortletEntry.save();
-
-			Close.closeWindow();
-		}
-
-		task ("Then the page designer can see new page name in pages admin") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			PagesAdmin.viewPageItemPresent(pageName = "Test Page Name Edited");
-		}
-	}
-
-	@description = "This is a test for LPS-137155. The page creator can delete content page via header ellipsis icon at edit mode."
-	@priority = 3
-	test DeleteViaHeaderEllipsisIcon {
-		task ("Given a page designer has content page in pages admin") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			PagesAdmin.viewPageItemPresent(pageName = "Test Content Page Name");
-		}
-
-		task ("When the page designer deletes the page via header ellipsis icon at edit mode") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
-
-			LexiconEntry.gotoHeaderMenuItem(menuItem = "Delete");
-
-			AssertTextEquals(
-				locator1 = "Modal#BODY",
-				value1 = "Are you sure you want to delete the page \"Test Content Page Name\"? It will be removed immediately.");
-
-			Click(
-				key_text = "Delete",
-				locator1 = "Modal#MODAL_FOOTER_BUTTON");
-		}
-
-		task ("Then the page designer should not see the page in pages admin") {
-			ControlMenu.viewHeaderTitle(headerTitle = "Pages");
-
-			AssertTextEquals(
-				locator1 = "Message#EMPTY_INFO_TAGLIB_TITLE",
-				value1 = "No Pages yet.");
-		}
-	}
-
-	@description = "This is a test for LPS-78726 and LPS-168168. Discarding a draft will revert a content page back to its most recent published version."
-	@priority = 5
+	@description = "This is a test for LPS-78726. Discarding a draft will revert a content page back to its most recent published version."
+	@priority = "5"
 	test DiscardContentPageDraft {
 		property portal.acceptance = "true";
 
-		task ("Given a page designer has a draft content page without any content") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-		}
-
-		task ("When the page designer accesses to the page editor") {
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Edit",
-				pageName = "Test Content Page Name");
-
-			PageEditor.assertFragmentSidebarLoaded();
-		}
-
-		task ("Then the page designer see the Discard Draft button is disabled but the Publish button is enabled") {
-			AssertVisible(
-				key_text = "Publish",
-				locator1 = "Button#ANY_ENABLED");
-
-			AssertVisible(
-				key_text = "Discard Draft",
-				locator1 = "Button#ANY_DISABLED");
-		}
-
-		task ("When the page designer accesses to the Pages admin") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			WaitForPageLoad();
-		}
-
-		task ("Then the page designer cannot see the Discard Draft action on dropdown menu of page item") {
-			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
-
-			MenuItem.viewNotPresent(menuItem = "Discard Draft");
-		}
-
-		task ("When the page designer makes some changes in page editor") {
-			MenuItem.click(menuItem = "Edit");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-		}
-
-		task ("Then the page designer could discard draft in page editor") {
-			PageEditor.discardDraft();
-
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Edit",
-				pageName = "Test Content Page Name");
-
-			PageEditor.viewFragmentNotPresent(fragmentName = "Heading");
-
-			AssertVisible(
-				key_text = "Publish",
-				locator1 = "Button#ANY_ENABLED");
-
-			AssertVisible(
-				key_text = "Discard Draft",
-				locator1 = "Button#ANY_DISABLED");
-		}
-
-		task ("When the page designer makes some changes in page editor") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-		}
-
-		task ("Then the page designer could discard draft in the Pages admin") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			PagesAdmin.discardDraft(pageName = "Test Content Page Name");
-
-			PagesAdmin.viewPageStatus(
-				index = 1,
+		task ("Assert the Discard Draft button starts off not shown but Publish button starts off enabled") {
+			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				status = "Draft");
-
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Edit",
-				pageName = "Test Content Page Name");
-
-			PageEditor.viewFragmentNotPresent(fragmentName = "Heading");
+				siteName = "Test Site Name");
 
 			AssertVisible(
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			AssertVisible(
-				key_text = "Discard Draft",
-				locator1 = "Button#ANY_DISABLED");
-
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewNotPresent(menuItem = "Discard Draft");
 		}
 
-		task ("When the page designer makes some changes on a published content page") {
-			MenuItem.click(menuItem = "Edit");
+		task ("Add a Heading fragment to the content page") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
 				fragmentName = "Heading");
-
-			PageEditor.publish();
-
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Edit",
-				pageName = "Test Content Page Name");
-
-			PageEditor.editFragmentText(
-				fragmentName = "Heading",
-				id = "element-text",
-				text = "New editable fragment text");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Paragraph",
-				targetFragmentName = "Heading");
 		}
 
-		task ("Then the page designer could discard draft in page editor") {
-			PageEditor.discardDraft();
+		task ("Discard the draft") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Edit",
-				pageName = "Test Content Page Name");
-
-			PageEditor.viewFragmentEditableText(
-				editableText = "Heading Example",
-				fragmentName = "Heading",
-				id = "element-text");
-
-			PageEditor.viewFragmentNotPresent(fragmentName = "Paragraph");
-
-			AssertVisible(
-				key_text = "Publish",
-				locator1 = "Button#ANY_ENABLED");
-
-			AssertVisible(
-				key_text = "Discard Draft",
-				locator1 = "Button#ANY_DISABLED");
+			PageEditor.clickDiscardDraft(pageName = "Test Content Page Name");
 		}
 
-		task ("When the page designer makes some changes in page editor") {
-			PageEditor.editFragmentText(
-				fragmentName = "Heading",
-				id = "element-text",
-				text = "New editable fragment text");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Paragraph",
-				targetFragmentName = "Heading");
-		}
-
-		task ("Then the page designer could discard draft in the Pages admin") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			PagesAdmin.discardDraft(pageName = "Test Content Page Name");
+		task ("Assert the Title fragment is no longer present") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
 			AssertElementNotPresent(
-				index = 1,
-				key_itemName = "Test Content Page Name",
-				locator1 = "PagesAdmin#LIST_GROUP_ITEM_PAGE_STATUS");
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#FRAGMENT_HEADER");
+		}
 
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Edit",
-				pageName = "Test Content Page Name");
+		task ("Assert the Discard Draft button is not shown but Publish button still is enabled") {
+			AssertVisible(
+				key_text = "Publish",
+				locator1 = "Button#ANY_ENABLED");
+
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			WaitForPageLoad();
+
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+
+			MenuItem.viewNotPresent(menuItem = "Discard Draft");
+		}
+
+		task ("Add a Heading fragment to the content page") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
+
+			PageEditor.addFragment(
+				collectionName = "Basic Components",
+				fragmentName = "Heading");
+		}
+
+		task ("Assert the Discard Draft is shown and Publish button is now enabled") {
+			AssertVisible(
+				key_text = "Publish",
+				locator1 = "Button#ANY_ENABLED");
+
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			WaitForPageLoad();
+
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+
+			MenuItem.viewPresent(menuItem = "Discard Draft");
+		}
+
+		task ("Publish the content page") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
+
+			PageEditor.clickPublish();
+		}
+
+		task ("Navigate to the content page in Edit mode") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
+		}
+
+		task ("Assert the Discard Draft button is not shown but Publish button is enabled") {
+			AssertVisible(
+				key_text = "Publish",
+				locator1 = "Button#ANY_ENABLED");
+
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			WaitForPageLoad();
+
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+
+			MenuItem.viewNotPresent(menuItem = "Discard Draft");
+		}
+
+		task ("Edit inline content of Heading") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
+
+			PageEditor.editFragmentText(
+				fragmentName = "Heading",
+				id = "element-text",
+				text = "New editable fragment text");
+		}
+
+		task ("Assert the Discard Draft is shown and Publish button is now enabled") {
+			AssertVisible(
+				key_text = "Publish",
+				locator1 = "Button#ANY_ENABLED");
+
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			WaitForPageLoad();
+
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+
+			MenuItem.viewPresent(menuItem = "Discard Draft");
+		}
+
+		task ("Discard the draft") {
+			MenuItem.clickNoError(menuItem = "Discard Draft");
+
+			AssertConfirm(value1 = "Are you sure you want to discard current draft and apply latest published changes?");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("Assert the inline content is back to default") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
 			PageEditor.viewFragmentEditableText(
 				editableText = "Heading Example",
 				fragmentName = "Heading",
 				id = "element-text");
+		}
 
-			PageEditor.viewFragmentNotPresent(fragmentName = "Paragraph");
-
+		task ("Assert the Discard Draft button is not shown but Publish button still is enabled") {
 			AssertVisible(
 				key_text = "Publish",
 				locator1 = "Button#ANY_ENABLED");
 
-			AssertVisible(
-				key_text = "Discard Draft",
-				locator1 = "Button#ANY_DISABLED");
-
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			WaitForPageLoad();
 
-			PagesAdmin.openPageEllipsisMenu(pageName = "Test Content Page Name");
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+
+			MenuItem.viewNotPresent(menuItem = "Discard Draft");
+		}
+
+		task ("Add a Paragraph fragment to the content page") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
+
+			PageEditor.addFragment(
+				collectionName = "Basic Components",
+				fragmentName = "Paragraph",
+				targetFragmentName = "Heading");
+		}
+
+		task ("Assert the Discard Draft is shown and Publish button is now enabled") {
+			AssertVisible(
+				key_text = "Publish",
+				locator1 = "Button#ANY_ENABLED");
+
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			WaitForPageLoad();
+
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
+
+			MenuItem.viewPresent(menuItem = "Discard Draft");
+		}
+
+		task ("Discard the draft") {
+			MenuItem.clickNoError(menuItem = "Discard Draft");
+
+			AssertConfirm(value1 = "Are you sure you want to discard current draft and apply latest published changes?");
+
+			Alert.viewSuccessMessage();
+		}
+
+		task ("Assert the Paragraph fragment has been removed") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
+
+			AssertElementNotPresent(
+				key_fragmentName = "Paragraph",
+				locator1 = "Fragment#FRAGMENT_HEADER");
+		}
+
+		task ("Assert the Discard Draft button is not shown but Publish button still is enabled") {
+			AssertVisible(
+				key_text = "Publish",
+				locator1 = "Button#ANY_ENABLED");
+
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+			WaitForPageLoad();
+
+			SitePages.clickPageMenu(pageName = "Test Content Page Name");
 
 			MenuItem.viewNotPresent(menuItem = "Discard Draft");
 		}
 	}
 
-	@description = "This is a test for LPS-159751. The page editor should be rendered after reset changes from site template."
-	@priority = 4
-	test EditContentPageAfterResetChangesFromSiteTemplate {
-		property ci.retries.disabled = "true";
-
-		var siteName = StringUtil.randomString(8);
-
-		var siteURLKey = StringUtil.toLowerCase(${siteName});
-		var siteTemplateName = StringUtil.randomString(8);
-
-		task ("Given a page creator has a site based on a site template") {
-			task ("Add a site template") {
-				JSONSiteTemplate.addSiteTemplate(
-					description = "It is a site template",
-					siteTemplateName = ${siteTemplateName});
-			}
-
-			task ("Add a master template on Site Template") {
-				SiteTemplatesNavigator.openSiteTemplatesAdmin();
-
-				LexiconEntry.gotoEntryMenuItem(
-					menuItem = "Manage",
-					rowEntry = ${siteTemplateName});
-
-				ProductMenu.gotoPortlet(
-					category = "Design",
-					portlet = "Page Templates");
-
-				MastersPageTemplatesAdmin.addMasters(masterLayoutName = "Custom Masters Page Template");
-			}
-
-			task ("Add a Button fragment to master template") {
-				PageEditor.addFragment(
-					collectionName = "Basic Components",
-					dropTarget = "Header",
-					fragmentName = "Button",
-					scope = "Master");
-
-				MastersPageTemplates.publishMaster();
-			}
-
-			task ("Select the master page template to Home page") {
-				ProductMenu.gotoPortlet(
-					category = "Site Builder",
-					portlet = "Pages");
-
-				PagesAdmin.gotoPageEllipsisMenuItem(
-					menuItem = "Edit",
-					pageName = "Home");
-
-				PageEditor.gotoTab(tabName = "Page Design Options");
-
-				Navigator.gotoNavTab(navTab = "Master");
-
-				MastersPageTemplates.selectMasterViaPageDesignOptions(masterLayoutName = "Custom Masters Page Template");
-
-				PageEditor.publish();
-			}
-
-			task ("Add a new site based on site template") {
-				HeadlessSite.addSite(
-					siteName = ${siteName},
-					templateName = ${siteTemplateName},
-					templateType = "Site Template");
-			}
-
-			task ("Delete the Button fragment of master template") {
-				ApplicationsMenu.gotoPortlet(
-					category = "Sites",
-					panel = "Control Panel",
-					portlet = "Sites");
-
-				LexiconTable.clickEllipsisItem(
-					item = "Go to Pages",
-					tableEntry = ${siteName});
-
-				SelectWindow.selectPopUp(locator1 = "null");
-
-				ContentPages.gotoPageEditor();
-
-				PageEditor.gotoTab(tabName = "Page Design Options");
-
-				Click(locator1 = "PageEditor#MORE_LINK");
-
-				WaitForPageLoad();
-
-				Navigator.gotoNavTab(navTab = "Design");
-
-				Click(
-					ariaLabel = "Edit Master",
-					locator1 = "Link#ANY_WITH_ARIA_LABEL");
-
-				PageEditor.removeFragment(fragmentName = "Button");
-			}
-
-			task ("Propagate change to master page template") {
-				MastersPageTemplates.propagateChange();
-			}
-
-			task ("Publish the page") {
-				ContentPagesNavigator.openEditContentPage(
-					pageName = "Home",
-					siteName = ${siteName});
-
-				PageEditor.publish();
-			}
-		}
-
-		task ("When the page creator resets the changes from site template") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Home",
-				siteName = ${siteName});
-
-			SiteTemplates.resetPageChanges();
-		}
-
-		task ("Then the page creator could access the page editor of content page") {
-			ContentPages.gotoPageEditor();
-
-			AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
-		}
-	}
-
-	@description = "This is a test for LPS-134844 and LPS-106776. Fragments can be hidden and shown. Could add widget to react page editor."
-	@priority = 5
+	@description = "This is a test for LPS-134844. Fragments can be hidden and shown."
+	@priority = "5"
 	@uitest
 	test FragmentsCanBeHiddenAndShown {
 		property portal.acceptance = "true";
@@ -699,11 +523,10 @@ definition {
 		task ("Add a widgets to the page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addWidget(portletName = "Blogs");
 		}
-
 		task ("Add fragments to page") {
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -724,17 +547,17 @@ definition {
 		task ("Hide Blogs from topper options") {
 			PageEditor.hideFragmentViaHeader(fragmentName = "Blogs");
 		}
-
 		task ("Hide Button fragment from fragment options") {
 			PageEditor.hideFragmentViaPageStyles(fragmentName = "Button");
 		}
-
 		task ("Hide Heading fragment from the sidebar fragment tree") {
 			PageEditor.hideFragmentViaPageStructure(fragmentName = "Heading");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
+
+			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 		}
 
 		task ("Assert only html fragment is shown") {
@@ -742,32 +565,32 @@ definition {
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
-			AssertNotVisible(
-				fragmentName = "heading",
-				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+			AssertTextNotPresent(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
 
-			AssertNotVisible(
-				fragmentName = "button",
-				id = "link",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+			AssertTextNotPresent(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Go Somewhere");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "html",
-				id = "element-html",
-				text = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "html",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "HTML Example");
 		}
 
 		task ("Publish and enter view mode") {
-			Close.closeWindow();
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 		}
 
 		task ("Assert only html fragment is shown") {
@@ -775,38 +598,33 @@ definition {
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
-			AssertNotVisible(
-				fragmentName = "heading",
-				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+			AssertTextNotPresent(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
 
-			AssertNotVisible(
-				fragmentName = "button",
-				id = "link",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+			AssertTextNotPresent(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Go Somewhere");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "html",
-				id = "element-html",
-				text = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "html",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "HTML Example");
 		}
 
 		task ("Edit the page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 		}
-
 		task ("Unhide Blogs from the sidebar fragment tree") {
 			PageEditor.unhideFragmentViaPageStructure(fragmentName = "Blogs");
 		}
-
 		task ("Unhide Heading from fragment options") {
 			PageEditor.unhideFragmentViaPageStyles(fragmentName = "Heading");
 		}
-
 		task ("Unhide Button from sidebar fragment tree") {
 			PageEditor.unhideFragmentViaPageStructure(fragmentName = "Button");
 		}
@@ -814,50 +632,45 @@ definition {
 		task ("Publish and enter view mode") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 		}
 
 		task ("Assert the four fragments are shown") {
-			AssertTextEquals.assertPartialText(
+			AssertTextEquals(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Go Somewhere");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "html",
-				id = "element-html",
-				text = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "html",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "HTML Example");
 		}
 	}
 
 	@description = "This is a test for LPS-134844. Groups of fragments can be hidden and shown and Fragments added to a fragment with nested hidden fragment should be shown."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test GroupsOfFragmentsCanBeHiddenAndShown {
-		task ("Add a Container and 4 elements inside") {
-			JSONLayout.addPublicLayout(
-				groupName = ${randomSiteName},
-				layoutName = "Test Content Page Name",
-				type = "content");
-
+		task ("Add a container and 4 headings inside") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Layout Elements",
@@ -867,86 +680,79 @@ definition {
 				navTab = "Widgets",
 				portletName = "Blogs");
 
-			for (var fragmentName : list "HTML,Button,Heading") {
-				PageEditor.addElementToContainer(
-					collectionName = "Basic Components",
-					fragmentName = ${fragmentName},
-					height = "Tall",
-					navTab = "Fragments",
-					ratio = "11 / 10",
-					targetElementName = "Blogs");
-			}
+			PageEditor.addElementToContainer(
+				collectionName = "Basic Components",
+				fragmentName = "HTML",
+				navTab = "Fragments",
+				targetElementName = "Blogs");
+
+			PageEditor.addElementToContainer(
+				collectionName = "Basic Components",
+				fragmentName = "Button",
+				navTab = "Fragments",
+				targetElementName = "HTML");
+
+			PageEditor.addElementToContainer(
+				collectionName = "Basic Components",
+				fragmentName = "Heading",
+				navTab = "Fragments",
+				targetElementName = "Button");
 		}
 
 		task ("Hide Blogs and HTML") {
-			for (var elementName : list "Blogs,HTML") {
-				PageEditor.hideFragmentViaPageStructure(fragmentName = ${elementName});
-			}
-		}
-
-		task ("View Blogs widget and HTML fragment are not shown") {
-			for (var elementName : list "Blogs,HTML") {
-				PageEditor.viewFragmentNotVisible(fragmentName = ${elementName});
-			}
-		}
-
-		task ("View Button and Heading are shown") {
-			for (var fragmentName : list "Button,Heading") {
-				PageEditor.viewFragment(fragmentName = ${fragmentName});
-			}
+			PageEditor.hideFragmentViaPageStructure(fragmentName = "Blogs");
+			PageEditor.hideFragmentViaPageStructure(fragmentName = "HTML");
 		}
 
 		task ("Hide the container") {
 			PageEditor.hideFragmentViaHeader(fragmentName = "Container");
 		}
 
-		task ("View elements are not shown") {
-			AssertVisible(locator1 = "PageEditor#NO_FRAGMENTS_MESSAGE");
+		task ("Assert no fragment or widget is shown") {
+			PageEditor.viewNoFragment(fragmentName = "Container");
+			PageEditor.viewNoFragment(fragmentName = "Blogs");
+			PageEditor.viewNoFragment(fragmentName = "HTML");
+			PageEditor.viewNoFragment(fragmentName = "Button");
+			PageEditor.viewNoFragment(fragmentName = "Heading");
 		}
 
-		task ("Unhide the Container and HTML ") {
-			for (var fragmentName : list "Container,HTML") {
-				PageEditor.unhideFragmentViaPageStructure(fragmentName = ${fragmentName});
-			}
+		task ("From the sidebar fragment tree, show HTML and Button") {
+			PageEditor.unhideFragmentViaPageStructure(fragmentName = "HTML");
+
+			PageEditor.hideFragmentViaPageStructure(fragmentName = "Button");
 		}
 
-		task ("Hide the Button and Heading fragment") {
-			for (var fragmentName : list "Button,Heading") {
-				PageEditor.hideFragmentViaPageStructure(fragmentName = ${fragmentName});
-			}
-		}
-
-		task ("View Blogs, Button and Heading are not shown") {
-			for (var elementName : list "Blogs,Button,Heading") {
-				PageEditor.viewFragmentNotVisible(fragmentName = ${elementName});
-			}
-		}
-
-		task ("View HTML fragment is shown") {
-			PageEditor.viewFragment(fragmentName = "HTML");
-		}
-
-		task ("Hide the container") {
-			PageEditor.hideFragmentViaHeader(fragmentName = "Container");
-		}
-
-		task ("View elements are not shown") {
-			AssertVisible(locator1 = "PageEditor#NO_FRAGMENTS_MESSAGE");
+		task ("Assert no fragment or widget is shown") {
+			PageEditor.viewNoFragment(fragmentName = "Container");
+			PageEditor.viewNoFragment(fragmentName = "Blogs");
+			PageEditor.viewNoFragment(fragmentName = "HTML");
+			PageEditor.viewNoFragment(fragmentName = "Button");
+			PageEditor.viewNoFragment(fragmentName = "Heading");
 		}
 
 		task ("Unhide the container") {
 			PageEditor.unhideFragmentViaPageStructure(fragmentName = "Container");
 		}
 
-		task ("Assert only HTML fragments is shown") {
-			for (var elementName : list "Blogs,Button,Heading") {
-				PageEditor.viewFragmentNotVisible(fragmentName = ${elementName});
-			}
+		task ("Assert only Heading and HTML fragments are shown") {
+			AssertTextNotPresent(
+				locator1 = "Message#EMPTY_INFO",
+				value1 = "No entries were found.");
 
-			PageEditor.viewFragmentEditableText(
-				editableText = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.",
-				fragmentName = "HTML",
-				id = "element-html");
+			AssertTextNotPresent(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Go Somewhere");
+
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
+
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "html",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "HTML Example");
 		}
 
 		task ("Add fragment and check it's shown") {
@@ -955,30 +761,25 @@ definition {
 				dropTarget = "Up",
 				fragmentName = "Paragraph",
 				navTab = "Fragments",
-				targetElementName = "HTML");
+				targetElementName = "Blogs");
 
-			PageEditor.viewFragmentEditableText(
-				editableText = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.",
-				fragmentName = "Paragraph",
-				id = "element-text");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "paragraph",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "A paragraph is a self-contained unit of a discourse");
 		}
 	}
 
 	@description = "This is a test for LPS-109169. Topper only visible when the element is selected but not hover."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test HeaderOnlyShownWhenElementSelected {
 		property portal.acceptance = "true";
 
 		task ("Add a Heading fragment and an Asset Publisher portlet to page") {
-			JSONLayout.addPublicLayout(
-				groupName = ${randomSiteName},
-				layoutName = "Test Content Page Name",
-				type = "content");
-
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -990,54 +791,68 @@ definition {
 		}
 
 		task ("Assert only header of Heading shown when Heading selected") {
-			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Heading");
+			if (IsNotVisible(key_fragmentName = "Heading", locator1 = "Fragment#FRAGMENT_HEADER")) {
+				Click.clickNoWaitForVisible(
+					key_fragmentName = "Heading",
+					locator1 = "Fragment#FRAGMENT_HEADER");
+			}
 
-			PageEditor.clickConfigurableField(fragmentName = "Heading");
+			AssertVisible(
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.viewFragmentHeaderVisible(fragmentName = "Heading");
-
-			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Asset Publisher");
-
-			MouseOver(
-				index = 1,
+			AssertNotVisible(
 				key_fragmentName = "Asset Publisher",
-				locator1 = "Fragment#FRAGMENT_CONTENT");
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Asset Publisher");
+			MouseOver.mouseOverInvisible(
+				key_fragmentName = "Asset Publisher",
+				locator1 = "Fragment#FRAGMENT_HEADER");
+
+			AssertNotVisible(
+				key_fragmentName = "Asset Publisher",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 		}
 
 		task ("Assert only header of Asset Publisher shown when Asset Publisher selected") {
-			PageEditor.clickConfigurableField(fragmentName = "Asset Publisher");
+			Click.clickNoWaitForVisible(
+				key_fragmentName = "Asset Publisher",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.viewFragmentHeaderVisible(fragmentName = "Asset Publisher");
+			AssertVisible(
+				key_fragmentName = "Asset Publisher",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Heading");
-
-			MouseOver(
-				index = 1,
+			AssertNotVisible(
 				key_fragmentName = "Heading",
-				locator1 = "Fragment#FRAGMENT_CONTENT");
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Heading");
+			MouseOver.mouseOverInvisible(
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#FRAGMENT_HEADER");
+
+			AssertNotVisible(
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 		}
 	}
 
 	@description = "This is a test for LPS-134844. Fragments hidden in pages templates appear as hidden in pages that use it and visibility can be changed."
-	@priority = 4
+	@priority = "4"
 	test HiddenFragmentsInPagesTemplatesAppearHiddenInPages {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				layoutPageTemplateCollectionName = "Page Template Collection");
 
 			JSONLayoutpagetemplate.addLayoutPageTemplateEntry(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				layoutPageTemplateCollectionName = "Page Template Collection",
 				layoutPageTemplateEntryName = "Page Template Name",
 				layoutPageTemplateStatus = "Draft",
 				layoutPageTemplateType = "Content Page Template");
 
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = ${siteURLKey});
+			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
@@ -1064,22 +879,21 @@ definition {
 			PageEditor.editFragmentText(
 				fragmentName = "Heading",
 				id = "element-text",
-				index = 2,
+				index = "2",
 				text = "Heading Example 2");
 		}
 
 		task ("Hide Heading Example 1") {
 			PageEditor.hideFragmentViaPageStructure(
 				fragmentName = "Heading",
-				index = 1);
+				index = "1");
 		}
-
 		task ("Publish page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a page based on content page template") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -1088,80 +902,44 @@ definition {
 		}
 
 		task ("Assert Heading Example 1 is not shown") {
-			AssertNotVisible(
-				fragmentName = "heading",
-				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+			AssertTextNotPresent(
+				key_fragmentName = "heading",
+				key_index = "1",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT_INDEX",
+				value1 = "Heading Example 1");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				position = 2,
-				text = "Heading Example 2");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				key_index = "2",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT_INDEX",
+				value1 = "Heading Example 2");
 		}
 
 		task ("Show Heading Example 1") {
 			PageEditor.unhideFragmentViaPageStructure(
 				fragmentName = "Heading",
-				index = 1);
+				index = "1");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
+
+			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 		}
 
 		task ("Assert both Heading Example 1 and Heading Example 2 are shown") {
 			for (var n : list "1,2") {
-				ContentPages.viewFragmentText(
-					fragmentName = "heading",
-					id = "element-text",
-					position = ${n},
-					text = "Heading Example ${n}");
+				AssertTextEquals(
+					key_fragmentName = "heading",
+					key_index = "${n}",
+					locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT_INDEX",
+					value1 = "Heading Example ${n}");
 			}
 		}
 	}
 
-	@description = "This is a test for LPS-148426. The page creator can successfully publish a content page with commerce widgets."
-	@priority = 4
-	test PublishPageWithCommerceWidgets {
-		task ("Given a page creator has a content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
-		}
-
-		task ("When the page creator adds commerce widgets to page") {
-			PageEditor.addWidget(portletName = "Checkout");
-
-			for (var widgetName : list "Open Carts,Placed Orders,Wish List Content,Wish Lists") {
-				PageEditor.addWidget(
-					portletName = ${widgetName},
-					targetFragmentName = "Checkout");
-			}
-		}
-
-		task ("The the page creator could publish the content page") {
-			task ("Publish the page") {
-				PageEditor.publish();
-			}
-
-			task ("View commerce widgets are shown at view mode") {
-				ContentPagesNavigator.openViewContentPage(
-					pageName = "Test Content Page Name",
-					siteName = ${randomSiteName});
-
-				for (var widgetName : list "Checkout,WishLists,WishListContent,OrderContent,OpenOrderContent") {
-					AssertElementPresent(
-						key_portletName = ${widgetName},
-						locator1 = "Portlet#SPECIFIC_FRAGMENTS_AND_WIDGETS");
-				}
-			}
-		}
-	}
-
-	@description = "This is a use case for LPS-106776. Reorganize fragments in page editor."
-	@priority = 5
+	@description = "This is a test for LPS-106778. Reorganize fragments in page editor."
+	@priority = "5"
 	@uitest
 	test ReorganizeFragmentsInPageEditor {
 		property portal.acceptance = "true";
@@ -1169,7 +947,7 @@ definition {
 		task ("Add a Heading fragment to the content page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -1184,35 +962,34 @@ definition {
 		}
 
 		task ("Publish the content page") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the content page in Edit mode") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 		}
 
 		task ("View Heading frgament is on top of Button fragment") {
 			PageEditor.viewFragmentOrder(
 				fragmentName = "Heading",
-				position = 1);
+				position = "1");
 
 			PageEditor.viewFragmentOrder(
 				fragmentName = "Button",
-				position = 2);
+				position = "2");
 		}
 
 		task ("Move the fragment") {
 			PageEditor.clickConfigurableField(fragmentName = "Button");
 
 			DragAndDrop.javaScriptDragAndDropToUp(
-				fragmentName = "heading",
 				id = "element-text",
-				index = 1,
 				key_dragFragmentName = "Button",
+				key_fragmentName = "Heading",
 				locator1 = "Fragment#FRAGMENT_HEADER_DRAG_HANDLER",
-				locator2 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				locator2 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
 				value1 = "");
 
 			PageEditor.waitForAutoSave();
@@ -1221,111 +998,30 @@ definition {
 		task ("Assert the Button fragment is on top of Heading frgament") {
 			PageEditor.viewFragmentOrder(
 				fragmentName = "Button",
-				position = 1);
+				position = "1");
 
 			PageEditor.viewFragmentOrder(
 				fragmentName = "Heading",
-				position = 2);
-		}
-	}
-
-	@description = "This is a test for LPS-162302. The page creator can navigate through fragment structure via breadcrumb on page editor."
-	@priority = 4
-	test ViewBreadcrumbOnContentPage {
-		task ("Given the page creator has a content page with custom fragment structure") {
-			task ("Add a Grid fragment to content page") {
-				ContentPagesNavigator.openEditContentPage(
-					pageName = "Test Content Page Name",
-					siteName = ${randomSiteName});
-
-				PageEditor.addFragment(
-					collectionName = "Layout Elements",
-					fragmentName = "Grid");
-			}
-
-			task ("Add a Container fragment inside first module of Grid") {
-				PageEditor.addElementToColumn(
-					collectionName = "Layout Elements",
-					columnNumber = 1,
-					fragmentName = "Container",
-					navTab = "Fragments");
-			}
-
-			task ("Add a Heading frgament inside Container") {
-				PageEditor.addElementToContainer(
-					collectionName = "Basic Components",
-					fragmentName = "Heading",
-					navTab = "Fragments");
-			}
-		}
-
-		task ("When the page creator selects the element-text of Heading fragment") {
-			PageEditor.gotoEditableFieldEdit(
-				fragmentName = "Heading",
-				id = "element-text");
-		}
-
-		task ("Then the page creator should see the Breadcrumb and element-text as active") {
-			Breadcrumb.seeFullNested();
-
-			Breadcrumb.viewBreadcrumbPath(breadcrumbNameList = "Grid,Container,Heading,element-text");
-
-			Breadcrumb.viewActiveEntry(breadcrumbName = "element-text");
-		}
-
-		task ("When the page creator closes the sidebar and selects the Heading on Breadcrumb") {
-			Click(
-				key_text = "times",
-				locator1 = "Icon#ANY");
-
-			Click(
-				key_breadcrumbName = "Heading",
-				locator1 = "Breadcrumb#BREADCRUMB_ENTRY");
-		}
-
-		task ("Then the page creator should see the sidebar still closed and the General panel") {
-			AssertElementNotPresent(locator1 = "Sidebar#PANEL_OPEN");
-
-			AssertVisible(
-				key_panel = "Heading Options",
-				locator1 = "Panel#PANEL");
-
-			Breadcrumb.viewActiveEntry(breadcrumbName = "Heading");
-		}
-
-		task ("When the page creator selects the Grid on Breadcrumb") {
-			Click(
-				key_breadcrumbName = "Grid",
-				locator1 = "Breadcrumb#BREADCRUMB_ENTRY");
-		}
-
-		task ("Then the page creator should see the sidebar still closed and the General panel") {
-			AssertElementNotPresent(locator1 = "Sidebar#PANEL_OPEN");
-
-			AssertVisible(
-				key_panel = "Grid Options",
-				locator1 = "Panel#PANEL");
-
-			Breadcrumb.viewActiveEntry(breadcrumbName = "Grid");
+				position = "2");
 		}
 	}
 
 	@description = "This is a test for LPS-129536. View the configuration settings of widget after execute Clean Up Orphaned Theme Portlet Preferences."
-	@priority = 4
+	@priority = "4"
 	test ViewConfigurationSettingsOfWidgetAfterCleanUpOrphanedThemePortletPreferences {
 		property test.name.skip.portal.instance = "ContentPages#ViewConfigurationSettingsOfWidgetAfterCleanUpOrphanedThemePortletPreferences";
 
 		task ("Add a web content") {
 			JSONWebcontent.addWebContent(
 				content = "Web Content Content",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				title = "Web Content Title");
 		}
 
 		task ("Add an Asset Publisher widget to the page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addWidget(portletName = "Asset Publisher");
 		}
@@ -1343,20 +1039,20 @@ definition {
 		task ("View web content displayed at Title List in Asset Publisher at edit mode") {
 			AssertTextEquals.assertText(
 				locator1 = "Relatedassets#ASSET_ROW_ENTRY_TITLE",
-				rowNumber = 1,
+				rowNumber = "1",
 				value1 = "Web Content Title");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View web content displayed at Title List in Asset Publisher at view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertTextEquals.assertText(
 				locator1 = "Relatedassets#ASSET_ROW_ENTRY_TITLE",
-				rowNumber = 1,
+				rowNumber = "1",
 				value1 = "Web Content Title");
 		}
 
@@ -1366,95 +1062,48 @@ definition {
 				panel = "Control Panel",
 				portlet = "Server Administration");
 
-			ServerAdministration.executeServerResourcesActions(actionsDescription = "Clean up orphaned theme portlet preferences.");
+			ServerAdministration.executeServerResourcesActions(actionsDescription = "Clean Up Orphaned Theme Portlet Preferences");
 		}
 
 		task ("View web content displayed at Title List in Asset Publisher at view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertTextEquals.assertText(
 				locator1 = "Relatedassets#ASSET_ROW_ENTRY_TITLE",
-				rowNumber = 1,
+				rowNumber = "1",
 				value1 = "Web Content Title");
 		}
 
 		task ("View web content displayed at Title List in Asset Publisher at edit mode") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertTextEquals.assertText(
 				locator1 = "Relatedassets#ASSET_ROW_ENTRY_TITLE",
-				rowNumber = 1,
+				rowNumber = "1",
 				value1 = "Web Content Title");
 		}
 	}
 
-	@description = "This is a test for LPS-145292. The user could view new icons on dropdown menu of page editor."
-	@priority = 4
-	test ViewDropdownIconsInPageEditor {
-		task ("Given a Page designer has a content page with a Collection Display fragment") {
-			JSONAssetlist.addDynamicAssetListEntryWithItemType(
-				groupName = ${randomSiteName},
-				itemSubtype = "All Subtypes",
-				itemType = "Web Content Article",
-				title = "Dynamic Collection");
-
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				fragmentName = "Collection Display");
-		}
-
-		task ("When the Page designer opens the dropdown menu of Collection Display topper") {
-			PageEditor.clickConfigurableField(fragmentName = "Collection Display");
-
-			Click.waitForMenuToggleJSClick(
-				key_fragmentName = "Collection Display",
-				locator1 = "Fragment#FRAGMENT_HEADER_ELLIPSIS");
-		}
-
-		task ("Then the Page designer can see the new icons on the dropdown menu") {
-			DropdownMenuItem.viewIcon(iconList = "hidden,copy,trash");
-		}
-
-		task ("When the Page designer opens the dropdown menu of Collection after selecting a dynamic collection") {
-			PageEditor.editCollectionDisplay(
-				assetListName = "Dynamic Collection",
-				fragmentName = "Collection Display");
-
-			Click.clickNoWaitForVisible(
-				key_fieldLabel = "Collection",
-				key_text = "ellipsis-v",
-				locator1 = "Icon#ANY_ITEM_SELECTOR");
-		}
-
-		task ("Then the Page designer can see the new icons on the dropdown menu") {
-			DropdownMenuItem.viewIcon(iconList = "pencil,list-ul,plus,password-policies,trash");
-		}
-	}
-
 	@description = "This is a test for LPS-81870. In edit mode the page should still show the elements of the page that are not from the page itself, like the header, footer, or elements defined by the theme."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test ViewEditModeHeaderFooterTheme {
 		property portal.acceptance = "true";
 
 		task ("Add a widget page to the site") {
 			JSONLayout.addPublicLayout(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				layoutName = "Test Widget Page Name");
 		}
 
 		task ("Assert the header and footer are disabled") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertVisible(locator1 = "PageEditor#CONTENT_PAGE_DISABLED_HEADER");
 
@@ -1466,7 +1115,7 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "Home#SITE_NAME",
-				value1 = ${randomSiteName});
+				value1 = "Test Site Name");
 
 			AssertVisible(
 				key_infoMessage = "This search bar is not visible to users yet.",
@@ -1518,14 +1167,14 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-130083 and LPS-106776. View the ellipsis button on the topper of fragment when the fragment is inside a nested Grid."
-	@priority = 4
+	@description = "This is a test for LPS-130083. View the ellipsis button on the topper of fragment when the fragment is inside a nested Grid."
+	@priority = "4"
 	@uitest
 	test ViewEllipsisButtonOnTheTopperOfFragmentInsideNestedGrid {
 		task ("Add a Grid element to the content page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Layout Elements",
@@ -1535,7 +1184,7 @@ definition {
 		task ("Add a second Grid to the second module of Grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Layout Elements",
-				columnNumber = 2,
+				columnNumber = "2",
 				fragmentName = "Grid",
 				navTab = "Fragments");
 		}
@@ -1543,43 +1192,43 @@ definition {
 		task ("Add a Heading fragment to the first module of inner Grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Basic Components",
-				columnNumber = 1,
+				columnNumber = "1",
 				fragmentName = "Heading",
 				navTab = "Fragments",
-				position = 2);
+				position = "2");
 		}
 
 		task ("Add a Button fragment to the second module of inner Grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Basic Components",
-				columnNumber = 2,
+				columnNumber = "2",
 				fragmentName = "Button",
 				navTab = "Fragments",
-				position = 2);
+				position = "2");
 		}
 
 		task ("Add a Paragraph fragment to the third module of inner Grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Basic Components",
-				columnNumber = 3,
+				columnNumber = "3",
 				fragmentName = "Paragraph",
 				navTab = "Fragments",
-				position = 2);
+				position = "2");
 		}
 
 		task ("View the ellipsis button is visible on topper of fragments inside inner Grid") {
 			for (var fragmentName : list "Heading,Button,Paragraph") {
-				PageEditor.clickConfigurableField(fragmentName = ${fragmentName});
+				PageEditor.clickConfigurableField(fragmentName = "${fragmentName}");
 
 				AssertVisible(
-					key_fragmentName = ${fragmentName},
+					key_fragmentName = "${fragmentName}",
 					locator1 = "Fragment#FRAGMENT_HEADER_ELLIPSIS");
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-104629. The header of fragment selected can reach the border of the management toolbar."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test ViewHeaderOfFragmentMoveInsideBodyWhenReachTheManagementToolbar {
 		property portal.acceptance = "true";
@@ -1587,7 +1236,7 @@ definition {
 		task ("Add Image, Slider, Card and HTML fragments to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -1611,11 +1260,12 @@ definition {
 
 		task ("Assert Header of Card is shown over body when doesn't reach the management toolbar") {
 			ScrollWebElementIntoView(
-				index = 1,
 				key_fragmentName = "Card",
-				locator1 = "Fragment#FRAGMENT_LABEL");
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.clickConfigurableField(fragmentName = "Card");
+			Click.clickNoWaitForVisible(
+				key_fragmentName = "Card",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
 			AssertElementNotPresent(
 				key_fragmentName = "Card",
@@ -1624,9 +1274,8 @@ definition {
 
 		task ("Assert Header of Card moves inside body when reach the management toolbar") {
 			ScrollWebElementIntoView(
-				index = 1,
 				key_fragmentName = "Image",
-				locator1 = "Fragment#FRAGMENT_LABEL");
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
 			AssertElementPresent(
 				key_fragmentName = "Card",
@@ -1635,13 +1284,13 @@ definition {
 	}
 
 	@description = "This is a test for LPS-104629. The header of widget selected can reach the border of the management toolbar."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test ViewHeaderOfWidgetMoveInsideBodyWhenReachTheManagementToolbar {
 		task ("Add My Sites, Documents and Media, Blogs and Asset Publisher widgets to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addWidget(portletName = "Asset Publisher");
 
@@ -1660,11 +1309,12 @@ definition {
 
 		task ("Assert Header of Blogs is shown over body when doesn't reach the management toolbar") {
 			ScrollWebElementIntoView(
-				index = 1,
 				key_fragmentName = "Blogs",
-				locator1 = "Fragment#FRAGMENT_LABEL");
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			PageEditor.clickConfigurableField(fragmentName = "Blogs");
+			Click.clickNoWaitForVisible(
+				key_fragmentName = "Blogs",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
 			AssertElementNotPresent(
 				key_fragmentName = "Blogs",
@@ -1673,9 +1323,8 @@ definition {
 
 		task ("Assert Header of Blogs moves inside body when reach the management toolbar") {
 			ScrollWebElementIntoView(
-				index = 1,
 				key_fragmentName = "My Sites",
-				locator1 = "Fragment#FRAGMENT_LABEL");
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
 			AssertElementPresent(
 				key_fragmentName = "Blogs",
@@ -1684,21 +1333,21 @@ definition {
 	}
 
 	@description = "This is for LPS-106813. Widgets inherited from content page template will inherit permissions set in content page template."
-	@priority = 4
+	@priority = "4"
 	test ViewPermissionsOfAssetPublisherInheritedFromContentPageTemplate {
 		task ("Add a content page template") {
 			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				layoutPageTemplateCollectionName = "Page Template Collection");
 
 			JSONLayoutpagetemplate.addLayoutPageTemplateEntry(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				layoutPageTemplateCollectionName = "Page Template Collection",
 				layoutPageTemplateEntryName = "Page Template Name",
 				layoutPageTemplateStatus = "Draft",
 				layoutPageTemplateType = "Content Page Template");
 
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = ${siteURLKey});
+			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
 			Navigator.gotoNavNested(navNested = "Page Template Collection");
 
@@ -1724,11 +1373,11 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked.assertCheckedNotVisible(
+			AssertChecked(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			Uncheck.uncheckNotVisible(
+			Uncheck(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -1740,11 +1389,11 @@ definition {
 
 			Click(locator1 = "Icon#CLOSE");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a page based on content page template") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -1765,28 +1414,28 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertNotChecked.assertNotCheckedNotVisible(
+			AssertNotChecked(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 		}
 	}
 
 	@description = "This is for LPS-106813. Widgets inherited from custom master will inherit permissions set in custom master."
-	@priority = 4
+	@priority = "4"
 	test ViewPermissionsOfAssetPublisherInheritedFromMasterPageTemplate {
 		task ("Add a web content") {
 			JSONWebcontent.addWebContent(
 				content = "WC WebContent Content",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				title = "WC WebContent Title");
 		}
 
 		task ("Add a custom master") {
 			JSONLayoutpagetemplate.addMasterPageTemplateEntry(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				masterPageTemplateEntryName = "Custom Masters Page Template");
 
-			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = ${siteURLKey});
+			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "test-site-name");
 		}
 
 		task ("Add an Asset Publisher widget to the master page template") {
@@ -1815,15 +1464,15 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked.assertCheckedNotVisible(
+			AssertChecked(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			Uncheck.uncheckNotVisible(
+			Uncheck(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			AssertNotChecked.assertNotCheckedNotVisible(
+			AssertNotChecked(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -1835,13 +1484,15 @@ definition {
 
 			Click(locator1 = "Icon#CLOSE");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Apply the master page template to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.gotoTab(tabName = "Page Design Options");
 
@@ -1853,309 +1504,21 @@ definition {
 				key_assetTitle = "WC WebContent Title",
 				locator1 = "AP#ASSET_ABSTRACT_TITLE");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the Asset Publisher is invisible to Guest") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			User.logoutPG();
 
-			Navigator.openSiteURL(siteName = ${randomSiteName});
+			Navigator.openSiteURL(siteName = "Test Site Name");
 
 			AssertElementNotPresent(
 				key_assetTitle = "WC WebContent Title",
 				locator1 = "AP#ASSET_ABSTRACT_TITLE");
 
 			Alert.viewErrorMessage(errorMessage = "You do not have the roles required to access this portlet.");
-		}
-	}
-
-	@description = "This is a test for LPS-162323. The pages propagated from a Site Template should refer to the master page from site."
-	@priority = 4
-	test ViewReferredMasterPageOfPagesPropagatedFromSiteTemplate {
-		var siteName = StringUtil.randomString(8);
-
-		var siteURLKey = StringUtil.toLowerCase(${siteName});
-		var siteTemplateName = StringUtil.randomString(8);
-
-		task ("Given a page creator has a site with a page from a site template") {
-			task ("Add a site template") {
-				JSONSiteTemplate.addSiteTemplate(
-					description = "Site description",
-					siteTemplateName = ${siteTemplateName});
-
-				SiteTemplatesNavigator.openSiteTemplatesAdmin();
-
-				LexiconEntry.gotoEntryMenuItem(
-					menuItem = "Manage",
-					rowEntry = ${siteTemplateName});
-			}
-
-			task ("Add a master page template") {
-				ProductMenu.gotoPortlet(
-					category = "Design",
-					portlet = "Page Templates");
-
-				MastersPageTemplatesAdmin.addMasters(masterLayoutName = "Custom Masters Page Template");
-
-				MastersPageTemplates.publishMaster();
-			}
-
-			task ("Add a page based on master page in the site template") {
-				SiteTemplates.addSitePageViaSiteTemplateCP(
-					masterLayoutName = "Custom Masters Page Template",
-					pageName = "Test Page Name 1",
-					sitePageType = "Content Page",
-					siteTemplateName = ${siteTemplateName});
-
-				PageEditor.publish();
-			}
-
-			task ("Add a site based on site template") {
-				HeadlessSite.addSite(
-					siteName = ${siteName},
-					templateName = ${siteTemplateName},
-					templateType = "Site Template");
-			}
-
-			task ("Add another page based on master page in the site template") {
-				SiteTemplates.addSitePageViaSiteTemplateCP(
-					masterLayoutName = "Custom Masters Page Template",
-					pageName = "Test Page Name 2",
-					sitePageType = "Content Page",
-					siteTemplateName = ${siteTemplateName});
-
-				PageEditor.publish();
-			}
-		}
-
-		task ("When the page creator makes some changes in master page from site") {
-			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = ${siteName});
-
-			MastersPageTemplatesAdmin.gotoMastersEllipsisItem(
-				item = "Edit",
-				masterLayoutName = "Custom Masters Page Template");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				dropTarget = "Header",
-				fragmentName = "Heading",
-				scope = "Master");
-
-			MastersPageTemplates.propagateChange();
-		}
-
-		task ("Then the page creator can see changes on propagated pages") {
-			for (var pageName : list "Test Page Name 1,Test Page Name 2") {
-				ContentPagesNavigator.openViewContentPage(
-					pageName = ${pageName},
-					siteName = ${siteName});
-
-				ContentPages.viewFragmentText(
-					fragmentName = "heading",
-					id = "element-text",
-					text = "Heading Example");
-			}
-		}
-	}
-
-	@description = "This is a test for LPS-154530. View custom values matches in spacing on page editor."
-	@priority = 4
-	test ViewValuesMatchesInSpacingOnPageEditor {
-		task ("Given a page designer has a content page with default and custom style books") {
-			task ("Add a style book") {
-				StyleBooksAdmin.openStyleBooksAdmin(siteURLKey = ${siteURLKey});
-
-				StyleBooksAdmin.addStyleBooks(styleBookName = "Test Style Book Name");
-			}
-
-			task ("Add unit values on Spacing") {
-				StyleBooks.selectForm(formName = "Spacing");
-
-				StyleBooks.expandSection(sectionName = "Spacing");
-
-				StyleBooks.configureUnit(
-					fieldLabel = "Spacer 1",
-					unit = "EM");
-
-				var i = 0;
-
-				for (var tokenValue : list "1,2,3") {
-					StyleBooks.configureUnit(
-						fieldLabel = "Spacer ${i}",
-						unit = "EM");
-
-					Type(
-						ariaLabel = "Spacer ${i}",
-						locator1 = "TextInput#ANY_WITH_AIRA_LABEL",
-						value1 = ${tokenValue});
-
-					StyleBooks.clickManagementBar();
-
-					StyleBooks.waitForAutoSave();
-
-					var i = ${i} + 1;
-				}
-
-				StyleBooks.configureUnit(
-					fieldLabel = "Spacer 3",
-					unit = "CUSTOM");
-
-				Type(
-					ariaLabel = "Spacer 3",
-					locator1 = "TextInput#ANY_WITH_AIRA_LABEL",
-					value1 = "Auto");
-
-				StyleBooks.clickManagementBar();
-
-				StyleBooks.waitForAutoSave();
-
-				StyleBooks.clickPublish();
-			}
-
-			task ("Add a Heading fragment to content page") {
-				ContentPagesNavigator.openEditContentPage(
-					pageName = "Test Content Page Name",
-					siteName = ${randomSiteName});
-
-				PageEditor.addFragment(
-					collectionName = "Basic Components",
-					fragmentName = "Heading");
-			}
-		}
-
-		task ("When the page designer selects dropdown menu of spacing on styles") {
-			PageEditor.gotoStyle(fragmentName = "Heading");
-
-			Click(
-				ariaLabel = "Margin Top",
-				locator1 = "Button#ANY_WITH_ARIA_LABEL");
-		}
-
-		task ("Then the page designer can see default values on dropdown menu") {
-			var i = 0;
-
-			for (var tokenValue : list "0,0.25rem,0.5rem,1rem") {
-				AssertTextEquals(
-					key_tokenName = "Spacer ${i}",
-					locator1 = "MenuItem#SPACING_VALUE",
-					value1 = ${tokenValue});
-
-				var i = ${i} + 1;
-			}
-		}
-
-		task ("When the page designer applies the new style book to content page") {
-			PageEditor.gotoTab(tabName = "Page Design Options");
-
-			Navigator.gotoNavTab(navTab = "Style Book");
-
-			StyleBooks.selectStyleBookViaPageDesignOptions(styleBookName = "Test Style Book Name");
-		}
-
-		task ("Then the page designer can see custom values on dropdown menu of spacing") {
-			PageEditor.gotoStyle(fragmentName = "Heading");
-
-			Click(
-				ariaLabel = "Margin Top",
-				locator1 = "Button#ANY_WITH_ARIA_LABEL");
-
-			var i = 0;
-
-			for (var tokenValue : list "1em,2em,3em,Auto") {
-				AssertTextEquals(
-					key_tokenName = "Spacer ${i}",
-					locator1 = "MenuItem#SPACING_VALUE",
-					value1 = ${tokenValue});
-
-				var i = ${i} + 1;
-			}
-		}
-
-		task ("When the page designer selects Auto in spacing") {
-			DropdownMenuItem.click(menuItem = "Spacer 3");
-
-			PageEditor.waitForAutoSave();
-		}
-
-		task ("Then the page designer can see auto style on heading fragment at edit mode") {
-			AssertCssValue(
-				index = 1,
-				key_fragmentName = "Heading",
-				locator1 = "Fragment#FRAGMENT_LABEL",
-				locator2 = "margin-top",
-				value1 = "0px");
-		}
-
-		task ("When the page designer opens the dropdown menu of marging top on spacing") {
-			Click(
-				ariaLabel = "Margin Top",
-				locator1 = "Button#ANY_WITH_ARIA_LABEL");
-		}
-
-		task ("Then te page designer can see Spacer 3 is shown as selected") {
-			AssertCssValue(
-				ariaLabel = "Set Margin Top to 3",
-				locator1 = "Button#ANY_WITH_ARIA_LABEL",
-				locator2 = "background-color",
-				value1 = "rgba(240, 245, 255, 1)");
-		}
-
-		task ("When the page designer accesses published content page at view mode") {
-			PageEditor.publish();
-
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
-		}
-
-		task ("Then the page designer can see auto style on heading fragment at view mode") {
-			AssertCssValue(
-				fragmentName = "layout-content",
-				index = 1,
-				locator1 = "PageEditor#COMMON_STYLES_CLASS",
-				locator2 = "margin-top",
-				value1 = "0px");
-		}
-	}
-
-	@description = "LPS-147400. Collection Display and Collection Filter have width and display configuration."
-	@priority = 3
-	test ViewWidthAndHideOfCollectionFilterAndCollectionDisplayAndCollectionFilterCanBeHidden {
-		task ("Go to edit page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Content Page Name",
-				siteName = ${randomSiteName});
-		}
-
-		task ("Add Collection Display and Collection Filter frgaments to page") {
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				fragmentName = "Collection Display");
-
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				fragmentName = "Collection Filter",
-				targetFragmentName = "Collection Display");
-		}
-
-		task ("View Collection Filter frgaments width and height options") {
-			PageEditor.gotoConfiguration(fragmentName = "Collection Filter");
-
-			AssertVisible(
-				key_text = "Height",
-				locator1 = "TextInput#ANY_SPECIFIC");
-
-			AssertVisible(
-				key_text = "Width",
-				locator1 = "TextInput#ANY_SPECIFIC");
-		}
-
-		task ("Hide Collection Display and Collection Filter frgaments from fragment options") {
-			PageEditor.hideFragmentViaPageStyles(fragmentName = "Collection Display");
-
-			PageEditor.hideFragmentViaPageStyles(fragmentName = "Collection Filter");
 		}
 	}
 

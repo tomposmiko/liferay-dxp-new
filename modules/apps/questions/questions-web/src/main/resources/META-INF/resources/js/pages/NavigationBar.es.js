@@ -42,15 +42,15 @@ export default withRouter(({history, location}) => {
 
 	const isActive = (value) => location.pathname === value;
 
-	const getLabel = () => {
+	const label = () => {
 		if (location.pathname.includes('tags')) {
 			return Liferay.Language.get('tags');
 		}
 		else if (location.pathname.includes('activity')) {
-			return Liferay.Language.get('activity');
+			return Liferay.Language.get('my-activity');
 		}
 		else if (location.pathname.includes('subscriptions')) {
-			return Liferay.Language.get('subscriptions');
+			return Liferay.Language.get('my-subscriptions');
 		}
 
 		return Liferay.Language.get('questions');
@@ -59,16 +59,15 @@ export default withRouter(({history, location}) => {
 	const historyPushParser = historyPushWithSlug(history.push);
 
 	return (
-		<section className="border-bottom pb-0 questions-section questions-section-nav">
+		<section className="questions-section questions-section-nav">
 			<div className="questions-container row">
 				<div className="align-items-center col d-flex justify-content-between">
 					<ClayNavigationBar
 						className="border-0 navigation-bar"
-						triggerLabel={getLabel()}
+						triggerLabel={label()}
 					>
 						<ClayNavigationBar.Item
 							active={
-								isActive(`/questions`) ||
 								isActive(`/questions/${sectionTitle}`) ||
 								isActive('/')
 							}
@@ -80,7 +79,10 @@ export default withRouter(({history, location}) => {
 								)
 							}
 						>
-							<ClayLink>
+							<ClayLink
+								className="nav-link"
+								displayType="unstyled"
+							>
 								{Liferay.Language.get('questions')}
 							</ClayLink>
 						</ClayNavigationBar.Item>
@@ -89,7 +91,12 @@ export default withRouter(({history, location}) => {
 							active={isActive(`/tags`)}
 							onClick={() => historyPushParser('/tags')}
 						>
-							<ClayLink>{Liferay.Language.get('tags')}</ClayLink>
+							<ClayLink
+								className="nav-link"
+								displayType="unstyled"
+							>
+								{Liferay.Language.get('tags')}
+							</ClayLink>
 						</ClayNavigationBar.Item>
 
 						<ClayNavigationBar.Item
@@ -113,8 +120,11 @@ export default withRouter(({history, location}) => {
 								)
 							}
 						>
-							<ClayLink>
-								{Liferay.Language.get('subscriptions')}
+							<ClayLink
+								className="nav-link"
+								displayType="unstyled"
+							>
+								{Liferay.Language.get('my-subscriptions')}
 							</ClayLink>
 						</ClayNavigationBar.Item>
 
@@ -137,8 +147,11 @@ export default withRouter(({history, location}) => {
 								)
 							}
 						>
-							<ClayLink>
-								{Liferay.Language.get('activity')}
+							<ClayLink
+								className="nav-link"
+								displayType="unstyled"
+							>
+								{Liferay.Language.get('my-activity')}
 							</ClayLink>
 						</ClayNavigationBar.Item>
 					</ClayNavigationBar>

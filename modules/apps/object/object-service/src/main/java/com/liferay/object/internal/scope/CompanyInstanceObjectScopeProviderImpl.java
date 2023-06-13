@@ -17,19 +17,19 @@ package com.liferay.object.internal.scope;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.scope.ObjectScopeProvider;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
  */
 @Component(
+	immediate = true,
 	property = "object.scope.provider.key=" + ObjectDefinitionConstants.SCOPE_COMPANY,
 	service = ObjectScopeProvider.class
 )
@@ -48,7 +48,7 @@ public class CompanyInstanceObjectScopeProviderImpl
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "company");
+		return LanguageUtil.get(locale, "company");
 	}
 
 	@Override
@@ -72,8 +72,5 @@ public class CompanyInstanceObjectScopeProviderImpl
 
 		return false;
 	}
-
-	@Reference
-	private Language _language;
 
 }

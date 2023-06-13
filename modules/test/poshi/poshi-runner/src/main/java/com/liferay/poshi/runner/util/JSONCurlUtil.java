@@ -71,22 +71,6 @@ public class JSONCurlUtil {
 		return _getParsedResponse(request, jsonPath);
 	}
 
-	public static String patch(String requestString)
-		throws IOException, TimeoutException {
-
-		Request request = new Request(requestString, "PATCH");
-
-		return request.send();
-	}
-
-	public static String patch(String requestString, String jsonPath)
-		throws IOException, TimeoutException {
-
-		Request request = new Request(requestString, "PATCH");
-
-		return _getParsedResponse(request, jsonPath);
-	}
-
 	public static String post(String requestString)
 		throws IOException, TimeoutException {
 
@@ -162,15 +146,14 @@ public class JSONCurlUtil {
 
 			String response = ExecUtil.readInputStream(inputStream, true);
 
-			_log(response);
+			System.out.println("Response: " + response);
 
 			if (process.exitValue() != 0) {
 				inputStream = process.getErrorStream();
 
-				String errorString = ExecUtil.readInputStream(
-					inputStream, true);
-
-				_log(errorString);
+				System.out.println(
+					"Error stream: " +
+						ExecUtil.readInputStream(inputStream, true));
 
 				throw new RuntimeException(
 					"Command finished with exit value: " + process.exitValue());
@@ -203,7 +186,7 @@ public class JSONCurlUtil {
 		private String _getRequestURL(List<String> tokens) {
 			String token = tokens.get(0);
 
-			if (token.startsWith("file") || token.startsWith("http")) {
+			if (token.startsWith("http")) {
 				return token;
 			}
 
@@ -215,21 +198,6 @@ public class JSONCurlUtil {
 			sb.append("' is an invalid URL.");
 
 			throw new IllegalArgumentException(sb.toString());
-		}
-
-		private void _log(String message) {
-			if (message == null) {
-				message = "";
-			}
-
-			if (message.length() > _maxPrintLineLength) {
-				System.out.println(
-					message.substring(0, _maxPrintLineLength) + "...");
-
-				return;
-			}
-
-			System.out.println(message);
 		}
 
 		private void _setRequestOptions(List<String> tokens) {
@@ -300,11 +268,10 @@ public class JSONCurlUtil {
 		private static Pattern _escapePattern = Pattern.compile(
 			"<CURL_DATA\\[([\\s\\S]*?)\\]CURL_DATA>");
 		private static Pattern _requestPattern = Pattern.compile(
-			"(-[\\w#:\\.]|--[\\w#:\\.-]{2,}|(?:[\\s]|^)(?:file|https?)" +
-				":[^\\s]+)(\\s+|\\Z)");
+			"(-[\\w#:\\.]|--[\\w#:\\.-]{2,}|(?:[\\s]|^)https?:[^\\s]+)" +
+				"(\\s+|\\Z)");
 
 		private Map<String, String> _curlDataMap = new HashMap<>();
-		private final int _maxPrintLineLength = 2500;
 		private final String _requestMethod;
 		private List<RequestOption> _requestOptions = new ArrayList<>();
 		private final String _requestURL;

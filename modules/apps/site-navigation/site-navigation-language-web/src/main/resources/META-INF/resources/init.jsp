@@ -35,7 +35,7 @@ page import="com.liferay.site.navigation.language.web.internal.display.context.S
 <%
 SiteNavigationLanguageDisplayContext siteNavigationLanguageDisplayContext = new SiteNavigationLanguageDisplayContext(request);
 
-SiteNavigationLanguagePortletInstanceConfiguration siteNavigationLanguagePortletInstanceConfiguration = siteNavigationLanguageDisplayContext.getSiteNavigationLanguagePortletInstanceConfiguration();
+SiteNavigationLanguagePortletInstanceConfiguration languagePortletInstanceConfiguration = siteNavigationLanguageDisplayContext.getSiteNavigationLanguagePortletInstanceConfiguration();
 %>
 
 <%@ include file="/init-ext.jsp" %>

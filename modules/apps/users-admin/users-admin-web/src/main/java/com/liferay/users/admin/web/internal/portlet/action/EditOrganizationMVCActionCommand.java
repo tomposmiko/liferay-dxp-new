@@ -28,18 +28,17 @@ import com.liferay.portal.kernel.exception.RequiredOrganizationException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
-import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
+import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -61,6 +60,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
@@ -68,8 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = MVCActionCommand.class
 )
-public class EditOrganizationMVCActionCommand
-	extends BaseTransactionalMVCActionCommand {
+public class EditOrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 	protected void deleteOrganizations(ActionRequest actionRequest)
 		throws Exception {
@@ -83,7 +82,7 @@ public class EditOrganizationMVCActionCommand
 	}
 
 	@Override
-	protected void doTransactionalCommand(
+	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -102,7 +101,7 @@ public class EditOrganizationMVCActionCommand
 			String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 			if (organization != null) {
-				redirect = HttpComponentsUtil.setParameter(
+				redirect = _http.setParameter(
 					redirect, actionResponse.getNamespace() + "organizationId",
 					organization.getOrganizationId());
 			}
@@ -159,7 +158,7 @@ public class EditOrganizationMVCActionCommand
 						actionRequest, "organizationId");
 
 					if (organizationId > 0) {
-						redirect = HttpComponentsUtil.setParameter(
+						redirect = _http.setParameter(
 							redirect,
 							actionResponse.getNamespace() + "organizationId",
 							organizationId);
@@ -221,11 +220,6 @@ public class EditOrganizationMVCActionCommand
 				Collections.emptyList(), Collections.emptyList(),
 				Collections.emptyList(), Collections.emptyList(),
 				serviceContext);
-
-			if (logoBytes != null) {
-				organization = _organizationLocalService.updateLogo(
-					organization.getOrganizationId(), logoBytes);
-			}
 		}
 		else {
 
@@ -252,7 +246,7 @@ public class EditOrganizationMVCActionCommand
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
-	private OrganizationLocalService _organizationLocalService;
+	private Http _http;
 
 	@Reference
 	private OrganizationService _organizationService;

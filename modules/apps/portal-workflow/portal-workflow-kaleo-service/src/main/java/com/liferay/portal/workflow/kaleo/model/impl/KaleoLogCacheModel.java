@@ -76,12 +76,10 @@ public class KaleoLogCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(67);
+		StringBundler sb = new StringBundler(65);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", kaleoLogId=");
 		sb.append(kaleoLogId);
 		sb.append(", groupId=");
@@ -154,7 +152,6 @@ public class KaleoLogCacheModel
 		KaleoLogImpl kaleoLogImpl = new KaleoLogImpl();
 
 		kaleoLogImpl.setMvccVersion(mvccVersion);
-		kaleoLogImpl.setCtCollectionId(ctCollectionId);
 		kaleoLogImpl.setKaleoLogId(kaleoLogId);
 		kaleoLogImpl.setGroupId(groupId);
 		kaleoLogImpl.setCompanyId(companyId);
@@ -295,8 +292,6 @@ public class KaleoLogCacheModel
 
 		mvccVersion = objectInput.readLong();
 
-		ctCollectionId = objectInput.readLong();
-
 		kaleoLogId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -348,8 +343,6 @@ public class KaleoLogCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		objectOutput.writeLong(kaleoLogId);
 
@@ -468,7 +461,6 @@ public class KaleoLogCacheModel
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public long kaleoLogId;
 	public long groupId;
 	public long companyId;

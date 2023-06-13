@@ -103,7 +103,7 @@ public class SessionParameters {
 		}
 		catch (IllegalStateException illegalStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(illegalStateException);
+				_log.debug(illegalStateException, illegalStateException);
 			}
 
 			parameters = new HashMap<>();
@@ -128,7 +128,7 @@ public class SessionParameters {
 		}
 		catch (IllegalStateException illegalStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(illegalStateException);
+				_log.debug(illegalStateException, illegalStateException);
 			}
 
 			parameters = new LinkedHashMap<>();

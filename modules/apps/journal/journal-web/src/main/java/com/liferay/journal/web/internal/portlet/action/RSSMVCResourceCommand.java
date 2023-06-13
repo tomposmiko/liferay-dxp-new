@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"auth.token.ignore.mvc.action=true",
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
@@ -47,11 +48,15 @@ public class RSSMVCResourceCommand extends BaseRSSMVCResourceCommand {
 		return _journalRSSHelper.getRSS(resourceRequest, resourceResponse);
 	}
 
+	@Reference
+	protected void setJournalRSSHelper(JournalRSSHelper journalRSSHelper) {
+		_journalRSSHelper = journalRSSHelper;
+	}
+
 	protected void unsetJournalRSSHelper(JournalRSSHelper journalRSSHelper) {
 		_journalRSSHelper = null;
 	}
 
-	@Reference
 	private JournalRSSHelper _journalRSSHelper;
 
 }

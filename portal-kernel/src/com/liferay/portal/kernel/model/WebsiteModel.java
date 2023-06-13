@@ -258,18 +258,18 @@ public interface WebsiteModel
 	public void setUrl(String url);
 
 	/**
-	 * Returns the list type ID of this website.
+	 * Returns the type ID of this website.
 	 *
-	 * @return the list type ID of this website
+	 * @return the type ID of this website
 	 */
-	public long getListTypeId();
+	public long getTypeId();
 
 	/**
-	 * Sets the list type ID of this website.
+	 * Sets the type ID of this website.
 	 *
-	 * @param listTypeId the list type ID of this website
+	 * @param typeId the type ID of this website
 	 */
-	public void setListTypeId(long listTypeId);
+	public void setTypeId(long typeId);
 
 	/**
 	 * Returns the primary of this website.
@@ -308,9 +308,5 @@ public interface WebsiteModel
 
 	@Override
 	public Website cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

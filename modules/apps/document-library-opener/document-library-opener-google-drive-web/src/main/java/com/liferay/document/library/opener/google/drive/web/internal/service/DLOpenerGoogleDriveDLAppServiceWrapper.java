@@ -14,7 +14,9 @@
 
 package com.liferay.document.library.opener.google.drive.web.internal.service;
 
+import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLAppServiceWrapper;
 import com.liferay.document.library.kernel.util.DLValidator;
 import com.liferay.document.library.opener.constants.DLOpenerFileEntryReferenceConstants;
@@ -50,6 +52,14 @@ import org.osgi.service.component.annotations.Reference;
 public class DLOpenerGoogleDriveDLAppServiceWrapper
 	extends DLAppServiceWrapper {
 
+	public DLOpenerGoogleDriveDLAppServiceWrapper() {
+		super(null);
+	}
+
+	public DLOpenerGoogleDriveDLAppServiceWrapper(DLAppService dlAppService) {
+		super(dlAppService);
+	}
+
 	@Override
 	public void cancelCheckOut(long fileEntryId) throws PortalException {
 		FileEntry fileEntry = getFileEntry(fileEntryId);
@@ -60,7 +70,22 @@ public class DLOpenerGoogleDriveDLAppServiceWrapper
 				fileEntry.getCompanyId()) &&
 			_dlOpenerGoogleDriveManager.isGoogleDriveFile(fileEntry)) {
 
+			DLOpenerFileEntryReference dlOpenerFileEntryReference =
+				_dlOpenerFileEntryReferenceLocalService.
+					getDLOpenerFileEntryReference(
+						DLOpenerGoogleDriveConstants.
+							GOOGLE_DRIVE_REFERENCE_TYPE,
+						fileEntry);
+
 			_dlOpenerGoogleDriveManager.delete(_getUserId(), fileEntry);
+
+			if ((dlOpenerFileEntryReference.getType() ==
+					DLOpenerFileEntryReferenceConstants.TYPE_NEW) &&
+				DLFileEntryConstants.VERSION_DEFAULT.equals(
+					fileEntry.getVersion())) {
+
+				deleteFileEntry(fileEntryId);
+			}
 		}
 	}
 
@@ -137,14 +162,10 @@ public class DLOpenerGoogleDriveDLAppServiceWrapper
 		throws PortalException {
 
 		DLOpenerGoogleDriveFileReference dlOpenerGoogleDriveFileReference =
-			_dlOpenerGoogleDriveManager.getDLOpenerGoogleDriveFileReference(
+			_dlOpenerGoogleDriveManager.requestEditAccess(
 				serviceContext.getUserId(), fileEntry);
 
 		File file = dlOpenerGoogleDriveFileReference.getContentFile();
-
-		if (file == null) {
-			return;
-		}
 
 		String title = fileEntry.getTitle();
 
@@ -164,9 +185,9 @@ public class DLOpenerGoogleDriveDLAppServiceWrapper
 
 			updateFileEntry(
 				fileEntry.getFileEntryId(), sourceFileName,
-				fileEntry.getMimeType(), title, StringPool.BLANK,
-				fileEntry.getDescription(), StringPool.BLANK,
-				DLVersionNumberIncrease.NONE, file, null, null, serviceContext);
+				fileEntry.getMimeType(), title, fileEntry.getDescription(),
+				StringPool.BLANK, DLVersionNumberIncrease.NONE, file,
+				serviceContext);
 		}
 		finally {
 			if ((file != null) && !file.delete()) {

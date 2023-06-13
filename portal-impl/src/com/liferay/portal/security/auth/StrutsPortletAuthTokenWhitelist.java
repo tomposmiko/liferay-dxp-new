@@ -14,7 +14,6 @@
 
 package com.liferay.portal.security.auth;
 
-import com.liferay.petra.concurrent.DCLSingleton;
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -55,9 +54,7 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 			return false;
 		}
 
-		Set<String> portletCSRFWhitelist =
-			_portletCSRFWhitelistDCLSingleton.getSingleton(
-				this::_createPortletCSRFWhitelist);
+		Set<String> portletCSRFWhitelist = _getPortletCSRFWhitelist();
 
 		if (portletCSRFWhitelist.contains(strutsAction) &&
 			isValidStrutsAction(
@@ -90,8 +87,7 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 		}
 
 		Set<String> portletInvocationWhitelist =
-			_portletInvocationWhitelistDCLSingleton.getSingleton(
-				this::_createPortletInvocationWhitelist);
+			_getPortletInvocationWhitelist();
 
 		if (portletInvocationWhitelist.contains(strutsAction) &&
 			isValidStrutsAction(
@@ -113,9 +109,7 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 			return false;
 		}
 
-		Set<String> portletCSRFWhitelist =
-			_portletCSRFWhitelistDCLSingleton.getSingleton(
-				this::_createPortletCSRFWhitelist);
+		Set<String> portletCSRFWhitelist = _getPortletCSRFWhitelist();
 
 		if (portletCSRFWhitelist.contains(strutsAction)) {
 			long plid = liferayPortletURL.getPlid();
@@ -152,8 +146,7 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 		}
 
 		Set<String> portletInvocationWhitelist =
-			_portletInvocationWhitelistDCLSingleton.getSingleton(
-				this::_createPortletInvocationWhitelist);
+			_getPortletInvocationWhitelist();
 
 		if (portletInvocationWhitelist.contains(strutsAction)) {
 			long plid = liferayPortletURL.getPlid();
@@ -200,35 +193,67 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return false;
 	}
 
-	private Set<String> _createPortletCSRFWhitelist() {
-		Set<String> portletCSRFWhitelist = Collections.newSetFromMap(
-			new ConcurrentHashMap<>());
+	private Set<String> _getPortletCSRFWhitelist() {
+		Set<String> portletCSRFWhitelist = _portletCSRFWhitelist;
 
-		registerPortalProperty(PropsKeys.AUTH_TOKEN_IGNORE_ACTIONS);
+		if (portletCSRFWhitelist != null) {
+			return portletCSRFWhitelist;
+		}
 
-		trackWhitelistServices(
-			PropsKeys.AUTH_TOKEN_IGNORE_ACTIONS, portletCSRFWhitelist);
+		synchronized (this) {
+			if (_portletCSRFWhitelist == null) {
+				portletCSRFWhitelist = Collections.newSetFromMap(
+					new ConcurrentHashMap<>());
+
+				registerPortalProperty(PropsKeys.AUTH_TOKEN_IGNORE_ACTIONS);
+
+				trackWhitelistServices(
+					PropsKeys.AUTH_TOKEN_IGNORE_ACTIONS, portletCSRFWhitelist);
+
+				_portletCSRFWhitelist = portletCSRFWhitelist;
+			}
+			else {
+				portletCSRFWhitelist = _portletCSRFWhitelist;
+			}
+		}
 
 		return portletCSRFWhitelist;
 	}
 
-	private Set<String> _createPortletInvocationWhitelist() {
-		Set<String> portletInvocationWhitelist = Collections.newSetFromMap(
-			new ConcurrentHashMap<>());
+	private Set<String> _getPortletInvocationWhitelist() {
+		Set<String> portletInvocationWhitelist = _portletInvocationWhitelist;
 
-		registerPortalProperty(
-			PropsKeys.PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST_ACTIONS);
+		if (portletInvocationWhitelist != null) {
+			return portletInvocationWhitelist;
+		}
 
-		trackWhitelistServices(
-			PropsKeys.PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST_ACTIONS,
-			portletInvocationWhitelist);
+		synchronized (this) {
+			if (_portletInvocationWhitelist == null) {
+				portletInvocationWhitelist = Collections.newSetFromMap(
+					new ConcurrentHashMap<>());
+
+				registerPortalProperty(
+					PropsKeys.
+						PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST_ACTIONS);
+
+				trackWhitelistServices(
+					PropsKeys.
+						PORTLET_ADD_DEFAULT_RESOURCE_CHECK_WHITELIST_ACTIONS,
+					portletInvocationWhitelist);
+
+				_portletInvocationWhitelist = portletInvocationWhitelist;
+			}
+			else {
+				portletInvocationWhitelist = _portletInvocationWhitelist;
+			}
+		}
 
 		return portletInvocationWhitelist;
 	}
@@ -236,9 +261,7 @@ public class StrutsPortletAuthTokenWhitelist extends BaseAuthTokenWhitelist {
 	private static final Log _log = LogFactoryUtil.getLog(
 		StrutsPortletAuthTokenWhitelist.class);
 
-	private final DCLSingleton<Set<String>> _portletCSRFWhitelistDCLSingleton =
-		new DCLSingleton<>();
-	private final DCLSingleton<Set<String>>
-		_portletInvocationWhitelistDCLSingleton = new DCLSingleton<>();
+	private volatile Set<String> _portletCSRFWhitelist;
+	private volatile Set<String> _portletInvocationWhitelist;
 
 }

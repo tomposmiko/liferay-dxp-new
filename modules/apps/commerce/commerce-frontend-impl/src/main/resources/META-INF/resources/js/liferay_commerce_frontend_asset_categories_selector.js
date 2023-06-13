@@ -15,17 +15,17 @@
 AUI.add(
 	'liferay-commerce-frontend-asset-categories-selector',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const LString = Lang.String;
+		var LString = Lang.String;
 
-		const BOUNDING_BOX = 'boundingBox';
+		var BOUNDING_BOX = 'boundingBox';
 
-		const EMPTY_FN = Lang.emptyFn;
+		var EMPTY_FN = Lang.emptyFn;
 
-		const ID = 'id';
+		var ID = 'id';
 
-		const NAME = 'categoriesselector';
+		var NAME = 'categoriesselector';
 
 		/**
 		 * OPTIONS
@@ -44,7 +44,7 @@ AUI.add(
 		 * moreResultsLabel {String}: The localized label for link "Load more results".
 		 */
 
-		const AssetTaglibCategoriesSelector = A.Component.create({
+		var AssetTaglibCategoriesSelector = A.Component.create({
 			ATTRS: {
 				categoryIds: {
 					setter(value) {
@@ -115,12 +115,12 @@ AUI.add(
 				_afterTBLFocusedChange: EMPTY_FN,
 
 				_applyARIARoles() {
-					const instance = this;
+					var instance = this;
 
-					const labelNode = instance.get('labelNode');
+					var labelNode = instance.get('labelNode');
 
 					if (labelNode) {
-						const boundingBox = instance.get(BOUNDING_BOX);
+						var boundingBox = instance.get(BOUNDING_BOX);
 
 						boundingBox.attr('aria-labelledby', labelNode.attr(ID));
 
@@ -144,9 +144,9 @@ AUI.add(
 				_onBoundingBoxClick: EMPTY_FN,
 
 				_renderIcons() {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance.get('contentBox');
+					var contentBox = instance.get('contentBox');
 
 					if (instance.get('portletURL')) {
 						instance.icons = new A.Toolbar({
@@ -168,19 +168,19 @@ AUI.add(
 						}).render(contentBox);
 					}
 
-					const iconsBoundingBox = instance.icons.get(BOUNDING_BOX);
+					var iconsBoundingBox = instance.icons.get(BOUNDING_BOX);
 
 					instance.entryHolder.placeAfter(iconsBoundingBox);
 				},
 
 				_showSelectPopup(event) {
-					const instance = this;
+					var instance = this;
 
 					event.domEvent.preventDefault();
 
 					instance.set('categoryIds', instance.entries.keys);
 
-					const uri = Lang.sub(
+					var uri = Lang.sub(
 						decodeURIComponent(instance.get('portletURL')),
 						{
 							selectedCategories: instance.get('categoryIds'),
@@ -236,9 +236,9 @@ AUI.add(
 				},
 
 				_updateInputHidden() {
-					const instance = this;
+					var instance = this;
 
-					const hiddenInput = instance.get('hiddenInput');
+					var hiddenInput = instance.get('hiddenInput');
 
 					hiddenInput.val(instance.entries.keys.join(','));
 				},
@@ -247,7 +247,7 @@ AUI.add(
 				UI_EVENTS: {},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					AssetTaglibCategoriesSelector.superclass.bindUI.apply(
 						instance,
@@ -256,7 +256,7 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					AssetTaglibCategoriesSelector.superclass.constructor.superclass.renderUI.apply(
 						instance,
@@ -265,13 +265,13 @@ AUI.add(
 
 					instance._renderIcons();
 
-					instance.inputContainer.addClass('hide-accessible sr-only');
+					instance.inputContainer.addClass('hide-accessible');
 
 					instance._applyARIARoles();
 				},
 
 				syncUI() {
-					const instance = this;
+					var instance = this;
 
 					AssetTaglibCategoriesSelector.superclass.constructor.superclass.syncUI.apply(
 						instance,
@@ -282,12 +282,12 @@ AUI.add(
 						return object.categoryId;
 					};
 
-					const categoryTitles = instance.get('categoryTitles');
+					var categoryTitles = instance.get('categoryTitles');
 
-					const categoryIds = instance.get('categoryIds');
+					var categoryIds = instance.get('categoryIds');
 
 					categoryIds.forEach((item, index) => {
-						const entry = {
+						var entry = {
 							categoryId: item,
 							value: LString.unescapeHTML(categoryTitles[index]),
 						};

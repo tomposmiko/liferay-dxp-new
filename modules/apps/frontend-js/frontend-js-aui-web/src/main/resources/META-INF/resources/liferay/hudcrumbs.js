@@ -22,11 +22,11 @@
 AUI.add(
 	'liferay-hudcrumbs',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const NAME = 'hudcrumbs';
+		var NAME = 'hudcrumbs';
 
-		const Hudcrumbs = A.Component.create({
+		var Hudcrumbs = A.Component.create({
 			ATTRS: {
 				clone: {
 					value: null,
@@ -53,9 +53,9 @@ AUI.add(
 
 			prototype: {
 				_calculateDimensions() {
-					const instance = this;
+					var instance = this;
 
-					const region = instance.get('host').get('region');
+					var region = instance.get('host').get('region');
 
 					instance.get('clone').setStyles({
 						left: region.left + 'px',
@@ -69,19 +69,19 @@ AUI.add(
 				},
 
 				_onScroll(event) {
-					const instance = this;
+					var instance = this;
 
-					const scrollTop = event.currentTarget.get('scrollTop');
+					var scrollTop = event.currentTarget.get('scrollTop');
 
-					const hudcrumbs = instance.get('clone');
+					var hudcrumbs = instance.get('clone');
 
-					let action = 'hide';
+					var action = 'hide';
 
 					if (scrollTop >= instance.get('hostMidpoint')) {
 						action = 'show';
 					}
 
-					if (instance.lastAction !== action) {
+					if (instance.lastAction != action) {
 						hudcrumbs[action]();
 					}
 
@@ -89,33 +89,32 @@ AUI.add(
 				},
 
 				_onStartNavigate() {
-					const instance = this;
+					var instance = this;
 
 					instance.get('clone').hide();
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					Liferay.detach('startNavigate', instance._onStartNavigate);
 
-					const win = instance._win;
+					var win = instance._win;
 
 					win.detach('scroll', instance._onScrollTask);
 					win.detach('windowresize', instance._calculateDimensions);
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const breadcrumbs = instance.get('host');
-					const hudcrumbs = breadcrumbs.clone();
+					var breadcrumbs = instance.get('host');
+					var hudcrumbs = breadcrumbs.clone();
 
 					hudcrumbs.resetId();
 
-					// eslint-disable-next-line @liferay/aui/no-get-body
-					const body = A.getBody();
-					const win = A.getWin();
+					var body = A.getBody();
+					var win = A.getWin();
 
 					instance._body = body;
 					instance._win = win;

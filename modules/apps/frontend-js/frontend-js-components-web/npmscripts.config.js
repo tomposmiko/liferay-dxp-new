@@ -14,6 +14,8 @@
 
 module.exports = {
 	build: {
-		main: 'src/main/resources/META-INF/resources/index.js',
+		bundler: {
+			ignore: ['**/legacy/config.js'],
+		},
 	},
 };

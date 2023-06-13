@@ -14,17 +14,17 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayInput} from '@clayui/form';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React, {useEffect, useState} from 'react';
 
-export default function ManagementToolbarSearch({
+export default ({
 	disabled,
 	onSubmit,
 	searchText = '',
 	setShowMobile,
 	showMobile,
 	...restProps
-}) {
+}) => {
 	const [value, setValue] = useState(searchText);
 
 	useEffect(() => {
@@ -32,7 +32,7 @@ export default function ManagementToolbarSearch({
 	}, [searchText]);
 
 	return (
-		<ManagementToolbar.Search
+		<ClayManagementToolbar.Search
 			onSubmit={(event) => {
 				event.preventDefault();
 				onSubmit(value.trim());
@@ -60,7 +60,6 @@ export default function ManagementToolbarSearch({
 							onClick={() => setShowMobile(false)}
 							symbol="times"
 						/>
-
 						<ClayButtonWithIcon
 							disabled={disabled}
 							displayType="unstyled"
@@ -70,6 +69,6 @@ export default function ManagementToolbarSearch({
 					</ClayInput.GroupInsetItem>
 				</ClayInput.GroupItem>
 			</ClayInput.Group>
-		</ManagementToolbar.Search>
+		</ClayManagementToolbar.Search>
 	);
-}
+};

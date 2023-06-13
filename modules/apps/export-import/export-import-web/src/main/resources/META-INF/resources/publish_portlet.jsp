@@ -91,10 +91,7 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 
 	<c:choose>
 		<c:when test="<%= Validator.isNotNull(errorMessageKey) %>">
-			<clay:stripe
-				displayType="warning"
-				message="<%= errorMessageKey %>"
-			/>
+			<liferay-ui:message key="<%= errorMessageKey %>" />
 		</c:when>
 		<c:when test="<%= (themeDisplay.getURLPublishToLive() != null) || layout.isTypeControlPanel() %>">
 			<c:choose>
@@ -147,21 +144,18 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 
 					var dateChecker = exportImport.getDateRangeChecker();
 
-					if (dateChecker.validRange) {
-						Liferay.Util.openConfirmModal({
-							message:
-								'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-copy-from-live-and-update-the-existing-staging-widget-information") %>',
-							onConfirm: (isConfirmed) => {
-								if (isConfirmed) {
-									document.<portlet:namespace />fm1.<portlet:namespace /><%= Constants.CMD %>.value =
-										'copy_from_live';
+					if (
+						dateChecker.validRange &&
+						confirm(
+							'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-copy-from-live-and-update-the-existing-staging-widget-information") %>'
+						)
+					) {
+						document.<portlet:namespace />fm1.<portlet:namespace /><%= Constants.CMD %>.value =
+							'copy_from_live';
 
-									submitForm(document.<portlet:namespace />fm1);
-								}
-							},
-						});
+						submitForm(document.<portlet:namespace />fm1);
 					}
-					else {
+					else if (!dateChecker.validRange) {
 						exportImport.showNotification(dateChecker);
 					}
 				}
@@ -173,18 +167,15 @@ if (!GroupPermissionUtil.contains(permissionChecker, themeDisplay.getScopeGroup(
 
 					var dateChecker = exportImport.getDateRangeChecker();
 
-					if (dateChecker.validRange) {
-						Liferay.Util.openConfirmModal({
-							message:
-								'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-publish-to-live-and-update-the-existing-application-data") %>',
-							onConfirm: (isConfirmed) => {
-								if (isConfirmed) {
-									submitForm(document.<portlet:namespace />fm1);
-								}
-							},
-						});
+					if (
+						dateChecker.validRange &&
+						confirm(
+							'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-publish-to-live-and-update-the-existing-application-data") %>'
+						)
+					) {
+						submitForm(document.<portlet:namespace />fm1);
 					}
-					else {
+					else if (!dateChecker.validRange) {
 						exportImport.showNotification(dateChecker);
 					}
 				}

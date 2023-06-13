@@ -12,7 +12,7 @@
  * details.
  */
 
-export default function withRepetitionControls(Component) {
+export default (Component) => {
 	return class withRepeatableFields extends Component {
 		remove() {
 			this.dispatch('fieldRemoved', this.name);
@@ -30,4 +30,4 @@ export default function withRepetitionControls(Component) {
 			this.remove();
 		}
 	};
-}
+};

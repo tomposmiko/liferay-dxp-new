@@ -14,49 +14,61 @@
 
 package com.liferay.roles.admin.web.internal.group.type.contributor.util;
 
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.roles.admin.group.type.contributor.GroupTypeContributor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Alejandro Tardín
  */
+@Component(immediate = true, service = {})
 public class GroupTypeContributorUtil {
 
 	public static long[] getClassNameIds() {
-		List<Long> classNameIds = new ArrayList<>();
+		Stream<GroupTypeContributor> stream = _groupTypeContributors.stream();
 
-		for (GroupTypeContributor groupTypeContributor : _serviceTrackerList) {
-			if (!groupTypeContributor.isEnabled()) {
-				continue;
-			}
-
-			classNameIds.add(
-				PortalUtil.getClassNameId(groupTypeContributor.getClassName()));
-		}
-
-		return ListUtil.toLongArray(classNameIds, Long::valueOf);
+		return ListUtil.toLongArray(
+			stream.filter(
+				GroupTypeContributor::isEnabled
+			).map(
+				GroupTypeContributor::getClassName
+			).map(
+				PortalUtil::getClassNameId
+			).collect(
+				Collectors.toList()
+			),
+			Long::valueOf);
 	}
 
-	private static final ServiceTrackerList<GroupTypeContributor>
-		_serviceTrackerList;
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addGroupTypeContributor(
+		GroupTypeContributor groupTypeContributor) {
 
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(GroupTypeContributorUtil.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		_serviceTrackerList = ServiceTrackerListFactory.open(
-			bundleContext, GroupTypeContributor.class);
+		_groupTypeContributors.add(groupTypeContributor);
 	}
+
+	protected void removeGroupTypeContributor(
+		GroupTypeContributor groupTypeContributor) {
+
+		_groupTypeContributors.remove(groupTypeContributor);
+	}
+
+	private static final List<GroupTypeContributor> _groupTypeContributors =
+		new ArrayList<>();
 
 }

@@ -16,15 +16,7 @@
 
 <%@ include file="/price/init.jsp" %>
 
-<%
-String containerId = StringPool.BLANK;
-
-if (Validator.isNotNull(namespace) || (Validator.isNull(namespace) && !compact)) {
-	containerId = namespace + "price";
-}
-%>
-
-<span class="<%= Validator.isNotNull(namespace) ? namespace + "price price" : "price" %><%= compact ? " compact" : StringPool.BLANK %>" id="<%= containerId %>">
+<span class="<%= Validator.isNotNull(namespace) ? namespace + "price price" : "price" %><%= compact ? " compact" : StringPool.BLANK %>" id="<%= Validator.isNotNull(namespace) ? namespace + "price" : "" %>">
 	<liferay-util:include page="/price/default.jsp" servletContext="<%= application %>" />
 
 	<c:choose>
@@ -54,9 +46,9 @@ if (Validator.isNotNull(namespace) || (Validator.isNull(namespace) && !compact))
 	</c:choose>
 </span>
 
-<c:if test="<%= Validator.isNotNull(containerId) %>">
+<c:if test="<%= Validator.isNotNull(namespace) %>">
 	<aui:script require="commerce-frontend-js/components/price/entry as Price">
-		const componentId = '<%= containerId %>';
+		const componentId = '<%= namespace + "price" %>';
 
 		const initialProps = {
 			displayDiscountLevels: <%= displayDiscountLevels %>,

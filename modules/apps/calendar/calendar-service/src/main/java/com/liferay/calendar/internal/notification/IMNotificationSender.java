@@ -24,7 +24,8 @@ import org.osgi.service.component.annotations.Component;
  * @author Eduardo Lundgren
  */
 @Component(
-	property = "notification.type=im", service = NotificationSender.class
+	immediate = true, property = "notification.type=im",
+	service = NotificationSender.class
 )
 public class IMNotificationSender implements NotificationSender {
 

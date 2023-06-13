@@ -12,7 +12,7 @@
  * details.
  */
 
-import {openImageSelector} from '../../common/openImageSelector';
+import {openImageSelector} from '../../core/openImageSelector';
 import {getEditableLinkValue} from '../utils/getEditableLinkValue';
 import {getEditableLocalizedValue} from '../utils/getEditableLocalizedValue';
 
@@ -64,10 +64,7 @@ function render(element, value, editableConfig = {}, languageId) {
 	}
 
 	if (image) {
-		image.alt =
-			getEditableLocalizedValue(editableConfig.alt, languageId) ||
-			value?.alt ||
-			'';
+		image.alt = getEditableLocalizedValue(editableConfig.alt, languageId);
 
 		const link = getEditableLinkValue(editableConfig, languageId);
 
@@ -79,9 +76,7 @@ function render(element, value, editableConfig = {}, languageId) {
 			else {
 				const anchorElement = document.createElement('a');
 
-				anchorElement.href = `${editableConfig.prefix || ''}${
-					link.href
-				}`;
+				anchorElement.href = link.href;
 				anchorElement.target = link.target;
 
 				image.parentElement.replaceChild(anchorElement, image);
@@ -94,10 +89,6 @@ function render(element, value, editableConfig = {}, languageId) {
 
 		if (imageValue) {
 			image.src = imageValue;
-		}
-
-		if (editableConfig.lazyLoading) {
-			image.loading = 'lazy';
 		}
 	}
 }

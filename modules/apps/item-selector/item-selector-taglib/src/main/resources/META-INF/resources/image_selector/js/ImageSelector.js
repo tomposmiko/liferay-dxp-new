@@ -15,18 +15,12 @@
 import ClayIcon from '@clayui/icon';
 import {State} from '@liferay/frontend-js-state-web';
 import classNames from 'classnames';
-import {
-	STATUS_CODE,
-	formatStorage,
-	openSelectionModal,
-	sub,
-} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
 
-import imageSelectorImageAtom, {
+import imageSelectorCoverImageAtom, {
 	STR_NULL_IMAGE_FILE_ENTRY_ID,
-} from '../../atoms/imageSelectorImageAtom';
+} from '../../atoms/imageSelectorCoverImageAtom';
 import DropHereInfo from '../../drop_here_info/js/DropHereInfo';
 import BrowseImage from './BrowseImage';
 import ChangeImageControls from './ChangeImageControls';
@@ -36,6 +30,7 @@ import ProgressWrapper from './ProgressWrapper';
 
 const CSS_DROP_ACTIVE = 'drop-active';
 const CSS_PROGRESS_ACTIVE = 'progress-active';
+const STATUS_CODE = Liferay.STATUS_CODE;
 
 const STR_SPACE = ' ';
 
@@ -87,7 +82,7 @@ const ImageSelector = ({
 		}
 		else if (errorType === STATUS_CODE.SC_FILE_EXTENSION_EXCEPTION) {
 			if (validExtensions) {
-				message = sub(
+				message = Liferay.Util.sub(
 					Liferay.Language.get(
 						'please-enter-a-file-with-a-valid-extension-x'
 					),
@@ -95,7 +90,7 @@ const ImageSelector = ({
 				);
 			}
 			else {
-				message = sub(
+				message = Liferay.Util.sub(
 					Liferay.Language.get(
 						'please-enter-a-file-with-a-valid-file-type'
 					)
@@ -108,22 +103,22 @@ const ImageSelector = ({
 			);
 		}
 		else if (errorType === STATUS_CODE.SC_FILE_SIZE_EXCEPTION) {
-			message = sub(
+			message = Liferay.Util.sub(
 				Liferay.Language.get(
 					'please-enter-a-file-with-a-valid-file-size-no-larger-than-x'
 				),
-				[formatStorage(parseInt(maxFileSize, 10))]
+				[Liferay.Util.formatStorage(parseInt(maxFileSize, 10))]
 			);
 		}
 		else if (errorType === STATUS_CODE.SC_UPLOAD_REQUEST_SIZE_EXCEPTION) {
 			const maxUploadRequestSize =
 				Liferay.PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE;
 
-			message = sub(
+			message = Liferay.Util.sub(
 				Liferay.Language.get(
 					'request-is-larger-than-x-and-could-not-be-processed'
 				),
-				[formatStorage(maxUploadRequestSize)]
+				[Liferay.Util.formatStorage(maxUploadRequestSize)]
 			);
 		}
 
@@ -161,7 +156,7 @@ const ImageSelector = ({
 	};
 
 	const handleSelectFileClick = () => {
-		openSelectionModal({
+		Liferay.Util.openSelectionModal({
 			onSelect: (selectedItem) => {
 				if (selectedItem) {
 					const itemValue = JSON.parse(selectedItem.value);
@@ -214,16 +209,16 @@ const ImageSelector = ({
 
 		setProgressValue(Math.ceil(percentLoaded));
 
-		const bytesLoaded = formatStorage(event.bytesLoaded);
+		const bytesLoaded = Liferay.Util.formatStorage(event.bytesLoaded);
 
-		const bytesTotal = formatStorage(event.bytesTotal);
+		const bytesTotal = Liferay.Util.formatStorage(event.bytesTotal);
 
 		const bytesLoadedSpaceIndex = bytesLoaded.indexOf(STR_SPACE);
 
 		const bytesTotalSpaceIndex = bytesTotal.indexOf(STR_SPACE);
 
 		setProgressData(
-			sub(
+			Liferay.Util.sub(
 				TPL_PROGRESS_DATA,
 				bytesLoaded.substring(0, bytesLoadedSpaceIndex),
 				bytesLoaded.substring(bytesLoadedSpaceIndex + 1),
@@ -255,10 +250,11 @@ const ImageSelector = ({
 	};
 
 	useEffect(() => {
-		State.write(imageSelectorImageAtom, {
-			...image,
-			paramName,
-		});
+		const isCoverImageSelector = paramName === 'coverImageFileEntry';
+
+		if (isCoverImageSelector) {
+			State.write(imageSelectorCoverImageAtom, image);
+		}
 	}, [image, paramName]);
 
 	useEffect(() => {

@@ -33,18 +33,22 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.model.SiteNavigationMenuModel;
+import com.liferay.site.navigation.model.SiteNavigationMenuSoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -177,6 +181,64 @@ public class SiteNavigationMenuModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static SiteNavigationMenu toModel(SiteNavigationMenuSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		SiteNavigationMenu model = new SiteNavigationMenuImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setUuid(soapModel.getUuid());
+		model.setSiteNavigationMenuId(soapModel.getSiteNavigationMenuId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setName(soapModel.getName());
+		model.setType(soapModel.getType());
+		model.setAuto(soapModel.isAuto());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<SiteNavigationMenu> toModels(
+		SiteNavigationMenuSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<SiteNavigationMenu> models = new ArrayList<SiteNavigationMenu>(
+			soapModels.length);
+
+		for (SiteNavigationMenuSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public SiteNavigationMenuModelImpl() {
 	}
 
@@ -253,130 +315,141 @@ public class SiteNavigationMenuModelImpl
 	public Map<String, Function<SiteNavigationMenu, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<SiteNavigationMenu, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, SiteNavigationMenu>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<SiteNavigationMenu, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SiteNavigationMenu.class.getClassLoader(), SiteNavigationMenu.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<SiteNavigationMenu, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<SiteNavigationMenu, Object>>();
+		try {
+			Constructor<SiteNavigationMenu> constructor =
+				(Constructor<SiteNavigationMenu>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", SiteNavigationMenu::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", SiteNavigationMenu::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", SiteNavigationMenu::getUuid);
-			attributeGetterFunctions.put(
-				"siteNavigationMenuId",
-				SiteNavigationMenu::getSiteNavigationMenuId);
-			attributeGetterFunctions.put(
-				"groupId", SiteNavigationMenu::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", SiteNavigationMenu::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", SiteNavigationMenu::getUserId);
-			attributeGetterFunctions.put(
-				"userName", SiteNavigationMenu::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", SiteNavigationMenu::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", SiteNavigationMenu::getModifiedDate);
-			attributeGetterFunctions.put("name", SiteNavigationMenu::getName);
-			attributeGetterFunctions.put("type", SiteNavigationMenu::getType);
-			attributeGetterFunctions.put("auto", SiteNavigationMenu::getAuto);
-			attributeGetterFunctions.put(
-				"lastPublishDate", SiteNavigationMenu::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<SiteNavigationMenu, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<SiteNavigationMenu, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<SiteNavigationMenu, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<SiteNavigationMenu, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<SiteNavigationMenu, Object>>();
+		Map<String, BiConsumer<SiteNavigationMenu, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<SiteNavigationMenu, ?>>();
 
-		static {
-			Map<String, BiConsumer<SiteNavigationMenu, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<SiteNavigationMenu, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", SiteNavigationMenu::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<SiteNavigationMenu, Long>)
+				SiteNavigationMenu::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SiteNavigationMenu::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<SiteNavigationMenu, Long>)
+				SiteNavigationMenu::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", SiteNavigationMenu::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<SiteNavigationMenu, String>)
+				SiteNavigationMenu::setUuid);
+		attributeGetterFunctions.put(
+			"siteNavigationMenuId",
+			SiteNavigationMenu::getSiteNavigationMenuId);
+		attributeSetterBiConsumers.put(
+			"siteNavigationMenuId",
+			(BiConsumer<SiteNavigationMenu, Long>)
+				SiteNavigationMenu::setSiteNavigationMenuId);
+		attributeGetterFunctions.put("groupId", SiteNavigationMenu::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<SiteNavigationMenu, Long>)
+				SiteNavigationMenu::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", SiteNavigationMenu::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<SiteNavigationMenu, Long>)
+				SiteNavigationMenu::setCompanyId);
+		attributeGetterFunctions.put("userId", SiteNavigationMenu::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<SiteNavigationMenu, Long>)
+				SiteNavigationMenu::setUserId);
+		attributeGetterFunctions.put(
+			"userName", SiteNavigationMenu::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<SiteNavigationMenu, String>)
+				SiteNavigationMenu::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", SiteNavigationMenu::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<SiteNavigationMenu, Date>)
+				SiteNavigationMenu::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", SiteNavigationMenu::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<SiteNavigationMenu, Date>)
+				SiteNavigationMenu::setModifiedDate);
+		attributeGetterFunctions.put("name", SiteNavigationMenu::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<SiteNavigationMenu, String>)
+				SiteNavigationMenu::setName);
+		attributeGetterFunctions.put("type", SiteNavigationMenu::getType);
+		attributeSetterBiConsumers.put(
+			"type",
+			(BiConsumer<SiteNavigationMenu, Integer>)
+				SiteNavigationMenu::setType);
+		attributeGetterFunctions.put("auto", SiteNavigationMenu::getAuto);
+		attributeSetterBiConsumers.put(
+			"auto",
+			(BiConsumer<SiteNavigationMenu, Boolean>)
+				SiteNavigationMenu::setAuto);
+		attributeGetterFunctions.put(
+			"lastPublishDate", SiteNavigationMenu::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<SiteNavigationMenu, Date>)
+				SiteNavigationMenu::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<SiteNavigationMenu, Long>)
-					SiteNavigationMenu::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<SiteNavigationMenu, Long>)
-					SiteNavigationMenu::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<SiteNavigationMenu, String>)
-					SiteNavigationMenu::setUuid);
-			attributeSetterBiConsumers.put(
-				"siteNavigationMenuId",
-				(BiConsumer<SiteNavigationMenu, Long>)
-					SiteNavigationMenu::setSiteNavigationMenuId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<SiteNavigationMenu, Long>)
-					SiteNavigationMenu::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<SiteNavigationMenu, Long>)
-					SiteNavigationMenu::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<SiteNavigationMenu, Long>)
-					SiteNavigationMenu::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<SiteNavigationMenu, String>)
-					SiteNavigationMenu::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<SiteNavigationMenu, Date>)
-					SiteNavigationMenu::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<SiteNavigationMenu, Date>)
-					SiteNavigationMenu::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<SiteNavigationMenu, String>)
-					SiteNavigationMenu::setName);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<SiteNavigationMenu, Integer>)
-					SiteNavigationMenu::setType);
-			attributeSetterBiConsumers.put(
-				"auto",
-				(BiConsumer<SiteNavigationMenu, Boolean>)
-					SiteNavigationMenu::setAuto);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<SiteNavigationMenu, Date>)
-					SiteNavigationMenu::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1007,12 +1080,41 @@ public class SiteNavigationMenuModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<SiteNavigationMenu, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<SiteNavigationMenu, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<SiteNavigationMenu, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((SiteNavigationMenu)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SiteNavigationMenu>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SiteNavigationMenu.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1036,8 +1138,7 @@ public class SiteNavigationMenuModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<SiteNavigationMenu, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

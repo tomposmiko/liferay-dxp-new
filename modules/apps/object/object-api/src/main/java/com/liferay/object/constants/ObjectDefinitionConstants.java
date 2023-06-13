@@ -25,8 +25,4 @@ public class ObjectDefinitionConstants {
 
 	public static final String SCOPE_SITE = "site";
 
-	public static final String STORAGE_TYPE_DEFAULT = "default";
-
-	public static final String STORAGE_TYPE_SALESFORCE = "salesforce";
-
 }

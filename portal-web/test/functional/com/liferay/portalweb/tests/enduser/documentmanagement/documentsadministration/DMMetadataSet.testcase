@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -23,19 +23,17 @@ definition {
 			DMDocumentType.tearDownCP();
 
 			DMMetadataSet.tearDownCP();
+
+			User.logoutPG();
 		}
 	}
 
-	@description = "This ensures that a metadata set can be removed from the entry Menu."
-	@e2etest
-	@priority = 5
-	@refactordone
-	test CanDeleteEntry {
-		property portal.acceptance = "true";
+	@priority = "4"
+	@refactorneeded
+	test AddToAndRemoveFromDocumentType {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
-
-		DMMetadataSet.viewDefaultCP();
+		DMNavigator.gotoMetadataSets();
 
 		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
 
@@ -45,52 +43,9 @@ definition {
 
 		DDLDataDefinition.save();
 
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMMetadataSet.delete(
-			metadataSetName = "DM Metadata Set Name",
-			searchMetadataSet = "true");
-
-		DMMetadataSet.viewMetadataSetNotFoundCP();
-	}
-
-	@description = "This test covers LPS-128046. It ensures that a metadata set can be removed from the management bar."
-	@priority = 4
-	@refactordone
-	test CanDeleteEntryViaManagementBar {
-		property portal.acceptance = "true";
-
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
-
-		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
-
-		DataEngine.addField(
-			fieldFieldLabel = "Text",
-			fieldName = "Text");
-
-		DDLDataDefinition.save();
-
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
-
-		DMMetadataSet.delete(
-			deleteViaManagementBar = "true",
-			metadataSetName = "DM Metadata Set Name");
-	}
-
-	@priority = 4
-	@refactordone
-	test CannotDeleteIfReferencedByDocType {
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
-
-		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
-
-		DataEngine.addField(
-			fieldFieldLabel = "Text",
-			fieldName = "Text");
-
-		DDLDataDefinition.save();
-
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
+		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -103,12 +58,30 @@ definition {
 		DMMetadataSet.delete(
 			metadataSetHasReference = "true",
 			metadataSetName = "DM Metadata Set Name");
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoDocumentType();
+
+		DMDocumentType.edit(
+			dmDocumentTypeName = "DM Document Type Name",
+			metadataSetName = "DM Metadata Set Name",
+			removeMetadataSet = "true");
+
+		DMNavigator.gotoMetadataSets();
+
+		DMMetadataSet.delete(metadataSetName = "DM Metadata Set Name");
 	}
 
-	@priority = 4
-	@refactordone
-	test CanRemoveFromDocType {
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+	@description = "This ensures that a metadata set can be removed from the entry Menu."
+	@priority = "5"
+	@refactorneeded
+	test DeleteEntry {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
+
+		DMMetadataSet.viewDefaultCP();
 
 		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
 
@@ -118,28 +91,106 @@ definition {
 
 		DDLDataDefinition.save();
 
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
+
+		DMMetadataSet.delete(
+			metadataSetName = "DM Metadata Set Name",
+			searchMetadataSet = "true");
+
+		DMMetadataSet.viewMetadataSetNotFoundCP();
+	}
+
+	@description = "This test covers LPS-128046. It ensures that a metadata set can be removed from the management bar."
+	@priority = "4"
+	@refactorneeded
+	test DeleteEntryViaManagementBar {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
+
+		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
+
+		DataEngine.addField(
+			fieldFieldLabel = "Text",
+			fieldName = "Text");
+
+		DDLDataDefinition.save();
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
+
+		DMMetadataSet.delete(
+			deleteViaManagementBar = "true",
+			metadataSetName = "DM Metadata Set Name");
+	}
+
+	@description = "This ensures that the user can delete fields within a metadata set."
+	@priority = "3"
+	@refactorneeded
+	test DeleteFields {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
+
+		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
+
+		DataEngine.addFields(fieldNameList = "Text,Date,Image");
+
+		DDLDataDefinition.save();
+
+		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
-			dmDocumentTypeFieldNames = "Text",
+			dmDocumentTypeFieldNames = "Numeric",
 			dmDocumentTypeName = "DM Document Type Name",
 			metadataSetName = "DM Metadata Set Name");
 
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMDocumentType.edit(
-			dmDocumentTypeName = "DM Document Type Name",
-			metadataSetName = "DM Metadata Set Name",
-			removeMetadataSet = "true");
+		DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "DM Document Type Name");
+
+		for (var fieldFieldLabel : list "Numeric,Text,Date,Image") {
+			AssertElementPresent(
+				key_fieldFieldLabel = "${fieldFieldLabel}",
+				locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
+		}
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
+
+		DMDocumentType.deleteFields(
+			dmDocumentTypeName = "DM Metadata Set Name",
+			fieldFieldLabel = "Text,Date");
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "DM Document Type Name");
+
+		for (var fieldFieldLabel : list "Text,Date") {
+			AssertElementNotPresent(
+				key_fieldFieldLabel = "${fieldFieldLabel}",
+				locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
+		}
+
+		for (var fieldFieldLabel : list "Numeric,Image") {
+			AssertElementPresent(
+				key_fieldFieldLabel = "${fieldFieldLabel}",
+				locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
+		}
 	}
 
 	@description = "This ensures that the user can create a document using edited image field inside metadata set."
-	@e2etest
-	@priority = 4
-	@refactordone
-	test CanViewDocumentwithEditedImageField {
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+	@priority = "4"
+	@refactorneeded
+	test ViewDocumentwithEditedImageField {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
 
 		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
 
@@ -149,7 +200,9 @@ definition {
 
 		DDLDataDefinition.save();
 
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -165,7 +218,7 @@ definition {
 			dmDocumentTypeName = "DM Document Type Name",
 			imageField = "Document_1.jpg",
 			navTab = "Documents and Media",
-			numericField = 123);
+			numericField = "123");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -173,7 +226,9 @@ definition {
 
 		DMDocument.viewDocumentTypePG(imageName = "Document_1.jpg");
 
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
 
 		DMDocumentType.edit(
 			dmDocumentTypeFieldNameEdit = "Photo",
@@ -205,7 +260,7 @@ definition {
 			imageDescription = "Photo Description",
 			imageField = "Document_2.jpg",
 			navTab = "Documents and Media",
-			numericField = 123);
+			numericField = "123");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title 2");
 
@@ -215,11 +270,12 @@ definition {
 	}
 
 	@description = "This ensures that the user can create a document using edited text field inside metadata set."
-	@e2etest
-	@priority = 4
-	@refactordone
-	test CanViewDocumentwithEditedTextField {
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+	@priority = "4"
+	@refactorneeded
+	test ViewDocumentwithEditedTextField {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
 
 		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
 
@@ -229,7 +285,9 @@ definition {
 
 		DDLDataDefinition.save();
 
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -243,7 +301,7 @@ definition {
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
 			dmDocumentTypeName = "DM Document Type Name",
-			numericField = 123,
+			numericField = "123",
 			textField = "DM Document Text");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
@@ -252,7 +310,9 @@ definition {
 
 		DMDocument.viewDocumentTypePG(textContent = "DM Document Text");
 
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
 
 		DMDocumentType.edit(
 			dmDocumentTypeFieldNameEdit = "Company",
@@ -282,7 +342,7 @@ definition {
 			dmDocumentTitle = "DM Document Title 2",
 			dmDocumentTypeName = "DM Document Type Name",
 			fieldFieldLabel = "Company",
-			numericField = 123,
+			numericField = "123",
 			textField = "Liferay");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title 2");
@@ -292,17 +352,29 @@ definition {
 			textFieldLabel = "Company");
 	}
 
-	@description = "This ensures that when a metadata field deletions in document type will be reflected when adding a new doc type."
-	@priority = 3
-	@refactordone
-	test DeletedFieldsAreReflectedWhenAddingNewDocType {
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+	@description = "This ensures that the user can create a document using edited upload field inside metadata set."
+	@priority = "4"
+	@refactorneeded
+	test ViewDocumentwithEditedUploadField {
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentTitle = "Document_1.doc",
+			groupName = "Guest",
+			mimeType = "application/msword",
+			sourceFileName = "Document_1.doc");
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMNavigator.gotoMetadataSets();
 
 		DMMetadataSet.addTitle(metadataSetName = "DM Metadata Set Name");
 
-		DataEngine.addFields(fieldNameList = "Text,Date,Image");
+		DataEngine.addField(
+			fieldFieldLabel = "Upload",
+			fieldName = "Upload");
 
 		DDLDataDefinition.save();
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMNavigator.gotoDocumentType();
 
@@ -314,35 +386,61 @@ definition {
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "DM Document Type Name");
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			dmDocumentTypeName = "DM Document Type Name",
+			documentsAndMediaField = "Document_1.doc",
+			fieldFieldLabel = "Upload",
+			navTab = "Documents and Media",
+			numericField = "123");
 
-		for (var fieldFieldLabel : list "Numeric,Text,Date,Image") {
-			AssertElementPresent(
-				key_fieldFieldLabel = ${fieldFieldLabel},
-				locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
-		}
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
-		DMNavigator.openMetadataSetsAdmin(siteURLKey = "guest");
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
-		DMDocumentType.deleteFields(
-			dmDocumentTypeName = "DM Metadata Set Name",
-			fieldFieldLabel = "Text,Date");
+		DMDocument.viewDocumentTypePG(uploadFile = "Document_1.doc");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "DM Document Type Name");
+		DMNavigator.gotoMetadataSets();
 
-		for (var fieldFieldLabel : list "Text,Date") {
-			AssertElementNotPresent(
-				key_fieldFieldLabel = ${fieldFieldLabel},
-				locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
-		}
+		DMDocumentType.edit(
+			dmDocumentTypeFieldNameEdit = "Resume",
+			dmDocumentTypeFieldRequiredEdit = "Resume",
+			dmDocumentTypeName = "DM Metadata Set Name",
+			dmDocumentTypeNameEdit = "DM Metadata Set Name Edit",
+			fieldFieldLabel = "Upload",
+			fieldFieldLabelEdit = "Resume");
 
-		for (var fieldFieldLabel : list "Numeric,Image") {
-			AssertElementPresent(
-				key_fieldFieldLabel = ${fieldFieldLabel},
-				locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
-		}
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "DM Document Title");
+
+		AssertElementPresent(
+			key_fieldFieldLabel = "Resume",
+			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER_LABEL");
+
+		FormFields.viewRequiredAsteriskDataField(fieldFieldLabel = "Resume");
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title 2",
+			dmDocumentTypeName = "DM Document Type Name",
+			documentsAndMediaField = "Document_1.doc",
+			fieldFieldLabel = "Resume",
+			navTab = "Documents and Media",
+			numericField = "123");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title 2");
+
+		DMDocument.viewDocumentTypePG(
+			uploadFieldLabel = "Resume",
+			uploadFile = "Document_1.doc");
 	}
 
 }

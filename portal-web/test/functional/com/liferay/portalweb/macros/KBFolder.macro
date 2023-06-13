@@ -1,25 +1,18 @@
 definition {
 
 	macro addCP {
-		if (isSet(centerPaneButton)) {
-			Button.click(button = "New");
+		LexiconEntry.gotoAddMenuItem(menuItem = "Folder");
 
-			MenuItem.click(menuItem = "Folder");
-		}
-		else {
-			LexiconEntry.gotoAddMenuItem(menuItem = "Folder");
-		}
+		PortletEntry.inputName(name = "${kbFolderName}");
 
-		PortletEntry.inputName(name = ${kbFolderName});
-
-		PortletEntry.inputDescription(description = ${kbFolderDescription});
+		PortletEntry.inputDescription(description = "${kbFolderDescription}");
 
 		if (isSet(customField)) {
 			Panel.expandPanel(panel = "Custom Fields");
 
 			Type(
 				locator1 = "TextInput#CUSTOM_FIELD",
-				value1 = ${customField});
+				value1 = "${customField}");
 		}
 
 		Button.clickSave();
@@ -37,16 +30,9 @@ definition {
 	}
 
 	macro deleteCP {
-		if (isSet(navigationPane)) {
-			KBFolder.gotoMenuItemViaNavigationPane(
-				kbFolderName = ${kbFolderName},
-				menuItem = "Delete");
-		}
-		else {
-			LexiconEntry.gotoEntryMenuItemNoError(
-				menuItem = "Delete",
-				rowEntry = ${kbFolderName});
-		}
+		LexiconEntry.gotoEntryMenuItemNoError(
+			menuItem = "Delete",
+			rowEntry = "${kbFolderName}");
 
 		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
 
@@ -54,103 +40,49 @@ definition {
 	}
 
 	macro editCP {
-		if (isSet(navigationPane)) {
-			KBFolder.gotoMenuItemViaNavigationPane(
-				kbFolderName = ${kbFolderName},
-				menuItem = "Edit");
-		}
-		else {
-			LexiconEntry.gotoEntryMenuItem(
-				menuItem = "Edit",
-				rowEntry = ${kbFolderName});
-		}
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "${kbFolderName}");
 
-		PortletEntry.inputName(name = ${kbFolderEditedName});
+		PortletEntry.inputName(name = "${kbFolderEditedName}");
 
-		PortletEntry.inputDescription(description = ${kbFolderDescription});
+		PortletEntry.inputDescription(description = "${kbFolderDescription}");
 
 		PortletEntry.save();
 	}
 
 	macro gotoCP {
-		var key_kbFolderName = ${kbFolderName};
-
-		if (isSet(pageTreePanel)) {
-			Click(
-				key_itemName = ${kbFolderName},
-				locator1 = "KnowledgeBase#PAGE_TREE_ITEM_NAME");
-
-			AssertVisible(
-				key_itemName = ${kbFolderName},
-				locator1 = "KnowledgeBase#PAGE_TREE_ITEM_HIGHLIGHT");
-		}
-		else {
-			AssertClick(
-				locator1 = "KnowledgeBase#FOLDER_DESCRIPTIVE_FOLDER_NAME",
-				value1 = ${kbFolderName});
-
-			if (isSet(highlight)) {
-				AssertVisible(
-					key_itemName = ${kbFolderName},
-					locator1 = "KnowledgeBase#PAGE_TREE_ITEM_HIGHLIGHT");
-			}
-		}
-
-		AssertTextEquals(
-			key_breadcrumbName = ${kbFolderName},
-			locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
-			value1 = ${kbFolderName});
-	}
-
-	macro gotoMenuItemViaNavigationPane {
-		MouseOver(
-			key_itemName = ${kbFolderName},
-			locator1 = "KnowledgeBase#PAGE_TREE_ITEM_NAME");
-
-		Click.waitForMenuToggleJSClick(
-			key_itemName = ${kbFolderName},
-			locator1 = "KnowledgeBase#PAGE_TREE_ITEM_ELLIPSIS");
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-
-		if (${menuItem} == "Delete") {
-			MenuItem.clickNoError(menuItem = ${menuItem});
-		}
-		else {
-			MenuItem.click(menuItem = ${menuItem});
-		}
-	}
-
-	macro goToMoveCPViaNavigationPane {
-		KBFolder.gotoMenuItemViaNavigationPane(
-			kbFolderName = ${kbFolderName},
-			menuItem = "Move");
+		var key_kbFolderName = "${kbFolderName}";
 
 		AssertClick(
-			locator1 = "Button#SELECT",
-			value1 = "Select");
+			locator1 = "KnowledgeBase#FOLDER_DESCRIPTIVE_FOLDER_NAME",
+			value1 = "${kbFolderName}");
+
+		AssertTextEquals(
+			key_breadcrumbName = "${kbFolderName}",
+			locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+			value1 = "${kbFolderName}");
 	}
 
 	macro gotoViaKBDisplayPG {
-		var key_kbFolderName = ${kbFolderName};
+		var key_kbFolderName = "${kbFolderName}";
 
 		Select(
 			locator1 = "KnowledgeBase#FOLDER_SELECT_DROPDOWN",
-			value1 = ${kbFolderName});
+			value1 = "${kbFolderName}");
 	}
 
 	macro selectParentCP {
-		var key_kbArticleTitle = ${kbFolderName};
+		var key_kbArticleTitle = "${kbFolderName}";
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		if (${kbFolderName} == "Home") {
+		if ("${kbFolderName}" == "Home") {
 			Click(locator1 = "KnowledgeBaseSelectParent#BREADCRUMB_HOME");
 
 			AssertClick(
-				key_text = "Select This Folder",
-				locator1 = "Button#ANY",
-				value1 = "Select This Folder");
+				locator1 = "Button#CHOOSE_THIS_FOLDER",
+				value1 = "Choose This Folder");
 		}
 		else {
 			Click(
@@ -162,7 +94,7 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "KnowledgeBase#MOVE_NEW_PARENT_TITLE_FIELD",
-			value1 = ${kbFolderName});
+			value1 = "${kbFolderName}");
 
 		Click(locator1 = "Button#MOVE");
 
@@ -170,7 +102,11 @@ definition {
 	}
 
 	macro tearDownCP {
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Knowledge Base");
 
 		while (IsElementPresent(locator1 = "KnowledgeBase#FOLDER_TABLE_HEADER")) {
 			Check.checkAll(locator1 = "KnowledgeBase#ARTICLE_TABLE_SELECT_ALL_CHECKBOX");
@@ -183,55 +119,12 @@ definition {
 		}
 	}
 
-	macro viewFolderInfo {
-		VerifyElementPresent(
-			key_entryTitle = ${kbFolderName},
-			key_infoText = ${entryDefaultInfo},
-			locator1 = "KnowledgeBase#DESCRIPTIVE_VIEW_ENTRY_INFO");
-
-		VerifyElementNotPresent(
-			key_entryTitle = ${kbFolderName},
-			key_infoText = "${folderQuantity} Folders",
-			locator1 = "KnowledgeBase#DESCRIPTIVE_VIEW_ENTRY_INFO");
-
-		VerifyElementNotPresent(
-			key_entryTitle = ${kbFolderName},
-			key_infoText = "${articleQuantity} Articles",
-			locator1 = "KnowledgeBase#DESCRIPTIVE_VIEW_ENTRY_INFO");
-
-		if (isSet(infoPanel)) {
-			LexiconEntry.selectEntry(rowEntry = ${kbFolderName});
-
-			ManagementBar.clickInfo();
-
-			if (isSet(foldersQuantity)) {
-				AssertVisible(
-					key_sectionContent = ${foldersQuantity},
-					key_sectionTitle = "of Folders",
-					locator1 = "KnowledgeBase#SIDE_PANEL_INFO");
-			}
-
-			if (isSet(articlesQuantity)) {
-				AssertVisible(
-					key_sectionContent = ${foldersQuantity},
-					key_sectionTitle = "of Articles",
-					locator1 = "KnowledgeBase#SIDE_PANEL_INFO");
-			}
-		}
-	}
-
 	macro viewFolderNameCP {
-		var key_kbFolderName = ${kbFolderName};
+		var key_kbFolderName = "${kbFolderName}";
 
 		AssertTextEquals(
 			locator1 = "KnowledgeBase#FOLDER_DESCRIPTIVE_FOLDER_NAME",
-			value1 = ${kbFolderName});
-	}
-
-	macro viewFolderThroughPageTreePanel {
-		AssertVisible(
-			key_itemName = ${kbFolderName},
-			locator1 = "KnowledgeBase#PAGE_TREE_ITEM_NAME");
+			value1 = "${kbFolderName}");
 	}
 
 }

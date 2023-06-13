@@ -58,7 +58,7 @@ public class UniqueFileEntryTitleProviderTest {
 		_group = GroupTestUtil.addGroup();
 
 		_folder = _dlAppLocalService.addFolder(
-			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			TestPropsValues.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
@@ -69,9 +69,8 @@ public class UniqueFileEntryTitleProviderTest {
 		_dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), "someTitle.jpg", ContentTypes.IMAGE_JPEG,
-			StringUtil.randomString(), StringPool.BLANK,
-			StringUtil.randomString(), StringPool.BLANK, "test".getBytes(),
-			null, null,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, "test".getBytes(), null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
@@ -86,8 +85,8 @@ public class UniqueFileEntryTitleProviderTest {
 		_dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), null, ContentTypes.IMAGE_JPEG, "someTitle",
-			StringPool.BLANK, StringUtil.randomString(), StringPool.BLANK,
-			"test".getBytes(), null, null,
+			StringUtil.randomString(), StringPool.BLANK, "test".getBytes(),
+			null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
@@ -119,8 +118,8 @@ public class UniqueFileEntryTitleProviderTest {
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), "Untitled" + mimeTypeExtension,
 			ContentTypes.IMAGE_JPEG, StringUtil.randomString(),
-			StringPool.BLANK, StringUtil.randomString(), StringPool.BLANK,
-			"test".getBytes(), null, null,
+			StringUtil.randomString(), StringPool.BLANK, "test".getBytes(),
+			null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
@@ -137,8 +136,8 @@ public class UniqueFileEntryTitleProviderTest {
 		_dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), null, ContentTypes.IMAGE_JPEG, "Untitled",
-			StringPool.BLANK, StringUtil.randomString(), StringPool.BLANK,
-			"test".getBytes(), null, null,
+			StringUtil.randomString(), StringPool.BLANK, "test".getBytes(),
+			null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
@@ -157,8 +156,8 @@ public class UniqueFileEntryTitleProviderTest {
 		_dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), "Untitled.ppt", ContentTypes.IMAGE_JPEG,
-			"Untitled", StringPool.BLANK, StringUtil.randomString(),
-			StringPool.BLANK, "test".getBytes(), null, null,
+			"Untitled", StringUtil.randomString(), StringPool.BLANK,
+			"test".getBytes(), null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
@@ -185,9 +184,8 @@ public class UniqueFileEntryTitleProviderTest {
 		_dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), "Untitled", ContentTypes.IMAGE_JPEG,
-			StringUtil.randomString(), StringPool.BLANK,
-			StringUtil.randomString(), StringPool.BLANK, "test".getBytes(),
-			null, null,
+			StringUtil.randomString(), StringUtil.randomString(),
+			StringPool.BLANK, "test".getBytes(), null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
@@ -203,8 +201,8 @@ public class UniqueFileEntryTitleProviderTest {
 		_dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), null, ContentTypes.IMAGE_JPEG, "Untitled",
-			StringPool.BLANK, StringUtil.randomString(), StringPool.BLANK,
-			"test".getBytes(), null, null,
+			StringUtil.randomString(), StringPool.BLANK, "test".getBytes(),
+			null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(

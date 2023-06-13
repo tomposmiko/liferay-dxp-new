@@ -21,18 +21,19 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Luca Pellizzon
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = {
 		"json.web.service.context.name=commerce",
 		"json.web.service.context.path=COREntryRel"
@@ -238,9 +239,10 @@ public class COREntryRelServiceImpl extends COREntryRelServiceBaseImpl {
 		return corEntryRelLocalService.getCOREntryRelsCount(corEntryId);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.order.rule.model.COREntry)"
-	)
-	private ModelResourcePermission<COREntry> _corEntryModelResourcePermission;
+	private static volatile ModelResourcePermission<COREntry>
+		_corEntryModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				COREntryRelServiceImpl.class,
+				"_corEntryModelResourcePermission", COREntry.class);
 
 }

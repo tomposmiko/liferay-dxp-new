@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Farache
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=push-notifications",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -49,8 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + PushNotificationsPortletKeys.PUSH_NOTIFICATIONS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -79,15 +79,28 @@ public class PushNotificationsPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	@Reference
-	private PushNotificationsDeviceService _pushNotificationsDeviceService;
+	@Reference(unbind = "-")
+	protected void setPushNotificationsDeviceService(
+		PushNotificationsDeviceService pushNotificationsDeviceService) {
+
+		_pushNotificationsDeviceService = pushNotificationsDeviceService;
+	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.push.notifications.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
+		target = "(&(release.bundle.symbolic.name=com.liferay.push.notifications.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
 	)
-	private Release _release;
+	protected void setRelease(Release release) {
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setResourceBundleLoaderProvider(
+		ResourceBundleLoaderProvider resourceBundleLoaderProvider) {
+
+		_resourceBundleLoaderProvider = resourceBundleLoaderProvider;
+	}
+
+	private PushNotificationsDeviceService _pushNotificationsDeviceService;
 	private ResourceBundleLoaderProvider _resourceBundleLoaderProvider;
 
 }

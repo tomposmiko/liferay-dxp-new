@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -29,24 +27,22 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8979 | Test Summary: All interests in the workspace appear in a list"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test AllInterestsInWorkspaceAppearInList {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-9004
@@ -59,10 +55,12 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.addPage(layoutName = ${layoutName});
+				JSONLayout.addPublicLayout(
+					groupName = "Site Name",
+					layoutName = "${layoutName}");
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = ${layoutName},
+					layoutName = "${layoutName}",
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -71,9 +69,9 @@ definition {
 			for (var name : list "ac,usera") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 			}
 
 			ACDXPSettings.syncNewContactData();
@@ -85,8 +83,8 @@ definition {
 				userLoginFullName = "ac ac");
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -97,8 +95,8 @@ definition {
 				userLoginFullName = "usera usera");
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -108,7 +106,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to Individule Tab") {
@@ -121,15 +119,15 @@ definition {
 			Click(locator1 = "ACInterests#VIEW_ALL_INTERESTS_BUTTON");
 
 			for (var interestTopic : list "liferay dxp,site,movies,music,science,sports,technology") {
-				ACInterests.viewInterest(interestTopic = ${interestTopic});
+				ACInterests.viewInterest(interestTopic = "${interestTopic}");
 			}
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8981| Test Summary: Assert individual interest shows contributing pages"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertIndividualInterestContributingPages {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-9006
@@ -141,7 +139,9 @@ definition {
 		task ("Add page and web content to Site as interest topic") {
 			Navigator.openSiteURL(siteName = "Site Name");
 
-			ACUtils.addPage(layoutName = "AC Page 1");
+			JSONLayout.addPublicLayout(
+				groupName = "Site Name",
+				layoutName = "AC Page 1");
 
 			ACUtils.createWCAndAddToPage(
 				layoutName = "AC Page 1",
@@ -163,7 +163,7 @@ definition {
 				userLoginEmailAddress = "ac@liferay.com",
 				userLoginFullName = "ac ac");
 
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page 1",
 				siteName = "Site Name");
 		}
@@ -173,7 +173,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to the Individual Interests") {
@@ -196,11 +196,12 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8982| Test Summary: Individuals interest details are shown"
-	@priority = 3
+	@priority = "3"
 	test AssertIndividualInterestDetails {
 		property portal.upstream = "quarantine";
 
-		// AC Quarantine Reason: Individual interests takes time to load
+		// AC Refactor: data doesn't appear on time and the test needs data from a past date
+		// AC Refactor ticket: LRAC-9007
 
 		task ("Connect DXP to AC") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -209,7 +210,9 @@ definition {
 		task ("Add page and web content to Site as interest topic") {
 			Navigator.openSiteURL(siteName = "Site Name");
 
-			ACUtils.addPage(layoutName = "AC Page 1");
+			JSONLayout.addPublicLayout(
+				groupName = "Site Name",
+				layoutName = "AC Page 1");
 
 			ACUtils.createWCAndAddToPage(
 				layoutName = "AC Page 1",
@@ -231,7 +234,7 @@ definition {
 				userLoginEmailAddress = "ac@liferay.com",
 				userLoginFullName = "ac ac");
 
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page 1",
 				siteName = "Site Name");
 		}
@@ -241,7 +244,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to the Individual Interests") {
@@ -258,9 +261,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8980 | Test Summary: Order the Individual's Interest List"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test OrderIndividualsInterests {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-9005
@@ -273,10 +276,12 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Sports,Technology") {
-				ACUtils.addPage(layoutName = ${layoutName});
+				JSONLayout.addPublicLayout(
+					groupName = "Site Name",
+					layoutName = "${layoutName}");
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = ${layoutName},
+					layoutName = "${layoutName}",
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -297,8 +302,8 @@ definition {
 				userLoginFullName = "ac ac");
 
 			for (var pageName : list "Movies,Sports,Technology") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -308,7 +313,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to the Individual Interests") {
@@ -335,9 +340,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8983 | Test Summary: Individuals Interest list has pagination"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test PaginateIndividualsInterestsList {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-9008
@@ -346,10 +351,12 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.addPage(layoutName = ${layoutName});
+				JSONLayout.addPublicLayout(
+					groupName = "Site Name",
+					layoutName = "${layoutName}");
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = ${layoutName},
+					layoutName = "${layoutName}",
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -370,8 +377,8 @@ definition {
 				userLoginFullName = "ac ac");
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -381,7 +388,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to Individule Interests") {
@@ -391,7 +398,7 @@ definition {
 		}
 
 		task ("Change pagination") {
-			ACUtils.changePagination(itemsPerPage = 5);
+			ACUtils.changePagination(itemsPerPage = "5");
 		}
 
 		task ("Click next page") {

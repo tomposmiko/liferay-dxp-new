@@ -22,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -43,11 +41,9 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.search.experiences.rest.client.dto.v1_0.Field;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.client.http.HttpInvoker;
 import com.liferay.search.experiences.rest.client.pagination.Page;
@@ -55,26 +51,24 @@ import com.liferay.search.experiences.rest.client.pagination.Pagination;
 import com.liferay.search.experiences.rest.client.resource.v1_0.SXPBlueprintResource;
 import com.liferay.search.experiences.rest.client.serdes.v1_0.SXPBlueprintSerDes;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -187,11 +181,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		SXPBlueprint sxpBlueprint = randomSXPBlueprint();
 
 		sxpBlueprint.setDescription(regex);
-		sxpBlueprint.setExternalReferenceCode(regex);
-		sxpBlueprint.setSchemaVersion(regex);
 		sxpBlueprint.setTitle(regex);
-		sxpBlueprint.setUserName(regex);
-		sxpBlueprint.setVersion(regex);
 
 		String json = SXPBlueprintSerDes.toJSON(sxpBlueprint);
 
@@ -200,17 +190,13 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		sxpBlueprint = SXPBlueprintSerDes.toDTO(json);
 
 		Assert.assertEquals(regex, sxpBlueprint.getDescription());
-		Assert.assertEquals(regex, sxpBlueprint.getExternalReferenceCode());
-		Assert.assertEquals(regex, sxpBlueprint.getSchemaVersion());
 		Assert.assertEquals(regex, sxpBlueprint.getTitle());
-		Assert.assertEquals(regex, sxpBlueprint.getUserName());
-		Assert.assertEquals(regex, sxpBlueprint.getVersion());
 	}
 
 	@Test
 	public void testGetSXPBlueprintsPage() throws Exception {
 		Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, null, Pagination.of(1, 10), null);
+			null, Pagination.of(1, 10));
 
 		long totalCount = page.getTotalCount();
 
@@ -221,116 +207,23 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			randomSXPBlueprint());
 
 		page = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, null, Pagination.of(1, 10), null);
+			null, Pagination.of(1, 10));
 
 		Assert.assertEquals(totalCount + 2, page.getTotalCount());
 
 		assertContains(sxpBlueprint1, (List<SXPBlueprint>)page.getItems());
 		assertContains(sxpBlueprint2, (List<SXPBlueprint>)page.getItems());
-		assertValid(page, testGetSXPBlueprintsPage_getExpectedActions());
+		assertValid(page);
 
 		sxpBlueprintResource.deleteSXPBlueprint(sxpBlueprint1.getId());
 
 		sxpBlueprintResource.deleteSXPBlueprint(sxpBlueprint2.getId());
 	}
 
-	protected Map<String, Map<String, String>>
-			testGetSXPBlueprintsPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetSXPBlueprintsPageWithFilterDateTimeEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DATE_TIME);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		SXPBlueprint sxpBlueprint1 = randomSXPBlueprint();
-
-		sxpBlueprint1 = testGetSXPBlueprintsPage_addSXPBlueprint(sxpBlueprint1);
-
-		for (EntityField entityField : entityFields) {
-			Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
-				null, getFilterString(entityField, "between", sxpBlueprint1),
-				Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(sxpBlueprint1),
-				(List<SXPBlueprint>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetSXPBlueprintsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		SXPBlueprint sxpBlueprint1 = testGetSXPBlueprintsPage_addSXPBlueprint(
-			randomSXPBlueprint());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		SXPBlueprint sxpBlueprint2 = testGetSXPBlueprintsPage_addSXPBlueprint(
-			randomSXPBlueprint());
-
-		for (EntityField entityField : entityFields) {
-			Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
-				null, getFilterString(entityField, "eq", sxpBlueprint1),
-				Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(sxpBlueprint1),
-				(List<SXPBlueprint>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetSXPBlueprintsPageWithFilterStringEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.STRING);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		SXPBlueprint sxpBlueprint1 = testGetSXPBlueprintsPage_addSXPBlueprint(
-			randomSXPBlueprint());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		SXPBlueprint sxpBlueprint2 = testGetSXPBlueprintsPage_addSXPBlueprint(
-			randomSXPBlueprint());
-
-		for (EntityField entityField : entityFields) {
-			Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
-				null, getFilterString(entityField, "eq", sxpBlueprint1),
-				Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(sxpBlueprint1),
-				(List<SXPBlueprint>)page.getItems());
-		}
-	}
-
 	@Test
 	public void testGetSXPBlueprintsPageWithPagination() throws Exception {
 		Page<SXPBlueprint> totalPage =
-			sxpBlueprintResource.getSXPBlueprintsPage(null, null, null, null);
+			sxpBlueprintResource.getSXPBlueprintsPage(null, null);
 
 		int totalCount = GetterUtil.getInteger(totalPage.getTotalCount());
 
@@ -344,7 +237,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			randomSXPBlueprint());
 
 		Page<SXPBlueprint> page1 = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, null, Pagination.of(1, totalCount + 2), null);
+			null, Pagination.of(1, totalCount + 2));
 
 		List<SXPBlueprint> sxpBlueprints1 =
 			(List<SXPBlueprint>)page1.getItems();
@@ -353,7 +246,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			sxpBlueprints1.toString(), totalCount + 2, sxpBlueprints1.size());
 
 		Page<SXPBlueprint> page2 = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, null, Pagination.of(2, totalCount + 2), null);
+			null, Pagination.of(2, totalCount + 2));
 
 		Assert.assertEquals(totalCount + 3, page2.getTotalCount());
 
@@ -364,142 +257,11 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			sxpBlueprints2.toString(), 1, sxpBlueprints2.size());
 
 		Page<SXPBlueprint> page3 = sxpBlueprintResource.getSXPBlueprintsPage(
-			null, null, Pagination.of(1, totalCount + 3), null);
+			null, Pagination.of(1, totalCount + 3));
 
 		assertContains(sxpBlueprint1, (List<SXPBlueprint>)page3.getItems());
 		assertContains(sxpBlueprint2, (List<SXPBlueprint>)page3.getItems());
 		assertContains(sxpBlueprint3, (List<SXPBlueprint>)page3.getItems());
-	}
-
-	@Test
-	public void testGetSXPBlueprintsPageWithSortDateTime() throws Exception {
-		testGetSXPBlueprintsPageWithSort(
-			EntityField.Type.DATE_TIME,
-			(entityField, sxpBlueprint1, sxpBlueprint2) -> {
-				BeanTestUtil.setProperty(
-					sxpBlueprint1, entityField.getName(),
-					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetSXPBlueprintsPageWithSortDouble() throws Exception {
-		testGetSXPBlueprintsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, sxpBlueprint1, sxpBlueprint2) -> {
-				BeanTestUtil.setProperty(
-					sxpBlueprint1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					sxpBlueprint2, entityField.getName(), 0.5);
-			});
-	}
-
-	@Test
-	public void testGetSXPBlueprintsPageWithSortInteger() throws Exception {
-		testGetSXPBlueprintsPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, sxpBlueprint1, sxpBlueprint2) -> {
-				BeanTestUtil.setProperty(
-					sxpBlueprint1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					sxpBlueprint2, entityField.getName(), 1);
-			});
-	}
-
-	@Test
-	public void testGetSXPBlueprintsPageWithSortString() throws Exception {
-		testGetSXPBlueprintsPageWithSort(
-			EntityField.Type.STRING,
-			(entityField, sxpBlueprint1, sxpBlueprint2) -> {
-				Class<?> clazz = sxpBlueprint1.getClass();
-
-				String entityFieldName = entityField.getName();
-
-				Method method = clazz.getMethod(
-					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
-
-				Class<?> returnType = method.getReturnType();
-
-				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
-						sxpBlueprint1, entityFieldName,
-						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
-						sxpBlueprint2, entityFieldName,
-						Collections.singletonMap("Bbb", "Bbb"));
-				}
-				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
-						sxpBlueprint1, entityFieldName,
-						"aaa" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()) +
-									"@liferay.com");
-					BeanTestUtil.setProperty(
-						sxpBlueprint2, entityFieldName,
-						"bbb" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()) +
-									"@liferay.com");
-				}
-				else {
-					BeanTestUtil.setProperty(
-						sxpBlueprint1, entityFieldName,
-						"aaa" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
-						sxpBlueprint2, entityFieldName,
-						"bbb" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()));
-				}
-			});
-	}
-
-	protected void testGetSXPBlueprintsPageWithSort(
-			EntityField.Type type,
-			UnsafeTriConsumer
-				<EntityField, SXPBlueprint, SXPBlueprint, Exception>
-					unsafeTriConsumer)
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(type);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		SXPBlueprint sxpBlueprint1 = randomSXPBlueprint();
-		SXPBlueprint sxpBlueprint2 = randomSXPBlueprint();
-
-		for (EntityField entityField : entityFields) {
-			unsafeTriConsumer.accept(entityField, sxpBlueprint1, sxpBlueprint2);
-		}
-
-		sxpBlueprint1 = testGetSXPBlueprintsPage_addSXPBlueprint(sxpBlueprint1);
-
-		sxpBlueprint2 = testGetSXPBlueprintsPage_addSXPBlueprint(sxpBlueprint2);
-
-		for (EntityField entityField : entityFields) {
-			Page<SXPBlueprint> ascPage =
-				sxpBlueprintResource.getSXPBlueprintsPage(
-					null, null, Pagination.of(1, 2),
-					entityField.getName() + ":asc");
-
-			assertEquals(
-				Arrays.asList(sxpBlueprint1, sxpBlueprint2),
-				(List<SXPBlueprint>)ascPage.getItems());
-
-			Page<SXPBlueprint> descPage =
-				sxpBlueprintResource.getSXPBlueprintsPage(
-					null, null, Pagination.of(1, 2),
-					entityField.getName() + ":desc");
-
-			assertEquals(
-				Arrays.asList(sxpBlueprint2, sxpBlueprint1),
-				(List<SXPBlueprint>)descPage.getItems());
-		}
 	}
 
 	protected SXPBlueprint testGetSXPBlueprintsPage_addSXPBlueprint(
@@ -522,25 +284,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	}
 
 	protected SXPBlueprint testPostSXPBlueprint_addSXPBlueprint(
-			SXPBlueprint sxpBlueprint)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testPostSXPBlueprintValidate() throws Exception {
-		SXPBlueprint randomSXPBlueprint = randomSXPBlueprint();
-
-		SXPBlueprint postSXPBlueprint =
-			testPostSXPBlueprintValidate_addSXPBlueprint(randomSXPBlueprint);
-
-		assertEquals(randomSXPBlueprint, postSXPBlueprint);
-		assertValid(postSXPBlueprint);
-	}
-
-	protected SXPBlueprint testPostSXPBlueprintValidate_addSXPBlueprint(
 			SXPBlueprint sxpBlueprint)
 		throws Exception {
 
@@ -576,8 +319,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteSXPBlueprint() throws Exception {
-		SXPBlueprint sxpBlueprint =
-			testGraphQLDeleteSXPBlueprint_addSXPBlueprint();
+		SXPBlueprint sxpBlueprint = testGraphQLSXPBlueprint_addSXPBlueprint();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -590,6 +332,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteSXPBlueprint"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -603,12 +346,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected SXPBlueprint testGraphQLDeleteSXPBlueprint_addSXPBlueprint()
-		throws Exception {
-
-		return testGraphQLSXPBlueprint_addSXPBlueprint();
 	}
 
 	@Test
@@ -631,8 +368,7 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 
 	@Test
 	public void testGraphQLGetSXPBlueprint() throws Exception {
-		SXPBlueprint sxpBlueprint =
-			testGraphQLGetSXPBlueprint_addSXPBlueprint();
+		SXPBlueprint sxpBlueprint = testGraphQLSXPBlueprint_addSXPBlueprint();
 
 		Assert.assertTrue(
 			equals(
@@ -673,12 +409,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				"Object/code"));
 	}
 
-	protected SXPBlueprint testGraphQLGetSXPBlueprint_addSXPBlueprint()
-		throws Exception {
-
-		return testGraphQLSXPBlueprint_addSXPBlueprint();
-	}
-
 	@Test
 	public void testPatchSXPBlueprint() throws Exception {
 		SXPBlueprint postSXPBlueprint = testPatchSXPBlueprint_addSXPBlueprint();
@@ -691,8 +421,8 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 
 		SXPBlueprint expectedPatchSXPBlueprint = postSXPBlueprint.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchSXPBlueprint, expectedPatchSXPBlueprint);
+		_beanUtilsBean.copyProperties(
+			expectedPatchSXPBlueprint, randomPatchSXPBlueprint);
 
 		SXPBlueprint getSXPBlueprint = sxpBlueprintResource.getSXPBlueprint(
 			patchSXPBlueprint.getId());
@@ -707,33 +437,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
-
-	@Test
-	public void testPostSXPBlueprintCopy() throws Exception {
-		SXPBlueprint randomSXPBlueprint = randomSXPBlueprint();
-
-		SXPBlueprint postSXPBlueprint =
-			testPostSXPBlueprintCopy_addSXPBlueprint(randomSXPBlueprint);
-
-		assertEquals(randomSXPBlueprint, postSXPBlueprint);
-		assertValid(postSXPBlueprint);
-	}
-
-	protected SXPBlueprint testPostSXPBlueprintCopy_addSXPBlueprint(
-			SXPBlueprint sxpBlueprint)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetSXPBlueprintExport() throws Exception {
-		Assert.assertTrue(false);
-	}
-
-	@Rule
-	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected SXPBlueprint testGraphQLSXPBlueprint_addSXPBlueprint()
 		throws Exception {
@@ -820,24 +523,8 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("actions", additionalAssertFieldName)) {
-				if (sxpBlueprint.getActions() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("configuration", additionalAssertFieldName)) {
 				if (sxpBlueprint.getConfiguration() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("createDate", additionalAssertFieldName)) {
-				if (sxpBlueprint.getCreateDate() == null) {
 					valid = false;
 				}
 
@@ -852,74 +539,8 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
-				if (sxpBlueprint.getDescription_i18n() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("elementInstances", additionalAssertFieldName)) {
-				if (sxpBlueprint.getElementInstances() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (sxpBlueprint.getExternalReferenceCode() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
-				if (sxpBlueprint.getModifiedDate() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("schemaVersion", additionalAssertFieldName)) {
-				if (sxpBlueprint.getSchemaVersion() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (sxpBlueprint.getTitle() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
-				if (sxpBlueprint.getTitle_i18n() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("userName", additionalAssertFieldName)) {
-				if (sxpBlueprint.getUserName() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("version", additionalAssertFieldName)) {
-				if (sxpBlueprint.getVersion() == null) {
 					valid = false;
 				}
 
@@ -935,13 +556,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	}
 
 	protected void assertValid(Page<SXPBlueprint> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<SXPBlueprint> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<SXPBlueprint> sxpBlueprints = page.getItems();
@@ -956,20 +570,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1040,32 +640,10 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("actions", additionalAssertFieldName)) {
-				if (!equals(
-						(Map)sxpBlueprint1.getActions(),
-						(Map)sxpBlueprint2.getActions())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("configuration", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpBlueprint1.getConfiguration(),
 						sxpBlueprint2.getConfiguration())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("createDate", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						sxpBlueprint1.getCreateDate(),
-						sxpBlueprint2.getCreateDate())) {
 
 					return false;
 				}
@@ -1084,41 +662,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
-				if (!equals(
-						(Map)sxpBlueprint1.getDescription_i18n(),
-						(Map)sxpBlueprint2.getDescription_i18n())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("elementInstances", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						sxpBlueprint1.getElementInstances(),
-						sxpBlueprint2.getElementInstances())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						sxpBlueprint1.getExternalReferenceCode(),
-						sxpBlueprint2.getExternalReferenceCode())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("id", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpBlueprint1.getId(), sxpBlueprint2.getId())) {
@@ -1129,64 +672,9 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						sxpBlueprint1.getModifiedDate(),
-						sxpBlueprint2.getModifiedDate())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("schemaVersion", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						sxpBlueprint1.getSchemaVersion(),
-						sxpBlueprint2.getSchemaVersion())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpBlueprint1.getTitle(), sxpBlueprint2.getTitle())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
-				if (!equals(
-						(Map)sxpBlueprint1.getTitle_i18n(),
-						(Map)sxpBlueprint2.getTitle_i18n())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("userName", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						sxpBlueprint1.getUserName(),
-						sxpBlueprint2.getUserName())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("version", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						sxpBlueprint1.getVersion(),
-						sxpBlueprint2.getVersion())) {
 
 					return false;
 				}
@@ -1231,16 +719,14 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1257,10 +743,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1270,18 +752,18 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1297,46 +779,9 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 		sb.append(operator);
 		sb.append(" ");
 
-		if (entityFieldName.equals("actions")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
 		if (entityFieldName.equals("configuration")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("createDate")) {
-			if (operator.equals("between")) {
-				sb = new StringBundler();
-
-				sb.append("(");
-				sb.append(entityFieldName);
-				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(
-							sxpBlueprint.getCreateDate(), -2)));
-				sb.append(" and ");
-				sb.append(entityFieldName);
-				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(sxpBlueprint.getCreateDate(), 2)));
-				sb.append(")");
-			}
-			else {
-				sb.append(entityFieldName);
-
-				sb.append(" ");
-				sb.append(operator);
-				sb.append(" ");
-
-				sb.append(_dateFormat.format(sxpBlueprint.getCreateDate()));
-			}
-
-			return sb.toString();
 		}
 
 		if (entityFieldName.equals("description")) {
@@ -1347,94 +792,14 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("description_i18n")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("elementInstances")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("externalReferenceCode")) {
-			sb.append("'");
-			sb.append(String.valueOf(sxpBlueprint.getExternalReferenceCode()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
 
-		if (entityFieldName.equals("modifiedDate")) {
-			if (operator.equals("between")) {
-				sb = new StringBundler();
-
-				sb.append("(");
-				sb.append(entityFieldName);
-				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(
-							sxpBlueprint.getModifiedDate(), -2)));
-				sb.append(" and ");
-				sb.append(entityFieldName);
-				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(
-							sxpBlueprint.getModifiedDate(), 2)));
-				sb.append(")");
-			}
-			else {
-				sb.append(entityFieldName);
-
-				sb.append(" ");
-				sb.append(operator);
-				sb.append(" ");
-
-				sb.append(_dateFormat.format(sxpBlueprint.getModifiedDate()));
-			}
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("schemaVersion")) {
-			sb.append("'");
-			sb.append(String.valueOf(sxpBlueprint.getSchemaVersion()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
 		if (entityFieldName.equals("title")) {
 			sb.append("'");
 			sb.append(String.valueOf(sxpBlueprint.getTitle()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("title_i18n")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("userName")) {
-			sb.append("'");
-			sb.append(String.valueOf(sxpBlueprint.getUserName()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("version")) {
-			sb.append("'");
-			sb.append(String.valueOf(sxpBlueprint.getVersion()));
 			sb.append("'");
 
 			return sb.toString();
@@ -1484,19 +849,10 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	protected SXPBlueprint randomSXPBlueprint() throws Exception {
 		return new SXPBlueprint() {
 			{
-				createDate = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				externalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
-				modifiedDate = RandomTestUtil.nextDate();
-				schemaVersion = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				title = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				userName = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				version = StringUtil.toLowerCase(RandomTestUtil.randomString());
 			}
 		};
 	}
@@ -1515,115 +871,6 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1699,6 +946,18 @@ public abstract class BaseSXPBlueprintResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseSXPBlueprintResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

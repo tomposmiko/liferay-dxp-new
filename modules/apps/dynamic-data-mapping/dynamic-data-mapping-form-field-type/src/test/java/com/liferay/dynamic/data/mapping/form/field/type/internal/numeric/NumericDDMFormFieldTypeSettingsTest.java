@@ -27,29 +27,34 @@ import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.dynamic.data.mapping.util.DDMFormLayoutFactory;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Leonardo Barros
  */
+@PrepareForTest({PortalClassLoaderUtil.class, ResourceBundleUtil.class})
+@RunWith(PowerMockRunner.class)
 public class NumericDDMFormFieldTypeSettingsTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -250,7 +255,7 @@ public class NumericDDMFormFieldTypeSettingsTest
 
 		actions = ddmFormRule3.getActions();
 
-		Assert.assertEquals(actions.toString(), 18, actions.size());
+		Assert.assertEquals(actions.toString(), 15, actions.size());
 		Assert.assertEquals(
 			"setDataType('predefinedValue', getValue('dataType'))",
 			actions.get(0));
@@ -271,49 +276,37 @@ public class NumericDDMFormFieldTypeSettingsTest
 				"getLocalizedValue('numericInputMask'))",
 			actions.get(4));
 		Assert.assertEquals(
-			"setPropertyValue('validation', 'inputMask', " +
-				"getValue('inputMask'))",
+			"setValidationDataType('validation', getValue('dataType'))",
 			actions.get(5));
 		Assert.assertEquals(
-			"setPropertyValue('validation', 'inputMaskFormat', " +
-				"getLocalizedValue('inputMaskFormat'))",
-			actions.get(6));
-		Assert.assertEquals(
-			"setPropertyValue('validation', 'numericInputMask', " +
-				"getLocalizedValue('numericInputMask'))",
-			actions.get(7));
-		Assert.assertEquals(
-			"setValidationDataType('validation', getValue('dataType'))",
-			actions.get(8));
-		Assert.assertEquals(
 			"setValidationFieldName('validation', getValue('name'))",
-			actions.get(9));
+			actions.get(6));
 		Assert.assertEquals(
 			"setVisible('characterOptions', equals(getValue('dataType'), " +
 				"'integer') and equals(getValue('inputMask'), TRUE))",
-			actions.get(10));
+			actions.get(7));
 		Assert.assertEquals(
 			"setVisible('confirmationErrorMessage', getValue(" +
 				"'requireConfirmation'))",
-			actions.get(11));
+			actions.get(8));
 		Assert.assertEquals(
 			"setVisible('confirmationLabel', getValue('requireConfirmation'))",
-			actions.get(12));
+			actions.get(9));
 		Assert.assertEquals(
 			"setVisible('direction', getValue('requireConfirmation'))",
-			actions.get(13));
+			actions.get(10));
 		Assert.assertEquals(
 			"setVisible('inputMaskFormat', equals(getValue('dataType'), " +
 				"'integer') and equals(getValue('inputMask'), TRUE))",
-			actions.get(14));
+			actions.get(11));
 		Assert.assertEquals(
 			"setVisible('numericInputMask', equals(getValue('dataType'), " +
 				"'double') and equals(getValue('inputMask'), TRUE))",
-			actions.get(15));
+			actions.get(12));
 		Assert.assertEquals(
 			"setVisible('requiredErrorMessage', getValue('required'))",
-			actions.get(16));
-		Assert.assertEquals("setVisible('tooltip', false)", actions.get(17));
+			actions.get(13));
+		Assert.assertEquals("setVisible('tooltip', false)", actions.get(14));
 	}
 
 	@Test
@@ -340,7 +333,36 @@ public class NumericDDMFormFieldTypeSettingsTest
 	protected void setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
-		languageUtil.setLanguage(Mockito.mock(Language.class));
+		languageUtil.setLanguage(PowerMockito.mock(Language.class));
+	}
+
+	protected void setUpPortalUtil() {
+		PortalUtil portalUtil = new PortalUtil();
+
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
+
+		portalUtil.setPortal(portal);
+	}
+
+	@Override
+	protected void setUpResourceBundleUtil() {
+		PowerMockito.mockStatic(ResourceBundleUtil.class);
+
+		PowerMockito.when(
+			ResourceBundleUtil.getBundle(
+				Matchers.anyString(), Matchers.any(Locale.class),
+				Matchers.any(ClassLoader.class))
+		).thenReturn(
+			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
+		);
 	}
 
 }

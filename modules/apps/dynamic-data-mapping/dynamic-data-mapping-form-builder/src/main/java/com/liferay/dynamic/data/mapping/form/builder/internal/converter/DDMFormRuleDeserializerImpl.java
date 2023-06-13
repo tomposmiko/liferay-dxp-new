@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = DDMFormRuleDeserializer.class)
+@Component(immediate = true, service = DDMFormRuleDeserializer.class)
 public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 
 	@Override
@@ -73,7 +73,7 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 			rulesJSONArray.length());
 
 		for (int i = 0; i < rulesJSONArray.length(); i++) {
-			SPIDDMFormRule spiDDMFormRule = _deserializeSPIDDMFormRule(
+			SPIDDMFormRule spiDDMFormRule = deserializeSPIDDMFormRule(
 				rulesJSONArray.getJSONObject(i));
 
 			spiDDMFormRules.add(spiDDMFormRule);
@@ -82,7 +82,7 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 		return spiDDMFormRules;
 	}
 
-	private SPIDDMFormRule _deserializeSPIDDMFormRule(
+	protected SPIDDMFormRule deserializeSPIDDMFormRule(
 		JSONObject ruleJSONObject) {
 
 		SPIDDMFormRule spiDDMFormRule = new SPIDDMFormRule();
@@ -92,28 +92,34 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 		spiDDMFormRule.setName(
 			LocalizedValueUtil.toLocalizedValue(
 				ruleJSONObject.getJSONObject("name")));
-		spiDDMFormRule.setSPIDDMFormRuleActions(
-			_deserializeSPIDDMFormRuleActions(
-				ruleJSONObject.getJSONArray("actions")));
-		spiDDMFormRule.setSPIDDMFormRuleConditions(
-			_deserializeSPIDDMFormRuleConditions(
-				ruleJSONObject.getJSONArray("conditions")));
+
+		List<SPIDDMFormRuleAction> spiDDMFormRuleActions =
+			deserializeSPIDDMFormRuleActions(
+				ruleJSONObject.getJSONArray("actions"));
+
+		spiDDMFormRule.setSPIDDMFormRuleActions(spiDDMFormRuleActions);
+
+		List<SPIDDMFormRuleCondition> spiDDMFormRuleConditions =
+			deserializeSPIDDMFormRuleConditions(
+				ruleJSONObject.getJSONArray("conditions"));
+
+		spiDDMFormRule.setSPIDDMFormRuleConditions(spiDDMFormRuleConditions);
 
 		return spiDDMFormRule;
 	}
 
-	private <T extends SPIDDMFormRuleAction> SPIDDMFormRuleAction
-		_deserializeSPIDDMFormRuleAction(
+	protected <T extends SPIDDMFormRuleAction> SPIDDMFormRuleAction
+		deserializeSPIDDMFormRuleAction(
 			JSONObject actionJSONObject, Class<T> targetClass) {
 
 		JSONDeserializer<T> jsonDeserializer =
 			_jsonFactory.createJSONDeserializer();
 
 		return jsonDeserializer.deserialize(
-			actionJSONObject.toString(), targetClass);
+			actionJSONObject.toJSONString(), targetClass);
 	}
 
-	private List<SPIDDMFormRuleAction> _deserializeSPIDDMFormRuleActions(
+	protected List<SPIDDMFormRuleAction> deserializeSPIDDMFormRuleActions(
 		JSONArray actionsJSONArray) {
 
 		List<SPIDDMFormRuleAction> spiDDMFormRuleActions = new ArrayList<>();
@@ -124,10 +130,10 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 			String action = actionJSONObject.getString("action");
 
 			Class<? extends SPIDDMFormRuleAction> clazz =
-				_getSPIDDMFormRuleActionClass(action);
+				getSPIDDMFormRuleActionClass(action);
 
 			SPIDDMFormRuleAction spiDDMFormRuleAction =
-				_deserializeSPIDDMFormRuleAction(actionJSONObject, clazz);
+				deserializeSPIDDMFormRuleAction(actionJSONObject, clazz);
 
 			spiDDMFormRuleActions.add(spiDDMFormRuleAction);
 		}
@@ -135,7 +141,7 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 		return spiDDMFormRuleActions;
 	}
 
-	private List<SPIDDMFormRuleCondition> _deserializeSPIDDMFormRuleConditions(
+	protected List<SPIDDMFormRuleCondition> deserializeSPIDDMFormRuleConditions(
 		JSONArray conditionsJSONArray) {
 
 		JSONDeserializer<SPIDDMFormRuleCondition[]> jsonDeserializer =
@@ -143,14 +149,14 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 
 		SPIDDMFormRuleCondition[] spiDDMFormRuleConditions =
 			jsonDeserializer.deserialize(
-				conditionsJSONArray.toString(),
+				conditionsJSONArray.toJSONString(),
 				SPIDDMFormRuleCondition[].class);
 
 		return ListUtil.fromArray(spiDDMFormRuleConditions);
 	}
 
-	private Class<? extends SPIDDMFormRuleAction> _getSPIDDMFormRuleActionClass(
-		String action) {
+	protected Class<? extends SPIDDMFormRuleAction>
+		getSPIDDMFormRuleActionClass(String action) {
 
 		if (action.equals("auto-fill")) {
 			return AutoFillDDMFormRuleAction.class;

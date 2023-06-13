@@ -20,17 +20,15 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
-import com.liferay.password.policies.admin.constants.PasswordPoliciesAdminPortletKeys;
 import com.liferay.password.policies.admin.web.internal.search.PasswordPolicyChecker;
 import com.liferay.password.policies.admin.web.internal.search.PasswordPolicyDisplayTerms;
 import com.liferay.password.policies.admin.web.internal.search.PasswordPolicySearch;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.PasswordPolicy;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.PasswordPolicyServiceUtil;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
@@ -105,27 +103,19 @@ public class ViewPasswordPoliciesManagementToolbarDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
+		if (Validator.isNull(_orderByCol)) {
+			_orderByCol = ParamUtil.getString(
+				_httpServletRequest, "orderByCol", "name");
 		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			PasswordPoliciesAdminPortletKeys.PASSWORD_POLICIES_ADMIN,
-			"view-password-policies-order-by-col", "name");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
+		if (Validator.isNull(_orderByType)) {
+			_orderByType = ParamUtil.getString(
+				_httpServletRequest, "orderByType", "asc");
 		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			PasswordPoliciesAdminPortletKeys.PASSWORD_POLICIES_ADMIN,
-			"view-password-policies-order-by-type", "asc");
 
 		return _orderByType;
 	}
@@ -178,6 +168,8 @@ public class ViewPasswordPoliciesManagementToolbarDisplayContext {
 			_renderRequest, getPortletURL());
 
 		passwordPolicySearch.setId("passwordPolicy");
+		passwordPolicySearch.setRowChecker(
+			new PasswordPolicyChecker(_renderResponse));
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)_httpServletRequest.getAttribute(
@@ -186,16 +178,16 @@ public class ViewPasswordPoliciesManagementToolbarDisplayContext {
 		PasswordPolicyDisplayTerms searchTerms =
 			(PasswordPolicyDisplayTerms)passwordPolicySearch.getSearchTerms();
 
-		passwordPolicySearch.setResultsAndTotal(
-			() -> PasswordPolicyServiceUtil.search(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				passwordPolicySearch.getStart(), passwordPolicySearch.getEnd(),
-				passwordPolicySearch.getOrderByComparator()),
-			PasswordPolicyServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords()));
+		List<PasswordPolicy> results = PasswordPolicyServiceUtil.search(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			passwordPolicySearch.getStart(), passwordPolicySearch.getEnd(),
+			passwordPolicySearch.getOrderByComparator());
 
-		passwordPolicySearch.setRowChecker(
-			new PasswordPolicyChecker(_renderResponse));
+		int total = PasswordPolicyServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords());
+
+		passwordPolicySearch.setResults(results);
+		passwordPolicySearch.setTotal(total);
 
 		_passwordPolicySearch = passwordPolicySearch;
 

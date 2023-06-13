@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Albert Lee
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.preferences-owned-by-group=true",
@@ -37,8 +38,7 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.init-param.view-template=/account_groups_admin/view.jsp",
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_GROUPS_ADMIN,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )

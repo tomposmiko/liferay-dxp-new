@@ -20,6 +20,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"auth.public.path=/bookmarks/find_entry",
 		"auth.public.path=/bookmarks/find_folder",

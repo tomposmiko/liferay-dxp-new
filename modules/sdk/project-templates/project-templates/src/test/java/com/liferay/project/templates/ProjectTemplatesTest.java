@@ -110,7 +110,7 @@ public class ProjectTemplatesTest implements BaseProjectTemplatesTestCase {
 	@Test
 	public void testBuildTemplateLiferayVersionValid70Maven() throws Exception {
 		_buildTemplateWithMaven(
-			"mvc-portlet", "test", "-DclassName=Foo", "-DliferayVersion=7.0.6",
+			"mvc-portlet", "test", "-DliferayVersion=7.0.6", "-DclassName=Foo",
 			"-Dpackage=foo.portlet");
 	}
 
@@ -137,7 +137,7 @@ public class ProjectTemplatesTest implements BaseProjectTemplatesTestCase {
 		throws Exception {
 
 		_buildTemplateWithMaven(
-			"mvc-portlet", "test", "-DclassName=Foo", "-DliferayVersion=7.20.0",
+			"mvc-portlet", "test", "-DliferayVersion=7.20.0", "-DclassName=Foo",
 			"-Dpackage=foo.portlet");
 	}
 
@@ -152,7 +152,7 @@ public class ProjectTemplatesTest implements BaseProjectTemplatesTestCase {
 		throws Exception {
 
 		_buildTemplateWithMaven(
-			"mvc-portlet", "test", "-DclassName=Foo", "-DliferayVersion=7.3.10",
+			"mvc-portlet", "test", "-DliferayVersion=7.3.10", "-DclassName=Foo",
 			"-Dpackage=foo.portlet");
 	}
 

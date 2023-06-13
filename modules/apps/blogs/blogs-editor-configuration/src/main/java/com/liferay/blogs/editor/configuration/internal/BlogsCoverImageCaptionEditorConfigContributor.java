@@ -32,7 +32,6 @@ import org.osgi.service.component.annotations.Component;
 @Component(
 	property = {
 		"editor.config.key=coverImageCaptionEditor",
-		"editor.name=ballooneditor",
 		"javax.portlet.name=" + BlogsPortletKeys.BLOGS,
 		"javax.portlet.name=" + BlogsPortletKeys.BLOGS_ADMIN
 	},
@@ -40,10 +39,6 @@ import org.osgi.service.component.annotations.Component;
 )
 public class BlogsCoverImageCaptionEditorConfigContributor
 	extends BaseEditorConfigContributor {
-
-	public static final String DEFAULT_REMOVE_PLUGINS =
-		"magicline,stylescombo,videoembed,video,image,contextmenu," +
-			"tabletools,liststyle,insertbutton";
 
 	@Override
 	public void populateConfigJSONObject(
@@ -54,31 +49,19 @@ public class BlogsCoverImageCaptionEditorConfigContributor
 		jsonObject.put(
 			"allowedContent", "a[*](*)"
 		).put(
-			"balloonEditorEnabled", true
-		).put(
 			"disallowedContent", "br"
 		);
 
 		String removePlugins = jsonObject.getString("removePlugins");
 
 		if (Validator.isNotNull(removePlugins)) {
-			removePlugins = removePlugins + "," + DEFAULT_REMOVE_PLUGINS;
+			removePlugins = removePlugins + ",magicline";
 		}
 		else {
-			removePlugins = DEFAULT_REMOVE_PLUGINS;
+			removePlugins = "magicline";
 		}
 
-		jsonObject.put(
-			"removePlugins", removePlugins
-		).put(
-			"toolbarImage", ""
-		).put(
-			"toolbarTable", ""
-		).put(
-			"toolbarText", "TextLink"
-		).put(
-			"toolbarVideo", ""
-		);
+		jsonObject.put("removePlugins", removePlugins);
 	}
 
 }

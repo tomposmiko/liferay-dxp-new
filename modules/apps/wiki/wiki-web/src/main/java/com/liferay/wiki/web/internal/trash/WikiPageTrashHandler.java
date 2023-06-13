@@ -15,6 +15,7 @@
 package com.liferay.wiki.web.internal.trash;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -23,7 +24,6 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.SystemEvent;
 import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashRenderer;
-import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -41,9 +40,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.trash.TrashHelper;
 import com.liferay.trash.constants.TrashActionKeys;
-import com.liferay.trash.constants.TrashEntryConstants;
-import com.liferay.trash.exception.RestoreEntryException;
+import com.liferay.trash.kernel.exception.RestoreEntryException;
 import com.liferay.trash.kernel.model.TrashEntry;
+import com.liferay.trash.kernel.model.TrashEntryConstants;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.engine.WikiEngineRenderer;
 import com.liferay.wiki.model.WikiNode;
@@ -142,17 +141,17 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 			try {
 				WikiPage parentPage = page.getParentPage();
 
-				while (_trashHelper.isInTrashImplicitly(parentPage)) {
+				while (parentPage.isInTrashImplicitly()) {
 					parentPage = parentPage.getParentPage();
 				}
 
-				if (_trashHelper.isInTrashExplicitly(parentPage)) {
+				if (parentPage.isInTrashExplicitly()) {
 					return parentPage;
 				}
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -282,7 +281,7 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 			classPK, WorkflowConstants.STATUS_ANY, false);
 
 		return new WikiPageAssetRenderer(
-			_htmlParser, _trashHelper, _wikiEngineRenderer, page);
+			page, _wikiEngineRenderer, _trashHelper);
 	}
 
 	@Override
@@ -316,6 +315,11 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 	}
 
 	@Override
+	public boolean isMovable() {
+		return false;
+	}
+
+	@Override
 	public boolean isRestorable(long classPK) throws PortalException {
 		WikiPage page = _wikiPageLocalService.getLatestPage(
 			classPK, WorkflowConstants.STATUS_ANY, false);
@@ -327,7 +331,7 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 			return false;
 		}
 
-		return !_trashHelper.isInTrashContainer(page);
+		return !page.isInTrashContainer();
 	}
 
 	@Override
@@ -466,16 +470,8 @@ public class WikiPageTrashHandler extends BaseWikiTrashHandler {
 			permissionChecker, classPK, actionId);
 	}
 
-	@Override
-	protected boolean isInTrashExplicitly(WikiPage page) {
-		return _trashHelper.isInTrashExplicitly(page);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		WikiPageTrashHandler.class);
-
-	@Reference
-	private HtmlParser _htmlParser;
 
 	@Reference
 	private Portal _portal;

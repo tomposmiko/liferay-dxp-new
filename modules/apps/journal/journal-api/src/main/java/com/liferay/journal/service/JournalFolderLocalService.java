@@ -75,9 +75,8 @@ public interface JournalFolderLocalService
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFolderLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the journal folder local service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link JournalFolderLocalServiceUtil} if injection and service tracking are not available.
 	 */
 	public JournalFolder addFolder(
-			String externalReferenceCode, long userId, long groupId,
-			long parentFolderId, String name, String description,
-			ServiceContext serviceContext)
+			long userId, long groupId, long parentFolderId, String name,
+			String description, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -255,10 +254,6 @@ public interface JournalFolderLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public JournalFolder fetchJournalFolder(long folderId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalFolder fetchJournalFolderByExternalReferenceCode(
-		String externalReferenceCode, long groupId);
-
 	/**
 	 * Returns the journal folder matching the UUID and group.
 	 *
@@ -366,11 +361,6 @@ public interface JournalFolderLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public JournalFolder getJournalFolder(long folderId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalFolder getJournalFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException;
 
 	/**
 	 * Returns the journal folder matching the UUID and group.

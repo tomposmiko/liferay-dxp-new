@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Sergio González
  */
-@Component(service = SharingHelper.class)
+@Component(immediate = true, service = SharingHelper.class)
 public class SharingHelper {
 
 	public SharingEntryPermissionDisplayAction
@@ -79,7 +79,7 @@ public class SharingHelper {
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 

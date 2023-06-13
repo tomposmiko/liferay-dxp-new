@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS,
 		"javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY,
@@ -45,19 +46,23 @@ public class DeleteRecordMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long[] recordIds = _getRecordIds(actionRequest);
+		long[] recordIds = getRecordIds(actionRequest);
 
 		for (long recordId : recordIds) {
 			_ddlRecordService.deleteRecord(recordId);
 		}
 	}
 
-	private long[] _getRecordIds(ActionRequest actionRequest) {
+	protected long[] getRecordIds(ActionRequest actionRequest) {
 		return StringUtil.split(
 			ParamUtil.getString(actionRequest, "recordIds"), 0L);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDLRecordService(DDLRecordService ddlRecordService) {
+		_ddlRecordService = ddlRecordService;
+	}
+
 	private DDLRecordService _ddlRecordService;
 
 }

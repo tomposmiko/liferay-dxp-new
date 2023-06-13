@@ -13,25 +13,22 @@
  */
 
 import ClayForm, {ClayInput} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
-import {useId} from '../hooks/useId';
+import {useId} from '../../app/utils/useId';
 import CurrentLanguageFlag from './CurrentLanguageFlag';
-import {PopoverTooltip} from './PopoverTooltip';
 
-export function ImageSelectorDescription({
+export const ImageSelectorDescription = ({
 	imageDescription,
 	onImageDescriptionChanged,
-}) {
+}) => {
 	const [
 		imageDescriptionInputElement,
 		setImageDescriptionInputElement,
 	] = useState();
 
 	const imageDescriptionInputId = useId();
-	const tooltipId = useId();
 
 	useEffect(() => {
 		if (imageDescriptionInputElement) {
@@ -42,24 +39,8 @@ export function ImageSelectorDescription({
 	return (
 		<ClayForm.Group>
 			<label htmlFor={imageDescriptionInputId}>
-				<span>{Liferay.Language.get('image-description')}</span>
-
-				<PopoverTooltip
-					content={Liferay.Language.get(
-						'this-value-is-used-for-alt-text'
-					)}
-					header={Liferay.Language.get('image-description')}
-					id={tooltipId}
-					trigger={
-						<ClayIcon
-							aria-label={Liferay.Language.get('show-more')}
-							className="ml-2"
-							symbol="question-circle-full"
-						/>
-					}
-				/>
+				{Liferay.Language.get('image-description')}
 			</label>
-
 			<ClayInput.Group small>
 				<ClayInput.GroupItem>
 					<ClayInput
@@ -72,14 +53,13 @@ export function ImageSelectorDescription({
 						type="text"
 					/>
 				</ClayInput.GroupItem>
-
 				<ClayInput.GroupItem shrink>
 					<CurrentLanguageFlag />
 				</ClayInput.GroupItem>
 			</ClayInput.Group>
 		</ClayForm.Group>
 	);
-}
+};
 
 ImageSelectorDescription.propTypes = {
 	imageDescription: PropTypes.string.isRequired,

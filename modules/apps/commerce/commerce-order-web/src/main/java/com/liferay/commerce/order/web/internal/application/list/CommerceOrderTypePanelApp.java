@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"panel.app.order:Integer=150",
 		"panel.category.key=" + CommercePanelCategoryKeys.COMMERCE_ORDER_MANAGEMENT
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class CommerceOrderTypePanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return CommercePortletKeys.COMMERCE_ORDER_TYPE;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER_TYPE + ")"
+		target = "(javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER_TYPE + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

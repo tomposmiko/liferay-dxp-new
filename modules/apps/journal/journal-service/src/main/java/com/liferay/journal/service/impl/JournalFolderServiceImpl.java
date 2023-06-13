@@ -15,8 +15,6 @@
 package com.liferay.journal.service.impl;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.service.DDMStructureService;
-import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.base.JournalFolderServiceBaseImpl;
@@ -28,7 +26,6 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -57,8 +54,8 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 
 	@Override
 	public JournalFolder addFolder(
-			String externalReferenceCode, long groupId, long parentFolderId,
-			String name, String description, ServiceContext serviceContext)
+			long groupId, long parentFolderId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		ModelResourcePermissionUtil.check(
@@ -66,8 +63,8 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			groupId, parentFolderId, ActionKeys.ADD_FOLDER);
 
 		return journalFolderLocalService.addFolder(
-			externalReferenceCode, getUserId(), groupId, parentFolderId, name,
-			description, serviceContext);
+			getUserId(), groupId, parentFolderId, name, description,
+			serviceContext);
 	}
 
 	@Override
@@ -107,7 +104,7 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			long[] groupIds, long folderId, int restrictionType)
 		throws PortalException {
 
-		return _filterStructures(
+		return filterStructures(
 			journalFolderLocalService.getDDMStructures(
 				groupIds, folderId, restrictionType));
 	}
@@ -118,7 +115,7 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			OrderByComparator<DDMStructure> orderByComparator)
 		throws PortalException {
 
-		return _filterStructures(
+		return filterStructures(
 			journalFolderLocalService.getDDMStructures(
 				groupIds, folderId, restrictionType, orderByComparator));
 	}
@@ -126,21 +123,6 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 	@Override
 	public JournalFolder getFolder(long folderId) throws PortalException {
 		JournalFolder folder = journalFolderLocalService.getFolder(folderId);
-
-		_journalFolderModelResourcePermission.check(
-			getPermissionChecker(), folder, ActionKeys.VIEW);
-
-		return folder;
-	}
-
-	@Override
-	public JournalFolder getFolderByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws PortalException {
-
-		JournalFolder folder =
-			journalFolderLocalService.getJournalFolderByExternalReferenceCode(
-				externalReferenceCode, groupId);
 
 		_journalFolderModelResourcePermission.check(
 			getPermissionChecker(), folder, ActionKeys.VIEW);
@@ -227,8 +209,8 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			status, userId, true, start, end,
 			(OrderByComparator<Object>)orderByComparator);
 
-		return journalFolderFinder.filterFindF_A_ByG_F_DDMSI(
-			groupId, folderId, 0, queryDefinition);
+		return journalFolderFinder.filterFindF_A_ByG_F(
+			groupId, folderId, queryDefinition);
 	}
 
 	@Override
@@ -240,22 +222,8 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			status, userId, true, start, end,
 			(OrderByComparator<Object>)orderByComparator);
 
-		return journalFolderFinder.filterFindF_A_ByG_F_DDMSI_L(
-			groupId, folderId, 0, locale, queryDefinition);
-	}
-
-	@Override
-	public List<Object> getFoldersAndArticles(
-		long groupId, long userId, long folderId, long ddmStructureId,
-		int status, Locale locale, int start, int end,
-		OrderByComparator<?> orderByComparator) {
-
-		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
-			status, userId, true, start, end,
-			(OrderByComparator<Object>)orderByComparator);
-
-		return journalFolderFinder.filterFindF_A_ByG_F_DDMSI_L(
-			groupId, folderId, ddmStructureId, locale, queryDefinition);
+		return journalFolderFinder.filterFindF_A_ByG_F_L(
+			groupId, folderId, locale, queryDefinition);
 	}
 
 	@Override
@@ -305,20 +273,8 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 		QueryDefinition<Object> queryDefinition = new QueryDefinition<>(
 			status, userId, true);
 
-		return journalFolderFinder.filterCountF_A_ByG_F_DDMSI(
-			groupId, folderId, 0, queryDefinition);
-	}
-
-	@Override
-	public int getFoldersAndArticlesCount(
-		long groupId, long userId, long folderId, long ddmStructureId,
-		int status) {
-
-		QueryDefinition<Object> queryDefinition = new QueryDefinition<>(
-			status, userId, true);
-
-		return journalFolderFinder.filterCountF_A_ByG_F_DDMSI(
-			groupId, folderId, ddmStructureId, queryDefinition);
+		return journalFolderFinder.filterCountF_A_ByG_F(
+			groupId, folderId, queryDefinition);
 	}
 
 	@Override
@@ -422,65 +378,10 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			OrderByComparator<DDMStructure> orderByComparator)
 		throws PortalException {
 
-		if (restrictionType ==
-				JournalFolderConstants.
-					RESTRICTION_TYPE_DDM_STRUCTURES_AND_WORKFLOW) {
-
-			return _ddmStructureService.search(
-				companyId, groupIds,
-				_classNameLocalService.getClassNameId(JournalFolder.class),
-				folderId, keywords, WorkflowConstants.STATUS_ANY, start, end,
-				orderByComparator);
-		}
-
-		folderId = journalFolderLocalService.getOverridedDDMStructuresFolderId(
-			folderId);
-
-		if (folderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			return _ddmStructureService.search(
-				companyId, groupIds,
-				_classNameLocalService.getClassNameId(JournalFolder.class),
-				folderId, keywords, WorkflowConstants.STATUS_ANY, start, end,
-				orderByComparator);
-		}
-
-		return _ddmStructureService.search(
-			companyId, groupIds,
-			_classNameLocalService.getClassNameId(JournalArticle.class),
-			keywords, WorkflowConstants.STATUS_ANY, start, end,
-			orderByComparator);
-	}
-
-	@Override
-	public int searchDDMStructuresCount(
-			long companyId, long[] groupIds, long folderId, int restrictionType,
-			String keywords)
-		throws PortalException {
-
-		if (restrictionType ==
-				JournalFolderConstants.
-					RESTRICTION_TYPE_DDM_STRUCTURES_AND_WORKFLOW) {
-
-			return _ddmStructureService.searchCount(
-				companyId, groupIds,
-				_classNameLocalService.getClassNameId(JournalFolder.class),
-				folderId, keywords, WorkflowConstants.STATUS_ANY);
-		}
-
-		folderId = journalFolderLocalService.getOverridedDDMStructuresFolderId(
-			folderId);
-
-		if (folderId != JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			return _ddmStructureService.searchCount(
-				companyId, groupIds,
-				_classNameLocalService.getClassNameId(JournalFolder.class),
-				folderId, keywords, WorkflowConstants.STATUS_ANY);
-		}
-
-		return _ddmStructureService.searchCount(
-			companyId, groupIds,
-			_classNameLocalService.getClassNameId(JournalArticle.class),
-			keywords, WorkflowConstants.STATUS_ANY);
+		return filterStructures(
+			journalFolderLocalService.searchDDMStructures(
+				companyId, groupIds, folderId, restrictionType, keywords, start,
+				end, orderByComparator));
 	}
 
 	@Override
@@ -536,7 +437,7 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 			serviceContext);
 	}
 
-	private List<DDMStructure> _filterStructures(
+	protected List<DDMStructure> filterStructures(
 			List<DDMStructure> ddmStructures)
 		throws PortalException {
 
@@ -559,17 +460,11 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 		return ddmStructures;
 	}
 
-	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
 	@Reference(
 		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMStructure)"
 	)
 	private ModelResourcePermission<DDMStructure>
 		_ddmStructureModelResourcePermission;
-
-	@Reference
-	private DDMStructureService _ddmStructureService;
 
 	@Reference
 	private JournalArticleFinder _journalArticleFinder;

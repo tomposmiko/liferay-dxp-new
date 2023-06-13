@@ -1,14 +1,17 @@
-@default = "mouseUp"
-definition {
+<definition default="mouseUp">
+	<command name="javaScriptMouseUp">
+		<execute selenium="javaScriptMouseUp" />
+	</command>
 
-	function mouseUp {
-		selenium.mouseUp();
-	}
+	<command name="mouseRelease">
+		<execute selenium="mouseRelease" />
+	</command>
 
-	function mouseUpAt {
-		selenium.waitForVisible();
+	<command name="mouseUp">
+		<execute selenium="mouseUp" />
+	</command>
 
-		selenium.mouseUpAt("${locator1}", "${value1}");
-	}
-
-}
+	<command name="mouseUpAt">
+		<execute selenium="mouseUpAt" />
+	</command>
+</definition>

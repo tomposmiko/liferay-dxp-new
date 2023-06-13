@@ -27,7 +27,11 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Cristina González
  */
-@Component(service = Capability.class)
+@Component(
+	service = {
+		Capability.class, DLCommentsAndRatingsExporterImporterCapability.class
+	}
+)
 public class DLCommentsAndRatingsExporterImporterCapability
 	implements Capability {
 

@@ -61,7 +61,7 @@ public abstract class DoAsUserThread extends Thread {
 				return;
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 			finally {
 				PrincipalThreadLocal.setName(null);

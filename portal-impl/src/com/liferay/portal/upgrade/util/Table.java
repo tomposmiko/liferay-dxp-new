@@ -123,7 +123,7 @@ public class Table {
 		}
 		catch (SQLException sqlException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(sqlException);
+				_log.debug(sqlException, sqlException);
 			}
 
 			if (name.equals("uuid_")) {
@@ -361,7 +361,7 @@ public class Table {
 			}
 			catch (SQLException sqlException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(sqlException);
+					_log.debug(sqlException, sqlException);
 				}
 
 				value = GetterUtil.getLong(resultSet.getString(name));
@@ -423,7 +423,7 @@ public class Table {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				// If the database doesn't allow CLOB types for the column
@@ -438,7 +438,7 @@ public class Table {
 			}
 			catch (SQLException sqlException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(sqlException);
+					_log.debug(sqlException, sqlException);
 				}
 
 				value = resultSet.getString(name);
@@ -470,7 +470,7 @@ public class Table {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 
@@ -505,7 +505,7 @@ public class Table {
 
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection, getInsertSQL());
+					connection.prepareStatement(getInsertSQL()));
 			UnsyncBufferedReader unsyncBufferedReader =
 				new UnsyncBufferedReader(new FileReader(_tempFileName))) {
 
@@ -689,7 +689,7 @@ public class Table {
 			preparedStatement.executeUpdate();
 		}
 		catch (SQLException sqlException) {
-			_log.error(sqlException);
+			_log.error(sqlException, sqlException);
 
 			throw new RuntimeException(
 				"Unable to execute " + sql, sqlException);

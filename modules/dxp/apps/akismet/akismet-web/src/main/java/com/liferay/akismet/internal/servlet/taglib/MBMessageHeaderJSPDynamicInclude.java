@@ -27,13 +27,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jamie Sammons
  */
-@Component(enabled = false, service = DynamicInclude.class)
+@Component(enabled = false, immediate = true, service = DynamicInclude.class)
 public class MBMessageHeaderJSPDynamicInclude extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
@@ -52,10 +47,15 @@ public class MBMessageHeaderJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.akismet.web)", unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		MBMessageHeaderJSPDynamicInclude.class);
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.akismet.web)")
-	private ServletContext _servletContext;
 
 }

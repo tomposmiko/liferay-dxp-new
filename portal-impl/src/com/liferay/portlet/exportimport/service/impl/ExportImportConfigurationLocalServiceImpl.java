@@ -43,6 +43,10 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portlet.exportimport.service.base.ExportImportConfigurationLocalServiceBaseImpl;
+import com.liferay.trash.kernel.exception.RestoreEntryException;
+import com.liferay.trash.kernel.exception.TrashEntryException;
+import com.liferay.trash.kernel.model.TrashEntry;
+import com.liferay.trash.kernel.service.TrashEntryLocalService;
 
 import java.io.Serializable;
 
@@ -294,8 +298,27 @@ public class ExportImportConfigurationLocalServiceImpl
 			long userId, long exportImportConfigurationId)
 		throws PortalException {
 
-		return exportImportConfigurationPersistence.findByPrimaryKey(
-			exportImportConfigurationId);
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationPersistence.findByPrimaryKey(
+				exportImportConfigurationId);
+
+		if (exportImportConfiguration.isInTrash()) {
+			throw new TrashEntryException();
+		}
+
+		int oldStatus = exportImportConfiguration.getStatus();
+
+		exportImportConfiguration = updateStatus(
+			userId, exportImportConfiguration.getExportImportConfigurationId(),
+			WorkflowConstants.STATUS_IN_TRASH);
+
+		_trashEntryLocalService.addTrashEntry(
+			userId, exportImportConfiguration.getGroupId(),
+			ExportImportConfiguration.class.getName(),
+			exportImportConfiguration.getExportImportConfigurationId(), null,
+			null, oldStatus, null, null);
+
+		return exportImportConfiguration;
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -304,8 +327,28 @@ public class ExportImportConfigurationLocalServiceImpl
 			long userId, long exportImportConfigurationId)
 		throws PortalException {
 
-		return exportImportConfigurationPersistence.findByPrimaryKey(
+		ExportImportConfiguration exportImportConfiguration =
+			exportImportConfigurationPersistence.findByPrimaryKey(
+				exportImportConfigurationId);
+
+		if (!exportImportConfiguration.isInTrash()) {
+			throw new RestoreEntryException(
+				RestoreEntryException.INVALID_STATUS);
+		}
+
+		TrashEntry trashEntry = _trashEntryLocalService.getEntry(
+			ExportImportConfiguration.class.getName(),
 			exportImportConfigurationId);
+
+		exportImportConfiguration = updateStatus(
+			userId, exportImportConfiguration.getExportImportConfigurationId(),
+			trashEntry.getStatus());
+
+		_trashEntryLocalService.deleteEntry(
+			ExportImportConfiguration.class.getName(),
+			exportImportConfiguration.getExportImportConfigurationId());
+
+		return exportImportConfiguration;
 	}
 
 	@Override
@@ -451,6 +494,10 @@ public class ExportImportConfigurationLocalServiceImpl
 
 		return searchContext;
 	}
+
+	@BeanReference(type = TrashEntryLocalService.class)
+	@SuppressWarnings("deprecation")
+	private TrashEntryLocalService _trashEntryLocalService;
 
 	@BeanReference(type = UserPersistence.class)
 	private UserPersistence _userPersistence;

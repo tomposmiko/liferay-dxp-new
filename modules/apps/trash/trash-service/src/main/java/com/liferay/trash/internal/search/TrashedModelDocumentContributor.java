@@ -27,10 +27,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.trash.TrashRenderer;
-import com.liferay.trash.TrashHelper;
-import com.liferay.trash.model.TrashEntry;
+import com.liferay.trash.kernel.model.TrashEntry;
 
 import java.util.Date;
 
@@ -40,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = DocumentContributor.class)
+@Component(immediate = true, service = DocumentContributor.class)
 public class TrashedModelDocumentContributor
 	implements DocumentContributor<TrashedModel> {
 
@@ -61,7 +59,7 @@ public class TrashedModelDocumentContributor
 		TrashEntry trashEntry = null;
 
 		try {
-			trashEntry = _trashHelper.getTrashEntry(trashedModel);
+			trashEntry = trashedModel.getTrashEntry();
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
@@ -101,7 +99,7 @@ public class TrashedModelDocumentContributor
 				Field.REMOVED_BY_USER_NAME, trashEntry.getUserName(), true);
 
 			if (trashedModel.isInTrash() &&
-				!_trashHelper.isInTrashExplicitly(trashedModel)) {
+				!trashedModel.isInTrashExplicitly()) {
 
 				document.addKeyword(
 					Field.ROOT_ENTRY_CLASS_NAME, trashEntry.getClassName());
@@ -110,8 +108,7 @@ public class TrashedModelDocumentContributor
 			}
 		}
 
-		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
-			baseModel.getModelClassName());
+		TrashHandler trashHandler = trashedModel.getTrashHandler();
 
 		try {
 			TrashRenderer trashRenderer = null;
@@ -135,13 +132,14 @@ public class TrashedModelDocumentContributor
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		TrashedModelDocumentContributor.class);
 
-	@Reference
-	private TrashHelper _trashHelper;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

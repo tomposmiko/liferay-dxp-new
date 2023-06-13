@@ -26,7 +26,7 @@
 				String taglibSearchCollatedKeywords = liferayPortletResponse.getNamespace() + "searchKeywords('" + HtmlUtil.escapeJS(hits.getCollatedSpellCheckResult()) + "')";
 				%>
 
-				<aui:a href="javascript:void(0);" onclick="<%= taglibSearchCollatedKeywords %>">
+				<aui:a href="javascript:;" onclick="<%= taglibSearchCollatedKeywords %>">
 
 					<%
 					KeywordsSuggestionHolder keywordsSuggestionHolder = new KeywordsSuggestionHolder(hits.getCollatedSpellCheckResult(), searchDisplayContext.getKeywords());
@@ -35,14 +35,7 @@
 					%>
 
 						<span class="<%= keywordsSuggestionHolder.hasChanged(suggestedKeyword) ? "changed-keyword" : "unchanged-keyword" %>">
-							<c:choose>
-								<c:when test="<%= keywordsSuggestionHolder.hasChanged(suggestedKeyword) %>">
-									<strong><%= HtmlUtil.escape(suggestedKeyword) %></strong>
-								</c:when>
-								<c:otherwise>
-									<%= HtmlUtil.escape(suggestedKeyword) %>
-								</c:otherwise>
-							</c:choose>
+							<%= HtmlUtil.escape(suggestedKeyword) %>
 						</span>
 
 					<%
@@ -71,7 +64,7 @@
 						String taglibOnClick = liferayPortletResponse.getNamespace() + "searchKeywords('" + HtmlUtil.escapeJS(querySuggestion) + "')";
 						%>
 
-						<aui:a href="javascript:void(0);" onClick="<%= taglibOnClick %>">
+						<aui:a href="javascript:;" onClick="<%= taglibOnClick %>">
 
 							<%
 							KeywordsSuggestionHolder keywordsSuggestionHolder = new KeywordsSuggestionHolder(querySuggestion, searchDisplayContext.getKeywords());
@@ -80,14 +73,7 @@
 							%>
 
 								<span class="<%= keywordsSuggestionHolder.hasChanged(suggestedKeyword) ? "changed-keyword" : "unchanged-keyword" %>">
-									<c:choose>
-										<c:when test="<%= keywordsSuggestionHolder.hasChanged(suggestedKeyword) %>">
-											<strong><%= HtmlUtil.escape(suggestedKeyword) %></strong>
-										</c:when>
-										<c:otherwise>
-											<%= HtmlUtil.escape(suggestedKeyword) %>
-										</c:otherwise>
-									</c:choose>
+									<%= HtmlUtil.escape(suggestedKeyword) %>
 								</span>
 
 							<%

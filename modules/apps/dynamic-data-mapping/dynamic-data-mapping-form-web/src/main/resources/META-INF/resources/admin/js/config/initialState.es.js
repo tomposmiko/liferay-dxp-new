@@ -33,6 +33,18 @@ export const BUILDER_INITIAL_STATE = {
 	fieldTypes: [],
 	formInstanceId: 0,
 	functionsMetadata: {},
+	initialSuccessPageSettings: {
+		body: {
+			[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
+				'your-information-was-successfully-received-thank-you-for-filling-out-the-form'
+			),
+		},
+		title: {
+			[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
+				'thank-you'
+			),
+		},
+	},
 	objectFields: [],
 	paginationMode: 'multi-pages',
 	rules: [],
@@ -94,16 +106,17 @@ const normalizePages = (pages) => {
 	);
 };
 
-export function initState(
+export const initState = (
 	{
+		initialSuccessPageSettings,
 		pages: initialPages,
 		paginationMode: initialPaginationMode,
 		rules: initialRules,
-		successPageSettings: initialSuccessPageSettings,
+		successPageSettings: initialSuccessPage,
 		...otherProps
 	},
 	{view}
-) {
+) => {
 	const pages = initialPages.length
 		? normalizePages(initialPages)
 		: INITIAL_PAGES;
@@ -122,24 +135,20 @@ export function initState(
 		view === 'fieldSets' ? 'single-page' : initialPaginationMode;
 
 	const successPageSettings = {
-		body: initialSuccessPageSettings?.body
-			? initialSuccessPageSettings?.body
-			: {
-					[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
-						'your-information-was-successfully-received-thank-you-for-filling-out-the-form'
-					),
-			  },
+		body:
+			initialSuccessPage?.body === 'string'
+				? {
+						[themeDisplay.getDefaultLanguageId()]: initialSuccessPage.body,
+				  }
+				: initialSuccessPageSettings.body,
 		enabled:
-			view === 'fieldSets'
-				? false
-				: initialSuccessPageSettings?.enabled ?? true,
-		title: initialSuccessPageSettings?.title
-			? initialSuccessPageSettings?.title
-			: {
-					[themeDisplay.getDefaultLanguageId()]: Liferay.Language.get(
-						'thank-you'
-					),
-			  },
+			view === 'fieldSets' ? false : initialSuccessPage?.enabled ?? true,
+		title:
+			initialSuccessPage?.title === 'string'
+				? {
+						[themeDisplay.getDefaultLanguageId()]: initialSuccessPage.title,
+				  }
+				: initialSuccessPageSettings.title,
 	};
 
 	return {
@@ -182,4 +191,4 @@ export function initState(
 		successPageSettings,
 		...otherProps,
 	};
-}
+};

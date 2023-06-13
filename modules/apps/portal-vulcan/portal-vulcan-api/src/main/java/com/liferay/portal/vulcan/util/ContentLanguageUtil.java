@@ -17,6 +17,7 @@ package com.liferay.portal.vulcan.util;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,25 +32,16 @@ public class ContentLanguageUtil {
 		String[] availableLocaleIds, String defaultLocaleId,
 		HttpServletResponse httpServletResponse, Locale requestedLocale) {
 
-		if (httpServletResponse == null) {
-			return;
-		}
-
-		Locale contentLocale = null;
-
-		for (String availableLocaleId : availableLocaleIds) {
-			Locale locale = LocaleUtil.fromLanguageId(availableLocaleId);
-
-			if (LocaleUtil.equals(locale, requestedLocale)) {
-				contentLocale = locale;
-
-				break;
-			}
-		}
-
-		if (contentLocale == null) {
-			contentLocale = LocaleUtil.fromLanguageId(defaultLocaleId);
-		}
+		Locale contentLocale = Stream.of(
+			availableLocaleIds
+		).map(
+			LocaleUtil::fromLanguageId
+		).filter(
+			locale -> LocaleUtil.equals(locale, requestedLocale)
+		).findFirst(
+		).orElse(
+			LocaleUtil.fromLanguageId(defaultLocaleId)
+		);
 
 		httpServletResponse.addHeader(
 			HttpHeaders.CONTENT_LANGUAGE,

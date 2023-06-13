@@ -18,14 +18,12 @@ export default function updateEditableValues({
 	content,
 	editableValues,
 	fragmentEntryLinkId,
-	pageContents,
 	segmentsExperienceId,
 }) {
 	return {
 		content,
 		editableValues,
 		fragmentEntryLinkId,
-		pageContents,
 		segmentsExperienceId,
 		type: UPDATE_EDITABLE_VALUES,
 	};

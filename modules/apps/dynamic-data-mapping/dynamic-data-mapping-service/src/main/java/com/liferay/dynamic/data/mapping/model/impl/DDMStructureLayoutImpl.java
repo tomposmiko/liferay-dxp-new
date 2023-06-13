@@ -38,7 +38,7 @@ public class DDMStructureLayoutImpl extends DDMStructureLayoutBaseImpl {
 						getStructureLayoutDDMFormLayout(this);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				return new DDMFormLayout();
 			}

@@ -1,58 +1,42 @@
 definition {
 
 	macro deleteCollection {
-		Navigator.gotoNavNested(navNested = ${collectionName});
+		Navigator.gotoNavNested(navNested = "${collectionName}");
 
-		Click.waitForMenuToggleJSClick(
-			key_headerName = ${collectionName},
-			locator1 = "Portlet#H2_HEADER_VERTICAL_ELLIPSIS");
+		LexiconEntry.gotoEllipsisMenuItemNoError(menuItem = "Delete");
 
-		MenuItem.click(menuItem = "Delete");
-
-		AssertTextEquals(
-			locator1 = "Modal#BODY",
-			value1 = "Deleting a fragment set is an action impossible to revert. All the fragments in the set will be removed and it will not be possible to recover them.");
-
-		Click(
-			key_text = "Delete",
-			locator1 = "Modal#MODAL_FOOTER_BUTTON");
+		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
 	}
 
 	macro editCollection {
-		PortletEntry.inputName(name = ${collectionName});
+		PortletEntry.inputName(name = "${collectionName}");
 
-		if (isSet(collectionDescription)) {
-			PortletEntry.inputDescription(description = ${collectionDescription});
+		if (!(contains("${collectionDescription}", "{collectionDescription}"))) {
+			PortletEntry.inputDescription(description = "${collectionDescription}");
 		}
 	}
 
 	macro renameCollection {
-		Navigator.gotoNavNested(navNested = ${collectionName});
+		Navigator.gotoNavNested(navNested = "${collectionName}");
 
-		Click.waitForMenuToggleJSClick(
-			key_headerName = ${collectionName},
-			locator1 = "Portlet#H2_HEADER_VERTICAL_ELLIPSIS");
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-
-		MenuItem.click(menuItem = "Edit");
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Edit");
 
 		Collection.editCollection(
-			collectionDescription = ${collectionDescription},
-			collectionName = ${collectionNameEdit});
+			collectionDescription = "${collectionDescription}",
+			collectionName = "${collectionNameEdit}");
 
 		PortletEntry.save();
 	}
 
 	macro viewNotPresent {
 		AssertElementNotPresent(
-			key_navNested = ${collectionName},
+			key_navNested = "${collectionName}",
 			locator1 = "NavNested#NAV_NESTED_LINK");
 	}
 
 	macro viewPresent {
 		AssertElementPresent(
-			key_navNested = ${collectionName},
+			key_navNested = "${collectionName}",
 			locator1 = "NavNested#NAV_NESTED_LINK");
 	}
 

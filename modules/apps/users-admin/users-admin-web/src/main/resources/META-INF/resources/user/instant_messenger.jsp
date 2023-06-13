@@ -32,15 +32,7 @@ Contact selContact = (Contact)request.getAttribute("user.selContact");
 			<aui:input label="skype" name="skypeSn" />
 
 			<c:if test="<%= Validator.isNotNull(selContact.getSkypeSn()) %>">
-				<div class="form-feedback-group">
-					<div class="form-text">
-						<clay:link
-							decoration="underline"
-							href='<%= "skype:" + HtmlUtil.escapeAttribute(selContact.getSkypeSn()) + "?call" %>'
-							label='<%= LanguageUtil.get(request, "call-this-user") %>'
-						/>
-					</div>
-				</div>
+				<a href="skype:<%= HtmlUtil.escapeAttribute(selContact.getSkypeSn()) %>?call"><liferay-ui:message escapeAttribute="<%= true %>" key="call-this-user" /></a>
 			</c:if>
 		</div>
 	</c:when>

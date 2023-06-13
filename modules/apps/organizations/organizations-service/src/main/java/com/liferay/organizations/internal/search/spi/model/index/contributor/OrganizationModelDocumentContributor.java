@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.exception.NoSuchCountryException;
 import com.liferay.portal.kernel.exception.NoSuchRegionException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Address;
@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Igor Fabiano Nazar
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.Organization",
 	service = ModelDocumentContributor.class
 )
@@ -114,7 +115,7 @@ public class OrganizationModelDocumentContributor
 	private Set<String> _getLocalizedCountryNames(Country country) {
 		Set<String> countryNames = new HashSet<>();
 
-		for (Locale locale : _language.getAvailableLocales()) {
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			String countryName = country.getName(locale);
 
 			countryName = StringUtil.toLowerCase(countryName);
@@ -142,7 +143,7 @@ public class OrganizationModelDocumentContributor
 			}
 			catch (NoSuchCountryException noSuchCountryException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchCountryException);
+					_log.warn(noSuchCountryException.getMessage());
 				}
 			}
 		}
@@ -157,7 +158,7 @@ public class OrganizationModelDocumentContributor
 			}
 			catch (NoSuchRegionException noSuchRegionException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchRegionException);
+					_log.warn(noSuchRegionException.getMessage());
 				}
 			}
 		}
@@ -194,9 +195,6 @@ public class OrganizationModelDocumentContributor
 
 	@Reference
 	private CountryService _countryService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;

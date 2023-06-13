@@ -17,33 +17,34 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
 		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
-		JSONLayout.addPublicLayout(
-			groupName = "Guest",
-			layoutName = "Web Content Display Page");
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages");
 
-		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
-			groupName = "Guest",
-			layoutName = "Web Content Display Page",
-			widgetName = "Web Content Display");
+		SitePages.addPublicPage(pageName = "Web Content Display Page");
+
+		Navigator.gotoPage(pageName = "Web Content Display Page");
+
+		Portlet.addPG(portletName = "Web Content Display");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			WebContent.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownPG();
 
 			Workflow.tearDownPortalWorkflow();
 
@@ -51,17 +52,17 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ApproveWebContentViaWebContentDisplayPG {
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
-		WebContentDisplayPortlet.addWithWorkflow(
+		WebContent.addWithWorkflowPGViaWCD(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title");
 
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
-		WebContentDisplayPortlet.viewWorkflow(
+		WebContent.viewWithWorkflowPGViaWCD(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title",
 			workflowTask = "Review");
@@ -75,7 +76,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
-		WebContentDisplayPortlet.viewWorkflow(
+		WebContent.viewWithWorkflowPGViaWCD(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title",
 			workflowTask = "Review");
@@ -89,16 +90,16 @@ definition {
 
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
-		WebContentDisplayPortlet.viewContent(
+		WebContent.viewPGViaWCD(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RejectWebContentViaWebContentDisplayPG {
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
-		WebContentDisplayPortlet.addWithWorkflow(
+		WebContent.addWithWorkflowPGViaWCD(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title");
 
@@ -124,7 +125,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
-		WebContentDisplayPortlet.viewWorkflow(
+		WebContent.viewWithWorkflowPGViaWCD(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title",
 			workflowTask = "Update");

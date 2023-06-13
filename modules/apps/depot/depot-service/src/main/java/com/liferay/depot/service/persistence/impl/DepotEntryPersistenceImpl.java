@@ -20,7 +20,6 @@ import com.liferay.depot.model.DepotEntryTable;
 import com.liferay.depot.model.impl.DepotEntryImpl;
 import com.liferay.depot.model.impl.DepotEntryModelImpl;
 import com.liferay.depot.service.persistence.DepotEntryPersistence;
-import com.liferay.depot.service.persistence.DepotEntryUtil;
 import com.liferay.depot.service.persistence.impl.constants.DepotPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -45,11 +45,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -76,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DepotEntryPersistence.class)
+@Component(service = {DepotEntryPersistence.class, BasePersistence.class})
 public class DepotEntryPersistenceImpl
 	extends BasePersistenceImpl<DepotEntry> implements DepotEntryPersistence {
 
@@ -192,7 +191,7 @@ public class DepotEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DepotEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DepotEntry depotEntry : list) {
@@ -572,7 +571,7 @@ public class DepotEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -702,7 +701,7 @@ public class DepotEntryPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof DepotEntry) {
@@ -813,7 +812,7 @@ public class DepotEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -979,7 +978,7 @@ public class DepotEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DepotEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DepotEntry depotEntry : list) {
@@ -1391,7 +1390,7 @@ public class DepotEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1516,7 +1515,7 @@ public class DepotEntryPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByGroupId, finderArgs, this);
+				_finderPathFetchByGroupId, finderArgs);
 		}
 
 		if (result instanceof DepotEntry) {
@@ -1606,7 +1605,7 @@ public class DepotEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1779,7 +1778,7 @@ public class DepotEntryPersistenceImpl
 		depotEntry.setNew(true);
 		depotEntry.setPrimaryKey(depotEntryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		depotEntry.setUuid(uuid);
 
@@ -1895,7 +1894,7 @@ public class DepotEntryPersistenceImpl
 			(DepotEntryModelImpl)depotEntry;
 
 		if (Validator.isNull(depotEntry.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			depotEntry.setUuid(uuid);
 		}
@@ -2090,7 +2089,7 @@ public class DepotEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DepotEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2160,7 +2159,7 @@ public class DepotEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2287,30 +2286,11 @@ public class DepotEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
-
-		_setDepotEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDepotEntryUtilPersistence(null);
-
 		entityCache.removeCache(DepotEntryImpl.class.getName());
-	}
-
-	private void _setDepotEntryUtilPersistence(
-		DepotEntryPersistence depotEntryPersistence) {
-
-		try {
-			Field field = DepotEntryUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, depotEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2377,6 +2357,6 @@ public class DepotEntryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private DepotEntryModelArgumentsResolver _depotEntryModelArgumentsResolver;
 
 }

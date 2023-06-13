@@ -13,9 +13,8 @@
  */
 
 import ClayTabs from '@clayui/tabs';
-import {useSessionState} from '@liferay/layout-content-page-editor-web';
 import PropTypes from 'prop-types';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 
 import {AddPanelContext} from './AddPanel';
 import TabsContent from './TabsContent';
@@ -23,23 +22,20 @@ import TabsContent from './TabsContent';
 const TabsPanel = ({tabs}) => {
 	const {portletNamespace} = useContext(AddPanelContext);
 
-	const [activeTabId, setActiveTabId] = useSessionState(
-		`${portletNamespace}_active-tab-id`,
-		0
-	);
+	const [activeTabId, setActiveTabId] = useState(0);
 
 	const getTabId = (tabId) => `${portletNamespace}_tab_${tabId}`;
 	const getTabPanelId = (tabId) => `${portletNamespace}_tabPanel_${tabId}`;
 
 	return (
 		<>
-			<ClayTabs className="mb-0 pl-3 sidebar-body__add-panel__tabs">
+			<ClayTabs className="sidebar-body__add-panel__tabs" modern>
 				{tabs.map((tab, index) => (
 					<ClayTabs.Item
 						active={activeTabId === index}
 						innerProps={{
 							'aria-controls': getTabPanelId(index),
-							'id': getTabId(index),
+							id: getTabId(index),
 						}}
 						key={index}
 						onClick={() => setActiveTabId(index)}
@@ -56,7 +52,6 @@ const TabsPanel = ({tabs}) => {
 				{tabs.map((tab, index) => (
 					<ClayTabs.TabPane
 						aria-labelledby={getTabId(index)}
-						className="p-3"
 						id={getTabPanelId(index)}
 						key={index}
 					>

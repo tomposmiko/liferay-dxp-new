@@ -15,11 +15,11 @@
 import {config} from '../config/index';
 import isNullOrUndefined from './isNullOrUndefined';
 
-export function getEditableLocalizedValue(
+export const getEditableLocalizedValue = (
 	editableValue,
 	languageId = null,
 	defaultValue = ''
-) {
+) => {
 	let content;
 
 	if (languageId && !isNullOrUndefined(editableValue?.[languageId])) {
@@ -39,4 +39,4 @@ export function getEditableLocalizedValue(
 	}
 
 	return content;
-}
+};

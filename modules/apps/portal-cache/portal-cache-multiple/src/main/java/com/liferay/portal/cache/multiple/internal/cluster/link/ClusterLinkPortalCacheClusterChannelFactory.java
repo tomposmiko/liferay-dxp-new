@@ -31,8 +31,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shuyang Zhou
  */
 @Component(
-	configurationPid = "com.liferay.portal.cache.multiple.configuration.PortalCacheClusterConfiguration",
-	enabled = false, service = PortalCacheClusterChannelFactory.class
+	configurationPid = "com.liferay.portal.cache.cluster.configuration.PortalCacheClusterConfiguration",
+	enabled = false, immediate = true,
+	service = PortalCacheClusterChannelFactory.class
 )
 public class ClusterLinkPortalCacheClusterChannelFactory
 	implements PortalCacheClusterChannelFactory {
@@ -65,9 +66,12 @@ public class ClusterLinkPortalCacheClusterChannelFactory
 			portalCacheClusterConfiguration.usingCoalescedPipe();
 	}
 
-	@Reference
-	private ClusterLink _clusterLink;
+	@Reference(unbind = "-")
+	protected void setClusterLink(ClusterLink clusterLink) {
+		_clusterLink = clusterLink;
+	}
 
+	private ClusterLink _clusterLink;
 	private volatile boolean _usingCoalescedPipe;
 
 }

@@ -19,9 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -37,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -58,10 +55,10 @@ public class SourceLocalServiceImpl extends SourceLocalServiceBaseImpl {
 
 		// Source
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 		Date date = new Date();
 
-		_validate(driverClassName, driverUrl, driverUserName, driverPassword);
+		validate(driverClassName, driverUrl, driverUserName, driverPassword);
 
 		long sourceId = counterLocalService.increment();
 
@@ -84,7 +81,7 @@ public class SourceLocalServiceImpl extends SourceLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.addModelResources(source, serviceContext);
+		resourceLocalService.addModelResources(source, serviceContext);
 
 		return source;
 	}
@@ -106,7 +103,7 @@ public class SourceLocalServiceImpl extends SourceLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.deleteResource(
+		resourceLocalService.deleteResource(
 			source.getCompanyId(), Source.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL, source.getSourceId());
 
@@ -158,7 +155,7 @@ public class SourceLocalServiceImpl extends SourceLocalServiceBaseImpl {
 			driverPassword = source.getDriverPassword();
 		}
 
-		_validate(driverClassName, driverUrl, driverUserName, driverPassword);
+		validate(driverClassName, driverUrl, driverUserName, driverPassword);
 
 		source.setModifiedDate(serviceContext.getModifiedDate(null));
 		source.setNameMap(nameMap);
@@ -170,7 +167,7 @@ public class SourceLocalServiceImpl extends SourceLocalServiceBaseImpl {
 		return sourcePersistence.update(source);
 	}
 
-	private void _validate(
+	protected void validate(
 			String driverClassName, String driverUrl, String driverUserName,
 			String driverPassword)
 		throws PortalException {
@@ -198,11 +195,5 @@ public class SourceLocalServiceImpl extends SourceLocalServiceBaseImpl {
 			currentThread.setContextClassLoader(classLoader);
 		}
 	}
-
-	@Reference
-	private ResourceLocalService _resourceLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

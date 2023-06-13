@@ -17,7 +17,6 @@
 <%@ include file="/init.jsp" %>
 
 <%
-CommerceContext commerceContext = (CommerceContext)request.getAttribute(CommerceWebKeys.COMMERCE_CONTEXT);
 CPDefinition cpDefinition = (CPDefinition)request.getAttribute(CPWebKeys.CP_DEFINITION);
 
 Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), portletDisplay.getId());
@@ -26,7 +25,7 @@ Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(),
 <liferay-util:html-top
 	outputKey="commerce_product_definitions_main_css"
 >
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/main.css", portlet.getTimestamp()) %>" rel="stylesheet" type="text/css" />
+	<link href="<%= PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/css/main.css", portlet.getTimestamp()) %>" rel="stylesheet" type="text/css" />
 </liferay-util:html-top>
 
 <div class="portlet-commerce-product-definitions">
@@ -50,7 +49,7 @@ Portlet portlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(),
 				<dl>
 
 					<%
-					String defaultImageThumbnailSrc = cpDefinition.getDefaultImageThumbnailSrc(CommerceUtil.getCommerceAccountId(commerceContext));
+					String defaultImageThumbnailSrc = cpDefinition.getDefaultImageThumbnailSrc();
 					%>
 
 					<c:if test="<%= Validator.isNotNull(defaultImageThumbnailSrc) %>">

@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alec Sloan
  */
-@Component(service = CPCompareHelper.class)
+@Component(enabled = false, immediate = true, service = CPCompareHelper.class)
 public class CPCompareHelperImpl implements CPCompareHelper {
 
 	@Override
@@ -62,7 +62,7 @@ public class CPCompareHelperImpl implements CPCompareHelper {
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 
 				continue;
@@ -76,7 +76,6 @@ public class CPCompareHelperImpl implements CPCompareHelper {
 		return cpCatalogEntries;
 	}
 
-	@Override
 	public List<Long> getCPDefinitionIds(
 		long groupId, long commerceAccountId,
 		String cpDefinitionIdsCookieValue) {
@@ -100,7 +99,7 @@ public class CPCompareHelperImpl implements CPCompareHelper {
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 
 				continue;

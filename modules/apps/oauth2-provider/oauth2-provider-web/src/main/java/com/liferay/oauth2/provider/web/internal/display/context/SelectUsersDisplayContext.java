@@ -15,17 +15,15 @@
 package com.liferay.oauth2.provider.web.internal.display.context;
 
 import com.liferay.oauth2.provider.web.internal.constants.OAuth2ProviderPortletKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
@@ -33,7 +31,6 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -63,7 +60,7 @@ public class SelectUsersDisplayContext {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -118,24 +115,23 @@ public class SelectUsersDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
-			"first-name");
+		_orderByCol = ParamUtil.getString(
+			_renderRequest, "orderByCol", "first-name");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, OAuth2ProviderPortletKeys.OAUTH2_ADMIN, "asc");
+		_orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -199,7 +195,7 @@ public class SelectUsersDisplayContext {
 		}
 		catch (WindowStateException windowStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(windowStateException);
+				_log.debug(windowStateException, windowStateException);
 			}
 		}
 
@@ -222,21 +218,19 @@ public class SelectUsersDisplayContext {
 		UserSearchTerms searchTerms =
 			(UserSearchTerms)userSearch.getSearchTerms();
 
-		LinkedHashMap<String, Object> userParams =
-			LinkedHashMapBuilder.<String, Object>put(
-				"types",
-				new long[] {
-					UserConstants.TYPE_DEFAULT_SERVICE_ACCOUNT,
-					UserConstants.TYPE_REGULAR,
-					UserConstants.TYPE_SERVICE_ACCOUNT
-				}
-			).build();
+		LinkedHashMap<String, Object> userParams = new LinkedHashMap<>();
 
 		if (group.isLimitedToParentSiteMembers()) {
 			userParams.put("inherit", Boolean.TRUE);
 			userParams.put(
 				"usersGroups", Long.valueOf(group.getParentGroupId()));
 		}
+
+		int usersCount = UserLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), userParams);
+
+		userSearch.setTotal(usersCount);
 
 		List<User> users = UserLocalServiceUtil.search(
 			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
@@ -255,18 +249,14 @@ public class SelectUsersDisplayContext {
 				}
 				catch (PortalException portalException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(portalException);
+						_log.debug(portalException.getMessage());
 					}
 
 					return false;
 				}
 			});
 
-		userSearch.setResultsAndTotal(
-			() -> users,
-			UserLocalServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), userParams));
+		userSearch.setResults(users);
 
 		_userSearch = userSearch;
 

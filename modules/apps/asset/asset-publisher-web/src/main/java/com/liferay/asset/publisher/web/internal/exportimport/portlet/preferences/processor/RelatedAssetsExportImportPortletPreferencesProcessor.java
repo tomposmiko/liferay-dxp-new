@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael Bowerman
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + AssetPublisherPortletKeys.RELATED_ASSETS,
 	service = ExportImportPortletPreferencesProcessor.class
 )

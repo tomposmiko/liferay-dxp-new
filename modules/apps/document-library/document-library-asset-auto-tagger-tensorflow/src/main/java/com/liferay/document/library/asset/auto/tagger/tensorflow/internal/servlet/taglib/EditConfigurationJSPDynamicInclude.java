@@ -40,11 +40,6 @@ import org.osgi.service.component.annotations.Reference;
 public class EditConfigurationJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public void include(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String key)
@@ -64,7 +59,7 @@ public class EditConfigurationJSPDynamicInclude extends BaseJSPDynamicInclude {
 				tensorFlowImageAssetAutoTagProviderCompanyConfiguration);
 		}
 		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
+			_log.error(configurationException, configurationException);
 		}
 
 		super.include(httpServletRequest, httpServletResponse, key);
@@ -91,6 +86,15 @@ public class EditConfigurationJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.document.library.asset.auto.tagger.tensorflow)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditConfigurationJSPDynamicInclude.class);
 
@@ -99,10 +103,5 @@ public class EditConfigurationJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.document.library.asset.auto.tagger.tensorflow)"
-	)
-	private ServletContext _servletContext;
 
 }

@@ -24,10 +24,10 @@ import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Order;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderItem;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.ShippingAddress;
+import com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.ShippingAddressDTOConverter;
 import com.liferay.headless.commerce.admin.order.internal.util.v1_0.ShippingAddressUtil;
 import com.liferay.headless.commerce.admin.order.resource.v1_0.ShippingAddressResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/shipping-address.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, ShippingAddressResource.class}
@@ -163,10 +164,7 @@ public class ShippingAddressResourceImpl
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.ShippingAddressDTOConverter)"
-	)
-	private DTOConverter<CommerceAddress, ShippingAddress>
-		_shippingAddressDTOConverter;
+	@Reference
+	private ShippingAddressDTOConverter _shippingAddressDTOConverter;
 
 }

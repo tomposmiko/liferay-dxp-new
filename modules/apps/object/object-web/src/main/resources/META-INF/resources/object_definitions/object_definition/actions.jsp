@@ -29,29 +29,30 @@ portletDisplay.setURLBack(backURL);
 renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 %>
 
-<frontend-data-set:headless-display
+<clay:headless-data-set-display
 	apiURL="<%= objectDefinitionsActionsDisplayContext.getAPIURL() %>"
+	clayDataSetActionDropdownItems="<%= objectDefinitionsActionsDisplayContext.getClayDataSetActionDropdownItems() %>"
 	creationMenu="<%= objectDefinitionsActionsDisplayContext.getCreationMenu() %>"
-	fdsActionDropdownItems="<%= objectDefinitionsActionsDisplayContext.getFDSActionDropdownItems() %>"
-	formName="fm"
-	id="<%= ObjectDefinitionsFDSNames.OBJECT_ACTIONS %>"
-	propsTransformer="js/components/FDSPropsTransformer/ObjectActionsFDSPropsTransformer"
+	formId="fm"
+	id="<%= ObjectDefinitionsClayDataSetDisplayNames.OBJECT_ACTIONS %>"
+	itemsPerPage="<%= 20 %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+	pageNumber="<%= 1 %>"
+	portletURL="<%= liferayPortletResponse.createRenderURL() %>"
 	style="fluid"
 />
 
-<div>
+<div id="<portlet:namespace />AddObjectAction">
 	<react:component
-		module="js/components/ExpressionBuilderModal"
+		module="js/components/ModalAddObjectAction"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
-				"sidebarElements", objectDefinitionsActionsDisplayContext.getObjectActionCodeEditorElements()
+				"apiURL", objectDefinitionsActionsDisplayContext.getAPIURL()
+			).put(
+				"objectActionExecutors", objectDefinitionsActionsDisplayContext.getObjectActionExecutorsJSONArray()
+			).put(
+				"objectActionTriggers", objectDefinitionsActionsDisplayContext.getObjectActionTriggersJSONArray()
 			).build()
 		%>'
-	/>
-</div>
-
-<div>
-	<react:component
-		module="js/components/ModalAddColumns"
 	/>
 </div>

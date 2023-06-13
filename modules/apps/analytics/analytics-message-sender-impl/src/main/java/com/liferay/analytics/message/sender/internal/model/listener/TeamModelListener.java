@@ -31,7 +31,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shinn Lok
  */
-@Component(service = {EntityModelListener.class, ModelListener.class})
+@Component(
+	immediate = true, service = {EntityModelListener.class, ModelListener.class}
+)
 public class TeamModelListener extends BaseEntityModelListener<Team> {
 
 	@Override

@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.wiki.model.WikiNode",
-	service = DTOConverter.class
+	service = {DTOConverter.class, WikiNodeDTOConverter.class}
 )
 public class WikiNodeDTOConverter
 	implements DTOConverter<com.liferay.wiki.model.WikiNode, WikiNode> {
@@ -51,7 +51,7 @@ public class WikiNodeDTOConverter
 			{
 				actions = dtoConverterContext.getActions();
 				creator = CreatorUtil.toCreator(
-					_portal, dtoConverterContext.getUriInfo(),
+					_portal, dtoConverterContext.getUriInfoOptional(),
 					_userLocalService.fetchUser(wikiNode.getUserId()));
 				dateCreated = wikiNode.getCreateDate();
 				dateModified = wikiNode.getModifiedDate();

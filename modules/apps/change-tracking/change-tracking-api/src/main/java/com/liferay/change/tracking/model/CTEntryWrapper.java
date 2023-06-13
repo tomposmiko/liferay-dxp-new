@@ -402,11 +402,6 @@ public class CTEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CTEntryWrapper wrap(CTEntry ctEntry) {
 		return new CTEntryWrapper(ctEntry);
 	}

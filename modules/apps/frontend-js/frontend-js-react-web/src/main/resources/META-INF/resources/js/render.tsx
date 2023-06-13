@@ -47,17 +47,11 @@ export default function render(
 	},
 	container: Element
 ) {
-	if (!container) {
-		return;
-	}
-
 	if (!(window.Liferay as any).SPA || (window.Liferay as any).SPA.app) {
 		const {portletId} = renderData;
-
-		// Temporary workaround until frontend-icons-web is converted to ESM.
-		// We will replace with an import from frontend-icons-web later.
-
-		const spritemap = ((Liferay as any).Icons || {}).spritemap as string;
+		const spritemap =
+			(window.Liferay as any).ThemeDisplay.getPathThemeImages() +
+			'/clay/icons.svg';
 
 		let {componentId} = renderData;
 
@@ -89,18 +83,6 @@ export default function render(
 				: null;
 
 		container.classList.add('lfr-tooltip-scope');
-
-		if (renderData.hasBodyContent) {
-			const children = container.querySelectorAll(
-				'.tag-body-content > *'
-			);
-
-			if (children.length) {
-				renderData.children = children;
-			}
-
-			delete renderData.hasBodyContent;
-		}
 
 		// eslint-disable-next-line @liferay/portal/no-react-dom-render
 		ReactDOM.render(

@@ -37,10 +37,15 @@ window.Liferay = {
 			return key;
 		},
 	},
+	Session: {
+		extend: () => {},
+	},
 	ThemeDisplay: {
-		...window.Liferay.ThemeDisplay,
-		getPathContext: () => undefined,
-		getPortalURL: () => window.location.origin,
+		getBCP47LanguageId: () => 'en-US',
+		getLanguageId: () => 'en_US',
+		getPathThemeImages: () => 'http://localhost:8080/o/admin-theme/images',
+		getUserId: () => '123',
+		getUserName: () => 'Test Test',
 	},
 	authToken: 'auth',
 };

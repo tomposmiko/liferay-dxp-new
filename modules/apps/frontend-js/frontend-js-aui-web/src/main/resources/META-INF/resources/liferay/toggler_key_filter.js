@@ -15,11 +15,11 @@
 AUI.add(
 	'liferay-toggler-key-filter',
 	(A) => {
-		const KeyMap = A.Event.KeyMap;
+		var KeyMap = A.Event.KeyMap;
 
-		const NAME = 'togglerkeyfilter';
+		var NAME = 'togglerkeyfilter';
 
-		const TogglerKeyFilter = A.Component.create({
+		var TogglerKeyFilter = A.Component.create({
 			ATTRS: {
 				filter: {
 					validator: Array.isArray,
@@ -42,16 +42,16 @@ AUI.add(
 
 			prototype: {
 				_headerEventHandler(event) {
-					const instance = this;
+					var instance = this;
 
-					let validAction = event.type === instance._toggleEvent;
+					var validAction = event.type === instance._toggleEvent;
 
 					if (!validAction) {
 						validAction =
 							instance.get('filter').indexOf(event.keyCode) > -1;
 					}
 
-					let retVal;
+					var retVal;
 
 					if (!validAction) {
 						retVal = new A.Do.Prevent();
@@ -61,7 +61,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._toggleEvent = instance
 						.get('host')

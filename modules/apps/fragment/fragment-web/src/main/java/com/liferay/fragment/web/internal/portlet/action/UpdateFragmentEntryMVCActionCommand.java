@@ -18,13 +18,13 @@ import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.fragment.web.internal.handler.FragmentEntryExceptionRequestHandler;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/update_fragment_entry"
@@ -58,12 +59,12 @@ public class UpdateFragmentEntryMVCActionCommand extends BaseMVCActionCommand {
 		String name = ParamUtil.getString(actionRequest, "name");
 
 		try {
+			FragmentEntry fragmentEntry =
+				_fragmentEntryService.updateFragmentEntry(
+					fragmentEntryId, name);
+
 			JSONObject jsonObject = JSONUtil.put(
-				"redirectURL",
-				getRedirectURL(
-					actionResponse,
-					_fragmentEntryService.updateFragmentEntry(
-						fragmentEntryId, name)));
+				"redirectURL", getRedirectURL(actionResponse, fragmentEntry));
 
 			if (SessionErrors.contains(actionRequest, "fragmentNameInvalid")) {
 				addSuccessMessage(actionRequest, actionResponse);

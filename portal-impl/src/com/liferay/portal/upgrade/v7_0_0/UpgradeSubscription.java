@@ -61,11 +61,13 @@ public class UpgradeSubscription extends UpgradeProcess {
 
 	protected void deleteOrphanedSubscriptions() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			long classNameId = PortalUtil.getClassNameId(
+				PortletPreferences.class.getName());
+
 			runSQL(
 				StringBundler.concat(
 					"delete from Subscription where classNameId = ",
-					PortalUtil.getClassNameId(
-						PortletPreferences.class.getName()),
+					classNameId,
 					" and classPK not in (select portletPreferencesId from ",
 					"PortletPreferences)"));
 		}

@@ -33,6 +33,7 @@ import com.liferay.portal.tools.service.builder.test.service.LocalizedEntryLocal
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -204,60 +205,71 @@ public class LocalizedEntryModelImpl
 	public Map<String, Function<LocalizedEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<LocalizedEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, LocalizedEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<LocalizedEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LocalizedEntry.class.getClassLoader(), LocalizedEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<LocalizedEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<LocalizedEntry, Object>>();
+		try {
+			Constructor<LocalizedEntry> constructor =
+				(Constructor<LocalizedEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"defaultLanguageId", LocalizedEntry::getDefaultLanguageId);
-			attributeGetterFunctions.put(
-				"localizedEntryId", LocalizedEntry::getLocalizedEntryId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<LocalizedEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<LocalizedEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<LocalizedEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<LocalizedEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<LocalizedEntry, Object>>();
+		Map<String, BiConsumer<LocalizedEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<LocalizedEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<LocalizedEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<LocalizedEntry, ?>>();
+		attributeGetterFunctions.put(
+			"defaultLanguageId", LocalizedEntry::getDefaultLanguageId);
+		attributeSetterBiConsumers.put(
+			"defaultLanguageId",
+			(BiConsumer<LocalizedEntry, String>)
+				LocalizedEntry::setDefaultLanguageId);
+		attributeGetterFunctions.put(
+			"localizedEntryId", LocalizedEntry::getLocalizedEntryId);
+		attributeSetterBiConsumers.put(
+			"localizedEntryId",
+			(BiConsumer<LocalizedEntry, Long>)
+				LocalizedEntry::setLocalizedEntryId);
 
-			attributeSetterBiConsumers.put(
-				"defaultLanguageId",
-				(BiConsumer<LocalizedEntry, String>)
-					LocalizedEntry::setDefaultLanguageId);
-			attributeSetterBiConsumers.put(
-				"localizedEntryId",
-				(BiConsumer<LocalizedEntry, Long>)
-					LocalizedEntry::setLocalizedEntryId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -655,12 +667,41 @@ public class LocalizedEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<LocalizedEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<LocalizedEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<LocalizedEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((LocalizedEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, LocalizedEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					LocalizedEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -669,8 +710,7 @@ public class LocalizedEntryModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<LocalizedEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

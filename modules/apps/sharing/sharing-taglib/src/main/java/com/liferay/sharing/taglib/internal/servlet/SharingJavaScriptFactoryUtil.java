@@ -14,20 +14,28 @@
 
 package com.liferay.sharing.taglib.internal.servlet;
 
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.sharing.display.context.util.SharingJavaScriptFactory;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
  */
+@Component(immediate = true, service = {})
 public class SharingJavaScriptFactoryUtil {
 
 	public static SharingJavaScriptFactory getSharingJavaScriptFactory() {
-		return _sharingJavaScriptFactorySnapshot.get();
+		return _sharingJavaScriptFactory;
 	}
 
-	private static final Snapshot<SharingJavaScriptFactory>
-		_sharingJavaScriptFactorySnapshot = new Snapshot<>(
-			SharingJavaScriptFactoryUtil.class, SharingJavaScriptFactory.class);
+	@Reference(unbind = "-")
+	protected void setSharingOnclickMethodFactory(
+		SharingJavaScriptFactory sharingJavaScriptFactory) {
+
+		_sharingJavaScriptFactory = sharingJavaScriptFactory;
+	}
+
+	private static SharingJavaScriptFactory _sharingJavaScriptFactory;
 
 }

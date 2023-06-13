@@ -113,15 +113,14 @@ public interface RoleService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end);
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId, int start,
+		int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId);
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId);
 
 	/**
 	 * Returns the OSGi service identifier.
@@ -184,9 +183,7 @@ public interface RoleService extends BaseService {
 		throws PortalException;
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groups are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param userId the primary key of the user
 	 * @param groups the groups (optionally <code>null</code>)

@@ -35,24 +35,22 @@ boolean last = assetEntryOrder == (searchContainer.getTotal() - 1);
 		String taglibUpURL = "javascript:" + liferayPortletResponse.getNamespace() + "moveSelectionUp('" + assetEntryOrder + "')";
 		%>
 
-		<clay:link
-			aria-label='<%= LanguageUtil.get(request, "up") %>'
-			cssClass="lfr-portal-tooltip"
-			href="<%= taglibUpURL %>"
+		<liferay-ui:icon
 			icon="angle-up"
-			title='<%= LanguageUtil.get(request, "up") %>'
+			markupView="lexicon"
+			message="up"
+			url="<%= taglibUpURL %>"
 		/>
 
 		<%
 		String taglibDownURL = "javascript:" + liferayPortletResponse.getNamespace() + "moveSelectionDown('" + assetEntryOrder + "')";
 		%>
 
-		<clay:link
-			aria-label='<%= LanguageUtil.get(request, "down") %>'
-			cssClass="lfr-portal-tooltip"
-			href="<%= taglibDownURL %>"
+		<liferay-ui:icon
 			icon="angle-down"
-			title='<%= LanguageUtil.get(request, "down") %>'
+			markupView="lexicon"
+			message="down"
+			url="<%= taglibDownURL %>"
 		/>
 	</c:when>
 	<c:when test="<%= assetEntryOrder == 0 %>">
@@ -61,12 +59,11 @@ boolean last = assetEntryOrder == (searchContainer.getTotal() - 1);
 		String taglibDownURL = "javascript:" + liferayPortletResponse.getNamespace() + "moveSelectionDown('" + assetEntryOrder + "')";
 		%>
 
-		<clay:link
-			aria-label='<%= LanguageUtil.get(request, "down") %>'
-			cssClass="lfr-portal-tooltip"
-			href="<%= taglibDownURL %>"
+		<liferay-ui:icon
 			icon="angle-down"
-			title='<%= LanguageUtil.get(request, "down") %>'
+			markupView="lexicon"
+			message="down"
+			url="<%= taglibDownURL %>"
 		/>
 	</c:when>
 	<c:when test="<%= last %>">
@@ -75,12 +72,11 @@ boolean last = assetEntryOrder == (searchContainer.getTotal() - 1);
 		String taglibUpURL = "javascript:" + liferayPortletResponse.getNamespace() + "moveSelectionUp('" + assetEntryOrder + "')";
 		%>
 
-		<clay:link
-			aria-label='<%= LanguageUtil.get(request, "up") %>'
-			cssClass="lfr-portal-tooltip"
-			href="<%= taglibUpURL %>"
+		<liferay-ui:icon
 			icon="angle-up"
-			title='<%= LanguageUtil.get(request, "up") %>'
+			markupView="lexicon"
+			message="up"
+			url="<%= taglibUpURL %>"
 		/>
 	</c:when>
 </c:choose>

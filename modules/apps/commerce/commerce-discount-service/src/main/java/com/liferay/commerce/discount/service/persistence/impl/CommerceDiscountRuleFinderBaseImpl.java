@@ -16,9 +16,7 @@ package com.liferay.commerce.discount.service.persistence.impl;
 
 import com.liferay.commerce.discount.model.CommerceDiscountRule;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountRulePersistence;
-import com.liferay.commerce.discount.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @generated
  */
-public abstract class CommerceDiscountRuleFinderBaseImpl
+public class CommerceDiscountRuleFinderBaseImpl
 	extends BasePersistenceImpl<CommerceDiscountRule> {
 
 	public CommerceDiscountRuleFinderBaseImpl() {
@@ -50,36 +44,32 @@ public abstract class CommerceDiscountRuleFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commerceDiscountRulePersistence.getBadColumnNames();
+		return getCommerceDiscountRulePersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce discount rule persistence.
+	 *
+	 * @return the commerce discount rule persistence
+	 */
+	public CommerceDiscountRulePersistence
+		getCommerceDiscountRulePersistence() {
+
+		return commerceDiscountRulePersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce discount rule persistence.
+	 *
+	 * @param commerceDiscountRulePersistence the commerce discount rule persistence
+	 */
+	public void setCommerceDiscountRulePersistence(
+		CommerceDiscountRulePersistence commerceDiscountRulePersistence) {
+
+		this.commerceDiscountRulePersistence = commerceDiscountRulePersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommerceDiscountRulePersistence.class)
 	protected CommerceDiscountRulePersistence commerceDiscountRulePersistence;
 
 	private static final Log _log = LogFactoryUtil.getLog(

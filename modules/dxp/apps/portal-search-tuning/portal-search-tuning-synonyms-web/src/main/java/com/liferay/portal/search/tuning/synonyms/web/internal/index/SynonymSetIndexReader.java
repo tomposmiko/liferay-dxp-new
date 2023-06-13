@@ -17,13 +17,15 @@ package com.liferay.portal.search.tuning.synonyms.web.internal.index;
 import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Adam Brandizzi
  */
 public interface SynonymSetIndexReader {
 
-	public SynonymSet fetch(SynonymSetIndexName synonymSetIndexName, String id);
+	public Optional<SynonymSet> fetchOptional(
+		SynonymSetIndexName synonymSetIndexName, String id);
 
 	public boolean isExists(SynonymSetIndexName synonymSetIndexName);
 

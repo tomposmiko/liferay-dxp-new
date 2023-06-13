@@ -15,14 +15,16 @@
 package com.liferay.password.policies.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.PasswordPolicyPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -46,10 +48,10 @@ public class PasswordPolicyDisplayContext {
 		_renderResponse = renderResponse;
 
 		_passwordPolicyId = ParamUtil.getLong(
-			httpServletRequest, "passwordPolicyId");
+			_httpServletRequest, "passwordPolicyId");
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
+			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
 		_permissionChecker = themeDisplay.getPermissionChecker();
@@ -133,6 +135,17 @@ public class PasswordPolicyDisplayContext {
 		}
 
 		return navigationItems;
+	}
+
+	public List<NavigationItem> getSelectMembersNavigationItems() {
+		return ListUtil.fromArray(
+			NavigationItemBuilder.setActive(
+				true
+			).setLabel(
+				LanguageUtil.get(
+					_httpServletRequest,
+					ParamUtil.getString(_httpServletRequest, "tabs2", "users"))
+			).build());
 	}
 
 	public boolean hasPermission(String actionId, long passwordPolicyId) {

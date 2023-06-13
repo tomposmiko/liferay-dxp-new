@@ -2,23 +2,15 @@
 	"dependencies": {
 		"@liferay/frontend-js-react-web": "*",
 		"frontend-js-web": "*",
-		"react": "16.12.0"
-	},
-	"jest": {
-		"setupFiles": [
-			"<rootDir>test/setup.js"
-		],
-		"testPathIgnorePatterns": [
-			"setup.js"
-		]
+		"react": "16.12.0",
+		"react-dom": "16.12.0"
 	},
 	"name": "@liferay/batch-planner-web",
 	"private": true,
 	"scripts": {
 		"build": "liferay-npm-scripts build",
 		"checkFormat": "liferay-npm-scripts check",
-		"format": "liferay-npm-scripts fix",
-		"test": "liferay-npm-scripts test"
+		"format": "liferay-npm-scripts fix"
 	},
-	"version": "1.0.78"
+	"version": "1.0.9"
 }

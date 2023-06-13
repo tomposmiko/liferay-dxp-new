@@ -17,7 +17,6 @@ package com.liferay.portal.search.internal.expando;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.ExpandoQueryContributor;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.search.internal.expando.helper.ExpandoQueryContributorHelper;
 import com.liferay.portal.search.internal.indexer.IndexerProvidedClausesUtil;
 
 import java.util.Arrays;
@@ -28,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author André de Oliveira
  */
-@Component(service = ExpandoQueryContributor.class)
+@Component(immediate = true, service = ExpandoQueryContributor.class)
 public class BaseIndexerExpandoQueryContributor
 	implements ExpandoQueryContributor {
 

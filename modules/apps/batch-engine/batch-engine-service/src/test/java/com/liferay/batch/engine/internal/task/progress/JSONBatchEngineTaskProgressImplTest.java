@@ -51,7 +51,7 @@ public class JSONBatchEngineTaskProgressImplTest
 		sb.append(StringPool.OPEN_BRACKET);
 
 		for (int i = 0; i < expectedTotalItemsCount; i++) {
-			sb.append(productJSONObject.toString());
+			sb.append(productJSON);
 
 			if (i < (PRODUCTS_COUNT - 1)) {
 				sb.append(StringPool.COMMA);
@@ -62,13 +62,11 @@ public class JSONBatchEngineTaskProgressImplTest
 			sb.append(StringPool.CLOSE_BRACKET);
 		}
 
-		String content = sb.toString();
-
 		Assert.assertEquals(
 			expectedTotalItemsCount,
 			_batchEngineTaskProgress.getTotalItemsCount(
 				compress(
-					content.getBytes(),
+					sb.toString(),
 					BatchEngineTaskContentType.JSON.toString())));
 	}
 

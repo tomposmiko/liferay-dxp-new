@@ -44,7 +44,7 @@ public class FlushIndexRequestExecutorImpl
 	public FlushIndexResponse execute(FlushIndexRequest flushIndexRequest) {
 		FlushRequest flushRequest = createFlushRequest(flushIndexRequest);
 
-		FlushResponse flushResponse = _getFlushResponse(
+		FlushResponse flushResponse = getFlushResponse(
 			flushRequest, flushIndexRequest);
 
 		FlushIndexResponse flushIndexResponse = new FlushIndexResponse();
@@ -89,7 +89,7 @@ public class FlushIndexRequestExecutorImpl
 		return flushRequest;
 	}
 
-	private FlushResponse _getFlushResponse(
+	protected FlushResponse getFlushResponse(
 		FlushRequest flushRequest, FlushIndexRequest flushIndexRequest) {
 
 		RestHighLevelClient restHighLevelClient =
@@ -107,10 +107,22 @@ public class FlushIndexRequestExecutorImpl
 		}
 	}
 
-	@Reference
-	private ElasticsearchClientResolver _elasticsearchClientResolver;
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-	@Reference
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	@Reference(unbind = "-")
+	protected void setIndexRequestShardFailureTranslator(
+		IndexRequestShardFailureTranslator indexRequestShardFailureTranslator) {
+
+		_indexRequestShardFailureTranslator =
+			indexRequestShardFailureTranslator;
+	}
+
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
 	private IndexRequestShardFailureTranslator
 		_indexRequestShardFailureTranslator;
 

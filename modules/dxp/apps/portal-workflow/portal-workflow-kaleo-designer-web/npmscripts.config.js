@@ -12,9 +12,6 @@
 module.exports = {
 	build: {
 		bundler: {
-			exclude: {
-				lodash: false,
-			},
 			ignore: ['**/designer/js/legacy/*.js'],
 		},
 	},

@@ -14,12 +14,9 @@
 
 package com.liferay.portal.vulcan.internal.jaxrs.writer.interceptor;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.vulcan.extension.EntityExtensionHandler;
-import com.liferay.portal.vulcan.jaxrs.extension.ExtendedEntity;
+import com.liferay.portal.vulcan.internal.jaxrs.extension.ExtendedEntity;
+import com.liferay.portal.vulcan.jaxrs.context.ExtensionContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -28,13 +25,14 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -56,44 +54,38 @@ public class PageEntityExtensionWriterInterceptor implements WriterInterceptor {
 
 			Type entityType = parameterizedType.getActualTypeArguments()[0];
 
-			EntityExtensionHandler entityExtensionHandler =
-				_getEntityExtensionHandler(
-					(Class)entityType, writerInterceptorContext.getMediaType());
-
-			if (entityExtensionHandler != null) {
-				_extendPageEntities(
-					entityExtensionHandler, writerInterceptorContext);
-			}
+			Optional.ofNullable(
+				_providers.getContextResolver(
+					ExtensionContext.class,
+					writerInterceptorContext.getMediaType())
+			).map(
+				contextResolver -> contextResolver.getContext((Class)entityType)
+			).ifPresent(
+				extensionContext -> _extendPageEntities(
+					extensionContext, writerInterceptorContext)
+			);
 		}
 
 		writerInterceptorContext.proceed();
 	}
 
 	private void _extendPageEntities(
-			EntityExtensionHandler entityExtensionHandler,
-			WriterInterceptorContext writerInterceptorContext)
-		throws IOException {
+		ExtensionContext extensionContext,
+		WriterInterceptorContext writerInterceptorContext) {
 
 		Page<?> page = (Page<?>)writerInterceptorContext.getEntity();
 
-		List<ExtendedEntity> extendedEntities = new ArrayList<>();
+		Collection<?> items = page.getItems();
 
-		try {
-			for (Object item : page.getItems()) {
-				extendedEntities.add(
-					ExtendedEntity.extend(
-						item,
-						entityExtensionHandler.getExtendedProperties(
-							_company.getCompanyId(), item),
-						entityExtensionHandler.getFilteredPropertyNames(
-							_company.getCompanyId(), item)));
-			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
+		Stream<?> stream = items.stream();
 
-			throw new IOException(exception);
-		}
+		List<ExtendedEntity> extendedEntities = stream.map(
+			entity -> ExtendedEntity.extend(
+				entity, extensionContext.getExtendedProperties(entity),
+				extensionContext.getFilteredPropertyKeys(entity))
+		).collect(
+			Collectors.toList()
+		);
 
 		Pagination pagination = Pagination.of(
 			GetterUtil.getInteger(page.getPage()),
@@ -108,26 +100,6 @@ public class PageEntityExtensionWriterInterceptor implements WriterInterceptor {
 			new GenericType<Page<ExtendedEntity>>() {
 			}.getType());
 	}
-
-	private EntityExtensionHandler _getEntityExtensionHandler(
-		Class<?> clazz, MediaType mediaType) {
-
-		ContextResolver<EntityExtensionHandler> contextResolver =
-			_providers.getContextResolver(
-				EntityExtensionHandler.class, mediaType);
-
-		if (contextResolver == null) {
-			return null;
-		}
-
-		return contextResolver.getContext(clazz);
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PageEntityExtensionWriterInterceptor.class);
-
-	@Context
-	private Company _company;
 
 	@Context
 	private Providers _providers;

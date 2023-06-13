@@ -30,8 +30,7 @@ import org.dom4j.Element;
  * @author Peter Yoo
  */
 public class PullRequestPortalTopLevelBuild
-	extends PortalTopLevelBuild
-	implements PortalWorkspaceBuild, PullRequestBuild {
+	extends PortalTopLevelBuild implements PullRequestBuild, WorkspaceBuild {
 
 	public PullRequestPortalTopLevelBuild(
 		String url, TopLevelBuild topLevelBuild) {
@@ -39,6 +38,19 @@ public class PullRequestPortalTopLevelBuild
 		super(url, topLevelBuild);
 
 		setCompareToUpstream(true);
+
+		try {
+			String testSuiteName = getTestSuiteName();
+
+			if (testSuiteName.equals("relevant")) {
+				_stableJob = JobFactory.newJob(jobName, "stable", branchName);
+			}
+		}
+		catch (Exception exception) {
+			System.out.println("Unable to create stable job for " + jobName);
+
+			exception.printStackTrace();
+		}
 	}
 
 	public boolean bypassCITestRelevant() {
@@ -64,14 +76,49 @@ public class PullRequestPortalTopLevelBuild
 	}
 
 	@Override
-	public PortalWorkspace getPortalWorkspace() {
+	public BranchInformation getOSBAsahBranchInformation() {
+		Workspace workspace = getWorkspace();
+
+		return new WorkspaceBranchInformation(
+			workspace.getWorkspaceGitRepository(
+				"com-liferay-osb-asah-private"));
+	}
+
+	@Override
+	public BranchInformation getOSBFaroBranchInformation() {
+		Workspace workspace = getWorkspace();
+
+		return new WorkspaceBranchInformation(
+			workspace.getWorkspaceGitRepository(
+				"com-liferay-osb-faro-private"));
+	}
+
+	@Override
+	public BranchInformation getPluginsBranchInformation() {
 		Workspace workspace = getWorkspace();
 
 		if (!(workspace instanceof PortalWorkspace)) {
 			return null;
 		}
 
-		return (PortalWorkspace)workspace;
+		PortalWorkspace portalWorkspace = (PortalWorkspace)workspace;
+
+		return new WorkspaceBranchInformation(
+			portalWorkspace.getPluginsWorkspaceGitRepository());
+	}
+
+	@Override
+	public BranchInformation getPortalBranchInformation() {
+		Workspace workspace = getWorkspace();
+
+		if (!(workspace instanceof PortalWorkspace)) {
+			return null;
+		}
+
+		PortalWorkspace portalWorkspace = (PortalWorkspace)workspace;
+
+		return new WorkspaceBranchInformation(
+			portalWorkspace.getPortalWorkspaceGitRepository());
 	}
 
 	@Override
@@ -102,10 +149,12 @@ public class PullRequestPortalTopLevelBuild
 
 	@Override
 	public String getResult() {
+		String result = super.getResult();
+
 		List<Build> downstreamBuildFailures = getFailedDownstreamBuilds();
 
-		if (downstreamBuildFailures.isEmpty()) {
-			return super.getResult();
+		if ((result == null) || downstreamBuildFailures.isEmpty()) {
+			return result;
 		}
 
 		Properties buildProperties;
@@ -123,8 +172,6 @@ public class PullRequestPortalTopLevelBuild
 				buildProperties.getProperty(
 					"pull.request.forward.upstream.failure.comparison." +
 						"enabled"));
-
-		String result = "FAILURE";
 
 		if (!pullRequestForwardUpstreamFailureComparisonEnabled ||
 			!isCompareToUpstream()) {
@@ -172,9 +219,7 @@ public class PullRequestPortalTopLevelBuild
 	}
 
 	public String getStableJobResult() {
-		Job stableJob = _getStableJob();
-
-		if (stableJob == null) {
+		if (_stableJob == null) {
 			return null;
 		}
 
@@ -191,7 +236,7 @@ public class PullRequestPortalTopLevelBuild
 		}
 
 		List<String> stableJobBatchNames = new ArrayList<>(
-			stableJob.getBatchNames());
+			_stableJob.getBatchNames());
 
 		int stableJobDownstreamBuildsCompletedCount =
 			getJobVariantsDownstreamBuildCount(
@@ -215,18 +260,6 @@ public class PullRequestPortalTopLevelBuild
 			_stableJobResult = "SUCCESS";
 		}
 		else {
-			int uniqueBuilds = 0;
-
-			for (Build build : stableJobDownstreamBuilds) {
-				if (build.isUniqueFailure()) {
-					uniqueBuilds += 1;
-				}
-			}
-
-			if (uniqueBuilds == 0) {
-				return "SUCCESS";
-			}
-
 			_stableJobResult = "FAILURE";
 		}
 
@@ -287,14 +320,8 @@ public class PullRequestPortalTopLevelBuild
 	}
 
 	protected Element getFailedStableJobSummaryElement() {
-		Job stableJob = _getStableJob();
-
-		if (stableJob == null) {
-			return Dom4JUtil.getNewElement("span");
-		}
-
 		List<String> stableJobBatchNames = new ArrayList<>(
-			stableJob.getBatchNames());
+			_stableJob.getBatchNames());
 
 		Element jobSummaryListElement = getJobSummaryListElement(
 			false, stableJobBatchNames);
@@ -320,20 +347,16 @@ public class PullRequestPortalTopLevelBuild
 	}
 
 	protected List<Build> getStableJobDownstreamBuilds() {
-		Job stableJob = _getStableJob();
-
-		if (stableJob != null) {
+		if (_stableJob != null) {
 			return getJobVariantsDownstreamBuilds(
-				stableJob.getBatchNames(), null, null);
+				_stableJob.getBatchNames(), null, null);
 		}
 
 		return Collections.emptyList();
 	}
 
 	protected Element getStableJobResultElement() {
-		Job stableJob = _getStableJob();
-
-		if (stableJob == null) {
+		if (_stableJob == null) {
 			return null;
 		}
 
@@ -352,7 +375,7 @@ public class PullRequestPortalTopLevelBuild
 
 		sb.append(
 			getJobVariantsDownstreamBuildCount(
-				new ArrayList<>(stableJob.getBatchNames()), "SUCCESS", null));
+				new ArrayList<>(_stableJob.getBatchNames()), "SUCCESS", null));
 
 		sb.append(" out of ");
 
@@ -366,14 +389,8 @@ public class PullRequestPortalTopLevelBuild
 	}
 
 	protected Element getStableJobSuccessSummaryElement() {
-		Job stableJob = _getStableJob();
-
-		if (stableJob == null) {
-			return Dom4JUtil.getNewElement("span");
-		}
-
 		List<String> stableJobBatchNames = new ArrayList<>(
-			stableJob.getBatchNames());
+			_stableJob.getBatchNames());
 
 		Element stableJobSummaryListElement = getJobSummaryListElement(
 			true, stableJobBatchNames);
@@ -394,14 +411,8 @@ public class PullRequestPortalTopLevelBuild
 	}
 
 	protected Element getStableJobSummaryElement() {
-		Job stableJob = _getStableJob();
-
-		if (stableJob == null) {
-			return Dom4JUtil.getNewElement("span");
-		}
-
 		List<String> stableJobBatchNames = new ArrayList<>(
-			stableJob.getBatchNames());
+			_stableJob.getBatchNames());
 
 		int stableJobDownstreamBuildSuccessCount =
 			getJobVariantsDownstreamBuildCount(
@@ -444,9 +455,7 @@ public class PullRequestPortalTopLevelBuild
 
 		List<Build> stableJobDownstreamBuilds = new ArrayList<>();
 
-		Job stableJob = _getStableJob();
-
-		if (stableJob != null) {
+		if (_stableJob != null) {
 			stableJobDownstreamBuilds.addAll(getStableJobDownstreamBuilds());
 		}
 
@@ -508,45 +517,6 @@ public class PullRequestPortalTopLevelBuild
 		}
 
 		return null;
-	}
-
-	private synchronized Job _getStableJob() {
-		if (_stableJob != null) {
-			return _stableJob;
-		}
-
-		String testSuiteName = getTestSuiteName();
-
-		if (!testSuiteName.equals("relevant")) {
-			return null;
-		}
-
-		String branchName = getBranchName();
-		Job.BuildProfile buildProfile = getBuildProfile();
-		String jobName = getJobName();
-		String repositoryName = getBaseGitRepositoryName();
-		String stableTestSuiteName = "stable";
-
-		try {
-			_stableJob = JobFactory.newJob(
-				buildProfile, jobName, null, null, branchName, null,
-				repositoryName, stableTestSuiteName, branchName);
-
-			BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
-
-			buildDatabase.putJob(
-				JobFactory.getKey(
-					buildProfile, jobName, null, branchName, null,
-					repositoryName, stableTestSuiteName, branchName),
-				_stableJob);
-		}
-		catch (Exception exception) {
-			System.out.println("Unable to create stable job for " + jobName);
-
-			exception.printStackTrace();
-		}
-
-		return _stableJob;
 	}
 
 	private String _getUpstreamBranchSHA() {

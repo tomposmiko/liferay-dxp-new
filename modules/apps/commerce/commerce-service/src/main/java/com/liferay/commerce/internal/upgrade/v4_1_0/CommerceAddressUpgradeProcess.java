@@ -14,12 +14,14 @@
 
 package com.liferay.commerce.internal.upgrade.v4_1_0;
 
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceAddressConstants;
+import com.liferay.commerce.internal.upgrade.base.BaseCommerceServiceUpgradeProcess;
+import com.liferay.commerce.model.impl.CommerceAddressImpl;
 import com.liferay.commerce.model.impl.CommerceAddressModelImpl;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +29,8 @@ import java.sql.ResultSet;
 /**
  * @author Alec Sloan
  */
-public class CommerceAddressUpgradeProcess extends UpgradeProcess {
+public class CommerceAddressUpgradeProcess
+	extends BaseCommerceServiceUpgradeProcess {
 
 	public CommerceAddressUpgradeProcess(
 		ClassNameLocalService classNameLocalService) {
@@ -46,7 +49,9 @@ public class CommerceAddressUpgradeProcess extends UpgradeProcess {
 						"'defaultShippingAddressId'");
 		}
 
-		alterTableAddColumn("CommerceAddress", "type_", "INTEGER");
+		addColumn(
+			CommerceAddressImpl.class, CommerceAddressImpl.TABLE_NAME, "type_",
+			"INTEGER");
 
 		PreparedStatement preparedStatement = null;
 
@@ -55,9 +60,9 @@ public class CommerceAddressUpgradeProcess extends UpgradeProcess {
 				"update CommerceAccount set defaultBillingAddressId = ? " +
 					"where commerceAccountId = ?");
 
-			_updateCommerceAccountAndSetType(
+			updateCommerceAccountAndSetType(
 				preparedStatement,
-				_getCommerceAddressResultSet("defaultBilling"));
+				getCommerceAddressResultSet("defaultBilling"));
 		}
 
 		if (hasColumn(CommerceAddressModelImpl.TABLE_NAME, "defaultShipping")) {
@@ -65,17 +70,17 @@ public class CommerceAddressUpgradeProcess extends UpgradeProcess {
 				"update CommerceAccount set defaultShippingAddressId = ? " +
 					"where commerceAccountId = ?");
 
-			_updateCommerceAccountAndSetType(
+			updateCommerceAccountAndSetType(
 				preparedStatement,
-				_getCommerceAddressResultSet("defaultShipping"));
+				getCommerceAddressResultSet("defaultShipping"));
 		}
 	}
 
-	private ResultSet _getCommerceAddressResultSet(String type)
+	protected ResultSet getCommerceAddressResultSet(String type)
 		throws Exception {
 
 		long commerceAccountClassNameId = _classNameLocalService.getClassNameId(
-			"com.liferay.commerce.account.model.CommerceAccount");
+			CommerceAccount.class);
 
 		PreparedStatement preparedStatement = null;
 
@@ -99,7 +104,7 @@ public class CommerceAddressUpgradeProcess extends UpgradeProcess {
 		return preparedStatement.executeQuery();
 	}
 
-	private void _setType(
+	protected void setType(
 			boolean defaultBilling, boolean defaultShipping,
 			long commerceAddressId)
 		throws Exception {
@@ -122,7 +127,7 @@ public class CommerceAddressUpgradeProcess extends UpgradeProcess {
 		preparedStatement.addBatch();
 	}
 
-	private void _updateCommerceAccountAndSetType(
+	protected void updateCommerceAccountAndSetType(
 			PreparedStatement preparedStatement, ResultSet resultSet)
 		throws Exception {
 
@@ -133,7 +138,7 @@ public class CommerceAddressUpgradeProcess extends UpgradeProcess {
 
 			preparedStatement.setLong(2, resultSet.getLong("classPK"));
 
-			_setType(
+			setType(
 				resultSet.getBoolean("defaultBilling"),
 				resultSet.getBoolean("defaultShipping"), commerceAddressId);
 

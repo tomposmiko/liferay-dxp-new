@@ -327,8 +327,4 @@ public interface SharingEntryModel
 	@Override
 	public SharingEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

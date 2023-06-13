@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -102,8 +101,7 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 		_groups = groupSearchFixture.getGroups();
 
 		_indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper, uidFactory,
-			documentBuilderFactory);
+			resourcePermissionLocalService, uidFactory, documentBuilderFactory);
 
 		_users = userSearchFixture.getUsers();
 	}
@@ -130,12 +128,10 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 				searchRequestBuilderFactory.builder(
 				).companyId(
 					_group.getCompanyId()
-				).fetchSourceIncludes(
-					new String[] {"*_sortable"}
-				).fields(
-					StringPool.STAR
 				).groupIds(
 					_group.getGroupId()
+				).fields(
+					StringPool.STAR
 				).modelIndexerClasses(
 					BookmarksFolder.class
 				).queryString(
@@ -161,9 +157,6 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 
 	@Inject
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
-
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
 
 	@Inject
 	protected Searcher searcher;
@@ -211,9 +204,6 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 		).put(
 			"assetEntryId_sortable",
 			String.valueOf(_getAssetEntryId(bookmarksFolder))
-		).put(
-			"statusByUserId",
-			String.valueOf(bookmarksFolder.getStatusByUserId())
 		).put(
 			"title_sortable", StringUtil.lowerCase(bookmarksFolder.getName())
 		).put(

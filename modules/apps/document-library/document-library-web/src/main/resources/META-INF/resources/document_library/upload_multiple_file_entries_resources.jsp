@@ -173,7 +173,7 @@ else {
 
 						<%
 						try {
-							for (DDMStructure ddmStructure : DLFileEntryTypeUtil.getDDMStructures(fileEntryType)) {
+							for (DDMStructure ddmStructure : fileEntryType.getDDMStructures()) {
 								DDMFormValues ddmFormValues = null;
 
 								try {
@@ -209,14 +209,14 @@ else {
 
 					</c:if>
 
-					<aui:script position="inline" require="frontend-js-web/index as frontendJsWeb">
-						var {delegate, runScriptsInElement} = frontendJsWeb;
-
+					<aui:script position="inline" require="frontend-js-web/liferay/delegate/delegate.es as delegateModule,frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 						var documentTypeMenuList = document.querySelector(
 							'#<portlet:namespace />documentTypeSelector .lfr-menu-list'
 						);
 
 						if (documentTypeMenuList) {
+							var delegate = delegateModule.default;
+
 							delegate(documentTypeMenuList, 'click', 'li a', (event) => {
 								event.preventDefault();
 
@@ -232,7 +232,7 @@ else {
 										if (commonFileMetadataContainer) {
 											commonFileMetadataContainer.innerHTML = response;
 
-											runScriptsInElement(commonFileMetadataContainer);
+											runScriptsInElement.default(commonFileMetadataContainer);
 										}
 
 										var fileNodes = document.querySelectorAll(
@@ -333,6 +333,7 @@ else {
 						className="<%= DLFileEntry.class.getName() %>"
 						classPK="<%= assetClassPK %>"
 						classTypePK="<%= fileEntryTypeId %>"
+						visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 					/>
 
 					<liferay-asset:asset-tags-selector

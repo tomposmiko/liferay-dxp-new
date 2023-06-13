@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -230,32 +229,6 @@ public class PostalAddress implements Serializable {
 	@GraphQLField(description = "The address's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
-
-	@Schema(description = "The address's name.")
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@JsonIgnore
-	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
-		try {
-			name = nameUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The address's name.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String name;
 
 	@Schema(description = "The address's postal code (e.g., zip code).")
 	public String getPostalCode() {
@@ -508,20 +481,6 @@ public class PostalAddress implements Serializable {
 			sb.append(id);
 		}
 
-		if (name != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"name\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(name));
-
-			sb.append("\"");
-		}
-
 		if (postalCode != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -601,9 +560,9 @@ public class PostalAddress implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -629,7 +588,7 @@ public class PostalAddress implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -661,7 +620,7 @@ public class PostalAddress implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -677,10 +636,5 @@ public class PostalAddress implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

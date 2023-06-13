@@ -21,7 +21,6 @@ import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Layout;
@@ -46,13 +45,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
@@ -65,7 +65,6 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.filters.autoxliff.AutoXLIFFFilter;
 import net.sf.okapi.lib.xliff2.InvalidParameterException;
 import net.sf.okapi.lib.xliff2.XLIFFException;
@@ -115,15 +114,11 @@ public class XLIFFInfoFormTranslationImporter
 	}
 
 	private InfoField _createInfoField(Locale locale, String value) {
-		String[] namespaceAndNameArray = _getNamespaceAndNameArray(value);
-
 		return InfoField.builder(
 		).infoFieldType(
 			TextInfoFieldType.INSTANCE
-		).namespace(
-			namespaceAndNameArray[0]
 		).name(
-			namespaceAndNameArray[1]
+			value
 		).labelInfoLocalizedValue(
 			InfoLocalizedValue.<String>builder(
 			).value(
@@ -154,7 +149,7 @@ public class XLIFFInfoFormTranslationImporter
 				unsafeConsumer, events, sourceLocale, targetLocale,
 				includeSource)
 		).infoItemReference(
-			_getInfoItemReference(events)
+			infoItemReference
 		).build();
 	}
 
@@ -182,64 +177,8 @@ public class XLIFFInfoFormTranslationImporter
 				unsafeConsumer, xliffDocument, sourceLocale, targetLocale,
 				includeSource)
 		).infoItemReference(
-			_getInfoItemReference(xliffDocument)
+			infoItemReference
 		).build();
-	}
-
-	private InfoItemReference _getInfoItemReference(List<Event> events)
-		throws XLIFFFileException {
-
-		Event eventStartSubdocument = null;
-
-		for (Event event : events) {
-			if (event.isStartSubDocument()) {
-				eventStartSubdocument = event;
-			}
-		}
-
-		if (eventStartSubdocument == null) {
-			throw new XLIFFFileException.MustBeWellFormed(
-				"The XLIFF file is not well formed");
-		}
-
-		StartSubDocument startSubDocument =
-			eventStartSubdocument.getStartSubDocument();
-
-		Matcher matcher = _pattern.matcher(startSubDocument.getName());
-
-		if (!matcher.matches()) {
-			throw new XLIFFFileException.MustBeWellFormed(
-				"The XLIFF file is not well formed");
-		}
-
-		return new InfoItemReference(
-			matcher.group(1), GetterUtil.getLong(matcher.group(2)));
-	}
-
-	private InfoItemReference _getInfoItemReference(XLIFFDocument xliffDocument)
-		throws XLIFFFileException {
-
-		List<String> fileNodeIds = xliffDocument.getFileNodeIds();
-
-		Matcher matcher = _pattern.matcher(fileNodeIds.get(0));
-
-		if (!matcher.matches()) {
-			throw new XLIFFFileException.MustBeWellFormed(
-				"The XLIFF file is not well formed");
-		}
-
-		return new InfoItemReference(
-			matcher.group(1), GetterUtil.getLong(matcher.group(2)));
-	}
-
-	private String[] _getNamespaceAndNameArray(String value) {
-		String[] parts = value.split(StringPool.UNDERLINE, 2);
-
-		if (parts.length != 2) {
-			return new String[] {StringPool.BLANK, value};
-		}
-
-		return parts;
 	}
 
 	private long _getSegmentsExperienceClassPK(
@@ -310,8 +249,6 @@ public class XLIFFInfoFormTranslationImporter
 			XLIFFInfoFormTranslationImporter.class.getClassLoader());
 
 		try (AutoXLIFFFilter autoXLIFFFilter = new AutoXLIFFFilter()) {
-			List<Event> events = new ArrayList<>();
-
 			File tempFile = FileUtil.createTempFile(inputStream);
 
 			Document document = _saxReader.read(tempFile);
@@ -326,9 +263,9 @@ public class XLIFFInfoFormTranslationImporter
 					tempFile.toURI(), document.getXMLEncoding(), sourceLocaleId,
 					targetLocaleId));
 
-			while (autoXLIFFFilter.hasNext()) {
-				events.add(autoXLIFFFilter.next());
-			}
+			Stream<Event> stream = autoXLIFFFilter.stream();
+
+			List<Event> events = stream.collect(Collectors.toList());
 
 			if (_isVersion20(events)) {
 				return new TranslationSnapshot(
@@ -409,34 +346,27 @@ public class XLIFFInfoFormTranslationImporter
 				TextContainer targetTextContainer = iTextUnit.getTarget(
 					targetLocaleId);
 
-				for (TextPart targetTextPart : targetTextContainer.getParts()) {
-					TextFragment targetTextFragment =
-						targetTextPart.getContent();
+				TextFragment targetTextFragment =
+					targetTextContainer.getFirstContent();
 
-					if (Validator.isNull(targetTextFragment.getText())) {
-						continue;
-					}
+				unsafeConsumer.accept(
+					new InfoFieldValue<>(
+						_createInfoField(targetLocale, iTextUnit.getId()),
+						InfoLocalizedValue.builder(
+						).value(
+							targetLocale, targetTextFragment.getText()
+						).value(
+							biConsumer -> {
+								if (includeSource) {
+									TextFragment sourceTextFragment =
+										sourceTextContainer.getFirstContent();
 
-					unsafeConsumer.accept(
-						new InfoFieldValue<>(
-							_createInfoField(targetLocale, iTextUnit.getId()),
-							InfoLocalizedValue.builder(
-							).value(
-								targetLocale, targetTextFragment.toText()
-							).value(
-								biConsumer -> {
-									if (includeSource) {
-										TextFragment sourceTextFragment =
-											sourceTextContainer.
-												getFirstContent();
-
-										biConsumer.accept(
-											sourceLocale,
-											sourceTextFragment.toText());
-									}
+									biConsumer.accept(
+										sourceLocale,
+										sourceTextFragment.getText());
 								}
-							).build()));
-				}
+							}
+						).build()));
 			}
 		}
 	}
@@ -449,34 +379,37 @@ public class XLIFFInfoFormTranslationImporter
 		throws XLIFFFileException {
 
 		for (Unit unit : xliffDocument.getUnits()) {
-			for (int i = 0; i < unit.getPartCount(); i++) {
-				Part part = unit.getPart(i);
-
-				Fragment targetFragment = part.getTarget();
-
-				if (targetFragment == null) {
-					throw new XLIFFFileException.MustBeWellFormed(
-						"There is no translation target");
-				}
-
-				unsafeConsumer.accept(
-					new InfoFieldValue<>(
-						_createInfoField(targetLocale, unit.getId()),
-						InfoLocalizedValue.builder(
-						).value(
-							targetLocale, targetFragment.getPlainText()
-						).value(
-							biConsumer -> {
-								if (includeSource) {
-									Fragment sourceFragment = part.getSource();
-
-									biConsumer.accept(
-										sourceLocale,
-										sourceFragment.getPlainText());
-								}
-							}
-						).build()));
+			if (unit.getPartCount() != 1) {
+				throw new XLIFFFileException.MustNotHaveMoreThanOne(
+					"The file only can have one unit");
 			}
+
+			Part part = unit.getPart(0);
+
+			Fragment targetFragment = part.getTarget();
+
+			if (targetFragment == null) {
+				throw new XLIFFFileException.MustBeWellFormed(
+					"There is no translation target");
+			}
+
+			unsafeConsumer.accept(
+				new InfoFieldValue<>(
+					_createInfoField(targetLocale, unit.getId()),
+					InfoLocalizedValue.builder(
+					).value(
+						targetLocale, targetFragment.getPlainText()
+					).value(
+						biConsumer -> {
+							if (includeSource) {
+								Fragment sourceFragment = part.getSource();
+
+								biConsumer.accept(
+									sourceLocale,
+									sourceFragment.getPlainText());
+							}
+						}
+					).build()));
 		}
 	}
 
@@ -490,7 +423,7 @@ public class XLIFFInfoFormTranslationImporter
 				Property versionProperty = documentPart.getProperty("version");
 
 				if ((versionProperty != null) &&
-					!Objects.equals(versionProperty.getValue(), "1.2")) {
+					!Objects.equals("1.2", versionProperty.getValue())) {
 
 					throw new XLIFFFileException.MustBeValid(
 						"version must be 1.2");
@@ -586,10 +519,6 @@ public class XLIFFInfoFormTranslationImporter
 			InfoItemReference infoItemReference, String xliffDocumentName)
 		throws XLIFFFileException {
 
-		if (infoItemReference == null) {
-			return;
-		}
-
 		Matcher matcher = _pattern.matcher(xliffDocumentName);
 
 		if (!matcher.matches()) {
@@ -614,7 +543,10 @@ public class XLIFFInfoFormTranslationImporter
 
 		if ((segmentsExperience == null) ||
 			!Objects.equals(
-				segmentsExperience.getPlid(),
+				segmentsExperience.getClassName(),
+				infoItemReference.getClassName()) ||
+			!Objects.equals(
+				segmentsExperience.getClassPK(),
 				_getSegmentsExperienceClassPK(infoItemReference))) {
 
 			throw new XLIFFFileException.MustHaveValidId("File ID is invalid");

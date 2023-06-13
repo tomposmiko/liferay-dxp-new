@@ -29,9 +29,7 @@ definition {
 
 		takeScreenshot();
 
-		AssertValue(
-			locator1 = "Segmentation#CRITERION_INPUT_ANY",
-			value1 = "liferay.com");
+		Segmentation.viewSegment(propertyField = "liferay.com");
 
 		Segmentation.openSegmentsAdmin(siteURLKey = "test-site-name");
 
@@ -39,9 +37,7 @@ definition {
 
 		takeScreenshot();
 
-		AssertValue(
-			locator1 = "Segmentation#CRITERION_INPUT_ANY",
-			value1 = "QA");
+		Segmentation.viewSegment(propertyField = "QA");
 
 		Segmentation.openSegmentsAdmin(siteURLKey = "test-site-name");
 
@@ -49,9 +45,7 @@ definition {
 
 		takeScreenshot();
 
-		AssertValue(
-			locator1 = "Segmentation#CRITERION_INPUT_ANY",
-			value1 = "1992-05-23");
+		Segmentation.viewSegment(date = "1992-05-23");
 	}
 
 }

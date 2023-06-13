@@ -37,6 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -66,18 +69,15 @@ public class SamlSameSiteLaxCookiesFilterTest {
 			"SAMLResponse", "TEST_SAMLRESPONSE"
 		).build();
 
-		StringBundler sb = new StringBundler(4 * _paramsMap.size());
+		Set<Map.Entry<String, String>> entrySet = _paramsMap.entrySet();
 
-		for (Map.Entry<String, String> entry : _paramsMap.entrySet()) {
-			sb.append(entry.getKey());
-			sb.append("=");
-			sb.append(entry.getValue());
-			sb.append("&");
-		}
+		Stream<Map.Entry<String, String>> stream = entrySet.stream();
 
-		sb.setIndex(sb.index() - 1);
-
-		_postBody = sb.toString();
+		_postBody = stream.map(
+			entry -> StringBundler.concat(entry.getKey(), "=", entry.getValue())
+		).collect(
+			Collectors.joining("&")
+		);
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class SamlSameSiteLaxCookiesFilterTest {
 			httpCookie -> Assert.assertFalse(
 				"New JSESSIONID cookie received, so session was undesirably " +
 					"invalidated",
-				Objects.equals(httpCookie.getName(), "JSESSIONID")));
+				Objects.equals("JSESSIONID", httpCookie.getName())));
 
 		Map<String, String> paramsMap = new HashMap<>(_paramsMap);
 

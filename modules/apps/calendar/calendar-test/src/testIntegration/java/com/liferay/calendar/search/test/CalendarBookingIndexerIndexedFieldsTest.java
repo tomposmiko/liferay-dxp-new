@@ -24,6 +24,7 @@ import com.liferay.calendar.model.CalendarResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
@@ -34,7 +35,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.test.rule.Inject;
 
@@ -103,9 +103,6 @@ public class CalendarBookingIndexerIndexedFieldsTest
 		map.put(Field.RELATED_ENTRY, "true");
 		map.put(Field.STAGING_GROUP, "false");
 		map.put(Field.STATUS, "0");
-		map.put(
-			"statusByUserId",
-			String.valueOf(calendarBooking.getStatusByUserId()));
 		map.put("viewActionId", CalendarActionKeys.VIEW_BOOKING_DETAILS);
 
 		populateTitle(originalTitle, map);
@@ -134,11 +131,11 @@ public class CalendarBookingIndexerIndexedFieldsTest
 
 		String keywords = "nev";
 
-		SearchResponse searchResponse = searchOnlyOneSearchResponse(
-			keywords, LocaleUtil.HUNGARY);
+		Document document = searchOnlyOne(keywords, LocaleUtil.HUNGARY);
 
-		FieldValuesAssert.assertFieldValues(
-			map, name -> !name.equals("score"), searchResponse);
+		indexedFieldsFixture.postProcessDocument(document);
+
+		FieldValuesAssert.assertFieldValues(map, document, keywords);
 	}
 
 	protected CalendarBooking addCalendarBooking(

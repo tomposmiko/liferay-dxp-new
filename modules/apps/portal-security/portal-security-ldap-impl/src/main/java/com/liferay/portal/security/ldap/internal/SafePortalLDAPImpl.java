@@ -64,7 +64,6 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -85,7 +84,10 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Tomas Polesovsky
  * @author Marta Medio
  */
-@Component(service = SafePortalLDAP.class)
+@Component(
+	configurationPid = "com.liferay.portal.security.ldap.configuration.LDAPConfiguration",
+	immediate = true, service = SafePortalLDAP.class
+)
 public class SafePortalLDAPImpl implements SafePortalLDAP {
 
 	@Override
@@ -319,7 +321,7 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 			}
 		}
 
-		if (ListUtil.isNotEmpty(ldapServerConfigurations)) {
+		if (!ListUtil.isEmpty(ldapServerConfigurations)) {
 			LDAPServerConfiguration ldapServerConfiguration =
 				ldapServerConfigurations.get(0);
 
@@ -608,10 +610,10 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 
 		Properties userMappings = _ldapSettings.getUserMappings(
 			ldapServerId, companyId);
+		Properties userExpandoMappings = _ldapSettings.getUserExpandoMappings(
+			ldapServerId, companyId);
 
-		PropertiesUtil.merge(
-			userMappings,
-			_ldapSettings.getUserExpandoMappings(ldapServerId, companyId));
+		PropertiesUtil.merge(userMappings, userExpandoMappings);
 
 		Properties contactMappings = _ldapSettings.getContactMappings(
 			ldapServerId, companyId);
@@ -930,7 +932,9 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 		}
 		catch (OperationNotSupportedException operationNotSupportedException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(operationNotSupportedException);
+				_log.debug(
+					operationNotSupportedException,
+					operationNotSupportedException);
 			}
 
 			if (enumeration != null) {
@@ -957,10 +961,37 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 		return null;
 	}
 
-	@Activate
-	protected void activate() {
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPServerConfigurationProvider(
+		ConfigurationProvider<LDAPServerConfiguration>
+			ldapServerConfigurationProvider) {
+
+		_ldapServerConfigurationProvider = ldapServerConfigurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLdapSettings(LDAPSettings ldapSettings) {
+		_ldapSettings = ldapSettings;
+	}
+
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
 		_companySecurityAuthType = GetterUtil.getString(
-			_props.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE));
+			props.get(PropsKeys.COMPANY_SECURITY_AUTH_TYPE));
+	}
+
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration)",
+		unbind = "-"
+	)
+	protected void setSystemLDAPConfigurationProvider(
+		ConfigurationProvider<SystemLDAPConfiguration>
+			systemLDAPConfigurationProvider) {
+
+		_systemLDAPConfigurationProvider = systemLDAPConfigurationProvider;
 	}
 
 	private Attributes _getAttributes(
@@ -1079,21 +1110,9 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 	)
 	private volatile LDAPFilterValidator _ldapFilterValidator;
 
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)"
-	)
 	private ConfigurationProvider<LDAPServerConfiguration>
 		_ldapServerConfigurationProvider;
-
-	@Reference
 	private LDAPSettings _ldapSettings;
-
-	@Reference
-	private Props _props;
-
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration)"
-	)
 	private ConfigurationProvider<SystemLDAPConfiguration>
 		_systemLDAPConfigurationProvider;
 

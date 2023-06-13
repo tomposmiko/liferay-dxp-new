@@ -31,13 +31,9 @@
 
 				<span class="font-weight-bold"><liferay-ui:message key="add" /></span>
 
-				<clay:button
-					aria-label='<%= LanguageUtil.get(request, "close") %>'
-					cssClass="sidenav-close text-secondary"
-					displayType="unstyled"
-					icon="times"
-					small="<%= true %>"
-				/>
+				<a aria-label="<%= LanguageUtil.get(request, "close") %>" class="sidenav-close text-secondary" href="javascript:;">
+					<aui:icon cssClass="icon-monospaced" image="times" markupView="lexicon" />
+				</a>
 			</div>
 
 			<div class="sidebar-body"></div>

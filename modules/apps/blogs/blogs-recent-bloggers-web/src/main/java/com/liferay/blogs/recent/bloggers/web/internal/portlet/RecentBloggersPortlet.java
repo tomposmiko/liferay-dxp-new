@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-recent-bloggers",
 		"com.liferay.portlet.display-category=category.collaboration",
@@ -42,8 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.name=" + RecentBloggersPortletKeys.RECENT_BLOGGERS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )

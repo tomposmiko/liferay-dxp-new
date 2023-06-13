@@ -15,8 +15,10 @@
 package com.liferay.portal.rules.engine.drools.internal;
 
 import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.messaging.proxy.ProxyMessageListener;
 import com.liferay.portal.kernel.resource.ResourceRetriever;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.rules.engine.Fact;
@@ -26,6 +28,7 @@ import com.liferay.portal.rules.engine.RulesEngine;
 import com.liferay.portal.rules.engine.RulesEngineException;
 import com.liferay.portal.rules.engine.RulesLanguage;
 import com.liferay.portal.rules.engine.RulesResourceRetriever;
+import com.liferay.portal.rules.engine.constants.RulesEngineConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +59,8 @@ import org.drools.runtime.rule.QueryResultsRow;
 
 import org.mvel2.MVELRuntime;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -68,8 +73,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	immediate = true,
 	property = {
-		"rules.engine.default.language=DRL",
+		"proxy.bean=false", "rules.engine.default.language=DRL",
 		"rules.engine.language.mapping.DROOLS_BRL=BRL",
 		"rules.engine.language.mapping.DROOLS_CHANGE_SET=CHANGE_SET",
 		"rules.engine.language.mapping.DROOLS_DECISION_TABLE=DTABLE",
@@ -80,7 +86,7 @@ import org.osgi.service.component.annotations.Reference;
 		"rules.engine.language.mapping.DROOLS_RULE_LANGUAGE=DRL",
 		"rules.engine.language.mapping.DROOLS_XML_LANGUAGE=XDRL"
 	},
-	service = RulesEngine.class
+	service = {RulesEngine.class, RulesEngineImpl.class}
 )
 public class RulesEngineImpl implements RulesEngine {
 
@@ -92,7 +98,7 @@ public class RulesEngineImpl implements RulesEngine {
 		KnowledgeBase knowledgeBase = _knowledgeBaseMap.get(domainName);
 
 		if (knowledgeBase == null) {
-			knowledgeBase = _createKnowledgeBase(rulesResourceRetriever);
+			knowledgeBase = createKnowledgeBase(rulesResourceRetriever);
 
 			_knowledgeBaseMap.put(domainName, knowledgeBase);
 		}
@@ -108,7 +114,7 @@ public class RulesEngineImpl implements RulesEngine {
 			RulesResourceRetriever rulesResourceRetriever, List<Fact<?>> facts)
 		throws RulesEngineException {
 
-		KnowledgeBase knowledgeBase = _createKnowledgeBase(
+		KnowledgeBase knowledgeBase = createKnowledgeBase(
 			rulesResourceRetriever);
 
 		execute(facts, knowledgeBase);
@@ -120,7 +126,7 @@ public class RulesEngineImpl implements RulesEngine {
 			Query query)
 		throws RulesEngineException {
 
-		KnowledgeBase knowledgeBase = _createKnowledgeBase(
+		KnowledgeBase knowledgeBase = createKnowledgeBase(
 			rulesResourceRetriever);
 
 		return execute(facts, knowledgeBase, query);
@@ -168,9 +174,10 @@ public class RulesEngineImpl implements RulesEngine {
 	public void setRulesLanguageMapping(Map<String, String> rulesLanguageMap) {
 		for (Map.Entry<String, String> entry : rulesLanguageMap.entrySet()) {
 			RulesLanguage rulesLanguage = RulesLanguage.valueOf(entry.getKey());
+			ResourceType resourceType = ResourceType.getResourceType(
+				entry.getValue());
 
-			_resourceTypeMap.put(
-				rulesLanguage, ResourceType.getResourceType(entry.getValue()));
+			_resourceTypeMap.put(rulesLanguage, resourceType);
 		}
 	}
 
@@ -189,15 +196,102 @@ public class RulesEngineImpl implements RulesEngine {
 		Dictionary<String, Object> properties =
 			componentContext.getProperties();
 
-		setDefaultRulesLanguage(
-			GetterUtil.getString(
-				properties.get("rules.engine.default.language")));
+		String defaultRulesLanguage = GetterUtil.getString(
+			properties.get("rules.engine.default.language"));
 
-		setRulesLanguageMapping(_getRulesLanguageMap(properties));
+		setDefaultRulesLanguage(defaultRulesLanguage);
+
+		setRulesLanguageMapping(getRulesLanguageMap(properties));
+
+		ProxyMessageListener proxyMessageListener = new ProxyMessageListener();
+
+		proxyMessageListener.setManager(this);
+		proxyMessageListener.setMessageBus(_messageBus);
+
+		Dictionary<String, Object> proxyMessageListenerProperties =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", RulesEngineConstants.DESTINATION_NAME
+			).build();
+
+		BundleContext bundleContext = componentContext.getBundleContext();
+
+		_serviceRegistration = bundleContext.registerService(
+			ProxyMessageListener.class, proxyMessageListener,
+			proxyMessageListenerProperties);
+	}
+
+	protected ResourceType convertRulesLanguage(String rulesLanguage) {
+		if (Validator.isNull(rulesLanguage)) {
+			return _defaultResourceType;
+		}
+
+		ResourceType resourceType = _resourceTypeMap.get(
+			RulesLanguage.valueOf(rulesLanguage));
+
+		if (resourceType == null) {
+			throw new IllegalArgumentException(
+				rulesLanguage + " not supported by the Drools");
+		}
+
+		return resourceType;
+	}
+
+	protected KnowledgeBase createKnowledgeBase(
+			RulesResourceRetriever retriever, ClassLoader... classloaders)
+		throws RulesEngineException {
+
+		try {
+			KnowledgeBuilderConfiguration knowledgeBuilderConfiguration =
+				KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
+
+			KnowledgeBuilder knowledgeBuilder =
+				KnowledgeBuilderFactory.newKnowledgeBuilder(
+					knowledgeBuilderConfiguration);
+
+			ResourceType resourceType = convertRulesLanguage(
+				retriever.getRulesLanguage());
+
+			Set<ResourceRetriever> resourceRetrievers =
+				retriever.getResourceRetrievers();
+
+			for (ResourceRetriever resourceRetriever : resourceRetrievers) {
+				Resource resource = ResourceFactory.newInputStreamResource(
+					resourceRetriever.getInputStream());
+
+				knowledgeBuilder.add(resource, resourceType);
+			}
+
+			if (knowledgeBuilder.hasErrors()) {
+				KnowledgeBuilderErrors knowledgeBuilderErrors =
+					knowledgeBuilder.getErrors();
+
+				throw new RulesEngineException(
+					knowledgeBuilderErrors.toString());
+			}
+
+			KnowledgeBaseConfiguration knowledgeBaseConfiguration =
+				KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
+
+			KnowledgeBase knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase(
+				knowledgeBaseConfiguration);
+
+			knowledgeBase.addKnowledgePackages(
+				knowledgeBuilder.getKnowledgePackages());
+
+			return knowledgeBase;
+		}
+		catch (Exception exception) {
+			throw new RulesEngineException(
+				"Unable to create knowledge base", exception);
+		}
 	}
 
 	@Deactivate
 	protected void deactivate() {
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
+		}
+
 		_defaultResourceType = null;
 
 		_resourceTypeMap = null;
@@ -254,75 +348,10 @@ public class RulesEngineImpl implements RulesEngine {
 		ExecutionResults executionResults = statelessKnowledgeSession.execute(
 			CommandFactory.newBatchExecution(commands));
 
-		return _processQueryResults(query, identifiers, executionResults);
+		return processQueryResults(query, identifiers, executionResults);
 	}
 
-	private ResourceType _convertRulesLanguage(String rulesLanguage) {
-		if (Validator.isNull(rulesLanguage)) {
-			return _defaultResourceType;
-		}
-
-		ResourceType resourceType = _resourceTypeMap.get(
-			RulesLanguage.valueOf(rulesLanguage));
-
-		if (resourceType == null) {
-			throw new IllegalArgumentException(
-				rulesLanguage + " not supported by the Drools");
-		}
-
-		return resourceType;
-	}
-
-	private KnowledgeBase _createKnowledgeBase(RulesResourceRetriever retriever)
-		throws RulesEngineException {
-
-		try {
-			KnowledgeBuilderConfiguration knowledgeBuilderConfiguration =
-				KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
-
-			KnowledgeBuilder knowledgeBuilder =
-				KnowledgeBuilderFactory.newKnowledgeBuilder(
-					knowledgeBuilderConfiguration);
-
-			ResourceType resourceType = _convertRulesLanguage(
-				retriever.getRulesLanguage());
-
-			Set<ResourceRetriever> resourceRetrievers =
-				retriever.getResourceRetrievers();
-
-			for (ResourceRetriever resourceRetriever : resourceRetrievers) {
-				Resource resource = ResourceFactory.newInputStreamResource(
-					resourceRetriever.getInputStream());
-
-				knowledgeBuilder.add(resource, resourceType);
-			}
-
-			if (knowledgeBuilder.hasErrors()) {
-				KnowledgeBuilderErrors knowledgeBuilderErrors =
-					knowledgeBuilder.getErrors();
-
-				throw new RulesEngineException(
-					knowledgeBuilderErrors.toString());
-			}
-
-			KnowledgeBaseConfiguration knowledgeBaseConfiguration =
-				KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
-
-			KnowledgeBase knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase(
-				knowledgeBaseConfiguration);
-
-			knowledgeBase.addKnowledgePackages(
-				knowledgeBuilder.getKnowledgePackages());
-
-			return knowledgeBase;
-		}
-		catch (Exception exception) {
-			throw new RulesEngineException(
-				"Unable to create knowledge base", exception);
-		}
-	}
-
-	private Map<String, String> _getRulesLanguageMap(
+	protected Map<String, String> getRulesLanguageMap(
 		Dictionary<String, Object> properties) {
 
 		Map<String, String> rulesLanguageMap = new HashMap<>();
@@ -346,7 +375,7 @@ public class RulesEngineImpl implements RulesEngine {
 		return rulesLanguageMap;
 	}
 
-	private Map<String, ?> _processQueryResults(
+	protected Map<String, ?> processQueryResults(
 		Query query, List<String> identifiers,
 		ExecutionResults executionResults) {
 
@@ -395,5 +424,6 @@ public class RulesEngineImpl implements RulesEngine {
 
 	private Map<RulesLanguage, ResourceType> _resourceTypeMap =
 		new ConcurrentHashMap<>();
+	private ServiceRegistration<ProxyMessageListener> _serviceRegistration;
 
 }

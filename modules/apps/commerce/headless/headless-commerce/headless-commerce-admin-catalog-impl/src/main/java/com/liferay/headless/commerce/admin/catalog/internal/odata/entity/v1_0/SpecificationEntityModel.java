@@ -21,6 +21,9 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.StringEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Andrea Sbarra
@@ -28,12 +31,15 @@ import java.util.Map;
 public class SpecificationEntityModel implements EntityModel {
 
 	public SpecificationEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = Stream.of(
 			new StringEntityField("key", locale -> "key"),
 			new StringEntityField(
 				"title",
 				locale -> LocalizationUtil.getLocalizedName(
-					"title", LocaleUtil.toLanguageId(locale))));
+					"title", LocaleUtil.toLanguageId(locale)))
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

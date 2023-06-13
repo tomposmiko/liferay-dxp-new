@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstanceTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstancePersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceUtil;
 import com.liferay.dynamic.data.mapping.service.persistence.impl.constants.DDMPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -40,6 +39,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -51,11 +51,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DDMFormInstancePersistence.class)
+@Component(service = {DDMFormInstancePersistence.class, BasePersistence.class})
 public class DDMFormInstancePersistenceImpl
 	extends BasePersistenceImpl<DDMFormInstance>
 	implements DDMFormInstancePersistence {
@@ -207,7 +206,7 @@ public class DDMFormInstancePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstance>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMFormInstance ddmFormInstance : list) {
@@ -600,7 +599,7 @@ public class DDMFormInstancePersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -736,7 +735,7 @@ public class DDMFormInstancePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof DDMFormInstance) {
@@ -856,7 +855,7 @@ public class DDMFormInstancePersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1028,7 +1027,7 @@ public class DDMFormInstancePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstance>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMFormInstance ddmFormInstance : list) {
@@ -1453,7 +1452,7 @@ public class DDMFormInstancePersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1617,7 +1616,7 @@ public class DDMFormInstancePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstance>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMFormInstance ddmFormInstance : list) {
@@ -2485,7 +2484,7 @@ public class DDMFormInstancePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDMFormInstanceModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of ddm form instances
 	 * @param end the upper bound of the range of ddm form instances (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2531,7 +2530,7 @@ public class DDMFormInstancePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstance>)finderCache.getResult(
-				_finderPathWithPaginationFindByGroupId, finderArgs, this);
+				_finderPathWithPaginationFindByGroupId, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMFormInstance ddmFormInstance : list) {
@@ -2641,7 +2640,7 @@ public class DDMFormInstancePersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2707,7 +2706,7 @@ public class DDMFormInstancePersistenceImpl
 			finderArgs = new Object[] {StringUtil.merge(groupIds)};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByGroupId, finderArgs, this);
+				_finderPathWithPaginationCountByGroupId, finderArgs);
 		}
 
 		if (count == null) {
@@ -3025,7 +3024,7 @@ public class DDMFormInstancePersistenceImpl
 		ddmFormInstance.setNew(true);
 		ddmFormInstance.setPrimaryKey(formInstanceId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		ddmFormInstance.setUuid(uuid);
 
@@ -3147,7 +3146,7 @@ public class DDMFormInstancePersistenceImpl
 			(DDMFormInstanceModelImpl)ddmFormInstance;
 
 		if (Validator.isNull(ddmFormInstance.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			ddmFormInstance.setUuid(uuid);
 		}
@@ -3274,9 +3273,7 @@ public class DDMFormInstancePersistenceImpl
 	 */
 	@Override
 	public DDMFormInstance fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMFormInstance.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMFormInstance.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3496,7 +3493,7 @@ public class DDMFormInstancePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMFormInstance>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3572,7 +3569,7 @@ public class DDMFormInstancePersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3781,31 +3778,11 @@ public class DDMFormInstancePersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
-
-		_setDDMFormInstanceUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMFormInstanceUtilPersistence(null);
-
 		entityCache.removeCache(DDMFormInstanceImpl.class.getName());
-	}
-
-	private void _setDDMFormInstanceUtilPersistence(
-		DDMFormInstancePersistence ddmFormInstancePersistence) {
-
-		try {
-			Field field = DDMFormInstanceUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmFormInstancePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3898,6 +3875,7 @@ public class DDMFormInstancePersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private DDMFormInstanceModelArgumentsResolver
+		_ddmFormInstanceModelArgumentsResolver;
 
 }

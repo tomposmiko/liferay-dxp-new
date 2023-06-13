@@ -29,10 +29,7 @@ public abstract class BaseIndexWriter
 			SearchContext searchContext)
 		throws SearchException {
 
-		SpellCheckIndexWriter spellCheckIndexWriter =
-			getSpellCheckIndexWriter();
-
-		if (spellCheckIndexWriter == null) {
+		if (_spellCheckIndexWriter == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No spell check index writer configured");
 			}
@@ -40,7 +37,7 @@ public abstract class BaseIndexWriter
 			return;
 		}
 
-		spellCheckIndexWriter.clearQuerySuggestionDictionaryIndexes(
+		_spellCheckIndexWriter.clearQuerySuggestionDictionaryIndexes(
 			searchContext);
 	}
 
@@ -48,10 +45,7 @@ public abstract class BaseIndexWriter
 	public void clearSpellCheckerDictionaryIndexes(SearchContext searchContext)
 		throws SearchException {
 
-		SpellCheckIndexWriter spellCheckIndexWriter =
-			getSpellCheckIndexWriter();
-
-		if (spellCheckIndexWriter == null) {
+		if (_spellCheckIndexWriter == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No spell check index writer configured");
 			}
@@ -59,7 +53,8 @@ public abstract class BaseIndexWriter
 			return;
 		}
 
-		spellCheckIndexWriter.clearSpellCheckerDictionaryIndexes(searchContext);
+		_spellCheckIndexWriter.clearSpellCheckerDictionaryIndexes(
+			searchContext);
 	}
 
 	/**
@@ -74,10 +69,7 @@ public abstract class BaseIndexWriter
 			SearchContext searchContext, float weight, String keywordType)
 		throws SearchException {
 
-		SpellCheckIndexWriter spellCheckIndexWriter =
-			getSpellCheckIndexWriter();
-
-		if (spellCheckIndexWriter == null) {
+		if (_spellCheckIndexWriter == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No spell check index writer configured");
 			}
@@ -85,17 +77,14 @@ public abstract class BaseIndexWriter
 			return;
 		}
 
-		spellCheckIndexWriter.indexKeyword(searchContext, weight, keywordType);
+		_spellCheckIndexWriter.indexKeyword(searchContext, weight, keywordType);
 	}
 
 	@Override
 	public void indexQuerySuggestionDictionaries(SearchContext searchContext)
 		throws SearchException {
 
-		SpellCheckIndexWriter spellCheckIndexWriter =
-			getSpellCheckIndexWriter();
-
-		if (spellCheckIndexWriter == null) {
+		if (_spellCheckIndexWriter == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No spell check index writer configured");
 			}
@@ -103,17 +92,14 @@ public abstract class BaseIndexWriter
 			return;
 		}
 
-		spellCheckIndexWriter.indexQuerySuggestionDictionaries(searchContext);
+		_spellCheckIndexWriter.indexQuerySuggestionDictionaries(searchContext);
 	}
 
 	@Override
 	public void indexQuerySuggestionDictionary(SearchContext searchContext)
 		throws SearchException {
 
-		SpellCheckIndexWriter spellCheckIndexWriter =
-			getSpellCheckIndexWriter();
-
-		if (spellCheckIndexWriter == null) {
+		if (_spellCheckIndexWriter == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No spell check index writer configured");
 			}
@@ -121,17 +107,14 @@ public abstract class BaseIndexWriter
 			return;
 		}
 
-		spellCheckIndexWriter.indexQuerySuggestionDictionary(searchContext);
+		_spellCheckIndexWriter.indexQuerySuggestionDictionary(searchContext);
 	}
 
 	@Override
 	public void indexSpellCheckerDictionaries(SearchContext searchContext)
 		throws SearchException {
 
-		SpellCheckIndexWriter spellCheckIndexWriter =
-			getSpellCheckIndexWriter();
-
-		if (spellCheckIndexWriter == null) {
+		if (_spellCheckIndexWriter == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No spell check index writer configured");
 			}
@@ -139,17 +122,14 @@ public abstract class BaseIndexWriter
 			return;
 		}
 
-		spellCheckIndexWriter.indexSpellCheckerDictionaries(searchContext);
+		_spellCheckIndexWriter.indexSpellCheckerDictionaries(searchContext);
 	}
 
 	@Override
 	public void indexSpellCheckerDictionary(SearchContext searchContext)
 		throws SearchException {
 
-		SpellCheckIndexWriter spellCheckIndexWriter =
-			getSpellCheckIndexWriter();
-
-		if (spellCheckIndexWriter == null) {
+		if (_spellCheckIndexWriter == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No spell check index writer configured");
 			}
@@ -157,12 +137,18 @@ public abstract class BaseIndexWriter
 			return;
 		}
 
-		spellCheckIndexWriter.indexSpellCheckerDictionary(searchContext);
+		_spellCheckIndexWriter.indexSpellCheckerDictionary(searchContext);
 	}
 
-	protected abstract SpellCheckIndexWriter getSpellCheckIndexWriter();
+	public void setSpellCheckIndexWriter(
+		SpellCheckIndexWriter spellCheckIndexWriter) {
+
+		_spellCheckIndexWriter = spellCheckIndexWriter;
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseIndexWriter.class);
+
+	private SpellCheckIndexWriter _spellCheckIndexWriter;
 
 }

@@ -456,11 +456,6 @@ public class DEDataDefinitionFieldLinkWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DEDataDefinitionFieldLink, Object>>
 		getAttributeGetterFunctions() {
 

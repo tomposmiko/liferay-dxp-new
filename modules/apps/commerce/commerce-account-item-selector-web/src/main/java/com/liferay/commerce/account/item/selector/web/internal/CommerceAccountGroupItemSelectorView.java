@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.account.item.selector.web.internal;
 
-import com.liferay.account.service.AccountGroupLocalService;
 import com.liferay.commerce.account.item.selector.criterion.CommerceAccountGroupItemSelectorCriterion;
 import com.liferay.commerce.account.item.selector.web.internal.display.context.CommerceAccountGroupItemSelectorViewDisplayContext;
+import com.liferay.commerce.account.service.CommerceAccountGroupLocalService;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = ItemSelectorView.class)
+@Component(enabled = false, immediate = true, service = ItemSelectorView.class)
 public class CommerceAccountGroupItemSelectorView
 	implements ItemSelectorView<CommerceAccountGroupItemSelectorCriterion> {
 
@@ -67,7 +67,7 @@ public class CommerceAccountGroupItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "accounts");
+		return LanguageUtil.get(locale, "accounts");
 	}
 
 	@Override
@@ -84,8 +84,8 @@ public class CommerceAccountGroupItemSelectorView
 		CommerceAccountGroupItemSelectorViewDisplayContext
 			commerceAccountGroupItemSelectorViewDisplayContext =
 				new CommerceAccountGroupItemSelectorViewDisplayContext(
-					_accountGroupLocalService, httpServletRequest, portletURL,
-					itemSelectedEventName);
+					_commerceAccountGroupLocalService, httpServletRequest,
+					portletURL, itemSelectedEventName);
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
@@ -105,10 +105,7 @@ public class CommerceAccountGroupItemSelectorView
 			ListUtil.fromArray(new UUIDItemSelectorReturnType()));
 
 	@Reference
-	private AccountGroupLocalService _accountGroupLocalService;
-
-	@Reference
-	private Language _language;
+	private CommerceAccountGroupLocalService _commerceAccountGroupLocalService;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.account.item.selector.web)"

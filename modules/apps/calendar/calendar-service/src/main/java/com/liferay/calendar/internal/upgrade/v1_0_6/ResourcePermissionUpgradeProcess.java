@@ -14,6 +14,7 @@
 
 package com.liferay.calendar.internal.upgrade.v1_0_6;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -51,16 +52,16 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeGuestResourceBlockPermissions();
+		upgradeGuestResourceBlockPermissions();
 	}
 
-	private List<String> _getCalendarResourceUnsupportedActionIds()
-		throws Exception {
+	protected List<String> getCalendarResourceUnsupportedActionIds()
+		throws PortalException {
 
 		List<String> actionIds = new ArrayList<>();
 
 		List<String> guestUnsupportedActions =
-			_getModelResourceGuestUnsupportedActions();
+			getModelResourceGuestUnsupportedActions();
 
 		for (String resourceActionId : _NEW_UNSUPPORTED_ACTION_IDS) {
 			if (guestUnsupportedActions.contains(resourceActionId)) {
@@ -75,8 +76,8 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 		return actionIds;
 	}
 
-	private List<String> _getModelResourceGuestUnsupportedActions()
-		throws Exception {
+	protected List<String> getModelResourceGuestUnsupportedActions()
+		throws UpgradeException {
 
 		try {
 			ResourceActionsImpl resourceActionsImpl = new ResourceActionsImpl();
@@ -97,9 +98,9 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _upgradeGuestResourceBlockPermissions() throws Exception {
+	protected void upgradeGuestResourceBlockPermissions() throws Exception {
 		List<String> unsupportedActionIds =
-			_getCalendarResourceUnsupportedActionIds();
+			getCalendarResourceUnsupportedActionIds();
 
 		if (unsupportedActionIds.isEmpty()) {
 			return;

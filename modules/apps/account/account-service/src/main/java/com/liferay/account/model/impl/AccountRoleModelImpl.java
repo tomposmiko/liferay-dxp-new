@@ -16,6 +16,7 @@ package com.liferay.account.model.impl;
 
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.model.AccountRoleModel;
+import com.liferay.account.model.AccountRoleSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -31,15 +32,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -140,6 +144,53 @@ public class AccountRoleModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AccountRole toModel(AccountRoleSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		AccountRole model = new AccountRoleImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setAccountRoleId(soapModel.getAccountRoleId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setAccountEntryId(soapModel.getAccountEntryId());
+		model.setRoleId(soapModel.getRoleId());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AccountRole> toModels(AccountRoleSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AccountRole> models = new ArrayList<AccountRole>(
+			soapModels.length);
+
+		for (AccountRoleSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public AccountRoleModelImpl() {
 	}
 
@@ -216,70 +267,81 @@ public class AccountRoleModelImpl
 	public Map<String, Function<AccountRole, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AccountRole, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AccountRole>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AccountRole, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AccountRole.class.getClassLoader(), AccountRole.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AccountRole, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<AccountRole, Object>>();
+		try {
+			Constructor<AccountRole> constructor =
+				(Constructor<AccountRole>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AccountRole::getMvccVersion);
-			attributeGetterFunctions.put(
-				"accountRoleId", AccountRole::getAccountRoleId);
-			attributeGetterFunctions.put(
-				"companyId", AccountRole::getCompanyId);
-			attributeGetterFunctions.put(
-				"accountEntryId", AccountRole::getAccountEntryId);
-			attributeGetterFunctions.put("roleId", AccountRole::getRoleId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AccountRole, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AccountRole, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AccountRole, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AccountRole, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AccountRole, Object>>();
+		Map<String, BiConsumer<AccountRole, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AccountRole, ?>>();
 
-		static {
-			Map<String, BiConsumer<AccountRole, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<AccountRole, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountRole::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AccountRole, Long>)AccountRole::setMvccVersion);
+		attributeGetterFunctions.put(
+			"accountRoleId", AccountRole::getAccountRoleId);
+		attributeSetterBiConsumers.put(
+			"accountRoleId",
+			(BiConsumer<AccountRole, Long>)AccountRole::setAccountRoleId);
+		attributeGetterFunctions.put("companyId", AccountRole::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AccountRole, Long>)AccountRole::setCompanyId);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountRole::getAccountEntryId);
+		attributeSetterBiConsumers.put(
+			"accountEntryId",
+			(BiConsumer<AccountRole, Long>)AccountRole::setAccountEntryId);
+		attributeGetterFunctions.put("roleId", AccountRole::getRoleId);
+		attributeSetterBiConsumers.put(
+			"roleId", (BiConsumer<AccountRole, Long>)AccountRole::setRoleId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AccountRole, Long>)AccountRole::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"accountRoleId",
-				(BiConsumer<AccountRole, Long>)AccountRole::setAccountRoleId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AccountRole, Long>)AccountRole::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"accountEntryId",
-				(BiConsumer<AccountRole, Long>)AccountRole::setAccountEntryId);
-			attributeSetterBiConsumers.put(
-				"roleId",
-				(BiConsumer<AccountRole, Long>)AccountRole::setRoleId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -604,12 +666,41 @@ public class AccountRoleModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AccountRole, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AccountRole, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AccountRole, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((AccountRole)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AccountRole>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AccountRole.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -620,9 +711,8 @@ public class AccountRoleModelImpl
 	private long _roleId;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<AccountRole, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<AccountRole, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

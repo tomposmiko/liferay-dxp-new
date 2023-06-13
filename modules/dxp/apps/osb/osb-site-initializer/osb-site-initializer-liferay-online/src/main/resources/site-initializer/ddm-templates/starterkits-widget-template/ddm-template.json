@@ -1,6 +1,0 @@
-{
-	"className": "com.liferay.commerce.product.content.search.web.internal.portlet.CPSearchResultsPortlet",
-	"ddmTemplateKey": "starterkits-list",
-	"name": "Starterkits list",
-	"resourceClassName": "com.liferay.portlet.display.template.PortletDisplayTemplate"
-}

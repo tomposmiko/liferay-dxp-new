@@ -22,15 +22,19 @@ Collection<ConvertProcess> convertProcesses = ConvertProcessUtil.getEnabledConve
 
 <liferay-ui:error exception="<%= FileSystemStoreRootDirException.class %>" message="the-root-directories-of-the-selected-file-system-stores-are-not-valid" />
 
-<c:choose>
-	<c:when test="<%= convertProcesses.isEmpty() %>">
-		<div class="alert alert-info">
-			<liferay-ui:message key="no-data-migration-processes-are-available" />
-		</div>
-	</c:when>
-	<c:otherwise>
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
+<div class="server-admin-tabs">
+	<c:choose>
+		<c:when test="<%= convertProcesses.isEmpty() %>">
+			<div class="alert alert-info">
+				<liferay-ui:message key="no-data-migration-processes-are-available" />
+			</div>
+		</c:when>
+		<c:otherwise>
+			<liferay-ui:panel-container
+				extended="<%= true %>"
+				id="convertPanelContainer"
+				persistState="<%= true %>"
+			>
 
 				<%
 				int i = 0;
@@ -41,7 +45,14 @@ Collection<ConvertProcess> convertProcesses = ConvertProcessUtil.getEnabledConve
 					String[] parameterNames = convertProcess.getParameterNames();
 				%>
 
-					<aui:fieldset collapsed="<%= false %>" collapsible="<%= true %>" label="<%= convertProcess.getDescription() %>">
+					<liferay-ui:panel
+						collapsible="<%= true %>"
+						extended="<%= true %>"
+						id='<%= "convert" + i + "Panel" %>'
+						markupView="lexicon"
+						persistState="<%= true %>"
+						title="<%= convertProcess.getDescription() %>"
+					>
 						<c:choose>
 							<c:when test="<%= convertProcess.hasCustomView() %>">
 
@@ -56,7 +67,7 @@ Collection<ConvertProcess> convertProcesses = ConvertProcessUtil.getEnabledConve
 								</div>
 							</c:when>
 							<c:otherwise>
-								<aui:field-wrapper label='<%= Validator.isNotNull(parameterDescription) ? parameterDescription : "" %>'>
+								<aui:fieldset label='<%= Validator.isNotNull(parameterDescription) ? parameterDescription : "" %>'>
 
 									<%
 									for (String parameterName : parameterNames) {
@@ -110,21 +121,21 @@ Collection<ConvertProcess> convertProcesses = ConvertProcessUtil.getEnabledConve
 									}
 									%>
 
-								</aui:field-wrapper>
+								</aui:fieldset>
 
 								<aui:button-row>
 									<aui:button cssClass="save-server-button" data-cmd='<%= "convertProcess." + clazz.getName() %>' value="execute" />
 								</aui:button-row>
 							</c:otherwise>
 						</c:choose>
-					</aui:fieldset>
+					</liferay-ui:panel>
 
 				<%
 					i++;
 				}
 				%>
 
-			</div>
-		</div>
-	</c:otherwise>
-</c:choose>
+			</liferay-ui:panel-container>
+		</c:otherwise>
+	</c:choose>
+</div>

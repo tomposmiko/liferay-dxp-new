@@ -6,8 +6,6 @@ create table OA2Auths_OA2ScopeGrants (
 );
 
 create table OAuth2Application (
-	uuid_ VARCHAR(75) null,
-	externalReferenceCode VARCHAR(75) null,
 	oAuth2ApplicationId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
@@ -15,8 +13,7 @@ create table OAuth2Application (
 	createDate DATE null,
 	modifiedDate DATE null,
 	oA2AScopeAliasesId LONG,
-	allowedGrantTypes VARCHAR(128) null,
-	clientAuthenticationMethod VARCHAR(75) null,
+	allowedGrantTypes VARCHAR(75) null,
 	clientCredentialUserId LONG,
 	clientCredentialUserName VARCHAR(75) null,
 	clientId VARCHAR(75) null,
@@ -26,7 +23,6 @@ create table OAuth2Application (
 	features STRING null,
 	homePageURL STRING null,
 	iconFileEntryId LONG,
-	jwks VARCHAR(3999) null,
 	name VARCHAR(75) null,
 	privacyPolicyURL STRING null,
 	redirectURIs STRING null,

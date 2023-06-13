@@ -124,7 +124,8 @@ public class DLVideoExternalShortcutResolverImpl
 	private DLVideoExternalShortcutMetadataHelperFactory
 		_dlVideoExternalShortcutMetadataHelperFactory;
 
-	private ServiceTrackerList<DLVideoExternalShortcutProvider>
-		_dlVideoExternalShortcutProviders;
+	private ServiceTrackerList
+		<DLVideoExternalShortcutProvider, DLVideoExternalShortcutProvider>
+			_dlVideoExternalShortcutProviders;
 
 }

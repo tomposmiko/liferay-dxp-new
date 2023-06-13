@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"mvc.command.name=/commerce_channels/edit_commerce_payment_method_group_rel_address_restriction"
@@ -89,7 +90,8 @@ public class EditCommercePaymentMethodGroupRelAddressRestrictionMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceAddressRestrictions(ActionRequest actionRequest)
+	protected void updateCommerceAddressRestrictions(
+			ActionRequest actionRequest)
 		throws Exception {
 
 		long commerceChannelId = ParamUtil.getLong(
@@ -165,7 +167,7 @@ public class EditCommercePaymentMethodGroupRelAddressRestrictionMVCActionCommand
 
 		@Override
 		public Object call() throws Exception {
-			_updateCommerceAddressRestrictions(_actionRequest);
+			updateCommerceAddressRestrictions(_actionRequest);
 
 			return null;
 		}

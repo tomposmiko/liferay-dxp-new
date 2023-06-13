@@ -16,7 +16,7 @@ package com.liferay.wiki.web.internal.portlet.action;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -67,7 +67,8 @@ public class AutocompletePageTitleMVCResourceCommand
 		throws PortletException {
 
 		try {
-			JSONArray jsonArray = _getJSONArray(resourceRequest);
+			JSONArray jsonArray = getJSONArray(
+				resourceRequest, resourceResponse);
 
 			HttpServletResponse httpServletResponse =
 				_portal.getHttpServletResponse(resourceResponse);
@@ -78,14 +79,15 @@ public class AutocompletePageTitleMVCResourceCommand
 				httpServletResponse, jsonArray.toString());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
-	private JSONArray _getJSONArray(ResourceRequest resourceRequest)
+	protected JSONArray getJSONArray(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws PortalException {
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			resourceRequest);
@@ -119,9 +121,6 @@ public class AutocompletePageTitleMVCResourceCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AutocompletePageTitleMVCResourceCommand.class);
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Portal _portal;

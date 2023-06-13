@@ -43,7 +43,6 @@ const Pages = React.forwardRef(
 			paginationMode,
 			persistDefaultValues,
 			readOnly,
-			showPartialResultsToRespondents,
 			viewMode,
 		} = useFormState();
 
@@ -63,11 +62,8 @@ const Pages = React.forwardRef(
 
 		return (
 			<div
-				aria-labelledby={`${portletNamespace}header`}
 				className={classNames({sheet: view === 'fieldSets'})}
 				ref={containerElementRef}
-				role="group"
-				tabIndex={0}
 			>
 				<input
 					key={portletNamespace + 'persistDefaultValues'}
@@ -105,9 +101,6 @@ const Pages = React.forwardRef(
 								paginationMode={paginationMode}
 								portletNamespace={portletNamespace}
 								readOnly={readOnly}
-								showPartialResultsToRespondents={
-									showPartialResultsToRespondents
-								}
 								total={pages.length}
 								view={view}
 								viewMode={viewMode}

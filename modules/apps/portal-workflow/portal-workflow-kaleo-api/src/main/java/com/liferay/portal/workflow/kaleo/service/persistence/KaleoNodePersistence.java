@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchNodeException;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
 
@@ -33,8 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-public interface KaleoNodePersistence
-	extends BasePersistence<KaleoNode>, CTPersistence<KaleoNode> {
+public interface KaleoNodePersistence extends BasePersistence<KaleoNode> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

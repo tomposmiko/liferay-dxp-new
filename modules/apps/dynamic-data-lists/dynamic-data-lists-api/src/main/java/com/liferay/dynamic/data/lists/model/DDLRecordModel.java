@@ -402,8 +402,4 @@ public interface DDLRecordModel
 	@Override
 	public DDLRecord cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

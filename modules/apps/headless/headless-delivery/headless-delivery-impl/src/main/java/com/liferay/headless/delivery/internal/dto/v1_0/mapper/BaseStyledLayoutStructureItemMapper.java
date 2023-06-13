@@ -24,7 +24,7 @@ import com.liferay.headless.delivery.dto.v1_0.Mapping;
 import com.liferay.headless.delivery.internal.dto.v1_0.mapper.util.FragmentMappedValueUtil;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.layout.responsive.ViewportSize;
@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Reference;
@@ -86,6 +85,61 @@ public abstract class BaseStyledLayoutStructureItemMapper
 		return fragmentViewports.toArray(new FragmentViewport[0]);
 	}
 
+	protected Function<Object, String> getImageURLTransformerFunction() {
+		return object -> {
+			if (object instanceof JSONObject) {
+				JSONObject jsonObject = (JSONObject)object;
+
+				return jsonObject.getString("url");
+			}
+
+			if (object instanceof String) {
+				return (String)object;
+			}
+
+			return StringPool.BLANK;
+		};
+	}
+
+	protected FragmentImage toBackgroundFragmentImage(
+		JSONObject jsonObject, boolean saveMappingConfiguration) {
+
+		if (jsonObject == null) {
+			return null;
+		}
+
+		String urlValue = jsonObject.getString("url");
+
+		return new FragmentImage() {
+			{
+				title = toTitleFragmentInlineValue(jsonObject, urlValue);
+
+				setUrl(
+					() -> {
+						if (FragmentMappedValueUtil.isSaveFragmentMappedValue(
+								jsonObject, saveMappingConfiguration)) {
+
+							return toFragmentMappedValue(
+								toDefaultMappingValue(
+									jsonObject,
+									getImageURLTransformerFunction()),
+								jsonObject);
+						}
+
+						if (Validator.isNull(urlValue)) {
+							return null;
+						}
+
+						return new FragmentInlineValue() {
+							{
+								value = urlValue;
+							}
+						};
+					});
+			}
+		};
+	}
+
 	protected FragmentInlineValue toDefaultMappingValue(
 		JSONObject jsonObject, Function<Object, String> transformerFunction) {
 
@@ -113,11 +167,11 @@ public abstract class BaseStyledLayoutStructureItemMapper
 		}
 
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
-			infoItemServiceRegistry.getFirstInfoItemService(
+			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class, className);
 
 		InfoItemObjectProvider<Object> infoItemObjectProvider =
-			infoItemServiceRegistry.getFirstInfoItemService(
+			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemObjectProvider.class, className);
 
 		if ((infoItemFieldValuesProvider == null) ||
@@ -237,91 +291,35 @@ public abstract class BaseStyledLayoutStructureItemMapper
 						JSONObject backgroundImageJSONObject =
 							(JSONObject)backgroundImage;
 
-						return _toBackgroundFragmentImage(
+						return toBackgroundFragmentImage(
 							backgroundImageJSONObject,
 							saveMappingConfiguration);
 					});
-
-				setHidden(
-					() -> {
-						if (Objects.equals(
-								jsonObject.getString("display"), "block")) {
-
-							return false;
-						}
-
-						if (Objects.equals(
-								jsonObject.getString("display"), "none")) {
-
-							return true;
-						}
-
-						return null;
-					});
 			}
 		};
 	}
 
-	@Reference
-	protected InfoItemServiceRegistry infoItemServiceRegistry;
+	protected FragmentInlineValue toTitleFragmentInlineValue(
+		JSONObject jsonObject, String urlValue) {
 
-	@Reference
-	protected Portal portal;
+		String title = jsonObject.getString("title");
 
-	private Function<Object, String> _getImageURLTransformerFunction() {
-		return object -> {
-			if (object instanceof JSONObject) {
-				JSONObject jsonObject = (JSONObject)object;
-
-				return jsonObject.getString("url");
-			}
-
-			if (object instanceof String) {
-				return (String)object;
-			}
-
-			return StringPool.BLANK;
-		};
-	}
-
-	private FragmentImage _toBackgroundFragmentImage(
-		JSONObject jsonObject, boolean saveMappingConfiguration) {
-
-		if (jsonObject == null) {
+		if (Validator.isNull(title) || title.equals(urlValue)) {
 			return null;
 		}
 
-		String urlValue = jsonObject.getString("url");
-
-		return new FragmentImage() {
+		return new FragmentInlineValue() {
 			{
-				title = _toTitleFragmentInlineValue(jsonObject, urlValue);
-
-				setUrl(
-					() -> {
-						if (FragmentMappedValueUtil.isSaveFragmentMappedValue(
-								jsonObject, saveMappingConfiguration)) {
-
-							return toFragmentMappedValue(
-								toDefaultMappingValue(
-									jsonObject,
-									_getImageURLTransformerFunction()),
-								jsonObject);
-						}
-
-						if (Validator.isNull(urlValue)) {
-							return null;
-						}
-
-						return new FragmentInlineValue() {
-							{
-								value = urlValue;
-							}
-						};
-					});
+				value = title;
 			}
 		};
 	}
+
+	@Reference
+	protected InfoItemServiceTracker infoItemServiceTracker;
+
+	@Reference
+	protected Portal portal;
 
 	private FragmentViewport _toFragmentViewportStyle(
 		JSONObject jsonObject, ViewportSize viewportSize) {
@@ -343,24 +341,10 @@ public abstract class BaseStyledLayoutStructureItemMapper
 
 		return new FragmentViewport() {
 			{
+				setId(viewportSize.getViewportSizeId());
 				setFragmentViewportStyle(
 					() -> new FragmentViewportStyle() {
 						{
-							backgroundColor = styleJSONObject.getString(
-								"backgroundColor", null);
-							borderColor = styleJSONObject.getString(
-								"borderColor", null);
-							borderRadius = styleJSONObject.getString(
-								"borderRadius", null);
-							borderWidth = styleJSONObject.getString(
-								"borderWidth", null);
-							fontFamily = styleJSONObject.getString(
-								"fontFamily", null);
-							fontSize = styleJSONObject.getString(
-								"fontSize", null);
-							fontWeight = styleJSONObject.getString(
-								"fontWeight", null);
-							height = styleJSONObject.getString("height", null);
 							marginBottom = styleJSONObject.getString(
 								"marginBottom", null);
 							marginLeft = styleJSONObject.getString(
@@ -369,18 +353,6 @@ public abstract class BaseStyledLayoutStructureItemMapper
 								"marginRight", null);
 							marginTop = styleJSONObject.getString(
 								"marginTop", null);
-							maxHeight = styleJSONObject.getString(
-								"maxHeight", null);
-							maxWidth = styleJSONObject.getString(
-								"maxWidth", null);
-							minHeight = styleJSONObject.getString(
-								"minHeight", null);
-							minWidth = styleJSONObject.getString(
-								"minWidth", null);
-							opacity = styleJSONObject.getString(
-								"opacity", null);
-							overflow = styleJSONObject.getString(
-								"overflow", null);
 							paddingBottom = styleJSONObject.getString(
 								"paddingBottom", null);
 							paddingLeft = styleJSONObject.getString(
@@ -389,52 +361,8 @@ public abstract class BaseStyledLayoutStructureItemMapper
 								"paddingRight", null);
 							paddingTop = styleJSONObject.getString(
 								"paddingTop", null);
-							shadow = styleJSONObject.getString("shadow", null);
-							textAlign = styleJSONObject.getString(
-								"textAlign", null);
-							textColor = styleJSONObject.getString(
-								"textColor", null);
-							width = styleJSONObject.getString("width", null);
-
-							setHidden(
-								() -> {
-									if (Objects.equals(
-											styleJSONObject.getString(
-												"display"),
-											"block")) {
-
-										return false;
-									}
-
-									if (Objects.equals(
-											styleJSONObject.getString(
-												"display"),
-											"none")) {
-
-										return true;
-									}
-
-									return null;
-								});
 						}
 					});
-				setId(viewportSize.getViewportSizeId());
-			}
-		};
-	}
-
-	private FragmentInlineValue _toTitleFragmentInlineValue(
-		JSONObject jsonObject, String urlValue) {
-
-		String title = jsonObject.getString("title");
-
-		if (Validator.isNull(title) || title.equals(urlValue)) {
-			return null;
-		}
-
-		return new FragmentInlineValue() {
-			{
-				value = title;
 			}
 		};
 	}

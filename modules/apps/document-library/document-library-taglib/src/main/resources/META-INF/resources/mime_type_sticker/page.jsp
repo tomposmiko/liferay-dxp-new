@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/mime_type_sticker/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 String cssClass = (String)request.getAttribute("liferay-document-library:mime-type-sticker:cssClass");

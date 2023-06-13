@@ -14,10 +14,14 @@
 
 package com.liferay.dynamic.data.lists.exporter;
 
+import java.util.Set;
+
 /**
  * @author Lance Ji
  */
 public interface DDLExporterFactory {
+
+	public Set<String> getAvailableFormats();
 
 	public DDLExporter getDDLExporter(String format);
 

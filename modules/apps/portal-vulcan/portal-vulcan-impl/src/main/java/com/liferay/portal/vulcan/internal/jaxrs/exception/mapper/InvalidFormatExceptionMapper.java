@@ -18,10 +18,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response;
 
@@ -38,28 +42,34 @@ public class InvalidFormatExceptionMapper
 	protected Problem getProblem(
 		InvalidFormatException invalidFormatException) {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(invalidFormatException, invalidFormatException);
+		}
+
 		List<JsonMappingException.Reference> references =
 			invalidFormatException.getPath();
 
-		StringBundler sb = new StringBundler(references.size() * 2);
+		Stream<JsonMappingException.Reference> stream = references.stream();
 
-		for (JsonMappingException.Reference reference : references) {
-			sb.append(reference.getFieldName());
-			sb.append(".");
-		}
-
-		sb.setIndex(sb.index() - 1);
+		String path = stream.map(
+			JsonMappingException.Reference::getFieldName
+		).collect(
+			Collectors.joining(".")
+		);
 
 		Class<?> clazz = invalidFormatException.getTargetType();
 
+		String message = StringBundler.concat(
+			"Unable to map JSON path \"", path, "\" with value \"",
+			invalidFormatException.getValue(), "\" to class \"",
+			clazz.getSimpleName(), "\"");
+
 		return new Problem(
 			invalidFormatException.getLocalizedMessage(),
-			Response.Status.BAD_REQUEST,
-			StringBundler.concat(
-				"Unable to map JSON path \"", sb.toString(), "\" with value \"",
-				invalidFormatException.getValue(), "\" to class \"",
-				clazz.getSimpleName(), "\""),
-			InvalidFormatException.class.getName());
+			Response.Status.BAD_REQUEST, message, "InvalidFormatException");
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		InvalidFormatExceptionMapper.class);
 
 }

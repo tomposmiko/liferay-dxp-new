@@ -35,10 +35,9 @@ import com.liferay.journal.web.internal.info.item.JournalArticleInfoItemFields;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
 
 import java.util.HashMap;
@@ -55,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
-	property = Constants.SERVICE_RANKING + ":Integer=10",
+	immediate = true, property = Constants.SERVICE_RANKING + ":Integer=10",
 	service = InfoItemFormProvider.class
 )
 public class JournalArticleInfoItemFormProvider
@@ -172,7 +171,7 @@ public class JournalArticleInfoItemFormProvider
 			String formVariationKey, InfoFieldSet assetEntryInfoFieldSet)
 		throws NoSuchFormVariationException {
 
-		Set<Locale> availableLocales = _language.getAvailableLocales();
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
 
 		InfoLocalizedValue.Builder infoLocalizedValueBuilder =
 			InfoLocalizedValue.builder();
@@ -260,13 +259,11 @@ public class JournalArticleInfoItemFormProvider
 
 			nameMap.replaceAll(
 				(locale, name) -> StringBundler.concat(
-					_language.get(locale, "content"), StringPool.SPACE,
+					LanguageUtil.get(locale, "content"), StringPool.SPACE,
 					StringPool.OPEN_PARENTHESIS, name,
 					StringPool.CLOSE_PARENTHESIS));
 
 			return InfoLocalizedValue.<String>builder(
-			).defaultLocale(
-				LocaleUtil.fromLanguageId(ddmStructure.getDefaultLanguageId())
 			).values(
 				nameMap
 			).build();
@@ -303,9 +300,6 @@ public class JournalArticleInfoItemFormProvider
 	@Reference
 	private InfoItemFieldReaderFieldSetProvider
 		_infoItemFieldReaderFieldSetProvider;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private TemplateInfoItemFieldSetProvider _templateInfoItemFieldSetProvider;

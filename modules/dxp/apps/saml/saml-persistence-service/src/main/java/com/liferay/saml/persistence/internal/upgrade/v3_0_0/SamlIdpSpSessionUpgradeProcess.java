@@ -16,13 +16,14 @@ package com.liferay.saml.persistence.internal.upgrade.v3_0_0;
 
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.saml.persistence.internal.upgrade.v3_0_0.util.SamlIdpSpSessionTable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
  * @author Stian Sigvartsen
@@ -32,61 +33,75 @@ public class SamlIdpSpSessionUpgradeProcess extends UpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			alterTableAddColumn(
-				"SamlIdpSpSession", "samlPeerBindingId", "LONG null");
+			if (!hasColumn(
+					SamlIdpSpSessionTable.TABLE_NAME, "samlPeerBindingId")) {
+
+				alter(
+					SamlIdpSpSessionTable.class,
+					new AlterTableAddColumn("samlPeerBindingId", "LONG null"));
+			}
 
 			runSQL("delete from SamlPeerBinding");
 
-			int latestSamlPeerBindingId = _getLatestSamlPeerBindingId();
 			int samlIdpSpSessionIdOffset = _getSamlIdpSpSessionIdOffset();
-			String sql1 = StringBundler.concat(
-				"select min(samlIdpSpSessionId) as samlIdpSpSessionId, ",
-				"companyId, min(createDate) as createDate, userId, userName, ",
-				"nameIdFormat, nameIdValue, samlSpEntityId from ",
-				"SamlIdpSpSession group by companyId, userId, userName, ",
-				"nameIdFormat, nameIdValue, samlSpEntityId");
-			String sql2 = StringBundler.concat(
-				"insert into SamlPeerBinding (samlPeerBindingId, companyId, ",
-				"createDate, userId, userName, deleted, samlNameIdFormat, ",
-				"samlNameIdNameQualifier, samlNameIdSpNameQualifier, ",
-				"samlNameIdSpProvidedId, samlNameIdValue, samlPeerEntityId) ",
-				"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-			try (PreparedStatement preparedStatement1 =
-					connection.prepareStatement(sql1);
-				ResultSet resultSet = preparedStatement1.executeQuery();
-				PreparedStatement preparedStatement2 =
-					AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-						connection, sql2)) {
+			int latestSamlPeerBindingId = _getLatestSamlPeerBindingId();
+
+			try (PreparedStatement preparedStatement =
+					connection.prepareStatement(
+						StringBundler.concat(
+							"select min(samlIdpSpSessionId) as ",
+							"samlIdpSpSessionId, companyId, min(createDate) ",
+							"as createDate, userId, userName, nameIdFormat, ",
+							"nameIdValue, samlSpEntityId from ",
+							"SamlIdpSpSession group by companyId, userId, ",
+							"userName, nameIdFormat, nameIdValue, ",
+							"samlSpEntityId"));
+				ResultSet resultSet = preparedStatement.executeQuery()) {
 
 				while (resultSet.next()) {
-					preparedStatement2.setInt(
-						1,
-						resultSet.getInt("samlIdpSpSessionId") +
-							-samlIdpSpSessionIdOffset +
-								latestSamlPeerBindingId);
-					preparedStatement2.setLong(
-						2, resultSet.getLong("companyId"));
-					preparedStatement2.setTimestamp(
-						3, resultSet.getTimestamp("createDate"));
-					preparedStatement2.setLong(4, resultSet.getLong("userId"));
-					preparedStatement2.setString(
-						5, resultSet.getString("userName"));
-					preparedStatement2.setBoolean(6, false);
-					preparedStatement2.setString(
-						7, resultSet.getString("nameIdFormat"));
-					preparedStatement2.setString(8, null);
-					preparedStatement2.setString(9, null);
-					preparedStatement2.setString(10, null);
-					preparedStatement2.setString(
-						11, resultSet.getString("nameIdValue"));
-					preparedStatement2.setString(
-						12, resultSet.getString("samlSpEntityId"));
+					int samlIdpSpSessionId = resultSet.getInt(
+						"samlIdpSpSessionId");
+					long companyId = resultSet.getLong("companyId");
+					Timestamp createDate = resultSet.getTimestamp("createDate");
+					long userId = resultSet.getLong("userId");
+					String userName = resultSet.getString("userName");
+					String nameIdFormat = resultSet.getString("nameIdFormat");
+					String nameIdValue = resultSet.getString("nameIdValue");
+					String samlSpEntityId = resultSet.getString(
+						"samlSpEntityId");
 
-					preparedStatement2.addBatch();
+					int samlPeerBindingId =
+						samlIdpSpSessionId + -samlIdpSpSessionIdOffset +
+							latestSamlPeerBindingId;
+
+					String sql = StringBundler.concat(
+						"insert into SamlPeerBinding (samlPeerBindingId, ",
+						"companyId, createDate, userId, userName, deleted, ",
+						"samlNameIdFormat, samlNameIdNameQualifier, ",
+						"samlNameIdSpNameQualifier, samlNameIdSpProvidedId, ",
+						"samlNameIdValue, samlPeerEntityId) values (?, ?, ?, ",
+						"?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+					try (PreparedStatement insertPreparedStatement =
+							connection.prepareStatement(sql)) {
+
+						insertPreparedStatement.setInt(1, samlPeerBindingId);
+						insertPreparedStatement.setLong(2, companyId);
+						insertPreparedStatement.setTimestamp(3, createDate);
+						insertPreparedStatement.setLong(4, userId);
+						insertPreparedStatement.setString(5, userName);
+						insertPreparedStatement.setBoolean(6, false);
+						insertPreparedStatement.setString(7, nameIdFormat);
+						insertPreparedStatement.setString(8, null);
+						insertPreparedStatement.setString(9, null);
+						insertPreparedStatement.setString(10, null);
+						insertPreparedStatement.setString(11, nameIdValue);
+						insertPreparedStatement.setString(12, samlSpEntityId);
+
+						insertPreparedStatement.executeUpdate();
+					}
 				}
-
-				preparedStatement2.executeBatch();
 			}
 
 			runSQL(

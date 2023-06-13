@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.push.notifications.constants.PushNotificationsDestinationNames;
 import com.liferay.push.notifications.model.PushNotificationsDevice;
@@ -57,7 +56,7 @@ public class PushNotificationsDeviceLocalServiceImpl
 			long userId, String platform, String token)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		long pushNotificationsDeviceId = counterLocalService.increment();
 
@@ -199,8 +198,5 @@ public class PushNotificationsDeviceLocalServiceImpl
 
 	private ServiceTrackerMap<String, PushNotificationsSender>
 		_serviceTrackerMap;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

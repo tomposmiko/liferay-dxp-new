@@ -181,9 +181,10 @@ public class CustomizationSettingsProcessor implements ColumnProcessor {
 			PortletProvider.Action portletProviderAction)
 		throws Exception {
 
-		return processPortlet(
-			PortletProviderUtil.getPortletId(
-				portletProviderClassName, portletProviderAction));
+		String portletId = PortletProviderUtil.getPortletId(
+			portletProviderClassName, portletProviderAction);
+
+		return processPortlet(portletId);
 	}
 
 	private final boolean _customizationEnabled;

@@ -19,10 +19,9 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductTaxConfiguration;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductTaxConfigurationDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.ProductTaxConfigurationUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductTaxConfigurationResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
@@ -38,11 +37,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/product-tax-configuration.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, ProductTaxConfigurationResource.class}
 )
-@CTAware
 public class ProductTaxConfigurationResourceImpl
 	extends BaseProductTaxConfigurationResourceImpl
 	implements NestedFieldSupport {
@@ -146,10 +145,8 @@ public class ProductTaxConfigurationResourceImpl
 	@Reference
 	private CPDefinitionService _cpDefinitionService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductTaxConfigurationDTOConverter)"
-	)
-	private DTOConverter<CPDefinition, ProductTaxConfiguration>
+	@Reference
+	private ProductTaxConfigurationDTOConverter
 		_productTaxConfigurationDTOConverter;
 
 }

@@ -18,10 +18,9 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.file.install.FileInstaller;
-import com.liferay.portal.file.install.constants.FileInstallConstants;
-import com.liferay.portal.file.install.internal.Util;
-import com.liferay.portal.file.install.properties.ConfigurationProperties;
-import com.liferay.portal.file.install.properties.ConfigurationPropertiesFactory;
+import com.liferay.portal.file.install.internal.DirectoryWatcher;
+import com.liferay.portal.file.install.internal.properties.ConfigurationProperties;
+import com.liferay.portal.file.install.internal.properties.ConfigurationPropertiesFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -30,12 +29,12 @@ import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 
+import java.net.URI;
 import java.net.URL;
 
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Objects;
-import java.util.Set;
 
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.Configuration;
@@ -51,19 +50,10 @@ public class ConfigurationFileInstaller implements FileInstaller {
 
 		_configurationAdmin = configurationAdmin;
 		_encoding = encoding;
-
-		_configsDirPath = Util.getFilePath(
-			PropsValues.MODULE_FRAMEWORK_CONFIGS_DIR);
 	}
 
 	@Override
 	public boolean canTransformURL(File file) {
-		if (!Objects.equals(
-				_configsDirPath, Util.getFilePath(file.getParent()))) {
-
-			return false;
-		}
-
 		String name = file.getName();
 
 		if (name.endsWith(".config")) {
@@ -98,17 +88,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 		String[] pid = _parsePid(file.getName());
 
 		Configuration configuration = _getConfiguration(
-			file.getName(), pid[0], pid[1]);
-
-		Set<Configuration.ConfigurationAttribute> configurationAttributes =
-			configuration.getAttributes();
-
-		if (configurationAttributes.contains(
-				Configuration.ConfigurationAttribute.READ_ONLY)) {
-
-			configuration.removeAttributes(
-				Configuration.ConfigurationAttribute.READ_ONLY);
-		}
+			_toConfigKey(file), pid[0], pid[1]);
 
 		Dictionary<String, Object> properties = configuration.getProperties();
 
@@ -129,8 +109,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 		String oldFileName = null;
 
 		if (old != null) {
-			oldFileName = (String)old.remove(
-				FileInstallConstants.FELIX_FILE_INSTALL_FILENAME);
+			oldFileName = (String)old.remove(DirectoryWatcher.FILENAME);
 
 			old.remove(Constants.SERVICE_PID);
 			old.remove(ConfigurationAdmin.SERVICE_FACTORYPID);
@@ -145,17 +124,12 @@ public class ConfigurationFileInstaller implements FileInstaller {
 			}
 		}
 
-		String currentFileName = file.getName();
+		String currentFileName = _toConfigKey(file);
 
 		if (!_equals(dictionary, old) ||
-			!Objects.equals(oldFileName, currentFileName) ||
-			configurationAttributes.contains(
-				Configuration.ConfigurationAttribute.READ_ONLY) ||
-			!file.canWrite()) {
+			!Objects.equals(oldFileName, currentFileName)) {
 
-			dictionary.put(
-				FileInstallConstants.FELIX_FILE_INSTALL_FILENAME,
-				currentFileName);
+			dictionary.put(DirectoryWatcher.FILENAME, currentFileName);
 
 			String logString = StringPool.BLANK;
 
@@ -180,17 +154,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 				}
 			}
 
-			configuration.updateIfDifferent(dictionary);
-
-			if (!file.canWrite()) {
-				try {
-					configuration.addAttributes(
-						Configuration.ConfigurationAttribute.READ_ONLY);
-				}
-				catch (Throwable throwable) {
-					_log.error(throwable);
-				}
-			}
+			configuration.update(dictionary);
 		}
 
 		return null;
@@ -214,7 +178,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 		}
 
 		Configuration configuration = _getConfiguration(
-			file.getName(), pid[0], pid[1]);
+			_toConfigKey(file), pid[0], pid[1]);
 
 		configuration.delete();
 	}
@@ -262,8 +226,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			StringBundler.concat(
-				StringPool.OPEN_PARENTHESIS,
-				FileInstallConstants.FELIX_FILE_INSTALL_FILENAME,
+				StringPool.OPEN_PARENTHESIS, DirectoryWatcher.FILENAME,
 				StringPool.EQUAL, _escapeFilterValue(fileName),
 				StringPool.CLOSE_PARENTHESIS));
 
@@ -316,10 +279,17 @@ public class ConfigurationFileInstaller implements FileInstaller {
 		return new String[] {pid, null};
 	}
 
+	private String _toConfigKey(File file) {
+		file = file.getAbsoluteFile();
+
+		URI uri = file.toURI();
+
+		return uri.toString();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ConfigurationFileInstaller.class);
 
-	private final String _configsDirPath;
 	private final ConfigurationAdmin _configurationAdmin;
 	private final String _encoding;
 

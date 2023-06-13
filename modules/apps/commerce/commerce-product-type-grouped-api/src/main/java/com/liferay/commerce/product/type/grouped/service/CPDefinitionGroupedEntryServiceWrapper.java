@@ -27,10 +27,6 @@ public class CPDefinitionGroupedEntryServiceWrapper
 	implements CPDefinitionGroupedEntryService,
 			   ServiceWrapper<CPDefinitionGroupedEntryService> {
 
-	public CPDefinitionGroupedEntryServiceWrapper() {
-		this(null);
-	}
-
 	public CPDefinitionGroupedEntryServiceWrapper(
 		CPDefinitionGroupedEntryService cpDefinitionGroupedEntryService) {
 
@@ -45,21 +41,6 @@ public class CPDefinitionGroupedEntryServiceWrapper
 
 		_cpDefinitionGroupedEntryService.addCPDefinitionGroupedEntries(
 			cpDefinitionId, entryCPDefinitionIds, serviceContext);
-	}
-
-	@Override
-	public
-		com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry
-				addCPDefinitionGroupedEntry(
-					long cpDefinitionId, long entryCProductId, double priority,
-					int quantity,
-					com.liferay.portal.kernel.service.ServiceContext
-						serviceContext)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionGroupedEntryService.addCPDefinitionGroupedEntry(
-			cpDefinitionId, entryCProductId, priority, quantity,
-			serviceContext);
 	}
 
 	@Override
@@ -102,31 +83,6 @@ public class CPDefinitionGroupedEntryServiceWrapper
 
 		return _cpDefinitionGroupedEntryService.getCPDefinitionGroupedEntry(
 			cpDefinitionGroupedEntryId);
-	}
-
-	@Override
-	public java.util.List
-		<com.liferay.commerce.product.type.grouped.model.
-			CPDefinitionGroupedEntry>
-					getEntryCProductCPDefinitionGroupedEntries(
-						long entryCProductId, int start, int end,
-						com.liferay.portal.kernel.util.OrderByComparator
-							<com.liferay.commerce.product.type.grouped.model.
-								CPDefinitionGroupedEntry> orderByComparator)
-				throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionGroupedEntryService.
-			getEntryCProductCPDefinitionGroupedEntries(
-				entryCProductId, start, end, orderByComparator);
-	}
-
-	@Override
-	public int getEntryCProductCPDefinitionGroupedEntriesCount(
-			long entryCProductId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionGroupedEntryService.
-			getEntryCProductCPDefinitionGroupedEntriesCount(entryCProductId);
 	}
 
 	/**

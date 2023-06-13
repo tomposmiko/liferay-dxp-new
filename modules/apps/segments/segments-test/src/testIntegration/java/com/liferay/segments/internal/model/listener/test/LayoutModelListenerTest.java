@@ -18,14 +18,13 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.segments.constants.SegmentsEntryConstants;
@@ -54,6 +53,8 @@ public class LayoutModelListenerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		_classNameId = _classNameLocalService.getClassNameId(
+			Layout.class.getName());
 		_group = GroupTestUtil.addGroup();
 	}
 
@@ -61,23 +62,26 @@ public class LayoutModelListenerTest {
 	public void testRelatedSegmentsExperiencesAreRemovedAfterRemovingLayout()
 		throws Exception {
 
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		_segmentsExperienceLocalService.addSegmentsExperience(
-			TestPropsValues.getUserId(), _group.getGroupId(),
-			SegmentsEntryConstants.ID_DEFAULT, layout.getPlid(),
+			SegmentsEntryConstants.ID_DEFAULT, _classNameId, layout.getPlid(),
 			RandomTestUtil.randomLocaleStringMap(), true,
-			new UnicodeProperties(true),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		_layoutLocalService.deleteLayout(layout);
 
 		List<SegmentsExperience> segmentsExperiences =
 			_segmentsExperienceLocalService.getSegmentsExperiences(
-				_group.getGroupId(), layout.getPlid(), true);
+				_group.getGroupId(), _classNameId, layout.getPlid(), true);
 
 		Assert.assertTrue(segmentsExperiences.isEmpty());
 	}
+
+	private long _classNameId;
+
+	@Inject
+	private ClassNameLocalService _classNameLocalService;
 
 	@DeleteAfterTestRun
 	private Group _group;

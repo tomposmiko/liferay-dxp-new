@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.search.indexer.IndexerPermissionPostFilter;
 import com.liferay.portal.search.spi.model.result.contributor.ModelVisibilityContributor;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -32,8 +33,9 @@ public class IndexerPermissionPostFilterImpl
 	implements IndexerPermissionPostFilter {
 
 	public IndexerPermissionPostFilterImpl(
-		Supplier<ModelResourcePermission<?>> modelResourcePermissionSupplier,
-		Supplier<ModelVisibilityContributor>
+		Supplier<Optional<ModelResourcePermission<?>>>
+			modelResourcePermissionSupplier,
+		Supplier<Optional<ModelVisibilityContributor>>
 			modelVisibilityContributorSupplier) {
 
 		_modelResourcePermissionSupplier = modelResourcePermissionSupplier;
@@ -45,39 +47,36 @@ public class IndexerPermissionPostFilterImpl
 	public boolean hasPermission(
 		PermissionChecker permissionChecker, long entryClassPK) {
 
-		ModelResourcePermission<?> modelResourcePermission =
+		Optional<ModelResourcePermission<?>> optional =
 			_modelResourcePermissionSupplier.get();
 
-		if (modelResourcePermission == null) {
-			return true;
-		}
-
-		return _containsView(
-			modelResourcePermission, permissionChecker, entryClassPK);
+		return optional.map(
+			modelResourcePermission -> _containsView(
+				modelResourcePermission, permissionChecker, entryClassPK)
+		).orElse(
+			true
+		);
 	}
 
 	@Override
 	public boolean isPermissionAware() {
-		ModelResourcePermission<?> modelResourcePermission =
+		Optional<ModelResourcePermission<?>> optional =
 			_modelResourcePermissionSupplier.get();
 
-		if (modelResourcePermission != null) {
-			return true;
-		}
-
-		return false;
+		return optional.isPresent();
 	}
 
 	@Override
 	public boolean isVisible(long classPK, int status) {
-		ModelVisibilityContributor modelVisibilityContributor =
+		Optional<ModelVisibilityContributor> optional =
 			_modelVisibilityContributorSupplier.get();
 
-		if (modelVisibilityContributor == null) {
-			return true;
-		}
-
-		return modelVisibilityContributor.isVisible(classPK, status);
+		return optional.map(
+			modelVisibilityContributor -> modelVisibilityContributor.isVisible(
+				classPK, status)
+		).orElse(
+			true
+		);
 	}
 
 	private Boolean _containsView(
@@ -90,7 +89,7 @@ public class IndexerPermissionPostFilterImpl
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -100,9 +99,9 @@ public class IndexerPermissionPostFilterImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		IndexerPermissionPostFilterImpl.class);
 
-	private final Supplier<ModelResourcePermission<?>>
+	private final Supplier<Optional<ModelResourcePermission<?>>>
 		_modelResourcePermissionSupplier;
-	private final Supplier<ModelVisibilityContributor>
+	private final Supplier<Optional<ModelVisibilityContributor>>
 		_modelVisibilityContributorSupplier;
 
 }

@@ -51,7 +51,6 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.test.MockLiferayPortletContext;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.Portlet;
@@ -137,9 +136,7 @@ public class ContentDashboardAdminPortletGetPropsTest {
 
 			Map<String, Object> data = _getData(
 				_getMockLiferayPortletRenderRequest(
-					new String[] {
-						String.valueOf(assetVocabulary.getVocabularyId())
-					}));
+					new String[] {assetVocabulary.getName()}));
 
 			Map<String, Object> props = (Map<String, Object>)data.get("props");
 
@@ -167,7 +164,7 @@ public class ContentDashboardAdminPortletGetPropsTest {
 				String.valueOf(props.get("vocabularies")));
 		}
 		finally {
-			_assetVocabularyLocalService.deleteVocabulary(assetVocabulary);
+			_assetVocabularyLocalService.deleteAssetVocabulary(assetVocabulary);
 		}
 	}
 
@@ -226,8 +223,8 @@ public class ContentDashboardAdminPortletGetPropsTest {
 			Map<String, Object> data = _getData(
 				_getMockLiferayPortletRenderRequest(
 					new String[] {
-						String.valueOf(assetVocabulary.getVocabularyId()),
-						String.valueOf(childAssetVocabulary.getVocabularyId())
+						assetVocabulary.getName(),
+						childAssetVocabulary.getName()
 					}));
 
 			Map<String, Object> props = (Map<String, Object>)data.get("props");
@@ -321,8 +318,8 @@ public class ContentDashboardAdminPortletGetPropsTest {
 			Map<String, Object> data = _getData(
 				_getMockLiferayPortletRenderRequest(
 					new String[] {
-						String.valueOf(assetVocabulary.getVocabularyId()),
-						String.valueOf(childAssetVocabulary.getVocabularyId())
+						assetVocabulary.getName(),
+						childAssetVocabulary.getName()
 					}));
 
 			Map<String, Object> props = (Map<String, Object>)data.get("props");
@@ -406,8 +403,8 @@ public class ContentDashboardAdminPortletGetPropsTest {
 			Map<String, Object> data = _getData(
 				_getMockLiferayPortletRenderRequest(
 					new String[] {
-						String.valueOf(assetVocabulary.getVocabularyId()),
-						String.valueOf(childAssetVocabulary.getVocabularyId())
+						assetVocabulary.getName(),
+						childAssetVocabulary.getName()
 					}));
 
 			Map<String, Object> props = (Map<String, Object>)data.get("props");
@@ -463,8 +460,8 @@ public class ContentDashboardAdminPortletGetPropsTest {
 			Map<String, Object> data = _getData(
 				_getMockLiferayPortletRenderRequest(
 					new String[] {
-						String.valueOf(assetVocabulary.getVocabularyId()),
-						String.valueOf(childAssetVocabulary.getVocabularyId())
+						assetVocabulary.getName(),
+						childAssetVocabulary.getName()
 					}));
 
 			Map<String, Object> props = (Map<String, Object>)data.get("props");
@@ -484,8 +481,9 @@ public class ContentDashboardAdminPortletGetPropsTest {
 				String.valueOf(props.get("vocabularies")));
 		}
 		finally {
-			_assetVocabularyLocalService.deleteVocabulary(assetVocabulary);
-			_assetVocabularyLocalService.deleteVocabulary(childAssetVocabulary);
+			_assetVocabularyLocalService.deleteAssetVocabulary(assetVocabulary);
+			_assetVocabularyLocalService.deleteAssetVocabulary(
+				childAssetVocabulary);
 		}
 	}
 
@@ -533,8 +531,8 @@ public class ContentDashboardAdminPortletGetPropsTest {
 			Map<String, Object> data = _getData(
 				_getMockLiferayPortletRenderRequest(
 					new String[] {
-						String.valueOf(assetVocabulary.getVocabularyId()),
-						String.valueOf(childAssetVocabulary.getVocabularyId())
+						assetVocabulary.getName(),
+						childAssetVocabulary.getName()
 					}));
 
 			Map<String, Object> props = (Map<String, Object>)data.get("props");
@@ -592,8 +590,9 @@ public class ContentDashboardAdminPortletGetPropsTest {
 				String.valueOf(props.get("vocabularies")));
 		}
 		finally {
-			_assetVocabularyLocalService.deleteVocabulary(assetVocabulary);
-			_assetVocabularyLocalService.deleteVocabulary(childAssetVocabulary);
+			_assetVocabularyLocalService.deleteAssetVocabulary(assetVocabulary);
+			_assetVocabularyLocalService.deleteAssetVocabulary(
+				childAssetVocabulary);
 		}
 	}
 
@@ -609,13 +608,12 @@ public class ContentDashboardAdminPortletGetPropsTest {
 
 		return ReflectionTestUtil.invoke(
 			mockLiferayPortletRenderRequest.getAttribute(
-				"com.liferay.content.dashboard.web.internal.display.context." +
-					"ContentDashboardAdminDisplayContext"),
+				"CONTENT_DASHBOARD_ADMIN_DISPLAY_CONTEXT"),
 			"getData", new Class<?>[0]);
 	}
 
 	private MockLiferayPortletRenderRequest _getMockLiferayPortletRenderRequest(
-			String[] assetVocabularyIds)
+			String[] assetVocabularyNames)
 		throws Exception {
 
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
@@ -623,6 +621,7 @@ public class ContentDashboardAdminPortletGetPropsTest {
 
 		mockLiferayPortletRenderRequest.setAttribute(
 			WebKeys.COMPANY_ID, _company.getCompanyId());
+
 		mockLiferayPortletRenderRequest.setAttribute(
 			StringBundler.concat(
 				mockLiferayPortletRenderRequest.getPortletName(), "-",
@@ -632,6 +631,7 @@ public class ContentDashboardAdminPortletGetPropsTest {
 		String path = "/view.jsp";
 
 		mockLiferayPortletRenderRequest.setParameter("mvcPath", path);
+
 		mockLiferayPortletRenderRequest.setAttribute(
 			MVCRenderConstants.
 				PORTLET_CONTEXT_OVERRIDE_REQUEST_ATTIBUTE_NAME_PREFIX + path,
@@ -643,7 +643,8 @@ public class ContentDashboardAdminPortletGetPropsTest {
 		PortletPreferences portletPreferences =
 			mockLiferayPortletRenderRequest.getPreferences();
 
-		portletPreferences.setValues("assetVocabularyIds", assetVocabularyIds);
+		portletPreferences.setValues(
+			"assetVocabularyNames", assetVocabularyNames);
 
 		return mockLiferayPortletRenderRequest;
 	}
@@ -652,15 +653,10 @@ public class ContentDashboardAdminPortletGetPropsTest {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		themeDisplay.setCompany(_company);
-
-		Locale locale = LocaleUtil.getSiteDefault();
-
-		themeDisplay.setLanguageId(LocaleUtil.toLanguageId(locale));
-		themeDisplay.setLocale(locale);
-
+		themeDisplay.setLocale(LocaleUtil.getSiteDefault());
 		themeDisplay.setPermissionChecker(
 			PermissionThreadLocal.getPermissionChecker());
-		themeDisplay.setUser(_company.getGuestUser());
+		themeDisplay.setUser(_company.getDefaultUser());
 
 		return themeDisplay;
 	}

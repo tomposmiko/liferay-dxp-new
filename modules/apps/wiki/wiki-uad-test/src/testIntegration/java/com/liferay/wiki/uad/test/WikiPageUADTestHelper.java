@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author William Newbury
  */
-@Component(service = WikiPageUADTestHelper.class)
+@Component(immediate = true, service = WikiPageUADTestHelper.class)
 public class WikiPageUADTestHelper {
 
 	public WikiPage addWikiPage(long userId) throws Exception {
@@ -59,10 +59,13 @@ public class WikiPageUADTestHelper {
 
 		WikiPage wikiPage = addWikiPage(userId);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
+
 		return _wikiPageLocalService.updateStatus(
 			statusByUserId, wikiPage, WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId()),
+			serviceContext,
 			HashMapBuilder.<String, Serializable>put(
 				WorkflowConstants.CONTEXT_URL, "http://localhost"
 			).build());

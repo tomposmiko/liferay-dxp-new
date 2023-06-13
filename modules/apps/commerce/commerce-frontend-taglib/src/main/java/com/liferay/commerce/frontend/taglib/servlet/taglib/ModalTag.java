@@ -110,7 +110,7 @@ public class ModalTag extends IncludeTag {
 				(ThemeDisplay)httpServletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
 
-			_spritemap = themeDisplay.getPathThemeSpritemap();
+			_spritemap = themeDisplay.getPathThemeImages() + "/clay/icons.svg";
 		}
 
 		httpServletRequest.setAttribute("liferay-commerce:modal:id", _id);

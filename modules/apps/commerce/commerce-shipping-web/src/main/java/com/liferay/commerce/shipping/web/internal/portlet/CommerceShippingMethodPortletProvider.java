@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "model.class.name=com.liferay.commerce.model.CommerceShippingMethod",
 	service = EditPortletProvider.class
 )

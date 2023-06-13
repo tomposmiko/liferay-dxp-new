@@ -1,18 +1,17 @@
 Bundle-Name: Liferay Dynamic Data Mapping Service
 Bundle-SymbolicName: com.liferay.dynamic.data.mapping.service
-Bundle-Version: 7.1.1
+Bundle-Version: 6.0.32
 Export-Package: com.liferay.dynamic.data.mapping.service.http
 Import-Package:\
 	!com.fasterxml.jackson.*,\
 	\
 	!com.google.gson.*,\
 	\
-	!com.graphbuilder.*,\
-	\
 	!org.apache.tapestry5.json.*,\
-	!org.apache.tools.ant.*,\
 	\
 	com.github.*;resolution:=optional,\
+	\
+	com.graphbuilder.*;resolution:=optional,\
 	\
 	com.microsoft.schemas.office.powerpoint.*;resolution:=optional,\
 	com.microsoft.schemas.office.word.*;resolution:=optional,\
@@ -36,6 +35,6 @@ Import-Package:\
 	org.tukaani.*;resolution:=optional,\
 	\
 	*
-Liferay-Require-SchemaVersion: 5.3.0
+Liferay-Require-SchemaVersion: 5.1.0
 Liferay-Service: true
 -dsannotations-options: inherit

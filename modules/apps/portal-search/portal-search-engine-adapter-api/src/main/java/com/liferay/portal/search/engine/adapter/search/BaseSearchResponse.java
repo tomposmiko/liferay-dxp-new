@@ -55,10 +55,6 @@ public abstract class BaseSearchResponse implements SearchResponse {
 		return _executionTime;
 	}
 
-	public String getPointInTimeId() {
-		return _pointInTimeId;
-	}
-
 	public String getSearchRequestString() {
 		return _searchRequestString;
 	}
@@ -95,14 +91,6 @@ public abstract class BaseSearchResponse implements SearchResponse {
 		_executionTime = executionTime;
 	}
 
-	public void setPointInTimeId(String pointInTimeId) {
-		_pointInTimeId = pointInTimeId;
-	}
-
-	public void setScrollId(String scrollId) {
-		_scrollId = scrollId;
-	}
-
 	public void setSearchRequestString(String searchRequestString) {
 		_searchRequestString = searchRequestString;
 	}
@@ -128,8 +116,6 @@ public abstract class BaseSearchResponse implements SearchResponse {
 	private long _count;
 	private Map<String, String> _executionProfile;
 	private long _executionTime;
-	private String _pointInTimeId;
-	private String _scrollId;
 	private String _searchRequestString;
 	private String _searchResponseString;
 	private SearchTimeValue _searchTimeValue;

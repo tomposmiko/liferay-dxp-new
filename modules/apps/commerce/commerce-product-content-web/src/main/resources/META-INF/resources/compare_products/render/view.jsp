@@ -31,16 +31,16 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 %>
 
 <c:if test="<%= !cpCatalogEntries.isEmpty() %>">
-	<table class="products-comparison-table table table-autofit table-bordered table-list table-nowrap entries-<%= cpCatalogEntries.size() %>">
+	<table class="commerce-compare-table entry--<%= cpCatalogEntries.size() %>">
 		<thead>
-			<tr>
+			<tr class="commerce-compare-table__card-row">
 				<td></td>
 
 				<%
 				for (CPCatalogEntry cpCatalogEntry : cpCatalogEntries) {
 				%>
 
-					<td class="table-cell-expand">
+					<td class="commerce-compare-table__card">
 						<liferay-commerce-product:product-list-entry-renderer
 							CPCatalogEntry="<%= cpCatalogEntry %>"
 						/>
@@ -55,9 +55,9 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 
 		<tbody>
 			<c:if test="<%= !cpDefinitionOptionRelTitles.isEmpty() %>">
-				<tr>
+				<tr class="commerce-compare-table__separator">
 					<td colspan="<%= cpCatalogEntries.size() + 1 %>">
-						<liferay-ui:message key="options" />
+						<span class="commerce-compare-table__title"><liferay-ui:message key="options" /></span>
 					</td>
 				</tr>
 
@@ -65,8 +65,8 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 				for (String cpDefinitionOptionRelTitle : cpDefinitionOptionRelTitles) {
 				%>
 
-					<tr>
-						<td>
+					<tr class="commerce-compare-table__common-row">
+						<td class="commerce-compare-table__title">
 							<%= HtmlUtil.escape(cpDefinitionOptionRelTitle) %>
 						</td>
 
@@ -74,7 +74,7 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 						for (CPCatalogEntry cpCatalogEntry : cpCatalogEntries) {
 						%>
 
-							<td class="table-cell-expand">
+							<td class="commerce-compare-table__value">
 								<%= HtmlUtil.escape(cpCompareContentHelper.getCPDefinitionOptionValueRels(cpCatalogEntry, cpDefinitionOptionRelTitle, locale)) %>
 							</td>
 
@@ -91,9 +91,11 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 			</c:if>
 
 			<c:if test="<%= !cpSpecificationOptions.isEmpty() %>">
-				<tr class="table-divider">
+				<tr class="commerce-compare-table__separator">
 					<td colspan="<%= cpCatalogEntries.size() + 1 %>">
-						<liferay-ui:message key="specifications" />
+						<span class="commerce-compare-table__title">
+							<liferay-ui:message key="specifications" />
+						</span>
 					</td>
 				</tr>
 
@@ -101,8 +103,8 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 				for (CPSpecificationOption cpSpecificationOption : cpSpecificationOptions) {
 				%>
 
-					<tr>
-						<td>
+					<tr class="commerce-compare-table__common-row">
+						<td class="commerce-compare-table__title">
 							<%= HtmlUtil.escape(cpSpecificationOption.getTitle(languageId)) %>
 						</td>
 
@@ -110,7 +112,7 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 						for (CPCatalogEntry cpCatalogEntry : cpCatalogEntries) {
 						%>
 
-							<td class="table-cell-expand">
+							<td class="commerce-compare-table__value">
 								<%= HtmlUtil.escape(cpCompareContentHelper.getCPDefinitionSpecificationOptionValue(cpCatalogEntry.getCPDefinitionId(), cpSpecificationOption.getCPSpecificationOptionId(), locale)) %>
 							</td>
 
@@ -131,9 +133,11 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 			%>
 
 				<c:if test="<%= cpCompareContentHelper.hasCategorizedCPDefinitionSpecificationOptionValues(cpDataSourceResult, cpOptionCategory.getCPOptionCategoryId()) %>">
-					<tr class="table-divider">
+					<tr class="commerce-compare-table__separator">
 						<td colspan="<%= cpCatalogEntries.size() + 1 %>">
-							<%= HtmlUtil.escape(cpOptionCategory.getTitle(languageId)) %>
+							<span class="commerce-compare-table__title">
+								<%= HtmlUtil.escape(cpOptionCategory.getTitle(languageId)) %>
+							</span>
 						</td>
 					</tr>
 
@@ -144,8 +148,8 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 						}
 					%>
 
-						<tr>
-							<td>
+						<tr class="commerce-compare-table__common-row">
+							<td class="commerce-compare-table__title">
 								<%= HtmlUtil.escape(cpSpecificationOption.getTitle(languageId)) %>
 							</td>
 
@@ -153,7 +157,7 @@ List<CPOptionCategory> cpOptionCategories = cpCompareContentHelper.getCPOptionCa
 							for (CPCatalogEntry cpCatalogEntry : cpCatalogEntries) {
 							%>
 
-								<td class="table-cell-expand">
+								<td class="commerce-compare-table__value">
 									<%= HtmlUtil.escape(cpCompareContentHelper.getCPDefinitionSpecificationOptionValue(cpCatalogEntry.getCPDefinitionId(), cpSpecificationOption.getCPSpecificationOptionId(), locale)) %>
 								</td>
 

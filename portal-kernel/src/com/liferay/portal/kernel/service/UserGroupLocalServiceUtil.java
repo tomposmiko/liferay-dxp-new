@@ -62,16 +62,6 @@ public class UserGroupLocalServiceUtil {
 		getService().addGroupUserGroups(groupId, userGroupIds);
 	}
 
-	public static UserGroup addOrUpdateUserGroup(
-			String externalReferenceCode, long userId, long companyId,
-			String name, String description, ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addOrUpdateUserGroup(
-			externalReferenceCode, userId, companyId, name, description,
-			serviceContext);
-	}
-
 	public static void addTeamUserGroup(long teamId, long userGroupId) {
 		getService().addTeamUserGroup(teamId, userGroupId);
 	}
@@ -132,40 +122,21 @@ public class UserGroupLocalServiceUtil {
 		return getService().addUserGroup(userGroup);
 	}
 
-	/**
-	 * @throws PortalException
-	 */
-	public static void addUserUserGroup(long userId, long userGroupId)
-		throws PortalException {
-
+	public static void addUserUserGroup(long userId, long userGroupId) {
 		getService().addUserUserGroup(userId, userGroupId);
 	}
 
-	/**
-	 * @throws PortalException
-	 */
-	public static void addUserUserGroup(long userId, UserGroup userGroup)
-		throws PortalException {
-
+	public static void addUserUserGroup(long userId, UserGroup userGroup) {
 		getService().addUserUserGroup(userId, userGroup);
 	}
 
-	/**
-	 * @throws PortalException
-	 */
 	public static void addUserUserGroups(
-			long userId, List<UserGroup> userGroups)
-		throws PortalException {
+		long userId, List<UserGroup> userGroups) {
 
 		getService().addUserUserGroups(userId, userGroups);
 	}
 
-	/**
-	 * @throws PortalException
-	 */
-	public static void addUserUserGroups(long userId, long[] userGroupIds)
-		throws PortalException {
-
+	public static void addUserUserGroups(long userId, long[] userGroupIds) {
 		getService().addUserUserGroups(userId, userGroupIds);
 	}
 
@@ -398,11 +369,29 @@ public class UserGroupLocalServiceUtil {
 		return getService().fetchUserGroup(companyId, name);
 	}
 
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
+	 */
 	public static UserGroup fetchUserGroupByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchUserGroupByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserGroupByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static UserGroup fetchUserGroupByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchUserGroupByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -554,12 +543,20 @@ public class UserGroupLocalServiceUtil {
 		return getService().getUserGroup(companyId, name);
 	}
 
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group
+	 * @throws PortalException if a matching user group could not be found
+	 */
 	public static UserGroup getUserGroupByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getUserGroupByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -606,14 +603,6 @@ public class UserGroupLocalServiceUtil {
 		long companyId, String name, int start, int end) {
 
 		return getService().getUserGroups(companyId, name, start, end);
-	}
-
-	public static List<UserGroup> getUserGroups(
-		long companyId, String name, int start, int end,
-		OrderByComparator<UserGroup> orderByComparator) {
-
-		return getService().getUserGroups(
-			companyId, name, start, end, orderByComparator);
 	}
 
 	/**
@@ -951,14 +940,6 @@ public class UserGroupLocalServiceUtil {
 	 */
 	public static void unsetTeamUserGroups(long teamId, long[] userGroupIds) {
 		getService().unsetTeamUserGroups(teamId, userGroupIds);
-	}
-
-	public static UserGroup updateExternalReferenceCode(
-			UserGroup userGroup, String externalReferenceCode)
-		throws PortalException {
-
-		return getService().updateExternalReferenceCode(
-			userGroup, externalReferenceCode);
 	}
 
 	/**

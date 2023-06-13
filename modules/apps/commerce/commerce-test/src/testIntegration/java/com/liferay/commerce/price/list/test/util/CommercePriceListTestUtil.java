@@ -66,7 +66,7 @@ public class CommercePriceListTestUtil {
 			CommerceCurrencyTestUtil.addCommerceCurrency(
 				serviceContext.getCompanyId());
 
-		User user = UserLocalServiceUtil.getGuestUser(
+		User user = UserLocalServiceUtil.getDefaultUser(
 			serviceContext.getCompanyId());
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(user.getTimeZone());
@@ -98,7 +98,7 @@ public class CommercePriceListTestUtil {
 			CommerceCurrencyTestUtil.addCommerceCurrency(
 				serviceContext.getCompanyId());
 
-		User user = UserLocalServiceUtil.getGuestUser(
+		User user = UserLocalServiceUtil.getDefaultUser(
 			serviceContext.getCompanyId());
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(user.getTimeZone());
@@ -128,7 +128,7 @@ public class CommercePriceListTestUtil {
 			CommerceCurrencyTestUtil.addCommerceCurrency(
 				serviceContext.getCompanyId());
 
-		User user = UserLocalServiceUtil.getGuestUser(
+		User user = UserLocalServiceUtil.getDefaultUser(
 			serviceContext.getCompanyId());
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(user.getTimeZone());
@@ -158,7 +158,7 @@ public class CommercePriceListTestUtil {
 			CommerceCurrencyTestUtil.addCommerceCurrency(
 				serviceContext.getCompanyId());
 
-		User user = UserLocalServiceUtil.getGuestUser(
+		User user = UserLocalServiceUtil.getDefaultUser(
 			serviceContext.getCompanyId());
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(user.getTimeZone());

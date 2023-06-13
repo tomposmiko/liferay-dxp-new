@@ -34,7 +34,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = ProductInteractionCommerceMLRecommendationManager.class)
+@Component(
+	enabled = false, immediate = true,
+	service = ProductInteractionCommerceMLRecommendationManager.class
+)
 public class ProductInteractionCommerceMLRecommendationManagerImpl
 	extends BaseCommerceMLRecommendationServiceImpl
 		<ProductInteractionCommerceMLRecommendation>

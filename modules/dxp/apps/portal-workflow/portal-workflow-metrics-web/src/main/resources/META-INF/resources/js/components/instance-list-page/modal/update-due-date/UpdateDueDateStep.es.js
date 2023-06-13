@@ -11,7 +11,6 @@
 
 import {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
-import ClayList from '@clayui/list';
 import ClayModal from '@clayui/modal';
 import getCN from 'classnames';
 import React, {useContext, useEffect, useRef, useState} from 'react';
@@ -58,13 +57,15 @@ const getTimeOptions = (isAmPm) => {
 };
 
 function UpdateDueDateStep({className, dueDate = new Date()}) {
-	const {isAmPm, timeFormat} = useContext(AppContext);
+	const {isAmPm} = useContext(AppContext);
 	const {setUpdateDueDate, updateDueDate} = useContext(ModalContext);
 
 	const dateFormat = getLocaleDateFormat();
+	const timeFormat = getLocaleDateFormat('LT');
 
 	const dateMask = getMaskByDateFormat(dateFormat);
 
+	const [invalidDate, setInvalidDate] = useState(false);
 	const [comment, setComment] = useState('');
 	const [date, setDate] = useState(
 		formatDate(dueDate, dateFormat, defaultDateFormat)
@@ -72,30 +73,12 @@ function UpdateDueDateStep({className, dueDate = new Date()}) {
 	const [time, setTime] = useState(
 		toUppercase(formatDate(dueDate, timeFormat, defaultDateFormat))
 	);
-	const [validDate, setValidDate] = useState(true);
-	const [validTime, setValidTime] = useState(true);
 
 	useEffect(() => {
 		let newDueDate = null;
-
 		const validDate = isValidDate(date, dateFormat);
 
-		let validTime = false;
-
-		if (time) {
-			if (isAmPm) {
-				if (time.includes('AM') || time.includes('PM')) {
-					validTime = true;
-				}
-			}
-			else {
-				if (!time.includes('AM') && !time.includes('PM')) {
-					validTime = true;
-				}
-			}
-		}
-
-		if (date && validDate && validTime) {
+		if (validDate && isValidDate(time, timeFormat)) {
 			const newDateTime = formatDate(
 				`${date} ${time}`,
 				defaultDateFormat,
@@ -107,10 +90,8 @@ function UpdateDueDateStep({className, dueDate = new Date()}) {
 				: null;
 		}
 
-		setValidDate(validDate);
-		setValidTime(validTime);
+		setInvalidDate(!validDate);
 		setUpdateDueDate({...updateDueDate, dueDate: newDueDate});
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [date, time]);
 
@@ -124,12 +105,11 @@ function UpdateDueDateStep({className, dueDate = new Date()}) {
 				<div className="form-group-autofit">
 					<div
 						className={`form-group-item ${
-							!validDate && 'has-error'
+							invalidDate && 'has-error'
 						}`}
 					>
 						<label htmlFor="dateInput">
-							{Liferay.Language.get('new-due-date') + ' '}
-
+							{Liferay.Language.get('new-due-date')}{' '}
 							<span className="reference-mark">
 								<ClayIcon symbol="asterisk" />
 							</span>
@@ -139,17 +119,15 @@ function UpdateDueDateStep({className, dueDate = new Date()}) {
 							className="form-control"
 							mask={dateMask}
 							onChange={({target}) => setDate(target.value)}
-							placeholder={Liferay.Language.get(
-								'mm-dd-yyyy'
-							).replace(/[()]/g, '')}
+							placeholder={dateFormat}
 							value={date}
 						/>
 					</div>
 
 					<UpdateDueDateStep.TimePickerInput
+						format={timeFormat}
 						isAmPm={isAmPm}
 						setValue={setTime}
-						validTime={validTime}
 						value={time}
 					/>
 				</div>
@@ -170,15 +148,20 @@ function UpdateDueDateStep({className, dueDate = new Date()}) {
 	);
 }
 
-function TimePickerInputWithOptions({isAmPm, setValue, validTime, value}) {
+function TimePickerInputWithOptions({format, isAmPm, setValue, value}) {
+	const [invalidTime, setInvalidTime] = useState(false);
 	const [showOptions, setShowOptions] = useState(false);
 	const inputRef = useRef();
 	const options = getTimeOptions(isAmPm);
 
+	useEffect(() => {
+		setInvalidTime(!isValidDate(value, format));
+	}, [format, value]);
+
 	return (
 		<div
 			className={`form-group-item form-group-item-label-spacer ${
-				!validTime ? 'has-error' : ''
+				invalidTime ? 'has-error' : ''
 			}`}
 		>
 			<ClayInput
@@ -200,16 +183,15 @@ function TimePickerInputWithOptions({isAmPm, setValue, validTime, value}) {
 					}}
 				>
 					<div className="arrow"></div>
-
 					<div className="inline-scroller">
 						<div className="popover-body">
 							{options.map((option, index) => (
-								<ClayList.Item
+								<li
 									key={index}
 									onMouseDown={() => setValue(option)}
 								>
 									{option}
-								</ClayList.Item>
+								</li>
 							))}
 						</div>
 					</div>

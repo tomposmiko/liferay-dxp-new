@@ -37,7 +37,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = PushNotificationMessagingConfigurator.class)
+@Component(
+	immediate = true, service = PushNotificationMessagingConfigurator.class
+)
 public class PushNotificationMessagingConfigurator {
 
 	@Activate
@@ -49,7 +51,7 @@ public class PushNotificationMessagingConfigurator {
 				DestinationConfiguration.DESTINATION_TYPE_SERIAL,
 				PushNotificationsDestinationNames.PUSH_NOTIFICATION);
 
-		Destination pushNotificationDestination = _registerDestination(
+		Destination pushNotificationDestination = registerDestination(
 			pushNotificationDestinationConfiguration);
 
 		MessageListener pushNotificationsMessageListener =
@@ -65,7 +67,7 @@ public class PushNotificationMessagingConfigurator {
 					PushNotificationsDestinationNames.
 						PUSH_NOTIFICATION_RESPONSE);
 
-		Destination pushNotificationResponseDestination = _registerDestination(
+		Destination pushNotificationResponseDestination = registerDestination(
 			pushNotificationResponseDestinationConfiguration);
 
 		MessageListener pushNotificationsResponseMessageListener =
@@ -95,7 +97,7 @@ public class PushNotificationMessagingConfigurator {
 		_bundleContext = null;
 	}
 
-	private Destination _registerDestination(
+	protected Destination registerDestination(
 		DestinationConfiguration destinationConfiguration) {
 
 		Destination destination = _destinationFactory.createDestination(

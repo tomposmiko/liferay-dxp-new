@@ -46,15 +46,15 @@ import com.liferay.search.experiences.service.SXPElementServiceUtil;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see SXPElementServiceSoap
  * @generated
  */
 public class SXPElementServiceHttp {
 
 	public static com.liferay.search.experiences.model.SXPElement addSXPElement(
-			HttpPrincipal httpPrincipal, String externalReferenceCode,
+			HttpPrincipal httpPrincipal,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			String elementDefinitionJSON, boolean readOnly,
-			String schemaVersion,
 			java.util.Map<java.util.Locale, String> titleMap, int type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -65,9 +65,8 @@ public class SXPElementServiceHttp {
 				_addSXPElementParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, descriptionMap,
-				elementDefinitionJSON, readOnly, schemaVersion, titleMap, type,
-				serviceContext);
+				methodKey, descriptionMap, elementDefinitionJSON, readOnly,
+				titleMap, type, serviceContext);
 
 			Object returnObj = null;
 
@@ -181,8 +180,7 @@ public class SXPElementServiceHttp {
 			updateSXPElement(
 				HttpPrincipal httpPrincipal, long sxpElementId,
 				java.util.Map<java.util.Locale, String> descriptionMap,
-				String elementDefinitionJSON, String schemaVersion,
-				boolean hidden,
+				String elementDefinitionJSON, boolean hidden,
 				java.util.Map<java.util.Locale, String> titleMap,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -194,7 +192,7 @@ public class SXPElementServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, sxpElementId, descriptionMap, elementDefinitionJSON,
-				schemaVersion, hidden, titleMap, serviceContext);
+				hidden, titleMap, serviceContext);
 
 			Object returnObj = null;
 
@@ -229,8 +227,8 @@ public class SXPElementServiceHttp {
 
 	private static final Class<?>[] _addSXPElementParameterTypes0 =
 		new Class[] {
-			String.class, java.util.Map.class, String.class, boolean.class,
-			String.class, java.util.Map.class, int.class,
+			java.util.Map.class, String.class, boolean.class,
+			java.util.Map.class, int.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _deleteSXPElementParameterTypes1 =
@@ -239,8 +237,8 @@ public class SXPElementServiceHttp {
 		new Class[] {long.class};
 	private static final Class<?>[] _updateSXPElementParameterTypes3 =
 		new Class[] {
-			long.class, java.util.Map.class, String.class, String.class,
-			boolean.class, java.util.Map.class,
+			long.class, java.util.Map.class, String.class, boolean.class,
+			java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 

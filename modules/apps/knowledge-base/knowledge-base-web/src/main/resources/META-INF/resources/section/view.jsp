@@ -17,7 +17,7 @@
 <%@ include file="/section/init.jsp" %>
 
 <%
-KBArticleURLHelper kbArticleURLHelper = new KBArticleURLHelper(renderRequest, renderResponse);
+KBArticleURLHelper kbArticleURLHelper = new KBArticleURLHelper(renderRequest, renderResponse, templatePath);
 
 String[] kbArticlesSections = kbSectionPortletInstanceConfiguration.kbArticlesSections();
 String kbArticleDisplayStyle = kbSectionPortletInstanceConfiguration.kbArticleDisplayStyle();
@@ -26,7 +26,7 @@ String kbArticleDisplayStyle = kbSectionPortletInstanceConfiguration.kbArticleDi
 <c:choose>
 	<c:when test="<%= ArrayUtil.isNotEmpty(kbSectionPortletInstanceConfiguration.adminKBArticleSections()) %>">
 		<liferay-portlet:renderURL varImpl="iteratorURL">
-			<portlet:param name="mvcRenderCommandName" value="/knowledge_base/view" />
+			<portlet:param name="mvcPath" value="/section/view.jsp" />
 		</liferay-portlet:renderURL>
 
 		<%
@@ -94,7 +94,7 @@ String kbArticleDisplayStyle = kbSectionPortletInstanceConfiguration.kbArticleDi
 									<%= HtmlUtil.escape(kbArticle.getDescription()) %>
 								</c:when>
 								<c:when test='<%= kbArticleDisplayStyle.equals("abstract") %>'>
-									<%= StringUtil.shorten(HtmlParserUtil.extractText(kbArticle.getContent()), 500) %>
+									<%= StringUtil.shorten(HtmlUtil.extractText(kbArticle.getContent()), 500) %>
 								</c:when>
 							</c:choose>
 						</div>
@@ -122,7 +122,7 @@ String kbArticleDisplayStyle = kbSectionPortletInstanceConfiguration.kbArticleDi
 		%>
 
 		<div class="alert alert-info">
-			<liferay-ui:message key="please-configure-the-list-of-available-sections-in-system-settings-knowledge-base-knowledge-base-section-to-enable-this-widget" />
+			<%= LanguageUtil.get(resourceBundle, "please-configure-the-list-of-available-sections-in-system-settings-knowledge-base-knowledge-base-section-to-enable-this-widget") %>
 		</div>
 	</c:otherwise>
 </c:choose>

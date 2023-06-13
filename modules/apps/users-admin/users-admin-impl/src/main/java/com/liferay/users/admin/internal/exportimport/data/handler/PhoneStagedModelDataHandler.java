@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Mendez Gonzalez
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class PhoneStagedModelDataHandler
 	extends BaseStagedModelDataHandler<Phone> {
 
@@ -105,22 +105,29 @@ public class PhoneStagedModelDataHandler
 
 			importedPhone = _phoneLocalService.addPhone(
 				userId, phone.getClassName(), phone.getClassPK(),
-				phone.getNumber(), phone.getExtension(), phone.getListTypeId(),
+				phone.getNumber(), phone.getExtension(), phone.getTypeId(),
 				phone.isPrimary(), serviceContext);
 		}
 		else {
 			importedPhone = _phoneLocalService.updatePhone(
 				existingPhone.getPhoneId(), phone.getNumber(),
-				phone.getExtension(), phone.getListTypeId(), phone.isPrimary());
+				phone.getExtension(), phone.getTypeId(), phone.isPrimary());
 		}
 
 		portletDataContext.importClassedModel(phone, importedPhone);
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPhoneLocalService(PhoneLocalService phoneLocalService) {
+		_phoneLocalService = phoneLocalService;
+	}
+
+	private GroupLocalService _groupLocalService;
 	private PhoneLocalService _phoneLocalService;
 
 }

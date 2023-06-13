@@ -9,73 +9,26 @@ definition {
 
 		Select(
 			locator1 = "Configuration#SELECTION_METHOD_SELECT",
-			value1 = ${selectionMethod});
+			value1 = "${selectionMethod}");
 
 		PortletEntry.save();
 
 		SelectFrame(value1 = "relative=top");
 	}
 
-	macro selectDisplayStyle {
-		Portlet.gotoPortletOptions(portletOption = "Configuration");
-
-		BlogsConfiguration.selectConfigurationIFrame();
-
-		Select(
-			locator1 = "Select#DISPLAY_STYLE",
-			value1 = ${displayStyle});
-
-		IFrame.saveConfiguration();
-	}
-
-	macro selectOrganization {
-		Portlet.gotoPortletOptions(
-			portletName = "Blogs Aggregator",
-			portletOption = "Configuration");
-
-		SelectFrame(locator1 = "IFrame#CONFIGURATION");
-
-		AssertClick(
-			locator1 = "Button#SELECT",
-			value1 = "Select");
-
-		SelectFrame.selectSecondFrame(locator1 = "IFrame#MODAL_BODY");
-
-		Click(
-			key_roleTitle = ${organizationName},
-			locator1 = "UsersAndOrganizationsEditUser#ROLES_REGULAR_SELECT_CHOOSE_BUTTON");
-
-		SelectFrame(value1 = "relative=top");
-
-		SelectFrame(locator1 = "IFrame#CONFIGURATION");
-
-		IFrame.saveConfiguration();
-	}
-
 	macro viewBlogsEntryViaBAPortletPG {
-		AssertTextEquals(
-			key_entryTitle = ${entryTitle},
-			locator1 = "BlogsAggregator#ENTRY_TITLE",
-			value1 = ${entryTitle});
+		for (var entryTitle : list "${viewEntryTitle}") {
+			var key_entryTitle = "${entryTitle}";
 
-		if (isSet(entryContent)) {
-			AssertTextEquals.assertPartialText(
-				key_entryContent = ${entryContent},
-				locator1 = "BlogsAggregator#ENTRY_CONTENT",
-				value1 = ${entryContent});
-		}
-
-		if (isSet(entryQuoteContent)) {
-			AssertTextEquals.assertPartialText(
-				key_entryContent = ${entryQuoteContent},
-				locator1 = "BlogsAggregator#ENTRY_QUOTE_CONTENT",
-				value1 = ${entryQuoteContent});
+			AssertTextEquals(
+				locator1 = "BlogsAggregator#ENTRY_TITLE",
+				value1 = "${entryTitle}");
 		}
 	}
 
 	macro viewParentOrganizationPG {
 		Portlet.gotoPortletOptions(
-			portletName = ${portletName},
+			portletName = "${portletName}",
 			portletOption = "Configuration");
 
 		SelectFrame(locator1 = "IFrame#CONFIGURATION");
@@ -86,15 +39,15 @@ definition {
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
-		var key_orgName = ${orgName};
+		var key_orgName = "${orgName}";
 
 		AssertTextEquals(
 			locator1 = "ContentRow#ORGANIZATION_TABLE_NAME",
-			value1 = ${orgName});
+			value1 = "${orgName}");
 
 		AssertTextEquals(
 			locator1 = "ContentRow#ORGANIZATION_TABLE_NAME_SECOND_COLUMN",
-			value1 = ${parentOrgName});
+			value1 = "${parentOrgName}");
 
 		SelectFrame(value1 = "relative=top");
 	}

@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael Bradford
  */
-@Component(service = PortalWebResources.class)
+@Component(immediate = true, service = PortalWebResources.class)
 public class CKEditorPortalWebResources implements PortalWebResources {
 
 	@Override
@@ -56,11 +56,15 @@ public class CKEditorPortalWebResources implements PortalWebResources {
 		_bundle = bundleContext.getBundle();
 	}
 
-	private Bundle _bundle;
-
 	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.frontend.editor.ckeditor.web)"
+		target = "(osgi.web.symbolicname=com.liferay.frontend.editor.ckeditor.web)",
+		unbind = "-"
 	)
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	private Bundle _bundle;
 	private ServletContext _servletContext;
 
 }

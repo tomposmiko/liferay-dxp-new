@@ -14,24 +14,16 @@
 
 package com.liferay.portal.tools.jspc.common;
 
-import java.io.IOException;
+import java.io.File;
 
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-
-import java.util.EnumSet;
+import org.apache.tools.ant.DirectoryScanner;
 
 /**
  * @author Minhchau Dang
  */
 public class TimestampUpdater {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		if (args.length == 1) {
 			new TimestampUpdater(args[0]);
 		}
@@ -40,35 +32,28 @@ public class TimestampUpdater {
 		}
 	}
 
-	public TimestampUpdater(String classDirName) throws IOException {
-		Files.walkFileTree(
-			Paths.get(classDirName), EnumSet.of(FileVisitOption.FOLLOW_LINKS),
-			Integer.MAX_VALUE,
-			new SimpleFileVisitor<Path>() {
+	public TimestampUpdater(String classDirName) {
+		DirectoryScanner directoryScanner = new DirectoryScanner();
 
-				@Override
-				public FileVisitResult visitFile(
-						Path filePath, BasicFileAttributes basicFileAttributes)
-					throws IOException {
+		directoryScanner.setBasedir(classDirName);
+		directoryScanner.setIncludes(new String[] {"**\\*.java"});
 
-					String fileName = String.valueOf(filePath.getFileName());
+		directoryScanner.scan();
 
-					if (fileName.endsWith(".java")) {
-						String fileNameWithoutExtension = fileName.substring(
-							0, fileName.length() - 5);
+		String[] fileNames = directoryScanner.getIncludedFiles();
 
-						Path classFilePath = filePath.resolveSibling(
-							fileNameWithoutExtension.concat(".class"));
+		for (String fileName : fileNames) {
+			File javaFile = new File(classDirName, fileName);
 
-						Files.setLastModifiedTime(
-							classFilePath,
-							basicFileAttributes.lastModifiedTime());
-					}
+			String fileNameWithoutExtension = fileName.substring(
+				0, fileName.length() - 5);
 
-					return FileVisitResult.CONTINUE;
-				}
+			String classFileName = fileNameWithoutExtension.concat(".class");
 
-			});
+			File classFile = new File(classDirName, classFileName);
+
+			classFile.setLastModified(javaFile.lastModified());
+		}
 	}
 
 }

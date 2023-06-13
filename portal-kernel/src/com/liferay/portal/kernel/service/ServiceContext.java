@@ -388,7 +388,7 @@ public class ServiceContext implements Cloneable, Serializable {
 		long companyId = getCompanyId();
 
 		if (companyId > 0) {
-			return UserLocalServiceUtil.getGuestUserId(getCompanyId());
+			return UserLocalServiceUtil.getDefaultUserId(getCompanyId());
 		}
 
 		return 0;

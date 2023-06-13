@@ -16,6 +16,7 @@ package com.liferay.users.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -25,9 +26,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.SortFactoryUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -198,8 +200,14 @@ public class SelectOrganizationManagementToolbarDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		long parentOrganizationId =
+			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID;
+
 		OrganizationSearchTerms organizationSearchTerms =
 			(OrganizationSearchTerms)organizationSearch.getSearchTerms();
+
+		List<Organization> results;
+		int total;
 
 		Indexer<?> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 			Organization.class);
@@ -210,37 +218,40 @@ public class SelectOrganizationManagementToolbarDisplayContext {
 			organizationParams.put(
 				"expandoAttributes", organizationSearchTerms.getKeywords());
 
-			organizationSearch.setResultsAndTotal(
+			Sort sort = SortFactoryUtil.getSort(
+				Organization.class, organizationSearch.getOrderByCol(),
+				organizationSearch.getOrderByType());
+
+			BaseModelSearchResult<Organization> baseModelSearchResult =
 				OrganizationLocalServiceUtil.searchOrganizations(
-					themeDisplay.getCompanyId(),
-					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID,
+					themeDisplay.getCompanyId(), parentOrganizationId,
 					organizationSearchTerms.getKeywords(), organizationParams,
 					organizationSearch.getStart(), organizationSearch.getEnd(),
-					SortFactoryUtil.getSort(
-						Organization.class, organizationSearch.getOrderByCol(),
-						organizationSearch.getOrderByType())));
+					sort);
+
+			results = baseModelSearchResult.getBaseModels();
+			total = baseModelSearchResult.getLength();
 		}
 		else {
-			organizationSearch.setResultsAndTotal(
-				() -> OrganizationLocalServiceUtil.search(
-					themeDisplay.getCompanyId(),
-					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID,
-					organizationSearchTerms.getKeywords(),
-					organizationSearchTerms.getType(),
-					organizationSearchTerms.getRegionIdObj(),
-					organizationSearchTerms.getCountryIdObj(),
-					organizationParams, organizationSearch.getStart(),
-					organizationSearch.getEnd(),
-					organizationSearch.getOrderByComparator()),
-				OrganizationLocalServiceUtil.searchCount(
-					themeDisplay.getCompanyId(),
-					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID,
-					organizationSearchTerms.getKeywords(),
-					organizationSearchTerms.getType(),
-					organizationSearchTerms.getRegionIdObj(),
-					organizationSearchTerms.getCountryIdObj(),
-					organizationParams));
+			total = OrganizationLocalServiceUtil.searchCount(
+				themeDisplay.getCompanyId(), parentOrganizationId,
+				organizationSearchTerms.getKeywords(),
+				organizationSearchTerms.getType(),
+				organizationSearchTerms.getRegionIdObj(),
+				organizationSearchTerms.getCountryIdObj(), organizationParams);
+
+			results = OrganizationLocalServiceUtil.search(
+				themeDisplay.getCompanyId(), parentOrganizationId,
+				organizationSearchTerms.getKeywords(),
+				organizationSearchTerms.getType(),
+				organizationSearchTerms.getRegionIdObj(),
+				organizationSearchTerms.getCountryIdObj(), organizationParams,
+				organizationSearch.getStart(), organizationSearch.getEnd(),
+				organizationSearch.getOrderByComparator());
 		}
+
+		organizationSearch.setResults(results);
+		organizationSearch.setTotal(total);
 
 		_organizationSearch = organizationSearch;
 
@@ -290,7 +301,7 @@ public class SelectOrganizationManagementToolbarDisplayContext {
 			return PortalUtil.getSelectedUser(_httpServletRequest);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}

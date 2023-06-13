@@ -25,10 +25,6 @@ public class ResourcePermissionServiceWrapper
 	implements ResourcePermissionService,
 			   ServiceWrapper<ResourcePermissionService> {
 
-	public ResourcePermissionServiceWrapper() {
-		this(null);
-	}
-
 	public ResourcePermissionServiceWrapper(
 		ResourcePermissionService resourcePermissionService) {
 

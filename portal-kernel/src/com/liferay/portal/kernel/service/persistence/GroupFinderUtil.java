@@ -49,13 +49,6 @@ public class GroupFinderUtil {
 			andOperator);
 	}
 
-	public static com.liferay.portal.kernel.model.Group fetchByC_GK(
-			long companyId, String groupKey)
-		throws com.liferay.portal.kernel.exception.NoSuchGroupException {
-
-		return getFinder().fetchByC_GK(companyId, groupKey);
-	}
-
 	public static java.util.List<Long> findByActiveGroupIds(long userId) {
 		return getFinder().findByActiveGroupIds(userId);
 	}
@@ -98,6 +91,12 @@ public class GroupFinderUtil {
 		findByLiveGroups() {
 
 		return getFinder().findByLiveGroups();
+	}
+
+	public static java.util.List<com.liferay.portal.kernel.model.Group>
+		findBySystem(long companyId) {
+
+		return getFinder().findBySystem(companyId);
 	}
 
 	public static java.util.List<Long> findByC_P(

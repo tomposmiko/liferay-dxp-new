@@ -15,33 +15,33 @@
 AUI.add(
 	'liferay-input-localized',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const STR_INPUT_PLACEHOLDER = 'inputPlaceholder';
+		var STR_INPUT_PLACEHOLDER = 'inputPlaceholder';
 
-		const STR_ITEMS = 'items';
+		var STR_ITEMS = 'items';
 
-		const STR_ITEMS_ERROR = 'itemsError';
+		var STR_ITEMS_ERROR = 'itemsError';
 
-		const STR_SELECTED = 'selected';
+		var STR_SELECTED = 'selected';
 
-		const STR_SUBMIT = '_onSubmit';
+		var STR_SUBMIT = '_onSubmit';
 
-		const availableLanguages = Liferay.Language.available;
+		var availableLanguages = Liferay.Language.available;
 
-		const defaultLanguageId = themeDisplay.getDefaultLanguageId();
+		var defaultLanguageId = themeDisplay.getDefaultLanguageId();
 
-		const userLanguageId = themeDisplay.getLanguageId();
+		var userLanguageId = themeDisplay.getLanguageId();
 
-		const availableLanguageIds = A.Array.dedupe(
+		var availableLanguageIds = A.Array.dedupe(
 			[defaultLanguageId, userLanguageId].concat(
-				Object.keys(availableLanguages)
+				A.Object.keys(availableLanguages)
 			)
 		);
 
-		const InputLocalized = A.Component.create({
+		var InputLocalized = A.Component.create({
 			_instances: {},
 
 			ATTRS: {
@@ -118,10 +118,6 @@ AUI.add(
 					validator: Array.isArray,
 				},
 
-				languagesTranslationsAriaLabels: {
-					validator: Lang.isObject,
-				},
-
 				name: {
 					validator: Lang.isString,
 				},
@@ -132,11 +128,11 @@ AUI.add(
 
 				selected: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const itemsError = instance.get(STR_ITEMS_ERROR);
+						var itemsError = instance.get(STR_ITEMS_ERROR);
 
-						let itemIndex =
+						var itemIndex =
 							instance.get('selectedLanguageId') ||
 							instance.get('defaultLanguageId');
 
@@ -154,7 +150,7 @@ AUI.add(
 
 				translatedLanguages: {
 					setter(val) {
-						const set = new A.Set();
+						var set = new A.Set();
 
 						if (Lang.isString(val)) {
 							val.split(',').forEach(set.add, set);
@@ -176,9 +172,9 @@ AUI.add(
 				_activeLanguageIdsAtom: null,
 
 				_animate(input, shouldFocus) {
-					const instance = this;
+					var instance = this;
 
-					const animateClass = instance.get('animateClass');
+					var animateClass = instance.get('animateClass');
 
 					if (animateClass) {
 						input.removeClass(animateClass);
@@ -206,12 +202,12 @@ AUI.add(
 				_availableLanguagesSubscription: null,
 
 				_bindManageTranslationsButton() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 
 					if (instance.get('adminMode')) {
-						const manageTranslationsButton = boundingBox.one(
+						var manageTranslationsButton = boundingBox.one(
 							'#manage-translations'
 						);
 
@@ -225,12 +221,12 @@ AUI.add(
 				},
 
 				_clearFormValidator(input) {
-					const form = input.get('form');
+					var form = input.get('form');
 
-					const liferayForm = Liferay.Form.get(form.attr('id'));
+					var liferayForm = Liferay.Form.get(form.attr('id'));
 
 					if (liferayForm) {
-						const validator = liferayForm.formValidator;
+						var validator = liferayForm.formValidator;
 
 						if (A.instanceOf(validator, A.FormValidator)) {
 							validator.resetAllFields();
@@ -243,26 +239,26 @@ AUI.add(
 				_flagsInitialContent: null,
 
 				_getInputLanguage(languageId) {
-					const instance = this;
+					var instance = this;
 
-					const fieldPrefix = instance.get('fieldPrefix');
-					const fieldPrefixSeparator = instance.get(
+					var fieldPrefix = instance.get('fieldPrefix');
+					var fieldPrefixSeparator = instance.get(
 						'fieldPrefixSeparator'
 					);
-					const id = instance.get('id');
-					const inputBox = instance.get('inputBox');
-					const name = instance.get('name');
-					const namespace = instance.get('namespace');
+					var id = instance.get('id');
+					var inputBox = instance.get('inputBox');
+					var name = instance.get('name');
+					var namespace = instance.get('namespace');
 
-					let fieldNamePrefix = STR_BLANK;
-					let fieldNameSuffix = STR_BLANK;
+					var fieldNamePrefix = STR_BLANK;
+					var fieldNameSuffix = STR_BLANK;
 
 					if (fieldPrefix) {
 						fieldNamePrefix = fieldPrefix + fieldPrefixSeparator;
 						fieldNameSuffix = fieldPrefixSeparator;
 					}
 
-					let inputLanguage = inputBox.one(
+					var inputLanguage = inputBox.one(
 						instance._getInputLanguageId(languageId)
 					);
 
@@ -285,20 +281,20 @@ AUI.add(
 				},
 
 				_getInputLanguageId(languageId) {
-					const instance = this;
+					var instance = this;
 
-					const id = instance.get('id');
-					const namespace = instance.get('namespace');
+					var id = instance.get('id');
+					var namespace = instance.get('namespace');
 
 					return '#' + namespace + id + '_' + languageId;
 				},
 
 				_moveDefaultLanguageFlagToFirstPosition(defaultLanguageId) {
-					const instance = this;
+					var instance = this;
 
-					const flags = instance._flags.getDOMNode();
+					var flags = instance._flags.getDOMNode();
 
-					const languageNode = flags.querySelector(
+					var languageNode = flags.querySelector(
 						'[data-languageid="' + defaultLanguageId + '"]'
 					)?.parentElement;
 
@@ -313,7 +309,7 @@ AUI.add(
 				},
 
 				_onActiveLanguageIdsChange(activeLanguageIds) {
-					const instance = this;
+					var instance = this;
 
 					instance.set('activeLanguageIds', activeLanguageIds);
 
@@ -321,12 +317,12 @@ AUI.add(
 				},
 
 				_onDefaultLocaleChanged(event) {
-					const instance = this;
+					var instance = this;
 
-					const prevDefaultLanguageId = instance.get(
+					var prevDefaultLanguageId = instance.get(
 						'defaultLanguageId'
 					);
-					const prevDefaultValue = instance.getValue(
+					var prevDefaultValue = instance.getValue(
 						prevDefaultLanguageId
 					);
 
@@ -338,7 +334,7 @@ AUI.add(
 						);
 					}
 
-					const defaultLanguageId = event.item.getAttribute(
+					var defaultLanguageId = event.item.getAttribute(
 						'data-value'
 					);
 
@@ -358,11 +354,11 @@ AUI.add(
 				},
 
 				_onInputValueChange(event, input) {
-					const instance = this;
+					var instance = this;
 
-					const editor = instance.get('editor');
+					var editor = instance.get('editor');
 
-					let value;
+					var value;
 
 					if (editor) {
 						value = editor.getHTML();
@@ -377,45 +373,45 @@ AUI.add(
 				},
 
 				_onLocaleChanged(event) {
-					const instance = this;
+					var instance = this;
 
-					const languageId = event.item.getAttribute('data-value');
+					var languageId = event.item.getAttribute('data-value');
 
 					instance.selectFlag(languageId, event.source === instance);
 				},
 
 				_onManageTranslationsClick() {
-					const instance = this;
+					var instance = this;
 
-					const modalContainerId =
+					var modalContainerId =
 						instance.get('namespace') + 'modal-container';
-					let modalContainer;
 
 					if (!document.getElementById(modalContainerId)) {
-						modalContainer = document.createElement('div');
+						var modalContainer = document.createElement('div');
 						document.body.appendChild(modalContainer);
 					}
 
-					const availableLocales = instance.get('availableLocales');
+					var availableLocales = Object.entries(
+						instance.get('availableLocales')
+					).map((entry) => {
+						var key = entry[0];
+						var value = entry[1];
 
-					const locales = instance.get('items').map((languageId) => {
-						const displayName = availableLocales[languageId];
-
-						const label = languageId.replaceAll(/_/g, '-');
+						var label = key.replace(/_/, '-');
 
 						return {
-							displayName,
-							id: languageId,
+							displayName: value,
+							id: key,
 							label,
 							symbol: label.toLowerCase(),
 						};
 					});
 
-					const translations = instance
+					var translations = instance
 						.get('translatedLanguages')
 						.values()
 						.reduce((accumulator, item) => {
-							const language = item.replaceAll(/_/g, '-');
+							var language = item.replace(/_/, '-');
 
 							if (!accumulator[language]) {
 								accumulator[language] = language;
@@ -424,9 +420,9 @@ AUI.add(
 							return accumulator;
 						}, {});
 
-					const props = {
+					var props = {
 						activeLanguageIds: instance.get('activeLanguageIds'),
-						availableLocales: locales,
+						availableLocales,
 						defaultLanguageId: instance.get('defaultLanguageId'),
 						onClose(newActiveLanguageIds) {
 							instance._State.writeAtom(
@@ -449,14 +445,7 @@ AUI.add(
 				},
 
 				_onSelectFlag(event) {
-					const instance = this;
-
-					const languageId = event.item.getAttribute('data-value');
-
-					instance._State.writeAtom(
-						instance._selectedLanguageIdAtom,
-						languageId
-					);
+					var instance = this;
 
 					if (!event.domEvent) {
 						Liferay.fire('inputLocalized:localeChanged', {
@@ -466,14 +455,8 @@ AUI.add(
 					}
 				},
 
-				_onSelectedLanguageIdChange(languageId) {
-					const instance = this;
-
-					instance.selectFlag(languageId);
-				},
-
 				_onSubmit(event, input) {
-					const instance = this;
+					var instance = this;
 
 					if (event.form === input.get('form')) {
 						instance._onInputValueChange.apply(instance, arguments);
@@ -483,31 +466,31 @@ AUI.add(
 				},
 
 				_renderActiveLanguageIds() {
-					const instance = this;
+					var instance = this;
 
-					const activeLanguageIds = instance.get('activeLanguageIds');
+					var activeLanguageIds = instance.get('activeLanguageIds');
 
-					const defaultLanguageId = instance.get('defaultLanguageId');
+					var defaultLanguageId = instance.get('defaultLanguageId');
 
-					const translatedLanguages = instance.get(
+					var translatedLanguages = instance.get(
 						'translatedLanguages'
 					);
 
-					const selectedLanguageId = instance.getSelectedLanguageId();
+					var selectedLanguageId = instance.getSelectedLanguageId();
 
-					const currentFlagsNode = instance._flags.getDOMNode();
+					var currentFlagsNode = instance._flags.getDOMNode();
 
-					const newFlagsNode = instance._flagsInitialContent
+					var newFlagsNode = instance._flagsInitialContent
 						.cloneNode(true)
 						.getDOMNode();
 
-					let changeToDefault;
+					var changeToDefault;
 
 					Object.entries(instance.get('availableLocales')).forEach(
 						(entry) => {
-							const key = entry[0];
+							var key = entry[0];
 
-							const localeNode = newFlagsNode.querySelector(
+							var localeNode = newFlagsNode.querySelector(
 								'[data-languageid="' + key + '"]'
 							)?.parentElement;
 
@@ -524,7 +507,7 @@ AUI.add(
 								}
 							}
 							else {
-								const currentlocaleNode = currentFlagsNode.querySelector(
+								var currentlocaleNode = currentFlagsNode.querySelector(
 									'[data-languageid="' + key + '"]'
 								)?.parentElement;
 
@@ -538,13 +521,7 @@ AUI.add(
 
 					currentFlagsNode.innerHTML = newFlagsNode.innerHTML;
 
-					Object.entries(instance.get('availableLocales')).forEach(
-						([key]) => {
-							this._updateTranslationStatus(key);
-						}
-					);
-
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 					instance._flags = boundingBox.one('.palette-container');
 
 					if (changeToDefault) {
@@ -560,17 +537,13 @@ AUI.add(
 					}
 				},
 
-				_selectedLanguageIdAtom: null,
-
-				_selectedLanguageIdSubscription: null,
-
 				_updateHelpMessage(languageId) {
-					const instance = this;
+					var instance = this;
 
-					let helpMessage = instance.get('helpMessage');
+					var helpMessage = instance.get('helpMessage');
 
 					if (!instance.get('editor')) {
-						const defaultLanguageId = instance.get(
+						var defaultLanguageId = instance.get(
 							'defaultLanguageId'
 						);
 
@@ -588,14 +561,14 @@ AUI.add(
 				},
 
 				_updateInputPlaceholderDescription(languageId) {
-					const instance = this;
+					var instance = this;
 
 					if (instance._inputPlaceholderDescription) {
-						const icon = instance._flags.one(
+						var icon = instance._flags.one(
 							'[data-languageId="' + languageId + '"]'
 						);
 
-						let title = '';
+						var title = '';
 
 						if (icon) {
 							title = icon.attr('title');
@@ -606,14 +579,14 @@ AUI.add(
 				},
 
 				_updateSelectedItem(languageId) {
-					const instance = this;
+					var instance = this;
 
 					instance._flags.all('.active').toggleClass('active');
 
-					const selectedLanguageId =
+					var selectedLanguageId =
 						languageId || instance.getSelectedLanguageId();
 
-					const flagNode = instance._flags.one(
+					var flagNode = instance._flags.one(
 						'[data-languageid="' + selectedLanguageId + '"]'
 					);
 
@@ -623,44 +596,28 @@ AUI.add(
 				},
 
 				_updateTranslationStatus(languageId) {
-					const instance = this;
+					var instance = this;
 
-					const languagesTranslationsAriaLabels = instance.get(
-						'languagesTranslationsAriaLabels'
-					);
-
-					const translatedLanguages = instance.get(
+					var translatedLanguages = instance.get(
 						'translatedLanguages'
 					);
 
-					let translationAriaLabel =
-						languagesTranslationsAriaLabels[languageId][
-							'notTranslatedStatus'
-						];
-					let translationStatus = Liferay.Language.get(
-						'not-translated'
+					var translationStatus = Liferay.Language.get(
+						'untranslated'
 					);
-					let translationStatusCssClass = 'warning';
+					var translationStatusCssClass = 'warning';
 
 					if (translatedLanguages.has(languageId)) {
-						translationAriaLabel =
-							languagesTranslationsAriaLabels[languageId][
-								'translatedStatus'
-							];
 						translationStatus = Liferay.Language.get('translated');
 						translationStatusCssClass = 'success';
 					}
 
 					if (languageId === instance.get('defaultLanguageId')) {
-						translationAriaLabel =
-							languagesTranslationsAriaLabels[languageId][
-								'defaultStatus'
-							];
 						translationStatus = Liferay.Language.get('default');
 						translationStatusCssClass = 'info';
 					}
 
-					const languageStatusNode = instance._flags.one(
+					var languageStatusNode = instance._flags.one(
 						'[data-languageid="' +
 							languageId +
 							'"] .taglib-text-icon'
@@ -669,8 +626,7 @@ AUI.add(
 					if (languageStatusNode) {
 						languageStatusNode.setHTML(
 							A.Lang.sub(instance.TRANSLATION_STATUS_TEMPLATE, {
-								languageId: languageId.replaceAll(/_/g, '-'),
-								translationAriaLabel,
+								languageId,
 								translationStatus,
 								translationStatusCssClass,
 							})
@@ -679,29 +635,16 @@ AUI.add(
 				},
 
 				_updateTrigger(languageId) {
-					const instance = this;
+					var instance = this;
 
-					const languagesTranslationsAriaLabels = instance.get(
-						'languagesTranslationsAriaLabels'
-					);
+					languageId = languageId.replace('_', '-');
 
-					const updatedTriggerAriaLabel =
-						languagesTranslationsAriaLabels[languageId][
-							'currentlySelected'
-						];
-
-					languageId = languageId.replaceAll('_', '-');
-
-					const triggerContent = A.Lang.sub(
-						instance.TRIGGER_TEMPLATE,
-						{
-							flag: Liferay.Util.getLexiconIconTpl(
-								languageId.toLowerCase()
-							),
-							languageId,
-							updatedTriggerAriaLabel,
-						}
-					);
+					var triggerContent = A.Lang.sub(instance.TRIGGER_TEMPLATE, {
+						flag: Liferay.Util.getLexiconIconTpl(
+							languageId.toLowerCase()
+						),
+						languageId,
+					});
 
 					instance
 						.get('inputBox')
@@ -713,13 +656,13 @@ AUI.add(
 					'<input id="{namespace}{id}_{value}" name="{namespace}{fieldNamePrefix}{name}_{value}{fieldNameSuffix}" type="hidden" value="" />',
 
 				TRANSLATION_STATUS_TEMPLATE:
-					'<span aria-label="{translationAriaLabel}" role="button" tabindex="0"> {languageId} <span class="dropdown-item-indicator-end w-auto"><span class="label label-{translationStatusCssClass}">{translationStatus}</span></span></span>',
+					'{languageId} <span class="label label-{translationStatusCssClass}">{translationStatus}</span>',
 
 				TRIGGER_TEMPLATE:
-					'<span class="inline-item">{flag}</span><span aria-label="{updatedTriggerAriaLabel}" class="btn-section">{languageId}</span>',
+					'<span class="inline-item">{flag}</span><span class="btn-section">{languageId}</span>',
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					InputLocalized.unregister(instance.get('instanceId'));
 
@@ -728,17 +671,13 @@ AUI.add(
 					if (instance._availableLanguagesSubscription) {
 						instance._availableLanguagesSubscription.dispose();
 					}
-
-					if (instance._selectedLanguageIdSubscription) {
-						instance._selectedLanguageIdSubscription.dispose();
-					}
 				},
 
 				getSelectedLanguageId() {
-					const instance = this;
+					var instance = this;
 
-					const items = instance.get(STR_ITEMS);
-					const selected = instance.get(STR_SELECTED);
+					var items = instance.get(STR_ITEMS);
+					var selected = instance.get(STR_SELECTED);
 
 					return (
 						items[selected] || instance.get('selectedLanguageId')
@@ -746,7 +685,7 @@ AUI.add(
 				},
 
 				getValue(languageId) {
-					const instance = this;
+					var instance = this;
 
 					if (!Lang.isValue(languageId)) {
 						languageId = defaultLanguageId;
@@ -756,13 +695,11 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const inputPlaceholder = instance.get(
-						STR_INPUT_PLACEHOLDER
-					);
+					var inputPlaceholder = instance.get(STR_INPUT_PLACEHOLDER);
 
-					const eventHandles = [
+					var eventHandles = [
 						inputPlaceholder
 							.get('form')
 							.on(
@@ -799,7 +736,7 @@ AUI.add(
 
 					instance._eventHandles = eventHandles;
 
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 
 					boundingBox.plug(A.Plugin.NodeFocusManager, {
 						descendants: '.palette-item a',
@@ -814,28 +751,16 @@ AUI.add(
 					);
 					instance._flags = boundingBox.one('.palette-container');
 
-					instance._State = instance.get(
-						'frontendJsStateWebModule'
-					).State;
-
-					instance._selectedLanguageIdAtom = instance.get(
-						'frontendJsComponentsWebModule'
-					).selectedLanguageIdAtom;
-
-					const selectedLanguageIdAtom =
-						instance._selectedLanguageIdAtom;
-
-					instance._selectedLanguageIdSubscription = instance._State.subscribe(
-						selectedLanguageIdAtom,
-						A.bind('_onSelectedLanguageIdChange', instance)
-					);
-
-					const activeLanguageIds = instance.get('activeLanguageIds');
+					var activeLanguageIds = instance.get('activeLanguageIds');
 
 					if (activeLanguageIds) {
 						instance._activeLanguageIdsAtom = instance.get(
 							'frontendJsComponentsWebModule'
 						).activeLanguageIdsAtom;
+
+						instance._State = instance.get(
+							'frontendJsStateWebModule'
+						).State;
 
 						instance._flagsInitialContent = instance._flags.cloneNode(
 							true
@@ -843,17 +768,18 @@ AUI.add(
 
 						instance._renderActiveLanguageIds();
 
-						const activeLanguageIdsAtom =
+						var State = instance._State;
+						var activeLanguageIdsAtom =
 							instance._activeLanguageIdsAtom;
 
 						if (instance.get('adminMode')) {
-							instance._State.writeAtom(
+							State.writeAtom(
 								activeLanguageIdsAtom,
 								activeLanguageIds
 							);
 						}
 
-						instance._availableLanguagesSubscription = instance._State.subscribe(
+						instance._availableLanguagesSubscription = State.subscribe(
 							activeLanguageIdsAtom,
 							A.bind('_onActiveLanguageIdsChange', instance)
 						);
@@ -861,11 +787,11 @@ AUI.add(
 				},
 
 				removeInputLanguage(languageId) {
-					const instance = this;
+					var instance = this;
 
-					const inputBox = instance.get('inputBox');
+					var inputBox = instance.get('inputBox');
 
-					const inputLanguage = inputBox.one(
+					var inputLanguage = inputBox.one(
 						instance._getInputLanguageId(languageId)
 					);
 
@@ -875,21 +801,19 @@ AUI.add(
 				},
 
 				selectFlag(languageId, shouldFocus) {
-					const instance = this;
+					var instance = this;
 
 					if (!Lang.isValue(languageId)) {
 						languageId = defaultLanguageId;
 					}
 
-					const inputPlaceholder = instance.get(
-						STR_INPUT_PLACEHOLDER
-					);
+					var inputPlaceholder = instance.get(STR_INPUT_PLACEHOLDER);
 
-					const defaultLanguageValue = instance.getValue(
+					var defaultLanguageValue = instance.getValue(
 						defaultLanguageId
 					);
 
-					const inputLanguageValue = instance.getValue(languageId);
+					var inputLanguageValue = instance.getValue(languageId);
 
 					instance._animate(inputPlaceholder, shouldFocus);
 					instance._clearFormValidator(inputPlaceholder);
@@ -910,13 +834,11 @@ AUI.add(
 				},
 
 				updateInput(value) {
-					const instance = this;
+					var instance = this;
 
-					const inputPlaceholder = instance.get(
-						STR_INPUT_PLACEHOLDER
-					);
+					var inputPlaceholder = instance.get(STR_INPUT_PLACEHOLDER);
 
-					const editor = instance.get('editor');
+					var editor = instance.get('editor');
 
 					if (editor) {
 						editor.setHTML(value);
@@ -934,19 +856,19 @@ AUI.add(
 				},
 
 				updateInputLanguage(value, languageId) {
-					const instance = this;
+					var instance = this;
 
-					let selectedLanguageId =
+					var selectedLanguageId =
 						languageId || instance.getSelectedLanguageId();
 
 					if (!Lang.isValue(selectedLanguageId)) {
 						selectedLanguageId = defaultLanguageId;
 					}
 
-					const defaultInputLanguage = instance._getInputLanguage(
+					var defaultInputLanguage = instance._getInputLanguage(
 						defaultLanguageId
 					);
-					const inputLanguage = instance._getInputLanguage(
+					var inputLanguage = instance._getInputLanguage(
 						selectedLanguageId
 					);
 
@@ -958,11 +880,11 @@ AUI.add(
 						}
 					}
 
-					const translatedLanguages = instance.get(
+					var translatedLanguages = instance.get(
 						'translatedLanguages'
 					);
 
-					let action = 'remove';
+					var action = 'remove';
 
 					if (value) {
 						action = 'add';
@@ -974,15 +896,13 @@ AUI.add(
 				},
 
 				updateInputPlaceholder(editor) {
-					const instance = this;
+					var instance = this;
 
-					const inputPlaceholder = instance.get(
-						STR_INPUT_PLACEHOLDER
-					);
+					var inputPlaceholder = instance.get(STR_INPUT_PLACEHOLDER);
 
-					const nativeEditor = editor.getNativeEditor();
+					var nativeEditor = editor.getNativeEditor();
 
-					const newPlaceholder = A.one(
+					var newPlaceholder = A.one(
 						'#' + nativeEditor.element.getId()
 					);
 
@@ -995,15 +915,15 @@ AUI.add(
 			},
 
 			register(id, config) {
-				const instance = this;
+				var instance = this;
 
 				config.instanceId = id;
 
-				const instances = instance._instances;
+				var instances = instance._instances;
 
-				let inputLocalizedInstance = instances[id];
+				var inputLocalizedInstance = instances[id];
 
-				const createInstance = !(
+				var createInstance = !(
 					inputLocalizedInstance &&
 					inputLocalizedInstance
 						.get(STR_INPUT_PLACEHOLDER)
@@ -1021,7 +941,7 @@ AUI.add(
 					instances[id] = inputLocalizedInstance;
 				}
 
-				const portletId = inputLocalizedInstance
+				var portletId = inputLocalizedInstance
 					.get('namespace')
 					.replace(/^_|_$/gm, '');
 

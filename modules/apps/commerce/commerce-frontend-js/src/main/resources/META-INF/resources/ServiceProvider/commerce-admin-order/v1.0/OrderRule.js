@@ -22,8 +22,6 @@ function resolvePath(basePath = '', orderRuleId = '') {
 	return `${basePath}${VERSION}${ORDER_RULES_PATH}/${orderRuleId}`;
 }
 
-export default function OrderRule(basePath) {
-	return {
-		addOrderRule: (json) => AJAX.POST(resolvePath(basePath), json),
-	};
-}
+export default (basePath) => ({
+	addOrderRule: (json) => AJAX.POST(resolvePath(basePath), json),
+});

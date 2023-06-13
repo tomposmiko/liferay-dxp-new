@@ -15,8 +15,6 @@
 package com.liferay.portal.sharepoint.methods;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.sharepoint.Property;
 import com.liferay.portal.sharepoint.ResponseElement;
 import com.liferay.portal.sharepoint.SharepointRequest;
@@ -65,9 +63,6 @@ public class GetDocsMetaInfoMethodImpl extends BaseMethodImpl {
 						storage.getFolderTree(sharepointRequest));
 				}
 				catch (Exception exception2) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(exception2);
-					}
 				}
 			}
 		}
@@ -83,8 +78,5 @@ public class GetDocsMetaInfoMethodImpl extends BaseMethodImpl {
 	}
 
 	private static final String _METHOD_NAME = "getDocsMetaInfo";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		GetDocsMetaInfoMethodImpl.class);
 
 }

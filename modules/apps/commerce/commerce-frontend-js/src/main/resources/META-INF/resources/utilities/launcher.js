@@ -20,11 +20,11 @@ export default function launcher(
 	containerId,
 	props = {}
 ) {
-	const container = window.document.getElementById(containerId);
-	const renderData = {
-		componentId,
-		...props,
-	};
+	const container = window.document.getElementById(containerId),
+		renderData = {
+			componentId,
+			...props,
+		};
 
-	return render(Component, renderData, container);
+	render(Component, renderData, container);
 }

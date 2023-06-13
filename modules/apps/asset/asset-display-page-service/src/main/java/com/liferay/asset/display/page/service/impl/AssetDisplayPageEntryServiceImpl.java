@@ -18,7 +18,7 @@ import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.base.AssetDisplayPageEntryServiceBaseImpl;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemPermissionProvider;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -52,8 +52,7 @@ public class AssetDisplayPageEntryServiceImpl
 			ServiceContext serviceContext)
 		throws Exception {
 
-		_checkPermissions(
-			_portal.getClassName(classNameId), classPK, ActionKeys.UPDATE);
+		_checkPermissions(classNameId, classPK, ActionKeys.UPDATE);
 
 		return assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
 			userId, groupId, classNameId, classPK, layoutPageTemplateEntryId,
@@ -66,8 +65,7 @@ public class AssetDisplayPageEntryServiceImpl
 			long layoutPageTemplateEntryId, ServiceContext serviceContext)
 		throws Exception {
 
-		_checkPermissions(
-			_portal.getClassName(classNameId), classPK, ActionKeys.UPDATE);
+		_checkPermissions(classNameId, classPK, ActionKeys.UPDATE);
 
 		return assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
 			userId, groupId, classNameId, classPK, layoutPageTemplateEntryId,
@@ -79,8 +77,7 @@ public class AssetDisplayPageEntryServiceImpl
 			long groupId, long classNameId, long classPK)
 		throws Exception {
 
-		_checkPermissions(
-			_portal.getClassName(classNameId), classPK, ActionKeys.DELETE);
+		_checkPermissions(classNameId, classPK, ActionKeys.DELETE);
 
 		assetDisplayPageEntryLocalService.deleteAssetDisplayPageEntry(
 			groupId, classNameId, classPK);
@@ -91,8 +88,7 @@ public class AssetDisplayPageEntryServiceImpl
 			long groupId, long classNameId, long classPK)
 		throws Exception {
 
-		_checkPermissions(
-			_portal.getClassName(classNameId), classPK, ActionKeys.VIEW);
+		_checkPermissions(classNameId, classPK, ActionKeys.VIEW);
 
 		return assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
 			groupId, classNameId, classPK);
@@ -161,7 +157,7 @@ public class AssetDisplayPageEntryServiceImpl
 				assetDisplayPageEntryId);
 
 		_checkPermissions(
-			assetDisplayPageEntry.getClassName(),
+			assetDisplayPageEntry.getClassNameId(),
 			assetDisplayPageEntry.getClassPK(), ActionKeys.UPDATE);
 
 		return assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
@@ -169,12 +165,13 @@ public class AssetDisplayPageEntryServiceImpl
 	}
 
 	private void _checkPermissions(
-			String className, long classPK, String actionId)
+			long classNameId, long classPK, String actionId)
 		throws Exception {
 
 		InfoItemPermissionProvider infoItemPermissionProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
-				InfoItemPermissionProvider.class, className);
+			_infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemPermissionProvider.class,
+				_portal.getClassName(classNameId));
 
 		if (infoItemPermissionProvider != null) {
 			if (!infoItemPermissionProvider.hasPermission(
@@ -186,7 +183,7 @@ public class AssetDisplayPageEntryServiceImpl
 		else {
 			AssetRendererFactory<?> assetRendererFactory =
 				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassName(className);
+					getAssetRendererFactoryByClassNameId(classNameId);
 
 			if (!assetRendererFactory.hasPermission(
 					getPermissionChecker(), classPK, actionId)) {
@@ -197,7 +194,7 @@ public class AssetDisplayPageEntryServiceImpl
 	}
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private Portal _portal;

@@ -19,6 +19,7 @@ import com.liferay.commerce.pricing.web.internal.display.context.CPDefinitionPri
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.portlet.action.ActionHelper;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.constants.MVCRenderConstants;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -41,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_definition_pricing_class"
@@ -79,7 +81,9 @@ public class EditCPDefinitionPricingClassMVCRenderCommand
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}
 		catch (Exception exception) {
-			throw new PortletException(exception);
+			throw new PortletException(
+				"Unable to include edit_cp_definition_pricing_class.jsp",
+				exception);
 		}
 
 		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;
@@ -96,6 +100,9 @@ public class EditCPDefinitionPricingClassMVCRenderCommand
 
 	@Reference
 	private CommercePricingClassService _commercePricingClassService;
+
+	@Reference
+	private JSPRenderer _jspRenderer;
 
 	@Reference
 	private Portal _portal;

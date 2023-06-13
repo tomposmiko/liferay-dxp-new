@@ -9,127 +9,91 @@
  * distribution rights of the Software.
  */
 
-export function addSegmentsExperiment(payload) {
-	return {
-		payload,
-		type: 'ADD_EXPERIMENT',
-	};
-}
+export const addSegmentsExperiment = (payload) => ({
+	payload,
+	type: 'ADD_EXPERIMENT',
+});
 
-export function addVariant(payload) {
-	return {
-		payload,
-		type: 'ADD_VARIANT',
-	};
-}
+export const addVariant = (payload) => ({
+	payload,
+	type: 'ADD_VARIANT',
+});
 
-export function archiveExperiment(payload) {
-	return {
-		payload,
-		type: 'ARCHIVE_EXPERIMENT',
-	};
-}
+export const archiveExperiment = (payload) => ({
+	payload,
+	type: 'ARCHIVE_EXPERIMENT',
+});
 
-export function closeCreationModal() {
-	return {
-		type: 'CREATE_EXPERIMENT_FINISH',
-	};
-}
+export const closeCreationModal = () => ({
+	type: 'CREATE_EXPERIMENT_FINISH',
+});
 
-export function closeEditionModal() {
-	return {
-		type: 'EDIT_EXPERIMENT_FINISH',
-	};
-}
+export const closeEditionModal = () => ({
+	type: 'EDIT_EXPERIMENT_FINISH',
+});
 
-export function closeReviewAndRunExperiment() {
-	return {
-		type: 'REVIEW_AND_RUN_EXPERIMENT_FINISH',
-	};
-}
+export const closeReviewAndRunExperiment = () => ({
+	type: 'REVIEW_AND_RUN_EXPERIMENT_FINISH',
+});
 
-export function deleteArchivedExperiment(experimentId) {
-	return {
-		payload: {
-			experimentId,
-		},
-		type: 'DELETE_ARCHIVED_EXPERIMENT',
-	};
-}
+export const deleteArchivedExperiment = (experimentId) => ({
+	payload: {
+		experimentId,
+	},
+	type: 'DELETE_ARCHIVED_EXPERIMENT',
+});
 
-export function editSegmentsExperiment(payload) {
-	return {
-		payload,
-		type: 'EDIT_EXPERIMENT',
-	};
-}
+export const editSegmentsExperiment = (payload) => ({
+	payload,
+	type: 'EDIT_EXPERIMENT',
+});
 
-export function openCreationModal(payload) {
-	return {
-		payload,
-		type: 'CREATE_EXPERIMENT_START',
-	};
-}
+export const openCreationModal = (payload) => ({
+	payload,
+	type: 'CREATE_EXPERIMENT_START',
+});
 
-export function openEditionModal(payload) {
-	return {
-		payload,
-		type: 'EDIT_EXPERIMENT_START',
-	};
-}
+export const openEditionModal = (payload) => ({
+	payload,
+	type: 'EDIT_EXPERIMENT_START',
+});
 
-export function reviewAndRunExperiment() {
-	return {
-		type: 'REVIEW_AND_RUN_EXPERIMENT',
-	};
-}
+export const reviewAndRunExperiment = () => ({
+	type: 'REVIEW_AND_RUN_EXPERIMENT',
+});
 
-export function reviewVariants() {
-	return {
-		type: 'REVIEW_VARIANTS',
-	};
-}
+export const reviewVariants = () => ({
+	type: 'REVIEW_VARIANTS',
+});
 
-export function reviewClickTargetElement() {
-	return {
-		type: 'REVIEW_CLICK_TARGET_ELEMENT',
-	};
-}
+export const reviewClickTargetElement = () => ({
+	type: 'REVIEW_CLICK_TARGET_ELEMENT',
+});
 
-export function runExperiment({experiment, splitVariantsMap}) {
-	return {
-		payload: {
-			experiment,
-			splitVariantsMap,
-		},
-		type: 'RUN_EXPERIMENT',
-	};
-}
+export const runExperiment = ({experiment, splitVariantsMap}) => ({
+	payload: {
+		experiment,
+		splitVariantsMap,
+	},
+	type: 'RUN_EXPERIMENT',
+});
 
-export function updateSegmentsExperimentTarget(payload) {
-	return {
-		payload,
-		type: 'UPDATE_SEGMENTS_EXPERIMENT_TARGET',
-	};
-}
+export const updateSegmentsExperimentTarget = (payload) => ({
+	payload,
+	type: 'UPDATE_SEGMENTS_EXPERIMENT_TARGET',
+});
 
-export function updateSegmentsExperimentStatus(payload) {
-	return {
-		payload,
-		type: 'UPDATE_EXPERIMENT_STATUS',
-	};
-}
+export const updateSegmentsExperimentStatus = (payload) => ({
+	payload,
+	type: 'UPDATE_EXPERIMENT_STATUS',
+});
 
-export function updateVariant(payload) {
-	return {
-		payload,
-		type: 'UPDATE_VARIANT',
-	};
-}
+export const updateVariant = (payload) => ({
+	payload,
+	type: 'UPDATE_VARIANT',
+});
 
-export function updateVariants(payload) {
-	return {
-		payload,
-		type: 'UPDATE_VARIANTS',
-	};
-}
+export const updateVariants = (payload) => ({
+	payload,
+	type: 'UPDATE_VARIANTS',
+});

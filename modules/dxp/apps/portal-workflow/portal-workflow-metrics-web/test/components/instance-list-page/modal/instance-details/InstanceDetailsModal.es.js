@@ -19,11 +19,11 @@ import {ModalContext} from '../../../../../src/main/resources/META-INF/resources
 import InstanceDetailsModal from '../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/modal/instance-details/InstanceDetailsModal.es';
 import {MockRouter} from '../../../../mock/MockRouter.es';
 
-const ContainerMock = ({children}) => {
+const ContainerMock = ({children, clientMock}) => {
 	const [instanceId, setInstanceId] = useState(37634);
 
 	return (
-		<MockRouter>
+		<MockRouter client={clientMock}>
 			<InstanceListContext.Provider value={{instanceId, setInstanceId}}>
 				<ModalContext.Provider
 					value={{
@@ -73,14 +73,13 @@ const data = {
 };
 
 describe('The InstanceDetailsModal component should', () => {
-	let getByText;
-	let renderResult;
+	let getByText, renderResult;
 
-	const renderComponent = () => {
+	const renderComponent = (clientMock) => {
 		cleanup();
 
 		renderResult = render(
-			<ContainerMock>
+			<ContainerMock clientMock={clientMock}>
 				<InstanceDetailsModal />
 			</ContainerMock>
 		);
@@ -90,12 +89,9 @@ describe('The InstanceDetailsModal component should', () => {
 
 	describe('render with a completed Instance', () => {
 		beforeAll(async () => {
-			fetch.mockResolvedValueOnce({
-				json: () => Promise.resolve(data),
-				ok: true,
+			renderComponent({
+				get: jest.fn().mockResolvedValue({data}),
 			});
-
-			renderComponent();
 
 			await act(async () => {
 				jest.runAllTimers();
@@ -118,7 +114,7 @@ describe('The InstanceDetailsModal component should', () => {
 
 			expect(getByText('OPEN (1)')).toBeTruthy();
 			expect(resultStatus[0]).toHaveTextContent(
-				'Jan 24, 2020, 10:08 AM (0d 3h 43min overdue)'
+				'Jan 24, 2020, 10:08 AM (0d 03h 43min overdue)'
 			);
 			expect(resultIcons[1].children[0].classList).toContain(
 				'lexicon-icon-exclamation-circle'
@@ -161,9 +157,9 @@ describe('The InstanceDetailsModal component should', () => {
 
 	describe('render with a pending Instance', () => {
 		beforeAll(async () => {
-			fetch.mockResolvedValueOnce({
-				json: () =>
-					Promise.resolve({
+			renderComponent({
+				get: jest.fn().mockResolvedValue({
+					data: {
 						...data,
 						completed: false,
 						slaResults: [
@@ -176,11 +172,9 @@ describe('The InstanceDetailsModal component should', () => {
 						],
 						slaStatus: 'Untracked',
 						taskNames: ['Review'],
-					}),
-				ok: true,
+					},
+				}),
 			});
-
-			renderComponent();
 
 			await act(async () => {
 				jest.runAllTimers();

@@ -17,7 +17,6 @@ package com.liferay.commerce.price.list.service.persistence;
 import com.liferay.commerce.price.list.exception.NoSuchPriceListChannelRelException;
 import com.liferay.commerce.price.list.model.CommercePriceListChannelRel;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -34,8 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommercePriceListChannelRelPersistence
-	extends BasePersistence<CommercePriceListChannelRel>,
-			CTPersistence<CommercePriceListChannelRel> {
+	extends BasePersistence<CommercePriceListChannelRel> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

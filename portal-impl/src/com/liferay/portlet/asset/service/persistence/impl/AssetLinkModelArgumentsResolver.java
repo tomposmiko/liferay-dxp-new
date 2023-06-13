@@ -18,7 +18,6 @@ import com.liferay.asset.kernel.model.AssetLinkTable;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portlet.asset.model.impl.AssetLinkImpl;
 import com.liferay.portlet.asset.model.impl.AssetLinkModelImpl;
 
@@ -31,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portlet.asset.model.impl.AssetLinkImpl",
-		"table.name=AssetLink"
-	},
-	service = ArgumentsResolver.class
-)
 public class AssetLinkModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

@@ -21,13 +21,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CARD_FOLDER</td>
-	<td>//div[contains(@class,'card-horizontal')]/.</td>
-	<td></td>
-</tr>
-<tr>
 	<td>CHECKIN_DIALOG_TITLE</td>
-	<td>//*[contains(@class,'modal-title') and contains(text(),'Describe Your Changes')]</td>
+	<td>//div[contains(@class,'modal-title') and contains(text(),'Describe Your Changes')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -57,7 +52,7 @@
 </tr>
 <tr>
 	<td>DOCUMENT_VERSION_VERTICAL_ELLIPSIS</td>
-	<td>//li[contains(.,'${key_dmDocumentVersionNumber}')]//*[span/*[contains(@class,'lexicon-icon-ellipsis-v')]]</td>
+	<td>//li[contains(.,'${key_dmDocumentVersionNumber}')]//a[span/*[contains(@class,'lexicon-icon-ellipsis-v')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -75,9 +70,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--EDIT_TAGS-->
-
 <tr>
 	<td>EDIT_TAGS_FIELD</td>
 	<td>//input[@class='form-control-inset']</td>
@@ -88,9 +81,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ICON_DOCUMENT-->
-
 <tr>
 	<td>ICON_DOCUMENT_GENERIC</td>
 	<td>//div[contains(@id,'entriesContainer')]//div[@class='entry-thumbnail']</td>
@@ -103,7 +94,7 @@
 </tr>
 <tr>
 	<td>ICON_DOCUMENT_ICON_LOCKED</td>
-	<td>//div[contains(@id,'entriesContainer')]//*[contains(@data-title,'${key_dmDocumentTitle}')]//span/*[name()='svg'][@message='locked']</td>
+	<td>//div[contains(@id,'entriesContainer')]//li[contains(@data-title,'${key_dmDocumentTitle}')]//span/*[name()='svg'][@message='locked']</td>
 	<td></td>
 </tr>
 <tr>
@@ -113,12 +104,12 @@
 </tr>
 <tr>
 	<td>ICON_DOCUMENT_CHECKBOX</td>
-	<td>//*[contains(@data-title,'${key_dmDocumentTitle}')]//input</td>
+	<td>//li[contains(@data-title,'${key_dmDocumentTitle}')]//input</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ICON_DOCUMENT_SHARED</td>
-	<td>xpath=(//dd | //tr)[contains(@data-title,'${key_dmDocumentTitle}')]//*[*[name()='svg'][contains(@class,'lexicon-icon-users')]]</td>
+	<td>//li[contains(@data-title,'${key_dmDocumentTitle}')]//*[*[name()='svg'][contains(@class,'lexicon-icon-users')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -138,7 +129,7 @@
 </tr>
 <tr>
 	<td>ICON_DOCUMENT_WORKFLOW_STATUS</td>
-	<td>//dd[contains(.,'${key_dmDocumentTitle}')]//span[@class='workflow-status']</td>
+	<td>//li[contains(.,'${key_dmDocumentTitle}')]//span[@class='workflow-status']</td>
 	<td></td>
 </tr>
 <tr>
@@ -146,9 +137,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ICON_FOLDER-->
-
 <tr>
 	<td>ICON_FOLDER_THUMBNAIL</td>
 	<td>//div[contains(@class,'card-col-content')]/span[contains(@class,'lfr-card-title-text')]/a[contains(@title,'${key_dmFolderName}')]</td>
@@ -156,7 +145,7 @@
 </tr>
 <tr>
 	<td>ICON_FOLDER_CHECKBOX</td>
-	<td>//*[contains(@data-title,'${key_dmFolderName}')]//label/input</td>
+	<td>//li[contains(@data-title,'${key_dmFolderName}')]//label/input</td>
 	<td></td>
 </tr>
 <tr>
@@ -169,42 +158,35 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DESCRIPTIVE_LIST_DOCUMENT-->
-
 <tr>
 	<td>DESCRIPTIVE_LIST_DOCUMENT_CHECKBOX</td>
-	<td>//*[@data-title='${key_dmDocumentTitle}']//input[@type='checkbox']</td>
+	<td>//li[@data-title='${key_dmDocumentTitle}']//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_DOCUMENT_ICON</td>
-	<td>//*[contains(@data-title,'${key_dmDocumentTitle}')]//div//div</td>
+	<td>//li[contains(@data-title,'${key_dmDocumentTitle}')]//div//div</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_DOCUMENT_TITLE</td>
-	<td>//*[contains(@data-title,'${key_dmDocumentTitle}')]//a</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PAGE_DOCUMENT_TITLE</td>
-	<td>//*[@data-title='${key_dmDocumentTitle}']//a</td>
+	<td>//li[contains(@data-title,'${key_dmDocumentTitle}')]//a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_DOCUMENT_TYPE</td>
-	<td>//*[@data-title='${key_dmDocumentTitle}']//span[contains(.,'${key_dmDocumentType}')]</td>
+	<td>//li[@data-title='${key_dmDocumentTitle}']//span[contains(.,'${key_dmDocumentType}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS</td>
-	<td>//dd[contains(.,'${key_dmDocumentTitle}')]//*[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td>//li[contains(.,'${key_dmDocumentTitle}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS_SPECIFIC</td>
-	<td>//dd[contains(.,"${key_dmDocumentTitle}")]//div[contains(@class,'dropdown-action')]</td>
+	<td>//li[contains(.,"${key_dmDocumentTitle}")]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -212,32 +194,30 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DESCRIPTIVE_LIST_FOLDER-->
-
 <tr>
 	<td>DESCRIPTIVE_LIST_VERTICAL_ELLIPSIS</td>
-	<td>//dd[contains(.,'${key_dmFolderName}')]//*[*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td>//li[contains(.,'${key_dmFolderName}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_FOLDER_CHECKBOX</td>
-	<td>//*[@data-title='${key_dmFolderName}']//input[@type='checkbox']</td>
+	<td>//li[@data-title='${key_dmFolderName}']//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_FOLDER_ICON</td>
-	<td>//*[@data-title='${key_dmFolderName}']//div[span/*[name()='svg'][contains(@class,'icon-folder')]]</td>
+	<td>//li[@data-title='${key_dmFolderName}']//div[span/*[name()='svg'][contains(@class,'icon-folder')]]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_FOLDER_TITLE</td>
-	<td>//*[@data-title='${key_dmFolderName}']//a|//tr[@data-title='${key_dmFolderName}']//a</td>
+	<td>//li[@data-title='${key_dmFolderName}']//a|//tr[@data-title='${key_dmFolderName}']//a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DESCRIPTIVE_LIST_FOLDER_EDITED_TITLE</td>
-	<td>//*[@data-title='${key_dmFolderNameEdit}']//a</td>
+	<td>//li[@data-title='${key_dmFolderNameEdit}']//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -245,9 +225,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--FILTER-->
-
 <tr>
 	<td>FILTER_REPOSITORY_GENERIC</td>
 	<td>xpath=(//div[contains(@id,'folderContainer')]/ul/li/a)[5]</td>
@@ -263,9 +241,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--TABLE_DOCUMENT-->
-
 <tr>
 	<td>TABLE_DOCUMENT_SHARED</td>
 	<td>//tr[contains(.,'${key_dmDocumentTitle}')]//*[*[name()='svg'][contains(@class,'lexicon-icon-users')]]</td>
@@ -276,22 +252,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--TOOLBAR-->
-
 <tr>
 	<td>TOOLBAR_ACTIONS</td>
 	<td>//div[contains(@class,'dropdown')]//button[*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TOOLBAR_INFO_PANEL</td>
-	<td>//li//button[*[name()='svg'][contains(@class,'info-circle')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TOOLBAR_INFO_PANEL_DETAILS_MESSAGE</td>
-	<td>//strong[contains(.,'${key_detailsMessage}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -304,9 +268,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SEARCH-->
-
 <tr>
 	<td>SEARCH_REPOSITORY_TAB</td>
 	<td>//div[contains(@class,'search-info')]/a[contains(.,'${dmRepositoryName}')]</td>
@@ -322,9 +284,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SIDEBAR-->
-
 <tr>
 	<td>SIDEBAR_INFO_ACTIVE</td>
 	<td>//div[contains(@class,'contextual-sidebar-visible')] | //div[contains(@class,'open')]/div[contains(@class,'info-panel')]/div[contains(@class,'sidebar')]</td>
@@ -341,18 +301,11 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DROPDOWN_INFO_PANEL</td>
-	<td>//div[@class= 'info-panel-content']//button[@class= 'dropdown-toggle component-action btn btn-monospaced btn-unstyled']</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--REPOSITORY-->
-
 <tr>
 	<td>REPOSITORY_FOLDER_NAME_DESCRIPTIVE_VIEW</td>
 	<td>//a[contains(.,'${key_dmRepositoryName}')]</td>

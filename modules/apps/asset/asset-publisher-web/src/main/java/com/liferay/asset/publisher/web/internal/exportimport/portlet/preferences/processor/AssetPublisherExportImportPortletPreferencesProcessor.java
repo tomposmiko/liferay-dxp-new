@@ -27,7 +27,6 @@ import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
-import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherSelectionStyleConfigurationUtil;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration;
 import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.asset.publisher.web.internal.display.context.AssetPublisherDisplayContext;
@@ -117,6 +116,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration",
+	immediate = true,
 	property = "javax.portlet.name=" + AssetPublisherPortletKeys.ASSET_PUBLISHER,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -145,14 +145,14 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 						portletDataContext.getParameterMap(),
 						PortletDataHandlerKeys.PORTLET_DATA)) {
 
-					_exportAssetObjects(portletDataContext, portletPreferences);
+					exportAssetObjects(portletDataContext, portletPreferences);
 				}
 			}
 			else {
-				_exportAssetObjects(portletDataContext, portletPreferences);
+				exportAssetObjects(portletDataContext, portletPreferences);
 			}
 
-			return _updateExportPortletPreferences(
+			return updateExportPortletPreferences(
 				portletDataContext, portletDataContext.getPortletId(),
 				portletPreferences);
 		}
@@ -178,11 +178,11 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		throws PortletDataException {
 
 		try {
-			_importLayoutReferences(portletDataContext);
+			importLayoutReferences(portletDataContext);
 
 			capability.process(portletDataContext, portletPreferences);
 
-			return _updateImportPortletPreferences(
+			return updateImportPortletPreferences(
 				portletDataContext, portletPreferences);
 		}
 		catch (Exception exception) {
@@ -205,6 +205,151 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 	protected void activate(Map<String, Object> properties) {
 		_assetPublisherWebConfiguration = ConfigurableUtil.createConfigurable(
 			AssetPublisherWebConfiguration.class, properties);
+	}
+
+	protected void exportAssetObjects(
+			PortletDataContext portletDataContext,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		List<AssetEntry> assetEntries = null;
+
+		Layout layout = layoutLocalService.getLayout(
+			portletDataContext.getPlid());
+
+		String selectionStyle = portletPreferences.getValue(
+			"selectionStyle",
+			AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC);
+
+		if (selectionStyle.equals(
+				AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC)) {
+
+			if (!_assetPublisherWebConfiguration.dynamicExportEnabled() ||
+				layout.isTypeAssetDisplay()) {
+
+				return;
+			}
+
+			AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+				layout, portletDataContext.getCompanyGroupId(),
+				portletDataContext.getScopeGroupId(), portletPreferences);
+
+			long assetVocabularyId = GetterUtil.getLong(
+				portletPreferences.getValue("assetVocabularyId", null));
+
+			if (assetVocabularyId > 0) {
+				mergeAnyCategoryIds(assetEntryQuery, assetVocabularyId);
+
+				if (ArrayUtil.isEmpty(assetEntryQuery.getAnyCategoryIds())) {
+					return;
+				}
+			}
+
+			BaseModelSearchResult<AssetEntry> baseModelSearchResult =
+				assetPublisherHelper.getAssetEntries(
+					assetEntryQuery, layout, portletPreferences,
+					AssetPublisherPortletKeys.ASSET_PUBLISHER,
+					LocaleUtil.getDefault(), TimeZoneUtil.getDefault(),
+					portletDataContext.getCompanyId(),
+					portletDataContext.getScopeGroupId(),
+					UserConstants.USER_ID_DEFAULT,
+					new HashMap<String, Serializable>(),
+					assetEntryQuery.getStart(), assetEntryQuery.getEnd());
+
+			assetEntries = baseModelSearchResult.getBaseModels();
+		}
+		else {
+			if (!_assetPublisherWebConfiguration.manualExportEnabled()) {
+				return;
+			}
+
+			long[] groupIds = assetPublisherHelper.getGroupIds(
+				portletPreferences, portletDataContext.getScopeGroupId(),
+				layout);
+
+			assetEntries = assetPublisherHelper.getAssetEntries(
+				null, portletPreferences,
+				PermissionThreadLocal.getPermissionChecker(), groupIds, false,
+				false);
+		}
+
+		for (AssetEntry assetEntry : assetEntries) {
+			AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
+
+			if ((assetRenderer == null) ||
+				!(assetRenderer.getAssetObject() instanceof StagedModel)) {
+
+				continue;
+			}
+
+			AssetRendererFactory<?> assetRendererFactory =
+				assetRenderer.getAssetRendererFactory();
+
+			if ((assetRendererFactory != null) &&
+				ExportImportThreadLocal.isStagingInProcess() &&
+				!stagingGroupHelper.isStagedPortlet(
+					assetEntry.getGroupId(),
+					assetRendererFactory.getPortletId())) {
+
+				continue;
+			}
+
+			if (!portletDataContext.addPrimaryKey(
+					AssetEntry.class, assetRenderer.getUuid())) {
+
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, portletDataContext.getPortletId(),
+					(StagedModel)assetRenderer.getAssetObject());
+			}
+		}
+	}
+
+	protected AssetEntryQuery getAssetEntryQuery(
+			Layout layout, long companyId, long groupId,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		AssetEntryQuery assetEntryQuery =
+			assetPublisherHelper.getAssetEntryQuery(
+				portletPreferences, groupId, layout, null, null);
+
+		long[] classNameIds = assetPublisherHelper.getClassNameIds(
+			portletPreferences,
+			AssetRendererFactoryRegistryUtil.getClassNameIds(companyId, true));
+
+		assetEntryQuery.setClassNameIds(classNameIds);
+
+		assetEntryQuery.setEnablePermissions(false);
+
+		int end = _assetPublisherWebConfiguration.dynamicExportLimit();
+
+		if (_isPaginationTypeNone(portletPreferences)) {
+			int delta = GetterUtil.getInteger(
+				portletPreferences.getValue("delta", null),
+				SearchContainer.DEFAULT_DELTA);
+
+			if ((delta < end) || (end == 0)) {
+				end = delta;
+			}
+		}
+
+		if (end == 0) {
+			end = QueryUtil.ALL_POS;
+		}
+
+		assetEntryQuery.setEnd(end);
+
+		assetEntryQuery.setExcludeZeroViewCount(false);
+
+		int start = 0;
+
+		if (end == 0) {
+			start = QueryUtil.ALL_POS;
+		}
+
+		assetEntryQuery.setStart(start);
+
+		return assetEntryQuery;
 	}
 
 	@Override
@@ -407,331 +552,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		return null;
 	}
 
-	@Reference
-	protected AssetCategoryLocalService assetCategoryLocalService;
-
-	@Reference(target = "(name=AssetPublisherExportCapability)")
-	protected Capability assetExportCapability;
-
-	@Reference(target = "(name=AssetPublisherImportCapability)")
-	protected Capability assetImportCapability;
-
-	@Reference
-	protected AssetListEntryLocalService assetListEntryLocalService;
-
-	@Reference
-	protected AssetPublisherHelper assetPublisherHelper;
-
-	@Reference
-	protected AssetPublisherWebHelper assetPublisherWebHelper;
-
-	@Reference
-	protected AssetVocabularyLocalService assetVocabularyLocalService;
-
-	@Reference(target = "(name=ReferencedStagedModelImporter)")
-	protected Capability capability;
-
-	@Reference
-	protected CompanyLocalService companyLocalService;
-
-	@Reference
-	protected DDMStructureLocalService ddmStructureLocalService;
-
-	@Reference
-	protected DLFileEntryTypeLocalService dlFileEntryTypeLocalService;
-
-	@Reference
-	protected GroupLocalService groupLocalService;
-
-	@Reference
-	protected LayoutLocalService layoutLocalService;
-
-	@Reference
-	protected OrganizationLocalService organizationLocalService;
-
-	@Reference
-	protected Portal portal;
-
-	@Reference
-	protected PortletLocalService portletLocalService;
-
-	@Reference
-	protected StagingGroupHelper stagingGroupHelper;
-
-	private void _exportAssetObjects(
-			PortletDataContext portletDataContext,
-			PortletPreferences portletPreferences)
-		throws Exception {
-
-		List<AssetEntry> assetEntries = null;
-
-		Layout layout = layoutLocalService.getLayout(
-			portletDataContext.getPlid());
-
-		String selectionStyle = portletPreferences.getValue(
-			"selectionStyle",
-			AssetPublisherSelectionStyleConfigurationUtil.
-				defaultSelectionStyle());
-
-		if (selectionStyle.equals(
-				AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC)) {
-
-			if (!_assetPublisherWebConfiguration.dynamicExportEnabled() ||
-				layout.isTypeAssetDisplay()) {
-
-				return;
-			}
-
-			AssetEntryQuery assetEntryQuery = _getAssetEntryQuery(
-				layout, portletDataContext.getCompanyGroupId(),
-				portletDataContext.getScopeGroupId(), portletPreferences);
-
-			long assetVocabularyId = GetterUtil.getLong(
-				portletPreferences.getValue("assetVocabularyId", null));
-
-			if (assetVocabularyId > 0) {
-				_mergeAnyCategoryIds(assetEntryQuery, assetVocabularyId);
-
-				if (ArrayUtil.isEmpty(assetEntryQuery.getAnyCategoryIds())) {
-					return;
-				}
-			}
-
-			BaseModelSearchResult<AssetEntry> baseModelSearchResult =
-				assetPublisherHelper.getAssetEntries(
-					assetEntryQuery, layout, portletPreferences,
-					AssetPublisherPortletKeys.ASSET_PUBLISHER,
-					LocaleUtil.getDefault(), TimeZoneUtil.getDefault(),
-					portletDataContext.getCompanyId(),
-					portletDataContext.getScopeGroupId(),
-					UserConstants.USER_ID_DEFAULT,
-					new HashMap<String, Serializable>(),
-					assetEntryQuery.getStart(), assetEntryQuery.getEnd());
-
-			assetEntries = baseModelSearchResult.getBaseModels();
-		}
-		else {
-			if (!_assetPublisherWebConfiguration.manualExportEnabled()) {
-				return;
-			}
-
-			long[] groupIds = assetPublisherHelper.getGroupIds(
-				portletPreferences, portletDataContext.getScopeGroupId(),
-				layout);
-
-			assetEntries = assetPublisherHelper.getAssetEntries(
-				null, portletPreferences,
-				PermissionThreadLocal.getPermissionChecker(), groupIds, false,
-				false);
-		}
-
-		for (AssetEntry assetEntry : assetEntries) {
-			AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
-
-			if ((assetRenderer == null) ||
-				!(assetRenderer.getAssetObject() instanceof StagedModel)) {
-
-				continue;
-			}
-
-			AssetRendererFactory<?> assetRendererFactory =
-				assetRenderer.getAssetRendererFactory();
-
-			if ((assetRendererFactory != null) &&
-				ExportImportThreadLocal.isStagingInProcess() &&
-				!stagingGroupHelper.isStagedPortlet(
-					assetEntry.getGroupId(),
-					assetRendererFactory.getPortletId())) {
-
-				continue;
-			}
-
-			if (!portletDataContext.addPrimaryKey(
-					AssetEntry.class, assetRenderer.getUuid())) {
-
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, portletDataContext.getPortletId(),
-					(StagedModel)assetRenderer.getAssetObject());
-			}
-		}
-	}
-
-	private AssetEntryQuery _getAssetEntryQuery(
-			Layout layout, long companyId, long groupId,
-			PortletPreferences portletPreferences)
-		throws Exception {
-
-		AssetEntryQuery assetEntryQuery =
-			assetPublisherHelper.getAssetEntryQuery(
-				portletPreferences, groupId, layout, null, null);
-
-		assetEntryQuery.setClassNameIds(
-			assetPublisherHelper.getClassNameIds(
-				portletPreferences,
-				AssetRendererFactoryRegistryUtil.getClassNameIds(
-					companyId, true)));
-		assetEntryQuery.setEnablePermissions(false);
-
-		int end = _assetPublisherWebConfiguration.dynamicExportLimit();
-
-		if (_isPaginationTypeNone(portletPreferences)) {
-			int delta = GetterUtil.getInteger(
-				portletPreferences.getValue("delta", null),
-				SearchContainer.DEFAULT_DELTA);
-
-			if ((delta < end) || (end == 0)) {
-				end = delta;
-			}
-		}
-
-		if (end == 0) {
-			end = QueryUtil.ALL_POS;
-		}
-
-		assetEntryQuery.setEnd(end);
-		assetEntryQuery.setExcludeZeroViewCount(false);
-
-		int start = 0;
-
-		if (end == 0) {
-			start = QueryUtil.ALL_POS;
-		}
-
-		assetEntryQuery.setStart(start);
-
-		return assetEntryQuery;
-	}
-
-	private String _getExportScopeId(
-			PortletDataContext portletDataContext,
-			Element groupIdMappingsElement, Layout layout, String value)
-		throws Exception {
-
-		if (value.startsWith(AssetPublisherHelper.SCOPE_ID_LAYOUT_PREFIX)) {
-
-			// Legacy preferences
-
-			String scopeIdSuffix = value.substring(
-				AssetPublisherHelper.SCOPE_ID_LAYOUT_PREFIX.length());
-
-			long scopeIdLayoutId = GetterUtil.getLong(scopeIdSuffix);
-
-			Layout scopeIdLayout = layoutLocalService.fetchLayout(
-				layout.getGroupId(), layout.isPrivateLayout(), scopeIdLayoutId);
-
-			if (scopeIdLayout == null) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Ignoring scope ", value,
-							" because the referenced layout ", scopeIdLayoutId,
-							" was not found"));
-				}
-
-				return value;
-			}
-
-			if (layout.getPlid() != scopeIdLayout.getPlid()) {
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, portletDataContext.getPortletId(),
-					scopeIdLayout);
-			}
-
-			return AssetPublisherHelper.SCOPE_ID_LAYOUT_UUID_PREFIX +
-				scopeIdLayout.getUuid();
-		}
-
-		if (value.startsWith(
-				AssetPublisherHelper.SCOPE_ID_LAYOUT_UUID_PREFIX)) {
-
-			String scopeLayoutUuid = value.substring(
-				AssetPublisherHelper.SCOPE_ID_LAYOUT_UUID_PREFIX.length());
-
-			Layout scopeUuidLayout =
-				layoutLocalService.fetchLayoutByUuidAndGroupId(
-					scopeLayoutUuid, portletDataContext.getGroupId(),
-					portletDataContext.isPrivateLayout());
-
-			if (scopeUuidLayout == null) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Ignoring scope ", value,
-							" because the referenced layout ", scopeLayoutUuid,
-							" was not found"));
-				}
-
-				return value;
-			}
-
-			if (layout.getPlid() != scopeUuidLayout.getPlid()) {
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, portletDataContext.getPortletId(),
-					scopeUuidLayout);
-			}
-
-			return value;
-		}
-
-		long groupId = GroupConstants.DEFAULT_LIVE_GROUP_ID;
-
-		try {
-			groupId = assetPublisherHelper.getGroupIdFromScopeId(
-				value, portletDataContext.getGroupId(),
-				portletDataContext.isPrivateLayout());
-		}
-		catch (NoSuchGroupException noSuchGroupException) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					StringBundler.concat(
-						"Ignoring scope ", value, " because the referenced ",
-						"group was not found"),
-					noSuchGroupException);
-			}
-
-			return value;
-		}
-		catch (PrincipalException principalException) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					StringBundler.concat(
-						"Ignoring scope ", value, " because the referenced ",
-						"parent group no longer allows sharing content with ",
-						"child sites"),
-					principalException);
-			}
-
-			return value;
-		}
-
-		Group group = groupLocalService.fetchGroup(groupId);
-
-		if (group == null) {
-			return value;
-		}
-
-		long liveGroupId = group.getLiveGroupId();
-
-		if (group.isStagedRemotely()) {
-			liveGroupId = group.getRemoteLiveGroupId();
-		}
-
-		if (liveGroupId == GroupConstants.DEFAULT_LIVE_GROUP_ID) {
-			liveGroupId = group.getGroupId();
-		}
-
-		Element groupIdMappingElement = groupIdMappingsElement.addElement(
-			"group-id-mapping");
-
-		groupIdMappingElement.addAttribute("group-id", String.valueOf(groupId));
-		groupIdMappingElement.addAttribute(
-			"live-group-id", String.valueOf(liveGroupId));
-		groupIdMappingElement.addAttribute("group-key", group.getGroupKey());
-
-		return String.valueOf(groupId);
-	}
-
-	private void _importLayoutReferences(PortletDataContext portletDataContext)
+	protected void importLayoutReferences(PortletDataContext portletDataContext)
 		throws PortletDataException {
 
 		Element importDataRootElement =
@@ -760,26 +581,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		}
 	}
 
-	private boolean _isPaginationTypeNone(
-		PortletPreferences portletPreferences) {
-
-		String paginationType = GetterUtil.getString(
-			portletPreferences.getValue("paginationType", null));
-
-		if (!ArrayUtil.contains(
-				AssetPublisherDisplayContext.PAGINATION_TYPES,
-				paginationType) ||
-			Objects.equals(
-				paginationType,
-				AssetPublisherDisplayContext.PAGINATION_TYPE_NONE)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private void _mergeAnyCategoryIds(
+	protected void mergeAnyCategoryIds(
 		AssetEntryQuery assetEntryQuery, long assetVocabularyId) {
 
 		List<AssetCategory> assetCategories =
@@ -814,15 +616,17 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		}
 	}
 
-	private void _restorePortletPreference(
+	protected void restorePortletPreference(
 			PortletDataContext portletDataContext, String name,
 			PortletPreferences portletPreferences)
 		throws Exception {
 
+		Layout layout = layoutLocalService.getLayout(
+			portletDataContext.getPlid());
+
 		PortletPreferences originalPortletPreferences =
 			PortletPreferencesFactoryUtil.getLayoutPortletSetup(
-				layoutLocalService.getLayout(portletDataContext.getPlid()),
-				portletDataContext.getPortletId());
+				layout, portletDataContext.getPortletId());
 
 		String[] values = originalPortletPreferences.getValues(
 			name, new String[] {StringPool.BLANK});
@@ -830,7 +634,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		portletPreferences.setValues(name, values);
 	}
 
-	private void _updateExportClassNameIds(
+	protected void updateExportClassNameIds(
 			PortletPreferences portletPreferences, String key)
 		throws Exception {
 
@@ -873,7 +677,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		portletPreferences.setValues(key, newValues);
 	}
 
-	private void _updateExportOrderByColumnClassPKs(
+	protected void updateExportOrderByColumnClassPKs(
 			PortletDataContext portletDataContext, Portlet portlet,
 			PortletPreferences portletPreferences, String key)
 		throws Exception {
@@ -913,7 +717,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		portletPreferences.setValue(key, newValue);
 	}
 
-	private PortletPreferences _updateExportPortletPreferences(
+	protected PortletPreferences updateExportPortletPreferences(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
@@ -976,7 +780,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 					portletPreferences.reset(name);
 				}
 				else {
-					_updateExportClassNameIds(portletPreferences, name);
+					updateExportClassNameIds(portletPreferences, name);
 				}
 			}
 			else if (name.equals(
@@ -1123,7 +927,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 					 StringUtil.startsWith(
 						 value, DDMIndexer.DDM_FIELD_PREFIX)) {
 
-				_updateExportOrderByColumnClassPKs(
+				updateExportOrderByColumnClassPKs(
 					portletDataContext, portlet, portletPreferences, name);
 			}
 			else if (name.startsWith("queryName") &&
@@ -1148,7 +952,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 					"queryValues" + index, AssetCategory.class.getName());
 			}
 			else if (name.equals("scopeIds")) {
-				_updateExportScopeIds(
+				updateExportScopeIds(
 					portletDataContext, portletPreferences, name,
 					portletDataContext.getPlid());
 			}
@@ -1157,7 +961,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
-	private void _updateExportScopeIds(
+	protected void updateExportScopeIds(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences, String key, long plid)
 		throws Exception {
@@ -1186,7 +990,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		portletPreferences.setValues(key, newValues);
 	}
 
-	private void _updateImportClassNameIds(
+	protected void updateImportClassNameIds(
 			PortletPreferences portletPreferences, String key)
 		throws Exception {
 
@@ -1226,7 +1030,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		portletPreferences.setValues(key, newValues);
 	}
 
-	private void _updateImportOrderByColumnClassPKs(
+	protected void updateImportOrderByColumnClassPKs(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences, String key,
 			long companyGroupId)
@@ -1263,7 +1067,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		portletPreferences.setValue(key, newValue);
 	}
 
-	private PortletPreferences _updateImportPortletPreferences(
+	protected PortletPreferences updateImportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws Exception {
@@ -1285,7 +1089,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 				portletPreferences.getValue(name, null));
 
 			if (name.equals("anyAssetType") || name.equals("classNameIds")) {
-				_updateImportClassNameIds(portletPreferences, name);
+				updateImportClassNameIds(portletPreferences, name);
 			}
 			else if (name.equals(
 						"anyClassTypeDLFileEntryAssetRendererFactory") ||
@@ -1320,7 +1124,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 					 StringUtil.startsWith(
 						 value, DDMIndexer.DDM_FIELD_PREFIX)) {
 
-				_updateImportOrderByColumnClassPKs(
+				updateImportOrderByColumnClassPKs(
 					portletDataContext, portletPreferences, name,
 					companyGroup.getGroupId());
 			}
@@ -1335,7 +1139,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 					companyGroup.getGroupId());
 			}
 			else if (name.equals("scopeIds")) {
-				_updateImportScopeIds(
+				updateImportScopeIds(
 					portletDataContext, portletPreferences, name,
 					companyGroup.getGroupId(), portletDataContext.getPlid());
 			}
@@ -1346,13 +1150,13 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 			}
 		}
 
-		_restorePortletPreference(
+		restorePortletPreference(
 			portletDataContext, "notifiedAssetEntryIds", portletPreferences);
 
 		return portletPreferences;
 	}
 
-	private void _updateImportScopeIds(
+	protected void updateImportScopeIds(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences, String key,
 			long companyGroupId, long plid)
@@ -1461,6 +1265,205 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		}
 
 		portletPreferences.setValues(key, newValues.toArray(new String[0]));
+	}
+
+	@Reference
+	protected AssetCategoryLocalService assetCategoryLocalService;
+
+	@Reference(target = "(name=AssetPublisherExportCapability)")
+	protected Capability assetExportCapability;
+
+	@Reference(target = "(name=AssetPublisherImportCapability)")
+	protected Capability assetImportCapability;
+
+	@Reference
+	protected AssetListEntryLocalService assetListEntryLocalService;
+
+	@Reference
+	protected AssetPublisherHelper assetPublisherHelper;
+
+	@Reference
+	protected AssetPublisherWebHelper assetPublisherWebHelper;
+
+	@Reference
+	protected AssetVocabularyLocalService assetVocabularyLocalService;
+
+	@Reference(target = "(name=ReferencedStagedModelImporter)")
+	protected Capability capability;
+
+	@Reference
+	protected CompanyLocalService companyLocalService;
+
+	@Reference
+	protected DDMStructureLocalService ddmStructureLocalService;
+
+	@Reference
+	protected DLFileEntryTypeLocalService dlFileEntryTypeLocalService;
+
+	@Reference
+	protected GroupLocalService groupLocalService;
+
+	@Reference
+	protected LayoutLocalService layoutLocalService;
+
+	@Reference
+	protected OrganizationLocalService organizationLocalService;
+
+	@Reference
+	protected Portal portal;
+
+	@Reference
+	protected PortletLocalService portletLocalService;
+
+	@Reference
+	protected StagingGroupHelper stagingGroupHelper;
+
+	private String _getExportScopeId(
+			PortletDataContext portletDataContext,
+			Element groupIdMappingsElement, Layout layout, String value)
+		throws Exception {
+
+		if (value.startsWith(AssetPublisherHelper.SCOPE_ID_LAYOUT_PREFIX)) {
+
+			// Legacy preferences
+
+			String scopeIdSuffix = value.substring(
+				AssetPublisherHelper.SCOPE_ID_LAYOUT_PREFIX.length());
+
+			long scopeIdLayoutId = GetterUtil.getLong(scopeIdSuffix);
+
+			Layout scopeIdLayout = layoutLocalService.fetchLayout(
+				layout.getGroupId(), layout.isPrivateLayout(), scopeIdLayoutId);
+
+			if (scopeIdLayout == null) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						StringBundler.concat(
+							"Ignoring scope ", value,
+							" because the referenced layout ", scopeIdLayoutId,
+							" was not found"));
+				}
+
+				return value;
+			}
+
+			if (layout.getPlid() != scopeIdLayout.getPlid()) {
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, portletDataContext.getPortletId(),
+					scopeIdLayout);
+			}
+
+			return AssetPublisherHelper.SCOPE_ID_LAYOUT_UUID_PREFIX +
+				scopeIdLayout.getUuid();
+		}
+
+		if (value.startsWith(
+				AssetPublisherHelper.SCOPE_ID_LAYOUT_UUID_PREFIX)) {
+
+			String scopeLayoutUuid = value.substring(
+				AssetPublisherHelper.SCOPE_ID_LAYOUT_UUID_PREFIX.length());
+
+			Layout scopeUuidLayout =
+				layoutLocalService.fetchLayoutByUuidAndGroupId(
+					scopeLayoutUuid, portletDataContext.getGroupId(),
+					portletDataContext.isPrivateLayout());
+
+			if (scopeUuidLayout == null) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						StringBundler.concat(
+							"Ignoring scope ", value,
+							" because the referenced layout ", scopeLayoutUuid,
+							" was not found"));
+				}
+
+				return value;
+			}
+
+			if (layout.getPlid() != scopeUuidLayout.getPlid()) {
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, portletDataContext.getPortletId(),
+					scopeUuidLayout);
+			}
+
+			return value;
+		}
+
+		long groupId = GroupConstants.DEFAULT_LIVE_GROUP_ID;
+
+		try {
+			groupId = assetPublisherHelper.getGroupIdFromScopeId(
+				value, portletDataContext.getGroupId(),
+				portletDataContext.isPrivateLayout());
+		}
+		catch (NoSuchGroupException noSuchGroupException) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					StringBundler.concat(
+						"Ignoring scope ", value, " because the referenced ",
+						"group was not found"),
+					noSuchGroupException);
+			}
+
+			return value;
+		}
+		catch (PrincipalException principalException) {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					StringBundler.concat(
+						"Ignoring scope ", value, " because the referenced ",
+						"parent group no longer allows sharing content with ",
+						"child sites"),
+					principalException);
+			}
+
+			return value;
+		}
+
+		Group group = groupLocalService.fetchGroup(groupId);
+
+		if (group == null) {
+			return value;
+		}
+
+		long liveGroupId = group.getLiveGroupId();
+
+		if (group.isStagedRemotely()) {
+			liveGroupId = group.getRemoteLiveGroupId();
+		}
+
+		if (liveGroupId == GroupConstants.DEFAULT_LIVE_GROUP_ID) {
+			liveGroupId = group.getGroupId();
+		}
+
+		Element groupIdMappingElement = groupIdMappingsElement.addElement(
+			"group-id-mapping");
+
+		groupIdMappingElement.addAttribute("group-id", String.valueOf(groupId));
+		groupIdMappingElement.addAttribute(
+			"live-group-id", String.valueOf(liveGroupId));
+		groupIdMappingElement.addAttribute("group-key", group.getGroupKey());
+
+		return String.valueOf(groupId);
+	}
+
+	private boolean _isPaginationTypeNone(
+		PortletPreferences portletPreferences) {
+
+		String paginationType = GetterUtil.getString(
+			portletPreferences.getValue("paginationType", null));
+
+		if (!ArrayUtil.contains(
+				AssetPublisherDisplayContext.PAGINATION_TYPES,
+				paginationType) ||
+			Objects.equals(
+				paginationType,
+				AssetPublisherDisplayContext.PAGINATION_TYPE_NONE)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

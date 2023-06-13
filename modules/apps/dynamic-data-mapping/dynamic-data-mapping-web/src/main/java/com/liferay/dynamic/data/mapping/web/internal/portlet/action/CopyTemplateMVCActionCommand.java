@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING,
 		"javax.portlet.name=" + PortletKeys.PORTLET_DISPLAY_TEMPLATE,
@@ -51,12 +52,29 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class CopyTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 
+	protected DDMTemplate copyTemplate(ActionRequest actionRequest)
+		throws Exception {
+
+		long templateId = ParamUtil.getLong(actionRequest, "templateId");
+
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+			actionRequest, "name");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DDMTemplate.class.getName(), actionRequest);
+
+		return _ddmTemplateService.copyTemplate(
+			templateId, nameMap, descriptionMap, serviceContext);
+	}
+
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		DDMTemplate template = _copyTemplate(actionRequest);
+		DDMTemplate template = copyTemplate(actionRequest);
 
 		setRedirectAttribute(actionRequest, template);
 	}
@@ -80,27 +98,13 @@ public class CopyTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 		return portletURL.toString();
 	}
 
-	private DDMTemplate _copyTemplate(ActionRequest actionRequest)
-		throws Exception {
+	@Reference(unbind = "-")
+	protected void setDDMTemplateService(
+		DDMTemplateService ddmTemplateService) {
 
-		long templateId = ParamUtil.getLong(actionRequest, "templateId");
-
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
-			actionRequest, "name");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DDMTemplate.class.getName(), actionRequest);
-
-		return _ddmTemplateService.copyTemplate(
-			templateId, nameMap, descriptionMap, serviceContext);
+		_ddmTemplateService = ddmTemplateService;
 	}
 
-	@Reference
 	private DDMTemplateService _ddmTemplateService;
-
-	@Reference
-	private Localization _localization;
 
 }

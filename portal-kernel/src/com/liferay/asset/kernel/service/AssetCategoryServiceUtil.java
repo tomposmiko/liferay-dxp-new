@@ -62,19 +62,6 @@ public class AssetCategoryServiceUtil {
 			groupId, title, vocabularyId, serviceContext);
 	}
 
-	public static AssetCategory addCategory(
-			String externalReferenceCode, long groupId, long parentCategoryId,
-			Map<java.util.Locale, String> titleMap,
-			Map<java.util.Locale, String> descriptionMap, long vocabularyId,
-			String[] categoryProperties,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addCategory(
-			externalReferenceCode, groupId, parentCategoryId, titleMap,
-			descriptionMap, vocabularyId, categoryProperties, serviceContext);
-	}
-
 	public static void deleteCategories(long[] categoryIds)
 		throws PortalException {
 
@@ -89,14 +76,6 @@ public class AssetCategoryServiceUtil {
 		throws PortalException {
 
 		return getService().fetchCategory(categoryId);
-	}
-
-	public static AssetCategory getAssetCategoryByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws PortalException {
-
-		return getService().getAssetCategoryByExternalReferenceCode(
-			groupId, externalReferenceCode);
 	}
 
 	/**

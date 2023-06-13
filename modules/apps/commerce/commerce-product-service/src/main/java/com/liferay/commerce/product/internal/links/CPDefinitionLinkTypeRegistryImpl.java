@@ -30,7 +30,10 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Marco Leo
  */
-@Component(service = CPDefinitionLinkTypeRegistry.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CPDefinitionLinkTypeRegistry.class
+)
 public class CPDefinitionLinkTypeRegistryImpl
 	implements CPDefinitionLinkTypeRegistry {
 
@@ -56,6 +59,7 @@ public class CPDefinitionLinkTypeRegistryImpl
 		_serviceTrackerList.close();
 	}
 
-	private ServiceTrackerList<CPDefinitionLinkType> _serviceTrackerList;
+	private ServiceTrackerList<CPDefinitionLinkType, CPDefinitionLinkType>
+		_serviceTrackerList;
 
 }

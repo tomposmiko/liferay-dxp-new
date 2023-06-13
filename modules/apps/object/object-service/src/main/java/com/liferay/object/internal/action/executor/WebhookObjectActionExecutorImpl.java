@@ -16,6 +16,7 @@ package com.liferay.object.internal.action.executor;
 
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
+import com.liferay.object.internal.action.settings.WebhookObjectActionSettings;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
@@ -56,6 +57,11 @@ public class WebhookObjectActionExecutorImpl implements ObjectActionExecutor {
 	@Override
 	public String getKey() {
 		return ObjectActionExecutorConstants.KEY_WEBHOOK;
+	}
+
+	@Override
+	public Class<?> getSettings() {
+		return WebhookObjectActionSettings.class;
 	}
 
 	@Reference

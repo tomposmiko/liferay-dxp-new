@@ -15,29 +15,27 @@
 AUI.add(
 	'liferay-form',
 	(A) => {
-		const AArray = A.Array;
+		var AArray = A.Array;
 
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
+		var DEFAULTS_FORM_VALIDATOR = A.config.FormValidator;
 
-		const defaultAcceptFiles = DEFAULTS_FORM_VALIDATOR.RULES.acceptFiles;
+		var defaultAcceptFiles = DEFAULTS_FORM_VALIDATOR.RULES.acceptFiles;
 
-		const TABS_SECTION_STR = 'TabsSection';
+		var TABS_SECTION_STR = 'TabsSection';
 
-		const REGEX_CUSTOM_ELEMENT_NAME = /^[a-z]([a-z]|[0-9]|-|\.|_)*-([a-z]|[0-9]|-|\.|_)*/;
+		var REGEX_CUSTOM_ELEMENT_NAME = /^[a-z]([a-z]|[0-9]|-|\.|_)*-([a-z]|[0-9]|-|\.|_)*/;
 
-		const REGEX_EMAIL = /^[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:\w(?:[\w-]*\w)?\.)+(\w(?:[\w-]*\w))$/;
+		var REGEX_EMAIL = /^[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:\w(?:[\w-]*\w)?\.)+(\w(?:[\w-]*\w))$/;
 
-		const REGEX_FRIENDLY_URL_MAPPING = /[A-Za-z0-9-_]*/;
+		var REGEX_NUMBER = /^[+-]?(\d+)([.|,]\d+)*([eE][+-]?\d+)?$/;
 
-		const REGEX_NUMBER = /^[+-]?(\d+)([.|,]\d+)*([eE][+-]?\d+)?$/;
+		var REGEX_URL = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(https?:\/\/|www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))((.*):(\d*)\/?(.*))?)/;
 
-		const REGEX_URL = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(https?:\/\/|www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))((.*):(\d*)\/?(.*))?)/;
+		var REGEX_URL_ALLOW_RELATIVE = /((([A-Za-z]{3,9}:(?:\/\/)?)|\/(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(https?:\/\/|www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))((.*):(\d*)\/?(.*))?)/;
 
-		const REGEX_URL_ALLOW_RELATIVE = /((([A-Za-z]{3,9}:(?:\/\/)?)|\/(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(https?:\/\/|www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))((.*):(\d*)\/?(.*))?)/;
-
-		const RESERVED_CUSTOM_ELEMENT_NAMES = new Set([
+		var RESERVED_CUSTOM_ELEMENT_NAMES = new Set([
 			'annotation-xml',
 			'color-profile',
 			'font-face',
@@ -48,7 +46,7 @@ AUI.add(
 			'missing-glyph',
 		]);
 
-		const acceptFiles = function (val, node, ruleValue) {
+		var acceptFiles = function (val, node, ruleValue) {
 			if (ruleValue && ruleValue.split(',').includes('*')) {
 				return true;
 			}
@@ -56,23 +54,19 @@ AUI.add(
 			return defaultAcceptFiles(val, node, ruleValue);
 		};
 
-		const customElementName = function (val, _node, _ruleValue) {
+		var customElementName = function (val, _node, _ruleValue) {
 			return (
 				REGEX_CUSTOM_ELEMENT_NAME.test(val) &&
 				!RESERVED_CUSTOM_ELEMENT_NAMES.has(val)
 			);
 		};
 
-		const email = function (val) {
+		var email = function (val) {
 			return REGEX_EMAIL.test(val);
 		};
 
-		const friendlyURLMapping = function (val, _node, _ruleValue) {
-			return REGEX_FRIENDLY_URL_MAPPING.test(val);
-		};
-
-		const maxFileSize = function (_val, node, ruleValue) {
-			const nodeType = node.get('type').toLowerCase();
+		var maxFileSize = function (_val, node, ruleValue) {
+			var nodeType = node.get('type').toLowerCase();
 
 			if (nodeType === 'file') {
 				return ruleValue === 0 || node._node.files[0].size <= ruleValue;
@@ -81,15 +75,15 @@ AUI.add(
 			return true;
 		};
 
-		const number = function (val, _node, _ruleValue) {
+		var number = function (val, _node, _ruleValue) {
 			return REGEX_NUMBER && REGEX_NUMBER.test(val);
 		};
 
-		const url = function (val, _node, _ruleValue) {
+		var url = function (val, _node, _ruleValue) {
 			return REGEX_URL && REGEX_URL.test(val);
 		};
 
-		const urlAllowRelative = function (val) {
+		var urlAllowRelative = function (val) {
 			return (
 				REGEX_URL_ALLOW_RELATIVE && REGEX_URL_ALLOW_RELATIVE.test(val)
 			);
@@ -101,7 +95,6 @@ AUI.add(
 				acceptFiles,
 				customElementName,
 				email,
-				friendlyURLMapping,
 				maxFileSize,
 				number,
 				url,
@@ -134,9 +127,6 @@ AUI.add(
 				equalTo: Liferay.Language.get(
 					'please-enter-the-same-value-again'
 				),
-				friendlyURLMapping: Liferay.Language.get(
-					'please-enter-a-valid-friendly-url-mapping'
-				),
 				max: Liferay.Language.get(
 					'please-enter-a-value-less-than-or-equal-to-x'
 				),
@@ -168,13 +158,13 @@ AUI.add(
 			true
 		);
 
-		const Form = A.Component.create({
+		var Form = A.Component.create({
 			_INSTANCES: {},
 
 			ATTRS: {
 				fieldRules: {
 					setter(val) {
-						const instance = this;
+						var instance = this;
 
 						instance._processFieldRules(val);
 
@@ -185,7 +175,7 @@ AUI.add(
 				namespace: {},
 				onSubmit: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
 						return instance._onSubmit;
 					},
@@ -199,22 +189,22 @@ AUI.add(
 			EXTENDS: A.Base,
 
 			get(id) {
-				const instance = this;
+				var instance = this;
 
 				return instance._INSTANCES[id];
 			},
 
 			prototype: {
 				_afterGetFieldsByName(fieldName) {
-					const instance = this;
+					var instance = this;
 
-					const editorString = 'Editor';
+					var editorString = 'Editor';
 
 					if (
 						fieldName.lastIndexOf(editorString) ===
 						fieldName.length - editorString.length
 					) {
-						const formNode = instance.formNode;
+						var formNode = instance.formNode;
 
 						return new A.Do.AlterReturn(
 							'Return editor dom element',
@@ -224,10 +214,10 @@ AUI.add(
 				},
 
 				_bindForm() {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.formNode;
-					const formValidator = instance.formValidator;
+					var formNode = instance.formNode;
+					var formValidator = instance.formValidator;
 
 					formValidator.on(
 						'submit',
@@ -258,7 +248,7 @@ AUI.add(
 				},
 
 				_defaultSubmitFn(event) {
-					const instance = this;
+					var instance = this;
 
 					if (!event.stopped) {
 						submitForm(instance.form);
@@ -266,7 +256,7 @@ AUI.add(
 				},
 
 				_findRuleIndex(fieldRules, fieldName, validatorName) {
-					let ruleIndex = -1;
+					var ruleIndex = -1;
 
 					AArray.some(fieldRules, (element, index) => {
 						if (
@@ -283,67 +273,62 @@ AUI.add(
 				},
 
 				_focusInvalidFieldTab() {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.formNode;
+					var formNode = instance.formNode;
 
-					const field = formNode.one(
+					var field = formNode.one(
 						'.' + instance.formValidator.get('errorClass')
 					);
 
 					if (field) {
-						const fieldWrapper = field.ancestor(
+						var fieldWrapper = field.ancestor(
 							'form > fieldset > div, form > div'
 						);
 
-						const formTabs = formNode.one('.lfr-nav');
+						var formTabs = formNode.one('.lfr-nav');
 
 						if (fieldWrapper && formTabs) {
-							const tabs = formTabs.all('.nav-item');
-							const tabsNamespace = formTabs.getAttribute(
+							var tabs = formTabs.all('.nav-item');
+							var tabsNamespace = formTabs.getAttribute(
 								'data-tabs-namespace'
 							);
 
-							const tabNames = AArray.map(tabs._nodes, (tab) => {
+							var tabNames = AArray.map(tabs._nodes, (tab) => {
 								return tab.getAttribute('data-tab-name');
 							});
 
-							const fieldWrapperId = fieldWrapper
+							var fieldWrapperId = fieldWrapper
 								.getAttribute('id')
 								.slice(0, -TABS_SECTION_STR.length);
 
-							const fieldTabId = AArray.find(
-								tabs._nodes,
-								(tab) => {
-									return (
-										tab
-											.getAttribute('id')
-											.indexOf(fieldWrapperId) !== -1
-									);
-								}
-							);
-
-							if (tabsNamespace) {
-								Liferay.Portal.Tabs.show(
-									tabsNamespace,
-									tabNames,
-									fieldTabId.getAttribute('data-tab-name')
+							var fieldTabId = AArray.find(tabs._nodes, (tab) => {
+								return (
+									tab
+										.getAttribute('id')
+										.indexOf(fieldWrapperId) !== -1
 								);
-							}
+							});
+
+							Liferay.Portal.Tabs.show(
+								tabsNamespace,
+								tabNames,
+								fieldTabId.getAttribute('data-tab-name')
+							);
 						}
 					}
 				},
 
 				_onEditorBlur(event) {
-					const instance = this;
+					var instance = this;
 
-					const formValidator = instance.formValidator;
+					var formValidator = instance.formValidator;
 
 					formValidator.validateField(event.target);
 				},
 
 				_onFieldFocusChange(event) {
-					const row = event.currentTarget.ancestor('.field');
+					var row = event.currentTarget.ancestor('.field');
 
 					if (row) {
 						row.toggleClass(
@@ -354,7 +339,7 @@ AUI.add(
 				},
 
 				_onSubmit(event) {
-					const instance = this;
+					var instance = this;
 
 					event.preventDefault();
 
@@ -364,19 +349,19 @@ AUI.add(
 				},
 
 				_onSubmitError() {
-					const instance = this;
+					var instance = this;
 
-					const collapsiblePanels = instance.formNode.all(
+					var collapsiblePanels = instance.formNode.all(
 						'.panel-collapse'
 					);
 
 					collapsiblePanels.each((panel) => {
-						const errorFields = panel
+						var errorFields = panel
 							.get('children')
 							.all('.has-error');
 
 						if (errorFields.size() > 0 && !panel.hasClass('show')) {
-							const panelNode = panel.getDOM();
+							var panelNode = panel.getDOM();
 
 							Liferay.CollapseProvider.show({panel: panelNode});
 						}
@@ -384,25 +369,25 @@ AUI.add(
 				},
 
 				_onValidatorSubmit(event) {
-					const instance = this;
+					var instance = this;
 
-					const onSubmit = instance.get('onSubmit');
+					var onSubmit = instance.get('onSubmit');
 
 					onSubmit.call(instance, event.validator.formEvent);
 				},
 
 				_processFieldRule(rules, strings, rule) {
-					const instance = this;
+					var instance = this;
 
-					let value = true;
+					var value = true;
 
-					const fieldName = rule.fieldName;
-					const validatorName = rule.validatorName;
+					var fieldName = rule.fieldName;
+					var validatorName = rule.validatorName;
 
-					const field = this.formValidator.getField(fieldName);
+					var field = this.formValidator.getField(fieldName);
 
 					if (field) {
-						const fieldNode = field.getDOMNode();
+						var fieldNode = field.getDOMNode();
 
 						A.Do.after(
 							'_setFieldAttribute',
@@ -425,7 +410,7 @@ AUI.add(
 						value = rule.body;
 					}
 
-					let fieldRules = rules[fieldName];
+					var fieldRules = rules[fieldName];
 
 					if (!fieldRules) {
 						fieldRules = {};
@@ -440,10 +425,10 @@ AUI.add(
 							rule.body;
 					}
 
-					const errorMessage = rule.errorMessage;
+					var errorMessage = rule.errorMessage;
 
 					if (errorMessage) {
-						let fieldStrings = strings[fieldName];
+						var fieldStrings = strings[fieldName];
 
 						if (!fieldStrings) {
 							fieldStrings = {};
@@ -456,16 +441,16 @@ AUI.add(
 				},
 
 				_processFieldRules(fieldRules) {
-					const instance = this;
+					var instance = this;
 
 					if (!fieldRules) {
 						fieldRules = instance.get('fieldRules');
 					}
 
-					const fieldStrings = {};
-					const rules = {};
+					var fieldStrings = {};
+					var rules = {};
 
-					for (const rule in fieldRules) {
+					for (var rule in fieldRules) {
 						instance._processFieldRule(
 							rules,
 							fieldStrings,
@@ -473,7 +458,7 @@ AUI.add(
 						);
 					}
 
-					const formValidator = instance.formValidator;
+					var formValidator = instance.formValidator;
 
 					if (formValidator) {
 						formValidator.set('fieldStrings', fieldStrings);
@@ -494,7 +479,7 @@ AUI.add(
 				},
 
 				_validatable(field) {
-					let result;
+					var result;
 
 					if (field.test(':disabled')) {
 						result = new A.Do.Halt();
@@ -504,17 +489,17 @@ AUI.add(
 				},
 
 				addRule(fieldName, validatorName, errorMessage, body, custom) {
-					const instance = this;
+					var instance = this;
 
-					const fieldRules = instance.get('fieldRules');
+					var fieldRules = instance.get('fieldRules');
 
-					const ruleIndex = instance._findRuleIndex(
+					var ruleIndex = instance._findRuleIndex(
 						fieldRules,
 						fieldName,
 						validatorName
 					);
 
-					if (ruleIndex === -1) {
+					if (ruleIndex == -1) {
 						fieldRules.push({
 							body: body || '',
 							custom: custom || false,
@@ -528,18 +513,18 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const id = instance.get('id');
+					var id = instance.get('id');
 
-					const form = document[id];
-					const formNode = A.one(form);
+					var form = document[id];
+					var formNode = A.one(form);
 
 					instance.form = form;
 					instance.formNode = formNode;
 
 					if (formNode) {
-						const formValidator = new A.FormValidator({
+						var formValidator = new A.FormValidator({
 							boundingBox: formNode,
 							stackErrorContainer:
 								'<div class="form-feedback-item form-validator-stack help-block"></div>',
@@ -569,18 +554,18 @@ AUI.add(
 				},
 
 				removeRule(fieldName, validatorName) {
-					const instance = this;
+					var instance = this;
 
-					const fieldRules = instance.get('fieldRules');
+					var fieldRules = instance.get('fieldRules');
 
-					const ruleIndex = instance._findRuleIndex(
+					var ruleIndex = instance._findRuleIndex(
 						fieldRules,
 						fieldName,
 						validatorName
 					);
 
-					if (ruleIndex !== -1) {
-						const rule = fieldRules[ruleIndex];
+					if (ruleIndex != -1) {
+						var rule = fieldRules[ruleIndex];
 
 						instance.formValidator.resetField(rule.fieldName);
 
@@ -595,11 +580,11 @@ AUI.add(
 			 * @deprecated As of Mueller (7.2.x), with no direct replacement
 			 */
 			register(config) {
-				const instance = this;
+				var instance = this;
 
-				const form = new Liferay.Form(config);
+				var form = new Liferay.Form(config);
 
-				const formName = config.id || config.namespace;
+				var formName = config.id || config.namespace;
 
 				instance._INSTANCES[formName] = form;
 

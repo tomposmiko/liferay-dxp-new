@@ -119,8 +119,7 @@
 						]
 					}
 				}
-			],
-			"label": "menu-display-options"
+			]
 		},
 		{
 			"configurationRole": "style",
@@ -135,8 +134,7 @@
 					"name": "selectedItemColor",
 					"type": "colorPicker"
 				}
-			],
-			"label": "menu-display-options"
+			]
 		}
 	]
 }

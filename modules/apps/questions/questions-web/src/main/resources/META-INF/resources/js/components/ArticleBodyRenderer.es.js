@@ -16,17 +16,13 @@ import React, {useEffect, useState} from 'react';
 
 import Highlight from './Highlight.es';
 
-export default function ArticleBodyRenderer({
+export default ({
 	articleBody,
 	compactMode = false,
-	companyName,
-	elapsedTime,
 	encodingFormat,
-	hasCompanyMx,
 	id,
-	showSignature = true,
 	signature,
-}) {
+}) => {
 	const [
 		articleBodyContainsParagraph,
 		setArticleBodyContainsParagraph,
@@ -36,13 +32,11 @@ export default function ArticleBodyRenderer({
 		setArticleBodyContainsParagraph(articleBody.includes('<p>'));
 	}, [articleBody]);
 
-	const _companyName = hasCompanyMx && companyName ? `(${companyName})` : '';
-
 	return (
 		<>
 			{encodingFormat !== 'bbcode' && compactMode && (
 				<div
-					className={`questions-article-body-${id} questions-labels-limit`}
+					className={`questions-article-body-${id}`}
 					dangerouslySetInnerHTML={{__html: articleBody}}
 				/>
 			)}
@@ -52,15 +46,15 @@ export default function ArticleBodyRenderer({
 				</div>
 			)}
 
-			{showSignature && signature && (
+			{signature && (
 				<style
 					dangerouslySetInnerHTML={{
 						__html: `.questions-article-body-${id} ${
 							articleBodyContainsParagraph ? 'p' : 'div'
-						}:last-child:after {content: " - ${signature} ${_companyName} - ${elapsedTime}"; font-weight: bold;}`,
+						}:last-child:after {content: " - ${signature}"; font-weight: bold;}`,
 					}}
 				/>
 			)}
 		</>
 	);
-}
+};

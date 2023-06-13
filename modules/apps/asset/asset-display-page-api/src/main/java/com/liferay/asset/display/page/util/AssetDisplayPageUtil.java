@@ -15,17 +15,17 @@
 package com.liferay.asset.display.page.util;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
-import com.liferay.asset.display.page.info.display.contributor.LayoutDisplayPageProviderRegistryUtil;
+import com.liferay.asset.display.page.info.display.contributor.LayoutDisplayPageProviderTrackerUtil;
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalServiceUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 /**
@@ -34,20 +34,21 @@ import com.liferay.portal.kernel.util.PortalUtil;
 public class AssetDisplayPageUtil {
 
 	public static LayoutPageTemplateEntry
-		getAssetDisplayPageLayoutPageTemplateEntry(
-			long groupId, long classNameId, long classPK, long classTypeId) {
+			getAssetDisplayPageLayoutPageTemplateEntry(
+				long groupId, long classNameId, long classPK, long classTypeId)
+		throws PortalException {
 
 		LayoutPageTemplateEntry defaultLayoutPageTemplateEntry =
 			LayoutPageTemplateEntryServiceUtil.
 				fetchDefaultLayoutPageTemplateEntry(
 					groupId, classNameId, classTypeId);
 
-		LayoutDisplayPageProviderRegistry layoutDisplayPageProviderRegistry =
-			LayoutDisplayPageProviderRegistryUtil.
-				getLayoutDisplayPageProviderRegistry();
+		LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker =
+			LayoutDisplayPageProviderTrackerUtil.
+				getLayoutDisplayPageProviderTracker();
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			layoutDisplayPageProviderRegistry.
+			layoutDisplayPageProviderTracker.
 				getLayoutDisplayPageProviderByClassName(
 					PortalUtil.getClassName(classNameId));
 
@@ -57,7 +58,8 @@ public class AssetDisplayPageUtil {
 	}
 
 	public static boolean hasAssetDisplayPage(
-		long groupId, AssetEntry assetEntry) {
+			long groupId, AssetEntry assetEntry)
+		throws PortalException {
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			getAssetDisplayPageLayoutPageTemplateEntry(
@@ -72,7 +74,8 @@ public class AssetDisplayPageUtil {
 	}
 
 	public static boolean hasAssetDisplayPage(
-		long groupId, long classNameId, long classPK, long classTypeId) {
+			long groupId, long classNameId, long classPK, long classTypeId)
+		throws PortalException {
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			getAssetDisplayPageLayoutPageTemplateEntry(
@@ -86,9 +89,10 @@ public class AssetDisplayPageUtil {
 	}
 
 	private static LayoutPageTemplateEntry _getAssetDisplayPage(
-		long groupId, long classNameId, long classPK,
-		LayoutPageTemplateEntry defaultLayoutPageTemplateEntry,
-		LayoutDisplayPageProvider<?> layoutDisplayPageProvider) {
+			long groupId, long classNameId, long classPK,
+			LayoutPageTemplateEntry defaultLayoutPageTemplateEntry,
+			LayoutDisplayPageProvider<?> layoutDisplayPageProvider)
+		throws PortalException {
 
 		AssetDisplayPageEntry assetDisplayPageEntry =
 			AssetDisplayPageEntryLocalServiceUtil.fetchAssetDisplayPageEntry(
@@ -128,7 +132,7 @@ public class AssetDisplayPageUtil {
 		if (assetDisplayPageEntry.getType() ==
 				AssetDisplayPageConstants.TYPE_SPECIFIC) {
 
-			return LayoutPageTemplateEntryLocalServiceUtil.
+			return LayoutPageTemplateEntryServiceUtil.
 				fetchLayoutPageTemplateEntry(
 					assetDisplayPageEntry.getLayoutPageTemplateEntryId());
 		}

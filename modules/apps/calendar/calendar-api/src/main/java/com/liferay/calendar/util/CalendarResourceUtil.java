@@ -48,7 +48,7 @@ public class CalendarResourceUtil {
 
 		return CalendarResourceLocalServiceUtil.fetchCalendarResource(
 			PortalUtil.getClassNameId(User.class),
-			UserLocalServiceUtil.getGuestUserId(companyId));
+			UserLocalServiceUtil.getDefaultUserId(companyId));
 	}
 
 	public static CalendarResource getGroupCalendarResource(
@@ -78,7 +78,7 @@ public class CalendarResourceUtil {
 
 		User user = UserLocalServiceUtil.fetchUserById(userId);
 
-		if ((user == null) || user.isGuestUser()) {
+		if ((user == null) || user.isDefaultUser()) {
 			Role role = RoleLocalServiceUtil.getRole(
 				group.getCompanyId(), RoleConstants.ADMINISTRATOR);
 
@@ -127,7 +127,7 @@ public class CalendarResourceUtil {
 
 		String userName = user.getFullName();
 
-		if (user.isGuestUser()) {
+		if (user.isDefaultUser()) {
 			userGroup = GroupLocalServiceUtil.getGroup(
 				serviceContext.getCompanyId(), GroupConstants.GUEST);
 

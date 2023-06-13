@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the site navigation menu item service. This utility wraps <code>com.liferay.site.navigation.service.persistence.impl.SiteNavigationMenuItemPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1647,9 +1651,29 @@ public class SiteNavigationMenuItemUtil {
 	}
 
 	public static SiteNavigationMenuItemPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile SiteNavigationMenuItemPersistence _persistence;
+	private static ServiceTracker
+		<SiteNavigationMenuItemPersistence, SiteNavigationMenuItemPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			SiteNavigationMenuItemPersistence.class);
+
+		ServiceTracker
+			<SiteNavigationMenuItemPersistence,
+			 SiteNavigationMenuItemPersistence> serviceTracker =
+				new ServiceTracker
+					<SiteNavigationMenuItemPersistence,
+					 SiteNavigationMenuItemPersistence>(
+						 bundle.getBundleContext(),
+						 SiteNavigationMenuItemPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

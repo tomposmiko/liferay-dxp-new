@@ -20,7 +20,6 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.CustomField;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.CustomValue;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Geo;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -38,14 +37,14 @@ import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.ParseException;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
-import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Javier Gamarra
@@ -61,23 +60,26 @@ public class CustomFieldsUtil {
 
 		Map<String, Serializable> attributes = expandoBridge.getAttributes();
 
-		return TransformUtil.transformToArray(
-			attributes.entrySet(),
+		Set<Map.Entry<String, Serializable>> entries = attributes.entrySet();
+
+		Stream<Map.Entry<String, Serializable>> entriesStream =
+			entries.stream();
+
+		return entriesStream.filter(
 			entry -> {
 				UnicodeProperties unicodeProperties =
 					expandoBridge.getAttributeProperties(entry.getKey());
 
-				if (GetterUtil.getBoolean(
-						unicodeProperties.getProperty(
-							ExpandoColumnConstants.PROPERTY_HIDDEN))) {
-
-					return null;
-				}
-
-				return _toCustomField(
-					acceptAllLanguages, entry, expandoBridge, locale);
-			},
-			CustomField.class);
+				return !GetterUtil.getBoolean(
+					unicodeProperties.getProperty(
+						ExpandoColumnConstants.PROPERTY_HIDDEN));
+			}
+		).map(
+			entry -> _toCustomField(
+				acceptAllLanguages, entry, expandoBridge, locale)
+		).toArray(
+			CustomField[]::new
+		);
 	}
 
 	public static Map<String, Serializable> toMap(
@@ -85,30 +87,88 @@ public class CustomFieldsUtil {
 		Locale locale) {
 
 		if (customFields == null) {
-			return Collections.emptyMap();
+			return null;
 		}
 
-		Map<String, Serializable> map = new HashMap<>();
+		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
+			companyId, className);
 
-		for (CustomField customField : customFields) {
-			map.put(
-				customField.getName(),
-				_getValue(className, companyId, locale, customField));
-		}
+		return Stream.of(
+			customFields
+		).collect(
+			Collectors.toMap(
+				CustomField::getName,
+				customField -> {
+					int attributeType = expandoBridge.getAttributeType(
+						customField.getName());
 
-		return map;
+					CustomValue customValue = customField.getCustomValue();
+
+					Object data = customValue.getData();
+
+					if (ExpandoColumnConstants.DATE == attributeType) {
+						return _parseDate(String.valueOf(data));
+					}
+					else if (ExpandoColumnConstants.DOUBLE_ARRAY ==
+								attributeType) {
+
+						return ArrayUtil.toDoubleArray((List<Number>)data);
+					}
+					else if (ExpandoColumnConstants.FLOAT_ARRAY ==
+								attributeType) {
+
+						return ArrayUtil.toFloatArray((List<Number>)data);
+					}
+					else if (ExpandoColumnConstants.GEOLOCATION ==
+								attributeType) {
+
+						Geo geo = customValue.getGeo();
+
+						return JSONUtil.put(
+							"latitude", geo.getLatitude()
+						).put(
+							"longitude", geo.getLongitude()
+						).toString();
+					}
+					else if (ExpandoColumnConstants.INTEGER_ARRAY ==
+								attributeType) {
+
+						return ArrayUtil.toIntArray((List<Number>)data);
+					}
+					else if (ExpandoColumnConstants.LONG_ARRAY ==
+								attributeType) {
+
+						return ArrayUtil.toLongArray((List<Number>)data);
+					}
+					else if (ExpandoColumnConstants.STRING_ARRAY ==
+								attributeType) {
+
+						List<?> list = (List<?>)data;
+
+						return list.toArray(new String[0]);
+					}
+					else if (ExpandoColumnConstants.STRING_LOCALIZED ==
+								attributeType) {
+
+						return (Serializable)LocalizedMapUtil.getLocalizedMap(
+							locale, (String)data, customValue.getData_i18n());
+					}
+
+					return (Serializable)data;
+				})
+		);
 	}
 
 	private static Map<String, String> _getLocalizedValues(
 		boolean acceptAllLanguages, int attributeType, Object value) {
 
-		if (ExpandoColumnConstants.STRING_LOCALIZED != attributeType) {
-			return null;
+		if (ExpandoColumnConstants.STRING_LOCALIZED == attributeType) {
+			Map<Locale, String> map = (Map<Locale, String>)value;
+
+			return LocalizedMapUtil.getI18nMap(acceptAllLanguages, map);
 		}
 
-		Map<Locale, String> map = (Map<Locale, String>)value;
-
-		return LocalizedMapUtil.getI18nMap(acceptAllLanguages, map);
+		return null;
 	}
 
 	private static Object _getValue(
@@ -126,71 +186,6 @@ public class CustomFieldsUtil {
 		}
 
 		return value;
-	}
-
-	private static Object _getValue(
-		Map.Entry<String, Serializable> entry, ExpandoBridge expandoBridge,
-		String key) {
-
-		Object value = entry.getValue();
-
-		if (_isEmpty(value)) {
-			return expandoBridge.getAttributeDefault(key);
-		}
-
-		return value;
-	}
-
-	private static Serializable _getValue(
-		String className, long companyId, Locale locale,
-		CustomField customField) {
-
-		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
-			companyId, className);
-
-		int attributeType = expandoBridge.getAttributeType(
-			customField.getName());
-
-		CustomValue customValue = customField.getCustomValue();
-
-		Object data = customValue.getData();
-
-		if (ExpandoColumnConstants.DATE == attributeType) {
-			return _parseDate(String.valueOf(data));
-		}
-		else if (ExpandoColumnConstants.DOUBLE_ARRAY == attributeType) {
-			return _toArray(data, ArrayUtil::toDoubleArray);
-		}
-		else if (ExpandoColumnConstants.FLOAT_ARRAY == attributeType) {
-			return _toArray(data, ArrayUtil::toFloatArray);
-		}
-		else if (ExpandoColumnConstants.GEOLOCATION == attributeType) {
-			Geo geo = customValue.getGeo();
-
-			return JSONUtil.put(
-				"latitude", geo.getLatitude()
-			).put(
-				"longitude", geo.getLongitude()
-			).toString();
-		}
-		else if (ExpandoColumnConstants.INTEGER_ARRAY == attributeType) {
-			return _toArray(data, ArrayUtil::toIntArray);
-		}
-		else if (ExpandoColumnConstants.LONG_ARRAY == attributeType) {
-			return _toArray(
-				data,
-				(Function<Collection<Number>, Serializable>)
-					ArrayUtil::toLongArray);
-		}
-		else if (ExpandoColumnConstants.STRING_ARRAY == attributeType) {
-			return _toArray(data, ArrayUtil::toStringArray);
-		}
-		else if (ExpandoColumnConstants.STRING_LOCALIZED == attributeType) {
-			return (Serializable)LocalizedMapUtil.getLocalizedMap(
-				locale, (String)data, customValue.getData_i18n());
-		}
-
-		return (Serializable)data;
 	}
 
 	private static boolean _isEmpty(Object value) {
@@ -226,16 +221,6 @@ public class CustomFieldsUtil {
 			throw new IllegalArgumentException(
 				"Unable to parse date from " + data, parseException);
 		}
-	}
-
-	private static <T> Serializable _toArray(
-		Object data, Function<Collection<T>, Serializable> function) {
-
-		if (data instanceof Collection) {
-			return function.apply((Collection)data);
-		}
-
-		return (Serializable)data;
 	}
 
 	private static CustomField _toCustomField(
@@ -279,12 +264,15 @@ public class CustomFieldsUtil {
 			{
 				customValue = new CustomValue() {
 					{
-						data = _getValue(
-							attributeType, locale,
-							_getValue(entry, expandoBridge, key));
+						Object value = entry.getValue();
+
+						if (_isEmpty(entry.getValue())) {
+							value = expandoBridge.getAttributeDefault(key);
+						}
+
+						data = _getValue(attributeType, locale, value);
 						data_i18n = _getLocalizedValues(
-							acceptAllLanguages, attributeType,
-							_getValue(entry, expandoBridge, key));
+							acceptAllLanguages, attributeType, value);
 					}
 				};
 				dataType = ExpandoColumnConstants.getDataType(attributeType);

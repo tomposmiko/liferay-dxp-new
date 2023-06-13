@@ -16,9 +16,7 @@ package com.liferay.commerce.product.service.persistence.impl;
 
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.persistence.CPDefinitionPersistence;
-import com.liferay.commerce.product.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @generated
  */
-public abstract class CPDefinitionFinderBaseImpl
+public class CPDefinitionFinderBaseImpl
 	extends BasePersistenceImpl<CPDefinition> {
 
 	public CPDefinitionFinderBaseImpl() {
@@ -52,36 +46,30 @@ public abstract class CPDefinitionFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return cpDefinitionPersistence.getBadColumnNames();
+		return getCPDefinitionPersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the cp definition persistence.
+	 *
+	 * @return the cp definition persistence
+	 */
+	public CPDefinitionPersistence getCPDefinitionPersistence() {
+		return cpDefinitionPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the cp definition persistence.
+	 *
+	 * @param cpDefinitionPersistence the cp definition persistence
+	 */
+	public void setCPDefinitionPersistence(
+		CPDefinitionPersistence cpDefinitionPersistence) {
+
+		this.cpDefinitionPersistence = cpDefinitionPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CPDefinitionPersistence.class)
 	protected CPDefinitionPersistence cpDefinitionPersistence;
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -17,6 +17,7 @@ package com.liferay.depot.web.internal.display.context;
 import com.liferay.admin.kernel.util.PortalMyAccountApplicationType;
 import com.liferay.depot.constants.DepotRolesConstants;
 import com.liferay.depot.web.internal.constants.DepotPortletKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -32,7 +33,6 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.UserGroupRolePermissionUtil;
@@ -47,6 +47,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 import javax.portlet.WindowStateException;
 
@@ -72,25 +74,32 @@ public class DepotAdminRolesDisplayContext {
 	}
 
 	public String getAssetLibraryLabel() {
-		return ResourceBundleUtil.getString(
-			ResourceBundleUtil.getBundle(_themeDisplay.getLocale(), getClass()),
-			"asset-library");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			_themeDisplay.getLocale(), getClass());
+
+		return ResourceBundleUtil.getString(resourceBundle, "asset-library");
 	}
 
 	public String getDepotRoleSyncEntitiesEventName() {
-		return PortalUtil.getPortletNamespace(DepotPortletKeys.DEPOT_ADMIN) +
-			"syncDepotRoles";
+		String portletNamespace = PortalUtil.getPortletNamespace(
+			DepotPortletKeys.DEPOT_ADMIN);
+
+		return portletNamespace + "syncDepotRoles";
 	}
 
 	public String getLabel() {
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			_themeDisplay.getLocale(), getClass());
+
 		return ResourceBundleUtil.getString(
-			ResourceBundleUtil.getBundle(_themeDisplay.getLocale(), getClass()),
-			"asset-library-roles");
+			resourceBundle, "asset-library-roles");
 	}
 
 	public String getSelectDepotRolesEventName() {
-		return PortalUtil.getPortletNamespace(DepotPortletKeys.DEPOT_ADMIN) +
-			"selectDepotRole";
+		String portletNamespace = PortalUtil.getPortletNamespace(
+			DepotPortletKeys.DEPOT_ADMIN);
+
+		return portletNamespace + "selectDepotRole";
 	}
 
 	public String getSelectDepotRolesURL() throws WindowStateException {
@@ -104,13 +113,15 @@ public class DepotAdminRolesDisplayContext {
 			"/depot/select_depot_role"
 		).setParameter(
 			"p_u_i_d",
-			() -> {
-				if (_user == null) {
-					return "0";
-				}
-
-				return String.valueOf(_user.getUserId());
-			}
+			Optional.ofNullable(
+				_user
+			).map(
+				User::getUserId
+			).map(
+				String::valueOf
+			).orElse(
+				"0"
+			)
 		).setParameter(
 			"step", "1"
 		).setWindowState(
@@ -175,7 +186,7 @@ public class DepotAdminRolesDisplayContext {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 
@@ -250,7 +261,7 @@ public class DepotAdminRolesDisplayContext {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 

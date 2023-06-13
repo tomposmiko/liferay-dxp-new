@@ -15,7 +15,6 @@
 package com.liferay.message.boards.internal.messaging;
 
 import com.liferay.mail.kernel.model.Account;
-import com.liferay.mail.kernel.service.MailService;
 import com.liferay.message.boards.constants.MBMessageConstants;
 import com.liferay.message.boards.internal.util.MBMailMessage;
 import com.liferay.message.boards.internal.util.MBMailUtil;
@@ -23,6 +22,7 @@ import com.liferay.message.boards.internal.util.MailingListThreadLocal;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBMessageService;
+import com.liferay.petra.mail.MailEngine;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.security.permission.PermissionCheckerUtil;
@@ -62,6 +61,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Thiago Moreira
  */
 @Component(
+	immediate = true,
 	property = "destination.name=" + DestinationNames.MESSAGE_BOARDS_MAILING_LIST,
 	service = MessageListener.class
 )
@@ -82,15 +82,15 @@ public class MailingListMessageListener extends BaseMessageListener {
 		Message[] messages = null;
 
 		try {
-			store = _getStore(mailingListRequest);
+			store = getStore(mailingListRequest);
 
 			store.connect();
 
-			folder = _getFolder(store);
+			folder = getFolder(store);
 
 			messages = folder.getMessages();
 
-			_processMessages(mailingListRequest, messages);
+			processMessages(mailingListRequest, messages);
 		}
 		finally {
 			if ((folder != null) && folder.isOpen()) {
@@ -100,7 +100,7 @@ public class MailingListMessageListener extends BaseMessageListener {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 
@@ -109,7 +109,7 @@ public class MailingListMessageListener extends BaseMessageListener {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -120,14 +120,14 @@ public class MailingListMessageListener extends BaseMessageListener {
 				}
 				catch (MessagingException messagingException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(messagingException);
+						_log.debug(messagingException, messagingException);
 					}
 				}
 			}
 		}
 	}
 
-	private Folder _getFolder(Store store) throws Exception {
+	protected Folder getFolder(Store store) throws Exception {
 		Folder folder = store.getFolder("INBOX");
 
 		if (!folder.exists()) {
@@ -139,7 +139,7 @@ public class MailingListMessageListener extends BaseMessageListener {
 		return folder;
 	}
 
-	private Store _getStore(MailingListRequest mailingListRequest)
+	protected Store getStore(MailingListRequest mailingListRequest)
 		throws Exception {
 
 		String protocol = mailingListRequest.getInProtocol();
@@ -155,7 +155,7 @@ public class MailingListMessageListener extends BaseMessageListener {
 		account.setUser(user);
 		account.setPassword(password);
 
-		Session session = _mailService.getSession(account);
+		Session session = MailEngine.getSession(account);
 
 		URLName urlName = new URLName(
 			protocol, host, port, StringPool.BLANK, user, password);
@@ -163,7 +163,7 @@ public class MailingListMessageListener extends BaseMessageListener {
 		return session.getStore(urlName);
 	}
 
-	private void _processMessage(
+	protected void processMessage(
 			MailingListRequest mailingListRequest, Message mailMessage)
 		throws Exception {
 
@@ -244,12 +244,12 @@ public class MailingListMessageListener extends BaseMessageListener {
 		serviceContext.setAddGuestPermissions(true);
 
 		long groupId = mailingListRequest.getGroupId();
+		String portletId = PortletProviderUtil.getPortletId(
+			MBMessage.class.getName(), PortletProvider.Action.VIEW);
 
 		serviceContext.setLayoutFullURL(
-			_portal.getLayoutFullURL(
-				groupId,
-				PortletProviderUtil.getPortletId(
-					MBMessage.class.getName(), PortletProvider.Action.VIEW)));
+			_portal.getLayoutFullURL(groupId, portletId));
+
 		serviceContext.setScopeGroupId(groupId);
 
 		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
@@ -258,17 +258,15 @@ public class MailingListMessageListener extends BaseMessageListener {
 		try {
 			if (parentMessage == null) {
 				_mbMessageService.addMessage(
-					groupId, categoryId, subject,
-					mbMailMessage.getBody(_htmlParser),
+					groupId, categoryId, subject, mbMailMessage.getBody(),
 					MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs,
 					anonymous, 0.0, true, serviceContext);
 			}
 			else {
 				_mbMessageService.addMessage(
 					parentMessage.getMessageId(), subject,
-					mbMailMessage.getBody(_htmlParser),
-					MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs,
-					anonymous, 0.0, true, serviceContext);
+					mbMailMessage.getBody(), MBMessageConstants.DEFAULT_FORMAT,
+					inputStreamOVPs, anonymous, 0.0, true, serviceContext);
 			}
 		}
 		finally {
@@ -279,20 +277,20 @@ public class MailingListMessageListener extends BaseMessageListener {
 				}
 				catch (IOException ioException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(ioException);
+						_log.warn(ioException, ioException);
 					}
 				}
 			}
 		}
 	}
 
-	private void _processMessages(
+	protected void processMessages(
 			MailingListRequest mailingListRequest, Message[] messages)
 		throws Exception {
 
 		for (Message message : messages) {
 			try {
-				_processMessage(mailingListRequest, message);
+				processMessage(mailingListRequest, message);
 			}
 			finally {
 				PermissionCheckerUtil.setThreadValues(null);
@@ -302,12 +300,6 @@ public class MailingListMessageListener extends BaseMessageListener {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		MailingListMessageListener.class);
-
-	@Reference
-	private HtmlParser _htmlParser;
-
-	@Reference
-	private MailService _mailService;
 
 	@Reference
 	private MBMessageLocalService _mbMessageLocalService;

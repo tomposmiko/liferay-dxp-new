@@ -111,11 +111,9 @@ Object.defineProperties(window.HTMLElement.prototype, {
 });
 
 describe('The WorkflowInstanceTracker component should', () => {
-	let container;
-	let queryAllByText;
-	let queryByText;
+	let container, queryAllByText, queryByText;
 
-	beforeEach(async () => {
+	beforeAll(async () => {
 		fetch.mockResponseOnce(JSON.stringify(workflowInstanceData));
 		fetch.mockResponseOnce(JSON.stringify(visitedNodes));
 		fetch.mockResponseOnce(JSON.stringify(workflowDefinitionData));
@@ -133,7 +131,7 @@ describe('The WorkflowInstanceTracker component should', () => {
 		});
 	});
 
-	afterEach(() => {
+	afterAll(() => {
 		delete window.SVGElement.prototype.getBBox;
 	});
 

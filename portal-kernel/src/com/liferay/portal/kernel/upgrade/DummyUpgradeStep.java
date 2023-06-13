@@ -14,13 +14,15 @@
 
 package com.liferay.portal.kernel.upgrade;
 
+import com.liferay.portal.kernel.dao.db.DBProcessContext;
+
 /**
  * @author Brian Wing Shun Chan
  */
 public class DummyUpgradeStep implements UpgradeStep {
 
 	@Override
-	public void upgrade() {
+	public void upgrade(DBProcessContext dbProcessContext) {
 	}
 
 }

@@ -20,7 +20,6 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructureTable;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureImpl;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureModelImpl;
 import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructurePersistence;
-import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructureUtil;
 import com.liferay.layout.page.template.service.persistence.impl.constants.LayoutPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = LayoutPageTemplateStructurePersistence.class)
+@Component(
+	service = {
+		LayoutPageTemplateStructurePersistence.class, BasePersistence.class
+	}
+)
 public class LayoutPageTemplateStructurePersistenceImpl
 	extends BasePersistenceImpl<LayoutPageTemplateStructure>
 	implements LayoutPageTemplateStructurePersistence {
@@ -205,7 +208,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructure>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateStructure layoutPageTemplateStructure :
@@ -610,7 +613,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -749,7 +752,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof LayoutPageTemplateStructure) {
@@ -872,7 +875,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1046,7 +1049,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructure>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateStructure layoutPageTemplateStructure :
@@ -1478,7 +1481,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1641,7 +1644,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructure>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateStructure layoutPageTemplateStructure :
@@ -2021,7 +2024,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2064,34 +2067,39 @@ public class LayoutPageTemplateStructurePersistenceImpl
 	private static final String _FINDER_COLUMN_GROUPID_GROUPID_2 =
 		"layoutPageTemplateStructure.groupId = ?";
 
-	private FinderPath _finderPathFetchByG_P;
-	private FinderPath _finderPathCountByG_P;
+	private FinderPath _finderPathFetchByG_C_C;
+	private FinderPath _finderPathCountByG_C_C;
 
 	/**
-	 * Returns the layout page template structure where groupId = &#63; and plid = &#63; or throws a <code>NoSuchPageTemplateStructureException</code> if it could not be found.
+	 * Returns the layout page template structure where groupId = &#63; and classNameId = &#63; and classPK = &#63; or throws a <code>NoSuchPageTemplateStructureException</code> if it could not be found.
 	 *
 	 * @param groupId the group ID
-	 * @param plid the plid
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
 	 * @return the matching layout page template structure
 	 * @throws NoSuchPageTemplateStructureException if a matching layout page template structure could not be found
 	 */
 	@Override
-	public LayoutPageTemplateStructure findByG_P(long groupId, long plid)
+	public LayoutPageTemplateStructure findByG_C_C(
+			long groupId, long classNameId, long classPK)
 		throws NoSuchPageTemplateStructureException {
 
-		LayoutPageTemplateStructure layoutPageTemplateStructure = fetchByG_P(
-			groupId, plid);
+		LayoutPageTemplateStructure layoutPageTemplateStructure = fetchByG_C_C(
+			groupId, classNameId, classPK);
 
 		if (layoutPageTemplateStructure == null) {
-			StringBundler sb = new StringBundler(6);
+			StringBundler sb = new StringBundler(8);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
 			sb.append("groupId=");
 			sb.append(groupId);
 
-			sb.append(", plid=");
-			sb.append(plid);
+			sb.append(", classNameId=");
+			sb.append(classNameId);
+
+			sb.append(", classPK=");
+			sb.append(classPK);
 
 			sb.append("}");
 
@@ -2106,28 +2114,32 @@ public class LayoutPageTemplateStructurePersistenceImpl
 	}
 
 	/**
-	 * Returns the layout page template structure where groupId = &#63; and plid = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the layout page template structure where groupId = &#63; and classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param groupId the group ID
-	 * @param plid the plid
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
 	 * @return the matching layout page template structure, or <code>null</code> if a matching layout page template structure could not be found
 	 */
 	@Override
-	public LayoutPageTemplateStructure fetchByG_P(long groupId, long plid) {
-		return fetchByG_P(groupId, plid, true);
+	public LayoutPageTemplateStructure fetchByG_C_C(
+		long groupId, long classNameId, long classPK) {
+
+		return fetchByG_C_C(groupId, classNameId, classPK, true);
 	}
 
 	/**
-	 * Returns the layout page template structure where groupId = &#63; and plid = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the layout page template structure where groupId = &#63; and classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param groupId the group ID
-	 * @param plid the plid
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching layout page template structure, or <code>null</code> if a matching layout page template structure could not be found
 	 */
 	@Override
-	public LayoutPageTemplateStructure fetchByG_P(
-		long groupId, long plid, boolean useFinderCache) {
+	public LayoutPageTemplateStructure fetchByG_C_C(
+		long groupId, long classNameId, long classPK, boolean useFinderCache) {
 
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			LayoutPageTemplateStructure.class);
@@ -2135,14 +2147,13 @@ public class LayoutPageTemplateStructurePersistenceImpl
 		Object[] finderArgs = null;
 
 		if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {groupId, plid};
+			finderArgs = new Object[] {groupId, classNameId, classPK};
 		}
 
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_P, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_C_C, finderArgs);
 		}
 
 		if (result instanceof LayoutPageTemplateStructure) {
@@ -2150,20 +2161,23 @@ public class LayoutPageTemplateStructurePersistenceImpl
 				(LayoutPageTemplateStructure)result;
 
 			if ((groupId != layoutPageTemplateStructure.getGroupId()) ||
-				(plid != layoutPageTemplateStructure.getPlid())) {
+				(classNameId != layoutPageTemplateStructure.getClassNameId()) ||
+				(classPK != layoutPageTemplateStructure.getClassPK())) {
 
 				result = null;
 			}
 		}
 
 		if (result == null) {
-			StringBundler sb = new StringBundler(4);
+			StringBundler sb = new StringBundler(5);
 
 			sb.append(_SQL_SELECT_LAYOUTPAGETEMPLATESTRUCTURE_WHERE);
 
-			sb.append(_FINDER_COLUMN_G_P_GROUPID_2);
+			sb.append(_FINDER_COLUMN_G_C_C_GROUPID_2);
 
-			sb.append(_FINDER_COLUMN_G_P_PLID_2);
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSPK_2);
 
 			String sql = sb.toString();
 
@@ -2178,14 +2192,16 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 				queryPos.add(groupId);
 
-				queryPos.add(plid);
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
 
 				List<LayoutPageTemplateStructure> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache && productionMode) {
 						finderCache.putResult(
-							_finderPathFetchByG_P, finderArgs, list);
+							_finderPathFetchByG_C_C, finderArgs, list);
 					}
 				}
 				else {
@@ -2214,31 +2230,34 @@ public class LayoutPageTemplateStructurePersistenceImpl
 	}
 
 	/**
-	 * Removes the layout page template structure where groupId = &#63; and plid = &#63; from the database.
+	 * Removes the layout page template structure where groupId = &#63; and classNameId = &#63; and classPK = &#63; from the database.
 	 *
 	 * @param groupId the group ID
-	 * @param plid the plid
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
 	 * @return the layout page template structure that was removed
 	 */
 	@Override
-	public LayoutPageTemplateStructure removeByG_P(long groupId, long plid)
+	public LayoutPageTemplateStructure removeByG_C_C(
+			long groupId, long classNameId, long classPK)
 		throws NoSuchPageTemplateStructureException {
 
-		LayoutPageTemplateStructure layoutPageTemplateStructure = findByG_P(
-			groupId, plid);
+		LayoutPageTemplateStructure layoutPageTemplateStructure = findByG_C_C(
+			groupId, classNameId, classPK);
 
 		return remove(layoutPageTemplateStructure);
 	}
 
 	/**
-	 * Returns the number of layout page template structures where groupId = &#63; and plid = &#63;.
+	 * Returns the number of layout page template structures where groupId = &#63; and classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param groupId the group ID
-	 * @param plid the plid
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
 	 * @return the number of matching layout page template structures
 	 */
 	@Override
-	public int countByG_P(long groupId, long plid) {
+	public int countByG_C_C(long groupId, long classNameId, long classPK) {
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			LayoutPageTemplateStructure.class);
 
@@ -2248,21 +2267,23 @@ public class LayoutPageTemplateStructurePersistenceImpl
 		Long count = null;
 
 		if (productionMode) {
-			finderPath = _finderPathCountByG_P;
+			finderPath = _finderPathCountByG_C_C;
 
-			finderArgs = new Object[] {groupId, plid};
+			finderArgs = new Object[] {groupId, classNameId, classPK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
-			StringBundler sb = new StringBundler(3);
+			StringBundler sb = new StringBundler(4);
 
 			sb.append(_SQL_COUNT_LAYOUTPAGETEMPLATESTRUCTURE_WHERE);
 
-			sb.append(_FINDER_COLUMN_G_P_GROUPID_2);
+			sb.append(_FINDER_COLUMN_G_C_C_GROUPID_2);
 
-			sb.append(_FINDER_COLUMN_G_P_PLID_2);
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSPK_2);
 
 			String sql = sb.toString();
 
@@ -2277,7 +2298,9 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 				queryPos.add(groupId);
 
-				queryPos.add(plid);
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
 
 				count = (Long)query.uniqueResult();
 
@@ -2296,11 +2319,14 @@ public class LayoutPageTemplateStructurePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_G_P_GROUPID_2 =
+	private static final String _FINDER_COLUMN_G_C_C_GROUPID_2 =
 		"layoutPageTemplateStructure.groupId = ? AND ";
 
-	private static final String _FINDER_COLUMN_G_P_PLID_2 =
-		"layoutPageTemplateStructure.plid = ?";
+	private static final String _FINDER_COLUMN_G_C_C_CLASSNAMEID_2 =
+		"layoutPageTemplateStructure.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_CLASSPK_2 =
+		"layoutPageTemplateStructure.classPK = ?";
 
 	public LayoutPageTemplateStructurePersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -2344,10 +2370,11 @@ public class LayoutPageTemplateStructurePersistenceImpl
 			layoutPageTemplateStructure);
 
 		finderCache.putResult(
-			_finderPathFetchByG_P,
+			_finderPathFetchByG_C_C,
 			new Object[] {
 				layoutPageTemplateStructure.getGroupId(),
-				layoutPageTemplateStructure.getPlid()
+				layoutPageTemplateStructure.getClassNameId(),
+				layoutPageTemplateStructure.getClassPK()
 			},
 			layoutPageTemplateStructure);
 	}
@@ -2455,12 +2482,14 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		args = new Object[] {
 			layoutPageTemplateStructureModelImpl.getGroupId(),
-			layoutPageTemplateStructureModelImpl.getPlid()
+			layoutPageTemplateStructureModelImpl.getClassNameId(),
+			layoutPageTemplateStructureModelImpl.getClassPK()
 		};
 
-		finderCache.putResult(_finderPathCountByG_P, args, Long.valueOf(1));
+		finderCache.putResult(_finderPathCountByG_C_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByG_P, args, layoutPageTemplateStructureModelImpl);
+			_finderPathFetchByG_C_C, args,
+			layoutPageTemplateStructureModelImpl);
 	}
 
 	/**
@@ -2480,7 +2509,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 		layoutPageTemplateStructure.setPrimaryKey(
 			layoutPageTemplateStructureId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		layoutPageTemplateStructure.setUuid(uuid);
 
@@ -2616,7 +2645,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 					layoutPageTemplateStructure;
 
 		if (Validator.isNull(layoutPageTemplateStructure.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			layoutPageTemplateStructure.setUuid(uuid);
 		}
@@ -2750,7 +2779,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				LayoutPageTemplateStructure.class, primaryKey)) {
+				LayoutPageTemplateStructure.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2979,7 +3008,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructure>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3058,7 +3087,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3158,7 +3187,8 @@ public class LayoutPageTemplateStructurePersistenceImpl
 		ctStrictColumnNames.add("userName");
 		ctStrictColumnNames.add("createDate");
 		ctIgnoreColumnNames.add("modifiedDate");
-		ctStrictColumnNames.add("plid");
+		ctStrictColumnNames.add("classNameId");
+		ctStrictColumnNames.add("classPK");
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
@@ -3172,7 +3202,8 @@ public class LayoutPageTemplateStructurePersistenceImpl
 
 		_uniqueIndexColumnNames.add(new String[] {"uuid_", "groupId"});
 
-		_uniqueIndexColumnNames.add(new String[] {"groupId", "plid"});
+		_uniqueIndexColumnNames.add(
+			new String[] {"groupId", "classNameId", "classPK"});
 	}
 
 	/**
@@ -3260,43 +3291,25 @@ public class LayoutPageTemplateStructurePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathFetchByG_P = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByG_P",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			new String[] {"groupId", "plid"}, true);
+		_finderPathFetchByG_C_C = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByG_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			new String[] {"groupId", "classNameId", "classPK"}, true);
 
-		_finderPathCountByG_P = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_P",
-			new String[] {Long.class.getName(), Long.class.getName()},
-			new String[] {"groupId", "plid"}, false);
-
-		_setLayoutPageTemplateStructureUtilPersistence(this);
+		_finderPathCountByG_C_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			new String[] {"groupId", "classNameId", "classPK"}, false);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setLayoutPageTemplateStructureUtilPersistence(null);
-
 		entityCache.removeCache(
 			LayoutPageTemplateStructureImpl.class.getName());
-	}
-
-	private void _setLayoutPageTemplateStructureUtilPersistence(
-		LayoutPageTemplateStructurePersistence
-			layoutPageTemplateStructurePersistence) {
-
-		try {
-			Field field =
-				LayoutPageTemplateStructureUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutPageTemplateStructurePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3367,6 +3380,7 @@ public class LayoutPageTemplateStructurePersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private LayoutPageTemplateStructureModelArgumentsResolver
+		_layoutPageTemplateStructureModelArgumentsResolver;
 
 }

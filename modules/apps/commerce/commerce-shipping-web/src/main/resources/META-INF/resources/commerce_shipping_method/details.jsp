@@ -47,15 +47,13 @@ if (commerceShippingMethod != null) {
 	</c:if>
 
 	<commerce-ui:panel>
-		<aui:input label="name" localized="<%= true %>" name="nameMapAsXML" type="text" value='<%= BeanParamUtil.getString(commerceShippingMethod, request, "name", commerceShippingMethodsDisplayContext.getCommerceShippingMethodEngineName(locale)) %>'>
+		<aui:input autoFocus="<%= true %>" label="name" localized="<%= true %>" name="nameMapAsXML" type="text" value='<%= BeanParamUtil.getString(commerceShippingMethod, request, "name", commerceShippingMethodsDisplayContext.getCommerceShippingMethodEngineName(locale)) %>'>
 			<aui:validator name="required" />
 		</aui:input>
 
 		<aui:input label="description" localized="<%= true %>" name="descriptionMapAsXML" type="text" value='<%= BeanParamUtil.getString(commerceShippingMethod, request, "description", commerceShippingMethodsDisplayContext.getCommerceShippingMethodEngineDescription(locale)) %>' />
 
 		<aui:model-context bean="<%= commerceShippingMethod %>" model="<%= CommerceShippingMethod.class %>" />
-
-		<aui:input label="tracking-url" name="trackingURL" type="text" value='<%= (commerceShippingMethod == null) ? "" : HtmlUtil.escape(commerceShippingMethod.getTrackingURL()) %>' />
 
 		<%
 		String thumbnailSrc = StringPool.BLANK;

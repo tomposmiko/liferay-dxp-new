@@ -540,8 +540,4 @@ public interface WorkflowMetricsSLADefinitionModel
 	@Override
 	public WorkflowMetricsSLADefinition cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.users.admin.configuration.UserFileUploadsConfiguration",
-	service = UserFileUploadsSettings.class
+	immediate = true, service = UserFileUploadsSettings.class
 )
 public class UserFileUploadsSettingsImpl implements UserFileUploadsSettings {
 
@@ -51,6 +51,15 @@ public class UserFileUploadsSettingsImpl implements UserFileUploadsSettings {
 	@Override
 	public boolean isImageCheckToken() {
 		return _userFileUploadsConfiguration.imageCheckToken();
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	@Override
+	public boolean isImageDefaultUseInitials() {
+		return false;
 	}
 
 	@Activate

@@ -13,23 +13,16 @@
  */
 
 import {
-	openConfirmModal,
 	openModal,
 	openSelectionModal,
 	openSimpleInputModal,
 } from 'frontend-js-web';
 
-import openDeletePageTemplateModal from '../modal/openDeletePageTemplateModal';
-
 const ACTIONS = {
 	deleteDisplayPage({deleteDisplayPageMessage, deleteDisplayPageURL}) {
-		openDeletePageTemplateModal({
-			message: deleteDisplayPageMessage,
-			onDelete: () => {
-				send(deleteDisplayPageURL);
-			},
-			title: Liferay.Language.get('display-page-template'),
-		});
+		if (confirm(deleteDisplayPageMessage)) {
+			send(deleteDisplayPageURL);
+		}
 	},
 
 	deleteLayoutPageTemplateEntryPreview({
@@ -39,28 +32,22 @@ const ACTIONS = {
 	},
 
 	discardDraft({discardDraftURL}) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					send(discardDraftURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
+				)
+			)
+		) {
+			send(discardDraftURL);
+		}
 	},
 
 	markAsDefaultDisplayPage({markAsDefaultDisplayPageURL, message}) {
 		if (message !== '') {
-			openConfirmModal({
-				message: Liferay.Language.get(message),
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						send(markAsDefaultDisplayPageURL);
-					}
-				},
-			});
+			if (confirm(Liferay.Language.get(message))) {
+				send(markAsDefaultDisplayPageURL);
+			}
 		}
 		else {
 			send(markAsDefaultDisplayPageURL);
@@ -96,14 +83,9 @@ const ACTIONS = {
 	},
 
 	unmarkAsDefaultDisplayPage({unmarkAsDefaultDisplayPageURL}) {
-		openConfirmModal({
-			message: Liferay.Language.get('unmark-default-confirmation'),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					send(unmarkAsDefaultDisplayPageURL);
-				}
-			},
-		});
+		if (confirm(Liferay.Language.get('unmark-default-confirmation'))) {
+			send(unmarkAsDefaultDisplayPageURL);
+		}
 	},
 
 	updateLayoutPageTemplateEntryPreview(

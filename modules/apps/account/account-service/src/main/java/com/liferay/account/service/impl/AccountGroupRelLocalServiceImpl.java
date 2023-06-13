@@ -24,12 +24,9 @@ import com.liferay.account.service.AccountGroupLocalService;
 import com.liferay.account.service.base.AccountGroupRelLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Date;
@@ -77,20 +74,7 @@ public class AccountGroupRelLocalServiceImpl
 		AccountGroup accountGroup = _accountGroupLocalService.getAccountGroup(
 			accountGroupId);
 
-		User user = null;
-
-		try {
-			user = GuestOrUserUtil.getGuestOrUser(accountGroup.getCompanyId());
-		}
-		catch (PortalException portalException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
-			}
-		}
-
-		if (user == null) {
-			user = _userLocalService.getGuestUser(accountGroup.getCompanyId());
-		}
+		User user = GuestOrUserUtil.getGuestOrUser(accountGroup.getCompanyId());
 
 		accountGroupRel.setCompanyId(user.getCompanyId());
 		accountGroupRel.setUserId(user.getUserId());
@@ -151,14 +135,6 @@ public class AccountGroupRelLocalServiceImpl
 
 	@Override
 	public List<AccountGroupRel> getAccountGroupRels(
-		long accountGroupId, String className) {
-
-		return accountGroupRelPersistence.findByA_C(
-			accountGroupId, _classNameLocalService.getClassNameId(className));
-	}
-
-	@Override
-	public List<AccountGroupRel> getAccountGroupRels(
 		String className, long classPK) {
 
 		return accountGroupRelPersistence.findByC_C(
@@ -202,9 +178,6 @@ public class AccountGroupRelLocalServiceImpl
 		return accountGroupRelPersistence.countByAccountGroupId(accountGroupId);
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountGroupRelLocalServiceImpl.class);
-
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
 
@@ -213,8 +186,5 @@ public class AccountGroupRelLocalServiceImpl
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

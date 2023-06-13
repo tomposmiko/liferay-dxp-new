@@ -20,11 +20,15 @@ import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
 import com.liferay.application.list.display.context.logic.PersonalMenuEntryHelper;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.product.navigation.personal.menu.PersonalMenuEntryRegistry;
+import com.liferay.product.navigation.personal.menu.PersonalMenuEntry;
 import com.liferay.roles.admin.constants.RolesAdminWebKeys;
-import com.liferay.roles.admin.panel.category.role.type.mapper.PanelCategoryRoleTypeMapperRegistry;
+import com.liferay.roles.admin.panel.category.role.type.mapper.PanelCategoryRoleTypeMapper;
 import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.portlet.PortletRequest;
 
@@ -32,11 +36,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = AccountRoleRequestHelper.class)
+@Component(immediate = true, service = AccountRoleRequestHelper.class)
 public class AccountRoleRequestHelper {
 
 	public void setRequestAttributes(HttpServletRequest httpServletRequest) {
@@ -50,14 +57,12 @@ public class AccountRoleRequestHelper {
 			_panelCategoryRegistry);
 		httpServletRequest.setAttribute(
 			ApplicationListWebKeys.PERSONAL_MENU_ENTRY_HELPER,
-			new PersonalMenuEntryHelper(
-				_personalMenuEntryRegistry.getPersonalMenuEntries()));
+			new PersonalMenuEntryHelper(_personalMenuEntries));
 		httpServletRequest.setAttribute(
 			RolesAdminWebKeys.CURRENT_ROLE_TYPE, _accountRoleTypeContributor);
 		httpServletRequest.setAttribute(
 			RolesAdminWebKeys.PANEL_CATEGORY_KEYS,
-			_panelCategoryRoleTypeMapperRegistry.getPanelCategoryKeys(
-				RoleConstants.TYPE_ACCOUNT));
+			ArrayUtil.toStringArray(_panelCategoryKeys));
 		httpServletRequest.setAttribute(
 			RolesAdminWebKeys.SHOW_NAV_TABS, Boolean.FALSE);
 	}
@@ -67,22 +72,58 @@ public class AccountRoleRequestHelper {
 	}
 
 	@Reference(
-		target = "(component.name=com.liferay.account.internal.roles.admin.role.type.contributor.AccountRoleTypeContributor)"
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		unbind = "_removePanelCategoryRoleTypeMapper"
 	)
+	private void _addPanelCategoryRoleTypeMapper(
+		PanelCategoryRoleTypeMapper panelCategoryRoleTypeMapper) {
+
+		if (ArrayUtil.contains(
+				panelCategoryRoleTypeMapper.getRoleTypes(),
+				RoleConstants.TYPE_ACCOUNT)) {
+
+			_panelCategoryKeys.add(
+				panelCategoryRoleTypeMapper.getPanelCategoryKey());
+		}
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		unbind = "_removePersonalMenuEntry"
+	)
+	private void _addPersonalMenuEntry(PersonalMenuEntry personalMenuEntry) {
+		_personalMenuEntries.add(personalMenuEntry);
+	}
+
+	private void _removePanelCategoryRoleTypeMapper(
+		PanelCategoryRoleTypeMapper panelCategoryRoleTypeMapper) {
+
+		_panelCategoryKeys.remove(
+			panelCategoryRoleTypeMapper.getPanelCategoryKey());
+	}
+
+	private void _removePersonalMenuEntry(PersonalMenuEntry personalMenuEntry) {
+		_personalMenuEntries.remove(personalMenuEntry);
+	}
+
+	@Reference(target = "(component.name=*.AccountRoleTypeContributor)")
 	private RoleTypeContributor _accountRoleTypeContributor;
 
 	@Reference
 	private PanelAppRegistry _panelAppRegistry;
 
+	private final List<String> _panelCategoryKeys =
+		new CopyOnWriteArrayList<>();
+
 	@Reference
 	private PanelCategoryRegistry _panelCategoryRegistry;
 
-	@Reference
-	private PanelCategoryRoleTypeMapperRegistry
-		_panelCategoryRoleTypeMapperRegistry;
-
-	@Reference
-	private PersonalMenuEntryRegistry _personalMenuEntryRegistry;
+	private final List<PersonalMenuEntry> _personalMenuEntries =
+		new CopyOnWriteArrayList<>();
 
 	@Reference
 	private Portal _portal;

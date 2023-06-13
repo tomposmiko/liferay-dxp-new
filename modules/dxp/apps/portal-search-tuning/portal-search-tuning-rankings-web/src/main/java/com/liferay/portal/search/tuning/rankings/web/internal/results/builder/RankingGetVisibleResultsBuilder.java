@@ -15,11 +15,10 @@
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
@@ -35,8 +34,11 @@ import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.Ranking;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.RankingIndexReader;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.name.RankingIndexName;
-import com.liferay.portal.search.tuning.rankings.web.internal.searcher.helper.RankingSearchRequestHelper;
+import com.liferay.portal.search.tuning.rankings.web.internal.searcher.RankingSearchRequestHelper;
 import com.liferay.portal.search.tuning.rankings.web.internal.util.RankingResultUtil;
+
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -73,10 +75,10 @@ public class RankingGetVisibleResultsBuilder {
 	}
 
 	public JSONObject build() {
-		Ranking ranking = _rankingIndexReader.fetch(
+		Optional<Ranking> optional = _rankingIndexReader.fetchOptional(
 			_rankingIndexName, _rankingId);
 
-		if (ranking == null) {
+		if (!optional.isPresent()) {
 			return JSONUtil.put(
 				"documents", JSONFactoryUtil.createJSONArray()
 			).put(
@@ -84,13 +86,12 @@ public class RankingGetVisibleResultsBuilder {
 			);
 		}
 
-		SearchResponse searchResponse = _getSearchResponse(ranking);
+		Ranking ranking = optional.get();
+
+		SearchResponse searchResponse = getSearchResponse(ranking);
 
 		return JSONUtil.put(
-			"documents",
-			JSONUtil.toJSONArray(
-				searchResponse.getDocuments(),
-				document -> translate(document, ranking), _log)
+			"documents", buildDocuments(ranking, searchResponse)
 		).put(
 			"total", searchResponse.getTotalHits()
 		);
@@ -126,6 +127,21 @@ public class RankingGetVisibleResultsBuilder {
 		return this;
 	}
 
+	protected JSONArray buildDocuments(
+		Ranking ranking, SearchResponse searchResponse) {
+
+		Stream<Document> documentsStream = searchResponse.getDocumentsStream();
+
+		Stream<JSONObject> jsonObjectStream = documentsStream.map(
+			document -> translate(document, ranking));
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		jsonObjectStream.forEach(jsonArray::put);
+
+		return jsonArray;
+	}
+
 	protected SearchRequest buildSearchRequest(Ranking ranking) {
 		String queryStringOfUrl = _queryString;
 
@@ -156,6 +172,12 @@ public class RankingGetVisibleResultsBuilder {
 		return searchRequestBuilder.build();
 	}
 
+	protected SearchResponse getSearchResponse(Ranking ranking) {
+		SearchRequest searchRequest = buildSearchRequest(ranking);
+
+		return _searcher.search(searchRequest);
+	}
+
 	protected JSONObject translate(Document document, Ranking ranking) {
 		RankingJSONBuilder rankingJSONBuilder = new RankingJSONBuilder(
 			_dlAppLocalService, _fastDateFormatFactory, _resourceActions,
@@ -172,12 +194,6 @@ public class RankingGetVisibleResultsBuilder {
 		).build();
 	}
 
-	private SearchResponse _getSearchResponse(Ranking ranking) {
-		SearchRequest searchRequest = buildSearchRequest(ranking);
-
-		return _searcher.search(searchRequest);
-	}
-
 	private String _getViewURL(Document document) {
 		return RankingResultUtil.getRankingResultViewURL(
 			document, _resourceRequest, _resourceResponse, true);
@@ -186,9 +202,6 @@ public class RankingGetVisibleResultsBuilder {
 	private boolean _isAssetDeleted(Document document) {
 		return RankingResultUtil.isAssetDeleted(document);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RankingGetVisibleResultsBuilder.class.getName());
 
 	private long _companyId;
 	private final ComplexQueryPartBuilderFactory

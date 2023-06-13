@@ -26,7 +26,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ObjectRelatedModelsProviderRegistry {
 
 	public ObjectRelatedModelsProvider getObjectRelatedModelsProvider(
-			String className, long companyId, String type)
+			String className, String type)
 		throws PortalException;
 
 }

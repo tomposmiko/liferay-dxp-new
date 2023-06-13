@@ -55,8 +55,8 @@ public class ContactWrapper
 		attributes.put("firstName", getFirstName());
 		attributes.put("middleName", getMiddleName());
 		attributes.put("lastName", getLastName());
-		attributes.put("prefixListTypeId", getPrefixListTypeId());
-		attributes.put("suffixListTypeId", getSuffixListTypeId());
+		attributes.put("prefixId", getPrefixId());
+		attributes.put("suffixId", getSuffixId());
 		attributes.put("male", isMale());
 		attributes.put("birthday", getBirthday());
 		attributes.put("smsSn", getSmsSn());
@@ -159,16 +159,16 @@ public class ContactWrapper
 			setLastName(lastName);
 		}
 
-		Long prefixListTypeId = (Long)attributes.get("prefixListTypeId");
+		Long prefixId = (Long)attributes.get("prefixId");
 
-		if (prefixListTypeId != null) {
-			setPrefixListTypeId(prefixListTypeId);
+		if (prefixId != null) {
+			setPrefixId(prefixId);
 		}
 
-		Long suffixListTypeId = (Long)attributes.get("suffixListTypeId");
+		Long suffixId = (Long)attributes.get("suffixId");
 
-		if (suffixListTypeId != null) {
-			setSuffixListTypeId(suffixListTypeId);
+		if (suffixId != null) {
+			setSuffixId(suffixId);
 		}
 
 		Boolean male = (Boolean)attributes.get("male");
@@ -475,13 +475,13 @@ public class ContactWrapper
 	}
 
 	/**
-	 * Returns the prefix list type ID of this contact.
+	 * Returns the prefix ID of this contact.
 	 *
-	 * @return the prefix list type ID of this contact
+	 * @return the prefix ID of this contact
 	 */
 	@Override
-	public long getPrefixListTypeId() {
-		return model.getPrefixListTypeId();
+	public long getPrefixId() {
+		return model.getPrefixId();
 	}
 
 	/**
@@ -515,13 +515,13 @@ public class ContactWrapper
 	}
 
 	/**
-	 * Returns the suffix list type ID of this contact.
+	 * Returns the suffix ID of this contact.
 	 *
-	 * @return the suffix list type ID of this contact
+	 * @return the suffix ID of this contact
 	 */
 	@Override
-	public long getSuffixListTypeId() {
-		return model.getSuffixListTypeId();
+	public long getSuffixId() {
+		return model.getSuffixId();
 	}
 
 	/**
@@ -800,13 +800,13 @@ public class ContactWrapper
 	}
 
 	/**
-	 * Sets the prefix list type ID of this contact.
+	 * Sets the prefix ID of this contact.
 	 *
-	 * @param prefixListTypeId the prefix list type ID of this contact
+	 * @param prefixId the prefix ID of this contact
 	 */
 	@Override
-	public void setPrefixListTypeId(long prefixListTypeId) {
-		model.setPrefixListTypeId(prefixListTypeId);
+	public void setPrefixId(long prefixId) {
+		model.setPrefixId(prefixId);
 	}
 
 	/**
@@ -840,13 +840,13 @@ public class ContactWrapper
 	}
 
 	/**
-	 * Sets the suffix list type ID of this contact.
+	 * Sets the suffix ID of this contact.
 	 *
-	 * @param suffixListTypeId the suffix list type ID of this contact
+	 * @param suffixId the suffix ID of this contact
 	 */
 	@Override
-	public void setSuffixListTypeId(long suffixListTypeId) {
-		model.setSuffixListTypeId(suffixListTypeId);
+	public void setSuffixId(long suffixId) {
+		model.setSuffixId(suffixId);
 	}
 
 	/**
@@ -887,11 +887,6 @@ public class ContactWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

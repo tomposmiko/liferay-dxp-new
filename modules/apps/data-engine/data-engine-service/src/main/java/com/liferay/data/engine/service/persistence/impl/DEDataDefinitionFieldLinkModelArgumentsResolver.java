@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.data.engine.model.impl.DEDataDefinitionFieldLinkImpl",
-		"table.name=DEDataDefinitionFieldLink"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		DEDataDefinitionFieldLinkModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class DEDataDefinitionFieldLinkModelArgumentsResolver
 	implements ArgumentsResolver {

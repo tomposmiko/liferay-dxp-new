@@ -89,7 +89,7 @@ public class LiferayTemplateCache extends TemplateCache {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				templateResource = null;

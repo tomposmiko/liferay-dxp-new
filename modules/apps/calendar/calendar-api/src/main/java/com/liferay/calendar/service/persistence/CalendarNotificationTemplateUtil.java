@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the calendar notification template service. This utility wraps <code>com.liferay.calendar.service.persistence.impl.CalendarNotificationTemplatePersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -987,10 +991,29 @@ public class CalendarNotificationTemplateUtil {
 	}
 
 	public static CalendarNotificationTemplatePersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile CalendarNotificationTemplatePersistence
-		_persistence;
+	private static ServiceTracker
+		<CalendarNotificationTemplatePersistence,
+		 CalendarNotificationTemplatePersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			CalendarNotificationTemplatePersistence.class);
+
+		ServiceTracker
+			<CalendarNotificationTemplatePersistence,
+			 CalendarNotificationTemplatePersistence> serviceTracker =
+				new ServiceTracker
+					<CalendarNotificationTemplatePersistence,
+					 CalendarNotificationTemplatePersistence>(
+						 bundle.getBundleContext(),
+						 CalendarNotificationTemplatePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

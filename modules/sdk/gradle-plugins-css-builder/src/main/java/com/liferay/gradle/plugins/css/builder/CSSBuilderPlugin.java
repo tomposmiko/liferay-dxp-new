@@ -274,7 +274,7 @@ public class CSSBuilderPlugin implements Plugin<Project> {
 	}
 
 	private void _configureTaskBuildCSSJvmArgs(BuildCSSTask buildCSSTask) {
-		if (Objects.equals(buildCSSTask.getSassCompilerClassName(), "ruby")) {
+		if (Objects.equals("ruby", buildCSSTask.getSassCompilerClassName())) {
 			buildCSSTask.jvmArgs("-Xss4096k");
 		}
 	}

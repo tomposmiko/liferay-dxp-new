@@ -19,7 +19,6 @@ import com.liferay.marketplace.model.App;
 import com.liferay.marketplace.model.Module;
 import com.liferay.marketplace.service.AppLocalService;
 import com.liferay.marketplace.service.ModuleLocalService;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -44,10 +43,13 @@ import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Ryan Park
  */
+@Component(service = {})
 public class AppDisplayFactoryUtil {
 
 	public static AppDisplay getAppDisplay(List<Bundle> bundles, long appId) {
@@ -56,17 +58,15 @@ public class AppDisplayFactoryUtil {
 
 			bundlesMap.load(bundles);
 
-			AppLocalService appLocalService = _appLocalServiceSnapshot.get();
-
-			return _createMarketplaceAppDisplay(
-				bundlesMap, appLocalService.getApp(appId));
+			return createMarketplaceAppDisplay(
+				bundlesMap, _appLocalService.getApp(appId));
 		}
 		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return null;
@@ -128,24 +128,21 @@ public class AppDisplayFactoryUtil {
 
 		bundlesMap.load(bundles);
 
-		appDisplays.addAll(_createMarketplaceAppDisplays(bundlesMap, category));
+		appDisplays.addAll(createMarketplaceAppDisplays(bundlesMap, category));
 		appDisplays.addAll(
-			_createPortalAppDisplays(bundlesMap, category, locale));
+			createPortalAppDisplays(bundlesMap, category, locale));
 
-		_filterAppDisplays(appDisplays, state);
+		filterAppDisplays(appDisplays, state);
 
 		return ListUtil.sort(appDisplays);
 	}
 
-	private static AppDisplay _createMarketplaceAppDisplay(
+	protected static AppDisplay createMarketplaceAppDisplay(
 		BundlesMap bundlesMap, App app) {
 
 		AppDisplay appDisplay = new MarketplaceAppDisplay(app);
 
-		ModuleLocalService moduleLocalService =
-			_moduleLocalServiceSnapshot.get();
-
-		List<Module> modules = moduleLocalService.getModules(app.getAppId());
+		List<Module> modules = _moduleLocalService.getModules(app.getAppId());
 
 		for (Module module : modules) {
 			Bundle bundle = bundlesMap.getBundle(module);
@@ -158,7 +155,7 @@ public class AppDisplayFactoryUtil {
 		return appDisplay;
 	}
 
-	private static List<AppDisplay> _createMarketplaceAppDisplays(
+	protected static List<AppDisplay> createMarketplaceAppDisplays(
 		BundlesMap bundlesMap, String category) {
 
 		List<AppDisplay> appDisplays = new ArrayList<>();
@@ -168,19 +165,15 @@ public class AppDisplayFactoryUtil {
 		List<App> apps = null;
 
 		if (Validator.isNotNull(category)) {
-			AppLocalService appLocalService = _appLocalServiceSnapshot.get();
-
-			apps = appLocalService.getApps(category);
+			apps = _appLocalService.getApps(category);
 		}
 		else {
-			AppLocalService appLocalService = _appLocalServiceSnapshot.get();
-
-			apps = appLocalService.getApps(
+			apps = _appLocalService.getApps(
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 		}
 
 		for (App app : apps) {
-			AppDisplay appDisplay = _createMarketplaceAppDisplay(
+			AppDisplay appDisplay = createMarketplaceAppDisplay(
 				bundlesMap, app);
 
 			appDisplays.add(appDisplay);
@@ -195,7 +188,7 @@ public class AppDisplayFactoryUtil {
 		return appDisplays;
 	}
 
-	private static List<AppDisplay> _createPortalAppDisplays(
+	protected static List<AppDisplay> createPortalAppDisplays(
 		BundlesMap bundlesMap, String category, Locale locale) {
 
 		Map<String, AppDisplay> appDisplaysMap = new HashMap<>();
@@ -242,7 +235,7 @@ public class AppDisplayFactoryUtil {
 		return ListUtil.fromMapValues(appDisplaysMap);
 	}
 
-	private static void _filterAppDisplays(
+	protected static void filterAppDisplays(
 		List<AppDisplay> appDisplays, int state) {
 
 		Iterator<AppDisplay> iterator = appDisplays.iterator();
@@ -256,13 +249,22 @@ public class AppDisplayFactoryUtil {
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setAppLocalService(AppLocalService appLocalService) {
+		_appLocalService = appLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setModuleLocalService(
+		ModuleLocalService moduleLocalService) {
+
+		_moduleLocalService = moduleLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		AppDisplayFactoryUtil.class);
 
-	private static final Snapshot<AppLocalService> _appLocalServiceSnapshot =
-		new Snapshot<>(AppDisplayFactoryUtil.class, AppLocalService.class);
-	private static final Snapshot<ModuleLocalService>
-		_moduleLocalServiceSnapshot = new Snapshot<>(
-			AppDisplayFactoryUtil.class, ModuleLocalService.class);
+	private static AppLocalService _appLocalService;
+	private static ModuleLocalService _moduleLocalService;
 
 }

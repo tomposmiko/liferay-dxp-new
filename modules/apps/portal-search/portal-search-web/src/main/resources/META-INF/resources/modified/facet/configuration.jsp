@@ -29,7 +29,7 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.modified.facet.configuration.ModifiedFacetPortletInstanceConfiguration" %><%@
 page import="com.liferay.portal.search.web.internal.modified.facet.display.context.ModifiedFacetDisplayContext" %><%@
-page import="com.liferay.portal.search.web.internal.modified.facet.portlet.ModifiedFacetPortlet" %><%@
+page import="com.liferay.portal.search.web.internal.modified.facet.display.context.ModifiedFacetTermDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.modified.facet.portlet.ModifiedFacetPortletPreferences" %><%@
 page import="com.liferay.portal.search.web.internal.modified.facet.portlet.ModifiedFacetPortletPreferencesImpl" %><%@
 page import="com.liferay.portal.search.web.internal.util.PortletPreferencesJspUtil" %>
@@ -61,36 +61,25 @@ JSONArray rangesJSONArray = modifiedFacetPortletPreferences.getRangesJSONArray()
 	<liferay-frontend:edit-form-body>
 		<liferay-ui:error key="unparsableDate" message="unparsable-date" />
 
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			label="display-settings"
-		>
-			<div class="display-template">
-				<liferay-template:template-selector
-					className="<%= ModifiedFacetPortlet.class.getName() %>"
-					displayStyle="<%= modifiedFacetPortletInstanceConfiguration.displayStyle() %>"
-					displayStyleGroupId="<%= modifiedFacetDisplayContext.getDisplayStyleGroupId() %>"
-					refreshURL="<%= configurationRenderURL %>"
-					showEmptyOption="<%= true %>"
-				/>
-			</div>
-		</liferay-frontend:fieldset>
-
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			label="advanced-configuration"
-		>
-			<aui:input label="frequency-threshold" name="<%= PortletPreferencesJspUtil.getInputName(ModifiedFacetPortletPreferences.PREFERENCE_KEY_FREQUENCY_THRESHOLD) %>" value="<%= modifiedFacetPortletPreferences.getFrequencyThreshold() %>" />
-
-			<aui:select label="order-terms-by" name="<%= PortletPreferencesJspUtil.getInputName(ModifiedFacetPortletPreferences.PREFERENCE_KEY_ORDER) %>" value="<%= modifiedFacetPortletPreferences.getOrder() %>">
-				<aui:option label="ranges-configuration" value="" />
-				<aui:option label="term-frequency-descending" value="count:desc" />
-				<aui:option label="term-frequency-ascending" value="count:asc" />
-			</aui:select>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				label="display-settings"
+			>
+				<div class="display-template">
+					<liferay-template:template-selector
+						className="<%= ModifiedFacetTermDisplayContext.class.getName() %>"
+						displayStyle="<%= modifiedFacetPortletInstanceConfiguration.displayStyle() %>"
+						displayStyleGroupId="<%= modifiedFacetDisplayContext.getDisplayStyleGroupId() %>"
+						refreshURL="<%= configurationRenderURL %>"
+						showEmptyOption="<%= true %>"
+					/>
+				</div>
+			</liferay-frontend:fieldset>
 
 			<liferay-frontend:fieldset
 				collapsible="<%= true %>"
-				label="ranges-configuration"
+				label="advanced-configuration"
 			>
 				<aui:fieldset id='<%= liferayPortletResponse.getNamespace() + "rangesId" %>'>
 
@@ -119,14 +108,14 @@ JSONArray rangesJSONArray = modifiedFacetPortletPreferences.getRangesJSONArray()
 
 					<aui:input name="rangesIndexes" type="hidden" value="<%= StringUtil.merge(rangesIndexes) %>" />
 				</aui:fieldset>
-
-				<aui:input label="display-frequencies" name="<%= PortletPreferencesJspUtil.getInputName(ModifiedFacetPortletPreferences.PREFERENCE_KEY_FREQUENCIES_VISIBLE) %>" type="checkbox" value="<%= modifiedFacetPortletPreferences.isFrequenciesVisible() %>" />
 			</liferay-frontend:fieldset>
-		</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button cssClass="btn-lg" type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 

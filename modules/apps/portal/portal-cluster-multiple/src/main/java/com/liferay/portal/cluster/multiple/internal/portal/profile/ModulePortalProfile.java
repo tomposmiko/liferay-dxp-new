@@ -33,9 +33,9 @@ import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.profile.BaseDSModulePortalProfile;
 import com.liferay.portal.profile.PortalProfile;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -46,15 +46,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Tina Tian
  */
-@Component(service = PortalProfile.class)
+@Component(immediate = true, service = PortalProfile.class)
 public class ModulePortalProfile extends BaseDSModulePortalProfile {
 
 	@Activate
 	protected void activate(ComponentContext componentContext) {
-		List<String> supportedPortalProfileNames = null;
+		Set<String> supportedPortalProfileNames = null;
 
 		if (GetterUtil.getBoolean(_props.get(PropsKeys.CLUSTER_LINK_ENABLED))) {
-			supportedPortalProfileNames = new ArrayList<>();
+			supportedPortalProfileNames = new HashSet<>();
 
 			supportedPortalProfileNames.add(
 				PortalProfile.PORTAL_PROFILE_NAME_CE);
@@ -62,7 +62,7 @@ public class ModulePortalProfile extends BaseDSModulePortalProfile {
 				PortalProfile.PORTAL_PROFILE_NAME_DXP);
 		}
 		else {
-			supportedPortalProfileNames = Collections.emptyList();
+			supportedPortalProfileNames = Collections.emptySet();
 
 			BundleContext bundleContext = componentContext.getBundleContext();
 

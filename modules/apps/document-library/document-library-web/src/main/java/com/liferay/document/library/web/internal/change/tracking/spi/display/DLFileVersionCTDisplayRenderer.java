@@ -17,6 +17,7 @@ package com.liferay.document.library.web.internal.change.tracking.spi.display;
 import com.liferay.change.tracking.spi.display.BaseCTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.context.DisplayContext;
+import com.liferay.document.library.constants.DLContentTypes;
 import com.liferay.document.library.constants.DLFileVersionPreviewConstants;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileVersion;
@@ -32,15 +33,15 @@ import com.liferay.document.library.preview.DLPreviewRendererProvider;
 import com.liferay.document.library.service.DLFileVersionPreviewLocalService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.LinkTag;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.documentlibrary.store.StoreFactory;
 
 import java.io.InputStream;
 
@@ -54,7 +55,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Samuel Trong Tran
  */
-@Component(service = CTDisplayRenderer.class)
+@Component(immediate = true, service = CTDisplayRenderer.class)
 public class DLFileVersionCTDisplayRenderer
 	extends BaseCTDisplayRenderer<DLFileVersion> {
 
@@ -72,8 +73,8 @@ public class DLFileVersionCTDisplayRenderer
 		throws PortalException {
 
 		return getDownloadInputStream(
-			_store, _audioProcessor, _dlAppLocalService, dlFileVersion,
-			_imageProcessor, key, _pdfProcessor, _videoProcessor);
+			_audioProcessor, _dlAppLocalService, dlFileVersion, _imageProcessor,
+			key, _pdfProcessor, _videoProcessor);
 	}
 
 	@Override
@@ -120,7 +121,8 @@ public class DLFileVersionCTDisplayRenderer
 
 			return StringBundler.concat(
 				"<audio controls controlsList=\"nodownload\" style=\"",
-				"max-width: ", PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH,
+				"max-width: ",
+				String.valueOf(PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH),
 				"px;\"><source src=\"",
 				displayContext.getDownloadURL(
 					_AUDIO_PREVIEW + ",mp3",
@@ -199,9 +201,7 @@ public class DLFileVersionCTDisplayRenderer
 		Set<String> videoMimeTypes = _videoProcessor.getVideoMimeTypes();
 
 		if (videoMimeTypes.contains(mimeType) ||
-			mimeType.equals(
-				ContentTypes.
-					APPLICATION_VND_LIFERAY_VIDEO_EXTERNAL_SHORTCUT_HTML)) {
+			mimeType.equals(DLContentTypes.VIDEO_EXTERNAL_SHORTCUT)) {
 
 			if (!_videoProcessor.hasVideo(fileVersion)) {
 				return null;
@@ -211,7 +211,7 @@ public class DLFileVersionCTDisplayRenderer
 				"<video controls controlsList=\"nodownload\" style=\"",
 				"background-color: #000; display: block; margin: auto; ",
 				"max-height:624px; max-width:",
-				PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH,
+				String.valueOf(PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_WIDTH),
 				"px;\"><source src=\"",
 				displayContext.getDownloadURL(
 					_VIDEO_PREVIEW + ",mp4",
@@ -229,10 +229,10 @@ public class DLFileVersionCTDisplayRenderer
 	}
 
 	protected static InputStream getDownloadInputStream(
-			Store store, AudioProcessor audioProcessor,
-			DLAppLocalService dlAppLocalService, DLFileVersion dlFileVersion,
-			ImageProcessor imageProcessor, String key,
-			PDFProcessor pdfProcessor, VideoProcessor videoProcessor)
+			AudioProcessor audioProcessor, DLAppLocalService dlAppLocalService,
+			DLFileVersion dlFileVersion, ImageProcessor imageProcessor,
+			String key, PDFProcessor pdfProcessor,
+			VideoProcessor videoProcessor)
 		throws PortalException {
 
 		String[] parts = StringUtil.split(key, StringPool.COMMA);
@@ -266,6 +266,10 @@ public class DLFileVersionCTDisplayRenderer
 		catch (Exception exception) {
 			throw new PortalException(exception);
 		}
+
+		StoreFactory storeFactory = StoreFactory.getInstance();
+
+		Store store = storeFactory.getStore();
 
 		DLFileEntry dlFileEntry = dlFileVersion.getFileEntry();
 
@@ -357,9 +361,6 @@ public class DLFileVersionCTDisplayRenderer
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private PDFProcessor _pdfProcessor;
-
-	@Reference(target = "(default=true)")
-	private Store _store;
 
 	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private VideoProcessor _videoProcessor;

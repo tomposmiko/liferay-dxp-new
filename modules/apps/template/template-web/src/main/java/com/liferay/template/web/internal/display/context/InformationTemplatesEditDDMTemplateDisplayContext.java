@@ -21,18 +21,16 @@ import com.liferay.info.field.InfoFieldSet;
 import com.liferay.info.field.InfoFieldSetEntry;
 import com.liferay.info.field.type.InfoFieldType;
 import com.liferay.info.form.InfoForm;
-import com.liferay.info.item.InfoItemClassDetails;
-import com.liferay.info.item.InfoItemFormVariation;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.template.TemplateVariableCodeHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
@@ -50,6 +48,7 @@ import com.liferay.template.service.TemplateEntryLocalServiceUtil;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Eudaldo Alonso
@@ -59,13 +58,13 @@ public class InformationTemplatesEditDDMTemplateDisplayContext
 	extends EditDDMTemplateDisplayContext {
 
 	public InformationTemplatesEditDDMTemplateDisplayContext(
-		InfoItemServiceRegistry infoItemServiceRegistry,
+		InfoItemServiceTracker infoItemServiceTracker,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
 		super(liferayPortletRequest, liferayPortletResponse);
 
-		_infoItemServiceRegistry = infoItemServiceRegistry;
+		_infoItemServiceTracker = infoItemServiceTracker;
 
 		_themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -79,67 +78,42 @@ public class InformationTemplatesEditDDMTemplateDisplayContext
 			return StringPool.BLANK;
 		}
 
-		InfoItemFormVariationsProvider infoItemFormVariationsProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+		return Optional.ofNullable(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormVariationsProvider.class,
-				templateEntry.getInfoItemClassName());
-
-		if (infoItemFormVariationsProvider == null) {
-			return StringPool.BLANK;
-		}
-
-		InfoItemFormVariation infoItemFormVariation =
-			infoItemFormVariationsProvider.getInfoItemFormVariation(
-				_themeDisplay.getScopeGroupId(),
-				templateEntry.getInfoItemFormVariationKey());
-
-		if (infoItemFormVariation == null) {
-			return StringPool.BLANK;
-		}
-
-		String label = infoItemFormVariation.getLabel(
-			_themeDisplay.getLocale());
-
-		if (label == null) {
-			return StringPool.BLANK;
-		}
-
-		return label;
+				templateEntry.getInfoItemClassName())
+		).map(
+			infoItemFormVariationsProvider ->
+				infoItemFormVariationsProvider.getInfoItemFormVariation(
+					_themeDisplay.getScopeGroupId(),
+					templateEntry.getInfoItemFormVariationKey())
+		).map(
+			infoItemFormVariation -> infoItemFormVariation.getLabel(
+				_themeDisplay.getLocale())
+		).orElse(
+			StringPool.BLANK
+		);
 	}
 
 	@Override
 	public String getTemplateTypeLabel() {
 		TemplateEntry templateEntry = _getTemplateEntry();
 
-		String defaultValue = ResourceActionsUtil.getModelResource(
-			_themeDisplay.getLocale(), templateEntry.getInfoItemClassName());
-
-		InfoItemDetailsProvider infoItemDetailsProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+		return Optional.ofNullable(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemDetailsProvider.class,
-				templateEntry.getInfoItemClassName());
-
-		if (infoItemDetailsProvider == null) {
-			return defaultValue;
-		}
-
-		InfoItemClassDetails infoItemClassDetails =
-			infoItemDetailsProvider.getInfoItemClassDetails();
-
-		if (infoItemClassDetails == null) {
-			return defaultValue;
-		}
-
-		String label = infoItemClassDetails.getLabel(_themeDisplay.getLocale());
-
-		if (label == null) {
-			return defaultValue;
-		}
-
-		return label;
+				templateEntry.getInfoItemClassName())
+		).map(
+			InfoItemDetailsProvider::getInfoItemClassDetails
+		).map(
+			infoItemDetails -> infoItemDetails.getLabel(
+				_themeDisplay.getLocale())
+		).orElse(
+			ResourceActionsUtil.getModelResource(
+				_themeDisplay.getLocale(), templateEntry.getInfoItemClassName())
+		);
 	}
 
-	@Override
 	public String getUpdateDDMTemplateURL() {
 		return PortletURLBuilder.createActionURL(
 			liferayPortletResponse
@@ -164,7 +138,7 @@ public class InformationTemplatesEditDDMTemplateDisplayContext
 		TemplateEntry templateEntry = _getTemplateEntry();
 
 		InfoItemFormProvider<?> infoItemFormProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormProvider.class,
 				templateEntry.getInfoItemClassName());
 
@@ -214,14 +188,14 @@ public class InformationTemplatesEditDDMTemplateDisplayContext
 
 			for (InfoField<?> infoField : infoFieldSet.getAllInfoFields()) {
 				if (!StringUtil.startsWith(
-						infoField.getUniqueId(),
+						infoField.getName(),
 						PortletDisplayTemplate.DISPLAY_STYLE_PREFIX)) {
 
 					InfoFieldType infoFieldType = infoField.getInfoFieldType();
 
 					templateVariableGroup.addFieldVariable(
 						infoField.getLabel(_themeDisplay.getLocale()),
-						TemplateNode.class, infoField.getUniqueId(),
+						TemplateNode.class, infoField.getName(),
 						infoField.getLabel(_themeDisplay.getLocale()),
 						infoFieldType.getName(), infoField.isMultivalued(),
 						_templateVariableCodeHandler);
@@ -248,13 +222,13 @@ public class InformationTemplatesEditDDMTemplateDisplayContext
 	private static final Log _log = LogFactoryUtil.getLog(
 		InformationTemplatesEditDDMTemplateDisplayContext.class);
 
-	private final InfoItemServiceRegistry _infoItemServiceRegistry;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 	private TemplateEntry _templateEntry;
 	private final TemplateVariableCodeHandler _templateVariableCodeHandler =
 		new DDMTemplateVariableCodeHandler(
 			InformationTemplatesTemplateDisplayContext.class.getClassLoader(),
 			"com/liferay/template/web/internal/portlet/template/dependencies/",
-			SetUtil.fromArray("boolean", "image"));
+			SetUtil.fromArray(new String[] {"boolean", "image"}));
 	private final ThemeDisplay _themeDisplay;
 
 }

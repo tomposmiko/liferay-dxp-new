@@ -14,17 +14,15 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.searcher;
 
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.tuning.rankings.web.internal.BaseRankingsWebTestCase;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.Ranking;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.RankingIndexReader;
-import com.liferay.portal.search.tuning.rankings.web.internal.searcher.helper.RankingSearchRequestHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
@@ -33,6 +31,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -48,6 +47,8 @@ public class RankingSearchRequestContributorTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		ReflectionTestUtil.setFieldValue(
 			_rankingSearchRequestContributor, "rankingIndexNameBuilder",
 			rankingIndexNameBuilder);
@@ -58,34 +59,8 @@ public class RankingSearchRequestContributorTest
 			_rankingSearchRequestContributor, "rankingSearchRequestHelper",
 			_rankingSearchRequestHelper);
 		ReflectionTestUtil.setFieldValue(
-			_rankingSearchRequestContributor, "searchEngineHelper",
-			_searchEngineHelper);
-		ReflectionTestUtil.setFieldValue(
 			_rankingSearchRequestContributor, "searchRequestBuilderFactory",
 			searchRequestBuilderFactory);
-	}
-
-	@Test
-	public void testContributeIsSearchEngineSolrTrue() {
-		SearchEngine searchEngine = Mockito.mock(SearchEngine.class);
-
-		Mockito.doReturn(
-			"Solr"
-		).when(
-			searchEngine
-		).getVendor();
-
-		Mockito.doReturn(
-			searchEngine
-		).when(
-			_searchEngineHelper
-		).getSearchEngine();
-
-		SearchRequest searchRequest = Mockito.mock(SearchRequest.class);
-
-		Assert.assertEquals(
-			searchRequest,
-			_rankingSearchRequestContributor.contribute(searchRequest));
 	}
 
 	@Test
@@ -105,18 +80,18 @@ public class RankingSearchRequestContributorTest
 			true);
 
 		Mockito.doReturn(
-			Mockito.mock(Ranking.class)
+			Optional.of(Mockito.mock(Ranking.class))
 		).when(
 			_rankingIndexReader
-		).fetchByQueryString(
-			Mockito.any(), Mockito.anyString()
+		).fetchByQueryStringOptional(
+			Mockito.anyObject(), Mockito.anyString()
 		);
 
 		Mockito.doNothing(
 		).when(
 			_rankingSearchRequestHelper
 		).contribute(
-			Mockito.any(), Mockito.any()
+			Mockito.anyObject(), Mockito.anyObject()
 		);
 
 		SearchRequest searchRequest = Mockito.mock(SearchRequest.class);
@@ -148,7 +123,6 @@ public class RankingSearchRequestContributorTest
 		);
 
 		setUpRankingIndexNameBuilder();
-		_setUpSearchEngineHelper();
 		setUpSearchRequestBuilderFactory(searchRequestBuilder);
 
 		Mockito.doReturn(
@@ -156,36 +130,20 @@ public class RankingSearchRequestContributorTest
 		).when(
 			_rankingIndexReader
 		).isExists(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 
 		return searchRequestBuilder;
 	}
 
-	private void _setUpSearchEngineHelper() {
-		SearchEngine searchEngine = Mockito.mock(SearchEngine.class);
+	@Mock
+	private RankingIndexReader _rankingIndexReader;
 
-		Mockito.doReturn(
-			"Elasticsearch"
-		).when(
-			searchEngine
-		).getVendor();
-
-		Mockito.doReturn(
-			searchEngine
-		).when(
-			_searchEngineHelper
-		).getSearchEngine();
-	}
-
-	private final RankingIndexReader _rankingIndexReader = Mockito.mock(
-		RankingIndexReader.class);
 	private final RankingSearchRequestContributor
 		_rankingSearchRequestContributor =
 			new RankingSearchRequestContributor();
-	private final RankingSearchRequestHelper _rankingSearchRequestHelper =
-		Mockito.mock(RankingSearchRequestHelper.class);
-	private final SearchEngineHelper _searchEngineHelper = Mockito.mock(
-		SearchEngineHelper.class);
+
+	@Mock
+	private RankingSearchRequestHelper _rankingSearchRequestHelper;
 
 }

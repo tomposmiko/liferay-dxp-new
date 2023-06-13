@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.atlassian.jira.rest.client.api.domain.Issue;
-
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil.HttpRequestMethod;
 
 import java.io.File;
@@ -26,11 +24,8 @@ import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -159,45 +154,6 @@ public class PullRequest {
 		_jsonObject.put("state", "closed");
 	}
 
-	public String forward(
-		String commentBody, String consoleURL, String forwardReceiverUsername,
-		String forwardBranchName, String forwardSenderUsername,
-		File gitRepositoryDir) {
-
-		GitWorkingDirectory gitWorkingDirectory =
-			GitWorkingDirectoryFactory.newGitWorkingDirectory(
-				getUpstreamRemoteGitBranchName(),
-				gitRepositoryDir.getAbsolutePath(), getGitRepositoryName());
-
-		LocalGitBranch forwardLocalGitBranch =
-			gitWorkingDirectory.getRebasedLocalGitBranch(
-				forwardBranchName, getSenderBranchName(), getSenderRemoteURL(),
-				getSenderSHA(), getUpstreamRemoteGitBranchName(),
-				getUpstreamBranchSHA());
-
-		RemoteGitBranch forwardRemoteGitBranch =
-			gitWorkingDirectory.pushToRemoteGitRepository(
-				true, forwardLocalGitBranch, forwardLocalGitBranch.getName(),
-				GitUtil.getUserRemoteURL(
-					getGitRepositoryName(), forwardSenderUsername));
-
-		if (forwardRemoteGitBranch == null) {
-			throw new RuntimeException("Unable to push branch to GitHub");
-		}
-
-		try {
-			return gitWorkingDirectory.createPullRequest(
-				commentBody, forwardBranchName, forwardReceiverUsername,
-				forwardSenderUsername, getTitle());
-		}
-		catch (IOException ioException) {
-			ioException.printStackTrace();
-
-			throw new RuntimeException(
-				"Unable to create new pull request", ioException);
-		}
-	}
-
 	public String getCIMergeSHA() {
 		getFileNames();
 
@@ -278,41 +234,6 @@ public class PullRequest {
 		}
 
 		return _commonParentSHA;
-	}
-
-	public List<String> getCompletedTestSuites() {
-		List<String> testSuiteNames = new ArrayList<>();
-
-		JSONArray statusesJSONArray = getSenderSHAStatusesJSONArray();
-
-		for (int i = 0; i < statusesJSONArray.length(); i++) {
-			JSONObject jsonObject = statusesJSONArray.getJSONObject(i);
-
-			Matcher matcher = _liferayContextPattern.matcher(
-				jsonObject.getString("context"));
-
-			if (!matcher.find()) {
-				continue;
-			}
-
-			String testSuiteName = matcher.group("testSuiteName");
-
-			if (testSuiteNames.contains(testSuiteName)) {
-				continue;
-			}
-
-			String state = jsonObject.getString("state");
-
-			if (!Objects.equals(state, "failure") &&
-				!Objects.equals(state, "success")) {
-
-				continue;
-			}
-
-			testSuiteNames.add(testSuiteName);
-		}
-
-		return testSuiteNames;
 	}
 
 	public List<String> getFileNames() {
@@ -401,14 +322,6 @@ public class PullRequest {
 		return _jsonObject.getString("html_url");
 	}
 
-	public Set<Issue> getJIRAIssues() {
-		if (_jiraIssues == null) {
-			_initJIRAIssues();
-		}
-
-		return _jiraIssues;
-	}
-
 	public String getJSON() {
 		return _jsonObject.toString(4);
 	}
@@ -468,7 +381,7 @@ public class PullRequest {
 			String testSuiteName = matcher.group("testSuiteName");
 
 			if (testSuiteNames.contains(testSuiteName) ||
-				!Objects.equals(jsonObject.getString("state"), "success")) {
+				!Objects.equals("success", jsonObject.getString("state"))) {
 
 				continue;
 			}
@@ -591,8 +504,8 @@ public class PullRequest {
 	}
 
 	public String getURL() {
-		return getURL(
-			getReceiverUsername(), getGitRepositoryName(), getNumber());
+		return JenkinsResultsParserUtil.getGitHubApiUrl(
+			_gitHubRemoteGitRepositoryName, _ownerUsername, "pulls/" + _number);
 	}
 
 	public boolean hasLabel(String labelName) {
@@ -605,50 +518,16 @@ public class PullRequest {
 		return false;
 	}
 
-	public boolean hasRequiredCompletedTestSuites() {
-		Properties buildProperties = null;
-
-		try {
-			buildProperties = JenkinsResultsParserUtil.getBuildProperties();
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
-
-		String requiredCompletedSuites = JenkinsResultsParserUtil.getProperty(
-			buildProperties, "pull.request.forward.required.completed.suites",
-			getGitRepositoryName());
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(requiredCompletedSuites)) {
-			return true;
-		}
-
-		List<String> completedTestSuites = getCompletedTestSuites();
-
-		for (String requiredCompletedSuite :
-				requiredCompletedSuites.split(",")) {
-
-			if (!completedTestSuites.contains(requiredCompletedSuite)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	public boolean hasRequiredPassingTestSuites() {
-		Properties buildProperties = null;
+		String requiredPassingSuites;
 
 		try {
-			buildProperties = JenkinsResultsParserUtil.getBuildProperties();
+			requiredPassingSuites = JenkinsResultsParserUtil.getBuildProperty(
+				"pull.request.forward.required.passing.suites");
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
 		}
-
-		String requiredPassingSuites = JenkinsResultsParserUtil.getProperty(
-			buildProperties, "pull.request.forward.required.passing.suites",
-			getGitRepositoryName());
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(requiredPassingSuites)) {
 			return true;
@@ -755,8 +634,7 @@ public class PullRequest {
 		}
 
 		String path = JenkinsResultsParserUtil.combine(
-			"issues/", getNumber(), "/labels/",
-			JenkinsResultsParserUtil.fixURL(labelName));
+			"issues/", getNumber(), "/labels/", labelName);
 
 		String gitHubApiUrl = JenkinsResultsParserUtil.getGitHubApiUrl(
 			getGitHubRemoteGitRepositoryName(), getOwnerUsername(), path);
@@ -1032,11 +910,6 @@ public class PullRequest {
 		refresh();
 	}
 
-	protected String getGitHubApiUrl() {
-		return JenkinsResultsParserUtil.getGitHubApiUrl(
-			_gitHubRemoteGitRepositoryName, _ownerUsername, "pulls/" + _number);
-	}
-
 	protected String getIssueURL() {
 		return _jsonObject.getString("issue_url");
 	}
@@ -1132,26 +1005,10 @@ public class PullRequest {
 		}
 	}
 
-	private void _initJIRAIssues() {
-		getGitHubRemoteCommits();
-
-		_jiraIssues = new HashSet<>();
-
-		for (GitHubRemoteGitCommit gitHubRemoteGitCommit :
-				_gitHubRemoteGitCommits) {
-
-			Issue issue = gitHubRemoteGitCommit.getJIRAIssue();
-
-			if (issue != null) {
-				_jiraIssues.add(issue);
-			}
-		}
-	}
-
 	private void _refreshJSONObject() {
 		try {
 			_jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				getGitHubApiUrl(), false);
+				getURL(), false);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
@@ -1177,7 +1034,6 @@ public class PullRequest {
 	private List<GitHubRemoteGitCommit> _gitHubRemoteGitCommits;
 	private GitHubRemoteGitRepository _gitHubRemoteGitRepository;
 	private final String _gitHubRemoteGitRepositoryName;
-	private Set<Issue> _jiraIssues;
 	private JSONObject _jsonObject;
 	private List<GitHubRemoteGitRepository.Label> _labels;
 	private RemoteGitBranch _liferayRemoteGitBranch;

@@ -24,8 +24,20 @@
 
 			<replaceregexp
 				file="${analytics.cloud.docker.test.yaml}"
+				match="image: liferay\/com-liferay-osb-faro\:latest"
+				replace="image: ${analytics.cloud.faro.image.name}"
+			/>
+
+			<replaceregexp
+				file="${analytics.cloud.docker.test.yaml}"
 				match="\&quot;8080:8080\&quot;"
 				replace="&quot;${analytics.cloud.faro.dxp.port}:8080&quot;"
+			/>
+
+			<replaceregexp
+				file="${analytics.cloud.docker.test.yaml}"
+				match="http://\{service\}:8080"
+				replace="http://{service}:${analytics.cloud.faro.dxp.port}"
 			/>
 
 			<replaceregexp
@@ -182,19 +194,18 @@ networks:
 	</macrodef>
 
 	<macrodef name="pull-docker-image-dependencies">
-		<attribute default="" name="analytics.cloud.image.names.excludes" />
 		<attribute name="analytics.cloud.repository.dir" />
 
 		<sequential>
-			<local name="analytics.cloud.image.names.excludes" />
-
-			<property name="analytics.cloud.image.names.excludes" value="@{analytics.cloud.image.names.excludes}" />
-
 			<beanshell>
 				<![CDATA[
 					import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 
 					String excludedImageNames = project.getProperty("analytics.cloud.image.names.excludes");
+
+					if (excludedImageNames == null) {
+						excludedImageNames = "";
+					}
 
 					JenkinsResultsParserUtil.pullDockerImageDependencies(new File("@{analytics.cloud.repository.dir}"), excludedImageNames.split(","));
 				]]>
@@ -218,6 +229,12 @@ networks:
 
 			<replaceregexp
 				file="${analytics.cloud.faro.dir}/build-ext.gradle"
+				match="def dockerImageId = \&quot;([^\&quot;]+)\&quot;"
+				replace="def dockerImageId = \&quot;${analytics.cloud.faro.image.name}\&quot;"
+			/>
+
+			<replaceregexp
+				file="${analytics.cloud.faro.dir}/build-ext.gradle"
 				match="network \&quot;([^\&quot;]+)\&quot;"
 				replace="network \&quot;${analytics.cloud.project.name}_default\&quot;"
 			/>
@@ -229,17 +246,13 @@ networks:
 			/>
 
 			<echo file="${analytics.cloud.asah.dir}/local.env">OSB_ASAH_BACKEND_URL=${analytics.cloud.asah.backend.url}
-OSB_ASAH_POSTGRESQL_ENABLED=false
 OSB_ASAH_PUBLISHER_URL=${analytics.cloud.asah.publisher.url}
 OSB_FARO_FRONTEND_URL=${analytics.cloud.faro.frontend.url}</echo>
 
 			<if>
 				<equals arg1="${analytics.cloud.asah.build}" arg2="true" />
 				<then>
-					<pull-docker-image-dependencies
-						analytics.cloud.image.names.excludes="${analytics.cloud.asah.image.names.excludes}"
-						analytics.cloud.repository.dir="${analytics.cloud.asah.dir}"
-					/>
+					<pull-docker-image-dependencies analytics.cloud.repository.dir="${analytics.cloud.asah.dir}" />
 
 					<execute dir="${analytics.cloud.asah.dir}">
 						./gradlew jar -Dliferay.ci=true
@@ -254,32 +267,14 @@ OSB_FARO_FRONTEND_URL=${analytics.cloud.faro.frontend.url}</echo>
 			<if>
 				<equals arg1="${analytics.cloud.faro.build}" arg2="true" />
 				<then>
-					<pull-docker-image-dependencies
-						analytics.cloud.image.names.excludes="${analytics.cloud.faro.image.names.excludes}"
-						analytics.cloud.repository.dir="${analytics.cloud.faro.dir}"
-					/>
+					<pull-docker-image-dependencies analytics.cloud.repository.dir="${analytics.cloud.faro.dir}" />
 
 					<local name="portal.gradlew" />
 
 					<property location="${project.dir}/gradlew" name="portal.gradlew" />
 
-					<loadfile
-						property="analytics.cloud.docker.test.yaml.content"
-						srcfile="${analytics.cloud.docker.test.yaml}"
-					/>
-
-					<propertyregex
-						input="${analytics.cloud.docker.test.yaml.content}"
-						override="true"
-						property="analytics.cloud.faro.tag.name"
-						regexp="[\S\s]*image: (liferay\/com-liferay-osb-faro\:[^\s]+)[\S\s]*"
-						replace="\1"
-					/>
-
 					<execute dir="${analytics.cloud.faro.dir}">
 						${portal.gradlew} createDocker -Pcom.liferay.osb.faro.environment.name=local -Dliferay.ci=true
-
-						docker tag ${analytics.cloud.faro.image.name} ${analytics.cloud.faro.tag.name}
 
 						docker rm ${analytics.cloud.faro.container.name}
 					</execute>
@@ -316,44 +311,35 @@ OSB_FARO_FRONTEND_URL=${analytics.cloud.faro.frontend.url}</echo>
 				docker volume prune -f
 			</echo>
 
-			<trycatch>
-				<try>
-					<retry retrycount="${analytics.cloud.retry.count}" retrydelay="30000">
-						<sequential>
-							<trycatch property="analytics.cloud.error">
-								<try>
-									<local name="analytics.cloud.start.result" />
+			<retry retrycount="${analytics.cloud.retry.count}" retrydelay="30000">
+				<sequential>
+					<trycatch property="analytics.cloud.error">
+						<try>
+							<local name="analytics.cloud.start.result" />
 
-									<exec dir="${analytics.cloud.asah.dir}" executable="/bin/bash" resultproperty="analytics.cloud.start.result" timeout="${analytics.cloud.start.timeout}">
-										<arg value="${analytics.cloud.start.sh}" />
-									</exec>
+							<exec dir="${analytics.cloud.asah.dir}" executable="/bin/bash" resultproperty="analytics.cloud.start.result" timeout="${analytics.cloud.start.timeout}">
+								<arg value="${analytics.cloud.start.sh}" />
+							</exec>
 
-									<if>
-										<not>
-											<equals arg1="${analytics.cloud.start.result}" arg2="0" />
-										</not>
-										<then>
-											<fail message="Failed to start Analytics Cloud with error code ${analytics.cloud.start.result}." />
-										</then>
-									</if>
-								</try>
-								<catch>
-									<print-analytics-cloud-logs />
+							<if>
+								<not>
+									<equals arg1="${analytics.cloud.start.result}" arg2="0" />
+								</not>
+								<then>
+									<fail message="Failed to start analytics cloud with error code ${analytics.cloud.start.result}" />
+								</then>
+							</if>
+						</try>
+						<catch>
+							<print-analytics-cloud-logs />
 
-									<stop-analytics-cloud />
+							<stop-analytics-cloud />
 
-									<fail message="${analytics.cloud.error}" />
-								</catch>
-							</trycatch>
-						</sequential>
-					</retry>
-				</try>
-				<catch>
-					<echo>Failed to create Analytics Cloud demo data.</echo>
-
-					<fail message="${analytics.cloud.error}" />
-				</catch>
-			</trycatch>
+							<fail message="${analytics.cloud.error}" />
+						</catch>
+					</trycatch>
+				</sequential>
+			</retry>
 
 			<delete file="${analytics.cloud.start.sh}" />
 		</sequential>

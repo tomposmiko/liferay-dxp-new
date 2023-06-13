@@ -54,7 +54,6 @@ const Link = ({url}) => {
 			<ClayInput.Group>
 				<ClayInput.GroupItem prepend>
 					<ClayInput readOnly ref={inputRef} value={url} />
-
 					{success && (
 						<ClayForm.FeedbackGroup>
 							<ClayForm.FeedbackItem>
@@ -63,7 +62,6 @@ const Link = ({url}) => {
 						</ClayForm.FeedbackGroup>
 					)}
 				</ClayInput.GroupItem>
-
 				<ClayInput.GroupItem append shrink>
 					<ClayButton
 						aria-label={

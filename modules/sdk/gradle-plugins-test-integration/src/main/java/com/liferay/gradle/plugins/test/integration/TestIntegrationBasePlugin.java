@@ -258,10 +258,10 @@ public class TestIntegrationBasePlugin implements Plugin<Project> {
 		Collection<Configuration> plusConfigurations =
 			eclipseClasspath.getPlusConfigurations();
 
-		plusConfigurations.add(
-			GradleUtil.getConfiguration(
-				project,
-				testIntegrationSourceSet.getRuntimeConfigurationName()));
+		Configuration configuration = GradleUtil.getConfiguration(
+			project, testIntegrationSourceSet.getRuntimeConfigurationName());
+
+		plusConfigurations.add(configuration);
 	}
 
 	private void _configureIdea(
@@ -295,10 +295,10 @@ public class TestIntegrationBasePlugin implements Plugin<Project> {
 
 		Collection<Configuration> plusConfigurations = testScope.get("plus");
 
-		plusConfigurations.add(
-			GradleUtil.getConfiguration(
-				project,
-				testIntegrationSourceSet.getRuntimeConfigurationName()));
+		Configuration configuration = GradleUtil.getConfiguration(
+			project, testIntegrationSourceSet.getRuntimeConfigurationName());
+
+		plusConfigurations.add(configuration);
 
 		project.afterEvaluate(
 			new Action<Project>() {

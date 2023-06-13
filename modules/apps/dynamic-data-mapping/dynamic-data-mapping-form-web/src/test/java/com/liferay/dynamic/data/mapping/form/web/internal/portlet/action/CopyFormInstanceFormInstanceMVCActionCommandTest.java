@@ -14,7 +14,6 @@
 
 package com.liferay.dynamic.data.mapping.form.web.internal.portlet.action;
 
-import com.liferay.dynamic.data.mapping.form.web.internal.portlet.action.helper.SaveFormInstanceMVCCommandHelper;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
@@ -26,14 +25,11 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
 import java.util.Locale;
@@ -41,27 +37,30 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Marcellus Tavares
  */
-public class CopyFormInstanceFormInstanceMVCActionCommandTest {
+@PrepareForTest(ResourceBundleUtil.class)
+@RunWith(PowerMockRunner.class)
+public class CopyFormInstanceFormInstanceMVCActionCommandTest
+	extends PowerMockito {
 
-	@ClassRule
-	public static LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		_setUpCopyFormInstanceMVCActionCommand();
+	@Before
+	public void setUp() {
+		setUpCopyFormInstanceMVCActionCommand();
 		setUpLanguageUtil();
-		_setUpPortalUtil();
-		_setUpResourceBundleUtil();
+		setUpPortalUtil();
+		setUpResourceBundleUtil();
 	}
 
 	@Test
@@ -69,12 +68,12 @@ public class CopyFormInstanceFormInstanceMVCActionCommandTest {
 		DDMForm formInstanceSettingsDDMForm = DDMFormFactory.create(
 			DDMFormInstanceSettings.class);
 
-		DDMFormInstance formInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance formInstance = mock(DDMFormInstance.class);
 
 		DDMFormValues ddmFormValues = createDDMFormValues(
 			formInstanceSettingsDDMForm);
 
-		Mockito.when(
+		when(
 			formInstance.getSettingsDDMFormValues()
 		).thenReturn(
 			ddmFormValues
@@ -96,7 +95,7 @@ public class CopyFormInstanceFormInstanceMVCActionCommandTest {
 
 		Assert.assertEquals(
 			formInstanceSettingsDDMFormFieldValuesCopy.toString(),
-			_getDDMFormFieldsSize(formInstanceSettingsDDMForm),
+			getDDMFormFieldsSize(formInstanceSettingsDDMForm),
 			formInstanceSettingsDDMFormFieldValuesCopy.size());
 
 		for (int i = 0; i < formInstanceSettingsDDMFormFieldValuesCopy.size();
@@ -124,12 +123,6 @@ public class CopyFormInstanceFormInstanceMVCActionCommandTest {
 					valueCopy.getString(LocaleUtil.US));
 			}
 		}
-	}
-
-	protected static void setUpLanguageUtil() {
-		LanguageUtil languageUtil = new LanguageUtil();
-
-		languageUtil.setLanguage(Mockito.mock(Language.class));
 	}
 
 	protected DDMFormFieldValue createDDMFormFieldValue(
@@ -160,7 +153,7 @@ public class CopyFormInstanceFormInstanceMVCActionCommandTest {
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
 			DDMFormFieldValue ddmFormFieldValue =
-				_createLocalizedDDMFormFieldValue(
+				createLocalizedDDMFormFieldValue(
 					ddmFormField.getName(), StringUtil.randomString());
 
 			ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
@@ -169,42 +162,7 @@ public class CopyFormInstanceFormInstanceMVCActionCommandTest {
 		return ddmFormValues;
 	}
 
-	private static void _setUpCopyFormInstanceMVCActionCommand() {
-		_copyFormInstanceMVCActionCommand.saveFormInstanceMVCCommandHelper =
-			Mockito.mock(SaveFormInstanceMVCCommandHelper.class);
-	}
-
-	private static void _setUpPortalUtil() {
-		PortalUtil portalUtil = new PortalUtil();
-
-		Portal portal = Mockito.mock(Portal.class);
-
-		ResourceBundle resourceBundle = Mockito.mock(ResourceBundle.class);
-
-		Mockito.when(
-			portal.getResourceBundle(Mockito.any(Locale.class))
-		).thenReturn(
-			resourceBundle
-		);
-
-		portalUtil.setPortal(portal);
-	}
-
-	private static void _setUpResourceBundleUtil() {
-		ResourceBundleLoader resourceBundleLoader = Mockito.mock(
-			ResourceBundleLoader.class);
-
-		ResourceBundleLoaderUtil.setPortalResourceBundleLoader(
-			resourceBundleLoader);
-
-		Mockito.when(
-			resourceBundleLoader.loadResourceBundle(Mockito.any(Locale.class))
-		).thenReturn(
-			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
-		);
-	}
-
-	private DDMFormFieldValue _createLocalizedDDMFormFieldValue(
+	protected DDMFormFieldValue createLocalizedDDMFormFieldValue(
 		String name, String enValue) {
 
 		Value localizedValue = new LocalizedValue(LocaleUtil.US);
@@ -214,13 +172,52 @@ public class CopyFormInstanceFormInstanceMVCActionCommandTest {
 		return createDDMFormFieldValue(name, localizedValue);
 	}
 
-	private int _getDDMFormFieldsSize(DDMForm ddmForm) {
+	protected int getDDMFormFieldsSize(DDMForm ddmForm) {
 		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
 
 		return ddmFormFields.size();
 	}
 
-	private static final CopyFormInstanceMVCActionCommand
+	protected void setUpCopyFormInstanceMVCActionCommand() {
+		_copyFormInstanceMVCActionCommand.saveFormInstanceMVCCommandHelper =
+			mock(SaveFormInstanceMVCCommandHelper.class);
+	}
+
+	protected void setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		languageUtil.setLanguage(mock(Language.class));
+	}
+
+	protected void setUpPortalUtil() {
+		PortalUtil portalUtil = new PortalUtil();
+
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
+
+		portalUtil.setPortal(portal);
+	}
+
+	protected void setUpResourceBundleUtil() {
+		mockStatic(ResourceBundleUtil.class);
+
+		when(
+			ResourceBundleUtil.getBundle(
+				Matchers.anyString(), Matchers.any(Locale.class),
+				Matchers.any(ClassLoader.class))
+		).thenReturn(
+			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
+		);
+	}
+
+	private final CopyFormInstanceMVCActionCommand
 		_copyFormInstanceMVCActionCommand =
 			new CopyFormInstanceMVCActionCommand();
 

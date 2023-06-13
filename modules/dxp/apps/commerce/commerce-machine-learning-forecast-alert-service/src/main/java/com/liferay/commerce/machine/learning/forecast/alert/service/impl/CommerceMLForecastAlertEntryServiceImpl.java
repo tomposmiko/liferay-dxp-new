@@ -14,36 +14,26 @@
 
 package com.liferay.commerce.machine.learning.forecast.alert.service.impl;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
-import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.machine.learning.forecast.alert.constants.CommerceMLForecastAlertActionKeys;
 import com.liferay.commerce.machine.learning.forecast.alert.constants.CommerceMLForecastAlertConstants;
 import com.liferay.commerce.machine.learning.forecast.alert.model.CommerceMLForecastAlertEntry;
 import com.liferay.commerce.machine.learning.forecast.alert.service.base.CommerceMLForecastAlertEntryServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Riccardo Ferrari
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceMLForecastAlertEntry"
-	},
-	service = AopService.class
-)
 public class CommerceMLForecastAlertEntryServiceImpl
 	extends CommerceMLForecastAlertEntryServiceBaseImpl {
 
@@ -58,11 +48,12 @@ public class CommerceMLForecastAlertEntryServiceImpl
 			getPermissionChecker(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			CommerceMLForecastAlertActionKeys.VIEW_ALERTS);
 
-		long[] accountEntryIds = _getUserAccountEntryIds(userId);
+		long[] commerceAccountIds = _getUserCommerceAccountIds(userId);
 
 		return commerceMLForecastAlertEntryLocalService.
 			getAboveThresholdCommerceMLForecastAlertEntries(
-				companyId, accountEntryIds, relativeChange, status, start, end);
+				companyId, commerceAccountIds, relativeChange, status, start,
+				end);
 	}
 
 	@Override
@@ -74,11 +65,11 @@ public class CommerceMLForecastAlertEntryServiceImpl
 			getPermissionChecker(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			CommerceMLForecastAlertActionKeys.VIEW_ALERTS);
 
-		long[] accountEntryIds = _getUserAccountEntryIds(userId);
+		long[] commerceAccountIds = _getUserCommerceAccountIds(userId);
 
 		return commerceMLForecastAlertEntryLocalService.
 			getAboveThresholdCommerceMLForecastAlertEntriesCount(
-				companyId, accountEntryIds, relativeChange, status);
+				companyId, commerceAccountIds, relativeChange, status);
 	}
 
 	@Override
@@ -92,11 +83,12 @@ public class CommerceMLForecastAlertEntryServiceImpl
 			getPermissionChecker(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			CommerceMLForecastAlertActionKeys.VIEW_ALERTS);
 
-		long[] accountEntryIds = _getUserAccountEntryIds(userId);
+		long[] commerceAccountIds = _getUserCommerceAccountIds(userId);
 
 		return commerceMLForecastAlertEntryLocalService.
 			getBelowThresholdCommerceMLForecastAlertEntries(
-				companyId, accountEntryIds, relativeChange, status, start, end);
+				companyId, commerceAccountIds, relativeChange, status, start,
+				end);
 	}
 
 	@Override
@@ -108,11 +100,11 @@ public class CommerceMLForecastAlertEntryServiceImpl
 			getPermissionChecker(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			CommerceMLForecastAlertActionKeys.VIEW_ALERTS);
 
-		long[] accountEntryIds = _getUserAccountEntryIds(userId);
+		long[] commerceAccountIds = _getUserCommerceAccountIds(userId);
 
 		return commerceMLForecastAlertEntryLocalService.
 			getBelowThresholdCommerceMLForecastAlertEntriesCount(
-				companyId, accountEntryIds, relativeChange, status);
+				companyId, commerceAccountIds, relativeChange, status);
 	}
 
 	@Override
@@ -124,11 +116,11 @@ public class CommerceMLForecastAlertEntryServiceImpl
 			getPermissionChecker(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			CommerceMLForecastAlertActionKeys.VIEW_ALERTS);
 
-		long[] accountEntryIds = _getUserAccountEntryIds(userId);
+		long[] commerceAccountIds = _getUserCommerceAccountIds(userId);
 
 		return commerceMLForecastAlertEntryLocalService.
 			getCommerceMLForecastAlertEntries(
-				companyId, accountEntryIds, status, start, end);
+				companyId, commerceAccountIds, status, start, end);
 	}
 
 	@Override
@@ -140,11 +132,11 @@ public class CommerceMLForecastAlertEntryServiceImpl
 			getPermissionChecker(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			CommerceMLForecastAlertActionKeys.VIEW_ALERTS);
 
-		long[] accountEntryIds = _getUserAccountEntryIds(userId);
+		long[] commerceAccountIds = _getUserCommerceAccountIds(userId);
 
 		return commerceMLForecastAlertEntryLocalService.
 			getCommerceMLForecastAlertEntriesCount(
-				companyId, accountEntryIds, status);
+				companyId, commerceAccountIds, status);
 	}
 
 	@Override
@@ -160,27 +152,26 @@ public class CommerceMLForecastAlertEntryServiceImpl
 			getUserId(), commerceMLForecastAlertEntryId, status);
 	}
 
-	private long[] _getUserAccountEntryIds(long userId) throws PortalException {
-		List<AccountEntry> accountEntries =
-			_accountEntryLocalService.getUserAccountEntries(
-				userId, null, null,
-				_commerceAccountHelper.toAccountEntryTypes(
-					CommerceAccountConstants.SITE_TYPE_B2X),
+	private long[] _getUserCommerceAccountIds(long userId)
+		throws PortalException {
+
+		List<CommerceAccount> commerceAccounts =
+			_commerceAccountLocalService.getUserCommerceAccounts(
+				userId, null, CommerceAccountConstants.SITE_TYPE_B2X, null,
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		return ListUtil.toLongArray(
-			accountEntries, AccountEntry::getAccountEntryId);
+			commerceAccounts, CommerceAccount::getCommerceAccountId);
 	}
 
-	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private static volatile PortletResourcePermission
+		_portletResourcePermission =
+			PortletResourcePermissionFactory.getInstance(
+				CommerceMLForecastAlertEntryServiceImpl.class,
+				"_portletResourcePermission",
+				CommerceMLForecastAlertConstants.RESOURCE_NAME);
 
-	@Reference
-	private CommerceAccountHelper _commerceAccountHelper;
-
-	@Reference(
-		target = "(resource.name=" + CommerceMLForecastAlertConstants.RESOURCE_NAME + ")"
-	)
-	private PortletResourcePermission _portletResourcePermission;
+	@ServiceReference(type = CommerceAccountLocalService.class)
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 }

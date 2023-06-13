@@ -38,7 +38,9 @@ else {
 }
 %>
 
-<div class="sheet-text"><liferay-ui:message key="select-the-delivery-options-for-alerts-and-announcements" /></div>
+<clay:sheet-section>
+	<div class="text-muted"><liferay-ui:message key="select-the-delivery-options-for-alerts-and-announcements" /></div>
+</clay:sheet-section>
 
 <liferay-ui:search-container>
 	<liferay-ui:search-container-results

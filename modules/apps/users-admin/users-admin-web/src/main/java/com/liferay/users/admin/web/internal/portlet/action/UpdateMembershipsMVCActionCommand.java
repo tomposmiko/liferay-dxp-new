@@ -14,10 +14,7 @@
 
 package com.liferay.users.admin.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.exception.ContactNameException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
-import com.liferay.portal.kernel.exception.UserEmailAddressException;
-import com.liferay.portal.kernel.exception.UserScreenNameException;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -45,10 +42,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ACCOUNT,
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
-		"javax.portlet.name=" + UsersAdminPortletKeys.SERVICE_ACCOUNTS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/users_admin/update_memberships"
 	},
@@ -85,21 +82,17 @@ public class UpdateMembershipsMVCActionCommand extends BaseMVCActionCommand {
 				user.getEmailAddress(), user.getLanguageId(),
 				user.getTimeZoneId(), user.getGreeting(), user.getComments(),
 				user.getFirstName(), user.getMiddleName(), user.getLastName(),
-				contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-				user.isMale(), birthdayCal.get(Calendar.MONTH),
-				birthdayCal.get(Calendar.DATE), birthdayCal.get(Calendar.YEAR),
-				contact.getSmsSn(), contact.getFacebookSn(),
-				contact.getJabberSn(), contact.getSkypeSn(),
-				contact.getTwitterSn(), user.getJobTitle(), groupIds,
-				user.getOrganizationIds(), null, null, userGroupIds,
-				serviceContext);
+				contact.getPrefixId(), contact.getSuffixId(), user.isMale(),
+				birthdayCal.get(Calendar.MONTH), birthdayCal.get(Calendar.DATE),
+				birthdayCal.get(Calendar.YEAR), contact.getSmsSn(),
+				contact.getFacebookSn(), contact.getJabberSn(),
+				contact.getSkypeSn(), contact.getTwitterSn(),
+				user.getJobTitle(), groupIds, user.getOrganizationIds(), null,
+				null, userGroupIds, serviceContext);
 		}
 		catch (Exception exception) {
-			if (exception instanceof ContactNameException ||
-				exception instanceof NoSuchUserException ||
-				exception instanceof PrincipalException ||
-				exception instanceof UserEmailAddressException ||
-				exception instanceof UserScreenNameException) {
+			if (exception instanceof NoSuchUserException ||
+				exception instanceof PrincipalException) {
 
 				SessionErrors.add(actionRequest, exception.getClass());
 

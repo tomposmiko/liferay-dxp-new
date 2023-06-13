@@ -16,7 +16,6 @@ package com.liferay.frontend.taglib.clay.servlet.taglib;
 
 import com.liferay.frontend.taglib.clay.internal.servlet.taglib.BaseContainerTag;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
@@ -125,15 +124,15 @@ public class LabelTag extends BaseContainerTag {
 
 			jspWriter.write("<span class=\"label-item label-item-expand\">");
 
-			String translatedLabel = _label;
-
 			if (_translated) {
-				translatedLabel = LanguageUtil.get(
-					TagResourceBundleUtil.getResourceBundle(pageContext),
-					_label);
+				jspWriter.write(
+					LanguageUtil.get(
+						TagResourceBundleUtil.getResourceBundle(pageContext),
+						_label));
 			}
-
-			jspWriter.write(HtmlUtil.escape(translatedLabel));
+			else {
+				jspWriter.write(_label);
+			}
 
 			jspWriter.write("</span>");
 

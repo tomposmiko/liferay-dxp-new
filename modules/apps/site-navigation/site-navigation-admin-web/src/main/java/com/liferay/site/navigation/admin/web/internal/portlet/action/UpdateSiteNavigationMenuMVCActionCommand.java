@@ -14,13 +14,13 @@
 
 package com.liferay.site.navigation.admin.web.internal.portlet.action;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SiteNavigationAdminPortletKeys.SITE_NAVIGATION_ADMIN,
 		"mvc.command.name=/site_navigation_admin/update_site_navigation_menu"
@@ -66,7 +67,7 @@ public class UpdateSiteNavigationMenuMVCActionCommand
 				siteNavigationMenuId, name, serviceContext);
 
 			JSONObject jsonObject = JSONUtil.put(
-				"redirectURL", _getRedirectURL(actionResponse));
+				"redirectURL", getRedirectURL(actionResponse));
 
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse, jsonObject);
@@ -79,7 +80,7 @@ public class UpdateSiteNavigationMenuMVCActionCommand
 		}
 	}
 
-	private String _getRedirectURL(ActionResponse actionResponse) {
+	protected String getRedirectURL(ActionResponse actionResponse) {
 		return PortletURLBuilder.createRenderURL(
 			_portal.getLiferayPortletResponse(actionResponse)
 		).setMVCPath(

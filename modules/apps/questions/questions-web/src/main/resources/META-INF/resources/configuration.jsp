@@ -32,7 +32,7 @@ try {
 }
 catch (Exception exception) {
 	if (_log.isDebugEnabled()) {
-		_log.debug(exception);
+		_log.debug(exception, exception);
 	}
 }
 %>
@@ -51,28 +51,32 @@ catch (Exception exception) {
 	<aui:input name="preferences--rootTopicId--" type="hidden" value="<%= rootTopicId %>" />
 
 	<liferay-frontend:edit-form-body>
-		<liferay-frontend:fieldset
-			collapsible="<%= false %>"
-			label="general-settings"
-		>
-			<aui:input name="preferences--showCardsForTopicNavigation--" type="checkbox" value="<%= questionsConfiguration.showCardsForTopicNavigation() %>" />
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset
+				collapsible="<%= false %>"
+				label="general-settings"
+			>
+				<aui:input name="preferences--showCardsForTopicNavigation--" type="checkbox" value="<%= questionsConfiguration.showCardsForTopicNavigation() %>" />
 
-			<div class="form-group">
-				<aui:input label="root-topic-id" name="rootTopicName" type="resource" value="<%= rootTopicName %>" />
+				<div class="form-group">
+					<aui:input label="root-topic-id" name="rootTopicName" type="resource" value="<%= rootTopicName %>" />
 
-				<aui:button name="selectRootTopicButton" value="select" />
+					<aui:button name="selectRootTopicButton" value="select" />
 
-				<%
-				String taglibRemoveRootTopic = "Liferay.Util.removeEntitySelection('rootTopicId', 'rootTopicName', this, '" + liferayPortletResponse.getNamespace() + "');";
-				%>
+					<%
+					String taglibRemoveRootTopic = "Liferay.Util.removeEntitySelection('rootTopicId', 'rootTopicName', this, '" + liferayPortletResponse.getNamespace() + "');";
+					%>
 
-				<aui:button disabled="<%= rootTopicId <= 0 %>" name="removeRootTopicButton" onClick="<%= taglibRemoveRootTopic %>" value="remove" />
-			</div>
-		</liferay-frontend:fieldset>
+					<aui:button disabled="<%= rootTopicId <= 0 %>" name="removeRootTopicButton" onClick="<%= taglibRemoveRootTopic %>" value="remove" />
+				</div>
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 

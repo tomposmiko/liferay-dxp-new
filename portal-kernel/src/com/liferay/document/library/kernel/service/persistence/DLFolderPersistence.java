@@ -3630,56 +3630,6 @@ public interface DLFolderPersistence
 		int status);
 
 	/**
-	 * Returns the document library folder where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchFolderException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching document library folder
-	 * @throws NoSuchFolderException if a matching document library folder could not be found
-	 */
-	public DLFolder findByERC_G(String externalReferenceCode, long groupId)
-		throws NoSuchFolderException;
-
-	/**
-	 * Returns the document library folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching document library folder, or <code>null</code> if a matching document library folder could not be found
-	 */
-	public DLFolder fetchByERC_G(String externalReferenceCode, long groupId);
-
-	/**
-	 * Returns the document library folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching document library folder, or <code>null</code> if a matching document library folder could not be found
-	 */
-	public DLFolder fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache);
-
-	/**
-	 * Removes the document library folder where externalReferenceCode = &#63; and groupId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the document library folder that was removed
-	 */
-	public DLFolder removeByERC_G(String externalReferenceCode, long groupId)
-		throws NoSuchFolderException;
-
-	/**
-	 * Returns the number of document library folders where externalReferenceCode = &#63; and groupId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the number of matching document library folders
-	 */
-	public int countByERC_G(String externalReferenceCode, long groupId);
-
-	/**
 	 * Caches the document library folder in the entity cache if it is enabled.
 	 *
 	 * @param dlFolder the document library folder

@@ -35,9 +35,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DETAILS-->
-
 <tr>
 	<td>DETAILS_MODE_SELECT</td>
 	<td>//select[contains(@id,'mode')]</td>
@@ -48,9 +46,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--FIELDS-->
-
 <tr>
 	<td>FIELDS_LINK</td>
 	<td>//*[contains(@class,'tab-label') and contains(.,'Fields')]</td>
@@ -71,17 +67,13 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--FIELDSET_MODAL-->
-
 <tr>
 	<td>FORM_FIELD_CONTAINER_LABEL_IN_FIELDSET_MODAL</td>
 	<td>//div[contains(@class,'modal-dialog')]//label[normalize-space(text())='${key_fieldFieldLabel}'] | //div[contains(@class,'modal-dialog')]//legend[normalize-space(text())='${key_fieldFieldLabel}']</td>
 	<td></td>
 </tr>
-
 <!--SETTINGS-->
-
 <tr>
 	<td>SETTINGS_EDIT_CONECTIONS_DEFAULT</td>
 	<td>//label[contains(.,'${key_radioOption}')]/input[@type='radio' and contains(@name,'')]</td>
@@ -129,12 +121,12 @@
 </tr>
 <tr>
 	<td>SETTINGS_TEXT</td>
-	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form-feedback-group')] | //legend[normalize-space(text())='${key_fieldFieldLabel}']/..//following-sibling::div[contains(@class,'form-feedback-group')]</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::span[contains(@class,'form-text')] | //legend[normalize-space(text())='${key_fieldFieldLabel}']/..//following-sibling::span[contains(@class,'form-text')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SETTINGS_TEXT_ANY</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form-feedback-group')] | //legend[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form-feedback-group')])[${key_index}]</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::span[contains(@class,'form-text')] | //legend[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::span[contains(@class,'form-text')])[${key_index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -167,9 +159,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--FORM-->
-
 <tr>
 	<td>FORM_BUILDER</td>
 	<td>//div[contains(@class,'property-builder-content-container')]</td>
@@ -212,7 +202,7 @@
 </tr>
 <tr>
 	<td>FORM_FIELD_CONTAINER_LABEL</td>
-	<td>//label[normalize-space()='${key_fieldFieldLabel}'] | //legend[normalize-space(text())='${key_fieldFieldLabel}']</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}'] | //legend[normalize-space(text())='${key_fieldFieldLabel}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -232,12 +222,7 @@
 </tr>
 <tr>
 	<td>FORM_FIELD_CONTAINER_HELP_TEXT</td>
-	<td>//span[@class='form-text' and normalize-space(text())='${key_helpText}'] | //div[text()='${key_helpText}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>FORM_FIELD_CONTAINER_TEXT</td>
-	<td>//span[normalize-space(text())='${key_text}']</td>
+	<td>//span[@class='form-text' and normalize-space(text())='${key_helpText}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -273,11 +258,6 @@
 <tr>
 	<td>FORM_FIELD_DELETE_BUTTON</td>
 	<td>portal/screenshots/ddm/form_delete.png</td>
-	<td></td>
-</tr>
-<tr>
-	<td>FORM_FIELD_DELETE_BUTTON_2</td>
-	<td>xpath=(//button//*[contains(@class,'lexicon-icon-trash')])[1]</td>
 	<td></td>
 </tr>
 <tr>
@@ -325,9 +305,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SETTINGS_CELL_EDITOR-->
-
 <tr>
 	<td>SETTINGS_CELL_EDITOR_FIELD</td>
 	<td>//input[@name='value']</td>
@@ -428,9 +406,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SOURCE_EDITOR-->
-
 <tr>
 	<td>SOURCE_EDITOR_CONTENT</td>
 	<td>//div[contains(@id,'formBuilderEditor')]/textarea</td>
@@ -441,9 +417,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ARE_YOU_SURE_DIALOG_BOX-->
-
 <tr>
 	<td>ARE_YOU_SURE_DIALOG_BOX_BODY</td>
 	<td>//div[contains(@class,'modal-body') and contains(.,'Are you sure')]</td>

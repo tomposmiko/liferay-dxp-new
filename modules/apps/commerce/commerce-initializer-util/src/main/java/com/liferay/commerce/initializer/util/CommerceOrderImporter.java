@@ -19,10 +19,8 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.context.CommerceContextFactory;
 import com.liferay.commerce.model.CommerceOrder;
@@ -35,7 +33,7 @@ import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -45,7 +43,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserIdMapperLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.File;
 
@@ -58,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = CommerceOrderImporter.class)
+@Component(enabled = false, service = CommerceOrderImporter.class)
 public class CommerceOrderImporter {
 
 	public void importOrders(
@@ -81,7 +78,7 @@ public class CommerceOrderImporter {
 		while (jsonFactoryParser.nextToken() != JsonToken.END_ARRAY) {
 			TreeNode treeNode = jsonFactoryParser.readValueAsTree();
 
-			JSONObject jsonObject = _jsonFactory.createJSONObject(
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				treeNode.toString());
 
 			if (_log.isDebugEnabled()) {
@@ -141,9 +138,8 @@ public class CommerceOrderImporter {
 
 		String externalProductId = jsonObject.getString("externalProductId");
 
-		CProduct cProduct =
-			_cProductLocalService.fetchCProductByExternalReferenceCode(
-				externalProductId, serviceContext.getCompanyId());
+		CProduct cProduct = _cProductLocalService.fetchCProductByReferenceCode(
+			serviceContext.getCompanyId(), externalProductId);
 
 		if (cProduct == null) {
 			return;
@@ -172,27 +168,13 @@ public class CommerceOrderImporter {
 
 		long userId = userIdMapper.getUserId();
 
-		AccountEntry accountEntry =
-			_accountEntryLocalService.fetchPersonAccountEntry(userId);
-
-		if (accountEntry == null) {
-			User user = _userLocalService.getUser(userId);
-
-			accountEntry = _accountEntryLocalService.addAccountEntry(
-				userId, AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
-				user.getFullName(), null, null, user.getEmailAddress(), null,
-				StringPool.BLANK, AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON,
-				WorkflowConstants.STATUS_APPROVED, serviceContext);
-
-			_commerceAccountHelper.addAccountEntryUserRel(
-				accountEntry.getAccountEntryId(), user.getUserId(),
-				serviceContext);
-		}
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.getPersonalCommerceAccount(userId);
 
 		CommerceOrder commerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				userId, serviceContext.getScopeGroupId(),
-				accountEntry.getAccountEntryId(), 0, 0);
+				commerceAccount.getCommerceAccountId(), 0, 0);
 
 		// We update the order create date to the one in the dataset
 
@@ -209,26 +191,22 @@ public class CommerceOrderImporter {
 		CommerceContext commerceContext = _commerceContextFactory.create(
 			serviceContext.getCompanyId(), commerceOrder.getGroupId(),
 			serviceContext.getUserId(), commerceOrder.getCommerceOrderId(),
-			accountEntry.getAccountEntryId());
+			commerceAccount.getCommerceAccountId());
 
 		// Create CommerceOrderItem
 
 		CPInstance cpInstance = cpInstances.get(0);
 
 		_commerceOrderItemLocalService.addCommerceOrderItem(
-			userId, commerceOrder.getCommerceOrderId(),
-			cpInstance.getCPInstanceId(), StringPool.BLANK, 1, 0, 1,
-			commerceContext, serviceContext);
+			commerceOrder.getCommerceOrderId(), cpInstance.getCPInstanceId(),
+			StringPool.BLANK, 1, 1, commerceContext, serviceContext);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceOrderImporter.class);
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Reference
-	private CommerceAccountHelper _commerceAccountHelper;
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Reference
 	private CommerceContextFactory _commerceContextFactory;
@@ -244,9 +222,6 @@ public class CommerceOrderImporter {
 
 	@Reference
 	private CProductLocalService _cProductLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private UserIdMapperLocalService _userIdMapperLocalService;

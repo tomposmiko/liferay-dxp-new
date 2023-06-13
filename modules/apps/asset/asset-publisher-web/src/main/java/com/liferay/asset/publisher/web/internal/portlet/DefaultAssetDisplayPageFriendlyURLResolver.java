@@ -42,7 +42,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
@@ -51,33 +50,30 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.InheritableMap;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.workflow.permission.WorkflowPermission;
+import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 import javax.portlet.WindowState;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -100,12 +96,12 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 			(HttpServletRequest)requestContext.get("request");
 
 		JournalArticle journalArticle = _getJournalArticle(
-			groupId, friendlyURL, params);
+			groupId, friendlyURL);
 
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
 			_getLayoutDisplayPageObjectProvider(journalArticle);
 
-		if (Validator.isNull(_getLayoutUuid(journalArticle)) &&
+		if (Validator.isNull(journalArticle.getLayoutUuid()) &&
 			(layoutDisplayPageObjectProvider != null) &&
 			AssetDisplayPageUtil.hasAssetDisplayPage(
 				groupId, layoutDisplayPageObjectProvider.getClassNameId(),
@@ -114,20 +110,13 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 
 			ThemeDisplay themeDisplay = new ThemeDisplay();
 
-			themeDisplay.setCompany(_companyLocalService.getCompany(companyId));
-
-			String portalURL = _portal.getPortalURL(httpServletRequest);
-
-			themeDisplay.setPortalDomain(
-				HttpComponentsUtil.getDomain(portalURL));
-			themeDisplay.setPortalURL(portalURL);
-
 			themeDisplay.setScopeGroupId(groupId);
 			themeDisplay.setSiteGroupId(groupId);
 
 			String assetFriendlyURL =
 				_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
-					layoutDisplayPageObjectProvider.getClassName(),
+					_portal.getClassName(
+						layoutDisplayPageObjectProvider.getClassNameId()),
 					layoutDisplayPageObjectProvider.getClassPK(),
 					_portal.getLocale(httpServletRequest), themeDisplay);
 
@@ -155,9 +144,14 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		throws PortalException {
 
 		JournalArticle journalArticle = _getJournalArticle(
-			groupId, friendlyURL, params);
+			groupId, friendlyURL);
 
-		Locale locale = getLocale(requestContext);
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest)requestContext.get("request");
+
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		Locale locale = (Locale)httpSession.getAttribute(WebKeys.LOCALE);
 
 		if (locale != null) {
 			Map<Locale, String> friendlyURLMap =
@@ -173,9 +167,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
 			_getLayoutDisplayPageObjectProvider(journalArticle);
 
-		String layoutUuid = _getLayoutUuid(journalArticle);
-
-		if (Validator.isNull(layoutUuid) &&
+		if (Validator.isNull(journalArticle.getLayoutUuid()) &&
 			(layoutDisplayPageObjectProvider != null) &&
 			AssetDisplayPageUtil.hasAssetDisplayPage(
 				groupId, layoutDisplayPageObjectProvider.getClassNameId(),
@@ -188,36 +180,14 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		}
 
 		Layout layout = _layoutLocalService.getLayoutByUuidAndGroupId(
-			layoutUuid, groupId, privateLayout);
+			journalArticle.getLayoutUuid(), groupId, privateLayout);
 
-		return new LayoutFriendlyURLComposite(layout, friendlyURL, false);
+		return new LayoutFriendlyURLComposite(layout, friendlyURL);
 	}
 
 	@Override
 	public String getURLSeparator() {
 		return JournalArticleConstants.CANONICAL_URL_SEPARATOR;
-	}
-
-	private AssetEntry _getAssetEntry(JournalArticle journalArticle) {
-		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
-			JournalArticle.class.getName(), journalArticle.getPrimaryKey());
-
-		if (assetEntry != null) {
-			return assetEntry;
-		}
-
-		AssetRendererFactory<?> assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				JournalArticle.class.getName());
-
-		try {
-			return assetRendererFactory.getAssetEntry(
-				JournalArticle.class.getName(),
-				journalArticle.getResourcePrimKey());
-		}
-		catch (PortalException portalException) {
-			throw new RuntimeException(portalException);
-		}
 	}
 
 	private String _getBasicLayoutURL(
@@ -228,7 +198,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		throws PortalException {
 
 		Layout layout = _layoutLocalService.getLayoutByUuidAndGroupId(
-			_getLayoutUuid(journalArticle), groupId, privateLayout);
+			journalArticle.getLayoutUuid(), groupId, privateLayout);
 
 		String layoutActualURL = _portal.getLayoutActualURL(layout, mainPath);
 
@@ -293,7 +263,21 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 
 		Locale locale = _portal.getLocale(httpServletRequest);
 
-		AssetEntry assetEntry = _getAssetEntry(journalArticle);
+		AssetEntry assetEntry = Optional.ofNullable(
+			_assetEntryLocalService.fetchEntry(
+				JournalArticle.class.getName(), journalArticle.getPrimaryKey())
+		).orElseGet(
+			() -> {
+				try {
+					return assetRendererFactory.getAssetEntry(
+						JournalArticle.class.getName(),
+						journalArticle.getResourcePrimKey());
+				}
+				catch (PortalException portalException) {
+					throw new RuntimeException(portalException);
+				}
+			}
+		);
 
 		actualParams.put(
 			namespace + "assetEntryId",
@@ -313,32 +297,15 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 				urlTitle);
 
 		if (friendlyURLEntryLocalization != null) {
-			String languageId = LocaleUtil.toLanguageId(locale);
+			locale = LocaleUtil.fromLanguageId(
+				friendlyURLEntryLocalization.getLanguageId());
 
-			if (!Objects.equals(
-					friendlyURLEntryLocalization.getLanguageId(), languageId) &&
-				ArrayUtil.contains(
-					journalArticle.getAvailableLanguageIds(), languageId)) {
-
-				actualParams.put(
-					namespace + "languageId", new String[] {languageId});
-
-				locale = LocaleUtil.fromLanguageId(languageId);
-			}
-			else {
-				actualParams.put(
-					namespace + "languageId",
-					new String[] {
-						friendlyURLEntryLocalization.getLanguageId()
-					});
-
-				locale = LocaleUtil.fromLanguageId(
-					friendlyURLEntryLocalization.getLanguageId());
-			}
+			actualParams.put(
+				namespace + "languageId",
+				new String[] {friendlyURLEntryLocalization.getLanguageId()});
 		}
 
-		String queryString = HttpComponentsUtil.parameterMapToString(
-			actualParams, false);
+		String queryString = _http.parameterMapToString(actualParams, false);
 
 		if (layoutActualURL.contains(StringPool.QUESTION)) {
 			layoutActualURL =
@@ -411,31 +378,16 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		return GetterUtil.getLong(paths.get(paths.size() - 1));
 	}
 
-	private JournalArticle _getJournalArticle(
-			long groupId, String friendlyURL, Map<String, String[]> params)
+	private JournalArticle _getJournalArticle(long groupId, String friendlyURL)
 		throws PortalException {
 
-		JournalArticle journalArticle = null;
-
 		String normalizedUrlTitle =
-			_friendlyURLNormalizer.normalizeWithEncoding(
+			FriendlyURLNormalizerUtil.normalizeWithEncoding(
 				_getFullURLTitle(friendlyURL));
 
-		String[] versions = params.get("version");
-
-		if (ArrayUtil.isNotEmpty(versions) && !_isGuestUser()) {
-			double version = GetterUtil.getDouble(versions[0]);
-
-			journalArticle = _journalArticleLocalService.fetchArticleByUrlTitle(
-				groupId, normalizedUrlTitle, version);
-		}
-
-		if (journalArticle == null) {
-			journalArticle =
-				_journalArticleLocalService.fetchLatestArticleByUrlTitle(
-					groupId, normalizedUrlTitle,
-					WorkflowConstants.STATUS_APPROVED);
-		}
+		JournalArticle journalArticle =
+			_journalArticleLocalService.fetchLatestArticleByUrlTitle(
+				groupId, normalizedUrlTitle, WorkflowConstants.STATUS_APPROVED);
 
 		if (journalArticle == null) {
 			PermissionChecker permissionChecker =
@@ -447,19 +399,19 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 					WorkflowConstants.STATUS_PENDING);
 
 			if ((journalArticle != null) &&
-				!GetterUtil.getBoolean(
-					_workflowPermission.hasPermission(
-						permissionChecker, groupId,
-						"com.liferay.journal.model.JournalArticle",
-						journalArticle.getId(), ActionKeys.VIEW))) {
+				!WorkflowPermissionUtil.hasPermission(
+					permissionChecker, groupId,
+					"com.liferay.journal.model.JournalArticle",
+					journalArticle.getId(), ActionKeys.VIEW)) {
 
 				throw new PrincipalException();
 			}
 		}
 
 		if (journalArticle == null) {
-			normalizedUrlTitle = _friendlyURLNormalizer.normalizeWithEncoding(
-				_getURLTitle(friendlyURL));
+			normalizedUrlTitle =
+				FriendlyURLNormalizerUtil.normalizeWithEncoding(
+					_getURLTitle(friendlyURL));
 
 			double version = _getVersion(friendlyURL);
 
@@ -477,8 +429,9 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		}
 
 		if (journalArticle == null) {
-			normalizedUrlTitle = _friendlyURLNormalizer.normalizeWithEncoding(
-				_getURLTitle(friendlyURL));
+			normalizedUrlTitle =
+				FriendlyURLNormalizerUtil.normalizeWithEncoding(
+					_getURLTitle(friendlyURL));
 
 			long id = _getId(friendlyURL);
 
@@ -496,11 +449,10 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 					groupId, normalizedUrlTitle,
 					WorkflowConstants.STATUS_PENDING);
 
-			if (!GetterUtil.getBoolean(
-					_workflowPermission.hasPermission(
-						permissionChecker, groupId,
-						"com.liferay.journal.model.JournalArticle",
-						journalArticle.getId(), ActionKeys.VIEW))) {
+			if (!WorkflowPermissionUtil.hasPermission(
+					permissionChecker, groupId,
+					"com.liferay.journal.model.JournalArticle",
+					journalArticle.getId(), ActionKeys.VIEW)) {
 
 				throw new PrincipalException();
 			}
@@ -521,10 +473,11 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 	}
 
 	private LayoutDisplayPageObjectProvider<?>
-		_getLayoutDisplayPageObjectProvider(JournalArticle journalArticle) {
+			_getLayoutDisplayPageObjectProvider(JournalArticle journalArticle)
+		throws PortalException {
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			layoutDisplayPageProviderRegistry.
+			layoutDisplayPageProviderTracker.
 				getLayoutDisplayPageProviderByClassName(
 					JournalArticle.class.getName());
 
@@ -534,18 +487,6 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 
 		return layoutDisplayPageProvider.getLayoutDisplayPageObjectProvider(
 			infoItemReference);
-	}
-
-	private String _getLayoutUuid(JournalArticle journalArticle) {
-		String layoutUuid = journalArticle.getLayoutUuid();
-
-		if (Validator.isNotNull(layoutUuid)) {
-			return layoutUuid;
-		}
-
-		AssetEntry assetEntry = _getAssetEntry(journalArticle);
-
-		return assetEntry.getLayoutUuid();
 	}
 
 	private String _getURLTitle(String friendlyURL) {
@@ -575,27 +516,10 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		if ((numbers.size() == 2) && Validator.isDigit(numbers.get(0)) &&
 			Validator.isDigit(numbers.get(1))) {
 
-			return GetterUtil.getDouble(lastPath);
+			return Double.valueOf(lastPath);
 		}
 
 		return 0;
-	}
-
-	private boolean _isGuestUser() {
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		if (serviceContext == null) {
-			return true;
-		}
-
-		User user = _userLocalService.fetchUser(serviceContext.getUserId());
-
-		if ((user == null) || user.isGuestUser()) {
-			return true;
-		}
-
-		return false;
 	}
 
 	@Reference
@@ -609,16 +533,13 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
-	private CompanyLocalService _companyLocalService;
-
-	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
 
 	@Reference
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
 
 	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
+	private Http _http;
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
@@ -628,11 +549,5 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private UserLocalService _userLocalService;
-
-	@Reference
-	private WorkflowPermission _workflowPermission;
 
 }

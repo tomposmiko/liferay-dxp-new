@@ -18,7 +18,7 @@ import com.liferay.commerce.pricing.constants.CommercePriceModifierConstants;
 import com.liferay.commerce.pricing.model.CommercePriceModifier;
 import com.liferay.commerce.pricing.type.CommercePriceModifierType;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.math.BigDecimal;
@@ -27,12 +27,12 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.price.modifier.type.key=" + CommercePriceModifierConstants.MODIFIER_TYPE_REPLACE,
 		"commerce.price.modifier.type.order:Integer=20"
@@ -69,12 +69,9 @@ public class ReplaceCommercePriceModifierTypeImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommercePriceModifierConstants.MODIFIER_TYPE_REPLACE);
 	}
-
-	@Reference
-	private Language _language;
 
 }

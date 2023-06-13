@@ -34,6 +34,7 @@ SearchContainer<DDMStructure> structureSearch = ddmDisplayContext.getStructureSe
 	searchActionURL="<%= ddmDisplayContext.getSelectStructureSearchActionURL() %>"
 	searchContainerId="<%= ddmDisplayContext.getStructureSearchContainerId() %>"
 	searchFormName="searchForm"
+	searchInputAutoFocus="<%= true %>"
 	selectable="<%= false %>"
 	sortingOrder="<%= ddmDisplayContext.getOrderByType() %>"
 	sortingURL="<%= ddmDisplayContext.getSortingURL() %>"
@@ -73,7 +74,7 @@ SearchContainer<DDMStructure> structureSearch = ddmDisplayContext.getStructureSe
 						data.put("name", structure.getName(locale));
 						%>
 
-						<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:void(0);">
+						<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
 							<%= HtmlUtil.escape(structure.getUnambiguousName(structureSearch.getResults(), themeDisplay.getScopeGroupId(), locale)) %>
 						</aui:a>
 					</c:when>

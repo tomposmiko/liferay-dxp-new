@@ -30,7 +30,7 @@ public class UpgradeClassNames extends UpgradeKernelPackage {
 
 	@Override
 	public void doUpgrade() throws UpgradeException {
-		_updateCounterClassNames();
+		updateCounterClassNames();
 
 		super.doUpgrade();
 	}
@@ -45,7 +45,7 @@ public class UpgradeClassNames extends UpgradeKernelPackage {
 		return _RESOURCE_NAMES;
 	}
 
-	private void _updateCounterClassNames() throws UpgradeException {
+	protected void updateCounterClassNames() throws UpgradeException {
 		for (String modelName : _MODEL_NAMES) {
 			try (PreparedStatement preparedStatement1 =
 					connection.prepareStatement(

@@ -24,7 +24,6 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +38,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.TEXT,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		TextDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class TextDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -56,7 +59,7 @@ public class TextDDMFormFieldTemplateContextContributor
 
 		if (ddmFormFieldRenderingContext.isReturnFullContext()) {
 			parameters = HashMapBuilder.<String, Object>put(
-				"autocompleteEnabled", _isAutocompleteEnabled(ddmFormField)
+				"autocompleteEnabled", isAutocompleteEnabled(ddmFormField)
 			).put(
 				"confirmationErrorMessage",
 				DDMFormFieldTypeUtil.getPropertyValue(
@@ -68,21 +71,10 @@ public class TextDDMFormFieldTemplateContextContributor
 			).put(
 				"direction", ddmFormField.getProperty("direction")
 			).put(
-				"displayStyle", _getDisplayStyle(ddmFormField)
+				"displayStyle", getDisplayStyle(ddmFormField)
 			).put(
 				"hideField",
 				GetterUtil.getBoolean(ddmFormField.getProperty("hideField"))
-			).put(
-				"maxLength",
-				() -> {
-					Object maxLength = ddmFormField.getProperty("maxLength");
-
-					if (Validator.isNotNull(maxLength)) {
-						return GetterUtil.getInteger(maxLength);
-					}
-
-					return null;
-				}
 			).put(
 				"placeholder",
 				DDMFormFieldTypeUtil.getPropertyValue(
@@ -91,18 +83,6 @@ public class TextDDMFormFieldTemplateContextContributor
 				"requireConfirmation",
 				GetterUtil.getBoolean(
 					ddmFormField.getProperty("requireConfirmation"))
-			).put(
-				"showCounter",
-				() -> {
-					Object showCounter = ddmFormField.getProperty(
-						"showCounter");
-
-					if (showCounter != null) {
-						return GetterUtil.getBoolean(showCounter);
-					}
-
-					return null;
-				}
 			).put(
 				"tooltip",
 				DDMFormFieldTypeUtil.getPropertyValue(
@@ -117,7 +97,7 @@ public class TextDDMFormFieldTemplateContextContributor
 			"normalizeField",
 			GetterUtil.getBoolean(ddmFormField.getProperty("normalizeField"))
 		).put(
-			"options", _getOptions(ddmFormField, ddmFormFieldRenderingContext)
+			"options", getOptions(ddmFormField, ddmFormFieldRenderingContext)
 		).put(
 			"predefinedValue",
 			DDMFormFieldTypeUtil.getPropertyValue(
@@ -128,15 +108,12 @@ public class TextDDMFormFieldTemplateContextContributor
 		).build();
 	}
 
-	@Reference
-	protected DDMFormFieldOptionsFactory ddmFormFieldOptionsFactory;
-
-	private String _getDisplayStyle(DDMFormField ddmFormField) {
+	protected String getDisplayStyle(DDMFormField ddmFormField) {
 		return GetterUtil.getString(
 			ddmFormField.getProperty("displayStyle"), "singleline");
 	}
 
-	private List<Object> _getOptions(
+	protected List<Object> getOptions(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -172,8 +149,11 @@ public class TextDDMFormFieldTemplateContextContributor
 		return options;
 	}
 
-	private boolean _isAutocompleteEnabled(DDMFormField ddmFormField) {
+	protected boolean isAutocompleteEnabled(DDMFormField ddmFormField) {
 		return GetterUtil.getBoolean(ddmFormField.getProperty("autocomplete"));
 	}
+
+	@Reference
+	protected DDMFormFieldOptionsFactory ddmFormFieldOptionsFactory;
 
 }

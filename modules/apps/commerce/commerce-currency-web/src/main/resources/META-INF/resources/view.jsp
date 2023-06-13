@@ -17,6 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <liferay-frontend:screen-navigation
+	containerWrapperCssClass="container"
 	key="<%= CommerceCurrencyScreenNavigationConstants.SCREEN_NAVIGATION_KEY_COMMERCE_CURRENCY %>"
 	portletURL="<%= currentURLObj %>"
 />

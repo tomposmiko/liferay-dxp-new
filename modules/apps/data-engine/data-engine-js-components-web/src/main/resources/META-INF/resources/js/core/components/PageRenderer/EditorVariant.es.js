@@ -18,7 +18,6 @@ import React, {
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo,
 	useRef,
 	useState,
 } from 'react';
@@ -28,27 +27,24 @@ import {getEmptyImage} from 'react-dnd-html5-backend';
 import {DRAG_FIELD_TYPE_MOVE} from '../../../utils/dragTypes';
 import {hasFieldSet} from '../../../utils/fields.es';
 import {DND_ORIGIN_TYPE, useDrop} from '../../hooks/useDrop.es';
-import {useFormState} from '../../hooks/useForm.es';
 import {Actions, ActionsControls, useActions} from '../Actions.es';
 import {ParentFieldContext} from '../Field/ParentFieldContext.es';
 import FieldDragPreview from '../FieldDragPreview.es';
-import {useIsOverTarget as useIsOverKeyboardTarget} from '../KeyboardDNDContext';
 import {Placeholder} from '../Placeholder.es';
 import ResizableColumn from '../ResizableColumn.es';
 import * as DefaultVariant from './DefaultVariant.es';
 
-export function Column({
+export const Column = ({
 	allowNestedFields,
 	children,
 	column,
 	editable,
 	index: columnIndex,
-	itemPath,
 	pageIndex,
 	resizeInfoRef,
 	rowIndex,
 	rowRef,
-}) {
+}) => {
 	const parentField = useContext(ParentFieldContext);
 
 	const actionsRef = useRef(null);
@@ -73,11 +69,6 @@ export function Column({
 		rowIndex,
 	});
 
-	const overFieldKeyboardTarget = useIsOverKeyboardTarget(
-		column.fields.length ? [...itemPath, 0] : itemPath,
-		'middle'
-	);
-
 	const [{isDragging}, drag, preview] = useDrag({
 		item: {
 			data: firstField ?? undefined,
@@ -98,11 +89,10 @@ export function Column({
 
 	const handleResize = useCallback((resizing) => setResizing(resizing), []);
 
-	if (!column.fields.length) {
+	if (column.fields.length === 0) {
 		return (
 			<Placeholder
 				columnIndex={columnIndex}
-				keyboardDNDPosition={{itemPath, position: 'middle'}}
 				pageIndex={pageIndex}
 				rowIndex={rowIndex}
 				size={column.size}
@@ -131,16 +121,19 @@ export function Column({
 		>
 			<DefaultVariant.Column
 				className={classNames({
-					'dragging': resizing || isDragging,
-					'hovered': editable && firstField.fieldName === hoveredId,
-					'selected': editable && firstField.fieldName === activeId,
-					'target-droppable': canDrop || overFieldKeyboardTarget,
+					'active-drop-child':
+						isFieldSetOrGroup &&
+						overTarget &&
+						!rootParentField.ddmStructureId,
+					dragging: resizing || isDragging,
+					hovered: editable && firstField.fieldName === hoveredId,
+					selected: editable && firstField.fieldName === activeId,
+					'target-droppable': canDrop,
 					'target-over targetOver':
 						(!rootParentField.ddmStructureId &&
 							overTarget &&
 							canDrop) ||
-						resizing ||
-						overFieldKeyboardTarget,
+						resizing,
 				})}
 				column={column}
 				index={columnIndex}
@@ -148,15 +141,12 @@ export function Column({
 				ref={columnRef}
 				rowIndex={rowIndex}
 			>
-				{editable && (
+				{editable && isFieldSelected && (
 					<Actions
 						activePage={pageIndex}
-						field={fieldRootOrCurrent}
 						fieldId={firstField.fieldName}
 						fieldType={firstField.type}
-						isFieldSelected={isFieldSelected}
 						isFieldSet={isFieldSet}
-						itemPath={itemPath}
 						parentFieldName={parentField?.fieldName}
 						ref={actionsRef}
 					/>
@@ -203,11 +193,11 @@ export function Column({
 			</DefaultVariant.Column>
 		</ActionsControls>
 	);
-}
+};
 
 Column.displayName = 'EditorVariant.Column';
 
-export function Page({
+export const Page = ({
 	activePage,
 	children,
 	editable,
@@ -216,58 +206,13 @@ export function Page({
 	header,
 	invalidFormMessage,
 	pageIndex,
-}) {
-	const dropTargetRef = useRef();
-
+}) => {
 	const {canDrop, drop, overTarget} = useDrop({
 		columnIndex: 0,
 		origin: DND_ORIGIN_TYPE.EMPTY,
 		pageIndex,
 		rowIndex: 0,
 	});
-
-	const overKeyboardPageTarget = useIsOverKeyboardTarget(
-		[pageIndex],
-		'middle'
-	);
-
-	const formState = useFormState();
-
-	const hasSingleEmptyColumn = useMemo(() => {
-		const {rows} = formState.pages[pageIndex];
-
-		if (rows?.length === 1) {
-			const [firstRow] = rows;
-
-			if (firstRow.columns?.length === 1) {
-				const [firstColumn] = firstRow.columns;
-
-				if (firstColumn.fields?.length === 0) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}, [formState, pageIndex]);
-
-	const overKeyboardColumnTarget = useIsOverKeyboardTarget(
-		hasSingleEmptyColumn ? [pageIndex, 0, 0] : [pageIndex],
-		'middle'
-	);
-
-	const overKeyboardTarget =
-		overKeyboardPageTarget || overKeyboardColumnTarget;
-
-	useEffect(() => {
-		if (overKeyboardTarget && dropTargetRef.current) {
-			dropTargetRef.current.scrollIntoView({
-				behavior: 'auto',
-				block: 'center',
-				inline: 'center',
-			});
-		}
-	}, [overKeyboardTarget]);
 
 	return (
 		<DefaultVariant.Page
@@ -287,18 +232,10 @@ export function Page({
 					>
 						<div
 							className={classNames('ddm-empty-page ddm-target', {
-								'target-droppable':
-									canDrop || overKeyboardTarget,
-								'target-over targetOver':
-									overTarget || overKeyboardTarget,
+								'target-droppable': canDrop,
+								'target-over targetOver': overTarget,
 							})}
-							ref={(element) => {
-								if (drop) {
-									drop(element);
-								}
-
-								dropTargetRef.current = element;
-							}}
+							ref={drop}
 						>
 							<p className="ddm-empty-page-message">
 								{Liferay.Language.get(
@@ -313,11 +250,11 @@ export function Page({
 			)}
 		</DefaultVariant.Page>
 	);
-}
+};
 
 Page.displayName = 'EditorVariant.Page';
 
-export function Rows({children, editable, itemPath, pageIndex, rows}) {
+export const Rows = ({children, editable, pageIndex, rows}) => {
 	if (!rows) {
 		return null;
 	}
@@ -327,10 +264,6 @@ export function Rows({children, editable, itemPath, pageIndex, rows}) {
 			{editable && index === 0 && (
 				<Placeholder
 					isRow
-					keyboardDNDPosition={{
-						itemPath: [...itemPath, 0],
-						position: 'top',
-					}}
 					pageIndex={pageIndex}
 					rowIndex={0}
 					size={12}
@@ -342,10 +275,6 @@ export function Rows({children, editable, itemPath, pageIndex, rows}) {
 			{editable && (
 				<Placeholder
 					isRow
-					keyboardDNDPosition={{
-						itemPath: [...itemPath, index],
-						position: 'bottom',
-					}}
 					pageIndex={pageIndex}
 					rowIndex={index + 1}
 					size={12}
@@ -353,21 +282,21 @@ export function Rows({children, editable, itemPath, pageIndex, rows}) {
 			)}
 		</div>
 	));
-}
+};
 
 Rows.displayName = 'EditorVariant.Rows';
 
-export function Row({children, row}) {
+export const Row = ({children, index, row}) => {
 	const rowRef = useRef(null);
 	const resizeInfoRef = useRef(null);
 
 	return (
-		<div className="position-relative row" ref={rowRef}>
+		<div className="position-relative row" key={index} ref={rowRef}>
 			{row.columns.map((column, index) =>
 				children({column, index, resizeInfoRef, rowRef})
 			)}
 		</div>
 	);
-}
+};
 
 Row.displayName = 'EditorVariant.Row';

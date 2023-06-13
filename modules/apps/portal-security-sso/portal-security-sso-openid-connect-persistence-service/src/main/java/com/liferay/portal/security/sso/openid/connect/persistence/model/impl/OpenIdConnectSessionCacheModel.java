@@ -78,7 +78,7 @@ public class OpenIdConnectSessionCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -86,20 +86,14 @@ public class OpenIdConnectSessionCacheModel
 		sb.append(openIdConnectSessionId);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", userId=");
-		sb.append(userId);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
 		sb.append(", accessToken=");
 		sb.append(accessToken);
-		sb.append(", accessTokenExpirationDate=");
-		sb.append(accessTokenExpirationDate);
-		sb.append(", authServerWellKnownURI=");
-		sb.append(authServerWellKnownURI);
-		sb.append(", clientId=");
-		sb.append(clientId);
 		sb.append(", idToken=");
 		sb.append(idToken);
+		sb.append(", providerName=");
+		sb.append(providerName);
 		sb.append(", refreshToken=");
 		sb.append(refreshToken);
 		sb.append("}");
@@ -116,7 +110,6 @@ public class OpenIdConnectSessionCacheModel
 		openIdConnectSessionImpl.setOpenIdConnectSessionId(
 			openIdConnectSessionId);
 		openIdConnectSessionImpl.setCompanyId(companyId);
-		openIdConnectSessionImpl.setUserId(userId);
 
 		if (modifiedDate == Long.MIN_VALUE) {
 			openIdConnectSessionImpl.setModifiedDate(null);
@@ -132,34 +125,18 @@ public class OpenIdConnectSessionCacheModel
 			openIdConnectSessionImpl.setAccessToken(accessToken);
 		}
 
-		if (accessTokenExpirationDate == Long.MIN_VALUE) {
-			openIdConnectSessionImpl.setAccessTokenExpirationDate(null);
-		}
-		else {
-			openIdConnectSessionImpl.setAccessTokenExpirationDate(
-				new Date(accessTokenExpirationDate));
-		}
-
-		if (authServerWellKnownURI == null) {
-			openIdConnectSessionImpl.setAuthServerWellKnownURI("");
-		}
-		else {
-			openIdConnectSessionImpl.setAuthServerWellKnownURI(
-				authServerWellKnownURI);
-		}
-
-		if (clientId == null) {
-			openIdConnectSessionImpl.setClientId("");
-		}
-		else {
-			openIdConnectSessionImpl.setClientId(clientId);
-		}
-
 		if (idToken == null) {
 			openIdConnectSessionImpl.setIdToken("");
 		}
 		else {
 			openIdConnectSessionImpl.setIdToken(idToken);
+		}
+
+		if (providerName == null) {
+			openIdConnectSessionImpl.setProviderName("");
+		}
+		else {
+			openIdConnectSessionImpl.setProviderName(providerName);
 		}
 
 		if (refreshToken == null) {
@@ -181,14 +158,10 @@ public class OpenIdConnectSessionCacheModel
 		openIdConnectSessionId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
-
-		userId = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
 		accessToken = objectInput.readUTF();
-		accessTokenExpirationDate = objectInput.readLong();
-		authServerWellKnownURI = objectInput.readUTF();
-		clientId = objectInput.readUTF();
 		idToken = objectInput.readUTF();
+		providerName = objectInput.readUTF();
 		refreshToken = objectInput.readUTF();
 	}
 
@@ -199,8 +172,6 @@ public class OpenIdConnectSessionCacheModel
 		objectOutput.writeLong(openIdConnectSessionId);
 
 		objectOutput.writeLong(companyId);
-
-		objectOutput.writeLong(userId);
 		objectOutput.writeLong(modifiedDate);
 
 		if (accessToken == null) {
@@ -210,27 +181,18 @@ public class OpenIdConnectSessionCacheModel
 			objectOutput.writeUTF(accessToken);
 		}
 
-		objectOutput.writeLong(accessTokenExpirationDate);
-
-		if (authServerWellKnownURI == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(authServerWellKnownURI);
-		}
-
-		if (clientId == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(clientId);
-		}
-
 		if (idToken == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
 			objectOutput.writeUTF(idToken);
+		}
+
+		if (providerName == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(providerName);
 		}
 
 		if (refreshToken == null) {
@@ -244,13 +206,10 @@ public class OpenIdConnectSessionCacheModel
 	public long mvccVersion;
 	public long openIdConnectSessionId;
 	public long companyId;
-	public long userId;
 	public long modifiedDate;
 	public String accessToken;
-	public long accessTokenExpirationDate;
-	public String authServerWellKnownURI;
-	public String clientId;
 	public String idToken;
+	public String providerName;
 	public String refreshToken;
 
 }

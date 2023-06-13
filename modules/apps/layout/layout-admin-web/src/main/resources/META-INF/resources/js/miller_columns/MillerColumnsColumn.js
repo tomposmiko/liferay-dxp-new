@@ -56,9 +56,9 @@ const isValidTarget = (sources, parent) =>
 	);
 
 const MillerColumnsColumn = ({
+	actionHandlers,
 	columnItems = [],
 	columnsContainer,
-	isPrivateLayoutsEnabled,
 	items,
 	namespace,
 	onItemDrop,
@@ -111,7 +111,7 @@ const MillerColumnsColumn = ({
 		>
 			{columnItems.map((item, index) => (
 				<MillerColumnsItem
-					isPrivateLayoutsEnabled={isPrivateLayoutsEnabled}
+					actionHandlers={actionHandlers}
 					item={{...item, itemIndex: index}}
 					items={items}
 					key={item.key}

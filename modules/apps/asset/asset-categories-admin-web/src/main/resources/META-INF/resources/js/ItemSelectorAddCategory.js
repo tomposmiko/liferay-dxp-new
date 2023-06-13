@@ -12,21 +12,16 @@
  * details.
  */
 
-import {delegate, getOpener, navigate} from 'frontend-js-web';
+import {delegate, navigate} from 'frontend-js-web';
 
-const createButton = ({action, buttonClasses, label, type = 'submit'}) => {
+const createButton = ({action, buttonClass, label, type = 'submit'}) => {
 	const wrapper = document.createElement('div');
 
 	wrapper.classList.add('btn-group-item');
 
 	const button = document.createElement('button');
 
-	button.classList.add('add-category-toolbar-button', 'btn');
-
-	for (const buttonClass of buttonClasses) {
-		button.classList.add(buttonClass);
-	}
-
+	button.classList.add('add-category-toolbar-button', 'btn', buttonClass);
 	button.dataset.action = action;
 	button.textContent = label;
 	button.type = type;
@@ -41,7 +36,7 @@ export default function ({currentURL, namespace, redirect}) {
 
 	formSheet.classList.add('border-0');
 
-	const openerWindow = getOpener();
+	const openerWindow = Liferay.Util.getOpener();
 
 	const modalTitle = openerWindow.document.querySelector('.modal-title');
 
@@ -76,35 +71,26 @@ export default function ({currentURL, namespace, redirect}) {
 		const buttons = [
 			createButton({
 				action: 'cancel',
-				buttonClasses: [
-					'btn-outline-borderless',
-					'btn-outline-secondary',
-				],
+				buttonClass: 'btn-link',
 				label: Liferay.Language.get('cancel'),
 				type: 'button',
 			}),
 
 			createButton({
 				action: 'saveAndAddNew',
-				buttonClasses: ['btn-secondary'],
+				buttonClass: 'btn-secondary',
 				label: Liferay.Language.get('save-and-add-a-new-one'),
 			}),
 
 			createButton({
 				action: 'save',
-				buttonClasses: ['btn-primary'],
+				buttonClass: 'btn-primary',
 				label: Liferay.Language.get('save'),
 			}),
 		];
 
 		buttons.forEach((button) => footer.appendChild(button));
 	}
-
-	const hideAddCategoryButtons = () => {
-		footer
-			.querySelectorAll('.add-category-toolbar-button')
-			.forEach((button) => button.parentElement.classList.add('hide'));
-	};
 
 	const delegateHandler = delegate(
 		footer,
@@ -113,9 +99,25 @@ export default function ({currentURL, namespace, redirect}) {
 		(event) => {
 			const delegateTarget = event.delegateTarget;
 
+			modalTitle.textContent = initialModalTitle;
+
+			initialModalFooterButtons.forEach((item) => {
+				item.classList.remove('hide');
+			});
+
+			const hideAddCategoryButtons = () => {
+				footer
+					.querySelectorAll('.add-category-toolbar-button')
+					.forEach((button) =>
+						button.parentElement.classList.add('hide')
+					);
+			};
+
 			const action = delegateTarget.dataset.action;
 
 			if (action === 'cancel') {
+				hideAddCategoryButtons();
+
 				navigate(redirect);
 			}
 			else if (action === 'saveAndAddNew') {
@@ -126,22 +128,14 @@ export default function ({currentURL, namespace, redirect}) {
 				submitForm(document.getElementById(`${namespace}fm`));
 			}
 			else if (action === 'save') {
+				hideAddCategoryButtons();
+
 				submitForm(document.getElementById(`${namespace}fm`));
 			}
 		}
 	);
 
 	return {
-		dispose: () => {
-			initialModalFooterButtons.forEach((item) => {
-				item.classList.remove('hide');
-			});
-
-			hideAddCategoryButtons();
-
-			modalTitle.textContent = initialModalTitle;
-
-			delegateHandler.dispose();
-		},
+		dispose: () => delegateHandler.dispose(),
 	};
 }

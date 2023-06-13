@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.oauth2.provider.model.impl.OAuth2ApplicationScopeAliasesImpl",
-		"table.name=OAuth2ApplicationScopeAliases"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		OAuth2ApplicationScopeAliasesModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class OAuth2ApplicationScopeAliasesModelArgumentsResolver
 	implements ArgumentsResolver {

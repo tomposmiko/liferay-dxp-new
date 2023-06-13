@@ -15,7 +15,6 @@
 package com.liferay.asset.publisher.web.internal.frontend.taglib.form.navigator;
 
 import com.liferay.asset.publisher.constants.AssetPublisherConstants;
-import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherSelectionStyleConfigurationUtil;
 import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry;
 import com.liferay.petra.string.StringPool;
@@ -66,8 +65,7 @@ public abstract class BaseConfigurationFormNavigatorEntry
 
 		return GetterUtil.getString(
 			portletSetup.getValue("selectionStyle", null),
-			AssetPublisherSelectionStyleConfigurationUtil.
-				defaultSelectionStyle());
+			AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC);
 	}
 
 	protected boolean isAssetListSelection() {

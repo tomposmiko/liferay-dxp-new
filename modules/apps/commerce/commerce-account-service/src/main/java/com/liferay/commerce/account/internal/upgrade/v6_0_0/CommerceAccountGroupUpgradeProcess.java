@@ -17,10 +17,7 @@ package com.liferay.commerce.account.internal.upgrade.v6_0_0;
 import com.liferay.account.model.AccountGroup;
 import com.liferay.account.service.AccountGroupLocalService;
 import com.liferay.commerce.account.model.impl.CommerceAccountGroupImpl;
-import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -31,11 +28,9 @@ import java.sql.Statement;
 public class CommerceAccountGroupUpgradeProcess extends UpgradeProcess {
 
 	public CommerceAccountGroupUpgradeProcess(
-		AccountGroupLocalService accountGroupLocalService,
-		ResourceLocalService resourceLocalService) {
+		AccountGroupLocalService accountGroupLocalService) {
 
 		_accountGroupLocalService = accountGroupLocalService;
-		_resourceLocalService = resourceLocalService;
 	}
 
 	@Override
@@ -62,39 +57,28 @@ public class CommerceAccountGroupUpgradeProcess extends UpgradeProcess {
 					_accountGroupLocalService.createAccountGroup(
 						accountGroupId);
 
-				accountGroup.setExternalReferenceCode(
-					resultSet.getString("externalReferenceCode"));
 				accountGroup.setCompanyId(resultSet.getLong("companyId"));
-				accountGroup.setUserId(resultSet.getLong("userId"));
-				accountGroup.setUserName(resultSet.getString("userName"));
 				accountGroup.setCreateDate(
 					resultSet.getTimestamp("createDate"));
+				accountGroup.setDefaultAccountGroup(system);
+				accountGroup.setExternalReferenceCode(
+					resultSet.getString("externalReferenceCode"));
+				accountGroup.setUserId(resultSet.getLong("userId"));
+				accountGroup.setUserName(resultSet.getString("userName"));
 				accountGroup.setModifiedDate(
 					resultSet.getTimestamp("modifiedDate"));
-				accountGroup.setDefaultAccountGroup(system);
 				accountGroup.setName(resultSet.getString("name"));
 				accountGroup.setType(
 					CommerceAccountGroupImpl.toAccountGroupType(
 						resultSet.getInt("type_")));
 
 				_accountGroupLocalService.addAccountGroup(accountGroup);
-
-				_resourceLocalService.addResources(
-					resultSet.getLong("companyId"), 0,
-					resultSet.getLong("userId"), AccountGroup.class.getName(),
-					accountGroupId, false, false, false);
 			}
+
+			runSQL("drop table CommerceAccountGroup");
 		}
 	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropTables("CommerceAccountGroup")
-		};
-	}
-
 	private final AccountGroupLocalService _accountGroupLocalService;
-	private final ResourceLocalService _resourceLocalService;
 
 }

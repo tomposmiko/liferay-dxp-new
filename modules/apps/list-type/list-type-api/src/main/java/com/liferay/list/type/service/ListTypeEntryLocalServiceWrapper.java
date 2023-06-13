@@ -27,10 +27,6 @@ public class ListTypeEntryLocalServiceWrapper
 	implements ListTypeEntryLocalService,
 			   ServiceWrapper<ListTypeEntryLocalService> {
 
-	public ListTypeEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ListTypeEntryLocalServiceWrapper(
 		ListTypeEntryLocalService listTypeEntryLocalService) {
 
@@ -56,13 +52,12 @@ public class ListTypeEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.list.type.model.ListTypeEntry addListTypeEntry(
-			String externalReferenceCode, long userId,
-			long listTypeDefinitionId, String key,
+			long userId, long listTypeDefinitionId, String key,
 			java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeEntryLocalService.addListTypeEntry(
-			externalReferenceCode, userId, listTypeDefinitionId, key, nameMap);
+			userId, listTypeDefinitionId, key, nameMap);
 	}
 
 	/**
@@ -123,14 +118,6 @@ public class ListTypeEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeEntryLocalService.deleteListTypeEntry(listTypeEntryId);
-	}
-
-	@Override
-	public void deleteListTypeEntryByListTypeDefinitionId(
-		long listTypeDefinitionId) {
-
-		_listTypeEntryLocalService.deleteListTypeEntryByListTypeDefinitionId(
-			listTypeDefinitionId);
 	}
 
 	/**
@@ -254,25 +241,6 @@ public class ListTypeEntryLocalServiceWrapper
 		return _listTypeEntryLocalService.fetchListTypeEntry(listTypeEntryId);
 	}
 
-	@Override
-	public com.liferay.list.type.model.ListTypeEntry fetchListTypeEntry(
-		long listTypeDefinitionId, String key) {
-
-		return _listTypeEntryLocalService.fetchListTypeEntry(
-			listTypeDefinitionId, key);
-	}
-
-	@Override
-	public com.liferay.list.type.model.ListTypeEntry
-		fetchListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId,
-			long listTypeDefinitionId) {
-
-		return _listTypeEntryLocalService.
-			fetchListTypeEntryByExternalReferenceCode(
-				externalReferenceCode, companyId, listTypeDefinitionId);
-	}
-
 	/**
 	 * Returns the list type entry with the matching UUID and company.
 	 *
@@ -377,27 +345,6 @@ public class ListTypeEntryLocalServiceWrapper
 		return _listTypeEntryLocalService.getListTypeEntry(listTypeEntryId);
 	}
 
-	@Override
-	public com.liferay.list.type.model.ListTypeEntry getListTypeEntry(
-			long listTypeDefinitionId, String key)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _listTypeEntryLocalService.getListTypeEntry(
-			listTypeDefinitionId, key);
-	}
-
-	@Override
-	public com.liferay.list.type.model.ListTypeEntry
-			getListTypeEntryByExternalReferenceCode(
-				String externalReferenceCode, long companyId,
-				long listTypeDefinitionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _listTypeEntryLocalService.
-			getListTypeEntryByExternalReferenceCode(
-				externalReferenceCode, companyId, listTypeDefinitionId);
-	}
-
 	/**
 	 * Returns the list type entry with the matching UUID and company.
 	 *
@@ -455,12 +402,12 @@ public class ListTypeEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.list.type.model.ListTypeEntry updateListTypeEntry(
-			String externalReferenceCode, long listTypeEntryId,
+			long listTypeEntryId,
 			java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeEntryLocalService.updateListTypeEntry(
-			externalReferenceCode, listTypeEntryId, nameMap);
+			listTypeEntryId, nameMap);
 	}
 
 	@Override

@@ -30,10 +30,6 @@ public class JournalFeedLocalServiceWrapper
 	implements JournalFeedLocalService,
 			   ServiceWrapper<JournalFeedLocalService> {
 
-	public JournalFeedLocalServiceWrapper() {
-		this(null);
-	}
-
 	public JournalFeedLocalServiceWrapper(
 		JournalFeedLocalService journalFeedLocalService) {
 
@@ -43,7 +39,7 @@ public class JournalFeedLocalServiceWrapper
 	@Override
 	public JournalFeed addFeed(
 			long userId, long groupId, String feedId, boolean autoFeedId,
-			String name, String description, long ddmStructureId,
+			String name, String description, String ddmStructureKey,
 			String ddmTemplateKey, String ddmRendererTemplateKey, int delta,
 			String orderByCol, String orderByType,
 			String targetLayoutFriendlyUrl, String targetPortletId,
@@ -53,7 +49,7 @@ public class JournalFeedLocalServiceWrapper
 
 		return _journalFeedLocalService.addFeed(
 			userId, groupId, feedId, autoFeedId, name, description,
-			ddmStructureId, ddmTemplateKey, ddmRendererTemplateKey, delta,
+			ddmStructureKey, ddmTemplateKey, ddmRendererTemplateKey, delta,
 			orderByCol, orderByType, targetLayoutFriendlyUrl, targetPortletId,
 			contentField, feedFormat, feedVersion, serviceContext);
 	}
@@ -529,7 +525,7 @@ public class JournalFeedLocalServiceWrapper
 	@Override
 	public JournalFeed updateFeed(
 			long groupId, String feedId, String name, String description,
-			long ddmStructureId, String ddmTemplateKey,
+			String ddmStructureKey, String ddmTemplateKey,
 			String ddmRendererTemplateKey, int delta, String orderByCol,
 			String orderByType, String targetLayoutFriendlyUrl,
 			String targetPortletId, String contentField, String feedFormat,
@@ -538,7 +534,7 @@ public class JournalFeedLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalFeedLocalService.updateFeed(
-			groupId, feedId, name, description, ddmStructureId, ddmTemplateKey,
+			groupId, feedId, name, description, ddmStructureKey, ddmTemplateKey,
 			ddmRendererTemplateKey, delta, orderByCol, orderByType,
 			targetLayoutFriendlyUrl, targetPortletId, contentField, feedFormat,
 			feedVersion, serviceContext);

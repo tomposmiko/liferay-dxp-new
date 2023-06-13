@@ -17,19 +17,18 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ObjectDefinitionsLayoutsDisplayContext objectDefinitionsLayoutsDisplayContext = (ObjectDefinitionsLayoutsDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 ObjectLayout objectLayout = (ObjectLayout)request.getAttribute(ObjectWebKeys.OBJECT_LAYOUT);
 %>
 
-<react:component
-	module="js/components/Layout/index"
-	props='<%=
-		HashMapBuilder.<String, Object>put(
-			"isViewOnly", !objectDefinitionsLayoutsDisplayContext.hasUpdateObjectDefinitionPermission()
-		).put(
-			"objectFieldTypes", objectDefinitionsLayoutsDisplayContext.getObjectFieldBusinessTypeMaps(locale)
-		).put(
-			"objectLayoutId", objectLayout.getObjectLayoutId()
-		).build()
-	%>'
-/>
+<liferay-frontend:side-panel-content
+	title='<%= LanguageUtil.get(request, "layout") %>'
+>
+	<react:component
+		module="js/components/layout/index"
+		props='<%=
+			HashMapBuilder.<String, Object>put(
+				"objectLayoutId", objectLayout.getObjectLayoutId()
+			).build()
+		%>'
+	/>
+</liferay-frontend:side-panel-content>

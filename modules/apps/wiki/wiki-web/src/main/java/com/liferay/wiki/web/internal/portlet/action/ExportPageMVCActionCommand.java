@@ -15,6 +15,7 @@
 package com.liferay.wiki.web.internal.portlet.action;
 
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
@@ -23,7 +24,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -61,6 +61,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Farache
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
@@ -123,7 +124,7 @@ public class ExportPageMVCActionCommand extends BaseMVCActionCommand {
 				WindowState.MAXIMIZED
 			).buildPortletURL();
 
-			_getFile(
+			getFile(
 				nodeId, title, version, targetExtension, viewPageURL,
 				editPageURL, themeDisplay,
 				_portal.getHttpServletRequest(actionRequest),
@@ -132,13 +133,13 @@ public class ExportPageMVCActionCommand extends BaseMVCActionCommand {
 			actionResponse.setRenderParameter("mvcPath", "/null.jsp");
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			_portal.sendError(exception, actionRequest, actionResponse);
 		}
 	}
 
-	private void _getFile(
+	protected void getFile(
 			long nodeId, String title, double version, String targetExtension,
 			PortletURL viewPageURL, PortletURL editPageURL,
 			ThemeDisplay themeDisplay, HttpServletRequest httpServletRequest,

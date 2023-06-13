@@ -12,13 +12,9 @@
  * details.
  */
 
-export function formDataToObj(formData) {
-	return Array.from(formData.entries()).reduce(
-		(accumulator, [key, value]) => {
-			accumulator[key] = value;
+export const formDataToObj = (formData) =>
+	Array.from(formData.entries()).reduce((accumulator, [key, value]) => {
+		accumulator[key] = value;
 
-			return accumulator;
-		},
-		{}
-	);
-}
+		return accumulator;
+	}, {});

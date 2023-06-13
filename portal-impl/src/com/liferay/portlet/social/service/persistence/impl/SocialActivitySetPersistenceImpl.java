@@ -42,11 +42,9 @@ import com.liferay.social.kernel.exception.NoSuchActivitySetException;
 import com.liferay.social.kernel.model.SocialActivitySet;
 import com.liferay.social.kernel.model.SocialActivitySetTable;
 import com.liferay.social.kernel.service.persistence.SocialActivitySetPersistence;
-import com.liferay.social.kernel.service.persistence.SocialActivitySetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -189,7 +187,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivitySet>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivitySet socialActivitySet : list) {
@@ -560,8 +558,7 @@ public class SocialActivitySetPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -702,7 +699,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivitySet>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivitySet socialActivitySet : list) {
@@ -1071,8 +1068,7 @@ public class SocialActivitySetPersistenceImpl
 
 			finderArgs = new Object[] {userId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1227,7 +1223,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivitySet>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivitySet socialActivitySet : list) {
@@ -1649,8 +1645,7 @@ public class SocialActivitySetPersistenceImpl
 
 			finderArgs = new Object[] {groupId, userId, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1820,7 +1815,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivitySet>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivitySet socialActivitySet : list) {
@@ -2242,8 +2237,7 @@ public class SocialActivitySetPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2421,7 +2415,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivitySet>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivitySet socialActivitySet : list) {
@@ -2870,8 +2864,7 @@ public class SocialActivitySetPersistenceImpl
 
 			finderArgs = new Object[] {groupId, userId, classNameId, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3056,7 +3049,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivitySet>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivitySet socialActivitySet : list) {
@@ -3505,8 +3498,7 @@ public class SocialActivitySetPersistenceImpl
 
 			finderArgs = new Object[] {userId, classNameId, classPK, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3906,9 +3898,7 @@ public class SocialActivitySetPersistenceImpl
 	 */
 	@Override
 	public SocialActivitySet fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				SocialActivitySet.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(SocialActivitySet.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4129,7 +4119,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivitySet>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4205,7 +4195,7 @@ public class SocialActivitySetPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -4470,30 +4460,10 @@ public class SocialActivitySetPersistenceImpl
 				Long.class.getName(), Integer.class.getName()
 			},
 			new String[] {"userId", "classNameId", "classPK", "type_"}, false);
-
-		_setSocialActivitySetUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialActivitySetUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(SocialActivitySetImpl.class.getName());
-	}
-
-	private void _setSocialActivitySetUtilPersistence(
-		SocialActivitySetPersistence socialActivitySetPersistence) {
-
-		try {
-			Field field = SocialActivitySetUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialActivitySetPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_SOCIALACTIVITYSET =

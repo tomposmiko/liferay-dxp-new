@@ -1,11 +1,15 @@
 {
 	"dependencies": {
-		"@liferay/frontend-js-react-web": "*",
-		"frontend-js-web": "*",
+		"@clayui/button": "3.37.0",
+		"@clayui/icon": "3.37.0",
+		"@clayui/layout": "3.37.0",
 		"prop-types": "15.7.2",
 		"react": "16.12.0"
 	},
 	"jest": {
+		"setupFilesAfterEnv": [
+			"<rootDir>/test/setup.js"
+		],
 		"testPathIgnorePatterns": [
 			"<rootDir>/test/setup.js",
 			"<rootDir>/test/utils.js"
@@ -19,5 +23,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "3.1.11"
+	"version": "3.0.10"
 }

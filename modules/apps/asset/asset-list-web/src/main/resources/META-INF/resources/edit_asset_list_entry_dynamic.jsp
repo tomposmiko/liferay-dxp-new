@@ -53,17 +53,7 @@ AssetListEntry assetListEntry = assetListDisplayContext.getAssetListEntry();
 				<clay:content-col
 					cssClass="inline-item-after"
 				>
-
-					<%
-					AssetListEntryVariationActionDropdownItemsProvider assetListEntryVariationActionDropdownItemsProvider = new AssetListEntryVariationActionDropdownItemsProvider(editAssetListDisplayContext, liferayPortletRequest, liferayPortletResponse);
-					%>
-
-					<clay:dropdown-actions
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-						dropdownItems="<%= assetListEntryVariationActionDropdownItemsProvider.getActionDropdownItems() %>"
-						propsTransformer="js/AssetListEntryVariationDefaultPropsTransformer"
-						title='<%= LanguageUtil.get(request, "show-actions") %>'
-					/>
+					<liferay-util:include page="/asset_list_entry_variation_action.jsp" servletContext="<%= application %>" />
 				</clay:content-col>
 			</clay:content-row>
 		</h3>
@@ -77,12 +67,9 @@ AssetListEntry assetListEntry = assetListDisplayContext.getAssetListEntry();
 
 	<c:if test="<%= !editAssetListDisplayContext.isLiveGroup() %>">
 		<liferay-frontend:edit-form-footer>
-			<liferay-frontend:edit-form-buttons
-				redirect="<%= editAssetListDisplayContext.getBackURL() %>"
-				submitDisabled="<%= editAssetListDisplayContext.isNoAssetTypeSelected() %>"
-				submitId="saveButton"
-				submitOnClick='<%= liferayPortletResponse.getNamespace() + "saveSelectBoxes();" %>'
-			/>
+			<aui:button disabled="<%= editAssetListDisplayContext.isNoAssetTypeSelected() %>" id="saveButton" onClick='<%= liferayPortletResponse.getNamespace() + "saveSelectBoxes();" %>' type="submit" />
+
+			<aui:button href="<%= editAssetListDisplayContext.getBackURL() %>" type="cancel" />
 		</liferay-frontend:edit-form-footer>
 	</c:if>
 </liferay-frontend:edit-form>

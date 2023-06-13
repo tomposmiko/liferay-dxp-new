@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Akos Thurzo
  */
-@Component(service = StagingGroupHelper.class)
+@Component(immediate = true, service = StagingGroupHelper.class)
 public class StagingGroupHelperImpl implements StagingGroupHelper {
 
 	@Override
@@ -147,32 +147,6 @@ public class StagingGroupHelperImpl implements StagingGroupHelper {
 	@Override
 	public Group fetchRemoteLiveGroup(long groupId) {
 		return fetchRemoteLiveGroup(_groupLocalService.fetchGroup(groupId));
-	}
-
-	@Override
-	public Group getStagedPortletGroup(Group group, String portletId) {
-		if (isLocalStagingGroup(group.getGroupId()) &&
-			!isStagedPortlet(group.getGroupId(), portletId)) {
-
-			return group.getLiveGroup();
-		}
-
-		return group;
-	}
-
-	@Override
-	public long getStagedPortletGroupId(long groupId, String portletId) {
-		if (!isStagedPortlet(groupId, portletId) &&
-			!isRemoteStagingGroup(groupId)) {
-
-			Group liveGroup = fetchLiveGroup(groupId);
-
-			if (liveGroup != null) {
-				return liveGroup.getGroupId();
-			}
-		}
-
-		return groupId;
 	}
 
 	@Override
@@ -310,8 +284,9 @@ public class StagingGroupHelperImpl implements StagingGroupHelper {
 
 	@Override
 	public boolean isStagedPortlet(long groupId, String portletId) {
-		return isStagedPortlet(
-			_groupLocalService.fetchGroup(groupId), portletId);
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		return isStagedPortlet(group, portletId);
 	}
 
 	@Override
@@ -331,7 +306,7 @@ public class StagingGroupHelperImpl implements StagingGroupHelper {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return true;

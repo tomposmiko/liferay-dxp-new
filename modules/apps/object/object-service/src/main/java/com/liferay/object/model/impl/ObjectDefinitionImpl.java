@@ -14,15 +14,11 @@
 
 package com.liferay.object.model.impl;
 
-import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-
-import java.util.Objects;
 
 /**
  * @author Marco Leo
@@ -49,7 +45,7 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public String getExtensionDBTableName() {
-		if (isUnmodifiableSystemObject()) {
+		if (isSystem()) {
 			String extensionDBTableName = getDBTableName();
 
 			if (extensionDBTableName.endsWith("_")) {
@@ -68,18 +64,8 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 	}
 
 	@Override
-	public String getOSGiJaxRsName() {
-		return getOSGiJaxRsName(StringPool.BLANK);
-	}
-
-	@Override
-	public String getOSGiJaxRsName(String className) {
-		return getName() + className;
-	}
-
-	@Override
 	public String getPortletId() {
-		if (isUnmodifiableSystemObject()) {
+		if (isSystem()) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -89,7 +75,7 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public String getResourceName() {
-		if (isUnmodifiableSystemObject()) {
+		if (isSystem()) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -98,7 +84,7 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 
 	@Override
 	public String getRESTContextPath() {
-		if (isUnmodifiableSystemObject()) {
+		if (isSystem()) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -118,31 +104,6 @@ public class ObjectDefinitionImpl extends ObjectDefinitionBaseImpl {
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean isDefaultStorageType() {
-		if (Objects.equals(
-				getStorageType(),
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isUnmodifiableSystemObject() {
-		if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
-			if (!isModifiable() && isSystem()) {
-				return true;
-			}
-
-			return false;
-		}
-
-		return isSystem();
 	}
 
 }

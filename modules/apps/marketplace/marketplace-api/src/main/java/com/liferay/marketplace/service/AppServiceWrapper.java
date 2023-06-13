@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class AppServiceWrapper
 	implements AppService, ServiceWrapper<AppService> {
 
-	public AppServiceWrapper() {
-		this(null);
-	}
-
 	public AppServiceWrapper(AppService appService) {
 		_appService = appService;
 	}

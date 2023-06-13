@@ -75,17 +75,17 @@ function InstanceListPage({routeParams}) {
 			<InstanceListPageProvider>
 				<InstanceListPage.Header
 					filterKeys={prefixedKeys}
-					items={data?.items}
+					items={data.items}
 					processId={processId}
 					routeParams={routeParams}
 					selectedFilters={selectedFilters}
-					totalCount={data?.totalCount}
+					totalCount={data.totalCount}
 				/>
 
 				<InstanceListPage.Body
 					data={data}
 					fetchData={fetchData}
-					filtered={!!selectedFilters.length}
+					filtered={selectedFilters.length > 0}
 					routeParams={routeParams}
 				/>
 			</InstanceListPageProvider>

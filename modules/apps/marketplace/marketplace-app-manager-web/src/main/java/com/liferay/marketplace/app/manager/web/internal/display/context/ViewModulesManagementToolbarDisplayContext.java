@@ -22,11 +22,11 @@ import com.liferay.marketplace.app.manager.web.internal.util.AppDisplayFactoryUt
 import com.liferay.marketplace.app.manager.web.internal.util.BundleManagerUtil;
 import com.liferay.marketplace.app.manager.web.internal.util.BundleUtil;
 import com.liferay.marketplace.app.manager.web.internal.util.comparator.BundleComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -65,15 +65,16 @@ public class ViewModulesManagementToolbarDisplayContext
 
 		AppDisplay appDisplay = null;
 
+		List<Bundle> allBundles = BundleManagerUtil.getBundles();
+
 		if (Validator.isNumber(app)) {
 			appDisplay = AppDisplayFactoryUtil.getAppDisplay(
-				BundleManagerUtil.getBundles(), GetterUtil.getLong(app));
+				allBundles, GetterUtil.getLong(app));
 		}
 
 		if (appDisplay == null) {
 			appDisplay = AppDisplayFactoryUtil.getAppDisplay(
-				BundleManagerUtil.getBundles(), app,
-				httpServletRequest.getLocale());
+				allBundles, app, httpServletRequest.getLocale());
 		}
 
 		return appDisplay;
@@ -142,10 +143,21 @@ public class ViewModulesManagementToolbarDisplayContext
 		BundleUtil.filterBundles(
 			bundles, BundleStateConstants.getState(getState()));
 
-		searchContainer.setResultsAndTotal(
-			new ArrayList<>(
-				ListUtil.sort(
-					bundles, new BundleComparator(getOrderByType()))));
+		bundles = ListUtil.sort(
+			bundles, new BundleComparator(getOrderByType()));
+
+		int end = searchContainer.getEnd();
+
+		if (end > bundles.size()) {
+			end = bundles.size();
+		}
+
+		List<Object> results = new ArrayList<>(bundles);
+
+		searchContainer.setResults(
+			results.subList(searchContainer.getStart(), end));
+
+		searchContainer.setTotal(bundles.size());
 
 		_searchContainer = searchContainer;
 

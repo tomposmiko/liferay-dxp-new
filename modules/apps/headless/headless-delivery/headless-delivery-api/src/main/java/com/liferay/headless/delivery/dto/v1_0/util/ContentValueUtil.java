@@ -22,7 +22,8 @@ import com.liferay.portal.kernel.util.Base64;
 
 import java.io.InputStream;
 
-import javax.ws.rs.core.MultivaluedMap;
+import java.util.Optional;
+
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -32,27 +33,26 @@ public class ContentValueUtil {
 
 	public static String toContentValue(
 		String field, UnsafeSupplier<InputStream, Exception> unsafeSupplier,
-		UriInfo uriInfo) {
+		Optional<UriInfo> uriInfoOptional) {
 
-		if (uriInfo == null) {
-			return null;
-		}
+		if (uriInfoOptional.map(
+				UriInfo::getQueryParameters
+			).map(
+				parameters -> parameters.getFirst("nestedFields")
+			).map(
+				fields -> fields.contains(field)
+			).orElse(
+				false
+			)) {
 
-		MultivaluedMap<String, String> queryParameters =
-			uriInfo.getQueryParameters();
-
-		String nestedFields = queryParameters.getFirst("nestedFields");
-
-		if ((nestedFields == null) || !nestedFields.contains(field)) {
-			return null;
-		}
-
-		try {
-			return Base64.encode(StreamUtil.toByteArray(unsafeSupplier.get()));
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+			try {
+				return Base64.encode(
+					StreamUtil.toByteArray(unsafeSupplier.get()));
+			}
+			catch (Exception exception) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(exception, exception);
+				}
 			}
 		}
 

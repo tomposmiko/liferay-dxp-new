@@ -25,10 +25,6 @@ public class RecentLayoutBranchLocalServiceWrapper
 	implements RecentLayoutBranchLocalService,
 			   ServiceWrapper<RecentLayoutBranchLocalService> {
 
-	public RecentLayoutBranchLocalServiceWrapper() {
-		this(null);
-	}
-
 	public RecentLayoutBranchLocalServiceWrapper(
 		RecentLayoutBranchLocalService recentLayoutBranchLocalService) {
 

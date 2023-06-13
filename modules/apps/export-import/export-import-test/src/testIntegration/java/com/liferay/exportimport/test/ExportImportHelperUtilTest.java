@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.repository.capabilities.ThumbnailCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -737,18 +738,21 @@ public class ExportImportHelperUtilTest {
 
 	@Test
 	public void testGetSelectedLayoutsJSONSelectAllLayouts() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(_stagingGroup);
+		Layout layout = LayoutTestUtil.addLayout(_stagingGroup);
 
-		Layout childLayout = LayoutTestUtil.addTypePortletLayout(
+		Layout childLayout = LayoutTestUtil.addLayout(
 			_stagingGroup, layout.getPlid());
 
-		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+		String selectedLayoutsJSON =
 			ExportImportHelperUtil.getSelectedLayoutsJSON(
 				_stagingGroup.getGroupId(), false,
 				StringUtil.merge(
 					new long[] {
 						layout.getLayoutId(), childLayout.getLayoutId()
-					})));
+					}));
+
+		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+			selectedLayoutsJSON);
 
 		Assert.assertEquals(1, selectedLayoutsJSONArray.length());
 
@@ -760,15 +764,18 @@ public class ExportImportHelperUtilTest {
 
 	@Test
 	public void testGetSelectedLayoutsJSONSelectChildLayout() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(_stagingGroup);
+		Layout layout = LayoutTestUtil.addLayout(_stagingGroup);
 
-		Layout childLayout = LayoutTestUtil.addTypePortletLayout(
+		Layout childLayout = LayoutTestUtil.addLayout(
 			_stagingGroup, layout.getPlid());
 
-		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+		String selectedLayoutsJSON =
 			ExportImportHelperUtil.getSelectedLayoutsJSON(
 				_stagingGroup.getGroupId(), false,
-				StringUtil.merge(new long[] {childLayout.getLayoutId()})));
+				StringUtil.merge(new long[] {childLayout.getLayoutId()}));
+
+		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+			selectedLayoutsJSON);
 
 		Assert.assertEquals(1, selectedLayoutsJSONArray.length());
 
@@ -781,14 +788,17 @@ public class ExportImportHelperUtilTest {
 
 	@Test
 	public void testGetSelectedLayoutsJSONSelectNoLayouts() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(_stagingGroup);
+		Layout layout = LayoutTestUtil.addLayout(_stagingGroup);
 
-		LayoutTestUtil.addTypePortletLayout(_stagingGroup, layout.getPlid());
+		LayoutTestUtil.addLayout(_stagingGroup, layout.getPlid());
 
-		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+		String selectedLayoutsJSON =
 			ExportImportHelperUtil.getSelectedLayoutsJSON(
 				_stagingGroup.getGroupId(), false,
-				StringUtil.merge(new long[0])));
+				StringUtil.merge(new long[0]));
+
+		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+			selectedLayoutsJSON);
 
 		Assert.assertEquals(0, selectedLayoutsJSONArray.length());
 	}
@@ -797,15 +807,18 @@ public class ExportImportHelperUtilTest {
 	public void testGetSelectedLayoutsJSONSelectParentLayout()
 		throws Exception {
 
-		Layout layout = LayoutTestUtil.addTypePortletLayout(_stagingGroup);
+		Layout layout = LayoutTestUtil.addLayout(_stagingGroup);
 
-		LayoutTestUtil.addTypePortletLayout(
+		LayoutTestUtil.addLayout(
 			_stagingGroup.getGroupId(), "Child Layout", layout.getPlid());
 
-		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+		String selectedLayoutsJSON =
 			ExportImportHelperUtil.getSelectedLayoutsJSON(
 				_stagingGroup.getGroupId(), false,
-				StringUtil.merge(new long[] {layout.getLayoutId()})));
+				StringUtil.merge(new long[] {layout.getLayoutId()}));
+
+		JSONArray selectedLayoutsJSONArray = JSONFactoryUtil.createJSONArray(
+			selectedLayoutsJSON);
 
 		Assert.assertEquals(1, selectedLayoutsJSONArray.length());
 
@@ -868,13 +881,15 @@ public class ExportImportHelperUtilTest {
 	}
 
 	protected FileEntry getFileEntry() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
 		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
 			null, TestPropsValues.getUserId(), _stagingGroup.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
-			TestDataConstants.TEST_BYTE_ARRAY, null, null,
-			ServiceContextTestUtil.getServiceContext(
-				_stagingGroup.getGroupId(), TestPropsValues.getUserId()));
+			TestDataConstants.TEST_BYTE_ARRAY, null, null, serviceContext);
 
 		ThumbnailCapability thumbnailCapability =
 			fileEntry.getRepositoryCapability(ThumbnailCapability.class);

@@ -28,7 +28,6 @@ import com.liferay.journal.web.internal.constants.JournalWebConstants;
 import com.liferay.journal.web.internal.display.context.JournalArticleItemSelectorViewDisplayContext;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.staging.StagingGroupHelper;
 
 import java.io.IOException;
 
@@ -107,8 +106,7 @@ public class JournalArticleItemSelectorView
 				new JournalArticleItemSelectorViewDisplayContext(
 					(HttpServletRequest)servletRequest,
 					infoItemItemSelectorCriterion, itemSelectedEventName, this,
-					_journalWebConfiguration, portletURL, search,
-					_stagingGroupHelper);
+					_journalWebConfiguration, portletURL, search);
 
 		servletRequest.setAttribute(
 			JournalWebConstants.
@@ -145,8 +143,5 @@ public class JournalArticleItemSelectorView
 
 	@Reference(target = "(osgi.web.symbolicname=com.liferay.journal.web)")
 	private ServletContext _servletContext;
-
-	@Reference
-	private StagingGroupHelper _stagingGroupHelper;
 
 }

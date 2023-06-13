@@ -518,8 +518,4 @@ public interface DLFileEntryTypeModel
 	@Override
 	public DLFileEntryType cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

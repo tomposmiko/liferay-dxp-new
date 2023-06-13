@@ -21,8 +21,7 @@ import java.util.Objects;
  */
 public enum LocationVariableProtocol {
 
-	FILE("file"), LANGUAGE("language"), RESOURCE("resource"),
-	SERVER_PROPERTY("server-property");
+	FILE("file"), RESOURCE("resource"), SERVER_PROPERTY("server-property");
 
 	public static boolean isProtocol(String string) {
 		for (LocationVariableProtocol locationVariableProtocol :

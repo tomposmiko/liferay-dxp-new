@@ -27,6 +27,8 @@ public class CalendarResourceDisplayTerms extends DisplayTerms {
 
 	public static final String ACTIVE = "active";
 
+	public static final String CODE = "code";
+
 	public static final String DESCRIPTION = "description";
 
 	public static final String NAME = "name";
@@ -37,9 +39,14 @@ public class CalendarResourceDisplayTerms extends DisplayTerms {
 		super(portletRequest);
 
 		active = ParamUtil.getBoolean(portletRequest, ACTIVE, true);
+		code = ParamUtil.getString(portletRequest, CODE);
 		description = ParamUtil.getString(portletRequest, DESCRIPTION);
 		name = ParamUtil.getString(portletRequest, NAME);
 		scope = ParamUtil.getLong(portletRequest, SCOPE);
+	}
+
+	public String getCode() {
+		return code;
 	}
 
 	public String getDescription() {
@@ -59,6 +66,7 @@ public class CalendarResourceDisplayTerms extends DisplayTerms {
 	}
 
 	protected boolean active;
+	protected String code;
 	protected String description;
 	protected String name;
 	protected long scope;

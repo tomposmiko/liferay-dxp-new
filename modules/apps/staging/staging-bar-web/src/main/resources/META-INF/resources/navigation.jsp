@@ -21,17 +21,9 @@ String navigationName = ParamUtil.getString(request, "navigationName");
 %>
 
 <c:if test="<%= Validator.isNotNull(navigationName) %>">
-	<clay:navigation-bar
-		navigationItems="<%=
-			new JSPNavigationItemList(pageContext) {
-				{
-					add(
-						navigationItem -> {
-							navigationItem.setActive(true);
-							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, navigationName));
-						});
-				}
-			}
-		%>"
-	/>
+	<aui:nav-bar cssClass="navbar-expand navbar-underline navigation-bar navigation-bar-light" markupView="lexicon">
+		<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
+			<aui:nav-item label="<%= navigationName %>" selected="<%= true %>" />
+		</aui:nav>
+	</aui:nav-bar>
 </c:if>

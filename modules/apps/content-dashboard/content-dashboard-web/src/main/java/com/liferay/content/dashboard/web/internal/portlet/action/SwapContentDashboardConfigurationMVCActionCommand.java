@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Component;
  * @author David Arques
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentDashboardPortletKeys.CONTENT_DASHBOARD_ADMIN,
 		"mvc.command.name=/content_dashboard/swap_content_dashboard_configuration"
@@ -52,22 +53,20 @@ public class SwapContentDashboardConfigurationMVCActionCommand
 			PortletPreferences portletPreferences =
 				actionRequest.getPreferences();
 
-			String[] assetVocabularyIds = portletPreferences.getValues(
-				"assetVocabularyIds", new String[0]);
+			String[] assetVocabularyNames = portletPreferences.getValues(
+				"assetVocabularyNames", new String[0]);
 
-			if (assetVocabularyIds.length == 2) {
-				ArrayUtil.reverse(assetVocabularyIds);
-
+			if (assetVocabularyNames.length == 2) {
+				ArrayUtil.reverse(assetVocabularyNames);
 				portletPreferences.setValues(
-					"assetVocabularyIds", assetVocabularyIds);
-
+					"assetVocabularyNames", assetVocabularyNames);
 				portletPreferences.store();
 			}
 
 			hideDefaultSuccessMessage(actionRequest);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			SessionErrors.add(actionRequest, exception.getClass());
 		}

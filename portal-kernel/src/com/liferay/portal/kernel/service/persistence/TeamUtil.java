@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1561,9 +1562,14 @@ public class TeamUtil {
 	}
 
 	public static TeamPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (TeamPersistence)PortalBeanLocatorUtil.locate(
+				TeamPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile TeamPersistence _persistence;
+	private static TeamPersistence _persistence;
 
 }

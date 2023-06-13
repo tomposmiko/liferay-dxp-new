@@ -24,9 +24,18 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = ClusterMasterTokenTransitionListener.class)
+@Component(
+	immediate = true, service = ClusterMasterTokenTransitionListener.class
+)
 public class BackgroundTaskClusterMasterTokenTransitionListener
 	extends BaseClusterMasterTokenTransitionListener {
+
+	@Reference(unbind = "-")
+	public void setBackgroundTaskManager(
+		BackgroundTaskManager backgroundTaskManager) {
+
+		_backgroundTaskManager = backgroundTaskManager;
+	}
 
 	@Override
 	protected void doMasterTokenAcquired() throws Exception {
@@ -37,7 +46,6 @@ public class BackgroundTaskClusterMasterTokenTransitionListener
 	protected void doMasterTokenReleased() throws Exception {
 	}
 
-	@Reference
 	private BackgroundTaskManager _backgroundTaskManager;
 
 }

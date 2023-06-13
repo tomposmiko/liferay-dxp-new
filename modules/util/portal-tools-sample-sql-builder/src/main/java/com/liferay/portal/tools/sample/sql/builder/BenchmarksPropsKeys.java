@@ -87,12 +87,6 @@ public interface BenchmarksPropsKeys {
 	public static final String MAX_COMMERCE_PRODUCT_OPTION_CATEGORY_COUNT =
 		"sample.sql.max.commerce.product.option.category.count";
 
-	public static final String MAX_COMPANY_COUNT =
-		"sample.sql.max.company.count";
-
-	public static final String MAX_COMPANY_USER_COUNT =
-		"sample.sql.max.company.user.count";
-
 	public static final String MAX_CONTENT_LAYOUT_COUNT =
 		"sample.sql.max.content.layout.count";
 
@@ -175,6 +169,8 @@ public interface BenchmarksPropsKeys {
 
 	public static final String OUTPUT_CSV_FILE_NAMES =
 		"sample.sql.output.csv.file.names";
+
+	public static final String OUTPUT_DIR = "sample.sql.output.dir";
 
 	public static final String OUTPUT_MERGE = "sample.sql.output.merge";
 

@@ -16,6 +16,7 @@ package com.liferay.change.tracking.model.impl;
 
 import com.liferay.change.tracking.model.CTProcess;
 import com.liferay.change.tracking.model.CTProcessModel;
+import com.liferay.change.tracking.model.CTProcessSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -35,15 +36,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -75,7 +79,7 @@ public class CTProcessModelImpl
 		{"mvccVersion", Types.BIGINT}, {"ctProcessId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"createDate", Types.TIMESTAMP}, {"ctCollectionId", Types.BIGINT},
-		{"backgroundTaskId", Types.BIGINT}, {"type_", Types.INTEGER}
+		{"backgroundTaskId", Types.BIGINT}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -89,11 +93,10 @@ public class CTProcessModelImpl
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("backgroundTaskId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("type_", Types.INTEGER);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CTProcess (mvccVersion LONG default 0 not null,ctProcessId LONG not null primary key,companyId LONG,userId LONG,createDate DATE null,ctCollectionId LONG,backgroundTaskId LONG,type_ INTEGER)";
+		"create table CTProcess (mvccVersion LONG default 0 not null,ctProcessId LONG not null primary key,companyId LONG,userId LONG,createDate DATE null,ctCollectionId LONG,backgroundTaskId LONG)";
 
 	public static final String TABLE_SQL_DROP = "drop table CTProcess";
 
@@ -122,17 +125,11 @@ public class CTProcessModelImpl
 	public static final long CTCOLLECTIONID_COLUMN_BITMASK = 2L;
 
 	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
-	 */
-	@Deprecated
-	public static final long TYPE_COLUMN_BITMASK = 4L;
-
-	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long CREATEDATE_COLUMN_BITMASK = 8L;
+	public static final long CREATEDATE_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -146,6 +143,54 @@ public class CTProcessModelImpl
 	 */
 	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static CTProcess toModel(CTProcessSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		CTProcess model = new CTProcessImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtProcessId(soapModel.getCtProcessId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setBackgroundTaskId(soapModel.getBackgroundTaskId());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<CTProcess> toModels(CTProcessSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<CTProcess> models = new ArrayList<CTProcess>(soapModels.length);
+
+		for (CTProcessSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public CTProcessModelImpl() {
@@ -223,80 +268,87 @@ public class CTProcessModelImpl
 	public Map<String, Function<CTProcess, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CTProcess, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CTProcess>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CTProcess, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTProcess.class.getClassLoader(), CTProcess.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<CTProcess, Object>>();
+		try {
+			Constructor<CTProcess> constructor =
+				(Constructor<CTProcess>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CTProcess::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctProcessId", CTProcess::getCtProcessId);
-			attributeGetterFunctions.put("companyId", CTProcess::getCompanyId);
-			attributeGetterFunctions.put("userId", CTProcess::getUserId);
-			attributeGetterFunctions.put(
-				"createDate", CTProcess::getCreateDate);
-			attributeGetterFunctions.put(
-				"ctCollectionId", CTProcess::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"backgroundTaskId", CTProcess::getBackgroundTaskId);
-			attributeGetterFunctions.put("type", CTProcess::getType);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<CTProcess, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CTProcess, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<CTProcess, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTProcess, Object>>();
+		Map<String, BiConsumer<CTProcess, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CTProcess, ?>>();
 
-		static {
-			Map<String, BiConsumer<CTProcess, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<CTProcess, ?>>();
+		attributeGetterFunctions.put("mvccVersion", CTProcess::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CTProcess, Long>)CTProcess::setMvccVersion);
+		attributeGetterFunctions.put("ctProcessId", CTProcess::getCtProcessId);
+		attributeSetterBiConsumers.put(
+			"ctProcessId",
+			(BiConsumer<CTProcess, Long>)CTProcess::setCtProcessId);
+		attributeGetterFunctions.put("companyId", CTProcess::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<CTProcess, Long>)CTProcess::setCompanyId);
+		attributeGetterFunctions.put("userId", CTProcess::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<CTProcess, Long>)CTProcess::setUserId);
+		attributeGetterFunctions.put("createDate", CTProcess::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CTProcess, Date>)CTProcess::setCreateDate);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTProcess::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<CTProcess, Long>)CTProcess::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"backgroundTaskId", CTProcess::getBackgroundTaskId);
+		attributeSetterBiConsumers.put(
+			"backgroundTaskId",
+			(BiConsumer<CTProcess, Long>)CTProcess::setBackgroundTaskId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CTProcess, Long>)CTProcess::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctProcessId",
-				(BiConsumer<CTProcess, Long>)CTProcess::setCtProcessId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CTProcess, Long>)CTProcess::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<CTProcess, Long>)CTProcess::setUserId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CTProcess, Date>)CTProcess::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<CTProcess, Long>)CTProcess::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"backgroundTaskId",
-				(BiConsumer<CTProcess, Long>)CTProcess::setBackgroundTaskId);
-			attributeSetterBiConsumers.put(
-				"type", (BiConsumer<CTProcess, Integer>)CTProcess::setType);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -440,31 +492,6 @@ public class CTProcessModelImpl
 		_backgroundTaskId = backgroundTaskId;
 	}
 
-	@JSON
-	@Override
-	public int getType() {
-		return _type;
-	}
-
-	@Override
-	public void setType(int type) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_type = type;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public int getOriginalType() {
-		return GetterUtil.getInteger(
-			this.<Integer>getColumnOriginalValue("type_"));
-	}
-
 	public long getColumnBitmask() {
 		if (_columnBitmask > 0) {
 			return _columnBitmask;
@@ -528,7 +555,6 @@ public class CTProcessModelImpl
 		ctProcessImpl.setCreateDate(getCreateDate());
 		ctProcessImpl.setCtCollectionId(getCtCollectionId());
 		ctProcessImpl.setBackgroundTaskId(getBackgroundTaskId());
-		ctProcessImpl.setType(getType());
 
 		ctProcessImpl.resetOriginalValues();
 
@@ -552,7 +578,6 @@ public class CTProcessModelImpl
 			this.<Long>getColumnOriginalValue("ctCollectionId"));
 		ctProcessImpl.setBackgroundTaskId(
 			this.<Long>getColumnOriginalValue("backgroundTaskId"));
-		ctProcessImpl.setType(this.<Integer>getColumnOriginalValue("type_"));
 
 		return ctProcessImpl;
 	}
@@ -649,8 +674,6 @@ public class CTProcessModelImpl
 
 		ctProcessCacheModel.backgroundTaskId = getBackgroundTaskId();
 
-		ctProcessCacheModel.type = getType();
-
 		return ctProcessCacheModel;
 	}
 
@@ -703,12 +726,41 @@ public class CTProcessModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CTProcess, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CTProcess, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((CTProcess)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTProcess>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTProcess.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -719,14 +771,10 @@ public class CTProcessModelImpl
 	private Date _createDate;
 	private long _ctCollectionId;
 	private long _backgroundTaskId;
-	private int _type;
 
 	public <T> T getColumnValue(String columnName) {
-		columnName = _attributeNames.getOrDefault(columnName, columnName);
-
-		Function<CTProcess, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<CTProcess, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -758,17 +806,6 @@ public class CTProcessModelImpl
 		_columnOriginalValues.put("createDate", _createDate);
 		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("backgroundTaskId", _backgroundTaskId);
-		_columnOriginalValues.put("type_", _type);
-	}
-
-	private static final Map<String, String> _attributeNames;
-
-	static {
-		Map<String, String> attributeNames = new HashMap<>();
-
-		attributeNames.put("type_", "type");
-
-		_attributeNames = Collections.unmodifiableMap(attributeNames);
 	}
 
 	private transient Map<String, Object> _columnOriginalValues;
@@ -795,8 +832,6 @@ public class CTProcessModelImpl
 		columnBitmasks.put("ctCollectionId", 32L);
 
 		columnBitmasks.put("backgroundTaskId", 64L);
-
-		columnBitmasks.put("type_", 128L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

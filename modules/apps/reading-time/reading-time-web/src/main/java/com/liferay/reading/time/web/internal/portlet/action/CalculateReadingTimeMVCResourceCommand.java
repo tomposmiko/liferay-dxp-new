@@ -14,7 +14,7 @@
 
 package com.liferay.reading.time.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
@@ -26,6 +26,8 @@ import com.liferay.reading.time.web.internal.constants.ReadingTimePortletKeys;
 
 import java.time.Duration;
 
+import java.util.Optional;
+
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -36,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ReadingTimePortletKeys.READING_TIME,
 		"mvc.command.name=/reading_time/calculate_reading_time"
@@ -50,31 +53,28 @@ public class CalculateReadingTimeMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		String content = ParamUtil.getString(resourceRequest, "content");
 		String contentType = ParamUtil.getString(
 			resourceRequest, "contentType");
 
-		Duration readingTimeDuration = _readingTimeCalculator.calculate(
-			content, contentType, resourceRequest.getLocale());
+		Optional<Duration> readingTimeDurationOptional =
+			_readingTimeCalculator.calculate(
+				content, contentType, resourceRequest.getLocale());
 
-		if (readingTimeDuration != null) {
-			jsonObject.put(
+		readingTimeDurationOptional.ifPresent(
+			readingTimeDuration -> jsonObject.put(
 				"readingTimeInSeconds", (float)readingTimeDuration.getSeconds()
 			).put(
 				"readingTimeMessage",
 				_readingTimeMessageProvider.provide(
 					readingTimeDuration, resourceRequest.getLocale())
-			);
-		}
+			));
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, jsonObject);
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private ReadingTimeCalculator _readingTimeCalculator;

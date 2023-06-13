@@ -14,13 +14,15 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.query;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.search.elasticsearch7.internal.query.function.score.ElasticsearchScoreFunctionTranslator;
 import com.liferay.portal.search.query.FunctionScoreQuery;
 import com.liferay.portal.search.query.FunctionScoreQuery.FilterQueryScoreFunctionHolder;
 import com.liferay.portal.search.query.QueryTranslator;
 import com.liferay.portal.search.query.function.score.ScoreFunction;
 import com.liferay.portal.search.query.function.score.ScoreFunctionTranslator;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -45,16 +47,23 @@ public class FunctionScoreQueryTranslatorImpl
 		QueryBuilder queryBuilder = queryTranslator.translate(
 			functionScoreQuery.getQuery());
 
+		List<FilterQueryScoreFunctionHolder> filterQueryScoreFunctionHolders =
+			functionScoreQuery.getFilterQueryScoreFunctionHolders();
+
+		Stream<FilterQueryScoreFunctionHolder> stream =
+			filterQueryScoreFunctionHolders.stream();
+
 		FunctionScoreQueryBuilder functionScoreQueryBuilder =
 			QueryBuilders.functionScoreQuery(
 				queryBuilder,
-				TransformUtil.transformToArray(
-					functionScoreQuery.getFilterQueryScoreFunctionHolders(),
-					filterQueryScoreFunctionHolder -> _translateFilterFunction(
+				stream.map(
+					filterQueryScoreFunctionHolder -> translateFilterFunction(
 						filterQueryScoreFunctionHolder, queryTranslator,
-						_translateScoreFunction(
-							filterQueryScoreFunctionHolder.getScoreFunction())),
-					FilterFunctionBuilder.class));
+						translateScoreFunction(
+							filterQueryScoreFunctionHolder.getScoreFunction()))
+				).toArray(
+					FilterFunctionBuilder[]::new
+				));
 
 		if (functionScoreQuery.getMinScore() != null) {
 			functionScoreQueryBuilder.setMinScore(
@@ -108,12 +117,13 @@ public class FunctionScoreQueryTranslatorImpl
 			return org.elasticsearch.common.lucene.search.function.
 				FunctionScoreQuery.ScoreMode.SUM;
 		}
-
-		throw new IllegalArgumentException(
-			"Invalid FunctionScoreQuery.ScoreMode: " + scoreMode);
+		else {
+			throw new IllegalArgumentException(
+				"Invalid FunctionScoreQuery.ScoreMode: " + scoreMode);
+		}
 	}
 
-	private FilterFunctionBuilder _translateFilterFunction(
+	protected FilterFunctionBuilder translateFilterFunction(
 		FilterQueryScoreFunctionHolder filterQueryScoreFunctionHolder,
 		QueryTranslator<QueryBuilder> queryTranslator,
 		ScoreFunctionBuilder<?> scoreFunctionBuilder) {
@@ -128,7 +138,7 @@ public class FunctionScoreQueryTranslatorImpl
 			scoreFunctionBuilder);
 	}
 
-	private ScoreFunctionBuilder<?> _translateScoreFunction(
+	protected ScoreFunctionBuilder<?> translateScoreFunction(
 		ScoreFunction scoreFunction) {
 
 		ScoreFunctionBuilder<?> scoreFunctionBuilder = scoreFunction.accept(

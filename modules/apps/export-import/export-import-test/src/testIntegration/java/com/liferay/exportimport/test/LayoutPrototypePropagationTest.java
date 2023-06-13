@@ -49,8 +49,7 @@ public class LayoutPrototypePropagationTest
 	public void testAddLayoutFromLayoutPrototypeWithLinkDisabled()
 		throws Exception {
 
-		layout = LayoutTestUtil.addTypePortletLayout(
-			group, false, layoutPrototype, false);
+		layout = LayoutTestUtil.addLayout(group, false, layoutPrototype, false);
 
 		Locale locale = LocaleUtil.getDefault();
 
@@ -72,8 +71,7 @@ public class LayoutPrototypePropagationTest
 			TestPropsValues.getUserId(), layoutPrototypeLayout, journalArticle,
 			"column-1");
 
-		layout = LayoutTestUtil.addTypePortletLayout(
-			group, true, layoutPrototype, true);
+		layout = LayoutTestUtil.addLayout(group, true, layoutPrototype, true);
 
 		layout = propagateChanges(layout);
 	}

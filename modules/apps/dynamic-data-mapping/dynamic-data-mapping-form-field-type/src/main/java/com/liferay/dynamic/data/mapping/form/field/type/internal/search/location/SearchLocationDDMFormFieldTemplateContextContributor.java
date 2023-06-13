@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -48,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rodrigo Paulino
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SEARCH_LOCATION,
 	service = DDMFormFieldTemplateContextContributor.class
 )
@@ -115,14 +117,16 @@ public class SearchLocationDDMFormFieldTemplateContextContributor
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject();
 
-		for (String visibleField : visibleFields) {
-			jsonObject.put(
+		Stream.of(
+			visibleFields
+		).forEach(
+			visibleField -> jsonObject.put(
 				visibleField,
-				_language.get(
+				LanguageUtil.get(
 					ResourceBundleUtil.getModuleAndPortalResourceBundle(
 						locale, getClass()),
-					visibleField));
-		}
+					visibleField))
+		);
 
 		return jsonObject;
 	}
@@ -142,7 +146,7 @@ public class SearchLocationDDMFormFieldTemplateContextContributor
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
+				_log.debug(jsonException, jsonException);
 			}
 		}
 
@@ -157,8 +161,5 @@ public class SearchLocationDDMFormFieldTemplateContextContributor
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 }

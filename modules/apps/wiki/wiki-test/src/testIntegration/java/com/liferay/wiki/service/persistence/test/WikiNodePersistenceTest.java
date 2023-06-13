@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
 import com.liferay.portal.test.rule.TransactionalTestRule;
-import com.liferay.wiki.exception.DuplicateWikiNodeExternalReferenceCodeException;
 import com.liferay.wiki.exception.NoSuchNodeException;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeLocalServiceUtil;
@@ -127,8 +126,6 @@ public class WikiNodePersistenceTest {
 
 		newWikiNode.setMvccVersion(RandomTestUtil.nextLong());
 
-		newWikiNode.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newWikiNode.setUuid(RandomTestUtil.randomString());
 
 		newWikiNode.setExternalReferenceCode(RandomTestUtil.randomString());
@@ -168,9 +165,6 @@ public class WikiNodePersistenceTest {
 
 		Assert.assertEquals(
 			existingWikiNode.getMvccVersion(), newWikiNode.getMvccVersion());
-		Assert.assertEquals(
-			existingWikiNode.getCtCollectionId(),
-			newWikiNode.getCtCollectionId());
 		Assert.assertEquals(existingWikiNode.getUuid(), newWikiNode.getUuid());
 		Assert.assertEquals(
 			existingWikiNode.getExternalReferenceCode(),
@@ -211,26 +205,6 @@ public class WikiNodePersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingWikiNode.getStatusDate()),
 			Time.getShortTimestamp(newWikiNode.getStatusDate()));
-	}
-
-	@Test(expected = DuplicateWikiNodeExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		WikiNode wikiNode = addWikiNode();
-
-		WikiNode newWikiNode = addWikiNode();
-
-		newWikiNode.setGroupId(wikiNode.getGroupId());
-
-		newWikiNode = _persistence.update(newWikiNode);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newWikiNode);
-
-		newWikiNode.setExternalReferenceCode(
-			wikiNode.getExternalReferenceCode());
-
-		_persistence.update(newWikiNode);
 	}
 
 	@Test
@@ -300,12 +274,12 @@ public class WikiNodePersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_G() throws Exception {
-		_persistence.countByERC_G("", RandomTestUtil.nextLong());
+	public void testCountByG_ERC() throws Exception {
+		_persistence.countByG_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_G("null", 0L);
+		_persistence.countByG_ERC(0L, "null");
 
-		_persistence.countByERC_G((String)null, 0L);
+		_persistence.countByG_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -339,13 +313,13 @@ public class WikiNodePersistenceTest {
 
 	protected OrderByComparator<WikiNode> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"WikiNode", "mvccVersion", true, "ctCollectionId", true, "uuid",
-			true, "externalReferenceCode", true, "nodeId", true, "groupId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "name", true,
-			"description", true, "lastPostDate", true, "lastPublishDate", true,
-			"status", true, "statusByUserId", true, "statusByUserName", true,
-			"statusDate", true);
+			"WikiNode", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "nodeId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "name", true, "description", true,
+			"lastPostDate", true, "lastPublishDate", true, "status", true,
+			"statusByUserId", true, "statusByUserName", true, "statusDate",
+			true);
 	}
 
 	@Test
@@ -622,15 +596,15 @@ public class WikiNodePersistenceTest {
 				new Class<?>[] {String.class}, "name"));
 
 		Assert.assertEquals(
-			wikiNode.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				wikiNode, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(wikiNode.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
 				wikiNode, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "groupId"));
+		Assert.assertEquals(
+			wikiNode.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				wikiNode, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected WikiNode addWikiNode() throws Exception {
@@ -639,8 +613,6 @@ public class WikiNodePersistenceTest {
 		WikiNode wikiNode = _persistence.create(pk);
 
 		wikiNode.setMvccVersion(RandomTestUtil.nextLong());
-
-		wikiNode.setCtCollectionId(RandomTestUtil.nextLong());
 
 		wikiNode.setUuid(RandomTestUtil.randomString());
 

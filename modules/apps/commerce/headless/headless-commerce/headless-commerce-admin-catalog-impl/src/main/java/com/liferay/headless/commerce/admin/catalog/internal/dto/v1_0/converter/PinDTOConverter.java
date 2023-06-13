@@ -18,9 +18,7 @@ import com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry;
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramPin;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramEntryService;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramPinService;
-import com.liferay.headless.commerce.admin.catalog.dto.v1_0.MappedProduct;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Pin;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -32,8 +30,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.shop.by.diagram.model.CSDiagramPin",
-	service = DTOConverter.class
+	service = {DTOConverter.class, PinDTOConverter.class}
 )
 public class PinDTOConverter implements DTOConverter<CSDiagramEntry, Pin> {
 
@@ -80,8 +79,7 @@ public class PinDTOConverter implements DTOConverter<CSDiagramEntry, Pin> {
 	@Reference
 	private CSDiagramPinService _csDiagramPinService;
 
-	@Reference(target = DTOConverterConstants.MAPPED_PRODUCT_DTO_CONVERTER)
-	private DTOConverter<CSDiagramEntry, MappedProduct>
-		_mappedProductDTOConverter;
+	@Reference
+	private MappedProductDTOConverter _mappedProductDTOConverter;
 
 }

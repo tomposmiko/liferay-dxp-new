@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -231,88 +232,96 @@ public class AssetLinkModelImpl
 	public Map<String, Function<AssetLink, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AssetLink, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AssetLink>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AssetLink, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetLink.class.getClassLoader(), AssetLink.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AssetLink, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<AssetLink, Object>>();
+		try {
+			Constructor<AssetLink> constructor =
+				(Constructor<AssetLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AssetLink::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", AssetLink::getCtCollectionId);
-			attributeGetterFunctions.put("linkId", AssetLink::getLinkId);
-			attributeGetterFunctions.put("companyId", AssetLink::getCompanyId);
-			attributeGetterFunctions.put("userId", AssetLink::getUserId);
-			attributeGetterFunctions.put("userName", AssetLink::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", AssetLink::getCreateDate);
-			attributeGetterFunctions.put("entryId1", AssetLink::getEntryId1);
-			attributeGetterFunctions.put("entryId2", AssetLink::getEntryId2);
-			attributeGetterFunctions.put("type", AssetLink::getType);
-			attributeGetterFunctions.put("weight", AssetLink::getWeight);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AssetLink, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AssetLink, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AssetLink, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AssetLink, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetLink, Object>>();
+		Map<String, BiConsumer<AssetLink, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AssetLink, ?>>();
 
-		static {
-			Map<String, BiConsumer<AssetLink, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<AssetLink, ?>>();
+		attributeGetterFunctions.put("mvccVersion", AssetLink::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AssetLink, Long>)AssetLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetLink::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<AssetLink, Long>)AssetLink::setCtCollectionId);
+		attributeGetterFunctions.put("linkId", AssetLink::getLinkId);
+		attributeSetterBiConsumers.put(
+			"linkId", (BiConsumer<AssetLink, Long>)AssetLink::setLinkId);
+		attributeGetterFunctions.put("companyId", AssetLink::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<AssetLink, Long>)AssetLink::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetLink::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<AssetLink, Long>)AssetLink::setUserId);
+		attributeGetterFunctions.put("userName", AssetLink::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<AssetLink, String>)AssetLink::setUserName);
+		attributeGetterFunctions.put("createDate", AssetLink::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<AssetLink, Date>)AssetLink::setCreateDate);
+		attributeGetterFunctions.put("entryId1", AssetLink::getEntryId1);
+		attributeSetterBiConsumers.put(
+			"entryId1", (BiConsumer<AssetLink, Long>)AssetLink::setEntryId1);
+		attributeGetterFunctions.put("entryId2", AssetLink::getEntryId2);
+		attributeSetterBiConsumers.put(
+			"entryId2", (BiConsumer<AssetLink, Long>)AssetLink::setEntryId2);
+		attributeGetterFunctions.put("type", AssetLink::getType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<AssetLink, Integer>)AssetLink::setType);
+		attributeGetterFunctions.put("weight", AssetLink::getWeight);
+		attributeSetterBiConsumers.put(
+			"weight", (BiConsumer<AssetLink, Integer>)AssetLink::setWeight);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AssetLink, Long>)AssetLink::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<AssetLink, Long>)AssetLink::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"linkId", (BiConsumer<AssetLink, Long>)AssetLink::setLinkId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AssetLink, Long>)AssetLink::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<AssetLink, Long>)AssetLink::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<AssetLink, String>)AssetLink::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<AssetLink, Date>)AssetLink::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"entryId1",
-				(BiConsumer<AssetLink, Long>)AssetLink::setEntryId1);
-			attributeSetterBiConsumers.put(
-				"entryId2",
-				(BiConsumer<AssetLink, Long>)AssetLink::setEntryId2);
-			attributeSetterBiConsumers.put(
-				"type", (BiConsumer<AssetLink, Integer>)AssetLink::setType);
-			attributeSetterBiConsumers.put(
-				"weight", (BiConsumer<AssetLink, Integer>)AssetLink::setWeight);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -783,12 +792,41 @@ public class AssetLinkModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AssetLink, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AssetLink, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AssetLink, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((AssetLink)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetLink>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetLink.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -807,9 +845,8 @@ public class AssetLinkModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<AssetLink, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<AssetLink, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

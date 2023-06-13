@@ -12,7 +12,7 @@
  * details.
  */
 
-export function convertValueToJSON(value) {
+export const convertValueToJSON = (value) => {
 	if (value && typeof value === 'string') {
 		try {
 			return JSON.parse(value);
@@ -23,14 +23,14 @@ export function convertValueToJSON(value) {
 	}
 
 	return value;
-}
+};
 
-export function getEditingValue({
+export const getEditingValue = ({
 	defaultLocale,
 	editingLocale,
 	fieldName,
 	value,
-}) {
+}) => {
 	const valueJSON = convertValueToJSON(value);
 
 	if (valueJSON) {
@@ -47,13 +47,13 @@ export function getEditingValue({
 	}
 
 	return editingLocale;
-}
+};
 
-export function getInitialInternalValue({editingLocale, value}) {
+export const getInitialInternalValue = ({editingLocale, value}) => {
 	const valueJSON = convertValueToJSON(value);
 
 	return valueJSON[editingLocale.localeId] || '';
-}
+};
 
 const convertValueToString = (value) => {
 	if (value && typeof value === 'object') {
@@ -77,64 +77,62 @@ const isDefaultLocale = ({defaultLocale, localeId}) => {
 	return defaultLocale.localeId === localeId;
 };
 
-export function normalizeLocaleId(localeId) {
+export const normalizeLocaleId = (localeId) => {
 	if (!localeId || localeId === '') {
 		throw new Error(`localeId ${localeId} is invalid`);
 	}
 
-	return localeId.replaceAll('_', '-').toLowerCase();
-}
+	return localeId.replace('_', '-').toLowerCase();
+};
 
-export function transformAvailableLocales(
+export const transformAvailableLocales = (
 	availableLocales,
 	defaultLocale,
 	value
-) {
-	return {
-		availableLocales: availableLocales.map((availableLocale) => ({
-			displayName: availableLocale[1].label,
-			icon: normalizeLocaleId(availableLocale[0]),
-			isDefault: isDefaultLocale({
-				defaultLocale,
-				localeId: availableLocale[0],
-			}),
-			isTranslated: isTranslated({
-				localeId: availableLocale[0],
-				value,
-			}),
+) => ({
+	availableLocales: availableLocales.map((availableLocale) => ({
+		displayName: availableLocale[1].label,
+		icon: normalizeLocaleId(availableLocale[0]),
+		isDefault: isDefaultLocale({
+			defaultLocale,
 			localeId: availableLocale[0],
-		})),
-	};
-}
+		}),
+		isTranslated: isTranslated({
+			localeId: availableLocale[0],
+			value,
+		}),
+		localeId: availableLocale[0],
+	})),
+});
 
-export function transformAvailableLocalesAndValue({
+export const transformAvailableLocalesAndValue = ({
 	availableLocales,
 	defaultLocale,
 	value,
-}) {
-	return {
-		availableLocales: availableLocales.map((availableLocale) => ({
-			...availableLocale,
-			icon: normalizeLocaleId(availableLocale.localeId),
-			isDefault: isDefaultLocale({
-				defaultLocale,
-				localeId: availableLocale.localeId,
-			}),
-			isTranslated: isTranslated({
-				localeId: availableLocale.localeId,
-				value,
-			}),
-		})),
-		value: convertValueToString(value),
-	};
-}
+}) => ({
+	availableLocales: availableLocales.map((availableLocale) => ({
+		...availableLocale,
+		icon: normalizeLocaleId(availableLocale.localeId),
+		isDefault: isDefaultLocale({
+			defaultLocale,
+			localeId: availableLocale.localeId,
+		}),
+		isTranslated: isTranslated({
+			localeId: availableLocale.localeId,
+			value,
+		}),
+	})),
+	value: convertValueToString(value),
+});
 
-export function transformEditingLocale({defaultLocale, editingLocale, value}) {
-	return {
-		displayName: editingLocale.label,
-		icon: editingLocale.icon,
-		isDefault: isDefaultLocale({defaultLocale, localeId: editingLocale.id}),
-		isTranslated: isTranslated({localeId: editingLocale.id, value}),
-		localeId: editingLocale.id,
-	};
-}
+export const transformEditingLocale = ({
+	defaultLocale,
+	editingLocale,
+	value,
+}) => ({
+	displayName: editingLocale.label,
+	icon: editingLocale.icon,
+	isDefault: isDefaultLocale({defaultLocale, localeId: editingLocale.id}),
+	isTranslated: isTranslated({localeId: editingLocale.id, value}),
+	localeId: editingLocale.id,
+});

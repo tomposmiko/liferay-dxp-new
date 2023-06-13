@@ -20,7 +20,6 @@ import com.liferay.info.item.updater.InfoItemFieldValuesUpdater;
 import com.liferay.layout.admin.web.internal.info.item.helper.LayoutInfoItemFieldValuesUpdaterHelper;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -41,13 +40,8 @@ public class LayoutInfoItemFieldValuesUpdater
 	public Layout updateFromInfoItemFieldValues(
 		Layout layout, InfoItemFieldValues infoItemFieldValues) {
 
-		long defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				layout.getPlid());
-
 		return _layoutInfoItemFieldValuesUpdaterHelper.
-			updateFromInfoItemFieldValues(
-				layout, infoItemFieldValues, defaultSegmentsExperienceId);
+			updateFromInfoItemFieldValues(layout, infoItemFieldValues);
 	}
 
 	@Activate
@@ -66,8 +60,5 @@ public class LayoutInfoItemFieldValuesUpdater
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 }

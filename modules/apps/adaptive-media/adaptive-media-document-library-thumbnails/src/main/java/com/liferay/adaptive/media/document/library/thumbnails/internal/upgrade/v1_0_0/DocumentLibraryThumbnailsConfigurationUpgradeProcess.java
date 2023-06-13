@@ -47,7 +47,7 @@ public class DocumentLibraryThumbnailsConfigurationUpgradeProcess
 							initializeCompany(company);
 					}
 					catch (Exception exception) {
-						_log.error(exception);
+						_log.error(exception, exception);
 					}
 				});
 		}

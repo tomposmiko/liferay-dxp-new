@@ -59,70 +59,46 @@
 					"visibilityExpression": ""
 				},
 				{
-					"collapsible": false,
-					"ddmStructureId": "",
-					"ddmStructureLayoutId": "",
-					"fieldReference": "TextFieldSetFieldSet",
+					"autocomplete": false,
+					"dataSourceType": "manual",
+					"dataType": "string",
+					"ddmDataProviderInstanceId": "[]",
+					"ddmDataProviderInstanceOutput": "[]",
+					"displayStyle": "singleline",
+					"fieldNamespace": "",
+					"fieldReference": "Text",
+					"indexType": "keyword",
 					"label": {
-						"en_US": ""
+						"en_US": "Text"
 					},
-					"localizable": false,
-					"name": "TextFieldSetFieldSet",
-					"nestedFields": [
+					"localizable": true,
+					"name": "Text",
+					"options": [
 						{
-							"autocomplete": false,
-							"dataSourceType": "manual",
-							"dataType": "string",
-							"ddmDataProviderInstanceId": "[]",
-							"ddmDataProviderInstanceOutput": "[]",
-							"displayStyle": "singleline",
-							"fieldNamespace": "",
-							"fieldReference": "Text",
-							"indexType": "keyword",
 							"label": {
-								"en_US": "Text"
+								"en_US": "Option"
 							},
-							"localizable": true,
-							"name": "Text",
-							"options": [
-								{
-									"label": {
-										"en_US": "Option"
-									},
-									"value": "Option"
-								}
-							],
-							"placeholder": {
-								"en_US": ""
-							},
-							"predefinedValue": {
-								"en_US": ""
-							},
-							"readOnly": false,
-							"repeatable": false,
-							"required": false,
-							"showLabel": true,
-							"tip": {
-								"en_US": ""
-							},
-							"tooltip": {
-								"en_US": ""
-							},
-							"type": "text",
-							"visibilityExpression": ""
+							"value": "Option"
 						}
 					],
+					"placeholder": {
+						"en_US": ""
+					},
 					"predefinedValue": {
+						"en_US": ""
 					},
 					"readOnly": false,
 					"repeatable": false,
 					"required": false,
-					"rows": "[{\"columns\":[{\"size\":12,\"fields\":[\"Text\"]}]}]",
-					"showLabel": false,
+					"showLabel": true,
 					"tip": {
+						"en_US": ""
 					},
-					"type": "fieldset",
-					"upgradedStructure": false
+					"tooltip": {
+						"en_US": ""
+					},
+					"type": "text",
+					"visibilityExpression": ""
 				}
 			],
 			"predefinedValue": {
@@ -130,7 +106,7 @@
 			"readOnly": false,
 			"repeatable": false,
 			"required": false,
-			"rows": "[{\"columns\":[{\"size\":12,\"fields\":[\"Text\"]}]},{\"columns\":[{\"size\":12,\"fields\":[\"TextFieldSetFieldSet\"]}]}]",
+			"rows": "[{\"columns\":[{\"size\":12,\"fields\":[\"Text\"]}]},{\"columns\":[{\"size\":12,\"fields\":[\"Text\"]}]}]",
 			"showLabel": false,
 			"tip": {
 			},
@@ -172,51 +148,27 @@
 					"visibilityExpression": ""
 				},
 				{
-					"collapsible": false,
-					"ddmStructureId": "",
-					"ddmStructureLayoutId": "",
-					"fieldReference": "NumberFieldSetFieldSet",
+					"dataType": "double",
+					"fieldNamespace": "",
+					"fieldReference": "Number",
+					"indexType": "keyword",
 					"label": {
-						"en_US": ""
+						"en_US": "Number"
 					},
-					"localizable": false,
-					"name": "NumberFieldSetFieldSet",
-					"nestedFields": [
-						{
-							"dataType": "double",
-							"fieldNamespace": "",
-							"fieldReference": "Number",
-							"indexType": "keyword",
-							"label": {
-								"en_US": "Number"
-							},
-							"localizable": true,
-							"name": "Number",
-							"predefinedValue": {
-								"en_US": ""
-							},
-							"readOnly": false,
-							"repeatable": false,
-							"required": false,
-							"showLabel": true,
-							"tip": {
-								"en_US": ""
-							},
-							"type": "numeric",
-							"visibilityExpression": ""
-						}
-					],
+					"localizable": true,
+					"name": "Number",
 					"predefinedValue": {
+						"en_US": ""
 					},
 					"readOnly": false,
 					"repeatable": false,
 					"required": false,
-					"rows": "[{\"columns\":[{\"size\":12,\"fields\":[\"Number\"]}]}]",
-					"showLabel": false,
+					"showLabel": true,
 					"tip": {
+						"en_US": ""
 					},
-					"type": "fieldset",
-					"upgradedStructure": false
+					"type": "numeric",
+					"visibilityExpression": ""
 				}
 			],
 			"predefinedValue": {
@@ -224,7 +176,7 @@
 			"readOnly": false,
 			"repeatable": false,
 			"required": false,
-			"rows": "[{\"columns\":[{\"size\":12,\"fields\":[\"Number\"]}]},{\"columns\":[{\"size\":12,\"fields\":[\"NumberFieldSetFieldSet\"]}]}]",
+			"rows": "[{\"columns\":[{\"size\":12,\"fields\":[\"Number\"]}]},{\"columns\":[{\"size\":12,\"fields\":[\"Number\"]}]}]",
 			"showLabel": false,
 			"tip": {
 			},

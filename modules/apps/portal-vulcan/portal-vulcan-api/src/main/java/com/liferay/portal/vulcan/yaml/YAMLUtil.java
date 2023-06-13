@@ -14,9 +14,6 @@
 
 package com.liferay.portal.vulcan.yaml;
 
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CamelCaseUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.yaml.config.ConfigYAML;
 import com.liferay.portal.vulcan.yaml.config.Security;
 import com.liferay.portal.vulcan.yaml.exception.InvalidYAMLException;
@@ -25,7 +22,6 @@ import com.liferay.portal.vulcan.yaml.openapi.OpenAPIYAML;
 import com.liferay.portal.vulcan.yaml.openapi.Parameter;
 import com.liferay.portal.vulcan.yaml.openapi.PathItem;
 import com.liferay.portal.vulcan.yaml.openapi.Schema;
-import com.liferay.portal.vulcan.yaml.openapi.SchemaDefinition;
 
 import java.util.List;
 import java.util.Map;
@@ -36,13 +32,14 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
-import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 import org.yaml.snakeyaml.representer.Representer;
 
 /**
- * @author Peter Shin
+ * @author     Peter Shin
+ * @deprecated As of Athanasius (7.3.x)
  */
+@Deprecated
 public class YAMLUtil {
 
 	public static ConfigYAML loadConfigYAML(String yamlString) {
@@ -63,21 +60,18 @@ public class YAMLUtil {
 		}
 	}
 
-	private static final String[] _LIFERAY_PROPERTIES = {
-		"x-field-definition", "x-operation-definition", "x-schema-definition"
-	};
-
 	private static final Yaml _YAML_CONFIG;
 
 	private static final Yaml _YAML_OPEN_API;
 
 	static {
-		LoaderOptions loaderOptions = new LoaderOptions();
+		Representer representer = new Representer();
 
-		loaderOptions.setAllowDuplicateKeys(false);
+		PropertyUtils propertyUtils = representer.getPropertyUtils();
 
-		Constructor configYAMLConstructor = new Constructor(
-			ConfigYAML.class, loaderOptions);
+		propertyUtils.setSkipMissingProperties(true);
+
+		Constructor configYAMLConstructor = new Constructor(ConfigYAML.class);
 
 		TypeDescription securityTypeDescription = new TypeDescription(
 			Security.class);
@@ -87,38 +81,15 @@ public class YAMLUtil {
 
 		configYAMLConstructor.addTypeDescription(securityTypeDescription);
 
-		Representer representer = new Representer(new DumperOptions()) {
-			{
-				setPropertyUtils(
-					new PropertyUtils() {
-						{
-							setSkipMissingProperties(true);
-						}
+		LoaderOptions loaderOptions = new LoaderOptions();
 
-						@Override
-						public Property getProperty(
-							Class<? extends Object> type, String name) {
-
-							if (ArrayUtil.contains(
-									_LIFERAY_PROPERTIES, name, false)) {
-
-								name = CamelCaseUtil.toCamelCase(
-									StringUtil.removeFirst(name, "x-"));
-							}
-
-							return super.getProperty(type, name);
-						}
-
-					});
-			}
-		};
+		loaderOptions.setAllowDuplicateKeys(false);
 
 		_YAML_CONFIG = new Yaml(
 			configYAMLConstructor, representer, new DumperOptions(),
 			loaderOptions);
 
-		Constructor openAPIYAMLConstructor = new Constructor(
-			OpenAPIYAML.class, loaderOptions);
+		Constructor openAPIYAMLConstructor = new Constructor(OpenAPIYAML.class);
 
 		TypeDescription itemsTypeDescription = new TypeDescription(Items.class);
 
@@ -199,10 +170,6 @@ public class YAMLUtil {
 			"setRequiredPropertySchemaNames");
 
 		schemaTypeDescription.addPropertyParameters("required", String.class);
-
-		schemaTypeDescription.substituteProperty(
-			"xSchemaDefinition", SchemaDefinition.class, "getSchemaDefinition",
-			"setSchemaDefinition");
 
 		openAPIYAMLConstructor.addTypeDescription(schemaTypeDescription);
 

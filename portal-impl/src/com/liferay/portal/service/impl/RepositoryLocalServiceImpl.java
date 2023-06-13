@@ -88,7 +88,7 @@ public class RepositoryLocalServiceImpl extends RepositoryLocalServiceBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			throw new InvalidRepositoryException(exception);
@@ -169,9 +169,7 @@ public class RepositoryLocalServiceImpl extends RepositoryLocalServiceBaseImpl {
 		action = SystemEventConstants.ACTION_SKIP,
 		type = SystemEventConstants.TYPE_DELETE
 	)
-	public Repository deleteRepository(Repository repository)
-		throws PortalException {
-
+	public Repository deleteRepository(Repository repository) {
 		_expandoValueLocalService.deleteValues(
 			Repository.class.getName(), repository.getRepositoryId());
 
@@ -179,7 +177,7 @@ public class RepositoryLocalServiceImpl extends RepositoryLocalServiceBaseImpl {
 			repository.getDlFolderId());
 
 		if (dlFolder != null) {
-			_dlFolderLocalService.deleteFolder(dlFolder);
+			_dlFolderLocalService.deleteDLFolder(dlFolder);
 		}
 
 		repositoryPersistence.remove(repository);
@@ -277,8 +275,8 @@ public class RepositoryLocalServiceImpl extends RepositoryLocalServiceBaseImpl {
 		}
 
 		DLFolder dlFolder = _dlFolderLocalService.addFolder(
-			null, user.getUserId(), groupId, repositoryId, true, parentFolderId,
-			name, description, hidden, serviceContext);
+			user.getUserId(), groupId, repositoryId, true, parentFolderId, name,
+			description, hidden, serviceContext);
 
 		return dlFolder.getFolderId();
 	}

@@ -91,7 +91,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 					</c:otherwise>
 				</c:choose>
 
-				<aui:input defaultLanguageId="<%= defaultLanguageId %>" label="name" localized="<%= true %>" name="nameMapAsXML" type="text">
+				<aui:input autoFocus="<%= true %>" defaultLanguageId="<%= defaultLanguageId %>" label="name" localized="<%= true %>" name="nameMapAsXML" type="text">
 					<aui:validator name="required" />
 				</aui:input>
 
@@ -129,7 +129,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 						defaultLanguageId="<%= defaultLanguageId %>"
 						inputAddon="<%= StringUtil.shorten(friendlyURLBase, 40) %>"
 						name="urlTitleMapAsXML"
-						xml="<%= HttpComponentsUtil.decodeURL(cpDefinitionsDisplayContext.getUrlTitleMapAsXML()) %>"
+						xml="<%= HttpUtil.decodeURL(cpDefinitionsDisplayContext.getUrlTitleMapAsXML()) %>"
 					/>
 				</div>
 
@@ -230,7 +230,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 						).then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 								id:
-									'<%= CommerceProductFDSNames.PRODUCT_DEFINITION_SPECIFICATIONS %>',
+									'<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITION_SPECIFICATIONS %>',
 							});
 							return null;
 						});
@@ -283,7 +283,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 							'<%= LanguageUtil.get(request, "specification-selected") %>',
 						itemsKey: 'id',
 						linkedDatasetsId: [
-							'<%= CommerceProductFDSNames.PRODUCT_DEFINITION_SPECIFICATIONS %>',
+							'<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITION_SPECIFICATIONS %>',
 						],
 						multiSelectableEntries: true,
 						itemsKey: 'id',
@@ -300,7 +300,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 								fieldName: 'key',
 							},
 						],
-						spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+						spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 						titleLabel:
 							'<%= LanguageUtil.get(request, "add-existing-specification") %>',
 					});
@@ -312,16 +312,19 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 					bodyClasses="p-0"
 					title='<%= LanguageUtil.get(request, "specifications") %>'
 				>
-					<frontend-data-set:classic-display
+					<clay:data-set-display
 						contextParams='<%=
 							HashMapBuilder.<String, String>put(
 								"cpDefinitionId", String.valueOf(cpDefinitionId)
 							).build()
 						%>'
-						dataProviderKey="<%= CommerceProductFDSNames.PRODUCT_DEFINITION_SPECIFICATIONS %>"
-						formName="fm"
-						id="<%= CommerceProductFDSNames.PRODUCT_DEFINITION_SPECIFICATIONS %>"
+						dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITION_SPECIFICATIONS %>"
+						formId="fm"
+						id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITION_SPECIFICATIONS %>"
 						itemsPerPage="<%= 10 %>"
+						namespace="<%= liferayPortletResponse.getNamespace() %>"
+						pageNumber="<%= 1 %>"
+						portletURL="<%= currentURLObj %>"
 						selectedItemsKey="cpdefinitionSpecificationOptionValueId"
 						showManagementBar="<%= false %>"
 					/>
@@ -332,9 +335,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 </aui:form>
 
 <c:if test="<%= cpDefinition == null %>">
-	<aui:script require="frontend-js-web/index as frontendJsWeb, commerce-frontend-js/utilities/slugify as slugify">
-		var {debounce} = frontendJsWeb;
-
+	<aui:script require="commerce-frontend-js/utilities/debounce as debounce, commerce-frontend-js/utilities/slugify as slugify">
 		var form = document.getElementById('<portlet:namespace />fm');
 
 		var nameInput = form.querySelector('#<portlet:namespace />nameMapAsXML');
@@ -350,7 +351,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 			urlTitleInputLocalized.updateInputLanguage(slug);
 		};
 
-		nameInput.addEventListener('input', debounce(handleOnNameInput, 200));
+		nameInput.addEventListener('input', debounce.default(handleOnNameInput, 200));
 	</aui:script>
 
 	<aui:script>

@@ -26,8 +26,8 @@ import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.MethodKey;
-import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
 import com.liferay.portal.spring.configurator.ConfigurableApplicationContextConfigurator;
+import com.liferay.portal.util.PropsValues;
 
 import java.lang.reflect.Method;
 
@@ -42,6 +42,7 @@ import javax.servlet.ServletContextEvent;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -89,7 +90,7 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -151,7 +152,7 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 				servletContext.getServletContextName(), beanLocatorImpl);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		if (previousApplicationContext == null) {
@@ -181,8 +182,10 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 		ServletContext servletContext,
 		ConfigurableWebApplicationContext configurableWebApplicationContext) {
 
-		configurableWebApplicationContext.setConfigLocation(
-			servletContext.getInitParameter(_PORTAL_CONFIG_LOCATION_PARAM));
+		String configLocation = servletContext.getInitParameter(
+			_PORTAL_CONFIG_LOCATION_PARAM);
+
+		configurableWebApplicationContext.setConfigLocation(configLocation);
 
 		configurableWebApplicationContext.addBeanFactoryPostProcessor(
 			configurableListableBeanFactory -> {
@@ -228,8 +231,14 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 						_serviceRegistrations.add(serviceRegistration);
 					}
 				}
+				catch (BeanIsAbstractException beanIsAbstractException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							beanIsAbstractException, beanIsAbstractException);
+					}
+				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			});
 	}
@@ -244,8 +253,7 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 
 		Set<String> names = OSGiBeanProperties.Service.interfaceNames(
 			bean, osgiBeanProperties,
-			ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES);
+			PropsValues.MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES);
 
 		if (names.isEmpty()) {
 			return null;

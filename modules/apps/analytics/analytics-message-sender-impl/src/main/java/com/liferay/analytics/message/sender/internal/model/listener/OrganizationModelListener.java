@@ -31,7 +31,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rachael Koestartyo
  */
-@Component(service = {EntityModelListener.class, ModelListener.class})
+@Component(
+	immediate = true, service = {EntityModelListener.class, ModelListener.class}
+)
 public class OrganizationModelListener
 	extends BaseEntityModelListener<Organization> {
 
@@ -54,7 +56,7 @@ public class OrganizationModelListener
 	public void onAfterRemove(Organization organization)
 		throws ModelListenerException {
 
-		if (!analyticsConfigurationRegistry.isActive() ||
+		if (!analyticsConfigurationTracker.isActive() ||
 			isExcluded(organization)) {
 
 			return;

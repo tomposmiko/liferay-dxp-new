@@ -58,7 +58,6 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "view-at
 	additionalProps="<%= expandoDisplayContext.getAdditionalProps() %>"
 	creationMenu="<%= expandoDisplayContext.getCreationMenu() %>"
 	disabled="<%= attributeNames.size() == 0 %>"
-	itemsTotal="<%= attributeNames.size() %>"
 	propsTransformer="js/ExpandoManagementToolbarPropsTransformer"
 	searchContainerId="customFields"
 	selectable="<%= true %>"
@@ -66,13 +65,16 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "view-at
 	showSearch="<%= false %>"
 />
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 	<aui:input name="columnIds" type="hidden" />
 
 	<clay:container-fluid>
-		<liferay-site-navigation:breadcrumb
-			breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+		<liferay-ui:breadcrumb
+			showCurrentGroup="<%= false %>"
+			showGuestGroup="<%= false %>"
+			showLayout="<%= false %>"
+			showPortletBreadcrumb="<%= true %>"
 		/>
 	</clay:container-fluid>
 
@@ -98,7 +100,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "view-at
 
 			ExpandoColumn expandoColumn = ExpandoColumnLocalServiceUtil.getDefaultTableColumn(company.getCompanyId(), modelResource, name);
 
-			UnicodeProperties typeSettingsUnicodeProperties = expandoColumn.getTypeSettingsProperties();
+			UnicodeProperties typeSettings = expandoColumn.getTypeSettingsProperties();
 			%>
 
 			<portlet:renderURL var="rowURL">

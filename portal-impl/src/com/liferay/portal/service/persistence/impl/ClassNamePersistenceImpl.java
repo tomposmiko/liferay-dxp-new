@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.ClassNameTable;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
-import com.liferay.portal.kernel.service.persistence.ClassNameUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -42,7 +41,6 @@ import com.liferay.portal.model.impl.ClassNameModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
@@ -146,7 +144,7 @@ public class ClassNamePersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByValue, finderArgs, this);
+				_finderPathFetchByValue, finderArgs);
 		}
 
 		if (result instanceof ClassName) {
@@ -249,8 +247,7 @@ public class ClassNamePersistenceImpl
 
 		Object[] finderArgs = new Object[] {value};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -693,7 +690,7 @@ public class ClassNamePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ClassName>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -763,7 +760,7 @@ public class ClassNamePersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -837,29 +834,10 @@ public class ClassNamePersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByValue",
 			new String[] {String.class.getName()}, new String[] {"value"},
 			false);
-
-		_setClassNameUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setClassNameUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(ClassNameImpl.class.getName());
-	}
-
-	private void _setClassNameUtilPersistence(
-		ClassNamePersistence classNamePersistence) {
-
-		try {
-			Field field = ClassNameUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, classNamePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_CLASSNAME =

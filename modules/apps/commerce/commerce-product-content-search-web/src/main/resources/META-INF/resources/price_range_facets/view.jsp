@@ -74,10 +74,6 @@ CPPriceRangeFacetsDisplayContext cpPriceRangeFacetsDisplayContext = (CPPriceRang
 								<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= facet.getFieldName() %>" />
 								<aui:input cssClass="start-parameter-name" name="start-parameter-name" type="hidden" value="<%= cpPriceRangeFacetsDisplayContext.getPaginationStartParameterName() %>" />
 
-								<c:if test="<%= cpPriceRangeFacetsDisplayContext.isShowClear(facet.getFieldName()) %>">
-									<aui:button cssClass="btn-link btn-unstyled facet-clear-btn" onClick="Liferay.Search.FacetUtil.clearSelections(event);" value="clear" />
-								</c:if>
-
 								<aui:fieldset>
 									<ul class="list-unstyled">
 
@@ -136,22 +132,49 @@ CPPriceRangeFacetsDisplayContext cpPriceRangeFacetsDisplayContext = (CPPriceRang
 						<aui:input cssClass="price-range-input" label="<%= StringPool.BLANK %>" name="maximum" prefix="<%= HtmlUtil.escape(cpPriceRangeFacetsDisplayContext.getCurrentCommerceCurrencySymbol()) %>" type="number" value="<%= max %>" wrapperCssClass="col-md-5 price-range-input-wrapper" />
 
 						<div class="col-md-3 ml-2 p-0">
-							<button class="btn btn-secondary price-range-btn" id="<portlet:namespace />priceRangeButton"><liferay-ui:message key="go" /></button>
+							<button class="btn btn-secondary price-range-btn" onclick="<%= liferayPortletResponse.getNamespace() + "submitPriceRange();" %>"><liferay-ui:message key="go" /></button>
 						</div>
 					</div>
+
+					<aui:script>
+						Liferay.provide(window, '<portlet:namespace />submitPriceRange', () => {
+							var max = document.getElementById('<portlet:namespace />maximum').value;
+
+							if (max == '') {
+								max = <%= Double.MAX_VALUE %>;
+							}
+
+							var min = document.getElementById('<portlet:namespace />minimum').value;
+
+							if (min == '' || min < 0) {
+								min = 0;
+							}
+
+							if (Number(min) > Number(max)) {
+								var tempMin = max;
+								max = min;
+								min = tempMin;
+							}
+
+							var url = new URL(window.location.href);
+
+							var queryString = url.search;
+
+							var searchParams = new URLSearchParams(queryString);
+
+							searchParams.set('basePrice', '[ ' + min + ' TO ' + max + ' ]');
+							searchParams.set('max', max);
+							searchParams.set('min', min);
+
+							url.search = searchParams;
+
+							window.location.href = url.toString();
+						});
+					</aui:script>
 				</c:if>
 			</liferay-ui:panel>
 		</liferay-ui:panel-container>
+
+		<aui:script use="liferay-search-facet-util"></aui:script>
 	</c:otherwise>
 </c:choose>
-
-<aui:script use="liferay-search-facet-util" />
-
-<liferay-frontend:component
-	context='<%=
-		HashMapBuilder.<String, Object>put(
-			"maxValue", Double.MAX_VALUE
-		).build()
-	%>'
-	module="js/price_range_facets/view"
-/>

@@ -12,82 +12,50 @@
  * details.
  */
 
-import {TreeView as ClayTreeView} from '@clayui/core';
-import ClayIcon from '@clayui/icon';
-import {navigate} from 'frontend-js-web';
+import {Treeview} from 'frontend-js-components-web';
 import React from 'react';
+
+function findCategory(categoryId, categories = []) {
+	// eslint-disable-next-line no-for-of-loops/no-for-of-loops
+	for (const category of categories) {
+		if (category.id === categoryId) {
+			return category;
+		}
+
+		const childrenCategory = findCategory(categoryId, category.children);
+
+		if (childrenCategory) {
+			return childrenCategory;
+		}
+	}
+
+	return null;
+}
 
 const AssetCategoriesNavigationTreeView = ({
 	selectedCategoryId,
 	vocabularies,
 }) => {
-	const handleSelectionChange = (item) => {
-		if (selectedCategoryId === item.id) {
-			return;
-		}
+	const handleSelectionChange = ([selectedNodeId]) => {
+		if (selectedNodeId && selectedCategoryId !== selectedNodeId) {
+			const category = findCategory(selectedNodeId, vocabularies);
 
-		navigate(item.url);
-	};
-
-	const onClick = (event, item, expand) => {
-		event.preventDefault();
-
-		if (item.disabled) {
-			expand.toggle(item.id);
-
-			return;
-		}
-
-		handleSelectionChange(item);
-	};
-
-	const onKeyUp = (event, item) => {
-		if (event.key === ' ' || event.key === 'Enter') {
-			event.preventDefault();
-
-			handleSelectionChange(item);
+			if (category) {
+				Liferay.Util.navigate(category.url);
+			}
 		}
 	};
 
 	return (
-		<ClayTreeView
-			defaultItems={vocabularies}
-			defaultSelectedKeys={
-				new Set(selectedCategoryId ? [selectedCategoryId] : [])
+		<Treeview
+			NodeComponent={Treeview.Card}
+			initialSelectedNodeIds={
+				selectedCategoryId ? [selectedCategoryId] : []
 			}
-			showExpanderOnHover={false}
-		>
-			{(item, expand) => (
-				<ClayTreeView.Item>
-					<ClayTreeView.ItemStack
-						onClick={(event) => onClick(event, item, expand)}
-						onKeyDownCapture={(event) => {
-							if (event.key === ' ' && item.disabled) {
-								event.stopPropagation();
-							}
-						}}
-						onKeyUp={(event) => onKeyUp(event, item)}
-					>
-						<ClayIcon symbol={item.icon} />
-
-						{item.name}
-					</ClayTreeView.ItemStack>
-
-					<ClayTreeView.Group items={item.children}>
-						{(item) => (
-							<ClayTreeView.Item
-								onClick={(event) => onClick(event, item)}
-								onKeyUp={(event) => onKeyUp(event, item)}
-							>
-								<ClayIcon symbol={item.icon} />
-
-								{item.name}
-							</ClayTreeView.Item>
-						)}
-					</ClayTreeView.Group>
-				</ClayTreeView.Item>
-			)}
-		</ClayTreeView>
+			multiSelection={false}
+			nodes={vocabularies}
+			onSelectedNodesChange={handleSelectionChange}
+		/>
 	);
 };
 

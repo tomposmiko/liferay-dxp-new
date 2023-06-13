@@ -26,10 +26,7 @@ if (Validator.isNotNull(description)) {
 Summary summary = new Summary(wikiPage.getTitle(), description);
 
 summary.setEscape(true);
-summary.setHighlight(wikiPortletInstanceSettingsHelper.isEnableHighlighting());
-
-Hits hits = wikiSearchDisplayContext.getHits();
-
+summary.setHighlight(queryConfig.isHighlightEnabled());
 summary.setQueryTerms(hits.getQueryTerms());
 %>
 
@@ -61,7 +58,7 @@ summary.setQueryTerms(hits.getQueryTerms());
 
 			summary = fileEntryRelatedSearchResult.getSummary();
 
-			summary.setHighlight(wikiPortletInstanceSettingsHelper.isEnableHighlighting());
+			summary.setHighlight(queryConfig.isHighlightEnabled());
 			summary.setQueryTerms(hits.getQueryTerms());
 		%>
 
@@ -112,7 +109,7 @@ summary.setQueryTerms(hits.getQueryTerms());
 
 			summary = commentRelatedSearchResult.getSummary();
 
-			summary.setHighlight(wikiPortletInstanceSettingsHelper.isEnableHighlighting());
+			summary.setHighlight(queryConfig.isHighlightEnabled());
 			summary.setQueryTerms(hits.getQueryTerms());
 		%>
 

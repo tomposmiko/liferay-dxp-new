@@ -65,7 +65,9 @@ public final class BatchOperation extends BaseOperation {
 
 		Node node = updates.getDomNode();
 
-		node.appendChild(XMLUtil.toNode(node.getOwnerDocument(), batch));
+		for (Node childNode : XMLUtil.toNodes(node.getOwnerDocument(), batch)) {
+			node.appendChild(childNode);
+		}
 
 		return updateListItemsDocument;
 	}

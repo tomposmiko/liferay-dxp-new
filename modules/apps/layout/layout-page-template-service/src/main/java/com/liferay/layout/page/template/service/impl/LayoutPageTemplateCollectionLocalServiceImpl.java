@@ -22,8 +22,6 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
 import com.liferay.layout.page.template.service.base.LayoutPageTemplateCollectionLocalServiceBaseImpl;
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
-import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -64,7 +62,7 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		_validate(groupId, name);
+		validate(groupId, name);
 
 		long layoutPageTemplateId = counterLocalService.increment();
 
@@ -104,7 +102,7 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 			LayoutPageTemplateCollection layoutPageTemplateCollection)
 		throws PortalException {
 
-		// Layout page template collection
+		/// Layout page template collection
 
 		layoutPageTemplateCollectionPersistence.remove(
 			layoutPageTemplateCollection);
@@ -161,14 +159,6 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 	}
 
 	@Override
-	public LayoutPageTemplateCollection fetchLayoutPageTemplateCollectionByName(
-		long groupId, String name) {
-
-		return layoutPageTemplateCollectionPersistence.fetchByG_N(
-			groupId, name);
-	}
-
-	@Override
 	public List<LayoutPageTemplateCollection> getLayoutPageTemplateCollections(
 		long groupId, int start, int end) {
 
@@ -196,27 +186,7 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 		}
 
 		return layoutPageTemplateCollectionPersistence.findByG_LikeN(
-			groupId, _customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
-			start, end, orderByComparator);
-	}
-
-	@Override
-	public int getLayoutPageTemplateCollectionsCount(long groupId) {
-		return layoutPageTemplateCollectionPersistence.countByGroupId(groupId);
-	}
-
-	@Override
-	public int getLayoutPageTemplateCollectionsCount(
-		long groupId, String name) {
-
-		if (Validator.isNull(name)) {
-			return layoutPageTemplateCollectionPersistence.countByGroupId(
-				groupId);
-		}
-
-		return layoutPageTemplateCollectionPersistence.countByG_LikeN(
-			groupId,
-			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0]);
+			groupId, name, start, end, orderByComparator);
 	}
 
 	@Override
@@ -230,18 +200,37 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 				layoutPageTemplateCollectionId);
 
 		if (!Objects.equals(layoutPageTemplateCollection.getName(), name)) {
-			_validate(layoutPageTemplateCollection.getGroupId(), name);
+			validate(layoutPageTemplateCollection.getGroupId(), name);
 		}
 
 		layoutPageTemplateCollection.setModifiedDate(new Date());
-		layoutPageTemplateCollection.setLayoutPageTemplateCollectionKey(
-			_generateLayoutPageTemplateCollectionKey(
-				layoutPageTemplateCollection.getGroupId(), name));
 		layoutPageTemplateCollection.setName(name);
 		layoutPageTemplateCollection.setDescription(description);
 
 		return layoutPageTemplateCollectionPersistence.update(
 			layoutPageTemplateCollection);
+	}
+
+	protected void validate(long groupId, String name) throws PortalException {
+		if (Validator.isNull(name)) {
+			throw new LayoutPageTemplateCollectionNameException(
+				"Name must not be null for group " + groupId);
+		}
+
+		int nameMaxLength = ModelHintsUtil.getMaxLength(
+			LayoutPageTemplateEntry.class.getName(), "name");
+
+		if (name.length() > nameMaxLength) {
+			throw new LayoutPageTemplateCollectionNameException(
+				"Maximum length of name exceeded");
+		}
+
+		LayoutPageTemplateCollection layoutPageTemplateCollection =
+			layoutPageTemplateCollectionPersistence.fetchByG_N(groupId, name);
+
+		if (layoutPageTemplateCollection != null) {
+			throw new DuplicateLayoutPageTemplateCollectionException(name);
+		}
 	}
 
 	private String _generateLayoutPageTemplateCollectionKey(
@@ -270,31 +259,6 @@ public class LayoutPageTemplateCollectionLocalServiceImpl
 				curLayoutPageTemplateCollectionKey + CharPool.DASH + count++;
 		}
 	}
-
-	private void _validate(long groupId, String name) throws PortalException {
-		if (Validator.isNull(name)) {
-			throw new LayoutPageTemplateCollectionNameException(
-				"Name must not be null for group " + groupId);
-		}
-
-		int nameMaxLength = ModelHintsUtil.getMaxLength(
-			LayoutPageTemplateEntry.class.getName(), "name");
-
-		if (name.length() > nameMaxLength) {
-			throw new LayoutPageTemplateCollectionNameException(
-				"Maximum length of name exceeded");
-		}
-
-		LayoutPageTemplateCollection layoutPageTemplateCollection =
-			layoutPageTemplateCollectionPersistence.fetchByG_N(groupId, name);
-
-		if (layoutPageTemplateCollection != null) {
-			throw new DuplicateLayoutPageTemplateCollectionException(name);
-		}
-	}
-
-	@Reference
-	private CustomSQL _customSQL;
 
 	@Reference
 	private LayoutPageTemplateEntryLocalService

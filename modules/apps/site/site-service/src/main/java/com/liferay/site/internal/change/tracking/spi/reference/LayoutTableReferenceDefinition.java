@@ -84,26 +84,6 @@ public class LayoutTableReferenceDefinition
 								PortletConstants.LAYOUT_SEPARATOR + "%")))
 				)
 			)
-		).referenceInnerJoin(
-			fromStep -> {
-				LayoutTable aliasLayoutTable = LayoutTable.INSTANCE.as(
-					"aliasLayoutTable");
-
-				return fromStep.from(
-					aliasLayoutTable
-				).innerJoinON(
-					LayoutTable.INSTANCE,
-					LayoutTable.INSTANCE.plid.eq(aliasLayoutTable.classPK)
-				).innerJoinON(
-					ClassNameTable.INSTANCE,
-					ClassNameTable.INSTANCE.value.eq(
-						Layout.class.getName()
-					).and(
-						aliasLayoutTable.classNameId.eq(
-							ClassNameTable.INSTANCE.classNameId)
-					)
-				);
-			}
 		).assetEntryReference(
 			LayoutTable.INSTANCE.plid, Layout.class
 		).resourcePermissionReference(
@@ -134,13 +114,26 @@ public class LayoutTableReferenceDefinition
 				).innerJoinON(
 					LayoutTable.INSTANCE,
 					LayoutTable.INSTANCE.parentLayoutId.eq(
-						aliasLayoutTable.layoutId
+						aliasLayoutTable.layoutId)
+				);
+			}
+		).referenceInnerJoin(
+			fromStep -> {
+				LayoutTable aliasLayoutTable = LayoutTable.INSTANCE.as(
+					"aliasLayoutTable");
+
+				return fromStep.from(
+					aliasLayoutTable
+				).innerJoinON(
+					LayoutTable.INSTANCE,
+					LayoutTable.INSTANCE.classPK.eq(aliasLayoutTable.plid)
+				).innerJoinON(
+					ClassNameTable.INSTANCE,
+					ClassNameTable.INSTANCE.value.eq(
+						Layout.class.getName()
 					).and(
-						LayoutTable.INSTANCE.groupId.eq(
-							aliasLayoutTable.groupId)
-					).and(
-						LayoutTable.INSTANCE.privateLayout.eq(
-							aliasLayoutTable.privateLayout)
+						LayoutTable.INSTANCE.classNameId.eq(
+							ClassNameTable.INSTANCE.classNameId)
 					)
 				);
 			}

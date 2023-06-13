@@ -229,9 +229,7 @@ public class PoshiGetterUtil {
 		if (element instanceof PoshiElement) {
 			PoshiElement poshiElement = (PoshiElement)element;
 
-			if (!poshiElement.isPoshiProse()) {
-				return poshiElement.getPoshiScriptLineNumber();
-			}
+			return poshiElement.getPoshiScriptLineNumber();
 		}
 
 		String lineNumber = element.attributeValue("line-number");
@@ -244,8 +242,8 @@ public class PoshiGetterUtil {
 	}
 
 	public static Object getMethodReturnValue(
-			String testNamespacedCommandName, List<String> args,
-			String className, String methodName, Object object)
+			List<String> args, String className, String methodName,
+			Object object)
 		throws Exception {
 
 		if (!className.equals("selenium")) {
@@ -269,20 +267,18 @@ public class PoshiGetterUtil {
 
 			Object parameter = null;
 
-			PoshiVariablesContext poshiVariablesContext =
-				PoshiVariablesContext.getPoshiVariablesContext(
-					testNamespacedCommandName);
-
 			if (matcher.matches()) {
-				parameter = poshiVariablesContext.getValueFromCommandMap(
+				parameter = PoshiVariablesUtil.getValueFromCommandMap(
 					matcher.group(1));
 			}
 			else {
-				parameter = poshiVariablesContext.replaceCommandVars(arg);
+				parameter = PoshiVariablesUtil.replaceCommandVars(arg);
 			}
 
-			if (className.endsWith("MathUtil")) {
-				parameter = GetterUtil.getLong(parameter);
+			if (className.endsWith("MathUtil") &&
+				(parameter instanceof String)) {
+
+				parameter = GetterUtil.getInteger((String)parameter);
 			}
 			else if (className.endsWith("StringUtil")) {
 				parameter = String.valueOf(parameter);
@@ -315,7 +311,7 @@ public class PoshiGetterUtil {
 			String namespace = matcher.group("namespace");
 
 			if (Validator.isNull(namespace)) {
-				namespace = PoshiContext.getDefaultNamespace();
+				namespace = PoshiStackTraceUtil.getCurrentNamespace();
 			}
 
 			String className = matcher.group("className");
@@ -337,7 +333,7 @@ public class PoshiGetterUtil {
 			String namespace = matcher.group("namespace");
 
 			if (Validator.isNull(namespace)) {
-				return null;
+				namespace = PoshiStackTraceUtil.getCurrentNamespace();
 			}
 
 			return namespace;
@@ -357,7 +353,7 @@ public class PoshiGetterUtil {
 			String namespace = matcher.group("namespace");
 
 			if (Validator.isNull(namespace)) {
-				namespace = PoshiContext.getDefaultNamespace();
+				namespace = PoshiStackTraceUtil.getCurrentNamespace();
 			}
 
 			return namespace;
@@ -378,13 +374,11 @@ public class PoshiGetterUtil {
 	public static Element getRootElementFromURL(URL url, boolean addLineNumbers)
 		throws Exception {
 
-		String filePath = url.getFile();
-
-		if (filePath.endsWith(".path")) {
-			Dom4JUtil.validateDocument(url);
-
+		if (Dom4JUtil.isValidDocument(url)) {
 			return _preparePoshiXMLElement(url, addLineNumbers);
 		}
+
+		String filePath = url.getFile();
 
 		if (filePath.endsWith(".function") || filePath.endsWith(".macro") ||
 			filePath.endsWith(".testcase")) {
@@ -401,15 +395,9 @@ public class PoshiGetterUtil {
 			PoshiProseDefinition poshiProseDefinition =
 				new PoshiProseDefinition(url);
 
-			PoshiElement poshiElement =
-				(PoshiElement)PoshiNodeFactory.newPoshiNode(
-					_preparePoshiXMLElement(
-						url, Dom4JUtil.format(poshiProseDefinition.toElement()),
-						addLineNumbers));
-
-			poshiElement.setFilePathURL(url);
-
-			return poshiElement;
+			return _preparePoshiXMLElement(
+				url, Dom4JUtil.format(poshiProseDefinition.toElement()),
+				addLineNumbers);
 		}
 
 		throw new Exception("Unable to parse Poshi file: " + filePath);

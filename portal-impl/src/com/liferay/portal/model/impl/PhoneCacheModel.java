@@ -76,12 +76,10 @@ public class PhoneCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", phoneId=");
@@ -104,8 +102,8 @@ public class PhoneCacheModel
 		sb.append(number);
 		sb.append(", extension=");
 		sb.append(extension);
-		sb.append(", listTypeId=");
-		sb.append(listTypeId);
+		sb.append(", typeId=");
+		sb.append(typeId);
 		sb.append(", primary=");
 		sb.append(primary);
 		sb.append("}");
@@ -118,7 +116,6 @@ public class PhoneCacheModel
 		PhoneImpl phoneImpl = new PhoneImpl();
 
 		phoneImpl.setMvccVersion(mvccVersion);
-		phoneImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			phoneImpl.setUuid("");
@@ -169,7 +166,7 @@ public class PhoneCacheModel
 			phoneImpl.setExtension(extension);
 		}
 
-		phoneImpl.setListTypeId(listTypeId);
+		phoneImpl.setTypeId(typeId);
 		phoneImpl.setPrimary(primary);
 
 		phoneImpl.resetOriginalValues();
@@ -180,8 +177,6 @@ public class PhoneCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
-
-		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		phoneId = objectInput.readLong();
@@ -199,7 +194,7 @@ public class PhoneCacheModel
 		number = objectInput.readUTF();
 		extension = objectInput.readUTF();
 
-		listTypeId = objectInput.readLong();
+		typeId = objectInput.readLong();
 
 		primary = objectInput.readBoolean();
 	}
@@ -207,8 +202,6 @@ public class PhoneCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -251,13 +244,12 @@ public class PhoneCacheModel
 			objectOutput.writeUTF(extension);
 		}
 
-		objectOutput.writeLong(listTypeId);
+		objectOutput.writeLong(typeId);
 
 		objectOutput.writeBoolean(primary);
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public String uuid;
 	public long phoneId;
 	public long companyId;
@@ -269,7 +261,7 @@ public class PhoneCacheModel
 	public long classPK;
 	public String number;
 	public String extension;
-	public long listTypeId;
+	public long typeId;
 	public boolean primary;
 
 }

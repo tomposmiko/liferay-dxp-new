@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.internal.upgrade.v2_6_0;
 
+import com.liferay.fragment.internal.upgrade.v2_6_0.util.FragmentEntryTable;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
@@ -29,14 +30,14 @@ public class FragmentEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeSchema();
+		upgradeSchema();
 
-		_upgradeFragmentEntryCounter();
-		_upgradeFragmentEntryHeadIdAndHeadStatusApproved();
-		_upgradeFragmentEntryHeadIdAndHeadStatusDraft();
+		upgradeFragmentEntryCounter();
+		upgradeFragmentEntryHeadIdAndHeadStatusApproved();
+		upgradeFragmentEntryHeadIdAndHeadStatusDraft();
 	}
 
-	private void _upgradeFragmentEntryCounter() throws Exception {
+	protected void upgradeFragmentEntryCounter() throws Exception {
 		runSQL(
 			StringBundler.concat(
 				"insert into Counter (name, currentId) select '",
@@ -44,7 +45,7 @@ public class FragmentEntryUpgradeProcess extends UpgradeProcess {
 				"', max(fragmentEntryId) from FragmentEntry"));
 	}
 
-	private void _upgradeFragmentEntryHeadIdAndHeadStatusApproved()
+	protected void upgradeFragmentEntryHeadIdAndHeadStatusApproved()
 		throws Exception {
 
 		try (Statement s = connection.createStatement()) {
@@ -57,7 +58,7 @@ public class FragmentEntryUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _upgradeFragmentEntryHeadIdAndHeadStatusDraft()
+	protected void upgradeFragmentEntryHeadIdAndHeadStatusDraft()
 		throws Exception {
 
 		try (Statement s = connection.createStatement()) {
@@ -70,9 +71,10 @@ public class FragmentEntryUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _upgradeSchema() throws Exception {
-		alterTableAddColumn("FragmentEntry", "headId", "LONG");
-		alterTableAddColumn("FragmentEntry", "head", "BOOLEAN");
+	protected void upgradeSchema() throws Exception {
+		alter(
+			FragmentEntryTable.class, new AlterTableAddColumn("headId", "LONG"),
+			new AlterTableAddColumn("head", "BOOLEAN"));
 	}
 
 }

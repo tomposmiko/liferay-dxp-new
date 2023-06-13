@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Drew Brokke
  */
-@Component(service = AccountEntryGroupSettings.class)
+@Component(immediate = true, service = AccountEntryGroupSettings.class)
 public class AccountEntryGroupSettingsImpl
 	implements AccountEntryGroupSettings, ConfigurationModelListener {
 
@@ -45,7 +45,7 @@ public class AccountEntryGroupSettingsImpl
 			return accountEntryGroupConfiguration.allowedTypes();
 		}
 		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
+			_log.error(configurationException, configurationException);
 		}
 
 		return AccountConstants.ACCOUNT_ENTRY_TYPES_DEFAULT_ALLOWED_TYPES;

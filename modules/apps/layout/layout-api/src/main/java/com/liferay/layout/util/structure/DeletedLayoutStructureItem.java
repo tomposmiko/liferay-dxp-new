@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -30,8 +31,7 @@ public class DeletedLayoutStructureItem {
 	public static DeletedLayoutStructureItem of(JSONObject jsonObject) {
 		if (jsonObject == null) {
 			return new DeletedLayoutStructureItem(
-				StringPool.BLANK, Collections.emptyList(), 0,
-				Collections.emptySet());
+				StringPool.BLANK, Collections.emptyList());
 		}
 
 		return new DeletedLayoutStructureItem(
@@ -39,6 +39,16 @@ public class DeletedLayoutStructureItem {
 			JSONUtil.toStringList(jsonObject.getJSONArray("portletIds")),
 			jsonObject.getInt("position"),
 			JSONUtil.toStringSet(jsonObject.getJSONArray("childrenItemIds")));
+	}
+
+	public DeletedLayoutStructureItem(String itemId, List<String> portletIds) {
+		this(itemId, portletIds, 0, Collections.emptySet());
+	}
+
+	public DeletedLayoutStructureItem(
+		String itemId, List<String> portletIds, int position) {
+
+		this(itemId, portletIds, position, Collections.emptySet());
 	}
 
 	public DeletedLayoutStructureItem(
@@ -49,6 +59,24 @@ public class DeletedLayoutStructureItem {
 		_portletIds = portletIds;
 		_position = position;
 		_childrenItemIds = childrenItemIds;
+	}
+
+	public boolean contains(String portletId) {
+		if (_portletIds.contains(portletId)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean containsItemId(String itemId) {
+		if (Objects.equals(itemId, _itemId) ||
+			_childrenItemIds.contains(itemId)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public Set<String> getChildrenItemIds() {

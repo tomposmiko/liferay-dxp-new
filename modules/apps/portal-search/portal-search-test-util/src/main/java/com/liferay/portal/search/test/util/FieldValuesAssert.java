@@ -19,8 +19,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
-import com.liferay.portal.search.hits.SearchHit;
-import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.searcher.SearchResponse;
 
 import java.util.ArrayList;
@@ -32,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author André de Oliveira
@@ -62,7 +62,9 @@ public class FieldValuesAssert {
 		Map<String, String> expectedFieldValuesMap = _toStringValuesMap(
 			expected);
 
-		List<Document> documents = searchResponse.getDocuments();
+		Stream<Document> stream = searchResponse.getDocumentsStream();
+
+		List<Document> documents = stream.collect(Collectors.toList());
 
 		if (documents.size() == 1) {
 			Map<String, String> actualFieldValuesMap = _toFieldValuesMap(
@@ -70,15 +72,6 @@ public class FieldValuesAssert {
 
 			Map<String, String> filteredFieldValuesMap = _filterOnKey(
 				actualFieldValuesMap, keysPredicate);
-
-			Map<String, Object> sourcesMap = _getSourcesMap(searchResponse);
-
-			for (String key : filteredFieldValuesMap.keySet()) {
-				if (key.endsWith("_sortable") && sourcesMap.containsKey(key)) {
-					filteredFieldValuesMap.put(
-						key, _toObjectString(sourcesMap.get(key)));
-				}
-			}
 
 			AssertUtils.assertEquals(
 				() -> StringBundler.concat(
@@ -158,33 +151,20 @@ public class FieldValuesAssert {
 	}
 
 	private static Map<String, String> _filterOnKey(
-		Map<String, String> map1, Predicate<String> predicate) {
+		Map<String, String> map, Predicate<String> predicate) {
 
 		if (predicate == null) {
-			return map1;
+			return map;
 		}
 
-		Map<String, String> map2 = new HashMap<>();
+		Stream<Map.Entry<String, String>> stream = SearchStreamUtil.stream(
+			map.entrySet());
 
-		for (Map.Entry<String, String> entry : map1.entrySet()) {
-			if (predicate.test(entry.getKey())) {
-				map2.put(entry.getKey(), entry.getValue());
-			}
-		}
-
-		return map2;
-	}
-
-	private static Map<String, Object> _getSourcesMap(
-		SearchResponse searchResponse) {
-
-		SearchHits searchHits = searchResponse.getSearchHits();
-
-		List<SearchHit> searchHitsList = searchHits.getSearchHits();
-
-		SearchHit searchHit = searchHitsList.get(0);
-
-		return searchHit.getSourcesMap();
+		return stream.filter(
+			entry -> predicate.test(entry.getKey())
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
 	}
 
 	private static <E> List<E> _sort(List<E> list) {
@@ -264,13 +244,13 @@ public class FieldValuesAssert {
 	private static <T> Map<String, String> _toStringValuesMap(
 		Map<String, T> map, Function<T, String> function) {
 
-		Map<String, String> stringValues = new HashMap<>();
+		Stream<Map.Entry<String, T>> stream = SearchStreamUtil.stream(
+			map.entrySet());
 
-		for (Map.Entry<String, T> entry : map.entrySet()) {
-			stringValues.put(entry.getKey(), function.apply(entry.getValue()));
-		}
-
-		return stringValues;
+		return stream.collect(
+			Collectors.toMap(
+				entry -> entry.getKey(),
+				entry -> function.apply(entry.getValue())));
 	}
 
 }

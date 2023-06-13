@@ -50,7 +50,6 @@ export default function SingleTransitionModal() {
 			title: '',
 			transitionName: '',
 		});
-		window.location.reload();
 	};
 
 	const {observer, onClose} = useModal({
@@ -62,37 +61,37 @@ export default function SingleTransitionModal() {
 			fetchData();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [visibleModal]);
+	}, [fetchData, visibleModal]);
 
 	const taskId = data?.items?.[0].id;
 
 	const {postData} = usePost({
 		admin: true,
 		body: {comment, transitionName, workflowTaskId: taskId},
-		callback: () => {
-			toaster.success(
-				Liferay.Language.get(
-					'the-selected-step-has-transitioned-successfully'
-				)
-			);
-
-			onCloseModal(true);
-		},
 		url: `/workflow-tasks/${taskId}/change-transition`,
 	});
 
 	const handleDone = useCallback(() => {
 		setErrorToast(false);
-		postData().catch(() => {
-			setErrorToast(
-				`${Liferay.Language.get(
-					'your-request-has-failed'
-				)} ${Liferay.Language.get('select-done-to-retry')}`
-			);
-		});
+		postData()
+			.then(() => {
+				toaster.success(
+					Liferay.Language.get(
+						'the-selected-step-has-transitioned-successfully'
+					)
+				);
 
+				onCloseModal(true);
+			})
+			.catch(() => {
+				setErrorToast(
+					`${Liferay.Language.get(
+						'your-request-has-failed'
+					)} ${Liferay.Language.get('select-done-to-retry')}`
+				);
+			});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [toaster]);
+	}, [postData]);
 
 	return (
 		<>
@@ -114,7 +113,6 @@ export default function SingleTransitionModal() {
 						<label htmlFor="commentTextArea">
 							{Liferay.Language.get('comment')}
 						</label>
-
 						<ClayInput
 							component="textarea"
 							id="commentTextArea"

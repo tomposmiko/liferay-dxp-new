@@ -42,15 +42,16 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = ObjectDefinitionDeployer.class)
+@Component(
+	enabled = false, immediate = true, service = ObjectDefinitionDeployer.class
+)
 public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	@Override
 	public List<ServiceRegistration<?>> deploy(
 		ObjectDefinition objectDefinition) {
 
-		if (objectDefinition.isUnmodifiableSystemObject() ||
-			Objects.equals(
+		if (Objects.equals(
 				objectDefinition.getScope(),
 				ObjectDefinitionConstants.SCOPE_COMPANY)) {
 
@@ -62,7 +63,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				CommerceNotificationType.class,
 				new ObjectDefinitionCommerceNotificationType(
 					"create", objectDefinition.getClassName() + "#create",
-					objectDefinition.getShortName()),
+					objectDefinition.getName()),
 				HashMapDictionaryBuilder.put(
 					"commerce.notification.type.key",
 					objectDefinition.getClassName() + "#create"
@@ -71,7 +72,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				CommerceNotificationType.class,
 				new ObjectDefinitionCommerceNotificationType(
 					"delete", objectDefinition.getClassName() + "#delete",
-					objectDefinition.getShortName()),
+					objectDefinition.getName()),
 				HashMapDictionaryBuilder.put(
 					"commerce.notification.type.key",
 					objectDefinition.getClassName() + "#delete"
@@ -80,7 +81,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				CommerceNotificationType.class,
 				new ObjectDefinitionCommerceNotificationType(
 					"update", objectDefinition.getClassName() + "#update",
-					objectDefinition.getShortName()),
+					objectDefinition.getName()),
 				HashMapDictionaryBuilder.put(
 					"commerce.notification.type.key",
 					objectDefinition.getClassName() + "#update"
@@ -105,9 +106,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 			_bundleContext.registerService(
 				CommerceDefinitionTermContributor.class,
 				new ObjectRecipientCommerceDefinitionTermContributor(
-					objectDefinition.getObjectDefinitionId(),
-					_objectFieldLocalService, _userGroupLocalService,
-					_userLocalService),
+					_userGroupLocalService, _userLocalService),
 				HashMapDictionaryBuilder.<String, Object>put(
 					"commerce.definition.term.contributor.key",
 					CommerceDefinitionTermConstants.

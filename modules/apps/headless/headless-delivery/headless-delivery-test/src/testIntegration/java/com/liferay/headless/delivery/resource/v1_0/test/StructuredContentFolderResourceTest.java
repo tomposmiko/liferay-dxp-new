@@ -15,11 +15,9 @@
 package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.headless.delivery.client.dto.v1_0.StructuredContentFolder;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import org.junit.runner.RunWith;
 
@@ -38,40 +36,6 @@ public class StructuredContentFolderResourceTest
 	@Override
 	protected String[] getIgnoredEntityFieldNames() {
 		return new String[] {"creatorId"};
-	}
-
-	@Override
-	protected StructuredContentFolder
-			testDeleteAssetLibraryStructuredContentFolderByExternalReferenceCode_addStructuredContentFolder()
-		throws Exception {
-
-		return testPostAssetLibraryStructuredContentFolder_addStructuredContentFolder(
-			randomStructuredContentFolder());
-	}
-
-	@Override
-	protected Long
-			testDeleteAssetLibraryStructuredContentFolderByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
-	}
-
-	@Override
-	protected StructuredContentFolder
-			testGetAssetLibraryStructuredContentFolderByExternalReferenceCode_addStructuredContentFolder()
-		throws Exception {
-
-		return testPostAssetLibraryStructuredContentFolder_addStructuredContentFolder(
-			randomStructuredContentFolder());
-	}
-
-	@Override
-	protected Long
-			testGetAssetLibraryStructuredContentFolderByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
 	}
 
 	@Override
@@ -94,79 +58,6 @@ public class StructuredContentFolderResourceTest
 			testGroup.getGroupId(), RandomTestUtil.randomString());
 
 		return journalFolder.getFolderId();
-	}
-
-	@Override
-	protected StructuredContentFolder
-			testGraphQLGetAssetLibraryStructuredContentFolderByExternalReferenceCode_addStructuredContentFolder()
-		throws Exception {
-
-		return testGetAssetLibraryStructuredContentFolderByExternalReferenceCode_addStructuredContentFolder();
-	}
-
-	@Override
-	protected Long
-			testGraphQLGetAssetLibraryStructuredContentFolderByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
-	}
-
-	@Override
-	protected StructuredContentFolder
-			testPutAssetLibraryStructuredContentFolderByExternalReferenceCode_addStructuredContentFolder()
-		throws Exception {
-
-		return testPostAssetLibraryStructuredContentFolder_addStructuredContentFolder(
-			randomStructuredContentFolder());
-	}
-
-	@Override
-	protected StructuredContentFolder
-			testPutAssetLibraryStructuredContentFolderByExternalReferenceCode_createStructuredContentFolder()
-		throws Exception {
-
-		return _randomStructuredContentFolder();
-	}
-
-	@Override
-	protected Long
-			testPutAssetLibraryStructuredContentFolderByExternalReferenceCode_getAssetLibraryId()
-		throws Exception {
-
-		return testDepotEntry.getDepotEntryId();
-	}
-
-	@Override
-	protected StructuredContentFolder
-			testPutSiteStructuredContentFolderByExternalReferenceCode_createStructuredContentFolder()
-		throws Exception {
-
-		return _randomStructuredContentFolder();
-	}
-
-	private StructuredContentFolder _randomStructuredContentFolder()
-		throws Exception {
-
-		return new StructuredContentFolder() {
-			{
-				assetLibraryKey = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				dateCreated = RandomTestUtil.nextDate();
-				dateModified = RandomTestUtil.nextDate();
-				description = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				externalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				id = RandomTestUtil.randomLong();
-				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				numberOfStructuredContentFolders = RandomTestUtil.randomInt();
-				numberOfStructuredContents = RandomTestUtil.randomInt();
-				parentStructuredContentFolderId = 0L;
-				siteId = testGroup.getGroupId();
-				subscribed = RandomTestUtil.randomBoolean();
-			}
-		};
 	}
 
 }

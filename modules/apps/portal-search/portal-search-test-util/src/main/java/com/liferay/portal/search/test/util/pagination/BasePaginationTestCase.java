@@ -15,10 +15,18 @@
 package com.liferay.portal.search.test.util.pagination;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
+
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +49,8 @@ public abstract class BasePaginationTestCase extends BaseIndexingTestCase {
 			addDocument(
 				DocumentCreationHelpers.singleText(
 					"test-field",
-					StringUtil.toLowerCase(testName.getMethodName())));
+					RandomTestUtil.randomString(
+						UniqueStringRandomizerBumper.INSTANCE)));
 		}
 	}
 
@@ -129,22 +138,25 @@ public abstract class BasePaginationTestCase extends BaseIndexingTestCase {
 	private void _assertPagination(int start, int end, int expectedSize)
 		throws Exception {
 
-		assertSearch(
-			indexingTestHelper -> {
-				indexingTestHelper.define(
-					searchContext -> {
-						searchContext.setEnd(end);
-						searchContext.setStart(start);
-					});
+		IdempotentRetryAssert.retryAssert(
+			3, TimeUnit.SECONDS,
+			() -> {
+				IndexSearcher indexSearcher = getIndexSearcher();
 
-				indexingTestHelper.setQuery(getDefaultQuery());
+				SearchContext searchContext = _createSearchContext(start, end);
+
+				Hits hits = indexSearcher.search(
+					searchContext, getDefaultQuery());
 
 				Assert.assertEquals(
-					_TOTAL_DOCUMENTS, indexingTestHelper.searchCount());
+					hits.toString(), _TOTAL_DOCUMENTS, hits.getLength());
 
-				indexingTestHelper.search();
+				Document[] documents = hits.getDocs();
 
-				indexingTestHelper.assertResultCount(expectedSize);
+				Assert.assertEquals(
+					Arrays.toString(documents), expectedSize, documents.length);
+
+				return null;
 			});
 	}
 

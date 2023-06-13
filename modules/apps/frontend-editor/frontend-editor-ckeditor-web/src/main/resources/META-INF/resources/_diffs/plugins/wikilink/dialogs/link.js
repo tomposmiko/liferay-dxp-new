@@ -13,21 +13,21 @@
  */
 
 CKEDITOR.dialog.add('link', (editor) => {
-	const LANG_COMMON = editor.lang.common;
+	var LANG_COMMON = editor.lang.common;
 
-	const LANG_LINK = editor.lang.link;
+	var LANG_LINK = editor.lang.link;
 
-	const PLUGIN = CKEDITOR.plugins.link;
+	var PLUGIN = CKEDITOR.plugins.link;
 
-	const parseLink = function (editor, element) {
-		const instance = this;
+	var parseLink = function (editor, element) {
+		var instance = this;
 
-		const data = {
+		var data = {
 			address: '',
 		};
 
 		if (element) {
-			const href = element.getAttribute('href');
+			var href = element.getAttribute('href');
 
 			if (editor.config.decodeLinks) {
 				data.address = decodeURIComponent(href);
@@ -37,7 +37,7 @@ CKEDITOR.dialog.add('link', (editor) => {
 			}
 		}
 		else {
-			const selection = editor.getSelection();
+			var selection = editor.getSelection();
 
 			data.address = selection.getSelectedText();
 		}
@@ -55,13 +55,13 @@ CKEDITOR.dialog.add('link', (editor) => {
 						children: [
 							{
 								commit(data) {
-									const instance = this;
+									var instance = this;
 
 									if (!data) {
 										data = {};
 									}
 
-									const val = instance.getValue();
+									var val = instance.getValue();
 
 									data.address = val;
 									data.text = val;
@@ -70,13 +70,13 @@ CKEDITOR.dialog.add('link', (editor) => {
 								label: LANG_COMMON.url,
 								required: true,
 								setup(data) {
-									const instance = this;
+									var instance = this;
 
 									if (data) {
 										instance.setValue(data.address);
 									}
 
-									const linkType = instance
+									var linkType = instance
 										.getDialog()
 										.getContentElement('info', 'linkType');
 
@@ -86,9 +86,9 @@ CKEDITOR.dialog.add('link', (editor) => {
 								},
 								type: 'text',
 								validate() {
-									const instance = this;
+									var instance = this;
 
-									const func = CKEDITOR.dialog.validate.notEmpty(
+									var func = CKEDITOR.dialog.validate.notEmpty(
 										LANG_LINK.noUrl
 									);
 
@@ -99,11 +99,11 @@ CKEDITOR.dialog.add('link', (editor) => {
 								id: 'linkBrowse',
 								label: LANG_COMMON.browseServer,
 								onClick(event) {
-									const dialog = event.data.dialog;
+									var dialog = event.data.dialog;
 
-									const editor = dialog.getParentEditor();
+									var editor = dialog.getParentEditor();
 
-									const urlField = dialog.getContentElement(
+									var urlField = dialog.getContentElement(
 										'info',
 										'linkAddress'
 									);
@@ -146,9 +146,9 @@ CKEDITOR.dialog.add('link', (editor) => {
 		minWidth: 250,
 
 		onFocus() {
-			const instance = this;
+			var instance = this;
 
-			const urlField = instance.getContentElement('info', 'linkAddress');
+			var urlField = instance.getContentElement('info', 'linkAddress');
 
 			urlField.select();
 		},
@@ -156,12 +156,12 @@ CKEDITOR.dialog.add('link', (editor) => {
 		onLoad() {},
 
 		onOk() {
-			const instance = this;
+			var instance = this;
 
-			const attributes = {};
-			const data = {};
+			var attributes = {};
+			var data = {};
 
-			const editor = instance.getParentEditor();
+			var editor = instance.getParentEditor();
 
 			instance.commitContent(data);
 
@@ -170,12 +170,12 @@ CKEDITOR.dialog.add('link', (editor) => {
 			attributes.href = data.address;
 
 			if (!instance._.selectedElement) {
-				const selection = editor.getSelection();
+				var selection = editor.getSelection();
 
-				const ranges = selection.getRanges(true);
+				var ranges = selection.getRanges(true);
 
-				if (ranges.length === 1 && ranges[0].collapsed) {
-					const text = new CKEDITOR.dom.text(
+				if (ranges.length == 1 && ranges[0].collapsed) {
+					var text = new CKEDITOR.dom.text(
 						data.text,
 						editor.document
 					);
@@ -186,7 +186,7 @@ CKEDITOR.dialog.add('link', (editor) => {
 					selection.selectRanges(ranges);
 				}
 
-				const style = new CKEDITOR.style({
+				var style = new CKEDITOR.style({
 					attributes,
 					element: 'a',
 				});
@@ -196,9 +196,9 @@ CKEDITOR.dialog.add('link', (editor) => {
 				editor.applyStyle(style);
 			}
 			else {
-				const selectedElement = instance._.selectedElement;
+				var selectedElement = instance._.selectedElement;
 
-				const currentText = selectedElement.getText(data.text);
+				var currentText = selectedElement.getText(data.text);
 
 				selectedElement.setAttributes(attributes);
 
@@ -209,16 +209,16 @@ CKEDITOR.dialog.add('link', (editor) => {
 		},
 
 		onShow() {
-			const instance = this;
+			var instance = this;
 
 			instance.fakeObj = false;
 
-			const editor = instance.getParentEditor();
+			var editor = instance.getParentEditor();
 
-			const element = PLUGIN.getSelectedLink(editor) || null;
+			var element = PLUGIN.getSelectedLink(editor) || null;
 
 			if (element) {
-				const selection = editor.getSelection();
+				var selection = editor.getSelection();
 
 				selection.selectElement(element);
 			}

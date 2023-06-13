@@ -14,26 +14,23 @@
 
 package com.liferay.portal.search.internal.reindexer;
 
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.search.spi.reindexer.BulkReindexer;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
+import java.util.Collections;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author André de Oliveira
@@ -47,14 +44,9 @@ public class ReindexWhenIndexerIsDisabledTest {
 
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+
 		_reindex = createReindex();
-	}
-
-	@After
-	public void tearDown() {
-		_bulkReindexersRegistryImpl.deactivate();
-
-		_bulkReindexerServiceRegistration.unregister();
 	}
 
 	@Test
@@ -93,7 +85,7 @@ public class ReindexWhenIndexerIsDisabledTest {
 			Mockito.anyString(), Mockito.anyLong()
 		);
 
-		Mockito.verifyNoInteractions(bulkReindexer);
+		Mockito.verifyZeroInteractions(bulkReindexer);
 	}
 
 	@Test
@@ -150,34 +142,31 @@ public class ReindexWhenIndexerIsDisabledTest {
 			_CLASS_NAME
 		);
 
-		_bulkReindexerServiceRegistration = _bundleContext.registerService(
-			BulkReindexer.class, bulkReindexer,
-			MapUtil.singletonDictionary("indexer.class.name", _CLASS_NAME));
+		BulkReindexersHolderImpl bulkReindexersHolderImpl =
+			new BulkReindexersHolderImpl();
 
-		_bulkReindexersRegistryImpl = new BulkReindexersRegistryImpl();
-
-		_bulkReindexersRegistryImpl.activate(_bundleContext);
+		bulkReindexersHolderImpl.addBulkReindexer(
+			bulkReindexer,
+			Collections.singletonMap("indexer.class.name", _CLASS_NAME));
 
 		Reindex reindex = new Reindex(
-			indexerRegistry, _bulkReindexersRegistryImpl, null, null);
+			indexerRegistry, bulkReindexersHolderImpl, null, null);
 
 		reindex.setSynchronousExecution(true);
 
 		return reindex;
 	}
 
-	protected BulkReindexer bulkReindexer = Mockito.mock(BulkReindexer.class);
-	protected Indexer<?> indexer = Mockito.mock(Indexer.class);
+	@Mock
+	protected BulkReindexer bulkReindexer;
+
+	@Mock
+	protected Indexer<?> indexer;
 
 	private static final String _CLASS_NAME = RandomTestUtil.randomString();
 
 	private static final long _CLASS_PK = RandomTestUtil.randomLong();
 
-	private ServiceRegistration<BulkReindexer>
-		_bulkReindexerServiceRegistration;
-	private BulkReindexersRegistryImpl _bulkReindexersRegistryImpl;
-	private final BundleContext _bundleContext =
-		SystemBundleUtil.getBundleContext();
 	private Reindex _reindex;
 
 }

@@ -1,10 +1,5 @@
-@default = "isChecked"
-definition {
-
-	function isChecked {
-		selenium.waitForElementPresent();
-
-		selenium.isChecked();
-	}
-
-}
+<definition default="isChecked">
+	<command name="isChecked">
+		<execute selenium="isChecked" />
+	</command>
+</definition>

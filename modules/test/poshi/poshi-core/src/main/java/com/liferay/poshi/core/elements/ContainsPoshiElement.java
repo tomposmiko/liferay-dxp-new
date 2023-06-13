@@ -56,39 +56,15 @@ public class ContainsPoshiElement extends PoshiElement {
 
 		matcher.find();
 
-		String string = matcher.group(1);
-
-		if (isQuotedContent(string)) {
-			string = getDoubleQuotedContent(string);
-		}
-
-		addAttribute("string", string);
-
-		String substring = matcher.group(2);
-
-		if (isQuotedContent(substring)) {
-			substring = getDoubleQuotedContent(substring);
-		}
-
-		addAttribute("substring", substring);
+		addAttribute("string", matcher.group(1));
+		addAttribute("substring", matcher.group(2));
 	}
 
 	@Override
 	public String toPoshiScript() {
-		String stringValue = attributeValue("string");
-
-		if (isQuotedContent(stringValue)) {
-			stringValue = "\"" + stringValue + "\"";
-		}
-
-		String substringValue = attributeValue("substring");
-
-		if (isQuotedContent(substringValue)) {
-			substringValue = "\"" + substringValue + "\"";
-		}
-
 		return StringUtil.combine(
-			_ELEMENT_NAME, "(" + stringValue + ", ", substringValue, ")");
+			_ELEMENT_NAME, "(\"" + attributeValue("string") + "\", \"",
+			attributeValue("substring"), "\")");
 	}
 
 	protected ContainsPoshiElement() {
@@ -126,7 +102,6 @@ public class ContainsPoshiElement extends PoshiElement {
 	private static final String _ELEMENT_NAME = "contains";
 
 	private static final Pattern _conditionPattern = Pattern.compile(
-		"^" + _ELEMENT_NAME + "\\((.*)[\\s]*,[\\s]*(\\d+|(?:\\$\\{|\\\")" +
-			"[\\s\\S]*(?:\\}|\"))\\)$");
+		"^" + _ELEMENT_NAME + "\\(\"(.*)\"[\\s]*,[\\s]*\"(.*)\"\\)$");
 
 }

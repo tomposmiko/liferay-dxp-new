@@ -54,7 +54,6 @@ public class ObjectRelationshipWrapper
 		attributes.put("objectDefinitionId1", getObjectDefinitionId1());
 		attributes.put("objectDefinitionId2", getObjectDefinitionId2());
 		attributes.put("objectFieldId2", getObjectFieldId2());
-		attributes.put("parameterObjectFieldId", getParameterObjectFieldId());
 		attributes.put("deletionType", getDeletionType());
 		attributes.put("dbTableName", getDBTableName());
 		attributes.put("label", getLabel());
@@ -132,13 +131,6 @@ public class ObjectRelationshipWrapper
 
 		if (objectFieldId2 != null) {
 			setObjectFieldId2(objectFieldId2);
-		}
-
-		Long parameterObjectFieldId = (Long)attributes.get(
-			"parameterObjectFieldId");
-
-		if (parameterObjectFieldId != null) {
-			setParameterObjectFieldId(parameterObjectFieldId);
 		}
 
 		String deletionType = (String)attributes.get("deletionType");
@@ -380,16 +372,6 @@ public class ObjectRelationshipWrapper
 	}
 
 	/**
-	 * Returns the parameter object field ID of this object relationship.
-	 *
-	 * @return the parameter object field ID of this object relationship
-	 */
-	@Override
-	public long getParameterObjectFieldId() {
-		return model.getParameterObjectFieldId();
-	}
-
-	/**
 	 * Returns the primary key of this object relationship.
 	 *
 	 * @return the primary key of this object relationship
@@ -467,11 +449,6 @@ public class ObjectRelationshipWrapper
 	@Override
 	public boolean isReverse() {
 		return model.isReverse();
-	}
-
-	@Override
-	public boolean isSelf() {
-		return model.isSelf();
 	}
 
 	@Override
@@ -669,16 +646,6 @@ public class ObjectRelationshipWrapper
 	}
 
 	/**
-	 * Sets the parameter object field ID of this object relationship.
-	 *
-	 * @param parameterObjectFieldId the parameter object field ID of this object relationship
-	 */
-	@Override
-	public void setParameterObjectFieldId(long parameterObjectFieldId) {
-		model.setParameterObjectFieldId(parameterObjectFieldId);
-	}
-
-	/**
 	 * Sets the primary key of this object relationship.
 	 *
 	 * @param primaryKey the primary key of this object relationship
@@ -746,11 +713,6 @@ public class ObjectRelationshipWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

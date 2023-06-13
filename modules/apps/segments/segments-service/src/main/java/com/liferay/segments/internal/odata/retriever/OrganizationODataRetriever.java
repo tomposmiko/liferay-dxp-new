@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.FilterParser;
-import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.segments.internal.odata.entity.OrganizationEntityModel;
 import com.liferay.segments.odata.retriever.ODataRetriever;
 import com.liferay.segments.odata.search.ODataSearchAdapter;
@@ -39,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author David Arques
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.Organization",
 	service = ODataRetriever.class
 )
@@ -51,11 +51,9 @@ public class OrganizationODataRetriever
 			int end)
 		throws PortalException {
 
-		FilterParser filterParser = _filterParserProvider.provide(_entityModel);
-
 		Hits hits = _oDataSearchAdapter.search(
-			companyId, filterParser, filterString, Organization.class.getName(),
-			_entityModel, locale, start, end);
+			companyId, _filterParser, filterString,
+			Organization.class.getName(), _entityModel, locale, start, end);
 
 		return _getOrganizations(hits);
 	}
@@ -65,11 +63,9 @@ public class OrganizationODataRetriever
 			long companyId, String filterString, Locale locale)
 		throws PortalException {
 
-		FilterParser filterParser = _filterParserProvider.provide(_entityModel);
-
 		return _oDataSearchAdapter.searchCount(
-			companyId, filterParser, filterString, Organization.class.getName(),
-			_entityModel, locale);
+			companyId, _filterParser, filterString,
+			Organization.class.getName(), _entityModel, locale);
 	}
 
 	private Organization _getOrganization(Document document)
@@ -100,8 +96,10 @@ public class OrganizationODataRetriever
 	)
 	private EntityModel _entityModel;
 
-	@Reference
-	private FilterParserProvider _filterParserProvider;
+	@Reference(
+		target = "(entity.model.name=" + OrganizationEntityModel.NAME + ")"
+	)
+	private FilterParser _filterParser;
 
 	@Reference
 	private ODataSearchAdapter _oDataSearchAdapter;

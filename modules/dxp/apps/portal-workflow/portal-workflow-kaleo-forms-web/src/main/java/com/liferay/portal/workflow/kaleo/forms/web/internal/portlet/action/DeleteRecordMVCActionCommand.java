@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + KaleoFormsPortletKeys.KALEO_FORMS_ADMIN,
 		"mvc.command.name=/kaleo_forms_admin/delete_record"
@@ -84,7 +85,7 @@ public class DeleteRecordMVCActionCommand
 		final ThemeDisplay themeDisplay =
 			(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		long[] ddlRecordIds = _getDDLRecordIds(actionRequest);
+		long[] ddlRecordIds = getDDLRecordIds(actionRequest);
 
 		for (final long ddlRecordId : ddlRecordIds) {
 			try {
@@ -124,7 +125,7 @@ public class DeleteRecordMVCActionCommand
 	 *         parameters
 	 * @return an array of the DDL record IDs
 	 */
-	private long[] _getDDLRecordIds(ActionRequest actionRequest) {
+	protected long[] getDDLRecordIds(ActionRequest actionRequest) {
 		long ddlRecordId = ParamUtil.getLong(actionRequest, "ddlRecordId");
 
 		if (ddlRecordId > 0) {

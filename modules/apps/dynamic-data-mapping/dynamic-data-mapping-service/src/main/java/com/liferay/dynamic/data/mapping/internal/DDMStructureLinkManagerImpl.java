@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = DDMStructureLinkManager.class)
+@Component(immediate = true, service = DDMStructureLinkManager.class)
 public class DDMStructureLinkManagerImpl implements DDMStructureLinkManager {
 
 	@Override
@@ -55,6 +55,25 @@ public class DDMStructureLinkManagerImpl implements DDMStructureLinkManager {
 	public void deleteStructureLinks(long classNameId, long classPK) {
 		_ddmStructureLinkLocalService.deleteStructureLinks(
 			classNameId, classPK);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public List<DDMStructureLink> getClassNameStructureLinks(long classNameId) {
+		List<DDMStructureLink> ddmStructureLinks = new ArrayList<>();
+
+		for (com.liferay.dynamic.data.mapping.model.DDMStructureLink
+				structureLink :
+					_ddmStructureLinkLocalService.getClassNameStructureLinks(
+						classNameId)) {
+
+			ddmStructureLinks.add(new DDMStructureLinkImpl(structureLink));
+		}
+
+		return ddmStructureLinks;
 	}
 
 	@Override
@@ -89,7 +108,13 @@ public class DDMStructureLinkManagerImpl implements DDMStructureLinkManager {
 		return ddmStructureLinks;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDMStructureLinkLocalService(
+		DDMStructureLinkLocalService ddmStructureLinkLocalService) {
+
+		_ddmStructureLinkLocalService = ddmStructureLinkLocalService;
+	}
+
 	private DDMStructureLinkLocalService _ddmStructureLinkLocalService;
 
 }

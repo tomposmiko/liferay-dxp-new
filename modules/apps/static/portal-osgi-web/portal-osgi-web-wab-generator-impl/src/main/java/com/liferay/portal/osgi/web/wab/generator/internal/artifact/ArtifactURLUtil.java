@@ -14,43 +14,34 @@
 
 package com.liferay.portal.osgi.web.wab.generator.internal.artifact;
 
-import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import aQute.bnd.osgi.Jar;
+import aQute.bnd.osgi.Resource;
 
-import java.io.File;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.whip.util.ReflectionUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URL;
 
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.osgi.framework.Constants;
 
 /**
  * @author Matthew Tambara
  * @author Raymond Augé
- * @author Gregory Amerson
  */
 public class ArtifactURLUtil {
 
-	public static String getClientExtensionSymbolicName(String path) {
-		int x = path.lastIndexOf('/');
-		int y = path.lastIndexOf(CharPool.PERIOD);
+	public static URL transform(URL artifact) throws IOException {
+		String path = artifact.getPath();
 
-		return path.substring(x + 1, y);
-	}
-
-	public static String getSymbolicName(String path) {
 		int x = path.lastIndexOf('/');
-		int y = path.lastIndexOf(CharPool.PERIOD);
+		int y = path.lastIndexOf(".war");
 
 		String symbolicName = path.substring(x + 1, y);
 
@@ -60,27 +51,17 @@ public class ArtifactURLUtil {
 			symbolicName = matcher.group(1);
 		}
 
-		return symbolicName;
-	}
-
-	public static URL transform(URL artifact) throws Exception {
 		String contextName = null;
 
-		String path = artifact.getPath();
-
-		String fileExtension = path.substring(
-			path.lastIndexOf(CharPool.PERIOD) + 1);
-
-		if (fileExtension.equals("war")) {
-			try (ZipFile zipFile = new ZipFile(new File(artifact.toURI()))) {
-				contextName = _readServletContextName(zipFile);
+		try (Jar jar = new Jar("WAR", artifact.openStream())) {
+			if (jar.getBsn() != null) {
+				return artifact;
 			}
+
+			contextName = _readServletContextName(jar);
 		}
-
-		String symbolicName = getSymbolicName(path);
-
-		if (fileExtension.equals("zip") && _isClientExtensionZip(path)) {
-			symbolicName = getClientExtensionSymbolicName(path);
+		catch (Exception exception) {
+			ReflectionUtil.throwException(exception);
 		}
 
 		if (contextName == null) {
@@ -92,55 +73,27 @@ public class ArtifactURLUtil {
 			StringBundler.concat(
 				artifact.getPath(), "?", Constants.BUNDLE_SYMBOLICNAME, "=",
 				symbolicName, "&Web-ContextPath=/", contextName,
-				"&fileExtension=", fileExtension, "&protocol=file"));
+				"&protocol=file"));
 	}
 
-	private static boolean _isClientExtensionZip(String path) {
-		try (ZipFile zipFile = new ZipFile(path)) {
-			Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
-
-			while (enumeration.hasMoreElements()) {
-				ZipEntry zipEntry = enumeration.nextElement();
-
-				String name = zipEntry.getName();
-
-				if (name.endsWith(".client-extension-config.json") &&
-					(name.indexOf("/") == -1)) {
-
-					return true;
-				}
-			}
-		}
-		catch (IOException ioException) {
-			_log.error("Path " + path + " is not a valid ZIP", ioException);
-		}
-
-		return false;
-	}
-
-	private static String _readServletContextName(ZipFile zipFile)
-		throws Exception {
-
-		ZipEntry zipEntry = zipFile.getEntry(
+	private static String _readServletContextName(Jar jar) throws Exception {
+		Resource resource = jar.getResource(
 			"WEB-INF/liferay-plugin-package.properties");
 
-		if (zipEntry == null) {
+		if (resource == null) {
 			return null;
 		}
 
 		Properties properties = new Properties();
 
-		try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
+		try (InputStream inputStream = resource.openInputStream()) {
 			properties.load(inputStream);
 		}
 
 		return properties.getProperty("servlet-context-name");
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		ArtifactURLUtil.class);
-
 	private static final Pattern _pattern = Pattern.compile(
-		"(.*?)(-[0-9\\.]+)");
+		"(.*?)(-\\d+\\.\\d+\\.\\d+\\.\\d+)?");
 
 }

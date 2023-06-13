@@ -23,8 +23,7 @@ public class Sku {
 
 	public Sku(
 		long cpInstanceId, String sku, String options, String price,
-		String productName, int availableQuantity, LabelField status,
-		String discontinued) {
+		String productName, int availableQuantity, LabelField status) {
 
 		_cpInstanceId = cpInstanceId;
 		_sku = sku;
@@ -33,7 +32,6 @@ public class Sku {
 		_productName = productName;
 		_availableQuantity = availableQuantity;
 		_status = status;
-		_discontinued = discontinued;
 	}
 
 	public int getAvailableQuantity() {
@@ -42,10 +40,6 @@ public class Sku {
 
 	public long getCPInstanceId() {
 		return _cpInstanceId;
-	}
-
-	public String getDiscontinued() {
-		return _discontinued;
 	}
 
 	public String getOptions() {
@@ -70,7 +64,6 @@ public class Sku {
 
 	private final int _availableQuantity;
 	private final long _cpInstanceId;
-	private final String _discontinued;
 	private final String _options;
 	private final String _price;
 	private final String _productName;

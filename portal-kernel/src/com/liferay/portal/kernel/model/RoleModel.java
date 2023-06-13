@@ -524,8 +524,4 @@ public interface RoleModel
 	@Override
 	public Role cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

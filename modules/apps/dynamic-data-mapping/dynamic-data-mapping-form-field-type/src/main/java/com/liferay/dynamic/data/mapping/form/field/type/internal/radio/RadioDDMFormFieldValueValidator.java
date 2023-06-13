@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.RADIO,
 	service = DDMFormFieldValueValidator.class
 )

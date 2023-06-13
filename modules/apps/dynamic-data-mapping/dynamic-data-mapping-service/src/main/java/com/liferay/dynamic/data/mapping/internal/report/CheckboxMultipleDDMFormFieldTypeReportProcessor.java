@@ -18,18 +18,18 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.report.DDMFormFieldTypeReportProcessor;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 
 import java.util.Iterator;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marcos Martins
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.name=checkbox_multiple",
 		"ddm.form.field.type.name=select"
@@ -38,15 +38,6 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class CheckboxMultipleDDMFormFieldTypeReportProcessor
 	implements DDMFormFieldTypeReportProcessor {
-
-	public CheckboxMultipleDDMFormFieldTypeReportProcessor() {
-	}
-
-	public CheckboxMultipleDDMFormFieldTypeReportProcessor(
-		JSONFactory jsonFactory) {
-
-		_jsonFactory = jsonFactory;
-	}
 
 	@Override
 	public JSONObject process(
@@ -58,17 +49,15 @@ public class CheckboxMultipleDDMFormFieldTypeReportProcessor
 
 		Value value = ddmFormFieldValue.getValue();
 
-		JSONArray valueJSONArray = _jsonFactory.createJSONArray(
+		JSONArray valueJSONArray = JSONFactoryUtil.createJSONArray(
 			value.getString(value.getDefaultLocale()));
 
-		if (valuesJSONObject != null) {
-			Iterator<String> iterator = valueJSONArray.iterator();
+		Iterator<String> iterator = valueJSONArray.iterator();
 
-			while (iterator.hasNext()) {
-				String key = iterator.next();
+		while (iterator.hasNext()) {
+			String key = iterator.next();
 
-				updateData(ddmFormInstanceReportEvent, valuesJSONObject, key);
-			}
+			updateData(ddmFormInstanceReportEvent, valuesJSONObject, key);
 		}
 
 		if (valueJSONArray.length() != 0) {
@@ -82,8 +71,5 @@ public class CheckboxMultipleDDMFormFieldTypeReportProcessor
 
 		return fieldJSONObject;
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

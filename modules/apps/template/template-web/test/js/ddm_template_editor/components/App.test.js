@@ -22,10 +22,8 @@ import App from '../../../../src/main/resources/META-INF/resources/js/ddm_templa
 const renderApp = ({initialScript = ''} = {}) => {
 	return render(
 		<App
-			editorAutocompleteData={{}}
 			portletNamespace="portletNamespace"
 			script={initialScript}
-			showCacheableWarning
 			templateVariableGroups={[
 				{
 					items: [
@@ -64,17 +62,6 @@ describe('', () => {
 				setEnd: () => {},
 				setStart: () => {},
 			});
-
-			const saveButton = global.document.createElement('button');
-			saveButton.classList.add('save-button');
-
-			const saveAndContinueButton = global.document.createElement(
-				'button'
-			);
-			saveAndContinueButton.classList.add('save-and-continue-button');
-
-			global.document.body.appendChild(saveButton);
-			global.document.body.appendChild(saveAndContinueButton);
 		}
 		global.Liferay.SideNavigation = {instance: () => {}};
 		global.Liferay.on = () => ({
@@ -121,13 +108,14 @@ describe('', () => {
 		expect(queryByText('variableTemplate1')).not.toBeInTheDocument();
 	});
 
-	it('no result when searching', () => {
+	it('filters variable groups when search', () => {
 		const {getByLabelText, queryByText} = renderApp();
 
 		const searchInput = getByLabelText('search');
 
-		userEvent.type(searchInput, 'anotherVariable');
+		userEvent.type(searchInput, 'variableTemplate2');
 
-		expect(queryByText('no-results-found')).toBeInTheDocument();
+		expect(queryByText('variableTemplate2')).toBeInTheDocument();
+		expect(queryByText('variableTemplate1')).not.toBeInTheDocument();
 	});
 });

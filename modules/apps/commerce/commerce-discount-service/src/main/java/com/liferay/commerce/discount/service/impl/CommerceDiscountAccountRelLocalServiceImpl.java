@@ -14,35 +14,26 @@
 
 package com.liferay.commerce.discount.service.impl;
 
-import com.liferay.commerce.discount.exception.DuplicateCommerceDiscountAccountRelException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountAccountRel;
 import com.liferay.commerce.discount.service.base.CommerceDiscountAccountRelLocalServiceBaseImpl;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Riccardo Alberti
  * @see CommerceDiscountAccountRelLocalServiceBaseImpl
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.discount.model.CommerceDiscountAccountRel",
-	service = AopService.class
-)
 public class CommerceDiscountAccountRelLocalServiceImpl
 	extends CommerceDiscountAccountRelLocalServiceBaseImpl {
 
@@ -52,26 +43,17 @@ public class CommerceDiscountAccountRelLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		CommerceDiscountAccountRel commerceDiscountAccountRel =
-			commerceDiscountAccountRelPersistence.fetchByCAI_CDI(
-				commerceAccountId, commerceDiscountId);
-
-		if (commerceDiscountAccountRel != null) {
-			throw new DuplicateCommerceDiscountAccountRelException();
-		}
+		User user = userLocalService.getUser(userId);
 
 		long commerceDiscountAccountRelId = counterLocalService.increment();
 
-		commerceDiscountAccountRel =
+		CommerceDiscountAccountRel commerceDiscountAccountRel =
 			commerceDiscountAccountRelPersistence.create(
 				commerceDiscountAccountRelId);
-
-		User user = _userLocalService.getUser(userId);
 
 		commerceDiscountAccountRel.setCompanyId(user.getCompanyId());
 		commerceDiscountAccountRel.setUserId(user.getUserId());
 		commerceDiscountAccountRel.setUserName(user.getFullName());
-
 		commerceDiscountAccountRel.setCommerceAccountId(commerceAccountId);
 		commerceDiscountAccountRel.setCommerceDiscountId(commerceDiscountId);
 
@@ -79,7 +61,7 @@ public class CommerceDiscountAccountRelLocalServiceImpl
 			commerceDiscountAccountRelPersistence.update(
 				commerceDiscountAccountRel);
 
-		_reindexCommerceDiscount(commerceDiscountId);
+		reindexCommerceDiscount(commerceDiscountId);
 
 		return commerceDiscountAccountRel;
 	}
@@ -96,7 +78,7 @@ public class CommerceDiscountAccountRelLocalServiceImpl
 		_expandoRowLocalService.deleteRows(
 			commerceDiscountAccountRel.getCommerceDiscountAccountRelId());
 
-		_reindexCommerceDiscount(
+		reindexCommerceDiscount(
 			commerceDiscountAccountRel.getCommerceDiscountId());
 
 		return commerceDiscountAccountRel;
@@ -183,7 +165,7 @@ public class CommerceDiscountAccountRelLocalServiceImpl
 			commerceDiscountId, name);
 	}
 
-	private void _reindexCommerceDiscount(long commerceDiscountId)
+	protected void reindexCommerceDiscount(long commerceDiscountId)
 		throws PortalException {
 
 		Indexer<CommerceDiscount> indexer =
@@ -192,10 +174,7 @@ public class CommerceDiscountAccountRelLocalServiceImpl
 		indexer.reindex(CommerceDiscount.class.getName(), commerceDiscountId);
 	}
 
-	@Reference
+	@ServiceReference(type = ExpandoRowLocalService.class)
 	private ExpandoRowLocalService _expandoRowLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

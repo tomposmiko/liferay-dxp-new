@@ -188,7 +188,7 @@ public class MVCActionCommandTest {
 
 	private static final String _PORTLET_NAME =
 		"com_liferay_portal_kernel_portlet_bridges_mvc_test_" +
-			"MVCActionCommandTest_Test-Portlet";
+			"MVCActionCommandTest_TestPortlet";
 
 	private static final String _TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1 =
 		"TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1";

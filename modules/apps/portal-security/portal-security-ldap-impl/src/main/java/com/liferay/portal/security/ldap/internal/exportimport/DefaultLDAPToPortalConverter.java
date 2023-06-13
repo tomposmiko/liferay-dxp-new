@@ -53,12 +53,14 @@ import com.liferay.portal.security.ldap.util.LDAPUtil;
 import java.text.ParseException;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
 import org.osgi.service.component.annotations.Component;
@@ -68,7 +70,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Edward Han
  * @author Brian Wing Shun Chan
  */
-@Component(service = LDAPToPortalConverter.class)
+@Component(immediate = true, service = LDAPToPortalConverter.class)
 public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 
 	@Override
@@ -79,12 +81,16 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		LDAPGroup ldapGroup = new LDAPGroup();
 
 		ldapGroup.setCompanyId(companyId);
-		ldapGroup.setDescription(
-			LDAPUtil.getAttributeString(
-				attributes, groupMappings, GroupConverterKeys.DESCRIPTION));
-		ldapGroup.setGroupName(
-			LDAPUtil.getAttributeString(
-				attributes, groupMappings, GroupConverterKeys.GROUP_NAME));
+
+		String description = LDAPUtil.getAttributeString(
+			attributes, groupMappings, GroupConverterKeys.DESCRIPTION);
+
+		ldapGroup.setDescription(description);
+
+		String groupName = LDAPUtil.getAttributeString(
+			attributes, groupMappings, GroupConverterKeys.GROUP_NAME);
+
+		ldapGroup.setGroupName(groupName);
 
 		return ldapGroup;
 	}
@@ -185,14 +191,17 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 			contactMappings.put(ContactConverterKeys.SUFFIX, suffix);
 		}
 
-		contact.setPrefixListTypeId(
-			_getListTypeId(
-				attributes, contactMappings, ContactConverterKeys.PREFIX,
-				ListTypeConstants.CONTACT_PREFIX));
-		contact.setSuffixListTypeId(
-			_getListTypeId(
-				attributes, contactMappings, ContactConverterKeys.SUFFIX,
-				ListTypeConstants.CONTACT_SUFFIX));
+		long prefixId = getListTypeId(
+			attributes, contactMappings, ContactConverterKeys.PREFIX,
+			ListTypeConstants.CONTACT_PREFIX);
+
+		contact.setPrefixId(prefixId);
+
+		long suffixId = getListTypeId(
+			attributes, contactMappings, ContactConverterKeys.SUFFIX,
+			ListTypeConstants.CONTACT_SUFFIX);
+
+		contact.setSuffixId(suffixId);
 
 		String gender = LDAPUtil.getAttributeString(
 			attributes, contactMappings, ContactConverterKeys.GENDER);
@@ -209,16 +218,16 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		}
 
 		try {
-			contact.setBirthday(
-				DateUtil.parseDate(
-					LDAPUtil.getAttributeString(
-						attributes, contactMappings,
-						ContactConverterKeys.BIRTHDAY),
-					locale));
+			Date birthday = DateUtil.parseDate(
+				LDAPUtil.getAttributeString(
+					attributes, contactMappings, ContactConverterKeys.BIRTHDAY),
+				locale);
+
+			contact.setBirthday(birthday);
 		}
 		catch (ParseException parseException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(parseException);
+				_log.debug(parseException, parseException);
 			}
 
 			Calendar birthdayCalendar = CalendarFactoryUtil.getCalendar(
@@ -247,8 +256,12 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 				attributes, contactMappings, ContactConverterKeys.JOB_TITLE));
 
 		ldapUser.setContact(contact);
-		ldapUser.setContactExpandoAttributes(
-			_getExpandoAttributes(attributes, contactExpandoMappings));
+
+		Map<String, String[]> contactExpandoAttributes = getExpandoAttributes(
+			attributes, contactExpandoMappings);
+
+		ldapUser.setContactExpandoAttributes(contactExpandoAttributes);
+
 		ldapUser.setCreatorUserId(0);
 		ldapUser.setGroupIds(null);
 		ldapUser.setOrganizationIds(null);
@@ -279,9 +292,10 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 
 		ServiceContext serviceContext = new ServiceContext();
 
-		serviceContext.setUuid(
-			LDAPUtil.getAttributeString(
-				attributes, userMappings, UserConverterKeys.UUID));
+		String uuid = LDAPUtil.getAttributeString(
+			attributes, userMappings, UserConverterKeys.UUID);
+
+		serviceContext.setUuid(uuid);
 
 		ldapUser.setServiceContext(serviceContext);
 
@@ -291,14 +305,18 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 
 		user.setCompanyId(companyId);
 		user.setEmailAddress(emailAddress);
-		user.setOpenId(StringPool.BLANK);
-		user.setLanguageId(locale.toString());
 		user.setFirstName(firstName);
+
+		String jobTitle = LDAPUtil.getAttributeString(
+			attributes, userMappings, UserConverterKeys.JOB_TITLE);
+
+		user.setJobTitle(jobTitle);
+
+		user.setLanguageId(locale.toString());
+
+		user.setOpenId(StringPool.BLANK);
 		user.setMiddleName(middleName);
 		user.setLastName(lastName);
-		user.setJobTitle(
-			LDAPUtil.getAttributeString(
-				attributes, userMappings, UserConverterKeys.JOB_TITLE));
 		user.setPasswordUnencrypted(password);
 		user.setScreenName(screenName);
 
@@ -310,17 +328,21 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		}
 
 		ldapUser.setUser(user);
-		ldapUser.setUserExpandoAttributes(
-			_getExpandoAttributes(attributes, userExpandoMappings));
+
+		Map<String, String[]> userExpandoAttributes = getExpandoAttributes(
+			attributes, userExpandoMappings);
+
+		ldapUser.setUserExpandoAttributes(userExpandoAttributes);
+
 		ldapUser.setUserGroupIds(null);
 		ldapUser.setUserGroupRoles(null);
 
 		return ldapUser;
 	}
 
-	private Map<String, String[]> _getExpandoAttributes(
+	protected Map<String, String[]> getExpandoAttributes(
 			Attributes attributes, Properties expandoMappings)
-		throws Exception {
+		throws NamingException {
 
 		Map<String, String[]> expandoAttributes = new HashMap<>();
 
@@ -338,7 +360,7 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		return expandoAttributes;
 	}
 
-	private long _getListTypeId(
+	protected long getListTypeId(
 			Attributes attributes, Properties contactMappings,
 			String contactMappingsKey, String listTypeType)
 		throws Exception {
@@ -358,19 +380,31 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		return 0;
 	}
 
+	@Reference(unbind = "-")
+	protected void setContactPersistence(
+		ContactPersistence contactPersistence) {
+
+		_contactPersistence = contactPersistence;
+	}
+
+	@Reference(unbind = "-")
+	protected void setListTypeService(ListTypeService listTypeService) {
+		_listTypeService = listTypeService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserPersistence(UserPersistence userPersistence) {
+		_userPersistence = userPersistence;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DefaultLDAPToPortalConverter.class);
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
-	@Reference
 	private ContactPersistence _contactPersistence;
-
-	@Reference
 	private ListTypeService _listTypeService;
-
-	@Reference
 	private UserPersistence _userPersistence;
 
 }

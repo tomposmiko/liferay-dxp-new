@@ -21,14 +21,11 @@ import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleC
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.exception.ExportImportIOException;
-import com.liferay.exportimport.kernel.exception.MissingReferenceException;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
-import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
-import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.kernel.staging.StagingURLHelperUtil;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.exportimport.kernel.staging.constants.StagingConstants;
@@ -535,25 +532,25 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 					ExportImportConfigurationConstants.
 						TYPE_PUBLISH_PORTLET_REMOTE) {
 
-				_exportImportLocalService.importPortletDataDeletions(
+				exportImportLocalService.importPortletDataDeletions(
 					exportImportConfiguration, file);
 
 				missingReferences =
-					_exportImportLocalService.validateImportPortletInfo(
+					exportImportLocalService.validateImportPortletInfo(
 						exportImportConfiguration, file);
 
-				_exportImportLocalService.importPortletInfo(
+				exportImportLocalService.importPortletInfo(
 					exportImportConfiguration, file);
 			}
 			else {
-				_exportImportLocalService.importLayoutsDataDeletions(
+				exportImportLocalService.importLayoutsDataDeletions(
 					exportImportConfiguration, file);
 
 				missingReferences =
-					_exportImportLocalService.validateImportLayoutsFile(
+					exportImportLocalService.validateImportLayoutsFile(
 						exportImportConfiguration, file);
 
-				_exportImportLocalService.importLayouts(
+				exportImportLocalService.importLayouts(
 					exportImportConfiguration, file);
 			}
 
@@ -569,9 +566,6 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 				ExportImportIOException.PUBLISH_STAGING_REQUEST);
 
 			throw exportImportIOException;
-		}
-		catch (MissingReferenceException missingReferenceException) {
-			return missingReferenceException.getMissingReferences();
 		}
 		finally {
 			if (exportImportConfiguration.getType() ==
@@ -606,7 +600,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 		try {
 			PortletFileRepositoryUtil.addPortletFileEntry(
-				null, folder.getGroupId(), userId, Group.class.getName(),
+				folder.getGroupId(), userId, Group.class.getName(),
 				folder.getGroupId(), _PORTLET_REPOSITORY_ID,
 				folder.getFolderId(), new UnsyncByteArrayInputStream(bytes),
 				fileName, ContentTypes.APPLICATION_ZIP, false);
@@ -794,12 +788,34 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		try {
 			GroupServiceHttp.disableStaging(httpPrincipal, remoteGroupId);
 		}
+		catch (NoSuchGroupException noSuchGroupException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Remote live group was already deleted",
+					noSuchGroupException);
+			}
+		}
+		catch (PrincipalException principalException) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(principalException, principalException);
+			}
+
+			RemoteExportException remoteExportException =
+				new RemoteExportException(RemoteExportException.NO_PERMISSIONS);
+
+			remoteExportException.setGroupId(remoteGroupId);
+
+			throw remoteExportException;
+		}
 		catch (RemoteAuthException remoteAuthException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(remoteAuthException);
+				_log.debug(remoteAuthException, remoteAuthException);
 			}
 
 			remoteAuthException.setURL(remoteURL);
@@ -811,7 +827,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(systemException);
+				_log.debug(systemException, systemException);
 			}
 
 			if (!forceDisable) {
@@ -822,45 +838,6 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 				remoteExportException.setURL(remoteURL);
 
 				throw remoteExportException;
-			}
-
-			if (_log.isWarnEnabled()) {
-				_log.warn("Forcibly disable remote staging");
-			}
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-
-			String message = portalException.getMessage();
-
-			if (message.contains(
-					NoSuchGroupException.class.getCanonicalName())) {
-
-				if (!forceDisable) {
-					RemoteExportException remoteExportException =
-						new RemoteExportException(
-							RemoteExportException.NO_GROUP);
-
-					remoteExportException.setGroupId(remoteGroupId);
-
-					throw remoteExportException;
-				}
-			}
-			else if (message.contains(
-						PrincipalException.class.getCanonicalName())) {
-
-				RemoteExportException remoteExportException =
-					new RemoteExportException(
-						RemoteExportException.NO_PERMISSIONS);
-
-				remoteExportException.setGroupId(remoteGroupId);
-
-				throw remoteExportException;
-			}
-			else {
-				throw portalException;
 			}
 
 			if (_log.isWarnEnabled()) {
@@ -881,7 +858,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchGroupException);
+				_log.debug(noSuchGroupException, noSuchGroupException);
 			}
 
 			RemoteExportException remoteExportException =
@@ -896,7 +873,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 
 			RemoteExportException remoteExportException =
@@ -911,7 +888,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(remoteAuthException);
+				_log.debug(remoteAuthException, remoteAuthException);
 			}
 
 			remoteAuthException.setURL(httpPrincipal.getUrl());
@@ -923,7 +900,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(systemException);
+				_log.debug(systemException, systemException);
 			}
 
 			RemoteExportException remoteExportException =
@@ -967,7 +944,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileEntryException);
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
 			}
 
 			return null;
@@ -1031,7 +1008,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			}
 
 			PortletFileRepositoryUtil.addPortletFileEntry(
-				null, folder.getGroupId(), userId, Group.class.getName(),
+				folder.getGroupId(), userId, Group.class.getName(),
 				folder.getGroupId(), _PORTLET_REPOSITORY_ID,
 				folder.getFolderId(), tempFile,
 				getAssembledFileName(stagingRequestId),
@@ -1077,8 +1054,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		}
 
 		List<ExportImportConfiguration> exportImportConfigurations =
-			_exportImportConfigurationLocalService.
-				getExportImportConfigurations(groupId, configurationType);
+			exportImportConfigurationLocalService.getExportImportConfigurations(
+				groupId, configurationType);
 
 		for (ExportImportConfiguration exportImportConfiguration :
 				exportImportConfigurations) {
@@ -1100,7 +1077,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			exportImportConfiguration.setSettings(
 				JSONFactoryUtil.serialize(settingsMap));
 
-			_exportImportConfigurationLocalService.
+			exportImportConfigurationLocalService.
 				updateExportImportConfiguration(exportImportConfiguration);
 		}
 	}
@@ -1212,7 +1189,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchGroupException);
+				_log.debug(noSuchGroupException, noSuchGroupException);
 			}
 
 			RemoteExportException remoteExportException =
@@ -1227,7 +1204,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 
 			RemoteExportException remoteExportException =
@@ -1242,7 +1219,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(remoteAuthException);
+				_log.debug(remoteAuthException, remoteAuthException);
 			}
 
 			remoteAuthException.setURL(remoteURL);
@@ -1254,7 +1231,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(systemException);
+				_log.debug(systemException, systemException);
 			}
 
 			RemoteExportException remoteExportException =
@@ -1272,13 +1249,6 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingLocalServiceImpl.class);
-
-	@BeanReference(type = ExportImportConfigurationLocalService.class)
-	private ExportImportConfigurationLocalService
-		_exportImportConfigurationLocalService;
-
-	@BeanReference(type = ExportImportLocalService.class)
-	private ExportImportLocalService _exportImportLocalService;
 
 	@BeanReference(type = GroupLocalService.class)
 	private GroupLocalService _groupLocalService;

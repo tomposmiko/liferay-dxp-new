@@ -22,7 +22,15 @@ import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
 public class UpgradeSocialMVCCVersion extends MVCCVersionUpgradeProcess {
 
 	@Override
-	protected String[] getTableNames() {
+	protected String[] getExcludedTableNames() {
+		return new String[] {
+			"CompanyInfo", "CountryLocalization", "PortalPreferenceValue",
+			"PortletPreferenceValue", "RegionLocalization"
+		};
+	}
+
+	@Override
+	protected String[] getModuleTableNames() {
 		return new String[] {
 			"SocialActivity", "SocialActivityAchievement",
 			"SocialActivityCounter", "SocialActivityLimit", "SocialActivitySet",

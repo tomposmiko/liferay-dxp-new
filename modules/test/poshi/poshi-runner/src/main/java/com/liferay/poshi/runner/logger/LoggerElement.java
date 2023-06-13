@@ -214,7 +214,7 @@ public class LoggerElement {
 
 		boolean hasChildren = false;
 
-		if (!_childLoggerElements.isEmpty()) {
+		if (_childLoggerElements.size() > 0) {
 			hasChildren = true;
 		}
 

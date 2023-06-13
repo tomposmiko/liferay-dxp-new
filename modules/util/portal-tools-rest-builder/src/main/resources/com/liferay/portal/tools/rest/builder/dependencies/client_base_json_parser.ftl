@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -112,13 +113,13 @@ public abstract class BaseJSONParser<T> {
 
 		Object[] objects = (Object[])_readValue();
 
-		T[] dtos = createDTOArray(objects.length);
-
-		for (int i = 0; i < dtos.length; i++) {
-			dtos[i] = parseToDTO((String)objects[i]);
-		}
-
-		return dtos;
+		return Stream.of(
+			objects
+		).map(
+			object -> parseToDTO((String)object)
+		).toArray(
+			size -> createDTOArray(size)
+		);
 	}
 
 	public Map<String, Object> parseToMap(String json) {
@@ -188,33 +189,33 @@ public abstract class BaseJSONParser<T> {
 	}
 
 	protected Date[] toDates(Object[] objects) {
-		Date[] dates = new Date[objects.length];
-
-		for (int i = 0; i < dates.length; i++) {
-			dates[i] = toDate((String)objects[i]);
-		}
-
-		return dates;
+		return Stream.of(
+			objects
+		).map(
+			object -> toDate((String)object)
+		).toArray(
+			size -> new Date[size]
+		);
 	}
 
 	protected Integer[] toIntegers(Object[] objects) {
-		Integer[] integers = new Integer[objects.length];
-
-		for (int i = 0; i < integers.length; i++) {
-			integers[i] = Integer.valueOf(objects[i].toString());
-		}
-
-		return integers;
+		return Stream.of(
+			objects
+		).map(
+			object -> Integer.valueOf(object.toString())
+		).toArray(
+			size -> new Integer[size]
+		);
 	}
 
 	protected Long[] toLongs(Object[] objects) {
-		Long[] longs = new Long[objects.length];
-
-		for (int i = 0; i < longs.length; i++) {
-			longs[i] = Long.valueOf(objects[i].toString());
-		}
-
-		return longs;
+		return Stream.of(
+			objects
+		).map(
+			object -> Long.valueOf(object.toString())
+		).toArray(
+			size -> new Long[size]
+		);
 	}
 
 	protected String toString(Date date) {
@@ -222,13 +223,13 @@ public abstract class BaseJSONParser<T> {
 	}
 
 	protected String[] toStrings(Object[] objects) {
-		String[] strings = new String[objects.length];
-
-		for (int i = 0; i < strings.length; i++) {
-			strings[i] = (String)objects[i];
-		}
-
-		return strings;
+		return Stream.of(
+			objects
+		).map(
+			String.class::cast
+		).toArray(
+			size -> new String[size]
+		);
 	}
 
 	private void _assertLastChar(char c) {
@@ -268,7 +269,7 @@ public abstract class BaseJSONParser<T> {
 
 	private void _init(String json) {
 		_captureStartStack = new Stack<>();
-		_dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXX");
+		_dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		_index = 0;
 		_json = json.trim();
 		_lastChar = 0;
@@ -332,14 +333,6 @@ public abstract class BaseJSONParser<T> {
 
 	private boolean _isLastCharNegative() {
 		if (_lastChar == '-') {
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean _isLastCharPositive() {
-		if (_lastChar == '+') {
 			return true;
 		}
 
@@ -562,8 +555,7 @@ public abstract class BaseJSONParser<T> {
 			_readNextChar();
 		}
 		while (_isLastCharDigit() || _isLastCharDecimalSeparator() ||
-			   _isLastCharNegative() || _isLastCharPositive() ||
-				_isLastCharScientificNotation());
+			   _isLastCharNegative() || _isLastCharScientificNotation());
 
 		return _getCapturedSubstring();
 	}

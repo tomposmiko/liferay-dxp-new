@@ -14,10 +14,9 @@
 
 package com.liferay.depot.internal.upgrade.v1_2_0;
 
+import com.liferay.depot.internal.upgrade.v1_2_0.util.DepotEntryGroupRelTable;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
@@ -31,15 +30,23 @@ public class DepotEntryGroupRelUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		alter(
+			DepotEntryGroupRelTable.class,
+			new AlterTableAddColumn("groupId", "LONG"),
+			new AlterTableAddColumn("createDate", "DATE null"),
+			new AlterTableAddColumn("modifiedDate", "DATE null"),
+			new AlterTableAddColumn("uuid_", "VARCHAR(75) null"));
+
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			try (PreparedStatement preparedStatement1 =
 					connection.prepareStatement(
 						"select depotEntryGroupRelId from DepotEntryGroupRel");
 				PreparedStatement preparedStatement2 =
 					AutoBatchPreparedStatementUtil.autoBatch(
-						connection,
-						"update DepotEntryGroupRel set groupId = toGroupId, " +
-							"uuid_ = ? where depotEntryGroupRelId = ?");
+						connection.prepareStatement(
+							"update DepotEntryGroupRel set groupId = " +
+								"toGroupId, uuid_ = ? where " +
+									"depotEntryGroupRelId = ?"));
 				ResultSet resultSet = preparedStatement1.executeQuery()) {
 
 				while (resultSet.next()) {
@@ -52,15 +59,6 @@ public class DepotEntryGroupRelUpgradeProcess extends UpgradeProcess {
 				preparedStatement2.executeBatch();
 			}
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"DepotEntryGroupRel", "uuid_ VARCHAR(75) null", "groupId LONG",
-				"createDate DATE null", "modifiedDate DATE null")
-		};
 	}
 
 }

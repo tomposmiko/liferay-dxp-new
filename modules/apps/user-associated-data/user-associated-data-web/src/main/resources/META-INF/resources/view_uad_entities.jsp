@@ -21,7 +21,7 @@ ViewUADEntitiesDisplay viewUADEntitiesDisplay = (ViewUADEntitiesDisplay)request.
 
 boolean topLevelView = true;
 
-String parentContainerTypeKey = ParamUtil.getString(request, "parentContainerTypeKey");
+String parentContainerClass = ParamUtil.getString(request, "parentContainerClass");
 
 long parentContainerId = ParamUtil.getLong(request, "parentContainerId");
 
@@ -44,7 +44,7 @@ long[] groupIds = viewUADEntitiesDisplay.getGroupIds();
 	<aui:input name="p_u_i_d" type="hidden" value="<%= String.valueOf(selectedUser.getUserId()) %>" />
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 	<aui:input name="groupIds" type="hidden" value='<%= (groupIds != null) ? StringUtil.merge(groupIds) : "" %>' />
-	<aui:input name="parentContainerTypeKey" type="hidden" value="<%= parentContainerTypeKey %>" />
+	<aui:input name="parentContainerClass" type="hidden" value="<%= parentContainerClass %>" />
 	<aui:input name="parentContainerId" type="hidden" value="<%= String.valueOf(parentContainerId) %>" />
 	<aui:input name="scope" type="hidden" value="<%= viewUADEntitiesDisplay.getScope() %>" />
 
@@ -57,12 +57,11 @@ long[] groupIds = viewUADEntitiesDisplay.getGroupIds();
 			<aui:input name="uadRegistryKey" type="hidden" value="<%= viewUADEntitiesDisplay.getUADRegistryKey() %>" />
 
 			<%
-			for (String typeKey : viewUADEntitiesDisplay.getTypeKeys()) {
-				String normalizedTypeKey = AUIUtil.normalizeId(typeKey);
+			for (Class<?> typeClass : viewUADEntitiesDisplay.getTypeClasses()) {
 			%>
 
-				<aui:input name='<%= "primaryKeys__" + normalizedTypeKey %>' type="hidden" />
-				<aui:input name='<%= "uadRegistryKey__" + normalizedTypeKey %>' type="hidden" value="<%= typeKey %>" />
+				<aui:input name='<%= "primaryKeys__" + typeClass.getSimpleName() %>' type="hidden" />
+				<aui:input name='<%= "uadRegistryKey__" + typeClass.getSimpleName() %>' type="hidden" value="<%= typeClass.getName() %>" />
 
 			<%
 			}
@@ -73,8 +72,11 @@ long[] groupIds = viewUADEntitiesDisplay.getGroupIds();
 
 	<div class="closed sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 		<div id="breadcrumb">
-			<liferay-site-navigation:breadcrumb
-				breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+			<liferay-ui:breadcrumb
+				showCurrentGroup="<%= false %>"
+				showGuestGroup="<%= false %>"
+				showLayout="<%= false %>"
+				showPortletBreadcrumb="<%= true %>"
 			/>
 		</div>
 
@@ -215,7 +217,7 @@ long[] groupIds = viewUADEntitiesDisplay.getGroupIds();
 					if (applicationKeys) {
 						applicationKeys.setAttribute(
 							'value',
-							Liferay.Util.getCheckedCheckboxes(
+							Liferay.Util.listCheckedExcept(
 								form,
 								'<portlet:namespace />allRowIds'
 							)
@@ -223,24 +225,24 @@ long[] groupIds = viewUADEntitiesDisplay.getGroupIds();
 					}
 				</c:when>
 				<c:otherwise>
-					let primaryKeysInput;
 
 					<%
-					for (String typeKey : viewUADEntitiesDisplay.getTypeKeys()) {
-						typeKey = AUIUtil.normalizeId(typeKey);
+					for (Class<?> typeClass : viewUADEntitiesDisplay.getTypeClasses()) {
+						String primaryKeysVar = "primaryKeys" + typeClass.getSimpleName();
 					%>
 
-						primaryKeysInput =
-							form['<portlet:namespace />primaryKeys__<%= typeKey %>'];
+						var <%= primaryKeysVar %> = form.querySelector(
+							'#<portlet:namespace />primaryKeys__<%= typeClass.getSimpleName() %>'
+						);
 
-						if (primaryKeysInput) {
-							var primaryKeys = Liferay.Util.getCheckedCheckboxes(
+						if (<%= primaryKeysVar %>) {
+							var primaryKeys = Liferay.Util.listCheckedExcept(
 								form,
 								'<portlet:namespace />allRowIds',
-								'<portlet:namespace />rowIds<%= typeKey %>'
+								'<portlet:namespace />rowIds<%= typeClass.getSimpleName() %>'
 							);
 
-							primaryKeysInput.setAttribute('value', primaryKeys);
+							<%= primaryKeysVar %>.setAttribute('value', primaryKeys);
 
 							var primaryKeyArray = primaryKeys.split(',');
 

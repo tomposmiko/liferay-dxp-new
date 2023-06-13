@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,57 +32,22 @@ import java.sql.Timestamp;
  */
 public class LayoutPageTemplateStructureUpgradeProcess extends UpgradeProcess {
 
+	protected void alterTable() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			runSQL("alter table LayoutPageTemplateStructure drop column data_");
+		}
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeSchema();
+		upgradeSchema();
 
-		_upgradeLayoutPageTemplatesStructures();
+		upgradeLayoutPageTemplatesStructures();
 
-		_alterTable();
+		alterTable();
 	}
 
-	private void _alterTable() throws Exception {
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			alterTableDropColumn("LayoutPageTemplateStructure", "data_");
-		}
-	}
-
-	private void _updateLayoutPageTemplateStructureRels(
-		long groupId, long companyId, long userId, String userName,
-		Timestamp createDate, long layoutPageTemplateStructureId, String data) {
-
-		String sql = StringBundler.concat(
-			"insert into LayoutPageTemplateStructureRel (uuid_, ",
-			"lPageTemplateStructureRelId, groupId, companyId, userId, ",
-			"userName, createDate, modifiedDate, ",
-			"layoutPageTemplateStructureId, segmentsExperienceId, data_) ",
-			"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				sql)) {
-
-			preparedStatement.setString(1, PortalUUIDUtil.generate());
-			preparedStatement.setLong(2, increment());
-			preparedStatement.setLong(3, groupId);
-			preparedStatement.setLong(4, companyId);
-			preparedStatement.setLong(5, userId);
-			preparedStatement.setString(6, userName);
-			preparedStatement.setTimestamp(7, createDate);
-			preparedStatement.setTimestamp(8, createDate);
-			preparedStatement.setLong(9, layoutPageTemplateStructureId);
-			preparedStatement.setLong(10, _SEGMENTS_EXPERIENCE_ID_DEFAULT);
-			preparedStatement.setString(11, data);
-
-			preparedStatement.executeUpdate();
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-		}
-	}
-
-	private void _upgradeLayoutPageTemplatesStructures() throws Exception {
+	protected void upgradeLayoutPageTemplatesStructures() throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				StringBundler.concat(
 					"select layoutPageTemplateStructureId, groupId, ",
@@ -107,7 +73,7 @@ public class LayoutPageTemplateStructureUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _upgradeSchema() throws Exception {
+	protected void upgradeSchema() throws Exception {
 		String template = StringUtil.read(
 			LayoutPageTemplateStructureUpgradeProcess.class.getResourceAsStream(
 				"dependencies/update.sql"));
@@ -115,7 +81,41 @@ public class LayoutPageTemplateStructureUpgradeProcess extends UpgradeProcess {
 		runSQLTemplateString(template, false);
 	}
 
-	private static final long _SEGMENTS_EXPERIENCE_ID_DEFAULT = 0;
+	private void _updateLayoutPageTemplateStructureRels(
+		long groupId, long companyId, long userId, String userName,
+		Timestamp createDate, long layoutPageTemplateStructureId, String data) {
+
+		String sql = StringBundler.concat(
+			"insert into LayoutPageTemplateStructureRel (uuid_, ",
+			"lPageTemplateStructureRelId, groupId, companyId, userId, ",
+			"userName, createDate, modifiedDate, ",
+			"layoutPageTemplateStructureId, segmentsExperienceId, data_) ",
+			"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				sql)) {
+
+			preparedStatement.setString(1, PortalUUIDUtil.generate());
+			preparedStatement.setLong(2, increment());
+			preparedStatement.setLong(3, groupId);
+			preparedStatement.setLong(4, companyId);
+			preparedStatement.setLong(5, userId);
+			preparedStatement.setString(6, userName);
+			preparedStatement.setTimestamp(7, createDate);
+			preparedStatement.setTimestamp(8, createDate);
+			preparedStatement.setLong(9, layoutPageTemplateStructureId);
+			preparedStatement.setLong(
+				10, SegmentsExperienceConstants.ID_DEFAULT);
+			preparedStatement.setString(11, data);
+
+			preparedStatement.executeUpdate();
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutPageTemplateStructureUpgradeProcess.class);

@@ -34,7 +34,7 @@ public class ContainsFunction
 
 	@Override
 	public Boolean apply(Object object1, Object object2) {
-		if ((object1 == null) || (object2 == null)) {
+		if (object1 == null) {
 			return false;
 		}
 
@@ -48,7 +48,11 @@ public class ContainsFunction
 			return apply(object1.toString(), object2);
 		}
 
-		return apply(object1.toString(), object2.toString());
+		if ((object1 instanceof String) && (object2 instanceof String)) {
+			return apply((String)object1, (String)object2);
+		}
+
+		return false;
 	}
 
 	@Override

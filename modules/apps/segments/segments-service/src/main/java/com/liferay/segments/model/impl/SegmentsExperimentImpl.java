@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.segments.constants.SegmentsEntryConstants;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperimentRel;
@@ -78,6 +79,12 @@ public class SegmentsExperimentImpl extends SegmentsExperimentBaseImpl {
 
 	@Override
 	public String getSegmentsEntryName(Locale locale) throws PortalException {
+		if (getSegmentsExperienceId() ==
+				SegmentsExperienceConstants.ID_DEFAULT) {
+
+			return SegmentsEntryConstants.getDefaultSegmentsEntryName(locale);
+		}
+
 		SegmentsExperience segmentsExperience =
 			SegmentsExperienceLocalServiceUtil.getSegmentsExperience(
 				getSegmentsExperienceId());
@@ -101,11 +108,11 @@ public class SegmentsExperimentImpl extends SegmentsExperimentBaseImpl {
 			SegmentsExperienceLocalServiceUtil.fetchSegmentsExperience(
 				getSegmentsExperienceId());
 
-		if (segmentsExperience == null) {
-			return null;
+		if (segmentsExperience != null) {
+			return segmentsExperience.getSegmentsExperienceKey();
 		}
 
-		return segmentsExperience.getSegmentsExperienceKey();
+		return SegmentsExperienceConstants.KEY_DEFAULT;
 	}
 
 	@Override
@@ -123,7 +130,7 @@ public class SegmentsExperimentImpl extends SegmentsExperimentBaseImpl {
 				_typeSettingsUnicodeProperties.load(super.getTypeSettings());
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 
@@ -153,7 +160,11 @@ public class SegmentsExperimentImpl extends SegmentsExperimentBaseImpl {
 			SegmentsExperienceLocalServiceUtil.fetchSegmentsExperience(
 				winnerSegmentsExperienceId);
 
-		return winnerSegmentsExperience.getSegmentsExperienceKey();
+		if (winnerSegmentsExperience != null) {
+			return winnerSegmentsExperience.getSegmentsExperienceKey();
+		}
+
+		return SegmentsExperienceConstants.KEY_DEFAULT;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

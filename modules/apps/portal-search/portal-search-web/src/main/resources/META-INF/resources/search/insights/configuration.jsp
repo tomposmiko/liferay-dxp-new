@@ -43,14 +43,18 @@ SearchInsightsPortletPreferences searchInsightsPortletPreferences = new com.life
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 	<liferay-frontend:edit-form-body>
-		<aui:fieldset>
-			<aui:input helpMessage="enable-score-explanation-help" label="enable-score-explanation" name="<%= PortletPreferencesJspUtil.getInputName(SearchInsightsPortletPreferences.PREFERENCE_KEY_EXPLAIN) %>" type="checkbox" value="<%= searchInsightsPortletPreferences.isExplain() %>" />
+		<liferay-frontend:fieldset-group>
+			<aui:fieldset>
+				<aui:input helpMessage="enable-score-explanation-help" label="enable-score-explanation" name="<%= PortletPreferencesJspUtil.getInputName(SearchInsightsPortletPreferences.PREFERENCE_KEY_EXPLAIN) %>" type="checkbox" value="<%= searchInsightsPortletPreferences.isExplain() %>" />
 
-			<aui:input helpMessage="enter-the-key-of-an-alternate-search-this-widget-is-participating-on-if-not-set-widget-participates-on-default-search" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(SearchInsightsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= searchInsightsPortletPreferences.getFederatedSearchKey() %>" />
-		</aui:fieldset>
+				<aui:input helpMessage="enter-the-key-of-an-alternate-search-this-widget-is-participating-on-if-not-set-widget-participates-on-default-search" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(SearchInsightsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= searchInsightsPortletPreferences.getFederatedSearchKeyString() %>" />
+			</aui:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>

@@ -25,13 +25,19 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Marcos Martins
  */
-public class DDMFormInstanceModelListenerTest {
+@RunWith(MockitoJUnitRunner.class)
+public class DDMFormInstanceModelListenerTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -48,16 +54,16 @@ public class DDMFormInstanceModelListenerTest {
 
 	@Test
 	public void testOnAfterCreate() throws PortalException {
-		Mockito.when(
+		when(
 			_ddmFormInstanceReportLocalService.addFormInstanceReport(
 				Mockito.anyLong())
 		).thenThrow(
 			new NoSuchFormInstanceException()
 		);
 
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getFormInstanceId()
 		).thenReturn(
 			0L
@@ -68,16 +74,16 @@ public class DDMFormInstanceModelListenerTest {
 
 	@Test
 	public void testOnBeforeRemove() throws PortalException {
-		Mockito.when(
+		when(
 			_ddmFormInstanceReportLocalService.
 				getFormInstanceReportByFormInstanceId(Mockito.anyLong())
 		).thenThrow(
 			new NoSuchFormInstanceReportException()
 		);
 
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getFormInstanceId()
 		).thenReturn(
 			0L
@@ -91,8 +97,9 @@ public class DDMFormInstanceModelListenerTest {
 	}
 
 	private DDMFormInstanceModelListener _ddmFormInstanceModelListener;
-	private final DDMFormInstanceReportLocalService
-		_ddmFormInstanceReportLocalService = Mockito.mock(
-			DDMFormInstanceReportLocalService.class);
+
+	@Mock
+	private DDMFormInstanceReportLocalService
+		_ddmFormInstanceReportLocalService;
 
 }

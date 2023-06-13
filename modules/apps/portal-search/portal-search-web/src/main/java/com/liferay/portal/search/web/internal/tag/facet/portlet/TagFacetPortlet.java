@@ -16,12 +16,15 @@ package com.liferay.portal.search.web.internal.tag.facet.portlet;
 
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.web.internal.facet.display.builder.AssetTagsSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetTagsSearchFacetDisplayContext;
-import com.liferay.portal.search.web.internal.facet.display.context.builder.AssetTagsSearchFacetDisplayContextBuilder;
+import com.liferay.portal.search.web.internal.tag.facet.builder.AssetTagsFacetConfiguration;
+import com.liferay.portal.search.web.internal.tag.facet.builder.AssetTagsFacetConfigurationImpl;
 import com.liferay.portal.search.web.internal.tag.facet.constants.TagFacetPortletKeys;
 import com.liferay.portal.search.web.internal.util.SearchOptionalUtil;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchRequest;
@@ -41,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-tag-facet",
@@ -60,8 +64,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/tag/facet/view.jsp",
 		"javax.portlet.name=" + TagFacetPortletKeys.TAG_FACET,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -76,7 +79,7 @@ public class TagFacetPortlet extends MVCPortlet {
 			portletSharedSearchRequest.search(renderRequest);
 
 		AssetTagsSearchFacetDisplayContext assetTagsSearchFacetDisplayContext =
-			_buildDisplayContext(portletSharedSearchResponse, renderRequest);
+			buildDisplayContext(portletSharedSearchResponse, renderRequest);
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
@@ -90,73 +93,64 @@ public class TagFacetPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	@Reference
-	protected Portal portal;
-
-	@Reference
-	protected PortletSharedSearchRequest portletSharedSearchRequest;
-
-	private AssetTagsSearchFacetDisplayContext _buildDisplayContext(
+	protected AssetTagsSearchFacetDisplayContext buildDisplayContext(
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		RenderRequest renderRequest) {
 
-		AssetTagsSearchFacetDisplayContextBuilder
-			assetTagsSearchFacetDisplayContextBuilder =
-				_createTagsSearchFacetDisplayContextBuilder(renderRequest);
+		Facet facet = portletSharedSearchResponse.getFacet(
+			getAggregationName(renderRequest));
 
 		TagFacetPortletPreferences tagFacetPortletPreferences =
 			new TagFacetPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
 					renderRequest));
 
-		assetTagsSearchFacetDisplayContextBuilder.setDisplayStyle(
-			tagFacetPortletPreferences.getDisplayStyle());
+		AssetTagsFacetConfiguration assetTagsFacetConfiguration =
+			new AssetTagsFacetConfigurationImpl(facet.getFacetConfiguration());
 
-		assetTagsSearchFacetDisplayContextBuilder.setFacet(
-			portletSharedSearchResponse.getFacet(
-				_getAggregationName(renderRequest)));
-		assetTagsSearchFacetDisplayContextBuilder.setFrequenciesVisible(
+		AssetTagsSearchFacetDisplayBuilder assetTagsSearchFacetDisplayBuilder =
+			createTagsSearchFacetDisplayBuilder(renderRequest);
+
+		assetTagsSearchFacetDisplayBuilder.setDisplayStyle(
+			tagFacetPortletPreferences.getDisplayStyle());
+		assetTagsSearchFacetDisplayBuilder.setFacet(facet);
+		assetTagsSearchFacetDisplayBuilder.setFrequenciesVisible(
 			tagFacetPortletPreferences.isFrequenciesVisible());
-		assetTagsSearchFacetDisplayContextBuilder.setFrequencyThreshold(
-			tagFacetPortletPreferences.getFrequencyThreshold());
-		assetTagsSearchFacetDisplayContextBuilder.setMaxTerms(
-			tagFacetPortletPreferences.getMaxTerms());
-		assetTagsSearchFacetDisplayContextBuilder.setOrder(
-			tagFacetPortletPreferences.getOrder());
-		assetTagsSearchFacetDisplayContextBuilder.
-			setPaginationStartParameterName(
-				_getPaginationStartParameterName(portletSharedSearchResponse));
+		assetTagsSearchFacetDisplayBuilder.setFrequencyThreshold(
+			assetTagsFacetConfiguration.getFrequencyThreshold());
+		assetTagsSearchFacetDisplayBuilder.setMaxTerms(
+			assetTagsFacetConfiguration.getMaxTerms());
+		assetTagsSearchFacetDisplayBuilder.setPaginationStartParameterName(
+			getPaginationStartParameterName(portletSharedSearchResponse));
 
 		String parameterName = tagFacetPortletPreferences.getParameterName();
 
-		assetTagsSearchFacetDisplayContextBuilder.setParameterName(
-			parameterName);
+		assetTagsSearchFacetDisplayBuilder.setParameterName(parameterName);
 
 		SearchOptionalUtil.copy(
 			() -> portletSharedSearchResponse.getParameterValues(
 				parameterName, renderRequest),
-			assetTagsSearchFacetDisplayContextBuilder::setParameterValues);
+			assetTagsSearchFacetDisplayBuilder::setParameterValues);
 
-		return assetTagsSearchFacetDisplayContextBuilder.build();
+		return assetTagsSearchFacetDisplayBuilder.build();
 	}
 
-	private AssetTagsSearchFacetDisplayContextBuilder
-		_createTagsSearchFacetDisplayContextBuilder(
-			RenderRequest renderRequest) {
+	protected AssetTagsSearchFacetDisplayBuilder
+		createTagsSearchFacetDisplayBuilder(RenderRequest renderRequest) {
 
 		try {
-			return new AssetTagsSearchFacetDisplayContextBuilder(renderRequest);
+			return new AssetTagsSearchFacetDisplayBuilder(renderRequest);
 		}
 		catch (ConfigurationException configurationException) {
 			throw new RuntimeException(configurationException);
 		}
 	}
 
-	private String _getAggregationName(RenderRequest renderRequest) {
+	protected String getAggregationName(RenderRequest renderRequest) {
 		return portal.getPortletId(renderRequest);
 	}
 
-	private String _getPaginationStartParameterName(
+	protected String getPaginationStartParameterName(
 		PortletSharedSearchResponse portletSharedSearchResponse) {
 
 		SearchResponse searchResponse =
@@ -166,5 +160,11 @@ public class TagFacetPortlet extends MVCPortlet {
 
 		return searchRequest.getPaginationStartParameterName();
 	}
+
+	@Reference
+	protected Portal portal;
+
+	@Reference
+	protected PortletSharedSearchRequest portletSharedSearchRequest;
 
 }

@@ -17,10 +17,12 @@ package com.liferay.portal.vulcan.internal.jaxrs.context.provider;
 import com.liferay.portal.vulcan.fields.FieldsQueryParam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,13 +53,17 @@ public class FieldsQueryParamContextProvider
 			return Collections::emptySet;
 		}
 
-		Set<String> paths = new HashSet<>();
+		Stream<String> stream = Arrays.stream(fieldNamesString.split(","));
 
-		for (String fieldName : fieldNamesString.split(",")) {
-			paths.addAll(_toPaths(fieldName));
-		}
+		Set<String> fieldNames = stream.map(
+			this::_toPaths
+		).flatMap(
+			List::stream
+		).collect(
+			Collectors.toSet()
+		);
 
-		return () -> paths;
+		return () -> fieldNames;
 	}
 
 	private List<String> _toPaths(String string) {

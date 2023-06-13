@@ -59,7 +59,7 @@ const TranslationManager = ({
 		onClose: () => setVisibleModal(false),
 	});
 
-	const localeToBeRemovedRef = React.useRef(null);
+	const localeToBeRemoved = React.useRef(null);
 
 	const removeLocale = (locale) => {
 		if (defaultLocale === locale.id) {
@@ -83,11 +83,11 @@ const TranslationManager = ({
 				<DeleteLocaleModal
 					observer={observer}
 					onCancel={() => {
-						localeToBeRemovedRef.current = null;
+						localeToBeRemoved.current = null;
 						onClose();
 					}}
 					onConfirm={() => {
-						removeLocale(localeToBeRemovedRef.current);
+						removeLocale(localeToBeRemoved.current);
 						onClose();
 					}}
 				/>
@@ -114,11 +114,10 @@ const TranslationManager = ({
 								setEditingLocale(locale.id);
 							}}
 							onLocaleRemoved={(locale) => {
-								localeToBeRemovedRef.current = locale;
+								localeToBeRemoved.current = locale;
 								setVisibleModal(true);
 							}}
 						/>
-
 						<div className="autofit-col">
 							<LocaleSelector
 								locales={locales}

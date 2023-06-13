@@ -33,7 +33,8 @@ import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortletIdException;
-import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -68,6 +69,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Daniel Kocsis
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ExportImportPortletKeys.EXPORT_IMPORT,
 		"mvc.command.name=/export_import/export_import"
@@ -134,7 +136,7 @@ public class ExportImportMVCActionCommand extends BaseMVCActionCommand {
 			else if (cmd.equals(Constants.EXPORT)) {
 				hideDefaultSuccessMessage(actionRequest);
 
-				_exportData(actionRequest, portlet);
+				exportData(actionRequest, portlet);
 
 				sendRedirect(actionRequest, actionResponse);
 			}
@@ -176,13 +178,56 @@ public class ExportImportMVCActionCommand extends BaseMVCActionCommand {
 					SessionErrors.add(actionRequest, exception.getClass());
 				}
 				else {
-					_log.error(exception);
+					_log.error(exception, exception);
 
 					SessionErrors.add(
 						actionRequest,
 						ExportImportMVCActionCommand.class.getName());
 				}
 			}
+		}
+	}
+
+	protected void exportData(ActionRequest actionRequest, Portlet portlet)
+		throws Exception {
+
+		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			long plid = ParamUtil.getLong(actionRequest, "plid");
+			long groupId = ParamUtil.getLong(actionRequest, "groupId");
+			String fileName = ParamUtil.getString(
+				actionRequest, "exportFileName");
+
+			Map<String, Serializable> exportPortletSettingsMap =
+				_exportImportConfigurationSettingsMapFactory.
+					buildExportPortletSettingsMap(
+						themeDisplay.getUserId(), plid, groupId,
+						portlet.getPortletId(), actionRequest.getParameterMap(),
+						themeDisplay.getLocale(), themeDisplay.getTimeZone(),
+						fileName);
+
+			ExportImportConfiguration exportImportConfiguration =
+				_exportImportConfigurationLocalService.
+					addDraftExportImportConfiguration(
+						themeDisplay.getUserId(),
+						ExportImportConfigurationConstants.TYPE_EXPORT_PORTLET,
+						exportPortletSettingsMap);
+
+			_exportImportService.exportPortletInfoAsFileInBackground(
+				exportImportConfiguration);
+		}
+		catch (Exception exception) {
+			if (exception instanceof LARFileNameException) {
+				throw exception;
+			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			SessionErrors.add(actionRequest, exception.getClass(), exception);
 		}
 	}
 
@@ -249,6 +294,36 @@ public class ExportImportMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setDLFileEntryLocalService(
+		DLFileEntryLocalService dlFileEntryLocalService) {
+
+		_dlFileEntryLocalService = dlFileEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setExportImportConfigurationLocalService(
+		ExportImportConfigurationLocalService
+			exportImportConfigurationLocalService) {
+
+		_exportImportConfigurationLocalService =
+			exportImportConfigurationLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setExportImportService(
+		ExportImportService exportImportService) {
+
+		_exportImportService = exportImportService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setImportLayoutsMVCActionCommand(
+		ImportLayoutsMVCActionCommand importLayoutsMVCActionCommand) {
+
+		_importLayoutsMVCActionCommand = importLayoutsMVCActionCommand;
+	}
+
 	protected void validateFile(
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			String folderName)
@@ -275,21 +350,19 @@ public class ExportImportMVCActionCommand extends BaseMVCActionCommand {
 				return;
 			}
 
-			JSONPortletResponseUtil.writeJSON(
-				actionRequest, actionResponse,
-				JSONUtil.put(
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+			if ((weakMissingReferences != null) &&
+				!weakMissingReferences.isEmpty()) {
+
+				jsonObject.put(
 					"warningMessages",
-					() -> {
-						if ((weakMissingReferences != null) &&
-							!weakMissingReferences.isEmpty()) {
+					_staging.getWarningMessagesJSONArray(
+						themeDisplay.getLocale(), weakMissingReferences));
+			}
 
-							return _staging.getWarningMessagesJSONArray(
-								themeDisplay.getLocale(),
-								weakMissingReferences);
-						}
-
-						return null;
-					}));
+			JSONPortletResponseUtil.writeJSON(
+				actionRequest, actionResponse, jsonObject);
 		}
 	}
 
@@ -323,56 +396,10 @@ public class ExportImportMVCActionCommand extends BaseMVCActionCommand {
 			exportImportConfiguration, inputStream);
 	}
 
-	private void _exportData(ActionRequest actionRequest, Portlet portlet)
-		throws Exception {
-
-		try {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-			long plid = ParamUtil.getLong(actionRequest, "plid");
-			long groupId = ParamUtil.getLong(actionRequest, "groupId");
-			String fileName = ParamUtil.getString(
-				actionRequest, "exportFileName");
-
-			Map<String, Serializable> exportPortletSettingsMap =
-				_exportImportConfigurationSettingsMapFactory.
-					buildExportPortletSettingsMap(
-						themeDisplay.getUserId(), plid, groupId,
-						portlet.getPortletId(), actionRequest.getParameterMap(),
-						themeDisplay.getLocale(), themeDisplay.getTimeZone(),
-						fileName);
-
-			ExportImportConfiguration exportImportConfiguration =
-				_exportImportConfigurationLocalService.
-					addDraftExportImportConfiguration(
-						themeDisplay.getUserId(),
-						ExportImportConfigurationConstants.TYPE_EXPORT_PORTLET,
-						exportPortletSettingsMap);
-
-			_exportImportService.exportPortletInfoAsFileInBackground(
-				exportImportConfiguration);
-		}
-		catch (Exception exception) {
-			if (exception instanceof LARFileNameException) {
-				throw exception;
-			}
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			SessionErrors.add(actionRequest, exception.getClass(), exception);
-		}
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportImportMVCActionCommand.class);
 
-	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
-
-	@Reference
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
 
@@ -383,10 +410,7 @@ public class ExportImportMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private ExportImportHelper _exportImportHelper;
 
-	@Reference
 	private ExportImportService _exportImportService;
-
-	@Reference
 	private ImportLayoutsMVCActionCommand _importLayoutsMVCActionCommand;
 
 	@Reference

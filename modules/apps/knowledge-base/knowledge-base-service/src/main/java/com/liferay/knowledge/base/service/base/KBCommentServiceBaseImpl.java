@@ -17,15 +17,18 @@ package com.liferay.knowledge.base.service.base;
 import com.liferay.knowledge.base.model.KBComment;
 import com.liferay.knowledge.base.service.KBCommentService;
 import com.liferay.knowledge.base.service.KBCommentServiceUtil;
+import com.liferay.knowledge.base.service.persistence.KBArticleFinder;
+import com.liferay.knowledge.base.service.persistence.KBArticlePersistence;
 import com.liferay.knowledge.base.service.persistence.KBCommentPersistence;
+import com.liferay.knowledge.base.service.persistence.KBFolderFinder;
+import com.liferay.knowledge.base.service.persistence.KBFolderPersistence;
+import com.liferay.knowledge.base.service.persistence.KBTemplatePersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -133,6 +136,12 @@ public abstract class KBCommentServiceBaseImpl
 	}
 
 	@Reference
+	protected KBArticlePersistence kbArticlePersistence;
+
+	@Reference
+	protected KBArticleFinder kbArticleFinder;
+
+	@Reference
 	protected com.liferay.knowledge.base.service.KBCommentLocalService
 		kbCommentLocalService;
 
@@ -142,10 +151,35 @@ public abstract class KBCommentServiceBaseImpl
 	protected KBCommentPersistence kbCommentPersistence;
 
 	@Reference
+	protected KBFolderPersistence kbFolderPersistence;
+
+	@Reference
+	protected KBFolderFinder kbFolderFinder;
+
+	@Reference
+	protected KBTemplatePersistence kbTemplatePersistence;
+
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		KBCommentServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameService
+		classNameService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserService userService;
 
 }

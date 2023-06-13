@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.stream.Stream;
+
 /**
  * @author Leonardo Barros
  */
@@ -36,11 +38,11 @@ public class IsEmptyFunction
 		if (isArray(parameter)) {
 			Object[] values = (Object[])parameter;
 
-			for (Object value : values) {
-				if (Validator.isNotNull(value)) {
-					return false;
-				}
-			}
+			return Stream.of(
+				values
+			).allMatch(
+				Validator::isNull
+			);
 		}
 
 		if (parameter instanceof JSONArray) {

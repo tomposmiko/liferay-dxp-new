@@ -22,15 +22,14 @@ import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.service.CPOptionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductOption;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductOptionDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.ProductOptionUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductOptionResource;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
@@ -52,11 +51,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/product-option.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, ProductOptionResource.class}
 )
-@CTAware
 public class ProductOptionResourceImpl
 	extends BaseProductOptionResourceImpl implements NestedFieldSupport {
 
@@ -296,11 +295,8 @@ public class ProductOptionResourceImpl
 	@Reference
 	private CPOptionService _cpOptionService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductOptionDTOConverter)"
-	)
-	private DTOConverter<CPDefinitionOptionRel, ProductOption>
-		_productOptionDTOConverter;
+	@Reference
+	private ProductOptionDTOConverter _productOptionDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

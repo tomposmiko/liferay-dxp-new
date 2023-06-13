@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.theme.minium.full.site.initializer.internal.importer;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.machine.learning.forecast.AssetCategoryCommerceMLForecast;
 import com.liferay.commerce.machine.learning.forecast.AssetCategoryCommerceMLForecastManager;
 import com.liferay.commerce.machine.learning.forecast.CommerceAccountCommerceMLForecast;
@@ -37,7 +37,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.time.LocalDateTime;
@@ -56,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = CommerceMLForecastImporter.class)
+@Component(enabled = false, service = CommerceMLForecastImporter.class)
 public class CommerceMLForecastImporter {
 
 	public void importCommerceMLForecasts(
@@ -169,12 +169,12 @@ public class CommerceMLForecastImporter {
 
 		String accountName = jsonObject.getString("account");
 
-		AccountEntry accountEntry =
-			_accountEntryLocalService.fetchAccountEntryByExternalReferenceCode(
-				_friendlyURLNormalizer.normalize(accountName),
-				serviceContext.getCompanyId());
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.fetchByExternalReferenceCode(
+				serviceContext.getCompanyId(),
+				FriendlyURLNormalizerUtil.normalize(accountName));
 
-		if (accountEntry == null) {
+		if (commerceAccount == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No commerce account with name: " + accountName);
 			}
@@ -183,7 +183,7 @@ public class CommerceMLForecastImporter {
 		}
 
 		assetCategoryCommerceMLForecast.setCommerceAccountId(
-			accountEntry.getAccountEntryId());
+			commerceAccount.getCommerceAccountId());
 
 		_assetCategoryCommerceMLForecastManager.
 			addAssetCategoryCommerceMLForecast(assetCategoryCommerceMLForecast);
@@ -201,12 +201,12 @@ public class CommerceMLForecastImporter {
 
 		String accountName = jsonObject.getString("account");
 
-		AccountEntry accountEntry =
-			_accountEntryLocalService.fetchAccountEntryByExternalReferenceCode(
-				_friendlyURLNormalizer.normalize(accountName),
-				serviceContext.getCompanyId());
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.fetchByExternalReferenceCode(
+				serviceContext.getCompanyId(),
+				FriendlyURLNormalizerUtil.normalize(accountName));
 
-		if (accountEntry == null) {
+		if (commerceAccount == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No commerce account with name: " + accountName);
 			}
@@ -215,7 +215,7 @@ public class CommerceMLForecastImporter {
 		}
 
 		commerceAccountCommerceMLForecast.setCommerceAccountId(
-			accountEntry.getAccountEntryId());
+			commerceAccount.getCommerceAccountId());
 
 		_commerceAccountCommerceMLForecastManager.
 			addCommerceAccountCommerceMLForecast(
@@ -255,9 +255,6 @@ public class CommerceMLForecastImporter {
 		CommerceMLForecastImporter.class);
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Reference
 	private AssetCategoryCommerceMLForecastManager
 		_assetCategoryCommerceMLForecastManager;
 
@@ -272,10 +269,10 @@ public class CommerceMLForecastImporter {
 		_commerceAccountCommerceMLForecastManager;
 
 	@Reference
-	private CompanyLocalService _companyLocalService;
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

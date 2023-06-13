@@ -17,10 +17,9 @@ package com.liferay.search.experiences.internal.blueprint.highlight;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.search.highlight.FieldConfigBuilderFactory;
-import com.liferay.portal.search.highlight.Highlight;
 import com.liferay.portal.search.highlight.HighlightBuilder;
 import com.liferay.portal.search.highlight.HighlightBuilderFactory;
-import com.liferay.search.experiences.rest.dto.v1_0.HighlightConfiguration;
+import com.liferay.search.experiences.rest.dto.v1_0.Highlight;
 import com.liferay.search.experiences.rest.dto.v1_0.HighlightField;
 
 import java.util.Map;
@@ -38,13 +37,12 @@ public class HighlightConverter {
 		_highlightBuilderFactory = highlightBuilderFactory;
 	}
 
-	public Highlight toHighlight(
-		HighlightConfiguration highlightConfiguration) {
+	public com.liferay.portal.search.highlight.Highlight toHighlight(
+		Highlight highlight) {
 
 		HighlightBuilder highlightBuilder = _highlightBuilderFactory.builder();
 
-		Map<String, HighlightField> highlightFields =
-			highlightConfiguration.getFields();
+		Map<String, HighlightField> highlightFields = highlight.getFields();
 
 		MapUtil.isNotEmptyForEach(
 			highlightFields,
@@ -60,31 +58,32 @@ public class HighlightConverter {
 				).build()));
 
 		highlightBuilder.fragmentSize(
-			highlightConfiguration.getFragment_size()
+			highlight.getFragment_size()
 		).highlighterType(
-			highlightConfiguration.getType()
+			highlight.getType()
 		).numOfFragments(
-			highlightConfiguration.getNumber_of_fragments()
+			highlight.getNumber_of_fragments()
 		).postTags(
-			highlightConfiguration.getPost_tags()
+			highlight.getPost_tags()
 		).preTags(
-			highlightConfiguration.getPre_tags()
+			highlight.getPre_tags()
 		).requireFieldMatch(
-			highlightConfiguration.getRequire_field_match()
+			highlight.getRequire_field_match()
 		);
 
 		return highlightBuilder.build();
 	}
 
-	public Highlight toHighlight(JSONObject jsonObject) {
+	public com.liferay.portal.search.highlight.Highlight toHighlight(
+		JSONObject jsonObject) {
+
 		if (jsonObject == null) {
 			return null;
 		}
 
-		HighlightConfiguration highlightConfiguration =
-			HighlightConfiguration.toDTO(jsonObject.toString());
+		Highlight highlight = Highlight.toDTO(jsonObject.toString());
 
-		return toHighlight(highlightConfiguration);
+		return toHighlight(highlight);
 	}
 
 	private final FieldConfigBuilderFactory _fieldConfigBuilderFactory;

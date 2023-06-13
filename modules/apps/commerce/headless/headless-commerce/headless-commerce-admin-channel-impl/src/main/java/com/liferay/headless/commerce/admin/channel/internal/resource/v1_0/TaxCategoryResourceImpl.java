@@ -17,8 +17,8 @@ package com.liferay.headless.commerce.admin.channel.internal.resource.v1_0;
 import com.liferay.commerce.product.model.CPTaxCategory;
 import com.liferay.commerce.product.service.CPTaxCategoryService;
 import com.liferay.headless.commerce.admin.channel.dto.v1_0.TaxCategory;
+import com.liferay.headless.commerce.admin.channel.internal.dto.v1_0.converter.TaxCategoryDTOConverter;
 import com.liferay.headless.commerce.admin.channel.resource.v1_0.TaxCategoryResource;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Andrea Sbarra
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/tax-category.properties",
 	scope = ServiceScope.PROTOTYPE, service = TaxCategoryResource.class
 )
@@ -79,9 +80,7 @@ public class TaxCategoryResourceImpl extends BaseTaxCategoryResourceImpl {
 	@Reference
 	private CPTaxCategoryService _cpTaxCategoryService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.channel.internal.dto.v1_0.converter.TaxCategoryDTOConverter)"
-	)
-	private DTOConverter<CPTaxCategory, TaxCategory> _taxCategoryDTOConverter;
+	@Reference
+	private TaxCategoryDTOConverter _taxCategoryDTOConverter;
 
 }

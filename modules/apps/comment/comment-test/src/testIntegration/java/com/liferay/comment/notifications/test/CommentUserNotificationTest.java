@@ -71,11 +71,13 @@ public class CommentUserNotificationTest extends BaseUserNotificationTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
 		_entry = BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), TestPropsValues.getUserId()));
+			RandomTestUtil.randomString(), serviceContext);
 	}
 
 	@Test
@@ -167,7 +169,7 @@ public class CommentUserNotificationTest extends BaseUserNotificationTestCase {
 			serviceContext, Constants.ADD);
 
 		return MBMessageLocalServiceUtil.addDiscussionMessage(
-			null, TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
 			group.getGroupId(), BlogsEntry.class.getName(), _entry.getEntryId(),
 			thread.getThreadId(), MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(50),

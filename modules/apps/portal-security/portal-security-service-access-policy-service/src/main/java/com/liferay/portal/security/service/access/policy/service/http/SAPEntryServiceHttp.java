@@ -46,6 +46,7 @@ import com.liferay.portal.security.service.access.policy.service.SAPEntryService
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see SAPEntryServiceSoap
  * @generated
  */
 public class SAPEntryServiceHttp {

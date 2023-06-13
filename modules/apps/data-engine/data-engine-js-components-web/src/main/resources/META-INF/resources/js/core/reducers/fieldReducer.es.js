@@ -22,7 +22,7 @@ import {
 import {PagesVisitor} from '../../utils/visitors.es';
 import {EVENT_TYPES} from '../actions/eventTypes.es';
 
-export function createRepeatedField(sourceField, repeatedIndex) {
+export const createRepeatedField = (sourceField, repeatedIndex) => {
 	const instanceId = generateInstanceId();
 	const {locale, name, nestedFields, predefinedValue} = sourceField;
 	let localizedValue;
@@ -52,9 +52,9 @@ export function createRepeatedField(sourceField, repeatedIndex) {
 		valid: true,
 		value: predefinedValue,
 	};
-}
+};
 
-export function updateNestedFieldNames(parentFieldName, nestedFields) {
+export const updateNestedFieldNames = (parentFieldName, nestedFields) => {
 	return (nestedFields || []).map((nestedField) => {
 		const newNestedFieldName = generateNestedFieldName(
 			nestedField.name,
@@ -63,12 +63,6 @@ export function updateNestedFieldNames(parentFieldName, nestedFields) {
 
 		return {
 			...nestedField,
-			...(nestedField.editorConfig && {
-				editorConfig: updateEditorConfigFieldName(
-					nestedField.editorConfig,
-					newNestedFieldName
-				),
-			}),
 			name: newNestedFieldName,
 			nestedFields: updateNestedFieldNames(
 				newNestedFieldName,
@@ -77,31 +71,9 @@ export function updateNestedFieldNames(parentFieldName, nestedFields) {
 			...parseNestedFieldName(newNestedFieldName),
 		};
 	});
-}
+};
 
-function updateEditorConfigFieldName(editorConfig, name) {
-	const updatedEditorConfig = {...editorConfig};
-	for (const [key, value] of Object.entries(updatedEditorConfig)) {
-		if (typeof value === 'string') {
-			const parsedName = parseName(decodeURIComponent(value));
-
-			if (Object.keys(parsedName).length) {
-				const currentName = encodeURIComponent(
-					generateName(null, parsedName)
-				);
-
-				updatedEditorConfig[key] = value.replace(
-					currentName,
-					encodeURIComponent(name) + 'selectItem'
-				);
-			}
-		}
-	}
-
-	return updatedEditorConfig;
-}
-
-export default function fieldReducer(state, action) {
+export default (state, action) => {
 	switch (action.type) {
 		case EVENT_TYPES.FIELD.BLUR: {
 			const {fieldInstance} = action.payload;
@@ -112,7 +84,7 @@ export default function fieldReducer(state, action) {
 					const matches =
 						field.name === fieldInstance.name &&
 						field.required &&
-						fieldInstance.value === '';
+						fieldInstance.value == '';
 
 					return {
 						...field,
@@ -252,12 +224,6 @@ export default function fieldReducer(state, action) {
 
 									return {
 										...currentField,
-										...(currentField.editorConfig && {
-											editorConfig: updateEditorConfigFieldName(
-												currentField.editorConfig,
-												name
-											),
-										}),
 										name,
 										nestedFields: updateNestedFieldNames(
 											name,
@@ -290,4 +256,4 @@ export default function fieldReducer(state, action) {
 		default:
 			return state;
 	}
-}
+};

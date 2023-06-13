@@ -1,24 +1,15 @@
-@default = "uploadCommonFile"
-definition {
+<definition default="uploadCommonFile">
+	<command name="uploadCommonFile">
+		<execute selenium="waitForVisible" />
 
-	function uploadCommonFile {
-		selenium.waitForVisible();
+		<execute selenium="mouseOver" />
 
-		selenium.mouseOver();
+		<execute selenium="uploadCommonFile" />
+	</command>
 
-		selenium.uploadCommonFile();
-	}
+	<command name="uploadCommonFileHidden">
+		<execute selenium="mouseOver" />
 
-	function uploadCommonFileHidden {
-		selenium.mouseOver();
-
-		selenium.uploadCommonFile();
-	}
-
-	function uploadCommonFileHiddenNoMouseOver {
-		selenium.waitForElementPresent();
-
-		selenium.uploadCommonFile();
-	}
-
-}
+		<execute selenium="uploadCommonFile" />
+	</command>
+</definition>

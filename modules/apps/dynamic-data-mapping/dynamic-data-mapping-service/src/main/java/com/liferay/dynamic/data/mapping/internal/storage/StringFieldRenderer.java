@@ -46,7 +46,7 @@ public class StringFieldRenderer extends BaseFieldRenderer {
 
 	@Override
 	protected String doRender(Field field, Locale locale) throws Exception {
-		String fieldType = _getFieldType(field);
+		String fieldType = getFieldType(field);
 
 		List<String> values = new ArrayList<>();
 
@@ -58,11 +58,11 @@ public class StringFieldRenderer extends BaseFieldRenderer {
 			}
 
 			if (fieldType.equals(DDMFormFieldType.SELECT)) {
-				valueString = _handleSelectFieldValue(
+				valueString = handleSelectFieldValue(
 					field, valueString, locale);
 			}
 			else if (fieldType.equals(DDMFormFieldType.RADIO)) {
-				return _handleRadioFieldValue(
+				return handleRadioFieldValue(
 					field, String.valueOf(value), locale);
 			}
 
@@ -82,21 +82,22 @@ public class StringFieldRenderer extends BaseFieldRenderer {
 			return StringPool.BLANK;
 		}
 
-		String fieldType = _getFieldType(field);
+		String fieldType = getFieldType(field);
 
 		String valueString = String.valueOf(value);
 
 		if (fieldType.equals(DDMFormFieldType.SELECT)) {
-			return _handleSelectFieldValue(field, valueString, locale);
+			return handleSelectFieldValue(field, valueString, locale);
 		}
 		else if (fieldType.equals(DDMFormFieldType.RADIO)) {
-			return _handleRadioFieldValue(field, valueString, locale);
+			return handleRadioFieldValue(field, valueString, locale);
 		}
 
 		return valueString;
 	}
 
-	private LocalizedValue _getFieldOptionLabel(Field field, String optionValue)
+	protected LocalizedValue getFieldOptionLabel(
+			Field field, String optionValue)
 		throws Exception {
 
 		DDMStructure ddmStructure = field.getDDMStructure();
@@ -110,13 +111,13 @@ public class StringFieldRenderer extends BaseFieldRenderer {
 		return ddmFormFieldOptions.getOptionLabels(optionValue);
 	}
 
-	private String _getFieldType(Field field) throws Exception {
+	protected String getFieldType(Field field) throws Exception {
 		DDMStructure ddmStructure = field.getDDMStructure();
 
 		return ddmStructure.getFieldType(field.getName());
 	}
 
-	private String _handleRadioFieldValue(
+	protected String handleRadioFieldValue(
 			Field field, String value, Locale locale)
 		throws Exception {
 
@@ -124,7 +125,7 @@ public class StringFieldRenderer extends BaseFieldRenderer {
 			return StringPool.BLANK;
 		}
 
-		LocalizedValue label = _getFieldOptionLabel(field, value);
+		LocalizedValue label = getFieldOptionLabel(field, value);
 
 		if (label == null) {
 			return value;
@@ -133,7 +134,7 @@ public class StringFieldRenderer extends BaseFieldRenderer {
 		return GetterUtil.getString(label.getString(locale));
 	}
 
-	private String _handleSelectFieldValue(
+	protected String handleSelectFieldValue(
 			Field field, String json, Locale locale)
 		throws Exception {
 
@@ -146,7 +147,7 @@ public class StringFieldRenderer extends BaseFieldRenderer {
 		StringBundler sb = new StringBundler(jsonArray.length() * 2);
 
 		for (int i = 0; i < jsonArray.length(); i++) {
-			LocalizedValue localizedValue = _getFieldOptionLabel(
+			LocalizedValue localizedValue = getFieldOptionLabel(
 				field, jsonArray.getString(i));
 
 			if (localizedValue != null) {

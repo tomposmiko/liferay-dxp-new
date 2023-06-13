@@ -22,30 +22,33 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
+
+import java.util.Locale;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Rodrigo Paulino
  */
-public class CheckboxDDMFormFieldTypeReportProcessorTest {
+@PrepareForTest(LanguageUtil.class)
+@RunWith(PowerMockRunner.class)
+public class CheckboxDDMFormFieldTypeReportProcessorTest extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
+	@Before
+	public void setUp() throws Exception {
 		_setUpJSONFactoryUtil();
+		_setUpLanguageUtil();
 	}
 
 	@Test
@@ -55,13 +58,13 @@ public class CheckboxDDMFormFieldTypeReportProcessorTest {
 		JSONObject processedJSONObject =
 			_checkboxDDMFormFieldTypeReportProcessor.process(
 				_mockDDMFormFieldValue("true"),
-				JSONUtil.put("values", JSONUtil.put("true", 1)), 0,
+				JSONUtil.put("values", JSONUtil.put("True", 1)), 0,
 				DDMFormInstanceReportConstants.EVENT_DELETE_RECORD_VERSION);
 
 		JSONObject valuesJSONObject = processedJSONObject.getJSONObject(
 			"values");
 
-		Assert.assertEquals(0, valuesJSONObject.getLong("true"));
+		Assert.assertEquals(0, valuesJSONObject.getLong("True"));
 	}
 
 	@Test
@@ -71,13 +74,13 @@ public class CheckboxDDMFormFieldTypeReportProcessorTest {
 		JSONObject processedJSONObject =
 			_checkboxDDMFormFieldTypeReportProcessor.process(
 				_mockDDMFormFieldValue("true"),
-				JSONUtil.put("values", JSONUtil.put("true", 1)), 0,
+				JSONUtil.put("values", JSONUtil.put("True", 1)), 0,
 				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
 
 		JSONObject valuesJSONObject = processedJSONObject.getJSONObject(
 			"values");
 
-		Assert.assertEquals(2, valuesJSONObject.getLong("true"));
+		Assert.assertEquals(2, valuesJSONObject.getLong("True"));
 	}
 
 	@Test
@@ -97,7 +100,7 @@ public class CheckboxDDMFormFieldTypeReportProcessorTest {
 		JSONObject valuesJSONObject = processedJSONObject.getJSONObject(
 			"values");
 
-		Assert.assertEquals(1, valuesJSONObject.getLong("false"));
+		Assert.assertEquals(1, valuesJSONObject.getLong("False"));
 	}
 
 	@Test
@@ -113,26 +116,19 @@ public class CheckboxDDMFormFieldTypeReportProcessorTest {
 		JSONObject valuesJSONObject = processedJSONObject.getJSONObject(
 			"values");
 
-		Assert.assertEquals(1, valuesJSONObject.getLong("true"));
-	}
-
-	private static void _setUpJSONFactoryUtil() {
-		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
-
-		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
+		Assert.assertEquals(1, valuesJSONObject.getLong("True"));
 	}
 
 	private DDMFormFieldValue _mockDDMFormFieldValue(String value) {
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getName()
 		).thenReturn(
 			"boolean"
 		);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getType()
 		).thenReturn(
 			DDMFormFieldTypeConstants.CHECKBOX
@@ -143,13 +139,35 @@ public class CheckboxDDMFormFieldTypeReportProcessorTest {
 		localizedValue.addString(LocaleUtil.US, value);
 		localizedValue.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			localizedValue
 		);
 
 		return ddmFormFieldValue;
+	}
+
+	private void _setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
+	}
+
+	private void _setUpLanguageUtil() {
+		mockStatic(LanguageUtil.class);
+
+		when(
+			LanguageUtil.get(Matchers.any(Locale.class), Matchers.eq("false"))
+		).thenReturn(
+			"False"
+		);
+
+		when(
+			LanguageUtil.get(Matchers.any(Locale.class), Matchers.eq("true"))
+		).thenReturn(
+			"True"
+		);
 	}
 
 	private final CheckboxDDMFormFieldTypeReportProcessor

@@ -13,30 +13,36 @@
  */
 
 import ClayAlert from '@clayui/alert';
+import {useIsMounted} from '@liferay/frontend-js-react-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef} from 'react';
 
 import {
 	LayoutDataPropTypes,
 	getLayoutDataItemPropTypes,
-} from '../../prop_types/index';
+} from '../../prop-types/index';
+import {ITEM_ACTIVATION_ORIGINS} from '../config/constants/itemActivationOrigins';
 import {LAYOUT_DATA_ITEM_TYPES} from '../config/constants/layoutDataItemTypes';
+import {LAYOUT_TYPES} from '../config/constants/layoutTypes';
 import {config} from '../config/index';
-import {useSelectItem} from '../contexts/ControlsContext';
+import {useSetCollectionActiveItemContext} from '../contexts/CollectionActiveItemContext';
+import {
+	useActivationOrigin,
+	useIsActive,
+	useSelectItem,
+} from '../contexts/ControlsContext';
 import {useSelector} from '../contexts/StoreContext';
 import {deepEqual} from '../utils/checkDeepEqual';
-import useDropContainerId from '../utils/useDropContainerId';
-import FragmentWithControls from './layout_data_items/FragmentWithControls';
+import FragmentWithControls from './layout-data-items/FragmentWithControls';
 import {
 	CollectionItemWithControls,
 	CollectionWithControls,
 	ColumnWithControls,
 	ContainerWithControls,
 	DropZoneWithControls,
-	FormWithControls,
 	Root,
 	RowWithControls,
-} from './layout_data_items/index';
+} from './layout-data-items/index';
 
 const LAYOUT_DATA_ITEMS = {
 	[LAYOUT_DATA_ITEM_TYPES.collection]: CollectionWithControls,
@@ -44,7 +50,6 @@ const LAYOUT_DATA_ITEMS = {
 	[LAYOUT_DATA_ITEM_TYPES.column]: ColumnWithControls,
 	[LAYOUT_DATA_ITEM_TYPES.container]: ContainerWithControls,
 	[LAYOUT_DATA_ITEM_TYPES.dropZone]: DropZoneWithControls,
-	[LAYOUT_DATA_ITEM_TYPES.form]: FormWithControls,
 	[LAYOUT_DATA_ITEM_TYPES.fragment]: FragmentWithControls,
 	[LAYOUT_DATA_ITEM_TYPES.fragmentDropZone]: Root,
 	[LAYOUT_DATA_ITEM_TYPES.root]: Root,
@@ -89,14 +94,15 @@ export default function Layout({mainItemId}) {
 		};
 	}, [layoutRef]);
 
+	const isPageConversion = config.layoutType === LAYOUT_TYPES.conversion;
 	const hasWarningMessages =
-		config.isConversionDraft &&
+		isPageConversion &&
 		config.layoutConversionWarningMessages &&
-		!!config.layoutConversionWarningMessages.length;
+		config.layoutConversionWarningMessages.length > 0;
 
 	return (
 		<>
-			{config.isConversionDraft && (
+			{isPageConversion && (
 				<div className="page-editor__conversion-messages">
 					<ClayAlert
 						displayType="info"
@@ -122,21 +128,14 @@ export default function Layout({mainItemId}) {
 			)}
 
 			{mainItem && (
-				<>
-					<div
-						className="page-editor"
-						id="page-editor"
-						onClick={onClick}
-						ref={layoutRef}
-					>
-						<LayoutDataItem
-							item={mainItem}
-							layoutData={layoutData}
-						/>
-					</div>
-
-					<LayoutClassManager layoutRef={layoutRef} />
-				</>
+				<div
+					className="page-editor"
+					id="page-editor"
+					onClick={onClick}
+					ref={layoutRef}
+				>
+					<LayoutDataItem item={mainItem} layoutData={layoutData} />
+				</div>
 			)}
 		</>
 	);
@@ -215,6 +214,11 @@ function LayoutDataItemContent({item, layoutData}) {
 
 	return (
 		<>
+			<LayoutDataItemInteractionFilter
+				componentRef={componentRef}
+				item={item}
+			/>
+
 			<Component item={item} layoutData={layoutData} ref={componentRef}>
 				{item.children.map((childId) => {
 					return (
@@ -235,17 +239,32 @@ LayoutDataItemContent.propTypes = {
 	layoutData: LayoutDataPropTypes.isRequired,
 };
 
-function LayoutClassManager({layoutRef}) {
-	const dropContainerId = useDropContainerId();
+const LayoutDataItemInteractionFilter = ({componentRef, item}) => {
+	useSetCollectionActiveItemContext(item.itemId);
+
+	const activationOrigin = useActivationOrigin();
+	const isActive = useIsActive()(item.itemId);
+	const isMounted = useIsMounted();
 
 	useEffect(() => {
-		if (dropContainerId) {
-			layoutRef.current?.classList.add('is-dragging');
+		if (
+			isActive &&
+			componentRef.current &&
+			isMounted() &&
+			activationOrigin === ITEM_ACTIVATION_ORIGINS.sidebar
+		) {
+			componentRef.current.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+				inline: 'nearest',
+			});
 		}
-		else {
-			layoutRef.current?.classList.remove('is-dragging');
-		}
-	}, [dropContainerId, layoutRef]);
+	}, [activationOrigin, componentRef, isActive, isMounted]);
 
 	return null;
-}
+};
+
+LayoutDataItemInteractionFilter.propTypes = {
+	componentRef: PropTypes.object.isRequired,
+	item: getLayoutDataItemPropTypes().isRequired,
+};

@@ -19,7 +19,7 @@ import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWe
 import com.liferay.analytics.settings.web.internal.search.GroupChecker;
 import com.liferay.analytics.settings.web.internal.search.GroupSearch;
 import com.liferay.analytics.settings.web.internal.util.AnalyticsSettingsUtil;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.GroupServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
@@ -49,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -93,33 +93,34 @@ public class GroupDisplayContext {
 
 		groupSearch.setOrderByCol(_getOrderByCol());
 		groupSearch.setOrderByType(getOrderByType());
-		groupSearch.setResultsAndTotal(
-			() -> {
-				List<Group> groups = Collections.emptyList();
 
-				try {
-					groups = GroupServiceUtil.search(
-						_getCompanyId(), _getClassNameIds(), _getKeywords(),
-						_getGroupParams(), groupSearch.getStart(),
-						groupSearch.getEnd(),
-						new GroupNameComparator(_isOrderByAscending()));
-				}
-				catch (PortalException portalException) {
-					_log.error(portalException);
-				}
+		List<Group> groups = Collections.emptyList();
 
-				_fetchChannelNames(groups);
-
-				return groups;
-			},
-			GroupServiceUtil.searchCount(
+		try {
+			groups = GroupServiceUtil.search(
 				_getCompanyId(), _getClassNameIds(), _getKeywords(),
-				_getGroupParams()));
+				_getGroupParams(), groupSearch.getStart(), groupSearch.getEnd(),
+				new GroupNameComparator(_isOrderByAscending()));
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+		}
+
+		groupSearch.setResults(groups);
+
+		_fetchChannelNames(groups);
+
 		groupSearch.setRowChecker(
 			new GroupChecker(
 				_renderResponse,
 				ParamUtil.getString(_renderRequest, "channelId"),
 				_getDisabledGroupIds(), _mvcRenderCommandName));
+
+		int total = GroupServiceUtil.searchCount(
+			_getCompanyId(), _getClassNameIds(), _getKeywords(),
+			_getGroupParams());
+
+		groupSearch.setTotal(total);
 
 		return groupSearch;
 	}
@@ -129,9 +130,8 @@ public class GroupDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_renderRequest, AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
-			"group-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -169,6 +169,16 @@ public class GroupDisplayContext {
 			return;
 		}
 
+		Stream<Group> stream = groups.stream();
+
+		List<String> groupIds = stream.map(
+			Group::getGroupId
+		).map(
+			String::valueOf
+		).collect(
+			Collectors.toList()
+		);
+
 		try {
 			HttpResponse httpResponse = AnalyticsSettingsUtil.doPost(
 				JSONUtil.put(
@@ -176,9 +186,7 @@ public class GroupDisplayContext {
 					AnalyticsSettingsUtil.getDataSourceId(
 						themeDisplay.getCompanyId())
 				).put(
-					"groupIds",
-					TransformUtil.transform(
-						groups, group -> String.valueOf(group.getGroupId()))
+					"groupIds", groupIds
 				),
 				themeDisplay.getCompanyId(),
 				"api/1.0/channels/query_channel_names");
@@ -199,7 +207,7 @@ public class GroupDisplayContext {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -254,15 +262,14 @@ public class GroupDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_renderRequest, AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
-			"group-order-by-col", "site-name");
+		_orderByCol = ParamUtil.getString(
+			_renderRequest, "orderByCol", "site-name");
 
 		return _orderByCol;
 	}
 
 	private boolean _isOrderByAscending() {
-		if (Objects.equals(getOrderByType(), "asc")) {
+		if (Objects.equals("asc", getOrderByType())) {
 			return true;
 		}
 

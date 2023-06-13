@@ -37,11 +37,8 @@ import com.liferay.portal.tools.service.builder.test.model.CacheMissEntryTable;
 import com.liferay.portal.tools.service.builder.test.model.impl.CacheMissEntryImpl;
 import com.liferay.portal.tools.service.builder.test.model.impl.CacheMissEntryModelImpl;
 import com.liferay.portal.tools.service.builder.test.service.persistence.CacheMissEntryPersistence;
-import com.liferay.portal.tools.service.builder.test.service.persistence.CacheMissEntryUtil;
 
 import java.io.Serializable;
-
-import java.lang.reflect.Field;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -386,9 +383,7 @@ public class CacheMissEntryPersistenceImpl
 	 */
 	@Override
 	public CacheMissEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				CacheMissEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(CacheMissEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -607,7 +602,7 @@ public class CacheMissEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<CacheMissEntry>)dummyFinderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -683,7 +678,7 @@ public class CacheMissEntryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)dummyFinderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -794,30 +789,10 @@ public class CacheMissEntryPersistenceImpl
 		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
-
-		_setCacheMissEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setCacheMissEntryUtilPersistence(null);
-
 		dummyEntityCache.removeCache(CacheMissEntryImpl.class.getName());
-	}
-
-	private void _setCacheMissEntryUtilPersistence(
-		CacheMissEntryPersistence cacheMissEntryPersistence) {
-
-		try {
-			Field field = CacheMissEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, cacheMissEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@ServiceReference(type = CTPersistenceHelper.class)

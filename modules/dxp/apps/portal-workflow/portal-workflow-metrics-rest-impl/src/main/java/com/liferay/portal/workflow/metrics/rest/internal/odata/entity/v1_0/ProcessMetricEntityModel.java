@@ -23,6 +23,9 @@ import com.liferay.portal.odata.entity.IntegerEntityField;
 import com.liferay.portal.odata.entity.StringEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Inácio Nery
@@ -30,7 +33,7 @@ import java.util.Map;
 public class ProcessMetricEntityModel implements EntityModel {
 
 	public ProcessMetricEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = Stream.of(
 			new IntegerEntityField("instanceCount", locale -> "instanceCount"),
 			new IntegerEntityField(
 				"onTimeInstanceCount", locale -> "onTimeInstanceCount"),
@@ -38,8 +41,10 @@ public class ProcessMetricEntityModel implements EntityModel {
 				"overdueInstanceCount", locale -> "overdueInstanceCount"),
 			new StringEntityField(
 				"title",
-				locale ->
-					Field.getLocalizedName(locale, "title") + ".keyword"));
+				locale -> Field.getLocalizedName(locale, "title") + ".keyword")
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

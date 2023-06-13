@@ -16,6 +16,7 @@ package com.liferay.portal.workflow.kaleo.internal.runtime.integration.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.messaging.proxy.ProxyMessageListener;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -24,6 +25,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 import com.liferay.portal.kernel.workflow.WorkflowException;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -40,7 +43,7 @@ import org.junit.runner.RunWith;
  */
 @DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
-public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
+public class WorkflowDefinitionManagerTest {
 
 	@ClassRule
 	@Rule
@@ -49,15 +52,19 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test(expected = WorkflowException.class)
 	public void testDeleteSaveWorkflowDefinition() throws Exception {
-		WorkflowDefinition workflowDefinition = _saveWorkflowDefinition();
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				ProxyMessageListener.class.getName(), LoggerTestUtil.OFF)) {
 
-		_workflowDefinitionManager.undeployWorkflowDefinition(
-			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
-			workflowDefinition.getName(), workflowDefinition.getVersion());
+			WorkflowDefinition workflowDefinition = _saveWorkflowDefinition();
 
-		_workflowDefinitionManager.getWorkflowDefinition(
-			TestPropsValues.getCompanyId(), workflowDefinition.getName(),
-			workflowDefinition.getVersion());
+			_workflowDefinitionManager.undeployWorkflowDefinition(
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				workflowDefinition.getName(), workflowDefinition.getVersion());
+
+			_workflowDefinitionManager.getWorkflowDefinition(
+				TestPropsValues.getCompanyId(), workflowDefinition.getName(),
+				workflowDefinition.getVersion());
+		}
 	}
 
 	@Test
@@ -106,7 +113,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateEmptyNotificationTemplateDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"single-approver-empty-notification-template-workflow-definition." +
 				"xml");
 
@@ -120,7 +127,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateIncomingTransitionInitialStateDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"incoming-initial-state-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -133,7 +140,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateIncomingTransitionsJoinNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"incoming-transitions-join-1-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -142,7 +149,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			"Fix the errors between the fork node fork and join node join",
 			error);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"incoming-transitions-join-2-workflow-definition.xml");
 
 		error = _assertInvalid(inputStream);
@@ -151,7 +158,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			"Fix the errors between the fork node fork1 and join node join1",
 			error);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"incoming-transitions-join-3-workflow-definition.xml");
 
 		error = _assertInvalid(inputStream);
@@ -160,7 +167,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			"Fix the errors between the fork node fork1 and join node join",
 			error);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"incoming-transitions-join-4-workflow-definition.xml");
 
 		error = _assertInvalid(inputStream);
@@ -169,7 +176,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			"Fix the errors between the fork node fork and join node join",
 			error);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"incoming-transitions-join-5-workflow-definition.xml");
 
 		error = _assertInvalid(inputStream);
@@ -178,12 +185,12 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			"Fix the errors between the fork node fork and join node fork Join",
 			error);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"incoming-transitions-join-6-workflow-definition.xml");
 
 		_assertValid(inputStream);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"incoming-transitions-join-7-workflow-definition.xml");
 
 		_assertValid(inputStream);
@@ -191,7 +198,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateJoinXorDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"join-xor-workflow-definition.xml");
 
 		_assertValid(inputStream);
@@ -199,7 +206,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateLegalMarketingDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"legal-marketing-workflow-definition.xml");
 
 		_assertValid(inputStream);
@@ -209,7 +216,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateLessThanTwoOutgoingConditionNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"less-than-two-outgoing-condition-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -223,7 +230,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateLessThanTwoOutgoingForkNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"less-than-two-outgoing-fork-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -234,21 +241,21 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateMatchingForkAndJoins() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"matching-fork-and-join-1-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
 
 		_assertEquals("Fork fork2 and join join1 nodes must be paired", error);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"matching-fork-and-join-2-workflow-definition.xml");
 
 		error = _assertInvalid(inputStream);
 
 		_assertEquals("Fork fork2 and join join1 nodes must be paired", error);
 
-		inputStream = getResourceInputStream(
+		inputStream = _getResourceInputStream(
 			"matching-fork-and-join-3-workflow-definition.xml");
 
 		error = _assertInvalid(inputStream);
@@ -260,7 +267,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateMultipleInitialStatesDefinedDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"multiple-initial-states-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -273,7 +280,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateNoAssignmentsTaskNodeDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-assignments-task-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -286,7 +293,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateNoIncomingTransitionConditionNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-incoming-condition-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -299,7 +306,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateNoIncomingTransitionForkNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-incoming-fork-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -311,7 +318,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateNoIncomingTransitionStateNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-incoming-state-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -323,7 +330,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateNoIncomingTransitionTaskNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-incoming-task-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -333,7 +340,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateNoInitialStateDefinedDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-initial-state-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -345,7 +352,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateNoOutgoingTransitionInitialStateDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-outgoing-initial-state-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -357,7 +364,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateNoOutgoingTransitionStartNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-outgoing-start-node-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -369,7 +376,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateNoOutgoingTransitionTaskNodeDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-outgoing-task-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -379,7 +386,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateNoTerminalStatesDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"no-terminal-states-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -389,7 +396,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateSingleApproverDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"single-approver-workflow-definition.xml");
 
 		_assertValid(inputStream);
@@ -399,8 +406,8 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateSingleApproverScriptedAssignmentDefinition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
-			"single-approver-scripted-assignment-1-workflow-definition.xml");
+		InputStream inputStream = _getResourceInputStream(
+			"single-approver-scripted-assignment-workflow-definition.xml");
 
 		_assertValid(inputStream);
 	}
@@ -409,7 +416,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	public void testValidateTaskWithMoreThanOneDefaultTransition()
 		throws Exception {
 
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"task-with-more-than-one-default-transitions-workflow-" +
 				"definition.xml");
 
@@ -422,7 +429,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateTransitions() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"invalid-transition-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -432,7 +439,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateUnbalancedForkAndJoinNodes() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"unbalanced-fork-and-join-workflow-definition.xml");
 
 		String error = _assertInvalid(inputStream);
@@ -445,7 +452,7 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 
 	@Test
 	public void testValidateValidDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"valid-workflow-definition.xml");
 
 		_assertValid(inputStream);
@@ -458,7 +465,9 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 	private String _assertInvalid(InputStream inputStream) throws Exception {
 		byte[] bytes = FileUtil.getBytes(inputStream);
 
-		try {
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				ProxyMessageListener.class.getName(), LoggerTestUtil.OFF)) {
+
 			_workflowDefinitionManager.validateWorkflowDefinition(bytes);
 
 			Assert.fail();
@@ -475,8 +484,17 @@ public class WorkflowDefinitionManagerTest extends BaseWorkflowManagerTestCase {
 			FileUtil.getBytes(inputStream));
 	}
 
+	private InputStream _getResourceInputStream(String name) {
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		return classLoader.getResourceAsStream(
+			"com/liferay/portal/workflow/kaleo/dependencies/" + name);
+	}
+
 	private WorkflowDefinition _saveWorkflowDefinition() throws Exception {
-		InputStream inputStream = getResourceInputStream(
+		InputStream inputStream = _getResourceInputStream(
 			"single-approver-workflow-definition.xml");
 
 		byte[] content = FileUtil.getBytes(inputStream);

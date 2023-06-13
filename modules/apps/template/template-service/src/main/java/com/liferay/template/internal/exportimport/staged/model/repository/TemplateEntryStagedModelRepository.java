@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.template.model.TemplateEntry",
 	service = StagedModelRepository.class
 )
@@ -89,7 +90,7 @@ public class TemplateEntryStagedModelRepository
 	public void deleteStagedModel(TemplateEntry templateEntry)
 		throws PortalException {
 
-		_ddmTemplateLocalService.deleteTemplate(
+		_ddmTemplateLocalService.deleteDDMTemplate(
 			templateEntry.getDDMTemplateId());
 
 		_templateEntryLocalService.deleteTemplateEntry(templateEntry);

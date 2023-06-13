@@ -24,15 +24,13 @@ export function adaptLegacyPriceModel(priceModel) {
 		discountPercentages,
 		finalPrice,
 		price,
-		priceFormatted,
 		promoPrice,
-		promoPriceFormatted,
 	} = priceModel;
 
 	return {
-		discountPercentage: parseFloat(discountPercentage || 0),
-		finalPriceFormatted: finalPrice || priceFormatted || price,
-		priceFormatted: priceFormatted || price,
+		discountPercentage: parseFloat(discountPercentage),
+		finalPriceFormatted: finalPrice || price,
+		priceFormatted: price,
 
 		/**
 		 * The following matches numbers in the
@@ -42,8 +40,8 @@ export function adaptLegacyPriceModel(priceModel) {
 		 *
 		 * Then the promoPriceFormatted must be used.
 		 */
-		promoPrice: promoPrice ? promoPrice.toString().match(/\d/gi)[0] : '0',
-		promoPriceFormatted: promoPriceFormatted || promoPrice,
+		promoPrice: promoPrice ? promoPrice.match(/\d/gi)[0] : '0',
+		promoPriceFormatted: promoPrice,
 		...(discountPercentages || ['0', '0', '0', '0']).reduce(
 			(discountLevels, percentage, i) => ({
 				...discountLevels,

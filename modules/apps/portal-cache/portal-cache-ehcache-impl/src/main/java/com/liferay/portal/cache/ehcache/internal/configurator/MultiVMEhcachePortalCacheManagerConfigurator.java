@@ -41,18 +41,44 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dante Wang
  */
-@Component(service = MultiVMEhcachePortalCacheManagerConfigurator.class)
+@Component(
+	immediate = true,
+	service = MultiVMEhcachePortalCacheManagerConfigurator.class
+)
 public class MultiVMEhcachePortalCacheManagerConfigurator
 	extends BaseEhcachePortalCacheManagerConfigurator {
 
 	@Activate
 	protected void activate() {
 		clusterEnabled = GetterUtil.getBoolean(
-			_props.get(PropsKeys.CLUSTER_LINK_ENABLED));
-		_defaultReplicatorPropertiesString = _getPortalPropertiesString(
+			props.get(PropsKeys.CLUSTER_LINK_ENABLED));
+		_defaultReplicatorPropertiesString = getPortalPropertiesString(
 			PropsKeys.EHCACHE_REPLICATOR_PROPERTIES_DEFAULT);
-		_replicatorProperties = _props.getProperties(
+		_replicatorProperties = props.getProperties(
 			PropsKeys.EHCACHE_REPLICATOR_PROPERTIES + StringPool.PERIOD, true);
+	}
+
+	protected String getPortalPropertiesString(String portalPropertyKey) {
+		String[] array = props.getArray(portalPropertyKey);
+
+		if (array.length == 0) {
+			return null;
+		}
+
+		if (array.length == 1) {
+			return array[0];
+		}
+
+		StringBundler sb = new StringBundler(array.length * 2);
+
+		for (String value : array) {
+			sb.append(value);
+			sb.append(StringPool.COMMA);
+		}
+
+		sb.setIndex(sb.index() - 1);
+
+		return sb.toString();
 	}
 
 	@Override
@@ -75,20 +101,35 @@ public class MultiVMEhcachePortalCacheManagerConfigurator
 			return;
 		}
 
+		PortalCacheConfiguration defaultPortalCacheConfiguration =
+			portalCacheManagerConfiguration.
+				getDefaultPortalCacheConfiguration();
+
 		Map<String, ObjectValuePair<Properties, Properties>>
 			mergedPropertiesMap = _getMergedPropertiesMap();
 
 		for (Map.Entry<String, ObjectValuePair<Properties, Properties>> entry :
 				mergedPropertiesMap.entrySet()) {
 
+			String portalCacheName = entry.getKey();
+
+			PortalCacheConfiguration portalCacheConfiguration =
+				portalCacheManagerConfiguration.getPortalCacheConfiguration(
+					portalCacheName);
+
+			if (portalCacheConfiguration == null) {
+				portalCacheConfiguration =
+					defaultPortalCacheConfiguration.newPortalCacheConfiguration(
+						portalCacheName);
+
+				portalCacheManagerConfiguration.putPortalCacheConfiguration(
+					portalCacheName, portalCacheConfiguration);
+			}
+
 			ObjectValuePair<Properties, Properties> propertiesPair =
 				entry.getValue();
 
 			if (propertiesPair.getValue() != null) {
-				PortalCacheConfiguration portalCacheConfiguration =
-					portalCacheManagerConfiguration.getPortalCacheConfiguration(
-						entry.getKey());
-
 				Set<Properties> portalCacheListenerPropertiesSet =
 					portalCacheConfiguration.
 						getPortalCacheListenerPropertiesSet();
@@ -146,6 +187,11 @@ public class MultiVMEhcachePortalCacheManagerConfigurator
 		return portalCacheConfiguration;
 	}
 
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		this.props = props;
+	}
+
 	protected boolean clusterEnabled;
 
 	private Map<String, ObjectValuePair<Properties, Properties>>
@@ -179,34 +225,7 @@ public class MultiVMEhcachePortalCacheManagerConfigurator
 		return mergedPropertiesMap;
 	}
 
-	private String _getPortalPropertiesString(String portalPropertyKey) {
-		String[] array = _props.getArray(portalPropertyKey);
-
-		if (array.length == 0) {
-			return null;
-		}
-
-		if (array.length == 1) {
-			return array[0];
-		}
-
-		StringBundler sb = new StringBundler(array.length * 2);
-
-		for (String value : array) {
-			sb.append(value);
-			sb.append(StringPool.COMMA);
-		}
-
-		sb.setIndex(sb.index() - 1);
-
-		return sb.toString();
-	}
-
 	private String _defaultReplicatorPropertiesString;
-
-	@Reference
-	private Props _props;
-
 	private Properties _replicatorProperties;
 
 }

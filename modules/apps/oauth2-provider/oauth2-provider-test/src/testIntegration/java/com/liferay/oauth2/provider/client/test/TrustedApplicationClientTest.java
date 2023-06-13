@@ -130,8 +130,8 @@ public class TrustedApplicationClientTest extends BaseClientTestCase {
 				defaultCompanyId, user, "oauthTestApplicationCode",
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE), false,
 				Collections.singletonList("everything"), false);
-			createOAuth2ApplicationWithNone(
-				defaultCompanyId, user, "oauthTestApplicationCodePKCE",
+			createOAuth2Application(
+				defaultCompanyId, user, "oauthTestApplicationCodePKCE", null,
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE_PKCE),
 				Collections.singletonList("http://redirecturi:8080"), false,
 				Collections.singletonList("everything"), false);
@@ -139,8 +139,9 @@ public class TrustedApplicationClientTest extends BaseClientTestCase {
 				defaultCompanyId, user, "oauthTestTrustedApplicationCode",
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE), false,
 				Collections.singletonList("everything"), true);
-			createOAuth2ApplicationWithNone(
+			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestTrustedApplicationCodePKCE",
+				null,
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE_PKCE),
 				Collections.singletonList("http://redirecturi:8080"), false,
 				Collections.singletonList("everything"), true);

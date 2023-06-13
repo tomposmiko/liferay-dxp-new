@@ -12,7 +12,7 @@
  * details.
  */
 
-import {ClayRadio} from '@clayui/form';
+import {ClayInput, ClayRadio} from '@clayui/form';
 import ClayTable from '@clayui/table';
 import React from 'react';
 
@@ -23,7 +23,6 @@ const TableHead = ({columns}) => (
 	<ClayTable.Head>
 		<ClayTable.Row>
 			<ClayTable.Cell headingCell />
-
 			{columns.map((column, colIndex) => {
 				return (
 					<ClayTable.Cell
@@ -90,7 +89,8 @@ const Grid = ({
 					: '';
 
 				return (
-					<input
+					<ClayInput
+						aria-hidden="true"
 						key={`row-${row.value}-${rowIndex}`}
 						name={name}
 						type="hidden"

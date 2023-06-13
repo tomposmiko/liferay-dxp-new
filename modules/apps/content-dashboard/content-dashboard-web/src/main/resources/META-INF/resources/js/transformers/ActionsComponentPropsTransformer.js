@@ -14,47 +14,31 @@
 
 import {render} from '@liferay/frontend-js-react-web';
 
-import SidebarPanel from '../components/SidebarPanel';
-import SidebarPanelInfoView from '../components/SidebarPanelInfoView/SidebarPanelInfoView';
+import SidebarPanel from '../SidebarPanel';
+import SidebarPanelInfoView from '../components/SidebarPanelInfoView';
 import SidebarPanelMetricsView from '../components/SidebarPanelMetricsView';
-import {
-	handlePanelStateFromSession,
-	handleSessionOnSidebarOpen,
-} from './panelStateHandler';
-
-const ACTIVE_ROW_CSS_CLASS = 'table-active';
 
 const deselectAllRows = (portletNamespace) => {
 	const activeRows = document.querySelectorAll(
-		`#${portletNamespace}contentSearchContainer tr.${ACTIVE_ROW_CSS_CLASS}`
+		`[data-searchcontainerid="${portletNamespace}content"] tr.active`
 	);
 
-	activeRows.forEach((row) => row.classList.remove(ACTIVE_ROW_CSS_CLASS));
+	activeRows.forEach((row) => row.classList.remove('active'));
 };
 
 const getRow = (portletNamespace, rowId) =>
 	document.querySelector(
-		`#${portletNamespace}contentSearchContainer [data-rowid="${rowId}"]`
+		`[data-searchcontainerid="${portletNamespace}content"] [data-rowid="${rowId}"]`
 	);
 
 const selectRow = (portletNamespace, rowId) => {
 	deselectAllRows(portletNamespace);
 
 	const currentRow = getRow(portletNamespace, rowId);
-
-	if (!currentRow) {
-		return;
-	}
-
-	currentRow.classList.add(ACTIVE_ROW_CSS_CLASS);
+	currentRow.classList.add('active');
 };
 
-const showSidebar = ({
-	View,
-	fetchURL,
-	portletNamespace,
-	singlePageApplicationEnabled,
-}) => {
+const showSidebar = ({View, fetchURL, portletNamespace}) => {
 	const id = `${portletNamespace}sidebar`;
 
 	const sidebarPanel = Liferay.component(id);
@@ -76,7 +60,6 @@ const showSidebar = ({
 				ref: (element) => {
 					Liferay.component(id, element);
 				},
-				singlePageApplicationEnabled,
 				viewComponent: View,
 			},
 			container
@@ -88,30 +71,12 @@ const showSidebar = ({
 };
 
 const actions = {
-	showInfo({
-		fetchURL,
-		panelState,
-		portletNamespace,
-		rowId,
-		selectedItemRowId,
-		singlePageApplicationEnabled,
-	}) {
+	showInfo({fetchURL, portletNamespace, rowId}) {
 		selectRow(portletNamespace, rowId);
-
-		if (singlePageApplicationEnabled) {
-			handleSessionOnSidebarOpen({
-				fetchURL,
-				panelState,
-				rowId,
-				selectedItemRowId,
-			});
-		}
-
 		showSidebar({
 			View: SidebarPanelInfoView,
 			fetchURL,
 			portletNamespace,
-			singlePageApplicationEnabled,
 		});
 	},
 	showMetrics({fetchURL, portletNamespace, rowId}) {
@@ -124,24 +89,11 @@ const actions = {
 	},
 };
 
-export {selectRow, showSidebar};
-
 export default function propsTransformer({
-	additionalProps,
 	items,
 	portletNamespace,
 	...otherProps
 }) {
-	const {
-		panelState,
-		selectedItemRowId,
-		singlePageApplicationEnabled,
-	} = additionalProps;
-
-	if (singlePageApplicationEnabled) {
-		handlePanelStateFromSession(additionalProps);
-	}
-
 	return {
 		...otherProps,
 		items: items.map((item) => {
@@ -155,11 +107,8 @@ export default function propsTransformer({
 
 						actions[action]({
 							fetchURL: item.data.fetchURL,
-							panelState,
 							portletNamespace,
 							rowId: item.data.classPK,
-							selectedItemRowId,
-							singlePageApplicationEnabled,
 						});
 					}
 				},

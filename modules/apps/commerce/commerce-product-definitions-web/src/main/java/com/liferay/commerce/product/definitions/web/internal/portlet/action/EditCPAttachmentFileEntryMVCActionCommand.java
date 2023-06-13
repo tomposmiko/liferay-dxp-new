@@ -22,6 +22,7 @@ import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryService;
 import com.liferay.commerce.product.service.CPDefinitionService;
+import com.liferay.commerce.product.util.DDMFormValuesHelper;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -30,7 +31,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -51,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_attachment_file_entry"
@@ -59,6 +61,34 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditCPAttachmentFileEntryMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected void deleteCPAttachmentFileEntry(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] deleteCPAttachmentFileEntryIds = null;
+
+		long cpAttachmentFileEntryId = ParamUtil.getLong(
+			actionRequest, "cpAttachmentFileEntryId");
+
+		if (cpAttachmentFileEntryId > 0) {
+			deleteCPAttachmentFileEntryIds = new long[] {
+				cpAttachmentFileEntryId
+			};
+		}
+		else {
+			deleteCPAttachmentFileEntryIds = StringUtil.split(
+				ParamUtil.getString(
+					actionRequest, "deleteCPAttachmentFileEntryIds"),
+				0L);
+		}
+
+		for (long deleteCPAttachmentFileEntryId :
+				deleteCPAttachmentFileEntryIds) {
+
+			_cpAttachmentFileEntryService.deleteCPAttachmentFileEntry(
+				deleteCPAttachmentFileEntryId);
+		}
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -71,10 +101,10 @@ public class EditCPAttachmentFileEntryMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCPAttachmentFileEntry(actionRequest);
+				updateCPAttachmentFileEntry(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCPAttachmentFileEntry(actionRequest);
+				deleteCPAttachmentFileEntry(actionRequest);
 			}
 
 			sendRedirect(actionRequest, actionResponse, redirect);
@@ -106,35 +136,7 @@ public class EditCPAttachmentFileEntryMVCActionCommand
 		}
 	}
 
-	private void _deleteCPAttachmentFileEntry(ActionRequest actionRequest)
-		throws Exception {
-
-		long[] deleteCPAttachmentFileEntryIds = null;
-
-		long cpAttachmentFileEntryId = ParamUtil.getLong(
-			actionRequest, "cpAttachmentFileEntryId");
-
-		if (cpAttachmentFileEntryId > 0) {
-			deleteCPAttachmentFileEntryIds = new long[] {
-				cpAttachmentFileEntryId
-			};
-		}
-		else {
-			deleteCPAttachmentFileEntryIds = StringUtil.split(
-				ParamUtil.getString(
-					actionRequest, "deleteCPAttachmentFileEntryIds"),
-				0L);
-		}
-
-		for (long deleteCPAttachmentFileEntryId :
-				deleteCPAttachmentFileEntryIds) {
-
-			_cpAttachmentFileEntryService.deleteCPAttachmentFileEntry(
-				deleteCPAttachmentFileEntryId);
-		}
-	}
-
-	private void _updateCPAttachmentFileEntry(ActionRequest actionRequest)
+	protected void updateCPAttachmentFileEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		long cpAttachmentFileEntryId = ParamUtil.getLong(
@@ -186,7 +188,7 @@ public class EditCPAttachmentFileEntryMVCActionCommand
 			actionRequest, "neverExpire");
 		String ddmFormValues = ParamUtil.getString(
 			actionRequest, "ddmFormValues");
-		Map<Locale, String> titleMap = _localization.getLocalizationMap(
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "title");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 		int type = ParamUtil.getInteger(actionRequest, "type");
@@ -228,7 +230,7 @@ public class EditCPAttachmentFileEntryMVCActionCommand
 	private CPDefinitionService _cpDefinitionService;
 
 	@Reference
-	private Localization _localization;
+	private DDMFormValuesHelper _ddmFormValuesHelper;
 
 	@Reference
 	private Portal _portal;

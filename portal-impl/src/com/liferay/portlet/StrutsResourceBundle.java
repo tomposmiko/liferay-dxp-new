@@ -90,7 +90,8 @@ public class StrutsResourceBundle extends ResourceBundle {
 			}
 			catch (MissingResourceException missingResourceException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(missingResourceException);
+					_log.debug(
+						missingResourceException, missingResourceException);
 				}
 
 				return null;
@@ -108,11 +109,13 @@ public class StrutsResourceBundle extends ResourceBundle {
 		StrutsResourceBundle.class);
 
 	private static final Set<String> _keys = SetUtil.fromArray(
-		JavaConstants.JAVAX_PORTLET_DESCRIPTION,
-		JavaConstants.JAVAX_PORTLET_KEYWORDS,
-		JavaConstants.JAVAX_PORTLET_LONG_TITLE,
-		JavaConstants.JAVAX_PORTLET_SHORT_TITLE,
-		JavaConstants.JAVAX_PORTLET_TITLE);
+		new String[] {
+			JavaConstants.JAVAX_PORTLET_DESCRIPTION,
+			JavaConstants.JAVAX_PORTLET_KEYWORDS,
+			JavaConstants.JAVAX_PORTLET_LONG_TITLE,
+			JavaConstants.JAVAX_PORTLET_SHORT_TITLE,
+			JavaConstants.JAVAX_PORTLET_TITLE
+		});
 
 	private final Locale _locale;
 	private final String _portletName;

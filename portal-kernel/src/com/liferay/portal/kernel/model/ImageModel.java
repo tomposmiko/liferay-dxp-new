@@ -194,8 +194,4 @@ public interface ImageModel
 	@Override
 	public Image cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

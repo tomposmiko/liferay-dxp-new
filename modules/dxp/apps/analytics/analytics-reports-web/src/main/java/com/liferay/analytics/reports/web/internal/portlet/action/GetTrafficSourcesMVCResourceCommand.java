@@ -16,25 +16,25 @@ package com.liferay.analytics.reports.web.internal.portlet.action;
 
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
-import com.liferay.analytics.reports.web.internal.model.TimeRange;
-import com.liferay.analytics.reports.web.internal.model.TimeSpan;
+import com.liferay.analytics.reports.web.internal.model.DirectTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.OrganicTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.PaidTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.ReferralTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.SocialTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.TrafficChannel;
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -44,8 +44,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -57,6 +59,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Cristina González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AnalyticsReportsPortletKeys.ANALYTICS_REPORTS,
 		"mvc.command.name=/analytics_reports/get_traffic_sources"
@@ -79,34 +82,21 @@ public class GetTrafficSourcesMVCResourceCommand
 
 		try {
 			AnalyticsReportsDataProvider analyticsReportsDataProvider =
-				new AnalyticsReportsDataProvider(
-					_analyticsSettingsManager, _http);
-
+				new AnalyticsReportsDataProvider(_http);
 			String canonicalURL = ParamUtil.getString(
 				resourceRequest, "canonicalURL");
-
-			String timeSpanKey = ParamUtil.getString(
-				resourceRequest, "timeSpanKey", TimeSpan.defaultTimeSpanKey());
-
-			TimeSpan timeSpan = TimeSpan.of(timeSpanKey);
-
-			int timeSpanOffset = ParamUtil.getInteger(
-				resourceRequest, "timeSpanOffset");
 
 			JSONObject jsonObject = JSONUtil.put(
 				"trafficSources",
 				_getTrafficSourcesJSONArray(
-					analyticsReportsDataProvider, canonicalURL,
-					themeDisplay.getCompanyId(),
-					_portal.getLiferayPortletRequest(resourceRequest),
-					_portal.getLiferayPortletResponse(resourceResponse),
-					timeSpan.toTimeRange(timeSpanOffset), resourceBundle));
+					analyticsReportsDataProvider, themeDisplay.getCompanyId(),
+					canonicalURL, themeDisplay.getLocale(), resourceBundle));
 
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse, jsonObject);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
@@ -118,108 +108,81 @@ public class GetTrafficSourcesMVCResourceCommand
 	}
 
 	private List<TrafficChannel> _getTrafficChannels(
-			AnalyticsReportsDataProvider analyticsReportsDataProvider,
-			String canonicalURL, long companyId, TimeRange timeRange)
-		throws Exception {
+		AnalyticsReportsDataProvider analyticsReportsDataProvider,
+		String canonicalURL, long companyId) {
 
-		Map<TrafficChannel.Type, TrafficChannel> emptyMap = HashMapBuilder.put(
-			TrafficChannel.Type.DIRECT,
-			TrafficChannel.newInstance(0, 0.0, TrafficChannel.Type.DIRECT)
+		Map<String, TrafficChannel> emptyMap = HashMapBuilder.put(
+			"direct", (TrafficChannel)new DirectTrafficChannelImpl(false)
 		).put(
-			TrafficChannel.Type.ORGANIC,
-			TrafficChannel.newInstance(0, 0.0, TrafficChannel.Type.ORGANIC)
+			"organic", new OrganicTrafficChannelImpl(false)
 		).put(
-			TrafficChannel.Type.PAID,
-			TrafficChannel.newInstance(0, 0.0, TrafficChannel.Type.PAID)
+			"paid", new PaidTrafficChannelImpl(false)
 		).put(
-			TrafficChannel.Type.REFERRAL,
-			TrafficChannel.newInstance(0, 0.0, TrafficChannel.Type.REFERRAL)
+			"referral", new ReferralTrafficChannelImpl(false)
 		).put(
-			TrafficChannel.Type.SOCIAL,
-			TrafficChannel.newInstance(0, 0.0, TrafficChannel.Type.SOCIAL)
+			"social", new SocialTrafficChannelImpl(false)
 		).build();
 
 		if (!analyticsReportsDataProvider.isValidAnalyticsConnection(
 				companyId)) {
 
-			PortalException portalException = new PortalException(
-				"Invalid Analytics Connection");
-
-			return Arrays.asList(
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.DIRECT),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.ORGANIC),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.PAID),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.REFERRAL),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.SOCIAL));
+			return new ArrayList<>(emptyMap.values());
 		}
 
 		try {
-			Map<TrafficChannel.Type, TrafficChannel> trafficChannels =
+			Map<String, TrafficChannel> trafficChannels =
 				analyticsReportsDataProvider.getTrafficChannels(
-					companyId, timeRange, canonicalURL);
+					companyId, canonicalURL);
 
 			emptyMap.forEach(
-				(type, trafficChannel) -> trafficChannels.merge(
-					type, trafficChannel,
+				(name, trafficChannel) -> trafficChannels.merge(
+					name, trafficChannel,
 					(trafficChannel1, trafficChannel2) -> trafficChannel1));
 
 			return new ArrayList<>(trafficChannels.values());
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return Arrays.asList(
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.DIRECT),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.ORGANIC),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.PAID),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.REFERRAL),
-				TrafficChannel.newInstance(
-					portalException, TrafficChannel.Type.SOCIAL));
+				new DirectTrafficChannelImpl(true),
+				new OrganicTrafficChannelImpl(true),
+				new PaidTrafficChannelImpl(true),
+				new ReferralTrafficChannelImpl(true),
+				new SocialTrafficChannelImpl(true));
 		}
 	}
 
 	private JSONArray _getTrafficSourcesJSONArray(
-			AnalyticsReportsDataProvider analyticsReportsDataProvider,
-			String canonicalURL, long companyId,
-			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse, TimeRange timeRange,
-			ResourceBundle resourceBundle)
-		throws Exception {
+		AnalyticsReportsDataProvider analyticsReportsDataProvider,
+		long companyId, String canonicalURL, Locale locale,
+		ResourceBundle resourceBundle) {
 
 		List<TrafficChannel> trafficChannels = _getTrafficChannels(
-			analyticsReportsDataProvider, canonicalURL, companyId, timeRange);
+			analyticsReportsDataProvider, canonicalURL, companyId);
+
+		Stream<TrafficChannel> stream = trafficChannels.stream();
 
 		Comparator<TrafficChannel> comparator = Comparator.comparing(
 			TrafficChannel::getTrafficShare);
 
-		trafficChannels = ListUtil.copy(trafficChannels);
-
-		trafficChannels.sort(comparator.reversed());
-
-		return JSONUtil.toJSONArray(
-			trafficChannels,
-			trafficChannel -> trafficChannel.toJSONObject(
-				liferayPortletRequest, liferayPortletResponse, resourceBundle),
-			_log);
+		return JSONUtil.putAll(
+			stream.sorted(
+				comparator.reversed()
+			).map(
+				trafficChannel -> trafficChannel.toJSONObject(
+					locale, resourceBundle)
+			).toArray());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		GetTrafficSourcesMVCResourceCommand.class);
 
 	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
+	private Http _http;
 
 	@Reference
-	private Http _http;
+	private Language _language;
 
 	@Reference
 	private Portal _portal;

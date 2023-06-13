@@ -17,8 +17,8 @@
 <%@ include file="/html/taglib/init.jsp" %>
 
 <%
-String alertIcon = (String)request.getAttribute("liferay-ui:error:alertIcon");
 String alertMessage = (String)request.getAttribute("liferay-ui:error:alertMessage");
+String alertIcon = (String)request.getAttribute("liferay-ui:error:alertIcon");
 String alertStyle = (String)request.getAttribute("liferay-ui:error:alertStyle");
 String alertTitle = (String)request.getAttribute("liferay-ui:error:alertTitle");
 %>
@@ -29,12 +29,12 @@ String alertTitle = (String)request.getAttribute("liferay-ui:error:alertTitle");
 			<button aria-label="<%= LanguageUtil.get(request, "close") %>" class="close" data-dismiss="liferay-alert" type="button">
 				<aui:icon image="times" markupView="lexicon" />
 
-				<span class="sr-only"><liferay-ui:message key="close" /></span>
+				<span class="sr-only"><%= LanguageUtil.get(request, "close") %></span>
 			</button>
 
 			<span class="alert-indicator">
 				<svg aria-hidden="true" class="lexicon-icon lexicon-icon-<%= alertIcon %>">
-					<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#<%= alertIcon %>"></use>
+					<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#<%= alertIcon %>"></use>
 				</svg>
 			</span>
 

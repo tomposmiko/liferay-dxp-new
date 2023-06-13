@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.UserGroupGroupRole;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1252,9 +1253,15 @@ public class UserGroupGroupRoleUtil {
 	}
 
 	public static UserGroupGroupRolePersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(UserGroupGroupRolePersistence)PortalBeanLocatorUtil.locate(
+					UserGroupGroupRolePersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile UserGroupGroupRolePersistence _persistence;
+	private static UserGroupGroupRolePersistence _persistence;
 
 }

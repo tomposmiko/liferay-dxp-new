@@ -125,10 +125,6 @@ public class AMImageEntryPersistenceTest {
 
 		AMImageEntry newAMImageEntry = _persistence.create(pk);
 
-		newAMImageEntry.setMvccVersion(RandomTestUtil.nextLong());
-
-		newAMImageEntry.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newAMImageEntry.setUuid(RandomTestUtil.randomString());
 
 		newAMImageEntry.setGroupId(RandomTestUtil.nextLong());
@@ -154,12 +150,6 @@ public class AMImageEntryPersistenceTest {
 		AMImageEntry existingAMImageEntry = _persistence.findByPrimaryKey(
 			newAMImageEntry.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingAMImageEntry.getMvccVersion(),
-			newAMImageEntry.getMvccVersion());
-		Assert.assertEquals(
-			existingAMImageEntry.getCtCollectionId(),
-			newAMImageEntry.getCtCollectionId());
 		Assert.assertEquals(
 			existingAMImageEntry.getUuid(), newAMImageEntry.getUuid());
 		Assert.assertEquals(
@@ -289,11 +279,10 @@ public class AMImageEntryPersistenceTest {
 
 	protected OrderByComparator<AMImageEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"AMImageEntry", "mvccVersion", true, "ctCollectionId", true, "uuid",
-			true, "amImageEntryId", true, "groupId", true, "companyId", true,
-			"createDate", true, "configurationUuid", true, "fileVersionId",
-			true, "mimeType", true, "height", true, "width", true, "size",
-			true);
+			"AMImageEntry", "uuid", true, "amImageEntryId", true, "groupId",
+			true, "companyId", true, "createDate", true, "configurationUuid",
+			true, "fileVersionId", true, "mimeType", true, "height", true,
+			"width", true, "size", true);
 	}
 
 	@Test
@@ -587,10 +576,6 @@ public class AMImageEntryPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		AMImageEntry amImageEntry = _persistence.create(pk);
-
-		amImageEntry.setMvccVersion(RandomTestUtil.nextLong());
-
-		amImageEntry.setCtCollectionId(RandomTestUtil.nextLong());
 
 		amImageEntry.setUuid(RandomTestUtil.randomString());
 

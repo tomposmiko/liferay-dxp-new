@@ -225,22 +225,18 @@ public class ModulesStructureTest {
 							}
 						}
 
-						if (!dirName.endsWith("poshi-standalone") &&
-							!liferaySpringBootDefaultsPlugin) {
-
+						if (!liferaySpringBootDefaultsPlugin) {
 							Assert.assertFalse(
 								"Forbidden " + gradlePropertiesPath,
 								Files.deleteIfExists(gradlePropertiesPath));
 						}
 
-						if (!dirName.endsWith("poshi-standalone")) {
-							Path settingsGradlePath = dirPath.resolve(
-								"settings.gradle");
+						Path settingsGradlePath = dirPath.resolve(
+							"settings.gradle");
 
-							Assert.assertFalse(
-								"Forbidden " + settingsGradlePath,
-								Files.deleteIfExists(settingsGradlePath));
-						}
+						Assert.assertFalse(
+							"Forbidden " + settingsGradlePath,
+							Files.deleteIfExists(settingsGradlePath));
 
 						if (Files.exists(dirPath.resolve("app.bnd"))) {
 							_testEquals(buildGradlePath, _APP_BUILD_GRADLE);
@@ -500,12 +496,6 @@ public class ModulesStructureTest {
 				@Override
 				public FileVisitResult preVisitDirectory(
 					Path dirPath, BasicFileAttributes basicFileAttributes) {
-
-					String dirName = String.valueOf(dirPath.getFileName());
-
-					if (_excludedDirNames.contains(dirName)) {
-						return FileVisitResult.SKIP_SUBTREE;
-					}
 
 					if (Files.exists(dirPath.resolve("bnd.bnd"))) {
 						for (Map.Entry<String, String> entry :
@@ -984,11 +974,9 @@ public class ModulesStructureTest {
 			return false;
 		}
 
-		String dirName = String.valueOf(dirPath.getFileName());
 		String name = gradleDependency.getModuleName();
 
-		if (dirName.endsWith("poshi-standalone") ||
-			name.equals("com.liferay.ant.bnd") ||
+		if (name.equals("com.liferay.ant.bnd") ||
 			name.equals("com.liferay.arquillian.extension.junit.bridge") ||
 			name.equals("com.liferay.gradle.plugins.defaults") ||
 			name.equals("com.liferay.portal.cache.test.util") ||
@@ -996,7 +984,6 @@ public class ModulesStructureTest {
 			name.equals("com.liferay.whip") ||
 			!name.startsWith("com.liferay.") ||
 			_isInModulesRootDir(dirPath, "sdk", "third-party", "util") ||
-			Files.exists(dirPath.resolve("settings.gradle")) ||
 			Files.exists(dirPath.resolve(".lfrbuild-ci")) ||
 			_hasGitCommitMarkerFile(dirPath) || _isInGitRepoReadOnly(dirPath) ||
 			_isInPrivateModulesCheckoutDir(dirPath)) {
@@ -1512,11 +1499,13 @@ public class ModulesStructureTest {
 				Assert.assertFalse(sb.toString(), !allowed);
 			}
 
+			GradleDependency activeGradleDependency =
+				_getActiveGradleDependency(
+					gradleDependencies, gradleDependency);
+
 			Assert.assertEquals(
 				"Redundant dependency detected in " + path,
-				_getActiveGradleDependency(
-					gradleDependencies, gradleDependency),
-				gradleDependency);
+				activeGradleDependency, gradleDependency);
 		}
 	}
 
@@ -1694,8 +1683,7 @@ public class ModulesStructureTest {
 	private static Set<String> _checkoutPrivateAppsDirs;
 	private static final Set<String> _excludedDirNames = SetUtil.fromList(
 		Arrays.asList(
-			"bin", "build", "classes", "ext-test-impl", "node_modules",
-			"test-classes", "tmp"));
+			"bin", "build", "classes", "node_modules", "test-classes", "tmp"));
 	private static final Pattern _gitRepoGradleProjectGroupPattern =
 		Pattern.compile("com\\.liferay(?:\\.[a-z]+)+");
 	private static final Set<String> _gitRepoGradlePropertiesKeys =

@@ -17,7 +17,6 @@ package com.liferay.portal.search.internal.indexer;
 import com.liferay.portal.kernel.search.AddSearchKeywordsQueryContributor;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.search.internal.indexer.helper.AddSearchKeywordsQueryContributorHelper;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -25,7 +24,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author André de Oliveira
  */
-@Component(service = AddSearchKeywordsQueryContributor.class)
+@Component(immediate = true, service = AddSearchKeywordsQueryContributor.class)
 public class BaseIndexerAddSearchKeywordsQueryContributor
 	implements AddSearchKeywordsQueryContributor {
 

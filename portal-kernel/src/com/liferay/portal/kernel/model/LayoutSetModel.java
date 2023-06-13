@@ -228,20 +228,6 @@ public interface LayoutSetModel
 	public void setColorSchemeId(String colorSchemeId);
 
 	/**
-	 * Returns the favicon file entry ID of this layout set.
-	 *
-	 * @return the favicon file entry ID of this layout set
-	 */
-	public long getFaviconFileEntryId();
-
-	/**
-	 * Sets the favicon file entry ID of this layout set.
-	 *
-	 * @param faviconFileEntryId the favicon file entry ID of this layout set
-	 */
-	public void setFaviconFileEntryId(long faviconFileEntryId);
-
-	/**
 	 * Returns the css of this layout set.
 	 *
 	 * @return the css of this layout set
@@ -310,9 +296,5 @@ public interface LayoutSetModel
 
 	@Override
 	public LayoutSet cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -177,15 +177,13 @@ if (analyticsConfiguration != null) {
 <script>
 	function <portlet:namespace />confirmation(event) {
 		<c:if test="<%= connected %>">
-			Liferay.Util.openConfirmModal({
-				message:
-					'<liferay-ui:message key="are-you-sure-you-want-to-disconnect-your-analytics-cloud-workspace-from-this-dxp-instance" />',
-				onConfirm: (isConfirmed) => {
-					if (!isConfirmed) {
-						event.preventDefault();
-					}
-				},
-			});
+			if (
+				!confirm(
+					'<liferay-ui:message key="are-you-sure-you-want-to-disconnect-your-analytics-cloud-workspace-from-this-dxp-instance" />'
+				)
+			) {
+				event.preventDefault();
+			}
 		</c:if>
 	}
 

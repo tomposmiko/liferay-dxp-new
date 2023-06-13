@@ -1,0 +1,15 @@
+definition {
+
+	macro addEntry {
+		Type(
+			key_text = "Name",
+			locator1 = "TextInput#ANY",
+			value1 = "${entryName}");
+
+		Type(
+			key_text = "URL",
+			locator1 = "TextInput#ANY",
+			value1 = "${entryURL}");
+	}
+
+}

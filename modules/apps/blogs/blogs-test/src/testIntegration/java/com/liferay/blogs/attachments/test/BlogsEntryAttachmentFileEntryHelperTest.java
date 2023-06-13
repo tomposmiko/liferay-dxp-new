@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -174,11 +175,13 @@ public class BlogsEntryAttachmentFileEntryHelperTest {
 			getBlogsEntryAttachmentFileEntryReferences(FileEntry tempFileEntry)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), _user.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_user.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _user.getUserId()));
+			RandomTestUtil.randomString(), serviceContext);
 
 		List<FileEntry> tempFileEntries = new ArrayList<>();
 
@@ -261,7 +264,7 @@ public class BlogsEntryAttachmentFileEntryHelperTest {
 		String uniqueFileName = _getUniqueFileName(groupId, fileName, folderId);
 
 		return PortletFileRepositoryUtil.addPortletFileEntry(
-			null, groupId, userId, BlogsEntry.class.getName(), blogsEntryId,
+			groupId, userId, BlogsEntry.class.getName(), blogsEntryId,
 			BlogsConstants.SERVICE_NAME, folderId, inputStream, uniqueFileName,
 			mimeType, true);
 	}

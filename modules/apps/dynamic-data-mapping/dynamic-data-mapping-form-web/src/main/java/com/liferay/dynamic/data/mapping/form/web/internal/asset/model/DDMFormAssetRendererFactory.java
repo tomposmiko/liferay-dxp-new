@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM,
 	service = AssetRendererFactory.class
 )
@@ -91,7 +92,7 @@ public class DDMFormAssetRendererFactory
 			}
 		}
 
-		return _createAssetRenderer(
+		return createAssetRenderer(
 			formInstanceRecord, formInstanceRecordVersion, type);
 	}
 
@@ -125,7 +126,15 @@ public class DDMFormAssetRendererFactory
 			permissionChecker, ddmFormInstance, actionId);
 	}
 
-	private AssetRenderer<DDMFormInstanceRecord> _createAssetRenderer(
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.dynamic.data.mapping.form.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	protected AssetRenderer<DDMFormInstanceRecord> createAssetRenderer(
 		DDMFormInstanceRecord formInstanceRecord,
 		DDMFormInstanceRecordVersion formInstanceRecordVersion, int type) {
 
@@ -178,9 +187,6 @@ public class DDMFormAssetRendererFactory
 	@Reference
 	private Portal _portal;
 
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.dynamic.data.mapping.form.web)"
-	)
 	private ServletContext _servletContext;
 
 }

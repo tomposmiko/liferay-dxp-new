@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = KeywordQueryContributor.class)
+@Component(immediate = true, service = KeywordQueryContributor.class)
 public class AlwaysPresentFieldsKeywordQueryContributor
 	implements KeywordQueryContributor {
 

@@ -17,7 +17,7 @@ package com.liferay.style.book.web.internal.zip.processor;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.kernel.zip.ZipWriterFactory;
+import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.style.book.constants.StyleBookPortletKeys;
 import com.liferay.style.book.exception.DuplicateStyleBookEntryKeyException;
 import com.liferay.style.book.model.StyleBookEntry;
@@ -59,7 +59,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = StyleBookEntryZipProcessor.class)
+@Component(immediate = true, service = StyleBookEntryZipProcessor.class)
 public class StyleBookEntryZipProcessorImpl
 	implements StyleBookEntryZipProcessor {
 
@@ -67,7 +67,7 @@ public class StyleBookEntryZipProcessorImpl
 	public File exportStyleBookEntries(List<StyleBookEntry> styleBookEntries)
 		throws PortletException {
 
-		ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
+		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
 		try {
 			for (StyleBookEntry styleBookEntry : styleBookEntries) {
@@ -143,7 +143,7 @@ public class StyleBookEntryZipProcessorImpl
 				new StyleBookEntryZipProcessorImportResultEntry(
 					name,
 					StyleBookEntryZipProcessorImportResultEntry.Status.IMPORTED,
-					styleBookEntry));
+					StringPool.BLANK));
 
 			return styleBookEntry;
 		}
@@ -204,7 +204,7 @@ public class StyleBookEntryZipProcessorImpl
 			key = path.substring(path.lastIndexOf(CharPool.SLASH) + 1);
 		}
 		else if (fileName.equals("style-book.json")) {
-			JSONObject styleBookJSONObject = _jsonFactory.createJSONObject(
+			JSONObject styleBookJSONObject = JSONFactoryUtil.createJSONObject(
 				StringUtil.read(
 					zipFile.getInputStream(zipFile.getEntry(fileName))));
 
@@ -256,7 +256,7 @@ public class StyleBookEntryZipProcessorImpl
 		}
 
 		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			null, groupId, userId, className, classPK,
+			groupId, userId, className, classPK,
 			StyleBookPortletKeys.STYLE_BOOK, repository.getDlFolderId(),
 			inputStream,
 			classPK + "_preview." + FileUtil.getExtension(contentPath),
@@ -313,8 +313,8 @@ public class StyleBookEntryZipProcessorImpl
 		String styleBookEntryContent = _getContent(zipFile, fileName);
 
 		if (Validator.isNotNull(styleBookEntryContent)) {
-			JSONObject styleBookEntryJSONObject = _jsonFactory.createJSONObject(
-				styleBookEntryContent);
+			JSONObject styleBookEntryJSONObject =
+				JSONFactoryUtil.createJSONObject(styleBookEntryContent);
 
 			defaultStyleBookEntry = styleBookEntryJSONObject.getBoolean(
 				"defaultStyleBookEntry");
@@ -342,19 +342,19 @@ public class StyleBookEntryZipProcessorImpl
 					styleBookEntry.getPreviewFileEntryId());
 			}
 
-			JSONObject jsonObject = _jsonFactory.createJSONObject(
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				styleBookEntryContent);
 
 			String thumbnailPath = jsonObject.getString("thumbnailPath");
 
 			if (Validator.isNotNull(thumbnailPath)) {
+				long previewFileEntryId = _getPreviewFileEntryId(
+					userId, groupId, zipFile, StyleBookEntry.class.getName(),
+					styleBookEntry.getStyleBookEntryId(), fileName,
+					thumbnailPath);
+
 				_styleBookEntryEntryService.updatePreviewFileEntryId(
-					styleBookEntry.getStyleBookEntryId(),
-					_getPreviewFileEntryId(
-						userId, groupId, zipFile,
-						StyleBookEntry.class.getName(),
-						styleBookEntry.getStyleBookEntryId(), fileName,
-						thumbnailPath));
+					styleBookEntry.getStyleBookEntryId(), previewFileEntryId);
 			}
 		}
 	}
@@ -374,15 +374,9 @@ public class StyleBookEntryZipProcessorImpl
 		_importResultEntries;
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
 	private StyleBookEntryLocalService _styleBookEntryEntryLocalService;
 
 	@Reference
 	private StyleBookEntryService _styleBookEntryEntryService;
-
-	@Reference
-	private ZipWriterFactory _zipWriterFactory;
 
 }

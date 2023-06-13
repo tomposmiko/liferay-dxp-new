@@ -22,12 +22,13 @@ import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.dynamic.data.mapping.constants.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -46,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alicia García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
 		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
@@ -68,9 +70,9 @@ public class CopyDataDefinitionMVCActionCommand
 		long ddmStructureId = ParamUtil.getLong(
 			actionRequest, "ddmStructureId");
 
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
 
 		DataDefinitionResource.Builder dataDefinitionResourceBuilder =
@@ -82,14 +84,17 @@ public class CopyDataDefinitionMVCActionCommand
 			).build();
 
 		DataDefinition dataDefinition =
-			dataDefinitionResource.postDataDefinitionCopy(ddmStructureId);
+			dataDefinitionResource.getDataDefinition(ddmStructureId);
 
+		dataDefinition.setDataDefinitionKey(StringPool.BLANK);
 		dataDefinition.setDescription(
 			LocalizedValueUtil.toStringObjectMap(descriptionMap));
 		dataDefinition.setName(LocalizedValueUtil.toStringObjectMap(nameMap));
 
-		dataDefinitionResource.putDataDefinition(
-			dataDefinition.getId(), dataDefinition);
+		dataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				themeDisplay.getScopeGroupId(), "document-library",
+				dataDefinition);
 
 		boolean copyTemplates = ParamUtil.getBoolean(
 			actionRequest, "copyTemplates");
@@ -111,9 +116,6 @@ public class CopyDataDefinitionMVCActionCommand
 
 	@Reference
 	private DDMTemplateService _ddmTemplateService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

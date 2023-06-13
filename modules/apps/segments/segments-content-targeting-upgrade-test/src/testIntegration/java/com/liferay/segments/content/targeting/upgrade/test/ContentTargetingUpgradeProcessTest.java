@@ -153,11 +153,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("context");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("context");
 
 		Assert.assertNotNull(criterion);
 
@@ -198,11 +198,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("user");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("user");
 
 		Assert.assertNotNull(criterion);
 
@@ -237,11 +237,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("context");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("context");
 
 		Assert.assertNotNull(criterion);
 
@@ -285,11 +285,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("context");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("context");
 
 		Assert.assertNotNull(criterion);
 
@@ -330,11 +330,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion(
+		Criteria.Criterion criterion = criteriaObj.getCriterion(
 			"user-organization");
 
 		Assert.assertNotNull(criterion);
@@ -369,11 +369,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("context");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("context");
 
 		Assert.assertNotNull(criterion);
 
@@ -410,11 +410,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("context");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("context");
 
 		Assert.assertNotNull(criterion);
 
@@ -448,11 +448,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("user");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("user");
 
 		Assert.assertNotNull(criterion);
 
@@ -519,11 +519,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("user");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("user");
 
 		Assert.assertNotNull(criterion);
 
@@ -557,11 +557,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("user");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("user");
 
 		Assert.assertNotNull(criterion);
 
@@ -595,11 +595,11 @@ public class ContentTargetingUpgradeProcessTest {
 
 		Assert.assertNotNull(segmentsEntry);
 
-		Criteria criteria = segmentsEntry.getCriteriaObj();
+		Criteria criteriaObj = segmentsEntry.getCriteriaObj();
 
-		Assert.assertNotNull(criteria);
+		Assert.assertNotNull(criteriaObj);
 
-		Criteria.Criterion criterion = criteria.getCriterion("context");
+		Criteria.Criterion criterion = criteriaObj.getCriterion("context");
 
 		Assert.assertNotNull(criterion);
 
@@ -793,8 +793,8 @@ public class ContentTargetingUpgradeProcessTest {
 	}
 
 	private static final String _CLASS_NAME =
-		"com.liferay.segments.content.targeting.upgrade.internal.upgrade." +
-			"v1_0_0.ContentTargetingUpgradeProcess";
+		"com.liferay.segments.content.targeting.upgrade.internal.v1_0_0." +
+			"ContentTargetingUpgradeProcess";
 
 	private static DB _db;
 
@@ -813,7 +813,7 @@ public class ContentTargetingUpgradeProcessTest {
 	private SegmentsEntryLocalService _segmentsEntryLocalService;
 
 	@Inject(
-		filter = "component.name=com.liferay.segments.content.targeting.upgrade.internal.upgrade.registry.SegmentsContentTargetingUpgradeStepRegistrator"
+		filter = "component.name=com.liferay.segments.content.targeting.upgrade.internal.SegmentsContentTargetingUpgrade"
 	)
 	private UpgradeStepRegistrator _upgradeStepRegistror;
 

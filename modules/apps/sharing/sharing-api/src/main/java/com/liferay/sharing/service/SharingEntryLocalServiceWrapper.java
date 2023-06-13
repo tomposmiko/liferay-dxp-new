@@ -27,10 +27,6 @@ public class SharingEntryLocalServiceWrapper
 	implements ServiceWrapper<SharingEntryLocalService>,
 			   SharingEntryLocalService {
 
-	public SharingEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SharingEntryLocalServiceWrapper(
 		SharingEntryLocalService sharingEntryLocalService) {
 

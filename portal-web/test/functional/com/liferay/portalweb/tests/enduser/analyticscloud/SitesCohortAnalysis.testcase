@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -36,25 +34,26 @@ definition {
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
-
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		JSONUser.tearDownNonAdminUsers();
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8327 | Test Summary: Assert Sites Cohort Analysis sort Anonymous Visitors"
-	@priority = 3
+	@priority = "3"
 	test AssertSitesCohortAnalysisSortAnonymousVisitors {
-		property analytics.cloud.upstream = "false";
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Logout from DXP") {
 			User.logoutPG();
@@ -73,9 +72,8 @@ definition {
 		task ("Switch the property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
-
 		task ("Assert that the cohort analysis card shows anonymous visitors after their first views") {
 			Select(
 				locator1 = "ACSites#COHORT_ANALYSIS_SELECT_VISITOR_TYPE",
@@ -88,9 +86,11 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8326 | Test Summary: Site overview cohort analysis card shows which individuals are returning after their first views"
-	@priority = 5
+	@priority = "5"
 	test ShowsIndividualsReturningAfterFirstViews {
-		property analytics.cloud.upstream = "false";
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Add a new user") {
 			JSONUser.addUser(
@@ -121,15 +121,12 @@ definition {
 		task ("Switch the property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
-
 		task ("Assert that the cohort analysis card shows which individuals are returning after their first views") {
-			while ((IsElementNotPresent(locator1 = "ACSites#COHORT_ANALYSIS_DAY_ZERO_PERCENTAGE")) && (maxIterations = "50")) {
-				TestUtils.hardRefresh();
-			}
-
-			AssertElementPresent(locator1 = "ACSites#COHORT_ANALYSIS_DAY_ZERO_PERCENTAGE");
+			AssertTextEquals(
+				locator1 = "ACSites#COHORT_ANALYSIS_DAY_ZERO_PERCENTAGE",
+				value1 = "100.00%");
 		}
 	}
 

@@ -110,12 +110,15 @@ else {
 	/>
 </c:if>
 
-<div class="closed sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+<clay:container-fluid
+	cssClass="closed sidenav-container sidenav-right"
+	id='<%= liferayPortletResponse.getNamespace() + "infoPanelId" %>'
+>
 	<c:if test="<%= recordVersion != null %>">
 		<div class="sidenav-menu-slider">
 			<div class="sidebar sidebar-light sidenav-menu">
 				<div class="sidebar-header">
-					<aui:icon cssClass="d-inline-block d-sm-none icon-monospaced sidenav-close text-default" image="times" markupView="lexicon" url="javascript:void(0);" />
+					<aui:icon cssClass="d-inline-block d-sm-none icon-monospaced sidenav-close text-default" image="times" markupView="lexicon" url="javascript:;" />
 				</div>
 
 				<liferay-ui:tabs
@@ -165,9 +168,7 @@ else {
 		</div>
 	</c:if>
 
-	<clay:container-fluid
-		cssClass="container-form-lg sidenav-content"
-	>
+	<div class="sidenav-content">
 		<aui:form action="<%= (record == null) ? addRecordURL : updateRecordURL %>" cssClass="container-fluid container-fluid-max-xl" enctype="multipart/form-data" method="post" name="fm">
 			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
@@ -183,12 +184,7 @@ else {
 				<liferay-ui:error exception="<%= DuplicateFileEntryException.class %>" message="a-file-with-that-name-already-exists" />
 
 				<liferay-ui:error exception="<%= FileSizeException.class %>">
-
-					<%
-					FileSizeException fileSizeException = (FileSizeException)errorException;
-					%>
-
-					<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(fileSizeException.getMaxSize(), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
+					<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(DLValidatorUtil.getMaxAllowableSize(), locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
 				</liferay-ui:error>
 
 				<liferay-ui:error exception="<%= StorageFieldRequiredException.class %>" message="please-fill-out-all-required-fields" />
@@ -220,22 +216,20 @@ else {
 						/>
 					</c:when>
 					<c:otherwise>
-						<div class="sheet">
-							<div class="panel-group panel-group-flush">
-								<aui:fieldset>
-									<liferay-ddm:html
-										classNameId="<%= classNameId %>"
-										classPK="<%= classPK %>"
-										ddmFormValues="<%= ddmFormValues %>"
-										defaultEditLocale="<%= defaultEditLocale %>"
-										defaultLocale="<%= LocaleUtil.fromLanguageId(defaultLanguageId) %>"
-										groupId="<%= recordSet.getGroupId() %>"
-										repeatable="<%= translating ? false : true %>"
-										requestedLocale="<%= locale %>"
-									/>
-								</aui:fieldset>
-							</div>
-						</div>
+						<aui:fieldset-group markupView="lexicon">
+							<aui:fieldset>
+								<liferay-ddm:html
+									classNameId="<%= classNameId %>"
+									classPK="<%= classPK %>"
+									ddmFormValues="<%= ddmFormValues %>"
+									defaultEditLocale="<%= defaultEditLocale %>"
+									defaultLocale="<%= LocaleUtil.fromLanguageId(defaultLanguageId) %>"
+									groupId="<%= recordSet.getGroupId() %>"
+									repeatable="<%= translating ? false : true %>"
+									requestedLocale="<%= locale %>"
+								/>
+							</aui:fieldset>
+						</aui:fieldset-group>
 					</c:otherwise>
 				</c:choose>
 
@@ -266,7 +260,7 @@ else {
 				String publishButtonLabel = "publish";
 
 				if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, DDLRecordSet.class.getName(), recordSetId)) {
-					publishButtonLabel = "submit-for-workflow";
+					publishButtonLabel = "submit-for-publication";
 				}
 
 				if (ddlDisplayContext.isFormView()) {
@@ -287,8 +281,8 @@ else {
 				</c:if>
 			</aui:button-row>
 		</aui:form>
-	</clay:container-fluid>
-</div>
+	</div>
+</clay:container-fluid>
 
 <aui:script>
 	function <portlet:namespace />setWorkflowAction(draft) {

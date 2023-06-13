@@ -47,6 +47,7 @@ import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.util.tracker.BundleTracker;
@@ -57,6 +58,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  */
 @Component(
 	configurationPid = "com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	service = TemplateClassResolver.class
 )
 public class LiferayTemplateClassResolver implements TemplateClassResolver {
@@ -153,52 +155,7 @@ public class LiferayTemplateClassResolver implements TemplateClassResolver {
 		_classLoaderBundleTracker.close();
 	}
 
-	protected boolean match(String className, String matchedClassName) {
-		if (className.equals(StringPool.STAR)) {
-			return true;
-		}
-		else if (className.endsWith(StringPool.STAR)) {
-			if (matchedClassName.regionMatches(
-					0, className, 0, className.length() - 1)) {
-
-				return true;
-			}
-		}
-		else if (className.equals(matchedClassName)) {
-			return true;
-		}
-		else {
-			int index = className.lastIndexOf('.');
-
-			if ((className.length() == index) &&
-				className.regionMatches(0, matchedClassName, 0, index)) {
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Modified
-	protected void modified(
-		BundleContext bundleContext, Map<String, Object> properties) {
-
-		_freeMarkerEngineConfiguration = ConfigurableUtil.createConfigurable(
-			FreeMarkerEngineConfiguration.class, properties);
-
-		for (Bundle bundle : _bundles) {
-			ClassLoader classLoader = _findClassLoader(
-				_freeMarkerEngineConfiguration.allowedClasses(),
-				bundle.getBundleContext());
-
-			if (classLoader != null) {
-				_whitelistedClassLoaders.add(classLoader);
-			}
-		}
-	}
-
-	private ClassLoader _findClassLoader(
+	protected ClassLoader findClassLoader(
 		String clazz, BundleContext bundleContext) {
 
 		Bundle bundle = bundleContext.getBundle();
@@ -261,7 +218,7 @@ public class LiferayTemplateClassResolver implements TemplateClassResolver {
 		return null;
 	}
 
-	private ClassLoader _findClassLoader(
+	protected ClassLoader findClassLoader(
 		String[] allowedClassNames, BundleContext bundleContext) {
 
 		if (allowedClassNames == null) {
@@ -275,7 +232,7 @@ public class LiferayTemplateClassResolver implements TemplateClassResolver {
 				continue;
 			}
 
-			ClassLoader classLoader = _findClassLoader(
+			ClassLoader classLoader = findClassLoader(
 				allowedClassName, bundleContext);
 
 			if (classLoader != null) {
@@ -293,6 +250,51 @@ public class LiferayTemplateClassResolver implements TemplateClassResolver {
 		}
 
 		return null;
+	}
+
+	protected boolean match(String className, String matchedClassName) {
+		if (className.equals(StringPool.STAR)) {
+			return true;
+		}
+		else if (className.endsWith(StringPool.STAR)) {
+			if (matchedClassName.regionMatches(
+					0, className, 0, className.length() - 1)) {
+
+				return true;
+			}
+		}
+		else if (className.equals(matchedClassName)) {
+			return true;
+		}
+		else {
+			int index = className.lastIndexOf('.');
+
+			if ((className.length() == index) &&
+				className.regionMatches(0, matchedClassName, 0, index)) {
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Modified
+	protected void modified(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
+		_freeMarkerEngineConfiguration = ConfigurableUtil.createConfigurable(
+			FreeMarkerEngineConfiguration.class, properties);
+
+		for (Bundle bundle : _bundles) {
+			ClassLoader classLoader = findClassLoader(
+				_freeMarkerEngineConfiguration.allowedClasses(),
+				bundle.getBundleContext());
+
+			if (classLoader != null) {
+				_whitelistedClassLoaders.add(classLoader);
+			}
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -313,7 +315,7 @@ public class LiferayTemplateClassResolver implements TemplateClassResolver {
 		public ClassLoader addingBundle(
 			Bundle bundle, BundleEvent bundleEvent) {
 
-			ClassLoader classLoader = _findClassLoader(
+			ClassLoader classLoader = findClassLoader(
 				_freeMarkerEngineConfiguration.allowedClasses(),
 				bundle.getBundleContext());
 

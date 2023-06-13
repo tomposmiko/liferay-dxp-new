@@ -32,8 +32,8 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Base64;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.uuid.PortalUUID;
@@ -69,6 +69,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import org.quartz.Calendar;
+import org.quartz.CalendarIntervalTrigger;
+import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -100,18 +102,14 @@ public class QuartzSchedulerEngineTest {
 
 		PortalClassLoaderUtil.setClassLoader(currentClassLoader);
 
-		_setUpPortalUUIDUtil();
+		setUpPortalUUIDUtil();
 
 		_quartzSchedulerEngine = new QuartzSchedulerEngine();
 
-		ReflectionTestUtil.setFieldValue(
-			_quartzSchedulerEngine, "_props",
-			PropsTestUtil.setProps(PropsKeys.SCHEDULER_ENABLED, "false"));
-
-		_quartzSchedulerEngine.activate();
+		_quartzSchedulerEngine.setProps(setUpPropsUtil());
 
 		ReflectionTestUtil.setFieldValue(
-			_quartzSchedulerEngine, "_jsonFactory", _setUpJSONFactory());
+			_quartzSchedulerEngine, "_jsonFactory", setUpJSONFactory());
 
 		ReflectionTestUtil.setFieldValue(
 			_quartzSchedulerEngine, "_memoryScheduler",
@@ -210,9 +208,26 @@ public class QuartzSchedulerEngineTest {
 	}
 
 	@Test
+	public void testDescriptionMaxLength() {
+		int descriptionMaxLength =
+			_quartzSchedulerEngine.getDescriptionMaxLength() +
+				RandomTestUtil.randomInt();
+
+		_quartzSchedulerEngine.setProps(
+			PropsTestUtil.setProps(
+				PropsKeys.SCHEDULER_DESCRIPTION_MAX_LENGTH,
+				String.valueOf(descriptionMaxLength)));
+
+		Assert.assertEquals(
+			descriptionMaxLength,
+			_quartzSchedulerEngine.getDescriptionMaxLength());
+	}
+
+	@Test
 	public void testDisableScheduler() {
-		ReflectionTestUtil.setFieldValue(
-			_quartzSchedulerEngine, "_props",
+		_quartzSchedulerEngine.deactivate();
+
+		_quartzSchedulerEngine.setProps(
 			PropsTestUtil.setProps(PropsKeys.SCHEDULER_ENABLED, "true"));
 
 		_quartzSchedulerEngine.activate();
@@ -224,8 +239,7 @@ public class QuartzSchedulerEngineTest {
 
 		_quartzSchedulerEngine.deactivate();
 
-		ReflectionTestUtil.setFieldValue(
-			_quartzSchedulerEngine, "_props",
+		_quartzSchedulerEngine.setProps(
 			PropsTestUtil.setProps(PropsKeys.SCHEDULER_ENABLED, "false"));
 
 		_quartzSchedulerEngine.activate();
@@ -234,6 +248,21 @@ public class QuartzSchedulerEngineTest {
 			_quartzSchedulerEngine, "_schedulerEngineEnabled");
 
 		Assert.assertFalse(schedulerEngineEnabled);
+	}
+
+	@Test
+	public void testGroupNameMaxLength() {
+		int groupNameMaxLength =
+			_quartzSchedulerEngine.getGroupNameMaxLength() +
+				RandomTestUtil.randomInt();
+
+		_quartzSchedulerEngine.setProps(
+			PropsTestUtil.setProps(
+				PropsKeys.SCHEDULER_GROUP_NAME_MAX_LENGTH,
+				String.valueOf(groupNameMaxLength)));
+
+		Assert.assertEquals(
+			groupNameMaxLength, _quartzSchedulerEngine.getGroupNameMaxLength());
 	}
 
 	@Test
@@ -271,52 +300,59 @@ public class QuartzSchedulerEngineTest {
 	}
 
 	@Test
-	public void testMaxLengthValues() {
-		int descriptionMaxLength =
-			_quartzSchedulerEngine.getDescriptionMaxLength() +
-				RandomTestUtil.randomInt();
-		int groupNameMaxLength =
-			_quartzSchedulerEngine.getGroupNameMaxLength() +
-				RandomTestUtil.randomInt();
+	public void testJobNameMaxLength() {
 		int jobNameMaxLength =
 			_quartzSchedulerEngine.getJobNameMaxLength() +
 				RandomTestUtil.randomInt();
 
-		ReflectionTestUtil.setFieldValue(
-			_quartzSchedulerEngine, "_props",
+		_quartzSchedulerEngine.setProps(
 			PropsTestUtil.setProps(
-				HashMapBuilder.<String, Object>put(
-					PropsKeys.SCHEDULER_DESCRIPTION_MAX_LENGTH,
-					String.valueOf(descriptionMaxLength)
-				).put(
-					PropsKeys.SCHEDULER_ENABLED, "false"
-				).put(
-					PropsKeys.SCHEDULER_GROUP_NAME_MAX_LENGTH,
-					String.valueOf(groupNameMaxLength)
-				).put(
-					PropsKeys.SCHEDULER_JOB_NAME_MAX_LENGTH,
-					String.valueOf(jobNameMaxLength)
-				).build()));
+				PropsKeys.SCHEDULER_JOB_NAME_MAX_LENGTH,
+				String.valueOf(jobNameMaxLength)));
 
-		_quartzSchedulerEngine.activate();
-
-		Assert.assertEquals(
-			descriptionMaxLength,
-			_quartzSchedulerEngine.getDescriptionMaxLength());
-		Assert.assertEquals(
-			groupNameMaxLength, _quartzSchedulerEngine.getGroupNameMaxLength());
 		Assert.assertEquals(
 			jobNameMaxLength, _quartzSchedulerEngine.getJobNameMaxLength());
 	}
 
 	@Test
-	public void testPauseAndResume() throws Exception {
+	public void testPauseAndResume1() throws Exception {
+		List<SchedulerResponse> schedulerResponses =
+			_quartzSchedulerEngine.getScheduledJobs(
+				_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		for (SchedulerResponse schedulerResponse : schedulerResponses) {
+			assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		}
+
+		_quartzSchedulerEngine.pause(
+			_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		schedulerResponses = _quartzSchedulerEngine.getScheduledJobs(
+			_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		for (SchedulerResponse schedulerResponse : schedulerResponses) {
+			assertTriggerState(schedulerResponse, TriggerState.PAUSED);
+		}
+
+		_quartzSchedulerEngine.resume(
+			_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		schedulerResponses = _quartzSchedulerEngine.getScheduledJobs(
+			_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		for (SchedulerResponse schedulerResponse : schedulerResponses) {
+			assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		}
+	}
+
+	@Test
+	public void testPauseAndResume2() throws Exception {
 		SchedulerResponse schedulerResponse =
 			_quartzSchedulerEngine.getScheduledJob(
 				_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
 				StorageType.PERSISTED);
 
-		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		assertTriggerState(schedulerResponse, TriggerState.NORMAL);
 
 		_quartzSchedulerEngine.pause(
 			_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
@@ -326,7 +362,7 @@ public class QuartzSchedulerEngineTest {
 			_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
 			StorageType.PERSISTED);
 
-		_assertTriggerState(schedulerResponse, TriggerState.PAUSED);
+		assertTriggerState(schedulerResponse, TriggerState.PAUSED);
 
 		_quartzSchedulerEngine.resume(
 			_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
@@ -336,7 +372,7 @@ public class QuartzSchedulerEngineTest {
 			_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
 			StorageType.PERSISTED);
 
-		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		assertTriggerState(schedulerResponse, TriggerState.NORMAL);
 	}
 
 	@Test
@@ -392,7 +428,75 @@ public class QuartzSchedulerEngineTest {
 	}
 
 	@Test
+	public void testSuppressError() throws Exception {
+		SchedulerResponse schedulerResponse =
+			_quartzSchedulerEngine.getScheduledJob(
+				_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		Message message = schedulerResponse.getMessage();
+
+		JobState jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
+
+		Assert.assertNotNull(jobState.getExceptions());
+
+		_quartzSchedulerEngine.suppressError(
+			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		schedulerResponse = _quartzSchedulerEngine.getScheduledJob(
+			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		message = schedulerResponse.getMessage();
+
+		jobState = (JobState)message.get(SchedulerEngine.JOB_STATE);
+
+		Assert.assertNull(jobState.getExceptions());
+	}
+
+	@Test
 	public void testUnschedule1() throws Exception {
+
+		// Unschedule memory job
+
+		List<SchedulerResponse> schedulerResponses =
+			_quartzSchedulerEngine.getScheduledJobs(
+				_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		Assert.assertEquals(
+			schedulerResponses.toString(), _DEFAULT_JOB_NUMBER,
+			schedulerResponses.size());
+
+		_quartzSchedulerEngine.unschedule(
+			_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		schedulerResponses = _quartzSchedulerEngine.getScheduledJobs(
+			_MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		for (SchedulerResponse schedulerResponse : schedulerResponses) {
+			assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
+		}
+
+		// Unschedule persisted job
+
+		schedulerResponses = _quartzSchedulerEngine.getScheduledJobs(
+			_PERSISTED_TEST_GROUP_NAME, StorageType.PERSISTED);
+
+		for (SchedulerResponse schedulerResponse : schedulerResponses) {
+			assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		}
+
+		_quartzSchedulerEngine.unschedule(
+			_PERSISTED_TEST_GROUP_NAME, StorageType.PERSISTED);
+
+		schedulerResponses = _quartzSchedulerEngine.getScheduledJobs(
+			_PERSISTED_TEST_GROUP_NAME, StorageType.PERSISTED);
+
+		for (SchedulerResponse schedulerResponse : schedulerResponses) {
+			assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
+		}
+	}
+
+	@Test
+	public void testUnschedule2() throws Exception {
 
 		// Unschedule memory job
 
@@ -400,7 +504,7 @@ public class QuartzSchedulerEngineTest {
 			_quartzSchedulerEngine.getScheduledJob(
 				_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
 
-		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		assertTriggerState(schedulerResponse, TriggerState.NORMAL);
 
 		_quartzSchedulerEngine.unschedule(
 			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
@@ -408,7 +512,7 @@ public class QuartzSchedulerEngineTest {
 		schedulerResponse = _quartzSchedulerEngine.getScheduledJob(
 			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
 
-		_assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
+		assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
 
 		// Unschedule persisted job
 
@@ -416,7 +520,7 @@ public class QuartzSchedulerEngineTest {
 			_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
 			StorageType.PERSISTED);
 
-		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		assertTriggerState(schedulerResponse, TriggerState.NORMAL);
 
 		_quartzSchedulerEngine.unschedule(
 			_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
@@ -426,11 +530,11 @@ public class QuartzSchedulerEngineTest {
 			_TEST_JOB_NAME_0, _PERSISTED_TEST_GROUP_NAME,
 			StorageType.PERSISTED);
 
-		_assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
+		assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
 	}
 
 	@Test
-	public void testUnschedule2() throws Exception {
+	public void testUnschedule3() throws Exception {
 		String testJobName = _TEST_JOB_NAME_PREFIX + "memory";
 
 		Trigger trigger = _quartzTriggerFactory.createTrigger(
@@ -445,7 +549,7 @@ public class QuartzSchedulerEngineTest {
 			_quartzSchedulerEngine.getScheduledJob(
 				testJobName, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
 
-		_assertTriggerState(schedulerResponse, TriggerState.NORMAL);
+		assertTriggerState(schedulerResponse, TriggerState.NORMAL);
 
 		_quartzSchedulerEngine.unschedule(
 			testJobName, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
@@ -453,7 +557,99 @@ public class QuartzSchedulerEngineTest {
 		schedulerResponse = _quartzSchedulerEngine.getScheduledJob(
 			testJobName, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
 
-		_assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
+		assertTriggerState(schedulerResponse, TriggerState.UNSCHEDULED);
+	}
+
+	@Test
+	public void testUpdate1() throws Exception {
+		SchedulerResponse schedulerResponse =
+			_quartzSchedulerEngine.getScheduledJob(
+				_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		Trigger trigger = schedulerResponse.getTrigger();
+
+		CalendarIntervalTrigger calendarIntervalTrigger =
+			(CalendarIntervalTrigger)trigger.getWrappedTrigger();
+
+		Assert.assertEquals(
+			_DEFAULT_INTERVAL, calendarIntervalTrigger.getRepeatInterval());
+
+		Trigger newTrigger = _quartzTriggerFactory.createTrigger(
+			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, null, null,
+			_DEFAULT_INTERVAL * 2, TimeUnit.SECOND);
+
+		_quartzSchedulerEngine.update(newTrigger, StorageType.MEMORY);
+
+		schedulerResponse = _quartzSchedulerEngine.getScheduledJob(
+			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		trigger = schedulerResponse.getTrigger();
+
+		calendarIntervalTrigger =
+			(CalendarIntervalTrigger)trigger.getWrappedTrigger();
+
+		Assert.assertEquals(
+			_DEFAULT_INTERVAL * 2, calendarIntervalTrigger.getRepeatInterval());
+	}
+
+	@Test
+	public void testUpdate2() throws Exception {
+		SchedulerResponse schedulerResponse =
+			_quartzSchedulerEngine.getScheduledJob(
+				_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		Trigger trigger = schedulerResponse.getTrigger();
+
+		CalendarIntervalTrigger calendarIntervalTrigger =
+			(CalendarIntervalTrigger)trigger.getWrappedTrigger();
+
+		Assert.assertEquals(
+			_DEFAULT_INTERVAL, calendarIntervalTrigger.getRepeatInterval());
+
+		String cronExpression = "0 0 12 * * ?";
+
+		Trigger newTrigger = _quartzTriggerFactory.createTrigger(
+			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, null, null,
+			cronExpression);
+
+		_quartzSchedulerEngine.update(newTrigger, StorageType.MEMORY);
+
+		schedulerResponse = _quartzSchedulerEngine.getScheduledJob(
+			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		trigger = schedulerResponse.getTrigger();
+
+		CronTrigger cronTrigger = (CronTrigger)trigger.getWrappedTrigger();
+
+		Assert.assertEquals(cronExpression, cronTrigger.getCronExpression());
+	}
+
+	@Test
+	public void testUpdate3() throws SchedulerException {
+		MockScheduler mockScheduler = ReflectionTestUtil.getFieldValue(
+			_quartzSchedulerEngine, "_memoryScheduler");
+
+		String jobName = _TEST_JOB_NAME_PREFIX + "memory";
+
+		mockScheduler.addJob(
+			jobName, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY, null);
+
+		SchedulerResponse schedulerResponse =
+			_quartzSchedulerEngine.getScheduledJob(
+				jobName, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		Assert.assertNull(schedulerResponse.getTrigger());
+
+		Trigger trigger = _quartzTriggerFactory.createTrigger(
+			jobName, _MEMORY_TEST_GROUP_NAME, new Date(), null,
+			_DEFAULT_INTERVAL, TimeUnit.SECOND);
+
+		_quartzSchedulerEngine.update(trigger, StorageType.MEMORY);
+
+		schedulerResponse = _quartzSchedulerEngine.getScheduledJob(
+			_TEST_JOB_NAME_0, _MEMORY_TEST_GROUP_NAME, StorageType.MEMORY);
+
+		Assert.assertNotNull(schedulerResponse.getTrigger());
 	}
 
 	public static class TestMessageListener implements MessageListener {
@@ -464,7 +660,7 @@ public class QuartzSchedulerEngineTest {
 
 	}
 
-	private void _assertTriggerState(
+	protected void assertTriggerState(
 		SchedulerResponse schedulerResponse,
 		TriggerState expectedTriggerState) {
 
@@ -475,7 +671,7 @@ public class QuartzSchedulerEngineTest {
 		Assert.assertEquals(expectedTriggerState, jobState.getTriggerState());
 	}
 
-	private JSONFactory _setUpJSONFactory() {
+	protected JSONFactory setUpJSONFactory() {
 		_jsonFactory = Mockito.mock(JSONFactory.class);
 
 		Mockito.when(
@@ -504,7 +700,7 @@ public class QuartzSchedulerEngineTest {
 		);
 
 		Mockito.when(
-			_jsonFactory.serialize(Mockito.any())
+			_jsonFactory.serialize(Mockito.anyObject())
 		).then(
 			new Answer<String>() {
 
@@ -535,7 +731,7 @@ public class QuartzSchedulerEngineTest {
 		return _jsonFactory;
 	}
 
-	private void _setUpPortalUUIDUtil() {
+	protected void setUpPortalUUIDUtil() {
 		PortalUUIDUtil portalUUIDUtil = new PortalUUIDUtil();
 
 		PortalUUID portalUUID = Mockito.mock(PortalUUID.class);
@@ -560,6 +756,10 @@ public class QuartzSchedulerEngineTest {
 		);
 
 		portalUUIDUtil.setPortalUUID(portalUUID);
+	}
+
+	protected Props setUpPropsUtil() {
+		return PropsTestUtil.setProps(PropsKeys.SCHEDULER_ENABLED, "true");
 	}
 
 	private static final int _DEFAULT_INTERVAL = 10;
@@ -631,6 +831,8 @@ public class QuartzSchedulerEngineTest {
 				SchedulerEngine.STORAGE_TYPE, storageType.toString());
 
 			JobState jobState = new JobState(TriggerState.NORMAL);
+
+			jobState.addException(new Exception(), new Date());
 
 			jobDataMap.put(
 				SchedulerEngine.JOB_STATE,

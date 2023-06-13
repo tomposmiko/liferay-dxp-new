@@ -53,18 +53,18 @@ public class MBUtilTest {
 	public static void setUpClass() {
 		Html html = Mockito.mock(Html.class);
 
-		Mockito.when(
+		Mockito.stub(
 			html.escape(Mockito.anyString())
-		).thenAnswer(
+		).toAnswer(
 			MBUtilTest::_getFirstArgument
 		);
 
 		Language language = Mockito.mock(Language.class);
 
-		Mockito.when(
+		Mockito.stub(
 			language.get(
 				Mockito.any(HttpServletRequest.class), Mockito.anyString())
-		).thenAnswer(
+		).toAnswer(
 			MBUtilTest::_getSecondArgument
 		);
 
@@ -74,10 +74,10 @@ public class MBUtilTest {
 
 		Portal portal = Mockito.mock(Portal.class);
 
-		Mockito.when(
+		Mockito.stub(
 			portal.getUserName(Mockito.any(MBMessage.class))
-		).thenReturn(
-			"USER[]"
+		).toReturn(
+			"USER[]()"
 		);
 
 		PortalUtil portalUtil = new PortalUtil();
@@ -96,7 +96,7 @@ public class MBUtilTest {
 		);
 
 		Assert.assertEquals(
-			"[quote=USER&#91;&#93;]\nCONTENT[/quote]\n\n\n",
+			"[quote=USER&#91;&#93;&#40;&#41;]\nCONTENT[/quote]\n\n\n",
 			MBUtil.getBBCodeQuoteBody(
 				Mockito.mock(HttpServletRequest.class), mbMessage));
 	}

@@ -15,7 +15,7 @@
 package com.liferay.object.web.internal.info.list.renderer;
 
 import com.liferay.info.item.renderer.InfoItemRenderer;
-import com.liferay.info.item.renderer.InfoItemRendererRegistry;
+import com.liferay.info.item.renderer.InfoItemRendererTracker;
 import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRenderer;
 import com.liferay.info.list.renderer.InfoListRendererContext;
@@ -24,7 +24,6 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.web.internal.info.item.renderer.ObjectEntryRowInfoItemRenderer;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,16 +44,16 @@ public class ObjectEntryTableInfoListRenderer
 	implements InfoListRenderer<ObjectEntry> {
 
 	public ObjectEntryTableInfoListRenderer(
-		InfoItemRendererRegistry infoItemRendererRegistry,
+		InfoItemRendererTracker infoItemRendererTracker,
 		ObjectFieldLocalService objectFieldLocalService) {
 
-		_infoItemRendererRegistry = infoItemRendererRegistry;
+		_infoItemRendererTracker = infoItemRendererTracker;
 		_objectFieldLocalService = objectFieldLocalService;
 	}
 
 	@Override
 	public List<InfoItemRenderer<?>> getAvailableInfoItemRenderers() {
-		return _infoItemRendererRegistry.getInfoItemRenderers(
+		return _infoItemRendererTracker.getInfoItemRenderers(
 			ObjectEntry.class.getName());
 	}
 
@@ -84,29 +84,23 @@ public class ObjectEntryTableInfoListRenderer
 		if ((objectEntries != null) && !objectEntries.isEmpty()) {
 			ObjectEntry objectEntry = objectEntries.get(0);
 
-			List<ObjectField> objectFields =
-				_objectFieldLocalService.getObjectFields(
-					objectEntry.getObjectDefinitionId(), false);
-
-			try {
-				objectFields = _objectFieldLocalService.getActiveObjectFields(
-					objectFields);
-			}
-			catch (PortalException portalException) {
-				_log.error(portalException);
-			}
-
 			infoListBasicTableTag.setInfoListObjectColumnNames(
-				ListUtil.toList(objectFields, ObjectField::getLabel));
+				ListUtil.toList(
+					_objectFieldLocalService.getObjectFields(
+						objectEntry.getObjectDefinitionId()),
+					ObjectField::getLabel));
 		}
 
 		infoListBasicTableTag.setInfoListObjects(objectEntries);
 
-		String listItemRendererKey =
-			infoListRendererContext.getListItemRendererKey();
+		Optional<String> infoListItemRendererKeyOptional =
+			infoListRendererContext.getListItemRendererKeyOptional();
 
-		if (Validator.isNotNull(listItemRendererKey)) {
-			infoListBasicTableTag.setItemRendererKey(listItemRendererKey);
+		if (infoListItemRendererKeyOptional.isPresent() &&
+			Validator.isNotNull(infoListItemRendererKeyOptional.get())) {
+
+			infoListBasicTableTag.setItemRendererKey(
+				infoListItemRendererKeyOptional.get());
 		}
 		else {
 			infoListBasicTableTag.setItemRendererKey(
@@ -126,7 +120,7 @@ public class ObjectEntryTableInfoListRenderer
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryTableInfoListRenderer.class);
 
-	private final InfoItemRendererRegistry _infoItemRendererRegistry;
+	private final InfoItemRendererTracker _infoItemRendererTracker;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 
 }

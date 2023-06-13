@@ -72,9 +72,11 @@ public class PageAttachmentWikiUploadFileEntryHandler
 		if (Validator.isNotNull(
 				uploadPortletRequest.getFileName("imageSelectorFileName"))) {
 
+			String fileName = uploadPortletRequest.getFileName(
+				"imageSelectorFileName");
+
 			return _addPageAttachment(
-				uploadPortletRequest, themeDisplay,
-				uploadPortletRequest.getFileName("imageSelectorFileName"),
+				uploadPortletRequest, themeDisplay, fileName,
 				"imageSelectorFileName");
 		}
 
@@ -97,9 +99,7 @@ public class PageAttachmentWikiUploadFileEntryHandler
 		throws IOException, PortalException {
 
 		dlValidator.validateFileSize(
-			themeDisplay.getScopeGroupId(), fileName,
-			uploadPortletRequest.getContentType(parameterName),
-			uploadPortletRequest.getSize(parameterName));
+			fileName, uploadPortletRequest.getSize(parameterName));
 
 		long resourcePrimKey = ParamUtil.getLong(
 			uploadPortletRequest, "resourcePrimKey");

@@ -30,10 +30,6 @@ public class FragmentCollectionLocalServiceWrapper
 	implements FragmentCollectionLocalService,
 			   ServiceWrapper<FragmentCollectionLocalService> {
 
-	public FragmentCollectionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public FragmentCollectionLocalServiceWrapper(
 		FragmentCollectionLocalService fragmentCollectionLocalService) {
 

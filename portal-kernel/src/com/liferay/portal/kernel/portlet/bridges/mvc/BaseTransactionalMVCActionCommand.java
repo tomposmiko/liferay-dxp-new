@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.portlet.bridges.mvc;
 
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 
@@ -27,26 +29,27 @@ import javax.portlet.PortletException;
  * @author Bruno Basto
  */
 public abstract class BaseTransactionalMVCActionCommand
-	extends BaseMVCActionCommand {
+	implements MVCActionCommand {
 
 	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
+	public boolean processAction(
+			final ActionRequest actionRequest,
+			final ActionResponse actionResponse)
 		throws PortletException {
 
 		try {
-			Callable<Void> callable = new Callable<Void>() {
+			Callable<Boolean> callable = new Callable<Boolean>() {
 
 				@Override
-				public Void call() throws Exception {
+				public Boolean call() throws Exception {
 					doTransactionalCommand(actionRequest, actionResponse);
 
-					return null;
+					return SessionErrors.isEmpty(actionRequest);
 				}
 
 			};
 
-			TransactionInvokerUtil.invoke(getTransactionConfig(), callable);
+			return TransactionInvokerUtil.invoke(_transactionConfig, callable);
 		}
 		catch (Throwable throwable) {
 			if (throwable instanceof PortletException) {
@@ -61,15 +64,12 @@ public abstract class BaseTransactionalMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception;
 
-	protected TransactionConfig getTransactionConfig() {
-		return _transactionConfig;
-	}
-
 	private static final TransactionConfig _transactionConfig;
 
 	static {
 		TransactionConfig.Builder builder = new TransactionConfig.Builder();
 
+		builder.setPropagation(Propagation.REQUIRES_NEW);
 		builder.setRollbackForClasses(Exception.class);
 
 		_transactionConfig = builder.build();

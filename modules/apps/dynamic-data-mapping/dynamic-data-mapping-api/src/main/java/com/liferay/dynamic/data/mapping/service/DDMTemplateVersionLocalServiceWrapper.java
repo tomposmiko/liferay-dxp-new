@@ -30,10 +30,6 @@ public class DDMTemplateVersionLocalServiceWrapper
 	implements DDMTemplateVersionLocalService,
 			   ServiceWrapper<DDMTemplateVersionLocalService> {
 
-	public DDMTemplateVersionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DDMTemplateVersionLocalServiceWrapper(
 		DDMTemplateVersionLocalService ddmTemplateVersionLocalService) {
 

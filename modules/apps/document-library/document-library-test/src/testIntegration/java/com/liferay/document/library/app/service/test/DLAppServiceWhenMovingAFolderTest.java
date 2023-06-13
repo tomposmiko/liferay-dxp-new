@@ -55,7 +55,7 @@ public class DLAppServiceWhenMovingAFolderTest extends BaseDLAppTestCase {
 			ServiceContextTestUtil.getServiceContext(group.getGroupId());
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(), parentFolder.getFolderId(),
+			group.getGroupId(), parentFolder.getFolderId(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 

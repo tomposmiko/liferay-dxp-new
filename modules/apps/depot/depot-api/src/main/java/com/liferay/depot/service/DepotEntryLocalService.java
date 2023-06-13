@@ -114,11 +114,9 @@ public interface DepotEntryLocalService
 	 *
 	 * @param depotEntry the depot entry
 	 * @return the depot entry that was removed
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
-	public DepotEntry deleteDepotEntry(DepotEntry depotEntry)
-		throws PortalException;
+	public DepotEntry deleteDepotEntry(DepotEntry depotEntry);
 
 	/**
 	 * Deletes the depot entry with the primary key from the database. Also notifies the appropriate model listeners.

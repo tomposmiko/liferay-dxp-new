@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class MBCategoryServiceWrapper
 	implements MBCategoryService, ServiceWrapper<MBCategoryService> {
 
-	public MBCategoryServiceWrapper() {
-		this(null);
-	}
-
 	public MBCategoryServiceWrapper(MBCategoryService mbCategoryService) {
 		_mbCategoryService = mbCategoryService;
 	}

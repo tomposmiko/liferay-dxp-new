@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the depot entry service. This utility wraps <code>com.liferay.depot.service.persistence.impl.DepotEntryPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -734,9 +738,25 @@ public class DepotEntryUtil {
 	}
 
 	public static DepotEntryPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile DepotEntryPersistence _persistence;
+	private static ServiceTracker<DepotEntryPersistence, DepotEntryPersistence>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(DepotEntryPersistence.class);
+
+		ServiceTracker<DepotEntryPersistence, DepotEntryPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<DepotEntryPersistence, DepotEntryPersistence>(
+						bundle.getBundleContext(), DepotEntryPersistence.class,
+						null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

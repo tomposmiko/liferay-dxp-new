@@ -14,7 +14,8 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.query;
 
-import com.liferay.portal.search.elasticsearch7.internal.LiferayElasticsearchIndexingFixtureFactory;
+import com.liferay.portal.search.elasticsearch7.internal.ElasticsearchIndexingFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.query.BaseFuzzyQueryTestCase;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -34,7 +35,12 @@ public class FuzzyQueryTest extends BaseFuzzyQueryTestCase {
 
 	@Override
 	protected IndexingFixture createIndexingFixture() throws Exception {
-		return LiferayElasticsearchIndexingFixtureFactory.getInstance();
+		return new ElasticsearchIndexingFixture() {
+			{
+				setElasticsearchFixture(new ElasticsearchFixture(getClass()));
+				setLiferayMappingsAddedToIndex(true);
+			}
+		};
 	}
 
 }

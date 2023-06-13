@@ -26,7 +26,6 @@ import './App.scss';
 
 export default function App({
 	editorAutocompleteData = {variables: {}},
-	mode = 'text/plain',
 	portletNamespace,
 	propertiesViewURL,
 	script: initialScript = '',
@@ -61,7 +60,6 @@ export default function App({
 					<Editor
 						autocompleteData={editorAutocompleteData}
 						initialScript={initialScript}
-						mode={mode}
 					/>
 				</div>
 
@@ -76,13 +74,6 @@ export default function App({
 
 App.propTypes = {
 	editorAutocompleteData: PropTypes.object.isRequired,
-	mode: PropTypes.oneOfType([
-		PropTypes.string,
-		PropTypes.shape({
-			globalVars: PropTypes.bool.isRequired,
-			name: PropTypes.string.isRequired,
-		}),
-	]),
 	portletNamespace: PropTypes.string.isRequired,
 	script: PropTypes.string.isRequired,
 	showCacheableWarning: PropTypes.bool.isRequired,

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -387,38 +386,6 @@ public class SEOSettings implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> seoKeywords_i18n;
 
-	@Schema(description = "Represents settings related with the site map.")
-	@Valid
-	public SiteMapSettings getSiteMapSettings() {
-		return siteMapSettings;
-	}
-
-	public void setSiteMapSettings(SiteMapSettings siteMapSettings) {
-		this.siteMapSettings = siteMapSettings;
-	}
-
-	@JsonIgnore
-	public void setSiteMapSettings(
-		UnsafeSupplier<SiteMapSettings, Exception>
-			siteMapSettingsUnsafeSupplier) {
-
-		try {
-			siteMapSettings = siteMapSettingsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "Represents settings related with the site map."
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected SiteMapSettings siteMapSettings;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -566,16 +533,6 @@ public class SEOSettings implements Serializable {
 			sb.append(_toJSON(seoKeywords_i18n));
 		}
 
-		if (siteMapSettings != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"siteMapSettings\": ");
-
-			sb.append(String.valueOf(siteMapSettings));
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -589,9 +546,9 @@ public class SEOSettings implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -617,7 +574,7 @@ public class SEOSettings implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -649,7 +606,7 @@ public class SEOSettings implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -665,10 +622,5 @@ public class SEOSettings implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

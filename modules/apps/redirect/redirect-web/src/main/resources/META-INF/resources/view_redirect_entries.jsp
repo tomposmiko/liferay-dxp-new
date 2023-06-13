@@ -17,126 +17,142 @@
 <%@ include file="/init.jsp" %>
 
 <%
-RedirectEntriesDisplayContext redirectEntriesDisplayContext = (RedirectEntriesDisplayContext)request.getAttribute(RedirectEntriesDisplayContext.class.getName());
+StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHelper();
+
+boolean stagingGroup = stagingGroupHelper.isLocalStagingGroup(themeDisplay.getScopeGroup()) || stagingGroupHelper.isRemoteStagingGroup(themeDisplay.getScopeGroup());
+
+RedirectDisplayContext redirectDisplayContext = new RedirectDisplayContext(request, liferayPortletRequest, liferayPortletResponse);
+
+SearchContainer<RedirectEntry> redirectSearchContainer = redirectDisplayContext.searchContainer();
+
+RedirectManagementToolbarDisplayContext redirectManagementToolbarDisplayContext = new RedirectManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, redirectSearchContainer);
 %>
 
-<c:if test="<%= !redirectEntriesDisplayContext.isStagingGroup() %>">
+<c:if test="<%= !stagingGroup %>">
 	<clay:management-toolbar
-		managementToolbarDisplayContext="<%= redirectEntriesDisplayContext.getRedirectManagementToolbarDisplayContext() %>"
+		managementToolbarDisplayContext="<%= redirectManagementToolbarDisplayContext %>"
 		propsTransformer="js/RedirectManagementToolbarPropsTransformer"
 	/>
 </c:if>
 
 <div class="closed redirect-entries sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/redirect/info_panel" var="sidebarPanelURL" />
+
 	<liferay-frontend:sidebar-panel
-		resourceURL="<%= redirectEntriesDisplayContext.getSidebarPanelURL() %>"
-		searchContainerId="<%= redirectEntriesDisplayContext.getSearchContainerId() %>"
+		resourceURL="<%= sidebarPanelURL %>"
+		searchContainerId="<%= redirectDisplayContext.getSearchContainerId() %>"
 	>
 		<liferay-util:include page="/info_panel.jsp" servletContext="<%= application %>" />
 	</liferay-frontend:sidebar-panel>
 
-	<clay:container-fluid
-		cssClass="sidenav-content"
-	>
-		<c:if test="<%= redirectEntriesDisplayContext.isStagingGroup() %>">
-			<div class="lfr-search-container">
-				<clay:alert
-					displayType="info"
-					message="redirections-are-unavailable-in-staged-sites"
-				/>
-			</div>
-		</c:if>
+	<div class="sidenav-content">
+		<clay:container-fluid>
+			<c:if test="<%= stagingGroup %>">
+				<div class="lfr-search-container">
+					<clay:alert
+						displayType="info"
+						message="redirections-are-unavailable-in-staged-sites"
+					/>
+				</div>
+			</c:if>
 
-		<aui:form action="<%= redirectEntriesDisplayContext.getActionURL() %>" cssClass="container-fluid container-fluid-max-xl" name="fm">
-			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+			<aui:form action="<%= redirectSearchContainer.getIteratorURL() %>" cssClass="container-fluid container-fluid-max-xl" name="fm">
+				<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
-			<liferay-ui:search-container
-				id="<%= redirectEntriesDisplayContext.getSearchContainerId() %>"
-				searchContainer="<%= redirectEntriesDisplayContext.getSearchContainer() %>"
-			>
-				<liferay-ui:search-container-row
-					className="com.liferay.redirect.model.RedirectEntry"
-					keyProperty="redirectEntryId"
-					modelVar="redirectEntry"
+				<liferay-ui:search-container
+					id="<%= redirectDisplayContext.getSearchContainerId() %>"
+					searchContainer="<%= redirectSearchContainer %>"
 				>
-
-					<%
-					row.setData(
-						HashMapBuilder.<String, Object>put(
-							"actions", redirectEntriesDisplayContext.getAvailableActions(redirectEntry)
-						).build());
-					%>
-
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand table-cell-text-truncate-reverse"
-						name="source-url"
+					<liferay-ui:search-container-row
+						className="com.liferay.redirect.model.RedirectEntry"
+						keyProperty="redirectEntryId"
+						modelVar="redirectEntry"
 					>
 
 						<%
-						String sourceURL = URLCodec.decodeURL(HtmlUtil.escape(redirectEntriesDisplayContext.getSourceURL(redirectEntry)));
+						row.setData(
+							HashMapBuilder.<String, Object>put(
+								"actions", redirectManagementToolbarDisplayContext.getAvailableActions(redirectEntry)
+							).build());
 						%>
 
-						<bdi data-title="<%= HtmlUtil.escapeAttribute(sourceURL) %>">
-							<%= sourceURL %>
-						</bdi>
-					</liferay-ui:search-container-column-text>
+						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand table-cell-text-truncate-reverse"
+							name="source-url"
+						>
 
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand table-cell-text-truncate-reverse"
-						name="destination-url"
-					>
+							<%
+							String sourceURL = HtmlUtil.escape(RedirectUtil.getGroupBaseURL(themeDisplay) + StringPool.SLASH + redirectEntry.getSourceURL());
+							%>
+
+							<bdi data-title="<%= HtmlUtil.escapeAttribute(sourceURL) %>">
+								<%= sourceURL %>
+							</bdi>
+						</liferay-ui:search-container-column-text>
+
+						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand table-cell-text-truncate-reverse"
+							name="destination-url"
+						>
+
+							<%
+							String destinationURL = HtmlUtil.escape(redirectEntry.getDestinationURL());
+							%>
+
+							<bdi data-title="<%= HtmlUtil.escapeAttribute(destinationURL) %>">
+								<%= destinationURL %>
+							</bdi>
+						</liferay-ui:search-container-column-text>
+
+						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand-smallest"
+							name="type"
+						>
+							<liferay-ui:message key='<%= redirectEntry.isPermanent() ? "permanent" : "temporary" %>' />
+						</liferay-ui:search-container-column-text>
+
+						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand-smallest"
+							name="expiration"
+						>
+							<c:choose>
+								<c:when test="<%= Validator.isNull(redirectEntry.getExpirationDate()) %>">
+									<%= StringPool.DASH %>
+								</c:when>
+								<c:when test="<%= DateUtil.compareTo(redirectEntry.getExpirationDate(), DateUtil.newDate()) <= 0 %>">
+									<strong><liferay-ui:message key="expired" /></strong>
+								</c:when>
+								<c:otherwise>
+									<%= redirectDisplayContext.formatExpirationDate(redirectEntry.getExpirationDate()) %>
+								</c:otherwise>
+							</c:choose>
+						</liferay-ui:search-container-column-text>
 
 						<%
-						String destinationURL = HtmlUtil.escape(redirectEntry.getDestinationURL());
+						List<DropdownItem> dropdownItems = redirectDisplayContext.getActionDropdownItems(redirectEntry);
 						%>
 
-						<bdi data-title="<%= HtmlUtil.escapeAttribute(destinationURL) %>">
-							<%= destinationURL %>
-						</bdi>
-					</liferay-ui:search-container-column-text>
+						<c:if test="<%= ListUtil.isNotEmpty(dropdownItems) %>">
+							<liferay-ui:search-container-column-text>
+								<clay:dropdown-actions
+									dropdownItems="<%= dropdownItems %>"
+								/>
+							</liferay-ui:search-container-column-text>
+						</c:if>
+					</liferay-ui:search-container-row>
 
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand-smallest"
-						name="type"
-					>
-						<liferay-ui:message key='<%= redirectEntry.isPermanent() ? "permanent" : "temporary" %>' />
-					</liferay-ui:search-container-column-text>
-
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand-smallest"
-						name="expiration"
-					>
-						<c:choose>
-							<c:when test="<%= Validator.isNull(redirectEntry.getExpirationDate()) %>">
-								<%= StringPool.DASH %>
-							</c:when>
-							<c:when test="<%= DateUtil.compareTo(redirectEntry.getExpirationDate(), DateUtil.newDate()) <= 0 %>">
-								<strong><liferay-ui:message key="expired" /></strong>
-							</c:when>
-							<c:otherwise>
-								<%= redirectEntriesDisplayContext.formatExpirationDate(redirectEntry.getExpirationDate()) %>
-							</c:otherwise>
-						</c:choose>
-					</liferay-ui:search-container-column-text>
-
-					<liferay-ui:search-container-column-text>
-						<clay:dropdown-actions
-							aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-							dropdownItems="<%= redirectEntriesDisplayContext.getActionDropdownItems(redirectEntry) %>"
-						/>
-					</liferay-ui:search-container-column-text>
-				</liferay-ui:search-container-row>
-
-				<liferay-ui:search-iterator
-					markupView="lexicon"
-				/>
-			</liferay-ui:search-container>
-		</aui:form>
-	</clay:container-fluid>
+					<liferay-ui:search-iterator
+						markupView="lexicon"
+						searchContainer="<%= redirectSearchContainer %>"
+					/>
+				</liferay-ui:search-container>
+			</aui:form>
+		</clay:container-fluid>
+	</div>
 </div>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {delegate} = frontendJsWeb;
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+	var delegate = delegateModule.default;
 
 	delegate(
 		document.querySelector('#<portlet:namespace />fm'),

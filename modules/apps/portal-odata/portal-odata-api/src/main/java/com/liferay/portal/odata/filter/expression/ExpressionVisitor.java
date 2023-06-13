@@ -173,13 +173,6 @@ public interface ExpressionVisitor<T> {
 			List<T> expressions, MethodExpression.Type type)
 		throws ExpressionVisitException;
 
-	public default T visitNavigationPropertyExpression(
-		NavigationPropertyExpression navigationPropertyExpression) {
-
-		throw new UnsupportedOperationException(
-			"Unsupported method navigationPropertyExpression");
-	}
-
 	/**
 	 * Called for each traversed {@link PrimitivePropertyExpression} expression.
 	 *

@@ -14,10 +14,7 @@
 
 package com.liferay.commerce.product.service;
 
-import com.liferay.commerce.product.model.CPSpecificationOption;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link CPSpecificationOptionLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class CPSpecificationOptionLocalServiceWrapper
 	implements CPSpecificationOptionLocalService,
 			   ServiceWrapper<CPSpecificationOptionLocalService> {
-
-	public CPSpecificationOptionLocalServiceWrapper() {
-		this(null);
-	}
 
 	public CPSpecificationOptionLocalServiceWrapper(
 		CPSpecificationOptionLocalService cpSpecificationOptionLocalService) {
@@ -51,20 +44,23 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @return the cp specification option that was added
 	 */
 	@Override
-	public CPSpecificationOption addCPSpecificationOption(
-		CPSpecificationOption cpSpecificationOption) {
+	public com.liferay.commerce.product.model.CPSpecificationOption
+		addCPSpecificationOption(
+			com.liferay.commerce.product.model.CPSpecificationOption
+				cpSpecificationOption) {
 
 		return _cpSpecificationOptionLocalService.addCPSpecificationOption(
 			cpSpecificationOption);
 	}
 
 	@Override
-	public CPSpecificationOption addCPSpecificationOption(
-			long userId, long cpOptionCategoryId,
-			java.util.Map<java.util.Locale, String> titleMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			boolean facetable, String key,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			addCPSpecificationOption(
+				long userId, long cpOptionCategoryId,
+				java.util.Map<java.util.Locale, String> titleMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				boolean facetable, String key,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.addCPSpecificationOption(
@@ -79,8 +75,8 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @return the new cp specification option
 	 */
 	@Override
-	public CPSpecificationOption createCPSpecificationOption(
-		long CPSpecificationOptionId) {
+	public com.liferay.commerce.product.model.CPSpecificationOption
+		createCPSpecificationOption(long CPSpecificationOptionId) {
 
 		return _cpSpecificationOptionLocalService.createCPSpecificationOption(
 			CPSpecificationOptionId);
@@ -110,8 +106,10 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @throws PortalException
 	 */
 	@Override
-	public CPSpecificationOption deleteCPSpecificationOption(
-			CPSpecificationOption cpSpecificationOption)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			deleteCPSpecificationOption(
+				com.liferay.commerce.product.model.CPSpecificationOption
+					cpSpecificationOption)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.deleteCPSpecificationOption(
@@ -130,8 +128,8 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @throws PortalException if a cp specification option with the primary key could not be found
 	 */
 	@Override
-	public CPSpecificationOption deleteCPSpecificationOption(
-			long CPSpecificationOptionId)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			deleteCPSpecificationOption(long CPSpecificationOptionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.deleteCPSpecificationOption(
@@ -263,16 +261,16 @@ public class CPSpecificationOptionLocalServiceWrapper
 	}
 
 	@Override
-	public CPSpecificationOption fetchCPSpecificationOption(
-		long CPSpecificationOptionId) {
+	public com.liferay.commerce.product.model.CPSpecificationOption
+		fetchCPSpecificationOption(long CPSpecificationOptionId) {
 
 		return _cpSpecificationOptionLocalService.fetchCPSpecificationOption(
 			CPSpecificationOptionId);
 	}
 
 	@Override
-	public CPSpecificationOption fetchCPSpecificationOption(
-		long companyId, String key) {
+	public com.liferay.commerce.product.model.CPSpecificationOption
+		fetchCPSpecificationOption(long companyId, String key) {
 
 		return _cpSpecificationOptionLocalService.fetchCPSpecificationOption(
 			companyId, key);
@@ -286,8 +284,9 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @return the matching cp specification option, or <code>null</code> if a matching cp specification option could not be found
 	 */
 	@Override
-	public CPSpecificationOption fetchCPSpecificationOptionByUuidAndCompanyId(
-		String uuid, long companyId) {
+	public com.liferay.commerce.product.model.CPSpecificationOption
+		fetchCPSpecificationOptionByUuidAndCompanyId(
+			String uuid, long companyId) {
 
 		return _cpSpecificationOptionLocalService.
 			fetchCPSpecificationOptionByUuidAndCompanyId(uuid, companyId);
@@ -308,8 +307,8 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @throws PortalException if a cp specification option with the primary key could not be found
 	 */
 	@Override
-	public CPSpecificationOption getCPSpecificationOption(
-			long CPSpecificationOptionId)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			getCPSpecificationOption(long CPSpecificationOptionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.getCPSpecificationOption(
@@ -317,8 +316,8 @@ public class CPSpecificationOptionLocalServiceWrapper
 	}
 
 	@Override
-	public CPSpecificationOption getCPSpecificationOption(
-			long companyId, String key)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			getCPSpecificationOption(long companyId, String key)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.getCPSpecificationOption(
@@ -334,8 +333,9 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @throws PortalException if a matching cp specification option could not be found
 	 */
 	@Override
-	public CPSpecificationOption getCPSpecificationOptionByUuidAndCompanyId(
-			String uuid, long companyId)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			getCPSpecificationOptionByUuidAndCompanyId(
+				String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.
@@ -354,8 +354,9 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @return the range of cp specification options
 	 */
 	@Override
-	public java.util.List<CPSpecificationOption> getCPSpecificationOptions(
-		int start, int end) {
+	public java.util.List
+		<com.liferay.commerce.product.model.CPSpecificationOption>
+			getCPSpecificationOptions(int start, int end) {
 
 		return _cpSpecificationOptionLocalService.getCPSpecificationOptions(
 			start, end);
@@ -414,9 +415,11 @@ public class CPSpecificationOptionLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult
-		<CPSpecificationOption> searchCPSpecificationOptions(
-				long companyId, Boolean facetable, String keywords, int start,
-				int end, com.liferay.portal.kernel.search.Sort sort)
+		<com.liferay.commerce.product.model.CPSpecificationOption>
+				searchCPSpecificationOptions(
+					long companyId, Boolean facetable, String keywords,
+					int start, int end,
+					com.liferay.portal.kernel.search.Sort sort)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.searchCPSpecificationOptions(
@@ -424,8 +427,9 @@ public class CPSpecificationOptionLocalServiceWrapper
 	}
 
 	@Override
-	public CPSpecificationOption updateCPOptionCategoryId(
-			long cpSpecificationOptionId, long cpOptionCategoryId)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			updateCPOptionCategoryId(
+				long cpSpecificationOptionId, long cpOptionCategoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.updateCPOptionCategoryId(
@@ -443,45 +447,28 @@ public class CPSpecificationOptionLocalServiceWrapper
 	 * @return the cp specification option that was updated
 	 */
 	@Override
-	public CPSpecificationOption updateCPSpecificationOption(
-		CPSpecificationOption cpSpecificationOption) {
+	public com.liferay.commerce.product.model.CPSpecificationOption
+		updateCPSpecificationOption(
+			com.liferay.commerce.product.model.CPSpecificationOption
+				cpSpecificationOption) {
 
 		return _cpSpecificationOptionLocalService.updateCPSpecificationOption(
 			cpSpecificationOption);
 	}
 
 	@Override
-	public CPSpecificationOption updateCPSpecificationOption(
-			long cpSpecificationOptionId, long cpOptionCategoryId,
-			java.util.Map<java.util.Locale, String> titleMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			boolean facetable, String key,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.product.model.CPSpecificationOption
+			updateCPSpecificationOption(
+				long cpSpecificationOptionId, long cpOptionCategoryId,
+				java.util.Map<java.util.Locale, String> titleMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				boolean facetable, String key,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpSpecificationOptionLocalService.updateCPSpecificationOption(
 			cpSpecificationOptionId, cpOptionCategoryId, titleMap,
 			descriptionMap, facetable, key, serviceContext);
-	}
-
-	@Override
-	public CTPersistence<CPSpecificationOption> getCTPersistence() {
-		return _cpSpecificationOptionLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<CPSpecificationOption> getModelClass() {
-		return _cpSpecificationOptionLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CPSpecificationOption>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _cpSpecificationOptionLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

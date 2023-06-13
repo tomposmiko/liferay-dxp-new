@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Bryan Engler
  */
-@Component(service = StatsRequestBuilderFactory.class)
+@Component(immediate = true, service = StatsRequestBuilderFactory.class)
 public class StatsRequestBuilderFactoryImpl
 	implements StatsRequestBuilderFactory {
 

@@ -324,14 +324,14 @@ public class SubscriptionSender implements Serializable {
 		setContextAttribute("[$COMPANY_NAME$]", company.getName());
 
 		if (Validator.isNotNull(_entryURL)) {
-			boolean secureConnection = HttpComponentsUtil.isSecure(_entryURL);
+			boolean secureConnection = HttpUtil.isSecure(_entryURL);
 
-			if (_entryURL.startsWith(
-					PortalUtil.getPortalURL(
-						company.getVirtualHostname(),
-						PortalUtil.getPortalServerPort(secureConnection),
-						secureConnection))) {
+			String portalURL = PortalUtil.getPortalURL(
+				company.getVirtualHostname(),
+				PortalUtil.getPortalServerPort(secureConnection),
+				secureConnection);
 
+			if (_entryURL.startsWith(portalURL)) {
 				setContextAttribute(
 					"[$PORTAL_URL$]",
 					company.getPortalURL(
@@ -565,7 +565,7 @@ public class SubscriptionSender implements Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -677,12 +677,33 @@ public class SubscriptionSender implements Serializable {
 		return Boolean.TRUE;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	protected void notifyPersistedSubscriber(Subscription subscription)
+		throws Exception {
+
+		notifyPersistedSubscriber(subscription, true);
+	}
+
 	protected void notifyPersistedSubscriber(
 			Subscription subscription, boolean notifyImmediately)
 		throws Exception {
 
 		notifyPersistedSubscriber(
 			subscription, _className, _classPK, notifyImmediately);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	protected void notifyPersistedSubscriber(
+			Subscription subscription, String className, long classPK)
+		throws Exception {
+
+		notifyPersistedSubscriber(subscription, _className, _classPK, true);
 	}
 
 	protected void notifyPersistedSubscriber(
@@ -762,7 +783,7 @@ public class SubscriptionSender implements Serializable {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return;
 		}
@@ -805,25 +826,17 @@ public class SubscriptionSender implements Serializable {
 				return;
 			}
 
-			sendNotification(user, true);
+			sendNotification(user);
 		}
 	}
 
 	protected void populateNotificationEventJSONObject(
 		JSONObject notificationEventJSONObject) {
 
-		String command = null;
-
-		if (serviceContext != null) {
-			command = serviceContext.getCommand();
-		}
-
 		notificationEventJSONObject.put(
 			"className", _className
 		).put(
 			"classPK", _classPK
-		).put(
-			"command", command
 		).put(
 			"context", _context
 		).put(
@@ -1085,13 +1098,13 @@ public class SubscriptionSender implements Serializable {
 		mailTemplateContextBuilder.put("[$FROM_ADDRESS$]", from.getAddress());
 		mailTemplateContextBuilder.put(
 			"[$FROM_NAME$]",
-			new EscapableObject<>(
+			HtmlUtil.escape(
 				GetterUtil.getString(from.getPersonal(), from.getAddress())));
 		mailTemplateContextBuilder.put(
-			"[$TO_ADDRESS$]", new EscapableObject<>(to.getAddress()));
+			"[$TO_ADDRESS$]", HtmlUtil.escape(to.getAddress()));
 		mailTemplateContextBuilder.put(
 			"[$TO_NAME$]",
-			new EscapableObject<>(
+			HtmlUtil.escape(
 				GetterUtil.getString(to.getPersonal(), to.getAddress())));
 
 		MailTemplateContext mailTemplateContext =

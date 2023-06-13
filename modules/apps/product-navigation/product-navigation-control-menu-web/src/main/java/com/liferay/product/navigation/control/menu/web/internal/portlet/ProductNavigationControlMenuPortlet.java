@@ -16,7 +16,6 @@ package com.liferay.product.navigation.control.menu.web.internal.portlet;
 
 import com.liferay.asset.constants.AssetWebKeys;
 import com.liferay.asset.util.AssetHelper;
-import com.liferay.layout.portlet.category.PortletCategoryManager;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Constants;
@@ -42,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-control-menu",
@@ -52,8 +52,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.display-name=Control Menu",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ProductNavigationControlMenuPortletKeys.PRODUCT_NAVIGATION_CONTROL_MENU,
-		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.version=3.0"
+		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
 )
@@ -65,8 +64,6 @@ public class ProductNavigationControlMenuPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		resourceRequest.setAttribute(AssetWebKeys.ASSET_HELPER, _assetHelper);
-		resourceRequest.setAttribute(
-			PortletCategoryManager.class.getName(), _portletCategoryManager);
 
 		super.serveResource(resourceRequest, resourceResponse);
 	}
@@ -108,8 +105,5 @@ public class ProductNavigationControlMenuPortlet extends MVCPortlet {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortletCategoryManager _portletCategoryManager;
 
 }

@@ -97,7 +97,7 @@ public class GhostscriptImpl implements Ghostscript {
 				_commandPath = getCommandPath();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}

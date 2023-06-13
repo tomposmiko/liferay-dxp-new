@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.shortcut.internal.instance.lifecycle;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderActionKeys;
@@ -40,6 +41,10 @@ import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.resource.bundle.AggregateResourceBundleLoader;
+import com.liferay.portal.kernel.resource.bundle.ClassResourceBundleLoader;
+import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ContactService;
@@ -53,6 +58,7 @@ import com.liferay.portal.kernel.service.UserGroupService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.language.LanguageResources;
@@ -78,6 +84,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shinn Lok
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.jaxrs.name=liferay-json-web-services-analytics",
 		"sap.scope.finder=true", "sap.system.entry=OAUTH2_analytics.read",
@@ -146,7 +153,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 			return oAuth2Applications.get(0);
 		}
 
-		User user = _userLocalService.getGuestUser(company.getCompanyId());
+		User user = _userLocalService.getDefaultUser(company.getCompanyId());
 
 		_addSAPEntries(company.getCompanyId(), user.getUserId());
 
@@ -159,15 +166,14 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 						add(GrantType.REFRESH_TOKEN);
 					}
 				},
-				"client_secret_post", user.getUserId(),
+				user.getUserId(),
 				OAuth2SecureRandomGenerator.generateClientId(),
 				ClientProfile.WEB_APPLICATION.id(),
 				OAuth2SecureRandomGenerator.generateClientSecret(), null, null,
-				"https://analytics.liferay.com", 0, null, _APPLICATION_NAME,
-				null,
+				"https://analytics.liferay.com", 0, _APPLICATION_NAME, null,
 				Collections.singletonList(
 					"https://analytics.liferay.com/oauth/receive"),
-				false, false, this::_buildScopes, new ServiceContext());
+				this::_buildScopes, new ServiceContext());
 
 		Class<?> clazz = getClass();
 
@@ -211,6 +217,14 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 	}
 
 	private void _addSAPEntries(long companyId, long userId) throws Exception {
+		Class<?> clazz = getClass();
+
+		ResourceBundleLoader resourceBundleLoader =
+			new AggregateResourceBundleLoader(
+				new ClassResourceBundleLoader(
+					"content.Language", clazz.getClassLoader()),
+				LanguageResources.PORTAL_RESOURCE_BUNDLE_LOADER);
+
 		for (String[] sapEntryObjectArray : _SAP_ENTRY_OBJECT_ARRAYS) {
 			String sapEntryName = sapEntryObjectArray[0];
 
@@ -223,8 +237,7 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 
 			Map<Locale, String> titleMap =
 				ResourceBundleUtil.getLocalizationMap(
-					LanguageResources.PORTAL_RESOURCE_BUNDLE_LOADER,
-					sapEntryName);
+					resourceBundleLoader, sapEntryName);
 
 			_sapEntryLocalService.addSAPEntry(
 				userId, sapEntryObjectArray[1], false, true, sapEntryName,
@@ -305,8 +318,16 @@ public class AnalyticsCloudPortalInstanceLifecycleListener
 		"DELETE", "GET", "POST"
 	};
 
+	@Reference(
+		target = "(indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry)"
+	)
+	private Indexer<DLFileEntry> _indexer;
+
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;

@@ -216,8 +216,4 @@ public interface PortletPreferenceValueModel
 	@Override
 	public PortletPreferenceValue cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

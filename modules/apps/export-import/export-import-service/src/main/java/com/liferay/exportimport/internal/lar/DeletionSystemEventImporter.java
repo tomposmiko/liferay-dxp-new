@@ -32,6 +32,8 @@ import com.liferay.portal.kernel.xml.ElementProcessor;
 import java.io.StringReader;
 
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -71,7 +73,7 @@ public class DeletionSystemEventImporter {
 
 				@Override
 				public void processElement(Element element) {
-					_importDeletionSystemEvents(portletDataContext, element);
+					doImportDeletionSystemEvents(portletDataContext, element);
 				}
 
 			},
@@ -82,10 +84,7 @@ public class DeletionSystemEventImporter {
 		xmlReader.parse(new InputSource(new StringReader(xml)));
 	}
 
-	private DeletionSystemEventImporter() {
-	}
-
-	private void _importDeletionSystemEvents(
+	protected void doImportDeletionSystemEvents(
 		PortletDataContext portletDataContext, Element element) {
 
 		StagedModelType stagedModelType = new StagedModelType(
@@ -113,6 +112,9 @@ public class DeletionSystemEventImporter {
 		}
 	}
 
+	private DeletionSystemEventImporter() {
+	}
+
 	private boolean _shouldImportDeletionSystemEvent(
 		PortletDataContext portletDataContext,
 		StagedModelType stagedModelType) {
@@ -124,17 +126,27 @@ public class DeletionSystemEventImporter {
 			return true;
 		}
 
-		for (StagedModelType curStagedModelType : stagedModelTypes) {
-			if ((curStagedModelType.getClassNameId() ==
-					stagedModelType.getClassNameId()) &&
-				(StagedModelType.REFERRER_CLASS_NAME_ALL.equals(
-					curStagedModelType.getReferrerClassName()) ||
-				 (Validator.isNotNull(stagedModelType.getReferrerClassName()) &&
-				  StagedModelType.REFERRER_CLASS_NAME_ANY.equals(
-					  curStagedModelType.getReferrerClassName())))) {
+		Stream<StagedModelType> stream = stagedModelTypes.stream();
 
-				return true;
-			}
+		Predicate<StagedModelType> classNameIdPredicate =
+			smt -> smt.getClassNameId() == stagedModelType.getClassNameId();
+
+		Predicate<StagedModelType> allReferrerClassNamePredicate =
+			smt -> StagedModelType.REFERRER_CLASS_NAME_ALL.equals(
+				smt.getReferrerClassName());
+
+		Predicate<StagedModelType> anyReferrerClassNamePredicate = smt ->
+			Validator.isNotNull(stagedModelType.getReferrerClassName()) &&
+			StagedModelType.REFERRER_CLASS_NAME_ANY.equals(
+				smt.getReferrerClassName());
+
+		boolean hasSimilar = stream.anyMatch(
+			classNameIdPredicate.and(
+				allReferrerClassNamePredicate.or(
+					anyReferrerClassNamePredicate)));
+
+		if (hasSimilar) {
+			return true;
 		}
 
 		return false;

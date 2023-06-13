@@ -19,9 +19,11 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.wish.list.model.impl.CommerceWishListItemModelImpl;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +45,14 @@ public class CommerceWishListItemUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		_addColumn(
+			CommerceWishListItemModelImpl.class,
+			CommerceWishListItemModelImpl.TABLE_NAME, "CPInstanceUuid",
+			"VARCHAR(75)");
+		_addColumn(
+			CommerceWishListItemModelImpl.class,
+			CommerceWishListItemModelImpl.TABLE_NAME, "CProductId", "LONG");
+
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"update CommerceWishListItem set CProductId = ?," +
 					"CPInstanceUuid = ? where CPInstanceId = ?");
@@ -68,25 +78,64 @@ public class CommerceWishListItemUpgradeProcess extends UpgradeProcess {
 				preparedStatement.execute();
 			}
 		}
+
+		_dropColumn(CommerceWishListItemModelImpl.TABLE_NAME, "CPDefinitionId");
+		_dropColumn(CommerceWishListItemModelImpl.TABLE_NAME, "CPInstanceId");
 	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns(
-				CommerceWishListItemModelImpl.TABLE_NAME, "CPDefinitionId",
-				"CPInstanceId")
-		};
+	private void _addColumn(
+			Class<?> entityClass, String tableName, String columnName,
+			String columnType)
+		throws Exception {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				String.format(
+					"Adding column %s to table %s", columnName, tableName));
+		}
+
+		if (!hasColumn(tableName, columnName)) {
+			alter(
+				entityClass,
+				new AlterTableAddColumn(
+					columnName + StringPool.SPACE + columnType));
+		}
+		else {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					String.format(
+						"Column %s already exists on table %s", columnName,
+						tableName));
+			}
+		}
 	}
 
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommerceWishListItem", "CPInstanceUuid VARCHAR(75)",
-				"CProductId LONG")
-		};
+	private void _dropColumn(String tableName, String columnName)
+		throws Exception {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				String.format(
+					"Dropping column %s from table %s", columnName, tableName));
+		}
+
+		if (hasColumn(tableName, columnName)) {
+			runSQL(
+				StringBundler.concat(
+					"alter table ", tableName, " drop column ", columnName));
+		}
+		else {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					String.format(
+						"Column %s already does not exist on table %s",
+						columnName, tableName));
+			}
+		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CommerceWishListItemUpgradeProcess.class);
 
 	private final CPDefinitionLocalService _cpDefinitionLocalService;
 	private final CPInstanceLocalService _cpInstanceLocalService;

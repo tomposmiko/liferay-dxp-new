@@ -40,14 +40,9 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Michael C. Han
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class FacebookConnectNavigationPreJSPDynamicInclude
 	extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -108,15 +103,23 @@ public class FacebookConnectNavigationPreJSPDynamicInclude
 		return _log;
 	}
 
+	@Reference(unbind = "-")
+	protected void setFacebookConnect(FacebookConnect facebookConnect) {
+		_facebookConnect = facebookConnect;
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.login.authentication.facebook.connect.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		FacebookConnectNavigationPreJSPDynamicInclude.class);
 
-	@Reference
 	private FacebookConnect _facebookConnect;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.login.authentication.facebook.connect.web)"
-	)
-	private ServletContext _servletContext;
 
 }

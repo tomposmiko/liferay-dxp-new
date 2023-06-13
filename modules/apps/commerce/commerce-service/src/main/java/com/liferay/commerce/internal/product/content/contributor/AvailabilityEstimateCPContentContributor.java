@@ -28,7 +28,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -46,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.product.content.contributor.name=" + CPContentContributorConstants.AVAILABILITY_ESTIMATE_NAME,
 	service = CPContentContributor.class
 )
@@ -76,12 +77,6 @@ public class AvailabilityEstimateCPContentContributor
 			return jsonObject;
 		}
 
-		boolean available = false;
-
-		int stockQuantity = _commerceInventoryEngine.getStockQuantity(
-			cpInstance.getCompanyId(), cpInstance.getGroupId(),
-			commerceChannel.getGroupId(), cpInstance.getSku());
-
 		CPDefinitionInventory cpDefinitionInventory =
 			_cpDefinitionInventoryLocalService.
 				fetchCPDefinitionInventoryByCPDefinitionId(
@@ -91,6 +86,11 @@ public class AvailabilityEstimateCPContentContributor
 			_cpDefinitionInventoryEngineRegistry.getCPDefinitionInventoryEngine(
 				cpDefinitionInventory);
 
+		boolean available = false;
+
+		int stockQuantity = _commerceInventoryEngine.getStockQuantity(
+			cpInstance.getCompanyId(), commerceChannel.getGroupId(),
+			cpInstance.getSku());
 		int minStockQuantity = cpDefinitionInventoryEngine.getMinStockQuantity(
 			cpInstance);
 
@@ -105,7 +105,7 @@ public class AvailabilityEstimateCPContentContributor
 
 			jsonObject.put(
 				CPContentContributorConstants.AVAILABILITY_ESTIMATE_NAME,
-				_getAvailabilityEstimateLabel(
+				getAvailabilityEstimateLabel(
 					themeDisplay.getLocale(),
 					cpDefinitionInventoryEngine.getAvailabilityEstimate(
 						cpInstance, themeDisplay.getLocale())));
@@ -114,14 +114,14 @@ public class AvailabilityEstimateCPContentContributor
 		return jsonObject;
 	}
 
-	private String _getAvailabilityEstimateLabel(
+	protected String getAvailabilityEstimateLabel(
 		Locale locale, String availabilityEstimate) {
 
 		if (Validator.isNull(availabilityEstimate)) {
 			return StringPool.BLANK;
 		}
 
-		return _language.format(
+		return LanguageUtil.format(
 			locale, "product-will-be-available-in-x", availabilityEstimate);
 	}
 
@@ -141,9 +141,6 @@ public class AvailabilityEstimateCPContentContributor
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

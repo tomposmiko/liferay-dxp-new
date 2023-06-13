@@ -15,7 +15,6 @@
 package com.liferay.product.navigation.control.menu.web.internal;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.product.navigation.control.menu.BaseJSPProductNavigationControlMenuEntry;
@@ -33,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
 		"product.navigation.control.menu.entry.order:Integer=200"
@@ -67,9 +67,7 @@ public class AddContentProductNavigationControlMenuEntry
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		Layout layout = themeDisplay.getLayout();
-
-		if (layout.isEmbeddedPersonalApplication()) {
+		if (isEmbeddedPersonalApplicationLayout(themeDisplay.getLayout())) {
 			return false;
 		}
 
@@ -77,13 +75,12 @@ public class AddContentProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
 	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.product.navigation.control.menu.web)"
+		target = "(osgi.web.symbolicname=com.liferay.product.navigation.control.menu.web)",
+		unbind = "-"
 	)
-	private ServletContext _servletContext;
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
 
 }

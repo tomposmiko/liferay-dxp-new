@@ -38,7 +38,7 @@ public class MarketplaceAppManagerSearchUtil {
 
 		List<Object> results = new ArrayList<>();
 
-		String keywordsRegex = _getKeywordsRegex(keywords);
+		String keywordsRegex = getKeywordsRegex(keywords);
 
 		// App display
 
@@ -46,7 +46,7 @@ public class MarketplaceAppManagerSearchUtil {
 			bundles, StringPool.BLANK, BundleStateConstants.ANY, locale);
 
 		for (AppDisplay appDisplay : appDisplays) {
-			if (_hasAppDisplayKeywordsMatch(appDisplay, keywordsRegex)) {
+			if (hasAppDisplayKeywordsMatch(appDisplay, keywordsRegex)) {
 				results.add(appDisplay);
 			}
 		}
@@ -54,7 +54,7 @@ public class MarketplaceAppManagerSearchUtil {
 		// Bundle
 
 		for (Bundle bundle : bundles) {
-			if (_hasBundleKeywordsMatch(bundle, keywordsRegex)) {
+			if (hasBundleKeywordsMatch(bundle, keywordsRegex)) {
 				results.add(bundle);
 			}
 		}
@@ -62,7 +62,7 @@ public class MarketplaceAppManagerSearchUtil {
 		return results;
 	}
 
-	private static boolean _containsMatches(String regex, String string) {
+	protected static boolean containsMatches(String regex, String string) {
 		if (string == null) {
 			return false;
 		}
@@ -78,7 +78,7 @@ public class MarketplaceAppManagerSearchUtil {
 		return false;
 	}
 
-	private static String _getKeywordsRegex(String keywords) {
+	protected static String getKeywordsRegex(String keywords) {
 		keywords = StringUtil.replace(
 			keywords,
 			new String[] {
@@ -90,11 +90,11 @@ public class MarketplaceAppManagerSearchUtil {
 			StringPool.CLOSE_PARENTHESIS;
 	}
 
-	private static boolean _hasAppDisplayKeywordsMatch(
+	protected static boolean hasAppDisplayKeywordsMatch(
 		AppDisplay appDisplay, String keywordsRegex) {
 
-		if (_containsMatches(keywordsRegex, appDisplay.getDisplayTitle()) ||
-			_containsMatches(keywordsRegex, appDisplay.getDescription())) {
+		if (containsMatches(keywordsRegex, appDisplay.getDisplayTitle()) ||
+			containsMatches(keywordsRegex, appDisplay.getDescription())) {
 
 			return true;
 		}
@@ -102,10 +102,10 @@ public class MarketplaceAppManagerSearchUtil {
 		return false;
 	}
 
-	private static boolean _hasBundleKeywordsMatch(
+	protected static boolean hasBundleKeywordsMatch(
 		Bundle bundle, String keywordsRegex) {
 
-		if (_containsMatches(keywordsRegex, bundle.getSymbolicName())) {
+		if (containsMatches(keywordsRegex, bundle.getSymbolicName())) {
 			return true;
 		}
 
@@ -114,13 +114,13 @@ public class MarketplaceAppManagerSearchUtil {
 
 		String bundleDescription = headers.get(Constants.BUNDLE_DESCRIPTION);
 
-		if (_containsMatches(keywordsRegex, bundleDescription)) {
+		if (containsMatches(keywordsRegex, bundleDescription)) {
 			return true;
 		}
 
 		String bundleName = headers.get(Constants.BUNDLE_NAME);
 
-		if (_containsMatches(keywordsRegex, bundleName)) {
+		if (containsMatches(keywordsRegex, bundleName)) {
 			return true;
 		}
 

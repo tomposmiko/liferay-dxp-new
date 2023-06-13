@@ -19,6 +19,9 @@ import com.liferay.commerce.product.model.CPOption;
 import com.liferay.commerce.product.service.CPOptionService;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import javax.portlet.PortletURL;
 
@@ -50,21 +53,30 @@ public class CPOptionItemSelectorViewDisplayContext
 		}
 
 		searchContainer = new SearchContainer<>(
-			liferayPortletRequest, getPortletURL(), null,
-			"no-options-were-found");
+			liferayPortletRequest, getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage("no-options-were-found");
+
+		OrderByComparator<CPOption> orderByComparator =
+			CPItemSelectorViewUtil.getCPOptionOrderByComparator(
+				getOrderByCol(), getOrderByType());
 
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
-			CPItemSelectorViewUtil.getCPOptionOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
+		searchContainer.setRowChecker(getRowChecker());
+
+		Sort sort = CPItemSelectorViewUtil.getCPOptionSort(
+			getOrderByCol(), getOrderByType());
+
+		BaseModelSearchResult<CPOption> cpOptionBaseModelSearchResult =
 			_cpOptionService.searchCPOptions(
 				cpRequestHelper.getCompanyId(), getKeywords(),
-				searchContainer.getStart(), searchContainer.getEnd(),
-				CPItemSelectorViewUtil.getCPOptionSort(
-					getOrderByCol(), getOrderByType())));
-		searchContainer.setRowChecker(getRowChecker());
+				searchContainer.getStart(), searchContainer.getEnd(), sort);
+
+		searchContainer.setTotal(cpOptionBaseModelSearchResult.getLength());
+		searchContainer.setResults(
+			cpOptionBaseModelSearchResult.getBaseModels());
 
 		return searchContainer;
 	}

@@ -12,10 +12,10 @@
  * details.
  */
 
-import {fetch, openConfirmModal} from 'frontend-js-web';
+import {fetch} from 'frontend-js-web';
 
 const HEADERS = {
-	'Accept': 'application/json',
+	Accept: 'application/json',
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 	'Content-Type': 'application/json',
 };
@@ -42,81 +42,66 @@ function fetchItem(url, options) {
 	});
 }
 
-export function getURL(path, params) {
+export const getURL = (path, params) => {
 	params = {
 		['p_auth']: Liferay.authToken,
 		t: Date.now(),
 		...params,
 	};
 
-	let pathContext = themeDisplay.getPathContext();
-
-	if (!pathContext || pathContext === '/') {
-		pathContext = '';
-	}
-
-	const uri = new URL(`${window.location.origin}${pathContext}${path}`);
-
+	const uri = new URL(`${window.location.origin}${path}`);
 	const keys = Object.keys(params);
 
 	keys.forEach((key) => uri.searchParams.set(key, params[key]));
 
 	return uri.toString();
-}
+};
 
-export function addItem(endpoint, item) {
-	return fetchItem(getURL(endpoint), {
+export const addItem = (endpoint, item) =>
+	fetchItem(getURL(endpoint), {
 		body: JSON.stringify(item),
 		headers: HEADERS,
 		method: 'POST',
 	});
-}
 
-export function deleteItem(endpoint) {
+export const deleteItem = (endpoint) => {
 	return fetch(getURL(endpoint), {
 		method: 'DELETE',
 	});
-}
+};
 
-export function confirmDelete(endpoint) {
-	return (item) =>
-		new Promise((resolve, reject) => {
-			openConfirmModal({
-				message: Liferay.Language.get(
-					'are-you-sure-you-want-to-delete-this'
-				),
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						deleteItem(endpoint + item.id)
-							.then(() => resolve(true))
-							.catch((error) => reject(error));
-					}
-					else {
-						resolve(false);
-					}
-				},
-			});
-		});
-}
+export const confirmDelete = (endpoint) => (item) =>
+	new Promise((resolve, reject) => {
+		const confirmed = confirm(
+			Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+		);
 
-export function request(endpoint, method = 'GET') {
-	return fetch(getURL(endpoint), {
+		if (confirmed) {
+			deleteItem(endpoint + item.id)
+				.then(() => resolve(true))
+				.catch((error) => reject(error));
+		}
+		else {
+			resolve(false);
+		}
+	});
+
+export const request = (endpoint, method = 'GET') =>
+	fetch(getURL(endpoint), {
 		headers: HEADERS,
 		method,
 	});
-}
 
-export function getItem(endpoint) {
+export const getItem = (endpoint) => {
 	return fetch(getURL(endpoint), {
 		headers: HEADERS,
 		method: 'GET',
 	}).then((response) => response.json());
-}
+};
 
-export function updateItem(endpoint, item, params) {
-	return fetchItem(getURL(endpoint, params), {
+export const updateItem = (endpoint, item, params) =>
+	fetchItem(getURL(endpoint, params), {
 		body: JSON.stringify(item),
 		headers: HEADERS,
 		method: 'PUT',
 	});
-}

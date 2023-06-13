@@ -85,8 +85,4 @@ public interface CacheDisabledEntryModel extends BaseModel<CacheDisabledEntry> {
 	@Override
 	public CacheDisabledEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

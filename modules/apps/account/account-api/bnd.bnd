@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Account API
 Bundle-SymbolicName: com.liferay.account.api
-Bundle-Version: 15.2.1
+Bundle-Version: 4.0.1
 Export-Package:\
 	com.liferay.account.configuration,\
 	com.liferay.account.constants,\
@@ -11,5 +11,4 @@ Export-Package:\
 	com.liferay.account.role,\
 	com.liferay.account.service,\
 	com.liferay.account.service.persistence,\
-	com.liferay.account.settings,\
-	com.liferay.account.validator
+	com.liferay.account.settings

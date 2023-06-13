@@ -20,10 +20,7 @@ import com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantityTable
 import com.liferay.commerce.inventory.model.impl.CommerceInventoryBookedQuantityImpl;
 import com.liferay.commerce.inventory.model.impl.CommerceInventoryBookedQuantityModelImpl;
 import com.liferay.commerce.inventory.service.persistence.CommerceInventoryBookedQuantityPersistence;
-import com.liferay.commerce.inventory.service.persistence.CommerceInventoryBookedQuantityUtil;
-import com.liferay.commerce.inventory.service.persistence.impl.constants.CommercePersistenceConstants;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -31,7 +28,6 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -44,10 +40,10 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
@@ -59,13 +55,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * The persistence implementation for the commerce inventory booked quantity service.
  *
@@ -76,7 +65,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  * @generated
  */
-@Component(service = CommerceInventoryBookedQuantityPersistence.class)
 public class CommerceInventoryBookedQuantityPersistenceImpl
 	extends BasePersistenceImpl<CommerceInventoryBookedQuantity>
 	implements CommerceInventoryBookedQuantityPersistence {
@@ -195,7 +183,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryBookedQuantity>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceInventoryBookedQuantity
@@ -596,7 +584,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 
 		Object[] finderArgs = new Object[] {sku};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -740,7 +728,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryBookedQuantity>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceInventoryBookedQuantity
@@ -1143,7 +1131,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 
 		Object[] finderArgs = new Object[] {_getTime(expirationDate)};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1305,7 +1293,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryBookedQuantity>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceInventoryBookedQuantity
@@ -1732,7 +1720,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, sku};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2259,7 +2247,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryBookedQuantity>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2332,7 +2320,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2387,8 +2375,7 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 	/**
 	 * Initializes the commerce inventory booked quantity persistence.
 	 */
-	@Activate
-	public void activate() {
+	public void afterPropertiesSet() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
@@ -2451,66 +2438,17 @@ public class CommerceInventoryBookedQuantityPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "sku"}, false);
-
-		_setCommerceInventoryBookedQuantityUtilPersistence(this);
 	}
 
-	@Deactivate
-	public void deactivate() {
-		_setCommerceInventoryBookedQuantityUtilPersistence(null);
-
+	public void destroy() {
 		entityCache.removeCache(
 			CommerceInventoryBookedQuantityImpl.class.getName());
 	}
 
-	private void _setCommerceInventoryBookedQuantityUtilPersistence(
-		CommerceInventoryBookedQuantityPersistence
-			commerceInventoryBookedQuantityPersistence) {
-
-		try {
-			Field field =
-				CommerceInventoryBookedQuantityUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceInventoryBookedQuantityPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
 
-	@Reference
+	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
 
 	private static Long _getTime(Date date) {

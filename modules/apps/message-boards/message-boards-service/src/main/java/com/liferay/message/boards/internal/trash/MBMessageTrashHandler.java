@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.trash.BaseTrashHandler;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -80,6 +80,11 @@ public class MBMessageTrashHandler extends BaseTrashHandler {
 	}
 
 	@Override
+	public boolean isDeletable() {
+		return false;
+	}
+
+	@Override
 	public boolean isDeletable(long classPK) throws PortalException {
 		return false;
 	}
@@ -114,13 +119,27 @@ public class MBMessageTrashHandler extends BaseTrashHandler {
 			permissionChecker, classPK, actionId);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setMBMessageLocalService(
+		MBMessageLocalService mbMessageLocalService) {
+
+		_mbMessageLocalService = mbMessageLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMBMessageService(MBMessageService mbMessageService) {
+		_mbMessageService = mbMessageService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMBThreadLocalService(
+		MBThreadLocalService mbThreadLocalService) {
+
+		_mbThreadLocalService = mbThreadLocalService;
+	}
+
 	private MBMessageLocalService _mbMessageLocalService;
-
-	@Reference
 	private MBMessageService _mbMessageService;
-
-	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
 
 	@Reference(

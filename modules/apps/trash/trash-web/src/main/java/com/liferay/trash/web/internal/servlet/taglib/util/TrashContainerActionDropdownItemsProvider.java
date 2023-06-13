@@ -16,21 +16,19 @@ package com.liferay.trash.web.internal.servlet.taglib.util;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.model.TrashEntry;
-import com.liferay.trash.web.internal.constants.TrashWebKeys;
 import com.liferay.trash.web.internal.display.context.TrashDisplayContext;
 
 import java.util.List;
@@ -53,59 +51,45 @@ public class TrashContainerActionDropdownItemsProvider {
 			WebKeys.THEME_DISPLAY);
 		_trashEntry = trashDisplayContext.getTrashEntry();
 		_trashHandler = trashDisplayContext.getTrashHandler();
-		_trashHelper = (TrashHelper)liferayPortletRequest.getAttribute(
-			TrashWebKeys.TRASH_HELPER);
 		_trashRenderer = trashDisplayContext.getTrashRenderer();
 	}
 
-	public List<DropdownItem> getActionDropdownItems() {
-		return DropdownItemListBuilder.addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() ->
-							(_trashEntry != null) &&
-							_trashHandler.isRestorable(
+	public List<DropdownItem> getActionDropdownItems() throws Exception {
+		return new DropdownItemList() {
+			{
+				if (_trashEntry != null) {
+					if (_trashHandler.isRestorable(_trashEntry.getClassPK()) &&
+						!_trashHandler.isInTrashContainer(
+							_trashEntry.getClassPK())) {
+
+						add(_getRestoreActionDropdownItem());
+					}
+					else if (!_trashHandler.isRestorable(
 								_trashEntry.getClassPK()) &&
-							!_trashHelper.isInTrashContainer(
-								_trashHandler.getTrashedModel(
-									_trashEntry.getClassPK())),
-						_getRestoreActionDropdownItem()
-					).add(
-						() ->
-							(_trashEntry != null) &&
-							!_trashHandler.isRestorable(
-								_trashEntry.getClassPK()) &&
-							_trashHandler.isMovable(_trashEntry.getClassPK()),
-						_getMoveTrashEntryActionDropdownItem()
-					).add(
-						() ->
-							(_trashEntry == null) &&
-							_trashHandler.isMovable(
-								_trashRenderer.getClassPK()),
-						_getMoveActionDropdownItem()
-					).build());
-				dropdownGroupItem.setSeparator(true);
+							 _trashHandler.isMovable(
+								 _trashEntry.getClassPK())) {
+
+						add(_getMoveTrashEntryActionDropdownItem());
+					}
+
+					if (_trashHandler.isDeletable(
+							_trashRenderer.getClassPK())) {
+
+						add(_getDeleteTrashEntryActionDropdownItem());
+					}
+				}
+				else {
+					if (_trashHandler.isMovable(_trashRenderer.getClassPK())) {
+						add(_getMoveActionDropdownItem());
+					}
+					else if (_trashHandler.isDeletable(
+								_trashRenderer.getClassPK())) {
+
+						add(_getDeleteActionDropdownItem());
+					}
+				}
 			}
-		).addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() ->
-							(_trashEntry != null) &&
-							_trashHandler.isDeletable(
-								_trashRenderer.getClassPK()),
-						_getDeleteTrashEntryActionDropdownItem()
-					).add(
-						() ->
-							(_trashEntry == null) &&
-							_trashHandler.isDeletable(
-								_trashRenderer.getClassPK()),
-						_getDeleteActionDropdownItem()
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
-		).build();
+		};
 	}
 
 	private DropdownItem _getDeleteActionDropdownItem() throws Exception {
@@ -124,8 +108,6 @@ public class TrashContainerActionDropdownItemsProvider {
 			).setParameter(
 				"classPK", _trashRenderer.getClassPK()
 			).buildString()
-		).setIcon(
-			"trash"
 		).setLabel(
 			LanguageUtil.get(_themeDisplay.getLocale(), "delete")
 		).build();
@@ -147,8 +129,6 @@ public class TrashContainerActionDropdownItemsProvider {
 			).setParameter(
 				"trashEntryId", _trashEntry.getEntryId()
 			).buildString()
-		).setIcon(
-			"trash"
 		).setLabel(
 			LanguageUtil.get(_themeDisplay.getLocale(), "delete")
 		).build();
@@ -170,14 +150,16 @@ public class TrashContainerActionDropdownItemsProvider {
 				"classPK", _trashRenderer.getClassPK()
 			).setParameter(
 				"containerModelClassNameId",
-				() -> PortalUtil.getClassNameId(
-					_trashHandler.getContainerModelClassName(
-						_trashDisplayContext.getClassPK()))
+				() -> {
+					String containerModelClassName =
+						_trashHandler.getContainerModelClassName(
+							_trashDisplayContext.getClassPK());
+
+					return PortalUtil.getClassNameId(containerModelClassName);
+				}
 			).setWindowState(
 				LiferayWindowState.POP_UP
 			).buildString()
-		).setIcon(
-			"restore"
 		).setLabel(
 			LanguageUtil.get(_themeDisplay.getLocale(), "restore")
 		).build();
@@ -211,8 +193,6 @@ public class TrashContainerActionDropdownItemsProvider {
 			).setWindowState(
 				LiferayWindowState.POP_UP
 			).buildString()
-		).setIcon(
-			"restore"
 		).setLabel(
 			LanguageUtil.get(_themeDisplay.getLocale(), "restore")
 		).build();
@@ -232,8 +212,6 @@ public class TrashContainerActionDropdownItemsProvider {
 			).setParameter(
 				"trashEntryId", _trashEntry.getEntryId()
 			).buildString()
-		).setIcon(
-			"restore"
 		).setLabel(
 			LanguageUtil.get(_themeDisplay.getLocale(), "restore")
 		).build();
@@ -244,7 +222,6 @@ public class TrashContainerActionDropdownItemsProvider {
 	private final TrashDisplayContext _trashDisplayContext;
 	private final TrashEntry _trashEntry;
 	private final TrashHandler _trashHandler;
-	private final TrashHelper _trashHelper;
 	private final TrashRenderer _trashRenderer;
 
 }

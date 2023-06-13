@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
@@ -52,6 +53,21 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class MovePageMVCActionCommand extends BaseMVCActionCommand {
 
+	protected void changeParentPage(ActionRequest actionRequest)
+		throws Exception {
+
+		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
+		String title = ParamUtil.getString(actionRequest, "title");
+		String newParentTitle = ParamUtil.getString(
+			actionRequest, "newParentTitle");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			WikiPage.class.getName(), actionRequest);
+
+		_wikiPageService.changeParent(
+			nodeId, title, newParentTitle, serviceContext);
+	}
+
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -61,10 +77,10 @@ public class MovePageMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (cmd.equals(Constants.CHANGE_PARENT)) {
-				_changeParentPage(actionRequest);
+				changeParentPage(actionRequest);
 			}
 			else if (cmd.equals(Constants.RENAME)) {
-				_renamePage(actionRequest);
+				renamePage(actionRequest);
 			}
 
 			if (Validator.isNotNull(cmd)) {
@@ -90,22 +106,7 @@ public class MovePageMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _changeParentPage(ActionRequest actionRequest)
-		throws Exception {
-
-		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
-		String title = ParamUtil.getString(actionRequest, "title");
-		String newParentTitle = ParamUtil.getString(
-			actionRequest, "newParentTitle");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			WikiPage.class.getName(), actionRequest);
-
-		_wikiPageService.changeParent(
-			nodeId, title, newParentTitle, serviceContext);
-	}
-
-	private void _renamePage(ActionRequest actionRequest) throws Exception {
+	protected void renamePage(ActionRequest actionRequest) throws Exception {
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
 		String title = ParamUtil.getString(actionRequest, "title");
 		String newTitle = ParamUtil.getString(actionRequest, "newTitle");

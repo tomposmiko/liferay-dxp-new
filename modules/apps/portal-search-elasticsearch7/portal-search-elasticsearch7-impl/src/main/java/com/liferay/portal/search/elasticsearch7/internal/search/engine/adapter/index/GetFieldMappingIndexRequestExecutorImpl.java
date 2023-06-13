@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.index;
 
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.index.GetFieldMappingIndexRequest;
@@ -37,7 +37,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = GetFieldMappingIndexRequestExecutor.class)
+@Component(
+	immediate = true, service = GetFieldMappingIndexRequestExecutor.class
+)
 public class GetFieldMappingIndexRequestExecutorImpl
 	implements GetFieldMappingIndexRequestExecutor {
 
@@ -49,7 +51,7 @@ public class GetFieldMappingIndexRequestExecutorImpl
 			createGetFieldMappingsRequest(getFieldMappingIndexRequest);
 
 		GetFieldMappingsResponse getFieldMappingsResponse =
-			_getGetFieldMappingsResponse(
+			getGetFieldMappingsResponse(
 				getFieldMappingsRequest, getFieldMappingIndexRequest);
 
 		Map
@@ -70,7 +72,7 @@ public class GetFieldMappingIndexRequestExecutorImpl
 			Map<String, GetFieldMappingsResponse.FieldMappingMetadata> map2 =
 				map1.get(getFieldMappingIndexRequest.getMappingName());
 
-			JSONObject jsonObject = _jsonFactory.createJSONObject();
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 			for (String fieldName : getFieldMappingIndexRequest.getFields()) {
 				GetFieldMappingsResponse.FieldMappingMetadata
@@ -102,7 +104,7 @@ public class GetFieldMappingIndexRequestExecutorImpl
 		return getFieldMappingsRequest;
 	}
 
-	private GetFieldMappingsResponse _getGetFieldMappingsResponse(
+	protected GetFieldMappingsResponse getGetFieldMappingsResponse(
 		GetFieldMappingsRequest getFieldMappingsRequest,
 		GetFieldMappingIndexRequest getFieldMappingIndexRequest) {
 
@@ -122,10 +124,13 @@ public class GetFieldMappingIndexRequestExecutorImpl
 		}
 	}
 
-	@Reference
-	private ElasticsearchClientResolver _elasticsearchClientResolver;
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-	@Reference
-	private JSONFactory _jsonFactory;
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

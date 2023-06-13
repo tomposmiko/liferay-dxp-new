@@ -27,7 +27,6 @@ import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
 import com.liferay.headless.commerce.admin.pricing.client.resource.v2_0.OrderTypeResource;
 import com.liferay.headless.commerce.admin.pricing.client.serdes.v2_0.OrderTypeSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -42,31 +41,30 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -191,18 +189,10 @@ public abstract class BaseOrderTypeResourceTestCase {
 			testGetDiscountOrderTypeOrderType_addOrderType();
 
 		OrderType getOrderType =
-			orderTypeResource.getDiscountOrderTypeOrderType(
-				testGetDiscountOrderTypeOrderType_getDiscountOrderTypeId());
+			orderTypeResource.getDiscountOrderTypeOrderType(null);
 
 		assertEquals(postOrderType, getOrderType);
 		assertValid(getOrderType);
-	}
-
-	protected Long testGetDiscountOrderTypeOrderType_getDiscountOrderTypeId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected OrderType testGetDiscountOrderTypeOrderType_addOrderType()
@@ -214,8 +204,7 @@ public abstract class BaseOrderTypeResourceTestCase {
 
 	@Test
 	public void testGraphQLGetDiscountOrderTypeOrderType() throws Exception {
-		OrderType orderType =
-			testGraphQLGetDiscountOrderTypeOrderType_addOrderType();
+		OrderType orderType = testGraphQLOrderType_addOrderType();
 
 		Assert.assertTrue(
 			equals(
@@ -227,22 +216,12 @@ public abstract class BaseOrderTypeResourceTestCase {
 								"discountOrderTypeOrderType",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"discountOrderTypeId",
-											testGraphQLGetDiscountOrderTypeOrderType_getDiscountOrderTypeId());
+										put("discountOrderTypeId", null);
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/discountOrderTypeOrderType"))));
-	}
-
-	protected Long
-			testGraphQLGetDiscountOrderTypeOrderType_getDiscountOrderTypeId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -269,30 +248,16 @@ public abstract class BaseOrderTypeResourceTestCase {
 				"Object/code"));
 	}
 
-	protected OrderType testGraphQLGetDiscountOrderTypeOrderType_addOrderType()
-		throws Exception {
-
-		return testGraphQLOrderType_addOrderType();
-	}
-
 	@Test
 	public void testGetPriceListOrderTypeOrderType() throws Exception {
 		OrderType postOrderType =
 			testGetPriceListOrderTypeOrderType_addOrderType();
 
 		OrderType getOrderType =
-			orderTypeResource.getPriceListOrderTypeOrderType(
-				testGetPriceListOrderTypeOrderType_getPriceListOrderTypeId());
+			orderTypeResource.getPriceListOrderTypeOrderType(null);
 
 		assertEquals(postOrderType, getOrderType);
 		assertValid(getOrderType);
-	}
-
-	protected Long testGetPriceListOrderTypeOrderType_getPriceListOrderTypeId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected OrderType testGetPriceListOrderTypeOrderType_addOrderType()
@@ -304,8 +269,7 @@ public abstract class BaseOrderTypeResourceTestCase {
 
 	@Test
 	public void testGraphQLGetPriceListOrderTypeOrderType() throws Exception {
-		OrderType orderType =
-			testGraphQLGetPriceListOrderTypeOrderType_addOrderType();
+		OrderType orderType = testGraphQLOrderType_addOrderType();
 
 		Assert.assertTrue(
 			equals(
@@ -317,22 +281,12 @@ public abstract class BaseOrderTypeResourceTestCase {
 								"priceListOrderTypeOrderType",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"priceListOrderTypeId",
-											testGraphQLGetPriceListOrderTypeOrderType_getPriceListOrderTypeId());
+										put("priceListOrderTypeId", null);
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/priceListOrderTypeOrderType"))));
-	}
-
-	protected Long
-			testGraphQLGetPriceListOrderTypeOrderType_getPriceListOrderTypeId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -357,12 +311,6 @@ public abstract class BaseOrderTypeResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected OrderType testGraphQLGetPriceListOrderTypeOrderType_addOrderType()
-		throws Exception {
-
-		return testGraphQLOrderType_addOrderType();
 	}
 
 	protected OrderType testGraphQLOrderType_addOrderType() throws Exception {
@@ -462,13 +410,6 @@ public abstract class BaseOrderTypeResourceTestCase {
 	}
 
 	protected void assertValid(Page<OrderType> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<OrderType> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<OrderType> orderTypes = page.getItems();
@@ -483,20 +424,6 @@ public abstract class BaseOrderTypeResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -622,16 +549,14 @@ public abstract class BaseOrderTypeResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -648,10 +573,6 @@ public abstract class BaseOrderTypeResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -661,18 +582,18 @@ public abstract class BaseOrderTypeResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -762,115 +683,6 @@ public abstract class BaseOrderTypeResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -945,6 +757,18 @@ public abstract class BaseOrderTypeResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseOrderTypeResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

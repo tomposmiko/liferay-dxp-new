@@ -104,10 +104,10 @@ public class PortletLayoutFinderTest {
 
 		Assert.assertEquals(_blogLayout.getPlid(), result.getPlid());
 
-		Assert.assertEquals(
-			PortletProviderUtil.getPortletId(
-				BlogsEntry.class.getName(), PortletProvider.Action.VIEW),
-			result.getPortletId());
+		String portletId = PortletProviderUtil.getPortletId(
+			BlogsEntry.class.getName(), PortletProvider.Action.VIEW);
+
+		Assert.assertEquals(portletId, result.getPortletId());
 	}
 
 	@Test(expected = NoSuchLayoutException.class)
@@ -158,14 +158,14 @@ public class PortletLayoutFinderTest {
 
 		_group = GroupTestUtil.addGroup();
 
-		_blogLayout = LayoutTestUtil.addTypePortletLayout(_group);
-		_assetLayout = LayoutTestUtil.addTypePortletLayout(_group);
+		_blogLayout = LayoutTestUtil.addLayout(_group);
+		_assetLayout = LayoutTestUtil.addLayout(_group);
 
 		if (portletExists) {
-			LayoutTestUtil.addPortletToLayout(
-				_blogLayout,
-				PortletProviderUtil.getPortletId(
-					BlogsEntry.class.getName(), PortletProvider.Action.VIEW));
+			String portletId = PortletProviderUtil.getPortletId(
+				BlogsEntry.class.getName(), PortletProvider.Action.VIEW);
+
+			LayoutTestUtil.addPortletToLayout(_blogLayout, portletId);
 		}
 
 		Group group = _group;
@@ -189,10 +189,12 @@ public class PortletLayoutFinderTest {
 	protected ThemeDisplay getThemeDisplay() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
+		themeDisplay.setScopeGroupId(_group.getGroupId());
+
 		themeDisplay.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
+
 		themeDisplay.setPlid(_assetLayout.getPlid());
-		themeDisplay.setScopeGroupId(_group.getGroupId());
 
 		return themeDisplay;
 	}

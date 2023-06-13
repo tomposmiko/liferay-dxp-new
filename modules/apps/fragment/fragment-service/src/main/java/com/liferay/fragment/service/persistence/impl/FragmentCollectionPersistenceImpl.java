@@ -20,7 +20,6 @@ import com.liferay.fragment.model.FragmentCollectionTable;
 import com.liferay.fragment.model.impl.FragmentCollectionImpl;
 import com.liferay.fragment.model.impl.FragmentCollectionModelImpl;
 import com.liferay.fragment.service.persistence.FragmentCollectionPersistence;
-import com.liferay.fragment.service.persistence.FragmentCollectionUtil;
 import com.liferay.fragment.service.persistence.impl.constants.FragmentPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -49,11 +49,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -85,7 +84,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = FragmentCollectionPersistence.class)
+@Component(
+	service = {FragmentCollectionPersistence.class, BasePersistence.class}
+)
 public class FragmentCollectionPersistenceImpl
 	extends BasePersistenceImpl<FragmentCollection>
 	implements FragmentCollectionPersistence {
@@ -207,7 +208,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentCollection fragmentCollection : list) {
@@ -604,7 +605,7 @@ public class FragmentCollectionPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -740,7 +741,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof FragmentCollection) {
@@ -860,7 +861,7 @@ public class FragmentCollectionPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1032,7 +1033,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentCollection fragmentCollection : list) {
@@ -1458,7 +1459,7 @@ public class FragmentCollectionPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1622,7 +1623,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentCollection fragmentCollection : list) {
@@ -2021,7 +2022,7 @@ public class FragmentCollectionPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentCollectionModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of fragment collections
 	 * @param end the upper bound of the range of fragment collections (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2067,7 +2068,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentCollection>)finderCache.getResult(
-				_finderPathWithPaginationFindByGroupId, finderArgs, this);
+				_finderPathWithPaginationFindByGroupId, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentCollection fragmentCollection : list) {
@@ -2177,7 +2178,7 @@ public class FragmentCollectionPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2243,7 +2244,7 @@ public class FragmentCollectionPersistenceImpl
 			finderArgs = new Object[] {StringUtil.merge(groupIds)};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByGroupId, finderArgs, this);
+				_finderPathWithPaginationCountByGroupId, finderArgs);
 		}
 
 		if (count == null) {
@@ -2382,8 +2383,7 @@ public class FragmentCollectionPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_FCK, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_FCK, finderArgs);
 		}
 
 		if (result instanceof FragmentCollection) {
@@ -2507,7 +2507,7 @@ public class FragmentCollectionPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionKey};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2668,7 +2668,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentCollection fragmentCollection : list) {
@@ -3124,7 +3124,7 @@ public class FragmentCollectionPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentCollectionModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param name the name
 	 * @param start the lower bound of the range of fragment collections
 	 * @param end the upper bound of the range of fragment collections (not inclusive)
@@ -3174,7 +3174,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentCollection>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_LikeN, finderArgs, this);
+				_finderPathWithPaginationFindByG_LikeN, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentCollection fragmentCollection : list) {
@@ -3311,7 +3311,7 @@ public class FragmentCollectionPersistenceImpl
 
 			finderArgs = new Object[] {groupId, name};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3395,7 +3395,7 @@ public class FragmentCollectionPersistenceImpl
 			finderArgs = new Object[] {StringUtil.merge(groupIds), name};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_LikeN, finderArgs, this);
+				_finderPathWithPaginationCountByG_LikeN, finderArgs);
 		}
 
 		if (count == null) {
@@ -3633,7 +3633,7 @@ public class FragmentCollectionPersistenceImpl
 		fragmentCollection.setNew(true);
 		fragmentCollection.setPrimaryKey(fragmentCollectionId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		fragmentCollection.setUuid(uuid);
 
@@ -3760,7 +3760,7 @@ public class FragmentCollectionPersistenceImpl
 			(FragmentCollectionModelImpl)fragmentCollection;
 
 		if (Validator.isNull(fragmentCollection.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			fragmentCollection.setUuid(uuid);
 		}
@@ -3888,9 +3888,7 @@ public class FragmentCollectionPersistenceImpl
 	 */
 	@Override
 	public FragmentCollection fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				FragmentCollection.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(FragmentCollection.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4112,7 +4110,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4188,7 +4186,7 @@ public class FragmentCollectionPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -4422,31 +4420,11 @@ public class FragmentCollectionPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LikeN",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "name"}, false);
-
-		_setFragmentCollectionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setFragmentCollectionUtilPersistence(null);
-
 		entityCache.removeCache(FragmentCollectionImpl.class.getName());
-	}
-
-	private void _setFragmentCollectionUtilPersistence(
-		FragmentCollectionPersistence fragmentCollectionPersistence) {
-
-		try {
-			Field field = FragmentCollectionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, fragmentCollectionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -4516,6 +4494,7 @@ public class FragmentCollectionPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private FragmentCollectionModelArgumentsResolver
+		_fragmentCollectionModelArgumentsResolver;
 
 }

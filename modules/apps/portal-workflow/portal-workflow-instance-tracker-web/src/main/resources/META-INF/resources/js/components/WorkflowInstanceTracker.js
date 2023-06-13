@@ -27,19 +27,15 @@ import {
 	nodeTypes,
 } from '../util/util';
 import CurrentNodes from './CurrentNodes';
-import ErrorFeedback from './ErrorFeedback';
 
 const eventObserver = new EventObserver();
 
 export default function WorkflowInstanceTracker({workflowInstanceId}) {
 	const [currentNodes, setCurrentNodes] = useState([]);
-	const [definitionElements, setDefinitionElements] = useState({});
-	const [filteredCurrentNodes, setFilteredCurrentNodes] = useState([]);
 	const [nodes, setNodes] = useState([]);
 	const [transitions, setTransitions] = useState([]);
 	const [visitedNodes, setVisitedNodes] = useState([]);
-
-	const languageId = themeDisplay.getLanguageId().replaceAll('_', '-');
+	const [definitionElements, setDefinitionElements] = useState({});
 
 	useEffect(() => {
 		fetch(
@@ -53,9 +49,6 @@ export default function WorkflowInstanceTracker({workflowInstanceId}) {
 				fetch(
 					`/o/headless-admin-workflow/v1.0/workflow-definitions/by-name/${data.workflowDefinitionName}`,
 					{
-						headers: {
-							'Accept-Language': languageId,
-						},
 						method: 'GET',
 						params: {
 							version: data.workflowDefinitionVersion,
@@ -63,12 +56,12 @@ export default function WorkflowInstanceTracker({workflowInstanceId}) {
 					}
 				)
 					.then((response) => response.json())
-					.then((data) => {
+					.then((data) =>
 						setDefinitionElements({
 							nodes: data.nodes,
 							transitions: data.transitions,
-						});
-					});
+						})
+					);
 			});
 
 		fetch(
@@ -98,12 +91,8 @@ export default function WorkflowInstanceTracker({workflowInstanceId}) {
 					return {
 						data: {
 							current: isCurrent(currentNodes, node),
-							done: isVisited(
-								visitedNodes,
-								transitionElements,
-								node
-							),
-							initial: node.type === 'INITIAL_STATE',
+							done: isVisited(visitedNodes, node),
+							initial: node.type == 'INITIAL_STATE',
 							label: node.label,
 							notifyVisibilityChange: (visible) => () => {
 								eventObserver.notify(node.name, () => visible);
@@ -138,18 +127,6 @@ export default function WorkflowInstanceTracker({workflowInstanceId}) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [definitionElements, visitedNodes]);
 
-	useEffect(() => {
-		const filteredCurrentNodes = [];
-
-		nodes.map((node) => {
-			if (node.data.current) {
-				filteredCurrentNodes.push(node.id);
-			}
-		});
-
-		setFilteredCurrentNodes(filteredCurrentNodes);
-	}, [nodes]);
-
 	const elements = nodes.concat(transitions);
 
 	const layoutedElements = getLayoutedElements(elements);
@@ -157,10 +134,6 @@ export default function WorkflowInstanceTracker({workflowInstanceId}) {
 	const onLoad = (reactFlowInstance) => {
 		reactFlowInstance.fitView();
 	};
-
-	if (!layoutedElements.length) {
-		return <ErrorFeedback />;
-	}
 
 	return (
 		<div className="workflow-instance-tracker">
@@ -176,7 +149,7 @@ export default function WorkflowInstanceTracker({workflowInstanceId}) {
 
 					<Controls showInteractive={false} />
 
-					<CurrentNodes nodesNames={filteredCurrentNodes} />
+					<CurrentNodes nodesNames={currentNodes} />
 				</ReactFlowProvider>
 			)}
 		</div>

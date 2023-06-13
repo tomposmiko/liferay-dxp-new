@@ -57,14 +57,18 @@ public class PortalCacheWrapper<K extends Serializable, V>
 		return portalCache;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
-	public boolean isMVCC() {
-		return portalCache.isMVCC();
+	public boolean isBlocking() {
+		return portalCache.isBlocking();
 	}
 
 	@Override
-	public boolean isSharded() {
-		return portalCache.isSharded();
+	public boolean isMVCC() {
+		return portalCache.isMVCC();
 	}
 
 	@Override

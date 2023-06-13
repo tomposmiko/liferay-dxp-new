@@ -17,7 +17,7 @@ package com.liferay.portal.search.web.internal.search.results.portlet;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.search.web.internal.portlet.preferences.BasePortletPreferences;
+import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
 import com.liferay.portal.util.PropsUtil;
 
 import java.util.Optional;
@@ -28,31 +28,41 @@ import javax.portlet.PortletPreferences;
  * @author Lino Alves
  */
 public class SearchResultsPortletPreferencesImpl
-	extends BasePortletPreferences implements SearchResultsPortletPreferences {
+	implements SearchResultsPortletPreferences {
 
 	public SearchResultsPortletPreferencesImpl(
 		Optional<PortletPreferences> portletPreferencesOptional) {
 
-		super(portletPreferencesOptional.orElse(null));
+		_portletPreferencesHelper = new PortletPreferencesHelper(
+			portletPreferencesOptional);
 	}
 
 	@Override
-	public String getFederatedSearchKey() {
-		return getString(
-			SearchResultsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY,
-			StringPool.BLANK);
+	public Optional<String> getFederatedSearchKeyOptional() {
+		return _portletPreferencesHelper.getString(
+			SearchResultsPortletPreferences.
+				PREFERENCE_KEY_FEDERATED_SEARCH_KEY);
 	}
 
 	@Override
-	public String getFieldsToDisplay() {
-		return getString(
-			SearchResultsPortletPreferences.PREFERENCE_KEY_FIELDS_TO_DISPLAY,
-			StringPool.BLANK);
+	public String getFederatedSearchKeyString() {
+		return getFederatedSearchKeyOptional().orElse(StringPool.BLANK);
+	}
+
+	@Override
+	public Optional<String> getFieldsToDisplayOptional() {
+		return _portletPreferencesHelper.getString(
+			SearchResultsPortletPreferences.PREFERENCE_KEY_FIELDS_TO_DISPLAY);
+	}
+
+	@Override
+	public String getFieldsToDisplayString() {
+		return getFieldsToDisplayOptional().orElse(StringPool.BLANK);
 	}
 
 	@Override
 	public int getPaginationDelta() {
-		return getInteger(
+		return _portletPreferencesHelper.getInteger(
 			SearchResultsPortletPreferences.PREFERENCE_KEY_PAGINATION_DELTA,
 			GetterUtil.getInteger(
 				PropsUtil.get(PropsKeys.SEARCH_CONTAINER_PAGE_DEFAULT_DELTA),
@@ -61,7 +71,7 @@ public class SearchResultsPortletPreferencesImpl
 
 	@Override
 	public String getPaginationDeltaParameterName() {
-		return getString(
+		return _portletPreferencesHelper.getString(
 			SearchResultsPortletPreferences.
 				PREFERENCE_KEY_PAGINATION_DELTA_PARAMETER_NAME,
 			"delta");
@@ -69,7 +79,7 @@ public class SearchResultsPortletPreferencesImpl
 
 	@Override
 	public String getPaginationStartParameterName() {
-		return getString(
+		return _portletPreferencesHelper.getString(
 			SearchResultsPortletPreferences.
 				PREFERENCE_KEY_PAGINATION_START_PARAMETER_NAME,
 			"start");
@@ -77,7 +87,7 @@ public class SearchResultsPortletPreferencesImpl
 
 	@Override
 	public boolean isDisplayInDocumentForm() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			SearchResultsPortletPreferences.
 				PREFERENCE_KEY_DISPLAY_IN_DOCUMENT_FORM,
 			false);
@@ -85,16 +95,18 @@ public class SearchResultsPortletPreferencesImpl
 
 	@Override
 	public boolean isHighlightEnabled() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			SearchResultsPortletPreferences.PREFERENCE_KEY_HIGHLIGHT_ENABLED,
 			true);
 	}
 
 	@Override
 	public boolean isViewInContext() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			SearchResultsPortletPreferences.PREFERENCE_KEY_VIEW_IN_CONTEXT,
 			true);
 	}
+
+	private final PortletPreferencesHelper _portletPreferencesHelper;
 
 }

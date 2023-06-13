@@ -17,8 +17,6 @@ package com.liferay.portal.deploy.auto;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployer;
 import com.liferay.portal.kernel.deploy.auto.BaseAutoDeployListener;
-import com.liferay.portal.kernel.model.Plugin;
-import com.liferay.portal.tools.deploy.BaseAutoDeployer;
 
 import java.io.File;
 
@@ -30,7 +28,7 @@ public class HookAutoDeployListener extends BaseAutoDeployListener {
 
 	@Override
 	protected AutoDeployer buildAutoDeployer() {
-		return new BaseAutoDeployer(Plugin.TYPE_HOOK);
+		return new ThreadSafeAutoDeployer(new HookAutoDeployer());
 	}
 
 	@Override

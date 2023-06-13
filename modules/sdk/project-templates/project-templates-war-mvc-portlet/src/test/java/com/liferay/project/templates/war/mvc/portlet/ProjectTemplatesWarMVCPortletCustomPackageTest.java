@@ -45,12 +45,11 @@ public class ProjectTemplatesWarMVCPortletCustomPackageTest
 	@ClassRule
 	public static final MavenExecutor mavenExecutor = new MavenExecutor();
 
-	@Parameterized.Parameters(name = "Testcase-{index}: testing {1} {0}")
+	@Parameterized.Parameters(name = "Testcase-{index}: testing {0}")
 	public static Iterable<Object[]> data() {
 		return Arrays.asList(
 			new Object[][] {
-				{"dxp", "7.0.10.17"}, {"dxp", "7.1.10.7"}, {"dxp", "7.2.10.7"},
-				{"portal", "7.3.7"}, {"portal", "7.4.1-1"}
+				{"7.0.6-2"}, {"7.1.3-1"}, {"7.2.1-1"}, {"7.3.7"}, {"7.4.1-1"}
 			});
 	}
 
@@ -71,9 +70,8 @@ public class ProjectTemplatesWarMVCPortletCustomPackageTest
 	}
 
 	public ProjectTemplatesWarMVCPortletCustomPackageTest(
-		String liferayProduct, String liferayVersion) {
+		String liferayVersion) {
 
-		_liferayProduct = liferayProduct;
 		_liferayVersion = liferayVersion;
 	}
 
@@ -81,8 +79,7 @@ public class ProjectTemplatesWarMVCPortletCustomPackageTest
 	public void testBuildTemplateWarMvcPortlet() throws Exception {
 		File gradleProjectDir = testBuildTemplatePortlet(
 			temporaryFolder, "war-mvc-portlet", "foo", "com.liferay.test",
-			_liferayProduct, _liferayVersion, mavenExecutor,
-			_gradleDistribution);
+			_liferayVersion, mavenExecutor, _gradleDistribution);
 
 		testTemplateWarPortletDTD(gradleProjectDir, _liferayVersion);
 	}
@@ -92,7 +89,6 @@ public class ProjectTemplatesWarMVCPortletCustomPackageTest
 
 	private static URI _gradleDistribution;
 
-	private final String _liferayProduct;
 	private final String _liferayVersion;
 
 }

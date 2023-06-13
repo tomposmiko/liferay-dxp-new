@@ -87,7 +87,7 @@ public class DLFolderPermissionCheckerTest extends BasePermissionTestCase {
 		}
 		catch (NoSuchFolderException noSuchFolderException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFolderException);
+				_log.debug(noSuchFolderException, noSuchFolderException);
 			}
 		}
 
@@ -96,9 +96,8 @@ public class DLFolderPermissionCheckerTest extends BasePermissionTestCase {
 				group.getGroupId(), TestPropsValues.getUserId());
 
 		_folder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, name,
-			RandomTestUtil.randomString(), serviceContext);
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			name, RandomTestUtil.randomString(), serviceContext);
 
 		name = RandomTestUtil.randomString();
 
@@ -108,12 +107,12 @@ public class DLFolderPermissionCheckerTest extends BasePermissionTestCase {
 		}
 		catch (NoSuchFolderException noSuchFolderException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFolderException);
+				_log.debug(noSuchFolderException, noSuchFolderException);
 			}
 		}
 
 		_subfolder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(), _folder.getFolderId(), name,
+			group.getGroupId(), _folder.getFolderId(), name,
 			RandomTestUtil.randomString(), serviceContext);
 	}
 

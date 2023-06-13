@@ -211,24 +211,29 @@ public class ERCGroupEntryLocalServiceUtil {
 		return getService().fetchERCGroupEntry(ercGroupEntryId);
 	}
 
+	/**
+	 * Returns the erc group entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the erc group entry's external reference code
+	 * @return the matching erc group entry, or <code>null</code> if a matching erc group entry could not be found
+	 */
 	public static ERCGroupEntry fetchERCGroupEntryByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
 		return getService().fetchERCGroupEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the erc group entry matching the UUID and group.
-	 *
-	 * @param uuid the erc group entry's UUID
-	 * @param groupId the primary key of the group
-	 * @return the matching erc group entry, or <code>null</code> if a matching erc group entry could not be found
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchERCGroupEntryByExternalReferenceCode(long, String)}
 	 */
-	public static ERCGroupEntry fetchERCGroupEntryByUuidAndGroupId(
-		String uuid, long groupId) {
+	@Deprecated
+	public static ERCGroupEntry fetchERCGroupEntryByReferenceCode(
+		long groupId, String externalReferenceCode) {
 
-		return getService().fetchERCGroupEntryByUuidAndGroupId(uuid, groupId);
+		return getService().fetchERCGroupEntryByReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
@@ -253,38 +258,6 @@ public class ERCGroupEntryLocalServiceUtil {
 	}
 
 	/**
-	 * Returns all the erc group entries matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the erc group entries
-	 * @param companyId the primary key of the company
-	 * @return the matching erc group entries, or an empty list if no matches were found
-	 */
-	public static List<ERCGroupEntry> getERCGroupEntriesByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		return getService().getERCGroupEntriesByUuidAndCompanyId(
-			uuid, companyId);
-	}
-
-	/**
-	 * Returns a range of erc group entries matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the erc group entries
-	 * @param companyId the primary key of the company
-	 * @param start the lower bound of the range of erc group entries
-	 * @param end the upper bound of the range of erc group entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the range of matching erc group entries, or an empty list if no matches were found
-	 */
-	public static List<ERCGroupEntry> getERCGroupEntriesByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<ERCGroupEntry> orderByComparator) {
-
-		return getService().getERCGroupEntriesByUuidAndCompanyId(
-			uuid, companyId, start, end, orderByComparator);
-	}
-
-	/**
 	 * Returns the number of erc group entries.
 	 *
 	 * @return the number of erc group entries
@@ -306,27 +279,20 @@ public class ERCGroupEntryLocalServiceUtil {
 		return getService().getERCGroupEntry(ercGroupEntryId);
 	}
 
-	public static ERCGroupEntry getERCGroupEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		return getService().getERCGroupEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
-	}
-
 	/**
-	 * Returns the erc group entry matching the UUID and group.
+	 * Returns the erc group entry with the matching external reference code and group.
 	 *
-	 * @param uuid the erc group entry's UUID
 	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the erc group entry's external reference code
 	 * @return the matching erc group entry
 	 * @throws PortalException if a matching erc group entry could not be found
 	 */
-	public static ERCGroupEntry getERCGroupEntryByUuidAndGroupId(
-			String uuid, long groupId)
+	public static ERCGroupEntry getERCGroupEntryByExternalReferenceCode(
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
-		return getService().getERCGroupEntryByUuidAndGroupId(uuid, groupId);
+		return getService().getERCGroupEntryByExternalReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	public static

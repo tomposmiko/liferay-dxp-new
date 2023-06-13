@@ -18,9 +18,9 @@ import com.liferay.commerce.product.constants.CPActionKeys;
 import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.model.CPTaxCategory;
 import com.liferay.commerce.product.service.base.CPTaxCategoryServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
@@ -28,20 +28,29 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CPTaxCategory"
-	},
-	service = AopService.class
-)
 public class CPTaxCategoryServiceImpl extends CPTaxCategoryServiceBaseImpl {
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #addCPTaxCategory(String, Map, Map, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public CPTaxCategory addCPTaxCategory(
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), null,
+			CPActionKeys.MANAGE_COMMERCE_PRODUCT_TAX_CATEGORIES);
+
+		return cpTaxCategoryLocalService.addCPTaxCategory(
+			nameMap, descriptionMap, serviceContext);
+	}
 
 	@Override
 	public CPTaxCategory addCPTaxCategory(
@@ -138,6 +147,25 @@ public class CPTaxCategoryServiceImpl extends CPTaxCategoryServiceBaseImpl {
 		return cpTaxCategoryLocalService.getCPTaxCategory(cpTaxCategoryId);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #updateCPTaxCategory(String, long, Map, Map)}
+	 */
+	@Deprecated
+	@Override
+	public CPTaxCategory updateCPTaxCategory(
+			long cpTaxCategoryId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), null,
+			CPActionKeys.MANAGE_COMMERCE_PRODUCT_TAX_CATEGORIES);
+
+		return cpTaxCategoryLocalService.updateCPTaxCategory(
+			cpTaxCategoryId, nameMap, descriptionMap);
+	}
+
 	@Override
 	public CPTaxCategory updateCPTaxCategory(
 			String externalReferenceCode, long cpTaxCategoryId,
@@ -152,7 +180,10 @@ public class CPTaxCategoryServiceImpl extends CPTaxCategoryServiceBaseImpl {
 			externalReferenceCode, cpTaxCategoryId, nameMap, descriptionMap);
 	}
 
-	@Reference(target = "(resource.name=" + CPConstants.RESOURCE_NAME_TAX + ")")
-	private PortletResourcePermission _portletResourcePermission;
+	private static volatile PortletResourcePermission
+		_portletResourcePermission =
+			PortletResourcePermissionFactory.getInstance(
+				CPTaxCategoryServiceImpl.class, "_portletResourcePermission",
+				CPConstants.RESOURCE_NAME_TAX);
 
 }

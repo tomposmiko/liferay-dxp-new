@@ -66,9 +66,6 @@ public class LiferayOSGiExtension {
 			Constants.BUNDLE_SYMBOLICNAME, project.getName());
 		_bundleDefaultInstructions.put(Constants.CDIANNOTATIONS, "");
 		_bundleDefaultInstructions.put(
-			Constants.CONSUMER_POLICY,
-			"${replacestring;${range;[==,==]};.*,(.*)];$1}");
-		_bundleDefaultInstructions.put(
 			Constants.DONOTCOPY, "(" + DONOTCOPY_DEFAULT + ")");
 		_bundleDefaultInstructions.put(
 			Constants.FIXUPMESSAGES + ".classpath.empty", "Classpath is empty");
@@ -83,9 +80,6 @@ public class LiferayOSGiExtension {
 		_bundleDefaultInstructions.put(
 			Constants.PLUGIN + ".liferay",
 			StringUtil.merge(_BND_PLUGIN_CLASS_NAMES, ","));
-		_bundleDefaultInstructions.put(
-			Constants.PROVIDER_POLICY,
-			"${replacestring;${range;[==,==]};.*,(.*)];$1}");
 
 		_bundleDefaultInstructions.put(
 			"Javac-Debug",

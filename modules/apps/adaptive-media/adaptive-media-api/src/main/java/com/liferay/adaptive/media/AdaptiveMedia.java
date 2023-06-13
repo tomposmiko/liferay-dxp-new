@@ -18,6 +18,8 @@ import java.io.InputStream;
 
 import java.net.URI;
 
+import java.util.Optional;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -47,6 +49,14 @@ public interface AdaptiveMedia<T> {
 	 */
 	public URI getURI();
 
-	public <V> V getValue(AMAttribute<T, V> amAttribute);
+	/**
+	 * Returns the value of this {@link AdaptiveMedia} instance's attribute.
+	 * This method always returns a non-<code>null</code> optional.
+	 *
+	 * @param  amAttribute the adaptive media attribute
+	 * @return the attribute value wrapped in an {@link Optional}. If no value
+	 *         exists, an {@link Optional#EMPTY} is returned.
+	 */
+	public <V> Optional<V> getValueOptional(AMAttribute<T, V> amAttribute);
 
 }

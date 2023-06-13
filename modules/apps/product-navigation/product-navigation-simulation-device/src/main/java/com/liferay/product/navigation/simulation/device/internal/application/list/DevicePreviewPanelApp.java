@@ -17,16 +17,18 @@ package com.liferay.product.navigation.simulation.device.internal.application.li
 import com.liferay.application.list.BaseJSPPanelApp;
 import com.liferay.application.list.PanelApp;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.product.navigation.simulation.constants.ProductNavigationSimulationConstants;
 import com.liferay.product.navigation.simulation.constants.ProductNavigationSimulationPortletKeys;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletContext;
 
@@ -37,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=100",
 		"panel.category.key=" + ProductNavigationSimulationConstants.SIMULATION_PANEL_CATEGORY_KEY
@@ -52,12 +55,10 @@ public class DevicePreviewPanelApp extends BaseJSPPanelApp {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "screen-size");
-	}
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
 
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
+		return LanguageUtil.get(resourceBundle, "screen-size");
 	}
 
 	@Override
@@ -71,7 +72,7 @@ public class DevicePreviewPanelApp extends BaseJSPPanelApp {
 		throws PortalException {
 
 		if (group.isControlPanel() ||
-			!_hasPreviewInDevicePermission(permissionChecker, group)) {
+			!hasPreviewInDevicePermission(permissionChecker, group)) {
 
 			return false;
 		}
@@ -80,32 +81,29 @@ public class DevicePreviewPanelApp extends BaseJSPPanelApp {
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(javax.portlet.name=" + ProductNavigationSimulationPortletKeys.PRODUCT_NAVIGATION_SIMULATION + ")",
+		unbind = "-"
+	)
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
 	}
 
-	private boolean _hasPreviewInDevicePermission(
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.product.navigation.simulation.device)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected boolean hasPreviewInDevicePermission(
 			PermissionChecker permissionChecker, Group group)
 		throws PortalException {
 
-		return _groupPermission.contains(
+		return GroupPermissionUtil.contains(
 			permissionChecker, group, ActionKeys.PREVIEW_IN_DEVICE);
 	}
-
-	@Reference
-	private GroupPermission _groupPermission;
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(javax.portlet.name=" + ProductNavigationSimulationPortletKeys.PRODUCT_NAVIGATION_SIMULATION + ")"
-	)
-	private Portlet _portlet;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.product.navigation.simulation.device)"
-	)
-	private ServletContext _servletContext;
 
 }

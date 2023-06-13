@@ -36,7 +36,7 @@ public class SingleValueInfoLocalizedValue<T> implements InfoLocalizedValue<T> {
 
 	@Override
 	public Locale getDefaultLocale() {
-		return LocaleUtil.getSiteDefault();
+		return LocaleUtil.getDefault();
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class SingleValueInfoLocalizedValue<T> implements InfoLocalizedValue<T> {
 	}
 
 	private final Set<Locale> _availableLocales = SetUtil.fromArray(
-		LocaleUtil.getSiteDefault());
+		new Locale[] {LocaleUtil.getDefault()});
 	private final T _value;
 
 }

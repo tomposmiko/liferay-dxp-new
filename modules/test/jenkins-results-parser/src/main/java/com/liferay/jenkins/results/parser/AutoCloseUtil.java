@@ -642,7 +642,9 @@ public class AutoCloseUtil {
 					new ArrayList<>(downstreamBuilds.size());
 
 				for (Build downstreamBuild : downstreamBuilds) {
-					if (downstreamBuild.isFailing()) {
+					if (UpstreamFailureUtil.isBuildFailingInUpstreamJob(
+							downstreamBuild)) {
+
 						failingInUpstreamJobDownstreamBuilds.add(
 							downstreamBuild);
 

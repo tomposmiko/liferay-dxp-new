@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-cp-price-range-facets",
@@ -60,8 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/price_range_facets/view.jsp",
 		"javax.portlet.name=" + CPPortletKeys.CP_PRICE_RANGE_FACETS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -89,7 +89,7 @@ public class CPPriceRangeFacetsPortlet extends MVCPortlet {
 				cpPriceRangeFacetsDisplayContext);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		super.render(renderRequest, renderResponse);

@@ -22,14 +22,12 @@ type Props = {
 	title: string;
 };
 
-export function NotFound({description, onClick, title}: Props) {
-	return (
-		<div className="a11y-panel__sidebar--body">
-			<ClayEmptyState description={description} title={title}>
-				<ClayButton displayType="secondary" onClick={onClick}>
-					{Liferay.Language.get('back')}
-				</ClayButton>
-			</ClayEmptyState>
-		</div>
-	);
-}
+export const NotFound = ({description, onClick, title}: Props) => (
+	<div className="a11y-panel__sidebar--body">
+		<ClayEmptyState description={description} title={title}>
+			<ClayButton displayType="secondary" onClick={onClick}>
+				{Liferay.Language.get('back')}
+			</ClayButton>
+		</ClayEmptyState>
+	</div>
+);

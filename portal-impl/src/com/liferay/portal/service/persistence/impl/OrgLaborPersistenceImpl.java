@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.model.OrgLabor;
 import com.liferay.portal.kernel.model.OrgLaborTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.OrgLaborPersistence;
-import com.liferay.portal.kernel.service.persistence.OrgLaborUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -43,7 +42,6 @@ import com.liferay.portal.model.impl.OrgLaborModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
@@ -178,7 +176,7 @@ public class OrgLaborPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OrgLabor>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OrgLabor orgLabor : list) {
@@ -537,8 +535,7 @@ public class OrgLaborPersistenceImpl
 
 		Object[] finderArgs = new Object[] {organizationId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -952,7 +949,7 @@ public class OrgLaborPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OrgLabor>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1022,7 +1019,7 @@ public class OrgLaborPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1104,29 +1101,10 @@ public class OrgLaborPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByOrganizationId",
 			new String[] {Long.class.getName()},
 			new String[] {"organizationId"}, false);
-
-		_setOrgLaborUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setOrgLaborUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(OrgLaborImpl.class.getName());
-	}
-
-	private void _setOrgLaborUtilPersistence(
-		OrgLaborPersistence orgLaborPersistence) {
-
-		try {
-			Field field = OrgLaborUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, orgLaborPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_ORGLABOR =

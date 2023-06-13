@@ -17,7 +17,6 @@ package com.liferay.commerce.shop.by.diagram.service.persistence;
 import com.liferay.commerce.shop.by.diagram.exception.NoSuchCSDiagramPinException;
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramPin;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -33,8 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-public interface CSDiagramPinPersistence
-	extends BasePersistence<CSDiagramPin>, CTPersistence<CSDiagramPin> {
+public interface CSDiagramPinPersistence extends BasePersistence<CSDiagramPin> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

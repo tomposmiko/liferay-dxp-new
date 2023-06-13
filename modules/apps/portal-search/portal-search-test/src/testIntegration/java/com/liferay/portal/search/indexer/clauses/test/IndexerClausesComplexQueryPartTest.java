@@ -19,7 +19,6 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.blogs.test.util.search.BlogsEntryBlueprint.BlogsEntryBlueprintBuilder;
 import com.liferay.blogs.test.util.search.BlogsEntrySearchFixture;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.search.JournalArticleBlueprintBuilder;
@@ -34,10 +33,9 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -47,7 +45,6 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.query.MatchQuery;
@@ -66,11 +63,9 @@ import com.liferay.users.admin.test.util.search.GroupBlueprint;
 import com.liferay.users.admin.test.util.search.GroupSearchFixture;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -91,16 +86,13 @@ public class IndexerClausesComplexQueryPartTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(!_isSearchEngine("Solr"));
-
 		BlogsEntrySearchFixture blogsEntrySearchFixture =
 			new BlogsEntrySearchFixture(blogsEntryLocalService);
 
 		GroupSearchFixture groupSearchFixture = new GroupSearchFixture();
 
 		JournalArticleSearchFixture journalArticleSearchFixture =
-			new JournalArticleSearchFixture(
-				ddmStructureLocalService, journalArticleLocalService, portal);
+			new JournalArticleSearchFixture(journalArticleLocalService);
 
 		_blogsEntries = blogsEntrySearchFixture.getBlogsEntries();
 		_blogsEntrySearchFixture = blogsEntrySearchFixture;
@@ -112,10 +104,8 @@ public class IndexerClausesComplexQueryPartTest {
 	}
 
 	@Test
-	public void testDefaultIndexer1() throws Exception {
-		Assert.assertEquals(
-			"class com.liferay.portal.search.internal.indexer.DefaultIndexer",
-			String.valueOf(journalArticleIndexer.getClass()));
+	public void testBaseIndexer() throws Exception {
+		Assert.assertTrue(journalArticleIndexer instanceof BaseIndexer);
 
 		addJournalArticle("Gamma Article");
 		addJournalArticle("Omega Article");
@@ -148,7 +138,7 @@ public class IndexerClausesComplexQueryPartTest {
 	}
 
 	@Test
-	public void testDefaultIndexer2() throws Exception {
+	public void testDefaultIndexer() throws Exception {
 		Assert.assertEquals(
 			"class com.liferay.portal.search.internal.indexer.DefaultIndexer",
 			String.valueOf(blogsEntryIndexer.getClass()));
@@ -301,7 +291,7 @@ public class IndexerClausesComplexQueryPartTest {
 		}
 
 		DocumentsAssert.assertValuesIgnoreRelevance(
-			requestString, searchResponse.getDocuments(), _TITLE_EN_US,
+			requestString, searchResponse.getDocumentsStream(), _TITLE_EN_US,
 			expected);
 	}
 
@@ -362,21 +352,13 @@ public class IndexerClausesComplexQueryPartTest {
 			).build());
 	}
 
-	@Inject
-	protected static DDMStructureLocalService ddmStructureLocalService;
-
-	@Inject
-	protected static Portal portal;
-
 	@Inject(filter = "indexer.class.name=com.liferay.blogs.model.BlogsEntry")
 	protected Indexer<BlogsEntry> blogsEntryIndexer;
 
 	@Inject
 	protected BlogsEntryLocalService blogsEntryLocalService;
 
-	@Inject(
-		filter = "indexer.class.name=com.liferay.journal.model.JournalArticle"
-	)
+	@Inject(filter = "component.name=*.JournalArticleIndexer")
 	protected Indexer<JournalArticle> journalArticleIndexer;
 
 	@Inject
@@ -394,12 +376,6 @@ public class IndexerClausesComplexQueryPartTest {
 	private ServiceContext _createServiceContext() throws Exception {
 		return ServiceContextTestUtil.getServiceContext(
 			_group.getGroupId(), _user.getUserId());
-	}
-
-	private boolean _isSearchEngine(String vendor) {
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
-
-		return Objects.equals(searchEngine.getVendor(), vendor);
 	}
 
 	private static final String _TITLE_EN_US = StringBundler.concat(
@@ -432,9 +408,6 @@ public class IndexerClausesComplexQueryPartTest {
 	private Queries _queries;
 
 	private MatchQuery _query;
-
-	@Inject
-	private SearchEngineHelper _searchEngineHelper;
 
 	@Inject
 	private Sorts _sorts;

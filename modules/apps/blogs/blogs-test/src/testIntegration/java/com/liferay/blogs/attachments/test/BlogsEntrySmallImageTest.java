@@ -19,6 +19,7 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -59,21 +60,26 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 	protected BlogsEntry addBlogsEntry(ImageSelector imageSelector)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), user.getUserId());
+
 		return BlogsEntryLocalServiceUtil.addEntry(
 			user.getUserId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), new Date(), true, true,
 			new String[0], StringPool.BLANK, null, imageSelector,
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId()));
+			serviceContext);
 	}
 
 	@Override
 	protected BlogsEntry addBlogsEntry(String imageTitle) throws Exception {
-		FileEntry fileEntry = getTempFileEntry(
-			user.getUserId(), imageTitle,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId()));
+				group.getGroupId(), user.getUserId());
+
+		FileEntry fileEntry = getTempFileEntry(
+			user.getUserId(), imageTitle, serviceContext);
 
 		ImageSelector imageSelector = new ImageSelector(
 			FileUtil.getBytes(fileEntry.getContentStream()),
@@ -99,13 +105,16 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 			long blogsEntryId, ImageSelector imageSelector)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), user.getUserId());
+
 		return BlogsEntryLocalServiceUtil.updateEntry(
 			user.getUserId(), blogsEntryId, RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), new Date(), true, true,
 			new String[0], StringPool.BLANK, null, imageSelector,
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId()));
+			serviceContext);
 	}
 
 	@Override
@@ -113,10 +122,12 @@ public class BlogsEntrySmallImageTest extends BaseBlogsEntryImageTestCase {
 			long blogsEntryId, String coverImageTitle)
 		throws Exception {
 
-		FileEntry fileEntry = getTempFileEntry(
-			user.getUserId(), coverImageTitle,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId()));
+				group.getGroupId(), user.getUserId());
+
+		FileEntry fileEntry = getTempFileEntry(
+			user.getUserId(), coverImageTitle, serviceContext);
 
 		ImageSelector imageSelector = new ImageSelector(
 			FileUtil.getBytes(fileEntry.getContentStream()),

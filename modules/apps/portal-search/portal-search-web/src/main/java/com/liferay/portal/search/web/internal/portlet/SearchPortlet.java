@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-search",
@@ -68,8 +69,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + SearchPortletKeys.SEARCH,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -108,7 +108,7 @@ public class SearchPortlet extends MVCPortlet {
 			try {
 				ServletResponseUtil.sendFile(
 					httpServletRequest, httpServletResponse, null,
-					_getXML(resourceRequest, resourceResponse),
+					getXML(resourceRequest, resourceResponse),
 					ContentTypes.TEXT_XML_UTF8);
 			}
 			catch (Exception exception) {
@@ -118,7 +118,7 @@ public class SearchPortlet extends MVCPortlet {
 				}
 				catch (ServletException servletException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(servletException);
+						_log.debug(servletException, servletException);
 					}
 				}
 			}
@@ -128,10 +128,7 @@ public class SearchPortlet extends MVCPortlet {
 		}
 	}
 
-	@Reference
-	protected SearchDisplayContextFactory searchDisplayContextFactory;
-
-	private byte[] _getXML(
+	protected byte[] getXML(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
@@ -165,14 +162,19 @@ public class SearchPortlet extends MVCPortlet {
 		return xml.getBytes();
 	}
 
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.portal.search.web)(&(release.schema.version>=2.0.0)(!(release.schema.version>=3.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
+	@Reference
+	protected SearchDisplayContextFactory searchDisplayContextFactory;
+
 	private static final Log _log = LogFactoryUtil.getLog(SearchPortlet.class);
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.portal.search.web)(&(release.schema.version>=2.0.0)(!(release.schema.version>=3.0.0))))"
-	)
-	private Release _release;
 
 }

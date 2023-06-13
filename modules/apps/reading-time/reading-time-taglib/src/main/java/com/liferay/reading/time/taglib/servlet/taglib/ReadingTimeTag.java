@@ -29,6 +29,8 @@ import java.io.IOException;
 
 import java.time.Duration;
 
+import java.util.Optional;
+
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,16 +46,16 @@ public class ReadingTimeTag extends AttributesTagSupport implements BodyTag {
 	@Override
 	public int doEndTag() throws JspException {
 		try {
-			Duration readingTimeDuration = _getReadingTimeDuration();
+			Optional<Duration> readingTimeDurationOptional =
+				_getReadingTimeDurationOptional();
 
-			if (readingTimeDuration != null) {
-				String tag = _buildTag(readingTimeDuration);
+			Optional<String> tagOptional = readingTimeDurationOptional.flatMap(
+				this::_buildTag);
 
-				if (tag != null) {
-					JspWriter jspWriter = pageContext.getOut();
+			if (tagOptional.isPresent()) {
+				JspWriter jspWriter = pageContext.getOut();
 
-					jspWriter.write(tag);
-				}
+				jspWriter.write(tagOptional.get());
 			}
 
 			return EVAL_PAGE;
@@ -75,7 +77,7 @@ public class ReadingTimeTag extends AttributesTagSupport implements BodyTag {
 		_groupedModel = groupedModel;
 	}
 
-	private String _buildTag(Duration readingTimeDuration) {
+	private Optional<String> _buildTag(Duration readingTimeDuration) {
 		String readingTimeMessage = _getReadingTimeMessage(readingTimeDuration);
 
 		if (Validator.isNotNull(readingTimeMessage)) {
@@ -96,10 +98,10 @@ public class ReadingTimeTag extends AttributesTagSupport implements BodyTag {
 			sb.append(readingTimeMessage);
 			sb.append("</time>");
 
-			return sb.toString();
+			return Optional.of(sb.toString());
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	private String _getNamespace() {
@@ -112,9 +114,9 @@ public class ReadingTimeTag extends AttributesTagSupport implements BodyTag {
 		return renderResponse.getNamespace();
 	}
 
-	private Duration _getReadingTimeDuration() {
+	private Optional<Duration> _getReadingTimeDurationOptional() {
 		if (_groupedModel == null) {
-			return Duration.ZERO;
+			return Optional.of(Duration.ZERO);
 		}
 
 		ReadingTimeEntry readingTimeEntry =
@@ -122,10 +124,11 @@ public class ReadingTimeTag extends AttributesTagSupport implements BodyTag {
 				_groupedModel);
 
 		if (readingTimeEntry != null) {
-			return Duration.ofMillis(readingTimeEntry.getReadingTime());
+			return Optional.of(
+				Duration.ofMillis(readingTimeEntry.getReadingTime()));
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	private String _getReadingTimeMessage(Duration readingTimeDuration) {

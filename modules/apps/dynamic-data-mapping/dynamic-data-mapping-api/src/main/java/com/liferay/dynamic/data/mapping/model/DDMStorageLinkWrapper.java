@@ -353,11 +353,6 @@ public class DDMStorageLinkWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DDMStorageLink, Object>>
 		getAttributeGetterFunctions() {
 

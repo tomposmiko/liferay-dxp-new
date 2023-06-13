@@ -41,7 +41,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author     Rafael Praxedes
  * @deprecated As of Mueller (7.2.x), with no direct replacement
  */
-@Component(service = VerifyProcess.class)
+@Component(
+	immediate = true,
+	property = "verify.process.name=com.liferay.dynamic.data.mapping.service",
+	service = VerifyProcess.class
+)
 @Deprecated
 public class DDMServiceVerifyProcess extends VerifyProcess {
 
@@ -70,6 +74,34 @@ public class DDMServiceVerifyProcess extends VerifyProcess {
 		throws PortalException {
 
 		return getDDMFormValues(ddmStructure.getDDMForm(), ddmContent);
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureLinkLocalService(
+		DDMStructureLinkLocalService ddmStructureLinkLocalService) {
+
+		_ddmStructureLinkLocalService = ddmStructureLinkLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureLocalService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		_ddmStructureLocalService = ddmStructureLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLinkLocalService(
+		DDMTemplateLinkLocalService ddmTemplateLinkLocalService) {
+
+		_ddmTemplateLinkLocalService = ddmTemplateLinkLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
 	}
 
 	protected void verifyStructureLink(DDMStructureLink ddmStructureLink)
@@ -125,16 +157,9 @@ public class DDMServiceVerifyProcess extends VerifyProcess {
 		}
 	}
 
-	@Reference
 	private DDMStructureLinkLocalService _ddmStructureLinkLocalService;
-
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
 	private DDMTemplateLinkLocalService _ddmTemplateLinkLocalService;
-
-	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
 
 	@Reference(target = "(ddm.form.values.deserializer.type=json)")

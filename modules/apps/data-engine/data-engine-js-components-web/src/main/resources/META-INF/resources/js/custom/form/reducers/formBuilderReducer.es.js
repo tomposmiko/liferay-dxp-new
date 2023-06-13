@@ -12,13 +12,13 @@
  * details.
  */
 
-import {EVENT_TYPES} from '../eventTypes';
+import {EVENT_TYPES} from '../eventTypes.es';
 
 /**
  * This reducer was created to consume datafrom
  * FormBuilder inside FormFieldSettings
  */
-export default function formBuilderReducer(state, action) {
+export default (state, action) => {
 	switch (action.type) {
 		case EVENT_TYPES.FORM_BUILDER.PAGES.UPDATE: {
 			const {pages} = action.payload;
@@ -43,4 +43,4 @@ export default function formBuilderReducer(state, action) {
 		default:
 			return state;
 	}
-}
+};

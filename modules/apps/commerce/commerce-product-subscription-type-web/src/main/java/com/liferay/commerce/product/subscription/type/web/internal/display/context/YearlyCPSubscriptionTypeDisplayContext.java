@@ -15,7 +15,7 @@
 package com.liferay.commerce.product.subscription.type.web.internal.display.context;
 
 import com.liferay.commerce.product.subscription.type.web.internal.constants.CPSubscriptionTypeConstants;
-import com.liferay.commerce.product.subscription.type.web.internal.display.context.helper.CPSubscriptionTypeRequestHelper;
+import com.liferay.commerce.product.subscription.type.web.internal.display.context.util.CPSubscriptionTypeRequestHelper;
 import com.liferay.commerce.product.subscription.type.web.internal.display.context.util.comparator.YearlyCPSubscriptionTypeCalendarMonthsComparator;
 import com.liferay.commerce.util.CommerceSubscriptionTypeUtil;
 import com.liferay.petra.string.StringPool;
@@ -49,7 +49,7 @@ public class YearlyCPSubscriptionTypeDisplayContext {
 		List<Integer> calendarMonths = new ArrayList<>();
 
 		Map<String, Integer> calendarMonthsDisplayNames =
-			_getCalendarMonthsDisplayNames();
+			getCalendarMonthsDisplayNames();
 
 		for (Map.Entry<String, Integer> entry :
 				calendarMonthsDisplayNames.entrySet()) {
@@ -65,8 +65,8 @@ public class YearlyCPSubscriptionTypeDisplayContext {
 
 	public int getMonthDay() {
 		UnicodeProperties subscriptionTypeSettingsUnicodeProperties =
-			CommerceSubscriptionTypeUtil.
-				getSubscriptionTypeSettingsUnicodeProperties(_object, _payment);
+			CommerceSubscriptionTypeUtil.getSubscriptionTypeSettingsProperties(
+				_object, _payment);
 
 		if ((subscriptionTypeSettingsUnicodeProperties == null) ||
 			subscriptionTypeSettingsUnicodeProperties.isEmpty()) {
@@ -85,7 +85,7 @@ public class YearlyCPSubscriptionTypeDisplayContext {
 
 	public String getMonthDisplayName(int month) {
 		Map<String, Integer> calendarMonthsDisplayNames =
-			_getCalendarMonthsDisplayNames();
+			getCalendarMonthsDisplayNames();
 
 		for (Map.Entry<String, Integer> entry :
 				calendarMonthsDisplayNames.entrySet()) {
@@ -100,8 +100,8 @@ public class YearlyCPSubscriptionTypeDisplayContext {
 
 	public int getSelectedMonth() {
 		UnicodeProperties subscriptionTypeSettingsUnicodeProperties =
-			CommerceSubscriptionTypeUtil.
-				getSubscriptionTypeSettingsUnicodeProperties(_object, _payment);
+			CommerceSubscriptionTypeUtil.getSubscriptionTypeSettingsProperties(
+				_object, _payment);
 
 		if (subscriptionTypeSettingsUnicodeProperties == null) {
 			return 0;
@@ -109,17 +109,17 @@ public class YearlyCPSubscriptionTypeDisplayContext {
 
 		if (isPayment()) {
 			return GetterUtil.getInteger(
-				subscriptionTypeSettingsUnicodeProperties.get("month"));
+				subscriptionTypeSettingsUnicodeProperties.get("deliveryMonth"));
 		}
 
 		return GetterUtil.getInteger(
-			subscriptionTypeSettingsUnicodeProperties.get("deliveryMonth"));
+			subscriptionTypeSettingsUnicodeProperties.get("month"));
 	}
 
 	public int getSelectedYearlyMode() {
 		UnicodeProperties subscriptionTypeSettingsUnicodeProperties =
-			CommerceSubscriptionTypeUtil.
-				getSubscriptionTypeSettingsUnicodeProperties(_object, _payment);
+			CommerceSubscriptionTypeUtil.getSubscriptionTypeSettingsProperties(
+				_object, _payment);
 
 		if (subscriptionTypeSettingsUnicodeProperties == null) {
 			return CPSubscriptionTypeConstants.MODE_ORDER_DATE;
@@ -139,7 +139,7 @@ public class YearlyCPSubscriptionTypeDisplayContext {
 		return _payment;
 	}
 
-	private Map<String, Integer> _getCalendarMonthsDisplayNames() {
+	protected Map<String, Integer> getCalendarMonthsDisplayNames() {
 		Calendar calendar = CalendarFactoryUtil.getCalendar(
 			_cpSubscriptionTypeRequestHelper.getLocale());
 

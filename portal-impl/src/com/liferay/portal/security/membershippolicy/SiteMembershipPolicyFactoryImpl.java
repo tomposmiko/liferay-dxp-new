@@ -14,7 +14,6 @@
 
 package com.liferay.portal.security.membershippolicy;
 
-import com.liferay.petra.concurrent.DCLSingleton;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,30 +36,12 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class SiteMembershipPolicyFactoryImpl
 	implements SiteMembershipPolicyFactory {
 
-	public void destroy() {
-		_serviceTrackerDCLSingleton.destroy(ServiceTracker::close);
-	}
-
 	@Override
 	public SiteMembershipPolicy getSiteMembershipPolicy() {
-		ServiceTracker<SiteMembershipPolicy, SiteMembershipPolicy>
-			serviceTracker = _serviceTrackerDCLSingleton.getSingleton(
-				SiteMembershipPolicyFactoryImpl::_createServiceTracker);
-
-		return serviceTracker.getService();
+		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker<SiteMembershipPolicy, SiteMembershipPolicy>
-		_createServiceTracker() {
-
-		ServiceTracker<SiteMembershipPolicy, SiteMembershipPolicy>
-			serviceTracker = new ServiceTracker<>(
-				_bundleContext, SiteMembershipPolicy.class,
-				new SiteMembershipPolicyTrackerCustomizer());
-
-		serviceTracker.open();
-
-		return serviceTracker;
+	private SiteMembershipPolicyFactoryImpl() {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -68,9 +49,8 @@ public class SiteMembershipPolicyFactoryImpl
 
 	private static final BundleContext _bundleContext =
 		SystemBundleUtil.getBundleContext();
-	private static final DCLSingleton
-		<ServiceTracker<SiteMembershipPolicy, SiteMembershipPolicy>>
-			_serviceTrackerDCLSingleton = new DCLSingleton<>();
+	private static final ServiceTracker<?, SiteMembershipPolicy>
+		_serviceTracker;
 
 	private static class SiteMembershipPolicyTrackerCustomizer
 		implements ServiceTrackerCustomizer
@@ -88,7 +68,7 @@ public class SiteMembershipPolicyFactoryImpl
 					siteMembershipPolicy.verifyPolicy();
 				}
 				catch (PortalException portalException) {
-					_log.error(portalException);
+					_log.error(portalException, portalException);
 				}
 			}
 
@@ -109,6 +89,14 @@ public class SiteMembershipPolicyFactoryImpl
 			_bundleContext.ungetService(serviceReference);
 		}
 
+	}
+
+	static {
+		_serviceTracker = new ServiceTracker<>(
+			_bundleContext, SiteMembershipPolicy.class,
+			new SiteMembershipPolicyTrackerCustomizer());
+
+		_serviceTracker.open();
 	}
 
 }

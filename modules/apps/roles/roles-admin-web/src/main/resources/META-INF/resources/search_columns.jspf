@@ -27,17 +27,17 @@ RoleTypeContributor currentRoleTypeContributor = RoleTypeContributorRetrieverUti
 		<liferay-ui:search-container-column-text
 			colspan="<%= 2 %>"
 		>
-			<div class="list-group-title">
+			<h5>
 				<aui:a href="<%= (rowURL != null) ? rowURL.toString() : null %>"><%= HtmlUtil.escape(role.getTitle(locale)) %></aui:a>
-			</div>
+			</h5>
 
-			<div class="list-group-text">
+			<h6 class="text-default">
 				<span><%= HtmlUtil.escape(role.getDescription(locale)) %></span>
-			</div>
+			</h6>
 
-			<div class="list-group-subtext">
-				<span><%= roleDisplayContext.getAssigneesMessage(role) %></span>
-			</div>
+			<h6 class="text-default">
+				<span><%= _getAssigneesMessage(request, role, roleDisplayContext) %></span>
+			</h6>
 		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-jsp
@@ -71,7 +71,7 @@ RoleTypeContributor currentRoleTypeContributor = RoleTypeContributorRetrieverUti
 			cssClass="table-cell-expand-smallest table-cell-ws-nowrap table-column-text-center"
 			href="<%= rowURL %>"
 			name="number-of-assignees"
-			value='<%= roleDisplayContext.isAutomaticallyAssigned(role) ? LanguageUtil.get(request, "not-available") : String.valueOf(roleDisplayContext.getAssigneesTotal(role.getRoleId())) %>'
+			value='<%= roleDisplayContext.isAutomaticallyAssigned(role) ? LanguageUtil.get(request, "not-available") : String.valueOf(_getAssigneesTotal(role.getRoleId())) %>'
 		/>
 
 		<liferay-ui:search-container-column-jsp

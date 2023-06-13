@@ -17,36 +17,43 @@ package com.liferay.portal.osgi.web.wab.generator.internal.artifact;
 import com.liferay.portal.file.install.FileInstaller;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.net.URI;
 import java.net.URL;
 
-import java.util.Enumeration;
-import java.util.Objects;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
  * @author Miguel Pastor
  * @author Raymond Augé
- * @author Gregory Amerson
  */
 public class WarArtifactUrlTransformer implements FileInstaller {
+
+	public WarArtifactUrlTransformer(AtomicBoolean portalIsReady) {
+		_portalIsReady = portalIsReady;
+	}
 
 	@Override
 	public boolean canTransformURL(File artifact) {
 		String name = artifact.getName();
 
-		if (name.endsWith(".war") ||
-			(name.endsWith(".zip") && _isClientExtensionZip(artifact))) {
+		if (!name.endsWith(".war")) {
+			return false;
+		}
 
+		if (!_hasResources(artifact)) {
 			return true;
 		}
 
-		return false;
+		return _portalIsReady.get();
 	}
 
 	@Override
@@ -60,30 +67,34 @@ public class WarArtifactUrlTransformer implements FileInstaller {
 	public void uninstall(File file) {
 	}
 
-	private boolean _isClientExtensionZip(File artifact) {
+	private boolean _hasResources(File artifact) {
 		try (ZipFile zipFile = new ZipFile(artifact)) {
-			Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+			if ((zipFile.getEntry("WEB-INF/classes/resources-importer/") !=
+					null) ||
+				(zipFile.getEntry("WEB-INF/classes/templates-importer/") !=
+					null)) {
 
-			while (enumeration.hasMoreElements()) {
-				ZipEntry zipEntry = enumeration.nextElement();
-
-				String name = zipEntry.getName();
-
-				if (Objects.equals(
-						name, "WEB-INF/liferay-plugin-package.properties") ||
-					(name.endsWith(".client-extension-config.json") &&
-					 (name.indexOf("/") == -1))) {
-
-					return true;
-				}
+				return true;
 			}
 
-			return false;
+			ZipEntry zipEntry = zipFile.getEntry(
+				"WEB-INF/liferay-plugin-package.properties");
+
+			if (zipEntry == null) {
+				return false;
+			}
+
+			try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
+				Properties properties = new Properties();
+
+				properties.load(inputStream);
+
+				return Validator.isNotNull(
+					properties.getProperty("resources-importer-external-dir"));
+			}
 		}
 		catch (IOException ioException) {
-			_log.error(
-				"Unable to check if " + artifact + " is a client extension",
-				ioException);
+			_log.error("Unable to check resources in " + artifact, ioException);
 		}
 
 		return false;
@@ -91,5 +102,7 @@ public class WarArtifactUrlTransformer implements FileInstaller {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		WarArtifactUrlTransformer.class);
+
+	private final AtomicBoolean _portalIsReady;
 
 }

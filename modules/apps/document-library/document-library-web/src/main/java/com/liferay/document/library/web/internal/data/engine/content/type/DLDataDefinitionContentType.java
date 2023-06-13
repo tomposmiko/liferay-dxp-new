@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alicia García
  */
 @Component(
-	property = "content.type=document-library",
+	immediate = true, property = "content.type=document-library",
 	service = DataDefinitionContentType.class
 )
 public class DLDataDefinitionContentType implements DataDefinitionContentType {

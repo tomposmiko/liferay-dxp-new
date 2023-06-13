@@ -32,7 +32,7 @@ export default function useThunk<R extends React.Reducer<any, any>>([
 	// Use a ref to ensure our `dispatch` is stable across renders, just
 	// like the React-provided `dispatch` that we're wrapping.
 
-	const thunkDispatchRef = useRef((action: any) => {
+	const thunkDispatch = useRef((action: any) => {
 		if (isMounted()) {
 			if (typeof action === 'function') {
 				return action((payload: any) => {
@@ -47,5 +47,5 @@ export default function useThunk<R extends React.Reducer<any, any>>([
 		}
 	});
 
-	return [state, thunkDispatchRef.current];
+	return [state, thunkDispatch.current];
 }

@@ -17,7 +17,6 @@ package com.liferay.portal.search.tuning.rankings.web.internal.index.creation.ac
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.uuid.PortalUUID;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.tuning.rankings.web.internal.background.task.RankingIndexCreationBackgroundTaskExecutor;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.importer.SingleIndexToMultipleIndexImporter;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -27,7 +26,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Wade Cao
@@ -41,6 +42,8 @@ public class RankingIndexCreationBundleActivatorTest {
 
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+
 		_rankingIndexCreationBundleActivator =
 			new RankingIndexCreationBundleActivator();
 
@@ -53,9 +56,6 @@ public class RankingIndexCreationBundleActivatorTest {
 			_rankingIndexCreationBundleActivator,
 			"_rankingIndexRenameBackgroundTaskExecutor",
 			_rankingIndexRenameBackgroundTaskExecutor);
-		ReflectionTestUtil.setFieldValue(
-			_rankingIndexCreationBundleActivator, "_searchEngineInformation",
-			_searchEngineInformation);
 		ReflectionTestUtil.setFieldValue(
 			_rankingIndexCreationBundleActivator,
 			"_singleIndexToMultipleIndexImporter",
@@ -77,7 +77,7 @@ public class RankingIndexCreationBundleActivatorTest {
 			_backgroundTaskManager, Mockito.times(0)
 		).addBackgroundTask(
 			Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(),
-			Mockito.anyString(), Mockito.anyMap(), Mockito.any()
+			Mockito.anyString(), Mockito.anyMap(), Mockito.anyObject()
 		);
 	}
 
@@ -96,7 +96,7 @@ public class RankingIndexCreationBundleActivatorTest {
 			_backgroundTaskManager, Mockito.times(1)
 		).addBackgroundTask(
 			Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(),
-			Mockito.anyString(), Mockito.anyMap(), Mockito.any()
+			Mockito.anyString(), Mockito.anyMap(), Mockito.anyObject()
 		);
 	}
 
@@ -108,18 +108,21 @@ public class RankingIndexCreationBundleActivatorTest {
 		).needImport();
 	}
 
-	private final BackgroundTaskManager _backgroundTaskManager = Mockito.mock(
-		BackgroundTaskManager.class);
-	private final PortalUUID _portalUUID = Mockito.mock(PortalUUID.class);
+	@Mock
+	private BackgroundTaskManager _backgroundTaskManager;
+
+	@Mock
+	private PortalUUID _portalUUID;
+
 	private RankingIndexCreationBundleActivator
 		_rankingIndexCreationBundleActivator;
-	private final RankingIndexCreationBackgroundTaskExecutor
-		_rankingIndexRenameBackgroundTaskExecutor = Mockito.mock(
-			RankingIndexCreationBackgroundTaskExecutor.class);
-	private final SearchEngineInformation _searchEngineInformation =
-		Mockito.mock(SearchEngineInformation.class);
-	private final SingleIndexToMultipleIndexImporter
-		_singleIndexToMultipleIndexImporter = Mockito.mock(
-			SingleIndexToMultipleIndexImporter.class);
+
+	@Mock
+	private RankingIndexCreationBackgroundTaskExecutor
+		_rankingIndexRenameBackgroundTaskExecutor;
+
+	@Mock
+	private SingleIndexToMultipleIndexImporter
+		_singleIndexToMultipleIndexImporter;
 
 }

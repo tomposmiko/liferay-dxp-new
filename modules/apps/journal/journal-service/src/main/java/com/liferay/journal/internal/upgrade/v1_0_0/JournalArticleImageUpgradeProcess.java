@@ -30,16 +30,7 @@ import java.sql.ResultSet;
  */
 public class JournalArticleImageUpgradeProcess extends UpgradeProcess {
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_deleteOrphanJournalArticleImages();
-
-		_updateJournalArticleImagesInstanceId();
-
-		_updateJournalArticleImagesName();
-	}
-
-	private void _deleteOrphanJournalArticleImages() throws Exception {
+	protected void deleteOrphanJournalArticleImages() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement = connection.prepareStatement(
 				StringBundler.concat(
@@ -51,7 +42,16 @@ public class JournalArticleImageUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateJournalArticleImagesInstanceId() throws Exception {
+	@Override
+	protected void doUpgrade() throws Exception {
+		deleteOrphanJournalArticleImages();
+
+		updateJournalArticleImagesInstanceId();
+
+		updateJournalArticleImagesName();
+	}
+
+	protected void updateJournalArticleImagesInstanceId() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select articleId, elName from JournalArticleImage where " +
@@ -61,9 +61,9 @@ public class JournalArticleImageUpgradeProcess extends UpgradeProcess {
 
 			try (PreparedStatement preparedStatement2 =
 					AutoBatchPreparedStatementUtil.autoBatch(
-						connection,
-						"update JournalArticleImage set elInstanceId = ? " +
-							"where articleId = ? and elName = ?")) {
+						connection.prepareStatement(
+							"update JournalArticleImage set elInstanceId = ? " +
+								"where articleId = ? and elName = ?"))) {
 
 				while (resultSet.next()) {
 					String articleId = resultSet.getString(1);
@@ -81,7 +81,7 @@ public class JournalArticleImageUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateJournalArticleImagesName() throws Exception {
+	protected void updateJournalArticleImagesName() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select articleImageId, elName from JournalArticleImage");
@@ -89,9 +89,9 @@ public class JournalArticleImageUpgradeProcess extends UpgradeProcess {
 
 			try (PreparedStatement preparedStatement2 =
 					AutoBatchPreparedStatementUtil.autoBatch(
-						connection,
-						"update JournalArticleImage set elName = ? where " +
-							"articleImageId = ?")) {
+						connection.prepareStatement(
+							"update JournalArticleImage set elName = ? where " +
+								"articleImageId = ?"))) {
 
 				while (resultSet.next()) {
 					String elName = resultSet.getString(2);

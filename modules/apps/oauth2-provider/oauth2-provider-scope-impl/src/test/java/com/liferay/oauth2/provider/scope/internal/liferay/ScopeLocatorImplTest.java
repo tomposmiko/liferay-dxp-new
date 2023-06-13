@@ -18,17 +18,15 @@ import com.liferay.oauth2.provider.scope.internal.configuration.ScopeLocatorConf
 import com.liferay.oauth2.provider.scope.internal.liferay.ScopeLocatorImpl.ScopeLocatorConfigurationProvider;
 import com.liferay.oauth2.provider.scope.internal.spi.scope.matcher.StrictScopeMatcherFactory;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
+import com.liferay.oauth2.provider.scope.liferay.ScopedServiceTrackerMap;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandler;
 import com.liferay.oauth2.provider.scope.spi.prefix.handler.PrefixHandlerFactory;
 import com.liferay.oauth2.provider.scope.spi.scope.finder.ScopeFinder;
 import com.liferay.oauth2.provider.scope.spi.scope.mapper.ScopeMapper;
 import com.liferay.oauth2.provider.scope.spi.scope.matcher.ScopeMatcherFactory;
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
-import com.liferay.osgi.service.tracker.collections.map.ScopedServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PropsImpl;
 
 import java.lang.reflect.Field;
@@ -38,29 +36,30 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hamcrest.CoreMatchers;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 import org.osgi.framework.ServiceReference;
 
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 /**
  * @author Stian Sigvartsen
  */
-public class ScopeLocatorImplTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+@RunWith(PowerMockRunner.class)
+public class ScopeLocatorImplTest extends PowerMockito {
 
 	@BeforeClass
 	public static void setUpClass() {
@@ -358,13 +357,18 @@ public class ScopeLocatorImplTest {
 	private Set<String> _getScopes(
 		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes) {
 
-		Set<String> scopes = new HashSet<>();
+		Stream<LiferayOAuth2Scope> stream = liferayOAuth2Scopes.stream();
 
-		for (LiferayOAuth2Scope liferayOAuth2Scope : liferayOAuth2Scopes) {
-			scopes.add(liferayOAuth2Scope.getScope());
-		}
+		return stream.flatMap(
+			liferayOAuth2Scope -> {
+				Set<String> singletonSet = Collections.singleton(
+					liferayOAuth2Scope.getScope());
 
-		return scopes;
+				return singletonSet.stream();
+			}
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
 	private void _set(Object object, String fieldName, Object value) {
@@ -473,7 +477,7 @@ public class ScopeLocatorImplTest {
 					ServiceReference<?> serviceReference = Mockito.mock(
 						ServiceReference.class);
 
-					Mockito.when(
+					when(
 						scopeFinderByNameServiceTrackerMap.getService(
 							applicationName)
 					).thenReturn(
@@ -481,7 +485,7 @@ public class ScopeLocatorImplTest {
 							serviceReference, service)
 					);
 
-					Mockito.when(
+					when(
 						scopeFindersScopedServiceTrackerMap.getService(
 							companyId, applicationName)
 					).thenReturn(
@@ -548,15 +552,14 @@ public class ScopeLocatorImplTest {
 				scopeMatcherFactoriesServiceTrackerMap = Mockito.mock(
 					ServiceTrackerMap.class);
 
-			ReflectionTestUtil.setFieldValue(
-				_scopeLocatorImpl, "_defaultScopeMatcherFactory",
+			_scopeLocatorImpl.setDefaultScopeMatcherFactory(
 				defaultScopeMatcherFactory);
 
 			_scopeLocatorImpl.setScopeMatcherFactoriesServiceTrackerMap(
 				scopeMatcherFactoriesServiceTrackerMap);
 
 			configurator.configure(
-				(companyId, service) -> Mockito.when(
+				(companyId, service) -> when(
 					scopeMatcherFactoriesServiceTrackerMap.getService(companyId)
 				).thenReturn(
 					service
@@ -578,15 +581,15 @@ public class ScopeLocatorImplTest {
 				new TestScopedServiceTrackerMap<>(defaultService);
 
 			Answer<T> answer = invocation -> {
-				long companyId = invocation.getArgument(0, Long.class);
-				String key = invocation.getArgument(1, String.class);
+				long companyId = invocation.getArgumentAt(0, Long.class);
+				String key = invocation.getArgumentAt(1, String.class);
 
 				return testScopedServiceTrackerMap.getService(companyId, key);
 			};
 
-			Mockito.when(
+			when(
 				scopedServiceTrackerMap.getService(
-					Mockito.anyLong(), Mockito.anyString())
+					Matchers.anyLong(), Matchers.anyString())
 			).thenAnswer(
 				answer
 			);

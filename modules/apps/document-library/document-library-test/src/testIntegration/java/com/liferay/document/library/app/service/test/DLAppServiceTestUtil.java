@@ -21,7 +21,6 @@ import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.test.util.BaseDLAppTestCase;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
-import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
@@ -85,8 +84,8 @@ public class DLAppServiceTestUtil {
 		return DLAppServiceUtil.addFileEntry(
 			externalReferenceCode, groupId, folderId, fileName,
 			ContentTypes.TEXT_PLAIN, title, StringPool.BLANK, StringPool.BLANK,
-			StringPool.BLANK, BaseDLAppTestCase.CONTENT.getBytes(),
-			expirationDate, reviewDate, serviceContext);
+			BaseDLAppTestCase.CONTENT.getBytes(), expirationDate, reviewDate,
+			serviceContext);
 	}
 
 	protected static ConfigurationTemporarySwapper
@@ -108,10 +107,8 @@ public class DLAppServiceTestUtil {
 
 		final AtomicInteger counter = new AtomicInteger();
 
-		Destination destination = MessageBusUtil.getDestination(
-			DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR);
-
-		destination.register(
+		MessageBusUtil.registerMessageListener(
+			DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR,
 			new MessageListener() {
 
 				@Override
@@ -206,7 +203,7 @@ public class DLAppServiceTestUtil {
 
 		return DLAppServiceUtil.updateFileEntry(
 			fileEntryId, fileName, ContentTypes.TEXT_PLAIN, fileName,
-			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+			StringPool.BLANK, StringPool.BLANK,
 			DLVersionNumberIncrease.fromMajorVersion(majorVersion),
 			TestDataConstants.TEST_BYTE_ARRAY, expirationDate, reviewDate,
 			ServiceContextTestUtil.getServiceContext(groupId));

@@ -131,8 +131,6 @@ public class KaleoTaskFormInstancePersistenceTest {
 
 		newKaleoTaskFormInstance.setMvccVersion(RandomTestUtil.nextLong());
 
-		newKaleoTaskFormInstance.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newKaleoTaskFormInstance.setGroupId(RandomTestUtil.nextLong());
 
 		newKaleoTaskFormInstance.setCompanyId(RandomTestUtil.nextLong());
@@ -182,9 +180,6 @@ public class KaleoTaskFormInstancePersistenceTest {
 		Assert.assertEquals(
 			existingKaleoTaskFormInstance.getMvccVersion(),
 			newKaleoTaskFormInstance.getMvccVersion());
-		Assert.assertEquals(
-			existingKaleoTaskFormInstance.getCtCollectionId(),
-			newKaleoTaskFormInstance.getCtCollectionId());
 		Assert.assertEquals(
 			existingKaleoTaskFormInstance.getKaleoTaskFormInstanceId(),
 			newKaleoTaskFormInstance.getKaleoTaskFormInstanceId());
@@ -313,9 +308,9 @@ public class KaleoTaskFormInstancePersistenceTest {
 
 	protected OrderByComparator<KaleoTaskFormInstance> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"KaleoTaskFormInstance", "mvccVersion", true, "ctCollectionId",
-			true, "kaleoTaskFormInstanceId", true, "groupId", true, "companyId",
-			true, "userId", true, "userName", true, "createDate", true,
+			"KaleoTaskFormInstance", "mvccVersion", true,
+			"kaleoTaskFormInstanceId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "kaleoDefinitionId", true,
 			"kaleoDefinitionVersionId", true, "kaleoInstanceId", true,
 			"kaleoTaskId", true, "kaleoTaskInstanceTokenId", true,
@@ -632,8 +627,6 @@ public class KaleoTaskFormInstancePersistenceTest {
 		KaleoTaskFormInstance kaleoTaskFormInstance = _persistence.create(pk);
 
 		kaleoTaskFormInstance.setMvccVersion(RandomTestUtil.nextLong());
-
-		kaleoTaskFormInstance.setCtCollectionId(RandomTestUtil.nextLong());
 
 		kaleoTaskFormInstance.setGroupId(RandomTestUtil.nextLong());
 

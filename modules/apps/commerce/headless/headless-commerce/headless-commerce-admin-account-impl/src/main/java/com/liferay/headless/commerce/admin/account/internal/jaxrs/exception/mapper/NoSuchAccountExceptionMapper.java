@@ -14,7 +14,7 @@
 
 package com.liferay.headless.commerce.admin.account.internal.jaxrs.exception.mapper;
 
-import com.liferay.account.exception.NoSuchEntryException;
+import com.liferay.commerce.account.exception.NoSuchAccountException;
 import com.liferay.headless.commerce.core.exception.mapper.BaseExceptionMapper;
 
 import javax.ws.rs.core.Response;
@@ -27,16 +27,17 @@ import org.osgi.service.component.annotations.Component;
  * @author Andrea Sbarra
  */
 @Component(
+	enabled = false,
 	property = {
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Account)",
 		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Account.NoSuchAccountExceptionMapper"
+		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Account.NoSuchAccountException"
 	},
 	service = ExceptionMapper.class
 )
 @Provider
 public class NoSuchAccountExceptionMapper
-	extends BaseExceptionMapper<NoSuchEntryException> {
+	extends BaseExceptionMapper<NoSuchAccountException> {
 
 	@Override
 	public String getErrorDescription() {
@@ -45,7 +46,7 @@ public class NoSuchAccountExceptionMapper
 
 	@Override
 	public Response.Status getStatus() {
-		return Response.Status.NOT_FOUND;
+		return Response.Status.BAD_REQUEST;
 	}
 
 }

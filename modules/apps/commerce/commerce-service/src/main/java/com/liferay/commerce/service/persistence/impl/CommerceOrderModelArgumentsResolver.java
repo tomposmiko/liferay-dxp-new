@@ -25,21 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CommerceOrder.
  *
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.model.impl.CommerceOrderImpl",
-		"table.name=CommerceOrder"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommerceOrderModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

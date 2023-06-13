@@ -40,8 +40,6 @@ public interface SearchHit {
 
 	public float getScore();
 
-	public Object[] getSortValues();
-
 	public Map<String, Object> getSourcesMap();
 
 	public long getVersion();

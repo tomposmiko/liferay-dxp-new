@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class AccountEntryUserRelModelListener
 	extends BaseModelListener<AccountEntryUserRel> {
 
@@ -50,7 +50,7 @@ public class AccountEntryUserRelModelListener
 	public void onAfterCreate(AccountEntryUserRel accountEntryUserRel)
 		throws ModelListenerException {
 
-		_updateDefaultAccountEntry(accountEntryUserRel);
+		_updateDefaultAccountEntry(accountEntryUserRel.getAccountUserId());
 
 		_reindexAccountEntry(accountEntryUserRel.getAccountEntryId());
 		_reindexUser(accountEntryUserRel.getAccountUserId());
@@ -75,7 +75,7 @@ public class AccountEntryUserRelModelListener
 				new long[] {accountEntry.getAccountEntryGroupId()});
 		}
 
-		_updateDefaultAccountEntry(accountEntryUserRel);
+		_updateDefaultAccountEntry(accountEntryUserRel.getAccountUserId());
 
 		_reindexAccountEntry(accountEntryUserRel.getAccountEntryId());
 		_reindexUser(accountEntryUserRel.getAccountUserId());
@@ -111,7 +111,7 @@ public class AccountEntryUserRelModelListener
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 	}
 
@@ -139,24 +139,31 @@ public class AccountEntryUserRelModelListener
 		}
 	}
 
-	private void _updateDefaultAccountEntry(
-			AccountEntryUserRel accountEntryUserRel)
+	private void _updateDefaultAccountEntry(long accountUserId)
 		throws ModelListenerException {
 
 		List<AccountEntryUserRel> accountEntryUserRels =
 			_accountEntryUserRelLocalService.
-				getAccountEntryUserRelsByAccountUserId(
-					accountEntryUserRel.getAccountUserId());
+				getAccountEntryUserRelsByAccountUserId(accountUserId);
 
-		if (accountEntryUserRels.size() > 1) {
-			for (AccountEntryUserRel curAccountEntryUserRel :
+		if (ListUtil.isEmpty(accountEntryUserRels)) {
+			try {
+				_accountEntryUserRelLocalService.addAccountEntryUserRel(
+					AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT, accountUserId);
+			}
+			catch (PortalException portalException) {
+				throw new ModelListenerException(portalException);
+			}
+		}
+		else if (accountEntryUserRels.size() > 1) {
+			for (AccountEntryUserRel accountEntryUserRel :
 					accountEntryUserRels) {
 
-				if (curAccountEntryUserRel.getAccountEntryId() ==
+				if (accountEntryUserRel.getAccountEntryId() ==
 						AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT) {
 
 					_accountEntryUserRelLocalService.deleteAccountEntryUserRel(
-						curAccountEntryUserRel);
+						accountEntryUserRel);
 				}
 			}
 		}

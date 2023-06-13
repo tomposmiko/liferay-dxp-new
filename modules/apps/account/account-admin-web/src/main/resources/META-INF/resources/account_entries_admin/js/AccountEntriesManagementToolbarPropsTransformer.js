@@ -12,11 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	postForm,
-} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
 
 const updateAccountEntries = (portletNamespace, url) => {
 	const form = document.getElementById(`${portletNamespace}fm`);
@@ -24,7 +20,7 @@ const updateAccountEntries = (portletNamespace, url) => {
 	if (form) {
 		postForm(form, {
 			data: {
-				accountEntryIds: getCheckedCheckboxes(
+				accountEntryIds: Liferay.Util.listCheckedExcept(
 					form,
 					`${portletNamespace}allRowIds`
 				),
@@ -42,31 +38,31 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 		);
 	};
 
-	const deactivateAccountEntries = (itemData) =>
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-deactivate-this'
-			),
-			onConfirm: (isConfirmed) =>
-				isConfirmed &&
-				updateAccountEntries(
-					portletNamespace,
-					itemData?.deactivateAccountEntriesURL
-				),
-		});
+	const deactivateAccountEntries = (itemData) => {
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-deactivate-this')
+			)
+		) {
+			updateAccountEntries(
+				portletNamespace,
+				itemData?.deactivateAccountEntriesURL
+			);
+		}
+	};
 
-	const deleteAccountEntries = (itemData) =>
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) =>
-				isConfirmed &&
-				updateAccountEntries(
-					portletNamespace,
-					itemData?.deleteAccountEntriesURL
-				),
-		});
+	const deleteAccountEntries = (itemData) => {
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			updateAccountEntries(
+				portletNamespace,
+				itemData?.deleteAccountEntriesURL
+			);
+		}
+	};
 
 	return {
 		...otherProps,

@@ -12,53 +12,14 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	openModal,
-	openSelectionModal,
-	postForm,
-	sub,
-} from 'frontend-js-web';
-
-function openSelectAccountUsersModal(
-	accountEntryName,
-	assignAccountUsersURL,
-	selectAccountUsersURL,
-	portletNamespace
-) {
-	openSelectionModal({
-		buttonAddLabel: Liferay.Language.get('assign'),
-		containerProps: {
-			className: '',
-		},
-		iframeBodyCssClass: '',
-		multiple: true,
-		onSelect: (selectedItems) => {
-			if (!selectedItems?.length) {
-				return;
-			}
-
-			const form = document.getElementById(`${portletNamespace}fm`);
-
-			if (form) {
-				const values = selectedItems.map((item) => item.value);
-
-				postForm(form, {
-					data: {
-						accountUserIds: values.join(','),
-					},
-					url: assignAccountUsersURL,
-				});
-			}
-		},
-		title: sub(Liferay.Language.get('assign-users-to-x'), accountEntryName),
-		url: selectAccountUsersURL,
-	});
-}
+import {openSelectionModal, postForm} from 'frontend-js-web';
 
 export default function propsTransformer({
-	additionalProps: {accountEntryName},
+	additionalProps: {
+		accountEntryName,
+		assignAccountUsersURL,
+		selectAccountUsersURL,
+	},
 	portletNamespace,
 	...otherProps
 }) {
@@ -70,84 +31,61 @@ export default function propsTransformer({
 			const action = data?.action;
 
 			if (action === 'removeUsers') {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-remove-the-selected-users'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							const form = document.getElementById(
-								`${portletNamespace}fm`
-							);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-remove-the-selected-users'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}fm`
+					);
 
-							if (form) {
-								postForm(form, {
-									data: {
-										accountUserIds: getCheckedCheckboxes(
-											form,
-											`${portletNamespace}allRowIds`
-										),
-									},
-									url: data?.removeUsersURL,
-								});
-							}
-						}
-					},
-				});
+					if (form) {
+						postForm(form, {
+							data: {
+								accountUserIds: Liferay.Util.listCheckedExcept(
+									form,
+									`${portletNamespace}allRowIds`
+								),
+							},
+							url: data?.removeUsersURL,
+						});
+					}
+				}
 			}
 		},
-		onCreateButtonClick: (event, {item}) => {
-			const data = item.data;
+		onCreateButtonClick: () => {
+			openSelectionModal({
+				buttonAddLabel: Liferay.Language.get('assign'),
+				multiple: true,
+				onSelect: (selectedItems) => {
+					if (!selectedItems?.length) {
+						return;
+					}
 
-			if (data?.action === 'selectAccountUsers') {
-				openSelectAccountUsersModal(
-					accountEntryName,
-					data?.assignAccountUsersURL,
-					data?.selectAccountUsersURL,
-					portletNamespace
-				);
-			}
-		},
-		onCreationMenuItemClick: (event, {item}) => {
-			const data = item?.data;
+					const form = document.getElementById(
+						`${portletNamespace}fm`
+					);
 
-			const action = data?.action;
+					if (form) {
+						const values = selectedItems.map((item) => item.value);
 
-			if (action === 'inviteAccountUsers') {
-				openModal({
-					buttons: [
-						{
-							displayType: 'secondary',
-							label: Liferay.Language.get('cancel'),
-							type: 'cancel',
-						},
-						{
-							formId: `${portletNamespace}inviteUserForm`,
-							label: Liferay.Language.get('invite'),
-							type: 'submit',
-						},
-					],
-					containerProps: {
-						className: 'modal-height-xl',
-					},
-					id: `${portletNamespace}inviteUsersDialog`,
-					iframeBodyCssClass: '',
-					size: 'lg',
-					title: sub(
-						Liferay.Language.get('invite-users-to-x'),
-						accountEntryName
-					),
-					url: data?.requestInvitationsURL,
-				});
-			}
-			else if (action === 'selectAccountUsers') {
-				openSelectAccountUsersModal(
-					accountEntryName,
-					data?.assignAccountUsersURL,
-					data?.selectAccountUsersURL,
-					portletNamespace
-				);
-			}
+						postForm(form, {
+							data: {
+								accountUserIds: values.join(','),
+							},
+							url: assignAccountUsersURL,
+						});
+					}
+				},
+				title: Liferay.Util.sub(
+					Liferay.Language.get('assign-users-to-x'),
+					accountEntryName
+				),
+				url: selectAccountUsersURL,
+			});
 		},
 	};
 }

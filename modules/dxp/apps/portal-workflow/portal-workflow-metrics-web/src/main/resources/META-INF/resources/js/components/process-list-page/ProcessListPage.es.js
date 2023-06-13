@@ -9,7 +9,7 @@
  * distribution rights of the Software.
  */
 
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React, {useMemo} from 'react';
 
 import HeaderKebab from '../../shared/components/header/HeaderKebab.es';
@@ -24,9 +24,9 @@ import Body from './ProcessListPageBody.es';
 const Header = ({page, pageSize, search, sort, totalCount}) => {
 	return (
 		<>
-			<ManagementToolbar.Container className="mb-0">
+			<ClayManagementToolbar className="mb-0">
 				<SearchField disabled={!search && totalCount === 0} />
-			</ManagementToolbar.Container>
+			</ClayManagementToolbar>
 
 			{search && (
 				<ResultsBar>
@@ -70,9 +70,7 @@ function ProcessListPage({history, query, routeParams}) {
 		}
 
 		return [new Promise(() => {})];
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [page, pageSize, search, sort]);
+	}, [fetchData, page, pageSize, sort]);
 
 	return (
 		<PromisesResolver promises={promises}>
@@ -84,10 +82,9 @@ function ProcessListPage({history, query, routeParams}) {
 					},
 				]}
 			/>
-
 			<ProcessListPage.Header
 				search={search}
-				totalCount={data?.totalCount}
+				totalCount={data.totalCount}
 				{...routeParams}
 			/>
 

@@ -1,8 +1,12 @@
-.data-set {
-	&-stacked .management-bar-wrapper {
+.data-set-display {
+	&-stacked .data-set-display-management-bar-wrapper {
 		border: none !important;
 		border-radius: 8px;
 		overflow: hidden;
+	}
+
+	.data-set-display-management-bar-wrapper .form-control {
+		border-width: 1px;
 	}
 
 	.dnd-table {
@@ -76,10 +80,6 @@
 			margin-top: -6px;
 			width: 25px;
 		}
-	}
-
-	.management-bar-wrapper .form-control {
-		border-width: 1px;
 	}
 
 	.table-style-fluid,

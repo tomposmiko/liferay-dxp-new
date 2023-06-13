@@ -117,8 +117,4 @@ public interface CompanyInfoModel
 	@Override
 	public CompanyInfo cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

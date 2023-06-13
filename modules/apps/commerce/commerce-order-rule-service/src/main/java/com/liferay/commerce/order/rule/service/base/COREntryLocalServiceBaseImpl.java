@@ -18,13 +18,7 @@ import com.liferay.commerce.order.rule.model.COREntry;
 import com.liferay.commerce.order.rule.service.COREntryLocalService;
 import com.liferay.commerce.order.rule.service.COREntryLocalServiceUtil;
 import com.liferay.commerce.order.rule.service.persistence.COREntryPersistence;
-import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
-import com.liferay.exportimport.kernel.lar.ManifestSummary;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
-import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
-import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.commerce.order.rule.service.persistence.COREntryRelPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -32,21 +26,13 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
-import com.liferay.portal.kernel.dao.orm.Property;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -57,7 +43,6 @@ import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
@@ -260,34 +245,47 @@ public abstract class COREntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the cor entry with the matching UUID and company.
+	 * Returns the cor entry with the matching external reference code and company.
 	 *
-	 * @param uuid the cor entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cor entry's external reference code
 	 * @return the matching cor entry, or <code>null</code> if a matching cor entry could not be found
 	 */
 	@Override
-	public COREntry fetchCOREntryByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		return corEntryPersistence.fetchByUuid_C_First(uuid, companyId, null);
-	}
-
-	@Override
 	public COREntry fetchCOREntryByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
-		return corEntryPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
+		return corEntryPersistence.fetchByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCOREntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public COREntry fetchCOREntryByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return fetchCOREntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the cor entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cor entry's external reference code
+	 * @return the matching cor entry
+	 * @throws PortalException if a matching cor entry could not be found
+	 */
 	@Override
 	public COREntry getCOREntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return corEntryPersistence.findByERC_C(
-			externalReferenceCode, companyId);
+		return corEntryPersistence.findByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -343,107 +341,6 @@ public abstract class COREntryLocalServiceBaseImpl
 		actionableDynamicQuery.setPrimaryKeyPropertyName("COREntryId");
 	}
 
-	@Override
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		final PortletDataContext portletDataContext) {
-
-		final ExportActionableDynamicQuery exportActionableDynamicQuery =
-			new ExportActionableDynamicQuery() {
-
-				@Override
-				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary =
-						portletDataContext.getManifestSummary();
-
-					StagedModelType stagedModelType = getStagedModelType();
-
-					long modelAdditionCount = super.performCount();
-
-					manifestSummary.addModelAdditionCount(
-						stagedModelType, modelAdditionCount);
-
-					long modelDeletionCount =
-						ExportImportHelperUtil.getModelDeletionCount(
-							portletDataContext, stagedModelType);
-
-					manifestSummary.addModelDeletionCount(
-						stagedModelType, modelDeletionCount);
-
-					return modelAdditionCount;
-				}
-
-			};
-
-		initActionableDynamicQuery(exportActionableDynamicQuery);
-
-		exportActionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
-
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					Criterion modifiedDateCriterion =
-						portletDataContext.getDateRangeCriteria("modifiedDate");
-
-					Criterion statusDateCriterion =
-						portletDataContext.getDateRangeCriteria("statusDate");
-
-					if ((modifiedDateCriterion != null) &&
-						(statusDateCriterion != null)) {
-
-						Disjunction disjunction =
-							RestrictionsFactoryUtil.disjunction();
-
-						disjunction.add(modifiedDateCriterion);
-						disjunction.add(statusDateCriterion);
-
-						dynamicQuery.add(disjunction);
-					}
-
-					Property workflowStatusProperty =
-						PropertyFactoryUtil.forName("status");
-
-					if (portletDataContext.isInitialPublication()) {
-						dynamicQuery.add(
-							workflowStatusProperty.ne(
-								WorkflowConstants.STATUS_IN_TRASH));
-					}
-					else {
-						StagedModelDataHandler<?> stagedModelDataHandler =
-							StagedModelDataHandlerRegistryUtil.
-								getStagedModelDataHandler(
-									COREntry.class.getName());
-
-						dynamicQuery.add(
-							workflowStatusProperty.in(
-								stagedModelDataHandler.
-									getExportableStatuses()));
-					}
-				}
-
-			});
-
-		exportActionableDynamicQuery.setCompanyId(
-			portletDataContext.getCompanyId());
-
-		exportActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<COREntry>() {
-
-				@Override
-				public void performAction(COREntry corEntry)
-					throws PortalException {
-
-					StagedModelDataHandlerUtil.exportStagedModel(
-						portletDataContext, corEntry);
-				}
-
-			});
-		exportActionableDynamicQuery.setStagedModelType(
-			new StagedModelType(
-				PortalUtil.getClassNameId(COREntry.class.getName())));
-
-		return exportActionableDynamicQuery;
-	}
-
 	/**
 	 * @throws PortalException
 	 */
@@ -461,11 +358,6 @@ public abstract class COREntryLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement COREntryLocalServiceImpl#deleteCOREntry(COREntry) to avoid orphaned data");
-		}
-
 		return corEntryLocalService.deleteCOREntry((COREntry)persistedModel);
 	}
 
@@ -482,21 +374,6 @@ public abstract class COREntryLocalServiceBaseImpl
 		throws PortalException {
 
 		return corEntryPersistence.findByPrimaryKey(primaryKeyObj);
-	}
-
-	/**
-	 * Returns the cor entry with the matching UUID and company.
-	 *
-	 * @param uuid the cor entry's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching cor entry
-	 * @throws PortalException if a matching cor entry could not be found
-	 */
-	@Override
-	public COREntry getCOREntryByUuidAndCompanyId(String uuid, long companyId)
-		throws PortalException {
-
-		return corEntryPersistence.findByUuid_C_First(uuid, companyId, null);
 	}
 
 	/**
@@ -625,10 +502,22 @@ public abstract class COREntryLocalServiceBaseImpl
 	protected COREntryPersistence corEntryPersistence;
 
 	@Reference
+	protected COREntryRelPersistence corEntryRelPersistence;
+
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		COREntryLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

@@ -45,12 +45,12 @@ public class WikiPageResourceTest extends BaseWikiPageResourceTestCase {
 		serviceContext.setScopeGroupId(testGroup.getGroupId());
 
 		_wikiNode = WikiNodeLocalServiceUtil.addNode(
-			UserLocalServiceUtil.getGuestUserId(testGroup.getCompanyId()),
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 
 		WikiNode parentWikiNode = WikiNodeLocalServiceUtil.addNode(
-			UserLocalServiceUtil.getGuestUserId(testGroup.getCompanyId()),
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 
@@ -169,7 +169,7 @@ public class WikiPageResourceTest extends BaseWikiPageResourceTestCase {
 	}
 
 	@Override
-	protected WikiPage testPutWikiPagePermissionsPage_addWikiPage()
+	protected WikiPage testPutWikiPagePermission_addWikiPage()
 		throws Exception {
 
 		return _addWikiPage(testGetWikiNodeWikiPagesPage_getWikiNodeId());

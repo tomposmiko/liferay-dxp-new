@@ -14,22 +14,23 @@
 
 package com.liferay.fragment.web.internal.display.context;
 
-import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.web.internal.util.FragmentPortletUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalInstances;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -68,9 +69,8 @@ public class FragmentCollectionsDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, FragmentPortletKeys.FRAGMENT,
-			"fragment-collections-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -87,13 +87,23 @@ public class FragmentCollectionsDisplayContext {
 		SearchContainer<FragmentCollection> searchContainer =
 			new SearchContainer(
 				_renderRequest, _getPortletURL(), null,
-				"there-are-no-fragment-sets");
+				"there-are-no-collections");
+
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
+
+		OrderByComparator<FragmentCollection> orderByComparator =
+			FragmentPortletUtil.getFragmentCollectionOrderByComparator(
+				_getOrderByCol(), getOrderByType());
 
 		searchContainer.setOrderByCol(_getOrderByCol());
-		searchContainer.setOrderByComparator(
-			FragmentPortletUtil.getFragmentCollectionOrderByComparator(
-				_getOrderByCol(), getOrderByType()));
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
+
+		List<FragmentCollection> fragmentCollections = null;
+		int fragmentCollectionsCount = 0;
 
 		long[] groupIds = {themeDisplay.getScopeGroupId()};
 
@@ -112,29 +122,29 @@ public class FragmentCollectionsDisplayContext {
 			groupIds = ArrayUtil.append(groupIds, CompanyConstants.SYSTEM);
 		}
 
-		long[] allGroupIds = groupIds;
-
 		if (_isSearch()) {
-			searchContainer.setResultsAndTotal(
-				() -> FragmentCollectionServiceUtil.getFragmentCollections(
-					allGroupIds, _getKeywords(), searchContainer.getStart(),
-					searchContainer.getEnd(),
-					searchContainer.getOrderByComparator()),
+			fragmentCollections =
+				FragmentCollectionServiceUtil.getFragmentCollections(
+					groupIds, _getKeywords(), searchContainer.getStart(),
+					searchContainer.getEnd(), orderByComparator);
+
+			fragmentCollectionsCount =
 				FragmentCollectionServiceUtil.getFragmentCollectionsCount(
-					allGroupIds, _getKeywords()));
+					groupIds, _getKeywords());
 		}
 		else {
-			searchContainer.setResultsAndTotal(
-				() -> FragmentCollectionServiceUtil.getFragmentCollections(
-					allGroupIds, searchContainer.getStart(),
-					searchContainer.getEnd(),
-					searchContainer.getOrderByComparator()),
+			fragmentCollections =
+				FragmentCollectionServiceUtil.getFragmentCollections(
+					groupIds, searchContainer.getStart(),
+					searchContainer.getEnd(), orderByComparator);
+
+			fragmentCollectionsCount =
 				FragmentCollectionServiceUtil.getFragmentCollectionsCount(
-					allGroupIds));
+					groupIds);
 		}
 
-		searchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(_renderResponse));
+		searchContainer.setTotal(fragmentCollectionsCount);
+		searchContainer.setResults(fragmentCollections);
 
 		_searchContainer = searchContainer;
 
@@ -156,9 +166,8 @@ public class FragmentCollectionsDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, FragmentPortletKeys.FRAGMENT,
-			"fragment-collections-order-by-col", "create-date");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}

@@ -138,7 +138,8 @@ public class SpringPostProcessor
 						}
 					}
 					catch (ClassNotFoundException classNotFoundException) {
-						_log.error(classNotFoundException);
+						_log.error(
+							classNotFoundException, classNotFoundException);
 					}
 				}
 			}

@@ -11,9 +11,7 @@ html#{$cadmin-selector} {
 		#wrapper,
 		.cadmin.control-menu-container {
 			@include media-breakpoint-up(sm, $cadmin-grid-breakpoints) {
-				@media (prefers-reduced-motion: no-preference) {
-					@include transition(padding 0.5s ease);
-				}
+				@include transition(padding 0.5s ease);
 			}
 		}
 	}
@@ -61,10 +59,6 @@ html#{$cadmin-selector} {
 				}
 			}
 
-			.loading-animation {
-				color: $cadmin-white;
-			}
-
 			.panel-header {
 				background-color: $product-menu-body-bg;
 			}
@@ -104,7 +98,7 @@ html#{$cadmin-selector} {
 		}
 
 		.product-menu {
-			a:not(.page-type-selector *),
+			a:not(.layout-tree),
 			button.list-group-heading.navigation-link {
 				color: $product-menu-nav-link-color;
 				outline: 0;
@@ -432,25 +426,6 @@ html#{$cadmin-selector} {
 				&.panel-heading {
 					border-bottom-width: 0;
 				}
-
-				.panel-header-link,
-				.panel-toggler {
-					display: block;
-					margin: -12px -20px;
-					padding: 12px 20px;
-					text-decoration: none;
-
-					&:focus {
-						box-shadow: none;
-
-						&::before {
-							bottom: 8px;
-							left: 8px;
-							right: 8px;
-							top: 8px;
-						}
-					}
-				}
 			}
 
 			.panel-header-link:focus {
@@ -484,7 +459,7 @@ html#{$cadmin-selector} {
 				&.collapsible-icon {
 					position: absolute;
 					right: 46px;
-					top: 11px;
+					top: 9px;
 				}
 
 				z-index: 1;

@@ -15,11 +15,11 @@
 AUI.add(
 	'liferay-calendar-date-picker-sanitizer',
 	(A) => {
-		const AArray = A.Array;
+		var AArray = A.Array;
 
-		const DateMath = A.DataType.DateMath;
+		var DateMath = A.DataType.DateMath;
 
-		const DatePickerSanitizer = A.Component.create({
+		var DatePickerSanitizer = A.Component.create({
 			ATTRS: {
 				datePickers: {},
 
@@ -38,17 +38,17 @@ AUI.add(
 				_onDatePickerSelectionChange: function _onDatePickerSelectionChange(
 					event
 				) {
-					const instance = this;
+					var instance = this;
 
-					const date = event.newSelection[0];
+					var date = event.newSelection[0];
 
-					const datePicker = event.currentTarget;
+					var datePicker = event.currentTarget;
 
-					const defaultDate = instance.get('defaultDate');
+					var defaultDate = instance.get('defaultDate');
 
-					const maximumDate = instance.get('maximumDate');
+					var maximumDate = instance.get('maximumDate');
 
-					const minimumDate = instance.get('minimumDate');
+					var minimumDate = instance.get('minimumDate');
 
 					if (
 						date &&
@@ -63,9 +63,9 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const datePickers = instance.get('datePickers');
+					var datePickers = instance.get('datePickers');
 
 					instance.eventHandlers = A.map(datePickers, (item) => {
 						return item.on(
@@ -79,7 +79,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					instance.unlink();
 
@@ -87,7 +87,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.eventHandlers = [];
 
@@ -95,7 +95,7 @@ AUI.add(
 				},
 
 				unlink() {
-					const instance = this;
+					var instance = this;
 
 					AArray.invoke(instance.eventHandlers, 'detach');
 				},

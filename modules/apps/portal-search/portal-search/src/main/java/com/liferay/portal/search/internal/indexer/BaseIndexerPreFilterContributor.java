@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.PreFilterContributor;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.search.internal.indexer.helper.PreFilterContributorHelper;
 
 import java.util.Map;
 
@@ -28,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author André de Oliveira
  */
-@Component(service = PreFilterContributor.class)
+@Component(immediate = true, service = PreFilterContributor.class)
 public class BaseIndexerPreFilterContributor implements PreFilterContributor {
 
 	@Override

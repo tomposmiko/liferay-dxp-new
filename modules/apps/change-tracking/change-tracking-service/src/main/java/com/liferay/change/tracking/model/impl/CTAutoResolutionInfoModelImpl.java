@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -224,108 +225,118 @@ public class CTAutoResolutionInfoModelImpl
 	public Map<String, Function<CTAutoResolutionInfo, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CTAutoResolutionInfo, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CTAutoResolutionInfo>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CTAutoResolutionInfo, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTAutoResolutionInfo.class.getClassLoader(),
+			CTAutoResolutionInfo.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<CTAutoResolutionInfo, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<CTAutoResolutionInfo, Object>>();
+		try {
+			Constructor<CTAutoResolutionInfo> constructor =
+				(Constructor<CTAutoResolutionInfo>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CTAutoResolutionInfo::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctAutoResolutionInfoId",
-				CTAutoResolutionInfo::getCtAutoResolutionInfoId);
-			attributeGetterFunctions.put(
-				"companyId", CTAutoResolutionInfo::getCompanyId);
-			attributeGetterFunctions.put(
-				"createDate", CTAutoResolutionInfo::getCreateDate);
-			attributeGetterFunctions.put(
-				"ctCollectionId", CTAutoResolutionInfo::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"modelClassNameId", CTAutoResolutionInfo::getModelClassNameId);
-			attributeGetterFunctions.put(
-				"sourceModelClassPK",
-				CTAutoResolutionInfo::getSourceModelClassPK);
-			attributeGetterFunctions.put(
-				"targetModelClassPK",
-				CTAutoResolutionInfo::getTargetModelClassPK);
-			attributeGetterFunctions.put(
-				"conflictIdentifier",
-				CTAutoResolutionInfo::getConflictIdentifier);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<CTAutoResolutionInfo, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CTAutoResolutionInfo, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<CTAutoResolutionInfo, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<CTAutoResolutionInfo, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<CTAutoResolutionInfo, Object>>();
+		Map<String, BiConsumer<CTAutoResolutionInfo, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<CTAutoResolutionInfo, ?>>();
 
-		static {
-			Map<String, BiConsumer<CTAutoResolutionInfo, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<CTAutoResolutionInfo, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", CTAutoResolutionInfo::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CTAutoResolutionInfo, Long>)
+				CTAutoResolutionInfo::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctAutoResolutionInfoId",
+			CTAutoResolutionInfo::getCtAutoResolutionInfoId);
+		attributeSetterBiConsumers.put(
+			"ctAutoResolutionInfoId",
+			(BiConsumer<CTAutoResolutionInfo, Long>)
+				CTAutoResolutionInfo::setCtAutoResolutionInfoId);
+		attributeGetterFunctions.put(
+			"companyId", CTAutoResolutionInfo::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CTAutoResolutionInfo, Long>)
+				CTAutoResolutionInfo::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", CTAutoResolutionInfo::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CTAutoResolutionInfo, Date>)
+				CTAutoResolutionInfo::setCreateDate);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTAutoResolutionInfo::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<CTAutoResolutionInfo, Long>)
+				CTAutoResolutionInfo::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"modelClassNameId", CTAutoResolutionInfo::getModelClassNameId);
+		attributeSetterBiConsumers.put(
+			"modelClassNameId",
+			(BiConsumer<CTAutoResolutionInfo, Long>)
+				CTAutoResolutionInfo::setModelClassNameId);
+		attributeGetterFunctions.put(
+			"sourceModelClassPK", CTAutoResolutionInfo::getSourceModelClassPK);
+		attributeSetterBiConsumers.put(
+			"sourceModelClassPK",
+			(BiConsumer<CTAutoResolutionInfo, Long>)
+				CTAutoResolutionInfo::setSourceModelClassPK);
+		attributeGetterFunctions.put(
+			"targetModelClassPK", CTAutoResolutionInfo::getTargetModelClassPK);
+		attributeSetterBiConsumers.put(
+			"targetModelClassPK",
+			(BiConsumer<CTAutoResolutionInfo, Long>)
+				CTAutoResolutionInfo::setTargetModelClassPK);
+		attributeGetterFunctions.put(
+			"conflictIdentifier", CTAutoResolutionInfo::getConflictIdentifier);
+		attributeSetterBiConsumers.put(
+			"conflictIdentifier",
+			(BiConsumer<CTAutoResolutionInfo, String>)
+				CTAutoResolutionInfo::setConflictIdentifier);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CTAutoResolutionInfo, Long>)
-					CTAutoResolutionInfo::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctAutoResolutionInfoId",
-				(BiConsumer<CTAutoResolutionInfo, Long>)
-					CTAutoResolutionInfo::setCtAutoResolutionInfoId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CTAutoResolutionInfo, Long>)
-					CTAutoResolutionInfo::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CTAutoResolutionInfo, Date>)
-					CTAutoResolutionInfo::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<CTAutoResolutionInfo, Long>)
-					CTAutoResolutionInfo::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"modelClassNameId",
-				(BiConsumer<CTAutoResolutionInfo, Long>)
-					CTAutoResolutionInfo::setModelClassNameId);
-			attributeSetterBiConsumers.put(
-				"sourceModelClassPK",
-				(BiConsumer<CTAutoResolutionInfo, Long>)
-					CTAutoResolutionInfo::setSourceModelClassPK);
-			attributeSetterBiConsumers.put(
-				"targetModelClassPK",
-				(BiConsumer<CTAutoResolutionInfo, Long>)
-					CTAutoResolutionInfo::setTargetModelClassPK);
-			attributeSetterBiConsumers.put(
-				"conflictIdentifier",
-				(BiConsumer<CTAutoResolutionInfo, String>)
-					CTAutoResolutionInfo::setConflictIdentifier);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -753,12 +764,42 @@ public class CTAutoResolutionInfoModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CTAutoResolutionInfo, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CTAutoResolutionInfo, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CTAutoResolutionInfo, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((CTAutoResolutionInfo)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTAutoResolutionInfo>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTAutoResolutionInfo.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -774,8 +815,7 @@ public class CTAutoResolutionInfoModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<CTAutoResolutionInfo, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

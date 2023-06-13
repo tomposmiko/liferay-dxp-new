@@ -16,14 +16,14 @@ package com.liferay.analytics.message.sender.internal;
 
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
-import com.liferay.analytics.settings.configuration.AnalyticsConfigurationRegistry;
+import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -44,7 +44,7 @@ public abstract class BaseAnalyticsClientImpl {
 	}
 
 	protected boolean isEnabled(long companyId) {
-		if (!analyticsConfigurationRegistry.isActive()) {
+		if (!analyticsConfigurationTracker.isActive()) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Analytics configuration tracker not active");
 			}
@@ -53,7 +53,7 @@ public abstract class BaseAnalyticsClientImpl {
 		}
 
 		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationRegistry.getAnalyticsConfiguration(companyId);
+			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
 
 		if (analyticsConfiguration.liferayAnalyticsEndpointURL() == null) {
 			if (_log.isDebugEnabled()) {
@@ -66,15 +66,13 @@ public abstract class BaseAnalyticsClientImpl {
 		return true;
 	}
 
-	protected void processInvalidTokenMessage(
-		long companyId, boolean disconnected, String message) {
-
-		if (message.equals("INVALID_TOKEN") || disconnected) {
+	protected void processInvalidTokenMessage(long companyId, String message) {
+		if (message.equals("INVALID_TOKEN")) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
 						"Disconnecting data source for company ", companyId,
-						" because of an invalid token"));
+						". Cause: ", message));
 			}
 
 			_disconnectDataSource(companyId);
@@ -89,7 +87,7 @@ public abstract class BaseAnalyticsClientImpl {
 	}
 
 	@Reference
-	protected AnalyticsConfigurationRegistry analyticsConfigurationRegistry;
+	protected AnalyticsConfigurationTracker analyticsConfigurationTracker;
 
 	@Reference
 	protected AnalyticsMessageLocalService analyticsMessageLocalService;
@@ -104,28 +102,20 @@ public abstract class BaseAnalyticsClientImpl {
 	protected UserLocalService userLocalService;
 
 	private void _disconnectDataSource(long companyId) {
+		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+
+		unicodeProperties.setProperty("liferayAnalyticsConnectionType", "");
+		unicodeProperties.setProperty("liferayAnalyticsDataSourceId", "");
+		unicodeProperties.setProperty("liferayAnalyticsEndpointURL", "");
+		unicodeProperties.setProperty(
+			"liferayAnalyticsFaroBackendSecuritySignature", "");
+		unicodeProperties.setProperty("liferayAnalyticsFaroBackendURL", "");
+		unicodeProperties.setProperty("liferayAnalyticsGroupIds", "");
+		unicodeProperties.setProperty("liferayAnalyticsProjectId", "");
+		unicodeProperties.setProperty("liferayAnalyticsURL", "");
+
 		try {
-			companyLocalService.updatePreferences(
-				companyId,
-				UnicodePropertiesBuilder.create(
-					true
-				).put(
-					"liferayAnalyticsConnectionType", ""
-				).put(
-					"liferayAnalyticsDataSourceId", ""
-				).put(
-					"liferayAnalyticsEndpointURL", ""
-				).put(
-					"liferayAnalyticsFaroBackendSecuritySignature", ""
-				).put(
-					"liferayAnalyticsFaroBackendURL", ""
-				).put(
-					"liferayAnalyticsGroupIds", ""
-				).put(
-					"liferayAnalyticsProjectId", ""
-				).put(
-					"liferayAnalyticsURL", ""
-				).build());
+			companyLocalService.updatePreferences(companyId, unicodeProperties);
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {

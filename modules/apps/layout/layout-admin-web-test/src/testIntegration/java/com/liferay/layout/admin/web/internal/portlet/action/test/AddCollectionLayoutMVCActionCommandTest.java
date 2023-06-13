@@ -58,6 +58,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import java.util.List;
 
@@ -95,13 +96,13 @@ public class AddCollectionLayoutMVCActionCommandTest {
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 
-		_themeDisplay = _getThemeDisplay(_company, _group);
+		_themeDisplay = _getThemeDisplay();
 
 		_serviceContext = _getServiceContext(_group, _themeDisplay);
 
 		ServiceContextThreadLocal.pushServiceContext(_serviceContext);
 
-		_assetListEntry = _addAssetListEntry(_group, _serviceContext);
+		_assetListEntry = _addAssetListEntry(_serviceContext);
 	}
 
 	@After
@@ -111,7 +112,7 @@ public class AddCollectionLayoutMVCActionCommandTest {
 
 	@Test
 	public void testAddChildCollectionLayout() throws Exception {
-		Layout parentLayout = LayoutTestUtil.addTypePortletLayout(_group);
+		Layout parentLayout = LayoutTestUtil.addLayout(_group);
 
 		Layout layout = ReflectionTestUtil.invoke(
 			_mvcActionCommand, "_addCollectionLayout",
@@ -137,13 +138,12 @@ public class AddCollectionLayoutMVCActionCommandTest {
 			layout, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 	}
 
-	private AssetListEntry _addAssetListEntry(
-			Group group, ServiceContext serviceContext)
+	private AssetListEntry _addAssetListEntry(ServiceContext serviceContext)
 		throws Exception {
 
 		return _assetListEntryLocalService.addManualAssetListEntry(
-			TestPropsValues.getUserId(), group.getGroupId(), "Collection Title",
-			new long[0], serviceContext);
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			"Collection Title", new long[0], serviceContext);
 	}
 
 	private MockHttpServletRequest _getMockHttpServletRequest(
@@ -154,8 +154,6 @@ public class AddCollectionLayoutMVCActionCommandTest {
 
 		mockHttpServletRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, themeDisplay);
-
-		themeDisplay.setRequest(mockHttpServletRequest);
 
 		return mockHttpServletRequest;
 	}
@@ -214,28 +212,26 @@ public class AddCollectionLayoutMVCActionCommandTest {
 		return serviceContext;
 	}
 
-	private ThemeDisplay _getThemeDisplay(Company company, Group group)
-		throws Exception {
-
+	private ThemeDisplay _getThemeDisplay() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		themeDisplay.setCompany(company);
-		themeDisplay.setLayout(LayoutTestUtil.addTypePortletLayout(group));
+		themeDisplay.setCompany(_company);
+		themeDisplay.setLayout(LayoutTestUtil.addLayout(_group));
 
 		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
-			group.getGroupId(), false);
+			_group.getGroupId(), false);
 
 		themeDisplay.setLayoutSet(layoutSet);
 		themeDisplay.setLookAndFeel(
 			_themeLocalService.getTheme(
-				company.getCompanyId(), layoutSet.getThemeId()),
+				_company.getCompanyId(), layoutSet.getThemeId()),
 			null);
 
 		themeDisplay.setPermissionChecker(
 			PermissionThreadLocal.getPermissionChecker());
 		themeDisplay.setRealUser(TestPropsValues.getUser());
-		themeDisplay.setScopeGroupId(group.getGroupId());
-		themeDisplay.setSiteGroupId(group.getGroupId());
+		themeDisplay.setScopeGroupId(_group.getGroupId());
+		themeDisplay.setSiteGroupId(_group.getGroupId());
 		themeDisplay.setUser(TestPropsValues.getUser());
 
 		return themeDisplay;
@@ -270,7 +266,8 @@ public class AddCollectionLayoutMVCActionCommandTest {
 		Assert.assertNotNull(layoutPageTemplateStructure);
 
 		LayoutStructure layoutStructure = LayoutStructure.of(
-			layoutPageTemplateStructure.getDefaultSegmentsExperienceData());
+			layoutPageTemplateStructure.getData(
+				SegmentsExperienceConstants.ID_DEFAULT));
 
 		Assert.assertNotNull(layoutStructure.getMainItemId());
 

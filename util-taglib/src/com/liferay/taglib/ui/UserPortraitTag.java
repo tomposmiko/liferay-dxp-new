@@ -60,8 +60,8 @@ public class UserPortraitTag extends IncludeTag {
 			sb.append("\"><span class=\"inline-item\">");
 			sb.append("<svg class=\"lexicon-icon\">");
 			sb.append("<use href=\"");
-			sb.append(themeDisplay.getPathThemeSpritemap());
-			sb.append("#user\" /></svg>");
+			sb.append(themeDisplay.getPathThemeImages());
+			sb.append("/clay/icons.svg#user\" /></svg>");
 			sb.append("</span></span>");
 
 			return sb.toString();
@@ -142,8 +142,10 @@ public class UserPortraitTag extends IncludeTag {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		jspWriter.write(
-			getUserPortraitHTML(_cssClass, _size, getUser(), themeDisplay));
+		String userPortraitHTML = getUserPortraitHTML(
+			_cssClass, _size, getUser(), themeDisplay);
+
+		jspWriter.write(userPortraitHTML);
 
 		return EVAL_PAGE;
 	}
@@ -228,7 +230,7 @@ public class UserPortraitTag extends IncludeTag {
 			return user.getPortraitURL(themeDisplay);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}

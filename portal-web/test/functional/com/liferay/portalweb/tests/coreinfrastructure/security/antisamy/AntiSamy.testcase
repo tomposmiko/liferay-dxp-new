@@ -1,7 +1,6 @@
 @component-name = "portal-security"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "AntiSamy";
@@ -15,21 +14,20 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			WikiPage.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@description = "LPS-112581 TC-4: AntiSamy configuration XML should be configurable through the Portal."
-	@priority = 5
+	@description = "This is a use case for LPS-112581 and LPS-115803."
+	@priority = "5"
 	test AntiSamyConfigXMLShouldBeConfigurableInPortal {
 		property antisamy.enabled = "true";
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AntiSamy#AntiSamyConfigXMLShouldBeConfigurableInPortal";
 
 		task ("Verify that AntiSamy module has been started") {
@@ -37,7 +35,10 @@ definition {
 		}
 
 		task ("Edit the configuration file url of Knowledge Base Article") {
-			SystemSettings.openSystemSettingsAdmin();
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "System Settings");
 
 			SystemSettings.gotoConfiguration(
 				configurationCategory = "Security Tools",
@@ -60,11 +61,10 @@ definition {
 		}
 	}
 
-	@description = "LPS-112581 TC-3: Knowledge base specific AntiSamy rule should work and sanitize dynamic parameter from KB article."
-	@priority = 5
+	@description = "This is a use case for LPS-112581 and LPS-115803."
+	@priority = "5"
 	test ModelSpecificAntiSamyRulesShouldWorkForModel {
 		property antisamy.enabled = "true";
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AntiSamy#ModelSpecificAntiSamyRulesShouldWorkForModel";
 
 		task ("Verify that AntiSamy module has been started") {
@@ -72,7 +72,9 @@ definition {
 		}
 
 		task ("Add KB article with dynamic attribute and view it as guest") {
-			KBAdmin.openKBAdmin(siteURLKey = "guest");
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				portlet = "Knowledge Base");
 
 			KBArticle.addCP(
 				kbArticleAddViaSource = "true",
@@ -87,11 +89,12 @@ definition {
 		}
 
 		task ("Save KB article as Draft") {
-			KBAdmin.openKBAdmin(siteURLKey = "guest");
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				portlet = "Knowledge Base");
 
 			KBArticle.editCP(
 				kbArticleTitle = "Test AntiSamy",
-				kbArticleTitleEdit = "Test AntiSamy Edit",
 				saveAsDraft = "true");
 		}
 
@@ -100,20 +103,21 @@ definition {
 		}
 	}
 
-	@description = "LRQA-42763 TC-1: Javascript injected into Web Content Display page should be sanitized by AntiSamy."
-	@priority = 4
+	@description = "This is a use case for LRQA-42763."
+	@priority = "4"
 	test ScriptInWebContentDisplayPortletShouldBeSanitized {
 		task ("Add public widget page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Guest",
-				layoutName = "Web Content Display Page");
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+
+			SitePages.addPublicPage(pageName = "Web Content Display Page");
 		}
 
 		task ("Add Web Content Display portlet and insert JS as content") {
-			JSONLayout.addWidgetToPublicLayout(
-				groupName = "Guest",
-				layoutName = "Web Content Display Page",
-				widgetName = "Web Content Display");
+			Navigator.gotoPage(pageName = "Web Content Display Page");
+
+			Portlet.addPG(portletName = "Web Content Display");
 
 			var webContentContent = '''
 					<p id='demo'>FAIL</p>
@@ -123,34 +127,33 @@ definition {
 					</script>
 				''';
 
-			Navigator.gotoPage(pageName = "Web Content Display Page");
-
-			WebContentDisplayPortlet.add(
-				webContentContent = ${webContentContent},
+			WebContent.addPGViaWCD(
+				webContentContent = "${webContentContent}",
 				webContentTitle = "WC WebContent Title");
 		}
 
 		task ("Assert that script is sanitized so page content remains unchanged") {
-			WebContentDisplayPortlet.viewContent(
-				webContentContent = "p id='demo'>FAIL</p>",
-				webContentTitle = "WC WebContent Title");
+			WebContent.viewPGViaWCD(
+				webContentContent = "PASS",
+				webContentTitle = "Web Content Title");
 		}
 	}
 
-	@description = "LRQA-4988 TC-1: Javascript injected into Wiki portlet should be sanitized by AntiSamy."
-	@priority = 4
+	@description = "This is a use case for LRQA-4988."
+	@priority = "4"
 	test ScriptInWikiPortletShouldBeSanitized {
 		task ("Add public widget page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Guest",
-				layoutName = "AntiSamy Test Page");
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+
+			SitePages.addPublicPage(pageName = "AntiSamy Test Page");
 		}
 
 		task ("Add Wiki portlet and insert JS as content") {
-			JSONLayout.addWidgetToPublicLayout(
-				groupName = "Guest",
-				layoutName = "AntiSamy Test Page",
-				widgetName = "Wiki");
+			Navigator.gotoPage(pageName = "AntiSamy Test Page");
+
+			Portlet.addPG(portletName = "Wiki");
 
 			var wikiPageContent = '''
 					<p id='demo'>PASS</p>
@@ -160,11 +163,9 @@ definition {
 					</script>
 				''';
 
-			Navigator.gotoPage(pageName = "AntiSamy Test Page");
-
 			WikiPage.addFrontPagePG(
 				htmlSource = "true",
-				wikiPageContent = ${wikiPageContent});
+				wikiPageContent = "${wikiPageContent}");
 		}
 
 		task ("Assert that script is sanitized so page content remains unchanged") {

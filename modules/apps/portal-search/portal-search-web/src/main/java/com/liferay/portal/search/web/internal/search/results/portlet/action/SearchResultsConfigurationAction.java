@@ -16,7 +16,7 @@ package com.liferay.portal.search.web.internal.search.results.portlet.action;
 
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
-import com.liferay.portal.search.web.constants.SearchResultsPortletKeys;
+import com.liferay.portal.search.web.internal.search.results.constants.SearchResultsPortletKeys;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SearchResultsPortletKeys.SEARCH_RESULTS,
 	service = ConfigurationAction.class
 )

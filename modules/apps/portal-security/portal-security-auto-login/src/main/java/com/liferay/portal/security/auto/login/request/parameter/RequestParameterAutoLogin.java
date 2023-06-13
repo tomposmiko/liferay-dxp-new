@@ -37,7 +37,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.security.auto.login.internal.request.parameter.configuration.RequestParameterAutoLoginConfiguration",
-	property = "type=request.parameter", service = AutoLogin.class
+	immediate = true, property = "type=request.parameter",
+	service = AutoLogin.class
 )
 public class RequestParameterAutoLogin extends BaseAutoLogin {
 
@@ -66,6 +67,18 @@ public class RequestParameterAutoLogin extends BaseAutoLogin {
 		return requestParameterAutoLoginConfiguration.enabled();
 	}
 
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
+	}
+
 	private RequestParameterAutoLoginConfiguration
 		_getRequestParameterAutoLoginConfiguration(long companyId) {
 
@@ -91,10 +104,7 @@ public class RequestParameterAutoLogin extends BaseAutoLogin {
 	@Reference(target = "(&(private.auto.login=true)(type=request.parameter))")
 	private AutoLogin _autoLogin;
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	@Reference
 	private Portal _portal;
 
 }

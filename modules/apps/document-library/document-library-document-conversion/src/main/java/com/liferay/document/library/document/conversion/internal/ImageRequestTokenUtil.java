@@ -86,7 +86,7 @@ public class ImageRequestTokenUtil {
 
 	public static long getUserId(String tokenString) {
 		try {
-			JsonTokenParser jsonTokenParser = _getJsonTokenParser();
+			JsonTokenParser jsonTokenParser = getJsonTokenParser();
 
 			JsonToken jsonToken = jsonTokenParser.verifyAndDeserialize(
 				tokenString);
@@ -137,7 +137,7 @@ public class ImageRequestTokenUtil {
 		}
 	}
 
-	private static JsonTokenParser _getJsonTokenParser() throws Exception {
+	protected static JsonTokenParser getJsonTokenParser() throws Exception {
 		final Verifier verifier = new HmacSHA256Verifier(_SECRET);
 
 		VerifierProvider verifierProvider = new VerifierProvider() {

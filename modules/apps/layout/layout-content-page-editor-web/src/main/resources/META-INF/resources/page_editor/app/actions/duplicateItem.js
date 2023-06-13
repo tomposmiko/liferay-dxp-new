@@ -18,13 +18,11 @@ export default function duplicateItem({
 	addedFragmentEntryLinks = [],
 	itemId,
 	layoutData,
-	restrictedItemIds,
 }) {
 	return {
 		addedFragmentEntryLinks,
 		itemId,
 		layoutData,
-		restrictedItemIds,
 		type: DUPLICATE_ITEM,
 	};
 }

@@ -23,7 +23,6 @@ import aQute.bnd.osgi.FileResource;
 import aQute.bnd.osgi.Instruction;
 import aQute.bnd.osgi.Instructions;
 import aQute.bnd.osgi.Jar;
-import aQute.bnd.osgi.Packages;
 import aQute.bnd.osgi.Resource;
 import aQute.bnd.service.AnalyzerPlugin;
 import aQute.bnd.version.Version;
@@ -79,20 +78,12 @@ public class ServiceAnalyzerPlugin implements AnalyzerPlugin {
 				analyzer, "com.liferay.portal.spring.extender");
 		}
 
-		Packages referredPackages = analyzer.getReferred();
-
-		Attrs springExtenderServiceAttrs = referredPackages.getByFQN(
-			"com.liferay.portal.spring.extender.service");
-
-		if ((jar == null) && (springExtenderServiceAttrs == null)) {
+		if (jar == null) {
 			return false;
 		}
 
-		if (jar != null) {
-			processRequireCapability(
-				analyzer, Version.parseVersion(jar.getVersion()));
-		}
-
+		processRequireCapability(
+			analyzer, Version.parseVersion(jar.getVersion()));
 		processSpringContext(analyzer);
 		processSpringDependency(analyzer);
 

@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * @author Jürgen Kappler
@@ -83,7 +84,10 @@ public class DLFileEntryTypeRelatedInfoCollectionProvider
 		CollectionQuery collectionQuery) {
 
 		try {
-			Object relatedItem = collectionQuery.getRelatedItem();
+			Optional<Object> relatedItemOptional =
+				collectionQuery.getRelatedItemObjectOptional();
+
+			Object relatedItem = relatedItemOptional.orElse(null);
 
 			if (!(relatedItem instanceof AssetCategory)) {
 				return InfoPage.of(
@@ -113,7 +117,7 @@ public class DLFileEntryTypeRelatedInfoCollectionProvider
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 
 			return null;
@@ -149,11 +153,14 @@ public class DLFileEntryTypeRelatedInfoCollectionProvider
 			ServiceContext serviceContext =
 				ServiceContextThreadLocal.getServiceContext();
 
+			long[] currentAndAncestorSiteAndDepotGroupIds =
+				SiteConnectedGroupGroupProviderUtil.
+					getCurrentAndAncestorSiteAndDepotGroupIds(
+						serviceContext.getScopeGroupId(), true);
+
 			if ((_dlFileEntryType.getGroupId() == 0) ||
 				ArrayUtil.contains(
-					SiteConnectedGroupGroupProviderUtil.
-						getCurrentAndAncestorSiteAndDepotGroupIds(
-							serviceContext.getScopeGroupId(), true),
+					currentAndAncestorSiteAndDepotGroupIds,
 					_dlFileEntryType.getGroupId())) {
 
 				return true;
@@ -161,7 +168,7 @@ public class DLFileEntryTypeRelatedInfoCollectionProvider
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -201,12 +208,15 @@ public class DLFileEntryTypeRelatedInfoCollectionProvider
 
 		searchContext.setEntryClassNames(
 			new String[] {DLFileEntryConstants.getClassName()});
+
 		searchContext.setGroupIds(
 			new long[] {serviceContext.getScopeGroupId()});
 
-		Sort sort = collectionQuery.getSort();
+		Optional<Sort> sortOptional = collectionQuery.getSortOptional();
 
-		if (sort != null) {
+		if (sortOptional.isPresent()) {
+			Sort sort = sortOptional.get();
+
 			searchContext.setSorts(
 				new com.liferay.portal.kernel.search.Sort(
 					sort.getFieldName(),

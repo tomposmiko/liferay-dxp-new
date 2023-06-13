@@ -56,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Andrea Di Giorgi
  */
-@Component(service = AssetCategoriesImporter.class)
+@Component(enabled = false, service = AssetCategoriesImporter.class)
 public class AssetCategoriesImporter {
 
 	public List<AssetCategory> importAssetCategories(
@@ -213,8 +213,7 @@ public class AssetCategoriesImporter {
 				LocaleUtil.getSiteDefault(), title);
 
 			assetCategory = _assetCategoryLocalService.addCategory(
-				null, serviceContext.getUserId(),
-				serviceContext.getScopeGroupId(),
+				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 				AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, titleMap,
 				null, assetVocabularyId, new String[0], serviceContext);
 		}
@@ -309,7 +308,7 @@ public class AssetCategoriesImporter {
 			String urlTitle = _friendlyURLEntryLocalService.getUniqueUrlTitle(
 				companyGroup.getGroupId(),
 				_portal.getClassNameId(AssetCategory.class),
-				assetCategory.getCategoryId(), titleEntry.getValue(), null);
+				assetCategory.getCategoryId(), titleEntry.getValue());
 
 			urlTitleMap.put(
 				LocaleUtil.toLanguageId(titleEntry.getKey()), urlTitle);

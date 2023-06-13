@@ -46,7 +46,7 @@ const PARAGRAPHS = [
 	'text-paragraph-xxs',
 ];
 
-const SAMPLE_TEXT = 'The quick brown fox jumps over the lazy dog.';
+const SAMPLE_TEXT = 'The quick brown fox jumps over the lazy dog';
 
 const SMALL_CAPS = ['text-small-caps'];
 
@@ -59,7 +59,6 @@ const TypographyGuide = () => {
 			>
 				{FONT_FAMILIES.map((item) => (
 					<TokenItem
-						border={true}
 						className={item}
 						key={item}
 						label={item}
@@ -77,7 +76,6 @@ const TypographyGuide = () => {
 			>
 				{FONT_WEIGHTS.map((item) => (
 					<TokenItem
-						border={true}
 						className={item}
 						key={item}
 						label={item}
@@ -91,7 +89,6 @@ const TypographyGuide = () => {
 			<TokenGroup group="texts" title={Liferay.Language.get('displays')}>
 				{DISPLAYS.map((item) => (
 					<TokenItem
-						border={true}
 						className={item}
 						key={item}
 						label={item}
@@ -105,7 +102,6 @@ const TypographyGuide = () => {
 			<TokenGroup group="texts" title={Liferay.Language.get('headings')}>
 				{HEADINGS.map((item) => (
 					<TokenItem
-						border={true}
 						className={item}
 						key={item}
 						label={item}
@@ -122,7 +118,6 @@ const TypographyGuide = () => {
 			>
 				{PARAGRAPHS.map((item) => (
 					<TokenItem
-						border={true}
 						className={item}
 						key={item}
 						label={item}
@@ -139,7 +134,6 @@ const TypographyGuide = () => {
 			>
 				{SMALL_CAPS.map((item) => (
 					<TokenItem
-						border={true}
 						className={item}
 						key={item}
 						label={item}
@@ -153,7 +147,6 @@ const TypographyGuide = () => {
 			<TokenGroup group="texts" title={Liferay.Language.get('links')}>
 				{LINKS.map((item) => (
 					<TokenItem
-						border={true}
 						className={item}
 						key={item}
 						label={item}
@@ -162,12 +155,6 @@ const TypographyGuide = () => {
 						{SAMPLE_TEXT}
 					</TokenItem>
 				))}
-			</TokenGroup>
-
-			<TokenGroup group="texts" title={Liferay.Language.get('other')}>
-				<TokenItem border={true} label="mark, .mark" size="large">
-					The <mark>quick brown fox</mark> jumps over the lazy dog.
-				</TokenItem>
 			</TokenGroup>
 		</>
 	);

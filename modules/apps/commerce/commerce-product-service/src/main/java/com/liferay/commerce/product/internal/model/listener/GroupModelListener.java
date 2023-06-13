@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Andrea Sbarra
  */
-@Component(service = ModelListener.class)
+@Component(enabled = false, immediate = true, service = ModelListener.class)
 public class GroupModelListener extends BaseModelListener<Group> {
 
 	@Override
@@ -45,13 +45,13 @@ public class GroupModelListener extends BaseModelListener<Group> {
 					commerceChannel.getCommerceChannelId(),
 					GroupConstants.DEFAULT_PARENT_GROUP_ID,
 					commerceChannel.getName(), commerceChannel.getType(),
-					commerceChannel.getTypeSettingsUnicodeProperties(),
+					commerceChannel.getTypeSettingsProperties(),
 					commerceChannel.getCommerceCurrencyCode());
 			}
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 	}

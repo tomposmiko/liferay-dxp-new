@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -49,7 +48,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Generated("")
 @GraphQLName("DiscountChannel")
 @JsonFilter("Liferay.Vulcan")
-@Schema(requiredProperties = {"channelId"})
+@Schema(requiredProperties = {"channelId", "discountId"})
 @XmlRootElement(name = "DiscountChannel")
 public class DiscountChannel implements Serializable {
 
@@ -120,7 +119,7 @@ public class DiscountChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Channel channel;
 
-	@Schema(example = "PAB-34098-789-N")
+	@Schema
 	public String getChannelExternalReferenceCode() {
 		return channelExternalReferenceCode;
 	}
@@ -153,7 +152,7 @@ public class DiscountChannel implements Serializable {
 	protected String channelExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getChannelId() {
 		return channelId;
 	}
@@ -183,7 +182,7 @@ public class DiscountChannel implements Serializable {
 	protected Long channelId;
 
 	@DecimalMin("0")
-	@Schema(example = "30643")
+	@Schema
 	public Long getDiscountChannelId() {
 		return discountChannelId;
 	}
@@ -211,7 +210,7 @@ public class DiscountChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long discountChannelId;
 
-	@Schema(example = "DAB-34098-789-N")
+	@Schema
 	public String getDiscountExternalReferenceCode() {
 		return discountExternalReferenceCode;
 	}
@@ -244,7 +243,7 @@ public class DiscountChannel implements Serializable {
 	protected String discountExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30324")
+	@Schema
 	public Long getDiscountId() {
 		return discountId;
 	}
@@ -269,7 +268,8 @@ public class DiscountChannel implements Serializable {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotNull
 	protected Long discountId;
 
 	@Override
@@ -390,9 +390,9 @@ public class DiscountChannel implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -418,7 +418,7 @@ public class DiscountChannel implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -450,7 +450,7 @@ public class DiscountChannel implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -466,10 +466,5 @@ public class DiscountChannel implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

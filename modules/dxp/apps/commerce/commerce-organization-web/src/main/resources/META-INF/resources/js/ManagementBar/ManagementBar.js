@@ -10,7 +10,7 @@
  */
 
 import ClayButton from '@clayui/button';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React, {useContext} from 'react';
 
 import ChartContext from '../ChartContext';
@@ -19,9 +19,9 @@ function ManagementBar() {
 	const {chartInstanceRef} = useContext(ChartContext);
 
 	return (
-		<ManagementToolbar.Container>
-			<ManagementToolbar.ItemList>
-				<ManagementToolbar.Item>
+		<ClayManagementToolbar>
+			<ClayManagementToolbar.ItemList>
+				<ClayManagementToolbar.Item>
 					<ClayButton
 						displayType="secondary"
 						onClick={() =>
@@ -30,9 +30,9 @@ function ManagementBar() {
 					>
 						{Liferay.Language.get('collapse-all')}
 					</ClayButton>
-				</ManagementToolbar.Item>
-			</ManagementToolbar.ItemList>
-		</ManagementToolbar.Container>
+				</ClayManagementToolbar.Item>
+			</ClayManagementToolbar.ItemList>
+		</ClayManagementToolbar>
 	);
 }
 

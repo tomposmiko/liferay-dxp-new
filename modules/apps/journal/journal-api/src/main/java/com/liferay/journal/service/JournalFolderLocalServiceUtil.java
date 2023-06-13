@@ -45,14 +45,13 @@ public class JournalFolderLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFolderLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static JournalFolder addFolder(
-			String externalReferenceCode, long userId, long groupId,
-			long parentFolderId, String name, String description,
+			long userId, long groupId, long parentFolderId, String name,
+			String description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addFolder(
-			externalReferenceCode, userId, groupId, parentFolderId, name,
-			description, serviceContext);
+			userId, groupId, parentFolderId, name, description, serviceContext);
 	}
 
 	/**
@@ -265,13 +264,6 @@ public class JournalFolderLocalServiceUtil {
 		return getService().fetchJournalFolder(folderId);
 	}
 
-	public static JournalFolder fetchJournalFolderByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
-
-		return getService().fetchJournalFolderByExternalReferenceCode(
-			externalReferenceCode, groupId);
-	}
-
 	/**
 	 * Returns the journal folder matching the UUID and group.
 	 *
@@ -445,14 +437,6 @@ public class JournalFolderLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getJournalFolder(folderId);
-	}
-
-	public static JournalFolder getJournalFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		return getService().getJournalFolderByExternalReferenceCode(
-			externalReferenceCode, groupId);
 	}
 
 	/**

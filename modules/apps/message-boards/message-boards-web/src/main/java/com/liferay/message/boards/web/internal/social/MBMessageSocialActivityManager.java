@@ -17,9 +17,10 @@ package com.liferay.message.boards.web.internal.social;
 import com.liferay.message.boards.model.MBDiscussion;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBDiscussionLocalService;
+import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.social.BaseSocialActivityManager;
@@ -45,15 +46,10 @@ public class MBMessageSocialActivityManager
 
 	@Override
 	public void deleteActivities(MBMessage message) throws PortalException {
-		_deleteDiscussionSocialActivities(message.getClassName(), message);
+		deleteDiscussionSocialActivities(message.getClassName(), message);
 	}
 
-	@Override
-	protected SocialActivityLocalService getSocialActivityLocalService() {
-		return _socialActivityLocalService;
-	}
-
-	private void _deleteDiscussionSocialActivities(
+	protected void deleteDiscussionSocialActivities(
 			String className, MBMessage message)
 		throws PortalException {
 
@@ -76,7 +72,7 @@ public class MBMessageSocialActivityManager
 				continue;
 			}
 
-			JSONObject extraDataJSONObject = _jsonFactory.createJSONObject(
+			JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject(
 				socialActivity.getExtraData());
 
 			long extraDataMessageId = extraDataJSONObject.getLong("messageId");
@@ -88,14 +84,19 @@ public class MBMessageSocialActivityManager
 		}
 	}
 
+	@Override
+	protected SocialActivityLocalService getSocialActivityLocalService() {
+		return _socialActivityLocalService;
+	}
+
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private MBDiscussionLocalService _mbDiscussionLocalService;
 
 	@Reference
-	private MBDiscussionLocalService _mbDiscussionLocalService;
+	private MBMessageLocalService _mbMessageLocalService;
 
 	@Reference
 	private SocialActivityLocalService _socialActivityLocalService;

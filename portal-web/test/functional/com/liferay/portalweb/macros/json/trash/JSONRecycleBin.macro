@@ -20,19 +20,15 @@ definition {
 			var userPassword = "test";
 		}
 
-		var groupId = JSONGroupAPI._getGroupIdByName(
-			grandParentGroupName = ${grandParentGroupName},
-			groupName = ${groupName},
-			parentGroupName = ${parentGroupName},
-			site = ${site});
+		var groupId = JSONGroupAPI._getGroupIdByName(groupName = "${groupName}", site = "${site}", parentGroupName = "${parentGroupName}", grandParentGroupName = "${grandParentGroupName}");
 
 		var curl = '''
 			${portalURL}/api/jsonws/trash.trashentry/delete-entries \
-				-u ${userEmailAddress}:${userPassword} \
-				-d groupId=${groupId}
+			-u ${userEmailAddress}:${userPassword} \
+			-d groupId=${groupId}
 		''';
 
-		JSONCurlUtil.post(${curl});
+		JSONCurlUtil.post("${curl}");
 	}
 
 }

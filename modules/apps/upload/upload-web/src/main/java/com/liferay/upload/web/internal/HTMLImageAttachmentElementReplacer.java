@@ -52,6 +52,13 @@ public class HTMLImageAttachmentElementReplacer
 		return element.toString();
 	}
 
+	@Reference(unbind = "-")
+	protected void setPortletFileRepository(
+		PortletFileRepository portletFileRepository) {
+
+		_portletFileRepository = portletFileRepository;
+	}
+
 	private Element _toElement(String originalImgTag) {
 		Document document = Jsoup.parseBodyFragment(originalImgTag);
 
@@ -67,7 +74,6 @@ public class HTMLImageAttachmentElementReplacer
 		return bodyElement.child(0);
 	}
 
-	@Reference
 	private PortletFileRepository _portletFileRepository;
 
 }

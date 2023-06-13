@@ -108,21 +108,15 @@ if (layoutSetBranches.contains(layoutSetBranch)) {
 			'<portlet:namespace />' + layoutSetBranchId
 		);
 
-		if (layoutSetBranch) {
-			Liferay.Util.openConfirmModal({
-				message: layoutSetBranch.getAttribute(
-					'data-layoutSetBranchMessage'
-				),
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						Liferay.Util.postForm(document.<portlet:namespace />fm4, {
-							data: {
-								mergeLayoutSetBranchId: layoutSetBranch.getAttribute(
-									'data-layoutSetBranchId'
-								),
-							},
-						});
-					}
+		if (
+			layoutSetBranch &&
+			confirm(layoutSetBranch.getAttribute('data-layoutSetBranchMessage'))
+		) {
+			Liferay.Util.postForm(document.<portlet:namespace />fm4, {
+				data: {
+					mergeLayoutSetBranchId: layoutSetBranch.getAttribute(
+						'data-layoutSetBranchId'
+					),
 				},
 			});
 		}

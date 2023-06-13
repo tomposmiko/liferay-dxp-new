@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -78,19 +78,22 @@ public class SiteNavigationMenuItemURLTest {
 				TestPropsValues.getUserId(), _group.getGroupId(), "Menu",
 				SiteNavigationConstants.TYPE_DEFAULT, true, serviceContext);
 
+		UnicodeProperties typeSettingsUnicodeProperties =
+			new UnicodeProperties();
+
+		typeSettingsUnicodeProperties.setProperty(
+			"name", StringUtil.randomString());
+		typeSettingsUnicodeProperties.setProperty(
+			"url", "http://www.liferay.com");
+		typeSettingsUnicodeProperties.setProperty(
+			"useNewTab", Boolean.TRUE.toString());
+
 		SiteNavigationMenuItem siteNavigationMenuItem =
 			_siteNavigationMenuItemLocalService.addSiteNavigationMenuItem(
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				siteNavigationMenu.getSiteNavigationMenuId(), 0,
 				SiteNavigationMenuItemTypeConstants.URL,
-				UnicodePropertiesBuilder.put(
-					"name", StringUtil.randomString()
-				).put(
-					"url", "http://www.liferay.com"
-				).put(
-					"useNewTab", Boolean.TRUE.toString()
-				).buildString(),
-				serviceContext);
+				typeSettingsUnicodeProperties.toString(), serviceContext);
 
 		Assert.assertEquals(
 			1,
@@ -119,17 +122,20 @@ public class SiteNavigationMenuItemURLTest {
 				TestPropsValues.getUserId(), _group.getGroupId(), "Menu",
 				SiteNavigationConstants.TYPE_DEFAULT, true, serviceContext);
 
+		UnicodeProperties typeSettingsUnicodeProperties =
+			new UnicodeProperties();
+
+		typeSettingsUnicodeProperties.setProperty(
+			"name", StringUtil.randomString());
+		typeSettingsUnicodeProperties.setProperty(
+			"url", "http://www.liferay.com");
+
 		SiteNavigationMenuItem siteNavigationMenuItem =
 			_siteNavigationMenuItemLocalService.addSiteNavigationMenuItem(
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				siteNavigationMenu.getSiteNavigationMenuId(), 0,
 				SiteNavigationMenuItemTypeConstants.URL,
-				UnicodePropertiesBuilder.put(
-					"name", StringUtil.randomString()
-				).put(
-					"url", "http://www.liferay.com"
-				).buildString(),
-				serviceContext);
+				typeSettingsUnicodeProperties.toString(), serviceContext);
 
 		Assert.assertEquals(
 			1,

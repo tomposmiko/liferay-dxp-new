@@ -54,7 +54,7 @@ WorkflowDefinition workflowDefinition = (WorkflowDefinition)row.getObject();
 		<liferay-ui:icon
 			id='<%= "previewBeforeRevert" + String.valueOf(workflowDefinition.getVersion()) %>'
 			message="preview"
-			url="javascript:void(0);"
+			url="javascript:;"
 		/>
 
 		<liferay-ui:icon

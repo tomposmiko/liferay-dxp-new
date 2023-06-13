@@ -14,13 +14,13 @@
 
 package com.liferay.product.navigation.product.menu.web.internal.product.navigation.control.menu;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -45,6 +45,7 @@ import java.util.Objects;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
+import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +58,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.SITES,
 		"product.navigation.control.menu.entry.order:Integer=100"
@@ -82,92 +84,66 @@ public class ProductMenuProductNavigationControlMenuEntry
 			HttpServletResponse httpServletResponse)
 		throws IOException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		String productMenuState = SessionClicks.get(
-			httpServletRequest,
-			"com.liferay.product.navigation.product.menu.web_productMenuState",
-			"closed");
-
 		Map<String, String> values = HashMapBuilder.put(
-			"closeProductMenuTitle",
-			HtmlUtil.escape(
-				_language.get(httpServletRequest, "close-product-menu"))
-		).put(
-			"cssClass",
-			() -> {
-				if (Objects.equals(productMenuState, "open")) {
-					return "active";
-				}
-
-				return StringPool.BLANK;
-			}
-		).put(
-			"dataURL",
-			() -> {
-				PortletURL portletURL = PortletURLBuilder.create(
-					PortletURLFactoryUtil.create(
-						httpServletRequest,
-						ProductNavigationProductMenuPortletKeys.
-							PRODUCT_NAVIGATION_PRODUCT_MENU,
-						RenderRequest.RENDER_PHASE)
-				).setMVCPath(
-					"/portlet/product_menu.jsp"
-				).setRedirect(
-					themeDisplay.getURLCurrent()
-				).setParameter(
-					"selPpid",
-					() -> {
-						PortletDisplay portletDisplay =
-							themeDisplay.getPortletDisplay();
-
-						return portletDisplay.getId();
-					}
-				).setWindowState(
-					LiferayWindowState.EXCLUSIVE
-				).buildPortletURL();
-
-				return "data-url='" + portletURL + "'";
-			}
-		).put(
-			"isOpen",
-			() -> {
-				if (Objects.equals(productMenuState, "open")) {
-					return StringPool.TRUE;
-				}
-
-				return StringPool.FALSE;
-			}
-		).put(
-			"openProductMenuTitle",
-			HtmlUtil.escape(
-				_language.get(httpServletRequest, "open-product-menu"))
-		).put(
 			"portletNamespace",
 			_portal.getPortletNamespace(
 				ProductNavigationProductMenuPortletKeys.
 					PRODUCT_NAVIGATION_PRODUCT_MENU)
 		).put(
 			"title",
-			() -> {
-				if (Objects.equals(productMenuState, "open")) {
-					return HtmlUtil.escape(
-						_language.get(
-							httpServletRequest, "close-product-menu"));
-				}
-
-				return HtmlUtil.escape(
-					_language.get(httpServletRequest, "open-product-menu"));
-			}
+			HtmlUtil.escape(LanguageUtil.get(httpServletRequest, "menu"))
 		).build();
+
+		String productMenuState = SessionClicks.get(
+			httpServletRequest,
+			"com.liferay.product.navigation.product.menu.web_productMenuState",
+			"closed");
+
+		if (Objects.equals(productMenuState, "open")) {
+			values.put("cssClass", "active");
+			values.put("dataURL", StringPool.BLANK);
+		}
+		else {
+			values.put("cssClass", StringPool.BLANK);
+
+			PortletURL portletURL = PortletURLBuilder.create(
+				PortletURLFactoryUtil.create(
+					httpServletRequest,
+					ProductNavigationProductMenuPortletKeys.
+						PRODUCT_NAVIGATION_PRODUCT_MENU,
+					RenderRequest.RENDER_PHASE)
+			).setMVCPath(
+				"/portlet/product_menu.jsp"
+			).setParameter(
+				"selPpid",
+				() -> {
+					ThemeDisplay themeDisplay =
+						(ThemeDisplay)httpServletRequest.getAttribute(
+							WebKeys.THEME_DISPLAY);
+
+					PortletDisplay portletDisplay =
+						themeDisplay.getPortletDisplay();
+
+					return portletDisplay.getId();
+				}
+			).buildPortletURL();
+
+			try {
+				portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
+			}
+			catch (WindowStateException windowStateException) {
+				ReflectionUtil.throwException(windowStateException);
+			}
+
+			values.put("dataURL", "data-url='" + portletURL.toString() + "'");
+		}
 
 		try {
 			IconTag iconTag = new IconTag();
 
 			iconTag.setCssClass("icon-monospaced icon-product-menu-closed");
 			iconTag.setImage("product-menu-closed");
+			iconTag.setMarkupView("lexicon");
 
 			values.put(
 				"closedIcon",
@@ -175,6 +151,7 @@ public class ProductMenuProductNavigationControlMenuEntry
 
 			iconTag.setCssClass("icon-monospaced icon-product-menu-open");
 			iconTag.setImage("product-menu-open");
+			iconTag.setMarkupView("lexicon");
 
 			values.put(
 				"openIcon",
@@ -206,9 +183,6 @@ public class ProductMenuProductNavigationControlMenuEntry
 
 	private static final String _TMPL_CONTENT = StringUtil.read(
 		ProductMenuProductNavigationControlMenuEntry.class, "icon.tmpl");
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

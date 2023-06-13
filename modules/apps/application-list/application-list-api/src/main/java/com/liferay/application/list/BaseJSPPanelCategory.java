@@ -33,9 +33,10 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * To implement a JSP application category, this class should be extended and
  * {@link #getJspPath()} should be implemented, which returns a path for the
- * main JSP application category view in the current servlet context. {@link
- * #getServletContext()} should be implemented, which returns the appropriate
- * servlet context for JSP pages. If the servlet context is not set, {@link
+ * main JSP application category view in the current servlet context. The
+ * servlet context should also be set using {@link
+ * #setServletContext(ServletContext)}, which uses the appropriate servlet
+ * context for JSP pages. If the servlet context is not set, {@link
  * #include(HttpServletRequest, HttpServletResponse)} will throw a
  * <code>NullPointerException</code>.
  * </p>
@@ -77,7 +78,9 @@ public abstract class BaseJSPPanelCategory extends BasePanelCategory {
 			httpServletRequest, httpServletResponse, getHeaderJspPath());
 	}
 
-	protected abstract ServletContext getServletContext();
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
 
 	protected boolean includeJSP(
 			HttpServletRequest httpServletRequest,
@@ -88,10 +91,8 @@ public abstract class BaseJSPPanelCategory extends BasePanelCategory {
 			return false;
 		}
 
-		ServletContext servletContext = getServletContext();
-
 		RequestDispatcher requestDispatcher =
-			servletContext.getRequestDispatcher(jspPath);
+			_servletContext.getRequestDispatcher(jspPath);
 
 		try {
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
@@ -107,5 +108,7 @@ public abstract class BaseJSPPanelCategory extends BasePanelCategory {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseJSPPanelCategory.class);
+
+	private ServletContext _servletContext;
 
 }

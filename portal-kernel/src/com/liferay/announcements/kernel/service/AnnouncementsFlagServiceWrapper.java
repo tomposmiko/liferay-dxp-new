@@ -27,10 +27,6 @@ public class AnnouncementsFlagServiceWrapper
 	implements AnnouncementsFlagService,
 			   ServiceWrapper<AnnouncementsFlagService> {
 
-	public AnnouncementsFlagServiceWrapper() {
-		this(null);
-	}
-
 	public AnnouncementsFlagServiceWrapper(
 		AnnouncementsFlagService announcementsFlagService) {
 

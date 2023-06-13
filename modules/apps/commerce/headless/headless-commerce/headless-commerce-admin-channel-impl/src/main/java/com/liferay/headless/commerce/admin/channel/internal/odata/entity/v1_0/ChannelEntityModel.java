@@ -17,10 +17,12 @@ package com.liferay.headless.commerce.admin.channel.internal.odata.entity.v1_0;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.odata.entity.IdEntityField;
 import com.liferay.portal.odata.entity.StringEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Andrea Sbarra
@@ -28,11 +30,12 @@ import java.util.Map;
 public class ChannelEntityModel implements EntityModel {
 
 	public ChannelEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
-			new IdEntityField(
-				"siteGroupId", locale -> Field.SCOPE_GROUP_ID, String::valueOf),
+		_entityFieldsMap = Stream.of(
 			new StringEntityField(
-				"name", locale -> Field.getSortableFieldName("name")));
+				"name", locale -> Field.getSortableFieldName("name"))
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

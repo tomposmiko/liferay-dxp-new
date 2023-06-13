@@ -51,7 +51,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  * @author Michael C. Han
  */
-@Component(service = NotificationMessageGenerator.class)
+@Component(
+	immediate = true,
+	property = {
+		"template.language=freemarker", "template.language=soy",
+		"template.language=velocity"
+	},
+	service = NotificationMessageGenerator.class
+)
 public class TemplateNotificationMessageGenerator
 	implements NotificationMessageGenerator {
 
@@ -80,7 +87,7 @@ public class TemplateNotificationMessageGenerator
 				new StringTemplateResource(templateId, notificationTemplate),
 				false);
 
-			_populateContextVariables(template, executionContext);
+			populateContextVariables(template, executionContext);
 
 			if (_log.isDebugEnabled()) {
 				template.forEach(
@@ -102,11 +109,6 @@ public class TemplateNotificationMessageGenerator
 		}
 	}
 
-	@Override
-	public String[] getTemplateLanguages() {
-		return new String[] {"freemarker", "soy", "velocity"};
-	}
-
 	@Activate
 	protected void activate() {
 		_templateManagerNames.put(
@@ -115,7 +117,7 @@ public class TemplateNotificationMessageGenerator
 		_templateManagerNames.put("velocity", TemplateConstants.LANG_TYPE_VM);
 	}
 
-	private void _populateContextVariables(
+	protected void populateContextVariables(
 			Template template, ExecutionContext executionContext)
 		throws Exception {
 

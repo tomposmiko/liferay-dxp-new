@@ -74,7 +74,7 @@ if (selLayout != null) {
 
 		<c:if test="<%= layoutPrototype != null %>">
 			<div class="layout-type">
-				<p class="small text-secondary">
+				<p class="small text-muted">
 					<%= HtmlUtil.escape(layoutPrototype.getDescription(locale)) %>
 				</p>
 
@@ -85,12 +85,16 @@ if (selLayout != null) {
 	<c:otherwise>
 
 		<%
+		liferayPortletRequest.setAttribute(WebKeys.LAYOUT_DESCRIPTIONS, layoutsAdminDisplayContext.getLayoutDescriptions());
+
 		LayoutTypeController layoutTypeController = LayoutTypeControllerTracker.getLayoutTypeController(type);
+
+		ResourceBundle layoutTypeResourceBundle = ResourceBundleUtil.getBundle("content.Language", locale, layoutTypeController.getClass());
 		%>
 
 		<div class="layout-type">
-			<p class="small text-secondary">
-				<liferay-ui:message key='<%= "layout.types." + type + ".description" %>' />
+			<p class="small text-muted">
+				<%= LanguageUtil.get(request, layoutTypeResourceBundle, "layout.types." + type + ".description") %>
 			</p>
 
 			<%= layoutTypeController.includeEditContent(request, response, selLayout) %>

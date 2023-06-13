@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -45,8 +43,6 @@ public class CPDisplayLayoutWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("CPDisplayLayoutId", getCPDisplayLayoutId());
 		attributes.put("groupId", getGroupId());
@@ -57,8 +53,6 @@ public class CPDisplayLayoutWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
-		attributes.put(
-			"layoutPageTemplateEntryUuid", getLayoutPageTemplateEntryUuid());
 		attributes.put("layoutUuid", getLayoutUuid());
 
 		return attributes;
@@ -66,18 +60,6 @@ public class CPDisplayLayoutWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -136,13 +118,6 @@ public class CPDisplayLayoutWrapper
 
 		if (classPK != null) {
 			setClassPK(classPK);
-		}
-
-		String layoutPageTemplateEntryUuid = (String)attributes.get(
-			"layoutPageTemplateEntryUuid");
-
-		if (layoutPageTemplateEntryUuid != null) {
-			setLayoutPageTemplateEntryUuid(layoutPageTemplateEntryUuid);
 		}
 
 		String layoutUuid = (String)attributes.get("layoutUuid");
@@ -233,16 +208,6 @@ public class CPDisplayLayoutWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this cp display layout.
-	 *
-	 * @return the ct collection ID of this cp display layout
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the group ID of this cp display layout.
 	 *
 	 * @return the group ID of this cp display layout
@@ -250,16 +215,6 @@ public class CPDisplayLayoutWrapper
 	@Override
 	public long getGroupId() {
 		return model.getGroupId();
-	}
-
-	/**
-	 * Returns the layout page template entry uuid of this cp display layout.
-	 *
-	 * @return the layout page template entry uuid of this cp display layout
-	 */
-	@Override
-	public String getLayoutPageTemplateEntryUuid() {
-		return model.getLayoutPageTemplateEntryUuid();
 	}
 
 	/**
@@ -280,16 +235,6 @@ public class CPDisplayLayoutWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this cp display layout.
-	 *
-	 * @return the mvcc version of this cp display layout
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -403,16 +348,6 @@ public class CPDisplayLayoutWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this cp display layout.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp display layout
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the group ID of this cp display layout.
 	 *
 	 * @param groupId the group ID of this cp display layout
@@ -420,18 +355,6 @@ public class CPDisplayLayoutWrapper
 	@Override
 	public void setGroupId(long groupId) {
 		model.setGroupId(groupId);
-	}
-
-	/**
-	 * Sets the layout page template entry uuid of this cp display layout.
-	 *
-	 * @param layoutPageTemplateEntryUuid the layout page template entry uuid of this cp display layout
-	 */
-	@Override
-	public void setLayoutPageTemplateEntryUuid(
-		String layoutPageTemplateEntryUuid) {
-
-		model.setLayoutPageTemplateEntryUuid(layoutPageTemplateEntryUuid);
 	}
 
 	/**
@@ -452,16 +375,6 @@ public class CPDisplayLayoutWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
-	 * Sets the mvcc version of this cp display layout.
-	 *
-	 * @param mvccVersion the mvcc version of this cp display layout
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -512,25 +425,6 @@ public class CPDisplayLayoutWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CPDisplayLayout, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CPDisplayLayout, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

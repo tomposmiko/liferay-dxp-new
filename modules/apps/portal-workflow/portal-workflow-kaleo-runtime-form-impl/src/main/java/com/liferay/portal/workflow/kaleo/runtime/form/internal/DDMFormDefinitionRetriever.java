@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = FormDefinitionRetriever.class)
+@Component(immediate = true, service = FormDefinitionRetriever.class)
 public class DDMFormDefinitionRetriever implements FormDefinitionRetriever {
 
 	@Override

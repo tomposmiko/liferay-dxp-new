@@ -35,8 +35,6 @@ public class InvalidFolderException extends PortalException {
 
 	public static final int CANNOT_MOVE_INTO_ITSELF = 2;
 
-	public static final int INVALID_ROOT_FOLDER = 3;
-
 	public InvalidFolderException(int type, long folderId) {
 		_type = type;
 		_folderId = folderId;
@@ -58,7 +56,7 @@ public class InvalidFolderException extends PortalException {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 
 			return StringPool.BLANK;
@@ -71,9 +69,6 @@ public class InvalidFolderException extends PortalException {
 		}
 		else if (_type == CANNOT_MOVE_INTO_ITSELF) {
 			return "unable-to-move-folder-x-into-itself";
-		}
-		else if (_type == INVALID_ROOT_FOLDER) {
-			return "invalid-root-folder-x";
 		}
 
 		return null;

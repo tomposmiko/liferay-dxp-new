@@ -14,8 +14,8 @@
 
 declare const PROTOCOL = 'com.liferay.frontend.js.a11y.protocol';
 export declare type ChannelEvent<T, K> = {
-	kind: K;
 	payload: T;
+	kind: K;
 	protocol: typeof PROTOCOL;
 };
 export declare type Recv<T, S> = (payload: T, kind?: S) => void;

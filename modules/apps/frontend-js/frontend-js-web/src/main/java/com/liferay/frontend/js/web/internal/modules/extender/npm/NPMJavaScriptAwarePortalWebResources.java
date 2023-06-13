@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
+	immediate = true,
 	service = {
 		JavaScriptAwarePortalWebResources.class, PortalWebResources.class
 	}
@@ -71,9 +72,15 @@ public class NPMJavaScriptAwarePortalWebResources
 		_lastModified.set(bundle.getLastModified());
 	}
 
-	private final AtomicLong _lastModified = new AtomicLong();
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.frontend.js.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
 
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.frontend.js.web)")
+	private final AtomicLong _lastModified = new AtomicLong();
 	private ServletContext _servletContext;
 
 }

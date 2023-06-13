@@ -18,7 +18,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 
 import org.osgi.service.component.annotations.Component;
@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcelo Mello
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.mapping.model.DDMStructureLayout",
 	service = ModelDocumentContributor.class
 )
@@ -43,19 +44,19 @@ public class DDMStructureLayoutModelDocumentContributor
 			classNameLocalService.getClassNameId(DDMStructureLayout.class));
 		document.addLocalizedText(
 			Field.DESCRIPTION,
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				ddmStructureLayout.getDescriptionMap(),
 				ddmStructureLayout.getDefaultLanguageId(),
 				ddmStructureLayout.getGroupId()));
 		document.addLocalizedText(
 			Field.NAME,
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				ddmStructureLayout.getNameMap(),
 				ddmStructureLayout.getDefaultLanguageId(),
 				ddmStructureLayout.getGroupId()));
 		document.addLocalizedKeyword(
 			"localized_name",
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				ddmStructureLayout.getNameMap(),
 				ddmStructureLayout.getDefaultLanguageId(),
 				ddmStructureLayout.getGroupId()),
@@ -67,7 +68,8 @@ public class DDMStructureLayoutModelDocumentContributor
 	protected String[] getLanguageIds(
 		String defaultLanguageId, String content) {
 
-		String[] languageIds = _localization.getAvailableLanguageIds(content);
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
+			content);
 
 		if (languageIds.length == 0) {
 			languageIds = new String[] {defaultLanguageId};
@@ -78,8 +80,5 @@ public class DDMStructureLayoutModelDocumentContributor
 
 	@Reference
 	protected ClassNameLocalService classNameLocalService;
-
-	@Reference
-	private Localization _localization;
 
 }

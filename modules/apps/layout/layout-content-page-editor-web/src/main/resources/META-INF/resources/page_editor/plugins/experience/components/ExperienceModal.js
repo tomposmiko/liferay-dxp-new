@@ -130,7 +130,6 @@ const ExperienceModal = ({
 							title={errorMessage}
 						/>
 					)}
-
 					<ClayForm.Group className={nameGroupClassName}>
 						<label htmlFor={nameInputId}>
 							{Liferay.Language.get('name')}
@@ -161,7 +160,6 @@ const ExperienceModal = ({
 									className="mr-1"
 									symbol="exclamation-full"
 								/>
-
 								{Liferay.Language.get(
 									'an-experience-name-is-required'
 								)}
@@ -180,10 +178,9 @@ const ExperienceModal = ({
 								symbol="asterisk"
 							/>
 						</label>
-
 						<div className="d-flex">
 							<ClaySelect
-								disabled={!segments.length}
+								disabled={segments.length === 0}
 								id={segmentSelectId}
 								onChange={handleSegmentChange}
 								value={selectedSegmentId}
@@ -223,7 +220,6 @@ const ExperienceModal = ({
 					</ClayForm.Group>
 				</ClayForm>
 			</ClayModal.Body>
-
 			<ClayModal.Footer
 				last={
 					<ClayButton.Group spaced>

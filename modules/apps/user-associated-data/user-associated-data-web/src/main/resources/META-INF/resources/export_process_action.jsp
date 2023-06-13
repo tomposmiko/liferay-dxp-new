@@ -32,6 +32,10 @@ BackgroundTask backgroundTask = (BackgroundTask)row.getObject();
 		<%
 		FileEntry fileEntry = UADExportProcessUtil.getFileEntry(backgroundTask);
 
+		Map<String, Object> data = HashMapBuilder.<String, Object>put(
+			"senna-off", "true"
+		).build();
+
 		StringBundler sb = new StringBundler(5);
 
 		sb.append(LanguageUtil.get(request, "download"));
@@ -42,7 +46,7 @@ BackgroundTask backgroundTask = (BackgroundTask)row.getObject();
 		%>
 
 		<liferay-ui:icon
-			data='<%= Collections.singletonMap("senna-off", "true") %>'
+			data="<%= data %>"
 			label="<%= true %>"
 			markupView="lexicon"
 			message="<%= sb.toString() %>"
@@ -61,7 +65,6 @@ BackgroundTask backgroundTask = (BackgroundTask)row.getObject();
 	%>
 
 	<liferay-ui:icon-delete
-		confirmation='<%= ((completionDate != null) && completionDate.before(new Date())) ? "are-you-sure-you-want-to-delete-this" : "are-you-sure-you-want-to-cancel" %>'
 		label="<%= true %>"
 		message='<%= ((completionDate != null) && completionDate.before(new Date())) ? "delete" : "cancel" %>'
 		url="<%= deleteBackgroundTaskURL.toString() %>"

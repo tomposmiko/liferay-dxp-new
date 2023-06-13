@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.product.content.search.web.internal.portlet.shared.search;
 
-import com.liferay.account.model.AccountEntry;
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.product.constants.CPField;
 import com.liferay.commerce.product.constants.CPPortletKeys;
@@ -27,7 +27,6 @@ import com.liferay.commerce.product.service.CPSpecificationOptionLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.search.facet.SerializableFacet;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
@@ -39,10 +38,7 @@ import com.liferay.portal.kernel.search.facet.MultiValueFacet;
 import com.liferay.portal.kernel.search.facet.SimpleFacet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
-import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
@@ -52,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -62,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shuyang Zhou
  */
 @Component(
+	enabled = false,
 	property = "javax.portlet.name=" + CPPortletKeys.CP_SPECIFICATION_OPTION_FACETS,
 	service = PortletSharedSearchContributor.class
 )
@@ -82,64 +78,46 @@ public class CPSpecificationOptionFacetsPortletSharedSearchContributor
 			SerializableFacet serializableFacet = new SerializableFacet(
 				CPField.SPECIFICATION_NAMES, searchContext);
 
-			String[] parameterValues =
-				portletSharedSearchSettings.getParameterValues(
+			Optional<String[]> parameterValuesOptional =
+				portletSharedSearchSettings.getParameterValues71(
 					CPField.SPECIFICATION_NAMES);
 
-			if (ArrayUtil.isNotEmpty(parameterValues)) {
-				serializableFacet.select(parameterValues);
+			if (parameterValuesOptional.isPresent()) {
+				serializableFacet.select(parameterValuesOptional.get());
 
 				searchContext.setAttribute(
-					CPField.SPECIFICATION_NAMES, parameterValues);
+					CPField.SPECIFICATION_NAMES, parameterValuesOptional.get());
 			}
 
 			portletSharedSearchSettings.addFacet(serializableFacet);
 
-			Optional<PortletPreferences> portletPreferencesOptional =
-				portletSharedSearchSettings.getPortletPreferencesOptional();
+			List<Facet> facets = getFacets(renderRequest);
 
-			int frequencyThreshold = 1;
-			int maxTerms = 10;
-
-			if (portletPreferencesOptional.isPresent()) {
-				PortletPreferences portletPreferences =
-					portletPreferencesOptional.get();
-
-				frequencyThreshold = GetterUtil.getInteger(
-					portletPreferences.getValue("frequencyThreshold", null), 1);
-				maxTerms = GetterUtil.getInteger(
-					portletPreferences.getValue("maxTerms", null), 10);
-			}
-
-			for (Facet facet : getFacets(renderRequest)) {
+			for (Facet facet : facets) {
 				String cpSpecificationOptionKey =
 					CPSpecificationOptionFacetsUtil.
 						getCPSpecificationOptionKeyFromIndexFieldName(
 							facet.getFieldName());
 
-				parameterValues =
-					portletSharedSearchSettings.getParameterValues(
+				parameterValuesOptional =
+					portletSharedSearchSettings.getParameterValues71(
 						cpSpecificationOptionKey);
 
 				serializableFacet = new SerializableFacet(
 					facet.getFieldName(), searchContext);
 
-				serializableFacet.setFacetConfiguration(
-					_buildFacetConfiguration(
-						facet, frequencyThreshold, maxTerms));
-
-				if (ArrayUtil.isNotEmpty(parameterValues)) {
-					serializableFacet.select(parameterValues);
+				if (parameterValuesOptional.isPresent()) {
+					serializableFacet.select(parameterValuesOptional.get());
 
 					searchContext.setAttribute(
-						facet.getFieldName(), parameterValues);
+						facet.getFieldName(), parameterValuesOptional.get());
 				}
 
 				portletSharedSearchSettings.addFacet(serializableFacet);
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -171,16 +149,18 @@ public class CPSpecificationOptionFacetsPortletSharedSearchContributor
 			searchContext.setAttribute(
 				"commerceChannelGroupId", commerceChannel.getGroupId());
 
-			AccountEntry accountEntry =
-				_commerceAccountHelper.getCurrentAccountEntry(
+			CommerceAccount commerceAccount =
+				_commerceAccountHelper.getCurrentCommerceAccount(
 					commerceChannel.getGroupId(),
 					_portal.getHttpServletRequest(renderRequest));
 
-			if (accountEntry != null) {
-				searchContext.setAttribute(
-					"commerceAccountGroupIds",
+			if (commerceAccount != null) {
+				long[] commerceAccountGroupIds =
 					_commerceAccountHelper.getCommerceAccountGroupIds(
-						accountEntry.getAccountEntryId()));
+						commerceAccount.getCommerceAccountId());
+
+				searchContext.setAttribute(
+					"commerceAccountGroupIds", commerceAccountGroupIds);
 			}
 		}
 
@@ -245,28 +225,6 @@ public class CPSpecificationOptionFacetsPortletSharedSearchContributor
 		}
 
 		return facets;
-	}
-
-	private FacetConfiguration _buildFacetConfiguration(
-		Facet facet, int frequencyThreshold, int maxTerms) {
-
-		FacetConfiguration facetConfiguration = new FacetConfiguration();
-
-		facetConfiguration.setFieldName(facet.getFieldName());
-		facetConfiguration.setLabel("any-category");
-		facetConfiguration.setOrder("OrderHitsDesc");
-		facetConfiguration.setStatic(false);
-		facetConfiguration.setWeight(1.6);
-
-		JSONObject jsonObject = facetConfiguration.getData();
-
-		jsonObject.put(
-			"frequencyThreshold", frequencyThreshold
-		).put(
-			"maxTerms", maxTerms
-		);
-
-		return facetConfiguration;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

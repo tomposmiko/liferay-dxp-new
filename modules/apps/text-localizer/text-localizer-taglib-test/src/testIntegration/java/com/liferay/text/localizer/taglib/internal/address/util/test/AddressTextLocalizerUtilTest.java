@@ -150,13 +150,12 @@ public class AddressTextLocalizerUtilTest {
 
 	private Address _addAddress(User user) throws Exception {
 		return AddressLocalServiceUtil.addAddress(
-			null, user.getUserId(), user.getModelClassName(), user.getUserId(),
-			null, null, RandomTestUtil.randomString(),
+			user.getUserId(), user.getModelClassName(), user.getUserId(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomLong(), RandomTestUtil.randomLong(),
-			RandomTestUtil.randomLong(), false, true, null,
-			new ServiceContext());
+			RandomTestUtil.randomString(), RandomTestUtil.randomLong(),
+			RandomTestUtil.randomLong(), RandomTestUtil.randomLong(), false,
+			true, new ServiceContext());
 	}
 
 	private ServiceRegistration<?> _registerAddressTextLocalizer(

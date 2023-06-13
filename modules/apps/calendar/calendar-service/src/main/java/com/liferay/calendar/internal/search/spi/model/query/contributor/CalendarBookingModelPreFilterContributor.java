@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.calendar.model.CalendarBooking",
 	service = ModelPreFilterContributor.class
 )
@@ -37,19 +38,19 @@ public class CalendarBookingModelPreFilterContributor
 		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
 		SearchContext searchContext) {
 
-		_addWorkflowStatusFilter(
+		addWorkflowStatusFilter(
 			booleanFilter, modelSearchSettings, searchContext);
 	}
 
-	@Reference(target = "(model.pre.filter.contributor.id=WorkflowStatus)")
-	protected ModelPreFilterContributor workflowStatusModelPreFilterContributor;
-
-	private void _addWorkflowStatusFilter(
+	protected void addWorkflowStatusFilter(
 		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
 		SearchContext searchContext) {
 
 		workflowStatusModelPreFilterContributor.contribute(
 			booleanFilter, modelSearchSettings, searchContext);
 	}
+
+	@Reference(target = "(model.pre.filter.contributor.id=WorkflowStatus)")
+	protected ModelPreFilterContributor workflowStatusModelPreFilterContributor;
 
 }

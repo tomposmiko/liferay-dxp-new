@@ -20,7 +20,7 @@ import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManagerUtil;
 import com.liferay.exportimport.kernel.lifecycle.constants.ExportImportLifecycleConstants;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
-import com.liferay.exportimport.kernel.service.ExportImportLocalService;
+import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
@@ -33,18 +33,11 @@ import java.io.File;
 
 import java.util.concurrent.Callable;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Julio Camarero
  * @author Daniel Kocsis
  * @author Akos Thurzo
  */
-@Component(
-	property = "background.task.executor.class.name=com.liferay.exportimport.internal.background.task.PortletStagingBackgroundTaskExecutor",
-	service = BackgroundTaskExecutor.class
-)
 public class PortletStagingBackgroundTaskExecutor
 	extends BaseStagingBackgroundTaskExecutor {
 
@@ -55,7 +48,17 @@ public class PortletStagingBackgroundTaskExecutor
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return this;
+		PortletStagingBackgroundTaskExecutor
+			portletStagingBackgroundTaskExecutor =
+				new PortletStagingBackgroundTaskExecutor();
+
+		portletStagingBackgroundTaskExecutor.
+			setBackgroundTaskStatusMessageTranslator(
+				getBackgroundTaskStatusMessageTranslator());
+		portletStagingBackgroundTaskExecutor.setIsolationLevel(
+			getIsolationLevel());
+
+		return portletStagingBackgroundTaskExecutor;
 	}
 
 	@Override
@@ -66,7 +69,7 @@ public class PortletStagingBackgroundTaskExecutor
 			getExportImportConfiguration(backgroundTask);
 
 		File file = null;
-		MissingReferences missingReferences;
+		MissingReferences missingReferences = null;
 
 		try {
 			ExportImportThreadLocal.setPortletStagingInProcess(true);
@@ -80,7 +83,7 @@ public class PortletStagingBackgroundTaskExecutor
 					exportImportConfiguration.getExportImportConfigurationId()),
 				exportImportConfiguration);
 
-			file = _exportImportLocalService.exportPortletInfoAsFile(
+			file = ExportImportLocalServiceUtil.exportPortletInfoAsFile(
 				exportImportConfiguration);
 
 			markBackgroundTask(
@@ -135,9 +138,6 @@ public class PortletStagingBackgroundTaskExecutor
 		return new PortletExportImportBackgroundTaskDisplay(backgroundTask);
 	}
 
-	@Reference
-	private ExportImportLocalService _exportImportLocalService;
-
 	private class PortletStagingCallable
 		implements Callable<MissingReferences> {
 
@@ -152,16 +152,16 @@ public class PortletStagingBackgroundTaskExecutor
 
 		@Override
 		public MissingReferences call() throws PortalException {
-			_exportImportLocalService.importPortletDataDeletions(
+			ExportImportLocalServiceUtil.importPortletDataDeletions(
 				_exportImportConfiguration, _file);
 
 			MissingReferences missingReferences =
-				_exportImportLocalService.validateImportPortletInfo(
+				ExportImportLocalServiceUtil.validateImportPortletInfo(
 					_exportImportConfiguration, _file);
 
 			markBackgroundTask(_backgroundTaskId, "validated");
 
-			_exportImportLocalService.importPortletInfo(
+			ExportImportLocalServiceUtil.importPortletInfo(
 				_exportImportConfiguration, _file);
 
 			return missingReferences;

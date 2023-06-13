@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/update_fragment_entry_preview"
@@ -94,7 +95,7 @@ public class UpdateFragmentEntryPreviewMVCActionCommand
 		}
 
 		fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			null, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
 			FragmentEntry.class.getName(), fragmentEntryId,
 			FragmentPortletKeys.FRAGMENT, repository.getDlFolderId(),
 			fileEntry.getContentStream(), fileName, fileEntry.getMimeType(),

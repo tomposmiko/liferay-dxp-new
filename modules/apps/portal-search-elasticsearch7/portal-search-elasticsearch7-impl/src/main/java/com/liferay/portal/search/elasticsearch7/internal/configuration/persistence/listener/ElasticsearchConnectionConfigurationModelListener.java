@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConnectionConfiguration",
 	service = ConfigurationModelListener.class
 )
@@ -52,7 +53,7 @@ public class ElasticsearchConnectionConfigurationModelListener
 
 		try {
 			elasticsearchConnectionManager.removeElasticsearchConnection(
-				_getConnectionId(pid));
+				getConnectionId(pid));
 		}
 		catch (Exception exception) {
 			throw new ConfigurationModelListenerException(
@@ -81,13 +82,7 @@ public class ElasticsearchConnectionConfigurationModelListener
 		}
 	}
 
-	@Reference
-	protected ConfigurationAdmin configurationAdmin;
-
-	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
-
-	private String _getConnectionId(String pid) throws Exception {
+	protected String getConnectionId(String pid) throws Exception {
 		Configuration configuration = configurationAdmin.getConfiguration(
 			pid, StringPool.QUESTION);
 
@@ -103,6 +98,12 @@ public class ElasticsearchConnectionConfigurationModelListener
 		return connectionId;
 	}
 
+	@Reference
+	protected ConfigurationAdmin configurationAdmin;
+
+	@Reference
+	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+
 	private String _getMessage(String key, Object... arguments) {
 		try {
 			return ResourceBundleUtil.getString(
@@ -110,7 +111,7 @@ public class ElasticsearchConnectionConfigurationModelListener
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -168,7 +169,7 @@ public class ElasticsearchConnectionConfigurationModelListener
 			filterString);
 
 		if (configurations == null) {
-			String previousConnectionId = _getConnectionId(pid);
+			String previousConnectionId = getConnectionId(pid);
 
 			if ((previousConnectionId != null) &&
 				!previousConnectionId.equals(connectionId)) {

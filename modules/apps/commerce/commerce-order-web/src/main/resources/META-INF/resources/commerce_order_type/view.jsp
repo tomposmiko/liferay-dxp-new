@@ -23,18 +23,21 @@ PortletURL portletURL = commerceOrderTypeDisplayContext.getPortletURL();
 %>
 
 <div class="pt-4">
-	<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+	<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="deleteOrderTypes" type="hidden" />
 
-		<frontend-data-set:headless-display
+		<clay:headless-data-set-display
 			apiURL="/o/headless-commerce-admin-order/v1.0/order-types"
+			clayDataSetActionDropdownItems="<%= commerceOrderTypeDisplayContext.getCommerceOrderTypeClayDataSetActionDropdownItems() %>"
 			creationMenu="<%= commerceOrderTypeDisplayContext.getCreationMenu() %>"
-			fdsActionDropdownItems="<%= commerceOrderTypeDisplayContext.getCommerceOrderTypeFDSActionDropdownItems() %>"
-			formName="fm"
-			id="<%= CommerceOrderFDSNames.ORDER_TYPES %>"
+			formId="fm"
+			id="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_ORDER_TYPES %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= portletURL %>"
 			style="stacked"
 		/>
 	</aui:form>

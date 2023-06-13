@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Michael C. Han
  */
 @Component(
-	enabled = false,
+	enabled = false, immediate = true,
 	property = {
 		"after-filter=Absolute Redirects Filter", "dispatcher=FORWARD",
 		"dispatcher=REQUEST", "servlet-context-name=",
@@ -99,94 +99,13 @@ public class MonitoringFilter
 		_monitorPortalRequest = monitorPortalRequest;
 	}
 
-	@Override
-	protected Log getLog() {
-		return _log;
-	}
-
-	@Override
-	protected void processFilter(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, FilterChain filterChain)
-		throws IOException, ServletException {
-
-		PortalRequestDataSample portalRequestDataSample = null;
-
-		_incrementProcessFilterCount();
-
-		if (_monitorPortalRequest) {
-			portalRequestDataSample =
-				(PortalRequestDataSample)
-					_dataSampleFactory.createPortalRequestDataSample(
-						_portal.getCompanyId(httpServletRequest),
-						_getGroupId(httpServletRequest),
-						httpServletRequest.getHeader(HttpHeaders.REFERER),
-						httpServletRequest.getRemoteAddr(),
-						httpServletRequest.getRemoteUser(),
-						httpServletRequest.getRequestURI(),
-						GetterUtil.getString(
-							httpServletRequest.getRequestURL()),
-						httpServletRequest.getHeader(HttpHeaders.USER_AGENT));
-
-			DataSampleThreadLocal.initialize();
-		}
-
-		try {
-			if (portalRequestDataSample != null) {
-				portalRequestDataSample.prepare();
-			}
-
-			processFilter(
-				MonitoringFilter.class.getName(), httpServletRequest,
-				httpServletResponse, filterChain);
-
-			if (portalRequestDataSample != null) {
-				portalRequestDataSample.capture(RequestStatus.SUCCESS);
-
-				portalRequestDataSample.setGroupId(
-					_getGroupId(httpServletRequest));
-				portalRequestDataSample.setStatusCode(
-					httpServletResponse.getStatus());
-			}
-		}
-		catch (Exception exception) {
-			if (portalRequestDataSample != null) {
-				portalRequestDataSample.capture(RequestStatus.ERROR);
-			}
-
-			if (exception instanceof IOException) {
-				throw (IOException)exception;
-			}
-			else if (exception instanceof ServletException) {
-				throw (ServletException)exception;
-			}
-
-			throw new ServletException("Unable to execute request", exception);
-		}
-		finally {
-			if (portalRequestDataSample != null) {
-				DataSampleThreadLocal.addDataSample(portalRequestDataSample);
-			}
-
-			if (_decrementProcessFilterCount() == 0) {
-				Message message = new Message();
-
-				message.setPayload(DataSampleThreadLocal.getDataSamples());
-
-				_messageBus.sendMessage(DestinationNames.MONITORING, message);
-
-				_processFilterCount.remove();
-			}
-		}
-	}
-
-	private int _decrementProcessFilterCount() {
+	protected int decrementProcessFilterCount() {
 		AtomicInteger processFilterCount = _processFilterCount.get();
 
 		return processFilterCount.decrementAndGet();
 	}
 
-	private long _getGroupId(HttpServletRequest httpServletRequest) {
+	protected long getGroupId(HttpServletRequest httpServletRequest) {
 		long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
 
 		if (groupId > 0) {
@@ -218,10 +137,112 @@ public class MonitoringFilter
 		return groupId;
 	}
 
-	private void _incrementProcessFilterCount() {
+	@Override
+	protected Log getLog() {
+		return _log;
+	}
+
+	protected void incrementProcessFilterCount() {
 		AtomicInteger processFilterCount = _processFilterCount.get();
 
 		processFilterCount.incrementAndGet();
+	}
+
+	@Override
+	protected void processFilter(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, FilterChain filterChain)
+		throws IOException, ServletException {
+
+		PortalRequestDataSample portalRequestDataSample = null;
+
+		incrementProcessFilterCount();
+
+		if (_monitorPortalRequest) {
+			portalRequestDataSample =
+				(PortalRequestDataSample)
+					_dataSampleFactory.createPortalRequestDataSample(
+						_portal.getCompanyId(httpServletRequest),
+						getGroupId(httpServletRequest),
+						httpServletRequest.getHeader(HttpHeaders.REFERER),
+						httpServletRequest.getRemoteAddr(),
+						httpServletRequest.getRemoteUser(),
+						httpServletRequest.getRequestURI(),
+						GetterUtil.getString(
+							httpServletRequest.getRequestURL()),
+						httpServletRequest.getHeader(HttpHeaders.USER_AGENT));
+
+			DataSampleThreadLocal.initialize();
+		}
+
+		try {
+			if (portalRequestDataSample != null) {
+				portalRequestDataSample.prepare();
+			}
+
+			processFilter(
+				MonitoringFilter.class.getName(), httpServletRequest,
+				httpServletResponse, filterChain);
+
+			if (portalRequestDataSample != null) {
+				portalRequestDataSample.capture(RequestStatus.SUCCESS);
+
+				portalRequestDataSample.setGroupId(
+					getGroupId(httpServletRequest));
+				portalRequestDataSample.setStatusCode(
+					httpServletResponse.getStatus());
+			}
+		}
+		catch (Exception exception) {
+			if (portalRequestDataSample != null) {
+				portalRequestDataSample.capture(RequestStatus.ERROR);
+			}
+
+			if (exception instanceof IOException) {
+				throw (IOException)exception;
+			}
+			else if (exception instanceof ServletException) {
+				throw (ServletException)exception;
+			}
+			else {
+				throw new ServletException(
+					"Unable to execute request", exception);
+			}
+		}
+		finally {
+			if (portalRequestDataSample != null) {
+				DataSampleThreadLocal.addDataSample(portalRequestDataSample);
+			}
+
+			if (decrementProcessFilterCount() == 0) {
+				Message message = new Message();
+
+				message.setPayload(DataSampleThreadLocal.getDataSamples());
+
+				_messageBus.sendMessage(DestinationNames.MONITORING, message);
+
+				_processFilterCount.remove();
+			}
+		}
+	}
+
+	@Reference(unbind = "-")
+	protected void setDataSampleFactory(DataSampleFactory dataSampleFactory) {
+		_dataSampleFactory = dataSampleFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected final void setPortletMonitoringControl(
+		PortletMonitoringControl portletMonitoringControl) {
+
+		_portletMonitoringControl = portletMonitoringControl;
+	}
+
+	@Reference(unbind = "-")
+	protected void setServiceMonitoringControl(
+		ServiceMonitoringControl serviceMonitoringControl) {
+
+		_serviceMonitoringControl = serviceMonitoringControl;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -232,7 +253,6 @@ public class MonitoringFilter
 			MonitoringFilter.class + "._processFilterCount",
 			AtomicInteger::new);
 
-	@Reference
 	private DataSampleFactory _dataSampleFactory;
 
 	@Reference(
@@ -250,10 +270,7 @@ public class MonitoringFilter
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private PortletMonitoringControl _portletMonitoringControl;
-
-	@Reference
 	private ServiceMonitoringControl _serviceMonitoringControl;
 
 }

@@ -43,12 +43,7 @@ function WorkloadByAssigneePage({query, routeParams}) {
 		url: `/processes/${processId}/assignees/metrics`,
 	});
 
-	const promises = useMemo(
-		() => [postData()],
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[routeParams]
-	);
+	const promises = useMemo(() => [postData()], [postData]);
 
 	return (
 		<PromisesResolver promises={promises}>
@@ -56,12 +51,12 @@ function WorkloadByAssigneePage({query, routeParams}) {
 				filterKeys={prefixedKeys}
 				routeParams={{...routeParams, search}}
 				selectedFilters={selectedFilters}
-				totalCount={data?.totalCount}
+				totalCount={data.totalCount}
 			/>
 
 			<WorkloadByAssigneePage.Body
 				{...data}
-				filtered={search || !!selectedFilters.length}
+				filtered={search || selectedFilters.length > 0}
 				processId={processId}
 				taskNames={taskNames}
 			/>

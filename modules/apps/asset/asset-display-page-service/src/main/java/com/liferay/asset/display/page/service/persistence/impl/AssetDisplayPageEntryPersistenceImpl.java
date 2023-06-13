@@ -20,7 +20,6 @@ import com.liferay.asset.display.page.model.AssetDisplayPageEntryTable;
 import com.liferay.asset.display.page.model.impl.AssetDisplayPageEntryImpl;
 import com.liferay.asset.display.page.model.impl.AssetDisplayPageEntryModelImpl;
 import com.liferay.asset.display.page.service.persistence.AssetDisplayPageEntryPersistence;
-import com.liferay.asset.display.page.service.persistence.AssetDisplayPageEntryUtil;
 import com.liferay.asset.display.page.service.persistence.impl.constants.AssetPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = AssetDisplayPageEntryPersistence.class)
+@Component(
+	service = {AssetDisplayPageEntryPersistence.class, BasePersistence.class}
+)
 public class AssetDisplayPageEntryPersistenceImpl
 	extends BasePersistenceImpl<AssetDisplayPageEntry>
 	implements AssetDisplayPageEntryPersistence {
@@ -205,7 +206,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetDisplayPageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetDisplayPageEntry assetDisplayPageEntry : list) {
@@ -604,7 +605,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -741,7 +742,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof AssetDisplayPageEntry) {
@@ -863,7 +864,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1037,7 +1038,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetDisplayPageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetDisplayPageEntry assetDisplayPageEntry : list) {
@@ -1464,7 +1465,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1627,7 +1628,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetDisplayPageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetDisplayPageEntry assetDisplayPageEntry : list) {
@@ -2004,7 +2005,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2156,7 +2157,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetDisplayPageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetDisplayPageEntry assetDisplayPageEntry : list) {
@@ -2545,7 +2546,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 			finderArgs = new Object[] {layoutPageTemplateEntryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2676,8 +2677,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_C_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_C_C, finderArgs);
 		}
 
 		if (result instanceof AssetDisplayPageEntry) {
@@ -2794,7 +2794,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, classNameId, classPK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3021,7 +3021,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 		assetDisplayPageEntry.setNew(true);
 		assetDisplayPageEntry.setPrimaryKey(assetDisplayPageEntryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		assetDisplayPageEntry.setUuid(uuid);
 
@@ -3150,7 +3150,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 			(AssetDisplayPageEntryModelImpl)assetDisplayPageEntry;
 
 		if (Validator.isNull(assetDisplayPageEntry.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			assetDisplayPageEntry.setUuid(uuid);
 		}
@@ -3279,9 +3279,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 	 */
 	@Override
 	public AssetDisplayPageEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				AssetDisplayPageEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(AssetDisplayPageEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3506,7 +3504,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetDisplayPageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3582,7 +3580,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3825,31 +3823,11 @@ public class AssetDisplayPageEntryPersistenceImpl
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"groupId", "classNameId", "classPK"}, false);
-
-		_setAssetDisplayPageEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAssetDisplayPageEntryUtilPersistence(null);
-
 		entityCache.removeCache(AssetDisplayPageEntryImpl.class.getName());
-	}
-
-	private void _setAssetDisplayPageEntryUtilPersistence(
-		AssetDisplayPageEntryPersistence assetDisplayPageEntryPersistence) {
-
-		try {
-			Field field = AssetDisplayPageEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, assetDisplayPageEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3920,6 +3898,7 @@ public class AssetDisplayPageEntryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private AssetDisplayPageEntryModelArgumentsResolver
+		_assetDisplayPageEntryModelArgumentsResolver;
 
 }

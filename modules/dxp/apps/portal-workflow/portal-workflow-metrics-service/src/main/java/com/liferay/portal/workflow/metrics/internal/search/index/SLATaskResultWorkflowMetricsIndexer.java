@@ -25,7 +25,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = SLATaskResultWorkflowMetricsIndexer.class)
+@Component(
+	immediate = true, service = SLATaskResultWorkflowMetricsIndexer.class
+)
 public class SLATaskResultWorkflowMetricsIndexer
 	extends BaseSLAWorkflowMetricsIndexer {
 
@@ -47,8 +49,6 @@ public class SLATaskResultWorkflowMetricsIndexer
 		WorkflowMetricsSLATaskResult workflowMetricsSLATaskResult) {
 
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
-
-		documentBuilder.setValue("active", true);
 
 		if (workflowMetricsSLATaskResult.getAssigneeIds() != null) {
 			documentBuilder.setLongs(

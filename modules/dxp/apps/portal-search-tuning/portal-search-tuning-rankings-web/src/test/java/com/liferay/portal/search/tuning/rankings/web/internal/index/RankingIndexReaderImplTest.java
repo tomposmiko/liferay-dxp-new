@@ -20,6 +20,7 @@ import com.liferay.portal.search.tuning.rankings.web.internal.index.name.Ranking
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +28,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -41,33 +43,20 @@ public class RankingIndexReaderImplTest extends BaseRankingsIndexTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_rankingIndexReaderImpl = new RankingIndexReaderImpl();
 
 		ReflectionTestUtil.setFieldValue(
 			_rankingIndexReaderImpl, "_documentToRankingTranslator",
 			_documentToRankingTranslator);
-		ReflectionTestUtil.setFieldValue(
-			_rankingIndexReaderImpl, "_queries", queries);
-		ReflectionTestUtil.setFieldValue(
-			_rankingIndexReaderImpl, "_searchEngineAdapter",
-			searchEngineAdapter);
+
+		_rankingIndexReaderImpl.setQueries(queries);
+		_rankingIndexReaderImpl.setSearchEngineAdapter(searchEngineAdapter);
 	}
 
 	@Test
-	public void testFetch() {
-		setUpSearchEngineAdapter(
-			setUpGetDocumentResponseGetDocument(
-				setUpDocument(Arrays.asList("queryStrings")),
-				setUpGetDocumentResponse()));
-
-		Assert.assertEquals(
-			_setUpDocumentToRankingTranslator(),
-			_rankingIndexReaderImpl.fetch(
-				Mockito.mock(RankingIndexName.class), "id"));
-	}
-
-	@Test
-	public void testFetchByQueryString() {
+	public void testFetchByQueryStringOptional() {
 		_setUpDocumentToRankingTranslator();
 
 		setUpQueries();
@@ -79,16 +68,30 @@ public class RankingIndexReaderImplTest extends BaseRankingsIndexTestCase {
 			setUpSearchHits(Arrays.asList("queryStrings")));
 
 		Assert.assertEquals(
-			_setUpDocumentToRankingTranslator(),
-			_rankingIndexReaderImpl.fetchByQueryString(
+			Optional.of(_setUpDocumentToRankingTranslator()),
+			_rankingIndexReaderImpl.fetchByQueryStringOptional(
 				Mockito.mock(RankingIndexName.class), "queryString"));
 	}
 
 	@Test
-	public void testFetchByQueryStringBlankQueryString() {
-		Assert.assertNull(
-			_rankingIndexReaderImpl.fetchByQueryString(
+	public void testFetchByQueryStringOptionalBlankQueryString() {
+		Assert.assertEquals(
+			Optional.empty(),
+			_rankingIndexReaderImpl.fetchByQueryStringOptional(
 				Mockito.mock(RankingIndexName.class), ""));
+	}
+
+	@Test
+	public void testFetchOptional() {
+		setUpSearchEngineAdapter(
+			setUpGetDocumentResponseGetDocument(
+				setUpDocument(Arrays.asList("queryStrings")),
+				setUpGetDocumentResponse()));
+
+		Assert.assertEquals(
+			Optional.of(_setUpDocumentToRankingTranslator()),
+			_rankingIndexReaderImpl.fetchOptional(
+				Mockito.mock(RankingIndexName.class), "id"));
 	}
 
 	@Test
@@ -131,14 +134,15 @@ public class RankingIndexReaderImplTest extends BaseRankingsIndexTestCase {
 		).when(
 			_documentToRankingTranslator
 		).translate(
-			Mockito.any(), Mockito.nullable(String.class)
+			Mockito.anyObject(), Mockito.anyString()
 		);
 
 		return ranking;
 	}
 
-	private final DocumentToRankingTranslator _documentToRankingTranslator =
-		Mockito.mock(DocumentToRankingTranslator.class);
+	@Mock
+	private DocumentToRankingTranslator _documentToRankingTranslator;
+
 	private RankingIndexReaderImpl _rankingIndexReaderImpl;
 
 }

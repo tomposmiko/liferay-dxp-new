@@ -158,24 +158,23 @@ public class RoleServiceImpl extends RoleServiceBaseImpl {
 
 	@Override
 	public List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end) {
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId, int start,
+		int end) {
 
 		return roleFinder.filterFindByGroupRoleAndTeamRole(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId, start, end);
+			companyId, keywords, excludedNames, types, excludedTeamRoleId,
+			teamGroupId, start, end);
 	}
 
 	@Override
 	public int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId) {
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId) {
 
 		return roleFinder.filterCountByGroupRoleAndTeamRole(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId);
+			companyId, keywords, excludedNames, types, excludedTeamRoleId,
+			teamGroupId);
 	}
 
 	/**
@@ -268,9 +267,7 @@ public class RoleServiceImpl extends RoleServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groups are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param  userId the primary key of the user
 	 * @param  groups the groups (optionally <code>null</code>)

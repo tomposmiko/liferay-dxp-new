@@ -1,12 +1,11 @@
-# Checks for .function, .jar, .lar, .macro, .path, .testcase, .war or .zip
+# Checks for .function, .macro or .testcase
 
 Check | Category | Description
 ----- | -------- | -----------
-PoshiAntCommandParametersOrderCheck | [Styling](styling_checks.markdown#styling-checks) | Sorts parameters in AntCommand call in Poshi Script files. |
-PoshiDependenciesFileLocationCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | Checks that dependencies files are located in the correct directory. |
-PoshiImportsCheck | [Styling](styling_checks.markdown#styling-checks) | Sorts and groups imports in Poshi Script files. |
-PoshiIndentationCheck | [Styling](styling_checks.markdown#styling-checks) | Finds incorrect indentation in Poshi Script files. |
-[PoshiPauseUsageCheck](check/poshi_pause_usage_check.markdown#poshipauseusagecheck) | [Performance](performance_checks.markdown#performance-checks) | Finds missing comment with JIRA project when using `Pause`. |
-PoshiStylingCheck | [Styling](styling_checks.markdown#styling-checks) | Applies rules to enforce consistency in code style. |
-PoshiVariableNameCheck | [Styling](styling_checks.markdown#styling-checks) | Checks variable names for correct use of `camelCase`. |
-PoshiWhitespaceCheck | [Styling](styling_checks.markdown#styling-checks) | Finds missing and unnecessary whitespace. |
+PoshiAnnotationsOrderCheck | [Styling](styling_checks.markdown#styling-checks) | Checks the order of annotations. |
+PoshiCommandsOrderCheck | [Styling](styling_checks.markdown#styling-checks) | Checks the order of poshi commands. |
+PoshiEmptyLinesCheck | [Styling](styling_checks.markdown#styling-checks) | Finds missing and unnecessary empty lines. |
+PoshiIndentationCheck | [Styling](styling_checks.markdown#styling-checks) | Finds incorrect indentation in poshi files. |
+PoshiParametersOrderCheck | [Styling](styling_checks.markdown#styling-checks) | Checks the order of parameters in `.function` and `.macro` files. |
+PoshiStylingCheck | [Styling](styling_checks.markdown#styling-checks) | Applies rules to enforce consisteny in code style. |
+PoshiWhitespaceCheck | [Styling](styling_checks.markdown#styling-checks) | Finds missing and unnecessary whitespace in poshi files. |

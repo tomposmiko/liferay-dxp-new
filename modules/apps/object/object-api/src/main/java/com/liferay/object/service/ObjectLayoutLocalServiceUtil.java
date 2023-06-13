@@ -124,12 +124,6 @@ public class ObjectLayoutLocalServiceUtil {
 		return getService().deleteObjectLayout(objectLayout);
 	}
 
-	public static void deleteObjectLayouts(long objectDefinitionId)
-		throws PortalException {
-
-		getService().deleteObjectLayouts(objectDefinitionId);
-	}
-
 	/**
 	 * @throws PortalException
 	 */
@@ -225,12 +219,6 @@ public class ObjectLayoutLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static ObjectLayout fetchDefaultObjectLayout(
-		long objectDefinitionId) {
-
-		return getService().fetchDefaultObjectLayout(objectDefinitionId);
-	}
-
 	public static ObjectLayout fetchObjectLayout(long objectLayoutId) {
 		return getService().fetchObjectLayout(objectLayoutId);
 	}
@@ -317,10 +305,6 @@ public class ObjectLayoutLocalServiceUtil {
 	 */
 	public static List<ObjectLayout> getObjectLayouts(int start, int end) {
 		return getService().getObjectLayouts(start, end);
-	}
-
-	public static List<ObjectLayout> getObjectLayouts(long objectDefinitionId) {
-		return getService().getObjectLayouts(objectDefinitionId);
 	}
 
 	public static List<ObjectLayout> getObjectLayouts(

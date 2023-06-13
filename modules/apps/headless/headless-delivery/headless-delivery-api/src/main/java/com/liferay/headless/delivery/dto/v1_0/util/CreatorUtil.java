@@ -21,7 +21,8 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 
-import javax.ws.rs.core.MultivaluedMap;
+import java.util.Optional;
+
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -29,8 +30,10 @@ import javax.ws.rs.core.UriInfo;
  */
 public class CreatorUtil {
 
-	public static Creator toCreator(Portal portal, UriInfo uriInfo, User user) {
-		if ((user == null) || user.isGuestUser()) {
+	public static Creator toCreator(
+		Portal portal, Optional<UriInfo> uriInfoOptional, User user) {
+
+		if ((user == null) || user.isDefaultUser()) {
 			return null;
 		}
 
@@ -59,32 +62,30 @@ public class CreatorUtil {
 					});
 				setProfileURL(
 					() -> {
-						if (uriInfo == null) {
-							return null;
+						if (uriInfoOptional.map(
+								UriInfo::getQueryParameters
+							).map(
+								parameters -> parameters.getFirst(
+									"nestedFields")
+							).map(
+								fields -> fields.contains("profileURL")
+							).orElse(
+								false
+							)) {
+
+							Group group = user.getGroup();
+
+							ThemeDisplay themeDisplay = new ThemeDisplay() {
+								{
+									setPortalURL(StringPool.BLANK);
+									setSiteGroupId(group.getGroupId());
+								}
+							};
+
+							return group.getDisplayURL(themeDisplay);
 						}
 
-						MultivaluedMap<String, String> queryParameters =
-							uriInfo.getQueryParameters();
-
-						String nestedFields = queryParameters.getFirst(
-							"nestedFields");
-
-						if ((nestedFields == null) ||
-							!nestedFields.contains("profileURL")) {
-
-							return null;
-						}
-
-						Group group = user.getGroup();
-
-						ThemeDisplay themeDisplay = new ThemeDisplay() {
-							{
-								setPortalURL(StringPool.BLANK);
-								setSiteGroupId(group.getGroupId());
-							}
-						};
-
-						return group.getDisplayURL(themeDisplay);
+						return null;
 					});
 			}
 		};

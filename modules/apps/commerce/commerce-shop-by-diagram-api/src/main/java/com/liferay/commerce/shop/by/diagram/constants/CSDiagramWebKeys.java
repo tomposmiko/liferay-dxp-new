@@ -22,9 +22,6 @@ public class CSDiagramWebKeys {
 	public static final String CS_DIAGRAM_CP_TYPE_DISPLAY_CONTEXT =
 		"CS_DIAGRAM_CP_TYPE_DISPLAY_CONTEXT";
 
-	public static final String CS_DIAGRAM_CP_TYPE_HELPER =
-		"CS_DIAGRAM_CP_TYPE_HELPER";
-
 	public static final String CS_DIAGRAM_CP_TYPE_PROPS =
 		"CS_DIAGRAM_CP_TYPE_PROPS";
 

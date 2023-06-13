@@ -58,6 +58,15 @@ if (MapUtil.isNotEmpty(exportImportConfigurationSettingsMap)) {
 	privateLayout = GetterUtil.getBoolean(exportImportConfigurationSettingsMap.get("privateLayout"), privateLayout);
 }
 
+String rootNodeName = StringPool.BLANK;
+
+if (privateLayout) {
+	rootNodeName = LanguageUtil.get(request, "private-pages");
+}
+else {
+	rootNodeName = LanguageUtil.get(request, "public-pages");
+}
+
 String treeId = "layoutsExportTree" + liveGroupId + privateLayout;
 
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
@@ -92,6 +101,7 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 		<aui:input name="groupId" type="hidden" value="<%= String.valueOf(groupId) %>" />
 		<aui:input name="liveGroupId" type="hidden" value="<%= String.valueOf(liveGroupId) %>" />
 		<aui:input name="privateLayout" type="hidden" value="<%= String.valueOf(privateLayout) %>" />
+		<aui:input name="rootNodeName" type="hidden" value="<%= rootNodeName %>" />
 		<aui:input name="treeId" type="hidden" value="<%= treeId %>" />
 		<aui:input name="<%= PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL %>" type="hidden" value="<%= true %>" />
 		<aui:input name="<%= PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL %>" type="hidden" value="<%= true %>" />
@@ -101,43 +111,41 @@ renderResponse.setTitle((exportImportConfiguration == null) ? LanguageUtil.get(r
 		<liferay-ui:error exception="<%= LARFileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
 
 		<div class="export-dialog-tree">
-			<div class="sheet">
-				<div class="panel-group panel-group-flush">
-					<liferay-staging:configuration-header
-						exportImportConfiguration="<%= exportImportConfiguration %>"
-					/>
+			<aui:fieldset-group markupView="lexicon">
+				<liferay-staging:configuration-header
+					exportImportConfiguration="<%= exportImportConfiguration %>"
+				/>
 
-					<liferay-staging:deletions
-						cmd="<%= Constants.EXPORT %>"
-						exportImportConfigurationId="<%= exportImportConfigurationId %>"
-					/>
+				<liferay-staging:deletions
+					cmd="<%= Constants.EXPORT %>"
+					exportImportConfigurationId="<%= exportImportConfigurationId %>"
+				/>
 
-					<c:if test="<%= !group.isLayoutPrototype() && !group.isCompany() %>">
-						<liferay-staging:select-pages
-							action="<%= Constants.EXPORT %>"
-							exportImportConfigurationId="<%= exportImportConfigurationId %>"
-							groupId="<%= liveGroupId %>"
-							privateLayout="<%= privateLayout %>"
-							treeId="<%= treeId %>"
-						/>
-					</c:if>
-
-					<liferay-staging:content
-						cmd="<%= cmd %>"
-						exportImportConfigurationId="<%= exportImportConfigurationId %>"
-						showAllPortlets="<%= true %>"
-						type="<%= Constants.EXPORT %>"
-					/>
-
-					<liferay-staging:permissions
+				<c:if test="<%= !group.isLayoutPrototype() && !group.isCompany() %>">
+					<liferay-staging:select-pages
 						action="<%= Constants.EXPORT %>"
-						descriptionCSSClass="permissions-description"
 						exportImportConfigurationId="<%= exportImportConfigurationId %>"
-						global="<%= group.isCompany() %>"
-						labelCSSClass="permissions-label"
+						groupId="<%= liveGroupId %>"
+						privateLayout="<%= privateLayout %>"
+						treeId="<%= treeId %>"
 					/>
-				</div>
-			</div>
+				</c:if>
+
+				<liferay-staging:content
+					cmd="<%= cmd %>"
+					exportImportConfigurationId="<%= exportImportConfigurationId %>"
+					showAllPortlets="<%= true %>"
+					type="<%= Constants.EXPORT %>"
+				/>
+
+				<liferay-staging:permissions
+					action="<%= Constants.EXPORT %>"
+					descriptionCSSClass="permissions-description"
+					exportImportConfigurationId="<%= exportImportConfigurationId %>"
+					global="<%= group.isCompany() %>"
+					labelCSSClass="permissions-label"
+				/>
+			</aui:fieldset-group>
 
 			<div class="sheet-footer">
 				<aui:button type="submit" value="save" />

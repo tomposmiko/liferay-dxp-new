@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PortletPreferenceValue;
 import com.liferay.portal.kernel.settings.SettingsDescriptor;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
+import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -37,8 +37,8 @@ import java.util.Set;
  */
 public abstract class UpgradePortletSettings extends UpgradeProcess {
 
-	public UpgradePortletSettings(SettingsLocatorHelper settingsLocatorHelper) {
-		_settingsLocatorHelper = settingsLocatorHelper;
+	public UpgradePortletSettings(SettingsFactory settingsFactory) {
+		_settingsFactory = settingsFactory;
 	}
 
 	protected void copyPortletSettingsAsServiceSettings(
@@ -164,7 +164,7 @@ public abstract class UpgradePortletSettings extends UpgradeProcess {
 			}
 
 			SettingsDescriptor settingsDescriptor =
-				_settingsLocatorHelper.getSettingsDescriptor(serviceName);
+				_settingsFactory.getSettingsDescriptor(serviceName);
 
 			resetPortletPreferencesValues(
 				portletId, ownerType, settingsDescriptor);
@@ -190,7 +190,7 @@ public abstract class UpgradePortletSettings extends UpgradeProcess {
 
 			if (resetPortletInstancePreferences) {
 				SettingsDescriptor portletInstanceSettingsDescriptor =
-					_settingsLocatorHelper.getSettingsDescriptor(portletId);
+					_settingsFactory.getSettingsDescriptor(portletId);
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
@@ -207,7 +207,7 @@ public abstract class UpgradePortletSettings extends UpgradeProcess {
 			}
 
 			SettingsDescriptor serviceSettingsDescriptor =
-				_settingsLocatorHelper.getSettingsDescriptor(serviceName);
+				_settingsFactory.getSettingsDescriptor(serviceName);
 
 			resetPortletPreferencesValues(
 				portletId, ownerType, serviceSettingsDescriptor);
@@ -230,19 +230,19 @@ public abstract class UpgradePortletSettings extends UpgradeProcess {
 						"?"));
 			PreparedStatement insertPreparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					StringBundler.concat(
-						"insert into PortletPreferenceValue (mvccVersion, ",
-						"ctCollectionId, portletPreferenceValueId, companyId, ",
-						"portletPreferencesId, index_, largeValue, name, ",
-						"readOnly, smallValue) select 0 as mvccVersion, 0 as ",
-						"ctCollectionId, ? as portletPreferenceValueId, ",
-						"TEMP_TABLE.companyId, ? as portletPreferencesId, ",
-						"TEMP_TABLE.index_, TEMP_TABLE.largeValue, ",
-						"TEMP_TABLE.name, TEMP_TABLE.readOnly, ",
-						"TEMP_TABLE.smallValue from PortletPreferenceValue ",
-						"TEMP_TABLE where TEMP_TABLE.portletPreferenceValueId ",
-						"= ?"))) {
+					connection.prepareStatement(
+						StringBundler.concat(
+							"insert into PortletPreferenceValue (mvccVersion, ",
+							"ctCollectionId, portletPreferenceValueId, ",
+							"companyId, portletPreferencesId, index_, ",
+							"largeValue, name, readOnly, smallValue) select 0 ",
+							"as mvccVersion, 0 as ctCollectionId, ? as ",
+							"portletPreferenceValueId, TEMP_TABLE.companyId, ",
+							"? as portletPreferencesId, TEMP_TABLE.index_, ",
+							"TEMP_TABLE.largeValue, TEMP_TABLE.name, ",
+							"TEMP_TABLE.readOnly, TEMP_TABLE.smallValue from ",
+							"PortletPreferenceValue TEMP_TABLE where ",
+							"TEMP_TABLE.portletPreferenceValueId = ?")))) {
 
 			selectPreparedStatement.setLong(1, oldPortletPreferencesId);
 
@@ -264,6 +264,6 @@ public abstract class UpgradePortletSettings extends UpgradeProcess {
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradePortletSettings.class);
 
-	private final SettingsLocatorHelper _settingsLocatorHelper;
+	private final SettingsFactory _settingsFactory;
 
 }

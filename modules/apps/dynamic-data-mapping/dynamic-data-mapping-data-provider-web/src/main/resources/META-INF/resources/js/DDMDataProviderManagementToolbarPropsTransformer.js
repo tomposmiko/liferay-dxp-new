@@ -12,11 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	postForm,
-} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
 
 export default function propsTransformer({
 	additionalProps: {deleteDataProviderURL},
@@ -27,34 +23,33 @@ export default function propsTransformer({
 		...otherProps,
 		onActionButtonClick(event, {item}) {
 			if (item?.data?.action === 'deleteDataProviderInstances') {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-delete-this'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							const form = document.getElementById(
-								`${portletNamespace}searchContainerForm`
-							);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-delete-this'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}searchContainerForm`
+					);
 
-							const searchContainer = document.getElementById(
-								`${portletNamespace}dataProviderInstance`
-							);
+					const searchContainer = document.getElementById(
+						`${portletNamespace}dataProviderInstance`
+					);
 
-							if (form && searchContainer) {
-								postForm(form, {
-									data: {
-										deleteDataProviderInstanceIds: getCheckedCheckboxes(
-											searchContainer,
-											`${portletNamespace}allRowIds`
-										),
-									},
-									url: deleteDataProviderURL,
-								});
-							}
-						}
-					},
-				});
+					if (form && searchContainer) {
+						postForm(form, {
+							data: {
+								deleteDataProviderInstanceIds: Liferay.Util.listCheckedExcept(
+									searchContainer,
+									`${portletNamespace}allRowIds`
+								),
+							},
+							url: deleteDataProviderURL,
+						});
+					}
+				}
 			}
 		},
 	};

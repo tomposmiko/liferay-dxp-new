@@ -15,11 +15,11 @@
 package com.liferay.dynamic.data.mapping.form.builder.internal.servlet;
 
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunctionFactory;
-import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunctionRegistry;
+import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunctionTracker;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"dynamic.data.mapping.form.builder.servlet=true",
 		"osgi.http.whiteboard.context.path=/dynamic-data-mapping-form-builder-functions",
@@ -63,9 +64,9 @@ public class DDMFormFunctionsServlet extends BaseDDMFormBuilderServlet {
 
 		Map<String, DDMExpressionFunctionFactory>
 			ddmExpressionFunctionFactories =
-				_getDDMExpressionFunctionFactories();
+				getDDMExpressionFunctionFactories();
 
-		JSONArray jsonArray = _toJSONArray(
+		JSONArray jsonArray = toJSONArray(
 			ddmExpressionFunctionFactories.entrySet(),
 			LocaleUtil.fromLanguageId(
 				ParamUtil.getString(httpServletRequest, "languageId")));
@@ -73,45 +74,22 @@ public class DDMFormFunctionsServlet extends BaseDDMFormBuilderServlet {
 		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
-		ServletResponseUtil.write(httpServletResponse, jsonArray.toString());
+		ServletResponseUtil.write(
+			httpServletResponse, jsonArray.toJSONString());
 	}
 
-	protected JSONObject toJSONObject(
-		Map.Entry<String, DDMExpressionFunctionFactory> entry,
-		ResourceBundle resourceBundle) {
-
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
-
-		String key = entry.getKey();
-
-		String labelLanguageKey = key + "_function";
-
-		jsonObject.put(
-			"label", _language.get(resourceBundle, labelLanguageKey)
-		).put(
-			"value", key
-		);
-
-		String tooltipLanguageKey = key + "_tooltip";
-
-		jsonObject.put(
-			"tooltip", _language.get(resourceBundle, tooltipLanguageKey));
-
-		return jsonObject;
-	}
-
-	private Map<String, DDMExpressionFunctionFactory>
-		_getDDMExpressionFunctionFactories() {
+	protected Map<String, DDMExpressionFunctionFactory>
+		getDDMExpressionFunctionFactories() {
 
 		Set<String> functionNames = new HashSet<>();
 
 		functionNames.add("sum");
 
-		return _ddmExpressionFunctionRegistry.getDDMExpressionFunctionFactories(
+		return _ddmExpressionFunctionTracker.getDDMExpressionFunctionFactories(
 			functionNames);
 	}
 
-	private JSONArray _toJSONArray(
+	protected JSONArray toJSONArray(
 		Set<Map.Entry<String, DDMExpressionFunctionFactory>> entries,
 		Locale locale) {
 
@@ -127,15 +105,36 @@ public class DDMFormFunctionsServlet extends BaseDDMFormBuilderServlet {
 		return jsonArray;
 	}
 
+	protected JSONObject toJSONObject(
+		Map.Entry<String, DDMExpressionFunctionFactory> entry,
+		ResourceBundle resourceBundle) {
+
+		JSONObject jsonObject = _jsonFactory.createJSONObject();
+
+		String key = entry.getKey();
+
+		String labelLanguageKey = key + "_function";
+
+		jsonObject.put(
+			"label", LanguageUtil.get(resourceBundle, labelLanguageKey)
+		).put(
+			"value", key
+		);
+
+		String tooltipLanguageKey = key + "_tooltip";
+
+		jsonObject.put(
+			"tooltip", LanguageUtil.get(resourceBundle, tooltipLanguageKey));
+
+		return jsonObject;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Reference
-	private DDMExpressionFunctionRegistry _ddmExpressionFunctionRegistry;
+	private DDMExpressionFunctionTracker _ddmExpressionFunctionTracker;
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 }

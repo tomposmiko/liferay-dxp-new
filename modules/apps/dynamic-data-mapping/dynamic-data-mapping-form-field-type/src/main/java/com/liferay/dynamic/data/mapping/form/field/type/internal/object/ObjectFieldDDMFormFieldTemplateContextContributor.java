@@ -36,8 +36,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carolina Barbosa
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.OBJECT_FIELD,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		ObjectFieldDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class ObjectFieldDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -85,7 +89,7 @@ public class ObjectFieldDDMFormFieldTemplateContextContributor
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
+				_log.debug(jsonException, jsonException);
 			}
 
 			return value;

@@ -14,16 +14,25 @@
 
 package com.liferay.commerce.frontend.internal.order;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.frontend.internal.account.model.Order;
 import com.liferay.commerce.frontend.internal.account.model.OrderList;
 import com.liferay.commerce.model.CommerceOrder;
+import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -35,18 +44,22 @@ import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceOrderResource.class)
+@Component(enabled = false, service = CommerceOrderResource.class)
 public class CommerceOrderResource {
 
 	public OrderList getOrderList(
 			long groupId, String keywords, int page, int pageSize,
-			HttpServletRequest httpServletRequest)
+			HttpServletRequest httpServletRequest,
+			CommerceAccount commerceAccount)
 		throws PortalException {
 
 		long companyId = _portal.getCompanyId(httpServletRequest);
@@ -55,11 +68,81 @@ public class CommerceOrderResource {
 			_commerceChannelLocalService.getCommerceChannelGroupIdBySiteGroupId(
 				groupId);
 
-		List<Order> orders = _getOrders(
+		List<Order> orders = getOrders(
 			companyId, groupId, keywords, page, pageSize, httpServletRequest);
 
 		return new OrderList(
-			orders, _getOrdersCount(companyId, groupId, keywords));
+			orders, getOrdersCount(companyId, groupId, keywords));
+	}
+
+	protected List<Order> getOrders(
+			long companyId, long groupId, String keywords, int page,
+			int pageSize, HttpServletRequest httpServletRequest)
+		throws PortalException {
+
+		List<Order> orders = new ArrayList<>();
+
+		int start = (page - 1) * pageSize;
+		int end = page * pageSize;
+
+		List<CommerceOrder> userCommerceOrders =
+			_commerceOrderService.getUserPendingCommerceOrders(
+				companyId, groupId, keywords, start, end);
+
+		for (CommerceOrder commerceOrder : userCommerceOrders) {
+			Date modifiedDate = commerceOrder.getModifiedDate();
+
+			String modifiedDateTimeDescription =
+				LanguageUtil.getTimeDescription(
+					httpServletRequest,
+					System.currentTimeMillis() - modifiedDate.getTime(), true);
+
+			orders.add(
+				new Order(
+					commerceOrder.getCommerceOrderId(),
+					commerceOrder.getCommerceAccountId(),
+					commerceOrder.getCommerceAccountName(),
+					commerceOrder.getPurchaseOrderNumber(),
+					LanguageUtil.format(
+						httpServletRequest, "x-ago",
+						modifiedDateTimeDescription),
+					WorkflowConstants.getStatusLabel(commerceOrder.getStatus()),
+					_getOrderLinkURL(
+						commerceOrder.getCommerceOrderId(),
+						httpServletRequest)));
+		}
+
+		return orders;
+	}
+
+	protected int getOrdersCount(long companyId, long groupId, String keywords)
+		throws PortalException {
+
+		return (int)_commerceOrderService.getUserPendingCommerceOrdersCount(
+			companyId, groupId, keywords);
+	}
+
+	protected Response getResponse(Object object) {
+		if (object == null) {
+			return Response.status(
+				Response.Status.NOT_FOUND
+			).build();
+		}
+
+		try {
+			String json = _OBJECT_MAPPER.writeValueAsString(object);
+
+			return Response.ok(
+				json, MediaType.APPLICATION_JSON
+			).build();
+		}
+		catch (JsonProcessingException jsonProcessingException) {
+			_log.error(jsonProcessingException, jsonProcessingException);
+		}
+
+		return Response.status(
+			Response.Status.NOT_FOUND
+		).build();
 	}
 
 	private String _getOrderLinkURL(
@@ -85,60 +168,24 @@ public class CommerceOrderResource {
 		return editURL.toString();
 	}
 
-	private List<Order> _getOrders(
-			long companyId, long groupId, String keywords, int page,
-			int pageSize, HttpServletRequest httpServletRequest)
-		throws PortalException {
-
-		List<Order> orders = new ArrayList<>();
-
-		int start = (page - 1) * pageSize;
-		int end = page * pageSize;
-
-		List<CommerceOrder> userCommerceOrders =
-			_commerceOrderService.getUserCommerceOrders(
-				companyId, groupId, keywords, start, end);
-
-		for (CommerceOrder commerceOrder : userCommerceOrders) {
-			Date modifiedDate = commerceOrder.getModifiedDate();
-
-			String modifiedDateTimeDescription = _language.getTimeDescription(
-				httpServletRequest,
-				System.currentTimeMillis() - modifiedDate.getTime(), true);
-
-			orders.add(
-				new Order(
-					commerceOrder.getCommerceOrderId(),
-					commerceOrder.getCommerceAccountId(),
-					commerceOrder.getCommerceAccountName(),
-					commerceOrder.getPurchaseOrderNumber(),
-					_language.format(
-						httpServletRequest, "x-ago",
-						modifiedDateTimeDescription),
-					WorkflowConstants.getStatusLabel(commerceOrder.getStatus()),
-					_getOrderLinkURL(
-						commerceOrder.getCommerceOrderId(),
-						httpServletRequest)));
+	private static final ObjectMapper _OBJECT_MAPPER = new ObjectMapper() {
+		{
+			configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+			disable(SerializationFeature.INDENT_OUTPUT);
 		}
+	};
 
-		return orders;
-	}
-
-	private int _getOrdersCount(long companyId, long groupId, String keywords)
-		throws PortalException {
-
-		return (int)_commerceOrderService.getUserPendingCommerceOrdersCount(
-			companyId, groupId, keywords);
-	}
+	private static final Log _log = LogFactoryUtil.getLog(
+		CommerceOrderResource.class);
 
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	@Reference
-	private CommerceOrderService _commerceOrderService;
+	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
 
 	@Reference
-	private Language _language;
+	private CommerceOrderService _commerceOrderService;
 
 	@Reference
 	private Portal _portal;

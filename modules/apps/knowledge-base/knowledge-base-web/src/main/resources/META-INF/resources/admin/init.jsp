@@ -16,9 +16,6 @@
 
 <%@ include file="/init.jsp" %>
 
-<%@ page import="com.liferay.knowledge.base.web.internal.display.context.KBArticleViewDisplayContext" %><%@
-page import="com.liferay.knowledge.base.web.internal.display.context.ViewKBTemplatesDisplayContext" %>
-
 <%
 request.setAttribute("init.jsp-enableKBArticleAssetLinks", true);
 request.setAttribute("init.jsp-enableKBArticleDescription", true);

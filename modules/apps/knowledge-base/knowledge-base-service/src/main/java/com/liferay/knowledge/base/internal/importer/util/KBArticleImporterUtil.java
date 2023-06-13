@@ -71,7 +71,7 @@ public class KBArticleImporterUtil {
 		}
 
 		try {
-			String zipReaderFileName = _getZipReaderFileName(
+			String zipReaderFileName = getZipReaderFileName(
 				kbGroupServiceConfiguration.markdownImporterImageFolder(),
 				imageFileName);
 
@@ -173,12 +173,12 @@ public class KBArticleImporterUtil {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileEntryException);
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
 			}
 		}
 
 		fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			null, kbArticle.getGroupId(), userId, KBArticle.class.getName(),
+			kbArticle.getGroupId(), userId, KBArticle.class.getName(),
 			kbArticle.getClassPK(), KBPortletKeys.KNOWLEDGE_BASE_ARTICLE,
 			kbArticle.getAttachmentsFolderId(), inputStream, imageFileName,
 			mimeType, false);
@@ -188,7 +188,7 @@ public class KBArticleImporterUtil {
 		return fileEntry;
 	}
 
-	private static String _getZipReaderFileName(
+	protected static String getZipReaderFileName(
 		String dirName, String fileName) {
 
 		if (dirName.endsWith(StringPool.SLASH)) {

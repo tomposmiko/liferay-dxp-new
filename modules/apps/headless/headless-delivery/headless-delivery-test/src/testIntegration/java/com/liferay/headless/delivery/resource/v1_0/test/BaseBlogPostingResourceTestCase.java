@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.delivery.client.dto.v1_0.BlogPosting;
-import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.Rating;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
@@ -32,7 +31,6 @@ import com.liferay.headless.delivery.client.permission.Permission;
 import com.liferay.headless.delivery.client.resource.v1_0.BlogPostingResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.BlogPostingSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -43,7 +41,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -59,7 +57,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -68,16 +66,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -241,7 +241,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteBlogPosting() throws Exception {
-		BlogPosting blogPosting = testGraphQLDeleteBlogPosting_addBlogPosting();
+		BlogPosting blogPosting = testGraphQLBlogPosting_addBlogPosting();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -254,6 +254,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteBlogPosting"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -267,12 +268,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected BlogPosting testGraphQLDeleteBlogPosting_addBlogPosting()
-		throws Exception {
-
-		return testGraphQLBlogPosting_addBlogPosting();
 	}
 
 	@Test
@@ -293,7 +288,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 	@Test
 	public void testGraphQLGetBlogPosting() throws Exception {
-		BlogPosting blogPosting = testGraphQLGetBlogPosting_addBlogPosting();
+		BlogPosting blogPosting = testGraphQLBlogPosting_addBlogPosting();
 
 		Assert.assertTrue(
 			equals(
@@ -334,12 +329,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 				"Object/code"));
 	}
 
-	protected BlogPosting testGraphQLGetBlogPosting_addBlogPosting()
-		throws Exception {
-
-		return testGraphQLBlogPosting_addBlogPosting();
-	}
-
 	@Test
 	public void testPatchBlogPosting() throws Exception {
 		BlogPosting postBlogPosting = testPatchBlogPosting_addBlogPosting();
@@ -352,8 +341,8 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		BlogPosting expectedPatchBlogPosting = postBlogPosting.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchBlogPosting, expectedPatchBlogPosting);
+		_beanUtilsBean.copyProperties(
+			expectedPatchBlogPosting, randomPatchBlogPosting);
 
 		BlogPosting getBlogPosting = blogPostingResource.getBlogPosting(
 			patchBlogPosting.getId());
@@ -439,18 +428,16 @@ public abstract class BaseBlogPostingResourceTestCase {
 	}
 
 	@Test
-	public void testPutBlogPostingPermissionsPage() throws Exception {
+	public void testPutBlogPostingPermission() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
-		BlogPosting blogPosting =
-			testPutBlogPostingPermissionsPage_addBlogPosting();
+		BlogPosting blogPosting = testPutBlogPostingPermission_addBlogPosting();
 
-		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			blogPostingResource.putBlogPostingPermissionsPageHttpResponse(
+			blogPostingResource.putBlogPostingPermissionHttpResponse(
 				blogPosting.getId(),
 				new Permission[] {
 					new Permission() {
@@ -463,7 +450,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			blogPostingResource.putBlogPostingPermissionsPageHttpResponse(
+			blogPostingResource.putBlogPostingPermissionHttpResponse(
 				0L,
 				new Permission[] {
 					new Permission() {
@@ -475,7 +462,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 				}));
 	}
 
-	protected BlogPosting testPutBlogPostingPermissionsPage_addBlogPosting()
+	protected BlogPosting testPutBlogPostingPermission_addBlogPosting()
 		throws Exception {
 
 		return blogPostingResource.postSiteBlogPosting(
@@ -513,10 +500,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantBlogPosting),
 				(List<BlogPosting>)page.getItems());
-			assertValid(
-				page,
-				testGetSiteBlogPostingsPage_getExpectedActions(
-					irrelevantSiteId));
+			assertValid(page);
 		}
 
 		BlogPosting blogPosting1 = testGetSiteBlogPostingsPage_addBlogPosting(
@@ -533,30 +517,11 @@ public abstract class BaseBlogPostingResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(blogPosting1, blogPosting2),
 			(List<BlogPosting>)page.getItems());
-		assertValid(
-			page, testGetSiteBlogPostingsPage_getExpectedActions(siteId));
+		assertValid(page);
 
 		blogPostingResource.deleteBlogPosting(blogPosting1.getId());
 
 		blogPostingResource.deleteBlogPosting(blogPosting2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetSiteBlogPostingsPage_getExpectedActions(Long siteId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/blog-postings/batch".
-				replace("{siteId}", String.valueOf(siteId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -582,39 +547,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 				blogPostingResource.getSiteBlogPostingsPage(
 					siteId, null, null,
 					getFilterString(entityField, "between", blogPosting1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(blogPosting1),
-				(List<BlogPosting>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetSiteBlogPostingsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long siteId = testGetSiteBlogPostingsPage_getSiteId();
-
-		BlogPosting blogPosting1 = testGetSiteBlogPostingsPage_addBlogPosting(
-			siteId, randomBlogPosting());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		BlogPosting blogPosting2 = testGetSiteBlogPostingsPage_addBlogPosting(
-			siteId, randomBlogPosting());
-
-		for (EntityField entityField : entityFields) {
-			Page<BlogPosting> page =
-				blogPostingResource.getSiteBlogPostingsPage(
-					siteId, null, null,
-					getFilterString(entityField, "eq", blogPosting1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -698,21 +630,9 @@ public abstract class BaseBlogPostingResourceTestCase {
 		testGetSiteBlogPostingsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, blogPosting1, blogPosting2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					blogPosting1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetSiteBlogPostingsPageWithSortDouble() throws Exception {
-		testGetSiteBlogPostingsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, blogPosting1, blogPosting2) -> {
-				BeanTestUtil.setProperty(
-					blogPosting1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					blogPosting2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -721,10 +641,8 @@ public abstract class BaseBlogPostingResourceTestCase {
 		testGetSiteBlogPostingsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, blogPosting1, blogPosting2) -> {
-				BeanTestUtil.setProperty(
-					blogPosting1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					blogPosting2, entityField.getName(), 1);
+				BeanUtils.setProperty(blogPosting1, entityField.getName(), 0);
+				BeanUtils.setProperty(blogPosting2, entityField.getName(), 1);
 			});
 	}
 
@@ -737,27 +655,27 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						blogPosting1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						blogPosting2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						blogPosting1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						blogPosting2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -765,12 +683,12 @@ public abstract class BaseBlogPostingResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						blogPosting1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						blogPosting2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -867,10 +785,8 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		Assert.assertEquals(0, blogPostingsJSONObject.get("totalCount"));
 
-		BlogPosting blogPosting1 =
-			testGraphQLGetSiteBlogPostingsPage_addBlogPosting();
-		BlogPosting blogPosting2 =
-			testGraphQLGetSiteBlogPostingsPage_addBlogPosting();
+		BlogPosting blogPosting1 = testGraphQLBlogPosting_addBlogPosting();
+		BlogPosting blogPosting2 = testGraphQLBlogPosting_addBlogPosting();
 
 		blogPostingsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -883,12 +799,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 			Arrays.asList(
 				BlogPostingSerDes.toDTOs(
 					blogPostingsJSONObject.getString("items"))));
-	}
-
-	protected BlogPosting testGraphQLGetSiteBlogPostingsPage_addBlogPosting()
-		throws Exception {
-
-		return testGraphQLBlogPosting_addBlogPosting();
 	}
 
 	@Test
@@ -932,32 +842,22 @@ public abstract class BaseBlogPostingResourceTestCase {
 			204,
 			blogPostingResource.
 				deleteSiteBlogPostingByExternalReferenceCodeHttpResponse(
-					testDeleteSiteBlogPostingByExternalReferenceCode_getSiteId(
-						blogPosting),
+					blogPosting.getSiteId(),
 					blogPosting.getExternalReferenceCode()));
 
 		assertHttpResponseStatusCode(
 			404,
 			blogPostingResource.
 				getSiteBlogPostingByExternalReferenceCodeHttpResponse(
-					testDeleteSiteBlogPostingByExternalReferenceCode_getSiteId(
-						blogPosting),
+					blogPosting.getSiteId(),
 					blogPosting.getExternalReferenceCode()));
 
 		assertHttpResponseStatusCode(
 			404,
 			blogPostingResource.
 				getSiteBlogPostingByExternalReferenceCodeHttpResponse(
-					testDeleteSiteBlogPostingByExternalReferenceCode_getSiteId(
-						blogPosting),
+					blogPosting.getSiteId(),
 					blogPosting.getExternalReferenceCode()));
-	}
-
-	protected Long testDeleteSiteBlogPostingByExternalReferenceCode_getSiteId(
-			BlogPosting blogPosting)
-		throws Exception {
-
-		return blogPosting.getSiteId();
 	}
 
 	protected BlogPosting
@@ -977,19 +877,11 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		BlogPosting getBlogPosting =
 			blogPostingResource.getSiteBlogPostingByExternalReferenceCode(
-				testGetSiteBlogPostingByExternalReferenceCode_getSiteId(
-					postBlogPosting),
+				postBlogPosting.getSiteId(),
 				postBlogPosting.getExternalReferenceCode());
 
 		assertEquals(postBlogPosting, getBlogPosting);
 		assertValid(getBlogPosting);
-	}
-
-	protected Long testGetSiteBlogPostingByExternalReferenceCode_getSiteId(
-			BlogPosting blogPosting)
-		throws Exception {
-
-		return blogPosting.getSiteId();
 	}
 
 	protected BlogPosting
@@ -1004,8 +896,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 	public void testGraphQLGetSiteBlogPostingByExternalReferenceCode()
 		throws Exception {
 
-		BlogPosting blogPosting =
-			testGraphQLGetSiteBlogPostingByExternalReferenceCode_addBlogPosting();
+		BlogPosting blogPosting = testGraphQLBlogPosting_addBlogPosting();
 
 		Assert.assertTrue(
 			equals(
@@ -1019,10 +910,8 @@ public abstract class BaseBlogPostingResourceTestCase {
 									{
 										put(
 											"siteKey",
-											"\"" +
-												testGraphQLGetSiteBlogPostingByExternalReferenceCode_getSiteId(
-													blogPosting) + "\"");
-
+											"\"" + blogPosting.getSiteId() +
+												"\"");
 										put(
 											"externalReferenceCode",
 											"\"" +
@@ -1034,14 +923,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/blogPostingByExternalReferenceCode"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteBlogPostingByExternalReferenceCode_getSiteId(
-				BlogPosting blogPosting)
-		throws Exception {
-
-		return blogPosting.getSiteId();
 	}
 
 	@Test
@@ -1072,13 +953,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 				"Object/code"));
 	}
 
-	protected BlogPosting
-			testGraphQLGetSiteBlogPostingByExternalReferenceCode_addBlogPosting()
-		throws Exception {
-
-		return testGraphQLBlogPosting_addBlogPosting();
-	}
-
 	@Test
 	public void testPutSiteBlogPostingByExternalReferenceCode()
 		throws Exception {
@@ -1090,8 +964,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		BlogPosting putBlogPosting =
 			blogPostingResource.putSiteBlogPostingByExternalReferenceCode(
-				testPutSiteBlogPostingByExternalReferenceCode_getSiteId(
-					postBlogPosting),
+				postBlogPosting.getSiteId(),
 				postBlogPosting.getExternalReferenceCode(), randomBlogPosting);
 
 		assertEquals(randomBlogPosting, putBlogPosting);
@@ -1099,8 +972,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		BlogPosting getBlogPosting =
 			blogPostingResource.getSiteBlogPostingByExternalReferenceCode(
-				testPutSiteBlogPostingByExternalReferenceCode_getSiteId(
-					putBlogPosting),
+				putBlogPosting.getSiteId(),
 				putBlogPosting.getExternalReferenceCode());
 
 		assertEquals(randomBlogPosting, getBlogPosting);
@@ -1111,8 +983,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		putBlogPosting =
 			blogPostingResource.putSiteBlogPostingByExternalReferenceCode(
-				testPutSiteBlogPostingByExternalReferenceCode_getSiteId(
-					newBlogPosting),
+				newBlogPosting.getSiteId(),
 				newBlogPosting.getExternalReferenceCode(), newBlogPosting);
 
 		assertEquals(newBlogPosting, putBlogPosting);
@@ -1120,8 +991,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		getBlogPosting =
 			blogPostingResource.getSiteBlogPostingByExternalReferenceCode(
-				testPutSiteBlogPostingByExternalReferenceCode_getSiteId(
-					putBlogPosting),
+				putBlogPosting.getSiteId(),
 				putBlogPosting.getExternalReferenceCode());
 
 		assertEquals(newBlogPosting, getBlogPosting);
@@ -1129,13 +999,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Assert.assertEquals(
 			newBlogPosting.getExternalReferenceCode(),
 			putBlogPosting.getExternalReferenceCode());
-	}
-
-	protected Long testPutSiteBlogPostingByExternalReferenceCode_getSiteId(
-			BlogPosting blogPosting)
-		throws Exception {
-
-		return blogPosting.getSiteId();
 	}
 
 	protected BlogPosting
@@ -1169,18 +1032,17 @@ public abstract class BaseBlogPostingResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteBlogPostingPermissionsPage() throws Exception {
+	public void testPutSiteBlogPostingPermission() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		BlogPosting blogPosting =
-			testPutSiteBlogPostingPermissionsPage_addBlogPosting();
+			testPutSiteBlogPostingPermission_addBlogPosting();
 
-		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
-			blogPostingResource.putSiteBlogPostingPermissionsPageHttpResponse(
+			blogPostingResource.putSiteBlogPostingPermissionHttpResponse(
 				blogPosting.getSiteId(),
 				new Permission[] {
 					new Permission() {
@@ -1193,7 +1055,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			404,
-			blogPostingResource.putSiteBlogPostingPermissionsPageHttpResponse(
+			blogPostingResource.putSiteBlogPostingPermissionHttpResponse(
 				blogPosting.getSiteId(),
 				new Permission[] {
 					new Permission() {
@@ -1205,7 +1067,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 				}));
 	}
 
-	protected BlogPosting testPutSiteBlogPostingPermissionsPage_addBlogPosting()
+	protected BlogPosting testPutSiteBlogPostingPermission_addBlogPosting()
 		throws Exception {
 
 		return blogPostingResource.postSiteBlogPosting(
@@ -1690,13 +1552,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 	}
 
 	protected void assertValid(Page<BlogPosting> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<BlogPosting> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<BlogPosting> blogPostings = page.getItems();
@@ -1711,20 +1566,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected void assertValid(Rating rating) {
@@ -2261,16 +2102,14 @@ public abstract class BaseBlogPostingResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -2287,10 +2126,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -2300,18 +2135,18 @@ public abstract class BaseBlogPostingResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -2517,9 +2352,8 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		if (entityFieldName.equals("numberOfComments")) {
-			sb.append(String.valueOf(blogPosting.getNumberOfComments()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("relatedContents")) {
@@ -2650,115 +2484,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -2833,6 +2558,18 @@ public abstract class BaseBlogPostingResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseBlogPostingResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

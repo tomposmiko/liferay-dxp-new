@@ -31,10 +31,11 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Eduardo Lundgren
  */
-@Component(service = NotificationSenderFactory.class)
+@Component(immediate = true, service = NotificationSenderFactory.class)
 public class NotificationSenderFactory {
 
-	public NotificationSender getNotificationSender(String notificationType)
+	public static NotificationSender getNotificationSender(
+			String notificationType)
 		throws PortalException {
 
 		NotificationSender notificationSender = _notificationSenders.get(
@@ -46,6 +47,12 @@ public class NotificationSenderFactory {
 		}
 
 		return notificationSender;
+	}
+
+	public void setNotificationSenders(
+		Map<String, NotificationSender> notificationSenders) {
+
+		_notificationSenders = notificationSenders;
 	}
 
 	@Reference(
@@ -89,7 +96,7 @@ public class NotificationSenderFactory {
 	private static final Log _log = LogFactoryUtil.getLog(
 		NotificationSenderFactory.class);
 
-	private final Map<String, NotificationSender> _notificationSenders =
+	private static Map<String, NotificationSender> _notificationSenders =
 		new ConcurrentHashMap<>();
 
 }

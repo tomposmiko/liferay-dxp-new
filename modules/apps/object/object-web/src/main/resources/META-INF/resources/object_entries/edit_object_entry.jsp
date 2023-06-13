@@ -17,35 +17,28 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String externalReferenceCode = ParamUtil.getString(request, "externalReferenceCode");
+long objectEntryId = ParamUtil.getLong(request, "objectEntryId");
 
 ObjectEntryDisplayContext objectEntryDisplayContext = (ObjectEntryDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab();
 %>
 
-<c:if test="<%= (objectEntryDisplayContext.getObjectEntry() != null) && (objectLayoutTab != null) %>">
-
-	<%
-	ObjectDefinition objectDefinition = objectEntryDisplayContext.getObjectDefinition1();
-	%>
-
-	<liferay-frontend:screen-navigation
-		key="<%= objectDefinition.getClassName() %>"
-		portletURL="<%= currentURLObj %>"
-	/>
-</c:if>
+<clay:navigation-bar
+	inverted="<%= false %>"
+	navigationItems="<%= objectEntryDisplayContext.getNavigationItems() %>"
+/>
 
 <c:choose>
 	<c:when test="<%= (objectLayoutTab != null) && (objectLayoutTab.getObjectRelationshipId() > 0) %>">
 		<liferay-util:include page="/object_entries/object_entry/relationship.jsp" servletContext="<%= application %>">
-			<liferay-util:param name="externalReferenceCode" value="<%= externalReferenceCode %>" />
+			<liferay-util:param name="objectEntryId" value="<%= String.valueOf(objectEntryId) %>" />
 			<liferay-util:param name="objectLayoutTabId" value="<%= String.valueOf(objectLayoutTab.getObjectLayoutTabId()) %>" />
 		</liferay-util:include>
 	</c:when>
-	<c:when test="<%= objectEntryDisplayContext.isShowObjectEntryForm() %>">
+	<c:otherwise>
 		<liferay-util:include page="/object_entries/object_entry/form.jsp" servletContext="<%= application %>">
-			<liferay-util:param name="externalReferenceCode" value="<%= externalReferenceCode %>" />
+			<liferay-util:param name="objectEntryId" value="<%= String.valueOf(objectEntryId) %>" />
 		</liferay-util:include>
-	</c:when>
+	</c:otherwise>
 </c:choose>

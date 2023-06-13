@@ -24,7 +24,7 @@ export default function ({currentURL, namespace}) {
 
 	const handleSelectChange = (event) => {
 		if (event.target.checked) {
-			portletURL.searchParams.set(
+			portletURL.searchParams.append(
 				`${namespace}channelQualifiers`,
 				event.target.value
 			);

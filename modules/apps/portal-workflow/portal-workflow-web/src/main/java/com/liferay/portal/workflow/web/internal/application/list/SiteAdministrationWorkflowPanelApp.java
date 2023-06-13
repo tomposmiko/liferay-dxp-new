@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adam Brandizzi
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=400",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_CONFIGURATION
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class SiteAdministrationWorkflowPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return WorkflowPortletKeys.SITE_ADMINISTRATION_WORKFLOW;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + WorkflowPortletKeys.SITE_ADMINISTRATION_WORKFLOW + ")"
+		target = "(javax.portlet.name=" + WorkflowPortletKeys.SITE_ADMINISTRATION_WORKFLOW + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

@@ -12,7 +12,6 @@
  * details.
  */
 
-import {getSpritemap} from '@liferay/frontend-icons-web';
 import {openSimpleInputModal} from 'frontend-js-web';
 
 export default function SelectLayoutPageTemplateEntryMasterLayoutVerticalCardPropsTransformer({
@@ -38,7 +37,8 @@ export default function SelectLayoutPageTemplateEntryMasterLayoutVerticalCardPro
 				mainFieldName,
 				mainFieldPlaceholder,
 				namespace,
-				spritemap: getSpritemap(),
+				spritemap:
+					'<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 			});
 		},
 		onKeyDown: (event) => {

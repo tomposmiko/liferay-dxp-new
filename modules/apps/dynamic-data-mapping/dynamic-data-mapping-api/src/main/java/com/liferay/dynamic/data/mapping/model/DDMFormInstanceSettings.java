@@ -31,22 +31,15 @@ import org.osgi.annotation.versioning.ProviderType;
 	rules = {
 		@DDMFormRule(
 			actions = {
-				"setEnabled('expirationDate', equals(getValue('neverExpire'), FALSE))",
 				"setVisible('emailFromAddress', getValue('sendEmailNotification'))",
 				"setVisible('emailFromName', getValue('sendEmailNotification'))",
 				"setVisible('emailSubject', getValue('sendEmailNotification'))",
 				"setVisible('emailToAddress', getValue('sendEmailNotification'))",
-				"setVisible('limitToOneSubmissionPerUserBody', getValue('limitToOneSubmissionPerUser'))",
-				"setVisible('limitToOneSubmissionPerUserHeader', getValue('limitToOneSubmissionPerUser'))",
 				"setVisible('objectDefinitionId', contains(getValue('storageType'), \"object\"))",
 				"setVisible('published', FALSE)",
 				"setVisible('workflowDefinition', not(contains(getValue('storageType'), \"object\")))"
 			},
 			condition = "TRUE"
-		),
-		@DDMFormRule(
-			actions = "setValue('expirationDate', '')",
-			condition = "equals(getValue('neverExpire'), TRUE)"
 		)
 	}
 )
@@ -98,26 +91,6 @@ import org.osgi.annotation.versioning.ProviderType;
 					}
 				)
 			}
-		),
-		@DDMFormLayoutPage(
-			title = "%submissions",
-			value = {
-				@DDMFormLayoutRow(
-					{
-						@DDMFormLayoutColumn(
-							size = 12,
-							value = {
-								"displayChartAsTable",
-								"showPartialResultsToRespondents",
-								"limitToOneSubmissionPerUser",
-								"limitToOneSubmissionPerUserHeader",
-								"limitToOneSubmissionPerUserBody",
-								"expirationDate", "neverExpire"
-							}
-						)
-					}
-				)
-			}
 		)
 	}
 )
@@ -129,16 +102,6 @@ public interface DDMFormInstanceSettings {
 		properties = "showAsSwitcher=true"
 	)
 	public boolean autosaveEnabled();
-
-	@DDMFormField
-	public boolean convertedFromPolls();
-
-	@DDMFormField(
-		label = "%display-chart-as-table",
-		tip = "%display-entries-of-the-following-field-types-as-tables-select-from-list-single-selection-multiple-selection-and-boolean",
-		type = "checkbox"
-	)
-	public boolean displayChartAsTable();
 
 	@DDMFormField(
 		label = "%from-address",
@@ -161,43 +124,6 @@ public interface DDMFormInstanceSettings {
 	public String emailToAddress();
 
 	@DDMFormField(
-		label = "%expiration-date", type = "date",
-		validationErrorMessage = "%please-enter-a-valid-expiration-date-only-future-dates-are-accepted",
-		validationExpression = "futureDates(expirationDate, \"{parameter}\")",
-		validationExpressionName = "futureDates",
-		validationParameter = "{\"startsFrom\": {\"date\": \"responseDate\", \"quantity\": 1, \"type\": \"customDate\", \"unit\": \"days\"}}"
-	)
-	public String expirationDate();
-
-	@DDMFormField(
-		label = "%limit-to-one-submission-per-user",
-		tip = "%respondents-will-be-required-to-sign-in", type = "checkbox"
-	)
-	public boolean limitToOneSubmissionPerUser();
-
-	@DDMFormField(
-		label = "%body",
-		properties = {
-			"displayStyle=multiline",
-			"placeholder=%you-can-fill-out-this-form-only-once.-contact-the-owner-of-the-form-if-you-think-this-is-a-mistake"
-		},
-		type = "localizable_text"
-	)
-	public String limitToOneSubmissionPerUserBody();
-
-	@DDMFormField(
-		label = "%header",
-		properties = "placeholder=%you-have-already-responded",
-		type = "localizable_text"
-	)
-	public String limitToOneSubmissionPerUserHeader();
-
-	@DDMFormField(
-		label = "%never-expire", predefinedValue = "true", type = "checkbox"
-	)
-	public boolean neverExpire();
-
-	@DDMFormField(
 		label = "%select-object",
 		properties = {
 			"dataSourceType=data-provider", "ddmDataProviderInstanceId=objects"
@@ -213,7 +139,7 @@ public interface DDMFormInstanceSettings {
 		label = "%redirect-url-on-success",
 		properties = "placeholder=%enter-a-valid-url",
 		validationErrorMessage = "%please-enter-a-valid-url",
-		validationExpression = "isEmpty(redirectURL) OR isURL(redirectURL, TRUE)"
+		validationExpression = "isEmpty(redirectURL) OR isURL(redirectURL)"
 	)
 	public String redirectURL();
 
@@ -234,13 +160,6 @@ public interface DDMFormInstanceSettings {
 		properties = "showAsSwitcher=true", type = "checkbox"
 	)
 	public boolean sendEmailNotification();
-
-	@DDMFormField(
-		label = "%show-forms-report-data-to-respondents",
-		tip = "%allow-respondents-to-see-the-current-forms-report-data",
-		type = "checkbox"
-	)
-	public boolean showPartialResultsToRespondents();
 
 	@DDMFormField(
 		label = "%select-a-storage-type", predefinedValue = "[\"default\"]",

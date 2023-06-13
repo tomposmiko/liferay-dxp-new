@@ -20,7 +20,6 @@ import com.liferay.frontend.view.state.model.FVSActiveEntryTable;
 import com.liferay.frontend.view.state.model.impl.FVSActiveEntryImpl;
 import com.liferay.frontend.view.state.model.impl.FVSActiveEntryModelImpl;
 import com.liferay.frontend.view.state.service.persistence.FVSActiveEntryPersistence;
-import com.liferay.frontend.view.state.service.persistence.FVSActiveEntryUtil;
 import com.liferay.frontend.view.state.service.persistence.impl.constants.FVSPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -45,11 +45,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -76,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = FVSActiveEntryPersistence.class)
+@Component(service = {FVSActiveEntryPersistence.class, BasePersistence.class})
 public class FVSActiveEntryPersistenceImpl
 	extends BasePersistenceImpl<FVSActiveEntry>
 	implements FVSActiveEntryPersistence {
@@ -193,7 +192,7 @@ public class FVSActiveEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<FVSActiveEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FVSActiveEntry fvsActiveEntry : list) {
@@ -576,7 +575,7 @@ public class FVSActiveEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -735,7 +734,7 @@ public class FVSActiveEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<FVSActiveEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FVSActiveEntry fvsActiveEntry : list) {
@@ -1151,7 +1150,7 @@ public class FVSActiveEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1310,7 +1309,7 @@ public class FVSActiveEntryPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByU_CDSDI_P_P, finderArgs, this);
+				_finderPathFetchByU_CDSDI_P_P, finderArgs);
 		}
 
 		if (result instanceof FVSActiveEntry) {
@@ -1456,7 +1455,7 @@ public class FVSActiveEntryPersistenceImpl
 			userId, clayDataSetDisplayId, plid, portletId
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -1681,7 +1680,7 @@ public class FVSActiveEntryPersistenceImpl
 		fvsActiveEntry.setNew(true);
 		fvsActiveEntry.setPrimaryKey(fvsActiveEntryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		fvsActiveEntry.setUuid(uuid);
 
@@ -1801,7 +1800,7 @@ public class FVSActiveEntryPersistenceImpl
 			(FVSActiveEntryModelImpl)fvsActiveEntry;
 
 		if (Validator.isNull(fvsActiveEntry.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			fvsActiveEntry.setUuid(uuid);
 		}
@@ -1998,7 +1997,7 @@ public class FVSActiveEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<FVSActiveEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2068,7 +2067,7 @@ public class FVSActiveEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2197,31 +2196,11 @@ public class FVSActiveEntryPersistenceImpl
 				"userId", "clayDataSetDisplayId", "plid", "portletId"
 			},
 			false);
-
-		_setFVSActiveEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setFVSActiveEntryUtilPersistence(null);
-
 		entityCache.removeCache(FVSActiveEntryImpl.class.getName());
-	}
-
-	private void _setFVSActiveEntryUtilPersistence(
-		FVSActiveEntryPersistence fvsActiveEntryPersistence) {
-
-		try {
-			Field field = FVSActiveEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, fvsActiveEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2288,6 +2267,7 @@ public class FVSActiveEntryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private FVSActiveEntryModelArgumentsResolver
+		_fvsActiveEntryModelArgumentsResolver;
 
 }

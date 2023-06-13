@@ -26,12 +26,12 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -139,7 +139,7 @@ public class CPInstanceCommercePriceEntryDisplayContext
 				commercePriceListItemSelectorCriterion)
 		).setParameter(
 			"checkedCommercePriceListIds",
-			StringUtil.merge(_getCheckedCommercePriceListIds())
+			StringUtil.merge(getCheckedCommercePriceListIds())
 		).buildString();
 	}
 
@@ -163,11 +163,11 @@ public class CPInstanceCommercePriceEntryDisplayContext
 		return "price-lists";
 	}
 
-	private long[] _getCheckedCommercePriceListIds() throws PortalException {
+	protected long[] getCheckedCommercePriceListIds() throws PortalException {
 		List<Long> commercePriceListIds = new ArrayList<>();
 
 		List<CommercePriceEntry> commercePriceEntries =
-			_getCommercePriceEntries();
+			getCommercePriceEntries();
 
 		for (CommercePriceEntry commercePriceEntry : commercePriceEntries) {
 			commercePriceListIds.add(
@@ -181,7 +181,7 @@ public class CPInstanceCommercePriceEntryDisplayContext
 		return new long[0];
 	}
 
-	private List<CommercePriceEntry> _getCommercePriceEntries()
+	protected List<CommercePriceEntry> getCommercePriceEntries()
 		throws PortalException {
 
 		return _commercePriceEntryService.getInstanceCommercePriceEntries(

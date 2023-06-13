@@ -27,10 +27,6 @@ public class CommerceDiscountServiceWrapper
 	implements CommerceDiscountService,
 			   ServiceWrapper<CommerceDiscountService> {
 
-	public CommerceDiscountServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceDiscountServiceWrapper(
 		CommerceDiscountService commerceDiscountService) {
 
@@ -269,16 +265,6 @@ public class CommerceDiscountServiceWrapper
 
 		return _commerceDiscountService.getCommerceDiscounts(
 			companyId, couponCode);
-	}
-
-	@Override
-	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
-			getCommerceDiscounts(
-				long companyId, String level, boolean active, int status)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceDiscountService.getCommerceDiscounts(
-			companyId, level, active, status);
 	}
 
 	/**

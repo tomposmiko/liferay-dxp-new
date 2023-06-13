@@ -97,7 +97,13 @@ public class KBArchiveFactory {
 		return new KBArchiveImpl(kbArchiveState.getFolders());
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	public void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
 	private ConfigurationProvider _configurationProvider;
 
 	private static final class FileImpl implements KBArchive.File {

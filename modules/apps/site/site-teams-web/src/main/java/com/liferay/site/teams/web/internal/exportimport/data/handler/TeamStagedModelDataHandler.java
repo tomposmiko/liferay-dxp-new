@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Akos Thurzo
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SiteTeamsPortletKeys.SITE_TEAMS,
 	service = StagedModelDataHandler.class
 )
@@ -120,7 +121,7 @@ public class TeamStagedModelDataHandler
 			PortletDataContext portletDataContext, Team team)
 		throws Exception {
 
-		Team existingTeam = _fetchExistingTeam(
+		Team existingTeam = fetchExistingTeam(
 			team.getUuid(), portletDataContext.getScopeGroupId(),
 			team.getName());
 
@@ -191,12 +192,7 @@ public class TeamStagedModelDataHandler
 		portletDataContext.importClassedModel(team, importedTeam);
 	}
 
-	@Override
-	protected boolean isSkipImportReferenceStagedModels() {
-		return true;
-	}
-
-	private Team _fetchExistingTeam(String uuid, long groupId, String name) {
+	protected Team fetchExistingTeam(String uuid, long groupId, String name) {
 		Team team = fetchStagedModelByUuidAndGroupId(uuid, groupId);
 
 		if (team != null) {
@@ -206,13 +202,30 @@ public class TeamStagedModelDataHandler
 		return _teamLocalService.fetchTeam(groupId, name);
 	}
 
-	@Reference
+	@Override
+	protected boolean isSkipImportReferenceStagedModels() {
+		return true;
+	}
+
+	@Reference(unbind = "-")
+	protected void setTeamLocalService(TeamLocalService teamLocalService) {
+		_teamLocalService = teamLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserGroupLocalService(
+		UserGroupLocalService userGroupLocalService) {
+
+		_userGroupLocalService = userGroupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private TeamLocalService _teamLocalService;
-
-	@Reference
 	private UserGroupLocalService _userGroupLocalService;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

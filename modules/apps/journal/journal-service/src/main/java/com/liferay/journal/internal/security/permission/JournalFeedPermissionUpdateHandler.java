@@ -48,7 +48,13 @@ public class JournalFeedPermissionUpdateHandler
 		_journalFeedLocalService.updateJournalFeed(feed);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setJournalFeedLocalService(
+		JournalFeedLocalService journalFeedLocalService) {
+
+		_journalFeedLocalService = journalFeedLocalService;
+	}
+
 	private JournalFeedLocalService _journalFeedLocalService;
 
 }

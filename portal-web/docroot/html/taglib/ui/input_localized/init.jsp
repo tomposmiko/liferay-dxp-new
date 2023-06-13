@@ -39,7 +39,6 @@ String id = HtmlUtil.getAUICompatibleId((String)request.getAttribute("liferay-ui
 boolean ignoreRequestValue = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:ignoreRequestValue"));
 String inputAddon = (String)request.getAttribute("liferay-ui:input-localized:inputAddon");
 String languageId = (String)request.getAttribute("liferay-ui:input-localized:languageId");
-String languagesDropdownDirection = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-localized:languagesDropdownDirection"));
 String maxLength = GetterUtil.getString((String)request.getAttribute("liferay-ui:input-localized:maxLength"));
 String name = (String)request.getAttribute("liferay-ui:input-localized:name");
 String placeholder = (String)request.getAttribute("liferay-ui:input-localized:placeholder");
@@ -77,6 +76,10 @@ String mainLanguageValue = LocalizationUtil.getLocalization(xml, mainLanguageId,
 
 if (!ignoreRequestValue) {
 	mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + mainLanguageId, mainLanguageValue);
+}
+
+if (Validator.isNull(mainLanguageValue)) {
+	mainLanguageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
 }
 
 String fieldNamePrefix = StringPool.BLANK;

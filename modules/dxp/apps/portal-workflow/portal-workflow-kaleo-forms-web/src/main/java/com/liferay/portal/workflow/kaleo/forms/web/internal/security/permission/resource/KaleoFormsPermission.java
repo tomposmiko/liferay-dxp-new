@@ -14,16 +14,19 @@
 
 package com.liferay.portal.workflow.kaleo.forms.web.internal.security.permission.resource;
 
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.workflow.kaleo.forms.constants.KaleoFormsConstants;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Dante Wang
  */
+@Component(immediate = true, service = {})
 public class KaleoFormsPermission {
 
 	public static void check(
@@ -38,16 +41,20 @@ public class KaleoFormsPermission {
 	public static boolean contains(
 		PermissionChecker permissionChecker, long groupId, String actionId) {
 
-		PortletResourcePermission portletResourcePermission =
-			_portletResourcePermissionSnapshot.get();
-
-		return portletResourcePermission.contains(
+		return _portletResourcePermission.contains(
 			permissionChecker, groupId, actionId);
 	}
 
-	private static final Snapshot<PortletResourcePermission>
-		_portletResourcePermissionSnapshot = new Snapshot<>(
-			KaleoFormsPermission.class, PortletResourcePermission.class,
-			"(resource.name=" + KaleoFormsConstants.RESOURCE_NAME + ")");
+	@Reference(
+		target = "(resource.name=" + KaleoFormsConstants.RESOURCE_NAME + ")",
+		unbind = "-"
+	)
+	protected void setPortletResourcePermission(
+		PortletResourcePermission portletResourcePermission) {
+
+		_portletResourcePermission = portletResourcePermission;
+	}
+
+	private static PortletResourcePermission _portletResourcePermission;
 
 }

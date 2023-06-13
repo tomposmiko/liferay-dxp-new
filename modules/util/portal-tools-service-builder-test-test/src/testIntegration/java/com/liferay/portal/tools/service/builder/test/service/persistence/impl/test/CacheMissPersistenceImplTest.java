@@ -138,7 +138,8 @@ public class CacheMissPersistenceImplTest {
 	@Test
 	public void testCacheMissIfCTProductionModeEnabled() throws Throwable {
 		try (SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			Assert.assertTrue(_fetchByPrimaryKeys().isEmpty());
 		}

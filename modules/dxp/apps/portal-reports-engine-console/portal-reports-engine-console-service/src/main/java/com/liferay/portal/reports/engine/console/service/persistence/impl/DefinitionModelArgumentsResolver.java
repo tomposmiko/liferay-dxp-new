@@ -33,11 +33,8 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.portal.reports.engine.console.model.impl.DefinitionImpl",
-		"table.name=Reports_Definition"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {DefinitionModelArgumentsResolver.class, ArgumentsResolver.class}
 )
 public class DefinitionModelArgumentsResolver implements ArgumentsResolver {
 

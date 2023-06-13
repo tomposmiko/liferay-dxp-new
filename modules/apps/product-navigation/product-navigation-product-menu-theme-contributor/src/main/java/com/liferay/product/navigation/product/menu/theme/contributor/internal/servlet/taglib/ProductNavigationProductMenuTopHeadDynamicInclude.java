@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Iván Zaera Avellón
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class ProductNavigationProductMenuTopHeadDynamicInclude
 	implements DynamicInclude {
 
@@ -66,7 +66,7 @@ public class ProductNavigationProductMenuTopHeadDynamicInclude
 				httpServletRequest);
 
 		sb.append(
-			absolutePortalURLBuilder.forBundleStylesheet(
+			absolutePortalURLBuilder.forModuleStylesheet(
 				_bundle, "/product_navigation_product_menu.css"
 			).build());
 

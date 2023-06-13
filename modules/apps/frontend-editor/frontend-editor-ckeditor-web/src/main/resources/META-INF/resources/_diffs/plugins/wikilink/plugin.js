@@ -14,7 +14,7 @@
 
 CKEDITOR.plugins.add('wikilink', {
 	init(editor) {
-		const instance = this;
+		var instance = this;
 
 		editor.addCommand('link', new CKEDITOR.dialogCommand('link'));
 		editor.addCommand('unlink', new CKEDITOR.unlinkCommand());
@@ -36,18 +36,18 @@ CKEDITOR.plugins.add('wikilink', {
 			// document.queryCommandEnabled does not work for this in Firefox.
 			// Use element paths to detect the state.
 
-			const command = editor.getCommand('unlink');
+			var command = editor.getCommand('unlink');
 
-			let commandState = CKEDITOR.TRISTATE_DISABLED;
+			var commandState = CKEDITOR.TRISTATE_DISABLED;
 
-			const lastElement = event.data.path.lastElement;
+			var lastElement = event.data.path.lastElement;
 
 			if (lastElement) {
-				const element = lastElement.getAscendant('a', true);
+				var element = lastElement.getAscendant('a', true);
 
 				if (
 					element &&
-					element.getName() === 'a' &&
+					element.getName() == 'a' &&
 					element.getAttribute('href')
 				) {
 					commandState = CKEDITOR.TRISTATE_OFF;
@@ -58,7 +58,7 @@ CKEDITOR.plugins.add('wikilink', {
 		});
 
 		editor.on('doubleclick', (event) => {
-			const element =
+			var element =
 				CKEDITOR.plugins.link.getSelectedLink(editor) ||
 				event.data.element;
 
@@ -86,7 +86,7 @@ CKEDITOR.plugins.add('wikilink', {
 
 		if (editor.contextMenu) {
 			editor.contextMenu.addListener((element) => {
-				let selectionObj = null;
+				var selectionObj = null;
 
 				if (element && !element.isReadOnly()) {
 					element = CKEDITOR.plugins.link.getSelectedLink(editor);
@@ -107,24 +107,24 @@ CKEDITOR.plugins.add('wikilink', {
 
 CKEDITOR.plugins.link = {
 	getSelectedLink(editor) {
-		let selectedLink = null;
+		var selectedLink = null;
 
 		try {
-			const selection = editor.getSelection();
+			var selection = editor.getSelection();
 
-			if (selection.getType() === CKEDITOR.SELECTION_ELEMENT) {
-				const selectedElement = selection.getSelectedElement();
+			if (selection.getType() == CKEDITOR.SELECTION_ELEMENT) {
+				var selectedElement = selection.getSelectedElement();
 
 				if (selectedElement.is('a')) {
 					selectedLink = selectedElement;
 				}
 			}
 			else {
-				const range = selection.getRanges(true)[0];
+				var range = selection.getRanges(true)[0];
 
 				range.shrink(CKEDITOR.SHRINK_TEXT);
 
-				const root = range.getCommonAncestor();
+				var root = range.getCommonAncestor();
 
 				selectedLink = root.getAscendant('a', true);
 			}
@@ -139,17 +139,17 @@ CKEDITOR.unlinkCommand = function () {};
 
 CKEDITOR.unlinkCommand.prototype = {
 	exec(editor) {
-		const selection = editor.getSelection();
+		var selection = editor.getSelection();
 
-		const bookmarks = selection.createBookmarks();
-		const ranges = selection.getRanges();
+		var bookmarks = selection.createBookmarks();
+		var ranges = selection.getRanges();
 
-		const length = ranges.length;
+		var length = ranges.length;
 
-		for (let i = 0; i < length; i++) {
-			const rangeRoot = ranges[i].getCommonAncestor(true);
+		for (var i = 0; i < length; i++) {
+			var rangeRoot = ranges[i].getCommonAncestor(true);
 
-			const element = rangeRoot.getAscendant('a', true);
+			var element = rangeRoot.getAscendant('a', true);
 
 			if (!element) {
 				continue;

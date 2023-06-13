@@ -18,11 +18,6 @@ import com.liferay.account.model.AccountGroup;
 import com.liferay.account.service.AccountGroupLocalService;
 import com.liferay.account.service.AccountGroupLocalServiceUtil;
 import com.liferay.account.service.persistence.AccountGroupPersistence;
-import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
-import com.liferay.exportimport.kernel.lar.ManifestSummary;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -33,13 +28,10 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -141,13 +133,10 @@ public abstract class AccountGroupLocalServiceBaseImpl
 	 *
 	 * @param accountGroup the account group
 	 * @return the account group that was removed
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public AccountGroup deleteAccountGroup(AccountGroup accountGroup)
-		throws PortalException {
-
+	public AccountGroup deleteAccountGroup(AccountGroup accountGroup) {
 		return accountGroupPersistence.remove(accountGroup);
 	}
 
@@ -256,35 +245,47 @@ public abstract class AccountGroupLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the account group with the matching UUID and company.
+	 * Returns the account group with the matching external reference code and company.
 	 *
-	 * @param uuid the account group's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
 	 * @return the matching account group, or <code>null</code> if a matching account group could not be found
 	 */
 	@Override
-	public AccountGroup fetchAccountGroupByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		return accountGroupPersistence.fetchByUuid_C_First(
-			uuid, companyId, null);
-	}
-
-	@Override
 	public AccountGroup fetchAccountGroupByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
-		return accountGroupPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
+		return accountGroupPersistence.fetchByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountGroupByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public AccountGroup fetchAccountGroupByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return fetchAccountGroupByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
+	 * @return the matching account group
+	 * @throws PortalException if a matching account group could not be found
+	 */
 	@Override
 	public AccountGroup getAccountGroupByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return accountGroupPersistence.findByERC_C(
-			externalReferenceCode, companyId);
+		return accountGroupPersistence.findByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -343,72 +344,6 @@ public abstract class AccountGroupLocalServiceBaseImpl
 		actionableDynamicQuery.setPrimaryKeyPropertyName("accountGroupId");
 	}
 
-	@Override
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		final PortletDataContext portletDataContext) {
-
-		final ExportActionableDynamicQuery exportActionableDynamicQuery =
-			new ExportActionableDynamicQuery() {
-
-				@Override
-				public long performCount() throws PortalException {
-					ManifestSummary manifestSummary =
-						portletDataContext.getManifestSummary();
-
-					StagedModelType stagedModelType = getStagedModelType();
-
-					long modelAdditionCount = super.performCount();
-
-					manifestSummary.addModelAdditionCount(
-						stagedModelType, modelAdditionCount);
-
-					long modelDeletionCount =
-						ExportImportHelperUtil.getModelDeletionCount(
-							portletDataContext, stagedModelType);
-
-					manifestSummary.addModelDeletionCount(
-						stagedModelType, modelDeletionCount);
-
-					return modelAdditionCount;
-				}
-
-			};
-
-		initActionableDynamicQuery(exportActionableDynamicQuery);
-
-		exportActionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
-
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(
-						dynamicQuery, "modifiedDate");
-				}
-
-			});
-
-		exportActionableDynamicQuery.setCompanyId(
-			portletDataContext.getCompanyId());
-
-		exportActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<AccountGroup>() {
-
-				@Override
-				public void performAction(AccountGroup accountGroup)
-					throws PortalException {
-
-					StagedModelDataHandlerUtil.exportStagedModel(
-						portletDataContext, accountGroup);
-				}
-
-			});
-		exportActionableDynamicQuery.setStagedModelType(
-			new StagedModelType(
-				PortalUtil.getClassNameId(AccountGroup.class.getName())));
-
-		return exportActionableDynamicQuery;
-	}
-
 	/**
 	 * @throws PortalException
 	 */
@@ -427,11 +362,6 @@ public abstract class AccountGroupLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement AccountGroupLocalServiceImpl#deleteAccountGroup(AccountGroup) to avoid orphaned data");
-		}
-
 		return accountGroupLocalService.deleteAccountGroup(
 			(AccountGroup)persistedModel);
 	}
@@ -449,23 +379,6 @@ public abstract class AccountGroupLocalServiceBaseImpl
 		throws PortalException {
 
 		return accountGroupPersistence.findByPrimaryKey(primaryKeyObj);
-	}
-
-	/**
-	 * Returns the account group with the matching UUID and company.
-	 *
-	 * @param uuid the account group's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching account group
-	 * @throws PortalException if a matching account group could not be found
-	 */
-	@Override
-	public AccountGroup getAccountGroupByUuidAndCompanyId(
-			String uuid, long companyId)
-		throws PortalException {
-
-		return accountGroupPersistence.findByUuid_C_First(
-			uuid, companyId, null);
 	}
 
 	/**
@@ -596,8 +509,5 @@ public abstract class AccountGroupLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountGroupLocalServiceBaseImpl.class);
 
 }

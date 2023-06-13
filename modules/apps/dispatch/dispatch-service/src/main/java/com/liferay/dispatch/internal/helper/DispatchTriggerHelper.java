@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 
 import java.util.Date;
-import java.util.TimeZone;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,19 +38,18 @@ public class DispatchTriggerHelper {
 
 	public void addSchedulerJob(
 			long dispatchTriggerId, String cronExpression, Date startDate,
-			Date endDate, StorageType storageType, String timeZoneId)
+			Date endDate, StorageType storageType)
 		throws DispatchTriggerSchedulerException {
 
 		Trigger trigger = _triggerFactory.createTrigger(
 			_getJobName(dispatchTriggerId), _getGroupName(dispatchTriggerId),
-			startDate, endDate, cronExpression,
-			TimeZone.getTimeZone(timeZoneId));
+			startDate, endDate, cronExpression);
 
 		try {
 			_schedulerEngineHelper.schedule(
 				trigger, storageType, null,
 				DispatchConstants.EXECUTOR_DESTINATION_NAME,
-				_getPayload(dispatchTriggerId));
+				_getPayload(dispatchTriggerId), 1000);
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(
@@ -96,32 +94,18 @@ public class DispatchTriggerHelper {
 	public Date getNextFireDate(long dispatchTriggerId, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse =
-			_schedulerEngineHelper.getScheduledJob(
-				_getJobName(dispatchTriggerId),
-				_getGroupName(dispatchTriggerId), storageType);
-
-		if (schedulerResponse == null) {
-			return null;
-		}
-
-		return _schedulerEngineHelper.getNextFireTime(schedulerResponse);
+		return _schedulerEngineHelper.getNextFireTime(
+			_getJobName(dispatchTriggerId), _getGroupName(dispatchTriggerId),
+			storageType);
 	}
 
 	public Date getPreviousFireDate(
 			long dispatchTriggerId, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse =
-			_schedulerEngineHelper.getScheduledJob(
-				_getJobName(dispatchTriggerId),
-				_getGroupName(dispatchTriggerId), storageType);
-
-		if (schedulerResponse == null) {
-			return null;
-		}
-
-		return _schedulerEngineHelper.getPreviousFireTime(schedulerResponse);
+		return _schedulerEngineHelper.getPreviousFireTime(
+			_getJobName(dispatchTriggerId), _getGroupName(dispatchTriggerId),
+			storageType);
 	}
 
 	public void unscheduleSchedulerJob(

@@ -14,7 +14,6 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0.factory;
 
-import com.liferay.object.admin.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectFieldResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,18 +33,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +58,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/object-admin/v1.0/ObjectField",
-	service = ObjectFieldResource.Factory.class
-)
+@Component(immediate = true, service = ObjectFieldResource.Factory.class)
 @Generated("")
 public class ObjectFieldResourceFactoryImpl
 	implements ObjectFieldResource.Factory {
@@ -79,7 +73,9 @@ public class ObjectFieldResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _objectFieldResourceProxyProviderFunction.apply(
+				return (ObjectFieldResource)ProxyUtil.newProxyInstance(
+					ObjectFieldResource.class.getClassLoader(),
+					new Class<?>[] {ObjectFieldResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -138,32 +134,14 @@ public class ObjectFieldResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, ObjectFieldResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		ObjectFieldResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			ObjectFieldResource.class.getClassLoader(),
-			ObjectFieldResource.class);
-
-		try {
-			Constructor<ObjectFieldResource> constructor =
-				(Constructor<ObjectFieldResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		ObjectFieldResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -186,7 +164,7 @@ public class ObjectFieldResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		ObjectFieldResource objectFieldResource =
@@ -210,7 +188,6 @@ public class ObjectFieldResourceFactoryImpl
 		objectFieldResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		objectFieldResource.setRoleLocalService(_roleLocalService);
-		objectFieldResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(objectFieldResource, arguments);
@@ -227,9 +204,6 @@ public class ObjectFieldResourceFactoryImpl
 		}
 	}
 
-	private static final Function<InvocationHandler, ObjectFieldResource>
-		_objectFieldResourceProxyProviderFunction = _getProxyProviderFunction();
-
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
@@ -240,9 +214,7 @@ public class ObjectFieldResourceFactoryImpl
 	@Reference
 	private PermissionCheckerFactory _defaultPermissionCheckerFactory;
 
-	@Reference(
-		target = "(result.class.name=com.liferay.portal.kernel.search.filter.Filter)"
-	)
+	@Reference
 	private ExpressionConvert<Filter> _expressionConvert;
 
 	@Reference
@@ -250,6 +222,9 @@ public class ObjectFieldResourceFactoryImpl
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
@@ -259,9 +234,6 @@ public class ObjectFieldResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

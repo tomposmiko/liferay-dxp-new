@@ -226,7 +226,7 @@ public class JournalContentImpl
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 
@@ -298,11 +298,12 @@ public class JournalContentImpl
 		PortletRequestModel portletRequestModel, ThemeDisplay themeDisplay) {
 
 		try {
+			JournalArticle article = _journalArticleLocalService.getArticle(
+				groupId, articleId, version);
+
 			return getDisplay(
-				_journalArticleLocalService.getArticle(
-					groupId, articleId, version),
-				ddmTemplateKey, viewMode, languageId, page, portletRequestModel,
-				themeDisplay);
+				article, ddmTemplateKey, viewMode, languageId, page,
+				portletRequestModel, themeDisplay);
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {

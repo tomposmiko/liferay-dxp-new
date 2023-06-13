@@ -25,7 +25,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.GroupKeyException;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -46,6 +46,7 @@ import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -68,70 +69,64 @@ public class AddDepotEntryMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		String name = ParamUtil.getString(actionRequest, "name");
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
 
 		if (Validator.isNotNull(name)) {
 			nameMap.put(LocaleUtil.getDefault(), name);
 		}
 
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 
 		try {
+			DepotEntry depotEntry = _depotEntryService.addDepotEntry(
+				nameMap, descriptionMap,
+				ServiceContextFactory.getInstance(
+					DepotEntry.class.getName(), actionRequest));
+
+			PortletURL editDepotURL =
+				DepotEntryURLUtil.getEditDepotEntryPortletURL(
+					depotEntry, ParamUtil.getString(actionRequest, "redirect"),
+					_portal.getLiferayPortletRequest(actionRequest));
+
 			MultiSessionMessages.add(
 				actionRequest,
 				DepotPortletKeys.DEPOT_ADMIN + "requestProcessed");
 
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse,
-				JSONUtil.put(
-					"redirectURL",
-					() -> {
-						DepotEntry depotEntry =
-							_depotEntryService.addDepotEntry(
-								nameMap, descriptionMap,
-								ServiceContextFactory.getInstance(
-									DepotEntry.class.getName(), actionRequest));
-
-						return String.valueOf(
-							DepotEntryURLUtil.getEditDepotEntryPortletURL(
-								depotEntry,
-								ParamUtil.getString(actionRequest, "redirect"),
-								_portal.getLiferayPortletRequest(
-									actionRequest)));
-					}));
+				JSONUtil.put("redirectURL", editDepotURL.toString()));
 		}
 		catch (Exception exception) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse,
 				JSONUtil.put(
-					"error",
-					_getErrorMessage(
-						(ThemeDisplay)actionRequest.getAttribute(
-							WebKeys.THEME_DISPLAY),
-						exception.getCause())));
+					"error", _getErrorMessage(exception, themeDisplay)));
 		}
 	}
 
 	private String _getErrorMessage(
-		ThemeDisplay themeDisplay, Throwable throwable) {
+		Exception exception, ThemeDisplay themeDisplay) {
 
-		if (throwable instanceof DepotEntryNameException) {
-			return _language.get(
+		if (exception instanceof DepotEntryNameException) {
+			return LanguageUtil.get(
 				themeDisplay.getRequest(), "please-enter-a-name");
 		}
 
-		if (throwable instanceof DuplicateGroupException) {
-			return _language.get(
+		if (exception instanceof DuplicateGroupException) {
+			return LanguageUtil.get(
 				themeDisplay.getRequest(), "please-enter-a-unique-name");
 		}
 
-		if (throwable instanceof GroupKeyException) {
+		if (exception instanceof GroupKeyException) {
 			return _handleGroupKeyException(themeDisplay);
 		}
 
-		return _language.get(
+		return LanguageUtil.get(
 			themeDisplay.getRequest(), "an-unexpected-error-occurred");
 	}
 
@@ -139,7 +134,7 @@ public class AddDepotEntryMVCActionCommand extends BaseMVCActionCommand {
 		StringBundler sb = new StringBundler(5);
 
 		sb.append(
-			_language.format(
+			LanguageUtil.format(
 				themeDisplay.getRequest(),
 				"the-x-cannot-be-x-or-a-reserved-word-such-as-x",
 				new String[] {
@@ -152,7 +147,7 @@ public class AddDepotEntryMVCActionCommand extends BaseMVCActionCommand {
 		sb.append(StringPool.SPACE);
 
 		sb.append(
-			_language.format(
+			LanguageUtil.format(
 				themeDisplay.getRequest(),
 				"the-x-cannot-contain-the-following-invalid-characters-x",
 				new String[] {
@@ -166,7 +161,7 @@ public class AddDepotEntryMVCActionCommand extends BaseMVCActionCommand {
 			Group.class.getName(), "groupKey");
 
 		sb.append(
-			_language.format(
+			LanguageUtil.format(
 				themeDisplay.getRequest(),
 				"the-x-cannot-contain-more-than-x-characters",
 				new String[] {
@@ -179,12 +174,6 @@ public class AddDepotEntryMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private DepotEntryService _depotEntryService;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

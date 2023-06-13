@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Add a fragment collection via JSON") {
@@ -37,7 +37,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -45,111 +45,66 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-76817. Can namespace the CSS of a Web Fragment to avoid affecting the rest of the page."
-	@priority = 3
-	test CanCheckTheNamespaceOfCSSInFragments {
-		task ("Edit this fragment with the following codes") {
+	@description = "This is a test for LPS-108376. Can check Cacheable for fragments when create them in portal and they are non-Cachable by default."
+	@priority = "5"
+	test MarkFragmentCreatedInPortalAsCacheable {
+		property portal.acceptance = "true";
+
+		task ("Add a new fragment") {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
 			FragmentsAdminNavigator.gotoEntryEllipsisItem(
 				entry = "Fragment Name",
 				item = "Edit");
-
-			var htmlSnippet = '''
-<div class="test">
-CSS
-</div>
-<div>
-NO CSS
-</div>
-		''';
-			var cssSnippet = '''
-.test
-{ font-size: 40px; }
-		''';
-
-			FragmentsEditor.typeHtmlEditor(content = ${htmlSnippet});
-
-			FragmentsEditor.typeCssEditor(content = ${cssSnippet});
-
-			FragmentsEditor.waitForAutoSave();
 		}
 
-		task ("Assert CSS only applies to CSS and not NO CSS in Fragment preview") {
-			FragmentsEditor.assertFragmentPreview(
-				fragmentLocator = "//div[@class='test']",
-				text = "CSS");
+		task ("Mark the fragment as cacheable") {
+			AssertNotChecked.assertNotCheckedNotVisible(
+				checkboxName = "Cacheable",
+				locator1 = "Checkbox#ANY_CHECKBOX");
 
-			FragmentsEditor.assertFragmentPreview(fragmentLocator = "//div[@class='test']/parent::div/following-sibling::style");
-		}
+			Check.checkNotVisible(
+				checkboxName = "Cacheable",
+				locator1 = "Checkbox#ANY_CHECKBOX");
 
-		task ("Assert Success Message") {
 			PortletEntry.publish();
 		}
 	}
 
-	@description = "This is a test for LPS-108376. Can check Cacheable for fragments when create them in portal and they are non-Cachable by default."
-	@priority = 5
-	@uitest
-	test MarkFragmentCreatedInPortalAsCacheable {
-		property portal.acceptance = "true";
-
-		task ("Mark the fragment as cacheable") {
-			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
-
-			FragmentsAdminNavigator.gotoEntryEllipsisItem(
-				entry = "Fragment Name",
-				item = "Mark as Cacheable");
-
-			AssertConfirm(value1 = "Only check when developing a static fragment that does not use request handling, the CMS query API, or other dynamic features. Referencing taglibs can also warrant unchecking this feature, since they could modify content outside the template engine's generated cache.");
-
-			Alert.viewSuccessMessage();
-
-			LexiconCard.viewCardLabel(
-				card = "Fragment Name",
-				cardLabel = "Cached",
-				index = 2);
-		}
-	}
-
 	@description = "This is a test for LPS-108376. Can check Cacheable for fragments without Read-Only label imported to portal and they are non-Cachable by default."
-	@priority = 4
+	@priority = "4"
 	test MarkFragmentWithoutReadOnlyImportedToPortalAsCacheable {
 		task ("Import a fragment collection without Read-Only") {
 			FragmentsAdmin.importCollectionFromDependenciesFolder(collectionZipFile = "fragment-collection.zip");
 		}
 
-		task ("Mark the imported fragment as cacheable") {
+		task ("Edit the imported fragment") {
 			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
 
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
 			FragmentsAdminNavigator.gotoEntryEllipsisItem(
 				entry = "Content",
-				item = "Mark as Cacheable");
-
-			AssertConfirm(value1 = "Only check when developing a static fragment that does not use request handling, the CMS query API, or other dynamic features. Referencing taglibs can also warrant unchecking this feature, since they could modify content outside the template engine's generated cache.");
-
-			Alert.viewSuccessMessage();
-
-			LexiconCard.viewCardLabel(
-				card = "Content",
-				cardLabel = "Cached",
-				index = 2);
+				item = "Edit");
 		}
 
-		task ("View the imported fragment without Read-Only label") {
-			FragmentsAdminNavigator.gotoEntryEllipsisItem(
-				entry = "Content",
-				item = "Edit");
-
+		task ("Mark the fragment as cacheable") {
 			AssertElementNotPresent(locator1 = "FragmentEditor#READ_ONLY_VIEW");
+
+			AssertNotChecked.assertNotCheckedNotVisible(
+				checkboxName = "Cacheable",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+
+			Check.checkNotVisible(
+				checkboxName = "Cacheable",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+
+			PortletEntry.publish();
 		}
 	}
 
 	@description = "This is a test for LPS-111657. Can save Container and nested elements as a new composition when the Container is inside a column of Row."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test SaveContainerAsCompositionInModuleOfGrid {
 		property portal.acceptance = "true";
 
@@ -173,7 +128,7 @@ NO CSS
 		task ("Add a Container to the first module of grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Layout Elements",
-				columnNumber = 1,
+				columnNumber = "1",
 				fragmentName = "Container",
 				navTab = "Fragments");
 		}
@@ -186,14 +141,22 @@ NO CSS
 		}
 
 		task ("Add an Asset Publisher below Image inside the Container") {
-			PageEditor.addElementToContainer(
-				navTab = "Widgets",
-				portletName = "Asset Publisher",
-				targetElementName = "Image");
+			PageEditor.gotoTab(tabName = "Widgets");
+
+			Type.sendKeysApplicationSearch(
+				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_SEARCH_FIELD",
+				value1 = "Asset Publisher");
+
+			DragAndDrop.javaScriptDragAndDropObjectBelowTallNestedObject(
+				key_portletName = "Asset Publisher",
+				key_position = "1",
+				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_WIDGET",
+				locator2 = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Image')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
+				value1 = "Asset Publisher");
 
 			AssertElementPresent(
-				key_elementHeader = "//div[@aria-label='Asset Publisher']",
-				key_position = 1,
+				key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
+				key_position = "1",
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
 			PageEditor.waitForAutoSave();
@@ -218,8 +181,8 @@ NO CSS
 
 			for (var elementName : list "Image,Asset Publisher") {
 				AssertElementPresent(
-					key_elementHeader = "//div[@aria-label='${elementName}']",
-					key_position = 2,
+					key_elementHeader = "//li[contains(@class,'topper__title') and contains(.,'${elementName}')]",
+					key_position = "2",
 					locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 			}
 		}

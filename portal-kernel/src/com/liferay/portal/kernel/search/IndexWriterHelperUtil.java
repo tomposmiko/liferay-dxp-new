@@ -29,49 +29,58 @@ import java.util.Map;
 public class IndexWriterHelperUtil {
 
 	public static void addDocument(
-			long companyId, Document document, boolean commitImmediately)
-		throws SearchException {
-
-		_indexWriterHelper.addDocument(companyId, document, commitImmediately);
-	}
-
-	public static void addDocuments(
-			long companyId, Collection<Document> documents,
+			String searchEngineId, long companyId, Document document,
 			boolean commitImmediately)
 		throws SearchException {
 
+		_indexWriterHelper.addDocument(
+			searchEngineId, companyId, document, commitImmediately);
+	}
+
+	public static void addDocuments(
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
+		throws SearchException {
+
 		_indexWriterHelper.addDocuments(
-			companyId, documents, commitImmediately);
+			searchEngineId, companyId, documents, commitImmediately);
 	}
 
-	public static void commit() throws SearchException {
-		_indexWriterHelper.commit();
+	public static void commit(String searchEngineId) throws SearchException {
+		_indexWriterHelper.commit(searchEngineId);
 	}
 
-	public static void commit(long companyId) throws SearchException {
-		_indexWriterHelper.commit(companyId);
+	public static void commit(String searchEngineId, long companyId)
+		throws SearchException {
+
+		_indexWriterHelper.commit(searchEngineId, companyId);
 	}
 
 	public static void deleteDocument(
-			long companyId, String uid, boolean commitImmediately)
+			String searchEngineId, long companyId, String uid,
+			boolean commitImmediately)
 		throws SearchException {
 
-		_indexWriterHelper.deleteDocument(companyId, uid, commitImmediately);
+		_indexWriterHelper.deleteDocument(
+			searchEngineId, companyId, uid, commitImmediately);
 	}
 
 	public static void deleteDocuments(
-			long companyId, Collection<String> uids, boolean commitImmediately)
+			String searchEngineId, long companyId, Collection<String> uids,
+			boolean commitImmediately)
 		throws SearchException {
 
-		_indexWriterHelper.deleteDocuments(companyId, uids, commitImmediately);
+		_indexWriterHelper.deleteDocuments(
+			searchEngineId, companyId, uids, commitImmediately);
 	}
 
 	public static void deleteEntityDocuments(
-			long companyId, String className, boolean commitImmediately)
+			String searchEngineId, long companyId, String className,
+			boolean commitImmediately)
 		throws SearchException {
 
 		_indexWriterHelper.deleteEntityDocuments(
-			companyId, className, commitImmediately);
+			searchEngineId, companyId, className, commitImmediately);
 	}
 
 	public static int getReindexTaskCount(long groupId, boolean completed)
@@ -89,10 +98,28 @@ public class IndexWriterHelperUtil {
 			companyId, querySuggestion, weight, keywordType, locale);
 	}
 
+	public static void indexKeyword(
+			String searchEngineId, long companyId, String querySuggestion,
+			float weight, String keywordType, Locale locale)
+		throws SearchException {
+
+		_indexWriterHelper.indexKeyword(
+			searchEngineId, companyId, querySuggestion, weight, keywordType,
+			locale);
+	}
+
 	public static void indexQuerySuggestionDictionaries(long companyId)
 		throws SearchException {
 
 		_indexWriterHelper.indexQuerySuggestionDictionaries(companyId);
+	}
+
+	public static void indexQuerySuggestionDictionaries(
+			String searchEngineId, long companyId)
+		throws SearchException {
+
+		_indexWriterHelper.indexQuerySuggestionDictionaries(
+			searchEngineId, companyId);
 	}
 
 	public static void indexQuerySuggestionDictionary(
@@ -102,10 +129,26 @@ public class IndexWriterHelperUtil {
 		_indexWriterHelper.indexQuerySuggestionDictionary(companyId, locale);
 	}
 
+	public static void indexQuerySuggestionDictionary(
+			String searchEngineId, long companyId, Locale locale)
+		throws SearchException {
+
+		_indexWriterHelper.indexQuerySuggestionDictionary(
+			searchEngineId, companyId, locale);
+	}
+
 	public static void indexSpellCheckerDictionaries(long companyId)
 		throws SearchException {
 
 		_indexWriterHelper.indexSpellCheckerDictionaries(companyId);
+	}
+
+	public static void indexSpellCheckerDictionaries(
+			String searchEngineId, long companyId)
+		throws SearchException {
+
+		_indexWriterHelper.indexSpellCheckerDictionaries(
+			searchEngineId, companyId);
 	}
 
 	public static void indexSpellCheckerDictionary(
@@ -113,6 +156,14 @@ public class IndexWriterHelperUtil {
 		throws SearchException {
 
 		_indexWriterHelper.indexSpellCheckerDictionary(companyId, locale);
+	}
+
+	public static void indexSpellCheckerDictionary(
+			String searchEngineId, long companyId, Locale locale)
+		throws SearchException {
+
+		_indexWriterHelper.indexSpellCheckerDictionary(
+			searchEngineId, companyId, locale);
 	}
 
 	/**
@@ -141,20 +192,21 @@ public class IndexWriterHelperUtil {
 	}
 
 	public static void partiallyUpdateDocument(
-			long companyId, Document document, boolean commitImmediately)
-		throws SearchException {
-
-		_indexWriterHelper.partiallyUpdateDocument(
-			companyId, document, commitImmediately);
-	}
-
-	public static void partiallyUpdateDocuments(
-			long companyId, Collection<Document> documents,
+			String searchEngineId, long companyId, Document document,
 			boolean commitImmediately)
 		throws SearchException {
 
+		_indexWriterHelper.partiallyUpdateDocument(
+			searchEngineId, companyId, document, commitImmediately);
+	}
+
+	public static void partiallyUpdateDocuments(
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
+		throws SearchException {
+
 		_indexWriterHelper.partiallyUpdateDocuments(
-			companyId, documents, commitImmediately);
+			searchEngineId, companyId, documents, commitImmediately);
 	}
 
 	public static BackgroundTask reindex(
@@ -197,19 +249,22 @@ public class IndexWriterHelperUtil {
 		_indexWriterHelper.setIndexReadOnly(className, indexReadOnly);
 	}
 
-	public static void updateDocument(long companyId, Document document)
-		throws SearchException {
-
-		_indexWriterHelper.updateDocument(companyId, document);
-	}
-
-	public static void updateDocuments(
-			long companyId, Collection<Document> documents,
+	public static void updateDocument(
+			String searchEngineId, long companyId, Document document,
 			boolean commitImmediately)
 		throws SearchException {
 
+		_indexWriterHelper.updateDocument(
+			searchEngineId, companyId, document, commitImmediately);
+	}
+
+	public static void updateDocuments(
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
+		throws SearchException {
+
 		_indexWriterHelper.updateDocuments(
-			companyId, documents, commitImmediately);
+			searchEngineId, companyId, documents, commitImmediately);
 	}
 
 	public static void updatePermissionFields(String name, String primKey) {

@@ -37,7 +37,7 @@ const DropDownAction = ({action: {action, name}, item, setActive}) => {
 	);
 };
 
-export default function DropDown({actions, item, noActionsMessage}) {
+export default ({actions, item, noActionsMessage}) => {
 	const [active, setActive] = useState(false);
 
 	const DropdownButton = (
@@ -52,12 +52,12 @@ export default function DropDown({actions, item, noActionsMessage}) {
 		action.show ? action.show(item) : true
 	);
 
-	if (!actions.length) {
+	if (actions.length === 0) {
 		return cloneElement(DropdownButton, {
 			'data-tooltip-align': 'bottom',
 			'data-tooltip-delay': '200',
-			'disabled': true,
-			'title': noActionsMessage,
+			disabled: true,
+			title: noActionsMessage,
 		});
 	}
 
@@ -81,4 +81,4 @@ export default function DropDown({actions, item, noActionsMessage}) {
 			</ClayDropDown.ItemList>
 		</ClayDropDown>
 	);
-}
+};

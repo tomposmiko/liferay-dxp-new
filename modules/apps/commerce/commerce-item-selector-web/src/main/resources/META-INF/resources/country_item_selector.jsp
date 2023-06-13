@@ -20,11 +20,36 @@
 CommerceCountryItemSelectorViewDisplayContext commerceCountryItemSelectorViewDisplayContext = (CommerceCountryItemSelectorViewDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 String itemSelectedEventName = commerceCountryItemSelectorViewDisplayContext.getItemSelectedEventName();
+
+PortletURL portletURL = commerceCountryItemSelectorViewDisplayContext.getPortletURL();
 %>
 
-<clay:management-toolbar
-	managementToolbarDisplayContext="<%= new CommerceCountryItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, commerceCountryItemSelectorViewDisplayContext.getSearchContainer()) %>"
-/>
+<liferay-frontend:management-bar
+	includeCheckBox="<%= true %>"
+	searchContainerId="commerceCountries"
+>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= portletURL %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= commerceCountryItemSelectorViewDisplayContext.getOrderByCol() %>"
+			orderByType="<%= commerceCountryItemSelectorViewDisplayContext.getOrderByType() %>"
+			orderColumns='<%= new String[] {"priority"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />commerceCountrySelectorWrapper">
 	<liferay-ui:search-container
@@ -93,7 +118,7 @@ String itemSelectedEventName = commerceCountryItemSelectorViewDisplayContext.get
 		Liferay.Util.getOpener().Liferay.fire(
 			'<%= HtmlUtil.escapeJS(itemSelectedEventName) %>',
 			{
-				data: Liferay.Util.getCheckedCheckboxes(
+				data: Liferay.Util.listCheckedExcept(
 					commerceCountrySelectorWrapper,
 					'<portlet:namespace />allRowIds'
 				),

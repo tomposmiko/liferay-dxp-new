@@ -17,7 +17,7 @@ package com.liferay.blogs.web.internal.info.list.renderer;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.web.internal.info.item.renderer.BlogsEntryAbstractInfoItemRenderer;
 import com.liferay.info.item.renderer.InfoItemRenderer;
-import com.liferay.info.item.renderer.InfoItemRendererRegistry;
+import com.liferay.info.item.renderer.InfoItemRendererTracker;
 import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRendererContext;
 import com.liferay.info.taglib.list.renderer.BasicInfoListRenderer;
@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +42,7 @@ public abstract class BaseBlogsEntryBasicInfoListRenderer
 
 	@Override
 	public List<InfoItemRenderer<?>> getAvailableInfoItemRenderers() {
-		return infoItemRendererRegistry.getInfoItemRenderers(
+		return infoItemRendererTracker.getInfoItemRenderers(
 			BlogsEntry.class.getName());
 	}
 
@@ -65,11 +66,14 @@ public abstract class BaseBlogsEntryBasicInfoListRenderer
 
 		infoListBasicListTag.setInfoListObjects(blogEntries);
 
-		String listItemRendererKey =
-			infoListRendererContext.getListItemRendererKey();
+		Optional<String> infoListItemRendererKeyOptional =
+			infoListRendererContext.getListItemRendererKeyOptional();
 
-		if (Validator.isNotNull(listItemRendererKey)) {
-			infoListBasicListTag.setItemRendererKey(listItemRendererKey);
+		if (infoListItemRendererKeyOptional.isPresent() &&
+			Validator.isNotNull(infoListItemRendererKeyOptional.get())) {
+
+			infoListBasicListTag.setItemRendererKey(
+				infoListItemRendererKeyOptional.get());
 		}
 		else {
 			infoListBasicListTag.setItemRendererKey(
@@ -89,7 +93,7 @@ public abstract class BaseBlogsEntryBasicInfoListRenderer
 	}
 
 	@Reference
-	protected InfoItemRendererRegistry infoItemRendererRegistry;
+	protected InfoItemRendererTracker infoItemRendererTracker;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseBlogsEntryBasicInfoListRenderer.class);

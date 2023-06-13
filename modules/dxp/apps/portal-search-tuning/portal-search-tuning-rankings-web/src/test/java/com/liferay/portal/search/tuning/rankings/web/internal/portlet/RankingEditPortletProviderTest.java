@@ -40,6 +40,8 @@ public class RankingEditPortletProviderTest extends BaseRankingsWebTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_rankingEditPortletProvider = new RankingEditPortletProvider();
 	}
 

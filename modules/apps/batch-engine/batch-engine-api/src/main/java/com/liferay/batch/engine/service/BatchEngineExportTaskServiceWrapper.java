@@ -27,10 +27,6 @@ public class BatchEngineExportTaskServiceWrapper
 	implements BatchEngineExportTaskService,
 			   ServiceWrapper<BatchEngineExportTaskService> {
 
-	public BatchEngineExportTaskServiceWrapper() {
-		this(null);
-	}
-
 	public BatchEngineExportTaskServiceWrapper(
 		BatchEngineExportTaskService batchEngineExportTaskService) {
 

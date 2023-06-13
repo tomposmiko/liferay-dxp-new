@@ -25,12 +25,10 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.constants.SegmentsExperimentConstants;
 import com.liferay.segments.model.SegmentsExperiment;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
-
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sarai Díaz
  * @author David Arques
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class SegmentsExperimentModelListener
 	extends BaseModelListener<SegmentsExperiment> {
 
@@ -57,17 +55,12 @@ public class SegmentsExperimentModelListener
 			ServiceContext serviceContext =
 				ServiceContextThreadLocal.getServiceContext();
 
-			long defaultSegmentsExperienceId =
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(
-						segmentsExperiment.getClassPK());
-
 			SegmentsExperienceUtil.copySegmentsExperienceData(
 				segmentsExperiment.getClassPK(), _commentManager,
 				segmentsExperiment.getGroupId(), _portletRegistry,
 				segmentsExperiment.getWinnerSegmentsExperienceId(),
-				defaultSegmentsExperienceId, className -> serviceContext,
-				segmentsExperiment.getUserId());
+				SegmentsExperienceConstants.ID_DEFAULT,
+				className -> serviceContext, segmentsExperiment.getUserId());
 
 			Layout draftLayout = _layoutLocalService.fetchDraftLayout(
 				segmentsExperiment.getClassPK());
@@ -77,7 +70,8 @@ public class SegmentsExperimentModelListener
 					draftLayout.getPlid(), _commentManager,
 					segmentsExperiment.getGroupId(), _portletRegistry,
 					segmentsExperiment.getWinnerSegmentsExperienceId(),
-					defaultSegmentsExperienceId, className -> serviceContext,
+					SegmentsExperienceConstants.ID_DEFAULT,
+					className -> serviceContext,
 					segmentsExperiment.getUserId());
 			}
 		}
@@ -92,14 +86,12 @@ public class SegmentsExperimentModelListener
 	private boolean _requiresDefaultExperienceReplacement(
 		SegmentsExperiment segmentsExperiment) {
 
-		if (Objects.equals(
-				segmentsExperiment.getSegmentsExperienceKey(),
-				SegmentsExperienceConstants.KEY_DEFAULT) &&
+		if ((segmentsExperiment.getSegmentsExperienceId() ==
+				SegmentsExperienceConstants.ID_DEFAULT) &&
 			(segmentsExperiment.getStatus() ==
 				SegmentsExperimentConstants.STATUS_COMPLETED) &&
-			Objects.equals(
-				segmentsExperiment.getWinnerSegmentsExperienceKey(),
-				SegmentsExperienceConstants.KEY_DEFAULT)) {
+			(segmentsExperiment.getWinnerSegmentsExperienceId() !=
+				SegmentsExperienceConstants.ID_DEFAULT)) {
 
 			return true;
 		}
@@ -114,9 +106,9 @@ public class SegmentsExperimentModelListener
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
-	private PortletRegistry _portletRegistry;
+	private Portal _portal;
 
 	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
+	private PortletRegistry _portletRegistry;
 
 }

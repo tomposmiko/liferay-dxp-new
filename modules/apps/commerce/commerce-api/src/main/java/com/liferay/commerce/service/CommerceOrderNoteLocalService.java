@@ -15,11 +15,9 @@
 package com.liferay.commerce.service;
 
 import com.liferay.commerce.model.CommerceOrderNote;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -227,20 +225,24 @@ public interface CommerceOrderNoteLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceOrderNote fetchCommerceOrderNote(long commerceOrderNoteId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderNote fetchCommerceOrderNoteByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
 	/**
-	 * Returns the commerce order note matching the UUID and group.
+	 * Returns the commerce order note with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order note's UUID
-	 * @param groupId the primary key of the group
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order note's external reference code
 	 * @return the matching commerce order note, or <code>null</code> if a matching commerce order note could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderNote fetchCommerceOrderNoteByUuidAndGroupId(
-		String uuid, long groupId);
+	public CommerceOrderNote fetchCommerceOrderNoteByExternalReferenceCode(
+		long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderNoteByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public CommerceOrderNote fetchCommerceOrderNoteByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -256,22 +258,17 @@ public interface CommerceOrderNoteLocalService
 	public CommerceOrderNote getCommerceOrderNote(long commerceOrderNoteId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderNote getCommerceOrderNoteByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException;
-
 	/**
-	 * Returns the commerce order note matching the UUID and group.
+	 * Returns the commerce order note with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order note's UUID
-	 * @param groupId the primary key of the group
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order note's external reference code
 	 * @return the matching commerce order note
 	 * @throws PortalException if a matching commerce order note could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderNote getCommerceOrderNoteByUuidAndGroupId(
-			String uuid, long groupId)
+	public CommerceOrderNote getCommerceOrderNoteByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -294,37 +291,7 @@ public interface CommerceOrderNoteLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceOrderNote> getCommerceOrderNotes(
-		long commerceOrderId, boolean restricted, int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceOrderNote> getCommerceOrderNotes(
 		long commerceOrderId, int start, int end);
-
-	/**
-	 * Returns all the commerce order notes matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the commerce order notes
-	 * @param companyId the primary key of the company
-	 * @return the matching commerce order notes, or an empty list if no matches were found
-	 */
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceOrderNote> getCommerceOrderNotesByUuidAndCompanyId(
-		String uuid, long companyId);
-
-	/**
-	 * Returns a range of commerce order notes matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the commerce order notes
-	 * @param companyId the primary key of the company
-	 * @param start the lower bound of the range of commerce order notes
-	 * @param end the upper bound of the range of commerce order notes (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the range of matching commerce order notes, or an empty list if no matches were found
-	 */
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceOrderNote> getCommerceOrderNotesByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<CommerceOrderNote> orderByComparator);
 
 	/**
 	 * Returns the number of commerce order notes.
@@ -340,10 +307,6 @@ public interface CommerceOrderNoteLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCommerceOrderNotesCount(
 		long commerceOrderId, boolean restricted);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();

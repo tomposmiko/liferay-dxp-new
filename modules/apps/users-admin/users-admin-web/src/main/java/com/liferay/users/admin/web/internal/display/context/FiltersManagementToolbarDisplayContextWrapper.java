@@ -20,11 +20,11 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.users.admin.management.toolbar.FilterContributor;
 
@@ -59,7 +59,7 @@ public class FiltersManagementToolbarDisplayContextWrapper
 		String clearResultsURL = super.getClearResultsURL();
 
 		for (FilterContributor filterContributor : _filterContributors) {
-			clearResultsURL = HttpComponentsUtil.removeParameter(
+			clearResultsURL = HttpUtil.removeParameter(
 				clearResultsURL,
 				liferayPortletResponse.getNamespace() +
 					filterContributor.getParameter());
@@ -123,14 +123,15 @@ public class FiltersManagementToolbarDisplayContextWrapper
 							).buildString());
 
 						labelItem.setCloseable(true);
-						labelItem.setLabel(
-							String.format(
-								"%s: %s",
-								filterContributor.getShortLabel(
-									httpServletRequest.getLocale()),
-								filterContributor.getValueLabel(
-									httpServletRequest.getLocale(),
-									currentValue)));
+
+						String label = String.format(
+							"%s: %s",
+							filterContributor.getShortLabel(
+								httpServletRequest.getLocale()),
+							filterContributor.getValueLabel(
+								httpServletRequest.getLocale(), currentValue));
+
+						labelItem.setLabel(label);
 					});
 			}
 		}

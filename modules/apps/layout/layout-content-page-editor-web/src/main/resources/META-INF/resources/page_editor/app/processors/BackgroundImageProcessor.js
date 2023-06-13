@@ -12,7 +12,7 @@
  * details.
  */
 
-import {openImageSelector} from '../../common/openImageSelector';
+import {openImageSelector} from '../../core/openImageSelector';
 
 function createEditor(element, changeCallback, destroyCallback) {
 	openImageSelector(

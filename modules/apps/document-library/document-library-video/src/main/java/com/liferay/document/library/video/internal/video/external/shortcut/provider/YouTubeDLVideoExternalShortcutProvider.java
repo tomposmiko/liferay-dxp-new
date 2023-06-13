@@ -17,13 +17,12 @@ package com.liferay.document.library.video.internal.video.external.shortcut.prov
 import com.liferay.document.library.video.external.shortcut.DLVideoExternalShortcut;
 import com.liferay.document.library.video.external.shortcut.provider.DLVideoExternalShortcutProvider;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.net.HttpURLConnection;
@@ -77,11 +76,10 @@ public class YouTubeDLVideoExternalShortcutProvider
 				String iframeSrc =
 					"https://www.youtube.com/embed/" + youTubeVideoId +
 						"?rel=0";
-				String start = HttpComponentsUtil.getParameter(url, "t", false);
+				String start = _http.getParameter(url, "t", false);
 
 				if (Validator.isNotNull(start)) {
-					iframeSrc = HttpComponentsUtil.addParameter(
-						iframeSrc, "start", start);
+					iframeSrc = _http.addParameter(iframeSrc, "start", start);
 				}
 
 				return StringBundler.concat(
@@ -108,20 +106,20 @@ public class YouTubeDLVideoExternalShortcutProvider
 			JSONObject jsonObject;
 
 			if (response.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				jsonObject = _jsonFactory.createJSONObject();
+				jsonObject = JSONFactoryUtil.createJSONObject();
 			}
 			else {
-				jsonObject = _jsonFactory.createJSONObject(responseJSON);
+				jsonObject = JSONFactoryUtil.createJSONObject(responseJSON);
 			}
 
 			return jsonObject;
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
-			return _jsonFactory.createJSONObject();
+			return JSONFactoryUtil.createJSONObject();
 		}
 	}
 
@@ -149,8 +147,5 @@ public class YouTubeDLVideoExternalShortcutProvider
 
 	@Reference
 	private Http _http;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

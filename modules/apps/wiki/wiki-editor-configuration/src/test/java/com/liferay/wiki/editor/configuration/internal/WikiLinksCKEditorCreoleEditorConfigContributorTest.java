@@ -24,44 +24,45 @@ import com.liferay.portal.kernel.portlet.PortletURLWrapper;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Roberto Díaz
  */
-public class WikiLinksCKEditorCreoleEditorConfigContributorTest {
+@RunWith(PowerMockRunner.class)
+public class WikiLinksCKEditorCreoleEditorConfigContributorTest
+	extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
 
-	@BeforeClass
-	public static void setUpClass() {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 
-		ItemSelector itemSelector = Mockito.mock(ItemSelector.class);
+		_inputEditorTaglibAttributes.put(
+			"liferay-ui:input-editor:name", "testEditor");
 
-		Mockito.when(
-			itemSelector.getItemSelectorURL(
-				Mockito.nullable(RequestBackedPortletURLFactory.class),
-				Mockito.nullable(String.class),
-				Mockito.nullable(ItemSelectorCriterion.class))
+		when(
+			_itemSelector.getItemSelectorURL(
+				Matchers.any(RequestBackedPortletURLFactory.class),
+				Matchers.anyString(), Matchers.any(ItemSelectorCriterion.class))
 		).thenReturn(
 			new PortletURLWrapper(null) {
 
@@ -73,12 +74,11 @@ public class WikiLinksCKEditorCreoleEditorConfigContributorTest {
 			}
 		);
 
-		Mockito.when(
-			itemSelector.getItemSelectorURL(
-				Mockito.nullable(RequestBackedPortletURLFactory.class),
-				Mockito.nullable(String.class),
-				Mockito.any(ItemSelectorCriterion.class),
-				Mockito.any(ItemSelectorCriterion.class))
+		when(
+			_itemSelector.getItemSelectorURL(
+				Matchers.any(RequestBackedPortletURLFactory.class),
+				Matchers.anyString(), Matchers.any(ItemSelectorCriterion.class),
+				Matchers.any(ItemSelectorCriterion.class))
 		).thenReturn(
 			new PortletURLWrapper(null) {
 
@@ -95,13 +95,7 @@ public class WikiLinksCKEditorCreoleEditorConfigContributorTest {
 
 		ReflectionTestUtil.setFieldValue(
 			_wikiLinksCKEditorCreoleEditorConfigContributor, "itemSelector",
-			itemSelector);
-	}
-
-	@Before
-	public void setUp() {
-		_inputEditorTaglibAttributes.put(
-			"liferay-ui:input-editor:name", "testEditor");
+			_itemSelector);
 	}
 
 	@Test
@@ -114,19 +108,20 @@ public class WikiLinksCKEditorCreoleEditorConfigContributorTest {
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		_wikiLinksCKEditorCreoleEditorConfigContributor.
 			populateConfigJSONObject(
 				jsonObject, _inputEditorTaglibAttributes, null, null);
 
+		JSONObject expectedJSONObject = JSONUtil.put(
+			"filebrowserBrowseUrl", "oneTabItemSelectorPortletURL"
+		).put(
+			"removePlugins", "plugin1"
+		);
+
 		JSONAssert.assertEquals(
-			JSONUtil.put(
-				"filebrowserBrowseUrl", "oneTabItemSelectorPortletURL"
-			).put(
-				"removePlugins", "plugin1"
-			).toString(),
-			jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -137,19 +132,20 @@ public class WikiLinksCKEditorCreoleEditorConfigContributorTest {
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		_wikiLinksCKEditorCreoleEditorConfigContributor.
 			populateConfigJSONObject(
 				jsonObject, _inputEditorTaglibAttributes, null, null);
 
+		JSONObject expectedJSONObject = JSONUtil.put(
+			"filebrowserBrowseUrl", "twoTabsItemSelectorPortletURL"
+		).put(
+			"removePlugins", "plugin1"
+		);
+
 		JSONAssert.assertEquals(
-			JSONUtil.put(
-				"filebrowserBrowseUrl", "twoTabsItemSelectorPortletURL"
-			).put(
-				"removePlugins", "plugin1"
-			).toString(),
-			jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -162,22 +158,25 @@ public class WikiLinksCKEditorCreoleEditorConfigContributorTest {
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		_wikiLinksCKEditorCreoleEditorConfigContributor.
 			populateConfigJSONObject(
 				jsonObject, _inputEditorTaglibAttributes, null, null);
 
+		JSONObject expectedJSONObject = JSONUtil.put(
+			"filebrowserBrowseUrl", "oneTabItemSelectorPortletURL"
+		).put(
+			"removePlugins", "plugin1"
+		);
+
 		JSONAssert.assertEquals(
-			JSONUtil.put(
-				"filebrowserBrowseUrl", "oneTabItemSelectorPortletURL"
-			).put(
-				"removePlugins", "plugin1"
-			).toString(),
-			jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
-	protected JSONObject getJSONObjectWithDefaultItemSelectorURL() {
+	protected JSONObject getJSONObjectWithDefaultItemSelectorURL()
+		throws Exception {
+
 		return JSONUtil.put(
 			"filebrowserBrowseUrl", "defaultItemSelectorPortletURL"
 		).put(
@@ -198,10 +197,13 @@ public class WikiLinksCKEditorCreoleEditorConfigContributorTest {
 			).build());
 	}
 
-	private static WikiLinksCKEditorCreoleEditorConfigContributor
-		_wikiLinksCKEditorCreoleEditorConfigContributor;
-
 	private final Map<String, Object> _inputEditorTaglibAttributes =
 		new HashMap<>();
+
+	@Mock
+	private ItemSelector _itemSelector;
+
+	private WikiLinksCKEditorCreoleEditorConfigContributor
+		_wikiLinksCKEditorCreoleEditorConfigContributor;
 
 }

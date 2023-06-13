@@ -17,29 +17,12 @@ package com.liferay.object.admin.rest.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectField;
-import com.liferay.object.admin.rest.client.dto.v1_0.Status;
 import com.liferay.object.admin.rest.client.pagination.Page;
-import com.liferay.object.admin.rest.client.problem.Problem;
-import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectDefinitionSerDes;
-import com.liferay.object.admin.rest.resource.v1_0.test.BaseObjectDefinitionResourceTestCase.GraphQLField;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.TextFormatter;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.language.LanguageResources;
-import com.liferay.portal.test.rule.FeatureFlags;
 import com.liferay.portal.test.rule.Inject;
 
 import java.util.Arrays;
@@ -47,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,13 +37,11 @@ import org.junit.runner.RunWith;
 /**
  * @author Javier Gamarra
  */
-@FeatureFlags({"LPS-146755", "LPS-167253"})
 @RunWith(Arquillian.class)
 public class ObjectDefinitionResourceTest
 	extends BaseObjectDefinitionResourceTestCase {
 
 	@After
-	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
 
@@ -74,27 +54,12 @@ public class ObjectDefinitionResourceTest
 						noSuchObjectDefinitionException) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchObjectDefinitionException);
+					_log.debug(
+						noSuchObjectDefinitionException,
+						noSuchObjectDefinitionException);
 				}
 			}
 		}
-	}
-
-	@Override
-	@Test
-	public void testGetObjectDefinition() throws Exception {
-		super.testGetObjectDefinition();
-
-		ObjectDefinition objectDefinition =
-			testGetObjectDefinitionsPage_addObjectDefinition(
-				randomObjectDefinition());
-
-		String objectDefinitionPluralName = StringUtil.lowerCaseFirstLetter(
-			TextFormatter.formatPlural(objectDefinition.getName()));
-
-		Assert.assertEquals(
-			"/o/c/" + objectDefinitionPluralName,
-			objectDefinition.getRestContextPath());
 	}
 
 	@Override
@@ -118,34 +83,22 @@ public class ObjectDefinitionResourceTest
 			objectDefinitionResource.getObjectDefinitionsPage(
 				null, null, null, null, "name:asc");
 
-		List<ObjectDefinition> objectDefinitions =
+		List<ObjectDefinition> items =
 			(List<ObjectDefinition>)ascPage.getItems();
 
 		assertEquals(
 			Arrays.asList(objectDefinition1, objectDefinition2),
-			objectDefinitions.subList(2, 4));
+			items.subList(0, 2));
 
 		Page<ObjectDefinition> descPage =
 			objectDefinitionResource.getObjectDefinitionsPage(
 				null, null, null, null, "name:desc");
 
-		objectDefinitions = (List<ObjectDefinition>)descPage.getItems();
+		items = (List<ObjectDefinition>)descPage.getItems();
 
 		assertEquals(
 			Arrays.asList(objectDefinition2, objectDefinition1),
-			objectDefinitions.subList(
-				objectDefinitions.size() - 4, objectDefinitions.size() - 2));
-
-		_objectDefinitionLocalService.deleteObjectDefinition(
-			objectDefinition1.getId());
-		_objectDefinitionLocalService.deleteObjectDefinition(
-			objectDefinition2.getId());
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetObjectDefinitionByExternalReferenceCodeNotFound() {
+			items.subList(items.size() - 2, items.size()));
 	}
 
 	@Ignore
@@ -155,117 +108,8 @@ public class ObjectDefinitionResourceTest
 	}
 
 	@Override
-	@Test
-	public void testGraphQLGetObjectDefinitionsPage() throws Exception {
-		GraphQLField graphQLField = new GraphQLField(
-			"objectDefinitions",
-			HashMapBuilder.<String, Object>put(
-				"page", 1
-			).put(
-				"pageSize",
-				() -> {
-					int objectDefinitionsCount =
-						_objectDefinitionLocalService.getObjectDefinitionsCount(
-							TestPropsValues.getCompanyId());
-
-					return objectDefinitionsCount + 10;
-				}
-			).build(),
-			new GraphQLField("items", getGraphQLFields()),
-			new GraphQLField("page"), new GraphQLField("totalCount"));
-
-		JSONObject objectDefinitionsJSONObject = JSONUtil.getValueAsJSONObject(
-			invokeGraphQLQuery(graphQLField), "JSONObject/data",
-			"JSONObject/objectDefinitions");
-
-		long totalCount = objectDefinitionsJSONObject.getLong("totalCount");
-
-		ObjectDefinition objectDefinition1 =
-			testGraphQLGetObjectDefinitionsPage_addObjectDefinition();
-		ObjectDefinition objectDefinition2 =
-			testGraphQLGetObjectDefinitionsPage_addObjectDefinition();
-
-		objectDefinitionsJSONObject = JSONUtil.getValueAsJSONObject(
-			invokeGraphQLQuery(graphQLField), "JSONObject/data",
-			"JSONObject/objectDefinitions");
-
-		Assert.assertEquals(
-			totalCount + 2, objectDefinitionsJSONObject.getLong("totalCount"));
-
-		assertContains(
-			objectDefinition1,
-			Arrays.asList(
-				ObjectDefinitionSerDes.toDTOs(
-					objectDefinitionsJSONObject.getString("items"))));
-		assertContains(
-			objectDefinition2,
-			Arrays.asList(
-				ObjectDefinitionSerDes.toDTOs(
-					objectDefinitionsJSONObject.getString("items"))));
-	}
-
-	@Override
-	@Test
-	public void testPostObjectDefinition() throws Exception {
-		super.testPostObjectDefinition();
-
-		ObjectDefinition randomObjectDefinition = randomObjectDefinition();
-
-		Status status = new Status() {
-			{
-				code = WorkflowConstants.STATUS_APPROVED;
-				label = WorkflowConstants.getStatusLabel(
-					WorkflowConstants.STATUS_APPROVED);
-				label_i18n = _language.get(
-					LanguageResources.getResourceBundle(
-						LocaleUtil.getDefault()),
-					WorkflowConstants.getStatusLabel(
-						WorkflowConstants.STATUS_APPROVED));
-			}
-		};
-
-		randomObjectDefinition.setStatus(status);
-
-		ObjectDefinition postObjectDefinition =
-			testPostObjectDefinition_addObjectDefinition(
-				randomObjectDefinition);
-
-		assertEquals(postObjectDefinition, randomObjectDefinition);
-		assertValid(postObjectDefinition);
-	}
-
-	@Override
-	@Test
-	public void testPutObjectDefinition() throws Exception {
-		super.testPutObjectDefinition();
-
-		ObjectDefinition postObjectDefinition =
-			testPutObjectDefinition_addObjectDefinition();
-
-		ObjectDefinition randomObjectDefinition = randomObjectDefinition();
-
-		randomObjectDefinition.setStorageType(
-			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
-
-		try {
-			objectDefinitionResource.putObjectDefinition(
-				postObjectDefinition.getId(), randomObjectDefinition);
-
-			Assert.fail();
-		}
-		catch (Problem.ProblemException problemException) {
-			Problem problem = problemException.getProblem();
-
-			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
-		}
-
-		_objectDefinitionLocalService.deleteObjectDefinition(
-			postObjectDefinition.getId());
-	}
-
-	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {"name", "status"};
+		return new String[] {"name"};
 	}
 
 	@Override
@@ -277,18 +121,10 @@ public class ObjectDefinitionResourceTest
 	protected ObjectDefinition randomObjectDefinition() throws Exception {
 		ObjectDefinition objectDefinition = super.randomObjectDefinition();
 
-		objectDefinition.setAccountEntryRestricted(false);
-		objectDefinition.setAccountEntryRestrictedObjectFieldName("");
 		objectDefinition.setActive(false);
 		objectDefinition.setLabel(
 			Collections.singletonMap(
 				"en_US", "O" + objectDefinition.getName()));
-		objectDefinition.setEnableLocalization(true);
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
-			objectDefinition.setModifiable((Boolean)null);
-		}
-
 		objectDefinition.setName("O" + objectDefinition.getName());
 		objectDefinition.setPluralLabel(
 			Collections.singletonMap(
@@ -297,36 +133,13 @@ public class ObjectDefinitionResourceTest
 			new ObjectField[] {
 				new ObjectField() {
 					{
-						businessType = BusinessType.TEXT;
-						DBType = ObjectField.DBType.create("String");
-						indexed = false;
-						indexedAsKeyword = false;
-						label = Collections.singletonMap("en_US", "Column");
-						localized = !objectDefinition.getSystem();
-						name = StringUtil.randomId();
-						required = false;
-						system = false;
+						setLabel(Collections.singletonMap("en_US", "Column"));
+						setName("column");
+						setType(ObjectField.Type.create("String"));
 					}
 				}
 			});
 		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_COMPANY);
-		objectDefinition.setStatus(
-			new Status() {
-				{
-					code = WorkflowConstants.STATUS_DRAFT;
-					label = WorkflowConstants.getStatusLabel(
-						WorkflowConstants.STATUS_DRAFT);
-					label_i18n = _language.get(
-						LanguageResources.getResourceBundle(
-							LocaleUtil.getDefault()),
-						WorkflowConstants.getStatusLabel(
-							WorkflowConstants.STATUS_DRAFT));
-				}
-			});
-
-		if (!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
-			objectDefinition.setStorageType(StringPool.BLANK);
-		}
 
 		return objectDefinition;
 	}
@@ -340,14 +153,6 @@ public class ObjectDefinitionResourceTest
 
 	@Override
 	protected ObjectDefinition testGetObjectDefinition_addObjectDefinition()
-		throws Exception {
-
-		return _addObjectDefinition(randomObjectDefinition());
-	}
-
-	@Override
-	protected ObjectDefinition
-			testGetObjectDefinitionByExternalReferenceCode_addObjectDefinition()
 		throws Exception {
 
 		return _addObjectDefinition(randomObjectDefinition());
@@ -398,14 +203,6 @@ public class ObjectDefinitionResourceTest
 		return _addObjectDefinition(randomObjectDefinition());
 	}
 
-	@Override
-	protected ObjectDefinition
-			testPutObjectDefinitionByExternalReferenceCode_addObjectDefinition()
-		throws Exception {
-
-		return _addObjectDefinition(randomObjectDefinition());
-	}
-
 	private ObjectDefinition _addObjectDefinition(
 			ObjectDefinition objectDefinition)
 		throws Exception {
@@ -418,9 +215,6 @@ public class ObjectDefinitionResourceTest
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectDefinitionResourceTest.class);
-
-	@Inject
-	private Language _language;
 
 	private ObjectDefinition _objectDefinition;
 

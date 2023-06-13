@@ -27,10 +27,6 @@ public class CommerceDiscountRuleLocalServiceWrapper
 	implements CommerceDiscountRuleLocalService,
 			   ServiceWrapper<CommerceDiscountRuleLocalService> {
 
-	public CommerceDiscountRuleLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceDiscountRuleLocalServiceWrapper(
 		CommerceDiscountRuleLocalService commerceDiscountRuleLocalService) {
 

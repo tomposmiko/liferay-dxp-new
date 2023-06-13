@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = {
 		"model.class.name=com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion",
 		"model.class.name=com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion"
@@ -46,8 +47,10 @@ public class DLFileItemSelectorCriterionCreationMenuRestriction
 
 	private static final Set<String> _allowedCreationMenuUIItemKeys =
 		SetUtil.fromArray(
-			DLFileEntryType.class.getSimpleName() +
-				GoogleDocsConstants.DL_FILE_ENTRY_TYPE_KEY,
-			DLUIItemKeys.ADD_FOLDER, DLUIItemKeys.UPLOAD);
+			new String[] {
+				DLFileEntryType.class.getSimpleName() +
+					GoogleDocsConstants.DL_FILE_ENTRY_TYPE_KEY,
+				DLUIItemKeys.ADD_FOLDER, DLUIItemKeys.UPLOAD
+			});
 
 }

@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
 		"product.navigation.control.menu.entry.order:Integer=200"
@@ -85,11 +86,12 @@ public class FragmentEntriesGeneratorProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.fragment.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.fragment.web)")
-	private ServletContext _servletContext;
 
 }

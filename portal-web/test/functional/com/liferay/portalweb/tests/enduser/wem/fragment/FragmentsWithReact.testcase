@@ -13,14 +13,14 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,8 +29,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-122082 and LPS-122641. Can not edit and export react fragment. View react fragment has a visual marker in vertical card."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test CannotEditAndExportReactFragment {
 		property portal.acceptance = "true";
 
@@ -72,7 +71,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-122082. Can not export react fragment with collection."
-	@priority = 4
+	@priority = "4"
 	test CannotExportReactFragmentWithCollection {
 		task ("Navigate to fragments admin") {
 			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
@@ -89,19 +88,13 @@ definition {
 		}
 
 		task ("Export the fragment collection") {
-			Click.waitForMenuToggleJSClick(
-				key_headerName = "Collection Name",
-				locator1 = "Portlet#H2_HEADER_VERTICAL_ELLIPSIS");
-
-			WaitForLiferayEvent.initializeLiferayEventLog();
-
-			MenuItem.click(menuItem = "Export");
+			LexiconEntry.gotoEllipsisMenuItem(menuItem = "Export");
 
 			DownloadTempFile();
 		}
 
 		task ("Add a new site") {
-			HeadlessSite.addSite(siteName = "New Site Name");
+			JSONGroup.addGroup(groupName = "New Site Name");
 		}
 
 		task ("Navigate to fragments admin in the new site") {
@@ -122,7 +115,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-129182. View react fragment is rendered correctly in page."
-	@priority = 5
+	@priority = "5"
 	test ViewReactFragmentInPage {
 		property portal.acceptance = "true";
 
@@ -152,11 +145,13 @@ definition {
 		}
 
 		task ("Assert the react fragment is rendered correctly in page editor") {
-			PageEditor.viewFragment(fragmentName = "React Fragment Example");
+			AssertElementPresent(
+				key_fragmentName = "React Fragment Example",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
 			AssertVisible(locator1 = "//h1[normalize-space(text())='Hello World']");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the react fragment is rendered correctly in view mode") {

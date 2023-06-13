@@ -25,20 +25,17 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.security.permission.InlineSQLHelper;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Riccardo Alberti
  */
-@Component(service = CommercePricingClassFinder.class)
 public class CommercePricingClassFinderImpl
 	extends CommercePricingClassFinderBaseImpl
 	implements CommercePricingClassFinder {
@@ -66,7 +63,7 @@ public class CommercePricingClassFinderImpl
 			String sql = _customSQL.get(getClass(), COUNT_BY_CPDEFINITION_ID);
 
 			if (inlineSQLHelper) {
-				sql = _inlineSQLHelper.replacePermissionCheck(
+				sql = InlineSQLHelperUtil.replacePermissionCheck(
 					sql, CommercePricingClass.class.getName(),
 					"CommercePricingClass.commercePricingClassId", null, null,
 					new long[] {0}, null);
@@ -141,7 +138,7 @@ public class CommercePricingClassFinderImpl
 			String sql = _customSQL.get(getClass(), FIND_BY_CPDEFINITION_ID);
 
 			if (inlineSQLHelper) {
-				sql = _inlineSQLHelper.replacePermissionCheck(
+				sql = InlineSQLHelperUtil.replacePermissionCheck(
 					sql, CommercePricingClass.class.getName(),
 					"CommercePricingClass.commercePricingClassId", null, null,
 					new long[] {0}, null);
@@ -185,10 +182,7 @@ public class CommercePricingClassFinderImpl
 		}
 	}
 
-	@Reference
+	@ServiceReference(type = CustomSQL.class)
 	private CustomSQL _customSQL;
-
-	@Reference
-	private InlineSQLHelper _inlineSQLHelper;
 
 }

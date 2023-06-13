@@ -10,13 +10,13 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -24,217 +24,11 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-155247. The Related Assets Widget should display the assets related to all contents placed on content page."
-	@priority = 4
-	test DisplayAllRelatedAssetsOnContentPage {
-		task ("Given a page designer has a displayed related assets and Web Content Display on content page") {
-			task ("Add a web content") {
-				JSONWebcontent.addWebContent(
-					content = "Web Content Content",
-					groupName = "Site Name",
-					title = "Web Content Title");
-			}
-
-			task ("Add a blogs entry") {
-				HeadlessBlog.addBlogEntry(
-					content = "Blogs Entry Content",
-					groupName = "Site Name",
-					title = "Blogs Entry Title");
-			}
-
-			task ("Select web content as related assets in blogs entry") {
-				BlogsNavigator.openBlogsAdmin(siteURLKey = "site-name");
-
-				BlogsNavigator.gotoEditCP(entryTitle = "Blogs Entry Title");
-
-				BlogsEntry.addRelatedAsset(
-					assetTitle = "Web Content Title",
-					assetType = "Basic Web Content");
-
-				PortletEntry.publish();
-			}
-
-			task ("Add an Asset Publisher, Web Content Display and Related Assets on content page") {
-				JSONLayout.addPublicLayout(
-					groupName = "Site Name",
-					layoutName = "Test Page Name",
-					type = "content");
-
-				ContentPagesNavigator.openEditContentPage(
-					pageName = "Test Page Name",
-					siteName = "Site Name");
-
-				PageEditor.addWidget(portletName = "Asset Publisher");
-
-				PageEditor.addWidget(
-					collectionName = "Content Management",
-					portletName = "Web Content Display",
-					targetFragmentName = "Asset Publisher");
-
-				PageEditor.addWidget(
-					collectionName = "Content Management",
-					portletName = "Related Assets",
-					targetFragmentName = "Web Content Display");
-			}
-
-			task ("Select the web content in Web Content Display") {
-				WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
-
-				IFrame.closeFrame();
-
-				PageEditor.publish();
-			}
-		}
-
-		task ("When the page designer navigates to content page at view mode") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = "Site Name");
-		}
-
-		task ("Then the page designer can see blogs entry in Related Asssets widget") {
-			RelatedAssets.viewPG(relatedAssetTitle = "Blogs Entry Title");
-		}
-
-		task ("When the page designer clicks on blogs entry title") {
-			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
-		}
-
-		task ("Then the page designer should not see Related Assets widget") {
-			AssertElementNotPresent(
-				key_portletName = "Related Assets",
-				locator1 = "Portlet#SPECIFIC_FRAGMENTS_AND_WIDGETS");
-		}
-	}
-
-	@description = "This is a test for LPS-155247. The Related Assets Widget should display the assets related to all contents placed on display page template."
-	@priority = 4
-	test DisplayAllRelatedAssetsOnDisplayPageTemplate {
-		property testray.component.names = "Display Page Templates,Related Assets";
-
-		task ("Given a page designer has a displayed related assets on display page template with associated web content") {
-			task ("Add a web content") {
-				JSONWebcontent.addWebContent(
-					content = "Web Content Content",
-					groupName = "Site Name",
-					title = "Web Content Title");
-			}
-
-			task ("Add a blogs entry") {
-				HeadlessBlog.addBlogEntry(
-					content = "Blogs Entry Content",
-					groupName = "Site Name",
-					title = "Blogs Entry Title");
-			}
-
-			task ("Add a document") {
-				JSONDocument.addFileWithUploadedFile(
-					dmDocumentDescription = "DM Document Description",
-					dmDocumentTitle = "Document Title",
-					groupName = "Site Name",
-					mimeType = "image/jpeg",
-					sourceFileName = "Document_1.jpg");
-			}
-
-			task ("Select web content as related assets in blogs entry") {
-				BlogsNavigator.openBlogsAdmin(siteURLKey = "site-name");
-
-				BlogsNavigator.gotoEditCP(entryTitle = "Blogs Entry Title");
-
-				BlogsEntry.addRelatedAsset(
-					assetTitle = "Web Content Title",
-					assetType = "Basic Web Content");
-
-				PortletEntry.publish();
-			}
-
-			task ("Select blogs entry as related assets in document") {
-				DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-				LexiconEntry.gotoEntryMenuItem(
-					menuItem = "Edit",
-					rowEntry = "Document Title");
-
-				RelatedAssets.selectAsset(
-					assetTitle = "Blogs Entry Title",
-					assetType = "Blogs Entry");
-
-				PortletEntry.publish();
-			}
-
-			task ("Add a display page template based on Basic Web Content") {
-				JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
-					contentType = "Web Content Article",
-					displayPageTemplateEntryName = "Display Page Name",
-					groupName = "Site Name",
-					subType = "Basic Web Content");
-			}
-
-			task ("Add an Asset Publisher and Related Assets on display page template") {
-				DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "site-name");
-
-				DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
-
-				PageEditor.addWidget(portletName = "Asset Publisher");
-
-				PageEditor.addWidget(
-					collectionName = "Content Management",
-					portletName = "Related Assets",
-					targetFragmentName = "Asset Publisher");
-			}
-
-			task ("Mark the display page template as default") {
-				PageEditor.publish();
-
-				DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
-			}
-		}
-
-		task ("When the page designer accesses to the associated display page template") {
-			Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/w/web-content-title");
-
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content Title");
-		}
-
-		task ("Then the page designer can see blogs entry on Related Assets widget") {
-			AssetPublisherPortlet.viewAssetPG(
-				assetContent = "Web Content Content",
-				assetTitle = "Web Content Title");
-
-			AssetPublisherPortlet.viewAssetPG(
-				assetContent = "Blogs Entry Content",
-				assetTitle = "Blogs Entry Title");
-
-			AssetPublisherPortlet.viewAssetPG(
-				assetContent = "DM Document Description",
-				assetTitle = "Document Title");
-
-			RelatedAssets.viewPG(relatedAssetTitle = "Blogs Entry Title");
-		}
-
-		task ("When the page designer clicks on blogs entry title") {
-			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Blogs Entry Title");
-		}
-
-		task ("Then the page designer can see documents on Related Assets widget") {
-			RelatedAssets.viewPG(relatedAssetTitle = "Document Title");
-		}
-
-		task ("When the page designer clicks on document title") {
-			Click(locator1 = "Icon#ANGLE_LEFT_BACK");
-
-			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Document Title");
-		}
-
-		task ("Then the page designer can see blogs entry on Related Assets widget") {
-			RelatedAssets.viewPG(relatedAssetTitle = "Blogs Entry Title");
-		}
-	}
-
 	@description = "Folders should not be shown as related assets"
-	@priority = 3
+	@priority = "3"
 	@uitest
 	test DontShowFolders {
+		property portal.release = "false";
 		property testray.component.names = "Related Assets";
 
 		task ("Add two widget pages with one widget each") {
@@ -277,13 +71,11 @@ definition {
 				pageName = "Test Page 1",
 				siteName = "Site Name");
 
-			WebContentDisplayPortlet.add(
+			WebContent.addPGViaWCD(
 				webContentContent = "Web Content Content",
 				webContentTitle = "Web Content Title");
 
-			WebContentDisplayPortlet.viewContent(
-				webContentContent = "Web Content Content",
-				webContentTitle = "Web Content Title");
+			WebContent.viewPGViaWCD(webContentContent = "Web Content Content");
 		}
 
 		task ("Add Blogs portlet to Page 2 and create a blog") {
@@ -299,6 +91,11 @@ definition {
 		}
 
 		task ("Create folders") {
+			JSONBookmarks.addFolder(
+				folderDescription = "Bookmarks Folder Description",
+				folderName = "Bookmarks Folder Name",
+				groupName = "Guest");
+
 			JSONFolder.addFolder(
 				dmFolderDescription = "DM Folder Description",
 				dmFolderName = "DM Folder Name",
@@ -309,7 +106,6 @@ definition {
 				folderName = "WC Folder Name",
 				groupName = "Guest");
 		}
-
 		task ("Assert assets are shown in Page 1") {
 			Navigator.gotoSitePage(
 				pageName = "Test Page 1",
@@ -323,16 +119,17 @@ definition {
 				assetContent = "Web Content Content",
 				assetTitle = "Web Content Title");
 		}
-
 		task ("Assert folders are not shown in Page1") {
-			RelatedAssets.viewNoPG(assetTitleList = "Blogs Entry Title,Web Content Title,DM Folder Name,WC Folder Name");
+			RelatedAssets.viewNoPG(
+				assetTitleList =
+				"Blogs Entry Title,Web Content Title,DM Folder Name,WC Folder Name,Bookmarks Folder Name");
 		}
 
 		task ("Edit Web Content") {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			ProductMenu.gotoPortlet(
-				category = "Content & Data",
+				category = "Content &amp; Data",
 				portlet = "Web Content");
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
@@ -354,30 +151,24 @@ definition {
 				assetContent = "Blogs Entry Content",
 				assetTitle = "Blogs Entry Title");
 
-			WebContentDisplayPortlet.viewContent(
-				webContentContent = "Web Content Content",
-				webContentTitle = "Web Content Title");
-
-			RelatedAssets.viewDefaultPG();
+			RelatedAssets.viewPG(relatedAssetTitle = "Web Content Title");
 		}
 	}
 
 	@description = "This is a use case for LPS-72472. When an article has related asset from the global site, the related asset is not displayed in live after publication"
-	@priority = 4
+	@priority = "4"
 	test ShouldBeDisplayedWithGlobalWebContentAfterPublishToLive {
 		task ("Add a public page with JSON") {
 			JSONLayout.addPublicLayout(
 				groupName = "Site Name",
 				layoutName = "Test Page");
 		}
-
 		task ("Enable staging from JSON") {
 			JSONStaging.enableLocalStaging(
 				branchingPrivate = "false",
 				branchingPublic = "false",
 				groupName = "Site Name");
 		}
-
 		task ("Add two web content with JSON") {
 			JSONWebcontent.addWebContent(
 				content = "Web Content Content 1",
@@ -390,29 +181,18 @@ definition {
 				site = "false",
 				title = "Web Content Title 2");
 		}
-
 		task ("Add existing related assets to Web Content 2") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
 			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title 2");
 
-			// Comment until LPS-159228 implemented
-
-			//WebContent.addExistingRelatedAssetCP(
-			//	assetTitle = "Web Content Title 1",
-			//	assetType = "Basic Web Content",
-			//	scopeSite = "Everywhere",
-			//	siteName = "Global",
-			//	webContentTitle = "Web Content Title 2");
-
 			WebContent.addExistingRelatedAssetCP(
 				assetTitle = "Web Content Title 1",
 				assetType = "Basic Web Content",
-				otherSite = "Global",
+				scopeSite = "Everywhere",
 				siteName = "Global",
 				webContentTitle = "Web Content Title 2");
 		}
-
 		task ("Add related assets to Test Page") {
 			Navigator.gotoStagedSitePage(
 				pageName = "Test Page",
@@ -427,7 +207,6 @@ definition {
 				assetTitle = "Web Content Title 2",
 				relatedAssetTitles = "Web Content Title 1");
 		}
-
 		task ("Publish to live") {
 			Staging.gotoPublishToLive();
 
@@ -437,7 +216,6 @@ definition {
 
 			Staging.publishToLive();
 		}
-
 		task ("Assert assets are whone in live after been published") {
 			ProductMenu.gotoLiveSite(site = "Site Name");
 
@@ -449,10 +227,9 @@ definition {
 	}
 
 	@description = "Related assets should be displayed with category."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test ShouldBeDisplayWithCategory {
-		property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 		property testray.component.names = "Categories,Staging,Related Assets,Web Content Administration";
 
 		task ("Add a public page with JSON") {
@@ -495,7 +272,7 @@ definition {
 				vocabularyName = "Vocabulary Name");
 
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Web Content Content 2",
 				groupName = "Site Name (Staging)",
 				site = "false",
@@ -512,7 +289,11 @@ definition {
 				vocabularyName = "Vocabulary Name");
 		}
 
-		task ("Add Web Content 1 as related asset for Web Content 2") {
+		task ("Add Web Content 1 as related asset for Web Contetn 2") {
+			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
+
+			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title 2");
+
 			WebContent.addExistingRelatedAssetCP(
 				assetTitle = "Web Content Title 1",
 				assetType = "Basic Web Content",
@@ -520,40 +301,39 @@ definition {
 		}
 
 		task ("Add a private page with an Asset Publisher that shows Web Content 1") {
-			JSONLayout.addPrivateLayout(
-				groupName = "Site Name (Staging)",
-				layoutName = "Private Page Name",
-				site = "false");
+			SitePages.openPagesAdmin(siteURLKey = "site-name-staging");
 
-			JSONLayout.addWidgetToPrivateLayout(
-				groupName = "Site Name (Staging)",
-				layoutName = "Private Page Name",
-				site = "false",
-				widgetName = "Asset Publisher");
+			SitePages.addPrivatePage(pageName = "Private Page Name");
 
 			Navigator.gotoPrivateStagedSitePage(
 				pageName = "Private Page Name",
 				siteName = "Site Name");
+
+			Portlet.addPG(portletName = "Asset Publisher");
 
 			AssetPublisherPortlet.configureManualAssetSelectionPG(
 				assetTitle = "Web Content Title 1",
 				assetType = "Basic Web Content");
 		}
 
-		task ("Configure asset publisher template to use Full Content one") {
+		task ("Configure asset publisher template to use Fill Content one") {
+			Navigator.gotoPrivateStagedSitePage(
+				pageName = "Private Page Name",
+				siteName = "Site Name");
+
+			Portlet.gotoPortletOptions(
+				portletName = "Asset Publisher",
+				portletOption = "Configuration");
+
 			AssetPublisherPortlet.configureDisplayTemplatePG(displayTemplate = "Full Content");
 		}
 
 		task ("Add and configure related assets portlet") {
-			JSONLayout.addWidgetToPrivateLayout(
-				groupName = "Site Name (Staging)",
-				layoutName = "Private Page Name",
-				site = "false",
-				widgetName = "Related Assets");
-
 			Navigator.gotoPrivateStagedSitePage(
 				pageName = "Private Page Name",
 				siteName = "Site Name");
+
+			Portlet.addPG(portletName = "Related Assets");
 
 			AssetPublisherPortlet.configureCategoriesFilterPG(
 				categoryName = "Category Name",
@@ -570,7 +350,7 @@ definition {
 	}
 
 	@description = "View related assets in Related Assets widget."
-	@priority = 3
+	@priority = "3"
 	@uitest
 	test ShouldBeShownInRelatedAssetsWidget {
 		task ("Add a widget page") {

@@ -62,11 +62,11 @@ long cpDefinitionOptionValueRelId = cpDefinitionOptionValueRelDisplayContext.get
 
 	<c:if test="<%= cpDefinitionOptionRel.isPriceContributor() %>">
 		<div class="sheet-section">
-			<h3 class="sheet-subtitle"><liferay-ui:message key="product" /></h3>
+			<h3 class="sheet-subtitle"><%= LanguageUtil.get(request, "product") %></h3>
 
 			<div class="row">
 				<div class="col">
-					<label class="control-label" for="skuId"><liferay-ui:message key="sku" /></label>
+					<label class="control-label" for="skuId"><%= LanguageUtil.get(request, "sku") %></label>
 
 					<div id="autocomplete-root"></div>
 				</div>
@@ -76,7 +76,7 @@ long cpDefinitionOptionValueRelId = cpDefinitionOptionValueRelDisplayContext.get
 				</div>
 
 				<div class="align-items-end col-auto d-flex">
-					<button class="btn btn-monospaced btn-secondary form-submitter" id="remove-sku-button" onclick="<portlet:namespace />removeSku();" type="button">
+					<button class="btn btn-monospaced btn-secondary form-submitter" id="remove-sku-button" onclick="<%= liferayPortletResponse.getNamespace() + "removeSku();" %>" type="button">
 						<clay:icon
 							symbol="trash"
 						/>
@@ -109,7 +109,7 @@ long cpDefinitionOptionValueRelId = cpDefinitionOptionValueRelDisplayContext.get
 
 			autocomplete.default('autocomplete', 'autocomplete-root', {
 				apiUrl:
-					'/o/headless-commerce-admin-catalog/v1.0/skus?filter=(hasChildCPDefinitions eq false)',
+					'/o/headless-commerce-admin-catalog/v1.0/skus?filter=(catalogId eq <%= cpDefinitionOptionValueRelDisplayContext.getCommerceCatalogId() %>) and (hasChildCPDefinitions eq false)',
 				initialLabel: '<%= cpInstanceLabel %>',
 				initialValue: '<%= cpInstanceId %>',
 				inputId: 'skuId',
@@ -145,9 +145,7 @@ long cpDefinitionOptionValueRelId = cpDefinitionOptionValueRelDisplayContext.get
 </c:if>
 
 <c:if test="<%= cpDefinitionOptionValueRel == null %>">
-	<aui:script require="frontend-js-web/index as frontendJsWeb, commerce-frontend-js/utilities/slugify as slugify">
-		var {debounce} = frontendJsWeb;
-
+	<aui:script require="commerce-frontend-js/utilities/debounce as debounce, commerce-frontend-js/utilities/slugify as slugify">
 		var form = document.getElementById(
 			'<portlet:namespace />cpDefinitionOptionValueRelfm'
 		);
@@ -159,6 +157,6 @@ long cpDefinitionOptionValueRelId = cpDefinitionOptionValueRelDisplayContext.get
 			keyInput.value = slugify.default(nameInput.value);
 		};
 
-		nameInput.addEventListener('input', debounce(handleOnNameInput, 200));
+		nameInput.addEventListener('input', debounce.default(handleOnNameInput, 200));
 	</aui:script>
 </c:if>

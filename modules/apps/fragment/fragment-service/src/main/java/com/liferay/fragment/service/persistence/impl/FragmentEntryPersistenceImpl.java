@@ -20,7 +20,6 @@ import com.liferay.fragment.model.FragmentEntryTable;
 import com.liferay.fragment.model.impl.FragmentEntryImpl;
 import com.liferay.fragment.model.impl.FragmentEntryModelImpl;
 import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
-import com.liferay.fragment.service.persistence.FragmentEntryUtil;
 import com.liferay.fragment.service.persistence.impl.constants.FragmentPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,11 +48,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = FragmentEntryPersistence.class)
+@Component(service = {FragmentEntryPersistence.class, BasePersistence.class})
 public class FragmentEntryPersistenceImpl
 	extends BasePersistenceImpl<FragmentEntry>
 	implements FragmentEntryPersistence {
@@ -204,7 +203,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -595,7 +594,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -759,7 +758,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -1180,7 +1179,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, head};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1351,7 +1350,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -1774,7 +1773,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1926,7 +1925,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G_Head, finderArgs, this);
+				_finderPathFetchByUUID_G_Head, finderArgs);
 		}
 
 		if (result instanceof FragmentEntry) {
@@ -2054,7 +2053,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId, head};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2233,7 +2232,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -2658,7 +2657,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2836,7 +2835,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -3283,7 +3282,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId, head};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3451,7 +3450,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -3819,7 +3818,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3968,7 +3967,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -4366,7 +4365,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, head};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4522,7 +4521,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -4900,7 +4899,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {fragmentCollectionId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5058,7 +5057,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -5465,7 +5464,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {fragmentCollectionId, head};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5517,1060 +5516,6 @@ public class FragmentEntryPersistenceImpl
 	private static final String
 		_FINDER_COLUMN_FRAGMENTCOLLECTIONID_HEAD_HEAD_2 =
 			"fragmentEntry.head = ?";
-
-	private FinderPath _finderPathWithPaginationFindByType;
-	private FinderPath _finderPathWithoutPaginationFindByType;
-	private FinderPath _finderPathCountByType;
-
-	/**
-	 * Returns all the fragment entries where type = &#63;.
-	 *
-	 * @param type the type
-	 * @return the matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType(int type) {
-		return findByType(type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-	}
-
-	/**
-	 * Returns a range of all the fragment entries where type = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param type the type
-	 * @param start the lower bound of the range of fragment entries
-	 * @param end the upper bound of the range of fragment entries (not inclusive)
-	 * @return the range of matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType(int type, int start, int end) {
-		return findByType(type, start, end, null);
-	}
-
-	/**
-	 * Returns an ordered range of all the fragment entries where type = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param type the type
-	 * @param start the lower bound of the range of fragment entries
-	 * @param end the upper bound of the range of fragment entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType(
-		int type, int start, int end,
-		OrderByComparator<FragmentEntry> orderByComparator) {
-
-		return findByType(type, start, end, orderByComparator, true);
-	}
-
-	/**
-	 * Returns an ordered range of all the fragment entries where type = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param type the type
-	 * @param start the lower bound of the range of fragment entries
-	 * @param end the upper bound of the range of fragment entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType(
-		int type, int start, int end,
-		OrderByComparator<FragmentEntry> orderByComparator,
-		boolean useFinderCache) {
-
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			FragmentEntry.class);
-
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
-
-		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
-			if (useFinderCache && productionMode) {
-				finderPath = _finderPathWithoutPaginationFindByType;
-				finderArgs = new Object[] {type};
-			}
-		}
-		else if (useFinderCache && productionMode) {
-			finderPath = _finderPathWithPaginationFindByType;
-			finderArgs = new Object[] {type, start, end, orderByComparator};
-		}
-
-		List<FragmentEntry> list = null;
-
-		if (useFinderCache && productionMode) {
-			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
-
-			if ((list != null) && !list.isEmpty()) {
-				for (FragmentEntry fragmentEntry : list) {
-					if (type != fragmentEntry.getType()) {
-						list = null;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (list == null) {
-			StringBundler sb = null;
-
-			if (orderByComparator != null) {
-				sb = new StringBundler(
-					3 + (orderByComparator.getOrderByFields().length * 2));
-			}
-			else {
-				sb = new StringBundler(3);
-			}
-
-			sb.append(_SQL_SELECT_FRAGMENTENTRY_WHERE);
-
-			sb.append(_FINDER_COLUMN_TYPE_TYPE_2);
-
-			if (orderByComparator != null) {
-				appendOrderByComparator(
-					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
-			}
-			else {
-				sb.append(FragmentEntryModelImpl.ORDER_BY_JPQL);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(type);
-
-				list = (List<FragmentEntry>)QueryUtil.list(
-					query, getDialect(), start, end);
-
-				cacheResult(list);
-
-				if (useFinderCache && productionMode) {
-					finderCache.putResult(finderPath, finderArgs, list);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return list;
-	}
-
-	/**
-	 * Returns the first fragment entry in the ordered set where type = &#63;.
-	 *
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching fragment entry
-	 * @throws NoSuchEntryException if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry findByType_First(
-			int type, OrderByComparator<FragmentEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		FragmentEntry fragmentEntry = fetchByType_First(
-			type, orderByComparator);
-
-		if (fragmentEntry != null) {
-			return fragmentEntry;
-		}
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("type=");
-		sb.append(type);
-
-		sb.append("}");
-
-		throw new NoSuchEntryException(sb.toString());
-	}
-
-	/**
-	 * Returns the first fragment entry in the ordered set where type = &#63;.
-	 *
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching fragment entry, or <code>null</code> if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry fetchByType_First(
-		int type, OrderByComparator<FragmentEntry> orderByComparator) {
-
-		List<FragmentEntry> list = findByType(type, 0, 1, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the last fragment entry in the ordered set where type = &#63;.
-	 *
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching fragment entry
-	 * @throws NoSuchEntryException if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry findByType_Last(
-			int type, OrderByComparator<FragmentEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		FragmentEntry fragmentEntry = fetchByType_Last(type, orderByComparator);
-
-		if (fragmentEntry != null) {
-			return fragmentEntry;
-		}
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("type=");
-		sb.append(type);
-
-		sb.append("}");
-
-		throw new NoSuchEntryException(sb.toString());
-	}
-
-	/**
-	 * Returns the last fragment entry in the ordered set where type = &#63;.
-	 *
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching fragment entry, or <code>null</code> if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry fetchByType_Last(
-		int type, OrderByComparator<FragmentEntry> orderByComparator) {
-
-		int count = countByType(type);
-
-		if (count == 0) {
-			return null;
-		}
-
-		List<FragmentEntry> list = findByType(
-			type, count - 1, count, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the fragment entries before and after the current fragment entry in the ordered set where type = &#63;.
-	 *
-	 * @param fragmentEntryId the primary key of the current fragment entry
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next fragment entry
-	 * @throws NoSuchEntryException if a fragment entry with the primary key could not be found
-	 */
-	@Override
-	public FragmentEntry[] findByType_PrevAndNext(
-			long fragmentEntryId, int type,
-			OrderByComparator<FragmentEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		FragmentEntry fragmentEntry = findByPrimaryKey(fragmentEntryId);
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			FragmentEntry[] array = new FragmentEntryImpl[3];
-
-			array[0] = getByType_PrevAndNext(
-				session, fragmentEntry, type, orderByComparator, true);
-
-			array[1] = fragmentEntry;
-
-			array[2] = getByType_PrevAndNext(
-				session, fragmentEntry, type, orderByComparator, false);
-
-			return array;
-		}
-		catch (Exception exception) {
-			throw processException(exception);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	protected FragmentEntry getByType_PrevAndNext(
-		Session session, FragmentEntry fragmentEntry, int type,
-		OrderByComparator<FragmentEntry> orderByComparator, boolean previous) {
-
-		StringBundler sb = null;
-
-		if (orderByComparator != null) {
-			sb = new StringBundler(
-				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
-					(orderByComparator.getOrderByFields().length * 3));
-		}
-		else {
-			sb = new StringBundler(3);
-		}
-
-		sb.append(_SQL_SELECT_FRAGMENTENTRY_WHERE);
-
-		sb.append(_FINDER_COLUMN_TYPE_TYPE_2);
-
-		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
-
-			if (orderByConditionFields.length > 0) {
-				sb.append(WHERE_AND);
-			}
-
-			for (int i = 0; i < orderByConditionFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByConditionFields[i]);
-
-				if ((i + 1) < orderByConditionFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN);
-					}
-				}
-			}
-
-			sb.append(ORDER_BY_CLAUSE);
-
-			String[] orderByFields = orderByComparator.getOrderByFields();
-
-			for (int i = 0; i < orderByFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByFields[i]);
-
-				if ((i + 1) < orderByFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC_HAS_NEXT);
-					}
-					else {
-						sb.append(ORDER_BY_DESC_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC);
-					}
-					else {
-						sb.append(ORDER_BY_DESC);
-					}
-				}
-			}
-		}
-		else {
-			sb.append(FragmentEntryModelImpl.ORDER_BY_JPQL);
-		}
-
-		String sql = sb.toString();
-
-		Query query = session.createQuery(sql);
-
-		query.setFirstResult(0);
-		query.setMaxResults(2);
-
-		QueryPos queryPos = QueryPos.getInstance(query);
-
-		queryPos.add(type);
-
-		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						fragmentEntry)) {
-
-				queryPos.add(orderByConditionValue);
-			}
-		}
-
-		List<FragmentEntry> list = query.list();
-
-		if (list.size() == 2) {
-			return list.get(1);
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
-	 * Removes all the fragment entries where type = &#63; from the database.
-	 *
-	 * @param type the type
-	 */
-	@Override
-	public void removeByType(int type) {
-		for (FragmentEntry fragmentEntry :
-				findByType(type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
-			remove(fragmentEntry);
-		}
-	}
-
-	/**
-	 * Returns the number of fragment entries where type = &#63;.
-	 *
-	 * @param type the type
-	 * @return the number of matching fragment entries
-	 */
-	@Override
-	public int countByType(int type) {
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			FragmentEntry.class);
-
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
-
-		Long count = null;
-
-		if (productionMode) {
-			finderPath = _finderPathCountByType;
-
-			finderArgs = new Object[] {type};
-
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-		}
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(2);
-
-			sb.append(_SQL_COUNT_FRAGMENTENTRY_WHERE);
-
-			sb.append(_FINDER_COLUMN_TYPE_TYPE_2);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(type);
-
-				count = (Long)query.uniqueResult();
-
-				if (productionMode) {
-					finderCache.putResult(finderPath, finderArgs, count);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String _FINDER_COLUMN_TYPE_TYPE_2 =
-		"fragmentEntry.type = ?";
-
-	private FinderPath _finderPathWithPaginationFindByType_Head;
-	private FinderPath _finderPathWithoutPaginationFindByType_Head;
-	private FinderPath _finderPathCountByType_Head;
-
-	/**
-	 * Returns all the fragment entries where type = &#63; and head = &#63;.
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @return the matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType_Head(int type, boolean head) {
-		return findByType_Head(
-			type, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-	}
-
-	/**
-	 * Returns a range of all the fragment entries where type = &#63; and head = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @param start the lower bound of the range of fragment entries
-	 * @param end the upper bound of the range of fragment entries (not inclusive)
-	 * @return the range of matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType_Head(
-		int type, boolean head, int start, int end) {
-
-		return findByType_Head(type, head, start, end, null);
-	}
-
-	/**
-	 * Returns an ordered range of all the fragment entries where type = &#63; and head = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @param start the lower bound of the range of fragment entries
-	 * @param end the upper bound of the range of fragment entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType_Head(
-		int type, boolean head, int start, int end,
-		OrderByComparator<FragmentEntry> orderByComparator) {
-
-		return findByType_Head(type, head, start, end, orderByComparator, true);
-	}
-
-	/**
-	 * Returns an ordered range of all the fragment entries where type = &#63; and head = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>FragmentEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @param start the lower bound of the range of fragment entries
-	 * @param end the upper bound of the range of fragment entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching fragment entries
-	 */
-	@Override
-	public List<FragmentEntry> findByType_Head(
-		int type, boolean head, int start, int end,
-		OrderByComparator<FragmentEntry> orderByComparator,
-		boolean useFinderCache) {
-
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			FragmentEntry.class);
-
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
-
-		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
-			if (useFinderCache && productionMode) {
-				finderPath = _finderPathWithoutPaginationFindByType_Head;
-				finderArgs = new Object[] {type, head};
-			}
-		}
-		else if (useFinderCache && productionMode) {
-			finderPath = _finderPathWithPaginationFindByType_Head;
-			finderArgs = new Object[] {
-				type, head, start, end, orderByComparator
-			};
-		}
-
-		List<FragmentEntry> list = null;
-
-		if (useFinderCache && productionMode) {
-			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
-
-			if ((list != null) && !list.isEmpty()) {
-				for (FragmentEntry fragmentEntry : list) {
-					if ((type != fragmentEntry.getType()) ||
-						(head != fragmentEntry.isHead())) {
-
-						list = null;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (list == null) {
-			StringBundler sb = null;
-
-			if (orderByComparator != null) {
-				sb = new StringBundler(
-					4 + (orderByComparator.getOrderByFields().length * 2));
-			}
-			else {
-				sb = new StringBundler(4);
-			}
-
-			sb.append(_SQL_SELECT_FRAGMENTENTRY_WHERE);
-
-			sb.append(_FINDER_COLUMN_TYPE_HEAD_TYPE_2);
-
-			sb.append(_FINDER_COLUMN_TYPE_HEAD_HEAD_2);
-
-			if (orderByComparator != null) {
-				appendOrderByComparator(
-					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
-			}
-			else {
-				sb.append(FragmentEntryModelImpl.ORDER_BY_JPQL);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(type);
-
-				queryPos.add(head);
-
-				list = (List<FragmentEntry>)QueryUtil.list(
-					query, getDialect(), start, end);
-
-				cacheResult(list);
-
-				if (useFinderCache && productionMode) {
-					finderCache.putResult(finderPath, finderArgs, list);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return list;
-	}
-
-	/**
-	 * Returns the first fragment entry in the ordered set where type = &#63; and head = &#63;.
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching fragment entry
-	 * @throws NoSuchEntryException if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry findByType_Head_First(
-			int type, boolean head,
-			OrderByComparator<FragmentEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		FragmentEntry fragmentEntry = fetchByType_Head_First(
-			type, head, orderByComparator);
-
-		if (fragmentEntry != null) {
-			return fragmentEntry;
-		}
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("type=");
-		sb.append(type);
-
-		sb.append(", head=");
-		sb.append(head);
-
-		sb.append("}");
-
-		throw new NoSuchEntryException(sb.toString());
-	}
-
-	/**
-	 * Returns the first fragment entry in the ordered set where type = &#63; and head = &#63;.
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching fragment entry, or <code>null</code> if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry fetchByType_Head_First(
-		int type, boolean head,
-		OrderByComparator<FragmentEntry> orderByComparator) {
-
-		List<FragmentEntry> list = findByType_Head(
-			type, head, 0, 1, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the last fragment entry in the ordered set where type = &#63; and head = &#63;.
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching fragment entry
-	 * @throws NoSuchEntryException if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry findByType_Head_Last(
-			int type, boolean head,
-			OrderByComparator<FragmentEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		FragmentEntry fragmentEntry = fetchByType_Head_Last(
-			type, head, orderByComparator);
-
-		if (fragmentEntry != null) {
-			return fragmentEntry;
-		}
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-		sb.append("type=");
-		sb.append(type);
-
-		sb.append(", head=");
-		sb.append(head);
-
-		sb.append("}");
-
-		throw new NoSuchEntryException(sb.toString());
-	}
-
-	/**
-	 * Returns the last fragment entry in the ordered set where type = &#63; and head = &#63;.
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching fragment entry, or <code>null</code> if a matching fragment entry could not be found
-	 */
-	@Override
-	public FragmentEntry fetchByType_Head_Last(
-		int type, boolean head,
-		OrderByComparator<FragmentEntry> orderByComparator) {
-
-		int count = countByType_Head(type, head);
-
-		if (count == 0) {
-			return null;
-		}
-
-		List<FragmentEntry> list = findByType_Head(
-			type, head, count - 1, count, orderByComparator);
-
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the fragment entries before and after the current fragment entry in the ordered set where type = &#63; and head = &#63;.
-	 *
-	 * @param fragmentEntryId the primary key of the current fragment entry
-	 * @param type the type
-	 * @param head the head
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next fragment entry
-	 * @throws NoSuchEntryException if a fragment entry with the primary key could not be found
-	 */
-	@Override
-	public FragmentEntry[] findByType_Head_PrevAndNext(
-			long fragmentEntryId, int type, boolean head,
-			OrderByComparator<FragmentEntry> orderByComparator)
-		throws NoSuchEntryException {
-
-		FragmentEntry fragmentEntry = findByPrimaryKey(fragmentEntryId);
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			FragmentEntry[] array = new FragmentEntryImpl[3];
-
-			array[0] = getByType_Head_PrevAndNext(
-				session, fragmentEntry, type, head, orderByComparator, true);
-
-			array[1] = fragmentEntry;
-
-			array[2] = getByType_Head_PrevAndNext(
-				session, fragmentEntry, type, head, orderByComparator, false);
-
-			return array;
-		}
-		catch (Exception exception) {
-			throw processException(exception);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	protected FragmentEntry getByType_Head_PrevAndNext(
-		Session session, FragmentEntry fragmentEntry, int type, boolean head,
-		OrderByComparator<FragmentEntry> orderByComparator, boolean previous) {
-
-		StringBundler sb = null;
-
-		if (orderByComparator != null) {
-			sb = new StringBundler(
-				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
-					(orderByComparator.getOrderByFields().length * 3));
-		}
-		else {
-			sb = new StringBundler(4);
-		}
-
-		sb.append(_SQL_SELECT_FRAGMENTENTRY_WHERE);
-
-		sb.append(_FINDER_COLUMN_TYPE_HEAD_TYPE_2);
-
-		sb.append(_FINDER_COLUMN_TYPE_HEAD_HEAD_2);
-
-		if (orderByComparator != null) {
-			String[] orderByConditionFields =
-				orderByComparator.getOrderByConditionFields();
-
-			if (orderByConditionFields.length > 0) {
-				sb.append(WHERE_AND);
-			}
-
-			for (int i = 0; i < orderByConditionFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByConditionFields[i]);
-
-				if ((i + 1) < orderByConditionFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(WHERE_GREATER_THAN);
-					}
-					else {
-						sb.append(WHERE_LESSER_THAN);
-					}
-				}
-			}
-
-			sb.append(ORDER_BY_CLAUSE);
-
-			String[] orderByFields = orderByComparator.getOrderByFields();
-
-			for (int i = 0; i < orderByFields.length; i++) {
-				sb.append(_ORDER_BY_ENTITY_ALIAS);
-				sb.append(orderByFields[i]);
-
-				if ((i + 1) < orderByFields.length) {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC_HAS_NEXT);
-					}
-					else {
-						sb.append(ORDER_BY_DESC_HAS_NEXT);
-					}
-				}
-				else {
-					if (orderByComparator.isAscending() ^ previous) {
-						sb.append(ORDER_BY_ASC);
-					}
-					else {
-						sb.append(ORDER_BY_DESC);
-					}
-				}
-			}
-		}
-		else {
-			sb.append(FragmentEntryModelImpl.ORDER_BY_JPQL);
-		}
-
-		String sql = sb.toString();
-
-		Query query = session.createQuery(sql);
-
-		query.setFirstResult(0);
-		query.setMaxResults(2);
-
-		QueryPos queryPos = QueryPos.getInstance(query);
-
-		queryPos.add(type);
-
-		queryPos.add(head);
-
-		if (orderByComparator != null) {
-			for (Object orderByConditionValue :
-					orderByComparator.getOrderByConditionValues(
-						fragmentEntry)) {
-
-				queryPos.add(orderByConditionValue);
-			}
-		}
-
-		List<FragmentEntry> list = query.list();
-
-		if (list.size() == 2) {
-			return list.get(1);
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
-	 * Removes all the fragment entries where type = &#63; and head = &#63; from the database.
-	 *
-	 * @param type the type
-	 * @param head the head
-	 */
-	@Override
-	public void removeByType_Head(int type, boolean head) {
-		for (FragmentEntry fragmentEntry :
-				findByType_Head(
-					type, head, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
-			remove(fragmentEntry);
-		}
-	}
-
-	/**
-	 * Returns the number of fragment entries where type = &#63; and head = &#63;.
-	 *
-	 * @param type the type
-	 * @param head the head
-	 * @return the number of matching fragment entries
-	 */
-	@Override
-	public int countByType_Head(int type, boolean head) {
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			FragmentEntry.class);
-
-		FinderPath finderPath = null;
-		Object[] finderArgs = null;
-
-		Long count = null;
-
-		if (productionMode) {
-			finderPath = _finderPathCountByType_Head;
-
-			finderArgs = new Object[] {type, head};
-
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-		}
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append(_SQL_COUNT_FRAGMENTENTRY_WHERE);
-
-			sb.append(_FINDER_COLUMN_TYPE_HEAD_TYPE_2);
-
-			sb.append(_FINDER_COLUMN_TYPE_HEAD_HEAD_2);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(type);
-
-				queryPos.add(head);
-
-				count = (Long)query.uniqueResult();
-
-				if (productionMode) {
-					finderCache.putResult(finderPath, finderArgs, count);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String _FINDER_COLUMN_TYPE_HEAD_TYPE_2 =
-		"fragmentEntry.type = ? AND ";
-
-	private static final String _FINDER_COLUMN_TYPE_HEAD_HEAD_2 =
-		"fragmentEntry.head = ?";
 
 	private FinderPath _finderPathWithPaginationFindByG_FCI;
 	private FinderPath _finderPathWithoutPaginationFindByG_FCI;
@@ -6681,7 +5626,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -7081,7 +6026,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7248,7 +6193,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -7675,7 +6620,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId, head};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7844,7 +6789,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -8270,7 +7215,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentEntryKey};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -8424,7 +7369,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByG_FEK_Head, finderArgs, this);
+				_finderPathFetchByG_FEK_Head, finderArgs);
 		}
 
 		if (result instanceof FragmentEntry) {
@@ -8556,7 +7501,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentEntryKey, head};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -8734,7 +7679,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -9189,7 +8134,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId, name};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -9374,7 +8319,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -9855,7 +8800,7 @@ public class FragmentEntryPersistenceImpl
 				groupId, fragmentCollectionId, name, head
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -10050,7 +8995,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -10477,7 +9422,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId, type};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -10658,7 +9603,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -11111,7 +10056,7 @@ public class FragmentEntryPersistenceImpl
 				groupId, fragmentCollectionId, type, head
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11295,7 +10240,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -11722,7 +10667,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, fragmentCollectionId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11903,7 +10848,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -12357,7 +11302,7 @@ public class FragmentEntryPersistenceImpl
 				groupId, fragmentCollectionId, status, head
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -12535,7 +11480,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -13017,7 +11962,7 @@ public class FragmentEntryPersistenceImpl
 				groupId, fragmentCollectionId, name, status
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -13216,7 +12161,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -13724,7 +12669,7 @@ public class FragmentEntryPersistenceImpl
 				groupId, fragmentCollectionId, name, status, head
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -13934,7 +12879,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -14388,7 +13333,7 @@ public class FragmentEntryPersistenceImpl
 				groupId, fragmentCollectionId, type, status
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -14584,7 +13529,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FragmentEntry fragmentEntry : list) {
@@ -15064,7 +14009,7 @@ public class FragmentEntryPersistenceImpl
 				groupId, fragmentCollectionId, type, status, head
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -15203,7 +14148,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByHeadId, finderArgs, this);
+				_finderPathFetchByHeadId, finderArgs);
 		}
 
 		if (result instanceof FragmentEntry) {
@@ -15302,7 +14247,7 @@ public class FragmentEntryPersistenceImpl
 
 			finderArgs = new Object[] {headId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -15513,7 +14458,7 @@ public class FragmentEntryPersistenceImpl
 		fragmentEntry.setNew(true);
 		fragmentEntry.setPrimaryKey(fragmentEntryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		fragmentEntry.setUuid(uuid);
 
@@ -15634,7 +14579,7 @@ public class FragmentEntryPersistenceImpl
 			(FragmentEntryModelImpl)fragmentEntry;
 
 		if (Validator.isNull(fragmentEntry.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			fragmentEntry.setUuid(uuid);
 		}
@@ -15759,9 +14704,7 @@ public class FragmentEntryPersistenceImpl
 	 */
 	@Override
 	public FragmentEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				FragmentEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(FragmentEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -15980,7 +14923,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<FragmentEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -16056,7 +14999,7 @@ public class FragmentEntryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -16164,11 +15107,9 @@ public class FragmentEntryPersistenceImpl
 		ctStrictColumnNames.add("js");
 		ctStrictColumnNames.add("cacheable");
 		ctStrictColumnNames.add("configuration");
-		ctStrictColumnNames.add("icon");
 		ctStrictColumnNames.add("previewFileEntryId");
 		ctStrictColumnNames.add("readOnly");
 		ctStrictColumnNames.add("type_");
-		ctStrictColumnNames.add("typeOptions");
 		ctStrictColumnNames.add("lastPublishDate");
 		ctStrictColumnNames.add("status");
 		ctStrictColumnNames.add("statusByUserId");
@@ -16408,43 +15349,6 @@ public class FragmentEntryPersistenceImpl
 			"countByFragmentCollectionId_Head",
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"fragmentCollectionId", "head"}, false);
-
-		_finderPathWithPaginationFindByType = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByType",
-			new String[] {
-				Integer.class.getName(), Integer.class.getName(),
-				Integer.class.getName(), OrderByComparator.class.getName()
-			},
-			new String[] {"type_"}, true);
-
-		_finderPathWithoutPaginationFindByType = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByType",
-			new String[] {Integer.class.getName()}, new String[] {"type_"},
-			true);
-
-		_finderPathCountByType = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByType",
-			new String[] {Integer.class.getName()}, new String[] {"type_"},
-			false);
-
-		_finderPathWithPaginationFindByType_Head = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByType_Head",
-			new String[] {
-				Integer.class.getName(), Boolean.class.getName(),
-				Integer.class.getName(), Integer.class.getName(),
-				OrderByComparator.class.getName()
-			},
-			new String[] {"type_", "head"}, true);
-
-		_finderPathWithoutPaginationFindByType_Head = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByType_Head",
-			new String[] {Integer.class.getName(), Boolean.class.getName()},
-			new String[] {"type_", "head"}, true);
-
-		_finderPathCountByType_Head = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByType_Head",
-			new String[] {Integer.class.getName(), Boolean.class.getName()},
-			new String[] {"type_", "head"}, false);
 
 		_finderPathWithPaginationFindByG_FCI = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_FCI",
@@ -16789,31 +15693,11 @@ public class FragmentEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByHeadId",
 			new String[] {Long.class.getName()}, new String[] {"headId"},
 			false);
-
-		_setFragmentEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setFragmentEntryUtilPersistence(null);
-
 		entityCache.removeCache(FragmentEntryImpl.class.getName());
-	}
-
-	private void _setFragmentEntryUtilPersistence(
-		FragmentEntryPersistence fragmentEntryPersistence) {
-
-		try {
-			Field field = FragmentEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, fragmentEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -16883,6 +15767,7 @@ public class FragmentEntryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private FragmentEntryModelArgumentsResolver
+		_fragmentEntryModelArgumentsResolver;
 
 }

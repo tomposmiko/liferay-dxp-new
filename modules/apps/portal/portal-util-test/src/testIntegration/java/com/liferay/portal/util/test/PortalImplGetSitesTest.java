@@ -140,7 +140,7 @@ public class PortalImplGetSitesTest {
 
 	@Test
 	public void testGetSharedContentSiteGroupIdsFromLayout() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(_group);
+		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		Group group = GroupTestUtil.addGroup(_user.getUserId(), layout);
 

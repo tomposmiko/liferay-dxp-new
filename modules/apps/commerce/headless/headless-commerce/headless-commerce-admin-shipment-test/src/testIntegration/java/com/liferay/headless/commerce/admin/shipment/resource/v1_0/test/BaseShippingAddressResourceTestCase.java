@@ -27,7 +27,6 @@ import com.liferay.headless.commerce.admin.shipment.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.shipment.client.pagination.Page;
 import com.liferay.headless.commerce.admin.shipment.client.resource.v1_0.ShippingAddressResource;
 import com.liferay.headless.commerce.admin.shipment.client.serdes.v1_0.ShippingAddressSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -49,24 +48,24 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -211,165 +210,15 @@ public abstract class BaseShippingAddressResourceTestCase {
 	}
 
 	@Test
-	public void testGetShipmentByExternalReferenceCodeShippingAddress()
-		throws Exception {
-
-		ShippingAddress postShippingAddress =
-			testGetShipmentByExternalReferenceCodeShippingAddress_addShippingAddress();
-
-		ShippingAddress getShippingAddress =
-			shippingAddressResource.
-				getShipmentByExternalReferenceCodeShippingAddress(
-					testGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-						postShippingAddress));
-
-		assertEquals(postShippingAddress, getShippingAddress);
-		assertValid(getShippingAddress);
-	}
-
-	protected String
-			testGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-				ShippingAddress shippingAddress)
-		throws Exception {
-
-		return shippingAddress.getExternalReferenceCode();
-	}
-
-	protected ShippingAddress
-			testGetShipmentByExternalReferenceCodeShippingAddress_addShippingAddress()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetShipmentByExternalReferenceCodeShippingAddress()
-		throws Exception {
-
-		ShippingAddress shippingAddress =
-			testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_addShippingAddress();
-
-		Assert.assertTrue(
-			equals(
-				shippingAddress,
-				ShippingAddressSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"shipmentByExternalReferenceCodeShippingAddress",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"externalReferenceCode",
-											"\"" +
-												testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-													shippingAddress) + "\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/shipmentByExternalReferenceCodeShippingAddress"))));
-	}
-
-	protected String
-			testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_getExternalReferenceCode(
-				ShippingAddress shippingAddress)
-		throws Exception {
-
-		return shippingAddress.getExternalReferenceCode();
-	}
-
-	@Test
-	public void testGraphQLGetShipmentByExternalReferenceCodeShippingAddressNotFound()
-		throws Exception {
-
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"shipmentByExternalReferenceCodeShippingAddress",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected ShippingAddress
-			testGraphQLGetShipmentByExternalReferenceCodeShippingAddress_addShippingAddress()
-		throws Exception {
-
-		return testGraphQLShippingAddress_addShippingAddress();
-	}
-
-	@Test
-	public void testPatchShipmentByExternalReferenceCodeShippingAddress()
-		throws Exception {
-
-		ShippingAddress postShippingAddress =
-			testPatchShipmentByExternalReferenceCodeShippingAddress_addShippingAddress();
-
-		ShippingAddress randomPatchShippingAddress =
-			randomPatchShippingAddress();
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ShippingAddress patchShippingAddress =
-			shippingAddressResource.
-				patchShipmentByExternalReferenceCodeShippingAddress(
-					postShippingAddress.getExternalReferenceCode(),
-					randomPatchShippingAddress);
-
-		ShippingAddress expectedPatchShippingAddress =
-			postShippingAddress.clone();
-
-		BeanTestUtil.copyProperties(
-			randomPatchShippingAddress, expectedPatchShippingAddress);
-
-		ShippingAddress getShippingAddress =
-			shippingAddressResource.
-				getShipmentByExternalReferenceCodeShippingAddress(
-					patchShippingAddress.getExternalReferenceCode());
-
-		assertEquals(expectedPatchShippingAddress, getShippingAddress);
-		assertValid(getShippingAddress);
-	}
-
-	protected ShippingAddress
-			testPatchShipmentByExternalReferenceCodeShippingAddress_addShippingAddress()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
 	public void testGetShipmentShippingAddress() throws Exception {
 		ShippingAddress postShippingAddress =
 			testGetShipmentShippingAddress_addShippingAddress();
 
 		ShippingAddress getShippingAddress =
-			shippingAddressResource.getShipmentShippingAddress(
-				testGetShipmentShippingAddress_getShipmentId());
+			shippingAddressResource.getShipmentShippingAddress(null);
 
 		assertEquals(postShippingAddress, getShippingAddress);
 		assertValid(getShippingAddress);
-	}
-
-	protected Long testGetShipmentShippingAddress_getShipmentId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected ShippingAddress
@@ -383,7 +232,7 @@ public abstract class BaseShippingAddressResourceTestCase {
 	@Test
 	public void testGraphQLGetShipmentShippingAddress() throws Exception {
 		ShippingAddress shippingAddress =
-			testGraphQLGetShipmentShippingAddress_addShippingAddress();
+			testGraphQLShippingAddress_addShippingAddress();
 
 		Assert.assertTrue(
 			equals(
@@ -395,20 +244,11 @@ public abstract class BaseShippingAddressResourceTestCase {
 								"shipmentShippingAddress",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"shipmentId",
-											testGraphQLGetShipmentShippingAddress_getShipmentId());
+										put("shipmentId", null);
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data", "Object/shipmentShippingAddress"))));
-	}
-
-	protected Long testGraphQLGetShipmentShippingAddress_getShipmentId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -433,13 +273,6 @@ public abstract class BaseShippingAddressResourceTestCase {
 				"Object/code"));
 	}
 
-	protected ShippingAddress
-			testGraphQLGetShipmentShippingAddress_addShippingAddress()
-		throws Exception {
-
-		return testGraphQLShippingAddress_addShippingAddress();
-	}
-
 	@Test
 	public void testPatchShipmentShippingAddress() throws Exception {
 		ShippingAddress postShippingAddress =
@@ -456,8 +289,8 @@ public abstract class BaseShippingAddressResourceTestCase {
 		ShippingAddress expectedPatchShippingAddress =
 			postShippingAddress.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchShippingAddress, expectedPatchShippingAddress);
+		_beanUtilsBean.copyProperties(
+			expectedPatchShippingAddress, randomPatchShippingAddress);
 
 		ShippingAddress getShippingAddress =
 			shippingAddressResource.getShipmentShippingAddress(null);
@@ -682,13 +515,6 @@ public abstract class BaseShippingAddressResourceTestCase {
 	}
 
 	protected void assertValid(Page<ShippingAddress> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<ShippingAddress> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<ShippingAddress> shippingAddresses =
@@ -704,20 +530,6 @@ public abstract class BaseShippingAddressResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -979,16 +791,14 @@ public abstract class BaseShippingAddressResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1005,10 +815,6 @@ public abstract class BaseShippingAddressResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1018,18 +824,18 @@ public abstract class BaseShippingAddressResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1085,15 +891,13 @@ public abstract class BaseShippingAddressResourceTestCase {
 		}
 
 		if (entityFieldName.equals("latitude")) {
-			sb.append(String.valueOf(shippingAddress.getLatitude()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("longitude")) {
-			sb.append(String.valueOf(shippingAddress.getLongitude()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("name")) {
@@ -1237,115 +1041,6 @@ public abstract class BaseShippingAddressResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1420,6 +1115,18 @@ public abstract class BaseShippingAddressResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseShippingAddressResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

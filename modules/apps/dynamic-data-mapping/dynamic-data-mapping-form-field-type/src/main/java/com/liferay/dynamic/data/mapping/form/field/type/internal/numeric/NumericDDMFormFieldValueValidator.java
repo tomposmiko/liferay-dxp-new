@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.NUMERIC,
 	service = DDMFormFieldValueValidator.class
 )
@@ -49,7 +50,7 @@ public class NumericDDMFormFieldValueValidator
 			String valueString = value.getString(availableLocale);
 
 			if (Validator.isNotNull(valueString) &&
-				!_isNumber(valueString, availableLocale)) {
+				!isNumber(valueString, availableLocale)) {
 
 				throw new DDMFormFieldValueValidationException(
 					String.format(
@@ -59,7 +60,7 @@ public class NumericDDMFormFieldValueValidator
 		}
 	}
 
-	private boolean _isNumber(String valueString, Locale locale) {
+	protected boolean isNumber(String valueString, Locale locale) {
 		try {
 			DecimalFormat decimalFormat =
 				NumericDDMFormFieldUtil.getDecimalFormat(locale);
@@ -68,7 +69,7 @@ public class NumericDDMFormFieldValueValidator
 		}
 		catch (ParseException parseException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(parseException);
+				_log.debug(parseException, parseException);
 			}
 
 			return false;

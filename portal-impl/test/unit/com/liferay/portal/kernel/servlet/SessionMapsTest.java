@@ -130,7 +130,9 @@ public class SessionMapsTest extends BaseSessionMapsTestCase {
 
 			LogEntry logEntry = logEntries.get(0);
 
-			Assert.assertEquals("Invalidated", logEntry.getMessage());
+			Assert.assertEquals(
+				"java.lang.IllegalStateException: Invalidated",
+				logEntry.getMessage());
 			Assert.assertTrue(
 				logEntry.getThrowable() instanceof IllegalStateException);
 		}

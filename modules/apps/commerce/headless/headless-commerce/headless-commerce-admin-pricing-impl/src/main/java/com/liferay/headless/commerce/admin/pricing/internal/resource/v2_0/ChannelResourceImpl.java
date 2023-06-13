@@ -16,14 +16,13 @@ package com.liferay.headless.commerce.admin.pricing.internal.resource.v2_0;
 
 import com.liferay.commerce.price.list.model.CommercePriceListChannelRel;
 import com.liferay.commerce.price.list.service.CommercePriceListChannelRelService;
-import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.CommerceChannelRelService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Channel;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountChannel;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListChannel;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.ChannelDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.ChannelResource;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
@@ -36,6 +35,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Zoltán Takács
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/channel.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {ChannelResource.class, NestedFieldSupport.class}
@@ -68,10 +68,8 @@ public class ChannelResourceImpl
 				contextAcceptLanguage.getPreferredLocale()));
 	}
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.ChannelDTOConverter)"
-	)
-	private DTOConverter<CommerceChannel, Channel> _channelDTOConverter;
+	@Reference
+	private ChannelDTOConverter _channelDTOConverter;
 
 	@Reference
 	private CommerceChannelRelService _commerceChannelRelService;

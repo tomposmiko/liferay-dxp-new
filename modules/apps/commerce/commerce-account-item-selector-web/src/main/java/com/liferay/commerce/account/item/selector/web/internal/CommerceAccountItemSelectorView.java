@@ -14,15 +14,14 @@
 
 package com.liferay.commerce.account.item.selector.web.internal;
 
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.commerce.account.item.selector.criterion.CommerceAccountItemSelectorCriterion;
 import com.liferay.commerce.account.item.selector.web.internal.display.context.CommerceAccountItemSelectorViewDisplayContext;
-import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.Base64ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -48,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  * @author Ethan Bustad
  */
-@Component(service = ItemSelectorView.class)
+@Component(enabled = false, immediate = true, service = ItemSelectorView.class)
 public class CommerceAccountItemSelectorView
 	implements ItemSelectorView<CommerceAccountItemSelectorCriterion> {
 
@@ -70,7 +69,7 @@ public class CommerceAccountItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "accounts");
+		return LanguageUtil.get(locale, "accounts");
 	}
 
 	@Override
@@ -87,8 +86,8 @@ public class CommerceAccountItemSelectorView
 		CommerceAccountItemSelectorViewDisplayContext
 			commerceAccountItemSelectorViewDisplayContext =
 				new CommerceAccountItemSelectorViewDisplayContext(
-					_accountEntryLocalService, _commerceAccountHelper,
-					httpServletRequest, portletURL, itemSelectedEventName);
+					_commerceAccountService, httpServletRequest, portletURL,
+					itemSelectedEventName);
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
@@ -109,13 +108,7 @@ public class CommerceAccountItemSelectorView
 				new UUIDItemSelectorReturnType()));
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Reference
-	private CommerceAccountHelper _commerceAccountHelper;
-
-	@Reference
-	private Language _language;
+	private CommerceAccountService _commerceAccountService;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.account.item.selector.web)"

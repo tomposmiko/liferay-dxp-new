@@ -16,6 +16,7 @@ package com.liferay.portal.deploy.hot;
 
 import com.liferay.document.library.kernel.util.DLProcessor;
 import com.liferay.document.library.kernel.util.DLProcessorRegistryUtil;
+import com.liferay.mail.kernel.util.Hook;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
+import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployListener;
 import com.liferay.portal.kernel.deploy.hot.BaseHotDeployListener;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
@@ -122,7 +124,6 @@ import java.io.InputStream;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
 
 import java.net.URL;
 
@@ -138,7 +139,6 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
@@ -176,9 +176,11 @@ public class HookHotDeployListener
 		"company.settings.form.miscellaneous", "company.settings.form.social",
 		"control.panel.entry.class.default", "default.landing.page.path",
 		"default.regular.color.scheme.id", "default.regular.theme.id",
-		"dl.file.entry.drafts.enabled", "dl.file.entry.processors",
-		"dl.repository.impl", "dl.store.antivirus.enabled",
-		"dl.store.antivirus.impl", "dl.store.impl",
+		"dl.file.entry.drafts.enabled",
+		"dl.file.entry.open.in.ms.office.manual.check.in.required",
+		"dl.file.entry.processors", "dl.repository.impl",
+		"dl.store.antivirus.enabled", "dl.store.antivirus.impl",
+		"dl.store.impl",
 		"field.enable.com.liferay.portal.kernel.model.Contact.birthday",
 		"field.enable.com.liferay.portal.kernel.model.Contact.male",
 		"field.enable.com.liferay.portal.kernel.model.Organization.status",
@@ -198,7 +200,7 @@ public class HookHotDeployListener
 		"login.create.account.allow.custom.password", "login.dialog.disabled",
 		"login.events.post", "login.events.pre", "login.form.navigation.post",
 		"login.form.navigation.pre", "logout.events.post", "logout.events.pre",
-		"my.sites.show.private.sites.with.no.layouts",
+		"mail.hook.impl", "my.sites.show.private.sites.with.no.layouts",
 		"my.sites.show.public.sites.with.no.layouts",
 		"my.sites.show.user.private.sites.with.no.layouts",
 		"my.sites.show.user.public.sites.with.no.layouts",
@@ -448,6 +450,8 @@ public class HookHotDeployListener
 			HotDeployUtil.fireUndeployEvent(
 				new HotDeployEvent(servletContext, portletClassLoader));
 
+			DeployManagerUtil.undeploy(servletContextName);
+
 			return;
 		}
 
@@ -582,7 +586,7 @@ public class HookHotDeployListener
 		}
 		catch (BeanLocatorException beanLocatorException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(beanLocatorException);
+				_log.debug(beanLocatorException, beanLocatorException);
 			}
 
 			return (BasePersistence<?>)PortletBeanLocatorUtil.locate(
@@ -1183,20 +1187,26 @@ public class HookHotDeployListener
 			return;
 		}
 
-		String name = portalPropertiesLocation;
+		Configuration portalPropertiesConfiguration = null;
 
-		int pos = name.lastIndexOf(".properties");
+		try {
+			String name = portalPropertiesLocation;
 
-		if (pos != -1) {
-			name = name.substring(0, pos);
+			int pos = name.lastIndexOf(".properties");
+
+			if (pos != -1) {
+				name = name.substring(0, pos);
+			}
+
+			portalPropertiesConfiguration =
+				ConfigurationFactoryUtil.getConfiguration(
+					portletClassLoader, name);
+		}
+		catch (Exception exception) {
+			_log.error("Unable to read " + portalPropertiesLocation, exception);
 		}
 
-		Configuration portalPropertiesConfiguration =
-			ConfigurationFactoryUtil.getConfiguration(portletClassLoader, name);
-
 		if (portalPropertiesConfiguration == null) {
-			_log.error("Unable to read " + portalPropertiesLocation);
-
 			return;
 		}
 
@@ -1395,6 +1405,18 @@ public class HookHotDeployListener
 					servletContextName, lockListenerClassName,
 					LockListener.class, lockListener, "service.ranking", 1000);
 			}
+		}
+
+		if (portalProperties.containsKey(PropsKeys.MAIL_HOOK_IMPL)) {
+			String mailHookClassName = portalProperties.getProperty(
+				PropsKeys.MAIL_HOOK_IMPL);
+
+			Hook mailHook = (Hook)newInstance(
+				portletClassLoader, Hook.class, mailHookClassName);
+
+			registerService(
+				servletContextName, mailHookClassName, Hook.class, mailHook,
+				"service.ranking", 1000);
 		}
 
 		if (portalProperties.containsKey(
@@ -1681,7 +1703,7 @@ public class HookHotDeployListener
 			}
 			catch (BeanLocatorException beanLocatorException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(beanLocatorException);
+					_log.debug(beanLocatorException, beanLocatorException);
 				}
 
 				SystemBundleUtil.callService(
@@ -1838,7 +1860,8 @@ public class HookHotDeployListener
 
 		if (strutsActionObject instanceof StrutsAction) {
 			StrutsAction strutsAction =
-				_strutsActionProxyProviderFunction.apply(
+				(StrutsAction)ProxyUtil.newProxyInstance(
+					portletClassLoader, new Class<?>[] {StrutsAction.class},
 					new ClassLoaderBeanHandler(
 						strutsActionObject, portletClassLoader));
 
@@ -2165,7 +2188,9 @@ public class HookHotDeployListener
 
 	private static final String[] _PROPS_VALUES_BOOLEAN = {
 		"auth.forward.by.last.path", "captcha.check.portal.create_account",
-		"dl.file.entry.drafts.enabled", "dl.store.antivirus.enabled",
+		"dl.file.entry.drafts.enabled",
+		"dl.file.entry.open.in.ms.office.manual.check.in.required",
+		"dl.store.antivirus.enabled",
 		"field.enable.com.liferay.portal.kernel.model.Contact.birthday",
 		"field.enable.com.liferay.portal.kernel.model.Contact.male",
 		"field.enable.com.liferay.portal.kernel.model.Organization.status",
@@ -2259,10 +2284,6 @@ public class HookHotDeployListener
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		HookHotDeployListener.class);
-
-	private static final Function<InvocationHandler, StrutsAction>
-		_strutsActionProxyProviderFunction = ProxyUtil.getProxyProviderFunction(
-			StrutsAction.class);
 
 	private final Map<String, DLFileEntryProcessorContainer>
 		_dlFileEntryProcessorContainerMap = new HashMap<>();

@@ -17,19 +17,19 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import Breadcrumbs from '../breadcrumbs/Breadcrumbs';
 import MillerColumns from '../miller_columns/MillerColumns';
+import actionHandlers from './actionHandlers';
 
 const Layout = ({
 	getItemChildrenURL,
 	initialBreadcrumbEntries,
 	initialLayoutColumns,
-	isPrivateLayoutsEnabled,
 	languageId,
 	moveItemURL,
 	namespace,
 	searchContainerId,
 }) => {
 	const layoutRef = useRef();
-	const searchContainerRef = useRef();
+	const searchContainer = useRef();
 
 	const [breadcrumbEntries, setBreadcrumbEntries] = useState(
 		initialBreadcrumbEntries
@@ -53,17 +53,17 @@ const Layout = ({
 					},
 				];
 
-				if (searchContainerRef.current) {
-					searchContainerRef.current.destroy();
+				if (searchContainer.current) {
+					searchContainer.current.destroy();
 				}
 
-				searchContainerRef.current = new Liferay.SearchContainer({
+				searchContainer.current = new Liferay.SearchContainer({
 					contentBox: layoutRef.current,
 					id: `${namespace}${searchContainerId}`,
 					plugins,
 				});
 
-				setSearchContainerElement(searchContainerRef.current);
+				setSearchContainerElement(searchContainer.current);
 			}
 		);
 	}, [namespace, searchContainerId]);
@@ -170,10 +170,9 @@ const Layout = ({
 	return (
 		<div ref={layoutRef}>
 			<Breadcrumbs entries={breadcrumbEntries} />
-
 			<MillerColumns
+				actionHandlers={actionHandlers}
 				initialColumns={layoutColumns}
-				isPrivateLayoutsEnabled={isPrivateLayoutsEnabled}
 				namespace={namespace}
 				onColumnsChange={updateBreadcrumbs}
 				onItemMove={saveData}
@@ -190,7 +189,6 @@ export default function ({
 	props: {
 		breadcrumbEntries,
 		getItemChildrenURL,
-		isPrivateLayoutsEnabled,
 		languageId,
 		layoutColumns,
 		moveItemURL,
@@ -202,7 +200,6 @@ export default function ({
 			getItemChildrenURL={getItemChildrenURL}
 			initialBreadcrumbEntries={breadcrumbEntries}
 			initialLayoutColumns={layoutColumns}
-			isPrivateLayoutsEnabled={isPrivateLayoutsEnabled}
 			languageId={languageId}
 			moveItemURL={moveItemURL}
 			namespace={namespace}

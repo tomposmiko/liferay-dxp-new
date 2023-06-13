@@ -59,7 +59,7 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 				blacklistItem = blacklistItem.trim();
 
 				if (!blacklistItem.isEmpty()) {
-					blacklistItem = _stripTrailingStar(blacklistItem);
+					blacklistItem = stripTrailingStar(blacklistItem);
 
 					_blacklist.add(blacklistItem);
 				}
@@ -71,7 +71,7 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 				whitelistItem = whitelistItem.trim();
 
 				if (!whitelistItem.isEmpty()) {
-					whitelistItem = _stripTrailingStar(whitelistItem);
+					whitelistItem = stripTrailingStar(whitelistItem);
 
 					_whitelist.add(whitelistItem);
 				}
@@ -109,37 +109,24 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 
 		if (Validator.isNull(content) || Validator.isNull(contentType) ||
 			!contentType.equals(ContentTypes.TEXT_HTML) ||
-			_isWhitelisted(className, classPK)) {
+			isWhitelisted(className, classPK)) {
 
 			return content;
 		}
 
-		Thread currentThread = Thread.currentThread();
-
-		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-
-		currentThread.setContextClassLoader(
-			AntiSamySanitizerImpl.class.getClassLoader());
+		AntiSamy antiSamy = new AntiSamy();
 
 		try {
-			CleanResults cleanResults = null;
-
-			AntiSamy antiSamy = new AntiSamy();
-
-			if (_isConfigured(className, classPK)) {
+			if (isConfigured(className, classPK)) {
 				Policy policy = _policies.get(className);
 
-				cleanResults = antiSamy.scan(content, policy, AntiSamy.SAX);
-			}
-			else {
-				cleanResults = antiSamy.scan(content, _policy);
+				CleanResults cleanResults = antiSamy.scan(
+					content, policy, AntiSamy.SAX);
+
+				return cleanResults.getCleanHTML();
 			}
 
-			if (_log.isWarnEnabled()) {
-				for (String errorMessage : cleanResults.getErrorMessages()) {
-					_log.warn(errorMessage);
-				}
-			}
+			CleanResults cleanResults = antiSamy.scan(content, _policy);
 
 			return cleanResults.getCleanHTML();
 		}
@@ -148,12 +135,9 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 
 			throw new SanitizerException(exception);
 		}
-		finally {
-			currentThread.setContextClassLoader(contextClassLoader);
-		}
 	}
 
-	private boolean _isConfigured(String className, long classPK) {
+	protected boolean isConfigured(String className, long classPK) {
 		String classNameAndClassPK = className + StringPool.POUND + classPK;
 
 		for (String policyClassName : _policies.keySet()) {
@@ -165,7 +149,7 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 		return false;
 	}
 
-	private boolean _isWhitelisted(String className, long classPK) {
+	protected boolean isWhitelisted(String className, long classPK) {
 		String classNameAndClassPK = className + StringPool.POUND + classPK;
 
 		for (String blacklistItem : _blacklist) {
@@ -187,7 +171,7 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 		return false;
 	}
 
-	private String _stripTrailingStar(String item) {
+	protected String stripTrailingStar(String item) {
 		if (item.equals(StringPool.STAR)) {
 			return item;
 		}

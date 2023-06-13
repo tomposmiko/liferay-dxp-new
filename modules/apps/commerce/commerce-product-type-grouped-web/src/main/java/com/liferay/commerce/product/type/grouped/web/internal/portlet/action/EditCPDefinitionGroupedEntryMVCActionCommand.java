@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_definition_grouped_entry"
@@ -44,25 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCPDefinitionGroupedEntryMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		if (cmd.equals(Constants.ADD)) {
-			_addCPDefinitionGroupedEntries(actionRequest);
-		}
-		else if (cmd.equals(Constants.DELETE)) {
-			_deleteCPDefinitionGroupedEntries(actionRequest);
-		}
-		else if (cmd.equals(Constants.UPDATE)) {
-			_updateCPDefinitionGroupedEntry(actionRequest);
-		}
-	}
-
-	private void _addCPDefinitionGroupedEntries(ActionRequest actionRequest)
+	protected void addCPDefinitionGroupedEntries(ActionRequest actionRequest)
 		throws Exception {
 
 		long cpDefinitionId = ParamUtil.getLong(
@@ -77,7 +60,7 @@ public class EditCPDefinitionGroupedEntryMVCActionCommand
 			cpDefinitionId, entryCPDefinitionIds, serviceContext);
 	}
 
-	private void _deleteCPDefinitionGroupedEntries(ActionRequest actionRequest)
+	protected void deleteCPDefinitionGroupedEntries(ActionRequest actionRequest)
 		throws Exception {
 
 		long[] deleteCPDefinitionGroupedEntryIds = null;
@@ -91,8 +74,10 @@ public class EditCPDefinitionGroupedEntryMVCActionCommand
 			};
 		}
 		else {
-			deleteCPDefinitionGroupedEntryIds = ParamUtil.getLongValues(
-				actionRequest, "rowIds");
+			deleteCPDefinitionGroupedEntryIds = StringUtil.split(
+				ParamUtil.getString(
+					actionRequest, "deleteCPDefinitionGroupedEntryIds"),
+				0L);
 		}
 
 		for (long deleteCPDefinitionGroupedEntryId :
@@ -103,7 +88,25 @@ public class EditCPDefinitionGroupedEntryMVCActionCommand
 		}
 	}
 
-	private CPDefinitionGroupedEntry _updateCPDefinitionGroupedEntry(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		if (cmd.equals(Constants.ADD)) {
+			addCPDefinitionGroupedEntries(actionRequest);
+		}
+		else if (cmd.equals(Constants.DELETE)) {
+			deleteCPDefinitionGroupedEntries(actionRequest);
+		}
+		else if (cmd.equals(Constants.UPDATE)) {
+			updateCPDefinitionGroupedEntry(actionRequest);
+		}
+	}
+
+	protected CPDefinitionGroupedEntry updateCPDefinitionGroupedEntry(
 			ActionRequest actionRequest)
 		throws Exception {
 

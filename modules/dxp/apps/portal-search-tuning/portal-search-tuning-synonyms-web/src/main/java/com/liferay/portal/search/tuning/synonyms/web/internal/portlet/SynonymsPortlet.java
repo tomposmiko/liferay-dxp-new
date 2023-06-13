@@ -17,8 +17,8 @@ package com.liferay.portal.search.tuning.synonyms.web.internal.portlet;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
+import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Filipe Oshiro
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-search-tuning",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -54,8 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + SynonymsPortletKeys.SYNONYMS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -71,8 +71,7 @@ public class SynonymsPortlet extends MVCPortlet {
 				_documentToSynonymSetTranslator,
 				_portal.getHttpServletRequest(renderRequest), _language,
 				_portal, _queries, renderRequest, renderResponse,
-				_searchEngineAdapter, _searchEngineInformation, _sorts,
-				_synonymSetIndexNameBuilder);
+				_searchEngineAdapter, _sorts, _synonymSetIndexNameBuilder);
 
 		renderRequest.setAttribute(
 			SynonymsPortletKeys.SYNONYMS_DISPLAY_CONTEXT,
@@ -85,6 +84,9 @@ public class SynonymsPortlet extends MVCPortlet {
 	private DocumentToSynonymSetTranslator _documentToSynonymSetTranslator;
 
 	@Reference
+	private IndexNameBuilder _indexNameBuilder;
+
+	@Reference
 	private Language _language;
 
 	@Reference
@@ -95,9 +97,6 @@ public class SynonymsPortlet extends MVCPortlet {
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
-
-	@Reference
-	private SearchEngineInformation _searchEngineInformation;
 
 	@Reference
 	private Sorts _sorts;

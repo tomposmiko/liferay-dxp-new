@@ -14,6 +14,7 @@
 
 package com.liferay.wiki.uad.test;
 
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -29,15 +30,17 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author William Newbury
  */
-@Component(service = WikiNodeUADTestHelper.class)
+@Component(immediate = true, service = WikiNodeUADTestHelper.class)
 public class WikiNodeUADTestHelper {
 
 	public WikiNode addWikiNode(long userId) throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
+
 		return _wikiNodeLocalService.addNode(
 			userId, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId()));
+			RandomTestUtil.randomString(), serviceContext);
 	}
 
 	public WikiNode addWikiNodeWithStatusByUserId(
@@ -46,10 +49,13 @@ public class WikiNodeUADTestHelper {
 
 		WikiNode wikiNode = addWikiNode(userId);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
+
 		return _wikiNodeLocalService.updateStatus(
 			statusByUserId, wikiNode, WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId()));
+			serviceContext);
 	}
 
 	public void cleanUpDependencies(List<WikiNode> wikiNodes) throws Exception {

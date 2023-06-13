@@ -15,7 +15,6 @@
 package com.liferay.portal.search.facet.faceted.searcher.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.search.JournalArticleBlueprint;
@@ -33,7 +32,6 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.facet.type.AssetEntriesFacetFactory;
 import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.FacetsAssert;
@@ -71,8 +69,7 @@ public class AssetEntriesVersionFacetedSearcherTest {
 		GroupSearchFixture groupSearchFixture = new GroupSearchFixture();
 
 		JournalArticleSearchFixture journalArticleSearchFixture =
-			new JournalArticleSearchFixture(
-				ddmStructureLocalService, journalArticleLocalService, portal);
+			new JournalArticleSearchFixture(journalArticleLocalService);
 
 		_group = groupSearchFixture.addGroup(new GroupBlueprint());
 		_journalArticles = journalArticleSearchFixture.getJournalArticles();
@@ -186,16 +183,10 @@ public class AssetEntriesVersionFacetedSearcherTest {
 	protected AssetEntriesFacetFactory assetEntriesFacetFactory;
 
 	@Inject
-	protected DDMStructureLocalService ddmStructureLocalService;
-
-	@Inject
 	protected FacetedSearcherManager facetedSearcherManager;
 
 	@Inject
 	protected JournalArticleLocalService journalArticleLocalService;
-
-	@Inject
-	protected Portal portal;
 
 	@DeleteAfterTestRun
 	private Group _group;

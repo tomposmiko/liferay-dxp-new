@@ -9,8 +9,6 @@
  * distribution rights of the Software.
  */
 
-/* eslint-disable @liferay/empty-line-between-elements */
-
 import {ClayCheckbox} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
@@ -28,8 +26,7 @@ import {capitalize, getSLAStatusIconInfo} from '../../shared/util/util.es';
 import {AppContext} from '../AppContext.es';
 import {InstanceListContext} from './InstanceListPageProvider.es';
 import {ModalContext} from './modal/ModalProvider.es';
-
-function Item({isAdmin, totalCount, ...instance}) {
+function Item({totalCount, ...instance}) {
 	const {userId} = useContext(AppContext);
 	const {
 		selectedItems = [],
@@ -68,11 +65,7 @@ function Item({isAdmin, totalCount, ...instance}) {
 	const assigneeNames = assignees.map((user) => user.name).join(', ');
 	const {reviewer} = assignees.find(({id}) => id === -1) || {};
 
-	let disableCheckbox = completed;
-
-	if (!isAdmin) {
-		disableCheckbox = !assignedToUser && !reviewer;
-	}
+	const disableCheckbox = (!assignedToUser && !reviewer) || completed;
 
 	const formattedAssignees = !completed
 		? assigneeNames
@@ -200,6 +193,7 @@ function Item({isAdmin, totalCount, ...instance}) {
 
 function QuickActionMenu({disabled, instance, setShowInstanceTrackerModal}) {
 	const {openModal, setSingleTransition} = useContext(ModalContext);
+	const {workflowInstanceTrackerEnabled} = useContext(AppContext);
 	const {setSelectedItems} = useContext(InstanceListContext);
 	const {transitions = [], taskNames = []} = instance;
 
@@ -215,20 +209,26 @@ function QuickActionMenu({disabled, instance, setShowInstanceTrackerModal}) {
 		onClick: () => handleClick('bulkUpdateDueDate', 'updateDueDate'),
 	};
 
-	const kebabItems = [
+	let kebabItems = [
 		{
 			icon: 'change',
 			label: Liferay.Language.get('reassign-task'),
 			onClick: () => handleClick('bulkReassign', 'singleReassign'),
 		},
 		updateDueDateItem,
-		{
-			label: Liferay.Language.get('track-workflow'),
-			onClick: setShowInstanceTrackerModal,
-		},
 	];
 
-	if (transitions.length) {
+	if (workflowInstanceTrackerEnabled) {
+		kebabItems = [
+			...kebabItems,
+			{
+				label: Liferay.Language.get('track-workflow'),
+				onClick: setShowInstanceTrackerModal,
+			},
+		];
+	}
+
+	if (transitions.length > 0) {
 		const transitionItems = [
 			{
 				type: 'divider',
@@ -254,7 +254,7 @@ function QuickActionMenu({disabled, instance, setShowInstanceTrackerModal}) {
 
 		kebabItems.push(...transitionItems);
 	}
-	else if (!transitions.length && taskNames.length > 1) {
+	else if (transitions.length === 0 && taskNames.length > 1) {
 		kebabItems.splice(
 			1,
 			1,
@@ -291,8 +291,7 @@ function DueDateSLAResults({slaResults, slaStatusIconInfo}) {
 
 		let format = '';
 
-		const sameYear =
-			dateOverdue.split('-')[0] === new Date().getFullYear().toString();
+		const sameYear = dateOverdue.split('-')[0] == new Date().getFullYear();
 
 		if (sameYear) {
 			format = fullDatetime
@@ -352,7 +351,6 @@ function DueDateSLAResults({slaResults, slaStatusIconInfo}) {
 					header={Liferay.Language.get('due-date')}
 					onMouseEnter={() => setPopover(true)}
 					onMouseLeave={() => setPopover(false)}
-					onShowChange={setPopover}
 					show={popover}
 					trigger={
 						<div
@@ -364,7 +362,6 @@ function DueDateSLAResults({slaResults, slaStatusIconInfo}) {
 							onMouseOver={() => showPopover()}
 						>
 							<span className="due-date-badge"></span>
-
 							{slaResultDateOverdue}
 						</div>
 					}
@@ -372,9 +369,9 @@ function DueDateSLAResults({slaResults, slaStatusIconInfo}) {
 					{instanceSlaResults.map((slaResult) => (
 						<div key={`critical-sla-${slaResult.id}`}>
 							<div>{slaResult.name}:</div>
-
 							<div className={slaResult.textClass}>
-								{`${slaResult.datetimeOverdueFormatted} (${slaResult.durationText} ${slaResult.onTimeText})`}
+								{slaResult.datetimeOverdueFormatted} (
+								{slaResult.durationText} {slaResult.onTimeText})
 							</div>
 						</div>
 					))}

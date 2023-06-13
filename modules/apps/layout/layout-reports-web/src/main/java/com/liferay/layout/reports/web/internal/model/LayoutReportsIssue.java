@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 /**
  * @author Cristina González
@@ -51,13 +52,11 @@ public class LayoutReportsIssue {
 
 		_key = key;
 
-		long total = 0;
+		Stream<Detail> stream = _details.stream();
 
-		for (LayoutReportsIssue.Detail detail : _details) {
-			total += detail.getTotal();
-		}
-
-		_total = total;
+		_total = stream.mapToLong(
+			Detail::getTotal
+		).sum();
 	}
 
 	@Override
@@ -94,23 +93,21 @@ public class LayoutReportsIssue {
 	}
 
 	public JSONObject toJSONObject(
-			String configureLayoutSeoURL, String configurePagesSeoURL,
-			ResourceBundle resourceBundle)
-		throws Exception {
+		String configureLayoutSeoURL, String configurePagesSeoURL,
+		ResourceBundle resourceBundle) {
+
+		Stream<Detail> stream = _details.stream();
 
 		return JSONUtil.put(
 			"details",
-			JSONUtil.toJSONArray(
-				_details,
-				detail -> {
-					if (detail.getTotal() <= 0) {
-						return null;
-					}
-
-					return detail.toJSONObject(
+			JSONUtil.putAll(
+				stream.filter(
+					detail -> detail.getTotal() > 0
+				).map(
+					detail -> detail.toJSONObject(
 						configureLayoutSeoURL, configurePagesSeoURL,
-						resourceBundle);
-				})
+						resourceBundle)
+				).toArray())
 		).put(
 			"key", _key.toString()
 		).put(

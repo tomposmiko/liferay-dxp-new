@@ -83,11 +83,13 @@ public class CommentsSubscriptionTest {
 	public void testCannotSubscribeToCommentsWithoutViewPermissions()
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), _creatorUser.getUserId());
+
 		BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
 			_creatorUser.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _creatorUser.getUserId()));
+			RandomTestUtil.randomString(), serviceContext);
 
 		RoleTestUtil.removeResourcePermission(
 			RoleConstants.GUEST, BlogsEntry.class.getName(),
@@ -97,7 +99,8 @@ public class CommentsSubscriptionTest {
 		DiscussionPermission discussionPermission =
 			_commentManager.getDiscussionPermission(
 				PermissionCheckerFactoryUtil.create(
-					UserLocalServiceUtil.getGuestUser(_group.getCompanyId())));
+					UserLocalServiceUtil.getDefaultUser(
+						_group.getCompanyId())));
 
 		Assert.assertFalse(
 			discussionPermission.hasSubscribePermission(
@@ -109,11 +112,13 @@ public class CommentsSubscriptionTest {
 	public void testCanSubscribeToCommentsWithViewPermissions()
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), _creatorUser.getUserId());
+
 		BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
 			_creatorUser.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _creatorUser.getUserId()));
+			RandomTestUtil.randomString(), serviceContext);
 
 		DiscussionPermission discussionPermission =
 			_commentManager.getDiscussionPermission(
@@ -259,7 +264,7 @@ public class CommentsSubscriptionTest {
 			serviceContext, Constants.ADD);
 
 		return MBMessageLocalServiceUtil.addDiscussionMessage(
-			null, userId, RandomTestUtil.randomString(), _group.getGroupId(),
+			userId, RandomTestUtil.randomString(), _group.getGroupId(),
 			BlogsEntry.class.getName(), entry.getEntryId(),
 			thread.getThreadId(), MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),

@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Leonardo Barros
  */
-@Component(service = WorkflowHandler.class)
+@Component(immediate = true, service = WorkflowHandler.class)
 public class DDLFormWorkflowHandler extends BaseWorkflowHandler<DDLFormRecord> {
 
 	@Override
@@ -115,13 +115,30 @@ public class DDLFormWorkflowHandler extends BaseWorkflowHandler<DDLFormRecord> {
 		return new DDLFormRecordImpl(record);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDLRecordLocalService(
+		DDLRecordLocalService ddlRecordLocalService) {
+
+		_ddlRecordLocalService = ddlRecordLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDLRecordVersionLocalService(
+		DDLRecordVersionLocalService ddlRecordVersionLocalService) {
+
+		_ddlRecordVersionLocalService = ddlRecordVersionLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWorkflowDefinitionLinkLocalService(
+		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
+
+		_workflowDefinitionLinkLocalService =
+			workflowDefinitionLinkLocalService;
+	}
+
 	private DDLRecordLocalService _ddlRecordLocalService;
-
-	@Reference
 	private DDLRecordVersionLocalService _ddlRecordVersionLocalService;
-
-	@Reference
 	private WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;
 

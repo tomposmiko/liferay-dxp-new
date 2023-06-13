@@ -28,13 +28,13 @@ import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelRelService;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -82,10 +82,11 @@ public class CommerceDiscountQualifiersDisplayContext
 			commerceDiscountOrderTypeRelService;
 	}
 
-	public List<FDSActionDropdownItem> getAccountFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getAccountClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionTemplates(
+		return getClayDataSetActionTemplates(
 			PortletURLBuilder.create(
 				portal.getControlPanelPortletURL(
 					httpServletRequest,
@@ -101,11 +102,12 @@ public class CommerceDiscountQualifiersDisplayContext
 			false);
 	}
 
-	public List<FDSActionDropdownItem> getAccountGroupFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getAccountGroupClayDataSetActionDropdownItems()
 		throws PortalException {
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "remove",
 				LanguageUtil.get(httpServletRequest, "remove"), "delete",
 				"delete", "headless"));
@@ -170,11 +172,11 @@ public class CommerceDiscountQualifiersDisplayContext
 			getCommerceDiscountId() + "/discount-accounts?nestedFields=account";
 	}
 
-	public List<FDSActionDropdownItem>
-			getDiscountChannelFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountChannelClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionTemplates(
+		return getClayDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
 					httpServletRequest, CommerceChannel.class.getName(),
@@ -194,11 +196,11 @@ public class CommerceDiscountQualifiersDisplayContext
 			getCommerceDiscountId() + "/discount-channels?nestedFields=channel";
 	}
 
-	public List<FDSActionDropdownItem>
-			getDiscountOrderTypeFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getDiscountOrderTypeClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionTemplates(
+		return getClayDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
 					httpServletRequest, CommerceOrderType.class.getName(),

@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.reading.time.model.impl.ReadingTimeEntryImpl",
-		"table.name=ReadingTimeEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		ReadingTimeEntryModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class ReadingTimeEntryModelArgumentsResolver
 	implements ArgumentsResolver {

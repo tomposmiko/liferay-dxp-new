@@ -12,17 +12,16 @@
  * details.
  */
 
-import {delegate, getOpener, sub} from 'frontend-js-web';
+import {delegate} from 'frontend-js-web';
 
 export default function ({
-	layoutItemSelectorUrl,
-	layoutPageTemplateEntryItemSelectorUrl,
+	displayPageItemSelectorUrl,
 	portletNamespace,
 	productItemSelectorUrl,
 	removeIcon,
 	searchContainerId,
 }) {
-	const openerWindow = getOpener();
+	const openerWindow = Liferay.Util.getOpener();
 
 	const initProductSelection = (searchContainer) => {
 		const selectProductButton = document.getElementById(
@@ -60,7 +59,7 @@ export default function ({
 
 					rowColumns.push(selectedItem.name);
 					rowColumns.push(
-						`<a class="float-right modify-link" data-rowId="${selectedItem.id}" href="javascript:void(0);">${removeIcon}</a>`
+						`<a class="float-right modify-link" data-rowId="${selectedItem.id}" href="javascript:;">${removeIcon}</a>`
 					);
 
 					const classPKInput = document.getElementById(
@@ -76,7 +75,7 @@ export default function ({
 					searchContainer.updateDataStore();
 				},
 				selectEventName: 'productDefinitionsSelectItem',
-				title: sub(
+				title: Liferay.Util.sub(
 					Liferay.Language.get('select-x'),
 					Liferay.Language.get('product')
 				),
@@ -115,11 +114,8 @@ export default function ({
 	);
 
 	const initDisplayPageSelection = () => {
-		const chooseLayoutButton = document.getElementById(
-			`${portletNamespace}chooseLayout`
-		);
-		const chooseLayoutPageTemplateEntryButton = document.getElementById(
-			`${portletNamespace}chooseLayoutPageTemplateEntry`
+		const chooseDisplayPageButton = document.getElementById(
+			`${portletNamespace}chooseDisplayPage`
 		);
 		const displayPageItemRemoveIcon = document.getElementById(
 			`${portletNamespace}displayPageItemRemove`
@@ -132,7 +128,7 @@ export default function ({
 		);
 
 		if (
-			(!chooseLayoutButton && !chooseLayoutPageTemplateEntryButton) ||
+			!chooseDisplayPageButton ||
 			!displayPageItemRemoveIcon ||
 			!pagesContainerInput ||
 			!displayPageNameInput
@@ -140,55 +136,26 @@ export default function ({
 			return;
 		}
 
-		if (chooseLayoutButton) {
-			chooseLayoutButton.addEventListener('click', () => {
-				openerWindow.Liferay.Util.openSelectionModal({
-					buttonAddLabel: Liferay.Language.get('done'),
-					multiple: true,
-					onSelect: (selectedItem) => {
-						if (!selectedItem) {
-							return;
-						}
+		chooseDisplayPageButton.addEventListener('click', () => {
+			openerWindow.Liferay.Util.openSelectionModal({
+				buttonAddLabel: Liferay.Language.get('done'),
+				multiple: true,
+				onSelect: (selectedItem) => {
+					if (!selectedItem) {
+						return;
+					}
 
-						pagesContainerInput.value = selectedItem.id;
+					pagesContainerInput.value = selectedItem.id;
 
-						displayPageNameInput.innerHTML = selectedItem.name;
+					displayPageNameInput.innerHTML = selectedItem.name;
 
-						displayPageItemRemoveIcon.classList.remove('hide');
-					},
-					selectEventName: 'selectLayout',
-					title: Liferay.Language.get('select-product-display-page'),
-					url: layoutItemSelectorUrl,
-				});
+					displayPageItemRemoveIcon.classList.remove('hide');
+				},
+				selectEventName: 'selectDisplayPage',
+				title: Liferay.Language.get('select-product-display-page'),
+				url: displayPageItemSelectorUrl,
 			});
-		}
-
-		if (chooseLayoutPageTemplateEntryButton) {
-			chooseLayoutPageTemplateEntryButton.addEventListener(
-				'click',
-				() => {
-					openerWindow.Liferay.Util.openSelectionModal({
-						buttonAddLabel: Liferay.Language.get('done'),
-						onSelect: (selectedItem) => {
-							if (!selectedItem) {
-								return;
-							}
-
-							pagesContainerInput.value = selectedItem.id;
-
-							displayPageNameInput.innerHTML = selectedItem.name;
-
-							displayPageItemRemoveIcon.classList.remove('hide');
-						},
-						selectEventName: 'selectLayoutPageTemplateEntry',
-						title: Liferay.Language.get(
-							'select-product-display-page'
-						),
-						url: layoutPageTemplateEntryItemSelectorUrl,
-					});
-				}
-			);
-		}
+		});
 
 		displayPageItemRemoveIcon.addEventListener('click', () => {
 			displayPageNameInput.innerHTML = Liferay.Language.get('none');

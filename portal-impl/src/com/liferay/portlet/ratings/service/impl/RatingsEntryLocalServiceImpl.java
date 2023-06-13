@@ -22,17 +22,13 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.social.SocialActivityManagerUtil;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portlet.ratings.service.base.RatingsEntryLocalServiceBaseImpl;
 import com.liferay.ratings.kernel.exception.EntryScoreException;
 import com.liferay.ratings.kernel.model.RatingsEntry;
 import com.liferay.ratings.kernel.model.RatingsStats;
-import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
-import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 import com.liferay.social.kernel.model.SocialActivityConstants;
 
 import java.util.Date;
@@ -52,7 +48,7 @@ public class RatingsEntryLocalServiceImpl
 		throws PortalException {
 
 		RatingsEntry entry = ratingsEntryPersistence.fetchByU_C_C(
-			userId, _classNameLocalService.getClassNameId(className), classPK);
+			userId, classNameLocalService.getClassNameId(className), classPK);
 
 		ratingsEntryLocalService.deleteEntry(entry, userId, className, classPK);
 	}
@@ -70,17 +66,17 @@ public class RatingsEntryLocalServiceImpl
 		}
 
 		ratingsEntryPersistence.removeByU_C_C(
-			userId, _classNameLocalService.getClassNameId(className), classPK);
+			userId, classNameLocalService.getClassNameId(className), classPK);
 
 		// Stats
 
-		RatingsStats stats = _ratingsStatsLocalService.getStats(
+		RatingsStats stats = ratingsStatsLocalService.getStats(
 			className, classPK);
 
 		int totalEntries = stats.getTotalEntries() - 1;
 
 		if (totalEntries == 0) {
-			_ratingsStatsPersistence.remove(stats);
+			ratingsStatsPersistence.remove(stats);
 		}
 		else {
 			double oldScore = entry.getScore();
@@ -97,7 +93,7 @@ public class RatingsEntryLocalServiceImpl
 			stats.setTotalScore(totalScore);
 			stats.setAverageScore(averageScore);
 
-			_ratingsStatsPersistence.update(stats);
+			ratingsStatsPersistence.update(stats);
 		}
 
 		// Social
@@ -120,14 +116,14 @@ public class RatingsEntryLocalServiceImpl
 		long userId, String className, long classPK) {
 
 		return ratingsEntryPersistence.fetchByU_C_C(
-			userId, _classNameLocalService.getClassNameId(className), classPK);
+			userId, classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
 	public Map<Long, RatingsEntry> getEntries(
 		long userId, String className, long[] classPKs) {
 
-		long classNameId = _classNameLocalService.getClassNameId(className);
+		long classNameId = classNameLocalService.getClassNameId(className);
 
 		Map<Long, RatingsEntry> ratingsEntries = new HashMap<>();
 
@@ -144,7 +140,7 @@ public class RatingsEntryLocalServiceImpl
 	@Override
 	public List<RatingsEntry> getEntries(String className, long classPK) {
 		return ratingsEntryPersistence.findByC_C(
-			_classNameLocalService.getClassNameId(className), classPK);
+			classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
@@ -152,13 +148,13 @@ public class RatingsEntryLocalServiceImpl
 		String className, long classPK, double score) {
 
 		return ratingsEntryPersistence.findByC_C_S(
-			_classNameLocalService.getClassNameId(className), classPK, score);
+			classNameLocalService.getClassNameId(className), classPK, score);
 	}
 
 	@Override
 	public int getEntriesCount(String className, long classPK, double score) {
 		return ratingsEntryPersistence.countByC_C_S(
-			_classNameLocalService.getClassNameId(className), classPK, score);
+			classNameLocalService.getClassNameId(className), classPK, score);
 	}
 
 	@Override
@@ -166,7 +162,7 @@ public class RatingsEntryLocalServiceImpl
 		throws PortalException {
 
 		return ratingsEntryPersistence.findByU_C_C(
-			userId, _classNameLocalService.getClassNameId(className), classPK);
+			userId, classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
@@ -177,7 +173,7 @@ public class RatingsEntryLocalServiceImpl
 
 		// Entry
 
-		long classNameId = _classNameLocalService.getClassNameId(className);
+		long classNameId = classNameLocalService.getClassNameId(className);
 
 		validate(score);
 
@@ -193,12 +189,11 @@ public class RatingsEntryLocalServiceImpl
 
 			// Stats
 
-			RatingsStats stats = _ratingsStatsPersistence.fetchByC_C(
+			RatingsStats stats = ratingsStatsPersistence.fetchByC_C(
 				classNameId, classPK);
 
 			if (stats == null) {
-				stats = _ratingsStatsLocalService.addStats(
-					classNameId, classPK);
+				stats = ratingsStatsLocalService.addStats(classNameId, classPK);
 			}
 
 			stats.setModifiedDate(new Date());
@@ -206,10 +201,10 @@ public class RatingsEntryLocalServiceImpl
 			stats.setAverageScore(
 				stats.getTotalScore() / stats.getTotalEntries());
 
-			_ratingsStatsPersistence.update(stats);
+			ratingsStatsPersistence.update(stats);
 		}
 		else {
-			User user = _userPersistence.findByPrimaryKey(userId);
+			User user = userPersistence.findByPrimaryKey(userId);
 
 			long entryId = counterLocalService.increment();
 
@@ -226,12 +221,11 @@ public class RatingsEntryLocalServiceImpl
 
 			// Stats
 
-			RatingsStats stats = _ratingsStatsPersistence.fetchByC_C(
+			RatingsStats stats = ratingsStatsPersistence.fetchByC_C(
 				classNameId, classPK);
 
 			if (stats == null) {
-				stats = _ratingsStatsLocalService.addStats(
-					classNameId, classPK);
+				stats = ratingsStatsLocalService.addStats(classNameId, classPK);
 			}
 
 			stats.setModifiedDate(new Date());
@@ -240,7 +234,7 @@ public class RatingsEntryLocalServiceImpl
 			stats.setAverageScore(
 				stats.getTotalScore() / stats.getTotalEntries());
 
-			_ratingsStatsPersistence.update(stats);
+			ratingsStatsPersistence.update(stats);
 		}
 
 		// Social
@@ -269,17 +263,5 @@ public class RatingsEntryLocalServiceImpl
 
 	@BeanReference(type = AssetEntryLocalService.class)
 	private AssetEntryLocalService _assetEntryLocalService;
-
-	@BeanReference(type = ClassNameLocalService.class)
-	private ClassNameLocalService _classNameLocalService;
-
-	@BeanReference(type = RatingsStatsLocalService.class)
-	private RatingsStatsLocalService _ratingsStatsLocalService;
-
-	@BeanReference(type = RatingsStatsPersistence.class)
-	private RatingsStatsPersistence _ratingsStatsPersistence;
-
-	@BeanReference(type = UserPersistence.class)
-	private UserPersistence _userPersistence;
 
 }

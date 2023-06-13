@@ -21,6 +21,4 @@ public class UsersAdminManagementToolbarKeys {
 
 	public static final String VIEW_FLAT_USERS = "VIEW_FLAT_USERS";
 
-	public static final String VIEW_SERVICE_ACCOUNTS = "VIEW_SERVICE_ACCOUNTS";
-
 }

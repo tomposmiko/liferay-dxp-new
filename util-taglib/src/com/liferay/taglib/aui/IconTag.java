@@ -26,6 +26,8 @@ import com.liferay.taglib.aui.base.BaseIconTag;
 import com.liferay.taglib.ui.MessageTag;
 import com.liferay.taglib.util.InlineUtil;
 
+import java.util.Objects;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
@@ -93,7 +95,6 @@ public class IconTag extends BaseIconTag {
 		else {
 			ATag aTag = new ATag();
 
-			aTag.setAriaLabel(getAriaLabel());
 			aTag.setCssClass(getCssClass());
 			aTag.setData(getData());
 			aTag.setHref(getUrl());
@@ -126,37 +127,44 @@ public class IconTag extends BaseIconTag {
 		JspWriter jspWriter = pageContext.getOut();
 
 		try {
-			jspWriter.write("<svg aria-hidden=\"true\" ");
-			jspWriter.write("class=\"lexicon-icon lexicon-icon-");
-			jspWriter.write(GetterUtil.getString(getImage()));
-			jspWriter.write("\" focusable=\"false\" ");
-			jspWriter.write(
-				InlineUtil.buildDynamicAttributes(getDynamicAttributes()));
-			jspWriter.write("><use href=\"");
+			if (Objects.equals(getMarkupView(), "lexicon")) {
+				jspWriter.write("<svg aria-hidden=\"true\" ");
+				jspWriter.write("class=\"lexicon-icon lexicon-icon-");
+				jspWriter.write(GetterUtil.getString(getImage()));
+				jspWriter.write("\" focusable=\"false\" ");
+				jspWriter.write(
+					InlineUtil.buildDynamicAttributes(getDynamicAttributes()));
+				jspWriter.write("><use href=\"");
 
-			String src = getSrc();
+				String src = getSrc();
 
-			if (src == null) {
-				HttpServletRequest httpServletRequest =
-					(HttpServletRequest)pageContext.getRequest();
+				if (src == null) {
+					HttpServletRequest httpServletRequest =
+						(HttpServletRequest)pageContext.getRequest();
 
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
+					ThemeDisplay themeDisplay =
+						(ThemeDisplay)httpServletRequest.getAttribute(
+							WebKeys.THEME_DISPLAY);
 
-				src = themeDisplay.getPathThemeSpritemap();
+					src = themeDisplay.getPathThemeImages() + "/clay/icons.svg";
+				}
+
+				jspWriter.write(src);
+				jspWriter.write(StringPool.POUND);
+				jspWriter.write(GetterUtil.getString(getImage()));
+				jspWriter.write("\"></use>");
+				jspWriter.write("</svg>");
 			}
-
-			jspWriter.write(src);
-			jspWriter.write(StringPool.POUND);
-			jspWriter.write(GetterUtil.getString(getImage()));
-			jspWriter.write("\"></use>");
-			jspWriter.write("</svg>");
+			else {
+				jspWriter.write("<i class=\"icon-");
+				jspWriter.write(GetterUtil.getString(getImage()));
+				jspWriter.write("\"></i>");
+			}
 
 			String label = getLabel();
 
 			if (label != null) {
-				jspWriter.write("<span class=\"ml-2 taglib-icon-label\">");
+				jspWriter.write("<span class=\"taglib-icon-label\">");
 
 				MessageTag messageTag = new MessageTag();
 

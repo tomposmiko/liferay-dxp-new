@@ -53,11 +53,11 @@ public class RepositorySearchQueryBuilderImpl
 		try {
 			BooleanQuery contextQuery = new BooleanQueryImpl();
 
-			_addContext(contextQuery, searchContext);
+			addContext(contextQuery, searchContext);
 
 			BooleanQuery searchQuery = new BooleanQueryImpl();
 
-			_addSearchKeywords(searchQuery, searchContext);
+			addSearchKeywords(searchQuery, searchContext);
 
 			BooleanQuery fullQuery = new BooleanQueryImpl();
 
@@ -89,7 +89,7 @@ public class RepositorySearchQueryBuilderImpl
 		}
 	}
 
-	private void _addContext(
+	protected void addContext(
 			BooleanQuery contextQuery, SearchContext searchContext)
 		throws Exception {
 
@@ -109,7 +109,7 @@ public class RepositorySearchQueryBuilderImpl
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				continue;
@@ -123,7 +123,7 @@ public class RepositorySearchQueryBuilderImpl
 		contextQuery.add(folderIdsQuery, BooleanClauseOccur.MUST);
 	}
 
-	private void _addSearchKeywords(
+	protected void addSearchKeywords(
 			BooleanQuery searchQuery, SearchContext searchContext)
 		throws Exception {
 
@@ -138,7 +138,7 @@ public class RepositorySearchQueryBuilderImpl
 		_repositorySearchQueryTermBuilder.addTerm(
 			titleQuery, searchContext, Field.TITLE, keywords);
 
-		if (titleQuery.hasClauses() && !_contains(searchQuery, titleQuery)) {
+		if (titleQuery.hasClauses() && !contains(searchQuery, titleQuery)) {
 			searchQuery.add(titleQuery, BooleanClauseOccur.SHOULD);
 		}
 
@@ -148,7 +148,7 @@ public class RepositorySearchQueryBuilderImpl
 			userNameQuery, searchContext, Field.USER_NAME, keywords);
 
 		if (userNameQuery.hasClauses() &&
-			!_contains(searchQuery, userNameQuery)) {
+			!contains(searchQuery, userNameQuery)) {
 
 			searchQuery.add(userNameQuery, BooleanClauseOccur.SHOULD);
 		}
@@ -158,19 +158,17 @@ public class RepositorySearchQueryBuilderImpl
 		_repositorySearchQueryTermBuilder.addTerm(
 			contentQuery, searchContext, Field.CONTENT, keywords);
 
-		if (contentQuery.hasClauses() &&
-			!_contains(searchQuery, contentQuery)) {
-
+		if (contentQuery.hasClauses() && !contains(searchQuery, contentQuery)) {
 			searchQuery.add(contentQuery, BooleanClauseOccur.SHOULD);
 		}
 	}
 
-	private boolean _contains(Query query1, Query query2) {
+	protected boolean contains(Query query1, Query query2) {
 		if (query1 instanceof BooleanQuery) {
 			BooleanQuery booleanQuery = (BooleanQuery)query1;
 
 			for (BooleanClause<Query> booleanClause : booleanQuery.clauses()) {
-				if (_contains(booleanClause.getClause(), query2)) {
+				if (contains(booleanClause.getClause(), query2)) {
 					return true;
 				}
 			}
@@ -181,7 +179,7 @@ public class RepositorySearchQueryBuilderImpl
 			BooleanQuery booleanQuery = (BooleanQuery)query2;
 
 			for (BooleanClause<Query> booleanClause : booleanQuery.clauses()) {
-				if (_contains(query1, booleanClause.getClause())) {
+				if (contains(query1, booleanClause.getClause())) {
 					return true;
 				}
 			}
@@ -259,13 +257,22 @@ public class RepositorySearchQueryBuilderImpl
 		return false;
 	}
 
+	@Reference(unbind = "-")
+	protected void setDLAppService(DLAppService dlAppService) {
+		_dlAppService = dlAppService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setRepositorySearchQueryTermBuilder(
+		RepositorySearchQueryTermBuilder repositorySearchQueryTermBuilder) {
+
+		_repositorySearchQueryTermBuilder = repositorySearchQueryTermBuilder;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		RepositorySearchQueryBuilderImpl.class);
 
-	@Reference
 	private DLAppService _dlAppService;
-
-	@Reference
 	private RepositorySearchQueryTermBuilder _repositorySearchQueryTermBuilder;
 
 }

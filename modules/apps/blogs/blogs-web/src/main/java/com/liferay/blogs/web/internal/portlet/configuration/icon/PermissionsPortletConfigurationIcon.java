@@ -17,7 +17,7 @@ package com.liferay.blogs.web.internal.portlet.configuration.icon;
 import com.liferay.blogs.constants.BlogsConstants;
 import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -28,8 +28,13 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.AggregateResourceBundle;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.security.PermissionsURLTag;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -41,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + BlogsPortletKeys.BLOGS_ADMIN,
 	service = PortletConfigurationIcon.class
 )
@@ -49,7 +55,18 @@ public class PermissionsPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "entries-permissions");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)),
+			"entries-permissions");
+	}
+
+	@Override
+	public ResourceBundle getResourceBundle(Locale locale) {
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return new AggregateResourceBundle(
+			resourceBundle, super.getResourceBundle(locale));
 	}
 
 	@Override
@@ -71,7 +88,7 @@ public class PermissionsPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -90,7 +107,7 @@ public class PermissionsPortletConfigurationIcon
 
 		User user = themeDisplay.getUser();
 
-		if (user.isGuestUser()) {
+		if (user.isDefaultUser()) {
 			return false;
 		}
 
@@ -107,7 +124,7 @@ public class PermissionsPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -117,15 +134,17 @@ public class PermissionsPortletConfigurationIcon
 	}
 
 	@Override
+	public boolean isToolTip() {
+		return false;
+	}
+
+	@Override
 	public boolean isUseDialog() {
 		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		PermissionsPortletConfigurationIcon.class);
-
-	@Reference
-	private Language _language;
 
 	@Reference(target = "(resource.name=" + BlogsConstants.RESOURCE_NAME + ")")
 	private PortletResourcePermission _portletResourcePermission;

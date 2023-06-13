@@ -30,10 +30,6 @@ public class DDMFormInstanceVersionLocalServiceWrapper
 	implements DDMFormInstanceVersionLocalService,
 			   ServiceWrapper<DDMFormInstanceVersionLocalService> {
 
-	public DDMFormInstanceVersionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DDMFormInstanceVersionLocalServiceWrapper(
 		DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService) {
 

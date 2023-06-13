@@ -16,22 +16,20 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import classNames from 'classnames';
 import React from 'react';
 
-export function LoadingComponent({className}) {
-	return (
-		<div
-			className={classNames(
-				'align-items-center',
-				'd-flex',
-				'w-100',
-				className
-			)}
-		>
-			<ClayLoadingIndicator />
-		</div>
-	);
-}
+export const LoadingComponent = ({className}) => (
+	<div
+		className={classNames(
+			'align-items-center',
+			'd-flex',
+			'w-100',
+			className
+		)}
+	>
+		<ClayLoadingIndicator />
+	</div>
+);
 
-export function withLoading(Component) {
+export const withLoading = (Component) => {
 	const Wrapper = (props) => {
 		const {className, isLoading, ...restProps} = props;
 
@@ -43,6 +41,6 @@ export function withLoading(Component) {
 	};
 
 	return Wrapper;
-}
+};
 
 export default withLoading(({children}) => <>{children}</>);

@@ -30,9 +30,6 @@ public class SingleStatementClause {
 
 		for (i = 0; i < 10;)
 			i++;
-			
-		if (s.length() > 5)
-			return;
 	}
 
 }

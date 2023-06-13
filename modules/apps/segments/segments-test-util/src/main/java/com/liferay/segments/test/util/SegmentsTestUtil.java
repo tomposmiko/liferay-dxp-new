@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.constants.SegmentsExperimentConstants;
 import com.liferay.segments.criteria.Criteria;
@@ -117,43 +116,44 @@ public class SegmentsTestUtil {
 	}
 
 	public static SegmentsExperience addSegmentsExperience(
-			long groupId, long plid)
+			long groupId, long classNameId, long classPK)
 		throws PortalException {
 
 		SegmentsEntry segmentsEntry = addSegmentsEntry(groupId);
 
 		return addSegmentsExperience(
-			groupId, segmentsEntry.getSegmentsEntryId(), plid);
+			groupId, segmentsEntry.getSegmentsEntryId(), classNameId, classPK);
 	}
 
 	public static SegmentsExperience addSegmentsExperience(
-			long groupId, long segmentsEntryId, long plid)
+			long groupId, long segmentsEntryId, long classNameId, long classPK)
 		throws PortalException {
 
 		return addSegmentsExperience(
-			segmentsEntryId, plid,
+			segmentsEntryId, classNameId, classPK,
 			ServiceContextTestUtil.getServiceContext(groupId));
 	}
 
 	public static SegmentsExperience addSegmentsExperience(
-			long segmentsEntryId, long plid, ServiceContext serviceContext)
+			long segmentsEntryId, long classNameId, long classPK,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		return SegmentsExperienceLocalServiceUtil.addSegmentsExperience(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-			segmentsEntryId, plid, RandomTestUtil.randomLocaleStringMap(), true,
-			new UnicodeProperties(true), serviceContext);
+			segmentsEntryId, classNameId, classPK,
+			RandomTestUtil.randomLocaleStringMap(), true, serviceContext);
 	}
 
 	public static SegmentsExperience addSegmentsExperience(
-			long plid, ServiceContext serviceContext)
+			long classNameId, long classPK, ServiceContext serviceContext)
 		throws PortalException {
 
 		SegmentsEntry segmentsEntry = addSegmentsEntry(
 			serviceContext.getScopeGroupId());
 
 		return addSegmentsExperience(
-			segmentsEntry.getSegmentsEntryId(), plid, serviceContext);
+			segmentsEntry.getSegmentsEntryId(), classNameId, classPK,
+			serviceContext);
 	}
 
 	public static SegmentsExperiment addSegmentsExperiment(

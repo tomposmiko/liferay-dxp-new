@@ -319,8 +319,4 @@ public interface LayoutFriendlyURLModel
 	@Override
 	public LayoutFriendlyURL cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

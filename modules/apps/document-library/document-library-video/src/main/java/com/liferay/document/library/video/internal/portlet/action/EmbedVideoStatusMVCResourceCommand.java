@@ -71,12 +71,13 @@ public class EmbedVideoStatusMVCResourceCommand extends BaseMVCResourceCommand {
 				else if (!_videoProcessor.hasVideo(fileVersion)) {
 					return HttpServletResponse.SC_ACCEPTED;
 				}
-
-				return HttpServletResponse.SC_OK;
+				else {
+					return HttpServletResponse.SC_OK;
+				}
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return HttpServletResponse.SC_SERVICE_UNAVAILABLE;

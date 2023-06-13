@@ -27,16 +27,18 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class BlogsEntryModelListener extends BaseModelListener<BlogsEntry> {
 
 	@Override
 	public void onBeforeRemove(BlogsEntry blogsEntry)
 		throws ModelListenerException {
 
+		long classNameId = _classNameLocalService.getClassNameId(
+			BlogsEntry.class.getName());
+
 		_sharingEntryLocalService.deleteSharingEntries(
-			_classNameLocalService.getClassNameId(BlogsEntry.class.getName()),
-			blogsEntry.getEntryId());
+			classNameId, blogsEntry.getEntryId());
 	}
 
 	@Reference

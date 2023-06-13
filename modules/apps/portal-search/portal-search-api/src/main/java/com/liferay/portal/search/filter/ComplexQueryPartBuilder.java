@@ -42,8 +42,6 @@ public interface ComplexQueryPartBuilder {
 
 	public ComplexQueryPartBuilder query(Query query);
 
-	public ComplexQueryPartBuilder rootClause(boolean rootClause);
-
 	public ComplexQueryPartBuilder type(String type);
 
 	public ComplexQueryPartBuilder value(String value);

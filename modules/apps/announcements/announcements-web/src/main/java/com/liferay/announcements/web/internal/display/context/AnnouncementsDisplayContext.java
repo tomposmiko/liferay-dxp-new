@@ -14,8 +14,6 @@
 
 package com.liferay.announcements.web.internal.display.context;
 
-import com.liferay.announcements.kernel.model.AnnouncementsEntry;
-import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.display.context.DisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -45,9 +43,6 @@ public interface AnnouncementsDisplayContext extends DisplayContext {
 	public int getPageDelta();
 
 	public List<Role> getRoles() throws PortalException;
-
-	public SearchContainer<AnnouncementsEntry> getSearchContainer()
-		throws PortalException;
 
 	public String getTabs1Names();
 

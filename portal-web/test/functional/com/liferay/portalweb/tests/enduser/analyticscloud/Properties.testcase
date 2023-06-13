@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -29,24 +27,93 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
+		}
+
+		ACUtils.tearDownAC();
+	}
+
+	@description = "Feature ID: Legacy | Automation ID: LRAC-9034 | Test Summary: As a Business User, I should be able to create multiple properties with multiple sites"
+	@priority = "3"
+	test AddPropertyBasedOnMultiplePropertiesType {
+		var propertyNameList = "AC Site,Site Name";
+
+		task ("Connect the DXP to Analytics Cloud") {
+			ACUtils.addSiteAndPage(siteName = "AC Site");
+
+			ACDXPSettings.goToInstanceSettingsAC();
+
+			ACDXPSettings.connectAnalyticsCloud();
+
+			ACDXPSettings.assertSuccessfulConnection();
+		}
+
+		task ("Navigate to the Synced Sites Menu tab") {
+			ACDXPSettings.navToSyncedSitesMenu();
+		}
+
+		task ("Add a new property based on Multiple Properties type") {
+			ACDXPSettings.createMultipleProperties(siteNameList = "AC Site,Site Name");
+		}
+
+		task ("Sign in AC") {
+			ACUtils.launchAC();
+		}
+
+		task ("View both properties are available") {
+			ACNavigation.goToSettings();
+
+			ACSettings.goToProperties();
+
+			ACUtils.viewNameList(nameList = "${propertyNameList}");
+		}
+	}
+
+	@description = "Feature ID: Legacy | Automation ID: LRAC-9036 | Test Summary: Assign site to property when properties exist"
+	@priority = "3"
+	test AssignSiteToExistingProperty {
+		task ("Add a new property on AC") {
+			ACUtils.launchAC();
+
+			ACNavigation.goToSettings();
+
+			ACSettings.goToProperties();
+
+			ACProperties.addNewProperty(propertyName = "AC Test Property");
+
+			ACProperties.assertNewCreatedProperty(propertyName = "AC Test Property");
+		}
+
+		task ("Connect the DXP to Analytics Cloud") {
+			ACUtils.launchDXP();
+
+			ACDXPSettings.goToInstanceSettingsAC();
+
+			ACDXPSettings.connectAnalyticsCloud();
+
+			ACDXPSettings.assertSuccessfulConnection();
+		}
+
+		task ("Assign the new site to existing property") {
+			ACDXPSettings.navToSyncedSitesMenu();
+
+			ACDXPSettings.assignSiteToExistingProperty(
+				assignedPropertyName = "AC Test Property",
+				siteName = "Site Name");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9037 | Test Summary: As an Business User, a Property with a duplicate name should have an incrementing identifier appended to it's name"
-	@priority = 3
+	@priority = "3"
 	test AutoRenamePropertyWhenDuplicateWithExistingOne {
-		var propertyNameList = "AC Duplicate Property,AC Duplicate Property (1)";
+		var propertyNameList = "AC Test Property,AC Test Property (1)";
 
 		task ("Add a new property on AC") {
 			ACUtils.launchAC();
@@ -55,31 +122,40 @@ definition {
 
 			ACSettings.goToProperties();
 
-			ACProperties.addNewProperty(propertyName = "AC Duplicate Property");
+			ACProperties.addNewProperty(propertyName = "AC Test Property");
 
-			ACProperties.assertNewCreatedProperty(propertyName = "AC Duplicate Property");
+			ACProperties.assertNewCreatedProperty(propertyName = "AC Test Property");
 		}
 
 		task ("Add the second property with same name") {
 			ACSettings.goToProperties();
 
-			ACProperties.addNewProperty(propertyName = "AC Duplicate Property");
+			ACProperties.addNewProperty(propertyName = "AC Test Property");
 		}
 
 		task ("View the property is autorenamed") {
-			ACProperties.assertNewCreatedProperty(propertyName = "AC Duplicate Property (1)");
+			ACProperties.assertNewCreatedProperty(propertyName = "AC Test Property (1)");
 		}
 
 		task ("View both properties are available") {
 			ACSettings.goToProperties();
 
-			ACUtils.viewNameList(nameList = ${propertyNameList});
+			ACUtils.viewNameList(nameList = "${propertyNameList}");
 		}
+	}
+
+	@description = "Feature ID: Legacy | Automation ID: LRAC-9113 | Test Summary: It is possible to create multiple properties in different workspaces"
+	@ignore = "true"
+	@priority = "4"
+	test CanCreateMultiplePropertiesInDifferentWorkspaces {
+
+		// TODO LRAC-9113 CanCreateMultiplePropertiesInDifferentWorkspaces pending implementation
+
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9108 | Test Summary: [AC][Portal] Creating a property at the same time (concurrency scenario)"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test CanCreatePropertiesAtTheSameTime {
 
 		// TODO LRAC-9108 CanCreatePropertiesAtTheSameTime pending implementation
@@ -87,17 +163,12 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9101 | Test Summary: [AC] It is possible create Properties when no data source is created yet"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test CanCreatePropertiesWhenNoDataSourceIsCreatedYet {
-
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
 		task ("Remove all data sources present") {
 			ACUtils.launchAC();
 
-			//ACSettings.deleteAllDataSource();
-
+			ACSettings.deleteAllDataSource();
 		}
 
 		task ("Create a new property") {
@@ -108,7 +179,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9107 | Test Summary: [AC] Canceling a property creation by clicking in Cancel button, x button or clicking outside the modal area"
-	@priority = 3
+	@priority = "3"
 	test CanCreatePropertyAndCancel {
 		var propertyName = "New Property";
 
@@ -127,7 +198,7 @@ definition {
 
 			Type(
 				locator1 = "ACSettings#PROPERTY_INPUT",
-				value1 = ${propertyName});
+				value1 = "${propertyName}");
 
 			Button.clickCancel();
 
@@ -137,7 +208,7 @@ definition {
 		task ("Assert property not created") {
 			AssertElementNotPresent(
 				locator1 = "ACSettings#PROPERTY_NAME",
-				value1 = ${propertyName});
+				value1 = "${propertyName}");
 		}
 
 		task ("Cancel propertie creation by clicking in 'X' button") {
@@ -145,7 +216,7 @@ definition {
 
 			Type(
 				locator1 = "ACSettings#PROPERTY_INPUT",
-				value1 = ${propertyName});
+				value1 = "${propertyName}");
 
 			IFrame.closeFrame();
 
@@ -155,12 +226,12 @@ definition {
 		task ("Assert property not created") {
 			AssertElementNotPresent(
 				locator1 = "ACSettings#PROPERTY_NAME",
-				value1 = ${propertyName});
+				value1 = "${propertyName}");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9105 | Test Summary: [AC] It is allowed to create property name with special chars"
-	@priority = 3
+	@priority = "3"
 	test CanCreatePropertyNameWithSpecialChars {
 		task ("Add a New Property on AC") {
 			ACUtils.launchAC();
@@ -179,57 +250,8 @@ definition {
 		}
 	}
 
-	@description = "Bug: LRAC-7916 | Automation ID: LRAC-11529 | Test Summary: It is possible to create multiple properties in different workspaces"
-	@priority = 4
-	test CanCreateSamePropertyNameInDifferentWorkspaces {
-		property test.name.skip.portal.instance = "Properties#CanCreateSamePropertyNameInDifferentWorkspaces";
-
-		var acProperty = "AC Property Name";
-		var acWorkspace = "New AC Workspace";
-
-		task ("Launch AC and create a new workspace then go to settings and add a new property") {
-			ACUtils.launchAC(
-				emailList = "test@liferay.com",
-				workspaceName = ${acWorkspace});
-
-			ACUtils.dismissOnboardingModal();
-
-			ACNavigation.goToSettings();
-
-			ACSettings.goToProperties();
-
-			ACProperties.addNewProperty(propertyName = ${acProperty});
-		}
-
-		task ("Go back to properties and see the newly created property") {
-			ACSettings.goToProperties();
-
-			ACProperties.assertPropertyTitleList(propertyName = ${acProperty});
-		}
-
-		task ("Exit settings and switch workspaces") {
-			ACNavigation.exitSettings();
-
-			ACWorkspace.switchWorkspace(workspaceName = "FARO-DEV-liferay");
-		}
-
-		task ("Go to settings and create a property that has the same name as the previous one") {
-			ACNavigation.goToSettings();
-
-			ACSettings.goToProperties();
-
-			ACProperties.addNewProperty(propertyName = ${acProperty});
-		}
-
-		task ("Go back to properties and see the newly created property") {
-			ACSettings.goToProperties();
-
-			ACProperties.assertPropertyTitleList(propertyName = ${acProperty});
-		}
-	}
-
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8144 | Test Summary: Properties management menu is present"
-	@priority = 5
+	@priority = "5"
 	test CanNavigateToProperties {
 		ACUtils.launchAC();
 
@@ -241,7 +263,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9038 | Test Summary: As a Business User, I should not be able to create an invalid property name"
-	@priority = 3
+	@priority = "3"
 	test CannotAddPropertyWhenNameExceedMaximumLength {
 		task ("Navigate to the Properties admin on AC") {
 			ACUtils.launchAC();
@@ -272,104 +294,49 @@ definition {
 		}
 	}
 
-	@description = "Bug ID: LRAC-8093 | Automation ID: LRAC-11533 | Test Summary: Able to clear property data"
-	@priority = 4
-	test ClearPropertyData {
+	@description = "Feature ID: Legacy | Automation ID: LRAC-9035 | Test Summary: Assign sites to property is blocked if the site is already assigned to another property"
+	@priority = "3"
+	test CannotAssignSiteToMultipleProperties {
 		task ("Connect the DXP to Analytics Cloud") {
-			JSONUser.addUser(
-				userEmailAddress = "userea@liferay.com",
-				userFirstName = "userfn",
-				userLastName = "userln",
-				userScreenName = "usersn");
+			ACDXPSettings.goToInstanceSettingsAC();
 
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			ACDXPSettings.connectAnalyticsCloud();
+
+			ACDXPSettings.assertSuccessfulConnection();
 		}
 
-		task ("Login new user and view page") {
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "userea@liferay.com",
-				userLoginFullName = "userfn userln");
+		task ("Assign the new site to a new property") {
+			ACDXPSettings.navToSyncedSitesMenu();
+
+			ACDXPSettings.createCombinedProperties(siteName = "Site Name");
 		}
 
-		task ("Interact with page") {
-			ACUtils.navigateToSitePage(
-				pageName = "AC Page",
-				siteName = "Site Name");
+		task ("Get the autogenerated property name") {
+			var assignedPropertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 
-			TestUtils.hardRefresh();
-
-			ACUtils.closeAllSessionsAndWait();
+			var autogeneratedPropertyName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var autogeneratedPropertyName = StringUtil.trim("${autogeneratedPropertyName}");
 		}
 
-		task ("Launch AC") {
-			ACUtils.launchAC();
+		task ("Navigate to another property") {
+			Search.searchCP(searchTerm = "${autogeneratedPropertyName}");
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			LexiconTable.clickTableEntryColumnLink(
+				columnName = "properties",
+				tableEntry = "${autogeneratedPropertyName}");
 
-			ACNavigation.goToSites();
+			ACDXPSettings.searchACItem(searchItem = "Site Name");
 		}
 
-		task ("Go to Sites overview") {
-			ACTimeFilter.clickTimeFilterButton();
-
-			ACTimeFilter.setLast24Hours();
-		}
-
-		task ("Assert the unique visitors is shown") {
-			ACAssets.viewVisitorsBehaviorMetric(
-				metricTitle = "Unique Visitors",
-				metricValue = 1,
-				timeFilter = "Last 24 hours");
-		}
-
-		task ("Navigate to the Individuals and view individual count") {
-			ACNavigation.goToIndividuals();
-
-			ACCards.viewTotalCount(
-				cardName = "Total Individuals",
-				count = 1);
-		}
-
-		task ("Go to AC Properties") {
-			ACNavigation.goToSettings();
-
-			ACSettings.goToProperties();
-		}
-
-		task ("Clear Property") {
-			ACSettings.clearProperty(propertyName = ${assignedPropertyName});
-		}
-
-		task ("Exit Settings") {
-			ACNavigation.exitSettings();
-		}
-
-		task ("Go to Sites overview") {
-			ACNavigation.goToSites();
-
-			ACTimeFilter.clickTimeFilterButton();
-
-			ACTimeFilter.setLast24Hours();
-		}
-
-		task ("Assert the unique visitors is shown") {
-			ACAssets.viewVisitorsBehaviorMetric(
-				metricTitle = "Unique Visitors",
-				metricValue = 0,
-				timeFilter = "Last 24 hours");
-		}
-
-		task ("Navigate to the Individuals and view individual count") {
-			ACNavigation.goToIndividuals();
-
-			ACCards.viewTotalCount(
-				cardName = "Total Individuals",
-				count = 0);
+		task ("View the checkbox of site entry is disabled") {
+			AssertElementPresent(
+				key_tableEntry = "Site Name",
+				locator1 = "LexiconTable#TABLE_ENTRY_CHECKBOX_DISABLED");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9103 | Test Summary: [AC] Properties created when no data source was connected, and then the admin connect data sources to workspace"
-	@priority = 3
+	@priority = "3"
 	test CreatePropertiesWhenNoDataSourceIsConnected {
 		task ("Add a new property on AC") {
 			ACUtils.launchAC();
@@ -395,9 +362,8 @@ definition {
 				locator1 = "ACSettings#DATA_SOURCE_LIST_STATUS",
 				value1 = "Active");
 		}
-
 		task ("Connect AC to DXP") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud();
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 		}
 
 		task ("Assert Data Source is Active") {
@@ -414,7 +380,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9112 | Test Summary: New properties generated IDs are not incremental"
-	@priority = 4
+	@priority = "4"
 	test NewPropertiesGeneratedIDsAreNotIncremental {
 		task ("Sign in AC") {
 			ACUtils.launchAC();
@@ -435,24 +401,26 @@ definition {
 		}
 
 		task ("Assert that the properties ID aren't incremental") {
-			var propertyId1 = ACSettings.getPropertyId(propertyName = "Name of property 1");
-			var propertyId2 = ACSettings.getPropertyId(propertyName = "Name of property 2");
-			var propertyId3 = ACSettings.getPropertyId(propertyName = "Name of property 3");
-			var differenceId2 = ${propertyId2} - ${propertyId1};
-			var differenceId3 = ${propertyId3} - ${propertyId2};
+			var propertyID1 = ACSettings.getPropertyId(propertyName = "Name of property 1");
+			var propertyID2 = ACSettings.getPropertyId(propertyName = "Name of property 2");
+			var propertyID3 = ACSettings.getPropertyId(propertyName = "Name of property 3");
+
+			var differenceID2 = MathUtil.difference(value1 = "${propertyID2}", value2 = "${propertyID1}");
+
+			var differenceID3 = MathUtil.difference(value1 = "${propertyID3}", value2 = "${propertyID2}");
 
 			TestUtils.assertNotEquals(
-				actual = ${differenceId2},
-				expected = 1);
+				actual = "${differenceID2}",
+				expected = "1");
 
 			TestUtils.assertNotEquals(
-				actual = ${differenceId3},
-				expected = 1);
+				actual = "${differenceID3}",
+				expected = "1");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9104 | Test Summary: [AC] It is not allowed duplicated property name for a same data source or workspace"
-	@priority = 3
+	@priority = "3"
 	test NoDuplicatePropertiesName {
 		task ("View the checkbox of site entry is disabled") {
 			ACUtils.launchAC();
@@ -484,7 +452,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8145 | Test Summary: Owner can create a new property"
-	@priority = 5
+	@priority = "5"
 	test OwnerCanCreateNewProperty {
 		ACUtils.launchAC();
 
@@ -528,7 +496,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9100 | Test Summary: [AC] Properties management menu can be accessed directly via URL"
-	@priority = 3
+	@priority = "3"
 	test PropertiesCanBeAccessedDirectlyViaURL {
 		var myProperty = "PropertyViaURL";
 
@@ -539,9 +507,9 @@ definition {
 
 			ACSettings.goToProperties();
 
-			ACProperties.addNewProperty(propertyName = ${myProperty});
+			ACProperties.addNewProperty(propertyName = "${myProperty}");
 
-			ACProperties.assertNewCreatedProperty(propertyName = ${myProperty});
+			ACProperties.assertNewCreatedProperty(propertyName = "${myProperty}");
 		}
 
 		task ("Get property URL") {
@@ -553,18 +521,16 @@ definition {
 		}
 
 		task ("Go to property via URL") {
-			Open(locator1 = ${propertyURL});
+			Open(locator1 = "${propertyURL}");
 
-			ACProperties.assertNewCreatedProperty(propertyName = ${myProperty});
+			ACProperties.assertNewCreatedProperty(propertyName = "${myProperty}");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8159 | Test Summary: The properties list in settings shows a list of all properties in the workspace"
-	@priority = 5
+	@priority = "5"
 	test PropertiesListInSettingsShowsListOfAllPropertiesInTheWorkspace {
-		property portal.acceptance = "true";
-
-		ACDXPSettings.connectDXPtoAnalyticsCloud();
+		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 
 		ACUtils.launchAC();
 
@@ -588,11 +554,11 @@ definition {
 
 		ACSettings.goToProperties();
 
-		ACUtils.assertItemsName(itemList = "${assignedPropertyName},New property 1,New property 2,New property 3");
+		ACUtils.assertItemsName(itemList = "${propertyName},New property 1,New property 2,New property 3");
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9102 | Test Summary: Property with name too big"
-	@priority = 3
+	@priority = "3"
 	test PropertyCanHaveABigName {
 		task ("Add a New Property on AC") {
 			ACUtils.launchAC();
@@ -611,8 +577,30 @@ definition {
 		}
 	}
 
+	@description = "Feature ID: Legacy | Automation ID: LRAC-9109 | Test Summary: Property field is displayed in empty state when no property is available"
+	@priority = "3"
+	test PropertyFieldDisplayedWhenNoPropertyAvailable {
+		task ("Go to properties") {
+			ACUtils.launchAC();
+
+			ACNavigation.goToSettings();
+
+			ACSettings.goToProperties();
+		}
+
+		task ("Delete all properties") {
+			ACSettings.deleteAllProperties();
+		}
+
+		task ("assert empty state on properties page") {
+			ACSettings.goToProperties();
+
+			ACProperties.assertNoProperties();
+		}
+	}
+
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9106 | Test Summary: [AC] Property name with the maximum and minimal char quantity validation"
-	@priority = 3
+	@priority = "3"
 	test PropertyNameWithCharQuantityValidation {
 		task ("Go to properties") {
 			ACUtils.launchAC();

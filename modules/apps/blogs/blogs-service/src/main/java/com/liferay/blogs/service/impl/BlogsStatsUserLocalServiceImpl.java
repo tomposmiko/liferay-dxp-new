@@ -14,33 +14,24 @@
 
 package com.liferay.blogs.service.impl;
 
+import com.liferay.blogs.exception.NoSuchStatsUserException;
 import com.liferay.blogs.model.BlogsEntry;
-import com.liferay.blogs.model.BlogsEntryTable;
 import com.liferay.blogs.model.BlogsStatsUser;
-import com.liferay.blogs.model.impl.BlogsStatsUserImpl;
 import com.liferay.blogs.service.base.BlogsStatsUserLocalServiceBaseImpl;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
-import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
-import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
-import com.liferay.petra.sql.dsl.Table;
-import com.liferay.petra.sql.dsl.expression.Alias;
-import com.liferay.petra.sql.dsl.expression.Expression;
-import com.liferay.petra.sql.dsl.expression.Predicate;
-import com.liferay.petra.sql.dsl.query.JoinStep;
-import com.liferay.petra.sql.dsl.query.LimitStep;
-import com.liferay.petra.sql.dsl.query.OrderByStep;
-import com.liferay.petra.sql.dsl.query.sort.OrderByExpression;
+import com.liferay.blogs.util.comparator.EntryDisplayDateComparator;
+import com.liferay.blogs.util.comparator.StatsUserLastPostDateComparator;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Users_OrgsTable;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.ratings.kernel.model.RatingsEntryTable;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -57,165 +48,225 @@ public class BlogsStatsUserLocalServiceImpl
 	extends BlogsStatsUserLocalServiceBaseImpl {
 
 	@Override
+	public void deleteStatsUser(BlogsStatsUser statsUsers) {
+		blogsStatsUserPersistence.remove(statsUsers);
+	}
+
+	@Override
+	public void deleteStatsUser(long statsUserId) throws PortalException {
+		BlogsStatsUser statsUsers = blogsStatsUserPersistence.findByPrimaryKey(
+			statsUserId);
+
+		deleteStatsUser(statsUsers);
+	}
+
+	@Override
+	public void deleteStatsUserByGroupId(long groupId) {
+		List<BlogsStatsUser> statsUsers =
+			blogsStatsUserPersistence.findByGroupId(groupId);
+
+		for (BlogsStatsUser statsUser : statsUsers) {
+			deleteStatsUser(statsUser);
+		}
+	}
+
+	@Override
+	public void deleteStatsUserByUserId(long userId) {
+		List<BlogsStatsUser> statsUsers =
+			blogsStatsUserPersistence.findByUserId(userId);
+
+		for (BlogsStatsUser statsUser : statsUsers) {
+			deleteStatsUser(statsUser);
+		}
+	}
+
+	@Override
+	public BlogsStatsUser fetchStatsUser(long groupId, long userId) {
+		return blogsStatsUserPersistence.fetchByG_U(groupId, userId);
+	}
+
+	@Override
+	public List<BlogsStatsUser> getCompanyStatsUsers(
+		long companyId, int start, int end) {
+
+		return blogsStatsUserPersistence.findByC_NotE(
+			companyId, 0, start, end, new StatsUserLastPostDateComparator());
+	}
+
+	@Override
+	public List<BlogsStatsUser> getCompanyStatsUsers(
+		long companyId, int start, int end,
+		OrderByComparator<BlogsStatsUser> orderByComparator) {
+
+		return blogsStatsUserPersistence.findByC_NotE(
+			companyId, 0, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getCompanyStatsUsersCount(long companyId) {
+		return blogsStatsUserPersistence.countByC_NotE(companyId, 0);
+	}
+
+	@Override
 	public List<BlogsStatsUser> getGroupsStatsUsers(
 		long companyId, long groupId, int start, int end) {
 
-		Predicate predicate = _companyIdAlias.eq(companyId);
-
-		return _getBlogsStatsUsers(
-			UnaryOperator.identity(), predicate.and(_groupIdAlias.eq(groupId)),
-			_entryCountExpression.descending(), start, end);
+		return blogsStatsUserFinder.findByGroupIds(
+			companyId, groupId, start, end);
 	}
 
 	@Override
 	public List<BlogsStatsUser> getGroupStatsUsers(
 		long groupId, int start, int end) {
 
-		Predicate predicate = _groupIdAlias.eq(groupId);
+		return blogsStatsUserPersistence.findByG_NotE(
+			groupId, 0, start, end, new StatsUserLastPostDateComparator());
+	}
 
-		return _getBlogsStatsUsers(
-			UnaryOperator.identity(),
-			predicate.and(_entryCountExpression.neq(0L)),
-			_lastPostDateExpression.descending(), start, end);
+	@Override
+	public List<BlogsStatsUser> getGroupStatsUsers(
+		long groupId, int start, int end,
+		OrderByComparator<BlogsStatsUser> orderByComparator) {
+
+		return blogsStatsUserPersistence.findByG_NotE(
+			groupId, 0, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getGroupStatsUsersCount(long groupId) {
+		return blogsStatsUserPersistence.countByG_NotE(groupId, 0);
 	}
 
 	@Override
 	public List<BlogsStatsUser> getOrganizationStatsUsers(
 		long organizationId, int start, int end) {
 
-		return _getBlogsStatsUsers(
-			joinStep -> joinStep.innerJoinON(
-				Users_OrgsTable.INSTANCE,
-				Users_OrgsTable.INSTANCE.userId.eq(
-					BlogsEntryTable.INSTANCE.userId
-				).and(
-					Users_OrgsTable.INSTANCE.organizationId.eq(organizationId)
-				)),
-			null, _lastPostDateExpression.descending(), start, end);
+		return blogsStatsUserFinder.findByOrganizationId(
+			organizationId, start, end, new StatsUserLastPostDateComparator());
+	}
+
+	@Override
+	public List<BlogsStatsUser> getOrganizationStatsUsers(
+		long organizationId, int start, int end,
+		OrderByComparator<BlogsStatsUser> orderByComparator) {
+
+		return blogsStatsUserFinder.findByOrganizationId(
+			organizationId, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getOrganizationStatsUsersCount(long organizationId) {
+		return blogsStatsUserFinder.countByOrganizationId(organizationId);
 	}
 
 	@Override
 	public BlogsStatsUser getStatsUser(long groupId, long userId)
 		throws PortalException {
 
-		Predicate predicate = _groupIdAlias.eq(groupId);
+		BlogsStatsUser statsUser = blogsStatsUserPersistence.fetchByG_U(
+			groupId, userId);
 
-		List<BlogsStatsUser> blogsStatsUsers = _getBlogsStatsUsers(
-			UnaryOperator.identity(), predicate.and(_userIdAlias.eq(userId)),
-			_groupIdExpression.descending(), 0, 1);
+		if (statsUser == null) {
+			Group group = _groupLocalService.getGroup(groupId);
 
-		if (blogsStatsUsers.isEmpty()) {
-			return new BlogsStatsUserImpl(0, groupId, null, 0, 0, 0, userId);
+			long statsUserId = counterLocalService.increment();
+
+			statsUser = blogsStatsUserPersistence.create(statsUserId);
+
+			statsUser.setGroupId(groupId);
+			statsUser.setCompanyId(group.getCompanyId());
+			statsUser.setUserId(userId);
+
+			statsUser = blogsStatsUserPersistence.update(statsUser);
 		}
 
-		return blogsStatsUsers.get(0);
+		return statsUser;
 	}
 
-	private List<BlogsStatsUser> _getBlogsStatsUsers(
-		UnaryOperator<JoinStep> unaryOperator, Predicate predicate,
-		OrderByExpression orderByExpression, int start, int end) {
+	@Override
+	public void updateStatsUser(long groupId, long userId)
+		throws PortalException {
 
-		JoinStep joinStep = DSLQueryFactoryUtil.select(
-			_entryCountExpression, _groupIdAlias, _lastPostDateExpression,
-			DSLFunctionFactoryUtil.countDistinct(
-				RatingsEntryTable.INSTANCE.entryId
-			).as(
-				"ratingsTotalEntries"
-			),
-			DSLFunctionFactoryUtil.avg(
-				RatingsEntryTable.INSTANCE.score
-			).as(
-				"ratingsAverageScore"
-			),
-			DSLFunctionFactoryUtil.sum(
-				RatingsEntryTable.INSTANCE.score
-			).as(
-				"ratingsTotalScore"
-			),
-			_userIdAlias, _companyIdAlias, _groupIdExpression
-		).from(
-			BlogsEntryTable.INSTANCE
-		);
-
-		joinStep = unaryOperator.apply(joinStep);
-
-		Table innerTable = joinStep.leftJoinOn(
-			RatingsEntryTable.INSTANCE,
-			RatingsEntryTable.INSTANCE.classNameId.eq(
-				_classNameLocalService.getClassNameId(
-					BlogsEntry.class.getName())
-			).and(
-				RatingsEntryTable.INSTANCE.classPK.eq(
-					BlogsEntryTable.INSTANCE.entryId)
-			)
-		).groupBy(
-			BlogsEntryTable.INSTANCE.groupId, BlogsEntryTable.INSTANCE.userId,
-			BlogsEntryTable.INSTANCE.companyId
-		).as(
-			"innerTable"
-		);
-
-		OrderByStep orderByStep = DSLQueryFactoryUtil.select(
-		).from(
-			innerTable
-		).where(
-			predicate
-		);
-
-		LimitStep limitStep = orderByStep;
-
-		if (orderByExpression != null) {
-			limitStep = orderByStep.orderBy(orderByExpression);
-		}
-
-		List<Object[]> results = _blogsEntryPersistence.dslQuery(
-			limitStep.limit(start, end));
-
-		List<BlogsStatsUser> blogsStatsUsers = new ArrayList<>(results.size());
-
-		for (Object[] columns : results) {
-			blogsStatsUsers.add(
-				new BlogsStatsUserImpl(
-					GetterUtil.getLong(columns[0]),
-					GetterUtil.getLong(columns[1]), (Date)columns[2],
-					GetterUtil.getLong(columns[3]),
-					GetterUtil.getDouble(columns[4]),
-					GetterUtil.getDouble(columns[5]),
-					GetterUtil.getLong(columns[6])));
-		}
-
-		return blogsStatsUsers;
+		updateStatsUser(groupId, userId, null);
 	}
+
+	@Override
+	public void updateStatsUser(long groupId, long userId, Date displayDate)
+		throws PortalException {
+
+		Date date = new Date();
+
+		int entryCount = _blogsEntryPersistence.countByG_U_LtD_S(
+			groupId, userId, date, WorkflowConstants.STATUS_APPROVED);
+
+		if (entryCount == 0) {
+			try {
+				blogsStatsUserPersistence.removeByG_U(groupId, userId);
+			}
+			catch (NoSuchStatsUserException noSuchStatsUserException) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						noSuchStatsUserException, noSuchStatsUserException);
+				}
+			}
+
+			return;
+		}
+
+		BlogsStatsUser statsUser = getStatsUser(groupId, userId);
+
+		statsUser.setEntryCount(entryCount);
+
+		BlogsEntry blogsEntry = _blogsEntryPersistence.findByG_U_LtD_S_First(
+			groupId, userId, date, WorkflowConstants.STATUS_APPROVED,
+			new EntryDisplayDateComparator());
+
+		Date lastDisplayDate = blogsEntry.getDisplayDate();
+
+		Date lastPostDate = statsUser.getLastPostDate();
+
+		if ((displayDate != null) && displayDate.before(date)) {
+			if (lastPostDate == null) {
+				statsUser.setLastPostDate(displayDate);
+			}
+			else if (displayDate.after(lastPostDate)) {
+				statsUser.setLastPostDate(displayDate);
+			}
+			else if (lastDisplayDate.before(lastPostDate)) {
+				statsUser.setLastPostDate(lastDisplayDate);
+			}
+		}
+		else if ((lastPostDate == null) ||
+				 lastPostDate.before(lastDisplayDate)) {
+
+			statsUser.setLastPostDate(lastDisplayDate);
+		}
+
+		blogsStatsUserPersistence.update(statsUser);
+	}
+
+	@Override
+	public BlogsStatsUser updateStatsUser(
+			long groupId, long userId, int ratingsTotalEntries,
+			double ratingsTotalScore, double ratingsAverageScore)
+		throws PortalException {
+
+		BlogsStatsUser blogsStatsUser = getStatsUser(groupId, userId);
+
+		blogsStatsUser.setRatingsTotalEntries(ratingsTotalEntries);
+		blogsStatsUser.setRatingsTotalScore(ratingsTotalScore);
+		blogsStatsUser.setRatingsAverageScore(ratingsAverageScore);
+
+		return blogsStatsUserPersistence.update(blogsStatsUser);
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BlogsStatsUserLocalServiceImpl.class);
 
 	@Reference
 	private BlogsEntryPersistence _blogsEntryPersistence;
 
 	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	private final Alias<Long> _companyIdAlias =
-		BlogsEntryTable.INSTANCE.companyId.as("blogsEntryCompanyId");
-	private final Expression<Long> _entryCountExpression =
-		DSLFunctionFactoryUtil.countDistinct(
-			BlogsEntryTable.INSTANCE.entryId
-		).as(
-			"entryCount"
-		);
-	private final Alias<Long> _groupIdAlias =
-		BlogsEntryTable.INSTANCE.groupId.as("blogsEntryGroupId");
-	private final Expression<Long> _groupIdExpression =
-		DSLFunctionFactoryUtil.max(
-			BlogsEntryTable.INSTANCE.groupId
-		).as(
-			"groupId"
-		);
-	private final Expression<Date> _lastPostDateExpression =
-		DSLFunctionFactoryUtil.max(
-			BlogsEntryTable.INSTANCE.modifiedDate
-		).as(
-			"lastPostDate"
-		);
-	private final Alias<Long> _userIdAlias = BlogsEntryTable.INSTANCE.userId.as(
-		"blogsEntryUserId");
+	private GroupLocalService _groupLocalService;
 
 }

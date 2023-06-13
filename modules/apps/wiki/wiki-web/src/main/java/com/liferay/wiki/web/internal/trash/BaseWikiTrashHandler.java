@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.trash.BaseTrashHandler;
+import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiNodeLocalServiceUtil;
@@ -56,7 +56,7 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			page = WikiPageLocalServiceUtil.fetchWikiPage(classPK);
@@ -66,7 +66,7 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 			WikiPage parentPage = page.getParentPage();
 
 			while (parentPage != null) {
-				if (isInTrashExplicitly(parentPage)) {
+				if (parentPage.isInTrashExplicitly()) {
 					return WikiPage.class.getName();
 				}
 
@@ -75,7 +75,7 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -205,8 +205,6 @@ public abstract class BaseWikiTrashHandler extends BaseTrashHandler {
 			userId, page.getNodeId(), page.getTitle(), parentPage.getNodeId(),
 			parentPage.getTitle());
 	}
-
-	protected abstract boolean isInTrashExplicitly(WikiPage page);
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseWikiTrashHandler.class);

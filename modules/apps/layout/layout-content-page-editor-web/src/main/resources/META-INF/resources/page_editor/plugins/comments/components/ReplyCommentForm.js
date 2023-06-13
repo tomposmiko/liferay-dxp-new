@@ -83,7 +83,7 @@ export default function ReplyCommentForm({
 					disabled={disabled}
 					displayType="secondary"
 					onClick={() => setShowForm(true)}
-					size="sm"
+					small
 				>
 					{Liferay.Language.get('reply')}
 				</ClayButton>

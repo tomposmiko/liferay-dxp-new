@@ -131,8 +131,4 @@ public interface ViewCountEntryModel
 	@Override
 	public ViewCountEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

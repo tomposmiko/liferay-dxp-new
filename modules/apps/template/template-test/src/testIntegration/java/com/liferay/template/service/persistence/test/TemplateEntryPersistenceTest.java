@@ -262,13 +262,6 @@ public class TemplateEntryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByG_IICN_IIFVKArrayable() throws Exception {
-		_persistence.countByG_IICN_IIFVK(
-			new long[] {RandomTestUtil.nextLong(), 0L},
-			RandomTestUtil.randomString(), RandomTestUtil.randomString());
-	}
-
-	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		TemplateEntry newTemplateEntry = addTemplateEntry();
 

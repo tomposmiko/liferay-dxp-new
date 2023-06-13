@@ -25,10 +25,6 @@ public class PasswordTrackerLocalServiceWrapper
 	implements PasswordTrackerLocalService,
 			   ServiceWrapper<PasswordTrackerLocalService> {
 
-	public PasswordTrackerLocalServiceWrapper() {
-		this(null);
-	}
-
 	public PasswordTrackerLocalServiceWrapper(
 		PasswordTrackerLocalService passwordTrackerLocalService) {
 

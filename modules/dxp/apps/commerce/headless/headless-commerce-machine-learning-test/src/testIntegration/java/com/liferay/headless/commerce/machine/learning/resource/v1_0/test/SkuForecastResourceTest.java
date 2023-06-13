@@ -20,11 +20,10 @@ import com.liferay.commerce.machine.learning.forecast.SkuCommerceMLForecastManag
 import com.liferay.headless.commerce.machine.learning.client.dto.v1_0.SkuForecast;
 import com.liferay.headless.commerce.machine.learning.client.pagination.Page;
 import com.liferay.headless.commerce.machine.learning.client.pagination.Pagination;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -32,9 +31,12 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,11 +57,14 @@ public class SkuForecastResourceTest extends BaseSkuForecastResourceTestCase {
 		_skuCommerceMLForecasts = _addSkuCommerceMLForecasts(
 			4, _FORECAST_LENGTH + _HISTORY_LENGTH);
 
-		_skus = TransformUtil.transform(
-			_skuCommerceMLForecasts,
-			skuCommerceMLForecast -> skuCommerceMLForecast.getSku());
+		Stream<SkuCommerceMLForecast> stream = _skuCommerceMLForecasts.stream();
 
-		ListUtil.distinct(_skus);
+		_skus = stream.map(
+			SkuCommerceMLForecast::getSku
+		).distinct(
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
@@ -68,7 +73,7 @@ public class SkuForecastResourceTest extends BaseSkuForecastResourceTestCase {
 		List<String> expectedSkus = _skus.subList(0, 2);
 
 		IdempotentRetryAssert.retryAssert(
-			5, TimeUnit.SECONDS, 1, TimeUnit.SECONDS,
+			1, TimeUnit.SECONDS, 3, TimeUnit.SECONDS,
 			() -> {
 				_testGetSkuForecastsByMonthlyRevenuePage(expectedSkus);
 
@@ -82,7 +87,7 @@ public class SkuForecastResourceTest extends BaseSkuForecastResourceTestCase {
 		throws Exception {
 
 		IdempotentRetryAssert.retryAssert(
-			5, TimeUnit.SECONDS, 1, TimeUnit.SECONDS,
+			1, TimeUnit.SECONDS, 3, TimeUnit.SECONDS,
 			() -> {
 				_testGetSkuForecastsByMonthlyRevenuePageWithPagination();
 
@@ -162,11 +167,17 @@ public class SkuForecastResourceTest extends BaseSkuForecastResourceTestCase {
 			expectedTotalCount,
 			skuForecastsByMonthlyRevenuePage.getTotalCount());
 
-		List<String> actualSkus = TransformUtil.transform(
-			skuForecastsByMonthlyRevenuePage.getItems(),
-			skuForecast -> skuForecast.getSku());
+		Collection<SkuForecast> skuForecasts =
+			skuForecastsByMonthlyRevenuePage.getItems();
 
-		ListUtil.distinct(actualSkus);
+		Stream<SkuForecast> stream = skuForecasts.stream();
+
+		List<String> actualSkus = stream.map(
+			SkuForecast::getSku
+		).distinct(
+		).collect(
+			Collectors.toList()
+		);
 
 		Assert.assertTrue(
 			expectedSkus.containsAll(actualSkus) &&

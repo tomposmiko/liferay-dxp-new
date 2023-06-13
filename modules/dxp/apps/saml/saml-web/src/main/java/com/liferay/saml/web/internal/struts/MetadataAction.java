@@ -31,13 +31,18 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  */
 @Component(
-	property = "path=/portal/saml/metadata", service = StrutsAction.class
+	immediate = true, property = "path=/portal/saml/metadata",
+	service = StrutsAction.class
 )
 public class MetadataAction extends BaseSamlStrutsAction {
 
 	@Override
-	public boolean isEnabled() {
-		return _samlProviderConfigurationHelper.isEnabled();
+	@Reference(unbind = "-")
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		super.setSamlProviderConfigurationHelper(
+			samlProviderConfigurationHelper);
 	}
 
 	@Override
@@ -60,8 +65,5 @@ public class MetadataAction extends BaseSamlStrutsAction {
 
 	@Reference
 	private SamlHttpRequestUtil _samlHttpRequestUtil;
-
-	@Reference
-	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
 
 }

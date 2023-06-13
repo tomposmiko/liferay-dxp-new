@@ -15,18 +15,18 @@
 AUI.add(
 	'liferay-staging-branch',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const StagingBar = Liferay.StagingBar;
+		var StagingBar = Liferay.StagingBar;
 
 		A.mix(StagingBar, {
 			_getBranchDialog() {
-				const instance = this;
+				var instance = this;
 
-				let branchDialog = instance._branchDialog;
+				var branchDialog = instance._branchDialog;
 
 				if (!branchDialog) {
-					const namespace = instance._namespace;
+					var namespace = instance._namespace;
 
 					branchDialog = Liferay.Util.Window.getWindow({
 						dialog: {
@@ -44,9 +44,9 @@ AUI.add(
 			},
 
 			addBranch(dialogTitle) {
-				const instance = this;
+				var instance = this;
 
-				const branchDialog = instance._getBranchDialog();
+				var branchDialog = instance._getBranchDialog();
 
 				if (Lang.isValue(dialogTitle)) {
 					branchDialog.set('title', dialogTitle);

@@ -49,14 +49,14 @@ import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.EscapableLocalizableFunction;
-import com.liferay.portal.kernel.util.EscapableObject;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.base.MembershipRequestLocalServiceBaseImpl;
+import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.ResourcePermissionUtil;
 
 import java.io.IOException;
@@ -201,10 +201,10 @@ public class MembershipRequestLocalServiceImpl
 			membershipRequest.setReplierUserId(replierUserId);
 		}
 		else {
-			long guestUserId = _userLocalService.getGuestUserId(
+			long defaultUserId = _userLocalService.getDefaultUserId(
 				membershipRequest.getCompanyId());
 
-			membershipRequest.setReplierUserId(guestUserId);
+			membershipRequest.setReplierUserId(defaultUserId);
 		}
 
 		membershipRequest.setStatusId(statusId);
@@ -361,29 +361,28 @@ public class MembershipRequestLocalServiceImpl
 			"[$COMPANY_ID$]", String.valueOf(company.getCompanyId()));
 		mailTemplateContextBuilder.put("[$COMPANY_MX$]", company.getMx());
 		mailTemplateContextBuilder.put(
-			"[$COMPANY_NAME$]", new EscapableObject<>(company.getName()));
+			"[$COMPANY_NAME$]", HtmlUtil.escape(company.getName()));
 		mailTemplateContextBuilder.put(
-			"[$COMMENTS$]",
-			new EscapableObject<>(membershipRequest.getComments()));
+			"[$COMMENTS$]", HtmlUtil.escape(membershipRequest.getComments()));
 		mailTemplateContextBuilder.put("[$FROM_ADDRESS$]", fromAddress);
 		mailTemplateContextBuilder.put(
-			"[$FROM_NAME$]", new EscapableObject<>(fromName));
+			"[$FROM_NAME$]", HtmlUtil.escape(fromName));
 		mailTemplateContextBuilder.put(
 			"[$PORTAL_URL$]", company.getPortalURL(0));
 		mailTemplateContextBuilder.put(
 			"[$REPLY_COMMENTS$]",
-			new EscapableObject<>(membershipRequest.getReplyComments()));
+			HtmlUtil.escape(membershipRequest.getReplyComments()));
 		mailTemplateContextBuilder.put(
 			"[$REQUEST_USER_ADDRESS$]", requestUser.getEmailAddress());
 		mailTemplateContextBuilder.put(
 			"[$REQUEST_USER_NAME$]",
-			new EscapableObject<>(requestUser.getFullName()));
+			HtmlUtil.escape(requestUser.getFullName()));
 
 		Group group = _groupLocalService.getGroup(
 			membershipRequest.getGroupId());
 
 		mailTemplateContextBuilder.put(
-			"[$SITE_NAME$]", new EscapableObject<>(group.getDescriptiveName()));
+			"[$SITE_NAME$]", HtmlUtil.escape(group.getDescriptiveName()));
 
 		mailTemplateContextBuilder.put(
 			"[$STATUS$]",
@@ -392,11 +391,11 @@ public class MembershipRequestLocalServiceImpl
 		mailTemplateContextBuilder.put(
 			"[$TO_ADDRESS$]", user.getEmailAddress());
 		mailTemplateContextBuilder.put(
-			"[$TO_NAME$]", new EscapableObject<>(user.getFullName()));
+			"[$TO_NAME$]", HtmlUtil.escape(user.getFullName()));
 		mailTemplateContextBuilder.put(
 			"[$USER_ADDRESS$]", user.getEmailAddress());
 		mailTemplateContextBuilder.put(
-			"[$USER_NAME$]", new EscapableObject<>(user.getFullName()));
+			"[$USER_NAME$]", HtmlUtil.escape(user.getFullName()));
 
 		_sendNotificationEmail(
 			fromAddress, fromName, toAddress, user, subject, body,

@@ -18,9 +18,13 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseAssetRenderer;
 import com.liferay.asset.kernel.model.BaseAssetRendererFactory;
-import com.liferay.fragment.helper.FragmentEntryLinkHelper;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.renderer.FragmentRenderer;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -32,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -46,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 	service = AssetRendererFactory.class
 )
@@ -122,18 +128,17 @@ public class FragmentEntryLinkAssetRendererFactory
 		public String getTitle(Locale locale) {
 			String fragmentEntryLinkContextTitle =
 				_getFragmentEntryLinkContextTitle(_fragmentEntryLink, locale);
-			String fragmentEntryName =
-				_fragmentEntryLinkHelper.getFragmentEntryName(
-					_fragmentEntryLink, locale);
+			String fragmentEntryLinkTitle = _getFragmentEntryLinkTitle(
+				_fragmentEntryLink, locale);
 
 			if (Validator.isNull(fragmentEntryLinkContextTitle)) {
-				return fragmentEntryName;
+				return fragmentEntryLinkTitle;
 			}
 
 			return _language.format(
 				locale, "x-in-x",
 				new String[] {
-					fragmentEntryName, fragmentEntryLinkContextTitle
+					fragmentEntryLinkTitle, fragmentEntryLinkContextTitle
 				});
 		}
 
@@ -186,11 +191,56 @@ public class FragmentEntryLinkAssetRendererFactory
 			false);
 	}
 
+	private String _getFragmentEntryLinkTitle(
+		FragmentEntryLink fragmentEntryLink, Locale locale) {
+
+		FragmentEntry fragmentEntry =
+			_fragmentEntryLocalService.fetchFragmentEntry(
+				fragmentEntryLink.getFragmentEntryId());
+
+		if (fragmentEntry != null) {
+			return fragmentEntry.getName();
+		}
+
+		String rendererKey = fragmentEntryLink.getRendererKey();
+
+		if (Validator.isNull(rendererKey)) {
+			return StringPool.BLANK;
+		}
+
+		Map<String, FragmentEntry> fragmentEntries =
+			_fragmentCollectionContributorTracker.getFragmentEntries();
+
+		FragmentEntry contributedFragmentEntry = fragmentEntries.get(
+			rendererKey);
+
+		if (contributedFragmentEntry != null) {
+			return contributedFragmentEntry.getName();
+		}
+
+		FragmentRenderer fragmentRenderer =
+			_fragmentRendererTracker.getFragmentRenderer(
+				fragmentEntryLink.getRendererKey());
+
+		if (fragmentRenderer != null) {
+			return fragmentRenderer.getLabel(locale);
+		}
+
+		return StringPool.BLANK;
+	}
+
 	@Reference
-	private FragmentEntryLinkHelper _fragmentEntryLinkHelper;
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private FragmentEntryLocalService _fragmentEntryLocalService;
+
+	@Reference
+	private FragmentRendererTracker _fragmentRendererTracker;
 
 	@Reference
 	private Language _language;

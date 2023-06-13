@@ -20,11 +20,9 @@ import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.CreatorUtil;
 import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.RoleUtil;
 import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.WorkflowLogUtil;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowLogResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowLogManager;
@@ -37,7 +35,8 @@ import com.liferay.portal.workflow.kaleo.definition.util.KaleoLogUtil;
 import com.liferay.portal.workflow.kaleo.service.KaleoLogLocalService;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -50,7 +49,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/workflow-log.properties",
 	scope = ServiceScope.PROTOTYPE, service = WorkflowLogResource.class
 )
-@CTAware
 public class WorkflowLogResourceImpl extends BaseWorkflowLogResourceImpl {
 
 	@Override
@@ -121,14 +119,18 @@ public class WorkflowLogResourceImpl extends BaseWorkflowLogResourceImpl {
 	}
 
 	private List<Integer> _toLogTypes(String[] types) {
-		List<Integer> logTypes = transformToList(
-			types,
-			type -> KaleoLogUtil.convert(
-				_toLogTypeName(WorkflowLog.Type.create(type))));
-
-		ListUtil.distinct(logTypes);
-
-		return logTypes;
+		return Stream.of(
+			types
+		).map(
+			WorkflowLog.Type::create
+		).map(
+			this::_toLogTypeName
+		).map(
+			KaleoLogUtil::convert
+		).distinct(
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private Role _toRole(long roleId) throws Exception {
@@ -173,13 +175,9 @@ public class WorkflowLogResourceImpl extends BaseWorkflowLogResourceImpl {
 					_userLocalService.fetchUser(
 						workflowLog.getPreviousUserId()));
 				previousRole = _toRole(workflowLog.getPreviousRoleId());
-				previousState = workflowLog.getPreviousWorkflowNodeName();
-				previousStateLabel = workflowLog.getPreviousWorkflowNodeLabel(
-					contextAcceptLanguage.getPreferredLocale());
+				previousState = workflowLog.getPreviousState();
 				role = _toRole(workflowLog.getRoleId());
-				state = workflowLog.getCurrentWorkflowNodeName();
-				stateLabel = workflowLog.getCurrentWorkflowNodeLabel(
-					contextAcceptLanguage.getPreferredLocale());
+				state = workflowLog.getState();
 				type = _toWorkflowLogType(
 					KaleoLogUtil.convert(workflowLog.getType()));
 				workflowTaskId = workflowLog.getWorkflowTaskId();
@@ -188,19 +186,19 @@ public class WorkflowLogResourceImpl extends BaseWorkflowLogResourceImpl {
 	}
 
 	private WorkflowLog.Type _toWorkflowLogType(String type) {
-		if (Objects.equals(type, LogType.NODE_ENTRY.name())) {
+		if (type == LogType.NODE_ENTRY.name()) {
 			return WorkflowLog.Type.NODE_ENTRY;
 		}
-		else if (Objects.equals(type, LogType.NODE_EXIT.name())) {
+		else if (type == LogType.NODE_EXIT.name()) {
 			return WorkflowLog.Type.TRANSITION;
 		}
-		else if (Objects.equals(type, LogType.TASK_ASSIGNMENT.name())) {
+		else if (type == LogType.TASK_ASSIGNMENT.name()) {
 			return WorkflowLog.Type.TASK_ASSIGN;
 		}
-		else if (Objects.equals(type, LogType.TASK_COMPLETION.name())) {
+		else if (type == LogType.TASK_COMPLETION.name()) {
 			return WorkflowLog.Type.TASK_COMPLETION;
 		}
-		else if (Objects.equals(type, LogType.TASK_UPDATE.name())) {
+		else if (type == LogType.TASK_UPDATE.name()) {
 			return WorkflowLog.Type.TASK_UPDATE;
 		}
 

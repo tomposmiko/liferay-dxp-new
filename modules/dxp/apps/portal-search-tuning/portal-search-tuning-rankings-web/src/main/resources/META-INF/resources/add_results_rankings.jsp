@@ -73,9 +73,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "new-ranking"));
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons
-			redirect="<%= redirect %>"
-			submitLabel="customize-results"
-		/>
+		<aui:button type="submit" value="customize-results" />
+
+		<aui:button href="<%= redirect %>" type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>

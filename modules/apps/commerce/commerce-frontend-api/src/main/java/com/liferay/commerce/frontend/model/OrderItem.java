@@ -21,14 +21,13 @@ public class OrderItem {
 
 	public OrderItem(
 		int available, Icon icon, long orderId, long orderItemId, int quantity,
-		String shippingMethodAndOptionName, String sku) {
+		String sku) {
 
 		_available = available;
 		_icon = icon;
 		_orderId = orderId;
 		_orderItemId = orderItemId;
 		_quantity = quantity;
-		_shippingMethodAndOptionName = shippingMethodAndOptionName;
 		_sku = sku;
 	}
 
@@ -52,10 +51,6 @@ public class OrderItem {
 		return _quantity;
 	}
 
-	public String getShippingMethodAndOptionName() {
-		return _shippingMethodAndOptionName;
-	}
-
 	public String getSku() {
 		return _sku;
 	}
@@ -65,7 +60,6 @@ public class OrderItem {
 	private final long _orderId;
 	private final long _orderItemId;
 	private final int _quantity;
-	private final String _shippingMethodAndOptionName;
 	private final String _sku;
 
 }

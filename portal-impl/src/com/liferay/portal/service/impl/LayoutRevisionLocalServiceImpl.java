@@ -88,7 +88,7 @@ public class LayoutRevisionLocalServiceImpl
 		parentLayoutRevisionId = getParentLayoutRevisionId(
 			layoutSetBranchId, parentLayoutRevisionId, plid);
 
-		long layoutRevisionId = getUniqueLayoutRevisionId();
+		long layoutRevisionId = counterLocalService.increment();
 
 		LayoutRevision layoutRevision = layoutRevisionPersistence.create(
 			layoutRevisionId);
@@ -195,7 +195,9 @@ public class LayoutRevisionLocalServiceImpl
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchPortletPreferencesException);
+					_log.debug(
+						noSuchPortletPreferencesException,
+						noSuchPortletPreferencesException);
 				}
 			}
 		}
@@ -270,7 +272,9 @@ public class LayoutRevisionLocalServiceImpl
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchLayoutRevisionException);
+				_log.debug(
+					noSuchLayoutRevisionException,
+					noSuchLayoutRevisionException);
 			}
 
 			return null;
@@ -424,11 +428,6 @@ public class LayoutRevisionLocalServiceImpl
 	}
 
 	@Override
-	public int getLayoutRevisionsCount(long plid) {
-		return layoutRevisionPersistence.countByPlid(plid);
-	}
-
-	@Override
 	public int getLayoutRevisionsCount(
 		long layoutSetBranchId, long layoutBranchId, long plid) {
 
@@ -480,8 +479,10 @@ public class LayoutRevisionLocalServiceImpl
 
 			User user = _userPersistence.findByPrimaryKey(userId);
 
+			long newLayoutRevisionId = counterLocalService.increment();
+
 			layoutRevision = layoutRevisionPersistence.create(
-				getUniqueLayoutRevisionId());
+				newLayoutRevisionId);
 
 			layoutRevision.setGroupId(oldLayoutRevision.getGroupId());
 			layoutRevision.setCompanyId(oldLayoutRevision.getCompanyId());
@@ -711,16 +712,6 @@ public class LayoutRevisionLocalServiceImpl
 		}
 
 		return LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID;
-	}
-
-	protected long getUniqueLayoutRevisionId() {
-		long layoutRevisionId = counterLocalService.increment();
-
-		while (_layoutLocalService.fetchLayout(layoutRevisionId) != null) {
-			layoutRevisionId = counterLocalService.increment();
-		}
-
-		return layoutRevisionId;
 	}
 
 	protected boolean isWorkflowEnabled(long plid) throws PortalException {

@@ -15,12 +15,13 @@
 package com.liferay.oauth2.provider.model.impl;
 
 import com.liferay.oauth2.provider.constants.GrantType;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Brian Wing Shun Chan
@@ -29,38 +30,52 @@ public class OAuth2ApplicationImpl extends OAuth2ApplicationBaseImpl {
 
 	@Override
 	public List<GrantType> getAllowedGrantTypesList() {
-		return TransformUtil.transform(
-			StringUtil.split(getAllowedGrantTypes()), GrantType::valueOf);
+		Stream<String> stream = Arrays.stream(
+			StringUtil.split(getAllowedGrantTypes()));
+
+		return stream.map(
+			GrantType::valueOf
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
 	public List<String> getFeaturesList() {
-		return StringUtil.split(getFeatures());
+		return Arrays.asList(StringUtil.split(getFeatures()));
 	}
 
 	@Override
 	public List<String> getRedirectURIsList() {
-		return StringUtil.split(getRedirectURIs(), CharPool.NEW_LINE);
+		return Arrays.asList(
+			StringUtil.split(getRedirectURIs(), StringPool.NEW_LINE));
 	}
 
 	@Override
 	public void setAllowedGrantTypesList(
 		List<GrantType> allowedGrantTypesList) {
 
+		Stream<GrantType> stream = allowedGrantTypesList.stream();
+
 		setAllowedGrantTypes(
-			StringUtil.merge(
-				allowedGrantTypesList, GrantType::toString, StringPool.COMMA));
+			stream.map(
+				GrantType::toString
+			).collect(
+				Collectors.joining(StringPool.COMMA)
+			));
 	}
 
 	@Override
 	public void setFeaturesList(List<String> featuresList) {
-		setFeatures(StringUtil.merge(featuresList, StringPool.COMMA));
+		setFeatures(StringUtil.merge(featuresList));
 	}
 
 	@Override
 	public void setRedirectURIsList(List<String> redirectURIsList) {
-		setRedirectURIs(
-			StringUtil.merge(redirectURIsList, StringPool.NEW_LINE));
+		String redirectURIs = StringUtil.merge(
+			redirectURIsList, StringPool.NEW_LINE);
+
+		setRedirectURIs(redirectURIs);
 	}
 
 }

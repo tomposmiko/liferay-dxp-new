@@ -45,15 +45,14 @@ function ItemInfoViewBase({name, sku}) {
 	return (
 		<div className="item-info-base">
 			<h5 className="item-name">{name}</h5>
-
 			<p className="item-sku">{sku}</p>
 		</div>
 	);
 }
 
 function ItemInfoView({childItems = [], name, options = '', sku}) {
-	const isBundle = !!childItems.length;
-	const hasOptions = !!options;
+	const isBundle = childItems.length > 0,
+		hasOptions = !!options;
 
 	return (
 		<>

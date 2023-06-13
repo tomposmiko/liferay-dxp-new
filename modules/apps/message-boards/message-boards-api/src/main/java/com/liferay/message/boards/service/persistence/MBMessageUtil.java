@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the message-boards message service. This utility wraps <code>com.liferay.message.boards.service.persistence.impl.MBMessagePersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -2891,7 +2895,7 @@ public class MBMessageUtil {
 	 * </p>
 	 *
 	 * @param userId the user ID
-	 * @param classNameIds the class name IDs
+	 * @param classNameId the class name ID
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5564,7 +5568,7 @@ public class MBMessageUtil {
 	 * </p>
 	 *
 	 * @param userId the user ID
-	 * @param classNameIds the class name IDs
+	 * @param classNameId the class name ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message-boards messages
 	 * @param end the upper bound of the range of message-boards messages (not inclusive)
@@ -6683,71 +6687,71 @@ public class MBMessageUtil {
 	}
 
 	/**
-	 * Returns the message-boards message where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchMessageException</code> if it could not be found.
+	 * Returns the message-boards message where groupId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchMessageException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching message-boards message
 	 * @throws NoSuchMessageException if a matching message-boards message could not be found
 	 */
-	public static MBMessage findByERC_G(
-			String externalReferenceCode, long groupId)
+	public static MBMessage findByG_ERC(
+			long groupId, String externalReferenceCode)
 		throws com.liferay.message.boards.exception.NoSuchMessageException {
 
-		return getPersistence().findByERC_G(externalReferenceCode, groupId);
+		return getPersistence().findByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the message-boards message where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the message-boards message where groupId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
 	 */
-	public static MBMessage fetchByERC_G(
-		String externalReferenceCode, long groupId) {
+	public static MBMessage fetchByG_ERC(
+		long groupId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_G(externalReferenceCode, groupId);
+		return getPersistence().fetchByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the message-boards message where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the message-boards message where groupId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
 	 */
-	public static MBMessage fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache) {
+	public static MBMessage fetchByG_ERC(
+		long groupId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_G(
-			externalReferenceCode, groupId, useFinderCache);
+		return getPersistence().fetchByG_ERC(
+			groupId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the message-boards message where externalReferenceCode = &#63; and groupId = &#63; from the database.
+	 * Removes the message-boards message where groupId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the message-boards message that was removed
 	 */
-	public static MBMessage removeByERC_G(
-			String externalReferenceCode, long groupId)
+	public static MBMessage removeByG_ERC(
+			long groupId, String externalReferenceCode)
 		throws com.liferay.message.boards.exception.NoSuchMessageException {
 
-		return getPersistence().removeByERC_G(externalReferenceCode, groupId);
+		return getPersistence().removeByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of message-boards messages where externalReferenceCode = &#63; and groupId = &#63;.
+	 * Returns the number of message-boards messages where groupId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching message-boards messages
 	 */
-	public static int countByERC_G(String externalReferenceCode, long groupId) {
-		return getPersistence().countByERC_G(externalReferenceCode, groupId);
+	public static int countByG_ERC(long groupId, String externalReferenceCode) {
+		return getPersistence().countByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
@@ -6898,9 +6902,24 @@ public class MBMessageUtil {
 	}
 
 	public static MBMessagePersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile MBMessagePersistence _persistence;
+	private static ServiceTracker<MBMessagePersistence, MBMessagePersistence>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MBMessagePersistence.class);
+
+		ServiceTracker<MBMessagePersistence, MBMessagePersistence>
+			serviceTracker =
+				new ServiceTracker<MBMessagePersistence, MBMessagePersistence>(
+					bundle.getBundleContext(), MBMessagePersistence.class,
+					null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

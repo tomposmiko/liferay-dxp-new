@@ -14,10 +14,12 @@
 
 package com.liferay.journal.internal.util;
 
-import com.liferay.diff.DiffHtml;
-import com.liferay.diff.exception.CompareVersionsException;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMTemplate;
+import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
+import com.liferay.journal.internal.transformer.JournalTransformerListenerRegistryUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.model.JournalFolder;
@@ -26,6 +28,8 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.util.JournalHelper;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.diff.CompareVersionsException;
+import com.liferay.portal.kernel.diff.DiffHtmlUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.log.Log;
@@ -40,11 +44,11 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.LayoutSetLocalService;
+import com.liferay.portal.kernel.templateparser.TransformerListener;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -58,7 +62,7 @@ import com.liferay.portal.kernel.xml.XPath;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,27 +74,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Tom Wang
  */
-@Component(service = JournalHelper.class)
+@Component(immediate = true, service = JournalHelper.class)
 public class JournalHelperImpl implements JournalHelper {
-
-	@Override
-	public String createURLPattern(
-			JournalArticle article, Locale locale, boolean privateLayout,
-			String separator, ThemeDisplay themeDisplay)
-		throws PortalException {
-
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(
-			_portal.getGroupFriendlyURL(
-				_layoutSetLocalService.getLayoutSet(
-					article.getGroupId(), privateLayout),
-				themeDisplay, false, false));
-		sb.append(separator);
-		sb.append(article.getUrlTitle(locale));
-
-		return sb.toString();
-	}
 
 	@Override
 	public String diffHtml(
@@ -129,7 +114,7 @@ public class JournalHelperImpl implements JournalHelper {
 				targetArticle, null, Constants.VIEW, languageId, 1,
 				portletRequestModel, themeDisplay);
 
-		String diff = _diffHtml.diff(
+		String diff = DiffHtmlUtil.diff(
 			new UnsyncStringReader(sourceArticleDisplay.getContent()),
 			new UnsyncStringReader(targetArticleDisplay.getContent()));
 
@@ -281,6 +266,29 @@ public class JournalHelperImpl implements JournalHelper {
 		return restrictionType;
 	}
 
+	@Override
+	public String getTemplateScript(
+			long groupId, String ddmTemplateKey, Map<String, String> tokens,
+			String languageId)
+		throws PortalException {
+
+		DDMTemplate ddmTemplate = _ddmTemplateLocalService.getTemplate(
+			groupId, _portal.getClassNameId(DDMStructure.class), ddmTemplateKey,
+			true);
+
+		String script = ddmTemplate.getScript();
+
+		for (TransformerListener transformerListener :
+				JournalTransformerListenerRegistryUtil.
+					getTransformerListeners()) {
+
+			script = transformerListener.onScript(
+				script, null, languageId, tokens);
+		}
+
+		return script;
+	}
+
 	private List<String> _getAttributeValues(String content, Pattern pattern) {
 		Matcher matcher = pattern.matcher(content);
 
@@ -311,7 +319,7 @@ public class JournalHelperImpl implements JournalHelper {
 				continue;
 			}
 
-			String changes = _html.stripHtml(
+			String changes = HtmlUtil.stripHtml(
 				spanElement.attributeValue("changes"));
 
 			if (changes == null) {
@@ -372,16 +380,10 @@ public class JournalHelperImpl implements JournalHelper {
 		"data-longitude (-?\\d+(?:\\.\\d+)?)");
 
 	@Reference
-	private DiffHtml _diffHtml;
-
-	@Reference
-	private Html _html;
+	private DDMTemplateLocalService _ddmTemplateLocalService;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private LayoutSetLocalService _layoutSetLocalService;
 
 	@Reference
 	private Portal _portal;

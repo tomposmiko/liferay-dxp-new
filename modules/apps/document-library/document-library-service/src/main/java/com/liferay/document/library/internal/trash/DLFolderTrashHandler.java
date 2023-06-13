@@ -44,11 +44,10 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.constants.TrashActionKeys;
-import com.liferay.trash.constants.TrashEntryConstants;
-import com.liferay.trash.exception.RestoreEntryException;
+import com.liferay.trash.kernel.exception.RestoreEntryException;
 import com.liferay.trash.kernel.model.TrashEntry;
+import com.liferay.trash.kernel.model.TrashEntryConstants;
 
 import javax.portlet.PortletRequest;
 
@@ -159,8 +158,7 @@ public class DLFolderTrashHandler extends BaseDLTrashHandler {
 		DLFolder dlFolder = getDLFolder(classPK);
 
 		return DLUtil.getAbsolutePath(
-			portletRequest, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			dlFolder.getParentFolderId());
+			portletRequest, dlFolder.getParentFolderId());
 	}
 
 	@Override
@@ -180,7 +178,7 @@ public class DLFolderTrashHandler extends BaseDLTrashHandler {
 		}
 		catch (PortalException | UnsupportedCapabilityException exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -252,7 +250,7 @@ public class DLFolderTrashHandler extends BaseDLTrashHandler {
 			return false;
 		}
 
-		return !_trashHelper.isInTrashContainer(dlFolder);
+		return !dlFolder.isInTrashContainer();
 	}
 
 	@Override
@@ -389,16 +387,30 @@ public class DLFolderTrashHandler extends BaseDLTrashHandler {
 			permissionChecker, dlFolder, actionId);
 	}
 
+	@Reference(unbind = "-")
+	protected void setDLAppLocalService(DLAppLocalService dlAppLocalService) {
+		_dlAppLocalService = dlAppLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDLFileEntryLocalService(
+		DLFileEntryLocalService dlFileEntryLocalService) {
+
+		_dlFileEntryLocalService = dlFileEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDLFolderLocalService(
+		DLFolderLocalService dlFolderLocalService) {
+
+		_dlFolderLocalService = dlFolderLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLFolderTrashHandler.class);
 
-	@Reference
 	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
-
-	@Reference
 	private DLFolderLocalService _dlFolderLocalService;
 
 	@Reference(
@@ -413,8 +425,5 @@ public class DLFolderTrashHandler extends BaseDLTrashHandler {
 		target = "(model.class.name=com.liferay.portal.kernel.repository.model.Folder)"
 	)
 	private ModelResourcePermission<Folder> _folderModelResourcePermission;
-
-	@Reference
-	private TrashHelper _trashHelper;
 
 }

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.deploy.hot.BaseHotDeployListener;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
 import com.liferay.portal.kernel.deploy.hot.HotDeployException;
+import com.liferay.portal.kernel.javadoc.JavadocManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
@@ -182,7 +183,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		String servletContextName = servletContext.getServletContextName();
@@ -281,12 +282,14 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 
 		for (Portlet portlet : portlets) {
-			portlet.setReady(
-				GetterUtil.getBoolean(
-					servletContext.getInitParameter(
-						"portlets-ready-by-default"),
-					true));
+			boolean ready = GetterUtil.getBoolean(
+				servletContext.getInitParameter("portlets-ready-by-default"),
+				true);
+
+			portlet.setReady(ready);
 		}
+
+		JavadocManagerUtil.load(servletContextName, classLoader);
 
 		DirectServletRegistryUtil.clearServlets();
 		FileTimestampUtil.reset(servletContext);
@@ -351,6 +354,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 
 		PortletContextBagPool.remove(servletContextName);
+
+		JavadocManagerUtil.unload(servletContextName);
 
 		DirectServletRegistryUtil.clearServlets();
 
@@ -445,6 +450,17 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void processPortletProperties(
+			String servletContextName, ClassLoader classLoader)
+		throws Exception {
+
+		_processPortletProperties(classLoader);
+	}
+
 	protected void unbindDataSource(String servletContextName) {
 		Boolean dataSourceBindState = _dataSourceBindStates.remove(
 			servletContextName);
@@ -467,7 +483,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			}
 			catch (NamingException namingException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(namingException);
+					_log.debug(namingException, namingException);
 				}
 			}
 
@@ -478,7 +494,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			}
 			catch (NamingException namingException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(namingException);
+					_log.debug(namingException, namingException);
 				}
 			}
 		}
@@ -525,13 +541,19 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
-	private String[] _processPortletProperties(ClassLoader classLoader) {
-		Configuration portletPropertiesConfiguration =
-			ConfigurationFactoryUtil.getConfiguration(classLoader, "portlet");
+	private String[] _processPortletProperties(ClassLoader classLoader)
+		throws Exception {
 
-		if (portletPropertiesConfiguration == null) {
+		Configuration portletPropertiesConfiguration = null;
+
+		try {
+			portletPropertiesConfiguration =
+				ConfigurationFactoryUtil.getConfiguration(
+					classLoader, "portlet");
+		}
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to read portlet.properties");
+				_log.debug("Unable to read portlet.properties", exception);
 			}
 
 			return new String[0];

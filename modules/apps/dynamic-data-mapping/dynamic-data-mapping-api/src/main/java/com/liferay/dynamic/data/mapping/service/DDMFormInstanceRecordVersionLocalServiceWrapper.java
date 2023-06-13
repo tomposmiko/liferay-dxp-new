@@ -30,10 +30,6 @@ public class DDMFormInstanceRecordVersionLocalServiceWrapper
 	implements DDMFormInstanceRecordVersionLocalService,
 			   ServiceWrapper<DDMFormInstanceRecordVersionLocalService> {
 
-	public DDMFormInstanceRecordVersionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DDMFormInstanceRecordVersionLocalServiceWrapper(
 		DDMFormInstanceRecordVersionLocalService
 			ddmFormInstanceRecordVersionLocalService) {
@@ -95,12 +91,10 @@ public class DDMFormInstanceRecordVersionLocalServiceWrapper
 	 *
 	 * @param ddmFormInstanceRecordVersion the ddm form instance record version
 	 * @return the ddm form instance record version that was removed
-	 * @throws PortalException
 	 */
 	@Override
 	public DDMFormInstanceRecordVersion deleteDDMFormInstanceRecordVersion(
-			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion) {
 
 		return _ddmFormInstanceRecordVersionLocalService.
 			deleteDDMFormInstanceRecordVersion(ddmFormInstanceRecordVersion);
@@ -344,14 +338,6 @@ public class DDMFormInstanceRecordVersionLocalServiceWrapper
 		return _ddmFormInstanceRecordVersionLocalService.
 			getFormInstanceRecordVersions(
 				ddmFormInstanceRecordId, start, end, orderByComparator);
-	}
-
-	@Override
-	public java.util.List<DDMFormInstanceRecordVersion>
-		getFormInstanceRecordVersions(long userId, long formInstanceId) {
-
-		return _ddmFormInstanceRecordVersionLocalService.
-			getFormInstanceRecordVersions(userId, formInstanceId);
 	}
 
 	@Override

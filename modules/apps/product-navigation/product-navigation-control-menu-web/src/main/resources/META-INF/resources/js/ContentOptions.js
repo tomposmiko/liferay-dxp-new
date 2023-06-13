@@ -16,7 +16,6 @@ import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayForm, {ClaySelectWithOption} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
-import {navigate, sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
@@ -24,15 +23,15 @@ import {AddPanelContext} from './AddPanel';
 
 const OPTIONS = [
 	{
-		label: sub(Liferay.Language.get('x-items'), 4),
+		label: Liferay.Util.sub(Liferay.Language.get('x-items'), 4),
 		value: 4,
 	},
 	{
-		label: sub(Liferay.Language.get('x-items'), 8),
+		label: Liferay.Util.sub(Liferay.Language.get('x-items'), 8),
 		value: 8,
 	},
 	{
-		label: sub(Liferay.Language.get('x-items'), 10),
+		label: Liferay.Util.sub(Liferay.Language.get('x-items'), 10),
 		value: 10,
 	},
 ];
@@ -60,16 +59,14 @@ const ContentOptions = ({onChangeSelect}) => {
 					sizing="sm"
 				/>
 			</ClayForm.Group>
-
 			<ClayButton
 				className="btn-monospaced sidebar-body__add-panel__content-options-list"
 				displayType="unstyled"
 				onClick={() => setDisplayGrid(!displayGrid)}
-				size="sm"
+				small
 				title={Liferay.Language.get('display-style')}
 			>
 				<ClayIcon symbol={displayGrid ? 'cards2' : 'list'} />
-
 				<span className="sr-only">
 					{Liferay.Language.get('display-style')}
 				</span>
@@ -87,11 +84,10 @@ const ContentOptions = ({onChangeSelect}) => {
 					<ClayButton
 						className="btn-monospaced sidebar-body__add-panel__content-options-add"
 						displayType="unstyled"
-						size="sm"
+						small
 						title={Liferay.Language.get('add-new')}
 					>
 						<ClayIcon symbol="plus" />
-
 						<span className="sr-only">
 							{Liferay.Language.get('add-new')}
 						</span>
@@ -104,7 +100,7 @@ const ContentOptions = ({onChangeSelect}) => {
 							key={index}
 							onClick={() => {
 								setActive(false);
-								navigate(content.url);
+								Liferay.Util.navigate(content.url);
 							}}
 						>
 							{content.label}

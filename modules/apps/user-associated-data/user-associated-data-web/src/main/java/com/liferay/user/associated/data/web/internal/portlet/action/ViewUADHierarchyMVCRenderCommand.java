@@ -28,10 +28,10 @@ import com.liferay.user.associated.data.web.internal.dao.search.UADHierarchyResu
 import com.liferay.user.associated.data.web.internal.display.UADHierarchyDisplay;
 import com.liferay.user.associated.data.web.internal.display.UADInfoPanelDisplay;
 import com.liferay.user.associated.data.web.internal.display.ViewUADEntitiesDisplay;
-import com.liferay.user.associated.data.web.internal.helper.SelectedUserHelper;
-import com.liferay.user.associated.data.web.internal.helper.UADApplicationSummaryHelper;
 import com.liferay.user.associated.data.web.internal.registry.UADRegistry;
 import com.liferay.user.associated.data.web.internal.util.GroupUtil;
+import com.liferay.user.associated.data.web.internal.util.SelectedUserHelper;
+import com.liferay.user.associated.data.web.internal.util.UADApplicationSummaryHelper;
 import com.liferay.user.associated.data.web.internal.util.UADSearchContainerBuilder;
 
 import javax.portlet.PortletException;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
 		"mvc.command.name=/user_associated_data/view_uad_hierarchy"
@@ -70,8 +71,7 @@ public class ViewUADHierarchyMVCRenderCommand implements MVCRenderCommand {
 
 			UADDisplay<Object> uadDisplay =
 				(UADDisplay<Object>)_uadRegistry.getUADDisplay(
-					ParamUtil.getString(
-						renderRequest, "parentContainerTypeKey"));
+					ParamUtil.getString(renderRequest, "parentContainerClass"));
 
 			renderRequest.setAttribute(
 				UADWebKeys.UAD_INFO_PANEL_DISPLAY,
@@ -136,11 +136,12 @@ public class ViewUADHierarchyMVCRenderCommand implements MVCRenderCommand {
 				_portal.getLiferayPortletResponse(renderResponse),
 				renderRequest, applicationKey,
 				PortletURLUtil.getCurrent(renderRequest, renderResponse),
-				groupIds, uadDisplay.getTypeKey(),
+				groupIds, uadDisplay.getTypeClass(),
 				ParamUtil.getLong(renderRequest, "parentContainerId"),
 				_selectedUserHelper.getSelectedUser(renderRequest),
 				uadHierarchyDisplay));
-		viewUADEntitiesDisplay.setTypeKeys(uadHierarchyDisplay.getTypeKeys());
+		viewUADEntitiesDisplay.setTypeClasses(
+			uadHierarchyDisplay.getTypeClasses());
 
 		return viewUADEntitiesDisplay;
 	}

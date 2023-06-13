@@ -21,10 +21,8 @@ import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.bookmarks.constants.BookmarksFolderConstants;
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.service.BookmarksEntryLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Hits;
@@ -43,8 +41,8 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.asset.util.AssetSearcher;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,8 +64,6 @@ public class AssetSearcherClassNameIdsTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_journalArticleFixture.setDDMStructureLocalService(
-			_ddmStructureLocalService);
 		_group = GroupTestUtil.addGroup();
 
 		_journalArticleFixture.setGroup(_group);
@@ -97,11 +93,11 @@ public class AssetSearcherClassNameIdsTest {
 		addBookmarksEntry();
 		addJournalArticle();
 
-		Hits hits = search(
-			getAssetEntryQuery(
-				"com.liferay.bookmarks.model.BookmarksEntry",
-				"com.liferay.journal.model.JournalArticle"),
-			getSearchContext());
+		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+			"com.liferay.bookmarks.model.BookmarksEntry",
+			"com.liferay.journal.model.JournalArticle");
+
+		Hits hits = search(assetEntryQuery, getSearchContext());
 
 		Assert.assertEquals(hits.toString(), 2, hits.getLength());
 	}
@@ -114,9 +110,10 @@ public class AssetSearcherClassNameIdsTest {
 		addBookmarksEntry();
 		addJournalArticle();
 
-		Hits hits = search(
-			getAssetEntryQuery("com.liferay.journal.model.JournalArticle"),
-			getSearchContext());
+		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+			"com.liferay.journal.model.JournalArticle");
+
+		Hits hits = search(assetEntryQuery, getSearchContext());
 
 		Assert.assertEquals(hits.toString(), 1, hits.getLength());
 	}
@@ -160,8 +157,11 @@ public class AssetSearcherClassNameIdsTest {
 	}
 
 	protected long[] getClassNameIds(String... classNames) {
-		return TransformUtil.transformToLongArray(
-			Arrays.asList(classNames), PortalUtil::getClassNameId);
+		return Stream.of(
+			classNames
+		).mapToLong(
+			PortalUtil::getClassNameId
+		).toArray();
 	}
 
 	protected SearchContext getSearchContext() {
@@ -194,9 +194,6 @@ public class AssetSearcherClassNameIdsTest {
 
 	@Inject
 	private static BookmarksEntryLocalService _bookmarksEntryLocalService;
-
-	@Inject
-	private static DDMStructureLocalService _ddmStructureLocalService;
 
 	@Inject
 	private static JournalArticleLocalService _journalArticleLocalService;

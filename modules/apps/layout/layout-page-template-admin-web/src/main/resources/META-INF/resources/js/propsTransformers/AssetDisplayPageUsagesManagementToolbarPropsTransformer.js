@@ -26,48 +26,30 @@
  * details.
  */
 
-import {openConfirmModal} from 'frontend-js-web';
-
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const deleteAssetDisplayPageEntry = (itemData) => {
-		openConfirmModal({
-			message: itemData.deleteAssetDisplayPageEntryMessage,
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const form = document.getElementById(
-						`${portletNamespace}fm`
-					);
+		if (confirm(itemData.deleteAssetDisplayPageEntryMessage)) {
+			const form = document.getElementById(`${portletNamespace}fm`);
 
-					if (form) {
-						submitForm(
-							form,
-							itemData?.deleteAssetDisplayPageEntryURL
-						);
-					}
-				}
-			},
-		});
+			if (form) {
+				submitForm(form, itemData?.deleteAssetDisplayPageEntryURL);
+			}
+		}
 	};
 	const updateAssetDisplayPageEntry = (itemData) => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-do-not-want-to-set-a-display-page-template-for-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const form = document.getElementById(
-						`${portletNamespace}fm`
-					);
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-do-not-want-to-set-a-display-page-template-for-this'
+				)
+			)
+		) {
+			const form = document.getElementById(`${portletNamespace}fm`);
 
-					if (form) {
-						submitForm(
-							form,
-							itemData?.updateAssetDisplayPageEntryURL
-						);
-					}
-				}
-			},
-		});
+			if (form) {
+				submitForm(form, itemData?.updateAssetDisplayPageEntryURL);
+			}
+		}
 	};
 
 	return {

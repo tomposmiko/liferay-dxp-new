@@ -14,17 +14,10 @@
 
 package com.liferay.portal.kernel.workflow;
 
-import java.util.Locale;
-import java.util.Map;
-
 /**
  * @author Feliphe Marinho
  */
 public interface WorkflowTransition {
-
-	public String getLabel(Locale locale);
-
-	public Map<Locale, String> getLabelMap();
 
 	public String getName();
 

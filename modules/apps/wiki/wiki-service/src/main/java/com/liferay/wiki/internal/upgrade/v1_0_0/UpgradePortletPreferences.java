@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.wiki.constants.WikiPortletKeys;
 
 import javax.portlet.PortletPreferences;
+import javax.portlet.ReadOnlyException;
 
 /**
  * @author Iván Zaera
@@ -28,9 +29,40 @@ import javax.portlet.PortletPreferences;
 public class UpgradePortletPreferences
 	extends BasePortletPreferencesUpgradeProcess {
 
+	protected String getEmailSignatureSeparator(
+		PortletPreferences portletPreferences) {
+
+		return StringPool.NEW_LINE;
+	}
+
 	@Override
 	protected String[] getPortletIds() {
 		return new String[] {WikiPortletKeys.WIKI};
+	}
+
+	protected void upgradeEmailSignature(
+			PortletPreferences portletPreferences,
+			String emailMessageBodyPortletPreferencesKey,
+			String emailMessageSignaturePortletPreferencesKey)
+		throws ReadOnlyException {
+
+		String emailMessageSignature = portletPreferences.getValue(
+			emailMessageSignaturePortletPreferencesKey, StringPool.BLANK);
+
+		if (Validator.isNotNull(emailMessageSignature)) {
+			String emailMessageBody = portletPreferences.getValue(
+				emailMessageBodyPortletPreferencesKey, StringPool.BLANK);
+
+			String signatureSeparator = getEmailSignatureSeparator(
+				portletPreferences);
+
+			emailMessageBody += signatureSeparator + emailMessageSignature;
+
+			portletPreferences.setValue(
+				emailMessageBodyPortletPreferencesKey, emailMessageBody);
+		}
+
+		portletPreferences.reset(emailMessageSignaturePortletPreferencesKey);
 	}
 
 	@Override
@@ -43,42 +75,14 @@ public class UpgradePortletPreferences
 			PortletPreferencesFactoryUtil.fromXML(
 				companyId, ownerId, ownerType, plid, portletId, xml);
 
-		_upgradeEmailSignature(
+		upgradeEmailSignature(
 			portletPreferences, "emailPageAddedBody",
 			"emailPageAddedSignature");
-		_upgradeEmailSignature(
+		upgradeEmailSignature(
 			portletPreferences, "emailPageUpdatedBody",
 			"emailPageUpdatedSignature");
 
 		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
-	}
-
-	private String _getEmailSignatureSeparator() {
-		return StringPool.NEW_LINE;
-	}
-
-	private void _upgradeEmailSignature(
-			PortletPreferences portletPreferences,
-			String emailMessageBodyPortletPreferencesKey,
-			String emailMessageSignaturePortletPreferencesKey)
-		throws Exception {
-
-		String emailMessageSignature = portletPreferences.getValue(
-			emailMessageSignaturePortletPreferencesKey, StringPool.BLANK);
-
-		if (Validator.isNotNull(emailMessageSignature)) {
-			String emailMessageBody = portletPreferences.getValue(
-				emailMessageBodyPortletPreferencesKey, StringPool.BLANK);
-
-			String signatureSeparator = _getEmailSignatureSeparator();
-
-			emailMessageBody += signatureSeparator + emailMessageSignature;
-
-			portletPreferences.setValue(
-				emailMessageBodyPortletPreferencesKey, emailMessageBody);
-		}
-
-		portletPreferences.reset(emailMessageSignaturePortletPreferencesKey);
 	}
 
 }

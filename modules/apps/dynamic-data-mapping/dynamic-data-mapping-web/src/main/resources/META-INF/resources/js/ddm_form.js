@@ -15,82 +15,109 @@
 AUI.add(
 	'liferay-ddm-form',
 	(A) => {
-		const AArray = A.Array;
+		var AArray = A.Array;
 
-		const AQueue = A.Queue;
+		var AObject = A.Object;
 
-		const DateMath = A.DataType.DateMath;
+		var AQueue = A.Queue;
 
-		const Lang = A.Lang;
+		var DateMath = A.DataType.DateMath;
 
-		const INSTANCE_ID_PREFIX = '_INSTANCE_';
+		var Lang = A.Lang;
 
-		const INTEGER_MIN_VALUE = 0;
+		var INSTANCE_ID_PREFIX = '_INSTANCE_';
 
-		const INTEGER_MAX_VALUE = 2147483647;
+		var INTEGER_MIN_VALUE = 0;
 
-		const SELECTOR_REPEAT_BUTTONS =
+		var INTEGER_MAX_VALUE = 2147483647;
+
+		var SELECTOR_REPEAT_BUTTONS =
 			'.lfr-ddm-repeatable-add-button, .lfr-ddm-repeatable-delete-button';
 
-		const TPL_REPEATABLE_ADD =
-			'<a aria-label="' +
-			Liferay.Language.get('add-custom-tags') +
-			'" class="lfr-ddm-repeatable-add-button" href="javascript:void(0);" role="button">' +
+		var TPL_ICON_CARET =
+			'<span class="collapse-icon-closed"><span class="icon-caret-right"></span></span>';
+
+		var TPL_LAYOUTS_NAVBAR =
+			'<nav class="navbar navbar-collapse-absolute navbar-expand-md navbar-underline navigation-bar navigation-bar-light">' +
+			'<div class="collapse navbar-collapse">' +
+			'<ul class="nav navbar-nav">' +
+			'<li class="public {publicLayoutClass}"><a href="javascript:;">' +
+			Liferay.Language.get('public-pages') +
+			'</a></li>' +
+			'<li class="private {privateLayoutClass}"><a href="javascript:;">' +
+			Liferay.Language.get('private-pages') +
+			'</a></li>' +
+			'</ul>' +
+			'</div>' +
+			'</nav>';
+
+		var TPL_LOADER = '<span class="linear loading-icon"></span>';
+
+		var TPL_PAGE =
+			'<li class="lfr-ddm-link" data-groupId="{groupId}" data-layoutId="{layoutId}" data-nodeType="{nodeType}" data-privateLayout="{privateLayout}">' +
+			'<input class="lfr-ddm-page-radio" {checked} name="lfr-ddm-page" type="radio" />' +
+			'<a class="collapsed collapse-icon lfr-ddm-page-label" href="javascript:;">{pageTitle}{icon}</a>' +
+			'</li>';
+
+		var TPL_PAGES_BREADCRUMB =
+			'<ul class="breadcrumb lfr-ddm-breadcrumb"></ul>';
+
+		var TPL_PAGES_BREADCRUMB_ELEMENT =
+			'<li class="lfr-ddm-breadcrumb-element" data-groupId={groupId} data-layoutId={layoutId} data-privateLayout={privateLayout}>' +
+			'<a title="{label}">{label}</a>' +
+			'</li>';
+
+		var TPL_PAGES_CONTAINER =
+			'<ul class="lfr-ddm-pages-container nav vertical-scrolling"></ul>';
+
+		var TPL_REPEATABLE_ADD =
+			'<a class="lfr-ddm-repeatable-add-button" href="javascript:;">' +
 			Liferay.Util.getLexiconIconTpl('plus') +
 			'</a>';
 
-		const TPL_REPEATABLE_ICON =
+		var TPL_REPEATABLE_ICON =
 			'<div class="lfr-ddm-repeatable-drag-icon">' +
 			Liferay.Util.getLexiconIconTpl('drag') +
 			'</div>';
 
-		const TPL_REPEATABLE_DELETE =
-			'<a aria-label="' +
-			Liferay.Language.get('remove-custom-tags') +
-			'" class="hide lfr-ddm-repeatable-delete-button" href="javascript:void(0);" role="button">' +
+		var TPL_REPEATABLE_DELETE =
+			'<a class="hide lfr-ddm-repeatable-delete-button" href="javascript:;">' +
 			Liferay.Util.getLexiconIconTpl('hr') +
 			'</a>';
 
-		const TPL_REPEATABLE_HELPER =
+		var TPL_REPEATABLE_HELPER =
 			'<div class="lfr-ddm-repeatable-helper"></div>';
 
-		const TPL_REQUIRED_MARK =
+		var TPL_REQUIRED_MARK =
 			'<span class="reference-mark">' +
 			Liferay.Util.getLexiconIconTpl('asterisk') +
-			'<span class="hide-accessible sr-only">' +
+			'<span class="hide-accessible">' +
 			Liferay.Language.get('required') +
 			'</span></span>';
 
-		const FieldTypes = Liferay.namespace('DDM.FieldTypes');
+		var FieldTypes = Liferay.namespace('DDM.FieldTypes');
 
-		const getFieldClass = function (type) {
+		var getFieldClass = function (type) {
 			return FieldTypes[type] || FieldTypes.field;
 		};
 
-		const isNode = function (node) {
+		var isNode = function (node) {
 			return node && (node._node || node.nodeType);
 		};
 
-		const DDMPortletSupport = function () {};
+		var DDMPortletSupport = function () {};
 
 		DDMPortletSupport.ATTRS = {
 			doAsGroupId: {},
 
 			fieldsNamespace: {},
 
-			isPrivateLayoutsEnabled: {
-				validator: Lang.isBoolean,
-				value: true,
-			},
-
 			p_l_id: {},
-
-			portletId: {},
 
 			portletNamespace: {},
 		};
 
-		const FieldsSupport = function () {};
+		var FieldsSupport = function () {};
 
 		FieldsSupport.ATTRS = {
 			container: {
@@ -116,37 +143,43 @@ AUI.add(
 
 		FieldsSupport.prototype = {
 			_getField(fieldNode) {
-				const instance = this;
+				var instance = this;
 
-				const displayLocale = instance.get('displayLocale');
+				var displayLocale = instance.get('displayLocale');
 
-				const fieldInstanceId = instance.extractInstanceId(fieldNode);
+				var fieldInstanceId = instance.extractInstanceId(fieldNode);
 
-				const fieldName = fieldNode.getData('fieldName');
+				var fieldName = fieldNode.getData('fieldName');
 
-				const definition = instance.get('definition');
+				var definition = instance.get('definition');
 
-				const fieldDefinition = instance.getFieldInfo(
+				var fieldDefinition = instance.getFieldInfo(
 					definition,
 					'name',
 					fieldName
 				);
 
-				const FieldClass = getFieldClass(fieldDefinition.type);
+				var FieldClass = getFieldClass(fieldDefinition.type);
 
-				const field = new FieldClass({
-					...instance.getAttrs(Object.keys(DDMPortletSupport.ATTRS)),
-					container: fieldNode,
-					dataType: fieldDefinition.dataType,
-					definition,
-					displayLocale,
-					instanceId: fieldInstanceId,
-					name: fieldName,
-					parent: instance,
-					values: instance.get('values'),
-				});
+				var field = new FieldClass(
+					A.merge(
+						instance.getAttrs(
+							AObject.keys(DDMPortletSupport.ATTRS)
+						),
+						{
+							container: fieldNode,
+							dataType: fieldDefinition.dataType,
+							definition,
+							displayLocale,
+							instanceId: fieldInstanceId,
+							name: fieldName,
+							parent: instance,
+							values: instance.get('values'),
+						}
+					)
+				);
 
-				const form = instance.getForm();
+				var form = instance.getForm();
 
 				field.addTarget(form);
 
@@ -154,9 +187,9 @@ AUI.add(
 			},
 
 			_getTemplate(callback) {
-				const instance = this;
+				var instance = this;
 
-				const key =
+				var key =
 					Liferay.Util.getPortletNamespace(
 						Liferay.PortletKeys.DYNAMIC_DATA_MAPPING
 					) + 'definition';
@@ -179,13 +212,13 @@ AUI.add(
 			},
 
 			_getTemplateResourceURL() {
-				const instance = this;
+				var instance = this;
 
-				const container = instance.get('container');
+				var container = instance.get('container');
 
-				const dataType = instance.get('dataType');
+				var dataType = instance.get('dataType');
 
-				const templateResourceParameters = {
+				var templateResourceParameters = {
 					doAsGroupId: instance.get('doAsGroupId'),
 					fieldName: instance.get('name'),
 					mode: instance.get('mode'),
@@ -197,7 +230,6 @@ AUI.add(
 					p_p_resource_id:
 						'/dynamic_data_mapping/render_structure_field',
 					p_p_state: 'pop_up',
-					portletId: instance.get('portletId'),
 					portletNamespace: instance.get('portletNamespace'),
 					readOnly: instance.get('readOnly'),
 				};
@@ -206,7 +238,7 @@ AUI.add(
 					delete templateResourceParameters.doAsGroupId;
 				}
 
-				const fields = instance.get('fields');
+				var fields = instance._valueFields();
 
 				if (fields && fields.length) {
 					instance._removeDoAsGroupIdParam(
@@ -215,7 +247,7 @@ AUI.add(
 					);
 				}
 
-				const templateResourceURL = Liferay.Util.PortletURL.createResourceURL(
+				var templateResourceURL = Liferay.Util.PortletURL.createResourceURL(
 					themeDisplay.getLayoutURL(),
 					templateResourceParameters
 				);
@@ -224,14 +256,14 @@ AUI.add(
 			},
 
 			_removeDoAsGroupIdParam(fields, templateResourceParameters) {
-				const instance = this;
+				var instance = this;
 
 				fields.forEach((field) => {
 					if (!templateResourceParameters.doAsGroupId) {
 						return;
 					}
 
-					const dataType = field.get('dataType');
+					var dataType = field.get('dataType');
 
 					if (dataType && dataType === 'html') {
 						delete templateResourceParameters.doAsGroupId;
@@ -239,7 +271,7 @@ AUI.add(
 						return;
 					}
 
-					const nestedFields = field.get('fields');
+					var nestedFields = field.get('fields');
 
 					if (nestedFields && nestedFields.length) {
 						instance._removeDoAsGroupIdParam(
@@ -251,15 +283,15 @@ AUI.add(
 			},
 
 			_valueDisplayLocale() {
-				const instance = this;
+				var instance = this;
 
-				let displayLocale = instance.get('displayLocale');
+				var displayLocale = instance.get('displayLocale');
 
 				if (!displayLocale) {
 					displayLocale = instance.getDefaultLocale();
 				}
 
-				const defaultEditLocale = instance.get('defaultEditLocale');
+				var defaultEditLocale = instance.get('defaultEditLocale');
 
 				if (defaultEditLocale) {
 					displayLocale = defaultEditLocale;
@@ -269,9 +301,9 @@ AUI.add(
 			},
 
 			_valueFields() {
-				const instance = this;
+				var instance = this;
 
-				const fields = [];
+				var fields = [];
 
 				instance.getFieldNodes().each((item) => {
 					fields.push(instance._getField(item));
@@ -281,9 +313,9 @@ AUI.add(
 			},
 
 			eachParent(fn) {
-				const instance = this;
+				var instance = this;
 
-				let parent = instance.get('parent');
+				var parent = instance.get('parent');
 
 				while (parent !== undefined) {
 					fn.call(instance, parent);
@@ -293,17 +325,17 @@ AUI.add(
 			},
 
 			extractInstanceId(fieldNode) {
-				const fieldInstanceId = fieldNode.getData('fieldNamespace');
+				var fieldInstanceId = fieldNode.getData('fieldNamespace');
 
 				return fieldInstanceId.replace(INSTANCE_ID_PREFIX, '');
 			},
 
 			getDefaultLocale() {
-				const instance = this;
+				var instance = this;
 
-				let defaultLocale = themeDisplay.getDefaultLanguageId();
+				var defaultLocale = themeDisplay.getDefaultLanguageId();
 
-				const definition = instance.get('definition');
+				var definition = instance.get('definition');
 
 				if (definition) {
 					defaultLocale = definition.defaultLanguageId;
@@ -313,24 +345,24 @@ AUI.add(
 			},
 
 			getFieldInfo(tree, key, value) {
-				const queue = new AQueue(tree);
+				var queue = new AQueue(tree);
 
-				const addToQueue = function (item) {
+				var addToQueue = function (item) {
 					if (queue._q.indexOf(item) === -1) {
 						queue.add(item);
 					}
 				};
 
-				let fieldInfo = {};
+				var fieldInfo = {};
 
 				while (queue.size() > 0) {
-					const next = queue.next();
+					var next = queue.next();
 
 					if (next[key] === value) {
 						fieldInfo = next;
 					}
 					else {
-						const children =
+						var children =
 							next.fields ||
 							next.nestedFields ||
 							next.fieldValues ||
@@ -346,15 +378,15 @@ AUI.add(
 			},
 
 			getFieldNodes() {
-				const instance = this;
+				var instance = this;
 
 				return instance.get('container').all('> .field-wrapper');
 			},
 
 			getForm() {
-				const instance = this;
+				var instance = this;
 
-				let root;
+				var root;
 
 				instance.eachParent((parent) => {
 					root = parent;
@@ -364,20 +396,19 @@ AUI.add(
 			},
 
 			getReadOnly() {
-				const instance = this;
+				var instance = this;
 
-				let retVal = false;
+				var retVal = false;
 
 				if (instance.get('readOnly')) {
 					retVal = true;
 				}
 				else {
-					const form = instance.getForm();
+					var form = instance.getForm();
 
 					if (
 						!instance.get('localizable') &&
-						form.getDefaultLocale() !==
-							instance.get('displayLocale')
+						form.getDefaultLocale() != instance.get('displayLocale')
 					) {
 						retVal = true;
 					}
@@ -387,7 +418,7 @@ AUI.add(
 			},
 		};
 
-		const Field = A.Component.create({
+		var Field = A.Component.create({
 			ATTRS: {
 				container: {
 					setter: A.one,
@@ -442,7 +473,7 @@ AUI.add(
 
 			prototype: {
 				_addFieldValidation(newField, originalField) {
-					const instance = this;
+					var instance = this;
 
 					instance.fire('liferay-ddm-field:repeat', {
 						field: newField,
@@ -450,9 +481,9 @@ AUI.add(
 					});
 
 					newField.get('fields').forEach((item) => {
-						const name = item.get('name');
+						var name = item.get('name');
 
-						const originalChildField = originalField.getFirstFieldByName(
+						var originalChildField = originalField.getFirstFieldByName(
 							name
 						);
 
@@ -467,15 +498,15 @@ AUI.add(
 
 				_addTip(labelNode, tipNode) {
 					if (tipNode) {
-						const instance = this;
+						var instance = this;
 
-						const defaultLocale = instance.getDefaultLocale();
-						const fieldDefinition = instance.getFieldDefinition();
+						var defaultLocale = instance.getDefaultLocale();
+						var fieldDefinition = instance.getFieldDefinition();
 
-						const tipsMap = fieldDefinition.tip;
+						var tipsMap = fieldDefinition.tip;
 
 						if (Lang.isObject(tipsMap)) {
-							const tip =
+							var tip =
 								tipsMap[instance.get('displayLocale')] ||
 								tipsMap[defaultLocale];
 
@@ -487,9 +518,9 @@ AUI.add(
 				},
 
 				_afterFormRegistered(event) {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.get('formNode');
+					var formNode = instance.get('formNode');
 
 					if (event.formName === formNode.attr('name')) {
 						instance.set('liferayForm', event.form);
@@ -499,21 +530,21 @@ AUI.add(
 				},
 
 				_getLocalizable() {
-					const instance = this;
+					var instance = this;
 
 					return instance.getFieldDefinition().localizable === true;
 				},
 
 				_getRepeatable() {
-					const instance = this;
+					var instance = this;
 
 					return instance.getFieldDefinition().repeatable === true;
 				},
 
 				_handleToolbarClick(event) {
-					const instance = this;
+					var instance = this;
 
-					const currentTarget = event.currentTarget;
+					var currentTarget = event.currentTarget;
 
 					instance.ddmRepeatableButton = currentTarget;
 
@@ -536,23 +567,22 @@ AUI.add(
 				},
 
 				_onLocaleChanged(event) {
-					const instance = this;
+					var instance = this;
 
-					const currentLocale = instance.get('displayLocale');
-					const displayLocale = event.item.getAttribute('data-value');
+					var currentLocale = instance.get('displayLocale');
+					var displayLocale = event.item.getAttribute('data-value');
 
 					instance.updateLocalizationMap(currentLocale);
 
 					instance.set('displayLocale', displayLocale);
 
 					instance.syncLabel(displayLocale);
-					instance.syncTranslatedLabelsUI(currentLocale);
 					instance.syncValueUI();
 					instance.syncReadOnlyUI();
 				},
 
 				_removeFieldValidation(field) {
-					const instance = this;
+					var instance = this;
 
 					field.get('fields').forEach((item) => {
 						instance._removeFieldValidation(item);
@@ -564,19 +594,19 @@ AUI.add(
 				},
 
 				_valueFormNode() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
 					return container.ancestor('form', true);
 				},
 
 				_valueLiferayForm() {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.get('formNode');
+					var formNode = instance.get('formNode');
 
-					let formName = null;
+					var formName = null;
 
 					if (formNode) {
 						formName = formNode.attr('name');
@@ -586,19 +616,19 @@ AUI.add(
 				},
 
 				_valueLocalizationMap() {
-					const instance = this;
+					var instance = this;
 
-					const instanceId = instance.get('instanceId');
+					var instanceId = instance.get('instanceId');
 
-					const values = instance.get('values');
+					var values = instance.get('values');
 
-					const fieldValue = instance.getFieldInfo(
+					var fieldValue = instance.getFieldInfo(
 						values,
 						'instanceId',
 						instanceId
 					);
 
-					let localizationMap = {};
+					var localizationMap = {};
 
 					if (fieldValue && fieldValue.value) {
 						localizationMap = fieldValue.value;
@@ -608,19 +638,19 @@ AUI.add(
 				},
 
 				addIntegerRangeRule() {
-					const instance = this;
+					var instance = this;
 
-					const dataType = instance.get('dataType');
+					var dataType = instance.get('dataType');
 
 					if (dataType && dataType === 'integer') {
-						const liferayForm = instance.get('liferayForm');
+						var liferayForm = instance.get('liferayForm');
 
 						if (liferayForm) {
-							const node = instance.getInputNode();
+							var node = instance.getInputNode();
 
-							const fieldName = node.get('name');
+							var fieldName = node.get('name');
 
-							const errorMessage = Liferay.Util.sub(
+							var errorMessage = Liferay.Util.sub(
 								Liferay.Language.get(
 									'please-enter-a-valid-integer-value-between-x-and-x'
 								),
@@ -645,7 +675,7 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance.eventHandlers.push(
 						Liferay.on(
@@ -655,7 +685,7 @@ AUI.add(
 						)
 					);
 
-					const formNode = instance.get('formNode');
+					var formNode = instance.get('formNode');
 
 					if (formNode) {
 						instance.eventHandlers.push(
@@ -670,12 +700,12 @@ AUI.add(
 
 				convertNumberLocale(number, sourceLocale, targetLocale) {
 					if (sourceLocale !== targetLocale) {
-						const test = 1.1;
-						const sourceDecimalSeparator = test
-							.toLocaleString(sourceLocale.replaceAll('_', '-'))
+						var test = 1.1;
+						var sourceDecimalSeparator = test
+							.toLocaleString(sourceLocale.replace('_', '-'))
 							.charAt(1);
-						const targetDecimalSeparator = test
-							.toLocaleString(targetLocale.replaceAll('_', '-'))
+						var targetDecimalSeparator = test
+							.toLocaleString(targetLocale.replace('_', '-'))
 							.charAt(1);
 
 						if (sourceDecimalSeparator !== targetDecimalSeparator) {
@@ -702,21 +732,21 @@ AUI.add(
 				},
 
 				createField(fieldTemplate) {
-					const instance = this;
+					var instance = this;
 
-					const fieldNode = A.Node.create(fieldTemplate);
+					var fieldNode = A.Node.create(fieldTemplate);
 
 					instance.get('container').placeAfter(fieldNode);
 
 					instance.parseContent(fieldTemplate);
 
-					const parent = instance.get('parent');
+					var parent = instance.get('parent');
 
-					const siblings = instance.getSiblings();
+					var siblings = instance.getSiblings();
 
-					const field = parent._getField(fieldNode);
+					var field = parent._getField(fieldNode);
 
-					let index = siblings.indexOf(instance);
+					var index = siblings.indexOf(instance);
 
 					siblings.splice(++index, 0, field);
 
@@ -726,7 +756,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					AArray.invoke(instance.eventHandlers, 'detach');
 
@@ -738,12 +768,12 @@ AUI.add(
 				},
 
 				getDefaultLocalization(locale) {
-					const instance = this;
+					var instance = this;
 
-					const localizationMap = instance.get('localizationMap');
+					var localizationMap = instance.get('localizationMap');
 
 					if (Lang.isUndefined(localizationMap[locale])) {
-						const predefinedValue = instance.getPredefinedValueByLocale(
+						var predefinedValue = instance.getPredefinedValueByLocale(
 							locale
 						);
 
@@ -751,17 +781,17 @@ AUI.add(
 							return predefinedValue;
 						}
 
-						const defaultLocale = instance.getDefaultLocale();
+						var defaultLocale = instance.getDefaultLocale();
 
 						if (defaultLocale && localizationMap[defaultLocale]) {
-							const name = instance.get('name');
+							var name = instance.get('name');
 
-							const field = instance.getFieldByNameInFieldDefinition(
+							var field = instance.getFieldByNameInFieldDefinition(
 								name
 							);
 
 							if (field) {
-								const type = field.type;
+								var type = field.type;
 
 								if (
 									type === 'ddm-number' ||
@@ -785,11 +815,11 @@ AUI.add(
 				},
 
 				getFieldByNameInFieldDefinition(name) {
-					const instance = this;
+					var instance = this;
 
-					const definition = instance.get('definition');
+					var definition = instance.get('definition');
 
-					const fields = [];
+					var fields = [];
 
 					if (definition && definition.fields) {
 						definition.fields.forEach((field) => {
@@ -808,17 +838,17 @@ AUI.add(
 				},
 
 				getFieldDefinition() {
-					const instance = this;
+					var instance = this;
 
-					const definition = instance.get('definition');
+					var definition = instance.get('definition');
 
-					const name = instance.get('name');
+					var name = instance.get('name');
 
 					return instance.getFieldInfo(definition, 'name', name);
 				},
 
 				getFirstFieldByName(name) {
-					const instance = this;
+					var instance = this;
 
 					return AArray.find(instance.get('fields'), (item) => {
 						return item.get('name') === name;
@@ -826,12 +856,12 @@ AUI.add(
 				},
 
 				getInputName() {
-					const instance = this;
+					var instance = this;
 
-					const fieldsNamespace = instance.get('fieldsNamespace');
-					const portletNamespace = instance.get('portletNamespace');
+					var fieldsNamespace = instance.get('fieldsNamespace');
+					var portletNamespace = instance.get('portletNamespace');
 
-					const prefix = [portletNamespace];
+					var prefix = [portletNamespace];
 
 					if (fieldsNamespace) {
 						prefix.push(fieldsNamespace);
@@ -847,7 +877,7 @@ AUI.add(
 				},
 
 				getInputNode() {
-					const instance = this;
+					var instance = this;
 
 					return instance
 						.get('container')
@@ -855,24 +885,22 @@ AUI.add(
 				},
 
 				getLabelNode() {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('container').one('.control-label');
 				},
 
 				getPredefinedValueByLocale(locale) {
-					const instance = this;
+					var instance = this;
 
-					const name = instance.get('name');
+					var name = instance.get('name');
 
-					const field = instance.getFieldByNameInFieldDefinition(
-						name
-					);
+					var field = instance.getFieldByNameInFieldDefinition(name);
 
-					let predefinedValue;
+					var predefinedValue;
 
 					if (field) {
-						const type = field.type;
+						var type = field.type;
 
 						if (
 							field.predefinedValue &&
@@ -881,12 +909,11 @@ AUI.add(
 							predefinedValue = field.predefinedValue[locale];
 						}
 
-						const localizationMap = instance.get('localizationMap');
+						var localizationMap = instance.get('localizationMap');
 
 						if (
 							type === 'select' &&
 							(predefinedValue === '[""]' ||
-								// eslint-disable-next-line @liferay/aui/no-object
 								!A.Object.isEmpty(localizationMap))
 						) {
 							predefinedValue = '';
@@ -897,7 +924,7 @@ AUI.add(
 				},
 
 				getRepeatedSiblings() {
-					const instance = this;
+					var instance = this;
 
 					return instance.getSiblings().filter((item) => {
 						return item.get('name') === instance.get('name');
@@ -905,25 +932,25 @@ AUI.add(
 				},
 
 				getRuleInputName() {
-					const instance = this;
+					var instance = this;
 
-					const inputName = instance.getInputName();
+					var inputName = instance.getInputName();
 
 					return inputName;
 				},
 
 				getSiblings() {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('parent').get('fields');
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const inputNode = instance.getInputNode();
+					var inputNode = instance.getInputNode();
 
-					let value = '';
+					var value = '';
 
 					if (inputNode) {
 						value = Liferay.Util.unescapeHTML(inputNode.val());
@@ -933,7 +960,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.eventHandlers = [];
 
@@ -941,23 +968,23 @@ AUI.add(
 				},
 
 				parseContent(content) {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
 					container.plug(A.Plugin.ParseContent);
 
-					const parser = container.ParseContent;
+					var parser = container.ParseContent;
 
 					parser.parseContent(content);
 				},
 
 				remove() {
-					const instance = this;
+					var instance = this;
 
-					const siblings = instance.getSiblings();
+					var siblings = instance.getSiblings();
 
-					const index = siblings.indexOf(instance);
+					var index = siblings.indexOf(instance);
 
 					siblings.splice(index, 1);
 
@@ -969,17 +996,17 @@ AUI.add(
 				},
 
 				renderRepeatableUI() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const fieldDefinition = instance.getFieldDefinition();
+					var fieldDefinition = instance.getFieldDefinition();
 
 					if (
 						fieldDefinition &&
-						(fieldDefinition.dataType === 'html' ||
-							fieldDefinition.type === 'ddm-geolocation' ||
-							fieldDefinition.type === 'ddm-separator')
+						(fieldDefinition.dataType == 'html' ||
+							fieldDefinition.type == 'ddm-geolocation' ||
+							fieldDefinition.type == 'ddm-separator')
 					) {
 						container._node.insertAdjacentHTML(
 							'afterbegin',
@@ -987,7 +1014,7 @@ AUI.add(
 						);
 					}
 					else {
-						const containerLabel = container._node.children[0];
+						var containerLabel = container._node.children[0];
 
 						containerLabel.insertAdjacentHTML(
 							'afterbegin',
@@ -1007,7 +1034,7 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					if (instance.get('repeatable')) {
 						instance.renderRepeatableUI();
@@ -1026,12 +1053,12 @@ AUI.add(
 				},
 
 				repeat() {
-					const instance = this;
+					var instance = this;
 
 					instance._getTemplate((fieldTemplate) => {
-						const field = instance.createField(fieldTemplate);
+						var field = instance.createField(fieldTemplate);
 
-						const displayLocale = instance.get('displayLocale');
+						var displayLocale = instance.get('displayLocale');
 
 						field.set('displayLocale', displayLocale);
 
@@ -1042,7 +1069,7 @@ AUI.add(
 							field.originalField = instance;
 						}
 
-						const form = field.getForm();
+						var form = field.getForm();
 
 						form.newRepeatableInstances.push(field);
 
@@ -1053,12 +1080,12 @@ AUI.add(
 				},
 
 				setLabel(label) {
-					const instance = this;
+					var instance = this;
 
-					const labelNode = instance.getLabelNode();
+					var labelNode = instance.getLabelNode();
 
 					if (labelNode) {
-						const tipNode = labelNode.one('.taglib-icon-help');
+						var tipNode = labelNode.one('.taglib-icon-help');
 
 						if (
 							!A.UA.ie &&
@@ -1068,7 +1095,7 @@ AUI.add(
 							labelNode.html(A.Escape.html(label));
 						}
 
-						const fieldDefinition = instance.getFieldDefinition();
+						var fieldDefinition = instance.getFieldDefinition();
 
 						if (!A.UA.ie && fieldDefinition.required) {
 							labelNode.append(TPL_REQUIRED_MARK);
@@ -1079,9 +1106,9 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const inputNode = instance.getInputNode();
+					var inputNode = instance.getInputNode();
 
 					if (Lang.isValue(value)) {
 						inputNode.val(value);
@@ -1089,9 +1116,9 @@ AUI.add(
 				},
 
 				syncLabel(locale) {
-					const instance = this;
+					var instance = this;
 
-					const fieldDefinition = instance.getFieldDefinition();
+					var fieldDefinition = instance.getFieldDefinition();
 
 					if (Lang.isUndefined(fieldDefinition.label[locale])) {
 						instance.setLabel(
@@ -1104,27 +1131,27 @@ AUI.add(
 				},
 
 				syncReadOnlyUI() {
-					const instance = this;
+					var instance = this;
 
-					const readOnly = instance.getReadOnly();
+					var readOnly = instance.getReadOnly();
 
-					const inputNode = instance.getInputNode();
+					var inputNode = instance.getInputNode();
 
 					if (inputNode) {
 						inputNode.attr('disabled', readOnly);
 					}
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
 					if (container) {
-						const selectorInput = container.one('.selector-input');
+						var selectorInput = container.one('.selector-input');
 
 						if (selectorInput) {
 							selectorInput.attr('disabled', readOnly);
 						}
 
 						if (instance.getFieldDefinition().type === 'checkbox') {
-							const checkboxInput = container.one(
+							var checkboxInput = container.one(
 								'input[type="checkbox"][name*="' +
 									instance.getFieldDefinition().name +
 									'"]'
@@ -1134,7 +1161,7 @@ AUI.add(
 								checkboxInput.attr('disabled', readOnly);
 							}
 
-							const disableCheckboxInput = container.one(
+							var disableCheckboxInput = container.one(
 								'input[type="checkbox"][name$="disable"]'
 							);
 
@@ -1150,13 +1177,13 @@ AUI.add(
 				},
 
 				syncRepeatablelUI() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const siblings = instance.getRepeatedSiblings();
+					var siblings = instance.getRepeatedSiblings();
 
-					const parentField = siblings[0];
+					var parentField = siblings[0];
 
 					container
 						.one('.lfr-ddm-repeatable-delete-button')
@@ -1169,82 +1196,17 @@ AUI.add(
 						);
 				},
 
-				syncTranslatedLabelsUI(locale) {
-					const instance = this;
-
-					const defaultLocale = instance.getDefaultLocale();
-
-					if (locale === defaultLocale) {
-						return;
-					}
-
-					const localizationMap = instance.get('localizationMap');
-
-					const regexpFieldsNamespace = new RegExp(
-						instance.get('name') +
-							INSTANCE_ID_PREFIX +
-							instance.get('instanceId'),
-						'gi'
-					);
-					const fieldsNamespace = instance
-						.getInputName()
-						.replace(regexpFieldsNamespace, '');
-
-					const labelItemSelector =
-						'#' +
-						fieldsNamespace +
-						'PaletteContentBox a[data-value="' +
-						locale +
-						'"] .label';
-
-					let labelItem = A.one(labelItemSelector);
-
-					const triggerMenu = A.one('#' + fieldsNamespace + 'Menu');
-
-					const listContainer = triggerMenu.getData(
-						'menuListContainer'
-					);
-
-					if (!labelItem && listContainer) {
-						labelItem = listContainer.one(labelItemSelector);
-					}
-
-					if (
-						labelItem &&
-						// eslint-disable-next-line @liferay/aui/no-object
-						!A.Object.isEmpty(localizationMap) &&
-						Object.prototype.hasOwnProperty.call(
-							localizationMap,
-							locale
-						)
-					) {
-						const translated = Liferay.Language.get('translated');
-						if (labelItem.getContent() !== translated) {
-							labelItem.setContent(translated);
-						}
-						if (labelItem.hasClass('label-warning')) {
-							labelItem.removeClass('label-warning');
-						}
-						if (!labelItem.hasClass('label-success')) {
-							labelItem.addClass('label-success');
-						}
-					}
-
-					triggerMenu.setData('menuListContainer', listContainer);
-				},
-
 				syncValueUI() {
-					const instance = this;
+					var instance = this;
 
-					const dataType = instance.get('dataType');
+					var dataType = instance.get('dataType');
 
 					if (dataType) {
-						const localizationMap = instance.get('localizationMap');
+						var localizationMap = instance.get('localizationMap');
 
-						let value;
+						var value;
 
 						if (instance.get('localizable')) {
-							// eslint-disable-next-line @liferay/aui/no-object
 							if (!A.Object.isEmpty(localizationMap)) {
 								value =
 									localizationMap[
@@ -1264,7 +1226,6 @@ AUI.add(
 							if (
 								(dataType === 'double' ||
 									dataType === 'number') &&
-								// eslint-disable-next-line @liferay/aui/no-object
 								!A.Object.isEmpty(localizationMap)
 							) {
 								instance.setValue(localizationMap);
@@ -1277,34 +1238,25 @@ AUI.add(
 				},
 
 				toJSON() {
-					const instance = this;
+					var instance = this;
 
-					const fieldJSON = {
+					var fieldJSON = {
 						instanceId: instance.get('instanceId'),
 						name: instance.get('name'),
 					};
 
-					const dataType = instance.get('dataType');
+					var dataType = instance.get('dataType');
 
-					const fields = instance.get('fields');
+					var fields = instance.get('fields');
 
 					if (dataType || fields.length) {
 						fieldJSON.value = instance.get('localizationMap');
 
-						if (
-							!Object.keys(fieldJSON.value).length &&
-							instance.getValue() !== null
-						) {
-							fieldJSON.value[
-								instance.getDefaultLocale()
-							] = instance.getValue();
-						}
-
 						if (instance.get('localizable')) {
-							const form = instance.getForm();
+							var form = instance.getForm();
 
 							form.addAvailableLanguageIds(
-								Object.keys(fieldJSON.value)
+								AObject.keys(fieldJSON.value)
 							);
 						}
 					}
@@ -1320,25 +1272,25 @@ AUI.add(
 				},
 
 				updateLocalizationMap(locale) {
-					const instance = this;
+					var instance = this;
 
-					let localizationMap = instance.get('localizationMap');
+					var localizationMap = instance.get('localizationMap');
 
-					const value = instance.getValue();
+					var value = instance.getValue();
 
 					if (instance.get('localizable')) {
-						const defaultLocale = instance.getDefaultLocale();
+						var defaultLocale = instance.getDefaultLocale();
 
 						if (
 							locale === defaultLocale ||
 							(localizationMap[defaultLocale] !== undefined &&
 								value !== localizationMap[defaultLocale]) ||
-							localizationMap[locale] !== undefined
+							localizationMap[locale]
 						) {
 							localizationMap[locale] = value;
 						}
 
-						for (const key in localizationMap) {
+						for (var key in localizationMap) {
 							if (!localizationMap[key]) {
 								localizationMap[key] = '';
 							}
@@ -1353,35 +1305,35 @@ AUI.add(
 			},
 		});
 
-		const CheckboxField = A.Component.create({
+		var CheckboxField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
 				getLabelNode() {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('container').one('label');
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
 					return instance.getInputNode().test(':checked') + '';
 				},
 
 				setLabel(label) {
-					const instance = this;
+					var instance = this;
 
-					const labelNode = instance.getLabelNode();
+					var labelNode = instance.getLabelNode();
 
-					const tipNode = labelNode.one('.taglib-icon-help');
+					var tipNode = labelNode.one('.taglib-icon-help');
 
-					const inputNode = instance.getInputNode();
+					var inputNode = instance.getInputNode();
 
 					if (Lang.isValue(label) && Lang.isNode(labelNode)) {
 						labelNode.html('&nbsp;' + A.Escape.html(label));
 
-						const fieldDefinition = instance.getFieldDefinition();
+						var fieldDefinition = instance.getFieldDefinition();
 
 						if (fieldDefinition.required) {
 							labelNode.append(TPL_REQUIRED_MARK);
@@ -1394,7 +1346,7 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
 					instance.getInputNode().attr('checked', value === 'true');
 				},
@@ -1403,28 +1355,28 @@ AUI.add(
 
 		FieldTypes.checkbox = CheckboxField;
 
-		const ColorField = A.Component.create({
+		var ColorField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
-					const valueField = container.one('.color-value');
+					var container = instance.get('container');
+					var valueField = container.one('.color-value');
 
 					return valueField.val();
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const selectorInput = container.one('.selector-input');
-					const valueField = container.one('.color-value');
+					var selectorInput = container.one('.selector-input');
+					var valueField = container.one('.color-value');
 
-					const colorPicker = new A.ColorPickerPopover({
+					var colorPicker = new A.ColorPickerPopover({
 						position: 'bottom',
 						trigger: selectorInput,
 						zIndex: 65535,
@@ -1452,13 +1404,13 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const colorPicker = instance.get('colorPicker');
-					const selectorInput = container.one('.selector-input');
-					const valueField = container.one('.color-value');
+					var colorPicker = instance.get('colorPicker');
+					var selectorInput = container.one('.selector-input');
+					var valueField = container.one('.color-value');
 
 					if (!colorPicker) {
 						return;
@@ -1471,12 +1423,12 @@ AUI.add(
 				},
 
 				validateField(valueField) {
-					const instance = this;
+					var instance = this;
 
-					const liferayForm = instance.get('liferayForm');
+					var liferayForm = instance.get('liferayForm');
 
 					if (liferayForm) {
-						const formValidator = liferayForm.formValidator;
+						var formValidator = liferayForm.formValidator;
 
 						if (formValidator) {
 							formValidator.validateField(valueField);
@@ -1488,14 +1440,14 @@ AUI.add(
 
 		FieldTypes['ddm-color'] = ColorField;
 
-		const DateField = A.Component.create({
+		var DateField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
 				getDatePicker() {
-					const instance = this;
+					var instance = this;
 
-					const inputNode = instance.getInputNode();
+					var inputNode = instance.getInputNode();
 
 					return Liferay.component(
 						inputNode.attr('id') + 'DatePicker'
@@ -1503,20 +1455,20 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const datePicker = instance.getDatePicker();
+					var datePicker = instance.getDatePicker();
 
-					let value = '';
+					var value = '';
 
 					if (datePicker) {
-						const selectedDate = datePicker.getDate();
+						var selectedDate = datePicker.getDate();
 
-						const formattedDate = A.DataType.Date.format(
+						var formattedDate = A.DataType.Date.format(
 							selectedDate
 						);
 
-						const inputNode = instance.getInputNode();
+						var inputNode = instance.getInputNode();
 
 						value = inputNode.val() ? formattedDate : '';
 					}
@@ -1525,12 +1477,12 @@ AUI.add(
 				},
 
 				repeat() {
-					const instance = this;
+					var instance = this;
 
 					instance._getTemplate((fieldTemplate) => {
-						const field = instance.createField(fieldTemplate);
+						var field = instance.createField(fieldTemplate);
 
-						const inputNode = field.getInputNode();
+						var inputNode = field.getInputNode();
 
 						Liferay.after(
 							inputNode.attr('id') + 'DatePicker:registered',
@@ -1544,9 +1496,9 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const datePicker = instance.getDatePicker();
+					var datePicker = instance.getDatePicker();
 
 					if (!datePicker) {
 						return;
@@ -1557,12 +1509,10 @@ AUI.add(
 					datePicker.deselectDates();
 
 					if (value) {
-						let date = A.DataType.Date.parse(value);
+						var date = A.DataType.Date.parse(value);
 
 						if (!date) {
-							datePicker.get('activeInput').val('');
-
-							datePicker.clearSelection();
+							datePicker.selectDates('');
 
 							return;
 						}
@@ -1576,9 +1526,7 @@ AUI.add(
 						datePicker.selectDates(date);
 					}
 					else {
-						datePicker.get('activeInput').val('');
-
-						datePicker.clearSelection();
+						datePicker.selectDates('');
 					}
 				},
 			},
@@ -1586,7 +1534,7 @@ AUI.add(
 
 		FieldTypes['ddm-date'] = DateField;
 
-		const DocumentLibraryField = A.Component.create({
+		var DocumentLibraryField = A.Component.create({
 			ATTRS: {
 				acceptedFileFormats: {
 					value: ['*'],
@@ -1597,10 +1545,10 @@ AUI.add(
 
 			prototype: {
 				_handleButtonsClick(event) {
-					const instance = this;
+					var instance = this;
 
 					if (!instance.get('readOnly')) {
-						const currentTarget = event.currentTarget;
+						var currentTarget = event.currentTarget;
 
 						if (currentTarget.test('.select-button')) {
 							instance._handleSelectButtonClick(event);
@@ -1612,22 +1560,20 @@ AUI.add(
 				},
 
 				_handleClearButtonClick() {
-					const instance = this;
+					var instance = this;
 
 					instance.setValue('');
 				},
 
 				_handleSelectButtonClick() {
-					const instance = this;
+					var instance = this;
 
-					const portletNamespace = instance.get('portletNamespace');
+					var portletNamespace = instance.get('portletNamespace');
 
 					Liferay.Util.openSelectionModal({
 						onSelect: (selectedItem) => {
 							if (selectedItem) {
-								const itemValue = JSON.parse(
-									selectedItem.value
-								);
+								var itemValue = JSON.parse(selectedItem.value);
 
 								instance.setValue({
 									classPK: itemValue.fileEntryId,
@@ -1646,12 +1592,12 @@ AUI.add(
 				},
 
 				_validateField(fieldNode) {
-					const instance = this;
+					var instance = this;
 
-					const liferayForm = instance.get('liferayForm');
+					var liferayForm = instance.get('liferayForm');
 
 					if (liferayForm) {
-						const formValidator = liferayForm.formValidator;
+						var formValidator = liferayForm.formValidator;
 
 						if (formValidator) {
 							formValidator.validateField(fieldNode);
@@ -1660,15 +1606,17 @@ AUI.add(
 				},
 
 				getDocumentLibrarySelectorURL() {
-					const instance = this;
+					var instance = this;
 
-					const form = instance.getForm();
+					var form = instance.getForm();
 
-					const documentLibrarySelectorURL = form.get(
+					var documentLibrarySelectorURL = form.get(
 						'documentLibrarySelectorURL'
 					);
 
-					let retVal = instance.getDocumentLibraryURL('file');
+					var retVal = instance.getDocumentLibraryURL(
+						'com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion'
+					);
 
 					if (documentLibrarySelectorURL) {
 						retVal = documentLibrarySelectorURL;
@@ -1678,37 +1626,37 @@ AUI.add(
 				},
 
 				getDocumentLibraryURL(criteria) {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const portletNamespace = instance.get('portletNamespace');
+					var portletNamespace = instance.get('portletNamespace');
 
-					const criterionJSON = {
+					var criterionJSON = {
 						desiredItemSelectorReturnTypes:
 							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
 					};
 
-					const uploadCriterionJSON = {
+					var uploadCriterionJSON = {
 						URL: instance.getUploadURL(),
 						desiredItemSelectorReturnTypes:
 							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
 					};
 
-					const documentLibraryParameters = {
+					var documentLibraryParameters = {
 						'0_json': JSON.stringify(criterionJSON),
 						'1_json': JSON.stringify(criterionJSON),
 						'2_json': JSON.stringify(uploadCriterionJSON),
 						criteria,
-						'itemSelectedEventName':
+						itemSelectedEventName:
 							portletNamespace + 'selectDocumentLibrary',
-						'p_p_auth': container.getData('itemSelectorAuthToken'),
-						'p_p_id': Liferay.PortletKeys.ITEM_SELECTOR,
-						'p_p_mode': 'view',
-						'p_p_state': 'pop_up',
+						p_p_auth: container.getData('itemSelectorAuthToken'),
+						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
+						p_p_mode: 'view',
+						p_p_state: 'pop_up',
 					};
 
-					const documentLibraryURL = Liferay.Util.PortletURL.createPortletURL(
+					var documentLibraryURL = Liferay.Util.PortletURL.createPortletURL(
 						themeDisplay.getLayoutRelativeControlPanelURL(),
 						documentLibraryParameters
 					);
@@ -1730,23 +1678,23 @@ AUI.add(
 				},
 
 				getRuleInputName() {
-					const instance = this;
+					var instance = this;
 
-					const inputName = instance.getInputName();
+					var inputName = instance.getInputName();
 
 					return inputName + 'Title';
 				},
 
 				getUploadURL() {
-					const uploadParameters = {
-						'cmd': 'add_temp',
+					var uploadParameters = {
+						cmd: 'add_temp',
 						'javax.portlet.action':
 							'/document_library/upload_file_entry',
-						'p_auth': Liferay.authToken,
-						'p_p_id': Liferay.PortletKeys.DOCUMENT_LIBRARY,
+						p_auth: Liferay.authToken,
+						p_p_id: Liferay.PortletKeys.DOCUMENT_LIBRARY,
 					};
 
-					const uploadURL = Liferay.Util.PortletURL.createActionURL(
+					var uploadURL = Liferay.Util.PortletURL.createActionURL(
 						themeDisplay.getLayoutRelativeControlPanelURL(),
 						uploadParameters
 					);
@@ -1755,9 +1703,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
 					container.delegate(
 						'click',
@@ -1768,9 +1716,9 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const parsedValue = instance.getParsedValue(value);
+					var parsedValue = instance.getParsedValue(value);
 
 					if (!parsedValue.title && !parsedValue.uuid) {
 						value = '';
@@ -1788,25 +1736,25 @@ AUI.add(
 				},
 
 				syncReadOnlyUI() {
-					const instance = this;
+					var instance = this;
 
-					const readOnly = instance.getReadOnly();
+					var readOnly = instance.getReadOnly();
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const selectButtonNode = container.one(
+					var selectButtonNode = container.one(
 						'#' + instance.getInputName() + 'SelectButton'
 					);
 
 					selectButtonNode.attr('disabled', readOnly);
 
-					const clearButtonNode = container.one(
+					var clearButtonNode = container.one(
 						'#' + instance.getInputName() + 'ClearButton'
 					);
 
 					clearButtonNode.attr('disabled', readOnly);
 
-					const altNode = container.one(
+					var altNode = container.one(
 						'input[name=' + instance.getInputName() + 'Alt]'
 					);
 
@@ -1816,13 +1764,13 @@ AUI.add(
 				},
 
 				syncUI() {
-					const instance = this;
+					var instance = this;
 
-					const parsedValue = instance.getParsedValue(
+					var parsedValue = instance.getParsedValue(
 						instance.getValue()
 					);
 
-					const titleNode = A.one(
+					var titleNode = A.one(
 						'input[name=' + instance.getInputName() + 'Title]'
 					);
 
@@ -1830,7 +1778,7 @@ AUI.add(
 
 					instance._validateField(titleNode);
 
-					const clearButtonNode = A.one(
+					var clearButtonNode = A.one(
 						'#' + instance.getInputName() + 'ClearButton'
 					);
 
@@ -1841,21 +1789,323 @@ AUI.add(
 
 		FieldTypes['ddm-documentlibrary'] = DocumentLibraryField;
 
-		const LinkToPageField = A.Component.create({
+		var LinkToPageField = A.Component.create({
+			ATTRS: {
+				delta: {
+					value: 10,
+				},
+
+				selectedLayout: {
+					valueFn() {
+						var instance = this;
+
+						var layoutValue = instance.getParsedValue(
+							instance.getValue()
+						);
+
+						var retVal = null;
+
+						if (layoutValue.layoutId) {
+							retVal = layoutValue;
+						}
+
+						return retVal;
+					},
+				},
+
+				selectedLayoutPath: {
+					valueFn() {
+						var instance = this;
+
+						var layoutValue = instance.getParsedValue(
+							instance.getValue()
+						);
+
+						var privateLayout = !!(
+							layoutValue && layoutValue.privateLayout
+						);
+
+						var groupId = themeDisplay.getScopeGroupIdOrLiveGroupId();
+
+						var layoutsRoot = {
+							groupId,
+							label: Liferay.Language.get('all'),
+							layoutId: 0,
+							privateLayout,
+						};
+
+						return [layoutsRoot];
+					},
+				},
+			},
+
 			EXTENDS: Field,
 
 			prototype: {
+				_addBreadcrumbElement(label, layoutId, groupId, privateLayout) {
+					var instance = this;
+
+					var breadcrumbNode = instance._modal.bodyNode.one(
+						'.lfr-ddm-breadcrumb'
+					);
+
+					var breadcrumbElementNode = A.Node.create(
+						Lang.sub(TPL_PAGES_BREADCRUMB_ELEMENT, {
+							groupId,
+							label,
+							layoutId,
+							privateLayout,
+						})
+					);
+
+					breadcrumbNode.append(breadcrumbElementNode);
+				},
+
+				_addListElement(layout, container, selected, prepend) {
+					var entryNode = A.Node.create(
+						Lang.sub(TPL_PAGE, {
+							checked: selected ? 'checked="checked"' : '',
+							groupId: layout.groupId,
+							icon: layout.hasChildren ? TPL_ICON_CARET : '',
+							layoutId: layout.layoutId,
+							nodeType: layout.hasChildren ? 'root' : 'leaf',
+							pageTitle: layout.name,
+							privateLayout: layout.privateLayout,
+						})
+					);
+
+					if (prepend) {
+						container.prepend(entryNode);
+					}
+					else {
+						container.append(entryNode);
+					}
+
+					if (selected) {
+						entryNode.scrollIntoView();
+					}
+				},
+
+				_afterSelectedLayoutChange(event) {
+					var instance = this;
+
+					var modal = instance._modal;
+
+					if (modal) {
+						var notSelected = !event.newVal;
+
+						var selectButton = modal.get('toolbars.footer')[0];
+
+						var boundingBox = selectButton.boundingBox;
+
+						boundingBox.attr('disabled', notSelected);
+						boundingBox.toggleClass('disabled', notSelected);
+					}
+				},
+
+				_afterSelectedLayoutPathChange(event) {
+					var instance = this;
+
+					instance._renderBreadcrumb(event.newVal);
+				},
+
+				_canLoadMore(key, start, end) {
+					var instance = this;
+
+					var cache = instance._getCache(key);
+
+					return !cache || start < cache.start || end > cache.end;
+				},
+
+				_cleanSelectedLayout() {
+					var instance = this;
+
+					var checkedElement = instance._modal.bodyNode.one(
+						'.lfr-ddm-page-radio:checked'
+					);
+
+					if (checkedElement) {
+						checkedElement.attr('checked', false);
+
+						instance.set('selectedLayout', null);
+					}
+				},
+
+				_getCache(key) {
+					var instance = this;
+
+					var cache;
+
+					if (instance._cache && instance._cache[key]) {
+						cache = instance._cache[key];
+					}
+
+					return cache;
+				},
+
+				_getModalConfig() {
+					var instance = this;
+
+					return {
+						dialog: {
+							cssClass: 'lfr-ddm-link-to-page-modal',
+							height: 600,
+							modal: true,
+							on: {
+								destroy() {
+									instance.set('selectedLayout', null);
+								},
+							},
+							resizable: false,
+							toolbars: {
+								footer: [
+									{
+										cssClass: 'btn-primary',
+										disabled: !instance.get(
+											'selectedLayout'
+										),
+										label: Liferay.Language.get('select'),
+										on: {
+											click: A.bind(
+												instance._handleChooseButtonClick,
+												instance
+											),
+										},
+									},
+									{
+										cssClass: 'btn-link',
+										label: Liferay.Language.get('cancel'),
+										on: {
+											click: A.bind(
+												instance._handleCancelButtonClick,
+												instance
+											),
+										},
+									},
+								],
+								header: [
+									{
+										cssClass: 'close',
+										discardDefaultButtonCssClasses: true,
+										labelHTML: Liferay.Util.getLexiconIconTpl(
+											'times'
+										),
+										on: {
+											click: A.bind(
+												instance._handleCancelButtonClick,
+												instance
+											),
+										},
+									},
+								],
+							},
+							width: 400,
+						},
+						title: Liferay.Language.get('select-layout'),
+					};
+				},
+
+				_handleBreadcrumbElementClick(event) {
+					var instance = this;
+
+					var currentTargetLayoutId = Number(
+						event.currentTarget.getData('layoutId')
+					);
+
+					var selectedLayoutPath = instance.get('selectedLayoutPath');
+
+					var lastLayoutIndex = selectedLayoutPath.length - 1;
+
+					var lastLayout = selectedLayoutPath[lastLayoutIndex];
+
+					var clickedLastElement =
+						Number(lastLayout.layoutId) === currentTargetLayoutId;
+
+					if (!clickedLastElement) {
+						instance._cleanSelectedLayout();
+
+						while (!clickedLastElement) {
+							if (
+								Number(lastLayout.layoutId) !==
+								currentTargetLayoutId
+							) {
+								selectedLayoutPath.pop();
+
+								lastLayoutIndex = selectedLayoutPath.length - 1;
+
+								lastLayout =
+									selectedLayoutPath[lastLayoutIndex];
+							}
+							else {
+								clickedLastElement = true;
+
+								var groupId = lastLayout.groupId;
+
+								var privateLayout = lastLayout.privateLayout;
+
+								instance._currentParentLayoutId = Number(
+									currentTargetLayoutId
+								);
+
+								var bodyNode = instance._modal.bodyNode;
+
+								var listNode = bodyNode.one(
+									'.lfr-ddm-pages-container'
+								);
+
+								listNode.empty();
+
+								instance._showLoader(listNode);
+
+								listNode.addClass('top-ended');
+
+								instance._requestInitialLayouts(
+									currentTargetLayoutId,
+									groupId,
+									privateLayout,
+									instance._renderLayouts
+								);
+							}
+						}
+
+						instance.set('selectedLayoutPath', selectedLayoutPath);
+					}
+				},
+
+				_handleCancelButtonClick() {
+					var instance = this;
+
+					instance._modal.hide();
+				},
+
+				_handleChooseButtonClick() {
+					var instance = this;
+
+					var selectedLayout = instance.get('selectedLayout');
+
+					instance.setValue(selectedLayout);
+
+					instance._modal.hide();
+				},
+
 				_handleClearButtonClick() {
-					const instance = this;
+					var instance = this;
+
+					instance._clearedModal = true;
 
 					instance.setValue('');
+
+					instance.set(
+						'selectedLayout',
+						instance.get('selectedLayoutPath')[0]
+					);
 				},
 
 				_handleControlButtonsClick(event) {
-					const instance = this;
+					var instance = this;
 
 					if (!instance.get('readOnly')) {
-						const currentTarget = event.currentTarget;
+						var currentTarget = event.currentTarget;
 
 						if (currentTarget.test('.select-button')) {
 							instance._handleSelectButtonClick(event);
@@ -1866,46 +2116,790 @@ AUI.add(
 					}
 				},
 
-				_handleSelectButtonClick() {
-					const instance = this;
+				_handleListEntryClick(event) {
+					var instance = this;
 
-					Liferay.Util.openSelectionModal({
-						onSelect: (selectedItem) => {
-							if (selectedItem) {
-								instance.setValue({
-									groupId: selectedItem.groupId,
-									label: selectedItem.name,
-									layoutId: selectedItem.layoutId,
-									privateLayout: selectedItem.privateLayout,
-								});
+					var currentTarget = event.currentTarget;
+
+					var label = event.currentTarget.text();
+
+					var layoutId = event.currentTarget.getData('layoutId');
+
+					var groupId = Number(
+						event.currentTarget.getData('groupId')
+					);
+
+					var privateLayout = A.DataType.Boolean.parse(
+						event.currentTarget.getData('privateLayout')
+					);
+
+					if (event.target.hasClass('lfr-ddm-page-label')) {
+						if (currentTarget.getData('nodeType') === 'root') {
+							instance._cleanSelectedLayout();
+
+							instance._currentParentLayoutId = layoutId;
+
+							instance._showLoader(currentTarget);
+
+							var selectedLayoutPath = instance.get(
+								'selectedLayoutPath'
+							);
+
+							selectedLayoutPath.push({
+								groupId,
+								label,
+								layoutId,
+								privateLayout,
+							});
+
+							instance.set(
+								'selectedLayoutPath',
+								selectedLayoutPath
+							);
+
+							var listNode = instance._modal.bodyNode.one(
+								'.lfr-ddm-pages-container'
+							);
+
+							listNode.addClass('top-ended');
+
+							instance._requestInitialLayouts(
+								layoutId,
+								groupId,
+								privateLayout,
+								instance._renderLayouts
+							);
+						}
+						else if (
+							currentTarget.getData('nodeType') === 'leaf'
+						) {
+							var inputRadioNode = currentTarget
+								.getElementsByTagName('input')
+								.first();
+
+							inputRadioNode.attr('checked', 'true');
+
+							instance.set('selectedLayout', {
+								groupId,
+								label,
+								layoutId,
+								path: instance.get('selectedLayoutPath'),
+								privateLayout,
+							});
+						}
+					}
+					else if (event.target.hasClass('lfr-ddm-page-radio')) {
+						instance.set('selectedLayout', {
+							groupId,
+							label,
+							layoutId,
+							path: instance.get('selectedLayoutPath'),
+							privateLayout,
+						});
+					}
+				},
+
+				_handleModalScroll(event) {
+					var instance = this;
+
+					var listNode = event.currentTarget;
+
+					var innerHeight = listNode.innerHeight();
+
+					var scrollHeight = listNode.get('scrollHeight');
+					var scrollTop = listNode.get('scrollTop');
+
+					var delta = instance.get('delta');
+
+					var groupId = themeDisplay.getScopeGroupIdOrLiveGroupId();
+
+					var parentLayoutId = instance._currentParentLayoutId;
+
+					var privateLayout = !!instance._navbar
+						.one('.private')
+						.hasClass('active');
+
+					var key = [parentLayoutId, groupId, privateLayout].join(
+						'-'
+					);
+
+					if (!instance._isListNodeEmpty(key)) {
+						var cache = instance._getCache(key);
+
+						var end = cache.end;
+						var start = cache.start;
+
+						if (scrollTop === 0) {
+							start -= delta;
+
+							if (start < 0) {
+								start = 0;
+								end = cache.start;
 							}
-						},
-						selectEventName: 'selectLayout',
-						title: Liferay.Language.get('select-layout'),
-						url: instance.getLayoutSelectorURL(),
+
+							if (end > start) {
+								listNode.prepend(
+									instance._loadingAnimationNode
+								);
+
+								instance._requestLayouts(
+									parentLayoutId,
+									groupId,
+									privateLayout,
+									start,
+									end,
+									A.rbind(
+										'_renderLayoutsFragment',
+										instance,
+										key,
+										'up'
+									)
+								);
+							}
+						}
+						else if (
+							scrollHeight - (scrollTop + innerHeight) <=
+							1
+						) {
+							start = end;
+							end = start + delta;
+
+							if (
+								start <= cache.total &&
+								start != cache.oldStart
+							) {
+								cache.oldStart = start;
+
+								listNode.append(instance._loadingAnimationNode);
+
+								instance._requestLayouts(
+									parentLayoutId,
+									groupId,
+									privateLayout,
+									start,
+									end,
+									A.rbind(
+										'_renderLayoutsFragment',
+										instance,
+										key
+									)
+								);
+							}
+						}
+					}
+				},
+
+				_handleNavbarClick(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					event.container.one('.active').removeClass('active');
+
+					currentTarget.addClass('active');
+
+					instance._currentParentLayoutId = 0;
+
+					instance._cleanSelectedLayout();
+
+					var privateLayout = currentTarget.test('.private');
+
+					instance._resetBreadcrumb(privateLayout);
+					instance._renderLayoutsList(privateLayout);
+				},
+
+				_handleSelectButtonClick() {
+					var instance = this;
+
+					instance._openLinkToPageModal();
+				},
+
+				_hideLoader() {
+					var instance = this;
+
+					instance._loadingAnimationNode.remove();
+				},
+
+				_initBreadcrumb() {
+					var instance = this;
+
+					var breadcrumbNode = A.Node.create(TPL_PAGES_BREADCRUMB);
+
+					instance._modal.bodyNode.append(breadcrumbNode);
+
+					breadcrumbNode.delegate(
+						'click',
+						instance._handleBreadcrumbElementClick,
+						'.lfr-ddm-breadcrumb-element',
+						instance
+					);
+				},
+
+				_initLayoutsList() {
+					var instance = this;
+
+					var bodyNode = instance._modal.bodyNode;
+
+					if (!bodyNode.one('.lfr-ddm-pages-container')) {
+						var navNode = A.Node.create(TPL_PAGES_CONTAINER);
+
+						bodyNode.append(navNode);
+
+						navNode.delegate(
+							'click',
+							instance._handleListEntryClick,
+							'.lfr-ddm-link',
+							instance
+						);
+					}
+				},
+
+				_isListNodeEmpty(key) {
+					var instance = this;
+
+					var cache = instance._getCache(key);
+
+					return !(cache && cache.layouts);
+				},
+
+				_openLinkToPageModal() {
+					var instance = this;
+
+					var value = instance.getParsedValue(instance.getValue());
+
+					var privateLayout = !!value.privateLayout;
+
+					var modal = instance._modal;
+
+					if (!modal) {
+						var config = instance._getModalConfig();
+
+						modal = Liferay.Util.Window.getWindow(config);
+
+						modal.render();
+
+						instance._modal = modal;
+
+						instance._initBreadcrumb();
+						instance._initLayoutsList();
+
+						instance._renderNavbar(privateLayout);
+						instance._renderBreadcrumb(
+							instance.get('selectedLayoutPath')
+						);
+						instance._renderLayoutsList(privateLayout);
+
+						var listNode = modal.bodyNode.one(
+							'.lfr-ddm-pages-container'
+						);
+
+						listNode.on(
+							'scroll',
+							instance._handleModalScroll,
+							instance
+						);
+					}
+					else if (instance._clearedModal) {
+						instance._navbar.one('.active').removeClass('active');
+
+						var activeClass = privateLayout
+							? '.private'
+							: '.public';
+
+						instance._navbar.one(activeClass).addClass('active');
+						instance._resetBreadcrumb(privateLayout);
+						instance._renderLayoutsList(privateLayout);
+						instance._clearedModal = false;
+					}
+
+					modal.show();
+
+					instance._syncModalHeight();
+				},
+
+				_renderBreadcrumb(layoutsPath) {
+					var instance = this;
+
+					var bodyNode = instance._modal.bodyNode;
+
+					var breadcrumbContainer = bodyNode.one(
+						'.lfr-ddm-breadcrumb'
+					);
+
+					breadcrumbContainer.empty();
+
+					var layoutsPathLenght = layoutsPath.length;
+
+					for (var index = 0; index < layoutsPathLenght; index++) {
+						var layoutPath = layoutsPath[index];
+
+						instance._addBreadcrumbElement(
+							layoutPath.label,
+							layoutPath.layoutId,
+							layoutPath.groupId,
+							layoutPath.privateLayout
+						);
+					}
+				},
+
+				_renderLayouts(layouts) {
+					var instance = this;
+
+					var bodyNode = instance._modal.bodyNode;
+
+					var listNode = bodyNode.one('.lfr-ddm-pages-container');
+
+					var selectedLayout = instance.get('selectedLayout');
+
+					listNode.empty();
+
+					layouts.forEach((layout) => {
+						var selected =
+							selectedLayout &&
+							layout.layoutId === selectedLayout.layoutId;
+
+						instance._addListElement(layout, listNode, selected);
 					});
+
+					instance._syncModalHeight();
+				},
+
+				_renderLayoutsFragment(layouts, key, direction) {
+					var instance = this;
+
+					var bodyNode = instance._modal.bodyNode;
+
+					var index;
+
+					var listNode = bodyNode.one('.lfr-ddm-pages-container');
+
+					instance._hideLoader();
+
+					var total = layouts.length;
+
+					if (direction === 'up') {
+						var cache = instance._getCache(key);
+
+						listNode.toggleClass('top-ended', cache.start === 0);
+
+						for (index = total - 1; index >= 0; index--) {
+							instance._addListElement(
+								layouts[index],
+								listNode,
+								false,
+								true
+							);
+						}
+
+						if (
+							cache.start > 0 &&
+							listNode.get('scrollTop') === 0
+						) {
+							listNode.set('scrollTop', 60);
+						}
+					}
+					else {
+						for (index = 0; index < total; index++) {
+							instance._addListElement(
+								layouts[index],
+								listNode,
+								false
+							);
+						}
+					}
+
+					instance._syncModalHeight();
+				},
+
+				_renderLayoutsList(privateLayout) {
+					var instance = this;
+
+					var bodyNode = instance._modal.bodyNode;
+
+					var listNode = bodyNode.one('.lfr-ddm-pages-container');
+
+					instance._showLoader(listNode);
+
+					instance._syncModalHeight();
+
+					var selectedLayout = instance.get('selectedLayout');
+
+					var groupId = themeDisplay.getScopeGroupIdOrLiveGroupId();
+
+					if (selectedLayout && selectedLayout.layoutId) {
+						instance._requestSiblingLayouts(
+							groupId,
+							privateLayout,
+							(layouts) => {
+								var key = [
+									instance._currentParentLayoutId,
+									groupId,
+									privateLayout,
+								].join('-');
+
+								var cache = instance._getCache(key);
+
+								listNode.toggleClass(
+									'top-ended',
+									cache.start === 0
+								);
+
+								instance._renderLayouts(layouts);
+
+								if (
+									cache.start > 0 &&
+									listNode.get('scrollTop') === 0
+								) {
+									listNode.set('scrollTop', 50);
+								}
+
+								instance._hideLoader();
+							}
+						);
+					}
+					else {
+						listNode.addClass('top-ended');
+
+						instance._requestInitialLayouts(
+							0,
+							groupId,
+							privateLayout,
+							instance._renderLayouts
+						);
+					}
+				},
+
+				_renderNavbar(privateLayout) {
+					var instance = this;
+
+					var navbar = instance._navbar;
+
+					if (!navbar) {
+						navbar = A.Node.create(
+							Lang.sub(TPL_LAYOUTS_NAVBAR, {
+								privateLayoutClass: privateLayout
+									? 'active'
+									: '',
+								publicLayoutClass: privateLayout
+									? ''
+									: 'active',
+							})
+						);
+
+						navbar.delegate(
+							'click',
+							instance._handleNavbarClick,
+							'li',
+							instance
+						);
+
+						instance._navbar = navbar;
+
+						navbar.insertBefore(navbar, instance._modal.bodyNode);
+					}
+				},
+
+				_requestInitialLayouts(
+					parentLayoutId,
+					groupId,
+					privateLayout,
+					callback
+				) {
+					var instance = this;
+
+					var end = instance.get('delta');
+
+					var start = 0;
+
+					instance._requestLayouts(
+						parentLayoutId,
+						groupId,
+						privateLayout,
+						start,
+						end,
+						callback
+					);
+				},
+
+				_requestLayouts(
+					parentLayoutId,
+					groupId,
+					privateLayout,
+					start,
+					end,
+					callback
+				) {
+					var instance = this;
+
+					var key = [parentLayoutId, groupId, privateLayout].join(
+						'-'
+					);
+
+					var cache = instance._getCache(key);
+
+					if (!cache || start <= cache.total) {
+						if (instance._canLoadMore(key, start, end)) {
+							const data = new URLSearchParams({
+								cmd: 'get',
+								end,
+								expandParentLayouts: false,
+								groupId,
+								p_auth: Liferay.authToken,
+								paginate: true,
+								parentLayoutId,
+								privateLayout,
+								start,
+							});
+
+							Liferay.Util.fetch(
+								themeDisplay.getPathMain() +
+									'/portal/get_layouts',
+								{
+									body: data,
+									method: 'POST',
+								}
+							)
+								.then((response) => {
+									return response.json();
+								})
+								.then((response) => {
+									var layouts = response && response.layouts;
+
+									if (layouts) {
+										instance._updateCache(
+											key,
+											layouts,
+											start,
+											end,
+											response.total
+										);
+
+										callback.call(instance, layouts);
+									}
+								});
+						}
+						else if (cache) {
+							callback.call(instance, cache.layouts);
+						}
+					}
+				},
+
+				_requestSiblingLayouts(groupId, privateLayout, callback) {
+					var instance = this;
+
+					var cache;
+
+					var path = instance.get('selectedLayoutPath');
+
+					var lastIndex = path.length - 1;
+
+					if (lastIndex >= 0) {
+						var parentLayout = path[lastIndex];
+
+						var key = [
+							parentLayout.layoutId,
+							parentLayout.groupId,
+							parentLayout.privateLayout,
+						].join('-');
+
+						cache = instance._getCache(key);
+					}
+
+					if (cache) {
+						callback.call(instance, cache.layouts);
+					}
+					else {
+						var selectedLayout = instance.get('selectedLayout');
+
+						const data = new URLSearchParams({
+							cmd: 'getSiblingLayoutsJSON',
+							expandParentLayouts: false,
+							groupId,
+							layoutId: selectedLayout.layoutId,
+							max: instance.get('delta'),
+							p_auth: Liferay.authToken,
+							paginate: true,
+							privateLayout,
+						});
+
+						Liferay.Util.fetch(
+							themeDisplay.getPathMain() + '/portal/get_layouts',
+							{
+								body: data,
+								method: 'POST',
+							}
+						)
+							.then((response) => {
+								return response.json();
+							})
+							.then((response) => {
+								var layouts = response && response.layouts;
+
+								if (layouts) {
+									var parentLayoutId =
+										response.ancestorLayoutIds[0];
+
+									var key = [
+										parentLayoutId,
+										groupId,
+										privateLayout,
+									].join('-');
+
+									var start = response.start;
+
+									var end = start + layouts.length;
+
+									instance._currentParentLayoutId = parentLayoutId;
+
+									instance._setSelectedLayoutPath(
+										groupId,
+										privateLayout,
+										response
+									);
+
+									instance._updateCache(
+										key,
+										layouts,
+										start,
+										end,
+										response.total
+									);
+
+									callback.call(instance, layouts);
+								}
+							})
+							.catch(() => {
+								var bodyNode = instance._modal.bodyNode;
+
+								var listNode = bodyNode.one(
+									'.lfr-ddm-pages-container'
+								);
+
+								listNode.addClass('top-ended');
+
+								instance._requestInitialLayouts(
+									0,
+									groupId,
+									privateLayout,
+									instance._renderLayouts
+								);
+							});
+					}
+				},
+
+				_resetBreadcrumb(privateLayout) {
+					var instance = this;
+
+					var selectedLayoutRoot = instance.get(
+						'selectedLayoutPath'
+					)[0];
+
+					selectedLayoutRoot.privateLayout = privateLayout;
+
+					instance.set('selectedLayoutPath', [selectedLayoutRoot]);
+				},
+
+				_setSelectedLayoutPath(groupId, privateLayout, response) {
+					var instance = this;
+
+					var ancestorLayoutIds = response.ancestorLayoutIds;
+
+					if (ancestorLayoutIds) {
+						var selectedLayoutPath = [
+							instance.get('selectedLayoutPath')[0],
+						];
+
+						var ancestorLayoutNames = response.ancestorLayoutNames;
+
+						for (
+							var index = ancestorLayoutIds.length - 1;
+							index >= 0;
+							index--
+						) {
+							selectedLayoutPath.push({
+								groupId,
+								label: ancestorLayoutNames[index],
+								layoutId: ancestorLayoutIds[index],
+								privateLayout,
+							});
+						}
+
+						instance.set('selectedLayoutPath', selectedLayoutPath);
+					}
+				},
+
+				_showLoader(node) {
+					var instance = this;
+
+					instance._loadingAnimationNode.appendTo(node);
+				},
+
+				_syncModalHeight() {
+					var instance = this;
+
+					var modal = instance._modal;
+
+					var bodyNode = modal.bodyNode;
+
+					modal.fillHeight(bodyNode);
+
+					bodyNode.set(
+						'offsetHeight',
+						Lang.toInt(bodyNode.get('offsetHeight')) -
+							Lang.toInt(instance._navbar.get('offsetHeight'))
+					);
+				},
+
+				_updateCache(key, layouts, start, end, total) {
+					var instance = this;
+
+					var cache = instance._cache[key];
+
+					if (!cache) {
+						var path = instance.get('selectedLayoutPath');
+
+						cache = {
+							end,
+							layouts,
+							oldStart: 0,
+							path: path.slice(),
+							start,
+							total,
+						};
+
+						instance._cache[key] = cache;
+					}
+					else {
+						var cachedLayouts = cache.layouts || [];
+
+						if (cache.start > start) {
+							cachedLayouts = layouts.concat(cachedLayouts);
+
+							cache.start = start;
+						}
+
+						if (cache.end < end) {
+							cachedLayouts = cachedLayouts.concat(layouts);
+
+							cache.end = end;
+						}
+
+						cache.layouts = cachedLayouts;
+					}
 				},
 
 				_validateField(fieldNode) {
-					const instance = this;
+					var instance = this;
 
-					const liferayForm = instance.get('liferayForm');
+					var liferayForm = instance.get('liferayForm');
 
 					if (liferayForm) {
-						const formValidator = liferayForm.formValidator;
+						var formValidator = liferayForm.formValidator;
 
 						if (formValidator) {
 							formValidator.validateField(fieldNode);
 						}
 					}
-				},
-
-				getLayoutSelectorURL() {
-					const instance = this;
-
-					const form = instance.getForm();
-
-					return form.get('layoutSelectorURL');
 				},
 
 				getParsedValue(value) {
@@ -1922,17 +2916,33 @@ AUI.add(
 				},
 
 				getRuleInputName() {
-					const instance = this;
+					var instance = this;
 
-					const inputName = instance.getInputName();
+					var inputName = instance.getInputName();
 
 					return inputName + 'LayoutName';
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
+
+					instance._currentParentLayoutId = 0;
+					instance._loadingAnimationNode = A.Node.create(TPL_LOADER);
+
+					instance._cache = {};
+
+					instance._clearedModal = false;
+
+					instance.after(
+						'selectedLayoutChange',
+						instance._afterSelectedLayoutChange
+					);
+					instance.after(
+						'selectedLayoutPathChange',
+						instance._afterSelectedLayoutPathChange
+					);
 
 					container.delegate(
 						'click',
@@ -1943,17 +2953,17 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const inputName = instance.getInputName();
+					var inputName = instance.getInputName();
 
-					const layoutNameNode = container.one(
+					var layoutNameNode = container.one(
 						'input[name=' + inputName + 'LayoutName]'
 					);
 
-					const parsedValue = instance.getParsedValue(value);
+					var parsedValue = instance.getParsedValue(value);
 
 					if (parsedValue && parsedValue.layoutId) {
 						if (parsedValue.label) {
@@ -1970,7 +2980,7 @@ AUI.add(
 
 					instance._validateField(layoutNameNode);
 
-					const clearButtonNode = container.one(
+					var clearButtonNode = container.one(
 						'#' + inputName + 'ClearButton'
 					);
 
@@ -1980,19 +2990,19 @@ AUI.add(
 				},
 
 				syncReadOnlyUI() {
-					const instance = this;
+					var instance = this;
 
-					const readOnly = instance.getReadOnly();
+					var readOnly = instance.getReadOnly();
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const selectButtonNode = container.one(
+					var selectButtonNode = container.one(
 						'#' + instance.getInputName() + 'SelectButton'
 					);
 
 					selectButtonNode.attr('disabled', readOnly);
 
-					const clearButtonNode = container.one(
+					var clearButtonNode = container.one(
 						'#' + instance.getInputName() + 'ClearButton'
 					);
 
@@ -2005,12 +3015,12 @@ AUI.add(
 
 		FieldTypes.field = Field;
 
-		const FieldsetField = A.Component.create({
+		var FieldsetField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
 				getFieldNodes() {
-					const instance = this;
+					var instance = this;
 
 					return instance
 						.get('container')
@@ -2021,7 +3031,7 @@ AUI.add(
 
 		FieldTypes.fieldset = FieldsetField;
 
-		const ImageField = A.Component.create({
+		var ImageField = A.Component.create({
 			ATTRS: {
 				acceptedFileFormats: {
 					value: [
@@ -2037,11 +3047,11 @@ AUI.add(
 
 			prototype: {
 				_getImagePreviewURL() {
-					const instance = this;
+					var instance = this;
 
-					let imagePreviewURL;
+					var imagePreviewURL;
 
-					const value = instance.getParsedValue(instance.getValue());
+					var value = instance.getParsedValue(instance.getValue());
 
 					if (value.data) {
 						imagePreviewURL =
@@ -2060,9 +3070,9 @@ AUI.add(
 				},
 
 				_handleButtonsClick(event) {
-					const instance = this;
+					var instance = this;
 
-					const currentTarget = event.currentTarget;
+					var currentTarget = event.currentTarget;
 
 					if (currentTarget.test('.preview-button')) {
 						instance._handlePreviewButtonClick(event);
@@ -2075,7 +3085,7 @@ AUI.add(
 				},
 
 				_handlePreviewButtonClick() {
-					const instance = this;
+					var instance = this;
 
 					if (!instance.viewer) {
 						instance.viewer = new A.ImageViewer({
@@ -2096,7 +3106,7 @@ AUI.add(
 							)
 						);
 
-						const TPL_PLAYER_PAUSE =
+						var TPL_PLAYER_PAUSE =
 							'<span>' +
 							Liferay.Util.getLexiconIconTpl(
 								'pause',
@@ -2104,7 +3114,7 @@ AUI.add(
 							) +
 							'</span>';
 
-						const TPL_PLAYER_PLAY =
+						var TPL_PLAYER_PLAY =
 							'<span>' +
 							Liferay.Util.getLexiconIconTpl(
 								'play',
@@ -2126,12 +3136,12 @@ AUI.add(
 						instance.viewer.render();
 					}
 
-					const imagePreviewURL = instance._getImagePreviewURL();
+					var imagePreviewURL = instance._getImagePreviewURL();
 
-					const previewImageNode = A.one(
+					var previewImageNode = A.one(
 						'#' + instance.getInputName() + 'PreviewContainer img'
 					);
-					const previewLinkNode = A.one(
+					var previewLinkNode = A.one(
 						'#' + instance.getInputName() + 'PreviewContainer a'
 					);
 
@@ -2145,12 +3155,12 @@ AUI.add(
 				},
 
 				_validateField(fieldNode) {
-					const instance = this;
+					var instance = this;
 
-					const liferayForm = instance.get('liferayForm');
+					var liferayForm = instance.get('liferayForm');
 
 					if (liferayForm) {
-						const formValidator = liferayForm.formValidator;
+						var formValidator = liferayForm.formValidator;
 
 						if (formValidator) {
 							formValidator.validateField(fieldNode);
@@ -2159,21 +3169,21 @@ AUI.add(
 				},
 
 				getAltRuleInputName() {
-					const instance = this;
+					var instance = this;
 
-					const inputName = instance.getInputName();
+					var inputName = instance.getInputName();
 
 					return inputName + 'Alt';
 				},
 
 				getDocumentLibrarySelectorURL() {
-					const instance = this;
+					var instance = this;
 
-					const form = instance.getForm();
+					var form = instance.getForm();
 
-					const imageSelectorURL = form.get('imageSelectorURL');
+					var imageSelectorURL = form.get('imageSelectorURL');
 
-					let retVal = instance.getDocumentLibraryURL(
+					var retVal = instance.getDocumentLibraryURL(
 						'com.liferay.journal.item.selector.criterion.JournalItemSelectorCriterion,com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion'
 					);
 
@@ -2185,43 +3195,43 @@ AUI.add(
 				},
 
 				getDocumentLibraryURL(criteria) {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const parsedValue = instance.getParsedValue(
+					var parsedValue = instance.getParsedValue(
 						ImageField.superclass.getValue.apply(
 							instance,
 							arguments
 						)
 					);
 
-					const portletNamespace = instance.get('portletNamespace');
+					var portletNamespace = instance.get('portletNamespace');
 
-					const journalCriterionJSON = {
+					var journalCriterionJSON = {
 						desiredItemSelectorReturnTypes:
 							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
 						resourcePrimKey: parsedValue.resourcePrimKey,
 					};
 
-					const imageCriterionJSON = {
+					var imageCriterionJSON = {
 						desiredItemSelectorReturnTypes:
 							'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType,com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
 					};
 
-					const documentLibraryParameters = {
+					var documentLibraryParameters = {
 						'0_json': JSON.stringify(journalCriterionJSON),
 						'1_json': JSON.stringify(imageCriterionJSON),
 						criteria,
-						'itemSelectedEventName':
+						itemSelectedEventName:
 							portletNamespace + 'selectDocumentLibrary',
-						'p_p_auth': container.getData('itemSelectorAuthToken'),
-						'p_p_id': Liferay.PortletKeys.ITEM_SELECTOR,
-						'p_p_mode': 'view',
-						'p_p_state': 'pop_up',
+						p_p_auth: container.getData('itemSelectorAuthToken'),
+						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
+						p_p_mode: 'view',
+						p_p_state: 'pop_up',
 					};
 
-					const documentLibraryURL = Liferay.Util.PortletURL.createPortletURL(
+					var documentLibraryURL = Liferay.Util.PortletURL.createPortletURL(
 						themeDisplay.getLayoutRelativeControlPanelURL(),
 						documentLibraryParameters
 					);
@@ -2230,11 +3240,11 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					let value;
+					var value;
 
-					const parsedValue = instance.getParsedValue(
+					var parsedValue = instance.getParsedValue(
 						ImageField.superclass.getValue.apply(
 							instance,
 							arguments
@@ -2242,7 +3252,7 @@ AUI.add(
 					);
 
 					if (instance.isNotEmpty(parsedValue)) {
-						const altNode = A.one(
+						var altNode = A.one(
 							'input[name=' + instance.getInputName() + 'Alt]'
 						);
 
@@ -2258,9 +3268,9 @@ AUI.add(
 				},
 
 				isNotEmpty(value) {
-					const instance = this;
+					var instance = this;
 
-					const parsedValue = instance.getParsedValue(value);
+					var parsedValue = instance.getParsedValue(value);
 
 					return (
 						(Object.prototype.hasOwnProperty.call(
@@ -2276,16 +3286,16 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const parsedValue = instance.getParsedValue(value);
+					var parsedValue = instance.getParsedValue(value);
 
 					if (instance.isNotEmpty(parsedValue)) {
 						if (!parsedValue.name && parsedValue.title) {
 							parsedValue.name = parsedValue.title;
 						}
 
-						const altNode = A.one(
+						var altNode = A.one(
 							'input[name=' + instance.getInputName() + 'Alt]'
 						);
 
@@ -2306,21 +3316,21 @@ AUI.add(
 				},
 
 				syncUI() {
-					const instance = this;
+					var instance = this;
 
-					const parsedValue = instance.getParsedValue(
+					var parsedValue = instance.getParsedValue(
 						instance.getValue()
 					);
 
-					const notEmpty = instance.isNotEmpty(parsedValue);
+					var notEmpty = instance.isNotEmpty(parsedValue);
 
-					const altNode = A.one(
+					var altNode = A.one(
 						'input[name=' + instance.getInputName() + 'Alt]'
 					);
 
 					altNode.attr('disabled', !notEmpty);
 
-					const titleNode = A.one(
+					var titleNode = A.one(
 						'input[name=' + instance.getInputName() + 'Title]'
 					);
 
@@ -2336,13 +3346,13 @@ AUI.add(
 					instance._validateField(altNode);
 					instance._validateField(titleNode);
 
-					const clearButtonNode = A.one(
+					var clearButtonNode = A.one(
 						'#' + instance.getInputName() + 'ClearButton'
 					);
 
 					clearButtonNode.toggle(notEmpty);
 
-					const previewButtonNode = A.one(
+					var previewButtonNode = A.one(
 						'#' + instance.getInputName() + 'PreviewButton'
 					);
 
@@ -2353,12 +3363,12 @@ AUI.add(
 
 		FieldTypes['ddm-image'] = ImageField;
 
-		const GeolocationField = A.Component.create({
+		var GeolocationField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					Liferay.componentReady(instance.getInputName()).then(
 						(map) => {
@@ -2372,11 +3382,11 @@ AUI.add(
 				},
 
 				onPositionChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const inputName = instance.getInputName();
+					var inputName = instance.getInputName();
 
-					const location = event.newVal.location;
+					var location = event.newVal.location;
 
 					instance.setValue(
 						JSON.stringify({
@@ -2385,7 +3395,7 @@ AUI.add(
 						})
 					);
 
-					const locationNode = A.one(`#${inputName}Location`);
+					var locationNode = A.one(`#${inputName}Location`);
 
 					locationNode.html(event.newVal.address);
 				},
@@ -2394,26 +3404,26 @@ AUI.add(
 
 		FieldTypes['ddm-geolocation'] = GeolocationField;
 
-		const TextHTMLField = A.Component.create({
+		var TextHTMLField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
 				_afterRenderTextHTMLField() {
-					const instance = this;
+					var instance = this;
 
 					instance.editorContainer.placeAfter(instance.readOnlyText);
 				},
 
 				getEditor() {
-					const instance = this;
+					var instance = this;
 
 					return window[instance.getInputName() + 'Editor'];
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const editor = instance.getEditor();
+					var editor = instance.getEditor();
 
 					return isNode(editor)
 						? A.one(editor).val()
@@ -2421,9 +3431,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const editorComponentName =
+					var editorComponentName =
 						instance.getInputName() + 'Editor';
 
 					instance.editorContainer = A.one(
@@ -2441,9 +3451,9 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const editorComponentName =
+					var editorComponentName =
 						instance.getInputName() + 'Editor';
 
 					Liferay.componentReady(editorComponentName).then(function (
@@ -2456,7 +3466,7 @@ AUI.add(
 							);
 						}
 						else {
-							const localizationMap = instance.get(
+							var localizationMap = instance.get(
 								'localizationMap'
 							);
 
@@ -2485,11 +3495,11 @@ AUI.add(
 				},
 
 				syncReadOnlyUI() {
-					const instance = this;
+					var instance = this;
 
 					instance.readOnlyText.html(instance.getValue());
 
-					const readOnly = instance.getReadOnly();
+					var readOnly = instance.getReadOnly();
 
 					instance.readOnlyText.toggle(readOnly);
 
@@ -2500,14 +3510,14 @@ AUI.add(
 
 		FieldTypes['ddm-text-html'] = TextHTMLField;
 
-		const RadioField = A.Component.create({
+		var RadioField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
 				getInputNode() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
 					return container.one(
 						'[name=' + instance.getInputName() + ']:checked'
@@ -2515,9 +3525,9 @@ AUI.add(
 				},
 
 				getRadioNodes() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
 					return container.all(
 						'[name=' + instance.getInputName() + ']'
@@ -2525,9 +3535,9 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					let value = '';
+					var value = '';
 
 					if (instance.getInputNode()) {
 						value = RadioField.superclass.getValue.apply(
@@ -2540,18 +3550,18 @@ AUI.add(
 				},
 
 				setLabel() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
-					const fieldDefinition = instance.getFieldDefinition();
+					var fieldDefinition = instance.getFieldDefinition();
 
 					container.all('label').each((item, index) => {
-						const optionDefinition = fieldDefinition.options[index];
+						var optionDefinition = fieldDefinition.options[index];
 
-						const inputNode = item.one('input');
+						var inputNode = item.one('input');
 
-						const optionLabel =
+						var optionLabel =
 							optionDefinition.label[
 								instance.get('displayLocale')
 							];
@@ -2567,9 +3577,9 @@ AUI.add(
 				},
 
 				setValue(value) {
-					const instance = this;
+					var instance = this;
 
-					const radioNodes = instance.getRadioNodes();
+					var radioNodes = instance.getRadioNodes();
 
 					radioNodes.set('checked', false);
 
@@ -2581,11 +3591,11 @@ AUI.add(
 				},
 
 				syncReadOnlyUI() {
-					const instance = this;
+					var instance = this;
 
-					const readOnly = instance.getReadOnly();
+					var readOnly = instance.getReadOnly();
 
-					const radioNodes = instance.getRadioNodes();
+					var radioNodes = instance.getRadioNodes();
 
 					radioNodes.attr('disabled', readOnly);
 				},
@@ -2594,16 +3604,16 @@ AUI.add(
 
 		FieldTypes.radio = RadioField;
 
-		const SelectField = A.Component.create({
+		var SelectField = A.Component.create({
 			EXTENDS: RadioField,
 
 			prototype: {
 				_getOptions() {
-					const instance = this;
+					var instance = this;
 
-					const fieldDefinition = instance.getFieldDefinition();
+					var fieldDefinition = instance.getFieldDefinition();
 
-					let fieldOptions = fieldDefinition.options;
+					var fieldOptions = fieldDefinition.options;
 
 					if (fieldOptions && fieldOptions[0]) {
 						fieldOptions = fieldOptions.filter(
@@ -2616,8 +3626,8 @@ AUI.add(
 				},
 
 				_getPlaceholderOption() {
-					const instance = this;
-					const label = {};
+					var instance = this;
+					var label = {};
 
 					label[instance.get('displayLocale')] = '';
 
@@ -2628,7 +3638,7 @@ AUI.add(
 				},
 
 				getInputNode() {
-					const instance = this;
+					var instance = this;
 
 					return Field.prototype.getInputNode.apply(
 						instance,
@@ -2637,15 +3647,18 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const selectedItems = instance
+					var selectedItems = instance
 						.getInputNode()
 						.all('option:selected');
 
-					let value;
+					var value;
 
-					if (selectedItems._nodes && !!selectedItems._nodes.length) {
+					if (
+						selectedItems._nodes &&
+						selectedItems._nodes.length > 0
+					) {
 						value = selectedItems.val();
 					}
 					else {
@@ -2656,17 +3669,17 @@ AUI.add(
 				},
 
 				setLabel() {
-					const instance = this;
+					var instance = this;
 
-					const options = instance._getOptions();
+					var options = instance._getOptions();
 
 					instance
 						.getInputNode()
 						.all('option')
 						.each((item, index) => {
-							const optionDefinition = options[index];
+							var optionDefinition = options[index];
 
-							const optionLabel =
+							var optionLabel =
 								optionDefinition.label[
 									instance.get('displayLocale')
 								];
@@ -2679,39 +3692,17 @@ AUI.add(
 					Field.prototype.setLabel.apply(instance, arguments);
 				},
 
-				setValue(values) {
-					const instance = this;
-					const currentlyAvailableValues = instance
-						.getInputNode()
-						.all('option')
-						.val();
-					const predefinedValues = JSON.parse(
-						instance.getFieldByNameInFieldDefinition(
-							instance.get('name')
-						).predefinedValue[instance.get('displayLocale')]
-					);
+				setValue(value) {
+					var instance = this;
 
-					if (Lang.isString(values)) {
-						if (values !== '') {
-							values = JSON.parse(values);
+					if (Lang.isString(value)) {
+						if (value !== '') {
+							value = JSON.parse(value);
 						}
 						else {
-							values = [''];
+							value = [''];
 						}
 					}
-
-					let resultValues = [];
-
-					values.forEach((value) => {
-						if (!currentlyAvailableValues.includes(value)) {
-							resultValues.push(...predefinedValues);
-						}
-						else {
-							resultValues.push(value);
-						}
-					});
-
-					resultValues = [...new Set(resultValues)];
 
 					instance
 						.getInputNode()
@@ -2719,7 +3710,7 @@ AUI.add(
 						.each((item) => {
 							item.set(
 								'selected',
-								resultValues.indexOf(item.val()) > -1
+								value.indexOf(item.val()) > -1
 							);
 						});
 				},
@@ -2728,7 +3719,7 @@ AUI.add(
 
 		FieldTypes.select = SelectField;
 
-		const SeparatorField = A.Component.create({
+		var SeparatorField = A.Component.create({
 			EXTENDS: Field,
 
 			prototype: {
@@ -2740,7 +3731,7 @@ AUI.add(
 
 		FieldTypes['ddm-separator'] = SeparatorField;
 
-		const Form = A.Component.create({
+		var Form = A.Component.create({
 			ATTRS: {
 				availableLanguageIds: {
 					value: [],
@@ -2759,8 +3750,6 @@ AUI.add(
 				},
 
 				imageSelectorURL: {},
-
-				layoutSelectorURL: {},
 
 				liferayForm: {
 					valueFn: '_valueLiferayForm',
@@ -2789,9 +3778,9 @@ AUI.add(
 
 			prototype: {
 				_afterFormRegistered(event) {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.get('formNode');
+					var formNode = instance.get('formNode');
 
 					if (event.formName === formNode.attr('name')) {
 						instance.set('liferayForm', event.form);
@@ -2799,9 +3788,9 @@ AUI.add(
 				},
 
 				_afterRenderField(event) {
-					const instance = this;
+					var instance = this;
 
-					const field = event.field;
+					var field = event.field;
 
 					if (field.get('repeatable')) {
 						instance.registerRepeatable(field);
@@ -2809,18 +3798,18 @@ AUI.add(
 				},
 
 				_afterRepeatableDragAlign() {
-					const DDM = A.DD.DDM;
+					var DDM = A.DD.DDM;
 
 					DDM.syncActiveShims();
 					DDM._dropMove();
 				},
 
 				_afterRepeatableDragEnd(event, parentField) {
-					const instance = this;
+					var instance = this;
 
-					const node = event.target.get('node');
+					var node = event.target.get('node');
 
-					let oldIndex = -1;
+					var oldIndex = -1;
 
 					parentField.get('fields').some((item, index) => {
 						oldIndex = index;
@@ -2831,7 +3820,7 @@ AUI.add(
 						);
 					});
 
-					const newIndex = node
+					var newIndex = node
 						.ancestor()
 						.all('> .field-wrapper')
 						.indexOf(node);
@@ -2840,23 +3829,23 @@ AUI.add(
 				},
 
 				_afterUpdateRepeatableFields(event) {
-					const instance = this;
+					var instance = this;
 
-					const field = event.field;
+					var field = event.field;
 
-					const liferayForm = instance.get('liferayForm');
+					var liferayForm = instance.get('liferayForm');
 
 					if (liferayForm) {
-						const validatorRules = liferayForm.formValidator.get(
+						var validatorRules = liferayForm.formValidator.get(
 							'rules'
 						);
 
 						if (event.type === 'liferay-ddm-field:repeat') {
-							const originalField = event.originalField;
+							var originalField = event.originalField;
 
-							const originalFieldRuleInputName = originalField.getRuleInputName();
+							var originalFieldRuleInputName = originalField.getRuleInputName();
 
-							let originalFieldRules =
+							var originalFieldRules =
 								validatorRules[originalFieldRuleInputName];
 
 							if (originalFieldRules) {
@@ -2866,7 +3855,7 @@ AUI.add(
 							}
 
 							if (field.get('dataType') === 'image') {
-								const originalAltRuleInputName = originalField.getAltRuleInputName();
+								var originalAltRuleInputName = originalField.getAltRuleInputName();
 
 								originalFieldRules =
 									validatorRules[originalAltRuleInputName];
@@ -2885,7 +3874,7 @@ AUI.add(
 								field.getRuleInputName()
 							];
 
-							const inputNode = field.getInputNode();
+							var inputNode = field.getInputNode();
 
 							if (inputNode) {
 								liferayForm.formValidator.resetField(inputNode);
@@ -2901,9 +3890,9 @@ AUI.add(
 				},
 
 				_onDefaultLocaleChanged(event) {
-					const instance = this;
+					var instance = this;
 
-					const definition = instance.get('definition');
+					var definition = instance.get('definition');
 
 					definition.defaultLanguageId = event.item.getAttribute(
 						'data-value'
@@ -2913,9 +3902,9 @@ AUI.add(
 				},
 
 				_onLiferaySubmitForm(event) {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.get('formNode');
+					var formNode = instance.get('formNode');
 
 					if (event.form.attr('name') === formNode.attr('name')) {
 						instance.updateDDMFormInputValue();
@@ -2923,16 +3912,16 @@ AUI.add(
 				},
 
 				_onSubmitForm() {
-					const instance = this;
+					var instance = this;
 
 					instance.updateDDMFormInputValue();
 				},
 
 				_updateNestedLocalizationMaps(fields) {
-					const instance = this;
+					var instance = this;
 
 					fields.forEach((field) => {
-						const nestedFields = field.get('fields');
+						var nestedFields = field.get('fields');
 
 						field.updateLocalizationMap(field.get('displayLocale'));
 
@@ -2945,19 +3934,19 @@ AUI.add(
 				},
 
 				_valueFormNode() {
-					const instance = this;
+					var instance = this;
 
-					const container = instance.get('container');
+					var container = instance.get('container');
 
 					return container.ancestor('form', true);
 				},
 
 				_valueLiferayForm() {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.get('formNode');
+					var formNode = instance.get('formNode');
 
-					let formName = null;
+					var formName = null;
 
 					if (formNode) {
 						formName = formNode.attr('name');
@@ -2967,23 +3956,23 @@ AUI.add(
 				},
 
 				addAvailableLanguageIds(availableLanguageIds) {
-					const instance = this;
+					var instance = this;
 
-					const currentAvailableLanguageIds = instance.get(
+					var currentAvailableLanguageIds = instance.get(
 						'availableLanguageIds'
 					);
 
 					availableLanguageIds.forEach((item) => {
-						if (currentAvailableLanguageIds.indexOf(item) === -1) {
+						if (currentAvailableLanguageIds.indexOf(item) == -1) {
 							currentAvailableLanguageIds.push(item);
 						}
 					});
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const formNode = instance.get('formNode');
+					var formNode = instance.get('formNode');
 
 					if (formNode) {
 						instance.eventHandlers.push(
@@ -3029,7 +4018,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					AArray.invoke(instance.eventHandlers, 'detach');
 					AArray.invoke(instance.get('fields'), 'destroy');
@@ -3048,14 +4037,12 @@ AUI.add(
 				fillEmptyLocales(instance, fields, availableLanguageIds) {
 					fields.forEach((field) => {
 						if (field.get('localizable')) {
-							const localizationMap = field.get(
-								'localizationMap'
-							);
+							var localizationMap = field.get('localizationMap');
 
-							const defaultLocale = field.getDefaultLocale();
+							var defaultLocale = field.getDefaultLocale();
 
 							availableLanguageIds.forEach((locale) => {
-								if (localizationMap[locale] === undefined) {
+								if (!localizationMap[locale]) {
 									localizationMap[locale] =
 										localizationMap[defaultLocale];
 								}
@@ -3073,13 +4060,13 @@ AUI.add(
 				},
 
 				finalizeRepeatableFieldLocalizations() {
-					const instance = this;
+					var instance = this;
 
-					const defaultLocale = instance.getDefaultLocale();
+					var defaultLocale = instance.getDefaultLocale();
 
 					Object.keys(instance.newRepeatableInstances).forEach(
 						(x) => {
-							const field = instance.newRepeatableInstances[x];
+							var field = instance.newRepeatableInstances[x];
 
 							if (!field.get('localizable')) {
 								return;
@@ -3100,7 +4087,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.eventHandlers = [];
 					instance.newRepeatableInstances = [];
@@ -3111,9 +4098,9 @@ AUI.add(
 				},
 
 				moveField(parentField, oldIndex, newIndex) {
-					const instance = this;
+					var instance = this;
 
-					const fields = parentField.get('fields');
+					var fields = parentField.get('fields');
 
 					fields.splice(newIndex, 0, fields.splice(oldIndex, 1)[0]);
 
@@ -3125,13 +4112,13 @@ AUI.add(
 					originalField,
 					repeatedField
 				) {
-					const instance = this;
+					var instance = this;
 
-					const newFieldLocalizations = repeatedField.get(
+					var newFieldLocalizations = repeatedField.get(
 						'localizationMap'
 					);
 
-					let totalLocalizations = {};
+					var totalLocalizations = {};
 
 					if (originalField) {
 						totalLocalizations = originalField.get(
@@ -3139,15 +4126,15 @@ AUI.add(
 						);
 					}
 
-					const currentLocale = repeatedField.get('displayLocale');
+					var currentLocale = repeatedField.get('displayLocale');
 
-					const localizations = Object.keys(totalLocalizations);
+					var localizations = Object.keys(totalLocalizations);
 
 					localizations.push(currentLocale);
 
 					localizations.forEach((localization) => {
 						if (!newFieldLocalizations[localization]) {
-							let localizationValue = '';
+							var localizationValue = '';
 
 							if (newFieldLocalizations[defaultLocale]) {
 								localizationValue =
@@ -3169,15 +4156,15 @@ AUI.add(
 
 					repeatedField.set('localizationMap', newFieldLocalizations);
 
-					const newNestedFields = repeatedField.get('fields');
+					var newNestedFields = repeatedField.get('fields');
 
-					let originalNestedFields = [];
+					var originalNestedFields = [];
 
 					if (originalField) {
 						originalNestedFields = originalField.get('fields');
 					}
 
-					for (let i = 0; i < newNestedFields.length; i++) {
+					for (var i = 0; i < newNestedFields.length; i++) {
 						instance.populateBlankLocalizationMap(
 							defaultLocale,
 							originalNestedFields[i],
@@ -3187,22 +4174,22 @@ AUI.add(
 				},
 
 				recreateEditor(field) {
-					const usingCKEditor =
+					var usingCKEditor =
 						CKEDITOR &&
 						CKEDITOR.instances &&
 						CKEDITOR.instances[field.getInputName() + 'Editor'];
 
-					const editor = field.getEditor();
+					var editor = field.getEditor();
 
-					const nativeEditor = editor.getNativeEditor();
+					var nativeEditor = editor.getNativeEditor();
 
-					const usingAlloyEditor =
+					var usingAlloyEditor =
 						nativeEditor &&
 						nativeEditor._editor &&
 						nativeEditor._editor.window.$.AlloyEditor;
 
 					if (usingCKEditor && !usingAlloyEditor) {
-						const html = editor.getHTML();
+						var html = editor.getHTML();
 
 						editor.dispose();
 
@@ -3215,20 +4202,20 @@ AUI.add(
 				},
 
 				recreateEditors(field) {
-					const instance = this;
+					var instance = this;
 
-					const fieldDefinition = field.getFieldDefinition();
+					var fieldDefinition = field.getFieldDefinition();
 
 					if (fieldDefinition) {
-						const type = fieldDefinition.type;
+						var type = fieldDefinition.type;
 
 						if (type === 'ddm-text-html') {
 							instance.recreateEditor(field);
 						}
 
-						const nestedFields = field.get('fields');
+						var nestedFields = field.get('fields');
 
-						if (!nestedFields || !nestedFields.length) {
+						if (!nestedFields || nestedFields.length == 0) {
 							return;
 						}
 
@@ -3239,24 +4226,24 @@ AUI.add(
 				},
 
 				registerRepeatable(field) {
-					const instance = this;
+					var instance = this;
 
-					const fieldName = field.get('name');
+					var fieldName = field.get('name');
 
-					const fieldContainer = field.get('container');
+					var fieldContainer = field.get('container');
 
-					const parentField = field.get('parent');
+					var parentField = field.get('parent');
 
-					const parentNode = fieldContainer.get('parentNode');
+					var parentNode = fieldContainer.get('parentNode');
 
-					const treeName =
+					var treeName =
 						fieldName + '_' + parentField.get('instanceId');
 
-					let repeatableInstance =
+					var repeatableInstance =
 						instance.repeatableInstances[treeName];
 
 					if (!repeatableInstance) {
-						const ddPlugins = [];
+						var ddPlugins = [];
 
 						if (Liferay.Util.getTop() === A.config.win) {
 							ddPlugins.push({
@@ -3298,15 +4285,15 @@ AUI.add(
 									'<div class="form-builder-placeholder"></div>'
 								),
 								sortCondition(event) {
-									const dropNode = event.drop.get('node');
+									var dropNode = event.drop.get('node');
 
-									const dropNodeAncestor = dropNode.ancestor();
+									var dropNodeAncestor = dropNode.ancestor();
 
-									const dragNode = event.drag.get('node');
+									var dragNode = event.drag.get('node');
 
-									const dragNodeAncestor = dragNode.ancestor();
+									var dragNodeAncestor = dragNode.ancestor();
 
-									let retVal =
+									var retVal =
 										dropNode.getData('fieldName') ===
 										fieldName;
 
@@ -3348,7 +4335,7 @@ AUI.add(
 						fieldContainer.removeAttribute('draggable');
 					}
 
-					const drag = A.DD.DDM.getDrag(fieldContainer);
+					var drag = A.DD.DDM.getDrag(fieldContainer);
 
 					drag.addInvalid('.alloy-editor');
 					drag.addInvalid('.cke');
@@ -3357,17 +4344,17 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					AArray.invoke(instance.get('fields'), 'renderUI');
 				},
 
 				toJSON() {
-					const instance = this;
+					var instance = this;
 
-					const definition = instance.get('definition');
+					var definition = instance.get('definition');
 
-					const fieldValues = AArray.invoke(
+					var fieldValues = AArray.invoke(
 						instance.get('fields'),
 						'toJSON'
 					);
@@ -3388,11 +4375,11 @@ AUI.add(
 				},
 
 				updateDDMFormInputValue() {
-					const instance = this;
+					var instance = this;
 
 					instance.toJSON();
 
-					const fields = instance.get('fields');
+					var fields = instance.get('fields');
 
 					instance._updateNestedLocalizationMaps(fields);
 
@@ -3404,9 +4391,7 @@ AUI.add(
 
 					instance.finalizeRepeatableFieldLocalizations();
 
-					const ddmFormValuesInput = instance.get(
-						'ddmFormValuesInput'
-					);
+					var ddmFormValuesInput = instance.get('ddmFormValuesInput');
 
 					ddmFormValuesInput.val(JSON.stringify(instance.toJSON()));
 				},
@@ -3418,18 +4403,18 @@ AUI.add(
 
 			prototype: {
 				_createDrag(node) {
-					const instance = this;
+					var instance = this;
 
-					const helper = instance.get('helper');
+					var helper = instance.get('helper');
 
 					if (!A.DD.DDM.getDrag(node)) {
-						const dragOptions = {
+						var dragOptions = {
 							bubbleTargets: instance,
 							node,
 							target: true,
 						};
 
-						const proxyOptions = instance.get('proxy');
+						var proxyOptions = instance.get('proxy');
 
 						if (helper) {
 							proxyOptions.borderStyle = null;
@@ -3458,6 +4443,9 @@ AUI.add(
 			'aui-sortable-list',
 			'json',
 			'liferay-form',
+			'liferay-layouts-tree',
+			'liferay-layouts-tree-radio',
+			'liferay-layouts-tree-selectable',
 			'liferay-map-base',
 			'liferay-translation-manager',
 		],

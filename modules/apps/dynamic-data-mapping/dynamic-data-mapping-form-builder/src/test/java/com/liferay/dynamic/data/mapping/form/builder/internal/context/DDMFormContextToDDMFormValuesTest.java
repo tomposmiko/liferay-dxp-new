@@ -29,11 +29,11 @@ import com.liferay.portal.json.JSONObjectImpl;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.ArrayList;
@@ -43,40 +43,32 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Rodrigo Paulino
  */
-public class DDMFormContextToDDMFormValuesTest {
+@RunWith(MockitoJUnitRunner.class)
+public class DDMFormContextToDDMFormValuesTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
-	@BeforeClass
-	public static void setUpClass() {
-		_ddmFormContextToDDMFormValues = new DDMFormContextToDDMFormValues();
-
-		ReflectionTestUtil.setFieldValue(
-			_ddmFormContextToDDMFormValues, "jsonFactory",
-			new JSONFactoryImpl());
-
-		LanguageUtil languageUtil = new LanguageUtil();
-
-		languageUtil.setLanguage(Mockito.mock(Language.class));
-
-		Mockito.when(
-			LanguageUtil.isAvailableLocale(LocaleUtil.BRAZIL)
-		).thenReturn(
-			true
-		);
+	@Before
+	public void setUp() throws Exception {
+		_setUpDDMFormContextToDDMFormValues();
+		_setUpLanguageUtil();
 	}
 
 	@Test
@@ -94,7 +86,7 @@ public class DDMFormContextToDDMFormValuesTest {
 
 		DDMFormContextDeserializerRequest ddmFormContextDeserializerRequest =
 			DDMFormContextDeserializerRequest.with(
-				ddmForm, _read("ddm-form-values.json"));
+				ddmForm, read("ddm-form-values.json"));
 
 		ddmFormContextDeserializerRequest.addProperty(
 			"currentLocale", LocaleUtil.BRAZIL);
@@ -152,7 +144,7 @@ public class DDMFormContextToDDMFormValuesTest {
 
 		List<DDMFormFieldValue> actualDDMFormFieldValues =
 			_ddmFormContextToDDMFormValues.getDDMFormFieldValues(
-				new JSONArrayImpl(_read("ddm-form-values-pages-only.json")),
+				new JSONArrayImpl(read("ddm-form-values-pages-only.json")),
 				ddmForm);
 
 		Assert.assertTrue(
@@ -182,15 +174,7 @@ public class DDMFormContextToDDMFormValuesTest {
 		Assert.assertTrue(Objects.equals(value1, value2));
 	}
 
-	private LocalizedValue _createLocalizedValue(Locale locale, String value) {
-		LocalizedValue localizedValue = new LocalizedValue();
-
-		localizedValue.addString(locale, value);
-
-		return localizedValue;
-	}
-
-	private String _read(String fileName) throws Exception {
+	protected String read(String fileName) throws IOException {
 		Class<?> clazz = getClass();
 
 		InputStream inputStream = clazz.getResourceAsStream(
@@ -199,6 +183,39 @@ public class DDMFormContextToDDMFormValuesTest {
 		return StringUtil.read(inputStream);
 	}
 
-	private static DDMFormContextToDDMFormValues _ddmFormContextToDDMFormValues;
+	private LocalizedValue _createLocalizedValue(Locale locale, String value) {
+		LocalizedValue localizedValue = new LocalizedValue();
+
+		localizedValue.addString(locale, value);
+
+		return localizedValue;
+	}
+
+	private void _setUpDDMFormContextToDDMFormValues() throws Exception {
+		_ddmFormContextToDDMFormValues = new DDMFormContextToDDMFormValues();
+
+		field(
+			DDMFormContextToDDMFormValues.class, "jsonFactory"
+		).set(
+			_ddmFormContextToDDMFormValues, new JSONFactoryImpl()
+		);
+	}
+
+	private void _setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		languageUtil.setLanguage(_language);
+
+		when(
+			_language.isAvailableLocale(LocaleUtil.BRAZIL)
+		).thenReturn(
+			true
+		);
+	}
+
+	private DDMFormContextToDDMFormValues _ddmFormContextToDDMFormValues;
+
+	@Mock
+	private Language _language;
 
 }

@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + CategoryFacetPortletKeys.CATEGORY_FACET,
 	service = PortletSharedSearchContributor.class
 )
@@ -56,18 +57,13 @@ public class CategoryFacetPortletSharedSearchContributor
 			).maxTerms(
 				categoryFacetPortletPreferences.getMaxTerms()
 			).selectedCategoryIds(
-				_toLongArray(
+				toLongArray(
 					portletSharedSearchSettings.getParameterValues(
 						categoryFacetPortletPreferences.getParameterName()))
-			).vocabularyIds(
-				categoryFacetPortletPreferences.getVocabularyIds()
 			));
 	}
 
-	@Reference
-	protected CategoryFacetSearchContributor categoryFacetSearchContributor;
-
-	private long[] _toLongArray(String[] parameterValues) {
+	protected static long[] toLongArray(String[] parameterValues) {
 		if (!ArrayUtil.isEmpty(parameterValues)) {
 			return ListUtil.toLongArray(
 				Arrays.asList(parameterValues), GetterUtil::getLong);
@@ -75,5 +71,8 @@ public class CategoryFacetPortletSharedSearchContributor
 
 		return new long[0];
 	}
+
+	@Reference
+	protected CategoryFacetSearchContributor categoryFacetSearchContributor;
 
 }

@@ -30,10 +30,6 @@ public class DLFileVersionPreviewLocalServiceWrapper
 	implements DLFileVersionPreviewLocalService,
 			   ServiceWrapper<DLFileVersionPreviewLocalService> {
 
-	public DLFileVersionPreviewLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLFileVersionPreviewLocalServiceWrapper(
 		DLFileVersionPreviewLocalService dlFileVersionPreviewLocalService) {
 

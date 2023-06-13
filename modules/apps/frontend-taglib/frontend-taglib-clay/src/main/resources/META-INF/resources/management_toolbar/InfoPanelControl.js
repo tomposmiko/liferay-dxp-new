@@ -13,14 +13,10 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import classNames from 'classnames';
-import {ManagementToolbar} from 'frontend-js-components-web';
-import React, {useContext, useEffect, useRef} from 'react';
+import ClayManagementToolbar from '@clayui/management-toolbar';
+import React, {useEffect, useRef} from 'react';
 
-import FeatureFlagContext from './FeatureFlagContext';
-
-const InfoPanelControl = ({infoPanelId, onInfoButtonClick, separator}) => {
-	const {showDesignImprovements} = useContext(FeatureFlagContext);
+const InfoPanelControl = ({infoPanelId, onInfoButtonClick}) => {
 	const infoButtonRef = useRef();
 
 	useEffect(() => {
@@ -46,14 +42,7 @@ const InfoPanelControl = ({infoPanelId, onInfoButtonClick, separator}) => {
 	}, [infoButtonRef, infoPanelId]);
 
 	return (
-		<ManagementToolbar.Item
-			className={
-				showDesignImprovements &&
-				classNames('d-none d-md-flex', {
-					'management-bar-separator-left': separator,
-				})
-			}
-		>
+		<ClayManagementToolbar.Item>
 			<ClayButtonWithIcon
 				className="nav-link nav-link-monospaced"
 				displayType="unstyled"
@@ -61,9 +50,8 @@ const InfoPanelControl = ({infoPanelId, onInfoButtonClick, separator}) => {
 				onClick={onInfoButtonClick}
 				ref={infoButtonRef}
 				symbol="info-circle-open"
-				title={Liferay.Language.get('toggle-info-panel')}
 			/>
-		</ManagementToolbar.Item>
+		</ClayManagementToolbar.Item>
 	);
 };
 

@@ -18,14 +18,15 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalServiceUtil;
-import com.liferay.petra.string.StringPool;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsEntryConstants;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -61,14 +62,17 @@ public class AssetListItemsDisplayContext {
 			_renderRequest, _getAssetListContentURL(), null,
 			"there-are-no-asset-entries");
 
-		searchContainer.setResultsAndTotal(
-			() -> _assetListAssetEntryProvider.getAssetEntries(
-				getAssetListEntry(), new long[] {getSegmentsEntryId()}, null,
-				null, StringPool.BLANK, StringPool.BLANK,
-				searchContainer.getStart(), searchContainer.getEnd()),
-			_assetListAssetEntryProvider.getAssetEntriesCount(
-				getAssetListEntry(), new long[] {getSegmentsEntryId()}, null,
-				null, StringPool.BLANK, StringPool.BLANK));
+		List<AssetEntry> assetEntries =
+			_assetListAssetEntryProvider.getAssetEntries(
+				getAssetListEntry(), getSegmentsEntryId(),
+				searchContainer.getStart(), searchContainer.getEnd());
+
+		searchContainer.setResults(assetEntries);
+
+		int total = _assetListAssetEntryProvider.getAssetEntriesCount(
+			getAssetListEntry(), getSegmentsEntryId());
+
+		searchContainer.setTotal(total);
 
 		_assetListContentSearchContainer = searchContainer;
 

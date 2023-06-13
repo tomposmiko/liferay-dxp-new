@@ -34,7 +34,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Preston Crary
  */
-@Component(enabled = false, service = ServiceMonitoringControl.class)
+@Component(
+	enabled = false, immediate = true, service = ServiceMonitoringControl.class
+)
 public class ServiceMonitoringControlImpl implements ServiceMonitoringControl {
 
 	@Override

@@ -18,21 +18,18 @@ import {SLAContext} from '../../../../src/main/resources/META-INF/resources/js/c
 import SLAListPage from '../../../../src/main/resources/META-INF/resources/js/components/sla/list-page/SLAListPage.es';
 import ToasterProvider from '../../../../src/main/resources/META-INF/resources/js/shared/components/toaster/ToasterProvider.es';
 import {MockRouter} from '../../../mock/MockRouter.es';
-import FetchMock, {fetchMockResponse} from '../../../mock/fetch.es';
 
 describe('The SLAListPage component should', () => {
 	describe('Be rendered correctly with no items', () => {
-		let getByTitle;
-		let getByText;
+		let getByTitle, getByText;
+
+		const clientMock = {
+			get: jest.fn().mockResolvedValue({data: {items: []}}),
+		};
 
 		beforeAll(async () => {
-			fetch.mockImplementation(async () => ({
-				json: async () => ({items: []}),
-				ok: true,
-			}));
-
 			const renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<ToasterProvider>
 						<SLAContext.Provider value={{}}>
 							<SLAListPage
@@ -70,9 +67,7 @@ describe('The SLAListPage component should', () => {
 	});
 
 	describe('Be rendered correctly with items', () => {
-		let container;
-		let fetchMock;
-		let getByText;
+		let container, getByText;
 
 		const data = {
 			actions: {},
@@ -89,26 +84,18 @@ describe('The SLAListPage component should', () => {
 			totalCount: 1,
 		};
 
+		const clientMock = {
+			delete: jest.fn().mockRejectedValueOnce({}).mockResolvedValue({}),
+			get: jest.fn().mockResolvedValue({data}),
+		};
+
 		const contextMock = {SLAUpdated: true, setSLAUpdated: jest.fn()};
 
 		beforeAll(async () => {
 			cleanup();
-			fetch.mockReset();
-
-			fetchMock = new FetchMock({
-				DELETE: {
-					'/o/portal-workflow-metrics/v1.0/slas/37975': [
-						fetchMockResponse({}, false),
-						fetchMockResponse(),
-					],
-				},
-				GET: {
-					default: fetchMockResponse(data),
-				},
-			});
 
 			const renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<ToasterProvider>
 						<SLAContext.Provider value={contextMock}>
 							<SLAListPage
@@ -127,14 +114,6 @@ describe('The SLAListPage component should', () => {
 			await act(async () => {
 				jest.runAllTimers();
 			});
-		});
-
-		beforeEach(() => {
-			fetchMock.mock();
-		});
-
-		afterEach(() => {
-			fetchMock.reset();
 		});
 
 		it('Show table columns', () => {
@@ -219,7 +198,7 @@ describe('The SLAListPage component should', () => {
 			});
 		});
 
-		it.skip('Display toast when confirm item delete', () => {
+		it('Display toast when confirm item delete', () => {
 			const alertToast = document.querySelector('.alert-dismissible');
 
 			const alertClose = alertToast.children[1];
@@ -247,8 +226,7 @@ describe('The SLAListPage component should', () => {
 	});
 
 	describe('Be rendered correctly with blocked items', () => {
-		let container;
-		let getByText;
+		let container, getByText;
 
 		const data = {
 			actions: {},
@@ -307,18 +285,15 @@ describe('The SLAListPage component should', () => {
 			totalCount: 1,
 		};
 
+		const clientMock = {
+			get: jest.fn().mockResolvedValue({data}),
+		};
+
 		beforeAll(async () => {
 			cleanup();
 
-			fetch.mockReset();
-
-			fetch.mockImplementation(async () => ({
-				json: async () => data,
-				ok: true,
-			}));
-
 			const renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<ToasterProvider>
 						<SLAContext.Provider value={{}}>
 							<SLAListPage

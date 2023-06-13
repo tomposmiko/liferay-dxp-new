@@ -14,8 +14,6 @@
 
 package com.liferay.asset.categories.admin.web.internal.exportimport.data.handler;
 
-import com.liferay.asset.categories.admin.web.internal.exportimport.data.handler.helper.AssetVocabularySettingsExportHelper;
-import com.liferay.asset.categories.admin.web.internal.exportimport.data.handler.helper.AssetVocabularySettingsImportHelper;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
@@ -51,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gergely Mathe
  * @author Máté Thurzó
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class AssetVocabularyStagedModelDataHandler
 	extends BaseStagedModelDataHandler<AssetVocabulary> {
 
@@ -126,7 +124,7 @@ public class AssetVocabularyStagedModelDataHandler
 
 		String displayName = referenceElement.attributeValue("display-name");
 
-		return _validateMissingReference(uuid, groupId, displayName);
+		return validateMissingReference(uuid, groupId, displayName);
 	}
 
 	protected ServiceContext createServiceContext(
@@ -160,7 +158,7 @@ public class AssetVocabularyStagedModelDataHandler
 
 		vocabulary.setUserUuid(vocabulary.getUserUuid());
 
-		_exportSettingsMetadata(
+		exportSettingsMetadata(
 			portletDataContext, vocabulary, vocabularyElement, locale);
 
 		portletDataContext.addReferenceElement(
@@ -204,7 +202,7 @@ public class AssetVocabularyStagedModelDataHandler
 			portletDataContext, vocabulary);
 
 		vocabulary.setSettings(
-			_getImportSettings(portletDataContext, vocabulary));
+			getImportSettings(portletDataContext, vocabulary));
 
 		AssetVocabulary importedVocabulary = null;
 
@@ -212,7 +210,7 @@ public class AssetVocabularyStagedModelDataHandler
 			vocabulary.getUuid(), portletDataContext.getScopeGroupId());
 
 		if (existingVocabulary == null) {
-			String name = _getVocabularyName(
+			String name = getVocabularyName(
 				null, portletDataContext.getScopeGroupId(),
 				vocabulary.getName(), 2);
 
@@ -222,19 +220,19 @@ public class AssetVocabularyStagedModelDataHandler
 				vocabulary.getExternalReferenceCode(), userId,
 				portletDataContext.getScopeGroupId(), StringPool.BLANK,
 				vocabulary.getTitle(),
-				_getVocabularyTitleMap(
+				getVocabularyTitleMap(
 					portletDataContext.getScopeGroupId(), vocabulary, name),
 				vocabulary.getDescriptionMap(), vocabulary.getSettings(),
 				vocabulary.getVisibilityType(), serviceContext);
 		}
 		else {
-			String name = _getVocabularyName(
+			String name = getVocabularyName(
 				vocabulary.getUuid(), portletDataContext.getScopeGroupId(),
 				vocabulary.getName(), 2);
 
 			importedVocabulary = _assetVocabularyLocalService.updateVocabulary(
 				existingVocabulary.getVocabularyId(), StringPool.BLANK,
-				_getVocabularyTitleMap(
+				getVocabularyTitleMap(
 					portletDataContext.getScopeGroupId(), vocabulary, name),
 				vocabulary.getDescriptionMap(), vocabulary.getSettings(),
 				serviceContext);
@@ -252,10 +250,10 @@ public class AssetVocabularyStagedModelDataHandler
 			importedVocabulary.getVocabularyId());
 	}
 
-	private void _exportSettingsMetadata(
+	protected void exportSettingsMetadata(
 			PortletDataContext portletDataContext, AssetVocabulary vocabulary,
 			Element vocabularyElement, Locale locale)
-		throws Exception {
+		throws PortalException {
 
 		String settingsMetadataPath = ExportImportPathUtil.getModelPath(
 			vocabulary, _SETTINGS_METADATA + ".json");
@@ -273,15 +271,15 @@ public class AssetVocabularyStagedModelDataHandler
 			assetVocabularySettingsExportHelper.getSettingsMetadata());
 	}
 
-	private String _getImportSettings(
+	protected String getImportSettings(
 			PortletDataContext portletDataContext, AssetVocabulary vocabulary)
-		throws Exception {
+		throws PortalException {
 
 		Element vocabularyElement = portletDataContext.getImportDataElement(
 			vocabulary);
 
 		JSONObject settingsMetadataJSONObject =
-			_getImportSettingsMetadataJSONObject(
+			getImportSettingsMetadataJSONObject(
 				portletDataContext, vocabularyElement);
 
 		if (settingsMetadataJSONObject.length() == 0) {
@@ -303,9 +301,9 @@ public class AssetVocabularyStagedModelDataHandler
 		return assetVocabularySettingsImportHelper.getSettings();
 	}
 
-	private JSONObject _getImportSettingsMetadataJSONObject(
+	protected JSONObject getImportSettingsMetadataJSONObject(
 			PortletDataContext portletDataContext, Element vocabularyElement)
-		throws Exception {
+		throws PortalException {
 
 		String settingsMetadataPath = vocabularyElement.attributeValue(
 			_SETTINGS_METADATA);
@@ -316,7 +314,7 @@ public class AssetVocabularyStagedModelDataHandler
 		return _jsonFactory.createJSONObject(serializedSettingsMetadata);
 	}
 
-	private String _getVocabularyName(
+	protected String getVocabularyName(
 			String uuid, long groupId, String name, int count)
 		throws Exception {
 
@@ -331,12 +329,12 @@ public class AssetVocabularyStagedModelDataHandler
 
 		name = StringUtil.appendParentheticalSuffix(name, count);
 
-		return _getVocabularyName(uuid, groupId, name, ++count);
+		return getVocabularyName(uuid, groupId, name, ++count);
 	}
 
-	private Map<Locale, String> _getVocabularyTitleMap(
+	protected Map<Locale, String> getVocabularyTitleMap(
 			long groupId, AssetVocabulary vocabulary, String name)
-		throws Exception {
+		throws PortalException {
 
 		Map<Locale, String> titleMap = vocabulary.getTitleMap();
 
@@ -351,7 +349,7 @@ public class AssetVocabularyStagedModelDataHandler
 		return titleMap;
 	}
 
-	private boolean _validateMissingReference(
+	protected boolean validateMissingReference(
 		String uuid, long groupId, String name) {
 
 		AssetVocabulary existingStagedModel = fetchMissingReference(

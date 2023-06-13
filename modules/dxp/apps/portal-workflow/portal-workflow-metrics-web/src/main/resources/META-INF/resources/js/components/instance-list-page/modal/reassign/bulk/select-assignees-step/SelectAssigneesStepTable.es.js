@@ -165,7 +165,6 @@ function Table({data, items}) {
 						}}
 					>
 						{`${Liferay.Language.get('new-assignee')}`}
-
 						<span
 							className="ml-1 workflow-tooltip"
 							data-tooltip-align="top"
@@ -182,7 +181,7 @@ function Table({data, items}) {
 
 			<ClayTable.Body>
 				{items &&
-					!!items.length &&
+					items.length > 0 &&
 					items.map((item) => (
 						<Table.Item data={data} {...item} key={item.id} />
 					))}

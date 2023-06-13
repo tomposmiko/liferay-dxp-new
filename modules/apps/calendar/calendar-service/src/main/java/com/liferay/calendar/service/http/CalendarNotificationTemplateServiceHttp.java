@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Eduardo Lundgren
+ * @see CalendarNotificationTemplateServiceSoap
  * @generated
  */
 public class CalendarNotificationTemplateServiceHttp {

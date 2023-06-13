@@ -17,16 +17,15 @@ package com.liferay.template.web.internal.portlet.action;
 import com.liferay.dynamic.data.mapping.constants.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -48,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lourdes Fernández Besada
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + TemplatePortletKeys.TEMPLATE,
 		"mvc.command.name=/template/update_ddm_template"
@@ -68,12 +68,13 @@ public class UpdateDDMTemplateMVCActionCommand extends BaseMVCActionCommand {
 			uploadPortletRequest, "ddmTemplateId");
 
 		long classPK = ParamUtil.getLong(uploadPortletRequest, "classPK");
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			uploadPortletRequest, "name");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			uploadPortletRequest, "description");
-		String script = FileUtil.read(
-			uploadPortletRequest.getFile("scriptContent"));
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(
+				uploadPortletRequest, "description");
+		String script = ParamUtil.getString(
+			uploadPortletRequest, "scriptContent");
 		boolean cacheable = ParamUtil.getBoolean(
 			uploadPortletRequest, "cacheable");
 
@@ -145,9 +146,6 @@ public class UpdateDDMTemplateMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private DDMTemplateService _ddmTemplateService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

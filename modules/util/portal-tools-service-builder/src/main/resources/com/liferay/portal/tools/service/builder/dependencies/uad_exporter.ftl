@@ -7,6 +7,6 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author ${author}
  */
-@Component(service = UADExporter.class)
+@Component(immediate = true,service = UADExporter.class)
 public class ${entity.name}UADExporter extends Base${entity.name}UADExporter {
 }

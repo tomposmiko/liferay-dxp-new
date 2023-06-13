@@ -16,14 +16,11 @@ package com.liferay.dynamic.data.mapping.storage.constants;
 
 import com.liferay.dynamic.data.mapping.util.NumberUtil;
 import com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil;
-import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -119,7 +116,11 @@ public class FieldConstants {
 				Number number = decimalFormat.parse(
 					GetterUtil.getString(value));
 
-				if (number.doubleValue() > Integer.MAX_VALUE) {
+				String formattedValue = String.valueOf(number);
+
+				if ((number.doubleValue() > Integer.MAX_VALUE) ||
+					formattedValue.matches(_SCIENTIFIC_NOTATION_PATTERN)) {
+
 					return value;
 				}
 
@@ -139,8 +140,6 @@ public class FieldConstants {
 					}
 				}
 
-				String formattedValue = String.valueOf(number);
-
 				if (!NumberUtil.hasDecimalSeparator(formattedValue) &&
 					NumberUtil.hasDecimalSeparator(value)) {
 
@@ -150,17 +149,11 @@ public class FieldConstants {
 							NumberUtil.getDecimalSeparatorIndex(value) + 1));
 				}
 
-				if ((formattedValue.charAt(0) != CharPool.MINUS) &&
-					(value.charAt(0) == CharPool.MINUS)) {
-
-					formattedValue = StringPool.MINUS + formattedValue;
-				}
-
 				serializable = getSerializable(type, formattedValue);
 			}
 			catch (ParseException parseException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(parseException);
+					_log.debug(parseException, parseException);
 				}
 
 				serializable = getSerializable(type, value);
@@ -194,32 +187,14 @@ public class FieldConstants {
 		else if (type.equals(FieldConstants.DATE)) {
 			return values.toArray(new String[0]);
 		}
-		else if (type.equals(FieldConstants.DOUBLE) ||
-				 type.equals(FieldConstants.INTEGER)) {
-
-			return ListUtil.toArray(
-				values,
-				new Accessor<Object, Number>() {
-
-					@Override
-					public Number get(Object value) {
-						return GetterUtil.getNumber(value);
-					}
-
-					@Override
-					public Class<Number> getAttributeClass() {
-						return Number.class;
-					}
-
-					@Override
-					public Class<Object> getTypeClass() {
-						return Object.class;
-					}
-
-				});
+		else if (type.equals(FieldConstants.DOUBLE)) {
+			return values.toArray(new Double[0]);
 		}
 		else if (type.equals(FieldConstants.FLOAT)) {
 			return values.toArray(new Float[0]);
+		}
+		else if (type.equals(FieldConstants.INTEGER)) {
+			return values.toArray(new Integer[0]);
 		}
 		else if (type.equals(FieldConstants.LONG)) {
 			return values.toArray(new Long[0]);
@@ -292,6 +267,9 @@ public class FieldConstants {
 
 		return false;
 	}
+
+	private static final String _SCIENTIFIC_NOTATION_PATTERN =
+		"^[+-]?\\d+(?:\\.\\d*(?:[eE][+-]?\\d+)+)+$";
 
 	private static final Log _log = LogFactoryUtil.getLog(FieldConstants.class);
 

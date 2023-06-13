@@ -50,11 +50,11 @@ import com.liferay.gradle.plugins.defaults.internal.util.NameSuffixFileSpec;
 import com.liferay.gradle.plugins.defaults.internal.util.StringUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.XMLUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.copy.ReplaceContentFilterReader;
-import com.liferay.gradle.plugins.defaults.task.CheckOSGiBundleStateTask;
-import com.liferay.gradle.plugins.defaults.task.InstallCacheTask;
-import com.liferay.gradle.plugins.defaults.task.ReplaceRegexTask;
-import com.liferay.gradle.plugins.defaults.task.WriteArtifactPublishCommandsTask;
-import com.liferay.gradle.plugins.defaults.task.WritePropertiesTask;
+import com.liferay.gradle.plugins.defaults.tasks.CheckOSGiBundleStateTask;
+import com.liferay.gradle.plugins.defaults.tasks.InstallCacheTask;
+import com.liferay.gradle.plugins.defaults.tasks.ReplaceRegexTask;
+import com.liferay.gradle.plugins.defaults.tasks.WriteArtifactPublishCommandsTask;
+import com.liferay.gradle.plugins.defaults.tasks.WritePropertiesTask;
 import com.liferay.gradle.plugins.dependency.checker.DependencyCheckerExtension;
 import com.liferay.gradle.plugins.dependency.checker.DependencyCheckerPlugin;
 import com.liferay.gradle.plugins.extensions.BundleExtension;
@@ -65,7 +65,7 @@ import com.liferay.gradle.plugins.jasper.jspc.JspCPlugin;
 import com.liferay.gradle.plugins.jsdoc.JSDocPlugin;
 import com.liferay.gradle.plugins.jsdoc.JSDocTask;
 import com.liferay.gradle.plugins.lang.builder.LangBuilderPlugin;
-import com.liferay.gradle.plugins.node.task.PublishNodeModuleTask;
+import com.liferay.gradle.plugins.node.tasks.PublishNodeModuleTask;
 import com.liferay.gradle.plugins.patcher.PatchTask;
 import com.liferay.gradle.plugins.rest.builder.BuildRESTTask;
 import com.liferay.gradle.plugins.rest.builder.RESTBuilderPlugin;
@@ -75,7 +75,7 @@ import com.liferay.gradle.plugins.source.formatter.SourceFormatterPlugin;
 import com.liferay.gradle.plugins.test.integration.TestIntegrationBasePlugin;
 import com.liferay.gradle.plugins.test.integration.TestIntegrationTomcatExtension;
 import com.liferay.gradle.plugins.tlddoc.builder.TLDDocBuilderPlugin;
-import com.liferay.gradle.plugins.tlddoc.builder.task.TLDDocTask;
+import com.liferay.gradle.plugins.tlddoc.builder.tasks.TLDDocTask;
 import com.liferay.gradle.plugins.upgrade.table.builder.UpgradeTableBuilderPlugin;
 import com.liferay.gradle.plugins.util.BndUtil;
 import com.liferay.gradle.plugins.util.PortalTools;
@@ -390,7 +390,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 			_addDependenciesPortalTest(project, portalVersion);
 			_addDependenciesPortalTestSnapshot(project);
-			_addDependenciesTestCompile(project, portalVersion);
+			_addDependenciesTestCompile(project);
 
 			_configureConfigurationTest(
 				project, JavaPlugin.TEST_COMPILE_CLASSPATH_CONFIGURATION_NAME);
@@ -709,53 +709,30 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			"com.liferay.portal.kernel", "default");
 	}
 
-	private void _addDependenciesTestCompile(
-		Project project, String portalVersion) {
+	private void _addDependenciesTestCompile(Project project) {
+		GradleUtil.addDependency(
+			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME, "org.mockito",
+			"mockito-core", "1.10.8");
 
-		if (PortalTools.PORTAL_VERSION_7_0_X.equals(portalVersion) ||
-			PortalTools.PORTAL_VERSION_7_1_X.equals(portalVersion) ||
-			PortalTools.PORTAL_VERSION_7_2_X.equals(portalVersion) ||
-			PortalTools.PORTAL_VERSION_7_3_X.equals(portalVersion)) {
-
-			GradleUtil.addDependency(
+		ModuleDependency moduleDependency =
+			(ModuleDependency)GradleUtil.addDependency(
 				project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
-				"org.mockito", "mockito-core", "1.10.8");
+				"org.powermock", "powermock-api-mockito", "1.6.1");
 
-			ModuleDependency moduleDependency =
-				(ModuleDependency)GradleUtil.addDependency(
-					project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
-					"org.powermock", "powermock-api-mockito", "1.6.1");
+		Map<String, String> excludeArgs = new HashMap<>();
 
-			Map<String, String> excludeArgs = new HashMap<>();
+		excludeArgs.put("group", "org.mockito");
+		excludeArgs.put("module", "mockito-all");
 
-			excludeArgs.put("group", "org.mockito");
-			excludeArgs.put("module", "mockito-all");
-
-			moduleDependency.exclude(excludeArgs);
-
-			GradleUtil.addDependency(
-				project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
-				"org.powermock", "powermock-module-junit4", "1.6.1");
-		}
-		else {
-			GradleUtil.addDependency(
-				project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
-				"org.mockito", "mockito-core", "4.5.1");
-
-			GradleUtil.addDependency(
-				project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
-				"org.mockito", "mockito-inline", "4.5.1");
-
-			GradleUtil.addDependency(
-				project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME, "junit",
-				"junit", "4.12");
-		}
+		moduleDependency.exclude(excludeArgs);
 
 		GradleUtil.addDependency(
 			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
 			"com.liferay.portletmvc4spring",
 			"com.liferay.portletmvc4spring.test", "5.2.1");
-
+		GradleUtil.addDependency(
+			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
+			"org.powermock", "powermock-module-junit4", "1.6.1");
 		GradleUtil.addDependency(
 			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME,
 			"org.springframework", "spring-test", "5.2.2.RELEASE");
@@ -1116,10 +1093,11 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 					StringBuilder sb = new StringBuilder();
 
-					sb.append(
-						FileUtil.getJavaClassesDir(
-							GradleUtil.getSourceSet(
-								project, SourceSet.MAIN_SOURCE_SET_NAME)));
+					SourceSet sourceSet = GradleUtil.getSourceSet(
+						project, SourceSet.MAIN_SOURCE_SET_NAME);
+
+					sb.append(FileUtil.getJavaClassesDir(sourceSet));
+
 					sb.append("/META-INF/maven/");
 					sb.append(groupId);
 					sb.append('/');
@@ -1139,10 +1117,13 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 								String compileOnlyConfigurationName =
 									JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME;
 
+								Configuration configuration =
+									GradleUtil.getConfiguration(
+										project, compileOnlyConfigurationName);
+
 								conf2ScopeMappingContainer.addMapping(
 									MavenPlugin.PROVIDED_COMPILE_PRIORITY,
-									GradleUtil.getConfiguration(
-										project, compileOnlyConfigurationName),
+									configuration,
 									Conf2ScopeMappingContainer.PROVIDED);
 
 								mavenPom.setArtifactId(artifactId);
@@ -2044,6 +2025,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		bundleDefaultInstructions.put(Constants.BUNDLE_VENDOR, "Liferay, Inc.");
 		bundleDefaultInstructions.put(
+			Constants.CONSUMER_POLICY,
+			"${replacestring;${range;[==,==]};.*,(.*)];$1}");
+		bundleDefaultInstructions.put(
 			Constants.DONOTCOPY,
 			"(" + LiferayOSGiExtension.DONOTCOPY_DEFAULT + "|.touch)");
 		bundleDefaultInstructions.put(Constants.SOURCES, "false");
@@ -2461,7 +2445,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 							"commons-configuration:commons-configuration:1.10";
 					}
 					else if (group.equals("xerces") && name.equals("xerces")) {
-						target = "xerces:xercesImpl:2.12.1";
+						target = "xerces:xercesImpl:2.12.0";
 					}
 					else if (group.equals("xml-apis") &&
 							 name.equals("xml-apis")) {
@@ -2977,12 +2961,15 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		Map<Configuration, Conf2ScopeMapping> mappings =
 			conf2ScopeMappingContainer.getMappings();
 
-		mappings.remove(
-			GradleUtil.getConfiguration(
-				project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME));
-		mappings.remove(
-			GradleUtil.getConfiguration(
-				project, JavaPlugin.TEST_RUNTIME_CONFIGURATION_NAME));
+		Configuration configuration = GradleUtil.getConfiguration(
+			project, JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME);
+
+		mappings.remove(configuration);
+
+		configuration = GradleUtil.getConfiguration(
+			project, JavaPlugin.TEST_RUNTIME_CONFIGURATION_NAME);
+
+		mappings.remove(configuration);
 	}
 
 	private void _configurePmd(Project project) {
@@ -3174,11 +3161,10 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 					String versionOverrideRelativePath = project.relativePath(
 						versionOverrideFile);
 
-					if (Validator.isNotNull(
-							GitUtil.getGitResult(
-								project, "ls-files",
-								versionOverrideRelativePath))) {
+					String gitResult = GitUtil.getGitResult(
+						project, "ls-files", versionOverrideRelativePath);
 
+					if (Validator.isNotNull(gitResult)) {
 						addVersionOverrideFile = true;
 					}
 

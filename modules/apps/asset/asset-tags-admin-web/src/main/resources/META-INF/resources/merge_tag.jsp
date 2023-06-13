@@ -45,38 +45,40 @@ renderResponse.setTitle(LanguageUtil.get(request, "merge-tags"));
 	<aui:input name="groupId" type="hidden" value="<%= scopeGroupId %>" />
 
 	<liferay-frontend:edit-form-body>
-		<liferay-frontend:fieldset>
-			<div class="button-holder">
-				<liferay-asset:asset-tags-selector
-					addCallback="onAddTag"
-					allowAddEntry="<%= false %>"
-					hiddenInput="mergeTagNames"
-					id="assetTagsSelector"
-					removeCallback="onRemoveTag"
-					tagNames="<%= StringUtil.merge(assetTagsDisplayContext.getMergeTagNames()) %>"
-				/>
-			</div>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset>
+				<div class="button-holder">
+					<liferay-asset:asset-tags-selector
+						addCallback="onAddTag"
+						allowAddEntry="<%= false %>"
+						hiddenInput="mergeTagNames"
+						id="assetTagsSelector"
+						removeCallback="onRemoveTag"
+						tagNames="<%= StringUtil.merge(assetTagsDisplayContext.getMergeTagNames()) %>"
+					/>
+				</div>
 
-			<aui:select cssClass="target-tag" label="into-this-tag" name="targetTagName">
+				<aui:select cssClass="target-tag" label="into-this-tag" name="targetTagName">
 
-				<%
-				for (String tagName : assetTagsDisplayContext.getMergeTagNames()) {
-				%>
+					<%
+					for (String tagName : assetTagsDisplayContext.getMergeTagNames()) {
+					%>
 
-					<aui:option label="<%= tagName %>" />
+						<aui:option label="<%= tagName %>" />
 
-				<%
-				}
-				%>
+					<%
+					}
+					%>
 
-			</aui:select>
-		</liferay-frontend:fieldset>
+				</aui:select>
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons
-			redirect="<%= redirect %>"
-		/>
+		<aui:button type="submit" />
+
+		<aui:button href="<%= redirect %>" type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
@@ -129,10 +131,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "merge-tags"));
 			);
 
 			if (mergeTagNames.length < 2) {
-				Liferay.Util.openAlertModal({
-					message:
-						'<liferay-ui:message arguments="2" key="please-choose-at-least-x-tags" />',
-				});
+				alert(
+					'<liferay-ui:message arguments="2" key="please-choose-at-least-x-tags" />'
+				);
 
 				return;
 			}
@@ -143,14 +144,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "merge-tags"));
 				targetTagNameSelect.value
 			);
 
-			Liferay.Util.openConfirmModal({
-				message: mergeText,
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						submitForm(form);
-					}
-				},
-			});
+			if (confirm(mergeText)) {
+				submitForm(form);
+			}
 		});
 	}
 </aui:script>

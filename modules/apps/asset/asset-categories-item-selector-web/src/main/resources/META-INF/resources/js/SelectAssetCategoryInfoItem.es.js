@@ -12,52 +12,71 @@
  * details.
  */
 
-import ClayAlert from '@clayui/alert';
-import ClayButton from '@clayui/button';
-import ClayEmptyState from '@clayui/empty-state';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
-import {navigate} from 'frontend-js-web';
-import React, {useState} from 'react';
+import {Treeview} from 'frontend-js-components-web';
+import React, {useMemo, useState} from 'react';
 
-import {AssetCategoryTree} from './AssetCategoryTree.es';
+function getFilter(filterQuery) {
+	if (!filterQuery) {
+		return null;
+	}
 
-function SelectAssetCategory({
-	addCategoryURL,
-	inheritSelection,
-	itemSelectedEventName,
-	moveCategory,
-	multiSelection,
-	namespace,
-	nodes,
-	selectedCategoryIds,
-}) {
-	const [items, setItems] = useState(() => {
+	const filterQueryLowerCase = filterQuery.toLowerCase();
+
+	return (node) =>
+		!node.vocabulary &&
+		node.name.toLowerCase().indexOf(filterQueryLowerCase) !== -1;
+}
+
+function visit(nodes, callback) {
+	nodes.forEach((node) => {
+		callback(node);
+
+		if (node.children) {
+			visit(node.children, callback);
+		}
+	});
+}
+
+function SelectAssetCategory({itemSelectedEventName, namespace, nodes}) {
+	const flattenedNodes = useMemo(() => {
 		if (nodes.length === 1 && nodes[0].vocabulary && nodes[0].id !== '0') {
 			return nodes[0].children;
 		}
 
 		return nodes;
-	});
+	}, [nodes]);
 
 	const [filterQuery, setFilterQuery] = useState('');
-	const [selectedKeys, setSelectedKeys] = useState(
-		new Set(selectedCategoryIds)
-	);
-	const [selectedItemsCount, setSelectedItemsCount] = useState(0);
+
+	const handleSelectionChange = (selectedNodeIds) => {
+		if (!selectedNodeIds.size) {
+			return;
+		}
+
+		let data;
+
+		visit(nodes, (node) => {
+			if (selectedNodeIds.has(node.id)) {
+				data = {
+					className: node.className,
+					classNameId: node.classNameId,
+					classPK: node.id,
+					title: node.name,
+				};
+			}
+		});
+
+		Liferay.Util.getOpener().Liferay.fire(itemSelectedEventName, {
+			data,
+		});
+	};
 
 	return (
 		<div className="select-category">
-			{moveCategory && (
-				<ClayAlert displayType="info" variant="stripe">
-					{Liferay.Language.get(
-						'categories-can-only-be-moved-to-a-vocabulary-or-a-category-with-the-same-visibility'
-					)}
-				</ClayAlert>
-			)}
-
 			<form
-				className="mb-0 px-1 py-3 select-category-filter"
+				className="select-category-filter"
 				onSubmit={(event) => event.preventDefault()}
 				role="search"
 			>
@@ -65,15 +84,12 @@ function SelectAssetCategory({
 					<div className="input-group">
 						<div className="input-group-item">
 							<input
-								aria-label={Liferay.Language.get(
-									'search-categories'
-								)}
 								className="form-control h-100 input-group-inset input-group-inset-after"
 								onChange={(event) =>
 									setFilterQuery(event.target.value)
 								}
 								placeholder={Liferay.Language.get('search')}
-								type="search"
+								type="text"
 							/>
 
 							<div className="input-group-inset-item input-group-inset-item-after pr-3">
@@ -81,78 +97,32 @@ function SelectAssetCategory({
 							</div>
 						</div>
 					</div>
-
-					{addCategoryURL && (
-						<ClayButton
-							className="btn-monospaced ml-3 nav-btn nav-btn-monospaced"
-							displayType="primary"
-							onClick={() => {
-								navigate(addCategoryURL);
-							}}
-						>
-							<ClayIcon symbol="plus" />
-						</ClayButton>
-					)}
 				</ClayLayout.ContainerFluid>
 			</form>
 
-			{selectedItemsCount && multiSelection ? (
-				<ClayLayout.Container
-					className="align-items-center category-tree-count-feedback d-flex justify-content-between px-3"
-					containerElement="section"
-					fluid
-				>
-					<p className="m-0 text-2">
-						{selectedItemsCount > 1
-							? `${selectedItemsCount} ${Liferay.Language.get(
-									'items-selected'
-							  )}`
-							: `${selectedItemsCount} ${Liferay.Language.get(
-									'item-selected'
-							  )}`}
-					</p>
-
-					<ClayButton
-						className="text-3 text-dark text-weight-semi-bold"
-						displayType="link"
-						onClick={() => {
-							setSelectedKeys(new Set([]));
-						}}
-					>
-						{Liferay.Language.get('clear-all')}
-					</ClayButton>
-				</ClayLayout.Container>
-			) : null}
-
 			<form name={`${namespace}selectCategoryFm`}>
-				<ClayLayout.ContainerFluid
-					className="px-3"
-					containerElement="fieldset"
-				>
+				<ClayLayout.ContainerFluid containerElement="fieldset">
 					<div
-						className="category-tree mt-3"
+						className="category-tree"
 						id={`${namespace}categoryContainer`}
 					>
-						{items.length ? (
-							<AssetCategoryTree
-								filterQuery={filterQuery}
-								inheritSelection={inheritSelection}
-								itemSelectedEventName={itemSelectedEventName}
-								items={items}
-								multiSelection={multiSelection}
-								onItems={setItems}
-								onSelectedItemsCount={setSelectedItemsCount}
-								selectedKeys={selectedKeys}
-								setSelectedKeys={setSelectedKeys}
+						{flattenedNodes.length > 0 ? (
+							<Treeview
+								NodeComponent={Treeview.Card}
+								filter={getFilter(filterQuery)}
+								multiSelection={false}
+								nodes={flattenedNodes}
+								onSelectedNodesChange={handleSelectionChange}
 							/>
 						) : (
-							<ClayEmptyState
-								description={Liferay.Language.get(
-									'no-categories-were-found'
-								)}
-								imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
-								title={null}
-							/>
+							<div className="border-0 pt-0 sheet taglib-empty-result-message">
+								<div className="taglib-empty-result-message-header"></div>
+								<div className="sheet-text text-center">
+									{Liferay.Language.get(
+										'no-categories-were-found'
+									)}
+								</div>
+							</div>
 						)}
 					</div>
 				</ClayLayout.ContainerFluid>

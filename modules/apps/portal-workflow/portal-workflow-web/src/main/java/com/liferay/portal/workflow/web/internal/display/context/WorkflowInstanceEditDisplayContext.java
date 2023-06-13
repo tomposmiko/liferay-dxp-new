@@ -94,14 +94,14 @@ public class WorkflowInstanceEditDisplayContext
 	}
 
 	public AssetRenderer<?> getAssetRenderer() throws PortalException {
-		WorkflowHandler<?> workflowHandler = getWorkflowHandler();
+		WorkflowHandler<?> workflowHandler = _getWorkflowHandler();
 
 		return workflowHandler.getAssetRenderer(
 			_getWorkflowContextEntryClassPK());
 	}
 
 	public AssetRendererFactory<?> getAssetRendererFactory() {
-		WorkflowHandler<?> workflowHandler = getWorkflowHandler();
+		WorkflowHandler<?> workflowHandler = _getWorkflowHandler();
 
 		return workflowHandler.getAssetRendererFactory();
 	}
@@ -136,7 +136,7 @@ public class WorkflowInstanceEditDisplayContext
 	}
 
 	public String getIconCssClass() {
-		WorkflowHandler<?> workflowHandler = getWorkflowHandler();
+		WorkflowHandler<?> workflowHandler = _getWorkflowHandler();
 
 		return workflowHandler.getIconCssClass();
 	}
@@ -168,9 +168,13 @@ public class WorkflowInstanceEditDisplayContext
 	}
 
 	public String getTaskCompleted(WorkflowTask workflowTask) {
+		if (workflowTask.isCompleted()) {
+			return LanguageUtil.get(
+				workflowInstanceRequestHelper.getRequest(), "yes");
+		}
+
 		return LanguageUtil.get(
-			workflowInstanceRequestHelper.getRequest(),
-			workflowTask.isCompleted() ? "yes" : "no");
+			workflowInstanceRequestHelper.getRequest(), "no");
 	}
 
 	public Object getTaskCompletionMessageArguments(WorkflowLog workflowLog) {
@@ -179,13 +183,15 @@ public class WorkflowInstanceEditDisplayContext
 				PortalUtil.getUserName(
 					workflowLog.getAuditUserId(),
 					String.valueOf(workflowLog.getAuditUserId()))),
-			workflowLog.getCurrentWorkflowNodeLabel(
-				workflowInstanceRequestHelper.getLocale())
+			HtmlUtil.escape(
+				LanguageUtil.get(
+					workflowInstanceRequestHelper.getRequest(),
+					workflowLog.getState()))
 		};
 	}
 
 	public String getTaskContentTitleMessage() {
-		WorkflowHandler<?> workflowHandler = getWorkflowHandler();
+		WorkflowHandler<?> workflowHandler = _getWorkflowHandler();
 
 		long classPK = _getWorkflowContextEntryClassPK();
 
@@ -209,6 +215,10 @@ public class WorkflowInstanceEditDisplayContext
 		return HtmlUtil.escape(_getActorName(workflowLog));
 	}
 
+	public String getTaskName(WorkflowTask workflowTask) {
+		return HtmlUtil.escape(workflowTask.getName());
+	}
+
 	public String getTaskUpdateMessageArguments(WorkflowLog workflowLog) {
 		return HtmlUtil.escape(
 			PortalUtil.getUserName(
@@ -222,10 +232,14 @@ public class WorkflowInstanceEditDisplayContext
 				PortalUtil.getUserName(
 					workflowLog.getAuditUserId(),
 					String.valueOf(workflowLog.getAuditUserId()))),
-			workflowLog.getPreviousWorkflowNodeLabel(
-				workflowInstanceRequestHelper.getLocale()),
-			workflowLog.getCurrentWorkflowNodeLabel(
-				workflowInstanceRequestHelper.getLocale())
+			HtmlUtil.escape(
+				LanguageUtil.get(
+					workflowInstanceRequestHelper.getRequest(),
+					workflowLog.getPreviousState())),
+			HtmlUtil.escape(
+				LanguageUtil.get(
+					workflowInstanceRequestHelper.getRequest(),
+					workflowLog.getState()))
 		};
 	}
 
@@ -237,12 +251,6 @@ public class WorkflowInstanceEditDisplayContext
 		}
 
 		return HtmlUtil.escape(user.getFullName());
-	}
-
-	public WorkflowHandler<?> getWorkflowHandler() {
-		String className = _getWorkflowContextEntryClassName();
-
-		return WorkflowHandlerRegistryUtil.getWorkflowHandler(className);
 	}
 
 	public String getWorkflowInstanceEndDate() {
@@ -401,6 +409,12 @@ public class WorkflowInstanceEditDisplayContext
 			workflowDefinition.getTitle(
 				LanguageUtil.getLanguageId(
 					workflowInstanceRequestHelper.getRequest())));
+	}
+
+	private WorkflowHandler<?> _getWorkflowHandler() {
+		String className = _getWorkflowContextEntryClassName();
+
+		return WorkflowHandlerRegistryUtil.getWorkflowHandler(className);
 	}
 
 	private WorkflowInstance _getWorkflowInstance() {

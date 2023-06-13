@@ -15,8 +15,6 @@
 package com.liferay.portal.util.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
-import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
@@ -38,11 +36,14 @@ import java.lang.reflect.Field;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.PortletPreferences;
+
+import org.apache.commons.collections.map.ReferenceMap;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -103,8 +104,7 @@ public class LocalizationImplTest {
 
 		_cache.set(
 			_localization,
-			new ConcurrentReferenceKeyHashMap<>(
-				FinalizeManager.SOFT_REFERENCE_FACTORY));
+			new ReferenceMap(ReferenceMap.SOFT, ReferenceMap.HARD));
 	}
 
 	@Test
@@ -227,6 +227,42 @@ public class LocalizationImplTest {
 			xml.contains(
 				"<test language-id=\"" + LocaleUtil.getDefault() +
 					"\">testValue</test>"));
+	}
+
+	@Test
+	public void testGetModifiedLocales() throws Exception {
+		String key = RandomTestUtil.randomString();
+
+		String defaultLanguageId = LocaleUtil.toLanguageId(
+			LocaleUtil.getDefault());
+
+		PortletPreferences preferences = new PortletPreferencesImpl();
+
+		LocalizationUtil.setPreferencesValue(
+			preferences, key, defaultLanguageId, "A0");
+		LocalizationUtil.setPreferencesValue(
+			preferences, key, _GERMAN_LANGUAGE_ID, "B0");
+
+		Map<Locale, String> oldLocalizationMap =
+			LocalizationUtil.getLocalizationMap(preferences, key);
+
+		LocalizationUtil.setPreferencesValue(
+			preferences, key, defaultLanguageId, "A1");
+		LocalizationUtil.setPreferencesValue(
+			preferences, key, _GERMAN_LANGUAGE_ID, "B1");
+
+		Map<Locale, String> newLocalizationMap =
+			LocalizationUtil.getLocalizationMap(preferences, key);
+
+		List<Locale> modifiedLocales = LocalizationUtil.getModifiedLocales(
+			oldLocalizationMap, newLocalizationMap);
+
+		Assert.assertTrue(
+			modifiedLocales.toString(),
+			modifiedLocales.contains(LocaleUtil.getDefault()));
+		Assert.assertTrue(
+			modifiedLocales.toString(),
+			modifiedLocales.contains(LocaleUtil.GERMANY));
 	}
 
 	@Test

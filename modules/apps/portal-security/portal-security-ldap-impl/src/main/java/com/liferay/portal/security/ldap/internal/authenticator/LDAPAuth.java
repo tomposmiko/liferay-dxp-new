@@ -19,6 +19,7 @@ import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PasswordExpiredException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.UserLockoutException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.auth.PasswordModificationThreadLocal;
 import com.liferay.portal.kernel.security.ldap.LDAPSettings;
 import com.liferay.portal.kernel.security.pwd.PasswordEncryptor;
+import com.liferay.portal.kernel.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -77,7 +79,10 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Scott Lee
  * @author Josef Sustacek
  */
-@Component(property = "key=auth.pipeline.pre", service = Authenticator.class)
+@Component(
+	immediate = true, property = "key=auth.pipeline.pre",
+	service = Authenticator.class
+)
 public class LDAPAuth implements Authenticator {
 
 	public static final String RESULT_PASSWORD_EXP_WARNING =
@@ -93,11 +98,11 @@ public class LDAPAuth implements Authenticator {
 		throws AuthException {
 
 		try {
-			return _authenticate(
+			return authenticate(
 				companyId, emailAddress, StringPool.BLANK, 0, password);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw new AuthException(exception);
 		}
@@ -110,11 +115,11 @@ public class LDAPAuth implements Authenticator {
 		throws AuthException {
 
 		try {
-			return _authenticate(
+			return authenticate(
 				companyId, StringPool.BLANK, screenName, 0, password);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw new AuthException(exception);
 		}
@@ -127,12 +132,12 @@ public class LDAPAuth implements Authenticator {
 		throws AuthException {
 
 		try {
-			return _authenticate(
+			return authenticate(
 				companyId, StringPool.BLANK, StringPool.BLANK, userId,
 				password);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw new AuthException(exception);
 		}
@@ -144,7 +149,7 @@ public class LDAPAuth implements Authenticator {
 			_props.get(PropsKeys.AUTH_PIPELINE_ENABLE_LIFERAY_CHECK));
 	}
 
-	private LDAPAuthResult _authenticate(
+	protected LDAPAuthResult authenticate(
 			LdapContext ctx, long companyId, Attributes attributes,
 			String userDN, String password)
 		throws Exception {
@@ -176,7 +181,7 @@ public class LDAPAuth implements Authenticator {
 
 			env.put("com.sun.jndi.ldap.connect.pool", "false");
 
-			ldapAuthResult = _getFailedLDAPAuthResult(env);
+			ldapAuthResult = getFailedLDAPAuthResult(env);
 
 			if (ldapAuthResult != null) {
 				return ldapAuthResult;
@@ -227,7 +232,7 @@ public class LDAPAuth implements Authenticator {
 				ldapAuthResult.setAuthenticated(false);
 				ldapAuthResult.setErrorMessage(exception.getMessage());
 
-				_setFailedLDAPAuthResult(env, ldapAuthResult);
+				setFailedLDAPAuthResult(env, ldapAuthResult);
 			}
 			finally {
 				if (initialLdapContext != null) {
@@ -250,9 +255,9 @@ public class LDAPAuth implements Authenticator {
 						ldapAuthConfiguration.passwordEncryptionAlgorithm()) &&
 					!Objects.equals(
 						ldapAuthConfiguration.passwordEncryptionAlgorithm(),
-						PasswordEncryptor.TYPE_NONE)) {
+						PasswordEncryptorUtil.TYPE_NONE)) {
 
-					ldapPassword = _removeEncryptionAlgorithm(ldapPassword);
+					ldapPassword = removeEncryptionAlgorithm(ldapPassword);
 
 					encryptedPassword = _passwordEncryptor.encrypt(
 						ldapAuthConfiguration.passwordEncryptionAlgorithm(),
@@ -276,7 +281,7 @@ public class LDAPAuth implements Authenticator {
 		return ldapAuthResult;
 	}
 
-	private int _authenticate(
+	protected int authenticate(
 			long ldapServerId, long companyId, String emailAddress,
 			String screenName, long userId, String password)
 		throws Exception {
@@ -372,7 +377,7 @@ public class LDAPAuth implements Authenticator {
 
 			String fullUserDN = searchResult.getNameInNamespace();
 
-			LDAPAuthResult ldapAuthResult = _authenticate(
+			LDAPAuthResult ldapAuthResult = authenticate(
 				safeLdapContext, companyId, attributes, fullUserDN, password);
 
 			// Get user or create fromUnsafe LDAP
@@ -429,19 +434,6 @@ public class LDAPAuth implements Authenticator {
 				return FAILURE;
 			}
 
-			if (user == null) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						StringBundler.concat(
-							"Rejecting authenticated user ", fullUserDN,
-							" because of failed import from LDAP server ",
-							ldapServerId, ", company ", companyId,
-							", and LDAP context ", safeLdapContext));
-				}
-
-				return FAILURE;
-			}
-
 			// Process LDAP success codes
 
 			String resultCode = ldapAuthResult.getResponseControl();
@@ -472,7 +464,7 @@ public class LDAPAuth implements Authenticator {
 		return SUCCESS;
 	}
 
-	private int _authenticate(
+	protected int authenticate(
 			long companyId, String emailAddress, String screenName, long userId,
 			String password)
 		throws Exception {
@@ -492,10 +484,10 @@ public class LDAPAuth implements Authenticator {
 			_log.debug("Authenticator is enabled");
 		}
 
-		long preferredLDAPServerId = _getPreferredLDAPServer(
+		long preferredLDAPServerId = getPreferredLDAPServer(
 			companyId, emailAddress, screenName, userId);
 
-		int preferredLDAPServerResult = _authenticateAgainstPreferredLDAPServer(
+		int preferredLDAPServerResult = authenticateAgainstPreferredLDAPServer(
 			companyId, preferredLDAPServerId, emailAddress, screenName, userId,
 			password);
 
@@ -538,7 +530,7 @@ public class LDAPAuth implements Authenticator {
 				continue;
 			}
 
-			int result = _authenticate(
+			int result = authenticate(
 				ldapServerConfiguration.ldapServerId(), companyId, emailAddress,
 				screenName, userId, password);
 
@@ -551,11 +543,11 @@ public class LDAPAuth implements Authenticator {
 			}
 		}
 
-		return _authenticateRequired(
+		return authenticateRequired(
 			companyId, userId, emailAddress, screenName, true, FAILURE);
 	}
 
-	private int _authenticateAgainstPreferredLDAPServer(
+	protected int authenticateAgainstPreferredLDAPServer(
 			long companyId, long ldapServerId, String emailAddress,
 			String screenName, long userId, String password)
 		throws Exception {
@@ -592,12 +584,12 @@ public class LDAPAuth implements Authenticator {
 			return DNE;
 		}
 
-		return _authenticate(
+		return authenticate(
 			ldapServerId, companyId, emailAddress, screenName, userId,
 			password);
 	}
 
-	private int _authenticateOmniadmin(
+	protected int authenticateOmniadmin(
 			long companyId, String emailAddress, String screenName, long userId)
 		throws Exception {
 
@@ -632,7 +624,7 @@ public class LDAPAuth implements Authenticator {
 		return FAILURE;
 	}
 
-	private int _authenticateRequired(
+	protected int authenticateRequired(
 			long companyId, long userId, String emailAddress, String screenName,
 			boolean allowOmniadmin, int failureCode)
 		throws Exception {
@@ -641,7 +633,7 @@ public class LDAPAuth implements Authenticator {
 		// configuration, they can still login to fix the problem
 
 		if (allowOmniadmin) {
-			int code = _authenticateOmniadmin(
+			int code = authenticateOmniadmin(
 				companyId, emailAddress, screenName, userId);
 
 			if (code == SUCCESS) {
@@ -659,16 +651,16 @@ public class LDAPAuth implements Authenticator {
 		return SUCCESS;
 	}
 
-	private LDAPAuthResult _getFailedLDAPAuthResult(Map<String, Object> env) {
+	protected LDAPAuthResult getFailedLDAPAuthResult(Map<String, Object> env) {
 		Map<String, LDAPAuthResult> failedLDAPAuthResults =
 			_failedLDAPAuthResults.get();
 
-		String cacheKey = _getKey(env);
+		String cacheKey = getKey(env);
 
 		return failedLDAPAuthResults.get(cacheKey);
 	}
 
-	private String _getKey(Map<String, Object> env) {
+	protected String getKey(Map<String, Object> env) {
 		return StringBundler.concat(
 			MapUtil.getString(env, Context.PROVIDER_URL), StringPool.POUND,
 			MapUtil.getString(env, Context.SECURITY_PRINCIPAL),
@@ -676,9 +668,9 @@ public class LDAPAuth implements Authenticator {
 			MapUtil.getString(env, Context.SECURITY_CREDENTIALS));
 	}
 
-	private long _getPreferredLDAPServer(
+	protected long getPreferredLDAPServer(
 			long companyId, String emailAddress, String screenName, long userId)
-		throws Exception {
+		throws PortalException {
 
 		User user = null;
 
@@ -719,7 +711,7 @@ public class LDAPAuth implements Authenticator {
 		return user.getLdapServerId();
 	}
 
-	private String _removeEncryptionAlgorithm(String ldapPassword) {
+	protected String removeEncryptionAlgorithm(String ldapPassword) {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Removing encryption algorithm");
 		}
@@ -739,13 +731,24 @@ public class LDAPAuth implements Authenticator {
 		return ldapPassword.substring(y + 1);
 	}
 
-	private void _setFailedLDAPAuthResult(
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration)",
+		unbind = "-"
+	)
+	protected void setConfigurationProvider(
+		ConfigurationProvider<LDAPAuthConfiguration>
+			ldapAuthConfigurationProvider) {
+
+		_ldapAuthConfigurationProvider = ldapAuthConfigurationProvider;
+	}
+
+	protected void setFailedLDAPAuthResult(
 		Map<String, Object> env, LDAPAuthResult ldapAuthResult) {
 
 		Map<String, LDAPAuthResult> failedLDAPAuthResults =
 			_failedLDAPAuthResults.get();
 
-		String cacheKey = _getKey(env);
+		String cacheKey = getKey(env);
 
 		if (failedLDAPAuthResults.containsKey(cacheKey)) {
 			return;
@@ -754,16 +757,70 @@ public class LDAPAuth implements Authenticator {
 		failedLDAPAuthResults.put(cacheKey, ldapAuthResult);
 	}
 
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPImportConfigurationProvider(
+		ConfigurationProvider<LDAPImportConfiguration>
+			ldapImportConfigurationProvider) {
+
+		_ldapImportConfigurationProvider = ldapImportConfigurationProvider;
+	}
+
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPServerConfigurationProvider(
+		ConfigurationProvider<LDAPServerConfiguration>
+			ldapServerConfigurationProvider) {
+
+		_ldapServerConfigurationProvider = ldapServerConfigurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLdapSettings(LDAPSettings ldapSettings) {
+		_ldapSettings = ldapSettings;
+	}
+
+	@Reference(unbind = "-")
+	protected void setOmniadmin(Omniadmin omniadmin) {
+		_omniadmin = omniadmin;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
+		_passwordEncryptor = passwordEncryptor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+	}
+
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration)",
+		unbind = "-"
+	)
+	protected void setSystemLDAPConfigurationProvider(
+		ConfigurationProvider<SystemLDAPConfiguration>
+			systemLDAPConfigurationProvider) {
+
+		_systemLDAPConfigurationProvider = systemLDAPConfigurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(LDAPAuth.class);
 
 	private boolean _authPipelineEnableLiferayCheck;
 	private final ThreadLocal<Map<String, LDAPAuthResult>>
 		_failedLDAPAuthResults = new CentralizedThreadLocal<>(
 			LDAPAuth.class + "._failedLDAPAuthResultCache", HashMap::new);
-
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration)"
-	)
 	private ConfigurationProvider<LDAPAuthConfiguration>
 		_ldapAuthConfigurationProvider;
 
@@ -773,19 +830,10 @@ public class LDAPAuth implements Authenticator {
 	)
 	private volatile LDAPFilterValidator _ldapFilterValidator;
 
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration)"
-	)
 	private ConfigurationProvider<LDAPImportConfiguration>
 		_ldapImportConfigurationProvider;
-
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)"
-	)
 	private ConfigurationProvider<LDAPServerConfiguration>
 		_ldapServerConfigurationProvider;
-
-	@Reference
 	private LDAPSettings _ldapSettings;
 
 	@Reference(
@@ -794,10 +842,7 @@ public class LDAPAuth implements Authenticator {
 	)
 	private volatile LDAPUserImporter _ldapUserImporter;
 
-	@Reference
 	private Omniadmin _omniadmin;
-
-	@Reference
 	private PasswordEncryptor _passwordEncryptor;
 
 	@Reference(
@@ -806,16 +851,9 @@ public class LDAPAuth implements Authenticator {
 	)
 	private volatile SafePortalLDAP _portalLDAP;
 
-	@Reference
 	private Props _props;
-
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration)"
-	)
 	private ConfigurationProvider<SystemLDAPConfiguration>
 		_systemLDAPConfigurationProvider;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

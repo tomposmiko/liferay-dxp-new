@@ -18,19 +18,22 @@ import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.segments.asah.connector.internal.configuration.provider.SegmentsAsahConfigurationProvider;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Sarai Díaz
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AsahInterestTermCacheTest {
 
 	@ClassRule
@@ -42,15 +45,6 @@ public class AsahInterestTermCacheTest {
 	public void setUp() {
 		ReflectionTestUtil.setFieldValue(
 			_asahInterestTermCache, "_portalCache", _portalCache);
-		ReflectionTestUtil.setFieldValue(
-			_asahInterestTermCache, "_segmentsAsahConfigurationProvider",
-			new SegmentsAsahConfigurationProvider() {
-
-				public int getInterestTermsCacheExpirationTime(long companyId) {
-					return 0;
-				}
-
-			});
 	}
 
 	@Test
@@ -104,7 +98,8 @@ public class AsahInterestTermCacheTest {
 
 	private final AsahInterestTermCache _asahInterestTermCache =
 		new AsahInterestTermCache();
-	private final PortalCache<String, String[]> _portalCache = Mockito.mock(
-		PortalCache.class);
+
+	@Mock
+	private PortalCache<String, String[]> _portalCache;
 
 }

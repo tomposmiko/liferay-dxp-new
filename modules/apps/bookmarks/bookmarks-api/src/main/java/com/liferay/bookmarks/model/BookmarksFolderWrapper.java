@@ -400,6 +400,18 @@ public class BookmarksFolderWrapper
 	}
 
 	/**
+	 * Returns the trash entry created when this bookmarks folder was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this bookmarks folder.
+	 *
+	 * @return the trash entry created when this bookmarks folder was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getTrashEntry();
+	}
+
+	/**
 	 * Returns the class primary key of the trash entry for this bookmarks folder.
 	 *
 	 * @return the class primary key of the trash entry for this bookmarks folder
@@ -407,6 +419,18 @@ public class BookmarksFolderWrapper
 	@Override
 	public long getTrashEntryClassPK() {
 		return model.getTrashEntryClassPK();
+	}
+
+	/**
+	 * Returns the trash handler for this bookmarks folder.
+	 *
+	 * @return the trash handler for this bookmarks folder
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
+		return model.getTrashHandler();
 	}
 
 	/**
@@ -527,6 +551,26 @@ public class BookmarksFolderWrapper
 	@Override
 	public boolean isInTrash() {
 		return model.isInTrash();
+	}
+
+	/**
+	 * Returns <code>true</code> if the parent of this bookmarks folder is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this bookmarks folder is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer() {
+		return model.isInTrashContainer();
+	}
+
+	@Override
+	public boolean isInTrashExplicitly() {
+		return model.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return model.isInTrashImplicitly();
 	}
 
 	/**
@@ -787,11 +831,6 @@ public class BookmarksFolderWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

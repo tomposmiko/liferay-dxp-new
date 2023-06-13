@@ -21,42 +21,6 @@ import org.json.JSONObject;
  */
 public class SubrepositoryWorkspace extends PortalWorkspace {
 
-	@Override
-	public PortalWorkspaceGitRepository getPortalWorkspaceGitRepository() {
-		if (_portalUpstreamBranchName == null) {
-			WorkspaceGitRepository workspaceGitRepository =
-				getPrimaryWorkspaceGitRepository();
-
-			_portalUpstreamBranchName =
-				workspaceGitRepository.getUpstreamBranchName();
-		}
-
-		String repositoryName = "liferay-portal";
-
-		if (!_portalUpstreamBranchName.equals("master")) {
-			repositoryName += "-ee";
-		}
-
-		String directoryName = JenkinsResultsParserUtil.getGitDirectoryName(
-			repositoryName, _portalUpstreamBranchName);
-
-		WorkspaceGitRepository portalWorkspaceGitRepository =
-			getWorkspaceGitRepository(directoryName);
-
-		if (!(portalWorkspaceGitRepository instanceof
-				PortalWorkspaceGitRepository)) {
-
-			throw new RuntimeException(
-				"The portal workspace Git repository is not set");
-		}
-
-		return (PortalWorkspaceGitRepository)portalWorkspaceGitRepository;
-	}
-
-	public void setPortalUpstreamBranchName(String portalUpstreamBranchName) {
-		_portalUpstreamBranchName = portalUpstreamBranchName;
-	}
-
 	protected SubrepositoryWorkspace(JSONObject jsonObject) {
 		super(jsonObject);
 	}
@@ -75,6 +39,36 @@ public class SubrepositoryWorkspace extends PortalWorkspace {
 	}
 
 	@Override
+	protected PortalWorkspaceGitRepository getPortalWorkspaceGitRepository() {
+		WorkspaceGitRepository workspaceGitRepository =
+			getPrimaryWorkspaceGitRepository();
+
+		String upstreamBranchName =
+			workspaceGitRepository.getUpstreamBranchName();
+
+		String repositoryName = "liferay-portal";
+
+		if (!upstreamBranchName.equals("master")) {
+			repositoryName += "-ee";
+		}
+
+		String directoryName = JenkinsResultsParserUtil.getGitDirectoryName(
+			repositoryName, upstreamBranchName);
+
+		WorkspaceGitRepository portalWorkspaceGitRepository =
+			getWorkspaceGitRepository(directoryName);
+
+		if (!(portalWorkspaceGitRepository instanceof
+				PortalWorkspaceGitRepository)) {
+
+			throw new RuntimeException(
+				"The portal workspace Git repository is not set");
+		}
+
+		return (PortalWorkspaceGitRepository)portalWorkspaceGitRepository;
+	}
+
+	@Override
 	protected void updateOSBAsahModule() {
 		WorkspaceGitRepository primaryWorkspaceGitRepository =
 			getPrimaryWorkspaceGitRepository();
@@ -85,19 +79,5 @@ public class SubrepositoryWorkspace extends PortalWorkspace {
 			copyOSBAsahRepositoryToModule();
 		}
 	}
-
-	@Override
-	protected void updateOSBFaroModule() {
-		WorkspaceGitRepository primaryWorkspaceGitRepository =
-			getPrimaryWorkspaceGitRepository();
-
-		String repositoryName = primaryWorkspaceGitRepository.getName();
-
-		if (repositoryName.equals("com-liferay-osb-faro-private")) {
-			copyOSBFaroRepositoryToModule();
-		}
-	}
-
-	private String _portalUpstreamBranchName;
 
 }

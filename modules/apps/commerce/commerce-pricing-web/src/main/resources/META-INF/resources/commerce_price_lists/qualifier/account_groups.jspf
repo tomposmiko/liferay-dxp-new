@@ -43,11 +43,11 @@
 						.then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 								id:
-									'<%= CommercePricingFDSNames.PRICE_LIST_QUALIFIER_ACCOUNT_GROUPS %>',
+									'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_ACCOUNT_GROUPS %>',
 							});
 						})
 						.catch((error) => {
-							return Promise.reject(error.title);
+							return Promise.reject(error);
 						});
 				}
 
@@ -63,7 +63,7 @@
 					itemSelectedMessage:
 						'<%= LanguageUtil.get(request, "account-group-selected") %>',
 					linkedDatasetsId: [
-						'<%= CommercePricingFDSNames.PRICE_LIST_QUALIFIER_ACCOUNT_GROUPS %>',
+						'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_ACCOUNT_GROUPS %>',
 					],
 					itemCreation: false,
 					itemsKey: 'id',
@@ -76,7 +76,7 @@
 							fieldName: 'name',
 						},
 					],
-					spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 					titleLabel:
 						'<%= LanguageUtil.get(request, "add-existing-account-group") %>',
 				});
@@ -88,12 +88,15 @@
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "account-groups") %>'
 			>
-				<frontend-data-set:headless-display
+				<clay:headless-data-set-display
 					apiURL="<%= commercePriceListQualifiersDisplayContext.getPriceListAccountGroupsApiURL() %>"
-					fdsActionDropdownItems="<%= commercePriceListQualifiersDisplayContext.getPriceListAccountGroupFDSActionDropdownItems() %>"
-					formName="fm"
-					id="<%= CommercePricingFDSNames.PRICE_LIST_QUALIFIER_ACCOUNT_GROUPS %>"
+					clayDataSetActionDropdownItems="<%= commercePriceListQualifiersDisplayContext.getPriceListAccountGroupClayDataSetActionDropdownItems() %>"
+					formId="fm"
+					id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_ACCOUNT_GROUPS %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= currentURLObj %>"
 				/>
 			</commerce-ui:panel>
 		</div>

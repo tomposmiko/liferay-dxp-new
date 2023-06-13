@@ -26,7 +26,7 @@ BlogsStatsUser statsUser = (BlogsStatsUser)objArray[0];
 
 <liferay-ui:user-display
 	url="<%= (String)objArray[1] %>"
-	userId="<%= statsUser.getStatsUserId() %>"
+	userId="<%= statsUser.getUserId() %>"
 >
 	<div class="blogger-post-count">
 		<c:choose>

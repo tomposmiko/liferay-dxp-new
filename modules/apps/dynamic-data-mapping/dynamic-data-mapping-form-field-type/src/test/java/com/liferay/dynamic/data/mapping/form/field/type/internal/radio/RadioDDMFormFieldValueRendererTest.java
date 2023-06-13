@@ -22,10 +22,8 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.HtmlImpl;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -53,7 +51,7 @@ public class RadioDDMFormFieldValueRendererTest {
 			ddmFormField.getDDMFormFieldOptions();
 
 		ddmFormFieldOptions.addOptionLabel(
-			"value 1", LocaleUtil.US, "option with &");
+			"value 1", LocaleUtil.US, "option 1");
 		ddmFormFieldOptions.addOptionLabel(
 			"value 2", LocaleUtil.US, "option 2");
 
@@ -69,16 +67,16 @@ public class RadioDDMFormFieldValueRendererTest {
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 
 		RadioDDMFormFieldValueRenderer radioDDMFormFieldValueRenderer =
-			_createRadioDDMFormFieldValueRenderer();
+			createRadioDDMFormFieldValueRenderer();
 
 		Assert.assertEquals(
-			"option with &amp;",
+			"option 1",
 			radioDDMFormFieldValueRenderer.render(
 				ddmFormFieldValue, LocaleUtil.US));
 	}
 
-	private RadioDDMFormFieldValueRenderer
-			_createRadioDDMFormFieldValueRenderer()
+	protected RadioDDMFormFieldValueRenderer
+			createRadioDDMFormFieldValueRenderer()
 		throws Exception {
 
 		RadioDDMFormFieldValueRenderer radioDDMFormFieldValueRenderer =
@@ -86,9 +84,6 @@ public class RadioDDMFormFieldValueRendererTest {
 
 		radioDDMFormFieldValueRenderer.radioDDMFormFieldValueAccessor =
 			new RadioDDMFormFieldValueAccessor();
-
-		ReflectionTestUtil.setFieldValue(
-			radioDDMFormFieldValueRenderer, "_html", new HtmlImpl());
 
 		return radioDDMFormFieldValueRenderer;
 	}

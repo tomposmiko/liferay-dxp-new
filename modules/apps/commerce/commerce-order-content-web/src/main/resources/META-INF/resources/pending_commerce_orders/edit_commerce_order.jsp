@@ -46,23 +46,16 @@ if (priceDisplayType.equals(CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
 	totalOrderCommerceMoney = commerceOrderPrice.getTotalWithTaxAmount();
 }
 
-AccountEntry accountEntry = commerceOrderContentDisplayContext.getAccountEntry();
+CommerceAccount commerceAccount = commerceOrderContentDisplayContext.getCommerceAccount();
 
 if (commerceOrder != null) {
-	accountEntry = commerceOrder.getAccountEntry();
+	commerceAccount = commerceOrder.getCommerceAccount();
 }
 
-List<CommerceAddress> shippingAddresses = commerceOrderContentDisplayContext.getShippingCommerceAddresses(accountEntry.getAccountEntryId());
-List<CommerceAddress> billingAddresses = commerceOrderContentDisplayContext.getBillingCommerceAddresses(accountEntry.getAccountEntryId());
+List<CommerceAddress> shippingAddresses = commerceOrderContentDisplayContext.getShippingCommerceAddresses(commerceAccount.getCommerceAccountId(), commerceAccount.getCompanyId());
+List<CommerceAddress> billingAddresses = commerceOrderContentDisplayContext.getBillingCommerceAddresses(commerceAccount.getCommerceAccountId(), commerceAccount.getCompanyId());
 
 List<String> errorMessages = (List<String>)request.getAttribute(CommerceWebKeys.COMMERCE_ORDER_ERROR_MESSAGES);
-
-String backURL = ParamUtil.getString(request, "backURL", null);
-
-if (backURL != null) {
-	portletDisplay.setShowBackIcon(true);
-	portletDisplay.setURLBack(backURL);
-}
 %>
 
 <c:if test="<%= (errorMessages != null) && !errorMessages.isEmpty() %>">
@@ -86,24 +79,6 @@ if (backURL != null) {
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 	<aui:input name="commerceOrderId" type="hidden" value="<%= String.valueOf(commerceOrder.getCommerceOrderId()) %>" />
 
-	<liferay-ui:error embed="<%= false %>" exception="<%= CommerceOrderImporterTypeException.class %>" message="the-import-process-failed" />
-
-	<liferay-ui:error embed="<%= false %>" exception="<%= CommerceOrderImporterTypeException.class %>">
-
-		<%
-		String commerceOrderImporterTypeKey = (String)SessionErrors.get(renderRequest, CommerceOrderImporterTypeException.class);
-		%>
-
-		<c:choose>
-			<c:when test="<%= Validator.isNull(commerceOrderImporterTypeKey) %>">
-				<liferay-ui:message key="the-import-process-failed" />
-			</c:when>
-			<c:otherwise>
-				<liferay-ui:message arguments="<%= commerceOrderImporterTypeKey %>" key="the-x-could-not-be-imported" />
-			</c:otherwise>
-		</c:choose>
-	</liferay-ui:error>
-
 	<liferay-ui:error exception="<%= CommerceOrderValidatorException.class %>">
 
 		<%
@@ -126,38 +101,6 @@ if (backURL != null) {
 
 	</liferay-ui:error>
 
-	<liferay-ui:error embed="<%= false %>" key="notImportedRowsCount">
-
-		<%
-		int notImportedRowsCount = (int)SessionErrors.get(renderRequest, "notImportedRowsCount");
-		%>
-
-		<c:choose>
-			<c:when test="<%= notImportedRowsCount > 1 %>">
-				<liferay-ui:message arguments="<%= notImportedRowsCount %>" key="x-rows-were-not-imported" translateArguments="<%= false %>" />
-			</c:when>
-			<c:otherwise>
-				<liferay-ui:message key="1-row-was-not-imported" />
-			</c:otherwise>
-		</c:choose>
-	</liferay-ui:error>
-
-	<liferay-ui:success key="importedRowsCount">
-
-		<%
-		int importedRowsCount = (int)SessionMessages.get(renderRequest, "importedRowsCount");
-		%>
-
-		<c:choose>
-			<c:when test="<%= importedRowsCount > 1 %>">
-				<liferay-ui:message arguments="<%= importedRowsCount %>" key="x-rows-were-imported-successfully" translateArguments="<%= false %>" />
-			</c:when>
-			<c:otherwise>
-				<liferay-ui:message key="1-row-was-imported-successfully" />
-			</c:otherwise>
-		</c:choose>
-	</liferay-ui:success>
-
 	<aui:model-context bean="<%= commerceOrder %>" model="<%= CommerceOrder.class %>" />
 
 	<div class="commerce-panel">
@@ -165,7 +108,7 @@ if (backURL != null) {
 			<div class="align-items-center row">
 				<div class="col-md-3">
 					<div class="commerce-order-title">
-						<%= HtmlUtil.escape(accountEntry.getName()) %>
+						<%= HtmlUtil.escape(commerceAccount.getName()) %>
 					</div>
 				</div>
 
@@ -198,7 +141,7 @@ if (backURL != null) {
 				<div class="col-md-3">
 					<dl class="commerce-list">
 						<dt><liferay-ui:message key="account-id" /></dt>
-						<dd><%= accountEntry.getAccountEntryId() %></dd>
+						<dd><%= commerceAccount.getCommerceAccountId() %></dd>
 					</dl>
 				</div>
 
@@ -262,42 +205,40 @@ if (backURL != null) {
 				<div class="commerce-panel__content">
 					<div class="row">
 						<div class="col-md-12">
-							<c:if test="<%= commerceOrderContentDisplayContext.hasViewBillingAddressPermission(permissionChecker, accountEntry) %>">
-								<c:choose>
-									<c:when test="<%= commerceOrderContentDisplayContext.hasModelPermission(commerceOrder, ActionKeys.UPDATE) %>">
-										<dl class="commerce-list">
-											<aui:select cssClass="commerce-input" inlineField="<%= true %>" label="" name="billingAddressId" showEmptyOption="<%= true %>" wrappedField="<%= false %>">
+							<c:choose>
+								<c:when test="<%= commerceOrderContentDisplayContext.hasModelPermission(commerceOrder, ActionKeys.UPDATE) %>">
+									<dl class="commerce-list">
+										<aui:select cssClass="commerce-input" inlineField="<%= true %>" label="" name="billingAddressId" showEmptyOption="<%= true %>" wrappedField="<%= false %>">
 
-												<%
-												for (CommerceAddress commerceAddress : billingAddresses) {
-												%>
+											<%
+											for (CommerceAddress commerceAddress : billingAddresses) {
+											%>
 
-													<aui:option label="<%= HtmlUtil.escape(commerceAddress.getName()) %>" selected="<%= billingCommerceAddressId == commerceAddress.getCommerceAddressId() %>" value="<%= commerceAddress.getCommerceAddressId() %>" />
+												<aui:option label="<%= HtmlUtil.escape(commerceAddress.getName()) %>" selected="<%= billingCommerceAddressId == commerceAddress.getCommerceAddressId() %>" value="<%= commerceAddress.getCommerceAddressId() %>" />
 
-												<%
-												}
-												%>
+											<%
+											}
+											%>
 
-											</aui:select>
-										</dl>
-									</c:when>
-									<c:otherwise>
-										<c:if test="<%= billingCommerceAddress != null %>">
-											<p><%= HtmlUtil.escape(billingCommerceAddress.getStreet1()) %></p>
+										</aui:select>
+									</dl>
+								</c:when>
+								<c:otherwise>
+									<c:if test="<%= billingCommerceAddress != null %>">
+										<p><%= HtmlUtil.escape(billingCommerceAddress.getStreet1()) %></p>
 
-											<c:if test="<%= !Validator.isBlank(billingCommerceAddress.getStreet2()) %>">
-												<p><%= HtmlUtil.escape(billingCommerceAddress.getStreet2()) %></p>
-											</c:if>
-
-											<c:if test="<%= !Validator.isBlank(billingCommerceAddress.getStreet3()) %>">
-												<p><%= HtmlUtil.escape(billingCommerceAddress.getStreet3()) %></p>
-											</c:if>
-
-											<p><%= HtmlUtil.escape(billingCommerceAddress.getCity() + StringPool.SPACE + billingCommerceAddress.getZip()) %></p>
+										<c:if test="<%= !Validator.isBlank(billingCommerceAddress.getStreet2()) %>">
+											<p><%= HtmlUtil.escape(billingCommerceAddress.getStreet2()) %></p>
 										</c:if>
-									</c:otherwise>
-								</c:choose>
-							</c:if>
+
+										<c:if test="<%= !Validator.isBlank(billingCommerceAddress.getStreet3()) %>">
+											<p><%= HtmlUtil.escape(billingCommerceAddress.getStreet3()) %></p>
+										</c:if>
+
+										<p><%= HtmlUtil.escape(billingCommerceAddress.getCity() + StringPool.SPACE + billingCommerceAddress.getZip()) %></p>
+									</c:if>
+								</c:otherwise>
+							</c:choose>
 						</div>
 					</div>
 				</div>
@@ -359,49 +300,10 @@ if (backURL != null) {
 		showWhenSingleIcon="<%= true %>"
 		triggerCssClass="btn btn-lg btn-monospaced btn-primary position-fixed thumb-menu"
 	>
-
-		<%
-		PortletURL viewCommerceOrderImporterTypeURL = PortletURLBuilder.createRenderURL(
-			renderResponse
-		).setMVCRenderCommandName(
-			"/commerce_open_order_content/view_commerce_order_importer_type"
-		).setParameter(
-			"commerceOrderId", commerceOrder.getCommerceOrderId()
-		).setWindowState(
-			LiferayWindowState.POP_UP
-		).buildPortletURL();
-
-		for (CommerceOrderImporterType commerceOrderImporterType : commerceOrderContentDisplayContext.getCommerceImporterTypes(commerceOrder)) {
-			String commerceOrderImporterTypeKey = commerceOrderImporterType.getKey();
-			String commerceOrderImporterTypeLabel = commerceOrderImporterType.getLabel(locale);
-
-			viewCommerceOrderImporterTypeURL.setParameter("commerceOrderImporterTypeKey", commerceOrderImporterTypeKey);
-
-			String viewCommerceOrderImporterTypeURLString = viewCommerceOrderImporterTypeURL.toString();
-		%>
-
-			<liferay-ui:icon
-				cssClass="<%= commerceOrderImporterTypeKey %>"
-				message="<%= commerceOrderImporterTypeLabel %>"
-				url="<%= viewCommerceOrderImporterTypeURLString %>"
-			/>
-
-			<liferay-frontend:component
-				context='<%=
-					HashMapBuilder.<String, Object>put(
-						"commerceOrderImporterTypeKey", commerceOrderImporterTypeKey
-					).put(
-						"title", commerceOrderImporterTypeLabel
-					).put(
-						"url", viewCommerceOrderImporterTypeURLString
-					).build()
-				%>'
-				module="js/edit_commerce_order"
-			/>
-
-		<%
-		}
-		%>
+		<liferay-ui:icon
+			message="print"
+			url='<%= "javascript:window.print();" %>'
+		/>
 
 		<c:if test="<%= commerceOrderContentDisplayContext.hasModelPermission(commerceOrder, ActionKeys.DELETE) %>">
 			<portlet:actionURL name="/commerce_open_order_content/edit_commerce_order" var="deleteURL">
@@ -425,13 +327,6 @@ if (backURL != null) {
 				message="remove-all-items"
 				url="<%= deleteOrderContentURL %>"
 			/>
-
-			<liferay-ui:icon
-				icon="print"
-				message="print"
-				target="_blank"
-				url="<%= commerceOrderContentDisplayContext.getExportCommerceOrderReportURL() %>"
-			/>
 		</c:if>
 	</liferay-ui:icon-menu>
 
@@ -448,17 +343,8 @@ if (backURL != null) {
 
 		<liferay-commerce:order-transitions
 			commerceOrderId="<%= commerceOrder.getCommerceOrderId() %>"
-			cssClass="btn btn-fixed btn-primary ml-3"
+			cssClass="btn btn-fixed btn-lg btn-primary ml-3"
 		/>
-
-		<c:if test="<%= commerceOrderContentDisplayContext.isRequestQuoteEnabled() %>">
-			<clay:button
-				cssClass="btn-fixed btn-secondary ml-3 request-quote"
-				displayType="secondary"
-				label='<%= LanguageUtil.get(request, "request-a-quote") %>'
-				small="<%= false %>"
-			/>
-		</c:if>
 	</div>
 </aui:form>
 
@@ -471,13 +357,16 @@ if (backURL != null) {
 		contextParams.put("commerceOrderId", String.valueOf(commerceOrder.getCommerceOrderId()));
 		%>
 
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			contextParams="<%= contextParams %>"
-			dataProviderKey="<%= CommerceOrderFDSNames.PENDING_ORDER_ITEMS %>"
-			id="<%= CommerceOrderFDSNames.PENDING_ORDER_ITEMS %>"
+			dataProviderKey="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PENDING_ORDER_ITEMS %>"
+			id="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PENDING_ORDER_ITEMS %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
 			nestedItemsKey="orderItemId"
 			nestedItemsReferenceKey="orderItems"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= commerceOrderContentDisplayContext.getPortletURL() %>"
 			style="stacked"
 		/>
 	</div>

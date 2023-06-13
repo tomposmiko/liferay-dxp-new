@@ -187,8 +187,4 @@ public interface SamlIdpSsoSessionModel
 	@Override
 	public SamlIdpSsoSession cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

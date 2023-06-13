@@ -70,7 +70,7 @@ public class MathUtil {
 			x = number.doubleValue();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception.getMessage());
 		}
 
 		return x;

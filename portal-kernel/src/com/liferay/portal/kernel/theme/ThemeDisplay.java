@@ -16,11 +16,11 @@ package com.liferay.portal.kernel.theme;
 
 import com.liferay.admin.kernel.util.PortalMyAccountApplicationType;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
+import com.liferay.mobile.device.rules.kernel.MDRRuleGroupInstance;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -49,11 +49,12 @@ import com.liferay.portal.kernel.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Mergeable;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.TimeZoneThreadLocal;
@@ -162,7 +163,7 @@ public class ThemeDisplay
 				portalURL = PortalUtil.getPortalURL(getLayout(), this);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 
 			host = portalURL;
@@ -190,15 +191,6 @@ public class ThemeDisplay
 
 	public String getCDNHost() {
 		return _cdnHost;
-	}
-
-	public String getClayCSSURL() {
-		if (Validator.isNotNull(_clayCSSURL)) {
-			return _clayCSSURL;
-		}
-
-		return PortalUtil.getStaticResourceURL(
-			getRequest(), getPathThemeCss() + "/clay.css");
 	}
 
 	public ColorScheme getColorScheme() {
@@ -328,19 +320,25 @@ public class ThemeDisplay
 	}
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #getGuestUser}
+	 * Returns the portal instance's default user.
+	 *
+	 * @return the portal instance's default user
 	 */
-	@Deprecated
 	public User getDefaultUser() throws PortalException {
-		return getGuestUser();
+		if (_defaultUser == null) {
+			_defaultUser = _company.getDefaultUser();
+		}
+
+		return _defaultUser;
 	}
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #getGuestUserId}
+	 * Returns the ID of the portal instance's default user.
+	 *
+	 * @return the ID of the portal instance's default user
 	 */
-	@Deprecated
 	public long getDefaultUserId() throws PortalException {
-		return getGuestUserId();
+		return getDefaultUser().getUserId();
 	}
 
 	/**
@@ -371,37 +369,6 @@ public class ThemeDisplay
 
 	public String getDoAsUserLanguageId() {
 		return _doAsUserLanguageId;
-	}
-
-	public String getFaviconURL() {
-		if (Validator.isNotNull(_faviconURL)) {
-			return _faviconURL;
-		}
-
-		return getPathThemeImages() + "/" +
-			PropsUtil.get(PropsKeys.THEME_SHORTCUT_ICON);
-	}
-
-	/**
-	 * Returns the portal instance's guest user.
-	 *
-	 * @return the portal instance's guest user
-	 */
-	public User getGuestUser() throws PortalException {
-		if (_guestUser == null) {
-			_guestUser = _company.getGuestUser();
-		}
-
-		return _guestUser;
-	}
-
-	/**
-	 * Returns the ID of the portal instance's guest user.
-	 *
-	 * @return the ID of the portal instance's guest user
-	 */
-	public long getGuestUserId() throws PortalException {
-		return getGuestUser().getUserId();
 	}
 
 	/**
@@ -559,31 +526,8 @@ public class ThemeDisplay
 		return _locale;
 	}
 
-	public String getMainCSSURL() {
-		if (Validator.isNotNull(_mainCSSURL)) {
-			return _mainCSSURL;
-		}
-
-		return PortalUtil.getStaticResourceURL(
-			getRequest(), getPathThemeCss() + "/main.css");
-	}
-
-	public String getMainJSURL() {
-		if (Validator.isNotNull(_mainJSURL)) {
-			return _mainJSURL;
-		}
-
-		return PortalUtil.getStaticResourceURL(
-			getRequest(), getPathThemeJavaScript() + "/main.js");
-	}
-
-	public List<NavItem> getNavItems() throws PortalException {
-		if (_navItems == null) {
-			_navItems = NavItem.fromLayouts(
-				_httpServletRequest, _layouts, this);
-		}
-
-		return _navItems;
+	public MDRRuleGroupInstance getMDRRuleGroupInstance() {
+		return _mdrRuleGroupInstance;
 	}
 
 	public String getPathApplet() {
@@ -609,12 +553,11 @@ public class ThemeDisplay
 	}
 
 	/**
-	 * Returns the URL for the control panel's spritemap.
-	 *
-	 * @return the URL for the control panel's spritemap
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
-	public String getPathControlPanelSpritemap() {
-		return _pathControlPanelSpritemap;
+	@Deprecated
+	public String getPathFlash() {
+		return _pathFlash;
 	}
 
 	/**
@@ -717,15 +660,6 @@ public class ThemeDisplay
 	}
 
 	/**
-	 * Returns the URL for the theme's spritemap.
-	 *
-	 * @return the URL for the theme's spritemap
-	 */
-	public String getPathThemeSpritemap() {
-		return _pathThemeSpritemap;
-	}
-
-	/**
 	 * Returns the URL for the theme's templates.
 	 *
 	 * @return the URL for the theme's templates
@@ -784,7 +718,7 @@ public class ThemeDisplay
 	}
 
 	public String getProtocol() {
-		return HttpComponentsUtil.getProtocol(_secure);
+		return HttpUtil.getProtocol(_secure);
 	}
 
 	public String getRealCompanyLogo() {
@@ -831,14 +765,6 @@ public class ThemeDisplay
 
 	public long getRefererPlid() {
 		return _refererPlid;
-	}
-
-	public String getRemoteAddr() {
-		return _remoteAddr;
-	}
-
-	public String getRemoteHost() {
-		return _remoteHost;
 	}
 
 	/**
@@ -1081,12 +1007,12 @@ public class ThemeDisplay
 	@JSON(include = false)
 	public PortletURL getURLMyAccount() {
 		if (_urlMyAccount == null) {
+			String portletId = PortletProviderUtil.getPortletId(
+				PortalMyAccountApplicationType.MyAccount.CLASS_NAME,
+				PortletProvider.Action.VIEW);
+
 			_urlMyAccount = PortalUtil.getControlPanelPortletURL(
-				getRequest(),
-				PortletProviderUtil.getPortletId(
-					PortalMyAccountApplicationType.MyAccount.CLASS_NAME,
-					PortletProvider.Action.VIEW),
-				PortletRequest.RENDER_PHASE);
+				getRequest(), portletId, PortletRequest.RENDER_PHASE);
 		}
 
 		return _urlMyAccount;
@@ -1107,6 +1033,17 @@ public class ThemeDisplay
 
 	public String getURLSignOut() {
 		return _urlSignOut;
+	}
+
+	@JSON(include = false)
+	public PortletURL getURLUpdateManager() {
+		if (_urlUpdateManager == null) {
+			_urlUpdateManager = PortalUtil.getControlPanelPortletURL(
+				getRequest(), PortletKeys.MARKETPLACE_STORE,
+				PortletRequest.RENDER_PHASE);
+		}
+
+		return _urlUpdateManager;
 	}
 
 	/**
@@ -1225,10 +1162,6 @@ public class ThemeDisplay
 
 	public boolean isSecure() {
 		return _secure;
-	}
-
-	public boolean isShowControlMenu() {
-		return _showControlMenu;
 	}
 
 	public boolean isShowControlPanelIcon() {
@@ -1350,10 +1283,6 @@ public class ThemeDisplay
 		_cdnHost = cdnHost;
 	}
 
-	public void setClayCSSURL(String clayCSSURL) {
-		_clayCSSURL = clayCSSURL;
-	}
-
 	public void setCompany(Company company) throws PortalException {
 		_company = company;
 		_companyGroupId = company.getGroupId();
@@ -1389,10 +1318,6 @@ public class ThemeDisplay
 
 	public void setDoAsUserLanguageId(String doAsUserLanguageId) {
 		_doAsUserLanguageId = doAsUserLanguageId;
-	}
-
-	public void setFaviconURL(String faviconURL) {
-		_faviconURL = faviconURL;
 	}
 
 	public void setHubAction(boolean hubAction) {
@@ -1507,12 +1432,6 @@ public class ThemeDisplay
 			cdnBaseURL + themeStaticResourcePath +
 				colorScheme.getColorSchemeImagesPath());
 
-		String claySpritemapPath = StringBundler.concat(
-			cdnBaseURL, themeStaticResourcePath, theme.getImagesPath(),
-			"/clay/icons.svg");
-
-		setPathControlPanelSpritemap(claySpritemapPath);
-
 		String dynamicResourcesHost = getCDNDynamicResourcesHost();
 
 		if (Validator.isNull(dynamicResourcesHost)) {
@@ -1522,7 +1441,7 @@ public class ThemeDisplay
 				portalURL = PortalUtil.getPortalURL(getLayout(), this);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 
 			dynamicResourcesHost = portalURL;
@@ -1546,21 +1465,14 @@ public class ThemeDisplay
 			setPathThemeRoot(themeStaticResourcePath + rootPath);
 		}
 
-		setPathThemeSpritemap(claySpritemapPath);
 		setPathThemeTemplates(
 			cdnBaseURL + themeStaticResourcePath + theme.getTemplatesPath());
 	}
 
-	public void setMainCSSURL(String mainCSSURL) {
-		_mainCSSURL = mainCSSURL;
-	}
+	public void setMDRRuleGroupInstance(
+		MDRRuleGroupInstance mdrRuleGroupInstance) {
 
-	public void setMainJSURL(String mainJSURL) {
-		_mainJSURL = mainJSURL;
-	}
-
-	public void setNavItems(List<NavItem> navItems) {
-		_navItems = navItems;
+		_mdrRuleGroupInstance = mdrRuleGroupInstance;
 	}
 
 	public void setPathApplet(String pathApplet) {
@@ -1579,8 +1491,12 @@ public class ThemeDisplay
 		_pathContext = pathContext;
 	}
 
-	public void setPathControlPanelSpritemap(String pathControlPanelSpritemap) {
-		_pathControlPanelSpritemap = pathControlPanelSpritemap;
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public void setPathFlash(String pathFlash) {
+		_pathFlash = pathFlash;
 	}
 
 	public void setPathFriendlyURLPrivateGroup(
@@ -1631,10 +1547,6 @@ public class ThemeDisplay
 		_pathThemeRoot = pathThemeRoot;
 	}
 
-	public void setPathThemeSpritemap(String pathThemeSpritemap) {
-		_pathThemeSpritemap = pathThemeSpritemap;
-	}
-
 	public void setPathThemeTemplates(String pathThemeTemplates) {
 		_pathThemeTemplates = pathThemeTemplates;
 	}
@@ -1683,7 +1595,7 @@ public class ThemeDisplay
 				_refererGroup = GroupLocalServiceUtil.getGroup(_refererGroupId);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
@@ -1692,21 +1604,8 @@ public class ThemeDisplay
 		_refererPlid = refererPlid;
 	}
 
-	public void setRemoteAddr(String remoteAddr) {
-		_remoteAddr = remoteAddr;
-	}
-
-	public void setRemoteHost(String remoteHost) {
-		_remoteHost = remoteHost;
-	}
-
 	public void setRequest(HttpServletRequest httpServletRequest) {
 		_httpServletRequest = httpServletRequest;
-
-		if (httpServletRequest != null) {
-			_remoteAddr = httpServletRequest.getRemoteAddr();
-			_remoteHost = httpServletRequest.getRemoteHost();
-		}
 	}
 
 	public void setResponse(HttpServletResponse httpServletResponse) {
@@ -1721,7 +1620,7 @@ public class ThemeDisplay
 				_scopeGroup = GroupLocalServiceUtil.getGroup(_scopeGroupId);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
@@ -1740,10 +1639,6 @@ public class ThemeDisplay
 
 	public void setSessionId(String sessionId) {
 		_sessionId = sessionId;
-	}
-
-	public void setShowControlMenu(boolean showControlMenu) {
-		_showControlMenu = showControlMenu;
 	}
 
 	public void setShowControlPanelIcon(boolean showControlPanelIcon) {
@@ -1812,7 +1707,7 @@ public class ThemeDisplay
 				_siteGroup = GroupLocalServiceUtil.getGroup(_siteGroupId);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
@@ -1945,12 +1840,6 @@ public class ThemeDisplay
 			}
 		}
 
-		if (layout.getCtCollectionId() !=
-				CTCollectionThreadLocal.CT_COLLECTION_ID_PRODUCTION) {
-
-			return layout.getFriendlyURL(_locale);
-		}
-
 		String layoutFriendlyURL = _layoutFriendlyURLs.get(layout.getPlid());
 
 		if (layoutFriendlyURL == null) {
@@ -1993,7 +1882,6 @@ public class ThemeDisplay
 	private String _cdnBaseURL;
 	private String _cdnDynamicResourcesHost = StringPool.BLANK;
 	private String _cdnHost = StringPool.BLANK;
-	private String _clayCSSURL;
 	private ColorScheme _colorScheme;
 	private Company _company;
 	private long _companyGroupId;
@@ -2003,12 +1891,11 @@ public class ThemeDisplay
 	private Contact _contact;
 	private Group _controlPanelGroup;
 	private Layout _controlPanelLayout;
+	private User _defaultUser;
 	private Device _device;
 	private long _doAsGroupId;
 	private String _doAsUserId = StringPool.BLANK;
 	private String _doAsUserLanguageId = StringPool.BLANK;
-	private String _faviconURL;
-	private User _guestUser;
 	private transient HttpServletRequest _httpServletRequest;
 	private transient HttpServletResponse _httpServletResponse;
 	private boolean _hubAction;
@@ -2033,14 +1920,12 @@ public class ThemeDisplay
 	private boolean _lifecycleRender;
 	private boolean _lifecycleResource;
 	private Locale _locale;
-	private String _mainCSSURL;
-	private String _mainJSURL;
-	private List<NavItem> _navItems;
+	private MDRRuleGroupInstance _mdrRuleGroupInstance;
 	private String _pathApplet = StringPool.BLANK;
 	private String _pathCms = StringPool.BLANK;
 	private String _pathColorSchemeImages = StringPool.BLANK;
 	private String _pathContext = StringPool.BLANK;
-	private String _pathControlPanelSpritemap = StringPool.BLANK;
+	private String _pathFlash = StringPool.BLANK;
 	private String _pathFriendlyURLPrivateGroup = StringPool.BLANK;
 	private String _pathFriendlyURLPrivateUser = StringPool.BLANK;
 	private String _pathFriendlyURLPublic = StringPool.BLANK;
@@ -2052,7 +1937,6 @@ public class ThemeDisplay
 	private String _pathThemeImages = StringPool.BLANK;
 	private String _pathThemeJavaScript = StringPool.BLANK;
 	private String _pathThemeRoot = StringPool.BLANK;
-	private String _pathThemeSpritemap = StringPool.BLANK;
 	private String _pathThemeTemplates = StringPool.BLANK;
 	private transient PermissionChecker _permissionChecker;
 	private long _plid;
@@ -2069,15 +1953,12 @@ public class ThemeDisplay
 	private Group _refererGroup;
 	private long _refererGroupId;
 	private long _refererPlid;
-	private String _remoteAddr;
-	private String _remoteHost;
 	private Group _scopeGroup;
 	private long _scopeGroupId;
 	private boolean _secure;
 	private String _serverName;
 	private int _serverPort;
 	private String _sessionId = StringPool.BLANK;
-	private boolean _showControlMenu;
 	private boolean _showControlPanelIcon;
 	private boolean _showHomeIcon;
 	private boolean _showLayoutTemplatesIcon;
@@ -2115,6 +1996,7 @@ public class ThemeDisplay
 	private transient PortletURL _urlPublishToLive;
 	private String _urlSignIn = StringPool.BLANK;
 	private String _urlSignOut = StringPool.BLANK;
+	private transient PortletURL _urlUpdateManager;
 	private User _user;
 	private boolean _widget;
 

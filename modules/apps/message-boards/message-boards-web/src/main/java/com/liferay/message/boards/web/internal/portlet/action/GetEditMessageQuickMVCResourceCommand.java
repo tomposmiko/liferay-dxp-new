@@ -15,6 +15,7 @@
 package com.liferay.message.boards.web.internal.portlet.action;
 
 import com.liferay.message.boards.constants.MBPortletKeys;
+import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 
@@ -23,6 +24,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
@@ -50,5 +52,8 @@ public class GetEditMessageQuickMVCResourceCommand
 
 		portletRequestDispatcher.include(resourceRequest, resourceResponse);
 	}
+
+	@Reference
+	private MBMessageService _mbMessageService;
 
 }

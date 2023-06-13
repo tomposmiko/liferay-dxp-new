@@ -33,18 +33,22 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.redirect.model.RedirectEntry;
 import com.liferay.redirect.model.RedirectEntryModel;
+import com.liferay.redirect.model.RedirectEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -171,6 +175,62 @@ public class RedirectEntryModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static RedirectEntry toModel(RedirectEntrySoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		RedirectEntry model = new RedirectEntryImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setRedirectEntryId(soapModel.getRedirectEntryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setDestinationURL(soapModel.getDestinationURL());
+		model.setExpirationDate(soapModel.getExpirationDate());
+		model.setLastOccurrenceDate(soapModel.getLastOccurrenceDate());
+		model.setPermanent(soapModel.isPermanent());
+		model.setSourceURL(soapModel.getSourceURL());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<RedirectEntry> toModels(RedirectEntrySoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<RedirectEntry> models = new ArrayList<RedirectEntry>(
+			soapModels.length);
+
+		for (RedirectEntrySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public RedirectEntryModelImpl() {
 	}
 
@@ -247,121 +307,123 @@ public class RedirectEntryModelImpl
 	public Map<String, Function<RedirectEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<RedirectEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, RedirectEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<RedirectEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			RedirectEntry.class.getClassLoader(), RedirectEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<RedirectEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<RedirectEntry, Object>>();
+		try {
+			Constructor<RedirectEntry> constructor =
+				(Constructor<RedirectEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", RedirectEntry::getMvccVersion);
-			attributeGetterFunctions.put("uuid", RedirectEntry::getUuid);
-			attributeGetterFunctions.put(
-				"redirectEntryId", RedirectEntry::getRedirectEntryId);
-			attributeGetterFunctions.put("groupId", RedirectEntry::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", RedirectEntry::getCompanyId);
-			attributeGetterFunctions.put("userId", RedirectEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", RedirectEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", RedirectEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", RedirectEntry::getModifiedDate);
-			attributeGetterFunctions.put(
-				"destinationURL", RedirectEntry::getDestinationURL);
-			attributeGetterFunctions.put(
-				"expirationDate", RedirectEntry::getExpirationDate);
-			attributeGetterFunctions.put(
-				"lastOccurrenceDate", RedirectEntry::getLastOccurrenceDate);
-			attributeGetterFunctions.put(
-				"permanent", RedirectEntry::getPermanent);
-			attributeGetterFunctions.put(
-				"sourceURL", RedirectEntry::getSourceURL);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<RedirectEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<RedirectEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<RedirectEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<RedirectEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<RedirectEntry, Object>>();
+		Map<String, BiConsumer<RedirectEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<RedirectEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<RedirectEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<RedirectEntry, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", RedirectEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<RedirectEntry, Long>)RedirectEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", RedirectEntry::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<RedirectEntry, String>)RedirectEntry::setUuid);
+		attributeGetterFunctions.put(
+			"redirectEntryId", RedirectEntry::getRedirectEntryId);
+		attributeSetterBiConsumers.put(
+			"redirectEntryId",
+			(BiConsumer<RedirectEntry, Long>)RedirectEntry::setRedirectEntryId);
+		attributeGetterFunctions.put("groupId", RedirectEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<RedirectEntry, Long>)RedirectEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", RedirectEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<RedirectEntry, Long>)RedirectEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", RedirectEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<RedirectEntry, Long>)RedirectEntry::setUserId);
+		attributeGetterFunctions.put("userName", RedirectEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<RedirectEntry, String>)RedirectEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", RedirectEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<RedirectEntry, Date>)RedirectEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", RedirectEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<RedirectEntry, Date>)RedirectEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"destinationURL", RedirectEntry::getDestinationURL);
+		attributeSetterBiConsumers.put(
+			"destinationURL",
+			(BiConsumer<RedirectEntry, String>)
+				RedirectEntry::setDestinationURL);
+		attributeGetterFunctions.put(
+			"expirationDate", RedirectEntry::getExpirationDate);
+		attributeSetterBiConsumers.put(
+			"expirationDate",
+			(BiConsumer<RedirectEntry, Date>)RedirectEntry::setExpirationDate);
+		attributeGetterFunctions.put(
+			"lastOccurrenceDate", RedirectEntry::getLastOccurrenceDate);
+		attributeSetterBiConsumers.put(
+			"lastOccurrenceDate",
+			(BiConsumer<RedirectEntry, Date>)
+				RedirectEntry::setLastOccurrenceDate);
+		attributeGetterFunctions.put("permanent", RedirectEntry::getPermanent);
+		attributeSetterBiConsumers.put(
+			"permanent",
+			(BiConsumer<RedirectEntry, Boolean>)RedirectEntry::setPermanent);
+		attributeGetterFunctions.put("sourceURL", RedirectEntry::getSourceURL);
+		attributeSetterBiConsumers.put(
+			"sourceURL",
+			(BiConsumer<RedirectEntry, String>)RedirectEntry::setSourceURL);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<RedirectEntry, Long>)RedirectEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<RedirectEntry, String>)RedirectEntry::setUuid);
-			attributeSetterBiConsumers.put(
-				"redirectEntryId",
-				(BiConsumer<RedirectEntry, Long>)
-					RedirectEntry::setRedirectEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<RedirectEntry, Long>)RedirectEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<RedirectEntry, Long>)RedirectEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<RedirectEntry, Long>)RedirectEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<RedirectEntry, String>)RedirectEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<RedirectEntry, Date>)RedirectEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<RedirectEntry, Date>)
-					RedirectEntry::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"destinationURL",
-				(BiConsumer<RedirectEntry, String>)
-					RedirectEntry::setDestinationURL);
-			attributeSetterBiConsumers.put(
-				"expirationDate",
-				(BiConsumer<RedirectEntry, Date>)
-					RedirectEntry::setExpirationDate);
-			attributeSetterBiConsumers.put(
-				"lastOccurrenceDate",
-				(BiConsumer<RedirectEntry, Date>)
-					RedirectEntry::setLastOccurrenceDate);
-			attributeSetterBiConsumers.put(
-				"permanent",
-				(BiConsumer<RedirectEntry, Boolean>)
-					RedirectEntry::setPermanent);
-			attributeSetterBiConsumers.put(
-				"sourceURL",
-				(BiConsumer<RedirectEntry, String>)RedirectEntry::setSourceURL);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -992,12 +1054,41 @@ public class RedirectEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<RedirectEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<RedirectEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<RedirectEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((RedirectEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, RedirectEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					RedirectEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1021,8 +1112,7 @@ public class RedirectEntryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<RedirectEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

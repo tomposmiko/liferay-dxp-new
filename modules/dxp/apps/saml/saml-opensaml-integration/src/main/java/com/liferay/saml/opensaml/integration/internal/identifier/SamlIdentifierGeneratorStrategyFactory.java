@@ -31,7 +31,9 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Mika Koivisto
  */
-@Component(service = IdentifierGenerationStrategyFactory.class)
+@Component(
+	immediate = true, service = IdentifierGenerationStrategyFactory.class
+)
 public class SamlIdentifierGeneratorStrategyFactory
 	implements IdentifierGenerationStrategyFactory {
 

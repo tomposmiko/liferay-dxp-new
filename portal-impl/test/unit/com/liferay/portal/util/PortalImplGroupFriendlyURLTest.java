@@ -60,20 +60,26 @@ public class PortalImplGroupFriendlyURLTest {
 
 	@Test
 	public void testGroupFriendlyURLIndexWithConflictiveLayoutURL1() {
-		Assert.assertNull(
-			_portalImpl.getGroupFriendlyURLIndex("/web-content-page"));
+		int[] groupFriendlyURLIndex = _portalImpl.getGroupFriendlyURLIndex(
+			"/web-content-page");
+
+		Assert.assertNull(groupFriendlyURLIndex);
 	}
 
 	@Test
 	public void testGroupFriendlyURLIndexWithConflictiveLayoutURL2() {
-		Assert.assertNull(
-			_portalImpl.getGroupFriendlyURLIndex("/group-content-page"));
+		int[] groupFriendlyURLIndex = _portalImpl.getGroupFriendlyURLIndex(
+			"/group-content-page");
+
+		Assert.assertNull(groupFriendlyURLIndex);
 	}
 
 	@Test
 	public void testGroupFriendlyURLIndexWithConflictiveLayoutURL3() {
-		Assert.assertNull(
-			_portalImpl.getGroupFriendlyURLIndex("/user-content-page"));
+		int[] groupFriendlyURLIndex = _portalImpl.getGroupFriendlyURLIndex(
+			"/user-content-page");
+
+		Assert.assertNull(groupFriendlyURLIndex);
 	}
 
 	@Test
@@ -87,7 +93,10 @@ public class PortalImplGroupFriendlyURLTest {
 
 	@Test
 	public void testGroupFriendlyURLIndexWithLayoutURL() {
-		Assert.assertNull(_portalImpl.getGroupFriendlyURLIndex("/home"));
+		int[] groupFriendlyURLIndex = _portalImpl.getGroupFriendlyURLIndex(
+			"/home");
+
+		Assert.assertNull(groupFriendlyURLIndex);
 	}
 
 	private final PortalImpl _portalImpl = new PortalImpl();

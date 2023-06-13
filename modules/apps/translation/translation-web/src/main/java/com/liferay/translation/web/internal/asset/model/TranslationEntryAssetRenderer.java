@@ -19,7 +19,7 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.petra.string.CharPool;
@@ -34,7 +34,6 @@ import com.liferay.translation.model.TranslationEntry;
 import com.liferay.translation.snapshot.TranslationSnapshot;
 import com.liferay.translation.snapshot.TranslationSnapshotProvider;
 import com.liferay.translation.web.internal.display.context.ViewTranslationDisplayContext;
-import com.liferay.translation.web.internal.helper.InfoItemHelper;
 
 import java.io.ByteArrayInputStream;
 
@@ -56,12 +55,12 @@ public class TranslationEntryAssetRenderer
 	extends BaseJSPAssetRenderer<TranslationEntry> {
 
 	public TranslationEntryAssetRenderer(
-		InfoItemServiceRegistry infoItemServiceRegistry,
+		InfoItemServiceTracker infoItemServiceTracker,
 		ServletContext servletContext, TranslationEntry translationEntry,
 		TranslationInfoFieldChecker translationInfoFieldChecker,
 		TranslationSnapshotProvider translationSnapshotProvider) {
 
-		_infoItemServiceRegistry = infoItemServiceRegistry;
+		_infoItemServiceTracker = infoItemServiceTracker;
 		_translationEntry = translationEntry;
 		_translationInfoFieldChecker = translationInfoFieldChecker;
 		_translationSnapshotProvider = translationSnapshotProvider;
@@ -105,24 +104,37 @@ public class TranslationEntryAssetRenderer
 
 	@Override
 	public String getTitle(Locale locale) {
-		InfoItemHelper infoItemHelper = new InfoItemHelper(
-			_translationEntry.getClassName(), _infoItemServiceRegistry);
+		try {
+			AssetRendererFactory<?> assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassNameId(
+						_translationEntry.getClassNameId());
 
-		String infoItemTitle = infoItemHelper.getInfoItemTitle(
-			_translationEntry.getClassPK(), locale);
+			if (assetRendererFactory == null) {
+				return LanguageUtil.get(locale, "translation");
+			}
 
-		if (infoItemTitle == null) {
-			infoItemTitle = _getAssetRendererTitle(locale);
+			AssetRenderer<?> assetRenderer = _getAssetRenderer(
+				assetRendererFactory);
+
+			if (assetRenderer == null) {
+				return LanguageUtil.get(locale, "translation");
+			}
+
+			return LanguageUtil.format(
+				locale, "translation-of-x-to-x",
+				new Object[] {
+					assetRenderer.getTitle(locale),
+					StringUtil.replace(
+						_translationEntry.getLanguageId(), CharPool.UNDERLINE,
+						CharPool.DASH)
+				});
 		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 
-		return LanguageUtil.format(
-			locale, "translation-of-x-to-x",
-			new Object[] {
-				infoItemTitle,
-				StringUtil.replace(
-					_translationEntry.getLanguageId(), CharPool.UNDERLINE,
-					CharPool.DASH)
-			});
+			return LanguageUtil.get(locale, "translation");
+		}
 	}
 
 	@Override
@@ -147,10 +159,10 @@ public class TranslationEntryAssetRenderer
 		throws Exception {
 
 		InfoItemFormProvider<Object> infoItemFormProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormProvider.class, _translationEntry.getClassName());
 		InfoItemObjectProvider<Object> infoItemObjectProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemObjectProvider.class, _translationEntry.getClassName());
 
 		String content = _translationEntry.getContent();
@@ -186,44 +198,17 @@ public class TranslationEntryAssetRenderer
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return null;
 		}
 	}
 
-	private String _getAssetRendererTitle(Locale locale) {
-		try {
-			AssetRendererFactory<?> assetRendererFactory =
-				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassName(
-						_translationEntry.getClassName());
-
-			if (assetRendererFactory == null) {
-				return LanguageUtil.get(locale, "translation");
-			}
-
-			AssetRenderer<?> assetRenderer = _getAssetRenderer(
-				assetRendererFactory);
-
-			if (assetRenderer == null) {
-				return LanguageUtil.get(locale, "translation");
-			}
-
-			return assetRenderer.getTitle(locale);
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
-
-			return LanguageUtil.get(locale, "translation");
-		}
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		TranslationEntryAssetRenderer.class);
 
-	private final InfoItemServiceRegistry _infoItemServiceRegistry;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 	private final TranslationEntry _translationEntry;
 	private final TranslationInfoFieldChecker _translationInfoFieldChecker;
 	private final TranslationSnapshotProvider _translationSnapshotProvider;

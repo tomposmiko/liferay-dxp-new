@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-MercanetGroupServiceConfiguration mercanetGroupServiceConfiguration = (MercanetGroupServiceConfiguration)request.getAttribute(MercanetGroupServiceConfiguration.class.getName());
+MercanetGroupServiceConfiguration mercanetCommercePaymentEngineGroupServiceConfiguration = (MercanetGroupServiceConfiguration)request.getAttribute(MercanetGroupServiceConfiguration.class.getName());
 %>
 
 <portlet:actionURL name="/commerce_payment_methods/edit_mercanet_commerce_payment_method_configuration" var="editCommercePaymentMethodActionURL" />
@@ -35,11 +35,11 @@ MercanetGroupServiceConfiguration mercanetGroupServiceConfiguration = (MercanetG
 		<commerce-ui:info-box
 			title='<%= LanguageUtil.get(request, "authentication") %>'
 		>
-			<aui:input label="merchant-id" name="settings--merchantId--" value="<%= mercanetGroupServiceConfiguration.merchantId() %>" />
+			<aui:input label="merchant-id" name="settings--merchantId--" value="<%= mercanetCommercePaymentEngineGroupServiceConfiguration.merchantId() %>" />
 
-			<aui:input label="secret-key" name="settings--secretKey--" value="<%= mercanetGroupServiceConfiguration.secretKey() %>" />
+			<aui:input label="secret-key" name="settings--secretKey--" value="<%= mercanetCommercePaymentEngineGroupServiceConfiguration.secretKey() %>" />
 
-			<aui:input label="key-version" name="settings--keyVersion--" value="<%= mercanetGroupServiceConfiguration.keyVersion() %>" />
+			<aui:input label="key-version" name="settings--keyVersion--" value="<%= mercanetCommercePaymentEngineGroupServiceConfiguration.keyVersion() %>" />
 
 			<aui:select name="settings--environment--">
 
@@ -47,7 +47,7 @@ MercanetGroupServiceConfiguration mercanetGroupServiceConfiguration = (MercanetG
 				for (String environment : MercanetCommercePaymentMethodConstants.ENVIRONMENTS) {
 				%>
 
-					<aui:option label="<%= environment %>" selected="<%= environment.equals(mercanetGroupServiceConfiguration.environment()) %>" value="<%= environment %>" />
+					<aui:option label="<%= environment %>" selected="<%= environment.equals(mercanetCommercePaymentEngineGroupServiceConfiguration.environment()) %>" value="<%= environment %>" />
 
 				<%
 				}

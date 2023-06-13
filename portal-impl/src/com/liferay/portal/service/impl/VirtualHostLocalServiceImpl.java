@@ -80,7 +80,7 @@ public class VirtualHostLocalServiceImpl
 			}
 			catch (UnknownHostException unknownHostException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(unknownHostException);
+					_log.debug(unknownHostException, unknownHostException);
 				}
 			}
 		}
@@ -124,21 +124,10 @@ public class VirtualHostLocalServiceImpl
 	}
 
 	@Override
-	public List<VirtualHost> getVirtualHosts(long companyId) {
-		return virtualHostPersistence.findByCompanyId(companyId);
-	}
+	public List<VirtualHost> getVirtualHosts(long companyId, long layoutSetId)
+		throws PortalException {
 
-	@Override
-	public List<VirtualHost> getVirtualHosts(long companyId, long layoutSetId) {
 		return virtualHostPersistence.findByC_L(companyId, layoutSetId);
-	}
-
-	@Override
-	public long getVirtualHostsCount(
-		long excludedLayoutSetId, String[] virtualHostNames) {
-
-		return virtualHostPersistence.countByNotL_H(
-			excludedLayoutSetId, virtualHostNames);
 	}
 
 	/**

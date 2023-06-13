@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -44,8 +42,6 @@ public class CSDiagramPinWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("CSDiagramPinId", getCSDiagramPinId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -62,18 +58,6 @@ public class CSDiagramPinWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		Long CSDiagramPinId = (Long)attributes.get("CSDiagramPinId");
 
 		if (CSDiagramPinId != null) {
@@ -188,16 +172,6 @@ public class CSDiagramPinWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this cs diagram pin.
-	 *
-	 * @return the ct collection ID of this cs diagram pin
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the modified date of this cs diagram pin.
 	 *
 	 * @return the modified date of this cs diagram pin
@@ -205,16 +179,6 @@ public class CSDiagramPinWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this cs diagram pin.
-	 *
-	 * @return the mvcc version of this cs diagram pin
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -333,16 +297,6 @@ public class CSDiagramPinWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this cs diagram pin.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cs diagram pin
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the modified date of this cs diagram pin.
 	 *
 	 * @param modifiedDate the modified date of this cs diagram pin
@@ -350,16 +304,6 @@ public class CSDiagramPinWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
-	 * Sets the mvcc version of this cs diagram pin.
-	 *
-	 * @param mvccVersion the mvcc version of this cs diagram pin
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -430,25 +374,6 @@ public class CSDiagramPinWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CSDiagramPin, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CSDiagramPin, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

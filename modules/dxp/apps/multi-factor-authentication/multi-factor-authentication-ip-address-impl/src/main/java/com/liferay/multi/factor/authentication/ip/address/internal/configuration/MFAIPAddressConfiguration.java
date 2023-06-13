@@ -23,8 +23,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  */
 @ExtendedObjectClassDefinition(
 	category = "multi-factor-authentication",
-	scope = ExtendedObjectClassDefinition.Scope.COMPANY,
-	visibilityControllerKey = "multi-factor-authentication"
+	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
 	id = "com.liferay.multi.factor.authentication.ip.address.internal.configuration.MFAIPAddressConfiguration",

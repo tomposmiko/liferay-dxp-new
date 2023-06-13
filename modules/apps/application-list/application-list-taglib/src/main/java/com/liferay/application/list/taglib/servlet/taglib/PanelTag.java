@@ -19,7 +19,6 @@ import com.liferay.application.list.PanelCategoryRegistry;
 import com.liferay.application.list.RootPanelCategory;
 import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
@@ -31,17 +30,6 @@ import javax.servlet.jsp.JspException;
  * @author Adolfo Pérez
  */
 public class PanelTag extends BasePanelTag {
-
-	@Override
-	public int doEndTag() throws JspException {
-		if (ListUtil.isEmpty(_getChildPanelCategories(getRequest()))) {
-			doClearTag();
-
-			return EVAL_PAGE;
-		}
-
-		return super.doEndTag();
-	}
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -70,16 +58,9 @@ public class PanelTag extends BasePanelTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
-		httpServletRequest.setAttribute(
-			"liferay-application-list:panel:childPanelCategories",
-			_getChildPanelCategories(httpServletRequest));
-		httpServletRequest.setAttribute(
-			"liferay-application-list:panel:panelCategory",
-			_getPanelCategory());
-	}
-
-	private List<PanelCategory> _getChildPanelCategories(
-		HttpServletRequest httpServletRequest) {
+		if (_panelCategory == null) {
+			_panelCategory = RootPanelCategory.getInstance();
+		}
 
 		PanelCategoryRegistry panelCategoryRegistry =
 			(PanelCategoryRegistry)httpServletRequest.getAttribute(
@@ -89,17 +70,17 @@ public class PanelTag extends BasePanelTag {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return panelCategoryRegistry.getChildPanelCategories(
-			_getPanelCategory(), themeDisplay.getPermissionChecker(),
-			getGroup());
-	}
+		List<PanelCategory> childPanelCategories =
+			panelCategoryRegistry.getChildPanelCategories(
+				_panelCategory, themeDisplay.getPermissionChecker(),
+				getGroup());
 
-	private PanelCategory _getPanelCategory() {
-		if (_panelCategory == null) {
-			_panelCategory = RootPanelCategory.getInstance();
-		}
+		httpServletRequest.setAttribute(
+			"liferay-application-list:panel:childPanelCategories",
+			childPanelCategories);
 
-		return _panelCategory;
+		httpServletRequest.setAttribute(
+			"liferay-application-list:panel:panelCategory", _panelCategory);
 	}
 
 	private PanelCategory _panelCategory;

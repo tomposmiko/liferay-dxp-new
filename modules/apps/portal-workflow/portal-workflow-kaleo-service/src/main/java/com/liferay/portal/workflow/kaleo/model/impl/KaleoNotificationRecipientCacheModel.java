@@ -81,12 +81,10 @@ public class KaleoNotificationRecipientCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(41);
+		StringBundler sb = new StringBundler(39);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", kaleoNotificationRecipientId=");
 		sb.append(kaleoNotificationRecipientId);
 		sb.append(", groupId=");
@@ -134,7 +132,6 @@ public class KaleoNotificationRecipientCacheModel
 			new KaleoNotificationRecipientImpl();
 
 		kaleoNotificationRecipientImpl.setMvccVersion(mvccVersion);
-		kaleoNotificationRecipientImpl.setCtCollectionId(ctCollectionId);
 		kaleoNotificationRecipientImpl.setKaleoNotificationRecipientId(
 			kaleoNotificationRecipientId);
 		kaleoNotificationRecipientImpl.setGroupId(groupId);
@@ -229,8 +226,6 @@ public class KaleoNotificationRecipientCacheModel
 
 		mvccVersion = objectInput.readLong();
 
-		ctCollectionId = objectInput.readLong();
-
 		kaleoNotificationRecipientId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -262,8 +257,6 @@ public class KaleoNotificationRecipientCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		objectOutput.writeLong(kaleoNotificationRecipientId);
 
@@ -337,7 +330,6 @@ public class KaleoNotificationRecipientCacheModel
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public long kaleoNotificationRecipientId;
 	public long groupId;
 	public long companyId;

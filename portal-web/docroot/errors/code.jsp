@@ -43,9 +43,6 @@ String xRequestWith = request.getHeader(HttpHeaders.X_REQUESTED_WITH);
 %>
 
 <c:choose>
-	<c:when test="<%= GetterUtil.getBoolean(request.getAttribute(WebKeys.UNKNOWN_VIRTUAL_HOST)) %>">
-		<liferay-ui:message key="unknown-virtual-hostname" />: <%= PortalUtil.getHost(request) %>
-	</c:when>
 	<c:when test="<%= !Validator.isBlank(dynamicIncludeKey) %>">
 		<liferay-util:dynamic-include key="<%= dynamicIncludeKey %>" />
 	</c:when>
@@ -77,7 +74,7 @@ String xRequestWith = request.getHeader(HttpHeaders.X_REQUESTED_WITH);
 				<meta content="1; url=<%= HtmlUtil.escapeAttribute(redirect) %>" http-equiv="refresh" />
 			</head>
 
-			<body onload="javascript:location.replace('<%= HtmlUtil.escapeJS(redirect) %>');">
+			<body onload="javascript:location.replace('<%= HtmlUtil.escapeJS(redirect) %>')">
 
 				<!--
 				The numbers below are used to fill up space so that this works properly in IE.
@@ -96,11 +93,11 @@ String xRequestWith = request.getHeader(HttpHeaders.X_REQUESTED_WITH);
 
 		<html>
 			<head>
-				<title>Http Status <%= code %> - <liferay-ui:message key='<%= "http-status-code[" + code + "]" %>' /></title>
+				<title>Http Status <%= code %> - <%= LanguageUtil.get(request, "http-status-code[" + code + "]") %></title>
 			</head>
 
 			<body>
-				<h1>Http Status <%= code %> - <liferay-ui:message key='<%= "http-status-code[" + code + "]" %>' /></h1>
+				<h1>Http Status <%= code %> - <%= LanguageUtil.get(request, "http-status-code[" + code + "]") %></h1>
 
 				<p>
 					<liferay-ui:message key="message" />: <%= HtmlUtil.escape(msg) %>

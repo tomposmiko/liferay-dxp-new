@@ -84,11 +84,11 @@ public class GrantAuthorizationCodePKCEKillSwitchTest
 					"oauth2.scope.checker.type", "annotations"
 				).build());
 
-			createOAuth2ApplicationWithNone(
-				defaultCompanyId, user, "oauthTestApplicationCodePKCE",
+			createOAuth2Application(
+				defaultCompanyId, user, "oauthTestApplicationCodePKCE", null,
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE_PKCE),
-				Collections.singletonList("http://redirecturi:8080"), false,
-				Collections.singletonList("everything"), false);
+				Collections.singletonList("http://redirecturi:8080"),
+				Collections.singletonList("everything"));
 		}
 
 	}

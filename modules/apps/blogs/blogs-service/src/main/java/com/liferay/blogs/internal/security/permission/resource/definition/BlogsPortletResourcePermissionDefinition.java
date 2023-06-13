@@ -27,7 +27,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Preston Crary
  */
-@Component(service = PortletResourcePermissionDefinition.class)
+@Component(
+	immediate = true, service = PortletResourcePermissionDefinition.class
+)
 public class BlogsPortletResourcePermissionDefinition
 	implements PortletResourcePermissionDefinition {
 

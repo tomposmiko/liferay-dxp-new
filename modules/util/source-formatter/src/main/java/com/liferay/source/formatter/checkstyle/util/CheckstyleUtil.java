@@ -52,8 +52,6 @@ public class CheckstyleUtil {
 
 	public static final int BATCH_SIZE = 1000;
 
-	public static final String FILTER_CHECK_NAMES_KEY = "filterCheckNames";
-
 	public static final String MAX_DIR_LEVEL_KEY = "maxDirLevel";
 
 	public static final String MAX_LINE_LENGTH_KEY = "maxLineLength";
@@ -98,19 +96,16 @@ public class CheckstyleUtil {
 				continue;
 			}
 
-			String checkCategory = checkConfiguration.getAttribute("category");
-
 			String checkName = checkConfiguration.getName();
 
 			String checkSimpleName = SourceFormatterUtil.getSimpleName(
 				checkName);
 
-			if ((checkCategory.startsWith("Upgrade") &&
-				 !filterCheckCategoryNames.contains(checkCategory)) ||
-				((!filterCheckCategoryNames.isEmpty() ||
-				  !filterCheckNames.isEmpty()) &&
-				 !filterCheckCategoryNames.contains(checkCategory) &&
-				 !filterCheckNames.contains(checkSimpleName))) {
+			if ((!filterCheckCategoryNames.isEmpty() ||
+				 !filterCheckNames.isEmpty()) &&
+				!filterCheckCategoryNames.contains(
+					checkConfiguration.getAttribute("category")) &&
+				!filterCheckNames.contains(checkSimpleName)) {
 
 				treeWalkerConfiguration.removeChild(checkConfiguration);
 
@@ -135,12 +130,12 @@ public class CheckstyleUtil {
 						_EXCLUDES_KEY, excludesJSONObject.toString());
 				}
 
+				JSONObject attributesJSONObject = _getAttributesJSONObject(
+					propertiesMap, checkSimpleName, checkConfiguration,
+					sourceFormatterArgs);
+
 				defaultConfiguration.addAttribute(
-					_ATTRIBUTES_KEY,
-					String.valueOf(
-						_getAttributesJSONObject(
-							propertiesMap, checkSimpleName, checkConfiguration,
-							sourceFormatterArgs)));
+					_ATTRIBUTES_KEY, attributesJSONObject.toString());
 			}
 			else {
 				for (String attributeName :
@@ -215,10 +210,6 @@ public class CheckstyleUtil {
 			new String[][] {
 				{BASE_DIR_NAME_KEY, sourceFormatterArgs.getBaseDirName()},
 				{
-					FILTER_CHECK_NAMES_KEY,
-					StringUtil.merge(sourceFormatterArgs.getCheckNames())
-				},
-				{
 					MAX_DIR_LEVEL_KEY,
 					String.valueOf(sourceFormatterArgs.getMaxDirLevel())
 				},
@@ -238,9 +229,7 @@ public class CheckstyleUtil {
 
 		attributesJSONObject = SourceFormatterCheckUtil.addPropertiesAttributes(
 			attributesJSONObject, propertiesMap,
-			SourceFormatterUtil.GIT_LIFERAY_PORTAL_BRANCH,
-			SourceFormatterUtil.UPGRADE_FROM_VERSION,
-			SourceFormatterUtil.UPGRADE_TO_VERSION);
+			SourceFormatterUtil.GIT_LIFERAY_PORTAL_BRANCH);
 
 		attributesJSONObject = SourceFormatterCheckUtil.addPropertiesAttributes(
 			attributesJSONObject, propertiesMap, CheckType.CHECKSTYLE,

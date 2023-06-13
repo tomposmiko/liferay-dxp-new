@@ -37,12 +37,17 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author David Arques
  */
+@RunWith(MockitoJUnitRunner.class)
 public class SegmentsEntryProviderRegistryTest {
 
 	@ClassRule
@@ -69,7 +74,7 @@ public class SegmentsEntryProviderRegistryTest {
 		).when(
 			_segmentsEntryLocalService
 		).getSegmentsEntry(
-			Mockito.anyLong()
+			Matchers.anyLong()
 		);
 	}
 
@@ -205,6 +210,24 @@ public class SegmentsEntryProviderRegistryTest {
 		Arrays.sort(segmentsEntryIds);
 
 		Assert.assertArrayEquals(segmentsEntryIds, actualSegmentsEntryIds);
+
+		Mockito.verify(
+			_serviceTrackerList, Mockito.times(1)
+		).iterator();
+
+		Mockito.verify(
+			segmentsEntryProvider1, Mockito.times(1)
+		).getSegmentsEntryIds(
+			Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong(),
+			Mockito.any(Context.class), Mockito.any(long[].class)
+		);
+
+		Mockito.verify(
+			segmentsEntryProvider2, Mockito.times(1)
+		).getSegmentsEntryIds(
+			Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong(),
+			Mockito.any(Context.class), Mockito.any(long[].class)
+		);
 	}
 
 	private SegmentsEntry _createSegmentsEntry(
@@ -276,20 +299,23 @@ public class SegmentsEntryProviderRegistryTest {
 			segmentsEntryProvider
 		).getSegmentsEntryIds(
 			Mockito.anyLong(), Mockito.anyString(), Mockito.anyLong(),
-			Mockito.any(Context.class), Mockito.any(long[].class),
-			Mockito.any(long[].class)
+			Mockito.any(Context.class), Mockito.any(long[].class)
 		);
 
 		return segmentsEntryProvider;
 	}
 
-	private final SegmentsEntryLocalService _segmentsEntryLocalService =
-		Mockito.mock(SegmentsEntryLocalService.class);
+	@Mock
+	private SegmentsEntryLocalService _segmentsEntryLocalService;
+
 	private final SegmentsEntryProviderRegistry _segmentsEntryProviderRegistry =
 		new SegmentsEntryProviderRegistryImpl();
-	private final ServiceTrackerList<SegmentsEntryProvider>
-		_serviceTrackerList = Mockito.mock(ServiceTrackerList.class);
-	private final ServiceTrackerMap<String, SegmentsEntryProvider>
-		_serviceTrackerMap = Mockito.mock(ServiceTrackerMap.class);
+
+	@Mock
+	private ServiceTrackerList<SegmentsEntryProvider, SegmentsEntryProvider>
+		_serviceTrackerList;
+
+	@Mock
+	private ServiceTrackerMap<String, SegmentsEntryProvider> _serviceTrackerMap;
 
 }

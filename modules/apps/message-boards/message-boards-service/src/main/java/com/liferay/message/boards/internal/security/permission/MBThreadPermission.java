@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.message.boards.model.MBThread",
 	service = BaseModelPermissionChecker.class
 )
@@ -43,8 +44,16 @@ public class MBThreadPermission implements BaseModelPermissionChecker {
 	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.message.boards.model.MBMessage)"
+		target = "(model.class.name=com.liferay.message.boards.model.MBMessage)",
+		unbind = "-"
 	)
-	private ModelResourcePermission<MBMessage> _messageModelResourcePermission;
+	protected void setModelResourcePermission(
+		ModelResourcePermission<MBMessage> modelResourcePermission) {
+
+		_messageModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<MBMessage>
+		_messageModelResourcePermission;
 
 }

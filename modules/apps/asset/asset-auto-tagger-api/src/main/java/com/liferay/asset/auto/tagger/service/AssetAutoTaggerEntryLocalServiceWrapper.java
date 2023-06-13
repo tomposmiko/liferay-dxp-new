@@ -30,10 +30,6 @@ public class AssetAutoTaggerEntryLocalServiceWrapper
 	implements AssetAutoTaggerEntryLocalService,
 			   ServiceWrapper<AssetAutoTaggerEntryLocalService> {
 
-	public AssetAutoTaggerEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AssetAutoTaggerEntryLocalServiceWrapper(
 		AssetAutoTaggerEntryLocalService assetAutoTaggerEntryLocalService) {
 

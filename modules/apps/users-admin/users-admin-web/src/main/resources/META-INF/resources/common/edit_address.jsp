@@ -51,8 +51,11 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 
 	<clay:container-fluid>
 		<div class="sheet-lg" id="breadcrumb">
-			<liferay-site-navigation:breadcrumb
-				breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+			<liferay-ui:breadcrumb
+				showCurrentGroup="<%= false %>"
+				showGuestGroup="<%= false %>"
+				showLayout="<%= false %>"
+				showPortletBreadcrumb="<%= true %>"
 			/>
 		</div>
 
@@ -68,7 +71,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 
 				<liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + editContactInformationDisplayContext.getClassName() + ListTypeConstants.ADDRESS %>" message="please-select-a-type" />
 
-				<aui:select label="type" listType="<%= editContactInformationDisplayContext.getClassName() + ListTypeConstants.ADDRESS %>" listTypeFieldName="listTypeId" name="addressListTypeId" />
+				<aui:select label="type" listType="<%= editContactInformationDisplayContext.getClassName() + ListTypeConstants.ADDRESS %>" name="addressTypeId" />
 
 				<liferay-ui:error exception="<%= AddressStreetException.class %>" message="please-enter-a-valid-street" />
 
@@ -99,7 +102,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 						<span hidden id="<portlet:namespace />addressZipRequiredWrapper">
 							<aui:icon cssClass="reference-mark text-warning" image="asterisk" markupView="lexicon" />
 
-							<span class="hide-accessible sr-only"><liferay-ui:message key="required" /></span>
+							<span class="hide-accessible"><liferay-ui:message key="required" /></span>
 						</span>
 					</label>
 
@@ -109,47 +112,33 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 				<aui:input cssClass="mailing-ctrl" fieldParam="addressMailing" id="addressMailing" name="mailing" />
 			</clay:sheet-section>
 
-			<clay:sheet-footer
-				cssClass="sheet-footer-btn-block-sm-down"
-			>
-				<div class="btn-group">
-					<div class="btn-group-item">
-						<clay:button
-							displayType="primary"
-							label='<%= LanguageUtil.get(resourceBundle, "save") %>'
-							type="submit"
-						/>
-					</div>
+			<clay:sheet-footer>
+				<aui:button primary="<%= true %>" type="submit" />
 
-					<div class="btn-group-item">
-						<clay:link
-							cssClass="btn btn-secondary"
-							displayType="null"
-							href="<%= editContactInformationDisplayContext.getRedirect() %>"
-							label='<%= LanguageUtil.get(resourceBundle, "cancel") %>'
-							role="button"
-						/>
-					</div>
-				</div>
+				<aui:button href="<%= editContactInformationDisplayContext.getRedirect() %>" type="cancel" />
 			</clay:sheet-footer>
 		</clay:sheet>
 	</clay:container-fluid>
 
-	<liferay-frontend:component
-		componentId="CountryRegionDynamicSelect"
-		context='<%=
-			HashMapBuilder.<String, Object>put(
-				"countrySelect", portletDisplay.getNamespace() + "addressCountryId"
-			).put(
-				"countrySelectVal", countryId
-			).put(
-				"regionSelect", portletDisplay.getNamespace() + "addressRegionId"
-			).put(
-				"regionSelectVal", regionId
-			).build()
-		%>'
-		module="js/CountryRegionDynamicSelect"
-	/>
+	<script>
+		new Liferay.DynamicSelect([
+			{
+				select: '<portlet:namespace />addressCountryId',
+				selectData: Liferay.Address.getCountries,
+				selectDesc: 'nameCurrentValue',
+				selectId: 'countryId',
+				selectSort: '<%= true %>',
+				selectVal: '<%= countryId %>',
+			},
+			{
+				select: '<portlet:namespace />addressRegionId',
+				selectData: Liferay.Address.getRegions,
+				selectDesc: 'name',
+				selectId: 'regionId',
+				selectVal: '<%= regionId %>',
+			},
+		]);
+	</script>
 </aui:form>
 
 <aui:script use="liferay-form">

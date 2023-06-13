@@ -16,14 +16,14 @@ package com.liferay.segments.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -64,7 +65,7 @@ public class SelectSegmentsEntryDisplayContext {
 		_renderResponse = renderResponse;
 		_segmentsEntryLocalService = segmentsEntryLocalService;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -82,8 +83,8 @@ public class SelectSegmentsEntryDisplayContext {
 		}
 
 		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
-			_renderRequest, SegmentsPortletKeys.SEGMENTS, "entry-display-style",
-			"list");
+			PortalUtil.getHttpServletRequest(_renderRequest),
+			SegmentsPortletKeys.SEGMENTS, "entry-display-style", "list");
 
 		return _displayStyle;
 	}
@@ -128,13 +129,12 @@ public class SelectSegmentsEntryDisplayContext {
 	}
 
 	public String getOrderByType() {
-		if (_orderByType != null) {
+		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, SegmentsPortletKeys.SEGMENTS,
-			"entry-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -157,17 +157,21 @@ public class SelectSegmentsEntryDisplayContext {
 		searchContainer.setOrderByCol(_getOrderByCol());
 		searchContainer.setOrderByComparator(_getOrderByComparator());
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
+
+		BaseModelSearchResult<SegmentsEntry> baseModelSearchResult =
 			_segmentsEntryLocalService.searchSegmentsEntries(
-				_themeDisplay.getCompanyId(), _getGroupId(), _getKeywords(),
-				true,
+				_themeDisplay.getCompanyId(), _themeDisplay.getScopeGroupId(),
+				_getKeywords(), true,
 				LinkedHashMapBuilder.<String, Object>put(
 					"excludedSegmentsEntryIds", _getExcludedSegmentsEntryIds()
 				).put(
 					"excludedSources", _getExcludedSources()
 				).build(),
 				searchContainer.getStart(), searchContainer.getEnd(),
-				_getSort()));
+				_getSort());
+
+		searchContainer.setResults(baseModelSearchResult.getBaseModels());
+		searchContainer.setTotal(baseModelSearchResult.getLength());
 
 		_searchContainer = searchContainer;
 
@@ -241,22 +245,6 @@ public class SelectSegmentsEntryDisplayContext {
 		).build();
 	}
 
-	private long _getGroupId() {
-		if (_groupId > 0) {
-			return _groupId;
-		}
-
-		long groupId = ParamUtil.getLong(_httpServletRequest, "groupId");
-
-		if (groupId == 0) {
-			groupId = _themeDisplay.getScopeGroupId();
-		}
-
-		_groupId = groupId;
-
-		return _groupId;
-	}
-
 	private String _getKeywords() {
 		if (_keywords != null) {
 			return _keywords;
@@ -272,9 +260,8 @@ public class SelectSegmentsEntryDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, SegmentsPortletKeys.SEGMENTS,
-			"entry-order-by-col", "modified-date");
+		_orderByCol = ParamUtil.getString(
+			_renderRequest, "orderByCol", "modified-date");
 
 		return _orderByCol;
 	}
@@ -282,7 +269,9 @@ public class SelectSegmentsEntryDisplayContext {
 	private OrderByComparator<SegmentsEntry> _getOrderByComparator() {
 		boolean orderByAsc = false;
 
-		if (Objects.equals(getOrderByType(), "asc")) {
+		String orderByType = getOrderByType();
+
+		if (orderByType.equals("asc")) {
 			orderByAsc = true;
 		}
 
@@ -356,17 +345,21 @@ public class SelectSegmentsEntryDisplayContext {
 	private Sort _getSort() {
 		boolean orderByAsc = false;
 
-		if (Objects.equals(getOrderByType(), "asc")) {
+		String orderByType = getOrderByType();
+
+		if (orderByType.equals("asc")) {
 			orderByAsc = true;
 		}
 
+		String orderByCol = _getOrderByCol();
+
 		Sort sort = null;
 
-		if (Objects.equals(_getOrderByCol(), "name")) {
-			sort = new Sort(
-				Field.getSortableFieldName(
-					"localized_name_".concat(_themeDisplay.getLanguageId())),
-				Sort.STRING_TYPE, !orderByAsc);
+		if (orderByCol.equals("name")) {
+			String sortFieldName = Field.getSortableFieldName(
+				"localized_name_".concat(_themeDisplay.getLanguageId()));
+
+			sort = new Sort(sortFieldName, Sort.STRING_TYPE, !orderByAsc);
 		}
 		else {
 			sort = new Sort(Field.MODIFIED_DATE, Sort.LONG_TYPE, !orderByAsc);
@@ -395,7 +388,6 @@ public class SelectSegmentsEntryDisplayContext {
 	private String _eventName;
 	private long[] _excludedSegmentsEntryIds;
 	private String[] _excludedSources;
-	private long _groupId;
 	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
 	private String _orderByCol;

@@ -13,7 +13,7 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {act, render, waitFor} from '@testing-library/react';
+import {act, cleanup, render, wait} from '@testing-library/react';
 import React from 'react';
 
 import Price from '../../../src/main/resources/META-INF/resources/components/price/Price';
@@ -35,6 +35,10 @@ describe('Price', () => {
 			jest.resetAllMocks();
 
 			window.Liferay.Language.get = jest.fn();
+		});
+
+		afterEach(() => {
+			cleanup();
 		});
 
 		it('displays the formatted list price of an item', () => {
@@ -84,7 +88,7 @@ describe('Price', () => {
 			);
 		});
 
-		it('displays the formatted promo price of an item', () => {
+		it('displays the formatted sale price of an item', () => {
 			const price = {
 				discount: 0.0,
 				discountFormatted: '$ 0.00',
@@ -119,10 +123,10 @@ describe('Price', () => {
 				'list-price'
 			);
 			expect(window.Liferay.Language.get).toHaveBeenCalledWith(
-				'promotion-price'
+				'sale-price'
 			);
 
-			const [listPrice, promoPrice] = Array.from(values);
+			const [listPrice, salePrice] = Array.from(values);
 
 			expect(listPrice.classList.length).toEqual(2);
 			expect(listPrice.classList.contains('price-value')).toBe(true);
@@ -130,19 +134,19 @@ describe('Price', () => {
 				true
 			);
 
-			expect(promoPrice.classList.length).toEqual(2);
-			expect(promoPrice.classList.contains('price-value')).toBe(true);
-			expect(promoPrice.classList.contains('price-value-promo')).toBe(
+			expect(salePrice.classList.length).toEqual(2);
+			expect(salePrice.classList.contains('price-value')).toBe(true);
+			expect(salePrice.classList.contains('price-value-promo')).toBe(
 				true
 			);
-			expect(promoPrice.classList.contains('price-value-inactive')).toBe(
+			expect(salePrice.classList.contains('price-value-inactive')).toBe(
 				false
 			);
 
 			expect(listPrice.innerHTML).toEqual(
 				BASE_PROPS.price.priceFormatted
 			);
-			expect(promoPrice.innerHTML).toEqual(price.promoPriceFormatted);
+			expect(salePrice.innerHTML).toEqual(price.promoPriceFormatted);
 		});
 
 		it('displays the formatted discounted price of an item', () => {
@@ -215,7 +219,7 @@ describe('Price', () => {
 			expect(finalPrice.innerHTML).toEqual(price.finalPriceFormatted);
 		});
 
-		it('displays the formatted discounted price of an item, also with a promo price applied', () => {
+		it('displays the formatted discounted price of an item, also with a sale price applied', () => {
 			const price = {
 				discount: 2.0,
 				discountFormatted: '$ 2.00',
@@ -250,7 +254,7 @@ describe('Price', () => {
 				'list-price'
 			);
 			expect(window.Liferay.Language.get).toHaveBeenCalledWith(
-				'promotion-price'
+				'sale-price'
 			);
 			expect(window.Liferay.Language.get).toHaveBeenCalledWith(
 				'discount'
@@ -259,7 +263,7 @@ describe('Price', () => {
 				'net-price'
 			);
 
-			const [listPrice, promoPrice, discount, finalPrice] = Array.from(
+			const [listPrice, salePrice, discount, finalPrice] = Array.from(
 				values
 			);
 
@@ -269,12 +273,12 @@ describe('Price', () => {
 				true
 			);
 
-			expect(promoPrice.classList.length).toEqual(3);
-			expect(promoPrice.classList.contains('price-value')).toBe(true);
-			expect(promoPrice.classList.contains('price-value-promo')).toBe(
+			expect(salePrice.classList.length).toEqual(3);
+			expect(salePrice.classList.contains('price-value')).toBe(true);
+			expect(salePrice.classList.contains('price-value-promo')).toBe(
 				true
 			);
-			expect(promoPrice.classList.contains('price-value-inactive')).toBe(
+			expect(salePrice.classList.contains('price-value-inactive')).toBe(
 				true
 			);
 
@@ -293,7 +297,7 @@ describe('Price', () => {
 			expect(listPrice.innerHTML).toEqual(
 				BASE_PROPS.price.priceFormatted
 			);
-			expect(promoPrice.innerHTML).toEqual(price.promoPriceFormatted);
+			expect(salePrice.innerHTML).toEqual(price.promoPriceFormatted);
 			expect(
 				discount.querySelector('.price-value-percentage').innerHTML
 			).toEqual(`–${price.discountPercentage}%`);
@@ -306,6 +310,10 @@ describe('Price', () => {
 			jest.resetAllMocks();
 
 			window.Liferay.Language.get = jest.fn();
+		});
+
+		afterEach(() => {
+			cleanup();
 		});
 
 		it('displays the formatted discounted gross price of an item', () => {
@@ -541,6 +549,10 @@ describe('Price', () => {
 			window.Liferay.Language.get = jest.fn();
 		});
 
+		afterEach(() => {
+			cleanup();
+		});
+
 		it('attaches a namespaced event listener for price update via event', () => {
 			const namespace = 'someNamespace_';
 
@@ -595,7 +607,7 @@ describe('Price', () => {
 
 			const incomingCPInstancePrice = {
 				cpInstance: {
-					price: {
+					prices: {
 						discountPercentage: '0',
 						discountPercentages: null,
 						finalPrice: 0,
@@ -627,7 +639,7 @@ describe('Price', () => {
 				updatePriceCB(incomingCPInstancePrice);
 			});
 
-			await waitFor(() => {
+			await wait(() => {
 				const labels = container.querySelectorAll('.price-label');
 				const values = container.querySelectorAll('.price-value');
 
@@ -646,7 +658,7 @@ describe('Price', () => {
 					listPrice.classList.contains('price-value-inactive')
 				).toBe(false);
 				expect(listPrice.innerHTML).toEqual(
-					incomingCPInstancePrice.cpInstance.price.price
+					incomingCPInstancePrice.cpInstance.prices.price
 				);
 			});
 		});

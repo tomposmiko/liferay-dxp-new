@@ -36,7 +36,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWiring;
@@ -49,7 +48,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 /**
  * @author Preston Crary
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class LanguageResourcesExtender
 	implements BundleTrackerCustomizer<List<ServiceRegistration<?>>> {
 
@@ -108,7 +107,7 @@ public class LanguageResourcesExtender
 		_bundleContext = bundleContext;
 
 		_bundleTracker = new BundleTracker<>(
-			bundleContext, Bundle.ACTIVE, this);
+			bundleContext, ~Bundle.INSTALLED & ~Bundle.UNINSTALLED, this);
 
 		_bundleTracker.open();
 	}
@@ -157,31 +156,13 @@ public class LanguageResourcesExtender
 
 			Locale locale = LocaleUtil.fromLanguageId(languageId, false);
 
+			ResourceBundle resourceBundle = ResourceBundle.getBundle(
+				baseName, locale, bundleWiring.getClassLoader(),
+				UTF8Control.INSTANCE);
+
 			ServiceRegistration<?> serviceRegistration =
 				_bundleContext.registerService(
-					ResourceBundle.class,
-					new ServiceFactory<ResourceBundle>() {
-
-						@Override
-						public ResourceBundle getService(
-							Bundle bundle,
-							ServiceRegistration<ResourceBundle>
-								serviceRegistration) {
-
-							return ResourceBundle.getBundle(
-								baseName, locale, bundleWiring.getClassLoader(),
-								UTF8Control.INSTANCE);
-						}
-
-						@Override
-						public void ungetService(
-							Bundle bundle,
-							ServiceRegistration<ResourceBundle>
-								serviceRegistration,
-							ResourceBundle resourceBundle) {
-						}
-
-					},
+					ResourceBundle.class, resourceBundle,
 					HashMapDictionaryBuilder.<String, Object>put(
 						Constants.SERVICE_RANKING, serviceRanking
 					).put(

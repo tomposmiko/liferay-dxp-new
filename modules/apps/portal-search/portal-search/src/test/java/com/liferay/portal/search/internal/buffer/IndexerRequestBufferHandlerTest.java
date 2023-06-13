@@ -15,7 +15,6 @@
 package com.liferay.portal.search.internal.buffer;
 
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.configuration.IndexerRegistryConfiguration;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -23,6 +22,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.ClassRule;
@@ -50,14 +50,14 @@ public class IndexerRequestBufferHandlerTest {
 		int maxBufferSize = 5;
 
 		_indexerRequestBufferHandler = new IndexerRequestBufferHandler(
-			_createIndexerRequestBufferOverflowHandler(),
-			_createIndexerRegistryConfiguration(maxBufferSize));
+			createIndexerRequestBufferOverflowHandler(),
+			createIndexerRegistryConfiguration(maxBufferSize));
 
 		_indexerRequestBuffer = IndexerRequestBuffer.create();
 
-		Indexer<?> indexer = _createIndexerWithDeepReindex();
+		Indexer<?> indexer = createIndexerWithDeepReindex();
 
-		List<IndexerRequest> indexerRequests = _createIndexerRequests(
+		List<IndexerRequest> indexerRequests = createIndexerRequests(
 			indexer, maxBufferSize + 3);
 
 		for (IndexerRequest indexerRequest : indexerRequests) {
@@ -66,7 +66,7 @@ public class IndexerRequestBufferHandlerTest {
 		}
 	}
 
-	private IndexerRegistryConfiguration _createIndexerRegistryConfiguration(
+	protected IndexerRegistryConfiguration createIndexerRegistryConfiguration(
 		int maxBufferSize) {
 
 		IndexerRegistryConfiguration indexerRegistryConfiguration =
@@ -81,45 +81,59 @@ public class IndexerRequestBufferHandlerTest {
 		return indexerRegistryConfiguration;
 	}
 
-	private IndexerRequest _createIndexerRequest(Indexer<?> indexer) {
+	protected IndexerRequest createIndexerRequest(Indexer<?> indexer) {
 		return new IndexerRequest(
 			_method, indexer, RandomTestUtil.randomString(),
 			RandomTestUtil.randomLong());
 	}
 
-	private IndexerRequestBufferOverflowHandler
-		_createIndexerRequestBufferOverflowHandler() {
+	protected IndexerRequestBufferExecutorWatcher
+		createIndexerRequestBufferExecutorWatcher() {
 
-		IndexerRequestBufferOverflowHandler
-			indexerRequestBufferOverflowHandler =
-				new IndexerRequestBufferOverflowHandler();
+		IndexerRequestBufferExecutorWatcher
+			indexerRequestBufferExecutorWatcher =
+				new IndexerRequestBufferExecutorWatcher();
 
-		ReflectionTestUtil.setFieldValue(
-			indexerRequestBufferOverflowHandler,
-			"_indexerRequestBufferExecutor",
-			new IndexerRequestBufferExecutor());
+		indexerRequestBufferExecutorWatcher.activate(
+			Collections.<String, Object>emptyMap());
 
-		return indexerRequestBufferOverflowHandler;
+		indexerRequestBufferExecutorWatcher.addIndexerRequestBufferExecutor(
+			new DefaultIndexerRequestBufferExecutor(),
+			Collections.singletonMap(
+				"buffered.execution.mode", (Object)"DEFAULT"));
+
+		return indexerRequestBufferExecutorWatcher;
 	}
 
-	private List<IndexerRequest> _createIndexerRequests(
+	protected IndexerRequestBufferOverflowHandler
+		createIndexerRequestBufferOverflowHandler() {
+
+		return new DefaultIndexerRequestBufferOverflowHandler() {
+			{
+				indexerRequestBufferExecutorWatcher =
+					createIndexerRequestBufferExecutorWatcher();
+			}
+		};
+	}
+
+	protected List<IndexerRequest> createIndexerRequests(
 		Indexer<?> indexer, int count) {
 
 		List<IndexerRequest> indexerRequests = new ArrayList<>(count);
 
 		for (int i = 0; i < count; i++) {
-			indexerRequests.add(_createIndexerRequest(indexer));
+			indexerRequests.add(createIndexerRequest(indexer));
 		}
 
 		return indexerRequests;
 	}
 
-	private Indexer<?> _createIndexerWithDeepReindex() throws Exception {
+	protected Indexer<?> createIndexerWithDeepReindex() throws Exception {
 		Indexer<?> indexer = Mockito.mock(Indexer.class);
 
 		Mockito.doAnswer(
 			invocationOnMock -> {
-				_deepReindex();
+				deepReindex();
 
 				return null;
 			}
@@ -132,8 +146,8 @@ public class IndexerRequestBufferHandlerTest {
 		return indexer;
 	}
 
-	private void _deepReindex() throws Exception {
-		IndexerRequest indexerRequest = _createIndexerRequest(_indexer);
+	protected void deepReindex() throws Exception {
+		IndexerRequest indexerRequest = createIndexerRequest(_indexer);
 
 		_indexerRequestBufferHandler.bufferRequest(
 			indexerRequest, _indexerRequestBuffer);

@@ -20,7 +20,7 @@ import com.liferay.account.service.AccountGroupLocalService;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
-import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -28,12 +28,12 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class AccountGroupModelListener extends BaseModelListener<AccountGroup> {
 
 	@Override
 	public void onAfterRemove(AccountGroup accountGroup) {
-		if (PortalInstances.isCurrentCompanyInDeletionProcess()) {
+		if (CompanyThreadLocal.isDeleteInProcess()) {
 			return;
 		}
 

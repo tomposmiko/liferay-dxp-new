@@ -1,8 +1,6 @@
 @component-name = "portal-publications"
 definition {
 
-	property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config";
-	property osgi.module.configurations = "enabled=B\"true\"";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Publications";
@@ -11,34 +9,39 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
+
+		JSONPublications.enablePublications();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
+			ApplicationsMenu.gotoPortlet(
+				category = "Publications",
+				panel = "Applications",
+				portlet = "Publications");
+
 			Publications.disablePublications();
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewProductionWebContentInPublication {
-		JSONGroup.addGroup(groupName = "Site Name");
-
 		JSONWebcontent.addWebContent(
 			content = "Web Content Content",
-			groupName = "Site Name",
+			groupName = "Guest",
 			title = "Production WC");
 
 		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
+			groupName = "Guest",
 			layoutName = "Test Page Name");
 
 		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Site Name",
+			groupName = "Guest",
 			layoutName = "Test Page Name",
 			widgetName = "Asset Publisher");
 
@@ -46,7 +49,7 @@ definition {
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContentNavigator.gotoAddCP();
 
@@ -58,21 +61,21 @@ definition {
 
 		Navigator.openSitePage(
 			pageName = "Test Page Name",
-			siteName = "Site Name");
+			siteName = "Guest");
 
 		AssetPublisherPortlet.viewDisplayOrderPG(
 			assetTitle = "Publication WC",
-			rowNumber = 1);
+			rowNumber = "1");
 
 		AssetPublisherPortlet.viewDisplayOrderPG(
 			assetTitle = "Production WC",
-			rowNumber = 2);
+			rowNumber = "2");
 
 		Publications.workOnProduction();
 
 		AssetPublisherPortlet.viewDisplayOrderPG(
 			assetTitle = "Production WC",
-			rowNumber = 1);
+			rowNumber = "1");
 	}
 
 }

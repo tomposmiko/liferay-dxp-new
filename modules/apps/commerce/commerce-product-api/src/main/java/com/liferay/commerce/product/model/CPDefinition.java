@@ -82,11 +82,13 @@ public interface CPDefinition extends CPDefinitionModel, PersistedModel {
 	public CPTaxCategory getCPTaxCategory()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public String getDefaultImageThumbnailSrc(long commerceAccountId)
-		throws Exception;
+	public String getDefaultImageFileURL()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public String getDefaultImageThumbnailSrc() throws Exception;
 
 	public com.liferay.portal.kernel.util.UnicodeProperties
-		getDeliverySubscriptionTypeSettingsUnicodeProperties();
+		getDeliverySubscriptionTypeSettingsProperties();
 
 	public java.util.Map<java.util.Locale, String> getDescriptionMap();
 
@@ -103,7 +105,7 @@ public interface CPDefinition extends CPDefinitionModel, PersistedModel {
 	public java.util.Map<java.util.Locale, String> getShortDescriptionMap();
 
 	public com.liferay.portal.kernel.util.UnicodeProperties
-		getSubscriptionTypeSettingsUnicodeProperties();
+		getSubscriptionTypeSettingsProperties();
 
 	public String getURL(String languageId);
 
@@ -111,7 +113,7 @@ public interface CPDefinition extends CPDefinitionModel, PersistedModel {
 
 	public int hashCode();
 
-	public void setDeliverySubscriptionTypeSettingsUnicodeProperties(
+	public void setDeliverySubscriptionTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
 			deliverySubscriptionTypeSettingsUnicodeProperties);
 
@@ -123,7 +125,7 @@ public interface CPDefinition extends CPDefinitionModel, PersistedModel {
 	public void setShortDescriptionMap(
 		java.util.Map<java.util.Locale, String> shortDescriptionMap);
 
-	public void setSubscriptionTypeSettingsUnicodeProperties(
+	public void setSubscriptionTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
 			subscriptionTypeSettingsUnicodeProperties);
 

@@ -36,7 +36,7 @@ public class ElasticsearchConfigurationTest {
 	@Test
 	public void testConfigurationsFromBuildTestXmlAntFile() throws Exception {
 		Map<String, Object> configurationProperties =
-			_loadConfigurationProperties(
+			loadConfigurationProperties(
 				"ElasticsearchConfigurationTest-build-test-xml.cfg");
 
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
@@ -55,7 +55,7 @@ public class ElasticsearchConfigurationTest {
 		}
 	}
 
-	private Map<String, Object> _loadConfigurationProperties(String fileName)
+	protected Map<String, Object> loadConfigurationProperties(String fileName)
 		throws Exception {
 
 		Properties properties = new Properties();

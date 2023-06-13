@@ -17,19 +17,20 @@ package com.liferay.journal.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.journal.util.JournalHelper;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistry;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.service.PortalPreferencesLocalService;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -37,17 +38,20 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -66,19 +70,30 @@ public class JournalArticleIndexVersionsTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(),
-			PermissionCheckerMethodTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
+		CompanyThreadLocal.setCompanyId(TestPropsValues.getCompanyId());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setCompanyId(TestPropsValues.getCompanyId());
+
 		_group = GroupTestUtil.addGroup();
 
+		User user = TestPropsValues.getUser();
+
+		user.setCompanyId(TestPropsValues.getCompanyId());
+
+		UserTestUtil.setUser(user);
+
 		PortalPreferences portalPreferences =
-			_portletPreferencesFactory.getPortalPreferences(
+			PortletPreferencesFactoryUtil.getPortalPreferences(
 				TestPropsValues.getUserId(), true);
 
-		_originalPortalPreferencesXML = _portletPreferencesFactory.toXML(
+		_originalPortalPreferencesXML = PortletPreferencesFactoryUtil.toXML(
 			portalPreferences);
 
 		portalPreferences.setValue(
@@ -86,7 +101,7 @@ public class JournalArticleIndexVersionsTest {
 		portalPreferences.setValue(
 			"", "indexAllArticleVersionsEnabled", "false");
 
-		_portalPreferencesLocalService.updatePreferences(
+		PortalPreferencesLocalServiceUtil.updatePreferences(
 			TestPropsValues.getCompanyId(),
 			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
 			PortletPreferencesFactoryUtil.toXML(portalPreferences));
@@ -94,7 +109,7 @@ public class JournalArticleIndexVersionsTest {
 
 	@After
 	public void tearDown() throws Exception {
-		_portalPreferencesLocalService.updatePreferences(
+		PortalPreferencesLocalServiceUtil.updatePreferences(
 			TestPropsValues.getCompanyId(),
 			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
 			_originalPortalPreferencesXML);
@@ -116,7 +131,7 @@ public class JournalArticleIndexVersionsTest {
 
 		assertSearchCount(1, true);
 
-		_journalArticleLocalService.deleteArticle(
+		JournalArticleLocalServiceUtil.deleteArticle(
 			_group.getGroupId(), updateArticle.getArticleId(),
 			ServiceContextTestUtil.getServiceContext());
 
@@ -142,7 +157,7 @@ public class JournalArticleIndexVersionsTest {
 
 		assertSearchCount(1, true);
 
-		_journalArticleLocalService.deleteArticle(
+		JournalArticleLocalServiceUtil.deleteArticle(
 			updateArticle, updateArticle.getUrlTitle(), serviceContext);
 
 		assertSearchArticle(1, article);
@@ -228,7 +243,7 @@ public class JournalArticleIndexVersionsTest {
 			long expectedCount, JournalArticle article)
 		throws Exception {
 
-		Indexer<JournalArticle> indexer = _indexerRegistry.getIndexer(
+		Indexer<JournalArticle> indexer = IndexerRegistryUtil.getIndexer(
 			JournalArticle.class);
 
 		SearchContext searchContext = SearchContextTestUtil.getSearchContext(
@@ -266,16 +281,24 @@ public class JournalArticleIndexVersionsTest {
 		SearchResponse searchResponse = _searcher.search(
 			_searchRequestBuilderFactory.builder(
 				searchContext
-			).emptySearchEnabled(
-				true
 			).modelIndexerClasses(
 				JournalArticle.class
 			).build());
 
 		Assert.assertEquals(
 			searchResponse.getRequestString() + "->" +
-				searchResponse.getDocuments(),
+				_toString(searchResponse.getDocumentsStream()),
 			expectedCount, searchResponse.getCount());
+	}
+
+	private String _toString(Stream<Document> stream) {
+		return stream.map(
+			Document::getFields
+		).map(
+			String::valueOf
+		).collect(
+			Collectors.joining()
+		);
 	}
 
 	@Inject
@@ -288,20 +311,8 @@ public class JournalArticleIndexVersionsTest {
 	private Group _group;
 
 	@Inject
-	private IndexerRegistry _indexerRegistry;
-
-	@Inject
-	private JournalArticleLocalService _journalArticleLocalService;
-
-	@Inject
 	private JournalHelper _journalHelper;
 
 	private String _originalPortalPreferencesXML;
-
-	@Inject
-	private PortalPreferencesLocalService _portalPreferencesLocalService;
-
-	@Inject
-	private PortletPreferencesFactory _portletPreferencesFactory;
 
 }

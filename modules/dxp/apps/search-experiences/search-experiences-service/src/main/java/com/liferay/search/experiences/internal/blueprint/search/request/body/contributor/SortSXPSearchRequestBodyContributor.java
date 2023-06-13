@@ -16,11 +16,13 @@ package com.liferay.search.experiences.internal.blueprint.search.request.body.co
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.geolocation.DistanceUnit;
 import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.geolocation.GeoDistanceType;
+import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.GeoDistanceSort;
@@ -34,6 +36,7 @@ import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterD
 import com.liferay.search.experiences.internal.blueprint.query.QueryConverter;
 import com.liferay.search.experiences.internal.blueprint.script.ScriptConverter;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
+import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.dto.v1_0.SortConfiguration;
 
 import java.util.Iterator;
@@ -57,8 +60,14 @@ public class SortSXPSearchRequestBodyContributor
 
 	@Override
 	public void contribute(
-		Configuration configuration, SearchRequestBuilder searchRequestBuilder,
+		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint,
 		SXPParameterData sxpParameterData) {
+
+		if (_hasSorts(searchRequestBuilder)) {
+			return;
+		}
+
+		Configuration configuration = sxpBlueprint.getConfiguration();
 
 		SortConfiguration sortConfiguration =
 			configuration.getSortConfiguration();
@@ -68,10 +77,6 @@ public class SortSXPSearchRequestBodyContributor
 		}
 
 		JSONArray jsonArray = (JSONArray)sortConfiguration.getSorts();
-
-		if (jsonArray == null) {
-			return;
-		}
 
 		for (int i = 0; i < jsonArray.length(); i++) {
 			searchRequestBuilder.addSort(_toSort(jsonArray.get(i)));
@@ -89,6 +94,16 @@ public class SortSXPSearchRequestBodyContributor
 		geoDistanceSort.addGeoLocationPoints(
 			_geoBuilders.geoLocationPoint(
 				jsonArray.getDouble(0), jsonArray.getDouble(1)));
+	}
+
+	private boolean _hasSorts(SearchRequestBuilder searchRequestBuilder) {
+		return searchRequestBuilder.withSearchContextGet(
+			searchContext -> {
+				SearchRequest searchRequest =
+					(SearchRequest)searchContext.getAttribute("search.request");
+
+				return !ListUtil.isEmpty(searchRequest.getSorts());
+			});
 	}
 
 	private void _processGeoDistanceType(
@@ -218,13 +233,10 @@ public class SortSXPSearchRequestBodyContributor
 	}
 
 	private NestedSort _toNestedSort(JSONObject jsonObject) {
-		NestedSort nestedSort = _sorts.nested(
-			jsonObject.getString("nested_path"));
+		NestedSort nestedSort = _sorts.nested(jsonObject.getString("path"));
 
-		if (jsonObject.has("nested_filter")) {
-			nestedSort.setFilterQuery(
-				_queryConverter.toQuery(
-					jsonObject.getJSONObject("nested_filter")));
+		if (jsonObject.has("filter")) {
+			nestedSort.setFilterQuery(_queryConverter.toQuery(jsonObject));
 		}
 
 		if (jsonObject.has("nested")) {

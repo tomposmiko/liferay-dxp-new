@@ -34,6 +34,7 @@ describe('MiniCart Items List', () => {
 		},
 		cartState: {},
 		labels: DEFAULT_LABELS,
+		spritemap: 'someSpritemap.svg',
 	};
 
 	const COMPONENT_SELECTOR = '.mini-cart-items-list';
@@ -68,8 +69,17 @@ describe('MiniCart Items List', () => {
 					EMPTY_CART_SELECTOR
 				);
 
+				const iconElement = EmptyCartElement.querySelector('svg use');
+
+				const iconPath = iconElement.getAttribute('xlink:href');
+
 				expect(CartItemsListElement).toBeInTheDocument();
 				expect(EmptyCartElement).toBeInTheDocument();
+				expect(iconElement).toBeInTheDocument();
+
+				expect(iconPath).toEqual(
+					`${BASE_CONTEXT_MOCK.spritemap}#shopping-cart`
+				);
 
 				expect(
 					getByText(BASE_CONTEXT_MOCK.labels[ADD_PRODUCT])
@@ -112,6 +122,7 @@ describe('MiniCart Items List', () => {
 				},
 				isUpdating: false,
 				labels: DEFAULT_LABELS,
+				spritemap: 'someSpritemap.svg',
 				summaryDataMapper: jest.fn(),
 			};
 

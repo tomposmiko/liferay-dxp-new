@@ -18,37 +18,36 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceLocalService;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Leonardo Barros
  */
-public class DDMDataProviderInstancesDataProviderTest {
+@PrepareForTest(LocaleThreadLocal.class)
+@RunWith(PowerMockRunner.class)
+public class DDMDataProviderInstancesDataProviderTest extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
+	@Before
+	public void setUp() throws Exception {
 		_setUpLocaleThreadLocal();
 
 		_ddmDataProviderInstancesDataProvider =
@@ -71,7 +70,7 @@ public class DDMDataProviderInstancesDataProviderTest {
 
 		long[] groups = {1, 2};
 
-		Mockito.when(
+		when(
 			_portal.getCurrentAndAncestorSiteGroupIds(1)
 		).thenReturn(
 			groups
@@ -83,7 +82,7 @@ public class DDMDataProviderInstancesDataProviderTest {
 		DDMDataProviderInstance ddmDataProviderInstance2 =
 			_createDDMDataProviderInstanceMock(2, "Data Provider Instance 2");
 
-		Mockito.when(
+		when(
 			_ddmDataProviderInstanceLocalService.getDataProviderInstances(
 				groups)
 		).thenReturn(
@@ -96,20 +95,20 @@ public class DDMDataProviderInstancesDataProviderTest {
 
 		Assert.assertTrue(ddmDataProviderResponse.hasOutput("Default-Output"));
 
-		List<KeyValuePair> keyValuePairs = ddmDataProviderResponse.getOutput(
-			"Default-Output", List.class);
+		Optional<List<KeyValuePair>> optional =
+			ddmDataProviderResponse.getOutputOptional(
+				"Default-Output", List.class);
 
-		Assert.assertNotNull(keyValuePairs);
+		Assert.assertTrue(optional.isPresent());
 
-		List<KeyValuePair> expectedKeyValuePairs =
-			new ArrayList<KeyValuePair>() {
-				{
-					add(new KeyValuePair("1", "Data Provider Instance 1"));
-					add(new KeyValuePair("2", "Data Provider Instance 2"));
-				}
-			};
+		List<KeyValuePair> keyValuePairs = new ArrayList<KeyValuePair>() {
+			{
+				add(new KeyValuePair("1", "Data Provider Instance 1"));
+				add(new KeyValuePair("2", "Data Provider Instance 2"));
+			}
+		};
 
-		Assert.assertEquals(expectedKeyValuePairs, keyValuePairs);
+		Assert.assertEquals(keyValuePairs, optional.get());
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -126,10 +125,10 @@ public class DDMDataProviderInstancesDataProviderTest {
 			1
 		).build();
 
-		Mockito.when(
+		when(
 			_portal.getCurrentAndAncestorSiteGroupIds(1)
 		).thenThrow(
-			PortalException.class
+			Exception.class
 		);
 
 		DDMDataProviderResponse ddmDataProviderResponse =
@@ -138,31 +137,30 @@ public class DDMDataProviderInstancesDataProviderTest {
 
 		Assert.assertTrue(ddmDataProviderResponse.hasOutput("Default-Output"));
 
-		List<KeyValuePair> keyValuePairs = ddmDataProviderResponse.getOutput(
-			"Default-Output", List.class);
+		Optional<List<KeyValuePair>> optional =
+			ddmDataProviderResponse.getOutputOptional(
+				"Default-Output", List.class);
 
-		Assert.assertNotNull(keyValuePairs);
+		Assert.assertTrue(optional.isPresent());
+
+		List<KeyValuePair> keyValuePairs = optional.get();
 
 		Assert.assertEquals(keyValuePairs.toString(), 0, keyValuePairs.size());
-	}
-
-	private static void _setUpLocaleThreadLocal() {
-		LocaleThreadLocal.setThemeDisplayLocale(_locale);
 	}
 
 	private DDMDataProviderInstance _createDDMDataProviderInstanceMock(
 		long dataProviderInstanceId, String name) {
 
-		DDMDataProviderInstance ddmDataProviderInstance = Mockito.mock(
+		DDMDataProviderInstance ddmDataProviderInstance = mock(
 			DDMDataProviderInstance.class);
 
-		Mockito.when(
+		when(
 			ddmDataProviderInstance.getDataProviderInstanceId()
 		).thenReturn(
 			dataProviderInstanceId
 		);
 
-		Mockito.when(
+		when(
 			ddmDataProviderInstance.getName(_locale)
 		).thenReturn(
 			name
@@ -171,12 +169,26 @@ public class DDMDataProviderInstancesDataProviderTest {
 		return ddmDataProviderInstance;
 	}
 
-	private static final DDMDataProviderInstanceLocalService
-		_ddmDataProviderInstanceLocalService = Mockito.mock(
-			DDMDataProviderInstanceLocalService.class);
-	private static DDMDataProviderInstancesDataProvider
-		_ddmDataProviderInstancesDataProvider;
+	private void _setUpLocaleThreadLocal() {
+		mockStatic(LocaleThreadLocal.class);
+
+		when(
+			LocaleThreadLocal.getThemeDisplayLocale()
+		).thenReturn(
+			_locale
+		);
+	}
+
 	private static final Locale _locale = new Locale("pt", "BR");
-	private static final Portal _portal = Mockito.mock(Portal.class);
+
+	@Mock
+	private DDMDataProviderInstanceLocalService
+		_ddmDataProviderInstanceLocalService;
+
+	private DDMDataProviderInstancesDataProvider
+		_ddmDataProviderInstancesDataProvider;
+
+	@Mock
+	private Portal _portal;
 
 }

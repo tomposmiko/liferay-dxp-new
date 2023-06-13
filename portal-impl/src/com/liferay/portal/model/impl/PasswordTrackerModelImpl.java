@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -215,82 +216,89 @@ public class PasswordTrackerModelImpl
 	public Map<String, Function<PasswordTracker, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<PasswordTracker, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, PasswordTracker>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<PasswordTracker, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PasswordTracker.class.getClassLoader(), PasswordTracker.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<PasswordTracker, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<PasswordTracker, Object>>();
+		try {
+			Constructor<PasswordTracker> constructor =
+				(Constructor<PasswordTracker>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", PasswordTracker::getMvccVersion);
-			attributeGetterFunctions.put(
-				"passwordTrackerId", PasswordTracker::getPasswordTrackerId);
-			attributeGetterFunctions.put(
-				"companyId", PasswordTracker::getCompanyId);
-			attributeGetterFunctions.put("userId", PasswordTracker::getUserId);
-			attributeGetterFunctions.put(
-				"createDate", PasswordTracker::getCreateDate);
-			attributeGetterFunctions.put(
-				"password", PasswordTracker::getPassword);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<PasswordTracker, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<PasswordTracker, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<PasswordTracker, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<PasswordTracker, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<PasswordTracker, Object>>();
+		Map<String, BiConsumer<PasswordTracker, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<PasswordTracker, ?>>();
 
-		static {
-			Map<String, BiConsumer<PasswordTracker, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<PasswordTracker, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", PasswordTracker::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<PasswordTracker, Long>)PasswordTracker::setMvccVersion);
+		attributeGetterFunctions.put(
+			"passwordTrackerId", PasswordTracker::getPasswordTrackerId);
+		attributeSetterBiConsumers.put(
+			"passwordTrackerId",
+			(BiConsumer<PasswordTracker, Long>)
+				PasswordTracker::setPasswordTrackerId);
+		attributeGetterFunctions.put(
+			"companyId", PasswordTracker::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<PasswordTracker, Long>)PasswordTracker::setCompanyId);
+		attributeGetterFunctions.put("userId", PasswordTracker::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<PasswordTracker, Long>)PasswordTracker::setUserId);
+		attributeGetterFunctions.put(
+			"createDate", PasswordTracker::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<PasswordTracker, Date>)PasswordTracker::setCreateDate);
+		attributeGetterFunctions.put("password", PasswordTracker::getPassword);
+		attributeSetterBiConsumers.put(
+			"password",
+			(BiConsumer<PasswordTracker, String>)PasswordTracker::setPassword);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<PasswordTracker, Long>)
-					PasswordTracker::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"passwordTrackerId",
-				(BiConsumer<PasswordTracker, Long>)
-					PasswordTracker::setPasswordTrackerId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<PasswordTracker, Long>)
-					PasswordTracker::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<PasswordTracker, Long>)PasswordTracker::setUserId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<PasswordTracker, Date>)
-					PasswordTracker::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"password",
-				(BiConsumer<PasswordTracker, String>)
-					PasswordTracker::setPassword);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -661,12 +669,41 @@ public class PasswordTrackerModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<PasswordTracker, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<PasswordTracker, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<PasswordTracker, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((PasswordTracker)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, PasswordTracker>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					PasswordTracker.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -681,8 +718,7 @@ public class PasswordTrackerModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<PasswordTracker, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.commerce.product.model.CPDefinitionOptionValueRel;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -24,6 +23,7 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -47,8 +47,14 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @AccessControlled
-@CTAware
 @JSONWebService
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=commerce",
+		"json.web.service.context.path=CPDefinitionOptionValueRel"
+	},
+	service = CPDefinitionOptionValueRelService.class
+)
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
@@ -116,6 +122,28 @@ public interface CPDefinitionOptionValueRelService extends BaseService {
 			long cpDefinitionOptionValueRelId)
 		throws PortalException;
 
+	/**
+	 * @param companyId
+	 * @param groupId
+	 * @param cpDefinitionOptionRelId
+	 * @param keywords
+	 * @param start
+	 * @param end
+	 * @param sort
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchCPDefinitionOptionValueRels(long, long, long, String,
+	 int, int, Sort[])}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BaseModelSearchResult<CPDefinitionOptionValueRel>
+			searchCPDefinitionOptionValueRels(
+				long companyId, long groupId, long cpDefinitionOptionRelId,
+				String keywords, int start, int end, Sort sort)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<CPDefinitionOptionValueRel>
 			searchCPDefinitionOptionValueRels(
@@ -129,11 +157,51 @@ public interface CPDefinitionOptionValueRelService extends BaseService {
 			String keywords)
 		throws PortalException;
 
+	/**
+	 * @param cpDefinitionOptionValueRelId
+	 * @param nameMap
+	 * @param priority
+	 * @param key
+	 * @param cpInstanceId
+	 * @param quantity
+	 * @param price
+	 * @param serviceContext
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Athanasius (7.3.x), use {@link
+	 #updateCPDefinitionOptionValueRel(long, Map, double, String,
+	 long, int, boolean, BigDecimal, ServiceContext)}
+	 */
+	@Deprecated
+	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
+			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
+			double priority, String key, long cpInstanceId, int quantity,
+			BigDecimal price, ServiceContext serviceContext)
+		throws PortalException;
+
 	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
 			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
 			double priority, String key, long cpInstanceId, int quantity,
 			boolean preselected, BigDecimal price,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @param cpDefinitionOptionValueRelId
+	 * @param nameMap
+	 * @param priority
+	 * @param key
+	 * @param serviceContext
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Athanasius (7.3.x), use {@link
+	 #updateCPDefinitionOptionValueRel(long, Map, double, String,
+	 long, int, boolean, BigDecimal, ServiceContext)}
+	 */
+	@Deprecated
+	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
+			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
+			double priority, String key, ServiceContext serviceContext)
 		throws PortalException;
 
 	public CPDefinitionOptionValueRel

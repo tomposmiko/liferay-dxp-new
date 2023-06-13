@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -34,8 +33,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface AddressModel
-	extends AttachedModel, BaseModel<Address>, CTModel<Address>, MVCCModel,
-			ShardedModel, StagedAuditedModel {
+	extends AttachedModel, BaseModel<Address>, MVCCModel, ShardedModel,
+			StagedAuditedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -48,7 +47,6 @@ public interface AddressModel
 	 *
 	 * @return the primary key of this address
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -56,7 +54,6 @@ public interface AddressModel
 	 *
 	 * @param primaryKey the primary key of this address
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -74,22 +71,6 @@ public interface AddressModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this address.
-	 *
-	 * @return the ct collection ID of this address
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this address.
-	 *
-	 * @param ctCollectionId the ct collection ID of this address
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this address.
@@ -291,20 +272,6 @@ public interface AddressModel
 	public void setCountryId(long countryId);
 
 	/**
-	 * Returns the list type ID of this address.
-	 *
-	 * @return the list type ID of this address
-	 */
-	public long getListTypeId();
-
-	/**
-	 * Sets the list type ID of this address.
-	 *
-	 * @param listTypeId the list type ID of this address
-	 */
-	public void setListTypeId(long listTypeId);
-
-	/**
 	 * Returns the region ID of this address.
 	 *
 	 * @return the region ID of this address
@@ -317,6 +284,20 @@ public interface AddressModel
 	 * @param regionId the region ID of this address
 	 */
 	public void setRegionId(long regionId);
+
+	/**
+	 * Returns the type ID of this address.
+	 *
+	 * @return the type ID of this address
+	 */
+	public long getTypeId();
+
+	/**
+	 * Sets the type ID of this address.
+	 *
+	 * @param typeId the type ID of this address
+	 */
+	public void setTypeId(long typeId);
 
 	/**
 	 * Returns the city of this address.
@@ -523,9 +504,5 @@ public interface AddressModel
 
 	@Override
 	public Address cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

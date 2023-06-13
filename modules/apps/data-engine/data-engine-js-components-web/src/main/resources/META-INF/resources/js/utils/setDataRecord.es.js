@@ -14,7 +14,7 @@
 
 import extractDataRecordValueKey from '../utils/extractDataRecordValueKey.es';
 
-export default function setDataRecord(
+export default (
 	{
 		locale,
 		localizable,
@@ -30,7 +30,7 @@ export default function setDataRecord(
 	dataRecordValues,
 	languageId,
 	preserveValue
-) {
+) => {
 	const dataRecordValueKey = extractDataRecordValueKey(name);
 
 	if (transient) {
@@ -97,4 +97,4 @@ export default function setDataRecord(
 	else {
 		dataRecordValues[dataRecordValueKey] = _value;
 	}
-}
+};

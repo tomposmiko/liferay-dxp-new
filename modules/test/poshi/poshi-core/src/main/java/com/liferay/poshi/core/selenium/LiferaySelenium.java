@@ -60,8 +60,6 @@ public interface LiferaySelenium {
 
 	public void assertEditable(String locator) throws Exception;
 
-	public void assertElementAccessible(String locator) throws Exception;
-
 	public void assertElementNotPresent(String locator) throws Exception;
 
 	public void assertElementPresent(String locator) throws Exception;
@@ -136,9 +134,6 @@ public interface LiferaySelenium {
 	public void assertSelectedLabel(String selectLocator, String pattern)
 		throws Exception;
 
-	public void assertTable(String locator, String tableString)
-		throws Exception;
-
 	public void assertText(String locator, String pattern) throws Exception;
 
 	public void assertTextCaseInsensitive(String locator, String pattern)
@@ -185,9 +180,6 @@ public interface LiferaySelenium {
 		String locatorOfObjectToBeDragged,
 		String locatorOfDragDestinationObject);
 
-	public void dragAtAndDrop(
-		String locator, String coordString, String movementsString);
-
 	public void echo(String message);
 
 	public void executeJavaScript(
@@ -201,11 +193,11 @@ public interface LiferaySelenium {
 
 	public String getConfirmation(String value);
 
-	public long getElementHeight(String locator);
+	public int getElementHeight(String locator);
 
 	public String getElementValue(String locator) throws Exception;
 
-	public long getElementWidth(String locator);
+	public int getElementWidth(String locator);
 
 	public String getEmailBody(String index) throws Exception;
 
@@ -216,8 +208,6 @@ public interface LiferaySelenium {
 	public String getFirstNumber(String locator);
 
 	public String getFirstNumberIncrement(String locator);
-
-	public String getHtmlNodeText(String locator) throws Exception;
 
 	public String getHtmlSource();
 
@@ -230,9 +220,9 @@ public interface LiferaySelenium {
 
 	public String getNumberIncrement(String value);
 
-	public String getOcularBaselineImageDirName();
-
 	public String getOcularResultImageDirName();
+
+	public String getOcularSnapImageDirName();
 
 	public String getOutputDirName();
 
@@ -251,8 +241,6 @@ public interface LiferaySelenium {
 	public String getText(String locator) throws Exception;
 
 	public String getTitle();
-
-	public String getWebElementAttribute(String locator, String attributeName);
 
 	public void goBack();
 
@@ -343,8 +331,6 @@ public interface LiferaySelenium {
 
 	public void javaScriptMouseDown(String locator);
 
-	public void javaScriptMouseOver(String locator);
-
 	public void javaScriptMouseUp(String locator);
 
 	public void keyDown(String locator, String keySequence);
@@ -354,8 +340,6 @@ public interface LiferaySelenium {
 	public void keyUp(String locator, String keySequence);
 
 	public void makeVisible(String locator);
-
-	public void maximizeWindow();
 
 	public void mouseDown(String locator);
 
@@ -375,9 +359,7 @@ public interface LiferaySelenium {
 
 	public void mouseUpAt(String locator, String coordString);
 
-	public void ocularAssertElementImage(
-			String locator, String fileName, String match)
-		throws Exception;
+	public void ocularAssertElementImage(String locator) throws Exception;
 
 	public void open(String url) throws Exception;
 
@@ -403,6 +385,11 @@ public interface LiferaySelenium {
 
 	public void saveScreenshot(String fileName) throws Exception;
 
+	public void saveScreenshotAndSource() throws Exception;
+
+	public void saveScreenshotBeforeAction(boolean actionFailed)
+		throws Exception;
+
 	public void scrollBy(String coordString);
 
 	public void scrollWebElementIntoView(String locator) throws Exception;
@@ -417,6 +404,10 @@ public interface LiferaySelenium {
 
 	public void selectWindow(String windowID);
 
+	public void sendActionDescriptionLogger(String description);
+
+	public boolean sendActionLogger(String command, String[] params);
+
 	public void sendEmail(String to, String subject, String body)
 		throws Exception;
 
@@ -425,13 +416,19 @@ public interface LiferaySelenium {
 	public void sendKeysAceEditor(String locator, String value)
 		throws Exception;
 
+	public void sendLogger(String id, String status);
+
+	public void sendMacroDescriptionLogger(String description);
+
+	public void sendTestCaseCommandLogger(String command);
+
+	public void sendTestCaseHeaderLogger(String command);
+
 	public void setDefaultTimeout();
 
 	public void setDefaultTimeoutImplicit();
 
 	public void setPrimaryTestSuiteName(String primaryTestSuiteName);
-
-	public void setTestName(String testName);
 
 	public void setTimeout(String timeout);
 
@@ -471,6 +468,12 @@ public interface LiferaySelenium {
 	public void sikuliUploadTempFile(String image, String value)
 		throws Exception;
 
+	public void startLogger();
+
+	public void stop();
+
+	public void stopLogger();
+
 	public void tripleClick(String locator);
 
 	public void type(String locator, String value) throws Exception;
@@ -478,6 +481,8 @@ public interface LiferaySelenium {
 	public void typeAceEditor(String locator, String value);
 
 	public void typeAlert(String value);
+
+	public void typeAlloyEditor(String locator, String value);
 
 	public void typeCKEditor(String locator, String value);
 

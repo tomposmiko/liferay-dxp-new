@@ -40,12 +40,12 @@ public class BaseDDMFormBuilderServlet extends HttpServlet {
 			HttpServletResponse httpServletResponse)
 		throws IOException, ServletException {
 
-		_createContext(httpServletRequest, httpServletResponse);
+		createContext(httpServletRequest, httpServletResponse);
 
 		super.service(httpServletRequest, httpServletResponse);
 	}
 
-	private void _createContext(
+	protected void createContext(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
@@ -57,7 +57,7 @@ public class BaseDDMFormBuilderServlet extends HttpServlet {
 		}
 		catch (ActionException actionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(actionException);
+				_log.debug(actionException, actionException);
 			}
 		}
 	}

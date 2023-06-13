@@ -118,23 +118,26 @@ String defaultLanguageId = cpDefinitionOptionRelDisplayContext.getCatalogDefault
 			>
 
 				<%
-				String datasetDisplayId = CommerceProductFDSNames.PRODUCT_OPTION_VALUES;
+				String datasetDisplayId = CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTION_VALUES;
 
 				if (cpDefinitionOptionRel.isPriceTypeStatic()) {
-					datasetDisplayId = CommerceProductFDSNames.PRODUCT_OPTION_VALUES_STATIC;
+					datasetDisplayId = CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTION_VALUES_STATIC;
 				}
 				%>
 
-				<frontend-data-set:classic-display
+				<clay:data-set-display
 					contextParams='<%=
 						HashMapBuilder.<String, String>put(
 							"cpDefinitionOptionRelId", String.valueOf(cpDefinitionOptionRelId)
 						).build()
 					%>'
 					creationMenu="<%= cpDefinitionOptionRelDisplayContext.getCreationMenu() %>"
-					dataProviderKey="<%= CommerceProductFDSNames.PRODUCT_OPTION_VALUES %>"
+					dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTION_VALUES %>"
 					id="<%= datasetDisplayId %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= currentURLObj %>"
 					selectedItemsKey="cpdefinitionOptionValueRelId"
 				/>
 			</commerce-ui:panel>
@@ -196,10 +199,9 @@ String defaultLanguageId = cpDefinitionOptionRelDisplayContext.getCatalogDefault
 					formFieldTypeSelect.value != '' &&
 					!endsWith(formFieldTypeSelect.value, array)
 				) {
-					Liferay.Util.openAlertModal({
-						message:
-							'<liferay-ui:message key="selected-field-type-price-type-and-sku-contributor-combination-is-not-allowed" />',
-					});
+					alert(
+						'<liferay-ui:message key="selected-field-type-price-type-and-sku-contributor-combination-is-not-allowed" />'
+					);
 
 					return;
 				}
@@ -237,7 +239,7 @@ String defaultLanguageId = cpDefinitionOptionRelDisplayContext.getCatalogDefault
 						disable(priceTypeSelect);
 					}
 					else {
-						Liferay.Util.openAlertModal(
+						alert(
 							'<liferay-ui:message key="selected-field-type-price-type-and-sku-contributor-combination-is-not-allowed" />'
 						);
 
@@ -258,10 +260,9 @@ String defaultLanguageId = cpDefinitionOptionRelDisplayContext.getCatalogDefault
 						disable(skuContributorInput);
 					}
 					else {
-						Liferay.Util.openAlertModal({
-							message:
-								'<liferay-ui:message key="selected-field-type-price-type-and-sku-contributor-combination-is-not-allowed" />',
-						});
+						alert(
+							'<liferay-ui:message key="selected-field-type-price-type-and-sku-contributor-combination-is-not-allowed" />'
+						);
 
 						return;
 					}

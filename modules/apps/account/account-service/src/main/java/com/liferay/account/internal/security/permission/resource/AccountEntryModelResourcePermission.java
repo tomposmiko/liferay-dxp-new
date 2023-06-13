@@ -23,16 +23,13 @@ import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.permission.OrganizationPermission;
-import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -41,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.account.model.AccountEntry",
 	service = ModelResourcePermission.class
 )
@@ -92,10 +90,9 @@ public class AccountEntryModelResourcePermission
 		AccountEntry accountEntry = _accountEntryLocalService.fetchAccountEntry(
 			accountEntryId);
 
-		if ((accountEntry != null) &&
-			permissionChecker.hasOwnerPermission(
+		if (permissionChecker.hasOwnerPermission(
 				permissionChecker.getCompanyId(), AccountEntry.class.getName(),
-				accountEntryId, accountEntry.getUserId(), actionId)) {
+				accountEntryId, permissionChecker.getUserId(), actionId)) {
 
 			return true;
 		}
@@ -104,10 +101,6 @@ public class AccountEntryModelResourcePermission
 			_accountEntryOrganizationRelLocalService.
 				getAccountEntryOrganizationRels(accountEntryId);
 
-		long[] userOrganizationIds =
-			_organizationLocalService.getUserOrganizationIds(
-				permissionChecker.getUserId(), true);
-
 		for (AccountEntryOrganizationRel accountEntryOrganizationRel :
 				accountEntryOrganizationRels) {
 
@@ -115,45 +108,33 @@ public class AccountEntryModelResourcePermission
 				_organizationLocalService.fetchOrganization(
 					accountEntryOrganizationRel.getOrganizationId());
 
-			Organization originalOrganization = organization;
+			if (organization == null) {
+				continue;
+			}
 
-			while (organization != null) {
-				boolean organizationMember = ArrayUtil.contains(
-					userOrganizationIds, organization.getOrganizationId());
+			if (permissionChecker.hasPermission(
+					organization.getGroupId(), AccountEntry.class.getName(),
+					accountEntryId, actionId)) {
 
-				if (!Objects.equals(
-						actionId, AccountActionKeys.MANAGE_ORGANIZATIONS) &&
-					organizationMember &&
-					_organizationPermission.contains(
-						permissionChecker, organization.getOrganizationId(),
-						AccountActionKeys.MANAGE_AVAILABLE_ACCOUNTS)) {
+				return true;
+			}
 
-					return true;
-				}
+			while (!organization.isRoot()) {
+				Organization parentOrganization =
+					organization.getParentOrganization();
 
-				if (Objects.equals(organization, originalOrganization) &&
-					permissionChecker.hasPermission(
-						organization.getGroupId(), AccountEntry.class.getName(),
-						accountEntryId, actionId)) {
-
-					return true;
-				}
-
-				if (!Objects.equals(organization, originalOrganization) &&
-					_organizationPermission.contains(
-						permissionChecker, organization,
+				if (_organizationPermission.contains(
+						permissionChecker, parentOrganization,
 						AccountActionKeys.MANAGE_SUBORGANIZATIONS_ACCOUNTS) &&
-					((organizationMember &&
-					  Objects.equals(actionId, ActionKeys.VIEW)) ||
-					 permissionChecker.hasPermission(
-						 organization.getGroupId(),
-						 AccountEntry.class.getName(), accountEntryId,
-						 actionId))) {
+					permissionChecker.hasPermission(
+						parentOrganization.getGroupId(),
+						AccountEntry.class.getName(), accountEntryId,
+						actionId)) {
 
 					return true;
 				}
 
-				organization = organization.getParentOrganization();
+				organization = parentOrganization;
 			}
 		}
 

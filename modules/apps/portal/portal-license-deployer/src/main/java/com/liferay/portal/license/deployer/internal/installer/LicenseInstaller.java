@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Amos Fong
  */
-@Component(enabled = false, service = FileInstaller.class)
+@Component(enabled = false, immediate = true, service = FileInstaller.class)
 public class LicenseInstaller implements FileInstaller {
 
 	@Override
@@ -63,7 +63,7 @@ public class LicenseInstaller implements FileInstaller {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

@@ -27,10 +27,6 @@ public class OpenIdConnectSessionLocalServiceWrapper
 	implements OpenIdConnectSessionLocalService,
 			   ServiceWrapper<OpenIdConnectSessionLocalService> {
 
-	public OpenIdConnectSessionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public OpenIdConnectSessionLocalServiceWrapper(
 		OpenIdConnectSessionLocalService openIdConnectSessionLocalService) {
 
@@ -123,19 +119,6 @@ public class OpenIdConnectSessionLocalServiceWrapper
 
 		return _openIdConnectSessionLocalService.deleteOpenIdConnectSession(
 			openIdConnectSession);
-	}
-
-	@Override
-	public void deleteOpenIdConnectSessions(long userId) {
-		_openIdConnectSessionLocalService.deleteOpenIdConnectSessions(userId);
-	}
-
-	@Override
-	public void deleteOpenIdConnectSessions(
-		long companyId, String authServerWellKnownURI, String clientId) {
-
-		_openIdConnectSessionLocalService.deleteOpenIdConnectSessions(
-			companyId, authServerWellKnownURI, clientId);
 	}
 
 	/**
@@ -261,28 +244,6 @@ public class OpenIdConnectSessionLocalServiceWrapper
 
 		return _openIdConnectSessionLocalService.fetchOpenIdConnectSession(
 			openIdConnectSessionId);
-	}
-
-	@Override
-	public com.liferay.portal.security.sso.openid.connect.persistence.model.
-		OpenIdConnectSession fetchOpenIdConnectSession(
-			long userId, String authServerWellKnownURI, String clientId) {
-
-		return _openIdConnectSessionLocalService.fetchOpenIdConnectSession(
-			userId, authServerWellKnownURI, clientId);
-	}
-
-	@Override
-	public java.util.List
-		<com.liferay.portal.security.sso.openid.connect.persistence.model.
-			OpenIdConnectSession>
-				getAccessTokenExpirationDateOpenIdConnectSessions(
-					java.util.Date ltAccessTokenExpirationDate, int start,
-					int end) {
-
-		return _openIdConnectSessionLocalService.
-			getAccessTokenExpirationDateOpenIdConnectSessions(
-				ltAccessTokenExpirationDate, start, end);
 	}
 
 	@Override

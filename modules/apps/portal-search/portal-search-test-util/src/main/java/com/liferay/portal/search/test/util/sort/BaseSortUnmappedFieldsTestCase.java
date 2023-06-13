@@ -184,7 +184,8 @@ public abstract class BaseSortUnmappedFieldsTestCase
 				indexingTestHelper.verifyResponse(
 					searchResponse -> DocumentsAssert.assertValues(
 						searchResponse.getRequestString(),
-						searchResponse.getDocuments(), fieldName, expected));
+						searchResponse.getDocumentsStream(), fieldName,
+						expected));
 			});
 	}
 

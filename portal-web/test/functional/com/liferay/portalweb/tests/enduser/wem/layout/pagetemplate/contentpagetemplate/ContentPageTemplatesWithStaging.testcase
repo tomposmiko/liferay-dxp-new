@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Activate local live staging") {
@@ -62,14 +62,14 @@ definition {
 		}
 
 		task ("Publish the page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -77,7 +77,7 @@ definition {
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AssertPageTemplatesAreOnlyEditableInStagingView {
 		property portal.acceptance = "true";
 
@@ -99,12 +99,12 @@ definition {
 	}
 
 	@description = "Publish content pages based on page templates to live."
-	@priority = 5
+	@priority = "5"
 	test PublishContentPageBasedOnContentPageTemplateToLive {
 		property portal.acceptance = "true";
 
 		task ("Add a content page that uses the page template") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			ContentPages.addPage(
 				collectionName = "Page Template Collection",
@@ -113,7 +113,7 @@ definition {
 		}
 
 		task ("Publish the content page") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the content page in the staging site") {
@@ -123,17 +123,17 @@ definition {
 		}
 
 		task ("View the Heading fragment in view mode") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
 		}
 
 		task ("View the Paragraph fragment in view mode") {
-			ContentPages.viewFragmentText(
-				fragmentName = "paragraph",
-				id = "element-text",
-				text = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals(
+				key_fragmentName = "paragraph",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 		}
 
 		task ("View the no resource shown in the live site") {
@@ -157,25 +157,25 @@ definition {
 		}
 
 		task ("View the Heading fragment") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
 		}
 
 		task ("View the Paragraph fragment") {
-			ContentPages.viewFragmentText(
-				fragmentName = "paragraph",
-				id = "element-text",
-				text = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals(
+				key_fragmentName = "paragraph",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 		}
 	}
 
 	@description = "This is a use case for for LPS-111548. Undo can make the content page template editor come back to previous state in Staging site."
-	@priority = 4
+	@priority = "4"
 	test UndoChangesOfContentPageTemplateInStagingSite {
 		task ("View Undo button is disabled when no changes") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name-staging");
 
@@ -204,11 +204,11 @@ definition {
 		task ("Configure the styles of Button") {
 			PageEditor.gotoStyle(fragmentName = "Button");
 
-			PageEditor.configureFragment(alignment = "Align Center");
+			PageEditor.configureFragment(alignment = "Center");
 
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
-				fragmentName = "Button");
+				fragmentName = "button");
 		}
 
 		task ("Undo changes") {
@@ -217,8 +217,7 @@ definition {
 				locator1 = "Icon#ANY");
 
 			AssertCssValue(
-				fragmentName = "button",
-				index = 1,
+				key_fragmentName = "Button",
 				locator1 = "Fragment#FRAGMENT_BODY",
 				locator2 = "text-align",
 				value1 = "start");
@@ -227,7 +226,7 @@ definition {
 				key_text = "undo",
 				locator1 = "Icon#ANY");
 
-			PageEditor.viewFragmentNotPresent(fragmentName = "Button");
+			PageEditor.viewNoFragment(fragmentName = "Button");
 		}
 
 		task ("View Undo button is disabled when back to original state") {

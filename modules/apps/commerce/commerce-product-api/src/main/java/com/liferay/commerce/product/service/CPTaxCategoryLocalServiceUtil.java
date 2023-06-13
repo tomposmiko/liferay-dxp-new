@@ -60,6 +60,21 @@ public class CPTaxCategoryLocalServiceUtil {
 		return getService().addCPTaxCategory(cpTaxCategory);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addCPTaxCategory(String, Map, Map, ServiceContext)}
+	 */
+	@Deprecated
+	public static CPTaxCategory addCPTaxCategory(
+			Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addCPTaxCategory(
+			nameMap, descriptionMap, serviceContext);
+	}
+
 	public static CPTaxCategory addCPTaxCategory(
 			String externalReferenceCode, Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
@@ -233,25 +248,29 @@ public class CPTaxCategoryLocalServiceUtil {
 		return getService().fetchCPTaxCategory(CPTaxCategoryId);
 	}
 
+	/**
+	 * Returns the cp tax category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
+	 * @return the matching cp tax category, or <code>null</code> if a matching cp tax category could not be found
+	 */
 	public static CPTaxCategory fetchCPTaxCategoryByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchCPTaxCategoryByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the cp tax category with the matching UUID and company.
-	 *
-	 * @param uuid the cp tax category's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching cp tax category, or <code>null</code> if a matching cp tax category could not be found
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPTaxCategoryByExternalReferenceCode(long, String)}
 	 */
-	public static CPTaxCategory fetchCPTaxCategoryByUuidAndCompanyId(
-		String uuid, long companyId) {
+	@Deprecated
+	public static CPTaxCategory fetchCPTaxCategoryByReferenceCode(
+		long companyId, String externalReferenceCode) {
 
-		return getService().fetchCPTaxCategoryByUuidAndCompanyId(
-			uuid, companyId);
+		return getService().fetchCPTaxCategoryByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static List<CPTaxCategory> findCPTaxCategoriesByCompanyId(
@@ -320,35 +339,20 @@ public class CPTaxCategoryLocalServiceUtil {
 		return getService().getCPTaxCategory(CPTaxCategoryId);
 	}
 
-	public static CPTaxCategory getCPTaxCategoryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getCPTaxCategoryByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the cp tax category with the matching UUID and company.
+	 * Returns the cp tax category with the matching external reference code and company.
 	 *
-	 * @param uuid the cp tax category's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
 	 * @return the matching cp tax category
 	 * @throws PortalException if a matching cp tax category could not be found
 	 */
-	public static CPTaxCategory getCPTaxCategoryByUuidAndCompanyId(
-			String uuid, long companyId)
+	public static CPTaxCategory getCPTaxCategoryByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return getService().getCPTaxCategoryByUuidAndCompanyId(uuid, companyId);
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return getService().getExportActionableDynamicQuery(portletDataContext);
+		return getService().getCPTaxCategoryByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static
@@ -390,6 +394,20 @@ public class CPTaxCategoryLocalServiceUtil {
 		CPTaxCategory cpTaxCategory) {
 
 		return getService().updateCPTaxCategory(cpTaxCategory);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateCPTaxCategory(String, long, Map, Map)}
+	 */
+	@Deprecated
+	public static CPTaxCategory updateCPTaxCategory(
+			long cpTaxCategoryId, Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap)
+		throws PortalException {
+
+		return getService().updateCPTaxCategory(
+			cpTaxCategoryId, nameMap, descriptionMap);
 	}
 
 	public static CPTaxCategory updateCPTaxCategory(

@@ -34,9 +34,11 @@ export default function LayoutReports({eventTriggered}) {
 		StoreStateContext
 	);
 
-	const {isPanelStateOpen, layoutReportsDataURL} = useContext(
-		ConstantsContext
-	);
+	const {
+		isPanelStateOpen,
+		layoutReportsDataURL,
+		portletNamespace,
+	} = useContext(ConstantsContext);
 
 	const dispatch = useContext(StoreDispatchContext);
 
@@ -73,6 +75,7 @@ export default function LayoutReports({eventTriggered}) {
 								dispatch: safeDispatch,
 								languageId:
 									languageId || data.defaultLanguageId,
+								portletNamespace,
 								refreshCache: false,
 								url,
 							});
@@ -88,7 +91,7 @@ export default function LayoutReports({eventTriggered}) {
 					});
 				});
 		},
-		[languageId, safeDispatch]
+		[languageId, portletNamespace, safeDispatch]
 	);
 
 	useEffect(() => {

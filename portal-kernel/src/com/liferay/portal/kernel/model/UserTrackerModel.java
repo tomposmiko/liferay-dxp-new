@@ -206,8 +206,4 @@ public interface UserTrackerModel
 	@Override
 	public UserTracker cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

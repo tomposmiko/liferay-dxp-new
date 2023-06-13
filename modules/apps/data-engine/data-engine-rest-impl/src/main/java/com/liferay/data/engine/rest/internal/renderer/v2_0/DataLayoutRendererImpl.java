@@ -19,6 +19,7 @@ import com.liferay.data.engine.renderer.DataLayoutRendererContext;
 import com.liferay.data.engine.rest.internal.dto.v2_0.util.MapToDDMFormValuesConverterUtil;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
@@ -41,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcela Cunha
  */
-@Component(service = DataLayoutRenderer.class)
+@Component(immediate = true, service = DataLayoutRenderer.class)
 public class DataLayoutRendererImpl implements DataLayoutRenderer {
 
 	@Override
@@ -65,14 +66,11 @@ public class DataLayoutRendererImpl implements DataLayoutRenderer {
 
 		DDMForm ddmForm = ddmStructure.getDDMForm();
 
-		long groupId = ParamUtil.getLong(
-			dataLayoutRendererContext.getHttpServletRequest(), "groupId",
-			ddmStructure.getGroupId());
-
 		return _ddmFormRenderer.render(
 			ddmForm, ddmStructureLayout.getDDMFormLayout(),
 			_toDDMFormRenderingContext(
-				dataLayoutId, dataLayoutRendererContext, ddmForm, groupId));
+				dataLayoutId, dataLayoutRendererContext, ddmForm,
+				ddmStructure.getGroupId()));
 	}
 
 	private DDMFormRenderingContext _toDDMFormRenderingContext(
@@ -83,11 +81,6 @@ public class DataLayoutRendererImpl implements DataLayoutRenderer {
 
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
-
-		if (Validator.isNotNull(dataLayoutRendererContext.getContentType())) {
-			ddmFormRenderingContext.addProperty(
-				"contentType", dataLayoutRendererContext.getContentType());
-		}
 
 		if (Validator.isNotNull(
 				dataLayoutRendererContext.getDefaultLanguageId())) {
@@ -130,6 +123,7 @@ public class DataLayoutRendererImpl implements DataLayoutRenderer {
 		}
 
 		ddmFormRenderingContext.setLocale(locale);
+
 		ddmFormRenderingContext.setPortletNamespace(
 			dataLayoutRendererContext.getPortletNamespace());
 		ddmFormRenderingContext.setReadOnly(
@@ -141,6 +135,9 @@ public class DataLayoutRendererImpl implements DataLayoutRenderer {
 
 		return ddmFormRenderingContext;
 	}
+
+	@Reference(target = "(ddm.form.deserializer.type=json)")
+	private DDMFormDeserializer _ddmFormDeserializer;
 
 	@Reference
 	private DDMFormRenderer _ddmFormRenderer;

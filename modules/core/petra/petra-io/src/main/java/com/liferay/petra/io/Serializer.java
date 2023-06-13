@@ -191,8 +191,11 @@ public class Serializer {
 		else if (serializable instanceof Class) {
 			Class<?> clazz = (Class<?>)serializable;
 
+			String contextName = ClassLoaderPool.getContextName(
+				clazz.getClassLoader());
+
 			writeByte(SerializationConstants.TC_CLASS);
-			writeString(ClassLoaderPool.getContextName(clazz.getClassLoader()));
+			writeString(contextName);
 			writeString(clazz.getName());
 
 			return;
@@ -227,8 +230,9 @@ public class Serializer {
 
 			return;
 		}
-
-		writeByte(SerializationConstants.TC_OBJECT);
+		else {
+			writeByte(SerializationConstants.TC_OBJECT);
+		}
 
 		try {
 			ObjectOutputStream objectOutputStream =

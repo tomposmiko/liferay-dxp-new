@@ -16,19 +16,24 @@ package com.liferay.portal.search.web.internal.facet;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.search.facet.util.FacetFactory;
+import com.liferay.portal.kernel.util.CalendarFactory;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactory;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.facet.modified.ModifiedFacetFactory;
 import com.liferay.portal.search.web.facet.BaseJSPSearchFacet;
 import com.liferay.portal.search.web.facet.SearchFacet;
 import com.liferay.portal.search.web.internal.modified.facet.builder.DateRangeFactory;
+import com.liferay.portal.search.web.internal.modified.facet.builder.ModifiedFacetConfiguration;
+import com.liferay.portal.search.web.internal.modified.facet.builder.ModifiedFacetConfigurationImpl;
 
 import javax.portlet.ActionRequest;
 
@@ -40,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = SearchFacet.class)
+@Component(immediate = true, service = SearchFacet.class)
 public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 
 	@Override
@@ -54,7 +59,7 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 
 		facetConfiguration.setClassName(getFacetClassName());
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (int i = 0; i < _LABELS.length; i++) {
 			jsonArray.put(
@@ -89,53 +94,54 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 	public Facet getFacet() {
 		Facet facet = super.getFacet();
 
-		FacetConfiguration facetConfiguration = facet.getFacetConfiguration();
+		ModifiedFacetConfiguration modifiedFacetConfiguration =
+			new ModifiedFacetConfigurationImpl(facet.getFacetConfiguration());
 
-		JSONObject jsonObject = facetConfiguration.getData();
-
-		jsonObject.put(
-			"ranges", _replaceAliases(jsonObject.getJSONArray("ranges")));
+		modifiedFacetConfiguration.setRangesJSONArray(
+			replaceAliases(modifiedFacetConfiguration.getRangesJSONArray()));
 
 		return facet;
 	}
 
 	@Override
 	public String getFacetClassName() {
-		return _modifiedFacetFactory.getFacetClassName();
+		return modifiedFacetFactory.getFacetClassName();
 	}
 
 	@Override
 	public String getFieldName() {
-		Facet facet = _modifiedFacetFactory.newInstance(null);
+		Facet facet = modifiedFacetFactory.newInstance(null);
 
 		return facet.getFieldName();
 	}
 
 	@Override
 	public JSONObject getJSONData(ActionRequest actionRequest) {
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		int frequencyThreshold = ParamUtil.getInteger(
+			actionRequest, getClassName() + "frequencyThreshold", 1);
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		String[] rangesIndexes = StringUtil.split(
 			ParamUtil.getString(
 				actionRequest, getClassName() + "rangesIndexes"));
 
 		for (String rangesIndex : rangesIndexes) {
+			String label = ParamUtil.getString(
+				actionRequest, getClassName() + "label_" + rangesIndex);
+			String range = ParamUtil.getString(
+				actionRequest, getClassName() + "range_" + rangesIndex);
+
 			jsonArray.put(
 				JSONUtil.put(
-					"label",
-					ParamUtil.getString(
-						actionRequest, getClassName() + "label_" + rangesIndex)
+					"label", label
 				).put(
-					"range",
-					ParamUtil.getString(
-						actionRequest, getClassName() + "range_" + rangesIndex)
+					"range", range
 				));
 		}
 
 		return JSONUtil.put(
-			"frequencyThreshold",
-			ParamUtil.getInteger(
-				actionRequest, getClassName() + "frequencyThreshold", 1)
+			"frequencyThreshold", frequencyThreshold
 		).put(
 			"ranges", jsonArray
 		);
@@ -152,22 +158,68 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 	}
 
 	@Override
-	protected FacetFactory getFacetFactory() {
-		return _modifiedFacetFactory;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.portal.search.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected CalendarFactory getCalendarFactory() {
+
+		// See LPS-72507 and LPS-76500
+
+		if (calendarFactory != null) {
+			return calendarFactory;
+		}
+
+		return CalendarFactoryUtil.getCalendarFactory();
+	}
+
+	protected DateFormatFactory getDateFormatFactory() {
+
+		// See LPS-72507 and LPS-76500
+
+		if (dateFormatFactory != null) {
+			return dateFormatFactory;
+		}
+
+		return DateFormatFactoryUtil.getDateFormatFactory();
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	protected FacetFactory getFacetFactory() {
+		return modifiedFacetFactory;
 	}
 
-	private JSONArray _replaceAliases(JSONArray rangesJSONArray) {
+	protected JSONFactory getJSONFactory() {
+
+		// See LPS-72507 and LPS-76500
+
+		if (jsonFactory != null) {
+			return jsonFactory;
+		}
+
+		return JSONFactoryUtil.getJSONFactory();
+	}
+
+	protected JSONArray replaceAliases(JSONArray rangesJSONArray) {
 		DateRangeFactory dateRangeFactory = new DateRangeFactory(
-			_dateFormatFactory);
+			getDateFormatFactory());
+
+		CalendarFactory calendarFactory = getCalendarFactory();
 
 		return dateRangeFactory.replaceAliases(
-			rangesJSONArray, CalendarFactoryUtil.getCalendar(), _jsonFactory);
+			rangesJSONArray, calendarFactory.getCalendar(), getJSONFactory());
 	}
+
+	protected CalendarFactory calendarFactory;
+	protected DateFormatFactory dateFormatFactory;
+	protected JSONFactory jsonFactory;
+
+	@Reference
+	protected ModifiedFacetFactory modifiedFacetFactory;
 
 	private static final String[] _LABELS = {
 		"past-hour", "past-24-hours", "past-week", "past-month", "past-year"
@@ -177,17 +229,5 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 		"[past-hour TO *]", "[past-24-hours TO *]", "[past-week TO *]",
 		"[past-month TO *]", "[past-year TO *]"
 	};
-
-	@Reference
-	private DateFormatFactory _dateFormatFactory;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private ModifiedFacetFactory _modifiedFacetFactory;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.portal.search.web)")
-	private ServletContext _servletContext;
 
 }

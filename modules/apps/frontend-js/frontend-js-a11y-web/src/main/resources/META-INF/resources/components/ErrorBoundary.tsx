@@ -15,8 +15,8 @@
 import React from 'react';
 
 type Props = {
-	children: React.ReactElement;
 	fallback: React.ReactElement;
+	children: React.ReactElement;
 };
 
 type State = {

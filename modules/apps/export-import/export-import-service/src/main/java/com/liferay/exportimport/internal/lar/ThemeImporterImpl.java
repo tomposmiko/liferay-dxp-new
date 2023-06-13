@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Máté Thurzó
  */
-@Component(service = ThemeImporter.class)
+@Component(immediate = true, service = ThemeImporter.class)
 public class ThemeImporterImpl implements ThemeImporter {
 
 	@Override

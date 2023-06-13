@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
-	property = "path=/portal/comment/discussion/get_comments",
+	immediate = true, property = "path=/portal/comment/discussion/get_comments",
 	service = StrutsAction.class
 )
 public class GetCommentsStrutsAction implements StrutsAction {
@@ -44,8 +44,6 @@ public class GetCommentsStrutsAction implements StrutsAction {
 		throws Exception {
 
 		String namespace = ParamUtil.getString(httpServletRequest, "namespace");
-
-		httpServletRequest.setAttribute("aui:form:portletNamespace", namespace);
 
 		HttpServletRequest namespacedHttpServletRequest =
 			new NamespaceServletRequest(
@@ -76,7 +74,7 @@ public class GetCommentsStrutsAction implements StrutsAction {
 			"liferay-comment:discussion:index", String.valueOf(index));
 
 		String portletId = ParamUtil.getString(
-			namespacedHttpServletRequest, "p_p_id");
+			namespacedHttpServletRequest, "portletId");
 
 		namespacedHttpServletRequest.setAttribute(
 			WebKeys.PORTLET_ID, portletId);

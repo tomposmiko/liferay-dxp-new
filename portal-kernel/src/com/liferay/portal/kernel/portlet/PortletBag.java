@@ -18,9 +18,12 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.expando.kernel.model.CustomAttributesDisplay;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
+import com.liferay.portal.kernel.poller.PollerProcessor;
 import com.liferay.portal.kernel.pop.MessageListener;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.security.permission.propagator.PermissionPropagator;
@@ -56,6 +59,8 @@ public interface PortletBag extends Cloneable {
 
 	public List<AssetRendererFactory<?>> getAssetRendererFactoryInstances();
 
+	public List<AtomCollectionAdapter<?>> getAtomCollectionAdapterInstances();
+
 	public List<ConfigurationAction> getConfigurationActionInstances();
 
 	public List<ControlPanelEntry> getControlPanelEntryInstances();
@@ -70,10 +75,9 @@ public interface PortletBag extends Cloneable {
 
 	public List<PermissionPropagator> getPermissionPropagatorInstances();
 
-	public List<MessageListener> getPopMessageListenerInstances();
+	public List<PollerProcessor> getPollerProcessorInstances();
 
-	public List<PortletConfigurationListener>
-		getPortletConfigurationListenerInstances();
+	public List<MessageListener> getPopMessageListenerInstances();
 
 	public List<PortletDataHandler> getPortletDataHandlerInstances();
 
@@ -88,6 +92,9 @@ public interface PortletBag extends Cloneable {
 	public ResourceBundle getResourceBundle(Locale locale);
 
 	public String getResourceBundleBaseName();
+
+	public List<SchedulerEventMessageListener>
+		getSchedulerEventMessageListeners();
 
 	public ServletContext getServletContext();
 

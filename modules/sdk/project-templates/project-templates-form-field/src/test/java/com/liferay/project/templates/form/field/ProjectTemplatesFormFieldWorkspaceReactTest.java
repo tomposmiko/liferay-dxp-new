@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -82,44 +81,19 @@ public class ProjectTemplatesFormFieldWorkspaceReactTest
 			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
 			mavenExecutor);
 
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			_liferayVersion);
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
 		File gradleProjectDir = buildTemplateWithGradle(
 			new File(workspaceDir, "modules"), "form-field", name,
-			"--js-framework", "react", "--liferay-version", _liferayVersion);
-
-		if (Objects.equals(_liferayVersion, "7.2.1-1")) {
-			testContains(
-				gradleProjectDir, "build.gradle",
-				"compileOnly group: \"com.liferay\", name: " +
-					"\"com.liferay.dynamic.data.mapping.api\"",
-				"compileOnly group: \"com.liferay\", name: " +
-					"\"com.liferay.frontend.js.loader.modules.extender.api\"",
-				"jsCompile group: \"com.liferay\", name: " +
-					"\"com.liferay.dynamic.data.mapping.form.field.type\"",
-				DEPENDENCY_PORTAL_KERNEL);
-		}
-		else {
-			testContains(
-				gradleProjectDir, "build.gradle",
-				"compileOnly group: \"com.liferay.portal\", name: " +
-					"\"release.portal.api\"",
-				"jsCompile group: \"com.liferay\", name: " +
-					"\"com.liferay.dynamic.data.mapping.form.field.type\"",
-				DEPENDENCY_RELEASE_PORTAL_API);
-		}
+			"--liferay-version", _liferayVersion, "--js-framework", "react");
 
 		testContains(
-			gradleProjectDir, "package.json", "\"@babel/cli\": \"^7.2.3\"",
-			"\"@liferay/portal-" + _liferayVersion.substring(0, 3) +
-				"\": \"*\"");
+			gradleProjectDir, "build.gradle",
+			"compileOnly group: \"com.liferay\", name: " +
+				"\"com.liferay.dynamic.data.mapping.api\"",
+			"compileOnly group: \"com.liferay\", name: " +
+				"\"com.liferay.frontend.js.loader.modules.extender.api\"",
+			"jsCompile group: \"com.liferay\", name: " +
+				"\"com.liferay.dynamic.data.mapping.form.field.type\"",
+			DEPENDENCY_PORTAL_KERNEL);
 		testContains(
 			gradleProjectDir,
 			"src/main/java/foobar/form/field/FoobarDDMFormFieldType.java",

@@ -27,14 +27,24 @@
 			<h5><%= HtmlUtil.escape(group.getDescriptiveName(locale)) %></h5>
 
 			<h6 class="text-default">
-				<span><liferay-ui:message key="<%= group.getTypeLabel() %>" /></span>
+				<span><%= LanguageUtil.get(request, group.getTypeLabel()) %></span>
 			</h6>
 		</liferay-ui:search-container-column-text>
 	</c:when>
 	<c:when test='<%= displayStyle.equals("icon") %>'>
+
+		<%
+		row.setCssClass("card-page-item card-page-item-asset selectable");
+		%>
+
 		<liferay-ui:search-container-column-text>
-			<clay:vertical-card
-				verticalCard="<%= new GroupVerticalCard(group, renderRequest, groupSearchContainer.getRowChecker()) %>"
+			<liferay-frontend:icon-vertical-card
+				actionJspServletContext="<%= application %>"
+				icon="sites"
+				resultRow="<%= row %>"
+				rowChecker="<%= groupSearchContainer.getRowChecker() %>"
+				subtitle="<%= LanguageUtil.get(request, group.getTypeLabel()) %>"
+				title="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
 			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>

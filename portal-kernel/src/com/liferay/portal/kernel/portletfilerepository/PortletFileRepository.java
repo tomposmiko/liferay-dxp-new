@@ -52,17 +52,15 @@ public interface PortletFileRepository {
 		throws PortalException;
 
 	public FileEntry addPortletFileEntry(
-			String externalReferenceCode, long groupId, long userId,
-			String className, long classPK, String portletId, long folderId,
-			File file, String fileName, String mimeType,
-			boolean indexingEnabled)
+			long groupId, long userId, String className, long classPK,
+			String portletId, long folderId, File file, String fileName,
+			String mimeType, boolean indexingEnabled)
 		throws PortalException;
 
 	public FileEntry addPortletFileEntry(
-			String externalReferenceCode, long groupId, long userId,
-			String className, long classPK, String portletId, long folderId,
-			InputStream inputStream, String fileName, String mimeType,
-			boolean indexingEnabled)
+			long groupId, long userId, String className, long classPK,
+			String portletId, long folderId, InputStream inputStream,
+			String fileName, String mimeType, boolean indexingEnabled)
 		throws PortalException;
 
 	public Folder addPortletFolder(
@@ -150,10 +148,6 @@ public interface PortletFileRepository {
 		throws PortalException;
 
 	public FileEntry getPortletFileEntry(String uuid, long groupId)
-		throws PortalException;
-
-	public FileEntry getPortletFileEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
 		throws PortalException;
 
 	public String getPortletFileEntryURL(

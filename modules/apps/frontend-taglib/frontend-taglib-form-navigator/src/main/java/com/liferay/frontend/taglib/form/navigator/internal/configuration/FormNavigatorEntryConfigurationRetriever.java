@@ -19,6 +19,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -31,29 +32,31 @@ import org.osgi.service.component.annotations.Deactivate;
 @Component(service = FormNavigatorEntryConfigurationRetriever.class)
 public class FormNavigatorEntryConfigurationRetriever {
 
-	public List<String> getFormNavigatorEntryKeys(
+	public Optional<List<String>> getFormNavigatorEntryKeys(
 		String formNavigatorId, String categoryKey, String context) {
-
-		List<String> formNavigatorEntryKeys = null;
 
 		List<FormNavigatorEntryConfigurationParser>
 			formNavigatorEntryConfigurationParsers = ListUtil.fromCollection(
 				_serviceTrackerMap.getService(formNavigatorId));
 
+		Optional<List<String>> formNavigatorEntryKeysOptional =
+			Optional.empty();
+
 		for (FormNavigatorEntryConfigurationParser
 				formNavigatorEntryConfigurationParser :
 					formNavigatorEntryConfigurationParsers) {
 
-			List<String> currentFormNavigatorEntryKeys =
+			Optional<List<String>> currentFormNavigatorEntryKeysOptional =
 				formNavigatorEntryConfigurationParser.getFormNavigatorEntryKeys(
 					categoryKey, context);
 
-			if (currentFormNavigatorEntryKeys != null) {
-				formNavigatorEntryKeys = currentFormNavigatorEntryKeys;
+			if (currentFormNavigatorEntryKeysOptional.isPresent()) {
+				formNavigatorEntryKeysOptional =
+					currentFormNavigatorEntryKeysOptional;
 			}
 		}
 
-		return formNavigatorEntryKeys;
+		return formNavigatorEntryKeysOptional;
 	}
 
 	@Activate

@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,11 +27,9 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136855. It checks that a pending file cannot be added to another asset."
-	@priority = 4
+	@priority = "4"
 	test CannotAddPendingFileToAsset {
-		property portal.acceptance = "true";
-
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -77,98 +75,19 @@ definition {
 			siteName = "Site Name");
 	}
 
-	@description = "This is a test for LPS-84593. It ensures that a user cannot delete the dismissed notification after deleting the pending file."
-	@priority = 5
-	test CannotDeleteDismissedNotificationAfterDeletingPendingFile {
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMFolder.configureWorkflowCP(
-			dmFolderName = "homeFolder",
-			homeFolder = "true",
-			workflowDefinition = "Single Approver",
-			workflowRestriction = "Default Workflow");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.addWithWorkflowCP(
-			dmDocumentFile = "Document_1.png",
-			dmDocumentTitle = "Document_1.png");
-
-		JSONDocument.moveToRecycleBin(
-			dmDocumentTitle = "Document_1.png",
-			groupName = "Guest");
-
-		Navigator.openURL();
-
-		Notifications.viewBadgeCount(notificationCount = 1);
-
-		Notifications.gotoNotifications();
-
-		Notifications.viewDeletedContent(
-			contentBody = "Notification for My Workflow Tasks was deleted.",
-			noOptions = "true");
-	}
-
 	@description = "This is a test for LPS-136854. It checks that the single approver workflow can be removed from a folder."
-	@priority = 3
+	@ignore = "true"
+	@priority = "3"
 	test CanRemoveWorkflowFromFolder {
-		HeadlessSite.addSite(siteName = "Site Name");
+		property portal.acceptance = "false";
 
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Site Name");
+		// TODO LPS-136854 CanRemoveWorkflowFromFolder pending implementation
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMFolder.configureWorkflowCP(
-			dmFolderName = "DM Folder Name",
-			workflowDefinition = "Single Approver",
-			workflowRestriction = "Default Workflow");
-
-		DMNavigator.openToFolderInAdmin(
-			dmFolderName = "DM Folder Name",
-			groupName = "Site Name",
-			siteURLKey = "site-name");
-
-		DMDocument.addWithWorkflowCP(
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentTitle = "Document_1.jpg");
-
-		DMDocument.viewStatus(
-			dmDocumentStatus = "Pending",
-			dmDocumentTitle = "Document_1.jpg");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		DMFolder.configureWorkflowCP(
-			dmFolderName = "DM Folder Name",
-			workflowDefinition = "No Workflow",
-			workflowRestriction = "Default Workflow");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			folderName = "DM Folder Name",
-			groupName = "Site Name",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_2.jpeg");
-
-		DMNavigator.openToFolderInAdmin(
-			dmFolderName = "DM Folder Name",
-			groupName = "Site Name",
-			siteURLKey = "site-name");
-
-		DMDocument.viewStatus(
-			dmDocumentStatus = "Approved",
-			dmDocumentTitle = "DM Document Title");
 	}
 
 	@description = "This is a test for LPS-136853. It checks that a file can be resubmitted after it has been rejected."
-	@priority = 4
+	@priority = "4"
 	test CanResubmitRejectedDocument {
-		property portal.acceptance = "true";
-
 		JSONFolder.addFolder(
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name",
@@ -212,7 +131,7 @@ definition {
 
 		Workflow.gotoPreviewEdit();
 
-		Button.clickSubmitForWorkflow();
+		Button.clickSubmitForPublication();
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 

@@ -14,14 +14,12 @@
 
 import ClayButton from '@clayui/button';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
-import ClayEmptyState from '@clayui/empty-state';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import ClayLayout from '@clayui/layout';
 import ClayList from '@clayui/list';
 import {RulesSupport, capitalize} from 'data-engine-js-components-web';
 import {LangUtil, OPERATOR_OPTIONS_TYPES} from 'data-engine-taglib';
-import {openConfirmModal} from 'frontend-js-web';
 import React, {useMemo} from 'react';
 
 import './RuleList.scss';
@@ -33,7 +31,7 @@ const LOGICAL_OPERATOR = {
 
 const OPERATORS = {
 	'belongs-to': Liferay.Language.get('belongs-to'),
-	'contains': Liferay.Language.get('contains'),
+	contains: Liferay.Language.get('contains'),
 	'equals-to': Liferay.Language.get('is-equal-to'),
 	'greater-than': Liferay.Language.get('is-greater-than'),
 	'greater-than-equals': Liferay.Language.get('is-greater-than-or-equal-to'),
@@ -53,14 +51,15 @@ const OPERAND_TEXT = {
 };
 
 const EmptyState = () => (
-	<ClayLayout.Sheet>
-		<ClayEmptyState
-			description={Liferay.Language.get(
-				'there-are-no-rules-yet-click-on-plus-icon-below-to-add-the-first'
-			)}
-			imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
-			title={null}
-		/>
+	<ClayLayout.Sheet className="taglib-empty-result-message">
+		<div className="taglib-empty-result-message-header"></div>
+		<div className="sheet-text text-center text-muted">
+			<p className="text-default">
+				{Liferay.Language.get(
+					'there-are-no-rules-yet-click-on-plus-icon-below-to-add-the-first'
+				)}
+			</p>
+		</div>
 	</ClayLayout.Sheet>
 );
 
@@ -86,7 +85,7 @@ const getOperandTypeJson = (json, field) => {
 
 	const lastCommaPosition = label.lastIndexOf(', ');
 
-	if (lastCommaPosition !== -1) {
+	if (lastCommaPosition != -1) {
 		label = label.substr(0, lastCommaPosition);
 	}
 
@@ -120,7 +119,6 @@ const Operand = ({field, left, type, value}) => {
 			<span className="inline-item-before">
 				{OPERAND_TEXT[type] ?? OPERAND_TEXT.value}
 			</span>
-
 			<ClayLabelCustom displayType="secondary" large>
 				{text}
 			</ClayLabelCustom>
@@ -194,7 +192,6 @@ const ActionJumpToPage = ({pages, target}) => (
 		<b className="inline-item-before">
 			{Liferay.Language.get('jump-to-page')}
 		</b>
-
 		<ClayLabelCustom displayType="secondary" large>
 			{pages[target]?.label}
 		</ClayLabelCustom>
@@ -229,7 +226,6 @@ const ACTIONS_LABELS = {
 const ActionDefault = ({action, fields, target}) => (
 	<span className="inline-item">
 		<b className="inline-item-before">{ACTIONS_LABELS[action]}</b>
-
 		<ClayLabelCustom displayType="secondary" large>
 			{fields.find(({value}) => value === target)?.label ?? target}
 		</ClayLabelCustom>
@@ -238,11 +234,11 @@ const ActionDefault = ({action, fields, target}) => (
 
 const ACTIONS = {
 	'auto-fill': ActionAutoFill,
-	'calculate': ActionCalculate,
-	'enable': ActionDefault,
+	calculate: ActionCalculate,
+	enable: ActionDefault,
 	'jump-to-page': ActionJumpToPage,
-	'require': ActionDefault,
-	'show': ActionDefault,
+	require: ActionDefault,
+	show: ActionDefault,
 };
 
 const LogicalOperator = ({children, logicalOperator}) => (
@@ -379,7 +375,6 @@ const ListItem = ({
 					<b className="inline-item inline-item-before">
 						{Liferay.Language.get('if')}
 					</b>
-
 					{conditions.map((condition, index) => (
 						<ConditionWithLogicalOperator
 							condition={condition}
@@ -389,9 +384,7 @@ const ListItem = ({
 							operatorsByType={operatorsByType}
 						/>
 					))}
-
 					<br />
-
 					{actions.map(({action, ...otherProps}, index) => (
 						<ActionWithLogicalOperator
 							action={action}
@@ -405,14 +398,13 @@ const ListItem = ({
 					))}
 				</div>
 			</ClayLayout.ContentCol>
-
 			<ClayLayout.ContentCol>
 				<div className="form-rule-list-col px-2 py-2">
 					{invalidRule && (
 						<div
 							className="form-rule-list-invalid-rule"
 							title={Liferay.Language.get(
-								'this-rule-is-broken-due-to-missing-fields'
+								'due-to-missing-fields'
 							)}
 						>
 							<ClayLabelCustom displayType="danger">
@@ -420,7 +412,6 @@ const ListItem = ({
 							</ClayLabelCustom>
 						</div>
 					)}
-
 					<ClayDropDownWithItems
 						items={[
 							{
@@ -431,20 +422,15 @@ const ListItem = ({
 							{
 								label: Liferay.Language.get('delete'),
 								onClick: () => {
-									if (!isNestedCondition) {
-										onDelete();
-									}
-									else {
-										openConfirmModal({
-											message: Liferay.Language.get(
+									if (
+										!isNestedCondition ||
+										window.confirm(
+											Liferay.Language.get(
 												'you-cannot-create-rules-with-nested-functions.-are-you-sure-you-want-to-delete-this-rule'
-											),
-											onConfirm: (isConfirmed) => {
-												if (isConfirmed) {
-													onDelete();
-												}
-											},
-										});
+											)
+										)
+									) {
+										onDelete();
 									}
 								},
 							},
@@ -461,37 +447,32 @@ const ListItem = ({
 	);
 };
 
-export function RuleList({
+export const RuleList = ({
 	rules = [],
 	onDelete,
 	onEdit,
 	operatorsByType = [],
 	...otherProps
-}) {
-	return (
-		<div className="form-rule-list">
-			<h1 className="text-default">
-				{Liferay.Language.get('rule-builder')}
-			</h1>
+}) => (
+	<div className="form-rule-list">
+		<h1 className="text-default">{Liferay.Language.get('rule-builder')}</h1>
 
-			{!rules.length && <EmptyState />}
-
-			{!!rules.length && (
-				<ClayList className="mt-4" showQuickActionsOnHover={false}>
-					{rules.map((rule, index) => (
-						<ListItem
-							key={index}
-							onDelete={() => onDelete(index)}
-							onEdit={() => onEdit(index)}
-							operatorsByType={operatorsByType}
-							rule={rule}
-							{...otherProps}
-						/>
-					))}
-				</ClayList>
-			)}
-		</div>
-	);
-}
+		{rules.length === 0 && <EmptyState />}
+		{rules.length > 0 && (
+			<ClayList className="mt-4" showQuickActionsOnHover={false}>
+				{rules.map((rule, index) => (
+					<ListItem
+						key={index}
+						onDelete={() => onDelete(index)}
+						onEdit={() => onEdit(index)}
+						operatorsByType={operatorsByType}
+						rule={rule}
+						{...otherProps}
+					/>
+				))}
+			</ClayList>
+		)}
+	</div>
+);
 
 RuleList.displayName = 'RuleList';

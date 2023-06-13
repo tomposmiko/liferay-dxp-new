@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Noah Sherrill
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
 		"mvc.command.name=/user_associated_data/delete_uad_entities"
@@ -59,8 +60,8 @@ public class DeleteUADEntitiesMVCActionCommand extends BaseUADMVCActionCommand {
 
 		String applicationKey = ParamUtil.getString(
 			actionRequest, "applicationKey");
-		String parentContainerTypeKey = ParamUtil.getString(
-			actionRequest, "parentContainerTypeKey");
+		String parentContainerClass = ParamUtil.getString(
+			actionRequest, "parentContainerClass");
 
 		UADHierarchyDisplay uadHierarchyDisplay =
 			uadRegistry.getUADHierarchyDisplay(applicationKey);
@@ -68,7 +69,7 @@ public class DeleteUADEntitiesMVCActionCommand extends BaseUADMVCActionCommand {
 		String redirect = null;
 
 		if ((uadHierarchyDisplay != null) &&
-			Validator.isNotNull(parentContainerTypeKey)) {
+			Validator.isNotNull(parentContainerClass)) {
 
 			redirect = uadHierarchyDisplay.getParentContainerURL(
 				actionRequest,
@@ -97,7 +98,7 @@ public class DeleteUADEntitiesMVCActionCommand extends BaseUADMVCActionCommand {
 				actionRequest, "parentContainerId");
 
 			UADDisplay<?> uadDisplay = uadRegistry.getUADDisplay(
-				parentContainerTypeKey);
+				parentContainerClass);
 
 			try {
 				uadDisplay.get(parentContainerId);
@@ -160,22 +161,23 @@ public class DeleteUADEntitiesMVCActionCommand extends BaseUADMVCActionCommand {
 				}
 			}
 			else {
-				Map<String, List<Serializable>> containerItemPKsMap =
+				Map<Class<?>, List<Serializable>> containerItemPKsMap =
 					uadHierarchyDisplay.getContainerItemPKsMap(
-						entityUADDisplay.getTypeKey(),
+						entityUADDisplay.getTypeClass(),
 						uadHierarchyDisplay.getPrimaryKey(entity),
 						selectedUserId);
 
-				for (Map.Entry<String, List<Serializable>> entry :
+				for (Map.Entry<Class<?>, List<Serializable>> entry :
 						containerItemPKsMap.entrySet()) {
 
-					String typeKey = entry.getKey();
+					Class<?> containerItemClass = entry.getKey();
 
 					UADAnonymizer<Object> containerItemUADAnonymizer =
 						(UADAnonymizer<Object>)uadRegistry.getUADAnonymizer(
-							typeKey);
+							containerItemClass.getName());
 					UADDisplay<Object> containerItemUADDisplay =
-						(UADDisplay<Object>)uadRegistry.getUADDisplay(typeKey);
+						(UADDisplay<Object>)uadRegistry.getUADDisplay(
+							containerItemClass.getName());
 
 					doMultipleAction(
 						entry.getValue(),
@@ -190,7 +192,9 @@ public class DeleteUADEntitiesMVCActionCommand extends BaseUADMVCActionCommand {
 							}
 							catch (NoSuchModelException noSuchModelException) {
 								if (_log.isDebugEnabled()) {
-									_log.debug(noSuchModelException);
+									_log.debug(
+										noSuchModelException,
+										noSuchModelException);
 								}
 							}
 						});

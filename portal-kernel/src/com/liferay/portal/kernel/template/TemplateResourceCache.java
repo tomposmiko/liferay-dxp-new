@@ -14,6 +14,8 @@
 
 package com.liferay.portal.kernel.template;
 
+import com.liferay.portal.kernel.cache.PortalCache;
+
 /**
  * @author Tina Tian
  */
@@ -28,5 +30,12 @@ public interface TemplateResourceCache {
 	public void put(String templateId, TemplateResource templateResource);
 
 	public void remove(String templateId);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public void setSecondLevelPortalCache(
+		PortalCache<TemplateResource, ?> portalCache);
 
 }

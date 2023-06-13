@@ -34,22 +34,23 @@ import com.liferay.portal.kernel.model.MembershipRequestConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.notifications.NotificationEvent;
+import com.liferay.portal.kernel.notifications.NotificationEventFactoryUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationManagerUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Date;
@@ -80,10 +81,10 @@ public class MemberRequestLocalServiceImpl
 
 		// Member request
 
-		User user = _userLocalService.getUserById(userId);
+		User user = userLocalService.getUserById(userId);
 
 		try {
-			User receiverUser = _userLocalService.getUserByEmailAddress(
+			User receiverUser = userLocalService.getUserByEmailAddress(
 				serviceContext.getCompanyId(), receiverEmailAddress);
 
 			receiverUserId = receiverUser.getUserId();
@@ -93,7 +94,7 @@ public class MemberRequestLocalServiceImpl
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchUserException);
+				_log.debug(noSuchUserException, noSuchUserException);
 			}
 		}
 
@@ -110,7 +111,7 @@ public class MemberRequestLocalServiceImpl
 		memberRequest.setUserName(user.getFullName());
 		memberRequest.setCreateDate(date);
 		memberRequest.setModifiedDate(date);
-		memberRequest.setKey(_portalUUID.generate());
+		memberRequest.setKey(PortalUUIDUtil.generate());
 		memberRequest.setReceiverUserId(receiverUserId);
 		memberRequest.setInvitedRoleId(invitedRoleId);
 		memberRequest.setInvitedTeamId(invitedTeamId);
@@ -121,7 +122,7 @@ public class MemberRequestLocalServiceImpl
 		// Email
 
 		try {
-			_sendEmail(receiverEmailAddress, memberRequest, serviceContext);
+			sendEmail(receiverEmailAddress, memberRequest, serviceContext);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -130,7 +131,7 @@ public class MemberRequestLocalServiceImpl
 		// Notifications
 
 		if (receiverUserId > 0) {
-			_sendNotificationEvent(memberRequest);
+			sendNotificationEvent(memberRequest);
 		}
 
 		return memberRequest;
@@ -148,7 +149,7 @@ public class MemberRequestLocalServiceImpl
 				continue;
 			}
 
-			User user = _userLocalService.getUser(receiverUserId);
+			User user = userLocalService.getUser(receiverUserId);
 
 			addMemberRequest(
 				userId, groupId, receiverUserId, user.getEmailAddress(),
@@ -230,7 +231,7 @@ public class MemberRequestLocalServiceImpl
 		MemberRequest memberRequest = memberRequestPersistence.findByPrimaryKey(
 			memberRequestId);
 
-		_validate(memberRequest, userId);
+		validate(memberRequest, userId);
 
 		memberRequest.setModifiedDate(new Date());
 		memberRequest.setStatus(status);
@@ -238,7 +239,7 @@ public class MemberRequestLocalServiceImpl
 		memberRequest = memberRequestPersistence.update(memberRequest);
 
 		if (status == InviteMembersConstants.STATUS_ACCEPTED) {
-			_userLocalService.addGroupUsers(
+			userLocalService.addGroupUsers(
 				memberRequest.getGroupId(),
 				new long[] {memberRequest.getReceiverUserId()});
 
@@ -250,7 +251,7 @@ public class MemberRequestLocalServiceImpl
 			}
 
 			if (memberRequest.getInvitedTeamId() > 0) {
-				_userLocalService.addTeamUsers(
+				userLocalService.addTeamUsers(
 					memberRequest.getInvitedTeamId(),
 					new long[] {memberRequest.getReceiverUserId()});
 			}
@@ -265,7 +266,7 @@ public class MemberRequestLocalServiceImpl
 
 		MemberRequest memberRequest = memberRequestPersistence.findByKey(key);
 
-		_validate(memberRequest, 0);
+		validate(memberRequest, 0);
 
 		memberRequest.setModifiedDate(new Date());
 		memberRequest.setReceiverUserId(receiverUserId);
@@ -273,28 +274,27 @@ public class MemberRequestLocalServiceImpl
 		memberRequest = memberRequestPersistence.update(memberRequest);
 
 		if (receiverUserId > 0) {
-			_sendNotificationEvent(memberRequest);
+			sendNotificationEvent(memberRequest);
 		}
 
 		return memberRequest;
 	}
 
-	private String _addParameterWithPortletNamespace(
+	protected static String addParameterWithPortletNamespace(
 		String url, String name, String value) {
 
-		String portletId = HttpComponentsUtil.getParameter(
-			url, "p_p_id", false);
+		String portletId = HttpUtil.getParameter(url, "p_p_id", false);
 
 		if (Validator.isNotNull(portletId)) {
-			name = _portal.getPortletNamespace(portletId) + name;
+			name = PortalUtil.getPortletNamespace(portletId) + name;
 		}
 
-		return HttpComponentsUtil.addParameter(url, name, value);
+		return HttpUtil.addParameter(url, name, value);
 	}
 
-	private String _getCreateAccountURL(
+	protected String getCreateAccountURL(
 			MemberRequest memberRequest, ServiceContext serviceContext)
-		throws Exception {
+		throws PortalException {
 
 		String createAccountURL = (String)serviceContext.getAttribute(
 			"createAccountURL");
@@ -307,21 +307,21 @@ public class MemberRequestLocalServiceImpl
 				memberRequest.getCompanyId(),
 				WorkflowConstants.DEFAULT_GROUP_ID, User.class.getName(), 0)) {
 
-			String redirectURL = _getRedirectURL(serviceContext);
+			String redirectURL = getRedirectURL(serviceContext);
 
-			redirectURL = _addParameterWithPortletNamespace(
+			redirectURL = addParameterWithPortletNamespace(
 				redirectURL, "actionRequired", StringPool.TRUE);
-			redirectURL = _addParameterWithPortletNamespace(
+			redirectURL = addParameterWithPortletNamespace(
 				redirectURL, "key", memberRequest.getKey());
 
-			createAccountURL = _addParameterWithPortletNamespace(
+			createAccountURL = addParameterWithPortletNamespace(
 				createAccountURL, "redirect", redirectURL);
 		}
 
 		return createAccountURL;
 	}
 
-	private String _getLoginURL(
+	protected String getLoginURL(
 		MemberRequest memberRequest, ServiceContext serviceContext) {
 
 		String loginURL = (String)serviceContext.getAttribute("loginURL");
@@ -330,18 +330,17 @@ public class MemberRequestLocalServiceImpl
 			loginURL = serviceContext.getPortalURL();
 		}
 
-		String redirectURL = _getRedirectURL(serviceContext);
+		String redirectURL = getRedirectURL(serviceContext);
 
-		redirectURL = _addParameterWithPortletNamespace(
+		redirectURL = addParameterWithPortletNamespace(
 			redirectURL, "actionRequired", StringPool.TRUE);
-		redirectURL = _addParameterWithPortletNamespace(
+		redirectURL = addParameterWithPortletNamespace(
 			redirectURL, "key", memberRequest.getKey());
 
-		return HttpComponentsUtil.addParameter(
-			loginURL, "redirect", redirectURL);
+		return _http.addParameter(loginURL, "redirect", redirectURL);
 	}
 
-	private String _getRedirectURL(ServiceContext serviceContext) {
+	protected String getRedirectURL(ServiceContext serviceContext) {
 		String redirectURL = (String)serviceContext.getAttribute("redirectURL");
 
 		if (Validator.isNull(redirectURL)) {
@@ -351,7 +350,7 @@ public class MemberRequestLocalServiceImpl
 		return redirectURL;
 	}
 
-	private void _sendEmail(
+	protected void sendEmail(
 			String emailAddress, MemberRequest memberRequest,
 			ServiceContext serviceContext)
 		throws Exception {
@@ -360,12 +359,12 @@ public class MemberRequestLocalServiceImpl
 
 		Group group = _groupLocalService.getGroup(memberRequest.getGroupId());
 
-		User user = _userLocalService.getUser(memberRequest.getUserId());
+		User user = userLocalService.getUser(memberRequest.getUserId());
 
 		User receiverUser = null;
 
 		if (memberRequest.getReceiverUserId() > 0) {
-			receiverUser = _userLocalService.getUser(
+			receiverUser = userLocalService.getUser(
 				memberRequest.getReceiverUserId());
 		}
 
@@ -420,9 +419,9 @@ public class MemberRequestLocalServiceImpl
 			},
 			new String[] {
 				fromAddress, fromName,
-				_getCreateAccountURL(memberRequest, serviceContext),
+				getCreateAccountURL(memberRequest, serviceContext),
 				group.getDescriptiveName(serviceContext.getLocale()),
-				_getLoginURL(memberRequest, serviceContext), user.getFullName()
+				getLoginURL(memberRequest, serviceContext), user.getFullName()
 			});
 
 		InternetAddress from = new InternetAddress(fromAddress, fromName);
@@ -435,7 +434,7 @@ public class MemberRequestLocalServiceImpl
 		_mailService.sendEmail(mailMessage);
 	}
 
-	private void _sendNotificationEvent(MemberRequest memberRequest)
+	protected void sendNotificationEvent(MemberRequest memberRequest)
 		throws PortalException {
 
 		String portletId = PortletProviderUtil.getPortletId(
@@ -446,25 +445,25 @@ public class MemberRequestLocalServiceImpl
 				MembershipRequestConstants.STATUS_PENDING,
 				UserNotificationDeliveryConstants.TYPE_WEBSITE)) {
 
-			NotificationEvent notificationEvent = new NotificationEvent(
-				System.currentTimeMillis(), portletId,
-				JSONUtil.put(
-					"classPK", memberRequest.getMemberRequestId()
-				).put(
-					"userId", memberRequest.getUserId()
-				));
+			NotificationEvent notificationEvent =
+				NotificationEventFactoryUtil.createNotificationEvent(
+					System.currentTimeMillis(), portletId,
+					JSONUtil.put(
+						"classPK", memberRequest.getMemberRequestId()
+					).put(
+						"userId", memberRequest.getUserId()
+					));
 
 			notificationEvent.setDeliveryRequired(0);
 			notificationEvent.setDeliveryType(
 				UserNotificationDeliveryConstants.TYPE_WEBSITE);
 
 			_userNotificationEventLocalService.addUserNotificationEvent(
-				memberRequest.getReceiverUserId(), true, true,
-				notificationEvent);
+				memberRequest.getReceiverUserId(), true, notificationEvent);
 		}
 	}
 
-	private void _validate(MemberRequest memberRequest, long userId)
+	protected void validate(MemberRequest memberRequest, long userId)
 		throws PortalException {
 
 		if (memberRequest.getStatus() !=
@@ -484,19 +483,13 @@ public class MemberRequestLocalServiceImpl
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+	private Http _http;
+
+	@Reference
 	private MailService _mailService;
 
 	@Reference
-	private Portal _portal;
-
-	@Reference
-	private PortalUUID _portalUUID;
-
-	@Reference
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 	@Reference
 	private UserNotificationEventLocalService

@@ -40,17 +40,17 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.tika.mime.MimeTypes;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,9 +68,7 @@ public class DepotPermissionCheckerWrapperTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(),
-			PermissionCheckerMethodTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -231,24 +229,6 @@ public class DepotPermissionCheckerWrapperTest {
 	}
 
 	@Test
-	public void testHasStagingPermissionReturnsTrueForAssetLibraryOwners()
-		throws Exception {
-
-		DepotTestUtil.withRegularUser(
-			(user, role) -> DepotTestUtil.withLocalStagingEnabled(
-				_addDepotEntry(user.getUserId()),
-				stagingDepotEntry -> {
-					PermissionChecker permissionChecker =
-						_permissionCheckerFactory.create(user);
-
-					Assert.assertTrue(
-						permissionChecker.hasPermission(
-							stagingDepotEntry.getGroup(), Group.class.getName(),
-							Group.class.getName(), ActionKeys.PUBLISH_STAGING));
-				}));
-	}
-
-	@Test
 	public void testIsContentReviewerWithAssetLibraryAdministrator()
 		throws Exception {
 
@@ -282,25 +262,6 @@ public class DepotPermissionCheckerWrapperTest {
 					permissionChecker.isContentReviewer(
 						user.getCompanyId(), depotEntry.getGroupId()));
 			});
-	}
-
-	@Test
-	public void testIsContentReviewerWithStagingEnabled() throws Exception {
-		DepotEntry depotEntry = _addDepotEntry(TestPropsValues.getUserId());
-
-		DepotTestUtil.withLocalStagingEnabled(
-			depotEntry,
-			stagingDepotEntry -> DepotTestUtil.withAssetLibraryContentReviewer(
-				depotEntry,
-				user -> {
-					PermissionChecker permissionChecker =
-						_permissionCheckerFactory.create(user);
-
-					Assert.assertTrue(
-						permissionChecker.isContentReviewer(
-							user.getCompanyId(),
-							stagingDepotEntry.getGroupId()));
-				}));
 	}
 
 	@Test
@@ -351,7 +312,7 @@ public class DepotPermissionCheckerWrapperTest {
 
 	@Test
 	public void testIsGroupAdminWithGuestUser() throws PortalException {
-		User user = _userLocalService.getGuestUser(
+		User user = _userLocalService.getDefaultUser(
 			TestPropsValues.getCompanyId());
 
 		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
@@ -376,24 +337,6 @@ public class DepotPermissionCheckerWrapperTest {
 
 		Assert.assertTrue(
 			permissionChecker.isGroupAdmin(TestPropsValues.getGroupId()));
-	}
-
-	@Test
-	public void testIsGroupAdminWithStagingEnabled() throws Exception {
-		DepotEntry depotEntry = _addDepotEntry(TestPropsValues.getUserId());
-
-		DepotTestUtil.withLocalStagingEnabled(
-			depotEntry,
-			stagingDepotEntry -> DepotTestUtil.withAssetLibraryAdministrator(
-				depotEntry,
-				user -> {
-					PermissionChecker permissionChecker =
-						_permissionCheckerFactory.create(user);
-
-					Assert.assertTrue(
-						permissionChecker.isGroupAdmin(
-							stagingDepotEntry.getGroupId()));
-				}));
 	}
 
 	@Test
@@ -461,7 +404,7 @@ public class DepotPermissionCheckerWrapperTest {
 
 	@Test
 	public void testIsGroupMemberWithGuestUser() throws PortalException {
-		User user = _userLocalService.getGuestUser(
+		User user = _userLocalService.getDefaultUser(
 			TestPropsValues.getCompanyId());
 
 		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
@@ -486,26 +429,6 @@ public class DepotPermissionCheckerWrapperTest {
 
 		Assert.assertTrue(
 			permissionChecker.isGroupMember(TestPropsValues.getGroupId()));
-	}
-
-	@Test
-	public void testIsGroupMemberWithStagingEnabled() throws Exception {
-		DepotEntry depotEntry = _addDepotEntry(TestPropsValues.getUserId());
-
-		DepotTestUtil.withLocalStagingEnabled(
-			depotEntry,
-			stagingDepotEntry -> DepotTestUtil.withRegularUser(
-				(user, role) -> {
-					_userLocalService.addGroupUsers(
-						depotEntry.getGroupId(), new long[] {user.getUserId()});
-
-					PermissionChecker permissionChecker =
-						_permissionCheckerFactory.create(user);
-
-					Assert.assertTrue(
-						permissionChecker.isGroupMember(
-							stagingDepotEntry.getGroupId()));
-				}));
 	}
 
 	@Test
@@ -573,7 +496,7 @@ public class DepotPermissionCheckerWrapperTest {
 
 	@Test
 	public void testIsGroupOwnerWithGuestUser() throws PortalException {
-		User user = _userLocalService.getGuestUser(
+		User user = _userLocalService.getDefaultUser(
 			TestPropsValues.getCompanyId());
 
 		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
@@ -598,21 +521,6 @@ public class DepotPermissionCheckerWrapperTest {
 
 		Assert.assertTrue(
 			permissionChecker.isGroupOwner(TestPropsValues.getGroupId()));
-	}
-
-	@Test
-	public void testIsGroupOwnerWithStagingEnabled() throws Exception {
-		DepotTestUtil.withRegularUser(
-			(user, role) -> DepotTestUtil.withLocalStagingEnabled(
-				_addDepotEntry(user.getUserId()),
-				stagingDepotEntry -> {
-					PermissionChecker permissionChecker =
-						_permissionCheckerFactory.create(user);
-
-					Assert.assertTrue(
-						permissionChecker.isGroupOwner(
-							stagingDepotEntry.getGroupId()));
-				}));
 	}
 
 	@Test
@@ -723,10 +631,9 @@ public class DepotPermissionCheckerWrapperTest {
 		return _dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), depotEntry.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			StringUtil.randomString(), ContentTypes.APPLICATION_OCTET_STREAM,
+			StringUtil.randomString(), MimeTypes.OCTET_STREAM,
 			StringUtil.randomString(), StringUtil.randomString(),
-			StringUtil.randomString(), StringUtil.randomString(), new byte[0],
-			null, null,
+			StringUtil.randomString(), new byte[0], null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 	}
 

@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration",
-	service = ElasticsearchConfigurationWrapper.class
+	immediate = true, service = ElasticsearchConfigurationWrapper.class
 )
 public class ElasticsearchConfigurationWrapper
 	implements Comparator<ElasticsearchConfigurationObserver> {
@@ -128,18 +128,6 @@ public class ElasticsearchConfigurationWrapper
 
 	public boolean logExceptionsOnly() {
 		return _elasticsearchConfiguration.logExceptionsOnly();
-	}
-
-	public int maxConnections() {
-		return _elasticsearchConfiguration.maxConnections();
-	}
-
-	public int maxConnectionsPerRoute() {
-		return _elasticsearchConfiguration.maxConnectionsPerRoute();
-	}
-
-	public String minimumRequiredNodeVersion() {
-		return _elasticsearchConfiguration.minimumRequiredNodeVersion();
 	}
 
 	public String networkBindHost() {
@@ -299,6 +287,11 @@ public class ElasticsearchConfigurationWrapper
 		_elasticsearchConfiguration = elasticsearchConfiguration;
 	}
 
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+	}
+
 	private Map<String, Object> _getPropsMap(
 		String[] keys, Class<?> clazz, Props props) {
 
@@ -332,10 +325,7 @@ public class ElasticsearchConfigurationWrapper
 	private volatile ElasticsearchConfiguration _elasticsearchConfiguration;
 	private final Set<ElasticsearchConfigurationObserver>
 		_elasticsearchConfigurationObservers = new ConcurrentSkipListSet<>();
-
-	@Reference
 	private Props _props;
-
 	private volatile ElasticsearchConfiguration
 		_propsElasticsearchConfiguration;
 	private volatile Map<String, Object> _propsMap = Collections.emptyMap();

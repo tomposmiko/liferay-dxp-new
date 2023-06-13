@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -407,18 +408,14 @@ public class PriceEntrySerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "tierPrices")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					TierPrice[] tierPricesArray =
-						new TierPrice[jsonParserFieldValues.length];
-
-					for (int i = 0; i < tierPricesArray.length; i++) {
-						tierPricesArray[i] = TierPriceSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					priceEntry.setTierPrices(tierPricesArray);
+					priceEntry.setTierPrices(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> TierPriceSerDes.toDTO((String)object)
+						).toArray(
+							size -> new TierPrice[size]
+						));
 				}
 			}
 		}

@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.analytics.message.storage.model.impl.AnalyticsMessageImpl",
-		"table.name=AnalyticsMessage"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		AnalyticsMessageModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class AnalyticsMessageModelArgumentsResolver
 	implements ArgumentsResolver {

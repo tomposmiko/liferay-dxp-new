@@ -1,21 +1,25 @@
 definition {
 
 	macro getFragmentFileContent {
-		var dependencyFilePath = TestCase.getDependenciesDirPath(fileName = ${fileName});
+		var baseDir = PropsUtil.get("test.base.dir.name");
+		var dependenciesDir = PropsUtil.get("test.dependencies.dir.name");
+		var filePath = "${baseDir}tests/enduser/wem/fragment/${dependenciesDir}/${fileName}";
+		var filePath = FileUtil.fixFilePath("${filePath}");
+		var fileContent = FileUtil.read("${filePath}");
 
-		var fileContent = FileUtil.read(${dependencyFilePath});
 		var os = OSDetector.isWindows();
 
-		if (${os} == "true") {
+		if ("${os}" == "true") {
 			var newline = '''
 ''';
 
-			var fileContent = StringUtil.replace(${fileContent}, ${newline}, "%0A");
+			var fileContent = StringUtil.replace("${fileContent}", "${newline}", "%0A");
 
-			return ${fileContent};
+			return "${fileContent}";
 		}
+
 		else {
-			return ${fileContent};
+			return "${fileContent}";
 		}
 	}
 

@@ -17,7 +17,6 @@ package com.liferay.dispatch.web.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dispatch.exception.NoSuchLogException;
 import com.liferay.dispatch.executor.DispatchTaskStatus;
-import com.liferay.dispatch.internal.messaging.TestDispatchTaskExecutor;
 import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchLogLocalService;
@@ -85,7 +84,7 @@ public class DispatchLogDisplayContextTest {
 
 		Object dispatchLogDisplayContext = _getDispatchLogDisplayContext(
 			_getMockHttpServletRequest(
-				company, LayoutTestUtil.addTypePortletLayout(group), user));
+				company, LayoutTestUtil.addLayout(group), user));
 
 		Assert.assertNotNull(dispatchLogDisplayContext);
 
@@ -137,7 +136,7 @@ public class DispatchLogDisplayContextTest {
 
 		MockHttpServletRequest mockHttpServletRequest =
 			_getMockHttpServletRequest(
-				company, LayoutTestUtil.addTypePortletLayout(group), user);
+				company, LayoutTestUtil.addLayout(group), user);
 
 		DispatchLog dispatchLog = _getDispatchLog(
 			DispatchTaskStatus.IN_PROGRESS, user);
@@ -214,11 +213,10 @@ public class DispatchLogDisplayContextTest {
 
 		DispatchTrigger dispatchTrigger =
 			DispatchTriggerTestUtil.randomDispatchTrigger(
-				user, TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST,
-				RandomTestUtil.nextInt());
+				user, RandomTestUtil.nextInt());
 
 		dispatchTrigger = _dispatchTriggerLocalService.addDispatchTrigger(
-			null, dispatchTrigger.getUserId(),
+			dispatchTrigger.getUserId(),
 			dispatchTrigger.getDispatchTaskExecutorType(),
 			dispatchTrigger.getDispatchTaskSettingsUnicodeProperties(),
 			dispatchTrigger.getName(), dispatchTrigger.isSystem());

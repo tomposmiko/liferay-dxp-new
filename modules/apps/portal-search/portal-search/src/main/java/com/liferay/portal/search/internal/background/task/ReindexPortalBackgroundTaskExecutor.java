@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
 import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSenderUtil;
-import com.liferay.portal.search.index.ConcurrentReindexManager;
 import com.liferay.portal.search.internal.SearchEngineInitializer;
 
 import org.osgi.framework.BundleContext;
@@ -33,23 +32,20 @@ public class ReindexPortalBackgroundTaskExecutor
 
 	public ReindexPortalBackgroundTaskExecutor(
 		BundleContext bundleContext,
-		ConcurrentReindexManager concurrentReindexManager,
 		PortalExecutorManager portalExecutorManager) {
 
 		_bundleContext = bundleContext;
-		_concurrentReindexManager = concurrentReindexManager;
 		_portalExecutorManager = portalExecutorManager;
 	}
 
 	@Override
 	public BackgroundTaskExecutor clone() {
 		return new ReindexPortalBackgroundTaskExecutor(
-			_bundleContext, _concurrentReindexManager, _portalExecutorManager);
+			_bundleContext, _portalExecutorManager);
 	}
 
 	@Override
-	protected void reindex(
-			String className, long[] companyIds, String executionMode)
+	protected void reindex(String className, long[] companyIds)
 		throws Exception {
 
 		for (long companyId : companyIds) {
@@ -57,29 +53,20 @@ public class ReindexPortalBackgroundTaskExecutor
 				ReindexBackgroundTaskConstants.PORTAL_START, companyId,
 				companyIds);
 
-			if (_log.isInfoEnabled()) {
-				_log.info("Start reindexing company " + companyId);
-			}
-
 			try {
 				SearchEngineInitializer searchEngineInitializer =
 					new SearchEngineInitializer(
-						_bundleContext, companyId, _concurrentReindexManager,
-						executionMode, _portalExecutorManager);
+						_bundleContext, companyId, _portalExecutorManager);
 
 				searchEngineInitializer.reindex();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 			finally {
 				ReindexStatusMessageSenderUtil.sendStatusMessage(
 					ReindexBackgroundTaskConstants.PORTAL_END, companyId,
 					companyIds);
-
-				if (_log.isInfoEnabled()) {
-					_log.info("Finished reindexing company " + companyId);
-				}
 			}
 		}
 	}
@@ -88,7 +75,6 @@ public class ReindexPortalBackgroundTaskExecutor
 		ReindexPortalBackgroundTaskExecutor.class);
 
 	private final BundleContext _bundleContext;
-	private final ConcurrentReindexManager _concurrentReindexManager;
 	private final PortalExecutorManager _portalExecutorManager;
 
 }

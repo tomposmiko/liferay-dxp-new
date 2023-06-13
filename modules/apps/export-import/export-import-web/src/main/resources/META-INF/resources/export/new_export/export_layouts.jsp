@@ -53,8 +53,17 @@ else {
 
 boolean configuredExport = (exportImportConfiguration == null) ? false : true;
 
+String rootNodeName = StringPool.BLANK;
+
 if (configuredExport) {
 	privateLayout = MapUtil.getBoolean(exportImportConfigurationSettingsMap, "privateLayout", privateLayout);
+}
+
+if (privateLayout) {
+	rootNodeName = LanguageUtil.get(request, "private-pages");
+}
+else {
+	rootNodeName = LanguageUtil.get(request, "public-pages");
 }
 
 String treeId = "layoutsExportTree" + liveGroupId + privateLayout;
@@ -98,12 +107,12 @@ renderResponse.setTitle(!configuredExport ? LanguageUtil.get(request, "new-custo
 	/>
 
 	<%
-	int incompleteBackgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(liveGroupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, false);
+	int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(liveGroupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, false);
 	%>
 
-	<div class="<%= (incompleteBackgroundTasksCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
+	<div class="<%= (incompleteBackgroundTaskCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
 		<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-			<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+			<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 		</liferay-util:include>
 	</div>
 
@@ -119,6 +128,7 @@ renderResponse.setTitle(!configuredExport ? LanguageUtil.get(request, "new-custo
 		<aui:input name="groupId" type="hidden" value="<%= String.valueOf(groupId) %>" />
 		<aui:input name="liveGroupId" type="hidden" value="<%= String.valueOf(liveGroupId) %>" />
 		<aui:input name="privateLayout" type="hidden" value="<%= String.valueOf(privateLayout) %>" />
+		<aui:input name="rootNodeName" type="hidden" value="<%= rootNodeName %>" />
 		<aui:input name="treeId" type="hidden" value="<%= treeId %>" />
 		<aui:input name="<%= PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL %>" type="hidden" value="<%= true %>" />
 		<aui:input name="<%= PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL %>" type="hidden" value="<%= true %>" />
@@ -128,58 +138,56 @@ renderResponse.setTitle(!configuredExport ? LanguageUtil.get(request, "new-custo
 		<liferay-ui:error exception="<%= LARFileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
 
 		<div class="export-dialog-tree">
-			<div class="sheet">
-				<div class="panel-group panel-group-flush">
-					<aui:fieldset>
-						<c:choose>
-							<c:when test="<%= exportImportConfiguration == null %>">
-								<aui:input label="title" maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" placeholder="process-name-placeholder" />
-							</c:when>
-							<c:otherwise>
-								<aui:input label="title" maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" value="<%= exportImportConfiguration.getName() %>" />
-							</c:otherwise>
-						</c:choose>
-					</aui:fieldset>
+			<aui:fieldset-group markupView="lexicon">
+				<aui:fieldset>
+					<c:choose>
+						<c:when test="<%= exportImportConfiguration == null %>">
+							<aui:input label="title" maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" placeholder="process-name-placeholder" />
+						</c:when>
+						<c:otherwise>
+							<aui:input label="title" maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" value="<%= exportImportConfiguration.getName() %>" />
+						</c:otherwise>
+					</c:choose>
+				</aui:fieldset>
 
-					<liferay-staging:deletions
-						cmd="<%= Constants.EXPORT %>"
-						exportImportConfigurationId="<%= exportImportConfigurationId %>"
-					/>
+				<liferay-staging:deletions
+					cmd="<%= Constants.EXPORT %>"
+					exportImportConfigurationId="<%= exportImportConfigurationId %>"
+				/>
 
-					<c:if test="<%= !group.isDepot() && !group.isCompany() && !group.isLayoutPrototype() %>">
-						<liferay-staging:select-pages
-							action="<%= Constants.EXPORT %>"
-							disableInputs="<%= configuredExport %>"
-							exportImportConfigurationId="<%= exportImportConfigurationId %>"
-							groupId="<%= liveGroupId %>"
-							privateLayout="<%= privateLayout %>"
-							treeId="<%= treeId %>"
-						/>
-					</c:if>
-
-					<liferay-staging:content
-						cmd="<%= Constants.EXPORT %>"
-						disableInputs="<%= configuredExport %>"
-						exportImportConfigurationId="<%= exportImportConfigurationId %>"
-						type="<%= Constants.EXPORT %>"
-					/>
-
-					<liferay-staging:permissions
+				<c:if test="<%= !group.isDepot() && !group.isCompany() && !group.isLayoutPrototype() %>">
+					<liferay-staging:select-pages
 						action="<%= Constants.EXPORT %>"
-						descriptionCSSClass="permissions-description"
 						disableInputs="<%= configuredExport %>"
 						exportImportConfigurationId="<%= exportImportConfigurationId %>"
-						global="<%= group.isCompany() %>"
-						labelCSSClass="permissions-label"
+						groupId="<%= liveGroupId %>"
+						privateLayout="<%= privateLayout %>"
+						treeId="<%= treeId %>"
 					/>
+				</c:if>
 
-					<div class="sheet-footer">
-						<aui:button type="submit" value="export" />
+				<liferay-staging:content
+					cmd="<%= Constants.EXPORT %>"
+					disableInputs="<%= configuredExport %>"
+					exportImportConfigurationId="<%= exportImportConfigurationId %>"
+					type="<%= Constants.EXPORT %>"
+				/>
 
-						<aui:button href="<%= backURL %>" type="cancel" />
-					</div>
+				<liferay-staging:permissions
+					action="<%= Constants.EXPORT %>"
+					descriptionCSSClass="permissions-description"
+					disableInputs="<%= configuredExport %>"
+					exportImportConfigurationId="<%= exportImportConfigurationId %>"
+					global="<%= group.isCompany() %>"
+					labelCSSClass="permissions-label"
+				/>
+
+				<div class="sheet-footer">
+					<aui:button type="submit" value="export" />
+
+					<aui:button href="<%= backURL %>" type="cancel" />
 				</div>
-			</div>
+			</aui:fieldset-group>
 		</div>
 	</aui:form>
 </clay:container-fluid>

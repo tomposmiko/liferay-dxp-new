@@ -32,7 +32,7 @@ long fileEntryId = BeanParamUtil.getLong(cpAttachmentFileEntry, request, "fileEn
 				draggableImage="vertical"
 				fileEntryId="<%= fileEntryId %>"
 				itemSelectorEventName="addCPAttachmentFileEntry"
-				itemSelectorURL="<%= cpAttachmentFileEntriesDisplayContext.getImageItemSelectorURL() %>"
+				itemSelectorURL="<%= cpAttachmentFileEntriesDisplayContext.getImageItemSelectorUrl() %>"
 				maxFileSize="<%= cpAttachmentFileEntriesDisplayContext.getImageMaxSize() %>"
 				paramName="fileEntry"
 				uploadURL="<%= uploadCoverImageURL %>"

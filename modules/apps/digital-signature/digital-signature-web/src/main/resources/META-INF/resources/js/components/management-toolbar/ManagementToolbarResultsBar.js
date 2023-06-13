@@ -14,8 +14,7 @@
 
 import ClayButton from '@clayui/button';
 import ClayLabel from '@clayui/label';
-import {ManagementToolbar} from 'frontend-js-components-web';
-import {sub} from 'frontend-js-web';
+import {ClayResultsBar} from '@clayui/management-toolbar';
 import React, {useContext} from 'react';
 
 import {concatValues} from '../../utils/utils';
@@ -25,7 +24,7 @@ const FilterItem = ({filterKey, name, value}) => {
 	const [, dispatch] = useContext(SearchContext);
 
 	return (
-		<ManagementToolbar.ResultsBarItem>
+		<ClayResultsBar.Item>
 			<ClayLabel
 				className="tbar-label"
 				closeButtonProps={{
@@ -35,15 +34,14 @@ const FilterItem = ({filterKey, name, value}) => {
 			>
 				<span className="label-section">
 					{`${name}: `}
-
 					<span className="font-weight-normal">{value}</span>
 				</span>
 			</ClayLabel>
-		</ManagementToolbar.ResultsBarItem>
+		</ClayResultsBar.Item>
 	);
 };
 
-export function getSelectedFilters(filters, appliedFilters) {
+export const getSelectedFilters = (filters, appliedFilters) => {
 	const selectedFilters = [];
 
 	Object.keys(appliedFilters).forEach((filterKey) => {
@@ -66,13 +64,9 @@ export function getSelectedFilters(filters, appliedFilters) {
 	});
 
 	return selectedFilters;
-}
+};
 
-export default function ManagementToolbarResultsBar({
-	filters = [],
-	isLoading,
-	totalCount,
-}) {
+export default ({filters = [], isLoading, totalCount}) => {
 	const [{filters: appliedFilters = {}, keywords}, dispatch] = useContext(
 		SearchContext
 	);
@@ -81,29 +75,25 @@ export default function ManagementToolbarResultsBar({
 
 	return (
 		<>
-			{(keywords || !!selectedFilters.length) && !isLoading && (
-				<ManagementToolbar.ResultsBar>
-					<ManagementToolbar.ResultsBarItem>
+			{(keywords || selectedFilters.length > 0) && !isLoading && (
+				<ClayResultsBar>
+					<ClayResultsBar.Item>
 						<span className="component-text text-truncate-inline">
 							<span className="text-truncate">
-								{sub(
-									totalCount === 1
-										? Liferay.Language.get('x-result-for-x')
-										: Liferay.Language.get(
-												'x-results-for-x'
-										  ),
+								{Liferay.Util.sub(
+									Liferay.Language.get('x-results-for-x'),
 									totalCount,
 									keywords
 								)}
 							</span>
 						</span>
-					</ManagementToolbar.ResultsBarItem>
+					</ClayResultsBar.Item>
 
 					{selectedFilters.map((filter, key) => (
 						<FilterItem key={key} {...filter} />
 					))}
 
-					<ManagementToolbar.ResultsBarItem expand>
+					<ClayResultsBar.Item expand>
 						<div className="tbar-section text-right">
 							<ClayButton
 								className="component-link tbar-link"
@@ -113,9 +103,9 @@ export default function ManagementToolbarResultsBar({
 								{Liferay.Language.get('clear-all')}
 							</ClayButton>
 						</div>
-					</ManagementToolbar.ResultsBarItem>
-				</ManagementToolbar.ResultsBar>
+					</ClayResultsBar.Item>
+				</ClayResultsBar>
 			)}
 		</>
 	);
-}
+};

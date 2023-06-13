@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
-	property = "ddm.form.values.serializer.type=json",
+	immediate = true, property = "ddm.form.values.serializer.type=json",
 	service = DDMFormValuesSerializer.class
 )
 public class DDMFormValuesJSONSerializer implements DDMFormValuesSerializer {
@@ -66,7 +66,7 @@ public class DDMFormValuesJSONSerializer implements DDMFormValuesSerializer {
 
 		DDMForm ddmForm = ddmFormValues.getDDMForm();
 
-		_addFieldValues(
+		addFieldValues(
 			jsonObject, ddmForm.getDDMFormFieldsMap(true),
 			ddmFormValues.getDDMFormFieldValues());
 
@@ -103,9 +103,84 @@ public class DDMFormValuesJSONSerializer implements DDMFormValuesSerializer {
 			"defaultLanguageId", LocaleUtil.toLanguageId(defaultLocale));
 	}
 
+	protected void addFieldValues(
+		JSONObject jsonObject, Map<String, DDMFormField> ddmFormFieldsMap,
+		List<DDMFormFieldValue> ddmFormFieldValues) {
+
+		jsonObject.put(
+			"fieldValues", toJSONArray(ddmFormFieldsMap, ddmFormFieldValues));
+	}
+
+	protected void addNestedFieldValues(
+		JSONObject jsonObject, Map<String, DDMFormField> ddmFormFieldsMap,
+		List<DDMFormFieldValue> nestedDDMFormFieldValues) {
+
+		if (nestedDDMFormFieldValues.isEmpty()) {
+			return;
+		}
+
+		jsonObject.put(
+			"nestedFieldValues",
+			toJSONArray(ddmFormFieldsMap, nestedDDMFormFieldValues));
+	}
+
+	protected void addValue(
+		JSONObject jsonObject, DDMFormField ddmFormField,
+		DDMFormFieldValue ddmFormFieldValue) {
+
+		Value value = ddmFormFieldValue.getValue();
+
+		if (value == null) {
+			return;
+		}
+
+		DDMFormFieldValueJSONSerializer ddmFormFieldValueJSONSerializer =
+			getDDMFormFieldValueJSONSerializer(ddmFormField);
+
+		if (ddmFormFieldValueJSONSerializer != null) {
+			jsonObject.put(
+				"value",
+				ddmFormFieldValueJSONSerializer.serialize(ddmFormField, value));
+		}
+		else if (value.isLocalized()) {
+			jsonObject.put("value", toJSONObject(value));
+		}
+		else {
+			jsonObject.put("value", value.getString(LocaleUtil.ROOT));
+		}
+	}
+
 	@Deactivate
 	protected void deactivate() {
 		_serviceTrackerMap.close();
+	}
+
+	protected DDMFormFieldValueJSONSerializer
+		getDDMFormFieldValueJSONSerializer(DDMFormField ddmFormField) {
+
+		if (ddmFormField == null) {
+			return null;
+		}
+
+		return _serviceTrackerMap.getService(ddmFormField.getType());
+	}
+
+	@Reference(unbind = "-")
+	protected void setJSONFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
+	}
+
+	protected JSONArray toJSONArray(
+		Map<String, DDMFormField> ddmFormFieldsMap,
+		List<DDMFormFieldValue> ddmFormFieldValues) {
+
+		JSONArray jsonArray = _jsonFactory.createJSONArray();
+
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			jsonArray.put(toJSONObject(ddmFormFieldsMap, ddmFormFieldValue));
+		}
+
+		return jsonArray;
 	}
 
 	protected JSONObject toJSONObject(
@@ -122,11 +197,11 @@ public class DDMFormValuesJSONSerializer implements DDMFormValuesSerializer {
 			"name", ddmFormFieldValue.getName()
 		);
 
-		_addNestedFieldValues(
+		addNestedFieldValues(
 			jsonObject, ddmFormFieldsMap,
 			ddmFormFieldValue.getNestedDDMFormFieldValues());
 
-		_addValue(
+		addValue(
 			jsonObject, ddmFormFieldsMap.get(ddmFormFieldValue.getName()),
 			ddmFormFieldValue);
 
@@ -145,79 +220,7 @@ public class DDMFormValuesJSONSerializer implements DDMFormValuesSerializer {
 		return jsonObject;
 	}
 
-	private void _addFieldValues(
-		JSONObject jsonObject, Map<String, DDMFormField> ddmFormFieldsMap,
-		List<DDMFormFieldValue> ddmFormFieldValues) {
-
-		jsonObject.put(
-			"fieldValues", _toJSONArray(ddmFormFieldsMap, ddmFormFieldValues));
-	}
-
-	private void _addNestedFieldValues(
-		JSONObject jsonObject, Map<String, DDMFormField> ddmFormFieldsMap,
-		List<DDMFormFieldValue> nestedDDMFormFieldValues) {
-
-		if (nestedDDMFormFieldValues.isEmpty()) {
-			return;
-		}
-
-		jsonObject.put(
-			"nestedFieldValues",
-			_toJSONArray(ddmFormFieldsMap, nestedDDMFormFieldValues));
-	}
-
-	private void _addValue(
-		JSONObject jsonObject, DDMFormField ddmFormField,
-		DDMFormFieldValue ddmFormFieldValue) {
-
-		Value value = ddmFormFieldValue.getValue();
-
-		if (value == null) {
-			return;
-		}
-
-		DDMFormFieldValueJSONSerializer ddmFormFieldValueJSONSerializer =
-			_getDDMFormFieldValueJSONSerializer(ddmFormField);
-
-		if (ddmFormFieldValueJSONSerializer != null) {
-			jsonObject.put(
-				"value",
-				ddmFormFieldValueJSONSerializer.serialize(ddmFormField, value));
-		}
-		else if (value.isLocalized()) {
-			jsonObject.put("value", toJSONObject(value));
-		}
-		else {
-			jsonObject.put("value", value.getString(LocaleUtil.ROOT));
-		}
-	}
-
-	private DDMFormFieldValueJSONSerializer _getDDMFormFieldValueJSONSerializer(
-		DDMFormField ddmFormField) {
-
-		if (ddmFormField == null) {
-			return null;
-		}
-
-		return _serviceTrackerMap.getService(ddmFormField.getType());
-	}
-
-	private JSONArray _toJSONArray(
-		Map<String, DDMFormField> ddmFormFieldsMap,
-		List<DDMFormFieldValue> ddmFormFieldValues) {
-
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
-
-		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-			jsonArray.put(toJSONObject(ddmFormFieldsMap, ddmFormFieldValue));
-		}
-
-		return jsonArray;
-	}
-
-	@Reference
 	private JSONFactory _jsonFactory;
-
 	private ServiceTrackerMap<String, DDMFormFieldValueJSONSerializer>
 		_serviceTrackerMap;
 

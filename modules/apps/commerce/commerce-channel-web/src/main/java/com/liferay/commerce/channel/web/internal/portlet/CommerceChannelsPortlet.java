@@ -16,14 +16,15 @@ package com.liferay.commerce.channel.web.internal.portlet;
 
 import com.liferay.commerce.channel.web.internal.display.context.CommerceChannelDisplayContext;
 import com.liferay.commerce.currency.service.CommerceCurrencyService;
+import com.liferay.commerce.payment.method.CommercePaymentMethodRegistry;
 import com.liferay.commerce.product.channel.CommerceChannelHealthStatusRegistry;
 import com.liferay.commerce.product.channel.CommerceChannelTypeRegistry;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPTaxCategoryLocalService;
 import com.liferay.commerce.product.service.CommerceChannelService;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.item.selector.ItemSelector;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocalCloseable;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -34,6 +35,8 @@ import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 
 import java.io.IOException;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -46,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -61,12 +65,25 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceChannelsPortlet.class, Portlet.class}
 )
 public class CommerceChannelsPortlet extends MVCPortlet {
+
+	@Override
+	public void processAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException, PortletException {
+
+		try (ProxyModeThreadLocalCloseable proxyModeThreadLocalCloseable =
+				new ProxyModeThreadLocalCloseable()) {
+
+			ProxyModeThreadLocal.setForceSync(true);
+
+			super.processAction(actionRequest, actionResponse);
+		}
+	}
 
 	@Override
 	public void render(
@@ -75,14 +92,13 @@ public class CommerceChannelsPortlet extends MVCPortlet {
 
 		CommerceChannelDisplayContext commerceChannelDisplayContext =
 			new CommerceChannelDisplayContext(
-				_commerceChannelHealthStatusRegistry,
 				_commerceChannelModelResourcePermission,
-				_commerceChannelService, _commerceChannelTypeRegistry,
-				_commerceCurrencyService, _configurationProvider,
-				_cpTaxCategoryLocalService, _dlAppLocalService,
-				_portal.getHttpServletRequest(renderRequest), _itemSelector,
-				_portal, _workflowDefinitionLinkLocalService,
-				_workflowDefinitionManager);
+				_commerceChannelHealthStatusRegistry, _commerceChannelService,
+				_commerceChannelTypeRegistry, _commerceCurrencyService,
+				_commercePaymentMethodRegistry, _configurationProvider,
+				_portal.getHttpServletRequest(renderRequest), _portal,
+				_workflowDefinitionLinkLocalService, _workflowDefinitionManager,
+				_cpTaxCategoryLocalService);
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT, commerceChannelDisplayContext);
@@ -110,16 +126,13 @@ public class CommerceChannelsPortlet extends MVCPortlet {
 	private CommerceCurrencyService _commerceCurrencyService;
 
 	@Reference
+	private CommercePaymentMethodRegistry _commercePaymentMethodRegistry;
+
+	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private CPTaxCategoryLocalService _cpTaxCategoryLocalService;
-
-	@Reference
-	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private ItemSelector _itemSelector;
 
 	@Reference
 	private Portal _portal;

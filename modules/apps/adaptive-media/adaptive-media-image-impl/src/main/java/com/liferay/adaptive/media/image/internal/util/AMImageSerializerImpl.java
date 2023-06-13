@@ -23,7 +23,7 @@ import com.liferay.adaptive.media.image.processor.AMImageAttribute;
 import com.liferay.adaptive.media.image.processor.AMImageProcessor;
 import com.liferay.adaptive.media.image.util.AMImageSerializer;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 
@@ -33,15 +33,15 @@ import java.net.URI;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Adolfo Pérez
  */
-@Component(service = AMImageSerializer.class)
+@Component(immediate = true, service = AMImageSerializer.class)
 public class AMImageSerializerImpl implements AMImageSerializer {
 
 	@Override
@@ -49,7 +49,7 @@ public class AMImageSerializerImpl implements AMImageSerializer {
 		String s, Supplier<InputStream> inputStreamSupplier) {
 
 		try {
-			JSONObject jsonObject = _jsonFactory.createJSONObject(s);
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(s);
 
 			Map<String, String> properties = new HashMap<>();
 
@@ -81,18 +81,19 @@ public class AMImageSerializerImpl implements AMImageSerializer {
 
 	@Override
 	public String serialize(AdaptiveMedia<AMImageProcessor> adaptiveMedia) {
-		JSONObject attributesJSONObject = _jsonFactory.createJSONObject();
+		JSONObject attributesJSONObject = JSONFactoryUtil.createJSONObject();
 
 		Map<String, AMAttribute<?, ?>> allowedAMAttributes =
 			AMImageAttribute.getAllowedAMAttributes();
 
 		allowedAMAttributes.forEach(
 			(name, amAttribute) -> {
-				Object value = adaptiveMedia.getValue((AMAttribute)amAttribute);
+				Optional<Object> valueOptional = adaptiveMedia.getValueOptional(
+					(AMAttribute)amAttribute);
 
-				if (value != null) {
-					attributesJSONObject.put(name, String.valueOf(value));
-				}
+				valueOptional.ifPresent(
+					value -> attributesJSONObject.put(
+						name, String.valueOf(value)));
 			});
 
 		return JSONUtil.put(
@@ -101,8 +102,5 @@ public class AMImageSerializerImpl implements AMImageSerializer {
 			"uri", adaptiveMedia.getURI()
 		).toString();
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

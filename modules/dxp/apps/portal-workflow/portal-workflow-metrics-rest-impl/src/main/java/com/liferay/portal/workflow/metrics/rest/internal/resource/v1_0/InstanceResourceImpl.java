@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.aggregation.bucket.Bucket;
 import com.liferay.portal.search.aggregation.bucket.FilterAggregation;
@@ -60,6 +59,7 @@ import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Creator;
@@ -87,8 +87,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -103,7 +106,8 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/instance.properties",
 	scope = ServiceScope.PROTOTYPE, service = InstanceResource.class
 )
-public class InstanceResourceImpl extends BaseInstanceResourceImpl {
+public class InstanceResourceImpl
+	extends BaseInstanceResourceImpl implements EntityModelResource {
 
 	@Override
 	public void deleteProcessInstance(Long processId, Long instanceId)
@@ -216,51 +220,51 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		SearchSearchResponse searchSearchResponse =
 			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
 
-		SearchHits searchHits = searchSearchResponse.getSearchHits();
+		return Stream.of(
+			searchSearchResponse.getSearchHits()
+		).map(
+			SearchHits::getSearchHits
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).filter(
+			document -> document.getString(
+				"uid"
+			).startsWith(
+				"WorkflowMetricsInstance"
+			)
+		).findFirst(
+		).map(
+			this::_createInstance
+		).map(
+			instance -> {
+				Stream.of(
+					searchSearchResponse.getAggregationResultsMap()
+				).map(
+					aggregationResultsMap ->
+						(TermsAggregationResult)aggregationResultsMap.get(
+							"instanceId")
+				).map(
+					TermsAggregationResult::getBuckets
+				).flatMap(
+					Collection::stream
+				).findFirst(
+				).ifPresent(
+					bucket -> {
+						_setAssignees(bucket, instance);
+						_setSLAResults(bucket, instance);
+						_setTaskNames(bucket, instance);
+						_setTransitions(instance);
+					}
+				);
 
-		Instance instance = null;
-
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			Document document = searchHit.getDocument();
-
-			String uid = document.getString("uid");
-
-			if (uid.startsWith("WorkflowMetricsInstance")) {
-				instance = _createInstance(document);
-
-				break;
+				return instance;
 			}
-		}
-
-		if (instance == null) {
-			throw new NoSuchInstanceException(
-				"No instance exists with the instance ID " + instanceId);
-		}
-
-		Map<String, AggregationResult> aggregationResultsMap =
-			searchSearchResponse.getAggregationResultsMap();
-
-		TermsAggregationResult termsAggregationResult =
-			(TermsAggregationResult)aggregationResultsMap.get("instanceId");
-
-		Bucket firstBucket = null;
-
-		for (Bucket bucket : termsAggregationResult.getBuckets()) {
-			firstBucket = bucket;
-
-			break;
-		}
-
-		if (firstBucket == null) {
-			return instance;
-		}
-
-		_setAssignees(firstBucket, instance);
-		_setSLAResults(firstBucket, instance);
-		_setTaskNames(firstBucket, instance);
-		_setTransitions(instance);
-
-		return instance;
+		).orElseThrow(
+			() -> new NoSuchInstanceException(
+				"No instance exists with the instance ID " + instanceId)
+		);
 	}
 
 	@Override
@@ -313,7 +317,6 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		getProcessInstance(processId, instanceId);
 
 		_instanceWorkflowMetricsIndexer.updateInstance(
-			instance.getActive(),
 			LocalizedMapUtil.getLocalizedMap(instance.getAssetTitle_i18n()),
 			LocalizedMapUtil.getLocalizedMap(instance.getAssetType_i18n()),
 			contextCompany.getCompanyId(), instanceId,
@@ -439,16 +442,15 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 			TermsQuery termsQuery = _queries.terms("tasks.assigneeIds");
 
 			termsQuery.addValues(
-				transform(
-					assigneeIds,
-					assigneeId -> {
-						if (assigneeId <= 0) {
-							return null;
-						}
-
-						return String.valueOf(assigneeId);
-					},
-					Object.class));
+				Stream.of(
+					assigneeIds
+				).filter(
+					assigneeId -> assigneeId > 0
+				).map(
+					String::valueOf
+				).toArray(
+					Object[]::new
+				));
 
 			nestedBooleanQuery.addShouldQueryClauses(termsQuery);
 
@@ -465,7 +467,13 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 			TermsQuery termsQuery = _queries.terms("classPK");
 
 			termsQuery.addValues(
-				transform(classPKs, String::valueOf, Object.class));
+				Stream.of(
+					classPKs
+				).map(
+					String::valueOf
+				).toArray(
+					Object[]::new
+				));
 
 			booleanQuery.addMustQueryClauses(termsQuery);
 		}
@@ -524,7 +532,6 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		}
 
 		return booleanQuery.addMustQueryClauses(
-			_queries.term("active", Boolean.TRUE),
 			_queries.term("deleted", Boolean.FALSE),
 			_queries.term("processId", processId));
 	}
@@ -564,21 +571,30 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 				(TermsAggregationResult)userBucket.getChildAggregationResult(
 					"assigneeId");
 
-			assignees.addAll(
-				transform(
-					termsAggregationResult.getBuckets(),
-					assigneeBucket -> AssigneeUtil.toAssignee(
-						_language, _portal,
-						ResourceBundleUtil.getModuleAndPortalResourceBundle(
-							contextAcceptLanguage.getPreferredLocale(),
-							InstanceResourceImpl.class),
-						GetterUtil.getLong(assigneeBucket.getKey()),
-						_userLocalService::fetchUser)));
+			Collection<Bucket> buckets = termsAggregationResult.getBuckets();
 
-			assignees.sort(
+			Stream<Bucket> stream = buckets.stream();
+
+			stream.map(
+				Bucket::getKey
+			).map(
+				GetterUtil::getLong
+			).map(
+				userId -> AssigneeUtil.toAssignee(
+					_language, _portal,
+					ResourceBundleUtil.getModuleAndPortalResourceBundle(
+						contextAcceptLanguage.getPreferredLocale(),
+						InstanceResourceImpl.class),
+					userId, _userLocalService::fetchUser)
+			).sorted(
 				Comparator.comparing(
 					Assignee::getName,
-					Comparator.nullsLast(String::compareToIgnoreCase)));
+					Comparator.nullsLast(String::compareToIgnoreCase))
+			).filter(
+				Objects::nonNull
+			).forEachOrdered(
+				assignees::add
+			);
 		}
 
 		Bucket roleBucket = assigneeTypeAggregationResult.getBucket(
@@ -658,28 +674,22 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		searchSearchRequest.setSize(1);
 		searchSearchRequest.setStart(9999);
 
-		SearchSearchResponse searchSearchResponse =
-			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
-
-		SearchHits searchHits = searchSearchResponse.getSearchHits();
-
-		List<SearchHit> searchHitsList = searchHits.getSearchHits();
-
-		if (searchHitsList.isEmpty()) {
-			return startInstanceId;
-		}
-
-		SearchHit searchHit = searchHitsList.get(0);
-
-		Document document = searchHit.getDocument();
-
-		Long instanceId = document.getLong("instanceId");
-
-		if (instanceId == null) {
-			return startInstanceId;
-		}
-
-		return instanceId;
+		return Stream.of(
+			_searchRequestExecutor.executeSearchRequest(searchSearchRequest)
+		).map(
+			SearchSearchResponse::getSearchHits
+		).map(
+			SearchHits::getSearchHits
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).mapToLong(
+			document -> document.getLong("instanceId")
+		).findFirst(
+		).orElse(
+			startInstanceId
+		);
 	}
 
 	private Collection<Instance> _getInstances(
@@ -687,8 +697,6 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		Pagination pagination, long processId, String[] slaStatuses,
 		Sort[] sorts, Long startInstanceId, String[] statuses,
 		String[] taskNames) {
-
-		Map<Long, Instance> instancesMap = new LinkedHashMap<>();
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
@@ -710,18 +718,24 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		searchSearchRequest.setSize(pagination.getPageSize());
 		searchSearchRequest.setStart(pagination.getStartPosition());
 
-		SearchSearchResponse searchSearchResponse =
-			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
+		Map<Long, Instance> instancesMap = Stream.of(
+			_searchRequestExecutor.executeSearchRequest(searchSearchRequest)
+		).map(
+			SearchSearchResponse::getSearchHits
+		).map(
+			SearchHits::getSearchHits
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).map(
+			this::_createInstance
+		).collect(
+			LinkedHashMap::new,
+			(map, instance) -> map.put(instance.getId(), instance), Map::putAll
+		);
 
-		SearchHits searchHits = searchSearchResponse.getSearchHits();
-
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			Instance instance = _createInstance(searchHit.getDocument());
-
-			instancesMap.put(instance.getId(), instance);
-		}
-
-		_setSLAResults(instancesMap, processId);
+		_setSLAResults(processId, instancesMap);
 
 		return instancesMap.values();
 	}
@@ -733,8 +747,6 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 
 	private List<String> _getNextTransitionNames(
 		long processId, long instanceId) {
-
-		List<String> names = new ArrayList<>();
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
@@ -794,44 +806,62 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 			booleanQuery.addFilterQueryClauses(
 				_createBooleanQuery(processId, instanceId)));
 
-		SearchSearchResponse searchSearchResponse =
-			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
-
-		Map<String, AggregationResult> aggregationResultsMap =
-			searchSearchResponse.getAggregationResultsMap();
-
-		TermsAggregationResult termsAggregationResult =
-			(TermsAggregationResult)aggregationResultsMap.get("nodeId");
-
-		for (Bucket bucket : termsAggregationResult.getBuckets()) {
-			FilterAggregationResult filterAggregationResult =
+		return Stream.of(
+			_searchRequestExecutor.executeSearchRequest(searchSearchRequest)
+		).map(
+			SearchSearchResponse::getAggregationResultsMap
+		).map(
+			aggregationResultsMap ->
+				(TermsAggregationResult)aggregationResultsMap.get("nodeId")
+		).map(
+			TermsAggregationResult::getBuckets
+		).flatMap(
+			Collection::stream
+		).map(
+			bucket -> Stream.of(
 				(FilterAggregationResult)bucket.getChildAggregationResult(
-					"nameFilter");
-
-			TermsAggregationResult childAggregationResult =
-				(TermsAggregationResult)
-					filterAggregationResult.getChildAggregationResult("name");
-
-			names.addAll(
-				transform(childAggregationResult.getBuckets(), Bucket::getKey));
-		}
-
-		names.sort(Comparator.naturalOrder());
-
-		return names;
+					"nameFilter")
+			).map(
+				filterAggregationResult ->
+					(TermsAggregationResult)
+						filterAggregationResult.getChildAggregationResult(
+							"name")
+			).map(
+				TermsAggregationResult::getBuckets
+			).flatMap(
+				Collection::stream
+			).map(
+				Bucket::getKey
+			).collect(
+				Collectors.toCollection(ArrayList::new)
+			)
+		).flatMap(
+			Collection::stream
+		).sorted(
+		).collect(
+			Collectors.toCollection(ArrayList::new)
+		);
 	}
 
 	private List<String> _getTaskNames(Bucket bucket) {
 		TermsAggregationResult termsAggregationResult =
 			(TermsAggregationResult)bucket.getChildAggregationResult("name");
 
-		return transform(
-			termsAggregationResult.getBuckets(),
-			nameBucket -> _language.get(
+		Collection<Bucket> buckets = termsAggregationResult.getBuckets();
+
+		Stream<Bucket> stream = buckets.stream();
+
+		return stream.map(
+			Bucket::getKey
+		).map(
+			taskName -> _language.get(
 				ResourceBundleUtil.getModuleAndPortalResourceBundle(
 					contextAcceptLanguage.getPreferredLocale(),
 					InstanceResourceImpl.class),
-				nameBucket.getKey()));
+				taskName)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private boolean _isReviewer(Map<String, Object> task) {
@@ -862,13 +892,18 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		for (long groupId : assigneeGroupIds) {
 			mapGroupRoleIds.put(
 				groupId,
-				transform(
-					ListUtil.concat(
-						roleLocalService.getUserGroupRoles(
-							contextUser.getUserId(), groupId),
-						roleLocalService.getUserGroupGroupRoles(
-							contextUser.getUserId(), groupId)),
-					Role::getRoleId));
+				Stream.of(
+					roleLocalService.getUserGroupRoles(
+						contextUser.getUserId(), groupId),
+					roleLocalService.getUserGroupGroupRoles(
+						contextUser.getUserId(), groupId)
+				).flatMap(
+					List::stream
+				).map(
+					Role::getRoleId
+				).collect(
+					Collectors.toList()
+				));
 		}
 
 		if (mapGroupRoleIds.isEmpty()) {
@@ -893,7 +928,7 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return null;
@@ -962,28 +997,35 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 	}
 
 	private void _setSLAResults(Bucket bucket, Instance instance) {
-		FilterAggregationResult filterAggregationResult =
-			(FilterAggregationResult)bucket.getChildAggregationResult(
-				"slaInstanceResult");
-
-		TopHitsAggregationResult topHitsAggregationResult =
-			(TopHitsAggregationResult)
-				filterAggregationResult.getChildAggregationResult("topHits");
-
-		SearchHits searchHits = topHitsAggregationResult.getSearchHits();
-
 		instance.setSlaResults(
-			transformToArray(
-				searchHits.getSearchHits(),
-				searchHit -> SLAResultUtil.toSLAResult(
-					searchHit.getSourcesMap(),
+			Stream.of(
+				(FilterAggregationResult)bucket.getChildAggregationResult(
+					"slaInstanceResult")
+			).map(
+				filterAggregationResult ->
+					(TopHitsAggregationResult)
+						filterAggregationResult.getChildAggregationResult(
+							"topHits")
+			).map(
+				TopHitsAggregationResult::getSearchHits
+			).map(
+				SearchHits::getSearchHits
+			).flatMap(
+				List::stream
+			).map(
+				SearchHit::getSourcesMap
+			).map(
+				sourcesMap -> SLAResultUtil.toSLAResult(
+					sourcesMap,
 					_workflowMetricsSLADefinitionLocalService::
-						fetchWorkflowMetricsSLADefinition),
-				SLAResult.class));
+						fetchWorkflowMetricsSLADefinition)
+			).toArray(
+				SLAResult[]::new
+			));
 	}
 
 	private void _setSLAResults(
-		Map<Long, Instance> instancesMap, long processId) {
+		long processId, Map<Long, Instance> instancesMap) {
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
@@ -1014,11 +1056,17 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		TermsQuery termsQuery = _queries.terms("instanceId");
 
 		termsQuery.addValues(
-			transformToArray(
-				instancesMap.keySet(), String::valueOf, Object.class));
+			Stream.of(
+				instancesMap.keySet()
+			).flatMap(
+				Set::stream
+			).map(
+				String::valueOf
+			).toArray(
+				Object[]::new
+			));
 
 		filterBooleanQuery.addMustQueryClauses(
-			_queries.term("blocked", Boolean.FALSE),
 			_queries.term("deleted", Boolean.FALSE),
 			_queries.term("processId", processId),
 			_queries.term("status", WorkflowMetricsSLAStatus.RUNNING.name()),
@@ -1031,31 +1079,42 @@ public class InstanceResourceImpl extends BaseInstanceResourceImpl {
 		SearchSearchResponse searchSearchResponse =
 			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
 
-		Map<String, AggregationResult> aggregationResultsMap =
-			searchSearchResponse.getAggregationResultsMap();
+		Stream.of(
+			searchSearchResponse.getAggregationResultsMap()
+		).map(
+			aggregationResultsMap ->
+				(TermsAggregationResult)aggregationResultsMap.get("instanceId")
+		).map(
+			TermsAggregationResult::getBuckets
+		).flatMap(
+			Collection::stream
+		).forEach(
+			bucket -> {
+				Instance instance = instancesMap.get(
+					GetterUtil.getLong(bucket.getKey()));
 
-		TermsAggregationResult termsAggregationResult =
-			(TermsAggregationResult)aggregationResultsMap.get("instanceId");
-
-		for (Bucket bucket : termsAggregationResult.getBuckets()) {
-			Instance instance = instancesMap.get(
-				GetterUtil.getLong(bucket.getKey()));
-
-			TopHitsAggregationResult topHitsAggregationResult =
-				(TopHitsAggregationResult)bucket.getChildAggregationResult(
-					"topHits");
-
-			SearchHits searchHits = topHitsAggregationResult.getSearchHits();
-
-			instance.setSlaResults(
-				transformToArray(
-					searchHits.getSearchHits(),
-					searchHit -> SLAResultUtil.toSLAResult(
-						searchHit.getSourcesMap(),
-						_workflowMetricsSLADefinitionLocalService::
-							fetchWorkflowMetricsSLADefinition),
-					SLAResult.class));
-		}
+				instance.setSlaResults(
+					Stream.of(
+						(TopHitsAggregationResult)
+							bucket.getChildAggregationResult("topHits")
+					).map(
+						TopHitsAggregationResult::getSearchHits
+					).map(
+						SearchHits::getSearchHits
+					).flatMap(
+						List::stream
+					).map(
+						SearchHit::getSourcesMap
+					).map(
+						sourcesMap -> SLAResultUtil.toSLAResult(
+							sourcesMap,
+							_workflowMetricsSLADefinitionLocalService::
+								fetchWorkflowMetricsSLADefinition)
+					).toArray(
+						SLAResult[]::new
+					));
+			}
+		);
 	}
 
 	private void _setTaskNames(Bucket bucket, Instance instance) {

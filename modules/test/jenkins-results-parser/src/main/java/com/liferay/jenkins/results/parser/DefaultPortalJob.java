@@ -17,8 +17,7 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 
 import java.util.Properties;
-
-import org.json.JSONObject;
+import java.util.Set;
 
 /**
  * @author Michael Hashimoto
@@ -27,16 +26,11 @@ public class DefaultPortalJob
 	extends BaseJob implements PortalTestClassJob, TestSuiteJob {
 
 	@Override
-	public JSONObject getJSONObject() {
-		if (jsonObject != null) {
-			return jsonObject;
-		}
+	public Set<String> getDistTypes() {
+		String testBatchDistAppServers = JenkinsResultsParserUtil.getProperty(
+			getJobProperties(), "test.batch.dist.app.servers");
 
-		jsonObject = super.getJSONObject();
-
-		jsonObject.put("test_suite_name", _testSuiteName);
-
-		return jsonObject;
+		return getSetFromString(testBatchDistAppServers);
 	}
 
 	@Override
@@ -83,33 +77,12 @@ public class DefaultPortalJob
 	}
 
 	protected DefaultPortalJob(
-		BuildProfile buildProfile, String jobName,
-		PortalGitWorkingDirectory portalGitWorkingDirectory,
-		String testSuiteName) {
+		String jobName, BuildProfile buildProfile, String testSuiteName) {
 
-		super(buildProfile, jobName);
+		super(jobName, buildProfile);
 
-		_portalGitWorkingDirectory = portalGitWorkingDirectory;
 		_testSuiteName = testSuiteName;
 
-		_initialize();
-	}
-
-	protected DefaultPortalJob(
-		BuildProfile buildProfile, String jobName, String testSuiteName) {
-
-		this(buildProfile, jobName, null, testSuiteName);
-	}
-
-	protected DefaultPortalJob(JSONObject jsonObject) {
-		super(jsonObject);
-
-		_testSuiteName = jsonObject.getString("test_suite_name");
-
-		_initialize();
-	}
-
-	private void _initialize() {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			getPortalGitWorkingDirectory();
 
@@ -120,6 +93,15 @@ public class DefaultPortalJob
 			new File(portalWorkingDirectory, "build.properties"));
 		jobPropertiesFiles.add(
 			new File(portalWorkingDirectory, "test.properties"));
+
+		readJobProperties();
+	}
+
+	@Override
+	protected Set<String> getRawBatchNames() {
+		return getSetFromString(
+			JenkinsResultsParserUtil.getProperty(
+				getJobProperties(), "test.batch.names"));
 	}
 
 	private PortalGitWorkingDirectory _portalGitWorkingDirectory;

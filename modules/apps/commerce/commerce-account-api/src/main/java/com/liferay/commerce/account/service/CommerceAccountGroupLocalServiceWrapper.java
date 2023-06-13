@@ -27,10 +27,6 @@ public class CommerceAccountGroupLocalServiceWrapper
 	implements CommerceAccountGroupLocalService,
 			   ServiceWrapper<CommerceAccountGroupLocalService> {
 
-	public CommerceAccountGroupLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAccountGroupLocalServiceWrapper(
 		CommerceAccountGroupLocalService commerceAccountGroupLocalService) {
 
@@ -121,19 +117,10 @@ public class CommerceAccountGroupLocalServiceWrapper
 	public java.util.List
 		<com.liferay.commerce.account.model.CommerceAccountGroup>
 			getCommerceAccountGroupsByCommerceAccountId(
-				long commerceAccountId, int start, int end) {
+				long commerceAccountId) {
 
 		return _commerceAccountGroupLocalService.
-			getCommerceAccountGroupsByCommerceAccountId(
-				commerceAccountId, start, end);
-	}
-
-	@Override
-	public int getCommerceAccountGroupsByCommerceAccountIdCount(
-		long commerceAccountId) {
-
-		return _commerceAccountGroupLocalService.
-			getCommerceAccountGroupsByCommerceAccountIdCount(commerceAccountId);
+			getCommerceAccountGroupsByCommerceAccountId(commerceAccountId);
 	}
 
 	@Override
@@ -173,8 +160,8 @@ public class CommerceAccountGroupLocalServiceWrapper
 	}
 
 	@Override
-	public int searchCommerceAccountsGroupCount(
-		long companyId, String keywords) {
+	public int searchCommerceAccountsGroupCount(long companyId, String keywords)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceAccountGroupLocalService.
 			searchCommerceAccountsGroupCount(companyId, keywords);

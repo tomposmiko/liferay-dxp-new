@@ -80,9 +80,10 @@ public class DDMFormInstanceIndexer extends BaseIndexer<DDMFormInstance> {
 	@Override
 	protected void doReindex(DDMFormInstance ddmFormInstance) throws Exception {
 		indexWriterHelper.updateDocument(
-			ddmFormInstance.getCompanyId(), getDocument(ddmFormInstance));
+			getSearchEngineId(), ddmFormInstance.getCompanyId(),
+			getDocument(ddmFormInstance), isCommitImmediately());
 
-		_reindexRecords(ddmFormInstance);
+		reindexRecords(ddmFormInstance);
 	}
 
 	@Override
@@ -97,14 +98,10 @@ public class DDMFormInstanceIndexer extends BaseIndexer<DDMFormInstance> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexFormInstances(companyId);
+		reindexFormInstances(companyId);
 	}
 
-	protected DDMFormInstanceLocalService ddmFormInstanceLocalService;
-	protected IndexerRegistry indexerRegistry;
-	protected IndexWriterHelper indexWriterHelper;
-
-	private void _reindexFormInstances(long companyId) throws Exception {
+	protected void reindexFormInstances(long companyId) throws Exception {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			ddmFormInstanceLocalService.getIndexableActionableDynamicQuery();
 
@@ -127,11 +124,12 @@ public class DDMFormInstanceIndexer extends BaseIndexer<DDMFormInstance> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}
 
-	private void _reindexRecords(DDMFormInstance ddmFormInstance)
+	protected void reindexRecords(DDMFormInstance ddmFormInstance)
 		throws Exception {
 
 		Indexer<DDMFormInstanceRecord> indexer =
@@ -139,6 +137,10 @@ public class DDMFormInstanceIndexer extends BaseIndexer<DDMFormInstance> {
 
 		indexer.reindex(ddmFormInstance.getFormInstanceRecords());
 	}
+
+	protected DDMFormInstanceLocalService ddmFormInstanceLocalService;
+	protected IndexerRegistry indexerRegistry;
+	protected IndexWriterHelper indexWriterHelper;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceIndexer.class);

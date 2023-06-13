@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -193,51 +194,64 @@ public class CounterModelImpl
 	public Map<String, Function<Counter, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<Counter, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, Counter>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<Counter, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Counter.class.getClassLoader(), Counter.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<Counter, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<Counter, Object>>();
+		try {
+			Constructor<Counter> constructor =
+				(Constructor<Counter>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put("name", Counter::getName);
-			attributeGetterFunctions.put("currentId", Counter::getCurrentId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<Counter, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<Counter, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<Counter, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<Counter, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Counter, Object>>();
+		Map<String, BiConsumer<Counter, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<Counter, ?>>();
 
-		static {
-			Map<String, BiConsumer<Counter, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<Counter, ?>>();
+		attributeGetterFunctions.put("name", Counter::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<Counter, String>)Counter::setName);
+		attributeGetterFunctions.put("currentId", Counter::getCurrentId);
+		attributeSetterBiConsumers.put(
+			"currentId", (BiConsumer<Counter, Long>)Counter::setCurrentId);
 
-			attributeSetterBiConsumers.put(
-				"name", (BiConsumer<Counter, String>)Counter::setName);
-			attributeSetterBiConsumers.put(
-				"currentId", (BiConsumer<Counter, Long>)Counter::setCurrentId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -460,12 +474,41 @@ public class CounterModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<Counter, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<Counter, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<Counter, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((Counter)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Counter>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Counter.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -473,9 +516,8 @@ public class CounterModelImpl
 	private long _currentId;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<Counter, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<Counter, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -142,7 +142,7 @@ public class AssetVocabularyServiceTest {
 		vocabulary =
 			AssetVocabularyLocalServiceUtil.
 				getAssetVocabularyByExternalReferenceCode(
-					externalReferenceCode, _group.getGroupId());
+					_group.getGroupId(), externalReferenceCode);
 
 		Assert.assertEquals(
 			externalReferenceCode, vocabulary.getExternalReferenceCode());
@@ -152,19 +152,22 @@ public class AssetVocabularyServiceTest {
 	public void testAddVocabularyWithoutExternalReferenceCode()
 		throws Exception {
 
-		AssetVocabulary vocabulary1 = AssetTestUtil.addVocabulary(
+		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
 			_group.getGroupId());
 
-		String externalReferenceCode = vocabulary1.getExternalReferenceCode();
+		String externalReferenceCode = String.valueOf(
+			vocabulary.getVocabularyId());
 
-		Assert.assertEquals(externalReferenceCode, vocabulary1.getUuid());
+		Assert.assertEquals(
+			externalReferenceCode, vocabulary.getExternalReferenceCode());
 
-		AssetVocabulary vocabulary2 =
+		vocabulary =
 			AssetVocabularyLocalServiceUtil.
 				getAssetVocabularyByExternalReferenceCode(
-					externalReferenceCode, _group.getGroupId());
+					_group.getGroupId(), externalReferenceCode);
 
-		Assert.assertEquals(vocabulary1, vocabulary2);
+		Assert.assertEquals(
+			externalReferenceCode, vocabulary.getExternalReferenceCode());
 	}
 
 	@Test
@@ -540,6 +543,32 @@ public class AssetVocabularyServiceTest {
 		Assert.assertEquals(title, vocabulary.getTitle(LocaleUtil.US, true));
 		Assert.assertEquals(
 			StringUtil.toLowerCase(title), vocabulary.getName());
+	}
+
+	@Test(expected = DuplicateVocabularyException.class)
+	public void testUpdateDuplicateVocabulary() throws Exception {
+		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
+			_group.getGroupId(), "test1");
+
+		AssetTestUtil.addVocabulary(_group.getGroupId(), "test2");
+
+		_assetVocabularyLocalService.updateVocabulary(
+			vocabulary.getVocabularyId(), "test2", vocabulary.getTitle(),
+			vocabulary.getTitleMap(), vocabulary.getDescriptionMap(),
+			vocabulary.getSettings(),
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+	}
+
+	@Test(expected = VocabularyNameException.class)
+	public void testUpdateEmptyNameVocabulary() throws Exception {
+		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
+			_group.getGroupId(), "test");
+
+		_assetVocabularyLocalService.updateVocabulary(
+			vocabulary.getVocabularyId(), StringPool.BLANK,
+			vocabulary.getTitle(), vocabulary.getTitleMap(),
+			vocabulary.getDescriptionMap(), vocabulary.getSettings(),
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 	}
 
 	@Rule

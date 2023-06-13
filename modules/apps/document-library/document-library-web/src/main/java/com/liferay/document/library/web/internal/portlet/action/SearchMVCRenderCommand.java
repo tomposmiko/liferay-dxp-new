@@ -54,6 +54,7 @@ public class SearchMVCRenderCommand implements MVCRenderCommand {
 
 		renderRequest.setAttribute(
 			DLAdminDisplayContext.class.getName(), dlAdminDisplayContext);
+
 		renderRequest.setAttribute(
 			DLAdminManagementToolbarDisplayContext.class.getName(),
 			_dlAdminDisplayContextProvider.

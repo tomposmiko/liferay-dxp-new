@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -42,10 +42,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.portlet.PortletRequest;
 
@@ -84,7 +82,7 @@ public class ServiceContextFactory {
 
 		ServiceContext serviceContext = _getInstance(httpServletRequest);
 
-		if ((className == null) || (httpServletRequest == null)) {
+		if (className == null) {
 			return serviceContext;
 		}
 
@@ -173,10 +171,6 @@ public class ServiceContextFactory {
 
 		ServiceContext serviceContext = new ServiceContext();
 
-		if (httpServletRequest == null) {
-			return serviceContext;
-		}
-
 		// Theme display
 
 		ThemeDisplay themeDisplay =
@@ -194,7 +188,7 @@ public class ServiceContextFactory {
 
 			String fullCanonicalURL = canonicalURL;
 
-			if (!HttpComponentsUtil.hasProtocol(layoutURL)) {
+			if (!HttpUtil.hasProtocol(layoutURL)) {
 				fullCanonicalURL = PortalUtil.getCanonicalURL(
 					PortalUtil.getPortalURL(themeDisplay) + layoutURL,
 					themeDisplay, themeDisplay.getLayout(), true);
@@ -229,12 +223,12 @@ public class ServiceContextFactory {
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchUserException);
+					_log.debug(noSuchUserException, noSuchUserException);
 				}
 			}
 
 			if (user != null) {
-				serviceContext.setSignedIn(!user.isGuestUser());
+				serviceContext.setSignedIn(!user.isDefaultUser());
 				serviceContext.setUserId(user.getUserId());
 			}
 			else {
@@ -319,7 +313,7 @@ public class ServiceContextFactory {
 		Map<String, String[]> parameterMap =
 			httpServletRequest.getParameterMap();
 
-		Set<Long> assetCategoryIdsSet = new HashSet<>();
+		List<Long> assetCategoryIdsList = new ArrayList<>();
 
 		boolean updateAssetCategoryIds = false;
 
@@ -336,13 +330,13 @@ public class ServiceContextFactory {
 				httpServletRequest, name);
 
 			for (long assetCategoryId : assetVocabularyAssetCategoryIds) {
-				assetCategoryIdsSet.add(assetCategoryId);
+				assetCategoryIdsList.add(assetCategoryId);
 			}
 		}
 
 		if (updateAssetCategoryIds) {
 			assetCategoryIds = ArrayUtil.toArray(
-				assetCategoryIdsSet.toArray(new Long[0]));
+				assetCategoryIdsList.toArray(new Long[0]));
 		}
 
 		serviceContext.setAssetCategoryIds(assetCategoryIds);
@@ -361,8 +355,11 @@ public class ServiceContextFactory {
 
 		serviceContext.setAssetPriority(
 			ParamUtil.getDouble(httpServletRequest, "assetPriority"));
-		serviceContext.setAssetTagNames(
-			ParamUtil.getStringValues(httpServletRequest, "assetTagNames"));
+
+		String[] assetTagNames = ParamUtil.getStringValues(
+			httpServletRequest, "assetTagNames");
+
+		serviceContext.setAssetTagNames(assetTagNames);
 
 		// Workflow
 
@@ -521,8 +518,11 @@ public class ServiceContextFactory {
 
 		serviceContext.setAssetPriority(
 			ParamUtil.getDouble(httpServletRequest, "assetPriority"));
-		serviceContext.setAssetTagNames(
-			ParamUtil.getStringValues(httpServletRequest, "assetTagNames"));
+
+		String[] assetTagNames = ParamUtil.getStringValues(
+			httpServletRequest, "assetTagNames");
+
+		serviceContext.setAssetTagNames(assetTagNames);
 
 		// Workflow
 

@@ -1,6 +1,5 @@
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
 
 task runGradleTest
 
@@ -10,34 +9,10 @@ gradle.liferayWorkspace {
 	modules.jspPrecompileEnabled = true
 }
 
-node {
-	nodeVersion = "14.19.0"
-}
-
 runGradleTest {
 	dependsOn distBundleZip
 
 	doLast {
-		int portalExtPropertiesCount = 0
-
-		ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(distBundleZip.archivePath))
-
-		ZipEntry nextZipEntry = zipInputStream.getNextEntry()
-
-		while (nextZipEntry != null) {
-			if (!nextZipEntry.isDirectory() && nextZipEntry.name.endsWith("portal-ext.properties")) {
-				portalExtPropertiesCount++
-			}
-
-			nextZipEntry = zipInputStream.getNextEntry()
-		}
-
-		zipInputStream.closeEntry()
-
-		zipInputStream.close()
-
-		assert portalExtPropertiesCount == 1
-
 		ZipFile zipFile = new ZipFile(distBundleZip.archivePath)
 
 		String zipEntryRootName = gradle.liferayWorkspace.bundleDistRootDirName
@@ -53,7 +28,7 @@ runGradleTest {
 
 			// Configs
 
-			for (String fileName in ["common/common.txt", "production/production.txt", "production/license/copyright.txt", "production/portal-ext.properties"]) {
+			for (String fileName in ["common/common.txt", "production/production.txt", "production/license/copyright.txt"]) {
 				File expectedFile = file("configs/" + fileName)
 
 				String zipEntryName = zipEntryRootName + fileName.substring(fileName.indexOf('/') + 1)
@@ -69,19 +44,19 @@ runGradleTest {
 
 			// Bundle
 
-			String bundleFileName = downloadBundle.src.toString()
+			String bundleFileName = downloadBundle.src.toString();
 
-			bundleFileName = bundleFileName.substring(bundleFileName.lastIndexOf('/') + 1)
+			bundleFileName = bundleFileName.substring(bundleFileName.lastIndexOf('/') + 1);
 
-			File bundleFile = new File(downloadBundle.dest, bundleFileName)
+			File bundleFile = new File(downloadBundle.dest, bundleFileName);
 
 			FileTree bundleFileTree
 
 			if (bundleFileName.endsWith(".tar.gz")) {
-				bundleFileTree = tarTree(bundleFile)
+				bundleFileTree = tarTree(bundleFile);
 			}
 			else {
-				bundleFileTree = zipTree(bundleFile)
+				bundleFileTree = zipTree(bundleFile);
 			}
 
 			bundleFileTree.visit {
@@ -112,10 +87,6 @@ runGradleTest {
 
 				assert zipFile.getEntry(zipEntryName) != null : zipEntryName
 			}
-
-			String setEnvTomcatEntryName = zipEntryRootName + "tomcat-9.0.10/bin/setEnv1.sh"
-
-			assert zipFile.getEntry(setEnvTomcatEntryName) != null : setEnvTomcatEntryName
 		}
 	}
 }

@@ -40,7 +40,7 @@ public class PauseFollowCCRRequestExecutorImpl
 	public PauseFollowCCRResponse execute(
 		PauseFollowCCRRequest pauseFollowCCRRequest) {
 
-		PauseFollowRequest pauseFollowRequest = _createPauseFollowRequest(
+		PauseFollowRequest pauseFollowRequest = createPauseFollowRequest(
 			pauseFollowCCRRequest);
 
 		AcknowledgedResponse acknowledgedResponse = getAcknowledgedResponse(
@@ -48,6 +48,12 @@ public class PauseFollowCCRRequestExecutorImpl
 
 		return new PauseFollowCCRResponse(
 			acknowledgedResponse.isAcknowledged());
+	}
+
+	protected PauseFollowRequest createPauseFollowRequest(
+		PauseFollowCCRRequest pauseFollowCCRRequest) {
+
+		return new PauseFollowRequest(pauseFollowCCRRequest.getIndexName());
 	}
 
 	protected AcknowledgedResponse getAcknowledgedResponse(
@@ -70,13 +76,13 @@ public class PauseFollowCCRRequestExecutorImpl
 		}
 	}
 
-	private PauseFollowRequest _createPauseFollowRequest(
-		PauseFollowCCRRequest pauseFollowCCRRequest) {
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-		return new PauseFollowRequest(pauseFollowCCRRequest.getIndexName());
+		_elasticsearchClientResolver = elasticsearchClientResolver;
 	}
 
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

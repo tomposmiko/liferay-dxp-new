@@ -16,7 +16,7 @@ package com.liferay.gradle.plugins.defaults.internal;
 
 import com.liferay.gradle.plugins.defaults.internal.util.FileUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.GradleUtil;
-import com.liferay.gradle.plugins.defaults.task.WriteFindBugsProjectTask;
+import com.liferay.gradle.plugins.defaults.tasks.WriteFindBugsProjectTask;
 import com.liferay.gradle.plugins.jasper.jspc.CompileJSPTask;
 import com.liferay.gradle.plugins.jasper.jspc.JspCPlugin;
 
@@ -485,29 +485,31 @@ public class FindSecurityBugsPlugin implements Plugin<Project> {
 						project.files(
 							mainSourceSet.getCompileClasspath(),
 							compileJSPJavaCompile.getClasspath()));
-					writeFindBugsProjectTask.setClasspath(
-						project.files(
-							new Callable<File>() {
 
-								@Override
-								public File call() throws Exception {
-									return compileJSPJavaCompile.
-										getDestinationDir();
-								}
+					FileCollection classpath = project.files(
+						new Callable<File>() {
 
-							},
-							new Callable<File>() {
+							@Override
+							public File call() throws Exception {
+								return compileJSPJavaCompile.
+									getDestinationDir();
+							}
 
-								@Override
-								public File call() throws Exception {
-									return javaSourceDirectorySet.
-										getOutputDir();
-								}
+						},
+						new Callable<File>() {
 
-							}));
+							@Override
+							public File call() throws Exception {
+								return javaSourceDirectorySet.getOutputDir();
+							}
+
+						});
+
+					writeFindBugsProjectTask.setClasspath(classpath);
 
 					writeFindBugsProjectTask.setDescription(
 						"Writes the FindBugs project file.");
+
 					writeFindBugsProjectTask.setOutputFile(
 						new Callable<File>() {
 
@@ -518,6 +520,7 @@ public class FindSecurityBugsPlugin implements Plugin<Project> {
 							}
 
 						});
+
 					writeFindBugsProjectTask.setProjectName(project.getName());
 
 					CompileJSPTask generateJSPJavaCompileJSPTask =

@@ -51,7 +51,11 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 			propsTransformer="js/ArticleHistoryManagementToolbarPropsTransformer"
 		/>
 
-		<aui:form action="<%= journalHistoryDisplayContext.getPortletURL() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+		<%
+		PortletURL portletURL = journalHistoryDisplayContext.getPortletURL();
+		%>
+
+		<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 			<aui:input name="referringPortletResource" type="hidden" value="<%= journalHistoryDisplayContext.getReferringPortletResource() %>" />
 			<aui:input name="groupId" type="hidden" value="<%= String.valueOf(article.getGroupId()) %>" />
 
@@ -77,7 +81,7 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 						<c:when test='<%= Objects.equals(journalHistoryDisplayContext.getDisplayStyle(), "descriptive") %>'>
 							<liferay-ui:search-container-column-text>
 								<liferay-ui:user-portrait
-									userId="<%= articleVersion.getStatusByUserId() %>"
+									userId="<%= articleVersion.getUserId() %>"
 								/>
 							</liferay-ui:search-container-column-text>
 
@@ -92,7 +96,7 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 								%>
 
 								<h6 class="text-default">
-									<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(articleVersion.getStatusByUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
+									<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(articleVersion.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
 								</h6>
 
 								<h5>
@@ -100,11 +104,7 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 								</h5>
 
 								<h6 class="text-default">
-									<liferay-portal-workflow:status
-										showStatusLabel="<%= false %>"
-										status="<%= articleVersion.getStatus() %>"
-										version="<%= String.valueOf(articleVersion.getVersion()) %>"
-									/>
+									<aui:workflow-status markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= articleVersion.getStatus() %>" version="<%= String.valueOf(articleVersion.getVersion()) %>" />
 								</h6>
 							</liferay-ui:search-container-column-text>
 
@@ -115,7 +115,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 											"trashEnabled", componentContext.get("trashEnabled")
 										).build()
 									%>'
-									aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 									dropdownItems="<%= journalDisplayContext.getArticleHistoryActionDropdownItems(articleVersion) %>"
 									propsTransformer="js/ElementsDefaultPropsTransformer"
 								/>
@@ -169,7 +168,7 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 							<liferay-ui:search-container-column-text
 								cssClass="table-cell-expand-smallest table-cell-minw-100"
 								name="author"
-								value="<%= HtmlUtil.escape(articleVersion.getStatusByUserName()) %>"
+								value="<%= HtmlUtil.escape(PortalUtil.getUserName(articleVersion)) %>"
 							/>
 
 							<liferay-ui:search-container-column-text>
@@ -179,7 +178,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 											"trashEnabled", componentContext.get("trashEnabled")
 										).build()
 									%>'
-									aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 									dropdownItems="<%= journalDisplayContext.getArticleHistoryActionDropdownItems(articleVersion) %>"
 									propsTransformer="js/ElementsDefaultPropsTransformer"
 								/>

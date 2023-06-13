@@ -16,7 +16,7 @@ package com.liferay.poshi.runner.logger;
 
 import com.liferay.poshi.core.PoshiContext;
 import com.liferay.poshi.core.PoshiGetterUtil;
-import com.liferay.poshi.core.PoshiStackTrace;
+import com.liferay.poshi.core.PoshiStackTraceUtil;
 import com.liferay.poshi.core.util.Validator;
 import com.liferay.poshi.runner.exception.PoshiRunnerLoggerException;
 
@@ -36,16 +36,10 @@ public abstract class SyntaxLogger {
 
 	public SyntaxLogger(String namespacedClassCommandName) throws Exception {
 		generateSyntaxLog(namespacedClassCommandName);
-
-		poshiStackTrace = PoshiStackTrace.getPoshiStackTrace(
-			namespacedClassCommandName);
 	}
 
 	public void generateSyntaxLog(String namespacedClassCommandName)
 		throws PoshiRunnerLoggerException {
-
-		poshiStackTrace = PoshiStackTrace.getPoshiStackTrace(
-			namespacedClassCommandName);
 
 		try {
 			_syntaxLogLoggerElement = new LoggerElement("syntaxLogContainer");
@@ -93,16 +87,16 @@ public abstract class SyntaxLogger {
 				className + "#set-up", namespace);
 
 			if (setUpElement != null) {
-				poshiStackTrace.startStackTrace(
+				PoshiStackTraceUtil.startStackTrace(
 					namespace + "." + className + "#set-up", "test-case");
 
 				childContainerLoggerElement.addChildLoggerElement(
 					getLoggerElementFromElement(setUpElement));
 
-				poshiStackTrace.emptyStackTrace();
+				PoshiStackTraceUtil.emptyStackTrace();
 			}
 
-			poshiStackTrace.startStackTrace(
+			PoshiStackTraceUtil.startStackTrace(
 				namespacedClassCommandName, "test-case");
 
 			String classCommandName =
@@ -113,27 +107,22 @@ public abstract class SyntaxLogger {
 			Element testCaseElement = PoshiContext.getTestCaseCommandElement(
 				classCommandName, namespace);
 
-			if (testCaseElement == null) {
-				throw new PoshiRunnerLoggerException(
-					"No test case element found for " + classCommandName);
-			}
-
 			childContainerLoggerElement.addChildLoggerElement(
 				getLoggerElementFromElement(testCaseElement));
 
-			poshiStackTrace.emptyStackTrace();
+			PoshiStackTraceUtil.emptyStackTrace();
 
 			Element tearDownElement = PoshiContext.getTestCaseCommandElement(
 				className + "#tear-down", namespace);
 
 			if (tearDownElement != null) {
-				poshiStackTrace.startStackTrace(
+				PoshiStackTraceUtil.startStackTrace(
 					namespace + "." + className + "#tear-down", "test-case");
 
 				childContainerLoggerElement.addChildLoggerElement(
 					getLoggerElementFromElement(tearDownElement));
 
-				poshiStackTrace.emptyStackTrace();
+				PoshiStackTraceUtil.emptyStackTrace();
 			}
 
 			headerLoggerElement.addChildLoggerElement(
@@ -332,7 +321,7 @@ public abstract class SyntaxLogger {
 		_btnLinkCollapseId++;
 		_btnLinkVarId++;
 
-		poshiStackTrace.setCurrentElement(element);
+		PoshiStackTraceUtil.setCurrentElement(element);
 
 		LoggerElement loggerElement = new LoggerElement();
 
@@ -349,7 +338,7 @@ public abstract class SyntaxLogger {
 			getLineContainerLoggerElement(element));
 
 		_loggerElements.put(
-			poshiStackTrace.getSimpleStackTrace(), loggerElement);
+			PoshiStackTraceUtil.getSimpleStackTrace(), loggerElement);
 
 		return loggerElement;
 	}
@@ -395,12 +384,12 @@ public abstract class SyntaxLogger {
 
 		String classCommandName = executeElement.attributeValue(macroType);
 
-		poshiStackTrace.pushStackTrace(executeElement);
+		PoshiStackTraceUtil.pushStackTrace(executeElement);
 
 		loggerElement.addChildLoggerElement(
 			_getMacroCommandLoggerElement(classCommandName));
 
-		poshiStackTrace.popStackTrace();
+		PoshiStackTraceUtil.popStackTrace();
 
 		return loggerElement;
 	}
@@ -451,12 +440,12 @@ public abstract class SyntaxLogger {
 		String namespacedClassCommandName = executeElement.attributeValue(
 			"test-case");
 
-		poshiStackTrace.pushStackTrace(executeElement);
+		PoshiStackTraceUtil.pushStackTrace(executeElement);
 
 		loggerElement.addChildLoggerElement(
 			getTestCaseCommandLoggerElement(namespacedClassCommandName));
 
-		poshiStackTrace.popStackTrace();
+		PoshiStackTraceUtil.popStackTrace();
 
 		return loggerElement;
 	}
@@ -524,9 +513,9 @@ public abstract class SyntaxLogger {
 	}
 
 	protected void updateElementStatus(Element element, String status) {
-		poshiStackTrace.setCurrentElement(element);
+		PoshiStackTraceUtil.setCurrentElement(element);
 
-		String stackTrace = poshiStackTrace.getSimpleStackTrace();
+		String stackTrace = PoshiStackTraceUtil.getSimpleStackTrace();
 
 		if (stackTrace.contains(".function")) {
 			return;
@@ -537,8 +526,6 @@ public abstract class SyntaxLogger {
 		loggerElement.setAttribute("data-status01", status);
 	}
 
-	protected PoshiStackTrace poshiStackTrace;
-
 	private LoggerElement _getMacroCommandLoggerElement(
 			String namespacedClassCommandName)
 		throws Exception {
@@ -546,7 +533,7 @@ public abstract class SyntaxLogger {
 		String classCommandName =
 			PoshiGetterUtil.getClassCommandNameFromNamespacedClassCommandName(
 				namespacedClassCommandName);
-		String namespace = poshiStackTrace.getCurrentNamespace(
+		String namespace = PoshiStackTraceUtil.getCurrentNamespace(
 			namespacedClassCommandName);
 
 		Element commandElement = PoshiContext.getMacroCommandElement(

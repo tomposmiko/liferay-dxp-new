@@ -61,11 +61,34 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().addDLFileEntry(dlFileEntry);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addFileEntry(String, long, long, long, long, String, String,
+	 String, String, String, long, Map, File, InputStream, long,
+	 Date, Date, ServiceContext)}
+	 */
+	@Deprecated
+	public static DLFileEntry addFileEntry(
+			long userId, long groupId, long repositoryId, long folderId,
+			String sourceFileName, String mimeType, String title,
+			String description, String changeLog, long fileEntryTypeId,
+			Map<String, com.liferay.dynamic.data.mapping.kernel.DDMFormValues>
+				ddmFormValuesMap,
+			java.io.File file, InputStream inputStream, long size,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addFileEntry(
+			userId, groupId, repositoryId, folderId, sourceFileName, mimeType,
+			title, description, changeLog, fileEntryTypeId, ddmFormValuesMap,
+			file, inputStream, size, serviceContext);
+	}
+
 	public static DLFileEntry addFileEntry(
 			String externalReferenceCode, long userId, long groupId,
 			long repositoryId, long folderId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog, long fileEntryTypeId,
+			String mimeType, String title, String description, String changeLog,
+			long fileEntryTypeId,
 			Map<String, com.liferay.dynamic.data.mapping.kernel.DDMFormValues>
 				ddmFormValuesMap,
 			java.io.File file, InputStream inputStream, long size,
@@ -75,7 +98,7 @@ public class DLFileEntryLocalServiceUtil {
 
 		return getService().addFileEntry(
 			externalReferenceCode, userId, groupId, repositoryId, folderId,
-			sourceFileName, mimeType, title, urlTitle, description, changeLog,
+			sourceFileName, mimeType, title, description, changeLog,
 			fileEntryTypeId, ddmFormValuesMap, file, inputStream, size,
 			expirationDate, reviewDate, serviceContext);
 	}
@@ -87,10 +110,10 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().cancelCheckOut(userId, fileEntryId);
 	}
 
-	public static void checkFileEntries(long companyId, long checkInterval)
+	public static void checkFileEntries(long checkInterval)
 		throws PortalException {
 
-		getService().checkFileEntries(companyId, checkInterval);
+		getService().checkFileEntries(checkInterval);
 	}
 
 	public static void checkInFileEntry(
@@ -160,25 +183,25 @@ public class DLFileEntryLocalServiceUtil {
 	}
 
 	public static DLFileEntry copyFileEntry(
-			long userId, long groupId, long repositoryId,
-			long sourceFileEntryId, long targetFolderId, String fileName,
+			long userId, long groupId, long repositoryId, long fileEntryId,
+			long destFolderId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyFileEntry(
-			userId, groupId, repositoryId, sourceFileEntryId, targetFolderId,
-			fileName, serviceContext);
+			userId, groupId, repositoryId, fileEntryId, destFolderId,
+			serviceContext);
 	}
 
 	public static void copyFileEntryMetadata(
 			long companyId, long fileEntryTypeId, long fileEntryId,
-			long sourceFileVersionId, long targetFileVersionId,
+			long fromFileVersionId, long toFileVersionId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		getService().copyFileEntryMetadata(
-			companyId, fileEntryTypeId, fileEntryId, sourceFileVersionId,
-			targetFileVersionId, serviceContext);
+			companyId, fileEntryTypeId, fileEntryId, fromFileVersionId,
+			toFileVersionId, serviceContext);
 	}
 
 	/**
@@ -391,11 +414,29 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().fetchDLFileEntry(fileEntryId);
 	}
 
+	/**
+	 * Returns the document library file entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the document library file entry's external reference code
+	 * @return the matching document library file entry, or <code>null</code> if a matching document library file entry could not be found
+	 */
 	public static DLFileEntry fetchDLFileEntryByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
 		return getService().fetchDLFileEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchDLFileEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static DLFileEntry fetchDLFileEntryByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return getService().fetchDLFileEntryByReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -532,12 +573,20 @@ public class DLFileEntryLocalServiceUtil {
 		return getService().getDLFileEntry(fileEntryId);
 	}
 
+	/**
+	 * Returns the document library file entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the document library file entry's external reference code
+	 * @return the matching document library file entry
+	 * @throws PortalException if a matching document library file entry could not be found
+	 */
 	public static DLFileEntry getDLFileEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getDLFileEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -644,13 +693,6 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static List<DLFileEntry> getFileEntries(long folderId, String name) {
 		return getService().getFileEntries(folderId, name);
-	}
-
-	public static List<DLFileEntry> getFileEntriesByClassNameIdAndTreePath(
-		long classNameId, String treePath) {
-
-		return getService().getFileEntriesByClassNameIdAndTreePath(
-			classNameId, treePath);
 	}
 
 	public static int getFileEntriesCount() {
@@ -931,8 +973,7 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static DLFileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog,
+			String mimeType, String title, String description, String changeLog,
 			com.liferay.document.library.kernel.model.DLVersionNumberIncrease
 				dlVersionNumberIncrease,
 			long fileEntryTypeId,
@@ -944,10 +985,32 @@ public class DLFileEntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, urlTitle,
-			description, changeLog, dlVersionNumberIncrease, fileEntryTypeId,
+			userId, fileEntryId, sourceFileName, mimeType, title, description,
+			changeLog, dlVersionNumberIncrease, fileEntryTypeId,
 			ddmFormValuesMap, file, inputStream, size, expirationDate,
 			reviewDate, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #updateFileEntry(long, long, String, String, String, String, String, DLVersionNumberIncrease, long, Map, File, InputStream, long, Date, Date, ServiceContext)}
+	 */
+	@Deprecated
+	public static DLFileEntry updateFileEntry(
+			long userId, long fileEntryId, String sourceFileName,
+			String mimeType, String title, String description, String changeLog,
+			com.liferay.document.library.kernel.model.DLVersionNumberIncrease
+				dlVersionNumberIncrease,
+			long fileEntryTypeId,
+			Map<String, com.liferay.dynamic.data.mapping.kernel.DDMFormValues>
+				ddmFormValuesMap,
+			java.io.File file, InputStream inputStream, long size,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().updateFileEntry(
+			userId, fileEntryId, sourceFileName, mimeType, title, description,
+			changeLog, dlVersionNumberIncrease, fileEntryTypeId,
+			ddmFormValuesMap, file, inputStream, size, serviceContext);
 	}
 
 	public static DLFileEntry updateFileEntryType(
@@ -957,6 +1020,16 @@ public class DLFileEntryLocalServiceUtil {
 
 		return getService().updateFileEntryType(
 			userId, fileEntryId, fileEntryTypeId, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public static void updateSmallImage(long smallImageId, long largeImageId)
+		throws PortalException {
+
+		getService().updateSmallImage(smallImageId, largeImageId);
 	}
 
 	public static DLFileEntry updateStatus(

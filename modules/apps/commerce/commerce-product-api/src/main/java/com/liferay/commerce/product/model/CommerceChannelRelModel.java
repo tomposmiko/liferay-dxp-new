@@ -18,9 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.AuditedModel;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -40,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface CommerceChannelRelModel
 	extends AttachedModel, AuditedModel, BaseModel<CommerceChannelRel>,
-			CTModel<CommerceChannelRel>, MVCCModel, ShardedModel {
+			ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -53,7 +51,6 @@ public interface CommerceChannelRelModel
 	 *
 	 * @return the primary key of this commerce channel rel
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -61,40 +58,7 @@ public interface CommerceChannelRelModel
 	 *
 	 * @param primaryKey the primary key of this commerce channel rel
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this commerce channel rel.
-	 *
-	 * @return the mvcc version of this commerce channel rel
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this commerce channel rel.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce channel rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this commerce channel rel.
-	 *
-	 * @return the ct collection ID of this commerce channel rel
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this commerce channel rel.
-	 *
-	 * @param ctCollectionId the ct collection ID of this commerce channel rel
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the commerce channel rel ID of this commerce channel rel.
@@ -265,9 +229,5 @@ public interface CommerceChannelRelModel
 
 	@Override
 	public CommerceChannelRel cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

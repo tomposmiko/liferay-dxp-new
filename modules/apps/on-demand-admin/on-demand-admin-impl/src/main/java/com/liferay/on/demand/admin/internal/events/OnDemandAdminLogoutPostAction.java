@@ -31,7 +31,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(property = "key=logout.events.post", service = LifecycleAction.class)
+@Component(
+	immediate = true, property = "key=logout.events.post",
+	service = LifecycleAction.class
+)
 public class OnDemandAdminLogoutPostAction extends Action {
 
 	@Override

@@ -20,5 +20,4 @@
 boolean closeButton = GetterUtil.getBoolean(String.valueOf(request.getAttribute("liferay-frontend:sidebar-panel:closeButton")));
 String resourceURL = (String)request.getAttribute("liferay-frontend:sidebar-panel:resourceURL");
 String searchContainerId = (String)request.getAttribute("liferay-frontend:sidebar-panel:searchContainerId");
-String title = (String)request.getAttribute("liferay-frontend:sidebar-panel:title");
 %>

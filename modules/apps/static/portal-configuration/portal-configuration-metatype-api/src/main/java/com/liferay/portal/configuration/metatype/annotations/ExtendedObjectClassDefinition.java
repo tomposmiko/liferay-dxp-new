@@ -74,19 +74,11 @@ public @interface ExtendedObjectClassDefinition {
 	 */
 	public boolean strictScope() default false;
 
-	public String visibilityControllerKey() default StringPool.BLANK;
-
 	public enum Scope {
 
-		COMPANY("companyWebId", "companyId", "company"),
-		GROUP("groupKey", "groupId", "group"),
-		PORTLET_INSTANCE(
-			"portletInstanceKey", "portletInstanceId", "portlet-instance"),
-		SYSTEM(null, null, "system");
-
-		public boolean equals(Scope scope) {
-			return equals(scope.getValue());
-		}
+		COMPANY("companyId", "company"), GROUP("groupId", "group"),
+		PORTLET_INSTANCE("portletInstanceId", "portlet-instance"),
+		SYSTEM(null, "system");
 
 		public boolean equals(String value) {
 			return _value.equals(value);
@@ -94,10 +86,6 @@ public @interface ExtendedObjectClassDefinition {
 
 		public String getDelimiterString() {
 			return StringBundler.concat(_SEPARATOR, name(), _SEPARATOR);
-		}
-
-		public String getPortablePropertyKey() {
-			return _portablePropertyKey;
 		}
 
 		public String getPropertyKey() {
@@ -113,17 +101,13 @@ public @interface ExtendedObjectClassDefinition {
 			return _value;
 		}
 
-		private Scope(
-			String portablePropertyKey, String propertyKey, String value) {
-
-			_portablePropertyKey = portablePropertyKey;
+		private Scope(String propertyKey, String value) {
 			_propertyKey = propertyKey;
 			_value = value;
 		}
 
 		private static final String _SEPARATOR = StringPool.DOUBLE_UNDERLINE;
 
-		private final String _portablePropertyKey;
 		private final String _propertyKey;
 		private final String _value;
 

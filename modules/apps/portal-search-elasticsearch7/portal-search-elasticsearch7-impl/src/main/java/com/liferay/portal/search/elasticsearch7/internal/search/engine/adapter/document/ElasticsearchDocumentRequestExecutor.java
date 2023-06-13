@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Dylan Rebelak
  */
 @Component(
-	property = "search.engine.impl=Elasticsearch",
+	immediate = true, property = "search.engine.impl=Elasticsearch",
 	service = DocumentRequestExecutor.class
 )
 public class ElasticsearchDocumentRequestExecutor
@@ -94,27 +94,67 @@ public class ElasticsearchDocumentRequestExecutor
 		return _updateDocumentRequestExecutor.execute(updateDocumentRequest);
 	}
 
-	@Reference
-	private BulkDocumentRequestExecutor _bulkDocumentRequestExecutor;
+	@Reference(unbind = "-")
+	protected void setBulkDocumentRequestExecutor(
+		BulkDocumentRequestExecutor bulkDocumentRequestExecutor) {
 
-	@Reference
+		_bulkDocumentRequestExecutor = bulkDocumentRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDeleteByQueryDocumentRequestExecutor(
+		DeleteByQueryDocumentRequestExecutor
+			deleteByQueryDocumentRequestExecutor) {
+
+		_deleteByQueryDocumentRequestExecutor =
+			deleteByQueryDocumentRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDeleteDocumentRequestExecutor(
+		DeleteDocumentRequestExecutor deleteDocumentRequestExecutor) {
+
+		_deleteDocumentRequestExecutor = deleteDocumentRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGetDocumentRequestExecutor(
+		GetDocumentRequestExecutor getDocumentRequestExecutor) {
+
+		_getDocumentRequestExecutor = getDocumentRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setIndexDocumentRequestExecutor(
+		IndexDocumentRequestExecutor indexDocumentRequestExecutor) {
+
+		_indexDocumentRequestExecutor = indexDocumentRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUpdateByQueryDocumentRequestExecutor(
+		UpdateByQueryDocumentRequestExecutor
+			updateByQueryDocumentRequestExecutor) {
+
+		_updateByQueryDocumentRequestExecutor =
+			updateByQueryDocumentRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUpdateDocumentRequestExecutor(
+		UpdateDocumentRequestExecutor updateDocumentRequestExecutor) {
+
+		_updateDocumentRequestExecutor = updateDocumentRequestExecutor;
+	}
+
+	private BulkDocumentRequestExecutor _bulkDocumentRequestExecutor;
 	private DeleteByQueryDocumentRequestExecutor
 		_deleteByQueryDocumentRequestExecutor;
-
-	@Reference
 	private DeleteDocumentRequestExecutor _deleteDocumentRequestExecutor;
-
-	@Reference
 	private GetDocumentRequestExecutor _getDocumentRequestExecutor;
-
-	@Reference
 	private IndexDocumentRequestExecutor _indexDocumentRequestExecutor;
-
-	@Reference
 	private UpdateByQueryDocumentRequestExecutor
 		_updateByQueryDocumentRequestExecutor;
-
-	@Reference
 	private UpdateDocumentRequestExecutor _updateDocumentRequestExecutor;
 
 }

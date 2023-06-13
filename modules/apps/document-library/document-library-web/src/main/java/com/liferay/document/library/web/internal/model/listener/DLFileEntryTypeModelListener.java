@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
-	enabled = false,
+	enabled = false, immediate = true,
 	service = {ModelListener.class, PortalInstanceLifecycleListener.class}
 )
 public class DLFileEntryTypeModelListener
@@ -120,13 +120,12 @@ public class DLFileEntryTypeModelListener
 		Map<Long, ServiceRegistration<?>> serviceRegistrations =
 			new HashMap<>();
 
+		List<Group> companyGroups = _groupLocalService.getCompanyGroups(
+			company.getCompanyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
 		List<DLFileEntryType> dlFileEntryTypes =
 			_dlFileEntryTypeLocalService.getFileEntryTypes(
-				ListUtil.toLongArray(
-					_groupLocalService.getCompanyGroups(
-						company.getCompanyId(), QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS),
-					Group::getGroupId));
+				ListUtil.toLongArray(companyGroups, Group::getGroupId));
 
 		for (DLFileEntryType dlFileEntryType : dlFileEntryTypes) {
 			serviceRegistrations.put(

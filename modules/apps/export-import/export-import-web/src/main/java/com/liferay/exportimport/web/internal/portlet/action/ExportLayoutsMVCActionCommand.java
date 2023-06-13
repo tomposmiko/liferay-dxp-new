@@ -22,12 +22,12 @@ import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportService;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -56,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ExportImportPortletKeys.EXPORT,
 		"mvc.command.name=/export_import/export_layouts"
@@ -96,7 +97,7 @@ public class ExportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 			SessionErrors.add(actionRequest, exception.getClass());
 
 			if (!(exception instanceof LARFileNameException)) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
@@ -134,7 +135,7 @@ public class ExportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 				_exportImportConfigurationSettingsMapFactory.
 					buildExportLayoutSettingsMap(
 						themeDisplay.getUserId(), groupId, privateLayout,
-						_getLayoutIds(actionRequest),
+						getLayoutIds(actionRequest),
 						actionRequest.getParameterMap(),
 						themeDisplay.getLocale(), themeDisplay.getTimeZone());
 		}
@@ -142,20 +143,13 @@ public class ExportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 		String taskName = ParamUtil.getString(actionRequest, "name");
 
 		if (Validator.isNull(taskName)) {
-			Group group = themeDisplay.getScopeGroup();
-
-			if (group.isPrivateLayoutsEnabled()) {
-				if (privateLayout) {
-					taskName = _language.get(
-						actionRequest.getLocale(), "private-pages");
-				}
-				else {
-					taskName = _language.get(
-						actionRequest.getLocale(), "public-pages");
-				}
+			if (privateLayout) {
+				taskName = LanguageUtil.get(
+					actionRequest.getLocale(), "private-pages");
 			}
 			else {
-				taskName = _language.get(actionRequest.getLocale(), "pages");
+				taskName = LanguageUtil.get(
+					actionRequest.getLocale(), "public-pages");
 			}
 		}
 
@@ -164,6 +158,28 @@ public class ExportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 				themeDisplay.getUserId(), taskName,
 				ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
 				exportLayoutSettingsMap);
+	}
+
+	protected long[] getLayoutIds(PortletRequest portletRequest)
+		throws Exception {
+
+		return _exportImportHelper.getLayoutIds(portletRequest);
+	}
+
+	@Reference(unbind = "-")
+	protected void setExportImportConfigurationLocalService(
+		ExportImportConfigurationLocalService
+			exportImportConfigurationLocalService) {
+
+		_exportImportConfigurationLocalService =
+			exportImportConfigurationLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setExportImportService(
+		ExportImportService exportImportService) {
+
+		_exportImportService = exportImportService;
 	}
 
 	protected void setLayoutIdMap(ActionRequest actionRequest) {
@@ -176,24 +192,25 @@ public class ExportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 
 		String treeId = ParamUtil.getString(actionRequest, "treeId");
 
-		actionRequest.setAttribute(
-			"layoutIdMap",
-			_exportImportHelper.getSelectedLayoutsJSON(
-				groupId, privateLayout,
-				SessionTreeJSClicks.getOpenNodes(
-					httpServletRequest, treeId + "SelectedNode")));
+		String openNodes = SessionTreeJSClicks.getOpenNodes(
+			httpServletRequest, treeId + "SelectedNode");
+
+		String selectedLayoutsJSON = _exportImportHelper.getSelectedLayoutsJSON(
+			groupId, privateLayout, openNodes);
+
+		actionRequest.setAttribute("layoutIdMap", selectedLayoutsJSON);
 	}
 
-	private long[] _getLayoutIds(PortletRequest portletRequest)
-		throws Exception {
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
 
-		return _exportImportHelper.getLayoutIds(portletRequest);
+		_layoutLocalService = layoutLocalService;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportLayoutsMVCActionCommand.class);
 
-	@Reference
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
 
@@ -204,11 +221,8 @@ public class ExportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private ExportImportHelper _exportImportHelper;
 
-	@Reference
 	private ExportImportService _exportImportService;
-
-	@Reference
-	private Language _language;
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private Portal _portal;

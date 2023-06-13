@@ -29,9 +29,9 @@ import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapter;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterDeleteRequest;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterGetRequest;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterGetResponse;
-import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterRegistry;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterSaveRequest;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterSaveResponse;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMBeanTranslator;
@@ -47,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = StorageEngineManager.class)
+@Component(immediate = true, service = StorageEngineManager.class)
 public class StorageEngineManagerImpl implements StorageEngineManager {
 
 	@Override
@@ -175,7 +175,7 @@ public class StorageEngineManagerImpl implements StorageEngineManager {
 	}
 
 	private DDMStorageAdapter _getDDMStorageAdapter() {
-		return _ddmStorageAdapterRegistry.getDDMStorageAdapter(
+		return _ddmStorageAdapterTracker.getDDMStorageAdapter(
 			StorageType.DEFAULT.toString());
 	}
 
@@ -217,7 +217,7 @@ public class StorageEngineManagerImpl implements StorageEngineManager {
 	private DDMFormValuesValidator _ddmFormValuesValidator;
 
 	@Reference
-	private DDMStorageAdapterRegistry _ddmStorageAdapterRegistry;
+	private DDMStorageAdapterTracker _ddmStorageAdapterTracker;
 
 	@Reference
 	private DDMStorageLinkLocalService _ddmStorageLinkLocalService;

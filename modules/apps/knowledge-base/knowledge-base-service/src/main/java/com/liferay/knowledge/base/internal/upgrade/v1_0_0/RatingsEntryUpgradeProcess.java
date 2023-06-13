@@ -27,7 +27,7 @@ public class RatingsEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateRatingsEntries();
+		updateRatingsEntries();
 	}
 
 	protected long getClassNameId(String className) throws Exception {
@@ -46,7 +46,7 @@ public class RatingsEntryUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateRatingsEntries() throws Exception {
+	protected void updateRatingsEntries() throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select entryId, score from RatingsEntry where classNameId = " +
 					getClassNameId(_CLASS_NAME_ARTICLE));

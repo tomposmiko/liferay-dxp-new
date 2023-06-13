@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Deactivate;
  *
  * @author Alejandro Tardín
  */
-@Component(service = ContentTransformerHandler.class)
+@Component(immediate = true, service = ContentTransformerHandler.class)
 public class ContentTransformerHandlerImpl
 	implements ContentTransformerHandler {
 
@@ -67,7 +67,7 @@ public class ContentTransformerHandlerImpl
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}

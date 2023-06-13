@@ -17,7 +17,6 @@ package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch7.internal.document.DefaultElasticsearchDocumentFactory;
@@ -34,7 +33,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.common.xcontent.XContentHelper;
-import org.elasticsearch.xcontent.XContentType;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -69,11 +68,11 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	@Before
 	public void setUp() throws Exception {
 		ElasticsearchDocumentFactory elasticsearchDocumentFactory =
-			_createElasticsearchDocumentFactory();
+			createElasticsearchDocumentFactory();
 
 		ElasticsearchBulkableDocumentRequestTranslator
 			elasticsearchBulkableDocumentRequestTranslator =
-				_createElasticsearchBulkableDocumentRequestTranslator(
+				createElasticsearchBulkableDocumentRequestTranslator(
 					elasticsearchDocumentFactory);
 
 		_elasticsearchBulkableDocumentRequestTranslator =
@@ -91,13 +90,13 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 
 	@Test
 	public void testDeleteDocumentRequestTranslationWithNoRefresh() {
-		_testDeleteDocumentRequestTranslation(
+		doTestDeleteDocumentRequestTranslation(
 			false, WriteRequest.RefreshPolicy.NONE);
 	}
 
 	@Test
 	public void testDeleteDocumentRequestTranslationWithRefresh() {
-		_testDeleteDocumentRequestTranslation(
+		doTestDeleteDocumentRequestTranslation(
 			true, WriteRequest.RefreshPolicy.IMMEDIATE);
 	}
 
@@ -105,7 +104,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testIndexDocumentRequestTranslationWithNoRefresh()
 		throws Exception {
 
-		_testIndexDocumentRequestTranslation(
+		doTestIndexDocumentRequestTranslation(
 			"1", false, WriteRequest.RefreshPolicy.NONE);
 	}
 
@@ -113,7 +112,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testIndexDocumentRequestTranslationWithNoRefreshNoId()
 		throws Exception {
 
-		_testIndexDocumentRequestTranslation(
+		doTestIndexDocumentRequestTranslation(
 			null, false, WriteRequest.RefreshPolicy.NONE);
 	}
 
@@ -121,7 +120,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testIndexDocumentRequestTranslationWithRefresh()
 		throws Exception {
 
-		_testIndexDocumentRequestTranslation(
+		doTestIndexDocumentRequestTranslation(
 			"1", true, WriteRequest.RefreshPolicy.IMMEDIATE);
 	}
 
@@ -129,7 +128,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testIndexDocumentRequestTranslationWithRefreshNoId()
 		throws Exception {
 
-		_testIndexDocumentRequestTranslation(
+		doTestIndexDocumentRequestTranslation(
 			null, true, WriteRequest.RefreshPolicy.IMMEDIATE);
 	}
 
@@ -137,7 +136,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testUpdateDocumentRequestTranslationWithNoRefresh()
 		throws Exception {
 
-		_testUpdateDocumentRequestTranslation(
+		doTestUpdateDocumentRequestTranslation(
 			"1", false, WriteRequest.RefreshPolicy.NONE);
 	}
 
@@ -145,7 +144,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testUpdateDocumentRequestTranslationWithNoRefreshNoId()
 		throws Exception {
 
-		_testUpdateDocumentRequestTranslation(
+		doTestUpdateDocumentRequestTranslation(
 			null, false, WriteRequest.RefreshPolicy.NONE);
 	}
 
@@ -153,7 +152,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testUpdateDocumentRequestTranslationWithRefresh()
 		throws Exception {
 
-		_testUpdateDocumentRequestTranslation(
+		doTestUpdateDocumentRequestTranslation(
 			"1", true, WriteRequest.RefreshPolicy.IMMEDIATE);
 	}
 
@@ -161,36 +160,28 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	public void testUpdateDocumentRequestTranslationWithRefreshNoId()
 		throws Exception {
 
-		_testUpdateDocumentRequestTranslation(
+		doTestUpdateDocumentRequestTranslation(
 			null, true, WriteRequest.RefreshPolicy.IMMEDIATE);
 	}
 
-	private ElasticsearchBulkableDocumentRequestTranslator
-		_createElasticsearchBulkableDocumentRequestTranslator(
+	protected static ElasticsearchBulkableDocumentRequestTranslator
+		createElasticsearchBulkableDocumentRequestTranslator(
 			ElasticsearchDocumentFactory elasticsearchDocumentFactory) {
 
-		ElasticsearchBulkableDocumentRequestTranslator
-			elasticsearchBulkableDocumentRequestTranslator =
-				new ElasticsearchBulkableDocumentRequestTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchBulkableDocumentRequestTranslator,
-			"_elasticsearchDocumentFactory", elasticsearchDocumentFactory);
-
-		return elasticsearchBulkableDocumentRequestTranslator;
+		return new ElasticsearchBulkableDocumentRequestTranslatorImpl() {
+			{
+				setElasticsearchDocumentFactory(elasticsearchDocumentFactory);
+			}
+		};
 	}
 
-	private ElasticsearchDocumentFactory _createElasticsearchDocumentFactory() {
+	protected static ElasticsearchDocumentFactory
+		createElasticsearchDocumentFactory() {
+
 		return new DefaultElasticsearchDocumentFactory();
 	}
 
-	private void _setUid(Document document, String uid) {
-		if (!Validator.isBlank(uid)) {
-			document.addKeyword(Field.UID, uid);
-		}
-	}
-
-	private void _testDeleteDocumentRequestTranslation(
+	protected void doTestDeleteDocumentRequestTranslation(
 		boolean refreshPolicy,
 		WriteRequest.RefreshPolicy expectedRefreshPolicy) {
 
@@ -221,7 +212,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 		Assert.assertEquals(1, bulkRequest.numberOfActions());
 	}
 
-	private void _testIndexDocumentRequestTranslation(
+	protected void doTestIndexDocumentRequestTranslation(
 			String id, boolean refreshPolicy,
 			WriteRequest.RefreshPolicy expectedRefreshPolicy)
 		throws Exception {
@@ -261,7 +252,7 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 		Assert.assertEquals(1, bulkRequest.numberOfActions());
 	}
 
-	private void _testUpdateDocumentRequestTranslation(
+	protected void doTestUpdateDocumentRequestTranslation(
 			String id, boolean refreshPolicy,
 			WriteRequest.RefreshPolicy expectedRefreshPolicy)
 		throws Exception {
@@ -301,6 +292,12 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 				updateDocumentRequest));
 
 		Assert.assertEquals(1, bulkRequest.numberOfActions());
+	}
+
+	private void _setUid(Document document, String uid) {
+		if (!Validator.isBlank(uid)) {
+			document.addKeyword(Field.UID, uid);
+		}
 	}
 
 	private static final String _INDEX_NAME = "test_request_index";

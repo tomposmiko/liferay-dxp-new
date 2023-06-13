@@ -14,7 +14,6 @@
 
 package com.liferay.saml.opensaml.integration.internal.util;
 
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -104,8 +103,6 @@ public class SamlUtil {
 		Map<String, List<Serializable>> attributesMap = new HashMap<>();
 
 		for (Attribute attribute : attributes) {
-			boolean implicitMapping = false;
-
 			String key = attributeMappingsProperties.getProperty(
 				attribute.getName());
 
@@ -117,13 +114,6 @@ public class SamlUtil {
 			}
 
 			if (Validator.isNull(key)) {
-				if (attributeMappingsProperties.containsKey(
-						attribute.getName())) {
-
-					continue;
-				}
-
-				implicitMapping = true;
 				key = attribute.getName();
 			}
 
@@ -139,12 +129,7 @@ public class SamlUtil {
 				Serializable value = getXMLObjectValue(xmlObject);
 
 				if (value != null) {
-					if (implicitMapping) {
-						values.add(value);
-					}
-					else {
-						values.add(0, value);
-					}
+					values.add(value);
 				}
 			}
 
@@ -352,8 +337,7 @@ public class SamlUtil {
 	}
 
 	public static AssertionConsumerService resolverAssertionConsumerService(
-		MessageContext<?> messageContext, String binding,
-		boolean dynamicACSURL) {
+		MessageContext<?> messageContext, String binding) {
 
 		AuthnRequest authnRequest = getAuthnRequest(messageContext);
 
@@ -365,8 +349,6 @@ public class SamlUtil {
 				authnRequest.getAssertionConsumerServiceIndex();
 			assertionConsumerServiceURL =
 				authnRequest.getAssertionConsumerServiceURL();
-			binding = GetterUtil.getString(
-				authnRequest.getProtocolBinding(), binding);
 		}
 
 		SAMLPeerEntityContext samlPeerEntityContext =
@@ -400,11 +382,6 @@ public class SamlUtil {
 
 				return assertionConsumerService;
 			}
-		}
-
-		if (dynamicACSURL && Validator.isNotNull(assertionConsumerServiceURL)) {
-			return OpenSamlUtil.buildAssertionConsumerService(
-				binding, -1, false, assertionConsumerServiceURL);
 		}
 
 		for (AssertionConsumerService assertionConsumerService :

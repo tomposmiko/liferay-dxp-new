@@ -5,37 +5,15 @@ definition {
 		Variables.assertDefined(parameterList = "${groupId},${tagName}");
 
 		var portalURL = JSONCompany.getPortalURL();
-		var userLoginInfo = JSONUtil2.formatJSONUser();
 
 		var curl = '''
 			${portalURL}/api/jsonws/assettag/add-tag \
-				-u ${userLoginInfo} \
+			-u test@liferay.com:test \
 				-d groupId=${groupId} \
 				-d name=${tagName}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
-	}
-
-	macro _getTagId {
-		Variables.assertDefined(parameterList = "${groupId},${tagName}");
-
-		var portalURL = JSONCompany.getPortalURL();
-		var userLoginInfo = JSONUtil2.formatJSONUser();
-
-		var curl = '''
-			${portalURL}/api/jsonws/assettag/get-tags \
-				-u ${userLoginInfo} \
-				-d groupIds=[${groupId}] \
-				-d name='${tagName}' \
-				-d 'start=-1' \
-				-d 'end=-1' \
-				-d -orderByComparator=
-		''';
-
-		var tagId = JSONCurlUtil.post(${curl}, "$..['tagId']");
-
-		return ${tagId};
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 }

@@ -20,6 +20,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -37,6 +38,7 @@ import com.liferay.portal.workflow.metrics.service.WorkflowMetricsSLADefinitionL
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -182,26 +184,26 @@ public class SLAResourceImpl extends BaseSLAResourceImpl {
 	}
 
 	private NodeKey[] _toNodeKeys(String nodeKeysString) {
-		return transform(
-			StringUtil.split(nodeKeysString),
-			nodeKey -> {
-				String[] nodeKeyStringParts = StringUtil.split(
-					nodeKey, StringPool.COLON);
+		return Stream.of(
+			StringUtil.split(nodeKeysString)
+		).map(
+			nodeKey -> StringUtil.split(nodeKey, StringPool.COLON)
+		).map(
+			nodeKeyStringParts -> new NodeKey() {
+				{
+					id = nodeKeyStringParts[0];
 
-				return new NodeKey() {
-					{
-						id = nodeKeyStringParts[0];
-
-						if (nodeKeyStringParts.length == 1) {
-							executionType = StringPool.BLANK;
-						}
-						else {
-							executionType = nodeKeyStringParts[1];
-						}
+					if (nodeKeyStringParts.length == 1) {
+						executionType = StringPool.BLANK;
 					}
-				};
-			},
-			NodeKey.class);
+					else {
+						executionType = nodeKeyStringParts[1];
+					}
+				}
+			}
+		).toArray(
+			NodeKey[]::new
+		);
 	}
 
 	private SLA _toSLA(
@@ -279,8 +281,13 @@ public class SLAResourceImpl extends BaseSLAResourceImpl {
 	}
 
 	private String[] _toStringArray(NodeKey[] nodeKeys) {
-		return transform(
-			nodeKeys,
+		if (ArrayUtil.isEmpty(nodeKeys)) {
+			return new String[0];
+		}
+
+		return Stream.of(
+			nodeKeys
+		).map(
 			nodeKey -> {
 				if (Validator.isNull(nodeKey.getExecutionType())) {
 					return nodeKey.getId();
@@ -289,8 +296,10 @@ public class SLAResourceImpl extends BaseSLAResourceImpl {
 				return StringBundler.concat(
 					nodeKey.getId(), CharPool.COLON,
 					nodeKey.getExecutionType());
-			},
-			String.class);
+			}
+		).toArray(
+			String[]::new
+		);
 	}
 
 	private String[] _toStringArray(PauseNodeKeys pauseNodeKeys) {

@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -21,10 +19,8 @@ definition {
 			ACUtils.launchDXP();
 		}
 
-		task ("Add a new site with a public widget page, then add a blog") {
+		task ("Add a new site with a public widget page") {
 			ACUtils.addSiteAndPage();
-
-			ACUtils.createBlogsAndAddToPage();
 		}
 
 		task ("Connect the DXP to AC") {
@@ -35,57 +31,44 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8911 | Test Summary: Enriched profiles increases by 1 when an anonymous individual converted to a known individual"
-	@priority = 5
+	@priority = "5"
 	test IncreaseByOneWhenAnonymousIndividualConvertedToKnownIndividual {
-		property analytics.cloud.upstream = "false";
-		property portal.acceptance = "false";
-		property portal.release = "false";
-
-		task ("Add a new user") {
-			JSONUser.addUser(
-				userEmailAddress = "ac@liferay.com",
-				userFirstName = "ac",
-				userLastName = "ac",
-				userScreenName = "ac");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "ac@liferay.com");
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
 
-		task ("View the blog as a new user") {
-			ACUtils.navigateToSitePageWithUser(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
-				emailList = "ac@liferay.com",
+		task ("Sign out") {
+			UserBar.signOut();
+		}
+
+		task ("View the site page as guest") {
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
 
 		task ("Close Sessions") {
-			ACUtils.closeAllSessionsAndWait();
+			ACUtils.closeAllSessions();
 		}
 
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to the Overview on the Individuals dashboard") {
@@ -97,45 +80,38 @@ definition {
 		task ("View the number of Total Individuals, Known, Anonymous and Enriched Profiles") {
 			ACCards.viewTotalCount(
 				cardName = "Total Individuals",
-				count = 1);
+				count = "1");
 
 			ACCards.viewTotalCount(
 				cardName = "Known",
-				count = 0);
+				count = "0");
 
 			ACCards.viewTotalCount(
 				cardName = "Anonymous",
-				count = 1);
+				count = "1");
 
 			ACCards.viewTotalCount(
 				cardName = "Enriched Profiles",
 				count = "0 Profiles");
 		}
 
-		task ("Sync the new user and view the blog") {
-			ACUtils.launchDXP();
+		task ("Sign in as Test Test") {
+			var portalURL = PropsUtil.get("portal.url");
 
-			ACDXPSettings.syncNewContactData();
-
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "ac@liferay.com",
-				userLoginFullName = "ac ac");
-
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
-				pageName = "AC Page",
-				siteName = "Site Name");
+			User.firstLoginUI(
+				password = "test",
+				specificURL = "${portalURL}/web/site-name/ac-page",
+				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Close Sessions") {
-			ACUtils.closeAllSessionsAndWait();
+			ACUtils.closeAllSessions();
 		}
 
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to the Overview on the Individuals dashboard") {
@@ -147,15 +123,15 @@ definition {
 		task ("View the number of Total Individuals, Known and Anonymous") {
 			ACCards.viewTotalCount(
 				cardName = "Total Individuals",
-				count = 1);
+				count = "1");
 
 			ACCards.viewTotalCount(
 				cardName = "Known",
-				count = 1);
+				count = "1");
 
 			ACCards.viewTotalCount(
 				cardName = "Anonymous",
-				count = 0);
+				count = "0");
 
 			ACCards.viewTotalCount(
 				cardName = "Enriched Profiles",

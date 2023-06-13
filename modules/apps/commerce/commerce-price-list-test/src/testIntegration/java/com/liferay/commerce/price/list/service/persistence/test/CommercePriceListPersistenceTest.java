@@ -15,7 +15,6 @@
 package com.liferay.commerce.price.list.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.price.list.exception.DuplicateCommercePriceListExternalReferenceCodeException;
 import com.liferay.commerce.price.list.exception.NoSuchPriceListException;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.service.CommercePriceListLocalServiceUtil;
@@ -128,10 +127,6 @@ public class CommercePriceListPersistenceTest {
 
 		CommercePriceList newCommercePriceList = _persistence.create(pk);
 
-		newCommercePriceList.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCommercePriceList.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newCommercePriceList.setUuid(RandomTestUtil.randomString());
 
 		newCommercePriceList.setExternalReferenceCode(
@@ -184,12 +179,6 @@ public class CommercePriceListPersistenceTest {
 		CommercePriceList existingCommercePriceList =
 			_persistence.findByPrimaryKey(newCommercePriceList.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommercePriceList.getMvccVersion(),
-			newCommercePriceList.getMvccVersion());
-		Assert.assertEquals(
-			existingCommercePriceList.getCtCollectionId(),
-			newCommercePriceList.getCtCollectionId());
 		Assert.assertEquals(
 			existingCommercePriceList.getUuid(),
 			newCommercePriceList.getUuid());
@@ -261,28 +250,6 @@ public class CommercePriceListPersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingCommercePriceList.getStatusDate()),
 			Time.getShortTimestamp(newCommercePriceList.getStatusDate()));
-	}
-
-	@Test(
-		expected = DuplicateCommercePriceListExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommercePriceList commercePriceList = addCommercePriceList();
-
-		CommercePriceList newCommercePriceList = addCommercePriceList();
-
-		newCommercePriceList.setCompanyId(commercePriceList.getCompanyId());
-
-		newCommercePriceList = _persistence.update(newCommercePriceList);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommercePriceList);
-
-		newCommercePriceList.setExternalReferenceCode(
-			commercePriceList.getExternalReferenceCode());
-
-		_persistence.update(newCommercePriceList);
 	}
 
 	@Test
@@ -410,50 +377,12 @@ public class CommercePriceListPersistenceTest {
 	}
 
 	@Test
-	public void testCountByG_C_T_S() throws Exception {
-		_persistence.countByG_C_T_S(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(), "",
-			RandomTestUtil.nextInt());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByG_C_T_S(0L, 0L, "null", 0);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByG_C_T_S(0L, 0L, (String)null, 0);
-	}
-
-	@Test
-	public void testCountByG_C_T_SArrayable() throws Exception {
-		_persistence.countByG_C_T_S(
-			new long[] {RandomTestUtil.nextLong(), 0L},
-			RandomTestUtil.nextLong(), RandomTestUtil.randomString(),
-			RandomTestUtil.nextInt());
-	}
-
-	@Test
-	public void testCountByG_C_T_NotS() throws Exception {
-		_persistence.countByG_C_T_NotS(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(), "",
-			RandomTestUtil.nextInt());
-
-		_persistence.countByG_C_T_NotS(0L, 0L, "null", 0);
-
-		_persistence.countByG_C_T_NotS(0L, 0L, (String)null, 0);
-	}
-
-	@Test
-	public void testCountByG_C_T_NotSArrayable() throws Exception {
-		_persistence.countByG_C_T_NotS(
-			new long[] {RandomTestUtil.nextLong(), 0L},
-			RandomTestUtil.nextLong(), RandomTestUtil.randomString(),
-			RandomTestUtil.nextInt());
-	}
-
-	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByERC_C("null", 0L);
-
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -481,16 +410,15 @@ public class CommercePriceListPersistenceTest {
 
 	protected OrderByComparator<CommercePriceList> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommercePriceList", "mvccVersion", true, "ctCollectionId", true,
-			"uuid", true, "externalReferenceCode", true, "commercePriceListId",
-			true, "groupId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"commerceCurrencyId", true, "parentCommercePriceListId", true,
-			"catalogBasePriceList", true, "netPrice", true, "type", true,
-			"name", true, "priority", true, "displayDate", true,
-			"expirationDate", true, "lastPublishDate", true, "status", true,
-			"statusByUserId", true, "statusByUserName", true, "statusDate",
-			true);
+			"CommercePriceList", "uuid", true, "externalReferenceCode", true,
+			"commercePriceListId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "commerceCurrencyId", true,
+			"parentCommercePriceListId", true, "catalogBasePriceList", true,
+			"netPrice", true, "type", true, "name", true, "priority", true,
+			"displayDate", true, "expirationDate", true, "lastPublishDate",
+			true, "status", true, "statusByUserId", true, "statusByUserName",
+			true, "statusDate", true);
 	}
 
 	@Test
@@ -811,25 +739,21 @@ public class CommercePriceListPersistenceTest {
 				new Class<?>[] {String.class}, "type_"));
 
 		Assert.assertEquals(
-			commercePriceList.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				commercePriceList, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(commercePriceList.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				commercePriceList, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			commercePriceList.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				commercePriceList, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CommercePriceList addCommercePriceList() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		CommercePriceList commercePriceList = _persistence.create(pk);
-
-		commercePriceList.setMvccVersion(RandomTestUtil.nextLong());
-
-		commercePriceList.setCtCollectionId(RandomTestUtil.nextLong());
 
 		commercePriceList.setUuid(RandomTestUtil.randomString());
 

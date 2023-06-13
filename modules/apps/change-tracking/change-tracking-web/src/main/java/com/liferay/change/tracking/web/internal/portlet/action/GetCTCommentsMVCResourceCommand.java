@@ -20,7 +20,7 @@ import com.liferay.change.tracking.model.CTCommentTable;
 import com.liferay.change.tracking.service.CTCommentLocalService;
 import com.liferay.change.tracking.web.internal.display.context.DisplayContextUtil;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/get_ct_comments"
@@ -72,7 +73,7 @@ public class GetCTCommentsMVCResourceCommand extends BaseMVCResourceCommand {
 	protected JSONObject getCTCommentsJSONObject(
 		ResourceRequest resourceRequest) {
 
-		JSONArray commentsJSONArray = jsonFactory.createJSONArray();
+		JSONArray commentsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -117,16 +118,13 @@ public class GetCTCommentsMVCResourceCommand extends BaseMVCResourceCommand {
 				));
 		}
 
-		return JSONUtil.put(
-			"comments", commentsJSONArray
-		).put(
-			"userInfo",
-			() -> {
-				if (ctComments.isEmpty()) {
-					return null;
-				}
+		JSONObject ctCommentsJSONObject = JSONUtil.put(
+			"comments", commentsJSONArray);
 
-				return DisplayContextUtil.getUserInfoJSONObject(
+		if (!ctComments.isEmpty()) {
+			ctCommentsJSONObject.put(
+				"userInfo",
+				DisplayContextUtil.getUserInfoJSONObject(
 					CTCommentTable.INSTANCE.userId.eq(
 						UserTable.INSTANCE.userId),
 					CTCommentTable.INSTANCE, themeDisplay, userLocalService,
@@ -134,16 +132,14 @@ public class GetCTCommentsMVCResourceCommand extends BaseMVCResourceCommand {
 						ctCollectionId
 					).and(
 						CTCommentTable.INSTANCE.ctEntryId.eq(ctEntryId)
-					));
-			}
-		);
+					)));
+		}
+
+		return ctCommentsJSONObject;
 	}
 
 	@Reference
 	protected CTCommentLocalService ctCommentLocalService;
-
-	@Reference
-	protected JSONFactory jsonFactory;
 
 	@Reference
 	protected Language language;

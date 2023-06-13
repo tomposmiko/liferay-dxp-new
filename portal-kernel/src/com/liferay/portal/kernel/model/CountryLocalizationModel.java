@@ -146,8 +146,4 @@ public interface CountryLocalizationModel
 	@Override
 	public CountryLocalization cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

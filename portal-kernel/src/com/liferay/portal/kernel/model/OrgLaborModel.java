@@ -112,18 +112,18 @@ public interface OrgLaborModel
 	public void setOrganizationId(long organizationId);
 
 	/**
-	 * Returns the list type ID of this org labor.
+	 * Returns the type ID of this org labor.
 	 *
-	 * @return the list type ID of this org labor
+	 * @return the type ID of this org labor
 	 */
-	public long getListTypeId();
+	public long getTypeId();
 
 	/**
-	 * Sets the list type ID of this org labor.
+	 * Sets the type ID of this org labor.
 	 *
-	 * @param listTypeId the list type ID of this org labor
+	 * @param typeId the type ID of this org labor
 	 */
-	public void setListTypeId(long listTypeId);
+	public void setTypeId(long typeId);
 
 	/**
 	 * Returns the sun open of this org labor.
@@ -323,9 +323,5 @@ public interface OrgLaborModel
 
 	@Override
 	public OrgLabor cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

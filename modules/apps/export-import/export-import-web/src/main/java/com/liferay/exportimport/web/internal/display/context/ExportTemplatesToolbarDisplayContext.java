@@ -23,15 +23,16 @@ import com.liferay.exportimport.web.internal.search.ExportImportConfigurationSea
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.BaseManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.site.display.context.GroupDisplayContextHelper;
+import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.portlet.PortletURL;
@@ -134,20 +135,27 @@ public class ExportTemplatesToolbarDisplayContext
 			new ExportImportConfigurationNameComparator(
 				Objects.equals(getOrderByType(), "asc")));
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			() ->
-				ExportImportConfigurationLocalServiceUtil.
-					getExportImportConfigurations(
-						company.getCompanyId(), liveGroupId,
-						exportImportConfigurationSearchTerms.getKeywords(),
-						ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
-						searchContainer.getStart(), searchContainer.getEnd(),
-						searchContainer.getOrderByComparator()),
+
+		int exportImportConfigurationType =
+			ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT;
+
+		List<ExportImportConfiguration> results =
+			ExportImportConfigurationLocalServiceUtil.
+				getExportImportConfigurations(
+					company.getCompanyId(), liveGroupId,
+					exportImportConfigurationSearchTerms.getKeywords(),
+					exportImportConfigurationType, searchContainer.getStart(),
+					searchContainer.getEnd(),
+					searchContainer.getOrderByComparator());
+		int total =
 			ExportImportConfigurationLocalServiceUtil.
 				getExportImportConfigurationsCount(
 					company.getCompanyId(), liveGroupId,
 					exportImportConfigurationSearchTerms.getKeywords(),
-					ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT));
+					exportImportConfigurationType);
+
+		searchContainer.setResults(results);
+		searchContainer.setTotal(total);
 
 		return searchContainer;
 	}

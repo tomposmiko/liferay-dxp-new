@@ -93,13 +93,14 @@ public class SearchContextFactory {
 
 		// Asset
 
-		searchContext.setAssetCategoryIds(
-			StringUtil.split(
-				ParamUtil.getString(httpServletRequest, "assetCategoryIds"),
-				0L));
-		searchContext.setAssetTagNames(
-			StringUtil.split(
-				ParamUtil.getString(httpServletRequest, "assetTagNames")));
+		long[] assetCategoryIds = StringUtil.split(
+			ParamUtil.getString(httpServletRequest, "assetCategoryIds"), 0L);
+
+		String[] assetTagNames = StringUtil.split(
+			ParamUtil.getString(httpServletRequest, "assetTagNames"));
+
+		searchContext.setAssetCategoryIds(assetCategoryIds);
+		searchContext.setAssetTagNames(assetTagNames);
 
 		// Keywords
 

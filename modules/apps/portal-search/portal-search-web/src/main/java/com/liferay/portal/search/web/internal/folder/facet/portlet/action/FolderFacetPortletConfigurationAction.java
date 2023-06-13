@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.web.internal.facet.display.context.builder.FolderSearchFacetDisplayContextBuilder;
+import com.liferay.portal.search.web.internal.facet.display.builder.FolderSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.folder.facet.constants.FolderFacetPortletKeys;
 
 import javax.portlet.PortletConfig;
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + FolderFacetPortletKeys.FOLDER_FACET,
 	service = ConfigurationAction.class
 )
@@ -55,23 +56,21 @@ public class FolderFacetPortletConfigurationAction
 			(RenderRequest)httpServletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_REQUEST);
 
-		FolderSearchFacetDisplayContextBuilder
-			folderSearchFacetDisplayContextBuilder =
-				_createFolderSearchFacetDisplayContextBuilder(renderRequest);
+		FolderSearchFacetDisplayBuilder folderSearchFacetDisplayBuilder =
+			createFolderSearchFacetDisplayBuilder(renderRequest);
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			folderSearchFacetDisplayContextBuilder.build());
+			folderSearchFacetDisplayBuilder.build());
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
 
-	private FolderSearchFacetDisplayContextBuilder
-		_createFolderSearchFacetDisplayContextBuilder(
-			RenderRequest renderRequest) {
+	protected FolderSearchFacetDisplayBuilder
+		createFolderSearchFacetDisplayBuilder(RenderRequest renderRequest) {
 
 		try {
-			return new FolderSearchFacetDisplayContextBuilder(renderRequest);
+			return new FolderSearchFacetDisplayBuilder(renderRequest);
 		}
 		catch (ConfigurationException configurationException) {
 			throw new RuntimeException(configurationException);

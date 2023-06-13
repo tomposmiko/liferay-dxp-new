@@ -106,7 +106,7 @@ public class AssetEntryInfoItemFieldValuesProvider
 			new InfoFieldValue<>(
 				AssetEntryInfoItemFields.urlInfoField, assetEntry.getUrl()),
 			new InfoFieldValue<>(
-				AssetEntryInfoItemFields.userProfileImageInfoField,
+				AssetEntryInfoItemFields.userProfileImage,
 				_getUserNameProfileImage(assetEntry.getUserId())));
 	}
 
@@ -137,7 +137,7 @@ public class AssetEntryInfoItemFieldValuesProvider
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -175,7 +175,7 @@ public class AssetEntryInfoItemFieldValuesProvider
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}

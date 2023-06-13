@@ -307,8 +307,4 @@ public interface WorkflowDefinitionLinkModel
 	@Override
 	public WorkflowDefinitionLink cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

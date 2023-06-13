@@ -72,7 +72,7 @@ public class CustomizationSettingsUtil {
 				currentThread.setContextClassLoader(pluginClassLoader);
 			}
 
-			_processCustomizationSettings(
+			doProcessCustomizationSettings(
 				httpServletRequest, httpServletResponse, templateResource,
 				langType);
 		}
@@ -85,7 +85,7 @@ public class CustomizationSettingsUtil {
 		}
 	}
 
-	private static void _processCustomizationSettings(
+	protected static void doProcessCustomizationSettings(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse,
 			TemplateResource templateResource, String langType)
@@ -115,7 +115,7 @@ public class CustomizationSettingsUtil {
 			template.processTemplate(httpServletResponse.getWriter());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw exception;
 		}

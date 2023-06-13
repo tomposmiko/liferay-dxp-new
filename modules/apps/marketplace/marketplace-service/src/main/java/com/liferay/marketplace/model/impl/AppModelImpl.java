@@ -19,6 +19,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.marketplace.model.App;
 import com.liferay.marketplace.model.AppModel;
+import com.liferay.marketplace.model.AppSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -36,15 +37,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -162,6 +166,61 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static App toModel(AppSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		App model = new AppImpl();
+
+		model.setUuid(soapModel.getUuid());
+		model.setAppId(soapModel.getAppId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setRemoteAppId(soapModel.getRemoteAppId());
+		model.setTitle(soapModel.getTitle());
+		model.setDescription(soapModel.getDescription());
+		model.setCategory(soapModel.getCategory());
+		model.setIconURL(soapModel.getIconURL());
+		model.setVersion(soapModel.getVersion());
+		model.setRequired(soapModel.isRequired());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<App> toModels(AppSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<App> models = new ArrayList<App>(soapModels.length);
+
+		for (AppSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public AppModelImpl() {
 	}
 
@@ -233,87 +292,100 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 	}
 
 	public Map<String, Function<App, Object>> getAttributeGetterFunctions() {
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<App, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, App>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<App, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			App.class.getClassLoader(), App.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<App, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<App, Object>>();
+		try {
+			Constructor<App> constructor =
+				(Constructor<App>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put("uuid", App::getUuid);
-			attributeGetterFunctions.put("appId", App::getAppId);
-			attributeGetterFunctions.put("companyId", App::getCompanyId);
-			attributeGetterFunctions.put("userId", App::getUserId);
-			attributeGetterFunctions.put("userName", App::getUserName);
-			attributeGetterFunctions.put("createDate", App::getCreateDate);
-			attributeGetterFunctions.put("modifiedDate", App::getModifiedDate);
-			attributeGetterFunctions.put("remoteAppId", App::getRemoteAppId);
-			attributeGetterFunctions.put("title", App::getTitle);
-			attributeGetterFunctions.put("description", App::getDescription);
-			attributeGetterFunctions.put("category", App::getCategory);
-			attributeGetterFunctions.put("iconURL", App::getIconURL);
-			attributeGetterFunctions.put("version", App::getVersion);
-			attributeGetterFunctions.put("required", App::getRequired);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<App, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<App, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<App, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<App, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<App, Object>>();
+		Map<String, BiConsumer<App, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<App, ?>>();
 
-		static {
-			Map<String, BiConsumer<App, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<App, ?>>();
+		attributeGetterFunctions.put("uuid", App::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<App, String>)App::setUuid);
+		attributeGetterFunctions.put("appId", App::getAppId);
+		attributeSetterBiConsumers.put(
+			"appId", (BiConsumer<App, Long>)App::setAppId);
+		attributeGetterFunctions.put("companyId", App::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<App, Long>)App::setCompanyId);
+		attributeGetterFunctions.put("userId", App::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<App, Long>)App::setUserId);
+		attributeGetterFunctions.put("userName", App::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<App, String>)App::setUserName);
+		attributeGetterFunctions.put("createDate", App::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate", (BiConsumer<App, Date>)App::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", App::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate", (BiConsumer<App, Date>)App::setModifiedDate);
+		attributeGetterFunctions.put("remoteAppId", App::getRemoteAppId);
+		attributeSetterBiConsumers.put(
+			"remoteAppId", (BiConsumer<App, Long>)App::setRemoteAppId);
+		attributeGetterFunctions.put("title", App::getTitle);
+		attributeSetterBiConsumers.put(
+			"title", (BiConsumer<App, String>)App::setTitle);
+		attributeGetterFunctions.put("description", App::getDescription);
+		attributeSetterBiConsumers.put(
+			"description", (BiConsumer<App, String>)App::setDescription);
+		attributeGetterFunctions.put("category", App::getCategory);
+		attributeSetterBiConsumers.put(
+			"category", (BiConsumer<App, String>)App::setCategory);
+		attributeGetterFunctions.put("iconURL", App::getIconURL);
+		attributeSetterBiConsumers.put(
+			"iconURL", (BiConsumer<App, String>)App::setIconURL);
+		attributeGetterFunctions.put("version", App::getVersion);
+		attributeSetterBiConsumers.put(
+			"version", (BiConsumer<App, String>)App::setVersion);
+		attributeGetterFunctions.put("required", App::getRequired);
+		attributeSetterBiConsumers.put(
+			"required", (BiConsumer<App, Boolean>)App::setRequired);
 
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<App, String>)App::setUuid);
-			attributeSetterBiConsumers.put(
-				"appId", (BiConsumer<App, Long>)App::setAppId);
-			attributeSetterBiConsumers.put(
-				"companyId", (BiConsumer<App, Long>)App::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<App, Long>)App::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName", (BiConsumer<App, String>)App::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate", (BiConsumer<App, Date>)App::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate", (BiConsumer<App, Date>)App::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"remoteAppId", (BiConsumer<App, Long>)App::setRemoteAppId);
-			attributeSetterBiConsumers.put(
-				"title", (BiConsumer<App, String>)App::setTitle);
-			attributeSetterBiConsumers.put(
-				"description", (BiConsumer<App, String>)App::setDescription);
-			attributeSetterBiConsumers.put(
-				"category", (BiConsumer<App, String>)App::setCategory);
-			attributeSetterBiConsumers.put(
-				"iconURL", (BiConsumer<App, String>)App::setIconURL);
-			attributeSetterBiConsumers.put(
-				"version", (BiConsumer<App, String>)App::setVersion);
-			attributeSetterBiConsumers.put(
-				"required", (BiConsumer<App, Boolean>)App::setRequired);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -941,12 +1013,40 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<App, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<App, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<App, Object> attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((App)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, App>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					App.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -969,9 +1069,8 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<App, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<App, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

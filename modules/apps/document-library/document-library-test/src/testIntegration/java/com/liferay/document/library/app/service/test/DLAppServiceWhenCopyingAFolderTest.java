@@ -60,7 +60,7 @@ public class DLAppServiceWhenCopyingAFolderTest extends BaseDLAppTestCase {
 				ServiceContextTestUtil.getServiceContext(group.getGroupId());
 
 			Folder folder = DLAppServiceUtil.addFolder(
-				null, group.getGroupId(), parentFolder.getFolderId(),
+				group.getGroupId(), parentFolder.getFolderId(),
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				serviceContext);
 
@@ -70,7 +70,7 @@ public class DLAppServiceWhenCopyingAFolderTest extends BaseDLAppTestCase {
 			Assert.assertEquals(
 				1,
 				workflowHandlerInvocationCounter.getCount(
-					"updateStatus", Object.class, int.class, Map.class));
+					"updateStatus", int.class, Map.class));
 
 			DLAppServiceUtil.copyFolder(
 				folder.getRepositoryId(), folder.getFolderId(),
@@ -80,7 +80,7 @@ public class DLAppServiceWhenCopyingAFolderTest extends BaseDLAppTestCase {
 			Assert.assertEquals(
 				2,
 				workflowHandlerInvocationCounter.getCount(
-					"updateStatus", Object.class, int.class, Map.class));
+					"updateStatus", int.class, Map.class));
 		}
 	}
 
@@ -94,11 +94,11 @@ public class DLAppServiceWhenCopyingAFolderTest extends BaseDLAppTestCase {
 			ServiceContextTestUtil.getServiceContext(group.getGroupId());
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(), parentFolder.getFolderId(),
+			group.getGroupId(), parentFolder.getFolderId(),
 			RandomTestUtil.randomString(), StringPool.BLANK, serviceContext);
 
 		DLAppServiceUtil.addFolder(
-			null, group.getGroupId(), folder.getFolderId(),
+			group.getGroupId(), folder.getFolderId(),
 			RandomTestUtil.randomString(), StringPool.BLANK, serviceContext);
 
 		DLAppServiceUtil.copyFolder(

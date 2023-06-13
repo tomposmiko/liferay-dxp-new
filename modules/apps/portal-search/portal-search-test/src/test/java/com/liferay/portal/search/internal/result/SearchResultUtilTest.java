@@ -17,7 +17,6 @@ package com.liferay.portal.search.internal.result;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
@@ -27,39 +26,34 @@ import com.liferay.portal.kernel.search.SearchResult;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.SummaryFactory;
 import com.liferay.portal.kernel.search.result.SearchResultTranslator;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.test.util.BaseSearchResultUtilTestCase;
 import com.liferay.portal.search.test.util.SearchTestUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author André de Oliveira
  */
+@PrepareForTest(AssetRendererFactoryRegistryUtil.class)
+@RunWith(PowerMockRunner.class)
 public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@After
-	public void tearDown() {
-		_searchResultManagerImpl.deactivate();
-	}
 
 	@Test
 	public void testBlankDocument() {
@@ -67,7 +61,7 @@ public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
 
 		Assert.assertNull(searchResult.getSummary());
 
-		_assertSearchResult(searchResult);
+		assertSearchResult(searchResult);
 	}
 
 	@Test
@@ -81,33 +75,30 @@ public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
 	@Test
 	public void testSummaryFromAssetRenderer() throws Exception {
 		Mockito.when(
-			_assetRenderer.getSearchSummary(Mockito.any())
+			_assetRenderer.getSearchSummary((Locale)Matchers.any())
 		).thenReturn(
 			SearchTestUtil.SUMMARY_CONTENT
 		);
 
 		Mockito.when(
-			_assetRenderer.getTitle(Mockito.any())
+			_assetRenderer.getTitle((Locale)Matchers.any())
 		).thenReturn(
 			SearchTestUtil.SUMMARY_TITLE
 		);
 
 		Mockito.when(
-			_assetRendererFactory.getAssetRenderer(Mockito.anyLong())
+			_assetRendererFactory.getAssetRenderer(Matchers.anyLong())
 		).thenReturn(
 			_assetRenderer
 		);
 
-		Mockito.when(
-			_serviceTrackerMap.getService(Mockito.anyString())
-		).thenReturn(
-			(AssetRendererFactory)_assetRendererFactory
+		PowerMockito.stub(
+			PowerMockito.method(
+				AssetRendererFactoryRegistryUtil.class,
+				"getAssetRendererFactoryByClassName", String.class)
+		).toReturn(
+			_assetRendererFactory
 		);
-
-		ReflectionTestUtil.setFieldValue(
-			AssetRendererFactoryRegistryUtil.class,
-			"_classNameAssetRenderFactoriesServiceTrackerMap",
-			_serviceTrackerMap);
 
 		SearchResult searchResult = assertOneSearchResult(new DocumentImpl());
 
@@ -120,7 +111,7 @@ public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
 			summary.getMaxContentLength());
 		Assert.assertEquals(SearchTestUtil.SUMMARY_TITLE, summary.getTitle());
 
-		_assertSearchResult(searchResult);
+		assertSearchResult(searchResult);
 	}
 
 	@Test
@@ -130,9 +121,9 @@ public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
 
 		Mockito.when(
 			_indexer.getSummary(
-				Mockito.any(), Mockito.anyString(),
-				(PortletRequest)Mockito.isNull(),
-				(PortletResponse)Mockito.isNull())
+				(Document)Matchers.any(), Matchers.anyString(),
+				(PortletRequest)Matchers.isNull(),
+				(PortletResponse)Matchers.isNull())
 		).thenReturn(
 			summary
 		);
@@ -147,7 +138,7 @@ public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
 
 		Assert.assertSame(summary, searchResult.getSummary());
 
-		_assertSearchResult(searchResult);
+		assertSearchResult(searchResult);
 	}
 
 	@Test
@@ -169,19 +160,7 @@ public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
 			searchResult.getClassPK(), SearchTestUtil.ENTRY_CLASS_PK);
 	}
 
-	@Override
-	protected SearchResultTranslator createSearchResultTranslator() {
-		SearchResultTranslatorImpl searchResultTranslatorImpl =
-			new SearchResultTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			searchResultTranslatorImpl, "_searchResultManager",
-			_createSearchResultManagerImpl());
-
-		return searchResultTranslatorImpl;
-	}
-
-	private void _assertSearchResult(SearchResult searchResult) {
+	protected void assertSearchResult(SearchResult searchResult) {
 		Assert.assertEquals(StringPool.BLANK, searchResult.getClassName());
 		Assert.assertEquals(0L, searchResult.getClassPK());
 
@@ -190,40 +169,46 @@ public class SearchResultUtilTest extends BaseSearchResultUtilTestCase {
 		assertEmptyVersions(searchResult);
 	}
 
-	private SearchResultManagerImpl _createSearchResultManagerImpl() {
-		_searchResultManagerImpl = new SearchResultManagerImpl();
+	protected SearchResultManagerImpl createSearchResultManagerImpl() {
+		SearchResultManagerImpl searchResultManagerImpl =
+			new SearchResultManagerImpl();
 
-		ReflectionTestUtil.setFieldValue(
-			_searchResultManagerImpl, "_classNameLocalService",
-			classNameLocalService);
-		ReflectionTestUtil.setFieldValue(
-			_searchResultManagerImpl, "_summaryFactory",
-			_createSummaryFactory());
+		searchResultManagerImpl.setClassNameLocalService(classNameLocalService);
+		searchResultManagerImpl.setSummaryFactory(createSummaryFactory());
 
-		_searchResultManagerImpl.activate(bundleContext);
-
-		return _searchResultManagerImpl;
+		return searchResultManagerImpl;
 	}
 
-	private SummaryFactory _createSummaryFactory() {
+	@Override
+	protected SearchResultTranslator createSearchResultTranslator() {
+		SearchResultTranslatorImpl searchResultTranslatorImpl =
+			new SearchResultTranslatorImpl();
+
+		searchResultTranslatorImpl.setSearchResultManager(
+			createSearchResultManagerImpl());
+
+		return searchResultTranslatorImpl;
+	}
+
+	protected SummaryFactory createSummaryFactory() {
 		SummaryFactoryImpl summaryFactoryImpl = new SummaryFactoryImpl();
 
-		ReflectionTestUtil.setFieldValue(
-			summaryFactoryImpl, "_indexerRegistry", _indexerRegistry);
+		summaryFactoryImpl.setIndexerRegistry(_indexerRegistry);
 
 		return summaryFactoryImpl;
 	}
 
+	@Mock
 	@SuppressWarnings("rawtypes")
-	private AssetRenderer _assetRenderer = Mockito.mock(AssetRenderer.class);
+	private AssetRenderer _assetRenderer;
 
-	private final AssetRendererFactory<?> _assetRendererFactory = Mockito.mock(
-		AssetRendererFactory.class);
-	private final Indexer<Object> _indexer = Mockito.mock(Indexer.class);
-	private final IndexerRegistry _indexerRegistry = Mockito.mock(
-		IndexerRegistry.class);
-	private SearchResultManagerImpl _searchResultManagerImpl;
-	private final ServiceTrackerMap<String, AssetRendererFactory<?>>
-		_serviceTrackerMap = Mockito.mock(ServiceTrackerMap.class);
+	@Mock
+	private AssetRendererFactory<?> _assetRendererFactory;
+
+	@Mock
+	private Indexer<Object> _indexer;
+
+	@Mock
+	private IndexerRegistry _indexerRegistry;
 
 }

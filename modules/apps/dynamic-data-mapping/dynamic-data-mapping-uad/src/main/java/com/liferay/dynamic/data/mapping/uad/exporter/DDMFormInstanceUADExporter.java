@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = UADExporter.class)
+@Component(immediate = true, service = UADExporter.class)
 public class DDMFormInstanceUADExporter extends BaseDDMFormInstanceUADExporter {
 
 	@Override

@@ -14,9 +14,9 @@
 
 package com.liferay.commerce.notification.test;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceSubscriptionNotificationConstants;
@@ -35,12 +35,14 @@ import com.liferay.commerce.payment.engine.CommerceSubscriptionEngine;
 import com.liferay.commerce.product.constants.CommerceChannelConstants;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.CommerceSubscriptionEntryLocalService;
 import com.liferay.commerce.subscription.CommerceSubscriptionEntryHelper;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -49,6 +51,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -63,6 +66,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,22 +85,28 @@ public class CommerceSubscriptionsNotificationTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
-
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(_user));
 
 		PrincipalThreadLocal.setName(_user.getUserId());
 
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
+
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
-			_group.getCompanyId());
+			_company.getCompanyId());
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
-			_group.getCompanyId(), _group.getGroupId(), _user.getUserId());
+			_company.getCompanyId(), _group.getGroupId(), _user.getUserId());
 
 		_commerceChannel = _commerceChannelLocalService.addCommerceChannel(
 			StringPool.BLANK, _group.getGroupId(),
@@ -110,16 +120,16 @@ public class CommerceSubscriptionsNotificationTest {
 			RandomTestUtil.randomString(),
 			new long[] {_serviceContext.getScopeGroupId()}, _serviceContext);
 
-		_accountEntry = CommerceAccountTestUtil.addBusinessAccountEntry(
+		_commerceAccount = CommerceAccountTestUtil.addBusinessCommerceAccount(
 			_user.getUserId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString() + "@liferay.com",
 			RandomTestUtil.randomString(), new long[] {_toUser.getUserId()},
 			null, _serviceContext);
 
-		CommerceAccountTestUtil.addAccountGroupAndAccountRel(
-			_group.getCompanyId(), RandomTestUtil.randomString(),
-			AccountConstants.ACCOUNT_GROUP_TYPE_STATIC,
-			_accountEntry.getAccountEntryId(), _serviceContext);
+		CommerceAccountTestUtil.addCommerceAccountGroupAndAccountRel(
+			_company.getCompanyId(), RandomTestUtil.randomString(),
+			CommerceAccountConstants.ACCOUNT_GROUP_TYPE_STATIC,
+			_commerceAccount.getCommerceAccountId(), _serviceContext);
 
 		_addCommerceNotificationTemplates();
 	}
@@ -165,7 +175,7 @@ public class CommerceSubscriptionsNotificationTest {
 		List<CommerceSubscriptionEntry> commerceSubscriptionEntries =
 			_commerceSubscriptionEntryLocalService.
 				getCommerceSubscriptionEntries(
-					_group.getCompanyId(), _commerceOrder.getUserId(),
+					_company.getCompanyId(), _commerceOrder.getUserId(),
 					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
 		Assert.assertEquals(
@@ -246,9 +256,10 @@ public class CommerceSubscriptionsNotificationTest {
 		CommerceSubscriptionNotificationConstants.SUBSCRIPTION_SUSPENDED
 	};
 
+	private static Company _company;
 	private static User _user;
 
-	private AccountEntry _accountEntry;
+	private CommerceAccount _commerceAccount;
 
 	@DeleteAfterTestRun
 	private CommerceChannel _commerceChannel;
@@ -274,6 +285,9 @@ public class CommerceSubscriptionsNotificationTest {
 
 	@Inject
 	private CommerceOrderEngine _commerceOrderEngine;
+
+	@Inject
+	private CommerceOrderLocalService _commerceOrderLocalService;
 
 	@Inject
 	private CommerceSubscriptionEngine _commerceSubscriptionEngine;

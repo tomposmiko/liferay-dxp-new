@@ -24,7 +24,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.SuppressAjWarnings;
 
-import org.hibernate.engine.jdbc.batch.internal.BatchingBatch;
+import org.hibernate.jdbc.AbstractBatcher;
+import org.hibernate.jdbc.BatchingBatcher;
 
 /**
  * @author Preston Crary
@@ -35,16 +36,16 @@ public class HibernateUnexpectedRowCountAspect {
 
 	@Before(
 		"handler(java.lang.RuntimeException) &&" +
-			"withincode(void org.hibernate.engine.jdbc.batch.internal.BatchingBatch." +
-				"doExecuteBatch()) && args(runtimeException) && this(batchingBatch)"
+			"withincode(void org.hibernate.jdbc.BatchingBatcher." +
+				"doExecuteBatch(java.sql.PreparedStatement)) &&" +
+					"args(runtimeException) && this(batchingBatcher)"
 	)
 	public void logUpdateSQL(
-		BatchingBatch batchingBatch, RuntimeException runtimeException) {
+		BatchingBatcher batchingBatcher, RuntimeException runtimeException) {
 
 		try {
 			_log.error(
-				"currentStatementSql = " +
-					_currentStatementSQLField.get(batchingBatch),
+				"batchUpdateSQL = " + _batchUpdateSQLField.get(batchingBatcher),
 				runtimeException);
 		}
 		catch (ReflectiveOperationException reflectiveOperationException) {
@@ -55,12 +56,12 @@ public class HibernateUnexpectedRowCountAspect {
 	private static final Log _log = LogFactoryUtil.getLog(
 		HibernateUnexpectedRowCountAspect.class);
 
-	private static final Field _currentStatementSQLField;
+	private static final Field _batchUpdateSQLField;
 
 	static {
 		try {
-			_currentStatementSQLField = ReflectionUtil.getDeclaredField(
-				BatchingBatch.class, "currentStatementSql");
+			_batchUpdateSQLField = ReflectionUtil.getDeclaredField(
+				AbstractBatcher.class, "batchUpdateSQL");
 		}
 		catch (Exception exception) {
 			throw new ExceptionInInitializerError(exception);

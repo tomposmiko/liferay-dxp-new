@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.model.UserNotificationDelivery;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.UserNotificationDeliveryPersistence;
-import com.liferay.portal.kernel.service.persistence.UserNotificationDeliveryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -43,7 +42,6 @@ import com.liferay.portal.model.impl.UserNotificationDeliveryModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
@@ -177,7 +175,7 @@ public class UserNotificationDeliveryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<UserNotificationDelivery>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserNotificationDelivery userNotificationDelivery : list) {
@@ -546,8 +544,7 @@ public class UserNotificationDeliveryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -692,7 +689,7 @@ public class UserNotificationDeliveryPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByU_P_C_N_D, finderArgs, this);
+				_finderPathFetchByU_P_C_N_D, finderArgs);
 		}
 
 		if (result instanceof UserNotificationDelivery) {
@@ -836,8 +833,7 @@ public class UserNotificationDeliveryPersistenceImpl
 			userId, portletId, classNameId, notificationType, deliveryType
 		};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(6);
@@ -1362,7 +1358,7 @@ public class UserNotificationDeliveryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<UserNotificationDelivery>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1433,7 +1429,7 @@ public class UserNotificationDeliveryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1541,32 +1537,11 @@ public class UserNotificationDeliveryPersistenceImpl
 				"deliveryType"
 			},
 			false);
-
-		_setUserNotificationDeliveryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setUserNotificationDeliveryUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(
 			UserNotificationDeliveryImpl.class.getName());
-	}
-
-	private void _setUserNotificationDeliveryUtilPersistence(
-		UserNotificationDeliveryPersistence
-			userNotificationDeliveryPersistence) {
-
-		try {
-			Field field = UserNotificationDeliveryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, userNotificationDeliveryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_USERNOTIFICATIONDELIVERY =

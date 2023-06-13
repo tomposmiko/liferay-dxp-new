@@ -10,17 +10,12 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayLoadingIndicator from '@clayui/loading-indicator';
-import {useIsMounted, useStateSafe} from '@liferay/frontend-js-react-web';
+import {useStateSafe} from '@liferay/frontend-js-react-web';
 import className from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {Cell, Pie, PieChart, Tooltip} from 'recharts';
 
-import {
-	ChartDispatchContext,
-	ChartStateContext,
-} from '../context/ChartStateContext';
 import ConnectionContext from '../context/ConnectionContext';
 import {StoreDispatchContext, StoreStateContext} from '../context/StoreContext';
 import {numberFormat} from '../utils/numberFormat';
@@ -52,67 +47,25 @@ const getColorByName = (name) => COLORS_MAP[name] || FALLBACK_COLOR;
 
 export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 	const [highlighted, setHighlighted] = useState(null);
-	const isMounted = useIsMounted();
 
 	const {validAnalyticsConnection} = useContext(ConnectionContext);
 
 	const dispatch = useContext(StoreDispatchContext);
 
-	const chartDispatch = useContext(ChartDispatchContext);
-
 	const {languageTag, publishedToday} = useContext(StoreStateContext);
-
-	const {pieChartLoading, timeSpanKey, timeSpanOffset} = useContext(
-		ChartStateContext
-	);
 
 	const [trafficSources, setTrafficSources] = useStateSafe([]);
 
-	const pieChartWrapperClasses = className('pie-chart-wrapper', {
-		'pie-chart-wrapper--loading': pieChartLoading,
-	});
-
 	useEffect(() => {
 		if (validAnalyticsConnection) {
-			chartDispatch({
-				payload: {
-					loading: true,
-				},
-				type: 'SET_PIE_CHART_LOADING',
-			});
 			dataProvider()
-				.then((trafficSources) => {
-					if (isMounted()) {
-						setTrafficSources(trafficSources);
-					}
-				})
+				.then((trafficSources) => setTrafficSources(trafficSources))
 				.catch(() => {
-					if (isMounted()) {
-						setTrafficSources([]);
-						dispatch({type: 'ADD_WARNING'});
-					}
-				})
-				.finally(() => {
-					if (isMounted()) {
-						chartDispatch({
-							payload: {
-								loading: false,
-							},
-							type: 'SET_PIE_CHART_LOADING',
-						});
-					}
+					setTrafficSources([]);
+					dispatch({type: 'ADD_WARNING'});
 				});
 		}
-	}, [
-		chartDispatch,
-		dispatch,
-		dataProvider,
-		setTrafficSources,
-		timeSpanKey,
-		timeSpanOffset,
-		validAnalyticsConnection,
-		isMounted,
-	]);
+	}, [dispatch, dataProvider, setTrafficSources, validAnalyticsConnection]);
 
 	const fullPieChart = useMemo(
 		() =>
@@ -145,7 +98,6 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 		<>
 			<h5 className="mt-3 sheet-subtitle">
 				{Liferay.Language.get('traffic-channels')}
-
 				<Hint
 					message={Liferay.Language.get('traffic-channels-help')}
 					secondary={true}
@@ -160,20 +112,16 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 					)}
 				</div>
 			)}
-			<div className={pieChartWrapperClasses}>
-				{pieChartLoading && (
-					<ClayLoadingIndicator
-						className="chart-loading-indicator"
-						small
-					/>
-				)}
-
+			<div className="pie-chart-wrapper">
 				<div className="pie-chart-wrapper--legend">
 					<table>
 						<tbody>
 							{trafficSources?.map((entry) => {
 								const hasDetails =
-									entry?.value > 0 && entry?.endpointURL;
+									entry?.countryKeywords ||
+									(entry?.referringPages &&
+										entry?.referringDomains) ||
+									entry?.referringSocialMedia;
 
 								return (
 									<tr key={entry.name}>
@@ -195,7 +143,6 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 												}}
 											></span>
 										</td>
-
 										<td
 											className="c-py-1 text-secondary"
 											onMouseOut={handleLegendMouseLeave}
@@ -207,6 +154,7 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 										>
 											{validAnalyticsConnection &&
 											!publishedToday &&
+											entry.value > 0 &&
 											hasDetails ? (
 												<ClayButton
 													className="px-0 py-1 text-primary"
@@ -214,8 +162,7 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 													onClick={() =>
 														onTrafficSourceClick(
 															trafficSources,
-															entry.name,
-															false
+															entry.name
 														)
 													}
 													small
@@ -226,24 +173,19 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 												<span>{entry.title}</span>
 											)}
 										</td>
-
 										<td className="text-secondary">
 											<Hint
 												message={entry.helpMessage}
 												title={entry.title}
 											/>
 										</td>
-
 										<td className="font-weight-semi-bold">
 											{validAnalyticsConnection &&
 											!publishedToday &&
 											entry.value !== undefined
 												? numberFormat(
 														languageTag,
-														entry.value,
-														{
-															useCompact: true,
-														}
+														entry.value
 												  )
 												: '-'}
 										</td>
@@ -331,8 +273,8 @@ function TrafficSourcesCustomTooltip(props) {
 	const {formatter, payload, separator = ''} = props;
 
 	return (
-		<div className="custom-tooltip popover">
-			<p className="mx-2 popover-header py-1">
+		<div className="custom-tooltip">
+			<p className="mb-1 mt-0">
 				<b>
 					{
 						// eslint-disable-next-line @liferay/no-length-jsx-expression
@@ -341,7 +283,7 @@ function TrafficSourcesCustomTooltip(props) {
 				</b>
 			</p>
 
-			<ul className="list-unstyled mb-0 p-2 popover-body">
+			<ul className="list-unstyled mb-0">
 				<>
 					{payload.map((item) => {
 						// eslint-disable-next-line no-unused-vars
@@ -355,17 +297,12 @@ function TrafficSourcesCustomTooltip(props) {
 							<React.Fragment key={item.name}>
 								<li>
 									{Liferay.Language.get('visitors')}
-
 									{separator}
-
 									<b>{value}</b>
 								</li>
-
 								<li>
 									{Liferay.Language.get('traffic-share')}
-
 									{separator}
-
 									<b>{`${payload.share}%`}</b>
 								</li>
 							</React.Fragment>

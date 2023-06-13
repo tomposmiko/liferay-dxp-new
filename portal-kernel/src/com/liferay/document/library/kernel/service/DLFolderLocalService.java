@@ -102,10 +102,9 @@ public interface DLFolderLocalService
 	public DLFolder addDLFolder(DLFolder dlFolder);
 
 	public DLFolder addFolder(
-			String externalReferenceCode, long userId, long groupId,
-			long repositoryId, boolean mountPoint, long parentFolderId,
-			String name, String description, boolean hidden,
-			ServiceContext serviceContext)
+			long userId, long groupId, long repositoryId, boolean mountPoint,
+			long parentFolderId, String name, String description,
+			boolean hidden, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void clearDLFileEntryTypeDLFolders(long fileEntryTypeId);
@@ -278,10 +277,6 @@ public interface DLFolderLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DLFolder fetchDLFolder(long folderId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DLFolder fetchDLFolderByExternalReferenceCode(
-		String externalReferenceCode, long groupId);
-
 	/**
 	 * Returns the document library folder matching the UUID and group.
 	 *
@@ -343,11 +338,6 @@ public interface DLFolderLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DLFolder getDLFolder(long folderId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DLFolder getDLFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException;
 
 	/**
 	 * Returns the document library folder matching the UUID and group.
@@ -432,10 +422,6 @@ public interface DLFolderLocalService
 	public long getFolderId(long companyId, long folderId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DLFolder> getFolders(
-		long groupId, boolean mountPoint, String treePath, boolean hidden);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DLFolder> getFolders(long groupId, long parentFolderId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -453,13 +439,22 @@ public interface DLFolderLocalService
 		long groupId, long parentFolderId, boolean includeMountfolders,
 		int start, int end, OrderByComparator<DLFolder> orderByComparator);
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getFolders(long, long, boolean, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DLFolder> getFolders(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		OrderByComparator<DLFolder> orderByComparator);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DLFolder> getFolders(
 		long groupId, long parentFolderId, int start, int end,
 		OrderByComparator<DLFolder> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DLFolder> getFolders(long classNameId, String treePath);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
@@ -516,10 +511,6 @@ public interface DLFolderLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DLFolder> getNoAssetFolders();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DLFolder> getNotInTrashFolders(
-		long groupId, boolean mountPoint, String treePath, boolean hidden);
 
 	/**
 	 * Returns the OSGi service identifier.

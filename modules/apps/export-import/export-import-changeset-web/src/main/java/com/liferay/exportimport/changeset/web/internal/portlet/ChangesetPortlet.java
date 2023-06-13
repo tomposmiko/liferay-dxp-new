@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.preferences-unique-per-layout=false",
@@ -32,8 +33,7 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.display-name=Changeset",
 		"javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )

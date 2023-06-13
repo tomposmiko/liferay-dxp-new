@@ -167,8 +167,8 @@ public class IndexedRecordJsonObjectConverter extends RejectHandler {
 			else if (AvroUtils.isSameType(fieldSchema, AvroUtils._string())) {
 				String stringFieldValue = (String)indexedRecord.get(fieldPos);
 
-				if (Objects.equals(field.getProp("oas.dictionary"), "true") ||
-					Objects.equals(fieldSchema.getName(), "Dictionary") ||
+				if (Objects.equals("true", field.getProp("oas.dictionary")) ||
+					Objects.equals("Dictionary", fieldSchema.getName()) ||
 					_isJsonObjectFormattedString(stringFieldValue) ||
 					_isJsonArrayFormattedString(stringFieldValue)) {
 
@@ -275,7 +275,6 @@ public class IndexedRecordJsonObjectConverter extends RejectHandler {
 	private boolean _isNestedFieldName(String fieldName) {
 		if ((!_oasExtensions.isI18nFieldNameNested(fieldName) &&
 			 _oasExtensions.isI18nFieldName(fieldName)) ||
-			_oasExtensions.isObjectDefinitionReferenceFieldName(fieldName) ||
 			!fieldName.contains("_")) {
 
 			return false;

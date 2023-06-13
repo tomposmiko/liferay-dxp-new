@@ -19,8 +19,6 @@ package com.liferay.product.navigation.control.menu.constants;
  */
 public interface ProductNavigationControlMenuCategoryKeys {
 
-	public static final String EXP = "exp";
-
 	public static final String ROOT = "root";
 
 	public static final String SITES = "sites";

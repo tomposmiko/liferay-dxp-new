@@ -26,10 +26,55 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 		navigationItems="<%= cpMeasurementUnitsDisplayContext.getNavigationItems() %>"
 	/>
 
-	<clay:management-toolbar
-		managementToolbarDisplayContext="<%= new CPMeasurementUnitsManagementToolbarDisplayContext(cpMeasurementUnitsDisplayContext, request, liferayPortletRequest, liferayPortletResponse) %>"
-		propsTransformer="js/CPMeasurementUnitsManagementToolbarPropsTransformer"
-	/>
+	<liferay-frontend:management-bar
+		includeCheckBox="<%= true %>"
+		searchContainerId="cpMeasurementUnits"
+	>
+		<liferay-frontend:management-bar-filters>
+			<liferay-frontend:management-bar-navigation
+				navigationKeys='<%= new String[] {"all"} %>'
+				portletURL="<%= cpMeasurementUnitsDisplayContext.getPortletURL() %>"
+			/>
+
+			<liferay-frontend:management-bar-sort
+				orderByCol="<%= cpMeasurementUnitsDisplayContext.getOrderByCol() %>"
+				orderByType="<%= cpMeasurementUnitsDisplayContext.getOrderByType() %>"
+				orderColumns='<%= new String[] {"priority"} %>'
+				portletURL="<%= cpMeasurementUnitsDisplayContext.getPortletURL() %>"
+			/>
+		</liferay-frontend:management-bar-filters>
+
+		<liferay-frontend:management-bar-buttons>
+			<liferay-frontend:management-bar-display-buttons
+				displayViews='<%= new String[] {"list"} %>'
+				portletURL="<%= cpMeasurementUnitsDisplayContext.getPortletURL() %>"
+				selectedDisplayStyle="list"
+			/>
+
+			<portlet:renderURL var="addCPMeasurementUnitURL">
+				<portlet:param name="mvcRenderCommandName" value="/cp_measurement_unit/edit_cp_measurement_unit" />
+				<portlet:param name="redirect" value="<%= currentURL %>" />
+				<portlet:param name="type" value="<%= String.valueOf(cpMeasurementUnitsDisplayContext.getType()) %>" />
+			</portlet:renderURL>
+
+			<liferay-frontend:add-menu
+				inline="<%= true %>"
+			>
+				<liferay-frontend:add-menu-item
+					title='<%= LanguageUtil.get(request, "add-measurement-unit") %>'
+					url="<%= addCPMeasurementUnitURL.toString() %>"
+				/>
+			</liferay-frontend:add-menu>
+		</liferay-frontend:management-bar-buttons>
+
+		<liferay-frontend:management-bar-action-buttons>
+			<liferay-frontend:management-bar-button
+				href='<%= "javascript:" + liferayPortletResponse.getNamespace() + "deleteCPMeasurementUnits();" %>'
+				icon="times"
+				label="delete"
+			/>
+		</liferay-frontend:management-bar-action-buttons>
+	</liferay-frontend:management-bar>
 
 	<div class="container-fluid container-fluid-max-xl">
 		<portlet:actionURL name="/cp_measurement_unit/edit_cp_measurement_unit" var="editCPMeasurementUnitActionURL" />
@@ -37,6 +82,7 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 		<aui:form action="<%= editCPMeasurementUnitActionURL %>" method="post" name="fm">
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.DELETE %>" />
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+			<aui:input name="deleteCPMeasurementUnitIds" type="hidden" />
 
 			<liferay-ui:search-container
 				id="cpMeasurementUnits"
@@ -48,7 +94,7 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 					modelVar="cpMeasurementUnit"
 				>
 					<liferay-ui:search-container-column-text
-						cssClass="font-weight-bold important table-cell-expand"
+						cssClass="important table-cell-expand"
 						href='<%=
 							PortletURLBuilder.createRenderURL(
 								renderResponse
@@ -117,24 +163,22 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 
 	<aui:script>
 		function <portlet:namespace />deleteCPMeasurementUnits() {
-			Liferay.Util.openConfirmModal({
-				message:
-					'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-measurement-units" />',
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						var form = window.document['<portlet:namespace />fm'];
+			if (
+				confirm(
+					'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-measurement-units" />'
+				)
+			) {
+				var form = window.document['<portlet:namespace />fm'];
 
-						form[
-							'<portlet:namespace />deleteCPMeasurementUnitIds'
-						].value = Liferay.Util.getCheckedCheckboxes(
-							form,
-							'<portlet:namespace />allRowIds'
-						);
+				form[
+					'<portlet:namespace />deleteCPMeasurementUnitIds'
+				].value = Liferay.Util.listCheckedExcept(
+					form,
+					'<portlet:namespace />allRowIds'
+				);
 
-						submitForm(form);
-					}
-				},
-			});
+				submitForm(form);
+			}
 		}
 	</aui:script>
 </c:if>

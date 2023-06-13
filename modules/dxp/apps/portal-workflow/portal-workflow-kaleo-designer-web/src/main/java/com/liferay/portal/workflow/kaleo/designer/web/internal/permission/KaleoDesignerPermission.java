@@ -14,13 +14,16 @@
 
 package com.liferay.portal.workflow.kaleo.designer.web.internal.permission;
 
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marcellus Tavares
  */
+@Component(immediate = true, service = {})
 public class KaleoDesignerPermission {
 
 	public static final String RESOURCE_NAME =
@@ -29,16 +32,20 @@ public class KaleoDesignerPermission {
 	public static boolean contains(
 		PermissionChecker permissionChecker, long groupId, String actionId) {
 
-		PortletResourcePermission portletResourcePermission =
-			_portletResourcePermissionSnapshot.get();
-
-		return portletResourcePermission.contains(
+		return _portletResourcePermission.contains(
 			permissionChecker, groupId, actionId);
 	}
 
-	private static final Snapshot<PortletResourcePermission>
-		_portletResourcePermissionSnapshot = new Snapshot<>(
-			KaleoDesignerPermission.class, PortletResourcePermission.class,
-			"(resource.name=" + RESOURCE_NAME + ")");
+	@Reference(
+		target = "(resource.name=" + KaleoDesignerPermission.RESOURCE_NAME + ")",
+		unbind = "-"
+	)
+	protected void setPortletResourcePermission(
+		PortletResourcePermission portletResourcePermission) {
+
+		_portletResourcePermission = portletResourcePermission;
+	}
+
+	private static PortletResourcePermission _portletResourcePermission;
 
 }

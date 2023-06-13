@@ -27,10 +27,6 @@ public class FVSCustomEntryLocalServiceWrapper
 	implements FVSCustomEntryLocalService,
 			   ServiceWrapper<FVSCustomEntryLocalService> {
 
-	public FVSCustomEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public FVSCustomEntryLocalServiceWrapper(
 		FVSCustomEntryLocalService fvsCustomEntryLocalService) {
 

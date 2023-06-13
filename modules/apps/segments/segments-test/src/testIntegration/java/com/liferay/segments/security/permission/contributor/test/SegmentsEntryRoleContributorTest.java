@@ -15,7 +15,6 @@
 package com.liferay.segments.security.permission.contributor.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -34,20 +33,18 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.segments.constants.SegmentsWebKeys;
 import com.liferay.segments.criteria.Criteria;
 import com.liferay.segments.criteria.CriteriaSerializer;
 import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributor;
@@ -79,87 +76,32 @@ public class SegmentsEntryRoleContributorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_companyConfigurationTemporarySwapper =
-			new CompanyConfigurationTemporarySwapper(
-				_group.getCompanyId(),
-				"com.liferay.segments.configuration." +
-					"SegmentsCompanyConfiguration",
-				HashMapDictionaryBuilder.<String, Object>put(
-					"roleSegmentationEnabled", true
-				).put(
-					"segmentationEnabled", true
-				).build(),
-				SettingsFactoryUtil.getSettingsFactory());
-
 		_configurationTemporarySwapper = new ConfigurationTemporarySwapper(
 			"com.liferay.segments.configuration.SegmentsConfiguration",
 			HashMapDictionaryBuilder.<String, Object>put(
 				"roleSegmentationEnabled", true
-			).put(
-				"segmentationEnabled", true
 			).build());
 
 		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+			ServiceContextTestUtil.getServiceContext();
 
-		_mockHttpServletRequest = new MockHttpServletRequest();
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
 
 		_user = UserTestUtil.addUser();
 
-		_mockHttpServletRequest.setAttribute(WebKeys.USER, _user);
+		mockHttpServletRequest.setAttribute(WebKeys.USER, _user);
 
-		serviceContext.setRequest(_mockHttpServletRequest);
+		serviceContext.setRequest(mockHttpServletRequest);
 
 		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_companyConfigurationTemporarySwapper.close();
 		_configurationTemporarySwapper.close();
 
 		ServiceContextThreadLocal.popServiceContext();
-	}
-
-	@Test
-	public void testCachedSegmentsEntryId() throws Exception {
-		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
-
-		_organization = OrganizationTestUtil.addOrganization();
-
-		String actionKey = ActionKeys.DELETE;
-
-		_resourcePermissionLocalService.addResourcePermission(
-			_group.getCompanyId(), Organization.class.getName(),
-			ResourceConstants.SCOPE_COMPANY,
-			String.valueOf(_group.getCompanyId()), _role.getRoleId(),
-			actionKey);
-
-		_segmentsEntry = _addSegmentsEntry(_user);
-
-		PermissionChecker permissionChecker =
-			PermissionCheckerFactoryUtil.create(_user);
-
-		Assert.assertFalse(
-			permissionChecker.hasPermission(
-				_group.getGroupId(), Organization.class.getName(),
-				_organization.getOrganizationId(), actionKey));
-
-		_segmentsEntryRoleLocalService.addSegmentsEntryRole(
-			_segmentsEntry.getSegmentsEntryId(), _role.getRoleId(),
-			ServiceContextTestUtil.getServiceContext());
-
-		_mockHttpServletRequest.setAttribute(
-			SegmentsWebKeys.SEGMENTS_ENTRY_IDS, new long[] {1234567890L});
-
-		permissionChecker = PermissionCheckerFactoryUtil.create(_user);
-
-		Assert.assertFalse(
-			permissionChecker.hasPermission(
-				_group.getGroupId(), Organization.class.getName(),
-				_organization.getOrganizationId(), actionKey));
 	}
 
 	@Test
@@ -176,8 +118,8 @@ public class SegmentsEntryRoleContributorTest {
 
 		Assert.assertFalse(
 			permissionChecker.hasPermission(
-				_group.getGroupId(), Group.class.getName(), _group.getGroupId(),
-				_ACTION_KEY));
+				TestPropsValues.getGroupId(), Group.class.getName(),
+				TestPropsValues.getGroupId(), _ACTION_KEY));
 	}
 
 	@Test
@@ -195,8 +137,8 @@ public class SegmentsEntryRoleContributorTest {
 
 		Assert.assertFalse(
 			permissionChecker.hasPermission(
-				_group.getGroupId(), Group.class.getName(), _group.getGroupId(),
-				_ACTION_KEY));
+				TestPropsValues.getGroupId(), Group.class.getName(),
+				TestPropsValues.getGroupId(), _ACTION_KEY));
 	}
 
 	@Test
@@ -210,8 +152,8 @@ public class SegmentsEntryRoleContributorTest {
 
 		Assert.assertFalse(
 			permissionChecker.hasPermission(
-				_group.getGroupId(), Group.class.getName(), _group.getGroupId(),
-				_ACTION_KEY));
+				TestPropsValues.getGroupId(), Group.class.getName(),
+				TestPropsValues.getGroupId(), _ACTION_KEY));
 	}
 
 	@Test
@@ -223,9 +165,9 @@ public class SegmentsEntryRoleContributorTest {
 		String actionKey = ActionKeys.DELETE;
 
 		_resourcePermissionLocalService.addResourcePermission(
-			_group.getCompanyId(), Organization.class.getName(),
+			TestPropsValues.getCompanyId(), Organization.class.getName(),
 			ResourceConstants.SCOPE_COMPANY,
-			String.valueOf(_group.getCompanyId()), _role.getRoleId(),
+			String.valueOf(TestPropsValues.getCompanyId()), _role.getRoleId(),
 			actionKey);
 
 		_segmentsEntry = _addSegmentsEntry(_user);
@@ -235,7 +177,7 @@ public class SegmentsEntryRoleContributorTest {
 
 		Assert.assertFalse(
 			permissionChecker.hasPermission(
-				_group.getGroupId(), Organization.class.getName(),
+				TestPropsValues.getGroupId(), Organization.class.getName(),
 				_organization.getOrganizationId(), actionKey));
 
 		_segmentsEntryRoleLocalService.addSegmentsEntryRole(
@@ -246,7 +188,7 @@ public class SegmentsEntryRoleContributorTest {
 
 		Assert.assertTrue(
 			permissionChecker.hasPermission(
-				_group.getGroupId(), Organization.class.getName(),
+				TestPropsValues.getGroupId(), Organization.class.getName(),
 				_organization.getOrganizationId(), actionKey));
 	}
 
@@ -265,10 +207,10 @@ public class SegmentsEntryRoleContributorTest {
 			String actionKey = ActionKeys.DELETE;
 
 			_resourcePermissionLocalService.addResourcePermission(
-				_group.getCompanyId(), Organization.class.getName(),
+				TestPropsValues.getCompanyId(), Organization.class.getName(),
 				ResourceConstants.SCOPE_COMPANY,
-				String.valueOf(_group.getCompanyId()), _role.getRoleId(),
-				actionKey);
+				String.valueOf(TestPropsValues.getCompanyId()),
+				_role.getRoleId(), actionKey);
 
 			UserTestUtil.addUserGroupRole(
 				_user.getUserId(), _organization.getGroupId(),
@@ -281,7 +223,8 @@ public class SegmentsEntryRoleContributorTest {
 			_segmentsEntry = _addSegmentEntry(_organization);
 
 			_groupLocalService.addOrganizationGroup(
-				_organization.getOrganizationId(), _group.getGroupId());
+				_organization.getOrganizationId(),
+				TestPropsValues.getGroupId());
 
 			_segmentsEntryRoleLocalService.addSegmentsEntryRole(
 				_segmentsEntry.getSegmentsEntryId(), _role.getRoleId(),
@@ -294,7 +237,7 @@ public class SegmentsEntryRoleContributorTest {
 
 			Assert.assertTrue(
 				userPermissionChecker.hasPermission(
-					_group.getGroupId(), Organization.class.getName(),
+					TestPropsValues.getGroupId(), Organization.class.getName(),
 					_organization.getOrganizationId(), actionKey));
 		}
 		finally {
@@ -321,10 +264,10 @@ public class SegmentsEntryRoleContributorTest {
 			String actionKey = ActionKeys.DELETE;
 
 			_resourcePermissionLocalService.addResourcePermission(
-				_group.getCompanyId(), Organization.class.getName(),
+				TestPropsValues.getCompanyId(), Organization.class.getName(),
 				ResourceConstants.SCOPE_COMPANY,
-				String.valueOf(_group.getCompanyId()), _role.getRoleId(),
-				actionKey);
+				String.valueOf(TestPropsValues.getCompanyId()),
+				_role.getRoleId(), actionKey);
 
 			_segmentsEntry = _addSegmentsEntry(_user);
 
@@ -337,7 +280,7 @@ public class SegmentsEntryRoleContributorTest {
 
 			Assert.assertFalse(
 				permissionChecker.hasPermission(
-					_group.getGroupId(), Organization.class.getName(),
+					TestPropsValues.getGroupId(), Organization.class.getName(),
 					_organization.getOrganizationId(), actionKey));
 		}
 	}
@@ -354,13 +297,13 @@ public class SegmentsEntryRoleContributorTest {
 			Criteria.Conjunction.AND);
 
 		return SegmentsTestUtil.addSegmentsEntry(
-			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
-			User.class.getName());
+			TestPropsValues.getGroupId(),
+			CriteriaSerializer.serialize(criteria), User.class.getName());
 	}
 
 	private SegmentsEntry _addSegmentsEntry(User user) throws Exception {
 		return SegmentsTestUtil.addSegmentsEntry(
-			_group.getGroupId(),
+			TestPropsValues.getGroupId(),
 			JSONUtil.put(
 				"criteria",
 				JSONUtil.put(
@@ -381,9 +324,10 @@ public class SegmentsEntryRoleContributorTest {
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_SITE);
 
 		_resourcePermissionLocalService.addResourcePermission(
-			_group.getCompanyId(), Group.class.getName(),
-			ResourceConstants.SCOPE_GROUP, String.valueOf(_group.getGroupId()),
-			_role.getRoleId(), _ACTION_KEY);
+			TestPropsValues.getCompanyId(), Group.class.getName(),
+			ResourceConstants.SCOPE_GROUP,
+			String.valueOf(TestPropsValues.getGroupId()), _role.getRoleId(),
+			_ACTION_KEY);
 
 		_segmentsEntry = _addSegmentsEntry(_user);
 
@@ -392,8 +336,8 @@ public class SegmentsEntryRoleContributorTest {
 
 		Assert.assertFalse(
 			permissionChecker.hasPermission(
-				_group.getGroupId(), Group.class.getName(), _group.getGroupId(),
-				_ACTION_KEY));
+				TestPropsValues.getGroupId(), Group.class.getName(),
+				TestPropsValues.getGroupId(), _ACTION_KEY));
 
 		_segmentsEntryRoleLocalService.setSegmentsEntrySiteRoles(
 			_segmentsEntry.getSegmentsEntryId(), new long[] {_role.getRoleId()},
@@ -403,23 +347,16 @@ public class SegmentsEntryRoleContributorTest {
 
 		Assert.assertTrue(
 			permissionChecker.hasPermission(
-				_group.getGroupId(), Group.class.getName(), _group.getGroupId(),
-				_ACTION_KEY));
+				TestPropsValues.getGroupId(), Group.class.getName(),
+				TestPropsValues.getGroupId(), _ACTION_KEY));
 	}
 
 	private static final String _ACTION_KEY = ActionKeys.UPDATE;
 
-	private CompanyConfigurationTemporarySwapper
-		_companyConfigurationTemporarySwapper;
 	private ConfigurationTemporarySwapper _configurationTemporarySwapper;
-
-	@DeleteAfterTestRun
-	private Group _group;
 
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	private MockHttpServletRequest _mockHttpServletRequest;
 
 	@DeleteAfterTestRun
 	private Organization _organization;
@@ -433,6 +370,7 @@ public class SegmentsEntryRoleContributorTest {
 	@Inject
 	private RoleLocalService _roleLocalService;
 
+	@DeleteAfterTestRun
 	private SegmentsEntry _segmentsEntry;
 
 	@Inject

@@ -17,7 +17,7 @@ package com.liferay.analytics.settings.web.internal.portlet.action;
 import com.liferay.analytics.settings.web.internal.util.AnalyticsSettingsUtil;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -167,7 +167,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 				throw new IllegalArgumentException();
 			}
 
-			return _jsonFactory.createJSONObject(
+			return JSONFactoryUtil.createJSONObject(
 				new String(Base64.decode(token)));
 		}
 		catch (Exception exception) {
@@ -228,7 +228,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			SessionErrors.add(actionRequest, "unableToNotifyAnalyticsCloud");
@@ -248,7 +248,7 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			dataSourceConnectionJSON);
 
 		Iterator<String> iterator = jsonObject.keys();
@@ -284,28 +284,28 @@ public class EditWorkspaceConnectionMVCActionCommand
 			configurationProperties.put(
 				"syncedContactFieldNames",
 				new String[] {
-					"birthday", "classNameId", "classPK", "companyId",
-					"contactId", "createDate", "emailAddress", "employeeNumber",
-					"employeeStatusId", "facebookSn", "firstName",
-					"hoursOfOperation", "jabberSn", "jobClass", "jobTitle",
-					"lastName", "male", "middleName", "modifiedDate",
-					"parentContactId", "prefixListTypeId", "skypeSn", "smsSn",
-					"suffixListTypeId", "twitterSn", "userId", "userName"
+					"accountId", "birthday", "classNameId", "classPK",
+					"companyId", "contactId", "createDate", "emailAddress",
+					"employeeNumber", "employeeStatusId", "facebookSn",
+					"firstName", "hoursOfOperation", "jabberSn", "jobClass",
+					"jobTitle", "lastName", "male", "middleName",
+					"modifiedDate", "parentContactId", "prefixId", "skypeSn",
+					"smsSn", "suffixId", "twitterSn", "userId", "userName"
 				});
 			configurationProperties.put(
 				"syncedUserFieldNames",
 				new String[] {
 					"agreedToTermsOfUse", "comments", "companyId", "contactId",
-					"createDate", "emailAddress", "emailAddressVerified",
-					"externalReferenceCode", "facebookId", "firstName",
-					"googleUserId", "greeting", "jobTitle", "languageId",
-					"lastName", "ldapServerId", "middleName", "modifiedDate",
-					"openId", "portraitId", "screenName", "status",
-					"timeZoneId", "userId", "uuid"
+					"createDate", "defaultUser", "emailAddress",
+					"emailAddressVerified", "externalReferenceCode",
+					"facebookId", "firstName", "googleUserId", "greeting",
+					"jobTitle", "languageId", "lastName", "ldapServerId",
+					"middleName", "modifiedDate", "openId", "portraitId",
+					"screenName", "status", "timeZoneId", "userId", "uuid"
 				});
 		}
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			dataSourceConnectionJSON);
 
 		Iterator<String> iterator = jsonObject.keys();
@@ -319,9 +319,6 @@ public class EditWorkspaceConnectionMVCActionCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditWorkspaceConnectionMVCActionCommand.class);
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Portal _portal;

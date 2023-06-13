@@ -23,6 +23,9 @@ import com.liferay.saml.addon.keep.alive.web.internal.constants.SamlKeepAliveCon
 import com.liferay.saml.constants.SamlWebKeys;
 import com.liferay.saml.persistence.model.SamlIdpSpConnection;
 import com.liferay.saml.persistence.model.SamlSpIdpConnection;
+import com.liferay.saml.persistence.service.SamlIdpSpConnectionLocalService;
+import com.liferay.saml.persistence.service.SamlSpIdpConnectionLocalService;
+import com.liferay.saml.persistence.service.SamlSpSessionLocalService;
 import com.liferay.saml.util.PortletPropsKeys;
 
 import java.io.IOException;
@@ -39,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Mika Koivisto
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class KeepAliveSamlWebDynamicInclude extends BaseDynamicInclude {
 
 	@Override
@@ -51,16 +54,16 @@ public class KeepAliveSamlWebDynamicInclude extends BaseDynamicInclude {
 		String keepAliveURL = null;
 
 		if (_KEY_IDENTITY_PROVIDER.equals(key)) {
-			keepAliveURL = _getSpIdpKeepAliveUrl(httpServletRequest);
+			keepAliveURL = getSpIdpKeepAliveUrl(httpServletRequest);
 		}
 		else {
-			keepAliveURL = _getIdpSpKeepAliveUrl(httpServletRequest);
+			keepAliveURL = getIdpSpKeepAliveUrl(httpServletRequest);
 		}
 
 		httpServletRequest.setAttribute(
 			SamlWebKeys.SAML_KEEP_ALIVE_URL, keepAliveURL);
 
-		_includeJSP(
+		includeJSP(
 			httpServletRequest, httpServletResponse,
 			"/com.liferay.saml.web/keep_alive.jsp");
 	}
@@ -71,7 +74,7 @@ public class KeepAliveSamlWebDynamicInclude extends BaseDynamicInclude {
 		dynamicIncludeRegistry.register(_KEY_SERVICE_PROVIDER);
 	}
 
-	private String _getIdpSpKeepAliveUrl(
+	protected String getIdpSpKeepAliveUrl(
 		HttpServletRequest httpServletRequest) {
 
 		SamlIdpSpConnection samlIdpSpConnection =
@@ -91,7 +94,7 @@ public class KeepAliveSamlWebDynamicInclude extends BaseDynamicInclude {
 		return keepAliveURL;
 	}
 
-	private String _getSpIdpKeepAliveUrl(
+	protected String getSpIdpKeepAliveUrl(
 		HttpServletRequest httpServletRequest) {
 
 		SamlSpIdpConnection samlSpIdpConnection =
@@ -118,7 +121,7 @@ public class KeepAliveSamlWebDynamicInclude extends BaseDynamicInclude {
 		return keepAliveURL;
 	}
 
-	private void _includeJSP(
+	protected void includeJSP(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String jspPath)
 		throws IOException {
@@ -141,6 +144,15 @@ public class KeepAliveSamlWebDynamicInclude extends BaseDynamicInclude {
 
 	private static final String _KEY_SERVICE_PROVIDER =
 		"com.liferay.saml.web#/admin/edit_service_provider_connection.jsp#post";
+
+	@Reference
+	private SamlIdpSpConnectionLocalService _samlIdpSpConnectionLocalService;
+
+	@Reference
+	private SamlSpIdpConnectionLocalService _samlSpIdpConnectionLocalService;
+
+	@Reference
+	private SamlSpSessionLocalService _samlSpSessionLocalService;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.saml.addon.keep.alive.web)"

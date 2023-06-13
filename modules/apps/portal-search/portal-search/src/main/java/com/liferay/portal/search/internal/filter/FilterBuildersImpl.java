@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author André de Oliveira
  */
-@Component(service = FilterBuilders.class)
+@Component(immediate = true, service = FilterBuilders.class)
 public class FilterBuildersImpl implements FilterBuilders {
 
 	@Override

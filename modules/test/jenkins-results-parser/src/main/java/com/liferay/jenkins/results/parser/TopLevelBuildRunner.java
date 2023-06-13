@@ -16,9 +16,6 @@ package com.liferay.jenkins.results.parser;
 
 import com.google.common.collect.Lists;
 
-import com.liferay.jenkins.results.parser.job.property.JobProperty;
-import com.liferay.jenkins.results.parser.job.property.JobPropertyFactory;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -117,11 +114,10 @@ public abstract class TopLevelBuildRunner<T extends TopLevelBuildData>
 		return _topLevelBuild.getJenkinsReportElement();
 	}
 
-	protected String getJobPropertyValue(String key) {
-		JobProperty jobProperty = JobPropertyFactory.newJobProperty(
-			key, getJob());
+	protected String getJobProperty(String key) {
+		Job job = getJob();
 
-		return jobProperty.getValue();
+		return job.getJobProperty(key);
 	}
 
 	protected TopLevelBuild getTopLevelBuild() {

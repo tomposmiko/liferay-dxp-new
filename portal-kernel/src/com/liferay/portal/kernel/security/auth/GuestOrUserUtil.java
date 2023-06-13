@@ -41,11 +41,11 @@ public class GuestOrUserUtil {
 		}
 		catch (PrincipalException principalException) {
 			try {
-				return UserLocalServiceUtil.getGuestUser(companyId);
+				return UserLocalServiceUtil.getDefaultUser(companyId);
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				throw principalException;
@@ -59,12 +59,12 @@ public class GuestOrUserUtil {
 		}
 		catch (PrincipalException principalException) {
 			try {
-				return UserLocalServiceUtil.getGuestUser(
+				return UserLocalServiceUtil.getDefaultUser(
 					CompanyThreadLocal.getCompanyId());
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				throw principalException;
@@ -78,12 +78,12 @@ public class GuestOrUserUtil {
 		}
 		catch (PrincipalException principalException) {
 			try {
-				return UserLocalServiceUtil.getGuestUserId(
+				return UserLocalServiceUtil.getDefaultUserId(
 					CompanyThreadLocal.getCompanyId());
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				throw principalException;

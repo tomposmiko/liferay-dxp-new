@@ -64,7 +64,7 @@ public class CollatorUtilTest {
 
 			Assert.assertTrue(
 				logEntry.toString(),
-				message.contains("missing chars (=,;<&): <<"));
+				message.contains("java.text.ParseException"));
 		}
 	}
 

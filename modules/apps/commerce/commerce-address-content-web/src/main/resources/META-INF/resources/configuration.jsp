@@ -30,21 +30,19 @@ CommerceAddressDisplayContext commerceAddressDisplayContext = (CommerceAddressDi
 
 	<div class="portlet-configuration-body-content">
 		<div class="container-fluid container-fluid-max-xl">
-			<div class="sheet">
-				<div class="panel-group panel-group-flush">
-					<aui:fieldset>
-						<div class="display-template">
-							<liferay-template:template-selector
-								className="<%= CommerceAddressContentPortlet.class.getName() %>"
-								displayStyle="<%= commerceAddressDisplayContext.getDisplayStyle() %>"
-								displayStyleGroupId="<%= commerceAddressDisplayContext.getDisplayStyleGroupId() %>"
-								refreshURL="<%= PortalUtil.getCurrentURL(request) %>"
-								showEmptyOption="<%= true %>"
-							/>
-						</div>
-					</aui:fieldset>
-				</div>
-			</div>
+			<aui:fieldset-group markupView="lexicon">
+				<aui:fieldset>
+					<div class="display-template">
+						<liferay-template:template-selector
+							className="<%= CommerceAddressContentPortlet.class.getName() %>"
+							displayStyle="<%= commerceAddressDisplayContext.getDisplayStyle() %>"
+							displayStyleGroupId="<%= commerceAddressDisplayContext.getDisplayStyleGroupId() %>"
+							refreshURL="<%= PortalUtil.getCurrentURL(request) %>"
+							showEmptyOption="<%= true %>"
+						/>
+					</div>
+				</aui:fieldset>
+			</aui:fieldset-group>
 		</div>
 	</div>
 

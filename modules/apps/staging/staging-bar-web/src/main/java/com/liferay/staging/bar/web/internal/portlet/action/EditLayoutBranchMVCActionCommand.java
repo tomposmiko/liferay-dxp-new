@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StagingBarPortletKeys.STAGING_BAR,
 		"mvc.command.name=/staging_bar/edit_layout_branch"
@@ -89,7 +90,13 @@ public class EditLayoutBranchMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setLayoutBranchService(
+		LayoutBranchService layoutBranchService) {
+
+		_layoutBranchService = layoutBranchService;
+	}
+
 	private LayoutBranchService _layoutBranchService;
 
 }

@@ -45,9 +45,7 @@ public class DataDefinitionMustSetValidIndexTypeValidationExceptionMapper
 
 		return new Problem(
 			mustSetValidIndexType.getFieldName(), Response.Status.BAD_REQUEST,
-			mustSetValidIndexType.getMessage(),
-			DataDefinitionValidationException.MustSetValidIndexType.class.
-				getName());
+			mustSetValidIndexType.getMessage(), "MustSetValidIndexType");
 	}
 
 }

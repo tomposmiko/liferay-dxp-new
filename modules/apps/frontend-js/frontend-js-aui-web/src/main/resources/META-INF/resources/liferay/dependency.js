@@ -13,19 +13,19 @@
  */
 
 (function () {
-	const A = AUI().use('oop');
+	var A = AUI().use('oop');
 
-	const usedModules = {};
+	var usedModules = {};
 
-	const Dependency = {
+	var Dependency = {
 		_getAOP(object, methodName) {
 			return object._yuiaop && object._yuiaop[methodName];
 		},
 
 		_proxy(object, methodName, methodFn, context, guid, modules, _A) {
-			let args;
+			var args;
 
-			const queue = Dependency._proxyLoaders[guid];
+			var queue = Dependency._proxyLoaders[guid];
 
 			Dependency._replaceMethod(object, methodName, methodFn, context);
 
@@ -33,7 +33,7 @@
 				methodFn.apply(context, args);
 			}
 
-			for (let i = modules.length - 1; i >= 0; i--) {
+			for (var i = modules.length - 1; i >= 0; i--) {
 				usedModules[modules[i]] = true;
 			}
 		},
@@ -41,9 +41,9 @@
 		_proxyLoaders: {},
 
 		_replaceMethod(object, methodName, methodFn) {
-			const AOP = Dependency._getAOP(object, methodName);
+			var AOP = Dependency._getAOP(object, methodName);
 
-			let proxy = object[methodName];
+			var proxy = object[methodName];
 
 			if (AOP) {
 				proxy = AOP.method;
@@ -62,12 +62,12 @@
 				modules = [modules];
 			}
 
-			let before;
+			var before;
 
-			const guid = A.guid();
+			var guid = A.guid();
 
 			if (A.Lang.isObject(methodFn, true)) {
-				const config = methodFn;
+				var config = methodFn;
 
 				methodFn = config.fn;
 				before = config.before;
@@ -81,22 +81,22 @@
 				object = object.prototype;
 			}
 
-			const AOP = Dependency._getAOP(object, methodName);
+			var AOP = Dependency._getAOP(object, methodName);
 
 			if (AOP) {
 				delete object._yuiaop[methodName];
 			}
 
-			const proxy = function () {
-				const args = arguments;
+			var proxy = function () {
+				var args = arguments;
 
-				let context = object;
+				var context = object;
 
 				if (proto) {
 					context = this;
 				}
 
-				if (modules.length === 1) {
+				if (modules.length == 1) {
 					if (modules[0] in usedModules) {
 						Dependency._replaceMethod(
 							object,
@@ -111,9 +111,9 @@
 					}
 				}
 
-				let firstLoad = false;
+				var firstLoad = false;
 
-				let queue = Dependency._proxyLoaders[guid];
+				var queue = Dependency._proxyLoaders[guid];
 
 				if (!queue) {
 					firstLoad = true;

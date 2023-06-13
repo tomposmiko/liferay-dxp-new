@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.change.tracking.internal.configuration.CTMessageBusConfiguration",
-	service = MessageBusInterceptor.class
+	immediate = true, service = MessageBusInterceptor.class
 )
 public class CTMessageBusInterceptor implements MessageBusInterceptor {
 

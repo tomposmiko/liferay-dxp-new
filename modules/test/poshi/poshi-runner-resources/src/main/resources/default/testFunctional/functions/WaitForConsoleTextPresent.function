@@ -1,8 +1,0 @@
-@default = "waitForConsoleTextPresent"
-definition {
-
-	function waitForConsoleTextPresent {
-		selenium.waitForConsoleTextPresent();
-	}
-
-}

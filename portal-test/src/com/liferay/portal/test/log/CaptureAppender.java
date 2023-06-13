@@ -41,7 +41,7 @@ public class CaptureAppender extends AppenderSkeleton implements Closeable {
 	public CaptureAppender(Logger logger) {
 		_logger = logger;
 
-		_level = logger.getLevel();
+		_level = _logger.getLevel();
 
 		_parentCategory = logger.getParent();
 

@@ -41,22 +41,12 @@ public class LayoutAdvancedFormNavigatorEntry
 
 	@Override
 	public String getCategoryKey() {
-		return FormNavigatorConstants.CATEGORY_KEY_LAYOUT_GENERAL;
-	}
-
-	@Override
-	public String getFormNavigatorId() {
-		return FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT;
+		return FormNavigatorConstants.CATEGORY_KEY_LAYOUT_ADVANCED;
 	}
 
 	@Override
 	public String getKey() {
 		return "advanced";
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
 	}
 
 	@Override
@@ -87,6 +77,15 @@ public class LayoutAdvancedFormNavigatorEntry
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/layout/advanced.jsp";
 	}
@@ -94,8 +93,5 @@ public class LayoutAdvancedFormNavigatorEntry
 	@Reference
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")
-	private ServletContext _servletContext;
 
 }

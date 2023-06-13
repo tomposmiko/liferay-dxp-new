@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Lucas Marques
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.asset.kernel.model.AssetCategory",
 	service = ModelPreFilterContributor.class
 )

@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.redirect.internal.configuration.RedirectURLConfiguration",
+	immediate = true,
 	property = Constants.SERVICE_PID + "=com.liferay.redirect.internal.configuration.RedirectURLConfiguration.scoped",
 	service = {
 		ManagedServiceFactory.class, RedirectURLManagedServiceFactory.class
@@ -73,11 +74,12 @@ public class RedirectURLManagedServiceFactory implements ManagedServiceFactory {
 			dictionary.get("companyId"), CompanyConstants.SYSTEM);
 
 		if (companyId != CompanyConstants.SYSTEM) {
+			_pidCompanyIdMapping.put(pid, companyId);
+
 			_companyConfigurationBeans.put(
 				companyId,
 				ConfigurableUtil.createConfigurable(
 					RedirectURLConfiguration.class, dictionary));
-			_companyIds.put(pid, companyId);
 		}
 	}
 
@@ -89,8 +91,8 @@ public class RedirectURLManagedServiceFactory implements ManagedServiceFactory {
 	}
 
 	private void _unmapPid(String pid) {
-		if (_companyIds.containsKey(pid)) {
-			long companyId = _companyIds.remove(pid);
+		if (_pidCompanyIdMapping.containsKey(pid)) {
+			long companyId = _pidCompanyIdMapping.remove(pid);
 
 			_companyConfigurationBeans.remove(companyId);
 		}
@@ -98,7 +100,8 @@ public class RedirectURLManagedServiceFactory implements ManagedServiceFactory {
 
 	private final Map<Long, RedirectURLConfiguration>
 		_companyConfigurationBeans = new ConcurrentHashMap<>();
-	private final Map<String, Long> _companyIds = new ConcurrentHashMap<>();
+	private final Map<String, Long> _pidCompanyIdMapping =
+		new ConcurrentHashMap<>();
 	private volatile RedirectURLConfiguration _systemRedirectURLConfiguration;
 
 }

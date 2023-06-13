@@ -187,11 +187,6 @@ public class VersionedEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public boolean isHead() {
 		return model.isHead();
 	}

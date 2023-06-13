@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = "info.item.identifier=com.liferay.info.item.ClassPKInfoItemIdentifier",
 	service = InfoItemObjectProvider.class
 )

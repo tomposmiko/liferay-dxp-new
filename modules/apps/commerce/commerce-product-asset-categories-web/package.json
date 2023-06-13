@@ -1,6 +1,5 @@
 {
 	"dependencies": {
-		"@liferay/frontend-icons-web": "*",
 		"frontend-js-web": "*"
 	},
 	"name": "@liferay/commerce-product-asset-categories-web",
@@ -9,5 +8,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "4.0.47"
+	"version": "4.0.13"
 }

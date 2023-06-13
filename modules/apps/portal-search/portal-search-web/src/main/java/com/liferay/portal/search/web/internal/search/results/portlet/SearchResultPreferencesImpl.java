@@ -17,6 +17,8 @@ package com.liferay.portal.search.web.internal.search.results.portlet;
 import com.liferay.portal.search.web.internal.display.context.SearchResultPreferences;
 import com.liferay.portal.search.web.internal.document.DocumentFormPermissionChecker;
 
+import java.util.Optional;
+
 /**
  * @author André de Oliveira
  */
@@ -31,8 +33,8 @@ public class SearchResultPreferencesImpl implements SearchResultPreferences {
 	}
 
 	@Override
-	public String getFieldsToDisplay() {
-		return _searchResultsPortletPreferences.getFieldsToDisplay();
+	public Optional<String> getFieldsToDisplayOptional() {
+		return _searchResultsPortletPreferences.getFieldsToDisplayOptional();
 	}
 
 	@Override

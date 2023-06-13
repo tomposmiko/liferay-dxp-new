@@ -57,7 +57,6 @@ public class FVSActiveEntryLocalServiceImpl
 		return fvsActiveEntryPersistence.update(fvsActiveEntry);
 	}
 
-	@Override
 	public FVSActiveEntry fetchFVSActiveEntry(
 		long userId, String clayDataSetDisplayId, long plid, String portletId) {
 

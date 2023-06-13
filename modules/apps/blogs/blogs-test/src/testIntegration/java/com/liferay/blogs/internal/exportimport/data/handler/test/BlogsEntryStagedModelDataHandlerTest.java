@@ -72,7 +72,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 	public void testImportedCoverImage() throws Exception {
 		initExport();
 
-		BlogsEntry entry = _addBlogsEntryWithCoverImage();
+		BlogsEntry entry = addBlogsEntryWithCoverImage();
 
 		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
 
@@ -103,7 +103,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 	public void testImportedCoverImageAfterUpdate() throws Exception {
 		initExport();
 
-		BlogsEntry entry = _addBlogsEntryWithCoverImage();
+		BlogsEntry entry = addBlogsEntryWithCoverImage();
 
 		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
 
@@ -146,7 +146,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 	public void testImportedSmallImage() throws Exception {
 		initExport();
 
-		BlogsEntry entry = _addBlogsEntryWithSmallImage();
+		BlogsEntry entry = addBlogsEntryWithSmallImage();
 
 		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
 
@@ -179,7 +179,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 	public void testImportedSmallImageAfterUpdate() throws Exception {
 		initExport();
 
-		BlogsEntry entry = _addBlogsEntryWithSmallImage();
+		BlogsEntry entry = addBlogsEntryWithSmallImage();
 
 		StagedModelDataHandlerUtil.exportStagedModel(portletDataContext, entry);
 
@@ -222,7 +222,7 @@ public class BlogsEntryStagedModelDataHandlerTest
 	public void testImportedSmallImageURL() throws Exception {
 		initExport();
 
-		BlogsEntry entry = _addBlogsEntry(
+		BlogsEntry entry = addBlogsEntry(
 			null, new ImageSelector(StringUtil.randomString()),
 			ServiceContextTestUtil.getServiceContext(
 				stagingGroup.getGroupId(), TestPropsValues.getUserId()));
@@ -246,17 +246,65 @@ public class BlogsEntryStagedModelDataHandlerTest
 			entry.getSmallImageURL(), importedEntry.getSmallImageURL());
 	}
 
+	protected BlogsEntry addBlogsEntry(
+			ImageSelector coverImageImageSelector,
+			ImageSelector smallImageImageSelector,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		return BlogsEntryLocalServiceUtil.addEntry(
+			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), new Date(), true, true,
+			new String[0], StringPool.BLANK, coverImageImageSelector,
+			smallImageImageSelector, serviceContext);
+	}
+
+	protected BlogsEntry addBlogsEntryWithCoverImage() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
+		InputStream inputStream = getInputStream();
+
+		String mimeType = MimeTypesUtil.getContentType(_IMAGE_TITLE);
+
+		ImageSelector imageSelector = new ImageSelector(
+			FileUtil.getBytes(inputStream), _IMAGE_TITLE, mimeType,
+			_IMAGE_CROP_REGION);
+
+		return addBlogsEntry(imageSelector, null, serviceContext);
+	}
+
+	protected BlogsEntry addBlogsEntryWithSmallImage() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
+		InputStream inputStream = getInputStream();
+
+		String mimeType = MimeTypesUtil.getContentType(_IMAGE_TITLE);
+
+		ImageSelector imageSelector = new ImageSelector(
+			FileUtil.getBytes(inputStream), _IMAGE_TITLE, mimeType,
+			StringPool.BLANK);
+
+		return addBlogsEntry(null, imageSelector, serviceContext);
+	}
+
 	@Override
 	protected StagedModel addStagedModel(
 			Group group,
 			Map<String, List<StagedModel>> dependentStagedModelsMap)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group, TestPropsValues.getUserId());
+
 		return BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				group, TestPropsValues.getUserId()));
+			RandomTestUtil.randomString(), serviceContext);
 	}
 
 	@Override
@@ -282,6 +330,15 @@ public class BlogsEntryStagedModelDataHandlerTest
 		stagedModels.add(pendingEntry);
 
 		return stagedModels;
+	}
+
+	protected InputStream getInputStream() {
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		return classLoader.getResourceAsStream(
+			"com/liferay/blogs/dependencies/test.jpg");
 	}
 
 	@Override
@@ -345,61 +402,6 @@ public class BlogsEntryStagedModelDataHandlerTest
 		Assert.assertEquals(
 			entry.getCoverImageCaption(), importedEntry.getCoverImageCaption());
 		Assert.assertEquals(entry.isSmallImage(), importedEntry.isSmallImage());
-	}
-
-	private BlogsEntry _addBlogsEntry(
-			ImageSelector coverImageImageSelector,
-			ImageSelector smallImageImageSelector,
-			ServiceContext serviceContext)
-		throws Exception {
-
-		return BlogsEntryLocalServiceUtil.addEntry(
-			TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), new Date(), true, true,
-			new String[0], StringPool.BLANK, coverImageImageSelector,
-			smallImageImageSelector, serviceContext);
-	}
-
-	private BlogsEntry _addBlogsEntryWithCoverImage() throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				stagingGroup.getGroupId(), TestPropsValues.getUserId());
-
-		InputStream inputStream = _getInputStream();
-
-		String mimeType = MimeTypesUtil.getContentType(_IMAGE_TITLE);
-
-		ImageSelector imageSelector = new ImageSelector(
-			FileUtil.getBytes(inputStream), _IMAGE_TITLE, mimeType,
-			_IMAGE_CROP_REGION);
-
-		return _addBlogsEntry(imageSelector, null, serviceContext);
-	}
-
-	private BlogsEntry _addBlogsEntryWithSmallImage() throws Exception {
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				stagingGroup.getGroupId(), TestPropsValues.getUserId());
-
-		InputStream inputStream = _getInputStream();
-
-		String mimeType = MimeTypesUtil.getContentType(_IMAGE_TITLE);
-
-		ImageSelector imageSelector = new ImageSelector(
-			FileUtil.getBytes(inputStream), _IMAGE_TITLE, mimeType,
-			StringPool.BLANK);
-
-		return _addBlogsEntry(null, imageSelector, serviceContext);
-	}
-
-	private InputStream _getInputStream() {
-		Class<?> clazz = getClass();
-
-		ClassLoader classLoader = clazz.getClassLoader();
-
-		return classLoader.getResourceAsStream(
-			"com/liferay/blogs/dependencies/test.jpg");
 	}
 
 	private BlogsEntry _updateBlogsEntry(BlogsEntry blogsEntry)

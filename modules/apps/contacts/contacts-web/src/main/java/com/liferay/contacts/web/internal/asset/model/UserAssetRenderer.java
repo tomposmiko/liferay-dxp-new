@@ -16,6 +16,7 @@ package com.liferay.contacts.web.internal.asset.model;
 
 import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
 import com.liferay.contacts.constants.ContactsWebKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -23,7 +24,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
@@ -110,11 +110,12 @@ public class UserAssetRenderer extends BaseJSPAssetRenderer<User> {
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
+		String portletId = PortletProviderUtil.getPortletId(
+			User.class.getName(), PortletProvider.Action.VIEW);
+
 		return PortletURLBuilder.createLiferayPortletURL(
 			liferayPortletResponse, getControlPanelPlid(liferayPortletRequest),
-			PortletProviderUtil.getPortletId(
-				User.class.getName(), PortletProvider.Action.VIEW),
-			PortletRequest.RENDER_PHASE
+			portletId, PortletRequest.RENDER_PHASE
 		).setMVCRenderCommandName(
 			"/users_admin/edit_user"
 		).setParameter(
@@ -137,19 +138,12 @@ public class UserAssetRenderer extends BaseJSPAssetRenderer<User> {
 			(ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return getURLViewInContext(themeDisplay, noSuchEntryRedirect);
-	}
-
-	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
-
 		try {
 			return _user.getDisplayURL(themeDisplay);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

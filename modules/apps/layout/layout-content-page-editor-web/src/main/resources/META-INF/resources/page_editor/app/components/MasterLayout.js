@@ -14,32 +14,24 @@
 
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 
 import {
 	LayoutDataPropTypes,
 	getLayoutDataItemPropTypes,
-} from '../../prop_types/index';
+} from '../../prop-types/index';
 import {LAYOUT_DATA_ITEM_TYPES} from '../config/constants/layoutDataItemTypes';
 import {useSelectItem} from '../contexts/ControlsContext';
 import {useSelector} from '../contexts/StoreContext';
 import Layout from './Layout';
-import FragmentContent from './fragment_content/FragmentContent';
-import hasDropZoneChild from './layout_data_items/hasDropZoneChild';
-import {
-	Collection,
-	Column,
-	Container,
-	Form,
-	Row,
-} from './layout_data_items/index';
+import FragmentContent from './fragment-content/FragmentContent';
+import {Collection, Column, Container, Row} from './layout-data-items/index';
 
 const LAYOUT_DATA_ITEMS = {
 	[LAYOUT_DATA_ITEM_TYPES.collection]: Collection,
 	[LAYOUT_DATA_ITEM_TYPES.collectionItem]: CollectionItem,
 	[LAYOUT_DATA_ITEM_TYPES.column]: MasterColumn,
 	[LAYOUT_DATA_ITEM_TYPES.container]: Container,
-	[LAYOUT_DATA_ITEM_TYPES.form]: Form,
 	[LAYOUT_DATA_ITEM_TYPES.dropZone]: DropZoneContainer,
 	[LAYOUT_DATA_ITEM_TYPES.fragment]: Fragment,
 	[LAYOUT_DATA_ITEM_TYPES.fragmentDropZone]: Root,
@@ -112,15 +104,9 @@ function Root({children}) {
 function CollectionItem({children}) {
 	return <div>{children}</div>;
 }
-
-function Fragment({item, layoutData}) {
+function Fragment({item}) {
 	const ref = useRef(null);
 	const selectItem = useSelectItem();
-
-	const hasDropzoneChild = useMemo(() => hasDropZoneChild(item, layoutData), [
-		item,
-		layoutData,
-	]);
 
 	useEffect(() => {
 		const element = ref.current;
@@ -143,20 +129,8 @@ function Fragment({item, layoutData}) {
 
 		element.addEventListener('click', handler);
 
-		if (!hasDropzoneChild) {
-			element.setAttribute('inert', '');
-		}
-
-		element.setAttribute('aria-hidden', 'true');
-
 		return () => {
 			element.removeEventListener('click', handler);
-
-			if (!hasDropzoneChild) {
-				element.removeAttribute('inert');
-			}
-
-			element.removeAttribute('aria-hidden');
 		};
 	});
 

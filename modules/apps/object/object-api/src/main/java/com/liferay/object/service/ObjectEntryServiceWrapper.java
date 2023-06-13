@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class ObjectEntryServiceWrapper
 	implements ObjectEntryService, ServiceWrapper<ObjectEntryService> {
 
-	public ObjectEntryServiceWrapper() {
-		this(null);
-	}
-
 	public ObjectEntryServiceWrapper(ObjectEntryService objectEntryService) {
 		_objectEntryService = objectEntryService;
 	}
@@ -58,15 +54,6 @@ public class ObjectEntryServiceWrapper
 	}
 
 	@Override
-	public void checkModelResourcePermission(
-			long objectDefinitionId, long objectEntryId, String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_objectEntryService.checkModelResourcePermission(
-			objectDefinitionId, objectEntryId, actionId);
-	}
-
-	@Override
 	public com.liferay.object.model.ObjectEntry deleteObjectEntry(
 			long objectEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -92,38 +79,6 @@ public class ObjectEntryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.object.model.ObjectEntry>
-			getManyToManyObjectEntries(
-				long groupId, long objectRelationshipId, long primaryKey,
-				boolean related, boolean reverse, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.getManyToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, related, reverse, start,
-			end);
-	}
-
-	@Override
-	public int getManyToManyObjectEntriesCount(
-			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related, boolean reverse)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.getManyToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related, reverse);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.security.permission.resource.
-		ModelResourcePermission<com.liferay.object.model.ObjectEntry>
-				getModelResourcePermission(
-					com.liferay.object.model.ObjectEntry objectEntry)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.getModelResourcePermission(objectEntry);
-	}
-
-	@Override
 	public com.liferay.object.model.ObjectEntry getObjectEntry(
 			long objectEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -140,27 +95,6 @@ public class ObjectEntryServiceWrapper
 			externalReferenceCode, companyId, groupId);
 	}
 
-	@Override
-	public java.util.List<com.liferay.object.model.ObjectEntry>
-			getOneToManyObjectEntries(
-				long groupId, long objectRelationshipId, long primaryKey,
-				boolean related, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.getOneToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, related, start, end);
-	}
-
-	@Override
-	public int getOneToManyObjectEntriesCount(
-			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.getOneToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -169,43 +103,6 @@ public class ObjectEntryServiceWrapper
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _objectEntryService.getOSGiServiceIdentifier();
-	}
-
-	@Override
-	public boolean hasModelResourcePermission(
-			long objectDefinitionId, long objectEntryId, String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.hasModelResourcePermission(
-			objectDefinitionId, objectEntryId, actionId);
-	}
-
-	@Override
-	public boolean hasModelResourcePermission(
-			com.liferay.object.model.ObjectEntry objectEntry, String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.hasModelResourcePermission(
-			objectEntry, actionId);
-	}
-
-	@Override
-	public boolean hasModelResourcePermission(
-			com.liferay.portal.kernel.model.User user, long objectEntryId,
-			String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.hasModelResourcePermission(
-			user, objectEntryId, actionId);
-	}
-
-	@Override
-	public boolean hasPortletResourcePermission(
-			long groupId, long objectDefinitionId, String actionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryService.hasPortletResourcePermission(
-			groupId, objectDefinitionId, actionId);
 	}
 
 	@Override

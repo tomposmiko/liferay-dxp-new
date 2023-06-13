@@ -14,10 +14,9 @@
 
 package com.liferay.commerce.product.internal.upgrade.v1_9_0;
 
+import com.liferay.commerce.product.internal.upgrade.base.BaseCommerceProductServiceUpgradeProcess;
+import com.liferay.commerce.product.model.impl.CPDefinitionOptionRelModelImpl;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,10 +25,15 @@ import java.sql.Statement;
 /**
  * @author Marco Leo
  */
-public class CPDefinitionOptionRelUpgradeProcess extends UpgradeProcess {
+public class CPDefinitionOptionRelUpgradeProcess
+	extends BaseCommerceProductServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CPDefinitionOptionRelModelImpl.class,
+			CPDefinitionOptionRelModelImpl.TABLE_NAME, "key_", "VARCHAR(75)");
+
 		String selectCPOptionSQL =
 			"select distinct CPOptionId, key_  from CPOption";
 		String updateCPDefinitionOptionRelSQL =
@@ -51,14 +55,6 @@ public class CPDefinitionOptionRelUpgradeProcess extends UpgradeProcess {
 
 			preparedStatement.executeBatch();
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CPDefinitionOptionRel", "key_ VARCHAR(75)")
-		};
 	}
 
 }

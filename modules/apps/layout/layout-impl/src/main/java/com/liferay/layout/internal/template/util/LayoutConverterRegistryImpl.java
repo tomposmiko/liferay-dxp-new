@@ -27,12 +27,12 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = LayoutConverterRegistry.class)
+@Component(immediate = true, service = LayoutConverterRegistry.class)
 public class LayoutConverterRegistryImpl implements LayoutConverterRegistry {
 
 	@Override
 	public LayoutConverter getLayoutConverter(String layoutTemplateId) {
-		LayoutConverter layoutConverter = _serviceTrackerMap.getService(
+		LayoutConverter layoutConverter = _layoutConverters.getService(
 			layoutTemplateId);
 
 		if (layoutConverter == null) {
@@ -44,13 +44,13 @@ public class LayoutConverterRegistryImpl implements LayoutConverterRegistry {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+		_layoutConverters = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, LayoutConverter.class, "layout.template.id");
 	}
 
 	@Reference(target = "(layout.template.id=default)")
 	private LayoutConverter _defaultLayoutConverter;
 
-	private ServiceTrackerMap<String, LayoutConverter> _serviceTrackerMap;
+	private ServiceTrackerMap<String, LayoutConverter> _layoutConverters;
 
 }

@@ -1,4 +1,3 @@
-create unique index IX_7010BDE on ReadingTimeEntry (groupId, classNameId, classPK, ctCollectionId);
-create index IX_BBA49AB1 on ReadingTimeEntry (uuid_[$COLUMN_LENGTH:75$], companyId, ctCollectionId);
-create index IX_41D63313 on ReadingTimeEntry (uuid_[$COLUMN_LENGTH:75$], ctCollectionId);
-create unique index IX_4FDED5F3 on ReadingTimeEntry (uuid_[$COLUMN_LENGTH:75$], groupId, ctCollectionId);
+create unique index IX_73B13580 on ReadingTimeEntry (groupId, classNameId, classPK);
+create index IX_29FACA53 on ReadingTimeEntry (uuid_[$COLUMN_LENGTH:75$], companyId);
+create unique index IX_D647C995 on ReadingTimeEntry (uuid_[$COLUMN_LENGTH:75$], groupId);

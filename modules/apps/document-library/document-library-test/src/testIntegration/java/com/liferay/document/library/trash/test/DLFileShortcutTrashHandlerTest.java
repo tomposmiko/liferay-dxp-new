@@ -27,10 +27,11 @@ import com.liferay.document.library.kernel.service.DLFolderLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLTrashServiceUtil;
 import com.liferay.document.library.test.util.DLAppTestUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -41,10 +42,8 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.exception.RestoreEntryException;
 import com.liferay.trash.exception.TrashEntryException;
 import com.liferay.trash.test.util.BaseTrashHandlerTestCase;
@@ -133,13 +132,35 @@ public class DLFileShortcutTrashHandlerTest
 	@Override
 	@Test(expected = TrashEntryException.class)
 	public void testTrashParentAndBaseModel() throws Exception {
-		super.testTrashParentAndBaseModel();
+		try {
+			super.testTrashParentAndBaseModel();
+		}
+		catch (com.liferay.trash.kernel.exception.TrashEntryException
+					trashEntryException) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(trashEntryException, trashEntryException);
+			}
+
+			throw new TrashEntryException();
+		}
 	}
 
 	@Override
 	@Test(expected = RestoreEntryException.class)
 	public void testTrashParentAndRestoreParentAndBaseModel() throws Exception {
-		super.testTrashParentAndRestoreParentAndBaseModel();
+		try {
+			super.testTrashParentAndRestoreParentAndBaseModel();
+		}
+		catch (com.liferay.trash.kernel.exception.RestoreEntryException
+					restoreEntryException) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(restoreEntryException, restoreEntryException);
+			}
+
+			throw new RestoreEntryException();
+		}
 	}
 
 	@Override
@@ -234,9 +255,8 @@ public class DLFileShortcutTrashHandlerTest
 		throws Exception {
 
 		Folder folder = DLAppLocalServiceUtil.addFolder(
-			null, TestPropsValues.getUserId(), group.getGroupId(),
-			parentBaseModelId, RandomTestUtil.randomString(), StringPool.BLANK,
-			serviceContext);
+			TestPropsValues.getUserId(), group.getGroupId(), parentBaseModelId,
+			RandomTestUtil.randomString(), StringPool.BLANK, serviceContext);
 
 		return (BaseModel<?>)folder.getModel();
 	}
@@ -253,11 +273,6 @@ public class DLFileShortcutTrashHandlerTest
 	@Override
 	protected String getUniqueTitle(BaseModel<?> baseModel) {
 		return null;
-	}
-
-	@Override
-	protected boolean isInTrashContainer(TrashedModel trashedModel) {
-		return _trashHelper.isInTrashContainer(trashedModel);
 	}
 
 	@Override
@@ -309,8 +324,8 @@ public class DLFileShortcutTrashHandlerTest
 			getNotInTrashBaseModelsCount(parentBaseModel));
 	}
 
-	@Inject
-	private TrashHelper _trashHelper;
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileShortcutTrashHandlerTest.class);
 
 	private final WhenIsAssetable _whenIsAssetable =
 		new DefaultWhenIsAssetable();

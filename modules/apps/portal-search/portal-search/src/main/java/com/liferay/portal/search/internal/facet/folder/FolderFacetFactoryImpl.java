@@ -17,6 +17,7 @@ package com.liferay.portal.search.internal.facet.folder;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.search.facet.Facet;
+import com.liferay.portal.search.facet.FacetFactory;
 import com.liferay.portal.search.facet.folder.FolderFacetFactory;
 import com.liferay.portal.search.internal.facet.FacetImpl;
 
@@ -25,7 +26,9 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Bryan Engler
  */
-@Component(service = FolderFacetFactory.class)
+@Component(
+	immediate = true, service = {FacetFactory.class, FolderFacetFactory.class}
+)
 public class FolderFacetFactoryImpl implements FolderFacetFactory {
 
 	@Override

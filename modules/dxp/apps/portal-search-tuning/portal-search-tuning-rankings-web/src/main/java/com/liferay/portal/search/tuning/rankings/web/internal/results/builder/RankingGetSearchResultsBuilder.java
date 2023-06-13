@@ -15,10 +15,10 @@
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.search.document.Document;
@@ -29,6 +29,8 @@ import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.tuning.rankings.web.internal.util.RankingResultUtil;
+
+import java.util.stream.Stream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -64,9 +66,7 @@ public class RankingGetSearchResultsBuilder {
 		SearchResponse searchResponse = _searcher.search(searchRequest);
 
 		return JSONUtil.put(
-			"documents",
-			JSONUtil.toJSONArray(
-				searchResponse.getDocuments(), this::translate, _log)
+			"documents", buildDocuments(searchResponse)
 		).put(
 			"total", searchResponse.getTotalHits()
 		);
@@ -96,6 +96,16 @@ public class RankingGetSearchResultsBuilder {
 		return this;
 	}
 
+	protected JSONArray buildDocuments(SearchResponse searchResponse) {
+		Stream<JSONObject> stream = getElements(searchResponse);
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		stream.forEach(jsonArray::put);
+
+		return jsonArray;
+	}
+
 	protected SearchRequest buildSearchRequest() {
 		RankingSearchRequestBuilder rankingSearchRequestBuilder =
 			new RankingSearchRequestBuilder(
@@ -112,6 +122,12 @@ public class RankingGetSearchResultsBuilder {
 			_queryString
 		).build(
 		).build();
+	}
+
+	protected Stream<JSONObject> getElements(SearchResponse searchResponse) {
+		Stream<Document> stream = searchResponse.getDocumentsStream();
+
+		return stream.map(this::translate);
 	}
 
 	protected JSONObject translate(Document document) {
@@ -136,9 +152,6 @@ public class RankingGetSearchResultsBuilder {
 	private boolean _isAssetDeleted(Document document) {
 		return RankingResultUtil.isAssetDeleted(document);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RankingGetSearchResultsBuilder.class.getName());
 
 	private long _companyId;
 	private final ComplexQueryPartBuilderFactory

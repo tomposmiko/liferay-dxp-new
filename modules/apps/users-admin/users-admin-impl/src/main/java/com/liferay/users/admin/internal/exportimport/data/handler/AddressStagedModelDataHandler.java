@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Mendez Gonzalez
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class AddressStagedModelDataHandler
 	extends BaseStagedModelDataHandler<Address> {
 
@@ -108,29 +108,37 @@ public class AddressStagedModelDataHandler
 			serviceContext.setUuid(address.getUuid());
 
 			importedAddress = _addressLocalService.addAddress(
-				null, userId, address.getClassName(), address.getClassPK(),
-				null, null, address.getStreet1(), address.getStreet2(),
+				userId, address.getClassName(), address.getClassPK(),
+				address.getStreet1(), address.getStreet2(),
 				address.getStreet3(), address.getCity(), address.getZip(),
 				address.getRegionId(), address.getCountryId(),
-				address.getListTypeId(), address.isMailing(),
-				address.isPrimary(), null, serviceContext);
+				address.getTypeId(), address.isMailing(), address.isPrimary(),
+				serviceContext);
 		}
 		else {
 			importedAddress = _addressLocalService.updateAddress(
 				existingAddress.getAddressId(), address.getStreet1(),
 				address.getStreet2(), address.getStreet3(), address.getCity(),
 				address.getZip(), address.getRegionId(), address.getCountryId(),
-				address.getListTypeId(), address.isMailing(),
-				address.isPrimary());
+				address.getTypeId(), address.isMailing(), address.isPrimary());
 		}
 
 		portletDataContext.importClassedModel(address, importedAddress);
 	}
 
-	@Reference
-	private AddressLocalService _addressLocalService;
+	@Reference(unbind = "-")
+	protected void setAddressLocalService(
+		AddressLocalService addressLocalService) {
 
-	@Reference
+		_addressLocalService = addressLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	private AddressLocalService _addressLocalService;
 	private GroupLocalService _groupLocalService;
 
 }

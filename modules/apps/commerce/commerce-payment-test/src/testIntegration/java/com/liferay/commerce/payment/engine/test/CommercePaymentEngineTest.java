@@ -15,8 +15,7 @@
 package com.liferay.commerce.payment.engine.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
-import com.liferay.commerce.context.CommerceGroupThreadLocal;
+import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
@@ -37,15 +36,16 @@ import com.liferay.commerce.product.test.util.CPTestUtil;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.test.util.CommerceInventoryTestUtil;
 import com.liferay.commerce.test.util.CommerceTestUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -67,6 +67,7 @@ import org.frutilla.FrutillaRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -87,30 +88,31 @@ public class CommercePaymentEngineTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
-
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(_user));
 
 		PrincipalThreadLocal.setName(_user.getUserId());
 
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
+
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
-			_group.getCompanyId());
+			_company.getCompanyId());
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
-			_group.getCompanyId(), _group.getGroupId(), _user.getUserId());
+			_company.getCompanyId(), _group.getGroupId(), _user.getUserId());
 
 		_commerceChannel = CommerceTestUtil.addCommerceChannel(
 			_group.getGroupId(), _commerceCurrency.getCode());
-
-		_originalCommerceGroup = CommerceGroupThreadLocal.get();
-
-		CommerceGroupThreadLocal.set(
-			_groupLocalService.fetchGroup(_commerceChannel.getGroupId()));
 
 		_commercePaymentMethodGroupRelLocalService.
 			addCommercePaymentMethodGroupRel(
@@ -126,8 +128,6 @@ public class CommercePaymentEngineTest {
 
 	@After
 	public void tearDown() throws Exception {
-		CommerceGroupThreadLocal.set(_originalCommerceGroup);
-
 		for (CommerceOrder commerceOrder : _commerceOrders) {
 			_commerceOrderLocalService.deleteCommerceOrder(commerceOrder);
 		}
@@ -206,7 +206,7 @@ public class CommercePaymentEngineTest {
 				checkoutOrder.getCommerceOrderId());
 
 		Assert.assertEquals(
-			CommerceOrderPaymentConstants.STATUS_AUTHORIZED,
+			CommerceOrderConstants.PAYMENT_STATUS_AUTHORIZED,
 			paymentOrder.getPaymentStatus());
 
 		Assert.assertNotNull(paymentOrder.getTransactionId());
@@ -219,7 +219,7 @@ public class CommercePaymentEngineTest {
 			checkoutOrder.getCommerceOrderId());
 
 		Assert.assertEquals(
-			CommerceOrderPaymentConstants.STATUS_COMPLETED,
+			CommerceOrderConstants.PAYMENT_STATUS_PAID,
 			paymentOrder.getPaymentStatus());
 	}
 
@@ -298,7 +298,7 @@ public class CommercePaymentEngineTest {
 				checkoutOrder.getCommerceOrderId());
 
 		Assert.assertEquals(
-			CommerceOrderPaymentConstants.STATUS_AUTHORIZED,
+			CommerceOrderConstants.PAYMENT_STATUS_AUTHORIZED,
 			paymentOrder.getPaymentStatus());
 
 		Assert.assertNotNull(paymentOrder.getTransactionId());
@@ -307,6 +307,7 @@ public class CommercePaymentEngineTest {
 	@Rule
 	public FrutillaRule frutillaRule = new FrutillaRule();
 
+	private static Company _company;
 	private static User _user;
 
 	@DeleteAfterTestRun
@@ -337,12 +338,7 @@ public class CommercePaymentEngineTest {
 	private CommercePriceListLocalService _commercePriceListLocalService;
 
 	private Group _group;
-
-	@Inject
-	private GroupLocalService _groupLocalService;
-
 	private HttpServletRequest _httpServletRequest;
-	private Group _originalCommerceGroup;
 	private ServiceContext _serviceContext;
 
 }

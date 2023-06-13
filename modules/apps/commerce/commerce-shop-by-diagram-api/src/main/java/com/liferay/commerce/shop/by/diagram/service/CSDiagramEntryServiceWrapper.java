@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.shop.by.diagram.service;
 
-import com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -27,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CSDiagramEntryServiceWrapper
 	implements CSDiagramEntryService, ServiceWrapper<CSDiagramEntryService> {
 
-	public CSDiagramEntryServiceWrapper() {
-		this(null);
-	}
-
 	public CSDiagramEntryServiceWrapper(
 		CSDiagramEntryService csDiagramEntryService) {
 
@@ -38,10 +33,11 @@ public class CSDiagramEntryServiceWrapper
 	}
 
 	@Override
-	public CSDiagramEntry addCSDiagramEntry(
-			long cpDefinitionId, long cpInstanceId, long cProductId,
-			boolean diagram, int quantity, String sequence, String sku,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			addCSDiagramEntry(
+				long cpDefinitionId, long cpInstanceId, long cProductId,
+				boolean diagram, int quantity, String sequence, String sku,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryService.addCSDiagramEntry(
@@ -57,15 +53,15 @@ public class CSDiagramEntryServiceWrapper
 	}
 
 	@Override
-	public void deleteCSDiagramEntry(CSDiagramEntry csDiagramEntry)
+	public void deleteCSDiagramEntry(long csDiagramEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		_csDiagramEntryService.deleteCSDiagramEntry(csDiagramEntry);
+		_csDiagramEntryService.deleteCSDiagramEntry(csDiagramEntryId);
 	}
 
 	@Override
-	public CSDiagramEntry fetchCSDiagramEntry(
-			long cpDefinitionId, String sequence)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			fetchCSDiagramEntry(long cpDefinitionId, String sequence)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryService.fetchCSDiagramEntry(
@@ -73,28 +69,10 @@ public class CSDiagramEntryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<CSDiagramEntry> getCProductCSDiagramEntries(
-			long cProductId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator<CSDiagramEntry>
-				orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _csDiagramEntryService.getCProductCSDiagramEntries(
-			cProductId, start, end, orderByComparator);
-	}
-
-	@Override
-	public int getCProductCSDiagramEntriesCount(long cProductId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _csDiagramEntryService.getCProductCSDiagramEntriesCount(
-			cProductId);
-	}
-
-	@Override
-	public java.util.List<CSDiagramEntry> getCSDiagramEntries(
-			long cpDefinitionId, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public java.util.List
+		<com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry>
+				getCSDiagramEntries(long cpDefinitionId, int start, int end)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryService.getCSDiagramEntries(
 			cpDefinitionId, start, end);
@@ -108,15 +86,16 @@ public class CSDiagramEntryServiceWrapper
 	}
 
 	@Override
-	public CSDiagramEntry getCSDiagramEntry(long csDiagramEntryId)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			getCSDiagramEntry(long csDiagramEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryService.getCSDiagramEntry(csDiagramEntryId);
 	}
 
 	@Override
-	public CSDiagramEntry getCSDiagramEntry(
-			long cpDefinitionId, String sequence)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			getCSDiagramEntry(long cpDefinitionId, String sequence)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryService.getCSDiagramEntry(
@@ -134,10 +113,11 @@ public class CSDiagramEntryServiceWrapper
 	}
 
 	@Override
-	public CSDiagramEntry updateCSDiagramEntry(
-			long csDiagramEntryId, long cpInstanceId, long cProductId,
-			boolean diagram, int quantity, String sequence, String sku,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry
+			updateCSDiagramEntry(
+				long csDiagramEntryId, long cpInstanceId, long cProductId,
+				boolean diagram, int quantity, String sequence, String sku,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramEntryService.updateCSDiagramEntry(

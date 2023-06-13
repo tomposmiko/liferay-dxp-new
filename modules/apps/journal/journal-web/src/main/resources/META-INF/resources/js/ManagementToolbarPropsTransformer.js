@@ -14,12 +14,9 @@
 
 import {addParams, navigate, openSelectionModal} from 'frontend-js-web';
 
-import openDeleteArticleModal from './modals/openDeleteArticleModal';
-
 export default function propsTransformer({
 	additionalProps: {
 		addArticleURL,
-		exportTranslationURL,
 		moveArticlesAndFoldersURL,
 		openViewMoreStructuresURL,
 		selectEntityURL,
@@ -30,54 +27,52 @@ export default function propsTransformer({
 	...otherProps
 }) {
 	const deleteEntries = () => {
-		if (trashEnabled) {
-			Liferay.fire(`${portletNamespace}editEntry`, {
-				action: '/journal/move_articles_and_folders_to_trash',
-			});
+		const searchContainer = Liferay.SearchContainer.get(
+			`${portletNamespace}articles`
+		);
 
-			return;
+		const selectedItems = searchContainer.select
+			.getAllSelectedElements()
+			.size();
+
+		let message = Liferay.Language.get(
+			'are-you-sure-you-want-to-delete-the-selected-entry'
+		);
+
+		if (trashEnabled && selectedItems > 1) {
+			message = Liferay.Language.get(
+				'are-you-sure-you-want-to-move-the-selected-entries-to-the-recycle-bin'
+			);
+		}
+		else if (trashEnabled && selectedItems === 1) {
+			message = Liferay.Language.get(
+				'are-you-sure-you-want-to-move-the-selected-entry-to-the-recycle-bin'
+			);
+		}
+		else if (!trashEnabled && selectedItems > 1) {
+			message = Liferay.Language.get(
+				'are-you-sure-you-want-to-delete-the-selected-entries'
+			);
 		}
 
-		openDeleteArticleModal({
-			onDelete: () => {
-				Liferay.fire(`${portletNamespace}editEntry`, {
-					action: '/journal/delete_articles_and_folders',
-				});
-			},
-		});
+		if (confirm(message)) {
+			Liferay.fire(`${portletNamespace}editEntry`, {
+				action: trashEnabled
+					? '/journal/move_articles_and_folders_to_trash'
+					: '/journal/delete_articles_and_folders',
+			});
+		}
 	};
-
 	const expireEntries = () => {
 		Liferay.fire(`${portletNamespace}editEntry`, {
 			action: '/journal/expire_articles_and_folders',
 		});
 	};
 
-	const exportTranslation = () => {
-		const url = new URL(exportTranslationURL);
-
-		const searchContainer = Liferay.SearchContainer.get(
-			`${portletNamespace}articles`
-		);
-
-		const keys = searchContainer.select
-			.getAllSelectedElements()
-			.get('value');
-
-		navigate(
-			addParams(
-				{
-					[`_${url.searchParams.get('p_p_id')}_key`]: keys.join(','),
-				},
-				exportTranslationURL
-			)
-		);
-	};
-
 	const moveEntries = () => {
 		let entrySelectorNodes = document.querySelectorAll('.entry-selector');
 
-		if (!entrySelectorNodes.length) {
+		if (entrySelectorNodes.length === 0) {
 			entrySelectorNodes = document.querySelectorAll(
 				'.card-page-item input[type="checkbox"]'
 			);
@@ -106,9 +101,6 @@ export default function propsTransformer({
 			else if (action === 'expireEntries') {
 				expireEntries();
 			}
-			else if (action === 'exportTranslation') {
-				exportTranslation();
-			}
 			else if (action === 'moveEntries') {
 				moveEntries();
 			}
@@ -117,18 +109,12 @@ export default function propsTransformer({
 			if (item?.data?.action === 'openDDMStructuresSelector') {
 				openSelectionModal({
 					onSelect: (selectedItem) => {
-						if (selectedItem) {
-							const itemValue = JSON.parse(selectedItem.value);
-
-							navigate(
-								addParams(
-									{
-										[`${portletNamespace}ddmStructureId`]: itemValue.ddmstructureid,
-									},
-									viewDDMStructureArticlesURL
-								)
-							);
-						}
+						navigate(
+							addParams(
+								`${portletNamespace}ddmStructureKey=${selectedItem.ddmstructurekey}`,
+								viewDDMStructureArticlesURL
+							)
+						);
 					},
 					selectEventName: `${portletNamespace}selectDDMStructure`,
 					title: Liferay.Language.get('structures'),
@@ -151,9 +137,7 @@ export default function propsTransformer({
 
 						navigate(
 							addParams(
-								{
-									[`${portletNamespace}ddmStructureId`]: selectedItem.ddmstructureid,
-								},
+								`${portletNamespace}ddmStructureKey=${selectedItem.ddmstructurekey}`,
 								addArticleURL
 							)
 						);

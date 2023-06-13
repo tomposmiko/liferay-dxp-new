@@ -27,10 +27,6 @@ public class CPDefinitionGroupedEntryLocalServiceWrapper
 	implements CPDefinitionGroupedEntryLocalService,
 			   ServiceWrapper<CPDefinitionGroupedEntryLocalService> {
 
-	public CPDefinitionGroupedEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CPDefinitionGroupedEntryLocalServiceWrapper(
 		CPDefinitionGroupedEntryLocalService
 			cpDefinitionGroupedEntryLocalService) {
@@ -39,14 +35,29 @@ public class CPDefinitionGroupedEntryLocalServiceWrapper
 			cpDefinitionGroupedEntryLocalService;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public void addCPDefinitionGroupedEntries(
-			long cpDefinitionId, long[] entryCProductIds,
+			long cpDefinitionId, long[] entryCPDefinitionIds,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_cpDefinitionGroupedEntryLocalService.addCPDefinitionGroupedEntries(
-			cpDefinitionId, entryCProductIds, serviceContext);
+			cpDefinitionId, entryCPDefinitionIds, serviceContext);
+	}
+
+	@Override
+	public void addCPDefinitionGroupedEntriesByEntryCProductIds(
+			long cpDefinitionId, long[] entryCProductIds,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_cpDefinitionGroupedEntryLocalService.
+			addCPDefinitionGroupedEntriesByEntryCProductIds(
+				cpDefinitionId, entryCProductIds, serviceContext);
 	}
 
 	/**
@@ -70,10 +81,30 @@ public class CPDefinitionGroupedEntryLocalServiceWrapper
 			addCPDefinitionGroupedEntry(cpDefinitionGroupedEntry);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public
 		com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry
 				addCPDefinitionGroupedEntry(
+					long cpDefinitionId, long entryCPDefinitionId,
+					double priority, int quantity,
+					com.liferay.portal.kernel.service.ServiceContext
+						serviceContext)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpDefinitionGroupedEntryLocalService.
+			addCPDefinitionGroupedEntry(
+				cpDefinitionId, entryCPDefinitionId, priority, quantity,
+				serviceContext);
+	}
+
+	@Override
+	public
+		com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry
+				addCPDefinitionGroupedEntryByEntryCProductId(
 					long cpDefinitionId, long entryCProductId, double priority,
 					int quantity,
 					com.liferay.portal.kernel.service.ServiceContext
@@ -81,7 +112,7 @@ public class CPDefinitionGroupedEntryLocalServiceWrapper
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionGroupedEntryLocalService.
-			addCPDefinitionGroupedEntry(
+			addCPDefinitionGroupedEntryByEntryCProductId(
 				cpDefinitionId, entryCProductId, priority, quantity,
 				serviceContext);
 	}
@@ -305,6 +336,21 @@ public class CPDefinitionGroupedEntryLocalServiceWrapper
 	}
 
 	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	@Override
+	public
+		com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry
+			fetchCPDefinitionGroupedEntryByC_E(
+				long cpDefinitionId, long entryCPDefinitionId) {
+
+		return _cpDefinitionGroupedEntryLocalService.
+			fetchCPDefinitionGroupedEntryByC_E(
+				cpDefinitionId, entryCPDefinitionId);
+	}
+
+	/**
 	 * Returns the cp definition grouped entry matching the UUID and group.
 	 *
 	 * @param uuid the cp definition grouped entry's UUID
@@ -479,22 +525,6 @@ public class CPDefinitionGroupedEntryLocalServiceWrapper
 
 		return _cpDefinitionGroupedEntryLocalService.
 			getCPDefinitionGroupedEntryByUuidAndGroupId(uuid, groupId);
-	}
-
-	@Override
-	public java.util.List
-		<com.liferay.commerce.product.type.grouped.model.
-			CPDefinitionGroupedEntry>
-					getEntryCProductCPDefinitionGroupedEntries(
-						long entryCProductId, int start, int end,
-						com.liferay.portal.kernel.util.OrderByComparator
-							<com.liferay.commerce.product.type.grouped.model.
-								CPDefinitionGroupedEntry> orderByComparator)
-				throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionGroupedEntryLocalService.
-			getEntryCProductCPDefinitionGroupedEntries(
-				entryCProductId, start, end, orderByComparator);
 	}
 
 	@Override

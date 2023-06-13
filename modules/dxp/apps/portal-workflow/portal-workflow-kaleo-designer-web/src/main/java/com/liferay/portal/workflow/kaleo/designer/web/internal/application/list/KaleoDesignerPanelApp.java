@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Inácio Nery
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=200",
 		"panel.category.key=" + PanelCategoryKeys.CONTROL_PANEL_WORKFLOW
@@ -37,11 +38,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = PanelApp.class
 )
 public class KaleoDesignerPanelApp extends BasePanelApp {
-
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
 
 	@Override
 	public String getPortletId() {
@@ -55,9 +51,13 @@ public class KaleoDesignerPanelApp extends BasePanelApp {
 		return false;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + KaleoDesignerPortletKeys.KALEO_DESIGNER + ")"
+		target = "(javax.portlet.name=" + KaleoDesignerPortletKeys.KALEO_DESIGNER + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

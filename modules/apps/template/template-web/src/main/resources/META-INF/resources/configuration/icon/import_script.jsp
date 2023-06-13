@@ -16,6 +16,15 @@
 
 <%@ include file="/init.jsp" %>
 
+<liferay-ui:icon
+	cssClass="ddm-template-editor-portlet-icon"
+	icon="upload"
+	id="importScript"
+	markupView="lexicon"
+	message="import-script"
+	url="javascript:;"
+/>
+
 <input class="d-none" id="<portlet:namespace />importScriptInput" type="file" />
 
 <liferay-frontend:component

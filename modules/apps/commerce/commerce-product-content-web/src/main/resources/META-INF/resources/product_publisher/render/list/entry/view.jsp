@@ -17,11 +17,13 @@
 <%@ include file="/init.jsp" %>
 
 <%
-CPCompareContentHelper cpCompareContentHelper = (CPCompareContentHelper)request.getAttribute(CPContentWebKeys.CP_COMPARE_CONTENT_HELPER);
-
 CPContentHelper cpContentHelper = (CPContentHelper)request.getAttribute(CPContentWebKeys.CP_CONTENT_HELPER);
 
 CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
+
+CPSku cpSku = cpContentHelper.getDefaultCPSku(cpCatalogEntry);
+
+String productDetailURL = cpContentHelper.getFriendlyURL(cpCatalogEntry, themeDisplay);
 %>
 
 <div class="cp-renderer">
@@ -29,35 +31,14 @@ CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
 
 	<div class="card d-flex flex-column product-card">
 		<div class="card-item-first position-relative">
-
-			<%
-			String productDetailURL = cpContentHelper.getFriendlyURL(cpCatalogEntry, themeDisplay);
-			%>
-
 			<a href="<%= productDetailURL %>">
-
-				<%
-				String cpDefinitionCDNURL = cpContentHelper.getCPDefinitionCDNURL(cpCatalogEntry.getCPDefinitionId(), request);
-				%>
-
-				<c:choose>
-					<c:when test="<%= Validator.isNotNull(cpDefinitionCDNURL) %>">
-						<img class="img-fluid product-card-picture" src="<%= cpDefinitionCDNURL %>" />
-					</c:when>
-					<c:otherwise>
-						<liferay-adaptive-media:img
-							class="img-fluid product-card-picture"
-							fileVersion="<%= cpContentHelper.getCPDefinitionImageFileVersion(cpCatalogEntry.getCPDefinitionId(), request) %>"
-						/>
-					</c:otherwise>
-				</c:choose>
+				<liferay-adaptive-media:img
+					class="img-fluid product-card-picture"
+					fileVersion="<%= cpContentHelper.getCPDefinitionImageFileVersion(cpCatalogEntry.getCPDefinitionId(), request) %>"
+				/>
 
 				<div class="aspect-ratio-item-bottom-left">
 					<commerce-ui:availability-label
-						CPCatalogEntry="<%= cpCatalogEntry %>"
-					/>
-
-					<commerce-ui:discontinued-label
 						CPCatalogEntry="<%= cpCatalogEntry %>"
 					/>
 				</div>
@@ -66,11 +47,6 @@ CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
 
 		<div class="card-body d-flex flex-column justify-content-between py-2">
 			<div class="cp-information">
-
-				<%
-				CPSku cpSku = cpContentHelper.getDefaultCPSku(cpCatalogEntry);
-				%>
-
 				<p class="card-subtitle" title="<%= (cpSku == null) ? StringPool.BLANK : cpSku.getSku() %>">
 					<span class="text-truncate-inline">
 						<span class="text-truncate"><%= (cpSku == null) ? StringPool.BLANK : cpSku.getSku() %></span>
@@ -100,22 +76,17 @@ CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
 			<div>
 				<c:choose>
 					<c:when test="<%= (cpSku == null) || cpContentHelper.hasCPDefinitionOptionRels(cpCatalogEntry.getCPDefinitionId()) %>">
-						<div class="add-to-cart d-flex my-2 pt-5" id="<%= PortalUtil.generateRandomKey(request, "taglib") + StringPool.UNDERLINE %>add_to_cart">
+						<div class="add-to-cart d-flex my-2 pt-5" id="<%= PortalUtil.generateRandomKey(request, "taglib") + StringPool.UNDERLINE + "add_to_cart" %>">
 							<a class="btn btn-block btn-secondary" href="<%= productDetailURL %>" role="button" style="margin-top: 0.35rem;">
 								<liferay-ui:message key="view-all-variants" />
 							</a>
 						</div>
 					</c:when>
 					<c:otherwise>
-						<div class="mt-2">
-							<commerce-ui:add-to-cart
-								alignment="full-width"
-								CPCatalogEntry="<%= cpCatalogEntry %>"
-								inline="<%= false %>"
-								size="md"
-								skuOptions="[]"
-							/>
-						</div>
+						<commerce-ui:add-to-cart
+							block="<%= true %>"
+							CPCatalogEntry="<%= cpCatalogEntry %>"
+						/>
 					</c:otherwise>
 				</c:choose>
 
@@ -127,7 +98,6 @@ CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
 									<commerce-ui:compare-checkbox
 										CPCatalogEntry="<%= cpCatalogEntry %>"
 										label='<%= LanguageUtil.get(request, "compare") %>'
-										refreshOnRemove="<%= (cpCompareContentHelper != null) && CPPortletKeys.CP_COMPARE_CONTENT_WEB.equals(portletDisplay.getPortletName()) %>"
 									/>
 								</div>
 							</div>

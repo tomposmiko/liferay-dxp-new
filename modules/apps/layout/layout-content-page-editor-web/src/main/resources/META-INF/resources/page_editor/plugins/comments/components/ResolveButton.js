@@ -58,7 +58,7 @@ export default function ResolveButton({
 			monospaced
 			onClick={onClick}
 			outline
-			size="sm"
+			small
 		>
 			{icon}
 		</ClayButton>

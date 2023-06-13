@@ -16,7 +16,7 @@ package com.liferay.layout.page.template.admin.web.internal.portlet.action;
 
 import com.liferay.item.selector.ItemSelectorUploadResponseHandler;
 import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminPortletKeys;
-import com.liferay.layout.page.template.admin.web.internal.upload.LayoutPageTemplateEntryPreviewImageEditorUploadFileEntryHandler;
+import com.liferay.layout.page.template.admin.web.internal.upload.LayoutPageTemplateEntryPreviewUploadFileEntryHandler;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.upload.UploadHandler;
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
 		"mvc.command.name=/layout_page_template_admin/upload_layout_page_template_entry_preview"
@@ -46,7 +47,7 @@ public class UploadLayoutPageTemplateEntryPreviewMVCActionCommand
 		throws Exception {
 
 		_uploadHandler.upload(
-			_layoutPageTemplateEntryPreviewImageEditorUploadFileEntryHandler,
+			_layoutPageTemplateEntryPreviewUploadFileEntryHandler,
 			_itemSelectorUploadResponseHandler, actionRequest, actionResponse);
 	}
 
@@ -55,8 +56,8 @@ public class UploadLayoutPageTemplateEntryPreviewMVCActionCommand
 		_itemSelectorUploadResponseHandler;
 
 	@Reference
-	private LayoutPageTemplateEntryPreviewImageEditorUploadFileEntryHandler
-		_layoutPageTemplateEntryPreviewImageEditorUploadFileEntryHandler;
+	private LayoutPageTemplateEntryPreviewUploadFileEntryHandler
+		_layoutPageTemplateEntryPreviewUploadFileEntryHandler;
 
 	@Reference
 	private UploadHandler _uploadHandler;

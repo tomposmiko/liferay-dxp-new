@@ -13,7 +13,7 @@
  */
 
 (function () {
-	const LiferayAUI = Liferay.AUI;
+	var LiferayAUI = Liferay.AUI;
 
 	AUI().applyConfig({
 		groups: {
@@ -34,6 +34,9 @@
 							'aui-sortable-list',
 							'json',
 							'liferay-form',
+							'liferay-layouts-tree',
+							'liferay-layouts-tree-radio',
+							'liferay-layouts-tree-selectable',
 							'liferay-map-base',
 							'liferay-translation-manager',
 							'liferay-util-window',

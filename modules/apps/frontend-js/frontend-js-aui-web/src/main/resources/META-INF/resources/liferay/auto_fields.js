@@ -15,13 +15,12 @@
 AUI.add(
 	'liferay-auto-fields',
 	(A) => {
-		// eslint-disable-next-line @liferay/aui/no-object
-		const AObject = A.Object;
-		const Lang = A.Lang;
+		var AObject = A.Object;
+		var Lang = A.Lang;
 
-		const CSS_ICON_LOADING = 'loading-animation';
+		var CSS_ICON_LOADING = 'loading-animation';
 
-		const CSS_VALIDATION_HELPER_CLASSES = [
+		var CSS_VALIDATION_HELPER_CLASSES = [
 			'error',
 			'error-field',
 			'has-error',
@@ -29,29 +28,29 @@ AUI.add(
 			'success-field',
 		];
 
-		const TPL_ADD_BUTTON =
-			'<button class="add-row btn btn-icon-only btn-monospaced btn-primary toolbar-first toolbar-item" title="' +
+		var TPL_ADD_BUTTON =
+			'<button class="add-row btn btn-icon-only btn-monospaced btn-secondary toolbar-first toolbar-item" title="' +
 			Liferay.Language.get('add') +
 			'" type="button">' +
 			Liferay.Util.getLexiconIconTpl('plus') +
 			'</button>';
 
-		const TPL_DELETE_BUTTON =
-			'<button class="btn btn-icon-only btn-monospaced btn-primary delete-row toolbar-item toolbar-last" title="' +
+		var TPL_DELETE_BUTTON =
+			'<button class="btn btn-icon-only btn-monospaced btn-secondary delete-row toolbar-item toolbar-last" title="' +
 			Liferay.Language.get('remove') +
 			'" type="button">' +
 			Liferay.Util.getLexiconIconTpl('hr') +
 			'</button>';
 
-		const TPL_AUTOROW_CONTROLS =
+		var TPL_AUTOROW_CONTROLS =
 			'<span class="lfr-autorow-controls toolbar toolbar-horizontal">' +
 			'<span class="toolbar-content">' +
-			TPL_DELETE_BUTTON +
 			TPL_ADD_BUTTON +
+			TPL_DELETE_BUTTON +
 			'</span>' +
 			'</span>';
 
-		const TPL_LOADING = '<div class="' + CSS_ICON_LOADING + '"></div>';
+		var TPL_LOADING = '<div class="' + CSS_ICON_LOADING + '"></div>';
 
 		/**
 		 * OPTIONS
@@ -67,7 +66,7 @@ AUI.add(
 		 *
 		 */
 
-		const AutoFields = A.Component.create({
+		var AutoFields = A.Component.create({
 			AUGMENTS: [Liferay.PortletBase],
 
 			EXTENDS: A.Base,
@@ -76,9 +75,9 @@ AUI.add(
 
 			prototype: {
 				_addHandleClass(node) {
-					const instance = this;
+					var instance = this;
 
-					const sortableHandle = instance.config.sortableHandle;
+					var sortableHandle = instance.config.sortableHandle;
 
 					if (sortableHandle) {
 						node.all(sortableHandle).addClass(
@@ -98,22 +97,22 @@ AUI.add(
 
 				_clearForm(node) {
 					node.all('input, select, textarea').each((item) => {
-						const tag = item.get('nodeName').toLowerCase();
+						var tag = item.get('nodeName').toLowerCase();
 
-						const type = item.getAttribute('type');
+						var type = item.getAttribute('type');
 
 						if (
-							type === 'text' ||
-							type === 'password' ||
-							tag === 'textarea'
+							type == 'text' ||
+							type == 'password' ||
+							tag == 'textarea'
 						) {
 							item.val('');
 						}
-						else if (type === 'checkbox' || type === 'radio') {
+						else if (type == 'checkbox' || type == 'radio') {
 							item.attr('checked', false);
 						}
-						else if (tag === 'select') {
-							let selectedIndex = 0;
+						else if (tag == 'select') {
+							var selectedIndex = 0;
 
 							if (item.getAttribute('showEmptyOption')) {
 								selectedIndex = -1;
@@ -129,7 +128,7 @@ AUI.add(
 				},
 
 				_clearHiddenRows(item) {
-					const instance = this;
+					var instance = this;
 
 					if (instance._isHiddenRow(item)) {
 						item.remove(true);
@@ -138,35 +137,35 @@ AUI.add(
 
 				_clearInputsLocalized(node) {
 					node.all('.language-value').attr('placeholder', '');
-					node.all('.form-text:not(.form-text-repeat)').setHTML('');
+					node.all('.form-text').setHTML('');
 				},
 
 				_createClone(node) {
-					const instance = this;
+					var instance = this;
 
-					const currentRow = node;
+					var currentRow = node;
 
-					const clone = currentRow.clone();
+					var clone = currentRow.clone();
 
-					const guid = instance._guid++;
+					var guid = instance._guid++;
 
-					const formValidator = instance._getFormValidator(node);
+					var formValidator = instance._getFormValidator(node);
 
-					const paletteIsCloned =
-						clone.one("[id$='PaletteBoundingBox']") !== null;
+					var paletteIsCloned =
+						clone.one("[id$='PaletteBoundingBox']") != null;
 
-					const inputsLocalized = node.all('.language-value');
+					var inputsLocalized = node.all('.language-value');
 
-					let clonedRow;
+					var clonedRow;
 
 					if (inputsLocalized && !paletteIsCloned) {
-						const palette = document.querySelector(
+						var palette = document.querySelector(
 							"[id$='PaletteBoundingBox']"
 						);
 
-						const trigger = clone.one('button');
+						var trigger = clone.one('button');
 
-						const list = A.Node.create(
+						var list = A.Node.create(
 							'<ul class="dropdown-menu dropdown-menu-left-side"></ul>'
 						);
 
@@ -196,11 +195,11 @@ AUI.add(
 					formValidator,
 					inputsLocalized
 				) {
-					const instance = this;
+					var instance = this;
 
-					let fieldStrings;
+					var fieldStrings;
 
-					let rules;
+					var rules;
 
 					if (formValidator) {
 						fieldStrings = formValidator.get('fieldStrings');
@@ -210,17 +209,17 @@ AUI.add(
 
 					node.all('button, input, select, textarea, span, div').each(
 						(item) => {
-							const inputNodeName = item.attr('nodeName');
-							const inputType = item.attr('type');
+							var inputNodeName = item.attr('nodeName');
+							var inputType = item.attr('type');
 
-							let oldName = item.attr('name') || item.attr('id');
+							var oldName = item.attr('name') || item.attr('id');
 
-							const newName = oldName.replace(
+							var newName = oldName.replace(
 								/([0-9]+)([_A-Za-z]*)$/,
 								guid + '$2'
 							);
 
-							if (inputType === 'radio') {
+							if (inputType == 'radio') {
 								oldName = item.attr('id');
 
 								item.attr('checked', '');
@@ -228,9 +227,9 @@ AUI.add(
 								item.attr('id', newName);
 							}
 							else if (
-								inputNodeName === 'button' ||
-								inputNodeName === 'div' ||
-								inputNodeName === 'span'
+								inputNodeName == 'button' ||
+								inputNodeName == 'div' ||
+								inputNodeName == 'span'
 							) {
 								if (oldName) {
 									item.attr('id', newName);
@@ -267,7 +266,7 @@ AUI.add(
 
 					instance.once('clone', () => {
 						inputsLocalized.each((item) => {
-							const inputId = item.attr('id');
+							var inputId = item.attr('id');
 
 							instance._registerInputLocalized(
 								Liferay.InputLocalized._instances[inputId],
@@ -287,23 +286,23 @@ AUI.add(
 				},
 
 				_createCloneFromURL(node, guid) {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = node.one('> div');
+					var contentBox = node.one('> div');
 
 					contentBox.html(TPL_LOADING);
 
 					contentBox.plug(A.Plugin.ParseContent);
 
-					const data = {
+					var data = {
 						index: guid,
 					};
 
-					const namespace = instance.urlNamespace
+					var namespace = instance.urlNamespace
 						? instance.urlNamespace
 						: instance.namespace;
 
-					const namespacedData = Liferay.Util.ns(namespace, data);
+					var namespacedData = Liferay.Util.ns(namespace, data);
 
 					Liferay.Util.fetch(instance.url, {
 						body: Liferay.Util.objectToFormData(namespacedData),
@@ -316,12 +315,12 @@ AUI.add(
 				},
 
 				_getFormValidator(node) {
-					let formValidator;
+					var formValidator;
 
-					const form = node.ancestor('form');
+					var form = node.ancestor('form');
 
 					if (form) {
-						const formId = form.attr('id');
+						var formId = form.attr('id');
 
 						formValidator = Liferay.Form.get(formId).formValidator;
 					}
@@ -336,9 +335,9 @@ AUI.add(
 				},
 
 				_makeSortable(sortableHandle) {
-					const instance = this;
+					var instance = this;
 
-					const rows = instance._contentBox.all('.lfr-form-row');
+					var rows = instance._contentBox.all('.lfr-form-row');
 
 					instance._addHandleClass(rows);
 
@@ -359,15 +358,15 @@ AUI.add(
 				},
 
 				_registerInputLocalized(inputLocalized, guid) {
-					const inputLocalizedId = inputLocalized
+					var inputLocalizedId = inputLocalized
 						.get('id')
 						.replace(/([0-9]+)$/, guid);
 
-					const inputLocalizedNamespace = inputLocalized.get(
+					var inputLocalizedNamespace = inputLocalized.get(
 						'namespace'
 					);
 
-					const inputLocalizedNamespaceId = `${inputLocalizedNamespace}${inputLocalizedId}`;
+					var inputLocalizedNamespaceId = `${inputLocalizedNamespace}${inputLocalizedId}`;
 
 					Liferay.InputLocalized.register(inputLocalizedNamespaceId, {
 						boundingBox: `#${inputLocalizedNamespaceId}PaletteBoundingBox`,
@@ -397,18 +396,18 @@ AUI.add(
 						),
 					});
 
-					const inputLocalizedMenuId = `${inputLocalizedNamespace}${inputLocalizedNamespaceId}Menu`;
+					var inputLocalizedMenuId = `${inputLocalizedNamespace}${inputLocalizedNamespaceId}Menu`;
 
 					Liferay.Menu.register(inputLocalizedMenuId);
 				},
 
 				_updateContentButtons() {
-					const instance = this;
+					var instance = this;
 
-					const minimumRows = instance.minimumRows;
+					var minimumRows = instance.minimumRows;
 
 					if (minimumRows) {
-						const deleteRowButtons = instance._contentBox.all(
+						var deleteRowButtons = instance._contentBox.all(
 							'.lfr-form-row:not(.hide) .delete-row'
 						);
 
@@ -420,15 +419,15 @@ AUI.add(
 				},
 
 				addRow(node) {
-					const instance = this;
+					var instance = this;
 
-					const clone = instance._createClone(node);
+					var clone = instance._createClone(node);
 
 					clone.resetId();
 
 					node.placeAfter(clone);
 
-					const input = clone.one(
+					var input = clone.one(
 						'input[type=text], input[type=password], textarea'
 					);
 
@@ -450,15 +449,15 @@ AUI.add(
 				},
 
 				deleteRow(node) {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance._contentBox;
+					var contentBox = instance._contentBox;
 
-					const visibleRows = contentBox.all('.lfr-form-row:visible');
+					var visibleRows = contentBox.all('.lfr-form-row:visible');
 
-					const visibleRowsSize = visibleRows.size();
+					var visibleRowsSize = visibleRows.size();
 
-					let deleteRow = visibleRowsSize > 1;
+					var deleteRow = visibleRowsSize > 1;
 
 					if (visibleRowsSize === 1) {
 						instance.addRow(node);
@@ -467,12 +466,12 @@ AUI.add(
 					}
 
 					if (deleteRow) {
-						const form = node.ancestor('form');
+						var form = node.ancestor('form');
 
 						node.hide();
 
 						CSS_VALIDATION_HELPER_CLASSES.forEach((item) => {
-							const disabledClass = item + '-disabled';
+							var disabledClass = item + '-disabled';
 
 							node.all('.' + item).replaceClass(
 								item,
@@ -480,20 +479,19 @@ AUI.add(
 							);
 						});
 
-						let rules;
+						var rules;
 
-						const deletedRules = {};
+						var deletedRules = {};
 
-						const formValidator = instance._getFormValidator(node);
+						var formValidator = instance._getFormValidator(node);
 
 						if (formValidator) {
-							const errors = formValidator.errors;
+							var errors = formValidator.errors;
 
 							rules = formValidator.get('rules');
 
 							node.all('input, select, textarea').each((item) => {
-								const name =
-									item.attr('name') || item.attr('id');
+								var name = item.attr('name') || item.attr('id');
 
 								if (rules && rules[name]) {
 									deletedRules[name] = rules[name];
@@ -515,7 +513,7 @@ AUI.add(
 							}
 
 							CSS_VALIDATION_HELPER_CLASSES.forEach((item) => {
-								const disabledClass = item + '-disabled';
+								var disabledClass = item + '-disabled';
 
 								node.all('.' + disabledClass).replaceClass(
 									disabledClass,
@@ -546,22 +544,22 @@ AUI.add(
 				},
 
 				initializer(config) {
-					const instance = this;
+					var instance = this;
 
 					instance.config = config;
 				},
 
 				render() {
-					const instance = this;
+					var instance = this;
 
-					const baseContainer = A.Node.create(
+					var baseContainer = A.Node.create(
 						'<div class="lfr-form-row"><div class="row-fields"></div></div>'
 					);
 
-					const config = instance.config;
-					const contentBox = A.one(config.contentBox);
+					var config = instance.config;
+					var contentBox = A.one(config.contentBox);
 
-					const baseRows = contentBox.all(
+					var baseRows = contentBox.all(
 						config.baseRows || '.lfr-form-row'
 					);
 
@@ -599,9 +597,9 @@ AUI.add(
 					contentBox.delegate(
 						'click',
 						(event) => {
-							const link = event.currentTarget;
+							var link = event.currentTarget;
 
-							const currentRow = link.ancestor('.lfr-form-row');
+							var currentRow = link.ancestor('.lfr-form-row');
 
 							if (link.hasClass('add-row')) {
 								instance.addRow(currentRow);
@@ -616,8 +614,8 @@ AUI.add(
 					);
 
 					baseRows.each((item, index) => {
-						let firstChild;
-						let formRow;
+						var firstChild;
+						var formRow;
 
 						if (item.hasClass('lfr-form-row')) {
 							formRow = item;
@@ -662,9 +660,9 @@ AUI.add(
 				},
 
 				reset() {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance._contentBox;
+					var contentBox = instance._contentBox;
 
 					contentBox.all('.lfr-form-row').each((item) => {
 						instance.deleteRow(item);
@@ -674,27 +672,27 @@ AUI.add(
 				},
 
 				save(form) {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = form || instance._contentBox;
+					var contentBox = form || instance._contentBox;
 
 					contentBox
 						.all('.lfr-form-row')
 						.each(instance._clearHiddenRows, instance);
 
-					const fieldOrder = instance.serialize();
+					var fieldOrder = instance.serialize();
 
 					instance._fieldIndexes.val(fieldOrder);
 				},
 
 				serialize(filter) {
-					const instance = this;
+					var instance = this;
 
-					const visibleRows = instance._contentBox
+					var visibleRows = instance._contentBox
 						.all('.lfr-form-row')
 						.each(instance._clearHiddenRows, instance);
 
-					let serializedData = [];
+					var serializedData = [];
 
 					if (filter) {
 						serializedData =
@@ -702,11 +700,9 @@ AUI.add(
 					}
 					else {
 						visibleRows.each((item) => {
-							const formField = item.one(
-								'input, textarea, select'
-							);
+							var formField = item.one('input, textarea, select');
 
-							let fieldId = formField.attr('id');
+							var fieldId = formField.attr('id');
 
 							if (!fieldId) {
 								fieldId = formField.attr('name');

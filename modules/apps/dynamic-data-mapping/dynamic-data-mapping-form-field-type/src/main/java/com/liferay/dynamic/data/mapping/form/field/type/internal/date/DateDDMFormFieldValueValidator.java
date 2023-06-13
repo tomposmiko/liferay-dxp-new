@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pedro Queiroz
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.DATE,
 	service = DDMFormFieldValueValidator.class
 )
@@ -48,16 +49,13 @@ public class DateDDMFormFieldValueValidator
 		throws DDMFormFieldValueValidationException {
 
 		for (Locale availableLocale : value.getAvailableLocales()) {
-			_validateDateValue(
+			validateDateValue(
 				ddmFormField, availableLocale,
 				value.getString(availableLocale));
 		}
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private void _validateDateValue(
+	protected void validateDateValue(
 			DDMFormField ddmFormField, Locale locale, String valueString)
 		throws DDMFormFieldValueValidationException {
 
@@ -67,7 +65,7 @@ public class DateDDMFormFieldValueValidator
 			}
 			catch (ParseException parseException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(parseException);
+					_log.debug(parseException, parseException);
 				}
 
 				throw new DDMFormFieldValueValidationException(
@@ -77,6 +75,9 @@ public class DateDDMFormFieldValueValidator
 			}
 		}
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DateDDMFormFieldValueValidator.class);

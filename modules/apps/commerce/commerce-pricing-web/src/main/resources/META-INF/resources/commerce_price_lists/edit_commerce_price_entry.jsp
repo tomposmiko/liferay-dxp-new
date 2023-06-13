@@ -68,17 +68,20 @@ if ((commercePriceEntry != null) && (commercePriceEntry.getExpirationDate() != n
 						</div>
 					</div>
 
-					<frontend-data-set:classic-display
+					<clay:data-set-display
 						contextParams='<%=
 							HashMapBuilder.<String, String>put(
 								"commercePriceEntryId", String.valueOf(commercePriceEntryId)
 							).build()
 						%>'
 						creationMenu="<%= commercePriceEntryDisplayContext.getCreationMenu() %>"
-						dataProviderKey="<%= CommercePricingFDSNames.TIER_PRICE_ENTRIES %>"
-						formName="fm"
-						id="<%= CommercePricingFDSNames.TIER_PRICE_ENTRIES %>"
+						dataProviderKey="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_TIER_PRICE_ENTRIES %>"
+						formId="fm"
+						id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_TIER_PRICE_ENTRIES %>"
 						itemsPerPage="<%= 10 %>"
+						namespace="<%= liferayPortletResponse.getNamespace() %>"
+						pageNumber="<%= 1 %>"
+						portletURL="<%= currentURLObj %>"
 						selectedItemsKey="tierPriceEntryId"
 						showManagementBar="<%= true %>"
 						showSearch="<%= false %>"

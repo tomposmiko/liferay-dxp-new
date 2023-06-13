@@ -33,10 +33,24 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 
 	@Override
 	protected AutoDeployer buildAutoDeployer() throws AutoDeployException {
-		AutoDeployer autoDeployer = new PortletAutoDeployer();
+		AutoDeployer autoDeployer = null;
 
-		if (_mvcDeployer) {
+		if (_portletDeployer) {
+			autoDeployer = new PortletAutoDeployer();
+		}
+		else if (_mvcDeployer) {
 			autoDeployer = new MVCPortletAutoDeployer();
+		}
+		else if (_waiDeployer) {
+			if (_log.isInfoEnabled()) {
+				_log.info("Deploying package as a web application");
+			}
+
+			autoDeployer = new WAIAutoDeployer();
+		}
+
+		if (autoDeployer == null) {
+			throw new AutoDeployException("Unable to find an auto deployer");
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -45,7 +59,7 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 			_log.debug("Using deployer " + clazz.getName());
 		}
 
-		return autoDeployer;
+		return new ThreadSafeAutoDeployer(autoDeployer);
 	}
 
 	@Override
@@ -64,6 +78,8 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 			new PluginAutoDeployListenerHelper(file);
 
 		if (pluginAutoDeployListenerHelper.isPortletPlugin()) {
+			_portletDeployer = true;
+
 			return true;
 		}
 
@@ -75,12 +91,15 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 
 		String fileName = file.getName();
 
-		if (!pluginAutoDeployListenerHelper.isHookPlugin() &&
+		if (!pluginAutoDeployListenerHelper.isExtPlugin() &&
+			!pluginAutoDeployListenerHelper.isHookPlugin() &&
 			!pluginAutoDeployListenerHelper.isMatchingFile(
 				"WEB-INF/liferay-layout-templates.xml") &&
 			!pluginAutoDeployListenerHelper.isThemePlugin() &&
 			!pluginAutoDeployListenerHelper.isWebPlugin() &&
 			fileName.endsWith(".war")) {
+
+			_waiDeployer = true;
 
 			return true;
 		}
@@ -92,5 +111,7 @@ public class PortletAutoDeployListener extends BaseAutoDeployListener {
 		PortletAutoDeployListener.class);
 
 	private boolean _mvcDeployer;
+	private boolean _portletDeployer;
+	private boolean _waiDeployer;
 
 }

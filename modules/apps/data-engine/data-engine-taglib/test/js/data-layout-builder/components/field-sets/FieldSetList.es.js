@@ -14,6 +14,7 @@
 
 import {ClayModalProvider} from '@clayui/modal';
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import * as DDMForm from 'dynamic-data-mapping-form-builder';
 import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
@@ -50,13 +51,11 @@ let spySuccessToast;
 let spyErrorToast;
 let ddmFormSpy;
 
-export function FieldSetWrapper({children}) {
-	return (
-		<DndProvider backend={HTML5Backend}>
-			<ClayModalProvider>{children}</ClayModalProvider>
-		</DndProvider>
-	);
-}
+export const FieldSetWrapper = ({children}) => (
+	<DndProvider backend={HTML5Backend}>
+		<ClayModalProvider>{children}</ClayModalProvider>
+	</DndProvider>
+);
 
 describe('FieldSets', () => {
 	beforeEach(() => {
@@ -66,6 +65,34 @@ describe('FieldSets', () => {
 			name: 'Field53354166',
 			pages: FORM_VIEW.pages,
 		});
+
+		ddmFormSpy = jest
+			.spyOn(DDMForm, 'default')
+			.mockImplementation((props) => {
+				const state = {
+					...dataLayoutBuilder,
+					dispose: jest.fn(),
+					emit: jest.fn(),
+					formBuilderWithLayoutProvider: {
+						refs: {
+							layoutProvider: {
+								getRules: jest
+									.fn()
+									.mockImplementation(() => []),
+								on: jest.fn().mockImplementation(() => ({
+									removeListener: jest.fn(),
+								})),
+							},
+						},
+					},
+				};
+
+				props.layoutProviderProps.onLoad(state);
+
+				return state;
+			});
+
+		jest.useFakeTimers();
 
 		spySuccessToast = jest
 			.spyOn(toast, 'successToast')
@@ -377,6 +404,10 @@ describe('FieldSets', () => {
 			...defaultState,
 			fieldSets: [fieldSet],
 		};
+
+		jest.spyOn(DataConverter, 'getDataDefinitionFieldSet').mockReturnValue({
+			fieldSet,
+		});
 
 		const {container} = render(
 			<DndProvider backend={HTML5Backend}>

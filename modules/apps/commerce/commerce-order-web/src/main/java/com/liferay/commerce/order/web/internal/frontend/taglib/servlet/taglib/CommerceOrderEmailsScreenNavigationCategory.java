@@ -14,13 +14,21 @@
 
 package com.liferay.commerce.order.web.internal.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.order.web.internal.constants.CommerceOrderScreenNavigationConstants;
+import com.liferay.commerce.model.CommerceOrder;
+import com.liferay.commerce.order.web.internal.servlet.taglib.ui.constants.CommerceOrderScreenNavigationConstants;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+
+import java.io.IOException;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,11 +37,15 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=70",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=70",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CommerceOrderEmailsScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory, ScreenNavigationEntry<CommerceOrder> {
 
 	@Override
 	public String getCategoryKey() {
@@ -42,11 +54,16 @@ public class CommerceOrderEmailsScreenNavigationCategory
 	}
 
 	@Override
+	public String getEntryKey() {
+		return getCategoryKey();
+	}
+
+	@Override
 	public String getLabel(Locale locale) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return language.get(resourceBundle, getCategoryKey());
+		return LanguageUtil.get(resourceBundle, getCategoryKey());
 	}
 
 	@Override
@@ -55,7 +72,18 @@ public class CommerceOrderEmailsScreenNavigationCategory
 			SCREEN_NAVIGATION_KEY_COMMERCE_ORDER_GENERAL;
 	}
 
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		_jspRenderer.renderJSP(
+			httpServletRequest, httpServletResponse,
+			"/commerce_order/emails.jsp");
+	}
+
 	@Reference
-	protected Language language;
+	private JSPRenderer _jspRenderer;
 
 }

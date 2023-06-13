@@ -17,7 +17,6 @@ import {ModalContext} from '../../../../../../src/main/resources/META-INF/resour
 import SingleTransitionModal from '../../../../../../src/main/resources/META-INF/resources/js/components/instance-list-page/modal/transition/single/SingleTransitionModal.es';
 import ToasterProvider from '../../../../../../src/main/resources/META-INF/resources/js/shared/components/toaster/ToasterProvider.es';
 import {MockRouter} from '../../../../../mock/MockRouter.es';
-import FetchMock, {fetchMockResponse} from '../../../../../mock/fetch.es';
 
 import '@testing-library/jest-dom/extend-expect';
 
@@ -54,36 +53,33 @@ const ContainerMock = ({children}) => {
 	);
 };
 
+let getByPlaceholderText, getByText;
+
 const items = [
 	{
 		id: 2,
-		label: 'Testing',
-		name: 'testing',
+		label: 'Test',
+		name: 'test',
 	},
 ];
 
-const fetchMock = new FetchMock({
-	GET: {
-		default: fetchMockResponse({
+const clientMock = {
+	get: jest.fn().mockResolvedValueOnce({
+		data: {
 			items,
 			totalCount: 1,
-		}),
-	},
-	POST: {
-		default: [
-			fetchMockResponse({title: 'Request failed'}, false),
-			fetchMockResponse({items: []}),
-		],
-	},
-});
+		},
+	}),
+	post: jest
+		.fn()
+		.mockRejectedValueOnce(new Error('Request failed'))
+		.mockResolvedValue({data: {items: []}}),
+};
 
 describe('The SingleTransitionModal component should', () => {
-	let getByPlaceholderText;
-	let getByText;
-
 	beforeAll(async () => {
 		const renderResult = render(
-			<MockRouter>
+			<MockRouter client={clientMock}>
 				<SingleTransitionModal />
 			</MockRouter>,
 			{
@@ -97,14 +93,6 @@ describe('The SingleTransitionModal component should', () => {
 		await act(async () => {
 			jest.runAllTimers();
 		});
-	});
-
-	beforeEach(() => {
-		fetchMock.mock();
-	});
-
-	afterEach(() => {
-		fetchMock.reset();
 	});
 
 	it('Be rendered when its attribute visible is "true"', () => {

@@ -1,5 +1,0 @@
-assemble:
-    - include: bar.txt
-      into: static
-foo-client-extension:
-    key: bar

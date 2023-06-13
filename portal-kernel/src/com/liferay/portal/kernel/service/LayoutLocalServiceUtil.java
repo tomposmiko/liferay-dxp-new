@@ -378,18 +378,6 @@ public class LayoutLocalServiceUtil {
 			description, type, hidden, friendlyURL, serviceContext);
 	}
 
-	public static Layout copyLayout(
-			long userId, long groupId, boolean privateLayout,
-			Map<java.util.Locale, String> nameMap, boolean hidden,
-			boolean system, boolean copyPermissions, long sourcePlid,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().copyLayout(
-			userId, groupId, privateLayout, nameMap, hidden, system,
-			copyPermissions, sourcePlid, serviceContext);
-	}
-
 	/**
 	 * Creates a new layout with the primary key. Does not add the layout to the database.
 	 *
@@ -1050,24 +1038,6 @@ public class LayoutLocalServiceUtil {
 	}
 
 	/**
-	 * Returns all the layouts that match the type and belong to the group.
-	 *
-	 * @param groupId the primary key of the group
-	 * @param privateLayout whether the layout is private to the group
-	 * @param types the layout's type (optionally {@link
-	 LayoutConstants#TYPE_PORTLET}). The possible types can be found
-	 in {@link LayoutConstants}.
-	 * @return the matching layouts, or <code>null</code> if no matches were
-	 found
-	 */
-	public static List<Layout> getLayouts(
-			long groupId, boolean privateLayout, String[] types)
-		throws PortalException {
-
-		return getService().getLayouts(groupId, privateLayout, types);
-	}
-
-	/**
 	 * Returns a range of all the layouts belonging to the group.
 	 *
 	 * @param groupId the primary key of the group
@@ -1297,13 +1267,6 @@ public class LayoutLocalServiceUtil {
 	}
 
 	public static int getLayoutsCount(
-		long groupId, boolean privateLayout, long parentLayoutId) {
-
-		return getService().getLayoutsCount(
-			groupId, privateLayout, parentLayoutId);
-	}
-
-	public static int getLayoutsCount(
 			long groupId, long userId, boolean privateLayout, String keywords,
 			String[] types)
 		throws PortalException {
@@ -1394,18 +1357,6 @@ public class LayoutLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
-	}
-
-	public static List<Layout> getPublishedLayouts(
-		long groupId, int start, int end,
-		OrderByComparator<Layout> orderByComparator) {
-
-		return getService().getPublishedLayouts(
-			groupId, start, end, orderByComparator);
-	}
-
-	public static int getPublishedLayoutsCount(long groupId) {
-		return getService().getPublishedLayoutsCount(groupId);
 	}
 
 	public static List<Layout> getScopeGroupLayouts(long parentGroupId)
@@ -1648,9 +1599,8 @@ public class LayoutLocalServiceUtil {
 	 String)}.
 	 * @param hasIconImage whether the icon image will be updated
 	 * @param iconBytes the byte array of the layout's new icon image
-	 * @param styleBookEntryId the primary key of the style book entrys
-	 * @param faviconFileEntryId the file entry ID of the layout's new favicon
 	 * @param masterLayoutPlid the primary key of the master layout
+	 * @param styleBookEntryId the primary key of the style book entrys
 	 * @param serviceContext the service context to be applied. Can set the
 	 modification date and expando bridge attributes for the layout.
 	 For layouts that are linked to a layout prototype, attributes
@@ -1671,16 +1621,15 @@ public class LayoutLocalServiceUtil {
 			Map<java.util.Locale, String> keywordsMap,
 			Map<java.util.Locale, String> robotsMap, String type,
 			boolean hidden, Map<java.util.Locale, String> friendlyURLMap,
-			boolean hasIconImage, byte[] iconBytes, long styleBookEntryId,
-			long faviconFileEntryId, long masterLayoutPlid,
-			ServiceContext serviceContext)
+			boolean hasIconImage, byte[] iconBytes, long masterLayoutPlid,
+			long styleBookEntryId, ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateLayout(
 			groupId, privateLayout, layoutId, parentLayoutId, nameMap, titleMap,
 			descriptionMap, keywordsMap, robotsMap, type, hidden,
-			friendlyURLMap, hasIconImage, iconBytes, styleBookEntryId,
-			faviconFileEntryId, masterLayoutPlid, serviceContext);
+			friendlyURLMap, hasIconImage, iconBytes, masterLayoutPlid,
+			styleBookEntryId, serviceContext);
 	}
 
 	/**
@@ -1701,19 +1650,6 @@ public class LayoutLocalServiceUtil {
 
 		return getService().updateLayout(
 			groupId, privateLayout, layoutId, typeSettings);
-	}
-
-	public static Layout updateLayout(
-			long groupId, boolean privateLayout, long layoutId,
-			String typeSettings, byte[] iconBytes, String themeId,
-			String colorSchemeId, long styleBookEntryId, String css,
-			long faviconFileEntryId, long masterLayoutPlid)
-		throws PortalException {
-
-		return getService().updateLayout(
-			groupId, privateLayout, layoutId, typeSettings, iconBytes, themeId,
-			colorSchemeId, styleBookEntryId, css, faviconFileEntryId,
-			masterLayoutPlid);
 	}
 
 	/**

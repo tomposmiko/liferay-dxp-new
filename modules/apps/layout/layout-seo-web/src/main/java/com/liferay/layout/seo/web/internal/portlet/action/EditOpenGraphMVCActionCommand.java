@@ -19,7 +19,9 @@ import com.liferay.layout.seo.model.LayoutSEOEntry;
 import com.liferay.layout.seo.service.LayoutSEOEntryLocalService;
 import com.liferay.layout.seo.service.LayoutSEOEntryService;
 import com.liferay.layout.seo.web.internal.util.LayoutTypeSettingsUtil;
+import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -28,10 +30,11 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -49,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
 		"mvc.command.name=/layout/edit_open_graph"
@@ -76,17 +80,18 @@ public class EditOpenGraphMVCActionCommand extends BaseMVCActionCommand {
 		boolean openGraphDescriptionEnabled = ParamUtil.getBoolean(
 			actionRequest, "openGraphDescriptionEnabled");
 		Map<Locale, String> openGraphDescriptionMap =
-			_localization.getLocalizationMap(
+			LocalizationUtil.getLocalizationMap(
 				actionRequest, "openGraphDescription");
 		Map<Locale, String> openGraphImageAltMap =
-			_localization.getLocalizationMap(
+			LocalizationUtil.getLocalizationMap(
 				actionRequest, "openGraphImageAlt");
 		long openGraphImageFileEntryId = ParamUtil.getLong(
 			actionRequest, "openGraphImageFileEntryId");
 		boolean openGraphTitleEnabled = ParamUtil.getBoolean(
 			actionRequest, "openGraphTitleEnabled");
 		Map<Locale, String> openGraphTitleMap =
-			_localization.getLocalizationMap(actionRequest, "openGraphTitle");
+			LocalizationUtil.getLocalizationMap(
+				actionRequest, "openGraphTitle");
 
 		LayoutSEOEntry layoutSEOEntry =
 			_layoutSEOEntryLocalService.fetchLayoutSEOEntry(
@@ -113,12 +118,35 @@ public class EditOpenGraphMVCActionCommand extends BaseMVCActionCommand {
 			openGraphImageFileEntryId, openGraphTitleEnabled, openGraphTitleMap,
 			serviceContext);
 
+		Layout draftLayout = layout.fetchDraftLayout();
+
 		UnicodeProperties formTypeSettingsUnicodeProperties =
 			PropertiesParamUtil.getProperties(
 				actionRequest, "TypeSettingsProperties--");
 
+		if (draftLayout != null) {
+			draftLayout = LayoutTypeSettingsUtil.updateTypeSettings(
+				draftLayout, _layoutService, formTypeSettingsUnicodeProperties);
+
+			_layoutSEOEntryService.updateLayoutSEOEntry(
+				groupId, privateLayout, draftLayout.getLayoutId(),
+				canonicalURLEnabled, canonicalURLMap,
+				openGraphDescriptionEnabled, openGraphDescriptionMap,
+				openGraphImageAltMap, openGraphImageFileEntryId,
+				openGraphTitleEnabled, openGraphTitleMap, serviceContext);
+		}
+
 		layout = LayoutTypeSettingsUtil.updateTypeSettings(
 			layout, _layoutService, formTypeSettingsUnicodeProperties);
+
+		LayoutTypePortlet layoutTypePortlet =
+			(LayoutTypePortlet)layout.getLayoutType();
+
+		EventsProcessorUtil.process(
+			PropsKeys.LAYOUT_CONFIGURATION_ACTION_UPDATE,
+			layoutTypePortlet.getConfigurationActionUpdate(),
+			_portal.getHttpServletRequest(actionRequest),
+			_portal.getHttpServletResponse(actionResponse));
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
@@ -149,9 +177,6 @@ public class EditOpenGraphMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private LayoutService _layoutService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

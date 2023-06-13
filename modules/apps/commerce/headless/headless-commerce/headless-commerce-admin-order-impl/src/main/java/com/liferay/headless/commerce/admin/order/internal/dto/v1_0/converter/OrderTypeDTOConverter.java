@@ -20,7 +20,7 @@ import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderType;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Status;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -33,8 +33,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.model.CommerceOrderType",
-	service = DTOConverter.class
+	service = {DTOConverter.class, OrderTypeDTOConverter.class}
 )
 public class OrderTypeDTOConverter
 	implements DTOConverter<CommerceOrderType, OrderType> {
@@ -72,7 +73,7 @@ public class OrderTypeDTOConverter
 				workflowStatusInfo = _toStatus(
 					WorkflowConstants.getStatusLabel(
 						commerceOrderType.getStatus()),
-					_language.get(
+					LanguageUtil.get(
 						LanguageResources.getResourceBundle(
 							dtoConverterContext.getLocale()),
 						WorkflowConstants.getStatusLabel(
@@ -97,8 +98,5 @@ public class OrderTypeDTOConverter
 
 	@Reference
 	private CommerceOrderTypeService _commerceOrderTypeService;
-
-	@Reference
-	private Language _language;
 
 }

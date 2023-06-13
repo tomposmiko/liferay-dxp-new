@@ -69,20 +69,20 @@ public class BaseCKEditorConfigContributor extends BaseEditorConfigContributor {
 		).put(
 			"contentsCss",
 			JSONUtil.putAll(
-				HtmlUtil.escape(themeDisplay.getClayCSSURL()),
-				HtmlUtil.escape(themeDisplay.getMainCSSURL()),
+				HtmlUtil.escape(
+					PortalUtil.getStaticResourceURL(
+						themeDisplay.getRequest(),
+						themeDisplay.getPathThemeCss() + "/clay.css")),
+				HtmlUtil.escape(
+					PortalUtil.getStaticResourceURL(
+						themeDisplay.getRequest(),
+						themeDisplay.getPathThemeCss() + "/main.css")),
 				HtmlUtil.escape(
 					PortalUtil.getStaticResourceURL(
 						themeDisplay.getRequest(),
 						PortalUtil.getPathContext() +
 							"/o/frontend-editor-ckeditor-web/ckeditor/skins" +
-								"/moono-lexicon/editor.css")),
-				HtmlUtil.escape(
-					PortalUtil.getStaticResourceURL(
-						themeDisplay.getRequest(),
-						PortalUtil.getPathContext() +
-							"/o/frontend-editor-ckeditor-web/ckeditor/skins" +
-								"/moono-lexicon/dialog.css")))
+								"/moono-lexicon/editor.css")))
 		).put(
 			"contentsLangDirection",
 			HtmlUtil.escapeJS(
@@ -113,12 +113,7 @@ public class BaseCKEditorConfigContributor extends BaseEditorConfigContributor {
 				CKEditorConstants.ATTRIBUTE_NAMESPACE + ":resizable"));
 
 		if (resizable) {
-			String resizeDirection = GetterUtil.getString(
-				inputEditorTaglibAttributes.get(
-					CKEditorConstants.ATTRIBUTE_NAMESPACE +
-						":resizeDirection"));
-
-			jsonObject.put("resize_dir", resizeDirection);
+			jsonObject.put("resize_dir", "vertical");
 		}
 
 		jsonObject.put("resize_enabled", resizable);

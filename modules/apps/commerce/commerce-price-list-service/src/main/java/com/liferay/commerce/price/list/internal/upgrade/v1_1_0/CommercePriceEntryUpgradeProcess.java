@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.price.list.internal.upgrade.v1_1_0;
 
+import com.liferay.commerce.price.list.internal.upgrade.base.BaseCommercePriceListUpgradeProcess;
 import com.liferay.commerce.price.list.model.impl.CommercePriceEntryModelImpl;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
@@ -22,9 +23,6 @@ import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.portal.kernel.dao.db.IndexMetadata;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.sql.DatabaseMetaData;
@@ -39,7 +37,8 @@ import java.util.Objects;
  * @author Alec Sloan
  * @author Alessio Antonio Rendina
  */
-public class CommercePriceEntryUpgradeProcess extends UpgradeProcess {
+public class CommercePriceEntryUpgradeProcess
+	extends BaseCommercePriceListUpgradeProcess {
 
 	public CommercePriceEntryUpgradeProcess(
 		CPDefinitionLocalService cpDefinitionLocalService,
@@ -51,6 +50,14 @@ public class CommercePriceEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CommercePriceEntryModelImpl.class,
+			CommercePriceEntryModelImpl.TABLE_NAME, "CPInstanceUuid",
+			"VARCHAR(75)");
+		addColumn(
+			CommercePriceEntryModelImpl.class,
+			CommercePriceEntryModelImpl.TABLE_NAME, "CProductId", "LONG");
+
 		_addIndexes(CommercePriceEntryModelImpl.TABLE_NAME);
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -73,28 +80,16 @@ public class CommercePriceEntryUpgradeProcess extends UpgradeProcess {
 				preparedStatement.setLong(1, cpDefinition.getCProductId());
 
 				preparedStatement.setString(2, cpInstance.getCPInstanceUuid());
+
 				preparedStatement.setLong(3, cpInstanceId);
 
 				preparedStatement.execute();
 			}
 		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns(
-				"CommercePriceEntry", "CPInstanceId")
-		};
-	}
+		runSQL("drop index IX_2083879C on CommercePriceEntry");
 
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommercePriceEntry", "CPInstanceUuid VARCHAR(75)",
-				"CProductId LONG")
-		};
+		runSQL("alter table CommercePriceEntry drop column CPInstanceId");
 	}
 
 	private void _addIndexes(String tableName) throws Exception {
@@ -143,7 +138,7 @@ public class CommercePriceEntryUpgradeProcess extends UpgradeProcess {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

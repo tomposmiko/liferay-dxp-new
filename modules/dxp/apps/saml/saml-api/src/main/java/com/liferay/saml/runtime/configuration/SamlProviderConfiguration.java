@@ -19,8 +19,6 @@ import aQute.bnd.annotation.metatype.Meta;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.saml.constants.SamlProviderConfigurationKeys;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Mika Koivisto
  */
@@ -31,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
 	id = "com.liferay.saml.runtime.configuration.SamlProviderConfiguration",
 	localization = "content/Language", name = "saml-provider-configuration-name"
 )
-@ProviderType
 public interface SamlProviderConfiguration {
 
 	@Meta.AD(deflt = "0", name = "company-id", required = false)
@@ -67,15 +64,6 @@ public interface SamlProviderConfiguration {
 		name = "saml-idp-authn-request-signature-required", required = false
 	)
 	public boolean authnRequestSignatureRequired();
-
-	@Meta.AD(
-		deflt = "true",
-		description = "saml-idp-authn-request-signing-allows-dynamic-acs-url-description",
-		id = "saml.idp.authn.request.signing.allows.dynamic.acs.url",
-		name = "saml-idp-authn-request-signing-allows-dynamic-acs-url",
-		required = false
-	)
-	public boolean authnRequestSigningAllowsDynamicACSURL();
 
 	@Meta.AD(
 		deflt = "3000", description = "saml-sp-clock-skew-description",

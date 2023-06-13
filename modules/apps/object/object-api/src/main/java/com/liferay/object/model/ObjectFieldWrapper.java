@@ -45,7 +45,6 @@ public class ObjectFieldWrapper
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
-		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("objectFieldId", getObjectFieldId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -54,20 +53,16 @@ public class ObjectFieldWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("listTypeDefinitionId", getListTypeDefinitionId());
 		attributes.put("objectDefinitionId", getObjectDefinitionId());
-		attributes.put("businessType", getBusinessType());
 		attributes.put("dbColumnName", getDBColumnName());
 		attributes.put("dbTableName", getDBTableName());
-		attributes.put("dbType", getDBType());
 		attributes.put("indexed", isIndexed());
 		attributes.put("indexedAsKeyword", isIndexedAsKeyword());
 		attributes.put("indexedLanguageId", getIndexedLanguageId());
 		attributes.put("label", getLabel());
-		attributes.put("localized", isLocalized());
 		attributes.put("name", getName());
 		attributes.put("relationshipType", getRelationshipType());
 		attributes.put("required", isRequired());
-		attributes.put("state", isState());
-		attributes.put("system", isSystem());
+		attributes.put("type", getType());
 
 		return attributes;
 	}
@@ -84,13 +79,6 @@ public class ObjectFieldWrapper
 
 		if (uuid != null) {
 			setUuid(uuid);
-		}
-
-		String externalReferenceCode = (String)attributes.get(
-			"externalReferenceCode");
-
-		if (externalReferenceCode != null) {
-			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long objectFieldId = (Long)attributes.get("objectFieldId");
@@ -142,12 +130,6 @@ public class ObjectFieldWrapper
 			setObjectDefinitionId(objectDefinitionId);
 		}
 
-		String businessType = (String)attributes.get("businessType");
-
-		if (businessType != null) {
-			setBusinessType(businessType);
-		}
-
 		String dbColumnName = (String)attributes.get("dbColumnName");
 
 		if (dbColumnName != null) {
@@ -158,12 +140,6 @@ public class ObjectFieldWrapper
 
 		if (dbTableName != null) {
 			setDBTableName(dbTableName);
-		}
-
-		String dbType = (String)attributes.get("dbType");
-
-		if (dbType != null) {
-			setDBType(dbType);
 		}
 
 		Boolean indexed = (Boolean)attributes.get("indexed");
@@ -190,12 +166,6 @@ public class ObjectFieldWrapper
 			setLabel(label);
 		}
 
-		Boolean localized = (Boolean)attributes.get("localized");
-
-		if (localized != null) {
-			setLocalized(localized);
-		}
-
 		String name = (String)attributes.get("name");
 
 		if (name != null) {
@@ -214,16 +184,10 @@ public class ObjectFieldWrapper
 			setRequired(required);
 		}
 
-		Boolean state = (Boolean)attributes.get("state");
+		String type = (String)attributes.get("type");
 
-		if (state != null) {
-			setState(state);
-		}
-
-		Boolean system = (Boolean)attributes.get("system");
-
-		if (system != null) {
-			setSystem(system);
+		if (type != null) {
+			setType(type);
 		}
 	}
 
@@ -233,23 +197,8 @@ public class ObjectFieldWrapper
 	}
 
 	@Override
-	public boolean compareBusinessType(String businessType) {
-		return model.compareBusinessType(businessType);
-	}
-
-	@Override
 	public String[] getAvailableLanguageIds() {
 		return model.getAvailableLanguageIds();
-	}
-
-	/**
-	 * Returns the business type of this object field.
-	 *
-	 * @return the business type of this object field
-	 */
-	@Override
-	public String getBusinessType() {
-		return model.getBusinessType();
 	}
 
 	/**
@@ -292,29 +241,9 @@ public class ObjectFieldWrapper
 		return model.getDBTableName();
 	}
 
-	/**
-	 * Returns the db type of this object field.
-	 *
-	 * @return the db type of this object field
-	 */
-	@Override
-	public String getDBType() {
-		return model.getDBType();
-	}
-
 	@Override
 	public String getDefaultLanguageId() {
 		return model.getDefaultLanguageId();
-	}
-
-	/**
-	 * Returns the external reference code of this object field.
-	 *
-	 * @return the external reference code of this object field
-	 */
-	@Override
-	public String getExternalReferenceCode() {
-		return model.getExternalReferenceCode();
 	}
 
 	/**
@@ -434,16 +363,6 @@ public class ObjectFieldWrapper
 	}
 
 	/**
-	 * Returns the localized of this object field.
-	 *
-	 * @return the localized of this object field
-	 */
-	@Override
-	public boolean getLocalized() {
-		return model.getLocalized();
-	}
-
-	/**
 	 * Returns the modified date of this object field.
 	 *
 	 * @return the modified date of this object field
@@ -473,13 +392,6 @@ public class ObjectFieldWrapper
 		return model.getName();
 	}
 
-	@Override
-	public ObjectDefinition getObjectDefinition()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getObjectDefinition();
-	}
-
 	/**
 	 * Returns the object definition ID of this object field.
 	 *
@@ -498,11 +410,6 @@ public class ObjectFieldWrapper
 	@Override
 	public long getObjectFieldId() {
 		return model.getObjectFieldId();
-	}
-
-	@Override
-	public java.util.List<ObjectFieldSetting> getObjectFieldSettings() {
-		return model.getObjectFieldSettings();
 	}
 
 	/**
@@ -536,23 +443,13 @@ public class ObjectFieldWrapper
 	}
 
 	/**
-	 * Returns the state of this object field.
+	 * Returns the type of this object field.
 	 *
-	 * @return the state of this object field
+	 * @return the type of this object field
 	 */
 	@Override
-	public boolean getState() {
-		return model.getState();
-	}
-
-	/**
-	 * Returns the system of this object field.
-	 *
-	 * @return the system of this object field
-	 */
-	@Override
-	public boolean getSystem() {
-		return model.getSystem();
+	public String getType() {
+		return model.getType();
 	}
 
 	/**
@@ -616,16 +513,6 @@ public class ObjectFieldWrapper
 	}
 
 	/**
-	 * Returns <code>true</code> if this object field is localized.
-	 *
-	 * @return <code>true</code> if this object field is localized; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isLocalized() {
-		return model.isLocalized();
-	}
-
-	/**
 	 * Returns <code>true</code> if this object field is required.
 	 *
 	 * @return <code>true</code> if this object field is required; <code>false</code> otherwise
@@ -633,26 +520,6 @@ public class ObjectFieldWrapper
 	@Override
 	public boolean isRequired() {
 		return model.isRequired();
-	}
-
-	/**
-	 * Returns <code>true</code> if this object field is state.
-	 *
-	 * @return <code>true</code> if this object field is state; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isState() {
-		return model.isState();
-	}
-
-	/**
-	 * Returns <code>true</code> if this object field is system.
-	 *
-	 * @return <code>true</code> if this object field is system; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isSystem() {
-		return model.isSystem();
 	}
 
 	@Override
@@ -673,16 +540,6 @@ public class ObjectFieldWrapper
 		throws com.liferay.portal.kernel.exception.LocaleException {
 
 		model.prepareLocalizedFieldsForImport(defaultImportLocale);
-	}
-
-	/**
-	 * Sets the business type of this object field.
-	 *
-	 * @param businessType the business type of this object field
-	 */
-	@Override
-	public void setBusinessType(String businessType) {
-		model.setBusinessType(businessType);
 	}
 
 	/**
@@ -723,26 +580,6 @@ public class ObjectFieldWrapper
 	@Override
 	public void setDBTableName(String dbTableName) {
 		model.setDBTableName(dbTableName);
-	}
-
-	/**
-	 * Sets the db type of this object field.
-	 *
-	 * @param dbType the db type of this object field
-	 */
-	@Override
-	public void setDBType(String dbType) {
-		model.setDBType(dbType);
-	}
-
-	/**
-	 * Sets the external reference code of this object field.
-	 *
-	 * @param externalReferenceCode the external reference code of this object field
-	 */
-	@Override
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		model.setExternalReferenceCode(externalReferenceCode);
 	}
 
 	/**
@@ -850,16 +687,6 @@ public class ObjectFieldWrapper
 	}
 
 	/**
-	 * Sets whether this object field is localized.
-	 *
-	 * @param localized the localized of this object field
-	 */
-	@Override
-	public void setLocalized(boolean localized) {
-		model.setLocalized(localized);
-	}
-
-	/**
 	 * Sets the modified date of this object field.
 	 *
 	 * @param modifiedDate the modified date of this object field
@@ -909,13 +736,6 @@ public class ObjectFieldWrapper
 		model.setObjectFieldId(objectFieldId);
 	}
 
-	@Override
-	public void setObjectFieldSettings(
-		java.util.List<ObjectFieldSetting> objectFieldSettings) {
-
-		model.setObjectFieldSettings(objectFieldSettings);
-	}
-
 	/**
 	 * Sets the primary key of this object field.
 	 *
@@ -947,23 +767,13 @@ public class ObjectFieldWrapper
 	}
 
 	/**
-	 * Sets whether this object field is state.
+	 * Sets the type of this object field.
 	 *
-	 * @param state the state of this object field
+	 * @param type the type of this object field
 	 */
 	@Override
-	public void setState(boolean state) {
-		model.setState(state);
-	}
-
-	/**
-	 * Sets whether this object field is system.
-	 *
-	 * @param system the system of this object field
-	 */
-	@Override
-	public void setSystem(boolean system) {
-		model.setSystem(system);
+	public void setType(String type) {
+		model.setType(type);
 	}
 
 	/**
@@ -1004,11 +814,6 @@ public class ObjectFieldWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

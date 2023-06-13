@@ -23,10 +23,8 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.HtmlImpl;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -81,7 +79,7 @@ public class GridDDMFormFieldValueRendererTest {
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 
 		GridDDMFormFieldValueRenderer gridDDMFormFieldValueRenderer =
-			_createGridDDMFormFieldValueRenderer();
+			createGridDDMFormFieldValueRenderer();
 
 		Assert.assertEquals(
 			"rowLabel 1: columnLabel 1",
@@ -130,7 +128,7 @@ public class GridDDMFormFieldValueRendererTest {
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 
 		GridDDMFormFieldValueRenderer gridDDMFormFieldValueRenderer =
-			_createGridDDMFormFieldValueRenderer();
+			createGridDDMFormFieldValueRenderer();
 
 		Assert.assertEquals(
 			"rowLabel 1: columnLabel 1, rowLabel 2: columnLabel 2",
@@ -138,8 +136,8 @@ public class GridDDMFormFieldValueRendererTest {
 				ddmFormFieldValue, LocaleUtil.US));
 	}
 
-	private GridDDMFormFieldValueAccessor
-		_createGridDDMFormFieldValueAccessor() {
+	protected GridDDMFormFieldValueAccessor
+		createGridDDMFormFieldValueAccessor() {
 
 		GridDDMFormFieldValueAccessor gridDDMFormFieldValueAccessor =
 			new GridDDMFormFieldValueAccessor();
@@ -149,17 +147,15 @@ public class GridDDMFormFieldValueRendererTest {
 		return gridDDMFormFieldValueAccessor;
 	}
 
-	private GridDDMFormFieldValueRenderer _createGridDDMFormFieldValueRenderer()
+	protected GridDDMFormFieldValueRenderer
+			createGridDDMFormFieldValueRenderer()
 		throws Exception {
 
 		GridDDMFormFieldValueRenderer gridDDMFormFieldValueRenderer =
 			new GridDDMFormFieldValueRenderer();
 
 		gridDDMFormFieldValueRenderer.gridDDMFormFieldValueAccessor =
-			_createGridDDMFormFieldValueAccessor();
-
-		ReflectionTestUtil.setFieldValue(
-			gridDDMFormFieldValueRenderer, "_html", new HtmlImpl());
+			createGridDDMFormFieldValueAccessor();
 
 		return gridDDMFormFieldValueRenderer;
 	}

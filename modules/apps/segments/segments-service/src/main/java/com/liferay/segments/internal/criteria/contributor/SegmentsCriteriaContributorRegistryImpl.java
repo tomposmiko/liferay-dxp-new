@@ -27,6 +27,8 @@ import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributorRegi
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -37,7 +39,9 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Eduardo García
  */
-@Component(service = SegmentsCriteriaContributorRegistry.class)
+@Component(
+	immediate = true, service = SegmentsCriteriaContributorRegistry.class
+)
 public class SegmentsCriteriaContributorRegistryImpl
 	implements SegmentsCriteriaContributorRegistry {
 
@@ -53,7 +57,7 @@ public class SegmentsCriteriaContributorRegistryImpl
 				classNameSegmentsCriteriaContributors =
 					_serviceTrackerMap.getService(className);
 
-			if (ListUtil.isNotEmpty(classNameSegmentsCriteriaContributors)) {
+			if (!ListUtil.isEmpty(classNameSegmentsCriteriaContributors)) {
 				segmentsCriteriaContributors.addAll(
 					classNameSegmentsCriteriaContributors);
 			}
@@ -62,7 +66,7 @@ public class SegmentsCriteriaContributorRegistryImpl
 		List<SegmentsCriteriaContributor> generalSegmentsCriteriaContributors =
 			_serviceTrackerMap.getService("*");
 
-		if (ListUtil.isNotEmpty(generalSegmentsCriteriaContributors)) {
+		if (!ListUtil.isEmpty(generalSegmentsCriteriaContributors)) {
 			segmentsCriteriaContributors.addAll(
 				generalSegmentsCriteriaContributors);
 		}
@@ -74,10 +78,18 @@ public class SegmentsCriteriaContributorRegistryImpl
 	public List<SegmentsCriteriaContributor> getSegmentsCriteriaContributors(
 		String className, Criteria.Type type) {
 
-		return ListUtil.filter(
-			getSegmentsCriteriaContributors(className),
+		List<SegmentsCriteriaContributor> segmentsCriteriaContributors =
+			getSegmentsCriteriaContributors(className);
+
+		Stream<SegmentsCriteriaContributor> stream =
+			segmentsCriteriaContributors.stream();
+
+		return stream.filter(
 			segmentsCriteriaContributor -> type.equals(
-				segmentsCriteriaContributor.getType()));
+				segmentsCriteriaContributor.getType())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Activate

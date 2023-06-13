@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CalendarServiceWrapper
 	implements CalendarService, ServiceWrapper<CalendarService> {
 
-	public CalendarServiceWrapper() {
-		this(null);
-	}
-
 	public CalendarServiceWrapper(CalendarService calendarService) {
 		_calendarService = calendarService;
 	}

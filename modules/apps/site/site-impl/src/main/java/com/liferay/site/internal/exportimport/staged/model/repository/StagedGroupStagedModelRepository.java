@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Daniel Kocsis
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.site.model.adapter.StagedGroup",
 	service = {
 		StagedGroupStagedModelRepository.class, StagedModelRepository.class
@@ -87,16 +88,19 @@ public class StagedGroupStagedModelRepository
 
 		List<StagedModel> childrenStagedModels = new ArrayList<>();
 
+		LayoutSet layoutSet = null;
+
 		Group group = stagedGroup.getGroup();
 
 		long groupId = group.getGroupId();
 
 		try {
+			layoutSet = _layoutSetLocalService.getLayoutSet(
+				groupId, portletDataContext.isPrivateLayout());
+
 			childrenStagedModels.add(
 				ModelAdapterUtil.adapt(
-					_layoutSetLocalService.getLayoutSet(
-						groupId, portletDataContext.isPrivateLayout()),
-					LayoutSet.class, StagedLayoutSet.class));
+					layoutSet, LayoutSet.class, StagedLayoutSet.class));
 		}
 		catch (PortalException portalException) {
 			_log.error(
@@ -185,9 +189,9 @@ public class StagedGroupStagedModelRepository
 	public StagedGroup fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
-		return ModelAdapterUtil.adapt(
-			_groupLocalService.fetchGroup(groupId), Group.class,
-			StagedGroup.class);
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		return ModelAdapterUtil.adapt(group, Group.class, StagedGroup.class);
 	}
 
 	@Override

@@ -12,7 +12,6 @@
 import ClayButton from '@clayui/button';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayModal from '@clayui/modal';
-import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {
 	useCallback,
@@ -33,14 +32,14 @@ import {
 	MIN_CONFIDENCE_LEVEL,
 	percentageNumberToIndex,
 } from '../util/percentages.es';
-import LoadingButton from './LoadingButton/LoadingButton.es';
+import BusyButton from './BusyButton/BusyButton.es';
 import {SliderWithLabel} from './SliderWithLabel.es';
 import {SplitPicker} from './SplitPicker/SplitPicker.es';
 
 const TIME_ESTIMATION_THROTTLE_TIME_MS = 1000;
 
 function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
-	const [loading, setLoading] = useState(false);
+	const [busy, setBusy] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [estimation, setEstimation] = useState({
 		days: null,
@@ -69,13 +68,13 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 	const {APIService, imagesPath} = useContext(SegmentsExperimentContext);
 	const {experiment} = useContext(StateContext);
 
-	const mountedRef = useRef();
+	const mounted = useRef();
 
 	useEffect(() => {
-		mountedRef.current = true;
+		mounted.current = true;
 
 		return () => {
-			mountedRef.current = false;
+			mounted.current = false;
 		};
 	});
 
@@ -84,7 +83,7 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 	const [getEstimation] = useDebounceCallback((body) => {
 		APIService.getEstimatedTime(body)
 			.then(({segmentsExperimentEstimatedDaysDuration}) => {
-				if (mountedRef.current) {
+				if (mounted.current) {
 					setEstimation({
 						days: segmentsExperimentEstimatedDaysDuration,
 						loading: false,
@@ -92,7 +91,7 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 				}
 			})
 			.catch((_error) => {
-				if (mountedRef.current) {
+				if (mounted.current) {
 					setEstimation({
 						error: true,
 					});
@@ -135,7 +134,6 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 					? Liferay.Language.get('test-started-successfully')
 					: Liferay.Language.get('review-and-run-test')}
 			</ClayModal.Header>
-
 			<ClayModal.Body>
 				{success ? (
 					<div
@@ -148,7 +146,6 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 							src={successAnimationPath}
 							width="250px"
 						/>
-
 						<h3>{Liferay.Language.get('test-running-message')}</h3>
 					</div>
 				) : (
@@ -181,7 +178,6 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 						/>
 
 						<hr />
-
 						<div className="d-flex">
 							<div className="w-100">
 								<label>
@@ -241,13 +237,13 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
 
-							<LoadingButton
-								disabled={loading}
-								loading={loading}
+							<BusyButton
+								busy={busy}
+								disabled={busy}
 								onClick={_handleRun}
 							>
 								{Liferay.Language.get('run')}
-							</LoadingButton>
+							</BusyButton>
 						</ClayButton.Group>
 					)
 				}
@@ -262,14 +258,14 @@ function ReviewExperimentModal({modalObserver, onModalClose, onRun, variants}) {
 	function _handleRun() {
 		const splitVariantsMap = _variantsToSplitVariantsMap(draftVariants);
 
-		setLoading(true);
+		setBusy(true);
 
 		onRun({
 			confidenceLevel: percentageNumberToIndex(confidenceLevel),
 			splitVariantsMap,
 		}).then(() => {
-			if (mountedRef.current) {
-				setLoading(false);
+			if (mounted.current) {
+				setBusy(false);
 				setSuccess(true);
 			}
 		});
@@ -287,10 +283,10 @@ function _variantsToSplitVariantsMap(variants) {
 
 function _getDaysMessage(days) {
 	if (days === 1) {
-		return sub(Liferay.Language.get('x-day'), days);
+		return Liferay.Util.sub(Liferay.Language.get('x-day'), days);
 	}
 	else {
-		return sub(Liferay.Language.get('x-days'), days);
+		return Liferay.Util.sub(Liferay.Language.get('x-days'), days);
 	}
 }
 

@@ -12,16 +12,12 @@
  * details.
  */
 
-import {openConfirmModal, openSelectionModal} from 'frontend-js-web';
+import {openSelectionModal} from 'frontend-js-web';
 
 export const ACTIONS = {
 	assignRoleAccountUsers(itemData, portletNamespace) {
 		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('done'),
-			containerProps: {
-				className: '',
-			},
-			iframeBodyCssClass: '',
 			multiple: true,
 			onSelect: (selectedItems) => {
 				if (Array.isArray(selectedItems)) {
@@ -52,15 +48,14 @@ export const ACTIONS = {
 	},
 
 	removeAccountUsers(itemData) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-remove-this-user'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, itemData.removeAccountUsersURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-remove-this-user'
+				)
+			)
+		) {
+			submitForm(document.hrefFm, itemData.removeAccountUsersURL);
+		}
 	},
 };

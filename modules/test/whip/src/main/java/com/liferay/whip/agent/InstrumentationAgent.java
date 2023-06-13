@@ -61,8 +61,9 @@ public class InstrumentationAgent {
 					continue;
 				}
 
-				_assertClassDataCoverage(
-					assertionErrors, projectData.getClassData(clazz.getName()));
+				ClassData classData = projectData.getClassData(clazz.getName());
+
+				_assertClassDataCoverage(assertionErrors, classData);
 
 				if (includeInnerClasses) {
 					Class<?>[] declaredClasses = clazz.getDeclaredClasses();
@@ -79,9 +80,10 @@ public class InstrumentationAgent {
 							}
 						}
 
-						_assertClassDataCoverage(
-							assertionErrors,
-							projectData.getClassData(declaredClass.getName()));
+						classData = projectData.getClassData(
+							declaredClass.getName());
+
+						_assertClassDataCoverage(assertionErrors, classData);
 					}
 				}
 			}

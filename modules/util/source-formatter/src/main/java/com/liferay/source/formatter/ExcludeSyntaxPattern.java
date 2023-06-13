@@ -31,7 +31,7 @@ public class ExcludeSyntaxPattern {
 
 		_excludeSyntax = excludeSyntax;
 
-		if (excludeSyntax == ExcludeSyntax.REGEX) {
+		if (_excludeSyntax == ExcludeSyntax.REGEX) {
 			_excludePattern = StringUtil.replace(
 				excludePattern, CharPool.SLASH, Pattern.quote(File.separator));
 		}

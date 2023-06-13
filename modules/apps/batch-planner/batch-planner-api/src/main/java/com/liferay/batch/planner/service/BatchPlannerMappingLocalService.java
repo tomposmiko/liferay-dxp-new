@@ -133,8 +133,6 @@ public interface BatchPlannerMappingLocalService
 			String internalFieldName)
 		throws PortalException;
 
-	public void deleteBatchPlannerMappings(long batchPlannerPlanId);
-
 	/**
 	 * @throws PortalException
 	 */

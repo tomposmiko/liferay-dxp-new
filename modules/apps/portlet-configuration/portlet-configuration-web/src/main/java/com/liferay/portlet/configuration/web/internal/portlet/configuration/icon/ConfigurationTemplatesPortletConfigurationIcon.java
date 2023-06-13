@@ -14,9 +14,10 @@
 
 package com.liferay.portlet.configuration.web.internal.portlet.configuration.icon;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
@@ -25,10 +26,9 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -41,12 +41,11 @@ import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class ConfigurationTemplatesPortletConfigurationIcon
 	extends BasePortletConfigurationIcon {
 
@@ -55,7 +54,7 @@ public class ConfigurationTemplatesPortletConfigurationIcon
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		return _language.get(
+		return LanguageUtil.get(
 			themeDisplay.getLocale(), "configuration-templates");
 	}
 
@@ -114,7 +113,7 @@ public class ConfigurationTemplatesPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -135,7 +134,7 @@ public class ConfigurationTemplatesPortletConfigurationIcon
 			themeDisplay.getPermissionChecker();
 
 		try {
-			if (!_groupPermission.contains(
+			if (!GroupPermissionUtil.contains(
 					permissionChecker, themeDisplay.getScopeGroupId(),
 					ActionKeys.MANAGE_ARCHIVED_SETUPS)) {
 
@@ -147,7 +146,7 @@ public class ConfigurationTemplatesPortletConfigurationIcon
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -162,7 +161,7 @@ public class ConfigurationTemplatesPortletConfigurationIcon
 		Layout layout = themeDisplay.getLayout();
 
 		if (layout.isTypeControlPanel() ||
-			layout.isEmbeddedPersonalApplication()) {
+			isEmbeddedPersonalApplicationLayout(layout)) {
 
 			return false;
 		}
@@ -184,11 +183,5 @@ public class ConfigurationTemplatesPortletConfigurationIcon
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ConfigurationTemplatesPortletConfigurationIcon.class);
-
-	@Reference
-	private GroupPermission _groupPermission;
-
-	@Reference
-	private Language _language;
 
 }

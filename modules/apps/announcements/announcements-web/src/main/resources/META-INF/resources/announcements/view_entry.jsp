@@ -42,21 +42,11 @@ if (portletTitleBasedNavigation) {
 %>
 
 <c:if test="<%= portletTitleBasedNavigation %>">
-	<div class="management-bar management-bar-light navbar navbar-expand-md">
-		<clay:container-fluid>
-			<ul class="m-auto navbar-nav"></ul>
-
-			<ul class="middle navbar-nav">
-				<li class="nav-item">
-					<span class="text-secondary">
-						<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(entry.getUserName()), LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - entry.getModifiedDate().getTime(), true)} %>" key="x-modified-x-ago" translateArguments="<%= false %>" />
-					</span>
-				</li>
-			</ul>
-
-			<ul class="end m-auto navbar-nav"></ul>
-		</clay:container-fluid>
-	</div>
+	<liferay-frontend:info-bar>
+		<span class="text-secondary">
+			<liferay-ui:message arguments="<%= new String[] {entry.getUserName(), LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - entry.getModifiedDate().getTime(), true)} %>" key="x-modified-x-ago" translateArguments="<%= false %>" />
+		</span>
+	</liferay-frontend:info-bar>
 </c:if>
 
 <div <%= portletTitleBasedNavigation ? "class=\"container-fluid container-fluid-max-xl\"" : StringPool.BLANK %>>
@@ -71,7 +61,7 @@ if (portletTitleBasedNavigation) {
 			<div class="autofit-col autofit-col-expand">
 
 				<%
-				String userDisplayText = HtmlUtil.escape(PortalUtil.getUserName(entry) + StringPool.COMMA_AND_SPACE + Time.getRelativeTimeDescription(entry.getDisplayDate(), locale, timeZone, announcementsDisplayContext.getDateFormatDate()));
+				String userDisplayText = PortalUtil.getUserName(entry) + StringPool.COMMA_AND_SPACE + Time.getRelativeTimeDescription(entry.getDisplayDate(), locale, timeZone, announcementsDisplayContext.getDateFormatDate());
 				%>
 
 				<div class="autofit-row">

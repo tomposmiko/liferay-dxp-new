@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 
 import java.io.Serializable;
 
@@ -42,7 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -57,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  * @author Michael C. Han
  */
-@Component(service = ConfigurationEntryRetriever.class)
+@Component(immediate = true, service = ConfigurationEntryRetriever.class)
 public class ConfigurationEntryRetrieverImpl
 	implements ConfigurationEntryRetriever {
 
@@ -144,7 +142,7 @@ public class ConfigurationEntryRetrieverImpl
 		ExtendedObjectClassDefinition.Scope scope, Serializable scopePK) {
 
 		Set<ConfigurationEntry> configurationEntries = new TreeSet<>(
-			_getConfigurationEntryComparator());
+			getConfigurationEntryComparator());
 
 		Locale locale = LocaleUtil.fromLanguageId(languageId);
 
@@ -241,18 +239,8 @@ public class ConfigurationEntryRetrieverImpl
 				configurationCategoryServiceRegistration.unregister());
 	}
 
-	private Comparator<ConfigurationEntry> _getConfigurationEntryComparator() {
+	protected Comparator<ConfigurationEntry> getConfigurationEntryComparator() {
 		return new ConfigurationEntryComparator();
-	}
-
-	private boolean _isCategorySectionEnabled(String categorySection) {
-		if (!_searchCapabilities.isCommerceSupported() &&
-			Objects.equals(categorySection, "commerce")) {
-
-			return false;
-		}
-
-		return true;
 	}
 
 	private void _populateConfigurationCategorySectionDisplay(
@@ -269,12 +257,6 @@ public class ConfigurationEntryRetrieverImpl
 				curConfigurationCategoryKey);
 
 			_registerConfigurationCategory(curConfigurationCategory);
-		}
-
-		if (!_isCategorySectionEnabled(
-				curConfigurationCategory.getCategorySection())) {
-
-			return;
 		}
 
 		ConfigurationCategorySectionDisplay
@@ -325,9 +307,6 @@ public class ConfigurationEntryRetrieverImpl
 
 	@Reference
 	private ResourceBundleLoaderProvider _resourceBundleLoaderProvider;
-
-	@Reference
-	private SearchCapabilities _searchCapabilities;
 
 	private static class ConfigurationCategorySectionDisplayComparator
 		implements Comparator<ConfigurationCategorySectionDisplay> {

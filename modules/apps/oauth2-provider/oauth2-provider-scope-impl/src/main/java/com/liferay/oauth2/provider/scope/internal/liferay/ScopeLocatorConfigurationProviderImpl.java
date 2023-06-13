@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.scope.internal.configuration.ScopeLocatorConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
 	service = ScopeLocatorConfigurationProvider.class
 )
 public class ScopeLocatorConfigurationProviderImpl

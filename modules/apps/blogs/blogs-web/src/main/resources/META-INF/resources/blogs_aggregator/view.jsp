@@ -28,11 +28,41 @@ boolean blogsPortletFound = ParamUtil.getBoolean(request, "blogsPortletFound", t
 </c:if>
 
 <%
-BlogsAggregatorViewDisplayContext blogsAggregatorViewDisplayContext = new BlogsAggregatorViewDisplayContext(request, renderRequest, renderResponse);
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/blogs_aggregator/view"
+).buildPortletURL();
 
-SearchContainer<BlogsEntry> searchContainer = blogsAggregatorViewDisplayContext.getSearchContainer();
+SearchContainer<BlogsEntry> searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, 5, portletURL, null, null);
 
-List<BlogsEntry> results = searchContainer.getResults();
+List<BlogsEntry> entries = null;
+
+if (selectionMethod.equals("users")) {
+	if (organizationId > 0) {
+		entries = BlogsEntryServiceUtil.getOrganizationEntries(organizationId, new Date(), WorkflowConstants.STATUS_APPROVED, max);
+	}
+	else {
+		entries = BlogsEntryServiceUtil.getGroupsEntries(company.getCompanyId(), scopeGroupId, new Date(), WorkflowConstants.STATUS_APPROVED, max);
+	}
+}
+else {
+	entries = BlogsEntryServiceUtil.getGroupEntries(scopeGroupId, new Date(), WorkflowConstants.STATUS_APPROVED, max);
+}
+
+searchContainer.setTotal(entries.size());
+
+List<BlogsEntry> results = ListUtil.subList(entries, searchContainer.getStart(), searchContainer.getEnd());
+
+searchContainer.setResults(results);
 %>
 
 <%@ include file="/blogs_aggregator/view_entries.jspf" %>
+
+<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">
+	<aui:script>
+		Liferay.Util.focusFormField(
+			document.<portlet:namespace />fm1.<portlet:namespace />keywords
+		);
+	</aui:script>
+</c:if>

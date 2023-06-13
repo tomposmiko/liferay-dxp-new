@@ -68,31 +68,15 @@ DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 	visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 />
 
+<div class="border-0 mb-0 sheet-subtitle text-uppercase">
+	<liferay-ui:message key="other-metadata" />
+</div>
+
 <liferay-asset:asset-tags-selector
 	className="<%= JournalArticle.class.getName() %>"
 	classPK="<%= classPK %>"
 	ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
 />
-
-<c:if test="<%= article != null %>">
-
-	<%
-	AssetAutoTaggerConfiguration assetAutoTaggerConfiguration = (AssetAutoTaggerConfiguration)request.getAttribute(AssetAutoTaggerConfiguration.class.getName());
-	%>
-
-	<clay:checkbox
-		checked="<%= assetAutoTaggerConfiguration.isUpdateAutoTags() %>"
-		id='<%= liferayPortletResponse.getNamespace() + "updateAutoTags" %>'
-		label='<%= LanguageUtil.get(request, "update-auto-tags") %>'
-		name='<%= liferayPortletResponse.getNamespace() + "updateAutoTags" %>'
-	/>
-
-	<div class="ml-4">
-		<small class="text-secondary">
-			<liferay-ui:message key="update-auto-tags-help" />
-		</small>
-	</div>
-</c:if>
 
 <aui:input cssClass="form-control-sm" label="priority" name="assetPriority" type="text" value="<%= priority %>" wrapperCssClass="mb-3">
 	<aui:validator name="number" />

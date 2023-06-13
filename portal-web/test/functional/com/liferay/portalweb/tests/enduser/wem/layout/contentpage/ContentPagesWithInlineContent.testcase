@@ -3,39 +3,41 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testcase.url = "http://localhost:8080";
 	property testray.main.component.name = "Content Pages";
 
-	static var randomSiteName = StringUtil.randomString(8);
-
-	var siteURLKey = StringUtil.toLowerCase(${randomSiteName});
-
 	setUp {
-		task ("Sign in") {
-			User.firstLoginPG();
-		}
+		TestCase.setUpPortalInstance();
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = ${randomSiteName});
-		}
+		User.firstLoginPG();
 
-		task ("Add a content page") {
-			JSONLayout.addPublicLayout(
-				groupName = ${randomSiteName},
-				layoutName = "Content Page Name",
-				type = "content");
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Content Page Name",
+			type = "content");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
 	@description = "This is a test for LPS-101333. Freemarker codes should not be executed in a HTML fragment."
-	@priority = 5
+	@priority = "5"
 	test CannotExecuteFreemarkerCodeInHTMLFragment {
 		property portal.acceptance = "true";
 
 		task ("Add a HTML fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -44,17 +46,17 @@ definition {
 
 		task ("Add freemarker codes to inline content of HTML") {
 			PageEditor.editFragmentHTML(
+				editableId = "element-html",
 				fileName = "fragment_freemarker_basic.html",
-				fragmentName = "HTML",
-				id = "element-html");
+				fragmentName = "HTML");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the freemarker codes are not executed") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertTextNotEquals(
 				locator1 = "//div[contains(@class,'fragment-html-test')]",
@@ -63,12 +65,12 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98553. Can edit contributed HTML type fragment."
-	@priority = 4
+	@priority = "4"
 	test EditInlineContentOfHTMLFragment {
 		task ("Add a HTML fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -88,49 +90,44 @@ definition {
 		''';
 
 			PageEditor.editFragmentHTML(
-				content = ${htmlSnippet},
-				fragmentName = "HTML",
-				id = "element-html");
+				content = "${htmlSnippet}",
+				editableId = "element-html",
+				fragmentName = "HTML");
 		}
 
 		task ("View edited inline content in edit mode") {
-			PageEditor.viewFragment(fragmentName = "HTML");
-
 			AssertTextEquals.assertPartialText(
-				fragmentName = "html",
 				id = "element-html",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				key_fragmentName = "HTML",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
 				value1 = "Edit HTML Title");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View edited inline content in view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertTextEquals.assertPartialText(
-				fragmentName = "html",
-				id = "element-html",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				key_fragmentName = "html",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
 				value1 = "Edit HTML Title");
 		}
 	}
 
 	@description = "This is a test for LPS-98553. Can edit created HTML lfr-editable fragment."
-	@priority = 4
+	@priority = "4"
 	test EditInlineContentOfHTMLFragmentWithOldTag {
 		task ("Add a fragment collection") {
 			JSONFragment.addFragmentCollection(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				name = "Collection Name");
 		}
 
 		task ("Add a new fragment with the following codes") {
-			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = ${siteURLKey});
+			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
 
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
 
@@ -138,7 +135,7 @@ definition {
 
 			var htmlSnippet = '''
 <div class="fragment-name">
-	<lfr-editable id="element-html" type="html">
+	<lfr-editable class="component-html" id="element-html" type="html">
 
 		<h1>HTML Example</h1>
 
@@ -151,15 +148,16 @@ definition {
 	</lfr-editable>
 </div>
 		''';
+
 			var cssSnippet = '''
 .component-html img {
 	max-width: 100%;
 }
 		''';
 
-			FragmentsEditor.typeHtmlEditor(content = ${htmlSnippet});
+			FragmentsEditor.typeHtmlEditor(content = "${htmlSnippet}");
 
-			FragmentsEditor.typeCssEditor(content = ${cssSnippet});
+			FragmentsEditor.typeCssEditor(content = "${cssSnippet}");
 
 			FragmentsEditor.waitForAutoSave();
 
@@ -169,7 +167,7 @@ definition {
 		task ("Add a new fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Collection Name",
@@ -189,35 +187,36 @@ definition {
 		''';
 
 			PageEditor.editFragmentHTML(
-				content = ${htmlSnippet},
+				content = "${htmlSnippet}",
 				contributed = "false",
-				fragmentName = "Fragment Name",
-				id = "element-html");
+				editableId = "element-html",
+				fragmentName = "Fragment Name");
 		}
 
 		task ("View edited inline content in edit mode") {
-			PageEditor.viewFragmentEditableText(
-				contributed = "false",
-				editableText = "Edit HTML Title A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.",
-				fragmentName = "Fragment Name");
+			AssertTextEquals.assertPartialText(
+				id = "element-html",
+				key_fragmentName = "Fragment Name",
+				locator1 = "Fragment#EDITABLE_FIELD",
+				value1 = "Edit HTML Title");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View edited inline content in view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "fragment-name",
-				text = "Edit HTML Title");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "html",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Edit HTML Title");
 		}
 	}
 
 	@description = "This is a use case for LPS-85872 and LPS-78726. Edit the inline content of text fragment."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test EditInlineContentOfTextFragment {
 		property portal.acceptance = "true";
@@ -225,7 +224,7 @@ definition {
 		task ("Add a Heading fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -247,22 +246,22 @@ definition {
 		}
 
 		task ("View the edited inline content in view mode") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "New editable fragment text");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "New editable fragment text");
 		}
 
 		task ("Edit the inline text again") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.editFragmentText(
 				fragmentName = "Heading",
@@ -273,42 +272,42 @@ definition {
 		task ("View new inline content not shown in view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "New editable fragment text");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "New editable fragment text");
 		}
 
 		task ("Publish the content page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View new inline content shown in view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Edited Heading Example");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Edited Heading Example");
 		}
 	}
 
 	@description = "This is a use case for LPS-127732. Edit the inline content style of rich text fragment."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test EditInlineContentStyleOfRichTextFragment {
 		task ("Add a Paragraph fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -347,14 +346,14 @@ definition {
 	}
 
 	@description = "This is a test for LPS-95045 and LPS-101328. A user should be able to display an image from Documents and Media in Image fragment."
-	@priority = 5
+	@priority = "5"
 	test ViewImageFromDocumentsAndMediaInImageFragment {
 		property portal.acceptance = "true";
 
 		task ("Add an Image fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -372,35 +371,35 @@ definition {
 			PageEditor.viewFragmentEditableImage(
 				id = "image-square",
 				imageDescription = "",
-				imageFileName = "document_1-png");
+				imageFileName = "Document_1.png");
 
 			AssertTextEquals(
 				key_fieldLabel = "Image",
 				locator1 = "PageEditor#ITEM_SELECTOR_CONTENT_INPUT",
 				value1 = "Document_1.png");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the selected image shown in view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.viewFragmentEditableImage(
 				id = "image-square",
 				imageDescription = "",
-				imageFileName = "document_1-png");
+				imageFileName = "Document_1.png");
 		}
 	}
 
 	@description = "This is a test for LPS-100121. Given a fragment with an editable image when the page author selects an image specifying a URL in the item selector then the URL is shown in selector input."
-	@priority = 4
+	@priority = "4"
 	test ViewImageFromURLInImageFragment {
 		task ("Add an Image fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -427,13 +426,13 @@ definition {
 				locator1 = "PageEditor#ITEM_SELECTOR_CONTENT_INPUT",
 				value1 = "https://raw.githubusercontent.com/liferay/liferay-portal/master/portal-web/test/functional/com/liferay/portalweb/dependencies/Document_1.jpg");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the selected image in view mode") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.viewFragmentEditableImage(
 				id = "image-square",
@@ -443,14 +442,14 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-111274. The light blue frame is shown when hover on unmapped editable field of selected fragments but the dark blue frame is shown when click on unmapped editable field of selected fragments."
-	@priority = 5
+	@priority = "5"
 	test ViewVisualStyleOfEditableField {
 		property portal.acceptance = "true";
 
 		task ("Add a Heading fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Content Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Basic Components",
@@ -465,15 +464,12 @@ definition {
 		}
 
 		task ("View the visual style of editable field") {
-			WaitForElementPresent(
-				key_nodeName = "element-text",
-				locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_ACTIVE");
+			Pause(locator1 = "1000");
 
 			AssertCssValue(
-				fragmentName = "heading",
 				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
 				locator2 = "boxShadow",
 				value1 = "rgb(11, 95, 255) 0px 0px 0px 1px inset");
 		}
@@ -483,23 +479,25 @@ definition {
 		}
 
 		task ("Select the body of Heading") {
-			PageEditor.clickConfigurableField(fragmentName = "Heading");
+			Click.clickNoWaitForVisible(
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 		}
 
 		task ("Mouse over the editable field of Heading") {
 			MouseOver.mouseOverNotVisible(
-				fragmentName = "heading",
 				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD");
 		}
 
 		task ("View the visual style of editable field") {
+			Pause(locator1 = "1000");
+
 			AssertCssValue(
-				fragmentName = "heading",
 				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				key_fragmentName = "Heading",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
 				locator2 = "boxShadow",
 				value1 = "rgb(128, 172, 255) 0px 0px 0px 1px inset");
 		}

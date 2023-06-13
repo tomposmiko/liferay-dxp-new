@@ -52,11 +52,10 @@ public class
 				mustSetValidVisibilityExpression.getVisibilityExpression()
 			).put(
 				"fieldName", mustSetValidVisibilityExpression.getFieldName()
-			).toString(),
+			).toJSONString(),
 			Response.Status.BAD_REQUEST,
 			mustSetValidVisibilityExpression.getMessage(),
-			DataDefinitionValidationException.MustSetValidVisibilityExpression.
-				class.getName());
+			"MustSetValidVisibilityExpression");
 	}
 
 }

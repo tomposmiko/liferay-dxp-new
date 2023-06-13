@@ -59,7 +59,7 @@ public class LayoutModelListenerTest {
 
 	@Test
 	public void testDeleteLayoutDeletesLayoutSEOEntry() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(
+		Layout layout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), RandomTestUtil.randomString(),
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 

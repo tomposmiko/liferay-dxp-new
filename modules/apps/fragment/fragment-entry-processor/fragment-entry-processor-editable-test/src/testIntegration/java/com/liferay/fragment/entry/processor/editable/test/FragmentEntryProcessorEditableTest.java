@@ -45,18 +45,19 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
-import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.repository.LocalRepository;
@@ -80,6 +81,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -91,16 +93,18 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.io.InputStream;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.Portlet;
 
@@ -144,7 +148,7 @@ public class FragmentEntryProcessorEditableTest {
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 
-		_layout = LayoutTestUtil.addTypeContentLayout(_group);
+		_layout = _addLayout(_group.getGroupId());
 
 		_processedHTML = _getProcessedHTML("processed_fragment_entry.html");
 
@@ -195,13 +199,10 @@ public class FragmentEntryProcessorEditableTest {
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
-				fragmentEntry.getFragmentEntryId(),
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()),
-				_layout.getPlid(), fragmentEntry.getCss(),
-				fragmentEntry.getHtml(), fragmentEntry.getJs(),
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0, null,
-				fragmentEntry.getType(), serviceContext);
+				fragmentEntry.getFragmentEntryId(), 0, _layout.getPlid(),
+				fragmentEntry.getCss(), fragmentEntry.getHtml(),
+				fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, 0, null, serviceContext);
 
 		List<PortletPreferences> portletPreferencesList =
 			_portletPreferencesLocalService.getPortletPreferences(
@@ -259,13 +260,10 @@ public class FragmentEntryProcessorEditableTest {
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
-				fragmentEntry.getFragmentEntryId(),
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()),
+				fragmentEntry.getFragmentEntryId(), 0,
 				TestPropsValues.getPlid(), fragmentEntry.getCss(),
 				fragmentEntry.getHtml(), fragmentEntry.getJs(),
 				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0, null,
-				fragmentEntry.getType(),
 				ServiceContextTestUtil.getServiceContext());
 
 		JournalArticle journalArticle = JournalTestUtil.addArticle(
@@ -576,9 +574,9 @@ public class FragmentEntryProcessorEditableTest {
 		return _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), fragmentCollection.getFragmentCollectionId(),
 			"fragment-entry", "Fragment Entry", null,
-			_readFileToString(htmlFile), null, false, null, null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			_readFileToString(htmlFile), null, null, 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 	}
 
 	private FileEntry _addImageFileEntry() throws Exception {
@@ -599,9 +597,8 @@ public class FragmentEntryProcessorEditableTest {
 			null, TestPropsValues.getUserId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.IMAGE_JPEG,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK, inputStream, bytes.length, null,
-			null, serviceContext);
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
+			inputStream, bytes.length, null, null, serviceContext);
 	}
 
 	private JournalArticle _addJournalArticle(
@@ -611,6 +608,20 @@ public class FragmentEntryProcessorEditableTest {
 		User user = TestPropsValues.getUser();
 
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
+
+		String dynamicContent = _readJSONFileToString("dynamic_content.json");
+
+		dynamicContent = StringUtil.replace(
+			dynamicContent,
+			new String[] {
+				"FILE_ENTRY_ID", "GROUP_ID", "RESOURCE_PRIM_KEY", "UUID"
+			},
+			new String[] {
+				String.valueOf(fileEntry.getFileEntryId()),
+				String.valueOf(fileEntry.getGroupId()),
+				String.valueOf(fileEntry.getPrimaryKey()),
+				String.valueOf(fileEntry.getUuid())
+			});
 
 		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
 			_group.getGroupId(), ddmStructure.getStructureId(),
@@ -632,11 +643,14 @@ public class FragmentEntryProcessorEditableTest {
 			HashMapBuilder.put(
 				defaultLocale, RandomTestUtil.randomString()
 			).build(),
-			StringUtil.replace(
-				_readFileToString("dynamic_content.xml"),
-				new String[] {"[$FIELD_ID$]", "[$IMAGE_JSON$]"},
-				new String[] {fieldId, _toJSON(fileEntry)}),
-			ddmStructure.getStructureId(), ddmTemplate.getTemplateKey(), null,
+			_getStructuredContent(
+				fieldId,
+				Collections.singletonList(
+					HashMapBuilder.put(
+						defaultLocale, dynamicContent
+					).build()),
+				LocaleUtil.toLanguageId(defaultLocale)),
+			ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(), null,
 			displayCalendar.get(Calendar.MONTH),
 			displayCalendar.get(Calendar.DATE),
 			displayCalendar.get(Calendar.YEAR),
@@ -644,6 +658,35 @@ public class FragmentEntryProcessorEditableTest {
 			displayCalendar.get(Calendar.MINUTE), 0, 0, 0, 0, 0, true, 0, 0, 0,
 			0, 0, true, true, false, null, null, null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+	}
+
+	private Layout _addLayout(long groupId) throws Exception {
+		String name = RandomTestUtil.randomString();
+
+		String friendlyURL =
+			StringPool.SLASH + FriendlyURLNormalizerUtil.normalize(name);
+
+		return _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), groupId, false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, name, null,
+			RandomTestUtil.randomString(), LayoutConstants.TYPE_PORTLET, false,
+			friendlyURL, ServiceContextTestUtil.getServiceContext());
+	}
+
+	private com.liferay.portal.kernel.xml.Document _createDocumentContent(
+		String availableLocales, String defaultLocale) {
+
+		com.liferay.portal.kernel.xml.Document document =
+			SAXReaderUtil.createDocument();
+
+		com.liferay.portal.kernel.xml.Element rootElement = document.addElement(
+			"root");
+
+		rootElement.addAttribute("available-locales", availableLocales);
+		rootElement.addAttribute("default-locale", defaultLocale);
+		rootElement.addElement("request");
+
+		return document;
 	}
 
 	private DDMForm _deserialize(String content) {
@@ -693,13 +736,10 @@ public class FragmentEntryProcessorEditableTest {
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
-				fragmentEntry.getFragmentEntryId(),
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()),
+				fragmentEntry.getFragmentEntryId(), 0,
 				TestPropsValues.getPlid(), fragmentEntry.getCss(),
 				fragmentEntry.getHtml(), fragmentEntry.getJs(),
 				StringPool.BLANK, editableValues, StringPool.BLANK, 0, null,
-				fragmentEntry.getType(),
 				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		String processedFragmentEntryLinkHTML =
@@ -734,10 +774,10 @@ public class FragmentEntryProcessorEditableTest {
 	}
 
 	private HttpServletRequest _getHttpServletRequest() throws Exception {
-		MockHttpServletRequest mockHttpServletRequest =
+		MockHttpServletRequest httpServletRequest =
 			new MockHttpServletRequest();
 
-		mockHttpServletRequest.setAttribute(
+		httpServletRequest.setAttribute(
 			JavaConstants.JAVAX_PORTLET_RESPONSE,
 			new MockLiferayPortletRenderResponse());
 
@@ -752,15 +792,14 @@ public class FragmentEntryProcessorEditableTest {
 			layoutSet.getTheme(), layoutSet.getColorScheme());
 
 		themeDisplay.setRealUser(TestPropsValues.getUser());
-		themeDisplay.setRequest(mockHttpServletRequest);
+		themeDisplay.setRequest(httpServletRequest);
 		themeDisplay.setResponse(new MockHttpServletResponse());
 		themeDisplay.setScopeGroupId(_group.getGroupId());
 		themeDisplay.setUser(TestPropsValues.getUser());
 
-		mockHttpServletRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, themeDisplay);
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 
-		return mockHttpServletRequest;
+		return httpServletRequest;
 	}
 
 	private String _getJournalArticleEditableFieldValues(
@@ -801,6 +840,47 @@ public class FragmentEntryProcessorEditableTest {
 		return bodyElement.html();
 	}
 
+	private String _getStructuredContent(
+		String name, List<Map<Locale, String>> contents, String defaultLocale) {
+
+		StringBundler sb = new StringBundler();
+
+		for (Map<Locale, String> map : contents) {
+			for (Locale locale : map.keySet()) {
+				sb.append(LocaleUtil.toLanguageId(locale));
+				sb.append(StringPool.COMMA);
+			}
+
+			sb.setIndex(sb.index() - 1);
+		}
+
+		com.liferay.portal.kernel.xml.Document document =
+			_createDocumentContent(sb.toString(), defaultLocale);
+
+		com.liferay.portal.kernel.xml.Element rootElement =
+			document.getRootElement();
+
+		for (Map<Locale, String> map : contents) {
+			com.liferay.portal.kernel.xml.Element dynamicElementElement =
+				rootElement.addElement("dynamic-element");
+
+			dynamicElementElement.addAttribute("index-type", "keyword");
+			dynamicElementElement.addAttribute("name", name);
+			dynamicElementElement.addAttribute("type", "image");
+
+			for (Map.Entry<Locale, String> entry : map.entrySet()) {
+				com.liferay.portal.kernel.xml.Element element =
+					dynamicElementElement.addElement("dynamic-content");
+
+				element.addAttribute(
+					"language-id", LocaleUtil.toLanguageId(entry.getKey()));
+				element.addCDATA(entry.getValue());
+			}
+		}
+
+		return document.asXML();
+	}
+
 	private ThemeDisplay _getThemeDisplay() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
@@ -814,13 +894,15 @@ public class FragmentEntryProcessorEditableTest {
 
 		themeDisplay.setLayoutTypePortlet(
 			(LayoutTypePortlet)_layout.getLayoutType());
-		themeDisplay.setLookAndFeel(
-			_themeLocalService.getTheme(
-				_company.getCompanyId(), layoutSet.getThemeId()),
-			null);
-		themeDisplay.setRealUser(TestPropsValues.getUser());
+
+		Theme theme = _themeLocalService.getTheme(
+			_company.getCompanyId(), layoutSet.getThemeId());
+
+		themeDisplay.setLookAndFeel(theme, null);
+
 		themeDisplay.setRequest(_getHttpServletRequest());
 		themeDisplay.setResponse(new MockHttpServletResponse());
+		themeDisplay.setRealUser(TestPropsValues.getUser());
 		themeDisplay.setUser(TestPropsValues.getUser());
 
 		return themeDisplay;
@@ -840,26 +922,6 @@ public class FragmentEntryProcessorEditableTest {
 			_readFileToString(jsonFileName));
 
 		return jsonObject.toString();
-	}
-
-	private String _toJSON(FileEntry fileEntry) {
-		return JSONUtil.put(
-			"alt", StringPool.BLANK
-		).put(
-			"description", StringPool.BLANK
-		).put(
-			"fileEntryId", fileEntry.getFileEntryId()
-		).put(
-			"groupId", fileEntry.getGroupId()
-		).put(
-			"name", fileEntry.getFileName()
-		).put(
-			"title", fileEntry.getTitle()
-		).put(
-			"type", "journal"
-		).put(
-			"uuid", fileEntry.getUuid()
-		).toString();
 	}
 
 	@Inject
@@ -920,9 +982,6 @@ public class FragmentEntryProcessorEditableTest {
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 	private String _processedHTML;
-
-	@Inject
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@Inject
 	private ThemeLocalService _themeLocalService;

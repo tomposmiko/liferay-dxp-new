@@ -68,7 +68,7 @@ public abstract class BaseWorkspace implements Workspace {
 					@Override
 					public WorkspaceGitRepository call() {
 						return GitRepositoryFactory.getWorkspaceGitRepository(
-							workspaceRepositoryDirName.trim());
+							workspaceRepositoryDirName);
 					}
 
 				};
@@ -129,8 +129,6 @@ public abstract class BaseWorkspace implements Workspace {
 			callables, threadPoolExecutor);
 
 		parallelExecutor.execute();
-
-		writePropertiesFiles();
 	}
 
 	@Override
@@ -213,15 +211,6 @@ public abstract class BaseWorkspace implements Workspace {
 		_parallelExecutor.waitFor();
 	}
 
-	@Override
-	public void writePropertiesFiles() {
-		for (WorkspaceGitRepository workspaceGitRepository :
-				getWorkspaceGitRepositories()) {
-
-			workspaceGitRepository.writePropertiesFiles();
-		}
-	}
-
 	protected BaseWorkspace(JSONObject jsonObject) {
 		this.jsonObject = jsonObject;
 
@@ -251,25 +240,23 @@ public abstract class BaseWorkspace implements Workspace {
 
 		jsonObject.put(
 			"primary_repository_dir_name",
-			_primaryWorkspaceGitRepository.getDirectoryName()
-		).put(
-			"primary_repository_name", _primaryWorkspaceGitRepository.getName()
-		).put(
+			_primaryWorkspaceGitRepository.getDirectoryName());
+		jsonObject.put(
+			"primary_repository_name",
+			_primaryWorkspaceGitRepository.getName());
+		jsonObject.put(
 			"primary_upstream_branch_name",
-			_primaryWorkspaceGitRepository.getUpstreamBranchName()
-		);
+			_primaryWorkspaceGitRepository.getUpstreamBranchName());
 
 		try {
 			jsonObject.put(
 				"workspace_repository_dir_names",
-				JenkinsResultsParserUtil.removeDuplicates(
-					",",
-					JenkinsResultsParserUtil.getProperty(
-						JenkinsResultsParserUtil.getBuildProperties(),
-						"workspace.repository.dir.names",
-						_primaryWorkspaceGitRepository.getName(),
-						_primaryWorkspaceGitRepository.getUpstreamBranchName(),
-						jobName)));
+				JenkinsResultsParserUtil.getProperty(
+					JenkinsResultsParserUtil.getBuildProperties(),
+					"workspace.repository.dir.names",
+					_primaryWorkspaceGitRepository.getName(),
+					_primaryWorkspaceGitRepository.getUpstreamBranchName(),
+					jobName));
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);

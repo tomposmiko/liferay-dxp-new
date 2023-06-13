@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!--IDENTITY_PROVIDER-->
-
 <tr>
 	<td>IDENTITY_PROVIDER_SIGN_METADATA_CHECKBOX</td>
 	<td>//input[contains(@id,'SamlAdminPortlet_saml-sign-metadata')]</td>
@@ -21,11 +19,6 @@
 <tr>
 	<td>IDENTITY_PROVIDER_AUTHN_REQUEST_SIGNATURE_REQUIRED_CHECKBOX</td>
 	<td>//input[contains(@id,'SamlAdminPortlet_saml-idp-authn-request-signature-required')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>IDENTITY_PROVIDER_SESSION_MAXIMUM_AGE_INPUT</td>
-	<td>//input[contains(@id,'SamlAdminPortlet_saml-idp-session-maximum-age')]</td>
 	<td></td>
 </tr>
 </tbody>

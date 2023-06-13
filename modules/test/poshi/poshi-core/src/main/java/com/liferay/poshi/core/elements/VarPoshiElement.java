@@ -15,18 +15,15 @@
 package com.liferay.poshi.core.elements;
 
 import com.liferay.poshi.core.script.PoshiScriptParserException;
-import com.liferay.poshi.core.script.PoshiScriptParserUtil;
 import com.liferay.poshi.core.util.Dom4JUtil;
 import com.liferay.poshi.core.util.StringUtil;
 import com.liferay.poshi.core.util.Validator;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,55 +73,27 @@ public class VarPoshiElement extends PoshiElement {
 
 	public String getVarValue() {
 		if (valueAttributeName == null) {
-			List<Node> cdataNodes = new ArrayList<>();
-
 			for (Node node : Dom4JUtil.toNodeList(content())) {
 				if (node instanceof CDATA) {
-					cdataNodes.add(node);
+					StringBuilder sb = new StringBuilder();
+
+					sb.append("\'\'\'");
+					sb.append(node.getText());
+					sb.append("\'\'\'");
+
+					return sb.toString();
 				}
 			}
-
-			StringBuilder sb = new StringBuilder();
-
-			sb.append("\'\'\'");
-
-			for (Node cdataNode : cdataNodes) {
-				sb.append(cdataNode.getText());
-			}
-
-			sb.append("\'\'\'");
-
-			return sb.toString();
 		}
 
 		return attributeValue(valueAttributeName);
-	}
-
-	public boolean isDoubleQuotedVar(String value) {
-		if (value.matches(_VAR_VALUE_INTEGER_REGEX)) {
-			return false;
-		}
-
-		if (value.matches(_VAR_VALUE_MATH_EXPRESSION_REGEX)) {
-			return true;
-		}
-
-		if (value.matches(_VAR_VALUE_VARIABLE_REGEX)) {
-			return false;
-		}
-
-		return true;
 	}
 
 	@Override
 	public void parsePoshiScript(String poshiScript)
 		throws PoshiScriptParserException {
 
-		if (!(getParent() instanceof ExecutePoshiElement)) {
-			validateSemicolon(poshiScript);
-		}
-
-		if (poshiScript.startsWith("static var")) {
+		if (poshiScript.startsWith("static")) {
 			addAttribute("static", "true");
 
 			poshiScript = poshiScript.replaceFirst("static", "");
@@ -147,24 +116,7 @@ public class VarPoshiElement extends PoshiElement {
 		String value = getValueFromAssignment(poshiScript);
 
 		if (value.startsWith("\'\'\'")) {
-			value = getPoshiScriptEscapedContent(value);
-
-			if (value.contains("CDATA")) {
-				Matcher nestedCDATAMatcher = _nestedCDATAPattern.matcher(value);
-
-				nestedCDATAMatcher.find();
-
-				String cdata1 = nestedCDATAMatcher.group("cdata1");
-				String cdata2 = nestedCDATAMatcher.group("cdata2");
-
-				add(new PoshiCDATA(cdata1));
-
-				add(new PoshiCDATA(cdata2));
-
-				return;
-			}
-
-			add(new PoshiCDATA(value));
+			add(new PoshiCDATA(getPoshiScriptEscapedContent(value)));
 
 			return;
 		}
@@ -184,14 +136,6 @@ public class VarPoshiElement extends PoshiElement {
 		}
 
 		if (value.endsWith("\"") && value.startsWith("\"")) {
-			if (value.contains("\n")) {
-				throw new PoshiScriptParserException(
-					"Invalid variable assignment syntax, please use triple " +
-						"quotes (''') to wrap a multiline string instead of " +
-							"double quotes",
-					value, (PoshiElement)getParent());
-			}
-
 			value = getDoubleQuotedContent(value);
 
 			if (value.endsWith("}") && value.startsWith("${")) {
@@ -224,8 +168,6 @@ public class VarPoshiElement extends PoshiElement {
 				}
 			}
 
-			value = value.replace("\\\"", "\"");
-
 			value = StringEscapeUtils.unescapeXml(value);
 
 			addAttribute("value", value);
@@ -233,45 +175,31 @@ public class VarPoshiElement extends PoshiElement {
 			return;
 		}
 
-		if (value.matches(_VAR_VALUE_INTEGER_REGEX)) {
-			addAttribute("value", value);
-
-			return;
-		}
-
-		if ((!isValidFunctionFileName(value) && !isValidMacroFileName(value)) ||
-			value.startsWith("selenium.")) {
-
-			Matcher matcher = _varValueMathExpressionPattern.matcher(value);
-
-			if (matcher.matches()) {
-				String mathOperation = _mathOperatorsMap.get(matcher.group(2));
-
-				String mathUtilValue = StringUtil.combine(
-					"MathUtil#", mathOperation, "('", matcher.group(1), "', '",
-					matcher.group(3), "')");
-
-				addAttribute("method", mathUtilValue);
-
-				return;
-			}
-
-			if (value.matches(_VAR_VALUE_VARIABLE_REGEX)) {
-				addAttribute("value", value);
-
-				return;
-			}
-
+		if (isValidUtilityClassName(value) || value.startsWith("selenium.")) {
 			value = value.replaceFirst("\\.", "#");
 
 			String content = getParentheticalContent(value);
 
 			if (!content.equals("")) {
 				value = StringUtil.replace(
-					value, content, swapParameterQuotations(content, false));
+					value, content, swapParameterQuotations(content));
 			}
 
 			addAttribute("method", value);
+
+			return;
+		}
+
+		Matcher matcher = _varValueMathExpressionPattern.matcher(value);
+
+		if (matcher.find()) {
+			String mathOperation = _mathOperatorsMap.get(matcher.group(2));
+
+			String mathUtilValue = StringUtil.combine(
+				"MathUtil#", mathOperation, "('", matcher.group(1), "', '",
+				matcher.group(3), "')");
+
+			addAttribute("method", mathUtilValue);
 		}
 	}
 
@@ -339,8 +267,7 @@ public class VarPoshiElement extends PoshiElement {
 				}
 			}
 			else if (valueAttributeName.equals("method")) {
-				if ((!isValidFunctionFileName(value) &&
-					 !isValidMacroFileName(value)) ||
+				if (isValidUtilityClassName(value) ||
 					value.startsWith("selenium#")) {
 
 					value = value.replaceFirst("#", ".");
@@ -348,50 +275,15 @@ public class VarPoshiElement extends PoshiElement {
 					String content = getParentheticalContent(value);
 
 					if (!content.equals("")) {
-						Matcher matcher = _mathUtilMethodCallPattern.matcher(
-							value);
-
-						String mathOperator = "";
-
-						if (matcher.find()) {
-							for (Map.Entry<String, String> entry :
-									_mathOperatorsMap.entrySet()) {
-
-								if (Objects.equals(
-										entry.getValue(), matcher.group(1))) {
-
-									mathOperator = " " + entry.getKey() + " ";
-
-									break;
-								}
-							}
-						}
-
-						if (!mathOperator.equals("") &&
-							!(parentElement instanceof ExecutePoshiElement)) {
-
-							value =
-								matcher.group(2) + mathOperator +
-									matcher.group(3);
-						}
-						else {
-							value = StringUtil.replace(
-								value, content,
-								swapParameterQuotations(content, true));
-						}
+						value = StringUtil.replace(
+							value, content, swapParameterQuotations(content));
 					}
 				}
 			}
 			else {
-				value = StringUtil.replace(value, "\"", "\\\"");
+				value = StringEscapeUtils.escapeXml(value);
 
-				String elementName = getName();
-
-				if (isDoubleQuotedVar(value) ||
-					elementName.equals("property")) {
-
-					value = doubleQuoteContent(value);
-				}
+				value = doubleQuoteContent(value);
 			}
 		}
 
@@ -453,11 +345,6 @@ public class VarPoshiElement extends PoshiElement {
 		return null;
 	}
 
-	@Override
-	protected Pattern getStatementPattern() {
-		return _statementPattern;
-	}
-
 	protected void initValueAttributeName(Element element) {
 		if (element.attribute("from") != null) {
 			valueAttributeName = "from";
@@ -491,62 +378,40 @@ public class VarPoshiElement extends PoshiElement {
 		}
 	}
 
-	protected String swapParameterQuotations(
-		String parametersString, boolean toScript) {
-
+	protected String swapParameterQuotations(String parametersString) {
 		StringBuilder sb = new StringBuilder();
 
 		parametersString = parametersString.trim();
 
-		List<String> methodParameterValues =
-			PoshiScriptParserUtil.getMethodParameterValues(
-				parametersString, this);
+		boolean singleQuote = false;
 
-		for (String methodParameterValue : methodParameterValues) {
-			methodParameterValue = methodParameterValue.trim();
+		if (parametersString.endsWith("'") &&
+			parametersString.startsWith("'")) {
 
-			if (methodParameterValue.endsWith("'") &&
-				methodParameterValue.startsWith("'")) {
+			singleQuote = true;
+		}
 
-				methodParameterValue = getSingleQuotedContent(
-					methodParameterValue);
+		List<String> parameters = getMethodParameters(parametersString);
 
-				methodParameterValue = StringUtil.replace(
-					methodParameterValue, "\\\'", "'");
-				methodParameterValue = StringUtil.replace(
-					methodParameterValue, "&quot;", "\"");
+		for (String parameter : parameters) {
+			if (singleQuote) {
+				parameter = getSingleQuotedContent(parameter);
 
-				methodParameterValue = StringUtil.replace(
-					methodParameterValue, "\"", "\\\"");
+				parameter = StringUtil.replace(parameter, "\\\'", "'");
+				parameter = StringUtil.replace(parameter, "\"", "&quot;");
 
-				if (isQuotedContent(methodParameterValue) && toScript) {
-					methodParameterValue = doubleQuoteContent(
-						methodParameterValue);
-				}
-			}
-			else if (methodParameterValue.endsWith("\"") &&
-					 methodParameterValue.startsWith("\"")) {
-
-				methodParameterValue = getDoubleQuotedContent(
-					methodParameterValue);
-
-				methodParameterValue = StringUtil.replace(
-					methodParameterValue, "'", "\\\'");
-				methodParameterValue = StringUtil.replace(
-					methodParameterValue, "\\\"", "\"");
-
-				methodParameterValue = singleQuoteContent(methodParameterValue);
+				parameter = doubleQuoteContent(parameter);
 			}
 			else {
-				if (!toScript) {
-					methodParameterValue = singleQuoteContent(
-						methodParameterValue);
-				}
+				parameter = getDoubleQuotedContent(parameter);
 
-				methodParameterValue = methodParameterValue.trim();
+				parameter = StringUtil.replace(parameter, "'", "\\\'");
+				parameter = StringUtil.replace(parameter, "&quot;", "\"");
+
+				parameter = singleQuoteContent(parameter);
 			}
 
-			sb.append(methodParameterValue);
+			sb.append(parameter);
 
 			sb.append(", ");
 		}
@@ -559,18 +424,16 @@ public class VarPoshiElement extends PoshiElement {
 	protected String valueAttributeName;
 
 	private boolean _isElementType(String poshiScript) {
-		if (isVarAssignedToMacroInvocation(poshiScript)) {
-			return false;
+		if (isValidPoshiScriptStatement(_statementPattern, poshiScript) ||
+			isVarAssignedToMacroInvocation(poshiScript)) {
+
+			return true;
 		}
 
-		return isValidPoshiScriptStatement(
-			_partialStatementPattern, poshiScript);
+		return false;
 	}
 
 	private static final String _ELEMENT_NAME = "var";
-
-	private static final String _VAR_VALUE_INTEGER_REGEX =
-		"\\d+[\\s]*(?![\\+-\\/\\*])";
 
 	private static final String _VAR_VALUE_MATH_EXPRESSION_REGEX;
 
@@ -586,8 +449,6 @@ public class VarPoshiElement extends PoshiElement {
 
 	private static final String _VAR_VALUE_STRING_REGEX = "\".*?\"";
 
-	private static final String _VAR_VALUE_VARIABLE_REGEX = "\\$\\{[\\w_-]+\\}";
-
 	private static final Map<String, String> _mathOperatorsMap =
 		new HashMap<String, String>() {
 			{
@@ -597,11 +458,6 @@ public class VarPoshiElement extends PoshiElement {
 				put("/", "quotient");
 			}
 		};
-	private static final Pattern _mathUtilMethodCallPattern = Pattern.compile(
-		"MathUtil\\.(\\w+)\\('(.+)', '(.+)'\\)");
-	private static final Pattern _nestedCDATAPattern = Pattern.compile(
-		"(?<cdata1><.+]])(?<cdata2>>.*>?)");
-	private static final Pattern _partialStatementPattern;
 	private static final Pattern _statementPattern;
 	private static final Pattern _varValueMathExpressionPattern;
 
@@ -612,16 +468,11 @@ public class VarPoshiElement extends PoshiElement {
 
 		_VAR_VALUE_REGEX = StringUtil.combine(
 			"(", _VAR_VALUE_STRING_REGEX, "|", _VAR_VALUE_MATH_EXPRESSION_REGEX,
-			"|", _VAR_VALUE_INTEGER_REGEX, "|", _VAR_VALUE_MULTILINE_REGEX, "|",
-			_VAR_VALUE_OBJECT_REGEX, "|", _VAR_VALUE_VARIABLE_REGEX, ")");
+			"|", _VAR_VALUE_MULTILINE_REGEX, "|", _VAR_VALUE_OBJECT_REGEX, ")");
 
 		_statementPattern = Pattern.compile(
 			"^" + VAR_NAME_REGEX + ASSIGNMENT_REGEX + _VAR_VALUE_REGEX +
-				"(;|)$",
-			Pattern.DOTALL | Pattern.MULTILINE);
-
-		_partialStatementPattern = Pattern.compile(
-			"^" + VAR_NAME_REGEX + ASSIGNMENT_REGEX + _VAR_VALUE_REGEX,
+				VAR_STATEMENT_END_REGEX,
 			Pattern.DOTALL);
 
 		_varValueMathExpressionPattern = Pattern.compile(

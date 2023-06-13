@@ -15,7 +15,6 @@
 import ClayButton from '@clayui/button';
 import ClayForm, {ClayInput} from '@clayui/form';
 import ClayModal, {useModal} from '@clayui/modal';
-import {addParams, openSelectionModal, sub} from 'frontend-js-web';
 import React, {useState} from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
@@ -24,18 +23,15 @@ import {useSyncValue} from '../hooks/useSyncValue.es';
 const defaultValue = {description: '', title: '', url: ''};
 
 const ImagePicker = ({
-	accessibleProps,
 	editingLanguageId,
 	id,
 	inputValue,
 	itemSelectorURL,
 	message,
 	name,
-	onBlur,
 	onClearClick,
 	onDescriptionChange,
 	onFieldChanged,
-	onFocus,
 	portletNamespace,
 	readOnly,
 }) => {
@@ -45,10 +41,6 @@ const ImagePicker = ({
 	const {observer, onClose} = useModal({
 		onClose: () => setModalVisible(false),
 	});
-
-	const [selectedImageId, setSelectedImageId] = useState(
-		inputValue?.fileEntryId
-	);
 
 	const dispatchValue = ({clear, value}, callback = () => {}) =>
 		setImageValues((oldValues) => {
@@ -65,8 +57,6 @@ const ImagePicker = ({
 		if (selectedItem?.value) {
 			const selectedImage = new Image();
 			const selectedItemValue = JSON.parse(selectedItem.value);
-
-			setSelectedImageId(selectedItemValue.fileEntryId);
 
 			selectedImage.addEventListener('load', (event) => {
 				const {
@@ -96,26 +86,14 @@ const ImagePicker = ({
 	const handleItemSelectorTriggerClick = (event) => {
 		event.preventDefault();
 
-		onFocus(event);
-
-		let url = itemSelectorURL;
-
-		if (Liferay.FeatureFlags['LPS-153332']) {
-			url = addParams(
-				`selectedItemIds=${selectedImageId}`,
-				itemSelectorURL
-			);
-		}
-
-		openSelectionModal({
-			onClose: () => onBlur(event),
+		Liferay.Util.openSelectionModal({
 			onSelect: handleFieldChanged,
 			selectEventName: `${portletNamespace}selectDocumentLibrary`,
-			title: sub(
+			title: Liferay.Util.sub(
 				Liferay.Language.get('select-x'),
 				Liferay.Language.get('image')
 			),
-			url,
+			url: itemSelectorURL,
 		});
 	};
 
@@ -131,11 +109,9 @@ const ImagePicker = ({
 					type="hidden"
 					value={JSON.stringify(imageValues)}
 				/>
-
 				<ClayInput.Group>
 					<ClayInput.GroupItem className="d-none d-sm-block" prepend>
 						<ClayInput
-							{...accessibleProps}
 							className="field"
 							dir={Liferay.Language.direction[editingLanguageId]}
 							disabled={readOnly}
@@ -196,7 +172,6 @@ const ImagePicker = ({
 					size="full-screen"
 				>
 					<ClayModal.Header />
-
 					<ClayModal.Body>
 						<img
 							alt={imageValues.description}
@@ -205,7 +180,6 @@ const ImagePicker = ({
 							src={imageValues.url}
 							style={{cursor: 'zoom-out', maxHeight: '95%'}}
 						/>
-
 						<p
 							className="font-weight-light text-center"
 							style={{color: '#FFFFFF'}}
@@ -267,9 +241,7 @@ const Main = ({
 	itemSelectorURL,
 	message,
 	name,
-	onBlur,
 	onChange,
-	onFocus,
 	portletNamespace,
 	readOnly,
 	valid,
@@ -316,18 +288,8 @@ const Main = ({
 			valid={isSignedIn ? valid : false}
 		>
 			<ImagePicker
-				accessibleProps={{
-					...(otherProps.tip && {
-						'aria-describedby': `${id ?? name}_fieldHelp`,
-					}),
-					...(otherProps.requiredErrorMessage && {
-						'aria-errormessage': `${id ?? name}_fieldError`,
-					}),
-					'aria-invalid': !valid,
-					'aria-required': otherProps.required,
-				}}
 				editingLanguageId={editingLanguageId}
-				id={id ?? name}
+				id={id}
 				inputValue={
 					transformValue(inputValue) ??
 					transformValue(value) ??
@@ -336,13 +298,11 @@ const Main = ({
 				itemSelectorURL={itemSelectorURL}
 				message={message}
 				name={name}
-				onBlur={onBlur}
 				onClearClick={({event, ...data}) => onChange(event, data)}
 				onDescriptionChange={({event, ...data}) =>
 					onChange(event, data)
 				}
 				onFieldChanged={({event, ...data}) => onChange(event, data)}
-				onFocus={onFocus}
 				portletNamespace={portletNamespace}
 				readOnly={isSignedIn ? readOnly : true}
 			/>

@@ -18,7 +18,6 @@ import com.liferay.adaptive.media.image.model.AMImageEntry;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -34,7 +33,7 @@ import java.util.Date;
  * @generated
  */
 public class AMImageEntryCacheModel
-	implements CacheModel<AMImageEntry>, Externalizable, MVCCModel {
+	implements CacheModel<AMImageEntry>, Externalizable {
 
 	@Override
 	public boolean equals(Object object) {
@@ -49,9 +48,7 @@ public class AMImageEntryCacheModel
 		AMImageEntryCacheModel amImageEntryCacheModel =
 			(AMImageEntryCacheModel)object;
 
-		if ((amImageEntryId == amImageEntryCacheModel.amImageEntryId) &&
-			(mvccVersion == amImageEntryCacheModel.mvccVersion)) {
-
+		if (amImageEntryId == amImageEntryCacheModel.amImageEntryId) {
 			return true;
 		}
 
@@ -60,30 +57,14 @@ public class AMImageEntryCacheModel
 
 	@Override
 	public int hashCode() {
-		int hashCode = HashUtil.hash(0, amImageEntryId);
-
-		return HashUtil.hash(hashCode, mvccVersion);
-	}
-
-	@Override
-	public long getMvccVersion() {
-		return mvccVersion;
-	}
-
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		this.mvccVersion = mvccVersion;
+		return HashUtil.hash(0, amImageEntryId);
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(23);
 
-		sb.append("{mvccVersion=");
-		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
-		sb.append(", uuid=");
+		sb.append("{uuid=");
 		sb.append(uuid);
 		sb.append(", amImageEntryId=");
 		sb.append(amImageEntryId);
@@ -113,9 +94,6 @@ public class AMImageEntryCacheModel
 	@Override
 	public AMImageEntry toEntityModel() {
 		AMImageEntryImpl amImageEntryImpl = new AMImageEntryImpl();
-
-		amImageEntryImpl.setMvccVersion(mvccVersion);
-		amImageEntryImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			amImageEntryImpl.setUuid("");
@@ -162,9 +140,6 @@ public class AMImageEntryCacheModel
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		mvccVersion = objectInput.readLong();
-
-		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
 		amImageEntryId = objectInput.readLong();
@@ -187,10 +162,6 @@ public class AMImageEntryCacheModel
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
-
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -228,8 +199,6 @@ public class AMImageEntryCacheModel
 		objectOutput.writeLong(size);
 	}
 
-	public long mvccVersion;
-	public long ctCollectionId;
 	public String uuid;
 	public long amImageEntryId;
 	public long groupId;

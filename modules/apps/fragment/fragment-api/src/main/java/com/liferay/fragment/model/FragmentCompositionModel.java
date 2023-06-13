@@ -492,8 +492,4 @@ public interface FragmentCompositionModel
 	@Override
 	public FragmentComposition cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

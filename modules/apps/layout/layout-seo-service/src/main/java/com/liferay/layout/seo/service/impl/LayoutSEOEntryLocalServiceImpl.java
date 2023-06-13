@@ -39,7 +39,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -59,10 +58,9 @@ public class LayoutSEOEntryLocalServiceImpl
 
 	@Override
 	public LayoutSEOEntry copyLayoutSEOEntry(
-			long userId, long groupId, boolean privateLayout,
-			long sourceLayoutId, boolean canonicalURLEnabled,
-			Map<Locale, String> canonicalURLMap, long copyDDMStorageId,
-			boolean openGraphDescriptionEnabled,
+			long userId, long groupId, boolean privateLayout, long layoutId,
+			boolean canonicalURLEnabled, Map<Locale, String> canonicalURLMap,
+			long copyDDMStorageId, boolean openGraphDescriptionEnabled,
 			Map<Locale, String> openGraphDescriptionMap,
 			Map<Locale, String> openGraphImageAltMap,
 			long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
@@ -71,19 +69,19 @@ public class LayoutSEOEntryLocalServiceImpl
 		throws PortalException {
 
 		LayoutSEOEntry layoutSEOEntry = layoutSEOEntryPersistence.fetchByG_P_L(
-			groupId, privateLayout, sourceLayoutId);
+			groupId, privateLayout, layoutId);
 
 		if (layoutSEOEntry == null) {
 			return _addLayoutSEOEntry(
-				userId, groupId, privateLayout, sourceLayoutId,
-				canonicalURLEnabled, canonicalURLMap, copyDDMStorageId,
-				openGraphDescriptionEnabled, openGraphDescriptionMap,
-				openGraphImageAltMap, openGraphImageFileEntryId,
-				openGraphTitleEnabled, openGraphTitleMap, serviceContext);
+				userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
+				canonicalURLMap, copyDDMStorageId, openGraphDescriptionEnabled,
+				openGraphDescriptionMap, openGraphImageAltMap,
+				openGraphImageFileEntryId, openGraphTitleEnabled,
+				openGraphTitleMap, serviceContext);
 		}
 
 		return updateLayoutSEOEntry(
-			userId, groupId, privateLayout, sourceLayoutId, canonicalURLEnabled,
+			userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
 			canonicalURLMap, openGraphDescriptionEnabled,
 			openGraphDescriptionMap, openGraphImageAltMap,
 			openGraphImageFileEntryId, openGraphTitleEnabled, openGraphTitleMap,
@@ -112,13 +110,6 @@ public class LayoutSEOEntryLocalServiceImpl
 
 		return layoutSEOEntryPersistence.fetchByG_P_L(
 			groupId, privateLayout, layoutId);
-	}
-
-	@Override
-	public List<LayoutSEOEntry> getLayoutSEOEntriesByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		return layoutSEOEntryPersistence.findByUuid_C(uuid, companyId);
 	}
 
 	@Override

@@ -24,15 +24,23 @@ import com.liferay.portal.kernel.lock.NoSuchLockException;
 import com.liferay.portal.lock.service.LockLocalService;
 
 import java.util.Date;
+import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tina Tian
  */
-@Component(service = LockManager.class)
+@Component(immediate = true, service = LockManager.class)
 public class LockManagerImpl implements LockManager {
+
+	@Override
+	public void clear() {
+		_lockLocalService.clear();
+	}
 
 	@Override
 	public Lock createLock(
@@ -79,7 +87,7 @@ public class LockManagerImpl implements LockManager {
 			return new LockImpl(_lockLocalService.getLock(className, key));
 		}
 		catch (PortalException portalException) {
-			throw _translate(portalException);
+			throw translate(portalException);
 		}
 	}
 
@@ -89,7 +97,7 @@ public class LockManagerImpl implements LockManager {
 			return new LockImpl(_lockLocalService.getLock(className, key));
 		}
 		catch (PortalException portalException) {
-			throw _translate(portalException);
+			throw translate(portalException);
 		}
 	}
 
@@ -102,7 +110,7 @@ public class LockManagerImpl implements LockManager {
 				_lockLocalService.getLockByUuidAndCompanyId(uuid, companyId));
 		}
 		catch (PortalException portalException) {
-			throw _translate(portalException);
+			throw translate(portalException);
 		}
 	}
 
@@ -149,7 +157,7 @@ public class LockManagerImpl implements LockManager {
 					renew));
 		}
 		catch (PortalException portalException) {
-			throw _translate(portalException);
+			throw translate(portalException);
 		}
 	}
 
@@ -176,7 +184,7 @@ public class LockManagerImpl implements LockManager {
 					renew));
 		}
 		catch (PortalException portalException) {
-			throw _translate(portalException);
+			throw translate(portalException);
 		}
 	}
 
@@ -204,7 +212,7 @@ public class LockManagerImpl implements LockManager {
 				_lockLocalService.refresh(uuid, companyId, expirationTime));
 		}
 		catch (PortalException portalException) {
-			throw _translate(portalException);
+			throw translate(portalException);
 		}
 	}
 
@@ -223,7 +231,18 @@ public class LockManagerImpl implements LockManager {
 		_lockLocalService.unlock(className, key, owner);
 	}
 
-	private PortalException _translate(PortalException portalException) {
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		clear();
+	}
+
+	@Reference(unbind = "-")
+	protected void setLockLocalService(LockLocalService lockLocalService) {
+		_lockLocalService = lockLocalService;
+	}
+
+	protected PortalException translate(PortalException portalException) {
 		if (portalException instanceof
 				com.liferay.portal.lock.exception.DuplicateLockException) {
 
@@ -270,7 +289,6 @@ public class LockManagerImpl implements LockManager {
 		return portalException;
 	}
 
-	@Reference
 	private LockLocalService _lockLocalService;
 
 }

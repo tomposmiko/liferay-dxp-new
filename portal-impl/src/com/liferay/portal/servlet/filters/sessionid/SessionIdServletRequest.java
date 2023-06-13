@@ -15,10 +15,9 @@
 package com.liferay.portal.servlet.filters.sessionid;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.Validator;
 
 import javax.servlet.http.Cookie;
@@ -66,9 +65,9 @@ public class SessionIdServletRequest extends HttpServletRequestWrapper {
 			return;
 		}
 
-		Object jSessionIdAlreadySet = getAttribute(_JSESSIONID_ALREADY_SET);
+		Object jsessionIdAlreadySet = getAttribute(_JESSIONID_ALREADY_SET);
 
-		if (jSessionIdAlreadySet != null) {
+		if (jsessionIdAlreadySet != null) {
 			return;
 		}
 
@@ -76,7 +75,7 @@ public class SessionIdServletRequest extends HttpServletRequestWrapper {
 			_log.debug("Processing " + httpSession.getId());
 		}
 
-		Cookie cookie = new Cookie(_JSESSIONID, httpSession.getId());
+		Cookie cookie = new Cookie(_JESSIONID, httpSession.getId());
 
 		cookie.setMaxAge(-1);
 
@@ -89,17 +88,17 @@ public class SessionIdServletRequest extends HttpServletRequestWrapper {
 			cookie.setPath(StringPool.SLASH);
 		}
 
-		CookiesManagerUtil.addCookie(
-			CookiesConstants.CONSENT_TYPE_NECESSARY, cookie,
-			(HttpServletRequest)super.getRequest(), _httpServletResponse);
+		CookieKeys.addCookie(
+			(HttpServletRequest)super.getRequest(), _httpServletResponse,
+			cookie);
 
-		setAttribute(_JSESSIONID_ALREADY_SET, Boolean.TRUE);
+		setAttribute(_JESSIONID_ALREADY_SET, Boolean.TRUE);
 	}
 
-	private static final String _JSESSIONID = "JSESSIONID";
+	private static final String _JESSIONID = "JSESSIONID";
 
-	private static final String _JSESSIONID_ALREADY_SET =
-		"JSESSIONID_ALREADY_SET";
+	private static final String _JESSIONID_ALREADY_SET =
+		"JESSIONID_ALREADY_SET";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SessionIdServletRequest.class);

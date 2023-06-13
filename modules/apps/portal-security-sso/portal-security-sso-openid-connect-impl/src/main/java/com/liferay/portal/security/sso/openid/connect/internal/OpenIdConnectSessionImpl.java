@@ -14,8 +14,6 @@
 
 package com.liferay.portal.security.sso.openid.connect.internal;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectFlowState;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectSession;
 import com.liferay.portal.security.sso.openid.connect.persistence.service.OpenIdConnectSessionLocalServiceUtil;
@@ -64,10 +62,6 @@ public class OpenIdConnectSessionImpl
 			return accessToken.getValue();
 		}
 		catch (ParseException parseException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(parseException);
-			}
-
 			return null;
 		}
 	}
@@ -124,9 +118,6 @@ public class OpenIdConnectSessionImpl
 	}
 
 	private static final long _LOGIN_TIME = System.currentTimeMillis();
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		OpenIdConnectSessionImpl.class);
 
 	private final long _loginUserId;
 	private final Nonce _nonce;

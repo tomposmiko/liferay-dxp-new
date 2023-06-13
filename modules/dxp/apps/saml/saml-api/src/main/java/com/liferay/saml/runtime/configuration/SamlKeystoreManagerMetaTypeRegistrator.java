@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Carlos Sierra Andrés
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class SamlKeystoreManagerMetaTypeRegistrator {
 
 	@Activate
@@ -43,6 +43,8 @@ public class SamlKeystoreManagerMetaTypeRegistrator {
 
 		_metaTypeRegistrator.importPackage(
 			"com.liferay.saml.runtime.configuration");
+		_metaTypeRegistrator.requireLanguageKeys(
+			"(bundle.symbolic.name=com.liferay.saml.api)");
 
 		_metaTypeRegistrator.open();
 	}

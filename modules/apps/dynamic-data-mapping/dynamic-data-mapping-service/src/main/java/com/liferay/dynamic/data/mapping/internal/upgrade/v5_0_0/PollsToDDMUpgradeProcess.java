@@ -64,7 +64,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -80,10 +79,13 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Carolina Barbosa
@@ -102,31 +104,6 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 		_ddmFormValuesSerializer = ddmFormValuesSerializer;
 		_resourceActionLocalService = resourceActionLocalService;
 		_resourcePermissionLocalService = resourcePermissionLocalService;
-	}
-
-	/**
-	 * @see com.liferay.polls.internal.upgrade.v1_0_0.UpgradeLastPublishDate
-	 */
-	public class UpgradeLastPublishDate
-		extends com.liferay.portal.upgrade.v7_0_0.UpgradeLastPublishDate {
-
-		protected void addLastPublishDateColumns() throws Exception {
-			try (LoggingTimer loggingTimer = new LoggingTimer()) {
-				addLastPublishDateColumn("PollsChoice");
-				addLastPublishDateColumn("PollsQuestion");
-				addLastPublishDateColumn("PollsVote");
-			}
-		}
-
-		@Override
-		protected void doUpgrade() throws Exception {
-			addLastPublishDateColumns();
-
-			//updateLastPublishDates(PollsPortletKeys.POLLS, "PollsChoice");
-			//updateLastPublishDates(PollsPortletKeys.POLLS, "PollsQuestion");
-			//updateLastPublishDates(PollsPortletKeys.POLLS, "PollsVote");
-		}
-
 	}
 
 	protected void createDDDMFormFieldOptions(
@@ -155,13 +132,6 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			return;
 		}
 
-		if (!hasColumn("PollsQuestion", "lastPublishDate")) {
-			UpgradeLastPublishDate upgradeLastPublishDate =
-				new UpgradeLastPublishDate();
-
-			upgradeLastPublishDate.upgrade();
-		}
-
 		_upgradePollsQuestions();
 
 		runSQL("delete from PollsVote");
@@ -171,13 +141,22 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 		runSQL("delete from PollsQuestion");
 	}
 
-	protected JSONObject getDataJSONObject(String ddmFormFieldName) {
+	protected JSONObject getDataJSONObject(DDMFormField ddmFormField) {
+		JSONObject valuesJSONObject = JSONFactoryUtil.createJSONObject();
+
+		DDMFormFieldOptions ddmFormFieldOptions =
+			ddmFormField.getDDMFormFieldOptions();
+
+		for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
+			valuesJSONObject.put(optionValue, 0);
+		}
+
 		return JSONUtil.put(
-			ddmFormFieldName,
+			ddmFormField.getName(),
 			JSONUtil.put(
 				"type", DDMFormFieldTypeConstants.RADIO
 			).put(
-				"values", JSONFactoryUtil.createJSONObject()
+				"values", valuesJSONObject
 			)
 		).put(
 			"totalItems", 0
@@ -195,7 +174,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	}
 
 	protected DDMFormField getDDMFormField(
-		DDMFormFieldOptions ddmFormFieldOptions, String description) {
+		DDMFormFieldOptions ddmFormFieldOptions) {
 
 		String ddmFormFieldLabel = LanguageUtil.get(
 			_getResourceBundle(), "radio-field-type-label");
@@ -206,28 +185,14 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 
 		ddmFormField.setDataType("string");
 		ddmFormField.setDDMFormFieldOptions(ddmFormFieldOptions);
-
-		LocalizedValue localizedValue = new LocalizedValue(_defaultLocale);
-
-		for (String availableLanguageId :
-				LocalizationUtil.getAvailableLanguageIds(description)) {
-
-			Locale availableLocale = LocaleUtil.fromLanguageId(
-				availableLanguageId);
-
-			localizedValue.addString(
-				availableLocale,
-				LocalizationUtil.getLocalization(
-					description, LocaleUtil.toLanguageId(availableLocale)));
-		}
-
-		ddmFormField.setLabel(localizedValue);
+		ddmFormField.setLabel(
+			_getLocalizedValue(_defaultLocale, ddmFormFieldLabel));
 		ddmFormField.setLocalizable(true);
 		ddmFormField.setProperty("inline", false);
 		ddmFormField.setProperty("instanceId", StringUtil.randomString(8));
 		ddmFormField.setProperty("visible", true);
 		ddmFormField.setRequired(true);
-		ddmFormField.setShowLabel(true);
+		ddmFormField.setShowLabel(false);
 
 		return ddmFormField;
 	}
@@ -263,17 +228,8 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			ddmFormFieldValue.setFieldReference(
 				ddmFormField.getFieldReference());
 			ddmFormFieldValue.setName(ddmFormField.getName());
-
-			if (StringUtil.equals(
-					ddmFormField.getName(), "convertedFromPolls")) {
-
-				ddmFormFieldValue.setValue(
-					new UnlocalizedValue(Boolean.TRUE.toString()));
-			}
-			else {
-				ddmFormFieldValue.setValue(
-					_getSettingDefaultValue(ddmForm, ddmFormField));
-			}
+			ddmFormFieldValue.setValue(
+				_getSettingDefaultValue(ddmForm, ddmFormField));
 
 			ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 		}
@@ -358,7 +314,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	private void _addDDMFormInstance(
 			long formInstanceId, long groupId, long companyId, long userId,
 			String userName, Timestamp createDate, Timestamp modifiedDate,
-			long structureId, String name, String settings,
+			long structureId, String name, String description,
 			Timestamp expirationDate, Timestamp lastPublishDate)
 		throws Exception {
 
@@ -386,8 +342,9 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			preparedStatement.setString(
 				12, DDMFormInstanceConstants.VERSION_DEFAULT);
 			preparedStatement.setString(13, name);
-			preparedStatement.setString(14, StringPool.BLANK);
-			preparedStatement.setString(15, settings);
+			preparedStatement.setString(14, description);
+			preparedStatement.setString(
+				15, getSerializedSettingsDDMFormValues());
 			preparedStatement.setTimestamp(16, expirationDate);
 			preparedStatement.setTimestamp(17, lastPublishDate);
 
@@ -504,7 +461,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	private void _addDDMFormInstanceVersion(
 			long groupId, long companyId, long userId, String userName,
 			Timestamp createDate, long formInstanceId, long structureVersionId,
-			String name, String settings, Timestamp statusDate)
+			String name, String description, Timestamp statusDate)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -526,8 +483,8 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			preparedStatement.setLong(7, formInstanceId);
 			preparedStatement.setLong(8, structureVersionId);
 			preparedStatement.setString(9, name);
-			preparedStatement.setString(10, StringPool.BLANK);
-			preparedStatement.setString(11, settings);
+			preparedStatement.setString(10, description);
+			preparedStatement.setString(11, StringPool.BLANK);
 			preparedStatement.setString(
 				12, DDMFormInstanceConstants.VERSION_DEFAULT);
 			preparedStatement.setInt(13, WorkflowConstants.STATUS_APPROVED);
@@ -572,7 +529,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	private long _addDDMStructure(
 			long groupId, long companyId, long userId, String userName,
 			Timestamp createDate, Timestamp modifiedDate, String name,
-			String definition, Timestamp lastPublishDate)
+			String description, String definition, Timestamp lastPublishDate)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -607,7 +564,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			preparedStatement.setString(
 				14, DDMStructureConstants.VERSION_DEFAULT);
 			preparedStatement.setString(15, name);
-			preparedStatement.setString(16, StringPool.BLANK);
+			preparedStatement.setString(16, description);
 			preparedStatement.setString(17, definition);
 			preparedStatement.setString(18, StorageType.DEFAULT.toString());
 			preparedStatement.setInt(19, DDMStructureConstants.TYPE_AUTO);
@@ -622,7 +579,8 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	private void _addDDMStructureLayout(
 			long groupId, long companyId, long userId, String userName,
 			Timestamp createDate, Timestamp modifiedDate,
-			long structureVersionId, String name, String definition)
+			long structureVersionId, String name, String description,
+			String definition)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -647,7 +605,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			preparedStatement.setString(10, String.valueOf(increment()));
 			preparedStatement.setLong(11, structureVersionId);
 			preparedStatement.setString(12, name);
-			preparedStatement.setString(13, StringPool.BLANK);
+			preparedStatement.setString(13, description);
 			preparedStatement.setString(14, definition);
 
 			preparedStatement.executeUpdate();
@@ -657,7 +615,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	private long _addDDMStructureVersion(
 			long groupId, long companyId, long userId, String userName,
 			Timestamp createDate, long structureId, String name,
-			String definition, Timestamp statusDate)
+			String description, String definition, Timestamp statusDate)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -685,7 +643,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 			preparedStatement.setLong(
 				9, DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID);
 			preparedStatement.setString(10, name);
-			preparedStatement.setString(11, StringPool.BLANK);
+			preparedStatement.setString(11, description);
 			preparedStatement.setString(12, definition);
 			preparedStatement.setString(13, StorageType.DEFAULT.toString());
 			preparedStatement.setInt(14, DDMStructureConstants.TYPE_AUTO);
@@ -740,8 +698,6 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	}
 
 	private long _getActionIds(long oldActionIds) {
-		long sum = 0;
-
 		Set<String> actionsIds = new HashSet<>();
 
 		for (ResourceAction resourceAction :
@@ -759,12 +715,12 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 					_resourceActionIds, resourceAction.getActionId()));
 		}
 
-		for (String actionId : actionsIds) {
-			sum += MapUtil.getLong(
-				_getDDMFormInstanceResourceActions(), actionId);
-		}
+		Stream<String> stream = actionsIds.stream();
 
-		return sum;
+		return stream.mapToLong(
+			actionId -> MapUtil.getLong(
+				_getDDMFormInstanceResourceActions(), actionId)
+		).sum();
 	}
 
 	private Map<Long, String> _getDDMFormFieldOptionsValues(
@@ -798,17 +754,16 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	}
 
 	private Map<String, Long> _getDDMFormInstanceResourceActions() {
-		Map<String, Long> ddmFormInstanceResourceActions = new HashMap<>();
+		List<ResourceAction> resourceActions =
+			_resourceActionLocalService.getResourceActions(
+				_CLASS_NAME_DDM_FORM_INSTANCE);
 
-		for (ResourceAction resourceAction :
-				_resourceActionLocalService.getResourceActions(
-					_CLASS_NAME_DDM_FORM_INSTANCE)) {
+		Stream<ResourceAction> stream = resourceActions.stream();
 
-			ddmFormInstanceResourceActions.put(
-				resourceAction.getActionId(), resourceAction.getBitwiseValue());
-		}
-
-		return ddmFormInstanceResourceActions;
+		return stream.collect(
+			Collectors.toMap(
+				resourceAction -> resourceAction.getActionId(),
+				resourceAction -> resourceAction.getBitwiseValue()));
 	}
 
 	private DDMFormLayoutPage _getDDMFormLayoutPage(DDMFormField ddmFormField) {
@@ -893,7 +848,9 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 	}
 
 	private void _upgradeDDMFormInstance() throws Exception {
-		alterTableAddColumn("DDMFormInstance", "expirationDate", "DATE null");
+		if (!hasColumn("DDMFormInstance", "expirationDate")) {
+			runSQL("alter table DDMFormInstance add expirationDate DATE null");
+		}
 	}
 
 	private void _upgradePollsQuestion(
@@ -909,38 +866,36 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 		Map<Long, String> ddmFormFieldOptionsValues =
 			_getDDMFormFieldOptionsValues(ddmFormFieldOptions, questionId);
 
-		DDMFormField ddmFormField = getDDMFormField(
-			ddmFormFieldOptions, description);
+		DDMFormField ddmFormField = getDDMFormField(ddmFormFieldOptions);
 
 		String definition = DDMFormSerializeUtil.serialize(
 			getDDMForm(ddmFormField), _ddmFormSerializer);
 
 		long structureId = _addDDMStructure(
 			groupId, companyId, userId, userName, createDate, modifiedDate,
-			name, definition, lastPublishDate);
+			name, description, definition, lastPublishDate);
 
 		long structureVersionId = _addDDMStructureVersion(
 			groupId, companyId, userId, userName, createDate, structureId, name,
-			definition, lastPublishDate);
+			description, definition, lastPublishDate);
 
 		_addDDMStructureLayout(
 			groupId, companyId, userId, userName, createDate, modifiedDate,
-			structureVersionId, name, getDDMFormLayoutDefinition(ddmFormField));
-
-		String settings = getSerializedSettingsDDMFormValues();
+			structureVersionId, name, description,
+			getDDMFormLayoutDefinition(ddmFormField));
 
 		_addDDMFormInstance(
 			questionId, groupId, companyId, userId, userName, createDate,
-			modifiedDate, structureId, name, settings, expirationDate,
+			modifiedDate, structureId, name, description, expirationDate,
 			lastPublishDate);
 
 		_upgradeResourcePermission(questionId);
 
 		_addDDMFormInstanceVersion(
 			groupId, companyId, userId, userName, createDate, questionId,
-			structureVersionId, name, settings, lastPublishDate);
+			structureVersionId, name, description, lastPublishDate);
 
-		JSONObject dataJSONObject = getDataJSONObject(ddmFormField.getName());
+		JSONObject dataJSONObject = getDataJSONObject(ddmFormField);
 
 		_upgradePollsVotes(
 			dataJSONObject, ddmFormFieldOptionsValues, ddmFormField.getName(),
@@ -965,6 +920,7 @@ public class PollsToDDMUpgradeProcess extends UpgradeProcess {
 				_availableLocales = SetUtil.fromArray(
 					LocaleUtil.fromLanguageIds(
 						LocalizationUtil.getAvailableLanguageIds(title)));
+
 				_defaultLocale = LocaleUtil.fromLanguageId(
 					LocalizationUtil.getDefaultLanguageId(title));
 

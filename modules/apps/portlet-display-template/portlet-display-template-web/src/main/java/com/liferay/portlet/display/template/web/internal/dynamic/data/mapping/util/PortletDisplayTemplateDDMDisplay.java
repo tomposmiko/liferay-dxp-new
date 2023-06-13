@@ -20,12 +20,12 @@ import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.util.BaseDDMDisplay;
 import com.liferay.dynamic.data.mapping.util.DDMDisplay;
 import com.liferay.dynamic.data.mapping.util.DDMDisplayTabItem;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -140,7 +140,7 @@ public class PortletDisplayTemplateDDMDisplay extends BaseDDMDisplay {
 		Locale locale) {
 
 		if (search) {
-			return _language.get(locale, "templates");
+			return LanguageUtil.get(locale, "templates");
 		}
 
 		if (controlPanel) {
@@ -158,12 +158,12 @@ public class PortletDisplayTemplateDDMDisplay extends BaseDDMDisplay {
 
 	@Override
 	protected String getDefaultEditTemplateTitle(Locale locale) {
-		return _language.get(locale, "new-widget-template");
+		return LanguageUtil.get(locale, "new-widget-template");
 	}
 
 	@Override
 	protected String getDefaultViewTemplateTitle(Locale locale) {
-		return _language.get(locale, "widget-templates");
+		return LanguageUtil.get(locale, "widget-templates");
 	}
 
 	@Override
@@ -201,14 +201,17 @@ public class PortletDisplayTemplateDDMDisplay extends BaseDDMDisplay {
 		return portletURL.toString();
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPortletDisplayTemplate(
+		PortletDisplayTemplate portletDisplayTemplate) {
+
+		this.portletDisplayTemplate = portletDisplayTemplate;
+	}
+
 	protected PortletDisplayTemplate portletDisplayTemplate;
 
 	private static final Set<String> _viewTemplateExcludedColumnNames =
-		SetUtil.fromArray("language", "mode", "structure");
-
-	@Reference
-	private Language _language;
+		SetUtil.fromArray(new String[] {"language", "mode", "structure"});
 
 	@Reference
 	private Portal _portal;

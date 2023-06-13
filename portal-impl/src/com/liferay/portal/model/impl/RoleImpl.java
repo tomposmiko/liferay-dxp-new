@@ -51,7 +51,7 @@ public class RoleImpl extends RoleBaseImpl {
 				value = getDescriptiveName();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -67,7 +67,7 @@ public class RoleImpl extends RoleBaseImpl {
 				value = getDescriptiveName();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 

@@ -20,10 +20,10 @@ import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortlet
 import com.liferay.layout.content.page.editor.web.internal.util.StyleBookEntryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Víctor Galán
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/change_style_book_entry"
@@ -63,8 +64,8 @@ public class ChangeStyleBookEntryMVCActionCommand
 
 		Layout layout = themeDisplay.getLayout();
 
-		LayoutPermissionUtil.checkLayoutRestrictedUpdatePermission(
-			themeDisplay.getPermissionChecker(), layout);
+		LayoutPermissionUtil.check(
+			themeDisplay.getPermissionChecker(), layout, ActionKeys.UPDATE);
 
 		long styleBookEntryId = ParamUtil.getLong(
 			actionRequest, "styleBookEntryId");
@@ -73,10 +74,8 @@ public class ChangeStyleBookEntryMVCActionCommand
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			styleBookEntryId);
 
-		Group group = themeDisplay.getScopeGroup();
-
 		LayoutSet layoutSet = _layoutSetLocalService.fetchLayoutSet(
-			themeDisplay.getSiteGroupId(), group.isLayoutSetPrototype());
+			themeDisplay.getSiteGroupId(), false);
 
 		FrontendTokenDefinition frontendTokenDefinition =
 			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(

@@ -110,12 +110,7 @@ public class NoticeableThreadPoolExecutor
 
 				return thread;
 			},
-			(runnable, threadPoolExecutor) -> {
-				DispatchRunnable dispatchRunnable = (DispatchRunnable)runnable;
-
-				rejectedExecutionHandler.rejectedExecution(
-					dispatchRunnable.getRunnable(), threadPoolExecutor);
-			}) {
+			rejectedExecutionHandler) {
 
 			@Override
 			protected void terminated() {
@@ -154,7 +149,7 @@ public class NoticeableThreadPoolExecutor
 		}
 
 		_dispatcherThreadPoolExecutor.execute(
-			new DispatchRunnable(_workerThreadPoolExecutor, runnable));
+			() -> _workerThreadPoolExecutor.execute(runnable));
 	}
 
 	public int getActiveCount() {
@@ -251,28 +246,5 @@ public class NoticeableThreadPoolExecutor
 	private final DefaultNoticeableFuture<Void>
 		_terminationDefaultNoticeableFuture;
 	private final ThreadPoolExecutor _workerThreadPoolExecutor;
-
-	private static class DispatchRunnable implements Runnable {
-
-		public Runnable getRunnable() {
-			return _runnable;
-		}
-
-		@Override
-		public void run() {
-			_workerThreadPoolExecutor.execute(_runnable);
-		}
-
-		private DispatchRunnable(
-			ThreadPoolExecutor workerThreadPoolExecutor, Runnable runnable) {
-
-			_workerThreadPoolExecutor = workerThreadPoolExecutor;
-			_runnable = runnable;
-		}
-
-		private final Runnable _runnable;
-		private final ThreadPoolExecutor _workerThreadPoolExecutor;
-
-	}
 
 }

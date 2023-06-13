@@ -16,9 +16,8 @@ package com.liferay.poshi.runner.logger;
 
 import com.liferay.poshi.core.PoshiContext;
 import com.liferay.poshi.core.PoshiGetterUtil;
-import com.liferay.poshi.core.PoshiStackTrace;
+import com.liferay.poshi.core.PoshiStackTraceUtil;
 import com.liferay.poshi.core.elements.PoshiElement;
-import com.liferay.poshi.core.util.Dom4JUtil;
 import com.liferay.poshi.core.util.FileUtil;
 import com.liferay.poshi.core.util.GetterUtil;
 import com.liferay.poshi.core.util.PropsValues;
@@ -39,99 +38,55 @@ import org.dom4j.Element;
 public class PoshiLogger {
 
 	public PoshiLogger(String testNamespacedClassCommandName) throws Exception {
-		_commandLogger = new CommandLogger(testNamespacedClassCommandName);
+		_commandLogger = new CommandLogger();
 
 		_syntaxLogger = _getSyntaxLogger(testNamespacedClassCommandName);
-
-		_testNamespacedClassCommandName = testNamespacedClassCommandName;
-
-		_poshiStackTrace = PoshiStackTrace.getPoshiStackTrace(
-			testNamespacedClassCommandName);
 	}
 
 	public void createPoshiReport() throws IOException {
-		String indexHTMLContent = null;
+		ClassLoader classLoader = PoshiLogger.class.getClassLoader();
+
+		URL url = classLoader.getResource("META-INF/resources/html/index.html");
+
+		String indexHTMLContent = FileUtil.read(url);
+
+		indexHTMLContent = StringUtil.replace(
+			indexHTMLContent,
+			"<ul class=\"command-log\" data-logid=\"01\" " +
+				"id=\"commandLog\"></ul>",
+			_commandLogger.getCommandLogText());
+		indexHTMLContent = StringUtil.replace(
+			indexHTMLContent,
+			"<ul class=\"syntax-log-container\" id=\"syntaxLogContainer\"" +
+				"></ul>",
+			_syntaxLogger.getSyntaxLogText());
 
 		String currentDirName = FileUtil.getCanonicalPath(".");
 
-		try {
-			ClassLoader classLoader = PoshiLogger.class.getClassLoader();
-
-			URL url = classLoader.getResource(
-				"META-INF/resources/html/index.html");
-
-			indexHTMLContent = FileUtil.read(url);
-
-			indexHTMLContent = StringUtil.replace(
-				indexHTMLContent,
-				"<ul class=\"command-log\" data-logid=\"01\" " +
-					"id=\"commandLog\"></ul>",
-				_commandLogger.getCommandLogText());
-			indexHTMLContent = StringUtil.replace(
-				indexHTMLContent,
-				"<ul class=\"syntax-log-container\" id=\"syntaxLogContainer\"" +
-					"></ul>",
-				_syntaxLogger.getSyntaxLogText());
-
-			if (PropsValues.TEST_RUN_LOCALLY) {
-				FileUtil.copyFileFromResource(
-					"META-INF/resources/css/main.css",
-					currentDirName + "/test-results/css/main.css");
-				FileUtil.copyFileFromResource(
-					"META-INF/resources/js/component.js",
-					currentDirName + "/test-results/js/component.js");
-				FileUtil.copyFileFromResource(
-					"META-INF/resources/js/main.js",
-					currentDirName + "/test-results/js/main.js");
-				FileUtil.copyFileFromResource(
-					"META-INF/resources/js/update_images.js",
-					currentDirName + "/test-results/js/update_images.js");
-			}
-			else {
-				indexHTMLContent = StringUtil.replace(
-					indexHTMLContent, "<link href=\"../css/main.css\"",
-					"<link href=\"" + PropsValues.LOGGER_RESOURCES_URL +
-						"/css/main.css\"");
-				indexHTMLContent = StringUtil.replace(
-					indexHTMLContent,
-					"<script defer src=\"../js/component.js\"",
-					"<script defer src=\"" + PropsValues.LOGGER_RESOURCES_URL +
-						"/js/component.js\"");
-				indexHTMLContent = StringUtil.replace(
-					indexHTMLContent, "<script defer src=\"../js/main.js\"",
-					"<script defer src=\"" + PropsValues.LOGGER_RESOURCES_URL +
-						"/js/main.js\"");
-				indexHTMLContent = StringUtil.replace(
-					indexHTMLContent,
-					"<script defer src=\"../js/update_images.js\"",
-					"<script defer src=\"" + PropsValues.LOGGER_RESOURCES_URL +
-						"/js/update_images.js\"");
-			}
+		if (PropsValues.TEST_RUN_LOCALLY) {
+			FileUtil.copyFileFromResource(
+				"META-INF/resources/css/main.css",
+				currentDirName + "/test-results/css/main.css");
+			FileUtil.copyFileFromResource(
+				"META-INF/resources/js/component.js",
+				currentDirName + "/test-results/js/component.js");
+			FileUtil.copyFileFromResource(
+				"META-INF/resources/js/main.js",
+				currentDirName + "/test-results/js/main.js");
 		}
-		catch (OutOfMemoryError outOfMemoryError) {
-			System.out.println(
-				"Unable to create Poshi syntax logger. See POSHI-378 for " +
-					"details. Use the summary.html log instead.");
-
-			String summaryHTMLFileName = "summary.html";
-
-			if (System.getenv("JENKINS_HOME") != null) {
-				summaryHTMLFileName = summaryHTMLFileName + ".gz";
-			}
-
-			Element element = Dom4JUtil.getNewElement(
-				"html", null,
-				Dom4JUtil.getNewElement(
-					"body", null, "Unable to create Poshi syntax logger. See ",
-					Dom4JUtil.getNewAnchorElement(
-						"https://issues.liferay.com/browse/POSHI-378",
-						"POSHI-378"),
-					" details. Use the ",
-					Dom4JUtil.getNewAnchorElement(
-						summaryHTMLFileName, "Summary Log"),
-					" instead."));
-
-			indexHTMLContent = Dom4JUtil.format(element);
+		else {
+			indexHTMLContent = StringUtil.replace(
+				indexHTMLContent, "<link href=\"../css/main.css\"",
+				"<link href=\"" + PropsValues.LOGGER_RESOURCES_URL +
+					"/css/main.css\"");
+			indexHTMLContent = StringUtil.replace(
+				indexHTMLContent, "<script defer src=\"../js/component.js\"",
+				"<script defer src=\"" + PropsValues.LOGGER_RESOURCES_URL +
+					"/js/component.js\"");
+			indexHTMLContent = StringUtil.replace(
+				indexHTMLContent, "<script defer src=\"../js/main.js\"",
+				"<script defer src=\"" + PropsValues.LOGGER_RESOURCES_URL +
+					"/js/main.js\"");
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -139,7 +94,9 @@ public class PoshiLogger {
 		sb.append(currentDirName);
 		sb.append("/test-results/");
 		sb.append(
-			StringUtil.replace(_testNamespacedClassCommandName, "#", "_"));
+			StringUtil.replace(
+				PoshiContext.getTestCaseNamespacedClassCommandName(), "#",
+				"_"));
 		sb.append("/index.html");
 
 		FileUtil.write(sb.toString(), indexHTMLContent);
@@ -155,10 +112,6 @@ public class PoshiLogger {
 
 	public int getDetailsLinkId() {
 		return _commandLogger.getDetailsLinkId();
-	}
-
-	public String getTestNamespacedClassCommandName() {
-		return _testNamespacedClassCommandName;
 	}
 
 	public void logExternalMethodCommand(
@@ -191,16 +144,6 @@ public class PoshiLogger {
 		throws PoshiRunnerLoggerException {
 
 		_commandLogger.logSeleniumCommand(element, arguments);
-	}
-
-	public void ocularCommand(Element element)
-		throws PoshiRunnerLoggerException {
-
-		_commandLogger.ocularCommand(element, _syntaxLogger);
-
-		LoggerElement syntaxLoggerElement = _getSyntaxLoggerElement();
-
-		syntaxLoggerElement.setAttribute("data-status01", "fail");
 	}
 
 	public void passCommand(Element element) throws PoshiRunnerLoggerException {
@@ -264,11 +207,7 @@ public class PoshiLogger {
 			classCommandName, namespace);
 
 		if (commandElement instanceof PoshiElement) {
-			PoshiElement poshiCommandElement = (PoshiElement)commandElement;
-
-			if (!poshiCommandElement.isPoshiProse()) {
-				return new PoshiScriptSyntaxLogger(namespacedClassCommandName);
-			}
+			return new PoshiScriptSyntaxLogger(namespacedClassCommandName);
 		}
 
 		return new XMLSyntaxLogger(namespacedClassCommandName);
@@ -276,7 +215,7 @@ public class PoshiLogger {
 
 	private LoggerElement _getSyntaxLoggerElement() {
 		return _syntaxLogger.getSyntaxLoggerElement(
-			_poshiStackTrace.getSimpleStackTrace());
+			PoshiStackTraceUtil.getSimpleStackTrace());
 	}
 
 	private void _linkLoggerElements(
@@ -302,8 +241,6 @@ public class PoshiLogger {
 
 	private final CommandLogger _commandLogger;
 	private int _functionLinkId;
-	private final PoshiStackTrace _poshiStackTrace;
 	private final SyntaxLogger _syntaxLogger;
-	private final String _testNamespacedClassCommandName;
 
 }

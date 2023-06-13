@@ -136,7 +136,7 @@ public class BundleBlacklistManagerImpl implements BundleBlacklistManager {
 		}
 		catch (InterruptedException interruptedException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(interruptedException);
+				_log.debug(interruptedException, interruptedException);
 			}
 		}
 		finally {

@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + PortletKeys.MY_WORKFLOW_TASK,
 		"mvc.command.name=/portal_workflow_task/update_task"
@@ -86,7 +87,7 @@ public class UpdateTaskMVCResourceCommand extends BaseMVCResourceCommand {
 				WorkflowTaskDueDateException.class);
 
 			WorkflowTask workflowTask = workflowTaskManager.getWorkflowTask(
-				workflowTaskId);
+				themeDisplay.getCompanyId(), workflowTaskId);
 
 			Date createDate = workflowTask.getCreateDate();
 
@@ -101,7 +102,7 @@ public class UpdateTaskMVCResourceCommand extends BaseMVCResourceCommand {
 				workflowTaskId, comment, dueDate);
 		}
 		catch (WorkflowException workflowException) {
-			_log.error(workflowException);
+			_log.error(workflowException, workflowException);
 
 			SessionErrors.add(
 				resourceRequest, workflowException.getClass(),

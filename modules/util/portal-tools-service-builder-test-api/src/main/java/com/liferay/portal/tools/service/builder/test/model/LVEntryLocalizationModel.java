@@ -184,8 +184,4 @@ public interface LVEntryLocalizationModel
 	@Override
 	public LVEntryLocalization cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

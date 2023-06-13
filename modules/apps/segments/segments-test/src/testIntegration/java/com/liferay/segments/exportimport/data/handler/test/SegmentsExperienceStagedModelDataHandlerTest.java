@@ -20,7 +20,9 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.StagedModel;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.test.rule.Inject;
@@ -55,7 +57,14 @@ public class SegmentsExperienceStagedModelDataHandlerTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		Layout layout = LayoutTestUtil.addTypeContentLayout(stagingGroup);
+		_classNameId = _classNameLocalService.getClassNameId(
+			Layout.class.getName());
+
+		Layout layout = LayoutTestUtil.addLayout(stagingGroup);
+
+		layout.setType(LayoutConstants.TYPE_CONTENT);
+
+		layout = _layoutLocalService.updateLayout(layout);
 
 		_classPK = layout.getPlid();
 	}
@@ -67,7 +76,7 @@ public class SegmentsExperienceStagedModelDataHandlerTest
 		throws Exception {
 
 		return SegmentsTestUtil.addSegmentsExperience(
-			group.getGroupId(), _classPK);
+			group.getGroupId(), _classNameId, _classPK);
 	}
 
 	@Override
@@ -103,6 +112,11 @@ public class SegmentsExperienceStagedModelDataHandlerTest
 			segmentsExperience.getPriority(),
 			importedSegmentsExperience.getPriority());
 	}
+
+	private long _classNameId;
+
+	@Inject
+	private ClassNameLocalService _classNameLocalService;
 
 	private long _classPK;
 

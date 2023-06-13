@@ -47,7 +47,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Marco Leo
  */
 @Component(
-	property = "search.engine.impl=Elasticsearch",
+	immediate = true, property = "search.engine.impl=Elasticsearch",
 	service = {FilterToQueryBuilderTranslator.class, FilterTranslator.class}
 )
 public class ElasticsearchFilterTranslator

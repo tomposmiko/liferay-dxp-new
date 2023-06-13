@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = {
 		"configuration.pid=com.liferay.asset.auto.tagger.internal.configuration.AssetAutoTaggerGroupConfiguration",
 		"configuration.pid=com.liferay.blogs.configuration.BlogsGroupServiceConfiguration",

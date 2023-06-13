@@ -14,8 +14,8 @@
 
 'use strict';
 
-const gulp = require('gulp');
-const liferayThemeTasks = require('liferay-theme-tasks');
+var gulp = require('gulp');
+var liferayThemeTasks = require('liferay-theme-tasks');
 
 liferayThemeTasks.registerTasks({
 	gulp,

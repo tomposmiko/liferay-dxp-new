@@ -15,8 +15,6 @@
 package com.liferay.announcements.web.internal.display.context;
 
 import com.liferay.announcements.kernel.model.AnnouncementsEntry;
-import com.liferay.announcements.kernel.service.AnnouncementsEntryLocalServiceUtil;
-import com.liferay.announcements.web.internal.search.AnnouncementsEntryChecker;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
@@ -24,19 +22,17 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.announcements.service.permission.AnnouncementsEntryPermission;
@@ -47,7 +43,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.portlet.PortletURL;
-import javax.portlet.RenderRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,27 +55,25 @@ public class AnnouncementsAdminViewManagementToolbarDisplayContext {
 		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		RenderRequest renderRequest) {
+		SearchContainer<AnnouncementsEntry> searchContainer) {
 
 		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_renderRequest = renderRequest;
+		_searchContainer = searchContainer;
 
 		_announcementsAdminViewDisplayContext =
 			new DefaultAnnouncementsAdminViewDisplayContext(
 				_httpServletRequest);
 		_currentURLObj = PortletURLUtil.getCurrent(
-			liferayPortletRequest, liferayPortletResponse);
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+			_liferayPortletRequest, _liferayPortletResponse);
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "deleteEntries");
-				dropdownItem.setIcon("trash");
+				dropdownItem.setIcon("times");
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "delete"));
 				dropdownItem.setQuickAction(true);
@@ -94,8 +87,12 @@ public class AnnouncementsAdminViewManagementToolbarDisplayContext {
 
 		List<String> availableActions = new ArrayList<>();
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		if (AnnouncementsEntryPermission.contains(
-				_themeDisplay.getPermissionChecker(), announcementsEntry,
+				themeDisplay.getPermissionChecker(), announcementsEntry,
 				ActionKeys.DELETE)) {
 
 			availableActions.add("deleteEntries");
@@ -171,53 +168,12 @@ public class AnnouncementsAdminViewManagementToolbarDisplayContext {
 					).buildString());
 
 				labelItem.setCloseable(true);
+
 				labelItem.setLabel(
 					_announcementsAdminViewDisplayContext.
 						getCurrentDistributionScopeLabel());
 			}
 		).build();
-	}
-
-	public SearchContainer<AnnouncementsEntry> getSearchContainer()
-		throws PortalException {
-
-		SearchContainer<AnnouncementsEntry>
-			announcementsEntriesSearchContainer = new SearchContainer(
-				_renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM,
-				SearchContainer.DEFAULT_DELTA, _currentURLObj, null,
-				"no-entries-were-found");
-
-		long classNameId = 0;
-		long classPK = 0;
-
-		String[] distributionScopeArray = StringUtil.split(
-			_getDistributionScope());
-
-		if (distributionScopeArray.length == 2) {
-			classNameId = GetterUtil.getLong(distributionScopeArray[0]);
-			classPK = GetterUtil.getLong(distributionScopeArray[1]);
-		}
-
-		long announcementsClassNameId = classNameId;
-		long announcementsClassPK = classPK;
-
-		announcementsEntriesSearchContainer.setResultsAndTotal(
-			() -> AnnouncementsEntryLocalServiceUtil.getEntries(
-				_themeDisplay.getCompanyId(), announcementsClassNameId,
-				announcementsClassPK,
-				Objects.equals(_getNavigation(), "alerts"),
-				announcementsEntriesSearchContainer.getStart(),
-				announcementsEntriesSearchContainer.getEnd()),
-			AnnouncementsEntryLocalServiceUtil.getEntriesCount(
-				_themeDisplay.getCompanyId(), announcementsClassNameId,
-				announcementsClassPK,
-				Objects.equals(_getNavigation(), "alerts")));
-
-		announcementsEntriesSearchContainer.setRowChecker(
-			new AnnouncementsEntryChecker(
-				_liferayPortletRequest, _liferayPortletResponse));
-
-		return announcementsEntriesSearchContainer;
 	}
 
 	public String getSearchContainerId() {
@@ -226,6 +182,10 @@ public class AnnouncementsAdminViewManagementToolbarDisplayContext {
 		}
 
 		return "announcementsEntries";
+	}
+
+	public int getTotal() {
+		return _searchContainer.getTotal();
 	}
 
 	public boolean isDisabled() {
@@ -284,7 +244,6 @@ public class AnnouncementsAdminViewManagementToolbarDisplayContext {
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final RenderRequest _renderRequest;
-	private final ThemeDisplay _themeDisplay;
+	private final SearchContainer<AnnouncementsEntry> _searchContainer;
 
 }

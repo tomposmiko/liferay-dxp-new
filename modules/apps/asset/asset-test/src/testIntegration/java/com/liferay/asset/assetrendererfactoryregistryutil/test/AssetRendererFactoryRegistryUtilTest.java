@@ -18,13 +18,13 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.test.util.asset.renderer.factory.TestAssetRendererFactory;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PortalImpl;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -47,14 +47,19 @@ public class AssetRendererFactoryRegistryUtilTest {
 	public void testGetAssetRendererFactories() {
 		String className = TestAssetRendererFactory.class.getName();
 
-		List<String> targetClassNames = ListUtil.filter(
-			TransformUtil.transform(
-				AssetRendererFactoryRegistryUtil.getAssetRendererFactories(1),
-				AssetRendererFactory::getClassName),
-			className::equals);
+		List<AssetRendererFactory<?>> assetRendererFactories =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactories(1);
+
+		Stream<AssetRendererFactory<?>> assetRendererFactoriesStream =
+			assetRendererFactories.stream();
 
 		Assert.assertEquals(
-			targetClassNames.toString(), 1, targetClassNames.size());
+			1,
+			assetRendererFactoriesStream.map(
+				AssetRendererFactory::getClassName
+			).filter(
+				className::equals
+			).count());
 	}
 
 	@Test
@@ -72,10 +77,12 @@ public class AssetRendererFactoryRegistryUtilTest {
 	public void testGetAssetRendererFactoryByClassNameId() {
 		PortalImpl portalImpl = new PortalImpl();
 
+		long classNameId = portalImpl.getClassNameId(
+			TestAssetRendererFactory.class);
+
 		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(
-					portalImpl.getClassNameId(TestAssetRendererFactory.class));
+				getAssetRendererFactoryByClassNameId(classNameId);
 
 		Assert.assertEquals(
 			TestAssetRendererFactory.class.getName(),
@@ -95,8 +102,10 @@ public class AssetRendererFactoryRegistryUtilTest {
 
 	@Test
 	public void testGetClassNameIds1() {
-		List<Long> classNameIdsList = ListUtil.fromArray(
-			AssetRendererFactoryRegistryUtil.getClassNameIds(1));
+		long[] classNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(
+			1);
+
+		List<Long> classNameIdsList = ListUtil.fromArray(classNameIds);
 
 		Assert.assertTrue(
 			classNameIdsList.toString(),
@@ -105,8 +114,10 @@ public class AssetRendererFactoryRegistryUtilTest {
 
 	@Test
 	public void testGetClassNameIds2() {
-		List<Long> classNameIdsList = ListUtil.fromArray(
-			AssetRendererFactoryRegistryUtil.getClassNameIds(1, true));
+		long[] classNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(
+			1, true);
+
+		List<Long> classNameIdsList = ListUtil.fromArray(classNameIds);
 
 		Assert.assertTrue(
 			classNameIdsList.toString(),
@@ -115,8 +126,10 @@ public class AssetRendererFactoryRegistryUtilTest {
 
 	@Test
 	public void testGetClassNameIds3() {
-		List<Long> classNameIdsList = ListUtil.fromArray(
-			AssetRendererFactoryRegistryUtil.getClassNameIds(1, false));
+		long[] classNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(
+			1, false);
+
+		List<Long> classNameIdsList = ListUtil.fromArray(classNameIds);
 
 		Assert.assertTrue(
 			classNameIdsList.toString(),

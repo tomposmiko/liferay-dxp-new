@@ -27,18 +27,16 @@ import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.message.boards.service.MBThreadLocalService;
 import com.liferay.message.boards.service.MBThreadService;
 import com.liferay.message.boards.settings.MBGroupServiceSettings;
-import com.liferay.message.boards.web.internal.util.MBRequestUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.LiferayActionResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Collections;
@@ -68,7 +66,7 @@ public class MoveThreadMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		try {
-			_moveThread(actionRequest, actionResponse);
+			moveThread(actionRequest, actionResponse);
 		}
 		catch (LockedThreadException | PrincipalException |
 			   RequiredMessageException exception) {
@@ -85,7 +83,7 @@ public class MoveThreadMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _moveThread(
+	protected void moveThread(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -108,8 +106,7 @@ public class MoveThreadMVCActionCommand extends BaseMVCActionCommand {
 			String body = ParamUtil.getString(actionRequest, "body");
 
 			MBGroupServiceSettings mbGroupServiceSettings =
-				MBRequestUtil.getMBGroupServiceSettings(
-					_portal.getHttpServletRequest(actionRequest),
+				MBGroupServiceSettings.getInstance(
 					themeDisplay.getScopeGroupId());
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
@@ -143,8 +140,5 @@ public class MoveThreadMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private MBThreadService _mbThreadService;
-
-	@Reference
-	private Portal _portal;
 
 }

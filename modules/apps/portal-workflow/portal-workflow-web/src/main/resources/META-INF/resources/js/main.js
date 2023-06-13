@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-workflow-web',
 	(A) => {
-		const WorkflowWeb = {
+		var WorkflowWeb = {
 			_doToggleDefinitionLinkEditionMode(namespace) {
-				const instance = this;
+				var instance = this;
 
 				instance._toggleElementVisibility(namespace);
 
@@ -31,31 +31,31 @@ AUI.add(
 			_forms: {},
 
 			_getClickedButtonName(event, namespace) {
-				const button = event.target;
+				var button = event.target;
 
-				const buttonId = button.get('id');
+				var buttonId = button.get('id');
 
-				const buttonType = buttonId.replace(namespace, '');
+				var buttonType = buttonId.replace(namespace, '');
 
 				return buttonType;
 			},
 
 			_getDefinitionLinkNodeNamespace(definitionLinkNode) {
-				const definitionLinkNodeInput = definitionLinkNode.one(
+				var definitionLinkNodeInput = definitionLinkNode.one(
 					'input[name$=namespace]'
 				);
 
-				const definitionLinkNamespace = definitionLinkNodeInput.val();
+				var definitionLinkNamespace = definitionLinkNodeInput.val();
 
 				return definitionLinkNamespace;
 			},
 
 			_getElementsByIds() {
-				const elements = [];
+				var elements = [];
 
-				let element;
+				var element;
 
-				for (const index in arguments) {
+				for (var index in arguments) {
 					element = document.getElementById(arguments[index]);
 
 					if (element) {
@@ -67,12 +67,12 @@ AUI.add(
 			},
 
 			_getOpenDefinitionLinkNode() {
-				const listEditMode = A.all('input[name$=editMode][value=true]');
+				var listEditMode = A.all('input[name$=editMode][value=true]');
 
-				let definitionLink;
+				var definitionLink;
 
 				if (listEditMode.size() === 1) {
-					const node = listEditMode.item(0);
+					var node = listEditMode.item(0);
 
 					definitionLink = node.ancestor('.workflow-definition-form');
 				}
@@ -81,17 +81,17 @@ AUI.add(
 			},
 
 			_hasDefinitionLinkChanged(definitionLinkNode) {
-				const select = definitionLinkNode.one('select');
+				var select = definitionLinkNode.one('select');
 
-				const currentValue = select.val();
+				var currentValue = select.val();
 
-				const workflowAssignedValue = definitionLinkNode.one(
+				var workflowAssignedValue = definitionLinkNode.one(
 					'input[name$=workflowAssignedValue]'
 				);
 
-				const savedValue = workflowAssignedValue.val();
+				var savedValue = workflowAssignedValue.val();
 
-				let changed = false;
+				var changed = false;
 
 				if (currentValue !== savedValue) {
 					changed = true;
@@ -101,11 +101,11 @@ AUI.add(
 			},
 
 			_removeFormGroupClass(namespace) {
-				const formContainer = document.getElementById(
+				var formContainer = document.getElementById(
 					namespace + 'formContainer'
 				);
 
-				const formGroup = formContainer.querySelector('.form-group');
+				var formGroup = formContainer.querySelector('.form-group');
 
 				if (formGroup) {
 					formGroup.classList.remove('form-group');
@@ -113,55 +113,55 @@ AUI.add(
 			},
 
 			_resetLastValue(namespace) {
-				const formContainerNode = A.one(
+				var formContainerNode = A.one(
 					'#' + namespace + 'formContainer'
 				);
 
-				const workflowAssignedValueNode = formContainerNode.one(
+				var workflowAssignedValueNode = formContainerNode.one(
 					'input[name$=workflowAssignedValue]'
 				);
 
-				const selectNode = formContainerNode.one('select');
+				var selectNode = formContainerNode.one('select');
 
 				selectNode.val(workflowAssignedValueNode.val());
 			},
 
 			_switchEditMode(namespace) {
-				const formContainerNode = A.one(
+				var formContainerNode = A.one(
 					'#' + namespace + 'formContainer'
 				);
 
-				const inputEditModeNode = formContainerNode.one(
+				var inputEditModeNode = formContainerNode.one(
 					'input[name$=editMode]'
 				);
 
-				const editMode = inputEditModeNode.val();
+				var editMode = inputEditModeNode.val();
 
-				const boolEditMode = editMode === 'true' || editMode === true;
+				var boolEditMode = editMode == 'true';
 
 				inputEditModeNode.val(!boolEditMode);
 			},
 
 			_toggleElementVisibility(namespace) {
-				const instance = this;
+				var instance = this;
 
-				const saveCancelGroupId = namespace + 'saveCancelGroup';
+				var saveCancelGroupId = namespace + 'saveCancelGroup';
 
-				const editButtonId = namespace + 'editButton';
+				var editButtonId = namespace + 'editButton';
 
-				const formContainerId = namespace + 'formContainer';
+				var formContainerId = namespace + 'formContainer';
 
-				const definitionLabelId = namespace + 'definitionLabel';
+				var definitionLabelId = namespace + 'definitionLabel';
 
-				const elementsList = instance._getElementsByIds(
+				var elementsList = instance._getElementsByIds(
 					saveCancelGroupId,
 					editButtonId,
 					formContainerId,
 					definitionLabelId
 				);
 
-				for (const index in elementsList) {
-					const element = elementsList[parseInt(index, 10)];
+				for (var index in elementsList) {
+					var element = elementsList[parseInt(index, 10)];
 
 					if (element.classList.contains('d-none')) {
 						element.classList.remove('d-none');
@@ -179,9 +179,9 @@ AUI.add(
 				randomId,
 				portletNamespace
 			) {
-				const instance = this;
+				var instance = this;
 
-				let form = A.one('#' + portletNamespace + randomId + 'form');
+				var form = A.one('#' + portletNamespace + randomId + 'form');
 
 				if (form && !instance._forms[randomId]) {
 					instance._forms[randomId] = form;
@@ -195,13 +195,13 @@ AUI.add(
 					form.setAttribute('method', 'POST');
 				}
 
-				const duplicationDialog = instance._duplicationDialog;
+				var duplicationDialog = instance._duplicationDialog;
 
 				if (duplicationDialog) {
 					duplicationDialog.destroy();
 				}
 
-				const dialog = Liferay.Util.Window.getWindow({
+				var dialog = Liferay.Util.Window.getWindow({
 					dialog: {
 						bodyContent: form,
 						height: 325,
@@ -242,8 +242,8 @@ AUI.add(
 									discardDefaultButtonCssClasses: true,
 									labelHTML:
 										'<svg class="lexicon-icon" focusable="false"><use href="' +
-										Liferay.Icons.spritemap +
-										'#times" /><title>' +
+										Liferay.ThemeDisplay.getPathThemeImages() +
+										'/clay/icons.svg#times" /><title>' +
 										Liferay.Language.get('close') +
 										'</title></svg>',
 									on: {
@@ -267,7 +267,7 @@ AUI.add(
 			},
 
 			openConfirmDeleteDialog(title, message, actionUrl) {
-				const dialog = Liferay.Util.Window.getWindow({
+				var dialog = Liferay.Util.Window.getWindow({
 					dialog: {
 						bodyContent: message,
 						destroyOnHide: true,
@@ -302,8 +302,8 @@ AUI.add(
 									discardDefaultButtonCssClasses: true,
 									labelHTML:
 										'<svg class="lexicon-icon" focusable="false"><use href="' +
-										Liferay.Icons.spritemap +
-										'#times" /><title>' +
+										Liferay.ThemeDisplay.getPathThemeImages() +
+										'/clay/icons.svg#times" /><title>' +
 										Liferay.Language.get('close') +
 										'</title></svg>',
 									on: {
@@ -323,7 +323,7 @@ AUI.add(
 			},
 
 			previewBeforeRevertDialog(event, renderUrl, actionUrl, title) {
-				const dialog = Liferay.Util.Window.getWindow({
+				var dialog = Liferay.Util.Window.getWindow({
 					dialog: {
 						destroyOnHide: true,
 						modal: true,
@@ -356,8 +356,8 @@ AUI.add(
 									discardDefaultButtonCssClasses: true,
 									labelHTML:
 										'<svg class="lexicon-icon" focusable="false"><use href="' +
-										Liferay.Icons.spritemap +
-										'#times" /><title>' +
+										Liferay.ThemeDisplay.getPathThemeImages() +
+										'/clay/icons.svg#times" /><title>' +
 										Liferay.Language.get('close') +
 										'</title></svg>',
 									on: {
@@ -377,17 +377,17 @@ AUI.add(
 			},
 
 			saveWorkflowDefinitionLink(event, namespace) {
-				const formContainer = document.getElementById(
+				var formContainer = document.getElementById(
 					namespace + 'formContainer'
 				);
 
-				const form = formContainer.querySelector('.form');
+				var form = formContainer.querySelector('.form');
 
 				submitForm(form);
 			},
 
 			showActionUndoneSuccessMessage() {
-				const successMessage = Liferay.Language.get('action-undone');
+				var successMessage = Liferay.Language.get('action-undone');
 
 				Liferay.Util.openToast({
 					container: document.querySelector('.portlet-column'),
@@ -397,18 +397,18 @@ AUI.add(
 			},
 
 			showDefinitionImportSuccessMessage(namespace) {
-				const undo = Liferay.Language.get('undo');
+				var undo = Liferay.Language.get('undo');
 
-				const undoEvent = "'" + namespace + "undoDefinition'";
+				var undoEvent = "'" + namespace + "undoDefinition'";
 
-				const undoLink =
-					'<a href="javascript:void(0);" onclick=Liferay.fire(' +
+				var undoLink =
+					'<a href="javascript:;" onclick=Liferay.fire(' +
 					undoEvent +
 					'); class="alert-link">' +
 					undo +
 					'</a>';
 
-				let successMessage =
+				var successMessage =
 					Liferay.Language.get('definition-imported-successfully') +
 					'&nbsp;';
 
@@ -421,16 +421,16 @@ AUI.add(
 			},
 
 			toggleDefinitionLinkEditionMode(event, namespace) {
-				const instance = this;
+				var instance = this;
 
-				const buttonName = instance._getClickedButtonName(
+				var buttonName = instance._getClickedButtonName(
 					event,
 					namespace
 				);
 
-				const openDefinitionLinkNode = instance._getOpenDefinitionLinkNode();
+				var openDefinitionLinkNode = instance._getOpenDefinitionLinkNode();
 
-				let openDefinitionLinkNamespace;
+				var openDefinitionLinkNamespace;
 
 				if (buttonName === 'cancelButton') {
 					instance._doToggleDefinitionLinkEditionMode(namespace);
@@ -458,26 +458,21 @@ AUI.add(
 						openDefinitionLinkNode
 					);
 
-					Liferay.Util.openConfirmModal({
-						message: Liferay.Language.get(
-							'you-have-unsaved-changes-do-you-want-to-proceed-without-saving'
-						),
-						onConfirm: (isConfirmed) => {
-							if (isConfirmed) {
-								instance._doToggleDefinitionLinkEditionMode(
-									openDefinitionLinkNamespace
-								);
+					if (
+						confirm(
+							Liferay.Language.get(
+								'you-have-unsaved-changes-do-you-want-to-proceed-without-saving'
+							)
+						)
+					) {
+						instance._doToggleDefinitionLinkEditionMode(
+							openDefinitionLinkNamespace
+						);
 
-								instance._resetLastValue(
-									openDefinitionLinkNamespace
-								);
+						instance._resetLastValue(openDefinitionLinkNamespace);
 
-								instance._doToggleDefinitionLinkEditionMode(
-									namespace
-								);
-							}
-						},
-					});
+						instance._doToggleDefinitionLinkEditionMode(namespace);
+					}
 				}
 			},
 		};

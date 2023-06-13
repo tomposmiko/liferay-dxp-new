@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,7 +44,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Bruno Basto
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Override
@@ -108,7 +107,8 @@ public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 		initScriptData.append(
 			null,
-			"frontendJsSpaWebInit.default(" + configJSONObject.toString() + ")",
+			"frontendJsSpaWebInit.default(" + configJSONObject.toJSONString() +
+				")",
 			initModuleName + " as frontendJsSpaWebInit",
 			ScriptData.ModulesType.ES6);
 
@@ -133,11 +133,6 @@ public class SPATopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 
 	@Override
 	protected Log getLog() {
-		return null;
-	}
-
-	@Override
-	protected ServletContext getServletContext() {
 		return null;
 	}
 

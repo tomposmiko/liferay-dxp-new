@@ -38,6 +38,7 @@ import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -77,14 +78,14 @@ public class KaleoDefinitionModelImpl
 	public static final String TABLE_NAME = "KaleoDefinition";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
-		{"kaleoDefinitionId", Types.BIGINT}, {"groupId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"name", Types.VARCHAR},
-		{"title", Types.VARCHAR}, {"description", Types.VARCHAR},
-		{"content", Types.CLOB}, {"scope", Types.VARCHAR},
-		{"version", Types.INTEGER}, {"active_", Types.BOOLEAN}
+		{"mvccVersion", Types.BIGINT}, {"kaleoDefinitionId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"name", Types.VARCHAR}, {"title", Types.VARCHAR},
+		{"description", Types.VARCHAR}, {"content", Types.CLOB},
+		{"scope", Types.VARCHAR}, {"version", Types.INTEGER},
+		{"active_", Types.BOOLEAN}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -92,7 +93,6 @@ public class KaleoDefinitionModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("kaleoDefinitionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -110,7 +110,7 @@ public class KaleoDefinitionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table KaleoDefinition (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,kaleoDefinitionId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(200) null,createDate DATE null,modifiedDate DATE null,name VARCHAR(200) null,title STRING null,description STRING null,content TEXT null,scope VARCHAR(75) null,version INTEGER,active_ BOOLEAN,primary key (kaleoDefinitionId, ctCollectionId))";
+		"create table KaleoDefinition (mvccVersion LONG default 0 not null,kaleoDefinitionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(200) null,createDate DATE null,modifiedDate DATE null,name VARCHAR(200) null,title STRING null,description STRING null,content TEXT null,scope VARCHAR(75) null,version INTEGER,active_ BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP = "drop table KaleoDefinition";
 
@@ -246,134 +246,129 @@ public class KaleoDefinitionModelImpl
 	public Map<String, Function<KaleoDefinition, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<KaleoDefinition, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, KaleoDefinition>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<KaleoDefinition, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KaleoDefinition.class.getClassLoader(), KaleoDefinition.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<KaleoDefinition, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<KaleoDefinition, Object>>();
+		try {
+			Constructor<KaleoDefinition> constructor =
+				(Constructor<KaleoDefinition>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", KaleoDefinition::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", KaleoDefinition::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"kaleoDefinitionId", KaleoDefinition::getKaleoDefinitionId);
-			attributeGetterFunctions.put(
-				"groupId", KaleoDefinition::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", KaleoDefinition::getCompanyId);
-			attributeGetterFunctions.put("userId", KaleoDefinition::getUserId);
-			attributeGetterFunctions.put(
-				"userName", KaleoDefinition::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", KaleoDefinition::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", KaleoDefinition::getModifiedDate);
-			attributeGetterFunctions.put("name", KaleoDefinition::getName);
-			attributeGetterFunctions.put("title", KaleoDefinition::getTitle);
-			attributeGetterFunctions.put(
-				"description", KaleoDefinition::getDescription);
-			attributeGetterFunctions.put(
-				"content", KaleoDefinition::getContent);
-			attributeGetterFunctions.put("scope", KaleoDefinition::getScope);
-			attributeGetterFunctions.put(
-				"version", KaleoDefinition::getVersion);
-			attributeGetterFunctions.put("active", KaleoDefinition::getActive);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<KaleoDefinition, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<KaleoDefinition, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<KaleoDefinition, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<KaleoDefinition, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<KaleoDefinition, Object>>();
+		Map<String, BiConsumer<KaleoDefinition, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<KaleoDefinition, ?>>();
 
-		static {
-			Map<String, BiConsumer<KaleoDefinition, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<KaleoDefinition, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", KaleoDefinition::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setMvccVersion);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionId", KaleoDefinition::getKaleoDefinitionId);
+		attributeSetterBiConsumers.put(
+			"kaleoDefinitionId",
+			(BiConsumer<KaleoDefinition, Long>)
+				KaleoDefinition::setKaleoDefinitionId);
+		attributeGetterFunctions.put("groupId", KaleoDefinition::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", KaleoDefinition::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setCompanyId);
+		attributeGetterFunctions.put("userId", KaleoDefinition::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setUserId);
+		attributeGetterFunctions.put("userName", KaleoDefinition::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", KaleoDefinition::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<KaleoDefinition, Date>)KaleoDefinition::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", KaleoDefinition::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<KaleoDefinition, Date>)
+				KaleoDefinition::setModifiedDate);
+		attributeGetterFunctions.put("name", KaleoDefinition::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setName);
+		attributeGetterFunctions.put("title", KaleoDefinition::getTitle);
+		attributeSetterBiConsumers.put(
+			"title",
+			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setTitle);
+		attributeGetterFunctions.put(
+			"description", KaleoDefinition::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<KaleoDefinition, String>)
+				KaleoDefinition::setDescription);
+		attributeGetterFunctions.put("content", KaleoDefinition::getContent);
+		attributeSetterBiConsumers.put(
+			"content",
+			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setContent);
+		attributeGetterFunctions.put("scope", KaleoDefinition::getScope);
+		attributeSetterBiConsumers.put(
+			"scope",
+			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setScope);
+		attributeGetterFunctions.put("version", KaleoDefinition::getVersion);
+		attributeSetterBiConsumers.put(
+			"version",
+			(BiConsumer<KaleoDefinition, Integer>)KaleoDefinition::setVersion);
+		attributeGetterFunctions.put("active", KaleoDefinition::getActive);
+		attributeSetterBiConsumers.put(
+			"active",
+			(BiConsumer<KaleoDefinition, Boolean>)KaleoDefinition::setActive);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<KaleoDefinition, Long>)
-					KaleoDefinition::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<KaleoDefinition, Long>)
-					KaleoDefinition::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"kaleoDefinitionId",
-				(BiConsumer<KaleoDefinition, Long>)
-					KaleoDefinition::setKaleoDefinitionId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<KaleoDefinition, Long>)
-					KaleoDefinition::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<KaleoDefinition, String>)
-					KaleoDefinition::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<KaleoDefinition, Date>)
-					KaleoDefinition::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<KaleoDefinition, Date>)
-					KaleoDefinition::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setName);
-			attributeSetterBiConsumers.put(
-				"title",
-				(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setTitle);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<KaleoDefinition, String>)
-					KaleoDefinition::setDescription);
-			attributeSetterBiConsumers.put(
-				"content",
-				(BiConsumer<KaleoDefinition, String>)
-					KaleoDefinition::setContent);
-			attributeSetterBiConsumers.put(
-				"scope",
-				(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setScope);
-			attributeSetterBiConsumers.put(
-				"version",
-				(BiConsumer<KaleoDefinition, Integer>)
-					KaleoDefinition::setVersion);
-			attributeSetterBiConsumers.put(
-				"active",
-				(BiConsumer<KaleoDefinition, Boolean>)
-					KaleoDefinition::setActive);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -388,20 +383,6 @@ public class KaleoDefinitionModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
-	}
-
-	@Override
-	public long getCtCollectionId() {
-		return _ctCollectionId;
-	}
-
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_ctCollectionId = ctCollectionId;
 	}
 
 	@Override
@@ -917,7 +898,6 @@ public class KaleoDefinitionModelImpl
 		KaleoDefinitionImpl kaleoDefinitionImpl = new KaleoDefinitionImpl();
 
 		kaleoDefinitionImpl.setMvccVersion(getMvccVersion());
-		kaleoDefinitionImpl.setCtCollectionId(getCtCollectionId());
 		kaleoDefinitionImpl.setKaleoDefinitionId(getKaleoDefinitionId());
 		kaleoDefinitionImpl.setGroupId(getGroupId());
 		kaleoDefinitionImpl.setCompanyId(getCompanyId());
@@ -944,8 +924,6 @@ public class KaleoDefinitionModelImpl
 
 		kaleoDefinitionImpl.setMvccVersion(
 			this.<Long>getColumnOriginalValue("mvccVersion"));
-		kaleoDefinitionImpl.setCtCollectionId(
-			this.<Long>getColumnOriginalValue("ctCollectionId"));
 		kaleoDefinitionImpl.setKaleoDefinitionId(
 			this.<Long>getColumnOriginalValue("kaleoDefinitionId"));
 		kaleoDefinitionImpl.setGroupId(
@@ -1061,8 +1039,6 @@ public class KaleoDefinitionModelImpl
 			new KaleoDefinitionCacheModel();
 
 		kaleoDefinitionCacheModel.mvccVersion = getMvccVersion();
-
-		kaleoDefinitionCacheModel.ctCollectionId = getCtCollectionId();
 
 		kaleoDefinitionCacheModel.kaleoDefinitionId = getKaleoDefinitionId();
 
@@ -1194,17 +1170,45 @@ public class KaleoDefinitionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<KaleoDefinition, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<KaleoDefinition, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<KaleoDefinition, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((KaleoDefinition)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KaleoDefinition>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KaleoDefinition.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
-	private long _ctCollectionId;
 	private long _kaleoDefinitionId;
 	private long _groupId;
 	private long _companyId;
@@ -1226,8 +1230,7 @@ public class KaleoDefinitionModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<KaleoDefinition, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -1253,7 +1256,6 @@ public class KaleoDefinitionModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
-		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("kaleoDefinitionId", _kaleoDefinitionId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1293,35 +1295,33 @@ public class KaleoDefinitionModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("ctCollectionId", 2L);
+		columnBitmasks.put("kaleoDefinitionId", 2L);
 
-		columnBitmasks.put("kaleoDefinitionId", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("name", 256L);
 
-		columnBitmasks.put("name", 512L);
+		columnBitmasks.put("title", 512L);
 
-		columnBitmasks.put("title", 1024L);
+		columnBitmasks.put("description", 1024L);
 
-		columnBitmasks.put("description", 2048L);
+		columnBitmasks.put("content", 2048L);
 
-		columnBitmasks.put("content", 4096L);
+		columnBitmasks.put("scope", 4096L);
 
-		columnBitmasks.put("scope", 8192L);
+		columnBitmasks.put("version", 8192L);
 
-		columnBitmasks.put("version", 16384L);
-
-		columnBitmasks.put("active_", 32768L);
+		columnBitmasks.put("active_", 16384L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

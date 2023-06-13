@@ -21,10 +21,11 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.kernel.service.DLFolderLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLTrashServiceUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -150,13 +151,35 @@ public class DLFolderTrashHandlerTest
 	@Override
 	@Test(expected = TrashEntryException.class)
 	public void testTrashParentAndBaseModel() throws Exception {
-		super.testTrashParentAndBaseModel();
+		try {
+			super.testTrashParentAndBaseModel();
+		}
+		catch (com.liferay.trash.kernel.exception.TrashEntryException
+					trashEntryException) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(trashEntryException, trashEntryException);
+			}
+
+			throw new TrashEntryException();
+		}
 	}
 
 	@Override
 	@Test(expected = RestoreEntryException.class)
 	public void testTrashParentAndRestoreParentAndBaseModel() throws Exception {
-		super.testTrashParentAndRestoreParentAndBaseModel();
+		try {
+			super.testTrashParentAndRestoreParentAndBaseModel();
+		}
+		catch (com.liferay.trash.kernel.exception.RestoreEntryException
+					restoreEntryException) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(restoreEntryException, restoreEntryException);
+			}
+
+			throw new RestoreEntryException();
+		}
 	}
 
 	@Override
@@ -196,7 +219,7 @@ public class DLFolderTrashHandlerTest
 				groupId, TestPropsValues.getUserId());
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, groupId, folderId, getSearchKeywords(),
+			groupId, folderId, getSearchKeywords(),
 			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
@@ -249,7 +272,7 @@ public class DLFolderTrashHandlerTest
 		throws Exception {
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(), parentBaseModelId,
+			group.getGroupId(), parentBaseModelId,
 			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
 			RandomTestUtil.randomString(), serviceContext);
 
@@ -273,11 +296,6 @@ public class DLFolderTrashHandlerTest
 	}
 
 	@Override
-	protected boolean isInTrashContainer(TrashedModel trashedModel) {
-		return _trashHelper.isInTrashContainer(trashedModel);
-	}
-
-	@Override
 	protected void moveBaseModelToTrash(long primaryKey) throws Exception {
 		DLTrashServiceUtil.moveFolderToTrash(primaryKey);
 	}
@@ -285,6 +303,9 @@ public class DLFolderTrashHandlerTest
 	private static final String _FOLDER_NAME = RandomTestUtil.randomString(100);
 
 	private static final int _FOLDER_NAME_MAX_LENGTH = 100;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFolderTrashHandlerTest.class);
 
 	@Inject
 	private TrashHelper _trashHelper;

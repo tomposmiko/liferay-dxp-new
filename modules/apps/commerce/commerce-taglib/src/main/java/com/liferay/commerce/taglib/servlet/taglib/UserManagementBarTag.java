@@ -41,7 +41,7 @@ public class UserManagementBarTag extends IncludeTag {
 
 		User user = themeDisplay.getUser();
 
-		if (!user.isGuestUser()) {
+		if (!user.isDefaultUser()) {
 			_notificationsCount = getNotificationsCount(themeDisplay);
 		}
 

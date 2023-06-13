@@ -22,7 +22,15 @@ import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
 public class UpgradeRatingsMVCCVersion extends MVCCVersionUpgradeProcess {
 
 	@Override
-	protected String[] getTableNames() {
+	protected String[] getExcludedTableNames() {
+		return new String[] {
+			"CountryLocalization", "PortalPreferenceValue",
+			"PortletPreferenceValue", "RegionLocalization"
+		};
+	}
+
+	@Override
+	protected String[] getModuleTableNames() {
 		return new String[] {"RatingsEntry", "RatingsStats"};
 	}
 

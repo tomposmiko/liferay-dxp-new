@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.fragment.model.FragmentEntryLink",
 	service = StagedModelRepository.class
 )
@@ -66,8 +67,7 @@ public class FragmentEntryLinkStagedModelRepository
 			fragmentEntryLink.getConfiguration(),
 			fragmentEntryLink.getEditableValues(),
 			fragmentEntryLink.getNamespace(), fragmentEntryLink.getPosition(),
-			fragmentEntryLink.getRendererKey(), fragmentEntryLink.getType(),
-			serviceContext);
+			fragmentEntryLink.getRendererKey(), serviceContext);
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class FragmentEntryLinkStagedModelRepository
 			fragmentEntryLink.getJs(), fragmentEntryLink.getConfiguration(),
 			fragmentEntryLink.getEditableValues(),
 			fragmentEntryLink.getNamespace(), fragmentEntryLink.getPosition(),
-			fragmentEntryLink.getType(), serviceContext);
+			serviceContext);
 	}
 
 	@Reference

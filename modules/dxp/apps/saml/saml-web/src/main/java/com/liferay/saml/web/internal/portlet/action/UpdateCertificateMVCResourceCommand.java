@@ -15,7 +15,7 @@
 package com.liferay.saml.web.internal.portlet.action;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -38,6 +38,8 @@ import com.liferay.saml.web.internal.upload.CertificateUploadResponseHandler;
 import com.liferay.saml.web.internal.util.SamlTempFileEntryUtil;
 import com.liferay.upload.UploadHandler;
 
+import java.io.IOException;
+
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -48,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Stian Sigvartsen
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
 		"mvc.command.name=/admin/update_certificate"
@@ -56,6 +59,49 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class UpdateCertificateMVCResourceCommand
 	extends BaseMVCResourceCommand {
+
+	protected void addTempFile(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws Exception {
+
+		_uploadHandler.upload(
+			_certificateUploadFileEntryHandler,
+			_certificateUploadResponseHandler, resourceRequest,
+			resourceResponse);
+	}
+
+	protected void deleteTempFile(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
+			ThemeDisplay themeDisplay)
+		throws Exception {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		try {
+			SamlTempFileEntryUtil.deleteTempFileEntry(
+				themeDisplay.getUser(),
+				ParamUtil.getString(resourceRequest, "fileName"));
+
+			jsonObject.put("deleted", Boolean.TRUE);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			String errorMessage = themeDisplay.translate(
+				"an-unexpected-error-occurred-while-deleting-the-file");
+
+			jsonObject.put(
+				"deleted", Boolean.FALSE
+			).put(
+				"errorMessage", errorMessage
+			);
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			resourceRequest, resourceResponse, jsonObject);
+	}
 
 	@Override
 	protected void doServeResource(
@@ -76,64 +122,21 @@ public class UpdateCertificateMVCResourceCommand
 			resourceRequest, Constants.CMD, Constants.GET_TEMP);
 
 		if (cmd.equals(Constants.ADD_TEMP)) {
-			_addTempFile(resourceRequest, resourceResponse);
+			addTempFile(resourceRequest, resourceResponse);
 		}
 		else if (cmd.equals(Constants.DELETE_TEMP)) {
-			_deleteTempFile(resourceRequest, resourceResponse, themeDisplay);
+			deleteTempFile(resourceRequest, resourceResponse, themeDisplay);
 		}
 		else if (cmd.equals(Constants.GET_TEMP)) {
-			_includeTempFileName(
+			includeTempFileName(
 				resourceRequest, resourceResponse, themeDisplay.getUser());
 		}
 	}
 
-	private void _addTempFile(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws Exception {
-
-		_uploadHandler.upload(
-			_certificateUploadFileEntryHandler,
-			_certificateUploadResponseHandler, resourceRequest,
-			resourceResponse);
-	}
-
-	private void _deleteTempFile(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
-			ThemeDisplay themeDisplay)
-		throws Exception {
-
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
-
-		try {
-			SamlTempFileEntryUtil.deleteTempFileEntry(
-				themeDisplay.getUser(),
-				ParamUtil.getString(resourceRequest, "fileName"));
-
-			jsonObject.put("deleted", Boolean.TRUE);
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			String errorMessage = themeDisplay.translate(
-				"an-unexpected-error-occurred-while-deleting-the-file");
-
-			jsonObject.put(
-				"deleted", Boolean.FALSE
-			).put(
-				"errorMessage", errorMessage
-			);
-		}
-
-		JSONPortletResponseUtil.writeJSON(
-			resourceRequest, resourceResponse, jsonObject);
-	}
-
-	private void _includeTempFileName(
+	protected void includeTempFileName(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
 			User user)
-		throws Exception {
+		throws IOException {
 
 		String selectUploadedFile = ParamUtil.getString(
 			resourceRequest, "selectUploadedFile");
@@ -172,9 +175,6 @@ public class UpdateCertificateMVCResourceCommand
 
 	@Reference
 	private CertificateUploadResponseHandler _certificateUploadResponseHandler;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private UploadHandler _uploadHandler;

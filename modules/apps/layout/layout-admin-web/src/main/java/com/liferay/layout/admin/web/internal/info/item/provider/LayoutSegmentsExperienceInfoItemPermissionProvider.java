@@ -76,9 +76,11 @@ public class LayoutSegmentsExperienceInfoItemPermissionProvider
 
 	private InfoItemReference _getInfoItemReference(long segmentsExperienceId) {
 		try {
-			Layout layout = _getLayout(
+			SegmentsExperience segmentsExperience =
 				_segmentsExperienceLocalService.getSegmentsExperience(
-					segmentsExperienceId));
+					segmentsExperienceId);
+
+			Layout layout = _getLayout(segmentsExperience);
 
 			return new InfoItemReference(
 				Layout.class.getName(),
@@ -92,7 +94,7 @@ public class LayoutSegmentsExperienceInfoItemPermissionProvider
 	private Layout _getLayout(SegmentsExperience segmentsExperience) {
 		try {
 			Layout layout = _layoutLocalService.getLayout(
-				segmentsExperience.getPlid());
+				segmentsExperience.getClassPK());
 
 			if (layout.isDraftLayout()) {
 				return layout;

@@ -43,7 +43,7 @@ public class GroupRoleChecker extends EmptyOnClickRowChecker {
 				_role.getRoleId(), group.getGroupId());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}

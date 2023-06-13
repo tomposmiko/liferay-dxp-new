@@ -15,9 +15,9 @@
 import {useEffect, useRef} from 'react';
 
 export default function useRegistry({componentId, states}) {
-	const currentStateRef = useRef({...states});
+	const currentState = useRef({...states});
 	const eventsRef = useRef([]);
-	const previousStateRef = useRef({...states});
+	const previousState = useRef({...states});
 
 	const detach = (stateName, callback) => {
 		if (eventsRef.current) {
@@ -33,7 +33,7 @@ export default function useRegistry({componentId, states}) {
 	};
 
 	const get = (stateName) => {
-		const stateValue = currentStateRef.current[stateName];
+		const stateValue = currentState.current[stateName];
 
 		if (stateValue) {
 			return stateValue;
@@ -63,14 +63,14 @@ export default function useRegistry({componentId, states}) {
 	}
 
 	useEffect(() => {
-		currentStateRef.current = {...states};
+		currentState.current = {...states};
 	}, [states]);
 
 	useEffect(() => {
 		const stateChanged = [];
 
 		Object.entries(states).forEach(([key, value]) => {
-			if (value !== previousStateRef.current[key]) {
+			if (value !== previousState.current[key]) {
 				stateChanged.push(key);
 			}
 		});
@@ -79,11 +79,11 @@ export default function useRegistry({componentId, states}) {
 			if (stateChanged.includes(stateName)) {
 				callback({
 					newValue: states[stateName],
-					previousValue: previousStateRef.current[stateName],
+					previousValue: previousState.current[stateName],
 				});
 			}
 		});
 
-		previousStateRef.current = {...states};
+		previousState.current = {...states};
 	}, [states]);
 }

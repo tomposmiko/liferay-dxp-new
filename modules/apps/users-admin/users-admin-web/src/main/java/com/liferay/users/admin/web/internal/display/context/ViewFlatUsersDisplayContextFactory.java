@@ -15,14 +15,15 @@
 package com.liferay.users.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.ManagementToolbarDisplayContext;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
+import com.liferay.portal.kernel.dao.search.RowChecker;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -30,13 +31,13 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.usersadmin.search.UserSearch;
 import com.liferay.portlet.usersadmin.search.UserSearchTerms;
-import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.management.toolbar.FilterContributor;
 import com.liferay.users.admin.web.internal.constants.UsersAdminWebKeys;
 import com.liferay.users.admin.web.internal.util.DisplayStyleUtil;
 
 import java.util.LinkedHashMap;
-import java.util.Objects;
+import java.util.List;
+import java.util.Optional;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -70,33 +71,19 @@ public class ViewFlatUsersDisplayContextFactory {
 		UserSearchTerms userSearchTerms =
 			(UserSearchTerms)searchContainer.getSearchTerms();
 
-		ManagementToolbarDisplayContext managementToolbarDisplayContext;
+		ManagementToolbarDisplayContext managementToolbarDisplayContext =
+			new ViewFlatUsersManagementToolbarDisplayContext(
+				liferayPortletRequest, liferayPortletResponse, searchContainer,
+				isShowDeleteButton(userSearchTerms),
+				isShowRestoreButton(userSearchTerms));
 
-		if (Objects.equals(
-				UsersAdminPortletKeys.SERVICE_ACCOUNTS,
-				PortalUtil.getPortletId(renderRequest))) {
+		Optional<FilterContributor[]> filterContributorsOptional =
+			getFilterContributorsOptional(httpServletRequest);
 
-			managementToolbarDisplayContext =
-				new ViewServiceAccountUsersManagementToolbarDisplayContext(
-					liferayPortletRequest, liferayPortletResponse,
-					searchContainer, _isShowDeleteButton(userSearchTerms),
-					_isShowRestoreButton(userSearchTerms));
-		}
-		else {
-			managementToolbarDisplayContext =
-				new ViewFlatUsersManagementToolbarDisplayContext(
-					liferayPortletRequest, liferayPortletResponse,
-					searchContainer, _isShowDeleteButton(userSearchTerms),
-					_isShowRestoreButton(userSearchTerms));
-		}
-
-		FilterContributor[] filterContributors = _getFilterContributors(
-			httpServletRequest);
-
-		if (filterContributors != null) {
+		if (filterContributorsOptional.isPresent()) {
 			managementToolbarDisplayContext =
 				new FiltersManagementToolbarDisplayContextWrapper(
-					filterContributors, httpServletRequest,
+					filterContributorsOptional.get(), httpServletRequest,
 					liferayPortletRequest, liferayPortletResponse,
 					managementToolbarDisplayContext);
 		}
@@ -119,6 +106,39 @@ public class ViewFlatUsersDisplayContextFactory {
 		return viewFlatUsersDisplayContext;
 	}
 
+	protected static Optional<FilterContributor[]>
+		getFilterContributorsOptional(HttpServletRequest httpServletRequest) {
+
+		return Optional.ofNullable(
+			(FilterContributor[])httpServletRequest.getAttribute(
+				UsersAdminWebKeys.MANAGEMENT_TOOLBAR_FILTER_CONTRIBUTORS));
+	}
+
+	protected static boolean isShowDeleteButton(
+		UserSearchTerms userSearchTerms) {
+
+		if ((userSearchTerms.getStatus() != WorkflowConstants.STATUS_ANY) &&
+			(userSearchTerms.isActive() ||
+			 (!userSearchTerms.isActive() && PropsValues.USERS_DELETE))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	protected static boolean isShowRestoreButton(
+		UserSearchTerms userSearchTerms) {
+
+		if ((userSearchTerms.getStatus() != WorkflowConstants.STATUS_ANY) &&
+			!userSearchTerms.isActive()) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private static UserSearch _createSearchContainer(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
@@ -133,9 +153,6 @@ public class ViewFlatUsersDisplayContextFactory {
 
 		if (navigation.equals("active")) {
 			status = WorkflowConstants.STATUS_APPROVED;
-		}
-		else if (navigation.equals("all")) {
-			status = WorkflowConstants.STATUS_ANY;
 		}
 		else if (navigation.equals("inactive")) {
 			status = WorkflowConstants.STATUS_INACTIVE;
@@ -163,11 +180,13 @@ public class ViewFlatUsersDisplayContextFactory {
 
 		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
-		FilterContributor[] filterContributors = _getFilterContributors(
-			httpServletRequest);
+		Optional<FilterContributor[]> filterContributorsOptional =
+			getFilterContributorsOptional(httpServletRequest);
 
-		if (filterContributors != null) {
-			for (FilterContributor filterContributor : filterContributors) {
+		if (filterContributorsOptional.isPresent()) {
+			for (FilterContributor filterContributor :
+					filterContributorsOptional.get()) {
+
 				params.putAll(
 					filterContributor.getSearchParameters(
 						ParamUtil.getString(
@@ -177,60 +196,31 @@ public class ViewFlatUsersDisplayContextFactory {
 			}
 		}
 
-		userSearch.setResultsAndTotal(
-			() -> UserLocalServiceUtil.search(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), params, userSearch.getStart(),
-				userSearch.getEnd(), userSearch.getOrderByComparator()),
-			UserLocalServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), params));
+		int total = UserLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), params);
 
-		if (ListUtil.isNotEmpty(userSearch.getResults()) &&
-			(_isShowDeleteButton(searchTerms) ||
-			 _isShowRestoreButton(searchTerms))) {
+		userSearch.setTotal(total);
 
-			userSearch.setRowChecker(
-				new EmptyOnClickRowChecker(renderResponse) {
-					{
-						setRowIds("rowIdsUser");
-					}
-				});
+		List<User> results = UserLocalServiceUtil.search(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), params, userSearch.getStart(),
+			userSearch.getEnd(), userSearch.getOrderByComparator());
+
+		userSearch.setResults(results);
+
+		if (!results.isEmpty() &&
+			(isShowDeleteButton(searchTerms) ||
+			 isShowRestoreButton(searchTerms))) {
+
+			RowChecker rowChecker = new EmptyOnClickRowChecker(renderResponse);
+
+			rowChecker.setRowIds("rowIdsUser");
+
+			userSearch.setRowChecker(rowChecker);
 		}
 
 		return userSearch;
-	}
-
-	private static FilterContributor[] _getFilterContributors(
-		HttpServletRequest httpServletRequest) {
-
-		return (FilterContributor[])httpServletRequest.getAttribute(
-			UsersAdminWebKeys.MANAGEMENT_TOOLBAR_FILTER_CONTRIBUTORS);
-	}
-
-	private static boolean _isShowDeleteButton(
-		UserSearchTerms userSearchTerms) {
-
-		if ((userSearchTerms.getStatus() != WorkflowConstants.STATUS_ANY) &&
-			(userSearchTerms.isActive() ||
-			 (!userSearchTerms.isActive() && PropsValues.USERS_DELETE))) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private static boolean _isShowRestoreButton(
-		UserSearchTerms userSearchTerms) {
-
-		if ((userSearchTerms.getStatus() != WorkflowConstants.STATUS_ANY) &&
-			!userSearchTerms.isActive()) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 }

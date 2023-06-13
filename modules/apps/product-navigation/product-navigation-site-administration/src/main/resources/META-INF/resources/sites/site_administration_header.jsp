@@ -53,7 +53,11 @@ int childPanelCategoriesSize = GetterUtil.getInteger(request.getAttribute("produ
 							cssClass="mr-4"
 							expand="<%= true %>"
 						>
-							<div class="lfr-portal-tooltip site-name text-truncate" title="<%= HtmlUtil.escapeAttribute(siteAdministrationPanelCategoryDisplayContext.getGroupName()) %>">
+							<div class="depot-type">
+								<liferay-ui:message key='<%= group.isDepot() ? "asset-library" : "site" %>' />
+							</div>
+
+							<div class="lfr-portal-tooltip site-name text-truncate" title="<%= HtmlUtil.escape(siteAdministrationPanelCategoryDisplayContext.getGroupName()) %>">
 								<%= HtmlUtil.escape(siteAdministrationPanelCategoryDisplayContext.getGroupName()) %>
 
 								<c:if test="<%= siteAdministrationPanelCategoryDisplayContext.isShowStagingInfo() && !group.isStagedRemotely() %>">
@@ -74,15 +78,9 @@ int childPanelCategoriesSize = GetterUtil.getInteger(request.getAttribute("produ
 						</clay:sticker>
 					</c:if>
 
-					<clay:icon
-						cssClass="collapse-icon-closed"
-						symbol="angle-right"
-					/>
+					<aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon" />
 
-					<clay:icon
-						cssClass="collapse-icon-open"
-						symbol="angle-down"
-					/>
+					<aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon" />
 				</a>
 			</c:when>
 			<c:otherwise>

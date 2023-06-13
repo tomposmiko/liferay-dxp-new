@@ -299,11 +299,6 @@ public class CommerceAccountOrganizationRelWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CommerceAccountOrganizationRelWrapper wrap(
 		CommerceAccountOrganizationRel commerceAccountOrganizationRel) {
 

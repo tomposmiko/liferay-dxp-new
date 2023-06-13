@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author David Arques
@@ -29,9 +30,11 @@ public class AssetCategoryMetric {
 		AssetVocabularyMetric assetVocabularyMetric, String key, String name,
 		long value) {
 
-		_assetVocabularyMetric =
-			(assetVocabularyMetric == null) ? AssetVocabularyMetric.empty() :
-				assetVocabularyMetric;
+		_assetVocabularyMetric = Optional.ofNullable(
+			assetVocabularyMetric
+		).orElse(
+			AssetVocabularyMetric.empty()
+		);
 		_key = key;
 		_name = name;
 		_value = value;
@@ -89,7 +92,7 @@ public class AssetCategoryMetric {
 	public JSONObject toJSONObject(String vocabularyName) {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		if (ListUtil.isNotEmpty(
+		if (!ListUtil.isEmpty(
 				_assetVocabularyMetric.getAssetCategoryMetrics())) {
 
 			jsonObject.put("categories", _assetVocabularyMetric.toJSONArray());
@@ -106,7 +109,7 @@ public class AssetCategoryMetric {
 		);
 	}
 
-	private final AssetVocabularyMetric _assetVocabularyMetric;
+	private AssetVocabularyMetric _assetVocabularyMetric;
 	private final String _key;
 	private final String _name;
 	private final long _value;

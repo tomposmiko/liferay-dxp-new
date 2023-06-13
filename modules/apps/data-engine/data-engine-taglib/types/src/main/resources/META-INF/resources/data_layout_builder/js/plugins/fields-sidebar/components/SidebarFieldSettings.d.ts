@@ -12,15 +12,10 @@
  * details.
  */
 
-import {FieldTypeName} from 'data-engine-js-components-web';
 import React from 'react';
 import './SidebarFieldSettings.scss';
 declare const SidebarFieldSettings: React.FC<IProps>;
 export default SidebarFieldSettings;
-interface Field {
-	name: string;
-	type: FieldTypeName;
-}
 interface IProps {
 	field: Field;
 }

@@ -26,46 +26,50 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 import java.io.File;
 import java.io.InputStream;
 
-import java.util.Date;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Adolfo Pérez
  */
-@Component(service = ServiceWrapper.class)
+@Component(immediate = true, service = ServiceWrapper.class)
 public class AMDLAppServiceWrapper extends DLAppServiceWrapper {
 
-	@Override
-	public FileEntry updateFileEntryAndCheckIn(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String urlTitle, String description, String changeLog,
-			DLVersionNumberIncrease dlVersionNumberIncrease, File file,
-			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
-		throws PortalException {
+	public AMDLAppServiceWrapper() {
+		super(null);
+	}
 
-		return AMCleanUpOnUpdateAndCheckInThreadLocal.enable(
-			() -> super.updateFileEntryAndCheckIn(
-				fileEntryId, sourceFileName, mimeType, title, urlTitle,
-				description, changeLog, dlVersionNumberIncrease, file,
-				expirationDate, reviewDate, serviceContext));
+	public AMDLAppServiceWrapper(DLAppService dlAppService) {
+		super(dlAppService);
 	}
 
 	@Override
 	public FileEntry updateFileEntryAndCheckIn(
 			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String urlTitle, String description, String changeLog,
-			DLVersionNumberIncrease dlVersionNumberIncrease,
-			InputStream inputStream, long size, Date expirationDate,
-			Date reviewDate, ServiceContext serviceContext)
+			String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease, File file,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		return AMCleanUpOnUpdateAndCheckInThreadLocal.enable(
 			() -> super.updateFileEntryAndCheckIn(
-				fileEntryId, sourceFileName, mimeType, title, urlTitle,
-				description, changeLog, dlVersionNumberIncrease, inputStream,
-				size, expirationDate, reviewDate, serviceContext));
+				fileEntryId, sourceFileName, mimeType, title, description,
+				changeLog, dlVersionNumberIncrease, file, serviceContext));
+	}
+
+	@Override
+	public FileEntry updateFileEntryAndCheckIn(
+			long fileEntryId, String sourceFileName, String mimeType,
+			String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease,
+			InputStream inputStream, long size, ServiceContext serviceContext)
+		throws PortalException {
+
+		return AMCleanUpOnUpdateAndCheckInThreadLocal.enable(
+			() -> super.updateFileEntryAndCheckIn(
+				fileEntryId, sourceFileName, mimeType, title, description,
+				changeLog, dlVersionNumberIncrease, inputStream, size,
+				serviceContext));
 	}
 
 	@Reference

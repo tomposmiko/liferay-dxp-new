@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see CountryServiceSoap
  * @generated
  */
 public class CountryServiceHttp {

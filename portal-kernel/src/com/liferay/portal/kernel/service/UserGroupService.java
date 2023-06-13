@@ -64,11 +64,6 @@ public interface UserGroupService extends BaseService {
 	public void addGroupUserGroups(long groupId, long[] userGroupIds)
 		throws PortalException;
 
-	public UserGroup addOrUpdateUserGroup(
-			String externalReferenceCode, String name, String description,
-			ServiceContext serviceContext)
-		throws PortalException;
-
 	/**
 	 * Adds the user groups to the team
 	 *
@@ -112,11 +107,6 @@ public interface UserGroupService extends BaseService {
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public UserGroup fetchUserGroup(long userGroupId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public UserGroup fetchUserGroupByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<UserGroup> getGtUserGroups(
@@ -288,10 +278,6 @@ public interface UserGroupService extends BaseService {
 	 * @param userGroupIds the primary keys of the user groups
 	 */
 	public void unsetTeamUserGroups(long teamId, long[] userGroupIds)
-		throws PortalException;
-
-	public UserGroup updateExternalReferenceCode(
-			UserGroup userGroup, String externalReferenceCode)
 		throws PortalException;
 
 	/**

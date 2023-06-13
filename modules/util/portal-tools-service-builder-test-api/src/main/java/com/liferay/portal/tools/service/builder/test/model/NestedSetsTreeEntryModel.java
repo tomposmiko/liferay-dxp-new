@@ -127,8 +127,4 @@ public interface NestedSetsTreeEntryModel
 	@Override
 	public NestedSetsTreeEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

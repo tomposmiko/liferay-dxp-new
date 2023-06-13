@@ -303,8 +303,4 @@ public interface FragmentCollectionModel
 	@Override
 	public FragmentCollection cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

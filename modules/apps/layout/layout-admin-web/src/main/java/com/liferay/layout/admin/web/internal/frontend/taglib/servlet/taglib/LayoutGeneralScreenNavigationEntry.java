@@ -21,7 +21,7 @@ import com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstan
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.layout.admin.constants.LayoutScreenNavigationEntryConstants;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +61,7 @@ public class LayoutGeneralScreenNavigationEntry
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(_getResourceBundle(locale), getEntryKey());
+		return LanguageUtil.get(getResourceBundle(locale), getEntryKey());
 	}
 
 	@Override
@@ -75,19 +76,14 @@ public class LayoutGeneralScreenNavigationEntry
 			_formNavigatorCategoryProvider.getFormNavigatorCategories(
 				FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT);
 
-		for (FormNavigatorCategory formNavigatorCategory :
-				formNavigatorCategories) {
+		Stream<FormNavigatorCategory> formNavigatorCategoryStream =
+			formNavigatorCategories.stream();
 
-			if (ListUtil.isNotEmpty(
-					_formNavigatorEntryProvider.getFormNavigatorEntries(
-						FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT,
-						formNavigatorCategory.getKey(), user, layout))) {
-
-				return true;
-			}
-		}
-
-		return false;
+		return formNavigatorCategoryStream.anyMatch(
+			category -> ListUtil.isNotEmpty(
+				_formNavigatorEntryProvider.getFormNavigatorEntries(
+					FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT,
+					category.getKey(), user, layout)));
 	}
 
 	@Override
@@ -101,7 +97,7 @@ public class LayoutGeneralScreenNavigationEntry
 			"/layout/screen/navigation/entries/general.jsp");
 	}
 
-	private ResourceBundle _getResourceBundle(Locale locale) {
+	protected ResourceBundle getResourceBundle(Locale locale) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
@@ -117,9 +113,6 @@ public class LayoutGeneralScreenNavigationEntry
 
 	@Reference
 	private JSPRenderer _jspRenderer;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

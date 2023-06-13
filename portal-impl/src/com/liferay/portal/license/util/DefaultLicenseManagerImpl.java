@@ -138,7 +138,7 @@ public class DefaultLicenseManagerImpl implements LicenseManager {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return 0;

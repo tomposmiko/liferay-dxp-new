@@ -92,8 +92,6 @@ public class VerifyMVCActionCommand extends BaseMVCActionCommand {
 					_portal.getHttpServletResponse(actionResponse),
 					mfaUserId)) {
 
-				hideDefaultErrorMessage(actionRequest);
-
 				SessionErrors.add(actionRequest, "mfaVerificationFailed");
 			}
 		}

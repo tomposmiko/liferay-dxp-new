@@ -35,7 +35,7 @@ if (ddmFormInstance != null) {
 		%>
 
 		<c:choose>
-			<c:when test="<%= formAvailable %>">
+			<c:when test="<%= isFormAvailable %>">
 				<div class="portlet-forms">
 					<c:if test="<%= Validator.isNull(redirectURL) %>">
 						<aui:input name="redirect" type="hidden" value='<%= ParamUtil.getString(request, "redirect", PortalUtil.getCurrentURL(request)) %>' />
@@ -53,30 +53,18 @@ if (ddmFormInstance != null) {
 
 						<%
 						DDMFormValuesValidationException.MustSetValidValue msvv = (DDMFormValuesValidationException.MustSetValidValue)errorException;
-
-						String fieldLabelValue = msvv.getFieldLabelValue(displayLocale);
-
-						if (Validator.isNull(fieldLabelValue)) {
-							fieldLabelValue = msvv.getFieldName();
-						}
 						%>
 
-						<liferay-ui:message arguments="<%= HtmlUtil.escape(fieldLabelValue) %>" key="validation-failed-for-field-x" translateArguments="<%= false %>" />
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(msvv.getFieldName()) %>" key="validation-failed-for-field-x" translateArguments="<%= false %>" />
 					</liferay-ui:error>
 
 					<liferay-ui:error exception="<%= DDMFormValuesValidationException.RequiredValue.class %>">
 
 						<%
 						DDMFormValuesValidationException.RequiredValue rv = (DDMFormValuesValidationException.RequiredValue)errorException;
-
-						String fieldLabelValue = rv.getFieldLabelValue(displayLocale);
-
-						if (Validator.isNull(fieldLabelValue)) {
-							fieldLabelValue = rv.getFieldName();
-						}
 						%>
 
-						<liferay-ui:message arguments="<%= HtmlUtil.escape(fieldLabelValue) %>" key="no-value-is-defined-for-field-x" translateArguments="<%= false %>" />
+						<liferay-ui:message arguments="<%= HtmlUtil.escape(rv.getFieldName()) %>" key="no-value-is-defined-for-field-x" translateArguments="<%= false %>" />
 					</liferay-ui:error>
 
 					<liferay-ui:error exception="<%= NoSuchFormInstanceException.class %>" message="the-selected-form-no-longer-exists" />

@@ -14,11 +14,8 @@
 
 package com.liferay.rss.web.internal.display.context;
 
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItemListBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
@@ -103,19 +100,6 @@ public class RSSDisplayContext {
 		getRSSPortletInstanceConfiguration() {
 
 		return _rssPortletInstanceConfiguration;
-	}
-
-	public List<TabsItem> getTabsItems() {
-		return TabsItemListBuilder.add(
-			tabsItem -> {
-				tabsItem.setActive(true);
-				tabsItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "feeds"));
-			}
-		).add(
-			tabsItem -> tabsItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "display-settings"))
-		).build();
 	}
 
 	public boolean isShowConfigurationLink() throws PortalException {

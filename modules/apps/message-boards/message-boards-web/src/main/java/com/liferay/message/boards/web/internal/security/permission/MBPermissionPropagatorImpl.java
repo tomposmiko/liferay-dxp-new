@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Hugo Huijser
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS,
 		"javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS_ADMIN
@@ -57,7 +58,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 		throws PortalException {
 
 		if (className.equals(MBCategory.class.getName())) {
-			_propagateCategoryRolePermissions(
+			propagateCategoryRolePermissions(
 				actionRequest, className, primKey, roleIds);
 		}
 		else if (className.equals(MBMessage.class.getName())) {
@@ -66,18 +67,18 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 			MBMessage message = _mbMessageLocalService.getMessage(messageId);
 
 			if (message.isRoot()) {
-				_propagateThreadRolePermissions(
+				propagateThreadRolePermissions(
 					actionRequest, className, messageId, message.getThreadId(),
 					roleIds);
 			}
 		}
 		else if (className.equals("com.liferay.message.boards")) {
-			_propagateMBRolePermissions(
+			propagateMBRolePermissions(
 				actionRequest, className, primKey, roleIds);
 		}
 	}
 
-	private void _propagateCategoryRolePermissions(
+	protected void propagateCategoryRolePermissions(
 			ActionRequest actionRequest, String className, long primaryKey,
 			long categoryId, long[] roleIds)
 		throws PortalException {
@@ -89,7 +90,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 		}
 	}
 
-	private void _propagateCategoryRolePermissions(
+	protected void propagateCategoryRolePermissions(
 			ActionRequest actionRequest, String className, String primKey,
 			long[] roleIds)
 		throws PortalException {
@@ -111,7 +112,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 						thread.getThreadId(), WorkflowConstants.STATUS_ANY);
 
 				for (MBMessage message : messages) {
-					_propagateMessageRolePermissions(
+					propagateMessageRolePermissions(
 						actionRequest, className, categoryId,
 						message.getMessageId(), roleIds);
 				}
@@ -128,7 +129,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 					category.getCategoryId());
 
 				for (final long addCategoryId : categoryIds) {
-					_propagateCategoryRolePermissions(
+					propagateCategoryRolePermissions(
 						actionRequest, className, categoryId, addCategoryId,
 						roleIds);
 
@@ -145,7 +146,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 						});
 					actionableDynamicQuery.setGroupId(category.getGroupId());
 					actionableDynamicQuery.setPerformActionMethod(
-						(MBMessage message) -> _propagateMessageRolePermissions(
+						(MBMessage message) -> propagateMessageRolePermissions(
 							actionRequest, className, categoryId,
 							message.getMessageId(), roleIds));
 
@@ -155,7 +156,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 		}
 	}
 
-	private void _propagateMBRolePermissions(
+	protected void propagateMBRolePermissions(
 			ActionRequest actionRequest, String className, String primKey,
 			long[] roleIds)
 		throws PortalException {
@@ -166,7 +167,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 			groupId);
 
 		for (MBCategory category : categories) {
-			_propagateCategoryRolePermissions(
+			propagateCategoryRolePermissions(
 				actionRequest, className, groupId, category.getCategoryId(),
 				roleIds);
 		}
@@ -176,14 +177,14 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 
 		actionableDynamicQuery.setGroupId(groupId);
 		actionableDynamicQuery.setPerformActionMethod(
-			(MBMessage message) -> _propagateMessageRolePermissions(
+			(MBMessage message) -> propagateMessageRolePermissions(
 				actionRequest, className, groupId, message.getMessageId(),
 				roleIds));
 
 		actionableDynamicQuery.performActions();
 	}
 
-	private void _propagateMessageRolePermissions(
+	protected void propagateMessageRolePermissions(
 			ActionRequest actionRequest, String className, long primaryKey,
 			long messageId, long[] roleIds)
 		throws PortalException {
@@ -195,7 +196,7 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 		}
 	}
 
-	private void _propagateThreadRolePermissions(
+	protected void propagateThreadRolePermissions(
 			ActionRequest actionRequest, String className, long messageId,
 			long threadId, long[] roleIds)
 		throws PortalException {
@@ -204,16 +205,27 @@ public class MBPermissionPropagatorImpl extends BasePermissionPropagator {
 			threadId, WorkflowConstants.STATUS_ANY);
 
 		for (MBMessage message : messages) {
-			_propagateMessageRolePermissions(
+			propagateMessageRolePermissions(
 				actionRequest, className, messageId, message.getMessageId(),
 				roleIds);
 		}
 	}
 
-	@Reference
-	private MBCategoryLocalService _mbCategoryLocalService;
+	@Reference(unbind = "-")
+	protected void setMBCategoryLocalService(
+		MBCategoryLocalService mbCategoryLocalService) {
 
-	@Reference
+		_mbCategoryLocalService = mbCategoryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMBMessageLocalService(
+		MBMessageLocalService mbMessageLocalService) {
+
+		_mbMessageLocalService = mbMessageLocalService;
+	}
+
+	private MBCategoryLocalService _mbCategoryLocalService;
 	private MBMessageLocalService _mbMessageLocalService;
 
 }

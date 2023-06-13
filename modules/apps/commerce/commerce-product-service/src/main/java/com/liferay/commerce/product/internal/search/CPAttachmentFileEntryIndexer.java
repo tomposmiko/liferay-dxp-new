@@ -59,7 +59,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPAttachmentFileEntryIndexer
 	extends BaseIndexer<CPAttachmentFileEntry> {
 
@@ -153,14 +153,14 @@ public class CPAttachmentFileEntryIndexer
 			SearchContext searchContext)
 		throws Exception {
 
+		addSearchLocalizedTerm(
+			searchQuery, searchContext, Field.CONTENT, false);
+		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		addSearchTerm(
 			searchQuery, searchContext, CPField.RELATED_ENTITY_CLASS_NAME_ID,
 			false);
 		addSearchTerm(
 			searchQuery, searchContext, CPField.RELATED_ENTITY_CLASS_PK, false);
-		addSearchLocalizedTerm(
-			searchQuery, searchContext, Field.CONTENT, false);
-		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
 
 		LinkedHashMap<String, Object> params =
@@ -199,39 +199,39 @@ public class CPAttachmentFileEntryIndexer
 
 		document.addKeyword(CPField.CDN, cpAttachmentFileEntry.isCDNEnabled());
 		document.addText(CPField.CDN_URL, cpAttachmentFileEntry.getCDNURL());
+		document.addText(Field.CONTENT, StringPool.BLANK);
 		document.addDateSortable(
 			CPField.DISPLAY_DATE, cpAttachmentFileEntry.getDisplayDate());
 		document.addNumber(
 			CPField.FILE_ENTRY_ID, cpAttachmentFileEntry.getFileEntryId());
+		document.addNumber(Field.PRIORITY, cpAttachmentFileEntry.getPriority());
 		document.addNumber(
 			CPField.RELATED_ENTITY_CLASS_NAME_ID,
 			cpAttachmentFileEntry.getClassNameId());
 		document.addNumber(
 			CPField.RELATED_ENTITY_CLASS_PK,
 			cpAttachmentFileEntry.getClassPK());
-		document.addText(Field.CONTENT, StringPool.BLANK);
-		document.addNumber(Field.PRIORITY, cpAttachmentFileEntry.getPriority());
 		document.addNumber(Field.TYPE, cpAttachmentFileEntry.getType());
 
 		Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
-			cpDefinitionOptionValueRelListMap =
-				_cpInstanceHelper.getCPDefinitionOptionValueRelsMap(
+			cpDefinitionOptionRelListMap =
+				_cpInstanceHelper.getCPDefinitionOptionRelsMap(
 					cpAttachmentFileEntry.getClassPK(),
 					cpAttachmentFileEntry.getJson());
 
 		for (Map.Entry<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
-				cpDefinitionOptionValueRelListMapEntry :
-					cpDefinitionOptionValueRelListMap.entrySet()) {
+				cpDefinitionOptionRelListMapEntry :
+					cpDefinitionOptionRelListMap.entrySet()) {
 
 			CPDefinitionOptionRel cpDefinitionOptionRel =
-				cpDefinitionOptionValueRelListMapEntry.getKey();
+				cpDefinitionOptionRelListMapEntry.getKey();
 
 			CPOption cpOption = cpDefinitionOptionRel.getCPOption();
 
 			List<String> optionValueIds = new ArrayList<>();
 
 			for (CPDefinitionOptionValueRel cpDefinitionOptionValueRel :
-					cpDefinitionOptionValueRelListMapEntry.getValue()) {
+					cpDefinitionOptionRelListMapEntry.getValue()) {
 
 				optionValueIds.add(cpDefinitionOptionValueRel.getKey());
 			}
@@ -268,8 +268,8 @@ public class CPAttachmentFileEntryIndexer
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			cpAttachmentFileEntry.getCompanyId(),
-			getDocument(cpAttachmentFileEntry));
+			getSearchEngineId(), cpAttachmentFileEntry.getCompanyId(),
+			getDocument(cpAttachmentFileEntry), isCommitImmediately());
 	}
 
 	@Override
@@ -283,11 +283,11 @@ public class CPAttachmentFileEntryIndexer
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPAttachmentFileEntries(companyId);
+		reindexCPAttachmentFileEntries(companyId);
 	}
 
-	private void _reindexCPAttachmentFileEntries(long companyId)
-		throws Exception {
+	protected void reindexCPAttachmentFileEntries(long companyId)
+		throws PortalException {
 
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpAttachmentFileEntryLocalService.
@@ -312,6 +312,7 @@ public class CPAttachmentFileEntryIndexer
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

@@ -15,14 +15,17 @@
 package com.liferay.layout.page.template.admin.web.internal.security.permission.resource;
 
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class LayoutPageTemplateEntryPermission {
 
 	public static void check(
@@ -30,11 +33,7 @@ public class LayoutPageTemplateEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<LayoutPageTemplateEntry>
-			modelResourcePermission =
-				_layoutPageTemplateEntryModelResourcePermissionSnapshot.get();
-
-		modelResourcePermission.check(
+		_layoutPageTemplateEntryModelResourcePermission.check(
 			permissionChecker, layoutPageTemplateEntryId, actionId);
 	}
 
@@ -43,11 +42,7 @@ public class LayoutPageTemplateEntryPermission {
 			LayoutPageTemplateEntry layoutPageTemplateEntry, String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<LayoutPageTemplateEntry>
-			modelResourcePermission =
-				_layoutPageTemplateEntryModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _layoutPageTemplateEntryModelResourcePermission.contains(
 			permissionChecker, layoutPageTemplateEntry, actionId);
 	}
 
@@ -56,21 +51,23 @@ public class LayoutPageTemplateEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<LayoutPageTemplateEntry>
-			modelResourcePermission =
-				_layoutPageTemplateEntryModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _layoutPageTemplateEntryModelResourcePermission.contains(
 			permissionChecker, layoutPageTemplateEntryId, actionId);
 	}
 
-	private static final Snapshot
-		<ModelResourcePermission<LayoutPageTemplateEntry>>
-			_layoutPageTemplateEntryModelResourcePermissionSnapshot =
-				new Snapshot<>(
-					LayoutPageTemplateEntryPermission.class,
-					Snapshot.cast(ModelResourcePermission.class),
-					"(model.class.name=com.liferay.layout.page.template." +
-						"model.LayoutPageTemplateEntry)");
+	@Reference(
+		target = "(model.class.name=com.liferay.layout.page.template.model.LayoutPageTemplateEntry)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<LayoutPageTemplateEntry>
+			modelResourcePermission) {
+
+		_layoutPageTemplateEntryModelResourcePermission =
+			modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<LayoutPageTemplateEntry>
+		_layoutPageTemplateEntryModelResourcePermission;
 
 }

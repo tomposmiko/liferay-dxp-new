@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
 
-<service-builder auto-import-default-references="false" auto-namespace-tables="false" change-tracking-enabled="true" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.segments">
+<service-builder auto-namespace-tables="false" change-tracking-enabled="true" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.segments">
 	<author>Eduardo Garcia</author>
 	<namespace>Segments</namespace>
 	<entity local-service="true" name="SegmentsEntry" remote-service="true" uuid="true">
@@ -43,9 +43,6 @@
 
 		<finder name="GroupId" return-type="Collection">
 			<finder-column arrayable-operator="OR" name="groupId" />
-		</finder>
-		<finder name="CompanyId" return-type="Collection">
-			<finder-column arrayable-operator="OR" name="companyId" />
 		</finder>
 		<finder name="Source" return-type="Collection">
 			<finder-column name="source" />
@@ -175,7 +172,8 @@
 
 		<column name="segmentsEntryId" type="long" />
 		<column name="segmentsExperienceKey" type="String" />
-		<column name="plid" type="long" />
+		<column name="classNameId" type="long" />
+		<column name="classPK" type="long" />
 		<column localized="true" name="name" type="String" />
 		<column name="priority" type="int" />
 		<column name="active" type="boolean" />
@@ -196,44 +194,50 @@
 		<finder name="SegmentsEntryId" return-type="Collection">
 			<finder-column name="segmentsEntryId" />
 		</finder>
-		<finder name="G_P" return-type="Collection">
-			<finder-column name="groupId" />
-			<finder-column name="plid" />
-		</finder>
-		<finder name="G_S_P" return-type="Collection">
-			<finder-column name="groupId" />
-			<finder-column name="segmentsEntryId" />
-			<finder-column name="plid" />
-		</finder>
-		<finder name="G_SEK_P" return-type="SegmentsExperience" unique="true">
+		<finder name="G_S" return-type="SegmentsExperience" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="segmentsExperienceKey" />
-			<finder-column name="plid" />
 		</finder>
-		<finder name="G_P_P" return-type="SegmentsExperience" unique="true">
+		<finder name="G_C_C" return-type="Collection">
 			<finder-column name="groupId" />
-			<finder-column name="plid" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
+		</finder>
+		<finder name="G_S_C_C" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="segmentsEntryId" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
+		</finder>
+		<finder name="G_C_C_P" return-type="SegmentsExperience" unique="true">
+			<finder-column name="groupId" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
 			<finder-column name="priority" />
 		</finder>
-		<finder name="G_P_GtP" return-type="Collection">
+		<finder name="G_C_C_GtP" return-type="Collection">
 			<finder-column name="groupId" />
-			<finder-column name="plid" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
 			<finder-column comparator="&gt;" name="priority" />
 		</finder>
-		<finder name="G_P_LtP" return-type="Collection">
+		<finder name="G_C_C_LtP" return-type="Collection">
 			<finder-column name="groupId" />
-			<finder-column name="plid" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
 			<finder-column comparator="&lt;" name="priority" />
 		</finder>
-		<finder name="G_P_A" return-type="Collection">
+		<finder name="G_C_C_A" return-type="Collection">
 			<finder-column name="groupId" />
-			<finder-column name="plid" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
 			<finder-column name="active" />
 		</finder>
-		<finder name="G_S_P_A" return-type="Collection">
+		<finder name="G_S_C_C_A" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column arrayable-operator="OR" name="segmentsEntryId" />
-			<finder-column name="plid" />
+			<finder-column name="classNameId" />
+			<finder-column name="classPK" />
 			<finder-column name="active" />
 		</finder>
 	</entity>
@@ -330,9 +334,6 @@
 
 		<finder name="SegmentsExperimentId" return-type="Collection">
 			<finder-column name="segmentsExperimentId" />
-		</finder>
-		<finder name="SegmentsExperienceId" return-type="Collection">
-			<finder-column name="segmentsExperienceId" />
 		</finder>
 		<finder name="S_S" return-type="SegmentsExperimentRel" unique="true">
 			<finder-column name="segmentsExperimentId" />

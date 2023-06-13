@@ -30,13 +30,14 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
-import com.liferay.users.admin.kernel.util.UsersAdmin;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
@@ -71,7 +72,7 @@ public class UpdateRolesMVCActionCommand extends BaseMVCActionCommand {
 
 			birthdayCal.setTime(user.getBirthday());
 
-			long[] organizationIds = _usersAdmin.getOrganizationIds(
+			long[] organizationIds = UsersAdminUtil.getOrganizationIds(
 				actionRequest);
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
@@ -86,15 +87,14 @@ public class UpdateRolesMVCActionCommand extends BaseMVCActionCommand {
 				user.getEmailAddress(), user.getLanguageId(),
 				user.getTimeZoneId(), user.getGreeting(), user.getComments(),
 				user.getFirstName(), user.getMiddleName(), user.getLastName(),
-				contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-				user.isMale(), birthdayCal.get(Calendar.MONTH),
-				birthdayCal.get(Calendar.DATE), birthdayCal.get(Calendar.YEAR),
-				contact.getSmsSn(), contact.getFacebookSn(),
-				contact.getJabberSn(), contact.getSkypeSn(),
-				contact.getTwitterSn(), user.getJobTitle(), user.getGroupIds(),
-				organizationIds, user.getRoleIds(),
-				_getUserGroupRoles(actionRequest), user.getUserGroupIds(),
-				serviceContext);
+				contact.getPrefixId(), contact.getSuffixId(), user.isMale(),
+				birthdayCal.get(Calendar.MONTH), birthdayCal.get(Calendar.DATE),
+				birthdayCal.get(Calendar.YEAR), contact.getSmsSn(),
+				contact.getFacebookSn(), contact.getJabberSn(),
+				contact.getSkypeSn(), contact.getTwitterSn(),
+				user.getJobTitle(), user.getGroupIds(), organizationIds,
+				user.getRoleIds(), _getUserGroupRoles(actionRequest),
+				user.getUserGroupIds(), serviceContext);
 		}
 		catch (PortalException portalException) {
 			SessionErrors.add(actionRequest, portalException.getClass());
@@ -129,7 +129,7 @@ public class UpdateRolesMVCActionCommand extends BaseMVCActionCommand {
 		Set<UserGroupRole> userGroupRoles = new HashSet<>(
 			_userGroupRoleLocalService.getUserGroupRoles(user.getUserId()));
 
-		long userId = user.getUserId();
+		long userId = _getUserId(user);
 
 		userGroupRoles.addAll(
 			_getUserGroupRoles(
@@ -168,14 +168,21 @@ public class UpdateRolesMVCActionCommand extends BaseMVCActionCommand {
 		return userGroupRoles;
 	}
 
+	private long _getUserId(User user) {
+		return Optional.of(
+			user
+		).map(
+			User::getUserId
+		).orElse(
+			0L
+		);
+	}
+
 	@Reference
 	private Portal _portal;
 
 	@Reference
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
-
-	@Reference
-	private UsersAdmin _usersAdmin;
 
 	@Reference
 	private UserService _userService;

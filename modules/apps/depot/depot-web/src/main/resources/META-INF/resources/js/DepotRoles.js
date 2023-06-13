@@ -12,7 +12,7 @@
  * details.
  */
 
-import {delegate, escapeHTML, openSelectionModal, sub} from 'frontend-js-web';
+import {delegate, openSelectionModal} from 'frontend-js-web';
 
 export default function ({
 	portletNamespace,
@@ -89,18 +89,20 @@ export default function ({
 								return;
 							}
 
-							const rowColumns = [];
+							var rowColumns = [];
 
 							rowColumns.push(
 								`<i class="${
 									selectedItem.iconcssclass
-								}"></i>${escapeHTML(selectedItem.rolename)}`
+								}"></i>${Liferay.Util.escapeHTML(
+									selectedItem.rolename
+								)}`
 							);
 
 							rowColumns.push(selectedItem.groupdescriptivename);
 
 							rowColumns.push(
-								`<a class="modify-link" data-entityid="${selectedItem.entityid}" href="javascript:void(0);">${removeDepotRoleIcon}</a>`
+								`<a class="modify-link" data-entityid="${selectedItem.entityid}" href="javascript:;">${removeDepotRoleIcon}</a>`
 							);
 
 							searchContainer.addRow(
@@ -156,7 +158,7 @@ export default function ({
 						},
 						selectEventName,
 						selectedData: searchContainer.getData(true),
-						title: sub(
+						title: Liferay.Util.sub(
 							Liferay.Language.get('select-x'),
 							Liferay.Language.get('role')
 						),

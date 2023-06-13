@@ -15,6 +15,7 @@
 package com.liferay.portal.webdav.methods;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.xml.Dom4jUtil;
 import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.lock.NoSuchLockException;
 import com.liferay.portal.kernel.log.Log;
@@ -80,11 +81,11 @@ public class LockMethodImpl implements Method {
 				FileUtil.getBytes(httpServletRequest.getInputStream()));
 
 			if (Validator.isNotNull(xml)) {
-				Document document = SAXReaderUtil.read(xml);
-
 				if (_log.isDebugEnabled()) {
-					_log.debug("Request XML\n" + document.formattedString());
+					_log.debug("Request XML\n" + Dom4jUtil.toString(xml));
 				}
+
+				Document document = SAXReaderUtil.read(xml);
 
 				Element rootElement = document.getRootElement();
 
@@ -179,7 +180,7 @@ public class LockMethodImpl implements Method {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -187,52 +188,44 @@ public class LockMethodImpl implements Method {
 	}
 
 	protected String getResponseXML(Lock lock, long depth) throws Exception {
-		Document document = SAXReaderUtil.createDocument();
-
-		Element propElement = document.addElement("D:prop", "DAV:");
-
-		Element lockDiscoveryElement = propElement.addElement(
-			"D:lockdiscovery");
-
-		Element activeLockElement = lockDiscoveryElement.addElement(
-			"D:activelock");
-
-		Element lockTypeElement = activeLockElement.addElement("D:locktype");
-
-		lockTypeElement.addElement("D:write");
-
-		Element lockScopeElement = activeLockElement.addElement("D:lockscope");
-
-		lockScopeElement.addElement("D:exclusive");
-
-		if (depth < 0) {
-			Element depthElement = activeLockElement.addElement("D:depth");
-
-			depthElement.addText("Infinity");
-		}
-
-		Element ownerElement = activeLockElement.addElement("D:owner");
-
-		ownerElement.addText(lock.getOwner());
-
-		Element timeoutElement = activeLockElement.addElement("D:timeout");
+		StringBundler sb = new StringBundler(21);
 
 		long timeoutSecs = lock.getExpirationTime() / Time.SECOND;
 
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
+		sb.append("<D:prop xmlns:D=\"DAV:\">");
+		sb.append("<D:lockdiscovery>");
+		sb.append("<D:activelock>");
+		sb.append("<D:locktype><D:write/></D:locktype>");
+		sb.append("<D:lockscope><D:exclusive/></D:lockscope>");
+
+		if (depth < 0) {
+			sb.append("<D:depth>Infinity</D:depth>");
+		}
+
+		sb.append("<D:owner>");
+		sb.append(lock.getOwner());
+		sb.append("</D:owner>");
+		sb.append("<D:timeout>");
+
 		if (timeoutSecs > 0) {
-			timeoutElement.addText("Second-" + timeoutSecs);
+			sb.append("Second-");
+			sb.append(timeoutSecs);
 		}
 		else {
-			timeoutElement.addText("Infinite");
+			sb.append("Infinite");
 		}
 
-		Element lockTokenElement = activeLockElement.addElement("D:locktoken");
+		sb.append("</D:timeout>");
+		sb.append("<D:locktoken><D:href>");
+		sb.append(WebDAVUtil.TOKEN_PREFIX);
+		sb.append(lock.getUuid());
+		sb.append("</D:href></D:locktoken>");
+		sb.append("</D:activelock>");
+		sb.append("</D:lockdiscovery>");
+		sb.append("</D:prop>");
 
-		Element hrefElement = lockTokenElement.addElement("D:href");
-
-		hrefElement.addText(WebDAVUtil.TOKEN_PREFIX + lock.getUuid());
-
-		return document.formattedString();
+		return Dom4jUtil.toString(sb.toString());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(LockMethodImpl.class);

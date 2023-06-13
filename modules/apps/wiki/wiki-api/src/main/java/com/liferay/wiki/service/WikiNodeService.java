@@ -14,7 +14,6 @@
 
 package com.liferay.wiki.service;
 
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -44,7 +43,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @AccessControlled
-@CTAware
 @JSONWebService
 @ProviderType
 @Transactional(
@@ -60,8 +58,8 @@ public interface WikiNodeService extends BaseService {
 	 */
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addNode(String,
-	 String, String, ServiceContext)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addNode(String, String, String, ServiceContext)}
 	 */
 	@Deprecated
 	public WikiNode addNode(
@@ -113,13 +111,8 @@ public interface WikiNodeService extends BaseService {
 	 */
 	public String getOSGiServiceIdentifier();
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public WikiNode getWikiNodeByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws PortalException;
-
 	public void importPages(
-			long nodeId, InputStream[] inputStreams,
+			long nodeId, String importer, InputStream[] inputStreams,
 			Map<String, String[]> options)
 		throws PortalException;
 

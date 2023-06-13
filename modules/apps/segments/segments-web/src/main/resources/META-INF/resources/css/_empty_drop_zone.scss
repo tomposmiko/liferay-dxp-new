@@ -1,7 +1,5 @@
-@import 'atlas-variables';
-
 .empty-drop-zone-root {
-	background: $light-l1;
+	background: $secondaryHover;
 	border-width: 2px;
 
 	.empty-drop-zone-target {
@@ -9,10 +7,11 @@
 
 		.empty-drop-zone-indicator {
 			visibility: hidden;
+			width: 100%;
 		}
 
 		&.dnd-hover {
-			background: $primary-l3;
+			background: $primaryLight;
 
 			.empty-drop-zone-indicator {
 				visibility: visible;

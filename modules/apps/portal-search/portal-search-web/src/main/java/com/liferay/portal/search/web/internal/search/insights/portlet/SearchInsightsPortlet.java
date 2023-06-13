@@ -22,19 +22,18 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.permission.PortletPermission;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.web.internal.search.insights.constants.SearchInsightsPortletKeys;
 import com.liferay.portal.search.web.internal.search.insights.display.context.SearchInsightsDisplayContext;
 import com.liferay.portal.search.web.internal.util.SearchPortletPermissionUtil;
+import com.liferay.portal.search.web.internal.util.SearchStringUtil;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchRequest;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchResponse;
 
 import java.io.IOException;
 
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.portlet.Portlet;
@@ -49,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-search-insights",
@@ -68,8 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/search/insights/view.jsp",
 		"javax.portlet.name=" + SearchInsightsPortletKeys.SEARCH_INSIGHTS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -81,7 +80,7 @@ public class SearchInsightsPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		PortletSharedSearchResponse portletSharedSearchResponse =
-			_portletSharedSearchRequest.search(renderRequest);
+			portletSharedSearchRequest.search(renderRequest);
 
 		SearchInsightsPortletPreferences searchInsightsPortletPreferences =
 			new SearchInsightsPortletPreferencesImpl(
@@ -90,12 +89,12 @@ public class SearchInsightsPortlet extends MVCPortlet {
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			_buildDisplayContext(
+			buildDisplayContext(
 				portletSharedSearchResponse, searchInsightsPortletPreferences,
 				renderRequest));
 
 		if (!SearchPortletPermissionUtil.containsConfiguration(
-				_portletPermission, renderRequest, _portal)) {
+				portletPermission, renderRequest, portal)) {
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
@@ -104,7 +103,7 @@ public class SearchInsightsPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	private SearchInsightsDisplayContext _buildDisplayContext(
+	protected SearchInsightsDisplayContext buildDisplayContext(
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		SearchInsightsPortletPreferences searchInsightsPortletPreferences,
 		RenderRequest renderRequest) {
@@ -114,84 +113,79 @@ public class SearchInsightsPortlet extends MVCPortlet {
 
 		SearchResponse searchResponse =
 			portletSharedSearchResponse.getFederatedSearchResponse(
-				searchInsightsPortletPreferences.getFederatedSearchKey());
+				searchInsightsPortletPreferences.
+					getFederatedSearchKeyOptional());
 
-		if (_isCompanyAdmin() &&
-			(_isRequestStringPresent(searchResponse) ||
-			 _isResponseStringPresent(searchResponse))) {
+		if (isCompanyAdmin() &&
+			(isRequestStringPresent(searchResponse) ||
+			 isResponseStringPresent(searchResponse))) {
 
 			searchInsightsDisplayContext.setRequestString(
-				_buildRequestString(searchResponse));
+				buildRequestString(searchResponse));
+
 			searchInsightsDisplayContext.setResponseString(
-				_buildResponseString(searchResponse));
-			searchInsightsDisplayContext.setSearchEngineVendor(
-				_searchEngineInformation.getVendorString());
+				buildResponseString(searchResponse));
 		}
 		else {
 			searchInsightsDisplayContext.setHelpMessage(
-				_getHelpMessage(renderRequest));
+				getHelpMessage(renderRequest));
 		}
 
 		return searchInsightsDisplayContext;
 	}
 
-	private String _buildRequestString(SearchResponse searchResponse) {
-		String requestString = StringUtil.trim(
+	protected String buildRequestString(SearchResponse searchResponse) {
+		Optional<String> optional = SearchStringUtil.maybe(
 			searchResponse.getRequestString());
 
-		if (Validator.isBlank(requestString)) {
-			return StringPool.BLANK;
-		}
-
-		return requestString;
+		return optional.orElse(StringPool.BLANK);
 	}
 
-	private String _buildResponseString(SearchResponse searchResponse) {
-		String responseString = StringUtil.trim(
+	protected String buildResponseString(SearchResponse searchResponse) {
+		Optional<String> responseStringOptional = SearchStringUtil.maybe(
 			searchResponse.getResponseString());
 
-		if (Validator.isBlank(responseString)) {
-			return StringPool.BLANK;
-		}
-
-		return responseString;
+		return responseStringOptional.orElse(StringPool.BLANK);
 	}
 
-	private String _getHelpMessage(RenderRequest renderRequest) {
+	protected String getHelpMessage(RenderRequest renderRequest) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", renderRequest.getLocale(), getClass());
 
-		return _language.get(resourceBundle, "search-insights-help");
+		return language.get(resourceBundle, "search-insights-help");
 	}
 
-	private boolean _isCompanyAdmin() {
+	protected boolean isCompanyAdmin() {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
 		return permissionChecker.isCompanyAdmin();
 	}
 
-	private boolean _isRequestStringPresent(SearchResponse searchResponse) {
-		return !Validator.isBlank(searchResponse.getRequestString());
+	protected boolean isRequestStringPresent(SearchResponse searchResponse) {
+		Optional<String> requestStringOptional = SearchStringUtil.maybe(
+			searchResponse.getRequestString());
+
+		return requestStringOptional.isPresent();
 	}
 
-	private boolean _isResponseStringPresent(SearchResponse searchResponse) {
-		return !Validator.isBlank(searchResponse.getResponseString());
+	protected boolean isResponseStringPresent(SearchResponse searchResponse) {
+		Optional<String> responseStringOptional = SearchStringUtil.maybe(
+			searchResponse.getResponseString());
+
+		return responseStringOptional.isPresent();
 	}
 
 	@Reference
-	private Language _language;
+	protected Language language;
 
 	@Reference
-	private Portal _portal;
+	protected Portal portal;
 
 	@Reference
-	private PortletPermission _portletPermission;
+	protected PortletPermission portletPermission;
 
 	@Reference
-	private PortletSharedSearchRequest _portletSharedSearchRequest;
-
-	@Reference
-	private SearchEngineInformation _searchEngineInformation;
+	protected PortletSharedSearchRequest portletSharedSearchRequest;
 
 }

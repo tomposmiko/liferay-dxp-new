@@ -15,14 +15,17 @@
 package com.liferay.asset.list.web.internal.security.permission.resource;
 
 import com.liferay.asset.list.model.AssetListEntry;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Jürgen Kappler
  */
+@Component(immediate = true, service = {})
 public class AssetListEntryPermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class AssetListEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<AssetListEntry> modelResourcePermission =
-			_assetListEntryModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _assetListEntryModelResourcePermission.contains(
 			permissionChecker, assetListEntry, actionId);
 	}
 
@@ -42,17 +42,21 @@ public class AssetListEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<AssetListEntry> modelResourcePermission =
-			_assetListEntryModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _assetListEntryModelResourcePermission.contains(
 			permissionChecker, assetListEntryId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<AssetListEntry>>
-		_assetListEntryModelResourcePermissionSnapshot = new Snapshot<>(
-			AssetListEntryPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.asset.list.model.AssetListEntry)");
+	@Reference(
+		target = "(model.class.name=com.liferay.asset.list.model.AssetListEntry)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<AssetListEntry> modelResourcePermission) {
+
+		_assetListEntryModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<AssetListEntry>
+		_assetListEntryModelResourcePermission;
 
 }

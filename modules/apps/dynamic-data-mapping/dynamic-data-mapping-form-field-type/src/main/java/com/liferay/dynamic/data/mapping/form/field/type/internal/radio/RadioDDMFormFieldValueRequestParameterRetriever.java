@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.RADIO,
 	service = DDMFormFieldValueRequestParameterRetriever.class
 )
@@ -47,13 +48,13 @@ public class RadioDDMFormFieldValueRequestParameterRetriever
 			ddmFormFieldParameterName);
 
 		if (parameterValue == null) {
-			return _getPredefinedValue(defaultDDMFormFieldParameterValue);
+			return getPredefinedValue(defaultDDMFormFieldParameterValue);
 		}
 
 		return GetterUtil.getString(parameterValue);
 	}
 
-	private String _getPredefinedValue(String predefinedValue) {
+	protected String getPredefinedValue(String predefinedValue) {
 		try {
 			JSONArray predefinedValueJSONArray = _jsonFactory.createJSONArray(
 				predefinedValue);

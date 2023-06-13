@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class TaxonomyCategorySerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (taxonomyCategory.getActions() != null) {
 			if (sb.length() > 1) {
@@ -248,16 +249,6 @@ public class TaxonomyCategorySerDes {
 				String.valueOf(taxonomyCategory.getParentTaxonomyVocabulary()));
 		}
 
-		if (taxonomyCategory.getSiteId() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"siteId\": ");
-
-			sb.append(taxonomyCategory.getSiteId());
-		}
-
 		if (taxonomyCategory.getTaxonomyCategoryProperties() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -296,16 +287,6 @@ public class TaxonomyCategorySerDes {
 			sb.append(taxonomyCategory.getTaxonomyCategoryUsageCount());
 		}
 
-		if (taxonomyCategory.getTaxonomyVocabularyId() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"taxonomyVocabularyId\": ");
-
-			sb.append(taxonomyCategory.getTaxonomyVocabularyId());
-		}
-
 		if (taxonomyCategory.getViewableBy() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -340,7 +321,7 @@ public class TaxonomyCategorySerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (taxonomyCategory.getActions() == null) {
 			map.put("actions", null);
@@ -462,13 +443,6 @@ public class TaxonomyCategorySerDes {
 				String.valueOf(taxonomyCategory.getParentTaxonomyVocabulary()));
 		}
 
-		if (taxonomyCategory.getSiteId() == null) {
-			map.put("siteId", null);
-		}
-		else {
-			map.put("siteId", String.valueOf(taxonomyCategory.getSiteId()));
-		}
-
 		if (taxonomyCategory.getTaxonomyCategoryProperties() == null) {
 			map.put("taxonomyCategoryProperties", null);
 		}
@@ -487,15 +461,6 @@ public class TaxonomyCategorySerDes {
 				"taxonomyCategoryUsageCount",
 				String.valueOf(
 					taxonomyCategory.getTaxonomyCategoryUsageCount()));
-		}
-
-		if (taxonomyCategory.getTaxonomyVocabularyId() == null) {
-			map.put("taxonomyVocabularyId", null);
-		}
-		else {
-			map.put(
-				"taxonomyVocabularyId",
-				String.valueOf(taxonomyCategory.getTaxonomyVocabularyId()));
 		}
 
 		if (taxonomyCategory.getViewableBy() == null) {
@@ -624,33 +589,19 @@ public class TaxonomyCategorySerDes {
 							(String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "siteId")) {
-				if (jsonParserFieldValue != null) {
-					taxonomyCategory.setSiteId(
-						Long.valueOf((String)jsonParserFieldValue));
-				}
-			}
 			else if (Objects.equals(
 						jsonParserFieldName, "taxonomyCategoryProperties")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					TaxonomyCategoryProperty[] taxonomyCategoryPropertiesArray =
-						new TaxonomyCategoryProperty
-							[jsonParserFieldValues.length];
-
-					for (int i = 0; i < taxonomyCategoryPropertiesArray.length;
-						 i++) {
-
-						taxonomyCategoryPropertiesArray[i] =
-							TaxonomyCategoryPropertySerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					taxonomyCategory.setTaxonomyCategoryProperties(
-						taxonomyCategoryPropertiesArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> TaxonomyCategoryPropertySerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new TaxonomyCategoryProperty[size]
+						));
 				}
 			}
 			else if (Objects.equals(
@@ -659,14 +610,6 @@ public class TaxonomyCategorySerDes {
 				if (jsonParserFieldValue != null) {
 					taxonomyCategory.setTaxonomyCategoryUsageCount(
 						Integer.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "taxonomyVocabularyId")) {
-
-				if (jsonParserFieldValue != null) {
-					taxonomyCategory.setTaxonomyVocabularyId(
-						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "viewableBy")) {

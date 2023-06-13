@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_INVENTORY,
 		"mvc.command.name=/commerce_inventory/edit_commerce_inventory_warehouse_item"
@@ -44,6 +45,18 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditCommerceInventoryWarehouseItemMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected void deleteCommerceInventoryWarehouseItem(
+			ActionRequest actionRequest)
+		throws PortalException {
+
+		long commerceInventoryWarehouseItemId = ParamUtil.getLong(
+			actionRequest, "commerceInventoryWarehouseItemId");
+
+		_commerceInventoryWarehouseItemService.
+			deleteCommerceInventoryWarehouseItem(
+				commerceInventoryWarehouseItemId);
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -54,10 +67,10 @@ public class EditCommerceInventoryWarehouseItemMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceInventoryWarehouseItem(actionRequest);
+				deleteCommerceInventoryWarehouseItem(actionRequest);
 			}
 			else if (cmd.equals(Constants.UPDATE)) {
-				_updateCommerceInventoryWarehouseItem(actionRequest);
+				updateCommerceInventoryWarehouseItem(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -70,34 +83,22 @@ public class EditCommerceInventoryWarehouseItemMVCActionCommand
 				sendRedirect(actionRequest, actionResponse);
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
 
-	private void _deleteCommerceInventoryWarehouseItem(
+	protected void updateCommerceInventoryWarehouseItem(
 			ActionRequest actionRequest)
 		throws PortalException {
 
-		long commerceInventoryWarehouseItemId = ParamUtil.getLong(
-			actionRequest, "commerceInventoryWarehouseItemId");
-
-		_commerceInventoryWarehouseItemService.
-			deleteCommerceInventoryWarehouseItem(
-				commerceInventoryWarehouseItemId);
-	}
-
-	private void _updateCommerceInventoryWarehouseItem(
-			ActionRequest actionRequest)
-		throws PortalException {
-
-		long mvccVersion = ParamUtil.getLong(actionRequest, "mvccVersion");
 		long commerceInventoryWarehouseItemId = ParamUtil.getLong(
 			actionRequest, "commerceInventoryWarehouseItemId");
 
 		int quantity = ParamUtil.getInteger(actionRequest, "quantity");
 		int reservedQuantity = ParamUtil.getInteger(
 			actionRequest, "reservedQuantity");
+		long mvccVersion = ParamUtil.getLong(actionRequest, "mvccVersion");
 
 		_commerceInventoryWarehouseItemService.
 			updateCommerceInventoryWarehouseItem(

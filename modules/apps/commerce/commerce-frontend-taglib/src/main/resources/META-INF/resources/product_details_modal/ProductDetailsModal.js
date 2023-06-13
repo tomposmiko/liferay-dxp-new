@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import Component from 'metal-component';
 import Soy, {Config} from 'metal-soy';
 

@@ -9,11 +9,8 @@
  * distribution rights of the Software.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	postForm,
-} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
+
 export default function propsTransformer({
 	additionalProps: {
 		activateResultsRankingEntryURL,
@@ -33,7 +30,7 @@ export default function propsTransformer({
 		if (form && searchContainer) {
 			postForm(form, {
 				data: {
-					actionFormInstanceIds: getCheckedCheckboxes(
+					actionFormInstanceIds: Liferay.Util.listCheckedExcept(
 						searchContainer,
 						`${portletNamespace}allRowIds`
 					),
@@ -53,7 +50,7 @@ export default function propsTransformer({
 		if (form && searchContainer) {
 			postForm(form, {
 				data: {
-					actionFormInstanceIds: getCheckedCheckboxes(
+					actionFormInstanceIds: Liferay.Util.listCheckedExcept(
 						searchContainer,
 						`${portletNamespace}allRowIds`
 					),
@@ -64,34 +61,29 @@ export default function propsTransformer({
 	};
 
 	const deleteResultsRankingsEntries = () => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const form = document.getElementById(
-						`${portletNamespace}fm`
-					);
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			const form = document.getElementById(`${portletNamespace}fm`);
 
-					const searchContainer = document.getElementById(
-						`${portletNamespace}resultsRankingEntries`
-					);
+			const searchContainer = document.getElementById(
+				`${portletNamespace}resultsRankingEntries`
+			);
 
-					if (form && searchContainer) {
-						postForm(form, {
-							data: {
-								actionFormInstanceIds: getCheckedCheckboxes(
-									searchContainer,
-									`${portletNamespace}allRowIds`
-								),
-							},
-							url: deleteResultsRankingEntryURL,
-						});
-					}
-				}
-			},
-		});
+			if (form && searchContainer) {
+				postForm(form, {
+					data: {
+						actionFormInstanceIds: Liferay.Util.listCheckedExcept(
+							searchContainer,
+							`${portletNamespace}allRowIds`
+						),
+					},
+					url: deleteResultsRankingEntryURL,
+				});
+			}
+		}
 	};
 
 	return {

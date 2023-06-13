@@ -96,21 +96,27 @@
 					</div>
 				</div>
 
-				<liferay-frontend:component
-					componentId="CountryRegionDynamicSelect"
-					context='<%=
-						HashMapBuilder.<String, Object>put(
-							"countrySelect", portletDisplay.getNamespace() + "addressCountryId" + addressesIndex
-						).put(
-							"countrySelectVal", ParamUtil.getLong(request, "addressCountryId" + addressesIndex, address.getCountryId())
-						).put(
-							"regionSelect", portletDisplay.getNamespace() + "addressRegionId" + addressesIndex
-						).put(
-							"regionSelectVal", ParamUtil.getLong(request, "addressRegionId" + addressesIndex, address.getRegionId())
-						).build()
-					%>'
-					module="js/CountryRegionDynamicSelect"
-				/>
+				<script>
+					new Liferay.DynamicSelect([
+						{
+							select: '<portlet:namespace />addressCountryId<%= addressesIndex %>',
+							selectData: Liferay.Address.getCountries,
+							selectDesc: 'nameCurrentValue',
+							selectId: 'countryId',
+							selectSort: '<%= true %>',
+							selectVal:
+								'<%= ParamUtil.getLong(request, "addressCountryId" + addressesIndex, address.getCountryId()) %>',
+						},
+						{
+							select: '<portlet:namespace />addressRegionId<%= addressesIndex %>',
+							selectData: Liferay.Address.getRegions,
+							selectDesc: 'name',
+							selectId: 'regionId',
+							selectVal:
+								'<%= ParamUtil.getLong(request, "addressRegionId" + addressesIndex, address.getRegionId()) %>',
+						},
+					]);
+				</script>
 
 			<%
 			}
@@ -119,34 +125,44 @@
 			<aui:input name="addressesIndexes" type="hidden" value="<%= StringUtil.merge(addressesIndexes) %>" />
 		</aui:fieldset>
 
-		<aui:script require='<%= npmResolvedPackageName + "/js/CountryRegionDynamicSelect as CountryRegionDynamicSelect" %>'>
-			AUI().use('liferay-auto-fields', (A) => {
-				new Liferay.AutoFields({
-					contentBox: '#<portlet:namespace />addresses',
-					fieldIndexes: '<portlet:namespace />addressesIndexes',
-					namespace: '<portlet:namespace />',
-					on: {
-						clone: function (event) {
-							var guid = event.guid;
-							var row = event.row;
+		<aui:script use="liferay-auto-fields">
+			new Liferay.AutoFields({
+				contentBox: '#<portlet:namespace />addresses',
+				fieldIndexes: '<portlet:namespace />addressesIndexes',
+				namespace: '<portlet:namespace />',
+				on: {
+					clone: function (event) {
+						var guid = event.guid;
+						var row = event.row;
 
-							var dynamicSelects = row.one(
-								'select[data-componentType=dynamic_select]'
-							);
+						var dynamicSelects = row.one(
+							'select[data-componentType=dynamic_select]'
+						);
 
-							if (dynamicSelects) {
-								dynamicSelects.detach('change');
-							}
+						if (dynamicSelects) {
+							dynamicSelects.detach('change');
+						}
 
-							CountryRegionDynamicSelect.default({
-								countrySelect:
-									'<portlet:namespace />addressCountryId' + guid,
-								regionSelect: '<portlet:namespace />addressRegionId' + guid,
-							});
-						},
+						new Liferay.DynamicSelect([
+							{
+								select: '<portlet:namespace />addressCountryId' + guid,
+								selectData: Liferay.Address.getCountries,
+								selectDesc: 'nameCurrentValue',
+								selectId: 'countryId',
+								selectSort: '<%= true %>',
+								selectVal: '0',
+							},
+							{
+								select: '<portlet:namespace />addressRegionId' + guid,
+								selectData: Liferay.Address.getRegions,
+								selectDesc: 'name',
+								selectId: 'regionId',
+								selectVal: '0',
+							},
+						]);
 					},
-				}).render();
-			});
+				},
+			}).render();
 		</aui:script>
 	</c:when>
 	<c:otherwise>

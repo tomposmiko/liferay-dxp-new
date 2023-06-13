@@ -19,7 +19,7 @@ let promise = Promise.resolve();
 
 export default function redo({store}) {
 	return (dispatch) => {
-		if (!store.redoHistory || !store.redoHistory.length) {
+		if (!store.redoHistory || store.redoHistory.length === 0) {
 			return;
 		}
 

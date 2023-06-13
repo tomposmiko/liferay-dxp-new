@@ -33,17 +33,16 @@ public class BuildRunnerFactory {
 			buildRunner = new RootCauseAnalysisToolTopLevelBuildRunner(
 				(PortalTopLevelBuildData)buildData);
 		}
-
-		if ((buildRunner == null) &&
-			jobName.equals("root-cause-analysis-tool-batch")) {
-
+		else if (jobName.equals("root-cause-analysis-tool-batch")) {
 			buildRunner = new RootCauseAnalysisBatchBuildRunner(
 				(PortalBatchBuildData)buildData);
 		}
+		else if (jobName.contains("-batch")) {
+			buildRunner = new DefaultPortalBatchBuildRunner(
+				(PortalBatchBuildData)buildData);
+		}
 
-		if ((buildRunner == null) &&
-			jobName.startsWith("test-portal-testsuite-upstream-controller(")) {
-
+		if (jobName.startsWith("test-portal-testsuite-upstream-controller(")) {
 			Matcher matcher = _jobNamePattern.matcher(jobName);
 
 			if (matcher.find() && (matcher.group("testSuiteName") != null)) {
@@ -57,30 +56,9 @@ public class BuildRunnerFactory {
 			}
 		}
 
-		if ((buildRunner == null) && jobName.equals("test-poshi-release")) {
-			buildRunner = new PoshiReleasePortalTopLevelBuildRunner(
-				(PortalTopLevelBuildData)buildData);
-		}
-
-		if ((buildRunner == null) &&
-			(jobName.startsWith(
-				"test-qa-websites-functional-daily-controller") ||
-			 jobName.startsWith(
-				 "test-qa-websites-functional-weekly-controller"))) {
-
-			buildRunner = new QAWebsitesControllerBuildRunner(buildData);
-		}
-
-		if ((buildRunner == null) &&
-			jobName.startsWith("test-results-consistency-report-controller")) {
-
+		if (jobName.startsWith("test-results-consistency-report-controller")) {
 			buildRunner = new TestResultsConsistencyReportControllerBuildRunner(
 				(BaseBuildData)buildData);
-		}
-
-		if ((buildRunner == null) && jobName.contains("-batch")) {
-			buildRunner = new DefaultPortalBatchBuildRunner(
-				(PortalBatchBuildData)buildData);
 		}
 
 		if (buildRunner == null) {

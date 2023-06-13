@@ -14,13 +14,13 @@
 
 package com.liferay.wiki.internal.engine;
 
-import com.liferay.diff.DiffHtml;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapListener;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
+import com.liferay.portal.kernel.diff.DiffHtmlUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
  */
-@Component(service = WikiEngineRenderer.class)
+@Component(immediate = true, service = WikiEngineRenderer.class)
 public class WikiEngineRendererImpl implements WikiEngineRenderer {
 
 	@Override
@@ -126,7 +126,7 @@ public class WikiEngineRendererImpl implements WikiEngineRenderer {
 				targetPage, viewPageURL, editPageURL, attachmentURLPrefix);
 		}
 
-		return _diffHtml.diff(
+		return DiffHtmlUtil.diff(
 			new UnsyncStringReader(sourceContent),
 			new UnsyncStringReader(targetContent));
 	}
@@ -174,8 +174,7 @@ public class WikiEngineRendererImpl implements WikiEngineRenderer {
 				public void keyEmitted(
 					ServiceTrackerMap<String, List<WikiEngine>>
 						serviceTrackerMap,
-					String key, WikiEngine serviceWikiEngine,
-					List<WikiEngine> contentWikiEngines) {
+					String key, WikiEngine service, List<WikiEngine> content) {
 
 					_portalCache.removeAll();
 				}
@@ -184,8 +183,7 @@ public class WikiEngineRendererImpl implements WikiEngineRenderer {
 				public void keyRemoved(
 					ServiceTrackerMap<String, List<WikiEngine>>
 						serviceTrackerMap,
-					String key, WikiEngine serviceWikiEngine,
-					List<WikiEngine> contentWikiEngines) {
+					String key, WikiEngine service, List<WikiEngine> content) {
 
 					_portalCache.removeAll();
 				}
@@ -240,9 +238,6 @@ public class WikiEngineRendererImpl implements WikiEngineRenderer {
 		"\\[\\$BEGIN_PAGE_TITLE\\$\\](.*?)\\[\\$END_PAGE_TITLE\\$\\]");
 
 	private BundleContext _bundleContext;
-
-	@Reference
-	private DiffHtml _diffHtml;
 
 	@Reference
 	private MultiVMPool _multiVMPool;

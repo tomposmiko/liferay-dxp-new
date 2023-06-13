@@ -32,13 +32,15 @@ import java.util.Map;
 public abstract class BaseIndexSearcher
 	implements IndexSearcher, QuerySuggester {
 
+	public void setQuerySuggester(QuerySuggester querySuggester) {
+		_querySuggester = querySuggester;
+	}
+
 	@Override
 	public String spellCheckKeywords(SearchContext searchContext)
 		throws SearchException {
 
-		QuerySuggester querySuggester = getQuerySuggester();
-
-		if (querySuggester == null) {
+		if (_querySuggester == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No query suggester configured");
 			}
@@ -46,7 +48,7 @@ public abstract class BaseIndexSearcher
 			return StringPool.BLANK;
 		}
 
-		return querySuggester.spellCheckKeywords(searchContext);
+		return _querySuggester.spellCheckKeywords(searchContext);
 	}
 
 	@Override
@@ -54,9 +56,7 @@ public abstract class BaseIndexSearcher
 			SearchContext searchContext, int max)
 		throws SearchException {
 
-		QuerySuggester querySuggester = getQuerySuggester();
-
-		if (querySuggester == null) {
+		if (_querySuggester == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No query suggester configured");
 			}
@@ -64,7 +64,7 @@ public abstract class BaseIndexSearcher
 			return Collections.emptyMap();
 		}
 
-		return querySuggester.spellCheckKeywords(searchContext, max);
+		return _querySuggester.spellCheckKeywords(searchContext, max);
 	}
 
 	@Override
@@ -72,9 +72,7 @@ public abstract class BaseIndexSearcher
 			SearchContext searchContext, Suggester suggester)
 		throws SearchException {
 
-		QuerySuggester querySuggester = getQuerySuggester();
-
-		if (querySuggester == null) {
+		if (_querySuggester == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No query suggester configured");
 			}
@@ -82,16 +80,14 @@ public abstract class BaseIndexSearcher
 			return new SuggesterResults();
 		}
 
-		return querySuggester.suggest(searchContext, suggester);
+		return _querySuggester.suggest(searchContext, suggester);
 	}
 
 	@Override
 	public String[] suggestKeywordQueries(SearchContext searchContext, int max)
 		throws SearchException {
 
-		QuerySuggester querySuggester = getQuerySuggester();
-
-		if (querySuggester == null) {
+		if (_querySuggester == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("No query suggester configured");
 			}
@@ -99,10 +95,8 @@ public abstract class BaseIndexSearcher
 			return StringPool.EMPTY_ARRAY;
 		}
 
-		return querySuggester.suggestKeywordQueries(searchContext, max);
+		return _querySuggester.suggestKeywordQueries(searchContext, max);
 	}
-
-	protected abstract QuerySuggester getQuerySuggester();
 
 	protected void populateUID(Document document, QueryConfig queryConfig) {
 		Field uidField = document.getField(Field.UID);
@@ -124,5 +118,7 @@ public abstract class BaseIndexSearcher
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseIndexSearcher.class);
+
+	private QuerySuggester _querySuggester;
 
 }

@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.Locale;
@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_OPTIONS,
 		"mvc.command.name=/cp_options/edit_cp_option_value"
@@ -57,7 +58,7 @@ public class EditCPOptionValueMVCActionCommand extends BaseMVCActionCommand {
 		long cpOptionValueId = ParamUtil.getLong(
 			actionRequest, "cpOptionValueId");
 
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 		String key = ParamUtil.getString(actionRequest, "key");
@@ -79,7 +80,7 @@ public class EditCPOptionValueMVCActionCommand extends BaseMVCActionCommand {
 					"mvcRenderCommandName", "/cp_options/edit_cp_option_value");
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
@@ -89,8 +90,5 @@ public class EditCPOptionValueMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CPOptionValueService _cpOptionValueService;
-
-	@Reference
-	private Localization _localization;
 
 }

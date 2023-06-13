@@ -16,11 +16,14 @@ package com.liferay.portal.vulcan.internal.jaxrs.exception.mapper;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.Response;
 
@@ -35,21 +38,28 @@ public class JsonMappingExceptionMapper
 
 	@Override
 	protected Problem getProblem(JsonMappingException jsonMappingException) {
+		if (_log.isDebugEnabled()) {
+			_log.debug(jsonMappingException, jsonMappingException);
+		}
+
 		List<JsonMappingException.Reference> references =
 			jsonMappingException.getPath();
 
-		StringBundler sb = new StringBundler(references.size() * 2);
+		Stream<JsonMappingException.Reference> stream = references.stream();
 
-		for (JsonMappingException.Reference reference : references) {
-			sb.append(reference.getFieldName());
-			sb.append(".");
-		}
-
-		sb.setIndex(sb.index() - 1);
+		String path = stream.map(
+			JsonMappingException.Reference::getFieldName
+		).collect(
+			Collectors.joining(".")
+		);
 
 		return new Problem(
-			Response.Status.BAD_REQUEST,
-			"Unable to map JSON path: " + sb.toString());
+			jsonMappingException.getLocalizedMessage(),
+			Response.Status.BAD_REQUEST, "Unable to map JSON path: " + path,
+			"JsonMappingException");
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		JsonMappingExceptionMapper.class);
 
 }

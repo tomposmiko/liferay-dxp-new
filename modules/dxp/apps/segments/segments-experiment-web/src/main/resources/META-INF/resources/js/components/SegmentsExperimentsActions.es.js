@@ -13,7 +13,6 @@ import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLink from '@clayui/link';
 import {useModal} from '@clayui/modal';
-import {openConfirmModal} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext} from 'react';
 
@@ -66,19 +65,18 @@ function SegmentsExperimentsActions({onEditSegmentsExperimentStatus}) {
 					className="w-100"
 					displayType="secondary"
 					onClick={() => {
-						openConfirmModal({
-							message: Liferay.Language.get(
+						const confirmed = confirm(
+							Liferay.Language.get(
 								'are-you-sure-you-want-to-terminate-this-test'
-							),
-							onConfirm: (isConfirmed) => {
-								if (isConfirmed) {
-									onEditSegmentsExperimentStatus(
-										experiment,
-										STATUS_TERMINATED
-									);
-								}
-							},
-						});
+							)
+						);
+
+						if (confirmed) {
+							onEditSegmentsExperimentStatus(
+								experiment,
+								STATUS_TERMINATED
+							);
+						}
 					}}
 				>
 					{Liferay.Language.get('terminate-test')}
@@ -139,7 +137,6 @@ function SegmentsExperimentsActions({onEditSegmentsExperimentStatus}) {
 					target="_blank"
 				>
 					{Liferay.Language.get('view-data-in-analytics-cloud')}
-
 					<ClayIcon className="ml-2" symbol="shortcut" />
 				</ClayLink>
 			)}

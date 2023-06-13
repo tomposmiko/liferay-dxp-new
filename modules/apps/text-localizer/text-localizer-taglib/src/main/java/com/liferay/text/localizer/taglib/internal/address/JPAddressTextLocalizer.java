@@ -22,31 +22,41 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.text.localizer.address.AddressTextLocalizer;
 import com.liferay.text.localizer.taglib.internal.address.util.AddressUtil;
 
+import java.util.Optional;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Yasuyuki Takeo
  */
-@Component(property = "country=JP", service = AddressTextLocalizer.class)
+@Component(
+	immediate = true, property = "country=JP",
+	service = AddressTextLocalizer.class
+)
 public class JPAddressTextLocalizer implements AddressTextLocalizer {
 
 	@Override
 	public String format(Address address) {
 		StringBundler sb = new StringBundler(13);
 
-		String countryName = AddressUtil.getCountryName(address);
+		Optional<String> countryNameOptional =
+			AddressUtil.getCountryNameOptional(address);
 
-		if (countryName != null) {
-			sb.append(html.escape(countryName));
-			sb.append(StringPool.NEW_LINE);
-		}
+		countryNameOptional.ifPresent(
+			countryName -> {
+				sb.append(html.escape(countryName));
+				sb.append(StringPool.NEW_LINE);
+			});
 
 		Address escapedAddress = address.toEscapedModel();
 
 		String city = escapedAddress.getCity();
 
 		boolean hasCity = Validator.isNotNull(city);
+
+		Optional<String> regionNameOptional = AddressUtil.getRegionNameOptional(
+			address);
 
 		String zip = escapedAddress.getZip();
 
@@ -56,15 +66,14 @@ public class JPAddressTextLocalizer implements AddressTextLocalizer {
 			sb.append(zip);
 		}
 
-		String regionName = AddressUtil.getRegionName(address);
+		regionNameOptional.ifPresent(
+			regionName -> {
+				if (hasZip) {
+					sb.append(StringPool.SPACE);
+				}
 
-		if (regionName != null) {
-			if (hasZip) {
-				sb.append(StringPool.SPACE);
-			}
-
-			sb.append(html.escape(regionName));
-		}
+				sb.append(html.escape(regionName));
+			});
 
 		if (hasCity) {
 			sb.append(StringPool.SPACE);

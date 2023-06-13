@@ -363,7 +363,9 @@ public class ProjectTemplateFilesTest {
 				"Undeclared \"" + expression + "\" property. Please add to " +
 					archetypeMetadataXmlPath,
 				_expressionContainedInList(declaredVariables, expression) ||
-				_expressionContainedInList(requiredPropertyNames, expression));
+				_expressionContainedInList(requiredPropertyNames, expression) ||
+				_expressionContainedInList(
+					_archetypeMetadataXmlDefaultPropertyNames, expression));
 		}
 	}
 
@@ -1007,8 +1009,7 @@ public class ProjectTemplateFilesTest {
 
 	private static final List<String>
 		_archetypeMetadataXmlDefaultPropertyNames = Arrays.asList(
-			"artifactId", "groupId", "package", "project", "replacestring",
-			"version");
+			"artifactId", "groupId", "package", "project", "version");
 	private static final Pattern _archetypeMetadataXmlIncludePattern =
 		Pattern.compile("<include>([^\\*]+?)<\\/include>");
 	private static final Pattern _archetypeMetadataXmlRequiredPropertyPattern =
@@ -1018,9 +1019,8 @@ public class ProjectTemplateFilesTest {
 	private static final Pattern _buildGradleDependencyPattern =
 		Pattern.compile(
 			"(compile(?:Only)?) \\(?group: \\\"(.+)\\\", name: \\\"([a-zA-Z" +
-				"0-9\\.\\-\\{\\}\\$]+)\\\"((?:, version: )\\\"([0-9\\.]+)" +
-					"\\\")?(, transitive: (?: true|false))?(\\) \\{force = " +
-						"true\\})?");
+				"0-9\\.\\-]+)\\\"((?:, version: )\\\"([0-9\\.]+)\\\")?(, " +
+					"transitive: (?: true|false))?(\\) \\{force = true\\})?");
 	private static final Pattern _bundleDescriptionPattern = Pattern.compile(
 		"Creates a .+\\.");
 	private static final Pattern _bundleNameSeparatorPattern = Pattern.compile(

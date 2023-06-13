@@ -34,9 +34,6 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.service.CommerceChannelRelLocalService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -67,21 +64,24 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 
 	public static final String CLASS_NAME = CommerceDiscount.class.getName();
@@ -242,7 +242,7 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 				_cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
 
 			for (CommerceDiscountProductTarget commerceDiscountProductTarget :
-					_commerceDiscountProductTargetServiceTrackerList) {
+					_commerceDiscountProductTargets) {
 
 				commerceDiscountProductTarget.postProcessContextBooleanFilter(
 					contextBooleanFilter, cpDefinition);
@@ -257,7 +257,7 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 				_commerceOrderLocalService.getCommerceOrder(commerceOrderId);
 
 			for (CommerceDiscountOrderTarget commerceDiscountOrderTarget :
-					_commerceDiscountOrderTargetServiceTrackerList) {
+					_commerceDiscountOrderTargets) {
 
 				commerceDiscountOrderTarget.postProcessContextBooleanFilter(
 					contextBooleanFilter, commerceOrder);
@@ -287,22 +287,6 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 		}
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_commerceDiscountOrderTargetServiceTrackerList =
-			ServiceTrackerListFactory.open(
-				bundleContext, CommerceDiscountOrderTarget.class);
-		_commerceDiscountProductTargetServiceTrackerList =
-			ServiceTrackerListFactory.open(
-				bundleContext, CommerceDiscountProductTarget.class);
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_commerceDiscountOrderTargetServiceTrackerList.close();
-		_commerceDiscountProductTargetServiceTrackerList.close();
-	}
-
 	@Override
 	protected void doDelete(CommerceDiscount commerceDiscount)
 		throws Exception {
@@ -330,30 +314,51 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 		Document document = getBaseModelDocument(CLASS_NAME, commerceDiscount);
 
 		document.addText(Field.TITLE, commerceDiscount.getTitle());
+
+		document.addText(
+			FIELD_TARGET_TYPE, commerceDiscountTargetType.toString());
 		document.addText(Field.USER_NAME, commerceDiscount.getUserName());
 		document.addKeyword(FIELD_ACTIVE, commerceDiscount.isActive());
 		document.addKeyword(
 			FIELD_COUPON_CODE, commerceDiscount.getCouponCode());
-		document.addText(
-			FIELD_TARGET_TYPE, commerceDiscountTargetType.toString());
 		document.addKeyword(
 			FIELD_USE_COUPON_CODE, commerceDiscount.isUseCouponCode());
 
-		document.addNumber(
-			"commerceAccountId",
-			TransformUtil.transformToLongArray(
-				_commerceDiscountAccountRelLocalService.
-					getCommerceDiscountAccountRels(
-						commerceDiscount.getCommerceDiscountId(),
-						QueryUtil.ALL_POS, QueryUtil.ALL_POS, null),
-				CommerceDiscountAccountRel::getCommerceAccountId));
-
-		long[] commerceAccountGroupIds = TransformUtil.transformToLongArray(
-			_commerceDiscountCommerceAccountGroupRelLocalService.
-				getCommerceDiscountCommerceAccountGroupRels(
+		List<CommerceDiscountAccountRel> commerceDiscountAccountRels =
+			_commerceDiscountAccountRelLocalService.
+				getCommerceDiscountAccountRels(
 					commerceDiscount.getCommerceDiscountId(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null),
-			CommerceDiscountCommerceAccountGroupRel::getCommerceAccountGroupId);
+					QueryUtil.ALL_POS, null);
+
+		Stream<CommerceDiscountAccountRel> commerceDiscountAccountRelsStream =
+			commerceDiscountAccountRels.stream();
+
+		LongStream commerceAccountIdLongStream =
+			commerceDiscountAccountRelsStream.mapToLong(
+				CommerceDiscountAccountRel::getCommerceAccountId);
+
+		long[] commerceAccountIds = commerceAccountIdLongStream.toArray();
+
+		document.addNumber("commerceAccountId", commerceAccountIds);
+
+		List<CommerceDiscountCommerceAccountGroupRel>
+			commerceDiscountCommerceAccountGroupRels =
+				_commerceDiscountCommerceAccountGroupRelLocalService.
+					getCommerceDiscountCommerceAccountGroupRels(
+						commerceDiscount.getCommerceDiscountId(),
+						QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Stream<CommerceDiscountCommerceAccountGroupRel>
+			commerceDiscountCommerceAccountGroupRelsStream =
+				commerceDiscountCommerceAccountGroupRels.stream();
+
+		LongStream commerceAccountGroupIdLongStream =
+			commerceDiscountCommerceAccountGroupRelsStream.mapToLong(
+				CommerceDiscountCommerceAccountGroupRel::
+					getCommerceAccountGroupId);
+
+		long[] commerceAccountGroupIds =
+			commerceAccountGroupIdLongStream.toArray();
 
 		document.addNumber("commerceAccountGroupIds", commerceAccountGroupIds);
 		document.addNumber(
@@ -382,16 +387,38 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 			groupIdList.add(commerceChannel.getGroupId());
 		}
 
-		document.addNumber(
-			"commerceChannelId", ArrayUtil.toLongArray(channelIdList));
-		document.addNumber(
-			"commerceOrderTypeId",
-			TransformUtil.transformToLongArray(
-				_commerceDiscountOrderTypeRelLocalService.
-					getCommerceDiscountOrderTypeRels(
-						commerceDiscount.getCommerceDiscountId()),
-				CommerceDiscountOrderTypeRel::getCommerceOrderTypeId));
-		document.addNumber(FIELD_GROUP_IDS, ArrayUtil.toLongArray(groupIdList));
+		Stream<Long> channelIdStream = channelIdList.stream();
+
+		long[] channelIds = channelIdStream.mapToLong(
+			l -> l
+		).toArray();
+
+		document.addNumber("commerceChannelId", channelIds);
+
+		List<CommerceDiscountOrderTypeRel> commerceDiscountOrderTypeRels =
+			_commerceDiscountOrderTypeRelLocalService.
+				getCommerceDiscountOrderTypeRels(
+					commerceDiscount.getCommerceDiscountId());
+
+		Stream<CommerceDiscountOrderTypeRel>
+			commerceDiscountOrderTypeRelsStream =
+				commerceDiscountOrderTypeRels.stream();
+
+		LongStream commerceOrderTypeIdLongStream =
+			commerceDiscountOrderTypeRelsStream.mapToLong(
+				CommerceDiscountOrderTypeRel::getCommerceOrderTypeId);
+
+		long[] commerceOrderTypeIds = commerceOrderTypeIdLongStream.toArray();
+
+		document.addNumber("commerceOrderTypeId", commerceOrderTypeIds);
+
+		Stream<Long> groupIdStream = groupIdList.stream();
+
+		long[] groupIds = groupIdStream.mapToLong(
+			l -> l
+		).toArray();
+
+		document.addNumber(FIELD_GROUP_IDS, groupIds);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -435,7 +462,8 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commerceDiscount.getCompanyId(), getDocument(commerceDiscount));
+			getSearchEngineId(), commerceDiscount.getCompanyId(),
+			getDocument(commerceDiscount), isCommitImmediately());
 	}
 
 	@Override
@@ -447,10 +475,36 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommerceDiscounts(companyId);
+		reindexCommerceDiscounts(companyId);
 	}
 
-	private void _reindexCommerceDiscounts(long companyId) throws Exception {
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		service = CommerceDiscountOrderTarget.class
+	)
+	protected void registerCommerceDiscountOrderTarget(
+		CommerceDiscountOrderTarget commerceDiscountOrderTarget) {
+
+		_commerceDiscountOrderTargets.add(commerceDiscountOrderTarget);
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		service = CommerceDiscountProductTarget.class
+	)
+	protected void registerCommerceDiscountProductTarget(
+		CommerceDiscountProductTarget commerceDiscountProductTarget) {
+
+		_commerceDiscountProductTargets.add(commerceDiscountProductTarget);
+	}
+
+	protected void reindexCommerceDiscounts(long companyId)
+		throws PortalException {
+
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_commerceDiscountLocalService.getIndexableActionableDynamicQuery();
 
@@ -470,8 +524,21 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
+	}
+
+	protected void unregisterCommerceDiscountOrderTarget(
+		CommerceDiscountOrderTarget commerceDiscountOrderTarget) {
+
+		_commerceDiscountOrderTargets.remove(commerceDiscountOrderTarget);
+	}
+
+	protected void unregisterCommerceDiscountProductTarget(
+		CommerceDiscountProductTarget commerceDiscountProductTarget) {
+
+		_commerceDiscountProductTargets.remove(commerceDiscountProductTarget);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -494,15 +561,15 @@ public class CommerceDiscountIndexer extends BaseIndexer<CommerceDiscount> {
 	@Reference
 	private CommerceDiscountLocalService _commerceDiscountLocalService;
 
-	private ServiceTrackerList<CommerceDiscountOrderTarget>
-		_commerceDiscountOrderTargetServiceTrackerList;
+	private final List<CommerceDiscountOrderTarget>
+		_commerceDiscountOrderTargets = new CopyOnWriteArrayList<>();
 
 	@Reference
 	private CommerceDiscountOrderTypeRelLocalService
 		_commerceDiscountOrderTypeRelLocalService;
 
-	private ServiceTrackerList<CommerceDiscountProductTarget>
-		_commerceDiscountProductTargetServiceTrackerList;
+	private final List<CommerceDiscountProductTarget>
+		_commerceDiscountProductTargets = new CopyOnWriteArrayList<>();
 
 	@Reference
 	private CommerceDiscountTargetRegistry _commerceDiscountTargetRegistry;

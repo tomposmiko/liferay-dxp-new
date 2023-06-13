@@ -12,20 +12,15 @@
  * details.
  */
 
-import {
-	TObjectField,
-	TObjectLayoutRow,
-	TObjectRelationship,
-} from '../components/Layout/types';
-export declare function findObjectLayoutRowIndex(
+import {TObjectLayoutRow} from '../components/layout/types';
+declare type TFindObjectLayoutRowIndex = (
 	objectLayoutRows: TObjectLayoutRow[],
-	fieldSize: number
-): number;
-export declare function findObjectFieldIndexById(
-	objectFields: TObjectField[] | TObjectRelationship[],
-	objectFieldId: number
-): number;
-export declare function findObjectFieldIndexByName(
-	objectFields: TObjectField[] | TObjectRelationship[],
-	objectFieldName: string
-): number;
+	size: number
+) => number;
+export declare const findObjectLayoutRowIndex: TFindObjectLayoutRowIndex;
+declare type TFindObjectFieldIndex = (
+	object: any[],
+	objectId: number
+) => number;
+export declare const findObjectFieldIndex: TFindObjectFieldIndex;
+export {};

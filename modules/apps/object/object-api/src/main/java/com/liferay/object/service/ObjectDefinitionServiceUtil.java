@@ -40,37 +40,15 @@ public class ObjectDefinitionServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectDefinitionServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static ObjectDefinition addCustomObjectDefinition(
-			boolean enableComments, boolean enableLocalization,
 			Map<java.util.Locale, String> labelMap, String name,
 			String panelAppOrder, String panelCategoryKey,
 			Map<java.util.Locale, String> pluralLabelMap, String scope,
-			String storageType,
 			List<com.liferay.object.model.ObjectField> objectFields)
 		throws PortalException {
 
 		return getService().addCustomObjectDefinition(
-			enableComments, enableLocalization, labelMap, name, panelAppOrder,
-			panelCategoryKey, pluralLabelMap, scope, storageType, objectFields);
-	}
-
-	public static ObjectDefinition addObjectDefinition(
-			String externalReferenceCode)
-		throws PortalException {
-
-		return getService().addObjectDefinition(externalReferenceCode);
-	}
-
-	public static ObjectDefinition addSystemObjectDefinition(
-			long userId, boolean enableComments,
-			Map<java.util.Locale, String> labelMap, String name,
-			String panelAppOrder, String panelCategoryKey,
-			Map<java.util.Locale, String> pluralLabelMap, String scope,
-			List<com.liferay.object.model.ObjectField> objectFields)
-		throws PortalException {
-
-		return getService().addSystemObjectDefinition(
-			userId, enableComments, labelMap, name, panelAppOrder,
-			panelCategoryKey, pluralLabelMap, scope, objectFields);
+			labelMap, name, panelAppOrder, panelCategoryKey, pluralLabelMap,
+			scope, objectFields);
 	}
 
 	public static ObjectDefinition deleteObjectDefinition(
@@ -80,26 +58,10 @@ public class ObjectDefinitionServiceUtil {
 		return getService().deleteObjectDefinition(objectDefinitionId);
 	}
 
-	public static ObjectDefinition fetchObjectDefinitionByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().fetchObjectDefinitionByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	public static ObjectDefinition getObjectDefinition(long objectDefinitionId)
 		throws PortalException {
 
 		return getService().getObjectDefinition(objectDefinitionId);
-	}
-
-	public static ObjectDefinition getObjectDefinitionByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getObjectDefinitionByExternalReferenceCode(
-			externalReferenceCode, companyId);
 	}
 
 	public static List<ObjectDefinition> getObjectDefinitions(
@@ -140,57 +102,18 @@ public class ObjectDefinitionServiceUtil {
 		return getService().publishCustomObjectDefinition(objectDefinitionId);
 	}
 
-	public static ObjectDefinition publishSystemObjectDefinition(
-			long objectDefinitionId)
-		throws PortalException {
-
-		return getService().publishSystemObjectDefinition(objectDefinitionId);
-	}
-
 	public static ObjectDefinition updateCustomObjectDefinition(
-			String externalReferenceCode, long objectDefinitionId,
-			long accountEntryRestrictedObjectFieldId,
-			long descriptionObjectFieldId, long titleObjectFieldId,
-			boolean accountEntryRestricted, boolean active,
-			boolean enableCategorization, boolean enableComments,
-			boolean enableLocalization, boolean enableObjectEntryHistory,
+			Long objectDefinitionId, long descriptionObjectFieldId,
+			long titleObjectFieldId, boolean active,
 			Map<java.util.Locale, String> labelMap, String name,
-			String panelAppOrder, String panelCategoryKey, boolean portlet,
+			String panelAppOrder, String panelCategoryKey,
 			Map<java.util.Locale, String> pluralLabelMap, String scope)
 		throws PortalException {
 
 		return getService().updateCustomObjectDefinition(
-			externalReferenceCode, objectDefinitionId,
-			accountEntryRestrictedObjectFieldId, descriptionObjectFieldId,
-			titleObjectFieldId, accountEntryRestricted, active,
-			enableCategorization, enableComments, enableLocalization,
-			enableObjectEntryHistory, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, pluralLabelMap, scope);
-	}
-
-	public static ObjectDefinition updateExternalReferenceCode(
-			long objectDefinitionId, String externalReferenceCode)
-		throws PortalException {
-
-		return getService().updateExternalReferenceCode(
-			objectDefinitionId, externalReferenceCode);
-	}
-
-	public static ObjectDefinition updateSystemObjectDefinition(
-			String externalReferenceCode, long objectDefinitionId,
-			long titleObjectFieldId)
-		throws PortalException {
-
-		return getService().updateSystemObjectDefinition(
-			externalReferenceCode, objectDefinitionId, titleObjectFieldId);
-	}
-
-	public static ObjectDefinition updateTitleObjectFieldId(
-			long objectDefinitionId, long titleObjectFieldId)
-		throws PortalException {
-
-		return getService().updateTitleObjectFieldId(
-			objectDefinitionId, titleObjectFieldId);
+			objectDefinitionId, descriptionObjectFieldId, titleObjectFieldId,
+			active, labelMap, name, panelAppOrder, panelCategoryKey,
+			pluralLabelMap, scope);
 	}
 
 	public static ObjectDefinitionService getService() {

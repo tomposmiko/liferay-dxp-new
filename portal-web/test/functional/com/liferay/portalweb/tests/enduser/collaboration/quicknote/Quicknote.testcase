@@ -1,7 +1,6 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Util";
@@ -15,7 +14,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Quick Note Page");
+		SitePages.addPublicPage(pageName = "Quick Note Page");
 
 		Navigator.gotoPage(pageName = "Quick Note Page");
 	}
@@ -23,13 +22,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
 	@ignore = "true"
-	@priority = 2
+	@priority = "2"
 	@refactorneeded
 	test AddQuickNote {
 		Portlet.addPG(portletName = "Quick Note");

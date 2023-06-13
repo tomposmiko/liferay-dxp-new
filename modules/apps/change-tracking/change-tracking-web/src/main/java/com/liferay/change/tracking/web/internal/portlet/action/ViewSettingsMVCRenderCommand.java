@@ -15,9 +15,10 @@
 package com.liferay.change.tracking.web.internal.portlet.action;
 
 import com.liferay.change.tracking.constants.CTPortletKeys;
-import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
+import com.liferay.change.tracking.service.CTPreferencesLocalService;
 import com.liferay.change.tracking.web.internal.constants.CTWebKeys;
 import com.liferay.change.tracking.web.internal.display.context.PublicationsConfigurationDisplayContext;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -35,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/view_settings"
@@ -60,8 +62,8 @@ public class ViewSettingsMVCRenderCommand implements MVCRenderCommand {
 		PublicationsConfigurationDisplayContext
 			publicationsConfigurationDisplayContext =
 				new PublicationsConfigurationDisplayContext(
-					_ctSettingsConfigurationHelper,
-					_portal.getHttpServletRequest(renderRequest),
+					_ctPreferencesLocalService,
+					_portal.getHttpServletRequest(renderRequest), _language,
 					renderResponse);
 
 		renderRequest.setAttribute(
@@ -72,7 +74,10 @@ public class ViewSettingsMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	@Reference
-	private CTSettingsConfigurationHelper _ctSettingsConfigurationHelper;
+	private CTPreferencesLocalService _ctPreferencesLocalService;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private Portal _portal;

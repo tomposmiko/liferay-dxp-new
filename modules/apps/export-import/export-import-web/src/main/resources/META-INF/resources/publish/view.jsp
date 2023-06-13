@@ -91,7 +91,7 @@ if ((liveGroup.isStaged() && liveGroup.isStagedRemotely()) || cmd.equals(Constan
 	localPublishing = false;
 }
 
-UnicodeProperties liveGroupTypeSettingsUnicodeProperties = liveGroup.getTypeSettingsProperties();
+UnicodeProperties liveGroupTypeSettings = liveGroup.getTypeSettingsProperties();
 
 PortletURL publishTemplatesURL = PortletURLBuilder.createRenderURL(
 	renderResponse
@@ -185,15 +185,15 @@ PortletURL simplePublishRedirectURL = PortletURLBuilder.createRenderURL(
 						).setParameter(
 							"quickPublish", true
 						).setParameter(
-							"remoteAddress", liveGroupTypeSettingsUnicodeProperties.getProperty("remoteAddress")
+							"remoteAddress", liveGroupTypeSettings.getProperty("remoteAddress")
 						).setParameter(
-							"remoteGroupId", liveGroupTypeSettingsUnicodeProperties.getProperty("remoteGroupId")
+							"remoteGroupId", liveGroupTypeSettings.getProperty("remoteGroupId")
 						).setParameter(
-							"remotePathContext", liveGroupTypeSettingsUnicodeProperties.getProperty("remotePathContext")
+							"remotePathContext", liveGroupTypeSettings.getProperty("remotePathContext")
 						).setParameter(
-							"remotePort", liveGroupTypeSettingsUnicodeProperties.getProperty("remotePort")
+							"remotePort", liveGroupTypeSettings.getProperty("remotePort")
 						).setParameter(
-							"secureConnection", liveGroupTypeSettingsUnicodeProperties.getProperty("secureConnection")
+							"secureConnection", liveGroupTypeSettings.getProperty("secureConnection")
 						).setParameter(
 							"sourceGroupId", stagingGroupId
 						).setParameter(

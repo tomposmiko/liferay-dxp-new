@@ -9,8 +9,4 @@
 		<name>orderByType1</name>
 		<value>DESC</value>
 	</preference>
-	<preference>
-		<name>selectionStyle</name>
-		<value>dynamic</value>
-	</preference>
 </portlet-preferences>

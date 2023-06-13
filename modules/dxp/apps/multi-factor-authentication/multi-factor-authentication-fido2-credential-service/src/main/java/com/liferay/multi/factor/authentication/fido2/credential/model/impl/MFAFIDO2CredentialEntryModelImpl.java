@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -227,131 +228,143 @@ public class MFAFIDO2CredentialEntryModelImpl
 	public Map<String, Function<MFAFIDO2CredentialEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<MFAFIDO2CredentialEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, MFAFIDO2CredentialEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<MFAFIDO2CredentialEntry, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MFAFIDO2CredentialEntry.class.getClassLoader(),
+			MFAFIDO2CredentialEntry.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<MFAFIDO2CredentialEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<MFAFIDO2CredentialEntry, Object>>();
+		try {
+			Constructor<MFAFIDO2CredentialEntry> constructor =
+				(Constructor<MFAFIDO2CredentialEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", MFAFIDO2CredentialEntry::getMvccVersion);
-			attributeGetterFunctions.put(
-				"mfaFIDO2CredentialEntryId",
-				MFAFIDO2CredentialEntry::getMfaFIDO2CredentialEntryId);
-			attributeGetterFunctions.put(
-				"companyId", MFAFIDO2CredentialEntry::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", MFAFIDO2CredentialEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", MFAFIDO2CredentialEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", MFAFIDO2CredentialEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", MFAFIDO2CredentialEntry::getModifiedDate);
-			attributeGetterFunctions.put(
-				"credentialKey", MFAFIDO2CredentialEntry::getCredentialKey);
-			attributeGetterFunctions.put(
-				"credentialKeyHash",
-				MFAFIDO2CredentialEntry::getCredentialKeyHash);
-			attributeGetterFunctions.put(
-				"credentialType", MFAFIDO2CredentialEntry::getCredentialType);
-			attributeGetterFunctions.put(
-				"failedAttempts", MFAFIDO2CredentialEntry::getFailedAttempts);
-			attributeGetterFunctions.put(
-				"publicKeyCOSE", MFAFIDO2CredentialEntry::getPublicKeyCOSE);
-			attributeGetterFunctions.put(
-				"signatureCount", MFAFIDO2CredentialEntry::getSignatureCount);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<MFAFIDO2CredentialEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<MFAFIDO2CredentialEntry, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<MFAFIDO2CredentialEntry, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<MFAFIDO2CredentialEntry, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<MFAFIDO2CredentialEntry, Object>>();
+		Map<String, BiConsumer<MFAFIDO2CredentialEntry, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<MFAFIDO2CredentialEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<MFAFIDO2CredentialEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<MFAFIDO2CredentialEntry, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", MFAFIDO2CredentialEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<MFAFIDO2CredentialEntry, Long>)
+				MFAFIDO2CredentialEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"mfaFIDO2CredentialEntryId",
+			MFAFIDO2CredentialEntry::getMfaFIDO2CredentialEntryId);
+		attributeSetterBiConsumers.put(
+			"mfaFIDO2CredentialEntryId",
+			(BiConsumer<MFAFIDO2CredentialEntry, Long>)
+				MFAFIDO2CredentialEntry::setMfaFIDO2CredentialEntryId);
+		attributeGetterFunctions.put(
+			"companyId", MFAFIDO2CredentialEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<MFAFIDO2CredentialEntry, Long>)
+				MFAFIDO2CredentialEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", MFAFIDO2CredentialEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<MFAFIDO2CredentialEntry, Long>)
+				MFAFIDO2CredentialEntry::setUserId);
+		attributeGetterFunctions.put(
+			"userName", MFAFIDO2CredentialEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<MFAFIDO2CredentialEntry, String>)
+				MFAFIDO2CredentialEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", MFAFIDO2CredentialEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<MFAFIDO2CredentialEntry, Date>)
+				MFAFIDO2CredentialEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", MFAFIDO2CredentialEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<MFAFIDO2CredentialEntry, Date>)
+				MFAFIDO2CredentialEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"credentialKey", MFAFIDO2CredentialEntry::getCredentialKey);
+		attributeSetterBiConsumers.put(
+			"credentialKey",
+			(BiConsumer<MFAFIDO2CredentialEntry, String>)
+				MFAFIDO2CredentialEntry::setCredentialKey);
+		attributeGetterFunctions.put(
+			"credentialKeyHash", MFAFIDO2CredentialEntry::getCredentialKeyHash);
+		attributeSetterBiConsumers.put(
+			"credentialKeyHash",
+			(BiConsumer<MFAFIDO2CredentialEntry, Long>)
+				MFAFIDO2CredentialEntry::setCredentialKeyHash);
+		attributeGetterFunctions.put(
+			"credentialType", MFAFIDO2CredentialEntry::getCredentialType);
+		attributeSetterBiConsumers.put(
+			"credentialType",
+			(BiConsumer<MFAFIDO2CredentialEntry, Integer>)
+				MFAFIDO2CredentialEntry::setCredentialType);
+		attributeGetterFunctions.put(
+			"failedAttempts", MFAFIDO2CredentialEntry::getFailedAttempts);
+		attributeSetterBiConsumers.put(
+			"failedAttempts",
+			(BiConsumer<MFAFIDO2CredentialEntry, Integer>)
+				MFAFIDO2CredentialEntry::setFailedAttempts);
+		attributeGetterFunctions.put(
+			"publicKeyCOSE", MFAFIDO2CredentialEntry::getPublicKeyCOSE);
+		attributeSetterBiConsumers.put(
+			"publicKeyCOSE",
+			(BiConsumer<MFAFIDO2CredentialEntry, String>)
+				MFAFIDO2CredentialEntry::setPublicKeyCOSE);
+		attributeGetterFunctions.put(
+			"signatureCount", MFAFIDO2CredentialEntry::getSignatureCount);
+		attributeSetterBiConsumers.put(
+			"signatureCount",
+			(BiConsumer<MFAFIDO2CredentialEntry, Long>)
+				MFAFIDO2CredentialEntry::setSignatureCount);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<MFAFIDO2CredentialEntry, Long>)
-					MFAFIDO2CredentialEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"mfaFIDO2CredentialEntryId",
-				(BiConsumer<MFAFIDO2CredentialEntry, Long>)
-					MFAFIDO2CredentialEntry::setMfaFIDO2CredentialEntryId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<MFAFIDO2CredentialEntry, Long>)
-					MFAFIDO2CredentialEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<MFAFIDO2CredentialEntry, Long>)
-					MFAFIDO2CredentialEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<MFAFIDO2CredentialEntry, String>)
-					MFAFIDO2CredentialEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<MFAFIDO2CredentialEntry, Date>)
-					MFAFIDO2CredentialEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<MFAFIDO2CredentialEntry, Date>)
-					MFAFIDO2CredentialEntry::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"credentialKey",
-				(BiConsumer<MFAFIDO2CredentialEntry, String>)
-					MFAFIDO2CredentialEntry::setCredentialKey);
-			attributeSetterBiConsumers.put(
-				"credentialKeyHash",
-				(BiConsumer<MFAFIDO2CredentialEntry, Long>)
-					MFAFIDO2CredentialEntry::setCredentialKeyHash);
-			attributeSetterBiConsumers.put(
-				"credentialType",
-				(BiConsumer<MFAFIDO2CredentialEntry, Integer>)
-					MFAFIDO2CredentialEntry::setCredentialType);
-			attributeSetterBiConsumers.put(
-				"failedAttempts",
-				(BiConsumer<MFAFIDO2CredentialEntry, Integer>)
-					MFAFIDO2CredentialEntry::setFailedAttempts);
-			attributeSetterBiConsumers.put(
-				"publicKeyCOSE",
-				(BiConsumer<MFAFIDO2CredentialEntry, String>)
-					MFAFIDO2CredentialEntry::setPublicKeyCOSE);
-			attributeSetterBiConsumers.put(
-				"signatureCount",
-				(BiConsumer<MFAFIDO2CredentialEntry, Long>)
-					MFAFIDO2CredentialEntry::setSignatureCount);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -895,13 +908,44 @@ public class MFAFIDO2CredentialEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<MFAFIDO2CredentialEntry, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<MFAFIDO2CredentialEntry, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<MFAFIDO2CredentialEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((MFAFIDO2CredentialEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, MFAFIDO2CredentialEntry>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						MFAFIDO2CredentialEntry.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -922,8 +966,7 @@ public class MFAFIDO2CredentialEntryModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<MFAFIDO2CredentialEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

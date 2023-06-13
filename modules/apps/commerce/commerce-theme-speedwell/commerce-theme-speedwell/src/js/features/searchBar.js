@@ -13,15 +13,15 @@
  */
 
 (function (w) {
-	const searchToggles = w.document.querySelectorAll('.js-toggle-search');
-	const HAS_SEARCH_CLASS = 'has-search';
-	const IS_OPEN_CLASS = 'is-open';
-	const IS_ACTIVE_CLASS = 'is-active';
-	const SEARCHBAR_SELECTOR = '.speedwell-search';
+	var searchToggles = w.document.querySelectorAll('.js-toggle-search'),
+		HAS_SEARCH_CLASS = 'has-search',
+		IS_OPEN_CLASS = 'is-open',
+		IS_ACTIVE_CLASS = 'is-active',
+		SEARCHBAR_SELECTOR = '.speedwell-search';
 
-	let searchBarElement;
+	var searchBarElement;
 
-	const searchBar = w.Liferay.component('search-bar');
+	var searchBar = w.Liferay.component('search-bar');
 
 	if (searchBar) {
 		searchBarElement = w.document.querySelector(SEARCHBAR_SELECTOR);

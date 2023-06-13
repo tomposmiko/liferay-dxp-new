@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.SubscriptionTable;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.model.impl.SubscriptionImpl;
 import com.liferay.portal.model.impl.SubscriptionModelImpl;
 
@@ -32,13 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @deprecated
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portal.model.impl.SubscriptionImpl",
-		"table.name=Subscription"
-	},
-	service = ArgumentsResolver.class
-)
 public class SubscriptionModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

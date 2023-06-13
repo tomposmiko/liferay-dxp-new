@@ -52,7 +52,7 @@ public class MinimalWorkflowCapability
 			long userId, FileEntry fileEntry, ServiceContext serviceContext)
 		throws PortalException {
 
-		_updateStatus(userId, fileEntry, serviceContext);
+		doUpdateStatus(userId, fileEntry, serviceContext);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class MinimalWorkflowCapability
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_updateStatus(userId, fileEntry, serviceContext);
+		doUpdateStatus(userId, fileEntry, serviceContext);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class MinimalWorkflowCapability
 			long userId, FileEntry fileEntry, ServiceContext serviceContext)
 		throws PortalException {
 
-		_updateStatus(userId, fileEntry, serviceContext);
+		doUpdateStatus(userId, fileEntry, serviceContext);
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class MinimalWorkflowCapability
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_updateStatus(userId, fileEntry, serviceContext);
+		doUpdateStatus(userId, fileEntry, serviceContext);
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class MinimalWorkflowCapability
 		return new LiferayWorkflowRepositoryWrapper(repository, this);
 	}
 
-	private void _updateStatus(
+	protected void doUpdateStatus(
 			long userId, FileEntry fileEntry, ServiceContext serviceContext)
 		throws PortalException {
 

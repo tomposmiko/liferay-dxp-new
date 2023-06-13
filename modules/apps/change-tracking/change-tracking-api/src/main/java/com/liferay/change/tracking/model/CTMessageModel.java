@@ -134,8 +134,4 @@ public interface CTMessageModel
 	@Override
 	public CTMessage cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

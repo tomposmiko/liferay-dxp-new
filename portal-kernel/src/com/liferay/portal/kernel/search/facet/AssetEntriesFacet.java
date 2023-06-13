@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 
 /**
@@ -74,6 +73,12 @@ public class AssetEntriesFacet extends MultiValueFacet {
 			Indexer<?> indexer = IndexerRegistryUtil.getIndexer(entryClassName);
 
 			if (indexer == null) {
+				continue;
+			}
+
+			String searchEngineId = searchContext.getSearchEngineId();
+
+			if (!searchEngineId.equals(indexer.getSearchEngineId())) {
 				continue;
 			}
 
@@ -128,7 +133,7 @@ public class AssetEntriesFacet extends MultiValueFacet {
 				}
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -221,8 +226,11 @@ public class AssetEntriesFacet extends MultiValueFacet {
 		facetBooleanFilter.addTerm(Field.ENTRY_CLASS_NAME, className);
 
 		if (searchContext.getUserId() > 0) {
+			SearchPermissionChecker searchPermissionChecker =
+				SearchEngineHelperUtil.getSearchPermissionChecker();
+
 			facetBooleanFilter =
-				_searchPermissionChecker.getPermissionBooleanFilter(
+				searchPermissionChecker.getPermissionBooleanFilter(
 					searchContext.getCompanyId(), searchContext.getGroupIds(),
 					searchContext.getUserId(), className, facetBooleanFilter,
 					searchContext);
@@ -233,10 +241,5 @@ public class AssetEntriesFacet extends MultiValueFacet {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetEntriesFacet.class);
-
-	private static volatile SearchPermissionChecker _searchPermissionChecker =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			SearchPermissionChecker.class, AssetEntriesFacet.class,
-			"_searchPermissionChecker", false);
 
 }

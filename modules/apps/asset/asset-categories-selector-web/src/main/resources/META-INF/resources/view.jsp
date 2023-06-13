@@ -19,6 +19,6 @@
 <liferay-ui:success key="categoryAdded" message='<%= GetterUtil.getString(MultiSessionMessages.get(renderRequest, "categoryAdded")) %>' />
 
 <react:component
-	module="js/SelectCategory"
+	module="js/SelectCategory.es"
 	props="<%= assetCategoriesSelectorDisplayContext.getData() %>"
 />

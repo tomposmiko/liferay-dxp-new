@@ -21,13 +21,12 @@ import com.liferay.commerce.product.service.CPDefinitionLinkService;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.RelatedProduct;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.RelatedProductDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.RelatedProductUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.RelatedProductResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
@@ -48,11 +47,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/related-product.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, RelatedProductResource.class}
 )
-@CTAware
 public class RelatedProductResourceImpl
 	extends BaseRelatedProductResourceImpl implements NestedFieldSupport {
 
@@ -216,11 +215,8 @@ public class RelatedProductResourceImpl
 	@Reference
 	private CPDefinitionService _cpDefinitionService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.RelatedProductDTOConverter)"
-	)
-	private DTOConverter<CPDefinitionLink, RelatedProduct>
-		_relatedProductDTOConverter;
+	@Reference
+	private RelatedProductDTOConverter _relatedProductDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

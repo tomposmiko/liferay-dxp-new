@@ -21,11 +21,9 @@ package com.liferay.commerce.frontend.model;
 public class ShipmentItem {
 
 	public ShipmentItem(
-		String externalReferenceCode, long orderId, int orderedQuantity,
-		long shipmentItemId, int shippedQuantity, String sku,
-		int toSendQuantity, String warehouse) {
+		long orderId, int orderedQuantity, long shipmentItemId,
+		int shippedQuantity, String sku, int toSendQuantity, String warehouse) {
 
-		_externalReferenceCode = externalReferenceCode;
 		_orderId = orderId;
 		_orderedQuantity = orderedQuantity;
 		_shipmentItemId = shipmentItemId;
@@ -33,10 +31,6 @@ public class ShipmentItem {
 		_sku = sku;
 		_toSendQuantity = toSendQuantity;
 		_warehouse = warehouse;
-	}
-
-	public String getExternalReferenceCode() {
-		return _externalReferenceCode;
 	}
 
 	public int getOrderedQuantity() {
@@ -67,7 +61,6 @@ public class ShipmentItem {
 		return _warehouse;
 	}
 
-	private final String _externalReferenceCode;
 	private final int _orderedQuantity;
 	private final long _orderId;
 	private final long _shipmentItemId;

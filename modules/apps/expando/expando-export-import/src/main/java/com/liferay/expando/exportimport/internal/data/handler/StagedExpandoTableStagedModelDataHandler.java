@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Akos Thurzo
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class StagedExpandoTableStagedModelDataHandler
 	extends BaseStagedModelDataHandler<StagedExpandoTable> {
 
@@ -114,8 +114,15 @@ public class StagedExpandoTableStagedModelDataHandler
 	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.expando.kernel.model.adapter.StagedExpandoTable)"
+		target = "(model.class.name=com.liferay.expando.kernel.model.adapter.StagedExpandoTable)",
+		unbind = "-"
 	)
+	protected void setStagedModelRepository(
+		StagedModelRepository<StagedExpandoTable> stagedModelRepository) {
+
+		_stagedModelRepository = stagedModelRepository;
+	}
+
 	private StagedModelRepository<StagedExpandoTable> _stagedModelRepository;
 
 }

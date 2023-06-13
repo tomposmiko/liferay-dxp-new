@@ -14,8 +14,15 @@
 
 package com.liferay.object.web.internal.object.entries.portlet.action;
 
-import com.liferay.object.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.object.entries.display.context.ObjectEntryDisplayContextFactory;
+import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
+import com.liferay.item.selector.ItemSelector;
+import com.liferay.list.type.service.ListTypeEntryLocalService;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectLayoutLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.web.internal.object.entries.display.context.ObjectEntryDisplayContext;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -24,18 +31,29 @@ import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @author Marco Leo
  */
 public class EditObjectEntryMVCRenderCommand implements MVCRenderCommand {
 
 	public EditObjectEntryMVCRenderCommand(
-		ObjectEntryDisplayContextFactory objectEntryDisplayContextFactory,
+		DDMFormRenderer ddmFormRenderer, ItemSelector itemSelector,
+		ListTypeEntryLocalService listTypeEntryLocalService,
+		ObjectDefinitionLocalService objectDefinitionLocalService,
+		ObjectEntryService objectEntryService,
+		ObjectFieldLocalService objectFieldLocalService,
+		ObjectLayoutLocalService objectLayoutLocalService,
+		ObjectRelationshipLocalService objectRelationshipLocalService,
 		Portal portal) {
 
-		_objectEntryDisplayContextFactory = objectEntryDisplayContextFactory;
+		_ddmFormRenderer = ddmFormRenderer;
+		_itemSelector = itemSelector;
+		_listTypeEntryLocalService = listTypeEntryLocalService;
+		_objectDefinitionLocalService = objectDefinitionLocalService;
+		_objectEntryService = objectEntryService;
+		_objectFieldLocalService = objectFieldLocalService;
+		_objectLayoutLocalService = objectLayoutLocalService;
+		_objectRelationshipLocalService = objectRelationshipLocalService;
 		_portal = portal;
 	}
 
@@ -44,21 +62,27 @@ public class EditObjectEntryMVCRenderCommand implements MVCRenderCommand {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws PortletException {
 
-		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
-			renderRequest);
-
-		httpServletRequest.setAttribute(
-			ObjectWebKeys.OBJECT_ENTRY_READ_ONLY, Boolean.FALSE);
-
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			_objectEntryDisplayContextFactory.create(httpServletRequest));
+			new ObjectEntryDisplayContext(
+				_ddmFormRenderer, _portal.getHttpServletRequest(renderRequest),
+				_itemSelector, _listTypeEntryLocalService,
+				_objectDefinitionLocalService, _objectEntryService,
+				_objectFieldLocalService, _objectLayoutLocalService,
+				_objectRelationshipLocalService));
 
 		return "/object_entries/edit_object_entry.jsp";
 	}
 
-	private final ObjectEntryDisplayContextFactory
-		_objectEntryDisplayContextFactory;
+	private final DDMFormRenderer _ddmFormRenderer;
+	private final ItemSelector _itemSelector;
+	private final ListTypeEntryLocalService _listTypeEntryLocalService;
+	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
+	private final ObjectEntryService _objectEntryService;
+	private final ObjectFieldLocalService _objectFieldLocalService;
+	private final ObjectLayoutLocalService _objectLayoutLocalService;
+	private final ObjectRelationshipLocalService
+		_objectRelationshipLocalService;
 	private final Portal _portal;
 
 }

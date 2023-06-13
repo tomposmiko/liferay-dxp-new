@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -30,7 +29,6 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.saml.constants.SamlPortletKeys;
@@ -69,6 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.saml.runtime.configuration.SamlKeyStoreManagerConfiguration",
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN,
 		"mvc.command.name=/admin/update_certificate"
@@ -76,6 +75,53 @@ import org.osgi.service.component.annotations.Reference;
 	service = MVCActionCommand.class
 )
 public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
+
+	protected void authenticateCertificate(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		LocalEntityManager.CertificateUsage certificateUsage =
+			LocalEntityManager.CertificateUsage.valueOf(
+				ParamUtil.getString(actionRequest, "certificateUsage"));
+
+		UnicodeProperties unicodeProperties = PropertiesParamUtil.getProperties(
+			actionRequest, "settings--");
+
+		String keystoreCredentialPassword = unicodeProperties.getProperty(
+			getCertificateUsagePropertyKey(certificateUsage));
+
+		if (Validator.isNotNull(keystoreCredentialPassword)) {
+			_samlProviderConfigurationHelper.updateProperties(
+				unicodeProperties);
+		}
+
+		try {
+			X509Certificate x509Certificate =
+				_localEntityManager.getLocalEntityCertificate(certificateUsage);
+
+			actionRequest.setAttribute(
+				SamlWebKeys.SAML_X509_CERTIFICATE, x509Certificate);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			SessionErrors.add(
+				actionRequest, CertificateKeyPasswordException.class);
+		}
+
+		actionResponse.setRenderParameter(
+			"mvcRenderCommandName", "/admin/update_certificate");
+	}
+
+	protected void deleteCertificate(ActionRequest actionRequest)
+		throws Exception {
+
+		_localEntityManager.deleteLocalEntityCertificate(
+			LocalEntityManager.CertificateUsage.valueOf(
+				ParamUtil.getString(actionRequest, "certificateUsage")));
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -95,69 +141,22 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		String cmd = ParamUtil.get(actionRequest, Constants.CMD, "auth");
 
 		if (cmd.equals("auth")) {
-			_authenticateCertificate(actionRequest, actionResponse);
+			authenticateCertificate(actionRequest, actionResponse);
 		}
 		else if (cmd.equals("delete")) {
-			_deleteCertificate(actionRequest);
+			deleteCertificate(actionRequest);
 		}
 		else if (cmd.equals("import")) {
-			_importCertificate(actionRequest, themeDisplay.getUser());
+			importCertificate(actionRequest, themeDisplay.getUser());
 		}
 		else if (cmd.equals("replace")) {
-			_replaceCertificate(actionRequest, actionResponse);
+			replaceCertificate(actionRequest);
 		}
 	}
 
-	private void _authenticateCertificate(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		LocalEntityManager.CertificateUsage certificateUsage =
-			LocalEntityManager.CertificateUsage.valueOf(
-				ParamUtil.getString(actionRequest, "certificateUsage"));
-
-		UnicodeProperties unicodeProperties = PropertiesParamUtil.getProperties(
-			actionRequest, "settings--");
-
-		String keystoreCredentialPassword = unicodeProperties.getProperty(
-			_getCertificateUsagePropertyKey(certificateUsage));
-
-		if (Validator.isNotNull(keystoreCredentialPassword)) {
-			_samlProviderConfigurationHelper.updateProperties(
-				unicodeProperties);
-		}
-
-		try {
-			X509Certificate x509Certificate =
-				_localEntityManager.getLocalEntityCertificate(certificateUsage);
-
-			actionRequest.setAttribute(
-				SamlWebKeys.SAML_X509_CERTIFICATE, x509Certificate);
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			SessionErrors.add(
-				actionRequest, CertificateKeyPasswordException.class);
-		}
-
-		actionResponse.setRenderParameter(
-			"mvcRenderCommandName", "/admin/update_certificate");
-	}
-
-	private void _deleteCertificate(ActionRequest actionRequest)
-		throws Exception {
-
-		_localEntityManager.deleteLocalEntityCertificate(
-			LocalEntityManager.CertificateUsage.valueOf(
-				ParamUtil.getString(actionRequest, "certificateUsage")));
-	}
-
-	private String _getCertificateUsagePropertyKey(
+	protected String getCertificateUsagePropertyKey(
 			LocalEntityManager.CertificateUsage certificateUsage)
-		throws Exception {
+		throws UnsupportedBindingException {
 
 		if (certificateUsage == LocalEntityManager.CertificateUsage.SIGNING) {
 			return PortletPropsKeys.SAML_KEYSTORE_CREDENTIAL_PASSWORD;
@@ -168,12 +167,13 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			return PortletPropsKeys.
 				SAML_KEYSTORE_ENCRYPTION_CREDENTIAL_PASSWORD;
 		}
-
-		throw new UnsupportedBindingException(
-			"Unsupported certificate usage: " + certificateUsage.name());
+		else {
+			throw new UnsupportedBindingException(
+				"Unsupported certificate usage: " + certificateUsage.name());
+		}
 	}
 
-	private void _importCertificate(ActionRequest actionRequest, User user)
+	protected void importCertificate(ActionRequest actionRequest, User user)
 		throws Exception {
 
 		hideDefaultSuccessMessage(actionRequest);
@@ -217,7 +217,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		}
 		catch (CertificateException certificateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(certificateException);
+				_log.debug(certificateException, certificateException);
 			}
 
 			SessionErrors.add(actionRequest, "certificateException");
@@ -235,7 +235,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		}
 		catch (KeyStoreException | NoSuchAlgorithmException exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			if (keyStore == null) {
@@ -252,7 +252,8 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 		}
 		catch (UnrecoverableEntryException unrecoverableEntryException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(unrecoverableEntryException);
+				_log.debug(
+					unrecoverableEntryException, unrecoverableEntryException);
 			}
 
 			SessionErrors.add(actionRequest, "incorrectKeyPassword");
@@ -270,11 +271,12 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			privateKeyEntry.getPrivateKey(), keyStorePassword, x509Certificate,
 			certificateUsage);
 
-		_samlProviderConfigurationHelper.updateProperties(
-			UnicodePropertiesBuilder.put(
-				_getCertificateUsagePropertyKey(certificateUsage),
-				keyStorePassword
-			).build());
+		UnicodeProperties unicodeProperties = new UnicodeProperties();
+
+		unicodeProperties.setProperty(
+			getCertificateUsagePropertyKey(certificateUsage), keyStorePassword);
+
+		_samlProviderConfigurationHelper.updateProperties(unicodeProperties);
 
 		SamlTempFileEntryUtil.deleteTempFileEntry(user, selectUploadedFile);
 
@@ -282,11 +284,8 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 			SamlWebKeys.SAML_X509_CERTIFICATE, x509Certificate);
 	}
 
-	private void _replaceCertificate(
-			ActionRequest actionRequest, ActionResponse actionResponse)
+	protected void replaceCertificate(ActionRequest actionRequest)
 		throws Exception {
-
-		hideDefaultSuccessMessage(actionRequest);
 
 		UnicodeProperties unicodeProperties = PropertiesParamUtil.getProperties(
 			actionRequest, "settings--");
@@ -296,7 +295,7 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 				ParamUtil.getString(actionRequest, "certificateUsage"));
 
 		String keystoreCredentialPassword = unicodeProperties.getProperty(
-			_getCertificateUsagePropertyKey(certificateUsage));
+			getCertificateUsagePropertyKey(certificateUsage));
 
 		if (Validator.isNull(keystoreCredentialPassword)) {
 			throw new CertificateKeyPasswordException();
@@ -353,7 +352,6 @@ public class UpdateCertificateMVCActionCommand extends BaseMVCActionCommand {
 
 		actionRequest.setAttribute(
 			SamlWebKeys.SAML_X509_CERTIFICATE, x509Certificate);
-		actionResponse.setWindowState(LiferayWindowState.EXCLUSIVE);
 	}
 
 	private static final String _SHA256_PREFIX = "SHA256with";

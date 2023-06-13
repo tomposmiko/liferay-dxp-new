@@ -42,6 +42,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Date;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -61,13 +62,11 @@ public class ElasticsearchSortFieldTranslatorTest
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 	}
 
 	@After
-	@Override
 	public void tearDown() throws Exception {
 		super.tearDown();
 	}
@@ -78,18 +77,18 @@ public class ElasticsearchSortFieldTranslatorTest
 
 		addDocuments(
 			value -> DocumentCreationHelpers.singleKeyword(fieldName, value),
-			"beta", "alpha beta", "beta gamma");
+			Stream.of("beta", "alpha beta", "beta gamma"));
 
 		FieldSort fieldSort = _sorts.field(fieldName, SortOrder.DESC);
 
-		_assertOrder(
+		assertOrder(
 			new Sort[] {fieldSort}, fieldName, "[beta gamma, beta, alpha beta]",
 			null);
 	}
 
 	@Test
 	public void testFieldSortNumber() throws Exception {
-		_addDocuments(
+		addDocuments(
 			value -> document -> {
 				document.addDate(
 					Field.MODIFIED_DATE, new Date(value.longValue()));
@@ -99,7 +98,7 @@ public class ElasticsearchSortFieldTranslatorTest
 
 		FieldSort fieldSort = _sorts.field(Field.PRIORITY, SortOrder.DESC);
 
-		_assertOrder(
+		assertOrder(
 			new Sort[] {fieldSort}, Field.PRIORITY, "[3.0, 2.0, 1.0]", null);
 	}
 
@@ -109,7 +108,7 @@ public class ElasticsearchSortFieldTranslatorTest
 
 		addDocuments(
 			value -> DocumentCreationHelpers.singleText(fieldName, value),
-			"delta", "alpha delta", "delta gamma");
+			Stream.of("delta", "alpha delta", "delta gamma"));
 
 		FieldSort fieldSortMissing = _sorts.field(fieldName + "_String");
 
@@ -117,7 +116,7 @@ public class ElasticsearchSortFieldTranslatorTest
 
 		Query query = new MatchQuery(fieldName, "delta");
 
-		_assertOrder(
+		assertOrder(
 			new Sort[] {fieldSortMissing}, fieldName,
 			"[delta, alpha delta, delta gamma]", query);
 	}
@@ -147,7 +146,7 @@ public class ElasticsearchSortFieldTranslatorTest
 		geoDistanceSort.setSortMode(SortMode.MIN);
 		geoDistanceSort.setSortOrder(SortOrder.DESC);
 
-		_assertOrder(
+		assertOrder(
 			new Sort[] {geoDistanceSort}, fieldName,
 			"[lat: 90.0, lon: 98.0, lat: 40.0, lon: 20.0, lat: 3.0, lon: 9.0]",
 			null);
@@ -160,7 +159,7 @@ public class ElasticsearchSortFieldTranslatorTest
 		addDocuments(
 			value -> DocumentCreationHelpers.singleText(
 				fieldNameForScoreSort, value),
-			"beta", "alpha beta", "beta gamma", "gamma");
+			Stream.of("beta", "alpha beta", "beta gamma", "gamma"));
 
 		ScoreSort scoreSort = _sorts.score();
 
@@ -169,14 +168,14 @@ public class ElasticsearchSortFieldTranslatorTest
 		Query query = new MatchQuery(
 			fieldNameForScoreSort, "beta beta beta gamma");
 
-		_assertOrder(
+		assertOrder(
 			new Sort[] {scoreSort}, fieldNameForScoreSort,
 			"[gamma, alpha beta, beta, beta gamma]", query);
 	}
 
 	@Test
 	public void testScriptSort() throws Exception {
-		_addDocuments(
+		addDocuments(
 			value -> document -> {
 				document.addDate(
 					Field.MODIFIED_DATE, new Date(value.longValue()));
@@ -197,7 +196,7 @@ public class ElasticsearchSortFieldTranslatorTest
 
 		scriptSort.setSortOrder(SortOrder.DESC);
 
-		_assertOrder(
+		assertOrder(
 			new Sort[] {scriptSort}, Field.PRIORITY, "[3.0, 2.0, 1.0]", null);
 	}
 
@@ -216,12 +215,7 @@ public class ElasticsearchSortFieldTranslatorTest
 	public void testSort3() throws Exception {
 	}
 
-	@Override
-	protected IndexingFixture createIndexingFixture() throws Exception {
-		return LiferayElasticsearchIndexingFixtureFactory.getInstance();
-	}
-
-	private void _addDocuments(
+	protected void addDocuments(
 			Function<Double, DocumentCreationHelper> function, double... values)
 		throws Exception {
 
@@ -230,7 +224,13 @@ public class ElasticsearchSortFieldTranslatorTest
 		}
 	}
 
-	private void _assertOrder(
+	protected void assertOrder(
+		Sort[] sorts, String fieldName, String expected) {
+
+		assertOrder(sorts, fieldName, expected, null);
+	}
+
+	protected void assertOrder(
 		Sort[] sorts, String fieldName, String expected, Query query) {
 
 		assertSearch(
@@ -249,6 +249,11 @@ public class ElasticsearchSortFieldTranslatorTest
 						indexingTestHelper.getRequestString(), hits.getDocs(),
 						fieldName, expected));
 			});
+	}
+
+	@Override
+	protected IndexingFixture createIndexingFixture() throws Exception {
+		return LiferayElasticsearchIndexingFixtureFactory.getInstance();
 	}
 
 	private static final Scripts _scripts = new ScriptsImpl();

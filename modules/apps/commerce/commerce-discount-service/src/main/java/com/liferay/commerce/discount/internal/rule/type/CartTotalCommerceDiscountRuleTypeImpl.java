@@ -23,7 +23,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.util.CommerceBigDecimalUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.math.BigDecimal;
@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.discount.rule.type.key=" + CommerceDiscountRuleConstants.TYPE_CART_TOTAL,
 		"commerce.discount.rule.type.order:Integer=10"
@@ -91,14 +92,11 @@ public class CartTotalCommerceDiscountRuleTypeImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle, CommerceDiscountRuleConstants.TYPE_CART_TOTAL);
 	}
 
 	@Reference
 	private CommerceOrderPriceCalculation _commerceOrderPriceCalculation;
-
-	@Reference
-	private Language _language;
 
 }

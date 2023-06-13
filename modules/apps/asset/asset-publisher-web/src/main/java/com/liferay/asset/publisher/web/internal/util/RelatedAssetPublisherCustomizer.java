@@ -14,13 +14,10 @@
 
 package com.liferay.asset.publisher.web.internal.util;
 
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Pavel Savinov
  */
-@Component(service = AssetPublisherCustomizer.class)
+@Component(immediate = true, service = AssetPublisherCustomizer.class)
 public class RelatedAssetPublisherCustomizer
 	extends DefaultAssetPublisherCustomizer {
 
@@ -88,13 +85,13 @@ public class RelatedAssetPublisherCustomizer
 		AssetEntryQuery assetEntryQuery,
 		HttpServletRequest httpServletRequest) {
 
-		Set<Long> linkedAssetEntryIds =
-			(Set<Long>)httpServletRequest.getAttribute(
-				WebKeys.LINKED_ASSET_ENTRY_IDS);
+		AssetEntry layoutAssetEntry =
+			(AssetEntry)httpServletRequest.getAttribute(
+				WebKeys.LAYOUT_ASSET_ENTRY);
 
-		if (SetUtil.isNotEmpty(linkedAssetEntryIds)) {
-			assetEntryQuery.setLinkedAssetEntryIds(
-				ArrayUtil.toLongArray(linkedAssetEntryIds));
+		if (layoutAssetEntry != null) {
+			assetEntryQuery.setLinkedAssetEntryId(
+				layoutAssetEntry.getEntryId());
 		}
 	}
 

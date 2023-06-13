@@ -27,10 +27,6 @@ public class CommerceAddressLocalServiceWrapper
 	implements CommerceAddressLocalService,
 			   ServiceWrapper<CommerceAddressLocalService> {
 
-	public CommerceAddressLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAddressLocalServiceWrapper(
 		CommerceAddressLocalService commerceAddressLocalService) {
 
@@ -87,12 +83,12 @@ public class CommerceAddressLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.model.CommerceAddress copyCommerceAddress(
-			long sourceCommerceAddressId, String className, long classPK,
+			long commerceAddressId, String className, long classPK,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceAddressLocalService.copyCommerceAddress(
-			sourceCommerceAddressId, className, classPK, serviceContext);
+			commerceAddressId, className, classPK, serviceContext);
 	}
 
 	@Override
@@ -110,6 +106,15 @@ public class CommerceAddressLocalServiceWrapper
 
 		return _commerceAddressLocalService.deleteCommerceAddress(
 			commerceAddress);
+	}
+
+	@Override
+	public com.liferay.commerce.model.CommerceAddress deleteCommerceAddress(
+			long commerceAddressId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commerceAddressLocalService.deleteCommerceAddress(
+			commerceAddressId);
 	}
 
 	@Override
@@ -182,16 +187,6 @@ public class CommerceAddressLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.commerce.model.CommerceAddress>
-		getBillingCommerceAddresses(
-			long channelId, String className, long classPK, int start,
-			int end) {
-
-		return _commerceAddressLocalService.getBillingCommerceAddresses(
-			channelId, className, classPK, start, end);
-	}
-
-	@Override
-	public java.util.List<com.liferay.commerce.model.CommerceAddress>
 			getBillingCommerceAddresses(
 				long companyId, String className, long classPK, String keywords,
 				int start, int end, com.liferay.portal.kernel.search.Sort sort)
@@ -199,14 +194,6 @@ public class CommerceAddressLocalServiceWrapper
 
 		return _commerceAddressLocalService.getBillingCommerceAddresses(
 			companyId, className, classPK, keywords, start, end, sort);
-	}
-
-	@Override
-	public int getBillingCommerceAddressesCount(
-		long channelId, String className, long classPK, int start, int end) {
-
-		return _commerceAddressLocalService.getBillingCommerceAddressesCount(
-			channelId, className, classPK, start, end);
 	}
 
 	@Override
@@ -336,16 +323,6 @@ public class CommerceAddressLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.commerce.model.CommerceAddress>
-		getShippingCommerceAddresses(
-			long channelId, String className, long classPK, int start,
-			int end) {
-
-		return _commerceAddressLocalService.getShippingCommerceAddresses(
-			channelId, className, classPK, start, end);
-	}
-
-	@Override
-	public java.util.List<com.liferay.commerce.model.CommerceAddress>
 			getShippingCommerceAddresses(
 				long companyId, String className, long classPK, String keywords,
 				int start, int end, com.liferay.portal.kernel.search.Sort sort)
@@ -353,14 +330,6 @@ public class CommerceAddressLocalServiceWrapper
 
 		return _commerceAddressLocalService.getShippingCommerceAddresses(
 			companyId, className, classPK, keywords, start, end, sort);
-	}
-
-	@Override
-	public int getShippingCommerceAddressesCount(
-		long channelId, String className, long classPK, int start, int end) {
-
-		return _commerceAddressLocalService.getShippingCommerceAddressesCount(
-			channelId, className, classPK, start, end);
 	}
 
 	@Override

@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.File;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.upload.UniqueFileNameProvider;
@@ -39,6 +39,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -46,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.product.configuration.AttachmentsConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
 	service = CommerceMediaDefaultImageUploadFileEntryHandler.class
 )
 public class CommerceMediaDefaultImageUploadFileEntryHandler
@@ -69,7 +71,7 @@ public class CommerceMediaDefaultImageUploadFileEntryHandler
 		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
 				_PARAMETER_NAME)) {
 
-			return _addFileEntry(
+			return addFileEntry(
 				fileName, contentType, inputStream, themeDisplay);
 		}
 	}
@@ -80,7 +82,7 @@ public class CommerceMediaDefaultImageUploadFileEntryHandler
 			AttachmentsConfiguration.class, properties);
 	}
 
-	private FileEntry _addFileEntry(
+	protected FileEntry addFileEntry(
 			String fileName, String contentType, InputStream inputStream,
 			ThemeDisplay themeDisplay)
 		throws PortalException {
@@ -109,7 +111,7 @@ public class CommerceMediaDefaultImageUploadFileEntryHandler
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -125,7 +127,7 @@ public class CommerceMediaDefaultImageUploadFileEntryHandler
 			throw new CPAttachmentFileEntrySizeException();
 		}
 
-		String extension = _file.getExtension(fileName);
+		String extension = FileUtil.getExtension(fileName);
 
 		String[] imageExtensions = _attachmentsConfiguration.imageExtensions();
 
@@ -150,9 +152,6 @@ public class CommerceMediaDefaultImageUploadFileEntryHandler
 		CommerceMediaDefaultImageUploadFileEntryHandler.class);
 
 	private volatile AttachmentsConfiguration _attachmentsConfiguration;
-
-	@Reference
-	private File _file;
 
 	@Reference
 	private UniqueFileNameProvider _uniqueFileNameProvider;

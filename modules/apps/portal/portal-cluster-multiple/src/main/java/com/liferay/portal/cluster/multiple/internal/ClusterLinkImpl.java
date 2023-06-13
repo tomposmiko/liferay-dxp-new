@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shuyang Zhou
  */
-@Component(enabled = false, service = ClusterLink.class)
+@Component(enabled = false, immediate = true, service = ClusterLink.class)
 public class ClusterLinkImpl implements ClusterLink {
 
 	@Override
@@ -79,11 +79,11 @@ public class ClusterLinkImpl implements ClusterLink {
 		_enabled = true;
 
 		initialize(
-			_getChannelSettings(
+			getChannelSettings(
 				PropsKeys.CLUSTER_LINK_CHANNEL_LOGIC_NAME_TRANSPORT),
-			_getChannelSettings(
+			getChannelSettings(
 				PropsKeys.CLUSTER_LINK_CHANNEL_PROPERTIES_TRANSPORT),
-			_getChannelSettings(PropsKeys.CLUSTER_LINK_CHANNEL_NAME_TRANSPORT));
+			getChannelSettings(PropsKeys.CLUSTER_LINK_CHANNEL_NAME_TRANSPORT));
 	}
 
 	@Deactivate
@@ -119,64 +119,7 @@ public class ClusterLinkImpl implements ClusterLink {
 		return _clusterChannels.get(channelIndex);
 	}
 
-	protected ExecutorService getExecutorService() {
-		return _executorService;
-	}
-
-	protected List<Address> getLocalAddresses() {
-		return _localAddresses;
-	}
-
-	protected void initialize(
-		Map<String, String> channelLogicNames,
-		Map<String, String> channelPropertiesLocations,
-		Map<String, String> channelNames) {
-
-		_executorService = _portalExecutorManager.getPortalExecutor(
-			ClusterLinkImpl.class.getName());
-
-		try {
-			_initChannels(
-				channelLogicNames, channelPropertiesLocations, channelNames);
-		}
-		catch (Exception exception) {
-			_log.error("Unable to initialize channels", exception);
-
-			throw new IllegalStateException(exception);
-		}
-
-		for (ClusterReceiver clusterReceiver : _clusterReceivers) {
-			clusterReceiver.openLatch();
-		}
-	}
-
-	protected void sendLocalMessage(Message message) {
-		String destinationName = message.getDestinationName();
-
-		if (Validator.isNotNull(destinationName)) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					StringBundler.concat(
-						"Sending local cluster link message ", message, " to ",
-						destinationName));
-			}
-
-			ClusterInvokeThreadLocal.setEnabled(false);
-
-			try {
-				_messageBus.sendMessage(destinationName, message);
-			}
-			finally {
-				ClusterInvokeThreadLocal.setEnabled(true);
-			}
-		}
-		else {
-			_log.error(
-				"Local cluster link message has no destination " + message);
-		}
-	}
-
-	private Map<String, String> _getChannelSettings(String propertyPrefix) {
+	protected Map<String, String> getChannelSettings(String propertyPrefix) {
 		Map<String, String> channelSettings = new HashMap<>();
 
 		Properties channelProperties = _props.getProperties(
@@ -190,7 +133,15 @@ public class ClusterLinkImpl implements ClusterLink {
 		return channelSettings;
 	}
 
-	private void _initChannels(
+	protected ExecutorService getExecutorService() {
+		return _executorService;
+	}
+
+	protected List<Address> getLocalAddresses() {
+		return _localAddresses;
+	}
+
+	protected void initChannels(
 			Map<String, String> channelLogicNames,
 			Map<String, String> channelPropertiesLocations,
 			Map<String, String> channelNames)
@@ -238,14 +189,79 @@ public class ClusterLinkImpl implements ClusterLink {
 		}
 	}
 
+	protected void initialize(
+		Map<String, String> channelLogicNames,
+		Map<String, String> channelPropertiesLocations,
+		Map<String, String> channelNames) {
+
+		_executorService = _portalExecutorManager.getPortalExecutor(
+			ClusterLinkImpl.class.getName());
+
+		try {
+			initChannels(
+				channelLogicNames, channelPropertiesLocations, channelNames);
+		}
+		catch (Exception exception) {
+			_log.error("Unable to initialize channels", exception);
+
+			throw new IllegalStateException(exception);
+		}
+
+		for (ClusterReceiver clusterReceiver : _clusterReceivers) {
+			clusterReceiver.openLatch();
+		}
+	}
+
+	protected void sendLocalMessage(Message message) {
+		String destinationName = message.getDestinationName();
+
+		if (Validator.isNotNull(destinationName)) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Sending local cluster link message ", message, " to ",
+						destinationName));
+			}
+
+			ClusterInvokeThreadLocal.setEnabled(false);
+
+			try {
+				_messageBus.sendMessage(destinationName, message);
+			}
+			finally {
+				ClusterInvokeThreadLocal.setEnabled(true);
+			}
+		}
+		else {
+			_log.error(
+				"Local cluster link message has no destination " + message);
+		}
+	}
+
+	@Reference(unbind = "-")
+	protected void setClusterChannelFactory(
+		ClusterChannelFactory clusterChannelFactory) {
+
+		_clusterChannelFactory = clusterChannelFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortalExecutorManager(
+		PortalExecutorManager portalExecutorManager) {
+
+		_portalExecutorManager = portalExecutorManager;
+	}
+
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ClusterLinkImpl.class);
 
 	private int _channelCount;
-
-	@Reference
 	private ClusterChannelFactory _clusterChannelFactory;
-
 	private List<ClusterChannel> _clusterChannels;
 	private List<ClusterReceiver> _clusterReceivers;
 	private boolean _enabled;
@@ -255,10 +271,7 @@ public class ClusterLinkImpl implements ClusterLink {
 	@Reference
 	private MessageBus _messageBus;
 
-	@Reference
 	private PortalExecutorManager _portalExecutorManager;
-
-	@Reference
 	private Props _props;
 
 }

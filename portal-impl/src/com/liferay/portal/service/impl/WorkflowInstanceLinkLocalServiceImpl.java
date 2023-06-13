@@ -17,7 +17,6 @@ package com.liferay.portal.service.impl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.NoSuchWorkflowInstanceLinkException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -31,13 +30,11 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.workflow.DefaultWorkflowNode;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManagerUtil;
-import com.liferay.portal.kernel.workflow.WorkflowNode;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.service.base.WorkflowInstanceLinkLocalServiceBaseImpl;
 
@@ -86,8 +83,10 @@ public class WorkflowInstanceLinkLocalServiceImpl
 			long workflowInstanceLinkId)
 		throws PortalException {
 
-		return deleteWorkflowInstanceLink(
-			fetchWorkflowInstanceLink(workflowInstanceLinkId));
+		WorkflowInstanceLink workflowInstanceLink = fetchWorkflowInstanceLink(
+			workflowInstanceLinkId);
+
+		return deleteWorkflowInstanceLink(workflowInstanceLink);
 	}
 
 	@Override
@@ -95,8 +94,10 @@ public class WorkflowInstanceLinkLocalServiceImpl
 			long companyId, long groupId, String className, long classPK)
 		throws PortalException {
 
-		return deleteWorkflowInstanceLink(
-			fetchWorkflowInstanceLink(companyId, groupId, className, classPK));
+		WorkflowInstanceLink workflowInstanceLink = fetchWorkflowInstanceLink(
+			companyId, groupId, className, classPK);
+
+		return deleteWorkflowInstanceLink(workflowInstanceLink);
 	}
 
 	@Override
@@ -159,14 +160,10 @@ public class WorkflowInstanceLinkLocalServiceImpl
 			WorkflowInstanceManagerUtil.getWorkflowInstance(
 				companyId, workflowInstanceLink.getWorkflowInstanceId());
 
-		List<WorkflowNode> currentWorkflowNodes =
-			workflowInstance.getCurrentWorkflowNodes();
+		List<String> currentNodeNames = workflowInstance.getCurrentNodeNames();
 
-		if (ListUtil.isNotEmpty(currentWorkflowNodes)) {
-			DefaultWorkflowNode defaultWorkflowNode =
-				(DefaultWorkflowNode)currentWorkflowNodes.get(0);
-
-			return defaultWorkflowNode.getLabel(LocaleUtil.getDefault());
+		if (ListUtil.isNotEmpty(currentNodeNames)) {
+			return currentNodeNames.get(0);
 		}
 
 		return StringPool.BLANK;
@@ -267,7 +264,7 @@ public class WorkflowInstanceLinkLocalServiceImpl
 		}
 
 		if (userId == 0) {
-			userId = _userLocalService.getGuestUserId(companyId);
+			userId = _userLocalService.getDefaultUserId(companyId);
 		}
 
 		WorkflowHandler<?> workflowHandler =
@@ -286,9 +283,6 @@ public class WorkflowInstanceLinkLocalServiceImpl
 
 		workflowContext.put(
 			WorkflowConstants.CONTEXT_COMPANY_ID, String.valueOf(companyId));
-		workflowContext.put(
-			WorkflowConstants.CONTEXT_CT_COLLECTION_ID,
-			String.valueOf(CTCollectionThreadLocal.getCTCollectionId()));
 		workflowContext.put(
 			WorkflowConstants.CONTEXT_ENTRY_CLASS_NAME, className);
 		workflowContext.put(

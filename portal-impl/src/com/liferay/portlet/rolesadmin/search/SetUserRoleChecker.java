@@ -45,7 +45,7 @@ public class SetUserRoleChecker extends EmptyOnClickRowChecker {
 				_role.getRoleId(), user.getUserId());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -64,7 +64,7 @@ public class SetUserRoleChecker extends EmptyOnClickRowChecker {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return super.isDisabled(object);

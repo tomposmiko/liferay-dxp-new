@@ -17,9 +17,6 @@ package com.liferay.portal.search.tuning.synonyms.web.internal;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
@@ -45,6 +42,7 @@ import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIn
 import com.liferay.portal.search.tuning.synonyms.web.internal.storage.SynonymSetStorageAdapter;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import javax.portlet.ActionURL;
 import javax.portlet.MimeResponse;
@@ -54,13 +52,19 @@ import javax.portlet.RenderURL;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.mockito.AdditionalAnswers;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Wade Cao
  */
 public abstract class BaseSynonymsWebTestCase {
+
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+	}
 
 	protected Document setUpDocument(String synonyms) {
 		Document document = Mockito.mock(Document.class);
@@ -70,7 +74,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			document
 		).getString(
-			Mockito.eq(SynonymSetFields.SYNONYMS)
+			Matchers.eq(SynonymSetFields.SYNONYMS)
 		);
 
 		return document;
@@ -85,7 +89,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			httpServletRequest
 		).getAttribute(
-			Mockito.eq(paramName)
+			Matchers.eq(paramName)
 		);
 	}
 
@@ -97,7 +101,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			httpServletRequest
 		).getParameter(
-			Mockito.eq(paramName)
+			Matchers.eq(paramName)
 		);
 	}
 
@@ -110,7 +114,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			httpServletRequest
 		).getParameterValues(
-			Mockito.eq(paramName)
+			Matchers.eq(paramName)
 		);
 	}
 
@@ -118,15 +122,81 @@ public abstract class BaseSynonymsWebTestCase {
 		return Mockito.mock(IndexResponse.class);
 	}
 
+	protected void setUpLayoutIsTypeControlPanel(
+		Layout layout, boolean returnValue) {
+
+		Mockito.doReturn(
+			returnValue
+		).when(
+			layout
+		).isTypeControlPanel();
+	}
+
+	protected void setUpLayoutTypePortletHasPortletId(
+		LayoutTypePortlet layoutTypePortlet, boolean returnValue) {
+
+		Mockito.doReturn(
+			returnValue
+		).when(
+			layoutTypePortlet
+		).hasPortletId(
+			Mockito.anyString()
+		);
+	}
+
 	protected void setUpPortal(HttpServletRequest httpServletRequest) {
 		setUpHttpServletRequestAttribute(
 			httpServletRequest, WebKeys.THEME_DISPLAY,
 			Mockito.mock(ThemeDisplay.class));
 
-		_setUpPortalGetCurrentURL();
-		_setUpPortalGetHttpServletRequest(httpServletRequest);
-		_setUpPortalGetLiferayPortletRequest();
-		_setUpPortalGetOriginalServletRequest(httpServletRequest);
+		setUpPortalGetCurrentURL();
+		setUpPortalGetHttpServletRequest(httpServletRequest);
+		setUpPortalGetLiferayPortletRequest();
+		setUpPortalGetOriginalServletRequest(httpServletRequest);
+	}
+
+	protected void setUpPortalGetCurrentURL() {
+		Mockito.doReturn(
+			"currentURL"
+		).when(
+			portal
+		).getCurrentURL(
+			Matchers.any(HttpServletRequest.class)
+		);
+	}
+
+	protected void setUpPortalGetHttpServletRequest(
+		HttpServletRequest httpServletRequest) {
+
+		Mockito.doReturn(
+			httpServletRequest
+		).when(
+			portal
+		).getHttpServletRequest(
+			Matchers.any(PortletRequest.class)
+		);
+	}
+
+	protected void setUpPortalGetLiferayPortletRequest() {
+		Mockito.doReturn(
+			Mockito.mock(LiferayPortletRequest.class)
+		).when(
+			portal
+		).getLiferayPortletRequest(
+			Matchers.any(PortletRequest.class)
+		);
+	}
+
+	protected void setUpPortalGetOriginalServletRequest(
+		HttpServletRequest httpServletRequest) {
+
+		Mockito.doReturn(
+			httpServletRequest
+		).when(
+			portal
+		).getOriginalServletRequest(
+			Matchers.any(HttpServletRequest.class)
+		);
 	}
 
 	protected void setUpPortalUtil() {
@@ -135,55 +205,39 @@ public abstract class BaseSynonymsWebTestCase {
 		portalUtil.setPortal(portal);
 	}
 
-	protected void setUpPortletPreferencesFactoryUtil() throws Exception {
-		PortletPreferencesFactoryUtil portletPreferencesFactoryUtil =
-			new PortletPreferencesFactoryUtil();
-
-		PortletPreferencesFactory portletPreferencesFactory = Mockito.mock(
-			PortletPreferencesFactory.class);
-
-		portletPreferencesFactoryUtil.setPortletPreferencesFactory(
-			portletPreferencesFactory);
-
-		PortalPreferences portalPreferences = Mockito.mock(
-			PortalPreferences.class);
-
-		Mockito.when(
-			portletPreferencesFactory.getPortalPreferences(
-				Mockito.any(HttpServletRequest.class))
-		).thenReturn(
-			portalPreferences
-		);
-
-		Mockito.when(
-			portalPreferences.getValue(
-				Mockito.anyString(), Mockito.anyString(), Mockito.anyString())
-		).then(
-			AdditionalAnswers.returnsLastArg()
-		);
-	}
-
 	protected void setUpPortletRequest(PortletRequest portletRequest) {
 		Layout layout = Mockito.mock(Layout.class);
 
-		_setUpLayoutIsTypeControlPanel(layout, true);
+		setUpLayoutIsTypeControlPanel(layout, true);
 
 		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
 
-		_setUpThemeDisplayGetLayout(themeDisplay, layout);
+		setUpThemeDisplayGetLayout(themeDisplay, layout);
 
 		LayoutTypePortlet layoutTypePortlet = Mockito.mock(
 			LayoutTypePortlet.class);
 
-		_setUpLayoutTypePortletHasPortletId(layoutTypePortlet, true);
+		setUpLayoutTypePortletHasPortletId(layoutTypePortlet, true);
 
-		_setUpThemeDisplayGetLayoutTypePortlet(themeDisplay, layoutTypePortlet);
+		setUpThemeDisplayGetLayoutTypePortlet(themeDisplay, layoutTypePortlet);
 
-		_setUpPortletRequestGetAttribute(
+		setUpPortletRequestGetAttribute(
 			portletRequest, Mockito.mock(PortletConfig.class),
 			JavaConstants.JAVAX_PORTLET_CONFIG);
-		_setUpPortletRequestGetAttribute(
+		setUpPortletRequestGetAttribute(
 			portletRequest, themeDisplay, WebKeys.THEME_DISPLAY);
+	}
+
+	protected void setUpPortletRequestGetAttribute(
+		PortletRequest portletRequest, Object object, String keyValue) {
+
+		Mockito.doReturn(
+			object
+		).when(
+			portletRequest
+		).getAttribute(
+			Matchers.eq(keyValue)
+		);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -195,7 +249,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			portletRequest
 		).getParameter(
-			Mockito.eq(paramName)
+			Matchers.eq(paramName)
 		);
 	}
 
@@ -234,7 +288,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			searchEngineAdapter
 		).execute(
-			(IndexRequest<IndexResponse>)Mockito.any()
+			(IndexRequest<IndexResponse>)Mockito.anyObject()
 		);
 	}
 
@@ -245,7 +299,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			searchEngineAdapter
 		).execute(
-			(DocumentRequest)Mockito.any()
+			(DocumentRequest)Mockito.anyObject()
 		);
 	}
 
@@ -256,8 +310,7 @@ public abstract class BaseSynonymsWebTestCase {
 			searchHits
 		).getTotalHits();
 
-		SearchSearchResponse searchSearchResponse =
-			_setUpSearchSearchResponse();
+		SearchSearchResponse searchSearchResponse = setUpSearchSearchResponse();
 
 		Mockito.doReturn(
 			searchHits
@@ -270,7 +323,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			searchEngineAdapter
 		).execute(
-			(SearchSearchRequest)Mockito.any()
+			(SearchSearchRequest)Mockito.anyObject()
 		);
 
 		return searchHits;
@@ -302,6 +355,10 @@ public abstract class BaseSynonymsWebTestCase {
 		).getSearchHits();
 
 		return searchHits;
+	}
+
+	protected SearchSearchResponse setUpSearchSearchResponse() {
+		return Mockito.mock(SearchSearchResponse.class);
 	}
 
 	protected void setUpSynonymSetFilterNameHolder(String[] synonyms) {
@@ -338,7 +395,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			synonymSetIndexReader
 		).isExists(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 	}
 
@@ -347,15 +404,16 @@ public abstract class BaseSynonymsWebTestCase {
 			new SynonymSet.SynonymSetBuilder();
 
 		Mockito.doReturn(
-			synonymSetBuilder.synonyms(
-				synonyms
-			).synonymSetDocumentId(
-				id
-			).build()
+			Optional.of(
+				synonymSetBuilder.synonyms(
+					synonyms
+				).synonymSetDocumentId(
+					id
+				).build())
 		).when(
 			synonymSetIndexReader
-		).fetch(
-			Mockito.any(), Mockito.anyString()
+		).fetchOptional(
+			Mockito.anyObject(), Mockito.anyString()
 		);
 
 		Mockito.doReturn(
@@ -368,107 +426,11 @@ public abstract class BaseSynonymsWebTestCase {
 		).when(
 			synonymSetIndexReader
 		).search(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 	}
 
-	protected Portal portal = Mockito.mock(Portal.class);
-	protected SearchEngineAdapter searchEngineAdapter = Mockito.mock(
-		SearchEngineAdapter.class);
-	protected SynonymSetFilterNameHolder synonymSetFilterNameHolder =
-		Mockito.mock(SynonymSetFilterNameHolder.class);
-	protected SynonymSetFilterReader synonymSetFilterReader = Mockito.mock(
-		SynonymSetFilterReader.class);
-	protected SynonymSetIndexNameBuilder synonymSetIndexNameBuilder =
-		Mockito.mock(SynonymSetIndexNameBuilder.class);
-	protected SynonymSetIndexReader synonymSetIndexReader = Mockito.mock(
-		SynonymSetIndexReader.class);
-	protected SynonymSetStorageAdapter synonymSetStorageAdapter = Mockito.mock(
-		SynonymSetStorageAdapter.class);
-
-	private void _setUpLayoutIsTypeControlPanel(
-		Layout layout, boolean returnValue) {
-
-		Mockito.doReturn(
-			returnValue
-		).when(
-			layout
-		).isTypeControlPanel();
-	}
-
-	private void _setUpLayoutTypePortletHasPortletId(
-		LayoutTypePortlet layoutTypePortlet, boolean returnValue) {
-
-		Mockito.doReturn(
-			returnValue
-		).when(
-			layoutTypePortlet
-		).hasPortletId(
-			Mockito.anyString()
-		);
-	}
-
-	private void _setUpPortalGetCurrentURL() {
-		Mockito.doReturn(
-			"currentURL"
-		).when(
-			portal
-		).getCurrentURL(
-			Mockito.any(HttpServletRequest.class)
-		);
-	}
-
-	private void _setUpPortalGetHttpServletRequest(
-		HttpServletRequest httpServletRequest) {
-
-		Mockito.doReturn(
-			httpServletRequest
-		).when(
-			portal
-		).getHttpServletRequest(
-			Mockito.any(PortletRequest.class)
-		);
-	}
-
-	private void _setUpPortalGetLiferayPortletRequest() {
-		Mockito.doReturn(
-			Mockito.mock(LiferayPortletRequest.class)
-		).when(
-			portal
-		).getLiferayPortletRequest(
-			Mockito.any(PortletRequest.class)
-		);
-	}
-
-	private void _setUpPortalGetOriginalServletRequest(
-		HttpServletRequest httpServletRequest) {
-
-		Mockito.doReturn(
-			httpServletRequest
-		).when(
-			portal
-		).getOriginalServletRequest(
-			Mockito.any(HttpServletRequest.class)
-		);
-	}
-
-	private void _setUpPortletRequestGetAttribute(
-		PortletRequest portletRequest, Object object, String keyValue) {
-
-		Mockito.doReturn(
-			object
-		).when(
-			portletRequest
-		).getAttribute(
-			Mockito.eq(keyValue)
-		);
-	}
-
-	private SearchSearchResponse _setUpSearchSearchResponse() {
-		return Mockito.mock(SearchSearchResponse.class);
-	}
-
-	private void _setUpThemeDisplayGetLayout(
+	protected void setUpThemeDisplayGetLayout(
 		ThemeDisplay themeDisplay, Layout layout) {
 
 		Mockito.doReturn(
@@ -478,7 +440,7 @@ public abstract class BaseSynonymsWebTestCase {
 		).getLayout();
 	}
 
-	private void _setUpThemeDisplayGetLayoutTypePortlet(
+	protected void setUpThemeDisplayGetLayoutTypePortlet(
 		ThemeDisplay themeDisplay, LayoutTypePortlet layoutTypePortlet) {
 
 		Mockito.doReturn(
@@ -487,5 +449,26 @@ public abstract class BaseSynonymsWebTestCase {
 			themeDisplay
 		).getLayoutTypePortlet();
 	}
+
+	@Mock
+	protected Portal portal;
+
+	@Mock
+	protected SearchEngineAdapter searchEngineAdapter;
+
+	@Mock
+	protected SynonymSetFilterNameHolder synonymSetFilterNameHolder;
+
+	@Mock
+	protected SynonymSetFilterReader synonymSetFilterReader;
+
+	@Mock
+	protected SynonymSetIndexNameBuilder synonymSetIndexNameBuilder;
+
+	@Mock
+	protected SynonymSetIndexReader synonymSetIndexReader;
+
+	@Mock
+	protected SynonymSetStorageAdapter synonymSetStorageAdapter;
 
 }

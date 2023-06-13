@@ -24,21 +24,12 @@ import com.liferay.portal.kernel.model.BaseModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CommercePaymentMethodGroupRel.
  *
  * @author Luca Pellizzon
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.payment.model.impl.CommercePaymentMethodGroupRelImpl",
-		"table.name=CommercePaymentMethodGroupRel"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommercePaymentMethodGroupRelModelArgumentsResolver
 	implements ArgumentsResolver {
 

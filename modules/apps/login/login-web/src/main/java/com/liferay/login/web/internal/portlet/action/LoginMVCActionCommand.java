@@ -15,6 +15,7 @@
 package com.liferay.login.web.internal.portlet.action;
 
 import com.liferay.login.web.constants.LoginPortletKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.CompanyMaxUsersException;
 import com.liferay.portal.kernel.exception.CookieNotSupportedException;
@@ -33,13 +34,11 @@ import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.URLCodec;
@@ -145,17 +144,40 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 					actionRequest, exception.getClass(), exception);
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				_portal.sendError(exception, actionRequest, actionResponse);
 
 				return;
 			}
 
-			_postProcessAuthFailure(actionRequest, actionResponse);
+			postProcessAuthFailure(actionRequest, actionResponse);
 
 			hideDefaultErrorMessage(actionRequest);
 		}
+	}
+
+	protected String getCompleteRedirectURL(
+		HttpServletRequest httpServletRequest, String redirect) {
+
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		Boolean httpsInitial = (Boolean)httpSession.getAttribute(
+			WebKeys.HTTPS_INITIAL);
+
+		String portalURL = null;
+
+		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
+			!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION &&
+			(httpsInitial != null) && !httpsInitial.booleanValue()) {
+
+			portalURL = _portal.getPortalURL(httpServletRequest, false);
+		}
+		else {
+			portalURL = _portal.getPortalURL(httpServletRequest);
+		}
+
+		return portalURL.concat(redirect);
 	}
 
 	protected void login(
@@ -214,7 +236,7 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			if (!themeDisplay.isSignedIn()) {
 				actionRequest.setAttribute(
 					WebKeys.REDIRECT,
-					HttpComponentsUtil.addParameter(
+					_http.addParameter(
 						_portal.getPathMain() + "/portal/login", "redirect",
 						redirect));
 
@@ -226,8 +248,7 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			if (Validator.isNotNull(redirect) &&
 				!redirect.startsWith(Http.HTTP)) {
 
-				redirect = _getCompleteRedirectURL(
-					httpServletRequest, redirect);
+				redirect = getCompleteRedirectURL(httpServletRequest, redirect);
 			}
 		}
 
@@ -246,30 +267,7 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private String _getCompleteRedirectURL(
-		HttpServletRequest httpServletRequest, String redirect) {
-
-		HttpSession httpSession = httpServletRequest.getSession();
-
-		Boolean httpsInitial = (Boolean)httpSession.getAttribute(
-			WebKeys.HTTPS_INITIAL);
-
-		String portalURL = null;
-
-		if (PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS &&
-			!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION &&
-			(httpsInitial != null) && !httpsInitial.booleanValue()) {
-
-			portalURL = _portal.getPortalURL(httpServletRequest, false);
-		}
-		else {
-			portalURL = _portal.getPortalURL(httpServletRequest);
-		}
-
-		return portalURL.concat(redirect);
-	}
-
-	private void _postProcessAuthFailure(
+	protected void postProcessAuthFailure(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -320,6 +318,9 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private AuthenticatedSessionManager _authenticatedSessionManager;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private Portal _portal;

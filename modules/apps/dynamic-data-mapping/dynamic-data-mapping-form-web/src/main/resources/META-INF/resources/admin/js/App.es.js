@@ -12,12 +12,10 @@
  * details.
  */
 
-import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {ClayModalProvider} from '@clayui/modal';
 import {
 	ConfigProvider,
 	FormProvider,
-	KeyboardDNDContextProvider,
 	parseProps,
 } from 'data-engine-js-components-web';
 import {
@@ -30,17 +28,19 @@ import {
 	objectFieldsReducer,
 	pageReducer,
 } from 'data-engine-js-components-web/js/custom/form/reducers/index.es';
-import React, {Suspense} from 'react';
+import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 import {HashRouter as Router, Route, Switch} from 'react-router-dom';
 
-import LazyRoute from './components/LazyRoute';
 import {NavigationBar} from './components/NavigationBar.es';
 import {INITIAL_CONFIG_STATE} from './config/initialConfigState.es';
 import {BUILDER_INITIAL_STATE, initState} from './config/initialState.es';
-import AutoSaveProvider from './hooks/useAutoSave.es';
+import {AutoSaveProvider} from './hooks/useAutoSave.es';
 import {ToastProvider} from './hooks/useToast.es';
+import {FormBuilder} from './pages/FormBuilder.es';
+import {Report} from './pages/Report.es';
+import {RuleBuilder} from './pages/RuleBuilder.es';
 import {
 	elementSetReducer,
 	formInfoReducer,
@@ -52,12 +52,7 @@ import {
  * Exporting default application to Forms Admin. Only Providers and
  * routing must be defined.
  */
-export default function App({
-	autosaveInterval,
-	autosaveURL,
-	mainRequire,
-	...otherProps
-}) {
+export const App = ({autosaveInterval, autosaveURL, ...otherProps}) => {
 	const {config, state} = parseProps(otherProps);
 
 	return (
@@ -84,48 +79,43 @@ export default function App({
 						]}
 						value={state}
 					>
-						<KeyboardDNDContextProvider>
+						<AutoSaveProvider
+							interval={autosaveInterval}
+							url={autosaveURL}
+						>
 							<ToastProvider>
 								<Router>
-									<AutoSaveProvider
-										interval={autosaveInterval}
-										url={autosaveURL}
-									>
+									<Switch>
 										<Route
 											component={NavigationBar}
 											path="/"
 										/>
-
-										<Suspense
-											fallback={<ClayLoadingIndicator />}
-										>
-											<Switch>
-												<LazyRoute
-													exact
-													importPath={`${mainRequire}/admin/js/pages/FormBuilder.es`}
-													path="/"
-												/>
-
-												<LazyRoute
-													importPath={`${mainRequire}/admin/js/pages/RuleBuilder.es`}
-													path="/rules"
-												/>
-
-												<LazyRoute
-													importPath={`${mainRequire}/admin/js/pages/Report`}
-													path="/report"
-												/>
-											</Switch>
-										</Suspense>
-									</AutoSaveProvider>
+									</Switch>
+									<Switch>
+										<Route
+											component={FormBuilder}
+											exact
+											path="/"
+										/>
+										<Route
+											component={RuleBuilder}
+											path="/rules"
+										/>
+										<Route
+											component={Report}
+											path="/report"
+										/>
+									</Switch>
 								</Router>
 							</ToastProvider>
-						</KeyboardDNDContextProvider>
+						</AutoSaveProvider>
 					</FormProvider>
 				</ClayModalProvider>
 			</ConfigProvider>
 		</DndProvider>
 	);
-}
+};
 
 App.displayName = 'App';
+
+export default App;

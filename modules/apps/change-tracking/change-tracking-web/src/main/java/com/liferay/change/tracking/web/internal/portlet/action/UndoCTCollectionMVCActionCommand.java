@@ -20,11 +20,9 @@ import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTCollectionService;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -46,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/undo_ct_collection"
@@ -101,19 +100,10 @@ public class UndoCTCollectionMVCActionCommand extends BaseMVCActionCommand {
 				"ctCollectionId",
 				String.valueOf(ctCollection.getCtCollectionId()));
 
-			JSONPortletResponseUtil.writeJSON(
-				actionRequest, actionResponse,
-				JSONUtil.put(
-					"ctCollectionId",
-					String.valueOf(ctCollection.getCtCollectionId())
-				).put(
-					"redirect", true
-				).put(
-					"revertedRedirectURL", redirectURL.toString()
-				));
+			sendRedirect(actionRequest, actionResponse, redirectURL.toString());
 		}
 		catch (CTLocalizedException ctLocalizedException) {
-			_log.error(ctLocalizedException);
+			_log.error(ctLocalizedException, ctLocalizedException);
 
 			SessionErrors.add(
 				actionRequest, CTLocalizedException.class.getName(),

@@ -109,10 +109,11 @@ public class SocialActivitySettingLocalServiceImpl
 		for (SocialActivityDefinition defaultActivityDefinition :
 				defaultActivityDefinitions) {
 
-			activityDefinitions.add(
-				getActivityDefinition(
-					groupId, className,
-					defaultActivityDefinition.getActivityType()));
+			SocialActivityDefinition activityDefinition = getActivityDefinition(
+				groupId, className,
+				defaultActivityDefinition.getActivityType());
+
+			activityDefinitions.add(activityDefinition);
 		}
 
 		return activityDefinitions;
@@ -346,7 +347,7 @@ public class SocialActivitySettingLocalServiceImpl
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 
 					jsonObject = JSONFactoryUtil.createJSONObject();

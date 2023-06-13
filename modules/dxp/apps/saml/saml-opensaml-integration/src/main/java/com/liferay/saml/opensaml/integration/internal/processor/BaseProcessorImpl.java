@@ -30,6 +30,7 @@ import com.liferay.saml.opensaml.integration.processor.context.ProcessorContext;
 import java.io.Serializable;
 
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,6 +39,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author Stian Sigvartsen
@@ -57,9 +59,12 @@ public abstract class BaseProcessorImpl
 	public M process(ServiceContext serviceContext) throws PortalException {
 		_preparePatches();
 
-		_consumePatches(serviceContext);
+		_consumePatches(_modelUnsafeConsumers, serviceContext);
 
-		return _model;
+		_consumePatches(_unsafeConsumers, serviceContext);
+
+		return (M)_objectCache.get(
+			new AbstractMap.SimpleEntry<>(_model.getClass(), null));
 	}
 
 	@Override
@@ -92,24 +97,21 @@ public abstract class BaseProcessorImpl
 
 			_processorContext = processorContext;
 
-			_unsafeConsumers.add(
-				new AbstractMap.SimpleEntry<>(
-					processingIndex,
-					serviceContext -> _patchModel(
-						publicIdentifier, modelGetterFunction, _patchingQueue,
-						updateFunction, serviceContext)));
+			_patchingQueue = getPatchingQueue(
+				modelGetterFunction, processingIndex, publicIdentifier,
+				updateFunction);
 		}
 
 		public <V> void handleUnsafeObjectArray(
 			String fieldExpression, Class<V> clazz,
 			UnsafeBiConsumer<T, V[], ?> unsafeBiConsumer) {
 
-			if (!_processorContext.isDefined(clazz, fieldExpression)) {
-				return;
-			}
-
 			V[] values = _processorContext.getValueArray(
 				clazz, fieldExpression);
+
+			if ((values == null) || (values.length == 0)) {
+				return;
+			}
 
 			_patchingQueue.add(
 				object -> unsafeBiConsumer.accept(object, values));
@@ -130,8 +132,11 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, values) -> biConsumer.accept(
-					object, GetterUtil.getBoolean(_head(values))));
+				(object, values) -> {
+					for (String value : values) {
+						biConsumer.accept(object, GetterUtil.getBoolean(value));
+					}
+				});
 		}
 
 		@Override
@@ -140,8 +145,15 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, value) -> biConsumer.accept(
-					object, GetterUtil.getBooleanValues(value)));
+				(object, value) -> {
+					boolean[] booleanArray = new boolean[value.length];
+
+					for (int i = 0; i < booleanArray.length; i++) {
+						booleanArray[i] = GetterUtil.getBoolean(value[i]);
+					}
+
+					biConsumer.accept(object, booleanArray);
+				});
 		}
 
 		@Override
@@ -151,11 +163,13 @@ public abstract class BaseProcessorImpl
 			handleUnsafeStringArray(
 				fieldExpression,
 				(object, values) -> {
-					try {
-						biConsumer.accept(object, Long.parseLong(values[0]));
-					}
-					catch (NumberFormatException numberFormatException) {
-						throw numberFormatException;
+					for (String value : values) {
+						try {
+							biConsumer.accept(object, Long.parseLong(value));
+						}
+						catch (NumberFormatException numberFormatException) {
+							throw numberFormatException;
+						}
 					}
 				});
 		}
@@ -167,18 +181,13 @@ public abstract class BaseProcessorImpl
 			handleUnsafeStringArray(
 				fieldExpression,
 				(object, value) -> {
-					try {
-						long[] longArray = new long[value.length];
+					Stream<String> stream = Arrays.stream(value);
 
-						for (int i = 0; i < longArray.length; i++) {
-							longArray[i] = Long.parseLong(value[i]);
-						}
-
-						biConsumer.accept(object, longArray);
-					}
-					catch (NumberFormatException numberFormatException) {
-						throw numberFormatException;
-					}
+					biConsumer.accept(
+						object,
+						stream.mapToLong(
+							Long::parseLong
+						).toArray());
 				});
 		}
 
@@ -188,14 +197,16 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, values) -> biConsumer.accept(object, _head(values)));
+				(object, values) -> biConsumer.accept(object, values[0]));
 		}
 
 		@Override
 		public void mapStringArray(
 			String fieldExpression, BiConsumer<T, String[]> biConsumer) {
 
-			handleUnsafeStringArray(fieldExpression, biConsumer::accept);
+			handleUnsafeStringArray(
+				fieldExpression,
+				(object, values) -> biConsumer.accept(object, values));
 		}
 
 		@Override
@@ -205,20 +216,10 @@ public abstract class BaseProcessorImpl
 
 			handleUnsafeStringArray(
 				fieldExpression,
-				(object, values) -> unsafeBiConsumer.accept(
-					object, _head(values)));
+				(object, values) -> unsafeBiConsumer.accept(object, values[0]));
 		}
 
-		private <V> V _head(V[] values) {
-			if ((values == null) || (values.length == 0)) {
-				return null;
-			}
-
-			return values[0];
-		}
-
-		private final Queue<UnsafeConsumer<T, ?>> _patchingQueue =
-			new LinkedList<>();
+		private final Queue<UnsafeConsumer<T, ?>> _patchingQueue;
 		private final ProcessorContext<M> _processorContext;
 
 	}
@@ -274,33 +275,51 @@ public abstract class BaseProcessorImpl
 			return (V[])map.get(fieldExpression);
 		}
 
-		public boolean isDefined(Class<?> clazz, String fieldExpression) {
-			if (!Validator.isBlank(_prefix)) {
-				fieldExpression = _prefix + ':' + fieldExpression;
+		private String _prefix;
+
+	}
+
+	protected <T extends BaseModel<T>> Queue<UnsafeConsumer<T, ?>>
+		getPatchingQueue(
+			Function<M, T> modelGetterFunction, int processingIndex,
+			String publicIdentifier,
+			ProcessorContext.UpdateFunction<T> updateFunction) {
+
+		T model = modelGetterFunction.apply(_model);
+
+		if (model != _model) {
+			if (publicIdentifier == null) {
+				throw new SystemException(
+					"Mapped models must have a public identifier");
 			}
 
-			Map<String, Object[]> map = _maps.get(clazz);
-
-			if (map == null) {
-				return false;
-			}
-
-			return map.containsKey(fieldExpression);
+			return _getPatchingQueue(
+				model, processingIndex, _unsafeConsumers, publicIdentifier,
+				updateFunction);
 		}
 
-		private final String _prefix;
+		if (publicIdentifier != null) {
+			throw new SystemException(
+				"The processing model can not have a public identifier");
+		}
 
+		return _getPatchingQueue(
+			model, processingIndex, _modelUnsafeConsumers, publicIdentifier,
+			updateFunction);
 	}
 
 	protected abstract PC getProcessorContext(String prefix);
 
-	private void _consumePatches(ServiceContext serviceContext)
+	private void _consumePatches(
+			Queue<Map.Entry<Integer, UnsafeConsumer<ServiceContext, ?>>>
+				unsafeConsumers,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		Map.Entry<Integer, UnsafeConsumer<ServiceContext, ?>> entry;
 
 		try {
-			while ((entry = _unsafeConsumers.poll()) != null) {
+			while ((entry = unsafeConsumers.poll()) != null) {
 				UnsafeConsumer<ServiceContext, ?> unsafeConsumer =
 					entry.getValue();
 
@@ -316,29 +335,32 @@ public abstract class BaseProcessorImpl
 		}
 	}
 
+	private <T extends BaseModel<T>> Queue<UnsafeConsumer<T, ?>>
+		_getPatchingQueue(
+			T model, int processingIndex,
+			Queue<Map.Entry<Integer, UnsafeConsumer<ServiceContext, ?>>>
+				processingQueue,
+			String publicIdentifier,
+			ProcessorContext.UpdateFunction<T> updateFunction) {
+
+		Queue<UnsafeConsumer<T, ?>> queue = new LinkedList<>();
+
+		processingQueue.add(
+			new AbstractMap.SimpleEntry<>(
+				processingIndex,
+				serviceContext -> _patchModel(
+					publicIdentifier, model, queue, updateFunction,
+					serviceContext)));
+
+		return queue;
+	}
+
 	private <T extends BaseModel<T>> T _patchModel(
-			String publicIdentifier, Function<M, T> modelGetterFunction,
+			String publicIdentifier, T model,
 			Queue<UnsafeConsumer<T, ?>> unsafeConsumers,
 			ProcessorContext.UpdateFunction<T> updateFunction,
 			ServiceContext serviceContext)
 		throws Throwable {
-
-		T model = modelGetterFunction.apply(_model);
-
-		boolean mappedModel = false;
-
-		if (model != _model) {
-			if (publicIdentifier == null) {
-				throw new SystemException(
-					"Mapped models must have a public identifier");
-			}
-
-			mappedModel = true;
-		}
-		else if (publicIdentifier != null) {
-			throw new SystemException(
-				"The processing model cannot have a public identifier");
-		}
 
 		Map.Entry<Class<?>, Serializable> objectKey =
 			new AbstractMap.SimpleEntry<>(model.getClass(), publicIdentifier);
@@ -366,10 +388,6 @@ public abstract class BaseProcessorImpl
 
 		_objectCache.put(objectKey, tNew);
 
-		if (!mappedModel) {
-			_model = (M)tNew;
-		}
-
 		return tNew;
 	}
 
@@ -382,6 +400,8 @@ public abstract class BaseProcessorImpl
 				_fieldExpressionHandlerRegistry.getFieldExpressionHandler(
 					prefix);
 
+			_prefix = prefix;
+
 			fieldExpressionHandler.bindProcessorContext(
 				getProcessorContext(prefix));
 		}
@@ -389,9 +409,13 @@ public abstract class BaseProcessorImpl
 
 	private final FEHR _fieldExpressionHandlerRegistry;
 	private final Map<Class<?>, Map<String, Object[]>> _maps = new HashMap<>();
-	private M _model;
+	private final M _model;
+	private final Queue<Map.Entry<Integer, UnsafeConsumer<ServiceContext, ?>>>
+		_modelUnsafeConsumers = new PriorityQueue<>(
+			Comparator.comparingInt(Map.Entry::getKey));
 	private final Map<Map.Entry<Class<?>, Serializable>, Object> _objectCache =
 		new HashMap<>();
+	private String _prefix;
 	private final Queue<Map.Entry<Integer, UnsafeConsumer<ServiceContext, ?>>>
 		_unsafeConsumers = new PriorityQueue<>(
 			Comparator.comparingInt(Map.Entry::getKey));

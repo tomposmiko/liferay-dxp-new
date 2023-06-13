@@ -1,8 +1,6 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
-	property ci.retries.disabled = "true";
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Blogs";
@@ -16,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,14 +23,14 @@ definition {
 	}
 
 	@description = "This checks that an entry can be added in the control panel."
-	@e2etest
-	@priority = 5
+	@priority = "5"
 	@refactordone
+	@uitest
 	test CanAddEntryInAdmin {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,rockylinux,solaris,suse,ubuntu,windows";
+		property portal.acceptance = "true";
 		property testray.component.names = "WYSIWYG";
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
@@ -50,32 +48,8 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@description = "This test covers LPS-67664. It ensures that a user can order blog entries by display date."
-	@priority = 4
-	test CanOrderByDisplayDate {
-		JSONBlog.addEntry(
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title");
-
-		JSONBlog.addEntry(
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Test Title");
-
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-		ManagementBar.setFilterAndOrder(menuItem = "Display Date");
-
-		Click(locator1 = "ManagementBar#ORDER_ICON_GENERIC");
-
-		Blogs.viewEntryTitle(
-			entryTitle = "Test Title",
-			position = 1);
-
-		ManagementBar.viewFilterAndOrderSelectedItem(menuItem = "Display Date");
-	}
-
 	@description = "This checks that the content for a blogs entry can be searched in admin."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForContentInAdmin {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
@@ -96,7 +70,7 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entrySearchTerm = "Blogs Entry Content",
 			entryTitle = "Unique Title",
-			position = 1,
+			position = "1",
 			relevance = "true");
 
 		BlogsEntry.searchCP(
@@ -111,7 +85,7 @@ definition {
 	}
 
 	@description = "This checks that the content for a blogs entry can be searched in admin."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForTitleInAdmin {
 		JSONBlog.addEntry(
@@ -130,7 +104,7 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entrySearchTerm = "Unique Title",
 			entryTitle = "Unique Title",
-			position = 1,
+			position = "1",
 			relevance = "true");
 
 		BlogsEntry.searchCP(

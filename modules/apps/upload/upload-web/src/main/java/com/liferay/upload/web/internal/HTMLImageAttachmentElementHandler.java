@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.upload.AttachmentElementHandler;
 import com.liferay.upload.AttachmentElementReplacer;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,28 +50,21 @@ public class HTMLImageAttachmentElementHandler
 				saveTempFileUnsafeFunction)
 		throws PortalException {
 
-		StringBuffer sb = new StringBuffer(content.length());
-
-		Map<String, FileEntry> fileEntries = new HashMap<>();
-
 		Matcher matcher = _tempAttachmentPattern.matcher(content);
 
+		StringBuffer sb = new StringBuffer(content.length());
+
 		while (matcher.find()) {
-			String fileName = matcher.group(0);
+			FileEntry tempAttachmentFileEntry = _getFileEntry(matcher);
 
-			FileEntry fileEntry = fileEntries.get(fileName);
-
-			if (fileEntry == null) {
-				fileEntry = saveTempFileUnsafeFunction.apply(
-					_getFileEntry(matcher));
-
-				fileEntries.put(fileName, fileEntry);
-			}
+			FileEntry attachmentFileEntry = saveTempFileUnsafeFunction.apply(
+				tempAttachmentFileEntry);
 
 			matcher.appendReplacement(
 				sb,
 				Matcher.quoteReplacement(
-					_attachmentElementReplacer.replace(fileName, fileEntry)));
+					_attachmentElementReplacer.replace(
+						matcher.group(0), attachmentFileEntry)));
 		}
 
 		matcher.appendTail(sb);

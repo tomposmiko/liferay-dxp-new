@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -37,7 +36,6 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -48,7 +46,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Generated("")
 @GraphQLName("CartItem")
 @JsonFilter("Liferay.Vulcan")
-@Schema(requiredProperties = {"skuId"})
 @XmlRootElement(name = "CartItem")
 public class CartItem implements Serializable {
 
@@ -339,9 +336,7 @@ public class CartItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long productId;
 
-	@Schema(
-		example = "{en_US=product-url-us, hr_HR=product-url-hr, hu_HU=product-url-hu}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getProductURLs() {
 		return productURLs;
@@ -398,62 +393,6 @@ public class CartItem implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer quantity;
-
-	@Schema(example = "12341234")
-	public String getReplacedSku() {
-		return replacedSku;
-	}
-
-	public void setReplacedSku(String replacedSku) {
-		this.replacedSku = replacedSku;
-	}
-
-	@JsonIgnore
-	public void setReplacedSku(
-		UnsafeSupplier<String, Exception> replacedSkuUnsafeSupplier) {
-
-		try {
-			replacedSku = replacedSkuUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected String replacedSku;
-
-	@Schema
-	public Long getReplacedSkuId() {
-		return replacedSkuId;
-	}
-
-	public void setReplacedSkuId(Long replacedSkuId) {
-		this.replacedSkuId = replacedSkuId;
-	}
-
-	@JsonIgnore
-	public void setReplacedSkuId(
-		UnsafeSupplier<Long, Exception> replacedSkuIdUnsafeSupplier) {
-
-		try {
-			replacedSkuId = replacedSkuIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long replacedSkuId;
 
 	@Schema
 	@Valid
@@ -534,10 +473,9 @@ public class CartItem implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	@NotNull
 	protected Long skuId;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getSubscription() {
 		return subscription;
 	}
@@ -804,30 +742,6 @@ public class CartItem implements Serializable {
 			sb.append(quantity);
 		}
 
-		if (replacedSku != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"replacedSku\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(replacedSku));
-
-			sb.append("\"");
-		}
-
-		if (replacedSkuId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"replacedSkuId\": ");
-
-			sb.append(replacedSkuId);
-		}
-
 		if (settings != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -909,9 +823,9 @@ public class CartItem implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -937,7 +851,7 @@ public class CartItem implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -969,7 +883,7 @@ public class CartItem implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -985,10 +899,5 @@ public class CartItem implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

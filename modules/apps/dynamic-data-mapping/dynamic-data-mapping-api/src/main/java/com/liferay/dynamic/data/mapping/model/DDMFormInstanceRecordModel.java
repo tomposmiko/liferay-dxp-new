@@ -374,8 +374,4 @@ public interface DDMFormInstanceRecordModel
 	@Override
 	public DDMFormInstanceRecord cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

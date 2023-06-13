@@ -4,7 +4,7 @@
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.list.type" short-no-such-exception-enabled="false">
 	<author>Gabriel Albuquerque</author>
 	<namespace>ListType</namespace>
-	<entity external-reference-code="company" local-service="true" name="ListTypeDefinition" remote-service="true" uuid="true">
+	<entity local-service="true" name="ListTypeDefinition" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
@@ -23,10 +23,6 @@
 		<column localized="true" name="name" type="String" />
 	</entity>
 	<entity local-service="true" name="ListTypeEntry" remote-service="true" uuid="true">
-
-		<!-- External reference code -->
-
-		<column name="externalReferenceCode" type="String" />
 
 		<!-- PK fields -->
 
@@ -49,9 +45,6 @@
 
 		<!-- Finder methods -->
 
-		<finder name="ListTypeEntryId" return-type="Collection">
-			<finder-column arrayable-operator="OR" comparator="=" name="listTypeEntryId" />
-		</finder>
 		<finder name="ListTypeDefinitionId" return-type="Collection">
 			<finder-column name="listTypeDefinitionId" />
 		</finder>
@@ -59,15 +52,9 @@
 			<finder-column name="listTypeDefinitionId" />
 			<finder-column name="key" />
 		</finder>
-		<finder name="ERC_C_LTDI" return-type="ListTypeEntry">
-			<finder-column name="externalReferenceCode" />
-			<finder-column name="companyId" />
-			<finder-column name="listTypeDefinitionId" />
-		</finder>
 	</entity>
 	<exceptions>
 		<exception>DuplicateListTypeEntry</exception>
-		<exception>DuplicateListTypeEntryExternalReferenceCode</exception>
 		<exception>ListTypeDefinitionName</exception>
 		<exception>ListTypeEntryKey</exception>
 		<exception>ListTypeEntryName</exception>

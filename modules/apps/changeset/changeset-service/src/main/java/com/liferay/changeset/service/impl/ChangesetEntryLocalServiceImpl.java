@@ -18,20 +18,17 @@ import com.liferay.changeset.exception.NoSuchEntryException;
 import com.liferay.changeset.model.ChangesetCollection;
 import com.liferay.changeset.model.ChangesetEntry;
 import com.liferay.changeset.service.base.ChangesetEntryLocalServiceBaseImpl;
-import com.liferay.changeset.service.persistence.ChangesetCollectionPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.SetUtil;
 
 import java.util.List;
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -49,9 +46,9 @@ public class ChangesetEntryLocalServiceImpl
 			long classPK)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 		ChangesetCollection changesetCollection =
-			_changesetCollectionPersistence.fetchByPrimaryKey(
+			changesetCollectionPersistence.fetchByPrimaryKey(
 				changesetCollectionId);
 
 		long changesetEntryId = counterLocalService.increment();
@@ -125,10 +122,10 @@ public class ChangesetEntryLocalServiceImpl
 		}
 
 		ChangesetCollection changesetCollection =
-			_changesetCollectionPersistence.findByPrimaryKey(
+			changesetCollectionPersistence.findByPrimaryKey(
 				changesetCollectionId);
 
-		User user = _userLocalService.getGuestUser(
+		User user = userLocalService.getDefaultUser(
 			changesetCollection.getCompanyId());
 
 		return changesetEntryLocalService.addChangesetEntry(
@@ -187,11 +184,5 @@ public class ChangesetEntryLocalServiceImpl
 		return changesetEntryPersistence.findByC_C_C(
 			changesetCollectionId, classNameId, classPK);
 	}
-
-	@Reference
-	private ChangesetCollectionPersistence _changesetCollectionPersistence;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

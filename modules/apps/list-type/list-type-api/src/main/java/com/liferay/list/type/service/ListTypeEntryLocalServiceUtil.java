@@ -61,13 +61,12 @@ public class ListTypeEntryLocalServiceUtil {
 	}
 
 	public static ListTypeEntry addListTypeEntry(
-			String externalReferenceCode, long userId,
-			long listTypeDefinitionId, String key,
+			long userId, long listTypeDefinitionId, String key,
 			Map<java.util.Locale, String> nameMap)
 		throws PortalException {
 
 		return getService().addListTypeEntry(
-			externalReferenceCode, userId, listTypeDefinitionId, key, nameMap);
+			userId, listTypeDefinitionId, key, nameMap);
 	}
 
 	/**
@@ -121,13 +120,6 @@ public class ListTypeEntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().deleteListTypeEntry(listTypeEntryId);
-	}
-
-	public static void deleteListTypeEntryByListTypeDefinitionId(
-		long listTypeDefinitionId) {
-
-		getService().deleteListTypeEntryByListTypeDefinitionId(
-			listTypeDefinitionId);
 	}
 
 	/**
@@ -229,20 +221,6 @@ public class ListTypeEntryLocalServiceUtil {
 		return getService().fetchListTypeEntry(listTypeEntryId);
 	}
 
-	public static ListTypeEntry fetchListTypeEntry(
-		long listTypeDefinitionId, String key) {
-
-		return getService().fetchListTypeEntry(listTypeDefinitionId, key);
-	}
-
-	public static ListTypeEntry fetchListTypeEntryByExternalReferenceCode(
-		String externalReferenceCode, long companyId,
-		long listTypeDefinitionId) {
-
-		return getService().fetchListTypeEntryByExternalReferenceCode(
-			externalReferenceCode, companyId, listTypeDefinitionId);
-	}
-
 	/**
 	 * Returns the list type entry with the matching UUID and company.
 	 *
@@ -332,22 +310,6 @@ public class ListTypeEntryLocalServiceUtil {
 		return getService().getListTypeEntry(listTypeEntryId);
 	}
 
-	public static ListTypeEntry getListTypeEntry(
-			long listTypeDefinitionId, String key)
-		throws PortalException {
-
-		return getService().getListTypeEntry(listTypeDefinitionId, key);
-	}
-
-	public static ListTypeEntry getListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId,
-			long listTypeDefinitionId)
-		throws PortalException {
-
-		return getService().getListTypeEntryByExternalReferenceCode(
-			externalReferenceCode, companyId, listTypeDefinitionId);
-	}
-
 	/**
 	 * Returns the list type entry with the matching UUID and company.
 	 *
@@ -398,12 +360,10 @@ public class ListTypeEntryLocalServiceUtil {
 	}
 
 	public static ListTypeEntry updateListTypeEntry(
-			String externalReferenceCode, long listTypeEntryId,
-			Map<java.util.Locale, String> nameMap)
+			long listTypeEntryId, Map<java.util.Locale, String> nameMap)
 		throws PortalException {
 
-		return getService().updateListTypeEntry(
-			externalReferenceCode, listTypeEntryId, nameMap);
+		return getService().updateListTypeEntry(listTypeEntryId, nameMap);
 	}
 
 	public static ListTypeEntryLocalService getService() {

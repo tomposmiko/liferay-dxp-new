@@ -24,18 +24,23 @@ import com.liferay.segments.field.customizer.SegmentsFieldCustomizer;
 import com.liferay.segments.field.customizer.SegmentsFieldCustomizerRegistry;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author David Arques
  */
+@RunWith(MockitoJUnitRunner.class)
 public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 
 	@ClassRule
@@ -60,10 +65,12 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 		Locale locale = LocaleUtil.getDefault();
 
 		Mockito.doReturn(
-			_createSegmentsFieldCustomizer(fieldValue, fieldValueName, locale)
+			Optional.of(
+				_createSegmentsFieldCustomizer(
+					fieldValue, fieldValueName, locale))
 		).when(
 			_segmentsFieldCustomizerRegistry
-		).getSegmentsFieldCustomizer(
+		).getSegmentsFieldCustomizerOptional(
 			entityName, fieldName
 		);
 
@@ -76,7 +83,7 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 			"fieldValueName", fieldValueName);
 
 		Assert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString());
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString());
 	}
 
 	@Test
@@ -85,10 +92,10 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 		String fieldName = RandomTestUtil.randomString();
 
 		Mockito.doReturn(
-			null
+			Optional.empty()
 		).when(
 			_segmentsFieldCustomizerRegistry
-		).getSegmentsFieldCustomizer(
+		).getSegmentsFieldCustomizerOptional(
 			entityName, fieldName
 		);
 
@@ -98,7 +105,7 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 					entityName, fieldName, RandomTestUtil.randomString(),
 					LocaleUtil.getDefault());
 
-		Assert.assertEquals("{}", jsonObject.toString());
+		Assert.assertEquals("{}", jsonObject.toJSONString());
 	}
 
 	private SegmentsFieldCustomizer _createSegmentsFieldCustomizer(
@@ -121,8 +128,8 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 	private final GetSegmentsFieldValueNameMVCResourceCommand
 		_getSegmentsFieldValueNameMVCResourceCommand =
 			new GetSegmentsFieldValueNameMVCResourceCommand();
-	private final SegmentsFieldCustomizerRegistry
-		_segmentsFieldCustomizerRegistry = Mockito.mock(
-			SegmentsFieldCustomizerRegistry.class);
+
+	@Mock
+	private SegmentsFieldCustomizerRegistry _segmentsFieldCustomizerRegistry;
 
 }

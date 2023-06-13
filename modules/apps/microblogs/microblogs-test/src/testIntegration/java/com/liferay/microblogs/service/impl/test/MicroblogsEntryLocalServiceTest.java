@@ -34,6 +34,7 @@ import com.liferay.social.kernel.service.SocialActivityLocalService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -90,20 +91,22 @@ public class MicroblogsEntryLocalServiceTest {
 			_user3.getUserId(), MicroblogsEntryConstants.TYPE_REPLY,
 			repostMicroblogsEntry1.getMicroblogsEntryId());
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNotNull(
+		Stream<MicroblogsEntry> stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNotNull(
 				_microblogsEntryLocalService.fetchMicroblogsEntry(
-					microblogsEntry.getMicroblogsEntryId()));
-		}
+					microblogsEntry.getMicroblogsEntryId())));
 
 		_microblogsEntryLocalService.deleteMicroblogsEntry(
 			parentMicroblogsEntry);
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNull(
+		stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNull(
 				_microblogsEntryLocalService.fetchMicroblogsEntry(
-					microblogsEntry.getMicroblogsEntryId()));
-		}
+					microblogsEntry.getMicroblogsEntryId())));
 	}
 
 	@Test
@@ -133,22 +136,24 @@ public class MicroblogsEntryLocalServiceTest {
 			_user3.getUserId(), MicroblogsEntryConstants.TYPE_REPLY,
 			repostMicroblogsEntry1.getMicroblogsEntryId());
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNotNull(
+		Stream<MicroblogsEntry> stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNotNull(
 				_assetEntryLocalService.fetchEntry(
 					MicroblogsEntry.class.getName(),
-					microblogsEntry.getPrimaryKey()));
-		}
+					microblogsEntry.getPrimaryKey())));
 
 		_microblogsEntryLocalService.deleteMicroblogsEntry(
 			parentMicroblogsEntry);
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNull(
+		stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNull(
 				_assetEntryLocalService.fetchEntry(
 					MicroblogsEntry.class.getName(),
-					microblogsEntry.getPrimaryKey()));
-		}
+					microblogsEntry.getPrimaryKey())));
 	}
 
 	@Test
@@ -206,20 +211,22 @@ public class MicroblogsEntryLocalServiceTest {
 			_user2.getUserId(), MicroblogsEntryConstants.TYPE_REPLY,
 			parentMicroblogsEntry.getMicroblogsEntryId());
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNotNull(
+		Stream<MicroblogsEntry> stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNotNull(
 				_microblogsEntryLocalService.fetchMicroblogsEntry(
-					microblogsEntry.getMicroblogsEntryId()));
-		}
+					microblogsEntry.getMicroblogsEntryId())));
 
 		_microblogsEntryLocalService.deleteMicroblogsEntry(
 			parentMicroblogsEntry);
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNull(
+		stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNull(
 				_microblogsEntryLocalService.fetchMicroblogsEntry(
-					microblogsEntry.getMicroblogsEntryId()));
-		}
+					microblogsEntry.getMicroblogsEntryId())));
 	}
 
 	@Test
@@ -233,22 +240,24 @@ public class MicroblogsEntryLocalServiceTest {
 			_user2.getUserId(), MicroblogsEntryConstants.TYPE_REPLY,
 			parentMicroblogsEntry.getMicroblogsEntryId());
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNotNull(
+		Stream<MicroblogsEntry> stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNotNull(
 				_assetEntryLocalService.fetchEntry(
 					MicroblogsEntry.class.getName(),
-					microblogsEntry.getPrimaryKey()));
-		}
+					microblogsEntry.getPrimaryKey())));
 
 		_microblogsEntryLocalService.deleteMicroblogsEntry(
 			parentMicroblogsEntry);
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNull(
+		stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNull(
 				_assetEntryLocalService.fetchEntry(
 					MicroblogsEntry.class.getName(),
-					microblogsEntry.getPrimaryKey()));
-		}
+					microblogsEntry.getPrimaryKey())));
 	}
 
 	@Test
@@ -290,20 +299,22 @@ public class MicroblogsEntryLocalServiceTest {
 			_user2.getUserId(), MicroblogsEntryConstants.TYPE_REPOST,
 			parentMicroblogsEntry.getMicroblogsEntryId());
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNotNull(
+		Stream<MicroblogsEntry> stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNotNull(
 				_microblogsEntryLocalService.fetchMicroblogsEntry(
-					microblogsEntry.getMicroblogsEntryId()));
-		}
+					microblogsEntry.getMicroblogsEntryId())));
 
 		_microblogsEntryLocalService.deleteMicroblogsEntry(
 			parentMicroblogsEntry);
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNull(
+		stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNull(
 				_microblogsEntryLocalService.fetchMicroblogsEntry(
-					microblogsEntry.getMicroblogsEntryId()));
-		}
+					microblogsEntry.getMicroblogsEntryId())));
 	}
 
 	@Test
@@ -317,22 +328,24 @@ public class MicroblogsEntryLocalServiceTest {
 			_user2.getUserId(), MicroblogsEntryConstants.TYPE_REPOST,
 			parentMicroblogsEntry.getMicroblogsEntryId());
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNotNull(
+		Stream<MicroblogsEntry> stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNotNull(
 				_assetEntryLocalService.fetchEntry(
 					MicroblogsEntry.class.getName(),
-					microblogsEntry.getPrimaryKey()));
-		}
+					microblogsEntry.getPrimaryKey())));
 
 		_microblogsEntryLocalService.deleteMicroblogsEntry(
 			parentMicroblogsEntry);
 
-		for (MicroblogsEntry microblogsEntry : _microblogsEntries) {
-			Assert.assertNull(
+		stream = _microblogsEntries.stream();
+
+		stream.forEach(
+			microblogsEntry -> Assert.assertNull(
 				_assetEntryLocalService.fetchEntry(
 					MicroblogsEntry.class.getName(),
-					microblogsEntry.getPrimaryKey()));
-		}
+					microblogsEntry.getPrimaryKey())));
 	}
 
 	@Test

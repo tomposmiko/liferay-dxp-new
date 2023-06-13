@@ -10,12 +10,10 @@
 </thead>
 
 <tbody>
-
 <!--THREADS-->
-
 <tr>
 	<td>THREADS_RECYCLE_BIN_BUTTON</td>
-	<td>//div[contains(@id,'messageBoardsThreadsPanel')]//button[contains(.,'Delete')]</td>
+	<td>//div[contains(@id,'messageBoardsThreadsPanel')]//button[contains(.,'Move to Recycle Bin')]</td>
 	<td></td>
 </tr>
 </tbody>

@@ -84,12 +84,35 @@ public class CommerceChannelRelServiceUtil {
 			commerceChannelId, start, end, orderByComparator);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
 	public static List<CommerceChannelRel> getCommerceChannelRels(
-			String className, long classPK, String name, int start, int end)
-		throws PortalException {
+		String className, long classPK, int start, int end,
+		OrderByComparator<CommerceChannelRel> orderByComparator) {
+
+		return getService().getCommerceChannelRels(
+			className, classPK, start, end, orderByComparator);
+	}
+
+	public static List<CommerceChannelRel> getCommerceChannelRels(
+		String className, long classPK, String name, int start, int end) {
 
 		return getService().getCommerceChannelRels(
 			className, classPK, name, start, end);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	public static List<CommerceChannelRel> getCommerceChannelRels(
+		String className, long classPK, String classPKField, String name,
+		int start, int end) {
+
+		return getService().getCommerceChannelRels(
+			className, classPK, classPKField, name, start, end);
 	}
 
 	public static int getCommerceChannelRelsCount(long commerceChannelId)
@@ -99,18 +122,27 @@ public class CommerceChannelRelServiceUtil {
 	}
 
 	public static int getCommerceChannelRelsCount(
-			String className, long classPK)
-		throws PortalException {
+		String className, long classPK) {
 
 		return getService().getCommerceChannelRelsCount(className, classPK);
 	}
 
 	public static int getCommerceChannelRelsCount(
-			String className, long classPK, String name)
-		throws PortalException {
+		String className, long classPK, String name) {
 
 		return getService().getCommerceChannelRelsCount(
 			className, classPK, name);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	public static int getCommerceChannelRelsCount(
+		String className, long classPK, String classPKField, String name) {
+
+		return getService().getCommerceChannelRelsCount(
+			className, classPK, classPKField, name);
 	}
 
 	/**

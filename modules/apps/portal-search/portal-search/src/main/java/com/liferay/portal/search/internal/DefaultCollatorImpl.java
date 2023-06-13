@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Daniela Zapata
  * @author David Gonzalez
  */
-@Component(service = Collator.class)
+@Component(immediate = true, service = Collator.class)
 public class DefaultCollatorImpl implements Collator {
 
 	@Override

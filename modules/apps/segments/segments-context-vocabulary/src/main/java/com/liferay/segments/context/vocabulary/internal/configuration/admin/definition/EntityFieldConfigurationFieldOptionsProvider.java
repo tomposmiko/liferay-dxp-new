@@ -21,14 +21,17 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -40,9 +43,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = {
-		"configuration.field.name=entityFieldName",
-		"configuration.pid=com.liferay.segments.context.vocabulary.internal.configuration.SegmentsContextVocabularyCompanyConfiguration",
+		"configuration.field.name=entityField",
 		"configuration.pid=com.liferay.segments.context.vocabulary.internal.configuration.SegmentsContextVocabularyConfiguration"
 	},
 	service = ConfigurationFieldOptionsProvider.class
@@ -52,33 +55,45 @@ public class EntityFieldConfigurationFieldOptionsProvider
 
 	@Override
 	public List<Option> getOptions() {
-		return _options;
+		return Optional.of(
+			_options
+		).orElse(
+			Collections.emptyList()
+		);
 	}
 
 	@Activate
 	@Modified
 	protected void activate() {
-		List<Option> options = new ArrayList<>();
-
 		Map<String, EntityField> entityFieldsMap =
 			_entityModel.getEntityFieldsMap();
 
-		for (EntityField entityField : entityFieldsMap.values()) {
-			if (Objects.equals(
-					entityField.getType(), EntityField.Type.STRING)) {
+		Set<Map.Entry<String, EntityField>> entries =
+			entityFieldsMap.entrySet();
 
-				options.add(_toOption(entityField.getName()));
+		Stream<Map.Entry<String, EntityField>> stream = entries.stream();
+
+		_options = stream.filter(
+			entry -> {
+				EntityField entityField = entry.getValue();
+
+				return Objects.equals(
+					entityField.getType(), EntityField.Type.STRING);
 			}
-		}
-
-		Collections.sort(options, Comparator.comparing(Option::getValue));
-
-		_options = options;
+		).map(
+			Map.Entry::getKey
+		).map(
+			this::_toOption
+		).sorted(
+			Comparator.comparing(Option::getValue)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_options = Collections.emptyList();
+		_options = null;
 	}
 
 	private Option _toOption(String value) {

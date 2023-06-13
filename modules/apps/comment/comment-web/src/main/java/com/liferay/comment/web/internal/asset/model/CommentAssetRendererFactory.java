@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.util.HtmlParser;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -45,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + CommentPortletKeys.COMMENT,
 	service = AssetRendererFactory.class
 )
@@ -74,7 +74,7 @@ public class CommentAssetRendererFactory
 		WorkflowableComment workflowableComment = (WorkflowableComment)comment;
 
 		CommentAssetRenderer commentAssetRenderer = new CommentAssetRenderer(
-			this, _htmlParser, workflowableComment);
+			workflowableComment, this);
 
 		commentAssetRenderer.setAssetRendererType(type);
 		commentAssetRenderer.setServletContext(_servletContext);
@@ -106,7 +106,7 @@ public class CommentAssetRendererFactory
 		}
 		catch (WindowStateException windowStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(windowStateException);
+				_log.debug(windowStateException, windowStateException);
 			}
 		}
 
@@ -136,9 +136,6 @@ public class CommentAssetRendererFactory
 
 	@Reference
 	private CommentManager _commentManager;
-
-	@Reference
-	private HtmlParser _htmlParser;
 
 	@Reference(target = "(osgi.web.symbolicname=com.liferay.comment.web)")
 	private ServletContext _servletContext;

@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SiteAdminPortletKeys.SITE_ADMIN,
 		"mvc.command.name=/site_admin/edit_group_assignments"
@@ -62,7 +63,7 @@ public class EditGroupAssignmentsMVCActionCommand extends BaseMVCActionCommand {
 		long[] removeUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "removeUserIds"), 0L);
 
-		removeUserIds = _filterRemoveUserIds(groupId, removeUserIds);
+		removeUserIds = filterRemoveUserIds(groupId, removeUserIds);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
@@ -73,7 +74,7 @@ public class EditGroupAssignmentsMVCActionCommand extends BaseMVCActionCommand {
 			themeDisplay.getCompanyId(), groupId, removeUserIds);
 	}
 
-	private long[] _filterRemoveUserIds(long groupId, long[] userIds) {
+	protected long[] filterRemoveUserIds(long groupId, long[] userIds) {
 		Set<Long> filteredUserIds = new HashSet<>();
 
 		for (long userId : userIds) {

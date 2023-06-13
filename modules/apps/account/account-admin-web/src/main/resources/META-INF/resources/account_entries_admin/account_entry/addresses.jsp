@@ -46,14 +46,6 @@ renderResponse.setTitle(accountEntryDisplay.getName());
 				keyProperty="addressId"
 				modelVar="addressDisplay"
 			>
-
-				<%
-				row.setData(
-					HashMapBuilder.<String, Object>put(
-						"actions", StringUtil.merge(viewAccountEntryAddressesManagementToolbarDisplayContext.getAvailableActions(accountEntryDisplay))
-					).build());
-				%>
-
 				<portlet:renderURL var="rowURL">
 					<portlet:param name="mvcRenderCommandName" value="/account_admin/edit_account_entry_address" />
 					<portlet:param name="backURL" value="<%= currentURL %>" />
@@ -61,52 +53,46 @@ renderResponse.setTitle(accountEntryDisplay.getName());
 					<portlet:param name="accountEntryId" value="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>" />
 				</portlet:renderURL>
 
-				<%
-				if (!AccountEntryPermission.contains(permissionChecker, accountEntryDisplay.getAccountEntryId(), AccountActionKeys.MANAGE_ADDRESSES)) {
-					rowURL = null;
-				}
-				%>
-
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand-small table-cell-minw-150"
 					href="<%= rowURL %>"
 					name="name"
-					value="<%= HtmlUtil.escape(addressDisplay.getName()) %>"
+					value="<%= addressDisplay.getName() %>"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand-small table-cell-minw-150"
 					href="<%= rowURL %>"
 					name="street"
-					value="<%= HtmlUtil.escape(addressDisplay.getStreet()) %>"
+					value="<%= addressDisplay.getStreet() %>"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand-small table-cell-minw-150"
 					href="<%= rowURL %>"
 					name="city"
-					value="<%= HtmlUtil.escape(addressDisplay.getCity()) %>"
+					value="<%= addressDisplay.getCity() %>"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand-small table-cell-minw-150"
 					href="<%= rowURL %>"
 					name="region"
-					value="<%= HtmlUtil.escape(addressDisplay.getRegionName()) %>"
+					value="<%= addressDisplay.getRegionName() %>"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand-small table-cell-minw-150"
 					href="<%= rowURL %>"
 					name="postal-code"
-					value="<%= HtmlUtil.escape(addressDisplay.getZip()) %>"
+					value="<%= addressDisplay.getZip() %>"
 				/>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand-small table-cell-minw-150"
 					href="<%= rowURL %>"
 					name="type"
-					value="<%= HtmlUtil.escape(addressDisplay.getType(themeDisplay.getLocale())) %>"
+					value="<%= addressDisplay.getType(themeDisplay.getLocale()) %>"
 				/>
 
 				<liferay-ui:search-container-column-jsp

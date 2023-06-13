@@ -16,7 +16,6 @@ package com.liferay.portal.security.sso.opensso.internal.verify;
 
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.settings.SettingsFactory;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.security.sso.opensso.constants.LegacyOpenSSOPropsKeys;
 import com.liferay.portal.security.sso.opensso.constants.OpenSSOConfigurationKeys;
@@ -32,7 +31,11 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Greenwald
  */
-@Component(service = VerifyProcess.class)
+@Component(
+	immediate = true,
+	property = "verify.process.name=com.liferay.portal.security.sso.opensso",
+	service = VerifyProcess.class
+)
 public class OpenSSOCompanySettingsVerifyProcess
 	extends BaseCompanySettingsVerifyProcess {
 
@@ -102,18 +105,19 @@ public class OpenSSOCompanySettingsVerifyProcess
 		return OpenSSOConstants.SERVICE_NAME;
 	}
 
-	@Override
-	protected SettingsLocatorHelper getSettingsLocatorHelper() {
-		return _settingsLocatorHelper;
+	@Reference(unbind = "-")
+	protected void setCompanyLocalService(
+		CompanyLocalService companyLocalService) {
+
+		_companyLocalService = companyLocalService;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setSettingsFactory(SettingsFactory settingsFactory) {
+		_settingsFactory = settingsFactory;
+	}
+
 	private CompanyLocalService _companyLocalService;
-
-	@Reference
 	private SettingsFactory _settingsFactory;
-
-	@Reference
-	private SettingsLocatorHelper _settingsLocatorHelper;
 
 }

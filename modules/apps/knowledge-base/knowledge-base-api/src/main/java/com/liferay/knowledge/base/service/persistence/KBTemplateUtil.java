@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the kb template service. This utility wraps <code>com.liferay.knowledge.base.service.persistence.impl.KBTemplatePersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -919,9 +923,25 @@ public class KBTemplateUtil {
 	}
 
 	public static KBTemplatePersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile KBTemplatePersistence _persistence;
+	private static ServiceTracker<KBTemplatePersistence, KBTemplatePersistence>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(KBTemplatePersistence.class);
+
+		ServiceTracker<KBTemplatePersistence, KBTemplatePersistence>
+			serviceTracker =
+				new ServiceTracker
+					<KBTemplatePersistence, KBTemplatePersistence>(
+						bundle.getBundleContext(), KBTemplatePersistence.class,
+						null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

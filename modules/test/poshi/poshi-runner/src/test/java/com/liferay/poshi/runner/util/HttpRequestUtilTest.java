@@ -32,7 +32,7 @@ public class HttpRequestUtilTest extends PoshiRunnerTestCase {
 
 	@Test
 	public void testAssertStatusCode() throws Exception {
-		runPoshiTest("HttpRequestTest#TestAssertStatusCode");
+		runPoshiTest("HttpRequestTest#testAssertStatusCode");
 	}
 
 	private static final String _TEST_BASE_DIR_NAME =

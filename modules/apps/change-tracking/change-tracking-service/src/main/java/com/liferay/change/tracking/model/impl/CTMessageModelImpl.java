@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -201,69 +202,80 @@ public class CTMessageModelImpl
 	public Map<String, Function<CTMessage, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CTMessage, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CTMessage>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CTMessage, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTMessage.class.getClassLoader(), CTMessage.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<CTMessage, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<CTMessage, Object>>();
+		try {
+			Constructor<CTMessage> constructor =
+				(Constructor<CTMessage>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CTMessage::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctMessageId", CTMessage::getCtMessageId);
-			attributeGetterFunctions.put("companyId", CTMessage::getCompanyId);
-			attributeGetterFunctions.put(
-				"ctCollectionId", CTMessage::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"messageContent", CTMessage::getMessageContent);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<CTMessage, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CTMessage, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<CTMessage, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<CTMessage, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTMessage, Object>>();
+		Map<String, BiConsumer<CTMessage, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CTMessage, ?>>();
 
-		static {
-			Map<String, BiConsumer<CTMessage, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<CTMessage, ?>>();
+		attributeGetterFunctions.put("mvccVersion", CTMessage::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CTMessage, Long>)CTMessage::setMvccVersion);
+		attributeGetterFunctions.put("ctMessageId", CTMessage::getCtMessageId);
+		attributeSetterBiConsumers.put(
+			"ctMessageId",
+			(BiConsumer<CTMessage, Long>)CTMessage::setCtMessageId);
+		attributeGetterFunctions.put("companyId", CTMessage::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<CTMessage, Long>)CTMessage::setCompanyId);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTMessage::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<CTMessage, Long>)CTMessage::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"messageContent", CTMessage::getMessageContent);
+		attributeSetterBiConsumers.put(
+			"messageContent",
+			(BiConsumer<CTMessage, String>)CTMessage::setMessageContent);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CTMessage, Long>)CTMessage::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctMessageId",
-				(BiConsumer<CTMessage, Long>)CTMessage::setCtMessageId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CTMessage, Long>)CTMessage::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<CTMessage, Long>)CTMessage::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"messageContent",
-				(BiConsumer<CTMessage, String>)CTMessage::setMessageContent);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -575,12 +587,41 @@ public class CTMessageModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CTMessage, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CTMessage, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CTMessage, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((CTMessage)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTMessage>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTMessage.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -591,9 +632,8 @@ public class CTMessageModelImpl
 	private String _messageContent;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<CTMessage, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<CTMessage, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

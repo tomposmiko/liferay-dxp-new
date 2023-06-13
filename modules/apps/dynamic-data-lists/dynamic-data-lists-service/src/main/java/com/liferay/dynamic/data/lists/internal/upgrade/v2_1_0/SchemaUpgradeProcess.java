@@ -28,7 +28,7 @@ public class SchemaUpgradeProcess extends UpgradeProcess {
 			new MVCCVersionUpgradeProcess() {
 
 				@Override
-				protected String[] getTableNames() {
+				protected String[] getModuleTableNames() {
 					return new String[] {
 						"DDLRecord", "DDLRecordSet", "DDLRecordSetVersion",
 						"DDLRecordVersion"

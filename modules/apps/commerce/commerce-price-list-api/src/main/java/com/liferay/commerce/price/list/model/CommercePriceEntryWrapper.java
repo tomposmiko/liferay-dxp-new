@@ -23,8 +23,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -47,8 +45,6 @@ public class CommercePriceEntryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("commercePriceEntryId", getCommercePriceEntryId());
@@ -82,18 +78,6 @@ public class CommercePriceEntryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -354,16 +338,6 @@ public class CommercePriceEntryWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this commerce price entry.
-	 *
-	 * @return the ct collection ID of this commerce price entry
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the discount discovery of this commerce price entry.
 	 *
 	 * @return the discount discovery of this commerce price entry
@@ -471,16 +445,6 @@ public class CommercePriceEntryWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this commerce price entry.
-	 *
-	 * @return the mvcc version of this commerce price entry
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -805,16 +769,6 @@ public class CommercePriceEntryWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this commerce price entry.
-	 *
-	 * @param ctCollectionId the ct collection ID of this commerce price entry
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets whether this commerce price entry is discount discovery.
 	 *
 	 * @param discountDiscovery the discount discovery of this commerce price entry
@@ -922,16 +876,6 @@ public class CommercePriceEntryWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
-	 * Sets the mvcc version of this commerce price entry.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce price entry
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -1052,25 +996,6 @@ public class CommercePriceEntryWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CommercePriceEntry, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CommercePriceEntry, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

@@ -42,9 +42,11 @@ import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalServ
 import com.liferay.portal.workflow.kaleo.service.KaleoNodeLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -196,34 +198,38 @@ public abstract class BaseWorkflowMetricsTestCase {
 				workflowDefinition.getCompanyId(),
 				workflowDefinition.getName());
 
-		for (KaleoNode kaleoNode :
-				_kaleoNodeLocalService.getKaleoDefinitionVersionKaleoNodes(
-					latestKaleoDefinitionVersion.
-						getKaleoDefinitionVersionId())) {
+		List<KaleoNode> kaleoNodes =
+			_kaleoNodeLocalService.getKaleoDefinitionVersionKaleoNodes(
+				latestKaleoDefinitionVersion.getKaleoDefinitionVersionId());
 
-			if (!Objects.equals(kaleoNode.getName(), taskName)) {
-				continue;
-			}
+		Stream<KaleoNode> stream = kaleoNodes.stream();
 
-			try {
-				KaleoTask kaleoTask =
-					_kaleoTaskLocalService.getKaleoNodeKaleoTask(
+		return stream.filter(
+			kaleoNode -> Objects.equals(kaleoNode.getName(), taskName)
+		).map(
+			kaleoNode -> {
+				try {
+					return _kaleoTaskLocalService.getKaleoNodeKaleoTask(
 						kaleoNode.getKaleoNodeId());
-
-				if (kaleoTask == null) {
-					continue;
+				}
+				catch (PortalException portalException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(portalException, portalException);
+					}
 				}
 
-				return String.valueOf(kaleoTask.getKaleoTaskId());
+				return null;
 			}
-			catch (PortalException portalException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
-				}
-			}
-		}
-
-		return StringPool.BLANK;
+		).filter(
+			Objects::nonNull
+		).findFirst(
+		).map(
+			KaleoTask::getKaleoTaskId
+		).map(
+			String::valueOf
+		).orElseGet(
+			() -> StringPool.BLANK
+		);
 	}
 
 	protected String getTerminalNodeKey(WorkflowDefinition workflowDefinition)
@@ -308,32 +314,44 @@ public abstract class BaseWorkflowMetricsTestCase {
 			KaleoDefinitionVersion kaleoDefinitionVersion)
 		throws Exception {
 
-		for (KaleoNode kaleoNode :
-				_kaleoNodeLocalService.getKaleoDefinitionVersionKaleoNodes(
-					kaleoDefinitionVersion.getKaleoDefinitionVersionId())) {
+		List<KaleoNode> kaleoNodes =
+			_kaleoNodeLocalService.getKaleoDefinitionVersionKaleoNodes(
+				kaleoDefinitionVersion.getKaleoDefinitionVersionId());
 
-			if (kaleoNode.isInitial()) {
-				return String.valueOf(kaleoNode.getKaleoNodeId());
-			}
-		}
+		Stream<KaleoNode> stream = kaleoNodes.stream();
 
-		return StringPool.BLANK;
+		return stream.filter(
+			KaleoNode::isInitial
+		).findFirst(
+		).map(
+			KaleoNode::getKaleoNodeId
+		).map(
+			String::valueOf
+		).orElseGet(
+			() -> StringPool.BLANK
+		);
 	}
 
 	private String _getTerminalNodeKey(
 			KaleoDefinitionVersion kaleoDefinitionVersion)
 		throws PortalException {
 
-		for (KaleoNode kaleoNode :
-				_kaleoNodeLocalService.getKaleoDefinitionVersionKaleoNodes(
-					kaleoDefinitionVersion.getKaleoDefinitionVersionId())) {
+		List<KaleoNode> kaleoNodes =
+			_kaleoNodeLocalService.getKaleoDefinitionVersionKaleoNodes(
+				kaleoDefinitionVersion.getKaleoDefinitionVersionId());
 
-			if (kaleoNode.isTerminal()) {
-				return String.valueOf(kaleoNode.getKaleoNodeId());
-			}
-		}
+		Stream<KaleoNode> stream = kaleoNodes.stream();
 
-		return StringPool.BLANK;
+		return stream.filter(
+			KaleoNode::isTerminal
+		).findFirst(
+		).map(
+			KaleoNode::getKaleoNodeId
+		).map(
+			String::valueOf
+		).orElseGet(
+			() -> StringPool.BLANK
+		);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

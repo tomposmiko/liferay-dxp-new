@@ -1,5 +1,9 @@
 {
 	"dependencies": {
+		"@clayui/layout": "3.37.0",
+		"classnames": "2.3.1",
+		"react": "16.12.0",
+		"react-dom": "16.12.0"
 	},
 	"name": "frontend-theme-classic-style-guide-sample-web",
 	"scripts": {
@@ -7,5 +11,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "2.0.53"
+	"version": "2.0.10"
 }

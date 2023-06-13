@@ -72,8 +72,7 @@ public class PriceTag extends IncludeTag {
 
 			if (_quantity <= 0) {
 				ProductSettingsModel productSettingsModel =
-					_productHelper.getProductSettingsModel(
-						_cpCatalogEntry.getCPDefinitionId());
+					_productHelper.getProductSettingsModel(cpInstanceId);
 
 				_quantity = productSettingsModel.getMinQuantity();
 			}
@@ -83,7 +82,7 @@ public class PriceTag extends IncludeTag {
 			_priceModel = _getPriceModel(commerceContext, cpInstanceId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return SKIP_BODY;
 		}

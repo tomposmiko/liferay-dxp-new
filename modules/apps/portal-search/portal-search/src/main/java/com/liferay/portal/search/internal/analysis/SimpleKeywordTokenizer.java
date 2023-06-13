@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = KeywordTokenizer.class)
+@Component(immediate = true, service = KeywordTokenizer.class)
 public class SimpleKeywordTokenizer implements KeywordTokenizer {
 
 	@Override
@@ -80,7 +80,7 @@ public class SimpleKeywordTokenizer implements KeywordTokenizer {
 			keyword = keyword.trim();
 
 			if (!keyword.isEmpty()) {
-				_tokenizeBySpace(keyword, tokens);
+				tokenizeBySpace(keyword, tokens);
 			}
 
 			return;
@@ -91,7 +91,7 @@ public class SimpleKeywordTokenizer implements KeywordTokenizer {
 		token = token.trim();
 
 		if (!token.isEmpty()) {
-			_tokenizeBySpace(token, tokens);
+			tokenizeBySpace(token, tokens);
 		}
 
 		token = keyword.substring(start, end + 1);
@@ -121,11 +121,7 @@ public class SimpleKeywordTokenizer implements KeywordTokenizer {
 		tokenize(keyword, tokens, start, end);
 	}
 
-	private String _normalizeWhitespace(String keyword) {
-		return StringUtil.replace(keyword, _IDEOGRAPHIC_SPACE, CharPool.SPACE);
-	}
-
-	private void _tokenizeBySpace(String keyword, List<String> tokens) {
+	protected void tokenizeBySpace(String keyword, List<String> tokens) {
 		String[] keywordTokens = split(keyword);
 
 		for (String keywordToken : keywordTokens) {
@@ -135,6 +131,10 @@ public class SimpleKeywordTokenizer implements KeywordTokenizer {
 				tokens.add(keyword);
 			}
 		}
+	}
+
+	private String _normalizeWhitespace(String keyword) {
+		return StringUtil.replace(keyword, _IDEOGRAPHIC_SPACE, CharPool.SPACE);
 	}
 
 	private static final char _IDEOGRAPHIC_SPACE = '\u3000';

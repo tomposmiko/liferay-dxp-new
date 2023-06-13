@@ -16,7 +16,7 @@ package com.liferay.journal.web.internal.info.item.renderer;
 
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
@@ -40,19 +40,13 @@ public class JournalArticleFullContentInfoItemRenderer
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "default-template");
+		return LanguageUtil.get(locale, "default-template");
 	}
 
 	@Override
 	public void render(
 		JournalArticle article, HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
-
-		if (!JournalArticleRendererUtil.isShowArticle(
-				httpServletRequest, article)) {
-
-			return;
-		}
 
 		try {
 			httpServletRequest.setAttribute(WebKeys.JOURNAL_ARTICLE, article);
@@ -68,10 +62,13 @@ public class JournalArticleFullContentInfoItemRenderer
 		}
 	}
 
-	@Reference
-	private Language _language;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.journal.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
 
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.journal.web)")
 	private ServletContext _servletContext;
 
 }

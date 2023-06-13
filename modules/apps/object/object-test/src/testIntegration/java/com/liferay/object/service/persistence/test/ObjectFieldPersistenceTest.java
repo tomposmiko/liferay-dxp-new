@@ -128,8 +128,6 @@ public class ObjectFieldPersistenceTest {
 
 		newObjectField.setUuid(RandomTestUtil.randomString());
 
-		newObjectField.setExternalReferenceCode(RandomTestUtil.randomString());
-
 		newObjectField.setCompanyId(RandomTestUtil.nextLong());
 
 		newObjectField.setUserId(RandomTestUtil.nextLong());
@@ -144,13 +142,9 @@ public class ObjectFieldPersistenceTest {
 
 		newObjectField.setObjectDefinitionId(RandomTestUtil.nextLong());
 
-		newObjectField.setBusinessType(RandomTestUtil.randomString());
-
 		newObjectField.setDBColumnName(RandomTestUtil.randomString());
 
 		newObjectField.setDBTableName(RandomTestUtil.randomString());
-
-		newObjectField.setDBType(RandomTestUtil.randomString());
 
 		newObjectField.setIndexed(RandomTestUtil.randomBoolean());
 
@@ -160,17 +154,13 @@ public class ObjectFieldPersistenceTest {
 
 		newObjectField.setLabel(RandomTestUtil.randomString());
 
-		newObjectField.setLocalized(RandomTestUtil.randomBoolean());
-
 		newObjectField.setName(RandomTestUtil.randomString());
 
 		newObjectField.setRelationshipType(RandomTestUtil.randomString());
 
 		newObjectField.setRequired(RandomTestUtil.randomBoolean());
 
-		newObjectField.setState(RandomTestUtil.randomBoolean());
-
-		newObjectField.setSystem(RandomTestUtil.randomBoolean());
+		newObjectField.setType(RandomTestUtil.randomString());
 
 		_objectFields.add(_persistence.update(newObjectField));
 
@@ -182,9 +172,6 @@ public class ObjectFieldPersistenceTest {
 			newObjectField.getMvccVersion());
 		Assert.assertEquals(
 			existingObjectField.getUuid(), newObjectField.getUuid());
-		Assert.assertEquals(
-			existingObjectField.getExternalReferenceCode(),
-			newObjectField.getExternalReferenceCode());
 		Assert.assertEquals(
 			existingObjectField.getObjectFieldId(),
 			newObjectField.getObjectFieldId());
@@ -207,16 +194,11 @@ public class ObjectFieldPersistenceTest {
 			existingObjectField.getObjectDefinitionId(),
 			newObjectField.getObjectDefinitionId());
 		Assert.assertEquals(
-			existingObjectField.getBusinessType(),
-			newObjectField.getBusinessType());
-		Assert.assertEquals(
 			existingObjectField.getDBColumnName(),
 			newObjectField.getDBColumnName());
 		Assert.assertEquals(
 			existingObjectField.getDBTableName(),
 			newObjectField.getDBTableName());
-		Assert.assertEquals(
-			existingObjectField.getDBType(), newObjectField.getDBType());
 		Assert.assertEquals(
 			existingObjectField.isIndexed(), newObjectField.isIndexed());
 		Assert.assertEquals(
@@ -228,8 +210,6 @@ public class ObjectFieldPersistenceTest {
 		Assert.assertEquals(
 			existingObjectField.getLabel(), newObjectField.getLabel());
 		Assert.assertEquals(
-			existingObjectField.isLocalized(), newObjectField.isLocalized());
-		Assert.assertEquals(
 			existingObjectField.getName(), newObjectField.getName());
 		Assert.assertEquals(
 			existingObjectField.getRelationshipType(),
@@ -237,9 +217,7 @@ public class ObjectFieldPersistenceTest {
 		Assert.assertEquals(
 			existingObjectField.isRequired(), newObjectField.isRequired());
 		Assert.assertEquals(
-			existingObjectField.isState(), newObjectField.isState());
-		Assert.assertEquals(
-			existingObjectField.isSystem(), newObjectField.isSystem());
+			existingObjectField.getType(), newObjectField.getType());
 	}
 
 	@Test
@@ -275,14 +253,6 @@ public class ObjectFieldPersistenceTest {
 	}
 
 	@Test
-	public void testCountByLTDI_S() throws Exception {
-		_persistence.countByLTDI_S(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
-
-		_persistence.countByLTDI_S(0L, RandomTestUtil.randomBoolean());
-	}
-
-	@Test
 	public void testCountByODI_DTN() throws Exception {
 		_persistence.countByODI_DTN(RandomTestUtil.nextLong(), "");
 
@@ -292,58 +262,12 @@ public class ObjectFieldPersistenceTest {
 	}
 
 	@Test
-	public void testCountByODI_I() throws Exception {
-		_persistence.countByODI_I(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
-
-		_persistence.countByODI_I(0L, RandomTestUtil.randomBoolean());
-	}
-
-	@Test
-	public void testCountByODI_L() throws Exception {
-		_persistence.countByODI_L(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
-
-		_persistence.countByODI_L(0L, RandomTestUtil.randomBoolean());
-	}
-
-	@Test
 	public void testCountByODI_N() throws Exception {
 		_persistence.countByODI_N(RandomTestUtil.nextLong(), "");
 
 		_persistence.countByODI_N(0L, "null");
 
 		_persistence.countByODI_N(0L, (String)null);
-	}
-
-	@Test
-	public void testCountByODI_S() throws Exception {
-		_persistence.countByODI_S(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
-
-		_persistence.countByODI_S(0L, RandomTestUtil.randomBoolean());
-	}
-
-	@Test
-	public void testCountByERC_C_ODI() throws Exception {
-		_persistence.countByERC_C_ODI(
-			"", RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
-
-		_persistence.countByERC_C_ODI("null", 0L, 0L);
-
-		_persistence.countByERC_C_ODI((String)null, 0L, 0L);
-	}
-
-	@Test
-	public void testCountByODI_DBT_I() throws Exception {
-		_persistence.countByODI_DBT_I(
-			RandomTestUtil.nextLong(), "", RandomTestUtil.randomBoolean());
-
-		_persistence.countByODI_DBT_I(
-			0L, "null", RandomTestUtil.randomBoolean());
-
-		_persistence.countByODI_DBT_I(
-			0L, (String)null, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
@@ -371,15 +295,13 @@ public class ObjectFieldPersistenceTest {
 
 	protected OrderByComparator<ObjectField> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"ObjectField", "mvccVersion", true, "uuid", true,
-			"externalReferenceCode", true, "objectFieldId", true, "companyId",
-			true, "userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "listTypeDefinitionId", true,
-			"objectDefinitionId", true, "businessType", true, "dbColumnName",
-			true, "dbTableName", true, "dbType", true, "indexed", true,
-			"indexedAsKeyword", true, "indexedLanguageId", true, "label", true,
-			"localized", true, "name", true, "relationshipType", true,
-			"required", true, "state", true, "system", true);
+			"ObjectField", "mvccVersion", true, "uuid", true, "objectFieldId",
+			true, "companyId", true, "userId", true, "userName", true,
+			"createDate", true, "modifiedDate", true, "listTypeDefinitionId",
+			true, "objectDefinitionId", true, "dbColumnName", true,
+			"dbTableName", true, "indexed", true, "indexedAsKeyword", true,
+			"indexedLanguageId", true, "label", true, "name", true,
+			"relationshipType", true, "required", true, "type", true);
 	}
 
 	@Test
@@ -652,22 +574,6 @@ public class ObjectFieldPersistenceTest {
 			ReflectionTestUtil.invoke(
 				objectField, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "name"));
-
-		Assert.assertEquals(
-			objectField.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				objectField, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
-			Long.valueOf(objectField.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(
-				objectField, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "companyId"));
-		Assert.assertEquals(
-			Long.valueOf(objectField.getObjectDefinitionId()),
-			ReflectionTestUtil.<Long>invoke(
-				objectField, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "objectDefinitionId"));
 	}
 
 	protected ObjectField addObjectField() throws Exception {
@@ -678,8 +584,6 @@ public class ObjectFieldPersistenceTest {
 		objectField.setMvccVersion(RandomTestUtil.nextLong());
 
 		objectField.setUuid(RandomTestUtil.randomString());
-
-		objectField.setExternalReferenceCode(RandomTestUtil.randomString());
 
 		objectField.setCompanyId(RandomTestUtil.nextLong());
 
@@ -695,13 +599,9 @@ public class ObjectFieldPersistenceTest {
 
 		objectField.setObjectDefinitionId(RandomTestUtil.nextLong());
 
-		objectField.setBusinessType(RandomTestUtil.randomString());
-
 		objectField.setDBColumnName(RandomTestUtil.randomString());
 
 		objectField.setDBTableName(RandomTestUtil.randomString());
-
-		objectField.setDBType(RandomTestUtil.randomString());
 
 		objectField.setIndexed(RandomTestUtil.randomBoolean());
 
@@ -711,17 +611,13 @@ public class ObjectFieldPersistenceTest {
 
 		objectField.setLabel(RandomTestUtil.randomString());
 
-		objectField.setLocalized(RandomTestUtil.randomBoolean());
-
 		objectField.setName(RandomTestUtil.randomString());
 
 		objectField.setRelationshipType(RandomTestUtil.randomString());
 
 		objectField.setRequired(RandomTestUtil.randomBoolean());
 
-		objectField.setState(RandomTestUtil.randomBoolean());
-
-		objectField.setSystem(RandomTestUtil.randomBoolean());
+		objectField.setType(RandomTestUtil.randomString());
 
 		_objectFields.add(_persistence.update(objectField));
 

@@ -43,11 +43,11 @@
 						.then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 								id:
-									'<%= CommercePricingFDSNames.DISCOUNT_QUALIFIER_ORDER_TYPES %>',
+									'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_ORDER_TYPES %>',
 							});
 						})
 						.catch((error) => {
-							return Promise.reject(error.title);
+							return Promise.reject(error);
 						});
 				}
 
@@ -62,7 +62,7 @@
 					itemSelectedMessage:
 						'<%= LanguageUtil.get(request, "order-type-selected") %>',
 					linkedDatasetsId: [
-						'<%= CommercePricingFDSNames.DISCOUNT_QUALIFIER_ORDER_TYPES %>',
+						'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_ORDER_TYPES %>',
 					],
 					itemCreation: false,
 					itemsKey: 'id',
@@ -75,7 +75,7 @@
 							fieldName: ['name', 'LANG'],
 						},
 					],
-					spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 					titleLabel: '<%= LanguageUtil.get(request, "add-existing-order-type") %>',
 				});
 			</aui:script>
@@ -86,12 +86,15 @@
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "order-types") %>'
 			>
-				<frontend-data-set:headless-display
+				<clay:headless-data-set-display
 					apiURL="<%= commerceDiscountQualifiersDisplayContext.getDiscountOrderTypesAPIURL() %>"
-					fdsActionDropdownItems="<%= commerceDiscountQualifiersDisplayContext.getDiscountOrderTypeFDSActionDropdownItems() %>"
-					formName="fm"
-					id="<%= CommercePricingFDSNames.DISCOUNT_QUALIFIER_ORDER_TYPES %>"
+					clayDataSetActionDropdownItems="<%= commerceDiscountQualifiersDisplayContext.getDiscountOrderTypeClayDataSetActionDropdownItems() %>"
+					formId="fm"
+					id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_ORDER_TYPES %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= currentURLObj %>"
 				/>
 			</commerce-ui:panel>
 		</div>

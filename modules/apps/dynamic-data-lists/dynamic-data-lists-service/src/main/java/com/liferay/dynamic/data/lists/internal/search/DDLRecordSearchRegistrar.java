@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcela Cunha
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class DDLRecordSearchRegistrar {
 
 	@Activate

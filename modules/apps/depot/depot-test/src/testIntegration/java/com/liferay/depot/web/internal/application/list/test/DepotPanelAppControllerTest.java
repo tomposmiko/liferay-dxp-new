@@ -41,6 +41,7 @@ import com.liferay.staging.constants.StagingProcessesPortletKeys;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -206,18 +207,15 @@ public class DepotPanelAppControllerTest {
 	private void _assertPanelAppsContain(
 		List<PanelApp> panelApps, String portletId) {
 
-		boolean found = false;
+		Stream<PanelApp> stream = panelApps.stream();
 
-		for (PanelApp panelApp : panelApps) {
-			if (Objects.equals(portletId, panelApp.getPortletId())) {
-				found = true;
-
-				break;
-			}
-		}
-
-		Assert.assertTrue(
-			"Panel apps do not contain portlet " + portletId, found);
+		stream.filter(
+			panelApp -> Objects.equals(portletId, panelApp.getPortletId())
+		).findFirst(
+		).orElseThrow(
+			() -> new AssertionError(
+				"Panel apps do not contain portlet " + portletId)
+		);
 	}
 
 	@DeleteAfterTestRun

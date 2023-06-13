@@ -22,34 +22,19 @@
 
 		iframe.on('load', () => {
 			var height = A.Plugin.AutosizeIframe.getContentHeight(iframe);
-			var normalHeight = 600;
 
 			if (height == null) {
 				if (themeDisplay.isStateMaximized()) {
 					height = A.getDoc().get('docHeight');
 				}
 				else {
-					height = normalHeight;
+					height = 600;
 
 					iframe.autosizeiframe.set('monitorHeight', false);
 				}
 			}
 
-			if (height < normalHeight) {
-				height = normalHeight;
-			}
-
 			iframe.setStyle('height', height);
 		});
-
-		iframe.set(
-			'src',
-
-			<%
-			UnicodeProperties typeSettingsUnicodeProperties = layout.getTypeSettingsProperties();
-			%>
-
-			'<%= HtmlUtil.escapeHREF(typeSettingsUnicodeProperties.getProperty("embeddedLayoutURL")) %>'
-		);
 	}
 </aui:script>

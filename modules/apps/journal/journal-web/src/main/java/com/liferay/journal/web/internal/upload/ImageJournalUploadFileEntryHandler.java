@@ -57,7 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.journal.configuration.JournalFileUploadsConfiguration",
-	service = ImageJournalUploadFileEntryHandler.class
+	immediate = true, service = ImageJournalUploadFileEntryHandler.class
 )
 public class ImageJournalUploadFileEntryHandler
 	implements UploadFileEntryHandler {
@@ -114,16 +114,33 @@ public class ImageJournalUploadFileEntryHandler
 			JournalFileUploadsConfiguration.class, properties);
 	}
 
+	@Reference(
+		target = "(model.class.name=com.liferay.journal.model.JournalArticle)",
+		unbind = "-"
+	)
+	protected void setJournalArticleModelResourcePermission(
+		ModelResourcePermission<JournalArticle> modelResourcePermission) {
+
+		_journalArticleModelResourcePermission = modelResourcePermission;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.journal.model.JournalFolder)",
+		unbind = "-"
+	)
+	protected void setJournalFolderModelResourcePermission(
+		ModelResourcePermission<JournalFolder> modelResourcePermission) {
+
+		_journalFolderModelResourcePermission = modelResourcePermission;
+	}
+
 	private FileEntry _addTempFileEntry(
 			String fileName, InputStream inputStream, String parameterName,
 			UploadPortletRequest uploadPortletRequest,
 			ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		_validateFile(
-			themeDisplay.getScopeGroupId(), fileName,
-			uploadPortletRequest.getContentType(parameterName),
-			uploadPortletRequest.getSize(parameterName));
+		_validateFile(fileName, uploadPortletRequest.getSize(parameterName));
 
 		String contentType = uploadPortletRequest.getContentType(parameterName);
 
@@ -168,18 +185,17 @@ public class ImageJournalUploadFileEntryHandler
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
 		}
 	}
 
-	private void _validateFile(
-			long groupId, String fileName, String mimeType, long size)
+	private void _validateFile(String fileName, long size)
 		throws PortalException {
 
-		_dlValidator.validateFileSize(groupId, fileName, mimeType, size);
+		_dlValidator.validateFileSize(fileName, size);
 
 		String extension = FileUtil.getExtension(fileName);
 
@@ -209,18 +225,10 @@ public class ImageJournalUploadFileEntryHandler
 	@Reference
 	private DLValidator _dlValidator;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.journal.model.JournalArticle)"
-	)
 	private ModelResourcePermission<JournalArticle>
 		_journalArticleModelResourcePermission;
-
 	private volatile JournalFileUploadsConfiguration
 		_journalFileUploadsConfiguration;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.journal.model.JournalFolder)"
-	)
 	private ModelResourcePermission<JournalFolder>
 		_journalFolderModelResourcePermission;
 

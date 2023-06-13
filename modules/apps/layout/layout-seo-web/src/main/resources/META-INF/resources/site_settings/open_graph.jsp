@@ -21,7 +21,7 @@ OpenGraphSettingsDisplayContext openGraphSettingsDisplayContext = (OpenGraphSett
 %>
 
 <liferay-util:html-top>
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/main.css") %>" rel="stylesheet" type="text/css" />
+	<link href="<%= PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/css/main.css") %>" rel="stylesheet" type="text/css" />
 </liferay-util:html-top>
 
 <aui:field-wrapper cssClass="form-group">
@@ -66,27 +66,15 @@ OpenGraphSettingsDisplayContext openGraphSettingsDisplayContext = (OpenGraphSett
 	<aui:input id="openGraphImageFileEntryId" name="openGraphImageFileEntryId" type="hidden" value="<%= openGraphSettingsDisplayContext.getOpenGraphImageFileEntryId() %>" />
 
 	<div class="form-group">
-		<label>
-			<div class="align-items-center d-flex">
-				<liferay-ui:message key="preview" />
-
-				<span>
-					<clay:icon
-						aria-label='<%= LanguageUtil.get(request, "preview-help") %>'
-						cssClass="lfr-portal-tooltip ml-1"
-						symbol="question-circle-full"
-						title='<%= LanguageUtil.get(request, "preview-help") %>'
-					/>
-				</span>
-			</div>
-		</label>
+		<label><liferay-ui:message key="preview" /> <liferay-ui:icon-help message="preview-help" /></label>
 
 		<div class="preview-seo preview-seo-og" dir="ltr">
 			<div class="aspect-ratio aspect-ratio-191-to-100 bg-light mb-0 preview-seo-image">
 				<div class="preview-seo-placeholder" id="<portlet:namespace />openGraphPreviewPlaceholder">
-					<clay:icon
-						cssClass="aspect-ratio-item aspect-ratio-item-center-middle aspect-ratio-item-fluid preview-seo-placeholder-icon"
-						symbol="picture"
+					<liferay-ui:icon
+						icon="picture"
+						iconCssClass="aspect-ratio-item aspect-ratio-item-center-middle aspect-ratio-item-fluid preview-seo-placeholder-icon"
+						markupView="lexicon"
 					/>
 
 					<div class="preview-seo-placeholder-text"><liferay-ui:message key="open-graph-image-placeholder" /></div>

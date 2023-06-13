@@ -19,35 +19,27 @@ import React, {useCallback, useContext, useRef, useState} from 'react';
 import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../AppContext.es';
-import {createCommentQuery, getUserActivityQuery} from '../utils/client.es';
-import {deleteCacheKey, getContextLink} from '../utils/utils.es';
+import {createCommentQuery} from '../utils/client.es';
+import {getContextLink} from '../utils/utils.es';
 import Comment from './Comment.es';
 import DefaultQuestionsEditor from './DefaultQuestionsEditor.es';
-import SubscritionCheckbox from './SubscribeCheckbox.es';
 
 export default withRouter(
 	({
 		comments,
 		commentsChange,
-		companyName,
-		display,
 		editable = true,
 		entityId,
 		match: {
 			params: {questionId, sectionTitle},
 		},
-		onSubscription,
-		question,
 		showNewComment,
 		showNewCommentChange,
-		showSignature,
-		styledItems = false,
 	}) => {
 		const context = useContext(AppContext);
 
-		const editorRef = useRef('');
+		const editor = useRef('');
 
-		const [allowSubscription, setAllowSubscription] = useState(false);
 		const [isReplyButtonDisable, setIsReplyButtonDisable] = useState(false);
 
 		const [createComment] = useMutation(createCommentQuery);
@@ -65,49 +57,14 @@ export default withRouter(
 			[commentsChange, comments]
 		);
 
-		const onCreateComment = async () => {
-			const {data} = await createComment({
-				fetchOptionsOverrides: getContextLink(
-					`${sectionTitle}/${questionId}`
-				),
-				variables: {
-					articleBody: editorRef.current.getContent(),
-					parentMessageBoardMessageId: entityId,
-				},
-			});
-
-			editorRef.current.clearContent();
-
-			showNewCommentChange(false);
-
-			commentsChange([
-				...comments,
-				data.createMessageBoardMessageMessageBoardMessage,
-			]);
-
-			onSubscription({allowSubscription});
-
-			deleteCacheKey(getUserActivityQuery, {
-				filter: `creatorId eq ${context.userId}`,
-				page: 1,
-				pageSize: 20,
-				siteKey: context.siteKey,
-			});
-		};
-
 		return (
 			<div>
 				{comments.map((comment) => (
 					<Comment
 						comment={comment}
 						commentChange={_commentChange}
-						companyName={companyName}
-						display={display}
 						editable={editable}
-						hasCompanyMx={comment.hasCompanyMx}
 						key={comment.id}
-						showSignature={showSignature}
-						styledItems={styledItems}
 					/>
 				))}
 
@@ -115,28 +72,38 @@ export default withRouter(
 					<>
 						<ClayForm.Group small>
 							<DefaultQuestionsEditor
-								label={Liferay.Language.get('your-comment')}
+								label={Liferay.Language.get('your-answer')}
 								onContentLengthValid={setIsReplyButtonDisable}
-								ref={editorRef}
+								ref={editor}
 							/>
-
-							{!question.subscribed && (
-								<SubscritionCheckbox
-									checked={allowSubscription}
-									setChecked={setAllowSubscription}
-								/>
-							)}
 
 							<ClayButton.Group className="c-mt-3" spaced>
 								<ClayButton
 									disabled={isReplyButtonDisable}
 									displayType="primary"
-									onClick={onCreateComment}
+									onClick={() => {
+										createComment({
+											fetchOptionsOverrides: getContextLink(
+												`${sectionTitle}/${questionId}`
+											),
+											variables: {
+												articleBody: editor.current.getContent(),
+												parentMessageBoardMessageId: entityId,
+											},
+										}).then(({data}) => {
+											editor.current.clearContent();
+											showNewCommentChange(false);
+											commentsChange([
+												...comments,
+												data.createMessageBoardMessageMessageBoardMessage,
+											]);
+										});
+									}}
 								>
 									{context.trustedUser
-										? Liferay.Language.get('add-comment')
+										? Liferay.Language.get('reply')
 										: Liferay.Language.get(
-												'submit-for-workflow'
+												'submit-for-publication'
 										  )}
 								</ClayButton>
 

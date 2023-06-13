@@ -14,12 +14,11 @@
 
 package com.liferay.asset.publisher.web.internal;
 
+import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
 import com.liferay.asset.publisher.web.internal.display.context.ChildSitesItemSelectorViewDisplayContext;
-import com.liferay.asset.publisher.web.internal.item.selector.SitesItemSelectorViewDescriptor;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
-import com.liferay.item.selector.ItemSelectorViewDescriptorRenderer;
 import com.liferay.item.selector.criteria.GroupItemSelectorReturnType;
 import com.liferay.item.selector.criteria.group.criterion.GroupItemSelectorCriterion;
 import com.liferay.portal.kernel.model.Group;
@@ -27,15 +26,17 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.site.item.selector.criteria.SiteItemSelectorReturnType;
 
 import java.io.IOException;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletURL;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -107,29 +108,29 @@ public class ChildSitesItemSelectorView
 			childSitesItemSelectorViewDisplayContext =
 				new ChildSitesItemSelectorViewDisplayContext(
 					(HttpServletRequest)servletRequest, _assetPublisherHelper,
+					groupItemSelectorCriterion, itemSelectedEventName,
 					portletURL);
 
-		_itemSelectorViewDescriptorRenderer.renderHTML(
-			servletRequest, servletResponse, groupItemSelectorCriterion,
-			portletURL, itemSelectedEventName, search,
-			new SitesItemSelectorViewDescriptor(
-				(HttpServletRequest)servletRequest,
-				childSitesItemSelectorViewDisplayContext));
+		servletRequest.setAttribute(
+			AssetPublisherWebKeys.ITEM_SELECTOR_DISPLAY_CONTEXT,
+			childSitesItemSelectorViewDisplayContext);
+
+		RequestDispatcher requestDispatcher =
+			_servletContext.getRequestDispatcher("/view_sites.jsp");
+
+		requestDispatcher.include(servletRequest, servletResponse);
 	}
 
 	private static final List<ItemSelectorReturnType>
-		_supportedItemSelectorReturnTypes = Collections.singletonList(
-			new GroupItemSelectorReturnType());
+		_supportedItemSelectorReturnTypes = Arrays.asList(
+			new GroupItemSelectorReturnType(),
+			new SiteItemSelectorReturnType());
 
 	@Reference
 	private AssetPublisherHelper _assetPublisherHelper;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private ItemSelectorViewDescriptorRenderer<GroupItemSelectorCriterion>
-		_itemSelectorViewDescriptorRenderer;
 
 	@Reference
 	private Portal _portal;

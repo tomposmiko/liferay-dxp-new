@@ -24,12 +24,12 @@ import com.liferay.commerce.price.list.service.CommercePriceListOrderTypeRelServ
 import com.liferay.commerce.price.list.service.CommercePriceListService;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceCatalogService;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -71,6 +71,7 @@ public class CommercePriceListQualifiersDisplayContext
 			commercePriceListCommerceAccountGroupRelService;
 		_commercePriceListOrderTypeRelService =
 			commercePriceListOrderTypeRelService;
+
 		_portal = portal;
 	}
 
@@ -122,11 +123,11 @@ public class CommercePriceListQualifiersDisplayContext
 		return "all";
 	}
 
-	public List<FDSActionDropdownItem>
-			getPriceListAccountFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getPriceListAccountClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionDropdownItems(
+		return getClayDataSetActionDropdownItems(
 			PortletURLBuilder.create(
 				_portal.getControlPanelPortletURL(
 					httpServletRequest,
@@ -142,12 +143,12 @@ public class CommercePriceListQualifiersDisplayContext
 			false);
 	}
 
-	public List<FDSActionDropdownItem>
-			getPriceListAccountGroupFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getPriceListAccountGroupClayDataSetActionDropdownItems()
 		throws PortalException {
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "delete",
 				LanguageUtil.get(httpServletRequest, "delete"), "delete",
 				"delete", "headless"));
@@ -165,11 +166,11 @@ public class CommercePriceListQualifiersDisplayContext
 				"/price-list-accounts?nestedFields=account";
 	}
 
-	public List<FDSActionDropdownItem>
-			getPriceListChannelFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getPriceListChannelClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionDropdownItems(
+		return getClayDataSetActionDropdownItems(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
 					httpServletRequest, CommerceChannel.class.getName(),
@@ -190,11 +191,11 @@ public class CommercePriceListQualifiersDisplayContext
 				"/price-list-channels?nestedFields=channel";
 	}
 
-	public List<FDSActionDropdownItem>
-			getPriceListOrderTypeFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getPriceListOrderTypeClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		return getFDSActionDropdownItems(
+		return getClayDataSetActionDropdownItems(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
 					httpServletRequest, CommerceOrderType.class.getName(),

@@ -30,10 +30,6 @@ public class AssetListEntryAssetEntryRelLocalServiceWrapper
 	implements AssetListEntryAssetEntryRelLocalService,
 			   ServiceWrapper<AssetListEntryAssetEntryRelLocalService> {
 
-	public AssetListEntryAssetEntryRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AssetListEntryAssetEntryRelLocalServiceWrapper(
 		AssetListEntryAssetEntryRelLocalService
 			assetListEntryAssetEntryRelLocalService) {
@@ -401,6 +397,22 @@ public class AssetListEntryAssetEntryRelLocalServiceWrapper
 	}
 
 	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public java.util.List<AssetListEntryAssetEntryRel>
+		getAssetListEntryAssetEntryRels(
+			long assetListEntryId, long[] segmentsEntryIds,
+			long[][] assetCategoryIds, int start, int end) {
+
+		return _assetListEntryAssetEntryRelLocalService.
+			getAssetListEntryAssetEntryRels(
+				assetListEntryId, segmentsEntryIds, assetCategoryIds, start,
+				end);
+	}
+
+	/**
 	 * Returns all the asset list entry asset entry rels matching the UUID and company.
 	 *
 	 * @param uuid the UUID of the asset list entry asset entry rels
@@ -480,6 +492,20 @@ public class AssetListEntryAssetEntryRelLocalServiceWrapper
 		return _assetListEntryAssetEntryRelLocalService.
 			getAssetListEntryAssetEntryRelsCount(
 				assetListEntryId, segmentsEntryIds);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public int getAssetListEntryAssetEntryRelsCount(
+		long assetListEntryId, long[] segmentsEntryIds,
+		long[][] assetCategoryIds) {
+
+		return _assetListEntryAssetEntryRelLocalService.
+			getAssetListEntryAssetEntryRelsCount(
+				assetListEntryId, segmentsEntryIds, assetCategoryIds);
 	}
 
 	@Override

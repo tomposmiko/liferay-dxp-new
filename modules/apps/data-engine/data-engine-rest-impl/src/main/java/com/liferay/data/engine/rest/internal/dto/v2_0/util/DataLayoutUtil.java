@@ -23,7 +23,7 @@ import com.liferay.data.engine.rest.dto.v2_0.DataLayoutPage;
 import com.liferay.data.engine.rest.dto.v2_0.DataLayoutRow;
 import com.liferay.data.engine.rest.dto.v2_0.DataRule;
 import com.liferay.dynamic.data.mapping.form.builder.rule.DDMFormRuleDeserializer;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutSerializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutSerializerSerializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutSerializerSerializeResponse;
@@ -39,7 +39,6 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.spi.converter.SPIDDMFormRuleConverter;
 import com.liferay.dynamic.data.mapping.spi.converter.model.SPIDDMFormRule;
 import com.liferay.dynamic.data.mapping.util.SettingsDDMFormFieldsUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -50,11 +49,14 @@ import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Jeyvison Nascimento
@@ -63,7 +65,7 @@ public class DataLayoutUtil {
 
 	public static String serialize(
 			DataLayout dataLayout, DDMForm ddmForm,
-			DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry,
+			DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
 			DDMFormLayoutSerializer ddmFormLayoutSerializer,
 			DDMFormRuleDeserializer ddmFormRuleDeserializer)
 		throws Exception {
@@ -71,7 +73,7 @@ public class DataLayoutUtil {
 		DDMFormLayoutSerializerSerializeRequest.Builder builder =
 			DDMFormLayoutSerializerSerializeRequest.Builder.newBuilder(
 				toDDMFormLayout(
-					dataLayout, ddmForm, ddmFormFieldTypeServicesRegistry,
+					dataLayout, ddmForm, ddmFormFieldTypeServicesTracker,
 					ddmFormRuleDeserializer));
 
 		DDMFormLayoutSerializerSerializeResponse
@@ -82,7 +84,7 @@ public class DataLayoutUtil {
 	}
 
 	public static DataLayout toDataLayout(
-			DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry,
+			DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
 			DDMFormLayout ddmFormLayout,
 			SPIDDMFormRuleConverter spiDDMFormRuleConverter)
 		throws Exception {
@@ -91,7 +93,7 @@ public class DataLayoutUtil {
 			{
 				dataLayoutFields = _toDataLayoutFields(
 					ddmFormLayout.getDDMFormFields(),
-					ddmFormFieldTypeServicesRegistry);
+					ddmFormFieldTypeServicesTracker);
 				dataLayoutPages = _toDataLayoutPages(
 					ddmFormLayout.getDDMFormLayoutPages());
 				dataRules = _toDataRules(
@@ -102,7 +104,7 @@ public class DataLayoutUtil {
 	}
 
 	public static DataLayout toDataLayout(
-			DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry,
+			DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
 			DDMStructureLayout ddmStructureLayout,
 			SPIDDMFormRuleConverter spiDDMFormRuleConverter)
 		throws Exception {
@@ -112,7 +114,7 @@ public class DataLayoutUtil {
 		}
 
 		DataLayout dataLayout = toDataLayout(
-			ddmFormFieldTypeServicesRegistry,
+			ddmFormFieldTypeServicesTracker,
 			ddmStructureLayout.getDDMFormLayout(), spiDDMFormRuleConverter);
 
 		dataLayout.setDateCreated(ddmStructureLayout.getCreateDate());
@@ -134,7 +136,7 @@ public class DataLayoutUtil {
 
 	public static DDMFormLayout toDDMFormLayout(
 			DataLayout dataLayout, DDMForm ddmForm,
-			DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry,
+			DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker,
 			DDMFormRuleDeserializer ddmFormRuleDeserializer)
 		throws Exception {
 
@@ -144,12 +146,13 @@ public class DataLayoutUtil {
 			_toDDMFormFields(
 				dataLayout.getDataLayoutFields(),
 				ddmForm.getDDMFormFieldsMap(true),
-				ddmFormFieldTypeServicesRegistry));
+				ddmFormFieldTypeServicesTracker));
 		ddmFormLayout.setDDMFormLayoutPages(
 			_toDDMFormLayoutPages(
 				dataLayout.getDataLayoutPages(), ddmForm.getDefaultLocale()));
 		ddmFormLayout.setDefaultLocale(ddmForm.getDefaultLocale());
 		ddmFormLayout.setPaginationMode(dataLayout.getPaginationMode());
+
 		ddmFormLayout.setDDMFormRules(
 			ddmFormRuleDeserializer.deserialize(
 				ddmForm,
@@ -197,15 +200,20 @@ public class DataLayoutUtil {
 			return new DataLayoutColumn[0];
 		}
 
-		return TransformUtil.transformToArray(
-			ddmFormLayoutColumns,
-			ddmFormLayoutColumn -> _toDataLayoutColumn(ddmFormLayoutColumn),
-			DataLayoutColumn.class);
+		Stream<DDMFormLayoutColumn> stream = ddmFormLayoutColumns.stream();
+
+		return stream.map(
+			DataLayoutUtil::_toDataLayoutColumn
+		).collect(
+			Collectors.toList()
+		).toArray(
+			new DataLayoutColumn[0]
+		);
 	}
 
 	private static Map<String, Object> _toDataLayoutFields(
 		List<DDMFormField> ddmFormFields,
-		DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry) {
+		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {
 
 		Map<String, Object> dataLayoutFields = new HashMap<>();
 
@@ -215,7 +223,7 @@ public class DataLayoutUtil {
 
 				Map<String, DDMFormField> settingsDDMFormFieldsMap =
 					SettingsDDMFormFieldsUtil.getSettingsDDMFormFields(
-						ddmFormFieldTypeServicesRegistry,
+						ddmFormFieldTypeServicesTracker,
 						ddmFormField.getType());
 
 				List<DDMFormField> visualPropertiesDDMFormFields =
@@ -268,10 +276,15 @@ public class DataLayoutUtil {
 			return new DataLayoutPage[0];
 		}
 
-		return TransformUtil.transformToArray(
-			ddmFormLayoutPages,
-			ddmFormLayoutPage -> _toDataLayoutPage(ddmFormLayoutPage),
-			DataLayoutPage.class);
+		Stream<DDMFormLayoutPage> stream = ddmFormLayoutPages.stream();
+
+		return stream.map(
+			DataLayoutUtil::_toDataLayoutPage
+		).collect(
+			Collectors.toList()
+		).toArray(
+			new DataLayoutPage[0]
+		);
 	}
 
 	private static DataLayoutRow _toDataLayoutRow(
@@ -288,10 +301,15 @@ public class DataLayoutUtil {
 	private static DataLayoutRow[] _toDataLayoutRows(
 		List<DDMFormLayoutRow> ddmFormLayoutRows) {
 
-		return TransformUtil.transformToArray(
-			ddmFormLayoutRows,
-			ddmFormLayoutRow -> _toDataLayoutRow(ddmFormLayoutRow),
-			DataLayoutRow.class);
+		Stream<DDMFormLayoutRow> stream = ddmFormLayoutRows.stream();
+
+		return stream.map(
+			DataLayoutUtil::_toDataLayoutRow
+		).collect(
+			Collectors.toList()
+		).toArray(
+			new DataLayoutRow[0]
+		);
 	}
 
 	private static DataRule[] _toDataRules(
@@ -308,22 +326,31 @@ public class DataLayoutUtil {
 			Gson gson = new Gson();
 
 			dataRule.setActions(
-				TransformUtil.transformToArray(
-					spiDDMFormRule.getSPIDDMFormRuleActions(),
+				Stream.of(
+					spiDDMFormRule.getSPIDDMFormRuleActions()
+				).flatMap(
+					Collection::stream
+				).map(
 					spiDDMFormRuleAction -> gson.fromJson(
 						JSONFactoryUtil.looseSerializeDeep(
 							spiDDMFormRuleAction),
-						Map.class),
-					Map.class));
-
+						Map.class)
+				).toArray(
+					Map[]::new
+				));
 			dataRule.setConditions(
-				TransformUtil.transformToArray(
-					spiDDMFormRule.getSPIDDMFormRuleConditions(),
+				Stream.of(
+					spiDDMFormRule.getSPIDDMFormRuleConditions()
+				).flatMap(
+					Collection::stream
+				).map(
 					spiDDMFormRuleCondition -> gson.fromJson(
 						JSONFactoryUtil.looseSerializeDeep(
 							spiDDMFormRuleCondition),
-						Map.class),
-					Map.class));
+						Map.class)
+				).toArray(
+					Map[]::new
+				));
 
 			dataRule.setLogicalOperator(spiDDMFormRule.getLogicalOperator());
 			dataRule.setName(
@@ -339,7 +366,7 @@ public class DataLayoutUtil {
 	private static List<DDMFormField> _toDDMFormFields(
 		Map<String, Object> dataLayoutFields,
 		Map<String, DDMFormField> ddmFormFieldsMap,
-		DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry) {
+		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {
 
 		List<DDMFormField> ddmFormFields = new ArrayList<>();
 
@@ -359,7 +386,7 @@ public class DataLayoutUtil {
 
 				Map<String, DDMFormField> settingsDDMFormFieldsMap =
 					SettingsDDMFormFieldsUtil.getSettingsDDMFormFields(
-						ddmFormFieldTypeServicesRegistry,
+						ddmFormFieldTypeServicesTracker,
 						ddmFormDDMFormField.getType());
 
 				Map<String, Object> dataLayoutField =
@@ -408,9 +435,13 @@ public class DataLayoutUtil {
 			return Collections.emptyList();
 		}
 
-		return TransformUtil.transformToList(
-			dataLayoutColumns,
-			dataLayoutColumn -> _toDDMFormLayoutColumn(dataLayoutColumn));
+		return Stream.of(
+			dataLayoutColumns
+		).map(
+			DataLayoutUtil::_toDDMFormLayoutColumn
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private static DDMFormLayoutPage _toDDMFormLayoutPage(
@@ -437,9 +468,13 @@ public class DataLayoutUtil {
 			return Collections.emptyList();
 		}
 
-		return TransformUtil.transformToList(
-			dataLayoutPages,
-			dataLayoutPage -> _toDDMFormLayoutPage(dataLayoutPage, locale));
+		return Stream.of(
+			dataLayoutPages
+		).map(
+			dataLayoutPage -> _toDDMFormLayoutPage(dataLayoutPage, locale)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private static DDMFormLayoutRow _toDDMFormLayoutRow(
@@ -460,9 +495,13 @@ public class DataLayoutUtil {
 			return Collections.emptyList();
 		}
 
-		return TransformUtil.transformToList(
-			dataLayoutRows,
-			dataLayoutRow -> _toDDMFormLayoutRow(dataLayoutRow));
+		return Stream.of(
+			dataLayoutRows
+		).map(
+			DataLayoutUtil::_toDDMFormLayoutRow
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 }

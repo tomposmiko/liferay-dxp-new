@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alec Sloan
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommerceShippingFixedOptionIndexer
 	extends BaseIndexer<CommerceShippingFixedOption> {
 
@@ -91,7 +91,6 @@ public class CommerceShippingFixedOptionIndexer
 		addSearchTerm(
 			searchQuery, searchContext, "commerceShippingMethodId", false);
 		addSearchTerm(searchQuery, searchContext, "description", false);
-		addSearchTerm(searchQuery, searchContext, "key", true);
 	}
 
 	@Override
@@ -118,13 +117,12 @@ public class CommerceShippingFixedOptionIndexer
 		Document document = getBaseModelDocument(
 			CLASS_NAME, commerceShippingFixedOption);
 
+		document.addKeyword(Field.NAME, commerceShippingFixedOption.getName());
 		document.addKeyword(
 			Field.DESCRIPTION, commerceShippingFixedOption.getDescription());
-		document.addKeyword(Field.NAME, commerceShippingFixedOption.getName());
 		document.addKeyword(
 			"commerceShippingMethodId",
 			commerceShippingFixedOption.getCommerceShippingMethodId());
-		document.addKeyword("key", commerceShippingFixedOption.getKey());
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -150,8 +148,8 @@ public class CommerceShippingFixedOptionIndexer
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commerceShippingFixedOption.getCompanyId(),
-			getDocument(commerceShippingFixedOption));
+			getSearchEngineId(), commerceShippingFixedOption.getCompanyId(),
+			getDocument(commerceShippingFixedOption), isCommitImmediately());
 	}
 
 	@Override
@@ -165,7 +163,7 @@ public class CommerceShippingFixedOptionIndexer
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommerceShippingFixedOptions(companyId);
+		reindexCommerceShippingFixedOptions(companyId);
 	}
 
 	@Override
@@ -183,7 +181,7 @@ public class CommerceShippingFixedOptionIndexer
 		return super.isUseSearchResultPermissionFilter(searchContext);
 	}
 
-	private void _reindexCommerceShippingFixedOptions(long companyId)
+	protected void reindexCommerceShippingFixedOptions(long companyId)
 		throws Exception {
 
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
@@ -210,6 +208,7 @@ public class CommerceShippingFixedOptionIndexer
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

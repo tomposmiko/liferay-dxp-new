@@ -15,28 +15,35 @@
 package com.liferay.calendar.web.internal.security.permission.resource;
 
 import com.liferay.calendar.constants.CalendarConstants;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class CalendarPortletPermission {
 
 	public static boolean contains(
 		PermissionChecker permissionChecker, long groupId, String actionId) {
 
-		PortletResourcePermission portletResourcePermission =
-			_portletResourcePermissionSnapshot.get();
-
-		return portletResourcePermission.contains(
+		return _portletResourcePermission.contains(
 			permissionChecker, groupId, actionId);
 	}
 
-	private static final Snapshot<PortletResourcePermission>
-		_portletResourcePermissionSnapshot = new Snapshot<>(
-			CalendarPortletPermission.class, PortletResourcePermission.class,
-			"(resource.name=" + CalendarConstants.RESOURCE_NAME + ")");
+	@Reference(
+		target = "(resource.name=" + CalendarConstants.RESOURCE_NAME + ")",
+		unbind = "-"
+	)
+	public void setPortletResourcePermission(
+		PortletResourcePermission portletResourcePermission) {
+
+		_portletResourcePermission = portletResourcePermission;
+	}
+
+	private static PortletResourcePermission _portletResourcePermission;
 
 }

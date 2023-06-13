@@ -17,7 +17,7 @@ import {ReactPortal} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
 import React, {useEffect, useState} from 'react';
 
-export function OriginalDocumentTag({id}) {
+export const OriginalDocumentTag = ({id}) => {
 	const [container, setContainer] = useState(null);
 
 	useEffect(() => {
@@ -47,4 +47,4 @@ export function OriginalDocumentTag({id}) {
 			</div>
 		</ReactPortal>
 	);
-}
+};

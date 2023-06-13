@@ -37,10 +37,6 @@ public class FallbackSettings extends BaseSettings {
 
 		String[] fallbackKeysArray = _fallbackKeys.get(key);
 
-		if (fallbackKeysArray == null) {
-			return null;
-		}
-
 		for (String fallbackKey : fallbackKeysArray) {
 			value = parentSettings.getValue(fallbackKey, null);
 
@@ -61,10 +57,6 @@ public class FallbackSettings extends BaseSettings {
 		}
 
 		String[] fallbackKeysArray = _fallbackKeys.get(key);
-
-		if (fallbackKeysArray == null) {
-			return null;
-		}
 
 		for (String fallbackKey : fallbackKeysArray) {
 			values = parentSettings.getValues(fallbackKey, null);

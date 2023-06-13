@@ -82,12 +82,10 @@ public class KaleoTaskAssignmentInstanceCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(41);
+		StringBundler sb = new StringBundler(39);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", kaleoTaskAssignmentInstanceId=");
 		sb.append(kaleoTaskAssignmentInstanceId);
 		sb.append(", groupId=");
@@ -135,7 +133,6 @@ public class KaleoTaskAssignmentInstanceCacheModel
 			new KaleoTaskAssignmentInstanceImpl();
 
 		kaleoTaskAssignmentInstanceImpl.setMvccVersion(mvccVersion);
-		kaleoTaskAssignmentInstanceImpl.setCtCollectionId(ctCollectionId);
 		kaleoTaskAssignmentInstanceImpl.setKaleoTaskAssignmentInstanceId(
 			kaleoTaskAssignmentInstanceId);
 		kaleoTaskAssignmentInstanceImpl.setGroupId(groupId);
@@ -209,8 +206,6 @@ public class KaleoTaskAssignmentInstanceCacheModel
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 
-		ctCollectionId = objectInput.readLong();
-
 		kaleoTaskAssignmentInstanceId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -245,8 +240,6 @@ public class KaleoTaskAssignmentInstanceCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		objectOutput.writeLong(kaleoTaskAssignmentInstanceId);
 
@@ -299,7 +292,6 @@ public class KaleoTaskAssignmentInstanceCacheModel
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public long kaleoTaskAssignmentInstanceId;
 	public long groupId;
 	public long companyId;

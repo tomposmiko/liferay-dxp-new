@@ -12,8 +12,6 @@
  * details.
  */
 
-import {getTop} from 'frontend-js-web';
-
 export default function propsTransformer({
 	additionalProps: {addAccountEntryDefaultAddressURL},
 	...otherProps
@@ -21,7 +19,7 @@ export default function propsTransformer({
 	return {
 		...otherProps,
 		onCreateButtonClick: () => {
-			const openerWindow = getTop();
+			const openerWindow = Liferay.Util.getTop();
 
 			openerWindow.Liferay.Util.navigate(
 				addAccountEntryDefaultAddressURL

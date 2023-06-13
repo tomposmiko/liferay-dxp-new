@@ -22,50 +22,50 @@
 AUI.add(
 	'liferay-autocomplete-input-caretindex-sel',
 	(A) => {
-		const DOC = A.config.doc;
+		var DOC = A.config.doc;
 
-		const REGEX_NEW_LINE = /\r\n/g;
+		var REGEX_NEW_LINE = /\r\n/g;
 
-		const STR_CHARACTER = 'character';
+		var STR_CHARACTER = 'character';
 
-		const STR_END_TO_END = 'EndToEnd';
+		var STR_END_TO_END = 'EndToEnd';
 
-		const STR_INPUT_NODE = 'inputNode';
+		var STR_INPUT_NODE = 'inputNode';
 
-		const STR_NEW_LINE = '\n';
+		var STR_NEW_LINE = '\n';
 
-		const AutcompleteInputCaretIndex = function () {};
+		var AutcompleteInputCaretIndex = function () {};
 
 		AutcompleteInputCaretIndex.prototype = {
 			_getCaretIndex(node) {
-				const instance = this;
+				var instance = this;
 
 				node = node || instance.get(STR_INPUT_NODE);
 
-				let end = 0;
-				let start = 0;
+				var end = 0;
+				var start = 0;
 
-				const range = DOC.selection.createRange();
+				var range = DOC.selection.createRange();
 
-				const inputEl = node.getDOM();
+				var inputEl = node.getDOM();
 
 				if (range && range.parentElement() === inputEl) {
-					const value = inputEl.value;
+					var value = inputEl.value;
 
-					const normalizedValue = value.replace(
+					var normalizedValue = value.replace(
 						REGEX_NEW_LINE,
 						STR_NEW_LINE
 					);
 
-					const textInputRange = inputEl.createTextRange();
+					var textInputRange = inputEl.createTextRange();
 
 					textInputRange.moveToBookmark(range.getBookmark());
 
-					const endRange = inputEl.createTextRange();
+					var endRange = inputEl.createTextRange();
 
 					endRange.collapse(false);
 
-					const length = value.length;
+					var length = value.length;
 
 					if (
 						textInputRange.compareEndPoints(
@@ -112,24 +112,24 @@ AUI.add(
 			},
 
 			_setCaretIndex(node, cursorIndex) {
-				const instance = this;
+				var instance = this;
 
 				node = node || instance.get(STR_INPUT_NODE);
 
-				const input = node.getDOM();
+				var input = node.getDOM();
 
 				if (input.createTextRange) {
-					const val = node.val().substring(0, cursorIndex);
+					var val = node.val().substring(0, cursorIndex);
 
-					let count = 0;
+					var count = 0;
 
-					const regExpNewLine = /\r\n/g;
+					var regExpNewLine = /\r\n/g;
 
 					while (regExpNewLine.exec(val) !== null) {
 						count++;
 					}
 
-					const range = input.createTextRange();
+					var range = input.createTextRange();
 
 					range.move(STR_CHARACTER, cursorIndex - count);
 

@@ -47,16 +47,16 @@ public class PortletRepositoryFactory implements RepositoryFactory {
 
 	@Override
 	public LocalRepository createLocalRepository(long repositoryId) {
-		return _createLocalRepositoryInstance(
-			_getRepositoryLocation(repositoryId));
+		return createLocalRepositoryInstance(
+			getRepositoryLocation(repositoryId));
 	}
 
 	@Override
 	public Repository createRepository(long repositoryId) {
-		return _createRepositoryInstance(_getRepositoryLocation(repositoryId));
+		return createRepositoryInstance(getRepositoryLocation(repositoryId));
 	}
 
-	private LocalRepository _createLocalRepositoryInstance(
+	protected LocalRepository createLocalRepositoryInstance(
 		long[] repositoryLocation) {
 
 		long groupId = repositoryLocation[0];
@@ -73,7 +73,7 @@ public class PortletRepositoryFactory implements RepositoryFactory {
 			groupId, repositoryId, dlFolderId);
 	}
 
-	private Repository _createRepositoryInstance(long[] repositoryLocation) {
+	protected Repository createRepositoryInstance(long[] repositoryLocation) {
 		long groupId = repositoryLocation[0];
 		long repositoryId = repositoryLocation[1];
 		long dlFolderId = repositoryLocation[2];
@@ -88,7 +88,7 @@ public class PortletRepositoryFactory implements RepositoryFactory {
 			groupId, repositoryId, dlFolderId);
 	}
 
-	private long[] _getRepositoryLocation(long repositoryId) {
+	protected long[] getRepositoryLocation(long repositoryId) {
 		long dlFolderId = 0;
 		long groupId = 0;
 

@@ -39,7 +39,7 @@ public class ServiceBuilderEmailAddressUtil {
 					GetterUtil.getLong(emailAddress.getId()));
 
 		serviceBuilderEmailAddress.setAddress(address);
-		serviceBuilderEmailAddress.setListTypeId(
+		serviceBuilderEmailAddress.setTypeId(
 			ServiceBuilderListTypeUtil.toServiceBuilderListTypeId(
 				"email-address", emailAddress.getType(), type));
 		serviceBuilderEmailAddress.setPrimary(

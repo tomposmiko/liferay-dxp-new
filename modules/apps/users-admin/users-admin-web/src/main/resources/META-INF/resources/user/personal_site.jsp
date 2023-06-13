@@ -116,14 +116,12 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 								Group selUserGroup = selUser.getGroup();
 								%>
 
-								<clay:link
-									aria-label='<%= LanguageUtil.get(request, "go-to-profile-pages") + StringPool.SPACE + LanguageUtil.get(request, "opens-new-window") %>'
-									decoration="underline"
-									displayType="primary"
-									href="<%= selUserGroup.getDisplayURL(themeDisplay, false) %>"
-									iconAfter="shortcut"
-									label='<%= LanguageUtil.get(request, "my-profile") %>'
+								<liferay-ui:icon
+									label="<%= true %>"
+									message="open-pages"
+									method="get"
 									target="_blank"
+									url="<%= selUserGroup.getDisplayURL(themeDisplay, false) %>"
 								/>
 							</c:when>
 							<c:otherwise>
@@ -197,14 +195,12 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 								Group selUserGroup = selUser.getGroup();
 								%>
 
-								<clay:link
-									aria-label='<%= LanguageUtil.get(request, "go-to-dashboard-pages") + StringPool.SPACE + LanguageUtil.get(request, "opens-new-window") %>'
-									decoration="underline"
-									displayType="primary"
-									href="<%= selUserGroup.getDisplayURL(themeDisplay, true) %>"
-									iconAfter="shortcut"
-									label='<%= LanguageUtil.get(request, "my-dashboard") %>'
+								<liferay-ui:icon
+									label="<%= true %>"
+									message="open-pages"
+									method="get"
 									target="_blank"
+									url="<%= selUserGroup.getDisplayURL(themeDisplay, true) %>"
 								/>
 							</c:when>
 							<c:otherwise>

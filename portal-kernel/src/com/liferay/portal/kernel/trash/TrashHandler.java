@@ -361,6 +361,18 @@ public interface TrashHandler {
 
 	public TrashedModel getTrashedModel(long classPK);
 
+	public default TrashEntry getTrashEntry(long classPK)
+		throws PortalException {
+
+		TrashedModel trashedModel = getTrashedModel(classPK);
+
+		if (trashedModel != null) {
+			return trashedModel.getTrashEntry();
+		}
+
+		return null;
+	}
+
 	public int getTrashModelsCount(long classPK) throws PortalException;
 
 	public default List<TrashedModel> getTrashModelTrashedModels(
@@ -414,6 +426,17 @@ public interface TrashHandler {
 	 * Returns <code>true</code> if the entity can be deleted from the Recycle
 	 * Bin.
 	 *
+	 * @return     <code>true</code> if the entity can be deleted from the
+	 *             Recycle Bin.
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #isDeletable(long)}
+	 */
+	@Deprecated
+	public boolean isDeletable();
+
+	/**
+	 * Returns <code>true</code> if the entity can be deleted from the Recycle
+	 * Bin.
+	 *
 	 * @return <code>true</code> if the entity can be deleted from the Recycle
 	 *         Bin.
 	 */
@@ -436,6 +459,38 @@ public interface TrashHandler {
 
 		return false;
 	}
+
+	/**
+	 * Returns <code>true</code> if the model entity with the primary key is in
+	 * a container that is in the Recycle Bin.
+	 *
+	 * @param  classPK the primary key of the model entity
+	 * @return <code>true</code> if the model entity with the primary key is in
+	 *         a container that is in the Recycle Bin; <code>false</code>
+	 *         otherwise
+	 */
+	public default boolean isInTrashContainer(long classPK)
+		throws PortalException {
+
+		TrashedModel trashedModel = getTrashedModel(classPK);
+
+		if (trashedModel != null) {
+			return trashedModel.isInTrashContainer();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the entity can be moved from one container
+	 * model (such as a folder) to another.
+	 *
+	 * @return     <code>true</code> if the entity can be moved from one
+	 *             container model to another; <code>false</code> otherwise
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #isMovable(long)}
+	 */
+	@Deprecated
+	public boolean isMovable();
 
 	/**
 	 * Returns <code>true</code> if the entity can be moved from one container

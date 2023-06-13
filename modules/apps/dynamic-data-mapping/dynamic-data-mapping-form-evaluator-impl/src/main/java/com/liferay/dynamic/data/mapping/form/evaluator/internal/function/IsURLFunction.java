@@ -15,42 +15,23 @@
 package com.liferay.dynamic.data.mapping.form.evaluator.internal.function;
 
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunction;
-import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Validator;
-
-import java.util.Objects;
 
 /**
  * @author Leonardo Barros
  */
 public class IsURLFunction
-	implements DDMExpressionFunction.Function1<Object, Boolean>,
-			   DDMExpressionFunction.Function2<Object, Boolean, Boolean> {
+	implements DDMExpressionFunction.Function1<Object, Boolean> {
 
 	public static final String NAME = "isURL";
 
 	@Override
 	public Boolean apply(Object parameter) {
-		if ((parameter == null) ||
-			Objects.equals(parameter.toString(), Http.HTTP_WITH_SLASH) ||
-			Objects.equals(parameter.toString(), Http.HTTPS_WITH_SLASH)) {
-
+		if (parameter == null) {
 			return false;
 		}
 
 		return Validator.isUrl(parameter.toString());
-	}
-
-	@Override
-	public Boolean apply(Object parameter, Boolean acceptRootRelative) {
-		if ((parameter == null) ||
-			Objects.equals(parameter.toString(), Http.HTTP_WITH_SLASH) ||
-			Objects.equals(parameter.toString(), Http.HTTPS_WITH_SLASH)) {
-
-			return false;
-		}
-
-		return Validator.isUrl(parameter.toString(), acceptRootRelative);
 	}
 
 	@Override

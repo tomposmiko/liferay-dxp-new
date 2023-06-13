@@ -15,7 +15,7 @@
 import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
-import EmptyAuditBarChart from '../../../src/main/resources/META-INF/resources/js/components/AuditGraphApp/EmptyAuditBarChart';
+import EmptyAuditBarChart from '../../../src/main/resources/META-INF/resources/js/components/EmptyAuditBarChart';
 
 import '@testing-library/jest-dom/extend-expect';
 
@@ -24,36 +24,17 @@ const LEARN_HOW_URL =
 
 describe('EmptyAuditBarChart', () => {
 	Liferay.Util.sub.mockImplementation((langKey) => langKey);
-	const {ResizeObserver} = window;
 
-	beforeAll(() => {
-		delete window.ResizeObserver;
-		window.ResizeObserver = jest.fn().mockImplementation(() => ({
-			disconnect: jest.fn(),
-			observe: jest.fn(),
-			unobserve: jest.fn(),
-		}));
-	});
-
-	afterEach(() => {
-		cleanup();
-		window.ResizeObserver = ResizeObserver;
-		jest.restoreAllMocks();
-	});
+	afterEach(cleanup);
 
 	it('renders empty bar chart if there is no content labeled with categories', () => {
 		const {getByText} = render(
-			<EmptyAuditBarChart
-				learnHowLink={{
-					message: 'Learn how to tailor categories to your needs.',
-					url: LEARN_HOW_URL,
-				}}
-			/>
+			<EmptyAuditBarChart learnHowURL={LEARN_HOW_URL} />
 		);
 
 		expect(getByText('there-is-no-data')).toBeInTheDocument();
 		expect(
-			getByText('Learn how to tailor categories to your needs.')
+			getByText('x-learn-how-x-to-tailor-categories-to-your-needs')
 		).toBeInTheDocument();
 	});
 });

@@ -20,23 +20,26 @@ import com.liferay.commerce.discount.model.CommerceDiscountRule;
 import com.liferay.commerce.discount.rule.type.CommerceDiscountRuleType;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.function.ToLongFunction;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.discount.rule.type.key=" + CommerceDiscountRuleConstants.TYPE_ADDED_ALL,
 		"commerce.discount.rule.type.order:Integer=50"
@@ -58,16 +61,21 @@ public class AddedAllCommerceDiscountRuleTypeImpl
 			return false;
 		}
 
-		long[] cpDefinitionIds = StringUtil.split(
-			commerceDiscountRule.getSettingsProperty(
-				commerceDiscountRule.getType()),
-			0L);
+		List<CommerceOrderItem> commerceOrderItems =
+			commerceOrder.getCommerceOrderItems();
 
-		return ArrayUtil.containsAll(
-			TransformUtil.transformToLongArray(
-				commerceOrder.getCommerceOrderItems(),
-				CommerceOrderItem::getCPDefinitionId),
-			cpDefinitionIds);
+		Stream<CommerceOrderItem> stream = commerceOrderItems.stream();
+
+		LongStream longStream = stream.mapToLong(_getOrderItemToLongFunction());
+
+		long[] orderItemDefinitionIds = longStream.toArray();
+
+		String settingsProperty = commerceDiscountRule.getSettingsProperty(
+			commerceDiscountRule.getType());
+
+		long[] cpDefinitionIds = StringUtil.split(settingsProperty, 0L);
+
+		return ArrayUtil.containsAll(orderItemDefinitionIds, cpDefinitionIds);
 	}
 
 	@Override
@@ -80,10 +88,18 @@ public class AddedAllCommerceDiscountRuleTypeImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "has-all-of-these-products");
+		return LanguageUtil.get(resourceBundle, "has-all-of-these-products");
 	}
 
-	@Reference
-	private Language _language;
+	private ToLongFunction<CommerceOrderItem> _getOrderItemToLongFunction() {
+		return new ToLongFunction<CommerceOrderItem>() {
+
+			@Override
+			public long applyAsLong(CommerceOrderItem commerceOrderItem) {
+				return commerceOrderItem.getCPDefinitionId();
+			}
+
+		};
+	}
 
 }

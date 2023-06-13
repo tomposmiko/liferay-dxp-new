@@ -12,7 +12,7 @@
  * details.
  */
 
-import {fireEvent, waitFor} from '@testing-library/react';
+import {fireEvent} from '@testing-library/react';
 
 export function testControlledInput({
 	element,
@@ -33,12 +33,11 @@ export function testControlledInput({
 		newValueExpected ? {value: newValueExpected} : {value: newValue}
 	);
 
-	waitFor(() => expect(element.value).toBe(value));
+	expect(element.value).toBe(value);
 }
 
 export function testControlledDateInput({
 	element,
-	inputChange = true,
 	mockOnChangeFunc,
 	newValue = 'Liferay',
 	newValueExpected,
@@ -55,20 +54,11 @@ export function testControlledDateInput({
 
 	fireEvent.blur(element);
 
-	if (inputChange) {
-		if (value === newValueExpected) {
-			expect(mockOnChangeFunc.mock.calls.length).toBe(0);
-		}
-		else {
-			expect(mockOnChangeFunc.mock.calls.length).toBe(1);
+	expect(mockOnChangeFunc.mock.calls.length).toBe(1);
 
-			expect(mockOnChangeFunc.mock.calls[0][0]).toMatchObject({
-				value: newValueOnChange,
-			});
-		}
-	}
-	else {
-		expect(mockOnChangeFunc.mock.calls.length).toBe(0);
-	}
+	expect(mockOnChangeFunc.mock.calls[0][0]).toMatchObject({
+		value: newValueOnChange,
+	});
+
 	expect(element.value).toBe(newValueExpected);
 }

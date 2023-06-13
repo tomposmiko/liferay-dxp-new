@@ -15,7 +15,6 @@
 package com.liferay.dynamic.data.mapping.form.web.internal.portlet.action;
 
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
-import com.liferay.dynamic.data.mapping.form.web.internal.portlet.action.helper.SaveFormInstanceMVCCommandHelper;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
@@ -23,7 +22,7 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -49,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pedro Queiroz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
 		"mvc.command.name=/dynamic_data_mapping_form/copy_form_instance"
@@ -65,7 +65,7 @@ public class CopyFormInstanceMVCActionCommand
 		DDMFormValues settingsDDMFormValuesCopy =
 			formInstance.getSettingsDDMFormValues();
 
-		_setDefaultPublishedDDMFormFieldValue(settingsDDMFormValuesCopy);
+		setDefaultPublishedDDMFormFieldValue(settingsDDMFormValuesCopy);
 
 		return settingsDDMFormValuesCopy;
 	}
@@ -104,7 +104,7 @@ public class CopyFormInstanceMVCActionCommand
 
 		Map<Locale, String> nameMap = formInstance.getNameMap();
 
-		String name = _language.format(
+		String name = LanguageUtil.format(
 			getResourceBundle(defaultLocale), "copy-of-x",
 			nameMap.get(defaultLocale));
 
@@ -123,19 +123,7 @@ public class CopyFormInstanceMVCActionCommand
 			moduleResourceBundle, portalResourceBundle);
 	}
 
-	@Reference
-	protected DDMFormInstanceService ddmFormInstanceService;
-
-	@Reference
-	protected DDMStructureService ddmStructureService;
-
-	@Reference
-	protected Portal portal;
-
-	@Reference
-	protected SaveFormInstanceMVCCommandHelper saveFormInstanceMVCCommandHelper;
-
-	private void _setDefaultPublishedDDMFormFieldValue(
+	protected void setDefaultPublishedDDMFormFieldValue(
 		DDMFormValues ddmFormValues) {
 
 		for (DDMFormFieldValue ddmFormFieldValue :
@@ -148,6 +136,15 @@ public class CopyFormInstanceMVCActionCommand
 	}
 
 	@Reference
-	private Language _language;
+	protected DDMFormInstanceService ddmFormInstanceService;
+
+	@Reference
+	protected DDMStructureService ddmStructureService;
+
+	@Reference
+	protected Portal portal;
+
+	@Reference
+	protected SaveFormInstanceMVCCommandHelper saveFormInstanceMVCCommandHelper;
 
 }

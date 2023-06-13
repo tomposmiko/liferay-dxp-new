@@ -25,10 +25,6 @@ public class BrowserTrackerLocalServiceWrapper
 	implements BrowserTrackerLocalService,
 			   ServiceWrapper<BrowserTrackerLocalService> {
 
-	public BrowserTrackerLocalServiceWrapper() {
-		this(null);
-	}
-
 	public BrowserTrackerLocalServiceWrapper(
 		BrowserTrackerLocalService browserTrackerLocalService) {
 

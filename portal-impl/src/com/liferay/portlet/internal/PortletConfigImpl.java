@@ -62,17 +62,13 @@ public class PortletConfigImpl implements LiferayPortletConfig {
 		_portletContext = portletContext;
 
 		_portletInfos = PortletResourceBundle.getPortletInfos(
-			portlet.getPortletInfo());
+			_portlet.getPortletInfo());
 
 		_copyRequestParameters = GetterUtil.getBoolean(
 			getInitParameter("copy-request-parameters"));
 		_portletApp = portlet.getPortletApp();
 
-		String portletName = portlet.getPortletName();
-
-		if (portletName == null) {
-			portletName = portlet.getRootPortletId();
-		}
+		String portletName = portlet.getRootPortletId();
 
 		int pos = portletName.indexOf(PortletConstants.WAR_SEPARATOR);
 

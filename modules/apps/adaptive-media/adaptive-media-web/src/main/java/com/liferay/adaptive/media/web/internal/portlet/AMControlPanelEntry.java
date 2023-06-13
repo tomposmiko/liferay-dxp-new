@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Alan Huang
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + AMPortletKeys.ADAPTIVE_MEDIA,
 	service = ControlPanelEntry.class
 )

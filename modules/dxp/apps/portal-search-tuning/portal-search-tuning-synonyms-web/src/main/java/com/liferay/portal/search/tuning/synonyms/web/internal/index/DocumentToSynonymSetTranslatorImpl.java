@@ -14,12 +14,13 @@
 
 package com.liferay.portal.search.tuning.synonyms.web.internal.index;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -49,7 +50,13 @@ public class DocumentToSynonymSetTranslatorImpl
 
 	@Override
 	public List<SynonymSet> translateAll(List<SearchHit> searchHits) {
-		return TransformUtil.transform(searchHits, this::translate);
+		Stream<SearchHit> stream = searchHits.stream();
+
+		return stream.map(
+			this::translate
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override

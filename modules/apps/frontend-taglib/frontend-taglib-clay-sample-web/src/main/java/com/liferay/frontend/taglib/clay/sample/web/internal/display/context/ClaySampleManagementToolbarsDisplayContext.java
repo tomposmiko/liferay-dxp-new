@@ -43,7 +43,6 @@ public class ClaySampleManagementToolbarsDisplayContext
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse);
 	}
 
-	@Override
 	public List<DropdownItem> getActionDropdownItems() {
 		if (_actionDropdownItems != null) {
 			return _actionDropdownItems;
@@ -72,7 +71,6 @@ public class ClaySampleManagementToolbarsDisplayContext
 		return _actionDropdownItems;
 	}
 
-	@Override
 	public CreationMenu getCreationMenu() {
 		if (_creationMenu != null) {
 			return _creationMenu;
@@ -135,69 +133,58 @@ public class ClaySampleManagementToolbarsDisplayContext
 		return _creationMenu;
 	}
 
-	@Override
-	public List<DropdownItem> getFilterNavigationDropdownItems() {
+	public List<DropdownItem> getFilterDropdownItems() {
 		if (_filterDropdownItems != null) {
 			return _filterDropdownItems;
 		}
 
-		_filterDropdownItems = DropdownItemListBuilder.add(
-			dropdownItem -> {
-				dropdownItem.setHref("#1");
-				dropdownItem.setLabel("Filter 1");
+		_filterDropdownItems = DropdownItemListBuilder.addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					DropdownItemListBuilder.add(
+						dropdownItem -> {
+							dropdownItem.setHref("#1");
+							dropdownItem.setLabel("Filter 1");
+						}
+					).add(
+						dropdownItem -> {
+							dropdownItem.setHref("#2");
+							dropdownItem.setLabel("Filter 2");
+						}
+					).build());
+
+				dropdownGroupItem.setLabel("Filter By");
 			}
-		).add(
-			dropdownItem -> {
-				dropdownItem.setHref("#2");
-				dropdownItem.setLabel("Filter 2");
+		).addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					DropdownItemListBuilder.add(
+						dropdownItem -> {
+							dropdownItem.setHref("#3");
+							dropdownItem.setLabel("Order 1");
+						}
+					).add(
+						dropdownItem -> {
+							dropdownItem.setHref("#4");
+							dropdownItem.setLabel("Order 2");
+						}
+					).build());
+
+				dropdownGroupItem.setLabel("Order By");
 			}
 		).build();
 
 		return _filterDropdownItems;
 	}
 
-	@Override
-	public String getFilterNavigationDropdownItemsLabel() {
-		return "Filter By";
-	}
-
-	@Override
-	public List<DropdownItem> getOrderByDropdownItems() {
-		if (_orderDropdownItems != null) {
-			return _orderDropdownItems;
-		}
-
-		_orderDropdownItems = DropdownItemListBuilder.add(
-			dropdownItem -> {
-				dropdownItem.setHref("#3");
-				dropdownItem.setLabel("Order 1");
-			}
-		).add(
-			dropdownItem -> {
-				dropdownItem.setHref("#4");
-				dropdownItem.setLabel("Order 2");
-			}
-		).build();
-
-		return _orderDropdownItems;
-	}
-
-	@Override
-	public String getOrderByDropdownItemsLabel() {
-		return "Order By";
-	}
-
-	@Override
 	public String getSearchActionURL() {
 		return "#search-action-url";
 	}
 
-	@Override
 	public Boolean getSupportsBulkActions() {
 		return true;
 	}
 
-	@Override
 	public List<ViewTypeItem> getViewTypeItems() {
 		if (_viewTypeItems != null) {
 			return _viewTypeItems;
@@ -222,7 +209,6 @@ public class ClaySampleManagementToolbarsDisplayContext
 		return _viewTypeItems;
 	}
 
-	@Override
 	public Boolean isShowInfoButton() {
 		return true;
 	}
@@ -230,7 +216,6 @@ public class ClaySampleManagementToolbarsDisplayContext
 	private List<DropdownItem> _actionDropdownItems;
 	private CreationMenu _creationMenu;
 	private List<DropdownItem> _filterDropdownItems;
-	private List<DropdownItem> _orderDropdownItems;
 	private List<ViewTypeItem> _viewTypeItems;
 
 }

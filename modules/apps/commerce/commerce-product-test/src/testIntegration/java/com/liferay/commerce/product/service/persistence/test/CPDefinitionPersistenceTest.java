@@ -125,10 +125,6 @@ public class CPDefinitionPersistenceTest {
 
 		CPDefinition newCPDefinition = _persistence.create(pk);
 
-		newCPDefinition.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCPDefinition.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newCPDefinition.setUuid(RandomTestUtil.randomString());
 
 		newCPDefinition.setDefaultLanguageId(RandomTestUtil.randomString());
@@ -232,12 +228,6 @@ public class CPDefinitionPersistenceTest {
 		CPDefinition existingCPDefinition = _persistence.findByPrimaryKey(
 			newCPDefinition.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCPDefinition.getMvccVersion(),
-			newCPDefinition.getMvccVersion());
-		Assert.assertEquals(
-			existingCPDefinition.getCtCollectionId(),
-			newCPDefinition.getCtCollectionId());
 		Assert.assertEquals(
 			existingCPDefinition.getUuid(), newCPDefinition.getUuid());
 		Assert.assertEquals(
@@ -407,13 +397,6 @@ public class CPDefinitionPersistenceTest {
 	}
 
 	@Test
-	public void testCountByCProductId() throws Exception {
-		_persistence.countByCProductId(RandomTestUtil.nextLong());
-
-		_persistence.countByCProductId(0L);
-	}
-
-	@Test
 	public void testCountByCPTaxCategoryId() throws Exception {
 		_persistence.countByCPTaxCategoryId(RandomTestUtil.nextLong());
 
@@ -485,22 +468,21 @@ public class CPDefinitionPersistenceTest {
 
 	protected OrderByComparator<CPDefinition> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CPDefinition", "mvccVersion", true, "ctCollectionId", true, "uuid",
-			true, "defaultLanguageId", true, "CPDefinitionId", true, "groupId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "CProductId", true,
-			"CPTaxCategoryId", true, "productTypeName", true,
-			"availableIndividually", true, "ignoreSKUCombinations", true,
-			"shippable", true, "freeShipping", true, "shipSeparately", true,
-			"shippingExtraPrice", true, "width", true, "height", true, "depth",
-			true, "weight", true, "taxExempt", true, "telcoOrElectronics", true,
-			"DDMStructureKey", true, "published", true, "displayDate", true,
-			"expirationDate", true, "lastPublishDate", true,
-			"subscriptionEnabled", true, "subscriptionLength", true,
-			"subscriptionType", true, "maxSubscriptionCycles", true,
-			"deliverySubscriptionEnabled", true, "deliverySubscriptionLength",
-			true, "deliverySubscriptionType", true,
-			"deliverySubscriptionTypeSettings", true,
+			"CPDefinition", "uuid", true, "defaultLanguageId", true,
+			"CPDefinitionId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "CProductId", true, "CPTaxCategoryId", true,
+			"productTypeName", true, "availableIndividually", true,
+			"ignoreSKUCombinations", true, "shippable", true, "freeShipping",
+			true, "shipSeparately", true, "shippingExtraPrice", true, "width",
+			true, "height", true, "depth", true, "weight", true, "taxExempt",
+			true, "telcoOrElectronics", true, "DDMStructureKey", true,
+			"published", true, "displayDate", true, "expirationDate", true,
+			"lastPublishDate", true, "subscriptionEnabled", true,
+			"subscriptionLength", true, "subscriptionType", true,
+			"maxSubscriptionCycles", true, "deliverySubscriptionEnabled", true,
+			"deliverySubscriptionLength", true, "deliverySubscriptionType",
+			true, "deliverySubscriptionTypeSettings", true,
 			"deliveryMaxSubscriptionCycles", true, "accountGroupFilterEnabled",
 			true, "channelFilterEnabled", true, "version", true, "status", true,
 			"statusByUserId", true, "statusByUserName", true, "statusDate",
@@ -798,10 +780,6 @@ public class CPDefinitionPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CPDefinition cpDefinition = _persistence.create(pk);
-
-		cpDefinition.setMvccVersion(RandomTestUtil.nextLong());
-
-		cpDefinition.setCtCollectionId(RandomTestUtil.nextLong());
 
 		cpDefinition.setUuid(RandomTestUtil.randomString());
 

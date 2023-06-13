@@ -19,6 +19,8 @@
 <%
 KBArticlePortletInstanceConfiguration kbArticlePortletInstanceConfiguration = portletDisplay.getPortletInstanceConfiguration(KBArticlePortletInstanceConfiguration.class);
 
+String portletResource = ParamUtil.getString(request, "portletResource");
+
 long kbFolderClassNameId = PortalUtil.getClassNameId(KBFolderConstants.getClassName());
 
 long resourceClassNameId = kbArticlePortletInstanceConfiguration.resourceClassNameId();

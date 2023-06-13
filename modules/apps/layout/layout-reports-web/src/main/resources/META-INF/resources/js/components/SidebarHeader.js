@@ -16,6 +16,7 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import React, {useContext} from 'react';
 
 import {SET_SELECTED_ISSUE} from '../constants/actionTypes';
+import {ConstantsContext} from '../context/ConstantsContext';
 import {StoreDispatchContext, StoreStateContext} from '../context/StoreContext';
 import loadIssues from '../utils/loadIssues';
 
@@ -31,6 +32,7 @@ export default function SidebarHeader() {
 
 const DefaultSidebarHeader = () => {
 	const {data, languageId, loading} = useContext(StoreStateContext);
+	const {portletNamespace} = useContext(ConstantsContext);
 	const dispatch = useContext(StoreDispatchContext);
 
 	const showRefreshButton = data?.validConnection && !data?.privateLayout;
@@ -40,11 +42,10 @@ const DefaultSidebarHeader = () => {
 			<span className="font-weight-bold">
 				{Liferay.Language.get('page-audit')}
 			</span>
-
 			<div>
 				{showRefreshButton && (
 					<ClayButtonWithIcon
-						className="component-action mr-2 sidenav-relaunch text-secondary"
+						className="sidenav-relaunch text-secondary"
 						disabled={loading}
 						displayType="unstyled"
 						onClick={() => {
@@ -57,6 +58,7 @@ const DefaultSidebarHeader = () => {
 							loadIssues({
 								dispatch,
 								languageId,
+								portletNamespace,
 								url,
 							});
 						}}
@@ -64,9 +66,8 @@ const DefaultSidebarHeader = () => {
 						title={Liferay.Language.get('relaunch')}
 					/>
 				)}
-
 				<ClayButtonWithIcon
-					className="component-action sidenav-close text-secondary"
+					className="sidenav-close text-secondary"
 					displayType="unstyled"
 					symbol="times"
 					title={Liferay.Language.get('close')}
@@ -81,10 +82,10 @@ const IssueDetailSidebarHeader = () => {
 	const dispatch = useContext(StoreDispatchContext);
 
 	return (
-		<div className="d-flex justify-content-between p-3 sidebar-header">
-			<div className="d-flex">
+		<div className="d-flex justify-content-between sidebar-header">
+			<div>
 				<ClayButtonWithIcon
-					className="align-items-start component-action flex-shrink-0 mr-2 sidenav-back text-secondary"
+					className="sidenav-back text-secondary"
 					displayType="unstyled"
 					onClick={() => {
 						dispatch({
@@ -96,13 +97,11 @@ const IssueDetailSidebarHeader = () => {
 					title={Liferay.Language.get('go-back')}
 				/>
 
-				<span className="align-self-center font-weight-bold issue-detail-title">
-					{selectedIssue.title}
-				</span>
+				<span className="font-weight-bold">{selectedIssue.title}</span>
 			</div>
 
 			<ClayButtonWithIcon
-				className="component-action flex-shrink-0 sidenav-close text-secondary"
+				className="sidenav-close text-secondary"
 				displayType="unstyled"
 				symbol="times"
 				title={Liferay.Language.get('close')}

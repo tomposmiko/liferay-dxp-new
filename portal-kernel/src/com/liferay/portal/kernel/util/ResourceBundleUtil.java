@@ -16,8 +16,6 @@ package com.liferay.portal.kernel.util;
 
 import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
 import com.liferay.petra.memory.FinalizeManager;
-import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageBuilderUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.language.UTF8Control;
@@ -113,6 +111,28 @@ public class ResourceBundleUtil {
 		return _getBundle(baseName, locale, classLoader, symbolicName);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getLocalizationMap(ResourceBundleLoader, String)}
+	 */
+	@Deprecated
+	public static Map<Locale, String> getLocalizationMap(
+		com.liferay.portal.kernel.util.ResourceBundleLoader
+			resourceBundleLoader,
+		String key) {
+
+		return getLocalizationMap(
+			new ResourceBundleLoader() {
+
+				@Override
+				public ResourceBundle loadResourceBundle(Locale locale) {
+					return resourceBundleLoader.loadResourceBundle(locale);
+				}
+
+			},
+			key);
+	}
+
 	public static Map<Locale, String> getLocalizationMap(
 		ResourceBundleLoader resourceBundleLoader, String key) {
 
@@ -135,6 +155,16 @@ public class ResourceBundleUtil {
 			getBundle(locale, clazz), PortalUtil.getResourceBundle(locale));
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static com.liferay.portal.kernel.util.ResourceBundleLoader
+		getResourceBundleLoader(String baseName, ClassLoader classLoader) {
+
+		return new ClassResourceBundleLoader(baseName, classLoader);
+	}
+
 	public static String getString(ResourceBundle resourceBundle, String key) {
 		if (!resourceBundle.containsKey(key)) {
 			return null;
@@ -145,7 +175,7 @@ public class ResourceBundleUtil {
 		}
 		catch (MissingResourceException missingResourceException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(missingResourceException);
+				_log.debug(missingResourceException, missingResourceException);
 			}
 
 			return null;
@@ -167,9 +197,7 @@ public class ResourceBundleUtil {
 
 		if (ArrayUtil.isNotEmpty(arguments)) {
 			MessageFormat messageFormat = new MessageFormat(
-				StringUtil.replace(
-					value, CharPool.APOSTROPHE, StringPool.DOUBLE_APOSTROPHE),
-				resourceBundle.getLocale());
+				value, resourceBundle.getLocale());
 
 			value = messageFormat.format(arguments);
 		}
@@ -206,7 +234,8 @@ public class ResourceBundleUtil {
 				}
 				catch (MissingResourceException missingResourceException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(missingResourceException);
+						_log.debug(
+							missingResourceException, missingResourceException);
 					}
 
 					_portalResourceBundleClassLoaders.add(classLoader);

@@ -35,8 +35,6 @@ public class KaleoActionTable extends BaseTable<KaleoActionTable> {
 
 	public final Column<KaleoActionTable, Long> mvccVersion = createColumn(
 		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<KaleoActionTable, Long> ctCollectionId = createColumn(
-		"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<KaleoActionTable, Long> kaleoActionId = createColumn(
 		"kaleoActionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<KaleoActionTable, Long> groupId = createColumn(
@@ -80,10 +78,6 @@ public class KaleoActionTable extends BaseTable<KaleoActionTable> {
 			Column.FLAG_DEFAULT);
 	public final Column<KaleoActionTable, Integer> priority = createColumn(
 		"priority", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
-	public final Column<KaleoActionTable, String> type = createColumn(
-		"type_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<KaleoActionTable, Integer> status = createColumn(
-		"status", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
 
 	private KaleoActionTable() {
 		super("KaleoAction", KaleoActionTable::new);

@@ -104,8 +104,4 @@ public interface RSVEntryModel
 	@Override
 	public RSVEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

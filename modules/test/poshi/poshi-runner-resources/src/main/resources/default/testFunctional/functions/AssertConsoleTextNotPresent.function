@@ -1,8 +1,5 @@
-@default = "assertConsoleTextNotPresent"
-definition {
-
-	function assertConsoleTextNotPresent {
-		selenium.assertConsoleTextNotPresent();
-	}
-
-}
+<definition default="assertConsoleTextNotPresent">
+	<command name="assertConsoleTextNotPresent">
+		<execute selenium="assertConsoleTextNotPresent" />
+	</command>
+</definition>

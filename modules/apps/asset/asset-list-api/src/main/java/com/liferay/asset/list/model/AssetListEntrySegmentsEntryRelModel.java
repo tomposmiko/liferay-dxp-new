@@ -256,20 +256,6 @@ public interface AssetListEntrySegmentsEntryRelModel
 	public void setAssetListEntryId(long assetListEntryId);
 
 	/**
-	 * Returns the priority of this asset list entry segments entry rel.
-	 *
-	 * @return the priority of this asset list entry segments entry rel
-	 */
-	public int getPriority();
-
-	/**
-	 * Sets the priority of this asset list entry segments entry rel.
-	 *
-	 * @param priority the priority of this asset list entry segments entry rel
-	 */
-	public void setPriority(int priority);
-
-	/**
 	 * Returns the segments entry ID of this asset list entry segments entry rel.
 	 *
 	 * @return the segments entry ID of this asset list entry segments entry rel
@@ -316,9 +302,5 @@ public interface AssetListEntrySegmentsEntryRelModel
 
 	@Override
 	public AssetListEntrySegmentsEntryRel cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

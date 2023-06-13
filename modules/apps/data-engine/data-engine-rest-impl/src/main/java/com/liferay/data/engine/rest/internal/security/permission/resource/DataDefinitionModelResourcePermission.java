@@ -15,7 +15,7 @@
 package com.liferay.data.engine.rest.internal.security.permission.resource;
 
 import com.liferay.data.engine.content.type.DataDefinitionContentType;
-import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeRegistry;
+import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeTracker;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.dynamic.data.mapping.model.DDMStructure",
 	service = DataDefinitionModelResourcePermission.class
 )
@@ -70,7 +71,7 @@ public class DataDefinitionModelResourcePermission
 
 		checkPortletPermission(
 			permissionChecker,
-			_dataDefinitionContentTypeRegistry.getDataDefinitionContentType(
+			_dataDefinitionContentTypeTracker.getDataDefinitionContentType(
 				ddmStructure.getClassNameId()),
 			ddmStructure.getGroupId(), actionId);
 	}
@@ -78,11 +79,11 @@ public class DataDefinitionModelResourcePermission
 	public void checkPortletPermission(
 			PermissionChecker permissionChecker, String contentType,
 			long groupId, String actionId)
-		throws Exception {
+		throws PortalException {
 
 		checkPortletPermission(
 			permissionChecker,
-			_dataDefinitionContentTypeRegistry.getDataDefinitionContentType(
+			_dataDefinitionContentTypeTracker.getDataDefinitionContentType(
 				contentType),
 			groupId, actionId);
 	}
@@ -94,7 +95,7 @@ public class DataDefinitionModelResourcePermission
 		throws PortalException {
 
 		DataDefinitionContentType dataDefinitionContentType =
-			_dataDefinitionContentTypeRegistry.getDataDefinitionContentType(
+			_dataDefinitionContentTypeTracker.getDataDefinitionContentType(
 				ddmStructure.getClassNameId());
 
 		if (dataDefinitionContentType == null) {
@@ -155,8 +156,7 @@ public class DataDefinitionModelResourcePermission
 	}
 
 	@Reference
-	private DataDefinitionContentTypeRegistry
-		_dataDefinitionContentTypeRegistry;
+	private DataDefinitionContentTypeTracker _dataDefinitionContentTypeTracker;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

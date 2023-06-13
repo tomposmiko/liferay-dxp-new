@@ -30,7 +30,7 @@ public class ElasticsearchIndexingFixtureBuilder {
 			new ElasticsearchIndexingFixture();
 
 		elasticsearchIndexingFixture.setElasticsearchFixture(
-			_getElasticsearchFixture());
+			getElasticsearchFixture());
 		elasticsearchIndexingFixture.setFacetProcessor(_facetProcessor);
 		elasticsearchIndexingFixture.setLiferayMappingsAddedToIndex(
 			_liferayMappingsAddedToIndex);
@@ -62,7 +62,7 @@ public class ElasticsearchIndexingFixtureBuilder {
 		return this;
 	}
 
-	private ElasticsearchFixture _getElasticsearchFixture() {
+	protected ElasticsearchFixture getElasticsearchFixture() {
 		if (_elasticsearchFixture != null) {
 			return _elasticsearchFixture;
 		}

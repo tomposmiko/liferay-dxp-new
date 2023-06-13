@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -222,84 +223,93 @@ public class WebDAVPropsModelImpl
 	public Map<String, Function<WebDAVProps, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<WebDAVProps, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, WebDAVProps>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<WebDAVProps, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			WebDAVProps.class.getClassLoader(), WebDAVProps.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<WebDAVProps, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<WebDAVProps, Object>>();
+		try {
+			Constructor<WebDAVProps> constructor =
+				(Constructor<WebDAVProps>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", WebDAVProps::getMvccVersion);
-			attributeGetterFunctions.put(
-				"webDavPropsId", WebDAVProps::getWebDavPropsId);
-			attributeGetterFunctions.put(
-				"companyId", WebDAVProps::getCompanyId);
-			attributeGetterFunctions.put(
-				"createDate", WebDAVProps::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", WebDAVProps::getModifiedDate);
-			attributeGetterFunctions.put(
-				"classNameId", WebDAVProps::getClassNameId);
-			attributeGetterFunctions.put("classPK", WebDAVProps::getClassPK);
-			attributeGetterFunctions.put("props", WebDAVProps::getProps);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<WebDAVProps, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<WebDAVProps, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<WebDAVProps, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<WebDAVProps, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<WebDAVProps, Object>>();
+		Map<String, BiConsumer<WebDAVProps, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<WebDAVProps, ?>>();
 
-		static {
-			Map<String, BiConsumer<WebDAVProps, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<WebDAVProps, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", WebDAVProps::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<WebDAVProps, Long>)WebDAVProps::setMvccVersion);
+		attributeGetterFunctions.put(
+			"webDavPropsId", WebDAVProps::getWebDavPropsId);
+		attributeSetterBiConsumers.put(
+			"webDavPropsId",
+			(BiConsumer<WebDAVProps, Long>)WebDAVProps::setWebDavPropsId);
+		attributeGetterFunctions.put("companyId", WebDAVProps::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<WebDAVProps, Long>)WebDAVProps::setCompanyId);
+		attributeGetterFunctions.put("createDate", WebDAVProps::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<WebDAVProps, Date>)WebDAVProps::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", WebDAVProps::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<WebDAVProps, Date>)WebDAVProps::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", WebDAVProps::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<WebDAVProps, Long>)WebDAVProps::setClassNameId);
+		attributeGetterFunctions.put("classPK", WebDAVProps::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK", (BiConsumer<WebDAVProps, Long>)WebDAVProps::setClassPK);
+		attributeGetterFunctions.put("props", WebDAVProps::getProps);
+		attributeSetterBiConsumers.put(
+			"props", (BiConsumer<WebDAVProps, String>)WebDAVProps::setProps);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<WebDAVProps, Long>)WebDAVProps::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"webDavPropsId",
-				(BiConsumer<WebDAVProps, Long>)WebDAVProps::setWebDavPropsId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<WebDAVProps, Long>)WebDAVProps::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<WebDAVProps, Date>)WebDAVProps::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<WebDAVProps, Date>)WebDAVProps::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<WebDAVProps, Long>)WebDAVProps::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<WebDAVProps, Long>)WebDAVProps::setClassPK);
-			attributeSetterBiConsumers.put(
-				"props",
-				(BiConsumer<WebDAVProps, String>)WebDAVProps::setProps);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -719,12 +729,41 @@ public class WebDAVPropsModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<WebDAVProps, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<WebDAVProps, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<WebDAVProps, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((WebDAVProps)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, WebDAVProps>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					WebDAVProps.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -739,9 +778,8 @@ public class WebDAVPropsModelImpl
 	private String _props;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<WebDAVProps, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<WebDAVProps, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

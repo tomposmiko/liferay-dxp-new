@@ -16,14 +16,17 @@ package com.liferay.dynamic.data.lists.internal.exporter;
 
 import com.liferay.dynamic.data.lists.exporter.DDLExporter;
 import com.liferay.dynamic.data.lists.exporter.DDLExporterFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * Provides a factory to fetch implementations of the DDL Exporter service. By
@@ -33,8 +36,19 @@ import org.osgi.service.component.annotations.Deactivate;
  * @author Marcellus Tavares
  * @see    DDLExporter
  */
-@Component(service = DDLExporterFactory.class)
+@Component(immediate = true, service = DDLExporterFactory.class)
 public class DDLExporterFactoryImpl implements DDLExporterFactory {
+
+	/**
+	 * Returns the available formats that can be used to export record set
+	 * records.
+	 *
+	 * @return the available formats registered in the system
+	 */
+	@Override
+	public Set<String> getAvailableFormats() {
+		return Collections.unmodifiableSet(_ddlExporters.keySet());
+	}
 
 	/**
 	 * Returns the DDL Exporter service instance for the format.
@@ -44,7 +58,7 @@ public class DDLExporterFactoryImpl implements DDLExporterFactory {
 	 */
 	@Override
 	public DDLExporter getDDLExporter(String format) {
-		DDLExporter ddlExporter = _serviceTrackerMap.getService(format);
+		DDLExporter ddlExporter = _ddlExporters.get(format);
 
 		if (ddlExporter == null) {
 			throw new IllegalArgumentException(
@@ -54,21 +68,20 @@ public class DDLExporterFactoryImpl implements DDLExporterFactory {
 		return ddlExporter;
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, DDLExporter.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(ddlExporter, emitter) -> emitter.emit(
-					ddlExporter.getFormat())));
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addDDLExporter(DDLExporter ddlExporter) {
+		_ddlExporters.put(ddlExporter.getFormat(), ddlExporter);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
+	protected void removeDDLExporter(DDLExporter ddlExporter) {
+		_ddlExporters.remove(ddlExporter.getFormat());
 	}
 
-	private ServiceTrackerMap<String, DDLExporter> _serviceTrackerMap;
+	private final Map<String, DDLExporter> _ddlExporters =
+		new ConcurrentHashMap<>();
 
 }

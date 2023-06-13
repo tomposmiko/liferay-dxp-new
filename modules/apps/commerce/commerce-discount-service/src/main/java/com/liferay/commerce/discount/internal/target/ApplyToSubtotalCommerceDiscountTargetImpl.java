@@ -16,20 +16,20 @@ package com.liferay.commerce.discount.internal.target;
 
 import com.liferay.commerce.discount.constants.CommerceDiscountConstants;
 import com.liferay.commerce.discount.target.CommerceDiscountTarget;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.discount.target.key=" + CommerceDiscountConstants.TARGET_SUBTOTAL,
 		"commerce.discount.target.order:Integer=40"
@@ -49,7 +49,7 @@ public class ApplyToSubtotalCommerceDiscountTargetImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle, CommerceDiscountConstants.TARGET_SUBTOTAL);
 	}
 
@@ -57,8 +57,5 @@ public class ApplyToSubtotalCommerceDiscountTargetImpl
 	public Type getType() {
 		return Type.APPLY_TO_SUBTOTAL;
 	}
-
-	@Reference
-	private Language _language;
 
 }

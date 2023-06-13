@@ -133,9 +133,6 @@ public interface ObjectLayoutLocalService
 	public ObjectLayout deleteObjectLayout(ObjectLayout objectLayout)
 		throws PortalException;
 
-	public void deleteObjectLayouts(long objectDefinitionId)
-		throws PortalException;
-
 	/**
 	 * @throws PortalException
 	 */
@@ -216,9 +213,6 @@ public interface ObjectLayoutLocalService
 		DynamicQuery dynamicQuery, Projection projection);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ObjectLayout fetchDefaultObjectLayout(long objectDefinitionId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectLayout fetchObjectLayout(long objectLayoutId);
 
 	/**
@@ -283,9 +277,6 @@ public interface ObjectLayoutLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectLayout> getObjectLayouts(int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectLayout> getObjectLayouts(long objectDefinitionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectLayout> getObjectLayouts(

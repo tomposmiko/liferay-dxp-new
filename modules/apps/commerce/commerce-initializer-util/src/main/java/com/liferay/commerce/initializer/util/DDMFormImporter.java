@@ -28,8 +28,8 @@ import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
-import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
@@ -39,14 +39,12 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
-import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactoryHelper;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -63,6 +61,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -70,7 +70,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Steven Smith
  */
-@Component(service = DDMFormImporter.class)
+@Component(enabled = false, service = DDMFormImporter.class)
 public class DDMFormImporter {
 
 	public void importDDMForms(
@@ -97,7 +97,7 @@ public class DDMFormImporter {
 		throws PortalException {
 
 		if (jsonArray == null) {
-			jsonArray = _jsonFactory.createJSONArray(
+			jsonArray = JSONFactoryUtil.createJSONArray(
 				"[{\"actionIds\": [\"VIEW\", \"ADD_FORM_INSTANCE_RECORD\"]," +
 					"\"roleName\": \"Site Member\", \"scope\": 4}]");
 		}
@@ -132,7 +132,7 @@ public class DDMFormImporter {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		// DDM Form
+		//DDM Form
 
 		Locale locale = serviceContext.getLocale();
 
@@ -161,8 +161,7 @@ public class DDMFormImporter {
 		DDMFormValuesDeserializerDeserializeRequest
 			ddmFormValuesDeserializerDeserializeRequest =
 				DDMFormValuesDeserializerDeserializeRequest.Builder.newBuilder(
-					jsonFormSettings,
-					DDMFormFactory.create(DDMFormInstanceSettings.class)
+					jsonFormSettings, ddmStructure.getDDMForm()
 				).build();
 
 		DDMFormValuesDeserializerDeserializeResponse
@@ -204,10 +203,14 @@ public class DDMFormImporter {
 			DDMForm ddmForm, String jsonFormSettings)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(jsonFormSettings);
+		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
 
-		return TransformUtil.transform(
-			ddmForm.getDDMFormFields(),
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			jsonFormSettings);
+
+		Stream<DDMFormField> ddmFormFieldsStream = ddmFormFields.stream();
+
+		return ddmFormFieldsStream.map(
 			formField -> {
 				DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
 
@@ -219,7 +222,10 @@ public class DDMFormImporter {
 				ddmFormFieldValue.setValue(unlocalizedValue);
 
 				return ddmFormFieldValue;
-			});
+			}
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private DDMStructure _createDDMStructure(
@@ -250,13 +256,14 @@ public class DDMFormImporter {
 
 		defaultDDMFormLayout.setPaginationMode(StringPool.BLANK);
 
+		long classNameId = _classNameLocalService.getClassNameId(
+			DDLRecordSet.class);
 		long userId = serviceContext.getUserId();
 		long groupId = serviceContext.getScopeGroupId();
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.addStructure(
 			userId, groupId, DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
-			_classNameLocalService.getClassNameId(DDLRecordSet.class),
-			StringPool.BLANK, nameMap, descriptionMap, ddmForm,
+			classNameId, StringPool.BLANK, nameMap, descriptionMap, ddmForm,
 			defaultDDMFormLayout, StorageType.DEFAULT.toString(),
 			DDMStructureConstants.TYPE_AUTO, serviceContext);
 
@@ -329,9 +336,6 @@ public class DDMFormImporter {
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;

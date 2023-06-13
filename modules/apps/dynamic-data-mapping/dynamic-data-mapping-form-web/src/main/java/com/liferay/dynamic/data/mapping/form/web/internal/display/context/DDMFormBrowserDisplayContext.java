@@ -15,7 +15,7 @@
 package com.liferay.dynamic.data.mapping.form.web.internal.display.context;
 
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
-import com.liferay.dynamic.data.mapping.form.web.internal.display.context.helper.DDMFormWebRequestHelper;
+import com.liferay.dynamic.data.mapping.form.web.internal.display.context.util.DDMFormWebRequestHelper;
 import com.liferay.dynamic.data.mapping.form.web.internal.search.DDMFormInstanceSearch;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
@@ -25,13 +25,12 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -59,7 +58,7 @@ public class DDMFormBrowserDisplayContext {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
-		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(_renderRequest);
 
 		_formWebRequestHelper = new DDMFormWebRequestHelper(
 			_httpServletRequest);
@@ -89,6 +88,16 @@ public class DDMFormBrowserDisplayContext {
 		DDMFormInstanceSearch ddmFormInstanceSearch = new DDMFormInstanceSearch(
 			_renderRequest, portletURL);
 
+		String orderByType = getOrderByType();
+
+		OrderByComparator<DDMFormInstance> orderByComparator =
+			_getDDMFormInstanceOrderByComparator(orderByType);
+
+		ddmFormInstanceSearch.setOrderByCol(getOrderByCol());
+
+		ddmFormInstanceSearch.setOrderByComparator(orderByComparator);
+		ddmFormInstanceSearch.setOrderByType(orderByType);
+
 		if (ddmFormInstanceSearch.isSearch()) {
 			ddmFormInstanceSearch.setEmptyResultsMessage("no-forms-were-found");
 		}
@@ -96,18 +105,15 @@ public class DDMFormBrowserDisplayContext {
 			ddmFormInstanceSearch.setEmptyResultsMessage("there-are-no-forms");
 		}
 
-		ddmFormInstanceSearch.setOrderByCol(getOrderByCol());
-		ddmFormInstanceSearch.setOrderByComparator(
-			_getDDMFormInstanceOrderByComparator(getOrderByType()));
-		ddmFormInstanceSearch.setOrderByType(getOrderByType());
-		ddmFormInstanceSearch.setResultsAndTotal(
-			() -> _ddmFormInstanceService.search(
-				_formWebRequestHelper.getCompanyId(),
-				_formWebRequestHelper.getScopeGroupId(), getKeywords(),
-				ddmFormInstanceSearch.getStart(),
-				ddmFormInstanceSearch.getEnd(),
-				ddmFormInstanceSearch.getOrderByComparator()),
-			getTotalItems());
+		List<DDMFormInstance> results = _ddmFormInstanceService.search(
+			_formWebRequestHelper.getCompanyId(),
+			_formWebRequestHelper.getScopeGroupId(), getKeywords(),
+			ddmFormInstanceSearch.getStart(), ddmFormInstanceSearch.getEnd(),
+			ddmFormInstanceSearch.getOrderByComparator());
+
+		ddmFormInstanceSearch.setResults(results);
+
+		ddmFormInstanceSearch.setTotal(getTotalItems());
 
 		_ddmFormInstanceSearch = ddmFormInstanceSearch;
 
@@ -191,9 +197,8 @@ public class DDMFormBrowserDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_BROWSER, "modified-date");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "modified-date");
 
 		return _orderByCol;
 	}
@@ -203,9 +208,8 @@ public class DDMFormBrowserDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_BROWSER, "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}

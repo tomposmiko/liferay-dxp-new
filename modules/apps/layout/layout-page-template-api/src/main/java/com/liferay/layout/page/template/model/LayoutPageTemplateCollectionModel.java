@@ -306,8 +306,4 @@ public interface LayoutPageTemplateCollectionModel
 	@Override
 	public LayoutPageTemplateCollection cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

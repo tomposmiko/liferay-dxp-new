@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Kenneth Chang
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class KaleoDefinitionModelListener
 	extends BaseModelListener<KaleoDefinition> {
 

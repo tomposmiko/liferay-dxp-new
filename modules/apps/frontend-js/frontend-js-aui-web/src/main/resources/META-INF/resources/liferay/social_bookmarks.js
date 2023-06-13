@@ -22,13 +22,13 @@
 AUI.add(
 	'liferay-social-bookmarks',
 	(A) => {
-		const NAME = 'social-bookmarks';
+		var NAME = 'social-bookmarks';
 
-		const SHARE_WINDOW_HEIGHT = 436;
+		var SHARE_WINDOW_HEIGHT = 436;
 
-		const SHARE_WINDOW_WIDTH = 626;
+		var SHARE_WINDOW_WIDTH = 626;
 
-		const WIN = A.getWin();
+		var WIN = A.getWin();
 
 		/**
 		 * A class to manage the different URLs provided by the registered
@@ -41,7 +41,7 @@ AUI.add(
 		 * @constructor
 		 */
 
-		const SocialBookmarks = A.Component.create({
+		var SocialBookmarks = A.Component.create({
 
 			/**
 			 * A static property used to define the default attribute
@@ -98,13 +98,13 @@ AUI.add(
 				 */
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance.get('contentBox');
+					var contentBox = instance.get('contentBox');
 
-					const dropdownMenu = contentBox.one('.dropdown-menu');
+					var dropdownMenu = contentBox.one('.dropdown-menu');
 
-					const id = dropdownMenu.guid();
+					var id = dropdownMenu.guid();
 
 					if (!SocialBookmarks.registered[id]) {
 						dropdownMenu.delegate(
@@ -112,7 +112,7 @@ AUI.add(
 							(event) => {
 								event.preventDefault();
 
-								const shareWindowFeatures = [
+								var shareWindowFeatures = [
 									'left=' +
 										WIN.get('innerWidth') / 2 -
 										SHARE_WINDOW_WIDTH / 2,
@@ -125,7 +125,7 @@ AUI.add(
 									'width=' + SHARE_WINDOW_WIDTH,
 								];
 
-								const url = event.currentTarget.attr('href');
+								var url = event.currentTarget.attr('href');
 
 								WIN.getDOM()
 									.open(url, null, shareWindowFeatures.join())

@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property portal.release = "false";
 	property portal.upstream = "true";
@@ -22,10 +20,8 @@ definition {
 			ACUtils.launchDXP();
 		}
 
-		task ("Add a new site and blog") {
+		task ("Add a new site with a public widget page") {
 			ACUtils.addSiteAndPage();
-
-			ACUtils.createBlogsAndAddToPage();
 		}
 
 		task ("Connect the DXP to AC") {
@@ -49,27 +45,29 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 
 			CustomFields.tearDownCP();
+
+			JSONUser.tearDownNonAdminUsers();
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8565 | Test Summary: Add segment using an individual property 'role'"
-	@priority = 4
+	@priority = "4"
 	test CanAddSegmentUsingIndividualPropertyRole {
-		property analytics.cloud.upstream = "false";
-		property test.name.skip.portal.instance = "SegmentsCreationIndividualAttributes#CanAddSegmentUsingIndividualPropertyRole";
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Add a new regular role and assign to the user") {
 			JSONRole.addRegularRole(
@@ -102,7 +100,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment using Individual Property Role") {
@@ -110,7 +108,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Individual Property Role");
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Using Individual Property Role");
 
 			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
@@ -120,7 +118,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "AC Seg Reg Role",
-				indexField = 1);
+				indexField = "1");
 		}
 
 		task ("View the user showns on the Preview mode") {
@@ -131,23 +129,10 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8564 | Test Summary: Add segment using an individual property 'site'"
-	@priority = 4
+	@priority = "4"
 	test CanAddSegmentUsingIndividualPropertySite {
-		property portal.upstream = "quarantine";
-
-		// AC Quarantine Reason: Not navigating DXP with the correct user line 162
-
-		task ("Add a new user") {
-			JSONUser.addUser(
-				userEmailAddress = "ac1@liferay.com",
-				userFirstName = "ac1",
-				userLastName = "ac1",
-				userScreenName = "ac1");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "ac1@liferay.com");
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
 		}
 
 		task ("Assign the user to site") {
@@ -160,11 +145,12 @@ definition {
 			ACDXPSettings.syncNewContactData();
 		}
 
-		task ("View the page as the new users") {
-			ACUtils.navigateToSitePageWithUser(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title,Blogs AC Title",
-				emailList = ${emailList},
+		task ("View the page as the new added user") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "ac@liferay.com",
+				userLoginFullName = "ac ac");
+
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -176,7 +162,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment using Individual Property Site") {
@@ -184,7 +170,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Individual Property Site");
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Using Individual Property Site");
 
 			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
@@ -194,97 +180,22 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "Site Name",
-				indexField = 1);
+				indexField = "1");
 		}
 
-		task ("View the user showns on the Preview mode and save segment") {
+		task ("View the user showns on the Preview mode") {
 			ACSegments.previewSegmentMembership();
 
 			ACUtils.viewNameList(nameList = "ac ac");
-
-			Button.clickDone();
-
-			ACSegments.saveSegment();
-		}
-
-		task ("Assert that the user is present in the Segments") {
-			ACNavigation.switchTab(tabName = "Membership");
-
-			ACUtils.viewNameList(nameList = "ac ac");
-		}
-
-		task ("Edit Segment") {
-			Button.click(button = "Edit Segment");
-
-			ACSegments.selectOperator(operator = "is not");
-
-			ACSegments.selectDocument(
-				documentTitle = "Site Name",
-				indexField = 1);
-
-			ACSegments.previewSegmentMembership();
-
-			ACUtils.viewNameList(nameList = "ac1 ac1");
-		}
-
-		task ("View the user showns on the Preview mode and save segment") {
-			ACSegments.previewSegmentMembership();
-
-			ACUtils.viewNameList(nameList = "ac1 ac1");
-
-			Button.clickDone();
-
-			ACSegments.saveSegment();
-		}
-
-		task ("Assert that the user is present in the Segments") {
-			ACNavigation.switchTab(tabName = "Membership");
-
-			ACUtils.viewNameList(nameList = "ac1 ac1");
-		}
-
-		task ("Edit Segment") {
-			Button.click(button = "Edit Segment");
-
-			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
-
-			ACSegments.addSegmentField(segmentField = "Site Membership");
-
-			ACSegments.selectOperator(operator = "is not");
-
-			ACSegments.selectDocument(
-				documentTitle = "Site Name",
-				indexField = 1);
-
-			ACSegments.selectDocument(
-				documentTitle = "Site Name",
-				indexField = 2);
-
-			ACSegments.editConjunction();
-		}
-
-		task ("View the users showns on the Preview mode and save segment") {
-			ACSegments.previewSegmentMembership();
-
-			ACUtils.viewNameList(nameList = "ac ac,ac1 ac1");
-
-			Button.clickDone();
-
-			ACSegments.saveSegment();
-		}
-
-		task ("Assert that the users are present in the Segments") {
-			ACNavigation.switchTab(tabName = "Membership");
-
-			ACUtils.viewNameList(nameList = "ac ac,ac1 ac1");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8566 | Test Summary: Add segment using an individual property 'team'"
-	@priority = 4
+	@priority = "4"
 	test CanAddSegmentUsingIndividualPropertyTeam {
-		property analytics.cloud.upstream = "false";
-		property test.name.skip.portal.instance = "SegmentsCreationIndividualAttributes#CanAddSegmentUsingIndividualPropertyTeam";
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Assign the site to user") {
 			JSONGroup.assignUserToGroup(
@@ -325,7 +236,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment using Individual Property Team") {
@@ -333,7 +244,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Individual Property Team");
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Using Individual Property Team");
 
 			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
@@ -343,7 +254,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "Site Team Name",
-				indexField = 1);
+				indexField = "1");
 		}
 
 		task ("View the user showns on the Preview mode") {
@@ -354,12 +265,17 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8568 | Test Summary: Add segment using an individual property 'user'"
-	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test CanAddSegmentUsingIndividualPropertyUser {
+		property portal.upstream = "quarantine";
 
-		// AC Refactor ticket: LRAC-9332
-		// AC Bug ticket: LRAC-10593
+		// AC Refactor: DXP User never appears
+		// AC Refactor ticket: LRAC-9281
+		// AC Bug ticket: LRAC-9263
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Sync the Contact Data") {
 			ACDXPSettings.syncNewContactData();
@@ -373,6 +289,10 @@ definition {
 			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
+
+			JSONBlog.addEntry(
+				entryContent = "Blogs Entry Content",
+				entryTitle = "Blogs Entry Title");
 		}
 
 		task ("Close sessions") {
@@ -382,15 +302,15 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
-		task ("Add a new dynamic segment using Individual Property User criteria") {
+		task ("Add a new dynamic segment using Individual Property User") {
 			ACNavigation.goToSegments();
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Individual Property User");
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Using Individual Property User");
 
 			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
@@ -400,10 +320,10 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "ac ac",
-				indexField = 1);
+				indexField = "1");
 		}
 
-		task ("View and assert that the user is in the list") {
+		task ("View and asset user") {
 			ACSegments.previewSegmentMembership();
 
 			ACUtils.viewNameList(nameList = "ac ac");
@@ -411,7 +331,7 @@ definition {
 			ACSegments.saveSegment();
 		}
 
-		task ("Go to membership tab and assert that the user is in the list") {
+		task ("Asset user present in the Segments") {
 			ACNavigation.switchTab(tabName = "Membership");
 
 			ACUtils.viewNameList(nameList = "ac ac");
@@ -419,10 +339,11 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8567 | Test Summary: Add segment using an individual property 'user group'"
-	@priority = 4
+	@priority = "4"
 	test CanAddSegmentUsingIndividualPropertyUserGroup {
-		property analytics.cloud.upstream = "false";
-		property test.name.skip.portal.instance = "SegmentsCreationIndividualAttributes#CanAddSegmentUsingIndividualPropertyUserGroup";
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Add a new user group and assign to the user") {
 			JSONUserGroup.addUserGroup(
@@ -455,7 +376,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment using Individual Property User Group") {
@@ -463,7 +384,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Individual Property User Group");
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Using Individual Property User Group");
 
 			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
@@ -473,7 +394,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "UG UserGroup Name",
-				indexField = 1);
+				indexField = "1");
 		}
 
 		task ("View the user showns on the Preview mode") {
@@ -484,13 +405,23 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8569 | Test Summary: Add segment with custom field for individuals"
-	@priority = 4
+	@priority = "4"
 	test CanAddSegmentWithCustomFieldsForIndividuals {
-		property analytics.cloud.upstream = "false";
-		property test.name.skip.portal.instance = "SegmentsCreationIndividualAttributes#CanAddSegmentWithCustomFieldsForIndividuals";
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: DXP User never appears
+		// AC Refactor ticket: LRAC-9351
+		// AC Bug ticket: LRAC-9350
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Add a user custom field") {
-			CustomFields.openCustomFieldAdmin();
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "Custom Fields");
 
 			CustomFields.addCP(
 				customFieldName = "User Custom Field",
@@ -505,34 +436,15 @@ definition {
 				panel = "Control Panel",
 				portlet = "Users and Organizations");
 
-			UserNavigator.gotoUser(userScreenName = "ac");
+			User.gotoEditCP(userScreenName = "ac");
 
 			User.editUserInformation(
 				userCustomField = "VIP",
 				userCustomFieldLabel = "User Custom Field");
 		}
 
-		task ("Sync the Custom Field") {
-			ACDXPSettings.syncAttributes(
-				attributeCategory = "People",
-				attributeNameList = "user custom field");
-		}
-
-		task ("Redefine the value of the custom field") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
-
-			UserNavigator.gotoUser(userScreenName = "ac");
-
-			User.editUserInformation(
-				userCustomField = "VIP AC",
-				userCustomFieldLabel = "User Custom Field");
-		}
-
 		task ("Sync the Contact Data") {
-			ACDXPSettings.syncNewContactData();
+			ACDXPSettings.syncNewUserData(fieldNameList = "user custom field");
 		}
 
 		task ("View the page as the new added user") {
@@ -552,7 +464,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment using Individual Property Custom Fields") {
@@ -560,7 +472,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Individual Property Custom Fields");
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Using Individual Property Custom Fields");
 
 			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
@@ -568,10 +480,10 @@ definition {
 
 			ACSegments.selectOperator(operator = "contains");
 
-			ACSegments.editTextCriterion(textInput = "VIP AC");
+			ACSegments.editTextCriterion(textInput = "VIP");
 		}
 
-		task ("View the user shown on the Preview mode") {
+		task ("View the user showns on the Preview mode") {
 			ACSegments.previewSegmentMembership();
 
 			ACUtils.viewNameList(nameList = "ac ac");
@@ -579,10 +491,11 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8570 | Test Summary: Add segment with custom fields for organizations"
-	@priority = 4
+	@priority = "4"
 	test CanAddSegmentWithCustomFieldsForOrganizations {
-		property analytics.cloud.upstream = "false";
-		property test.name.skip.portal.instance = "SegmentsCreationIndividualAttributes#CanAddSegmentWithCustomFieldsForOrganizations";
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Add a new organization and assign to the user") {
 			JSONOrganization.addOrganization(organizationName = "Organization Name");
@@ -593,7 +506,10 @@ definition {
 		}
 
 		task ("Add Custom Fields for organization") {
-			CustomFields.openCustomFieldAdmin();
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "Custom Fields");
 
 			CustomFields.addCP(
 				customFieldName = "Org Custom Field",
@@ -622,7 +538,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment using Organization Custom Fields") {
@@ -630,7 +546,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Organization Custom Fields");
+			ACSegments.nameSegment(segmentName = "Dynamic Segment Using Organization Custom Fields");
 
 			ACSegments.goToSidebarAttributes(criterion = "Organization Attributes");
 
@@ -645,264 +561,6 @@ definition {
 			ACSegments.previewSegmentMembership();
 
 			ACUtils.viewNameList(nameList = "ac ac");
-		}
-	}
-
-	@description = "Bug: LRAC-11848 | Automation ID: LRAC-12005 | Test Summary: Add a segment using custom field of type Breakdwon, Checkbox and Radio"
-	@priority = 4
-	test CanAddSegmentWithCustomFieldThatUsesList {
-		property portal.upstream = "quarantine";
-
-		// AC Quarantine reason: Custom field values take a long time to appear in AC
-		// AC Quarantine ticket: Wait for segments migration to see if this case becomes faster - LRAC-11818
-
-		var customFieldDropdown = "user custom field dropdown";
-		var customFieldCheckbox = "user custom field checkbox";
-		var customFieldRadio = "user custom field radio";
-
-		var customFieldNameList = "${customFieldDropdown},${customFieldCheckbox},${customFieldRadio}";
-		var autocompleteTextList = "Option2,QA,LXC";
-		var list1 = ListUtil.newListFromString(${customFieldNameList});
-		var list2 = ListUtil.newListFromString(${autocompleteTextList});
-		var size = ListUtil.size(${list1});
-		var i = 0;
-
-		task ("Add new custom fields") {
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = ${customFieldDropdown},
-				customFieldType = "Dropdown",
-				resourceName = "User",
-				startingValue = '''Option1
-						Option2
-						Option3''');
-
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = ${customFieldCheckbox},
-				customFieldType = "Checkbox",
-				resourceName = "User",
-				startingValue = '''QA
-						DEV
-						EPM''');
-
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = ${customFieldRadio},
-				customFieldType = "Radio",
-				resourceName = "User",
-				startingValue = '''AC
-						DXP
-						LXC''');
-		}
-
-		task ("Go to a user and add information for the custom fields created") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
-
-			User.editCustomFieldInformation(
-				customFieldName = ${customFieldDropdown},
-				customFieldType = "Dropdown",
-				customFieldValue = "Option2",
-				userScreenName = "ac");
-
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
-
-			User.editCustomFieldInformation(
-				customFieldName = ${customFieldCheckbox},
-				customFieldType = "Checkbox",
-				customFieldValue = "QA",
-				userScreenName = "ac");
-
-			ApplicationsMenu.gotoPortlet(
-				category = "Users",
-				panel = "Control Panel",
-				portlet = "Users and Organizations");
-
-			User.editCustomFieldInformation(
-				customFieldName = ${customFieldRadio},
-				customFieldType = "Radio",
-				customFieldValue = "LXC",
-				userScreenName = "ac");
-		}
-
-		task ("Sync the Custom Field") {
-			ACDXPSettings.syncAttributes(
-				attributeCategory = "People",
-				attributeNameList = ${customFieldNameList});
-		}
-
-		task ("View the page as the new added user") {
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "ac@liferay.com",
-				userLoginFullName = "ac ac");
-
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
-				pageName = "AC Page",
-				siteName = "Site Name");
-		}
-
-		task ("Close sessions") {
-			ACUtils.closeAllSessionsAndWait();
-		}
-
-		task ("Switch to new property in AC") {
-			ACUtils.launchAC();
-
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
-		}
-
-		task ("Add a new dynamic segment with one of the custom fields created") {
-			ACNavigation.goToSegments();
-
-			ACSegments.createDynamicSegment();
-
-			ACUtils.setItemName(itemName = "Dynamic Segment Dropdown");
-
-			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
-
-			ACSegments.addSegmentField(segmentField = ${customFieldDropdown});
-
-			ACSegments.selectOperator(operator = "contains");
-
-			ACSegments.selectAutocompleteOption(
-				autocompleteText = "Option2",
-				criteriaName = ${customFieldDropdown});
-		}
-
-		task ("View the user shown on the Preview mode") {
-			ACSegments.previewSegmentMembership();
-
-			ACUtils.viewNameList(nameList = "ac ac");
-		}
-
-		task ("Save the segment") {
-			ACSegments.saveSegment();
-		}
-
-		task ("Check if the segment title appears to verify that the page is not broken") {
-			ACUtils.viewGenericText(textValueList = "Dynamic Segment Dropdown");
-		}
-
-		task ("Add a new dynamic segment with all custom fields created") {
-			ACNavigation.goToSegments();
-
-			ACSegments.createDynamicSegment();
-
-			ACUtils.setItemName(itemName = "Dynamic Segment Using Custom Fields");
-
-			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
-
-			while (${i} != ${size}) {
-				var customFieldName = ListUtil.get(${list1}, ${i});
-				var autocompleteText = ListUtil.get(${list2}, ${i});
-
-				ACSegments.addSegmentField(segmentField = ${customFieldName});
-
-				ACSegments.selectOperator(operator = "contains");
-
-				ACSegments.selectAutocompleteOption(
-					autocompleteText = ${autocompleteText},
-					criteriaName = ${customFieldName});
-
-				var i = ${i} + 1;
-
-				var i = StringUtil.valueOf(${i});
-			}
-		}
-
-		task ("View the user shown on the Preview mode") {
-			ACSegments.previewSegmentMembership();
-
-			ACUtils.viewNameList(nameList = "ac ac");
-		}
-
-		task ("Save the segment") {
-			ACSegments.saveSegment();
-		}
-
-		task ("Check if the segment title appears to verify that the page is not broken") {
-			ACUtils.viewGenericText(textValueList = "Dynamic Segment Using Custom Fields");
-		}
-	}
-
-	@description = "Bug: LRAC-11460 | Automation ID: LRAC-11634 | Test Summary: Add a dynamic segment using an individual property "email" selecting one of the suggested autocomplete options and assert in the Known Individuals tab search this individual exists"
-	@priority = 3
-	test CheckIfAutocompleteSuggestionEmailPresentInKnownIndividualsList {
-		property analytics.cloud.upstream = "false";
-
-		var username = "ac ac";
-		var individualEmail = "ac@liferay.com";
-
-		task ("Sync the Contact Data") {
-			ACDXPSettings.syncNewContactData();
-		}
-
-		task ("Go to DXP and see a page with the new user") {
-			ACUtils.navigateToSitePageWithUser(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
-				emailList = ${individualEmail},
-				pageName = "AC Page",
-				siteName = "Site Name");
-
-			ACUtils.closeAllSessionsAndWait();
-		}
-
-		task ("Go to AC > Go to segments") {
-			ACUtils.launchAC();
-
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
-
-			ACNavigation.goToSegments();
-		}
-
-		task ("Create a dynamic segment with the individual attribute: email") {
-			ACSegments.createDynamicSegment();
-
-			ACUtils.setItemName(itemName = "Individual Attribute Segment");
-
-			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
-
-			ACSegments.addSegmentField(segmentField = "email");
-		}
-
-		task ("See that there's only one user email suggested by the autocomplete") {
-			ACSegments.viewAutocompleteSuggestions(autocompleteText = ${individualEmail});
-
-			AssertElementNotPresent(
-				key_index = 2,
-				locator1 = "ACSegments#SEGMENT_AUTOCOMPLETE_DROPDOWN_BY_INDEX");
-		}
-
-		task ("Select the user email suggested by the autocomplete and see in the preview icon there's one user matching that email") {
-			ACSegments.editTextCriterion(textInput = ${individualEmail});
-
-			ACSegments.previewSegmentMembership();
-
-			ACUtils.viewNameList(nameList = ${username});
-
-			ACSegments.cancelSegment();
-		}
-
-		task ("Go to Individuals > Know individuals tab") {
-			ACNavigation.goToIndividuals();
-
-			ACIndividualsDashboard.goToKnownIndividualsTab();
-		}
-
-		task ("Go to the search bar and see that the individual was returned") {
-			ACUtils.viewNameList(nameList = ${username});
 		}
 	}
 

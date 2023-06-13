@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -219,91 +220,100 @@ public class DDMStructureLinkModelImpl
 	public Map<String, Function<DDMStructureLink, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<DDMStructureLink, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, DDMStructureLink>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<DDMStructureLink, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMStructureLink.class.getClassLoader(), DDMStructureLink.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<DDMStructureLink, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<DDMStructureLink, Object>>();
+		try {
+			Constructor<DDMStructureLink> constructor =
+				(Constructor<DDMStructureLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", DDMStructureLink::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", DDMStructureLink::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"structureLinkId", DDMStructureLink::getStructureLinkId);
-			attributeGetterFunctions.put(
-				"companyId", DDMStructureLink::getCompanyId);
-			attributeGetterFunctions.put(
-				"classNameId", DDMStructureLink::getClassNameId);
-			attributeGetterFunctions.put(
-				"classPK", DDMStructureLink::getClassPK);
-			attributeGetterFunctions.put(
-				"structureId", DDMStructureLink::getStructureId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<DDMStructureLink, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DDMStructureLink, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<DDMStructureLink, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<DDMStructureLink, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<DDMStructureLink, Object>>();
+		Map<String, BiConsumer<DDMStructureLink, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<DDMStructureLink, ?>>();
 
-		static {
-			Map<String, BiConsumer<DDMStructureLink, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<DDMStructureLink, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMStructureLink::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<DDMStructureLink, Long>)
+				DDMStructureLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMStructureLink::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<DDMStructureLink, Long>)
+				DDMStructureLink::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"structureLinkId", DDMStructureLink::getStructureLinkId);
+		attributeSetterBiConsumers.put(
+			"structureLinkId",
+			(BiConsumer<DDMStructureLink, Long>)
+				DDMStructureLink::setStructureLinkId);
+		attributeGetterFunctions.put(
+			"companyId", DDMStructureLink::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DDMStructureLink, Long>)DDMStructureLink::setCompanyId);
+		attributeGetterFunctions.put(
+			"classNameId", DDMStructureLink::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<DDMStructureLink, Long>)
+				DDMStructureLink::setClassNameId);
+		attributeGetterFunctions.put("classPK", DDMStructureLink::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<DDMStructureLink, Long>)DDMStructureLink::setClassPK);
+		attributeGetterFunctions.put(
+			"structureId", DDMStructureLink::getStructureId);
+		attributeSetterBiConsumers.put(
+			"structureId",
+			(BiConsumer<DDMStructureLink, Long>)
+				DDMStructureLink::setStructureId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<DDMStructureLink, Long>)
-					DDMStructureLink::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<DDMStructureLink, Long>)
-					DDMStructureLink::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"structureLinkId",
-				(BiConsumer<DDMStructureLink, Long>)
-					DDMStructureLink::setStructureLinkId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<DDMStructureLink, Long>)
-					DDMStructureLink::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<DDMStructureLink, Long>)
-					DDMStructureLink::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<DDMStructureLink, Long>)
-					DDMStructureLink::setClassPK);
-			attributeSetterBiConsumers.put(
-				"structureId",
-				(BiConsumer<DDMStructureLink, Long>)
-					DDMStructureLink::setStructureId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -683,12 +693,41 @@ public class DDMStructureLinkModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<DDMStructureLink, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<DDMStructureLink, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<DDMStructureLink, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((DDMStructureLink)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDMStructureLink>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDMStructureLink.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -702,8 +741,7 @@ public class DDMStructureLinkModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<DDMStructureLink, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

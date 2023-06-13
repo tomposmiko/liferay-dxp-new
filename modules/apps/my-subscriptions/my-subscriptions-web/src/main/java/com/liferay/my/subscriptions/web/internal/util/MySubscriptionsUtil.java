@@ -70,11 +70,11 @@ public class MySubscriptionsUtil {
 		String className, long classPK) {
 
 		try {
-			return _getAssetRenderer(_getClassName(className), classPK);
+			return doGetAssetRenderer(_getClassName(className), classPK);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -137,10 +137,10 @@ public class MySubscriptionsUtil {
 		}
 
 		if (className.equals(MBCategory.class.getName())) {
-			return PortalUtil.getLayoutFullURL(
-				classPK,
-				PortletProviderUtil.getPortletId(
-					MBMessage.class.getName(), PortletProvider.Action.VIEW));
+			String portletId = PortletProviderUtil.getPortletId(
+				MBMessage.class.getName(), PortletProvider.Action.VIEW);
+
+			return PortalUtil.getLayoutFullURL(classPK, portletId);
 		}
 
 		if (className.equals(WikiNode.class.getName())) {
@@ -153,9 +153,11 @@ public class MySubscriptionsUtil {
 
 			StringBundler sb = new StringBundler(5);
 
-			sb.append(
-				PortalUtil.getLayoutFullURL(
-					LayoutLocalServiceUtil.getLayout(plid), themeDisplay));
+			String layoutFullURL = PortalUtil.getLayoutFullURL(
+				LayoutLocalServiceUtil.getLayout(plid), themeDisplay);
+
+			sb.append(layoutFullURL);
+
 			sb.append(Portal.FRIENDLY_URL_SEPARATOR);
 			sb.append("wiki/");
 			sb.append(classPK);
@@ -220,11 +222,12 @@ public class MySubscriptionsUtil {
 				PortletPreferencesLocalServiceUtil.getPortletPreferences(
 					classPK);
 
+			Layout layout = LayoutLocalServiceUtil.getLayout(
+				portletPreferences.getPlid());
+
 			javax.portlet.PortletPreferences jxPortletPreferences =
 				PortletPreferencesFactoryUtil.getPortletSetup(
-					LayoutLocalServiceUtil.getLayout(
-						portletPreferences.getPlid()),
-					portletPreferences.getPortletId(), null);
+					layout, portletPreferences.getPortletId(), null);
 
 			String portletTitle = jxPortletPreferences.getValue(
 				"portletSetupTitle_" + LocaleUtil.toLanguageId(locale),
@@ -253,7 +256,7 @@ public class MySubscriptionsUtil {
 		return title;
 	}
 
-	private static AssetRenderer<?> _getAssetRenderer(
+	protected static AssetRenderer<?> doGetAssetRenderer(
 			String className, long classPK)
 		throws Exception {
 

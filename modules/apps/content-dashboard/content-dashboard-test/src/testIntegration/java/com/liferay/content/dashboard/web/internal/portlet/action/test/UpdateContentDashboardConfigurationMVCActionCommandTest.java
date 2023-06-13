@@ -51,10 +51,10 @@ public class UpdateContentDashboardConfigurationMVCActionCommandTest {
 		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
 			new MockLiferayPortletActionRequest();
 
-		String[] assetVocabularyIds = {"vocabulary1", "vocabulary2"};
+		String[] assetVocabularyNames = {"vocabulary1", "vocabulary2"};
 
 		mockLiferayPortletActionRequest.setParameter(
-			"assetVocabularyIds", StringUtil.merge(assetVocabularyIds));
+			"assetVocabularyNames", StringUtil.merge(assetVocabularyNames));
 
 		_mvcActionCommand.processAction(
 			mockLiferayPortletActionRequest,
@@ -64,23 +64,24 @@ public class UpdateContentDashboardConfigurationMVCActionCommandTest {
 			mockLiferayPortletActionRequest.getPreferences();
 
 		Assert.assertArrayEquals(
-			assetVocabularyIds,
-			portletPreferences.getValues("assetVocabularyIds", new String[0]));
+			assetVocabularyNames,
+			portletPreferences.getValues(
+				"assetVocabularyNames", new String[0]));
 
 		Assert.assertNull(
 			SessionMessages.get(
-				mockLiferayPortletActionRequest, "emptyAssetVocabularyIds"));
+				mockLiferayPortletActionRequest, "emptyAssetVocabularyNames"));
 	}
 
 	@Test
-	public void testProcessActionWithEmptyAssetVocabularyIdsDuringInitialization()
+	public void testProcessActionWithEmptyAssetVocabularyNames()
 		throws PortletException {
 
 		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
 			new MockLiferayPortletActionRequest();
 
 		mockLiferayPortletActionRequest.setParameter(
-			"assetVocabularyIds", new String[0]);
+			"assetVocabularyNames", new String[0]);
 
 		_mvcActionCommand.processAction(
 			mockLiferayPortletActionRequest,
@@ -91,13 +92,14 @@ public class UpdateContentDashboardConfigurationMVCActionCommandTest {
 
 		Assert.assertArrayEquals(
 			new String[0],
-			portletPreferences.getValues("assetVocabularyIds", new String[0]));
+			portletPreferences.getValues(
+				"assetVocabularyNames", new String[0]));
 
-		Object emptyAssetVocabularyIds = SessionMessages.get(
-			mockLiferayPortletActionRequest, "emptyAssetVocabularyIds");
+		Object emptyAssetVocabularyNames = SessionMessages.get(
+			mockLiferayPortletActionRequest, "emptyAssetVocabularyNames");
 
-		Assert.assertNotNull(emptyAssetVocabularyIds);
-		Assert.assertTrue((Boolean)emptyAssetVocabularyIds);
+		Assert.assertNotNull(emptyAssetVocabularyNames);
+		Assert.assertTrue((Boolean)emptyAssetVocabularyNames);
 	}
 
 	@Inject(

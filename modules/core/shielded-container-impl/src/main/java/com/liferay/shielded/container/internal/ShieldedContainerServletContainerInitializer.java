@@ -16,6 +16,7 @@ package com.liferay.shielded.container.internal;
 
 import com.liferay.shielded.container.Ordered;
 import com.liferay.shielded.container.ShieldedContainerInitializer;
+import com.liferay.shielded.container.internal.proxy.ProxyFactory;
 import com.liferay.shielded.container.internal.proxy.ServletContextDelegate;
 import com.liferay.shielded.container.internal.session.ShieldedContainerHttpSessionListener;
 
@@ -48,8 +49,18 @@ public class ShieldedContainerServletContainerInitializer
 		ClassLoader shieldedContainerClassLoader =
 			_buildShieldContainerClassLoader(servletContext);
 
-		servletContext = ServletContextDelegate.create(
-			shieldedContainerClassLoader, servletContext);
+		ProxyFactory proxyFactory = new ProxyFactory(
+			shieldedContainerClassLoader);
+
+		ServletContextDelegate servletContextDelegate =
+			new ServletContextDelegate(
+				proxyFactory, servletContext, shieldedContainerClassLoader);
+
+		servletContext = proxyFactory.createASMWrapper(
+			shieldedContainerClassLoader, ServletContext.class,
+			servletContextDelegate, servletContext);
+
+		servletContextDelegate.setProxiedServletContext(servletContext);
 
 		servletContext.addListener(
 			new ShieldedContainerHttpSessionListener(servletContext));

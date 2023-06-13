@@ -36,16 +36,14 @@ public interface CommentManager {
 		throws PortalException;
 
 	public long addComment(
-			String externalReferenceCode, long userId, long groupId,
-			String className, long classPK, String userName, String subject,
-			String body,
+			long userId, long groupId, String className, long classPK,
+			String userName, String subject, String body,
 			Function<String, ServiceContext> serviceContextFunction)
 		throws PortalException;
 
 	public long addComment(
-			String externalReferenceCode, long userId, String className,
-			long classPK, String userName, long parentCommentId, String subject,
-			String body,
+			long userId, String className, long classPK, String userName,
+			long parentCommentId, String subject, String body,
 			Function<String, ServiceContext> serviceContextFunction)
 		throws PortalException;
 
@@ -68,16 +66,6 @@ public interface CommentManager {
 	public void deleteGroupComments(long groupId) throws PortalException;
 
 	public Comment fetchComment(long commentId);
-
-	/**
-	 * Returns a comment matching with the external reference code and the
-	 * group ID
-	 *
-	 * @param groupId the primary key of the group
-	 * @param externalReferenceCode the comment's external reference code
-	 * @return the matching comment or null if it could not be found
-	 */
-	public Comment fetchComment(long groupId, String externalReferenceCode);
 
 	public DiscussionComment fetchDiscussionComment(long userId, long commentId)
 		throws PortalException;
@@ -103,9 +91,6 @@ public interface CommentManager {
 	 * @return the number of matching comments
 	 */
 	public int getChildCommentsCount(long parentCommentId, int status);
-
-	public Comment getComment(long groupId, String externalReferenceCode)
-		throws PortalException;
 
 	public int getCommentsCount(String className, long classPK);
 

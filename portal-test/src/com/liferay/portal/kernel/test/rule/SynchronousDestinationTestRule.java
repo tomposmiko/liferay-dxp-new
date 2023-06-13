@@ -31,7 +31,9 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
+import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule.SyncHandler;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -41,6 +43,7 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.runner.Description;
@@ -127,6 +130,8 @@ public class SynchronousDestinationTestRule
 		public void enableSync() {
 			Filter audioProcessorFilter = _registerDestinationFilter(
 				DestinationNames.DOCUMENT_LIBRARY_AUDIO_PROCESSOR);
+			Filter auditFilter = _registerDestinationFilter(
+				DestinationNames.AUDIT);
 			Filter asyncFilter = _registerDestinationFilter(
 				DestinationNames.ASYNC_SERVICE);
 			Filter backgroundTaskFilter = _registerDestinationFilter(
@@ -161,21 +166,24 @@ public class SynchronousDestinationTestRule
 				DestinationNames.DOCUMENT_LIBRARY_VIDEO_PROCESSOR);
 
 			_waitForDependencies(
-				audioProcessorFilter, asyncFilter, backgroundTaskFilter,
-				backgroundTaskStatusFilter, commerceBasePriceListFilter,
-				commerceOrderFilter, commercePaymentFilter,
-				commerceShipmentFilter, commerceSubscriptionFilter,
-				ddmStructureReindexFilter, mailFilter, pdfProcessorFilter,
-				rawMetaDataProcessorFilter, segmentsEntryReindexFilter,
-				subscrpitionSenderFilter, tensorflowModelDownloadFilter,
-				videoProcessorFilter);
+				audioProcessorFilter, auditFilter, asyncFilter,
+				backgroundTaskFilter, backgroundTaskStatusFilter,
+				commerceBasePriceListFilter, commerceOrderFilter,
+				commercePaymentFilter, commerceShipmentFilter,
+				commerceSubscriptionFilter, ddmStructureReindexFilter,
+				mailFilter, pdfProcessorFilter, rawMetaDataProcessorFilter,
+				segmentsEntryReindexFilter, subscrpitionSenderFilter,
+				tensorflowModelDownloadFilter, videoProcessorFilter);
 
 			_destinations = ReflectionTestUtil.getFieldValue(
 				MessageBusUtil.getMessageBus(), "_destinations");
 
 			_bufferedIncrementForceSyncSafeCloseable =
 				BufferedIncrementThreadLocal.setWithSafeCloseable(true);
+			_forceSyncSafeCloseable = ProxyModeThreadLocal.setWithSafeCloseable(
+				true);
 
+			replaceDestination(DestinationNames.AUDIT);
 			replaceDestination(DestinationNames.ASYNC_SERVICE);
 			replaceDestination(DestinationNames.BACKGROUND_TASK);
 			replaceDestination(DestinationNames.BACKGROUND_TASK_STATUS);
@@ -194,6 +202,7 @@ public class SynchronousDestinationTestRule
 			replaceDestination(
 				DestinationNames.DOCUMENT_LIBRARY_VIDEO_PROCESSOR);
 			replaceDestination(DestinationNames.MAIL);
+			replaceDestination(DestinationNames.SCHEDULER_ENGINE);
 			replaceDestination(DestinationNames.SUBSCRIPTION_SENDER);
 			replaceDestination("liferay/adaptive_media_processor");
 			replaceDestination("liferay/asset_auto_tagger");
@@ -207,6 +216,17 @@ public class SynchronousDestinationTestRule
 				for (String name : _sync.destinationNames()) {
 					replaceDestination(name);
 				}
+			}
+
+			for (String searchEngineId :
+					SearchEngineHelperUtil.getSearchEngineIds()) {
+
+				replaceDestination(
+					SearchEngineHelperUtil.getSearchReaderDestinationName(
+						searchEngineId));
+				replaceDestination(
+					SearchEngineHelperUtil.getSearchWriterDestinationName(
+						searchEngineId));
 			}
 
 			Destination schedulerDestination = _destinations.get(
@@ -315,6 +335,10 @@ public class SynchronousDestinationTestRule
 				_bufferedIncrementForceSyncSafeCloseable.close();
 			}
 
+			if (_forceSyncSafeCloseable != null) {
+				_forceSyncSafeCloseable.close();
+			}
+
 			for (Destination destination : _asyncServiceDestinations) {
 				_destinations.put(destination.getName(), destination);
 			}
@@ -397,6 +421,7 @@ public class SynchronousDestinationTestRule
 			new ArrayList<>();
 		private SafeCloseable _bufferedIncrementForceSyncSafeCloseable;
 		private Map<String, Destination> _destinations;
+		private SafeCloseable _forceSyncSafeCloseable;
 		private final List<InvokerMessageListener>
 			_schedulerInvokerMessageListeners = new ArrayList<>();
 		private Sync _sync;
@@ -453,15 +478,20 @@ public class SynchronousDestinationTestRule
 		extends TestSynchronousDestination {
 
 		@Override
-		public void send(Message message) {
+		public void send(final Message message) {
 			try {
 				TransactionInvokerUtil.invoke(
 					_transactionConfig,
-					() -> {
-						CleanTransactionSynchronousDestination.super.send(
-							message);
+					new Callable<Void>() {
 
-						return null;
+						@Override
+						public Void call() throws Exception {
+							CleanTransactionSynchronousDestination.super.send(
+								message);
+
+							return null;
+						}
+
 					});
 			}
 			catch (Throwable throwable) {

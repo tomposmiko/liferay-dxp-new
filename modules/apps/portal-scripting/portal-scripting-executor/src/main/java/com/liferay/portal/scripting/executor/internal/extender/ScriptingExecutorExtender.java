@@ -57,7 +57,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Michael C. Han
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ScriptingExecutorExtender {
 
 	@Activate

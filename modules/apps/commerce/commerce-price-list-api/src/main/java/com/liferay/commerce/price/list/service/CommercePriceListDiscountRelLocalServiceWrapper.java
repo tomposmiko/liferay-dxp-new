@@ -14,10 +14,7 @@
 
 package com.liferay.commerce.price.list.service;
 
-import com.liferay.commerce.price.list.model.CommercePriceListDiscountRel;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link CommercePriceListDiscountRelLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class CommercePriceListDiscountRelLocalServiceWrapper
 	implements CommercePriceListDiscountRelLocalService,
 			   ServiceWrapper<CommercePriceListDiscountRelLocalService> {
-
-	public CommercePriceListDiscountRelLocalServiceWrapper() {
-		this(null);
-	}
 
 	public CommercePriceListDiscountRelLocalServiceWrapper(
 		CommercePriceListDiscountRelLocalService
@@ -53,18 +46,21 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @return the commerce price list discount rel that was added
 	 */
 	@Override
-	public CommercePriceListDiscountRel addCommercePriceListDiscountRel(
-		CommercePriceListDiscountRel commercePriceListDiscountRel) {
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+		addCommercePriceListDiscountRel(
+			com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+				commercePriceListDiscountRel) {
 
 		return _commercePriceListDiscountRelLocalService.
 			addCommercePriceListDiscountRel(commercePriceListDiscountRel);
 	}
 
 	@Override
-	public CommercePriceListDiscountRel addCommercePriceListDiscountRel(
-			long userId, long commercePriceListId, long commerceDiscountId,
-			int order,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+			addCommercePriceListDiscountRel(
+				long userId, long commercePriceListId, long commerceDiscountId,
+				int order,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListDiscountRelLocalService.
@@ -80,8 +76,9 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @return the new commerce price list discount rel
 	 */
 	@Override
-	public CommercePriceListDiscountRel createCommercePriceListDiscountRel(
-		long commercePriceListDiscountRelId) {
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+		createCommercePriceListDiscountRel(
+			long commercePriceListDiscountRelId) {
 
 		return _commercePriceListDiscountRelLocalService.
 			createCommercePriceListDiscountRel(commercePriceListDiscountRelId);
@@ -111,8 +108,10 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @throws PortalException
 	 */
 	@Override
-	public CommercePriceListDiscountRel deleteCommercePriceListDiscountRel(
-			CommercePriceListDiscountRel commercePriceListDiscountRel)
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+			deleteCommercePriceListDiscountRel(
+				com.liferay.commerce.price.list.model.
+					CommercePriceListDiscountRel commercePriceListDiscountRel)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListDiscountRelLocalService.
@@ -131,8 +130,9 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @throws PortalException if a commerce price list discount rel with the primary key could not be found
 	 */
 	@Override
-	public CommercePriceListDiscountRel deleteCommercePriceListDiscountRel(
-			long commercePriceListDiscountRelId)
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+			deleteCommercePriceListDiscountRel(
+				long commercePriceListDiscountRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListDiscountRelLocalService.
@@ -264,16 +264,17 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	}
 
 	@Override
-	public CommercePriceListDiscountRel fetchCommercePriceListDiscountRel(
-		long commercePriceListDiscountRelId) {
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+		fetchCommercePriceListDiscountRel(long commercePriceListDiscountRelId) {
 
 		return _commercePriceListDiscountRelLocalService.
 			fetchCommercePriceListDiscountRel(commercePriceListDiscountRelId);
 	}
 
 	@Override
-	public CommercePriceListDiscountRel fetchCommercePriceListDiscountRel(
-		long commerceDiscountId, long commercePriceListId) {
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+		fetchCommercePriceListDiscountRel(
+			long commerceDiscountId, long commercePriceListId) {
 
 		return _commercePriceListDiscountRelLocalService.
 			fetchCommercePriceListDiscountRel(
@@ -288,7 +289,7 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @return the matching commerce price list discount rel, or <code>null</code> if a matching commerce price list discount rel could not be found
 	 */
 	@Override
-	public CommercePriceListDiscountRel
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
 		fetchCommercePriceListDiscountRelByUuidAndCompanyId(
 			String uuid, long companyId) {
 
@@ -313,8 +314,8 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @throws PortalException if a commerce price list discount rel with the primary key could not be found
 	 */
 	@Override
-	public CommercePriceListDiscountRel getCommercePriceListDiscountRel(
-			long commercePriceListDiscountRelId)
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+			getCommercePriceListDiscountRel(long commercePriceListDiscountRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListDiscountRelLocalService.
@@ -330,7 +331,7 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @throws PortalException if a matching commerce price list discount rel could not be found
 	 */
 	@Override
-	public CommercePriceListDiscountRel
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
 			getCommercePriceListDiscountRelByUuidAndCompanyId(
 				String uuid, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -351,27 +352,31 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @return the range of commerce price list discount rels
 	 */
 	@Override
-	public java.util.List<CommercePriceListDiscountRel>
-		getCommercePriceListDiscountRels(int start, int end) {
+	public java.util.List
+		<com.liferay.commerce.price.list.model.CommercePriceListDiscountRel>
+			getCommercePriceListDiscountRels(int start, int end) {
 
 		return _commercePriceListDiscountRelLocalService.
 			getCommercePriceListDiscountRels(start, end);
 	}
 
 	@Override
-	public java.util.List<CommercePriceListDiscountRel>
-		getCommercePriceListDiscountRels(long commercePriceListId) {
+	public java.util.List
+		<com.liferay.commerce.price.list.model.CommercePriceListDiscountRel>
+			getCommercePriceListDiscountRels(long commercePriceListId) {
 
 		return _commercePriceListDiscountRelLocalService.
 			getCommercePriceListDiscountRels(commercePriceListId);
 	}
 
 	@Override
-	public java.util.List<CommercePriceListDiscountRel>
-		getCommercePriceListDiscountRels(
-			long commercePriceListId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<CommercePriceListDiscountRel> orderByComparator) {
+	public java.util.List
+		<com.liferay.commerce.price.list.model.CommercePriceListDiscountRel>
+			getCommercePriceListDiscountRels(
+				long commercePriceListId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.commerce.price.list.model.
+						CommercePriceListDiscountRel> orderByComparator) {
 
 		return _commercePriceListDiscountRelLocalService.
 			getCommercePriceListDiscountRels(
@@ -447,31 +452,13 @@ public class CommercePriceListDiscountRelLocalServiceWrapper
 	 * @return the commerce price list discount rel that was updated
 	 */
 	@Override
-	public CommercePriceListDiscountRel updateCommercePriceListDiscountRel(
-		CommercePriceListDiscountRel commercePriceListDiscountRel) {
+	public com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+		updateCommercePriceListDiscountRel(
+			com.liferay.commerce.price.list.model.CommercePriceListDiscountRel
+				commercePriceListDiscountRel) {
 
 		return _commercePriceListDiscountRelLocalService.
 			updateCommercePriceListDiscountRel(commercePriceListDiscountRel);
-	}
-
-	@Override
-	public CTPersistence<CommercePriceListDiscountRel> getCTPersistence() {
-		return _commercePriceListDiscountRelLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<CommercePriceListDiscountRel> getModelClass() {
-		return _commercePriceListDiscountRelLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CommercePriceListDiscountRel>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _commercePriceListDiscountRelLocalService.
-			updateWithUnsafeFunction(updateUnsafeFunction);
 	}
 
 	@Override

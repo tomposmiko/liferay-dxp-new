@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Máté Thurzó
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class StagedThemeStagedModelDataHandler
 	extends BaseStagedModelDataHandler<StagedTheme> {
 
@@ -127,7 +127,11 @@ public class StagedThemeStagedModelDataHandler
 		PortletDataContext portletDataContext, StagedTheme stagedTheme) {
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setThemeLocalService(ThemeLocalService themeLocalService) {
+		_themeLocalService = themeLocalService;
+	}
+
 	private ThemeLocalService _themeLocalService;
 
 }

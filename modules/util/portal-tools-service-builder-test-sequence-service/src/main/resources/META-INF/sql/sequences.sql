@@ -1,1 +1,0 @@
-create sequence id_sequence;

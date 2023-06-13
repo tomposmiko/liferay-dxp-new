@@ -1,4 +1,4 @@
-@component-name = "portal-security"
+@component-name = "portal-user-management-and-portal-configuration"
 definition {
 
 	property portal.release = "true";
@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -22,22 +22,42 @@ definition {
 
 			Site.tearDownCP();
 
-			Organization.tearDownCP(orgName = "Suborganization*");
+			Suborganization.tearDownCP();
 
 			Organization.tearDownCP();
 		}
 	}
 
 	@description = "This test adds five suborganizations to an organization"
-	@priority = 5
+	@priority = "5"
 	test AddMultipleSuborganizations {
+		property test.name.skip.portal.instance = "UsersandorganizationsUsecase#AddMultipleSuborganizations";
 		property testray.component.names = "Training";
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name 1");
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
 
-		var count = 1;
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
 
-		while (${count} != 5) {
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		Organization.addCP(
+			orgName = "Organization Name 1",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		var count = "1";
+
+		while ("${count}" != "5") {
 			JSONOrganization.addOrganization(
 				organizationName = "Suborganization Name ${count}",
 				parentOrganizationName = "Organization Name 1");
@@ -49,8 +69,6 @@ definition {
 
 			UsersAndOrganizationsNavigator.gotoOrganizations();
 
-			Organization.gotoCP(orgName = "Organization Name 1");
-
 			Organization.viewParentOrganizationCP(
 				orgName = "Suborganization Name ${count}",
 				parentOrgName = "Organization Name 1",
@@ -59,7 +77,12 @@ definition {
 			var count = ${count} + 1;
 		}
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Suborganization Name 1",
@@ -70,13 +93,25 @@ definition {
 			searchTerm = "Suborganization");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddOrganization {
 		property testray.component.names = "Training";
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name",
@@ -86,23 +121,6 @@ definition {
 			orgName = "Organization Name",
 			orgType = "Organization");
 
-		LexiconEntry.openEntryMenu(rowEntry = "Organization Name");
-
-		MenuItem.click(menuItem = "Edit");
-
-		AssertTextEquals(
-			locator1 = "Portlet#HEADER",
-			value1 = "Edit Organization Name");
-
-		AssertTextEquals(
-			locator1 = "TextInput#NAME",
-			value1 = "Organization Name");
-
-		AssertTextEquals.assertValue(
-			key_text = "Type",
-			locator1 = "TextInput#ANY",
-			value1 = "Organization");
-
 		LexiconEntry.viewNoEntry(rowEntry = "Organization Name");
 
 		ProductMenu.viewNoSite(site = "Organization Name");
@@ -110,26 +128,40 @@ definition {
 		Site.viewNoMySitesViaMySitesPG(siteName = "Organization Name");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddOrganizationComment {
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.addCP(orgName = "Organization Name");
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
 
-		Organization.addComment(orgComment = "This is a test comment!");
-
-		AssertTextEquals(
-			locator1 = "TextArea#COMMENTS",
-			value1 = "This is a test comment!");
+		Organization.addCommentCP(
+			orgComment = "This is a test comment!",
+			orgName = "Organization Name",
+			orgType = "Organization");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddOrganizationName50Characters {
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.addCP(orgName = "Organization Staging Organization Web Content Display");
+		Organization.addCP(
+			orgName = "Organization Staging Organization Web Content Display",
+			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Staging Organization Web Content Display",
@@ -140,11 +172,23 @@ definition {
 			orgType = "Organization");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddOrganizationNameDuplicate {
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name",
@@ -154,30 +198,34 @@ definition {
 			orgName = "Organization Name",
 			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		LexiconEntry.gotoAdd();
-
-		Type(
-			locator1 = "TextInput#NAME",
-			value1 = "Organization Name");
-
-		Button.clickSave();
-
-		Alert.viewRequestFailedToComplete();
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Message#ERROR_1",
-			value1 = "The organization name is already taken.");
+		Organization.addCP(
+			organizationName = "Duplicate",
+			orgName = "Organization Name",
+			orgType = "Organization");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddOrganizations {
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.addCP(orgName = "Organization Name 1");
+		Organization.addCP(
+			orgName = "Organization Name 1",
+			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name 1",
@@ -187,11 +235,21 @@ definition {
 			orgName = "Organization Name 1",
 			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.addCP(orgName = "Organization Name 2");
+		Organization.addCP(
+			orgName = "Organization Name 2",
+			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name 2",
@@ -201,11 +259,21 @@ definition {
 			orgName = "Organization Name 2",
 			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.addCP(orgName = "Organization Name 3");
+		Organization.addCP(
+			orgName = "Organization Name 3",
+			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name 3",
@@ -216,16 +284,27 @@ definition {
 			orgType = "Organization");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddOrganizationSitePrivatePage {
-		property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 		property testray.component.names = "Training";
 
 		var portalURL = PropsUtil.get("portal.url");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
@@ -239,56 +318,90 @@ definition {
 			siteName = "Organization Name",
 			siteType = "Private");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPrivatePage(pageName = "Private Page");
+		SitePages.addPrivatePage(pageName = "Private Page");
 
 		Navigator.gotoSpecificURLPage(
 			pageName = "Private Page",
 			url = "${portalURL}/group/organization-name/private-page");
 
-		PagesAdmin.viewPageItemPresent(
+		Page.view(
 			pageName = "Private Page",
 			privacy = "Private Pages");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test AddOrganizationSitePublicPage {
 		var portalURL = PropsUtil.get("portal.url");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Public Page");
+		SitePages.addPublicPage(pageName = "Public Page");
 
 		Navigator.gotoSpecificURLPage(
 			pageName = "Public Page",
 			url = "${portalURL}/web/organization-name/public-page");
 
-		PagesAdmin.viewPageItemPresent(pageName = "Public Page");
+		Page.view(
+			pageName = "Public Page",
+			privacy = "Public Pages");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddOrganizationTeam {
 		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "CPUsersandorganizations#AddOrganizationTeam";
 		property testray.component.names = "Training";
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
 
-		Organization.openOrganizationsAdmin();
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
@@ -296,7 +409,12 @@ definition {
 
 		Site.manageMembershipOptions(allowManualMembershipManagement = "true");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.assignUser(
 			orgName = "Organization Name",
@@ -305,15 +423,15 @@ definition {
 			userName = "Test Test",
 			userScreenName = "test");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Organization Public Page");
+		SitePages.addPublicPage(pageName = "Organization Public Page");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -325,14 +443,26 @@ definition {
 			teamName = "Site Team Name");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AddSuborganization {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name",
@@ -342,26 +472,32 @@ definition {
 			orgName = "Organization Name",
 			orgType = "Organization");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.addSuborganizationCP(
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Suborganization.addCP(
 			orgName = "Organization Name",
 			suborgName = "Suborganization Name");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		Breadcrumb.viewActiveEntry(breadcrumbName = "Organization Name");
-
-		Organization.viewSuborganizationCP(
+		Suborganization.viewCP(
 			orgName = "Organization Name",
 			orgType = "Organization",
 			suborgName = "Suborganization Name",
 			suborgType = "Organization");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AssignImportedUserGroupToSuborganizationSites {
 		property liferay.training.dependency.jars = "01-liferay-fundamentals/modules/02-manage-user-accounts/exercise-src/com.liferay.training.contentloader.jar";
 		property portal.release = "false";
@@ -372,7 +508,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Mock LDAP Page");
+		SitePages.addPublicPage(pageName = "Mock LDAP Page");
 
 		Navigator.gotoPage(pageName = "Mock LDAP Page");
 
@@ -384,6 +520,7 @@ definition {
 
 		MockLDAP.selectJsonFile(
 			fileName = "space-groups.json",
+			filePath = "coreinfrastructure/administration/users/cpusersandorganizations",
 			tabName = "User Groups");
 
 		ApplicationsMenu.gotoPortlet(
@@ -391,28 +528,41 @@ definition {
 			panel = "Control Panel",
 			portlet = "User Groups");
 
-		Pagination.changePagination(itemsPerPage = 20);
+		Pagination.changePagination(itemsPerPage = "20");
 
 		Pagination.viewResults(results = "Showing 1 to 11 of 11 entries.");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		LAR.importPortlet(
+			compressedFile = "true",
+			filePath = "coreinfrastructure/administration/users/cpusersandorganizations",
 			larFileName = "organizations-7.0.lar",
 			uploadFrom = "dependencies");
 
 		for (var suborgName : list "Accounting,Business Administration,College of Agricultural Science,College of Business,College of Engineering") {
-			Organization.openOrganizationsAdmin();
+			Navigator.openURL();
+
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
+
+			UsersAndOrganizationsNavigator.gotoOrganizations();
 
 			Organization.addSiteCP(
-				orgName = ${suborgName},
+				orgName = "${suborgName}",
 				orgType = "Organization");
 
-			var suborgName = StringUtil.replace(${suborgName}, " ", "-");
+			var suborgName = StringUtil.replace("${suborgName}", " ", "-");
+			var suborgName = StringUtil.lowerCase("${suborgName}");
 
-			var suborgName = StringUtil.lowerCase(${suborgName});
-
-			Site.openSiteSettingsAdmin(siteURLKey = ${suborgName});
+			Site.openSiteSettingsAdmin(siteURLKey = "${suborgName}");
 
 			Site.manageMembershipOptions(allowManualMembershipManagement = "true");
 		}
@@ -432,11 +582,11 @@ definition {
 			portlet = "Memberships");
 
 		for (var userGroupName : list "Business: Accounting,Business: Business Administration") {
-			Site.assignUserGroupAsMemberCP(userGroupName = ${userGroupName});
+			Site.assignUserGroupAsMemberCP(userGroupName = "${userGroupName}");
 		}
 
 		for (var siteName : list "Accounting,Business Administration") {
-			Navigator.openSiteURL(siteName = ${siteName});
+			Navigator.openSiteURL(siteName = "${siteName}");
 
 			ProductMenu.gotoPortlet(
 				category = "People",
@@ -447,13 +597,21 @@ definition {
 	}
 
 	@description = "Assign multiple members to an organization and searches for them under assignees"
-	@priority = 5
+	@priority = "5"
 	test AssignMultipleUsersToOrganization {
+		property test.name.skip.portal.instance = "UsersandorganizationsUsecase#AssignMultipleUsersToOrganization";
 		property testray.component.names = "Training";
 
-		var count = 1;
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
 
-		while (${count} != 6) {
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
+
+		var count = "1";
+
+		while ("${count}" != "6") {
 			JSONUser.addUser(
 				userEmailAddress = "userea${count}@liferay.com",
 				userFirstName = "userfn${count}",
@@ -469,16 +627,23 @@ definition {
 			portlet = "Users and Organizations");
 
 		for (var userScreenName : list "usersn1,usersn2,usersn3,usersn4,usersn5") {
-			var key_userScreenName = ${userScreenName};
+			var key_userScreenName = "${userScreenName}";
 
 			AssertTextEquals(
 				locator1 = "UsersAndOrganizations#USER_TABLE_SCREEN_NAME",
-				value1 = ${userScreenName});
+				value1 = "${userScreenName}");
 		}
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name 1");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name 1",
+			orgType = "Organization");
+
+		Navigator.gotoBack();
 
 		Organization.assignUser(
 			orgName = "Organization Name 1",
@@ -495,48 +660,77 @@ definition {
 			organizationName = "Organization Name 1",
 			userEmailAddress = "userea5@liferay.com");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name 1");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		LexiconEntry.gotoEntry(rowEntry = "Organization Name 1");
 
 		for (var userName : list "userfn1 userln1,userfn3 userln3,userfn5 userln5") {
 			AssertTextEquals(
-				key_userScreenName = ${userName},
+				key_userScreenName = "${userName}",
 				locator1 = "UsersAndOrganizations#USER_TABLE_NAME",
-				value1 = ${userName});
+				value1 = "${userName}");
 		}
 
 		for (var userName : list "userfn2 userln2,userfn4 userln4") {
 			AssertElementNotPresent(
-				key_userScreenName = ${userName},
+				key_userScreenName = "${userName}",
 				locator1 = "UsersAndOrganizations#USER_TABLE_NAME");
 		}
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name 1");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		Organization.viewUser(userName = "userfn1 userln1");
+		Organization.gotoCP(
+			orgName = "Organization Name 1",
+			searchToken = "Organization");
 
-		Organization.viewUser(userName = "userfn3 userln3");
+		Organization.viewAssignMemberCP(userName = "userfn1 userln1");
 
-		Organization.viewUser(userName = "userfn5 userln5");
+		Organization.viewAssignMemberCP(userName = "userfn3 userln3");
+
+		Organization.viewAssignMemberCP(userName = "userfn5 userln5");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test AssignUser {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		JSONUser.addUser(
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.addCP(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.assignUser(
 			orgName = "Organization Name",
@@ -545,15 +739,22 @@ definition {
 			userName = "userfn userln",
 			userScreenName = "usersn");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		Organization.viewUser(userName = "userfn userln");
+		Organization.gotoCP(
+			orgName = "Organization Name",
+			searchToken = "Organization");
+
+		Organization.viewAssignMemberCP(userName = "userfn userln");
 	}
 
 	@description = "Add a site to an organization, assign user to that organization and assert it displays in My Dashboard"
-	@priority = 5
+	@priority = "5"
 	test AssignUserToOrganizationWithSite {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -585,7 +786,12 @@ definition {
 
 		LexiconEntry.viewEntryName(rowEntry = "Organization Name");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name",
@@ -593,7 +799,7 @@ definition {
 	}
 
 	@description = "This adds a global category to an organization."
-	@priority = 3
+	@priority = "3"
 	test CanAddGlobalCategoryToOrganization {
 		JSONCategory.addVocabulary(
 			groupName = "Global",
@@ -608,103 +814,26 @@ definition {
 
 		Organization.openOrganizationsAdmin();
 
-		Organization.gotoEdit(orgName = "Organization Name");
+		Organization.editOrganizationCP(orgName = "Organization Name");
 
-		Click(
-			key_vocabularyName = "Vocabulary Name 1",
-			locator1 = "AssetCategorization#CATEGORY_SELECT");
-
-		AssetCategorization.selectCategories(categoryNameList = "Category Name 1");
+		Organization.editCategorizationCP(
+			categoryName = "Category Name 1",
+			orgName = "Organization Name",
+			vocabularyName = "Vocabulary Name 1");
 
 		PortletEntry.save();
 
 		Organization.openOrganizationsAdmin();
 
-		Organization.gotoEdit(orgName = "Organization Name");
+		Organization.editOrganizationCP(orgName = "Organization Name");
 
 		AssetCategorization.viewCategory(categoryName = "Category Name 1");
 
 		AssetCategorization.viewVocabulary(vocabularyName = "Vocabulary Name 1");
 	}
 
-	@description = "Resolved bug automation for LPS-140712. This test asserts that a user can be added to an organization through the UI and displays a success message"
-	@priority = 3
-	test CanAddOrganizationUser {
-		task ("Given an organization") {
-			JSONOrganization.addOrganization(
-				organizationName = "Organization Name",
-				organizationSite = "true");
-		}
-
-		task ("When a user is added to that organization through the UI") {
-			Organization.openOrganizationsAdmin();
-
-			Organization.addUser(
-				organizationName = "Organization Name",
-				userEmailAddress = "userea@liferay.com",
-				userFirstName = "userfn",
-				userLastName = "userln",
-				userScreenName = "usersn");
-		}
-
-		task ("Then a success message should display and the user should be listed under the organization") {
-			Alert.viewSuccessMessageText(successMessage = "The user was created successfully. You can now add additional information about the user.");
-
-			User.viewUserInformation(
-				userEmailAddress = "userea@liferay.com",
-				userFirstName = "userfn",
-				userLastName = "userln",
-				userScreenName = "usersn");
-
-			Organization.openOrganizationsAdmin();
-
-			Organization.gotoCP(orgName = "Organization Name");
-
-			LexiconEntry.viewEntryContent(
-				rowAny = "userfn userln",
-				rowEntry = "User");
-		}
-	}
-
-	@description = "This test automates LPS-141217 and asserts that a user can still be added to an organization after initially using an invalid email"
-	@priority = 3
-	test CanAddOrganizationUserAfterFirstUsingInvalidEmail {
-		task ("Given the creation of a user under an organization is attempted using an invalid email") {
-			JSONOrganization.addOrganization(organizationName = "Organization Name");
-
-			Organization.openOrganizationsAdmin();
-
-			Organization.addUser(
-				organizationName = "Organization Name",
-				userEmailAddress = "postmaster@liferay.com",
-				userFirstName = "userfn",
-				userLastName = "userln",
-				userScreenName = "usersn");
-
-			Alert.viewErrorMessage(errorMessage = "Error:Please enter a valid email address.");
-		}
-
-		task ("When the email is changed to a valid email address and the user is saved") {
-			Type(
-				locator1 = "UsersAndOrganizationsEditUser#DETAILS_EMAIL_ADDRESS_FIELD",
-				value1 = "postmaster1@liferay.com");
-
-			Button.clickSave();
-		}
-
-		task ("Then the user should be created and associated under the organization") {
-			Organization.openOrganizationsAdmin();
-
-			Organization.gotoCP(orgName = "Organization Name");
-
-			LexiconEntry.viewEntryContent(
-				rowAny = "userfn userln",
-				rowEntry = "User");
-		}
-	}
-
 	@description = "This test asserts that an organization cannot be deleted if there is a suborganization associated with it."
-	@priority = 3
+	@priority = "3"
 	test CannotDeleteAnOrganizationWithSuborganization {
 		JSONOrganization.addOrganization(organizationName = "Organization Name");
 
@@ -714,9 +843,9 @@ definition {
 
 		Organization.openOrganizationsAdmin();
 
-		LexiconEntry.gotoEntryMenuItemNoError(
-			menuItem = "Delete",
-			rowEntry = "Organization Name");
+		Organization.gotoActionsCmd(orgName = "Organization Name");
+
+		MenuItem.clickNoError(menuItem = "Delete");
 
 		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
 
@@ -726,17 +855,17 @@ definition {
 
 		Organization.openOrganizationsAdmin();
 
-		Organization.removeSuborganizationCP(
+		Suborganization.removeCP(
 			orgName = "Organization Name",
 			subOrgName = "Suborganization Name 1");
 
 		Organization.openOrganizationsAdmin();
 
-		Organization.delete(orgName = "Organization Name");
+		Organization.deleteCP(orgName = "Organization Name");
 	}
 
 	@description = "This sets Order By Name and asserts descending and ascending order"
-	@priority = 3
+	@priority = "3"
 	test CanOrderOrganizationsByName {
 		for (var organizationNumber : list "1,2,3,4,5,6,7,8") {
 			JSONOrganization.addOrganization(organizationName = "Organization ${organizationNumber}");
@@ -744,7 +873,7 @@ definition {
 
 		Organization.openOrganizationsAdmin();
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		ManagementBar.setFilterAndOrder(orderBy = "Name");
 
@@ -770,7 +899,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-123120."
-	@priority = 3
+	@priority = "3"
 	test ClearSearchResults {
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -785,9 +914,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Permissions",
-			rowEntry = "usersn");
+		UserNavigator.gotoPermissions(rowEntry = "usersn");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -795,11 +922,18 @@ definition {
 
 		Search.clearSearchResult();
 
-		Organization.openOrganizationsAdmin();
+		Navigator.openURL();
 
-		LexiconEntry.gotoEntryMenuItemNoError(
-			menuItem = "Assign Organization Roles",
-			rowEntry = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.gotoActionsCmd(orgName = "Organization Name");
+
+		MenuItem.click(menuItem = "Assign Organization Roles");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -807,7 +941,14 @@ definition {
 
 		Search.clearSearchResult();
 
-		LexiconTable.clickTableEntryTitle(tableEntry = "Organization Administrator");
+		AssertTextEquals(
+			key_roleTitle = "Organization Administrator",
+			locator1 = "UsersAndOrganizationsAssignOrganizationalRoles#ROLE_TITLE",
+			value1 = "Organization Administrator");
+
+		Click(
+			key_roleTitle = "Organization Administrator",
+			locator1 = "UsersAndOrganizationsAssignOrganizationalRoles#ROLE_TITLE");
 
 		Navigator.gotoNavItem(navItem = "Available");
 
@@ -815,11 +956,18 @@ definition {
 
 		Search.clearSearchResult();
 
-		Organization.openOrganizationsAdmin();
+		Navigator.openURL();
 
-		LexiconEntry.gotoEntryMenuItemNoError(
-			menuItem = "Assign Users",
-			rowEntry = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.gotoActionsCmd(orgName = "Organization Name");
+
+		MenuItem.click(menuItem = "Assign Users");
 
 		AssertElementPresent.assertVisible(locator1 = "Button#DONE");
 
@@ -830,7 +978,7 @@ definition {
 		Search.clearSearchResult();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test DeleteOrganization {
 		property portal.acceptance = "true";
 
@@ -839,26 +987,46 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
 		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		Organization.addCP(orgName = "Organization Name");
+		Organization.deleteCP(orgName = "Organization Name");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.delete(orgName = "Organization Name");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		Organization.openOrganizationsAdmin();
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Message#EMPTY_INFO",
-			value1 = "No organizations were found.");
+		Organization.viewNoOrganizationsFoundCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteOrganizationSite {
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
@@ -880,14 +1048,26 @@ definition {
 		Site.deleteCP(siteName = "Organization Name");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test EditOrganizationSite {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
@@ -901,17 +1081,23 @@ definition {
 			siteName = "Organization Name",
 			siteType = "Private");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.edit(
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.editSiteCP(
 			orgName = "Organization Name",
 			orgNameEdit = "Organization Name Edit");
 
-		AssertTextEquals(
-			locator1 = "TextInput#NAME",
-			value1 = "Organization Name Edit");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name Edit",
@@ -922,7 +1108,7 @@ definition {
 			orgType = "Organization");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test EditOrganizationSiteTeam {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -935,9 +1121,21 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Name");
 
@@ -945,7 +1143,12 @@ definition {
 
 		Site.manageMembershipOptions(allowManualMembershipManagement = "true");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.assignUser(
 			orgName = "Organization Name",
@@ -954,15 +1157,15 @@ definition {
 			userName = "userfn userln",
 			userScreenName = "usersn");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Public Page");
+		SitePages.addPublicPage(pageName = "Public Page");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Organization Name");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name");
 
 		ProductMenu.gotoPortlet(
 			category = "People",
@@ -986,11 +1189,18 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-75084."
-	@priority = 5
+	@priority = "5"
 	test NoPermissionUserCannotAddOrganizationViaURL {
 		var portalURL = PropsUtil.get("portal.url");
 
-		JSONOrganization.addOrganization(organizationName = "Organization for Test");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		Organization.addCP(
+			orgName = "Organization for Test",
+			orgType = "Organization");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1021,21 +1231,36 @@ definition {
 
 		Navigator.openSpecificURL(url = "${portalURL}/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_MyOrganizationsPortlet&p_p_lifecycle=0&p_p_state=pop_up&p_p_mode=view&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_mvcPath=%2Fselect_organization.jsp&_com_liferay_users_admin_web_portlet_MyOrganizationsPortlet_p_u_i_d=0");
 
-		AssertTextEquals.assertPartialText(
+		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO",
 			value1 = "No organizations were found.");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test OrganizationAdministratorActivate {
 		property testray.component.names = "Training";
 
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "VIEW_CONTROL_PANEL",
-			resourceName = 90,
-			roleTitle = "User");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Roles");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		Role.definePermissionCP(
+			permissionDefinitionKey = "CONTROL_PANEL_GENERAL_PERMISSIONS_GO_TO_CONTROL_PANEL_CHECKBOX",
+			permissionDefinitionValue = "View Control Panel Menu",
+			permissionNavigationKey = "CONTROL_PANEL_GENERAL_PERMISSIONS",
+			permissionNavigationValue = "General Permissions",
+			roleTitle = "Authenticated",
+			roleUser = "User");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea1@liferay.com",
@@ -1052,7 +1277,12 @@ definition {
 			userEmailAddress = "userea1@liferay.com",
 			userScreenName = "usersn1");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.assignUser(
 			orgName = "Organization Name",
@@ -1061,9 +1291,14 @@ definition {
 			userName = "userfn1 userln1",
 			userScreenName = "usersn1");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.assignOrgRole(
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.assignOrgRoleCP(
 			orgName = "Organization Name",
 			roleTitle = "Organization Administrator",
 			userFirstName = "userfn1",
@@ -1078,7 +1313,12 @@ definition {
 			userLastName = "userln2",
 			userScreenName = "usersn2");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.assignUser(
 			orgName = "Organization Name",
@@ -1091,39 +1331,27 @@ definition {
 
 		User.loginUserPG(userEmailAddress = "userea1@liferay.com");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		LexiconEntry.gotoEntryMenuItemNoError(
-			menuItem = "Deactivate",
-			rowEntry = "userfn2");
+		Organization.deactivateMemberCP(
+			orgName = "Organization Name",
+			userFirstName = "userfn2");
 
-		AssertConfirm(value1 = "Are you sure you want to deactivate this?");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Alert.viewSuccessMessage();
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		AssertTextEquals(
-			key_columnName = "status",
-			key_tableEntry = "userfn2",
-			locator1 = "LexiconTable#TABLE_ENTRY_INFO",
-			value1 = "Inactive");
-
-		Organization.openOrganizationsAdmin();
-
-		Organization.gotoCP(orgName = "Organization Name");
-
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Activate",
-			rowEntry = "userfn2");
-
-		Alert.viewSuccessMessage();
-
-		AssertTextEquals(
-			key_columnName = "status",
-			key_tableEntry = "userfn2",
-			locator1 = "LexiconTable#TABLE_ENTRY_INFO",
-			value1 = "Active");
+		Organization.activateMemberCP(
+			orgName = "Organization Name",
+			userFirstName = "userfn2");
 
 		User.logoutPG();
 
@@ -1132,10 +1360,10 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test OrganizationDropDownItems {
 		for (var siteName : list "Site Name A,Site Name B,Site Name C,Site Name D,Site Name E,Site Name F,Site Name G,Site Name H") {
-			HeadlessSite.addSite(siteName = ${siteName});
+			JSONGroup.addGroup(groupName = "${siteName}");
 		}
 
 		ApplicationsMenu.gotoPortlet(
@@ -1144,11 +1372,11 @@ definition {
 			portlet = "Sites");
 
 		for (var siteName : list "Site Name A,Site Name B,Site Name C,Site Name D,Site Name E,Site Name F,Site Name G,Site Name H") {
-			var key_siteName = ${siteName};
+			var key_siteName = "${siteName}";
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "Sites#SITE_TABLE_NAME",
-				value1 = ${siteName});
+				value1 = "${siteName}");
 		}
 
 		ApplicationsMenu.gotoSiteViaViewAll(site = "Site Name H");
@@ -1168,8 +1396,10 @@ definition {
 			value1 = "Site Name H");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test OrganizationSiteDefaultUserAssociations {
+		property test.name.skip.portal.instance = "UsersandorganizationsUsecase#OrganizationSiteDefaultUserAssociations";
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
 			panel = "Control Panel",
@@ -1179,15 +1409,27 @@ definition {
 			siteName = "Site Name Alpha",
 			siteType = "Blank");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Site Bravo");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Site Bravo",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Site Bravo");
 
-		PortalSettings.editConfigurationUsersDefaultUserAssociationsCP(siteName = "Site Name Alpha");
+		PortalSettings.editConfigurationUsersDefaultUserAssociationsSitesCP(siteName = "Site Name Alpha");
 
-		PortalSettings.editConfigurationUsersDefaultUserAssociationsCP(orgName = "Organization Site Bravo");
+		PortalSettings.editConfigurationUsersDefaultUserAssociationsOrganizationSitesCP(orgName = "Organization Site Bravo");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1200,45 +1442,39 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		UserNavigator.gotoUser(userScreenName = "usersn");
+		User.gotoEditCP(userScreenName = "usersn");
 
-		User.viewMemberships(
-			assetType = "Sites",
-			assigneeName = "Site Name Alpha");
+		User.viewUserInfomationSitesCP(siteName = "Site Name Alpha");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		UserNavigator.gotoUser(userScreenName = "usersn");
+		User.gotoEditCP(userScreenName = "usersn");
 
-		User.viewMemberships(
-			assetType = "Sites",
-			assigneeName = "Organization Site Bravo");
+		User.viewUserInfomationSitesCP(siteName = "Organization Site Bravo");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test OrganizationUserManagement {
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "Organizations#OrganizationUserManagement";
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		SearchAdministration.executeReindex();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
-
-		Organization.openOrganizationsAdmin();
-
-		Organization.gotoEdit(orgName = "Organization Name");
-
-		Navigator.gotoNavTab(navTab = "Contact");
+		Organization.gotoContact();
 
 		Organization.addContactInformation(
 			addressType = "Billing",
 			city = "Diamond Bar",
 			contactType = "add-address-link",
 			country = "United States",
-			postalCode = 91765,
+			postalCode = "91765",
 			region = "California",
 			street1 = "1400 Montefino Ave");
 
@@ -1263,15 +1499,16 @@ definition {
 			mondayClose = "18:00",
 			mondayOpen = "08:00");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoEdit(orgName = "Organization Name");
+		Organization.editOrganizationCP(orgName = "Organization Name");
 
-		Organization.addComment(orgComment = "This is a test organization.");
-
-		AssertTextEquals(
-			locator1 = "TextArea#COMMENTS",
-			value1 = "This is a test organization.");
+		Organization.addCommentCP(
+			orgComment = "This is a test organization.",
+			orgName = "Organization Name");
 
 		Navigator.gotoNavNested(navNested = "Security Questions");
 
@@ -1282,42 +1519,79 @@ definition {
 			securityQuestions = "This is just a test");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RemoveMember {
-		property portal.acceptance = "true";
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		JSONUser.addUser(
+		User.addCP(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.assignUser(
 			orgName = "Organization Name",
 			userScreenName = "usersn");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		Organization.removeAssignee(userFullName = "userfn userln");
+		Organization.removeMemberCP(
+			orgName = "Organization Name",
+			userFullName = "userfn userln");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
-		LexiconTable.viewTableEntryNotPresent(tableEntry = "userfn");
+		Organization.viewRemoveMemberCP(
+			orgName = "Organization Name",
+			userFirstName = "userfn");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SearchOrganization {
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name",
@@ -1327,39 +1601,56 @@ definition {
 	}
 
 	@description = "This test adds tags to organizations and asserts proper organization displays when tag is searched"
-	@priority = 4
+	@priority = "4"
 	test SearchTags {
-		JSONOrganization.addOrganization(organizationName = "Organization Name 1");
+		property test.name.skip.portal.instance = "UsersandorganizationsUsecase#SearchTags";
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
 
-		Organization.gotoEdit(orgName = "Organization Name 1");
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
 
-		AssetCategorization.addTag(tagName = "alpha");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		PortletEntry.save();
+		Organization.addCP(
+			orgName = "Organization Name 1",
+			orgType = "Organization");
 
-		AssertTextEquals(
-			key_tagName = "alpha",
-			locator1 = "AssetCategorization#TAG",
-			value1 = "alpha");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		Organization.editOrganizationCP(orgName = "Organization Name 1");
+
+		Organization.addCategorizationCP(
+			orgName = "Organization Name 1",
+			tagName = "alpha");
 
 		JSONOrganization.addOrganization(organizationName = "Organization Name 2");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoEdit(orgName = "Organization Name 2");
+		Organization.editOrganizationCP(orgName = "Organization Name 2");
 
-		AssetCategorization.addTag(tagName = "bravo");
+		Organization.addCategorizationCP(
+			orgName = "Organization Name 2",
+			tagName = "bravo");
 
-		PortletEntry.save();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		AssertTextEquals(
-			key_tagName = "bravo",
-			locator1 = "AssetCategorization#TAG",
-			value1 = "bravo");
-
-		Organization.openOrganizationsAdmin();
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.searchCP(
 			orgName = "Organization Name 1",
@@ -1371,14 +1662,14 @@ definition {
 
 		Organization.searchCP(
 			orgName = "Organization Name 1",
-			searchTerm = 1);
+			searchTerm = "1");
 
 		Organization.searchCP(
 			orgName = "Organization Name 2",
-			searchTerm = 2);
+			searchTerm = "2");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchUsersInOrganization {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -1391,9 +1682,21 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.assignUser(
 			orgName = "Organization Name",
@@ -1402,39 +1705,52 @@ definition {
 			userName = "userfn userln",
 			userScreenName = "usersn");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.gotoCP(orgName = "Organization Name");
+		UsersAndOrganizationsNavigator.gotoOrganizations();
+
+		Organization.gotoCP(
+			orgName = "Organization Name",
+			searchToken = "Organization Name");
 
 		User.searchCP(searchTerm = "usersn");
 
-		Organization.viewUser(userName = "userfn userln");
+		Organization.viewAssignMemberCP(
+			userName = "userfn userln",
+			userScreenName = "usersn");
 
 		User.searchCP(searchTerm = "test");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "Message#EMPTY_INFO",
-			value1 = "No results were found.");
+		Organization.viewMembersNotFoundCP();
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewBack {
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.addCP(orgName = "Organization Name");
+		Organization.addCP(
+			orgName = "Organization Name",
+			orgType = "Organization");
 
 		AssertElementPresent(locator1 = "Icon#BACK");
 
 		takeScreenshot();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewContentInCustomOrganizationTypeSite {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
-		property test.name.skip.portal.instance = "Organizations#ViewContentInCustomOrganizationTypeSite";
+		property test.name.skip.portal.instance = "UsersandorganizationsUsecase#ViewContentInCustomOrganizationTypeSite";
 
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONRole.addOrganizationRole(roleTitle = "Canada Orgrole");
 
@@ -1461,7 +1777,7 @@ definition {
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "MB Page",
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(
@@ -1486,12 +1802,12 @@ definition {
 
 		for (var settingName : list "Name,Children Types") {
 			SystemSettings.editTextAreaSetting(
-				settingName = ${settingName},
+				settingName = "${settingName}",
 				settingValue = "Location");
 		}
 
 		for (var fieldName : list "countryEnabled,rootable") {
-			FormFields.enableCheckbox(fieldName = ${fieldName});
+			FormFields.enableCheckbox(fieldName = "${fieldName}");
 		}
 
 		SystemSettings.saveConfiguration();
@@ -1504,13 +1820,23 @@ definition {
 			organizationName = "Canada",
 			organizationType = "Location");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(
 			orgName = "United States",
 			siteTemplateName = "Site Template Name");
 
-		Organization.openOrganizationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(
 			orgName = "Canada",
@@ -1604,44 +1930,63 @@ definition {
 		MessageboardsThread.viewDoNotHaveRequiredPermissionsPG(threadSubject = "Canada Message Subject");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewOrganizationSiteViaSitesDirectory {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Sites Directory Page");
+		SitePages.addPublicPage(pageName = "Sites Directory Page");
 
 		Navigator.gotoPage(pageName = "Sites Directory Page");
 
 		Portlet.addPG(portletName = "Sites Directory");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name 1");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Organization.openOrganizationsAdmin();
+		Organization.addCP(
+			orgName = "Organization Name 1",
+			orgType = "Organization");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		UsersAndOrganizationsNavigator.gotoOrganizations();
 
 		Organization.addSiteCP(orgName = "Organization Name 1");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "Organization Name 1");
+		SitePages.openPagesAdmin(siteURLKey = "Organization Name 1");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Test Page");
+		SitePages.addPublicPage(pageName = "Test Page");
 
-		JSONOrganization.addOrganization(organizationName = "Organization Name 2");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		Organization.addCP(
+			orgName = "Organization Name 2",
+			orgType = "Organization");
 
 		Navigator.gotoPage(pageName = "Sites Directory Page");
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		var key_siteName = ${siteName};
+		var key_siteName = "${siteName}";
 		var key_orgName = "Organization Name 1";
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "SitesDirectory#SITE_ENTRY",
-			value1 = ${siteName});
+			value1 = "${siteName}");
 
 		AssertTextEquals(
 			locator1 = "SitesDirectory#ORG_SITE_ENTRY",
@@ -1666,7 +2011,7 @@ definition {
 			value1 = "Organization Name 1");
 
 		Breadcrumb.viewPG(
-			breadcrumbListNotVisible = ${siteName},
+			breadcrumbListNotVisible = "${siteName}",
 			breadcrumbListVisible = "Organization Name 1",
 			pathLocator = "CURRENT_LOCATION");
 

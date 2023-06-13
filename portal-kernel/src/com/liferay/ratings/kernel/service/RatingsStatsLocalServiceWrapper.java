@@ -30,10 +30,6 @@ public class RatingsStatsLocalServiceWrapper
 	implements RatingsStatsLocalService,
 			   ServiceWrapper<RatingsStatsLocalService> {
 
-	public RatingsStatsLocalServiceWrapper() {
-		this(null);
-	}
-
 	public RatingsStatsLocalServiceWrapper(
 		RatingsStatsLocalService ratingsStatsLocalService) {
 

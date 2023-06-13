@@ -29,10 +29,6 @@ public class UserGroupGroupRoleLocalServiceWrapper
 	implements ServiceWrapper<UserGroupGroupRoleLocalService>,
 			   UserGroupGroupRoleLocalService {
 
-	public UserGroupGroupRoleLocalServiceWrapper() {
-		this(null);
-	}
-
 	public UserGroupGroupRoleLocalServiceWrapper(
 		UserGroupGroupRoleLocalService userGroupGroupRoleLocalService) {
 

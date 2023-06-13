@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + COREntryPortletKeys.COR_ENTRY,
 		"mvc.command.name=/cor_entry/edit_cor_entry_external_reference_code"
@@ -67,7 +68,7 @@ public class EditCOREntryExternalReferenceCodeMVCActionCommand
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				String redirect = ParamUtil.getString(
 					actionRequest, "redirect");

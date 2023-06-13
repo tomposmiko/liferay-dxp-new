@@ -28,10 +28,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class LayoutSetLocalServiceWrapper
 	implements LayoutSetLocalService, ServiceWrapper<LayoutSetLocalService> {
 
-	public LayoutSetLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutSetLocalServiceWrapper(
 		LayoutSetLocalService layoutSetLocalService) {
 
@@ -360,15 +356,6 @@ public class LayoutSetLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.getPersistedModel(primaryKeyObj);
-	}
-
-	@Override
-	public LayoutSet updateFaviconFileEntryId(
-			long groupId, boolean privateLayout, long faviconFileEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.updateFaviconFileEntryId(
-			groupId, privateLayout, faviconFileEntryId);
 	}
 
 	/**

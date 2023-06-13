@@ -14,7 +14,6 @@
 
 package com.liferay.headless.delivery.internal.dto.v1_0.converter;
 
-import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -25,6 +24,8 @@ import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.storage.Fields;
+import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
 import com.liferay.headless.delivery.dto.v1_0.ContentField;
 import com.liferay.headless.delivery.dto.v1_0.RenderedContent;
 import com.liferay.headless.delivery.dto.v1_0.StructuredContent;
@@ -38,13 +39,13 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.RelatedContentUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RenderedContentValueUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.TaxonomyCategoryBriefUtil;
 import com.liferay.headless.delivery.internal.resource.v1_0.BaseStructuredContentResourceImpl;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
 import com.liferay.journal.util.JournalContent;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
+import com.liferay.journal.util.JournalConverter;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.model.Group;
@@ -61,13 +62,17 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.GroupUtil;
 import com.liferay.portal.vulcan.util.JaxRsLinkUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -82,7 +87,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.journal.model.JournalArticle",
-	service = DTOConverter.class
+	service = {DTOConverter.class, StructuredContentDTOConverter.class}
 )
 public class StructuredContentDTOConverter
 	implements DTOConverter<JournalArticle, StructuredContent> {
@@ -90,13 +95,6 @@ public class StructuredContentDTOConverter
 	@Override
 	public String getContentType() {
 		return StructuredContent.class.getSimpleName();
-	}
-
-	@Override
-	public String getJaxRsLink(long classPK, UriInfo uriInfo) {
-		return JaxRsLinkUtil.getJaxRsLink(
-			"headless-delivery", BaseStructuredContentResourceImpl.class,
-			"getStructuredContent", uriInfo, classPK);
 	}
 
 	@Override
@@ -132,11 +130,12 @@ public class StructuredContentDTOConverter
 					journalArticle.getAvailableLanguageIds());
 				contentFields = _toContentFields(
 					_dlAppService, _dlURLHelper, dtoConverterContext,
-					journalArticle, _journalArticleService,
+					_fieldsToDDMFormValuesConverter, journalArticle,
+					_journalArticleService, _journalConverter,
 					_layoutLocalService);
 				contentStructureId = ddmStructure.getStructureId();
 				creator = CreatorUtil.toCreator(
-					_portal, dtoConverterContext.getUriInfo(),
+					_portal, dtoConverterContext.getUriInfoOptional(),
 					_userLocalService.fetchUser(journalArticle.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
 					dtoConverterContext.isAcceptAllLanguages(),
@@ -177,7 +176,6 @@ public class StructuredContentDTOConverter
 				renderedContents = _toRenderedContents(
 					ddmStructure, dtoConverterContext, journalArticle);
 				siteId = GroupUtil.getSiteId(group);
-				structuredContentFolderId = journalArticle.getFolderId();
 				subscribed = _subscriptionLocalService.isSubscribed(
 					journalArticle.getCompanyId(),
 					dtoConverterContext.getUserId(),
@@ -197,20 +195,6 @@ public class StructuredContentDTOConverter
 					dtoConverterContext.isAcceptAllLanguages(),
 					journalArticle.getTitleMap());
 				uuid = journalArticle.getUuid();
-
-				setPriority(
-					() -> {
-						AssetEntry assetEntry =
-							_assetEntryLocalService.fetchEntry(
-								journalArticle.getModelClassName(),
-								journalArticle.getResourcePrimKey());
-
-						if (assetEntry == null) {
-							return null;
-						}
-
-						return assetEntry.getPriority();
-					});
 			}
 		};
 	}
@@ -218,28 +202,34 @@ public class StructuredContentDTOConverter
 	private Map<Locale, String> _filterDescriptionMap(
 		Map<Locale, String> descriptionMap) {
 
-		Map<Locale, String> filterDescriptionMap = new HashMap<>();
+		Set<Map.Entry<Locale, String>> set = descriptionMap.entrySet();
 
-		for (Map.Entry<Locale, String> entry : descriptionMap.entrySet()) {
-			if (StringPool.BLANK.equals(entry.getValue())) {
-				continue;
-			}
+		Stream<Map.Entry<Locale, String>> stream = set.stream();
 
-			filterDescriptionMap.put(entry.getKey(), entry.getValue());
-		}
-
-		return filterDescriptionMap;
+		return stream.filter(
+			entry -> !StringPool.BLANK.equals(entry.getValue())
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
 	}
 
 	private ContentField[] _toContentFields(
 			DLAppService dlAppService, DLURLHelper dlURLHelper,
 			DTOConverterContext dtoConverterContext,
+			FieldsToDDMFormValuesConverter fieldsToDDMFormValuesConverter,
 			JournalArticle journalArticle,
 			JournalArticleService journalArticleService,
+			JournalConverter journalConverter,
 			LayoutLocalService layoutLocalService)
 		throws Exception {
 
-		DDMFormValues ddmFormValues = journalArticle.getDDMFormValues();
+		DDMStructure ddmStructure = journalArticle.getDDMStructure();
+
+		Fields fields = journalConverter.getDDMFields(
+			ddmStructure, journalArticle.getContent());
+
+		DDMFormValues ddmFormValues = fieldsToDDMFormValuesConverter.convert(
+			ddmStructure, fields);
 
 		return TransformUtil.transformToArray(
 			ddmFormValues.getDDMFormFieldValues(),
@@ -253,9 +243,10 @@ public class StructuredContentDTOConverter
 		DDMStructure ddmStructure, DTOConverterContext dtoConverterContext,
 		JournalArticle journalArticle) {
 
-		UriInfo uriInfo = dtoConverterContext.getUriInfo();
+		Optional<UriInfo> uriInfoOptional =
+			dtoConverterContext.getUriInfoOptional();
 
-		if (uriInfo == null) {
+		if (!uriInfoOptional.isPresent()) {
 			return null;
 		}
 
@@ -263,6 +254,7 @@ public class StructuredContentDTOConverter
 		HttpServletRequest httpServletRequest =
 			dtoConverterContext.getHttpServletRequest();
 		Locale locale = dtoConverterContext.getLocale();
+		UriInfo uriInfo = uriInfoOptional.get();
 
 		RenderedContent[] renderedContents = TransformUtil.transformToArray(
 			ddmStructure.getTemplates(),
@@ -275,8 +267,8 @@ public class StructuredContentDTOConverter
 					renderedContentURL = JaxRsLinkUtil.getJaxRsLink(
 						"headless-delivery",
 						BaseStructuredContentResourceImpl.class,
-						"getStructuredContentRenderedContentContentTemplate",
-						uriInfo, journalArticle.getResourcePrimKey(),
+						"getStructuredContentRenderedContentTemplate", uriInfo,
+						journalArticle.getResourcePrimKey(),
 						ddmTemplate.getTemplateKey());
 
 					setMarkedAsDefault(
@@ -292,8 +284,17 @@ public class StructuredContentDTOConverter
 						});
 					setRenderedContentValue(
 						() -> {
-							if (!dtoConverterContext.containsNestedFieldsValue(
-									"renderedContentValue")) {
+							if (!uriInfoOptional.map(
+									UriInfo::getQueryParameters
+								).map(
+									parameters -> parameters.getFirst(
+										"nestedFields")
+								).map(
+									fields -> fields.contains(
+										"renderedContentValue")
+								).orElse(
+									false
+								)) {
 
 								return null;
 							}
@@ -317,7 +318,7 @@ public class StructuredContentDTOConverter
 				journalArticle.getResourcePrimKey(),
 				ddmStructure.getStructureId(), dtoConverterContext,
 				journalArticle.getGroupId(), journalArticle,
-				_infoItemServiceRegistry, _layoutDisplayPageProviderRegistry,
+				_infoItemServiceTracker, _layoutDisplayPageProviderTracker,
 				_layoutLocalService, _layoutPageTemplateEntryService,
 				"getStructuredContentRenderedContentByDisplayPageDisplayPage" +
 					"Key");
@@ -353,10 +354,13 @@ public class StructuredContentDTOConverter
 	private DLURLHelper _dlURLHelper;
 
 	@Reference
+	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
+
+	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private JournalArticleService _journalArticleService;
@@ -365,8 +369,10 @@ public class StructuredContentDTOConverter
 	private JournalContent _journalContent;
 
 	@Reference
-	private LayoutDisplayPageProviderRegistry
-		_layoutDisplayPageProviderRegistry;
+	private JournalConverter _journalConverter;
+
+	@Reference
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

@@ -16,6 +16,9 @@ package com.liferay.frontend.taglib.form.navigator.internal.configuration;
 
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -34,9 +37,11 @@ public class RetrieverWhenThereIsNoConfigAtAllTest
 
 	@Test
 	public void testReturnsEmptyOptional() {
-		Assert.assertNull(
+		Optional<List<String>> formNavigatorEntryKeysOptional =
 			formNavigatorEntryConfigurationRetriever.getFormNavigatorEntryKeys(
-				"form1", "general", "add"));
+				"form1", "general", "add");
+
+		Assert.assertFalse(formNavigatorEntryKeysOptional.isPresent());
 	}
 
 }

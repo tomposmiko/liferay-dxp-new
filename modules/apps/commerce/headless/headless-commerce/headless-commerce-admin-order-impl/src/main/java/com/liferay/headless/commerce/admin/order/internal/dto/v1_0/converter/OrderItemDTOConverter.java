@@ -14,24 +14,14 @@
 
 package com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter;
 
-import com.liferay.commerce.media.CommerceMediaResolver;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.product.model.CPInstance;
-import com.liferay.commerce.product.model.CPMeasurementUnit;
-import com.liferay.commerce.product.service.CPMeasurementUnitService;
-import com.liferay.commerce.product.type.virtual.order.model.CommerceVirtualOrderItem;
-import com.liferay.commerce.product.type.virtual.order.service.CommerceVirtualOrderItemService;
 import com.liferay.commerce.service.CommerceOrderItemService;
-import com.liferay.commerce.util.CommerceOrderItemQuantityFormatter;
+import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderItem;
-import com.liferay.headless.commerce.admin.order.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 
@@ -42,8 +32,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.model.CommerceOrderItem",
-	service = DTOConverter.class
+	service = {DTOConverter.class, OrderItemDTOConverter.class}
 )
 public class OrderItemDTOConverter
 	implements DTOConverter<CommerceOrderItem, OrderItem> {
@@ -63,21 +54,14 @@ public class OrderItemDTOConverter
 
 		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
 		CPInstance cpInstance = commerceOrderItem.fetchCPInstance();
+		ExpandoBridge expandoBridge = commerceOrderItem.getExpandoBridge();
 
 		return new OrderItem() {
 			{
 				bookedQuantityId = commerceOrderItem.getBookedQuantityId();
-				customFields = CustomFieldsUtil.toCustomFields(
-					dtoConverterContext.isAcceptAllLanguages(),
-					CommerceOrderItem.class.getName(),
-					commerceOrderItem.getCommerceOrderItemId(),
-					commerceOrderItem.getCompanyId(),
-					dtoConverterContext.getLocale());
-				decimalQuantity = commerceOrderItem.getDecimalQuantity();
+				customFields = expandoBridge.getAttributes();
 				deliveryGroup = commerceOrderItem.getDeliveryGroup();
 				discountAmount = commerceOrderItem.getDiscountAmount();
-				discountManuallyAdjusted =
-					commerceOrderItem.isDiscountManuallyAdjusted();
 				discountPercentageLevel1 =
 					commerceOrderItem.getDiscountPercentageLevel1();
 				discountPercentageLevel1WithTaxAmount =
@@ -105,24 +89,17 @@ public class OrderItemDTOConverter
 				finalPrice = commerceOrderItem.getFinalPrice();
 				finalPriceWithTaxAmount =
 					commerceOrderItem.getFinalPriceWithTaxAmount();
-				formattedQuantity = _commerceOrderItemQuantityFormatter.format(
-					commerceOrderItem, dtoConverterContext.getLocale());
 				id = commerceOrderItem.getCommerceOrderItemId();
 				name = LanguageUtils.getLanguageIdMap(
 					commerceOrderItem.getNameMap());
-				options = commerceOrderItem.getJson();
 				orderExternalReferenceCode =
 					commerceOrder.getExternalReferenceCode();
 				orderId = commerceOrder.getCommerceOrderId();
-				priceManuallyAdjusted =
-					commerceOrderItem.isPriceManuallyAdjusted();
 				printedNote = commerceOrderItem.getPrintedNote();
 				promoPrice = commerceOrderItem.getPromoPrice();
 				promoPriceWithTaxAmount =
 					commerceOrderItem.getPromoPriceWithTaxAmount();
 				quantity = commerceOrderItem.getQuantity();
-				replacedSku = commerceOrderItem.getReplacedSku();
-				replacedSkuId = commerceOrderItem.getReplacedCPInstanceId();
 				requestedDeliveryDate =
 					commerceOrderItem.getRequestedDeliveryDate();
 				shippedQuantity = commerceOrderItem.getShippedQuantity();
@@ -135,52 +112,6 @@ public class OrderItemDTOConverter
 				unitPrice = commerceOrderItem.getUnitPrice();
 				unitPriceWithTaxAmount =
 					commerceOrderItem.getUnitPriceWithTaxAmount();
-
-				setUnitOfMeasure(
-					() -> {
-						if (commerceOrderItem.getCPMeasurementUnitId() <= 0) {
-							return StringPool.BLANK;
-						}
-
-						CPMeasurementUnit cpMeasurementUnit =
-							_cpMeasurementUnitService.getCPMeasurementUnit(
-								commerceOrderItem.getCPMeasurementUnitId());
-
-						return cpMeasurementUnit.getKey();
-					});
-				setVirtualItemURLs(
-					() -> {
-						try {
-							CommerceVirtualOrderItem commerceVirtualOrderItem =
-								_commerceVirtualOrderItemService.
-									fetchCommerceVirtualOrderItemByCommerceOrderItemId(
-										commerceOrderItem.
-											getCommerceOrderItemId());
-
-							if (commerceVirtualOrderItem == null) {
-								return null;
-							}
-
-							String url = commerceVirtualOrderItem.getUrl();
-
-							if (Validator.isBlank(url)) {
-								url =
-									_commerceMediaResolver.
-										getDownloadVirtualOrderItemURL(
-											commerceVirtualOrderItem.
-												getCommerceVirtualOrderItemId());
-							}
-
-							return new String[] {url};
-						}
-						catch (PortalException portalException) {
-							if (_log.isDebugEnabled()) {
-								_log.debug(portalException);
-							}
-
-							return null;
-						}
-					});
 			}
 		};
 	}
@@ -201,23 +132,7 @@ public class OrderItemDTOConverter
 		return cpInstance.getCPInstanceId();
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		OrderItemDTOConverter.class);
-
-	@Reference
-	private CommerceMediaResolver _commerceMediaResolver;
-
-	@Reference
-	private CommerceOrderItemQuantityFormatter
-		_commerceOrderItemQuantityFormatter;
-
 	@Reference
 	private CommerceOrderItemService _commerceOrderItemService;
-
-	@Reference
-	private CommerceVirtualOrderItemService _commerceVirtualOrderItemService;
-
-	@Reference
-	private CPMeasurementUnitService _cpMeasurementUnitService;
 
 }

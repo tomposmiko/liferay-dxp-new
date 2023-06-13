@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
 import com.liferay.portal.workflow.kaleo.model.KaleoTransition;
@@ -33,13 +32,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = NodeExecutor.class)
+@Component(
+	immediate = true, property = "node.type=JOIN", service = NodeExecutor.class
+)
 public class JoinNodeExecutor extends BaseNodeExecutor {
-
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.JOIN;
-	}
 
 	@Override
 	protected boolean doEnter(

@@ -17,7 +17,8 @@ package com.liferay.commerce.product.options.web.internal.portlet.action;
 import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.options.web.internal.display.context.CPOptionDisplayContext;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.commerce.product.service.CPOptionService;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
@@ -35,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_OPTIONS,
 		"mvc.command.name=/cp_options/add_cp_option"
@@ -52,7 +54,7 @@ public class AddCPOptionMVCRenderCommand implements MVCRenderCommand {
 			CPOptionDisplayContext cpOptionDisplayContext =
 				new CPOptionDisplayContext(
 					_configurationProvider, null,
-					_ddmFormFieldTypeServicesRegistry,
+					_ddmFormFieldTypeServicesTracker,
 					_portletResourcePermission,
 					_portal.getHttpServletRequest(renderRequest));
 
@@ -70,7 +72,10 @@ public class AddCPOptionMVCRenderCommand implements MVCRenderCommand {
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
-	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
+	private CPOptionService _cpOptionService;
+
+	@Reference
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	private Portal _portal;

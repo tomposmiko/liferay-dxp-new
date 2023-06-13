@@ -27,10 +27,6 @@ public class ChangesetEntryLocalServiceWrapper
 	implements ChangesetEntryLocalService,
 			   ServiceWrapper<ChangesetEntryLocalService> {
 
-	public ChangesetEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ChangesetEntryLocalServiceWrapper(
 		ChangesetEntryLocalService changesetEntryLocalService) {
 

@@ -15,7 +15,7 @@
 AUI.add(
 	'liferay-calendar-recurrence-util',
 	(A) => {
-		const STR_DASH = '-';
+		var STR_DASH = '-';
 
 		Liferay.RecurrenceUtil = {
 			_createConfirmationPanel(title, bodyContent, footerContent) {
@@ -36,16 +36,16 @@ AUI.add(
 			},
 
 			_createConfirmationPanelContent(description, options) {
-				const instance = this;
+				var instance = this;
 
-				const contentNode = A.Node.create(
+				var contentNode = A.Node.create(
 					A.Lang.sub(instance.RECURRING_EVENT_MODAL_TEMPLATE, {
 						description,
 					})
 				);
 
 				A.each(options, (option) => {
-					const optionRow = A.Lang.sub(
+					var optionRow = A.Lang.sub(
 						instance.RECURRING_EVENT_MODAL_ITEM_TEMPLATE,
 						{
 							confirmationDescription:
@@ -55,7 +55,7 @@ AUI.add(
 						}
 					);
 
-					const optionRowNode = A.Node.create(optionRow);
+					var optionRowNode = A.Node.create(optionRow);
 
 					new A.Button(option.button).render(optionRowNode.one('td'));
 
@@ -71,9 +71,11 @@ AUI.add(
 				allEventsInFn,
 				cancelFn
 			) {
-				const instance = this;
+				var instance = this;
 
-				const getButtonConfig = function (label, callback, cssClass) {
+				var buttons;
+
+				var getButtonConfig = function (label, callback, cssClass) {
 					return {
 						cssClass,
 						label,
@@ -89,7 +91,7 @@ AUI.add(
 					};
 				};
 
-				const buttons = {
+				buttons = {
 					confirmations: [
 						{
 							button: getButtonConfig(
@@ -167,12 +169,13 @@ AUI.add(
 			WEEKDAY_LABELS: {},
 
 			getSummary(recurrence) {
-				const instance = this;
+				var instance = this;
 
-				const params = [];
-				const parts = [];
+				var key;
+				var params = [];
+				var parts = [];
 
-				if (Number(recurrence.interval) === 1) {
+				if (recurrence.interval == 1) {
 					parts.push(A.Lang.String.toLowerCase(recurrence.frequency));
 				}
 				else {
@@ -185,7 +188,7 @@ AUI.add(
 				}
 
 				if (recurrence.positionalWeekday) {
-					if (recurrence.frequency === instance.FREQUENCY.MONTHLY) {
+					if (recurrence.frequency == instance.FREQUENCY.MONTHLY) {
 						parts.push('on-x-x');
 
 						params.push(
@@ -220,12 +223,12 @@ AUI.add(
 					}
 				}
 				else if (
-					recurrence.frequency === instance.FREQUENCY.WEEKLY &&
-					!!recurrence.weekdays.length
+					recurrence.frequency == instance.FREQUENCY.WEEKLY &&
+					recurrence.weekdays.length > 0
 				) {
 					parts.push('on-x');
 
-					const weekdays = recurrence.weekdays.map((item) => {
+					var weekdays = recurrence.weekdays.map((item) => {
 						return instance.WEEKDAY_LABELS[item];
 					});
 
@@ -243,14 +246,14 @@ AUI.add(
 				) {
 					parts.push('until-x-x-x');
 
-					const untilDate = recurrence.untilDate;
+					var untilDate = recurrence.untilDate;
 
 					params.push(instance.MONTH_LABELS[untilDate.getMonth()]);
 					params.push(untilDate.getDate());
 					params.push(untilDate.getFullYear());
 				}
 
-				const key = parts.join(STR_DASH);
+				key = parts.join(STR_DASH);
 
 				return A.Lang.sub(instance.RECURRENCE_SUMMARIES[key], params);
 			},
@@ -262,16 +265,18 @@ AUI.add(
 				allEventsInFn,
 				cancelFn
 			) {
-				const instance = this;
+				var instance = this;
 
-				const buttons = instance._getConfirmationPanelButtons(
+				var bodyContent;
+				var buttons = instance._getConfirmationPanelButtons(
 					onlyThisInstanceFn,
 					allFollowingFn,
 					allEventsInFn,
 					cancelFn
 				);
-				let modalDescription;
-				let titleText;
+				var footerContent;
+				var modalDescription;
+				var titleText;
 
 				if (actionName === 'delete') {
 					titleText = Liferay.Language.get('delete-recurring-event');
@@ -286,12 +291,12 @@ AUI.add(
 					);
 				}
 
-				const bodyContent = instance._createConfirmationPanelContent(
+				bodyContent = instance._createConfirmationPanelContent(
 					modalDescription,
 					buttons.confirmations
 				);
 
-				const footerContent = [buttons.dismiss];
+				footerContent = [buttons.dismiss];
 
 				instance.confirmationPanel = instance._createConfirmationPanel(
 					titleText,

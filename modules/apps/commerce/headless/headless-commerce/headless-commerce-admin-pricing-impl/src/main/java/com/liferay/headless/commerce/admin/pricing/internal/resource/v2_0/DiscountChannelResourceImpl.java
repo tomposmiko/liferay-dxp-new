@@ -22,6 +22,7 @@ import com.liferay.commerce.product.service.CommerceChannelRelService;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Discount;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountChannel;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountChannelDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v2_0.DiscountChannelUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountChannelResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/discount-channel.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {DiscountChannelResource.class, NestedFieldSupport.class}
@@ -215,11 +216,8 @@ public class DiscountChannelResourceImpl
 	@Reference
 	private CommerceDiscountService _commerceDiscountService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountChannelDTOConverter)"
-	)
-	private DTOConverter<CommerceChannelRel, DiscountChannel>
-		_discountChannelDTOConverter;
+	@Reference
+	private DiscountChannelDTOConverter _discountChannelDTOConverter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.model.RegionLocalization;
 import com.liferay.portal.kernel.model.RegionModel;
+import com.liferay.portal.kernel.model.RegionSoap;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.RegionLocalServiceUtil;
@@ -39,11 +40,13 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -187,6 +190,62 @@ public class RegionModelImpl
 	@Deprecated
 	public static final long POSITION_COLUMN_BITMASK = 64L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static Region toModel(RegionSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		Region model = new RegionImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setDefaultLanguageId(soapModel.getDefaultLanguageId());
+		model.setRegionId(soapModel.getRegionId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setCountryId(soapModel.getCountryId());
+		model.setActive(soapModel.isActive());
+		model.setName(soapModel.getName());
+		model.setPosition(soapModel.getPosition());
+		model.setRegionCode(soapModel.getRegionCode());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<Region> toModels(RegionSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<Region> models = new ArrayList<Region>(soapModels.length);
+
+		for (RegionSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.portal.kernel.model.Region"));
@@ -263,98 +322,107 @@ public class RegionModelImpl
 	}
 
 	public Map<String, Function<Region, Object>> getAttributeGetterFunctions() {
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<Region, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, Region>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<Region, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Region.class.getClassLoader(), Region.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<Region, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<Region, Object>>();
+		try {
+			Constructor<Region> constructor =
+				(Constructor<Region>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put("mvccVersion", Region::getMvccVersion);
-			attributeGetterFunctions.put("uuid", Region::getUuid);
-			attributeGetterFunctions.put(
-				"defaultLanguageId", Region::getDefaultLanguageId);
-			attributeGetterFunctions.put("regionId", Region::getRegionId);
-			attributeGetterFunctions.put("companyId", Region::getCompanyId);
-			attributeGetterFunctions.put("userId", Region::getUserId);
-			attributeGetterFunctions.put("userName", Region::getUserName);
-			attributeGetterFunctions.put("createDate", Region::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", Region::getModifiedDate);
-			attributeGetterFunctions.put("countryId", Region::getCountryId);
-			attributeGetterFunctions.put("active", Region::getActive);
-			attributeGetterFunctions.put("name", Region::getName);
-			attributeGetterFunctions.put("position", Region::getPosition);
-			attributeGetterFunctions.put("regionCode", Region::getRegionCode);
-			attributeGetterFunctions.put(
-				"lastPublishDate", Region::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<Region, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<Region, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<Region, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<Region, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Region, Object>>();
+		Map<String, BiConsumer<Region, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<Region, ?>>();
 
-		static {
-			Map<String, BiConsumer<Region, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<Region, ?>>();
+		attributeGetterFunctions.put("mvccVersion", Region::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion", (BiConsumer<Region, Long>)Region::setMvccVersion);
+		attributeGetterFunctions.put("uuid", Region::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<Region, String>)Region::setUuid);
+		attributeGetterFunctions.put(
+			"defaultLanguageId", Region::getDefaultLanguageId);
+		attributeSetterBiConsumers.put(
+			"defaultLanguageId",
+			(BiConsumer<Region, String>)Region::setDefaultLanguageId);
+		attributeGetterFunctions.put("regionId", Region::getRegionId);
+		attributeSetterBiConsumers.put(
+			"regionId", (BiConsumer<Region, Long>)Region::setRegionId);
+		attributeGetterFunctions.put("companyId", Region::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<Region, Long>)Region::setCompanyId);
+		attributeGetterFunctions.put("userId", Region::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<Region, Long>)Region::setUserId);
+		attributeGetterFunctions.put("userName", Region::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<Region, String>)Region::setUserName);
+		attributeGetterFunctions.put("createDate", Region::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate", (BiConsumer<Region, Date>)Region::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Region::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate", (BiConsumer<Region, Date>)Region::setModifiedDate);
+		attributeGetterFunctions.put("countryId", Region::getCountryId);
+		attributeSetterBiConsumers.put(
+			"countryId", (BiConsumer<Region, Long>)Region::setCountryId);
+		attributeGetterFunctions.put("active", Region::getActive);
+		attributeSetterBiConsumers.put(
+			"active", (BiConsumer<Region, Boolean>)Region::setActive);
+		attributeGetterFunctions.put("name", Region::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<Region, String>)Region::setName);
+		attributeGetterFunctions.put("position", Region::getPosition);
+		attributeSetterBiConsumers.put(
+			"position", (BiConsumer<Region, Double>)Region::setPosition);
+		attributeGetterFunctions.put("regionCode", Region::getRegionCode);
+		attributeSetterBiConsumers.put(
+			"regionCode", (BiConsumer<Region, String>)Region::setRegionCode);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Region::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<Region, Date>)Region::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<Region, Long>)Region::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<Region, String>)Region::setUuid);
-			attributeSetterBiConsumers.put(
-				"defaultLanguageId",
-				(BiConsumer<Region, String>)Region::setDefaultLanguageId);
-			attributeSetterBiConsumers.put(
-				"regionId", (BiConsumer<Region, Long>)Region::setRegionId);
-			attributeSetterBiConsumers.put(
-				"companyId", (BiConsumer<Region, Long>)Region::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<Region, Long>)Region::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName", (BiConsumer<Region, String>)Region::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate", (BiConsumer<Region, Date>)Region::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<Region, Date>)Region::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"countryId", (BiConsumer<Region, Long>)Region::setCountryId);
-			attributeSetterBiConsumers.put(
-				"active", (BiConsumer<Region, Boolean>)Region::setActive);
-			attributeSetterBiConsumers.put(
-				"name", (BiConsumer<Region, String>)Region::setName);
-			attributeSetterBiConsumers.put(
-				"position", (BiConsumer<Region, Double>)Region::setPosition);
-			attributeSetterBiConsumers.put(
-				"regionCode",
-				(BiConsumer<Region, String>)Region::setRegionCode);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<Region, Date>)Region::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -1091,12 +1159,40 @@ public class RegionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<Region, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<Region, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<Region, Object> attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((Region)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Region>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Region.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1120,9 +1216,8 @@ public class RegionModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<Region, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<Region, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

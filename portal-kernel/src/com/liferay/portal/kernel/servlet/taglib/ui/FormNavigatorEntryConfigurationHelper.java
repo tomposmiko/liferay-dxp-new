@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.servlet.taglib.ui;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author     Alejandro Tardín
@@ -23,7 +24,7 @@ import java.util.List;
 @Deprecated
 public interface FormNavigatorEntryConfigurationHelper {
 
-	public <T> List<FormNavigatorEntry<T>> getFormNavigatorEntries(
+	public <T> Optional<List<FormNavigatorEntry<T>>> getFormNavigatorEntries(
 		String formNavigatorId, String categoryKey, T formModelBean);
 
 }

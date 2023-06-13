@@ -46,7 +46,7 @@ public class CompanyTestUtil {
 		String virtualHostname = name + "." + RandomTestUtil.randomString(3);
 
 		return CompanyLocalServiceUtil.addCompany(
-			null, name, virtualHostname, virtualHostname, 0, true);
+			null, name, virtualHostname, virtualHostname, false, 0, true);
 	}
 
 	public static void resetCompanyLocales(
@@ -67,7 +67,7 @@ public class CompanyTestUtil {
 
 		// Reset company default locale and timezone
 
-		User user = UserLocalServiceUtil.loadGetGuestUser(companyId);
+		User user = UserLocalServiceUtil.loadGetDefaultUser(companyId);
 
 		user.setLanguageId(defaultLanguageId);
 
@@ -95,7 +95,7 @@ public class CompanyTestUtil {
 		CompanyThreadLocal.setCompanyId(companyId);
 
 		LocaleThreadLocal.setDefaultLocale(
-			LocaleUtil.fromLanguageId(defaultLanguageId, false));
+			LocaleUtil.fromLanguageId(defaultLanguageId));
 	}
 
 }

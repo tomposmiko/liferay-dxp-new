@@ -66,7 +66,7 @@ export default function ({
 					ref={(node) => {
 						ref.current = node;
 					}}
-					size="sm"
+					small
 					symbol="information-live"
 					title={Liferay.Language.get('additional-information')}
 				/>

@@ -23,8 +23,6 @@ import com.liferay.exportimport.test.util.TestUserIdStrategy;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutFriendlyURLRandomizerBumper;
 import com.liferay.layout.test.util.LayoutTestUtil;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
@@ -37,7 +35,6 @@ import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBu
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.xml.Document;
@@ -50,7 +47,6 @@ import com.liferay.portal.util.PropsValues;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.TreeMap;
 
 import org.junit.Assert;
@@ -84,7 +80,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(importGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Assert.assertEquals(
 			_getCompanyHostPortalURL(importGroup) +
@@ -101,7 +97,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		Group exportGroup = GroupTestUtil.addGroup();
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -122,7 +118,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		Group exportGroup = GroupTestUtil.addGroup();
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -145,7 +141,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -166,7 +162,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -189,7 +185,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -212,7 +208,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -228,12 +224,12 @@ public class LayoutReferencesExportImportContentProcessorTest {
 	}
 
 	@Test
-	public void testExportDefaultGroupRelativeURLImportDefaultGroup()
+	public void testExportDefaultGroupRelativeURLHostImportDefaultGroup()
 		throws Exception {
 
 		Group exportGroup = GroupTestUtil.addGroup();
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -250,7 +246,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		Group exportGroup = GroupTestUtil.addGroup();
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -268,7 +264,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		Group exportGroup = GroupTestUtil.addGroup();
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -282,25 +278,6 @@ public class LayoutReferencesExportImportContentProcessorTest {
 	}
 
 	@Test
-	public void testExportDefaultGroupRelativeURLWithLocaleImportDefaultGroup()
-		throws Exception {
-
-		Group exportGroup = GroupTestUtil.addGroup();
-
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
-
-		Group importGroup = GroupTestUtil.addGroup();
-
-		Assert.assertEquals(
-			StringPool.SLASH + LocaleUtil.getDefault() +
-				exportLayout.getFriendlyURL(),
-			_exportAndImportLayoutURL(
-				StringPool.SLASH + LocaleUtil.getDefault() +
-					exportLayout.getFriendlyURL(),
-				exportGroup, importGroup, true, true));
-	}
-
-	@Test
 	public void testExportPrivatePagesVirtualHostURLImportDefaultGroup()
 		throws Exception {
 
@@ -308,8 +285,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, true);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(
-			exportGroup, true);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup, true);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -332,7 +308,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -353,7 +329,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -376,7 +352,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Assert.assertEquals(
 			exportLayout.getFriendlyURL(),
@@ -405,8 +381,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, true);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(
-			exportGroup, true);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup, true);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -429,8 +404,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, true);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(
-			exportGroup, true);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup, true);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -453,7 +427,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -476,7 +450,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -499,7 +473,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -518,7 +492,7 @@ public class LayoutReferencesExportImportContentProcessorTest {
 
 		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
 
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(exportGroup);
+		Layout exportLayout = LayoutTestUtil.addLayout(exportGroup);
 
 		Group importGroup = GroupTestUtil.addGroup();
 
@@ -528,102 +502,6 @@ public class LayoutReferencesExportImportContentProcessorTest {
 			exportLayout.getFriendlyURL(),
 			_exportAndImportLayoutURL(
 				exportLayout.getFriendlyURL(), exportGroup, importGroup));
-	}
-
-	@Test
-	public void testRelativePublicDefaultPageURLWithLocale() throws Exception {
-		Group exportGroup = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
-
-		Group importGroup = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(importGroup, false);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(exportGroup);
-
-		String url = StringPool.SLASH + siteDefaultLocale.getLanguage();
-
-		Assert.assertEquals(
-			url, _exportAndImportLayoutURL(url, exportGroup, importGroup));
-	}
-
-	@Test
-	public void testRelativePublicPageURLWithSlashWithLocale()
-		throws Exception {
-
-		Group exportGroup = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
-
-		Group importGroup = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(importGroup, false);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(exportGroup);
-
-		String layoutName = RandomTestUtil.randomString(
-			LayoutFriendlyURLRandomizerBumper.INSTANCE,
-			NumericStringRandomizerBumper.INSTANCE,
-			UniqueStringRandomizerBumper.INSTANCE);
-
-		layoutName = layoutName + StringPool.SLASH + layoutName;
-
-		Layout exportLayout = LayoutTestUtil.addTypePortletLayout(
-			exportGroup.getGroupId(), layoutName, false, null, false);
-
-		String url = StringBundler.concat(
-			StringPool.SLASH, siteDefaultLocale.getLanguage(),
-			exportLayout.getFriendlyURL());
-
-		Assert.assertEquals(
-			url, _exportAndImportLayoutURL(url, exportGroup, importGroup));
-	}
-
-	@Test
-	public void testValidateContentRelativePublicDefaultPageURLWithLocale()
-		throws Exception {
-
-		Group group = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(group, false);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(group);
-
-		_layoutReferencesExportImportContentProcessor.validateContentReferences(
-			group.getGroupId(),
-			StringBundler.concat(
-				_CONTENT_PREFIX, StringPool.SLASH,
-				siteDefaultLocale.getLanguage(), _CONTENT_POSTFIX));
-	}
-
-	@Test
-	public void testValidateContentRelativePublicPageURLWithSlashWithLocale()
-		throws Exception {
-
-		Group group = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(group, false);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(group);
-
-		String layoutName = RandomTestUtil.randomString(
-			LayoutFriendlyURLRandomizerBumper.INSTANCE,
-			NumericStringRandomizerBumper.INSTANCE,
-			UniqueStringRandomizerBumper.INSTANCE);
-
-		layoutName = layoutName + StringPool.SLASH + layoutName;
-
-		Layout layout = LayoutTestUtil.addTypePortletLayout(
-			group.getGroupId(), layoutName, false, null, false);
-
-		String url = StringBundler.concat(
-			StringPool.SLASH, siteDefaultLocale.getLanguage(),
-			layout.getFriendlyURL());
-
-		_layoutReferencesExportImportContentProcessor.validateContentReferences(
-			group.getGroupId(),
-			StringBundler.concat(_CONTENT_PREFIX, url, _CONTENT_POSTFIX));
 	}
 
 	private String _exportAndImportLayoutURL(

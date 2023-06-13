@@ -22,12 +22,14 @@ import com.liferay.headless.form.dto.v1_0.FormContext;
 import com.liferay.headless.form.dto.v1_0.FormFieldContext;
 import com.liferay.headless.form.dto.v1_0.FormFieldValue;
 import com.liferay.headless.form.dto.v1_0.FormPageContext;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Victor Oliveira
@@ -106,26 +108,25 @@ public class FormContextUtil {
 			{
 				enabled = _getBoolean(formPageContext, "enabled");
 
-				List<FormFieldContext> formFieldContextsList =
-					new ArrayList<>();
+				List<Map<String, Object>> maps = _getMaps(
+					formPageContext, "rows");
 
-				for (Map<String, Object> rowsMap :
-						_getMaps(formPageContext, "rows")) {
+				Stream<Map<String, Object>> stream = maps.stream();
 
-					for (Map<String, Object> columnsMap :
-							_getMaps(rowsMap, "columns")) {
-
-						for (Map<String, Object> fieldsMap :
-								_getMaps(columnsMap, "fields")) {
-
-							formFieldContextsList.add(
-								_toFormFieldContext(fieldsMap));
-						}
-					}
-				}
-
-				formFieldContexts = formFieldContextsList.toArray(
-					new FormFieldContext[0]);
+				formFieldContexts = TransformUtil.transformToArray(
+					stream.map(
+						row -> _getMaps(row, "columns")
+					).flatMap(
+						List::stream
+					).map(
+						column -> _getMaps(column, "fields")
+					).flatMap(
+						List::stream
+					).collect(
+						Collectors.toList()
+					),
+					FormContextUtil::_toFormFieldContext,
+					FormFieldContext.class);
 
 				showRequiredFieldsWarning = _getBoolean(
 					formPageContext, "showRequiredFieldsWarning");

@@ -16,41 +16,31 @@ package com.liferay.analytics.reports.web.internal.product.navigation.control.me
 
 import com.liferay.analytics.reports.constants.AnalyticsReportsWebKeys;
 import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItem;
-import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItemRegistry;
-import com.liferay.analytics.reports.info.item.ClassNameClassPKInfoItemIdentifier;
+import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItemTracker;
 import com.liferay.analytics.reports.info.item.provider.AnalyticsReportsInfoItemObjectProvider;
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
-import com.liferay.analytics.reports.web.internal.info.item.provider.AnalyticsReportsInfoItemObjectProviderRegistry;
+import com.liferay.analytics.reports.web.internal.info.item.provider.AnalyticsReportsInfoItemObjectProviderTracker;
 import com.liferay.analytics.reports.web.internal.util.AnalyticsReportsUtil;
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
-import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
-import com.liferay.frontend.taglib.clay.servlet.taglib.ButtonTag;
-import com.liferay.frontend.taglib.clay.servlet.taglib.IconTag;
-import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.template.react.renderer.ComponentDescriptor;
-import com.liferay.portal.template.react.renderer.ReactRenderer;
 import com.liferay.product.navigation.control.menu.BaseProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
+import com.liferay.taglib.aui.IconTag;
+import com.liferay.taglib.portletext.RuntimeTag;
 import com.liferay.taglib.util.BodyBottomTag;
 
 import java.io.IOException;
@@ -60,9 +50,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
-
-import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -78,6 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sarai Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
 		"product.navigation.control.menu.entry.order:Integer=400"
@@ -131,9 +121,24 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 		Map<String, String> values = new HashMap<>();
 
 		if (isPanelStateOpen(httpServletRequest)) {
+			values.put("analyticsReportsPanelURL", StringPool.BLANK);
 			values.put("cssClass", "active");
 		}
 		else {
+			InfoItemReference infoItemReference = _getInfoItemReference(
+				httpServletRequest);
+
+			try {
+				values.put(
+					"analyticsReportsPanelURL",
+					AnalyticsReportsUtil.getAnalyticsReportsPanelURL(
+						infoItemReference, httpServletRequest, _portal,
+						_portletURLFactory));
+			}
+			catch (Exception exception) {
+				ReflectionUtil.throwException(exception);
+			}
+
 			values.put("cssClass", StringPool.BLANK);
 		}
 
@@ -147,7 +152,8 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 		IconTag iconTag = new IconTag();
 
 		iconTag.setCssClass("icon-monospaced");
-		iconTag.setSymbol("analytics");
+		iconTag.setImage("analytics");
+		iconTag.setMarkupView("lexicon");
 
 		try {
 			values.put(
@@ -155,7 +161,7 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 				iconTag.doTagAsString(httpServletRequest, httpServletResponse));
 		}
 		catch (JspException jspException) {
-			throw new IOException(jspException);
+			ReflectionUtil.throwException(jspException);
 		}
 
 		values.put("portletNamespace", _portletNamespace);
@@ -188,7 +194,7 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 		AnalyticsReportsInfoItemObjectProvider<Object>
 			analyticsReportsInfoItemObjectProvider =
 				(AnalyticsReportsInfoItemObjectProvider<Object>)
-					_analyticsReportsInfoItemObjectProviderRegistry.
+					_analyticsReportsInfoItemObjectProviderTracker.
 						getAnalyticsReportsInfoItemObjectProvider(
 							infoItemReference.getClassName());
 
@@ -206,7 +212,7 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 
 		AnalyticsReportsInfoItem<Object> analyticsReportsInfoItem =
 			(AnalyticsReportsInfoItem<Object>)
-				_analyticsReportsInfoItemRegistry.getAnalyticsReportsInfoItem(
+				_analyticsReportsInfoItemTracker.getAnalyticsReportsInfoItem(
 					infoItemReference.getClassName());
 
 		if ((analyticsReportsInfoItem == null) ||
@@ -219,19 +225,8 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		try {
-			if (!AnalyticsReportsUtil.isShowAnalyticsReportsPanel(
-					_analyticsSettingsManager, themeDisplay.getCompanyId(),
-					httpServletRequest)) {
-
-				return false;
-			}
-		}
-		catch (PortalException portalException) {
-			throw portalException;
-		}
-		catch (Exception exception) {
-			_log.error(exception);
+		if (!AnalyticsReportsUtil.isShowAnalyticsReportsPanel(
+				themeDisplay.getCompanyId(), httpServletRequest)) {
 
 			return false;
 		}
@@ -251,73 +246,20 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 			AnalyticsReportsPortletKeys.ANALYTICS_REPORTS);
 	}
 
-	private String _getAnalyticsReportsURL(
-		HttpServletRequest httpServletRequest) {
-
-		InfoItemReference infoItemReference = _getInfoItemReference(
-			httpServletRequest);
-
-		if (infoItemReference.getInfoItemIdentifier() instanceof
-				ClassNameClassPKInfoItemIdentifier) {
-
-			ClassNameClassPKInfoItemIdentifier
-				classNameClassPKInfoItemIdentifier =
-					(ClassNameClassPKInfoItemIdentifier)
-						infoItemReference.getInfoItemIdentifier();
-
-			return PortletURLBuilder.create(
-				_portletURLFactory.create(
-					httpServletRequest,
-					AnalyticsReportsPortletKeys.ANALYTICS_REPORTS,
-					PortletRequest.RESOURCE_PHASE)
-			).setParameter(
-				"className", infoItemReference.getClassName()
-			).setParameter(
-				"classPK", classNameClassPKInfoItemIdentifier.getClassPK()
-			).setParameter(
-				"classTypeName",
-				classNameClassPKInfoItemIdentifier.getClassName()
-			).setParameter(
-				"p_p_resource_id", "/analytics_reports/get_data"
-			).buildString();
-		}
-		else if (infoItemReference.getInfoItemIdentifier() instanceof
-					ClassPKInfoItemIdentifier) {
-
-			return PortletURLBuilder.create(
-				_portletURLFactory.create(
-					httpServletRequest,
-					AnalyticsReportsPortletKeys.ANALYTICS_REPORTS,
-					PortletRequest.RESOURCE_PHASE)
-			).setParameter(
-				"className", infoItemReference.getClassName()
-			).setParameter(
-				"classPK", infoItemReference.getClassPK()
-			).setParameter(
-				"p_p_resource_id", "/analytics_reports/get_data"
-			).buildString();
-		}
-
-		return StringPool.BLANK;
-	}
-
 	private InfoItemReference _getInfoItemReference(
 		HttpServletRequest httpServletRequest) {
 
-		InfoItemReference infoItemReference =
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return Optional.ofNullable(
 			(InfoItemReference)httpServletRequest.getAttribute(
-				AnalyticsReportsWebKeys.ANALYTICS_INFO_ITEM_REFERENCE);
-
-		if (infoItemReference == null) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			return new InfoItemReference(
-				Layout.class.getName(), themeDisplay.getPlid());
-		}
-
-		return infoItemReference;
+				AnalyticsReportsWebKeys.INFO_ITEM_REFERENCE)
+		).orElseGet(
+			() -> new InfoItemReference(
+				Layout.class.getName(), themeDisplay.getPlid())
+		);
 	}
 
 	private void _processBodyBottomTagBody(PageContext pageContext) {
@@ -332,74 +274,34 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 
 			JspWriter jspWriter = pageContext.getOut();
 
-			StringBundler sb = new StringBundler(24);
-
-			sb.append("<div class=\"");
+			jspWriter.write("<div class=\"");
 
 			if (isPanelStateOpen(httpServletRequest)) {
-				sb.append("lfr-has-analytics-reports-panel open-admin-panel ");
+				jspWriter.write(
+					"lfr-has-analytics-reports-panel open-admin-panel ");
 			}
 
-			sb.append(
+			jspWriter.write(
 				StringBundler.concat(
 					"cadmin d-print-none lfr-admin-panel ",
 					"lfr-product-menu-panel lfr-analytics-reports-panel ",
 					"sidenav-fixed sidenav-menu-slider sidenav-right\" id=\""));
-			sb.append(_portletNamespace);
-			sb.append("analyticsReportsPanelId\" ");
-			sb.append("tabindex=\"-1\">");
-			sb.append("<div class=\"sidebar sidebar-light sidenav-menu ");
-			sb.append("sidebar-sm\">");
-			sb.append("<div class=\"lfr-analytics-reports-sidebar\" ");
-			sb.append("id=\"analyticsReportsSidebar\">");
-			sb.append("<div class=\"d-flex justify-content-between p-3 ");
-			sb.append("sidebar-header\">");
-			sb.append("<h1 class=\"sr-only\">");
-			sb.append(
-				_language.get(httpServletRequest, "content-performance-panel"));
-			sb.append("</h1>");
-			sb.append("<span class=\"font-weight-bold\">");
-			sb.append(_language.get(httpServletRequest, "content-performance"));
-			sb.append("</span>");
 
-			ButtonTag buttonTag = new ButtonTag();
+			jspWriter.write(_portletNamespace);
 
-			buttonTag.setCssClass("close sidenav-close");
-			buttonTag.setDisplayType("unstyled");
-			buttonTag.setDynamicAttribute(
-				StringPool.BLANK, "aria-label",
-				_language.get(
-					(HttpServletRequest)pageContext.getRequest(), "close"));
-			buttonTag.setIcon("times");
+			jspWriter.write("analyticsReportsPanelId\">");
+			jspWriter.write(
+				"<div class=\"sidebar sidebar-light sidenav-menu " +
+					"sidebar-sm\">");
 
-			sb.append(buttonTag.doTagAsString(pageContext));
+			RuntimeTag runtimeTag = new RuntimeTag();
 
-			sb.append("</div>");
-			sb.append("<div class=\"sidebar-body\">");
-			sb.append("<span aria-hidden=\"true\" ");
-			sb.append("className=\"loading-animation ");
-			sb.append("loading-animation-sm\" />");
+			runtimeTag.setPortletName(
+				AnalyticsReportsPortletKeys.ANALYTICS_REPORTS);
 
-			jspWriter.write(sb.toString());
+			runtimeTag.doTag(pageContext);
 
-			_reactRenderer.renderReact(
-				new ComponentDescriptor(
-					_npmResolver.resolveModuleName("analytics-reports-web") +
-						"/js/AnalyticsReportsApp"),
-				HashMapBuilder.<String, Object>put(
-					"context",
-					HashMapBuilder.<String, Object>put(
-						"analyticsReportsDataURL",
-						_getAnalyticsReportsURL(httpServletRequest)
-					).put(
-						"isPanelStateOpen", isPanelStateOpen(httpServletRequest)
-					).build()
-				).put(
-					"portletNamespace", _portletNamespace
-				).build(),
-				httpServletRequest, jspWriter);
-
-			jspWriter.write("</div></div></div></div>");
+			jspWriter.write("</div></div>");
 		}
 		catch (Exception exception) {
 			ReflectionUtil.throwException(exception);
@@ -412,18 +314,12 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 	private static final String _SESSION_CLICKS_KEY =
 		"com.liferay.analytics.reports.web_panelState";
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AnalyticsReportsProductNavigationControlMenuEntry.class);
+	@Reference
+	private AnalyticsReportsInfoItemObjectProviderTracker
+		_analyticsReportsInfoItemObjectProviderTracker;
 
 	@Reference
-	private AnalyticsReportsInfoItemObjectProviderRegistry
-		_analyticsReportsInfoItemObjectProviderRegistry;
-
-	@Reference
-	private AnalyticsReportsInfoItemRegistry _analyticsReportsInfoItemRegistry;
-
-	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
+	private AnalyticsReportsInfoItemTracker _analyticsReportsInfoItemTracker;
 
 	@Reference
 	private Html _html;
@@ -432,17 +328,11 @@ public class AnalyticsReportsProductNavigationControlMenuEntry
 	private Language _language;
 
 	@Reference
-	private NPMResolver _npmResolver;
-
-	@Reference
 	private Portal _portal;
 
 	private String _portletNamespace;
 
 	@Reference
 	private PortletURLFactory _portletURLFactory;
-
-	@Reference
-	private ReactRenderer _reactRenderer;
 
 }

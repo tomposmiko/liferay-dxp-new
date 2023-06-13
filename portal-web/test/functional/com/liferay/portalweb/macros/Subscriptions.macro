@@ -3,13 +3,13 @@ definition {
 	macro subscribeViaInfoPanelPG {
 		Click(locator1 = "Icon#INFO");
 
-		Click(locator1 = "Icon#SUBSCRIBE_BELL");
+		Click(locator1 = "Icon#SUBSCRIBE");
 
 		Alert.viewSuccessMessage();
 	}
 
 	macro unsubscribeViaMySubscriptions {
-		var key_rowNumber = ${rowNumber};
+		var key_rowNumber = "${rowNumber}";
 
 		Check(locator1 = "ContentRow#ENTRY_CONTENT_ROW_NUMBER_CHECKBOX");
 
@@ -27,24 +27,24 @@ definition {
 	}
 
 	macro viewSubscription {
-		var key_assetTitle = ${assetTitle};
-		var key_assetType = ${assetType};
+		var key_assetTitle = "${assetTitle}";
+		var key_assetType = "${assetType}";
 
 		AssertTextEquals(
 			locator1 = "MySubscriptions#ASSET_TITLE",
-			value1 = ${assetTitle});
+			value1 = "${assetTitle}");
 
-		var assetType = StringUtil.toUpperCase(${assetType});
+		var assetType = StringUtil.toUpperCase("${assetType}");
 
 		AssertTextEquals(
 			locator1 = "MySubscriptions#ASSET_TYPE",
-			value1 = ${assetType});
+			value1 = "${assetType}");
 	}
 
 	macro viewUnsubscribedViaInfoPanel {
 		Click(locator1 = "Icon#INFO");
 
-		AssertVisible(locator1 = "Icon#SUBSCRIBE_BELL");
+		AssertVisible(locator1 = "Icon#STAR_UNSUBSCRIBED");
 	}
 
 }

@@ -1,6 +1,5 @@
 create table AccountEntry (
 	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	accountEntryId LONG not null primary key,
 	companyId LONG,
@@ -9,7 +8,6 @@ create table AccountEntry (
 	createDate DATE null,
 	modifiedDate DATE null,
 	defaultBillingAddressId LONG,
-	defaultCPaymentMethodKey VARCHAR(75) null,
 	defaultShippingAddressId LONG,
 	parentAccountEntryId LONG,
 	description STRING null,
@@ -17,14 +15,10 @@ create table AccountEntry (
 	emailAddress VARCHAR(254) null,
 	logoId LONG,
 	name VARCHAR(100) null,
-	restrictMembership BOOLEAN,
 	taxExemptionCode VARCHAR(75) null,
 	taxIdNumber VARCHAR(75) null,
 	type_ VARCHAR(75) null,
-	status INTEGER,
-	statusByUserId LONG,
-	statusByUserName VARCHAR(75) null,
-	statusDate DATE null
+	status INTEGER
 );
 
 create table AccountEntryOrganizationRel (
@@ -45,7 +39,6 @@ create table AccountEntryUserRel (
 
 create table AccountGroup (
 	mvccVersion LONG default 0 not null,
-	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	accountGroupId LONG not null primary key,
 	companyId LONG,

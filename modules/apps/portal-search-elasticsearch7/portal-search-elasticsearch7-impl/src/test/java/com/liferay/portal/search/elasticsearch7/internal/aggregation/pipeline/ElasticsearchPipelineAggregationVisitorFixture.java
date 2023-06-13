@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.aggregation.pipeline;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.query.ElasticsearchQueryTranslatorFixture;
 import com.liferay.portal.search.elasticsearch7.internal.sort.ElasticsearchSortFieldTranslatorFixture;
 
@@ -28,7 +27,7 @@ public class ElasticsearchPipelineAggregationVisitorFixture {
 			elasticsearchPipelineAggregationVisitor =
 				new ElasticsearchPipelineAggregationVisitor();
 
-		_injectSortFieldTranslators(elasticsearchPipelineAggregationVisitor);
+		injectSortFieldTranslators(elasticsearchPipelineAggregationVisitor);
 
 		_elasticsearchPipelineAggregationVisitor =
 			elasticsearchPipelineAggregationVisitor;
@@ -40,7 +39,7 @@ public class ElasticsearchPipelineAggregationVisitorFixture {
 		return _elasticsearchPipelineAggregationVisitor;
 	}
 
-	private void _injectSortFieldTranslators(
+	protected void injectSortFieldTranslators(
 		ElasticsearchPipelineAggregationVisitor
 			elasticsearchPipelineAggregationVisitor) {
 
@@ -54,8 +53,7 @@ public class ElasticsearchPipelineAggregationVisitorFixture {
 					elasticsearchQueryTranslatorFixture.
 						getElasticsearchQueryTranslator());
 
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchPipelineAggregationVisitor, "_sortFieldTranslator",
+		elasticsearchPipelineAggregationVisitor.setSortFieldTranslator(
 			elasticsearchSortFieldTranslatorFixture.
 				getElasticsearchSortFieldTranslator());
 	}

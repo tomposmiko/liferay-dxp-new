@@ -55,13 +55,15 @@ public final class AnalyticsMessage implements Serializable {
 		}
 
 		public String buildJSONString() {
-			return JSONUtil.put(
+			JSONObject jsonObject = JSONUtil.put(
 				"action", _analyticsMessage.getAction()
 			).put(
 				"objectJSONObject", _analyticsMessage.getObjectJSONObject()
 			).put(
 				"type", _analyticsMessage.getType()
-			).toString();
+			);
+
+			return jsonObject.toJSONString();
 		}
 
 		public Builder object(JSONObject objectJSONObject) {

@@ -21,7 +21,7 @@ import com.liferay.document.library.opener.constants.DLOpenerMimeTypes;
 import com.liferay.document.library.opener.google.drive.web.internal.DLOpenerGoogleDriveFileReference;
 import com.liferay.document.library.opener.google.drive.web.internal.DLOpenerGoogleDriveManager;
 import com.liferay.document.library.opener.google.drive.web.internal.constants.DLOpenerGoogleDriveWebKeys;
-import com.liferay.document.library.opener.google.drive.web.internal.helper.GoogleDrivePortletRequestAuthorizationHelper;
+import com.liferay.document.library.opener.google.drive.web.internal.util.GoogleDrivePortletRequestAuthorizationHelper;
 import com.liferay.document.library.opener.upload.UniqueFileEntryTitleProvider;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -76,7 +76,7 @@ public class EditInGoogleDocsMVCActionCommand extends BaseMVCActionCommand {
 				long fileEntryId = ParamUtil.getLong(
 					actionRequest, "fileEntryId");
 
-				_executeCommand(actionRequest, actionResponse, fileEntryId);
+				_executeCommand(actionRequest, fileEntryId);
 			}
 			else {
 				_googleDrivePortletRequestAuthorizationHelper.
@@ -101,7 +101,7 @@ public class EditInGoogleDocsMVCActionCommand extends BaseMVCActionCommand {
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		FileEntry fileEntry = _dlAppService.addFileEntry(
-			null, repositoryId, folderId, null, contentType, title, null,
+			null, repositoryId, folderId, null, contentType, title,
 			StringPool.BLANK, StringPool.BLANK, new byte[0], null, null,
 			serviceContext);
 
@@ -123,10 +123,8 @@ public class EditInGoogleDocsMVCActionCommand extends BaseMVCActionCommand {
 			_dlAppService.getFileEntry(fileEntryId));
 	}
 
-	private void _executeCommand(
-			ActionRequest actionRequest, ActionResponse actionResponse,
-			long fileEntryId)
-		throws Exception {
+	private void _executeCommand(ActionRequest actionRequest, long fileEntryId)
+		throws PortalException {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
@@ -173,27 +171,9 @@ public class EditInGoogleDocsMVCActionCommand extends BaseMVCActionCommand {
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				actionRequest);
 
-			boolean hasGoogleDriveFile =
-				_dlOpenerGoogleDriveManager.hasGoogleDriveFile(
-					serviceContext.getUserId(),
-					_dlAppService.getFileEntry(fileEntryId));
-
 			_dlAppService.checkInFileEntry(
 				fileEntryId, dlVersionNumberIncrease, changeLog,
 				serviceContext);
-
-			if (!hasGoogleDriveFile) {
-				hideDefaultSuccessMessage(actionRequest);
-
-				SessionErrors.add(actionRequest, "googleDriveFileMissing");
-
-				hideDefaultErrorMessage(actionRequest);
-
-				String redirect = ParamUtil.getString(
-					actionRequest, "redirect");
-
-				sendRedirect(actionRequest, actionResponse, redirect);
-			}
 		}
 		else if (cmd.equals(Constants.CHECKOUT)) {
 			try {

@@ -22,6 +22,7 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.application.type.ApplicationType;
+import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Plugin;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.model.portlet.PortletDependency;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
 import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.poller.PollerProcessor;
 import com.liferay.portal.kernel.pop.MessageListener;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.ControlPanelEntry;
@@ -43,7 +45,6 @@ import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapperTracker;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
-import com.liferay.portal.kernel.portlet.PortletConfigurationListener;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletQNameUtil;
@@ -119,6 +120,7 @@ public class PortletImpl extends PortletBaseImpl {
 		setStrutsPath(portletId);
 
 		_assetRendererFactoryClasses = new ArrayList<>();
+		_atomCollectionAdapterClasses = new ArrayList<>();
 		_autopropagatedParameters = new LinkedHashSet<>();
 		_customAttributesDisplayClasses = new ArrayList<>();
 		_footerPortalCss = new ArrayList<>();
@@ -164,8 +166,8 @@ public class PortletImpl extends PortletBaseImpl {
 		String friendlyURLMapping, String friendlyURLRoutes,
 		String urlEncoderClass, String portletDataHandlerClass,
 		List<String> stagedModelDataHandlerClasses, String templateHandlerClass,
-		String portletConfigurationListenerClass,
-		String portletLayoutListenerClass, String popMessageListenerClass,
+		String portletLayoutListenerClass, String pollerProcessorClass,
+		String popMessageListenerClass,
 		List<String> socialActivityInterpreterClasses,
 		String socialRequestInterpreterClass,
 		String userNotificationDefinitions,
@@ -173,6 +175,7 @@ public class PortletImpl extends PortletBaseImpl {
 		String webDAVStorageClass, String xmlRpcMethodClass,
 		String controlPanelEntryCategory, double controlPanelEntryWeight,
 		String controlPanelEntryClass, List<String> assetRendererFactoryClasses,
+		List<String> atomCollectionAdapterClasses,
 		List<String> customAttributesDisplayClasses,
 		String permissionPropagatorClass, List<String> trashHandlerClasses,
 		List<String> workflowHandlerClasses, String defaultPreferences,
@@ -240,8 +243,8 @@ public class PortletImpl extends PortletBaseImpl {
 		_portletDataHandlerClass = portletDataHandlerClass;
 		_stagedModelDataHandlerClasses = stagedModelDataHandlerClasses;
 		_templateHandlerClass = templateHandlerClass;
-		_portletConfigurationListenerClass = portletConfigurationListenerClass;
 		_portletLayoutListenerClass = portletLayoutListenerClass;
+		_pollerProcessorClass = pollerProcessorClass;
 		_popMessageListenerClass = popMessageListenerClass;
 		_socialActivityInterpreterClasses = socialActivityInterpreterClasses;
 		_socialRequestInterpreterClass = socialRequestInterpreterClass;
@@ -254,6 +257,7 @@ public class PortletImpl extends PortletBaseImpl {
 		_controlPanelEntryWeight = controlPanelEntryWeight;
 		_controlPanelEntryClass = controlPanelEntryClass;
 		_assetRendererFactoryClasses = assetRendererFactoryClasses;
+		_atomCollectionAdapterClasses = atomCollectionAdapterClasses;
 		_customAttributesDisplayClasses = customAttributesDisplayClasses;
 		_permissionPropagatorClass = permissionPropagatorClass;
 		_trashHandlerClasses = trashHandlerClasses;
@@ -406,11 +410,11 @@ public class PortletImpl extends PortletBaseImpl {
 			getPortletName(), getDisplayName(), getPortletClass(),
 			getConfigurationActionClass(), getIndexerClasses(),
 			getOpenSearchClass(), getSchedulerEntries(), getPortletURLClass(),
-			getFriendlyURLMapperClass(), _friendlyURLMapping,
+			getFriendlyURLMapperClass(), getFriendlyURLMapping(),
 			getFriendlyURLRoutes(), getURLEncoderClass(),
 			getPortletDataHandlerClass(), getStagedModelDataHandlerClasses(),
-			getTemplateHandlerClass(), getPortletConfigurationListenerClass(),
-			getPortletLayoutListenerClass(), getPopMessageListenerClass(),
+			getTemplateHandlerClass(), getPortletLayoutListenerClass(),
+			getPollerProcessorClass(), getPopMessageListenerClass(),
 			getSocialActivityInterpreterClasses(),
 			getSocialRequestInterpreterClass(),
 			getUserNotificationDefinitions(),
@@ -418,6 +422,7 @@ public class PortletImpl extends PortletBaseImpl {
 			getWebDAVStorageClass(), getXmlRpcMethodClass(),
 			getControlPanelEntryCategory(), getControlPanelEntryWeight(),
 			getControlPanelEntryClass(), getAssetRendererFactoryClasses(),
+			getAtomCollectionAdapterClasses(),
 			getCustomAttributesDisplayClasses(), getPermissionPropagatorClass(),
 			getTrashHandlerClasses(), getWorkflowHandlerClasses(),
 			getDefaultPreferences(), getPreferencesValidator(),
@@ -616,6 +621,34 @@ public class PortletImpl extends PortletBaseImpl {
 		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
 
 		return portletBag.getAssetRendererFactoryInstances();
+	}
+
+	/**
+	 * Returns the names of the classes that represent atom collection adapters
+	 * associated with the portlet.
+	 *
+	 * @return the names of the classes that represent atom collection adapters
+	 *         associated with the portlet
+	 */
+	@Override
+	public List<String> getAtomCollectionAdapterClasses() {
+		return _atomCollectionAdapterClasses;
+	}
+
+	/**
+	 * Returns the atom collection adapter instances of the portlet.
+	 *
+	 * @return the atom collection adapter instances of the portlet
+	 */
+	@Override
+	public List<AtomCollectionAdapter<?>> getAtomCollectionAdapterInstances() {
+		if (_atomCollectionAdapterClasses.isEmpty()) {
+			return null;
+		}
+
+		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
+
+		return portletBag.getAtomCollectionAdapterInstances();
 	}
 
 	/**
@@ -927,27 +960,18 @@ public class PortletImpl extends PortletBaseImpl {
 	 */
 	@Override
 	public String getFriendlyURLMapping() {
-		return getFriendlyURLMapping(true);
-	}
-
-	@Override
-	public String getFriendlyURLMapping(boolean lookUpFriendlyURLMapper) {
 		if (Validator.isNotNull(_friendlyURLMapping)) {
 			return _friendlyURLMapping;
 		}
 
-		if (lookUpFriendlyURLMapper) {
-			FriendlyURLMapper friendlyURLMapperInstance =
-				getFriendlyURLMapperInstance();
+		FriendlyURLMapper friendlyURLMapperInstance =
+			getFriendlyURLMapperInstance();
 
-			if (friendlyURLMapperInstance == null) {
-				return null;
-			}
-
-			return friendlyURLMapperInstance.getMapping();
+		if (friendlyURLMapperInstance == null) {
+			return null;
 		}
 
-		return null;
+		return friendlyURLMapperInstance.getMapping();
 	}
 
 	/**
@@ -1289,6 +1313,35 @@ public class PortletImpl extends PortletBaseImpl {
 	}
 
 	/**
+	 * Returns the name of the poller processor class of the portlet.
+	 *
+	 * @return the name of the poller processor class of the portlet
+	 */
+	@Override
+	public String getPollerProcessorClass() {
+		return _pollerProcessorClass;
+	}
+
+	/**
+	 * Returns the poller processor instance of the portlet.
+	 *
+	 * @return the poller processor instance of the portlet
+	 */
+	@Override
+	public PollerProcessor getPollerProcessorInstance() {
+		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
+
+		List<PollerProcessor> pollerProcessorInstances =
+			portletBag.getPollerProcessorInstances();
+
+		if (pollerProcessorInstances.isEmpty()) {
+			return null;
+		}
+
+		return pollerProcessorInstances.get(0);
+	}
+
+	/**
 	 * Returns the name of the POP message listener class of the portlet.
 	 *
 	 * @return the name of the POP message listener class of the portlet
@@ -1347,32 +1400,6 @@ public class PortletImpl extends PortletBaseImpl {
 	@Override
 	public String getPortletClass() {
 		return _portletClass;
-	}
-
-	@Override
-	public String getPortletConfigurationListenerClass() {
-		return _portletConfigurationListenerClass;
-	}
-
-	@Override
-	public PortletConfigurationListener
-		getPortletConfigurationListenerInstance() {
-
-		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
-
-		if (portletBag == null) {
-			return null;
-		}
-
-		List<PortletConfigurationListener>
-			portletConfigurationListenerInstances =
-				portletBag.getPortletConfigurationListenerInstances();
-
-		if (portletConfigurationListenerInstances.isEmpty()) {
-			return null;
-		}
-
-		return portletConfigurationListenerInstances.get(0);
 	}
 
 	/**
@@ -2320,7 +2347,7 @@ public class PortletImpl extends PortletBaseImpl {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;
@@ -2995,6 +3022,20 @@ public class PortletImpl extends PortletBaseImpl {
 	}
 
 	/**
+	 * Sets the names of the classes that represent atom collection adapters
+	 * associated with the portlet.
+	 *
+	 * @param atomCollectionAdapterClasses the names of the classes that
+	 *        represent atom collection adapters associated with the portlet
+	 */
+	@Override
+	public void setAtomCollectionAdapterClasses(
+		List<String> atomCollectionAdapterClasses) {
+
+		_atomCollectionAdapterClasses = atomCollectionAdapterClasses;
+	}
+
+	/**
 	 * Sets the names of the parameters that will be automatically propagated
 	 * through the portlet.
 	 *
@@ -3479,6 +3520,17 @@ public class PortletImpl extends PortletBaseImpl {
 	}
 
 	/**
+	 * Sets the name of the poller processor class of the portlet.
+	 *
+	 * @param pollerProcessorClass the name of the poller processor class of the
+	 *        portlet
+	 */
+	@Override
+	public void setPollerProcessorClass(String pollerProcessorClass) {
+		_pollerProcessorClass = pollerProcessorClass;
+	}
+
+	/**
 	 * Sets the name of the POP message listener class of the portlet.
 	 *
 	 * @param popMessageListenerClass the name of the POP message listener class
@@ -3521,13 +3573,6 @@ public class PortletImpl extends PortletBaseImpl {
 	@Override
 	public void setPortletClass(String portletClass) {
 		_portletClass = portletClass;
-	}
-
-	@Override
-	public void setPortletConfigurationListenerClass(
-		String portletConfigurationListenerClass) {
-
-		_portletConfigurationListenerClass = portletConfigurationListenerClass;
 	}
 
 	/**
@@ -4302,6 +4347,12 @@ public class PortletImpl extends PortletBaseImpl {
 	private boolean _asyncSupported;
 
 	/**
+	 * The names of the classes that represents atom collection adapters
+	 * associated with the portlet.
+	 */
+	private List<String> _atomCollectionAdapterClasses;
+
+	/**
 	 * The names of the parameters that will be automatically propagated through
 	 * the portlet.
 	 */
@@ -4532,6 +4583,11 @@ public class PortletImpl extends PortletBaseImpl {
 	private PluginPackage _pluginPackage;
 
 	/**
+	 * The name of the poller processor class of the portlet.
+	 */
+	private String _pollerProcessorClass;
+
+	/**
 	 * The name of the POP message listener class of the portlet.
 	 */
 	private String _popMessageListenerClass;
@@ -4551,8 +4607,6 @@ public class PortletImpl extends PortletBaseImpl {
 	 * The name of the portlet class of the portlet.
 	 */
 	private String _portletClass;
-
-	private String _portletConfigurationListenerClass;
 
 	/**
 	 * The name of the portlet data handler class of the portlet.

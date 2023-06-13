@@ -27,10 +27,6 @@ public class RedirectNotFoundEntryLocalServiceWrapper
 	implements RedirectNotFoundEntryLocalService,
 			   ServiceWrapper<RedirectNotFoundEntryLocalService> {
 
-	public RedirectNotFoundEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public RedirectNotFoundEntryLocalServiceWrapper(
 		RedirectNotFoundEntryLocalService redirectNotFoundEntryLocalService) {
 

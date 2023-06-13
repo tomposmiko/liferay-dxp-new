@@ -15,6 +15,7 @@
 package com.liferay.announcements.kernel.service.persistence;
 
 import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -693,9 +694,15 @@ public class AnnouncementsDeliveryUtil {
 	}
 
 	public static AnnouncementsDeliveryPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(AnnouncementsDeliveryPersistence)PortalBeanLocatorUtil.locate(
+					AnnouncementsDeliveryPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile AnnouncementsDeliveryPersistence _persistence;
+	private static AnnouncementsDeliveryPersistence _persistence;
 
 }

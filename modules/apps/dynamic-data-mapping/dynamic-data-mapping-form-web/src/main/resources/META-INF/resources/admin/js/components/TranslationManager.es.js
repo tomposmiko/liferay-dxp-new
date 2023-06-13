@@ -20,7 +20,7 @@ import {useEffect} from 'react';
 
 import {EVENT_TYPES} from '../eventTypes.es';
 
-export function TranslationManager() {
+export const TranslationManager = () => {
 	const dispatch = useForm();
 
 	useEffect(() => {
@@ -69,7 +69,7 @@ export function TranslationManager() {
 							}
 						});
 
-						if (!languageIds.length) {
+						if (languageIds.length === 0) {
 							return;
 						}
 
@@ -94,4 +94,4 @@ export function TranslationManager() {
 	}, [dispatch]);
 
 	return null;
-}
+};

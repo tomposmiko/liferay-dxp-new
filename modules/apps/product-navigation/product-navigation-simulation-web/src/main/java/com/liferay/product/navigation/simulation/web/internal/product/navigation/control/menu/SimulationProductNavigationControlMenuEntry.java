@@ -16,15 +16,14 @@ package com.liferay.product.navigation.simulation.web.internal.product.navigatio
 
 import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.PanelAppRegistry;
-import com.liferay.frontend.taglib.clay.servlet.taglib.ButtonTag;
+import com.liferay.application.list.PanelCategory;
+import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -53,6 +52,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
+import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +68,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
 		"product.navigation.control.menu.entry.order:Integer=300"
@@ -114,12 +116,26 @@ public class SimulationProductNavigationControlMenuEntry
 			HttpServletResponse httpServletResponse)
 		throws IOException {
 
+		PortletURL simulationPanelURL = _portletURLFactory.create(
+			httpServletRequest,
+			ProductNavigationSimulationPortletKeys.
+				PRODUCT_NAVIGATION_SIMULATION,
+			PortletRequest.RENDER_PHASE);
+
+		try {
+			simulationPanelURL.setWindowState(LiferayWindowState.EXCLUSIVE);
+		}
+		catch (WindowStateException windowStateException) {
+			ReflectionUtil.throwException(windowStateException);
+		}
+
 		Map<String, String> values = new HashMap<>();
 
 		IconTag iconTag = new IconTag();
 
 		iconTag.setCssClass("icon-monospaced");
 		iconTag.setImage("simulation-menu-closed");
+		iconTag.setMarkupView("lexicon");
 
 		try {
 			values.put(
@@ -131,19 +147,7 @@ public class SimulationProductNavigationControlMenuEntry
 		}
 
 		values.put("portletNamespace", _portletNamespace);
-		values.put(
-			"simulationPanelURL",
-			PortletURLBuilder.create(
-				_portletURLFactory.create(
-					httpServletRequest,
-					ProductNavigationSimulationPortletKeys.
-						PRODUCT_NAVIGATION_SIMULATION,
-					PortletRequest.RENDER_PHASE)
-			).setBackURL(
-				_portal.getCurrentCompleteURL(httpServletRequest)
-			).setWindowState(
-				LiferayWindowState.EXCLUSIVE
-			).buildString());
+		values.put("simulationPanelURL", simulationPanelURL.toString());
 		values.put(
 			"title",
 			_html.escape(_language.get(httpServletRequest, "simulation")));
@@ -165,8 +169,8 @@ public class SimulationProductNavigationControlMenuEntry
 
 		Layout layout = themeDisplay.getLayout();
 
-		if (layout.isEmbeddedPersonalApplication() ||
-			layout.isTypeControlPanel()) {
+		if (layout.isTypeControlPanel() ||
+			isEmbeddedPersonalApplicationLayout(layout)) {
 
 			return false;
 		}
@@ -189,11 +193,23 @@ public class SimulationProductNavigationControlMenuEntry
 		return super.isShow(httpServletRequest);
 	}
 
+	@Reference(
+		target = "(panel.category.key=" + PanelCategoryKeys.HIDDEN + ")",
+		unbind = "-"
+	)
+	public void setPanelCategory(PanelCategory panelCategory) {
+	}
+
 	@Activate
 	protected void activate() {
 		_portletNamespace = _portal.getPortletNamespace(
 			ProductNavigationSimulationPortletKeys.
 				PRODUCT_NAVIGATION_SIMULATION);
+	}
+
+	@Reference(unbind = "-")
+	protected void setPanelAppRegistry(PanelAppRegistry panelAppRegistry) {
+		_panelAppRegistry = panelAppRegistry;
 	}
 
 	private void _processBodyBottomTagBody(PageContext pageContext) {
@@ -215,17 +231,14 @@ public class SimulationProductNavigationControlMenuEntry
 			values.put(
 				"simulationPanel", messageTag.doTagAsString(pageContext));
 
-			ButtonTag buttonTag = new ButtonTag();
+			IconTag iconTag = new IconTag();
 
-			buttonTag.setCssClass("close sidenav-close");
-			buttonTag.setDisplayType("unstyled");
-			buttonTag.setDynamicAttribute(
-				StringPool.BLANK, "aria-label",
-				_language.get(
-					(HttpServletRequest)pageContext.getRequest(), "close"));
-			buttonTag.setIcon("times");
+			iconTag.setCssClass("close sidenav-close");
+			iconTag.setImage("times");
+			iconTag.setMarkupView("lexicon");
+			iconTag.setUrl("javascript:;");
 
-			values.put("sidebarIcon", buttonTag.doTagAsString(pageContext));
+			values.put("sidebarIcon", iconTag.doTagAsString(pageContext));
 
 			Writer writer = pageContext.getOut();
 
@@ -273,7 +286,6 @@ public class SimulationProductNavigationControlMenuEntry
 	@Reference
 	private Language _language;
 
-	@Reference
 	private PanelAppRegistry _panelAppRegistry;
 
 	@Reference

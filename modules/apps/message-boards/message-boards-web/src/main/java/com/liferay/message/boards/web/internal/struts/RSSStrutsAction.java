@@ -17,7 +17,6 @@ package com.liferay.message.boards.web.internal.struts;
 import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.message.boards.settings.MBGroupServiceSettings;
-import com.liferay.message.boards.web.internal.util.MBRequestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -50,7 +49,7 @@ public class RSSStrutsAction implements StrutsAction {
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		if (!_isRSSFeedsEnabled(httpServletRequest)) {
+		if (!isRSSFeedsEnabled(httpServletRequest)) {
 			_portal.sendRSSFeedsDisabledError(
 				httpServletRequest, httpServletResponse);
 
@@ -60,7 +59,7 @@ public class RSSStrutsAction implements StrutsAction {
 		try {
 			ServletResponseUtil.sendFile(
 				httpServletRequest, httpServletResponse, null,
-				_getRSS(httpServletRequest), ContentTypes.TEXT_XML_UTF8);
+				getRSS(httpServletRequest), ContentTypes.TEXT_XML_UTF8);
 
 			return null;
 		}
@@ -72,7 +71,7 @@ public class RSSStrutsAction implements StrutsAction {
 		}
 	}
 
-	private byte[] _getRSS(HttpServletRequest httpServletRequest)
+	protected byte[] getRSS(HttpServletRequest httpServletRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
@@ -169,7 +168,7 @@ public class RSSStrutsAction implements StrutsAction {
 		return rss.getBytes(StringPool.UTF8);
 	}
 
-	private boolean _isRSSFeedsEnabled(HttpServletRequest httpServletRequest)
+	protected boolean isRSSFeedsEnabled(HttpServletRequest httpServletRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
@@ -177,8 +176,7 @@ public class RSSStrutsAction implements StrutsAction {
 				WebKeys.THEME_DISPLAY);
 
 		MBGroupServiceSettings mbGroupServiceSettings =
-			MBRequestUtil.getMBGroupServiceSettings(
-				httpServletRequest, themeDisplay.getSiteGroupId());
+			MBGroupServiceSettings.getInstance(themeDisplay.getSiteGroupId());
 
 		return mbGroupServiceSettings.isEnableRSS();
 	}

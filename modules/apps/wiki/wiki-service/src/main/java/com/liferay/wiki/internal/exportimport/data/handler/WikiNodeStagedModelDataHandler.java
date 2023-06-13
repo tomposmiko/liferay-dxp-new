@@ -20,7 +20,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.trash.TrashHandler;
@@ -33,17 +32,13 @@ import com.liferay.wiki.service.WikiNodeLocalService;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Zsolt Berentey
  */
-@Component(
-	configurationPid = "com.liferay.wiki.configuration.WikiGroupServiceConfiguration",
-	service = StagedModelDataHandler.class
-)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class WikiNodeStagedModelDataHandler
 	extends BaseStagedModelDataHandler<WikiNode> {
 
@@ -85,12 +80,6 @@ public class WikiNodeStagedModelDataHandler
 	@Override
 	public String[] getClassNames() {
 		return CLASS_NAMES;
-	}
-
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_wikiGroupServiceConfiguration = ConfigurableUtil.createConfigurable(
-			WikiGroupServiceConfiguration.class, properties);
 	}
 
 	@Override
@@ -146,7 +135,7 @@ public class WikiNodeStagedModelDataHandler
 		if (portletDataContext.isDataStrategyMirror()) {
 			if (existingNode == null) {
 				if (nodeWithSameName != null) {
-					nodeName = _getNodeName(
+					nodeName = getNodeName(
 						portletDataContext, node, nodeName, 2);
 				}
 
@@ -162,7 +151,7 @@ public class WikiNodeStagedModelDataHandler
 				if ((nodeWithSameName != null) &&
 					!uuid.equals(nodeWithSameName.getUuid())) {
 
-					nodeName = _getNodeName(
+					nodeName = getNodeName(
 						portletDataContext, node, nodeName, 2);
 				}
 
@@ -185,7 +174,7 @@ public class WikiNodeStagedModelDataHandler
 			else {
 				importedNode = _wikiNodeLocalService.addNode(
 					node.getExternalReferenceCode(), userId,
-					_getNodeName(portletDataContext, node, nodeName, 2),
+					getNodeName(portletDataContext, node, nodeName, 2),
 					node.getDescription(), serviceContext);
 			}
 		}
@@ -215,7 +204,7 @@ public class WikiNodeStagedModelDataHandler
 		}
 	}
 
-	private String _getNodeName(
+	protected String getNodeName(
 			PortletDataContext portletDataContext, WikiNode node, String name,
 			int count)
 		throws Exception {
@@ -229,14 +218,21 @@ public class WikiNodeStagedModelDataHandler
 
 		String nodeName = node.getName();
 
-		return _getNodeName(
+		return getNodeName(
 			portletDataContext, node,
 			StringBundler.concat(nodeName, StringPool.SPACE, count), ++count);
 	}
 
-	private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
+	@Reference(unbind = "-")
+	protected void setWikiNodeLocalService(
+		WikiNodeLocalService wikiNodeLocalService) {
+
+		_wikiNodeLocalService = wikiNodeLocalService;
+	}
 
 	@Reference
+	private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
+
 	private WikiNodeLocalService _wikiNodeLocalService;
 
 }

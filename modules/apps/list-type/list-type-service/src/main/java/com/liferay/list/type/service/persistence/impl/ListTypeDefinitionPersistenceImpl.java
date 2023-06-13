@@ -14,14 +14,12 @@
 
 package com.liferay.list.type.service.persistence.impl;
 
-import com.liferay.list.type.exception.DuplicateListTypeDefinitionExternalReferenceCodeException;
 import com.liferay.list.type.exception.NoSuchListTypeDefinitionException;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.model.ListTypeDefinitionTable;
 import com.liferay.list.type.model.impl.ListTypeDefinitionImpl;
 import com.liferay.list.type.model.impl.ListTypeDefinitionModelImpl;
 import com.liferay.list.type.service.persistence.ListTypeDefinitionPersistence;
-import com.liferay.list.type.service.persistence.ListTypeDefinitionUtil;
 import com.liferay.list.type.service.persistence.impl.constants.ListTypePersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -40,6 +38,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -48,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -79,7 +77,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gabriel Albuquerque
  * @generated
  */
-@Component(service = ListTypeDefinitionPersistence.class)
+@Component(
+	service = {ListTypeDefinitionPersistence.class, BasePersistence.class}
+)
 public class ListTypeDefinitionPersistenceImpl
 	extends BasePersistenceImpl<ListTypeDefinition>
 	implements ListTypeDefinitionPersistence {
@@ -198,7 +198,7 @@ public class ListTypeDefinitionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ListTypeDefinition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ListTypeDefinition listTypeDefinition : list) {
@@ -947,7 +947,7 @@ public class ListTypeDefinitionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1173,7 +1173,7 @@ public class ListTypeDefinitionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ListTypeDefinition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ListTypeDefinition listTypeDefinition : list) {
@@ -1967,7 +1967,7 @@ public class ListTypeDefinitionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2100,262 +2100,6 @@ public class ListTypeDefinitionPersistenceImpl
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
 		"listTypeDefinition.companyId = ?";
 
-	private FinderPath _finderPathFetchByERC_C;
-	private FinderPath _finderPathCountByERC_C;
-
-	/**
-	 * Returns the list type definition where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchListTypeDefinitionException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching list type definition
-	 * @throws NoSuchListTypeDefinitionException if a matching list type definition could not be found
-	 */
-	@Override
-	public ListTypeDefinition findByERC_C(
-			String externalReferenceCode, long companyId)
-		throws NoSuchListTypeDefinitionException {
-
-		ListTypeDefinition listTypeDefinition = fetchByERC_C(
-			externalReferenceCode, companyId);
-
-		if (listTypeDefinition == null) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			sb.append("externalReferenceCode=");
-			sb.append(externalReferenceCode);
-
-			sb.append(", companyId=");
-			sb.append(companyId);
-
-			sb.append("}");
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(sb.toString());
-			}
-
-			throw new NoSuchListTypeDefinitionException(sb.toString());
-		}
-
-		return listTypeDefinition;
-	}
-
-	/**
-	 * Returns the list type definition where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching list type definition, or <code>null</code> if a matching list type definition could not be found
-	 */
-	@Override
-	public ListTypeDefinition fetchByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return fetchByERC_C(externalReferenceCode, companyId, true);
-	}
-
-	/**
-	 * Returns the list type definition where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching list type definition, or <code>null</code> if a matching list type definition could not be found
-	 */
-	@Override
-	public ListTypeDefinition fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
-
-		externalReferenceCode = Objects.toString(externalReferenceCode, "");
-
-		Object[] finderArgs = null;
-
-		if (useFinderCache) {
-			finderArgs = new Object[] {externalReferenceCode, companyId};
-		}
-
-		Object result = null;
-
-		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByERC_C, finderArgs, this);
-		}
-
-		if (result instanceof ListTypeDefinition) {
-			ListTypeDefinition listTypeDefinition = (ListTypeDefinition)result;
-
-			if (!Objects.equals(
-					externalReferenceCode,
-					listTypeDefinition.getExternalReferenceCode()) ||
-				(companyId != listTypeDefinition.getCompanyId())) {
-
-				result = null;
-			}
-		}
-
-		if (result == null) {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(_SQL_SELECT_LISTTYPEDEFINITION_WHERE);
-
-			boolean bindExternalReferenceCode = false;
-
-			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
-			}
-			else {
-				bindExternalReferenceCode = true;
-
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
-			}
-
-			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindExternalReferenceCode) {
-					queryPos.add(externalReferenceCode);
-				}
-
-				queryPos.add(companyId);
-
-				List<ListTypeDefinition> list = query.list();
-
-				if (list.isEmpty()) {
-					if (useFinderCache) {
-						finderCache.putResult(
-							_finderPathFetchByERC_C, finderArgs, list);
-					}
-				}
-				else {
-					ListTypeDefinition listTypeDefinition = list.get(0);
-
-					result = listTypeDefinition;
-
-					cacheResult(listTypeDefinition);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		if (result instanceof List<?>) {
-			return null;
-		}
-		else {
-			return (ListTypeDefinition)result;
-		}
-	}
-
-	/**
-	 * Removes the list type definition where externalReferenceCode = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the list type definition that was removed
-	 */
-	@Override
-	public ListTypeDefinition removeByERC_C(
-			String externalReferenceCode, long companyId)
-		throws NoSuchListTypeDefinitionException {
-
-		ListTypeDefinition listTypeDefinition = findByERC_C(
-			externalReferenceCode, companyId);
-
-		return remove(listTypeDefinition);
-	}
-
-	/**
-	 * Returns the number of list type definitions where externalReferenceCode = &#63; and companyId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the number of matching list type definitions
-	 */
-	@Override
-	public int countByERC_C(String externalReferenceCode, long companyId) {
-		externalReferenceCode = Objects.toString(externalReferenceCode, "");
-
-		FinderPath finderPath = _finderPathCountByERC_C;
-
-		Object[] finderArgs = new Object[] {externalReferenceCode, companyId};
-
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append(_SQL_COUNT_LISTTYPEDEFINITION_WHERE);
-
-			boolean bindExternalReferenceCode = false;
-
-			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
-			}
-			else {
-				bindExternalReferenceCode = true;
-
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
-			}
-
-			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindExternalReferenceCode) {
-					queryPos.add(externalReferenceCode);
-				}
-
-				queryPos.add(companyId);
-
-				count = (Long)query.uniqueResult();
-
-				finderCache.putResult(finderPath, finderArgs, count);
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
-		"listTypeDefinition.externalReferenceCode = ? AND ";
-
-	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
-		"(listTypeDefinition.externalReferenceCode IS NULL OR listTypeDefinition.externalReferenceCode = '') AND ";
-
-	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
-		"listTypeDefinition.companyId = ?";
-
 	public ListTypeDefinitionPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -2380,14 +2124,6 @@ public class ListTypeDefinitionPersistenceImpl
 	public void cacheResult(ListTypeDefinition listTypeDefinition) {
 		entityCache.putResult(
 			ListTypeDefinitionImpl.class, listTypeDefinition.getPrimaryKey(),
-			listTypeDefinition);
-
-		finderCache.putResult(
-			_finderPathFetchByERC_C,
-			new Object[] {
-				listTypeDefinition.getExternalReferenceCode(),
-				listTypeDefinition.getCompanyId()
-			},
 			listTypeDefinition);
 	}
 
@@ -2462,19 +2198,6 @@ public class ListTypeDefinitionPersistenceImpl
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		ListTypeDefinitionModelImpl listTypeDefinitionModelImpl) {
-
-		Object[] args = new Object[] {
-			listTypeDefinitionModelImpl.getExternalReferenceCode(),
-			listTypeDefinitionModelImpl.getCompanyId()
-		};
-
-		finderCache.putResult(_finderPathCountByERC_C, args, Long.valueOf(1));
-		finderCache.putResult(
-			_finderPathFetchByERC_C, args, listTypeDefinitionModelImpl);
-	}
-
 	/**
 	 * Creates a new list type definition with the primary key. Does not add the list type definition to the database.
 	 *
@@ -2488,7 +2211,7 @@ public class ListTypeDefinitionPersistenceImpl
 		listTypeDefinition.setNew(true);
 		listTypeDefinition.setPrimaryKey(listTypeDefinitionId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		listTypeDefinition.setUuid(uuid);
 
@@ -2613,41 +2336,9 @@ public class ListTypeDefinitionPersistenceImpl
 			(ListTypeDefinitionModelImpl)listTypeDefinition;
 
 		if (Validator.isNull(listTypeDefinition.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			listTypeDefinition.setUuid(uuid);
-		}
-
-		if (Validator.isNull(listTypeDefinition.getExternalReferenceCode())) {
-			listTypeDefinition.setExternalReferenceCode(
-				listTypeDefinition.getUuid());
-		}
-		else {
-			ListTypeDefinition ercListTypeDefinition = fetchByERC_C(
-				listTypeDefinition.getExternalReferenceCode(),
-				listTypeDefinition.getCompanyId());
-
-			if (isNew) {
-				if (ercListTypeDefinition != null) {
-					throw new DuplicateListTypeDefinitionExternalReferenceCodeException(
-						"Duplicate list type definition with external reference code " +
-							listTypeDefinition.getExternalReferenceCode() +
-								" and company " +
-									listTypeDefinition.getCompanyId());
-				}
-			}
-			else {
-				if ((ercListTypeDefinition != null) &&
-					(listTypeDefinition.getListTypeDefinitionId() !=
-						ercListTypeDefinition.getListTypeDefinitionId())) {
-
-					throw new DuplicateListTypeDefinitionExternalReferenceCodeException(
-						"Duplicate list type definition with external reference code " +
-							listTypeDefinition.getExternalReferenceCode() +
-								" and company " +
-									listTypeDefinition.getCompanyId());
-				}
-			}
 		}
 
 		ServiceContext serviceContext =
@@ -2698,8 +2389,6 @@ public class ListTypeDefinitionPersistenceImpl
 		entityCache.putResult(
 			ListTypeDefinitionImpl.class, listTypeDefinitionModelImpl, false,
 			true);
-
-		cacheUniqueFindersCache(listTypeDefinitionModelImpl);
 
 		if (isNew) {
 			listTypeDefinition.setNew(false);
@@ -2845,7 +2534,7 @@ public class ListTypeDefinitionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ListTypeDefinition>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2915,7 +2604,7 @@ public class ListTypeDefinitionPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3023,41 +2712,11 @@ public class ListTypeDefinitionPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
-
-		_finderPathFetchByERC_C = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "companyId"}, true);
-
-		_finderPathCountByERC_C = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "companyId"}, false);
-
-		_setListTypeDefinitionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setListTypeDefinitionUtilPersistence(null);
-
 		entityCache.removeCache(ListTypeDefinitionImpl.class.getName());
-	}
-
-	private void _setListTypeDefinitionUtilPersistence(
-		ListTypeDefinitionPersistence listTypeDefinitionPersistence) {
-
-		try {
-			Field field = ListTypeDefinitionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, listTypeDefinitionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3147,6 +2806,7 @@ public class ListTypeDefinitionPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private ListTypeDefinitionModelArgumentsResolver
+		_listTypeDefinitionModelArgumentsResolver;
 
 }

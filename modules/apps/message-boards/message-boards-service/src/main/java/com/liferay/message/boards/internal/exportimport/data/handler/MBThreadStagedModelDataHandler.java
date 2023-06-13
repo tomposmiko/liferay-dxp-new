@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class MBThreadStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MBThread> {
 
@@ -105,7 +105,13 @@ public class MBThreadStagedModelDataHandler
 		throws Exception {
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setMBThreadLocalService(
+		MBThreadLocalService mbThreadLocalService) {
+
+		_mbThreadLocalService = mbThreadLocalService;
+	}
+
 	private MBThreadLocalService _mbThreadLocalService;
 
 }

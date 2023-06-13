@@ -30,11 +30,10 @@ import com.google.cloud.storage.StorageOptions;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileException;
 import com.liferay.document.library.kernel.store.Store;
-import com.liferay.document.library.kernel.store.StoreArea;
 import com.liferay.document.library.kernel.util.comparator.VersionNumberComparator;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -50,11 +49,12 @@ import java.io.InputStream;
 
 import java.nio.channels.Channels;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -70,7 +70,7 @@ import org.threeten.bp.Duration;
  */
 @Component(
 	configurationPid = "com.liferay.portal.store.gcs.configuration.GCSStoreConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
 	property = "store.type=com.liferay.portal.store.gcs.GCSStore",
 	service = Store.class
 )
@@ -131,20 +131,14 @@ public class GCSStore implements Store {
 
 	@Override
 	public InputStream getFileAsStream(
-			long companyId, long repositoryId, String fileName,
-			String versionLabel)
-		throws NoSuchFileException {
+		long companyId, long repositoryId, String fileName,
+		String versionLabel) {
 
 		Blob blob = _gcsStore.get(
 			BlobId.of(
 				_gcsStoreConfiguration.bucketName(),
 				_getHeadVersionLabel(
 					companyId, repositoryId, fileName, versionLabel)));
-
-		if (blob == null) {
-			throw new NoSuchFileException(
-				companyId, repositoryId, fileName, versionLabel);
-		}
 
 		return Channels.newInputStream(_getReadChannel(blob));
 	}
@@ -153,15 +147,19 @@ public class GCSStore implements Store {
 	public String[] getFileNames(
 		long companyId, long repositoryId, String dirName) {
 
-		String prefix =
-			StoreArea.getPath(companyId, repositoryId) + StringPool.SLASH;
+		Stream<String> stream = Arrays.stream(
+			_getFilePaths(companyId, repositoryId, dirName));
 
-		return TransformUtil.transform(
-			_getFilePaths(companyId, repositoryId, dirName),
+		String prefix = StringBundler.concat(
+			companyId, StringPool.SLASH, repositoryId, StringPool.SLASH);
+
+		return stream.map(
 			filePath -> filePath.substring(
 				filePath.indexOf(prefix) + prefix.length(),
-				filePath.lastIndexOf(StringPool.SLASH)),
-			String.class);
+				filePath.lastIndexOf(StringPool.SLASH))
+		).toArray(
+			String[]::new
+		);
 	}
 
 	@Override
@@ -188,14 +186,18 @@ public class GCSStore implements Store {
 	public String[] getFileVersions(
 		long companyId, long repositoryId, String fileName) {
 
-		return TransformUtil.transform(
-			_getFilePaths(companyId, repositoryId, fileName),
+		Stream<String> stream = Arrays.stream(
+			_getFilePaths(companyId, repositoryId, fileName));
+
+		return stream.map(
 			path -> {
 				String[] parts = StringUtil.split(path, CharPool.SLASH);
 
 				return parts[parts.length - 1];
-			},
-			String.class);
+			}
+		).toArray(
+			String[]::new
+		);
 	}
 
 	@Override
@@ -263,13 +265,13 @@ public class GCSStore implements Store {
 	private String _getFileKey(
 		long companyId, long repositoryId, String fileName) {
 
-		return StoreArea.getPath(companyId, repositoryId, fileName);
+		return StringBundler.concat(
+			companyId, StringPool.SLASH, repositoryId, StringPool.SLASH,
+			fileName);
 	}
 
 	private String[] _getFilePaths(
 		long companyId, long repositoryId, String dirName) {
-
-		List<String> filePaths = new ArrayList<>();
 
 		Bucket bucket = _gcsStore.get(_gcsStoreConfiguration.bucketName());
 
@@ -288,17 +290,23 @@ public class GCSStore implements Store {
 
 		Iterable<Blob> blobs = blobPage.iterateAll();
 
-		blobs.forEach(blob -> filePaths.add(blob.getName()));
+		Stream<Blob> blobStream = StreamSupport.stream(
+			blobs.spliterator(), false);
 
-		return filePaths.toArray(new String[0]);
+		return blobStream.map(
+			BlobInfo::getName
+		).toArray(
+			String[]::new
+		);
 	}
 
 	private String _getFileVersionKey(
 		long companyId, long repositoryId, String fileName,
 		String versionLabel) {
 
-		return StoreArea.getPath(
-			companyId, repositoryId, fileName, versionLabel);
+		return StringBundler.concat(
+			companyId, StringPool.SLASH, repositoryId, StringPool.SLASH,
+			fileName, StringPool.SLASH, versionLabel);
 	}
 
 	private String _getHeadVersionLabel(
@@ -339,7 +347,7 @@ public class GCSStore implements Store {
 	}
 
 	private String _getRepositoryKey(long companyId, long repositoryId) {
-		return StoreArea.getPath(companyId, repositoryId);
+		return companyId + StringPool.SLASH + repositoryId;
 	}
 
 	private WriteChannel _getWriteChannel(BlobInfo blobInfo) {
@@ -374,49 +382,41 @@ public class GCSStore implements Store {
 	private void _initGCSStore() throws PortalException {
 		String serviceAccountKey = _gcsStoreConfiguration.serviceAccountKey();
 
-		try {
-			if (Validator.isBlank(serviceAccountKey)) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Using application default credentials because " +
-							"service account key was not set");
-				}
+		try (InputStream inputStream = new ByteArrayInputStream(
+				serviceAccountKey.getBytes())) {
 
-				_googleCredentials =
-					ServiceAccountCredentials.getApplicationDefault();
-			}
-			else {
-				_googleCredentials = ServiceAccountCredentials.fromStream(
-					new ByteArrayInputStream(serviceAccountKey.getBytes()));
-			}
+			_googleCredentials = ServiceAccountCredentials.fromStream(
+				inputStream);
 		}
 		catch (IOException ioException) {
 			throw new PortalException(
 				"Unable to authenticate with GCS", ioException);
 		}
 
+		RetrySettings retrySettings = RetrySettings.newBuilder(
+		).setInitialRetryDelay(
+			Duration.ofMillis(_gcsStoreConfiguration.initialRetryDelay())
+		).setInitialRpcTimeout(
+			Duration.ofMillis(_gcsStoreConfiguration.initialRPCTimeout())
+		).setJittered(
+			_gcsStoreConfiguration.retryJitter()
+		).setMaxAttempts(
+			_gcsStoreConfiguration.maxRetryAttempts()
+		).setMaxRetryDelay(
+			Duration.ofMillis(_gcsStoreConfiguration.maxRetryDelay())
+		).setMaxRpcTimeout(
+			Duration.ofMillis(_gcsStoreConfiguration.maxRPCTimeout())
+		).setRetryDelayMultiplier(
+			_gcsStoreConfiguration.retryDelayMultiplier()
+		).setRpcTimeoutMultiplier(
+			_gcsStoreConfiguration.rpcTimeoutMultiplier()
+		).build();
+
 		StorageOptions storageOptions = StorageOptions.newBuilder(
 		).setCredentials(
 			_googleCredentials
 		).setRetrySettings(
-			RetrySettings.newBuilder(
-			).setInitialRetryDelay(
-				Duration.ofMillis(_gcsStoreConfiguration.initialRetryDelay())
-			).setInitialRpcTimeout(
-				Duration.ofMillis(_gcsStoreConfiguration.initialRPCTimeout())
-			).setJittered(
-				_gcsStoreConfiguration.retryJitter()
-			).setMaxAttempts(
-				_gcsStoreConfiguration.maxRetryAttempts()
-			).setMaxRetryDelay(
-				Duration.ofMillis(_gcsStoreConfiguration.maxRetryDelay())
-			).setMaxRpcTimeout(
-				Duration.ofMillis(_gcsStoreConfiguration.maxRPCTimeout())
-			).setRetryDelayMultiplier(
-				_gcsStoreConfiguration.retryDelayMultiplier()
-			).setRpcTimeoutMultiplier(
-				_gcsStoreConfiguration.rpcTimeoutMultiplier()
-			).build()
+			retrySettings
 		).build();
 
 		_gcsStore = storageOptions.getService();

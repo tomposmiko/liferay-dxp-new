@@ -78,19 +78,6 @@ public class RandomTestUtil {
 		return enumConstants[_random.nextInt(enumConstants.length)];
 	}
 
-	public static float randomFloat() {
-		float value = _random.nextFloat();
-
-		if (value > 0) {
-			return value;
-		}
-		else if (value == 0) {
-			return randomFloat();
-		}
-
-		return -value;
-	}
-
 	public static int randomInt() {
 		return randomInt(1, Integer.MAX_VALUE);
 	}
@@ -118,7 +105,7 @@ public class RandomTestUtil {
 
 	public static Map<Locale, String> randomLocaleStringMap(Locale locale) {
 		return HashMapBuilder.put(
-			locale, randomString()
+			LocaleUtil.getDefault(), randomString()
 		).build();
 	}
 

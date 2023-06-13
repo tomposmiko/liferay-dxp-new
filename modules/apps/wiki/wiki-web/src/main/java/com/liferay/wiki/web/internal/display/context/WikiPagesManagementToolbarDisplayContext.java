@@ -21,6 +21,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -28,8 +29,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.toolbar.contributor.PortletToolbarContributor;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
@@ -44,7 +43,8 @@ import com.liferay.trash.TrashHelper;
 import com.liferay.wiki.constants.WikiWebKeys;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
-import com.liferay.wiki.web.internal.display.context.helper.WikiURLHelper;
+import com.liferay.wiki.web.internal.display.context.util.WikiURLHelper;
+import com.liferay.wiki.web.internal.portlet.toolbar.item.WikiPortletToolbarContributor;
 import com.liferay.wiki.web.internal.security.permission.resource.WikiPagePermission;
 
 import java.util.ArrayList;
@@ -63,20 +63,20 @@ import javax.servlet.http.HttpServletRequest;
 public class WikiPagesManagementToolbarDisplayContext {
 
 	public WikiPagesManagementToolbarDisplayContext(
-		String displayStyle, LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse, String displayStyle,
 		SearchContainer<WikiPage> searchContainer, TrashHelper trashHelper,
 		WikiURLHelper wikiURLHelper) {
 
-		_displayStyle = displayStyle;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+		_displayStyle = displayStyle;
 		_searchContainer = searchContainer;
 		_trashHelper = trashHelper;
 		_wikiURLHelper = wikiURLHelper;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
-			liferayPortletRequest, liferayPortletResponse);
+			_liferayPortletRequest, _liferayPortletResponse);
 
 		_httpServletRequest = liferayPortletRequest.getHttpServletRequest();
 
@@ -88,9 +88,21 @@ public class WikiPagesManagementToolbarDisplayContext {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "deletePages");
-				dropdownItem.setIcon("trash");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "delete"));
+
+				if (_trashHelper.isTrashEnabled(
+						_themeDisplay.getScopeGroupId())) {
+
+					dropdownItem.setIcon("trash");
+					dropdownItem.setLabel(
+						LanguageUtil.get(
+							_httpServletRequest, "move-to-recycle-bin"));
+				}
+				else {
+					dropdownItem.setIcon("times-circle");
+					dropdownItem.setLabel(
+						LanguageUtil.get(_httpServletRequest, "delete"));
+				}
+
 				dropdownItem.setQuickAction(true);
 			}
 		).build();
@@ -158,8 +170,8 @@ public class WikiPagesManagementToolbarDisplayContext {
 			return null;
 		}
 
-		PortletToolbarContributor wikiPortletToolbarContributor =
-			(PortletToolbarContributor)_httpServletRequest.getAttribute(
+		WikiPortletToolbarContributor wikiPortletToolbarContributor =
+			(WikiPortletToolbarContributor)_httpServletRequest.getAttribute(
 				WikiWebKeys.WIKI_PORTLET_TOOLBAR_CONTRIBUTOR);
 
 		List<Menu> menus = wikiPortletToolbarContributor.getPortletTitleMenus(

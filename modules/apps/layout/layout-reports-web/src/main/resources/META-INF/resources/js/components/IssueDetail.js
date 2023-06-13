@@ -33,12 +33,10 @@ export default function IssueDetail() {
 					content={selectedIssue.description}
 					title={Liferay.Language.get('description')}
 				/>
-
 				<HtmlPanel
 					content={selectedIssue.tips}
 					title={Liferay.Language.get('tips')}
 				/>
-
 				<FailingElementsPanel
 					failingElements={selectedIssue.failingElements}
 					issueType={selectedIssue.key}
@@ -109,7 +107,6 @@ const FailingElementsPanel = ({failingElements, issueType}) => {
 							>
 								{Liferay.Language.get('failing-elements')}
 							</ClayLayout.ContentCol>
-
 							<ClayLayout.ContentCol>
 								<ClayBadge
 									displayType={
@@ -155,20 +152,18 @@ FailingElementsPanel.propTypes = {
 
 const FailingElement = ({element}) => {
 	return (
-		<ClayList.Item className="border-0 failing-element mb-2 p-0" flex>
+		<ClayList.Item className="failing-element mb-2 p-0" flex>
 			<ClayList.ItemField className="mb-2 p-0" expand>
 				{element.title && (
 					<ClayList.ItemText className="font-weight-semi-bold mb-2">
 						{element.title}
 					</ClayList.ItemText>
 				)}
-
 				{element.content && (
 					<ClayList.ItemText className="text-secondary">
 						{element.content}
 					</ClayList.ItemText>
 				)}
-
 				{element.htmlContent && (
 					<div
 						className="text-secondary"
@@ -177,7 +172,6 @@ const FailingElement = ({element}) => {
 						}}
 					/>
 				)}
-
 				{element.snippet && (
 					<ClayList.ItemText className="bg-lighter border border-light mb-2 px-2 py-1 rounded">
 						<code className="text-secondary">
@@ -185,7 +179,6 @@ const FailingElement = ({element}) => {
 						</code>
 					</ClayList.ItemText>
 				)}
-
 				{element.sections &&
 					element.sections.map((section, index) => (
 						<ClayList.ItemText
@@ -193,7 +186,6 @@ const FailingElement = ({element}) => {
 							key={index}
 						>
 							<span className="mr-1 section-label text-secondary">{`${section.label}:`}</span>
-
 							<span
 								className="font-weight-semi-bold"
 								data-tooltip-align="bottom"

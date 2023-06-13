@@ -16,7 +16,7 @@
 
 <%@ include file="/html/portal/init.jsp" %>
 
-<div class="position-relative pt-0" id="wrapper">
+<div class="pt-0" id="wrapper">
 	<header class="mb-4" id="banner">
 		<div class="mb-4 navbar navbar-classic navbar-top py-3">
 			<div class="container">
@@ -53,7 +53,7 @@
 					boolean defaultDatabase = SetupWizardUtil.isDefaultDatabase(request);
 					%>
 
-					<aui:form action='<%= themeDisplay.getPathMain() + "/portal/setup_wizard" %>' method="post" name="fm" onSubmit="updateConfiguration(event);">
+					<aui:form action='<%= themeDisplay.getPathMain() + "/portal/setup_wizard" %>' method="post" name="fm" onSubmit="event.preventDefault();">
 						<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 
 						<div class="row">
@@ -98,13 +98,7 @@
 									<liferay-ui:message key="administrator-user" />
 								</h3>
 
-								<aui:input label="first-name" name="adminFirstName" value="<%= PropsValues.DEFAULT_ADMIN_FIRST_NAME %>">
-									<aui:validator name="required" />
-								</aui:input>
-
-								<aui:input label="last-name" name="adminLastName" value="<%= PropsValues.DEFAULT_ADMIN_LAST_NAME %>">
-									<aui:validator name="required" />
-								</aui:input>
+								<%@ include file="/html/portal/setup_wizard_user_name.jspf" %>
 
 								<aui:input label="email" name="adminEmailAddress">
 									<aui:validator name="email" />
@@ -177,7 +171,7 @@
 									</c:choose>
 
 									<c:if test="<%= Validator.isNull(PropsValues.JDBC_DEFAULT_JNDI_NAME) %>">
-										<a href="<%= HttpComponentsUtil.addParameter(themeDisplay.getPathMain() + "/portal/setup_wizard", "defaultDatabase", false) %>" id="customDatabaseOptionsLink">
+										<a href="<%= HttpUtil.addParameter(themeDisplay.getPathMain() + "/portal/setup_wizard", "defaultDatabase", false) %>" id="customDatabaseOptionsLink">
 											(<liferay-ui:message key="change" />)
 										</a>
 									</c:if>
@@ -186,7 +180,7 @@
 								<div class="hide" id="customDatabaseOptions">
 									<div class="connection-messages" id="connectionMessages"></div>
 
-									<a class="d-inline-block database-options mb-3" href="<%= HttpComponentsUtil.addParameter(themeDisplay.getPathMain() + "/portal/setup_wizard", "defaultDatabase", true) %>" id="defaultDatabaseOptionsLink">
+									<a class="d-inline-block database-options mb-3" href="<%= HttpUtil.addParameter(themeDisplay.getPathMain() + "/portal/setup_wizard", "defaultDatabase", true) %>" id="defaultDatabaseOptionsLink">
 										&laquo; <liferay-ui:message key='<%= defaultDatabase ? "use-default-database" : "use-configured-database" %>' />
 									</a>
 
@@ -271,6 +265,10 @@
 					</aui:form>
 
 					<aui:script use="aui-base,aui-loading-mask-deprecated,io">
+						var adminEmailAddress = A.one('#<portlet:namespace />adminEmailAddress');
+						var adminFirstName = A.one('#<portlet:namespace />adminFirstName');
+						var adminLastName = A.one('#<portlet:namespace />adminLastName');
+						var companyName = A.one('#<portlet:namespace />companyName');
 						var customDatabaseOptions = A.one('#customDatabaseOptions');
 						var customDatabaseOptionsLink = A.one('#customDatabaseOptionsLink');
 						var databaseSelector = A.one('#databaseType');
@@ -371,7 +369,7 @@
 						);
 
 						var updateMessage = function(message) {
-							connectionMessages.html('<div class="alert alert-danger"><span class="alert-indicator"><svg aria-hidden="true" class="lexicon-icon lexicon-icon-exclamation-full"><use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#exclamation-full"></use></svg></span><strong class="lead"><liferay-ui:message key="error-colon" /></strong>' + message + '</div>');
+							connectionMessages.html('<div class="alert alert-danger"><span class="alert-indicator"><svg aria-hidden="true" class="lexicon-icon lexicon-icon-exclamation-full"><use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#exclamation-full"></use></svg></span><strong class="lead"><liferay-ui:message key="error-colon" /></strong>' + message + '</div>');
 						};
 
 						var startInstall = function() {
@@ -380,53 +378,58 @@
 							loadingMask.show();
 						};
 
-						var updateConfiguration = function(event) {
-							var form = document.fm;
+						A.one('#fm').on(
+							'submit',
+							function(event) {
+								var form = document.fm;
 
-							if (defaultDatabase.val() == 'true') {
-								startInstall();
+								if ((adminEmailAddress && (adminEmailAddress.val() != '')) && (adminFirstName && (adminFirstName.val() != '')) && (adminLastName && (adminLastName.val() != '')) && (companyName && (companyName.val() != '')) && (jdbcDefaultDriverClassName && (jdbcDefaultDriverClassName.val() != '')) && (jdbcDefaultURL && (jdbcDefaultURL.val() != ''))) {
+									if (defaultDatabase.val() == 'true') {
+										startInstall();
 
-								command.val('<%= Constants.UPDATE %>');
-
-								submitForm(form);
-							}
-							else {
-								command.val('<%= Constants.TEST %>');
-
-								startInstall();
-
-								Liferay.Util.fetch(
-									form.action,
-									{
-										body: new FormData(form),
-										method: 'POST'
-									}
-								).then(
-									function(response) {
-										return response.json();
-									}
-								).then(
-									function(responseData) {
 										command.val('<%= Constants.UPDATE %>');
 
-										if (!responseData.success) {
-											updateMessage(responseData.message);
-
-											loadingMask.hide();
-										}
-										else {
-											submitForm(form);
-										}
+										submitForm(form);
 									}
-								).catch(
-									function() {
-										loadingMask.hide();
+									else {
+										command.val('<%= Constants.TEST %>');
 
-										updateMessage('<%= UnicodeLanguageUtil.get(request, "an-unexpected-error-occurred-while-connecting-to-the-database") %>');
+										startInstall();
+
+										Liferay.Util.fetch(
+											form.action,
+											{
+												body: new FormData(form),
+												method: 'POST'
+											}
+										).then(
+											function(response) {
+												return response.json();
+											}
+										).then(
+											function(responseData) {
+												command.val('<%= Constants.UPDATE %>');
+
+												if (!responseData.success) {
+													updateMessage(responseData.message);
+
+													loadingMask.hide();
+												}
+												else {
+													submitForm(form);
+												}
+											}
+										).catch(
+											function() {
+												loadingMask.hide();
+
+												updateMessage('<%= UnicodeLanguageUtil.get(request, "an-unexpected-error-occurred-while-connecting-to-the-database") %>');
+											}
+										);
 									}
-								);
+								}
 							}
-						};
+						);
 					</aui:script>
 				</c:when>
 				<c:otherwise>
@@ -435,7 +438,7 @@
 							<div class="alert alert-success">
 								<span class="alert-indicator">
 									<svg aria-hidden="true" class="lexicon-icon lexicon-icon-check-circle-full">
-										<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#check-circle-full"></use>
+										<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#check-circle-full"></use>
 									</svg>
 								</span>
 
@@ -464,7 +467,7 @@
 							<div class="alert alert-info">
 								<span class="alert-indicator">
 									<svg aria-hidden="true" class="lexicon-icon lexicon-icon-info-circle">
-										<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#info-circle"></use>
+										<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#info-circle"></use>
 									</svg>
 								</span>
 
@@ -476,7 +479,7 @@
 								<div class="alert alert-warning">
 									<span class="alert-indicator">
 										<svg aria-hidden="true" class="lexicon-icon lexicon-icon-warning-full">
-											<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#warning-full"></use>
+											<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#warning-full"></use>
 										</svg>
 									</span>
 

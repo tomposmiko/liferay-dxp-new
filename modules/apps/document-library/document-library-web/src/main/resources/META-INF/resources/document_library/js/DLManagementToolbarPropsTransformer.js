@@ -15,25 +15,19 @@
 import {
 	addParams,
 	navigate,
-	openConfirmModal,
 	openModal,
 	openSelectionModal,
-	openToast,
-	sub,
 } from 'frontend-js-web';
 
 import {collectDigitalSignature} from './digital-signature/DigitalSignatureUtil';
 
 export default function propsTransformer({
 	additionalProps: {
-		bulkPermissionsConfiguration: {defaultModelClassName, permissionsURLs},
 		collectDigitalSignaturePortlet,
 		downloadEntryURL,
 		editEntryURL,
 		folderConfiguration,
 		openViewMoreFileEntryTypesURL,
-		selectAssetTagsURL,
-		selectExtensionURL,
 		selectFileEntryTypeURL,
 		selectFolderURL,
 		trashEnabled,
@@ -115,21 +109,22 @@ export default function propsTransformer({
 	};
 
 	const deleteEntries = () => {
+		let action;
+
 		if (trashEnabled) {
-			processAction('move_to_trash', editEntryURL);
+			action = 'move_to_trash';
 		}
-		else {
-			openConfirmModal({
-				message: Liferay.Language.get(
+		else if (
+			confirm(
+				Liferay.Language.get(
 					'are-you-sure-you-want-to-delete-the-selected-entries'
-				),
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						processAction('delete', editEntryURL);
-					}
-				},
-			});
+				)
+			)
+		) {
+			action = 'delete';
 		}
+
+		processAction(action, editEntryURL);
 	};
 
 	const editCategories = () => {
@@ -176,75 +171,6 @@ export default function propsTransformer({
 				);
 			}
 		);
-	};
-
-	const filterByDocumentType = () => {
-		openSelectionModal({
-			onSelect(selectedItem) {
-				if (selectedItem) {
-					const url = addParams(
-						`${portletNamespace}fileEntryTypeId=${selectedItem.value}`,
-						viewFileEntryTypeURL
-					);
-					navigate(url);
-				}
-			},
-			selectEventName: `${portletNamespace}selectFileEntryType`,
-			title: Liferay.Language.get('select-document-type'),
-			url: selectFileEntryTypeURL,
-		});
-	};
-
-	const filterByExtension = (extensionsFilterURL) => {
-		openSelectionModal({
-			buttonAddLabel: Liferay.Language.get('select'),
-			height: '70vh',
-			multiple: true,
-			onSelect(selectedItem) {
-				if (selectedItem) {
-					const url = selectedItem.reduce(
-						(acc, item) =>
-							addParams(
-								`${portletNamespace}extension=${item}`,
-								acc
-							),
-						selectExtensionURL
-					);
-
-					navigate(url);
-				}
-			},
-			selectEventName: `${portletNamespace}selectedFileExtension`,
-			size: 'md',
-			title: Liferay.Language.get('filter-by-extension'),
-			url: extensionsFilterURL,
-		});
-	};
-
-	const filterByTag = (tagsFilterURL) => {
-		openSelectionModal({
-			buttonAddLabel: Liferay.Language.get('select'),
-			height: '70vh',
-			multiple: true,
-			onSelect: (selectedItem) => {
-				if (selectedItem) {
-					const url = selectedItem.reduce(
-						(acc, item) =>
-							addParams(
-								`${portletNamespace}assetTagId=${item.value}`,
-								acc
-							),
-						selectAssetTagsURL
-					);
-
-					navigate(url);
-				}
-			},
-			selectEventName: `${portletNamespace}selectedAssetTag`,
-			size: 'lg',
-			title: Liferay.Language.get('filter-by-tags'),
-			url: tagsFilterURL,
-		});
 	};
 
 	const move = () => {
@@ -300,55 +226,8 @@ export default function propsTransformer({
 			},
 			selectEventName: `${portletNamespace}selectFolder`,
 			size: 'lg',
-			title: sub(dialogTitle, [selectedItems]),
+			title: Liferay.Util.sub(dialogTitle, [selectedItems]),
 			url: selectFolderURL,
-		});
-	};
-
-	const permissions = () => {
-		const map = new Map();
-
-		getAllSelectedElements().each((element) => {
-			const modelClassName =
-				element.getData('modelclassname') ?? defaultModelClassName;
-
-			map.set(modelClassName, [
-				...(map.get(modelClassName) ?? []),
-				element.get('value'),
-			]);
-		});
-
-		if (map.size > 1) {
-			openToast({
-				message: Liferay.Language.get(
-					'it-is-not-possible-to-simultaneously-change-the-permissions-of-different-asset-types'
-				),
-				title: Liferay.Language.get('error'),
-				type: 'danger',
-			});
-
-			return;
-		}
-
-		const [
-			selectedModelClassName,
-			selectedFileEntries,
-		] = map.entries()?.next().value;
-
-		const permissionsURL = permissionsURLs[selectedModelClassName];
-
-		const url = new URL(permissionsURL);
-
-		openSelectionModal({
-			title: Liferay.Language.get('permissions'),
-			url: addParams(
-				{
-					[`_${url.searchParams.get(
-						'p_p_id'
-					)}_resourcePrimKey`]: selectedFileEntries.join(','),
-				},
-				permissionsURL
-			),
 		});
 	};
 
@@ -384,19 +263,23 @@ export default function propsTransformer({
 			else if (action === 'move') {
 				move();
 			}
-			else if (action === 'permissions') {
-				permissions();
-			}
 		},
 		onFilterDropdownItemClick(event, {item}) {
 			if (item?.data?.action === 'openDocumentTypesSelector') {
-				filterByDocumentType();
-			}
-			else if (item?.data?.action === 'openExtensionSelector') {
-				filterByExtension(item?.data?.extensionsFilterURL);
-			}
-			else if (item?.data?.action === 'openTagsSelector') {
-				filterByTag(item?.data?.tagsFilterURL);
+				openSelectionModal({
+					onSelect(selectedItem) {
+						if (selectedItem) {
+							const url = addParams(
+								`${portletNamespace}fileEntryTypeId=${selectedItem.value}`,
+								viewFileEntryTypeURL
+							);
+							navigate(url);
+						}
+					},
+					selectEventName: `${portletNamespace}selectFileEntryType`,
+					title: Liferay.Language.get('select-document-type'),
+					url: selectFileEntryTypeURL,
+				});
 			}
 		},
 		onShowMoreButtonClick() {

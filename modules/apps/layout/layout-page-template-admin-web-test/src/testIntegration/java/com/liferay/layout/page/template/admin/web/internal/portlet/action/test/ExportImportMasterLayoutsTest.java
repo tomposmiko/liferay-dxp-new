@@ -15,9 +15,9 @@
 package com.liferay.layout.page.template.admin.web.internal.portlet.action.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.layout.importer.LayoutsImporter;
-import com.liferay.layout.importer.LayoutsImporterResultEntry;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporter;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporterResultEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -50,7 +50,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.io.File;
 
@@ -104,13 +103,11 @@ public class ExportImportMasterLayoutsTest {
 		Layout layout1 = _layoutLocalService.fetchLayout(
 			layoutPageTemplateEntry1.getPlid());
 
-		_layoutPageTemplateStructureLocalService.
-			updateLayoutPageTemplateStructureData(
-				_group1.getGroupId(), layoutPageTemplateEntry1.getPlid(),
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(
-						layoutPageTemplateEntry1.getPlid()),
-				_read("export_import_master_layout_layout_data.json"));
+		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
+			TestPropsValues.getUserId(), _group1.getGroupId(),
+			layoutPageTemplateEntry1.getPlid(),
+			_read("export_import_master_layout_layout_data.json"),
+			_serviceContext1);
 
 		Repository repository = PortletFileRepositoryUtil.addPortletRepository(
 			_group1.getGroupId(), RandomTestUtil.randomString(),
@@ -119,7 +116,7 @@ public class ExportImportMasterLayoutsTest {
 		Class<?> clazz = getClass();
 
 		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			null, _group1.getGroupId(), TestPropsValues.getUserId(),
+			_group1.getGroupId(), TestPropsValues.getUserId(),
 			LayoutPageTemplateEntry.class.getName(),
 			layoutPageTemplateEntry1.getLayoutPageTemplateEntryId(),
 			RandomTestUtil.randomString(), repository.getDlFolderId(),
@@ -136,30 +133,32 @@ public class ExportImportMasterLayoutsTest {
 				layoutPageTemplateEntry1.getLayoutPageTemplateEntryId()
 			});
 
-		List<LayoutsImporterResultEntry> layoutsImporterResultEntries = null;
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries = null;
 
 		ServiceContextThreadLocal.pushServiceContext(_serviceContext2);
 
 		try {
-			layoutsImporterResultEntries = _layoutsImporter.importFile(
-				TestPropsValues.getUserId(), _group2.getGroupId(), 0, file,
-				false);
+			layoutPageTemplatesImporterResultEntries =
+				_layoutPageTemplatesImporter.importFile(
+					TestPropsValues.getUserId(), _group2.getGroupId(), 0, file,
+					false);
 		}
 		finally {
 			ServiceContextThreadLocal.popServiceContext();
 		}
 
-		Assert.assertNotNull(layoutsImporterResultEntries);
+		Assert.assertNotNull(layoutPageTemplatesImporterResultEntries);
 
 		Assert.assertEquals(
-			layoutsImporterResultEntries.toString(), 1,
-			layoutsImporterResultEntries.size());
+			layoutPageTemplatesImporterResultEntries.toString(), 1,
+			layoutPageTemplatesImporterResultEntries.size());
 
-		LayoutsImporterResultEntry layoutPageTemplateImportEntry =
-			layoutsImporterResultEntries.get(0);
+		LayoutPageTemplatesImporterResultEntry layoutPageTemplateImportEntry =
+			layoutPageTemplatesImporterResultEntries.get(0);
 
 		Assert.assertEquals(
-			LayoutsImporterResultEntry.Status.IMPORTED,
+			LayoutPageTemplatesImporterResultEntry.Status.IMPORTED,
 			layoutPageTemplateImportEntry.getStatus());
 
 		String layoutPageTemplateEntryKey = StringUtil.toLowerCase(
@@ -201,9 +200,9 @@ public class ExportImportMasterLayoutsTest {
 					layoutPageTemplateEntry2.getPlid());
 
 		LayoutStructure layoutStructure1 = LayoutStructure.of(
-			layoutPageTemplateStructure1.getDefaultSegmentsExperienceData());
+			layoutPageTemplateStructure1.getData(0));
 		LayoutStructure layoutStructure2 = LayoutStructure.of(
-			layoutPageTemplateStructure2.getDefaultSegmentsExperienceData());
+			layoutPageTemplateStructure2.getData(0));
 
 		DropZoneLayoutStructureItem dropZoneLayoutStructureItem1 =
 			_getDropZoneLayoutStructureItem(layoutStructure1);
@@ -293,19 +292,16 @@ public class ExportImportMasterLayoutsTest {
 		_layoutPageTemplateEntryLocalService;
 
 	@Inject
-	private LayoutPageTemplateStructureLocalService
-		_layoutPageTemplateStructureLocalService;
+	private LayoutPageTemplatesImporter _layoutPageTemplatesImporter;
 
 	@Inject
-	private LayoutsImporter _layoutsImporter;
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
 
 	@Inject(
 		filter = "mvc.command.name=/layout_page_template_admin/export_master_layouts"
 	)
 	private MVCResourceCommand _mvcResourceCommand;
-
-	@Inject
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	private ServiceContext _serviceContext1;
 	private ServiceContext _serviceContext2;

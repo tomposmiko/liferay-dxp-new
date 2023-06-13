@@ -20,7 +20,7 @@ import com.liferay.commerce.product.type.virtual.model.CPDefinitionVirtualSettin
 import com.liferay.commerce.product.type.virtual.service.CPDefinitionVirtualSettingLocalService;
 import com.liferay.commerce.product.type.virtual.util.VirtualCPTypeHelper;
 import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.document.library.util.DLURLHelperUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -32,7 +32,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = VirtualCPTypeHelper.class)
+@Component(
+	enabled = false, immediate = true, service = VirtualCPTypeHelper.class
+)
 public class VirtualCPTypeHelperImpl implements VirtualCPTypeHelper {
 
 	@Override
@@ -77,7 +79,7 @@ public class VirtualCPTypeHelperImpl implements VirtualCPTypeHelper {
 		FileEntry fileEntry = _dlAppService.getFileEntry(
 			cpDefinitionVirtualSetting.getSampleFileEntryId());
 
-		return DLURLHelperUtil.getDownloadURL(
+		return DLUtil.getDownloadURL(
 			fileEntry, fileEntry.getFileVersion(), themeDisplay,
 			StringPool.BLANK);
 	}

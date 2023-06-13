@@ -21,6 +21,7 @@ import com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentInstanceLoca
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Inácio Nery
@@ -46,14 +47,11 @@ public class LazyWorkflowTaskAssigneeList
 	@Override
 	public WorkflowTaskAssignee get(int index) {
 		if (index == 0) {
-			WorkflowTaskAssignee workflowTaskAssignee =
+			Optional<WorkflowTaskAssignee> workflowTaskAssigneeOptional =
 				_firstWorkflowTaskAssigneeSupplier.get();
 
-			if (workflowTaskAssignee == null) {
-				throw new IndexOutOfBoundsException();
-			}
-
-			return workflowTaskAssignee;
+			return workflowTaskAssigneeOptional.orElseThrow(
+				IndexOutOfBoundsException::new);
 		}
 
 		initWorkflowTaskAssignees();

@@ -82,7 +82,8 @@ public class UnsplashFileEntryDemoDataCreatorImpl
 			}
 			catch (NoSuchFileEntryException noSuchFileEntryException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchFileEntryException);
+					_log.warn(
+						noSuchFileEntryException, noSuchFileEntryException);
 				}
 			}
 
@@ -98,7 +99,7 @@ public class UnsplashFileEntryDemoDataCreatorImpl
 		}
 		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioException);
+				_log.warn(ioException, ioException);
 			}
 
 			String fileName = String.format(

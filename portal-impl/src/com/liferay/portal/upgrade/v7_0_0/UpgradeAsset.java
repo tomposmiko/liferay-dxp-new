@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.upgrade.v7_0_0.util.AssetEntryTable;
 import com.liferay.portlet.asset.util.AssetVocabularySettingsHelper;
 
 import java.sql.PreparedStatement;
@@ -67,8 +68,10 @@ public class UpgradeAsset extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("AssetEntry", "description", "TEXT null");
-		alterColumnType("AssetEntry", "summary", "TEXT null");
+		alter(
+			AssetEntryTable.class,
+			new AlterColumnType("description", "TEXT null"),
+			new AlterColumnType("summary", "TEXT null"));
 
 		deleteOrphanedAssetEntries();
 		updateAssetEntries();

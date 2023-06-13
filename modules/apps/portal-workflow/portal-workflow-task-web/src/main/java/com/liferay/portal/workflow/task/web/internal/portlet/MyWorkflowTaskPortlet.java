@@ -29,9 +29,9 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManagerUtil;
-import com.liferay.portal.workflow.security.permission.WorkflowTaskPermission;
 import com.liferay.portal.workflow.task.web.internal.configuration.WorkflowTaskWebConfiguration;
 import com.liferay.portal.workflow.task.web.internal.display.context.WorkflowTaskDisplayContext;
+import com.liferay.portal.workflow.task.web.internal.permission.WorkflowTaskPermissionChecker;
 
 import java.io.IOException;
 
@@ -54,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.workflow.task.web.internal.configuration.WorkflowTaskWebConfiguration",
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-workflow-tasks",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -71,8 +72,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + PortletKeys.MY_WORKFLOW_TASK,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )
@@ -99,9 +99,9 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		try {
-			_setWorkflowTaskDisplayContextRenderRequestAttribute(
+			setWorkflowTaskDisplayContextRenderRequestAttribute(
 				renderRequest, renderResponse);
-			_setWorkflowTaskRenderRequestAttribute(renderRequest);
+			setWorkflowTaskRenderRequestAttribute(renderRequest);
 		}
 		catch (Exception exception) {
 			if (isSessionErrorException(exception)) {
@@ -122,6 +122,18 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 	protected void activate(Map<String, Object> properties) {
 		_workflowTaskWebConfiguration = ConfigurableUtil.createConfigurable(
 			WorkflowTaskWebConfiguration.class, properties);
+	}
+
+	protected void checkWorkflowTaskViewPermission(
+			WorkflowTask workflowTask, ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		long groupId = MapUtil.getLong(
+			workflowTask.getOptionalAttributes(), "groupId",
+			themeDisplay.getSiteGroupId());
+
+		_workflowTaskPermissionChecker.check(
+			groupId, workflowTask, themeDisplay.getPermissionChecker());
 	}
 
 	@Override
@@ -154,19 +166,7 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 		return false;
 	}
 
-	private void _checkWorkflowTaskViewPermission(
-			WorkflowTask workflowTask, ThemeDisplay themeDisplay)
-		throws PortalException {
-
-		long groupId = MapUtil.getLong(
-			workflowTask.getOptionalAttributes(), "groupId",
-			themeDisplay.getSiteGroupId());
-
-		_workflowTaskPermission.check(
-			themeDisplay.getPermissionChecker(), workflowTask, groupId);
-	}
-
-	private void _setWorkflowTaskDisplayContextRenderRequestAttribute(
+	protected void setWorkflowTaskDisplayContextRenderRequestAttribute(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws PortalException {
 
@@ -177,7 +177,7 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 				_portal.getLiferayPortletResponse(renderResponse)));
 	}
 
-	private void _setWorkflowTaskRenderRequestAttribute(
+	protected void setWorkflowTaskRenderRequestAttribute(
 			RenderRequest renderRequest)
 		throws PortalException {
 
@@ -191,7 +191,7 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 			WorkflowTask workflowTask = WorkflowTaskManagerUtil.getWorkflowTask(
 				themeDisplay.getCompanyId(), workflowTaskId);
 
-			_checkWorkflowTaskViewPermission(workflowTask, themeDisplay);
+			checkWorkflowTaskViewPermission(workflowTask, themeDisplay);
 
 			renderRequest.setAttribute(WebKeys.WORKFLOW_TASK, workflowTask);
 		}
@@ -204,9 +204,8 @@ public class MyWorkflowTaskPortlet extends MVCPortlet {
 	@Reference
 	private Portal _portal;
 
-	@Reference
-	private WorkflowTaskPermission _workflowTaskPermission;
-
+	private final WorkflowTaskPermissionChecker _workflowTaskPermissionChecker =
+		new WorkflowTaskPermissionChecker();
 	private volatile WorkflowTaskWebConfiguration _workflowTaskWebConfiguration;
 
 }

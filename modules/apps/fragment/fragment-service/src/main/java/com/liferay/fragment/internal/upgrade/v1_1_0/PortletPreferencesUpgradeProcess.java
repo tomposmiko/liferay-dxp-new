@@ -16,6 +16,7 @@ package com.liferay.fragment.internal.upgrade.v1_1_0;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -41,6 +42,14 @@ public class PortletPreferencesUpgradeProcess extends UpgradeProcess {
 		_layoutLocalService = layoutLocalService;
 	}
 
+	protected void deleteGroupControlPanelLayouts() throws PortalException {
+		for (Long groupControlPanelLayoutPlid :
+				_groupControlPanelPlids.values()) {
+
+			_layoutLocalService.deleteLayout(groupControlPanelLayoutPlid);
+		}
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
 		_computeControlPanelPlids();
@@ -49,94 +58,25 @@ public class PortletPreferencesUpgradeProcess extends UpgradeProcess {
 			return;
 		}
 
-		_upgradePortletPreferences();
+		upgradePortletPreferences();
 
-		_deleteGroupControlPanelLayouts();
+		deleteGroupControlPanelLayouts();
 	}
 
-	private void _computeControlPanelPlids() throws Exception {
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				StringBundler.concat(
-					"select Layout.plid, Group_.groupKey from Layout inner ",
-					"join Group_ on Layout.groupId = Group_.groupId where ",
-					"Layout.type_ = '", LayoutConstants.TYPE_CONTROL_PANEL,
-					"'"));
-			ResultSet resultSet = preparedStatement.executeQuery()) {
-
-			while (resultSet.next()) {
-				String groupKey = resultSet.getString("groupKey");
-
-				long plid = resultSet.getLong("plid");
-
-				Layout layout = _layoutLocalService.getLayout(plid);
-
-				if (groupKey.equals(GroupConstants.CONTROL_PANEL)) {
-					_companyControlPanelPlids.put(layout.getCompanyId(), plid);
-				}
-				else {
-					_groupControlPanelPlids.put(layout.getGroupId(), plid);
-				}
-			}
-		}
-	}
-
-	private void _deleteGroupControlPanelLayouts() throws Exception {
-		for (Long groupControlPanelLayoutPlid :
-				_groupControlPanelPlids.values()) {
-
-			_layoutLocalService.deleteLayout(groupControlPanelLayoutPlid);
-		}
-	}
-
-	private Map<Long, Long> _getPortletPreferencesMap(
-			long companyId, long groupId, String namespace)
-		throws Exception {
-
-		Map<Long, Long> portletPreferencesMap = new HashMap<>();
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				StringBundler.concat(
-					"select PortletPreferences.portletPreferencesId, ",
-					"PortletPreferences.plid from PortletPreferences inner ",
-					"join Layout on PortletPreferences.plid = Layout.plid ",
-					"where PortletPreferences.portletId like ",
-					"CONCAT('%_INSTANCE_', ?) and (Layout.groupId = ? or ",
-					"PortletPreferences.plid = ?)"))) {
-
-			preparedStatement.setString(1, namespace);
-			preparedStatement.setLong(2, groupId);
-			preparedStatement.setLong(
-				3, _companyControlPanelPlids.get(companyId));
-
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			while (resultSet.next()) {
-				long portletPreferencesId = resultSet.getLong(
-					"portletPreferencesId");
-				long portletPreferencesPlid = resultSet.getLong("plid");
-
-				portletPreferencesMap.put(
-					portletPreferencesId, portletPreferencesPlid);
-			}
-		}
-
-		return portletPreferencesMap;
-	}
-
-	private void _upgradePortletPreferences() throws Exception {
+	protected void upgradePortletPreferences() throws Exception {
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select groupId, companyId, classPK, namespace from " +
 					"FragmentEntryLink");
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"delete from PortletPreferences where " +
-						"portletPreferencesId = ?");
+					connection.prepareStatement(
+						"delete from PortletPreferences where " +
+							"portletPreferencesId = ?"));
 			PreparedStatement preparedStatement3 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update PortletPreferences set plid = ? where " +
-						"portletPreferencesId = ?");
+					connection.prepareStatement(
+						"update PortletPreferences set plid = ? where " +
+							"portletPreferencesId = ?"));
 			ResultSet resultSet = preparedStatement1.executeQuery()) {
 
 			while (resultSet.next()) {
@@ -217,7 +157,7 @@ public class PortletPreferencesUpgradeProcess extends UpgradeProcess {
 					}
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			}
 
@@ -225,6 +165,65 @@ public class PortletPreferencesUpgradeProcess extends UpgradeProcess {
 
 			preparedStatement3.executeBatch();
 		}
+	}
+
+	private void _computeControlPanelPlids() throws Exception {
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select Layout.plid, Group_.groupKey from Layout inner ",
+					"join Group_ on Layout.groupId = Group_.groupId where ",
+					"Layout.type_ = '", LayoutConstants.TYPE_CONTROL_PANEL,
+					"'"));
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				String groupKey = resultSet.getString("groupKey");
+
+				long plid = resultSet.getLong("plid");
+
+				Layout layout = _layoutLocalService.getLayout(plid);
+
+				if (groupKey.equals(GroupConstants.CONTROL_PANEL)) {
+					_companyControlPanelPlids.put(layout.getCompanyId(), plid);
+				}
+				else {
+					_groupControlPanelPlids.put(layout.getGroupId(), plid);
+				}
+			}
+		}
+	}
+
+	private Map<Long, Long> _getPortletPreferencesMap(
+			long companyId, long groupId, String namespace)
+		throws Exception {
+
+		Map<Long, Long> portletPreferencesMap = new HashMap<>();
+
+		long companyControlPanelPlid = _companyControlPanelPlids.get(companyId);
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select PortletPreferences.portletPreferencesId, ",
+					"PortletPreferences.plid from PortletPreferences inner ",
+					"join Layout on PortletPreferences.plid = Layout.plid ",
+					"where PortletPreferences.portletId like ",
+					"CONCAT('%_INSTANCE_', '", namespace,
+					"') and (Layout.groupId = ", groupId,
+					" or PortletPreferences.plid = ", companyControlPanelPlid,
+					")"));
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				long portletPreferencesId = resultSet.getLong(
+					"portletPreferencesId");
+				long portletPreferencesPlid = resultSet.getLong("plid");
+
+				portletPreferencesMap.put(
+					portletPreferencesId, portletPreferencesPlid);
+			}
+		}
+
+		return portletPreferencesMap;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

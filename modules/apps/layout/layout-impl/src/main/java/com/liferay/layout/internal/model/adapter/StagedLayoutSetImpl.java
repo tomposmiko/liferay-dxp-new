@@ -37,6 +37,7 @@ import java.time.Instant;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -57,7 +58,7 @@ public class StagedLayoutSetImpl
 		// Last publish date
 
 		UnicodeProperties settingsUnicodeProperties =
-			layoutSet.getSettingsProperties();
+			_layoutSet.getSettingsProperties();
 
 		String lastPublishDateString = settingsUnicodeProperties.getProperty(
 			"last-publish-date");
@@ -69,12 +70,12 @@ public class StagedLayoutSetImpl
 
 		// Layout set prototype
 
-		if (Validator.isNotNull(layoutSet.getLayoutSetPrototypeUuid())) {
+		if (Validator.isNotNull(_layoutSet.getLayoutSetPrototypeUuid())) {
 			LayoutSetPrototype layoutSetPrototype =
 				LayoutSetPrototypeLocalServiceUtil.
 					fetchLayoutSetPrototypeByUuidAndCompanyId(
-						layoutSet.getLayoutSetPrototypeUuid(),
-						layoutSet.getCompanyId());
+						_layoutSet.getLayoutSetPrototypeUuid(),
+						_layoutSet.getCompanyId());
 
 			if (layoutSetPrototype != null) {
 				_layoutSetPrototypeName = layoutSetPrototype.getName(
@@ -83,7 +84,7 @@ public class StagedLayoutSetImpl
 		}
 
 		try {
-			Group layoutSetGroup = layoutSet.getGroup();
+			Group layoutSetGroup = _layoutSet.getGroup();
 
 			_userId = layoutSetGroup.getCreatorUserId();
 
@@ -97,7 +98,7 @@ public class StagedLayoutSetImpl
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 	}
@@ -123,8 +124,8 @@ public class StagedLayoutSetImpl
 	}
 
 	@Override
-	public String getLayoutSetPrototypeName() {
-		return _layoutSetPrototypeName;
+	public Optional<String> getLayoutSetPrototypeName() {
+		return Optional.ofNullable(_layoutSetPrototypeName);
 	}
 
 	@Override
@@ -167,6 +168,16 @@ public class StagedLayoutSetImpl
 		return String.valueOf(_layoutSet.isPrivateLayout());
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getVirtualHostnames()}
+	 */
+	@Deprecated
+	@Override
+	public String getVirtualHostname() {
+		return _layoutSet.getVirtualHostname();
+	}
+
 	@Override
 	public void setLastPublishDate(Date lastPublishDate) {
 		_lastPublishDate = lastPublishDate;
@@ -203,6 +214,16 @@ public class StagedLayoutSetImpl
 	@Override
 	public void setUuid(String uuid) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #setVirtualHostnames(TreeMap)}
+	 */
+	@Deprecated
+	@Override
+	public void setVirtualHostname(String virtualHostname) {
+		_layoutSet.setVirtualHostname(virtualHostname);
 	}
 
 	@Override

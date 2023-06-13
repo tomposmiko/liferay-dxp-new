@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Levente Hudák
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StagingProcessesPortletKeys.STAGING_PROCESSES,
 		"mvc.command.name=/staging_processes/publish_layouts"
@@ -166,12 +167,13 @@ public class PublishLayoutsMVCActionCommand extends BaseMVCActionCommand {
 
 		String treeId = ParamUtil.getString(actionRequest, "treeId");
 
-		actionRequest.setAttribute(
-			"layoutIdMap",
-			_exportImportHelper.getSelectedLayoutsJSON(
-				groupId, privateLayout,
-				SessionTreeJSClicks.getOpenNodes(
-					httpServletRequest, treeId + "SelectedNode")));
+		String openNodes = SessionTreeJSClicks.getOpenNodes(
+			httpServletRequest, treeId + "SelectedNode");
+
+		String selectedLayoutsJSON = _exportImportHelper.getSelectedLayoutsJSON(
+			groupId, privateLayout, openNodes);
+
+		actionRequest.setAttribute("layoutIdMap", selectedLayoutsJSON);
 	}
 
 	@Reference

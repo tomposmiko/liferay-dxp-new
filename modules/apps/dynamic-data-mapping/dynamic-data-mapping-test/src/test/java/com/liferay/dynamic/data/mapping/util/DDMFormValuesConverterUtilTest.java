@@ -19,28 +19,24 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hamcrest.CoreMatchers;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Carolina Barbosa
  */
+@RunWith(PowerMockRunner.class)
 public class DDMFormValuesConverterUtilTest extends BaseDDMTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testAddMissingNestedDDMFormFieldValues() {
@@ -72,15 +68,15 @@ public class DDMFormValuesConverterUtilTest extends BaseDDMTestCase {
 			nestedDDMFormFieldValues.toString(), 2,
 			nestedDDMFormFieldValues.size());
 
-		Set<String> names = new HashSet<>();
+		Stream<DDMFormFieldValue> stream = nestedDDMFormFieldValues.stream();
 
-		for (DDMFormFieldValue nestedDDMFormFieldValue :
-				nestedDDMFormFieldValues) {
-
-			names.add(nestedDDMFormFieldValue.getName());
-		}
-
-		Assert.assertThat(names, CoreMatchers.hasItems("Text1", "Text2"));
+		Assert.assertThat(
+			stream.map(
+				DDMFormFieldValue::getName
+			).collect(
+				Collectors.toSet()
+			),
+			CoreMatchers.hasItems("Text1", "Text2"));
 
 		Assert.assertEquals(
 			nestedDDMFormFieldValues.get(0), textDDMFormFieldValue);

@@ -16,14 +16,14 @@ package com.liferay.object.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectDefinitionConstants;
-import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
-import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
+import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -39,9 +39,8 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -64,21 +63,20 @@ public class ObjectRelationshipServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_guestUser = _userLocalService.getGuestUser(
+		_defaultUser = _userLocalService.getDefaultUser(
 			TestPropsValues.getCompanyId());
+		_originalName = PrincipalThreadLocal.getName();
+		_originalPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+		_user = TestPropsValues.getUser();
 
 		_objectDefinition1 =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), false, false,
+				TestPropsValues.getUserId(),
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				LocalizedMapUtil.getLocalizedMap("Ables"),
 				ObjectDefinitionConstants.SCOPE_COMPANY,
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-				Arrays.asList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
+				Collections.<ObjectField>emptyList());
 
 		_objectDefinition1 =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
@@ -87,26 +85,16 @@ public class ObjectRelationshipServiceTest {
 
 		_objectDefinition2 =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), false, false,
+				TestPropsValues.getUserId(),
 				LocalizedMapUtil.getLocalizedMap("Baker"), "Baker", null, null,
 				LocalizedMapUtil.getLocalizedMap("Bakers"),
 				ObjectDefinitionConstants.SCOPE_COMPANY,
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-				Arrays.asList(
-					ObjectFieldUtil.createObjectField(
-						ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-						ObjectFieldConstants.DB_TYPE_STRING,
-						RandomTestUtil.randomString(), StringUtil.randomId())));
+				Collections.<ObjectField>emptyList());
 
 		_objectDefinition2 =
 			_objectDefinitionLocalService.publishCustomObjectDefinition(
 				TestPropsValues.getUserId(),
 				_objectDefinition2.getObjectDefinitionId());
-
-		_originalName = PrincipalThreadLocal.getName();
-		_originalPermissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-		_user = TestPropsValues.getUser();
 	}
 
 	@After
@@ -119,7 +107,7 @@ public class ObjectRelationshipServiceTest {
 	@Test
 	public void testAddObjectRelationship() throws Exception {
 		try {
-			_testAddObjectRelationship(_guestUser);
+			_testAddObjectRelationship(_defaultUser);
 
 			Assert.fail();
 		}
@@ -128,7 +116,7 @@ public class ObjectRelationshipServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have UPDATE permission for"));
 		}
 
@@ -138,7 +126,7 @@ public class ObjectRelationshipServiceTest {
 	@Test
 	public void testDeleteObjectRelationship() throws Exception {
 		try {
-			_testDeleteObjectRelationship(_guestUser);
+			_testDeleteObjectRelationship(_defaultUser);
 
 			Assert.fail();
 		}
@@ -147,7 +135,7 @@ public class ObjectRelationshipServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have UPDATE permission for"));
 		}
 
@@ -157,7 +145,7 @@ public class ObjectRelationshipServiceTest {
 	@Test
 	public void testGetObjectRelationship() throws Exception {
 		try {
-			_testGetObjectRelationship(_guestUser);
+			_testGetObjectRelationship(_defaultUser);
 
 			Assert.fail();
 		}
@@ -166,7 +154,7 @@ public class ObjectRelationshipServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have VIEW permission for"));
 		}
 
@@ -176,14 +164,14 @@ public class ObjectRelationshipServiceTest {
 	@Test
 	public void testGetObjectRelationships() throws Exception {
 		try {
-			_testGetObjectRelationships(_guestUser);
+			_testGetObjectRelationships(_defaultUser);
 		}
 		catch (PrincipalException.MustHavePermission principalException) {
 			String message = principalException.getMessage();
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have VIEW permission for"));
 		}
 
@@ -193,7 +181,7 @@ public class ObjectRelationshipServiceTest {
 	@Test
 	public void testUpdateObjectRelationship() throws Exception {
 		try {
-			_testUpdateObjectRelationship(_guestUser);
+			_testUpdateObjectRelationship(_defaultUser);
 
 			Assert.fail();
 		}
@@ -202,7 +190,7 @@ public class ObjectRelationshipServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have UPDATE permission for"));
 		}
 
@@ -214,8 +202,7 @@ public class ObjectRelationshipServiceTest {
 
 		return _objectRelationshipLocalService.addObjectRelationship(
 			user.getUserId(), _objectDefinition1.getObjectDefinitionId(),
-			_objectDefinition2.getObjectDefinitionId(), 0,
-			ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+			_objectDefinition2.getObjectDefinitionId(),
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(),
 			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
@@ -237,8 +224,7 @@ public class ObjectRelationshipServiceTest {
 			objectRelationship =
 				_objectRelationshipService.addObjectRelationship(
 					_objectDefinition1.getObjectDefinitionId(),
-					_objectDefinition2.getObjectDefinitionId(), 0,
-					ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+					_objectDefinition2.getObjectDefinitionId(),
 					LocalizedMapUtil.getLocalizedMap(
 						RandomTestUtil.randomString()),
 					StringUtil.randomId(),
@@ -322,7 +308,7 @@ public class ObjectRelationshipServiceTest {
 
 			objectRelationship =
 				_objectRelationshipService.updateObjectRelationship(
-					objectRelationship.getObjectRelationshipId(), 0,
+					objectRelationship.getObjectRelationshipId(),
 					objectRelationship.getDeletionType(),
 					LocalizedMapUtil.getLocalizedMap("Baker"));
 		}
@@ -334,7 +320,7 @@ public class ObjectRelationshipServiceTest {
 		}
 	}
 
-	private User _guestUser;
+	private User _defaultUser;
 
 	@DeleteAfterTestRun
 	private ObjectDefinition _objectDefinition1;

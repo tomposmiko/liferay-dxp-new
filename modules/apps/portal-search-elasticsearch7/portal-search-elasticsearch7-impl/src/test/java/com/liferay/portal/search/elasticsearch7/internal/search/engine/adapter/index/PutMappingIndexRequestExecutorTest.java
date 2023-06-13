@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.index;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.engine.adapter.index.PutMappingIndexRequest;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -56,11 +55,11 @@ public class PutMappingIndexRequestExecutorTest {
 				new String[] {_INDEX_NAME}, _MAPPING_NAME, _FIELD_NAME);
 
 		PutMappingIndexRequestExecutorImpl putMappingIndexRequestExecutorImpl =
-			new PutMappingIndexRequestExecutorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			putMappingIndexRequestExecutorImpl, "_elasticsearchClientResolver",
-			_elasticsearchFixture);
+			new PutMappingIndexRequestExecutorImpl() {
+				{
+					setElasticsearchClientResolver(_elasticsearchFixture);
+				}
+			};
 
 		PutMappingRequest putMappingRequest =
 			putMappingIndexRequestExecutorImpl.createPutMappingRequest(

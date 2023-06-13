@@ -14,14 +14,13 @@
 
 package com.liferay.commerce.dashboard.web.internal.portlet;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.permission.CommerceAccountPermission;
 import com.liferay.commerce.dashboard.web.internal.constants.CommerceDashboardPortletKeys;
 import com.liferay.commerce.dashboard.web.internal.display.context.CommerceDashboardForecastDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -34,14 +33,13 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-dashboard-forecasts-chart",
@@ -50,6 +48,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 		"com.liferay.portlet.instanceable=true",
 		"com.liferay.portlet.layout-cacheable=true",
 		"com.liferay.portlet.preferences-owned-by-group=true",
+		"com.liferay.portlet.preferences-unique-per-layout=true",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
@@ -59,10 +58,9 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 		"javax.portlet.init-param.view-template=/forecast.jsp",
 		"javax.portlet.name=" + CommerceDashboardPortletKeys.COMMERCE_DASHBOARD_FORECASTS_CHART,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceDashboardForecastsChartPortlet.class, Portlet.class}
 )
 public class CommerceDashboardForecastsChartPortlet extends MVCPortlet {
 
@@ -75,11 +73,11 @@ public class CommerceDashboardForecastsChartPortlet extends MVCPortlet {
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
 				new CommerceDashboardForecastDisplayContext(
-					_accountEntryModelResourcePermission,
+					_commerceAccountPermission,
 					_portal.getHttpServletRequest(renderRequest)));
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		super.render(renderRequest, renderResponse);
@@ -88,13 +86,8 @@ public class CommerceDashboardForecastsChartPortlet extends MVCPortlet {
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceDashboardForecastsChartPortlet.class);
 
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(model.class.name=com.liferay.account.model.AccountEntry)"
-	)
-	private volatile ModelResourcePermission<AccountEntry>
-		_accountEntryModelResourcePermission;
+	@Reference
+	private CommerceAccountPermission _commerceAccountPermission;
 
 	@Reference
 	private Portal _portal;

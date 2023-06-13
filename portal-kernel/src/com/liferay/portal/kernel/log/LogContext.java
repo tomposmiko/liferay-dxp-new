@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public interface LogContext {
 
-	public Map<String, String> getContext(String logName);
+	public Map<String, String> getContext();
 
 	public String getName();
 

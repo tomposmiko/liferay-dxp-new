@@ -27,10 +27,6 @@ public class CommerceAccountOrganizationRelLocalServiceWrapper
 	implements CommerceAccountOrganizationRelLocalService,
 			   ServiceWrapper<CommerceAccountOrganizationRelLocalService> {
 
-	public CommerceAccountOrganizationRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAccountOrganizationRelLocalServiceWrapper(
 		CommerceAccountOrganizationRelLocalService
 			commerceAccountOrganizationRelLocalService) {
@@ -86,11 +82,9 @@ public class CommerceAccountOrganizationRelLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.account.model.CommerceAccountOrganizationRel
-			deleteCommerceAccountOrganizationRel(
-				com.liferay.commerce.account.model.
-					CommerceAccountOrganizationRel
-						commerceAccountOrganizationRel)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		deleteCommerceAccountOrganizationRel(
+			com.liferay.commerce.account.model.CommerceAccountOrganizationRel
+				commerceAccountOrganizationRel) {
 
 		return _commerceAccountOrganizationRelLocalService.
 			deleteCommerceAccountOrganizationRel(

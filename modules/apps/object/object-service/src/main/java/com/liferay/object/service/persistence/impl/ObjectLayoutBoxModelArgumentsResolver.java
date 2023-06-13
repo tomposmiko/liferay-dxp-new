@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.object.model.impl.ObjectLayoutBoxImpl",
-		"table.name=ObjectLayoutBox"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		ObjectLayoutBoxModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class ObjectLayoutBoxModelArgumentsResolver
 	implements ArgumentsResolver {

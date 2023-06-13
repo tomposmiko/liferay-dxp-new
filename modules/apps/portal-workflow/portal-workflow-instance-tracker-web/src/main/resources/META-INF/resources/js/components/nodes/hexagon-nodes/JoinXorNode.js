@@ -26,9 +26,7 @@ export default function JoinXorNode({
 			title={label}
 		>
 			<ClayIcon className="mr-2" symbol="arrow-xor" />
-
 			<span>{label}</span>
-
 			{done && (
 				<ClayIcon
 					className="done-icon hexagon-done-icon"

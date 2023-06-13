@@ -37,11 +37,11 @@ const ITEM_HOVER_TIMEOUT = 500;
 
 const ITEM_STATES_COLORS = {
 	'conversion-draft': 'info',
-	'draft': 'secondary',
-	'pending': 'info',
+	draft: 'secondary',
+	pending: 'info',
 };
 
-const isValidTarget = (sources, target, dropZone, isPrivateLayoutsEnabled) => {
+const isValidTarget = (sources, target, dropZone) => {
 	if (sources.some((item) => item.id === target.id)) {
 		return false;
 	}
@@ -50,8 +50,7 @@ const isValidTarget = (sources, target, dropZone, isPrivateLayoutsEnabled) => {
 		sources.some(
 			(source) =>
 				!(
-					(((isPrivateLayoutsEnabled && target.parentId) ||
-						!isPrivateLayoutsEnabled) &&
+					(target.parentId &&
 						target.columnIndex <= source.columnIndex) ||
 					(target.columnIndex > source.columnIndex && !source.active)
 				)
@@ -165,7 +164,6 @@ function filterEmptyGroups(items) {
 const noop = () => {};
 
 const MillerColumnsItem = ({
-	isPrivateLayoutsEnabled,
 	item: {
 		actions = [],
 		active,
@@ -182,7 +180,6 @@ const MillerColumnsItem = ({
 		quickActions = [],
 		selectable,
 		states = [],
-		target,
 		title,
 		url,
 		viewUrl,
@@ -197,44 +194,33 @@ const MillerColumnsItem = ({
 	const ref = useRef();
 	const timeoutRef = useRef();
 
+	const [dropdownActionsActive, setDropdownActionsActive] = useState();
 	const [dropZone, setDropZone] = useState();
-
-	const [dropdownActionsActive, setDropdownActionsActive] = useState(false);
-
-	const [layoutActionsActive, setLayoutActionsActive] = useState(false);
+	const [layoutActionsActive, setLayoutActionsActive] = useState();
 
 	const dropdownActions = useMemo(() => {
-		const updateItem = (item) => {
-			const newItem = {
-				...item,
-				onClick(event) {
-					const action = item.data?.action;
-
-					if (action) {
-						event.preventDefault();
-
-						ACTIONS[action]?.(item.data);
-					}
-				},
-				symbolLeft: item.icon,
-			};
-
-			if (Array.isArray(item.items)) {
-				newItem.items = item.items.map(updateItem);
-			}
-
-			return newItem;
-		};
-
 		const dropdownActions = actions.map((action) => {
 			return {
 				...action,
-				items: action.items?.map(updateItem),
+				items: action.items?.map((child) => {
+					return {
+						...child,
+						onClick(event) {
+							const action = child.data?.action;
+
+							if (action) {
+								event.preventDefault();
+
+								ACTIONS[action](child.data, namespace);
+							}
+						},
+					};
+				}),
 			};
 		});
 
 		return addSeparators(filterEmptyGroups(dropdownActions));
-	}, [actions]);
+	}, [actions, namespace]);
 
 	const layoutActions = useMemo(() => {
 		return quickActions.filter(
@@ -287,8 +273,7 @@ const MillerColumnsItem = ({
 			return isValidTarget(
 				source.items,
 				{columnIndex, id: itemId, itemIndex, parentId, parentable},
-				dropZone,
-				isPrivateLayoutsEnabled
+				dropZone
 			);
 		},
 		collect: (monitor) => ({
@@ -353,7 +338,7 @@ const MillerColumnsItem = ({
 	return (
 		<ClayLayout.ContentRow
 			className={classNames('list-group-item-flex miller-columns-item', {
-				'dragging': isDragging,
+				dragging: isDragging,
 				'drop-bottom': isOver && dropZone === DROP_ZONES.BOTTOM,
 				'drop-element': isOver && dropZone === DROP_ZONES.ELEMENT,
 				'drop-top': isOver && dropZone === DROP_ZONES.TOP,
@@ -386,14 +371,10 @@ const MillerColumnsItem = ({
 				</ClayLayout.ContentCol>
 			)}
 
-			<ClayLayout.ContentCol className="pl-1" expand>
+			<ClayLayout.ContentCol expand>
 				<h4 className="list-group-title text-truncate-inline">
 					{viewUrl ? (
-						<ClayLink
-							className="text-truncate"
-							href={viewUrl}
-							target={target}
-						>
+						<ClayLink className="text-truncate" href={viewUrl}>
 							{title}
 						</ClayLink>
 					) : (
@@ -418,19 +399,17 @@ const MillerColumnsItem = ({
 				)}
 			</ClayLayout.ContentCol>
 
-			{!!layoutActions.length && (
+			{layoutActions.length > 0 && (
 				<ClayLayout.ContentCol className="miller-columns-item-actions">
 					<ClayDropDown
 						active={layoutActionsActive}
 						onActiveChange={setLayoutActionsActive}
-						renderMenuOnClick
 						trigger={
 							<ClayButtonWithIcon
 								borderless
 								displayType="secondary"
-								size="sm"
+								small
 								symbol="plus"
-								title={Liferay.Language.get('add-child-page')}
 							/>
 						}
 					>
@@ -468,22 +447,18 @@ const MillerColumnsItem = ({
 				</ClayLayout.ContentCol>
 			))}
 
-			{!!dropdownActions.length && (
+			{dropdownActions.length > 0 && (
 				<ClayLayout.ContentCol className="miller-columns-item-actions">
 					<ClayDropDownWithItems
 						active={dropdownActionsActive}
 						items={dropdownActions}
 						onActiveChange={setDropdownActionsActive}
-						renderMenuOnClick
 						trigger={
 							<ClayButtonWithIcon
 								borderless
 								displayType="secondary"
-								size="sm"
+								small
 								symbol="ellipsis-v"
-								title={Liferay.Language.get(
-									'open-page-options-menu'
-								)}
 							/>
 						}
 					/>
@@ -491,7 +466,7 @@ const MillerColumnsItem = ({
 			)}
 
 			{hasChild && (
-				<ClayLayout.ContentCol className="miller-columns-item-child-indicator text-secondary">
+				<ClayLayout.ContentCol className="miller-columns-item-child-indicator">
 					<ClayIcon symbol={rtl ? 'caret-left' : 'caret-right'} />
 				</ClayLayout.ContentCol>
 			)}

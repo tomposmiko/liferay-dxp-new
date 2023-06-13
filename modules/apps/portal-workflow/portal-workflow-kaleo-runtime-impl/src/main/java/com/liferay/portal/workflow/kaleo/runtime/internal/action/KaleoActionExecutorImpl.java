@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = KaleoActionExecutor.class)
+@Component(immediate = true, service = KaleoActionExecutor.class)
 public class KaleoActionExecutorImpl implements KaleoActionExecutor {
 
 	@Override
@@ -66,10 +66,10 @@ public class KaleoActionExecutorImpl implements KaleoActionExecutor {
 
 				_kaleoInstanceLocalService.updateKaleoInstance(
 					kaleoInstanceToken.getKaleoInstanceId(),
-					executionContext.getWorkflowContext());
+					executionContext.getWorkflowContext(), serviceContext);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				comment = exception.getMessage();
 			}

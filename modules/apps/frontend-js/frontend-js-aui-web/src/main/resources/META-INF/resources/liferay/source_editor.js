@@ -17,35 +17,35 @@
 AUI.add(
 	'liferay-source-editor',
 	(A) => {
-		const Lang = A.Lang;
-		const UA = A.UA;
+		var Lang = A.Lang;
+		var UA = A.UA;
 
-		const CSS_ACTIVE_CELL = 'ace_gutter-active-cell';
+		var CSS_ACTIVE_CELL = 'ace_gutter-active-cell';
 
-		const STR_BOUNDING_BOX = 'boundingBox';
+		var STR_BOUNDING_BOX = 'boundingBox';
 
-		const STR_CHANGE = 'change';
+		var STR_CHANGE = 'change';
 
-		const STR_CHANGE_CURSOR = 'changeCursor';
+		var STR_CHANGE_CURSOR = 'changeCursor';
 
-		const STR_CHANGE_FOLD = 'changeFold';
+		var STR_CHANGE_FOLD = 'changeFold';
 
-		const STR_CODE = 'code';
+		var STR_CODE = 'code';
 
-		const STR_DOT = '.';
+		var STR_DOT = '.';
 
-		const STR_THEMES = 'themes';
+		var STR_THEMES = 'themes';
 
-		const TPL_CODE_CONTAINER = '<div class="{cssClass}"></div>';
+		var TPL_CODE_CONTAINER = '<div class="{cssClass}"></div>';
 
-		const LiferaySourceEditor = A.Component.create({
+		var LiferaySourceEditor = A.Component.create({
 			ATTRS: {
 				aceOptions: {
 					validator: Lang.isObject,
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const aceEditor = instance.getEditor();
+						var aceEditor = instance.getEditor();
 
 						return {
 							fontSize: 13,
@@ -106,9 +106,9 @@ AUI.add(
 
 			prototype: {
 				_highlightActiveGutterLine(line) {
-					const instance = this;
+					var instance = this;
 
-					const session = instance.getSession();
+					var session = instance.getSession();
 
 					if (instance._currentLine !== null) {
 						session.removeGutterDecoration(
@@ -123,9 +123,9 @@ AUI.add(
 				},
 
 				_initializeThemes() {
-					const instance = this;
+					var instance = this;
 
-					const themes = instance.get(STR_THEMES);
+					var themes = instance.get(STR_THEMES);
 
 					if (themes.length) {
 						instance
@@ -135,7 +135,7 @@ AUI.add(
 				},
 
 				_notifyEditorChange(data) {
-					const instance = this;
+					var instance = this;
 
 					instance.fire('change', {
 						change: data,
@@ -144,11 +144,11 @@ AUI.add(
 				},
 
 				_updateActiveLine() {
-					const instance = this;
+					var instance = this;
 
-					let line = instance.getEditor().getCursorPosition().row;
+					var line = instance.getEditor().getCursorPosition().row;
 
-					const session = instance.getSession();
+					var session = instance.getSession();
 
 					if (session.isRowFolded(line)) {
 						line = session.getRowFoldStart(line);
@@ -160,14 +160,14 @@ AUI.add(
 				CONTENT_TEMPLATE: null,
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const updateActiveLineFn = A.bind(
+					var updateActiveLineFn = A.bind(
 						'_updateActiveLine',
 						instance
 					);
 
-					const aceEditor = instance.getEditor();
+					var aceEditor = instance.getEditor();
 
 					aceEditor.selection.on(
 						STR_CHANGE_CURSOR,
@@ -181,9 +181,9 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
-					const aceEditor = instance.getEditor();
+					var aceEditor = instance.getEditor();
 
 					aceEditor.selection.removeAllListeners(STR_CHANGE_CURSOR);
 					aceEditor.session.removeAllListeners(STR_CHANGE_FOLD);
@@ -193,12 +193,12 @@ AUI.add(
 				},
 
 				getEditor() {
-					const instance = this;
+					var instance = this;
 
 					if (!instance.editor) {
-						const boundingBox = instance.get(STR_BOUNDING_BOX);
+						var boundingBox = instance.get(STR_BOUNDING_BOX);
 
-						let codeContainer = boundingBox.one(
+						var codeContainer = boundingBox.one(
 							STR_DOT + instance.getClassName(STR_CODE)
 						);
 
@@ -219,9 +219,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const aceEditor = instance.getEditor();
+					var aceEditor = instance.getEditor();
 
 					aceEditor.setOptions(instance.get('aceOptions'));
 
@@ -236,27 +236,27 @@ AUI.add(
 				},
 
 				switchTheme(themeToSwitch) {
-					const instance = this;
+					var instance = this;
 
-					const themes = instance.get(STR_THEMES);
+					var themes = instance.get(STR_THEMES);
 
-					let currentThemeIndex = instance._currentThemeIndex || 0;
+					var currentThemeIndex = instance._currentThemeIndex || 0;
 
-					let nextThemeIndex =
+					var nextThemeIndex =
 						themeToSwitch ||
 						(currentThemeIndex + 1) % themes.length;
 
-					const currentTheme = themes[currentThemeIndex];
-					const nextTheme = themes[nextThemeIndex];
+					var currentTheme = themes[currentThemeIndex];
+					var nextTheme = themes[nextThemeIndex];
 
-					const boundingBox = instance.get(STR_BOUNDING_BOX);
+					var boundingBox = instance.get(STR_BOUNDING_BOX);
 
 					boundingBox.replaceClass(
 						currentTheme.cssClass,
 						nextTheme.cssClass
 					);
 
-					const prevThemeIndex = currentThemeIndex;
+					var prevThemeIndex = currentThemeIndex;
 
 					currentThemeIndex = nextThemeIndex;
 					nextThemeIndex = (currentThemeIndex + 1) % themes.length;

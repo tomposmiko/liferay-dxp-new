@@ -15,7 +15,7 @@
 package com.liferay.portal.security.ldap.internal.model.listener;
 
 import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.MembershipRequest;
 import com.liferay.portal.kernel.model.MembershipRequestConstants;
@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Raymond Augé
  * @author Vilmos Papp
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class UserModelListener extends BaseLDAPExportModelListener<User> {
 
 	@Override
@@ -57,7 +57,7 @@ public class UserModelListener extends BaseLDAPExportModelListener<User> {
 				Long userId = (Long)classPK;
 				Long groupId = (Long)associationClassPK;
 
-				_updateMembershipRequestStatus(
+				updateMembershipRequestStatus(
 					userId.longValue(), groupId.longValue());
 			}
 		}
@@ -104,7 +104,7 @@ public class UserModelListener extends BaseLDAPExportModelListener<User> {
 		exportToLDAP(user, _userExporter, _ldapSettings);
 	}
 
-	private void _updateMembershipRequestStatus(long userId, long groupId)
+	protected void updateMembershipRequestStatus(long userId, long groupId)
 		throws Exception {
 
 		long principalUserId = GetterUtil.getLong(
@@ -119,15 +119,12 @@ public class UserModelListener extends BaseLDAPExportModelListener<User> {
 		for (MembershipRequest membershipRequest : membershipRequests) {
 			_membershipRequestLocalService.updateStatus(
 				principalUserId, membershipRequest.getMembershipRequestId(),
-				_language.get(
+				LanguageUtil.get(
 					user.getLocale(), "your-membership-has-been-approved"),
 				MembershipRequestConstants.STATUS_APPROVED, false,
 				new ServiceContext());
 		}
 	}
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,

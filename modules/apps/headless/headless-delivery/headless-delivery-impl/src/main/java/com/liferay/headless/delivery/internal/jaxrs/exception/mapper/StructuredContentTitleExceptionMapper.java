@@ -18,6 +18,7 @@ import com.liferay.journal.exception.ArticleTitleException;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.osgi.service.component.annotations.Component;
@@ -40,7 +41,8 @@ public class StructuredContentTitleExceptionMapper
 
 	@Override
 	protected Problem getProblem(ArticleTitleException articleTitleException) {
-		return new Problem(articleTitleException);
+		return new Problem(
+			Response.Status.BAD_REQUEST, articleTitleException.getMessage());
 	}
 
 }

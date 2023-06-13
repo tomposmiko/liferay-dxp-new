@@ -22,16 +22,16 @@ import com.liferay.portal.kernel.security.access.control.AccessControlUtil;
 import com.liferay.portal.kernel.security.auth.AccessControlContext;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierConfiguration;
 import com.liferay.portal.kernel.security.auth.verifier.AuthVerifierResult;
+import com.liferay.portal.kernel.servlet.ProtectedServletRequest;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.AuthVerifierPipeline;
-import com.liferay.portal.servlet.AuthVerifierServletRequest;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.util.PropsUtil;
 
@@ -201,17 +201,17 @@ public class AuthVerifierFilter extends BasePortalFilter {
 				accessControlContext.getSettings(),
 				AuthVerifierPipeline.AUTH_TYPE);
 
-			AuthVerifierServletRequest authVerifierServletRequest =
-				new AuthVerifierServletRequest(
-					httpServletRequest, userId, authType);
+			ProtectedServletRequest protectedServletRequest =
+				new ProtectedServletRequest(
+					httpServletRequest, String.valueOf(userId), authType);
 
-			accessControlContext.setRequest(authVerifierServletRequest);
+			accessControlContext.setRequest(protectedServletRequest);
 
 			Class<?> clazz = getClass();
 
 			processFilter(
-				clazz.getName(), authVerifierServletRequest,
-				httpServletResponse, filterChain);
+				clazz.getName(), protectedServletRequest, httpServletResponse,
+				filterChain);
 		}
 		else {
 			_log.error("Unimplemented state " + state);
@@ -236,10 +236,10 @@ public class AuthVerifierFilter extends BasePortalFilter {
 			String authVerifierPropertyName = propertyName.substring(
 				PropsKeys.AUTH_VERIFIER.length());
 
-			int index = authVerifierPropertyName.indexOf('.');
+			int indexOf = authVerifierPropertyName.indexOf('.');
 
 			String authVerifierClassName = authVerifierPropertyName.substring(
-				0, index);
+				0, indexOf);
 
 			Integer authVerifierConfigurationIndex =
 				authVerifierConfigurationIndexs.get(authVerifierClassName);
@@ -269,7 +269,7 @@ public class AuthVerifierFilter extends BasePortalFilter {
 			Properties properties = authVerifierConfiguration.getProperties();
 
 			properties.put(
-				authVerifierPropertyName.substring(index + 1),
+				authVerifierPropertyName.substring(indexOf + 1),
 				entry.getValue());
 		}
 
@@ -314,8 +314,7 @@ public class AuthVerifierFilter extends BasePortalFilter {
 		}
 
 		if (_log.isDebugEnabled()) {
-			String completeURL = HttpComponentsUtil.getCompleteURL(
-				httpServletRequest);
+			String completeURL = HttpUtil.getCompleteURL(httpServletRequest);
 
 			_log.debug("Securing " + completeURL);
 		}

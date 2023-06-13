@@ -27,10 +27,6 @@ public class CommerceVirtualOrderItemLocalServiceWrapper
 	implements CommerceVirtualOrderItemLocalService,
 			   ServiceWrapper<CommerceVirtualOrderItemLocalService> {
 
-	public CommerceVirtualOrderItemLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceVirtualOrderItemLocalServiceWrapper(
 		CommerceVirtualOrderItemLocalService
 			commerceVirtualOrderItemLocalService) {
@@ -302,17 +298,6 @@ public class CommerceVirtualOrderItemLocalServiceWrapper
 		return _commerceVirtualOrderItemLocalService.
 			fetchCommerceVirtualOrderItemByCommerceOrderItemId(
 				commerceOrderItemId);
-	}
-
-	@Override
-	public com.liferay.commerce.product.type.virtual.order.model.
-		CommerceVirtualOrderItem
-			fetchCommerceVirtualOrderItemByCommerceOrderItemId(
-				long commerceOrderItemId, boolean useFinderCache) {
-
-		return _commerceVirtualOrderItemLocalService.
-			fetchCommerceVirtualOrderItemByCommerceOrderItemId(
-				commerceOrderItemId, useFinderCache);
 	}
 
 	/**

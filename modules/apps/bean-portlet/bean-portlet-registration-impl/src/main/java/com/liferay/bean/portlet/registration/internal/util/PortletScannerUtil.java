@@ -101,7 +101,7 @@ public class PortletScannerUtil {
 				}
 			}
 			catch (NoSuchMethodException noSuchMethodException) {
-				_log.error(noSuchMethodException);
+				_log.error(noSuchMethodException, noSuchMethodException);
 			}
 		}
 
@@ -118,7 +118,7 @@ public class PortletScannerUtil {
 				}
 			}
 			catch (NoSuchMethodException noSuchMethodException) {
-				_log.error(noSuchMethodException);
+				_log.error(noSuchMethodException, noSuchMethodException);
 			}
 		}
 
@@ -137,7 +137,7 @@ public class PortletScannerUtil {
 				}
 			}
 			catch (NoSuchMethodException noSuchMethodException) {
-				_log.error(noSuchMethodException);
+				_log.error(noSuchMethodException, noSuchMethodException);
 			}
 		}
 
@@ -158,7 +158,7 @@ public class PortletScannerUtil {
 				}
 			}
 			catch (NoSuchMethodException noSuchMethodException) {
-				_log.error(noSuchMethodException);
+				_log.error(noSuchMethodException, noSuchMethodException);
 			}
 		}
 	}

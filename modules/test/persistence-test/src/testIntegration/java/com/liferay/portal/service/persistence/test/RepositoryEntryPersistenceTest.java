@@ -125,8 +125,6 @@ public class RepositoryEntryPersistenceTest {
 
 		newRepositoryEntry.setMvccVersion(RandomTestUtil.nextLong());
 
-		newRepositoryEntry.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newRepositoryEntry.setUuid(RandomTestUtil.randomString());
 
 		newRepositoryEntry.setGroupId(RandomTestUtil.nextLong());
@@ -158,9 +156,6 @@ public class RepositoryEntryPersistenceTest {
 		Assert.assertEquals(
 			existingRepositoryEntry.getMvccVersion(),
 			newRepositoryEntry.getMvccVersion());
-		Assert.assertEquals(
-			existingRepositoryEntry.getCtCollectionId(),
-			newRepositoryEntry.getCtCollectionId());
 		Assert.assertEquals(
 			existingRepositoryEntry.getUuid(), newRepositoryEntry.getUuid());
 		Assert.assertEquals(
@@ -267,10 +262,10 @@ public class RepositoryEntryPersistenceTest {
 
 	protected OrderByComparator<RepositoryEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"RepositoryEntry", "mvccVersion", true, "ctCollectionId", true,
-			"uuid", true, "repositoryEntryId", true, "groupId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "repositoryId", true, "mappedId", true,
+			"RepositoryEntry", "mvccVersion", true, "uuid", true,
+			"repositoryEntryId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "repositoryId", true, "mappedId", true,
 			"manualCheckInRequired", true, "lastPublishDate", true);
 	}
 
@@ -570,8 +565,6 @@ public class RepositoryEntryPersistenceTest {
 		RepositoryEntry repositoryEntry = _persistence.create(pk);
 
 		repositoryEntry.setMvccVersion(RandomTestUtil.nextLong());
-
-		repositoryEntry.setCtCollectionId(RandomTestUtil.nextLong());
 
 		repositoryEntry.setUuid(RandomTestUtil.randomString());
 

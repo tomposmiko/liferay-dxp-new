@@ -18,7 +18,8 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
-<%@ taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
 taglib uri="http://liferay.com/tld/site-navigation" prefix="liferay-site-navigation" %><%@
@@ -37,7 +38,12 @@ page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.site.navigation.item.selector.web.internal.constants.SiteNavigationItemSelectorWebKeys" %><%@
 page import="com.liferay.site.navigation.item.selector.web.internal.display.context.SelectSiteNavigationMenuDisplayContext" %><%@
 page import="com.liferay.site.navigation.item.selector.web.internal.display.context.SiteNavigationMenuContextualMenusItemSelectorViewDisplayContext" %><%@
-page import="com.liferay.site.navigation.item.selector.web.internal.display.context.SiteNavigationMenuItemItemSelectorViewDisplayContext" %>
+page import="com.liferay.site.navigation.item.selector.web.internal.display.context.SiteNavigationMenuItemItemSelectorViewDisplayContext" %><%@
+page import="com.liferay.site.navigation.item.selector.web.internal.display.context.SiteNavigationMenuItemSelectorViewDisplayContext" %><%@
+page import="com.liferay.site.navigation.item.selector.web.internal.display.context.SiteNavigationMenuItemSelectorViewManagementToolbarDisplayContext" %>
+
+<%@ page import="java.util.Date" %><%@
+page import="java.util.Map" %>
 
 <liferay-frontend:defineObjects />
 

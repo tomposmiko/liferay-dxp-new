@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
@@ -41,7 +40,6 @@ import com.liferay.portal.search.indexer.IndexerWriter;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -59,7 +57,8 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 		IndexerSearcher indexerSearcher, IndexerWriter<T> indexerWriter,
 		IndexerPermissionPostFilter indexerPermissionPostFilter,
 		IndexerQueryBuilderImpl indexerQueryBuilderImpl,
-		IndexerSummaryBuilder indexerSummaryBuilder, String className) {
+		IndexerSummaryBuilder indexerSummaryBuilder,
+		IndexerPostProcessorsHolder indexerPostProcessorsHolder) {
 
 		_modelSearchSettings = modelSearchSettings;
 		_indexerDocumentBuilder = indexerDocumentBuilder;
@@ -68,7 +67,7 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 		_indexerPermissionPostFilter = indexerPermissionPostFilter;
 		_indexerQueryBuilderImpl = indexerQueryBuilderImpl;
 		_indexerSummaryBuilder = indexerSummaryBuilder;
-		_className = className;
+		_indexerPostProcessorsHolder = indexerPostProcessorsHolder;
 	}
 
 	@Override
@@ -133,15 +132,17 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 
 	@Override
 	public IndexerPostProcessor[] getIndexerPostProcessors() {
-		List<IndexerPostProcessor> indexerPostProcessors =
-			IndexerRegistryUtil.getIndexerPostProcessors(this);
-
-		return indexerPostProcessors.toArray(new IndexerPostProcessor[0]);
+		return _indexerPostProcessorsHolder.toArray();
 	}
 
 	@Override
 	public String[] getSearchClassNames() {
 		return _modelSearchSettings.getSearchClassNames();
+	}
+
+	@Override
+	public String getSearchEngineId() {
+		return _modelSearchSettings.getSearchEngineId();
 	}
 
 	@Override
@@ -244,6 +245,14 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 	}
 
 	@Override
+	public void registerIndexerPostProcessor(
+		IndexerPostProcessor indexerPostProcessor) {
+
+		_indexerPostProcessorsHolder.addIndexerPostProcessor(
+			indexerPostProcessor);
+	}
+
+	@Override
 	public void reindex(Collection<T> objects) throws SearchException {
 		_indexerWriter.reindex(objects);
 	}
@@ -261,11 +270,6 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 	@Override
 	public void reindex(T baseModel) throws SearchException {
 		_indexerWriter.reindex(baseModel);
-	}
-
-	@Override
-	public void reindex(T baseModel, boolean notify) throws SearchException {
-		_indexerWriter.reindex(baseModel, notify);
 	}
 
 	@Override
@@ -297,6 +301,14 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 		_indexerWriter.setEnabled(indexerEnabled);
 	}
 
+	@Override
+	public void unregisterIndexerPostProcessor(
+		IndexerPostProcessor indexerPostProcessor) {
+
+		_indexerPostProcessorsHolder.removeIndexerPostProcessor(
+			indexerPostProcessor);
+	}
+
 	private Locale _getLocale(PortletRequest portletRequest) {
 		if (portletRequest != null) {
 			return portletRequest.getLocale();
@@ -305,9 +317,9 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 		return LocaleUtil.getMostRelevantLocale();
 	}
 
-	private final String _className;
 	private final IndexerDocumentBuilder _indexerDocumentBuilder;
 	private final IndexerPermissionPostFilter _indexerPermissionPostFilter;
+	private final IndexerPostProcessorsHolder _indexerPostProcessorsHolder;
 	private final IndexerQueryBuilderImpl _indexerQueryBuilderImpl;
 	private final IndexerSearcher _indexerSearcher;
 	private final IndexerSummaryBuilder _indexerSummaryBuilder;

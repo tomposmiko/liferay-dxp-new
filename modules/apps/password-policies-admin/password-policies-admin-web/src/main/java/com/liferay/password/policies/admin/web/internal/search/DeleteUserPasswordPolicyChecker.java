@@ -54,7 +54,7 @@ public class DeleteUserPasswordPolicyChecker extends EmptyOnClickRowChecker {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;

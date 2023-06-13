@@ -18,10 +18,13 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.asset.util.AssetHelper;
+import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
+import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Locale;
 
@@ -31,19 +34,12 @@ import java.util.Locale;
 public class JournalArticleLayoutDisplayPageObjectProvider
 	implements LayoutDisplayPageObjectProvider<JournalArticle> {
 
-	public JournalArticleLayoutDisplayPageObjectProvider(
-			JournalArticle article, AssetHelper assetHelper)
+	public JournalArticleLayoutDisplayPageObjectProvider(JournalArticle article)
 		throws PortalException {
 
 		_article = article;
-		_assetHelper = assetHelper;
 
 		_assetEntry = _getAssetEntry(article);
-	}
-
-	@Override
-	public String getClassName() {
-		return JournalArticle.class.getName();
 	}
 
 	@Override
@@ -78,8 +74,18 @@ public class JournalArticleLayoutDisplayPageObjectProvider
 
 	@Override
 	public String getKeywords(Locale locale) {
-		return _assetHelper.getAssetKeywords(
-			_assetEntry.getClassName(), _assetEntry.getClassPK(), locale);
+		String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(
+			_assetEntry.getClassName(), _assetEntry.getClassPK());
+		String[] assetCategoryNames =
+			AssetCategoryLocalServiceUtil.getCategoryNames(
+				_assetEntry.getClassName(), _assetEntry.getClassPK());
+
+		String[] keywords =
+			new String[assetTagNames.length + assetCategoryNames.length];
+
+		ArrayUtil.combine(assetTagNames, assetCategoryNames, keywords);
+
+		return StringUtil.merge(keywords);
 	}
 
 	@Override
@@ -108,6 +114,5 @@ public class JournalArticleLayoutDisplayPageObjectProvider
 
 	private final JournalArticle _article;
 	private final AssetEntry _assetEntry;
-	private final AssetHelper _assetHelper;
 
 }

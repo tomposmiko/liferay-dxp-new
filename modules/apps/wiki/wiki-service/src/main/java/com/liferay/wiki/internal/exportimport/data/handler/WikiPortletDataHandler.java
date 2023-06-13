@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gergely Mathe
  */
 @Component(
-	property = "javax.portlet.name=" + WikiPortletKeys.WIKI,
+	immediate = true, property = "javax.portlet.name=" + WikiPortletKeys.WIKI,
 	service = PortletDataHandler.class
 )
 public class WikiPortletDataHandler extends BasePortletDataHandler {
@@ -124,8 +124,10 @@ public class WikiPortletDataHandler extends BasePortletDataHandler {
 		setStagingControls(getExportControls());
 	}
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
 
 	@Reference(
 		target = "(javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN + ")"

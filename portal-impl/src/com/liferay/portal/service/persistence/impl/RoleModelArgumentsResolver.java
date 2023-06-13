@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.RoleTable;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.model.impl.RoleImpl;
 import com.liferay.portal.model.impl.RoleModelImpl;
 
@@ -31,12 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portal.model.impl.RoleImpl", "table.name=Role_"
-	},
-	service = ArgumentsResolver.class
-)
 public class RoleModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

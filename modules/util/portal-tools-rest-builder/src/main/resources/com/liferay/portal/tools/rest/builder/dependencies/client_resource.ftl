@@ -34,14 +34,14 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -75,39 +75,8 @@ public interface ${schemaName}Resource {
 			return this;
 		}
 
-		public Builder bearerToken(String token) {
-			return header("Authorization", "Bearer " + token);
-		}
-
 		public ${schemaName}Resource build() {
 			return new ${schemaName}ResourceImpl(this);
-		}
-
-		public Builder contextPath(String contextPath) {
-			_contextPath = contextPath;
-
-			return this;
-		}
-
-		public Builder endpoint(String address, String scheme) {
-			String[] addressParts = address.split(":");
-
-			String host = addressParts[0];
-
-			int port = 443;
-
-			if (addressParts.length > 1) {
-				String portString = addressParts[1];
-
-				try {
-					port = Integer.parseInt(portString);
-				}
-				catch (NumberFormatException numberFormatException) {
-					throw new IllegalArgumentException("Unable to parse port from " + portString);
-				}
-			}
-
-			return endpoint(host, port, scheme);
 		}
 
 		public Builder endpoint(String host, int port, String scheme) {
@@ -155,7 +124,6 @@ public interface ${schemaName}Resource {
 		private Builder() {
 		}
 
-		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -185,22 +153,7 @@ public interface ${schemaName}Resource {
 					_logger.log(Level.WARNING, "HTTP response message: " + httpResponse.getMessage());
 					_logger.log(Level.WARNING, "HTTP response status code: " + httpResponse.getStatusCode());
 
-					Problem.ProblemException problemException = null;
-
-					if (Objects.equals(httpResponse.getContentType(), "application/json")) {
-						problemException = new Problem.ProblemException(Problem.toDTO(content));
-					}
-					else {
-						_logger.log(Level.WARNING, "Unable to process content type: " + httpResponse.getContentType());
-
-						Problem problem = new Problem();
-
-						problem.setStatus(String.valueOf(httpResponse.getStatusCode()));
-
-						problemException = new Problem.ProblemException(problem);
-					}
-
-					throw problemException;
+					throw new Problem.ProblemException(Problem.toDTO(content));
 				}
 				else {
 					_logger.fine("HTTP response content: " + content);
@@ -249,7 +202,7 @@ public interface ${schemaName}Resource {
 				HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
 				<#if freeMarkerTool.hasHTTPMethod(javaMethodSignature, "delete", "patch", "post", "put")>
-					<#if freeMarkerTool.hasRequestBodyMediaType(javaMethodSignature, "multipart/form-data") && freeMarkerTool.hasParameter(javaMethodSignature, "multipartBody")>
+					<#if freeMarkerTool.hasRequestBodyMediaType(javaMethodSignature, "multipart/form-data")>
 						httpInvoker.multipart();
 
 						httpInvoker.part("${schemaVarName}", ${schemaName}SerDes.toJSON(${schemaVarName}));
@@ -263,29 +216,30 @@ public interface ${schemaName}Resource {
 						/>
 
 						<#if bodyJavaMethodParameters?has_content>
+							httpInvoker.body(
 								<#list bodyJavaMethodParameters as javaMethodParameter>
 									<#if javaMethodParameter?is_last>
 										<#if javaMethodParameter.parameterType?starts_with("[L")>
-											List<String> values = new ArrayList<>();
-
-											for (${javaMethodParameter.parameterType?keep_after_last(".")?keep_before(";")} ${javaMethodParameter.parameterName?remove_ending("s")}Value : ${javaMethodParameter.parameterName}) {
-												values.add(
+											Stream.of(
+												${javaMethodParameter.parameterName}
+											).map(
+												value ->
 
 												<#if javaMethodParameter.parameterType?contains("String")>
-													"\"" + String.valueOf(${javaMethodParameter.parameterName?remove_ending("s")}Value) + "\""
+													"\"" + String.valueOf(value) + "\""
 												<#else>
-													String.valueOf(${javaMethodParameter.parameterName?remove_ending("s")}Value)
+													String.valueOf(value)
 												</#if>
-
-												);
-											}
-
-											httpInvoker.body(values.toString(), "application/json");
+											).collect(
+												Collectors.toList()
+											).toString()
 										<#else>
-											httpInvoker.body(${javaMethodParameter.parameterName}.toString(), "application/json");
+											${javaMethodParameter.parameterName}.toString()
 										</#if>
 									</#if>
 								</#list>
+
+								, "application/json");
 						</#if>
 					</#if>
 				</#if>
@@ -306,7 +260,7 @@ public interface ${schemaName}Resource {
 
 				<#list javaMethodSignature.javaMethodParameters as javaMethodParameter>
 					<#if stringUtil.equals(javaMethodParameter.parameterType, "java.util.Date")>
-						DateFormat liferayToJSONDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXX");
+						DateFormat liferayToJSONDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 						<#break>
 					</#if>
@@ -351,7 +305,7 @@ public interface ${schemaName}Resource {
 					</#if>
 				</#list>
 
-				httpInvoker.path(_builder._scheme + "://" + _builder._host + ":" + _builder._port + _builder._contextPath + "/o${configYAML.application.baseURI}/${openAPIYAML.info.version}${javaMethodSignature.path}");
+				httpInvoker.path(_builder._scheme + "://" + _builder._host + ":" + _builder._port + "/o${configYAML.application.baseURI}/${openAPIYAML.info.version}${javaMethodSignature.path}");
 
 				<#list javaMethodSignature.pathJavaMethodParameters as javaMethodParameter>
 					httpInvoker.path("${javaMethodParameter.parameterName}", ${javaMethodParameter.parameterName});

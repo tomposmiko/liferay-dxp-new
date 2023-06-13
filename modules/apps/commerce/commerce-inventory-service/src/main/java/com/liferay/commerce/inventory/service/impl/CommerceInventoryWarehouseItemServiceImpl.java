@@ -18,30 +18,20 @@ import com.liferay.commerce.inventory.constants.CommerceInventoryActionKeys;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem;
 import com.liferay.commerce.inventory.service.base.CommerceInventoryWarehouseItemServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 
 import java.util.Date;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Luca Pellizzon
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceInventoryWarehouseItem"
-	},
-	service = AopService.class
-)
 public class CommerceInventoryWarehouseItemServiceImpl
 	extends CommerceInventoryWarehouseItemServiceBaseImpl {
 
@@ -177,7 +167,7 @@ public class CommerceInventoryWarehouseItemServiceImpl
 
 		return commerceInventoryWarehouseItemLocalService.
 			fetchCommerceInventoryWarehouseItemByExternalReferenceCode(
-				externalReferenceCode, companyId);
+				companyId, externalReferenceCode);
 	}
 
 	@Override
@@ -203,18 +193,28 @@ public class CommerceInventoryWarehouseItemServiceImpl
 				commerceInventoryWarehouseItemId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #getCommerceInventoryWarehouseItemByReferenceCode(String,
+	 *             long)}
+	 */
+	@Deprecated
 	@Override
-	public CommerceInventoryWarehouseItem getCommerceInventoryWarehouseItem(
-			long commerceInventoryWarehouseId, String sku)
+	public CommerceInventoryWarehouseItem
+			getCommerceInventoryWarehouseItemByReferenceCode(
+				long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		_commerceInventoryWarehouseModelResourcePermission.check(
-			getPermissionChecker(), commerceInventoryWarehouseId,
-			ActionKeys.VIEW);
+		PortletResourcePermission portletResourcePermission =
+			_commerceInventoryWarehouseModelResourcePermission.
+				getPortletResourcePermission();
 
-		return commerceInventoryWarehouseItemLocalService.
-			getCommerceInventoryWarehouseItem(
-				commerceInventoryWarehouseId, sku);
+		portletResourcePermission.check(
+			getPermissionChecker(), null,
+			CommerceInventoryActionKeys.MANAGE_INVENTORY);
+
+		return getCommerceInventoryWarehouseItemByReferenceCode(
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -394,18 +394,6 @@ public class CommerceInventoryWarehouseItemServiceImpl
 	}
 
 	@Override
-	public int getStockQuantity(long companyId, long groupId, String sku) {
-		return commerceInventoryWarehouseItemFinder.countStockQuantityByC_G_S(
-			companyId, groupId, sku, true);
-	}
-
-	@Override
-	public int getStockQuantity(long companyId, String sku) {
-		return commerceInventoryWarehouseItemFinder.countStockQuantityByC_S(
-			companyId, sku, true);
-	}
-
-	@Override
 	public CommerceInventoryWarehouseItem
 			increaseCommerceInventoryWarehouseItemQuantity(
 				long commerceInventoryWarehouseItemId, int quantity)
@@ -499,10 +487,11 @@ public class CommerceInventoryWarehouseItemServiceImpl
 				mvccVersion);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.inventory.model.CommerceInventoryWarehouse)"
-	)
-	private ModelResourcePermission<CommerceInventoryWarehouse>
-		_commerceInventoryWarehouseModelResourcePermission;
+	private static volatile ModelResourcePermission<CommerceInventoryWarehouse>
+		_commerceInventoryWarehouseModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CommerceInventoryWarehouseItemServiceImpl.class,
+				"_commerceInventoryWarehouseModelResourcePermission",
+				CommerceInventoryWarehouse.class);
 
 }

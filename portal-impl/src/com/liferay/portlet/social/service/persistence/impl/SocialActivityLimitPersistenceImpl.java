@@ -41,11 +41,9 @@ import com.liferay.social.kernel.exception.NoSuchActivityLimitException;
 import com.liferay.social.kernel.model.SocialActivityLimit;
 import com.liferay.social.kernel.model.SocialActivityLimitTable;
 import com.liferay.social.kernel.service.persistence.SocialActivityLimitPersistence;
-import com.liferay.social.kernel.service.persistence.SocialActivityLimitUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -189,7 +187,7 @@ public class SocialActivityLimitPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivityLimit>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivityLimit socialActivityLimit : list) {
@@ -564,8 +562,7 @@ public class SocialActivityLimitPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -706,7 +703,7 @@ public class SocialActivityLimitPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivityLimit>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivityLimit socialActivityLimit : list) {
@@ -1078,8 +1075,7 @@ public class SocialActivityLimitPersistenceImpl
 
 			finderArgs = new Object[] {userId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1228,7 +1224,7 @@ public class SocialActivityLimitPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivityLimit>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivityLimit socialActivityLimit : list) {
@@ -1629,8 +1625,7 @@ public class SocialActivityLimitPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1796,7 +1791,7 @@ public class SocialActivityLimitPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByG_U_C_C_A_A, finderArgs, this);
+				_finderPathFetchByG_U_C_C_A_A, finderArgs);
 		}
 
 		if (result instanceof SocialActivityLimit) {
@@ -1957,8 +1952,7 @@ public class SocialActivityLimitPersistenceImpl
 				activityCounterName
 			};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2417,7 +2411,7 @@ public class SocialActivityLimitPersistenceImpl
 	@Override
 	public SocialActivityLimit fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				SocialActivityLimit.class, primaryKey)) {
+				SocialActivityLimit.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2643,7 +2637,7 @@ public class SocialActivityLimitPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivityLimit>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2719,7 +2713,7 @@ public class SocialActivityLimitPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2928,30 +2922,10 @@ public class SocialActivityLimitPersistenceImpl
 				"activityCounterName"
 			},
 			false);
-
-		_setSocialActivityLimitUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialActivityLimitUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(SocialActivityLimitImpl.class.getName());
-	}
-
-	private void _setSocialActivityLimitUtilPersistence(
-		SocialActivityLimitPersistence socialActivityLimitPersistence) {
-
-		try {
-			Field field = SocialActivityLimitUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialActivityLimitPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_SOCIALACTIVITYLIMIT =

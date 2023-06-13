@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the kaleo condition service. This utility wraps <code>com.liferay.portal.workflow.kaleo.service.persistence.impl.KaleoConditionPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -689,9 +693,26 @@ public class KaleoConditionUtil {
 	}
 
 	public static KaleoConditionPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile KaleoConditionPersistence _persistence;
+	private static ServiceTracker
+		<KaleoConditionPersistence, KaleoConditionPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			KaleoConditionPersistence.class);
+
+		ServiceTracker<KaleoConditionPersistence, KaleoConditionPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<KaleoConditionPersistence, KaleoConditionPersistence>(
+						bundle.getBundleContext(),
+						KaleoConditionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

@@ -51,7 +51,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.geocoder.bing.internal.configuration.BingCommerceGeocoderConfiguration",
-	service = CommerceGeocoder.class
+	enabled = false, immediate = true, service = CommerceGeocoder.class
 )
 public class BingCommerceGeocoder implements CommerceGeocoder {
 
@@ -67,11 +67,10 @@ public class BingCommerceGeocoder implements CommerceGeocoder {
 			Country country = _countryLocalService.getCountryByA2(
 				group.getCompanyId(), countryA2);
 
-			return _getCoordinates(
-				street, city, zip,
-				_regionLocalService.getRegion(
-					country.getCountryId(), regionCode),
-				country);
+			Region region = _regionLocalService.getRegion(
+				country.getCountryId(), regionCode);
+
+			return _getCoordinates(street, city, zip, region, country);
 		}
 		catch (CommerceGeocoderException commerceGeocoderException) {
 			throw commerceGeocoderException;

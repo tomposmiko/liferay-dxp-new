@@ -30,8 +30,4 @@ public interface DispatchTaskExecutorRegistry {
 
 	public Set<String> getDispatchTaskExecutorTypes();
 
-	public boolean isClusterModeSingle(String type);
-
-	public boolean isHiddenInUI(String type);
-
 }

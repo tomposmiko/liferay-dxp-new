@@ -59,11 +59,11 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 <c:if test="<%= !portletCategories.isEmpty() || !portlets.isEmpty() %>">
 	<liferay-ui:panel
 		collapsible="<%= true %>"
-		cssClass="panel-page-category"
+		cssClass="lfr-content-category list-unstyled panel-page-category"
 		extended="<%= true %>"
 		title="<%= Validator.isNotNull(externalPortletCategory) ? externalPortletCategory : LanguageUtil.get(request, portletCategory.getName()) %>"
 	>
-		<div class="list-group mb-0">
+		<aui:nav cssClass="list-group">
 
 			<%
 			for (PortletCategory curPortletCategory : portletCategories) {
@@ -82,17 +82,14 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 					<div>
 						<a
 							href="<%=
-								PortletURLBuilder.create(
-									PortletURLFactoryUtil.create(request, portlet.getRootPortlet(), PortletRequest.ACTION_PHASE)
-								).setPortletMode(
-									PortletMode.VIEW
-								).setWindowState(
-									WindowState.MAXIMIZED
-								).buildPortletURL()
-							%>"
+PortletURLBuilder.create(
+						PortletURLFactoryUtil.create(request, portlet.getRootPortlet(), PortletRequest.ACTION_PHASE)
+					).setPortletMode(
+						PortletMode.VIEW
+					).setWindowState(
+						WindowState.MAXIMIZED
+					).buildPortletURL() %>"><%= PortalUtil.getPortletTitle(portlet, application, locale) %></a
 						>
-							<%= PortalUtil.getPortletTitle(portlet, application, locale) %>
-						</a>
 					</div>
 				</c:if>
 
@@ -100,6 +97,6 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 			}
 			%>
 
-		</div>
+		</aui:nav>
 	</liferay-ui:panel>
 </c:if>

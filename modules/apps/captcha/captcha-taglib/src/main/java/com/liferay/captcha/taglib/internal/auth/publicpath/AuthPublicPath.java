@@ -20,7 +20,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Alejandro Tardín
  */
 @Component(
-	property = "auth.public.path=/portal/captcha/get_image",
+	immediate = true, property = "auth.public.path=/portal/captcha/get_image",
 	service = Object.class
 )
 public class AuthPublicPath {

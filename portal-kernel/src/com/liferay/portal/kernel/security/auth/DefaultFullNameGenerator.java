@@ -61,19 +61,17 @@ public class DefaultFullNameGenerator implements FullNameGenerator {
 	@Override
 	public String getLocalizedFullName(
 		String firstName, String middleName, String lastName, Locale locale,
-		long prefixListTypeId, long suffixListTypeId) {
+		long prefixId, long suffixId) {
 
 		String fullName = buildLocalizedFullName(
-			firstName, middleName, lastName, locale, prefixListTypeId,
-			suffixListTypeId, false);
+			firstName, middleName, lastName, locale, prefixId, suffixId, false);
 
 		if (!isFullNameTooLong(fullName)) {
 			return fullName;
 		}
 
 		fullName = buildLocalizedFullName(
-			firstName, middleName, lastName, locale, prefixListTypeId,
-			suffixListTypeId, true);
+			firstName, middleName, lastName, locale, prefixId, suffixId, true);
 
 		if (!isFullNameTooLong(fullName)) {
 			return fullName;
@@ -147,7 +145,7 @@ public class DefaultFullNameGenerator implements FullNameGenerator {
 
 	protected String buildLocalizedFullName(
 		String firstName, String middleName, String lastName, Locale locale,
-		long prefixListTypeId, long suffixListTypeId, boolean useInitials) {
+		long prefixId, long suffixId, boolean useInitials) {
 
 		Map<String, String> namesMap = new HashMap<>();
 
@@ -171,10 +169,9 @@ public class DefaultFullNameGenerator implements FullNameGenerator {
 			namesMap.put("last-name", lastName);
 		}
 
-		if (prefixListTypeId != 0) {
+		if (prefixId != 0) {
 			try {
-				ListType listType = ListTypeServiceUtil.getListType(
-					suffixListTypeId);
+				ListType listType = ListTypeServiceUtil.getListType(suffixId);
 
 				String prefix = listType.getName();
 
@@ -185,7 +182,7 @@ public class DefaultFullNameGenerator implements FullNameGenerator {
 			catch (NoSuchListTypeException noSuchListTypeException) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Ignoring full name prefix " + prefixListTypeId,
+						"Ignoring full name prefix " + prefixId,
 						noSuchListTypeException);
 				}
 			}
@@ -194,10 +191,9 @@ public class DefaultFullNameGenerator implements FullNameGenerator {
 			}
 		}
 
-		if (suffixListTypeId != 0) {
+		if (suffixId != 0) {
 			try {
-				ListType listType = ListTypeServiceUtil.getListType(
-					suffixListTypeId);
+				ListType listType = ListTypeServiceUtil.getListType(suffixId);
 
 				String suffix = listType.getName();
 
@@ -208,7 +204,7 @@ public class DefaultFullNameGenerator implements FullNameGenerator {
 			catch (NoSuchListTypeException noSuchListTypeException) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Ignoring full name suffix " + suffixListTypeId,
+						"Ignoring full name suffix " + suffixId,
 						noSuchListTypeException);
 				}
 			}

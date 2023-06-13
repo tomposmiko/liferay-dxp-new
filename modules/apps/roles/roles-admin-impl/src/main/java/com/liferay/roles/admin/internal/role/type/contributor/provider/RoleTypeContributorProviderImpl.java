@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Drew Brokke
  */
-@Component(service = RoleTypeContributorProvider.class)
+@Component(immediate = true, service = RoleTypeContributorProvider.class)
 public class RoleTypeContributorProviderImpl
 	implements RoleTypeContributorProvider {
 

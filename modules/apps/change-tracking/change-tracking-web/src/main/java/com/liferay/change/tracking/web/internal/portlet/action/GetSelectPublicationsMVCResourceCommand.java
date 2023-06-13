@@ -26,7 +26,7 @@ import com.liferay.change.tracking.web.internal.security.permission.resource.CTC
 import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.UserTable;
@@ -56,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/get_select_publications"
@@ -84,7 +85,7 @@ public class GetSelectPublicationsMVCResourceCommand
 		}
 
 		Set<Long> ctCollectionIds = new HashSet<>();
-		JSONArray entriesJSONArray = _jsonFactory.createJSONArray();
+		JSONArray entriesJSONArray = JSONFactoryUtil.createJSONArray();
 
 		List<CTCollection> ctCollections =
 			_ctCollectionService.getCTCollections(
@@ -136,26 +137,22 @@ public class GetSelectPublicationsMVCResourceCommand
 			entriesJSONArray.put(entryJSONObject);
 		}
 
-		JSONPortletResponseUtil.writeJSON(
-			resourceRequest, resourceResponse,
-			JSONUtil.put(
-				"entries", entriesJSONArray
-			).put(
-				"userInfo",
-				() -> {
-					if (ctCollectionIds.isEmpty()) {
-						return null;
-					}
+		JSONObject responseJSONObject = JSONUtil.put(
+			"entries", entriesJSONArray);
 
-					return DisplayContextUtil.getUserInfoJSONObject(
-						CTCollectionTable.INSTANCE.userId.eq(
-							UserTable.INSTANCE.userId),
-						CTCollectionTable.INSTANCE, themeDisplay,
-						_userLocalService,
-						CTCollectionTable.INSTANCE.ctCollectionId.in(
-							ctCollectionIds.toArray(new Long[0])));
-				}
-			));
+		if (!ctCollectionIds.isEmpty()) {
+			responseJSONObject.put(
+				"userInfo",
+				DisplayContextUtil.getUserInfoJSONObject(
+					CTCollectionTable.INSTANCE.userId.eq(
+						UserTable.INSTANCE.userId),
+					CTCollectionTable.INSTANCE, themeDisplay, _userLocalService,
+					CTCollectionTable.INSTANCE.ctCollectionId.in(
+						ctCollectionIds.toArray(new Long[0]))));
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			resourceRequest, resourceResponse, responseJSONObject);
 	}
 
 	@Reference
@@ -163,9 +160,6 @@ public class GetSelectPublicationsMVCResourceCommand
 
 	@Reference
 	private CTPreferencesLocalService _ctPreferencesLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private UserLocalService _userLocalService;

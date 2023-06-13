@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.internal.messaging;
 
-import com.liferay.dynamic.data.mapping.internal.background.task.DDMStructureIndexerRegistry;
+import com.liferay.dynamic.data.mapping.internal.background.task.DDMStructureIndexerTracker;
 import com.liferay.dynamic.data.mapping.internal.constants.DDMDestinationNames;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Preston Crary
  */
 @Component(
+	immediate = true,
 	property = "destination.name=" + DDMDestinationNames.DDM_STRUCTURE_REINDEX,
 	service = MessageListener.class
 )
@@ -46,7 +47,7 @@ public class DDMStructureReindexMessageListener extends BaseMessageListener {
 			structureId);
 
 		DDMStructureIndexer structureIndexer =
-			_ddmStructureIndexerRegistry.getDDMStructureIndexer(
+			_ddmStructureIndexerTracker.getDDMStructureIndexer(
 				structure.getClassName());
 
 		List<Long> ddmStructureIds = new ArrayList<>();
@@ -73,7 +74,7 @@ public class DDMStructureReindexMessageListener extends BaseMessageListener {
 	}
 
 	@Reference
-	private DDMStructureIndexerRegistry _ddmStructureIndexerRegistry;
+	private DDMStructureIndexerTracker _ddmStructureIndexerTracker;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

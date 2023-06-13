@@ -14,9 +14,9 @@
 
 package com.liferay.commerce.price.test;
 
-import com.liferay.account.model.AccountEntry;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
@@ -35,6 +35,7 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
+import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalServiceUtil;
 import com.liferay.commerce.product.test.util.CPTestUtil;
@@ -42,12 +43,14 @@ import com.liferay.commerce.tax.model.CommerceTaxMethod;
 import com.liferay.commerce.test.util.CommerceTaxTestUtil;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.commerce.test.util.context.TestCommerceContext;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -65,6 +68,7 @@ import org.frutilla.FrutillaRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,20 +88,27 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 			PermissionCheckerMethodTestRule.INSTANCE,
 			SynchronousDestinationTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
-		_user = UserTestUtil.addUser();
-
-		_accountEntry = CommerceAccountTestUtil.getPersonAccountEntry(
-			_user.getUserId());
+		_commerceAccount =
+			_commerceAccountLocalService.getPersonalCommerceAccount(
+				_user.getUserId());
 
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
 			_group.getCompanyId());
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
-			_group.getCompanyId(), _group.getGroupId(), _user.getUserId());
+			_company.getCompanyId(), _group.getGroupId(), _user.getUserId());
 
 		_commerceChannel = CommerceTestUtil.addCommerceChannel(
 			_group.getGroupId(), _commerceCurrency.getCode());
@@ -109,7 +120,7 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 	@After
 	public void tearDown() throws Exception {
 		_commercePriceListLocalService.deleteCommercePriceLists(
-			_group.getCompanyId());
+			_company.getCompanyId());
 	}
 
 	@Test
@@ -156,8 +167,8 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 			commercePriceList.getCommercePriceListId(), price);
 
 		CommerceContext commerceContext = new TestCommerceContext(
-			_accountEntry, _commerceCurrency, _commerceChannel, _user, _group,
-			null);
+			_commerceCurrency, _commerceChannel, _user, _group,
+			_commerceAccount, null);
 
 		int quantity = 1;
 
@@ -171,10 +182,12 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 		commerceProductPriceRequest.setQuantity(quantity);
 		commerceProductPriceRequest.setSecure(false);
 
-		_assertCommerceProductPrice(
-			quantity, rate, price, true,
+		CommerceProductPrice commerceProductPrice =
 			_commerceProductPriceCalculation.getCommerceProductPrice(
-				commerceProductPriceRequest),
+				commerceProductPriceRequest);
+
+		_assertCommerceProductPrice(
+			quantity, rate, price, true, commerceProductPrice,
 			RoundingMode.valueOf(_commerceCurrency.getRoundingMode()));
 	}
 
@@ -190,7 +203,7 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 				commerceTaxIncludedChannel.getSiteGroupId(),
 				commerceTaxIncludedChannel.getName(),
 				commerceTaxIncludedChannel.getType(),
-				commerceTaxIncludedChannel.getTypeSettingsUnicodeProperties(),
+				commerceTaxIncludedChannel.getTypeSettingsProperties(),
 				commerceTaxIncludedChannel.getCommerceCurrencyCode(),
 				CommercePricingConstants.TAX_INCLUDED_IN_PRICE,
 				commerceTaxIncludedChannel.isDiscountsTargetNetPrice());
@@ -242,8 +255,8 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 			commercePriceList.getCommercePriceListId(), price);
 
 		CommerceContext commerceContext = new TestCommerceContext(
-			_accountEntry, _commerceCurrency, commerceTaxIncludedChannel, _user,
-			_group, null);
+			_commerceCurrency, commerceTaxIncludedChannel, _user, _group,
+			_commerceAccount, null);
 
 		int quantity = 1;
 
@@ -257,10 +270,12 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 		commerceProductPriceRequest.setQuantity(quantity);
 		commerceProductPriceRequest.setSecure(false);
 
-		_assertCommerceProductPrice(
-			quantity, rate, price, false,
+		CommerceProductPrice commerceProductPrice =
 			_commerceProductPriceCalculation.getCommerceProductPrice(
-				commerceProductPriceRequest),
+				commerceProductPriceRequest);
+
+		_assertCommerceProductPrice(
+			quantity, rate, price, false, commerceProductPrice,
 			RoundingMode.valueOf(_commerceCurrency.getRoundingMode()));
 	}
 
@@ -354,10 +369,13 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 			finalPrice.stripTrailingZeros());
 	}
 
+	private static Company _company;
 	private static User _user;
 
-	@DeleteAfterTestRun
-	private AccountEntry _accountEntry;
+	private CommerceAccount _commerceAccount;
+
+	@Inject
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Inject
 	private CommerceCatalogLocalService _commerceCatalogLocalService;
@@ -378,6 +396,9 @@ public class CommerceProductPriceCalculationWithTaxV2Test {
 
 	@Inject
 	private CPDefinitionLocalService _cpDefinitionLocalService;
+
+	@Inject
+	private CPInstanceLocalService _cpInstanceLocalService;
 
 	private Group _group;
 	private ServiceContext _serviceContext;

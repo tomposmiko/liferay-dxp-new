@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 
 /**
@@ -28,21 +29,22 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormWebConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	service = DDMFormWebConfigurationActivator.class
 )
 public class DDMFormWebConfigurationActivator {
 
 	public DDMFormWebConfiguration getDDMFormWebConfiguration() {
-		return _ddmFormWebConfiguration;
+		return _formWebConfiguration;
 	}
 
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_ddmFormWebConfiguration = ConfigurableUtil.createConfigurable(
+		_formWebConfiguration = ConfigurableUtil.createConfigurable(
 			DDMFormWebConfiguration.class, properties);
 	}
 
-	private volatile DDMFormWebConfiguration _ddmFormWebConfiguration;
+	private volatile DDMFormWebConfiguration _formWebConfiguration;
 
 }

@@ -12,16 +12,17 @@
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
+import {ClaySelect} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import ClayTabs from '@clayui/tabs';
-import {openConfirmModal, sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
 import SegmentsExperimentsContext from '../context.es';
 import {archiveExperiment} from '../state/actions.es';
 import {DispatchContext, StateContext} from '../state/context.es';
+import {SegmentsExperienceType} from '../types.es';
 import {NO_EXPERIMENT_ILLUSTRATION_FILE_NAME} from '../util/contants.es';
 import {navigateToExperience} from '../util/navigation.es';
 import {
@@ -47,7 +48,9 @@ function SegmentsExperiments({
 	onDeleteSegmentsExperiment,
 	onEditSegmentsExperiment,
 	onEditSegmentsExperimentStatus,
+	onSelectSegmentsExperienceChange,
 	onTargetChange,
+	segmentsExperiences = [],
 }) {
 	const [dropdown, setDropdown] = useState(false);
 	const [activeTab, setActiveTab] = useState(TABS_STATES.ACTIVE);
@@ -60,6 +63,9 @@ function SegmentsExperiments({
 	const {APIService, imagesPath} = useContext(SegmentsExperimentsContext);
 	const dispatch = useContext(DispatchContext);
 
+	const _selectedExperienceId = experiment
+		? experiment.segmentsExperienceId
+		: selectedExperienceId;
 	const noExperimentIllustration = `${imagesPath}${NO_EXPERIMENT_ILLUSTRATION_FILE_NAME}`;
 	const winnerVariant = variants.find((variant) => variant.winner === true);
 	const goalTarget = experiment?.goal?.target?.replace('#', '');
@@ -73,22 +79,47 @@ function SegmentsExperiments({
 
 	return (
 		<>
+			{segmentsExperiences.length > 1 && (
+				<>
+					<div className="form-group">
+						<label>
+							{Liferay.Language.get('select-experience')}
+						</label>
+						<ClaySelect
+							defaultValue={_selectedExperienceId}
+							onChange={_handleExperienceSelection}
+						>
+							{segmentsExperiences.map((segmentsExperience) => {
+								return (
+									<ClaySelect.Option
+										key={
+											segmentsExperience.segmentsExperienceId
+										}
+										label={segmentsExperience.name}
+										value={
+											segmentsExperience.segmentsExperienceId
+										}
+									/>
+								);
+							})}
+						</ClaySelect>
+					</div>
+					<hr />
+				</>
+			)}
+
 			<ClayTabs justified={true}>
 				<ClayTabs.Item
-					active={activeTab === TABS_STATES.ACTIVE}
-					className="c-pt-1"
+					active={activeTab == TABS_STATES.ACTIVE}
 					onClick={() => setActiveTab(TABS_STATES.ACTIVE)}
 				>
 					{Liferay.Language.get('active-test')}
 				</ClayTabs.Item>
-
 				<ClayTabs.Item
-					active={activeTab === TABS_STATES.HISTORY}
-					className="c-pt-1"
+					active={activeTab == TABS_STATES.HISTORY}
 					onClick={() => setActiveTab(TABS_STATES.HISTORY)}
 				>
-					{Liferay.Language.get('history[record]')}
-
+					{Liferay.Language.get('history')}
 					{' (' + experimentHistory.length + ')'}
 				</ClayTabs.Item>
 			</ClayTabs>
@@ -128,24 +159,13 @@ function SegmentsExperiments({
 											<ClayDropDown.Item
 												onClick={_handleEditExperiment}
 											>
-												<ClayIcon
-													className="c-mr-3 text-4"
-													symbol="pencil"
-												/>
-
 												{Liferay.Language.get('edit')}
 											</ClayDropDown.Item>
-
 											<ClayDropDown.Item
 												onClick={
 													_handleDeleteActiveExperiment
 												}
 											>
-												<ClayIcon
-													className="c-mr-3 text-4"
-													symbol="trash"
-												/>
-
 												{Liferay.Language.get('delete')}
 											</ClayDropDown.Item>
 										</ClayDropDown.ItemList>
@@ -170,7 +190,7 @@ function SegmentsExperiments({
 									<div
 										className="d-inline"
 										dangerouslySetInnerHTML={{
-											__html: sub(
+											__html: Liferay.Util.sub(
 												Liferay.Language.get(
 													'x-is-the-winner-variant'
 												),
@@ -180,7 +200,6 @@ function SegmentsExperiments({
 											),
 										}}
 									/>
-
 									<ClayAlert.Footer>
 										<ClayButton.Group>
 											<ClayButton
@@ -232,29 +251,23 @@ function SegmentsExperiments({
 					)}
 
 					{!experiment && (
-						<div className="segments-experiments-empty-state text-center">
+						<div className="text-center">
 							<img
-								alt={Liferay.Language.get(
-									'create-test-help-message'
-								)}
-								className="mb-3 mt-4 segments-experiments-empty-state__image"
-								height="185"
+								alt=""
+								className="my-3"
 								src={noExperimentIllustration}
-								width="185"
+								width="120px"
 							/>
-
 							<h4 className="text-dark">
 								{Liferay.Language.get(
 									'no-active-tests-were-found-for-the-selected-experience'
 								)}
 							</h4>
-
 							<p>
 								{Liferay.Language.get(
 									'create-test-help-message'
 								)}
 							</p>
-
 							<ClayButton
 								displayType="secondary"
 								onClick={() =>
@@ -268,7 +281,6 @@ function SegmentsExperiments({
 						</div>
 					)}
 				</ClayTabs.TabPane>
-
 				<ClayTabs.TabPane>
 					<ExperimentsHistory
 						experimentHistory={experimentHistory}
@@ -280,18 +292,19 @@ function SegmentsExperiments({
 	);
 
 	function _handleDeleteActiveExperiment() {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					return onDeleteSegmentsExperiment(
-						experiment.segmentsExperimentId
-					);
-				}
-			},
-		});
+		const confirmed = confirm(
+			Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+		);
+
+		if (confirmed) {
+			return onDeleteSegmentsExperiment(experiment.segmentsExperimentId);
+		}
+	}
+
+	function _handleExperienceSelection(event) {
+		const segmentsExperienceId = event.target.value;
+
+		onSelectSegmentsExperienceChange(segmentsExperienceId);
 	}
 
 	function _handleEditExperiment() {
@@ -305,29 +318,28 @@ function SegmentsExperiments({
 			winnerSegmentsExperienceId: experienceId,
 		};
 
-		openConfirmModal({
-			message: Liferay.Language.get(
+		const confirmed = confirm(
+			Liferay.Language.get(
 				'are-you-sure-you-want-to-publish-this-variant'
-			),
-			onConfirm: (isConfimed) => {
-				if (isConfimed) {
-					APIService.publishExperience(body)
-						.then(({segmentsExperiment}) => {
-							openSuccessToast();
+			)
+		);
 
-							dispatch(
-								archiveExperiment({
-									status: segmentsExperiment.status,
-								})
-							);
-							navigateToExperience(experienceId);
+		if (confirmed) {
+			APIService.publishExperience(body)
+				.then(({segmentsExperiment}) => {
+					openSuccessToast();
+
+					dispatch(
+						archiveExperiment({
+							status: segmentsExperiment.status,
 						})
-						.catch((_error) => {
-							openErrorToast();
-						});
-				}
-			},
-		});
+					);
+					navigateToExperience(experienceId);
+				})
+				.catch((_error) => {
+					openErrorToast();
+				});
+		}
 	}
 }
 
@@ -336,7 +348,9 @@ SegmentsExperiments.propTypes = {
 	onDeleteSegmentsExperiment: PropTypes.func.isRequired,
 	onEditSegmentsExperiment: PropTypes.func.isRequired,
 	onEditSegmentsExperimentStatus: PropTypes.func.isRequired,
+	onSelectSegmentsExperienceChange: PropTypes.func.isRequired,
 	onTargetChange: PropTypes.func.isRequired,
+	segmentsExperiences: PropTypes.arrayOf(SegmentsExperienceType),
 };
 
 export default SegmentsExperiments;

@@ -19,7 +19,7 @@
 <c:choose>
 	<c:when test="<%= !themeDisplay.isStatePopUp() %>">
 		<clay:container-fluid
-			cssClass="mt-3"
+			cssClass="lfr-panel-page"
 			id="main-content"
 		>
 			<clay:row>
@@ -81,4 +81,4 @@
 	</c:otherwise>
 </c:choose>
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />

@@ -30,10 +30,6 @@ public class DLFileVersionLocalServiceWrapper
 	implements DLFileVersionLocalService,
 			   ServiceWrapper<DLFileVersionLocalService> {
 
-	public DLFileVersionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLFileVersionLocalServiceWrapper(
 		DLFileVersionLocalService dlFileVersionLocalService) {
 
@@ -388,14 +384,6 @@ public class DLFileVersionLocalServiceWrapper
 		long fileEntryId, int status) {
 
 		return _dlFileVersionLocalService.getFileVersions(fileEntryId, status);
-	}
-
-	@Override
-	public java.util.List<DLFileVersion> getFileVersions(
-		long fileEntryId, int status, int start, int end) {
-
-		return _dlFileVersionLocalService.getFileVersions(
-			fileEntryId, status, start, end);
 	}
 
 	@Override

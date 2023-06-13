@@ -438,11 +438,6 @@ public class SamlPeerBindingWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected SamlPeerBindingWrapper wrap(SamlPeerBinding samlPeerBinding) {
 		return new SamlPeerBindingWrapper(samlPeerBinding);
 	}

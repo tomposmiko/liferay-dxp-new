@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.VirtualLayoutConstants;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolverRegistryUtil;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -43,7 +41,6 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -115,7 +112,7 @@ public class UpdateLanguageActionTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_layout = LayoutTestUtil.addTypePortletLayout(
+		_layout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), false,
 			HashMapBuilder.put(
 				_defaultLocale, "Page in Default Locale"
@@ -190,21 +187,16 @@ public class UpdateLanguageActionTest {
 
 		LayoutSet layoutSet = _layout.getLayoutSet();
 
-		layoutSet.setVirtualHostnames(
-			TreeMapBuilder.put(
-				_VIRTUAL_HOSTNAME, StringPool.BLANK
-			).build());
+		layoutSet.setVirtualHostname(_VIRTUAL_HOSTNAME);
 
-		themeDisplay.setCompany(
-			_companyLocalService.getCompany(_group.getCompanyId()));
 		themeDisplay.setI18nLanguageId(_sourceUKLocale.getLanguage());
 		themeDisplay.setI18nPath("/" + _sourceUKLocale.getLanguage());
+		themeDisplay.setLocale(_sourceUKLocale);
 		themeDisplay.setLayout(_layout);
 		themeDisplay.setLayoutSet(_group.getPublicLayoutSet());
-		themeDisplay.setLocale(_sourceUKLocale);
+		themeDisplay.setSiteGroupId(_group.getGroupId());
 		themeDisplay.setPortalDomain(_VIRTUAL_HOSTNAME);
 		themeDisplay.setPortalURL(Http.HTTP_WITH_SLASH + _VIRTUAL_HOSTNAME);
-		themeDisplay.setSiteGroupId(_group.getGroupId());
 
 		Assert.assertEquals(
 			StringBundler.concat(
@@ -281,10 +273,10 @@ public class UpdateLanguageActionTest {
 
 		mockHttpServletRequest.setParameter("redirect", url);
 
-		Assert.assertEquals(
-			expectedRedirect,
-			updateLanguageAction.getRedirect(
-				mockHttpServletRequest, themeDisplay, _targetLocale));
+		String redirect = updateLanguageAction.getRedirect(
+			mockHttpServletRequest, themeDisplay, _targetLocale);
+
+		Assert.assertEquals(expectedRedirect, redirect);
 	}
 
 	private String _getFriendlyURLSeparatorPart(Locale locale)
@@ -353,11 +345,9 @@ public class UpdateLanguageActionTest {
 		_testGetRedirectWithFriendlyURL(
 			i18n,
 			_getFriendlyURLSeparatorPart(
-				_sourceLocale,
-				FriendlyURLResolverConstants.URL_SEPARATOR_JOURNAL_ARTICLE),
+				_sourceLocale, _FRIENDLY_URL_SEPARATOR_JOURNAL_ARTICLE),
 			_getFriendlyURLSeparatorPart(
-				_targetLocale,
-				FriendlyURLResolverConstants.URL_SEPARATOR_JOURNAL_ARTICLE));
+				_targetLocale, _FRIENDLY_URL_SEPARATOR_JOURNAL_ARTICLE));
 	}
 
 	private void _testGetRedirectWithFriendlyURL(
@@ -373,8 +363,6 @@ public class UpdateLanguageActionTest {
 			themeDisplay.setLocale(_sourceLocale);
 		}
 
-		themeDisplay.setCompany(
-			_companyLocalService.getCompany(_group.getCompanyId()));
 		themeDisplay.setLayout(_layout);
 		themeDisplay.setLayoutSet(_group.getPublicLayoutSet());
 		themeDisplay.setSiteGroupId(_group.getGroupId());
@@ -425,8 +413,6 @@ public class UpdateLanguageActionTest {
 			themeDisplay.setLocale(_sourceLocale);
 		}
 
-		themeDisplay.setCompany(
-			_companyLocalService.getCompany(_group.getCompanyId()));
 		themeDisplay.setLayout(_layout);
 		themeDisplay.setLayoutSet(_group.getPublicLayoutSet());
 		themeDisplay.setSiteGroupId(_group.getGroupId());
@@ -449,6 +435,8 @@ public class UpdateLanguageActionTest {
 			"/" + _sourceLocale.getLanguage() + sourceURL);
 	}
 
+	private static final String _FRIENDLY_URL_SEPARATOR_JOURNAL_ARTICLE = "/w/";
+
 	private static final String _PORTLET_FRIENDLY_URL_PART_ASSET_PUBLISHER =
 		"/-/asset_publisher/instanceID/content/";
 
@@ -464,9 +452,6 @@ public class UpdateLanguageActionTest {
 
 	@Inject
 	private static Portal _portal;
-
-	@Inject
-	private CompanyLocalService _companyLocalService;
 
 	private Group _group;
 	private JournalArticle _journalArticle;

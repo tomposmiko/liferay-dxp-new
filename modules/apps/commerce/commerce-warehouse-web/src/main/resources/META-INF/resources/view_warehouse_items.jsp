@@ -82,13 +82,13 @@ if (Validator.isNotNull(backURL)) {
 
 							<tr data-commerce-inventory-warehouse-id="<%= commerceInventoryWarehouse.getCommerceInventoryWarehouseId() %>" data-commerce-inventory-warehouse-item-id="<%= commerceInventoryWarehouseItemId %>" data-index="<%= curIndex %>" data-mvcc-version="<%= mvccVersion %>">
 								<td>
-									<%= HtmlUtil.escape(commerceInventoryWarehouse.getName(locale)) %>
+									<%= HtmlUtil.escape(commerceInventoryWarehouse.getName()) %>
 								</td>
 								<td>
 									<aui:input id='<%= "commerceInventoryWarehouseItemQuantity" + curIndex %>' label="" name="commerceInventoryWarehouseItemQuantity" value="<%= quantity %>" wrapperCssClass="m-0" />
 								</td>
 								<td class="text-center">
-									<aui:button cssClass="warehouse-save-btn" name='<%= "saveButton" + curIndex %>' primary="<%= true %>" value="save" />
+									<aui:button cssClass="btn-primary warehouse-save-btn" name='<%= "saveButton" + curIndex %>' primary="<%= true %>" value="save" />
 								</td>
 							</tr>
 

@@ -38,8 +38,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Akos Thurzo
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + DummyFolderPortletKeys.DUMMY_FOLDER,
-	service = PortletDataHandler.class
+	service = {DummyFolderPortletDataHandler.class, PortletDataHandler.class}
 )
 public class DummyFolderPortletDataHandler extends BasePortletDataHandler {
 
@@ -144,8 +145,15 @@ public class DummyFolderPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.exportimport.test.util.model.DummyFolder)"
+		target = "(model.class.name=com.liferay.exportimport.test.util.model.DummyFolder)",
+		unbind = "-"
 	)
+	protected void setDummyFolderStagedModelRepository(
+		StagedModelRepository<DummyFolder> dummyFolderStagedModelRepository) {
+
+		_dummyFolderStagedModelRepository = dummyFolderStagedModelRepository;
+	}
+
 	private StagedModelRepository<DummyFolder>
 		_dummyFolderStagedModelRepository;
 

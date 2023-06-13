@@ -20,14 +20,14 @@ import {useConfig} from '../../../core/hooks/useConfig.es';
 import {Pagination} from '../components/Pagination.es';
 import {PaginationControls} from '../components/PaginationControls.es';
 
-export function Container({
+export const Container = ({
 	activePage,
 	children,
 	pageIndex,
 	pages,
 	readOnly,
 	strings,
-}) {
+}) => {
 	const {showSubmitButton, submitLabel} = useConfig();
 
 	return (
@@ -41,7 +41,7 @@ export function Container({
 
 			{pageIndex === activePage && (
 				<>
-					{!!pages.length && (
+					{pages.length > 0 && (
 						<>
 							<Pagination activePage={activePage} pages={pages} />
 							<PaginationControls
@@ -57,7 +57,7 @@ export function Container({
 
 					{!pages.length && showSubmitButton && (
 						<ClayButton
-							className="float-right"
+							className="float-right lfr-ddm-form-submit"
 							id="ddm-form-submit"
 							type="submit"
 						>
@@ -68,6 +68,6 @@ export function Container({
 			)}
 		</div>
 	);
-}
+};
 
 Container.displayName = 'PaginatedVariant.Container';

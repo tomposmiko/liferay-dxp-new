@@ -12,95 +12,97 @@
  * details.
  */
 
-import {ClayIconSpriteContext} from '@clayui/icon';
+import {ReactPortal} from '@liferay/frontend-js-react-web';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect, useMemo} from 'react';
 
-import ConvertToPageTemplateModal from '../../plugins/convert_to_page_template_modal/components/ConvertToPageTemplateModal';
-import {StyleBookContextProvider} from '../../plugins/page_design_options/hooks/useStyleBook';
+import {StyleBookContextProvider} from '../../plugins/page-design-options/hooks/useStyleBook';
 import {INIT} from '../actions/types';
+import {LAYOUT_TYPES} from '../config/constants/layoutTypes';
 import {config} from '../config/index';
 import {CollectionActiveItemContextProvider} from '../contexts/CollectionActiveItemContext';
 import {ControlsProvider} from '../contexts/ControlsContext';
 import {DisplayPagePreviewItemContextProvider} from '../contexts/DisplayPagePreviewItemContext';
 import {EditableProcessorContextProvider} from '../contexts/EditableProcessorContext';
-import {FormValidationContextProvider} from '../contexts/FormValidationContext';
 import {GlobalContextProvider} from '../contexts/GlobalContext';
-import {
-	KeyboardMovementContextProvider,
-	useMovementSource,
-} from '../contexts/KeyboardMovementContext';
-import {StoreContextProvider} from '../contexts/StoreContext';
-import AppHooks from '../hooks/app_hooks/index';
+import {StoreContextProvider, useSelector} from '../contexts/StoreContext';
+import {WidgetsContextProvider} from '../contexts/WidgetsContext';
 import {reducer} from '../reducers/index';
-import {DragAndDropContextProvider} from '../utils/drag_and_drop/useDragAndDrop';
-import CommonStylesManager from './CommonStylesManager';
+import selectLanguageId from '../selectors/selectLanguageId';
+import {DragAndDropContextProvider} from '../utils/drag-and-drop/useDragAndDrop';
 import {DisplayPagePreviewItemSelector} from './DisplayPagePreviewItemSelector';
 import DragPreview from './DragPreview';
-import ItemConfigurationSidebar from './ItemConfigurationSidebar';
-import KeyboardMovementManager from './KeyboardMovementManager';
-import KeyboardMovementPreview from './KeyboardMovementPreview';
-import KeyboardMovementText from './KeyboardMovementText';
-import {LayoutBreadcrumbs} from './LayoutBreadcrumbs';
 import LayoutViewport from './LayoutViewport';
 import ShortcutManager from './ShortcutManager';
 import Sidebar from './Sidebar';
 import Toolbar from './Toolbar';
-import WidgetsManager from './WidgetsManager';
+import URLParser from './URLParser';
+
+const DEFAULT_SESSION_LENGTH = 60 * 1000;
 
 export default function App({state}) {
+	const displayPagePreviewItemSelectorWrapper = useMemo(
+		() =>
+			config.layoutType === LAYOUT_TYPES.display &&
+			document.getElementById('infoItemSelectorContainer'),
+		[]
+	);
+
 	const initialState = reducer(state, {type: INIT});
 
+	useEffect(() => {
+		if (Liferay.Session && config.autoExtendSessionEnabled) {
+			const sessionLength =
+				Liferay.Session.get('sessionLength') || DEFAULT_SESSION_LENGTH;
+
+			const interval = setInterval(() => {
+				Liferay.Session.extend();
+			}, sessionLength / 2);
+
+			return () => clearInterval(interval);
+		}
+	}, []);
+
 	return (
-		<ClayIconSpriteContext.Provider value={config.adminThemeSpritemap}>
-			<StoreContextProvider initialState={initialState} reducer={reducer}>
-				<ConvertToPageTemplateModal />
-
-				<ControlsProvider>
-					<CollectionActiveItemContextProvider>
-						<DragAndDropContextProvider>
-							<EditableProcessorContextProvider>
-								<DisplayPagePreviewItemContextProvider>
-									<AppHooks />
-
-									<DisplayPagePreviewItemSelector dark />
+		<StoreContextProvider initialState={initialState} reducer={reducer}>
+			<LanguageDirection />
+			<URLParser />
+			<ControlsProvider>
+				<CollectionActiveItemContextProvider>
+					<DragAndDropContextProvider>
+						<EditableProcessorContextProvider>
+							<DisplayPagePreviewItemContextProvider>
+								<WidgetsContextProvider>
+									{displayPagePreviewItemSelectorWrapper ? (
+										<ReactPortal
+											container={
+												displayPagePreviewItemSelectorWrapper
+											}
+										>
+											<DisplayPagePreviewItemSelector
+												dark
+											/>
+										</ReactPortal>
+									) : null}
 
 									<DragPreview />
+									<Toolbar />
+									<ShortcutManager />
 
-									<WidgetsManager />
+									<GlobalContextProvider>
+										<LayoutViewport />
 
-									<FormValidationContextProvider>
-										<Toolbar />
-
-										<KeyboardMovementContextProvider>
-											<KeyboardManager />
-
-											<KeyboardMovementPreview />
-
-											<KeyboardMovementText />
-
-											<GlobalContextProvider>
-												<CommonStylesManager />
-
-												<LayoutViewport />
-
-												<LayoutBreadcrumbs />
-
-												<StyleBookContextProvider>
-													<Sidebar />
-
-													<ItemConfigurationSidebar />
-												</StyleBookContextProvider>
-											</GlobalContextProvider>
-										</KeyboardMovementContextProvider>
-									</FormValidationContextProvider>
-								</DisplayPagePreviewItemContextProvider>
-							</EditableProcessorContextProvider>
-						</DragAndDropContextProvider>
-					</CollectionActiveItemContextProvider>
-				</ControlsProvider>
-			</StoreContextProvider>
-		</ClayIconSpriteContext.Provider>
+										<StyleBookContextProvider>
+											<Sidebar />
+										</StyleBookContextProvider>
+									</GlobalContextProvider>
+								</WidgetsContextProvider>
+							</DisplayPagePreviewItemContextProvider>
+						</EditableProcessorContextProvider>
+					</DragAndDropContextProvider>
+				</CollectionActiveItemContextProvider>
+			</ControlsProvider>
+		</StoreContextProvider>
 	);
 }
 
@@ -108,8 +110,18 @@ App.propTypes = {
 	state: PropTypes.object.isRequired,
 };
 
-function KeyboardManager() {
-	const movementSource = useMovementSource();
+const LanguageDirection = () => {
+	const languageId = useSelector(selectLanguageId);
 
-	return movementSource ? <KeyboardMovementManager /> : <ShortcutManager />;
-}
+	useEffect(() => {
+		const currentLanguageDirection = Liferay.Language.direction[languageId];
+		const wrapper = document.getElementById('wrapper');
+
+		if (wrapper) {
+			wrapper.dir = currentLanguageDirection;
+			wrapper.lang = languageId;
+		}
+	}, [languageId]);
+
+	return null;
+};

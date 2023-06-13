@@ -35,8 +35,8 @@ import org.osgi.service.component.annotations.ReferencePolicy;
  * @author Shuyang Zhou
  */
 @Component(
-	configurationPid = "com.liferay.portal.cache.multiple.configuration.PortalCacheClusterConfiguration",
-	enabled = false, service = PortalCacheClusterLink.class
+	configurationPid = "com.liferay.portal.cache.cluster.configuration.PortalCacheClusterConfiguration",
+	enabled = false, immediate = true, service = PortalCacheClusterLink.class
 )
 public class PortalCacheClusterLink {
 

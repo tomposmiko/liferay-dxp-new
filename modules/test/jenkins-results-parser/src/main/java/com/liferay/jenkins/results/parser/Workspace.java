@@ -42,6 +42,4 @@ public interface Workspace {
 
 	public void waitForSynchronizeToGitHubDev();
 
-	public void writePropertiesFiles();
-
 }

@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.model.PortletPreferencesIds;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.workflow.kaleo.internal.upgrade.helper.v1_3_0.WorkflowContextUpgradeHelper;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_3_0.WorkflowContextUpgradeHelper;
 import com.liferay.portal.workflow.kaleo.runtime.util.WorkflowContextUtil;
 
 import java.io.Serializable;
@@ -45,12 +45,12 @@ public class WorkflowContextUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateTable("KaleoInstance", "kaleoInstanceId");
-		_updateTable("KaleoLog", "kaleoLogId");
-		_updateTable("KaleoTaskInstanceToken", "kaleoTaskInstanceTokenId");
+		updateTable("KaleoInstance", "kaleoInstanceId");
+		updateTable("KaleoLog", "kaleoLogId");
+		updateTable("KaleoTaskInstanceToken", "kaleoTaskInstanceTokenId");
 	}
 
-	private JSONSerializer _getJSONSerializer() throws Exception {
+	protected JSONSerializer getJSONSerializer() throws Exception {
 		if (_jsonSerializer == null) {
 			_jsonSerializer = new JSONSerializer();
 
@@ -63,7 +63,7 @@ public class WorkflowContextUpgradeProcess extends UpgradeProcess {
 		return _jsonSerializer;
 	}
 
-	private void _updateTable(String tableName, String fieldName)
+	protected void updateTable(String tableName, String fieldName)
 		throws Exception {
 
 		try (LoggingTimer loggingTimer = new LoggingTimer(tableName);
@@ -74,7 +74,7 @@ public class WorkflowContextUpgradeProcess extends UpgradeProcess {
 					"not like '%serializable%'"));
 			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-			JSONSerializer jsonSerializer = _getJSONSerializer();
+			JSONSerializer jsonSerializer = getJSONSerializer();
 
 			while (resultSet.next()) {
 				String workflowContextJSON = resultSet.getString(
@@ -98,14 +98,14 @@ public class WorkflowContextUpgradeProcess extends UpgradeProcess {
 					_workflowContextUpgradeHelper.renameEntryClassName(
 						workflowContext);
 
-				_updateWorkflowContext(
+				updateWorkflowContext(
 					tableName, fieldName, fieldValue,
 					WorkflowContextUtil.convert(workflowContext));
 			}
 		}
 	}
 
-	private void _updateWorkflowContext(
+	protected void updateWorkflowContext(
 			String tableName, String primaryKeyName, long primaryKeyValue,
 			String workflowContext)
 		throws Exception {

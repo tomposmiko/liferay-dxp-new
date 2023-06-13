@@ -29,6 +29,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS_ADMIN,
 	service = ConfigurationAction.class
 )
@@ -58,12 +60,21 @@ public class BookmarksAdminConfigurationAction
 		validateEmail(actionRequest, "emailMessageAdded");
 		validateEmail(actionRequest, "emailMessageUpdated");
 		validateEmailFrom(actionRequest);
-		_validateRootFolder(actionRequest);
+		validateRootFolder(actionRequest);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	private void _validateRootFolder(ActionRequest actionRequest)
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.bookmarks.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected void validateRootFolder(ActionRequest actionRequest)
 		throws Exception {
 
 		long rootFolderId = GetterUtil.getLong(
@@ -78,7 +89,7 @@ public class BookmarksAdminConfigurationAction
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchFolderException);
+					_log.debug(noSuchFolderException, noSuchFolderException);
 				}
 
 				SessionErrors.add(actionRequest, "rootFolderIdInvalid");

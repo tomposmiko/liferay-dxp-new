@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * @author Adolfo Pérez
  */
-public abstract class BaseReplacePortletId extends BasePortletIdUpgradeProcess {
+public abstract class BaseReplacePortletId extends BaseUpgradePortletId {
 
 	@Override
 	protected void doUpgrade() throws Exception {

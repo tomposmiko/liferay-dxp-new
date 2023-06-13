@@ -12,14 +12,10 @@
  * details.
  */
 
-import {
-	MARK_NAVIGATION_START,
-	MARK_VIEW_DURATION,
-	PAGE,
-} from '../utils/constants';
+import {MARK_NAVIGATION_START, MARK_VIEW_DURATION} from '../utils/constants';
 import {getDuration} from '../utils/performance';
 
-const applicationId = PAGE;
+const applicationId = 'Page';
 
 /**
  * Sends page load information on the window load event

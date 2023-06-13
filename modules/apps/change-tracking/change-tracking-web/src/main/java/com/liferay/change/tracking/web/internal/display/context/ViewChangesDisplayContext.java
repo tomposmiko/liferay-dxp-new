@@ -16,32 +16,30 @@ package com.liferay.change.tracking.web.internal.display.context;
 
 import com.liferay.change.tracking.closure.CTClosure;
 import com.liferay.change.tracking.closure.CTClosureFactory;
-import com.liferay.change.tracking.constants.CTActionKeys;
 import com.liferay.change.tracking.constants.CTConstants;
-import com.liferay.change.tracking.mapping.CTMappingTableInfo;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.model.CTEntryTable;
-import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTSchemaVersionLocalService;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
 import com.liferay.change.tracking.web.internal.configuration.CTConfiguration;
 import com.liferay.change.tracking.web.internal.display.BasePersistenceRegistry;
+import com.liferay.change.tracking.web.internal.display.CTClosureUtil;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
 import com.liferay.change.tracking.web.internal.display.CTModelDisplayRendererAdapter;
 import com.liferay.change.tracking.web.internal.scheduler.PublishScheduler;
 import com.liferay.change.tracking.web.internal.scheduler.ScheduledPublishInfo;
 import com.liferay.change.tracking.web.internal.security.permission.resource.CTCollectionPermission;
-import com.liferay.change.tracking.web.internal.security.permission.resource.CTPermission;
 import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
 import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
+import com.liferay.portal.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.dao.orm.ORMException;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -53,10 +51,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupedModel;
-import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserTable;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -67,10 +63,8 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.util.PropsValues;
 
 import java.io.Serializable;
 
@@ -82,6 +76,7 @@ import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -103,24 +98,23 @@ import javax.servlet.http.HttpServletRequest;
 public class ViewChangesDisplayContext {
 
 	public ViewChangesDisplayContext(
-		long activeCTCollectionId,
-		BasePersistenceRegistry basePersistenceRegistry,
-		CTClosureFactory ctClosureFactory, CTCollection ctCollection,
-		CTCollectionLocalService ctCollectionLocalService,
-		CTConfiguration ctConfiguration,
-		CTDisplayRendererRegistry ctDisplayRendererRegistry,
-		CTEntryLocalService ctEntryLocalService,
-		CTSchemaVersionLocalService ctSchemaVersionLocalService,
-		GroupLocalService groupLocalService, Language language, Portal portal,
-		PublicationsDisplayContext publicationsDisplayContext,
-		PublishScheduler publishScheduler, RenderRequest renderRequest,
-		RenderResponse renderResponse, UserLocalService userLocalService) {
+			long activeCTCollectionId,
+			BasePersistenceRegistry basePersistenceRegistry,
+			CTClosureFactory ctClosureFactory, CTCollection ctCollection,
+			CTConfiguration ctConfiguration,
+			CTDisplayRendererRegistry ctDisplayRendererRegistry,
+			CTEntryLocalService ctEntryLocalService,
+			CTSchemaVersionLocalService ctSchemaVersionLocalService,
+			GroupLocalService groupLocalService, Language language,
+			Portal portal, PublishScheduler publishScheduler,
+			RenderRequest renderRequest, RenderResponse renderResponse,
+			UserLocalService userLocalService)
+		throws PortalException {
 
 		_activeCTCollectionId = activeCTCollectionId;
 		_basePersistenceRegistry = basePersistenceRegistry;
 		_ctClosureFactory = ctClosureFactory;
 		_ctCollection = ctCollection;
-		_ctCollectionLocalService = ctCollectionLocalService;
 		_ctConfiguration = ctConfiguration;
 		_ctDisplayRendererRegistry = ctDisplayRendererRegistry;
 		_ctEntryLocalService = ctEntryLocalService;
@@ -128,13 +122,22 @@ public class ViewChangesDisplayContext {
 		_groupLocalService = groupLocalService;
 		_language = language;
 		_portal = portal;
-		_publicationsDisplayContext = publicationsDisplayContext;
 		_publishScheduler = publishScheduler;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 		_userLocalService = userLocalService;
 
-		_httpServletRequest = portal.getHttpServletRequest(renderRequest);
+		int count = _ctEntryLocalService.getCTCollectionCTEntriesCount(
+			_ctCollection.getCtCollectionId());
+
+		if (count > 0) {
+			_hasChanges = true;
+		}
+		else {
+			_hasChanges = false;
+		}
+
+		_httpServletRequest = _portal.getHttpServletRequest(renderRequest);
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -157,17 +160,29 @@ public class ViewChangesDisplayContext {
 		return portletURL.toString();
 	}
 
-	public Map<String, Object> getReactData() throws Exception {
+	public CTCollection getCtCollection() {
+		return _ctCollection;
+	}
+
+	public Map<String, Object> getDropdownReactData(
+			PermissionChecker permissionChecker)
+		throws Exception {
+
+		JSONArray jsonArray = _getDropdownItemsJSONArray(permissionChecker);
+
+		if (jsonArray.length() == 0) {
+			return null;
+		}
+
+		return Collections.singletonMap("dropdownItems", jsonArray);
+	}
+
+	public Map<String, Object> getReactData() throws PortalException {
 		JSONObject contextViewJSONObject = null;
 
 		CTClosure ctClosure = null;
 
-		int ctEntriesCount = _ctEntryLocalService.getCTCollectionCTEntriesCount(
-			_ctCollection.getCtCollectionId());
-
-		if ((_ctCollection.getStatus() != WorkflowConstants.STATUS_APPROVED) &&
-			(ctEntriesCount <= _ctConfiguration.contextViewLimitCount())) {
-
+		if (_ctCollection.getStatus() != WorkflowConstants.STATUS_APPROVED) {
 			try {
 				ctClosure = _ctClosureFactory.create(
 					_ctCollection.getCtCollectionId());
@@ -178,7 +193,7 @@ public class ViewChangesDisplayContext {
 					_language.get(
 						_httpServletRequest, "context-view-is-unavailable"));
 
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -243,15 +258,13 @@ public class ViewChangesDisplayContext {
 			}
 		}
 
-		boolean showHideable = ParamUtil.getBoolean(
-			_renderRequest, "showHideable");
 		Map<Long, String> typeNameCacheMap = new HashMap<>();
 
 		for (Map.Entry<Long, Set<Long>> entry :
 				classNameIdClassPKsMap.entrySet()) {
 
 			_populateEntryValues(
-				modelInfoMap, entry.getKey(), entry.getValue(), showHideable,
+				modelInfoMap, entry.getKey(), entry.getValue(),
 				typeNameCacheMap);
 		}
 
@@ -267,7 +280,12 @@ public class ViewChangesDisplayContext {
 			}
 		}
 
+		Set<Long> rootClassNameIds = _getRootClassNameIds(ctClosure);
+
 		return HashMapBuilder.<String, Object>put(
+			"activeCTCollection",
+			_ctCollection.getCtCollectionId() == _activeCTCollectionId
+		).put(
 			"changes",
 			() -> {
 				JSONArray changesJSONArray = JSONFactoryUtil.createJSONArray();
@@ -284,94 +302,12 @@ public class ViewChangesDisplayContext {
 			"changeTypesFromURL",
 			ParamUtil.getString(_renderRequest, "changeTypes")
 		).put(
-			"collaboratorsData",
-			_publicationsDisplayContext.getCollaboratorsReactData(
-				_ctCollection.getCtCollectionId(), false)
-		).put(
-			"columnFromURL", ParamUtil.getString(_renderRequest, "column")
-		).put(
 			"contextView",
 			_getContextViewJSONObject(
-				ctClosure, modelInfoMap, contextViewJSONObject,
-				typeNameCacheMap)
+				ctClosure, modelInfoMap, rootClassNameIds,
+				contextViewJSONObject, typeNameCacheMap)
 		).put(
 			"ctCollectionId", _ctCollection.getCtCollectionId()
-		).put(
-			"ctCollections",
-			JSONUtil.toJSONArray(
-				_ctCollectionLocalService.getCTCollections(
-					_themeDisplay.getCompanyId(),
-					WorkflowConstants.STATUS_DRAFT, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null),
-				ctCollection -> JSONUtil.put(
-					"ctCollectionId",
-					String.valueOf(ctCollection.getCtCollectionId())
-				).put(
-					"name", ctCollection.getName()
-				))
-		).put(
-			"ctMappingInfos",
-			() -> {
-				JSONArray ctMappingInfosJSONArray =
-					JSONFactoryUtil.createJSONArray();
-
-				List<CTMappingTableInfo> ctMappingTableInfos =
-					_ctCollectionLocalService.getCTMappingTableInfos(
-						_ctCollection.getCtCollectionId());
-
-				for (CTMappingTableInfo ctMappingTableInfo :
-						ctMappingTableInfos) {
-
-					String description = StringPool.BLANK;
-
-					List<Map.Entry<Long, Long>> addedMappings =
-						ctMappingTableInfo.getAddedMappings();
-
-					if (!addedMappings.isEmpty()) {
-						description = StringBundler.concat(
-							addedMappings.size(), StringPool.SPACE,
-							_language.get(_themeDisplay.getLocale(), "added"));
-					}
-
-					List<Map.Entry<Long, Long>> removedMappings =
-						ctMappingTableInfo.getRemovedMappings();
-
-					if (!removedMappings.isEmpty()) {
-						if (Validator.isNotNull(description)) {
-							description = description.concat(", ");
-						}
-
-						description = StringBundler.concat(
-							description, removedMappings.size(),
-							StringPool.SPACE,
-							_language.get(
-								_themeDisplay.getLocale(), "removed"));
-					}
-
-					ctMappingInfosJSONArray.put(
-						JSONUtil.put(
-							"description", description
-						).put(
-							"name",
-							StringBundler.concat(
-								_ctDisplayRendererRegistry.getTypeName(
-									_themeDisplay.getLocale(),
-									_portal.getClassNameId(
-										ctMappingTableInfo.
-											getLeftModelClass())),
-								" & ",
-								_ctDisplayRendererRegistry.getTypeName(
-									_themeDisplay.getLocale(),
-									_portal.getClassNameId(
-										ctMappingTableInfo.
-											getRightModelClass())))
-						).put(
-							"tableName", ctMappingTableInfo.getTableName()
-						));
-				}
-
-				return ctMappingInfosJSONArray;
-			}
 		).put(
 			"currentUserId", _themeDisplay.getUserId()
 		).put(
@@ -379,9 +315,6 @@ public class ViewChangesDisplayContext {
 			() -> {
 				ResourceURL dataURL = _renderResponse.createResourceURL();
 
-				dataURL.setParameter(
-					"activeCTCollectionId",
-					String.valueOf(_activeCTCollectionId));
 				dataURL.setParameter("localize", Boolean.TRUE.toString());
 				dataURL.setResourceID("/change_tracking/get_entry_render_data");
 
@@ -412,82 +345,6 @@ public class ViewChangesDisplayContext {
 				return deleteCTCommentURL.toString();
 			}
 		).put(
-			"deltaFromURL", ParamUtil.getString(_renderRequest, "delta")
-		).put(
-			"description",
-			() -> {
-				if (_ctCollection.getStatus() ==
-						WorkflowConstants.STATUS_APPROVED) {
-
-					String description = _ctCollection.getDescription();
-
-					if (Validator.isNotNull(description)) {
-						description = description.concat(" | ");
-					}
-
-					Format format = FastDateFormatFactoryUtil.getDateTime(
-						_themeDisplay.getLocale(), _themeDisplay.getTimeZone());
-
-					return description.concat(
-						_language.format(
-							_httpServletRequest, "published-by-x-on-x",
-							new Object[] {
-								_ctCollection.getUserName(),
-								format.format(_ctCollection.getStatusDate())
-							},
-							false));
-				}
-				else if (_ctCollection.getStatus() ==
-							WorkflowConstants.STATUS_SCHEDULED) {
-
-					String description = _ctCollection.getDescription();
-
-					if (_publishScheduler == null) {
-						return description;
-					}
-
-					ScheduledPublishInfo scheduledPublishInfo =
-						_publishScheduler.getScheduledPublishInfo(
-							_ctCollection);
-
-					if (scheduledPublishInfo != null) {
-						Format format = FastDateFormatFactoryUtil.getDateTime(
-							_themeDisplay.getLocale(),
-							_themeDisplay.getTimeZone());
-
-						if (Validator.isNotNull(description)) {
-							description = description.concat(" | ");
-						}
-
-						description = description.concat(
-							_language.format(
-								_httpServletRequest, "publishing-x",
-								new Object[] {
-									format.format(
-										scheduledPublishInfo.getStartDate())
-								},
-								false));
-
-						User user = _userLocalService.fetchUser(
-							scheduledPublishInfo.getUserId());
-
-						if (user != null) {
-							return StringBundler.concat(
-								description, " | ",
-								_language.format(
-									_httpServletRequest, "scheduled-by-x",
-									new Object[] {user.getFullName()}, false));
-						}
-
-						return description;
-					}
-
-					return StringPool.BLANK;
-				}
-
-				return _ctCollection.getDescription();
-			}
-		).put(
 			"discardURL",
 			PortletURLBuilder.createRenderURL(
 				_renderResponse
@@ -499,16 +356,8 @@ public class ViewChangesDisplayContext {
 				"ctCollectionId", _ctCollection.getCtCollectionId()
 			).buildString()
 		).put(
-			"dropdownItems",
-			_getDropdownItemsJSONArray(_themeDisplay.getPermissionChecker())
-		).put(
-			"entryFromURL", ParamUtil.getString(_renderRequest, "entry")
-		).put(
 			"expired",
-			(_ctCollection.getStatus() == WorkflowConstants.STATUS_EXPIRED) ||
-			((_ctCollection.getStatus() == WorkflowConstants.STATUS_APPROVED) &&
-			 !_ctSchemaVersionLocalService.isLatestCTSchemaVersion(
-				 _ctCollection.getSchemaVersionId()))
+			_ctCollection.getStatus() == WorkflowConstants.STATUS_EXPIRED
 		).put(
 			"getCTCommentsURL",
 			() -> {
@@ -542,121 +391,29 @@ public class ViewChangesDisplayContext {
 				return modelDataJSONObject;
 			}
 		).put(
-			"moveChangesURL",
-			PortletURLBuilder.createActionURL(
-				_renderResponse
-			).setActionName(
-				"/change_tracking/move_changes"
-			).setRedirect(
-				PortletURLBuilder.createRenderURL(
-					_renderResponse
-				).setMVCRenderCommandName(
-					"/change_tracking/view_changes"
-				).setParameter(
-					"ctCollectionId", _ctCollection.getCtCollectionId()
-				).buildString()
-			).setParameter(
-				"ctCollectionId", _ctCollection.getCtCollectionId()
-			).buildString()
-		).put(
-			"name", _ctCollection.getName()
-		).put(
 			"namespace", _renderResponse.getNamespace()
 		).put(
-			"navigationFromURL",
-			ParamUtil.getString(_renderRequest, "navigation")
+			"pathFromURL", ParamUtil.getString(_renderRequest, "path")
 		).put(
-			"orderByTypeFromURL",
-			ParamUtil.getString(_renderRequest, "orderByType")
-		).put(
-			"pageFromURL", ParamUtil.getString(_renderRequest, "page")
-		).put(
-			"publishURL",
+			"rootDisplayClasses",
 			() -> {
-				if ((_ctCollection.getStatus() !=
-						WorkflowConstants.STATUS_DRAFT) ||
-					!CTCollectionPermission.contains(
-						_themeDisplay.getPermissionChecker(), _ctCollection,
-						CTActionKeys.PUBLISH)) {
+				JSONArray rootDisplayClassesJSONArray =
+					JSONFactoryUtil.createJSONArray();
 
-					return null;
+				for (long rootClassNameId : rootClassNameIds) {
+					if (classNameIdClassPKsMap.containsKey(rootClassNameId)) {
+						rootDisplayClassesJSONArray.put(
+							_getTypeName(
+								_themeDisplay.getLocale(), rootClassNameId,
+								typeNameCacheMap));
+					}
 				}
 
-				return PortletURLBuilder.createRenderURL(
-					_renderResponse
-				).setMVCRenderCommandName(
-					"/change_tracking/view_conflicts"
-				).setParameter(
-					"ctCollectionId", _ctCollection.getCtCollectionId()
-				).buildString();
+				return rootDisplayClassesJSONArray;
 			}
 		).put(
-			"rescheduleURL",
-			() -> {
-				if ((_ctCollection.getStatus() !=
-						WorkflowConstants.STATUS_SCHEDULED) ||
-					!CTCollectionPermission.contains(
-						_themeDisplay.getPermissionChecker(), _ctCollection,
-						CTActionKeys.PUBLISH)) {
-
-					return null;
-				}
-
-				return PortletURLBuilder.createRenderURL(
-					_renderResponse
-				).setMVCRenderCommandName(
-					"/change_tracking/reschedule_publication"
-				).setParameter(
-					"ctCollectionId", _ctCollection.getCtCollectionId()
-				).buildString();
-			}
-		).put(
-			"revertURL",
-			() -> {
-				if ((_ctCollection.getStatus() !=
-						WorkflowConstants.STATUS_APPROVED) ||
-					!CTPermission.contains(
-						_themeDisplay.getPermissionChecker(),
-						CTActionKeys.ADD_PUBLICATION)) {
-
-					return null;
-				}
-
-				return PortletURLBuilder.createRenderURL(
-					_renderResponse
-				).setMVCRenderCommandName(
-					"/change_tracking/undo_ct_collection"
-				).setParameter(
-					"ctCollectionId", _ctCollection.getCtCollectionId()
-				).setParameter(
-					"revert", true
-				).buildString();
-			}
-		).put(
-			"scheduleURL",
-			() -> {
-				if ((_ctCollection.getStatus() !=
-						WorkflowConstants.STATUS_DRAFT) ||
-					!PropsValues.SCHEDULER_ENABLED ||
-					!CTCollectionPermission.contains(
-						_themeDisplay.getPermissionChecker(), _ctCollection,
-						CTActionKeys.PUBLISH)) {
-
-					return null;
-				}
-
-				return PortletURLBuilder.createRenderURL(
-					_renderResponse
-				).setMVCRenderCommandName(
-					"/change_tracking/view_conflicts"
-				).setParameter(
-					"ctCollectionId", _ctCollection.getCtCollectionId()
-				).setParameter(
-					"schedule", true
-				).buildString();
-			}
-		).put(
-			"showHideableFromURL", showHideable
+			"showHideableFromURL",
+			ParamUtil.getBoolean(_renderRequest, "showHideable")
 		).put(
 			"siteNames",
 			() -> {
@@ -694,19 +451,7 @@ public class ViewChangesDisplayContext {
 		).put(
 			"sitesFromURL", ParamUtil.getString(_renderRequest, "sites")
 		).put(
-			"spritemap", _themeDisplay.getPathThemeSpritemap()
-		).put(
-			"statusLabel",
-			_language.get(
-				_themeDisplay.getLocale(),
-				_publicationsDisplayContext.getStatusLabel(
-					_ctCollection.getStatus()))
-		).put(
-			"statusStyle",
-			_publicationsDisplayContext.getStatusStyle(
-				_ctCollection.getStatus())
-		).put(
-			"total", ctEntriesCount
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"typeNames",
 			() -> {
@@ -726,26 +471,6 @@ public class ViewChangesDisplayContext {
 			}
 		).put(
 			"typesFromURL", ParamUtil.getString(_renderRequest, "types")
-		).put(
-			"unscheduleURL",
-			() -> {
-				if ((_ctCollection.getStatus() !=
-						WorkflowConstants.STATUS_SCHEDULED) ||
-					!CTCollectionPermission.contains(
-						_themeDisplay.getPermissionChecker(), _ctCollection,
-						CTActionKeys.PUBLISH)) {
-
-					return null;
-				}
-
-				return PortletURLBuilder.createActionURL(
-					_renderResponse
-				).setActionName(
-					"/change_tracking/unschedule_publication"
-				).setParameter(
-					"ctCollectionId", _ctCollection.getCtCollectionId()
-				).buildString();
-			}
 		).put(
 			"updateCTCommentURL",
 			() -> {
@@ -772,9 +497,54 @@ public class ViewChangesDisplayContext {
 		).build();
 	}
 
+	public String getScheduledDescription() throws PortalException {
+		if (_publishScheduler == null) {
+			return StringPool.BLANK;
+		}
+
+		ScheduledPublishInfo scheduledPublishInfo =
+			_publishScheduler.getScheduledPublishInfo(_ctCollection);
+
+		if (scheduledPublishInfo != null) {
+			Format format = FastDateFormatFactoryUtil.getDateTime(
+				_themeDisplay.getLocale(), _themeDisplay.getTimeZone());
+
+			String description = _language.format(
+				_httpServletRequest, "publishing-x",
+				new Object[] {
+					format.format(scheduledPublishInfo.getStartDate())
+				},
+				false);
+
+			User user = _userLocalService.fetchUser(
+				scheduledPublishInfo.getUserId());
+
+			if (user != null) {
+				return StringBundler.concat(
+					description, " | ",
+					_language.format(
+						_httpServletRequest, "scheduled-by-x",
+						new Object[] {user.getFullName()}, false));
+			}
+
+			return description;
+		}
+
+		return StringPool.BLANK;
+	}
+
+	public boolean hasChanges() {
+		return _hasChanges;
+	}
+
+	public boolean isExpired(CTCollection ctCollection) {
+		return !_ctSchemaVersionLocalService.isLatestCTSchemaVersion(
+			ctCollection.getSchemaVersionId());
+	}
+
 	private JSONObject _getContextViewJSONObject(
 		CTClosure ctClosure, Map<ModelInfoKey, ModelInfo> modelInfoMap,
-		JSONObject defaultContextViewJSONObject,
+		Set<Long> rootClassNameIds, JSONObject defaultContextViewJSONObject,
 		Map<Long, String> typeNameCacheMap) {
 
 		if (ctClosure == null) {
@@ -823,7 +593,9 @@ public class ViewChangesDisplayContext {
 
 					childrenJSONArray.put(jsonObject);
 
-					if (rootModelKeys.add(modelKey)) {
+					if (rootClassNameIds.contains(modelClassNameId) &&
+						rootModelKeys.add(modelKey)) {
+
 						JSONArray jsonArray = rootDisplayMap.computeIfAbsent(
 							modelClassNameId,
 							key -> JSONFactoryUtil.createJSONArray());
@@ -855,11 +627,11 @@ public class ViewChangesDisplayContext {
 			"everything", everythingJSONObject);
 
 		for (Map.Entry<Long, JSONArray> entry : rootDisplayMap.entrySet()) {
+			String typeName = _getTypeName(
+				_themeDisplay.getLocale(), entry.getKey(), typeNameCacheMap);
+
 			contextViewJSONObject.put(
-				_getTypeName(
-					_themeDisplay.getLocale(), entry.getKey(),
-					typeNameCacheMap),
-				JSONUtil.put("children", entry.getValue()));
+				typeName, JSONUtil.put("children", entry.getValue()));
 		}
 
 		return contextViewJSONObject;
@@ -868,12 +640,6 @@ public class ViewChangesDisplayContext {
 	private JSONArray _getDropdownItemsJSONArray(
 			PermissionChecker permissionChecker)
 		throws Exception {
-
-		if ((_ctCollection.getStatus() != WorkflowConstants.STATUS_DRAFT) &&
-			(_ctCollection.getStatus() != WorkflowConstants.STATUS_EXPIRED)) {
-
-			return null;
-		}
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
@@ -969,6 +735,31 @@ public class ViewChangesDisplayContext {
 			", modelClassNameId=", modelClassNameId, "}");
 	}
 
+	private Set<Long> _getRootClassNameIds(CTClosure ctClosure) {
+		if (ctClosure == null) {
+			return Collections.emptySet();
+		}
+
+		Set<Long> rootClassNameIds = new LinkedHashSet<>();
+
+		for (String className : _ctConfiguration.rootDisplayClassNames()) {
+			rootClassNameIds.add(_portal.getClassNameId(className));
+		}
+
+		for (String childClassName :
+				_ctConfiguration.rootDisplayChildClassNames()) {
+
+			for (long parentClassNameId :
+					CTClosureUtil.getParentClassNameIds(
+						ctClosure, _portal.getClassNameId(childClassName))) {
+
+				rootClassNameIds.add(parentClassNameId);
+			}
+		}
+
+		return rootClassNameIds;
+	}
+
 	private <T extends BaseModel<T>> String _getTitle(
 		long ctCollectionId, CTSQLModeThreadLocal.CTSQLMode ctSQLMode,
 		Locale locale, T model, long modelClassNameId,
@@ -1020,9 +811,8 @@ public class ViewChangesDisplayContext {
 
 	private <T extends BaseModel<T>> void _populateEntryValues(
 			Map<ModelInfoKey, ModelInfo> modelInfoMap, long modelClassNameId,
-			Set<Long> classPKs, boolean showHideable,
-			Map<Long, String> typeNameCacheMap)
-		throws Exception {
+			Set<Long> classPKs, Map<Long, String> typeNameCacheMap)
+		throws PortalException {
 
 		Map<Serializable, T> baseModelMap = null;
 		Map<Serializable, T> ctModelMap = null;
@@ -1043,12 +833,6 @@ public class ViewChangesDisplayContext {
 			CTEntry ctEntry = ctEntryMap.get(classPK);
 
 			if (ctEntry == null) {
-				if (modelClassNameId == _portal.getClassNameId(
-						PortletPreferences.class)) {
-
-					continue;
-				}
-
 				if (baseModelMap == null) {
 					baseModelMap = _basePersistenceRegistry.fetchBaseModelMap(
 						modelClassNameId, classPKs);
@@ -1068,15 +852,10 @@ public class ViewChangesDisplayContext {
 					continue;
 				}
 
-				boolean hideable = _ctDisplayRendererRegistry.isHideable(
-					model, modelClassNameId);
-
-				if (hideable && !showHideable) {
-					continue;
-				}
-
 				modelInfo._jsonObject = JSONUtil.put(
-					"hideable", hideable
+					"hideable",
+					_ctDisplayRendererRegistry.isHideable(
+						model, modelClassNameId)
 				).put(
 					"modelClassNameId", modelClassNameId
 				).put(
@@ -1117,9 +896,7 @@ public class ViewChangesDisplayContext {
 									modelClassNameId, classPKs);
 						}
 
-						if (ctModelMap != null) {
-							model = ctModelMap.get(classPK);
-						}
+						model = ctModelMap.get(classPK);
 					}
 					else {
 						model = _ctDisplayRendererRegistry.fetchCTModel(
@@ -1162,16 +939,6 @@ public class ViewChangesDisplayContext {
 					continue;
 				}
 
-				boolean hideable = _ctDisplayRendererRegistry.isHideable(
-					model, modelClassNameId);
-
-				if (hideable && !showHideable) {
-					continue;
-				}
-
-				Map<String, Object> modelAttributes =
-					model.getModelAttributes();
-
 				Date modifiedDate = ctEntry.getModifiedDate();
 
 				modelInfo._ctEntry = true;
@@ -1181,7 +948,9 @@ public class ViewChangesDisplayContext {
 				).put(
 					"ctEntryId", ctEntry.getCtEntryId()
 				).put(
-					"hideable", hideable
+					"hideable",
+					_ctDisplayRendererRegistry.isHideable(
+						model, modelClassNameId)
 				).put(
 					"modelClassNameId", ctEntry.getModelClassNameId()
 				).put(
@@ -1203,8 +972,6 @@ public class ViewChangesDisplayContext {
 						model, modelClassNameId, typeNameCacheMap)
 				).put(
 					"userId", ctEntry.getUserId()
-				).put(
-					"workflowStatus", (Integer)modelAttributes.get("status")
 				);
 
 				if (model instanceof GroupedModel) {
@@ -1266,16 +1033,15 @@ public class ViewChangesDisplayContext {
 	private final BasePersistenceRegistry _basePersistenceRegistry;
 	private final CTClosureFactory _ctClosureFactory;
 	private final CTCollection _ctCollection;
-	private final CTCollectionLocalService _ctCollectionLocalService;
 	private final CTConfiguration _ctConfiguration;
 	private final CTDisplayRendererRegistry _ctDisplayRendererRegistry;
 	private final CTEntryLocalService _ctEntryLocalService;
 	private final CTSchemaVersionLocalService _ctSchemaVersionLocalService;
 	private final GroupLocalService _groupLocalService;
+	private final boolean _hasChanges;
 	private final HttpServletRequest _httpServletRequest;
 	private final Language _language;
 	private final Portal _portal;
-	private final PublicationsDisplayContext _publicationsDisplayContext;
 	private final PublishScheduler _publishScheduler;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;

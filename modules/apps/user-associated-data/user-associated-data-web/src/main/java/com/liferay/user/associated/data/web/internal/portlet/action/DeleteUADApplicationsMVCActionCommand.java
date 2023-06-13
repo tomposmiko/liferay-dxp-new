@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
 		"mvc.command.name=/user_associated_data/delete_uad_applications"
@@ -57,9 +58,11 @@ public class DeleteUADApplicationsMVCActionCommand
 			for (UADDisplay<?> uadDisplay :
 					uadRegistry.getApplicationUADDisplays(applicationKey)) {
 
+				Class<?> typeClass = uadDisplay.getTypeClass();
+
 				UADAnonymizer<Object> uadAnonymizer =
 					(UADAnonymizer<Object>)uadRegistry.getUADAnonymizer(
-						uadDisplay.getTypeKey());
+						typeClass.getName());
 
 				UADDisplay<Object> objectUADDisplay =
 					(UADDisplay<Object>)uadDisplay;
@@ -74,7 +77,8 @@ public class DeleteUADApplicationsMVCActionCommand
 					}
 					catch (NoSuchModelException noSuchModelException) {
 						if (_log.isDebugEnabled()) {
-							_log.debug(noSuchModelException);
+							_log.debug(
+								noSuchModelException, noSuchModelException);
 						}
 					}
 				}

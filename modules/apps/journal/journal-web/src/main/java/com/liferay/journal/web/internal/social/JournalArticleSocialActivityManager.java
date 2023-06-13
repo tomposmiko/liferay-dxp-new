@@ -42,7 +42,13 @@ public class JournalArticleSocialActivityManager
 		return _socialActivityLocalService;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setSocialActivityLocalService(
+		SocialActivityLocalService socialActivityLocalService) {
+
+		_socialActivityLocalService = socialActivityLocalService;
+	}
+
 	private SocialActivityLocalService _socialActivityLocalService;
 
 }

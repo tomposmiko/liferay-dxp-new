@@ -24,21 +24,12 @@ import com.liferay.portal.kernel.model.BaseModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CommerceTaxMethod.
  *
  * @author Marco Leo
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.tax.model.impl.CommerceTaxMethodImpl",
-		"table.name=CommerceTaxMethod"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommerceTaxMethodModelArgumentsResolver
 	implements ArgumentsResolver {
 

@@ -40,7 +40,7 @@ public class IndicesExistsIndexRequestExecutorImpl
 		IndicesExistsIndexRequest indicesExistsIndexRequest) {
 
 		return new IndicesExistsIndexResponse(
-			_indicesExists(
+			indicesExists(
 				createGetIndexRequest(indicesExistsIndexRequest),
 				indicesExistsIndexRequest));
 	}
@@ -55,7 +55,7 @@ public class IndicesExistsIndexRequestExecutorImpl
 		return getIndexRequest;
 	}
 
-	private boolean _indicesExists(
+	protected boolean indicesExists(
 		GetIndexRequest getIndexRequest,
 		IndicesExistsIndexRequest indicesExistsIndexRequest) {
 
@@ -75,7 +75,13 @@ public class IndicesExistsIndexRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

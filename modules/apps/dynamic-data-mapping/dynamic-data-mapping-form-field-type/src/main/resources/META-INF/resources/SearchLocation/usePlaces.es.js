@@ -36,7 +36,7 @@ const loadScript = (readOnly, elementId, googlePlacesAPIKey, callback) => {
 		script.setAttribute('src', url);
 	}
 
-	const dataLoaded = script.dataset.loaded;
+	const dataLoaded = script.getAttribute('data-loaded');
 
 	if (dataLoaded) {
 		callback();
@@ -67,20 +67,16 @@ async function handlePlaceSelect(autoComplete, setValue) {
 		administrative_area_level_1: 'short_name',
 		administrative_area_level_2: 'long_name',
 		country: 'long_name',
-		locality: 'long_name',
 		postal_code: 'short_name',
 		route: 'long_name',
-		street_number: 'long_name',
 	};
 	const address = {
 		administrative_area_level_1: '',
 		administrative_area_level_2: '',
 		country: '',
 		formatted_address: place?.formatted_address,
-		locality: '',
 		postal_code: '',
 		route: '',
-		street_number: '',
 	};
 
 	for (let i = 0; i < addressComponents.length; i++) {
@@ -92,8 +88,8 @@ async function handlePlaceSelect(autoComplete, setValue) {
 	setValue({
 		target: {
 			value: JSON.stringify({
-				address: address.street_number + ' ' + address.route,
-				city: address.locality,
+				address: address.route,
+				city: address.administrative_area_level_2,
 				country: address.country,
 				place: address.formatted_address,
 				['postal-code']: address.postal_code,
@@ -110,19 +106,14 @@ const usePlaces = ({
 	onChange,
 	viewMode,
 }) => {
-	const autoCompleteRef = useRef();
+	const autoComplete = useRef();
 	const [listener, setListener] = useState();
 	const [value, setValue] = useState();
 
 	useEffect(() => {
 		if (viewMode) {
 			loadScript(isReadOnly, elementId, googlePlacesAPIKey, () =>
-				handleScriptLoad(
-					autoCompleteRef,
-					elementId,
-					setListener,
-					setValue
-				)
+				handleScriptLoad(autoComplete, elementId, setListener, setValue)
 			);
 
 			return () => {

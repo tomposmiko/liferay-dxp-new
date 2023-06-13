@@ -14,12 +14,9 @@
 
 package com.liferay.commerce.order.engine;
 
-import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.order.status.CommerceOrderStatus;
 import com.liferay.portal.kernel.exception.PortalException;
-
-import java.math.BigDecimal;
 
 import java.util.List;
 
@@ -45,19 +42,6 @@ public interface CommerceOrderEngine {
 
 	public CommerceOrder transitionCommerceOrder(
 			CommerceOrder commerceOrder, int orderStatus, long userId)
-		throws PortalException;
-
-	public CommerceOrder updateCommerceOrder(
-			String externalReferenceCode, long commerceOrderId,
-			long billingAddressId, long commerceShippingMethodId,
-			long shippingAddressId, String advanceStatus,
-			String commercePaymentMethodKey, String purchaseOrderNumber,
-			BigDecimal shippingAmount, String shippingOptionName,
-			BigDecimal shippingWithTaxAmount, BigDecimal subtotal,
-			BigDecimal subtotalWithTaxAmount, BigDecimal taxAmount,
-			BigDecimal total, BigDecimal totalDiscountAmount,
-			BigDecimal totalWithTaxAmount, CommerceContext commerceContext,
-			boolean recalculatePrice)
 		throws PortalException;
 
 }

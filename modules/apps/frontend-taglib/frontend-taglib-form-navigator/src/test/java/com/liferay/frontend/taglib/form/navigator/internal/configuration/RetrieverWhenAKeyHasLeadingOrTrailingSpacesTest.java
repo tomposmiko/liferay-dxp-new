@@ -53,7 +53,8 @@ public class RetrieverWhenAKeyHasLeadingOrTrailingSpacesTest
 	public void testTheyAreTrimmed() {
 		List<String> formNavigatorEntryKeys =
 			formNavigatorEntryConfigurationRetriever.getFormNavigatorEntryKeys(
-				"form1", "general", "add");
+				"form1", "general", "add"
+			).get();
 
 		Assert.assertEquals(
 			formNavigatorEntryKeys.toString(), 2,

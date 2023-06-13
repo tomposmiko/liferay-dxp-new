@@ -21,33 +21,34 @@ import com.liferay.commerce.order.rule.model.COREntryRel;
 import com.liferay.commerce.order.rule.service.COREntryLocalService;
 import com.liferay.commerce.order.rule.service.COREntryRelLocalService;
 import com.liferay.commerce.service.CommerceOrderTypeLocalService;
-import com.liferay.commerce.term.model.CommerceTermEntry;
-import com.liferay.commerce.term.model.CommerceTermEntryRel;
-import com.liferay.commerce.term.service.CommerceTermEntryLocalService;
-import com.liferay.commerce.term.service.CommerceTermEntryRelLocalService;
 import com.liferay.headless.commerce.admin.order.client.dto.v1_0.OrderType;
+import com.liferay.headless.commerce.admin.order.client.serdes.v1_0.OrderTypeSerDes;
 import com.liferay.headless.commerce.core.util.DateConfig;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.Inject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Alessio Antonio Rendina
- * @author Stefano Motta
  */
-@DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class OrderTypeResourceTest extends BaseOrderTypeResourceTestCase {
 
@@ -61,28 +62,73 @@ public class OrderTypeResourceTest extends BaseOrderTypeResourceTestCase {
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			testCompany.getCompanyId(), testGroup.getGroupId(),
 			_user.getUserId());
-
-		_commerceTermEntry =
-			_commerceTermEntryLocalService.addCommerceTermEntry(
-				RandomTestUtil.randomString(), _user.getUserId(),
-				RandomTestUtil.randomBoolean(),
-				RandomTestUtil.randomLocaleStringMap(), 1, 1, 2022, 12, 0, 0, 0,
-				0, 0, 0, true, RandomTestUtil.randomLocaleStringMap(),
-				RandomTestUtil.randomString(), RandomTestUtil.nextDouble(),
-				RandomTestUtil.randomString(), StringPool.BLANK,
-				_serviceContext);
-		_corEntry = _corEntryLocalService.addCOREntry(
-			RandomTestUtil.randomString(), _user.getUserId(),
-			RandomTestUtil.randomBoolean(), RandomTestUtil.randomString(), 1, 1,
-			2022, 12, 0, 0, 0, 0, 0, 0, true, RandomTestUtil.randomString(), 0,
-			RandomTestUtil.randomString(), StringPool.BLANK, _serviceContext);
 	}
 
-	@Ignore
+	@After
+	@Override
+	public void tearDown() throws Exception {
+		super.tearDown();
+
+		Iterator<CommerceOrderType> iterator = _commerceOrderTypes.iterator();
+
+		while (iterator.hasNext()) {
+			CommerceOrderType commerceOrderType1 = iterator.next();
+
+			CommerceOrderType commerceOrderType2 =
+				_commerceOrderTypeLocalService.fetchCommerceOrderType(
+					commerceOrderType1.getCommerceOrderTypeId());
+
+			if (commerceOrderType2 != null) {
+				_commerceOrderTypeLocalService.deleteCommerceOrderType(
+					commerceOrderType2.getCommerceOrderTypeId());
+			}
+
+			iterator.remove();
+		}
+	}
+
+	@Override
+	@Test
+	public void testGetOrderRuleOrderTypeOrderType() throws Exception {
+		OrderType postOrderType = _addOrderType(randomOrderType());
+
+		COREntryRel corEntryRel = _getCOREntryRel(postOrderType);
+
+		OrderType getOrderType =
+			orderTypeResource.getOrderRuleOrderTypeOrderType(
+				corEntryRel.getCOREntryRelId());
+
+		assertEquals(postOrderType, getOrderType);
+		assertValid(getOrderType);
+	}
+
+	@Override
+	@Test
+	public void testGraphQLGetOrderRuleOrderTypeOrderType() throws Exception {
+		OrderType orderType = testGraphQLOrderType_addOrderType();
+
+		COREntryRel corEntryRel = _getCOREntryRel(orderType);
+
+		Assert.assertTrue(
+			equals(
+				orderType,
+				OrderTypeSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"orderRuleOrderTypeOrderType",
+								HashMapBuilder.<String, Object>put(
+									"orderRuleOrderTypeId",
+									corEntryRel.getCOREntryRelId()
+								).build(),
+								getGraphQLFields())),
+						"JSONObject/data",
+						"Object/orderRuleOrderTypeOrderType"))));
+	}
+
 	@Override
 	@Test
 	public void testGraphQLGetOrderTypeNotFound() throws Exception {
-		super.testGraphQLGetOrderTypeNotFound();
 	}
 
 	@Override
@@ -94,7 +140,7 @@ public class OrderTypeResourceTest extends BaseOrderTypeResourceTestCase {
 	protected OrderType randomOrderType() {
 		return new OrderType() {
 			{
-				active = true;
+				active = RandomTestUtil.randomBoolean();
 				description = LanguageUtils.getLanguageIdMap(
 					RandomTestUtil.randomLocaleStringMap());
 				displayDate = RandomTestUtil.nextDate();
@@ -104,14 +150,18 @@ public class OrderTypeResourceTest extends BaseOrderTypeResourceTestCase {
 				id = RandomTestUtil.nextLong();
 				name = LanguageUtils.getLanguageIdMap(
 					RandomTestUtil.randomLocaleStringMap());
-				neverExpire = true;
 			}
 		};
 	}
 
 	@Override
+	protected OrderType randomPatchOrderType() throws Exception {
+		return randomOrderType();
+	}
+
+	@Override
 	protected OrderType testDeleteOrderType_addOrderType() throws Exception {
-		return _addCommerceOrderType(randomOrderType());
+		return _addOrderType(randomOrderType());
 	}
 
 	@Override
@@ -119,98 +169,53 @@ public class OrderTypeResourceTest extends BaseOrderTypeResourceTestCase {
 			testDeleteOrderTypeByExternalReferenceCode_addOrderType()
 		throws Exception {
 
-		return _addCommerceOrderType(randomOrderType());
-	}
-
-	@Override
-	protected OrderType testGetOrderRuleOrderTypeOrderType_addOrderType()
-		throws Exception {
-
-		return _addCommerceOrderType(randomOrderType());
-	}
-
-	@Override
-	protected Long testGetOrderRuleOrderTypeOrderType_getOrderRuleOrderTypeId()
-		throws Exception {
-
-		return _corEntryRel.getCOREntryRelId();
+		return _addOrderType(randomOrderType());
 	}
 
 	@Override
 	protected OrderType testGetOrderType_addOrderType() throws Exception {
-		return _addCommerceOrderType(randomOrderType());
+		return _addOrderType(randomOrderType());
 	}
 
 	@Override
 	protected OrderType testGetOrderTypeByExternalReferenceCode_addOrderType()
 		throws Exception {
 
-		return _addCommerceOrderType(randomOrderType());
+		return _addOrderType(randomOrderType());
 	}
 
 	@Override
 	protected OrderType testGetOrderTypesPage_addOrderType(OrderType orderType)
 		throws Exception {
 
-		return _addCommerceOrderType(orderType);
-	}
-
-	@Override
-	protected OrderType testGetTermOrderTypeOrderType_addOrderType()
-		throws Exception {
-
-		return _addCommerceOrderType(randomOrderType());
-	}
-
-	@Override
-	protected Long testGetTermOrderTypeOrderType_getTermOrderTypeId()
-		throws Exception {
-
-		return _commerceTermEntryRel.getCommerceTermEntryRelId();
-	}
-
-	@Override
-	protected Long
-			testGraphQLGetOrderRuleOrderTypeOrderType_getOrderRuleOrderTypeId()
-		throws Exception {
-
-		return _corEntryRel.getCOREntryRelId();
-	}
-
-	@Override
-	protected Long testGraphQLGetTermOrderTypeOrderType_getTermOrderTypeId()
-		throws Exception {
-
-		return _commerceTermEntryRel.getCommerceTermEntryRelId();
+		return _addOrderType(orderType);
 	}
 
 	@Override
 	protected OrderType testGraphQLOrderType_addOrderType() throws Exception {
-		return _addCommerceOrderType(randomOrderType());
+		return _addOrderType(randomOrderType());
 	}
 
 	@Override
 	protected OrderType testPatchOrderType_addOrderType() throws Exception {
-		return _addCommerceOrderType(randomOrderType());
+		return _addOrderType(randomOrderType());
 	}
 
 	@Override
 	protected OrderType testPatchOrderTypeByExternalReferenceCode_addOrderType()
 		throws Exception {
 
-		return _addCommerceOrderType(randomOrderType());
+		return _addOrderType(randomOrderType());
 	}
 
 	@Override
 	protected OrderType testPostOrderType_addOrderType(OrderType orderType)
 		throws Exception {
 
-		return _addCommerceOrderType(orderType);
+		return _addOrderType(orderType);
 	}
 
-	private OrderType _addCommerceOrderType(OrderType orderType)
-		throws Exception {
-
+	private OrderType _addOrderType(OrderType orderType) throws Exception {
 		DateConfig displayDateConfig = DateConfig.toDisplayDateConfig(
 			orderType.getDisplayDate(), _user.getTimeZone());
 		DateConfig expirationDateConfig = DateConfig.toExpirationDateConfig(
@@ -232,16 +237,34 @@ public class OrderTypeResourceTest extends BaseOrderTypeResourceTestCase {
 				GetterUtil.getBoolean(orderType.getNeverExpire(), true),
 				_serviceContext);
 
-		_commerceTermEntryRel =
-			_commerceTermEntryRelLocalService.addCommerceTermEntryRel(
-				_user.getUserId(), CommerceOrderType.class.getName(),
-				commerceOrderType.getCommerceOrderTypeId(),
-				_commerceTermEntry.getCommerceTermEntryId());
-		_corEntryRel = _corEntryRelLocalService.addCOREntryRel(
-			_user.getUserId(), CommerceOrderType.class.getName(),
-			commerceOrderType.getCommerceOrderTypeId(),
-			_corEntry.getCOREntryId());
+		_commerceOrderTypes.add(commerceOrderType);
 
+		return _toOrderType(commerceOrderType);
+	}
+
+	private COREntryRel _getCOREntryRel(OrderType orderType) throws Exception {
+		DateConfig displayDateConfig = DateConfig.toDisplayDateConfig(
+			RandomTestUtil.nextDate(), _user.getTimeZone());
+		DateConfig expirationDateConfig = DateConfig.toExpirationDateConfig(
+			RandomTestUtil.nextDate(), _user.getTimeZone());
+
+		COREntry corEntry = _corEntryLocalService.addCOREntry(
+			RandomTestUtil.randomString(), _user.getUserId(),
+			RandomTestUtil.randomBoolean(), RandomTestUtil.randomString(),
+			displayDateConfig.getMonth(), displayDateConfig.getDay(),
+			displayDateConfig.getYear(), displayDateConfig.getHour(),
+			displayDateConfig.getMinute(), expirationDateConfig.getMonth(),
+			expirationDateConfig.getDay(), expirationDateConfig.getYear(),
+			expirationDateConfig.getHour(), expirationDateConfig.getMinute(),
+			true, RandomTestUtil.randomString(), 0,
+			RandomTestUtil.randomString(), StringPool.BLANK, _serviceContext);
+
+		return _corEntryRelLocalService.addCOREntryRel(
+			_user.getUserId(), CommerceOrderType.class.getName(),
+			orderType.getId(), corEntry.getCOREntryId());
+	}
+
+	private OrderType _toOrderType(CommerceOrderType commerceOrderType) {
 		return new OrderType() {
 			{
 				active = commerceOrderType.isActive();
@@ -262,22 +285,11 @@ public class OrderTypeResourceTest extends BaseOrderTypeResourceTestCase {
 	@Inject
 	private CommerceOrderTypeLocalService _commerceOrderTypeLocalService;
 
-	private CommerceTermEntry _commerceTermEntry;
-
-	@Inject
-	private CommerceTermEntryLocalService _commerceTermEntryLocalService;
-
-	private CommerceTermEntryRel _commerceTermEntryRel;
-
-	@Inject
-	private CommerceTermEntryRelLocalService _commerceTermEntryRelLocalService;
-
-	private COREntry _corEntry;
+	private final List<CommerceOrderType> _commerceOrderTypes =
+		new ArrayList<>();
 
 	@Inject
 	private COREntryLocalService _corEntryLocalService;
-
-	private COREntryRel _corEntryRel;
 
 	@Inject
 	private COREntryRelLocalService _corEntryRelLocalService;

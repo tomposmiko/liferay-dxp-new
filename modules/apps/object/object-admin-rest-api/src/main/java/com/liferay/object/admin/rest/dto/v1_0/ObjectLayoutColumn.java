@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -83,20 +82,20 @@ public class ObjectLayoutColumn implements Serializable {
 	protected Long id;
 
 	@Schema
-	public String getObjectFieldName() {
-		return objectFieldName;
+	public Long getObjectFieldId() {
+		return objectFieldId;
 	}
 
-	public void setObjectFieldName(String objectFieldName) {
-		this.objectFieldName = objectFieldName;
+	public void setObjectFieldId(Long objectFieldId) {
+		this.objectFieldId = objectFieldId;
 	}
 
 	@JsonIgnore
-	public void setObjectFieldName(
-		UnsafeSupplier<String, Exception> objectFieldNameUnsafeSupplier) {
+	public void setObjectFieldId(
+		UnsafeSupplier<Long, Exception> objectFieldIdUnsafeSupplier) {
 
 		try {
-			objectFieldName = objectFieldNameUnsafeSupplier.get();
+			objectFieldId = objectFieldIdUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -108,7 +107,7 @@ public class ObjectLayoutColumn implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String objectFieldName;
+	protected Long objectFieldId;
 
 	@Schema
 	public Integer getPriority() {
@@ -201,18 +200,14 @@ public class ObjectLayoutColumn implements Serializable {
 			sb.append(id);
 		}
 
-		if (objectFieldName != null) {
+		if (objectFieldId != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"objectFieldName\": ");
+			sb.append("\"objectFieldId\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(objectFieldName));
-
-			sb.append("\"");
+			sb.append(objectFieldId);
 		}
 
 		if (priority != null) {
@@ -248,9 +243,9 @@ public class ObjectLayoutColumn implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -276,7 +271,7 @@ public class ObjectLayoutColumn implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -308,7 +303,7 @@ public class ObjectLayoutColumn implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -324,10 +319,5 @@ public class ObjectLayoutColumn implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

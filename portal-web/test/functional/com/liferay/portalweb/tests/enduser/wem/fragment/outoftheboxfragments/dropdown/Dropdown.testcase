@@ -13,14 +13,14 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -28,12 +28,10 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-120190 and LPS-125164. Can add fragments into drop zone of Dropdown fragment."
-	@priority = 5
-	@uitest
+	@description = "This is a test for LPS-120190. Can add fragments into drop zone of Dropdown fragment."
+	@priority = "5"
 	test AddFragmentIntoDropdownPanel {
 		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "Dropdown#AddFragmentIntoDropdownPanel";
 
 		task ("Add a custom master page") {
 			JSONLayoutpagetemplate.addMasterPageTemplateEntry(
@@ -65,19 +63,17 @@ definition {
 				fragmentName = "Menu Display",
 				navTab = "Fragments");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Add a page based on custom master page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				masterLayoutName = "Custom Masters Page Template",
 				pageName = "Test Content Page");
-		}
-
-		task ("Assert the console does not occur NPE error") {
-			AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
 		}
 
 		task ("Assert the dropdown panel is collapsed") {
@@ -98,7 +94,7 @@ definition {
 				key_element = "//div[contains(@class,'alert-info')][normalize-space(text())='There are no menu items to display.']",
 				locator1 = "Fragment#DROPDOWN_FRAGMENT_MENU_CONTENT");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the dropdown panel is collapsed in view mode") {
@@ -126,8 +122,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-120190. Can define the displayed behavior of dropdown panel in Dropdown fragment."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test DefineDisplayedBehaviorOfDropdownPanel {
 		property portal.acceptance = "true";
 
@@ -160,10 +155,10 @@ definition {
 				value1 = "true");
 
 			AssertVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 
 			Click.javaScriptClick(locator1 = "Fragment#DROPDOWN_FRAGMENT_TOGGLE");
 
@@ -173,16 +168,18 @@ definition {
 				value1 = "false");
 
 			AssertNotVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Add a page based on custom master page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				masterLayoutName = "Custom Masters Page Template",
@@ -219,10 +216,10 @@ definition {
 				value1 = "true");
 
 			AssertVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 
 			MouseOver(
 				key_sidebarButton = "Browser",
@@ -234,10 +231,10 @@ definition {
 				value1 = "false");
 
 			AssertNotVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 		}
 
 		task ("Define the Keep Panel Open in Edit Mode as displayed behavior") {
@@ -251,7 +248,7 @@ definition {
 					locator1 = "Checkbox#ANY_CHECKBOX");
 			}
 
-			PageEditor.waitForAutoSave();
+			Pause(locator1 = "3000");
 
 			AssertNotChecked.assertNotCheckedNotVisible(
 				checkboxName = "Display on Hover",
@@ -265,14 +262,16 @@ definition {
 				value1 = "true");
 
 			AssertVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 
 			PageEditor.clickManagementBar();
 
-			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Dropdown");
+			AssertNotVisible(
+				key_fragmentName = "Dropdown",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
 			AssertAttributeValue(
 				attribute1 = "aria-expanded",
@@ -280,10 +279,10 @@ definition {
 				value1 = "true");
 
 			AssertVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 		}
 
 		task ("Define the Display on Hover and Keep Panel Open in Edit Mode as displayed behavior") {
@@ -299,14 +298,16 @@ definition {
 				value1 = "true");
 
 			AssertVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 
 			PageEditor.clickManagementBar();
 
-			PageEditor.viewFragmentHeaderNotVisible(fragmentName = "Dropdown");
+			AssertNotVisible(
+				key_fragmentName = "Dropdown",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
 			AssertAttributeValue(
 				attribute1 = "aria-expanded",
@@ -314,16 +315,15 @@ definition {
 				value1 = "true");
 
 			AssertVisible(
-				key_content = "Place fragments or widgets here.",
+				key_content = "Place fragments here.",
 				key_fragmentClass = "menu",
-				key_position = 1,
-				locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
+				key_position = "1",
+				locator1 = "Fragment#NO_FRAGMENTS_MESSAGE");
 		}
 	}
 
 	@description = "This is a test for LPS-120190. Can define the panel type of Dropdown fragment."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test DefinePanelType {
 		property portal.acceptance = "true";
 
@@ -348,7 +348,7 @@ definition {
 		task ("Add a Dropdown fragment to the second module") {
 			PageEditor.addElementToColumn(
 				collectionName = "Basic Components",
-				columnNumber = 2,
+				columnNumber = "2",
 				fragmentName = "Dropdown",
 				navTab = "Fragments");
 		}
@@ -382,7 +382,7 @@ definition {
 			var moduleContainerWidth = selenium.getAttribute("//div[contains(@class,'col-4')][2]//div[contains(@class,'col__border')]@width");
 
 			AssertVisible(
-				key_panelWidth = ${moduleContainerWidth},
+				key_panelWidth = "${moduleContainerWidth}",
 				locator1 = "Fragment#DROPDOWN_FRAGMENT_MENU_WIDTH");
 		}
 
@@ -398,14 +398,13 @@ definition {
 			var pageEditorWidth = selenium.getAttribute("//div[contains(@class,'layout-viewport')]/div[contains(@id,'page-editor')]@width");
 
 			AssertVisible(
-				key_panelWidth = ${pageEditorWidth},
+				key_panelWidth = "${pageEditorWidth}",
 				locator1 = "Fragment#DROPDOWN_FRAGMENT_MENU_WIDTH");
 		}
 	}
 
 	@description = "This is a test for LPS-120190. Can edit the text of dropdown button in Dropdown fragment."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test EditInlineContent {
 		property portal.acceptance = "true";
 
@@ -440,11 +439,13 @@ definition {
 				fragmentName = "Dropdown",
 				id = "dropdown-text");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Add a page based on custom master page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 			ContentPages.addPage(
 				masterLayoutName = "Custom Masters Page Template",

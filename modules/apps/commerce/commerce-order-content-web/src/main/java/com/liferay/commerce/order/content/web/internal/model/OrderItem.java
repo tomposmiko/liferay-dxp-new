@@ -22,34 +22,28 @@ import java.util.List;
 public class OrderItem {
 
 	public OrderItem(
-		long cpInstanceId, String discount, String[] errorMessages,
-		String formattedQuantity, String formattedSubscriptionPeriod,
-		String name, String options, long orderId, long orderItemId,
+		long orderItemId, long orderId, String sku, String name, String options,
 		List<OrderItem> orderItems, long parentOrderItemId, String price,
-		String promoPrice, int shippedQuantity, String sku, String thumbnail,
-		String total) {
+		String promoPrice, String discount, int quantity, String total,
+		String thumbnail, int shippedQuantity, String[] errorMessages,
+		String formattedSubscriptionPeriod) {
 
-		_cpInstanceId = cpInstanceId;
-		_discount = discount;
-		_errorMessages = errorMessages;
-		_formattedQuantity = formattedQuantity;
-		_formattedSubscriptionPeriod = formattedSubscriptionPeriod;
+		_orderItemId = orderItemId;
+		_orderId = orderId;
+		_sku = sku;
 		_name = name;
 		_options = options;
-		_orderId = orderId;
-		_orderItemId = orderItemId;
 		_orderItems = orderItems;
 		_parentOrderItemId = parentOrderItemId;
 		_price = price;
 		_promoPrice = promoPrice;
-		_shippedQuantity = shippedQuantity;
-		_sku = sku;
-		_thumbnail = thumbnail;
+		_discount = discount;
+		_quantity = quantity;
 		_total = total;
-	}
-
-	public long getCPInstanceId() {
-		return _cpInstanceId;
+		_thumbnail = thumbnail;
+		_shippedQuantity = shippedQuantity;
+		_errorMessages = errorMessages;
+		_formattedSubscriptionPeriod = formattedSubscriptionPeriod;
 	}
 
 	public String getDiscount() {
@@ -58,10 +52,6 @@ public class OrderItem {
 
 	public String[] getErrorMessages() {
 		return _errorMessages;
-	}
-
-	public String getFormattedQuantity() {
-		return _formattedQuantity;
 	}
 
 	public String getFormattedSubscriptionPeriod() {
@@ -100,6 +90,10 @@ public class OrderItem {
 		return _promoPrice;
 	}
 
+	public int getQuantity() {
+		return _quantity;
+	}
+
 	public int getShippedQuantity() {
 		return _shippedQuantity;
 	}
@@ -116,10 +110,8 @@ public class OrderItem {
 		return _total;
 	}
 
-	private final long _cpInstanceId;
 	private final String _discount;
 	private final String[] _errorMessages;
-	private final String _formattedQuantity;
 	private final String _formattedSubscriptionPeriod;
 	private final String _name;
 	private final String _options;
@@ -129,6 +121,7 @@ public class OrderItem {
 	private final long _parentOrderItemId;
 	private final String _price;
 	private final String _promoPrice;
+	private final int _quantity;
 	private final int _shippedQuantity;
 	private final String _sku;
 	private final String _thumbnail;

@@ -192,6 +192,7 @@ components:
                 printedNote:
                     type: string
                 purchaseOrderNumber:
+                    readOnly: true
                     type: string
                 shippingAddress:
                     $ref: "#/components/schemas/Address"
@@ -281,13 +282,6 @@ components:
                 quantity:
                     format: int32
                     type: integer
-                replacedSku:
-                    example: "12341234"
-                    readOnly: true
-                    type: string
-                replacedSkuId:
-                    format: int64
-                    type: integer
                 settings:
                     $ref: "#/components/schemas/Settings"
                 sku:
@@ -306,8 +300,6 @@ components:
                 valid:
                     readOnly: true
                     type: boolean
-            required:
-                - skuId
             type: object
         CouponCode:
             properties:
@@ -510,7 +502,7 @@ components:
 info:
     description:
         "Headless Delivery Commerce Cart API. A Java client JAR is available for use with the group ID 'com.liferay',
-        artifact ID 'com.liferay.headless.commerce.delivery.cart.client', and version '4.0.25'."
+        artifact ID 'com.liferay.headless.commerce.delivery.cart.client', and version '4.0.8'."
     license:
         name: Apache 2.0
         url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -534,9 +526,8 @@ paths:
                   style: simple
             responses:
                 204:
-                    content:
-                        application/json: {}
-                        application/xml: {}
+                    description:
+                        No content
                 401:
                     content:
                         application/json:
@@ -1481,12 +1472,6 @@ paths:
                       type: integer
                   style: simple
                 - in: query
-                  name: skuId
-                  required: false
-                  schema:
-                      format: int64
-                      type: integer
-                - in: query
                   name: page
                   required: false
                   schema:
@@ -1668,28 +1653,6 @@ paths:
                     description:
                         Unexpected error
             tags: ["PaymentMethod"]
-    /carts/{cartId}/payment-url:
-        get:
-            operationId: getCartPaymentURL
-            parameters:
-                - in: path
-                  name: cartId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-                - in: query
-                  name: callbackURL
-                  required: false
-                  schema:
-                      type: string
-            responses:
-                200:
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
-            tags: ["Cart"]
     /carts/{cartId}/shipping-address:
         get:
             description:
@@ -1844,11 +1807,6 @@ paths:
                   required: false
                   schema:
                       type: integer
-                - in: query
-                  name: search
-                  required: false
-                  schema:
-                      type: string
             responses:
                 200:
                     content:

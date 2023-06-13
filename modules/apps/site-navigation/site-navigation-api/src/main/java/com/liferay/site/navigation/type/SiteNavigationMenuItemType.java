@@ -17,7 +17,6 @@ package com.liferay.site.navigation.type;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -28,8 +27,6 @@ import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 
 import java.io.IOException;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletURL;
@@ -53,27 +50,10 @@ public interface SiteNavigationMenuItemType {
 		return true;
 	}
 
-	public default String getAddTitle(Locale locale) {
-		return LanguageUtil.format(locale, "add-x", getLabel(locale));
-	}
-
 	public default PortletURL getAddURL(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		return null;
-	}
-
-	public default List<SiteNavigationMenuItem>
-			getChildrenSiteNavigationMenuItems(
-				HttpServletRequest httpServletRequest,
-				SiteNavigationMenuItem siteNavigationMenuItem)
-		throws Exception {
-
-		if (isDynamic()) {
-			return Collections.emptyList();
-		}
-
-		throw new UnsupportedOperationException();
 	}
 
 	public default String getIcon() {
@@ -123,24 +103,6 @@ public interface SiteNavigationMenuItemType {
 			HttpServletRequest httpServletRequest,
 			SiteNavigationMenuItem siteNavigationMenuItem)
 		throws Exception {
-
-		return StringPool.BLANK;
-	}
-
-	public default List<SiteNavigationMenuItem> getSiteNavigationMenuItems(
-			HttpServletRequest httpServletRequest,
-			SiteNavigationMenuItem siteNavigationMenuItem)
-		throws Exception {
-
-		if (isDynamic()) {
-			return Collections.emptyList();
-		}
-
-		throw new UnsupportedOperationException();
-	}
-
-	public default String getStatusIcon(
-		SiteNavigationMenuItem siteNavigationMenuItem) {
 
 		return StringPool.BLANK;
 	}
@@ -221,15 +183,7 @@ public interface SiteNavigationMenuItemType {
 		return false;
 	}
 
-	public default boolean isDynamic() {
-		return false;
-	}
-
 	public default boolean isItemSelector() {
-		return false;
-	}
-
-	public default boolean isMultiSelection() {
 		return false;
 	}
 

@@ -48,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.security.auto.login.internal.request.header.configuration.RequestHeaderAutoLoginConfiguration",
-	service = AutoLogin.class
+	immediate = true, service = AutoLogin.class
 )
 public class RequestHeaderAutoLogin extends BaseAutoLogin {
 
@@ -95,7 +95,7 @@ public class RequestHeaderAutoLogin extends BaseAutoLogin {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -161,6 +161,23 @@ public class RequestHeaderAutoLogin extends BaseAutoLogin {
 		return requestHeaderAutoLoginConfiguration.importFromLDAP();
 	}
 
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserImporter(UserImporter userImporter) {
+		_userImporter = userImporter;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private RequestHeaderAutoLoginConfiguration
 		_getRequestHeaderAutoLoginConfiguration(long companyId) {
 
@@ -182,16 +199,12 @@ public class RequestHeaderAutoLogin extends BaseAutoLogin {
 	private static final Log _log = LogFactoryUtil.getLog(
 		RequestHeaderAutoLogin.class);
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserImporter _userImporter;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

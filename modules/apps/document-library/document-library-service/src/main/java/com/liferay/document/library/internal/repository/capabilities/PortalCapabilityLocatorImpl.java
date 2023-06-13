@@ -45,7 +45,6 @@ import com.liferay.portal.repository.capabilities.util.GroupServiceAdapter;
 import com.liferay.portal.repository.capabilities.util.RepositoryEntryChecker;
 import com.liferay.portal.repository.capabilities.util.RepositoryEntryConverter;
 import com.liferay.portal.repository.capabilities.util.RepositoryServiceAdapter;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.service.TrashEntryLocalService;
 import com.liferay.trash.service.TrashVersionLocalService;
 
@@ -186,7 +185,7 @@ public class PortalCapabilityLocatorImpl
 			DLFileEntryServiceAdapter.create(documentRepository),
 			DLFolderServiceAdapter.create(documentRepository),
 			RepositoryServiceAdapter.create(documentRepository),
-			_trashEntryLocalService, _trashHelper, _trashVersionLocalService);
+			_trashEntryLocalService, _trashVersionLocalService);
 	}
 
 	@Override
@@ -268,9 +267,6 @@ public class PortalCapabilityLocatorImpl
 
 	@Reference
 	private TrashEntryLocalService _trashEntryLocalService;
-
-	@Reference
-	private TrashHelper _trashHelper;
 
 	@Reference
 	private TrashVersionLocalService _trashVersionLocalService;

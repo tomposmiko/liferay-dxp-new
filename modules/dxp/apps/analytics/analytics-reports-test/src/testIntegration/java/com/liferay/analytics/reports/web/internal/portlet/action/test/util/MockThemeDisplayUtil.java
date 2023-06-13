@@ -39,13 +39,13 @@ public class MockThemeDisplayUtil {
 		themeDisplay.setCompany(company);
 
 		themeDisplay.setLanguageId(group.getDefaultLanguageId());
-		themeDisplay.setLayout(layout);
-		themeDisplay.setLayoutSet(layoutSet);
 		themeDisplay.setLocale(
 			LocaleUtil.fromLanguageId(group.getDefaultLanguageId()));
+		themeDisplay.setLayout(layout);
+		themeDisplay.setLayoutSet(layoutSet);
 		themeDisplay.setLocale(locale);
-		themeDisplay.setPortalDomain("localhost");
 		themeDisplay.setPortalURL(company.getPortalURL(group.getGroupId()));
+		themeDisplay.setPortalDomain("localhost");
 		themeDisplay.setSecure(true);
 		themeDisplay.setServerName("localhost");
 		themeDisplay.setServerPort(8080);

@@ -19,7 +19,6 @@ import com.liferay.headless.commerce.admin.site.setting.client.serdes.v1_0.Wareh
 
 import java.io.Serializable;
 
-import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -117,17 +116,16 @@ public class Warehouse implements Cloneable, Serializable {
 
 	protected Long commerceRegionId;
 
-	public Map<String, String> getDescription() {
+	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(Map<String, String> description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
 	public void setDescription(
-		UnsafeSupplier<Map<String, String>, Exception>
-			descriptionUnsafeSupplier) {
+		UnsafeSupplier<String, Exception> descriptionUnsafeSupplier) {
 
 		try {
 			description = descriptionUnsafeSupplier.get();
@@ -137,7 +135,7 @@ public class Warehouse implements Cloneable, Serializable {
 		}
 	}
 
-	protected Map<String, String> description;
+	protected String description;
 
 	public Long getGroupId() {
 		return groupId;
@@ -242,17 +240,15 @@ public class Warehouse implements Cloneable, Serializable {
 
 	protected Number mvccVersion;
 
-	public Map<String, String> getName() {
+	public String getName() {
 		return name;
 	}
 
-	public void setName(Map<String, String> name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setName(
-		UnsafeSupplier<Map<String, String>, Exception> nameUnsafeSupplier) {
-
+	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
 		try {
 			name = nameUnsafeSupplier.get();
 		}
@@ -261,7 +257,7 @@ public class Warehouse implements Cloneable, Serializable {
 		}
 	}
 
-	protected Map<String, String> name;
+	protected String name;
 
 	public Boolean getPrimary() {
 		return primary;

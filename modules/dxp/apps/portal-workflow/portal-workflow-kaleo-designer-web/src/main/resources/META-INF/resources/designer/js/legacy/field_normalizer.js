@@ -12,24 +12,23 @@
 AUI.add(
 	'liferay-kaleo-designer-field-normalizer',
 	(A) => {
-		const AArray = A.Array;
-		// eslint-disable-next-line @liferay/aui/no-object
-		const AObject = A.Object;
-		const Lang = A.Lang;
+		var AArray = A.Array;
+		var AObject = A.Object;
+		var Lang = A.Lang;
 
-		const KaleoDesignerRemoteServices = Liferay.KaleoDesignerRemoteServices;
+		var KaleoDesignerRemoteServices = Liferay.KaleoDesignerRemoteServices;
 
-		const isArray = Lang.isArray;
-		const isObject = Lang.isObject;
-		const isValue = Lang.isValue;
+		var isArray = Lang.isArray;
+		var isObject = Lang.isObject;
+		var isValue = Lang.isValue;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const isNotEmptyValue = function (item) {
+		var isNotEmptyValue = function (item) {
 			return isValue(item) && item !== STR_BLANK;
 		};
 
-		const COL_TYPES_ASSIGNMENT = [
+		var COL_TYPES_ASSIGNMENT = [
 			'address',
 			'receptionType',
 			'resourceActions',
@@ -42,11 +41,11 @@ AUI.add(
 			'userId',
 		];
 
-		const populateRole = function (assignments) {
+		var populateRole = function (assignments) {
 			KaleoDesignerRemoteServices.getRole(assignments.roleId, (data) => {
 				AArray.each(data, (item) => {
 					if (item) {
-						const index = assignments.roleId.indexOf(item.roleId);
+						var index = assignments.roleId.indexOf(item.roleId);
 
 						assignments.roleNameAC[index] = item.name;
 					}
@@ -54,7 +53,7 @@ AUI.add(
 			});
 		};
 
-		const populateUser = function (assignments) {
+		var populateUser = function (assignments) {
 			if (
 				isArray(assignments.emailAddress) &&
 				assignments.emailAddress.filter(isNotEmptyValue).length !== 0
@@ -66,7 +65,7 @@ AUI.add(
 					(data) => {
 						AArray.each(data, (item) => {
 							if (item) {
-								const index = assignments.emailAddress.indexOf(
+								var index = assignments.emailAddress.indexOf(
 									item.emailAddress
 								);
 
@@ -87,7 +86,7 @@ AUI.add(
 					(data) => {
 						AArray.each(data, (item) => {
 							if (item) {
-								const index = assignments.screenName.indexOf(
+								var index = assignments.screenName.indexOf(
 									item.screenName
 								);
 
@@ -108,7 +107,7 @@ AUI.add(
 					(data) => {
 						AArray.each(data, (item) => {
 							if (item) {
-								const index = assignments.userId.indexOf(
+								var index = assignments.userId.indexOf(
 									item.userId
 								);
 
@@ -120,7 +119,7 @@ AUI.add(
 			}
 		};
 
-		const _put = function (object, key, value, index) {
+		var _put = function (object, key, value, index) {
 			object[key] = object[key] || [];
 
 			if (index === undefined) {
@@ -131,9 +130,9 @@ AUI.add(
 			}
 		};
 
-		const FieldNormalizer = {
+		var FieldNormalizer = {
 			normalizeToActions(data) {
-				const actions = {};
+				var actions = {};
 
 				data = data || {};
 
@@ -149,11 +148,11 @@ AUI.add(
 			},
 
 			normalizeToAssignments(data) {
-				const assignments = {};
+				var assignments = {};
 
 				if (data && data.length) {
 					COL_TYPES_ASSIGNMENT.forEach((item1) => {
-						const value = data[0][item1];
+						var value = data[0][item1];
 
 						if (item1 === 'taskAssignees' && value === '') {
 							assignments.assignmentType = 'taskAssignees';
@@ -163,7 +162,7 @@ AUI.add(
 							return;
 						}
 
-						const assignmentValue = AArray(value);
+						var assignmentValue = AArray(value);
 
 						assignmentValue.forEach((item2, index2) => {
 							if (isObject(item2)) {
@@ -181,7 +180,7 @@ AUI.add(
 						if (
 							item1 !== 'receptionType' &&
 							AArray.some(assignmentValue, (item2) => {
-								let valid = isNotEmptyValue(item2);
+								var valid = isNotEmptyValue(item2);
 
 								if (
 									valid &&
@@ -202,10 +201,10 @@ AUI.add(
 						}
 					});
 
-					if (assignments.assignmentType === 'roleId') {
+					if (assignments.assignmentType == 'roleId') {
 						populateRole(assignments);
 					}
-					else if (assignments.assignmentType === 'user') {
+					else if (assignments.assignmentType == 'user') {
 						populateUser(assignments);
 					}
 				}
@@ -214,7 +213,7 @@ AUI.add(
 			},
 
 			normalizeToDelays(data) {
-				const delays = {};
+				var delays = {};
 
 				data = data || {};
 
@@ -230,7 +229,7 @@ AUI.add(
 			},
 
 			normalizeToNotifications(data) {
-				const notifications = {};
+				var notifications = {};
 
 				data = data || {};
 
@@ -260,7 +259,7 @@ AUI.add(
 			},
 
 			normalizeToTaskTimers(data) {
-				const taskTimers = {};
+				var taskTimers = {};
 
 				data = data || {};
 
@@ -294,7 +293,7 @@ AUI.add(
 						}
 					});
 
-					const delays = item1.delay.concat(item1.recurrence);
+					var delays = item1.delay.concat(item1.recurrence);
 
 					_put(
 						taskTimers,

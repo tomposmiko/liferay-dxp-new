@@ -17,6 +17,11 @@ package com.liferay.calendar.service.base;
 import com.liferay.calendar.model.CalendarResource;
 import com.liferay.calendar.service.CalendarResourceLocalService;
 import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
+import com.liferay.calendar.service.persistence.CalendarBookingFinder;
+import com.liferay.calendar.service.persistence.CalendarBookingPersistence;
+import com.liferay.calendar.service.persistence.CalendarFinder;
+import com.liferay.calendar.service.persistence.CalendarNotificationTemplatePersistence;
+import com.liferay.calendar.service.persistence.CalendarPersistence;
 import com.liferay.calendar.service.persistence.CalendarResourceFinder;
 import com.liferay.calendar.service.persistence.CalendarResourcePersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
@@ -42,8 +47,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -450,11 +453,6 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement CalendarResourceLocalServiceImpl#deleteCalendarResource(CalendarResource) to avoid orphaned data");
-		}
-
 		return calendarResourceLocalService.deleteCalendarResource(
 			(CalendarResource)persistedModel);
 	}
@@ -661,6 +659,22 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 		}
 	}
 
+	@Reference
+	protected CalendarPersistence calendarPersistence;
+
+	@Reference
+	protected CalendarFinder calendarFinder;
+
+	@Reference
+	protected CalendarBookingPersistence calendarBookingPersistence;
+
+	@Reference
+	protected CalendarBookingFinder calendarBookingFinder;
+
+	@Reference
+	protected CalendarNotificationTemplatePersistence
+		calendarNotificationTemplatePersistence;
+
 	protected CalendarResourceLocalService calendarResourceLocalService;
 
 	@Reference
@@ -673,7 +687,16 @@ public abstract class CalendarResourceLocalServiceBaseImpl
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CalendarResourceLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

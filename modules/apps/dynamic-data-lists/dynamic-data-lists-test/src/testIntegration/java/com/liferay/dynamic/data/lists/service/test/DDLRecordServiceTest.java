@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -184,12 +185,14 @@ public class DDLRecordServiceTest {
 	public void testAddRecordWithDifferentGroupIdFromRecordSet()
 		throws Exception {
 
+		long groupId = RandomTestUtil.nextLong();
+
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm("Field");
 
 		DDLRecordSet ddlRecordSet = addRecordSet(ddmForm);
 
 		DDLRecordTestHelper ddlRecordTestHelper = new DDLRecordTestHelper(
-			GroupTestUtil.addGroup(), ddlRecordSet);
+			GroupTestUtil.addGroup(groupId), ddlRecordSet);
 
 		ddlRecordTestHelper.addRecord();
 	}
@@ -585,10 +588,13 @@ public class DDLRecordServiceTest {
 			long recordId, DDMFormValues ddmFormValues, int workflowAction)
 		throws Exception {
 
+		ServiceContext serviceContext = DDLRecordTestUtil.getServiceContext(
+			workflowAction);
+
 		return DDLRecordLocalServiceUtil.updateRecord(
 			TestPropsValues.getUserId(), recordId, false,
 			DDLRecordConstants.DISPLAY_INDEX_DEFAULT, ddmFormValues,
-			DDLRecordTestUtil.getServiceContext(workflowAction));
+			serviceContext);
 	}
 
 	private static Group _group;

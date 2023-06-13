@@ -20,32 +20,23 @@ import com.liferay.commerce.discount.model.CommerceDiscountRule;
 import com.liferay.commerce.discount.rule.type.CommerceDiscountRuleType;
 import com.liferay.commerce.discount.rule.type.CommerceDiscountRuleTypeRegistry;
 import com.liferay.commerce.discount.service.base.CommerceDiscountRuleLocalServiceBaseImpl;
-import com.liferay.commerce.discount.service.persistence.CommerceDiscountPersistence;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.discount.model.CommerceDiscountRule",
-	service = AopService.class
-)
 public class CommerceDiscountRuleLocalServiceImpl
 	extends CommerceDiscountRuleLocalServiceBaseImpl {
 
@@ -67,9 +58,9 @@ public class CommerceDiscountRuleLocalServiceImpl
 
 		// Commerce discount rule
 
-		User user = _userLocalService.getUser(serviceContext.getUserId());
+		User user = userLocalService.getUser(serviceContext.getUserId());
 
-		_validate(type);
+		validate(type);
 
 		long commerceDiscountRuleId = counterLocalService.increment();
 
@@ -95,7 +86,7 @@ public class CommerceDiscountRuleLocalServiceImpl
 
 		// Commerce discount
 
-		_reindexCommerceDiscount(commerceDiscountId);
+		reindexCommerceDiscount(commerceDiscountId);
 
 		return commerceDiscountRule;
 	}
@@ -112,7 +103,7 @@ public class CommerceDiscountRuleLocalServiceImpl
 
 		// Commerce discount
 
-		_reindexCommerceDiscount(commerceDiscountRule.getCommerceDiscountId());
+		reindexCommerceDiscount(commerceDiscountRule.getCommerceDiscountId());
 
 		return commerceDiscountRule;
 	}
@@ -190,7 +181,7 @@ public class CommerceDiscountRuleLocalServiceImpl
 			commerceDiscountRulePersistence.findByPrimaryKey(
 				commerceDiscountRuleId);
 
-		_validate(type);
+		validate(type);
 
 		commerceDiscountRule.setType(type);
 
@@ -206,7 +197,7 @@ public class CommerceDiscountRuleLocalServiceImpl
 
 		// Commerce discount
 
-		_reindexCommerceDiscount(commerceDiscountRule.getCommerceDiscountId());
+		reindexCommerceDiscount(commerceDiscountRule.getCommerceDiscountId());
 
 		return commerceDiscountRule;
 	}
@@ -223,7 +214,7 @@ public class CommerceDiscountRuleLocalServiceImpl
 			commerceDiscountRulePersistence.findByPrimaryKey(
 				commerceDiscountRuleId);
 
-		_validate(type);
+		validate(type);
 
 		commerceDiscountRule.setName(name);
 		commerceDiscountRule.setType(type);
@@ -240,16 +231,17 @@ public class CommerceDiscountRuleLocalServiceImpl
 
 		// Commerce discount
 
-		_reindexCommerceDiscount(commerceDiscountRule.getCommerceDiscountId());
+		reindexCommerceDiscount(commerceDiscountRule.getCommerceDiscountId());
 
 		return commerceDiscountRule;
 	}
 
-	private void _reindexCommerceDiscount(long commerceDiscountId)
+	protected void reindexCommerceDiscount(long commerceDiscountId)
 		throws PortalException {
 
 		CommerceDiscount commerceDiscount =
-			_commerceDiscountPersistence.findByPrimaryKey(commerceDiscountId);
+			commerceDiscountLocalService.getCommerceDiscount(
+				commerceDiscountId);
 
 		Indexer<CommerceDiscount> indexer =
 			IndexerRegistryUtil.nullSafeGetIndexer(CommerceDiscount.class);
@@ -257,7 +249,7 @@ public class CommerceDiscountRuleLocalServiceImpl
 		indexer.reindex(commerceDiscount);
 	}
 
-	private void _validate(String type) throws PortalException {
+	protected void validate(String type) throws PortalException {
 		CommerceDiscountRuleType commerceDiscountRuleType =
 			_commerceDiscountRuleTypeRegistry.getCommerceDiscountRuleType(type);
 
@@ -266,13 +258,7 @@ public class CommerceDiscountRuleLocalServiceImpl
 		}
 	}
 
-	@Reference
-	private CommerceDiscountPersistence _commerceDiscountPersistence;
-
-	@Reference
+	@ServiceReference(type = CommerceDiscountRuleTypeRegistry.class)
 	private CommerceDiscountRuleTypeRegistry _commerceDiscountRuleTypeRegistry;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

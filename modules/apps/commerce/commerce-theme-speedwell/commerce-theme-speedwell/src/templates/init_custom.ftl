@@ -2,18 +2,18 @@
 	copyright = getterUtil.getString(themeDisplay.getThemeSetting("copyright"))
 	mini_cart_display_total_items_count = getterUtil.getBoolean(themeDisplay.getThemeSetting("mini-cart-display-total-items-count"))
 	mini_cart_keep_open = getterUtil.getBoolean(themeDisplay.getThemeSetting("mini-cart-keep-open"))
-	my_account_url = themeDisplay.getPathFriendlyURLPublic() + themeDisplay.getScopeGroup().getFriendlyURL() + "/my-account"
-	notification_count = commerceThemeMiniumHttpHelper.getNotificationsCount(themeDisplay)
-	notification_url = commerceThemeMiniumHttpHelper.getNotificationsURL(request)
-	notifications_text = languageUtil.get(locale, "notifications")
-	show_mini_cart = getterUtil.getBoolean(themeDisplay.getThemeSetting("show-mini-cart"))
 	show_top_menu = getterUtil.getBoolean(themeDisplay.getThemeSetting("show-top-menu"))
-	speedwell_content_css_class = "speedwell-content"
-	speedwell_topbar_css_class = "speedwell-topbar"
-	translucent_topbar = getterUtil.getBoolean(themeDisplay.getThemeSetting("translucent-topbar"))
-	wide_layout = getterUtil.getBoolean(themeDisplay.getThemeSetting("wide-layout"))
-	wish_lists_text = commerceThemeMiniumHttpHelper.getMyListsLabel(locale)
+	my_account_url = themeDisplay.getPathFriendlyURLPublic() + themeDisplay.getScopeGroup().getFriendlyURL() + "/my-account"
 	wishlistUrl = commerceWishListHttpHelper.getCommerceWishListPortletURL(request)
+	wish_lists_text = commerceThemeMiniumHttpHelper.getMyListsLabel(locale)
+	notifications_text = languageUtil.get(locale, "notifications")
+	notification_url = commerceThemeMiniumHttpHelper.getNotificationsURL(request)
+	notification_count = commerceThemeMiniumHttpHelper.getNotificationsCount(themeDisplay)
+	wide_layout = getterUtil.getBoolean(themeDisplay.getThemeSetting("wide-layout"))
+	back_url = paramUtil.getString(request, "p_r_p_backURL")
+	speedwell_content_css_class = "speedwell-content"
+	translucent_topbar = getterUtil.getBoolean(themeDisplay.getThemeSetting("translucent-topbar"))
+	speedwell_topbar_css_class = "speedwell-topbar"
 />
 
 <#if !is_setup_complete && is_signed_in>
@@ -39,9 +39,7 @@
 	/>
 </#if>
 
-<#macro site_navigation_menu_main
-	default_preferences = ""
->
+<#macro site_navigation_menu_main default_preferences = "">
 	<@liferay_portlet["runtime"]
 		defaultPreferences=default_preferences
 		instanceId="siteNavigationMenuPortlet_main"
@@ -49,9 +47,7 @@
 	/>
 </#macro>
 
-<#macro site_navigation_menu_sub_navigation
-	default_preferences = ""
->
+<#macro site_navigation_menu_sub_navigation default_preferences = "">
 	<@liferay_portlet["runtime"]
 		defaultPreferences=default_preferences
 		instanceId="siteNavigationMenuPortlet_sub_navigation"
@@ -59,9 +55,7 @@
 	/>
 </#macro>
 
-<#macro site_navigation_menu_account
-	default_preferences = ""
->
+<#macro site_navigation_menu_account default_preferences = "">
 	<@liferay_portlet["runtime"]
 		defaultPreferences=default_preferences
 		instanceId="siteNavigationMenuPortlet_account"
@@ -69,9 +63,7 @@
 	/>
 </#macro>
 
-<#macro commerce_category_navigation_menu
-	default_preferences = ""
->
+<#macro commerce_category_navigation_menu default_preferences = "">
 	<@liferay_portlet["runtime"]
 		defaultPreferences=default_preferences
 		instanceId="cpAssetCategoriesNavigationPortlet_navigation_menu"

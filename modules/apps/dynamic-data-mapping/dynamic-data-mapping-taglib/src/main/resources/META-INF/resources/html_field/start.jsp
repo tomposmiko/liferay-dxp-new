@@ -44,11 +44,6 @@
 		<aui:input name="<%= HtmlUtil.getAUICompatibleId(ddmFormValuesInputName) %>" type="hidden" />
 
 		<aui:script use="liferay-ddm-form">
-
-			<%
-			Group group = themeDisplay.getScopeGroup();
-			%>
-
 			Liferay.component(
 				'<portlet:namespace /><%= HtmlUtil.escapeJS(fieldsNamespace) %>ddmForm',
 				() => {
@@ -57,10 +52,8 @@
 						ddmFormValuesInput:
 							'#<portlet:namespace /><%= HtmlUtil.getAUICompatibleId(ddmFormValuesInputName) %>',
 						definition: <%= DDMUtil.getDDMFormJSONString(ddmForm) %>,
-						displayLocale: '<%= LocaleUtil.toLanguageId(requestedLocale) %>',
 						doAsGroupId: <%= scopeGroupId %>,
 						fieldsNamespace: '<%= HtmlUtil.escapeJS(fieldsNamespace) %>',
-						isPrivateLayoutsEnabled: <%= group.isPrivateLayoutsEnabled() %>,
 						mode: '<%= HtmlUtil.escapeJS(mode) %>',
 						p_l_id: <%= themeDisplay.getPlid() %>,
 						portletNamespace: '<portlet:namespace />',

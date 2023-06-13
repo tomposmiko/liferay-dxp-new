@@ -27,10 +27,6 @@ public class ObjectEntryLocalServiceWrapper
 	implements ObjectEntryLocalService,
 			   ServiceWrapper<ObjectEntryLocalService> {
 
-	public ObjectEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ObjectEntryLocalServiceWrapper(
 		ObjectEntryLocalService objectEntryLocalService) {
 
@@ -63,29 +59,6 @@ public class ObjectEntryLocalServiceWrapper
 		com.liferay.object.model.ObjectEntry objectEntry) {
 
 		return _objectEntryLocalService.addObjectEntry(objectEntry);
-	}
-
-	@Override
-	public com.liferay.object.model.ObjectEntry addObjectEntry(
-			String externalReferenceCode, long userId,
-			com.liferay.object.model.ObjectDefinition objectDefinition)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.addObjectEntry(
-			externalReferenceCode, userId, objectDefinition);
-	}
-
-	@Override
-	public void addOrUpdateExtensionDynamicObjectDefinitionTableValues(
-			long userId,
-			com.liferay.object.model.ObjectDefinition objectDefinition,
-			long primaryKey, java.util.Map<String, java.io.Serializable> values,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_objectEntryLocalService.
-			addOrUpdateExtensionDynamicObjectDefinitionTableValues(
-				userId, objectDefinition, primaryKey, values, serviceContext);
 	}
 
 	@Override
@@ -123,17 +96,6 @@ public class ObjectEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.createPersistedModel(primaryKeyObj);
-	}
-
-	@Override
-	public void deleteExtensionDynamicObjectDefinitionTableValues(
-			com.liferay.object.model.ObjectDefinition objectDefinition,
-			long primaryKey)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_objectEntryLocalService.
-			deleteExtensionDynamicObjectDefinitionTableValues(
-				objectDefinition, primaryKey);
 	}
 
 	/**
@@ -312,14 +274,6 @@ public class ObjectEntryLocalServiceWrapper
 		return _objectEntryLocalService.fetchObjectEntry(objectEntryId);
 	}
 
-	@Override
-	public com.liferay.object.model.ObjectEntry fetchObjectEntry(
-		String externalReferenceCode, long objectDefinitionId) {
-
-		return _objectEntryLocalService.fetchObjectEntry(
-			externalReferenceCode, objectDefinitionId);
-	}
-
 	/**
 	 * Returns the object entry matching the UUID and group.
 	 *
@@ -343,18 +297,6 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.Map<Object, Long> getAggregationCounts(
-			long groupId, long objectDefinitionId, String aggregationTerm,
-			com.liferay.petra.sql.dsl.expression.Predicate predicate, int start,
-			int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.getAggregationCounts(
-			groupId, objectDefinitionId, aggregationTerm, predicate, start,
-			end);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
 		getExportActionableDynamicQuery(
 			com.liferay.exportimport.kernel.lar.PortletDataContext
@@ -362,18 +304,6 @@ public class ObjectEntryLocalServiceWrapper
 
 		return _objectEntryLocalService.getExportActionableDynamicQuery(
 			portletDataContext);
-	}
-
-	@Override
-	public java.util.Map<String, java.io.Serializable>
-			getExtensionDynamicObjectDefinitionTableValues(
-				com.liferay.object.model.ObjectDefinition objectDefinition,
-				long primaryKey)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.
-			getExtensionDynamicObjectDefinitionTableValues(
-				objectDefinition, primaryKey);
 	}
 
 	@Override
@@ -385,24 +315,23 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.object.model.ObjectEntry>
-			getManyToManyObjectEntries(
+			getManyToManyRelatedObjectEntries(
 				long groupId, long objectRelationshipId, long primaryKey,
-				boolean related, boolean reverse, int start, int end)
+				boolean reverse, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _objectEntryLocalService.getManyToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, related, reverse, start,
-			end);
+		return _objectEntryLocalService.getManyToManyRelatedObjectEntries(
+			groupId, objectRelationshipId, primaryKey, reverse, start, end);
 	}
 
 	@Override
-	public int getManyToManyObjectEntriesCount(
+	public int getManyToManyRelatedObjectEntriesCount(
 			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related, boolean reverse)
+			boolean reverse)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _objectEntryLocalService.getManyToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related, reverse);
+		return _objectEntryLocalService.getManyToManyRelatedObjectEntriesCount(
+			groupId, objectRelationshipId, primaryKey, reverse);
 	}
 
 	/**
@@ -425,21 +354,12 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.object.model.ObjectEntry>
-		getObjectEntries(
-			long groupId, long objectDefinitionId, int start, int end) {
+			getObjectEntries(
+				long groupId, long objectDefinitionId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.getObjectEntries(
 			groupId, objectDefinitionId, start, end);
-	}
-
-	@Override
-	public java.util.List<com.liferay.object.model.ObjectEntry>
-		getObjectEntries(
-			long groupId, long objectDefinitionId, int status, int start,
-			int end) {
-
-		return _objectEntryLocalService.getObjectEntries(
-			groupId, objectDefinitionId, status, start, end);
 	}
 
 	/**
@@ -511,15 +431,6 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.object.model.ObjectEntry getObjectEntry(
-			String externalReferenceCode, long objectDefinitionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.getObjectEntry(
-			externalReferenceCode, objectDefinitionId);
-	}
-
-	@Override
-	public com.liferay.object.model.ObjectEntry getObjectEntry(
 			String externalReferenceCode, long companyId, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -546,23 +457,22 @@ public class ObjectEntryLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.object.model.ObjectEntry>
-			getOneToManyObjectEntries(
+			getOneToManyRelatedObjectEntries(
 				long groupId, long objectRelationshipId, long primaryKey,
-				boolean related, int start, int end)
+				int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _objectEntryLocalService.getOneToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, related, start, end);
+		return _objectEntryLocalService.getOneToManyRelatedObjectEntries(
+			groupId, objectRelationshipId, primaryKey, start, end);
 	}
 
 	@Override
-	public int getOneToManyObjectEntriesCount(
-			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related)
+	public int getOneToManyRelatedObjectEntriesCount(
+			long groupId, long objectRelationshipId, long primaryKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _objectEntryLocalService.getOneToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related);
+		return _objectEntryLocalService.getOneToManyRelatedObjectEntriesCount(
+			groupId, objectRelationshipId, primaryKey);
 	}
 
 	/**
@@ -587,32 +497,6 @@ public class ObjectEntryLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.Map<String, Object> getSystemModelAttributes(
-			com.liferay.object.model.ObjectDefinition objectDefinition,
-			long primaryKey)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.getSystemModelAttributes(
-			objectDefinition, primaryKey);
-	}
-
-	@Override
-	public java.util.Map<String, java.io.Serializable> getSystemValues(
-			com.liferay.object.model.ObjectEntry objectEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.getSystemValues(objectEntry);
-	}
-
-	@Override
-	public String getTitleValue(long objectDefinitionId, long primaryKey)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.getTitleValue(
-			objectDefinitionId, primaryKey);
-	}
-
-	@Override
 	public java.util.Map<String, java.io.Serializable> getValues(
 			long objectEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -631,38 +515,21 @@ public class ObjectEntryLocalServiceWrapper
 	@Override
 	public java.util.List<java.util.Map<String, java.io.Serializable>>
 			getValuesList(
-				long groupId, long companyId, long userId,
-				long objectDefinitionId,
-				com.liferay.petra.sql.dsl.expression.Predicate predicate,
-				String search, int start, int end,
-				com.liferay.petra.sql.dsl.query.sort.OrderByExpression[]
-					orderByExpressions)
+				long objectDefinitionId, int[] statuses, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectEntryLocalService.getValuesList(
-			groupId, companyId, userId, objectDefinitionId, predicate, search,
-			start, end, orderByExpressions);
-	}
-
-	@Override
-	public int getValuesListCount(
-			long groupId, long companyId, long userId, long objectDefinitionId,
-			com.liferay.petra.sql.dsl.expression.Predicate predicate,
-			String search)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _objectEntryLocalService.getValuesListCount(
-			groupId, companyId, userId, objectDefinitionId, predicate, search);
+			objectDefinitionId, statuses, start, end);
 	}
 
 	@Override
 	public void insertIntoOrUpdateExtensionTable(
-			long userId, long objectDefinitionId, long primaryKey,
+			long objectDefinitionId, long primaryKey,
 			java.util.Map<String, java.io.Serializable> values)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_objectEntryLocalService.insertIntoOrUpdateExtensionTable(
-			userId, objectDefinitionId, primaryKey, values);
+			objectDefinitionId, primaryKey, values);
 	}
 
 	@Override

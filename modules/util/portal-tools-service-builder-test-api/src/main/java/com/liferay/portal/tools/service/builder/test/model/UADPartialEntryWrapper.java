@@ -207,11 +207,6 @@ public class UADPartialEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected UADPartialEntryWrapper wrap(UADPartialEntry uadPartialEntry) {
 		return new UADPartialEntryWrapper(uadPartialEntry);
 	}

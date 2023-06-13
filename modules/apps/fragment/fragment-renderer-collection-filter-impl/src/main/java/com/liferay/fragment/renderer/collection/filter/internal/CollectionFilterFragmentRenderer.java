@@ -15,18 +15,22 @@
 package com.liferay.fragment.renderer.collection.filter.internal;
 
 import com.liferay.fragment.collection.filter.FragmentCollectionFilter;
-import com.liferay.fragment.collection.filter.FragmentCollectionFilterRegistry;
+import com.liferay.fragment.collection.filter.FragmentCollectionFilterTracker;
 import com.liferay.fragment.constants.FragmentConfigurationFieldDataType;
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -54,7 +58,10 @@ public class CollectionFilterFragmentRenderer implements FragmentRenderer {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "collection-filter");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getClass());
+
+		return LanguageUtil.get(resourceBundle, "collection-filter");
 	}
 
 	@Override
@@ -64,11 +71,13 @@ public class CollectionFilterFragmentRenderer implements FragmentRenderer {
 		HttpServletResponse httpServletResponse) {
 
 		FragmentCollectionFilter fragmentCollectionFilter =
-			_fragmentCollectionFilterRegistry.getFragmentCollectionFilter(
+			_fragmentCollectionFilterTracker.getFragmentCollectionFilter(
 				_getInfoFilterKey(fragmentRendererContext));
 
 		if ((fragmentCollectionFilter == null) &&
-			!fragmentRendererContext.isEditMode()) {
+			!Objects.equals(
+				fragmentRendererContext.getMode(),
+				FragmentEntryLinkConstants.EDIT)) {
 
 			return;
 		}
@@ -108,13 +117,10 @@ public class CollectionFilterFragmentRenderer implements FragmentRenderer {
 		CollectionFilterFragmentRenderer.class);
 
 	@Reference
-	private FragmentCollectionFilterRegistry _fragmentCollectionFilterRegistry;
+	private FragmentCollectionFilterTracker _fragmentCollectionFilterTracker;
 
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.fragment.renderer.collection.filter.impl)"

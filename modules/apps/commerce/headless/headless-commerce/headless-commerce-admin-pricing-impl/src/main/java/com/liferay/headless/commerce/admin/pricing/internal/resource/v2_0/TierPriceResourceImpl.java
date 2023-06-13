@@ -21,6 +21,7 @@ import com.liferay.commerce.price.list.model.CommerceTierPriceEntry;
 import com.liferay.commerce.price.list.service.CommercePriceEntryService;
 import com.liferay.commerce.price.list.service.CommerceTierPriceEntryService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.TierPrice;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.TierPriceDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v2_0.TierPriceUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.TierPriceResource;
 import com.liferay.headless.commerce.core.util.DateConfig;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Zoltán Takács
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/tier-price.properties",
 	scope = ServiceScope.PROTOTYPE, service = TierPriceResource.class
 )
@@ -338,10 +339,7 @@ public class TierPriceResourceImpl extends BaseTierPriceResourceImpl {
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.TierPriceDTOConverter)"
-	)
-	private DTOConverter<CommerceTierPriceEntry, TierPrice>
-		_tierPriceDTOConverter;
+	@Reference
+	private TierPriceDTOConverter _tierPriceDTOConverter;
 
 }

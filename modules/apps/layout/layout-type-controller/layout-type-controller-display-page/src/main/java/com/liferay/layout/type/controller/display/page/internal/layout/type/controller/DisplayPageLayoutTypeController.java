@@ -17,8 +17,7 @@ package com.liferay.layout.type.controller.display.page.internal.layout.type.con
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.info.display.request.attributes.contributor.InfoDisplayRequestAttributesContributor;
-import com.liferay.info.item.InfoItemServiceRegistry;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -39,10 +38,9 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
-import com.liferay.portal.kernel.servlet.TransferHeadersHelper;
+import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -62,6 +60,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Juergen Kappler
  */
 @Component(
+	immediate = true,
 	property = "layout.type=" + LayoutConstants.TYPE_ASSET_DISPLAY,
 	service = LayoutTypeController.class
 )
@@ -149,8 +148,7 @@ public class DisplayPageLayoutTypeController
 		DisplayPageLayoutTypeControllerDisplayContext
 			displayPageLayoutTypeControllerDisplayContext =
 				new DisplayPageLayoutTypeControllerDisplayContext(
-					httpServletRequest, _infoItemServiceRegistry,
-					_infoSearchClassMapperRegistry);
+					httpServletRequest, _infoItemServiceTracker);
 
 		httpServletRequest.setAttribute(
 			DisplayPageLayoutTypeControllerWebKeys.
@@ -164,8 +162,8 @@ public class DisplayPageLayoutTypeController
 		}
 
 		RequestDispatcher requestDispatcher =
-			_transferHeadersHelper.getTransferHeadersRequestDispatcher(
-				_servletContext.getRequestDispatcher(page));
+			TransferHeadersHelperUtil.getTransferHeadersRequestDispatcher(
+				servletContext.getRequestDispatcher(page));
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
@@ -216,11 +214,7 @@ public class DisplayPageLayoutTypeController
 				httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			}
 			else {
-				String signInURL = themeDisplay.getURLSignIn();
-
-				httpServletResponse.sendRedirect(
-					HttpComponentsUtil.setParameter(
-						signInURL, "redirect", themeDisplay.getURLCurrent()));
+				httpServletResponse.sendRedirect(themeDisplay.getURLSignIn());
 			}
 		}
 
@@ -268,6 +262,22 @@ public class DisplayPageLayoutTypeController
 		}
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
+	}
+
 	@Override
 	protected ServletResponse createServletResponse(
 		HttpServletResponse httpServletResponse,
@@ -283,13 +293,16 @@ public class DisplayPageLayoutTypeController
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	protected String getViewPage() {
 		return _VIEW_PAGE;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.display.page)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 
 	private LayoutPageTemplateEntry _fetchLayoutPageTemplateEntry(
@@ -318,15 +331,18 @@ public class DisplayPageLayoutTypeController
 		PermissionChecker permissionChecker, Layout layout) {
 
 		try {
-			if (LayoutPermissionUtil.containsLayoutUpdatePermission(
-					permissionChecker, layout)) {
+			if (LayoutPermissionUtil.contains(
+					permissionChecker, layout, ActionKeys.UPDATE) ||
+				LayoutPermissionUtil.contains(
+					permissionChecker, layout,
+					ActionKeys.UPDATE_LAYOUT_CONTENT)) {
 
 				return true;
 			}
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -353,10 +369,7 @@ public class DisplayPageLayoutTypeController
 		_infoDisplayRequestAttributesContributors;
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
-
-	@Reference
-	private InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
@@ -367,13 +380,5 @@ public class DisplayPageLayoutTypeController
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.display.page)"
-	)
-	private ServletContext _servletContext;
-
-	@Reference
-	private TransferHeadersHelper _transferHeadersHelper;
 
 }

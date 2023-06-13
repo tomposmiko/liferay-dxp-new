@@ -14,10 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.service;
 
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
-import com.liferay.portal.workflow.kaleo.model.KaleoTask;
 
 /**
  * Provides a wrapper for {@link KaleoTaskLocalService}.
@@ -28,10 +25,6 @@ import com.liferay.portal.workflow.kaleo.model.KaleoTask;
  */
 public class KaleoTaskLocalServiceWrapper
 	implements KaleoTaskLocalService, ServiceWrapper<KaleoTaskLocalService> {
-
-	public KaleoTaskLocalServiceWrapper() {
-		this(null);
-	}
 
 	public KaleoTaskLocalServiceWrapper(
 		KaleoTaskLocalService kaleoTaskLocalService) {
@@ -50,12 +43,14 @@ public class KaleoTaskLocalServiceWrapper
 	 * @return the kaleo task that was added
 	 */
 	@Override
-	public KaleoTask addKaleoTask(KaleoTask kaleoTask) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask addKaleoTask(
+		com.liferay.portal.workflow.kaleo.model.KaleoTask kaleoTask) {
+
 		return _kaleoTaskLocalService.addKaleoTask(kaleoTask);
 	}
 
 	@Override
-	public KaleoTask addKaleoTask(
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask addKaleoTask(
 			long kaleoDefinitionId, long kaleoDefinitionVersionId,
 			long kaleoNodeId,
 			com.liferay.portal.workflow.kaleo.definition.Task task,
@@ -74,7 +69,9 @@ public class KaleoTaskLocalServiceWrapper
 	 * @return the new kaleo task
 	 */
 	@Override
-	public KaleoTask createKaleoTask(long kaleoTaskId) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask createKaleoTask(
+		long kaleoTaskId) {
+
 		return _kaleoTaskLocalService.createKaleoTask(kaleoTaskId);
 	}
 
@@ -113,7 +110,9 @@ public class KaleoTaskLocalServiceWrapper
 	 * @return the kaleo task that was removed
 	 */
 	@Override
-	public KaleoTask deleteKaleoTask(KaleoTask kaleoTask) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask deleteKaleoTask(
+		com.liferay.portal.workflow.kaleo.model.KaleoTask kaleoTask) {
+
 		return _kaleoTaskLocalService.deleteKaleoTask(kaleoTask);
 	}
 
@@ -129,7 +128,8 @@ public class KaleoTaskLocalServiceWrapper
 	 * @throws PortalException if a kaleo task with the primary key could not be found
 	 */
 	@Override
-	public KaleoTask deleteKaleoTask(long kaleoTaskId)
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask deleteKaleoTask(
+			long kaleoTaskId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskLocalService.deleteKaleoTask(kaleoTaskId);
@@ -249,7 +249,9 @@ public class KaleoTaskLocalServiceWrapper
 	}
 
 	@Override
-	public KaleoTask fetchKaleoTask(long kaleoTaskId) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask fetchKaleoTask(
+		long kaleoTaskId) {
+
 		return _kaleoTaskLocalService.fetchKaleoTask(kaleoTaskId);
 	}
 
@@ -268,7 +270,8 @@ public class KaleoTaskLocalServiceWrapper
 	}
 
 	@Override
-	public KaleoTask getKaleoNodeKaleoTask(long kaleoNodeId)
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask
+			getKaleoNodeKaleoTask(long kaleoNodeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskLocalService.getKaleoNodeKaleoTask(kaleoNodeId);
@@ -282,7 +285,8 @@ public class KaleoTaskLocalServiceWrapper
 	 * @throws PortalException if a kaleo task with the primary key could not be found
 	 */
 	@Override
-	public KaleoTask getKaleoTask(long kaleoTaskId)
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask getKaleoTask(
+			long kaleoTaskId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskLocalService.getKaleoTask(kaleoTaskId);
@@ -300,7 +304,9 @@ public class KaleoTaskLocalServiceWrapper
 	 * @return the range of kaleo tasks
 	 */
 	@Override
-	public java.util.List<KaleoTask> getKaleoTasks(int start, int end) {
+	public java.util.List<com.liferay.portal.workflow.kaleo.model.KaleoTask>
+		getKaleoTasks(int start, int end) {
+
 		return _kaleoTaskLocalService.getKaleoTasks(start, end);
 	}
 
@@ -346,27 +352,10 @@ public class KaleoTaskLocalServiceWrapper
 	 * @return the kaleo task that was updated
 	 */
 	@Override
-	public KaleoTask updateKaleoTask(KaleoTask kaleoTask) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTask updateKaleoTask(
+		com.liferay.portal.workflow.kaleo.model.KaleoTask kaleoTask) {
+
 		return _kaleoTaskLocalService.updateKaleoTask(kaleoTask);
-	}
-
-	@Override
-	public CTPersistence<KaleoTask> getCTPersistence() {
-		return _kaleoTaskLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<KaleoTask> getModelClass() {
-		return _kaleoTaskLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<KaleoTask>, R, E> updateUnsafeFunction)
-		throws E {
-
-		return _kaleoTaskLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

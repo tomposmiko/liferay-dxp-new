@@ -14,12 +14,10 @@
 
 package com.liferay.message.boards.internal.upgrade.v3_1_0;
 
-import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.message.boards.internal.upgrade.v3_1_0.util.MBMessageTable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -34,19 +32,19 @@ public class UrlSubjectUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		try (SafeCloseable safeCloseable = addTemporaryIndex(
-				"MBMessage", false, "subject")) {
-
-			_populateUrlSubject();
+		if (!hasColumn("MBMessage", "urlSubject")) {
+			alter(
+				MBMessageTable.class,
+				new AlterTableAddColumn("urlSubject", "VARCHAR(255) null"));
 		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"MBMessage", "urlSubject VARCHAR(255) null")
-		};
+		runSQL(
+			"create index IX_TEMP on MBMessage (subject[$COLUMN_LENGTH:75$]," +
+				"messageId)");
+
+		_populateUrlSubject();
+
+		runSQL("drop index IX_TEMP on MBMessage");
 	}
 
 	private String _getURLSubject(long id, String subject) {
@@ -76,9 +74,9 @@ public class UrlSubjectUpgradeProcess extends UpgradeProcess {
 			ResultSet resultSet = preparedStatement1.executeQuery();
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update MBMessage set urlSubject = ? where messageId = " +
-						"?")) {
+					connection.prepareStatement(
+						"update MBMessage set urlSubject = ? where messageId " +
+							"= ?"))) {
 
 			int count = 0;
 			String curURLSubject = null;

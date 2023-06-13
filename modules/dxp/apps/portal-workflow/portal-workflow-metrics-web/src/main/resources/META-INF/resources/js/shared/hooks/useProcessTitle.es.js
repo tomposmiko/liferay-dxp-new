@@ -12,23 +12,17 @@
 import {useContext, useEffect} from 'react';
 
 import {AppContext} from '../../components/AppContext.es';
-import {useFetch} from './useFetch.es';
 
 const useProcessTitle = (processId, pageTitle = null) => {
-	const {setTitle} = useContext(AppContext);
-
-	const {fetchData} = useFetch({
-		callback: (data) =>
-			setTitle(data + `${pageTitle ? ': ' + pageTitle : ''}`),
-		plainText: true,
-		url: `/processes/${processId}/title`,
-	});
+	const {client, setTitle} = useContext(AppContext);
 
 	useEffect(() => {
-		fetchData();
+		client.get(`/processes/${processId}/title`).then(({data}) => {
+			setTitle(data + `${pageTitle ? ': ' + pageTitle : ''}`);
+		});
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [pageTitle, processId]);
+	}, []);
 };
 
 export {useProcessTitle};

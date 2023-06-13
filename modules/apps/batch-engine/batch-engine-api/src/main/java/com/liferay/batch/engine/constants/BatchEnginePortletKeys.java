@@ -15,11 +15,11 @@
 package com.liferay.batch.engine.constants;
 
 /**
- * @author Igor Beslic
+ * @author Matija Petanjek
  */
 public class BatchEnginePortletKeys {
 
-	public static final String BATCH_ENGINE =
+	public static final String BATCH =
 		"com_liferay_batch_engine_web_internal_portlet_BatchEnginePortlet";
 
 }

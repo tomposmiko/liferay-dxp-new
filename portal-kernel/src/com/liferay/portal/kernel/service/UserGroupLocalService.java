@@ -80,11 +80,6 @@ public interface UserGroupLocalService
 
 	public void addGroupUserGroups(long groupId, long[] userGroupIds);
 
-	public UserGroup addOrUpdateUserGroup(
-			String externalReferenceCode, long userId, long companyId,
-			String name, String description, ServiceContext serviceContext)
-		throws PortalException;
-
 	public void addTeamUserGroup(long teamId, long userGroupId);
 
 	public void addTeamUserGroup(long teamId, UserGroup userGroup);
@@ -130,29 +125,13 @@ public interface UserGroupLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public UserGroup addUserGroup(UserGroup userGroup);
 
-	/**
-	 * @throws PortalException
-	 */
-	public void addUserUserGroup(long userId, long userGroupId)
-		throws PortalException;
+	public void addUserUserGroup(long userId, long userGroupId);
 
-	/**
-	 * @throws PortalException
-	 */
-	public void addUserUserGroup(long userId, UserGroup userGroup)
-		throws PortalException;
+	public void addUserUserGroup(long userId, UserGroup userGroup);
 
-	/**
-	 * @throws PortalException
-	 */
-	public void addUserUserGroups(long userId, List<UserGroup> userGroups)
-		throws PortalException;
+	public void addUserUserGroups(long userId, List<UserGroup> userGroups);
 
-	/**
-	 * @throws PortalException
-	 */
-	public void addUserUserGroups(long userId, long[] userGroupIds)
-		throws PortalException;
+	public void addUserUserGroups(long userId, long[] userGroupIds);
 
 	public void clearGroupUserGroups(long groupId);
 
@@ -319,9 +298,24 @@ public interface UserGroupLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public UserGroup fetchUserGroup(long companyId, String name);
 
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public UserGroup fetchUserGroupByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
+		long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserGroupByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public UserGroup fetchUserGroupByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	/**
 	 * Returns the user group with the matching UUID and company.
@@ -430,9 +424,17 @@ public interface UserGroupLocalService
 	public UserGroup getUserGroup(long companyId, String name)
 		throws PortalException;
 
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group
+	 * @throws PortalException if a matching user group could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public UserGroup getUserGroupByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -473,11 +475,6 @@ public interface UserGroupLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<UserGroup> getUserGroups(
 		long companyId, String name, int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<UserGroup> getUserGroups(
-		long companyId, String name, int start, int end,
-		OrderByComparator<UserGroup> orderByComparator);
 
 	/**
 	 * Returns all the user groups with the primary keys.
@@ -754,11 +751,6 @@ public interface UserGroupLocalService
 	 * @param userGroupIds the primary keys of the user groups
 	 */
 	public void unsetTeamUserGroups(long teamId, long[] userGroupIds);
-
-	@Indexable(type = IndexableType.REINDEX)
-	public UserGroup updateExternalReferenceCode(
-			UserGroup userGroup, String externalReferenceCode)
-		throws PortalException;
 
 	/**
 	 * Updates the user group.

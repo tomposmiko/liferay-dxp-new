@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"@liferay/map-common": "*",
-		"frontend-js-web": "*"
+		"metal-state": "2.16.8"
 	},
 	"name": "@liferay/map-google-maps",
 	"private": true,
@@ -10,5 +10,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "5.0.28"
+	"version": "5.0.11"
 }

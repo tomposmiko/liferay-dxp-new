@@ -10,7 +10,7 @@
  */
 
 import * as d3 from 'd3';
-import {openConfirmModal, openToast, sub} from 'frontend-js-web';
+import {openToast} from 'frontend-js-web';
 
 import {getAccount} from './data/accounts';
 import {getOrganization} from './data/organizations';
@@ -210,10 +210,6 @@ class D3OrganizationChart {
 		}
 		else {
 			const sourcesMap = new Map();
-
-			if (!this._root.children) {
-				return;
-			}
 
 			this._root.children.forEach((child) => {
 				const descendants = child.descendants();
@@ -432,14 +428,14 @@ class D3OrganizationChart {
 
 					const message =
 						nodesToBeMoved.length === 1
-							? sub(
+							? Liferay.Util.sub(
 									Liferay.Language.get(
 										'x-will-be-moved-into-x'
 									),
 									nodesToBeMoved[0].data.name,
 									target.data.name
 							  )
-							: sub(
+							: Liferay.Util.sub(
 									Liferay.Language.get(
 										'x-items-will-be-moved-into-x'
 									),
@@ -447,14 +443,9 @@ class D3OrganizationChart {
 									target.data.name
 							  );
 
-					openConfirmModal({
-						message,
-						onConfirm: (isConfimed) => {
-							if (isConfimed) {
-								this._moveNodes(nodesToBeMoved, target);
-							}
-						},
-					});
+					if (confirm(message)) {
+						this._moveNodes(nodesToBeMoved, target);
+					}
 				}
 			});
 	}
@@ -495,7 +486,7 @@ class D3OrganizationChart {
 				if (rejectedNodes.length) {
 					rejectedNodes.forEach((node) => {
 						openToast({
-							message: sub(
+							message: Liferay.Util.sub(
 								Liferay.Language.get('x-could-not-be-moved'),
 								node.data.name
 							),
@@ -546,10 +537,6 @@ class D3OrganizationChart {
 			y0 = source.y0 + RECT_SIZES[source.data.type].width / 2;
 		}
 		else {
-			if (!source.children) {
-				return;
-			}
-
 			y0 = source.children[0].y0 + getMinWidth(source.children) / 2;
 		}
 
@@ -663,7 +650,7 @@ class D3OrganizationChart {
 			.remove()
 			.attr('opacity', 0)
 			.attr('transform', (d) => {
-				if (showDeleteTransition || d.data.type === 'add') {
+				if (showDeleteTransition || d.data.type == 'add') {
 					return `translate(${d.y},${d.x}) scale(0)`;
 				}
 

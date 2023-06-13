@@ -24,6 +24,8 @@ import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeResponse;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerSerializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
@@ -31,12 +33,16 @@ import com.liferay.dynamic.data.mapping.model.DDMFormLayoutColumn;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.Serializable;
 
@@ -45,21 +51,27 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Marcellus Tavares
  */
+@PrepareForTest(PropsValues.class)
+@RunWith(PowerMockRunner.class)
+@SuppressStaticInitializationFor(
+	{
+		"com.liferay.portal.kernel.xml.SAXReaderUtil",
+		"com.liferay.portal.util.PropsValues"
+	}
+)
 public class DDMImplTest extends BaseDDMTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -75,6 +87,8 @@ public class DDMImplTest extends BaseDDMTestCase {
 		setUpDDMStructureLocalServiceUtil();
 		setUpJSONFactoryUtil();
 		setUpLanguageUtil();
+		setUpLocaleUtil();
+		setUpPropsValues();
 		setUpSAXReaderUtil();
 	}
 
@@ -103,7 +117,9 @@ public class DDMImplTest extends BaseDDMTestCase {
 	}
 
 	@Test
-	public void testMergeAfterNewFieldIsAddedAndPublishingContentAtBranch() {
+	public void testMergeAfterNewFieldIsAddedAndPublishingContentAtBranch()
+		throws Exception {
+
 		DDMForm ddmForm = createDDMForm();
 
 		addDDMFormFields(
@@ -149,7 +165,9 @@ public class DDMImplTest extends BaseDDMTestCase {
 	}
 
 	@Test
-	public void testMergeFieldsAfterFieldValueIsRemovedFromTheMiddleOfSeries() {
+	public void testMergeFieldsAfterFieldValueIsRemovedFromTheMiddleOfSeries()
+		throws Exception {
+
 		DDMForm ddmForm = createDDMForm();
 
 		addDDMFormFields(
@@ -195,7 +213,7 @@ public class DDMImplTest extends BaseDDMTestCase {
 	}
 
 	@Test
-	public void testMergeFieldsAfterNewFieldIsAdded() {
+	public void testMergeFieldsAfterNewFieldIsAdded() throws Exception {
 		DDMForm ddmForm = createDDMForm();
 
 		addDDMFormFields(
@@ -694,6 +712,18 @@ public class DDMImplTest extends BaseDDMTestCase {
 		return ddmFormSerializerSerializeResponse.getContent();
 	}
 
+	protected String serialize(DDMFormValues ddmFormValues) {
+		DDMFormValuesSerializerSerializeRequest.Builder builder =
+			DDMFormValuesSerializerSerializeRequest.Builder.newBuilder(
+				ddmFormValues);
+
+		DDMFormValuesSerializerSerializeResponse
+			ddmFormValuesSerializerSerializeResponse =
+				_ddmFormValuesSerializer.serialize(builder.build());
+
+		return ddmFormValuesSerializerSerializeResponse.getContent();
+	}
+
 	protected void setUpDDM() throws Exception {
 		java.lang.reflect.Field field = ReflectionUtil.getDeclaredField(
 			DDMImpl.class, "_jsonDDMFormSerializer");
@@ -709,6 +739,34 @@ public class DDMImplTest extends BaseDDMTestCase {
 			DDMImpl.class, "_jsonDDMFormValuesSerializer");
 
 		field.set(_ddmImpl, _ddmFormValuesSerializer);
+	}
+
+	protected void setUpDDMFormValuesJSONDeserializer() throws Exception {
+		java.lang.reflect.Field field = ReflectionUtil.getDeclaredField(
+			DDMFormValuesJSONDeserializer.class, "_jsonFactory");
+
+		field.set(_ddmFormValuesDeserializer, new JSONFactoryImpl());
+
+		field = ReflectionUtil.getDeclaredField(
+			DDMFormValuesJSONDeserializer.class, "_serviceTrackerMap");
+
+		field.set(
+			_ddmFormValuesDeserializer,
+			ProxyFactory.newDummyInstance(ServiceTrackerMap.class));
+	}
+
+	protected void setUpDDMFormValuesJSONSerializer() throws Exception {
+		java.lang.reflect.Field field = ReflectionUtil.getDeclaredField(
+			DDMFormValuesJSONSerializer.class, "_jsonFactory");
+
+		field.set(_ddmFormValuesSerializer, new JSONFactoryImpl());
+
+		field = ReflectionUtil.getDeclaredField(
+			DDMFormValuesJSONSerializer.class, "_serviceTrackerMap");
+
+		field.set(
+			_ddmFormValuesSerializer,
+			ProxyFactory.newDummyInstance(ServiceTrackerMap.class));
 	}
 
 	protected void testValues(

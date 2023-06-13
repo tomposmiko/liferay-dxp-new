@@ -18,26 +18,16 @@ import com.liferay.commerce.inventory.constants.CommerceInventoryActionKeys;
 import com.liferay.commerce.inventory.constants.CommerceInventoryConstants;
 import com.liferay.commerce.inventory.model.CommerceInventoryAudit;
 import com.liferay.commerce.inventory.service.base.CommerceInventoryAuditServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Luca Pellizzon
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceInventoryAudit"
-	},
-	service = AopService.class
-)
 public class CommerceInventoryAuditServiceImpl
 	extends CommerceInventoryAuditServiceBaseImpl {
 
@@ -66,9 +56,11 @@ public class CommerceInventoryAuditServiceImpl
 			getCommerceInventoryAuditsCount(companyId, sku);
 	}
 
-	@Reference(
-		target = "(resource.name=" + CommerceInventoryConstants.RESOURCE_NAME + ")"
-	)
-	private PortletResourcePermission _portletResourcePermission;
+	private static volatile PortletResourcePermission
+		_portletResourcePermission =
+			PortletResourcePermissionFactory.getInstance(
+				CommerceInventoryAuditServiceImpl.class,
+				"_portletResourcePermission",
+				CommerceInventoryConstants.RESOURCE_NAME);
 
 }

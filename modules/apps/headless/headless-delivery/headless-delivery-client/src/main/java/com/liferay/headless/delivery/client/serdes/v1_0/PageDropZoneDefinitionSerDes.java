@@ -62,16 +62,11 @@ public class PageDropZoneDefinitionSerDes {
 
 			sb.append("\"fragmentSettings\": ");
 
-			if (pageDropZoneDefinition.getFragmentSettings() instanceof
-					String) {
+			sb.append("\"");
 
-				sb.append("\"");
-				sb.append((String)pageDropZoneDefinition.getFragmentSettings());
-				sb.append("\"");
-			}
-			else {
-				sb.append(pageDropZoneDefinition.getFragmentSettings());
-			}
+			sb.append(_escape(pageDropZoneDefinition.getFragmentSettings()));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -41,6 +42,13 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @AccessControlled
 @JSONWebService
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=commerce",
+		"json.web.service.context.path=CPDefinitionGroupedEntry"
+	},
+	service = CPDefinitionGroupedEntryService.class
+)
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
@@ -56,11 +64,6 @@ public interface CPDefinitionGroupedEntryService extends BaseService {
 	public void addCPDefinitionGroupedEntries(
 			long cpDefinitionId, long[] entryCPDefinitionIds,
 			ServiceContext serviceContext)
-		throws PortalException;
-
-	public CPDefinitionGroupedEntry addCPDefinitionGroupedEntry(
-			long cpDefinitionId, long entryCProductId, double priority,
-			int quantity, ServiceContext serviceContext)
 		throws PortalException;
 
 	public CPDefinitionGroupedEntry deleteCPDefinitionGroupedEntry(
@@ -80,18 +83,6 @@ public interface CPDefinitionGroupedEntryService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPDefinitionGroupedEntry getCPDefinitionGroupedEntry(
 			long cpDefinitionGroupedEntryId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CPDefinitionGroupedEntry>
-			getEntryCProductCPDefinitionGroupedEntries(
-				long entryCProductId, int start, int end,
-				OrderByComparator<CPDefinitionGroupedEntry> orderByComparator)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getEntryCProductCPDefinitionGroupedEntriesCount(
-			long entryCProductId)
 		throws PortalException;
 
 	/**

@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.discount.service;
 
-import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountRel;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -101,12 +100,6 @@ public interface CommerceDiscountRelLocalService
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
-	public CommerceDiscountRel deleteCommerceDiscountRel(
-			CommerceDiscount commerceDiscount,
-			CommerceDiscountRel commerceDiscountRel)
-		throws PortalException;
-
 	/**
 	 * Deletes the commerce discount rel from the database. Also notifies the appropriate model listeners.
 	 *
@@ -116,10 +109,13 @@ public interface CommerceDiscountRelLocalService
 	 *
 	 * @param commerceDiscountRel the commerce discount rel
 	 * @return the commerce discount rel that was removed
+	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public CommerceDiscountRel deleteCommerceDiscountRel(
-		CommerceDiscountRel commerceDiscountRel);
+			CommerceDiscountRel commerceDiscountRel)
+		throws PortalException;
 
 	/**
 	 * Deletes the commerce discount rel with the primary key from the database. Also notifies the appropriate model listeners.
@@ -137,7 +133,7 @@ public interface CommerceDiscountRelLocalService
 			long commerceDiscountRelId)
 		throws PortalException;
 
-	public void deleteCommerceDiscountRels(CommerceDiscount commerceDiscount)
+	public void deleteCommerceDiscountRels(long commerceDiscountId)
 		throws PortalException;
 
 	public void deleteCommerceDiscountRels(String className, long classPK)

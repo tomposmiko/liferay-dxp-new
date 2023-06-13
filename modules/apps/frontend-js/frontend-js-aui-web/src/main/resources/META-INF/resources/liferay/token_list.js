@@ -22,12 +22,12 @@
 AUI().add(
 	'liferay-token-list',
 	(A) => {
-		const TPL_TOKEN = A.Template(
+		var TPL_TOKEN = A.Template(
 			'<tpl for=".">',
 			'<span class="lfr-token" data-fieldValues="{fieldValues}" data-clearFields="{clearFields}">',
 			'<span class="align-middle d-inline-block">{text:this.getTokenText}</span>',
 
-			'<a class="align-middle c-ml-1 d-inline-block icon icon-remove lfr-token-close" href="javascript:void(0);"></a>',
+			'<a class="align-middle c-ml-1 d-inline-block icon icon-remove lfr-token-close" href="javascript:;"></a>',
 			'</span>',
 			'</tpl>',
 			{
@@ -44,7 +44,7 @@ AUI().add(
 			}
 		);
 
-		const TokenList = A.Component.create({
+		var TokenList = A.Component.create({
 			ATTRS: {
 				children: {
 					validator: Array.isArray,
@@ -59,9 +59,9 @@ AUI().add(
 
 			prototype: {
 				_addToken() {
-					const instance = this;
+					var instance = this;
 
-					const buffer = instance._buffer;
+					var buffer = instance._buffer;
 
 					instance.get('contentBox').append(TPL_TOKEN.parse(buffer));
 
@@ -73,7 +73,7 @@ AUI().add(
 				},
 
 				_onClick(event) {
-					const instance = this;
+					var instance = this;
 
 					instance.fire('close', {
 						item: event.currentTarget.ancestor('.lfr-token'),
@@ -81,10 +81,10 @@ AUI().add(
 				},
 
 				add(token) {
-					const instance = this;
+					var instance = this;
 
 					if (token) {
-						const buffer = instance._buffer;
+						var buffer = instance._buffer;
 
 						if (Array.isArray(token)) {
 							instance._buffer = buffer.concat(token);
@@ -98,9 +98,9 @@ AUI().add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 
 					boundingBox.delegate(
 						'click',
@@ -115,7 +115,7 @@ AUI().add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._buffer = [];
 
@@ -126,7 +126,7 @@ AUI().add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					instance.add(instance.get('children'));
 				},

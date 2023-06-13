@@ -12,59 +12,31 @@
  * details.
  */
 
-import {navigate, openConfirmModal, openModal} from 'frontend-js-web';
-
-import openDeleteLayoutModal from './openDeleteLayoutModal';
+import {openModal} from 'frontend-js-web';
 
 const ACTIONS = {
-	convertToPageTemplate: () => {
-		Liferay.fire('convertToPageTemplate');
-	},
-
-	copyLayout: ({copyLayoutURL}) => {
+	copyLayout: ({copyLayoutURL}, portletNamespace) => {
 		openModal({
-			height: '60vh',
-			id: 'addLayoutDialog',
-			size: 'md',
+			id: `${portletNamespace}addLayoutDialog`,
 			title: Liferay.Language.get('copy-page'),
 			url: copyLayoutURL,
 		});
 	},
 
-	copyLayoutWithPermissions: ({copyLayoutURL}) => {
-		openModal({
-			height: '60vh',
-			id: 'addLayoutDialog',
-			size: 'md',
-			title: Liferay.Language.get('copy-page-with-permissions'),
-			url: copyLayoutURL,
-		});
-	},
-
 	deleteLayout: ({deleteLayoutURL, message}) => {
-		openDeleteLayoutModal({
-			message,
-			onDelete: () => {
-				navigate(deleteLayoutURL);
-			},
-		});
+		if (confirm(message)) {
+			Liferay.Util.navigate(deleteLayoutURL);
+		}
 	},
 
 	discardDraft: ({discardDraftURL}) => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					navigate(discardDraftURL);
-				}
-			},
-		});
-	},
+		const discardDraftMessage = Liferay.Language.get(
+			'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
+		);
 
-	exportTranslation: ({exportTranslationURL}) => {
-		navigate(exportTranslationURL);
+		if (confirm(discardDraftMessage)) {
+			Liferay.Util.navigate(discardDraftURL);
+		}
 	},
 
 	permissionLayout: ({permissionLayoutURL}) => {

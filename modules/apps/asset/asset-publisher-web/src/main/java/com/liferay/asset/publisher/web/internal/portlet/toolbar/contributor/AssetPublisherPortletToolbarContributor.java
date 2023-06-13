@@ -20,14 +20,14 @@ import com.liferay.asset.publisher.web.internal.display.context.AssetPublisherDi
 import com.liferay.asset.publisher.web.internal.helper.AssetPublisherWebHelper;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.asset.util.AssetPublisherAddItemHolder;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.BasePortletToolbarContributor;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.PortletToolbarContributor;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
 
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.portlet.PortletRequest;
@@ -57,33 +59,20 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AssetPublisherPortletKeys.ASSET_PUBLISHER,
 		"mvc.path=-", "mvc.path=/view.jsp"
 	},
-	service = PortletToolbarContributor.class
+	service = {
+		AssetPublisherPortletToolbarContributor.class,
+		PortletToolbarContributor.class
+	}
 )
 public class AssetPublisherPortletToolbarContributor
 	extends BasePortletToolbarContributor {
 
-	@Override
-	protected List<MenuItem> getPortletTitleMenuItems(
-		PortletRequest portletRequest, PortletResponse portletResponse) {
-
-		List<MenuItem> menuItems = new ArrayList<>();
-
-		try {
-			_addPortletTitleAddAssetEntryMenuItems(
-				menuItems, portletRequest, portletResponse);
-		}
-		catch (Exception exception) {
-			_log.error("Unable to add folder menu item", exception);
-		}
-
-		return menuItems;
-	}
-
-	private void _addPortletTitleAddAssetEntryMenuItems(
+	protected void addPortletTitleAddAssetEntryMenuItems(
 			List<MenuItem> menuItems, PortletRequest portletRequest,
 			PortletResponse portletResponse)
 		throws Exception {
@@ -140,8 +129,11 @@ public class AssetPublisherPortletToolbarContributor
 
 		URLMenuItem urlMenuItem = new URLMenuItem();
 
-		String title = _language.get(
-			themeDisplay.getLocale(), "add-content-select-scope-and-type");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", themeDisplay.getLocale(), getClass());
+
+		String title = LanguageUtil.get(
+			resourceBundle, "add-content-select-scope-and-type");
 
 		urlMenuItem.setData(
 			HashMapBuilder.<String, Object>put(
@@ -170,6 +162,23 @@ public class AssetPublisherPortletToolbarContributor
 		menuItems.add(urlMenuItem);
 	}
 
+	@Override
+	protected List<MenuItem> getPortletTitleMenuItems(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		List<MenuItem> menuItems = new ArrayList<>();
+
+		try {
+			addPortletTitleAddAssetEntryMenuItems(
+				menuItems, portletRequest, portletResponse);
+		}
+		catch (Exception exception) {
+			_log.error("Unable to add folder menu item", exception);
+		}
+
+		return menuItems;
+	}
+
 	private URLMenuItem _getPortletTitleAddAssetEntryMenuItem(
 		ThemeDisplay themeDisplay,
 		AssetPublisherDisplayContext assetPublisherDisplayContext, long groupId,
@@ -187,9 +196,10 @@ public class AssetPublisherPortletToolbarContributor
 				HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset"
 			).put(
 				"title",
-				_language.format(
+				LanguageUtil.format(
 					themeDisplay.getLocale(), "new-x", message, false)
 			).build());
+
 		urlMenuItem.setLabel(message);
 
 		long curGroupId = groupId;
@@ -214,10 +224,11 @@ public class AssetPublisherPortletToolbarContributor
 				themeDisplay.getLayout(), portletDisplay.getId(),
 				assetPublisherDisplayContext.getPortletResource());
 
-		urlMenuItem.setURL(
-			_assetHelper.getAddURLPopUp(
-				curGroupId, themeDisplay.getPlid(), portletURL,
-				addDisplayPageParameter, themeDisplay.getLayout()));
+		String url = _assetHelper.getAddURLPopUp(
+			curGroupId, themeDisplay.getPlid(), portletURL,
+			addDisplayPageParameter, themeDisplay.getLayout());
+
+		urlMenuItem.setURL(url);
 
 		return urlMenuItem;
 	}
@@ -276,9 +287,6 @@ public class AssetPublisherPortletToolbarContributor
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

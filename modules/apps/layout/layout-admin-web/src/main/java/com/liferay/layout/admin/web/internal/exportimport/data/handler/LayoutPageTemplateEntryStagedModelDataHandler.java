@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -56,7 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.layout.configuration.LayoutExportImportConfiguration",
-	service = StagedModelDataHandler.class
+	immediate = true, service = StagedModelDataHandler.class
 )
 public class LayoutPageTemplateEntryStagedModelDataHandler
 	extends BaseStagedModelDataHandler<LayoutPageTemplateEntry> {
@@ -135,10 +136,10 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		Element entryElement = portletDataContext.getExportDataElement(
 			layoutPageTemplateEntry);
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			layoutPageTemplateEntry.getCompanyId());
 
-		if (guestUserId == layoutPageTemplateEntry.getUserId()) {
+		if (defaultUserId == layoutPageTemplateEntry.getUserId()) {
 			entryElement.addAttribute("preloaded", "true");
 		}
 
@@ -185,7 +186,7 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				uuid, groupId);
 		}
 		else {
-			existingLayoutPageTemplateEntry = _fetchExistingTemplate(
+			existingLayoutPageTemplateEntry = fetchExistingTemplate(
 				uuid, groupId, name, type, 0L, preloaded);
 		}
 
@@ -299,11 +300,13 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 					LayoutPrototype.class);
 
+			long layoutPrototypeId = MapUtil.getLong(
+				layoutPrototypeIds,
+				layoutPageTemplateEntry.getLayoutPrototypeId(),
+				layoutPageTemplateEntry.getLayoutPrototypeId());
+
 			importedLayoutPageTemplateEntry.setLayoutPrototypeId(
-				MapUtil.getLong(
-					layoutPrototypeIds,
-					layoutPageTemplateEntry.getLayoutPrototypeId(),
-					layoutPageTemplateEntry.getLayoutPrototypeId()));
+				layoutPrototypeId);
 		}
 
 		if (portletDataContext.isDataStrategyMirror()) {
@@ -315,7 +318,7 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				element.attributeValue("preloaded"));
 
 			LayoutPageTemplateEntry existingLayoutPageTemplateEntry =
-				_fetchExistingTemplate(
+				fetchExistingTemplate(
 					layoutPageTemplateEntry.getUuid(),
 					portletDataContext.getScopeGroupId(),
 					layoutPageTemplateEntry.getName(),
@@ -367,6 +370,32 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			layoutPageTemplateEntry, importedLayoutPageTemplateEntry);
 	}
 
+	protected LayoutPageTemplateEntry fetchExistingTemplate(
+		String uuid, long groupId, String name, int type, long plid,
+		boolean preloaded) {
+
+		LayoutPageTemplateEntry existingTemplate = null;
+
+		if (!preloaded) {
+			existingTemplate =
+				_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
+					uuid, groupId);
+		}
+		else if (plid > 0) {
+			existingTemplate =
+				_layoutPageTemplateEntryLocalService.
+					fetchLayoutPageTemplateEntryByPlid(plid);
+		}
+
+		if ((existingTemplate == null) && preloaded) {
+			existingTemplate =
+				_layoutPageTemplateEntryLocalService.
+					fetchLayoutPageTemplateEntry(groupId, name, type);
+		}
+
+		return existingTemplate;
+	}
+
 	@Override
 	protected StagedModelRepository<LayoutPageTemplateEntry>
 		getStagedModelRepository() {
@@ -374,14 +403,17 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		return _stagedModelRepository;
 	}
 
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private LayoutPageTemplateEntry _addStagedModel(
 			PortletDataContext portletDataContext,
 			LayoutPageTemplateEntry layoutPageTemplateEntry)
 		throws Exception {
 
-		if (!ExportImportThreadLocal.isStagingInProcess() &&
-			layoutPageTemplateEntry.isDefaultTemplate()) {
-
+		if (layoutPageTemplateEntry.isDefaultTemplate()) {
 			LayoutPageTemplateEntry defaultLayoutPageTemplateEntry =
 				_layoutPageTemplateEntryLocalService.
 					fetchDefaultLayoutPageTemplateEntry(
@@ -406,10 +438,7 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		Layout layout = _layoutLocalService.fetchLayout(
 			layoutPageTemplateEntry.getPlid());
 
-		if ((layout == null) ||
-			(!_layoutExportImportConfiguration.exportDraftLayout() &&
-			 !layout.isPublished())) {
-
+		if (layout == null) {
 			return;
 		}
 
@@ -436,32 +465,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
 			portletDataContext, layoutPageTemplateEntry, layout,
 			PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
-	}
-
-	private LayoutPageTemplateEntry _fetchExistingTemplate(
-		String uuid, long groupId, String name, int type, long plid,
-		boolean preloaded) {
-
-		LayoutPageTemplateEntry existingTemplate = null;
-
-		if (!preloaded) {
-			existingTemplate =
-				_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
-					uuid, groupId);
-		}
-		else if (plid > 0) {
-			existingTemplate =
-				_layoutPageTemplateEntryLocalService.
-					fetchLayoutPageTemplateEntryByPlid(plid);
-		}
-
-		if ((existingTemplate == null) && preloaded) {
-			existingTemplate =
-				_layoutPageTemplateEntryLocalService.
-					fetchLayoutPageTemplateEntry(groupId, name, type);
-		}
-
-		return existingTemplate;
 	}
 
 	private void _validateLayoutPrototype(
@@ -534,6 +537,9 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 	@Reference
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
 
+	@Reference
+	private Portal _portal;
+
 	@Reference(
 		target = "(model.class.name=com.liferay.layout.page.template.model.LayoutPageTemplateEntry)",
 		unbind = "-"
@@ -541,7 +547,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 	private StagedModelRepository<LayoutPageTemplateEntry>
 		_stagedModelRepository;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

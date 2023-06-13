@@ -18,7 +18,6 @@ import com.liferay.expando.kernel.exception.NoSuchValueException;
 import com.liferay.expando.kernel.model.ExpandoValue;
 import com.liferay.expando.kernel.model.ExpandoValueTable;
 import com.liferay.expando.kernel.service.persistence.ExpandoValuePersistence;
-import com.liferay.expando.kernel.service.persistence.ExpandoValueUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
@@ -46,7 +45,6 @@ import com.liferay.portlet.expando.model.impl.ExpandoValueModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -188,7 +186,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -555,8 +553,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {tableId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -698,7 +695,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -1065,8 +1062,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {columnId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1205,7 +1201,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -1570,8 +1566,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {rowId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1720,7 +1715,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -2117,8 +2112,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {tableId, columnId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2273,7 +2267,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -2669,8 +2663,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {tableId, rowId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2826,7 +2819,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -3223,8 +3216,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {tableId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3351,7 +3343,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_R, finderArgs, this);
+				_finderPathFetchByC_R, finderArgs);
 		}
 
 		if (result instanceof ExpandoValue) {
@@ -3458,8 +3450,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {columnId, rowId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3615,7 +3606,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -4013,8 +4004,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4149,7 +4139,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByT_C_C, finderArgs, this);
+				_finderPathFetchByT_C_C, finderArgs);
 		}
 
 		if (result instanceof ExpandoValue) {
@@ -4263,8 +4253,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {tableId, columnId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4436,7 +4425,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ExpandoValue expandoValue : list) {
@@ -4882,8 +4871,7 @@ public class ExpandoValuePersistenceImpl
 
 			finderArgs = new Object[] {tableId, columnId, data};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5317,9 +5305,7 @@ public class ExpandoValuePersistenceImpl
 	 */
 	@Override
 	public ExpandoValue fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				ExpandoValue.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(ExpandoValue.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -5535,7 +5521,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<ExpandoValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -5611,7 +5597,7 @@ public class ExpandoValuePersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -5919,30 +5905,10 @@ public class ExpandoValuePersistenceImpl
 				String.class.getName()
 			},
 			new String[] {"tableId", "columnId", "data_"}, false);
-
-		_setExpandoValueUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setExpandoValueUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(ExpandoValueImpl.class.getName());
-	}
-
-	private void _setExpandoValueUtilPersistence(
-		ExpandoValuePersistence expandoValuePersistence) {
-
-		try {
-			Field field = ExpandoValueUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, expandoValuePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_EXPANDOVALUE =

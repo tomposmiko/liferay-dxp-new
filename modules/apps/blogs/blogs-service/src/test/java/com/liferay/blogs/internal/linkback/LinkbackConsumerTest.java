@@ -28,7 +28,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author André de Oliveira
@@ -42,10 +44,13 @@ public class LinkbackConsumerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+
 		_linkbackConsumer = new LinkbackConsumerImpl();
 
 		ReflectionTestUtil.setFieldValue(
 			_linkbackConsumer, "_commentManager", _commentManager);
+
 		ReflectionTestUtil.setFieldValue(_linkbackConsumer, "_http", _http);
 	}
 
@@ -130,7 +135,7 @@ public class LinkbackConsumerTest {
 
 		_linkbackConsumer.verifyNewTrackbacks();
 
-		Mockito.verifyNoInteractions(_commentManager);
+		Mockito.verifyZeroInteractions(_commentManager);
 
 		Mockito.verify(
 			_http
@@ -139,9 +144,12 @@ public class LinkbackConsumerTest {
 		);
 	}
 
-	private final CommentManager _commentManager = Mockito.mock(
-		CommentManager.class);
-	private final Http _http = Mockito.mock(Http.class);
+	@Mock
+	private CommentManager _commentManager;
+
+	@Mock
+	private Http _http;
+
 	private LinkbackConsumer _linkbackConsumer;
 
 }

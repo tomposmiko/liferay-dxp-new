@@ -22,6 +22,7 @@ import com.liferay.layout.page.template.service.test.util.DisplayPageTemplateTes
 import com.liferay.portal.kernel.exception.NoSuchClassNameException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -62,13 +63,15 @@ public class DisplayPageTemplateServiceTest {
 	public void testAddDisplayPageTemplate() throws PortalException {
 		String name = RandomTestUtil.randomString();
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		LayoutPageTemplateEntry displayPageTemplate =
 			_layoutPageTemplateEntryService.addLayoutPageTemplateEntry(
 				_group.getGroupId(), 0, name,
-				LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE, 0,
-				WorkflowConstants.STATUS_DRAFT,
-				ServiceContextTestUtil.getServiceContext(
-					_group.getGroupId(), TestPropsValues.getUserId()));
+				LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE,
+				WorkflowConstants.STATUS_DRAFT, serviceContext);
 
 		LayoutPageTemplateEntry persistedDisplayPageTemplate =
 			_layoutPageTemplateEntryService.fetchLayoutPageTemplateEntry(
@@ -102,11 +105,14 @@ public class DisplayPageTemplateServiceTest {
 			long classNameId, long classTypeId)
 		throws PortalException {
 
-		return _layoutPageTemplateEntryService.addLayoutPageTemplateEntry(
-			_group.getGroupId(), 0, classNameId, classTypeId,
-			RandomTestUtil.randomString(), 0, WorkflowConstants.STATUS_DRAFT,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		return _layoutPageTemplateEntryService.addLayoutPageTemplateEntry(
+			_group.getGroupId(), 0, RandomTestUtil.randomString(),
+			WorkflowConstants.STATUS_DRAFT, classNameId, classTypeId,
+			serviceContext);
 	}
 
 	@Inject

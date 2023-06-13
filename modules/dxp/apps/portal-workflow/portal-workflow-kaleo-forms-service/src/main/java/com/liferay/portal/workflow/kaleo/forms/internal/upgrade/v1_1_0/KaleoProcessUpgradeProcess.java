@@ -37,8 +37,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.LocaleThreadLocal;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.workflow.kaleo.forms.model.KaleoProcess;
@@ -48,7 +46,6 @@ import java.sql.ResultSet;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Inácio Nery
@@ -77,27 +74,27 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_initKaleoFormsDDMCompositeModelsResourceActions();
+		initKaleoFormsDDMCompositeModelsResourceActions();
 
-		_updateKaleoProcess();
-		_updateKaleoProcessLink();
+		updateKaleoProcess();
+		updateKaleoProcessLink();
 	}
 
-	private String _getDDMStructureModelResourceName(DDMStructure ddmStructure)
+	protected String getDDMStructureModelResourceName(DDMStructure ddmStructure)
 		throws PortalException {
 
 		return _resourceActions.getCompositeModelName(
 			ddmStructure.getClassName(), DDMStructure.class.getName());
 	}
 
-	private String _getDDMTemplateModelResourceName(DDMTemplate ddmTemplate)
+	protected String getDDMTemplateModelResourceName(DDMTemplate ddmTemplate)
 		throws PortalException {
 
 		return _resourceActions.getCompositeModelName(
 			ddmTemplate.getResourceClassName(), DDMTemplate.class.getName());
 	}
 
-	private Long _getNewDDMStructureId(long oldDDMStructureId)
+	protected Long getNewDDMStructureId(long oldDDMStructureId)
 		throws PortalException {
 
 		Long newDDMStructureId = _ddmStructureMap.get(oldDDMStructureId);
@@ -118,9 +115,9 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 		serviceContext.setAttribute("status", ddmStructureVersion.getStatus());
 
 		ModelPermissions oldDDMStructureModelPermissions =
-			_getResourceModelPermissions(
+			getResourceModelPermissions(
 				oldDDMStructure.getCompanyId(),
-				_getDDMStructureModelResourceName(oldDDMStructure),
+				getDDMStructureModelResourceName(oldDDMStructure),
 				oldDDMStructureId);
 
 		serviceContext.setModelPermissions(oldDDMStructureModelPermissions);
@@ -141,7 +138,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 		return newDDMStructureId;
 	}
 
-	private Long _getNewDDMTemplateId(long oldDDMTemplateId)
+	protected Long getNewDDMTemplateId(long oldDDMTemplateId)
 		throws PortalException {
 
 		Long newDDMTemplateId = _ddmTemplateMap.get(oldDDMTemplateId);
@@ -161,41 +158,31 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 
 		serviceContext.setAttribute("status", ddmTemplateVersion.getStatus());
 
-		serviceContext.setModelPermissions(
-			_getResourceModelPermissions(
-				oldDDMTemplate.getCompanyId(),
-				_getDDMTemplateModelResourceName(oldDDMTemplate),
-				oldDDMTemplateId));
+		ModelPermissions modelPermissions = getResourceModelPermissions(
+			oldDDMTemplate.getCompanyId(),
+			getDDMTemplateModelResourceName(oldDDMTemplate), oldDDMTemplateId);
 
-		Long newDDMStructureId = _getNewDDMStructureId(
+		serviceContext.setModelPermissions(modelPermissions);
+
+		Long newDDMStructureId = getNewDDMStructureId(
 			oldDDMTemplate.getClassPK());
 
-		Locale siteDefaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
+		DDMTemplate newDDMTemplate = _ddmTemplateLocalService.addTemplate(
+			oldDDMTemplate.getUserId(), oldDDMTemplate.getGroupId(),
+			oldDDMTemplate.getClassNameId(), newDDMStructureId,
+			_KALEO_PROCESS_CLASS_NAME_ID, oldDDMTemplate.getNameMap(),
+			oldDDMTemplate.getDescriptionMap(), oldDDMTemplate.getType(),
+			oldDDMTemplate.getMode(), oldDDMTemplate.getLanguage(),
+			oldDDMTemplate.getScript(), serviceContext);
 
-		LocaleThreadLocal.setSiteDefaultLocale(
-			LocaleUtil.fromLanguageId(oldDDMTemplate.getDefaultLanguageId()));
-
-		try {
-			DDMTemplate newDDMTemplate = _ddmTemplateLocalService.addTemplate(
-				oldDDMTemplate.getUserId(), oldDDMTemplate.getGroupId(),
-				oldDDMTemplate.getClassNameId(), newDDMStructureId,
-				_KALEO_PROCESS_CLASS_NAME_ID, oldDDMTemplate.getNameMap(),
-				oldDDMTemplate.getDescriptionMap(), oldDDMTemplate.getType(),
-				oldDDMTemplate.getMode(), oldDDMTemplate.getLanguage(),
-				oldDDMTemplate.getScript(), serviceContext);
-
-			newDDMTemplateId = newDDMTemplate.getTemplateId();
-		}
-		finally {
-			LocaleThreadLocal.setSiteDefaultLocale(siteDefaultLocale);
-		}
+		newDDMTemplateId = newDDMTemplate.getTemplateId();
 
 		_ddmTemplateMap.put(oldDDMTemplateId, newDDMTemplateId);
 
 		return newDDMTemplateId;
 	}
 
-	private ModelPermissions _getResourceModelPermissions(
+	protected ModelPermissions getResourceModelPermissions(
 			long companyId, String resourceName, long primKey)
 		throws PortalException {
 
@@ -219,7 +206,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 		return modelPermissions;
 	}
 
-	private void _initKaleoFormsDDMCompositeModelsResourceActions()
+	protected void initKaleoFormsDDMCompositeModelsResourceActions()
 		throws Exception {
 
 		_resourceActions.populateModelResources(
@@ -227,7 +214,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 			"/resource-actions/default.xml");
 	}
 
-	private void _updateDDLRecordSet(
+	protected void updateDDLRecordSet(
 			long ddlRecordSetId, Long newDDMStructureId)
 		throws PortalException {
 
@@ -239,7 +226,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 		_ddlRecordSetLocalService.updateDDLRecordSet(ddlRecordSet);
 	}
 
-	private void _updateKaleoProcess() throws Exception {
+	protected void updateKaleoProcess() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement1 = connection.prepareStatement(
 				StringBundler.concat(
@@ -265,11 +252,11 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 
 				long ddmStructureId = resultSet.getLong("DDMStructureId");
 
-				_updateDDLRecordSet(
-					ddlRecordSetId, _getNewDDMStructureId(ddmStructureId));
+				updateDDLRecordSet(
+					ddlRecordSetId, getNewDDMStructureId(ddmStructureId));
 
 				preparedStatement2.setLong(
-					1, _getNewDDMTemplateId(ddmTemplateId));
+					1, getNewDDMTemplateId(ddmTemplateId));
 
 				preparedStatement2.setLong(2, kaleoProcessId);
 
@@ -280,7 +267,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateKaleoProcessLink() throws Exception {
+	protected void updateKaleoProcessLink() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement1 = connection.prepareStatement(
 				StringBundler.concat(
@@ -304,7 +291,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 				long ddmTemplateId = resultSet.getLong("DDMTemplateId");
 
 				preparedStatement2.setLong(
-					1, _getNewDDMTemplateId(ddmTemplateId));
+					1, getNewDDMTemplateId(ddmTemplateId));
 
 				preparedStatement2.setLong(2, kaleoProcessLinkId);
 

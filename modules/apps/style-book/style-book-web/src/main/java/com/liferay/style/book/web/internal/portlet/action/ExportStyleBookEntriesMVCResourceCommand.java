@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StyleBookPortletKeys.STYLE_BOOK,
 		"mvc.command.name=/style_book/export_style_book_entries"
@@ -91,9 +92,11 @@ public class ExportStyleBookEntriesMVCResourceCommand
 
 		if (ArrayUtil.isNotEmpty(exportStyleBookEntryIds)) {
 			for (long exportStyleBookEntryId : exportStyleBookEntryIds) {
-				styleBookEntries.add(
+				StyleBookEntry styleBookEntry =
 					_styleBookEntryLocalService.fetchStyleBookEntry(
-						exportStyleBookEntryId));
+						exportStyleBookEntryId);
+
+				styleBookEntries.add(styleBookEntry);
 			}
 		}
 

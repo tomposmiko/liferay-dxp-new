@@ -14,17 +14,18 @@
 
 package com.liferay.portal.search.web.internal.search.request;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.web.search.request.SearchSettings;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author André de Oliveira
@@ -58,40 +59,40 @@ public class SearchSettingsImpl implements SearchSettings {
 	public void addFacet(Facet facet) {
 		Map<String, Facet> facets = _searchContext.getFacets();
 
-		facets.put(_getAggregationName(facet), facet);
+		facets.put(getAggregationName(facet), facet);
 	}
 
 	@Override
 	public SearchRequestBuilder getFederatedSearchRequestBuilder(
-		String federatedSearchKey) {
+		Optional<String> federatedSearchKeyOptional) {
 
 		return _searchRequestBuilder.getFederatedSearchRequestBuilder(
-			GetterUtil.getString(federatedSearchKey));
+			federatedSearchKeyOptional.orElse(StringPool.BLANK));
 	}
 
 	@Override
-	public String getKeywordsParameterName() {
-		return _keywordsParameterName;
+	public Optional<String> getKeywordsParameterName() {
+		return Optional.ofNullable(_keywordsParameterName);
 	}
 
 	@Override
-	public Integer getPaginationDelta() {
-		return _paginationDelta;
+	public Optional<Integer> getPaginationDelta() {
+		return Optional.ofNullable(_paginationDelta);
 	}
 
 	@Override
-	public String getPaginationDeltaParameterName() {
-		return _paginationDeltaParameterName;
+	public Optional<String> getPaginationDeltaParameterName() {
+		return Optional.ofNullable(_paginationDeltaParameterName);
 	}
 
 	@Override
-	public Integer getPaginationStart() {
-		return _paginationStart;
+	public Optional<Integer> getPaginationStart() {
+		return Optional.ofNullable(_paginationStart);
 	}
 
 	@Override
-	public String getPaginationStartParameterName() {
-		return _paginationStartParameterName;
+	public Optional<String> getPaginationStartParameterName() {
+		return Optional.ofNullable(_paginationStartParameterName);
 	}
 
 	@Override
@@ -100,13 +101,8 @@ public class SearchSettingsImpl implements SearchSettings {
 	}
 
 	@Override
-	public String getScope() {
-		return _scope;
-	}
-
-	@Override
-	public String getScopeParameterName() {
-		return _scopeParameterName;
+	public Optional<String> getScopeParameterName() {
+		return Optional.ofNullable(_scopeParameterName);
 	}
 
 	@Override
@@ -154,16 +150,11 @@ public class SearchSettingsImpl implements SearchSettings {
 	}
 
 	@Override
-	public void setScope(String scope) {
-		_scope = scope;
-	}
-
-	@Override
 	public void setScopeParameterName(String scopeParameterName) {
 		_scopeParameterName = scopeParameterName;
 	}
 
-	private String _getAggregationName(Facet facet) {
+	protected String getAggregationName(Facet facet) {
 		if (facet instanceof com.liferay.portal.search.facet.Facet) {
 			com.liferay.portal.search.facet.Facet osgiFacet =
 				(com.liferay.portal.search.facet.Facet)facet;
@@ -179,7 +170,6 @@ public class SearchSettingsImpl implements SearchSettings {
 	private String _paginationDeltaParameterName;
 	private Integer _paginationStart;
 	private String _paginationStartParameterName;
-	private String _scope;
 	private String _scopeParameterName;
 	private final SearchContext _searchContext;
 	private final SearchRequestBuilder _searchRequestBuilder;

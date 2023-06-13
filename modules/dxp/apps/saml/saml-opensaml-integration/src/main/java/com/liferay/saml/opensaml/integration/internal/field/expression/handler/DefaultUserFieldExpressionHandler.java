@@ -22,13 +22,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PrefsProps;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.ldap.exportimport.LDAPUserImporter;
@@ -58,7 +55,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = {
-		"display.index:Integer=0", "prefix=", "processing.index:Integer=-1"
+		"display.index:Integer=0", "prefix=",
+		"processing.index:Integer=" + Integer.MAX_VALUE
 	},
 	service = UserFieldExpressionHandler.class
 )
@@ -81,23 +79,7 @@ public class DefaultUserFieldExpressionHandler
 
 				user.setModifiedDate(dateTime.toDate());
 			});
-		userBind.mapString(
-			"screenName",
-			(user, screenName) -> {
-				if (_prefsProps.getBoolean(
-						user.getCompanyId(),
-						PropsKeys.USERS_SCREEN_NAME_ALWAYS_AUTOGENERATE)) {
-
-					if (_log.isDebugEnabled()) {
-						_log.debug(
-							"Ignored incoming screen name because " +
-								"autogeneration is configured");
-					}
-				}
-				else {
-					user.setScreenName(screenName);
-				}
-			});
+		userBind.mapString("screenName", User::setScreenName);
 		userBind.mapString("uuid", User::setUuid);
 
 		processorContext.bind(_processingIndex, this::_updateUser);
@@ -164,7 +146,7 @@ public class DefaultUserFieldExpressionHandler
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchUserException);
+				_log.debug(noSuchUserException, noSuchUserException);
 			}
 		}
 
@@ -195,8 +177,8 @@ public class DefaultUserFieldExpressionHandler
 		String password1 = null;
 		String password2 = null;
 		boolean autoScreenName = false;
-		int prefixListTypeId = 0;
-		int suffixListTypeId = 0;
+		int prefixId = 0;
+		int suffixId = 0;
 		boolean male = true;
 		int birthdayMonth = Calendar.JANUARY;
 		int birthdayDay = 1;
@@ -212,11 +194,11 @@ public class DefaultUserFieldExpressionHandler
 			password2, autoScreenName, newUser.getScreenName(),
 			newUser.getEmailAddress(), serviceContext.getLocale(),
 			newUser.getFirstName(), newUser.getMiddleName(),
-			newUser.getLastName(), prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, newUser.getJobTitle(),
-			UserConstants.TYPE_REGULAR, newUser.getGroupIds(),
-			newUser.getOrganizationIds(), newUser.getRoleIds(),
-			newUser.getUserGroupIds(), sendEmail, serviceContext);
+			newUser.getLastName(), prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, newUser.getJobTitle(),
+			newUser.getGroupIds(), newUser.getOrganizationIds(),
+			newUser.getRoleIds(), newUser.getUserGroupIds(), sendEmail,
+			serviceContext);
 
 		user = _userLocalService.updateEmailAddressVerified(
 			user.getUserId(), true);
@@ -281,8 +263,8 @@ public class DefaultUserFieldExpressionHandler
 			newUser.getTimeZoneId(), newUser.getGreeting(),
 			newUser.getComments(), newUser.getFirstName(),
 			newUser.getMiddleName(), newUser.getLastName(),
-			contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-			newUser.getMale(), birthdayCalendar.get(Calendar.MONTH),
+			contact.getPrefixId(), contact.getSuffixId(), newUser.getMale(),
+			birthdayCalendar.get(Calendar.MONTH),
 			birthdayCalendar.get(Calendar.DATE),
 			birthdayCalendar.get(Calendar.YEAR), contact.getSmsSn(),
 			contact.getFacebookSn(), contact.getJabberSn(),
@@ -307,9 +289,6 @@ public class DefaultUserFieldExpressionHandler
 
 	@Reference
 	private LDAPUserImporter _ldapUserImporter;
-
-	@Reference
-	private PrefsProps _prefsProps;
 
 	private int _processingIndex;
 

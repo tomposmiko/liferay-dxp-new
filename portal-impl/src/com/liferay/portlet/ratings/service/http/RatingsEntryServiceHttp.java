@@ -46,6 +46,7 @@ import com.liferay.ratings.kernel.service.RatingsEntryServiceUtil;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see RatingsEntryServiceSoap
  * @generated
  */
 public class RatingsEntryServiceHttp {

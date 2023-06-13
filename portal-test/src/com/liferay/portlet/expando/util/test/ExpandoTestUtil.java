@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import java.io.Serializable;
-
 import java.util.Locale;
 import java.util.Map;
 
@@ -102,16 +100,6 @@ public class ExpandoTestUtil {
 			ExpandoColumnConstants.STRING);
 
 		return addValue(table, column, classPK, data);
-	}
-
-	public static void addValues(
-			ExpandoTable table, long classPK,
-			Map<String, Serializable> attributes)
-		throws Exception {
-
-		ExpandoValueLocalServiceUtil.addValues(
-			TestPropsValues.getCompanyId(), table.getClassNameId(),
-			table.getName(), classPK, attributes);
 	}
 
 }

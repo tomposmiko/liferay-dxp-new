@@ -81,6 +81,13 @@ public class UserAttributes {
 
 	public static final String USER_NAME_SUFFIX = "user.name.suffix";
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #USER_NAME_NICK_NAME}
+	 */
+	@Deprecated
+	public static final String USER_NAME_NICKNAME = "user.name.nickName";
+
 	public static final String USER_NAME_NICK_NAME = "user.name.nickName";
 
 	public static final String USER_HOME_INFO_POSTAL_NAME =
@@ -274,7 +281,7 @@ public class UserAttributes {
 
 		try {
 			for (Address address : user.getAddresses()) {
-				ListType listType = address.getListType();
+				ListType listType = address.getType();
 
 				String listTypeName = listType.getName();
 
@@ -287,7 +294,7 @@ public class UserAttributes {
 			}
 
 			for (Phone phone : user.getPhones()) {
-				ListType listType = phone.getListType();
+				ListType listType = phone.getType();
 
 				String listTypeName = listType.getName();
 
@@ -312,7 +319,7 @@ public class UserAttributes {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		_businessAddress = businessAddress;
@@ -462,7 +469,7 @@ public class UserAttributes {
 		else if (name.equals(USER_NAME_SUFFIX)) {
 			return StringPool.BLANK;
 		}
-		else if (name.equals(USER_NAME_NICK_NAME)) {
+		else if (name.equals(USER_NAME_NICKNAME)) {
 			return _user.getScreenName();
 		}
 		else if (name.equals(USER_LOGIN_ID)) {

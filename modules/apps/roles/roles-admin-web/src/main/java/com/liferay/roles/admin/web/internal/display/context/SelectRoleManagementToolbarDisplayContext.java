@@ -16,6 +16,7 @@ package com.liferay.roles.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -24,10 +25,10 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -63,8 +64,8 @@ public class SelectRoleManagementToolbarDisplayContext {
 		_currentRoleTypeContributor =
 			RoleTypeContributorRetrieverUtil.getCurrentRoleTypeContributor(
 				renderRequest);
-		_groupId = ParamUtil.getLong(httpServletRequest, "groupId");
-		_step = ParamUtil.getInteger(httpServletRequest, "step", 1);
+		_groupId = ParamUtil.getLong(_httpServletRequest, "groupId");
+		_step = ParamUtil.getInteger(_httpServletRequest, "step", 1);
 	}
 
 	public String getClearResultsURL() {
@@ -90,9 +91,6 @@ public class SelectRoleManagementToolbarDisplayContext {
 			"roleType", String.valueOf(_currentRoleTypeContributor.getType()));
 
 		portletURL.setParameter("eventName", _eventName);
-		portletURL.setParameter(
-			"groupEventName",
-			ParamUtil.getString(_httpServletRequest, "groupEventName"));
 
 		String[] keywords = ParamUtil.getStringValues(
 			_httpServletRequest, "keywords");
@@ -148,8 +146,11 @@ public class SelectRoleManagementToolbarDisplayContext {
 		RoleSearchTerms roleSearchTerms =
 			(RoleSearchTerms)roleSearch.getSearchTerms();
 
+		List<Role> results = null;
+		int total = 0;
+
 		if (filterManageableRoles) {
-			List<Role> results = RoleLocalServiceUtil.search(
+			results = RoleLocalServiceUtil.search(
 				themeDisplay.getCompanyId(), roleSearchTerms.getKeywords(),
 				new Integer[] {_currentRoleTypeContributor.getType()},
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
@@ -164,19 +165,25 @@ public class SelectRoleManagementToolbarDisplayContext {
 					themeDisplay.getPermissionChecker(), groupId, results);
 			}
 
-			roleSearch.setResultsAndTotal(results);
+			total = results.size();
+
+			results = ListUtil.subList(
+				results, roleSearch.getStart(), roleSearch.getEnd());
 		}
 		else {
-			roleSearch.setResultsAndTotal(
-				() -> RoleLocalServiceUtil.search(
-					themeDisplay.getCompanyId(), roleSearchTerms.getKeywords(),
-					new Integer[] {_currentRoleTypeContributor.getType()},
-					roleSearch.getStart(), roleSearch.getEnd(),
-					roleSearch.getOrderByComparator()),
-				RoleLocalServiceUtil.searchCount(
-					themeDisplay.getCompanyId(), roleSearchTerms.getKeywords(),
-					new Integer[] {_currentRoleTypeContributor.getType()}));
+			total = RoleLocalServiceUtil.searchCount(
+				themeDisplay.getCompanyId(), roleSearchTerms.getKeywords(),
+				new Integer[] {_currentRoleTypeContributor.getType()});
+
+			results = RoleLocalServiceUtil.search(
+				themeDisplay.getCompanyId(), roleSearchTerms.getKeywords(),
+				new Integer[] {_currentRoleTypeContributor.getType()},
+				roleSearch.getStart(), roleSearch.getEnd(),
+				roleSearch.getOrderByComparator());
 		}
+
+		roleSearch.setResults(results);
+		roleSearch.setTotal(total);
 
 		_roleSearch = roleSearch;
 
@@ -210,7 +217,7 @@ public class SelectRoleManagementToolbarDisplayContext {
 			return PortalUtil.getSelectedUser(_httpServletRequest);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}

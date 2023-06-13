@@ -13,8 +13,10 @@
  */
 
 import updateFragmentEntryLinkConfiguration from '../actions/updateFragmentEntryLinkConfiguration';
+import updatePageContents from '../actions/updatePageContents';
 import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/freemarkerFragmentEntryProcessor';
 import FragmentService from '../services/FragmentService';
+import InfoItemService from '../services/InfoItemService';
 
 export default function updateFragmentConfiguration({
 	configurationValues,
@@ -28,23 +30,31 @@ export default function updateFragmentConfiguration({
 	};
 
 	return (dispatch, getState) => {
-		const {languageId, segmentsExperienceId} = getState();
-
 		return FragmentService.updateConfigurationValues({
 			editableValues: nextEditableValues,
 			fragmentEntryLinkId,
-			languageId,
+			languageId: getState().languageId,
 			onNetworkStatus: dispatch,
-			segmentsExperienceId,
-		}).then(({fragmentEntryLink, layoutData, pageContents}) => {
-			dispatch(
-				updateFragmentEntryLinkConfiguration({
-					fragmentEntryLink,
-					fragmentEntryLinkId,
-					layoutData,
-					pageContents,
-				})
-			);
-		});
+		})
+			.then(({fragmentEntryLink, layoutData}) => {
+				dispatch(
+					updateFragmentEntryLinkConfiguration({
+						fragmentEntryLink,
+						fragmentEntryLinkId,
+						layoutData,
+					})
+				);
+			})
+			.then(() => {
+				InfoItemService.getPageContents({
+					onNetworkStatus: dispatch,
+				}).then((pageContents) => {
+					dispatch(
+						updatePageContents({
+							pageContents,
+						})
+					);
+				});
+			});
 	};
 }

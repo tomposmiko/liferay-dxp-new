@@ -22,9 +22,9 @@
 AUI.add(
 	'liferay-resize-rtl',
 	(A) => {
-		const RULES = A.Resize.RULES;
+		var RULES = A.Resize.RULES;
 
-		const tmpL = RULES.l;
+		var tmpL = RULES.l;
 
 		RULES.l = RULES.r;
 		RULES.r = tmpL;

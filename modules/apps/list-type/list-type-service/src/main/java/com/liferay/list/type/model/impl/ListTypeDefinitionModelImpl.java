@@ -19,6 +19,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.list.type.model.ListTypeDefinition;
 import com.liferay.list.type.model.ListTypeDefinitionModel;
+import com.liferay.list.type.model.ListTypeDefinitionSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.LocaleException;
@@ -40,15 +41,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -82,7 +86,6 @@ public class ListTypeDefinitionModelImpl
 
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
-		{"externalReferenceCode", Types.VARCHAR},
 		{"listTypeDefinitionId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -95,7 +98,6 @@ public class ListTypeDefinitionModelImpl
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("listTypeDefinitionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
@@ -106,7 +108,7 @@ public class ListTypeDefinitionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table ListTypeDefinition (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,listTypeDefinitionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null)";
+		"create table ListTypeDefinition (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,listTypeDefinitionId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null)";
 
 	public static final String TABLE_SQL_DROP = "drop table ListTypeDefinition";
 
@@ -132,20 +134,14 @@ public class ListTypeDefinitionModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long EXTERNALREFERENCECODE_COLUMN_BITMASK = 2L;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
-	 */
-	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 4L;
+	public static final long UUID_COLUMN_BITMASK = 2L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long LISTTYPEDEFINITIONID_COLUMN_BITMASK = 8L;
+	public static final long LISTTYPEDEFINITIONID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -159,6 +155,59 @@ public class ListTypeDefinitionModelImpl
 	 */
 	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static ListTypeDefinition toModel(ListTypeDefinitionSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		ListTypeDefinition model = new ListTypeDefinitionImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setListTypeDefinitionId(soapModel.getListTypeDefinitionId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setName(soapModel.getName());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<ListTypeDefinition> toModels(
+		ListTypeDefinitionSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<ListTypeDefinition> models = new ArrayList<ListTypeDefinition>(
+			soapModels.length);
+
+		for (ListTypeDefinitionSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public ListTypeDefinitionModelImpl() {
@@ -237,109 +286,114 @@ public class ListTypeDefinitionModelImpl
 	public Map<String, Function<ListTypeDefinition, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ListTypeDefinition, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ListTypeDefinition>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ListTypeDefinition, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ListTypeDefinition.class.getClassLoader(), ListTypeDefinition.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ListTypeDefinition, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<ListTypeDefinition, Object>>();
+		try {
+			Constructor<ListTypeDefinition> constructor =
+				(Constructor<ListTypeDefinition>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", ListTypeDefinition::getMvccVersion);
-			attributeGetterFunctions.put("uuid", ListTypeDefinition::getUuid);
-			attributeGetterFunctions.put(
-				"externalReferenceCode",
-				ListTypeDefinition::getExternalReferenceCode);
-			attributeGetterFunctions.put(
-				"listTypeDefinitionId",
-				ListTypeDefinition::getListTypeDefinitionId);
-			attributeGetterFunctions.put(
-				"companyId", ListTypeDefinition::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", ListTypeDefinition::getUserId);
-			attributeGetterFunctions.put(
-				"userName", ListTypeDefinition::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", ListTypeDefinition::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", ListTypeDefinition::getModifiedDate);
-			attributeGetterFunctions.put("name", ListTypeDefinition::getName);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ListTypeDefinition, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ListTypeDefinition, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ListTypeDefinition, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ListTypeDefinition, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<ListTypeDefinition, Object>>();
+		Map<String, BiConsumer<ListTypeDefinition, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<ListTypeDefinition, ?>>();
 
-		static {
-			Map<String, BiConsumer<ListTypeDefinition, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<ListTypeDefinition, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", ListTypeDefinition::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<ListTypeDefinition, Long>)
+				ListTypeDefinition::setMvccVersion);
+		attributeGetterFunctions.put("uuid", ListTypeDefinition::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<ListTypeDefinition, String>)
+				ListTypeDefinition::setUuid);
+		attributeGetterFunctions.put(
+			"listTypeDefinitionId",
+			ListTypeDefinition::getListTypeDefinitionId);
+		attributeSetterBiConsumers.put(
+			"listTypeDefinitionId",
+			(BiConsumer<ListTypeDefinition, Long>)
+				ListTypeDefinition::setListTypeDefinitionId);
+		attributeGetterFunctions.put(
+			"companyId", ListTypeDefinition::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<ListTypeDefinition, Long>)
+				ListTypeDefinition::setCompanyId);
+		attributeGetterFunctions.put("userId", ListTypeDefinition::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<ListTypeDefinition, Long>)
+				ListTypeDefinition::setUserId);
+		attributeGetterFunctions.put(
+			"userName", ListTypeDefinition::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<ListTypeDefinition, String>)
+				ListTypeDefinition::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", ListTypeDefinition::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<ListTypeDefinition, Date>)
+				ListTypeDefinition::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", ListTypeDefinition::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<ListTypeDefinition, Date>)
+				ListTypeDefinition::setModifiedDate);
+		attributeGetterFunctions.put("name", ListTypeDefinition::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<ListTypeDefinition, String>)
+				ListTypeDefinition::setName);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<ListTypeDefinition, Long>)
-					ListTypeDefinition::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<ListTypeDefinition, String>)
-					ListTypeDefinition::setUuid);
-			attributeSetterBiConsumers.put(
-				"externalReferenceCode",
-				(BiConsumer<ListTypeDefinition, String>)
-					ListTypeDefinition::setExternalReferenceCode);
-			attributeSetterBiConsumers.put(
-				"listTypeDefinitionId",
-				(BiConsumer<ListTypeDefinition, Long>)
-					ListTypeDefinition::setListTypeDefinitionId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<ListTypeDefinition, Long>)
-					ListTypeDefinition::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<ListTypeDefinition, Long>)
-					ListTypeDefinition::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<ListTypeDefinition, String>)
-					ListTypeDefinition::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<ListTypeDefinition, Date>)
-					ListTypeDefinition::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<ListTypeDefinition, Date>)
-					ListTypeDefinition::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<ListTypeDefinition, String>)
-					ListTypeDefinition::setName);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -384,35 +438,6 @@ public class ListTypeDefinitionModelImpl
 	@Deprecated
 	public String getOriginalUuid() {
 		return getColumnOriginalValue("uuid_");
-	}
-
-	@JSON
-	@Override
-	public String getExternalReferenceCode() {
-		if (_externalReferenceCode == null) {
-			return "";
-		}
-		else {
-			return _externalReferenceCode;
-		}
-	}
-
-	@Override
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_externalReferenceCode = externalReferenceCode;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public String getOriginalExternalReferenceCode() {
-		return getColumnOriginalValue("externalReferenceCode");
 	}
 
 	@JSON
@@ -781,8 +806,6 @@ public class ListTypeDefinitionModelImpl
 
 		listTypeDefinitionImpl.setMvccVersion(getMvccVersion());
 		listTypeDefinitionImpl.setUuid(getUuid());
-		listTypeDefinitionImpl.setExternalReferenceCode(
-			getExternalReferenceCode());
 		listTypeDefinitionImpl.setListTypeDefinitionId(
 			getListTypeDefinitionId());
 		listTypeDefinitionImpl.setCompanyId(getCompanyId());
@@ -806,8 +829,6 @@ public class ListTypeDefinitionModelImpl
 			this.<Long>getColumnOriginalValue("mvccVersion"));
 		listTypeDefinitionImpl.setUuid(
 			this.<String>getColumnOriginalValue("uuid_"));
-		listTypeDefinitionImpl.setExternalReferenceCode(
-			this.<String>getColumnOriginalValue("externalReferenceCode"));
 		listTypeDefinitionImpl.setListTypeDefinitionId(
 			this.<Long>getColumnOriginalValue("listTypeDefinitionId"));
 		listTypeDefinitionImpl.setCompanyId(
@@ -910,18 +931,6 @@ public class ListTypeDefinitionModelImpl
 			listTypeDefinitionCacheModel.uuid = null;
 		}
 
-		listTypeDefinitionCacheModel.externalReferenceCode =
-			getExternalReferenceCode();
-
-		String externalReferenceCode =
-			listTypeDefinitionCacheModel.externalReferenceCode;
-
-		if ((externalReferenceCode != null) &&
-			(externalReferenceCode.length() == 0)) {
-
-			listTypeDefinitionCacheModel.externalReferenceCode = null;
-		}
-
 		listTypeDefinitionCacheModel.listTypeDefinitionId =
 			getListTypeDefinitionId();
 
@@ -1016,18 +1025,46 @@ public class ListTypeDefinitionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ListTypeDefinition, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ListTypeDefinition, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ListTypeDefinition, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ListTypeDefinition)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ListTypeDefinition>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ListTypeDefinition.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
 	private String _uuid;
-	private String _externalReferenceCode;
 	private long _listTypeDefinitionId;
 	private long _companyId;
 	private long _userId;
@@ -1042,8 +1079,7 @@ public class ListTypeDefinitionModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<ListTypeDefinition, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -1070,8 +1106,6 @@ public class ListTypeDefinitionModelImpl
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
-		_columnOriginalValues.put(
-			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put(
 			"listTypeDefinitionId", _listTypeDefinitionId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1107,21 +1141,19 @@ public class ListTypeDefinitionModelImpl
 
 		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("externalReferenceCode", 4L);
+		columnBitmasks.put("listTypeDefinitionId", 4L);
 
-		columnBitmasks.put("listTypeDefinitionId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
-
-		columnBitmasks.put("name", 512L);
+		columnBitmasks.put("name", 256L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

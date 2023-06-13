@@ -17,14 +17,18 @@ package com.liferay.portal.search.web.internal.facet;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.asset.SearchableAssetClassNamesProvider;
 import com.liferay.portal.search.facet.Facet;
@@ -34,6 +38,9 @@ import com.liferay.portal.search.web.facet.BaseJSPSearchFacet;
 import com.liferay.portal.search.web.facet.SearchFacet;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 
@@ -45,8 +52,59 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = SearchFacet.class)
+@Component(immediate = true, service = SearchFacet.class)
 public class AssetEntriesSearchFacet extends BaseJSPSearchFacet {
+
+	public static String[] getEntryClassNames(String configuration) {
+		if (Validator.isNull(configuration)) {
+			return null;
+		}
+
+		JSONObject configurationJSONObject;
+
+		try {
+			configurationJSONObject = JSONFactoryUtil.createJSONObject(
+				configuration);
+		}
+		catch (JSONException jsonException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to parse configuration", jsonException.getCause());
+			}
+
+			return null;
+		}
+
+		JSONArray jsonArray = configurationJSONObject.getJSONArray("facets");
+
+		if (jsonArray == null) {
+			return null;
+		}
+
+		String id = AssetEntriesSearchFacet.class.getName();
+
+		IntStream intStream = IntStream.range(0, jsonArray.length());
+
+		Stream<JSONObject> jsonObjectsStream = intStream.mapToObj(
+			jsonArray::getJSONObject);
+
+		return jsonObjectsStream.filter(
+			jsonObject -> id.equals(jsonObject.getString("id"))
+		).map(
+			jsonObject -> jsonObject.getJSONObject("data")
+		).filter(
+			Objects::nonNull
+		).map(
+			jsonObject -> jsonObject.getJSONArray("values")
+		).filter(
+			Objects::nonNull
+		).map(
+			ArrayUtil::toStringArray
+		).findAny(
+		).orElse(
+			null
+		);
+	}
 
 	public List<AssetRendererFactory<?>> getAssetRendererFactories(
 		long companyId) {
@@ -66,20 +124,17 @@ public class AssetEntriesSearchFacet extends BaseJSPSearchFacet {
 
 		facetConfiguration.setClassName(getFacetClassName());
 
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		for (String assetType : getAssetTypes(companyId)) {
+			jsonArray.put(assetType);
+		}
+
 		facetConfiguration.setDataJSONObject(
 			JSONUtil.put(
 				"frequencyThreshold", 1
 			).put(
-				"values",
-				() -> {
-					JSONArray jsonArray = _jsonFactory.createJSONArray();
-
-					for (String assetType : getAssetTypes(companyId)) {
-						jsonArray.put(assetType);
-					}
-
-					return jsonArray;
-				}
+				"values", jsonArray
 			));
 
 		facetConfiguration.setFieldName(getFieldName());
@@ -98,45 +153,41 @@ public class AssetEntriesSearchFacet extends BaseJSPSearchFacet {
 
 	@Override
 	public String getFacetClassName() {
-		return _assetEntriesFacetFactory.getFacetClassName();
+		return assetEntriesFacetFactory.getFacetClassName();
 	}
 
 	@Override
 	public String getFieldName() {
-		Facet facet = _assetEntriesFacetFactory.newInstance(null);
+		Facet facet = assetEntriesFacetFactory.newInstance(null);
 
 		return facet.getFieldName();
 	}
 
 	@Override
 	public JSONObject getJSONData(ActionRequest actionRequest) {
+		int frequencyThreshold = ParamUtil.getInteger(
+			actionRequest, getClassName() + "frequencyThreshold", 1);
+
+		String[] assetTypes = StringUtil.split(
+			ParamUtil.getString(actionRequest, getClassName() + "assetTypes"));
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		if (ArrayUtil.isEmpty(assetTypes)) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			assetTypes = getAssetTypes(themeDisplay.getCompanyId());
+		}
+
+		for (String assetType : assetTypes) {
+			jsonArray.put(assetType);
+		}
+
 		return JSONUtil.put(
-			"frequencyThreshold",
-			ParamUtil.getInteger(
-				actionRequest, getClassName() + "frequencyThreshold", 1)
+			"frequencyThreshold", frequencyThreshold
 		).put(
-			"values",
-			() -> {
-				String[] assetTypes = StringUtil.split(
-					ParamUtil.getString(
-						actionRequest, getClassName() + "assetTypes"));
-
-				JSONArray jsonArray = _jsonFactory.createJSONArray();
-
-				if (ArrayUtil.isEmpty(assetTypes)) {
-					ThemeDisplay themeDisplay =
-						(ThemeDisplay)actionRequest.getAttribute(
-							WebKeys.THEME_DISPLAY);
-
-					assetTypes = getAssetTypes(themeDisplay.getCompanyId());
-				}
-
-				for (String assetType : assetTypes) {
-					jsonArray.put(assetType);
-				}
-
-				return jsonArray;
-			}
+			"values", jsonArray
 		);
 	}
 
@@ -150,31 +201,32 @@ public class AssetEntriesSearchFacet extends BaseJSPSearchFacet {
 		return "asset-type";
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.portal.search.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	protected String[] getAssetTypes(long companyId) {
-		return _searchableAssetClassNamesProvider.getClassNames(companyId);
+		return searchableAssetClassNamesProvider.getClassNames(companyId);
 	}
 
 	@Override
 	protected FacetFactory getFacetFactory() {
-		return _assetEntriesFacetFactory;
-	}
-
-	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+		return assetEntriesFacetFactory;
 	}
 
 	@Reference
-	private AssetEntriesFacetFactory _assetEntriesFacetFactory;
+	protected AssetEntriesFacetFactory assetEntriesFacetFactory;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	protected SearchableAssetClassNamesProvider
+		searchableAssetClassNamesProvider;
 
-	@Reference
-	private SearchableAssetClassNamesProvider
-		_searchableAssetClassNamesProvider;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.portal.search.web)")
-	private ServletContext _servletContext;
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetEntriesSearchFacet.class);
 
 }

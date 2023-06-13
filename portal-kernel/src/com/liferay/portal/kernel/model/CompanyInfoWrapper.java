@@ -186,11 +186,6 @@ public class CompanyInfoWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CompanyInfoWrapper wrap(CompanyInfo companyInfo) {
 		return new CompanyInfoWrapper(companyInfo);
 	}

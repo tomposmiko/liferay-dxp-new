@@ -44,8 +44,7 @@ public class DataDefinitionMustSetFieldTypeValidationExceptionMapper
 
 		return new Problem(
 			mustSetFieldType.getFieldName(), Response.Status.BAD_REQUEST,
-			mustSetFieldType.getMessage(),
-			DataDefinitionValidationException.MustSetFieldType.class.getName());
+			mustSetFieldType.getMessage(), "MustSetFieldType");
 	}
 
 }

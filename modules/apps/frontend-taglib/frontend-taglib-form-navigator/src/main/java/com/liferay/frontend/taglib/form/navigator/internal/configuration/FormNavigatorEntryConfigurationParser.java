@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +44,7 @@ import org.osgi.service.component.annotations.Modified;
 )
 public class FormNavigatorEntryConfigurationParser {
 
-	public List<String> getFormNavigatorEntryKeys(
+	public Optional<List<String>> getFormNavigatorEntryKeys(
 		String categoryKey, String context) {
 
 		List<String> formNavigatorEntryKeys = null;
@@ -61,7 +62,7 @@ public class FormNavigatorEntryConfigurationParser {
 				categoryKey);
 		}
 
-		return formNavigatorEntryKeys;
+		return Optional.ofNullable(formNavigatorEntryKeys);
 	}
 
 	public String getFormNavigatorId() {

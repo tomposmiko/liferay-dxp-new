@@ -14,26 +14,22 @@
 
 package com.liferay.commerce.discount.internal.upgrade.v2_4_0;
 
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
+import com.liferay.commerce.discount.internal.upgrade.base.BaseCommerceDiscountUpgradeProcess;
+import com.liferay.commerce.discount.internal.upgrade.v2_4_0.util.CommerceDiscountTable;
 
 /**
  * @author Riccardo Alberti
  */
-public class CommerceDiscountUpgradeProcess extends UpgradeProcess {
+public class CommerceDiscountUpgradeProcess
+	extends BaseCommerceDiscountUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		runSQL("update CommerceDiscount set limitationTimesPerAccount = 0");
-	}
+		addColumn(
+			CommerceDiscountTable.class, CommerceDiscountTable.TABLE_NAME,
+			"limitationTimesPerAccount", "INTEGER");
 
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommerceDiscount", "limitationTimesPerAccount INTEGER")
-		};
+		runSQL("update CommerceDiscount set limitationTimesPerAccount = 0");
 	}
 
 }

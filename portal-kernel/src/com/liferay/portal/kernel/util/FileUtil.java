@@ -58,10 +58,22 @@ public class FileUtil {
 		_file.copyFile(source, destination);
 	}
 
+	public static void copyFile(File source, File destination, boolean lazy)
+		throws IOException {
+
+		_file.copyFile(source, destination, lazy);
+	}
+
 	public static void copyFile(String source, String destination)
 		throws IOException {
 
 		_file.copyFile(source, destination);
+	}
+
+	public static void copyFile(String source, String destination, boolean lazy)
+		throws IOException {
+
+		_file.copyFile(source, destination, lazy);
 	}
 
 	public static File createTempFile() {
@@ -143,14 +155,20 @@ public class FileUtil {
 	 * @return the extracted text if it is a supported format or an empty string
 	 *         if it is an unsupported format
 	 */
-	public static String extractText(InputStream inputStream) {
-		return _file.extractText(inputStream);
+	public static String extractText(InputStream inputStream, String fileName) {
+		return _file.extractText(inputStream, fileName);
 	}
 
 	public static String extractText(
-		InputStream inputStream, int maxStringLength) {
+		InputStream inputStream, String fileName, int maxStringLength) {
 
-		return _file.extractText(inputStream, maxStringLength);
+		return _file.extractText(inputStream, fileName, maxStringLength);
+	}
+
+	public static String[] find(
+		String directory, String includes, String excludes) {
+
+		return _file.find(directory, includes, excludes);
 	}
 
 	public static String getAbsolutePath(File file) {
@@ -204,6 +222,10 @@ public class FileUtil {
 		return _file.getShortFileName(fullFileName);
 	}
 
+	public static boolean isAscii(File file) throws IOException {
+		return _file.isAscii(file);
+	}
+
 	public static boolean isSameContent(File file, byte[] bytes, int length) {
 		return _file.isSameContent(file, bytes, length);
 	}
@@ -228,7 +250,7 @@ public class FileUtil {
 		return _file.listFiles(fileName);
 	}
 
-	public static void mkdirs(File file) {
+	public static void mkdirs(File file) throws IOException {
 		_file.mkdirs(file);
 	}
 

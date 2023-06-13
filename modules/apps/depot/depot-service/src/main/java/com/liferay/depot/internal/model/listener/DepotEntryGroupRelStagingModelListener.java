@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class DepotEntryGroupRelStagingModelListener
 	extends BaseModelListener<DepotEntryGroupRel> {
 

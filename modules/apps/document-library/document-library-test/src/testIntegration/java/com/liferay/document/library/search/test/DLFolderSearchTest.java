@@ -145,7 +145,7 @@ public class DLFolderSearchTest extends BaseSearchTestCase {
 		}
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, serviceContext.getScopeGroupId(), folderId, keywords,
+			serviceContext.getScopeGroupId(), folderId, keywords,
 			RandomTestUtil.randomString(), serviceContext);
 
 		return (DLFolder)folder.getModel();
@@ -167,7 +167,7 @@ public class DLFolderSearchTest extends BaseSearchTestCase {
 		throws Exception {
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, serviceContext.getScopeGroupId(),
+			serviceContext.getScopeGroupId(),
 			(Long)parentBaseModel.getPrimaryKeyObj(),
 			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
 			RandomTestUtil.randomString(), serviceContext);
@@ -181,7 +181,7 @@ public class DLFolderSearchTest extends BaseSearchTestCase {
 		throws Exception {
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, serviceContext.getScopeGroupId(),
+			serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(_FOLDER_NAME_MAX_LENGTH),
 			RandomTestUtil.randomString(), serviceContext);

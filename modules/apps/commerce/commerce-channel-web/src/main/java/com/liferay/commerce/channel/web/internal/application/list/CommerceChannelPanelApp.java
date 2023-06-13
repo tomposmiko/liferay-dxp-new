@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"panel.app.order:Integer=100",
 		"panel.category.key=" + CommercePanelCategoryKeys.COMMERCE_STORE_MANAGEMENT
@@ -37,18 +38,17 @@ import org.osgi.service.component.annotations.Reference;
 public class CommerceChannelPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return CPPortletKeys.COMMERCE_CHANNELS;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS + ")"
+		target = "(javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

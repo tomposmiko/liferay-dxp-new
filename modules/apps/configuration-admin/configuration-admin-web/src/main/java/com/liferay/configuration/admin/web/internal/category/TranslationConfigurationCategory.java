@@ -25,11 +25,6 @@ import org.osgi.service.component.annotations.Component;
 public class TranslationConfigurationCategory implements ConfigurationCategory {
 
 	@Override
-	public String getCategoryIcon() {
-		return "automatic-translate";
-	}
-
-	@Override
 	public String getCategoryKey() {
 		return "translation";
 	}

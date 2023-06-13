@@ -26,8 +26,8 @@ import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
+import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.workflow.kaleo.definition.DelayDuration;
 import com.liferay.portal.workflow.kaleo.definition.DurationScale;
@@ -40,8 +40,6 @@ import com.liferay.portal.workflow.kaleo.runtime.constants.KaleoRuntimeDestinati
 import com.liferay.portal.workflow.kaleo.runtime.util.SchedulerUtil;
 import com.liferay.portal.workflow.kaleo.runtime.util.WorkflowContextUtil;
 import com.liferay.portal.workflow.kaleo.service.base.KaleoTimerInstanceTokenLocalServiceBaseImpl;
-import com.liferay.portal.workflow.kaleo.service.persistence.KaleoInstanceTokenPersistence;
-import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTimerPersistence;
 
 import java.io.Serializable;
 
@@ -73,12 +71,11 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(
-			serviceContext.getGuestOrUserId());
+		User user = userLocalService.getUser(serviceContext.getGuestOrUserId());
 		KaleoInstanceToken kaleoInstanceToken =
-			_kaleoInstanceTokenPersistence.findByPrimaryKey(
+			kaleoInstanceTokenPersistence.findByPrimaryKey(
 				kaleoInstanceTokenId);
-		KaleoTimer kaleoTimer = _kaleoTimerPersistence.findByPrimaryKey(
+		KaleoTimer kaleoTimer = kaleoTimerPersistence.findByPrimaryKey(
 			kaleoTimerId);
 		Date date = new Date();
 
@@ -88,8 +85,11 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 			kaleoTimerInstanceTokenPersistence.create(
 				kaleoTimerInstanceTokenId);
 
-		kaleoTimerInstanceToken.setGroupId(
-			_staging.getLiveGroupId(serviceContext.getScopeGroupId()));
+		long groupId = _staging.getLiveGroupId(
+			serviceContext.getScopeGroupId());
+
+		kaleoTimerInstanceToken.setGroupId(groupId);
+
 		kaleoTimerInstanceToken.setCompanyId(user.getCompanyId());
 		kaleoTimerInstanceToken.setUserId(user.getUserId());
 		kaleoTimerInstanceToken.setUserName(user.getFullName());
@@ -117,7 +117,7 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 		kaleoTimerInstanceToken = kaleoTimerInstanceTokenPersistence.update(
 			kaleoTimerInstanceToken);
 
-		_scheduleTimer(kaleoTimerInstanceToken, kaleoTimer);
+		scheduleTimer(kaleoTimerInstanceToken, kaleoTimer);
 
 		return kaleoTimerInstanceToken;
 	}
@@ -174,7 +174,7 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 		kaleoTimerInstanceToken = kaleoTimerInstanceTokenPersistence.update(
 			kaleoTimerInstanceToken);
 
-		_deleteScheduledTimer(kaleoTimerInstanceToken);
+		deleteScheduledTimer(kaleoTimerInstanceToken);
 
 		return kaleoTimerInstanceToken;
 	}
@@ -215,7 +215,7 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 		KaleoTimerInstanceToken kaleoTimerInstanceToken =
 			getKaleoTimerInstanceToken(kaleoInstanceTokenId, kaleoTimerId);
 
-		_deleteScheduledTimer(kaleoTimerInstanceToken);
+		deleteScheduledTimer(kaleoTimerInstanceToken);
 
 		kaleoTimerInstanceTokenPersistence.remove(kaleoTimerInstanceToken);
 	}
@@ -234,7 +234,7 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 			}
 
 			try {
-				_deleteScheduledTimer(kaleoTimerInstanceToken);
+				deleteScheduledTimer(kaleoTimerInstanceToken);
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
@@ -275,30 +275,30 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 			kaleoInstanceTokenId, blocking, completed);
 	}
 
-	private void _deleteScheduledTimer(
+	protected void deleteScheduledTimer(
 			KaleoTimerInstanceToken kaleoTimerInstanceToken)
 		throws PortalException {
 
-		String groupName = _getSchedulerGroupName(kaleoTimerInstanceToken);
+		String groupName = getSchedulerGroupName(kaleoTimerInstanceToken);
 
 		_schedulerEngineHelper.delete(groupName, StorageType.PERSISTED);
 	}
 
-	private String _getSchedulerGroupName(
+	protected String getSchedulerGroupName(
 		KaleoTimerInstanceToken kaleoTimerInstanceToken) {
 
 		return SchedulerUtil.getGroupName(
 			kaleoTimerInstanceToken.getKaleoTimerInstanceTokenId());
 	}
 
-	private void _scheduleTimer(
+	protected void scheduleTimer(
 			KaleoTimerInstanceToken kaleoTimerInstanceToken,
 			KaleoTimer kaleoTimer)
 		throws PortalException {
 
-		_deleteScheduledTimer(kaleoTimerInstanceToken);
+		deleteScheduledTimer(kaleoTimerInstanceToken);
 
-		String groupName = _getSchedulerGroupName(kaleoTimerInstanceToken);
+		String groupName = getSchedulerGroupName(kaleoTimerInstanceToken);
 
 		DelayDuration delayDuration = new DelayDuration(
 			kaleoTimer.getDuration(),
@@ -323,8 +323,8 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 				StringUtil.toUpperCase(durationScale.getValue()));
 		}
 
-		Trigger trigger = _triggerFactory.createTrigger(
-			groupName, groupName, dueDate, null, interval, timeUnit);
+		Trigger trigger = TriggerFactoryUtil.createTrigger(
+			groupName, groupName, dueDate, interval, timeUnit);
 
 		Message message = new Message();
 
@@ -335,7 +335,7 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 
 		_schedulerEngineHelper.schedule(
 			trigger, StorageType.PERSISTED, null,
-			KaleoRuntimeDestinationNames.WORKFLOW_TIMER, message);
+			KaleoRuntimeDestinationNames.WORKFLOW_TIMER, message, 0);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -345,12 +345,6 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 	private DueDateCalculator _dueDateCalculator;
 
 	@Reference
-	private KaleoInstanceTokenPersistence _kaleoInstanceTokenPersistence;
-
-	@Reference
-	private KaleoTimerPersistence _kaleoTimerPersistence;
-
-	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
 
 	@Reference
@@ -358,8 +352,5 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 
 	@Reference
 	private TriggerFactory _triggerFactory;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

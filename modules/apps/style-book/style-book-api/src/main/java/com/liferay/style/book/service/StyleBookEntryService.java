@@ -62,8 +62,7 @@ public interface StyleBookEntryService extends BaseService {
 		throws PortalException;
 
 	public StyleBookEntry copyStyleBookEntry(
-			long groupId, long sourceStyleBookEntryId,
-			ServiceContext serviceContext)
+			long groupId, long styleBookEntryId, ServiceContext serviceContext)
 		throws PortalException;
 
 	public StyleBookEntry deleteStyleBookEntry(long styleBookEntryId)

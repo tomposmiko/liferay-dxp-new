@@ -38,7 +38,6 @@ public class UserFinderBaseImpl extends BasePersistenceImpl<User> {
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("password", "password_");
-		dbColumnNames.put("type", "type_");
 		dbColumnNames.put("groups", "groups_");
 
 		setDBColumnNames(dbColumnNames);

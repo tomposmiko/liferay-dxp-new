@@ -258,8 +258,4 @@ public interface PortletItemModel
 	@Override
 	public PortletItem cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -19,22 +19,26 @@ import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,13 +47,24 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
 		"mvc.command.name=/layout_admin/discard_draft_layout"
 	},
-	service = MVCActionCommand.class
+	service = {AopService.class, MVCActionCommand.class}
 )
-public class DiscardDraftLayoutMVCActionCommand extends BaseMVCActionCommand {
+public class DiscardDraftLayoutMVCActionCommand
+	extends BaseMVCActionCommand implements AopService, MVCActionCommand {
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean processAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws PortletException {
+
+		return super.processAction(actionRequest, actionResponse);
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -61,8 +76,19 @@ public class DiscardDraftLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 		long selPlid = ParamUtil.getLong(actionRequest, "selPlid");
 
-		LayoutPermissionUtil.checkLayoutUpdatePermission(
-			themeDisplay.getPermissionChecker(), selPlid);
+		try {
+			LayoutPermissionUtil.check(
+				themeDisplay.getPermissionChecker(), selPlid,
+				ActionKeys.UPDATE);
+		}
+		catch (PrincipalException principalException) {
+			if (!LayoutPermissionUtil.contains(
+					themeDisplay.getPermissionChecker(), selPlid,
+					ActionKeys.UPDATE_LAYOUT_CONTENT)) {
+
+				throw principalException;
+			}
+		}
 
 		Layout draftLayout = _layoutLocalService.getLayout(selPlid);
 
@@ -96,18 +122,24 @@ public class DiscardDraftLayoutMVCActionCommand extends BaseMVCActionCommand {
 			themeDisplay.getPermissionChecker(), layout.getPlid(),
 			ActionKeys.VIEW);
 
-		boolean published = layout.isPublished();
+		UnicodeProperties typeSettingsUnicodeProperties =
+			draftLayout.getTypeSettingsProperties();
 
-		draftLayout = _layoutCopyHelper.copyLayoutContent(layout, draftLayout);
+		boolean published = GetterUtil.getBoolean(
+			typeSettingsUnicodeProperties.getProperty("published"));
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			Layout.class.getName(), actionRequest);
+		draftLayout = _layoutCopyHelper.copyLayout(layout, draftLayout);
 
-		serviceContext.setAttribute("published", published);
+		draftLayout.setStatus(WorkflowConstants.STATUS_APPROVED);
 
-		_layoutLocalService.updateStatus(
-			themeDisplay.getUserId(), draftLayout.getPlid(),
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+		typeSettingsUnicodeProperties = draftLayout.getTypeSettingsProperties();
+
+		typeSettingsUnicodeProperties.put(
+			"published", String.valueOf(published));
+
+		draftLayout.setTypeSettingsProperties(typeSettingsUnicodeProperties);
+
+		_layoutLocalService.updateLayout(draftLayout);
 
 		sendRedirect(actionRequest, actionResponse);
 	}

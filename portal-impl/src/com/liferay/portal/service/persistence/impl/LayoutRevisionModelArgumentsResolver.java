@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LayoutRevisionTable;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.model.impl.LayoutRevisionImpl;
 import com.liferay.portal.model.impl.LayoutRevisionModelImpl;
 
@@ -31,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portal.model.impl.LayoutRevisionImpl",
-		"table.name=LayoutRevision"
-	},
-	service = ArgumentsResolver.class
-)
 public class LayoutRevisionModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

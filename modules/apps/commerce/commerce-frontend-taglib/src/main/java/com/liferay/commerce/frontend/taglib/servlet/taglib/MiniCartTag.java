@@ -14,34 +14,26 @@
 
 package com.liferay.commerce.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.configuration.CommerceOrderFieldsConfiguration;
 import com.liferay.commerce.configuration.CommercePriceConfiguration;
 import com.liferay.commerce.constants.CommerceConstants;
-import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
-import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.frontend.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.order.CommerceOrderHttpHelper;
-import com.liferay.commerce.product.url.CPFriendlyURL;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
-import com.liferay.portal.kernel.portlet.PortletProvider;
-import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.SystemSettingsLocator;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.util.IncludeTag;
 
@@ -68,41 +60,17 @@ public class MiniCartTag extends IncludeTag {
 			(CommerceContext)httpServletRequest.getAttribute(
 				CommerceWebKeys.COMMERCE_CONTEXT);
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		_siteDefaultURL = _getSiteDefaultURL(themeDisplay);
+
+		if (Validator.isNull(_spritemap)) {
+			_spritemap = themeDisplay.getPathThemeImages() + "/clay/icons.svg";
+		}
+
 		try {
-			_checkoutURL = StringPool.BLANK;
-
-			PortletURL portletURL = PortletProviderUtil.getPortletURL(
-				httpServletRequest, CommercePortletKeys.COMMERCE_CHECKOUT,
-				PortletProvider.Action.VIEW);
-
-			if (portletURL != null) {
-				_checkoutURL = PortletURLBuilder.create(
-					portletURL
-				).setMVCRenderCommandName(
-					"/commerce_checkout/checkout_redirect"
-				).buildString();
-			}
-
-			_commerceChannelId = commerceContext.getCommerceChannelId();
-
-			if (_commerceChannelId == 0) {
-				_commerceChannelGroupId = 0;
-				_checkoutURL = StringPool.BLANK;
-				_itemsQuantity = 0;
-				_orderDetailURL = StringPool.BLANK;
-				_orderId = 0;
-
-				return super.doStartTag();
-			}
-
-			_commerceChannelGroupId =
-				commerceContext.getCommerceChannelGroupId();
-
-			CommerceCurrency commerceCurrency =
-				commerceContext.getCommerceCurrency();
-
-			_commerceCurrencyCode = commerceCurrency.getCode();
-
 			CommerceOrder commerceOrder = commerceContext.getCommerceOrder();
 
 			if (commerceOrder != null) {
@@ -119,24 +87,22 @@ public class MiniCartTag extends IncludeTag {
 				}
 			}
 			else {
-				PortletURL commerceCartPortletURL =
-					_commerceOrderHttpHelper.getCommerceCartPortletURL(
-						httpServletRequest, null);
-
-				if (commerceCartPortletURL != null) {
-					_orderDetailURL = String.valueOf(commerceCartPortletURL);
-				}
-				else {
-					_orderDetailURL = StringPool.BLANK;
-				}
-
+				_orderDetailURL = StringPool.BLANK;
 				_orderId = 0;
 			}
 
-			_requestQuoteEnabled = _isRequestQuoteEnabled();
+			_checkoutURL = StringPool.BLANK;
+
+			PortletURL commerceCheckoutPortletURL =
+				_commerceOrderHttpHelper.getCommerceCheckoutPortletURL(
+					httpServletRequest);
+
+			if (commerceCheckoutPortletURL != null) {
+				_checkoutURL = String.valueOf(commerceCheckoutPortletURL);
+			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			_checkoutURL = StringPool.BLANK;
 			_itemsQuantity = 0;
@@ -144,21 +110,15 @@ public class MiniCartTag extends IncludeTag {
 			_orderId = 0;
 		}
 
-		CPFriendlyURL cpFriendlyURL = ServletContextUtil.getCPFriendlyURL();
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		_productURLSeparator = cpFriendlyURL.getProductURLSeparator(
-			themeDisplay.getCompanyId());
-		_siteDefaultURL = _getSiteDefaultURL(themeDisplay);
-
 		return super.doStartTag();
 	}
 
 	public Map<String, String> getLabels() {
 		return _labels;
+	}
+
+	public String getSpritemap() {
+		return _spritemap;
 	}
 
 	public Map<String, String> getViews() {
@@ -194,6 +154,10 @@ public class MiniCartTag extends IncludeTag {
 			ServletContextUtil.getCommerceOrderHttpHelper();
 	}
 
+	public void setSpritemap(String spritemap) {
+		_spritemap = spritemap;
+	}
+
 	public void setToggleable(boolean toggleable) {
 		_toggleable = toggleable;
 	}
@@ -207,9 +171,6 @@ public class MiniCartTag extends IncludeTag {
 		super.cleanUp();
 
 		_checkoutURL = null;
-		_commerceChannelGroupId = 0;
-		_commerceChannelId = 0;
-		_commerceCurrencyCode = null;
 		_commerceOrderHttpHelper = null;
 		_configurationProvider = null;
 		_displayTotalItemsQuantity = false;
@@ -217,9 +178,8 @@ public class MiniCartTag extends IncludeTag {
 		_labels = new HashMap<>();
 		_orderDetailURL = null;
 		_orderId = 0;
-		_productURLSeparator = StringPool.BLANK;
-		_requestQuoteEnabled = false;
 		_siteDefaultURL = StringPool.BLANK;
+		_spritemap = null;
 		_toggleable = true;
 		_views = new HashMap<>();
 	}
@@ -236,14 +196,6 @@ public class MiniCartTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			"liferay-commerce:cart:checkoutURL", _checkoutURL);
 		httpServletRequest.setAttribute(
-			"liferay-commerce:cart:commerceChannelGroupId",
-			_commerceChannelGroupId);
-		httpServletRequest.setAttribute(
-			"liferay-commerce:cart:commerceChannelId", _commerceChannelId);
-		httpServletRequest.setAttribute(
-			"liferay-commerce:cart:commerceCurrencyCode",
-			_commerceCurrencyCode);
-		httpServletRequest.setAttribute(
 			"liferay-commerce:cart:displayDiscountLevels",
 			_isDisplayDiscountLevels());
 		httpServletRequest.setAttribute(
@@ -258,11 +210,9 @@ public class MiniCartTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			"liferay-commerce:cart:orderId", _orderId);
 		httpServletRequest.setAttribute(
-			"liferay-commerce:cart:productURLSeparator", _productURLSeparator);
-		httpServletRequest.setAttribute(
-			"liferay-commerce:cart:requestQuoteEnabled", _requestQuoteEnabled);
-		httpServletRequest.setAttribute(
 			"liferay-commerce:cart:siteDefaultURL", _siteDefaultURL);
+		httpServletRequest.setAttribute(
+			"liferay-commerce:cart:spritemap", _spritemap);
 		httpServletRequest.setAttribute(
 			"liferay-commerce:cart:toggleable", _toggleable);
 	}
@@ -302,25 +252,10 @@ public class MiniCartTag extends IncludeTag {
 			return commercePriceConfiguration.displayDiscountLevels();
 		}
 		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
+			_log.error(configurationException, configurationException);
 
 			return false;
 		}
-	}
-
-	private boolean _isRequestQuoteEnabled() throws PortalException {
-		if (!FeatureFlagManagerUtil.isEnabled("COMMERCE-11028")) {
-			return false;
-		}
-
-		CommerceOrderFieldsConfiguration commerceOrderFieldsConfiguration =
-			_configurationProvider.getConfiguration(
-				CommerceOrderFieldsConfiguration.class,
-				new GroupServiceSettingsLocator(
-					_commerceChannelGroupId,
-					CommerceConstants.SERVICE_NAME_COMMERCE_ORDER_FIELDS));
-
-		return commerceOrderFieldsConfiguration.requestQuoteEnabled();
 	}
 
 	private static final String _PAGE = "/mini_cart/page.jsp";
@@ -328,9 +263,6 @@ public class MiniCartTag extends IncludeTag {
 	private static final Log _log = LogFactoryUtil.getLog(MiniCartTag.class);
 
 	private String _checkoutURL;
-	private long _commerceChannelGroupId;
-	private long _commerceChannelId;
-	private String _commerceCurrencyCode;
 	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
 	private ConfigurationProvider _configurationProvider;
 	private boolean _displayTotalItemsQuantity;
@@ -338,9 +270,8 @@ public class MiniCartTag extends IncludeTag {
 	private Map<String, String> _labels = new HashMap<>();
 	private String _orderDetailURL;
 	private long _orderId;
-	private String _productURLSeparator = StringPool.BLANK;
-	private boolean _requestQuoteEnabled;
 	private String _siteDefaultURL = StringPool.BLANK;
+	private String _spritemap;
 	private boolean _toggleable = true;
 	private Map<String, String> _views = new HashMap<>();
 

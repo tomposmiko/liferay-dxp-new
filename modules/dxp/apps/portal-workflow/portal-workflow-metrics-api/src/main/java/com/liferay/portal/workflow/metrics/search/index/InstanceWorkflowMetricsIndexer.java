@@ -38,8 +38,7 @@ public interface InstanceWorkflowMetricsIndexer {
 	public void deleteInstance(long companyId, long instanceId);
 
 	public Document updateInstance(
-		boolean active, Map<Locale, String> assetTitleMap,
-		Map<Locale, String> assetTypeMap, long companyId, long instanceId,
-		Date modifiedDate);
+		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
+		long companyId, long instanceId, Date modifiedDate);
 
 }

@@ -45,7 +45,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +61,7 @@ import org.apache.commons.io.FileUtils;
 public class LangBuilder {
 
 	public static void main(String[] args) throws Exception {
-		Map<String, String> arguments = new HashMap<>(
-			ArgumentsUtil.parseArguments(args));
+		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
 		System.setProperty("line.separator", StringPool.NEW_LINE);
 
@@ -120,17 +118,7 @@ public class LangBuilder {
 		_langDirName = langDirName;
 		_langFileName = langFileName;
 		_titleCapitalization = titleCapitalization;
-
-		if (Validator.isNull(translateSubscriptionKey)) {
-			System.out.println(
-				"Translation is disabled because credentials are not " +
-					"specified");
-
-			_translate = false;
-		}
-		else {
-			_translate = translate;
-		}
+		_translate = translate;
 
 		Translate.setSubscriptionKey(translateSubscriptionKey);
 
@@ -147,7 +135,7 @@ public class LangBuilder {
 
 		File propertiesFile = new File(
 			StringBundler.concat(
-				langDirName, "/", langFileName, ".properties"));
+				_langDirName, "/", _langFileName, ".properties"));
 
 		if (!propertiesFile.exists()) {
 			return;
@@ -162,7 +150,6 @@ public class LangBuilder {
 		_createProperties(content, "ar"); // Arabic
 		_createProperties(content, "eu"); // Basque
 		_createProperties(content, "bg"); // Bulgarian
-		_createProperties(content, "km"); // Cambodian
 		_createProperties(content, "ca"); // Catalan
 		_createProperties(content, "zh_CN"); // Chinese (China)
 		_createProperties(content, "zh_TW"); // Chinese (Taiwan)
@@ -203,9 +190,6 @@ public class LangBuilder {
 		_createProperties(content, "sk"); // Slovak
 		_createProperties(content, "sl"); // Slovene
 		_createProperties(content, "es"); // Spanish
-		_createProperties(content, "es_AR", "es"); // Spanish (Argentina)
-		_createProperties(content, "es_CO", "es"); // Spanish (Colombia)
-		_createProperties(content, "es_MX", "es"); // Spanish (Mexico)
 		_createProperties(content, "sv"); // Swedish
 		_createProperties(content, "ta_IN"); // Tamil
 		_createProperties(content, "th"); // Thai

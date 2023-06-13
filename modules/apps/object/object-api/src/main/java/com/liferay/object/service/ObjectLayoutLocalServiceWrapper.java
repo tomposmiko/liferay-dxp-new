@@ -27,10 +27,6 @@ public class ObjectLayoutLocalServiceWrapper
 	implements ObjectLayoutLocalService,
 			   ServiceWrapper<ObjectLayoutLocalService> {
 
-	public ObjectLayoutLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ObjectLayoutLocalServiceWrapper(
 		ObjectLayoutLocalService objectLayoutLocalService) {
 
@@ -127,13 +123,6 @@ public class ObjectLayoutLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectLayoutLocalService.deleteObjectLayout(objectLayout);
-	}
-
-	@Override
-	public void deleteObjectLayouts(long objectDefinitionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_objectLayoutLocalService.deleteObjectLayouts(objectDefinitionId);
 	}
 
 	/**
@@ -250,14 +239,6 @@ public class ObjectLayoutLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.object.model.ObjectLayout fetchDefaultObjectLayout(
-		long objectDefinitionId) {
-
-		return _objectLayoutLocalService.fetchDefaultObjectLayout(
-			objectDefinitionId);
-	}
-
-	@Override
 	public com.liferay.object.model.ObjectLayout fetchObjectLayout(
 		long objectLayoutId) {
 
@@ -360,13 +341,6 @@ public class ObjectLayoutLocalServiceWrapper
 		getObjectLayouts(int start, int end) {
 
 		return _objectLayoutLocalService.getObjectLayouts(start, end);
-	}
-
-	@Override
-	public java.util.List<com.liferay.object.model.ObjectLayout>
-		getObjectLayouts(long objectDefinitionId) {
-
-		return _objectLayoutLocalService.getObjectLayouts(objectDefinitionId);
 	}
 
 	@Override

@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class BookmarksEntryServiceWrapper
 	implements BookmarksEntryService, ServiceWrapper<BookmarksEntryService> {
 
-	public BookmarksEntryServiceWrapper() {
-		this(null);
-	}
-
 	public BookmarksEntryServiceWrapper(
 		BookmarksEntryService bookmarksEntryService) {
 

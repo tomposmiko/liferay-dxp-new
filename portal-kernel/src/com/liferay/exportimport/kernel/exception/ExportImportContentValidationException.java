@@ -31,8 +31,6 @@ public class ExportImportContentValidationException extends PortalException {
 
 	public static final int FILE_ENTRY_NOT_FOUND = 5;
 
-	public static final int JOURNAL_FEED_NOT_FOUND = 7;
-
 	public static final int LAYOUT_GROUP_NOT_FOUND = 2;
 
 	public static final int LAYOUT_NOT_FOUND = 3;
@@ -70,10 +68,6 @@ public class ExportImportContentValidationException extends PortalException {
 		return _groupFriendlyURL;
 	}
 
-	public String getJournalArticleFeedURL() {
-		return _journalArticleFeedURL;
-	}
-
 	public Map<String, String> getLayoutReferenceParameters() {
 		return _layoutReferenceParameters;
 	}
@@ -84,6 +78,15 @@ public class ExportImportContentValidationException extends PortalException {
 
 	public String getStagedModelClassName() {
 		return _stagedModelClassName;
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getStagedModelPrimaryKeyObj()}
+	 */
+	@Deprecated
+	public long getStagedModelClassPK() {
+		return _stagedModelClassPK;
 	}
 
 	public Serializable getStagedModelPrimaryKeyObj() {
@@ -112,10 +115,6 @@ public class ExportImportContentValidationException extends PortalException {
 		_groupFriendlyURL = groupFriendlyURL;
 	}
 
-	public void setJournalArticleFeedURL(String journalArticleFeedURL) {
-		_journalArticleFeedURL = journalArticleFeedURL;
-	}
-
 	public void setLayoutReferenceParameters(
 		Map<String, String> layoutReferenceParameters) {
 
@@ -128,6 +127,15 @@ public class ExportImportContentValidationException extends PortalException {
 
 	public void setStagedModelClassName(String stagedModelClassName) {
 		_stagedModelClassName = stagedModelClassName;
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #setStagedModelPrimaryKeyObj(Serializable)}
+	 */
+	@Deprecated
+	public void setStagedModelClassPK(long stagedModelClassPK) {
+		_stagedModelClassPK = stagedModelClassPK;
 	}
 
 	public void setStagedModelPrimaryKeyObj(
@@ -144,10 +152,10 @@ public class ExportImportContentValidationException extends PortalException {
 	private String _dlReference;
 	private Map<String, String[]> _dlReferenceParameters;
 	private String _groupFriendlyURL;
-	private String _journalArticleFeedURL;
 	private Map<String, String> _layoutReferenceParameters;
 	private String _layoutURL;
 	private String _stagedModelClassName;
+	private long _stagedModelClassPK;
 	private Serializable _stagedModelPrimaryKeyObj;
 	private int _type = DEFAULT;
 

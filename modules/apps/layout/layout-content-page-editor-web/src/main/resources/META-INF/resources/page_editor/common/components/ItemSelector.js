@@ -16,17 +16,16 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayForm, {ClayInput} from '@clayui/form';
 import classNames from 'classnames';
-import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useCallback} from 'react';
 
 import {config} from '../../app/config/index';
 import {useSelectorCallback} from '../../app/contexts/StoreContext';
 import {selectPageContentDropdownItems} from '../../app/selectors/selectPageContentDropdownItems';
-import {useId} from '../hooks/useId';
-import {openItemSelector} from '../openItemSelector';
+import {useId} from '../../app/utils/useId';
+import {openItemSelector} from '../../core/openItemSelector';
 
-const DEFAULT_BEFORE_ITEM_SELECT = () => {};
+const DEFAULT_PREVENT_ITEM_SELECT = () => false;
 
 const DEFAULT_OPTIONS_MENU_ITEMS = [];
 
@@ -35,32 +34,22 @@ const DEFAULT_QUICK_MAPPED_INFO_ITEMS = [];
 export default function ItemSelector({
 	className,
 	eventName,
-	helpText,
 	itemSelectorURL,
 	label,
 	modalProps,
-	onBeforeItemSelect = DEFAULT_BEFORE_ITEM_SELECT,
 	onItemSelect,
 	optionsMenuItems = DEFAULT_OPTIONS_MENU_ITEMS,
 	quickMappedInfoItems = DEFAULT_QUICK_MAPPED_INFO_ITEMS,
 	selectedItem,
+	shouldPreventItemSelect = DEFAULT_PREVENT_ITEM_SELECT,
 	showEditControls = true,
 	showMappedItems = true,
 	transformValueCallback,
 }) {
-	const helpTextId = useId();
 	const itemSelectorInputId = useId();
 
 	const openModal = useCallback(() => {
-		let defaultPrevented = false;
-
-		onBeforeItemSelect({
-			preventDefault: () => {
-				defaultPrevented = true;
-			},
-		});
-
-		if (defaultPrevented) {
+		if (shouldPreventItemSelect()) {
 			return;
 		}
 
@@ -76,7 +65,7 @@ export default function ItemSelector({
 		itemSelectorURL,
 		modalProps,
 		onItemSelect,
-		onBeforeItemSelect,
+		shouldPreventItemSelect,
 		transformValueCallback,
 	]);
 
@@ -90,11 +79,11 @@ export default function ItemSelector({
 
 			const transformMappedItem = (item) => ({
 				'data-item-id': `${item.classNameId}-${item.classPK}`,
-				'label': item.title,
-				'onClick': () => onItemSelect(item),
+				label: item.title,
+				onClick: () => onItemSelect(item),
 			});
 
-			if (quickMappedInfoItems.length) {
+			if (quickMappedInfoItems.length > 0) {
 				transformedMappedItems = quickMappedInfoItems.map(
 					transformMappedItem
 				);
@@ -106,20 +95,12 @@ export default function ItemSelector({
 			}
 
 			if (transformedMappedItems.length) {
-				transformedMappedItems = [
-					{
-						items: transformedMappedItems,
-						label: Liferay.Language.get('recent'),
-						type: 'group',
-					},
-				];
-
 				transformedMappedItems.push(
 					{
 						type: 'divider',
 					},
 					{
-						label: `${sub(
+						label: `${Liferay.Util.sub(
 							Liferay.Language.get('select-x'),
 							label
 						)}...`,
@@ -161,12 +142,11 @@ export default function ItemSelector({
 			}
 
 			menuItems.push({
-				label: sub(Liferay.Language.get('remove-x'), label),
+				label: Liferay.Util.sub(
+					Liferay.Language.get('remove-x'),
+					label
+				),
 				onClick: () => onItemSelect({}),
-				symbolLeft:
-					label === Liferay.Language.get('collection')
-						? 'trash'
-						: null,
 			});
 
 			return menuItems;
@@ -198,7 +178,7 @@ export default function ItemSelector({
 
 	const selectContentButtonIcon = selectedItem?.title ? 'change' : 'plus';
 
-	const selectContentButtonLabel = sub(
+	const selectContentButtonLabel = Liferay.Util.sub(
 		selectedItem?.title
 			? Liferay.Language.get('change-x')
 			: Liferay.Language.get('select-x'),
@@ -212,7 +192,6 @@ export default function ItemSelector({
 			<ClayInput.Group small>
 				<ClayInput.GroupItem>
 					<ClayInput
-						aria-describedby={helpText ? helpTextId : null}
 						className={classNames({
 							'page-editor__item-selector__content-input': showEditControls,
 						})}
@@ -222,20 +201,19 @@ export default function ItemSelector({
 								openModal();
 							}
 						}}
-						placeholder={sub(
+						placeholder={Liferay.Util.sub(
 							Liferay.Language.get('select-x'),
 							label
 						)}
 						readOnly
 						sizing="sm"
-						title={selectedItemTitle}
 						type="text"
 						value={selectedItemTitle}
 					/>
 				</ClayInput.GroupItem>
 
 				{showEditControls &&
-					(mappedItemsMenu.length ? (
+					(mappedItemsMenu.length > 0 ? (
 						<ClayInput.GroupItem shrink>
 							<ClayDropDownWithItems
 								items={mappedItemsMenu}
@@ -248,7 +226,7 @@ export default function ItemSelector({
 									<ClayButtonWithIcon
 										aria-label={selectContentButtonLabel}
 										displayType="secondary"
-										size="sm"
+										small
 										symbol={selectContentButtonIcon}
 										title={selectContentButtonLabel}
 									/>
@@ -261,7 +239,7 @@ export default function ItemSelector({
 								aria-label={selectContentButtonLabel}
 								displayType="secondary"
 								onClick={openModal}
-								size="sm"
+								small
 								symbol={selectContentButtonIcon}
 								title={selectContentButtonLabel}
 							/>
@@ -279,14 +257,14 @@ export default function ItemSelector({
 							}}
 							trigger={
 								<ClayButtonWithIcon
-									aria-label={sub(
+									aria-label={Liferay.Util.sub(
 										Liferay.Language.get('view-x-options'),
 										label
 									)}
 									displayType="secondary"
-									size="sm"
+									small
 									symbol="ellipsis-v"
-									title={sub(
+									title={Liferay.Util.sub(
 										Liferay.Language.get('view-x-options'),
 										label
 									)}
@@ -296,12 +274,6 @@ export default function ItemSelector({
 					</ClayInput.GroupItem>
 				)}
 			</ClayInput.Group>
-
-			{helpText ? (
-				<div className="mt-1 text-secondary" id={helpTextId}>
-					{helpText}
-				</div>
-			) : null}
 		</ClayForm.Group>
 	);
 }
@@ -309,17 +281,14 @@ export default function ItemSelector({
 ItemSelector.propTypes = {
 	className: PropTypes.string,
 	eventName: PropTypes.string,
-	helpText: PropTypes.string,
 	itemSelectorURL: PropTypes.string,
 	label: PropTypes.string.isRequired,
 	modalProps: PropTypes.object,
-	onBeforeItemSelect: PropTypes.func,
 	onItemSelect: PropTypes.func.isRequired,
 	optionsMenuItems: PropTypes.arrayOf(
 		PropTypes.shape({
-			href: PropTypes.string,
 			label: PropTypes.string.isRequired,
-			onClick: PropTypes.func,
+			onClick: PropTypes.func.isRequired,
 		})
 	),
 	quickMappedInfoItems: PropTypes.arrayOf(
@@ -330,6 +299,7 @@ ItemSelector.propTypes = {
 		})
 	),
 	selectedItem: PropTypes.shape({title: PropTypes.string}),
+	shouldPreventItemSelect: PropTypes.func,
 	showEditControls: PropTypes.bool,
 	showMappedItems: PropTypes.bool,
 	transformValueCallback: PropTypes.func.isRequired,

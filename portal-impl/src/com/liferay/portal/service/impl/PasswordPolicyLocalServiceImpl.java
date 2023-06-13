@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.model.PasswordPolicyRel;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.ldap.LDAPSettingsUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.PasswordPolicyRelLocalService;
@@ -40,7 +41,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.base.PasswordPolicyLocalServiceBaseImpl;
-import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.List;
@@ -114,7 +114,7 @@ public class PasswordPolicyLocalServiceImpl
 
 		long ownerId = userId;
 
-		if (user.isGuestUser()) {
+		if (user.isDefaultUser()) {
 			ownerId = 0;
 		}
 
@@ -141,7 +141,7 @@ public class PasswordPolicyLocalServiceImpl
 		}
 
 		addPasswordPolicy(
-			_userLocalService.getGuestUserId(companyId), true,
+			_userLocalService.getDefaultUserId(companyId), true,
 			defaultPasswordPolicyName, defaultPasswordPolicyName,
 			PropsValues.PASSWORDS_DEFAULT_POLICY_CHANGEABLE,
 			PropsValues.PASSWORDS_DEFAULT_POLICY_CHANGE_REQUIRED,
@@ -202,7 +202,7 @@ public class PasswordPolicyLocalServiceImpl
 		throws PortalException {
 
 		if (passwordPolicy.isDefaultPolicy() &&
-			!PortalInstances.isCurrentCompanyInDeletionProcess()) {
+			!CompanyThreadLocal.isDeleteInProcess()) {
 
 			throw new RequiredPasswordPolicyException();
 		}
@@ -295,10 +295,12 @@ public class PasswordPolicyLocalServiceImpl
 				user.getCompanyId(), true);
 		}
 
+		long classNameId = _classNameLocalService.getClassNameId(
+			User.class.getName());
+
 		PasswordPolicyRel passwordPolicyRel =
 			_passwordPolicyRelPersistence.fetchByC_C(
-				_classNameLocalService.getClassNameId(User.class.getName()),
-				user.getUserId());
+				classNameId, user.getUserId());
 
 		if (passwordPolicyRel != null) {
 			return getPasswordPolicy(passwordPolicyRel.getPasswordPolicyId());

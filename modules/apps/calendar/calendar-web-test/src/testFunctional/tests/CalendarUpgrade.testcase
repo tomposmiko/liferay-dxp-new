@@ -9,38 +9,40 @@ definition {
 	setUp {
 		SignIn.signIn();
 
-		SearchAdministration.executeReindex();
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
+
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewCalendarArchive625 {
 		property data.archive.type = "data-archive-calendar";
 		property database.types = "mariadb,mysql,postgresql";
-		property portal.upstream = "quarantine";
 		property portal.upstream = "true";
 		property portal.version = "6.2.5";
 
-		ValidateCalendarUpgrade.viewCalendar();
+		Upgrade.viewCalendar();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewCalendarArchive621015 {
 		property data.archive.type = "data-archive-calendar";
-		property portal.upstream = "quarantine";
 		property portal.upstream = "true";
 		property portal.version = "6.2.10.15";
 
-		ValidateCalendarUpgrade.viewCalendar();
+		Upgrade.viewCalendar();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewCalendarArchive621021 {
 		property data.archive.type = "data-archive-calendar";
-		property portal.upstream = "quarantine";
 		property portal.upstream = "true";
 		property portal.version = "6.2.10.21";
 
-		ValidateCalendarUpgrade.viewCalendar();
+		Upgrade.viewCalendar();
 	}
 
 }

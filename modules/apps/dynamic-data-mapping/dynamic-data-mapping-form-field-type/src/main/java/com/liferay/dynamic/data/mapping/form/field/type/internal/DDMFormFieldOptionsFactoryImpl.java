@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -47,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = DDMFormFieldOptionsFactory.class)
+@Component(immediate = true, service = DDMFormFieldOptionsFactory.class)
 public class DDMFormFieldOptionsFactoryImpl
 	implements DDMFormFieldOptionsFactory {
 
@@ -59,24 +60,15 @@ public class DDMFormFieldOptionsFactoryImpl
 		String dataSourceType = ddmFormField.getDataSourceType();
 
 		if (Objects.equals(dataSourceType, "data-provider")) {
-			return _createDDMFormFieldOptionsFromDataProvider(
+			return createDDMFormFieldOptionsFromDataProvider(
 				ddmFormField, ddmFormFieldRenderingContext);
 		}
 
-		return _createDDMFormFieldOptions(
+		return createDDMFormFieldOptions(
 			ddmFormField, ddmFormFieldRenderingContext, dataSourceType);
 	}
 
-	@Reference
-	protected DDMDataProviderInvoker ddmDataProviderInvoker;
-
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	@Reference
-	protected Portal portal;
-
-	private DDMFormFieldOptions _createDDMFormFieldOptions(
+	protected DDMFormFieldOptions createDDMFormFieldOptions(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext,
 		String dataSourceType) {
@@ -119,7 +111,7 @@ public class DDMFormFieldOptionsFactoryImpl
 		return ddmFormFieldOptions;
 	}
 
-	private DDMFormFieldOptions _createDDMFormFieldOptionsFromDataProvider(
+	protected DDMFormFieldOptions createDDMFormFieldOptionsFromDataProvider(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -129,7 +121,7 @@ public class DDMFormFieldOptionsFactoryImpl
 			ddmFormFieldRenderingContext.getLocale());
 
 		try {
-			String ddmDataProviderInstanceId = _getJSONArrayFirstValue(
+			String ddmDataProviderInstanceId = getJSONArrayFirstValue(
 				GetterUtil.getString(
 					ddmFormField.getProperty("ddmDataProviderInstanceId")));
 
@@ -145,12 +137,12 @@ public class DDMFormFieldOptionsFactoryImpl
 				).withCompanyId(
 					portal.getCompanyId(httpServletRequest)
 				).withGroupId(
-					_getGroupId(httpServletRequest)
+					getGroupId(httpServletRequest)
 				).withLocale(
 					ddmFormFieldRenderingContext.getLocale()
 				).withParameter(
 					"filterParameterValue",
-					_html.escapeURL(
+					HtmlUtil.escapeURL(
 						String.valueOf(ddmFormFieldRenderingContext.getValue()))
 				).withParameter(
 					"httpServletRequest", httpServletRequest
@@ -159,20 +151,20 @@ public class DDMFormFieldOptionsFactoryImpl
 			DDMDataProviderResponse ddmDataProviderResponse =
 				ddmDataProviderInvoker.invoke(ddmDataProviderRequest);
 
-			String ddmDataProviderInstanceOutput = _getJSONArrayFirstValue(
+			String ddmDataProviderInstanceOutput = getJSONArrayFirstValue(
 				GetterUtil.getString(
 					ddmFormField.getProperty("ddmDataProviderInstanceOutput"),
 					"Default-Output"));
 
-			List<KeyValuePair> keyValuesPairs =
-				ddmDataProviderResponse.getOutput(
+			Optional<List<KeyValuePair>> keyValuesPairsOptional =
+				ddmDataProviderResponse.getOutputOptional(
 					ddmDataProviderInstanceOutput, List.class);
 
-			if (keyValuesPairs == null) {
+			if (!keyValuesPairsOptional.isPresent()) {
 				return ddmFormFieldOptions;
 			}
 
-			for (KeyValuePair keyValuePair : keyValuesPairs) {
+			for (KeyValuePair keyValuePair : keyValuesPairsOptional.get()) {
 				ddmFormFieldOptions.addOptionLabel(
 					keyValuePair.getKey(),
 					ddmFormFieldRenderingContext.getLocale(),
@@ -181,14 +173,14 @@ public class DDMFormFieldOptionsFactoryImpl
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
 		return ddmFormFieldOptions;
 	}
 
-	private long _getGroupId(HttpServletRequest httpServletRequest) {
+	protected long getGroupId(HttpServletRequest httpServletRequest) {
 		long scopeGroupId = ParamUtil.getLong(
 			httpServletRequest, "scopeGroupId");
 
@@ -203,7 +195,7 @@ public class DDMFormFieldOptionsFactoryImpl
 		return scopeGroupId;
 	}
 
-	private String _getJSONArrayFirstValue(String value) {
+	protected String getJSONArrayFirstValue(String value) {
 		try {
 			JSONArray jsonArray = jsonFactory.createJSONArray(value);
 
@@ -211,17 +203,23 @@ public class DDMFormFieldOptionsFactoryImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return value;
 		}
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMFormFieldOptionsFactoryImpl.class);
+	@Reference
+	protected DDMDataProviderInvoker ddmDataProviderInvoker;
 
 	@Reference
-	private Html _html;
+	protected JSONFactory jsonFactory;
+
+	@Reference
+	protected Portal portal;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DDMFormFieldOptionsFactoryImpl.class);
 
 }

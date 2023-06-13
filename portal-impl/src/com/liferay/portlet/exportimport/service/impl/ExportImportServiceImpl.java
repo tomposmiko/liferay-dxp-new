@@ -16,8 +16,6 @@ package com.liferay.portlet.exportimport.service.impl;
 
 import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
-import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
@@ -70,7 +68,7 @@ public class ExportImportServiceImpl extends ExportImportServiceBaseImpl {
 		throws PortalException {
 
 		ExportImportConfiguration exportImportConfiguration =
-			_exportImportConfigurationLocalService.getExportImportConfiguration(
+			exportImportConfigurationLocalService.getExportImportConfiguration(
 				exportImportConfigurationId);
 
 		long sourceGroupId = MapUtil.getLong(
@@ -312,9 +310,5 @@ public class ExportImportServiceImpl extends ExportImportServiceBaseImpl {
 		return exportImportLocalService.validateImportPortletInfo(
 			exportImportConfiguration, inputStream);
 	}
-
-	@BeanReference(type = ExportImportConfigurationLocalService.class)
-	private ExportImportConfigurationLocalService
-		_exportImportConfigurationLocalService;
 
 }

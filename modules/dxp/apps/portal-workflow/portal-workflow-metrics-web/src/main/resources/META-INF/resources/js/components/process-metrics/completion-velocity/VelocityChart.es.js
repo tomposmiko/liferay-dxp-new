@@ -51,7 +51,7 @@ function VelocityChart({timeRange, velocityData = {}, velocityUnit}) {
 
 	return (
 		<div className="velocity-chart">
-			{!!histograms.length && (
+			{histograms.length > 0 && (
 				<ResponsiveContainer height="100%" width="100%">
 					<LineChart
 						data={dataChart}
@@ -65,14 +65,11 @@ function VelocityChart({timeRange, velocityData = {}, velocityUnit}) {
 						width={1180}
 					>
 						<CartesianGrid strokeDasharray="3 3" />
-
 						<XAxis dataKey="name" interval="preserveStartEnd" />
-
 						<YAxis
 							domain={[intervals, maxValue]}
 							interval="preserveStartEnd"
 						/>
-
 						<Tooltip
 							content={
 								<CustomTooltip
@@ -83,7 +80,6 @@ function VelocityChart({timeRange, velocityData = {}, velocityUnit}) {
 								/>
 							}
 						/>
-
 						<Line
 							activeDot={{r: 8}}
 							dataKey="value"
@@ -151,7 +147,6 @@ const CustomTooltip = ({active, isAmPm, payload, timeRange, unit, unitKey}) => {
 						{label}
 					</div>
 				</div>
-
 				<div className={`${CLASSNAME}-body`}>
 					<div className={`${CLASSNAME}-row`}>
 						<div

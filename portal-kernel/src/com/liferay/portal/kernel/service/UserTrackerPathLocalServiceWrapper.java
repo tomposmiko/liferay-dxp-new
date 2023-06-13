@@ -25,10 +25,6 @@ public class UserTrackerPathLocalServiceWrapper
 	implements ServiceWrapper<UserTrackerPathLocalService>,
 			   UserTrackerPathLocalService {
 
-	public UserTrackerPathLocalServiceWrapper() {
-		this(null);
-	}
-
 	public UserTrackerPathLocalServiceWrapper(
 		UserTrackerPathLocalService userTrackerPathLocalService) {
 

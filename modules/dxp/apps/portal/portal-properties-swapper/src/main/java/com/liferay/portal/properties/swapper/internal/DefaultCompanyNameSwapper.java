@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shuyang Zhou
  */
-@Component(enabled = false, service = {})
+@Component(enabled = false, immediate = true, service = {})
 public class DefaultCompanyNameSwapper {
 
 	@Activate

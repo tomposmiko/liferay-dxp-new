@@ -14,10 +14,11 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib;
 
-import com.liferay.frontend.taglib.clay.internal.servlet.taglib.util.DropdownItemListUtil;
+import com.liferay.frontend.taglib.clay.servlet.taglib.soy.HorizontalCard;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
 import java.util.Map;
@@ -80,12 +81,8 @@ public class HorizontalCardTag extends BaseCardTag {
 			title = horizontalCard.getTitle();
 		}
 
-		if (_isTranslated()) {
-			title = LanguageUtil.get(
-				TagResourceBundleUtil.getResourceBundle(pageContext), title);
-		}
-
-		return title;
+		return LanguageUtil.get(
+			TagResourceBundleUtil.getResourceBundle(pageContext), title);
 	}
 
 	public void setHorizontalCard(HorizontalCard horizontalCard) {
@@ -96,21 +93,16 @@ public class HorizontalCardTag extends BaseCardTag {
 		_title = title;
 	}
 
-	public void setTranslated(Boolean translated) {
-		_translated = translated;
-	}
-
 	@Override
 	protected void cleanUp() {
 		super.cleanUp();
 
 		_title = null;
-		_translated = null;
 	}
 
 	@Override
 	protected String getHydratedModuleName() {
-		return "{HorizontalCard} from frontend-taglib-clay";
+		return "frontend-taglib-clay/cards/HorizontalCard";
 	}
 
 	@Override
@@ -183,20 +175,6 @@ public class HorizontalCardTag extends BaseCardTag {
 		return SKIP_BODY;
 	}
 
-	private boolean _isTranslated() {
-		if (_translated != null) {
-			return _translated;
-		}
-
-		HorizontalCard horizontalCard = getHorizontalCard();
-
-		if (horizontalCard == null) {
-			return true;
-		}
-
-		return horizontalCard.isTranslated();
-	}
-
 	private void _writeBody(JspWriter jspWriter) throws Exception {
 		jspWriter.write("<div class=\"card card-horizontal\"><div class=\"");
 		jspWriter.write("card-body\"><div class=\"card-row\"><div class=\"");
@@ -235,8 +213,6 @@ public class HorizontalCardTag extends BaseCardTag {
 				linkTag.setLabel(title);
 			}
 
-			linkTag.setTranslated(_isTranslated());
-
 			linkTag.doTag(pageContext);
 		}
 		else {
@@ -251,7 +227,7 @@ public class HorizontalCardTag extends BaseCardTag {
 
 		jspWriter.write("</span></p></div>");
 
-		if (!DropdownItemListUtil.isEmpty(getActionDropdownItems())) {
+		if (!ListUtil.isEmpty(getActionDropdownItems())) {
 			jspWriter.write("<div class=\"autofit-col\">");
 
 			DropdownActionsTag dropdownActionsTag = new DropdownActionsTag();
@@ -274,6 +250,5 @@ public class HorizontalCardTag extends BaseCardTag {
 	private static final String _ATTRIBUTE_NAMESPACE = "clay:horizontal-card:";
 
 	private String _title;
-	private Boolean _translated;
 
 }

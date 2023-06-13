@@ -10,14 +10,7 @@
 </thead>
 
 <tbody>
-
 <!--RESOURCE_TABLE-->
-
-<tr>
-	<td>ASSET_TYPE_WORKFLOW_ASSIGNED</td>
-	<td>//*[@data-qa-id='row' and contains(.,'${assetType}')] //td[contains(@class,'workflow-assigned-column')] //*[contains(@id,'_definitionLabel') and contains(text(),'${workflowAssigned}')]</td>
-	<td></td>
-</tr>
 <tr>
 	<td>RESOURCE_TABLE_CANCEL</td>
 	<td>//*[@data-qa-id='row' and contains(.,'${key_workflowResourceValue}')]//button[contains(.,'Cancel')]</td>
@@ -40,7 +33,7 @@
 </tr>
 <tr>
 	<td>BLOGS_MOVE_TO_RECYCLE_BIN</td>
-	<td>//div[@class='sidebar-header']//*[contains(@class, 'icon-trash')]</td>
+	<td>//*[contains(@class, 'icon-trash')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -55,7 +48,7 @@
 </tr>
 <tr>
 	<td>PROCESS_BUILDER_TABLE_FIELD_NAME</td>
-	<td>//tbody//tr[${key_order}]//td//span[contains(text(),"${key_fieldName}")]</td>
+	<td>//tbody//tr[${key_order}]//td//span//span[contains(text(),"${key_fieldName}")]</td>
 	<td></td>
 </tr>
 <tr>

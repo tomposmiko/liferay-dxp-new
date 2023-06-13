@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the object action service. This utility wraps <code>com.liferay.object.service.persistence.impl.ObjectActionPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -468,332 +472,6 @@ public class ObjectActionUtil {
 	}
 
 	/**
-	 * Returns all the object actions where objectDefinitionId = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @return the matching object actions
-	 */
-	public static List<ObjectAction> findByObjectDefinitionId(
-		long objectDefinitionId) {
-
-		return getPersistence().findByObjectDefinitionId(objectDefinitionId);
-	}
-
-	/**
-	 * Returns a range of all the object actions where objectDefinitionId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectActionModelImpl</code>.
-	 * </p>
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param start the lower bound of the range of object actions
-	 * @param end the upper bound of the range of object actions (not inclusive)
-	 * @return the range of matching object actions
-	 */
-	public static List<ObjectAction> findByObjectDefinitionId(
-		long objectDefinitionId, int start, int end) {
-
-		return getPersistence().findByObjectDefinitionId(
-			objectDefinitionId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the object actions where objectDefinitionId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectActionModelImpl</code>.
-	 * </p>
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param start the lower bound of the range of object actions
-	 * @param end the upper bound of the range of object actions (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching object actions
-	 */
-	public static List<ObjectAction> findByObjectDefinitionId(
-		long objectDefinitionId, int start, int end,
-		OrderByComparator<ObjectAction> orderByComparator) {
-
-		return getPersistence().findByObjectDefinitionId(
-			objectDefinitionId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the object actions where objectDefinitionId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ObjectActionModelImpl</code>.
-	 * </p>
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param start the lower bound of the range of object actions
-	 * @param end the upper bound of the range of object actions (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching object actions
-	 */
-	public static List<ObjectAction> findByObjectDefinitionId(
-		long objectDefinitionId, int start, int end,
-		OrderByComparator<ObjectAction> orderByComparator,
-		boolean useFinderCache) {
-
-		return getPersistence().findByObjectDefinitionId(
-			objectDefinitionId, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first object action in the ordered set where objectDefinitionId = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching object action
-	 * @throws NoSuchObjectActionException if a matching object action could not be found
-	 */
-	public static ObjectAction findByObjectDefinitionId_First(
-			long objectDefinitionId,
-			OrderByComparator<ObjectAction> orderByComparator)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().findByObjectDefinitionId_First(
-			objectDefinitionId, orderByComparator);
-	}
-
-	/**
-	 * Returns the first object action in the ordered set where objectDefinitionId = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByObjectDefinitionId_First(
-		long objectDefinitionId,
-		OrderByComparator<ObjectAction> orderByComparator) {
-
-		return getPersistence().fetchByObjectDefinitionId_First(
-			objectDefinitionId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last object action in the ordered set where objectDefinitionId = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching object action
-	 * @throws NoSuchObjectActionException if a matching object action could not be found
-	 */
-	public static ObjectAction findByObjectDefinitionId_Last(
-			long objectDefinitionId,
-			OrderByComparator<ObjectAction> orderByComparator)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().findByObjectDefinitionId_Last(
-			objectDefinitionId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last object action in the ordered set where objectDefinitionId = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByObjectDefinitionId_Last(
-		long objectDefinitionId,
-		OrderByComparator<ObjectAction> orderByComparator) {
-
-		return getPersistence().fetchByObjectDefinitionId_Last(
-			objectDefinitionId, orderByComparator);
-	}
-
-	/**
-	 * Returns the object actions before and after the current object action in the ordered set where objectDefinitionId = &#63;.
-	 *
-	 * @param objectActionId the primary key of the current object action
-	 * @param objectDefinitionId the object definition ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next object action
-	 * @throws NoSuchObjectActionException if a object action with the primary key could not be found
-	 */
-	public static ObjectAction[] findByObjectDefinitionId_PrevAndNext(
-			long objectActionId, long objectDefinitionId,
-			OrderByComparator<ObjectAction> orderByComparator)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().findByObjectDefinitionId_PrevAndNext(
-			objectActionId, objectDefinitionId, orderByComparator);
-	}
-
-	/**
-	 * Removes all the object actions where objectDefinitionId = &#63; from the database.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 */
-	public static void removeByObjectDefinitionId(long objectDefinitionId) {
-		getPersistence().removeByObjectDefinitionId(objectDefinitionId);
-	}
-
-	/**
-	 * Returns the number of object actions where objectDefinitionId = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @return the number of matching object actions
-	 */
-	public static int countByObjectDefinitionId(long objectDefinitionId) {
-		return getPersistence().countByObjectDefinitionId(objectDefinitionId);
-	}
-
-	/**
-	 * Returns the object action where objectDefinitionId = &#63; and name = &#63; or throws a <code>NoSuchObjectActionException</code> if it could not be found.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param name the name
-	 * @return the matching object action
-	 * @throws NoSuchObjectActionException if a matching object action could not be found
-	 */
-	public static ObjectAction findByODI_N(long objectDefinitionId, String name)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().findByODI_N(objectDefinitionId, name);
-	}
-
-	/**
-	 * Returns the object action where objectDefinitionId = &#63; and name = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param name the name
-	 * @return the matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByODI_N(
-		long objectDefinitionId, String name) {
-
-		return getPersistence().fetchByODI_N(objectDefinitionId, name);
-	}
-
-	/**
-	 * Returns the object action where objectDefinitionId = &#63; and name = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param name the name
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByODI_N(
-		long objectDefinitionId, String name, boolean useFinderCache) {
-
-		return getPersistence().fetchByODI_N(
-			objectDefinitionId, name, useFinderCache);
-	}
-
-	/**
-	 * Removes the object action where objectDefinitionId = &#63; and name = &#63; from the database.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param name the name
-	 * @return the object action that was removed
-	 */
-	public static ObjectAction removeByODI_N(
-			long objectDefinitionId, String name)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().removeByODI_N(objectDefinitionId, name);
-	}
-
-	/**
-	 * Returns the number of object actions where objectDefinitionId = &#63; and name = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param name the name
-	 * @return the number of matching object actions
-	 */
-	public static int countByODI_N(long objectDefinitionId, String name) {
-		return getPersistence().countByODI_N(objectDefinitionId, name);
-	}
-
-	/**
-	 * Returns the object action where externalReferenceCode = &#63; and companyId = &#63; and objectDefinitionId = &#63; or throws a <code>NoSuchObjectActionException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param objectDefinitionId the object definition ID
-	 * @return the matching object action
-	 * @throws NoSuchObjectActionException if a matching object action could not be found
-	 */
-	public static ObjectAction findByERC_C_ODI(
-			String externalReferenceCode, long companyId,
-			long objectDefinitionId)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().findByERC_C_ODI(
-			externalReferenceCode, companyId, objectDefinitionId);
-	}
-
-	/**
-	 * Returns the object action where externalReferenceCode = &#63; and companyId = &#63; and objectDefinitionId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param objectDefinitionId the object definition ID
-	 * @return the matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByERC_C_ODI(
-		String externalReferenceCode, long companyId, long objectDefinitionId) {
-
-		return getPersistence().fetchByERC_C_ODI(
-			externalReferenceCode, companyId, objectDefinitionId);
-	}
-
-	/**
-	 * Returns the object action where externalReferenceCode = &#63; and companyId = &#63; and objectDefinitionId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param objectDefinitionId the object definition ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByERC_C_ODI(
-		String externalReferenceCode, long companyId, long objectDefinitionId,
-		boolean useFinderCache) {
-
-		return getPersistence().fetchByERC_C_ODI(
-			externalReferenceCode, companyId, objectDefinitionId,
-			useFinderCache);
-	}
-
-	/**
-	 * Removes the object action where externalReferenceCode = &#63; and companyId = &#63; and objectDefinitionId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param objectDefinitionId the object definition ID
-	 * @return the object action that was removed
-	 */
-	public static ObjectAction removeByERC_C_ODI(
-			String externalReferenceCode, long companyId,
-			long objectDefinitionId)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().removeByERC_C_ODI(
-			externalReferenceCode, companyId, objectDefinitionId);
-	}
-
-	/**
-	 * Returns the number of object actions where externalReferenceCode = &#63; and companyId = &#63; and objectDefinitionId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param objectDefinitionId the object definition ID
-	 * @return the number of matching object actions
-	 */
-	public static int countByERC_C_ODI(
-		String externalReferenceCode, long companyId, long objectDefinitionId) {
-
-		return getPersistence().countByERC_C_ODI(
-			externalReferenceCode, companyId, objectDefinitionId);
-	}
-
-	/**
 	 * Returns all the object actions where objectDefinitionId = &#63; and active = &#63; and objectActionTriggerKey = &#63;.
 	 *
 	 * @param objectDefinitionId the object definition ID
@@ -1013,96 +691,6 @@ public class ObjectActionUtil {
 	}
 
 	/**
-	 * Returns the object action where objectDefinitionId = &#63; and active = &#63; and name = &#63; and objectActionTriggerKey = &#63; or throws a <code>NoSuchObjectActionException</code> if it could not be found.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param active the active
-	 * @param name the name
-	 * @param objectActionTriggerKey the object action trigger key
-	 * @return the matching object action
-	 * @throws NoSuchObjectActionException if a matching object action could not be found
-	 */
-	public static ObjectAction findByODI_A_N_OATK(
-			long objectDefinitionId, boolean active, String name,
-			String objectActionTriggerKey)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().findByODI_A_N_OATK(
-			objectDefinitionId, active, name, objectActionTriggerKey);
-	}
-
-	/**
-	 * Returns the object action where objectDefinitionId = &#63; and active = &#63; and name = &#63; and objectActionTriggerKey = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param active the active
-	 * @param name the name
-	 * @param objectActionTriggerKey the object action trigger key
-	 * @return the matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByODI_A_N_OATK(
-		long objectDefinitionId, boolean active, String name,
-		String objectActionTriggerKey) {
-
-		return getPersistence().fetchByODI_A_N_OATK(
-			objectDefinitionId, active, name, objectActionTriggerKey);
-	}
-
-	/**
-	 * Returns the object action where objectDefinitionId = &#63; and active = &#63; and name = &#63; and objectActionTriggerKey = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param active the active
-	 * @param name the name
-	 * @param objectActionTriggerKey the object action trigger key
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching object action, or <code>null</code> if a matching object action could not be found
-	 */
-	public static ObjectAction fetchByODI_A_N_OATK(
-		long objectDefinitionId, boolean active, String name,
-		String objectActionTriggerKey, boolean useFinderCache) {
-
-		return getPersistence().fetchByODI_A_N_OATK(
-			objectDefinitionId, active, name, objectActionTriggerKey,
-			useFinderCache);
-	}
-
-	/**
-	 * Removes the object action where objectDefinitionId = &#63; and active = &#63; and name = &#63; and objectActionTriggerKey = &#63; from the database.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param active the active
-	 * @param name the name
-	 * @param objectActionTriggerKey the object action trigger key
-	 * @return the object action that was removed
-	 */
-	public static ObjectAction removeByODI_A_N_OATK(
-			long objectDefinitionId, boolean active, String name,
-			String objectActionTriggerKey)
-		throws com.liferay.object.exception.NoSuchObjectActionException {
-
-		return getPersistence().removeByODI_A_N_OATK(
-			objectDefinitionId, active, name, objectActionTriggerKey);
-	}
-
-	/**
-	 * Returns the number of object actions where objectDefinitionId = &#63; and active = &#63; and name = &#63; and objectActionTriggerKey = &#63;.
-	 *
-	 * @param objectDefinitionId the object definition ID
-	 * @param active the active
-	 * @param name the name
-	 * @param objectActionTriggerKey the object action trigger key
-	 * @return the number of matching object actions
-	 */
-	public static int countByODI_A_N_OATK(
-		long objectDefinitionId, boolean active, String name,
-		String objectActionTriggerKey) {
-
-		return getPersistence().countByODI_A_N_OATK(
-			objectDefinitionId, active, name, objectActionTriggerKey);
-	}
-
-	/**
 	 * Caches the object action in the entity cache if it is enabled.
 	 *
 	 * @param objectAction the object action
@@ -1250,9 +838,25 @@ public class ObjectActionUtil {
 	}
 
 	public static ObjectActionPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile ObjectActionPersistence _persistence;
+	private static ServiceTracker
+		<ObjectActionPersistence, ObjectActionPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(ObjectActionPersistence.class);
+
+		ServiceTracker<ObjectActionPersistence, ObjectActionPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<ObjectActionPersistence, ObjectActionPersistence>(
+						bundle.getBundleContext(),
+						ObjectActionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

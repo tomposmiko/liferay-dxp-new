@@ -16,15 +16,15 @@ package com.liferay.commerce.channel.web.internal.display.context;
 
 import com.liferay.commerce.account.configuration.CommerceAccountGroupServiceConfiguration;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
-import com.liferay.commerce.channel.web.internal.display.context.helper.CommerceChannelRequestHelper;
+import com.liferay.commerce.channel.web.internal.display.context.util.CommerceChannelRequestHelper;
 import com.liferay.commerce.configuration.CommerceOrderCheckoutConfiguration;
 import com.liferay.commerce.configuration.CommerceOrderFieldsConfiguration;
-import com.liferay.commerce.configuration.CommerceOrderImporterDateFormatConfiguration;
 import com.liferay.commerce.constants.CommerceConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.service.CommerceCurrencyService;
 import com.liferay.commerce.frontend.model.HeaderActionModel;
 import com.liferay.commerce.model.CommerceOrder;
+import com.liferay.commerce.payment.method.CommercePaymentMethodRegistry;
 import com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel;
 import com.liferay.commerce.product.channel.CommerceChannelHealthStatus;
 import com.liferay.commerce.product.channel.CommerceChannelHealthStatusRegistry;
@@ -37,12 +37,8 @@ import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPTaxCategoryLocalService;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.tax.configuration.CommerceShippingTaxConfiguration;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
-import com.liferay.item.selector.ItemSelector;
-import com.liferay.item.selector.ItemSelectorReturnType;
-import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
-import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchWorkflowDefinitionLinkException;
@@ -56,10 +52,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
-import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -73,7 +65,6 @@ import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
@@ -90,33 +81,30 @@ public class CommerceChannelDisplayContext
 	extends BaseCommerceChannelDisplayContext {
 
 	public CommerceChannelDisplayContext(
-		CommerceChannelHealthStatusRegistry commerceChannelHealthStatusRegistry,
 		ModelResourcePermission<CommerceChannel>
 			commerceChannelModelResourcePermission,
+		CommerceChannelHealthStatusRegistry commerceChannelHealthStatusRegistry,
 		CommerceChannelService commerceChannelService,
 		CommerceChannelTypeRegistry commerceChannelTypeRegistry,
 		CommerceCurrencyService commerceCurrencyService,
+		CommercePaymentMethodRegistry commercePaymentMethodRegistry,
 		ConfigurationProvider configurationProvider,
-		CPTaxCategoryLocalService cpTaxCategoryLocalService,
-		DLAppLocalService dlAppLocalService,
-		HttpServletRequest httpServletRequest, ItemSelector itemSelector,
-		Portal portal,
+		HttpServletRequest httpServletRequest, Portal portal,
 		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService,
-		WorkflowDefinitionManager workflowDefinitionManager) {
+		WorkflowDefinitionManager workflowDefinitionManager,
+		CPTaxCategoryLocalService cpTaxCategoryLocalService) {
 
 		super(httpServletRequest);
 
-		_commerceChannelHealthStatusRegistry =
-			commerceChannelHealthStatusRegistry;
 		_commerceChannelModelResourcePermission =
 			commerceChannelModelResourcePermission;
+		_commerceChannelHealthStatusRegistry =
+			commerceChannelHealthStatusRegistry;
 		_commerceChannelService = commerceChannelService;
 		_commerceChannelTypeRegistry = commerceChannelTypeRegistry;
 		_commerceCurrencyService = commerceCurrencyService;
+		_commercePaymentMethodRegistry = commercePaymentMethodRegistry;
 		_configurationProvider = configurationProvider;
-		_cpTaxCategoryLocalService = cpTaxCategoryLocalService;
-		_dlAppLocalService = dlAppLocalService;
-		_itemSelector = itemSelector;
 		_portal = portal;
 		_workflowDefinitionLinkLocalService =
 			workflowDefinitionLinkLocalService;
@@ -124,16 +112,13 @@ public class CommerceChannelDisplayContext
 
 		_commerceChannelRequestHelper = new CommerceChannelRequestHelper(
 			httpServletRequest);
-	}
 
-	public FileEntry fetchFileEntry() throws PortalException {
-		return _dlAppLocalService.fetchFileEntryByExternalReferenceCode(
-			getCommerceChannel().getGroupId(), "ORDER_PRINT_TEMPLATE");
+		_cpTaxCategoryLocalService = cpTaxCategoryLocalService;
 	}
 
 	public int getAccountCartMaxAllowed() throws PortalException {
 		CommerceOrderFieldsConfiguration commerceOrderFieldsConfiguration =
-			_getCommerceOrderFieldsConfiguration();
+			getCommerceOrderFieldsConfiguration();
 
 		int maxAllowed =
 			commerceOrderFieldsConfiguration.accountCartMaxAllowed();
@@ -212,6 +197,7 @@ public class CommerceChannelDisplayContext
 			PortletRequest.RENDER_PHASE);
 
 		portletURL.setParameter("backURL", portletURL.toString());
+
 		portletURL.setParameter(
 			"commerceChannelId",
 			String.valueOf(commerceChannel.getCommerceChannelId()));
@@ -257,7 +243,7 @@ public class CommerceChannelDisplayContext
 	public int getCommerceSiteType() throws PortalException {
 		CommerceAccountGroupServiceConfiguration
 			commerceAccountGroupServiceConfiguration =
-				_getCommerceAccountGroupServiceConfiguration();
+				getCommerceAccountGroupServiceConfiguration();
 
 		return commerceAccountGroupServiceConfiguration.commerceSiteType();
 	}
@@ -305,40 +291,6 @@ public class CommerceChannelDisplayContext
 				null, null, "save"));
 
 		return headerActionModels;
-	}
-
-	public String getImageItemSelectorURL() {
-		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
-			RequestBackedPortletURLFactoryUtil.create(
-				cpRequestHelper.getRenderRequest());
-
-		FileItemSelectorCriterion fileItemSelectorCriterion =
-			new FileItemSelectorCriterion();
-
-		fileItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			Collections.<ItemSelectorReturnType>singletonList(
-				new FileEntryItemSelectorReturnType()));
-
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, "addFileEntry",
-				fileItemSelectorCriterion));
-	}
-
-	public String getOrderImporterDateFormat() throws PortalException {
-		CommerceChannel commerceChannel = getCommerceChannel();
-
-		CommerceOrderImporterDateFormatConfiguration
-			commerceOrderImporterDateFormatConfiguration =
-				_configurationProvider.getConfiguration(
-					CommerceOrderImporterDateFormatConfiguration.class,
-					new GroupServiceSettingsLocator(
-						commerceChannel.getGroupId(),
-						CommerceConstants.
-							SERVICE_NAME_COMMERCE_ORDER_IMPORTER_DATE_FORMAT));
-
-		return commerceOrderImporterDateFormatConfiguration.
-			orderImporterDateFormat();
 	}
 
 	@Override
@@ -393,7 +345,9 @@ public class CommerceChannelDisplayContext
 					noSuchWorkflowDefinitionLinkException) {
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchWorkflowDefinitionLinkException);
+				_log.debug(
+					noSuchWorkflowDefinitionLinkException,
+					noSuchWorkflowDefinitionLinkException);
 			}
 		}
 
@@ -444,22 +398,6 @@ public class CommerceChannelDisplayContext
 		return false;
 	}
 
-	public boolean isCheckoutRequestedDeliveryDateEnabled()
-		throws PortalException {
-
-		CommerceChannel commerceChannel = getCommerceChannel();
-
-		CommerceOrderCheckoutConfiguration commerceOrderCheckoutConfiguration =
-			_configurationProvider.getConfiguration(
-				CommerceOrderCheckoutConfiguration.class,
-				new GroupServiceSettingsLocator(
-					commerceChannel.getGroupId(),
-					CommerceConstants.SERVICE_NAME_COMMERCE_ORDER));
-
-		return commerceOrderCheckoutConfiguration.
-			checkoutRequestedDeliveryDateEnabled();
-	}
-
 	public boolean isGuestCheckoutEnabled() throws PortalException {
 		CommerceChannel commerceChannel = getCommerceChannel();
 
@@ -471,26 +409,6 @@ public class CommerceChannelDisplayContext
 					CommerceConstants.SERVICE_NAME_COMMERCE_ORDER));
 
 		return commerceOrderCheckoutConfiguration.guestCheckoutEnabled();
-	}
-
-	public boolean isHideShippingPriceZero() throws PortalException {
-		CommerceChannel commerceChannel = getCommerceChannel();
-
-		CommerceOrderCheckoutConfiguration commerceOrderCheckoutConfiguration =
-			_configurationProvider.getConfiguration(
-				CommerceOrderCheckoutConfiguration.class,
-				new GroupServiceSettingsLocator(
-					commerceChannel.getGroupId(),
-					CommerceConstants.SERVICE_NAME_COMMERCE_ORDER));
-
-		return commerceOrderCheckoutConfiguration.hideShippingPriceZero();
-	}
-
-	public boolean isRequestQuoteEnabled() throws PortalException {
-		CommerceOrderFieldsConfiguration commerceOrderFieldsConfiguration =
-			_getCommerceOrderFieldsConfiguration();
-
-		return commerceOrderFieldsConfiguration.requestQuoteEnabled();
 	}
 
 	public boolean isShowPurchaseOrderNumber() throws PortalException {
@@ -506,8 +424,8 @@ public class CommerceChannelDisplayContext
 		return commerceOrderFieldsConfiguration.showPurchaseOrderNumber();
 	}
 
-	private CommerceAccountGroupServiceConfiguration
-			_getCommerceAccountGroupServiceConfiguration()
+	protected CommerceAccountGroupServiceConfiguration
+			getCommerceAccountGroupServiceConfiguration()
 		throws PortalException {
 
 		if (_commerceAccountGroupServiceConfiguration != null) {
@@ -526,8 +444,8 @@ public class CommerceChannelDisplayContext
 		return _commerceAccountGroupServiceConfiguration;
 	}
 
-	private CommerceOrderFieldsConfiguration
-			_getCommerceOrderFieldsConfiguration()
+	protected CommerceOrderFieldsConfiguration
+			getCommerceOrderFieldsConfiguration()
 		throws PortalException {
 
 		if (_commerceOrderFieldsConfiguration != null) {
@@ -560,10 +478,9 @@ public class CommerceChannelDisplayContext
 	private final CommerceChannelTypeRegistry _commerceChannelTypeRegistry;
 	private final CommerceCurrencyService _commerceCurrencyService;
 	private CommerceOrderFieldsConfiguration _commerceOrderFieldsConfiguration;
+	private final CommercePaymentMethodRegistry _commercePaymentMethodRegistry;
 	private final ConfigurationProvider _configurationProvider;
 	private final CPTaxCategoryLocalService _cpTaxCategoryLocalService;
-	private final DLAppLocalService _dlAppLocalService;
-	private final ItemSelector _itemSelector;
 	private final Portal _portal;
 	private final WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;

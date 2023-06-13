@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.liferay.headless.delivery.dto.v1_0.Creator;
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -95,39 +94,6 @@ public class ObjectEntry implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
-
-	@Schema(
-		description = "Optional field with the audit events associated with this object entry, can be embedded with nestedFields"
-	)
-	@Valid
-	public AuditEvent[] getAuditEvents() {
-		return auditEvents;
-	}
-
-	public void setAuditEvents(AuditEvent[] auditEvents) {
-		this.auditEvents = auditEvents;
-	}
-
-	@JsonIgnore
-	public void setAuditEvents(
-		UnsafeSupplier<AuditEvent[], Exception> auditEventsUnsafeSupplier) {
-
-		try {
-			auditEvents = auditEventsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "Optional field with the audit events associated with this object entry, can be embedded with nestedFields"
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected AuditEvent[] auditEvents;
 
 	@Schema
 	@Valid
@@ -268,36 +234,6 @@ public class ObjectEntry implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(description = "A list of keywords describing the object entry.")
-	public String[] getKeywords() {
-		return keywords;
-	}
-
-	public void setKeywords(String[] keywords) {
-		this.keywords = keywords;
-	}
-
-	@JsonIgnore
-	public void setKeywords(
-		UnsafeSupplier<String[], Exception> keywordsUnsafeSupplier) {
-
-		try {
-			keywords = keywordsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "A list of keywords describing the object entry."
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String[] keywords;
-
 	@JsonAnyGetter
 	@Schema
 	@Valid
@@ -387,72 +323,6 @@ public class ObjectEntry implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Status status;
 
-	@Schema(description = "The categories associated with this object entry.")
-	@Valid
-	public TaxonomyCategoryBrief[] getTaxonomyCategoryBriefs() {
-		return taxonomyCategoryBriefs;
-	}
-
-	public void setTaxonomyCategoryBriefs(
-		TaxonomyCategoryBrief[] taxonomyCategoryBriefs) {
-
-		this.taxonomyCategoryBriefs = taxonomyCategoryBriefs;
-	}
-
-	@JsonIgnore
-	public void setTaxonomyCategoryBriefs(
-		UnsafeSupplier<TaxonomyCategoryBrief[], Exception>
-			taxonomyCategoryBriefsUnsafeSupplier) {
-
-		try {
-			taxonomyCategoryBriefs = taxonomyCategoryBriefsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "The categories associated with this object entry."
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected TaxonomyCategoryBrief[] taxonomyCategoryBriefs;
-
-	@Schema(
-		description = "A write-only field that adds `TaxonomyCategory` instances to the object entry."
-	)
-	public Long[] getTaxonomyCategoryIds() {
-		return taxonomyCategoryIds;
-	}
-
-	public void setTaxonomyCategoryIds(Long[] taxonomyCategoryIds) {
-		this.taxonomyCategoryIds = taxonomyCategoryIds;
-	}
-
-	@JsonIgnore
-	public void setTaxonomyCategoryIds(
-		UnsafeSupplier<Long[], Exception> taxonomyCategoryIdsUnsafeSupplier) {
-
-		try {
-			taxonomyCategoryIds = taxonomyCategoryIdsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "A write-only field that adds `TaxonomyCategory` instances to the object entry."
-	)
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	protected Long[] taxonomyCategoryIds;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -491,26 +361,6 @@ public class ObjectEntry implements Serializable {
 			sb.append("\"actions\": ");
 
 			sb.append(_toJSON(actions));
-		}
-
-		if (auditEvents != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"auditEvents\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < auditEvents.length; i++) {
-				sb.append(String.valueOf(auditEvents[i]));
-
-				if ((i + 1) < auditEvents.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
 		}
 
 		if (creator != null) {
@@ -575,30 +425,6 @@ public class ObjectEntry implements Serializable {
 			sb.append(id);
 		}
 
-		if (keywords != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"keywords\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < keywords.length; i++) {
-				sb.append("\"");
-
-				sb.append(_escape(keywords[i]));
-
-				sb.append("\"");
-
-				if ((i + 1) < keywords.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		if (properties != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -633,46 +459,6 @@ public class ObjectEntry implements Serializable {
 			sb.append(String.valueOf(status));
 		}
 
-		if (taxonomyCategoryBriefs != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"taxonomyCategoryBriefs\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < taxonomyCategoryBriefs.length; i++) {
-				sb.append(String.valueOf(taxonomyCategoryBriefs[i]));
-
-				if ((i + 1) < taxonomyCategoryBriefs.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (taxonomyCategoryIds != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"taxonomyCategoryIds\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < taxonomyCategoryIds.length; i++) {
-				sb.append(taxonomyCategoryIds[i]);
-
-				if ((i + 1) < taxonomyCategoryIds.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -686,9 +472,9 @@ public class ObjectEntry implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -714,7 +500,7 @@ public class ObjectEntry implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -746,7 +532,7 @@ public class ObjectEntry implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -762,10 +548,5 @@ public class ObjectEntry implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

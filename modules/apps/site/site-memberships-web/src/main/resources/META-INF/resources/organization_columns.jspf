@@ -39,7 +39,7 @@
 			</h6>
 
 			<h6 class="text-default">
-				<span><liferay-ui:message key="<%= organization.getType() %>" /></span>
+				<span><%= LanguageUtil.get(request, organization.getType()) %></span>
 			</h6>
 
 			<h6 class="text-default">
@@ -57,7 +57,6 @@
 
 			<liferay-ui:search-container-column-text>
 				<clay:dropdown-actions
-					aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 					dropdownItems="<%= organizationActionDropdownItemsProvider.getActionDropdownItems() %>"
 					propsTransformer="js/OrganizationDropdownDefaultPropsTransformer"
 				/>
@@ -111,7 +110,6 @@
 
 			<liferay-ui:search-container-column-text>
 				<clay:dropdown-actions
-					aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 					dropdownItems="<%= organizationActionDropdownItemsProvider.getActionDropdownItems() %>"
 					propsTransformer="js/OrganizationDropdownDefaultPropsTransformer"
 				/>

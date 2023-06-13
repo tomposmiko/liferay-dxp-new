@@ -15,10 +15,6 @@ html#{$cadmin-selector} {
 				}
 			}
 		}
-
-		.component-action.portlet-options {
-			color: white;
-		}
 	}
 }
 
@@ -28,26 +24,20 @@ body.portlet {
 
 .portlet-icon-back {
 	margin-top: -2px;
-
-	.portlet-topper .portlet-topper-toolbar & {
-		background: url(../images/arrows/12_left.png) no-repeat 0 50%;
-		padding: 5px 5px 5px 18px;
-	}
-}
-
-.portlet-options-dropdown {
-	z-index: 1035;
 }
 
 .portlet-topper {
 	position: relative;
 
-	.portlet-topper-toolbar .portlet-options .lfr-icon-menu-text {
-		display: none;
-	}
+	.portlet-topper-toolbar {
+		.portlet-icon-back {
+			background: url(../images/arrows/12_left.png) no-repeat 0 50%;
+			padding: 5px 5px 5px 18px;
+		}
 
-	.portlet-draggable & {
-		cursor: move;
+		.portlet-options .lfr-icon-menu-text {
+			display: none;
+		}
 	}
 }
 
@@ -63,9 +53,11 @@ body.portlet {
 	text-overflow: ellipsis;
 	vertical-align: top;
 	white-space: nowrap;
+}
 
-	.panel-page-body &,
-	.panel-page-content & {
+.panel-page-content,
+.panel-page-body {
+	.portlet-title-text {
 		cursor: auto;
 	}
 }
@@ -80,8 +72,16 @@ body.portlet {
 	top: 0 !important;
 }
 
-.portlet-layout .portlet-header {
-	margin-bottom: $portlet-header-margin-bottom;
+.portlet-layout {
+	.portlet-header {
+		margin-bottom: $portlet-header-margin-bottom;
+	}
+}
+
+.portlet-draggable {
+	.portlet-topper {
+		cursor: move;
+	}
 }
 
 .portlet {
@@ -89,34 +89,18 @@ body.portlet {
 		@include media-breakpoint-up(sm) {
 			display: none;
 		}
-
-		.controls-hidden & {
-			@include media-breakpoint-down(sm) {
-				display: none;
-			}
-		}
 	}
 
 	&:hover,
-	&.open,
-	&.focus {
+	&.open {
 		.visible-interaction {
 			display: block;
 		}
 	}
 }
 
-.controls-hidden {
-	.lfr-meta-actions,
-	.lfr-configurator-visibility {
+.controls-hidden .portlet .visible-interaction {
+	@include media-breakpoint-down(sm) {
 		display: none;
-	}
-
-	.portlet-topper-toolbar {
-		display: none !important;
-	}
-
-	.portlet-topper {
-		display: none !important;
 	}
 }

@@ -99,16 +99,14 @@
 						'<portlet:namespace />termsOfUseJournalArticleResourcePrimKey'
 					);
 
-					const itemValue = JSON.parse(selectedItem.value);
-
 					if (termsOfUseJournalArticleResourcePrimKey) {
 						termsOfUseJournalArticleResourcePrimKey.value =
-							itemValue.classPK;
+							selectedItem.assetclasspk;
 					}
 
 					journalArticleRemove.classList.remove('hide');
 
-					journalArticleNameInput.innerText = itemValue.title;
+					journalArticleNameInput.innerText = selectedItem.assettitle;
 				},
 				selectEventName: 'selectJournalArticle',
 				title: '<liferay-ui:message key="select-web-content" />',

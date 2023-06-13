@@ -13,7 +13,7 @@
  */
 
 import ClayAlert from '@clayui/alert';
-import ClayButton from '@clayui/button';
+import ClayButton from '@clayui/button/lib/Button';
 import {Context as ClayModalContext} from '@clayui/modal';
 import ClayPanel from '@clayui/panel';
 import {useFormState} from 'data-engine-js-components-web';
@@ -30,7 +30,6 @@ const getName = ({name = {}}) => {
 const FieldInfo = ({label, value}) => (
 	<div>
 		<label className="use-propagate-field-set__field-info-label">{`${label}:`}</label>
-
 		<span>{value}</span>
 	</div>
 );
@@ -70,7 +69,7 @@ const usePropagateFieldSet = () => {
 
 		const dataDefinitionField = dataDefinition.dataDefinitionFields.find(
 			({customProperties: {ddmStructureId}}) =>
-				ddmStructureId === fieldSet.id
+				ddmStructureId == fieldSet.id
 		);
 
 		if (dataDefinitionField) {
@@ -160,7 +159,7 @@ const usePropagateFieldSet = () => {
 							</ClayPanel>
 						)}
 
-						{!!dataLayouts.length && (
+						{dataLayouts.length > 0 && (
 							<ClayPanel
 								className="remove-object-field-panel"
 								displayType="secondary"
@@ -174,7 +173,7 @@ const usePropagateFieldSet = () => {
 							</ClayPanel>
 						)}
 
-						{!!dataListViews.length && (
+						{dataListViews.length > 0 && (
 							<ClayPanel
 								className="remove-object-field-panel"
 								displayTitle={Liferay.Language.get(
@@ -211,7 +210,6 @@ const usePropagateFieldSet = () => {
 						>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
-
 						<ClayButton
 							disabled={
 								!allowReferencedDataDefinitionDeletion &&

@@ -3,8 +3,8 @@ definition {
 	macro configureDisplaySettings {
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		for (var settingName : list ${uncheckSetting}) {
-			Uncheck(locator1 = "Checkbox#${settingName}");
+		for (var SettingName : list "${uncheckSetting}") {
+			Uncheck(locator1 = "Checkbox#${SettingName}");
 		}
 
 		Click(locator1 = "Button#SAVE");
@@ -28,7 +28,7 @@ definition {
 
 			Type(
 				locator1 = "CKEditor#BODY",
-				value1 = ${bodyContent});
+				value1 = "${bodyContent}");
 
 			SelectFrame(value1 = "relative=top");
 
@@ -38,18 +38,31 @@ definition {
 		}
 	}
 
+	macro configureSharingAllowUsersToAddWikiToAnyWebsite {
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		Navigator.gotoNavItem(navItem = "Sharing");
+
+		if ("${enabled}" == "true") {
+			Check.checkToggleSwitch(locator1 = "WikiConfiguration#ALLOW_USERS_TO_ADD_WIKI_TO_ANY_WEBSITE_CHECKBOX");
+		}
+		else {
+			Uncheck.uncheckToggleSwitch(locator1 = "WikiConfiguration#ALLOW_USERS_TO_ADD_WIKI_TO_ANY_WEBSITE_CHECKBOX");
+		}
+
+		Button.clickSave();
+
+		SelectFrame(value1 = "relative=top");
+	}
+
 	macro subscribeToNodeCP {
-		var key_wikiNodeName = ${wikiNodeName};
+		var key_wikiNodeName = "${wikiNodeName}";
 
-		Click.waitForMenuToggleJSClick(locator1 = "Wiki#NODE_TABLE_ACTIONS_DROPDOWN");
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-
-		MenuItem.click(menuItem = "Subscribe");
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Subscribe");
 
 		Alert.viewSuccessMessage();
 
-		Click.waitForMenuToggleJSClick(locator1 = "Wiki#NODE_TABLE_ACTIONS_DROPDOWN");
+		Click.waitForMenuToggleJSClick(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
 
 		MenuItem.viewPresent(menuItem = "Unsubscribe");
 	}
@@ -58,7 +71,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Wiki");
 
 		LexiconEntry.openEntryMenu(rowEntry = "Main");
@@ -75,12 +88,27 @@ definition {
 	macro viewConfigurationTabs {
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		for (var isPresent : list ${isPresent}) {
+		for (var isPresent : list "${isPresent}") {
 			AssertElementPresent(locator1 = "Configuration#${isPresent}");
 		}
 
-		for (var isNotPresent : list ${isNotPresent}) {
+		for (var isNotPresent : list "${isNotPresent}") {
 			AssertElementNotPresent(locator1 = "Configuration#${isNotPresent}");
+		}
+
+		SelectFrame(value1 = "relative=top");
+	}
+
+	macro viewConfigureSharingAllowUsersToAddWikiToAnyWebsite {
+		SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+		Navigator.gotoNavItem(navItem = "Sharing");
+
+		if ("${enabled}" == "true") {
+			AssertChecked.assertCheckedNotVisible(locator1 = "WikiConfiguration#ALLOW_USERS_TO_ADD_WIKI_TO_ANY_WEBSITE_CHECKBOX");
+		}
+		else {
+			AssertNotChecked.assertNotCheckedNotVisible(locator1 = "WikiConfiguration#ALLOW_USERS_TO_ADD_WIKI_TO_ANY_WEBSITE_CHECKBOX");
 		}
 
 		SelectFrame(value1 = "relative=top");
@@ -89,8 +117,8 @@ definition {
 	macro viewDisplaySettings {
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		for (var settingName : list ${uncheckedSetting}) {
-			AssertNotChecked(locator1 = "Checkbox#${settingName}");
+		for (var SettingName : list "${uncheckedSetting}") {
+			AssertNotChecked(locator1 = "Checkbox#${SettingName}");
 		}
 	}
 
@@ -108,7 +136,7 @@ definition {
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "CKEditor#BODY",
-				value1 = ${bodyContent});
+				value1 = "${bodyContent}");
 
 			SelectFrame(value1 = "relative=top");
 		}

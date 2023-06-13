@@ -15,29 +15,28 @@
 package com.liferay.portal.search.admin.web.internal.portlet.action;
 
 import com.liferay.portal.instances.service.PortalInstancesLocalService;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
-import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.uuid.PortalUUID;
 import com.liferay.portal.search.admin.web.internal.constants.SearchAdminPortletKeys;
-import com.liferay.portal.search.admin.web.internal.reindexer.IndexReindexerRegistry;
 import com.liferay.portal.search.admin.web.internal.util.DictionaryReindexer;
 import com.liferay.portal.search.spi.reindexer.IndexReindexer;
 
@@ -45,6 +44,7 @@ import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -54,6 +54,9 @@ import javax.portlet.PortletSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Wade Cao
@@ -91,34 +94,42 @@ public class EditMVCActionCommand extends BaseMVCActionCommand {
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		if (cmd.equals("reindex")) {
-			_reindex(actionRequest);
+			reindex(actionRequest);
 
-			_reindexIndexReindexers(actionRequest);
+			reindexIndexReindexers(actionRequest);
 		}
 		else if (cmd.equals("reindexDictionaries")) {
-			_reindexDictionaries(actionRequest);
+			reindexDictionaries(actionRequest);
 		}
 		else if (cmd.equals("reindexIndexReindexer")) {
-			_reindexIndexReindexer(actionRequest);
+			reindexIndexReindexer(actionRequest);
 		}
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
-		redirect = HttpComponentsUtil.setParameter(
+		redirect = _http.setParameter(
 			redirect, actionResponse.getNamespace() + "companyIds",
 			StringUtil.merge(
 				ParamUtil.getLongValues(actionRequest, "companyIds")));
-		redirect = HttpComponentsUtil.setParameter(
-			redirect, actionResponse.getNamespace() + "executionMode",
-			ParamUtil.getString(actionRequest, "executionMode"));
-		redirect = HttpComponentsUtil.setParameter(
+		redirect = _http.setParameter(
 			redirect, actionResponse.getNamespace() + "scope",
 			ParamUtil.getString(actionRequest, "scope"));
 
 		sendRedirect(actionRequest, actionResponse, redirect);
 	}
 
-	private void _reindex(ActionRequest actionRequest) throws Exception {
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addIndexReindexer(IndexReindexer indexReindexer) {
+		Class<?> clazz = indexReindexer.getClass();
+
+		_indexReindexers.put(clazz.getName(), indexReindexer);
+	}
+
+	protected void reindex(final ActionRequest actionRequest) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -126,14 +137,7 @@ public class EditMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "companyIds");
 
 		String className = ParamUtil.getString(actionRequest, "className");
-
 		Map<String, Serializable> taskContextMap = new HashMap<>();
-
-		if (FeatureFlagManagerUtil.isEnabled("LPS-177664")) {
-			taskContextMap.put(
-				ReindexBackgroundTaskConstants.EXECUTION_MODE,
-				ParamUtil.getString(actionRequest, "executionMode"));
-		}
 
 		if (!ParamUtil.getBoolean(actionRequest, "blocking")) {
 			_indexWriterHelper.reindex(
@@ -143,43 +147,50 @@ public class EditMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		String jobName = "reindex-".concat(_portalUUID.generate());
+		final String jobName = "reindex-".concat(_portalUUID.generate());
 
-		CountDownLatch countDownLatch = new CountDownLatch(1);
+		final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-		MessageListener messageListener = message -> {
-			int status = message.getInteger("status");
+		MessageListener messageListener = new MessageListener() {
 
-			if ((status != BackgroundTaskConstants.STATUS_CANCELLED) &&
-				(status != BackgroundTaskConstants.STATUS_FAILED) &&
-				(status != BackgroundTaskConstants.STATUS_SUCCESSFUL)) {
+			@Override
+			public void receive(Message message)
+				throws MessageListenerException {
 
-				return;
+				int status = message.getInteger("status");
+
+				if ((status != BackgroundTaskConstants.STATUS_CANCELLED) &&
+					(status != BackgroundTaskConstants.STATUS_FAILED) &&
+					(status != BackgroundTaskConstants.STATUS_SUCCESSFUL)) {
+
+					return;
+				}
+
+				if (!jobName.equals(message.getString("name"))) {
+					return;
+				}
+
+				PortletSession portletSession =
+					actionRequest.getPortletSession();
+
+				long lastAccessedTime = portletSession.getLastAccessedTime();
+				int maxInactiveInterval =
+					portletSession.getMaxInactiveInterval();
+
+				int extendedMaxInactiveIntervalTime =
+					(int)(System.currentTimeMillis() - lastAccessedTime +
+						maxInactiveInterval);
+
+				portletSession.setMaxInactiveInterval(
+					extendedMaxInactiveIntervalTime);
+
+				countDownLatch.countDown();
 			}
 
-			if (!jobName.equals(message.getString("name"))) {
-				return;
-			}
-
-			PortletSession portletSession = actionRequest.getPortletSession();
-
-			long lastAccessedTime = portletSession.getLastAccessedTime();
-			int maxInactiveInterval = portletSession.getMaxInactiveInterval();
-
-			int extendedMaxInactiveIntervalTime =
-				(int)(System.currentTimeMillis() - lastAccessedTime +
-					maxInactiveInterval);
-
-			portletSession.setMaxInactiveInterval(
-				extendedMaxInactiveIntervalTime);
-
-			countDownLatch.countDown();
 		};
 
-		Destination destination = _messageBus.getDestination(
-			DestinationNames.BACKGROUND_TASK_STATUS);
-
-		destination.register(messageListener);
+		_messageBus.registerMessageListener(
+			DestinationNames.BACKGROUND_TASK_STATUS, messageListener);
 
 		try {
 			_indexWriterHelper.reindex(
@@ -191,11 +202,12 @@ public class EditMVCActionCommand extends BaseMVCActionCommand {
 				TimeUnit.MILLISECONDS);
 		}
 		finally {
-			destination.unregister(messageListener);
+			_messageBus.unregisterMessageListener(
+				DestinationNames.BACKGROUND_TASK_STATUS, messageListener);
 		}
 	}
 
-	private void _reindexDictionaries(ActionRequest actionRequest)
+	protected void reindexDictionaries(ActionRequest actionRequest)
 		throws Exception {
 
 		DictionaryReindexer dictionaryReindexer = new DictionaryReindexer(
@@ -205,31 +217,40 @@ public class EditMVCActionCommand extends BaseMVCActionCommand {
 			ParamUtil.getLongValues(actionRequest, "companyIds"));
 	}
 
-	private void _reindexIndexReindexer(ActionRequest actionRequest)
+	protected void reindexIndexReindexer(ActionRequest actionRequest)
 		throws Exception {
 
 		String className = ParamUtil.getString(actionRequest, "className");
 
-		IndexReindexer indexReindexer =
-			_indexReindexerRegistry.getIndexReindexer(className);
+		IndexReindexer indexReindexer = _indexReindexers.get(className);
 
 		indexReindexer.reindex(
 			ParamUtil.getLongValues(actionRequest, "companyIds"));
 	}
 
-	private void _reindexIndexReindexers(ActionRequest actionRequest)
+	protected void reindexIndexReindexers(ActionRequest actionRequest)
 		throws Exception {
 
-		for (IndexReindexer indexReindexer :
-				_indexReindexerRegistry.getIndexReindexers()) {
-
+		for (IndexReindexer indexReindexer : _indexReindexers.values()) {
 			indexReindexer.reindex(
 				ParamUtil.getLongValues(actionRequest, "companyIds"));
 		}
 	}
 
+	protected void removeIndexReindexer(IndexReindexer indexReindexer) {
+		Class<?> clazz = indexReindexer.getClass();
+
+		_indexReindexers.remove(clazz.getName());
+	}
+
 	@Reference
-	private IndexReindexerRegistry _indexReindexerRegistry;
+	private BackgroundTaskManager _backgroundTaskManager;
+
+	@Reference
+	private Http _http;
+
+	private final Map<String, IndexReindexer> _indexReindexers =
+		new ConcurrentHashMap<>();
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;

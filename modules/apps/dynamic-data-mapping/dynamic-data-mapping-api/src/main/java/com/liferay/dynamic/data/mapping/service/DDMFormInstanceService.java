@@ -75,7 +75,7 @@ public interface DDMFormInstanceService extends BaseService {
 
 	public DDMFormInstance copyFormInstance(
 			long groupId, Map<Locale, String> nameMap,
-			DDMFormInstance sourceDDMFormInstance,
+			DDMFormInstance ddmFormInstance,
 			DDMFormValues settingsDDMFormValues, ServiceContext serviceContext)
 		throws PortalException;
 

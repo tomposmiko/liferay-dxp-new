@@ -49,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Dylan Rebelak
  */
 @Component(
-	property = "search.engine.impl=Elasticsearch",
+	immediate = true, property = "search.engine.impl=Elasticsearch",
 	service = IndexRequestExecutor.class
 )
 public class ElasticsearchIndexRequestExecutor implements IndexRequestExecutor {
@@ -148,45 +148,115 @@ public class ElasticsearchIndexRequestExecutor implements IndexRequestExecutor {
 			updateIndexSettingsIndexRequest);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setAnalyzeIndexRequestExecutor(
+		AnalyzeIndexRequestExecutor analyzeIndexRequestExecutor) {
+
+		_analyzeIndexRequestExecutor = analyzeIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setCloseIndexRequestExecutor(
+		CloseIndexRequestExecutor closeIndexRequestExecutor) {
+
+		_closeIndexRequestExecutor = closeIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setCreateIndexRequestExecutor(
+		CreateIndexRequestExecutor createIndexRequestExecutor) {
+
+		_createIndexRequestExecutor = createIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDeleteIndexRequestExecutor(
+		DeleteIndexRequestExecutor deleteIndexRequestExecutor) {
+
+		_deleteIndexRequestExecutor = deleteIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setFlushIndexRequestExecutor(
+		FlushIndexRequestExecutor flushIndexRequestExecutor) {
+
+		_flushIndexRequestExecutor = flushIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGetFieldMappingIndexRequestExecutor(
+		GetFieldMappingIndexRequestExecutor
+			getFieldMappingIndexRequestExecutor) {
+
+		_getFieldMappingIndexRequestExecutor =
+			getFieldMappingIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGetIndexIndexRequestExecutor(
+		GetIndexIndexRequestExecutor getIndexIndexRequestExecutor) {
+
+		_getIndexIndexRequestExecutor = getIndexIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGetMappingIndexRequestExecutor(
+		GetMappingIndexRequestExecutor getMappingIndexRequestExecutor) {
+
+		_getMappingIndexRequestExecutor = getMappingIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setIndicesExistsIndexRequestExecutor(
+		IndicesExistsIndexRequestExecutor indicesExistsIndexRequestExecutor) {
+
+		_indicesExistsIndexRequestExecutor = indicesExistsIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setOpenIndexRequestExecutor(
+		OpenIndexRequestExecutor openIndexRequestExecutor) {
+
+		_openIndexRequestExecutor = openIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPutMappingIndexRequestExecutor(
+		PutMappingIndexRequestExecutor putMappingIndexRequestExecutor) {
+
+		_putMappingIndexRequestExecutor = putMappingIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setRefreshIndexRequestExecutor(
+		RefreshIndexRequestExecutor refreshIndexRequestExecutor) {
+
+		_refreshIndexRequestExecutor = refreshIndexRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUpdateIndexSettingsIndexRequestExecutor(
+		UpdateIndexSettingsIndexRequestExecutor
+			updateIndexSettingsIndexRequestExecutor) {
+
+		_updateIndexSettingsIndexRequestExecutor =
+			updateIndexSettingsIndexRequestExecutor;
+	}
+
 	private AnalyzeIndexRequestExecutor _analyzeIndexRequestExecutor;
-
-	@Reference
 	private CloseIndexRequestExecutor _closeIndexRequestExecutor;
-
-	@Reference
 	private CreateIndexRequestExecutor _createIndexRequestExecutor;
-
-	@Reference
 	private DeleteIndexRequestExecutor _deleteIndexRequestExecutor;
-
-	@Reference
 	private FlushIndexRequestExecutor _flushIndexRequestExecutor;
-
-	@Reference
 	private GetFieldMappingIndexRequestExecutor
 		_getFieldMappingIndexRequestExecutor;
-
-	@Reference
 	private GetIndexIndexRequestExecutor _getIndexIndexRequestExecutor;
-
-	@Reference
 	private GetMappingIndexRequestExecutor _getMappingIndexRequestExecutor;
-
-	@Reference
 	private IndicesExistsIndexRequestExecutor
 		_indicesExistsIndexRequestExecutor;
-
-	@Reference
 	private OpenIndexRequestExecutor _openIndexRequestExecutor;
-
-	@Reference
 	private PutMappingIndexRequestExecutor _putMappingIndexRequestExecutor;
-
-	@Reference
 	private RefreshIndexRequestExecutor _refreshIndexRequestExecutor;
-
-	@Reference
 	private UpdateIndexSettingsIndexRequestExecutor
 		_updateIndexSettingsIndexRequestExecutor;
 

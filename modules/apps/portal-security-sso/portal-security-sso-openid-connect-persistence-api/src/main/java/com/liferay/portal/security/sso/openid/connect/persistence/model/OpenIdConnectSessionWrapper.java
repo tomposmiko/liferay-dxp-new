@@ -47,14 +47,10 @@ public class OpenIdConnectSessionWrapper
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("openIdConnectSessionId", getOpenIdConnectSessionId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("userId", getUserId());
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("accessToken", getAccessToken());
-		attributes.put(
-			"accessTokenExpirationDate", getAccessTokenExpirationDate());
-		attributes.put("authServerWellKnownURI", getAuthServerWellKnownURI());
-		attributes.put("clientId", getClientId());
 		attributes.put("idToken", getIdToken());
+		attributes.put("providerName", getProviderName());
 		attributes.put("refreshToken", getRefreshToken());
 
 		return attributes;
@@ -81,12 +77,6 @@ public class OpenIdConnectSessionWrapper
 			setCompanyId(companyId);
 		}
 
-		Long userId = (Long)attributes.get("userId");
-
-		if (userId != null) {
-			setUserId(userId);
-		}
-
 		Date modifiedDate = (Date)attributes.get("modifiedDate");
 
 		if (modifiedDate != null) {
@@ -99,30 +89,16 @@ public class OpenIdConnectSessionWrapper
 			setAccessToken(accessToken);
 		}
 
-		Date accessTokenExpirationDate = (Date)attributes.get(
-			"accessTokenExpirationDate");
-
-		if (accessTokenExpirationDate != null) {
-			setAccessTokenExpirationDate(accessTokenExpirationDate);
-		}
-
-		String authServerWellKnownURI = (String)attributes.get(
-			"authServerWellKnownURI");
-
-		if (authServerWellKnownURI != null) {
-			setAuthServerWellKnownURI(authServerWellKnownURI);
-		}
-
-		String clientId = (String)attributes.get("clientId");
-
-		if (clientId != null) {
-			setClientId(clientId);
-		}
-
 		String idToken = (String)attributes.get("idToken");
 
 		if (idToken != null) {
 			setIdToken(idToken);
+		}
+
+		String providerName = (String)attributes.get("providerName");
+
+		if (providerName != null) {
+			setProviderName(providerName);
 		}
 
 		String refreshToken = (String)attributes.get("refreshToken");
@@ -145,36 +121,6 @@ public class OpenIdConnectSessionWrapper
 	@Override
 	public String getAccessToken() {
 		return model.getAccessToken();
-	}
-
-	/**
-	 * Returns the access token expiration date of this open ID connect session.
-	 *
-	 * @return the access token expiration date of this open ID connect session
-	 */
-	@Override
-	public Date getAccessTokenExpirationDate() {
-		return model.getAccessTokenExpirationDate();
-	}
-
-	/**
-	 * Returns the auth server well known uri of this open ID connect session.
-	 *
-	 * @return the auth server well known uri of this open ID connect session
-	 */
-	@Override
-	public String getAuthServerWellKnownURI() {
-		return model.getAuthServerWellKnownURI();
-	}
-
-	/**
-	 * Returns the client ID of this open ID connect session.
-	 *
-	 * @return the client ID of this open ID connect session
-	 */
-	@Override
-	public String getClientId() {
-		return model.getClientId();
 	}
 
 	/**
@@ -238,6 +184,16 @@ public class OpenIdConnectSessionWrapper
 	}
 
 	/**
+	 * Returns the provider name of this open ID connect session.
+	 *
+	 * @return the provider name of this open ID connect session
+	 */
+	@Override
+	public String getProviderName() {
+		return model.getProviderName();
+	}
+
+	/**
 	 * Returns the refresh token of this open ID connect session.
 	 *
 	 * @return the refresh token of this open ID connect session
@@ -245,26 +201,6 @@ public class OpenIdConnectSessionWrapper
 	@Override
 	public String getRefreshToken() {
 		return model.getRefreshToken();
-	}
-
-	/**
-	 * Returns the user ID of this open ID connect session.
-	 *
-	 * @return the user ID of this open ID connect session
-	 */
-	@Override
-	public long getUserId() {
-		return model.getUserId();
-	}
-
-	/**
-	 * Returns the user uuid of this open ID connect session.
-	 *
-	 * @return the user uuid of this open ID connect session
-	 */
-	@Override
-	public String getUserUuid() {
-		return model.getUserUuid();
 	}
 
 	@Override
@@ -280,36 +216,6 @@ public class OpenIdConnectSessionWrapper
 	@Override
 	public void setAccessToken(String accessToken) {
 		model.setAccessToken(accessToken);
-	}
-
-	/**
-	 * Sets the access token expiration date of this open ID connect session.
-	 *
-	 * @param accessTokenExpirationDate the access token expiration date of this open ID connect session
-	 */
-	@Override
-	public void setAccessTokenExpirationDate(Date accessTokenExpirationDate) {
-		model.setAccessTokenExpirationDate(accessTokenExpirationDate);
-	}
-
-	/**
-	 * Sets the auth server well known uri of this open ID connect session.
-	 *
-	 * @param authServerWellKnownURI the auth server well known uri of this open ID connect session
-	 */
-	@Override
-	public void setAuthServerWellKnownURI(String authServerWellKnownURI) {
-		model.setAuthServerWellKnownURI(authServerWellKnownURI);
-	}
-
-	/**
-	 * Sets the client ID of this open ID connect session.
-	 *
-	 * @param clientId the client ID of this open ID connect session
-	 */
-	@Override
-	public void setClientId(String clientId) {
-		model.setClientId(clientId);
 	}
 
 	/**
@@ -373,6 +279,16 @@ public class OpenIdConnectSessionWrapper
 	}
 
 	/**
+	 * Sets the provider name of this open ID connect session.
+	 *
+	 * @param providerName the provider name of this open ID connect session
+	 */
+	@Override
+	public void setProviderName(String providerName) {
+		model.setProviderName(providerName);
+	}
+
+	/**
 	 * Sets the refresh token of this open ID connect session.
 	 *
 	 * @param refreshToken the refresh token of this open ID connect session
@@ -380,31 +296,6 @@ public class OpenIdConnectSessionWrapper
 	@Override
 	public void setRefreshToken(String refreshToken) {
 		model.setRefreshToken(refreshToken);
-	}
-
-	/**
-	 * Sets the user ID of this open ID connect session.
-	 *
-	 * @param userId the user ID of this open ID connect session
-	 */
-	@Override
-	public void setUserId(long userId) {
-		model.setUserId(userId);
-	}
-
-	/**
-	 * Sets the user uuid of this open ID connect session.
-	 *
-	 * @param userUuid the user uuid of this open ID connect session
-	 */
-	@Override
-	public void setUserUuid(String userUuid) {
-		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Lucas Marques de Paula
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ContactSearchRegistrar {
 
 	@Activate

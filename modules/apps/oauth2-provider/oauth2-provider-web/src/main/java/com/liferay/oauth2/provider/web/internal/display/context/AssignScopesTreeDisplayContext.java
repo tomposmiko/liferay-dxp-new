@@ -29,17 +29,19 @@ import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.oauth2.provider.web.internal.tree.Tree;
 import com.liferay.oauth2.provider.web.internal.util.ScopeTreeUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 
@@ -111,31 +113,32 @@ public class AssignScopesTreeDisplayContext
 		long oAuth2ApplicationScopeAliasesId,
 		OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService) {
 
-		Set<String> assignedScopeAliases = new HashSet<>();
+		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
+			oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				oAuth2ApplicationScopeAliasesId, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null);
 
-		for (OAuth2ScopeGrant oAuth2ScopeGrant :
-				oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
-					oAuth2ApplicationScopeAliasesId, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null)) {
+		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
 
-			assignedScopeAliases.addAll(oAuth2ScopeGrant.getScopeAliasesList());
-		}
-
-		return assignedScopeAliases;
+		return stream.map(
+			OAuth2ScopeGrant::getScopeAliasesList
+		).flatMap(
+			Collection::stream
+		).collect(
+			Collectors.toCollection(HashSet::new)
+		);
 	}
 
 	private Set<String> _getAssignedDeletedScopeAliases(
 		Set<String> scopeAliases) {
 
-		Set<String> assignedDeletedScopeAliases = new HashSet<>();
+		Stream<String> stream = _assignedScopeAliases.stream();
 
-		for (String assignedScopeAlias : _assignedScopeAliases) {
-			if (!scopeAliases.contains(assignedScopeAlias)) {
-				assignedDeletedScopeAliases.add(assignedScopeAlias);
-			}
-		}
-
-		return assignedDeletedScopeAliases;
+		return stream.filter(
+			scopeAlias -> !scopeAliases.contains(scopeAlias)
+		).collect(
+			Collectors.toCollection(HashSet::new)
+		);
 	}
 
 	private String _getDescription(String scopeAlias, Locale locale) {
@@ -168,7 +171,14 @@ public class AssignScopesTreeDisplayContext
 					liferayOAuth2Scope.getScope(), locale));
 		}
 
-		return StringUtil.merge(descriptions, StringPool.COMMA_AND_SPACE);
+		if (!descriptions.isEmpty()) {
+			Stream<String> stream = descriptions.stream();
+
+			return stream.collect(
+				Collectors.joining(StringPool.COMMA_AND_SPACE));
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private Map<String, String> _getScopeAliasesDescriptionsMap(

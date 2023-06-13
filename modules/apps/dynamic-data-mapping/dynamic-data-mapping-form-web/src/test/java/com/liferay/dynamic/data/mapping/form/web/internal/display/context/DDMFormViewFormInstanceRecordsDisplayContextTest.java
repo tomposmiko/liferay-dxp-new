@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.web.internal.display.context;
 
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRenderer;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PropsImpl;
 
 import java.util.Arrays;
@@ -54,24 +53,24 @@ import javax.servlet.http.HttpServletRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Marcos Martins
  */
-public class DDMFormViewFormInstanceRecordsDisplayContextTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+@RunWith(PowerMockRunner.class)
+public class DDMFormViewFormInstanceRecordsDisplayContextTest
+	extends PowerMockito {
 
 	@BeforeClass
-	public static void setUpClass() {
+	public static void setUpClass() throws Exception {
 		PropsUtil.setProps(new PropsImpl());
 	}
 
@@ -110,27 +109,28 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 
 	@Test
 	public void testGetDefaultLocale() throws Exception {
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		DDMFormValues ddmFormValues = Mockito.mock(DDMFormValues.class);
+		DDMFormValues ddmFormValues = mock(DDMFormValues.class);
 
-		Mockito.when(
+		when(
 			ddmFormValues.getDefaultLocale()
 		).thenReturn(
 			LocaleUtil.US
 		);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getDDMFormValues()
 		).thenReturn(
 			ddmFormValues
 		);
 
-		Assert.assertEquals(
-			LocaleUtil.US,
+		Locale defaultLocale =
 			_ddmFormViewFormInstanceRecordsDisplayContext.getDefaultLocale(
-				ddmFormInstanceRecord));
+				ddmFormInstanceRecord);
+
+		Assert.assertEquals(LocaleUtil.US, defaultLocale);
 	}
 
 	@Test
@@ -148,9 +148,9 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 	}
 
 	private DDMForm _mockDDMForm() {
-		DDMForm ddmForm = Mockito.mock(DDMForm.class);
+		DDMForm ddmForm = mock(DDMForm.class);
 
-		Mockito.when(
+		when(
 			ddmForm.getAvailableLocales()
 		).thenReturn(
 			new HashSet<Locale>(Arrays.asList(LocaleUtil.US, LocaleUtil.BRAZIL))
@@ -160,9 +160,9 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 	}
 
 	private DDMFormField _mockDDMFormField(String type) {
-		DDMFormField ddmFormField = Mockito.mock(DDMFormField.class);
+		DDMFormField ddmFormField = mock(DDMFormField.class);
 
-		Mockito.when(
+		when(
 			ddmFormField.getType()
 		).thenReturn(
 			type
@@ -171,33 +171,33 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 		return ddmFormField;
 	}
 
-	private DDMFormFieldTypeServicesRegistry
-		_mockDDMFormFieldTypeServicesRegistry() {
+	private DDMFormFieldTypeServicesTracker
+		_mockDDMFormFieldTypeServicesTracker() {
 
-		DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry =
-			Mockito.mock(DDMFormFieldTypeServicesRegistry.class);
+		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker = mock(
+			DDMFormFieldTypeServicesTracker.class);
 
 		DDMFormFieldValueRenderer ddmFormFieldValueRenderer =
 			_mockDDMFormFieldValueRenderer();
 
-		Mockito.when(
-			ddmFormFieldTypeServicesRegistry.getDDMFormFieldValueRenderer(
-				Mockito.anyString())
+		when(
+			ddmFormFieldTypeServicesTracker.getDDMFormFieldValueRenderer(
+				Matchers.anyString())
 		).thenReturn(
 			ddmFormFieldValueRenderer
 		);
 
-		return ddmFormFieldTypeServicesRegistry;
+		return ddmFormFieldTypeServicesTracker;
 	}
 
 	private DDMFormFieldValueRenderer _mockDDMFormFieldValueRenderer() {
-		DDMFormFieldValueRenderer ddmFormFieldValueRenderer = Mockito.mock(
+		DDMFormFieldValueRenderer ddmFormFieldValueRenderer = mock(
 			DDMFormFieldValueRenderer.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValueRenderer.render(
-				Mockito.anyString(), Mockito.any(DDMFormFieldValue.class),
-				Mockito.any(Locale.class))
+				Matchers.anyString(), Matchers.any(DDMFormFieldValue.class),
+				Matchers.any(Locale.class))
 		).thenReturn(
 			"mockedRenderResponse"
 		);
@@ -206,11 +206,11 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 	}
 
 	private DDMFormInstance _mockDDMFormInstance() throws PortalException {
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
 
 		DDMForm ddmForm = _mockDDMForm();
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getDDMForm()
 		).thenReturn(
 			ddmForm
@@ -218,7 +218,7 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 
 		DDMStructure ddmStructure = _mockDDMStructure(ddmForm);
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getStructure()
 		).thenReturn(
 			ddmStructure
@@ -228,9 +228,9 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 	}
 
 	private DDMStructure _mockDDMStructure(DDMForm ddmForm) {
-		DDMStructure ddmStructure = Mockito.mock(DDMStructure.class);
+		DDMStructure ddmStructure = mock(DDMStructure.class);
 
-		Mockito.when(
+		when(
 			ddmStructure.getDDMForm()
 		).thenReturn(
 			ddmForm
@@ -240,9 +240,9 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 	}
 
 	private ThemeDisplay _mockThemeDisplay() {
-		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
+		ThemeDisplay themeDisplay = mock(ThemeDisplay.class);
 
-		Mockito.when(
+		when(
 			themeDisplay.getPortletDisplay()
 		).thenReturn(
 			new PortletDisplay()
@@ -254,17 +254,17 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 	private void _setUpDDMFormViewFormInstanceRecordsDisplayContext()
 		throws PortalException {
 
-		RenderRequest renderRequest = Mockito.mock(RenderRequest.class);
+		RenderRequest renderRequest = mock(RenderRequest.class);
 
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
 
-		Mockito.when(
+		when(
 			renderRequest.getAttribute(WebKeys.THEME_DISPLAY)
 		).thenReturn(
 			themeDisplay
 		);
 
-		Mockito.when(
+		when(
 			renderRequest.getParameter(Mockito.eq("redirect"))
 		).thenReturn(
 			"test"
@@ -272,30 +272,29 @@ public class DDMFormViewFormInstanceRecordsDisplayContextTest {
 
 		_ddmFormViewFormInstanceRecordsDisplayContext =
 			new DDMFormViewFormInstanceRecordsDisplayContext(
-				renderRequest, Mockito.mock(RenderResponse.class),
+				renderRequest, mock(RenderResponse.class),
 				_mockDDMFormInstance(),
-				Mockito.mock(DDMFormInstanceRecordLocalService.class),
-				_mockDDMFormFieldTypeServicesRegistry());
+				mock(DDMFormInstanceRecordLocalService.class),
+				_mockDDMFormFieldTypeServicesTracker());
 	}
 
 	private void _setUpPortalUtil() {
 		PortalUtil portalUtil = new PortalUtil();
 
-		Portal portal = Mockito.mock(Portal.class);
+		Portal portal = mock(Portal.class);
 
-		HttpServletRequest httpServletRequest = Mockito.mock(
-			HttpServletRequest.class);
+		HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
 
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
 
-		Mockito.when(
+		when(
 			httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY)
 		).thenReturn(
 			themeDisplay
 		);
 
-		Mockito.when(
-			portal.getHttpServletRequest(Mockito.any(PortletRequest.class))
+		when(
+			portal.getHttpServletRequest(Matchers.any(PortletRequest.class))
 		).thenReturn(
 			httpServletRequest
 		);

@@ -16,9 +16,7 @@ package com.liferay.commerce.price.list.service;
 
 import com.liferay.commerce.price.list.model.CommerceTierPriceEntry;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -37,8 +35,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -64,15 +60,13 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CommerceTierPriceEntryLocalServiceUtil
  * @generated
  */
-@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface CommerceTierPriceEntryLocalService
-	extends BaseLocalService, CTService<CommerceTierPriceEntry>,
-			PersistedModelLocalService {
+	extends BaseLocalService, PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -104,6 +98,7 @@ public interface CommerceTierPriceEntryLocalService
 			int minQuantity, ServiceContext serviceContext)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
 	public CommerceTierPriceEntry addCommerceTierPriceEntry(
 			String externalReferenceCode, long commercePriceEntryId,
 			BigDecimal price, BigDecimal promoPrice, boolean bulkPricing,
@@ -181,6 +176,7 @@ public interface CommerceTierPriceEntryLocalService
 	 * @return CommerceTierPriceEntry
 	 * @throws PortalException
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public CommerceTierPriceEntry addOrUpdateCommerceTierPriceEntry(
 			String externalReferenceCode, long commerceTierPriceEntryId,
 			long commercePriceEntryId, BigDecimal price, BigDecimal promoPrice,
@@ -347,10 +343,25 @@ public interface CommerceTierPriceEntryLocalService
 	public CommerceTierPriceEntry fetchCommerceTierPriceEntry(
 		long commerceTierPriceEntryId);
 
+	/**
+	 * Returns the commerce tier price entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce tier price entry's external reference code
+	 * @return the matching commerce tier price entry, or <code>null</code> if a matching commerce tier price entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceTierPriceEntry
 		fetchCommerceTierPriceEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId);
+			long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceTierPriceEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public CommerceTierPriceEntry fetchCommerceTierPriceEntryByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	/**
 	 * Returns the commerce tier price entry with the matching UUID and company.
@@ -422,10 +433,18 @@ public interface CommerceTierPriceEntryLocalService
 			long commerceTierPriceEntryId)
 		throws PortalException;
 
+	/**
+	 * Returns the commerce tier price entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce tier price entry's external reference code
+	 * @return the matching commerce tier price entry
+	 * @throws PortalException if a matching commerce tier price entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceTierPriceEntry
 			getCommerceTierPriceEntryByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
+				long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -506,6 +525,7 @@ public interface CommerceTierPriceEntryLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
 	public CommerceTierPriceEntry updateCommerceTierPriceEntry(
 			long commerceTierPriceEntryId, BigDecimal price,
 			BigDecimal promoPrice, int minQuantity,
@@ -536,20 +556,5 @@ public interface CommerceTierPriceEntryLocalService
 			ServiceContext serviceContext,
 			Map<String, Serializable> workflowContext)
 		throws PortalException;
-
-	@Override
-	@Transactional(enabled = false)
-	public CTPersistence<CommerceTierPriceEntry> getCTPersistence();
-
-	@Override
-	@Transactional(enabled = false)
-	public Class<CommerceTierPriceEntry> getModelClass();
-
-	@Override
-	@Transactional(rollbackFor = Throwable.class)
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CommerceTierPriceEntry>, R, E>
-				updateUnsafeFunction)
-		throws E;
 
 }

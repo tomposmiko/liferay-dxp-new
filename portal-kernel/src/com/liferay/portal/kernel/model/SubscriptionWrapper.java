@@ -413,11 +413,6 @@ public class SubscriptionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected SubscriptionWrapper wrap(Subscription subscription) {
 		return new SubscriptionWrapper(subscription);
 	}

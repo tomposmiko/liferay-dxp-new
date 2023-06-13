@@ -64,7 +64,7 @@ public class JournalArticleWrapper
 		attributes.put("articleId", getArticleId());
 		attributes.put("version", getVersion());
 		attributes.put("urlTitle", getUrlTitle());
-		attributes.put("DDMStructureId", getDDMStructureId());
+		attributes.put("DDMStructureKey", getDDMStructureKey());
 		attributes.put("DDMTemplateKey", getDDMTemplateKey());
 		attributes.put("defaultLanguageId", getDefaultLanguageId());
 		attributes.put("layoutUuid", getLayoutUuid());
@@ -201,10 +201,10 @@ public class JournalArticleWrapper
 			setUrlTitle(urlTitle);
 		}
 
-		Long DDMStructureId = (Long)attributes.get("DDMStructureId");
+		String DDMStructureKey = (String)attributes.get("DDMStructureKey");
 
-		if (DDMStructureId != null) {
-			setDDMStructureId(DDMStructureId);
+		if (DDMStructureKey != null) {
+			setDDMStructureKey(DDMStructureKey);
 		}
 
 		String DDMTemplateKey = (String)attributes.get("DDMTemplateKey");
@@ -429,13 +429,6 @@ public class JournalArticleWrapper
 	}
 
 	@Override
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
-		getDDMFormValues() {
-
-		return model.getDDMFormValues();
-	}
-
-	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMStructure
 		getDDMStructure() {
 
@@ -443,13 +436,13 @@ public class JournalArticleWrapper
 	}
 
 	/**
-	 * Returns the ddm structure ID of this journal article.
+	 * Returns the ddm structure key of this journal article.
 	 *
-	 * @return the ddm structure ID of this journal article
+	 * @return the ddm structure key of this journal article
 	 */
 	@Override
-	public long getDDMStructureId() {
-		return model.getDDMStructureId();
+	public String getDDMStructureKey() {
+		return model.getDDMStructureKey();
 	}
 
 	@Override
@@ -530,13 +523,6 @@ public class JournalArticleWrapper
 	@Override
 	public com.liferay.portal.kernel.xml.Document getDocument() {
 		return model.getDocument();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.xml.Document getDocumentByLocale(
-		String languageId) {
-
-		return model.getDocumentByLocale(languageId);
 	}
 
 	/**
@@ -686,6 +672,24 @@ public class JournalArticleWrapper
 	}
 
 	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public String getLegacyDescription() {
+		return model.getLegacyDescription();
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public String getLegacyTitle() {
+		return model.getLegacyTitle();
+	}
+
+	/**
 	 * Returns the modified date of this journal article.
 	 *
 	 * @return the modified date of this journal article
@@ -822,6 +826,26 @@ public class JournalArticleWrapper
 		return model.getStatusDate();
 	}
 
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #getDDMStructureKey()}
+	 */
+	@Deprecated
+	@Override
+	public String getStructureId() {
+		return model.getStructureId();
+	}
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #getDDMTemplateKey()}
+	 */
+	@Deprecated
+	@Override
+	public String getTemplateId() {
+		return model.getTemplateId();
+	}
+
 	@Override
 	public String getTitle() {
 		return model.getTitle();
@@ -863,6 +887,18 @@ public class JournalArticleWrapper
 	}
 
 	/**
+	 * Returns the trash entry created when this journal article was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this journal article.
+	 *
+	 * @return the trash entry created when this journal article was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getTrashEntry();
+	}
+
+	/**
 	 * Returns the class primary key of the trash entry for this journal article.
 	 *
 	 * @return the class primary key of the trash entry for this journal article
@@ -870,6 +906,18 @@ public class JournalArticleWrapper
 	@Override
 	public long getTrashEntryClassPK() {
 		return model.getTrashEntryClassPK();
+	}
+
+	/**
+	 * Returns the trash handler for this journal article.
+	 *
+	 * @return the trash handler for this journal article
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
+		return model.getTrashHandler();
 	}
 
 	/**
@@ -1035,6 +1083,26 @@ public class JournalArticleWrapper
 	}
 
 	/**
+	 * Returns <code>true</code> if the parent of this journal article is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this journal article is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer() {
+		return model.isInTrashContainer();
+	}
+
+	@Override
+	public boolean isInTrashExplicitly() {
+		return model.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return model.isInTrashImplicitly();
+	}
+
+	/**
 	 * Returns <code>true</code> if this journal article is pending.
 	 *
 	 * @return <code>true</code> if this journal article is pending; <code>false</code> otherwise
@@ -1067,6 +1135,15 @@ public class JournalArticleWrapper
 	@Override
 	public boolean isSmallImage() {
 		return model.isSmallImage();
+	}
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public boolean isTemplateDriven() {
+		return model.isTemplateDriven();
 	}
 
 	@Override
@@ -1140,13 +1217,13 @@ public class JournalArticleWrapper
 	}
 
 	/**
-	 * Sets the ddm structure ID of this journal article.
+	 * Sets the ddm structure key of this journal article.
 	 *
-	 * @param DDMStructureId the ddm structure ID of this journal article
+	 * @param DDMStructureKey the ddm structure key of this journal article
 	 */
 	@Override
-	public void setDDMStructureId(long DDMStructureId) {
-		model.setDDMStructureId(DDMStructureId);
+	public void setDDMStructureKey(String DDMStructureKey) {
+		model.setDDMStructureKey(DDMStructureKey);
 	}
 
 	/**
@@ -1167,6 +1244,15 @@ public class JournalArticleWrapper
 	@Override
 	public void setDefaultLanguageId(String defaultLanguageId) {
 		model.setDefaultLanguageId(defaultLanguageId);
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public void setDescription(String description) {
+		model.setDescription(description);
 	}
 
 	@Override
@@ -1411,6 +1497,35 @@ public class JournalArticleWrapper
 		model.setStatusDate(statusDate);
 	}
 
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #setDDMStructureKey(String)}
+	 */
+	@Deprecated
+	@Override
+	public void setStructureId(String ddmStructureKey) {
+		model.setStructureId(ddmStructureKey);
+	}
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #setDDMTemplateKey(String)}
+	 */
+	@Deprecated
+	@Override
+	public void setTemplateId(String ddmTemplateKey) {
+		model.setTemplateId(ddmTemplateKey);
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public void setTitle(String title) {
+		model.setTitle(title);
+	}
+
 	@Override
 	public void setTitleMap(Map<java.util.Locale, String> titleMap) {
 		model.setTitleMap(titleMap);
@@ -1484,11 +1599,6 @@ public class JournalArticleWrapper
 	@Override
 	public void setVersion(double version) {
 		model.setVersion(version);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

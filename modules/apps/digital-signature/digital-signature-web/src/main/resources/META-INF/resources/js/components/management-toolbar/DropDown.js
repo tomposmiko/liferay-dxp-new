@@ -16,13 +16,13 @@ import ClayDropDown from '@clayui/drop-down';
 import {ClayCheckbox, ClayRadio} from '@clayui/form';
 import React from 'react';
 
-export function CheckboxGroup({
+export const CheckboxGroup = ({
 	checked = [],
 	items = [],
 	label,
 	onAdd,
 	onRemove,
-}) {
+}) => {
 	return (
 		<ClayDropDown.Group header={label}>
 			<ClayDropDown.ItemList>
@@ -41,9 +41,9 @@ export function CheckboxGroup({
 			</ClayDropDown.ItemList>
 		</ClayDropDown.Group>
 	);
-}
+};
 
-export function ItemsGroup({checked, items = [], label, onClick}) {
+export const ItemsGroup = ({checked, items = [], label, onClick}) => {
 	return (
 		<ClayDropDown.Group header={label}>
 			<ClayDropDown.ItemList>
@@ -61,9 +61,9 @@ export function ItemsGroup({checked, items = [], label, onClick}) {
 			</ClayDropDown.ItemList>
 		</ClayDropDown.Group>
 	);
-}
+};
 
-export function RadioGroup({checked, items = [], label, onChange}) {
+export const RadioGroup = ({checked, items = [], label, onChange}) => {
 	return (
 		<ClayDropDown.Group header={label}>
 			<ClayDropDown.ItemList>
@@ -80,9 +80,9 @@ export function RadioGroup({checked, items = [], label, onChange}) {
 			</ClayDropDown.ItemList>
 		</ClayDropDown.Group>
 	);
-}
+};
 
-export default function DropDown({children, footerContent, ...otherProps}) {
+export default ({children, footerContent, ...otherProps}) => {
 	return (
 		<ClayDropDown {...otherProps}>
 			<ClayDropDown.ItemList className="dropdown-fixed-height inline-scroller">
@@ -96,4 +96,4 @@ export default function DropDown({children, footerContent, ...otherProps}) {
 			)}
 		</ClayDropDown>
 	);
-}
+};

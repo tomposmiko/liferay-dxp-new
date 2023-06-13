@@ -17,16 +17,19 @@ package com.liferay.calendar.service.base;
 import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.service.CalendarService;
 import com.liferay.calendar.service.CalendarServiceUtil;
+import com.liferay.calendar.service.persistence.CalendarBookingFinder;
+import com.liferay.calendar.service.persistence.CalendarBookingPersistence;
 import com.liferay.calendar.service.persistence.CalendarFinder;
+import com.liferay.calendar.service.persistence.CalendarNotificationTemplatePersistence;
 import com.liferay.calendar.service.persistence.CalendarPersistence;
+import com.liferay.calendar.service.persistence.CalendarResourceFinder;
+import com.liferay.calendar.service.persistence.CalendarResourcePersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -146,10 +149,42 @@ public abstract class CalendarServiceBaseImpl
 	protected CalendarFinder calendarFinder;
 
 	@Reference
+	protected CalendarBookingPersistence calendarBookingPersistence;
+
+	@Reference
+	protected CalendarBookingFinder calendarBookingFinder;
+
+	@Reference
+	protected CalendarNotificationTemplatePersistence
+		calendarNotificationTemplatePersistence;
+
+	@Reference
+	protected CalendarResourcePersistence calendarResourcePersistence;
+
+	@Reference
+	protected CalendarResourceFinder calendarResourceFinder;
+
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CalendarServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameService
+		classNameService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserService userService;
 
 }

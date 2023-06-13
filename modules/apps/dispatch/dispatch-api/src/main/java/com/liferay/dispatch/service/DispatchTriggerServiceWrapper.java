@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class DispatchTriggerServiceWrapper
 	implements DispatchTriggerService, ServiceWrapper<DispatchTriggerService> {
 
-	public DispatchTriggerServiceWrapper() {
-		this(null);
-	}
-
 	public DispatchTriggerServiceWrapper(
 		DispatchTriggerService dispatchTriggerService) {
 
@@ -38,15 +34,14 @@ public class DispatchTriggerServiceWrapper
 
 	@Override
 	public com.liferay.dispatch.model.DispatchTrigger addDispatchTrigger(
-			String externalReferenceCode, long userId,
-			String dispatchTaskExecutorType,
+			long userId, String dispatchTaskExecutorType,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				dispatchTaskSettingsUnicodeProperties,
 			String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _dispatchTriggerService.addDispatchTrigger(
-			externalReferenceCode, userId, dispatchTaskExecutorType,
+			userId, dispatchTaskExecutorType,
 			dispatchTaskSettingsUnicodeProperties, name);
 	}
 
@@ -55,14 +50,6 @@ public class DispatchTriggerServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_dispatchTriggerService.deleteDispatchTrigger(dispatchTriggerId);
-	}
-
-	@Override
-	public com.liferay.dispatch.model.DispatchTrigger getDispatchTrigger(
-			long dispatchTriggerId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _dispatchTriggerService.getDispatchTrigger(dispatchTriggerId);
 	}
 
 	@Override
@@ -98,14 +85,14 @@ public class DispatchTriggerServiceWrapper
 			int endDateMonth, int endDateDay, int endDateYear, int endDateHour,
 			int endDateMinute, boolean neverEnd, boolean overlapAllowed,
 			int startDateMonth, int startDateDay, int startDateYear,
-			int startDateHour, int startDateMinute, String timeZoneId)
+			int startDateHour, int startDateMinute)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _dispatchTriggerService.updateDispatchTrigger(
 			dispatchTriggerId, active, cronExpression, dispatchTaskClusterMode,
 			endDateMonth, endDateDay, endDateYear, endDateHour, endDateMinute,
 			neverEnd, overlapAllowed, startDateMonth, startDateDay,
-			startDateYear, startDateHour, startDateMinute, timeZoneId);
+			startDateYear, startDateHour, startDateMinute);
 	}
 
 	@Override

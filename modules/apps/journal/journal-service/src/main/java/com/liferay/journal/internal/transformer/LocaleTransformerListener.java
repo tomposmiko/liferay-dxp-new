@@ -17,7 +17,6 @@ package com.liferay.journal.internal.transformer;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.constants.JournalPortletKeys;
-import com.liferay.journal.model.impl.JournalArticleImpl;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -35,15 +34,14 @@ import com.liferay.portal.kernel.xml.Element;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 	service = TransformerListener.class
 )
@@ -69,21 +67,11 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 			_log.debug("onXml");
 		}
 
-		_filterByLocalizability(document, tokens);
+		filterByLocalizability(document, tokens);
 
-		_filterByLanguage(document, languageId);
+		filterByLanguage(document, languageId);
 
 		return document;
-	}
-
-	@Activate
-	protected void activate() {
-		JournalArticleImpl.setLocaleTransformerListener(this);
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		JournalArticleImpl.setLocaleTransformerListener(null);
 	}
 
 	protected void filter(
@@ -107,7 +95,7 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 		}
 	}
 
-	private void _filterByLanguage(Document document, String languageId) {
+	protected void filterByLanguage(Document document, String languageId) {
 		Element rootElement = document.getRootElement();
 
 		String defaultLanguageId = LocaleUtil.toLanguageId(
@@ -121,17 +109,16 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 				"available-locales", articleDefaultLanguageId));
 
 		if (!ArrayUtil.contains(availableLanguageIds, languageId, true)) {
-			_filterByLanguage(
+			filterByLanguage(
 				rootElement, articleDefaultLanguageId,
 				articleDefaultLanguageId);
 		}
 		else {
-			_filterByLanguage(
-				rootElement, languageId, articleDefaultLanguageId);
+			filterByLanguage(rootElement, languageId, articleDefaultLanguageId);
 		}
 	}
 
-	private void _filterByLanguage(
+	protected void filterByLanguage(
 		Element root, String languageId, String defaultLanguageId) {
 
 		Element defaultLanguageElement = null;
@@ -150,7 +137,7 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 					hasLanguageIdElement = true;
 				}
 
-				_filterByLanguage(element, languageId, defaultLanguageId);
+				filterByLanguage(element, languageId, defaultLanguageId);
 			}
 			else {
 				if (StringUtil.equalsIgnoreCase(
@@ -166,12 +153,12 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 		if (!hasLanguageIdElement && (defaultLanguageElement != null)) {
 			root.add(defaultLanguageElement);
 
-			_filterByLanguage(
+			filterByLanguage(
 				defaultLanguageElement, languageId, defaultLanguageId);
 		}
 	}
 
-	private void _filterByLocalizability(
+	protected void filterByLocalizability(
 		Document document, Map<String, String> tokens) {
 
 		try {
@@ -199,7 +186,7 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 			String articleDefaultLanguageId = rootElement.attributeValue(
 				"default-locale", defaultLanguageId);
 
-			_filterByLocalizability(
+			filterByLocalizability(
 				rootElement, articleDefaultLanguageId, ddmStructure);
 		}
 		catch (NullPointerException nullPointerException) {
@@ -211,7 +198,7 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 		}
 	}
 
-	private void _filterByLocalizability(
+	protected void filterByLocalizability(
 			Element root, String defaultLanguageId, DDMStructure ddmStructure)
 		throws PortalException {
 
@@ -226,14 +213,20 @@ public class LocaleTransformerListener extends BaseTransformerListener {
 				filter(element, ddmStructure, name, defaultLanguageId);
 			}
 
-			_filterByLocalizability(element, defaultLanguageId, ddmStructure);
+			filterByLocalizability(element, defaultLanguageId, ddmStructure);
 		}
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureLocalService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		_ddmStructureLocalService = ddmStructureLocalService;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LocaleTransformerListener.class);
 
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
 
 }

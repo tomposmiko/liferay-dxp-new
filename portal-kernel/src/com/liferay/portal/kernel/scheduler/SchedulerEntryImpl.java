@@ -22,18 +22,15 @@ import com.liferay.petra.string.StringPool;
  */
 public class SchedulerEntryImpl implements SchedulerEntry {
 
-	public SchedulerEntryImpl(
-		String eventListenerClass, TriggerConfiguration triggerConfiguration) {
-
-		this(eventListenerClass, triggerConfiguration, StringPool.BLANK);
+	public SchedulerEntryImpl(String eventListenerClass, Trigger trigger) {
+		this(eventListenerClass, trigger, StringPool.BLANK);
 	}
 
 	public SchedulerEntryImpl(
-		String eventListenerClass, TriggerConfiguration triggerConfiguration,
-		String description) {
+		String eventListenerClass, Trigger trigger, String description) {
 
 		_eventListenerClass = eventListenerClass;
-		_triggerConfiguration = triggerConfiguration;
+		_trigger = trigger;
 		_description = description;
 	}
 
@@ -48,20 +45,19 @@ public class SchedulerEntryImpl implements SchedulerEntry {
 	}
 
 	@Override
-	public TriggerConfiguration getTriggerConfiguration() {
-		return _triggerConfiguration;
+	public Trigger getTrigger() {
+		return _trigger;
 	}
 
 	@Override
 	public String toString() {
 		return StringBundler.concat(
-			"{description=", _description, ", eventListenerClass=",
-			_eventListenerClass, ", triggerConfiguration=",
-			_triggerConfiguration, "}");
+			", description=, eventListenerClass=", _eventListenerClass,
+			", trigger=", _trigger, "}");
 	}
 
 	private String _description;
 	private String _eventListenerClass;
-	private TriggerConfiguration _triggerConfiguration;
+	private Trigger _trigger;
 
 }

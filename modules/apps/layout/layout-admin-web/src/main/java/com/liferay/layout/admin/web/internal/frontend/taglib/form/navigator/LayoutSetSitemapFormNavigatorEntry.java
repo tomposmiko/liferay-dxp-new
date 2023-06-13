@@ -16,7 +16,6 @@ package com.liferay.layout.admin.web.internal.frontend.taglib.form.navigator;
 
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstants;
-import com.liferay.layout.admin.web.internal.constants.LayoutAdminFormNavigatorConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.User;
 
@@ -41,19 +40,8 @@ public class LayoutSetSitemapFormNavigatorEntry
 	}
 
 	@Override
-	public String getFormNavigatorId() {
-		return LayoutAdminFormNavigatorConstants.
-			FORM_NAVIGATOR_ID_LAYOUT_SET_ADVANCED;
-	}
-
-	@Override
 	public String getKey() {
 		return "sitemap";
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
 	}
 
 	@Override
@@ -66,11 +54,17 @@ public class LayoutSetSitemapFormNavigatorEntry
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/layout_set/sitemap.jsp";
 	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")
-	private ServletContext _servletContext;
 
 }

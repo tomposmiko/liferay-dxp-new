@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -66,7 +65,7 @@ public class OrderItem implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "32144")
+	@Schema
 	public Long getBookedQuantityId() {
 		return bookedQuantityId;
 	}
@@ -96,17 +95,17 @@ public class OrderItem implements Serializable {
 
 	@Schema
 	@Valid
-	public CustomField[] getCustomFields() {
+	public Map<String, ?> getCustomFields() {
 		return customFields;
 	}
 
-	public void setCustomFields(CustomField[] customFields) {
+	public void setCustomFields(Map<String, ?> customFields) {
 		this.customFields = customFields;
 	}
 
 	@JsonIgnore
 	public void setCustomFields(
-		UnsafeSupplier<CustomField[], Exception> customFieldsUnsafeSupplier) {
+		UnsafeSupplier<Map<String, ?>, Exception> customFieldsUnsafeSupplier) {
 
 		try {
 			customFields = customFieldsUnsafeSupplier.get();
@@ -121,39 +120,9 @@ public class OrderItem implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected CustomField[] customFields;
+	protected Map<String, ?> customFields;
 
-	@DecimalMin("0")
-	@Schema(example = "10.1")
-	@Valid
-	public BigDecimal getDecimalQuantity() {
-		return decimalQuantity;
-	}
-
-	public void setDecimalQuantity(BigDecimal decimalQuantity) {
-		this.decimalQuantity = decimalQuantity;
-	}
-
-	@JsonIgnore
-	public void setDecimalQuantity(
-		UnsafeSupplier<BigDecimal, Exception> decimalQuantityUnsafeSupplier) {
-
-		try {
-			decimalQuantity = decimalQuantityUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected BigDecimal decimalQuantity;
-
-	@Schema(example = "separate package")
+	@Schema
 	public String getDeliveryGroup() {
 		return deliveryGroup;
 	}
@@ -182,7 +151,7 @@ public class OrderItem implements Serializable {
 	protected String deliveryGroup;
 
 	@DecimalMin("0")
-	@Schema(example = "2")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountAmount() {
 		return discountAmount;
@@ -211,38 +180,8 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal discountAmount;
 
-	@Schema(example = "true")
-	public Boolean getDiscountManuallyAdjusted() {
-		return discountManuallyAdjusted;
-	}
-
-	public void setDiscountManuallyAdjusted(Boolean discountManuallyAdjusted) {
-		this.discountManuallyAdjusted = discountManuallyAdjusted;
-	}
-
-	@JsonIgnore
-	public void setDiscountManuallyAdjusted(
-		UnsafeSupplier<Boolean, Exception>
-			discountManuallyAdjustedUnsafeSupplier) {
-
-		try {
-			discountManuallyAdjusted =
-				discountManuallyAdjustedUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Boolean discountManuallyAdjusted;
-
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel1() {
 		return discountPercentageLevel1;
@@ -276,7 +215,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel1;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel1WithTaxAmount() {
 		return discountPercentageLevel1WithTaxAmount;
@@ -311,7 +250,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel1WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel2() {
 		return discountPercentageLevel2;
@@ -345,7 +284,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel2;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel2WithTaxAmount() {
 		return discountPercentageLevel2WithTaxAmount;
@@ -380,7 +319,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel2WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel3() {
 		return discountPercentageLevel3;
@@ -414,7 +353,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel3;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel3WithTaxAmount() {
 		return discountPercentageLevel3WithTaxAmount;
@@ -449,7 +388,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel3WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel4() {
 		return discountPercentageLevel4;
@@ -483,7 +422,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel4;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountPercentageLevel4WithTaxAmount() {
 		return discountPercentageLevel4WithTaxAmount;
@@ -518,7 +457,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal discountPercentageLevel4WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "2")
+	@Schema
 	@Valid
 	public BigDecimal getDiscountWithTaxAmount() {
 		return discountWithTaxAmount;
@@ -548,7 +487,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal discountWithTaxAmount;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -577,7 +516,7 @@ public class OrderItem implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "200")
+	@Schema
 	@Valid
 	public BigDecimal getFinalPrice() {
 		return finalPrice;
@@ -607,7 +546,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal finalPrice;
 
 	@DecimalMin("0")
-	@Schema(example = "200")
+	@Schema
 	@Valid
 	public BigDecimal getFinalPriceWithTaxAmount() {
 		return finalPriceWithTaxAmount;
@@ -638,36 +577,8 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal finalPriceWithTaxAmount;
 
-	@Schema
-	public String getFormattedQuantity() {
-		return formattedQuantity;
-	}
-
-	public void setFormattedQuantity(String formattedQuantity) {
-		this.formattedQuantity = formattedQuantity;
-	}
-
-	@JsonIgnore
-	public void setFormattedQuantity(
-		UnsafeSupplier<String, Exception> formattedQuantityUnsafeSupplier) {
-
-		try {
-			formattedQuantity = formattedQuantityUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected String formattedQuantity;
-
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -693,9 +604,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(
-		example = "{en_US=Hand Saw, hr_HR=Product Name HR, hu_HU=Product Name HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getName() {
 		return name;
@@ -725,34 +634,6 @@ public class OrderItem implements Serializable {
 	protected Map<String, String> name;
 
 	@Schema
-	public String getOptions() {
-		return options;
-	}
-
-	public void setOptions(String options) {
-		this.options = options;
-	}
-
-	@JsonIgnore
-	public void setOptions(
-		UnsafeSupplier<String, Exception> optionsUnsafeSupplier) {
-
-		try {
-			options = optionsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String options;
-
-	@Schema(example = "CAB-34098-789-N")
 	public String getOrderExternalReferenceCode() {
 		return orderExternalReferenceCode;
 	}
@@ -785,7 +666,7 @@ public class OrderItem implements Serializable {
 	protected String orderExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30128")
+	@Schema
 	public Long getOrderId() {
 		return orderId;
 	}
@@ -813,36 +694,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long orderId;
 
-	@Schema(example = "true")
-	public Boolean getPriceManuallyAdjusted() {
-		return priceManuallyAdjusted;
-	}
-
-	public void setPriceManuallyAdjusted(Boolean priceManuallyAdjusted) {
-		this.priceManuallyAdjusted = priceManuallyAdjusted;
-	}
-
-	@JsonIgnore
-	public void setPriceManuallyAdjusted(
-		UnsafeSupplier<Boolean, Exception>
-			priceManuallyAdjustedUnsafeSupplier) {
-
-		try {
-			priceManuallyAdjusted = priceManuallyAdjustedUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Boolean priceManuallyAdjusted;
-
-	@Schema(example = "Order item printed note")
+	@Schema
 	public String getPrintedNote() {
 		return printedNote;
 	}
@@ -871,7 +723,7 @@ public class OrderItem implements Serializable {
 	protected String printedNote;
 
 	@DecimalMin("0")
-	@Schema(example = "101")
+	@Schema
 	@Valid
 	public BigDecimal getPromoPrice() {
 		return promoPrice;
@@ -901,7 +753,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal promoPrice;
 
 	@DecimalMin("0")
-	@Schema(example = "101")
+	@Schema
 	@Valid
 	public BigDecimal getPromoPriceWithTaxAmount() {
 		return promoPriceWithTaxAmount;
@@ -933,7 +785,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal promoPriceWithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "2")
+	@Schema
 	public Integer getQuantity() {
 		return quantity;
 	}
@@ -961,63 +813,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer quantity;
 
-	@Schema(example = "1234123124")
-	public String getReplacedSku() {
-		return replacedSku;
-	}
-
-	public void setReplacedSku(String replacedSku) {
-		this.replacedSku = replacedSku;
-	}
-
-	@JsonIgnore
-	public void setReplacedSku(
-		UnsafeSupplier<String, Exception> replacedSkuUnsafeSupplier) {
-
-		try {
-			replacedSku = replacedSkuUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected String replacedSku;
-
 	@Schema
-	public Long getReplacedSkuId() {
-		return replacedSkuId;
-	}
-
-	public void setReplacedSkuId(Long replacedSkuId) {
-		this.replacedSkuId = replacedSkuId;
-	}
-
-	@JsonIgnore
-	public void setReplacedSkuId(
-		UnsafeSupplier<Long, Exception> replacedSkuIdUnsafeSupplier) {
-
-		try {
-			replacedSkuId = replacedSkuIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long replacedSkuId;
-
-	@Schema(example = "2017-07-21")
 	public Date getRequestedDeliveryDate() {
 		return requestedDeliveryDate;
 	}
@@ -1046,7 +842,7 @@ public class OrderItem implements Serializable {
 	protected Date requestedDeliveryDate;
 
 	@DecimalMin("0")
-	@Schema(example = "1")
+	@Schema
 	public Integer getShippedQuantity() {
 		return shippedQuantity;
 	}
@@ -1105,7 +901,7 @@ public class OrderItem implements Serializable {
 	protected ShippingAddress shippingAddress;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getShippingAddressId() {
 		return shippingAddressId;
 	}
@@ -1133,7 +929,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long shippingAddressId;
 
-	@Schema(example = "12341234")
+	@Schema
 	public String getSku() {
 		return sku;
 	}
@@ -1159,7 +955,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String sku;
 
-	@Schema(example = "CAB-34098-789-N")
+	@Schema
 	public String getSkuExternalReferenceCode() {
 		return skuExternalReferenceCode;
 	}
@@ -1190,7 +986,7 @@ public class OrderItem implements Serializable {
 	protected String skuExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30128")
+	@Schema
 	public Long getSkuId() {
 		return skuId;
 	}
@@ -1216,7 +1012,7 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long skuId;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getSubscription() {
 		return subscription;
 	}
@@ -1244,36 +1040,8 @@ public class OrderItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean subscription;
 
-	@Schema(example = "pc")
-	public String getUnitOfMeasure() {
-		return unitOfMeasure;
-	}
-
-	public void setUnitOfMeasure(String unitOfMeasure) {
-		this.unitOfMeasure = unitOfMeasure;
-	}
-
-	@JsonIgnore
-	public void setUnitOfMeasure(
-		UnsafeSupplier<String, Exception> unitOfMeasureUnsafeSupplier) {
-
-		try {
-			unitOfMeasure = unitOfMeasureUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String unitOfMeasure;
-
 	@DecimalMin("0")
-	@Schema(example = "101")
+	@Schema
 	@Valid
 	public BigDecimal getUnitPrice() {
 		return unitPrice;
@@ -1303,7 +1071,7 @@ public class OrderItem implements Serializable {
 	protected BigDecimal unitPrice;
 
 	@DecimalMin("0")
-	@Schema(example = "101")
+	@Schema
 	@Valid
 	public BigDecimal getUnitPriceWithTaxAmount() {
 		return unitPriceWithTaxAmount;
@@ -1332,34 +1100,6 @@ public class OrderItem implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal unitPriceWithTaxAmount;
-
-	@Schema
-	public String[] getVirtualItemURLs() {
-		return virtualItemURLs;
-	}
-
-	public void setVirtualItemURLs(String[] virtualItemURLs) {
-		this.virtualItemURLs = virtualItemURLs;
-	}
-
-	@JsonIgnore
-	public void setVirtualItemURLs(
-		UnsafeSupplier<String[], Exception> virtualItemURLsUnsafeSupplier) {
-
-		try {
-			virtualItemURLs = virtualItemURLsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected String[] virtualItemURLs;
 
 	@Override
 	public boolean equals(Object object) {
@@ -1408,27 +1148,7 @@ public class OrderItem implements Serializable {
 
 			sb.append("\"customFields\": ");
 
-			sb.append("[");
-
-			for (int i = 0; i < customFields.length; i++) {
-				sb.append(String.valueOf(customFields[i]));
-
-				if ((i + 1) < customFields.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (decimalQuantity != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"decimalQuantity\": ");
-
-			sb.append(decimalQuantity);
+			sb.append(_toJSON(customFields));
 		}
 
 		if (deliveryGroup != null) {
@@ -1453,16 +1173,6 @@ public class OrderItem implements Serializable {
 			sb.append("\"discountAmount\": ");
 
 			sb.append(discountAmount);
-		}
-
-		if (discountManuallyAdjusted != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"discountManuallyAdjusted\": ");
-
-			sb.append(discountManuallyAdjusted);
 		}
 
 		if (discountPercentageLevel1 != null) {
@@ -1589,20 +1299,6 @@ public class OrderItem implements Serializable {
 			sb.append(finalPriceWithTaxAmount);
 		}
 
-		if (formattedQuantity != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"formattedQuantity\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(formattedQuantity));
-
-			sb.append("\"");
-		}
-
 		if (id != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1621,20 +1317,6 @@ public class OrderItem implements Serializable {
 			sb.append("\"name\": ");
 
 			sb.append(_toJSON(name));
-		}
-
-		if (options != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"options\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(options));
-
-			sb.append("\"");
 		}
 
 		if (orderExternalReferenceCode != null) {
@@ -1659,16 +1341,6 @@ public class OrderItem implements Serializable {
 			sb.append("\"orderId\": ");
 
 			sb.append(orderId);
-		}
-
-		if (priceManuallyAdjusted != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"priceManuallyAdjusted\": ");
-
-			sb.append(priceManuallyAdjusted);
 		}
 
 		if (printedNote != null) {
@@ -1713,30 +1385,6 @@ public class OrderItem implements Serializable {
 			sb.append("\"quantity\": ");
 
 			sb.append(quantity);
-		}
-
-		if (replacedSku != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"replacedSku\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(replacedSku));
-
-			sb.append("\"");
-		}
-
-		if (replacedSkuId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"replacedSkuId\": ");
-
-			sb.append(replacedSkuId);
 		}
 
 		if (requestedDeliveryDate != null) {
@@ -1831,20 +1479,6 @@ public class OrderItem implements Serializable {
 			sb.append(subscription);
 		}
 
-		if (unitOfMeasure != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"unitOfMeasure\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(unitOfMeasure));
-
-			sb.append("\"");
-		}
-
 		if (unitPrice != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1865,30 +1499,6 @@ public class OrderItem implements Serializable {
 			sb.append(unitPriceWithTaxAmount);
 		}
 
-		if (virtualItemURLs != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"virtualItemURLs\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < virtualItemURLs.length; i++) {
-				sb.append("\"");
-
-				sb.append(_escape(virtualItemURLs[i]));
-
-				sb.append("\"");
-
-				if ((i + 1) < virtualItemURLs.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -1902,9 +1512,9 @@ public class OrderItem implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -1930,7 +1540,7 @@ public class OrderItem implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -1962,7 +1572,7 @@ public class OrderItem implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -1978,10 +1588,5 @@ public class OrderItem implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

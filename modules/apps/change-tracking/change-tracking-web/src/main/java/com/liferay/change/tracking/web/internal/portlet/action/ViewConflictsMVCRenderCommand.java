@@ -22,11 +22,9 @@ import com.liferay.change.tracking.model.CTPreferences;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
-import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
 import com.liferay.change.tracking.web.internal.constants.CTWebKeys;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
 import com.liferay.change.tracking.web.internal.display.context.ViewConflictsDisplayContext;
-import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
@@ -34,8 +32,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/view_conflicts"
@@ -84,31 +81,20 @@ public class ViewConflictsMVCRenderCommand implements MVCRenderCommand {
 			CTCollection ctCollection =
 				_ctCollectionLocalService.getCTCollection(ctCollectionId);
 
-			Map<Long, List<ConflictInfo>> conflictInfoMap = null;
-
-			boolean hasUnapprovedChanges =
-				_ctCollectionLocalService.hasUnapprovedChanges(ctCollectionId);
-
-			if (!hasUnapprovedChanges) {
-				conflictInfoMap = _ctCollectionLocalService.checkConflicts(
-					ctCollection);
-			}
+			Map<Long, List<ConflictInfo>> conflictInfoMap =
+				_ctCollectionLocalService.checkConflicts(ctCollection);
 
 			renderRequest.setAttribute(
 				CTWebKeys.VIEW_CONFLICTS_DISPLAY_CONTEXT,
 				new ViewConflictsDisplayContext(
 					activeCtCollectionId, conflictInfoMap, ctCollection,
-					_ctDisplayRendererRegistry, _ctEntryLocalService,
-					_ctSettingsConfigurationHelper, hasUnapprovedChanges,
-					_language, _portal, renderRequest, renderResponse));
+					_ctDisplayRendererRegistry, _ctEntryLocalService, _language,
+					_portal, renderRequest, renderResponse));
 
 			return "/publications/view_conflicts.jsp";
 		}
 		catch (PortalException portalException) {
 			throw new PortletException(portalException);
-		}
-		catch (SQLException sqlException) {
-			throw new ORMException(sqlException);
 		}
 	}
 
@@ -123,9 +109,6 @@ public class ViewConflictsMVCRenderCommand implements MVCRenderCommand {
 
 	@Reference
 	private CTPreferencesLocalService _ctPreferencesLocalService;
-
-	@Reference
-	private CTSettingsConfigurationHelper _ctSettingsConfigurationHelper;
 
 	@Reference
 	private Language _language;

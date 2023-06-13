@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the workflow metrics sla definition service. This utility wraps <code>com.liferay.portal.workflow.metrics.service.persistence.impl.WorkflowMetricsSLADefinitionPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1897,10 +1901,29 @@ public class WorkflowMetricsSLADefinitionUtil {
 	}
 
 	public static WorkflowMetricsSLADefinitionPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile WorkflowMetricsSLADefinitionPersistence
-		_persistence;
+	private static ServiceTracker
+		<WorkflowMetricsSLADefinitionPersistence,
+		 WorkflowMetricsSLADefinitionPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			WorkflowMetricsSLADefinitionPersistence.class);
+
+		ServiceTracker
+			<WorkflowMetricsSLADefinitionPersistence,
+			 WorkflowMetricsSLADefinitionPersistence> serviceTracker =
+				new ServiceTracker
+					<WorkflowMetricsSLADefinitionPersistence,
+					 WorkflowMetricsSLADefinitionPersistence>(
+						 bundle.getBundleContext(),
+						 WorkflowMetricsSLADefinitionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

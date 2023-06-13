@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
-	property = "service.ranking:Integer=100",
+	immediate = true, property = "service.ranking:Integer=100",
 	service = RoleTypeContributor.class
 )
 public class RegularRoleTypeContributor implements RoleTypeContributor {

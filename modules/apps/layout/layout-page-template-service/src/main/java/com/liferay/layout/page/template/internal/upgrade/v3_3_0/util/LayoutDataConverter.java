@@ -19,7 +19,6 @@ import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
 import com.liferay.layout.util.structure.ColumnLayoutStructureItem;
 import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.DropZoneLayoutStructureItem;
-import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
@@ -63,15 +62,6 @@ public class LayoutDataConverter {
 		LayoutStructureItem rootLayoutStructureItem =
 			layoutStructure.addRootLayoutStructureItem();
 
-		JSONArray nonindexableFragmentEntryLinkIdsJSONArray =
-			inputDataJSONObject.getJSONArray(
-				"nonIndexableFragmentEntryLinkIds");
-
-		if (nonindexableFragmentEntryLinkIdsJSONArray == null) {
-			nonindexableFragmentEntryLinkIdsJSONArray =
-				JSONFactoryUtil.createJSONArray();
-		}
-
 		for (int i = 0; i < structureJSONArray.length(); i++) {
 			JSONObject inputRowJSONObject = structureJSONArray.getJSONObject(i);
 
@@ -93,11 +83,10 @@ public class LayoutDataConverter {
 				ContainerStyledLayoutStructureItem
 					innerContainerStyledLayoutStructureItem =
 						(ContainerStyledLayoutStructureItem)
-							layoutStructure.
-								addContainerStyledLayoutStructureItem(
-									outerContainerStyledLayoutStructureItem.
-										getItemId(),
-									0);
+							layoutStructure.addContainerLayoutStructureItem(
+								outerContainerStyledLayoutStructureItem.
+									getItemId(),
+								0);
 
 				JSONObject inputRowConfigJSONObject =
 					inputRowJSONObject.getJSONObject("config");
@@ -160,11 +149,6 @@ public class LayoutDataConverter {
 						"columnSpacing", true);
 
 					rowStyledLayoutStructureItem.setGutters(columnSpacing);
-
-					boolean nonindexable = inputRowConfigJSONObject.getBoolean(
-						"nonIndexable", false);
-
-					rowStyledLayoutStructureItem.setIndexed(!nonindexable);
 				}
 
 				for (int j = 0; j < columnsJSONArray.length(); j++) {
@@ -186,16 +170,9 @@ public class LayoutDataConverter {
 					for (int k = 0; k < fragmentEntryLinksJSONArray.length();
 						 k++) {
 
-						String fragmentEntryLinkId =
-							fragmentEntryLinksJSONArray.getString(k);
-
-						boolean indexed = !JSONUtil.hasValue(
-							nonindexableFragmentEntryLinkIdsJSONArray,
-							fragmentEntryLinkId);
-
 						_addFragmentEntryLink(
-							fragmentEntryLinkId, inputDataJSONObject, indexed,
-							layoutStructure,
+							fragmentEntryLinksJSONArray.getString(k),
+							inputDataJSONObject, layoutStructure,
 							columnLayoutStructureItem.getItemId(), k);
 					}
 				}
@@ -206,16 +183,10 @@ public class LayoutDataConverter {
 				JSONArray fragmentEntryLinkIdsJSONArray =
 					columnJSONObject.getJSONArray("fragmentEntryLinkIds");
 
-				String fragmentEntryLinkId =
-					fragmentEntryLinkIdsJSONArray.getString(0);
-
-				boolean indexed = !JSONUtil.hasValue(
-					nonindexableFragmentEntryLinkIdsJSONArray,
-					fragmentEntryLinkId);
-
 				_addFragmentEntryLink(
-					fragmentEntryLinkId, inputDataJSONObject, indexed,
-					layoutStructure, rootLayoutStructureItem.getItemId(), i);
+					fragmentEntryLinkIdsJSONArray.getString(0),
+					inputDataJSONObject, layoutStructure,
+					rootLayoutStructureItem.getItemId(), i);
 			}
 		}
 
@@ -226,8 +197,7 @@ public class LayoutDataConverter {
 
 	private static void _addFragmentEntryLink(
 		String fragmentEntryLinkId, JSONObject inputDataJSONObject,
-		boolean indexed, LayoutStructure layoutStructure, String parentItemId,
-		int position) {
+		LayoutStructure layoutStructure, String parentItemId, int position) {
 
 		if (fragmentEntryLinkId.equals(
 				LayoutDataItemTypeConstants.TYPE_DROP_ZONE)) {
@@ -250,13 +220,8 @@ public class LayoutDataConverter {
 			return;
 		}
 
-		FragmentStyledLayoutStructureItem fragmentStyledLayoutStructureItem =
-			(FragmentStyledLayoutStructureItem)
-				layoutStructure.addFragmentStyledLayoutStructureItem(
-					GetterUtil.getLong(fragmentEntryLinkId), parentItemId,
-					position);
-
-		fragmentStyledLayoutStructureItem.setIndexed(indexed);
+		layoutStructure.addFragmentStyledLayoutStructureItem(
+			GetterUtil.getLong(fragmentEntryLinkId), parentItemId, position);
 	}
 
 	private static JSONObject _getBackgroundImageJSONObject(

@@ -10,7 +10,6 @@
  */
 
 import ClayDropDown from '@clayui/drop-down';
-import {openConfirmModal, sub} from 'frontend-js-web';
 import React, {useContext} from 'react';
 
 import ChartContext from '../ChartContext';
@@ -26,42 +25,43 @@ export default function AccountMenuContent({closeMenu, data, parentData}) {
 	const {chartInstanceRef} = useContext(ChartContext);
 
 	function handleDelete() {
-		openConfirmModal({
-			message: sub(Liferay.Language.get('x-will-be-deleted'), data.name),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					deleteUser(data.id).then(() => {
-						chartInstanceRef.current.deleteNodes([data], true);
+		if (
+			confirm(
+				Liferay.Util.sub(
+					Liferay.Language.get('x-will-be-deleted'),
+					data.name
+				)
+			)
+		) {
+			deleteUser(data.id).then(() => {
+				chartInstanceRef.current.deleteNodes([data], true);
 
-						closeMenu();
-					});
-				}
-			},
-		});
+				closeMenu();
+			});
+		}
 	}
 
 	function handleRemove() {
-		openConfirmModal({
-			message: sub(
-				Liferay.Language.get('x-will-be-removed-from-x'),
-				data.name,
-				parentData.name
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const removeUser =
-						parentData.type === 'organization'
-							? removeUserFromOrganization
-							: removeUserFromAccount;
+		if (
+			confirm(
+				Liferay.Util.sub(
+					Liferay.Language.get('x-will-be-removed-from-x'),
+					data.name,
+					parentData.name
+				)
+			)
+		) {
+			const removeUser =
+				parentData.type === 'organization'
+					? removeUserFromOrganization
+					: removeUserFromAccount;
 
-					removeUser(data.emailAddress, parentData.id).then(() => {
-						chartInstanceRef.current.deleteNodes([data], false);
+			removeUser(data.emailAddress, parentData.id).then(() => {
+				chartInstanceRef.current.deleteNodes([data], false);
 
-						closeMenu();
-					});
-				}
-			},
-		});
+				closeMenu();
+			});
+		}
 	}
 
 	const actions = [];

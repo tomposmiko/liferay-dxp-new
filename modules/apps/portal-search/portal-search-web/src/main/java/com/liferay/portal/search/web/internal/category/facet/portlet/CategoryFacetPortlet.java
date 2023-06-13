@@ -15,18 +15,20 @@
 package com.liferay.portal.search.web.internal.category.facet.portlet;
 
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
-import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.web.internal.category.facet.builder.AssetCategoriesFacetConfiguration;
+import com.liferay.portal.search.web.internal.category.facet.builder.AssetCategoriesFacetConfigurationImpl;
 import com.liferay.portal.search.web.internal.category.facet.constants.CategoryFacetPortletKeys;
+import com.liferay.portal.search.web.internal.facet.display.builder.AssetCategoriesSearchFacetDisplayBuilder;
+import com.liferay.portal.search.web.internal.facet.display.builder.AssetCategoryPermissionCheckerImpl;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetDisplayContext;
-import com.liferay.portal.search.web.internal.facet.display.context.builder.AssetCategoriesSearchFacetDisplayContextBuilder;
-import com.liferay.portal.search.web.internal.facet.display.context.builder.AssetCategoryPermissionCheckerImpl;
 import com.liferay.portal.search.web.internal.util.SearchOptionalUtil;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchRequest;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchResponse;
@@ -45,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-category-facet",
@@ -64,8 +67,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/category/facet/view.jsp",
 		"javax.portlet.name=" + CategoryFacetPortletKeys.CATEGORY_FACET,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -80,7 +82,7 @@ public class CategoryFacetPortlet extends MVCPortlet {
 			portletSharedSearchRequest.search(renderRequest);
 
 		AssetCategoriesSearchFacetDisplayContext
-			assetCategoriesSearchFacetDisplayContext = _buildDisplayContext(
+			assetCategoriesSearchFacetDisplayContext = buildDisplayContext(
 				portletSharedSearchResponse, renderRequest);
 
 		renderRequest.setAttribute(
@@ -95,97 +97,80 @@ public class CategoryFacetPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	@Reference
-	protected AssetCategoryLocalService assetCategoryLocalService;
-
-	@Reference
-	protected AssetVocabularyLocalService assetVocabularyLocalService;
-
-	@Reference
-	protected Portal portal;
-
-	@Reference
-	protected PortletSharedSearchRequest portletSharedSearchRequest;
-
-	private AssetCategoriesSearchFacetDisplayContext _buildDisplayContext(
+	protected AssetCategoriesSearchFacetDisplayContext buildDisplayContext(
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		RenderRequest renderRequest) {
 
-		AssetCategoriesSearchFacetDisplayContextBuilder
-			assetCategoriesSearchFacetDisplayContextBuilder =
-				new AssetCategoriesSearchFacetDisplayContextBuilder(
-					renderRequest);
-
-		assetCategoriesSearchFacetDisplayContextBuilder.
-			setAssetCategoryLocalService(assetCategoryLocalService);
-
-		ThemeDisplay themeDisplay = portletSharedSearchResponse.getThemeDisplay(
-			renderRequest);
-
-		assetCategoriesSearchFacetDisplayContextBuilder.
-			setAssetCategoryPermissionChecker(
-				new AssetCategoryPermissionCheckerImpl(
-					themeDisplay.getPermissionChecker()));
-
-		assetCategoriesSearchFacetDisplayContextBuilder.
-			setAssetVocabularyLocalService(assetVocabularyLocalService);
+		Facet facet = portletSharedSearchResponse.getFacet(
+			getAggregationName(renderRequest));
 
 		CategoryFacetPortletPreferences categoryFacetPortletPreferences =
 			new CategoryFacetPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
 					renderRequest));
 
-		assetCategoriesSearchFacetDisplayContextBuilder.setDisplayStyle(
+		AssetCategoriesFacetConfiguration assetCategoriesFacetConfiguration =
+			new AssetCategoriesFacetConfigurationImpl(
+				facet.getFacetConfiguration());
+
+		AssetCategoriesSearchFacetDisplayBuilder
+			assetCategoriesSearchFacetDisplayBuilder =
+				new AssetCategoriesSearchFacetDisplayBuilder(renderRequest);
+
+		assetCategoriesSearchFacetDisplayBuilder.setAssetCategoryLocalService(
+			assetCategoryLocalService);
+		assetCategoriesSearchFacetDisplayBuilder.setDisplayStyle(
 			categoryFacetPortletPreferences.getDisplayStyle());
+		assetCategoriesSearchFacetDisplayBuilder.setFacet(facet);
+		assetCategoriesSearchFacetDisplayBuilder.setFrequenciesVisible(
+			categoryFacetPortletPreferences.isFrequenciesVisible());
+		assetCategoriesSearchFacetDisplayBuilder.setFrequencyThreshold(
+			assetCategoriesFacetConfiguration.getFrequencyThreshold());
+		assetCategoriesSearchFacetDisplayBuilder.setMaxTerms(
+			assetCategoriesFacetConfiguration.getMaxTerms());
+		assetCategoriesSearchFacetDisplayBuilder.
+			setPaginationStartParameterName(
+				getPaginationStartParameterName(portletSharedSearchResponse));
+		assetCategoriesSearchFacetDisplayBuilder.setPortal(portal);
+
+		ThemeDisplay themeDisplay = portletSharedSearchResponse.getThemeDisplay(
+			renderRequest);
 
 		Group group = themeDisplay.getScopeGroup();
 
 		Group stagingGroup = group.getStagingGroup();
 
 		if (stagingGroup != null) {
-			assetCategoriesSearchFacetDisplayContextBuilder.setExcludedGroupId(
+			assetCategoriesSearchFacetDisplayBuilder.setExcludedGroupId(
 				stagingGroup.getGroupId());
 		}
 
-		assetCategoriesSearchFacetDisplayContextBuilder.setFacet(
-			portletSharedSearchResponse.getFacet(
-				_getAggregationName(renderRequest)));
-		assetCategoriesSearchFacetDisplayContextBuilder.setFrequenciesVisible(
-			categoryFacetPortletPreferences.isFrequenciesVisible());
-		assetCategoriesSearchFacetDisplayContextBuilder.setFrequencyThreshold(
-			categoryFacetPortletPreferences.getFrequencyThreshold());
-		assetCategoriesSearchFacetDisplayContextBuilder.setLocale(
+		assetCategoriesSearchFacetDisplayBuilder.setLocale(
 			themeDisplay.getLocale());
-		assetCategoriesSearchFacetDisplayContextBuilder.setMaxTerms(
-			categoryFacetPortletPreferences.getMaxTerms());
-		assetCategoriesSearchFacetDisplayContextBuilder.setOrder(
-			categoryFacetPortletPreferences.getOrder());
-		assetCategoriesSearchFacetDisplayContextBuilder.
-			setPaginationStartParameterName(
-				_getPaginationStartParameterName(portletSharedSearchResponse));
+		assetCategoriesSearchFacetDisplayBuilder.
+			setAssetCategoryPermissionChecker(
+				new AssetCategoryPermissionCheckerImpl(
+					themeDisplay.getPermissionChecker()));
 
 		String parameterName =
 			categoryFacetPortletPreferences.getParameterName();
 
-		assetCategoriesSearchFacetDisplayContextBuilder.setParameterName(
+		assetCategoriesSearchFacetDisplayBuilder.setParameterName(
 			parameterName);
 
 		SearchOptionalUtil.copy(
 			() -> portletSharedSearchResponse.getParameterValues(
 				parameterName, renderRequest),
-			assetCategoriesSearchFacetDisplayContextBuilder::
-				setParameterValues);
+			assetCategoriesSearchFacetDisplayBuilder::setParameterValues);
 
-		assetCategoriesSearchFacetDisplayContextBuilder.setPortal(portal);
-
-		return assetCategoriesSearchFacetDisplayContextBuilder.build();
+		return assetCategoriesSearchFacetDisplayBuilder.build();
 	}
 
-	private String _getAggregationName(RenderRequest renderRequest) {
+	protected String getAggregationName(RenderRequest renderRequest) {
 		return portal.getPortletId(renderRequest);
 	}
 
-	private String _getPaginationStartParameterName(
+	protected String getPaginationStartParameterName(
 		PortletSharedSearchResponse portletSharedSearchResponse) {
 
 		SearchResponse searchResponse =
@@ -195,5 +180,14 @@ public class CategoryFacetPortlet extends MVCPortlet {
 
 		return searchRequest.getPaginationStartParameterName();
 	}
+
+	@Reference
+	protected AssetCategoryLocalService assetCategoryLocalService;
+
+	@Reference
+	protected Portal portal;
+
+	@Reference
+	protected PortletSharedSearchRequest portletSharedSearchRequest;
 
 }

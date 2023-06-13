@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CompanyInfoTable;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.model.impl.CompanyInfoImpl;
 import com.liferay.portal.model.impl.CompanyInfoModelImpl;
 
@@ -31,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portal.model.impl.CompanyInfoImpl",
-		"table.name=CompanyInfo"
-	},
-	service = ArgumentsResolver.class
-)
 public class CompanyInfoModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

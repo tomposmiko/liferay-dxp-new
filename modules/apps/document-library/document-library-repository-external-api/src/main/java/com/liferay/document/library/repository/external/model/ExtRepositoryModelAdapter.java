@@ -144,7 +144,7 @@ public abstract class ExtRepositoryModelAdapter<T>
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -265,18 +265,18 @@ public abstract class ExtRepositoryModelAdapter<T>
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
 
 		if (user == null) {
 			try {
-				user = UserLocalServiceUtil.getGuestUser(getCompanyId());
+				user = UserLocalServiceUtil.getDefaultUser(getCompanyId());
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}

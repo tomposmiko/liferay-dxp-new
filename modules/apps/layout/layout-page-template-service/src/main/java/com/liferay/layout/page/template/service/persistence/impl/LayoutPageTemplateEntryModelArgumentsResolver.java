@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.layout.page.template.model.impl.LayoutPageTemplateEntryImpl",
-		"table.name=LayoutPageTemplateEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		LayoutPageTemplateEntryModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class LayoutPageTemplateEntryModelArgumentsResolver
 	implements ArgumentsResolver {

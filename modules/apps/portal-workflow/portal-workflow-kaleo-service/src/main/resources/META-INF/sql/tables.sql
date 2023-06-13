@@ -1,7 +1,6 @@
 create table KaleoAction (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoActionId LONG not null,
+	kaleoActionId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -19,16 +18,12 @@ create table KaleoAction (
 	script TEXT null,
 	scriptLanguage VARCHAR(75) null,
 	scriptRequiredContexts STRING null,
-	priority INTEGER,
-	type_ VARCHAR(75) null,
-	status INTEGER,
-	primary key (kaleoActionId, ctCollectionId)
+	priority INTEGER
 );
 
 create table KaleoCondition (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoConditionId LONG not null,
+	kaleoConditionId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -40,14 +35,12 @@ create table KaleoCondition (
 	kaleoNodeId LONG,
 	script TEXT null,
 	scriptLanguage VARCHAR(75) null,
-	scriptRequiredContexts STRING null,
-	primary key (kaleoConditionId, ctCollectionId)
+	scriptRequiredContexts STRING null
 );
 
 create table KaleoDefinition (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoDefinitionId LONG not null,
+	kaleoDefinitionId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -60,18 +53,19 @@ create table KaleoDefinition (
 	content TEXT null,
 	scope VARCHAR(75) null,
 	version INTEGER,
-	active_ BOOLEAN,
-	primary key (kaleoDefinitionId, ctCollectionId)
+	active_ BOOLEAN
 );
 
 create table KaleoDefinitionVersion (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoDefinitionVersionId LONG not null,
+	kaleoDefinitionVersionId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(200) null,
+	statusByUserId LONG,
+	statusByUserName VARCHAR(75) null,
+	statusDate DATE null,
 	createDate DATE null,
 	modifiedDate DATE null,
 	kaleoDefinitionId LONG,
@@ -81,17 +75,12 @@ create table KaleoDefinitionVersion (
 	content TEXT null,
 	version VARCHAR(75) null,
 	startKaleoNodeId LONG,
-	status INTEGER,
-	statusByUserId LONG,
-	statusByUserName VARCHAR(75) null,
-	statusDate DATE null,
-	primary key (kaleoDefinitionVersionId, ctCollectionId)
+	status INTEGER
 );
 
 create table KaleoInstance (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoInstanceId LONG not null,
+	kaleoInstanceId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -103,19 +92,16 @@ create table KaleoInstance (
 	kaleoDefinitionName VARCHAR(200) null,
 	kaleoDefinitionVersion INTEGER,
 	rootKaleoInstanceTokenId LONG,
-	active_ BOOLEAN,
 	className VARCHAR(200) null,
 	classPK LONG,
 	completed BOOLEAN,
 	completionDate DATE null,
-	workflowContext TEXT null,
-	primary key (kaleoInstanceId, ctCollectionId)
+	workflowContext TEXT null
 );
 
 create table KaleoInstanceToken (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoInstanceTokenId LONG not null,
+	kaleoInstanceTokenId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -131,14 +117,12 @@ create table KaleoInstanceToken (
 	className VARCHAR(200) null,
 	classPK LONG,
 	completed BOOLEAN,
-	completionDate DATE null,
-	primary key (kaleoInstanceTokenId, ctCollectionId)
+	completionDate DATE null
 );
 
 create table KaleoLog (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoLogId LONG not null,
+	kaleoLogId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -168,14 +152,12 @@ create table KaleoLog (
 	startDate DATE null,
 	endDate DATE null,
 	duration LONG,
-	workflowContext TEXT null,
-	primary key (kaleoLogId, ctCollectionId)
+	workflowContext TEXT null
 );
 
 create table KaleoNode (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoNodeId LONG not null,
+	kaleoNodeId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -185,19 +167,16 @@ create table KaleoNode (
 	kaleoDefinitionId LONG,
 	kaleoDefinitionVersionId LONG,
 	name VARCHAR(200) null,
-	label STRING null,
 	metadata STRING null,
 	description STRING null,
 	type_ VARCHAR(20) null,
 	initial_ BOOLEAN,
-	terminal BOOLEAN,
-	primary key (kaleoNodeId, ctCollectionId)
+	terminal BOOLEAN
 );
 
 create table KaleoNotification (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoNotificationId LONG not null,
+	kaleoNotificationId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -214,14 +193,12 @@ create table KaleoNotification (
 	executionType VARCHAR(20) null,
 	template TEXT null,
 	templateLanguage VARCHAR(75) null,
-	notificationTypes VARCHAR(255) null,
-	primary key (kaleoNotificationId, ctCollectionId)
+	notificationTypes VARCHAR(255) null
 );
 
 create table KaleoNotificationRecipient (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoNotificationRecipientId LONG not null,
+	kaleoNotificationRecipientId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -238,14 +215,12 @@ create table KaleoNotificationRecipient (
 	recipientScriptLanguage VARCHAR(75) null,
 	recipientScriptContexts STRING null,
 	address VARCHAR(255) null,
-	notificationReceptionType VARCHAR(3) null,
-	primary key (kaleoNotificationRecipientId, ctCollectionId)
+	notificationReceptionType VARCHAR(3) null
 );
 
 create table KaleoTask (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTaskId LONG not null,
+	kaleoTaskId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -256,14 +231,12 @@ create table KaleoTask (
 	kaleoDefinitionVersionId LONG,
 	kaleoNodeId LONG,
 	name VARCHAR(200) null,
-	description STRING null,
-	primary key (kaleoTaskId, ctCollectionId)
+	description STRING null
 );
 
 create table KaleoTaskAssignment (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTaskAssignmentId LONG not null,
+	kaleoTaskAssignmentId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -280,14 +253,12 @@ create table KaleoTaskAssignment (
 	assigneeActionId VARCHAR(75) null,
 	assigneeScript TEXT null,
 	assigneeScriptLanguage VARCHAR(75) null,
-	assigneeScriptRequiredContexts STRING null,
-	primary key (kaleoTaskAssignmentId, ctCollectionId)
+	assigneeScriptRequiredContexts STRING null
 );
 
 create table KaleoTaskAssignmentInstance (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTaskAssignmentInstanceId LONG not null,
+	kaleoTaskAssignmentInstanceId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -304,14 +275,12 @@ create table KaleoTaskAssignmentInstance (
 	assigneeClassName VARCHAR(200) null,
 	assigneeClassPK LONG,
 	completed BOOLEAN,
-	completionDate DATE null,
-	primary key (kaleoTaskAssignmentInstanceId, ctCollectionId)
+	completionDate DATE null
 );
 
 create table KaleoTaskForm (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTaskFormId LONG not null,
+	kaleoTaskFormId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -331,14 +300,12 @@ create table KaleoTaskForm (
 	formId LONG,
 	formUuid VARCHAR(75) null,
 	metadata STRING null,
-	priority INTEGER,
-	primary key (kaleoTaskFormId, ctCollectionId)
+	priority INTEGER
 );
 
 create table KaleoTaskFormInstance (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTaskFormInstanceId LONG not null,
+	kaleoTaskFormInstanceId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -355,14 +322,12 @@ create table KaleoTaskFormInstance (
 	formValueEntryGroupId LONG,
 	formValueEntryId LONG,
 	formValueEntryUuid VARCHAR(75) null,
-	metadata STRING null,
-	primary key (kaleoTaskFormInstanceId, ctCollectionId)
+	metadata STRING null
 );
 
 create table KaleoTaskInstanceToken (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTaskInstanceTokenId LONG not null,
+	kaleoTaskInstanceTokenId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -381,14 +346,12 @@ create table KaleoTaskInstanceToken (
 	completed BOOLEAN,
 	completionDate DATE null,
 	dueDate DATE null,
-	workflowContext TEXT null,
-	primary key (kaleoTaskInstanceTokenId, ctCollectionId)
+	workflowContext TEXT null
 );
 
 create table KaleoTimer (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTimerId LONG not null,
+	kaleoTimerId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -405,14 +368,12 @@ create table KaleoTimer (
 	duration DOUBLE,
 	scale VARCHAR(75) null,
 	recurrenceDuration DOUBLE,
-	recurrenceScale VARCHAR(75) null,
-	primary key (kaleoTimerId, ctCollectionId)
+	recurrenceScale VARCHAR(75) null
 );
 
 create table KaleoTimerInstanceToken (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTimerInstanceTokenId LONG not null,
+	kaleoTimerInstanceTokenId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -432,14 +393,12 @@ create table KaleoTimerInstanceToken (
 	completionUserId LONG,
 	completed BOOLEAN,
 	completionDate DATE null,
-	workflowContext TEXT null,
-	primary key (kaleoTimerInstanceTokenId, ctCollectionId)
+	workflowContext TEXT null
 );
 
 create table KaleoTransition (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
-	kaleoTransitionId LONG not null,
+	kaleoTransitionId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -450,12 +409,10 @@ create table KaleoTransition (
 	kaleoDefinitionVersionId LONG,
 	kaleoNodeId LONG,
 	name VARCHAR(200) null,
-	label STRING null,
 	description STRING null,
 	sourceKaleoNodeId LONG,
 	sourceKaleoNodeName VARCHAR(200) null,
 	targetKaleoNodeId LONG,
 	targetKaleoNodeName VARCHAR(200) null,
-	defaultTransition BOOLEAN,
-	primary key (kaleoTransitionId, ctCollectionId)
+	defaultTransition BOOLEAN
 );

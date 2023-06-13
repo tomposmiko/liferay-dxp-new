@@ -502,11 +502,6 @@ public class SiteNavigationMenuWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<SiteNavigationMenu, Object>>
 		getAttributeGetterFunctions() {
 

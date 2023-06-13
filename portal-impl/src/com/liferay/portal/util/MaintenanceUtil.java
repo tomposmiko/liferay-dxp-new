@@ -90,7 +90,8 @@ public class MaintenanceUtil {
 				}
 				catch (IllegalStateException illegalStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(illegalStateException);
+						_log.debug(
+							illegalStateException, illegalStateException);
 					}
 				}
 			}

@@ -42,9 +42,11 @@ public class WorkflowDefinitionTitleComparator
 
 	public WorkflowDefinitionTitleComparator(boolean ascending, Locale locale) {
 		_ascending = ascending;
+
 		_locale = locale;
 
-		_collator = CollatorUtil.getInstance(locale);
+		_collator = CollatorUtil.getInstance(_locale);
+
 		_languageId = LocaleUtil.toLanguageId(locale);
 	}
 

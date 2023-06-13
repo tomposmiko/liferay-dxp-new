@@ -24,13 +24,19 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Marcos Martins
  */
-public class DDMFormInstanceRecordModelListenerTest {
+@RunWith(MockitoJUnitRunner.class)
+public class DDMFormInstanceRecordModelListenerTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -47,17 +53,17 @@ public class DDMFormInstanceRecordModelListenerTest {
 
 	@Test
 	public void testOnBeforeRemove() throws PortalException {
-		Mockito.when(
+		when(
 			_ddmFormInstanceReportLocalService.
 				getFormInstanceReportByFormInstanceId(Mockito.anyLong())
 		).thenThrow(
 			new NoSuchFormInstanceReportException()
 		);
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getFormInstanceId()
 		).thenReturn(
 			0L
@@ -74,8 +80,9 @@ public class DDMFormInstanceRecordModelListenerTest {
 
 	private DDMFormInstanceRecordModelListener
 		_ddmFormInstanceRecordModelListener;
-	private final DDMFormInstanceReportLocalService
-		_ddmFormInstanceReportLocalService = Mockito.mock(
-			DDMFormInstanceReportLocalService.class);
+
+	@Mock
+	private DDMFormInstanceReportLocalService
+		_ddmFormInstanceReportLocalService;
 
 }

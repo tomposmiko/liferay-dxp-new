@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.RepositoryEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -937,9 +938,15 @@ public class RepositoryEntryUtil {
 	}
 
 	public static RepositoryEntryPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(RepositoryEntryPersistence)PortalBeanLocatorUtil.locate(
+					RepositoryEntryPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile RepositoryEntryPersistence _persistence;
+	private static RepositoryEntryPersistence _persistence;
 
 }

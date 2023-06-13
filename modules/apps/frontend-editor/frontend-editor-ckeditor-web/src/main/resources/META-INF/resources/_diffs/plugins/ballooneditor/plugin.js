@@ -295,58 +295,21 @@
 
 				const selectedElement = selection.getSelectedElement();
 
-				if (!selectedElement) {
-					const selectedText = selection.getSelectedText();
+				if (!selectedElement && !selection.getSelectedText()) {
+					editor.balloonToolbars.hide();
 
-					if (!selectedText?.match(/\w/)) {
-						editor.balloonToolbars.hide();
-
-						return;
-					}
+					return;
 				}
 
 				originalContextManagerCheck.call(this, selection);
 			};
-
-			const ckeditorWindow = CKEDITOR.document.getWindow();
-
-			ckeditorWindow.on('click', (event) => {
-				const target = event.data.getTarget();
-
-				if (
-					!target.$.closest(
-						'.cke_toolgroup, .lfr-balloon-editor, .lfr-balloon-editor-insert-button, .liferay-editable'
-					)
-				) {
-					for (const editorName in CKEDITOR.instances) {
-						const editor = CKEDITOR.instances[editorName];
-
-						editor.balloonToolbars?.hide();
-
-						const liferayToolbars = editor.liferayToolbars;
-
-						if (liferayToolbars) {
-							for (const toolbar in liferayToolbars) {
-								liferayToolbars[toolbar].hide();
-							}
-						}
-					}
-
-					const insertButtons = CKEDITOR.document.$.querySelectorAll(
-						'.lfr-balloon-editor-insert-button'
-					);
-
-					for (const button of insertButtons) {
-						button.classList.add('hide');
-					}
-				}
-			});
 		},
 
 		requires: [
 			'balloonpanel',
 			'balloontoolbar',
 			'imagealt',
+			'insertbutton',
 			'linktoolbar',
 			'tabletoolbar',
 			'toolbarbuttons',

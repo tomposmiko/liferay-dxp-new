@@ -22,7 +22,7 @@ import {getFormId, getFormNode} from '../../../utils/formId.es';
 import nextPage from '../thunks/nextPage.es';
 import previousPage from '../thunks/previousPage.es';
 
-export function MultiStep({activePage, editable, pages}) {
+export const MultiStep = ({activePage, editable, pages}) => {
 	const {containerElement} = usePage();
 
 	const createPreviousPage = useEvaluate(previousPage);
@@ -36,8 +36,8 @@ export function MultiStep({activePage, editable, pages}) {
 				{pages.map((page, index) => (
 					<li
 						className={classnames('multi-step-item', {
-							'active': index === activePage,
-							'complete': index < activePage,
+							active: index === activePage,
+							complete: index < activePage,
 							'multi-step-item-expand':
 								index + 1 !== pages.length,
 						})}
@@ -52,7 +52,6 @@ export function MultiStep({activePage, editable, pages}) {
 												containerElement.current
 											)
 										),
-										selectedPage: index,
 									})
 								);
 							}
@@ -65,14 +64,12 @@ export function MultiStep({activePage, editable, pages}) {
 												containerElement.current
 											)
 										),
-										selectedPage: index,
 									})
 								);
 							}
 						}}
 					>
 						<div className="multi-step-divider"></div>
-
 						<div className="multi-step-indicator">
 							<div className="multi-step-indicator-label">
 								{page.paginationItemRenderer ===
@@ -87,7 +84,7 @@ export function MultiStep({activePage, editable, pages}) {
 								<a
 									className="multi-step-icon"
 									data-multi-step-icon={index + 1}
-									href="javascript:void(0);"
+									href="javascript:;"
 								/>
 							) : (
 								<span
@@ -101,4 +98,4 @@ export function MultiStep({activePage, editable, pages}) {
 			</ol>
 		</div>
 	);
-}
+};

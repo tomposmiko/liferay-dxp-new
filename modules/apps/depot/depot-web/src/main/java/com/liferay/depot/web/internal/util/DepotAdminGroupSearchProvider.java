@@ -15,18 +15,18 @@
 package com.liferay.depot.web.internal.util;
 
 import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.depot.service.DepotEntryService;
 import com.liferay.item.selector.criteria.group.criterion.GroupItemSelectorCriterion;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
 import com.liferay.portlet.usersadmin.search.GroupSearchTerms;
@@ -38,14 +38,13 @@ import java.util.List;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
  */
-@Component(service = DepotAdminGroupSearchProvider.class)
+@Component(immediate = true, service = DepotAdminGroupSearchProvider.class)
 public class DepotAdminGroupSearchProvider {
 
 	public GroupSearch getGroupSearch(
@@ -68,10 +67,12 @@ public class DepotAdminGroupSearchProvider {
 		return _getGroupSearch(portletRequest, portletURL);
 	}
 
-	@Activate
-	protected void activate() {
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+
 		_classNameIds = new long[] {
-			_portal.getClassNameId(DepotEntry.class.getName())
+			PortalUtil.getClassNameId(DepotEntry.class.getName())
 		};
 	}
 
@@ -84,26 +85,26 @@ public class DepotAdminGroupSearchProvider {
 
 		GroupSearch groupSearch = new GroupSearch(portletRequest, portletURL);
 
-		groupSearch.setEmptyResultsMessage(
-			_language.get(
-				portletRequest.getLocale(), "no-asset-libraries-were-found"));
-		groupSearch.setResultsAndTotal(
-			() -> {
-				List<DepotEntry> depotEntries =
-					_depotEntryService.getGroupConnectedDepotEntries(
-						themeDisplay.getScopeGroupId(), groupSearch.getStart(),
-						groupSearch.getEnd());
-
-				List<Group> groups = new ArrayList<>();
-
-				for (DepotEntry depotEntry : depotEntries) {
-					groups.add(depotEntry.getGroup());
-				}
-
-				return groups;
-			},
+		groupSearch.setTotal(
 			_depotEntryService.getGroupConnectedDepotEntriesCount(
 				themeDisplay.getScopeGroupId()));
+
+		List<DepotEntry> depotEntries =
+			_depotEntryService.getGroupConnectedDepotEntries(
+				themeDisplay.getScopeGroupId(), groupSearch.getStart(),
+				groupSearch.getEnd());
+
+		List<Group> groups = new ArrayList<>();
+
+		for (DepotEntry depotEntry : depotEntries) {
+			groups.add(depotEntry.getGroup());
+		}
+
+		groupSearch.setResults(groups);
+
+		groupSearch.setEmptyResultsMessage(
+			LanguageUtil.get(
+				portletRequest.getLocale(), "no-asset-libraries-were-found"));
 
 		return groupSearch;
 	}
@@ -119,42 +120,46 @@ public class DepotAdminGroupSearchProvider {
 
 		LinkedHashMap<String, Object> groupParams =
 			LinkedHashMapBuilder.<String, Object>put(
-				"actionId", ActionKeys.VIEW
-			).put(
 				"site", Boolean.FALSE
 			).build();
 
 		GroupSearch groupSearch = new GroupSearch(portletRequest, portletURL);
 
 		groupSearch.setEmptyResultsMessage(
-			_language.get(
+			LanguageUtil.get(
 				portletRequest.getLocale(), "no-asset-libraries-were-found"));
 
 		GroupSearchTerms searchTerms =
 			(GroupSearchTerms)groupSearch.getSearchTerms();
 
+		List<Group> results = null;
+
 		if (searchTerms.hasSearchTerms()) {
-			groupSearch.setResultsAndTotal(
-				() -> _groupService.search(
-					company.getCompanyId(), _classNameIds,
-					searchTerms.getKeywords(), groupParams,
-					groupSearch.getStart(), groupSearch.getEnd(),
-					groupSearch.getOrderByComparator()),
-				_groupService.searchCount(
-					company.getCompanyId(), _classNameIds,
-					searchTerms.getKeywords(), groupParams));
+			int total = _groupService.searchCount(
+				company.getCompanyId(), _classNameIds,
+				searchTerms.getKeywords(), groupParams);
+
+			groupSearch.setTotal(total);
+
+			results = _groupService.search(
+				company.getCompanyId(), _classNameIds,
+				searchTerms.getKeywords(), groupParams, groupSearch.getStart(),
+				groupSearch.getEnd(), groupSearch.getOrderByComparator());
 		}
 		else {
-			groupSearch.setResultsAndTotal(
-				() -> _groupService.search(
-					company.getCompanyId(), _classNameIds,
-					searchTerms.getKeywords(), groupParams,
-					groupSearch.getStart(), groupSearch.getEnd(),
-					groupSearch.getOrderByComparator()),
-				_groupService.searchCount(
-					company.getCompanyId(), _classNameIds,
-					searchTerms.getKeywords(), groupParams));
+			int total = _groupService.searchCount(
+				company.getCompanyId(), _classNameIds,
+				searchTerms.getKeywords(), groupParams);
+
+			groupSearch.setTotal(total);
+
+			results = _groupService.search(
+				company.getCompanyId(), _classNameIds,
+				searchTerms.getKeywords(), groupParams, groupSearch.getStart(),
+				groupSearch.getEnd(), groupSearch.getOrderByComparator());
 		}
+
+		groupSearch.setResults(results);
 
 		return groupSearch;
 	}
@@ -162,18 +167,12 @@ public class DepotAdminGroupSearchProvider {
 	private long[] _classNameIds;
 
 	@Reference
+	private DepotEntryLocalService _depotEntryLocalService;
+
+	@Reference
 	private DepotEntryService _depotEntryService;
 
 	@Reference
 	private GroupService _groupService;
-
-	@Reference
-	private Language _language;
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
-
-	@Reference
-	private Portal _portal;
 
 }

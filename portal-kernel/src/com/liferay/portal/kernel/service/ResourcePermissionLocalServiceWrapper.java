@@ -29,10 +29,6 @@ public class ResourcePermissionLocalServiceWrapper
 	implements ResourcePermissionLocalService,
 			   ServiceWrapper<ResourcePermissionLocalService> {
 
-	public ResourcePermissionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ResourcePermissionLocalServiceWrapper(
 		ResourcePermissionLocalService resourcePermissionLocalService) {
 
@@ -166,17 +162,19 @@ public class ResourcePermissionLocalServiceWrapper
 	 optionally an empty string if no instance exists
 	 * @param portletActions whether to associate portlet actions with the
 	 resource
+	 * @param addGroupPermissions whether to add group permissions
+	 * @param addGuestPermissions whether to add guest permissions
 	 */
 	@Override
 	public void addResourcePermissions(
 			long companyId, long groupId, long userId, String name,
-			String primKey, boolean portletActions,
-			ServiceContext serviceContext)
+			String primKey, boolean portletActions, boolean addGroupPermissions,
+			boolean addGuestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourcePermissionLocalService.addResourcePermissions(
 			companyId, groupId, userId, name, primKey, portletActions,
-			serviceContext);
+			addGroupPermissions, addGuestPermissions);
 	}
 
 	/**
@@ -207,11 +205,11 @@ public class ResourcePermissionLocalServiceWrapper
 
 	@Override
 	public void copyModelResourcePermissions(
-			long companyId, String name, long sourcePrimKey, long targetPrimKey)
+			long companyId, String name, long oldPrimKey, long newPrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_resourcePermissionLocalService.copyModelResourcePermissions(
-			companyId, name, sourcePrimKey, targetPrimKey);
+			companyId, name, oldPrimKey, newPrimKey);
 	}
 
 	/**

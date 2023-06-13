@@ -85,12 +85,6 @@ WidgetTemplatesManagementToolbarDisplayContext widgetTemplatesManagementToolbarD
 					value="<%= HtmlUtil.escape(widgetTemplatesTemplateDisplayContext.getDDMTemplateScope(ddmTemplate)) %>"
 				/>
 
-				<liferay-ui:search-container-column-text
-					cssClass="table-cell-expand-smallest"
-					name="usages"
-					value='<%= String.valueOf(PortletPreferenceValueLocalServiceUtil.getPortletPreferenceValuesCount(ddmTemplate.getCompanyId(), "displayStyle", PortletDisplayTemplate.DISPLAY_STYLE_PREFIX + HtmlUtil.escape(ddmTemplate.getTemplateKey()))) %>'
-				/>
-
 				<liferay-ui:search-container-column-date
 					name="modified-date"
 					value="<%= ddmTemplate.getModifiedDate() %>"
@@ -98,7 +92,6 @@ WidgetTemplatesManagementToolbarDisplayContext widgetTemplatesManagementToolbarD
 
 				<liferay-ui:search-container-column-text>
 					<clay:dropdown-actions
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 						dropdownItems="<%= widgetTemplatesTemplateDisplayContext.getDDMTemplateActionDropdownItems(ddmTemplate) %>"
 						propsTransformer="js/WidgetTemplatesDropdownPropsTransformer"
 					/>

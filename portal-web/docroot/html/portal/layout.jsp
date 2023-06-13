@@ -18,43 +18,9 @@
 
 <c:choose>
 	<c:when test="<%= Validator.isNotNull(request.getAttribute(NoSuchLayoutException.class.getName())) %>">
-
-		<%
-		LayoutUtilityPageEntryViewRenderer layoutUtilityPageEntryViewRenderer = LayoutUtilityPageEntryViewRendererRegistryUtil.getLayoutUtilityPageEntryViewRenderer(LayoutUtilityPageEntryConstants.TYPE_SC_NOT_FOUND);
-		%>
-
-		<c:choose>
-			<c:when test="<%= layoutUtilityPageEntryViewRenderer != null %>">
-
-				<%
-				layoutUtilityPageEntryViewRenderer.renderHTML(request, response);
-				%>
-
-			</c:when>
-			<c:otherwise>
-				<div class="container pb-3 pt-3">
-					<h3 class="alert alert-danger">
-						<liferay-ui:message key="not-found" />
-					</h3>
-
-					<liferay-ui:message key="the-requested-resource-could-not-be-found" />
-
-					<br /><br />
-
-					<%
-					String url = ParamUtil.getString(request, "previousURL");
-
-					if (Validator.isNull(url)) {
-						url = PortalUtil.getCurrentURL(request);
-					}
-
-					url = HttpComponentsUtil.decodeURL(themeDisplay.getPortalURL() + url);
-					%>
-
-					<code class="lfr-url-error"><%= HtmlUtil.escape(url) %></code>
-				</div>
-			</c:otherwise>
-		</c:choose>
+		<div class="container pb-3 pt-3">
+			<%@ include file="/html/portal/status.jsp" %>
+		</div>
 	</c:when>
 	<c:otherwise>
 

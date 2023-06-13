@@ -284,11 +284,6 @@ public class FriendlyURLEntryMappingWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<FriendlyURLEntryMapping, Object>>
 		getAttributeGetterFunctions() {
 

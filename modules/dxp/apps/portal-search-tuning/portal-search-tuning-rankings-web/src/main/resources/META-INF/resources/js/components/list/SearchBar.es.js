@@ -12,8 +12,8 @@
 import ClayButton from '@clayui/button';
 import {ClayCheckbox} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import getCN from 'classnames';
-import {ManagementToolbar} from 'frontend-js-components-web';
 import {PropTypes} from 'prop-types';
 import React, {Component} from 'react';
 
@@ -52,7 +52,7 @@ class SearchBar extends Component {
 	};
 
 	_handleAllCheckbox = () => {
-		if (this.props.selectedIds.length) {
+		if (this.props.selectedIds.length > 0) {
 			this.props.onSelectClear();
 		}
 		else {
@@ -89,7 +89,7 @@ class SearchBar extends Component {
 	 * Checks if there are any items selected.
 	 * @returns {boolean} True if there is at least 1 item selected.
 	 */
-	_hasSelectedIds = () => !!this.props.selectedIds.length;
+	_hasSelectedIds = () => this.props.selectedIds.length > 0;
 
 	/**
 	 * Checks if any selected ids contain any hidden items.
@@ -133,10 +133,10 @@ class SearchBar extends Component {
 
 		return (
 			<div className="search-bar-root">
-				<ManagementToolbar.Container className={classManagementBar}>
+				<ClayManagementToolbar className={classManagementBar}>
 					<div className={classNavBarForm}>
-						<ManagementToolbar.ItemList>
-							<ManagementToolbar.Item>
+						<ClayManagementToolbar.ItemList>
+							<ClayManagementToolbar.Item>
 								<ClayCheckbox
 									aria-label={Liferay.Language.get(
 										'select-all'
@@ -144,18 +144,18 @@ class SearchBar extends Component {
 									checked={this._hasSelectedIds()}
 									disabled={!resultIds.length}
 									indeterminate={
-										!!selectedIds.length &&
+										selectedIds.length > 0 &&
 										selectedIds.length !== resultIds.length
 									}
 									onChange={this._handleAllCheckbox}
 								/>
-							</ManagementToolbar.Item>
-						</ManagementToolbar.ItemList>
+							</ClayManagementToolbar.Item>
+						</ClayManagementToolbar.ItemList>
 
 						{this._hasSelectedIds() && (
 							<>
-								<ManagementToolbar.ItemList expand>
-									<ManagementToolbar.Item>
+								<ClayManagementToolbar.ItemList expand>
+									<ClayManagementToolbar.Item>
 										<span className="navbar-text">
 											{getPluralMessage(
 												Liferay.Language.get(
@@ -167,22 +167,13 @@ class SearchBar extends Component {
 												selectedIds.length
 											)}
 										</span>
-									</ManagementToolbar.Item>
-								</ManagementToolbar.ItemList>
+									</ClayManagementToolbar.Item>
+								</ClayManagementToolbar.ItemList>
 
-								<ManagementToolbar.ItemList>
-									<ManagementToolbar.Item>
+								<ClayManagementToolbar.ItemList>
+									<ClayManagementToolbar.Item>
 										<div className="nav-link nav-link-monospaced">
 											<ClayButton
-												aria-label={
-													this._isAnyHidden()
-														? Liferay.Language.get(
-																'show-result'
-														  )
-														: Liferay.Language.get(
-																'hide-result'
-														  )
-												}
 												className="btn-outline-borderless component-action"
 												displayType="secondary"
 												onClick={this._handleClickHide}
@@ -205,20 +196,11 @@ class SearchBar extends Component {
 												/>
 											</ClayButton>
 										</div>
-									</ManagementToolbar.Item>
+									</ClayManagementToolbar.Item>
 
-									<ManagementToolbar.Item>
+									<ClayManagementToolbar.Item>
 										<div className="nav-link nav-link-monospaced">
 											<ClayButton
-												aria-label={
-													this._isAnyUnpinned()
-														? Liferay.Language.get(
-																'pin-result'
-														  )
-														: Liferay.Language.get(
-																'unpin-result'
-														  )
-												}
 												className="btn-outline-borderless component-action"
 												displayType="secondary"
 												onClick={this._handleClickPin}
@@ -245,9 +227,9 @@ class SearchBar extends Component {
 												)}
 											</ClayButton>
 										</div>
-									</ManagementToolbar.Item>
+									</ClayManagementToolbar.Item>
 
-									<ManagementToolbar.Item>
+									<ClayManagementToolbar.Item>
 										<div className="nav-link nav-link-monospaced">
 											<ItemDropdown
 												hidden={this._isAnyHidden()}
@@ -261,28 +243,28 @@ class SearchBar extends Component {
 												pinned={!this._isAnyUnpinned()}
 											/>
 										</div>
-									</ManagementToolbar.Item>
-								</ManagementToolbar.ItemList>
+									</ClayManagementToolbar.Item>
+								</ClayManagementToolbar.ItemList>
 							</>
 						)}
 
 						{!this._hasSelectedIds() && (
 							<>
-								<ManagementToolbar.ItemList expand>
+								<ClayManagementToolbar.ItemList expand>
 									{!!resultIds.length && (
-										<ManagementToolbar.Item>
+										<ClayManagementToolbar.Item>
 											<span className="component-text navbar-text">
 												{Liferay.Language.get(
 													'select-items'
 												)}
 											</span>
-										</ManagementToolbar.Item>
+										</ClayManagementToolbar.Item>
 									)}
-								</ManagementToolbar.ItemList>
+								</ClayManagementToolbar.ItemList>
 
 								{onAddResultSubmit && (
-									<ManagementToolbar.ItemList>
-										<ManagementToolbar.Item>
+									<ClayManagementToolbar.ItemList>
+										<ClayManagementToolbar.Item>
 											<AddResult
 												fetchDocumentsSearchUrl={
 													fetchDocumentsSearchUrl
@@ -291,13 +273,13 @@ class SearchBar extends Component {
 													onAddResultSubmit
 												}
 											/>
-										</ManagementToolbar.Item>
-									</ManagementToolbar.ItemList>
+										</ClayManagementToolbar.Item>
+									</ClayManagementToolbar.ItemList>
 								)}
 							</>
 						)}
 					</div>
-				</ManagementToolbar.Container>
+				</ClayManagementToolbar>
 			</div>
 		);
 	}

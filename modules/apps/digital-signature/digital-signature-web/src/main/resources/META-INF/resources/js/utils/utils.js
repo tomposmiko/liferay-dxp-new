@@ -12,19 +12,18 @@
  * details.
  */
 
-export function isEqualObjects(firstObj, secondObj) {
+export const isEqualObjects = (firstObj, secondObj) => {
 	if (typeof firstObj !== 'object' || typeof secondObj !== 'object') {
 		return false;
 	}
 
 	return JSON.stringify(firstObj) === JSON.stringify(secondObj);
-}
+};
 
-export function concatValues(values) {
-	return values
+export const concatValues = (values) =>
+	values
 		.join(', ')
 		.replace(
 			/, ([^,]*)$/,
 			` ${Liferay.Language.get('and').toLowerCase()} $1`
 		);
-}

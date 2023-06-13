@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component( service = {})
+@Component(immediate = true, service = {})
 public class AssetPersistenceConstants {
 
 	public static final String BUNDLE_SYMBOLIC_NAME =

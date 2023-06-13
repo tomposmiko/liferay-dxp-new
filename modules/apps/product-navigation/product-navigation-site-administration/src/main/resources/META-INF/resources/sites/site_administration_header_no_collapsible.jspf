@@ -36,7 +36,11 @@
 			cssClass="mr-4"
 			expand="<%= true %>"
 		>
-			<div class="lfr-portal-tooltip site-name text-truncate" title="<%= HtmlUtil.escapeAttribute(siteAdministrationPanelCategoryDisplayContext.getGroupName()) %>">
+			<div class="depot-type">
+				<liferay-ui:message key='<%= group.isDepot() ? "asset-library" : "site" %>' />
+			</div>
+
+			<div class="lfr-portal-tooltip site-name text-truncate" title="<%= HtmlUtil.escape(siteAdministrationPanelCategoryDisplayContext.getGroupName()) %>">
 				<%= HtmlUtil.escape(siteAdministrationPanelCategoryDisplayContext.getGroupName()) %>
 
 				<c:if test="<%= siteAdministrationPanelCategoryDisplayContext.isShowStagingInfo() && !group.isStagedRemotely() %>">
@@ -70,16 +74,7 @@
 		<clay:content-col
 			cssClass="autofit-col-end"
 		>
-			<clay:button
-				aria-label='<%= LanguageUtil.get(request, "close") %>'
-				borderless="<%= true %>"
-				cssClass="lfr-portal-tooltip sidenav-close text-white"
-				displayType="secondary"
-				icon="times"
-				monospaced="<%= true %>"
-				small="<%= true %>"
-				title='<%= LanguageUtil.get(request, "close") %>'
-			/>
+			<aui:icon cssClass="d-inline-block d-md-none icon-monospaced sidenav-close" image="times" markupView="lexicon" url="javascript:;" />
 		</clay:content-col>
 	</clay:content-row>
 </span>

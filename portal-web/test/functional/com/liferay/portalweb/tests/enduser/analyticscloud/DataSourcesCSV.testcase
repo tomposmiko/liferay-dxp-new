@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -20,39 +18,32 @@ definition {
 
 			ACUtils.launchDXP();
 		}
+
+		task ("Add a new site and page") {
+			ACUtils.addSiteAndPage();
+		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
+
+			JSONUser.tearDownNonAdminUsers();
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8849 | Test Summary: Add a CSV data source with an individual whose email matches another individual that already has activities and check that the indiviual details are updated"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test AddCSVWithIndividualWhoseEmailMatchesAnotherIndividualAlreadyHasActivitiesCheckIndividualDetailsUpdated {
-		property portal.upstream = "quarantine";
-
-		// CSV data source tests are no longer possible to run due to this ticket LRAC-11651
-		// AC Quarantine reason: CSV data source takes too long to update individual details
-		// AC Quarantine: Maybe it is possible to validate in personas
-
-		task ("Add site and page") {
-			ACUtils.addSiteAndPage();
-		}
-
 		task ("Add user") {
 			JSONUser.addUser(
 				userEmailAddress = "ac@liferay.com",
@@ -72,7 +63,7 @@ definition {
 		}
 
 		task ("View the site page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -84,7 +75,7 @@ definition {
 		}
 
 		task ("Assert Field not present") {
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToIndividuals();
 
@@ -94,9 +85,9 @@ definition {
 
 			ACNavigation.switchTab(tabName = "Details");
 
-			ACUtils.viewNameList(nameList = "ac@liferay.com");
+			ACIndividualsDashboard.assertIndividualAttribute(individualAttribute = "ac@liferay.com");
 
-			ACUtils.viewNameListIsNotPresent(nameList = "Farmer");
+			ACIndividualsDashboard.assertIndividualAttributeNotPresent(individualAttribute = "Farmer");
 		}
 
 		task ("Add a CSV Data Source") {
@@ -120,37 +111,9 @@ definition {
 
 			ACNavigation.switchTab(tabName = "Details");
 
-			ACUtils.viewNameList(nameList = "ac@liferay.com,Farmer");
-		}
-	}
+			ACIndividualsDashboard.assertIndividualAttribute(individualAttribute = "ac@liferay.com");
 
-	@description = "Bug: LRAC-11436 | Automation ID: LRAC-11501 | Test Summary: Create a CSV data source"
-	@ignore = "true"
-	@priority = 5
-	test CreateCSVDataSource {
-
-		// CSV data source tests are no longer possible to run due to this ticket LRAC-11651
-
-		task ("Launch AC and go to settings") {
-			ACUtils.launchAC();
-
-			ACNavigation.goToSettings();
-		}
-
-		task ("Create a new CSV data source and see that it's on the data source list") {
-			ACSettings.addCSVDataSource(
-				dataSourceName = "CSV Job Title",
-				sourceFileName = "jobTitle.csv");
-
-			ACSettings.goToDataSources();
-
-			ACUtils.searchBar(searchItem = "CSV Job Title");
-
-			ACUtils.assertDataSourceName(dataSourceName = "CSV Job Title");
-
-			AssertElementPresent(
-				key_listStatus = "Active",
-				locator1 = "ACSettings#DATA_SOURCE_LIST_STATUS");
+			ACIndividualsDashboard.assertIndividualAttribute(individualAttribute = "Farmer");
 		}
 	}
 

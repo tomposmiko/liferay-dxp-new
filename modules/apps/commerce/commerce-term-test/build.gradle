@@ -1,4 +1,0 @@
-dependencies {
-	testIntegrationCompile project(":apps:commerce:commerce-term-api")
-	testIntegrationCompile project(":test:arquillian-extension-junit-bridge")
-}

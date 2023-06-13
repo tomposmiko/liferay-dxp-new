@@ -40,7 +40,6 @@ import {
 	subscribeSectionQuery,
 	unsubscribeSectionQuery,
 } from '../../utils/client.es';
-import {ALL_SECTIONS_ID} from '../../utils/contants.es';
 import lang from '../../utils/lang.es';
 import {
 	deleteCacheKey,
@@ -139,10 +138,8 @@ export default withRouter(
 		);
 
 		const [getRankedThreads] = useManualQuery(getRankedThreadsQuery);
-		const [getSectionThreads] = useManualQuery(getSectionThreadsQuery, {
-			useCache: false,
-		});
-		const [getThreads] = useManualQuery(getThreadsQuery, {useCache: false});
+		const [getSectionThreads] = useManualQuery(getSectionThreadsQuery);
+		const [getThreads] = useManualQuery(getThreadsQuery);
 
 		useEffect(() => {
 			setCurrentTag(tag ? slugToText(tag) : '');
@@ -162,10 +159,7 @@ export default withRouter(
 		}, [queryParams]);
 
 		useEffect(() => {
-			document.title =
-				sectionTitle === ALL_SECTIONS_ID
-					? Liferay.Language.get('all-questions')
-					: (section && section.title) || sectionTitle;
+			document.title = (section && section.title) || sectionTitle;
 		}, [sectionTitle, section]);
 
 		useEffect(() => {
@@ -286,9 +280,7 @@ export default withRouter(
 					}keywords/any(x:x eq '${keywords}')`;
 				}
 				else if (creatorId) {
-					const operand = filter ? 'and' : '';
-
-					filter += `${operand} creator/id eq ${creatorId}`;
+					filter += ` and creator/id eq ${creatorId}`;
 				}
 
 				sort = sort || 'dateCreated:desc';
@@ -311,15 +303,11 @@ export default withRouter(
 		);
 
 		useEffect(() => {
-			if (!page || !pageSize || search === null || search === undefined) {
+			if (!page || !pageSize || search == null) {
 				return;
 			}
 
-			if (
-				!section ||
-				((section.id === null || section.id === undefined) &&
-					!currentTag)
-			) {
+			if (!section || (section.id == null && !currentTag)) {
 				return;
 			}
 
@@ -393,7 +381,7 @@ export default withRouter(
 		function buildURL(search, page, pageSize) {
 			let url = '/questions';
 
-			if (sectionTitle || sectionTitle === ALL_SECTIONS_ID) {
+			if (sectionTitle || sectionTitle === '0') {
 				url += `/${sectionTitle}`;
 			}
 
@@ -421,11 +409,11 @@ export default withRouter(
 
 		const [debounceCallback] = useDebounceCallback(
 			(search) => changePage(search, 1, 20),
-			1000
+			500
 		);
 
 		useEffect(() => {
-			if (sectionTitle && sectionTitle !== ALL_SECTIONS_ID) {
+			if (sectionTitle && sectionTitle !== '0') {
 				const variables = {
 					filter: `title eq '${slugToText(
 						sectionTitle
@@ -447,7 +435,7 @@ export default withRouter(
 					}
 				});
 			}
-			else if (sectionTitle === ALL_SECTIONS_ID) {
+			else if (sectionTitle === '0') {
 				const variables = {siteKey: context.siteKey};
 				getSections({
 					variables,
@@ -478,9 +466,7 @@ export default withRouter(
 
 		function isVotedFilter(filter) {
 			return (
-				filter === 'month' ||
-				filter === 'most-voted' ||
-				filter === 'week'
+				filter == 'month' || filter == 'most-voted' || filter == 'week'
 			);
 		}
 
@@ -490,9 +476,7 @@ export default withRouter(
 
 				window.location.replace(
 					`/c/portal/login?redirect=${baseURL}${
-						context.historyRouterBasePath
-							? context.historyRouterBasePath
-							: '#'
+						context.historyRouterBasePath ? '' : '#'
 					}/questions/${sectionTitle}/new`
 				);
 			}
@@ -509,7 +493,6 @@ export default withRouter(
 					allowCreateTopicInRootTopic={allowCreateTopicInRootTopic}
 					section={section}
 				/>
-
 				<div className="questions-container row">
 					<div className="c-mt-3 col col-xl-12">
 						<QuestionsNavigationBar />
@@ -600,20 +583,11 @@ export default withRouter(
 										/>
 									)
 								}
-								hrefConstructor={(page) =>
-									`${getFullPath('questions')}${
-										context.historyRouterBasePath
-											? ''
-											: '#/'
-									}questions/${sectionTitle}?page=${page}&pagesize=${pageSize}`
-								}
 								loading={loading}
 								totalCount={totalCount}
 							>
 								{(question) => (
 									<QuestionRow
-										context={context}
-										creatorId={creatorId}
 										currentSection={sectionTitle}
 										key={question.id}
 										question={question}
@@ -623,7 +597,6 @@ export default withRouter(
 									/>
 								)}
 							</PaginatedList>
-
 							<ClayButton
 								className="btn-monospaced d-block d-sm-none position-fixed questions-button shadow"
 								displayType="primary"
@@ -756,13 +729,12 @@ export default withRouter(
 												/>
 											</button>
 										)}
-
 										{!loading &&
 											((!!search && (
 												<ClayButtonWithIcon
 													displayType="unstyled"
 													onClick={() => {
-														setSearch('');
+														debounceCallback('');
 													}}
 													symbol="times-circle"
 													type="submit"
@@ -787,8 +759,7 @@ export default withRouter(
 											Boolean(
 												section.actions['add-thread']
 											)) ||
-										context.canCreateThread) &&
-									sectionTitle !== ALL_SECTIONS_ID && (
+										context.canCreateThread) && (
 										<ClayInput.GroupItem shrink>
 											<ClayButton
 												className="c-ml-3 d-none d-sm-block text-nowrap"
@@ -808,11 +779,10 @@ export default withRouter(
 					{section && (
 						<Helmet>
 							<title>{section.title}</title>
-
 							<link
 								href={`${getFullPath('questions')}${
 									context.historyRouterBasePath ? '' : '#/'
-								}questions/${sectionTitle}?page=${page}&pagesize=${pageSize}`}
+								}questions/${sectionTitle}`}
 								rel="canonical"
 							/>
 						</Helmet>

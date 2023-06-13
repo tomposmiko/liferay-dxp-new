@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -25,27 +23,37 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		ACUtils.tearDownAC();
+	}
+
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8113 | Test Summary: Assert clicking a blog in the blogs list navigates to the blogs overview page"
+	@ignore = "true"
+	@priority = "5"
+	test CanNavigatesToBlogsOverviewPage {
+
+		// TODO LRAC-8113 CanNavigatesToBlogsOverviewPage pending implementation
+
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8112 | Test Summary: Assert clicking on a page in the pages lists navigates to the page profile"
-	@priority = 5
+	@priority = "5"
 	test ClickOnPageInPagesListsNavigatesToPageProfile {
-		property analytics.cloud.upstream = "false";
+		property portal.upstream = "quarantine";
 
-		task ("Connect DXP to Analytics Cloud") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		// AC Refactor: the issue is due to data not appearing on time
+		// AC Refactor ticket: LRAC-8990
+
+		task ("Connect DXP to Analytics Cloud and get the property name") {
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("View the blog") {
@@ -65,7 +73,7 @@ definition {
 		}
 
 		task ("Navigate to Pages tab in Sites") {
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
 
@@ -79,44 +87,17 @@ definition {
 		}
 
 		task ("Navigate to page report entry") {
-			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, " ");
+			ACNavigation.openItem(itemName = "AC Page - Site Name - Liferay DXP");
 
-			ACNavigation.openItem(itemName = "AC Page - Site Name - ${dataSourceName}");
+			// Unable to perform the declaration because the data does not appear at the time
+
 		}
 
 		task ("Assert Page Profile") {
-			ACUtils.assertPageTitle(pageTitle = "AC Page - Site Name - ${dataSourceName}");
+			ACUtils.assertPageTitle(pageTitle = "AC Page - Site Name - Liferay DXP");
 
-			for (var cardTitle : list "Visitors Behavior,Audience,Views by Location,Views by Technology") {
-				ACCards.viewCards(cardTitle = ${cardTitle});
-			}
-		}
-
-		task ("View the time filter of Visitors Behavior is Last 24 Hours") {
-			ACTimeFilter.assertCurrentTimeFilterRange(
-				cardName = "Visitors Behavior",
-				timeFilterRange = "Last 24 hours");
-		}
-
-		for (var tabName : list "Path,Known Individuals") {
-			task ("Switch the tab") {
-				ACNavigation.switchTab(tabName = ${tabName});
-			}
-
-			task ("Set the time filter to the last 30 days") {
-				ACTimeFilter.clickTimeFilterButton();
-
-				ACTimeFilter.setLast30Days();
-			}
-
-			task ("Switch to Overview tab") {
-				ACNavigation.switchTab(tabName = "Overview");
-			}
-
-			task ("View the time filter of Visitors Behavior is Last 24 Hours") {
-				ACTimeFilter.assertCurrentTimeFilterRange(
-					cardName = "Visitors Behavior",
-					timeFilterRange = "Last 24 hours");
+			for (var cardTitle : list "Visitors Behavior,Audience,Views by Location,Views by Technology,Displayed Assets") {
+				ACCards.viewCards(cardTitle = "${cardTitle}");
 			}
 		}
 	}

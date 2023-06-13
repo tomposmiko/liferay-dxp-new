@@ -25,10 +25,6 @@ public class LayoutTemplateLocalServiceWrapper
 	implements LayoutTemplateLocalService,
 			   ServiceWrapper<LayoutTemplateLocalService> {
 
-	public LayoutTemplateLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutTemplateLocalServiceWrapper(
 		LayoutTemplateLocalService layoutTemplateLocalService) {
 

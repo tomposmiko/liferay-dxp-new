@@ -15,28 +15,23 @@
 AUI.add(
 	'liferay-portlet-dynamic-data-lists',
 	(A) => {
-		const AArray = A.Array;
+		var AArray = A.Array;
 
-		const DateMath = A.DataType.DateMath;
+		var DateMath = A.DataType.DateMath;
 
-		const FormBuilder = Liferay.FormBuilder;
+		var FormBuilder = Liferay.FormBuilder;
 
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const EMPTY_FN = A.Lang.emptyFn;
+		var EMPTY_FN = A.Lang.emptyFn;
 
-		const STR_EMPTY = '';
+		var STR_EMPTY = '';
 
-		const isArray = Array.isArray;
-		const isNumber = Lang.isNumber;
+		var isArray = Array.isArray;
+		var isNumber = Lang.isNumber;
 
-		const SpreadSheet = A.Component.create({
+		var SpreadSheet = A.Component.create({
 			ATTRS: {
-				addRecordURL: {
-					validator: Lang.isString,
-					value: STR_EMPTY,
-				},
-
 				portletNamespace: {
 					validator: Lang.isString,
 					value: STR_EMPTY,
@@ -71,7 +66,7 @@ AUI.add(
 			NAME: A.DataTable.Base.NAME,
 
 			TYPE_EDITOR: {
-				'checkbox': A.CheckboxCellEditor,
+				checkbox: A.CheckboxCellEditor,
 				'ddm-color':
 					FormBuilder.CUSTOM_CELL_EDITORS['color-cell-editor'],
 				'ddm-date': A.DateCellEditor,
@@ -84,29 +79,22 @@ AUI.add(
 				'ddm-link-to-page':
 					FormBuilder.CUSTOM_CELL_EDITORS['link-to-page-cell-editor'],
 				'ddm-number': A.TextCellEditor,
-				'radio': A.RadioCellEditor,
-				'select': A.DropDownCellEditor,
-				'text': A.TextCellEditor,
-				'textarea': A.TextAreaCellEditor,
+				radio: A.RadioCellEditor,
+				select: A.DropDownCellEditor,
+				text: A.TextCellEditor,
+				textarea: A.TextAreaCellEditor,
 			},
 
-			addRecord(
-				addRecordURL,
-				callback,
-				ddmFormValues,
-				displayIndex,
-				portletNamespace,
-				recordsetId
-			) {
-				const instance = this;
+			addRecord(recordsetId, displayIndex, fieldsMap, callback) {
+				var instance = this;
 
 				callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
 
-				// eslint-disable-next-line @liferay/aui/no-io
-				A.io.request(addRecordURL, {
-					data: Liferay.Util.ns(portletNamespace, {
-						ddmFormValues: JSON.stringify(ddmFormValues),
+				Liferay.Service(
+					'/ddl.ddlrecord/add-record',
+					{
 						displayIndex,
+						fieldsMap: JSON.stringify(fieldsMap),
 						groupId: themeDisplay.getScopeGroupId(),
 						recordSetId: recordsetId,
 						serviceContext: JSON.stringify({
@@ -114,32 +102,26 @@ AUI.add(
 							userId: themeDisplay.getUserId(),
 							workflowAction: Liferay.Workflow.ACTION_PUBLISH,
 						}),
-					}),
-					dataType: 'JSON',
-					method: 'POST',
-					on: {
-						success() {
-							callback();
-						},
 					},
-				});
+					callback
+				);
 			},
 
 			buildDataTableColumns(columns, locale, structure, editable) {
-				const instance = this;
+				var instance = this;
 
 				columns.forEach((item) => {
-					const dataType = item.dataType;
-					let label = item.label;
-					const name = item.name;
-					const type = item.type;
+					var dataType = item.dataType;
+					var label = item.label;
+					var name = item.name;
+					var type = item.type;
 
 					item.key = name;
 
-					const EditorClass =
+					var EditorClass =
 						instance.TYPE_EDITOR[type] || A.TextCellEditor;
 
-					const config = {
+					var config = {
 						elementName: name,
 						strings: {
 							cancel: Liferay.Language.get('cancel'),
@@ -151,9 +133,9 @@ AUI.add(
 						},
 					};
 
-					const required = item.required;
+					var required = item.required;
 
-					let structureField;
+					var structureField;
 
 					if (required) {
 						label += ' (' + Liferay.Language.get('required') + ')';
@@ -169,11 +151,11 @@ AUI.add(
 						};
 
 						config.inputFormatter = function (value) {
-							if (Array.isArray(value) && !!value.length) {
+							if (Array.isArray(value) && value.length > 0) {
 								value = value[0];
 							}
 
-							let checkedValue = 'false';
+							var checkedValue = 'false';
 
 							if (value === 'true') {
 								checkedValue = value;
@@ -183,9 +165,9 @@ AUI.add(
 						};
 
 						item.formatter = function (object) {
-							const data = object.data;
+							var data = object.data;
 
-							let value = data[name];
+							var value = data[name];
 
 							if (value === 'true') {
 								value = Liferay.Language.get('true');
@@ -206,7 +188,7 @@ AUI.add(
 
 						config.outputFormatter = function (val) {
 							return val.map((item) => {
-								let date;
+								var date;
 
 								if (item !== STR_EMPTY) {
 									date = A.DataType.Date.parse(item);
@@ -226,9 +208,9 @@ AUI.add(
 						};
 
 						item.formatter = function (object) {
-							const data = object.data;
+							var data = object.data;
 
-							let value = data[name];
+							var value = data[name];
 
 							if (isArray(value)) {
 								value = value[0];
@@ -243,9 +225,9 @@ AUI.add(
 						type === 'ddm-number'
 					) {
 						config.outputFormatter = function (value) {
-							const number = A.DataType.Number.parse(value);
+							var number = A.DataType.Number.parse(value);
 
-							let numberValue = STR_EMPTY;
+							var numberValue = STR_EMPTY;
 
 							if (isNumber(number)) {
 								numberValue = number;
@@ -255,9 +237,9 @@ AUI.add(
 						};
 
 						item.formatter = function (object) {
-							const data = object.data;
+							var data = object.data;
 
-							let value = A.DataType.Number.parse(data[name]);
+							var value = A.DataType.Number.parse(data[name]);
 
 							if (!isNumber(value)) {
 								value = STR_EMPTY;
@@ -268,13 +250,13 @@ AUI.add(
 					}
 					else if (type === 'ddm-documentlibrary') {
 						item.formatter = function (object) {
-							const data = object.data;
+							var data = object.data;
 
-							let label = STR_EMPTY;
-							const value = data[name];
+							var label = STR_EMPTY;
+							var value = data[name];
 
 							if (value !== STR_EMPTY) {
-								const fileData = FormBuilder.Util.parseJSON(
+								var fileData = FormBuilder.Util.parseJSON(
 									value
 								);
 
@@ -288,13 +270,13 @@ AUI.add(
 					}
 					else if (type === 'ddm-link-to-page') {
 						item.formatter = function (object) {
-							const data = object.data;
+							var data = object.data;
 
-							let label = STR_EMPTY;
-							const value = data[name];
+							var label = STR_EMPTY;
+							var value = data[name];
 
 							if (value !== STR_EMPTY) {
-								const linkToPageData = FormBuilder.Util.parseJSON(
+								var linkToPageData = FormBuilder.Util.parseJSON(
 									value
 								);
 
@@ -326,19 +308,19 @@ AUI.add(
 							name
 						);
 
-						const multiple = A.DataType.Boolean.parse(
+						var multiple = A.DataType.Boolean.parse(
 							structureField.multiple
 						);
-						const options = instance.getCellEditorOptions(
+						var options = instance.getCellEditorOptions(
 							structureField.options,
 							locale
 						);
 
 						item.formatter = function (object) {
-							const data = object.data;
+							var data = object.data;
 
-							const label = [];
-							const value = data[name];
+							var label = [];
+							var value = data[name];
 
 							if (isArray(value)) {
 								value.forEach((item1) => {
@@ -357,9 +339,9 @@ AUI.add(
 						item.allowHTML = true;
 
 						item.formatter = function (object) {
-							const data = object.data;
+							var data = object.data;
 
-							const value = data[name];
+							var value = data[name];
 
 							if (!value) {
 								return value;
@@ -369,10 +351,10 @@ AUI.add(
 						};
 					}
 
-					const validatorRuleName =
+					var validatorRuleName =
 						instance.DATATYPE_VALIDATOR[dataType];
 
-					const validatorRules = config.validator.rules;
+					var validatorRules = config.validator.rules;
 
 					validatorRules[name] = A.mix(
 						{
@@ -394,11 +376,11 @@ AUI.add(
 			},
 
 			buildEmptyRecords(num, keys) {
-				const instance = this;
+				var instance = this;
 
-				const emptyRows = [];
+				var emptyRows = [];
 
-				for (let i = 0; i < num; i++) {
+				for (var i = 0; i < num; i++) {
 					emptyRows.push(instance.getRecordModel(keys));
 				}
 
@@ -410,12 +392,12 @@ AUI.add(
 				attributeName,
 				attributeValue
 			) {
-				const instance = this;
+				var instance = this;
 
-				let structureField;
+				var structureField;
 
 				AArray.some(fieldsArray, (item) => {
-					const nestedFieldsArray = item.fields;
+					var nestedFieldsArray = item.fields;
 
 					if (item[attributeName] === attributeValue) {
 						structureField = item;
@@ -435,12 +417,12 @@ AUI.add(
 			},
 
 			getCellEditorOptions(options, locale) {
-				const normalized = {};
+				var normalized = {};
 
 				options.forEach((item) => {
 					normalized[item.value] = item.label;
 
-					const localizationMap = item.localizationMap;
+					var localizationMap = item.localizationMap;
 
 					if (localizationMap[locale]) {
 						normalized[item.value] = localizationMap[locale].label;
@@ -451,7 +433,7 @@ AUI.add(
 			},
 
 			getRecordModel(keys) {
-				const recordModel = {};
+				var recordModel = {};
 
 				keys.forEach((item) => {
 					recordModel[item] = STR_EMPTY;
@@ -462,30 +444,30 @@ AUI.add(
 
 			prototype: {
 				_afterActiveCellIndexChange() {
-					const instance = this;
+					var instance = this;
 
-					const activeCell = instance.get('activeCell');
-					const boundingBox = instance.get('boundingBox');
+					var activeCell = instance.get('activeCell');
+					var boundingBox = instance.get('boundingBox');
 
-					const scrollableElement = boundingBox.one(
+					var scrollableElement = boundingBox.one(
 						'.table-x-scroller'
 					);
 
-					const tableHighlightBorder = instance.highlight.get(
+					var tableHighlightBorder = instance.highlight.get(
 						'activeBorderWidth'
 					)[0];
 
-					const activeCellWidth =
+					var activeCellWidth =
 						activeCell.outerWidth() + tableHighlightBorder;
-					const scrollableWidth = scrollableElement.outerWidth();
+					var scrollableWidth = scrollableElement.outerWidth();
 
-					const activeCellOffsetLeft = activeCell.get('offsetLeft');
-					const scrollLeft = scrollableElement.get('scrollLeft');
+					var activeCellOffsetLeft = activeCell.get('offsetLeft');
+					var scrollLeft = scrollableElement.get('scrollLeft');
 
-					const activeCellOffsetRight =
+					var activeCellOffsetRight =
 						activeCellOffsetLeft + activeCellWidth;
 
-					let scrollTo = scrollLeft;
+					var scrollTo = scrollLeft;
 
 					if (scrollLeft + scrollableWidth < activeCellOffsetRight) {
 						scrollTo = activeCellOffsetRight - scrollableWidth;
@@ -498,13 +480,13 @@ AUI.add(
 				},
 
 				_afterSelectionKey(event) {
-					const instance = this;
+					var instance = this;
 
-					const activeCell = instance.get('activeCell');
+					var activeCell = instance.get('activeCell');
 
-					const alignNode = event.alignNode || activeCell;
+					var alignNode = event.alignNode || activeCell;
 
-					const column = instance.getColumn(alignNode);
+					var column = instance.getColumn(alignNode);
 
 					if (
 						activeCell &&
@@ -516,12 +498,12 @@ AUI.add(
 				},
 
 				_normalizeFieldData(item, record, normalized) {
-					const instance = this;
+					var instance = this;
 
-					const type = item.type;
-					let value = record.get(item.name);
+					var type = item.type;
+					var value = record.get(item.name);
 
-					if (!record.changed[item.id] && value && !!value.length) {
+					if (!record.changed[item.id] && value && value.length > 0) {
 						return;
 					}
 
@@ -540,7 +522,7 @@ AUI.add(
 						value = JSON.stringify(value);
 					}
 
-					const fieldValue = {
+					var fieldValue = {
 						instanceId: instance._randomString(8),
 						name: item.name,
 					};
@@ -568,11 +550,11 @@ AUI.add(
 				},
 
 				_normalizeRecordData(record) {
-					const instance = this;
+					var instance = this;
 
-					const structure = instance.get('structure');
+					var structure = instance.get('structure');
 
-					const normalized = {
+					var normalized = {
 						availableLanguageIds: [themeDisplay.getLanguageId()],
 						defaultLanguageId: themeDisplay.getLanguageId(),
 						fieldValues: [],
@@ -599,32 +581,32 @@ AUI.add(
 				},
 
 				_onDataChange(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._setDataStableSort(event.newVal);
 				},
 
 				_onEditCell(event) {
-					const instance = this;
+					var instance = this;
 
 					SpreadSheet.superclass._onEditCell.apply(
 						instance,
 						arguments
 					);
 
-					const activeCell = instance.get('activeCell');
+					var activeCell = instance.get('activeCell');
 
-					const alignNode = event.alignNode || activeCell;
+					var alignNode = event.alignNode || activeCell;
 
-					const column = instance.getColumn(alignNode);
-					const record = instance.getRecord(alignNode);
+					var column = instance.getColumn(alignNode);
+					var record = instance.getRecord(alignNode);
 
-					const data = instance.get('data');
-					const portletNamespace = instance.get('portletNamespace');
-					const recordsetId = instance.get('recordsetId');
-					const structure = instance.get('structure');
+					var data = instance.get('data');
+					var portletNamespace = instance.get('portletNamespace');
+					var recordsetId = instance.get('recordsetId');
+					var structure = instance.get('structure');
 
-					const editor = instance.getEditor(record, column);
+					var editor = instance.getEditor(record, column);
 
 					if (editor) {
 						editor.setAttrs({
@@ -639,7 +621,7 @@ AUI.add(
 				},
 
 				_onRecordUpdate(event) {
-					const instance = this;
+					var instance = this;
 
 					if (
 						!Object.prototype.hasOwnProperty.call(
@@ -647,16 +629,16 @@ AUI.add(
 							'recordId'
 						)
 					) {
-						const data = instance.get('data');
-						const recordsetId = instance.get('recordsetId');
+						var data = instance.get('data');
+						var recordsetId = instance.get('recordsetId');
 
-						const record = event.target;
+						var record = event.target;
 
-						const recordId = record.get('recordId');
+						var recordId = record.get('recordId');
 
-						const fieldsMap = instance._normalizeRecordData(record);
+						var fieldsMap = instance._normalizeRecordData(record);
 
-						const recordIndex = data.indexOf(record);
+						var recordIndex = data.indexOf(record);
 
 						if (recordId > 0) {
 							SpreadSheet.updateRecord(
@@ -670,27 +652,25 @@ AUI.add(
 						}
 						else {
 							SpreadSheet.addRecord(
-								instance.get('addRecordURL'),
+								recordsetId,
+								recordIndex,
+								fieldsMap,
 								(json) => {
 									if (json.recordId > 0) {
 										record.set('recordId', json.recordId, {
 											silent: true,
 										});
 									}
-								},
-								fieldsMap,
-								recordIndex,
-								instance.get('portletNamespace'),
-								recordsetId
+								}
 							);
 						}
 					}
 				},
 
 				_randomString(length) {
-					const random = Math.random();
+					var random = Math.random();
 
-					const randomString = random.toString(36);
+					var randomString = random.toString(36);
 
 					return randomString.substring(length);
 				},
@@ -700,18 +680,17 @@ AUI.add(
 						if (this.comparator) {
 							options = options || {};
 
-							const models = this._items.concat();
+							var models = this._items.concat();
 
 							A.ArraySort.stableSort(
 								models,
 								A.bind(this._sort, this)
 							);
 
-							const facade = {
-								...options,
+							var facade = A.merge(options, {
 								models,
 								src: 'sort',
-							};
+							});
 
 							if (options.silent) {
 								this._defResetFn(facade);
@@ -726,12 +705,12 @@ AUI.add(
 				},
 
 				addEmptyRows(num) {
-					const instance = this;
+					var instance = this;
 
-					const columns = instance.get('columns');
-					const data = instance.get('data');
+					var columns = instance.get('columns');
+					var data = instance.get('data');
 
-					const keys = columns.map((item) => {
+					var keys = columns.map((item) => {
 						return item.key;
 					});
 
@@ -739,7 +718,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._setDataStableSort(instance.get('data'));
 
@@ -750,12 +729,12 @@ AUI.add(
 				},
 
 				updateMinDisplayRows(minDisplayRows, callback) {
-					const instance = this;
+					var instance = this;
 
 					callback =
 						(callback && A.bind(callback, instance)) || EMPTY_FN;
 
-					const recordsetId = instance.get('recordsetId');
+					var recordsetId = instance.get('recordsetId');
 
 					Liferay.Service(
 						'/ddl.ddlrecordset/update-min-display-rows',
@@ -781,11 +760,10 @@ AUI.add(
 				updateRecordURL,
 				callback
 			) {
-				const instance = this;
+				var instance = this;
 
 				callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
 
-				// eslint-disable-next-line @liferay/aui/no-io
 				A.io.request(updateRecordURL, {
 					data: Liferay.Util.ns(portletNamespace, {
 						ddmFormValues: JSON.stringify(ddmFormValues),
@@ -806,11 +784,11 @@ AUI.add(
 
 		Liferay.SpreadSheet = SpreadSheet;
 
-		const DDLUtil = {
+		var DDLUtil = {
 			openPreviewDialog(content) {
-				const instance = this;
+				var instance = this;
 
-				let previewDialog = instance.previewDialog;
+				var previewDialog = instance.previewDialog;
 
 				if (!previewDialog) {
 					previewDialog = Liferay.Util.Window.getWindow({

@@ -16,16 +16,18 @@ package com.liferay.journal.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -62,59 +64,73 @@ public class JournalHistoryManagementToolbarDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return DropdownItemListBuilder.addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() -> JournalArticlePermission.contains(
+		return new DropdownItemList() {
+			{
+				try {
+					if (JournalArticlePermission.contains(
 							themeDisplay.getPermissionChecker(), _article,
-							ActionKeys.EXPIRE),
-						dropdownItem -> {
-							dropdownItem.putData("action", "expireArticles");
-							dropdownItem.putData(
-								"expireArticlesURL",
-								PortletURLBuilder.createActionURL(
-									liferayPortletResponse
-								).setActionName(
-									"/journal/expire_articles"
-								).setRedirect(
-									themeDisplay.getURLCurrent()
-								).buildString());
-							dropdownItem.setIcon("time");
-							dropdownItem.setLabel(
-								LanguageUtil.get(httpServletRequest, "expire"));
-							dropdownItem.setQuickAction(true);
-						}
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
-		).addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() -> JournalArticlePermission.contains(
+							ActionKeys.DELETE)) {
+
+						add(
+							dropdownItem -> {
+								dropdownItem.putData(
+									"action", "deleteArticles");
+								dropdownItem.putData(
+									"deleteArticlesURL",
+									PortletURLBuilder.createActionURL(
+										liferayPortletResponse
+									).setActionName(
+										"/journal/delete_articles"
+									).setRedirect(
+										themeDisplay.getURLCurrent()
+									).buildString());
+								dropdownItem.setIcon("times-circle");
+								dropdownItem.setLabel(
+									LanguageUtil.get(
+										httpServletRequest, "delete"));
+								dropdownItem.setQuickAction(true);
+							});
+					}
+				}
+				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
+				}
+
+				try {
+					if (JournalArticlePermission.contains(
 							themeDisplay.getPermissionChecker(), _article,
-							ActionKeys.DELETE),
-						dropdownItem -> {
-							dropdownItem.putData("action", "deleteArticles");
-							dropdownItem.putData(
-								"deleteArticlesURL",
-								PortletURLBuilder.createActionURL(
-									liferayPortletResponse
-								).setActionName(
-									"/journal/delete_articles"
-								).setRedirect(
-									themeDisplay.getURLCurrent()
-								).buildString());
-							dropdownItem.setIcon("trash");
-							dropdownItem.setLabel(
-								LanguageUtil.get(httpServletRequest, "delete"));
-							dropdownItem.setQuickAction(true);
-						}
-					).build());
-				dropdownGroupItem.setSeparator(true);
+							ActionKeys.EXPIRE)) {
+
+						add(
+							dropdownItem -> {
+								dropdownItem.putData(
+									"action", "expireArticles");
+								dropdownItem.putData(
+									"expireArticlesURL",
+									PortletURLBuilder.createActionURL(
+										liferayPortletResponse
+									).setActionName(
+										"/journal/expire_articles"
+									).setRedirect(
+										themeDisplay.getURLCurrent()
+									).buildString());
+								dropdownItem.setIcon("time");
+								dropdownItem.setLabel(
+									LanguageUtil.get(
+										httpServletRequest, "expire"));
+								dropdownItem.setQuickAction(true);
+							});
+					}
+				}
+				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
+				}
 			}
-		).build();
+		};
 	}
 
 	public String getAvailableActions(JournalArticle article)
@@ -173,6 +189,9 @@ public class JournalHistoryManagementToolbarDisplayContext
 	protected String[] getOrderByKeys() {
 		return new String[] {"version", "display-date", "modified-date"};
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		JournalHistoryManagementToolbarDisplayContext.class);
 
 	private final JournalArticle _article;
 	private final JournalHistoryDisplayContext _journalHistoryDisplayContext;

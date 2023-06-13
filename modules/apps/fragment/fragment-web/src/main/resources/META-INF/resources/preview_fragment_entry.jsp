@@ -16,19 +16,21 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {runScriptsInElement} = frontendJsWeb;
-
+<aui:script require="frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 	function handleIframeMessage(event) {
 		if (event.data) {
 			var virtualDocument = document.createElement('html');
 
 			virtualDocument.innerHTML = JSON.parse(event.data).data;
 
-			document.querySelector('.portlet-body').innerHTML =
-				virtualDocument.innerHTML;
+			var virtualBody = virtualDocument.querySelector('.portlet-body');
 
-			runScriptsInElement(virtualDocument);
+			if (virtualBody) {
+				document.querySelector('.portlet-body').innerHTML =
+					virtualBody.innerHTML;
+			}
+
+			runScriptsInElement.default(virtualBody);
 		}
 	}
 

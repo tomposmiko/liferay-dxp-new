@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Ricardo Couso
  */
-@Component(service = AssetRendererFactory.class)
+@Component(immediate = true, service = AssetRendererFactory.class)
 public class SiteAssetRendererFactory extends BaseAssetRendererFactory<Group> {
 
 	public static final String TYPE = "site";
@@ -75,7 +75,11 @@ public class SiteAssetRendererFactory extends BaseAssetRendererFactory<Group> {
 		return TYPE;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
 	private GroupLocalService _groupLocalService;
 
 }

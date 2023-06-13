@@ -37,8 +37,6 @@ public interface Value extends Serializable {
 
 	public boolean isLocalized();
 
-	public void removeLocale(Locale locale);
-
 	public void setDefaultLocale(Locale defaultLocale);
 
 }

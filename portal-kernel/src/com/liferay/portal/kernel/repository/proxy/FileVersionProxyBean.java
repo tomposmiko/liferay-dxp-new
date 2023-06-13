@@ -20,16 +20,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.RepositoryModelOperation;
-import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.InputStream;
 import java.io.Serializable;
 
-import java.lang.reflect.InvocationHandler;
-
 import java.util.Date;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author Mika Koivisto
@@ -91,9 +87,8 @@ public class FileVersionProxyBean
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
-		return newProxyInstance(
-			_fileVersion.getExpandoBridge(),
-			_expandoBridgeProxyProviderFunction);
+		return (ExpandoBridge)newProxyInstance(
+			_fileVersion.getExpandoBridge(), ExpandoBridge.class);
 	}
 
 	@Override
@@ -349,10 +344,6 @@ public class FileVersionProxyBean
 
 		return newFileVersionProxyBean(fileVersion);
 	}
-
-	private static final Function<InvocationHandler, ExpandoBridge>
-		_expandoBridgeProxyProviderFunction =
-			ProxyUtil.getProxyProviderFunction(ExpandoBridge.class);
 
 	private final FileVersion _fileVersion;
 

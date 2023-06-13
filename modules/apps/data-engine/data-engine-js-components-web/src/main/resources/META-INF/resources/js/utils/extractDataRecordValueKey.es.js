@@ -12,6 +12,4 @@
  * details.
  */
 
-export default function extractDataRecordValueKey(name) {
-	return name.split('$$')[1];
-}
+export default (name) => name.split('$$')[1];

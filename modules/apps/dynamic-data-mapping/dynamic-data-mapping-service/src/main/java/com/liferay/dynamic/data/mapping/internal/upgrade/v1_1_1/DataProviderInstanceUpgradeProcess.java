@@ -51,68 +51,35 @@ public class DataProviderInstanceUpgradeProcess extends UpgradeProcess {
 		DDMFormValuesDeserializer ddmFormValuesDeserializer,
 		DDMFormValuesSerializer ddmFormValuesSerializer) {
 
+		_ddmDataProviderSettingsProviderServiceTracker =
+			ddmDataProviderSettingsProviderServiceTracker;
 		_ddmFormValuesDeserializer = ddmFormValuesDeserializer;
 		_ddmFormValuesSerializer = ddmFormValuesSerializer;
-
-		_serviceTrackerMap = ddmDataProviderSettingsProviderServiceTracker;
 	}
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
-				"select dataProviderInstanceId, definition, type_ from " +
-					"DDMDataProviderInstance");
-			PreparedStatement preparedStatement2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection,
-					"update DDMDataProviderInstance set definition = ? where " +
-						"dataProviderInstanceId = ?");
-			ResultSet resultSet = preparedStatement1.executeQuery()) {
-
-			while (resultSet.next()) {
-				String dataProviderInstanceDefinition = resultSet.getString(2);
-				String type = resultSet.getString(3);
-
-				String newDefinition = _upgradeDataProviderInstanceDefinition(
-					dataProviderInstanceDefinition, type);
-
-				preparedStatement2.setString(1, newDefinition);
-
-				long dataProviderInstanceId = resultSet.getLong(1);
-
-				preparedStatement2.setLong(2, dataProviderInstanceId);
-
-				preparedStatement2.addBatch();
-			}
-
-			preparedStatement2.executeBatch();
-		}
-	}
-
-	private void _addDefaultInputParameters(DDMFormValues ddmFormValues) {
-		DDMFormFieldValue ddmFormFieldValue = _createDDMFormFieldValue(
+	protected void addDefaultInputParameters(DDMFormValues ddmFormValues) {
+		DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(
 			ddmFormValues, "inputParameters", null);
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "inputParameterLabel", StringPool.BLANK));
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "inputParameterName", StringPool.BLANK));
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "inputParameterRequired", "false"));
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
-				ddmFormValues, "inputParameterType", "[]"));
+			createDDMFormFieldValue(ddmFormValues, "inputParameterType", "[]"));
 
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 	}
 
-	private void _addDefaultOutputParameters(DDMFormValues ddmFormValues) {
+	protected void addDefaultOutputParameters(DDMFormValues ddmFormValues) {
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
 			ddmFormValues.getDDMFormFieldValuesMap();
 
@@ -131,15 +98,15 @@ public class DataProviderInstanceUpgradeProcess extends UpgradeProcess {
 
 		DDMFormFieldValue valueDDMFormFieldValue = ddmFormFieldValues.get(0);
 
-		String outputParameterPath = _createOutputPathValue(
+		String outputParameterPath = createOutputPathValue(
 			ddmFormValues.getDefaultLocale(), keyDDMFormFieldValue.getValue(),
 			valueDDMFormFieldValue.getValue());
 
 		ddmFormValues.addDDMFormFieldValue(
-			_createDefaultOutputParameters(ddmFormValues, outputParameterPath));
+			createDefaultOutputParameters(ddmFormValues, outputParameterPath));
 	}
 
-	private void _addPaginationParameter(DDMFormValues ddmFormValues) {
+	protected void addPaginationParameter(DDMFormValues ddmFormValues) {
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
 			ddmFormValues.getDDMFormFieldValuesMap();
 
@@ -148,10 +115,10 @@ public class DataProviderInstanceUpgradeProcess extends UpgradeProcess {
 		}
 
 		ddmFormValues.addDDMFormFieldValue(
-			_createDDMFormFieldValue(ddmFormValues, "pagination", "false"));
+			createDDMFormFieldValue(ddmFormValues, "pagination", "false"));
 	}
 
-	private void _addStartEndParameters(DDMFormValues ddmFormValues) {
+	protected void addStartEndParameters(DDMFormValues ddmFormValues) {
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
 			ddmFormValues.getDDMFormFieldValuesMap();
 
@@ -162,14 +129,14 @@ public class DataProviderInstanceUpgradeProcess extends UpgradeProcess {
 		}
 
 		ddmFormValues.addDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "paginationStartParameterName", "start"));
 		ddmFormValues.addDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "paginationEndParameterName", "end"));
 	}
 
-	private DDMFormFieldValue _createDDMFormFieldValue(
+	protected DDMFormFieldValue createDDMFormFieldValue(
 		DDMFormValues ddmFormValues, String name, String value) {
 
 		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
@@ -185,46 +152,78 @@ public class DataProviderInstanceUpgradeProcess extends UpgradeProcess {
 		return ddmFormFieldValue;
 	}
 
-	private DDMFormFieldValue _createDefaultOutputParameters(
+	protected DDMFormFieldValue createDefaultOutputParameters(
 		DDMFormValues ddmFormValues, String outputParameterPath) {
 
-		DDMFormFieldValue ddmFormFieldValue = _createDDMFormFieldValue(
+		DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(
 			ddmFormValues, "outputParameters", null);
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "outputParameterLabel",
 				_DEFAULT_OUTPUT_PARAMETER_LABEL));
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "outputParameterName",
 				_DEFAULT_OUTPUT_PARAMETER_NAME));
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "outputParameterPath", outputParameterPath));
 
 		ddmFormFieldValue.addNestedDDMFormFieldValue(
-			_createDDMFormFieldValue(
+			createDDMFormFieldValue(
 				ddmFormValues, "outputParameterType", "[\"list\"]"));
 
 		return ddmFormFieldValue;
 	}
 
-	private String _createOutputPathValue(
+	protected String createOutputPathValue(
 		Locale locale, Value key, Value value) {
 
 		return StringBundler.concat(
 			key.getString(locale), CharPool.SEMICOLON, value.getString(locale));
 	}
 
-	private String _upgradeDataProviderInstanceDefinition(
+	@Override
+	protected void doUpgrade() throws Exception {
+		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
+				"select dataProviderInstanceId, definition, type_ from " +
+					"DDMDataProviderInstance");
+			PreparedStatement preparedStatement2 =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					connection,
+					"update DDMDataProviderInstance set definition = ? where " +
+						"dataProviderInstanceId = ?");
+			ResultSet resultSet = preparedStatement1.executeQuery()) {
+
+			while (resultSet.next()) {
+				String dataProviderInstanceDefinition = resultSet.getString(2);
+				String type = resultSet.getString(3);
+
+				String newDefinition = upgradeDataProviderInstanceDefinition(
+					dataProviderInstanceDefinition, type);
+
+				preparedStatement2.setString(1, newDefinition);
+
+				long dataProviderInstanceId = resultSet.getLong(1);
+
+				preparedStatement2.setLong(2, dataProviderInstanceId);
+
+				preparedStatement2.addBatch();
+			}
+
+			preparedStatement2.executeBatch();
+		}
+	}
+
+	protected String upgradeDataProviderInstanceDefinition(
 			String dataProviderInstanceDefinition, String type)
 		throws Exception {
 
 		DDMDataProviderSettingsProvider ddmDataProviderSettingsProvider =
-			_serviceTrackerMap.getService(type);
+			_ddmDataProviderSettingsProviderServiceTracker.getService(type);
 
 		DDMFormValues ddmFormValues = DDMFormValuesDeserializeUtil.deserialize(
 			dataProviderInstanceDefinition,
@@ -232,13 +231,13 @@ public class DataProviderInstanceUpgradeProcess extends UpgradeProcess {
 				ddmDataProviderSettingsProvider.getSettings()),
 			_ddmFormValuesDeserializer);
 
-		_addDefaultInputParameters(ddmFormValues);
+		addDefaultInputParameters(ddmFormValues);
 
-		_addDefaultOutputParameters(ddmFormValues);
+		addDefaultOutputParameters(ddmFormValues);
 
-		_addPaginationParameter(ddmFormValues);
+		addPaginationParameter(ddmFormValues);
 
-		_addStartEndParameters(ddmFormValues);
+		addStartEndParameters(ddmFormValues);
 
 		return DDMFormValuesSerializeUtil.serialize(
 			ddmFormValues, _ddmFormValuesSerializer);
@@ -250,9 +249,9 @@ public class DataProviderInstanceUpgradeProcess extends UpgradeProcess {
 	private static final String _DEFAULT_OUTPUT_PARAMETER_NAME =
 		"Default-Output";
 
+	private final ServiceTrackerMap<String, DDMDataProviderSettingsProvider>
+		_ddmDataProviderSettingsProviderServiceTracker;
 	private final DDMFormValuesDeserializer _ddmFormValuesDeserializer;
 	private final DDMFormValuesSerializer _ddmFormValuesSerializer;
-	private final ServiceTrackerMap<String, DDMDataProviderSettingsProvider>
-		_serviceTrackerMap;
 
 }

@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ServiceComponent;
 import com.liferay.portal.kernel.model.ServiceComponentTable;
 import com.liferay.portal.kernel.service.persistence.ServiceComponentPersistence;
-import com.liferay.portal.kernel.service.persistence.ServiceComponentUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -43,7 +42,6 @@ import com.liferay.portal.model.impl.ServiceComponentModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -184,7 +182,7 @@ public class ServiceComponentPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ServiceComponent>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ServiceComponent serviceComponent : list) {
@@ -581,8 +579,7 @@ public class ServiceComponentPersistenceImpl
 
 		Object[] finderArgs = new Object[] {buildNamespace};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -716,7 +713,7 @@ public class ServiceComponentPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByBNS_BNU, finderArgs, this);
+				_finderPathFetchByBNS_BNU, finderArgs);
 		}
 
 		if (result instanceof ServiceComponent) {
@@ -830,8 +827,7 @@ public class ServiceComponentPersistenceImpl
 
 		Object[] finderArgs = new Object[] {buildNamespace, buildNumber};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1308,7 +1304,7 @@ public class ServiceComponentPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ServiceComponent>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1378,7 +1374,7 @@ public class ServiceComponentPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1475,30 +1471,10 @@ public class ServiceComponentPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByBNS_BNU",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"buildNamespace", "buildNumber"}, false);
-
-		_setServiceComponentUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setServiceComponentUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(ServiceComponentImpl.class.getName());
-	}
-
-	private void _setServiceComponentUtilPersistence(
-		ServiceComponentPersistence serviceComponentPersistence) {
-
-		try {
-			Field field = ServiceComponentUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, serviceComponentPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_SERVICECOMPONENT =

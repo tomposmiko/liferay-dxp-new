@@ -16,9 +16,7 @@ package com.liferay.commerce.service.persistence.impl;
 
 import com.liferay.commerce.model.CommerceSubscriptionEntry;
 import com.liferay.commerce.service.persistence.CommerceSubscriptionEntryPersistence;
-import com.liferay.commerce.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  * @generated
  */
-public abstract class CommerceSubscriptionEntryFinderBaseImpl
+public class CommerceSubscriptionEntryFinderBaseImpl
 	extends BasePersistenceImpl<CommerceSubscriptionEntry> {
 
 	public CommerceSubscriptionEntryFinderBaseImpl() {
@@ -52,36 +46,34 @@ public abstract class CommerceSubscriptionEntryFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commerceSubscriptionEntryPersistence.getBadColumnNames();
+		return getCommerceSubscriptionEntryPersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce subscription entry persistence.
+	 *
+	 * @return the commerce subscription entry persistence
+	 */
+	public CommerceSubscriptionEntryPersistence
+		getCommerceSubscriptionEntryPersistence() {
+
+		return commerceSubscriptionEntryPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce subscription entry persistence.
+	 *
+	 * @param commerceSubscriptionEntryPersistence the commerce subscription entry persistence
+	 */
+	public void setCommerceSubscriptionEntryPersistence(
+		CommerceSubscriptionEntryPersistence
+			commerceSubscriptionEntryPersistence) {
+
+		this.commerceSubscriptionEntryPersistence =
+			commerceSubscriptionEntryPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommerceSubscriptionEntryPersistence.class)
 	protected CommerceSubscriptionEntryPersistence
 		commerceSubscriptionEntryPersistence;
 

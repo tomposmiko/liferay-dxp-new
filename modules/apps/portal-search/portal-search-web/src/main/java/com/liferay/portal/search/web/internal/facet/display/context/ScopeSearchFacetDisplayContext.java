@@ -21,11 +21,7 @@ import java.util.List;
 /**
  * @author André de Oliveira
  */
-public class ScopeSearchFacetDisplayContext implements FacetDisplayContext {
-
-	public List<BucketDisplayContext> getBucketDisplayContexts() {
-		return _bucketDisplayContexts;
-	}
+public class ScopeSearchFacetDisplayContext {
 
 	public long getDisplayStyleGroupId() {
 		return _displayStyleGroupId;
@@ -53,18 +49,16 @@ public class ScopeSearchFacetDisplayContext implements FacetDisplayContext {
 		return _siteFacetPortletInstanceConfiguration;
 	}
 
+	public List<ScopeSearchFacetTermDisplayContext> getTermDisplayContexts() {
+		return _scopeSearchFacetTermDisplayContexts;
+	}
+
 	public boolean isNothingSelected() {
 		return _nothingSelected;
 	}
 
 	public boolean isRenderNothing() {
 		return _renderNothing;
-	}
-
-	public void setBucketDisplayContexts(
-		List<BucketDisplayContext> bucketDisplayContexts) {
-
-		_bucketDisplayContexts = bucketDisplayContexts;
 	}
 
 	public void setDisplayStyleGroupId(long displayStyleGroupId) {
@@ -105,7 +99,14 @@ public class ScopeSearchFacetDisplayContext implements FacetDisplayContext {
 			siteFacetPortletInstanceConfiguration;
 	}
 
-	private List<BucketDisplayContext> _bucketDisplayContexts;
+	public void setTermDisplayContexts(
+		List<ScopeSearchFacetTermDisplayContext>
+			scopeSearchFacetTermDisplayContexts) {
+
+		_scopeSearchFacetTermDisplayContexts =
+			scopeSearchFacetTermDisplayContexts;
+	}
+
 	private long _displayStyleGroupId;
 	private boolean _nothingSelected;
 	private String _paginationStartParameterName;
@@ -113,6 +114,8 @@ public class ScopeSearchFacetDisplayContext implements FacetDisplayContext {
 	private String _parameterValue;
 	private List<String> _parameterValues;
 	private boolean _renderNothing;
+	private List<ScopeSearchFacetTermDisplayContext>
+		_scopeSearchFacetTermDisplayContexts;
 	private SiteFacetPortletInstanceConfiguration
 		_siteFacetPortletInstanceConfiguration;
 

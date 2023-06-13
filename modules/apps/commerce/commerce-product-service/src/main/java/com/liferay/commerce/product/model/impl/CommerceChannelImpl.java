@@ -55,7 +55,7 @@ public class CommerceChannelImpl extends CommerceChannelBaseImpl {
 	}
 
 	@Override
-	public UnicodeProperties getTypeSettingsUnicodeProperties() {
+	public UnicodeProperties getTypeSettingsProperties() {
 		if (_typeSettingsUnicodeProperties == null) {
 			_typeSettingsUnicodeProperties = UnicodePropertiesBuilder.create(
 				true
@@ -75,7 +75,7 @@ public class CommerceChannelImpl extends CommerceChannelBaseImpl {
 	}
 
 	@Override
-	public void setTypeSettingsUnicodeProperties(
+	public void setTypeSettingsProperties(
 		UnicodeProperties typeSettingsUnicodeProperties) {
 
 		_typeSettingsUnicodeProperties = typeSettingsUnicodeProperties;

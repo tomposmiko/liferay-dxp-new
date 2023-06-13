@@ -46,6 +46,43 @@ public class DDMFormInstanceRecordUpgradeProcess extends UpgradeProcess {
 		_assetEntryLocalService = assetEntryLocalService;
 	}
 
+	protected void addAssetEntry(
+			String uuid, long formInstanceRecordId, long groupId, long userId,
+			Timestamp createDate, Timestamp modifiedDate,
+			String formInstanceName)
+		throws Exception {
+
+		Locale defautLocale = LocaleUtil.fromLanguageId(
+			LocalizationUtil.getDefaultLanguageId(formInstanceName));
+		Map<Locale, String> localizationMap =
+			LocalizationUtil.getLocalizationMap(formInstanceName);
+
+		if ((defautLocale != null) &&
+			localizationMap.containsKey(defautLocale)) {
+
+			String title = LanguageUtil.format(
+				getResourceBundle(defautLocale), "form-record-for-form-x",
+				localizationMap.get(defautLocale), false);
+
+			_assetEntryLocalService.updateEntry(
+				userId, groupId, createDate, modifiedDate,
+				DDMFormInstanceRecord.class.getName(), formInstanceRecordId,
+				uuid, 0, new long[0], new String[0], true, true, null, null,
+				null, null, ContentTypes.TEXT_HTML, title, null,
+				StringPool.BLANK, null, null, 0, 0, 0.0);
+		}
+	}
+
+	protected void deleteDDLRecord(long recordId) throws Exception {
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"delete from DDLRecord where recordId = ?")) {
+
+			preparedStatement.setLong(1, recordId);
+
+			preparedStatement.executeUpdate();
+		}
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
@@ -90,6 +127,7 @@ public class DDMFormInstanceRecordUpgradeProcess extends UpgradeProcess {
 					8, resultSet.getString("versionUserName"));
 				preparedStatement2.setTimestamp(9, createDate);
 				preparedStatement2.setTimestamp(10, modifiedDate);
+
 				preparedStatement2.setLong(
 					11, resultSet.getLong("recordSetId"));
 				preparedStatement2.setString(
@@ -101,9 +139,9 @@ public class DDMFormInstanceRecordUpgradeProcess extends UpgradeProcess {
 				preparedStatement2.setTimestamp(
 					15, resultSet.getTimestamp("lastPublishDate"));
 
-				_deleteDDLRecord(recordId);
+				deleteDDLRecord(recordId);
 
-				_addAssetEntry(
+				addAssetEntry(
 					uuid, recordId, groupId, userId, createDate, modifiedDate,
 					resultSet.getString("formInstanceName"));
 
@@ -114,44 +152,7 @@ public class DDMFormInstanceRecordUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _addAssetEntry(
-			String uuid, long formInstanceRecordId, long groupId, long userId,
-			Timestamp createDate, Timestamp modifiedDate,
-			String formInstanceName)
-		throws Exception {
-
-		Locale defautLocale = LocaleUtil.fromLanguageId(
-			LocalizationUtil.getDefaultLanguageId(formInstanceName));
-		Map<Locale, String> localizationMap =
-			LocalizationUtil.getLocalizationMap(formInstanceName);
-
-		if ((defautLocale != null) &&
-			localizationMap.containsKey(defautLocale)) {
-
-			String title = LanguageUtil.format(
-				_getResourceBundle(defautLocale), "form-record-for-form-x",
-				localizationMap.get(defautLocale), false);
-
-			_assetEntryLocalService.updateEntry(
-				userId, groupId, createDate, modifiedDate,
-				DDMFormInstanceRecord.class.getName(), formInstanceRecordId,
-				uuid, 0, new long[0], new String[0], true, true, null, null,
-				null, null, ContentTypes.TEXT_HTML, title, null,
-				StringPool.BLANK, null, null, 0, 0, 0.0);
-		}
-	}
-
-	private void _deleteDDLRecord(long recordId) throws Exception {
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				"delete from DDLRecord where recordId = ?")) {
-
-			preparedStatement.setLong(1, recordId);
-
-			preparedStatement.executeUpdate();
-		}
-	}
-
-	private ResourceBundle _getResourceBundle(Locale defaultLocale) {
+	protected ResourceBundle getResourceBundle(Locale defaultLocale) {
 		return PortalUtil.getResourceBundle(defaultLocale);
 	}
 

@@ -25,27 +25,8 @@ export default function nextPage({
 	pages,
 	portletNamespace,
 	rules,
-	selectedPage,
-	title,
 	viewMode,
 }) {
-	const isValidPage = (currentPage, pages) => {
-		const visitor = new PagesVisitor(pages);
-		let validPage = true;
-
-		visitor.mapFields(
-			({valid}, fieldIndex, columnIndex, rowIndex, pageIndex) => {
-				if (currentPage === pageIndex && !valid) {
-					validPage = false;
-				}
-			},
-			true,
-			true
-		);
-
-		return validPage;
-	};
-
 	return (dispatch) => {
 		evaluate(null, {
 			activePage,
@@ -61,35 +42,22 @@ export default function nextPage({
 			viewMode,
 		}).then((evaluatedPages) => {
 			let validPage = true;
+			const visitor = new PagesVisitor(evaluatedPages);
 
-			let currentPage = activePage;
-
-			if (selectedPage) {
-				while (validPage) {
-					validPage = isValidPage(currentPage, evaluatedPages);
-
-					if (currentPage === selectedPage) {
-						break;
+			visitor.mapFields(
+				({valid}, fieldIndex, columnIndex, rowIndex, pageIndex) => {
+					if (activePage === pageIndex && !valid) {
+						validPage = false;
 					}
+				},
+				true,
+				true
+			);
 
-					if (validPage) {
-						currentPage++;
-					}
-				}
-			}
-			else {
-				validPage = isValidPage(activePage, evaluatedPages);
-			}
-
-			if (validPage || selectedPage) {
-				const nextActivePageIndex = selectedPage
-					? evaluatedPages.findIndex(
-							({enabled}, index) =>
-								enabled && index === currentPage
-					  )
-					: evaluatedPages.findIndex(
-							({enabled}, index) => enabled && index > activePage
-					  );
+			if (validPage) {
+				const nextActivePageIndex = evaluatedPages.findIndex(
+					({enabled}, index) => enabled && index > activePage
+				);
 
 				const activePageUpdated = Math.min(
 					nextActivePageIndex,
@@ -108,21 +76,13 @@ export default function nextPage({
 
 				Liferay.fire('ddmFormPageShow', {
 					formId,
-					formPageTitle: pages[activePageUpdated].title,
 					page: activePageUpdated,
-					title,
+					title: pages[activePageUpdated].title,
 				});
-
-				const formPagination = document.getElementsByClassName(
-					'ddm-form-pagination'
-				)[0];
-
-				formPagination.scrollIntoView();
 			}
 			else {
-				const pageIndex = selectedPage ? currentPage : activePage;
 				dispatch({
-					payload: {newPages: evaluatedPages, pageIndex},
+					payload: {newPages: evaluatedPages, pageIndex: activePage},
 					type: CORE_EVENT_TYPES.PAGE.VALIDATION_FAILED,
 				});
 			}

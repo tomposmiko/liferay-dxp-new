@@ -42,16 +42,16 @@ public abstract class BaseLDAPExportModelListener<T extends BaseModel<T>>
 			User user, UserExporter userExporter, LDAPSettings ldapSettings)
 		throws Exception {
 
-		if ((user == null) || user.isGuestUser() ||
+		if ((user == null) || user.isDefaultUser() ||
 			UserImportTransactionThreadLocal.isOriginatesFromImport()) {
 
 			return;
 		}
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
 		Callable<Void> callable = () -> {
+			ServiceContext serviceContext =
+				ServiceContextThreadLocal.getServiceContext();
+
 			Map<String, Serializable> expandoBridgeAttributes = null;
 
 			if (serviceContext != null) {

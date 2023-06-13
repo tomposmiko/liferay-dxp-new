@@ -15,13 +15,10 @@
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
@@ -39,6 +36,8 @@ import com.liferay.portal.search.tuning.rankings.web.internal.index.name.Ranking
 import com.liferay.portal.search.tuning.rankings.web.internal.util.RankingResultUtil;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -69,10 +68,10 @@ public class RankingGetHiddenResultsBuilder {
 	}
 
 	public JSONObject build() {
-		Ranking ranking = _rankingIndexReader.fetch(
+		Optional<Ranking> optional = _rankingIndexReader.fetchOptional(
 			_rankingIndexName, _rankingId);
 
-		if (ranking == null) {
+		if (!optional.isPresent()) {
 			return JSONUtil.put(
 				"documents", JSONFactoryUtil.createJSONArray()
 			).put(
@@ -80,9 +79,11 @@ public class RankingGetHiddenResultsBuilder {
 			);
 		}
 
+		Ranking ranking = optional.get();
+
 		List<String> ids = ranking.getHiddenDocumentIds();
 
-		List<String> paginatedIds = _paginateIds(ids);
+		List<String> paginatedIds = paginateIds(ids);
 
 		return JSONUtil.put(
 			"documents", buildDocuments(paginatedIds, ranking)
@@ -110,12 +111,39 @@ public class RankingGetHiddenResultsBuilder {
 	}
 
 	protected JSONArray buildDocuments(List<String> ids, Ranking ranking) {
-		return JSONUtil.toJSONArray(
-			TransformUtil.transform(
-				ids,
-				id -> _getDocument(
-					ranking.getIndexName(), id, LIFERAY_DOCUMENT_TYPE)),
-			this::translate, _log);
+		Stream<String> stringStream = ids.stream();
+
+		Stream<JSONObject> jsonObjectStream = stringStream.map(
+			id -> getDocument(ranking.getIndexName(), id, LIFERAY_DOCUMENT_TYPE)
+		).filter(
+			document -> document != null
+		).map(
+			this::translate
+		);
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		jsonObjectStream.forEach(jsonArray::put);
+
+		return jsonArray;
+	}
+
+	protected Document getDocument(String indexName, String id, String type) {
+		GetDocumentRequest getDocumentRequest = new GetDocumentRequest(
+			indexName, id);
+
+		getDocumentRequest.setFetchSource(true);
+		getDocumentRequest.setFetchSourceInclude("*");
+		getDocumentRequest.setType(type);
+
+		GetDocumentResponse getDocumentResponse = _searchEngineAdapter.execute(
+			getDocumentRequest);
+
+		if (!getDocumentResponse.isExists()) {
+			return null;
+		}
+
+		return getDocumentResponse.getDocument();
 	}
 
 	protected Query getIdsQuery(List<String> ids) {
@@ -124,6 +152,12 @@ public class RankingGetHiddenResultsBuilder {
 		idsQuery.addIds(ArrayUtil.toStringArray(ids));
 
 		return idsQuery;
+	}
+
+	protected List<String> paginateIds(List<String> ids) {
+		int end = _from + _size;
+
+		return ListUtil.subList(ids, _from, end);
 	}
 
 	protected JSONObject translate(Document document) {
@@ -144,24 +178,6 @@ public class RankingGetHiddenResultsBuilder {
 
 	protected static final String LIFERAY_DOCUMENT_TYPE = "LiferayDocumentType";
 
-	private Document _getDocument(String indexName, String id, String type) {
-		GetDocumentRequest getDocumentRequest = new GetDocumentRequest(
-			indexName, id);
-
-		getDocumentRequest.setFetchSource(true);
-		getDocumentRequest.setFetchSourceInclude("*");
-		getDocumentRequest.setType(type);
-
-		GetDocumentResponse getDocumentResponse = _searchEngineAdapter.execute(
-			getDocumentRequest);
-
-		if (!getDocumentResponse.isExists()) {
-			return null;
-		}
-
-		return getDocumentResponse.getDocument();
-	}
-
 	private String _getViewURL(Document document) {
 		return RankingResultUtil.getRankingResultViewURL(
 			document, _resourceRequest, _resourceResponse, true);
@@ -170,15 +186,6 @@ public class RankingGetHiddenResultsBuilder {
 	private boolean _isAssetDeleted(Document document) {
 		return RankingResultUtil.isAssetDeleted(document);
 	}
-
-	private List<String> _paginateIds(List<String> ids) {
-		int end = _from + _size;
-
-		return ListUtil.subList(ids, _from, end);
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RankingGetHiddenResultsBuilder.class.getName());
 
 	private final DLAppLocalService _dlAppLocalService;
 	private final FastDateFormatFactory _fastDateFormatFactory;

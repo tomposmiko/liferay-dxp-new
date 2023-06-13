@@ -17,17 +17,17 @@ package com.liferay.product.navigation.control.panel.internal.application.list;
 import com.liferay.application.list.BasePanelCategory;
 import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.PanelCategoryKeys;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.category.key=" + PanelCategoryKeys.APPLICATIONS_MENU_APPLICATIONS,
 		"panel.category.order:Integer=100"
@@ -43,11 +43,8 @@ public class ApplicationsContentPanelCategory extends BasePanelCategory {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			locale, "category.applications_menu.applications.content");
 	}
-
-	@Reference
-	private Language _language;
 
 }

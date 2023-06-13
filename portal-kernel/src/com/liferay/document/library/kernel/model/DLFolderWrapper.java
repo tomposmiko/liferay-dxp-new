@@ -48,7 +48,6 @@ public class DLFolderWrapper
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
-		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("folderId", getFolderId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -93,13 +92,6 @@ public class DLFolderWrapper
 
 		if (uuid != null) {
 			setUuid(uuid);
-		}
-
-		String externalReferenceCode = (String)attributes.get(
-			"externalReferenceCode");
-
-		if (externalReferenceCode != null) {
-			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long folderId = (Long)attributes.get("folderId");
@@ -333,16 +325,6 @@ public class DLFolderWrapper
 	}
 
 	/**
-	 * Returns the external reference code of this document library folder.
-	 *
-	 * @return the external reference code of this document library folder
-	 */
-	@Override
-	public String getExternalReferenceCode() {
-		return model.getExternalReferenceCode();
-	}
-
-	/**
 	 * Returns the folder ID of this document library folder.
 	 *
 	 * @return the folder ID of this document library folder
@@ -554,6 +536,18 @@ public class DLFolderWrapper
 	}
 
 	/**
+	 * Returns the trash entry created when this document library folder was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this document library folder.
+	 *
+	 * @return the trash entry created when this document library folder was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getTrashEntry();
+	}
+
+	/**
 	 * Returns the class primary key of the trash entry for this document library folder.
 	 *
 	 * @return the class primary key of the trash entry for this document library folder
@@ -561,6 +555,18 @@ public class DLFolderWrapper
 	@Override
 	public long getTrashEntryClassPK() {
 		return model.getTrashEntryClassPK();
+	}
+
+	/**
+	 * Returns the trash handler for this document library folder.
+	 *
+	 * @return the trash handler for this document library folder
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
+		return model.getTrashHandler();
 	}
 
 	/**
@@ -708,6 +714,26 @@ public class DLFolderWrapper
 		return model.isInTrash();
 	}
 
+	/**
+	 * Returns <code>true</code> if the parent of this document library folder is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this document library folder is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer() {
+		return model.isInTrashContainer();
+	}
+
+	@Override
+	public boolean isInTrashExplicitly() {
+		return model.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return model.isInTrashImplicitly();
+	}
+
 	@Override
 	public boolean isLocked() {
 		return model.isLocked();
@@ -811,16 +837,6 @@ public class DLFolderWrapper
 	@Override
 	public void setDescription(String description) {
 		model.setDescription(description);
-	}
-
-	/**
-	 * Sets the external reference code of this document library folder.
-	 *
-	 * @param externalReferenceCode the external reference code of this document library folder
-	 */
-	@Override
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		model.setExternalReferenceCode(externalReferenceCode);
 	}
 
 	/**
@@ -1061,11 +1077,6 @@ public class DLFolderWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

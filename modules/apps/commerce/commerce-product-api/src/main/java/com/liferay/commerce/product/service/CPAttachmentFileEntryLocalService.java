@@ -16,9 +16,7 @@ package com.liferay.commerce.product.service;
 
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -34,8 +32,6 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -60,15 +56,13 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CPAttachmentFileEntryLocalServiceUtil
  * @generated
  */
-@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface CPAttachmentFileEntryLocalService
-	extends BaseLocalService, CTService<CPAttachmentFileEntry>,
-			PersistedModelLocalService {
+	extends BaseLocalService, PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -260,10 +254,25 @@ public interface CPAttachmentFileEntryLocalService
 	public CPAttachmentFileEntry fetchCPAttachmentFileEntry(
 		long CPAttachmentFileEntryId);
 
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry, or <code>null</code> if a matching cp attachment file entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPAttachmentFileEntry
 		fetchCPAttachmentFileEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId);
+			long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPAttachmentFileEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public CPAttachmentFileEntry fetchCPAttachmentFileEntryByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	/**
 	 * Returns the cp attachment file entry matching the UUID and group.
@@ -313,12 +322,6 @@ public interface CPAttachmentFileEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CPAttachmentFileEntry> getCPAttachmentFileEntries(
-			long classNameId, long classPK, String keywords, int type,
-			int status, int start, int end)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CPAttachmentFileEntry> getCPAttachmentFileEntries(
 			long cpDefinitionId, String serializedDDMFormValues, int type,
 			int start, int end)
 		throws Exception;
@@ -363,12 +366,6 @@ public interface CPAttachmentFileEntryLocalService
 	public int getCPAttachmentFileEntriesCount(
 		long classNameId, long classPK, int type, int status);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCPAttachmentFileEntriesCount(
-			long classNameId, long classPK, String keywords, int type,
-			int status)
-		throws PortalException;
-
 	/**
 	 * Returns the cp attachment file entry with the primary key.
 	 *
@@ -381,10 +378,18 @@ public interface CPAttachmentFileEntryLocalService
 			long CPAttachmentFileEntryId)
 		throws PortalException;
 
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry
+	 * @throws PortalException if a matching cp attachment file entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPAttachmentFileEntry
 			getCPAttachmentFileEntryByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
+				long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -454,20 +459,5 @@ public interface CPAttachmentFileEntryLocalService
 			ServiceContext serviceContext,
 			Map<String, Serializable> workflowContext)
 		throws PortalException;
-
-	@Override
-	@Transactional(enabled = false)
-	public CTPersistence<CPAttachmentFileEntry> getCTPersistence();
-
-	@Override
-	@Transactional(enabled = false)
-	public Class<CPAttachmentFileEntry> getModelClass();
-
-	@Override
-	@Transactional(rollbackFor = Throwable.class)
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CPAttachmentFileEntry>, R, E>
-				updateUnsafeFunction)
-		throws E;
 
 }

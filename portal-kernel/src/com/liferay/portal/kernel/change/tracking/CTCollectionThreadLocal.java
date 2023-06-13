@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.change.tracking;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.petra.lang.SafeClosable;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
@@ -23,14 +24,12 @@ import com.liferay.portal.kernel.util.ServiceProxyFactory;
  */
 public class CTCollectionThreadLocal {
 
-	public static final long CT_COLLECTION_ID_PRODUCTION = 0;
-
 	public static long getCTCollectionId() {
 		return _ctCollectionId.get();
 	}
 
 	public static boolean isProductionMode() {
-		if (_ctCollectionId.get() == CT_COLLECTION_ID_PRODUCTION) {
+		if (_ctCollectionId.get() == 0) {
 			return true;
 		}
 
@@ -41,21 +40,26 @@ public class CTCollectionThreadLocal {
 		_ctCollectionId.remove();
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #setCTCollectionIdWithSafeCloseable(long)}
+	 */
+	@Deprecated
+	public static SafeClosable setCTCollectionId(long ctCollectionId) {
+		return _ctCollectionId.setWithSafeClosable(ctCollectionId);
+	}
+
 	public static SafeCloseable setCTCollectionIdWithSafeCloseable(
 		long ctCollectionId) {
 
 		return _ctCollectionId.setWithSafeCloseable(ctCollectionId);
 	}
 
-	public static SafeCloseable setProductionModeWithSafeCloseable() {
-		return setCTCollectionIdWithSafeCloseable(CT_COLLECTION_ID_PRODUCTION);
-	}
-
 	private static long _getCTCollectionId() {
 		CTCollectionIdSupplier ctCollectionIdSupplier = _ctCollectionIdSupplier;
 
 		if (ctCollectionIdSupplier == null) {
-			return CT_COLLECTION_ID_PRODUCTION;
+			return 0;
 		}
 
 		return ctCollectionIdSupplier.getCTCollectionId();

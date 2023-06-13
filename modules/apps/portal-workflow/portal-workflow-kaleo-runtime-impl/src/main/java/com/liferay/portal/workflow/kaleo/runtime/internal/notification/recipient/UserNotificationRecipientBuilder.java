@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	property = "recipient.type=USER",
+	immediate = true, property = "recipient.type=USER",
 	service = NotificationRecipientBuilder.class
 )
 public class UserNotificationRecipientBuilder
@@ -48,7 +48,7 @@ public class UserNotificationRecipientBuilder
 			ExecutionContext executionContext)
 		throws Exception {
 
-		_addUserNotificationRecipient(
+		addUserNotificationRecipient(
 			notificationRecipients,
 			kaleoNotificationRecipient.getRecipientClassPK(),
 			notificationReceptionType, executionContext);
@@ -62,13 +62,13 @@ public class UserNotificationRecipientBuilder
 			ExecutionContext executionContext)
 		throws Exception {
 
-		_addUserNotificationRecipient(
+		addUserNotificationRecipient(
 			notificationRecipients,
 			kaleoTaskAssignmentInstance.getAssigneeClassPK(),
 			notificationReceptionType, executionContext);
 	}
 
-	private void _addUserNotificationRecipient(
+	protected void addUserNotificationRecipient(
 			Set<NotificationRecipient> notificationRecipients, long userId,
 			NotificationReceptionType notificationReceptionType,
 			ExecutionContext executionContext)

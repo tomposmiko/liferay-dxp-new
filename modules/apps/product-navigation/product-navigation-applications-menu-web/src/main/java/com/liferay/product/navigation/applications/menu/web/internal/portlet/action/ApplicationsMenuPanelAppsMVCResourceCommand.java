@@ -24,7 +24,7 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -51,6 +51,7 @@ import com.liferay.site.util.RecentGroupManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.portlet.PortletURL;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -63,6 +64,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ProductNavigationApplicationsMenuPortletKeys.PRODUCT_NAVIGATION_APPLICATIONS_MENU,
 		"mvc.command.name=/applications_menu/panel_apps"
@@ -111,7 +113,7 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 		throws Exception {
 
 		JSONArray childPanelCategoriesJSONArray =
-			_jsonFactory.createJSONArray();
+			JSONFactoryUtil.createJSONArray();
 
 		List<PanelCategory> childPanelCategories =
 			_panelCategoryRegistry.getChildPanelCategories(
@@ -179,7 +181,7 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		JSONArray panelAppsJSONArray = _jsonFactory.createJSONArray();
+		JSONArray panelAppsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		List<PanelApp> panelApps = _panelAppRegistry.getPanelApps(
 			key, themeDisplay.getPermissionChecker(),
@@ -198,7 +200,7 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 			HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		JSONArray panelCategoriesJSONArray = _jsonFactory.createJSONArray();
+		JSONArray panelCategoriesJSONArray = JSONFactoryUtil.createJSONArray();
 
 		List<PanelCategory> applicationsMenuPanelCategories =
 			_panelCategoryRegistry.getChildPanelCategories(
@@ -207,19 +209,12 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 				themeDisplay.getScopeGroup());
 
 		for (PanelCategory panelCategory : applicationsMenuPanelCategories) {
-			JSONArray childCategoriesJSONArray =
-				_getChildPanelCategoriesJSONArray(
-					httpServletRequest, panelCategory.getKey(), themeDisplay);
-
-			if ((childCategoriesJSONArray == null) ||
-				(childCategoriesJSONArray.length() <= 0)) {
-
-				continue;
-			}
-
 			panelCategoriesJSONArray.put(
 				JSONUtil.put(
-					"childCategories", childCategoriesJSONArray
+					"childCategories",
+					_getChildPanelCategoriesJSONArray(
+						httpServletRequest, panelCategory.getKey(),
+						themeDisplay)
 				).put(
 					"key", panelCategory.getKey()
 				).put(
@@ -235,7 +230,7 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		JSONArray recentSitesJSONArray = _jsonFactory.createJSONArray();
+		JSONArray recentSitesJSONArray = JSONFactoryUtil.createJSONArray();
 
 		boolean applicationMenuApp = _isApplicationMenuApp(
 			resourceRequest, themeDisplay);
@@ -266,7 +261,7 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 			ThemeDisplay themeDisplay)
 		throws Exception {
 
-		JSONObject sitesJSONObject = _jsonFactory.createJSONObject();
+		JSONObject sitesJSONObject = JSONFactoryUtil.createJSONObject();
 
 		int max = 8;
 
@@ -334,11 +329,12 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 		siteItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new URLItemSelectorReturnType());
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(resourceRequest),
-				resourceResponse.getNamespace() + "selectSite",
-				siteItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(resourceRequest),
+			resourceResponse.getNamespace() + "selectSite",
+			siteItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	private boolean _isApplicationMenuApp(
@@ -373,9 +369,6 @@ public class ApplicationsMenuPanelAppsMVCResourceCommand
 
 	@Reference
 	private ItemSelector _itemSelector;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private PanelAppRegistry _panelAppRegistry;

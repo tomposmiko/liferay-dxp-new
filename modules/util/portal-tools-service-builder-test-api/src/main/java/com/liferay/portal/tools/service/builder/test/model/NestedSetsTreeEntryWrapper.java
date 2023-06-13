@@ -223,11 +223,6 @@ public class NestedSetsTreeEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public long getNestedSetsTreeNodeLeft() {
 		return model.getNestedSetsTreeNodeLeft();
 	}

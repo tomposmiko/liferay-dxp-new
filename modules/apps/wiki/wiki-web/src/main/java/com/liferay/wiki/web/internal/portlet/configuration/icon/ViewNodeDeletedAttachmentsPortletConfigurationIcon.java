@@ -14,13 +14,13 @@
 
 package com.liferay.wiki.web.internal.portlet.configuration.icon;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
 		"path=/wiki/view_pages"
@@ -51,8 +52,9 @@ public class ViewNodeDeletedAttachmentsPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(
-			getLocale(portletRequest), "view-removed-attachments");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)),
+			"view-removed-attachments");
 	}
 
 	@Override
@@ -84,7 +86,7 @@ public class ViewNodeDeletedAttachmentsPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -108,7 +110,7 @@ public class ViewNodeDeletedAttachmentsPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -117,9 +119,6 @@ public class ViewNodeDeletedAttachmentsPortletConfigurationIcon
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ViewNodeDeletedAttachmentsPortletConfigurationIcon.class);
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = SearchContextContributor.class)
+@Component(immediate = true, service = SearchContextContributor.class)
 public class RelatedEntrySearchContextContributor
 	implements SearchContextContributor {
 
@@ -42,10 +42,11 @@ public class RelatedEntrySearchContextContributor
 				searchContextContributorHelper.getSearchClassNames());
 		}
 
-		searchContext.setEntryClassNames(
-			ArrayUtil.append(
-				searchContextContributorHelper.getSearchClassNames(),
-				fullQueryEntryClassNames));
+		String[] entryClassNames = ArrayUtil.append(
+			searchContextContributorHelper.getSearchClassNames(),
+			fullQueryEntryClassNames);
+
+		searchContext.setEntryClassNames(entryClassNames);
 	}
 
 }

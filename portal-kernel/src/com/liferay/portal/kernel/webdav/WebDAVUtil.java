@@ -31,9 +31,8 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -111,7 +110,7 @@ public class WebDAVUtil {
 
 		String destination = pathSegments[pathSegments.length - 1];
 
-		destination = HttpComponentsUtil.decodePath(destination);
+		destination = HttpUtil.decodePath(destination);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Destination " + destination);
@@ -167,10 +166,15 @@ public class WebDAVUtil {
 
 		// Guest
 
-		if (user.isGuestUser()) {
-			return ListUtil.fromArray(
-				GroupLocalServiceUtil.getGroup(
-					user.getCompanyId(), GroupConstants.GUEST));
+		if (user.isDefaultUser()) {
+			List<Group> groups = new ArrayList<>();
+
+			Group group = GroupLocalServiceUtil.getGroup(
+				user.getCompanyId(), GroupConstants.GUEST);
+
+			groups.add(group);
+
+			return groups;
 		}
 
 		// Communities
@@ -196,7 +200,7 @@ public class WebDAVUtil {
 
 		// User
 
-		if (!user.isGuestUser()) {
+		if (!user.isDefaultUser()) {
 			groups.add(user.getGroup());
 		}
 
@@ -246,7 +250,7 @@ public class WebDAVUtil {
 	}
 
 	public static String[] getPathArray(String path, boolean fixTrailing) {
-		path = HttpComponentsUtil.fixPath(path, true, fixTrailing);
+		path = HttpUtil.fixPath(path, true, fixTrailing);
 
 		return StringUtil.split(path, CharPool.SLASH);
 	}

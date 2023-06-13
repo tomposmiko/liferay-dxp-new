@@ -33,11 +33,8 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.search.experiences.model.impl.SXPElementImpl",
-		"table.name=SXPElement"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {SXPElementModelArgumentsResolver.class, ArgumentsResolver.class}
 )
 public class SXPElementModelArgumentsResolver implements ArgumentsResolver {
 

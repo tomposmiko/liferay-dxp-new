@@ -21,18 +21,15 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.PasswordPolicy;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.PasswordPolicyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.user.associated.data.anonymizer.UADAnonymousUserProvider;
 import com.liferay.user.associated.data.web.internal.configuration.AnonymousUserConfiguration;
 import com.liferay.user.associated.data.web.internal.configuration.AnonymousUserConfigurationRetriever;
@@ -40,6 +37,7 @@ import com.liferay.user.associated.data.web.internal.configuration.AnonymousUser
 import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.component.annotations.Component;
@@ -49,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  * @author Erick Monteiro
  */
-@Component(service = UADAnonymousUserProvider.class)
+@Component(immediate = true, service = UADAnonymousUserProvider.class)
 public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 
 	@Override
@@ -70,7 +68,7 @@ public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -80,10 +78,7 @@ public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 	private User _createAnonymousUser(long companyId) throws Exception {
 		long creatorUserId = 0;
 
-		PasswordPolicy passwordPolicy =
-			_passwordPolicyLocalService.getDefaultPasswordPolicy(companyId);
-
-		String randomString = PwdToolkitUtil.generate(passwordPolicy);
+		String randomString = StringUtil.randomString();
 
 		long counter = _counterLocalService.increment(
 			UADAnonymousUserProvider.class.getName());
@@ -100,8 +95,8 @@ public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 		String firstName = "Anonymous";
 		String middleName = StringPool.BLANK;
 		String lastName = "Anonymous";
-		long prefixListTypeId = 0;
-		long suffixListTypeId = 0;
+		long prefixId = 0;
+		long suffixId = 0;
 		int birthdayMonth = Calendar.JANUARY;
 		int birthdayDay = 1;
 		int birthdayYear = 1970;
@@ -110,9 +105,8 @@ public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 		User anonymousUser = _userLocalService.addUser(
 			creatorUserId, companyId, false, randomString, randomString, false,
 			screenName, emailAddress, locale, firstName, middleName, lastName,
-			prefixListTypeId, suffixListTypeId, true, birthdayMonth,
-			birthdayDay, birthdayYear, jobTitle, UserConstants.TYPE_REGULAR,
-			null, null, null, null, false, null);
+			prefixId, suffixId, true, birthdayMonth, birthdayDay, birthdayYear,
+			jobTitle, null, null, null, null, false, null);
 
 		anonymousUser.setComments(
 			StringBundler.concat(
@@ -130,10 +124,10 @@ public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 	}
 
 	private User _getAnonymousUser(long companyId) throws Exception {
-		Configuration configuration = _anonymousUserConfigurationRetriever.get(
-			companyId);
+		Optional<Configuration> configurationOptional =
+			_anonymousUserConfigurationRetriever.getOptional(companyId);
 
-		if (configuration == null) {
+		if (!configurationOptional.isPresent()) {
 			User anonymousUser = _createAnonymousUser(companyId);
 
 			_configurationProvider.saveCompanyConfiguration(
@@ -146,6 +140,8 @@ public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 
 			return anonymousUser;
 		}
+
+		Configuration configuration = configurationOptional.get();
 
 		Dictionary<String, Object> properties = configuration.getProperties();
 
@@ -184,9 +180,6 @@ public class UADAnonymousUserProviderImpl implements UADAnonymousUserProvider {
 
 	@Reference
 	private CounterLocalService _counterLocalService;
-
-	@Reference
-	private PasswordPolicyLocalService _passwordPolicyLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

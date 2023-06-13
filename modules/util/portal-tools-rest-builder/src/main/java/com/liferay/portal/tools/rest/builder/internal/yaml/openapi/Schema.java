@@ -14,6 +14,8 @@
 
 package com.liferay.portal.tools.rest.builder.internal.yaml.openapi;
 
+import java.beans.Transient;
+
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +57,12 @@ public class Schema {
 		return _enumValues;
 	}
 
-	public Object getExample() {
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	@Transient
+	public String getExample() {
 		return _example;
 	}
 
@@ -71,20 +78,8 @@ public class Schema {
 		return _maximum;
 	}
 
-	public Integer getMaxLength() {
-		return _maxLength;
-	}
-
 	public Double getMinimum() {
 		return _minimum;
-	}
-
-	public Integer getMinLength() {
-		return _minLength;
-	}
-
-	public String getName() {
-		return _name;
 	}
 
 	public List<Schema> getOneOfSchemas() {
@@ -105,10 +100,6 @@ public class Schema {
 
 	public String getType() {
 		return _type;
-	}
-
-	public XML getXml() {
-		return _xml;
 	}
 
 	public boolean isDeprecated() {
@@ -155,7 +146,12 @@ public class Schema {
 		_enumValues = enumValues;
 	}
 
-	public void setExample(Object example) {
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	@Transient
+	public void setExample(String example) {
 		_example = example;
 	}
 
@@ -175,20 +171,8 @@ public class Schema {
 		_maximum = maximum;
 	}
 
-	public void setMaxLength(Integer maxLength) {
-		_maxLength = maxLength;
-	}
-
 	public void setMinimum(Double minimum) {
 		_minimum = minimum;
-	}
-
-	public void setMinLength(Integer minLength) {
-		_minLength = minLength;
-	}
-
-	public void setName(String name) {
-		_name = name;
 	}
 
 	public void setOneOfSchemas(List<Schema> oneOfSchemas) {
@@ -221,10 +205,6 @@ public class Schema {
 		_writeOnly = writeOnly;
 	}
 
-	public void setXML(XML xml) {
-		_xml = xml;
-	}
-
 	private Schema _additionalPropertySchema;
 	private List<Schema> _allOfSchemas;
 	private List<Schema> _anyOfSchemas;
@@ -232,15 +212,12 @@ public class Schema {
 	private boolean _deprecated;
 	private String _description;
 	private List<String> _enumValues;
-	private Object _example;
+	private String _example;
 	private String _format;
 	private Items _items;
 	private boolean _jsonMap;
 	private Double _maximum;
-	private Integer _maxLength;
 	private Double _minimum;
-	private Integer _minLength;
-	private String _name;
 	private List<Schema> _oneOfSchemas;
 	private Map<String, Schema> _propertySchemas;
 	private boolean _readOnly;
@@ -248,6 +225,5 @@ public class Schema {
 	private List<String> _requiredPropertySchemaNames;
 	private String _type;
 	private boolean _writeOnly;
-	private XML _xml;
 
 }

@@ -19,13 +19,13 @@ import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
 import com.liferay.dynamic.data.lists.constants.DDLWebKeys;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -124,7 +124,7 @@ public class KaleoProcessAssetRenderer
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 
@@ -192,7 +192,7 @@ public class KaleoProcessAssetRenderer
 		httpServletRequest.setAttribute(
 			KaleoFormsWebKeys.KALEO_PROCESS, _kaleoProcess);
 
-		KaleoProcessLink kaleoProcessLink = _fetchKaleoProcessLink(
+		KaleoProcessLink kaleoProcessLink = fetchKaleoProcessLink(
 			httpServletRequest);
 
 		httpServletRequest.setAttribute(
@@ -201,19 +201,13 @@ public class KaleoProcessAssetRenderer
 		return super.include(httpServletRequest, httpServletResponse, template);
 	}
 
-	protected void setKaleoProcessLinkLocalService(
-		KaleoProcessLinkLocalService kaleoProcessLinkLocalService) {
-
-		_kaKaleoProcessLinkLocalService = kaleoProcessLinkLocalService;
-	}
-
-	private KaleoProcessLink _fetchKaleoProcessLink(
+	protected KaleoProcessLink fetchKaleoProcessLink(
 			HttpServletRequest httpServletRequest)
 		throws Exception {
 
 		KaleoProcessLink kaleoProcessLink = null;
 
-		WorkflowTask workflowTask = _getWorkflowTask(httpServletRequest);
+		WorkflowTask workflowTask = getWorkflowTask(httpServletRequest);
 
 		if (workflowTask != null) {
 			kaleoProcessLink =
@@ -224,7 +218,8 @@ public class KaleoProcessAssetRenderer
 		return kaleoProcessLink;
 	}
 
-	private WorkflowTask _getWorkflowTask(HttpServletRequest httpServletRequest)
+	protected WorkflowTask getWorkflowTask(
+			HttpServletRequest httpServletRequest)
 		throws Exception {
 
 		WorkflowTask workflowTask = null;
@@ -242,6 +237,12 @@ public class KaleoProcessAssetRenderer
 		}
 
 		return workflowTask;
+	}
+
+	protected void setKaleoProcessLinkLocalService(
+		KaleoProcessLinkLocalService kaleoProcessLinkLocalService) {
+
+		_kaKaleoProcessLinkLocalService = kaleoProcessLinkLocalService;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

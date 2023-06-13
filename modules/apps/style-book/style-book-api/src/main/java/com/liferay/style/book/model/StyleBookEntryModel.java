@@ -341,8 +341,4 @@ public interface StyleBookEntryModel
 	@Override
 	public StyleBookEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

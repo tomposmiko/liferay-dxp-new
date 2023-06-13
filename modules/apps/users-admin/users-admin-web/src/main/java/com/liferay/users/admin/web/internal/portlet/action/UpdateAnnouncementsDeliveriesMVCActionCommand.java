@@ -40,10 +40,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ACCOUNT,
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
-		"javax.portlet.name=" + UsersAdminPortletKeys.SERVICE_ACCOUNTS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/users_admin/update_announcements_deliveries"
 	},
@@ -60,7 +60,7 @@ public class UpdateAnnouncementsDeliveriesMVCActionCommand
 		User user = _portal.getSelectedUser(actionRequest);
 
 		List<AnnouncementsDelivery> announcementsDeliveries =
-			_getAnnouncementsDeliveries(actionRequest, user);
+			getAnnouncementsDeliveries(actionRequest, user);
 
 		for (AnnouncementsDelivery announcementsDelivery :
 				announcementsDeliveries) {
@@ -78,7 +78,7 @@ public class UpdateAnnouncementsDeliveriesMVCActionCommand
 		}
 	}
 
-	private List<AnnouncementsDelivery> _getAnnouncementsDeliveries(
+	protected List<AnnouncementsDelivery> getAnnouncementsDeliveries(
 		ActionRequest actionRequest) {
 
 		List<AnnouncementsDelivery> announcementsDeliveries = new ArrayList<>();
@@ -99,7 +99,7 @@ public class UpdateAnnouncementsDeliveriesMVCActionCommand
 		return announcementsDeliveries;
 	}
 
-	private List<AnnouncementsDelivery> _getAnnouncementsDeliveries(
+	protected List<AnnouncementsDelivery> getAnnouncementsDeliveries(
 			ActionRequest actionRequest, User user)
 		throws Exception {
 
@@ -112,7 +112,7 @@ public class UpdateAnnouncementsDeliveriesMVCActionCommand
 				user.getUserId());
 		}
 
-		return _getAnnouncementsDeliveries(actionRequest);
+		return getAnnouncementsDeliveries(actionRequest);
 	}
 
 	@Reference

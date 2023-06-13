@@ -13,15 +13,15 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {fireEvent, render} from '@testing-library/react';
+import {cleanup, fireEvent, render} from '@testing-library/react';
 import React from 'react';
 
 import {StoreAPIContextProvider} from '../../../../src/main/resources/META-INF/resources/page_editor/app/contexts/StoreContext';
 import ItemSelector from '../../../../src/main/resources/META-INF/resources/page_editor/common/components/ItemSelector';
-import {openItemSelector} from '../../../../src/main/resources/META-INF/resources/page_editor/common/openItemSelector';
+import {openItemSelector} from '../../../../src/main/resources/META-INF/resources/page_editor/core/openItemSelector';
 
 jest.mock(
-	'../../../../src/main/resources/META-INF/resources/page_editor/app/config/index',
+	'../../../../src/main/resources/META-INF/resources/page_editor/app/config',
 	() => ({
 		config: {
 			infoItemSelectorUrl: 'infoItemSelectorUrl',
@@ -31,16 +31,11 @@ jest.mock(
 );
 
 jest.mock(
-	'../../../../src/main/resources/META-INF/resources/page_editor/common/openItemSelector',
+	'../../../../src/main/resources/META-INF/resources/page_editor/core/openItemSelector',
 	() => ({
 		openItemSelector: jest.fn(() => {}),
 	})
 );
-
-jest.mock('frontend-js-web', () => ({
-	...jest.requireActual('frontend-js-web'),
-	sub: jest.fn((langKey, args) => langKey.replace('x', args)),
-}));
 
 function renderItemSelector({
 	pageContents = [],
@@ -50,6 +45,10 @@ function renderItemSelector({
 	const state = {
 		pageContents,
 	};
+
+	Liferay.Util.sub.mockImplementation((langKey, args) =>
+		langKey.replace('x', args)
+	);
 
 	return render(
 		<StoreAPIContextProvider dispatch={() => {}} getState={() => state}>
@@ -72,6 +71,8 @@ function renderItemSelector({
 
 describe('ItemSelector', () => {
 	afterEach(() => {
+		cleanup();
+
 		openItemSelector.mockClear();
 	});
 

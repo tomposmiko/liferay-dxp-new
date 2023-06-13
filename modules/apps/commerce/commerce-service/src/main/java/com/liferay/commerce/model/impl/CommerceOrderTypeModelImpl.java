@@ -16,9 +16,9 @@ package com.liferay.commerce.model.impl;
 
 import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.model.CommerceOrderTypeModel;
+import com.liferay.commerce.model.CommerceOrderTypeSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.LocaleException;
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -42,15 +41,18 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -82,7 +84,6 @@ public class CommerceOrderTypeModelImpl
 	public static final String TABLE_NAME = "CommerceOrderType";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
 		{"externalReferenceCode", Types.VARCHAR},
 		{"commerceOrderTypeId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
@@ -99,8 +100,6 @@ public class CommerceOrderTypeModelImpl
 		new HashMap<String, Integer>();
 
 	static {
-		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commerceOrderTypeId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -122,7 +121,7 @@ public class CommerceOrderTypeModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceOrderType (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,commerceOrderTypeId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,active_ BOOLEAN,displayDate DATE null,displayOrder INTEGER,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table CommerceOrderType (externalReferenceCode VARCHAR(75) null,commerceOrderTypeId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,active_ BOOLEAN,displayDate DATE null,displayOrder INTEGER,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommerceOrderType";
 
@@ -139,67 +138,125 @@ public class CommerceOrderTypeModelImpl
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
 	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static final long ACTIVE_COLUMN_BITMASK = 1L;
+	public static final boolean ENTITY_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean FINDER_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean COLUMN_BITMASK_ENABLED = true;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long COMPANYID_COLUMN_BITMASK = 2L;
+	public static final long COMPANYID_COLUMN_BITMASK = 1L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long DISPLAYDATE_COLUMN_BITMASK = 4L;
+	public static final long DISPLAYDATE_COLUMN_BITMASK = 2L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long EXPIRATIONDATE_COLUMN_BITMASK = 8L;
+	public static final long EXPIRATIONDATE_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long EXTERNALREFERENCECODE_COLUMN_BITMASK = 16L;
+	public static final long EXTERNALREFERENCECODE_COLUMN_BITMASK = 8L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long STATUS_COLUMN_BITMASK = 32L;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
-	 */
-	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 64L;
+	public static final long STATUS_COLUMN_BITMASK = 16L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long CREATEDATE_COLUMN_BITMASK = 128L;
+	public static final long CREATEDATE_COLUMN_BITMASK = 32L;
 
 	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+	public static CommerceOrderType toModel(CommerceOrderTypeSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		CommerceOrderType model = new CommerceOrderTypeImpl();
+
+		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
+		model.setCommerceOrderTypeId(soapModel.getCommerceOrderTypeId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setActive(soapModel.isActive());
+		model.setDisplayDate(soapModel.getDisplayDate());
+		model.setDisplayOrder(soapModel.getDisplayOrder());
+		model.setExpirationDate(soapModel.getExpirationDate());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+		model.setStatus(soapModel.getStatus());
+		model.setStatusByUserId(soapModel.getStatusByUserId());
+		model.setStatusByUserName(soapModel.getStatusByUserName());
+		model.setStatusDate(soapModel.getStatusDate());
+
+		return model;
 	}
 
 	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	public static List<CommerceOrderType> toModels(
+		CommerceOrderTypeSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<CommerceOrderType> models = new ArrayList<CommerceOrderType>(
+			soapModels.length);
+
+		for (CommerceOrderTypeSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.commerce.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.commerce.model.CommerceOrderType"));
 
 	public CommerceOrderTypeModelImpl() {
 	}
@@ -277,213 +334,165 @@ public class CommerceOrderTypeModelImpl
 	public Map<String, Function<CommerceOrderType, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CommerceOrderType, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CommerceOrderType>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CommerceOrderType, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceOrderType.class.getClassLoader(), CommerceOrderType.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<CommerceOrderType, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<CommerceOrderType, Object>>();
+		try {
+			Constructor<CommerceOrderType> constructor =
+				(Constructor<CommerceOrderType>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CommerceOrderType::getMvccVersion);
-			attributeGetterFunctions.put("uuid", CommerceOrderType::getUuid);
-			attributeGetterFunctions.put(
-				"externalReferenceCode",
-				CommerceOrderType::getExternalReferenceCode);
-			attributeGetterFunctions.put(
-				"commerceOrderTypeId",
-				CommerceOrderType::getCommerceOrderTypeId);
-			attributeGetterFunctions.put(
-				"companyId", CommerceOrderType::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", CommerceOrderType::getUserId);
-			attributeGetterFunctions.put(
-				"userName", CommerceOrderType::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", CommerceOrderType::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", CommerceOrderType::getModifiedDate);
-			attributeGetterFunctions.put("name", CommerceOrderType::getName);
-			attributeGetterFunctions.put(
-				"description", CommerceOrderType::getDescription);
-			attributeGetterFunctions.put(
-				"active", CommerceOrderType::getActive);
-			attributeGetterFunctions.put(
-				"displayDate", CommerceOrderType::getDisplayDate);
-			attributeGetterFunctions.put(
-				"displayOrder", CommerceOrderType::getDisplayOrder);
-			attributeGetterFunctions.put(
-				"expirationDate", CommerceOrderType::getExpirationDate);
-			attributeGetterFunctions.put(
-				"lastPublishDate", CommerceOrderType::getLastPublishDate);
-			attributeGetterFunctions.put(
-				"status", CommerceOrderType::getStatus);
-			attributeGetterFunctions.put(
-				"statusByUserId", CommerceOrderType::getStatusByUserId);
-			attributeGetterFunctions.put(
-				"statusByUserName", CommerceOrderType::getStatusByUserName);
-			attributeGetterFunctions.put(
-				"statusDate", CommerceOrderType::getStatusDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
-	}
-
-	private static class AttributeSetterBiConsumersHolder {
-
-		private static final Map<String, BiConsumer<CommerceOrderType, Object>>
-			_attributeSetterBiConsumers;
-
-		static {
-			Map<String, BiConsumer<CommerceOrderType, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<CommerceOrderType, ?>>();
-
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CommerceOrderType, Long>)
-					CommerceOrderType::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<CommerceOrderType, String>)
-					CommerceOrderType::setUuid);
-			attributeSetterBiConsumers.put(
-				"externalReferenceCode",
-				(BiConsumer<CommerceOrderType, String>)
-					CommerceOrderType::setExternalReferenceCode);
-			attributeSetterBiConsumers.put(
-				"commerceOrderTypeId",
-				(BiConsumer<CommerceOrderType, Long>)
-					CommerceOrderType::setCommerceOrderTypeId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CommerceOrderType, Long>)
-					CommerceOrderType::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<CommerceOrderType, Long>)
-					CommerceOrderType::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<CommerceOrderType, String>)
-					CommerceOrderType::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CommerceOrderType, Date>)
-					CommerceOrderType::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<CommerceOrderType, Date>)
-					CommerceOrderType::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<CommerceOrderType, String>)
-					CommerceOrderType::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<CommerceOrderType, String>)
-					CommerceOrderType::setDescription);
-			attributeSetterBiConsumers.put(
-				"active",
-				(BiConsumer<CommerceOrderType, Boolean>)
-					CommerceOrderType::setActive);
-			attributeSetterBiConsumers.put(
-				"displayDate",
-				(BiConsumer<CommerceOrderType, Date>)
-					CommerceOrderType::setDisplayDate);
-			attributeSetterBiConsumers.put(
-				"displayOrder",
-				(BiConsumer<CommerceOrderType, Integer>)
-					CommerceOrderType::setDisplayOrder);
-			attributeSetterBiConsumers.put(
-				"expirationDate",
-				(BiConsumer<CommerceOrderType, Date>)
-					CommerceOrderType::setExpirationDate);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<CommerceOrderType, Date>)
-					CommerceOrderType::setLastPublishDate);
-			attributeSetterBiConsumers.put(
-				"status",
-				(BiConsumer<CommerceOrderType, Integer>)
-					CommerceOrderType::setStatus);
-			attributeSetterBiConsumers.put(
-				"statusByUserId",
-				(BiConsumer<CommerceOrderType, Long>)
-					CommerceOrderType::setStatusByUserId);
-			attributeSetterBiConsumers.put(
-				"statusByUserName",
-				(BiConsumer<CommerceOrderType, String>)
-					CommerceOrderType::setStatusByUserName);
-			attributeSetterBiConsumers.put(
-				"statusDate",
-				(BiConsumer<CommerceOrderType, Date>)
-					CommerceOrderType::setStatusDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
-	}
-
-	@JSON
-	@Override
-	public long getMvccVersion() {
-		return _mvccVersion;
-	}
-
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_mvccVersion = mvccVersion;
-	}
-
-	@JSON
-	@Override
-	public String getUuid() {
-		if (_uuid == null) {
-			return "";
-		}
-		else {
-			return _uuid;
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
 		}
 	}
 
-	@Override
-	public void setUuid(String uuid) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
+	private static final Map<String, Function<CommerceOrderType, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceOrderType, Object>>
+		_attributeSetterBiConsumers;
 
-		_uuid = uuid;
-	}
+	static {
+		Map<String, Function<CommerceOrderType, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<CommerceOrderType, Object>>();
+		Map<String, BiConsumer<CommerceOrderType, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<CommerceOrderType, ?>>();
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public String getOriginalUuid() {
-		return getColumnOriginalValue("uuid_");
+		attributeGetterFunctions.put(
+			"externalReferenceCode",
+			CommerceOrderType::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<CommerceOrderType, String>)
+				CommerceOrderType::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceOrderTypeId", CommerceOrderType::getCommerceOrderTypeId);
+		attributeSetterBiConsumers.put(
+			"commerceOrderTypeId",
+			(BiConsumer<CommerceOrderType, Long>)
+				CommerceOrderType::setCommerceOrderTypeId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceOrderType::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CommerceOrderType, Long>)
+				CommerceOrderType::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceOrderType::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<CommerceOrderType, Long>)CommerceOrderType::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceOrderType::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<CommerceOrderType, String>)
+				CommerceOrderType::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceOrderType::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CommerceOrderType, Date>)
+				CommerceOrderType::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceOrderType::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<CommerceOrderType, Date>)
+				CommerceOrderType::setModifiedDate);
+		attributeGetterFunctions.put("name", CommerceOrderType::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<CommerceOrderType, String>)CommerceOrderType::setName);
+		attributeGetterFunctions.put(
+			"description", CommerceOrderType::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<CommerceOrderType, String>)
+				CommerceOrderType::setDescription);
+		attributeGetterFunctions.put("active", CommerceOrderType::getActive);
+		attributeSetterBiConsumers.put(
+			"active",
+			(BiConsumer<CommerceOrderType, Boolean>)
+				CommerceOrderType::setActive);
+		attributeGetterFunctions.put(
+			"displayDate", CommerceOrderType::getDisplayDate);
+		attributeSetterBiConsumers.put(
+			"displayDate",
+			(BiConsumer<CommerceOrderType, Date>)
+				CommerceOrderType::setDisplayDate);
+		attributeGetterFunctions.put(
+			"displayOrder", CommerceOrderType::getDisplayOrder);
+		attributeSetterBiConsumers.put(
+			"displayOrder",
+			(BiConsumer<CommerceOrderType, Integer>)
+				CommerceOrderType::setDisplayOrder);
+		attributeGetterFunctions.put(
+			"expirationDate", CommerceOrderType::getExpirationDate);
+		attributeSetterBiConsumers.put(
+			"expirationDate",
+			(BiConsumer<CommerceOrderType, Date>)
+				CommerceOrderType::setExpirationDate);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CommerceOrderType::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<CommerceOrderType, Date>)
+				CommerceOrderType::setLastPublishDate);
+		attributeGetterFunctions.put("status", CommerceOrderType::getStatus);
+		attributeSetterBiConsumers.put(
+			"status",
+			(BiConsumer<CommerceOrderType, Integer>)
+				CommerceOrderType::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", CommerceOrderType::getStatusByUserId);
+		attributeSetterBiConsumers.put(
+			"statusByUserId",
+			(BiConsumer<CommerceOrderType, Long>)
+				CommerceOrderType::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", CommerceOrderType::getStatusByUserName);
+		attributeSetterBiConsumers.put(
+			"statusByUserName",
+			(BiConsumer<CommerceOrderType, String>)
+				CommerceOrderType::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", CommerceOrderType::getStatusDate);
+		attributeSetterBiConsumers.put(
+			"statusDate",
+			(BiConsumer<CommerceOrderType, Date>)
+				CommerceOrderType::setStatusDate);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -882,16 +891,6 @@ public class CommerceOrderTypeModelImpl
 		_active = active;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public boolean getOriginalActive() {
-		return GetterUtil.getBoolean(
-			this.<Boolean>getColumnOriginalValue("active_"));
-	}
-
 	@JSON
 	@Override
 	public Date getDisplayDate() {
@@ -1059,12 +1058,6 @@ public class CommerceOrderTypeModelImpl
 		}
 
 		_statusDate = statusDate;
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return new StagedModelType(
-			PortalUtil.getClassNameId(CommerceOrderType.class.getName()));
 	}
 
 	@Override
@@ -1292,8 +1285,6 @@ public class CommerceOrderTypeModelImpl
 		CommerceOrderTypeImpl commerceOrderTypeImpl =
 			new CommerceOrderTypeImpl();
 
-		commerceOrderTypeImpl.setMvccVersion(getMvccVersion());
-		commerceOrderTypeImpl.setUuid(getUuid());
 		commerceOrderTypeImpl.setExternalReferenceCode(
 			getExternalReferenceCode());
 		commerceOrderTypeImpl.setCommerceOrderTypeId(getCommerceOrderTypeId());
@@ -1324,10 +1315,6 @@ public class CommerceOrderTypeModelImpl
 		CommerceOrderTypeImpl commerceOrderTypeImpl =
 			new CommerceOrderTypeImpl();
 
-		commerceOrderTypeImpl.setMvccVersion(
-			this.<Long>getColumnOriginalValue("mvccVersion"));
-		commerceOrderTypeImpl.setUuid(
-			this.<String>getColumnOriginalValue("uuid_"));
 		commerceOrderTypeImpl.setExternalReferenceCode(
 			this.<String>getColumnOriginalValue("externalReferenceCode"));
 		commerceOrderTypeImpl.setCommerceOrderTypeId(
@@ -1417,7 +1404,7 @@ public class CommerceOrderTypeModelImpl
 	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return true;
+		return ENTITY_CACHE_ENABLED;
 	}
 
 	/**
@@ -1426,7 +1413,7 @@ public class CommerceOrderTypeModelImpl
 	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return true;
+		return FINDER_CACHE_ENABLED;
 	}
 
 	@Override
@@ -1442,16 +1429,6 @@ public class CommerceOrderTypeModelImpl
 	public CacheModel<CommerceOrderType> toCacheModel() {
 		CommerceOrderTypeCacheModel commerceOrderTypeCacheModel =
 			new CommerceOrderTypeCacheModel();
-
-		commerceOrderTypeCacheModel.mvccVersion = getMvccVersion();
-
-		commerceOrderTypeCacheModel.uuid = getUuid();
-
-		String uuid = commerceOrderTypeCacheModel.uuid;
-
-		if ((uuid != null) && (uuid.length() == 0)) {
-			commerceOrderTypeCacheModel.uuid = null;
-		}
 
 		commerceOrderTypeCacheModel.externalReferenceCode =
 			getExternalReferenceCode();
@@ -1621,17 +1598,44 @@ public class CommerceOrderTypeModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CommerceOrderType, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CommerceOrderType, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CommerceOrderType, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((CommerceOrderType)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommerceOrderType>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommerceOrderType.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
-	private long _mvccVersion;
-	private String _uuid;
 	private String _externalReferenceCode;
 	private long _commerceOrderTypeId;
 	private long _companyId;
@@ -1658,8 +1662,7 @@ public class CommerceOrderTypeModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<CommerceOrderType, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -1684,8 +1687,6 @@ public class CommerceOrderTypeModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
-		_columnOriginalValues.put("mvccVersion", _mvccVersion);
-		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("commerceOrderTypeId", _commerceOrderTypeId);
@@ -1712,7 +1713,6 @@ public class CommerceOrderTypeModelImpl
 	static {
 		Map<String, String> attributeNames = new HashMap<>();
 
-		attributeNames.put("uuid_", "uuid");
 		attributeNames.put("active_", "active");
 
 		_attributeNames = Collections.unmodifiableMap(attributeNames);
@@ -1729,45 +1729,41 @@ public class CommerceOrderTypeModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("mvccVersion", 1L);
+		columnBitmasks.put("externalReferenceCode", 1L);
 
-		columnBitmasks.put("uuid_", 2L);
+		columnBitmasks.put("commerceOrderTypeId", 2L);
 
-		columnBitmasks.put("externalReferenceCode", 4L);
+		columnBitmasks.put("companyId", 4L);
 
-		columnBitmasks.put("commerceOrderTypeId", 8L);
+		columnBitmasks.put("userId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("userName", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("createDate", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("modifiedDate", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("name", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("description", 256L);
 
-		columnBitmasks.put("name", 512L);
+		columnBitmasks.put("active_", 512L);
 
-		columnBitmasks.put("description", 1024L);
+		columnBitmasks.put("displayDate", 1024L);
 
-		columnBitmasks.put("active_", 2048L);
+		columnBitmasks.put("displayOrder", 2048L);
 
-		columnBitmasks.put("displayDate", 4096L);
+		columnBitmasks.put("expirationDate", 4096L);
 
-		columnBitmasks.put("displayOrder", 8192L);
+		columnBitmasks.put("lastPublishDate", 8192L);
 
-		columnBitmasks.put("expirationDate", 16384L);
+		columnBitmasks.put("status", 16384L);
 
-		columnBitmasks.put("lastPublishDate", 32768L);
+		columnBitmasks.put("statusByUserId", 32768L);
 
-		columnBitmasks.put("status", 65536L);
+		columnBitmasks.put("statusByUserName", 65536L);
 
-		columnBitmasks.put("statusByUserId", 131072L);
-
-		columnBitmasks.put("statusByUserName", 262144L);
-
-		columnBitmasks.put("statusDate", 524288L);
+		columnBitmasks.put("statusDate", 131072L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

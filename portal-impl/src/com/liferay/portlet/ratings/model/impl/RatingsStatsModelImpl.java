@@ -32,6 +32,7 @@ import com.liferay.ratings.kernel.model.RatingsStatsModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -227,103 +228,109 @@ public class RatingsStatsModelImpl
 	public Map<String, Function<RatingsStats, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<RatingsStats, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, RatingsStats>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<RatingsStats, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			RatingsStats.class.getClassLoader(), RatingsStats.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<RatingsStats, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<RatingsStats, Object>>();
+		try {
+			Constructor<RatingsStats> constructor =
+				(Constructor<RatingsStats>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", RatingsStats::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", RatingsStats::getCtCollectionId);
-			attributeGetterFunctions.put("statsId", RatingsStats::getStatsId);
-			attributeGetterFunctions.put(
-				"companyId", RatingsStats::getCompanyId);
-			attributeGetterFunctions.put(
-				"createDate", RatingsStats::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", RatingsStats::getModifiedDate);
-			attributeGetterFunctions.put(
-				"classNameId", RatingsStats::getClassNameId);
-			attributeGetterFunctions.put("classPK", RatingsStats::getClassPK);
-			attributeGetterFunctions.put(
-				"totalEntries", RatingsStats::getTotalEntries);
-			attributeGetterFunctions.put(
-				"totalScore", RatingsStats::getTotalScore);
-			attributeGetterFunctions.put(
-				"averageScore", RatingsStats::getAverageScore);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<RatingsStats, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<RatingsStats, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<RatingsStats, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<RatingsStats, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<RatingsStats, Object>>();
+		Map<String, BiConsumer<RatingsStats, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<RatingsStats, ?>>();
 
-		static {
-			Map<String, BiConsumer<RatingsStats, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<RatingsStats, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", RatingsStats::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<RatingsStats, Long>)RatingsStats::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", RatingsStats::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<RatingsStats, Long>)RatingsStats::setCtCollectionId);
+		attributeGetterFunctions.put("statsId", RatingsStats::getStatsId);
+		attributeSetterBiConsumers.put(
+			"statsId",
+			(BiConsumer<RatingsStats, Long>)RatingsStats::setStatsId);
+		attributeGetterFunctions.put("companyId", RatingsStats::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<RatingsStats, Long>)RatingsStats::setCompanyId);
+		attributeGetterFunctions.put("createDate", RatingsStats::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<RatingsStats, Date>)RatingsStats::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", RatingsStats::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<RatingsStats, Date>)RatingsStats::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", RatingsStats::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<RatingsStats, Long>)RatingsStats::setClassNameId);
+		attributeGetterFunctions.put("classPK", RatingsStats::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<RatingsStats, Long>)RatingsStats::setClassPK);
+		attributeGetterFunctions.put(
+			"totalEntries", RatingsStats::getTotalEntries);
+		attributeSetterBiConsumers.put(
+			"totalEntries",
+			(BiConsumer<RatingsStats, Integer>)RatingsStats::setTotalEntries);
+		attributeGetterFunctions.put("totalScore", RatingsStats::getTotalScore);
+		attributeSetterBiConsumers.put(
+			"totalScore",
+			(BiConsumer<RatingsStats, Double>)RatingsStats::setTotalScore);
+		attributeGetterFunctions.put(
+			"averageScore", RatingsStats::getAverageScore);
+		attributeSetterBiConsumers.put(
+			"averageScore",
+			(BiConsumer<RatingsStats, Double>)RatingsStats::setAverageScore);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<RatingsStats, Long>)RatingsStats::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<RatingsStats, Long>)
-					RatingsStats::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"statsId",
-				(BiConsumer<RatingsStats, Long>)RatingsStats::setStatsId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<RatingsStats, Long>)RatingsStats::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<RatingsStats, Date>)RatingsStats::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<RatingsStats, Date>)RatingsStats::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<RatingsStats, Long>)RatingsStats::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<RatingsStats, Long>)RatingsStats::setClassPK);
-			attributeSetterBiConsumers.put(
-				"totalEntries",
-				(BiConsumer<RatingsStats, Integer>)
-					RatingsStats::setTotalEntries);
-			attributeSetterBiConsumers.put(
-				"totalScore",
-				(BiConsumer<RatingsStats, Double>)RatingsStats::setTotalScore);
-			attributeSetterBiConsumers.put(
-				"averageScore",
-				(BiConsumer<RatingsStats, Double>)
-					RatingsStats::setAverageScore);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -790,12 +797,41 @@ public class RatingsStatsModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<RatingsStats, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<RatingsStats, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<RatingsStats, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((RatingsStats)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, RatingsStats>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					RatingsStats.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -813,9 +849,8 @@ public class RatingsStatsModelImpl
 	private double _averageScore;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<RatingsStats, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<RatingsStats, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

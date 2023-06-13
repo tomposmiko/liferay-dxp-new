@@ -16,9 +16,7 @@ package com.liferay.blogs.service;
 
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -36,9 +34,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
@@ -65,15 +61,13 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see BlogsEntryLocalServiceUtil
  * @generated
  */
-@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface BlogsEntryLocalService
-	extends BaseLocalService, CTService<BlogsEntry>,
-			PersistedModelLocalService {
+	extends BaseLocalService, PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -321,9 +315,24 @@ public interface BlogsEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry fetchBlogsEntry(long entryId);
 
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry fetchBlogsEntryByExternalReferenceCode(
-		String externalReferenceCode, long groupId);
+		long groupId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchBlogsEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BlogsEntry fetchBlogsEntryByReferenceCode(
+		long groupId, String externalReferenceCode);
 
 	/**
 	 * Returns the blogs entry matching the UUID and group.
@@ -400,9 +409,17 @@ public interface BlogsEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry getBlogsEntry(long entryId) throws PortalException;
 
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry
+	 * @throws PortalException if a matching blogs entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BlogsEntry getBlogsEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -629,20 +646,5 @@ public interface BlogsEntryLocalService
 			ServiceContext serviceContext,
 			Map<String, Serializable> workflowContext)
 		throws PortalException;
-
-	@Override
-	@Transactional(enabled = false)
-	public CTPersistence<BlogsEntry> getCTPersistence();
-
-	@Override
-	@Transactional(enabled = false)
-	public Class<BlogsEntry> getModelClass();
-
-	@Override
-	@Transactional(rollbackFor = Throwable.class)
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<BlogsEntry>, R, E>
-				updateUnsafeFunction)
-		throws E;
 
 }

@@ -17,7 +17,6 @@ package com.liferay.portal.workflow.kaleo.definition.internal.parser;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.workflow.kaleo.definition.Assignment;
 import com.liferay.portal.workflow.kaleo.definition.Definition;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.definition.Task;
 import com.liferay.portal.workflow.kaleo.definition.TaskForm;
 import com.liferay.portal.workflow.kaleo.definition.TaskFormReference;
@@ -25,8 +24,12 @@ import com.liferay.portal.workflow.kaleo.definition.Transition;
 import com.liferay.portal.workflow.kaleo.definition.exception.KaleoDefinitionValidationException;
 import com.liferay.portal.workflow.kaleo.definition.parser.NodeValidator;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -34,13 +37,10 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  * @author Marcellus Tavares
  */
-@Component(service = NodeValidator.class)
+@Component(
+	immediate = true, property = "node.type=TASK", service = NodeValidator.class
+)
 public class TaskNodeValidator extends BaseNodeValidator<Task> {
-
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.TASK;
-	}
 
 	@Override
 	protected void doValidate(Definition definition, Task task)
@@ -48,22 +48,24 @@ public class TaskNodeValidator extends BaseNodeValidator<Task> {
 
 		if (task.getIncomingTransitionsCount() == 0) {
 			throw new KaleoDefinitionValidationException.
-				MustSetIncomingTransition(task.getDefaultLabel());
+				MustSetIncomingTransition(task.getName());
 		}
 
 		if (task.getOutgoingTransitionsCount() == 0) {
 			throw new KaleoDefinitionValidationException.
-				MustSetOutgoingTransition(task.getDefaultLabel());
+				MustSetOutgoingTransition(task.getName());
 		}
 
 		Set<Assignment> assignments = task.getAssignments();
 
 		if ((assignments == null) || assignments.isEmpty()) {
 			throw new KaleoDefinitionValidationException.MustSetAssignments(
-				task.getDefaultLabel());
+				task.getName());
 		}
 
-		for (TaskForm taskForm : task.getTaskForms()) {
+		Set<TaskForm> taskForms = task.getTaskForms();
+
+		for (TaskForm taskForm : taskForms) {
 			String formDefinition = taskForm.getFormDefinition();
 
 			TaskFormReference taskFormReference =
@@ -74,30 +76,27 @@ public class TaskNodeValidator extends BaseNodeValidator<Task> {
 
 				throw new KaleoDefinitionValidationException.
 					MustSetTaskFormDefinitionOrReference(
-						task.getDefaultLabel(), taskForm.getName());
+						task.getName(), taskForm.getName());
 			}
 		}
 
 		Map<String, Transition> outgoingTransitions =
 			task.getOutgoingTransitions();
 
-		if (outgoingTransitions.size() <= 1) {
-			return;
-		}
+		if (outgoingTransitions.size() > 1) {
+			List<Transition> defaultTransitions = Stream.of(
+				outgoingTransitions.values()
+			).flatMap(
+				Collection::stream
+			).filter(
+				Transition::isDefault
+			).collect(
+				Collectors.toList()
+			);
 
-		int defaultTransitionCount = 0;
-
-		for (Transition transition : outgoingTransitions.values()) {
-			if (!transition.isDefault()) {
-				continue;
-			}
-
-			defaultTransitionCount += 1;
-
-			if (defaultTransitionCount > 1) {
+			if (defaultTransitions.size() > 1) {
 				throw new KaleoDefinitionValidationException.
-					MustNotSetMoreThanOneDefaultTransition(
-						task.getDefaultLabel());
+					MustNotSetMoreThanOneDefaultTransition(task.getName());
 			}
 		}
 	}

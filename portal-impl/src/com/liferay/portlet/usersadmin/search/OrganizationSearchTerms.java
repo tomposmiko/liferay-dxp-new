@@ -72,7 +72,7 @@ public class OrganizationSearchTerms extends OrganizationDisplayTerms {
 			}
 			catch (NoSuchCountryException noSuchCountryException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchCountryException);
+					_log.warn(noSuchCountryException.getMessage());
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class OrganizationSearchTerms extends OrganizationDisplayTerms {
 			}
 			catch (NoSuchRegionException noSuchRegionException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchRegionException);
+					_log.warn(noSuchRegionException.getMessage());
 				}
 			}
 		}

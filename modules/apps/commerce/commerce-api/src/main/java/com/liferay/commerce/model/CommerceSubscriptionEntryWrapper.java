@@ -46,7 +46,6 @@ public class CommerceSubscriptionEntryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put(
 			"commerceSubscriptionEntryId", getCommerceSubscriptionEntryId());
@@ -93,12 +92,6 @@ public class CommerceSubscriptionEntryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -484,9 +477,9 @@ public class CommerceSubscriptionEntryWrapper
 
 	@Override
 	public com.liferay.portal.kernel.util.UnicodeProperties
-		getDeliverySubscriptionTypeSettingsUnicodeProperties() {
+		getDeliverySubscriptionTypeSettingsProperties() {
 
-		return model.getDeliverySubscriptionTypeSettingsUnicodeProperties();
+		return model.getDeliverySubscriptionTypeSettingsProperties();
 	}
 
 	/**
@@ -527,16 +520,6 @@ public class CommerceSubscriptionEntryWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this commerce subscription entry.
-	 *
-	 * @return the mvcc version of this commerce subscription entry
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -611,9 +594,9 @@ public class CommerceSubscriptionEntryWrapper
 
 	@Override
 	public com.liferay.portal.kernel.util.UnicodeProperties
-		getSubscriptionTypeSettingsUnicodeProperties() {
+		getSubscriptionTypeSettingsProperties() {
 
-		return model.getSubscriptionTypeSettingsUnicodeProperties();
+		return model.getSubscriptionTypeSettingsProperties();
 	}
 
 	/**
@@ -829,11 +812,11 @@ public class CommerceSubscriptionEntryWrapper
 	}
 
 	@Override
-	public void setDeliverySubscriptionTypeSettingsUnicodeProperties(
+	public void setDeliverySubscriptionTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
 			deliverySubscriptionTypeSettingsUnicodeProperties) {
 
-		model.setDeliverySubscriptionTypeSettingsUnicodeProperties(
+		model.setDeliverySubscriptionTypeSettingsProperties(
 			deliverySubscriptionTypeSettingsUnicodeProperties);
 	}
 
@@ -875,16 +858,6 @@ public class CommerceSubscriptionEntryWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
-	 * Sets the mvcc version of this commerce subscription entry.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce subscription entry
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -958,11 +931,11 @@ public class CommerceSubscriptionEntryWrapper
 	}
 
 	@Override
-	public void setSubscriptionTypeSettingsUnicodeProperties(
+	public void setSubscriptionTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
 			subscriptionTypeSettingsUnicodeProperties) {
 
-		model.setSubscriptionTypeSettingsUnicodeProperties(
+		model.setSubscriptionTypeSettingsProperties(
 			subscriptionTypeSettingsUnicodeProperties);
 	}
 
@@ -1004,11 +977,6 @@ public class CommerceSubscriptionEntryWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

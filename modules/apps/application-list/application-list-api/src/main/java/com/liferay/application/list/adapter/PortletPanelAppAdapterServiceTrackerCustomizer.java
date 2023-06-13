@@ -59,8 +59,7 @@ public class PortletPanelAppAdapterServiceTrackerCustomizer
 			return null;
 		}
 
-		PanelApp portletPanelAppAdapter = new PortletPanelAppAdapter(
-			portletId, () -> _bundleContext.getService(serviceReference));
+		PanelApp portletPanelAppAdapter = new PortletPanelAppAdapter(portletId);
 
 		ServiceRegistration<PanelApp> serviceRegistration =
 			_bundleContext.registerService(

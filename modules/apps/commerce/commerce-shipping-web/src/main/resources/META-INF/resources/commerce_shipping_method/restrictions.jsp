@@ -28,16 +28,20 @@ long commerceChannelId = commerceShippingMethodsDisplayContext.getCommerceChanne
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 	<aui:input name="commerceChannelId" type="hidden" value="<%= commerceChannelId %>" />
 
-	<frontend-data-set:classic-display
+	<clay:data-set-display
 		contextParams='<%=
 			HashMapBuilder.<String, String>put(
 				"commerceChannelId", String.valueOf(commerceChannelId)
 			).build()
 		%>'
-		dataProviderKey="<%= CommerceShippingFDSNames.SHIPPING_RESTRICTIONS %>"
-		formName="fm"
-		id="<%= CommerceShippingFDSNames.SHIPPING_RESTRICTIONS %>"
-		itemsPerPage="<%= 10 %>"
+		dataProviderKey="<%= CommerceShippingRestrictionsPageClayTable.NAME %>"
+		formId="fm"
+		id="<%= CommerceShippingRestrictionsPageClayTable.NAME %>"
+		itemsPerPage="<%= commerceShippingMethodsDisplayContext.getCountriesCount() %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= currentURLObj %>"
 		selectedItemsKey="countryId"
+		showPagination="<%= false %>"
 	/>
 </aui:form>

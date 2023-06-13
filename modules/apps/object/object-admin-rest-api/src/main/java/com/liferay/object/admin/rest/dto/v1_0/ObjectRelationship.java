@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -210,72 +209,6 @@ public class ObjectRelationship implements Serializable {
 	protected String name;
 
 	@Schema
-	public String getObjectDefinitionExternalReferenceCode1() {
-		return objectDefinitionExternalReferenceCode1;
-	}
-
-	public void setObjectDefinitionExternalReferenceCode1(
-		String objectDefinitionExternalReferenceCode1) {
-
-		this.objectDefinitionExternalReferenceCode1 =
-			objectDefinitionExternalReferenceCode1;
-	}
-
-	@JsonIgnore
-	public void setObjectDefinitionExternalReferenceCode1(
-		UnsafeSupplier<String, Exception>
-			objectDefinitionExternalReferenceCode1UnsafeSupplier) {
-
-		try {
-			objectDefinitionExternalReferenceCode1 =
-				objectDefinitionExternalReferenceCode1UnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String objectDefinitionExternalReferenceCode1;
-
-	@Schema
-	public String getObjectDefinitionExternalReferenceCode2() {
-		return objectDefinitionExternalReferenceCode2;
-	}
-
-	public void setObjectDefinitionExternalReferenceCode2(
-		String objectDefinitionExternalReferenceCode2) {
-
-		this.objectDefinitionExternalReferenceCode2 =
-			objectDefinitionExternalReferenceCode2;
-	}
-
-	@JsonIgnore
-	public void setObjectDefinitionExternalReferenceCode2(
-		UnsafeSupplier<String, Exception>
-			objectDefinitionExternalReferenceCode2UnsafeSupplier) {
-
-		try {
-			objectDefinitionExternalReferenceCode2 =
-				objectDefinitionExternalReferenceCode2UnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String objectDefinitionExternalReferenceCode2;
-
-	@Schema
 	public Long getObjectDefinitionId1() {
 		return objectDefinitionId1;
 	}
@@ -358,92 +291,6 @@ public class ObjectRelationship implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String objectDefinitionName2;
-
-	@Schema
-	public Long getParameterObjectFieldId() {
-		return parameterObjectFieldId;
-	}
-
-	public void setParameterObjectFieldId(Long parameterObjectFieldId) {
-		this.parameterObjectFieldId = parameterObjectFieldId;
-	}
-
-	@JsonIgnore
-	public void setParameterObjectFieldId(
-		UnsafeSupplier<Long, Exception> parameterObjectFieldIdUnsafeSupplier) {
-
-		try {
-			parameterObjectFieldId = parameterObjectFieldIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Long parameterObjectFieldId;
-
-	@Schema
-	public String getParameterObjectFieldName() {
-		return parameterObjectFieldName;
-	}
-
-	public void setParameterObjectFieldName(String parameterObjectFieldName) {
-		this.parameterObjectFieldName = parameterObjectFieldName;
-	}
-
-	@JsonIgnore
-	public void setParameterObjectFieldName(
-		UnsafeSupplier<String, Exception>
-			parameterObjectFieldNameUnsafeSupplier) {
-
-		try {
-			parameterObjectFieldName =
-				parameterObjectFieldNameUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String parameterObjectFieldName;
-
-	@Schema
-	public Boolean getReverse() {
-		return reverse;
-	}
-
-	public void setReverse(Boolean reverse) {
-		this.reverse = reverse;
-	}
-
-	@JsonIgnore
-	public void setReverse(
-		UnsafeSupplier<Boolean, Exception> reverseUnsafeSupplier) {
-
-		try {
-			reverse = reverseUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Boolean reverse;
 
 	@Schema
 	@Valid
@@ -566,34 +413,6 @@ public class ObjectRelationship implements Serializable {
 			sb.append("\"");
 		}
 
-		if (objectDefinitionExternalReferenceCode1 != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectDefinitionExternalReferenceCode1\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(objectDefinitionExternalReferenceCode1));
-
-			sb.append("\"");
-		}
-
-		if (objectDefinitionExternalReferenceCode2 != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectDefinitionExternalReferenceCode2\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(objectDefinitionExternalReferenceCode2));
-
-			sb.append("\"");
-		}
-
 		if (objectDefinitionId1 != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -626,40 +445,6 @@ public class ObjectRelationship implements Serializable {
 			sb.append(_escape(objectDefinitionName2));
 
 			sb.append("\"");
-		}
-
-		if (parameterObjectFieldId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"parameterObjectFieldId\": ");
-
-			sb.append(parameterObjectFieldId);
-		}
-
-		if (parameterObjectFieldName != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"parameterObjectFieldName\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(parameterObjectFieldName));
-
-			sb.append("\"");
-		}
-
-		if (reverse != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"reverse\": ");
-
-			sb.append(reverse);
 		}
 
 		if (type != null) {
@@ -729,8 +514,7 @@ public class ObjectRelationship implements Serializable {
 	@GraphQLName("Type")
 	public static enum Type {
 
-		ONE_TO_MANY("oneToMany"), ONE_TO_ONE("oneToOne"),
-		MANY_TO_MANY("manyToMany");
+		ONE_TO_MANY("oneToMany"), MANY_TO_MANY("manyToMany");
 
 		@JsonCreator
 		public static Type create(String value) {
@@ -766,9 +550,9 @@ public class ObjectRelationship implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -794,7 +578,7 @@ public class ObjectRelationship implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -826,7 +610,7 @@ public class ObjectRelationship implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -842,10 +626,5 @@ public class ObjectRelationship implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

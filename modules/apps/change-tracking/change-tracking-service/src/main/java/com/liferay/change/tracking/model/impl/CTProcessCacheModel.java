@@ -76,7 +76,7 @@ public class CTProcessCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(15);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -92,8 +92,6 @@ public class CTProcessCacheModel
 		sb.append(ctCollectionId);
 		sb.append(", backgroundTaskId=");
 		sb.append(backgroundTaskId);
-		sb.append(", type=");
-		sb.append(type);
 		sb.append("}");
 
 		return sb.toString();
@@ -117,7 +115,6 @@ public class CTProcessCacheModel
 
 		ctProcessImpl.setCtCollectionId(ctCollectionId);
 		ctProcessImpl.setBackgroundTaskId(backgroundTaskId);
-		ctProcessImpl.setType(type);
 
 		ctProcessImpl.resetOriginalValues();
 
@@ -138,8 +135,6 @@ public class CTProcessCacheModel
 		ctCollectionId = objectInput.readLong();
 
 		backgroundTaskId = objectInput.readLong();
-
-		type = objectInput.readInt();
 	}
 
 	@Override
@@ -156,8 +151,6 @@ public class CTProcessCacheModel
 		objectOutput.writeLong(ctCollectionId);
 
 		objectOutput.writeLong(backgroundTaskId);
-
-		objectOutput.writeInt(type);
 	}
 
 	public long mvccVersion;
@@ -167,6 +160,5 @@ public class CTProcessCacheModel
 	public long createDate;
 	public long ctCollectionId;
 	public long backgroundTaskId;
-	public int type;
 
 }

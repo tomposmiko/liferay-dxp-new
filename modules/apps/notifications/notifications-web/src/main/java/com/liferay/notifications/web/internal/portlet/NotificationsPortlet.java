@@ -15,7 +15,8 @@
 package com.liferay.notifications.web.internal.portlet;
 
 import com.liferay.notifications.web.internal.constants.NotificationsPortletKeys;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.UserNotificationDelivery;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
@@ -48,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=notifications-portlet",
@@ -60,8 +62,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/notifications/view.jsp",
 		"javax.portlet.name=" + NotificationsPortletKeys.NOTIFICATIONS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator,guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -138,8 +139,7 @@ public class NotificationsPortlet extends MVCPortlet {
 		long userNotificationEventId = ParamUtil.getLong(
 			actionRequest, "userNotificationEventId");
 
-		_updateArchived(
-			themeDisplay.getUserId(), userNotificationEventId, true);
+		updateArchived(themeDisplay.getUserId(), userNotificationEventId, true);
 
 		_addSuccessMessage(
 			actionRequest, "notification-was-marked-as-read-successfully");
@@ -157,7 +157,7 @@ public class NotificationsPortlet extends MVCPortlet {
 		long userNotificationEventId = ParamUtil.getLong(
 			actionRequest, "userNotificationEventId");
 
-		_updateArchived(
+		updateArchived(
 			themeDisplay.getUserId(), userNotificationEventId, false);
 
 		_addSuccessMessage(
@@ -177,7 +177,7 @@ public class NotificationsPortlet extends MVCPortlet {
 			actionRequest, "rowIds");
 
 		for (long userNotificationEventId : userNotificationEventIds) {
-			_updateArchived(
+			updateArchived(
 				themeDisplay.getUserId(), userNotificationEventId, true);
 		}
 
@@ -198,7 +198,7 @@ public class NotificationsPortlet extends MVCPortlet {
 			actionRequest, "rowIds");
 
 		for (long userNotificationEventId : userNotificationEventIds) {
-			_updateArchived(
+			updateArchived(
 				themeDisplay.getUserId(), userNotificationEventId, false);
 		}
 
@@ -278,7 +278,7 @@ public class NotificationsPortlet extends MVCPortlet {
 		if ((userNotificationEvent != null) &&
 			!userNotificationEvent.isArchived()) {
 
-			_updateArchived(
+			updateArchived(
 				themeDisplay.getUserId(), userNotificationEventId, true);
 		}
 
@@ -311,6 +311,35 @@ public class NotificationsPortlet extends MVCPortlet {
 		_sendRedirect(actionRequest, actionResponse);
 	}
 
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.notifications.web)(&(release.schema.version>=2.1.0)(!(release.schema.version>=3.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
+	protected void updateArchived(
+			long userId, long userNotificationEventId, boolean archived)
+		throws PortalException {
+
+		UserNotificationEvent userNotificationEvent =
+			_userNotificationEventLocalService.fetchUserNotificationEvent(
+				userNotificationEventId);
+
+		if (userNotificationEvent == null) {
+			return;
+		}
+
+		if (userNotificationEvent.getUserId() != userId) {
+			throw new PrincipalException();
+		}
+
+		userNotificationEvent.setArchived(archived);
+
+		_userNotificationEventLocalService.updateUserNotificationEvent(
+			userNotificationEvent);
+	}
+
 	private void _addSuccessMessage(
 		ActionRequest actionRequest, String message) {
 
@@ -319,7 +348,7 @@ public class NotificationsPortlet extends MVCPortlet {
 
 		SessionMessages.add(
 			actionRequest, "requestProcessed",
-			_language.get(themeDisplay.getLocale(), message));
+			LanguageUtil.get(themeDisplay.getLocale(), message));
 	}
 
 	private void _deleteSubscription(long userId, long subscriptionId)
@@ -370,28 +399,6 @@ public class NotificationsPortlet extends MVCPortlet {
 		}
 	}
 
-	private void _updateArchived(
-			long userId, long userNotificationEventId, boolean archived)
-		throws Exception {
-
-		UserNotificationEvent userNotificationEvent =
-			_userNotificationEventLocalService.fetchUserNotificationEvent(
-				userNotificationEventId);
-
-		if (userNotificationEvent == null) {
-			return;
-		}
-
-		if (userNotificationEvent.getUserId() != userId) {
-			throw new PrincipalException();
-		}
-
-		userNotificationEvent.setArchived(archived);
-
-		_userNotificationEventLocalService.updateUserNotificationEvent(
-			userNotificationEvent);
-	}
-
 	private void _updateUserNotificationDelivery(
 			long userId, long userNotificationDeliveryId, boolean deliver)
 		throws Exception {
@@ -427,15 +434,7 @@ public class NotificationsPortlet extends MVCPortlet {
 	}
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.notifications.web)(&(release.schema.version>=2.1.0)(!(release.schema.version>=3.0.0))))"
-	)
-	private Release _release;
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;

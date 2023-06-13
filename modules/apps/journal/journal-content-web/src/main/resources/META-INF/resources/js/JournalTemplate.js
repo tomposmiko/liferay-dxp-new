@@ -13,14 +13,23 @@
  */
 
 import {
+	createPortletURL,
 	delegate,
 	fetch,
 	openSelectionModal,
 	openToast,
-	toggleRadio,
 } from 'frontend-js-web';
 
-export default function ({actionURL, namespace, portletNamespace, portletURL}) {
+export default function ({
+	actionURL,
+	ddmStructure,
+	ddmStructureId,
+	eventName,
+	namespace,
+	portletNamespace,
+	portletURL,
+	windowState,
+}) {
 	const form = document.getElementById(`${namespace}fm`);
 	const templateKeyInput = document.getElementById(
 		`${namespace}ddmTemplateKey`
@@ -44,9 +53,7 @@ export default function ({actionURL, namespace, portletNamespace, portletURL}) {
 
 		openSelectionModal({
 			onSelect: (selectedItem) => {
-				const itemValue = JSON.parse(selectedItem.value);
-
-				templateKeyInput.value = itemValue.ddmtemplatekey;
+				templateKeyInput.value = selectedItem.ddmtemplatekey;
 
 				createTemplatePreview({
 					className: 'loading-animation',
@@ -55,7 +62,7 @@ export default function ({actionURL, namespace, portletNamespace, portletURL}) {
 
 				const data = new URLSearchParams(
 					Liferay.Util.ns(portletNamespace, {
-						ddmTemplateKey: itemValue.ddmtemplatekey,
+						ddmTemplateKey: selectedItem.ddmtemplatekey,
 					})
 				);
 
@@ -87,9 +94,13 @@ export default function ({actionURL, namespace, portletNamespace, portletURL}) {
 					type: 'info',
 				});
 			},
-			selectEventName: 'selectDDMTemplate',
+			selectEventName: eventName,
 			title: Liferay.Language.get('templates'),
-			url: portletURL,
+			url: createPortletURL(portletURL, {
+				eventName,
+				p_p_state: windowState,
+				...(ddmStructure !== null && {ddmStructureId}),
+			}).toString(),
 		});
 	};
 
@@ -116,13 +127,13 @@ export default function ({actionURL, namespace, portletNamespace, portletURL}) {
 		),
 	];
 
-	toggleRadio(
+	Liferay.Util.toggleRadio(
 		`${namespace}ddmTemplateTypeCustom`,
 		`${namespace}customDDMTemplateContainer`,
 		null
 	);
 
-	toggleRadio(
+	Liferay.Util.toggleRadio(
 		`${namespace}ddmTemplateTypeDefault`,
 		null,
 		`${namespace}customDDMTemplateContainer`

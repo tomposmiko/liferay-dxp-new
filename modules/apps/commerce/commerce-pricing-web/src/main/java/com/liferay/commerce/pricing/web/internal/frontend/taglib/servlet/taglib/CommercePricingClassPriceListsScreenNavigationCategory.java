@@ -14,13 +14,30 @@
 
 package com.liferay.commerce.pricing.web.internal.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.pricing.web.internal.constants.CommercePricingClassScreenNavigationConstants;
+import com.liferay.commerce.pricing.model.CommercePricingClass;
+import com.liferay.commerce.pricing.service.CommercePricingClassService;
+import com.liferay.commerce.pricing.web.internal.display.context.CommercePricingClassPriceListDisplayContext;
+import com.liferay.commerce.pricing.web.internal.servlet.taglib.ui.constants.CommercePricingClassScreenNavigationConstants;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+
+import java.io.IOException;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,14 +46,25 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=30",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=30",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CommercePricingClassPriceListsScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<CommercePricingClass> {
 
 	@Override
 	public String getCategoryKey() {
+		return CommercePricingClassScreenNavigationConstants.
+			CATEGORY_KEY_PRICE_LISTS;
+	}
+
+	@Override
+	public String getEntryKey() {
 		return CommercePricingClassScreenNavigationConstants.
 			CATEGORY_KEY_PRICE_LISTS;
 	}
@@ -46,7 +74,7 @@ public class CommercePricingClassPriceListsScreenNavigationCategory
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommercePricingClassScreenNavigationConstants.
 				CATEGORY_KEY_PRICE_LISTS);
@@ -58,7 +86,67 @@ public class CommercePricingClassPriceListsScreenNavigationCategory
 			SCREEN_NAVIGATION_KEY_PRICING_CLASS_GENERAL;
 	}
 
+	@Override
+	public boolean isVisible(
+		User user, CommercePricingClass commercePricingClass) {
+
+		if (commercePricingClass == null) {
+			return false;
+		}
+
+		boolean hasPermission = false;
+
+		try {
+			hasPermission =
+				_commercePricingClassModelResourcePermission.contains(
+					PermissionThreadLocal.getPermissionChecker(),
+					commercePricingClass.getCommercePricingClassId(),
+					ActionKeys.UPDATE);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+
+		return hasPermission;
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		CommercePricingClassPriceListDisplayContext
+			commercePricingClassPriceListDisplayContext =
+				new CommercePricingClassPriceListDisplayContext(
+					httpServletRequest,
+					_commercePricingClassModelResourcePermission,
+					_commercePricingClassService);
+
+		httpServletRequest.setAttribute(
+			WebKeys.PORTLET_DISPLAY_CONTEXT,
+			commercePricingClassPriceListDisplayContext);
+
+		_jspRenderer.renderJSP(
+			httpServletRequest, httpServletResponse,
+			"/commerce_pricing_class/price_lists.jsp");
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CommercePricingClassPriceListsScreenNavigationCategory.class);
+
+	@Reference(
+		target = "(model.class.name=com.liferay.commerce.pricing.model.CommercePricingClass)"
+	)
+	private ModelResourcePermission<CommercePricingClass>
+		_commercePricingClassModelResourcePermission;
+
 	@Reference
-	protected Language language;
+	private CommercePricingClassService _commercePricingClassService;
+
+	@Reference
+	private JSPRenderer _jspRenderer;
 
 }

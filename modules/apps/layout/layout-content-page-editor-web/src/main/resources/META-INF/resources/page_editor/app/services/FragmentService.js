@@ -242,7 +242,6 @@ export default {
 	/**
 	 * Render the content of a fragmentEntryLink
 	 * @param {object} options
-	 * @param {string} options.collectionItemIndex Index of the collection item
 	 * @param {string} options.itemClassName Class name id of the collection item
 	 * @param {string} options.itemClassPK Class PK of the collection item
 	 * @param {string} options.fragmentEntryLinkId Id of the fragmentEntryLink
@@ -274,33 +273,6 @@ export default {
 	},
 
 	/**
-	 * Mark a fragment as highlighted if it wasn't, and unmark it if it was
-	 * @param {object} options
-	 * @param {string} options.fragmentEntryKey
-	 * @param {boolean} options.highlighted
-	 * @param {function} options.onNetworkStatus
-	 */
-	toggleFragmentHighlighted({
-		fragmentEntryKey,
-		groupId = '0',
-		highlighted,
-		onNetworkStatus,
-	}) {
-		return serviceFetch(
-			config.updateFragmentsHighlightedConfigurationURL,
-			{
-				body: {
-					fragmentEntryKey,
-					groupId,
-					highlighted,
-				},
-			},
-			onNetworkStatus,
-			{requestGenerateDraft: true}
-		);
-	},
-
-	/**
 	 * Update configurationValues of the fragmentEntryLink with the given fragmentEntryLinkId
 	 * @param {object} options
 	 * @param {string} options.editableValues
@@ -313,7 +285,6 @@ export default {
 		fragmentEntryLinkId,
 		languageId,
 		onNetworkStatus,
-		segmentsExperienceId,
 	}) {
 		return serviceFetch(
 			config.updateConfigurationValuesURL,
@@ -322,7 +293,6 @@ export default {
 					editableValues: JSON.stringify(editableValues),
 					fragmentEntryLinkId,
 					languageId,
-					segmentsExperienceId,
 				},
 			},
 			onNetworkStatus,
@@ -342,7 +312,6 @@ export default {
 		fragmentEntryLinkId,
 		languageId,
 		onNetworkStatus,
-		segmentsExperienceId,
 	}) {
 		return serviceFetch(
 			config.editFragmentEntryLinkURL,
@@ -351,34 +320,6 @@ export default {
 					editableValues: JSON.stringify(editableValues),
 					fragmentEntryLinkId,
 					languageId,
-					segmentsExperienceId,
-				},
-			},
-			onNetworkStatus,
-			{requestGenerateDraft: true}
-		);
-	},
-
-	/**
-	 * Update fragment and widgets sets sorting them according to user criteria
-	 * @param {object} options
-	 * @param {array} options.fragmentCollectionKeys
-	 * @param {array} options.portletCategoryKeys
-	 * @param {function} options.onNetworkStatus
-	 */
-	updateSetsOrder({
-		fragmentCollectionKeys,
-		onNetworkStatus,
-		portletCategoryKeys,
-	}) {
-		return serviceFetch(
-			config.updateFragmentPortletSetsSortURL,
-			{
-				body: {
-					fragmentCollectionKeys:
-						JSON.stringify(fragmentCollectionKeys) || null,
-					portletCategoryKeys:
-						JSON.stringify(portletCategoryKeys) || null,
 				},
 			},
 			onNetworkStatus,

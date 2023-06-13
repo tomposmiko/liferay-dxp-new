@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=100",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class JournalPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return JournalPortletKeys.JOURNAL;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + JournalPortletKeys.JOURNAL + ")"
+		target = "(javax.portlet.name=" + JournalPortletKeys.JOURNAL + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

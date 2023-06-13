@@ -14,13 +14,21 @@
 
 package com.liferay.commerce.inventory.web.internal.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.inventory.web.internal.constants.CommerceInventoryScreenNavigationConstants;
+import com.liferay.commerce.inventory.model.CommerceInventoryReplenishmentItem;
+import com.liferay.commerce.inventory.web.internal.servlet.taglib.ui.constants.CommerceInventoryScreenNavigationConstants;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+
+import java.io.IOException;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,11 +37,16 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=40",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=40",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CommerceInventoryChangeLogScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<CommerceInventoryReplenishmentItem> {
 
 	@Override
 	public String getCategoryKey() {
@@ -42,11 +55,16 @@ public class CommerceInventoryChangeLogScreenNavigationCategory
 	}
 
 	@Override
+	public String getEntryKey() {
+		return getCategoryKey();
+	}
+
+	@Override
 	public String getLabel(Locale locale) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return language.get(resourceBundle, getCategoryKey());
+		return LanguageUtil.get(resourceBundle, getCategoryKey());
 	}
 
 	@Override
@@ -55,7 +73,17 @@ public class CommerceInventoryChangeLogScreenNavigationCategory
 			SCREEN_NAVIGATION_KEY_COMMERCE_INVENTORY;
 	}
 
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		_jspRenderer.renderJSP(
+			httpServletRequest, httpServletResponse, "/details/changelog.jsp");
+	}
+
 	@Reference
-	protected Language language;
+	private JSPRenderer _jspRenderer;
 
 }

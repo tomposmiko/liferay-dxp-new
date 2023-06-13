@@ -57,7 +57,8 @@ public class KnowledgeBaseFolderResourceTest
 		serviceContext.setScopeGroupId(testGroup.getGroupId());
 
 		KBFolder kbFolder = KBFolderLocalServiceUtil.addKBFolder(
-			null, UserLocalServiceUtil.getGuestUserId(testGroup.getCompanyId()),
+			null,
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
 			testGroup.getGroupId(),
 			PortalUtil.getClassNameId(KBFolder.class.getName()), 0,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),

@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.Organization",
 	service = BaseSearcher.class
 )

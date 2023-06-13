@@ -13,34 +13,34 @@
  */
 
 (function () {
-	const hasOwnProperty = Object.prototype.hasOwnProperty;
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
 
-	const isString = function (val) {
-		return typeof val === 'string';
+	var isString = function (val) {
+		return typeof val == 'string';
 	};
 
-	const ELEMENTS_BLOCK = {
+	var ELEMENTS_BLOCK = {
 		'*': 1,
-		'center': 1,
-		'code': 1,
-		'justify': 1,
-		'left': 1,
-		'li': 1,
-		'list': 1,
-		'q': 1,
-		'quote': 1,
-		'right': 1,
-		'table': 1,
-		'td': 1,
-		'th': 1,
-		'tr': 1,
+		center: 1,
+		code: 1,
+		justify: 1,
+		left: 1,
+		li: 1,
+		list: 1,
+		q: 1,
+		quote: 1,
+		right: 1,
+		table: 1,
+		td: 1,
+		th: 1,
+		tr: 1,
 	};
 
-	const ELEMENTS_CLOSE_SELF = {
+	var ELEMENTS_CLOSE_SELF = {
 		'*': 1,
 	};
 
-	const ELEMENTS_INLINE = {
+	var ELEMENTS_INLINE = {
 		b: 1,
 		color: 1,
 		font: 1,
@@ -53,12 +53,12 @@
 		url: 1,
 	};
 
-	const REGEX_TAG_NAME = /^\/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|right|\*|s|size|table|tr|th|td|li|list|font|u|url)$/i;
+	var REGEX_TAG_NAME = /^\/?(?:b|center|code|colou?r|email|i|img|justify|left|pre|q|quote|right|\*|s|size|table|tr|th|td|li|list|font|u|url)$/i;
 
-	const STR_TAG_CODE = 'code';
+	var STR_TAG_CODE = 'code';
 
-	const Parser = function (config) {
-		const instance = this;
+	var Parser = function (config) {
+		var instance = this;
 
 		config = config || {};
 
@@ -69,18 +69,18 @@
 
 	Parser.prototype = {
 		_handleData(token, data) {
-			const instance = this;
+			var instance = this;
 
-			let length = data.length;
+			var length = data.length;
 
-			let lastIndex = length;
+			var lastIndex = length;
 
 			if (token) {
 				lastIndex = instance._lexer.getLastIndex();
 
 				length = lastIndex;
 
-				const tokenItem = token[1] || token[3];
+				var tokenItem = token[1] || token[3];
 
 				if (instance._isValidTag(tokenItem)) {
 					length = token.index;
@@ -98,13 +98,13 @@
 		},
 
 		_handleTagEnd(token) {
-			const instance = this;
+			var instance = this;
 
-			let pos = 0;
+			var pos = 0;
 
-			const stack = instance._stack;
+			var stack = instance._stack;
 
-			let tagName;
+			var tagName;
 
 			if (token) {
 				if (isString(token)) {
@@ -117,16 +117,16 @@
 				tagName = tagName.toLowerCase();
 
 				for (pos = stack.length - 1; pos >= 0; pos--) {
-					if (stack[pos] === tagName) {
+					if (stack[pos] == tagName) {
 						break;
 					}
 				}
 			}
 
 			if (pos >= 0) {
-				const tokenTagEnd = Parser.TOKEN_TAG_END;
+				var tokenTagEnd = Parser.TOKEN_TAG_END;
 
-				for (let i = stack.length - 1; i >= pos; i--) {
+				for (var i = stack.length - 1; i >= pos; i--) {
 					instance._result.push({
 						type: tokenTagEnd,
 						value: stack[i],
@@ -138,15 +138,15 @@
 		},
 
 		_handleTagStart(token) {
-			const instance = this;
+			var instance = this;
 
-			const tagName = token[1].toLowerCase();
+			var tagName = token[1].toLowerCase();
 
 			if (instance._isValidTag(tagName)) {
-				const stack = instance._stack;
+				var stack = instance._stack;
 
 				if (hasOwnProperty.call(ELEMENTS_BLOCK, tagName)) {
-					let lastTag;
+					var lastTag;
 
 					while (
 						(lastTag = stack.last()) &&
@@ -158,7 +158,7 @@
 
 				if (
 					hasOwnProperty.call(ELEMENTS_CLOSE_SELF, tagName) &&
-					stack.last() === tagName
+					stack.last() == tagName
 				) {
 					instance._handleTagEnd(tagName);
 				}
@@ -174,7 +174,7 @@
 		},
 
 		_isValidTag(tagName) {
-			let valid = false;
+			var valid = false;
 
 			if (tagName && tagName.length) {
 				valid = REGEX_TAG_NAME.test(tagName);
@@ -184,7 +184,7 @@
 		},
 
 		_reset() {
-			const instance = this;
+			var instance = this;
 
 			instance._stack.length = 0;
 			instance._result.length = 0;
@@ -195,14 +195,14 @@
 		constructor: Parser,
 
 		init() {
-			const instance = this;
+			var instance = this;
 
-			const stack = [];
+			var stack = [];
 
 			stack.last =
 				stack.last ||
 				function () {
-					const instance = this;
+					var instance = this;
 
 					return instance[instance.length - 1];
 				};
@@ -215,13 +215,13 @@
 		},
 
 		parse(data) {
-			const instance = this;
+			var instance = this;
 
-			const lexer = new Liferay.BBCodeLexer(data);
+			var lexer = new Liferay.BBCodeLexer(data);
 
 			instance._lexer = lexer;
 
-			let token;
+			var token;
 
 			while ((token = lexer.getNextToken())) {
 				instance._handleData(token, data);
@@ -229,10 +229,10 @@
 				if (token[1]) {
 					instance._handleTagStart(token);
 
-					if (token[1].toLowerCase() === STR_TAG_CODE) {
+					if (token[1].toLowerCase() == STR_TAG_CODE) {
 						while (
 							(token = lexer.getNextToken()) &&
-							token[3] !== STR_TAG_CODE
+							token[3] != STR_TAG_CODE
 						) {
 
 							// Continue.
@@ -258,7 +258,7 @@
 
 			instance._handleTagEnd();
 
-			const result = instance._result.slice(0);
+			var result = instance._result.slice(0);
 
 			instance._reset();
 

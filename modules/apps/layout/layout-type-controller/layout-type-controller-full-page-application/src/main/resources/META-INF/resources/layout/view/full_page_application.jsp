@@ -19,18 +19,18 @@
 <%
 String ppid = ParamUtil.getString(request, "p_p_id");
 
-UnicodeProperties typeSettingsUnicodeProperties = layout.getTypeSettingsProperties();
+UnicodeProperties typeSettingsProperties = layout.getTypeSettingsProperties();
 
 if (Validator.isNull(ppid)) {
-	ppid = typeSettingsUnicodeProperties.getProperty("fullPageApplicationPortlet");
+	ppid = typeSettingsProperties.getProperty("fullPageApplicationPortlet");
 }
 
 String velocityTemplateId = theme.getThemeId() + LayoutTemplateConstants.STANDARD_SEPARATOR + "max";
 String velocityTemplateContent = LayoutTemplateLocalServiceUtil.getContent("max", true, theme.getThemeId());
 
 if (Validator.isNotNull(velocityTemplateContent)) {
-	RuntimePageUtil.processTemplate(request, response, ppid, velocityTemplateId, velocityTemplateContent);
+	RuntimePageUtil.processTemplate(request, response, ppid, new StringTemplateResource(velocityTemplateId, velocityTemplateContent));
 }
 %>
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />

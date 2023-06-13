@@ -14,36 +14,28 @@
 
 package com.liferay.exportimport.web.internal.display.context;
 
-import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
-import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-
-import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -67,48 +59,6 @@ public class ProcessSummaryDisplayContext {
 		}
 
 		return new ArrayList<>(pageNames);
-	}
-
-	public String getPagesDescription(
-		long groupId, Locale locale, boolean settingsMapPrivateLayout) {
-
-		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
-
-		if ((group != null) && !group.isPrivateLayoutsEnabled()) {
-			return LanguageUtil.get(locale, "pages");
-		}
-
-		if (settingsMapPrivateLayout) {
-			return LanguageUtil.get(locale, "private-pages");
-		}
-
-		return LanguageUtil.get(locale, "public-pages");
-	}
-
-	public long[] getSelectedLayoutIds(
-		Map<String, Serializable> exportImportConfigurationSettingsMap) {
-
-		long[] layoutIds = GetterUtil.getLongValues(
-			exportImportConfigurationSettingsMap.get("layoutIds"));
-
-		if ((layoutIds != null) && (layoutIds.length > 0)) {
-			return layoutIds;
-		}
-
-		Map<Long, Boolean> layoutIdMap =
-			(Map<Long, Boolean>)exportImportConfigurationSettingsMap.get(
-				"layoutIdMap");
-
-		try {
-			layoutIds = ExportImportHelperUtil.getLayoutIds(layoutIdMap);
-		}
-		catch (PortalException portalException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
-			}
-		}
-
-		return layoutIds;
 	}
 
 	private void _addPageNames(
@@ -141,12 +91,11 @@ public class ProcessSummaryDisplayContext {
 					groupId, privateLayout, selectedLayoutIds,
 					layout.getLayoutId(), pageNames, languageId);
 
-				sb.insert(
-					0, layout.getName(languageId) + StringPool.FORWARD_SLASH);
+				sb.insert(0, layout.getName() + StringPool.FORWARD_SLASH);
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 			}
 		}
@@ -173,10 +122,11 @@ public class ProcessSummaryDisplayContext {
 			pageNames.add(childPageName);
 
 			if (childLayoutJSONObject.getBoolean("hasChildren")) {
-				pageNames.addAll(
-					_getChildPageNames(
-						childPageName,
-						childLayoutJSONObject.getJSONObject("children")));
+				List<String> childPageNames = _getChildPageNames(
+					childPageName,
+					childLayoutJSONObject.getJSONObject("children"));
+
+				pageNames.addAll(childPageNames);
 			}
 		}
 
@@ -184,9 +134,11 @@ public class ProcessSummaryDisplayContext {
 	}
 
 	private boolean _hasApprovedLayoutRevision(Layout layout) {
+		LayoutSet layoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
+			layout.getGroupId(), layout.isPrivateLayout());
+
 		LayoutSetBranch layoutSetBranch = LayoutStagingUtil.getLayoutSetBranch(
-			LayoutSetLocalServiceUtil.fetchLayoutSet(
-				layout.getGroupId(), layout.isPrivateLayout()));
+			layoutSet);
 
 		List<LayoutRevision> approvedLayoutRevisions =
 			LayoutRevisionLocalServiceUtil.getLayoutRevisions(

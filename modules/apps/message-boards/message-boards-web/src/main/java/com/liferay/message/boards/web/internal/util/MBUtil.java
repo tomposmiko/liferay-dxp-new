@@ -20,11 +20,11 @@ import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.settings.MBGroupServiceSettings;
 import com.liferay.message.boards.web.internal.security.permission.MBMessagePermission;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -51,11 +51,14 @@ public class MBUtil {
 	public static String getBBCodeQuoteBody(
 		HttpServletRequest httpServletRequest, MBMessage parentMessage) {
 
+		String parentAuthor = _getParentAuthor(
+			parentMessage, httpServletRequest);
+
 		return StringBundler.concat(
 			"[quote=",
 			StringUtil.replace(
-				_getParentAuthor(parentMessage, httpServletRequest),
-				new String[] {"[", "]"}, new String[] {"&#91;", "&#93;"}),
+				parentAuthor, new String[] {"[", "]", "(", ")"},
+				new String[] {"&#91;", "&#93;", "&#40;", "&#41;"}),
 			"]\n", parentMessage.getBody(false), "[/quote]\n\n\n");
 	}
 
@@ -119,9 +122,11 @@ public class MBUtil {
 	public static String getHtmlQuoteBody(
 		HttpServletRequest httpServletRequest, MBMessage parentMessage) {
 
+		String parentAuthor = _getParentAuthor(
+			parentMessage, httpServletRequest);
+
 		return StringBundler.concat(
-			"<blockquote><div class=\"quote-title\">",
-			_getParentAuthor(parentMessage, httpServletRequest),
+			"<blockquote><div class=\"quote-title\">", parentAuthor,
 			": </div><div class=\"quote\"><div class=\"quote-content\">",
 			parentMessage.getBody(false),
 			"</div></blockquote><br /><br /><br />");

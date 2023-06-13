@@ -446,11 +446,6 @@ public class MBBanWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<MBBan, Object>> getAttributeGetterFunctions() {
 		return model.getAttributeGetterFunctions();
 	}

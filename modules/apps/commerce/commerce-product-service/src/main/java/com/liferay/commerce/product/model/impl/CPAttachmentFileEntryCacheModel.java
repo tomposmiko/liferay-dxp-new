@@ -18,7 +18,6 @@ import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -34,7 +33,7 @@ import java.util.Date;
  * @generated
  */
 public class CPAttachmentFileEntryCacheModel
-	implements CacheModel<CPAttachmentFileEntry>, Externalizable, MVCCModel {
+	implements CacheModel<CPAttachmentFileEntry>, Externalizable {
 
 	@Override
 	public boolean equals(Object object) {
@@ -49,9 +48,8 @@ public class CPAttachmentFileEntryCacheModel
 		CPAttachmentFileEntryCacheModel cpAttachmentFileEntryCacheModel =
 			(CPAttachmentFileEntryCacheModel)object;
 
-		if ((CPAttachmentFileEntryId ==
-				cpAttachmentFileEntryCacheModel.CPAttachmentFileEntryId) &&
-			(mvccVersion == cpAttachmentFileEntryCacheModel.mvccVersion)) {
+		if (CPAttachmentFileEntryId ==
+				cpAttachmentFileEntryCacheModel.CPAttachmentFileEntryId) {
 
 			return true;
 		}
@@ -61,30 +59,14 @@ public class CPAttachmentFileEntryCacheModel
 
 	@Override
 	public int hashCode() {
-		int hashCode = HashUtil.hash(0, CPAttachmentFileEntryId);
-
-		return HashUtil.hash(hashCode, mvccVersion);
-	}
-
-	@Override
-	public long getMvccVersion() {
-		return mvccVersion;
-	}
-
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		this.mvccVersion = mvccVersion;
+		return HashUtil.hash(0, CPAttachmentFileEntryId);
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(55);
+		StringBundler sb = new StringBundler(51);
 
-		sb.append("{mvccVersion=");
-		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
-		sb.append(", uuid=");
+		sb.append("{uuid=");
 		sb.append(uuid);
 		sb.append(", externalReferenceCode=");
 		sb.append(externalReferenceCode);
@@ -143,9 +125,6 @@ public class CPAttachmentFileEntryCacheModel
 	public CPAttachmentFileEntry toEntityModel() {
 		CPAttachmentFileEntryImpl cpAttachmentFileEntryImpl =
 			new CPAttachmentFileEntryImpl();
-
-		cpAttachmentFileEntryImpl.setMvccVersion(mvccVersion);
-		cpAttachmentFileEntryImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			cpAttachmentFileEntryImpl.setUuid("");
@@ -267,9 +246,6 @@ public class CPAttachmentFileEntryCacheModel
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
 
-		mvccVersion = objectInput.readLong();
-
-		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 		externalReferenceCode = objectInput.readUTF();
 
@@ -311,10 +287,6 @@ public class CPAttachmentFileEntryCacheModel
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
-
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -398,8 +370,6 @@ public class CPAttachmentFileEntryCacheModel
 		objectOutput.writeLong(statusDate);
 	}
 
-	public long mvccVersion;
-	public long ctCollectionId;
 	public String uuid;
 	public String externalReferenceCode;
 	public long CPAttachmentFileEntryId;

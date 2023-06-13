@@ -16,6 +16,7 @@ package com.liferay.commerce.inventory.engine;
 
 import com.liferay.portal.kernel.exception.PortalException;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,35 +27,35 @@ import java.util.Map;
 public interface CommerceInventoryEngine {
 
 	public void consumeQuantity(
-			long userId, long commerceCatalogGroupId,
-			long commerceInventoryWarehouseId, String sku, int quantity,
-			long bookedQuantityId, Map<String, String> context)
+			long userId, long commerceInventoryWarehouseId, String sku,
+			int quantity, long bookedQuantityId, Map<String, String> context)
 		throws PortalException;
 
 	public void decreaseStockQuantity(
-			long userId, long commerceCatalogGroupId,
-			long commerceInventoryWarehouseId, String sku, int quantity)
+			long userId, long commerceInventoryWarehouseId, String sku,
+			int quantity)
 		throws PortalException;
 
 	public String getAvailabilityStatus(
-		long companyId, long commerceCatalogGroupId,
-		long commerceChannelGroupId, int minStockQuantity, String sku);
+		long companyId, long commerceChannelGroupId, int minStockQuantity,
+		String sku);
 
-	public int getStockQuantity(
-			long companyId, long commerceCatalogGroupId,
-			long commerceChannelGroupId, String sku)
+	public Map<String, Integer> getStockQuantities(
+			long companyId, long commerceChannelGroupId, List<String> skus)
 		throws PortalException;
 
 	public int getStockQuantity(
-			long companyId, long commerceCatalogGroupId, String sku)
+			long companyId, long commerceChannelGroupId, String sku)
 		throws PortalException;
 
-	public boolean hasStockQuantity(
-		long companyId, long commerceCatalogGroupId, String sku, int quantity);
+	public int getStockQuantity(long companyId, String sku)
+		throws PortalException;
+
+	public boolean hasStockQuantity(long companyId, String sku, int quantity);
 
 	public void increaseStockQuantity(
-			long userId, long commerceCatalogGroupId,
-			long commerceInventoryWarehouseId, String sku, int quantity)
+			long userId, long commerceInventoryWarehouseId, String sku,
+			int quantity)
 		throws PortalException;
 
 }

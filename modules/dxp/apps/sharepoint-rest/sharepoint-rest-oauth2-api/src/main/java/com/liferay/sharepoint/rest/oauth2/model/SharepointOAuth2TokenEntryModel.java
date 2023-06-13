@@ -207,8 +207,4 @@ public interface SharepointOAuth2TokenEntryModel
 	@Override
 	public SharepointOAuth2TokenEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

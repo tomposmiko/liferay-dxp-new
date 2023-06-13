@@ -16,6 +16,7 @@ import {useIsMounted} from '@liferay/frontend-js-react-web';
 import {ImageEditor} from 'item-selector-taglib';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
+import ReactDOM from 'react-dom';
 
 import Carousel from './Carousel.es';
 import Footer from './Footer.es';
@@ -29,26 +30,19 @@ const KEY_CODE = {
 	RIGTH: 39,
 };
 
-const noop = () => {};
-
-const itemIsImage = ({mimeType, type}) =>
-	type === 'image' || Boolean(mimeType?.match(/image.*/));
-
 const ItemSelectorPreview = ({
+	container,
 	currentIndex = 0,
 	editImageURL,
-	handleClose = noop,
 	handleSelectedItem,
 	headerTitle,
 	itemReturnType,
 	items,
-	reloadOnHide: initialReloadOnHide = false,
 }) => {
 	const [currentItemIndex, setCurrentItemIndex] = useState(currentIndex);
 	const [isEditing, setIsEditing] = useState();
-	const [isImage, setIsImage] = useState(itemIsImage(items[currentIndex]));
 	const [itemList, setItemList] = useState(items);
-	const [reloadOnHide, setReloadOnHide] = useState(initialReloadOnHide);
+	const [reloadOnHide, setReloadOnHide] = useState(false);
 
 	const currentItem = itemList[currentItemIndex];
 
@@ -56,12 +50,16 @@ const ItemSelectorPreview = ({
 
 	const isMounted = useIsMounted();
 
+	const close = useCallback(() => {
+		ReactDOM.unmountComponentAtNode(container);
+	}, [container]);
+
 	const handleCancelEditing = () => {
 		setIsEditing(false);
 	};
 
 	const handleClickBack = () => {
-		handleClose();
+		close();
 
 		if (reloadOnHide) {
 			const frame = window.frameElement;
@@ -73,6 +71,11 @@ const ItemSelectorPreview = ({
 	};
 
 	const handleClickDone = () => {
+
+		// LPS-120692
+
+		close();
+
 		handleSelectedItem(currentItem);
 	};
 
@@ -118,13 +121,13 @@ const ItemSelectorPreview = ({
 				case KEY_CODE.ESC:
 					event.preventDefault();
 					event.stopPropagation();
-					handleClose();
+					close();
 					break;
 				default:
 					break;
 			}
 		},
-		[handleClickNext, handleClickPrevious, handleClose, isMounted]
+		[close, handleClickNext, handleClickPrevious, isMounted]
 	);
 
 	const handleSaveEditedImage = ({file, success}) => {
@@ -154,7 +157,7 @@ const ItemSelectorPreview = ({
 
 			setIsEditing(false);
 
-			handleClose();
+			close();
 			handleSelectedItem(newItem);
 		}
 	};
@@ -209,15 +212,7 @@ const ItemSelectorPreview = ({
 				width: '320px',
 			});
 		}
-
-		return () => {
-			Liferay.SideNavigation.destroy(sidenavToggle);
-		};
 	}, [infoButtonRef]);
-
-	useEffect(() => {
-		setIsImage(itemIsImage(currentItem));
-	}, [currentItem]);
 
 	return (
 		<div className="fullscreen item-selector-preview">
@@ -228,11 +223,10 @@ const ItemSelectorPreview = ({
 				handleClickEdit={handleClickEdit}
 				headerTitle={headerTitle}
 				infoButtonRef={infoButtonRef}
-				showEditIcon={isImage}
+				showEditIcon={true}
 				showInfoIcon={!!currentItem.metadata}
 				showNavbar={!isEditing}
 			/>
-
 			{isEditing ? (
 				<ImageEditor
 					imageId={currentItem.fileEntryId || currentItem.fileentryid}
@@ -248,7 +242,6 @@ const ItemSelectorPreview = ({
 						currentItem={currentItem}
 						handleClickNext={handleClickNext}
 						handleClickPrevious={handleClickPrevious}
-						isImage={isImage}
 						showArrows={itemList.length > 1}
 					/>
 
@@ -259,20 +252,20 @@ const ItemSelectorPreview = ({
 					/>
 				</>
 			)}
+			;
 		</div>
 	);
 };
 
 ItemSelectorPreview.propTypes = {
+	container: PropTypes.instanceOf(Element).isRequired,
 	currentIndex: PropTypes.number,
-	editImageURL: PropTypes.string,
+	editItemURL: PropTypes.string,
 	handleSelectedItem: PropTypes.func.isRequired,
 	headerTitle: PropTypes.string.isRequired,
-	itemReturnType: PropTypes.string,
 	items: PropTypes.arrayOf(
 		PropTypes.shape({
 			base64: PropTypes.string,
-			fileEntryId: PropTypes.string,
 			metadata: PropTypes.string,
 			returntype: PropTypes.string.isRequired,
 			title: PropTypes.string.isRequired,

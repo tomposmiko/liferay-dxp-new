@@ -17,6 +17,7 @@ package com.liferay.project.templates.simulation.panel.entry;
 import com.liferay.maven.executor.MavenExecutor;
 import com.liferay.project.templates.BaseProjectTemplatesTestCase;
 import com.liferay.project.templates.extensions.util.Validator;
+import com.liferay.project.templates.extensions.util.VersionUtil;
 import com.liferay.project.templates.util.FileTestUtil;
 
 import java.io.File;
@@ -45,13 +46,11 @@ public class ProjectTemplatesSimulationPanelEntryTest
 	@ClassRule
 	public static final MavenExecutor mavenExecutor = new MavenExecutor();
 
-	@Parameterized.Parameters(name = "Testcase-{index}: testing {1} {0}")
+	@Parameterized.Parameters(name = "Testcase-{index}: testing {0}")
 	public static Iterable<Object[]> data() {
 		return Arrays.asList(
 			new Object[][] {
-				{"dxp", "7.0.10.17"}, {"dxp", "7.1.10.7"}, {"dxp", "7.2.10.7"},
-				{"portal", "7.3.7"}, {"portal", "7.4.3.36"},
-				{"dxp", "7.4.13.u72"}
+				{"7.0.6-2"}, {"7.1.3-1"}, {"7.2.1-1"}, {"7.3.7"}, {"7.4.1-1"}
 			});
 	}
 
@@ -71,10 +70,7 @@ public class ProjectTemplatesSimulationPanelEntryTest
 		_gradleDistribution = URI.create(gradleDistribution);
 	}
 
-	public ProjectTemplatesSimulationPanelEntryTest(
-		String liferayProduct, String liferayVersion) {
-
-		_liferayProduct = liferayProduct;
+	public ProjectTemplatesSimulationPanelEntryTest(String liferayVersion) {
 		_liferayVersion = liferayVersion;
 	}
 
@@ -88,27 +84,20 @@ public class ProjectTemplatesSimulationPanelEntryTest
 			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
 			mavenExecutor);
 
-		String liferayWorkspaceProduct = _getLiferayWorkspaceProduct();
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				gradleWorkspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
 		File gradleWorkspaceModulesDir = new File(
 			gradleWorkspaceDir, "modules");
 
 		File gradleProjectDir = buildTemplateWithGradle(
-			gradleWorkspaceModulesDir, template, name, "--liferay-product",
-			_liferayProduct, "--liferay-version", _liferayVersion,
-			"--package-name", packageName);
+			gradleWorkspaceModulesDir, template, name, "--liferay-version",
+			_liferayVersion, "--package-name", packageName);
 
 		testExists(gradleProjectDir, "bnd.bnd");
 
-		if (_liferayProduct.equals("dxp")) {
+		if (VersionUtil.getMinorVersion(_liferayVersion) < 3) {
 			testContains(
-				gradleProjectDir, "build.gradle", DEPENDENCY_RELEASE_DXP_API);
+				gradleProjectDir, "build.gradle", DEPENDENCY_PORTAL_KERNEL,
+				DEPENDENCY_JAVAX_PORTLET_API, DEPENDENCY_JAVAX_SERVLET_API,
+				DEPENDENCY_ORG_OSGI_ANNOTATIONS);
 		}
 		else {
 			testContains(
@@ -129,49 +118,12 @@ public class ProjectTemplatesSimulationPanelEntryTest
 			temporaryFolder, "maven", "mavenWS", _liferayVersion,
 			mavenExecutor);
 
-		if (_liferayVersion.startsWith("7.4") &&
-			_liferayProduct.equals("dxp")) {
-
-			updateMavenPomProperties(
-				mavenWorkspaceDir, "liferay.bom.version", "liferay.bom.version",
-				_liferayVersion);
-
-			updateMavenPomElementText(
-				mavenWorkspaceDir, "//artifactId[text()='release.portal.bom']",
-				"release.dxp.bom");
-			updateMavenPomElementText(
-				mavenWorkspaceDir,
-				"//artifactId[text()='release.portal.bom.compile.only']",
-				"release.dxp.bom.compile.only");
-			updateMavenPomElementText(
-				mavenWorkspaceDir,
-				"//artifactId[text()='release.portal.bom.third.party']",
-				"release.dxp.bom.third.party");
-		}
-
 		File mavenModulesDir = new File(mavenWorkspaceDir, "modules");
-
-		String newTemplate = "false";
-
-		if (_liferayVersion.startsWith("7.4")) {
-			String qualifiedVersion = _liferayVersion.substring(
-				_liferayVersion.lastIndexOf(".") + 1);
-
-			if (_liferayProduct.equals("dxp")) {
-				qualifiedVersion = qualifiedVersion.substring(1);
-			}
-
-			if (Integer.valueOf(qualifiedVersion) > 71) {
-				newTemplate = "true";
-			}
-		}
 
 		File mavenProjectDir = buildTemplateWithMaven(
 			mavenModulesDir, mavenModulesDir, template, name, "com.test",
-			mavenExecutor, "-DclassName=Simulator",
-			"-DliferayProduct=" + _liferayProduct,
-			"-DliferayVersion=" + _liferayVersion,
-			"-DnewTemplate=" + newTemplate, "-Dpackage=" + packageName);
+			mavenExecutor, "-DclassName=Simulator", "-Dpackage=" + packageName,
+			"-DliferayVersion=" + _liferayVersion);
 
 		if (!_liferayVersion.startsWith("7.0")) {
 			testContains(
@@ -193,33 +145,8 @@ public class ProjectTemplatesSimulationPanelEntryTest
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-	private String _getLiferayWorkspaceProduct() {
-		if (_liferayVersion.startsWith("7.0")) {
-			return "dxp-7.0-sp17";
-		}
-		else if (_liferayVersion.startsWith("7.1")) {
-			return "dxp-7.1-sp7";
-		}
-		else if (_liferayVersion.startsWith("7.2")) {
-			return "dxp-7.2-sp7";
-		}
-		else if (_liferayVersion.startsWith("7.3")) {
-			return "portal-7.3-ga8";
-		}
-		else if (_liferayVersion.startsWith("7.4")) {
-			if (_liferayProduct.equals("dxp")) {
-				return "dxp-7.4-u72";
-			}
-
-			return "portal-7.4-ga36";
-		}
-
-		return null;
-	}
-
 	private static URI _gradleDistribution;
 
-	private final String _liferayProduct;
 	private final String _liferayVersion;
 
 }

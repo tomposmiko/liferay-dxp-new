@@ -145,6 +145,7 @@ public class PanelContainerTag extends BaseBodyTagSupport implements BodyTag {
 	}
 
 	public void setMarkupView(String markupView) {
+		_markupView = markupView;
 	}
 
 	public void setPersistState(boolean persistState) {
@@ -161,12 +162,18 @@ public class PanelContainerTag extends BaseBodyTagSupport implements BodyTag {
 		_endPage = null;
 		_extended = null;
 		_id = null;
+		_markupView = null;
 		_persistState = false;
 		_startPage = null;
 	}
 
 	protected String getEndPage() {
 		if (Validator.isNull(_endPage)) {
+			if (Validator.isNotNull(_markupView)) {
+				return "/html/taglib/ui/panel_container/" + _markupView +
+					"/end.jsp";
+			}
+
 			return "/html/taglib/ui/panel_container/end.jsp";
 		}
 
@@ -175,6 +182,11 @@ public class PanelContainerTag extends BaseBodyTagSupport implements BodyTag {
 
 	protected String getStartPage() {
 		if (Validator.isNull(_startPage)) {
+			if (Validator.isNotNull(_markupView)) {
+				return "/html/taglib/ui/panel_container/" + _markupView +
+					"/start.jsp";
+			}
+
 			return "/html/taglib/ui/panel_container/start.jsp";
 		}
 
@@ -186,6 +198,7 @@ public class PanelContainerTag extends BaseBodyTagSupport implements BodyTag {
 	private String _endPage;
 	private Boolean _extended;
 	private String _id;
+	private String _markupView;
 	private boolean _persistState;
 	private String _startPage;
 

@@ -39,6 +39,7 @@ import com.liferay.taglib.util.PortalIncludeUtil;
 import java.io.IOException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 
@@ -140,13 +141,15 @@ public class DepotItemSelectorViewRenderer implements ItemSelectorViewRenderer {
 			return _getPortletId(_className);
 		}
 
-		for (String portletId : _portletIds) {
-			if (_depotApplicationController.isEnabled(portletId, groupId)) {
-				return portletId;
-			}
-		}
+		Stream<String> stream = _portletIds.stream();
 
-		return StringPool.BLANK;
+		return stream.filter(
+			portletId -> _depotApplicationController.isEnabled(
+				portletId, groupId)
+		).findFirst(
+		).orElse(
+			StringPool.BLANK
+		);
 	}
 
 	private String _getPortletId(String className) {
@@ -162,8 +165,9 @@ public class DepotItemSelectorViewRenderer implements ItemSelectorViewRenderer {
 
 			return JournalPortletKeys.JOURNAL;
 		}
-
-		return StringPool.BLANK;
+		else {
+			return StringPool.BLANK;
+		}
 	}
 
 	private final String _className;

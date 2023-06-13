@@ -29,7 +29,6 @@ ClaySampleManagementToolbarsDisplayContext managementToolbarsDisplayContext = ne
 <clay:management-toolbar
 	creationMenu="<%= managementToolbarsDisplayContext.getCreationMenu() %>"
 	filterDropdownItems="<%= managementToolbarsDisplayContext.getFilterDropdownItems() %>"
-	orderDropdownItems="<%= managementToolbarsDisplayContext.getOrderDropdownItems() %>"
 	searchActionURL="mySearchActionURL?key1=val1&key2=val2&key3=val3"
 	searchFormName="mySearchName"
 	searchInputAutoFocus="<%= true %>"
@@ -57,7 +56,6 @@ ClaySampleManagementToolbarsDisplayContext managementToolbarsDisplayContext = ne
 	filterDropdownItems="<%= managementToolbarsDisplayContext.getFilterDropdownItems() %>"
 	filterLabelItems="<%= managementToolbarsDisplayContext.getFilterLabelItems() %>"
 	itemsTotal="<%= 42 %>"
-	orderDropdownItems="<%= managementToolbarsDisplayContext.getOrderDropdownItems() %>"
 	searchActionURL="mySearchActionURL?key1=val1&key2=val2&key3=val3"
 	searchFormName="mySearchName"
 	searchInputName="mySearchInputName"

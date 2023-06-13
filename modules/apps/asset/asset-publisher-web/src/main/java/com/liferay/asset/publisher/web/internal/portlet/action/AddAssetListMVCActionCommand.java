@@ -20,7 +20,6 @@ import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
 import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.asset.publisher.web.internal.handler.AssetListExceptionRequestHandler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -32,7 +31,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -40,7 +38,6 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
@@ -56,6 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AssetPublisherPortletKeys.ASSET_PUBLISHER,
 		"mvc.command.name=/asset_publisher/add_asset_list"
@@ -143,35 +141,6 @@ public class AddAssetListMVCActionCommand extends BaseMVCActionCommand {
 				continue;
 			}
 
-			if (name.equals("scopeIds")) {
-				List<Long> groupIds = new ArrayList<>();
-
-				String[] parts = value.split(StringPool.COMMA);
-
-				for (String part : parts) {
-					if (part.equals("Group_default")) {
-						groupIds.add(serviceContext.getScopeGroupId());
-					}
-					else {
-						if (part.startsWith("Group_")) {
-							long groupId = GetterUtil.getLong(
-								part.replace("Group_", StringPool.BLANK), -1);
-
-							if (groupId != -1) {
-								groupIds.add(groupId);
-							}
-						}
-					}
-				}
-
-				if (groupIds.isEmpty()) {
-					continue;
-				}
-
-				name = "groupIds";
-				value = ListUtil.toString(groupIds, StringPool.BLANK);
-			}
-
 			unicodeProperties.put(name, value);
 		}
 
@@ -195,11 +164,12 @@ public class AddAssetListMVCActionCommand extends BaseMVCActionCommand {
 			portletPreferences, themeDisplay.getScopeGroupId(),
 			themeDisplay.getLayout());
 
+		List<AssetEntry> assetEntries = _assetPublisherHelper.getAssetEntries(
+			actionRequest, portletPreferences,
+			themeDisplay.getPermissionChecker(), groupIds, true, true);
+
 		long[] assetEntryIds = ListUtil.toLongArray(
-			_assetPublisherHelper.getAssetEntries(
-				actionRequest, portletPreferences,
-				themeDisplay.getPermissionChecker(), groupIds, true, true),
-			AssetEntry::getEntryId);
+			assetEntries, AssetEntry::getEntryId);
 
 		_assetListEntryService.addManualAssetListEntry(
 			themeDisplay.getUserId(), themeDisplay.getScopeGroupId(), title,

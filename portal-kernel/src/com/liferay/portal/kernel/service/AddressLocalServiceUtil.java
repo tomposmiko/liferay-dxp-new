@@ -59,28 +59,46 @@ public class AddressLocalServiceUtil {
 		return getService().addAddress(address);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addAddress(String, long, String, long, String, String,
+	 String, String, String, String, String, long, long, long,
+	 boolean, boolean, String, ServiceContext)}
+	 */
+	@Deprecated
+	public static Address addAddress(
+			long userId, String className, long classPK, String street1,
+			String street2, String street3, String city, String zip,
+			long regionId, long countryId, long typeId, boolean mailing,
+			boolean primary, ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addAddress(
+			userId, className, classPK, street1, street2, street3, city, zip,
+			regionId, countryId, typeId, mailing, primary, serviceContext);
+	}
+
 	public static Address addAddress(
 			String externalReferenceCode, long userId, String className,
 			long classPK, String name, String description, String street1,
 			String street2, String street3, String city, String zip,
-			long regionId, long countryId, long listTypeId, boolean mailing,
+			long regionId, long countryId, long typeId, boolean mailing,
 			boolean primary, String phoneNumber, ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addAddress(
 			externalReferenceCode, userId, className, classPK, name,
 			description, street1, street2, street3, city, zip, regionId,
-			countryId, listTypeId, mailing, primary, phoneNumber,
-			serviceContext);
+			countryId, typeId, mailing, primary, phoneNumber, serviceContext);
 	}
 
 	public static Address copyAddress(
-			long sourceAddressId, String className, long classPK,
+			long addressId, String className, long classPK,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyAddress(
-			sourceAddressId, className, classPK, serviceContext);
+			addressId, className, classPK, serviceContext);
 	}
 
 	/**
@@ -245,11 +263,29 @@ public class AddressLocalServiceUtil {
 		return getService().fetchAddress(addressId);
 	}
 
+	/**
+	 * Returns the address with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the address's external reference code
+	 * @return the matching address, or <code>null</code> if a matching address could not be found
+	 */
 	public static Address fetchAddressByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchAddressByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAddressByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static Address fetchAddressByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchAddressByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -282,12 +318,20 @@ public class AddressLocalServiceUtil {
 		return getService().getAddress(addressId);
 	}
 
+	/**
+	 * Returns the address with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the address's external reference code
+	 * @return the matching address
+	 * @throws PortalException if a matching address could not be found
+	 */
 	public static Address getAddressByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getAddressByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -368,22 +412,6 @@ public class AddressLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
-	public static List<Address> getListTypeAddresses(
-		long companyId, String className, long classPK, long[] listTypeIds) {
-
-		return getService().getListTypeAddresses(
-			companyId, className, classPK, listTypeIds);
-	}
-
-	public static List<Address> getListTypeAddresses(
-		long companyId, String className, long classPK, long[] listTypeIds,
-		int start, int end, OrderByComparator<Address> orderByComparator) {
-
-		return getService().getListTypeAddresses(
-			companyId, className, classPK, listTypeIds, start, end,
-			orderByComparator);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -400,6 +428,22 @@ public class AddressLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
+	}
+
+	public static List<Address> getTypeAddresses(
+		long companyId, String className, long classPK, long[] typeIds) {
+
+		return getService().getTypeAddresses(
+			companyId, className, classPK, typeIds);
+	}
+
+	public static List<Address> getTypeAddresses(
+		long companyId, String className, long classPK, long[] typeIds,
+		int start, int end, OrderByComparator<Address> orderByComparator) {
+
+		return getService().getTypeAddresses(
+			companyId, className, classPK, typeIds, start, end,
+			orderByComparator);
 	}
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult
@@ -429,25 +473,25 @@ public class AddressLocalServiceUtil {
 
 	public static Address updateAddress(
 			long addressId, String street1, String street2, String street3,
-			String city, String zip, long regionId, long countryId,
-			long listTypeId, boolean mailing, boolean primary)
+			String city, String zip, long regionId, long countryId, long typeId,
+			boolean mailing, boolean primary)
 		throws PortalException {
 
 		return getService().updateAddress(
 			addressId, street1, street2, street3, city, zip, regionId,
-			countryId, listTypeId, mailing, primary);
+			countryId, typeId, mailing, primary);
 	}
 
 	public static Address updateAddress(
 			long addressId, String name, String description, String street1,
 			String street2, String street3, String city, String zip,
-			long regionId, long countryId, long listTypeId, boolean mailing,
+			long regionId, long countryId, long typeId, boolean mailing,
 			boolean primary, String phoneNumber)
 		throws PortalException {
 
 		return getService().updateAddress(
 			addressId, name, description, street1, street2, street3, city, zip,
-			regionId, countryId, listTypeId, mailing, primary, phoneNumber);
+			regionId, countryId, typeId, mailing, primary, phoneNumber);
 	}
 
 	public static AddressLocalService getService() {

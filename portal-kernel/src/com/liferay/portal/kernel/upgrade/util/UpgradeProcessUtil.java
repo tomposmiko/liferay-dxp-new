@@ -14,11 +14,9 @@
 
 package com.liferay.portal.kernel.upgrade.util;
 
-import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -50,25 +48,13 @@ public class UpgradeProcessUtil {
 			return languageId;
 		}
 
-		try (Connection connection = DataAccess.getConnection()) {
-			DBInspector dbInspector = new DBInspector(connection);
-			String sql = "select languageId from User_ where companyId = ?";
+		try (Connection connection = DataAccess.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
+				"select languageId from User_ where companyId = ? and " +
+					"defaultUser = ?")) {
 
-			PreparedStatement preparedStatement = null;
-
-			if (dbInspector.hasColumn("User_", "defaultUser")) {
-				preparedStatement = connection.prepareStatement(
-					sql + " and defaultUser = ?");
-
-				preparedStatement.setLong(1, companyId);
-				preparedStatement.setBoolean(2, Boolean.TRUE);
-			}
-			else {
-				preparedStatement = connection.prepareStatement(
-					sql + " and type_ = " + UserConstants.TYPE_GUEST);
-
-				preparedStatement.setLong(1, companyId);
-			}
+			preparedStatement.setLong(1, companyId);
+			preparedStatement.setBoolean(2, true);
 
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
 				if (resultSet.next()) {
@@ -81,13 +67,6 @@ public class UpgradeProcessUtil {
 
 				return LocaleUtil.toLanguageId(LocaleUtil.US);
 			}
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			return LocaleUtil.toLanguageId(LocaleUtil.US);
 		}
 	}
 
@@ -163,6 +142,19 @@ public class UpgradeProcessUtil {
 		}
 
 		return ranUpgradeProcess;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #upgradeProcess(int, List)} ()}
+	 */
+	@Deprecated
+	public static boolean upgradeProcess(
+			int buildNumber, List<UpgradeProcess> upgradeProcesses,
+			boolean indexOnUpgrade)
+		throws UpgradeException {
+
+		return upgradeProcess(buildNumber, upgradeProcesses);
 	}
 
 	private static boolean _upgradeProcess(

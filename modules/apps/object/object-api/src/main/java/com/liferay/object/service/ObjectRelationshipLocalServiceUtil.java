@@ -47,13 +47,12 @@ public class ObjectRelationshipLocalServiceUtil {
 	 */
 	public static ObjectRelationship addObjectRelationship(
 			long userId, long objectDefinitionId1, long objectDefinitionId2,
-			long parameterObjectFieldId, String deletionType,
 			Map<java.util.Locale, String> labelMap, String name, String type)
 		throws PortalException {
 
 		return getService().addObjectRelationship(
-			userId, objectDefinitionId1, objectDefinitionId2,
-			parameterObjectFieldId, deletionType, labelMap, name, type);
+			userId, objectDefinitionId1, objectDefinitionId2, labelMap, name,
+			type);
 	}
 
 	/**
@@ -81,14 +80,6 @@ public class ObjectRelationshipLocalServiceUtil {
 		getService().addObjectRelationshipMappingTableValues(
 			userId, objectRelationshipId, primaryKey1, primaryKey2,
 			serviceContext);
-	}
-
-	public static ObjectRelationship createManyToManyObjectRelationshipTable(
-			long userId, ObjectRelationship objectRelationship)
-		throws PortalException {
-
-		return getService().createManyToManyObjectRelationshipTable(
-			userId, objectRelationship);
 	}
 
 	/**
@@ -163,19 +154,6 @@ public class ObjectRelationshipLocalServiceUtil {
 
 		getService().deleteObjectRelationshipMappingTableValues(
 			objectRelationshipId, primaryKey1, primaryKey2);
-	}
-
-	public static void deleteObjectRelationships(long objectDefinitionId1)
-		throws PortalException {
-
-		getService().deleteObjectRelationships(objectDefinitionId1);
-	}
-
-	public static void deleteObjectRelationships(
-			long objectDefinitionId1, boolean reverse)
-		throws PortalException {
-
-		getService().deleteObjectRelationships(objectDefinitionId1, reverse);
 	}
 
 	/**
@@ -279,22 +257,6 @@ public class ObjectRelationshipLocalServiceUtil {
 		return getService().fetchObjectRelationship(objectRelationshipId);
 	}
 
-	public static ObjectRelationship
-		fetchObjectRelationshipByObjectDefinitionId(
-			long objectDefinitionId, String name) {
-
-		return getService().fetchObjectRelationshipByObjectDefinitionId(
-			objectDefinitionId, name);
-	}
-
-	public static ObjectRelationship
-		fetchObjectRelationshipByObjectDefinitionId1(
-			long objectDefinitionId1, String name) {
-
-		return getService().fetchObjectRelationshipByObjectDefinitionId1(
-			objectDefinitionId1, name);
-	}
-
 	public static ObjectRelationship fetchObjectRelationshipByObjectFieldId2(
 		long objectFieldId2) {
 
@@ -329,12 +291,6 @@ public class ObjectRelationshipLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	public static List<ObjectRelationship> getAllObjectRelationships(
-		long objectDefinitionId) {
-
-		return getService().getAllObjectRelationships(objectDefinitionId);
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
 		getExportActionableDynamicQuery(
 			com.liferay.exportimport.kernel.lar.PortletDataContext
@@ -362,21 +318,6 @@ public class ObjectRelationshipLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getObjectRelationship(objectRelationshipId);
-	}
-
-	public static ObjectRelationship getObjectRelationship(
-			long objectDefinitionId1, String name)
-		throws PortalException {
-
-		return getService().getObjectRelationship(objectDefinitionId1, name);
-	}
-
-	public static ObjectRelationship getObjectRelationshipByObjectDefinitionId(
-			long objectDefinitionId, String name)
-		throws Exception {
-
-		return getService().getObjectRelationshipByObjectDefinitionId(
-			objectDefinitionId, name);
 	}
 
 	/**
@@ -413,43 +354,10 @@ public class ObjectRelationshipLocalServiceUtil {
 	}
 
 	public static List<ObjectRelationship> getObjectRelationships(
-		long objectDefinitionId1) {
-
-		return getService().getObjectRelationships(objectDefinitionId1);
-	}
-
-	public static List<ObjectRelationship> getObjectRelationships(
 		long objectDefinitionId1, int start, int end) {
 
 		return getService().getObjectRelationships(
 			objectDefinitionId1, start, end);
-	}
-
-	public static List<ObjectRelationship> getObjectRelationships(
-		long objectDefinitionId1, long objectDefinition2, String type) {
-
-		return getService().getObjectRelationships(
-			objectDefinitionId1, objectDefinition2, type);
-	}
-
-	public static List<ObjectRelationship> getObjectRelationships(
-		long objectDefinitionId, String type) {
-
-		return getService().getObjectRelationships(objectDefinitionId, type);
-	}
-
-	public static List<ObjectRelationship> getObjectRelationships(
-		long objectDefinitionId1, String deletionType, boolean reverse) {
-
-		return getService().getObjectRelationships(
-			objectDefinitionId1, deletionType, reverse);
-	}
-
-	public static List<ObjectRelationship>
-		getObjectRelationshipsByObjectDefinitionId2(long objectDefinitionId2) {
-
-		return getService().getObjectRelationshipsByObjectDefinitionId2(
-			objectDefinitionId2);
 	}
 
 	/**
@@ -479,23 +387,13 @@ public class ObjectRelationshipLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static void
-		registerObjectRelationshipsRelatedInfoCollectionProviders(
-			com.liferay.object.model.ObjectDefinition objectDefinition1,
-			ObjectDefinitionLocalService objectDefinitionLocalService) {
-
-		getService().registerObjectRelationshipsRelatedInfoCollectionProviders(
-			objectDefinition1, objectDefinitionLocalService);
-	}
-
 	public static ObjectRelationship updateObjectRelationship(
-			long objectRelationshipId, long parameterObjectFieldId,
-			String deletionType, Map<java.util.Locale, String> labelMap)
+			long objectRelationshipId, String deletionType,
+			Map<java.util.Locale, String> labelMap)
 		throws PortalException {
 
 		return getService().updateObjectRelationship(
-			objectRelationshipId, parameterObjectFieldId, deletionType,
-			labelMap);
+			objectRelationshipId, deletionType, labelMap);
 	}
 
 	/**

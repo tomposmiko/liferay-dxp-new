@@ -14,18 +14,10 @@
 
 package com.liferay.info.field.type;
 
-import com.liferay.portal.kernel.util.KeyValuePair;
-
 /**
  * @author Jorge Ferrer
  */
 public class CategoriesInfoFieldType implements InfoFieldType {
-
-	public static final Attribute<CategoriesInfoFieldType, KeyValuePair>
-		DEPENDENCY = new Attribute<>();
-
-	public static final Attribute<CategoriesInfoFieldType, String>
-		INFO_ITEM_SELECTOR_URL = new Attribute<>();
 
 	public static final CategoriesInfoFieldType INSTANCE =
 		new CategoriesInfoFieldType();

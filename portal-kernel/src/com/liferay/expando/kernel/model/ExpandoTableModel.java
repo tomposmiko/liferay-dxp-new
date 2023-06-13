@@ -167,8 +167,4 @@ public interface ExpandoTableModel
 	@Override
 	public ExpandoTable cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

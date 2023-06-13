@@ -14,19 +14,16 @@
 
 package com.liferay.osgi.log.service.extender.internal.activator;
 
-import com.liferay.osgi.log.service.extender.internal.osgi.commands.LoggingLevelsOSGiCommands;
+import com.liferay.petra.log4j.Log4JUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.log4j.Log4JUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URL;
 
-import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -38,7 +35,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogLevel;
 import org.osgi.service.log.admin.LoggerAdmin;
 import org.osgi.service.log.admin.LoggerContext;
@@ -64,21 +60,6 @@ public class OSGiLogServiceExtenderBundleActivator implements BundleActivator {
 	@Override
 	public void stop(BundleContext bundleContext) {
 		_serviceTracker.close();
-	}
-
-	public static class Tracked
-		extends AbstractMap.SimpleEntry
-			<BundleTracker<LoggerContext>,
-			 ServiceRegistration<LoggingLevelsOSGiCommands>> {
-
-		public Tracked(
-			BundleTracker<LoggerContext> bundleTracker,
-			ServiceRegistration<LoggingLevelsOSGiCommands>
-				serviceRegistration) {
-
-			super(bundleTracker, serviceRegistration);
-		}
-
 	}
 
 	private static Map<String, LogLevel> _loadLogConfigurations(Bundle bundle) {
@@ -145,55 +126,39 @@ public class OSGiLogServiceExtenderBundleActivator implements BundleActivator {
 	private static final Log _log = LogFactoryUtil.getLog(
 		OSGiLogServiceExtenderBundleActivator.class);
 
-	private volatile ServiceTracker<LoggerAdmin, Tracked> _serviceTracker;
+	private volatile ServiceTracker<LoggerAdmin, BundleTracker<LoggerContext>>
+		_serviceTracker;
 
 	private static class LoggerAdminServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer<LoggerAdmin, Tracked> {
+		implements ServiceTrackerCustomizer
+			<LoggerAdmin, BundleTracker<LoggerContext>> {
 
 		@Override
-		public Tracked addingService(
+		public BundleTracker<LoggerContext> addingService(
 			ServiceReference<LoggerAdmin> serviceReference) {
 
 			LoggerAdmin loggerAdmin = _bundleContext.getService(
 				serviceReference);
 
 			BundleTracker<LoggerContext> bundleTracker = new BundleTracker<>(
-				_bundleContext, Bundle.ACTIVE,
+				_bundleContext, ~(Bundle.INSTALLED | Bundle.UNINSTALLED),
 				new LoggerContextBundleTrackerCustomizer(loggerAdmin));
 
 			bundleTracker.open();
 
-			LoggingLevelsOSGiCommands loggingLevelsOSGiCommands =
-				new LoggingLevelsOSGiCommands(loggerAdmin);
-
-			ServiceRegistration<LoggingLevelsOSGiCommands> serviceRegistration =
-				_bundleContext.registerService(
-					LoggingLevelsOSGiCommands.class, loggingLevelsOSGiCommands,
-					HashMapDictionaryBuilder.<String, Object>put(
-						"osgi.command.function",
-						new String[] {"levels", "level"}
-					).put(
-						"osgi.command.scope", "logging"
-					).build());
-
-			return new Tracked(bundleTracker, serviceRegistration);
+			return bundleTracker;
 		}
 
 		@Override
 		public void modifiedService(
-			ServiceReference<LoggerAdmin> serviceReference, Tracked tracked) {
+			ServiceReference<LoggerAdmin> serviceReference,
+			BundleTracker<LoggerContext> bundleTracker) {
 		}
 
 		@Override
 		public void removedService(
-			ServiceReference<LoggerAdmin> serviceReference, Tracked tracked) {
-
-			ServiceRegistration<LoggingLevelsOSGiCommands> serviceRegistration =
-				tracked.getValue();
-
-			serviceRegistration.unregister();
-
-			BundleTracker<LoggerContext> bundleTracker = tracked.getKey();
+			ServiceReference<LoggerAdmin> serviceReference,
+			BundleTracker<LoggerContext> bundleTracker) {
 
 			bundleTracker.close();
 

@@ -1,23 +1,17 @@
-@default = "assertElementPresent"
-@summary = "Assert that '${locator1}' is available"
-definition {
+<definition default="assertElementPresent" summary="Assert that '${locator1}' is available">
+	<command name="assertElementPresent">
+		<execute selenium="waitForElementPresent" />
 
-	function assertElementPresent {
-		selenium.waitForElementPresent();
+		<execute selenium="assertElementPresent" />
+	</command>
 
-		selenium.assertElementPresent();
-	}
+	<command name="assertVisible">
+		<execute selenium="waitForVisible" />
 
-	function assertVisible {
-		selenium.waitForVisible();
+		<execute selenium="assertVisible" />
+	</command>
 
-		selenium.assertVisible();
-	}
-
-	function pauseAssertVisible {
-		selenium.pause("2000");
-
-		AssertElementPresent.assertVisible();
-	}
-
-}
+	<command name="pauseAssertVisible">
+		<execute function="AssertElementPresent#assertVisible" />
+	</command>
+</definition>

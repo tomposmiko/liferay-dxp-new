@@ -50,7 +50,7 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 				.then(() => {
 					Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 						id:
-							'<%= CommercePricingFDSNames.PRICE_MODIFIER_PRICING_CLASSES %>',
+							'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_MODIFIER_PRICING_CLASSES %>',
 					});
 				})
 				.catch((error) => {
@@ -72,7 +72,7 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 			itemsKey: 'id',
 			itemCreation: false,
 			linkedDatasetsId: [
-				'<%= CommercePricingFDSNames.PRICE_MODIFIER_PRICING_CLASSES %>',
+				'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_MODIFIER_PRICING_CLASSES %>',
 			],
 			onItemSelected: selectItem,
 			pageSize: 10,
@@ -84,7 +84,7 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 					fieldName: ['title', 'LANG'],
 				},
 			],
-			spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+			spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 			titleLabel:
 				'<%= LanguageUtil.get(request, "add-existing-product-group") %>',
 		});
@@ -94,12 +94,15 @@ long commercePriceModifierId = commercePriceListDisplayContext.getCommercePriceM
 		bodyClasses="p-0"
 		title='<%= LanguageUtil.get(request, "product-groups") %>'
 	>
-		<frontend-data-set:headless-display
+		<clay:headless-data-set-display
 			apiURL="<%= commercePriceListDisplayContext.getPriceModifierPricingClassesApiUrl() %>"
-			fdsActionDropdownItems="<%= commercePriceListDisplayContext.getPriceModifierPricingClassFDSActionDropdownItems() %>"
-			formName="fm"
-			id="<%= CommercePricingFDSNames.PRICE_MODIFIER_PRICING_CLASSES %>"
+			clayDataSetActionDropdownItems="<%= commercePriceListDisplayContext.getPriceModifierPricingClassClayDataSetActionDropdownItems() %>"
+			formId="fm"
+			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_MODIFIER_PRICING_CLASSES %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= currentURLObj %>"
 		/>
 	</commerce-ui:panel>
 </c:if>

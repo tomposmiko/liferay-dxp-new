@@ -40,28 +40,24 @@ Role role = accountRoleDisplay.getRole();
 		<portlet:param name="accountRoleId" value="<%= String.valueOf(accountRoleDisplay.getAccountRoleId()) %>" />
 	</portlet:renderURL>
 
-	<c:if test="<%= !AccountRoleConstants.isSharedRole(role) && AccountRolePermission.contains(permissionChecker, accountRoleDisplay.getAccountRoleId(), ActionKeys.UPDATE) %>">
+	<c:if test="<%= !AccountRoleConstants.isSharedRole(role) %>">
 		<liferay-ui:icon
 			message="edit"
 			url="<%= editAccountRoleURL %>"
 		/>
-	</c:if>
 
-	<c:if test="<%= !AccountRoleConstants.isSharedRole(role) && AccountRolePermission.contains(permissionChecker, accountRoleDisplay.getAccountRoleId(), ActionKeys.DEFINE_PERMISSIONS) %>">
 		<liferay-ui:icon
 			message="define-permissions"
-			url='<%= HttpComponentsUtil.setParameter(editAccountRoleURL, liferayPortletResponse.getNamespace() + "screenNavigationCategoryKey", AccountScreenNavigationEntryConstants.CATEGORY_KEY_DEFINE_PERMISSIONS) %>'
+			url='<%= HttpUtil.setParameter(editAccountRoleURL, liferayPortletResponse.getNamespace() + "screenNavigationCategoryKey", AccountScreenNavigationEntryConstants.CATEGORY_KEY_DEFINE_PERMISSIONS) %>'
 		/>
 	</c:if>
 
-	<c:if test="<%= AccountRolePermission.contains(permissionChecker, accountRoleDisplay.getAccountRoleId(), AccountActionKeys.ASSIGN_USERS) %>">
-		<liferay-ui:icon
-			message="assign-users"
-			url='<%= HttpComponentsUtil.setParameter(editAccountRoleURL, liferayPortletResponse.getNamespace() + "screenNavigationCategoryKey", AccountScreenNavigationEntryConstants.CATEGORY_KEY_ASSIGNEES) %>'
-		/>
-	</c:if>
+	<liferay-ui:icon
+		message="assign-users"
+		url='<%= HttpUtil.setParameter(editAccountRoleURL, liferayPortletResponse.getNamespace() + "screenNavigationCategoryKey", AccountScreenNavigationEntryConstants.CATEGORY_KEY_ASSIGNEES) %>'
+	/>
 
-	<c:if test="<%= !AccountRoleConstants.isSharedRole(role) && AccountRolePermission.contains(permissionChecker, accountRoleDisplay.getAccountRoleId(), ActionKeys.DELETE) %>">
+	<c:if test="<%= !AccountRoleConstants.isSharedRole(role) %>">
 		<portlet:actionURL name="/account_admin/delete_account_roles" var="deleteAccountRolesURL">
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="accountRoleIds" value="<%= String.valueOf(accountRoleDisplay.getAccountRoleId()) %>" />

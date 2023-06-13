@@ -35,7 +35,7 @@ public class ResourceBundleLoaderProvider {
 		String bundleSymbolicName) {
 
 		ResourceBundleLoader resourceBundleLoader =
-			_serviceTrackerMap.getService(bundleSymbolicName);
+			_resourceBundleLoaders.getService(bundleSymbolicName);
 
 		if (resourceBundleLoader == null) {
 			return ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
@@ -48,15 +48,16 @@ public class ResourceBundleLoaderProvider {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+		_resourceBundleLoaders = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, ResourceBundleLoader.class, "bundle.symbolic.name");
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_resourceBundleLoaders.close();
 	}
 
-	private ServiceTrackerMap<String, ResourceBundleLoader> _serviceTrackerMap;
+	private ServiceTrackerMap<String, ResourceBundleLoader>
+		_resourceBundleLoaders;
 
 }

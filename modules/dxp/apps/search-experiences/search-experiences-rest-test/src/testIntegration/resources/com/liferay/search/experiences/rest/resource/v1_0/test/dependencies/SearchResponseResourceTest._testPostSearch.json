@@ -1,6 +1,6 @@
 {
 	"configuration": {
-		"generalConfiguration": {
+		"general": {
 			"emptySearchEnabled": false
 		}
 	}

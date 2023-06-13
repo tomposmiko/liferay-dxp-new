@@ -18,6 +18,9 @@ import com.liferay.commerce.product.constants.CommerceChannelConstants;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
+import com.liferay.commerce.product.model.impl.CommerceCatalogModelImpl;
+import com.liferay.commerce.product.model.impl.CommerceChannelModelImpl;
+import com.liferay.commerce.product.model.impl.CommerceChannelRelModelImpl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -46,6 +49,18 @@ public class CommerceCatalogUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		if (!hasTable(CommerceChannelModelImpl.TABLE_NAME)) {
+			runSQL(CommerceChannelModelImpl.TABLE_SQL_CREATE);
+		}
+
+		if (!hasTable(CommerceChannelRelModelImpl.TABLE_NAME)) {
+			runSQL(CommerceChannelRelModelImpl.TABLE_SQL_CREATE);
+		}
+
+		if (!hasTable(CommerceCatalogModelImpl.TABLE_NAME)) {
+			runSQL(CommerceCatalogModelImpl.TABLE_SQL_CREATE);
+		}
+
 		String insertCommerceCatalogSQL = StringBundler.concat(
 			"insert into CommerceCatalog (commerceCatalogId, companyId, ",
 			"userId, userName, createDate, modifiedDate, name, ",
@@ -99,8 +114,10 @@ public class CommerceCatalogUpgradeProcess extends UpgradeProcess {
 				preparedStatement1.setString(4, userName);
 				preparedStatement1.setDate(5, date);
 				preparedStatement1.setDate(6, date);
+
 				preparedStatement1.setString(
 					7, siteGroup.getName(defaultLanguageId));
+
 				preparedStatement1.setString(8, defaultLanguageId);
 
 				preparedStatement1.addBatch();

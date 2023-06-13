@@ -183,6 +183,14 @@ public class SearchContext implements Serializable {
 		return _scoresThreshold;
 	}
 
+	public String getSearchEngineId() {
+		if (Validator.isNull(_searchEngineId)) {
+			return SearchEngineHelperUtil.getDefaultSearchEngineId();
+		}
+
+		return _searchEngineId;
+	}
+
 	public Sort[] getSorts() {
 		return _sorts;
 	}
@@ -395,6 +403,12 @@ public class SearchContext implements Serializable {
 		_scoresThreshold = scoresThreshold;
 	}
 
+	public void setSearchEngineId(String searchEngineId) {
+		if (_searchEngineId == null) {
+			_searchEngineId = searchEngineId;
+		}
+	}
+
 	public void setSorts(Sort... sorts) {
 		_sorts = sorts;
 	}
@@ -448,6 +462,7 @@ public class SearchContext implements Serializable {
 	private QueryConfig _queryConfig;
 	private boolean _scopeStrict = true;
 	private float _scoresThreshold;
+	private String _searchEngineId;
 	private Sort[] _sorts;
 	private int _start = QueryUtil.ALL_POS;
 	private final Map<String, Stats> _stats = new ConcurrentHashMap<>();

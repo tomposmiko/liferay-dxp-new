@@ -86,29 +86,26 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	@Override
 	public long[] getGuestUserRoleIds() {
 		long[] roleIds = PermissionCacheUtil.getUserGroupRoleIds(
-			guestUserId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
+			defaultUserId, _guestGroupId);
 
 		if (roleIds != null) {
 			return roleIds;
 		}
 
-		List<Role> roles = RoleLocalServiceUtil.getUserRoles(guestUserId);
+		List<Role> roles = RoleLocalServiceUtil.getUserRelatedRoles(
+			defaultUserId, _guestGroupId);
+
+		// Only use the guest group for deriving the roles for unauthenticated
+		// users. Do not add the group to the permission bag as this implies
+		// group membership which is incorrect in the case of unauthenticated
+		// users.
 
 		roleIds = ListUtil.toLongArray(roles, Role.ROLE_ID_ACCESSOR);
 
-		if (roleIds.length > 1) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"More than one role ID was returned for the guest user. " +
-						"This may cause guest users to have more permissions " +
-							"than intended.");
-			}
-
-			Arrays.sort(roleIds);
-		}
+		Arrays.sort(roleIds);
 
 		PermissionCacheUtil.putUserGroupRoleIds(
-			guestUserId, GroupConstants.DEFAULT_PARENT_GROUP_ID, roleIds);
+			defaultUserId, _guestGroupId, roleIds);
 
 		return roleIds;
 	}
@@ -121,7 +118,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return PermissionChecker.DEFAULT_ROLE_IDS;
@@ -142,13 +139,13 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return false;
 		}
 
-		boolean ownerIsGuestUser = false;
+		boolean ownerIsDefaultUser = false;
 
-		if (ownerId == guestUserId) {
-			ownerIsGuestUser = true;
+		if (ownerId == defaultUserId) {
+			ownerIsDefaultUser = true;
 		}
 
-		if (ownerIsGuestUser) {
+		if (ownerIsDefaultUser) {
 			List<String> guestUnsupportedActions;
 
 			if (name.indexOf(CharPool.PERIOD) != -1) {
@@ -170,7 +167,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		try {
 			long ownerRoleId = getOwnerRoleId();
 
-			if (ownerIsGuestUser) {
+			if (ownerIsDefaultUser) {
 				Role guestRole = RoleLocalServiceUtil.getRole(
 					companyId, RoleConstants.GUEST);
 
@@ -183,7 +180,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -228,7 +225,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		long[] roleIds = getRoleIds(getUserId(), groupId);
@@ -257,6 +254,21 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 	}
 
 	@Override
+	public void init(User user) {
+		super.init(user);
+
+		try {
+			Group guestGroup = GroupLocalServiceUtil.getGroup(
+				user.getCompanyId(), GroupConstants.GUEST);
+
+			_guestGroupId = guestGroup.getGroupId();
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+		}
+	}
+
+	@Override
 	public void init(User user, RoleContributor[] roleContributors) {
 		init(user);
 
@@ -269,7 +281,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return isCompanyAdminImpl(user.getCompanyId());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -281,7 +293,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return isCompanyAdminImpl(companyId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -293,7 +305,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return isContentReviewerImpl(companyId, groupId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;
@@ -311,7 +323,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return _isGroupAdminImpl(group);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -323,7 +335,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return isGroupMemberImpl(groupId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -335,7 +347,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return isGroupOwnerImpl(groupId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -347,7 +359,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return isOrganizationAdminImpl(organizationId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -359,7 +371,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			return isOrganizationOwnerImpl(organizationId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -436,10 +448,6 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 		if (roleIds != null) {
 			return roleIds;
-		}
-
-		if (_contributedRoleIds != null) {
-			_contributedRoleIds.remove(groupId);
 		}
 
 		Group group = null;
@@ -820,11 +828,13 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			while (!parentGroup.isRoot()) {
 				parentGroup = parentGroup.getParentGroup();
 
+				long[] roleIds = getRoleIds(
+					getUserId(), parentGroup.getGroupId());
+
 				if (doCheckPermission(
 						parentGroup.getCompanyId(), parentGroup.getGroupId(),
 						Group.class.getName(),
-						String.valueOf(parentGroup.getGroupId()),
-						getRoleIds(getUserId(), parentGroup.getGroupId()),
+						String.valueOf(parentGroup.getGroupId()), roleIds,
 						ActionKeys.MANAGE_SUBGROUPS, stopWatch)) {
 
 					return true;
@@ -896,12 +906,15 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 
 				Group parentGroup = parentOrganization.getGroup();
 
+				long[] roleIds = getRoleIds(
+					getUserId(), parentGroup.getGroupId());
+
 				if (doCheckPermission(
 						parentGroup.getCompanyId(), parentGroup.getGroupId(),
 						Organization.class.getName(),
 						String.valueOf(parentOrganization.getOrganizationId()),
-						getRoleIds(getUserId(), parentGroup.getGroupId()),
-						ActionKeys.MANAGE_SUBORGANIZATIONS, stopWatch)) {
+						roleIds, ActionKeys.MANAGE_SUBORGANIZATIONS,
+						stopWatch)) {
 
 					return true;
 				}
@@ -1248,7 +1261,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 				companyId, groupId, name, primKey, actionId, resources);
 
 			return ResourceLocalServiceUtil.hasUserPermissions(
-				guestUserId, groupId, resources, actionId,
+				defaultUserId, groupId, resources, actionId,
 				_applyRoleContributors(getGuestUserRoleIds(), groupId));
 		}
 		catch (NoSuchResourcePermissionException
@@ -1260,7 +1273,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 				noSuchResourcePermissionException);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -1282,7 +1295,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 			throw illegalArgumentException;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -1414,6 +1427,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		AdvancedPermissionChecker.class);
 
 	private Map<Long, long[]> _contributedRoleIds;
+	private long _guestGroupId;
 	private RoleContributor[] _roleContributors;
 
 }

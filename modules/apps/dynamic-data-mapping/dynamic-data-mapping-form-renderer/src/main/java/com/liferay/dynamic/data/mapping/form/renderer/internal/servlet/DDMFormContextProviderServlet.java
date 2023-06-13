@@ -15,7 +15,7 @@
 package com.liferay.dynamic.data.mapping.form.renderer.internal.servlet;
 
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.internal.DDMFormPagesTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
@@ -26,13 +26,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONSerializer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.HtmlParser;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -57,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.http.whiteboard.context.path=/dynamic-data-mapping-form-context-provider",
 		"osgi.http.whiteboard.servlet.name=com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.DDMFormContextProviderServlet",
@@ -89,55 +89,26 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 		}
 		catch (ActionException actionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(actionException);
+				_log.debug(actionException, actionException);
 			}
 		}
 	}
 
-	@Override
-	protected void doPost(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws IOException {
-
-		String portletNamespace = ParamUtil.getString(
-			httpServletRequest, "portletNamespace");
-
-		List<Object> ddmFormPagesTemplateContext =
-			_createDDMFormPagesTemplateContext(
-				httpServletRequest, httpServletResponse, portletNamespace);
-
-		if (ddmFormPagesTemplateContext == null) {
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
-
-			return;
-		}
-
-		JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
-
-		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
-		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-
-		ServletResponseUtil.write(
-			httpServletResponse,
-			jsonSerializer.serializeDeep(ddmFormPagesTemplateContext));
-	}
-
-	private List<Object> _createDDMFormPagesTemplateContext(
+	protected List<Object> createDDMFormPagesTemplateContext(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, String portletNamespace) {
 
 		try {
 			Locale locale = LocaleUtil.fromLanguageId(
-				_language.getLanguageId(httpServletRequest));
+				LanguageUtil.getLanguageId(httpServletRequest));
 
 			DDMFormRenderingContext ddmFormRenderingContext =
-				_createDDMFormRenderingContext(
+				createDDMFormRenderingContext(
 					httpServletRequest, httpServletResponse, locale,
 					portletNamespace);
 
 			DDMFormTemplateContextProcessor ddmFormTemplateContextProcessor =
-				_createDDMFormTemplateContextProcessor(httpServletRequest);
+				createDDMFormTemplateContextProcessor(httpServletRequest);
 
 			ddmFormRenderingContext.setDDMFormInstanceId(
 				ddmFormTemplateContextProcessor.getDDMFormInstanceId());
@@ -156,26 +127,26 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 						ddmFormRenderingContext,
 						_ddmStructureLayoutLocalService,
 						_ddmStructureLocalService, _groupLocalService,
-						_htmlParser, _jsonFactory);
+						_jsonFactory);
 
 			ddmFormPagesTemplateContextFactory.setDDMFormEvaluator(
 				_ddmFormEvaluator);
 			ddmFormPagesTemplateContextFactory.
-				setDDMFormFieldTypeServicesRegistry(
-					_ddmFormFieldTypeServicesRegistry);
+				setDDMFormFieldTypeServicesTracker(
+					_ddmFormFieldTypeServicesTracker);
 
 			return ddmFormPagesTemplateContextFactory.create();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return null;
 	}
 
-	private DDMFormRenderingContext _createDDMFormRenderingContext(
+	protected DDMFormRenderingContext createDDMFormRenderingContext(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, Locale locale,
 		String portletNamespace) {
@@ -193,8 +164,8 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 		return ddmFormRenderingContext;
 	}
 
-	private DDMFormTemplateContextProcessor
-			_createDDMFormTemplateContextProcessor(
+	protected DDMFormTemplateContextProcessor
+			createDDMFormTemplateContextProcessor(
 				HttpServletRequest httpServletRequest)
 		throws Exception {
 
@@ -206,6 +177,35 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 
 		return new DDMFormTemplateContextProcessor(
 			jsonObject, ParamUtil.getString(httpServletRequest, "languageId"));
+	}
+
+	@Override
+	protected void doPost(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		String portletNamespace = ParamUtil.getString(
+			httpServletRequest, "portletNamespace");
+
+		List<Object> ddmFormPagesTemplateContext =
+			createDDMFormPagesTemplateContext(
+				httpServletRequest, httpServletResponse, portletNamespace);
+
+		if (ddmFormPagesTemplateContext == null) {
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
+
+			return;
+		}
+
+		JSONSerializer jsonSerializer = _jsonFactory.createJSONSerializer();
+
+		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
+		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+
+		ServletResponseUtil.write(
+			httpServletResponse,
+			jsonSerializer.serializeDeep(ddmFormPagesTemplateContext));
 	}
 
 	private void _prepareThreadLocal(Locale locale)
@@ -223,7 +223,7 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 	private DDMFormEvaluator _ddmFormEvaluator;
 
 	@Reference
-	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	private DDMStructureLayoutLocalService _ddmStructureLayoutLocalService;
@@ -235,12 +235,6 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private HtmlParser _htmlParser;
-
-	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 }

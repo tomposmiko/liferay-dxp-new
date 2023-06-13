@@ -56,7 +56,6 @@ const DragAndDropElements = () => {
 			{dropItems.map((dropItem, index) => (
 				<DropTarget dropItem={dropItem} key={index} />
 			))}
-
 			<Wrapper item={body} />
 		</DragAndDropProvider>
 	);

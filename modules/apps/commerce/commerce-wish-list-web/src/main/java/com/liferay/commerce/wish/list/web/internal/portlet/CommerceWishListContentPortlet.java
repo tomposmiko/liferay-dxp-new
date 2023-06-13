@@ -43,12 +43,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-wish-list-content",
 		"com.liferay.portlet.display-category=commerce",
 		"com.liferay.portlet.layout-cacheable=true",
 		"com.liferay.portlet.preferences-owned-by-group=true",
+		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
@@ -59,10 +61,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.name=" + CommerceWishListPortletKeys.COMMERCE_WISH_LIST_CONTENT,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.supported-public-render-parameter=commerceWishListId",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supported-public-render-parameter=commerceWishListId"
 	},
-	service = Portlet.class
+	service = {CommerceWishListContentPortlet.class, Portlet.class}
 )
 public class CommerceWishListContentPortlet extends MVCPortlet {
 

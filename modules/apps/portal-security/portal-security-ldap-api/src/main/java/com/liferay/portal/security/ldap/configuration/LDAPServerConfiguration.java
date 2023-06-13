@@ -18,8 +18,6 @@ import aQute.bnd.annotation.metatype.Meta;
 
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Michael C. Han
  */
@@ -32,7 +30,6 @@ import org.osgi.annotation.versioning.ProviderType;
 	id = "com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration",
 	localization = "content/Language", name = "ldap-server-configuration-name"
 )
-@ProviderType
 public interface LDAPServerConfiguration {
 
 	public static final long LDAP_SERVER_ID_DEFAULT = 0;
@@ -117,12 +114,6 @@ public interface LDAPServerConfiguration {
 		deflt = "true", name = "group-search-filter-enabled", required = false
 	)
 	public boolean groupSearchFilterEnabled();
-
-	@Meta.AD(
-		deflt = "true", description = "ignore-user-search-filter-for-auth-help",
-		name = "ignore-user-search-filter-for-auth", required = false
-	)
-	public boolean ignoreUserSearchFilterForAuth();
 
 	@Meta.AD(
 		deflt = "(objectClass=groupOfUniqueNames)",

@@ -66,7 +66,7 @@ public class ViewScheduledDisplayContext
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -102,6 +102,8 @@ public class ViewScheduledDisplayContext
 				displayTerms.getKeywords(), QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, _getOrderByComparator());
 
+		searchContainer.setTotal(ctCollections.size());
+
 		if (Objects.equals(getOrderByCol(), "publishing")) {
 			ctCollections = new ArrayList<>(ctCollections);
 
@@ -135,20 +137,14 @@ public class ViewScheduledDisplayContext
 				});
 		}
 
-		List<CTCollection> sortedCTCollections = ctCollections;
+		int end = searchContainer.getEnd();
 
-		searchContainer.setResultsAndTotal(
-			() -> {
-				int end = searchContainer.getEnd();
+		if (end > ctCollections.size()) {
+			end = ctCollections.size();
+		}
 
-				if (end > sortedCTCollections.size()) {
-					end = sortedCTCollections.size();
-				}
-
-				return sortedCTCollections.subList(
-					searchContainer.getStart(), end);
-			},
-			sortedCTCollections.size());
+		searchContainer.setResults(
+			ctCollections.subList(searchContainer.getStart(), end));
 
 		_searchContainer = searchContainer;
 

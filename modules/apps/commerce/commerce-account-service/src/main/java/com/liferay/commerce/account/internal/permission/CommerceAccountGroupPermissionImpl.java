@@ -28,7 +28,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceAccountGroupPermission.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceAccountGroupPermission.class
+)
 public class CommerceAccountGroupPermissionImpl
 	implements CommerceAccountGroupPermission {
 

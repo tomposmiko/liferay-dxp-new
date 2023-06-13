@@ -19,6 +19,7 @@ import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeService;
 import com.liferay.info.item.InfoItemFormVariation;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
@@ -28,7 +29,6 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.ArrayList;
@@ -38,14 +38,13 @@ import java.util.List;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Adolfo Pérez
  * @author Jorge Ferrer
  */
-@Component(service = InfoItemFormVariationsProvider.class)
+@Component(immediate = true, service = InfoItemFormVariationsProvider.class)
 public class FileEntryInfoItemFormVariationsProvider
 	implements InfoItemFormVariationsProvider<FileEntry> {
 
@@ -64,9 +63,6 @@ public class FileEntryInfoItemFormVariationsProvider
 		return new InfoItemFormVariation(
 			groupId, String.valueOf(dlFileEntryType.getFileEntryTypeId()),
 			InfoLocalizedValue.<String>builder(
-			).defaultLocale(
-				LocaleUtil.fromLanguageId(
-					dlFileEntryType.getDefaultLanguageId())
 			).values(
 				dlFileEntryType.getNameMap()
 			).build());
@@ -78,7 +74,7 @@ public class FileEntryInfoItemFormVariationsProvider
 
 		List<InfoItemFormVariation> infoItemFormVariations = new ArrayList<>();
 
-		infoItemFormVariations.add(_getBasicDocumentInfoItemFormVariation());
+		infoItemFormVariations.add(getBasicDocumentInfoItemFormVariation());
 
 		try {
 			return getInfoItemFormVariations(
@@ -96,7 +92,7 @@ public class FileEntryInfoItemFormVariationsProvider
 
 		List<InfoItemFormVariation> infoItemFormVariations = new ArrayList<>();
 
-		infoItemFormVariations.add(_getBasicDocumentInfoItemFormVariation());
+		infoItemFormVariations.add(getBasicDocumentInfoItemFormVariation());
 
 		List<DLFileEntryType> dlFileEntryTypes =
 			_dlFileEntryTypeLocalService.getFileEntryTypes(groupIds);
@@ -107,9 +103,6 @@ public class FileEntryInfoItemFormVariationsProvider
 					dlFileEntryType.getGroupId(),
 					String.valueOf(dlFileEntryType.getFileEntryTypeId()),
 					InfoLocalizedValue.<String>builder(
-					).defaultLocale(
-						LocaleUtil.fromLanguageId(
-							dlFileEntryType.getDefaultLanguageId())
 					).values(
 						dlFileEntryType.getNameMap()
 					).build()));
@@ -118,7 +111,7 @@ public class FileEntryInfoItemFormVariationsProvider
 		return infoItemFormVariations;
 	}
 
-	private InfoItemFormVariation _getBasicDocumentInfoItemFormVariation() {
+	protected InfoItemFormVariation getBasicDocumentInfoItemFormVariation() {
 		DLFileEntryType basicDocumentDLFileEntryType =
 			_dlFileEntryTypeLocalService.fetchDLFileEntryType(
 				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
@@ -150,13 +143,15 @@ public class FileEntryInfoItemFormVariationsProvider
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
 	private volatile DepotEntryLocalService _depotEntryLocalService;
 
 	@Reference
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
+
+	@Reference
+	private DLFileEntryTypeService _dlFileEntryTypeService;
 
 	@Reference
 	private Portal _portal;

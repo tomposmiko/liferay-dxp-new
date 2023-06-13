@@ -80,24 +80,24 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 					<c:choose>
 						<c:when test="<%= disableCopyButton %>">
 							<button class="btn btn-secondary btn-sm disabled lfr-ddm-button lfr-ddm-share-url-button share-form-icon" data-original-title="<liferay-ui:message key="share" />" id="<portlet:namespace />publishIcon" title="<%= disableCopyButton ? LanguageUtil.get(request, "publish-the-form-to-get-its-shareable-link") : "" %>" type="button">
-								<liferay-ui:message key="share" />
+								<%= LanguageUtil.get(request, "share") %>
 							</button>
 						</c:when>
 						<c:otherwise>
 							<button class="btn btn-secondary btn-sm lfr-ddm-button lfr-ddm-share-url-button share-form-icon" id="<portlet:namespace />publishIcon" type="button">
-								<liferay-ui:message key="share" />
+								<%= LanguageUtil.get(request, "share") %>
 							</button>
 						</c:otherwise>
 					</c:choose>
 				</li>
 				<li class="nav-item pr-2">
 					<button class="btn btn-secondary btn-sm lfr-ddm-button lfr-ddm-preview-button" title="<%= LanguageUtil.get(request, "a-form-draft-will-be-saved-before-the-preview") %>">
-						<liferay-ui:message key="preview" />
+						<%= LanguageUtil.get(request, "preview") %>
 					</button>
 				</li>
 				<li class="nav-item pl-2 pr-2">
 					<button class="btn btn-secondary btn-sm lfr-ddm-button lfr-ddm-save-button">
-						<liferay-ui:message key="save" />
+						<%= LanguageUtil.get(request, "save") %>
 					</button>
 				</li>
 				<li class="nav-item pr-2">
@@ -138,9 +138,6 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 		<aui:input name="serializedSettingsContext" type="hidden" value="" />
 
 		<%@ include file="/admin/exceptions.jspf" %>
-		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/dynamic_data_mapping_form/get_form_report_data" var="formReportDataURL">
-			<portlet:param name="formInstanceId" value="<%= String.valueOf(formInstanceId) %>" />
-		</liferay-portlet:resourceURL>
 
 		<div id="<portlet:namespace />-container">
 			<react:component
@@ -157,15 +154,11 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 					).put(
 						"context", formBuilderContextJSONObject
 					).put(
-						"dataEngineModule", ddmFormAdminDisplayContext.getDataEngineModule()
-					).put(
 						"dataProviderInstanceParameterSettingsURL", dataProviderInstanceParameterSettingsURL
 					).put(
 						"dataProviderInstancesURL", dataProviderInstancesURL
 					).put(
 						"defaultLanguageId", ddmFormAdminDisplayContext.getDefaultLanguageId()
-					).put(
-						"displayChartAsTable", ddmFormAdminDisplayContext.isDisplayChartAsTable()
 					).put(
 						"elementSets", ddmFormAdminDisplayContext.getFieldSetsJSONArray()
 					).put(
@@ -174,8 +167,6 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 						"fieldTypes", ddmFormAdminDisplayContext.getDDMFormFieldTypesJSONArray()
 					).put(
 						"formInstanceId", formInstanceId
-					).put(
-						"formReportDataURL", formReportDataURL.toString()
 					).put(
 						"formSettingsContext", ddmFormAdminDisplayContext.getDDMFormSettingsContext(pageContext)
 					).put(
@@ -188,8 +179,6 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 						"localizedDescription", ddmFormAdminDisplayContext.getFormLocalizedDescriptionJSONObject()
 					).put(
 						"localizedName", ddmFormAdminDisplayContext.getFormLocalizedNameJSONObject(formInstance)
-					).put(
-						"mainRequire", ddmFormAdminDisplayContext.getMainRequire()
 					).put(
 						"portletNamespace", liferayPortletResponse.getNamespace()
 					).put(
@@ -209,7 +198,7 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 					).put(
 						"showPublishAlert", ddmFormAdminDisplayContext.isShowPublishAlert()
 					).put(
-						"spritemap", themeDisplay.getPathThemeSpritemap()
+						"spritemap", themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 					).put(
 						"view", "formBuilder"
 					).build()
@@ -218,6 +207,11 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 		</div>
 	</aui:form>
 </div>
+
+<liferay-portlet:runtime
+	portletName="<%= DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_REPORT %>"
+	queryString='<%= "formInstanceId=" + formInstanceId %>'
+/>
 
 <aui:script>
 	var clearPortletHandlers = function (event) {

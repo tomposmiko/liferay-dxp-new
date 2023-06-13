@@ -53,7 +53,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = CommerceTaxCalculation.class)
+@Component(enabled = false, service = CommerceTaxCalculation.class)
 public class CommerceTaxCalculationImpl implements CommerceTaxCalculation {
 
 	@Override
@@ -136,7 +136,7 @@ public class CommerceTaxCalculationImpl implements CommerceTaxCalculation {
 
 		return _getCommerceTaxValues(
 			groupId, commerceBillingAddressId, commerceShippingAddressId,
-			amount, includeTax, false, cpDefinition.getCPTaxCategoryId());
+			amount, includeTax, cpDefinition.getCPTaxCategoryId());
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class CommerceTaxCalculationImpl implements CommerceTaxCalculation {
 		List<CommerceTaxValue> commerceTaxValues = _getCommerceTaxValues(
 			commerceOrder.getGroupId(), commerceOrder.getBillingAddressId(),
 			commerceOrder.getShippingAddressId(),
-			commerceOrder.getShippingAmount(), false, true,
+			commerceOrder.getShippingAmount(), false,
 			commerceShippingTaxConfiguration.taxCategoryId());
 
 		BigDecimal taxAmount = BigDecimal.ZERO;
@@ -217,7 +217,7 @@ public class CommerceTaxCalculationImpl implements CommerceTaxCalculation {
 	private List<CommerceTaxValue> _getCommerceTaxValues(
 		long groupId, long commerceBillingAddressId,
 		long commerceShippingAddressId, BigDecimal amount, boolean includeTax,
-		boolean shipping, long taxCategoryId) {
+		long taxCategoryId) {
 
 		List<CommerceTaxValue> commerceTaxValues = new ArrayList<>();
 
@@ -226,12 +226,11 @@ public class CommerceTaxCalculationImpl implements CommerceTaxCalculation {
 
 		commerceTaxCalculateRequest.setCommerceBillingAddressId(
 			commerceBillingAddressId);
-		commerceTaxCalculateRequest.setCommerceChannelGroupId(groupId);
 		commerceTaxCalculateRequest.setCommerceShippingAddressId(
 			commerceShippingAddressId);
 		commerceTaxCalculateRequest.setPrice(amount);
 		commerceTaxCalculateRequest.setIncludeTax(includeTax);
-		commerceTaxCalculateRequest.setShipping(shipping);
+		commerceTaxCalculateRequest.setCommerceChannelGroupId(groupId);
 		commerceTaxCalculateRequest.setTaxCategoryId(taxCategoryId);
 
 		List<CommerceTaxMethod> commerceTaxMethods =
@@ -257,7 +256,8 @@ public class CommerceTaxCalculationImpl implements CommerceTaxCalculation {
 				}
 			}
 			catch (CommerceTaxEngineException commerceTaxEngineException) {
-				_log.error(commerceTaxEngineException);
+				_log.error(
+					commerceTaxEngineException, commerceTaxEngineException);
 			}
 		}
 

@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.odata.entity.EntityField;
 
 import java.util.Collections;
 
@@ -39,63 +38,13 @@ public class ListTypeEntryResourceTest
 	extends BaseListTypeEntryResourceTestCase {
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
 		_listTypeDefinition =
 			ListTypeDefinitionLocalServiceUtil.addListTypeDefinition(
-				null, TestPropsValues.getUserId(),
-				Collections.singletonMap(LocaleUtil.getDefault(), "test"),
-				Collections.emptyList());
-	}
-
-	@Override
-	@Test
-	public void testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageWithSortInteger()
-		throws Exception {
-
-		testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, listTypeEntry1, listTypeEntry2) -> {
-				if (BeanTestUtil.hasProperty(
-						listTypeEntry1, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						listTypeEntry1, entityField.getName(), 0);
-				}
-
-				if (BeanTestUtil.hasProperty(
-						listTypeEntry2, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						listTypeEntry2, entityField.getName(), 1);
-				}
-			});
-	}
-
-	@Override
-	@Test
-	public void testGetListTypeDefinitionListTypeEntriesPageWithSortInteger()
-		throws Exception {
-
-		testGetListTypeDefinitionListTypeEntriesPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, listTypeEntry1, listTypeEntry2) -> {
-				if (BeanTestUtil.hasProperty(
-						listTypeEntry1, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						listTypeEntry1, entityField.getName(), 0);
-				}
-
-				if (BeanTestUtil.hasProperty(
-						listTypeEntry2, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						listTypeEntry2, entityField.getName(), 1);
-				}
-			});
+				TestPropsValues.getUserId(),
+				Collections.singletonMap(LocaleUtil.getDefault(), "test"));
 	}
 
 	@Ignore
@@ -120,30 +69,10 @@ public class ListTypeEntryResourceTest
 		return listTypeEntry;
 	}
 
-	@Override
 	protected ListTypeEntry testDeleteListTypeEntry_addListTypeEntry()
 		throws Exception {
 
 		return _addListTypeEntry();
-	}
-
-	@Override
-	protected ListTypeEntry
-			testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage_addListTypeEntry(
-				String externalReferenceCode, ListTypeEntry listTypeEntry)
-		throws Exception {
-
-		return listTypeEntryResource.
-			postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
-				externalReferenceCode, listTypeEntry);
-	}
-
-	@Override
-	protected String
-			testGetListTypeDefinitionByExternalReferenceCodeListTypeEntriesPage_getExternalReferenceCode()
-		throws Exception {
-
-		return _listTypeDefinition.getExternalReferenceCode();
 	}
 
 	@Override
@@ -165,17 +94,6 @@ public class ListTypeEntryResourceTest
 		throws Exception {
 
 		return _addListTypeEntry();
-	}
-
-	@Override
-	protected ListTypeEntry
-			testPostListTypeDefinitionByExternalReferenceCodeListTypeEntry_addListTypeEntry(
-				ListTypeEntry listTypeEntry)
-		throws Exception {
-
-		return listTypeEntryResource.
-			postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
-				_listTypeDefinition.getExternalReferenceCode(), listTypeEntry);
 	}
 
 	@Override

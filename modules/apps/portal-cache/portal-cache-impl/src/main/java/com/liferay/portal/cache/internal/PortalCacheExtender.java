@@ -41,7 +41,7 @@ import org.osgi.util.tracker.BundleTracker;
 /**
  * @author Tina Tian
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class PortalCacheExtender {
 
 	@Activate

@@ -12,12 +12,10 @@
  * details.
  */
 
-function runJSFromText(sourceScriptElement, next, appendFn) {
-	const {text, type} = sourceScriptElement;
+function runJSFromText(text, next, appendFn) {
 	const scriptElement = document.createElement('script');
 
 	scriptElement.text = text;
-	scriptElement.type = type;
 
 	if (appendFn) {
 		appendFn(scriptElement);
@@ -31,12 +29,10 @@ function runJSFromText(sourceScriptElement, next, appendFn) {
 	next();
 }
 
-function runJSFromFile(sourceScriptElement, next, appendFn) {
-	const {src, type} = sourceScriptElement;
+function runJSFromFile(src, next, appendFn) {
 	const scriptElement = document.createElement('script');
 
 	scriptElement.src = src;
-	scriptElement.type = type;
 
 	const callback = function () {
 		scriptElement.remove();
@@ -70,22 +66,17 @@ function runScriptsInOrder(scripts, i, defaultFn, appendFn) {
 	if (!scriptElement) {
 		return;
 	}
-	else if (
-		scriptElement.type &&
-		scriptElement.type !== 'text/javascript' &&
-		scriptElement.type !== 'module' &&
-		scriptElement.type !== 'module-shim'
-	) {
+	else if (scriptElement.type && scriptElement.type !== 'text/javascript') {
 		runNextScript();
 	}
 	else {
 		scriptElement.remove();
 
 		if (scriptElement.src) {
-			runJSFromFile(scriptElement, runNextScript, appendFn);
+			runJSFromFile(scriptElement.src, runNextScript, appendFn);
 		}
 		else {
-			runJSFromText(scriptElement, runNextScript, appendFn);
+			runJSFromText(scriptElement.text, runNextScript, appendFn);
 		}
 	}
 }

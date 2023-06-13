@@ -16,8 +16,8 @@ package com.liferay.exportimport.internal.background.task.display;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.background.task.display.BaseBackgroundTaskDisplay;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
+import com.liferay.portal.kernel.backgroundtask.display.BaseBackgroundTaskDisplay;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.template.TemplateResource;
@@ -129,11 +129,47 @@ public class ExportImportBackgroundTaskDisplay
 			return super.renderDisplayTemplate(locale);
 		}
 
-		if (_hasStagedModelMessage()) {
-			return _getStagedModelMessage(locale);
+		if (hasStagedModelMessage()) {
+			return getStagedModelMessage(locale);
 		}
 
-		return LanguageUtil.get(locale, _getStatusMessageKey());
+		return LanguageUtil.get(locale, getStatusMessageKey());
+	}
+
+	protected String getStagedModelMessage(Locale locale) {
+		return StringBundler.concat(
+			"<strong>", LanguageUtil.get(locale, getStatusMessageKey()),
+			"...</strong>",
+			ResourceActionsUtil.getModelResource(locale, _stagedModelType),
+			"<em>", HtmlUtil.escape(_stagedModelName), "</em>");
+	}
+
+	protected String getStatusMessageKey() {
+		if (Validator.isNotNull(_messageKey)) {
+			return _messageKey;
+		}
+
+		_messageKey = StringPool.BLANK;
+
+		if (hasRemoteMessage()) {
+			_messageKey =
+				"please-wait-as-the-publish-processes-complete-on-the-remote-" +
+					"site";
+		}
+		else if (hasStagedModelMessage()) {
+			_messageKey = "exporting";
+
+			if (Objects.equals(_cmd, Constants.IMPORT)) {
+				_messageKey = "importing";
+			}
+			else if (Objects.equals(_cmd, Constants.PUBLISH_TO_LIVE) ||
+					 Objects.equals(_cmd, Constants.PUBLISH_TO_REMOTE)) {
+
+				_messageKey = "publishing";
+			}
+		}
+
+		return _messageKey;
 	}
 
 	@Override
@@ -159,43 +195,7 @@ public class ExportImportBackgroundTaskDisplay
 		).build();
 	}
 
-	private String _getStagedModelMessage(Locale locale) {
-		return StringBundler.concat(
-			"<strong>", LanguageUtil.get(locale, _getStatusMessageKey()),
-			"...</strong>",
-			ResourceActionsUtil.getModelResource(locale, _stagedModelType),
-			"<em>", HtmlUtil.escape(_stagedModelName), "</em>");
-	}
-
-	private String _getStatusMessageKey() {
-		if (Validator.isNotNull(_messageKey)) {
-			return _messageKey;
-		}
-
-		_messageKey = StringPool.BLANK;
-
-		if (_hasRemoteMessage()) {
-			_messageKey =
-				"please-wait-as-the-publish-processes-complete-on-the-remote-" +
-					"site";
-		}
-		else if (_hasStagedModelMessage()) {
-			_messageKey = "exporting";
-
-			if (Objects.equals(_cmd, Constants.IMPORT)) {
-				_messageKey = "importing";
-			}
-			else if (Objects.equals(_cmd, Constants.PUBLISH_TO_LIVE) ||
-					 Objects.equals(_cmd, Constants.PUBLISH_TO_REMOTE)) {
-
-				_messageKey = "publishing";
-			}
-		}
-
-		return _messageKey;
-	}
-
-	private boolean _hasRemoteMessage() {
+	protected boolean hasRemoteMessage() {
 		if (Objects.equals(_cmd, Constants.PUBLISH_TO_REMOTE) &&
 			(getPercentage() == PERCENTAGE_MAX)) {
 
@@ -205,7 +205,7 @@ public class ExportImportBackgroundTaskDisplay
 		return false;
 	}
 
-	private boolean _hasStagedModelMessage() {
+	protected boolean hasStagedModelMessage() {
 		if (Validator.isNotNull(_stagedModelName) &&
 			Validator.isNotNull(_stagedModelType)) {
 

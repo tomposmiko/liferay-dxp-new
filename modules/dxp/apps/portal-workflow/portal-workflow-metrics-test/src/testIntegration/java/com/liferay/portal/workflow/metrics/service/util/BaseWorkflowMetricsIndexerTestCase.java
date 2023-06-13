@@ -59,6 +59,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.stream.Stream;
 
 import org.junit.Before;
 
@@ -192,11 +193,12 @@ public abstract class BaseWorkflowMetricsIndexerTestCase
 			String[] indexNames, String[] indexTypes, Object... parameters)
 		throws Exception {
 
-		Map<String, Integer> indexNamesMap = new LinkedHashMap<>();
-
-		for (String indexName : indexNames) {
-			indexNamesMap.put(indexName, 1);
-		}
+		Map<String, Integer> indexNamesMap = Stream.of(
+			indexNames
+		).collect(
+			LinkedHashMap::new, (map, indexName) -> map.put(indexName, 1),
+			Map::putAll
+		);
 
 		assertReindex(indexNamesMap, indexTypes, parameters);
 	}
@@ -214,11 +216,12 @@ public abstract class BaseWorkflowMetricsIndexerTestCase
 			String[] indexNames, String[] indexTypes, Object... parameters)
 		throws Exception {
 
-		Map<String, Integer> indexNamesMap = new LinkedHashMap<>();
-
-		for (String indexName : indexNames) {
-			indexNamesMap.put(indexName, 1);
-		}
+		Map<String, Integer> indexNamesMap = Stream.of(
+			indexNames
+		).collect(
+			LinkedHashMap::new, (map, indexName) -> map.put(indexName, 1),
+			Map::putAll
+		);
 
 		assertSLAReindex(indexNamesMap, indexTypes, parameters);
 	}

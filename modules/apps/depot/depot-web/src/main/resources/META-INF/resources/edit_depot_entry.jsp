@@ -20,8 +20,8 @@
 	cssClass="container-view"
 >
 	<c:if test="<%= GetterUtil.getBoolean(request.getAttribute(DepotAdminWebKeys.SHOW_BREADCRUMB)) %>">
-		<liferay-site-navigation:breadcrumb
-			breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, true, false, false, true, true) %>"
+		<liferay-ui:breadcrumb
+			showLayout="<%= false %>"
 		/>
 	</c:if>
 

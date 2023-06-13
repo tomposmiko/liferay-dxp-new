@@ -18,18 +18,19 @@ import com.liferay.knowledge.base.constants.KBActionKeys;
 import com.liferay.knowledge.base.constants.KBConstants;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.model.KBArticle;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_ADMIN, "path=-"
 	},
@@ -54,28 +56,31 @@ public class KBArticleGroupSubscriptionPortletConfigurationIcon
 			key = "unsubscribe";
 		}
 
-		return _language.get(getLocale(portletRequest), key);
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), key);
 	}
 
 	@Override
 	public String getURL(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		return PortletURLBuilder.create(
-			_portal.getControlPanelPortletURL(
-				portletRequest, KBPortletKeys.KNOWLEDGE_BASE_ADMIN,
-				PortletRequest.ACTION_PHASE)
-		).setActionName(
-			() -> {
-				if (_isSubscribed(portletRequest)) {
-					return "/knowledge_base/unsubscribe_group_kb_articles";
-				}
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			portletRequest, KBPortletKeys.KNOWLEDGE_BASE_ADMIN,
+			PortletRequest.ACTION_PHASE);
 
-				return "/knowledge_base/subscribe_group_kb_articles";
-			}
-		).setRedirect(
-			_portal.getCurrentURL(portletRequest)
-		).buildString();
+		if (_isSubscribed(portletRequest)) {
+			portletURL.setParameter(
+				ActionRequest.ACTION_NAME, "unsubscribeGroupKBArticles");
+		}
+		else {
+			portletURL.setParameter(
+				ActionRequest.ACTION_NAME, "subscribeGroupKBArticles");
+		}
+
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(portletRequest));
+
+		return portletURL.toString();
 	}
 
 	@Override
@@ -93,6 +98,13 @@ public class KBArticleGroupSubscriptionPortletConfigurationIcon
 			KBActionKeys.SUBSCRIBE);
 	}
 
+	@Reference(unbind = "-")
+	protected void setSubscriptionLocalService(
+		SubscriptionLocalService subscriptionLocalService) {
+
+		_subscriptionLocalService = subscriptionLocalService;
+	}
+
 	private boolean _isSubscribed(PortletRequest portletRequest) {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -103,9 +115,6 @@ public class KBArticleGroupSubscriptionPortletConfigurationIcon
 	}
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
 
 	@Reference(
@@ -113,7 +122,6 @@ public class KBArticleGroupSubscriptionPortletConfigurationIcon
 	)
 	private PortletResourcePermission _portletResourcePermission;
 
-	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
 
 }

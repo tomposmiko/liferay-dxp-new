@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CATALOGS,
 		"mvc.command.name=/commerce_catalogs/edit_commerce_catalog_external_reference_code"
@@ -50,7 +51,7 @@ public class EditCommerceCatalogExternalReferenceCodeMVCActionCommand
 		throws Exception {
 
 		try {
-			_updateCommerceCatalogExternalReferenceCode(actionRequest);
+			updateCommerceCatalogExternalReferenceCode(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchCatalogException ||
@@ -61,7 +62,7 @@ public class EditCommerceCatalogExternalReferenceCodeMVCActionCommand
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				String redirect = ParamUtil.getString(
 					actionRequest, "redirect");
@@ -71,7 +72,7 @@ public class EditCommerceCatalogExternalReferenceCodeMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceCatalogExternalReferenceCode(
+	protected void updateCommerceCatalogExternalReferenceCode(
 			ActionRequest actionRequest)
 		throws Exception {
 

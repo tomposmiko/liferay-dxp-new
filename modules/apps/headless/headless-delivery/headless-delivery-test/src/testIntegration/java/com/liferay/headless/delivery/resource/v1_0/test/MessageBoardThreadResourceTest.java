@@ -58,38 +58,9 @@ public class MessageBoardThreadResourceTest
 		serviceContext.setScopeGroupId(testGroup.getGroupId());
 
 		_mbCategory = MBCategoryLocalServiceUtil.addCategory(
-			UserLocalServiceUtil.getGuestUserId(testGroup.getCompanyId()),
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
 			testGroup.getGroupId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), serviceContext);
-	}
-
-	@Override
-	@Test
-	public void testDeleteMessageBoardThreadMyRating() throws Exception {
-		super.testDeleteMessageBoardThreadMyRating();
-
-		MessageBoardThread messageBoardThread =
-			testDeleteMessageBoardThreadMyRating_addMessageBoardThread();
-
-		assertHttpResponseStatusCode(
-			204,
-			messageBoardThreadResource.
-				deleteMessageBoardThreadMyRatingHttpResponse(
-					messageBoardThread.getId()));
-		assertHttpResponseStatusCode(
-			404,
-			messageBoardThreadResource.
-				deleteMessageBoardThreadMyRatingHttpResponse(
-					messageBoardThread.getId()));
-
-		MessageBoardThread irrelevantMessageBoardThread =
-			randomIrrelevantMessageBoardThread();
-
-		assertHttpResponseStatusCode(
-			404,
-			messageBoardThreadResource.
-				deleteMessageBoardThreadMyRatingHttpResponse(
-					irrelevantMessageBoardThread.getId()));
 	}
 
 	@Override
@@ -176,9 +147,8 @@ public class MessageBoardThreadResourceTest
 	@Override
 	protected String[] getIgnoredEntityFieldNames() {
 		return new String[] {
-			"creatorId", "lastPostDate", "messageBoardSectionId",
-			"messageBoardThreadId", "modified", "parentMessageBoardMessageId",
-			"ratingValue"
+			"creatorId", "messageBoardSectionId", "messageBoardThreadId",
+			"parentMessageBoardMessageId", "ratingValue"
 		};
 	}
 
@@ -190,20 +160,6 @@ public class MessageBoardThreadResourceTest
 		messageBoardThread.setMessageBoardSectionId((Long)null);
 		messageBoardThread.setSubscribed(false);
 		messageBoardThread.setThreadType("Urgent");
-
-		return messageBoardThread;
-	}
-
-	@Override
-	protected MessageBoardThread
-			testDeleteMessageBoardThreadMyRating_addMessageBoardThread()
-		throws Exception {
-
-		MessageBoardThread messageBoardThread =
-			super.testDeleteMessageBoardThreadMyRating_addMessageBoardThread();
-
-		messageBoardThreadResource.putMessageBoardThreadMyRating(
-			messageBoardThread.getId(), randomRating());
 
 		return messageBoardThread;
 	}

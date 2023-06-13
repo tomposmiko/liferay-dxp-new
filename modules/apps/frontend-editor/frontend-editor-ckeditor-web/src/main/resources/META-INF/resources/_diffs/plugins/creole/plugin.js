@@ -15,17 +15,17 @@
 (function () {
 	CKEDITOR.plugins.add('creole', {
 		init(editor) {
-			const instance = this;
+			var instance = this;
 
-			const path = instance.path;
+			var path = instance.path;
 
-			const dependencies = [
+			var dependencies = [
 				CKEDITOR.getUrl(path + 'creole_data_processor.js'),
 				CKEDITOR.getUrl(path + 'creole_parser.js'),
 			];
 
 			CKEDITOR.scriptLoader.load(dependencies, () => {
-				const creoleDataProcessor = CKEDITOR.plugins.get(
+				var creoleDataProcessor = CKEDITOR.plugins.get(
 					'creole_data_processor'
 				);
 

@@ -27,10 +27,6 @@ public class CommerceAvailabilityEstimateLocalServiceWrapper
 	implements CommerceAvailabilityEstimateLocalService,
 			   ServiceWrapper<CommerceAvailabilityEstimateLocalService> {
 
-	public CommerceAvailabilityEstimateLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAvailabilityEstimateLocalServiceWrapper(
 		CommerceAvailabilityEstimateLocalService
 			commerceAvailabilityEstimateLocalService) {

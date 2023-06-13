@@ -15,8 +15,6 @@
 package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
-import com.liferay.layout.configuration.LayoutExportImportConfiguration;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -24,14 +22,11 @@ import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.sites.kernel.util.Sites;
-
-import java.util.Map;
+import com.liferay.sites.kernel.util.SitesUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -39,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	configurationPid = "com.liferay.layout.configuration.LayoutExportImportConfiguration",
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
 		"mvc.command.name=/layout_admin/reset_prototype"
@@ -47,12 +42,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = MVCActionCommand.class
 )
 public class ResetPrototypeMVCActionCommand extends BaseMVCActionCommand {
-
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_layoutExportImportConfiguration = ConfigurableUtil.createConfigurable(
-			LayoutExportImportConfiguration.class, properties);
-	}
 
 	@Override
 	protected void doProcessAction(
@@ -64,14 +53,12 @@ public class ResetPrototypeMVCActionCommand extends BaseMVCActionCommand {
 
 		Layout layout = themeDisplay.getLayout();
 
-		_sites.resetPrototype(layout);
+		SitesUtil.resetPrototype(layout);
 
 		Layout draftLayout = layout.fetchDraftLayout();
 
-		if ((draftLayout != null) &&
-			_layoutExportImportConfiguration.exportDraftLayout()) {
-
-			_sites.resetPrototype(draftLayout);
+		if (draftLayout != null) {
+			SitesUtil.resetPrototype(draftLayout);
 		}
 
 		MultiSessionMessages.add(
@@ -79,13 +66,7 @@ public class ResetPrototypeMVCActionCommand extends BaseMVCActionCommand {
 			_portal.getPortletId(actionRequest) + "requestProcessed");
 	}
 
-	private volatile LayoutExportImportConfiguration
-		_layoutExportImportConfiguration;
-
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private Sites _sites;
 
 }

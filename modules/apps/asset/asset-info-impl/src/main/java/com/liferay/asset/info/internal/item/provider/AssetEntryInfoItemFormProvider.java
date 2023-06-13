@@ -21,7 +21,7 @@ import com.liferay.info.field.InfoFieldSet;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
 
@@ -40,7 +40,7 @@ public class AssetEntryInfoItemFormProvider
 
 	@Override
 	public InfoForm getInfoForm() {
-		Set<Locale> availableLocales = _language.getAvailableLocales();
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
 
 		InfoLocalizedValue.Builder infoLocalizedValueBuilder =
 			InfoLocalizedValue.builder();
@@ -76,7 +76,7 @@ public class AssetEntryInfoItemFormProvider
 			).infoFieldSetEntry(
 				AssetEntryInfoItemFields.urlInfoField
 			).infoFieldSetEntry(
-				AssetEntryInfoItemFields.userProfileImageInfoField
+				AssetEntryInfoItemFields.userProfileImage
 			).labelInfoLocalizedValue(
 				InfoLocalizedValue.localize(getClass(), "basic-information")
 			).name(
@@ -98,9 +98,6 @@ public class AssetEntryInfoItemFormProvider
 	@Reference
 	private AssetEntryInfoItemFieldSetProvider
 		_assetEntryInfoItemFieldSetProvider;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private TemplateInfoItemFieldSetProvider _templateInfoItemFieldSetProvider;

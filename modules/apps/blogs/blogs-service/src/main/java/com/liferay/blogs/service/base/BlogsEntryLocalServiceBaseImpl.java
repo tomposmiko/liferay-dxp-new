@@ -26,7 +26,6 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -48,17 +47,13 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -277,21 +272,48 @@ public abstract class BlogsEntryLocalServiceBaseImpl
 		return blogsEntryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
+	 */
 	@Override
 	public BlogsEntry fetchBlogsEntryByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
-		return blogsEntryPersistence.fetchByERC_G(
-			externalReferenceCode, groupId);
+		return blogsEntryPersistence.fetchByG_ERC(
+			groupId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchBlogsEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public BlogsEntry fetchBlogsEntryByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return fetchBlogsEntryByExternalReferenceCode(
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry
+	 * @throws PortalException if a matching blogs entry could not be found
+	 */
 	@Override
 	public BlogsEntry getBlogsEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
-		return blogsEntryPersistence.findByERC_G(
-			externalReferenceCode, groupId);
+		return blogsEntryPersistence.findByG_ERC(
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -491,11 +513,6 @@ public abstract class BlogsEntryLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement BlogsEntryLocalServiceImpl#deleteBlogsEntry(BlogsEntry) to avoid orphaned data");
-		}
-
 		return blogsEntryLocalService.deleteBlogsEntry(
 			(BlogsEntry)persistedModel);
 	}
@@ -614,7 +631,7 @@ public abstract class BlogsEntryLocalServiceBaseImpl
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			BlogsEntryLocalService.class, IdentifiableOSGiService.class,
-			CTService.class, PersistedModelLocalService.class
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -635,23 +652,8 @@ public abstract class BlogsEntryLocalServiceBaseImpl
 		return BlogsEntryLocalService.class.getName();
 	}
 
-	@Override
-	public CTPersistence<BlogsEntry> getCTPersistence() {
-		return blogsEntryPersistence;
-	}
-
-	@Override
-	public Class<BlogsEntry> getModelClass() {
+	protected Class<?> getModelClass() {
 		return BlogsEntry.class;
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<BlogsEntry>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return updateUnsafeFunction.apply(blogsEntryPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -709,8 +711,5 @@ public abstract class BlogsEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BlogsEntryLocalServiceBaseImpl.class);
 
 }

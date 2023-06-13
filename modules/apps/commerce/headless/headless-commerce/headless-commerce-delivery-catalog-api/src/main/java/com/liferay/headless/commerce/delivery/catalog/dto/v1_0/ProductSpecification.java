@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -60,7 +59,7 @@ public class ProductSpecification implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -87,7 +86,7 @@ public class ProductSpecification implements Serializable {
 	protected Long id;
 
 	@DecimalMin("0")
-	@Schema(example = "30129")
+	@Schema
 	public Long getOptionCategoryId() {
 		return optionCategoryId;
 	}
@@ -116,7 +115,7 @@ public class ProductSpecification implements Serializable {
 	protected Long optionCategoryId;
 
 	@DecimalMin("0")
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -145,7 +144,7 @@ public class ProductSpecification implements Serializable {
 	protected Double priority;
 
 	@DecimalMin("0")
-	@Schema(example = "30129")
+	@Schema
 	public Long getProductId() {
 		return productId;
 	}
@@ -173,66 +172,8 @@ public class ProductSpecification implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long productId;
 
-	@Schema
-	public String getSpecificationGroupKey() {
-		return specificationGroupKey;
-	}
-
-	public void setSpecificationGroupKey(String specificationGroupKey) {
-		this.specificationGroupKey = specificationGroupKey;
-	}
-
-	@JsonIgnore
-	public void setSpecificationGroupKey(
-		UnsafeSupplier<String, Exception> specificationGroupKeyUnsafeSupplier) {
-
-		try {
-			specificationGroupKey = specificationGroupKeyUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String specificationGroupKey;
-
-	@Schema
-	public String getSpecificationGroupTitle() {
-		return specificationGroupTitle;
-	}
-
-	public void setSpecificationGroupTitle(String specificationGroupTitle) {
-		this.specificationGroupTitle = specificationGroupTitle;
-	}
-
-	@JsonIgnore
-	public void setSpecificationGroupTitle(
-		UnsafeSupplier<String, Exception>
-			specificationGroupTitleUnsafeSupplier) {
-
-		try {
-			specificationGroupTitle =
-				specificationGroupTitleUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String specificationGroupTitle;
-
 	@DecimalMin("0")
-	@Schema(example = "30129")
+	@Schema
 	public Long getSpecificationId() {
 		return specificationId;
 	}
@@ -260,7 +201,7 @@ public class ProductSpecification implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long specificationId;
 
-	@Schema(example = "specification-key")
+	@Schema
 	public String getSpecificationKey() {
 		return specificationKey;
 	}
@@ -287,34 +228,6 @@ public class ProductSpecification implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String specificationKey;
-
-	@Schema
-	public String getSpecificationTitle() {
-		return specificationTitle;
-	}
-
-	public void setSpecificationTitle(String specificationTitle) {
-		this.specificationTitle = specificationTitle;
-	}
-
-	@JsonIgnore
-	public void setSpecificationTitle(
-		UnsafeSupplier<String, Exception> specificationTitleUnsafeSupplier) {
-
-		try {
-			specificationTitle = specificationTitleUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String specificationTitle;
 
 	@Schema
 	public String getValue() {
@@ -412,34 +325,6 @@ public class ProductSpecification implements Serializable {
 			sb.append(productId);
 		}
 
-		if (specificationGroupKey != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"specificationGroupKey\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(specificationGroupKey));
-
-			sb.append("\"");
-		}
-
-		if (specificationGroupTitle != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"specificationGroupTitle\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(specificationGroupTitle));
-
-			sb.append("\"");
-		}
-
 		if (specificationId != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -460,20 +345,6 @@ public class ProductSpecification implements Serializable {
 			sb.append("\"");
 
 			sb.append(_escape(specificationKey));
-
-			sb.append("\"");
-		}
-
-		if (specificationTitle != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"specificationTitle\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(specificationTitle));
 
 			sb.append("\"");
 		}
@@ -505,9 +376,9 @@ public class ProductSpecification implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -533,7 +404,7 @@ public class ProductSpecification implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -565,7 +436,7 @@ public class ProductSpecification implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -581,10 +452,5 @@ public class ProductSpecification implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

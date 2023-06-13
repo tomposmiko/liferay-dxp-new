@@ -14,21 +14,26 @@
 
 package com.liferay.commerce.product.internal.upgrade.v1_5_0;
 
+import com.liferay.commerce.product.internal.upgrade.base.BaseCommerceProductServiceUpgradeProcess;
 import com.liferay.commerce.product.model.impl.CPDefinitionImpl;
 import com.liferay.commerce.product.model.impl.CProductImpl;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
+import com.liferay.commerce.product.model.impl.CProductModelImpl;
 import com.liferay.portal.kernel.util.StringUtil;
 
 /**
  * @author Alessio Antonio Rendina
  */
 public class CProductExternalReferenceCodeUpgradeProcess
-	extends UpgradeProcess {
+	extends BaseCommerceProductServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		if (!hasColumn(CProductImpl.TABLE_NAME, "externalReferenceCode")) {
+			addColumn(
+				CProductImpl.class, CProductModelImpl.TABLE_NAME,
+				"externalReferenceCode", "VARCHAR(75)");
+		}
+
 		if (hasColumn(CProductImpl.TABLE_NAME, "externalReferenceCode")) {
 			Class<CProductExternalReferenceCodeUpgradeProcess> clazz =
 				CProductExternalReferenceCodeUpgradeProcess.class;
@@ -38,19 +43,10 @@ public class CProductExternalReferenceCodeUpgradeProcess
 					"dependencies" +
 						"/CProductExternalReferenceCodeUpgradeProcess.sql"));
 
-			runSQLTemplateString(template, false);
+			runSQLTemplateString(template, false, false);
 
-			alterTableDropColumn(
-				CPDefinitionImpl.TABLE_NAME, "externalReferenceCode");
+			dropColumn(CPDefinitionImpl.TABLE_NAME, "externalReferenceCode");
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CProduct", "externalReferenceCode VARCHAR(75)")
-		};
 	}
 
 }

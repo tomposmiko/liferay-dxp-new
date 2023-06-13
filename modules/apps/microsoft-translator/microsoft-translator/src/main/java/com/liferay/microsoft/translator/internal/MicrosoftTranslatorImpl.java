@@ -46,7 +46,7 @@ public class MicrosoftTranslatorImpl implements MicrosoftTranslator {
 		throws MicrosoftTranslatorException {
 
 		try {
-			return _translate(fromLanguageId, toLanguageId, fromText);
+			return doTranslate(fromLanguageId, toLanguageId, fromText);
 		}
 		catch (MicrosoftTranslatorException microsoftTranslatorException) {
 			throw microsoftTranslatorException;
@@ -56,38 +56,12 @@ public class MicrosoftTranslatorImpl implements MicrosoftTranslator {
 		}
 	}
 
-	private String _getMicrosoftLanguageId(String languageId) {
-		if (languageId.equals("pt_BR") || languageId.equals("pt_PT")) {
-			return "pt";
-		}
-		else if (languageId.equals("hi_IN")) {
-			return "hi";
-		}
-		else if (languageId.equals("in")) {
-			return "id";
-		}
-		else if (languageId.equals("iw")) {
-			return "he";
-		}
-		else if (languageId.equals("nb")) {
-			return "no";
-		}
-		else if (languageId.equals("zh_CN")) {
-			return "zh-CHS";
-		}
-		else if (languageId.equals("zh_TW")) {
-			return "zh-CHT";
-		}
-
-		return languageId;
-	}
-
-	private String _translate(
+	protected String doTranslate(
 			String fromLanguageId, String toLanguageId, String fromText)
 		throws Exception {
 
-		fromLanguageId = _getMicrosoftLanguageId(fromLanguageId);
-		toLanguageId = _getMicrosoftLanguageId(toLanguageId);
+		fromLanguageId = getMicrosoftLanguageId(fromLanguageId);
+		toLanguageId = getMicrosoftLanguageId(toLanguageId);
 
 		Http.Options options = new Http.Options();
 
@@ -129,6 +103,32 @@ public class MicrosoftTranslatorImpl implements MicrosoftTranslator {
 		toText = toText.trim();
 
 		return StringUtil.replace(toText, CharPool.NEW_LINE, CharPool.SPACE);
+	}
+
+	protected String getMicrosoftLanguageId(String languageId) {
+		if (languageId.equals("pt_BR") || languageId.equals("pt_PT")) {
+			return "pt";
+		}
+		else if (languageId.equals("hi_IN")) {
+			return "hi";
+		}
+		else if (languageId.equals("in")) {
+			return "id";
+		}
+		else if (languageId.equals("iw")) {
+			return "he";
+		}
+		else if (languageId.equals("nb")) {
+			return "no";
+		}
+		else if (languageId.equals("zh_CN")) {
+			return "zh-CHS";
+		}
+		else if (languageId.equals("zh_TW")) {
+			return "zh-CHT";
+		}
+
+		return languageId;
 	}
 
 	private final MicrosoftTranslatorAuthenticator

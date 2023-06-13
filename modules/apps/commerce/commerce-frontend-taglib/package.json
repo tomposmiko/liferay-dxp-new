@@ -1,11 +1,13 @@
 {
 	"dependencies": {
-		"clay-icon": "2.24.1",
-		"clay-modal": "2.24.1",
-		"commerce-frontend-js": "*",
+		"clay-icon": "2.22.4",
+		"clay-modal": "2.22.4",
+		"clay-pagination-bar": "2.22.4",
+		"clay-table": "2.22.4",
 		"frontend-js-web": "*",
 		"metal-component": "2.16.8",
-		"metal-soy": "2.16.9"
+		"metal-soy": "2.16.9",
+		"metal-state": "2.16.8"
 	},
 	"name": "commerce-frontend-taglib",
 	"scripts": {
@@ -13,5 +15,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "19.5.1"
+	"version": "13.0.3"
 }

@@ -21,7 +21,8 @@ import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TimeRange;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.TimeRangeUtil;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.TimeRangeResource;
 
-import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,9 +40,13 @@ public class TimeRangeResourceImpl extends BaseTimeRangeResourceImpl {
 	@Override
 	public Page<TimeRange> getTimeRangesPage() throws Exception {
 		return Page.of(
-			transform(
-				Arrays.asList(0, 1, 7, 30, 90, 180, 365),
-				this::_createTimeRange));
+			Stream.of(
+				0, 1, 7, 30, 90, 180, 365
+			).map(
+				this::_createTimeRange
+			).collect(
+				Collectors.toList()
+			));
 	}
 
 	private TimeRange _createTimeRange(int id) {

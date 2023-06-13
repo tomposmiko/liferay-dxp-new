@@ -15,11 +15,13 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.exception.NoSuchReleaseException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.ReleaseConstants;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.upgrade.OlderVersionException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
@@ -101,6 +103,14 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 		return releasePersistence.update(release);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public void createTablesAndPopulate() {
+	}
+
 	@Override
 	public Release fetchRelease(String servletContextName) {
 		if (Validator.isNull(servletContextName)) {
@@ -121,6 +131,23 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 		}
 
 		return release;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	@Transactional
+	public int getBuildNumberOrCreate() throws PortalException {
+		Release release = releasePersistence.fetchByPrimaryKey(
+			ReleaseConstants.DEFAULT_ID);
+
+		if (release != null) {
+			return release.getBuildNumber();
+		}
+
+		throw new NoSuchReleaseException("The database needs to be populated");
 	}
 
 	@Override
@@ -181,6 +208,22 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 		releaseLocalService.updateRelease(
 			release.getReleaseId(), release.getSchemaVersion(), buildNumber,
 			null, true);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #updateRelease(String, List, int, int)}
+	 */
+	@Deprecated
+	@Override
+	public void updateRelease(
+			String servletContextName, List<UpgradeProcess> upgradeProcesses,
+			int buildNumber, int previousBuildNumber, boolean indexOnUpgrade)
+		throws PortalException {
+
+		updateRelease(
+			servletContextName, upgradeProcesses, buildNumber,
+			previousBuildNumber);
 	}
 
 	@Override

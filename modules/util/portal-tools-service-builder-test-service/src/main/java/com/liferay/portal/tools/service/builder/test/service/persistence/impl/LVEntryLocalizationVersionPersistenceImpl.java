@@ -38,11 +38,9 @@ import com.liferay.portal.tools.service.builder.test.model.LVEntryLocalizationVe
 import com.liferay.portal.tools.service.builder.test.model.impl.LVEntryLocalizationVersionImpl;
 import com.liferay.portal.tools.service.builder.test.model.impl.LVEntryLocalizationVersionModelImpl;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryLocalizationVersionPersistence;
-import com.liferay.portal.tools.service.builder.test.service.persistence.LVEntryLocalizationVersionUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
@@ -184,7 +182,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LVEntryLocalizationVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LVEntryLocalizationVersion lvEntryLocalizationVersion :
@@ -562,7 +560,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {lvEntryLocalizationId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -684,8 +682,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByLvEntryLocalizationId_Version, finderArgs,
-				this);
+				_finderPathFetchByLvEntryLocalizationId_Version, finderArgs);
 		}
 
 		if (result instanceof LVEntryLocalizationVersion) {
@@ -792,7 +789,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {lvEntryLocalizationId, version};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -940,7 +937,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LVEntryLocalizationVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LVEntryLocalizationVersion lvEntryLocalizationVersion :
@@ -1313,7 +1310,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {lvEntryId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1459,7 +1456,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LVEntryLocalizationVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LVEntryLocalizationVersion lvEntryLocalizationVersion :
@@ -1857,7 +1854,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {lvEntryId, version};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2013,7 +2010,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LVEntryLocalizationVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LVEntryLocalizationVersion lvEntryLocalizationVersion :
@@ -2441,7 +2438,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {lvEntryId, languageId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2593,8 +2590,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByLvEntryId_LanguageId_Version, finderArgs,
-				this);
+				_finderPathFetchByLvEntryId_LanguageId_Version, finderArgs);
 		}
 
 		if (result instanceof LVEntryLocalizationVersion) {
@@ -2722,7 +2718,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {lvEntryId, languageId, version};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3267,7 +3263,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LVEntryLocalizationVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3340,7 +3336,7 @@ public class LVEntryLocalizationVersionPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3515,31 +3511,10 @@ public class LVEntryLocalizationVersionPersistenceImpl
 				Integer.class.getName()
 			},
 			new String[] {"lvEntryId", "languageId", "version"}, false);
-
-		_setLVEntryLocalizationVersionUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setLVEntryLocalizationVersionUtilPersistence(null);
-
 		entityCache.removeCache(LVEntryLocalizationVersionImpl.class.getName());
-	}
-
-	private void _setLVEntryLocalizationVersionUtilPersistence(
-		LVEntryLocalizationVersionPersistence
-			lvEntryLocalizationVersionPersistence) {
-
-		try {
-			Field field = LVEntryLocalizationVersionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, lvEntryLocalizationVersionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@ServiceReference(type = EntityCache.class)

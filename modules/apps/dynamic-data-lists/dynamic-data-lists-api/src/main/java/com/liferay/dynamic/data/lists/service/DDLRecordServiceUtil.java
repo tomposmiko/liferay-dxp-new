@@ -17,10 +17,7 @@ package com.liferay.dynamic.data.lists.service;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.portal.kernel.exception.PortalException;
 
-import java.io.Serializable;
-
 import java.util.List;
-import java.util.Map;
 
 /**
  * Provides the remote service utility for DDLRecord. This utility wraps
@@ -66,31 +63,6 @@ public class DDLRecordServiceUtil {
 
 		return getService().addRecord(
 			groupId, recordSetId, displayIndex, ddmFormValues, serviceContext);
-	}
-
-	/**
-	 * Adds a record referencing the record set.
-	 *
-	 * @param groupId the primary key of the record's group
-	 * @param recordSetId the primary key of the record set
-	 * @param displayIndex the index position in which the record is
-	 displayed in the spreadsheet view
-	 * @param fieldsMap the record values. The fieldsMap is a map of field
-	 names and its serializable values.
-	 * @param serviceContext the service context to be applied. This can
-	 set the UUID, guest permissions, and group permissions for
-	 the record.
-	 * @return the record
-	 * @throws PortalException if a portal exception occurred
-	 */
-	public static DDLRecord addRecord(
-			long groupId, long recordSetId, int displayIndex,
-			Map<String, Serializable> fieldsMap,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addRecord(
-			groupId, recordSetId, displayIndex, fieldsMap, serviceContext);
 	}
 
 	/**
@@ -178,31 +150,6 @@ public class DDLRecordServiceUtil {
 		return getService().updateRecord(
 			recordId, majorVersion, displayIndex, ddmFormValues,
 			serviceContext);
-	}
-
-	/**
-	 * Updates a record, replacing its display index and values.
-	 *
-	 * @param recordId the primary key of the record
-	 * @param displayIndex the index position in which the record is
-	 displayed in the spreadsheet view
-	 * @param fieldsMap the record values. The fieldsMap is a map of field
-	 names and its serializable values.
-	 * @param mergeFields whether to merge the new fields with the existing
-	 ones; otherwise replace the existing fields
-	 * @param serviceContext the service context to be applied. This can
-	 set the record modified date.
-	 * @return the record
-	 * @throws PortalException if a portal exception occurred
-	 */
-	public static DDLRecord updateRecord(
-			long recordId, int displayIndex,
-			Map<String, Serializable> fieldsMap, boolean mergeFields,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().updateRecord(
-			recordId, displayIndex, fieldsMap, mergeFields, serviceContext);
 	}
 
 	public static DDLRecordService getService() {

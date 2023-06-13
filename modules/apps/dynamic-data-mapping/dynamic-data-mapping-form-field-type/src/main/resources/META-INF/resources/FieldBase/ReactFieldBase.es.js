@@ -12,30 +12,24 @@
  * details.
  */
 
+import './FieldBase.scss';
+
 import ClayButton from '@clayui/button';
-import ClayForm from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayLabel from '@clayui/label';
 import ClayPopover from '@clayui/popover';
 import classNames from 'classnames';
 import {
-	EVENT_TYPES as CORE_EVENT_TYPES,
-	FieldFeedback,
 	Layout,
-	PagesVisitor,
+	getRepeatedIndex,
 	useForm,
 	useFormState,
 } from 'data-engine-js-components-web';
-import {sub} from 'frontend-js-web';
+import {EVENT_TYPES as CORE_EVENT_TYPES} from 'data-engine-js-components-web/js/core/actions/eventTypes.es';
 import moment from 'moment/min/moment-with-locales';
 import React, {useMemo, useState} from 'react';
 
-import './FieldBase.scss';
-
-function normalizeInputValue(fieldType, locale, value) {
-	if (!value) {
-		return '';
-	}
+const convertInputValue = (fieldType, locale, value) => {
 	if (fieldType === 'date') {
 		const momentLocale = moment().locale(locale);
 
@@ -54,48 +48,50 @@ function normalizeInputValue(fieldType, locale, value) {
 		fieldType === 'grid' ||
 		fieldType === 'image'
 	) {
-		return !Object.keys(value).length ? '' : JSON.stringify(value);
+		if (Object.keys(value).length === 0) {
+			return '';
+		}
+
+		return JSON.stringify(value);
 	}
 
 	return value;
-}
+};
 
-const getFieldDetails = ({
-	errorMessage,
-	hasError,
-	label,
-	required,
-	text,
-	tip,
-	warningMessage,
-}) => {
-	const fieldDetails = [];
+const getDefaultRows = (nestedFields) => {
+	return nestedFields.map((nestedField) => {
+		return {
+			columns: [
+				{
+					fields: [nestedField],
+					size: 12,
+				},
+			],
+		};
+	});
+};
 
-	if (label) {
-		fieldDetails.push(Liferay.Util.escape(label));
-	}
+const getFieldDetails = (props) => {
+	let fieldDetails = '';
+
+	const {errorMessage, hasError, required, text, tip} = props;
 
 	if (tip) {
-		fieldDetails.push(Liferay.Util.escape(tip));
+		fieldDetails += Liferay.Util.escape(tip) + '<br>';
 	}
 
 	if (text) {
-		fieldDetails.push(Liferay.Util.escape(text));
+		fieldDetails += Liferay.Util.escape(text) + '<br>';
 	}
 
 	if (hasError) {
-		fieldDetails.push(Liferay.Util.escape(errorMessage));
+		fieldDetails += Liferay.Util.escape(errorMessage);
 	}
-	else {
-		if (warningMessage) {
-			fieldDetails.push(Liferay.Util.escape(warningMessage));
-		}
-		if (required) {
-			fieldDetails.push(Liferay.Language.get('required'));
-		}
+	else if (required) {
+		fieldDetails += Liferay.Language.get('required');
 	}
 
-	return fieldDetails.length ? fieldDetails.join('<br>') : false;
+	return fieldDetails;
 };
 
 const HideFieldProperty = () => {
@@ -141,7 +137,6 @@ const Popover = ({tooltip}) => {
 			data-testid="clayPopover"
 			disableScroll
 			header={Liferay.Language.get('input-mask-format')}
-			onShowChange={setPopoverVisible}
 			show={isPopoverVisible}
 			style={{maxWidth: POPOVER_MAX_WIDTH}}
 			trigger={
@@ -166,24 +161,21 @@ const Popover = ({tooltip}) => {
 	);
 };
 
-export function FieldBase({
+function FieldBase({
 	accessible = true,
 	children,
 	displayErrors,
 	errorMessage,
 	fieldName,
-	fieldReference,
 	hideField,
 	hideEditedFlag,
 	id,
-	itemPath,
 	label,
 	localizedValue = {},
 	name,
 	nestedFields,
 	onClick,
-	overMaximumRepetitionsLimit,
-	parentInstanceId,
+	overMaximumRepetitionsLimit = false,
 	readOnly,
 	repeatable,
 	required,
@@ -195,9 +187,8 @@ export function FieldBase({
 	type,
 	valid,
 	visible,
-	warningMessage,
 }) {
-	const {editingLanguageId, pages} = useFormState();
+	const {editingLanguageId} = useFormState();
 	const dispatch = useForm();
 
 	const hasError = displayErrors && errorMessage && !valid;
@@ -205,111 +196,62 @@ export function FieldBase({
 	const fieldDetails = getFieldDetails({
 		errorMessage,
 		hasError,
-		label,
 		required,
 		text,
 		tip,
-		warningMessage,
 	});
 
-	const fieldDetailsId = `${id ?? name}_fieldDetails`;
+	const fieldDetailsId = id || name;
 
 	const hiddenTranslations = useMemo(() => {
+		const array = [];
+
 		if (!localizedValue) {
-			return;
+			return array;
 		}
 
-		return Object.entries(localizedValue).map(([locale, value]) => {
-			if (locale === editingLanguageId) {
-				return null;
+		Object.keys(localizedValue).forEach((key) => {
+			if (key !== editingLanguageId) {
+				array.push({
+					inputName: name.replace(editingLanguageId, key),
+					locale: key,
+					value: localizedValue[key],
+				});
 			}
-
-			return (
-				<input
-					key={locale}
-					name={name.replace(editingLanguageId, locale)}
-					type="hidden"
-					value={normalizeInputValue(type, locale, value)}
-				/>
-			);
 		});
-	}, [localizedValue, editingLanguageId, name, type]);
 
+		return array;
+	}, [localizedValue, editingLanguageId, name]);
+
+	const inputEditedName = name + '_edited';
 	const renderLabel =
 		(label && showLabel) || hideField || repeatable || required || tooltip;
+	const repeatedIndex = useMemo(() => getRepeatedIndex(name), [name]);
 	const showLegend =
-		type === 'checkbox_multiple' ||
-		type === 'grid' ||
-		type === 'paragraph' ||
-		type === 'radio';
+		type &&
+		(type === 'checkbox_multiple' ||
+			type === 'grid' ||
+			type === 'paragraph' ||
+			type === 'radio');
 	const showPopover = fieldName === 'inputMaskFormat';
-	const showFor =
-		type === 'text' ||
-		type === 'numeric' ||
-		type === 'image' ||
-		type === 'rich_text' ||
-		type === 'search_location' ||
-		type === 'select';
-	const readFieldDetails = !showFor || type === 'select';
-	const hasFieldDetails = accessible && fieldDetails && readFieldDetails;
-
-	const accessiblePropsGroup = {
-		...(!renderLabel && {'aria-labelledby': fieldDetailsId, 'tabIndex': 0}),
-		...(type === 'fieldset' && {role: 'group'}),
-	};
-
-	const accessiblePropsFields = {
-		...(hasFieldDetails && {'aria-labelledby': fieldDetailsId}),
-		...(showFor && {htmlFor: id ?? name}),
-		...(readFieldDetails && {tabIndex: 0}),
-	};
-
-	const defaultRows = nestedFields?.map((field) => ({
-		columns: [{fields: [field], size: 12}],
-	}));
-
-	const checkRepetitions = () => {
-		let repetitionsCounter = 0;
-
-		const visitor = new PagesVisitor(pages);
-
-		const newFieldName = fieldName ?? fieldReference;
-		const newParentInstanceId = parentInstanceId;
-
-		visitor.mapFields(
-			(field) => {
-				if (
-					newFieldName === field.fieldName &&
-					newParentInstanceId === field.parentInstanceId
-				) {
-					repetitionsCounter++;
-				}
-			},
-			true,
-			true
-		);
-
-		return repetitionsCounter;
-	};
 
 	return (
-		<ClayForm.Group
-			{...accessiblePropsGroup}
-			className={classNames({
+		<div
+			aria-labelledby={!renderLabel ? fieldDetailsId : null}
+			className={classNames('form-group', {
 				'has-error': hasError,
-				'has-warning': warningMessage && !hasError,
-				'hide': !visible,
+				hide: !visible,
 			})}
 			data-field-name={name}
-			data-field-reference={fieldReference}
 			onClick={onClick}
 			style={style}
+			tabIndex={!renderLabel ? 0 : null}
 		>
 			{repeatable && (
 				<div className="lfr-ddm-form-field-repeatable-toolbar">
-					{checkRepetitions() > 1 && (
+					{repeatable && repeatedIndex > 0 && (
 						<ClayButton
-							aria-label={sub(
+							aria-label={Liferay.Util.sub(
 								Liferay.Language.get('remove-duplicate-field'),
 								label ? label : type
 							)}
@@ -330,7 +272,7 @@ export function FieldBase({
 					)}
 
 					<ClayButton
-						aria-label={sub(
+						aria-label={Liferay.Util.sub(
 							Liferay.Language.get('add-duplicate-field'),
 							label ? label : type
 						)}
@@ -361,8 +303,9 @@ export function FieldBase({
 					{showLegend ? (
 						<fieldset>
 							<legend
-								{...accessiblePropsFields}
+								aria-labelledby={fieldDetailsId}
 								className="lfr-ddm-legend"
+								tabIndex="0"
 							>
 								{showLabel && label}
 
@@ -375,18 +318,17 @@ export function FieldBase({
 									/>
 								)}
 							</legend>
-
 							{children}
 						</fieldset>
 					) : (
 						<>
 							<label
-								{...accessiblePropsFields}
 								className={classNames({
 									'ddm-empty': !showLabel && !required,
 									'ddm-label': showLabel || required,
-									'ddm-repeatable': repeatable,
 								})}
+								htmlFor={fieldDetailsId}
+								tabIndex="0"
 							>
 								{showLabel && label && (
 									<LabelProperty
@@ -422,25 +364,48 @@ export function FieldBase({
 
 			{!renderLabel && children}
 
-			{hiddenTranslations}
+			{hiddenTranslations.length > 0 &&
+				hiddenTranslations.map((translation) => (
+					<input
+						key={translation.inputName}
+						name={translation.inputName}
+						type="hidden"
+						value={
+							translation.value
+								? convertInputValue(
+										type,
+										translation.locale,
+										translation.value
+								  )
+								: ''
+						}
+					/>
+				))}
 
 			{!hideEditedFlag && (
 				<input
-					name={`${name}_edited`}
+					key={inputEditedName}
+					name={inputEditedName}
 					type="hidden"
 					value={localizedValue[editingLanguageId] !== undefined}
 				/>
 			)}
 
-			<FieldFeedback
-				aria-hidden={readFieldDetails}
-				errorMessage={hasError ? errorMessage : undefined}
-				helpMessage={typeof tip === 'string' ? tip : undefined}
-				name={id ?? name}
-				warningMessage={warningMessage}
-			/>
+			{typeof tip === 'string' && (
+				<span aria-hidden="true" className="form-text">
+					{tip}
+				</span>
+			)}
 
-			{hasFieldDetails && (
+			{hasError && (
+				<span className="form-feedback-group">
+					<div aria-hidden="true" className="form-feedback-item">
+						{errorMessage}
+					</div>
+				</span>
+			)}
+
+			{accessible && fieldDetails && (
 				<span
 					className="sr-only"
 					dangerouslySetInnerHTML={{
@@ -450,7 +415,9 @@ export function FieldBase({
 				/>
 			)}
 
-			{defaultRows && <Layout itemPath={itemPath} rows={defaultRows} />}
-		</ClayForm.Group>
+			{nestedFields && <Layout rows={getDefaultRows(nestedFields)} />}
+		</div>
 	);
 }
+
+export {FieldBase};

@@ -24,10 +24,11 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.headless.form.dto.v1_0.FormFieldValue;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Victor Oliveira
@@ -75,15 +76,25 @@ public class DDMFormValuesUtil {
 			formFieldValue.getName());
 
 		if (ddmFormField != null) {
-			String string = formFieldValue.getValue();
-
-			if ((string != null) && ddmFormField.isLocalizable()) {
-				value = new LocalizedValue() {
-					{
-						addString(locale, string);
+			value = Optional.ofNullable(
+				formFieldValue.getValue()
+			).map(
+				Object::toString
+			).map(
+				stringValue -> {
+					if (ddmFormField.isLocalizable()) {
+						return new LocalizedValue() {
+							{
+								addString(locale, stringValue);
+							}
+						};
 					}
-				};
-			}
+
+					return _VALUE;
+				}
+			).orElse(
+				_VALUE
+			);
 		}
 
 		ddmFormFieldValue.setValue(value);

@@ -21,8 +21,7 @@ although it may be updated in the future to be more comprehensive.
         - [Assigning variables to values of Poshi macros or Java methods](#assigning-variables-to-values-of-poshi-macros-or-java-methods)
             - [Assigning a `var` to a value returned by a Poshi macro](#assigning-a-var-to-a-value-returned-by-a-poshi-macro)
             - [Assigning a `var` to the value of a Java method](#assigning-a-var-to-the-value-of-a-java-method)
-
-1. [Variables](#variables-1)
+2. [Variables](#variables-1)
     - [Declaring and assigning variables](#declaring-and-assigning-variables)
         - [`var` assignments](#var-assignments)
             - [Basic Strings](#basic-strings)
@@ -31,8 +30,7 @@ although it may be updated in the future to be more comprehensive.
             - [Assigning `var`'s to class/method invocations](#assigning-vars-to-classmethod-invocations)
             - [Referencing `var`'s](#referencing-vars)
         - [`property` assignments](#property-assignments)
-
-1. [Using Poshi Functions, Poshi Macros and Java Methods](#using-poshi-functions-poshi-macros-and-java-methods-1)
+3. [Using Poshi Functions, Poshi Macros and Java Methods](#using-poshi-functions-poshi-macros-and-java-methods-1)
     - [Creating a function](#creating-a-function)
     - [Creating a macro](#creating-a-macro)
         - [Creating a `.macro` file](#creating-a-macro-file)
@@ -46,8 +44,7 @@ although it may be updated in the future to be more comprehensive.
         - [Additional Utilities](#additional-utilities)
             - [`echo`](#echo)
             - [`fail`](#fail)
-
-1. [Control Flow](#control-flow)
+4. [Control Flow](#control-flow)
     - [Conditional logic](#conditional-logic)
         - [`if`, `else if`, and `else` conditions](#if-else-if-and-else-conditions)
     - [Conditional expressions](#conditional-expressions)
@@ -59,8 +56,7 @@ although it may be updated in the future to be more comprehensive.
     - [Loops](#loops)
         - [`while` loops](#while-loops)
         - [`for` loops](#for-loops)
-
-1. [Writing a Test](#writing-a-test-1)
+5. [Writing a Test](#writing-a-test-1)
     - [Creating a `.testcase` file](#creating-a-testcase-file)
     - [Adding a `test`](#adding-a-test)
     - [`setUp` and `tearDown` blocks](#setup-and-teardown-blocks)
@@ -73,14 +69,12 @@ although it may be updated in the future to be more comprehensive.
             - [`@description`](#description)
             - [`@ignore`](#ignore-1)
             - [`@priority`](#priority)
-
-1. [Other](#other-1)
+6. [Other](#other-1)
     - [Comments](#comments)
         - [Inline comments](#inline-comments)
         - [Multiline comments](#multiline-comments)
     - [Grouping `task`'s](#grouping-tasks)
-
-1. [Debugging Syntax Errors](#debugging-syntax-errors)
+7. [Debugging Syntax Errors](#debugging-syntax-errors)
     - [How to run Poshi Script validation](#how-to-run-poshi-script-validation)
     - [Types of Poshi Script syntax errors](#types-of-poshi-script-syntax-errors)
         - [Data Loss](#data-loss)
@@ -251,12 +245,9 @@ is more limited in what it can be assigned to. The syntax for assignments is the
 same, and is specified in this order:
 
 1. Keyword
-
-1. Variable name
-
-1. Equals sign
-
-1. Notation of a valid assignment
+2. Variable name
+3. Equals sign
+4. Notation of a valid assignment
 
 For specific examples, see below.
 
@@ -640,10 +631,8 @@ The syntax for using this condition requires double quotes to denote a string.
 To reference a variable, the following syntax and order must be followed:
 
 1. Double quotes used in conjunction with the variable reference syntax (`${}`).
-
-1. A `==` to denote an equality evaluation.
-
-1. The second string.
+2. A `==` to denote an equality evaluation.
+3. The second string.
 
 Please note that the `!=` operator is not currently supported.
 

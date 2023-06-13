@@ -15,68 +15,48 @@
 import ClayIcon from '@clayui/icon';
 import React, {useContext} from 'react';
 
-import CartQuickAdd from './CartQuickAdd';
 import MiniCartContext from './MiniCartContext';
 import {ADD_PRODUCT} from './util/constants';
 
-export default function CartItemsList() {
+function CartItemsList() {
 	const {
 		CartViews,
 		cartState,
 		isUpdating,
 		labels,
-		setCartState,
+		spritemap,
 		summaryDataMapper,
 	} = useContext(MiniCartContext);
 
-	const {cartItems = [], id, summary = {}} = cartState;
+	const {cartItems = [], summary = {}} = cartState;
 
 	return (
 		<div className="mini-cart-items-list">
 			<CartViews.ItemsListActions />
 
-			{cartState.accountId && !!id && <CartQuickAdd />}
-
-			{cartItems.length ? (
+			{cartItems.length > 0 ? (
 				<>
 					<div className="mini-cart-cart-items">
-						{cartItems.map((currentCartItem, index) => {
-							const updateCartItem = (callback) => {
-								const updatedCartItem = callback(
-									currentCartItem
-								);
-
-								setCartState((cartState) => ({
-									...cartState,
-									cartItems: cartItems.map((cartItem) =>
-										cartItem.id === currentCartItem.id
-											? updatedCartItem
-											: cartItem
-									),
-								}));
-							};
-
-							return (
-								<CartViews.Item
-									index={index}
-									key={currentCartItem.id}
-									updateCartItem={updateCartItem}
-									{...currentCartItem}
-								/>
-							);
-						})}
+						{cartItems.map((item) => (
+							<CartViews.Item item={item} key={item.id} />
+						))}
 					</div>
 
-					<CartViews.Summary
-						dataMapper={summaryDataMapper}
-						isLoading={isUpdating}
-						summaryData={summary}
-					/>
+					<>
+						<CartViews.Summary
+							dataMapper={summaryDataMapper}
+							isLoading={isUpdating}
+							summaryData={summary}
+						/>
+					</>
 				</>
 			) : (
 				<div className="empty-cart">
 					<div className="empty-cart-icon mb-3">
-						<ClayIcon symbol="shopping-cart" />
+						<ClayIcon
+							spritemap={spritemap}
+							symbol="shopping-cart"
+						/>
 					</div>
 
 					<p className="empty-cart-label">{labels[ADD_PRODUCT]}</p>
@@ -85,3 +65,5 @@ export default function CartItemsList() {
 		</div>
 	);
 }
+
+export default CartItemsList;

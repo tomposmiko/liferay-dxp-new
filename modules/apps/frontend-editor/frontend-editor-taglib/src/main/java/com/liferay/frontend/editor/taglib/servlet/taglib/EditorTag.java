@@ -24,9 +24,9 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -137,10 +137,6 @@ public class EditorTag extends BaseValidatorTagSupport {
 
 	public String getPlaceholder() {
 		return _placeholder;
-	}
-
-	public String getResizeDirection() {
-		return _resizeDirection;
 	}
 
 	public String getToolbarSet() {
@@ -263,10 +259,6 @@ public class EditorTag extends BaseValidatorTagSupport {
 		_resizable = resizable;
 	}
 
-	public void setResizeDirection(String resizeDirection) {
-		_resizeDirection = resizeDirection;
-	}
-
 	public void setShowSource(boolean showSource) {
 		_showSource = showSource;
 	}
@@ -308,7 +300,6 @@ public class EditorTag extends BaseValidatorTagSupport {
 		_placeholder = null;
 		_required = false;
 		_resizable = true;
-		_resizeDirection = "vertical";
 		_showSource = true;
 		_skipEditorLoading = false;
 		_toolbarSet = _TOOLBAR_SET_DEFAULT;
@@ -381,8 +372,6 @@ public class EditorTag extends BaseValidatorTagSupport {
 		setNamespacedAttribute(
 			httpServletRequest, "resizable", String.valueOf(_resizable));
 		setNamespacedAttribute(
-			httpServletRequest, "resizeDirection", _resizeDirection);
-		setNamespacedAttribute(
 			httpServletRequest, "showSource", String.valueOf(_showSource));
 		setNamespacedAttribute(
 			httpServletRequest, "skipEditorLoading",
@@ -440,8 +429,12 @@ public class EditorTag extends BaseValidatorTagSupport {
 	private Map<String, Object> _getData() {
 		HttpServletRequest httpServletRequest = getRequest();
 
-		String portletId = GetterUtil.getString(
-			(String)httpServletRequest.getAttribute(WebKeys.PORTLET_ID));
+		String portletId = (String)httpServletRequest.getAttribute(
+			WebKeys.PORTLET_ID);
+
+		if (portletId == null) {
+			return _data;
+		}
 
 		Map<String, Object> attributes = new HashMap<>();
 
@@ -524,6 +517,10 @@ public class EditorTag extends BaseValidatorTagSupport {
 	}
 
 	private String _getResolvedEditorName() {
+		if (!BrowserSnifferUtil.isRtf(getRequest())) {
+			return "simple";
+		}
+
 		if (Validator.isNull(_editorName)) {
 			return _EDITOR_WYSIWYG_DEFAULT;
 		}
@@ -572,7 +569,6 @@ public class EditorTag extends BaseValidatorTagSupport {
 	private String _placeholder;
 	private boolean _required;
 	private boolean _resizable = true;
-	private String _resizeDirection = "vertical";
 	private boolean _showSource = true;
 	private boolean _skipEditorLoading;
 	private String _toolbarSet = _TOOLBAR_SET_DEFAULT;

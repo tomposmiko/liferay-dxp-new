@@ -52,7 +52,7 @@ public class NodeExecutor {
 	public NodeExecutor(Project project) {
 		_project = project;
 
-		_workingDir = project.getProjectDir();
+		_workingDir = _project.getProjectDir();
 	}
 
 	public NodeExecutor args(Iterable<?> args) {

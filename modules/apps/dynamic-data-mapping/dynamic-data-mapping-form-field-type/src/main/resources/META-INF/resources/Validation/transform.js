@@ -12,20 +12,22 @@
  * details.
  */
 
-const getValidationFromExpression = (validations, validation, expression) => {
-	let mutValidation;
+const getValidationFromExpression = (validations, validation) => {
+	return function transformValidationFromExpression(expression) {
+		let mutValidation;
 
-	if (!expression && validation) {
-		expression = validation.expression;
-	}
+		if (!expression && validation) {
+			expression = validation.expression;
+		}
 
-	if (expression) {
-		mutValidation = validations.find(
-			(validation) => validation.name === expression.name
-		);
-	}
+		if (expression) {
+			mutValidation = validations.find(
+				(validation) => validation.name === expression.name
+			);
+		}
 
-	return mutValidation;
+		return mutValidation;
+	};
 };
 
 const transformValidations = (validations, dataType) => {
@@ -38,44 +40,42 @@ const transformValidations = (validations, dataType) => {
 	});
 };
 
-const getValidation = (validations, validation, value) => {
-	const {errorMessage = {}, expression = {}, parameter = {}} = value;
-	let parameterMessage = '';
-	let selectedValidation = getValidationFromExpression(
-		validations,
-		validation,
-		expression
-	);
-	const enableValidation = !!expression.value;
+const getValidation = (validations, transformValidationFromExpression) => {
+	return function transformValue(value) {
+		const {errorMessage = {}, expression = {}, parameter = {}} = value;
+		let parameterMessage = '';
+		let selectedValidation = transformValidationFromExpression(expression);
+		const enableValidation = !!expression.value;
 
-	if (selectedValidation) {
-		parameterMessage = selectedValidation.parameterMessage;
-	}
-	else {
-		selectedValidation = validations[0];
-	}
+		if (selectedValidation) {
+			parameterMessage = selectedValidation.parameterMessage;
+		}
+		else {
+			selectedValidation = validations[0];
+		}
 
-	return {
-		enableValidation,
-		errorMessage,
-		expression,
-		parameter,
-		parameterMessage,
-		selectedValidation,
+		return {
+			enableValidation,
+			errorMessage,
+			expression,
+			parameter,
+			parameterMessage,
+			selectedValidation,
+		};
 	};
 };
 
-export function normalizeDataType(initialDataType) {
+export const normalizeDataType = (initialDataType) => {
 	return initialDataType === 'double' || initialDataType === 'integer'
 		? 'numeric'
 		: initialDataType;
-}
+};
 
-export function getLocalizedValue({defaultLanguageId, editingLanguageId}) {
-	return (value) => value[editingLanguageId] ?? value[defaultLanguageId];
-}
+export const getLocalizedValue = ({defaultLanguageId, editingLanguageId}) => (
+	value
+) => value[editingLanguageId] || value[defaultLanguageId];
 
-export function getSelectedValidation(validations) {
+export const getSelectedValidation = (validations) => {
 	return function transformSelectedValidation(value) {
 		if (Array.isArray(value)) {
 			value = value[0];
@@ -89,19 +89,22 @@ export function getSelectedValidation(validations) {
 
 		return selectedValidation;
 	};
-}
+};
 
-export function transformData({
+export const transformData = ({
 	defaultLanguageId,
 	editingLanguageId,
 	initialDataType,
 	validation,
 	validations: initialValidations,
 	value,
-}) {
+}) => {
 	const dataType = validation?.dataType ?? initialDataType;
 	const validations = transformValidations(initialValidations, dataType);
-	const parsedValidation = getValidation(validations, validation, value);
+	const parsedValidation = getValidation(
+		validations,
+		getValidationFromExpression(validations, validation)
+	)(value);
 	const localizationMode = editingLanguageId !== defaultLanguageId;
 
 	return {
@@ -110,4 +113,4 @@ export function transformData({
 		localizationMode,
 		validations,
 	};
-}
+};

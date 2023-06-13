@@ -15,6 +15,4 @@
 import launcher from '../../utilities/launcher';
 import Example from './Gallery';
 
-export default function entry(...data) {
-	return launcher(Example, ...data);
-}
+export default (...data) => launcher(Example, ...data);

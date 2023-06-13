@@ -24,6 +24,8 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl;
 
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -70,13 +72,14 @@ public class MetadataVersioningPolicyTest {
 		nextDLFileVersionImpl.setTitle(previousDLFileVersionImpl.getTitle());
 		nextDLFileVersionImpl.setDescription(StringUtil.randomString(6));
 
-		DLVersionNumberIncrease dlVersionNumberIncrease =
+		Optional<DLVersionNumberIncrease> dlVersionNumberIncreaseOptional =
 			_versioningPolicy.computeDLVersionNumberIncrease(
 				previousDLFileVersionImpl, nextDLFileVersionImpl);
 
-		Assert.assertNotNull(dlVersionNumberIncrease);
+		Assert.assertTrue(dlVersionNumberIncreaseOptional.isPresent());
 		Assert.assertEquals(
-			DLVersionNumberIncrease.MINOR, dlVersionNumberIncrease);
+			DLVersionNumberIncrease.MINOR,
+			dlVersionNumberIncreaseOptional.get());
 	}
 
 	@Test
@@ -94,13 +97,14 @@ public class MetadataVersioningPolicyTest {
 		nextDLFileVersionImpl.setFileEntryTypeId(
 			previousDLFileVersionImpl.getFileEntryTypeId() + 1);
 
-		DLVersionNumberIncrease dlVersionNumberIncrease =
+		Optional<DLVersionNumberIncrease> dlVersionNumberIncreaseOptional =
 			_versioningPolicy.computeDLVersionNumberIncrease(
 				previousDLFileVersionImpl, nextDLFileVersionImpl);
 
-		Assert.assertNotNull(dlVersionNumberIncrease);
+		Assert.assertTrue(dlVersionNumberIncreaseOptional.isPresent());
 		Assert.assertEquals(
-			DLVersionNumberIncrease.MINOR, dlVersionNumberIncrease);
+			DLVersionNumberIncrease.MINOR,
+			dlVersionNumberIncreaseOptional.get());
 	}
 
 	@Test
@@ -113,13 +117,14 @@ public class MetadataVersioningPolicyTest {
 
 		nextDLFileVersionImpl.setTitle(StringUtil.randomString(6));
 
-		DLVersionNumberIncrease dlVersionNumberIncrease =
+		Optional<DLVersionNumberIncrease> dlVersionNumberIncreaseOptional =
 			_versioningPolicy.computeDLVersionNumberIncrease(
 				previousDLFileVersionImpl, nextDLFileVersionImpl);
 
-		Assert.assertNotNull(dlVersionNumberIncrease);
+		Assert.assertTrue(dlVersionNumberIncreaseOptional.isPresent());
 		Assert.assertEquals(
-			DLVersionNumberIncrease.MINOR, dlVersionNumberIncrease);
+			DLVersionNumberIncrease.MINOR,
+			dlVersionNumberIncreaseOptional.get());
 	}
 
 	@Inject(filter = "component.name=*.MetadataVersioningPolicy")

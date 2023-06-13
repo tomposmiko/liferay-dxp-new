@@ -27,10 +27,6 @@ public class SamlSpSessionLocalServiceWrapper
 	implements SamlSpSessionLocalService,
 			   ServiceWrapper<SamlSpSessionLocalService> {
 
-	public SamlSpSessionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SamlSpSessionLocalServiceWrapper(
 		SamlSpSessionLocalService samlSpSessionLocalService) {
 
@@ -271,14 +267,6 @@ public class SamlSpSessionLocalServiceWrapper
 		fetchSamlSpSessionBySessionIndex(long companyId, String sessionIndex) {
 
 		return _samlSpSessionLocalService.fetchSamlSpSessionBySessionIndex(
-			companyId, sessionIndex);
-	}
-
-	@Override
-	public java.util.List<com.liferay.saml.persistence.model.SamlSpSession>
-		fetchSamlSpSessionsBySessionIndex(long companyId, String sessionIndex) {
-
-		return _samlSpSessionLocalService.fetchSamlSpSessionsBySessionIndex(
 			companyId, sessionIndex);
 	}
 

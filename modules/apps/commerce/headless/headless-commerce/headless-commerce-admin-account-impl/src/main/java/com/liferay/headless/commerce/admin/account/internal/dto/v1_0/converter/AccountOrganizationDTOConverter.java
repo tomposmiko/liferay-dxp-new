@@ -14,8 +14,9 @@
 
 package com.liferay.headless.commerce.admin.account.internal.dto.v1_0.converter;
 
-import com.liferay.account.model.AccountEntryOrganizationRel;
-import com.liferay.account.service.AccountEntryOrganizationRelService;
+import com.liferay.commerce.account.model.CommerceAccountOrganizationRel;
+import com.liferay.commerce.account.service.CommerceAccountOrganizationRelService;
+import com.liferay.commerce.account.service.persistence.CommerceAccountOrganizationRelPK;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.AccountOrganization;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -28,11 +29,13 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "dto.class.name=com.liferay.account.model.AccountEntryOrganizationRel",
-	service = DTOConverter.class
+	enabled = false,
+	property = "dto.class.name=com.liferay.commerce.account.model.CommerceAccountOrganizationRel",
+	service = {AccountOrganizationDTOConverter.class, DTOConverter.class}
 )
 public class AccountOrganizationDTOConverter
-	implements DTOConverter<AccountEntryOrganizationRel, AccountOrganization> {
+	implements DTOConverter
+		<CommerceAccountOrganizationRel, AccountOrganization> {
 
 	@Override
 	public String getContentType() {
@@ -43,17 +46,19 @@ public class AccountOrganizationDTOConverter
 	public AccountOrganization toDTO(DTOConverterContext dtoConverterContext)
 		throws Exception {
 
-		AccountEntryOrganizationRel accountEntryOrganizationRel =
-			_accountEntryOrganizationRelService.
-				fetchAccountEntryOrganizationRel(
-					(long)dtoConverterContext.getId());
+		CommerceAccountOrganizationRel commerceAccountOrganizationRel =
+			_commerceAccountOrganizationRelService.
+				getCommerceAccountOrganizationRel(
+					(CommerceAccountOrganizationRelPK)
+						dtoConverterContext.getId());
 
 		Organization organization =
-			accountEntryOrganizationRel.getOrganization();
+			commerceAccountOrganizationRel.getOrganization();
 
 		return new AccountOrganization() {
 			{
-				accountId = accountEntryOrganizationRel.getAccountEntryId();
+				accountId =
+					commerceAccountOrganizationRel.getCommerceAccountId();
 				name = organization.getName();
 				organizationId = organization.getOrganizationId();
 				treePath = organization.getTreePath();
@@ -62,7 +67,7 @@ public class AccountOrganizationDTOConverter
 	}
 
 	@Reference
-	private AccountEntryOrganizationRelService
-		_accountEntryOrganizationRelService;
+	private CommerceAccountOrganizationRelService
+		_commerceAccountOrganizationRelService;
 
 }

@@ -54,7 +54,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  * @author Tibor Lipusz
  */
-@Component(service = GroupByTranslator.class)
+@Component(immediate = true, service = GroupByTranslator.class)
 public class DefaultGroupByTranslator implements GroupByTranslator {
 
 	@Override
@@ -78,27 +78,26 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 			termsAggregationBuilder.size(termsSize);
 		}
 
-		_addTermsSorts(termsAggregationBuilder, groupByRequest);
+		addTermsSorts(termsAggregationBuilder, groupByRequest);
 
 		int termsStart = GetterUtil.getInteger(groupByRequest.getTermsStart());
 
 		if ((termsSize > 0) || (termsStart > 0)) {
 			termsAggregationBuilder.subAggregation(
-				_getBucketSortPipelineBuilder(termsStart, termsSize));
+				getBucketSortPipelineBuilder(termsStart, termsSize));
 		}
 
-		TopHitsAggregationBuilder topHitsAggregationBuilder =
-			_getTopHitsBuilder(
-				groupByRequest, selectedFieldNames, locale, highlightFieldNames,
-				highlightEnabled, highlightRequireFieldMatch,
-				highlightFragmentSize, highlightSnippetSize);
+		TopHitsAggregationBuilder topHitsAggregationBuilder = getTopHitsBuilder(
+			groupByRequest, selectedFieldNames, locale, highlightFieldNames,
+			highlightEnabled, highlightRequireFieldMatch, highlightFragmentSize,
+			highlightSnippetSize);
 
 		termsAggregationBuilder.subAggregation(topHitsAggregationBuilder);
 
 		searchSourceBuilder.aggregation(termsAggregationBuilder);
 	}
 
-	private void _addDocsSorts(
+	protected void addDocsSorts(
 		TopHitsAggregationBuilder topHitsAggregationBuilder, Sort[] sorts) {
 
 		if (ArrayUtil.isEmpty(sorts)) {
@@ -178,7 +177,7 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 		}
 	}
 
-	private void _addHighlightedField(
+	protected void addHighlightedField(
 		TopHitsAggregationBuilder topHitsAggregationBuilder,
 		HighlightBuilder highlightBuilder, Locale locale, String fieldName,
 		int highlightFragmentSize, int highlightSnippetSize) {
@@ -194,7 +193,7 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 		topHitsAggregationBuilder.highlighter(highlightBuilder);
 	}
 
-	private void _addHighlights(
+	protected void addHighlights(
 		TopHitsAggregationBuilder topHitsAggregationBuilder, Locale locale,
 		String[] highlightFieldNames, int highlightFragmentSize,
 		int highlightSnippetSize, boolean highlightRequireFieldMatch) {
@@ -202,7 +201,7 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 		HighlightBuilder highlightBuilder = new HighlightBuilder();
 
 		for (String highlightFieldName : highlightFieldNames) {
-			_addHighlightedField(
+			addHighlightedField(
 				topHitsAggregationBuilder, highlightBuilder, locale,
 				highlightFieldName, highlightFragmentSize,
 				highlightSnippetSize);
@@ -215,7 +214,7 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 		topHitsAggregationBuilder.highlighter(highlightBuilder);
 	}
 
-	private void _addSelectedFields(
+	protected void addSelectedFields(
 		TopHitsAggregationBuilder topHitsAggregationBuilder,
 		String[] selectedFieldNames) {
 
@@ -228,7 +227,7 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 		}
 	}
 
-	private void _addTermsSorts(
+	protected void addTermsSorts(
 		TermsAggregationBuilder termsAggregationBuilder,
 		GroupByRequest groupByRequest) {
 
@@ -268,7 +267,7 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 		}
 	}
 
-	private BucketSortPipelineAggregationBuilder _getBucketSortPipelineBuilder(
+	protected BucketSortPipelineAggregationBuilder getBucketSortPipelineBuilder(
 		int start, int size) {
 
 		BucketSortPipelineAggregationBuilder
@@ -287,7 +286,7 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 		return bucketSortPipelineAggregationBuilder;
 	}
 
-	private TopHitsAggregationBuilder _getTopHitsBuilder(
+	protected TopHitsAggregationBuilder getTopHitsBuilder(
 		GroupByRequest groupByRequest, String[] selectedFieldNames,
 		Locale locale, String[] highlightFieldNames, boolean highlightEnabled,
 		boolean highlightRequireFieldMatch, int highlightFragmentSize,
@@ -308,16 +307,16 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 			topHitsAggregationBuilder.size(docsSize);
 		}
 
-		_addDocsSorts(topHitsAggregationBuilder, groupByRequest.getDocsSorts());
+		addDocsSorts(topHitsAggregationBuilder, groupByRequest.getDocsSorts());
 
 		if (highlightEnabled) {
-			_addHighlights(
+			addHighlights(
 				topHitsAggregationBuilder, locale, highlightFieldNames,
 				highlightFragmentSize, highlightSnippetSize,
 				highlightRequireFieldMatch);
 		}
 
-		_addSelectedFields(topHitsAggregationBuilder, selectedFieldNames);
+		addSelectedFields(topHitsAggregationBuilder, selectedFieldNames);
 
 		return topHitsAggregationBuilder;
 	}

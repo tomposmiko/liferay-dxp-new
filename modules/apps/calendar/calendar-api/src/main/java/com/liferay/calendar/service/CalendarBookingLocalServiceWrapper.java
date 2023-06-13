@@ -30,10 +30,6 @@ public class CalendarBookingLocalServiceWrapper
 	implements CalendarBookingLocalService,
 			   ServiceWrapper<CalendarBookingLocalService> {
 
-	public CalendarBookingLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CalendarBookingLocalServiceWrapper(
 		CalendarBookingLocalService calendarBookingLocalService) {
 
@@ -705,17 +701,15 @@ public class CalendarBookingLocalServiceWrapper
 	public java.util.List<CalendarBooking> search(
 		long companyId, long[] groupIds, long[] calendarIds,
 		long[] calendarResourceIds, long parentCalendarBookingId,
-		String keywords, long startTime, long endTime,
-		java.util.TimeZone displayTimeZone, boolean recurring, int[] statuses,
-		int start, int end,
+		String keywords, long startTime, long endTime, boolean recurring,
+		int[] statuses, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<CalendarBooking>
 			orderByComparator) {
 
 		return _calendarBookingLocalService.search(
 			companyId, groupIds, calendarIds, calendarResourceIds,
-			parentCalendarBookingId, keywords, startTime, endTime,
-			displayTimeZone, recurring, statuses, start, end,
-			orderByComparator);
+			parentCalendarBookingId, keywords, startTime, endTime, recurring,
+			statuses, start, end, orderByComparator);
 	}
 
 	@Override

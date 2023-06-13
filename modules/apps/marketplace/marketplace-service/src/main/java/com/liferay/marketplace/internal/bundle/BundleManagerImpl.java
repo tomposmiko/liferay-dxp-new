@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.lpkg.deployer.LPKGVerifier;
 import com.liferay.portal.util.ShutdownUtil;
 
 import java.io.File;
@@ -44,12 +45,15 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Joan Kim
  * @author Ryan Park
  */
-@Component(service = {BundleManager.class, BundleManagerImpl.class})
+@Component(
+	immediate = true, service = {BundleManager.class, BundleManagerImpl.class}
+)
 public class BundleManagerImpl implements BundleManager {
 
 	@Override
@@ -103,7 +107,7 @@ public class BundleManagerImpl implements BundleManager {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -111,13 +115,13 @@ public class BundleManagerImpl implements BundleManager {
 	}
 
 	public void installLPKG(File file) throws Exception {
-		File installFile = new File(_getInstallDirName(), file.getName());
+		File installFile = new File(getInstallDirName(), file.getName());
 
 		Files.move(
 			file.toPath(), installFile.toPath(),
 			StandardCopyOption.REPLACE_EXISTING);
 
-		if (_isRestartRequired(installFile)) {
+		if (isRestartRequired(installFile)) {
 			ShutdownUtil.shutdown(0);
 		}
 	}
@@ -145,7 +149,7 @@ public class BundleManagerImpl implements BundleManager {
 			bundle.uninstall();
 		}
 		catch (BundleException bundleException) {
-			_log.error(bundleException);
+			_log.error(bundleException, bundleException);
 		}
 	}
 
@@ -164,7 +168,7 @@ public class BundleManagerImpl implements BundleManager {
 		_bundleContext = bundleContext;
 	}
 
-	private String _getInstallDirName() throws Exception {
+	protected String getInstallDirName() throws Exception {
 		String[] autoDeployDirNames = PropsUtil.getArray(
 			PropsKeys.MODULE_FRAMEWORK_AUTO_DEPLOY_DIRS);
 
@@ -188,7 +192,7 @@ public class BundleManagerImpl implements BundleManager {
 		return autoDeployDirName;
 	}
 
-	private boolean _isRestartRequired(File file) {
+	protected boolean isRestartRequired(File file) {
 		try (ZipFile zipFile = new ZipFile(file)) {
 			ZipEntry zipEntry = zipFile.getEntry(
 				"liferay-marketplace.properties");
@@ -224,5 +228,8 @@ public class BundleManagerImpl implements BundleManager {
 		BundleManagerImpl.class);
 
 	private BundleContext _bundleContext;
+
+	@Reference
+	private LPKGVerifier _lpkgVerifier;
 
 }

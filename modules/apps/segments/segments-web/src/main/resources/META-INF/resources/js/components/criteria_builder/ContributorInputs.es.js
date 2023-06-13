@@ -15,12 +15,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import {CONJUNCTIONS} from '../../utils/constants.es';
 import {initialContributorShape} from '../../utils/types.es';
 
 function ContributorInputs({contributors}) {
 	return contributors
 		.filter((criteria) => criteria.query)
 		.map((criteria, i) => {
+
+			/**
+			 * First criteria has to be preceded by a `AND` conjunction
+			 */
+			const conjunction =
+				i === 0 ? CONJUNCTIONS.AND : criteria.conjunctionId;
+
 			return (
 				<React.Fragment key={i}>
 					<input
@@ -32,13 +40,12 @@ function ContributorInputs({contributors}) {
 						type="hidden"
 						value={criteria.query}
 					/>
-
 					<input
 						id={criteria.conjunctionInputId}
 						name={criteria.conjunctionInputId}
 						readOnly
 						type="hidden"
-						value={criteria.conjunctionId}
+						value={conjunction}
 					/>
 				</React.Fragment>
 			);

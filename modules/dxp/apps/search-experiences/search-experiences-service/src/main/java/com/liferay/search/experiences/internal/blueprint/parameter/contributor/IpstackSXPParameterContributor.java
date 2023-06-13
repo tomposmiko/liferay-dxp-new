@@ -20,20 +20,17 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.search.experiences.blueprint.parameter.DoubleSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition;
-import com.liferay.search.experiences.internal.blueprint.parameter.DoubleSXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.internal.configuration.IpstackConfiguration;
 import com.liferay.search.experiences.internal.web.cache.IpstackWebCacheItem;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
-import java.beans.ExceptionListener;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -49,8 +46,8 @@ public class IpstackSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public void contribute(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint, Set<SXPParameter> sxpParameters) {
+		SearchContext searchContext, SXPBlueprint sxpBlueprint,
+		Set<SXPParameter> sxpParameters) {
 
 		IpstackConfiguration ipstackConfiguration = _getIpstackConfiguration(
 			searchContext.getCompanyId());
@@ -60,14 +57,14 @@ public class IpstackSXPParameterContributor implements SXPParameterContributor {
 		}
 
 		String ipAddress = (String)searchContext.getAttribute(
-			"search.experiences.ip.address");
+			"search.experiences.ipaddress");
 
 		if (Validator.isNull(ipAddress)) {
 			return;
 		}
 
 		JSONObject jsonObject = IpstackWebCacheItem.get(
-			exceptionListener, ipAddress, ipstackConfiguration);
+			ipAddress, ipstackConfiguration);
 
 		if (jsonObject.length() == 0) {
 			return;
@@ -118,7 +115,7 @@ public class IpstackSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public List<SXPParameterContributorDefinition>
-		getSXPParameterContributorDefinitions(long companyId, Locale locale) {
+		getSXPParameterContributorDefinitions(long companyId) {
 
 		IpstackConfiguration ipstackConfiguration = _getIpstackConfiguration(
 			companyId);

@@ -65,7 +65,7 @@ public class PluginsGitSvnSyncer {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 		}
 	}
 
@@ -123,7 +123,7 @@ public class PluginsGitSvnSyncer {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}

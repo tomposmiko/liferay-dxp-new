@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Display Page Templates";
+	property testray.main.component.name = "Display Pages";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Add a display page") {
@@ -29,7 +29,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -38,11 +38,11 @@ definition {
 	}
 
 	@description = "User cannot delete a display page template with usage."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test CannotDeleteDisplayPageTemplateWithUsage {
 		task ("Publish the display page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content") {
@@ -77,13 +77,13 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-129360 and LPS-106776. The user could change the display style of Documents and Media in display page template."
-	@priority = 4
+	@description = "This is a test for LPS-129360. The user could change the display style of Documents and Media in display page template."
+	@priority = "4"
 	test ChangeDisplayStyleOfDocumentsAndMediaInDisplayPageTemplate {
 		task ("Add a Documents and Media widget to the display page template") {
 			PageEditor.addWidget(portletName = "Documents and Media");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Mark the display page template as default") {
@@ -130,34 +130,8 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-153367. The page creator could configure the display page template in a new tab."
-	@priority = 4
-	test ConfigureDisplayPageTemplateInANewTab {
-		task ("When the page creator accesses to the page editor of display page template") {
-			AssertVisible(locator1 = "PageEditor#NO_FRAGMENTS_MESSAGE");
-		}
-
-		task ("Then the page creator could configure display page template in a new tab") {
-			LexiconEntry.gotoHeaderMenuItem(menuItem = "Configure");
-
-			SelectWindow.selectPopUp(locator1 = "null");
-
-			AssertElementPresent(
-				key_title = "SEO",
-				locator1 = "Header#H2_TITLE");
-
-			AssertElementPresent(
-				key_title = "Settings",
-				locator1 = "Header#H3_TITLE");
-
-			AssertElementPresent(
-				key_title = "Sitemap",
-				locator1 = "Header#H3_TITLE");
-		}
-	}
-
 	@description = "This is for LPS-106813. Can set permissions for widgets in display page template."
-	@priority = 5
+	@priority = "5"
 	test ConfigurePermissionsOfAssetPublisher {
 		property portal.acceptance = "true";
 
@@ -172,11 +146,11 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertChecked.assertCheckedNotVisible(
+			AssertChecked(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
-			Uncheck.uncheckNotVisible(
+			Uncheck(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -188,7 +162,7 @@ definition {
 
 			PageEditor.waitForAutoSave();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the permissions of Asset Publisher is saved") {
@@ -202,20 +176,20 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			AssertNotChecked.assertNotCheckedNotVisible(
+			AssertNotChecked(
 				key_roleTitle = "guest",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 		}
 	}
 
 	@description = "This is a test for LPS-86191. Configure the theme of display page template."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test ConfigureTheme {
 		property test.name.skip.portal.instance = "DisplayPageTemplates#ConfigureTheme";
 
 		task ("Publish the display page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Import a theme") {
@@ -275,7 +249,7 @@ definition {
 
 			PageEditor.assertFragmentSidebarLoaded();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the Fjord theme is shown") {
@@ -286,13 +260,13 @@ definition {
 	}
 
 	@description = "User can delete default display page template."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test DeleteDefaultDisplayPageTemplate {
 		property portal.acceptance = "true";
 
 		task ("Publish the display page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Mark the display page template as default") {
@@ -319,20 +293,22 @@ definition {
 		task ("Delete the default display page template") {
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-			DisplayPageTemplatesAdmin.deleteDisplayPage(
-				defaultDisplayPageTemplate = "true",
-				displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
+				displayPageName = "Display Page Name",
+				item = "Delete");
+
+			AssertConfirm(value1 = "Are you sure you want to delete the default display page template? All related display pages will be deleted.");
 
 			Alert.viewSuccessMessageText(successMessage = "You successfully deleted 1 display page template(s).");
 		}
 
 		task ("View the default display page template not shown") {
-			DisplayPageTemplatesAdmin.viewDisplayPageNotPresent(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.viewDisplayPageNotPresent(displayPageName = "DisplayPage Name");
 		}
 	}
 
 	@description = "User can delete display page template."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test DeleteDisplayPageTemplate {
 		property portal.acceptance = "true";
@@ -349,11 +325,11 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86191 and LPS-96438. Disable Show Header and Show Footer of display page template."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test DisableShowHeaderAndFooter {
 		task ("Publish the display page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add two widget pages") {
@@ -426,7 +402,7 @@ definition {
 
 			PageEditor.assertFragmentSidebarLoaded();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the display page template at view mode") {
@@ -452,8 +428,8 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-106776. User can edit a display page. This includes adding and removing fragments and includes editing text in fragment editable fields."
-	@priority = 5
+	@description = "User can edit a display page. This includes adding and removing fragments and includes editing text in fragment editable fields."
+	@priority = "5"
 	@uitest
 	test EditDisplayPageTemplate {
 		property portal.acceptance = "true";
@@ -475,7 +451,7 @@ definition {
 		}
 
 		task ("Publish the display page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Edit the display page template") {
@@ -520,7 +496,7 @@ definition {
 		}
 
 		task ("View the Button is not shown") {
-			PageEditor.viewFragmentNotPresent(fragmentName = "Button");
+			PageEditor.viewNoFragment(fragmentName = "Button");
 		}
 
 		task ("View the Heading and HTML fragments are shown") {
@@ -530,16 +506,15 @@ definition {
 				id = "element-text");
 
 			AssertTextEquals.assertPartialText(
-				fragmentName = "html",
 				id = "element-html",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
+				key_fragmentName = "HTML",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
 				value1 = "HTML Example");
 		}
 	}
 
 	@description = "User can rename a display page."
-	@priority = 3
+	@priority = "3"
 	@uitest
 	test RenameDisplayPageTemplate {
 		task ("Rename the display page") {
@@ -557,7 +532,7 @@ definition {
 		task ("Publish the display page template") {
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the display page") {
@@ -566,7 +541,7 @@ definition {
 	}
 
 	@description = "User can only map a display page to an asset type once."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test ViewAssetTypeOnlySelectableOnce {
 		task ("View the plus button of Item field no longer shown in Mapping tab") {
@@ -574,58 +549,8 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-162302. The page creator can navigate through fragment structure via breadcrumb on display page template."
-	@priority = 4
-	test ViewBreadcrumbOnDisplayPageTemplate {
-		task ("Given the display page template creator has a DPT with an Asset Publisher inside Container fragment") {
-			task ("Add a Container fragment to display page template") {
-				PageEditor.addFragment(
-					collectionName = "Layout Elements",
-					fragmentName = "Container");
-			}
-
-			task ("Add an Asset Publisher inside Container") {
-				PageEditor.addElementToContainer(
-					navTab = "Widgets",
-					portletName = "Asset Publisher");
-			}
-
-			task ("Close the sidebar") {
-				Click(
-					key_text = "times",
-					locator1 = "Icon#ANY");
-			}
-		}
-
-		task ("When the display page template creator selects the Asset Publisher") {
-			PageEditor.clickConfigurableField(fragmentName = "Asset Publisher");
-		}
-
-		task ("Then the display page template creator should see the Breadcrumb and Assset Publisher as active") {
-			Breadcrumb.viewBreadcrumbPath(breadcrumbNameList = "Container,Asset Publisher");
-
-			Breadcrumb.viewActiveEntry(breadcrumbName = "Asset Publisher");
-		}
-
-		task ("When the display page template creator selects the Container on Breadcrumb") {
-			Click(
-				key_breadcrumbName = "Container",
-				locator1 = "Breadcrumb#BREADCRUMB_ENTRY");
-		}
-
-		task ("Then the display page template creator should see the sidebar still closed and the General panel") {
-			AssertElementNotPresent(locator1 = "Sidebar#PANEL_OPEN");
-
-			AssertVisible(
-				key_panel = "Container Options",
-				locator1 = "Panel#PANEL");
-
-			Breadcrumb.viewActiveEntry(breadcrumbName = "Container");
-		}
-	}
-
 	@description = "This is a test for LPS-133350. View master page after renaming display page template within custom master page."
-	@priority = 4
+	@priority = "4"
 	test ViewMasterPageAfterRenamingDisplayPageTemplateWithinCustomMasterPage {
 		task ("Add a custom master page and publish") {
 			JSONLayoutpagetemplate.addMasterPageTemplateEntry(
@@ -636,7 +561,9 @@ definition {
 
 			MastersPageTemplatesAdmin.gotoMasters(masterLayoutName = "TestMaster");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Add a display page template with created master page") {
@@ -677,114 +604,6 @@ definition {
 			AssertElementPresent(
 				key_card = "TestMaster",
 				locator1 = "Card#CARD_SELECTED");
-		}
-	}
-
-	@description = "This is a test for LPS-140197. Draft version can only be accessed by author."
-	@priority = 4
-	test ViewPreviewDraftViaURLFromNonAuthor {
-		property custom.properties = "jsonws.web.service.paths.excludes=";
-
-		task ("Add a user and assign it to the created site") {
-			JSONUser.addUser(
-				userEmailAddress = "userea@liferay.com",
-				userFirstName = "userfn",
-				userLastName = "userln",
-				userScreenName = "usersn");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "userea@liferay.com");
-
-			JSONUser.addUserToSite(
-				groupName = "Test Site Name",
-				userEmailAddress = "userea@liferay.com");
-		}
-
-		task ("Add a role and assign view web content permissions to the user") {
-			JSONRole.addSiteRole(
-				roleKey = "Web Content Viewer",
-				roleTitle = "Web Content Viewer");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_SITE_ADMINISTRATION",
-				resourceName = "com.liferay.portal.kernel.model.Group",
-				roleTitle = "Web Content Viewer",
-				roleType = "site");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "ACCESS_IN_CONTROL_PANEL",
-				resourceName = "com_liferay_journal_web_portlet_JournalPortlet",
-				roleTitle = "Web Content Viewer",
-				roleType = "site");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW",
-				resourceName = "com_liferay_journal_web_portlet_JournalPortlet",
-				roleTitle = "Web Content Viewer",
-				roleType = "site");
-
-			JSONRole.assignSiteRoleToUser(
-				groupName = "Test Site Name",
-				roleTitle = "Web Content Viewer",
-				userEmailAddress = "userea@liferay.com");
-		}
-
-		task ("Add a Display Page Content fragment and publish") {
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				fragmentName = "Display Page Content");
-
-			PageEditor.publish();
-		}
-
-		task ("Mark the display page template as default") {
-			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Display Page Name");
-		}
-
-		task ("Add a web content") {
-			JSONWebcontent.addWebContent(
-				content = "Web Content Content",
-				groupName = "Test Site Name",
-				title = "Web Content Title");
-		}
-
-		task ("Save web content as draft") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
-
-			WebContent.editCP(
-				saveAsDraft = "true",
-				webContentContentEdit = "WC WebContent Content Draft",
-				webContentTitle = "WC WebContent Title",
-				webContentTitleEdit = "WC WebContent Title Draft");
-		}
-
-		task ("Preview draft and get its URL") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			WebContentNavigator.gotoEntryMenuItem(
-				entry = "WC WebContent Title Draft",
-				menuItem = "Preview Draft");
-
-			AssertElementPresent(locator1 = "IFrame#MODAL_BODY");
-
-			var url = selenium.getAttribute("//iframe@src");
-
-			User.logoutPG();
-
-			User.firstLoginUI(
-				password = "test",
-				specificURL = ${url},
-				userEmailAddress = "userea@liferay.com");
-		}
-
-		task ("View the content is in published version") {
-			AssertTextEquals(
-				locator1 = "PageEditor#CONTENT_PAGE_WEB_CONTENT_CONTENT",
-				value1 = "Web Content Content");
 		}
 	}
 

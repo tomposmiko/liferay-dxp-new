@@ -19,16 +19,10 @@ import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.staging.StagingGroupHelper;
-
-import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,38 +31,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kapler
  */
 @Component(
+	immediate = true,
 	property = {
-		"javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
 		"panel.app.order:Integer=400",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_DESIGN
 	},
 	service = PanelApp.class
 )
 public class LayoutPageTemplatesPanelApp extends BasePanelApp {
-
-	@Override
-	public String getLabel(Locale locale) {
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		if (serviceContext == null) {
-			return super.getLabel(locale);
-		}
-
-		Group scopeGroup = _groupLocalService.fetchGroup(
-			serviceContext.getScopeGroupId());
-
-		if ((scopeGroup != null) && scopeGroup.isCompany()) {
-			return _language.get(locale, "widget-page-templates");
-		}
-
-		return super.getLabel(locale);
-	}
-
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
 
 	@Override
 	public String getPortletId() {
@@ -88,16 +58,14 @@ public class LayoutPageTemplatesPanelApp extends BasePanelApp {
 		return super.isShow(permissionChecker, group);
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
-
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES + ")"
+		target = "(javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 	@Reference
 	private StagingGroupHelper _stagingGroupHelper;

@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.upgrade.ViewCountUpgradeProcess;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -62,9 +60,9 @@ public class UpgradeViewCountTest {
 
 		_db.runSQL(
 			"create table UpgradeViewCount (primaryKey LONG not null primary " +
-				"key, companyId LONG not null, readCount LONG)");
+				"key, companyId LONG not null, readCount LONG);");
 
-		_db.runSQL("insert into UpgradeViewCount values (1, 2, 3)");
+		_db.runSQL("insert into UpgradeViewCount values (1, 2, 3);");
 	}
 
 	@After
@@ -89,11 +87,7 @@ public class UpgradeViewCountTest {
 				dbInspector.hasColumn("UpgradeViewCount", "readCount"));
 		}
 
-		for (UpgradeStep upgradeStep : upgradeCTModel.getUpgradeSteps()) {
-			UpgradeProcess upgradeProcess = (UpgradeProcess)upgradeStep;
-
-			upgradeProcess.upgrade();
-		}
+		upgradeCTModel.upgrade();
 
 		try (Connection connection = DataAccess.getConnection();
 			PreparedStatement preparedStatement = connection.prepareStatement(

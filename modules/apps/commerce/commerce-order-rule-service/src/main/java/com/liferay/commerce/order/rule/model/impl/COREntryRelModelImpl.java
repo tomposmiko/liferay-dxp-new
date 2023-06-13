@@ -16,6 +16,7 @@ package com.liferay.commerce.order.rule.model.impl;
 
 import com.liferay.commerce.order.rule.model.COREntryRel;
 import com.liferay.commerce.order.rule.model.COREntryRelModel;
+import com.liferay.commerce.order.rule.model.COREntryRelSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -37,15 +38,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -74,18 +78,17 @@ public class COREntryRelModelImpl
 	public static final String TABLE_NAME = "COREntryRel";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"COREntryRelId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"classNameId", Types.BIGINT},
-		{"classPK", Types.BIGINT}, {"COREntryId", Types.BIGINT}
+		{"COREntryRelId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
+		{"COREntryId", Types.BIGINT}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
 		new HashMap<String, Integer>();
 
 	static {
-		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("COREntryRelId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
@@ -98,7 +101,7 @@ public class COREntryRelModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table COREntryRel (mvccVersion LONG default 0 not null,COREntryRelId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,COREntryId LONG)";
+		"create table COREntryRel (COREntryRelId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,COREntryId LONG)";
 
 	public static final String TABLE_SQL_DROP = "drop table COREntryRel";
 
@@ -151,6 +154,57 @@ public class COREntryRelModelImpl
 	 */
 	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static COREntryRel toModel(COREntryRelSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		COREntryRel model = new COREntryRelImpl();
+
+		model.setCOREntryRelId(soapModel.getCOREntryRelId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
+		model.setCOREntryId(soapModel.getCOREntryId());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<COREntryRel> toModels(COREntryRelSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<COREntryRel> models = new ArrayList<COREntryRel>(
+			soapModels.length);
+
+		for (COREntryRelSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public COREntryRelModelImpl() {
@@ -229,108 +283,96 @@ public class COREntryRelModelImpl
 	public Map<String, Function<COREntryRel, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<COREntryRel, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, COREntryRel>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<COREntryRel, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			COREntryRel.class.getClassLoader(), COREntryRel.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<COREntryRel, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<COREntryRel, Object>>();
+		try {
+			Constructor<COREntryRel> constructor =
+				(Constructor<COREntryRel>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", COREntryRel::getMvccVersion);
-			attributeGetterFunctions.put(
-				"COREntryRelId", COREntryRel::getCOREntryRelId);
-			attributeGetterFunctions.put(
-				"companyId", COREntryRel::getCompanyId);
-			attributeGetterFunctions.put("userId", COREntryRel::getUserId);
-			attributeGetterFunctions.put("userName", COREntryRel::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", COREntryRel::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", COREntryRel::getModifiedDate);
-			attributeGetterFunctions.put(
-				"classNameId", COREntryRel::getClassNameId);
-			attributeGetterFunctions.put("classPK", COREntryRel::getClassPK);
-			attributeGetterFunctions.put(
-				"COREntryId", COREntryRel::getCOREntryId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
-	}
-
-	private static class AttributeSetterBiConsumersHolder {
-
-		private static final Map<String, BiConsumer<COREntryRel, Object>>
-			_attributeSetterBiConsumers;
-
-		static {
-			Map<String, BiConsumer<COREntryRel, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<COREntryRel, ?>>();
-
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<COREntryRel, Long>)COREntryRel::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"COREntryRelId",
-				(BiConsumer<COREntryRel, Long>)COREntryRel::setCOREntryRelId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<COREntryRel, Long>)COREntryRel::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<COREntryRel, Long>)COREntryRel::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<COREntryRel, String>)COREntryRel::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<COREntryRel, Date>)COREntryRel::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<COREntryRel, Date>)COREntryRel::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<COREntryRel, Long>)COREntryRel::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<COREntryRel, Long>)COREntryRel::setClassPK);
-			attributeSetterBiConsumers.put(
-				"COREntryId",
-				(BiConsumer<COREntryRel, Long>)COREntryRel::setCOREntryId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
 		}
-
 	}
 
-	@JSON
-	@Override
-	public long getMvccVersion() {
-		return _mvccVersion;
-	}
+	private static final Map<String, Function<COREntryRel, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<COREntryRel, Object>>
+		_attributeSetterBiConsumers;
 
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
+	static {
+		Map<String, Function<COREntryRel, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<COREntryRel, Object>>();
+		Map<String, BiConsumer<COREntryRel, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<COREntryRel, ?>>();
 
-		_mvccVersion = mvccVersion;
+		attributeGetterFunctions.put(
+			"COREntryRelId", COREntryRel::getCOREntryRelId);
+		attributeSetterBiConsumers.put(
+			"COREntryRelId",
+			(BiConsumer<COREntryRel, Long>)COREntryRel::setCOREntryRelId);
+		attributeGetterFunctions.put("companyId", COREntryRel::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<COREntryRel, Long>)COREntryRel::setCompanyId);
+		attributeGetterFunctions.put("userId", COREntryRel::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<COREntryRel, Long>)COREntryRel::setUserId);
+		attributeGetterFunctions.put("userName", COREntryRel::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<COREntryRel, String>)COREntryRel::setUserName);
+		attributeGetterFunctions.put("createDate", COREntryRel::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<COREntryRel, Date>)COREntryRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", COREntryRel::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<COREntryRel, Date>)COREntryRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", COREntryRel::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<COREntryRel, Long>)COREntryRel::setClassNameId);
+		attributeGetterFunctions.put("classPK", COREntryRel::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK", (BiConsumer<COREntryRel, Long>)COREntryRel::setClassPK);
+		attributeGetterFunctions.put("COREntryId", COREntryRel::getCOREntryId);
+		attributeSetterBiConsumers.put(
+			"COREntryId",
+			(BiConsumer<COREntryRel, Long>)COREntryRel::setCOREntryId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -600,7 +642,6 @@ public class COREntryRelModelImpl
 	public Object clone() {
 		COREntryRelImpl corEntryRelImpl = new COREntryRelImpl();
 
-		corEntryRelImpl.setMvccVersion(getMvccVersion());
 		corEntryRelImpl.setCOREntryRelId(getCOREntryRelId());
 		corEntryRelImpl.setCompanyId(getCompanyId());
 		corEntryRelImpl.setUserId(getUserId());
@@ -620,8 +661,6 @@ public class COREntryRelModelImpl
 	public COREntryRel cloneWithOriginalValues() {
 		COREntryRelImpl corEntryRelImpl = new COREntryRelImpl();
 
-		corEntryRelImpl.setMvccVersion(
-			this.<Long>getColumnOriginalValue("mvccVersion"));
 		corEntryRelImpl.setCOREntryRelId(
 			this.<Long>getColumnOriginalValue("COREntryRelId"));
 		corEntryRelImpl.setCompanyId(
@@ -718,8 +757,6 @@ public class COREntryRelModelImpl
 		COREntryRelCacheModel corEntryRelCacheModel =
 			new COREntryRelCacheModel();
 
-		corEntryRelCacheModel.mvccVersion = getMvccVersion();
-
 		corEntryRelCacheModel.COREntryRelId = getCOREntryRelId();
 
 		corEntryRelCacheModel.companyId = getCompanyId();
@@ -810,16 +847,44 @@ public class COREntryRelModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<COREntryRel, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<COREntryRel, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<COREntryRel, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((COREntryRel)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, COREntryRel>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					COREntryRel.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
-	private long _mvccVersion;
 	private long _COREntryRelId;
 	private long _companyId;
 	private long _userId;
@@ -832,9 +897,8 @@ public class COREntryRelModelImpl
 	private long _COREntryId;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<COREntryRel, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<COREntryRel, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -859,7 +923,6 @@ public class COREntryRelModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
-		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("COREntryRelId", _COREntryRelId);
 		_columnOriginalValues.put("companyId", _companyId);
 		_columnOriginalValues.put("userId", _userId);
@@ -882,25 +945,23 @@ public class COREntryRelModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("mvccVersion", 1L);
+		columnBitmasks.put("COREntryRelId", 1L);
 
-		columnBitmasks.put("COREntryRelId", 2L);
+		columnBitmasks.put("companyId", 2L);
 
-		columnBitmasks.put("companyId", 4L);
+		columnBitmasks.put("userId", 4L);
 
-		columnBitmasks.put("userId", 8L);
+		columnBitmasks.put("userName", 8L);
 
-		columnBitmasks.put("userName", 16L);
+		columnBitmasks.put("createDate", 16L);
 
-		columnBitmasks.put("createDate", 32L);
+		columnBitmasks.put("modifiedDate", 32L);
 
-		columnBitmasks.put("modifiedDate", 64L);
+		columnBitmasks.put("classNameId", 64L);
 
-		columnBitmasks.put("classNameId", 128L);
+		columnBitmasks.put("classPK", 128L);
 
-		columnBitmasks.put("classPK", 256L);
-
-		columnBitmasks.put("COREntryId", 512L);
+		columnBitmasks.put("COREntryId", 256L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Carolina Barbosa
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.list.type.model.ListTypeDefinition",
 	service = ModelDocumentContributor.class
 )
@@ -36,9 +37,6 @@ public class ListTypeDefinitionModelDocumentContributor
 		Document document, ListTypeDefinition listTypeDefinition) {
 
 		document.addLocalizedText(Field.NAME, listTypeDefinition.getNameMap());
-		document.addLocalizedKeyword(
-			Field.getSortableFieldName(Field.NAME),
-			listTypeDefinition.getNameMap(), true);
 		document.remove(Field.USER_NAME);
 	}
 

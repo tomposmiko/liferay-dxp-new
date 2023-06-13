@@ -54,8 +54,9 @@ public final class AllowedIPAddressesValidatorFactory {
 						ipAddressAndNetmask[0]),
 					ipAddressAndNetmask);
 			}
-
-			return _ALLOWED_IP_ADDRESSES_VALIDATOR;
+			else {
+				return _ALLOWED_IP_ADDRESSES_VALIDATOR;
+			}
 		}
 		catch (Exception exception) {
 			_log.error("Invalid configured address: ", exception);
@@ -87,7 +88,7 @@ public final class AllowedIPAddressesValidatorFactory {
 			}
 			catch (UnknownHostException unknownHostException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(unknownHostException);
+					_log.debug(unknownHostException, unknownHostException);
 				}
 
 				return false;
@@ -130,7 +131,7 @@ public final class AllowedIPAddressesValidatorFactory {
 
 			_allowedIpAddress = allowedIpAddress;
 
-			_allowedIpAddressBytes = allowedIpAddress.getAddress();
+			_allowedIpAddressBytes = _allowedIpAddress.getAddress();
 
 			if (_hasNetmask(ipAddressAndNetmask)) {
 				String netmask = GetterUtil.getString(ipAddressAndNetmask[1]);

@@ -14,7 +14,7 @@
 
 import {useState} from 'react';
 
-export function useChannel() {
+export const useChannel = () => {
 	const [channel] = useState(() => {
 		const listeners = new Set();
 
@@ -36,4 +36,4 @@ export function useChannel() {
 	});
 
 	return channel;
-}
+};

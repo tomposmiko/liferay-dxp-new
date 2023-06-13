@@ -34,23 +34,11 @@ public class StartupFailureMessageGenerator
 
 		start = consoleText.lastIndexOf(_TOKEN_COULD_NOT_RESOLVE_MODULE, start);
 
-		int newLineIndex = consoleText.lastIndexOf("\n", start);
-
-		if (newLineIndex != -1) {
-			start = newLineIndex;
-		}
+		start = consoleText.lastIndexOf("\n", start);
 
 		int end = consoleText.indexOf(_TOKEN_DELETING, start);
 
-		if (end == -1) {
-			end = consoleText.length() - 1;
-		}
-
-		newLineIndex = consoleText.lastIndexOf("\n", end);
-
-		if (newLineIndex != -1) {
-			end = newLineIndex;
-		}
+		end = consoleText.lastIndexOf("\n", end);
 
 		return Dom4JUtil.getNewElement(
 			"div", null,

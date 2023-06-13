@@ -39,7 +39,8 @@
 					return CommerceDiscountSkusResource.addDiscountSku(id, skuData)
 						.then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
-								id: '<%= CommercePricingFDSNames.DISCOUNT_SKUS %>',
+								id:
+									'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS %>',
 							});
 						})
 						.catch((error) => {
@@ -58,7 +59,9 @@
 					itemCreation: false,
 					itemSelectedMessage: '<%= LanguageUtil.get(request, "sku-selected") %>',
 					itemsKey: 'id',
-					linkedDatasetsId: ['<%= CommercePricingFDSNames.DISCOUNT_SKUS %>'],
+					linkedDatasetsId: [
+						'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS %>',
+					],
 					onItemSelected: selectItem,
 					pageSize: 10,
 					panelHeaderLabel: '<%= LanguageUtil.get(request, "add-skus") %>',
@@ -74,7 +77,7 @@
 							fieldName: 'sku',
 						},
 					],
-					spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 					titleLabel: '<%= LanguageUtil.get(request, "add-existing-sku") %>',
 				});
 			</aui:script>
@@ -85,12 +88,15 @@
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "skus") %>'
 			>
-				<frontend-data-set:headless-display
+				<clay:headless-data-set-display
 					apiURL="<%= commerceDiscountDisplayContext.getDiscountCPInstanceAPIURL() %>"
-					fdsActionDropdownItems="<%= commerceDiscountDisplayContext.getDiscountCPInstanceFDSActionDropdownItems() %>"
-					formName="fm"
-					id="<%= CommercePricingFDSNames.DISCOUNT_SKUS %>"
+					clayDataSetActionDropdownItems="<%= commerceDiscountDisplayContext.getDiscountCPInstanceClayDataSetActionDropdownItems() %>"
+					formId="fm"
+					id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= portletDiscountRuleURL %>"
 				/>
 			</commerce-ui:panel>
 		</div>

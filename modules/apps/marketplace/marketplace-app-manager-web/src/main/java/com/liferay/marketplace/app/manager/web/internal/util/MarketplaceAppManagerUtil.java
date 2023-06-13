@@ -16,9 +16,9 @@ package com.liferay.marketplace.app.manager.web.internal.util;
 
 import com.liferay.marketplace.app.manager.web.internal.constants.BundleConstants;
 import com.liferay.marketplace.model.App;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -90,8 +90,8 @@ public class MarketplaceAppManagerUtil {
 	public static String[] getCategories(List<App> apps, List<Bundle> bundles) {
 		List<String> categories = new ArrayList<>();
 
-		categories.addAll(_getAppCategories(apps));
-		categories.addAll(_getBundleCategories(bundles));
+		categories.addAll(getAppCategories(apps));
+		categories.addAll(getBundleCategories(bundles));
 
 		ListUtil.distinct(categories);
 		ListUtil.sort(categories);
@@ -115,7 +115,7 @@ public class MarketplaceAppManagerUtil {
 		return string;
 	}
 
-	private static List<String> _getAppCategories(List<App> apps) {
+	protected static List<String> getAppCategories(List<App> apps) {
 		List<String> categories = new ArrayList<>(apps.size());
 
 		for (App app : apps) {
@@ -127,7 +127,7 @@ public class MarketplaceAppManagerUtil {
 		return categories;
 	}
 
-	private static List<String> _getBundleCategories(List<Bundle> bundles) {
+	protected static List<String> getBundleCategories(List<Bundle> bundles) {
 		List<String> categories = new ArrayList<>();
 
 		for (Bundle bundle : bundles) {

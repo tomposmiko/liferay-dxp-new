@@ -15,21 +15,24 @@
 package com.liferay.portal.workflow.metrics.internal.search.index;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.index.CreateIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.DeleteIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexResponse;
+import com.liferay.portal.workflow.metrics.internal.petra.executor.WorkflowMetricsPortalExecutor;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Inácio Nery
@@ -37,78 +40,64 @@ import org.osgi.service.component.annotations.Reference;
 public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 
 	@Override
-	public boolean createIndex(long companyId) throws PortalException {
-		if (!searchCapabilities.isWorkflowMetricsSupported() ||
-			_hasIndex(getIndexName(companyId))) {
+	public void createIndex(long companyId) throws PortalException {
+		workflowMetricsPortalExecutor.execute(
+			() -> {
+				if ((searchEngineAdapter == null) ||
+					hasIndex(getIndexName(companyId))) {
 
-			return false;
-		}
+					return;
+				}
 
-		_createIndex(getIndexName(companyId));
+				CreateIndexRequest createIndexRequest = new CreateIndexRequest(
+					getIndexName(companyId));
 
-		return true;
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+					StringUtil.read(
+						getClass(), "/META-INF/search/mappings.json"));
+
+				createIndexRequest.setSource(
+					JSONUtil.put(
+						"mappings",
+						JSONUtil.put(
+							getIndexType(), jsonObject.get(getIndexType()))
+					).put(
+						"settings",
+						JSONFactoryUtil.createJSONObject(
+							StringUtil.read(
+								getClass(), "/META-INF/search/settings.json"))
+					).toString());
+
+				searchEngineAdapter.execute(createIndexRequest);
+			});
 	}
 
 	@Override
-	public boolean removeIndex(long companyId) throws PortalException {
-		if (!searchCapabilities.isWorkflowMetricsSupported() ||
-			!_hasIndex(getIndexName(companyId))) {
+	public void removeIndex(long companyId) throws PortalException {
+		workflowMetricsPortalExecutor.execute(
+			() -> {
+				if ((searchEngineAdapter == null) ||
+					!hasIndex(getIndexName(companyId))) {
 
+					return;
+				}
+
+				searchEngineAdapter.execute(
+					new DeleteIndexRequest(getIndexName(companyId)));
+			});
+	}
+
+	@Activate
+	protected void activate() throws Exception {
+		companyLocalService.forEachCompanyId(
+			companyId -> createIndex(companyId));
+	}
+
+	protected boolean hasIndex(String indexName) {
+		if (searchEngineAdapter == null) {
 			return false;
 		}
 
-		searchEngineAdapter.execute(
-			new DeleteIndexRequest(getIndexName(companyId)));
-
-		return true;
-	}
-
-	@Reference
-	protected SearchCapabilities searchCapabilities;
-
-	@Reference
-	protected SearchEngineAdapter searchEngineAdapter;
-
-	private String _createIndex(String indexName) {
-		IndicesExistsIndexResponse indicesExistsIndexResponse =
-			searchEngineAdapter.execute(
-				new IndicesExistsIndexRequest(indexName));
-
-		if (indicesExistsIndexResponse.isExists()) {
-			return indexName;
-		}
-
-		try {
-			CreateIndexRequest createIndexRequest = new CreateIndexRequest(
-				indexName);
-
-			createIndexRequest.setSource(
-				JSONUtil.put(
-					"mappings",
-					JSONUtil.put(
-						getIndexType(),
-						() -> {
-							JSONObject jsonObject = _readJSONObject(
-								"mappings.json");
-
-							return jsonObject.get(getIndexType());
-						})
-				).put(
-					"settings", _readJSONObject("settings.json")
-				).toString());
-
-			searchEngineAdapter.execute(createIndexRequest);
-
-			return indexName;
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-
-		return null;
-	}
-
-	private boolean _hasIndex(String indexName) {
 		IndicesExistsIndexRequest indicesExistsIndexRequest =
 			new IndicesExistsIndexRequest(indexName);
 
@@ -118,12 +107,25 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 		return indicesExistsIndexResponse.isExists();
 	}
 
-	private JSONObject _readJSONObject(String fileName) throws JSONException {
-		return JSONFactoryUtil.createJSONObject(
-			StringUtil.read(getClass(), "/META-INF/search/" + fileName));
+	@Reference(
+		target = ModuleServiceLifecycle.PORTLETS_INITIALIZED, unbind = "-"
+	)
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BaseWorkflowMetricsIndex.class);
+	@Reference
+	protected CompanyLocalService companyLocalService;
+
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(search.engine.impl=Elasticsearch)"
+	)
+	protected volatile SearchEngineAdapter searchEngineAdapter;
+
+	@Reference
+	protected WorkflowMetricsPortalExecutor workflowMetricsPortalExecutor;
 
 }

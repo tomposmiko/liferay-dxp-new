@@ -23,7 +23,7 @@ import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.Role;
@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -49,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Steven Smith
  */
-@Component(service = DLImporter.class)
+@Component(enabled = false, service = DLImporter.class)
 public class DLImporter {
 
 	public void importDocuments(
@@ -78,7 +79,7 @@ public class DLImporter {
 		throws PortalException {
 
 		if (jsonArray == null) {
-			jsonArray = _jsonFactory.createJSONArray(
+			jsonArray = JSONFactoryUtil.createJSONArray(
 				"[{\"actionIds\": [\"VIEW\"], \"roleName\": \"Site Member\"," +
 					"\"scope\": 4}]");
 		}
@@ -150,14 +151,13 @@ public class DLImporter {
 			InputStream inputStream = classLoader.getResourceAsStream(
 				documentsDependencyPath + fileName);
 
-			File file = _file.createTempFile(inputStream);
+			File file = FileUtil.createTempFile(inputStream);
 
 			FileEntry fileEntry = _dlAppLocalService.addFileEntry(
 				null, userId, repository.getRepositoryId(),
 				dlFolder.getFolderId(), fileName,
-				MimeTypesUtil.getContentType(file), title, StringPool.BLANK,
-				description, StringPool.BLANK, file, null, null,
-				serviceContext);
+				MimeTypesUtil.getContentType(file), title, description,
+				StringPool.BLANK, file, null, null, serviceContext);
 
 			dlFileEntry = _dlFileEntryLocalService.getDLFileEntry(
 				fileEntry.getFileEntryId());
@@ -202,7 +202,7 @@ public class DLImporter {
 		Repository repository = repositories.get(0);
 
 		DLFolder dlFolder = _dlFolderLocalService.addFolder(
-			null, userId, scopeGroupId, repository.getRepositoryId(), false,
+			userId, scopeGroupId, repository.getRepositoryId(), false,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, name, description,
 			false, serviceContext);
 
@@ -235,12 +235,6 @@ public class DLImporter {
 
 	@Reference
 	private DLFolderLocalService _dlFolderLocalService;
-
-	@Reference
-	private com.liferay.portal.kernel.util.File _file;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private RepositoryLocalService _repositoryLocalService;

@@ -14,14 +14,12 @@
 
 package com.liferay.commerce.shipment.test;
 
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.constants.CommerceShipmentConstants;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
 import com.liferay.commerce.exception.CommerceShipmentStatusException;
-import com.liferay.commerce.exception.DuplicateCommerceShipmentItemException;
 import com.liferay.commerce.inventory.engine.CommerceInventoryEngine;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceShipment;
@@ -29,19 +27,22 @@ import com.liferay.commerce.model.CommerceShipmentItem;
 import com.liferay.commerce.product.constants.CommerceChannelConstants;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CommerceChannel;
-import com.liferay.commerce.product.service.CommerceChannelLocalService;
+import com.liferay.commerce.product.service.CommerceChannelLocalServiceUtil;
 import com.liferay.commerce.product.test.util.CPTestUtil;
 import com.liferay.commerce.service.CommerceShipmentItemLocalService;
-import com.liferay.commerce.service.CommerceShipmentLocalService;
+import com.liferay.commerce.service.CommerceShipmentItemLocalServiceUtil;
+import com.liferay.commerce.service.CommerceShipmentLocalServiceUtil;
 import com.liferay.commerce.shipment.test.util.CommerceShipmentTestUtil;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.commerce.test.util.context.TestCommerceContext;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -55,6 +56,7 @@ import org.frutilla.FrutillaRule;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +64,6 @@ import org.junit.runner.RunWith;
 
 /**
  * @author Alec Sloan
- * @author Alessio Antonio Rendina
  */
 @RunWith(Arquillian.class)
 public class CommerceShipmentItemTest {
@@ -74,11 +75,17 @@ public class CommerceShipmentItemTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -86,7 +93,7 @@ public class CommerceShipmentItemTest {
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
 			_group.getCompanyId());
 
-		_commerceChannel = _commerceChannelLocalService.addCommerceChannel(
+		_commerceChannel = CommerceChannelLocalServiceUtil.addCommerceChannel(
 			null, _group.getGroupId(), "Test Channel",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
 			_commerceCurrency.getCode(), serviceContext);
@@ -99,8 +106,8 @@ public class CommerceShipmentItemTest {
 			_group.getGroupId(), _commerceOrder.getCommerceOrderId());
 
 		_commerceContext = new TestCommerceContext(
-			_commerceOrder.getAccountEntry(), _commerceCurrency,
-			_commerceChannel, _user, _group, _commerceOrder);
+			_commerceCurrency, _commerceChannel, _user, _group,
+			_commerceOrder.getCommerceAccount(), _commerceOrder);
 
 		_commerceShipmentItem =
 			CommerceShipmentTestUtil.addCommerceShipmentItem(
@@ -166,7 +173,7 @@ public class CommerceShipmentItemTest {
 			CommerceShipmentConstants.SHIPMENT_STATUS_SHIPPED);
 
 		_commerceShipment =
-			_commerceShipmentLocalService.updateCommerceShipment(
+			CommerceShipmentLocalServiceUtil.updateCommerceShipment(
 				_commerceShipment);
 
 		CommerceShipmentTestUtil.addCommerceShipmentItem(
@@ -217,16 +224,15 @@ public class CommerceShipmentItemTest {
 			CommerceShipmentConstants.SHIPMENT_STATUS_SHIPPED);
 
 		_commerceShipment =
-			_commerceShipmentLocalService.updateCommerceShipment(
+			CommerceShipmentLocalServiceUtil.updateCommerceShipment(
 				_commerceShipment);
 
-		_commerceShipmentItemLocalService.deleteCommerceShipmentItem(
+		CommerceShipmentItemLocalServiceUtil.deleteCommerceShipmentItem(
 			commerceShipmentItem, false);
 
 		int actualCPInstanceStockQuantity =
 			_commerceInventoryEngine.getStockQuantity(
-				_user.getCompanyId(), cpInstance.getGroupId(),
-				cpInstance.getSku());
+				_user.getCompanyId(), cpInstance.getSku());
 
 		Assert.assertNotEquals(1, actualCPInstanceStockQuantity);
 
@@ -267,55 +273,18 @@ public class CommerceShipmentItemTest {
 			CommerceShipmentConstants.SHIPMENT_STATUS_SHIPPED);
 
 		_commerceShipment =
-			_commerceShipmentLocalService.updateCommerceShipment(
+			CommerceShipmentLocalServiceUtil.updateCommerceShipment(
 				_commerceShipment);
 
-		_commerceShipmentItemLocalService.deleteCommerceShipmentItem(
+		CommerceShipmentItemLocalServiceUtil.deleteCommerceShipmentItem(
 			commerceShipmentItem, true);
 
 		int actualCPInstanceStockQuantity =
 			_commerceInventoryEngine.getStockQuantity(
-				_user.getCompanyId(), cpInstance.getGroupId(),
-				_commerceChannel.getGroupId(), cpInstance.getSku());
+				_user.getCompanyId(), _commerceChannel.getGroupId(),
+				cpInstance.getSku());
 
 		Assert.assertEquals(1, actualCPInstanceStockQuantity);
-
-		_resetCommerceShipment();
-	}
-
-	@Test(expected = DuplicateCommerceShipmentItemException.class)
-	public void testUpdateCommerceShipmentItem() throws Exception {
-		frutillaRule.scenario(
-			"It should not be possible to update the ERC field with a value " +
-				"that already exists"
-		).given(
-			"An commerce shipment with an commerce shipment item associated"
-		).when(
-			"I update the ERC field"
-		).then(
-			"An exception shall be raised"
-		);
-
-		CommerceShipmentItem newCommerceShipmentItem =
-			CommerceShipmentTestUtil.addCommerceShipmentItem(
-				_commerceContext,
-				CPTestUtil.addCPInstanceWithRandomSku(_group.getGroupId()),
-				_group.getGroupId(), _user.getUserId(),
-				_commerceOrder.getCommerceOrderId(),
-				_commerceShipment.getCommerceShipmentId(), 2, 1);
-
-		String externalReferenceCode = "externalReferenceCode";
-
-		_commerceShipmentItemLocalService.updateExternalReferenceCode(
-			_commerceShipmentItem.getCommerceShipmentItemId(),
-			externalReferenceCode);
-
-		_commerceShipmentItemLocalService.updateExternalReferenceCode(
-			newCommerceShipmentItem.getCommerceShipmentItemId(),
-			externalReferenceCode);
-
-		_commerceShipmentItemLocalService.deleteCommerceShipmentItem(
-			newCommerceShipmentItem.getCommerceShipmentItemId());
 
 		_resetCommerceShipment();
 	}
@@ -341,14 +310,12 @@ public class CommerceShipmentItemTest {
 			CommerceShipmentConstants.SHIPMENT_STATUS_SHIPPED);
 
 		_commerceShipment =
-			_commerceShipmentLocalService.updateCommerceShipment(
+			CommerceShipmentLocalServiceUtil.updateCommerceShipment(
 				_commerceShipment);
 
 		CommerceShipmentItem newCommerceShipmentItem =
-			_commerceShipmentItemLocalService.updateCommerceShipmentItem(
-				_commerceShipmentItem.getCommerceShipmentItemId(),
-				_commerceShipmentItem.getCommerceInventoryWarehouseId(), 2,
-				true);
+			CommerceShipmentItemLocalServiceUtil.updateCommerceShipmentItem(
+				_commerceShipmentItem.getCommerceShipmentItemId(), 2);
 
 		Assert.assertEquals(
 			_commerceShipment.getStatus(),
@@ -364,22 +331,17 @@ public class CommerceShipmentItemTest {
 	public FrutillaRule frutillaRule = new FrutillaRule();
 
 	private void _resetCommerceShipment() throws Exception {
-		_commerceShipmentLocalService.deleteCommerceShipment(
+		CommerceShipmentLocalServiceUtil.deleteCommerceShipment(
 			_commerceShipment, true);
 
-		_commerceShipmentLocalService.addCommerceShipment(_commerceShipment);
+		CommerceShipmentLocalServiceUtil.addCommerceShipment(_commerceShipment);
 	}
 
+	private static Company _company;
 	private static User _user;
-
-	@Inject
-	private AccountEntryLocalService _accountEntryLocalService;
 
 	@DeleteAfterTestRun
 	private CommerceChannel _commerceChannel;
-
-	@Inject
-	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	private CommerceContext _commerceContext;
 
@@ -400,9 +362,6 @@ public class CommerceShipmentItemTest {
 
 	@Inject
 	private CommerceShipmentItemLocalService _commerceShipmentItemLocalService;
-
-	@Inject
-	private CommerceShipmentLocalService _commerceShipmentLocalService;
 
 	private Group _group;
 

@@ -904,10 +904,10 @@ public class CTStoreTest {
 	private void _assertCTFileSize(String fileName, byte[] data)
 		throws Exception {
 
-		Assert.assertEquals(
-			data.length,
-			_ctStore.getFileSize(
-				_companyId, _REPOSITORY_ID, fileName, _VERSION_1));
+		long fileSize = _ctStore.getFileSize(
+			_companyId, _REPOSITORY_ID, fileName, _VERSION_1);
+
+		Assert.assertEquals(data.length, fileSize);
 	}
 
 	private void _assertCTFileVersions(String fileName, String... versions)
@@ -952,16 +952,16 @@ public class CTStoreTest {
 	private void _assertFileSize(String fileName, byte[] data)
 		throws Exception {
 
-		Assert.assertEquals(
-			data.length,
-			_fileSystemStore.getFileSize(
-				_companyId, _REPOSITORY_ID, fileName, _VERSION_1));
+		long fileSize = _fileSystemStore.getFileSize(
+			_companyId, _REPOSITORY_ID, fileName, _VERSION_1);
+
+		Assert.assertEquals(data.length, fileSize);
 	}
 
 	private void _assertHasCTFile(String fileName, byte[] data)
 		throws Exception {
 
-		if (data.length == 0) {
+		if (data == null) {
 			Assert.assertFalse(
 				_ctStore.hasFile(
 					_companyId, _REPOSITORY_ID, fileName, _VERSION_1));
@@ -976,7 +976,7 @@ public class CTStoreTest {
 	}
 
 	private void _assertHasFile(String fileName, byte[] data) throws Exception {
-		if (data.length == 0) {
+		if (data == null) {
 			Assert.assertFalse(
 				_fileSystemStore.hasFile(
 					_companyId, _REPOSITORY_ID, fileName, _VERSION_1));
@@ -1069,13 +1069,13 @@ public class CTStoreTest {
 		String fileName = "testFile";
 
 		try {
-			ctFileAssertor.assertFile(fileName, new byte[0]);
+			ctFileAssertor.assertFile(fileName, null);
 
 			Assert.fail();
 		}
 		catch (NoSuchFileException noSuchFileException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileException);
+				_log.debug(noSuchFileException, noSuchFileException);
 			}
 		}
 
@@ -1101,13 +1101,13 @@ public class CTStoreTest {
 			_ctCollections[0],
 			() -> {
 				try {
-					ctFileAssertor.assertFile(fileName, new byte[0]);
+					ctFileAssertor.assertFile(fileName, null);
 
 					Assert.fail();
 				}
 				catch (NoSuchFileException noSuchFileException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(noSuchFileException);
+						_log.debug(noSuchFileException, noSuchFileException);
 					}
 				}
 
@@ -1183,7 +1183,7 @@ public class CTStoreTest {
 				_deleteCTSContent(fileName, _VERSION_1);
 
 				try {
-					ctFileAssertor.assertFile(fileName, new byte[0]);
+					ctFileAssertor.assertFile(fileName, null);
 
 					Assert.fail();
 				}
@@ -1200,26 +1200,26 @@ public class CTStoreTest {
 		_publish(_ctCollections[2]);
 
 		try {
-			ctFileAssertor.assertFile(fileName, new byte[0]);
+			ctFileAssertor.assertFile(fileName, null);
 
 			Assert.fail();
 		}
 		catch (NoSuchFileException noSuchFileException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileException);
+				_log.debug(noSuchFileException, noSuchFileException);
 			}
 		}
 
 		_assertMethods(readMethod);
 
 		try {
-			fsFileAssertor.assertFile(fileName, new byte[0]);
+			fsFileAssertor.assertFile(fileName, null);
 
 			Assert.fail();
 		}
 		catch (NoSuchFileException noSuchFileException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileException);
+				_log.debug(noSuchFileException, noSuchFileException);
 			}
 		}
 	}

@@ -48,10 +48,15 @@ public class UpgradeDatabaseTestHelperImpl
 			String tableClassName, String tableName, String columnName)
 		throws Exception {
 
-		// Hack through the OSGi classloading, it is not worth exporting
-		// the generated *Table packages just to support this test
+		if (hasColumn(tableName, columnName)) {
 
-		alterTableDropColumn(tableName, columnName);
+			// Hack through the OSGi classloading, it is not worth exporting
+			// the generated *Table packages just to support this test
+
+			alter(
+				_CLASS_LOADER.loadClass(tableClassName),
+				new AlterTableDropColumn(columnName));
+		}
 	}
 
 	@Override

@@ -9,7 +9,6 @@
  * distribution rights of the Software.
  */
 
-import ClayList from '@clayui/list';
 import ClayPanel from '@clayui/panel';
 import React, {useMemo, useState} from 'react';
 
@@ -34,7 +33,7 @@ function Header({processId}) {
 			/>
 
 			<div className="management-bar management-bar-light ml-3 navbar navbar-expand-md pl-1">
-				<ClayList className="navbar-nav">
+				<ul className="navbar-nav">
 					<ProcessStepFilter
 						options={{
 							hideControl: true,
@@ -44,7 +43,7 @@ function Header({processId}) {
 						}}
 						processId={processId}
 					/>
-				</ClayList>
+				</ul>
 			</div>
 		</>
 	);
@@ -79,12 +78,7 @@ function WorkloadByAssigneeCard({routeParams}) {
 		url: `/processes/${processId}/assignees/metrics`,
 	});
 
-	const promises = useMemo(
-		() => [postData()],
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[routeParams]
-	);
+	const promises = useMemo(() => [postData()], [postData]);
 
 	const tabs = [
 		{name: Liferay.Language.get('overdue'), tabKey: 'overdue'},

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,17 +61,7 @@ public class WorkflowTaskSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
-
-		if (workflowTask.getActions() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"actions\": ");
-
-			sb.append(_toJSON(workflowTask.getActions()));
-		}
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (workflowTask.getAssigneePerson() != null) {
 			if (sb.length() > 1) {
@@ -288,14 +279,7 @@ public class WorkflowTaskSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
-
-		if (workflowTask.getActions() == null) {
-			map.put("actions", null);
-		}
-		else {
-			map.put("actions", String.valueOf(workflowTask.getActions()));
-		}
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (workflowTask.getAssigneePerson() == null) {
 			map.put("assigneePerson", null);
@@ -445,14 +429,7 @@ public class WorkflowTaskSerDes {
 			WorkflowTask workflowTask, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "actions")) {
-				if (jsonParserFieldValue != null) {
-					workflowTask.setActions(
-						(Map)WorkflowTaskSerDes.toMap(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "assigneePerson")) {
+			if (Objects.equals(jsonParserFieldName, "assigneePerson")) {
 				if (jsonParserFieldValue != null) {
 					workflowTask.setAssigneePerson(
 						CreatorSerDes.toDTO((String)jsonParserFieldValue));
@@ -460,18 +437,14 @@ public class WorkflowTaskSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "assigneeRoles")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Role[] assigneeRolesArray =
-						new Role[jsonParserFieldValues.length];
-
-					for (int i = 0; i < assigneeRolesArray.length; i++) {
-						assigneeRolesArray[i] = RoleSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					workflowTask.setAssigneeRoles(assigneeRolesArray);
+					workflowTask.setAssigneeRoles(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RoleSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Role[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "completed")) {

@@ -2,18 +2,12 @@ definition {
 
 	macro click {
 		Click.mouseDownMouseUp(
-			key_text = ${button},
+			key_text = "${button}",
 			locator1 = "Button#ANY");
 	}
 
 	macro clickAdd {
 		Button.click(button = "Add");
-
-		SelectFrameTop();
-
-		if (IsElementPresent(locator1 = "Modal#MODAL_SHOW")) {
-			SelectFrame(locator1 = "IFrame#MODAL_BODY");
-		}
 	}
 
 	macro clickAddRow {
@@ -30,8 +24,6 @@ definition {
 
 	macro clickCancel {
 		Button.click(button = "Cancel");
-
-		SelectFrameTop();
 	}
 
 	macro clickCheckOut {
@@ -40,7 +32,7 @@ definition {
 
 	macro clickCollapse {
 		Click(
-			key_label = ${label},
+			key_label = "${label}",
 			locator1 = "DDMEditStructure#FORM_COLLAPSE_BUTTON");
 	}
 
@@ -50,10 +42,6 @@ definition {
 
 	macro clickConfirm {
 		Click(locator1 = "Button#CONFIRM");
-	}
-
-	macro clickCreate {
-		Button.click(button = "Create");
 	}
 
 	macro clickDelete {
@@ -90,7 +78,7 @@ definition {
 
 	macro clickNoError {
 		ClickNoError.mouseDownMouseUp(
-			key_text = ${button},
+			key_text = "${button}",
 			locator1 = "Button#ANY");
 	}
 
@@ -128,20 +116,10 @@ definition {
 
 	macro clickSubmitButton {
 		Click(locator1 = "Button#SUBMIT");
-
-		SelectFrameTop();
 	}
 
-	macro clickSubmitForWorkflow {
-		Button.click(button = "Submit for Workflow");
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-	}
-
-	macro clickTrash {
-		ScrollWebElementIntoView(locator1 = "Button#TRASH_ENABLED");
-
-		Click(locator1 = "Button#TRASH_ENABLED");
+	macro clickSubmitForPublication {
+		Button.click(button = "Submit for Publication");
 	}
 
 	macro clickUpdate {
@@ -158,13 +136,13 @@ definition {
 
 	macro viewNotPresent {
 		AssertElementNotPresent(
-			key_text = ${button},
+			key_text = "${button}",
 			locator1 = "Button#ANY");
 	}
 
 	macro viewPresent {
 		AssertElementPresent(
-			key_text = ${button},
+			key_text = "${button}",
 			locator1 = "Button#ANY");
 	}
 

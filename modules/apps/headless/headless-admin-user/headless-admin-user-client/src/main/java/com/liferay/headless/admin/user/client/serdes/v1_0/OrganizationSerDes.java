@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -63,7 +64,7 @@ public class OrganizationSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (organization.getActions() != null) {
 			if (sb.length() > 1) {
@@ -158,20 +159,6 @@ public class OrganizationSerDes {
 
 			sb.append(
 				liferayToJSONDateFormat.format(organization.getDateModified()));
-
-			sb.append("\"");
-		}
-
-		if (organization.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(organization.getExternalReferenceCode()));
 
 			sb.append("\"");
 		}
@@ -387,7 +374,7 @@ public class OrganizationSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (organization.getActions() == null) {
 			map.put("actions", null);
@@ -436,15 +423,6 @@ public class OrganizationSerDes {
 			map.put(
 				"dateModified",
 				liferayToJSONDateFormat.format(organization.getDateModified()));
-		}
-
-		if (organization.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(organization.getExternalReferenceCode()));
 		}
 
 		if (organization.getId() == null) {
@@ -584,18 +562,14 @@ public class OrganizationSerDes {
 						jsonParserFieldName, "childOrganizations")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Organization[] childOrganizationsArray =
-						new Organization[jsonParserFieldValues.length];
-
-					for (int i = 0; i < childOrganizationsArray.length; i++) {
-						childOrganizationsArray[i] = OrganizationSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					organization.setChildOrganizations(childOrganizationsArray);
+					organization.setChildOrganizations(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> OrganizationSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Organization[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "comment")) {
@@ -605,18 +579,14 @@ public class OrganizationSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					organization.setCustomFields(customFieldsArray);
+					organization.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
@@ -629,14 +599,6 @@ public class OrganizationSerDes {
 				if (jsonParserFieldValue != null) {
 					organization.setDateModified(
 						toDate((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					organization.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -690,19 +652,14 @@ public class OrganizationSerDes {
 						jsonParserFieldName, "organizationAccounts")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Account[] organizationAccountsArray =
-						new Account[jsonParserFieldValues.length];
-
-					for (int i = 0; i < organizationAccountsArray.length; i++) {
-						organizationAccountsArray[i] = AccountSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
 					organization.setOrganizationAccounts(
-						organizationAccountsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AccountSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Account[size]
+						));
 				}
 			}
 			else if (Objects.equals(
@@ -725,34 +682,26 @@ public class OrganizationSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "services")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Service[] servicesArray =
-						new Service[jsonParserFieldValues.length];
-
-					for (int i = 0; i < servicesArray.length; i++) {
-						servicesArray[i] = ServiceSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					organization.setServices(servicesArray);
+					organization.setServices(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ServiceSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Service[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "userAccounts")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					UserAccount[] userAccountsArray =
-						new UserAccount[jsonParserFieldValues.length];
-
-					for (int i = 0; i < userAccountsArray.length; i++) {
-						userAccountsArray[i] = UserAccountSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					organization.setUserAccounts(userAccountsArray);
+					organization.setUserAccounts(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> UserAccountSerDes.toDTO((String)object)
+						).toArray(
+							size -> new UserAccount[size]
+						));
 				}
 			}
 		}

@@ -32,6 +32,8 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
 import com.liferay.layout.item.selector.criterion.LayoutItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -42,11 +44,11 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -54,6 +56,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -220,48 +223,56 @@ public class CategoryCPDisplayLayoutDisplayContext
 		layoutItemSelectorCriterion.setShowHiddenPages(true);
 		layoutItemSelectorCriterion.setShowPrivatePages(true);
 		layoutItemSelectorCriterion.setShowPublicPages(true);
+
 		layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			Collections.<ItemSelectorReturnType>singletonList(
 				new UUIDItemSelectorReturnType()));
 
 		CommerceChannel commerceChannel = getCommerceChannel();
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory,
-				_groupLocalService.getGroup(commerceChannel.getSiteGroupId()),
-				commerceChannel.getSiteGroupId(), "selectDisplayPage",
-				layoutItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory,
+			_groupLocalService.getGroup(commerceChannel.getSiteGroupId()),
+			commerceChannel.getSiteGroupId(), "selectDisplayPage",
+			layoutItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
-	public String getLayoutBreadcrumb(CPDisplayLayout cpDisplayLayout)
-		throws PortalException {
+	public String getLayoutBreadcrumb(Layout layout) throws Exception {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
-		if (cpDisplayLayout == null) {
-			return StringPool.BLANK;
+		Locale locale = themeDisplay.getLocale();
+
+		List<Layout> ancestors = layout.getAncestors();
+
+		StringBundler sb = new StringBundler((4 * ancestors.size()) + 5);
+
+		if (layout.isPrivateLayout()) {
+			sb.append(LanguageUtil.get(httpServletRequest, "private-pages"));
+		}
+		else {
+			sb.append(LanguageUtil.get(httpServletRequest, "public-pages"));
 		}
 
-		String layoutUuid = cpDisplayLayout.getLayoutUuid();
+		sb.append(StringPool.SPACE);
+		sb.append(StringPool.GREATER_THAN);
+		sb.append(StringPool.SPACE);
 
-		if (Validator.isNull(layoutUuid)) {
-			return StringPool.BLANK;
+		Collections.reverse(ancestors);
+
+		for (Layout ancestor : ancestors) {
+			sb.append(HtmlUtil.escape(ancestor.getName(locale)));
+			sb.append(StringPool.SPACE);
+			sb.append(StringPool.GREATER_THAN);
+			sb.append(StringPool.SPACE);
 		}
 
-		CommerceChannel commerceChannel = getCommerceChannel();
+		sb.append(HtmlUtil.escape(layout.getName(locale)));
 
-		Layout selLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
-			layoutUuid, commerceChannel.getSiteGroupId(), false);
-
-		if (selLayout == null) {
-			selLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
-				layoutUuid, commerceChannel.getSiteGroupId(), true);
-		}
-
-		if (selLayout != null) {
-			return selLayout.getBreadcrumb(cpRequestHelper.getLocale());
-		}
-
-		return StringPool.BLANK;
+		return sb.toString();
 	}
 
 	@Override

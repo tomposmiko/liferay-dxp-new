@@ -15,6 +15,4 @@
 import launcher from '../../utilities/launcher';
 import CompareCheckbox from './CompareCheckbox';
 
-export default function entry(...data) {
-	return launcher(CompareCheckbox, ...data);
-}
+export default (...data) => launcher(CompareCheckbox, ...data);

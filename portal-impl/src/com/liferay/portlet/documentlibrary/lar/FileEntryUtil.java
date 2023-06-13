@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.lar;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
@@ -88,11 +87,9 @@ public class FileEntryUtil {
 
 		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
 
-		DLFileVersion dlFileVersion = dlFileEntry.getFileVersion();
-
 		InputStream inputStream = DLStoreUtil.getFileAsStream(
 			fileEntry.getCompanyId(), repositoryId, dlFileEntry.getName(),
-			dlFileVersion.getStoreFileName());
+			fileEntry.getVersion());
 
 		if (inputStream == null) {
 			inputStream = new UnsyncByteArrayInputStream(new byte[0]);

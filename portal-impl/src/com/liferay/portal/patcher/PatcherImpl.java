@@ -205,7 +205,7 @@ public class PatcherImpl implements Patcher {
 		}
 		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioException);
+				_log.warn(ioException, ioException);
 			}
 		}
 

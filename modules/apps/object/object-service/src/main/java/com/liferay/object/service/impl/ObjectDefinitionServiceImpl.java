@@ -18,13 +18,13 @@ import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.base.ObjectDefinitionServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 import java.util.Locale;
@@ -49,50 +49,18 @@ public class ObjectDefinitionServiceImpl
 
 	@Override
 	public ObjectDefinition addCustomObjectDefinition(
-			boolean enableComments, boolean enableLocalization,
 			Map<Locale, String> labelMap, String name, String panelAppOrder,
 			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
-			String scope, String storageType, List<ObjectField> objectFields)
+			String scope, List<ObjectField> objectFields)
 		throws PortalException {
 
 		_portletResourcePermission.check(
 			getPermissionChecker(), null,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
 
-		return objectDefinitionLocalService.addCustomObjectDefinition(
-			getUserId(), enableComments, enableLocalization, labelMap, name,
-			panelAppOrder, panelCategoryKey, pluralLabelMap, scope, storageType,
-			objectFields);
-	}
-
-	@Override
-	public ObjectDefinition addObjectDefinition(String externalReferenceCode)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), null,
-			ObjectActionKeys.ADD_OBJECT_DEFINITION);
-
-		return objectDefinitionLocalService.addObjectDefinition(
-			externalReferenceCode, getUserId());
-	}
-
-	@Override
-	public ObjectDefinition addSystemObjectDefinition(
-			long userId, boolean enableComments, Map<Locale, String> labelMap,
-			String name, String panelAppOrder, String panelCategoryKey,
-			Map<Locale, String> pluralLabelMap, String scope,
-			List<ObjectField> objectFields)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), null,
-			ObjectActionKeys.ADD_OBJECT_DEFINITION);
-
-		return objectDefinitionLocalService.addSystemObjectDefinition(
-			userId, null, null, enableComments, labelMap, true, name,
-			panelAppOrder, panelCategoryKey, null, null, pluralLabelMap, scope,
-			null, 1, WorkflowConstants.STATUS_DRAFT, objectFields);
+		return _objectDefinitionLocalService.addCustomObjectDefinition(
+			getUserId(), labelMap, name, panelAppOrder, panelCategoryKey,
+			pluralLabelMap, scope, objectFields);
 	}
 
 	@Override
@@ -102,26 +70,8 @@ public class ObjectDefinitionServiceImpl
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.DELETE);
 
-		return objectDefinitionLocalService.deleteObjectDefinition(
+		return _objectDefinitionLocalService.deleteObjectDefinition(
 			objectDefinitionId);
-	}
-
-	@Override
-	public ObjectDefinition fetchObjectDefinitionByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		ObjectDefinition objectDefinition =
-			objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					externalReferenceCode, companyId);
-
-		if (objectDefinition != null) {
-			_objectDefinitionModelResourcePermission.check(
-				getPermissionChecker(), objectDefinition, ActionKeys.VIEW);
-		}
-
-		return objectDefinition;
 	}
 
 	@Override
@@ -131,29 +81,13 @@ public class ObjectDefinitionServiceImpl
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.VIEW);
 
-		return objectDefinitionLocalService.getObjectDefinition(
+		return _objectDefinitionLocalService.getObjectDefinition(
 			objectDefinitionId);
 	}
 
 	@Override
-	public ObjectDefinition getObjectDefinitionByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		ObjectDefinition objectDefinition =
-			objectDefinitionLocalService.
-				getObjectDefinitionByExternalReferenceCode(
-					externalReferenceCode, companyId);
-
-		_objectDefinitionModelResourcePermission.check(
-			getPermissionChecker(), objectDefinition, ActionKeys.VIEW);
-
-		return objectDefinition;
-	}
-
-	@Override
 	public List<ObjectDefinition> getObjectDefinitions(int start, int end) {
-		return objectDefinitionLocalService.getObjectDefinitions(start, end);
+		return _objectDefinitionLocalService.getObjectDefinitions(start, end);
 	}
 
 	@Override
@@ -166,14 +100,14 @@ public class ObjectDefinitionServiceImpl
 
 	@Override
 	public int getObjectDefinitionsCount() throws PortalException {
-		return objectDefinitionLocalService.getObjectDefinitionsCount();
+		return _objectDefinitionLocalService.getObjectDefinitionsCount();
 	}
 
 	@Override
 	public int getObjectDefinitionsCount(long companyId)
 		throws PortalException {
 
-		return objectDefinitionLocalService.getObjectDefinitionsCount(
+		return _objectDefinitionLocalService.getObjectDefinitionsCount(
 			companyId);
 	}
 
@@ -186,83 +120,30 @@ public class ObjectDefinitionServiceImpl
 			getPermissionChecker(), null,
 			ObjectActionKeys.PUBLISH_OBJECT_DEFINITION);
 
-		return objectDefinitionLocalService.publishCustomObjectDefinition(
+		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			getUserId(), objectDefinitionId);
 	}
 
 	@Override
-	public ObjectDefinition publishSystemObjectDefinition(
-			long objectDefinitionId)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), null,
-			ObjectActionKeys.PUBLISH_OBJECT_DEFINITION);
-
-		return objectDefinitionLocalService.publishSystemObjectDefinition(
-			getUserId(), objectDefinitionId);
-	}
-
 	public ObjectDefinition updateCustomObjectDefinition(
-			String externalReferenceCode, long objectDefinitionId,
-			long accountEntryRestrictedObjectFieldId,
-			long descriptionObjectFieldId, long titleObjectFieldId,
-			boolean accountEntryRestricted, boolean active,
-			boolean enableCategorization, boolean enableComments,
-			boolean enableLocalization, boolean enableObjectEntryHistory,
+			Long objectDefinitionId, long descriptionObjectFieldId,
+			long titleObjectFieldId, boolean active,
 			Map<Locale, String> labelMap, String name, String panelAppOrder,
-			String panelCategoryKey, boolean portlet,
-			Map<Locale, String> pluralLabelMap, String scope)
+			String panelCategoryKey, Map<Locale, String> pluralLabelMap,
+			String scope)
 		throws PortalException {
 
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
 
-		return objectDefinitionLocalService.updateCustomObjectDefinition(
-			externalReferenceCode, objectDefinitionId,
-			accountEntryRestrictedObjectFieldId, descriptionObjectFieldId,
-			titleObjectFieldId, accountEntryRestricted, active,
-			enableCategorization, enableComments, enableLocalization,
-			enableObjectEntryHistory, labelMap, name, panelAppOrder,
-			panelCategoryKey, portlet, pluralLabelMap, scope);
+		return _objectDefinitionLocalService.updateCustomObjectDefinition(
+			objectDefinitionId, descriptionObjectFieldId, titleObjectFieldId,
+			active, labelMap, name, panelAppOrder, panelCategoryKey,
+			pluralLabelMap, scope);
 	}
 
-	@Override
-	public ObjectDefinition updateExternalReferenceCode(
-			long objectDefinitionId, String externalReferenceCode)
-		throws PortalException {
-
-		_objectDefinitionModelResourcePermission.check(
-			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
-
-		return objectDefinitionLocalService.updateExternalReferenceCode(
-			objectDefinitionId, externalReferenceCode);
-	}
-
-	@Override
-	public ObjectDefinition updateSystemObjectDefinition(
-			String externalReferenceCode, long objectDefinitionId,
-			long titleObjectFieldId)
-		throws PortalException {
-
-		_objectDefinitionModelResourcePermission.check(
-			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
-
-		return objectDefinitionLocalService.updateSystemObjectDefinition(
-			externalReferenceCode, objectDefinitionId, titleObjectFieldId);
-	}
-
-	@Override
-	public ObjectDefinition updateTitleObjectFieldId(
-			long objectDefinitionId, long titleObjectFieldId)
-		throws PortalException {
-
-		_objectDefinitionModelResourcePermission.check(
-			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
-
-		return objectDefinitionLocalService.updateTitleObjectFieldId(
-			objectDefinitionId, titleObjectFieldId);
-	}
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"

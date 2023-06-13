@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=1500",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_BUILD
@@ -37,11 +38,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = PanelApp.class
 )
 public class AssetListPanelApp extends BasePanelApp {
-
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
 
 	@Override
 	public String getPortletId() {
@@ -55,9 +51,13 @@ public class AssetListPanelApp extends BasePanelApp {
 		return super.isShow(permissionChecker, group);
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + AssetListPortletKeys.ASSET_LIST + ")"
+		target = "(javax.portlet.name=" + AssetListPortletKeys.ASSET_LIST + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

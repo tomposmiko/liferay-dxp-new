@@ -30,50 +30,51 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PortalImpl;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Rafael Praxedes
  */
-public class DDMDataProviderInstanceParameterSettingsServletTest {
+@PrepareForTest(ResourceBundleUtil.class)
+@RunWith(PowerMockRunner.class)
+public class DDMDataProviderInstanceParameterSettingsServletTest
+	extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		_setUpDDMDataProvider();
-		_setUpDDMFormValuesJSONDeserializer();
-		_setUpGetDataProviderParametersSettingsMVCResourceCommand();
-		_setUpJSONFactoryUtil();
-		_setUpLanguageUtil();
-		_setUpPortalUtil();
-		_setUpResourceBundleUtil();
+	@Before
+	public void setUp() throws Exception {
+		setUpDDMDataProvider();
+		setUpDDMFormValuesJSONDeserializer();
+		setUpGetDataProviderParametersSettingsMVCResourceCommand();
+		setUpJSONFactoryUtil();
+		setUpLanguageUtil();
+		setUpPortalUtil();
+		setUpResourceBundleUtil();
 	}
 
 	@Test
@@ -85,7 +86,7 @@ public class DDMDataProviderInstanceParameterSettingsServletTest {
 					getDataProviderFormValues(
 						"form-values-data-provider-settings-1.json"));
 
-		String expectedValue = _read(
+		String expectedValue = read(
 			"data-provider-input-output-parameters-1.json");
 
 		JSONAssert.assertEquals(
@@ -101,7 +102,7 @@ public class DDMDataProviderInstanceParameterSettingsServletTest {
 					getDataProviderFormValues(
 						"form-values-data-provider-settings-2.json"));
 
-		String expectedValue = _read(
+		String expectedValue = read(
 			"data-provider-input-output-parameters-2.json");
 
 		JSONAssert.assertEquals(
@@ -129,84 +130,12 @@ public class DDMDataProviderInstanceParameterSettingsServletTest {
 		com.liferay.dynamic.data.mapping.model.DDMForm ddmForm =
 			DDMFormFactory.create(DDMDataProviderSettings.class);
 
-		String serializedDDMFormValues = _read(file);
+		String serializedDDMFormValues = read(file);
 
 		return deserialize(serializedDDMFormValues, ddmForm);
 	}
 
-	private static void _setUpDDMDataProvider() {
-		_ddmDataProvider = Mockito.mock(DDMDataProvider.class);
-
-		Mockito.when(
-			_ddmDataProvider.getSettings()
-		).then(
-			(Answer<Class<?>>)invocationOnMock -> DDMDataProviderSettings.class
-		);
-	}
-
-	private static void _setUpDDMFormValuesJSONDeserializer() {
-		ReflectionTestUtil.setFieldValue(
-			_ddmFormValuesJSONDeserializer, "_jsonFactory", _jsonFactory);
-		ReflectionTestUtil.setFieldValue(
-			_ddmFormValuesJSONDeserializer, "_serviceTrackerMap",
-			ProxyFactory.newDummyInstance(ServiceTrackerMap.class));
-	}
-
-	private static void _setUpGetDataProviderParametersSettingsMVCResourceCommand() {
-		_ddmDataProviderInstanceParameterSettingsServlet =
-			new DDMDataProviderInstanceParameterSettingsServlet();
-
-		ReflectionTestUtil.setFieldValue(
-			_ddmDataProviderInstanceParameterSettingsServlet, "_jsonFactory",
-			_jsonFactory);
-		ReflectionTestUtil.setFieldValue(
-			_ddmDataProviderInstanceParameterSettingsServlet,
-			"_jsonDDMFormValuesDeserializer", _ddmFormValuesJSONDeserializer);
-	}
-
-	private static void _setUpJSONFactoryUtil() {
-		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
-
-		jsonFactoryUtil.setJSONFactory(_jsonFactory);
-	}
-
-	private static void _setUpLanguageUtil() {
-		LanguageUtil languageUtil = new LanguageUtil();
-
-		languageUtil.setLanguage(Mockito.mock(Language.class));
-	}
-
-	private static void _setUpPortalUtil() {
-		PortalUtil portalUtil = new PortalUtil();
-
-		Portal portal = Mockito.mock(Portal.class);
-
-		ResourceBundle resourceBundle = Mockito.mock(ResourceBundle.class);
-
-		Mockito.when(
-			portal.getResourceBundle(Mockito.any(Locale.class))
-		).thenReturn(
-			resourceBundle
-		);
-
-		portalUtil.setPortal(portal);
-	}
-
-	private static void _setUpResourceBundleUtil() {
-		ResourceBundleLoader resourceBundleLoader = Mockito.mock(
-			ResourceBundleLoader.class);
-
-		ResourceBundleLoaderUtil.setPortalResourceBundleLoader(
-			resourceBundleLoader);
-
-		Mockito.when(
-			resourceBundleLoader.loadResourceBundle(Mockito.any(Locale.class))
-		).thenReturn(
-			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
-		);
-	}
-
-	private String _read(String fileName) throws Exception {
+	protected String read(String fileName) throws IOException {
 		Class<?> clazz = getClass();
 
 		InputStream inputStream = clazz.getResourceAsStream(
@@ -215,12 +144,112 @@ public class DDMDataProviderInstanceParameterSettingsServletTest {
 		return StringUtil.read(inputStream);
 	}
 
-	private static DDMDataProvider _ddmDataProvider;
-	private static DDMDataProviderInstanceParameterSettingsServlet
+	protected void setUpDDMDataProvider() {
+		_ddmDataProvider = PowerMockito.mock(DDMDataProvider.class);
+
+		PowerMockito.when(
+			_ddmDataProvider.getSettings()
+		).then(
+			new Answer<Class<?>>() {
+
+				@Override
+				public Class<?> answer(InvocationOnMock invocationOnMock)
+					throws Throwable {
+
+					return DDMDataProviderSettings.class;
+				}
+
+			}
+		);
+	}
+
+	protected void setUpDDMFormValuesJSONDeserializer() throws Exception {
+		PowerMockito.field(
+			DDMFormValuesJSONDeserializer.class, "_jsonFactory"
+		).set(
+			_ddmFormValuesJSONDeserializer, _jsonFactory
+		);
+
+		PowerMockito.field(
+			DDMFormValuesJSONDeserializer.class, "_serviceTrackerMap"
+		).set(
+			_ddmFormValuesJSONDeserializer,
+			ProxyFactory.newDummyInstance(ServiceTrackerMap.class)
+		);
+	}
+
+	protected void setUpGetDataProviderParametersSettingsMVCResourceCommand()
+		throws Exception {
+
+		_ddmDataProviderInstanceParameterSettingsServlet =
+			new DDMDataProviderInstanceParameterSettingsServlet();
+
+		PowerMockito.field(
+			_ddmDataProviderInstanceParameterSettingsServlet.getClass(),
+			"_jsonFactory"
+		).set(
+			_ddmDataProviderInstanceParameterSettingsServlet, _jsonFactory
+		);
+
+		PowerMockito.field(
+			_ddmDataProviderInstanceParameterSettingsServlet.getClass(),
+			"_jsonDDMFormValuesDeserializer"
+		).set(
+			_ddmDataProviderInstanceParameterSettingsServlet,
+			_ddmFormValuesJSONDeserializer
+		);
+	}
+
+	protected void setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(_jsonFactory);
+	}
+
+	protected void setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		languageUtil.setLanguage(PowerMockito.mock(Language.class));
+	}
+
+	protected void setUpPortalClassLoaderUtil() {
+		PortalClassLoaderUtil.setClassLoader(PortalImpl.class.getClassLoader());
+	}
+
+	protected void setUpPortalUtil() {
+		PortalUtil portalUtil = new PortalUtil();
+
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
+
+		portalUtil.setPortal(portal);
+	}
+
+	protected void setUpResourceBundleUtil() {
+		PowerMockito.mockStatic(ResourceBundleUtil.class);
+
+		PowerMockito.when(
+			ResourceBundleUtil.getBundle(
+				Matchers.anyString(), Matchers.any(Locale.class),
+				Matchers.any(ClassLoader.class))
+		).thenReturn(
+			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
+		);
+	}
+
+	private DDMDataProvider _ddmDataProvider;
+	private DDMDataProviderInstanceParameterSettingsServlet
 		_ddmDataProviderInstanceParameterSettingsServlet;
-	private static final DDMFormValuesDeserializer
-		_ddmFormValuesJSONDeserializer = new DDMFormValuesJSONDeserializer();
-	private static final JSONFactory _jsonFactory = new JSONFactoryImpl();
+	private final DDMFormValuesDeserializer _ddmFormValuesJSONDeserializer =
+		new DDMFormValuesJSONDeserializer();
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 	@DDMForm
 	private interface DDMDataProviderSettings

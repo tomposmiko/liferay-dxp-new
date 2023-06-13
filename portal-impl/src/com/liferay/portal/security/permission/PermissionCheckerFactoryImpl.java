@@ -24,6 +24,9 @@ import com.liferay.portal.kernel.security.permission.contributor.RoleContributor
 import com.liferay.portal.kernel.security.permission.wrapper.PermissionCheckerWrapperFactory;
 import com.liferay.portal.util.PropsValues;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.osgi.framework.BundleContext;
 
 /**
@@ -54,8 +57,12 @@ public class PermissionCheckerFactoryImpl implements PermissionCheckerFactory {
 	public PermissionChecker create(User user) {
 		PermissionChecker permissionChecker = _permissionChecker.clone();
 
+		List<RoleContributor> roleContributors = new ArrayList<>();
+
+		_roleContributors.forEach(roleContributors::add);
+
 		permissionChecker.init(
-			user, _roleContributors.toArray(new RoleContributor[0]));
+			user, roleContributors.toArray(new RoleContributor[0]));
 
 		permissionChecker = new StagingPermissionChecker(permissionChecker);
 
@@ -76,8 +83,10 @@ public class PermissionCheckerFactoryImpl implements PermissionCheckerFactory {
 	}
 
 	private final PermissionChecker _permissionChecker;
-	private ServiceTrackerList<PermissionCheckerWrapperFactory>
-		_permissionCheckerWrapperFactories;
-	private ServiceTrackerList<RoleContributor> _roleContributors;
+	private ServiceTrackerList
+		<PermissionCheckerWrapperFactory, PermissionCheckerWrapperFactory>
+			_permissionCheckerWrapperFactories;
+	private ServiceTrackerList<RoleContributor, RoleContributor>
+		_roleContributors;
 
 }

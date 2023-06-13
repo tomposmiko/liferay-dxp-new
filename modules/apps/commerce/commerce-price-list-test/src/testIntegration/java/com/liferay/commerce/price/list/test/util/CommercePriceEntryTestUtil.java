@@ -25,6 +25,7 @@ import com.liferay.commerce.product.test.util.CPTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -78,11 +79,14 @@ public class CommercePriceEntryTestUtil {
 			CommercePriceListLocalServiceUtil.getCommercePriceList(
 				commercePriceListId);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				commercePriceList.getGroupId());
+
 		return CommercePriceEntryLocalServiceUtil.addCommercePriceEntry(
 			externalReferenceCode, skuId, commercePriceListId,
 			BigDecimal.valueOf(price), BigDecimal.valueOf(promoPrice),
-			ServiceContextTestUtil.getServiceContext(
-				commercePriceList.getGroupId()));
+			serviceContext);
 	}
 
 	public static CommercePriceEntry addCommercePriceEntry(
@@ -94,11 +98,13 @@ public class CommercePriceEntryTestUtil {
 			CommercePriceListLocalServiceUtil.getCommercePriceList(
 				commercePriceListId);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				commercePriceList.getGroupId());
+
 		return CommercePriceEntryLocalServiceUtil.addCommercePriceEntry(
 			externalReferenceCode, cpProductId, cpInstanceUuid,
-			commercePriceListId, price, BigDecimal.ZERO,
-			ServiceContextTestUtil.getServiceContext(
-				commercePriceList.getGroupId()));
+			commercePriceListId, price, BigDecimal.ZERO, serviceContext);
 	}
 
 	public static CommercePriceEntry addOrUpdateCommercePriceEntry(
@@ -111,12 +117,15 @@ public class CommercePriceEntryTestUtil {
 			CommercePriceListLocalServiceUtil.getCommercePriceList(
 				commercePriceListId);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				commercePriceList.getGroupId());
+
 		return CommercePriceEntryLocalServiceUtil.upsertCommercePriceEntry(
 			commercePriceEntryId, skuId, commercePriceListId,
 			externalReferenceCode, BigDecimal.valueOf(price),
 			BigDecimal.valueOf(promoPrice), skuExternalReferenceCode,
-			ServiceContextTestUtil.getServiceContext(
-				commercePriceList.getGroupId()));
+			serviceContext);
 	}
 
 }

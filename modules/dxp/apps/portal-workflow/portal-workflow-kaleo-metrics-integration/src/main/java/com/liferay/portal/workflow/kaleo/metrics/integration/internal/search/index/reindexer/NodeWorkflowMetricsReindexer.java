@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
-import com.liferay.portal.workflow.kaleo.metrics.integration.internal.helper.IndexerHelper;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
 import com.liferay.portal.workflow.kaleo.model.KaleoTask;
@@ -40,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
-	property = "workflow.metrics.index.entity.name=node",
+	immediate = true, property = "workflow.metrics.index.entity.name=node",
 	service = WorkflowMetricsReindexer.class
 )
 public class NodeWorkflowMetricsReindexer implements WorkflowMetricsReindexer {
@@ -80,8 +79,12 @@ public class NodeWorkflowMetricsReindexer implements WorkflowMetricsReindexer {
 				}
 
 				_nodeWorkflowMetricsIndexer.addNode(
-					_indexerHelper.createAddNodeRequest(
-						kaleoDefinitionVersion, kaleoNode));
+					kaleoNode.getCompanyId(), kaleoNode.getCreateDate(),
+					kaleoNode.isInitial(), kaleoNode.getModifiedDate(),
+					kaleoNode.getName(), kaleoNode.getKaleoNodeId(),
+					kaleoNode.getKaleoDefinitionId(),
+					kaleoDefinitionVersion.getVersion(), kaleoNode.isTerminal(),
+					kaleoNode.getType());
 			});
 
 		actionableDynamicQuery.performActions();
@@ -117,8 +120,12 @@ public class NodeWorkflowMetricsReindexer implements WorkflowMetricsReindexer {
 				}
 
 				_nodeWorkflowMetricsIndexer.addNode(
-					_indexerHelper.createAddNodeRequest(
-						kaleoDefinitionVersion, kaleoTask));
+					kaleoTask.getCompanyId(), kaleoTask.getCreateDate(), false,
+					kaleoTask.getModifiedDate(), kaleoTask.getName(),
+					kaleoTask.getKaleoTaskId(),
+					kaleoTask.getKaleoDefinitionId(),
+					kaleoDefinitionVersion.getVersion(), false,
+					NodeType.TASK.name());
 
 				_workflowMetricsReindexStatusMessageSender.sendStatusMessage(
 					atomicCounter.incrementAndGet(), total, "node");
@@ -126,9 +133,6 @@ public class NodeWorkflowMetricsReindexer implements WorkflowMetricsReindexer {
 
 		actionableDynamicQuery.performActions();
 	}
-
-	@Reference
-	private IndexerHelper _indexerHelper;
 
 	@Reference
 	private KaleoDefinitionVersionLocalService

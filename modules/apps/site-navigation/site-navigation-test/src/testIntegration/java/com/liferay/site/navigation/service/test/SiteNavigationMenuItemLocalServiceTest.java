@@ -541,6 +541,10 @@ public class SiteNavigationMenuItemLocalServiceTest {
 
 	@Test(expected = SiteNavigationMenuItemNameException.class)
 	public void testInvalidSiteNavigationMenuItemName() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_siteNavigationMenuItemLocalService.addSiteNavigationMenuItem(
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			_siteNavigationMenu.getSiteNavigationMenuId(), 0,
@@ -548,31 +552,35 @@ public class SiteNavigationMenuItemLocalServiceTest {
 			UnicodePropertiesBuilder.put(
 				"name", StringUtil.randomString(1000)
 			).buildString(),
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 	}
 
 	@Test(expected = InvalidSiteNavigationMenuItemTypeException.class)
 	public void testInvalidSiteNavigationMenuItemType() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_siteNavigationMenuItemLocalService.addSiteNavigationMenuItem(
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			_siteNavigationMenu.getSiteNavigationMenuId(), 0,
-			"invalidMenuItemType", StringPool.BLANK,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			"invalidMenuItemType", StringPool.BLANK, serviceContext);
 	}
 
 	@Test
 	public void testSiteNavigationMenuItemInvalidCustomAttribute()
 		throws PortalException {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		SiteNavigationMenuItem siteNavigationMenuItem =
 			_siteNavigationMenuItemLocalService.addSiteNavigationMenuItem(
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				_siteNavigationMenu.getSiteNavigationMenuId(), 0,
 				SiteNavigationMenuItemTypeConstants.LAYOUT, StringPool.BLANK,
-				ServiceContextTestUtil.getServiceContext(
-					_group.getGroupId(), TestPropsValues.getUserId()));
+				serviceContext);
 
 		_expandoBridge.setClassPK(
 			siteNavigationMenuItem.getSiteNavigationMenuItemId());

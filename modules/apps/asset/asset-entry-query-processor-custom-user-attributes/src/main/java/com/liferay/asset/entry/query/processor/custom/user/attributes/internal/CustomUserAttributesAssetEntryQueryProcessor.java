@@ -30,15 +30,12 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PrimitiveLongList;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.portlet.PortletPreferences;
@@ -50,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + AssetPublisherPortletKeys.ASSET_PUBLISHER,
 	service = AssetEntryQueryProcessor.class
 )
@@ -98,20 +96,8 @@ public class CustomUserAttributesAssetEntryQueryProcessor
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
-			}
-
-			if (userCustomFieldValue == null) {
-				continue;
-			}
-
-			if (userCustomFieldValue instanceof Map) {
-				Map<Locale, String> userCustomFieldValueMap =
-					(Map<Locale, String>)userCustomFieldValue;
-
-				userCustomFieldValue = userCustomFieldValueMap.get(
-					LocaleUtil.getMostRelevantLocale());
 			}
 
 			if (userCustomFieldValue == null) {
@@ -131,8 +117,8 @@ public class CustomUserAttributesAssetEntryQueryProcessor
 						assetCategory.getVocabularyId());
 
 				if (Objects.equals(
-						StringUtil.toLowerCase(customUserAttributeName),
-						StringUtil.toLowerCase(assetVocabulary.getName()))) {
+						customUserAttributeName,
+						assetVocabulary.getTitleCurrentValue())) {
 
 					allCategoryIdsList.add(assetCategory.getCategoryId());
 				}

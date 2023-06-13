@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the list type definition service. This utility wraps <code>com.liferay.list.type.service.persistence.impl.ListTypeDefinitionPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -643,78 +647,6 @@ public class ListTypeDefinitionUtil {
 	}
 
 	/**
-	 * Returns the list type definition where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchListTypeDefinitionException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching list type definition
-	 * @throws NoSuchListTypeDefinitionException if a matching list type definition could not be found
-	 */
-	public static ListTypeDefinition findByERC_C(
-			String externalReferenceCode, long companyId)
-		throws com.liferay.list.type.exception.
-			NoSuchListTypeDefinitionException {
-
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the list type definition where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching list type definition, or <code>null</code> if a matching list type definition could not be found
-	 */
-	public static ListTypeDefinition fetchByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the list type definition where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching list type definition, or <code>null</code> if a matching list type definition could not be found
-	 */
-	public static ListTypeDefinition fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
-
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
-	}
-
-	/**
-	 * Removes the list type definition where externalReferenceCode = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the list type definition that was removed
-	 */
-	public static ListTypeDefinition removeByERC_C(
-			String externalReferenceCode, long companyId)
-		throws com.liferay.list.type.exception.
-			NoSuchListTypeDefinitionException {
-
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the number of list type definitions where externalReferenceCode = &#63; and companyId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the number of matching list type definitions
-	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
 	 * Caches the list type definition in the entity cache if it is enabled.
 	 *
 	 * @param listTypeDefinition the list type definition
@@ -872,9 +804,29 @@ public class ListTypeDefinitionUtil {
 	}
 
 	public static ListTypeDefinitionPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile ListTypeDefinitionPersistence _persistence;
+	private static ServiceTracker
+		<ListTypeDefinitionPersistence, ListTypeDefinitionPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			ListTypeDefinitionPersistence.class);
+
+		ServiceTracker
+			<ListTypeDefinitionPersistence, ListTypeDefinitionPersistence>
+				serviceTracker =
+					new ServiceTracker
+						<ListTypeDefinitionPersistence,
+						 ListTypeDefinitionPersistence>(
+							 bundle.getBundleContext(),
+							 ListTypeDefinitionPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

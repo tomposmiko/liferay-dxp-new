@@ -38,10 +38,16 @@ public class ModuleUpgradeProcess extends UpgradeProcess {
 	}
 
 	protected void updateModules() throws Exception {
-		alterTableAddColumn(
-			"Marketplace_Module", "bundleSymbolicName", "VARCHAR(500)");
-		alterTableAddColumn(
-			"Marketplace_Module", "bundleVersion", "VARCHAR(75)");
+		if (!hasColumn("Marketplace_Module", "bundleSymbolicName")) {
+			runSQL(
+				"alter table Marketplace_Module add bundleSymbolicName " +
+					"VARCHAR(500)");
+		}
+
+		if (!hasColumn("Marketplace_Module", "bundleVersion")) {
+			runSQL(
+				"alter table Marketplace_Module add bundleVersion VARCHAR(75)");
+		}
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select moduleId, contextName from Marketplace_Module");

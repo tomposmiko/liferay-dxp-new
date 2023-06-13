@@ -27,10 +27,6 @@ public class CommerceAccountGroupRelLocalServiceWrapper
 	implements CommerceAccountGroupRelLocalService,
 			   ServiceWrapper<CommerceAccountGroupRelLocalService> {
 
-	public CommerceAccountGroupRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAccountGroupRelLocalServiceWrapper(
 		CommerceAccountGroupRelLocalService
 			commerceAccountGroupRelLocalService) {

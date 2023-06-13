@@ -13,16 +13,16 @@
  */
 
 (function () {
-	const STR_FILE_ENTRY_RETURN_TYPE =
+	var STR_FILE_ENTRY_RETURN_TYPE =
 		'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType';
 
-	const STR_VIDEO_HTML_RETURN_TYPE =
+	var STR_VIDEO_HTML_RETURN_TYPE =
 		'com.liferay.item.selector.criteria.VideoEmbeddableHTMLItemSelectorReturnType';
 
-	const TPL_AUDIO_SCRIPT =
+	var TPL_AUDIO_SCRIPT =
 		'boundingBox: "#" + mediaId,' + 'oggUrl: "{oggUrl}",' + 'url: "{url}"';
 
-	const TPL_VIDEO_SCRIPT =
+	var TPL_VIDEO_SCRIPT =
 		'boundingBox: "#" + mediaId,' +
 		'height: {height},' +
 		'ogvUrl: "{ogvUrl}",' +
@@ -30,8 +30,8 @@
 		'url: "{url}",' +
 		'width: {width}';
 
-	const defaultVideoHeight = 300;
-	const defaultVideoWidth = 400;
+	var defaultVideoHeight = 300;
+	var defaultVideoWidth = 400;
 
 	CKEDITOR.plugins.add('itemselector', {
 		_bindBrowseButton(
@@ -41,10 +41,10 @@
 			commandName,
 			targetField
 		) {
-			const tab = dialogDefinition.getContents(tabName);
+			var tab = dialogDefinition.getContents(tabName);
 
 			if (tab) {
-				const browseButton = tab.get('browse');
+				var browseButton = tab.get('browse');
 
 				if (browseButton) {
 					browseButton.onClick = function () {
@@ -61,18 +61,18 @@
 		},
 
 		_commitAudioValue(value, node) {
-			const instance = this;
+			var instance = this;
 
 			node.setAttribute('data-document-url', value);
 
-			const audioUrl = Liferay.Util.addParams(
+			var audioUrl = Liferay.Util.addParams(
 				'audioPreview=1&type=mp3',
 				value
 			);
 
 			node.setAttribute('data-audio-url', audioUrl);
 
-			const audioOggUrl = Liferay.Util.addParams(
+			var audioOggUrl = Liferay.Util.addParams(
 				'audioPreview=1&type=ogg',
 				value
 			);
@@ -86,9 +86,9 @@
 		},
 
 		_commitMediaValue(value, editor, type) {
-			const instance = this;
+			var instance = this;
 
-			const mediaPlugin = editor.plugins.media;
+			var mediaPlugin = editor.plugins.media;
 
 			if (mediaPlugin) {
 				mediaPlugin.onOkCallback(
@@ -117,33 +117,33 @@
 		},
 
 		_commitVideoValue(value, node, extraStyles) {
-			const instance = this;
+			var instance = this;
 
 			node.setAttribute('data-document-url', value);
 
-			const videoUrl = Liferay.Util.addParams(
+			var videoUrl = Liferay.Util.addParams(
 				'videoPreview=1&type=mp4',
 				value
 			);
 
 			node.setAttribute('data-video-url', videoUrl);
 
-			const videoOgvUrl = Liferay.Util.addParams(
+			var videoOgvUrl = Liferay.Util.addParams(
 				'videoPreview=1&type=ogv',
 				value
 			);
 
 			node.setAttribute('data-video-ogv-url', videoOgvUrl);
 
-			const videoHeight = defaultVideoHeight;
+			var videoHeight = defaultVideoHeight;
 
 			node.setAttribute('data-height', videoHeight);
 
-			const videoWidth = defaultVideoWidth;
+			var videoWidth = defaultVideoWidth;
 
 			node.setAttribute('data-width', videoWidth);
 
-			const poster = Liferay.Util.addParams('videoThumbnail=1', value);
+			var poster = Liferay.Util.addParams('videoThumbnail=1', value);
 
 			node.setAttribute('data-poster', poster);
 
@@ -161,10 +161,10 @@
 		},
 
 		_getCommitMediaValueFn(value, editor, type) {
-			const instance = this;
+			var instance = this;
 
-			const commitValueFn = function (node, extraStyles) {
-				let mediaScript;
+			var commitValueFn = function (node, extraStyles) {
+				var mediaScript;
 
 				if (type === 'audio') {
 					mediaScript = instance._commitAudioValue(
@@ -181,7 +181,7 @@
 					);
 				}
 
-				const mediaPlugin = editor.plugins.media;
+				var mediaPlugin = editor.plugins.media;
 
 				if (mediaPlugin) {
 					mediaPlugin.applyMediaScript(node, type, mediaScript);
@@ -192,7 +192,7 @@
 		},
 
 		_getItemSrc(editor, selectedItem) {
-			let itemSrc;
+			var itemSrc;
 
 			try {
 				itemSrc = JSON.parse(selectedItem.value);
@@ -213,7 +213,7 @@
 
 			if (selectedItem.returnType === STR_FILE_ENTRY_RETURN_TYPE) {
 				try {
-					const itemValue = JSON.parse(selectedItem.value);
+					var itemValue = JSON.parse(selectedItem.value);
 
 					itemSrc = editor.config.attachmentURLPrefix
 						? editor.config.attachmentURLPrefix +
@@ -227,9 +227,9 @@
 		},
 
 		_isEmptySelection(editor) {
-			const selection = editor.getSelection();
+			var selection = editor.getSelection();
 
-			const ranges = selection.getRanges();
+			var ranges = selection.getRanges();
 
 			return (
 				selection.getType() === CKEDITOR.SELECTION_NONE ||
@@ -238,10 +238,10 @@
 		},
 
 		_onSelectedAudioChange(editor, callback, selectedItem) {
-			const instance = this;
+			var instance = this;
 
 			if (selectedItem) {
-				const audioSrc = instance._getItemSrc(editor, selectedItem);
+				var audioSrc = instance._getItemSrc(editor, selectedItem);
 
 				if (audioSrc) {
 					if (typeof callback === 'function') {
@@ -255,17 +255,17 @@
 		},
 
 		_onSelectedImageChange(editor, callback, selectedItem) {
-			const instance = this;
+			var instance = this;
 
 			if (selectedItem) {
-				const imageSrc = instance._getItemSrc(editor, selectedItem);
+				var imageSrc = instance._getItemSrc(editor, selectedItem);
 
 				if (imageSrc) {
 					if (typeof callback === 'function') {
 						callback(imageSrc, selectedItem);
 					}
 					else {
-						let elementOuterHtml = '<img src="' + imageSrc + '">';
+						var elementOuterHtml = '<img src="' + imageSrc + '">';
 
 						if (instance._isEmptySelection(editor)) {
 							elementOuterHtml += '<br />';
@@ -281,7 +281,7 @@
 
 		_onSelectedLinkChange(editor, callback, selectedItem) {
 			if (selectedItem) {
-				const linkUrl = selectedItem.value;
+				var linkUrl = selectedItem.value;
 
 				if (typeof callback === 'function') {
 					callback(linkUrl, selectedItem);
@@ -290,10 +290,10 @@
 		},
 
 		_onSelectedVideoChange(editor, callback, selectedItem) {
-			const instance = this;
+			var instance = this;
 
 			if (selectedItem) {
-				const videoSrc = instance._getItemSrc(editor, selectedItem);
+				var videoSrc = instance._getItemSrc(editor, selectedItem);
 
 				if (videoSrc) {
 					if (typeof callback === 'function') {
@@ -328,7 +328,7 @@
 		},
 
 		init(editor) {
-			const instance = this;
+			var instance = this;
 
 			instance._audioTPL = new CKEDITOR.template(TPL_AUDIO_SCRIPT);
 			instance._videoTPL = new CKEDITOR.template(TPL_VIDEO_SCRIPT);
@@ -336,7 +336,7 @@
 			editor.addCommand('audioselector', {
 				canUndo: false,
 				exec(editor, callback) {
-					const onSelectedAudioChangeFn = AUI().bind(
+					var onSelectedAudioChangeFn = AUI().bind(
 						'_onSelectedAudioChange',
 						instance,
 						editor,
@@ -354,7 +354,7 @@
 			editor.addCommand('imageselector', {
 				canUndo: false,
 				exec(editor, callback) {
-					const onSelectedImageChangeFn = AUI().bind(
+					var onSelectedImageChangeFn = AUI().bind(
 						'_onSelectedImageChange',
 						instance,
 						editor,
@@ -372,7 +372,7 @@
 			editor.addCommand('linkselector', {
 				canUndo: false,
 				exec(editor, callback) {
-					const onSelectedLinkChangeFn = AUI().bind(
+					var onSelectedLinkChangeFn = AUI().bind(
 						'_onSelectedLinkChange',
 						instance,
 						editor,
@@ -390,7 +390,7 @@
 			editor.addCommand('videoselector', {
 				canUndo: false,
 				exec(editor, callback) {
-					const onSelectedVideoChangeFn = AUI().bind(
+					var onSelectedVideoChangeFn = AUI().bind(
 						'_onSelectedVideoChange',
 						instance,
 						editor,
@@ -426,9 +426,9 @@
 			}
 
 			CKEDITOR.on('dialogDefinition', (event) => {
-				const dialogName = event.data.name;
+				var dialogName = event.data.name;
 
-				const dialogDefinition = event.data.definition;
+				var dialogDefinition = event.data.definition;
 
 				if (dialogName === 'audio') {
 					instance._bindBrowseButton(

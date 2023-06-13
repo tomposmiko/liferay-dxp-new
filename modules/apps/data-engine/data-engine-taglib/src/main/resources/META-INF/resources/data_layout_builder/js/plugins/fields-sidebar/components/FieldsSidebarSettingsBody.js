@@ -29,7 +29,7 @@ import {useSettingsContextFilter} from '../../../utils/settingsForm.es';
  * This component will override the Column from Form Renderer.
  */
 const getColumn = ({objectFields}) => ({children, column, index}) => {
-	if (!column.fields.length) {
+	if (column.fields.length === 0) {
 		return null;
 	}
 
@@ -74,13 +74,13 @@ export default function FieldsSidebarSettingsBody({field}) {
 		<form onSubmit={(event) => event.preventDefault()}>
 			<FormFieldSettings
 				{...filteredSettingsContext}
+				builderPages={pages}
 				builderRules={rules}
 				defaultLanguageId={defaultLanguageId}
 				displayable={true}
 				editable={false}
 				editingLanguageId={editingLanguageId}
 				focusedField={field}
-				formBuilder={{pages}}
 				objectFields={objectFields}
 				onAction={({payload, type}) => {
 					switch (type) {

@@ -14,7 +14,6 @@
 
 package com.liferay.journal.internal.upgrade.v3_5_1;
 
-import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -39,13 +38,13 @@ public class JournalArticleDataFileEntryIdUpgradeProcess
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
-				"select id_, content from JournalArticle");
-			ResultSet resultSet = preparedStatement1.executeQuery();
-			PreparedStatement preparedStatement2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection,
-					"update JournalArticle set content = ? where id_ = ?")) {
+		try (PreparedStatement selectPreparedStatement =
+				connection.prepareStatement(
+					"select id_, content from JournalArticle");
+			PreparedStatement updatePreparedStatement =
+				connection.prepareStatement(
+					"update JournalArticle set content = ? where id_ = ?");
+			ResultSet resultSet = selectPreparedStatement.executeQuery()) {
 
 			while (resultSet.next()) {
 				String content = resultSet.getString("content");
@@ -53,14 +52,13 @@ public class JournalArticleDataFileEntryIdUpgradeProcess
 				String upgradedContent = _upgradeContent(content);
 
 				if (!Objects.equals(content, upgradedContent)) {
-					preparedStatement2.setString(1, upgradedContent);
-					preparedStatement2.setLong(2, resultSet.getLong("id_"));
+					updatePreparedStatement.setString(1, upgradedContent);
+					updatePreparedStatement.setLong(
+						2, resultSet.getLong("id_"));
 
-					preparedStatement2.addBatch();
+					updatePreparedStatement.executeUpdate();
 				}
 			}
-
-			preparedStatement2.executeBatch();
 		}
 	}
 

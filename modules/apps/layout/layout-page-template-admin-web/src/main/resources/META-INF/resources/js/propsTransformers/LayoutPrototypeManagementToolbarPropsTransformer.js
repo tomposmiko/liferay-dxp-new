@@ -12,8 +12,6 @@
  * details.
  */
 
-import openDeletePageTemplateModal from '../modal/openDeletePageTemplateModal';
-
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	return {
 		...otherProps,
@@ -21,18 +19,21 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 			const data = item?.data;
 
 			if (data?.action === 'deleteSelectedLayoutPrototypes') {
-				openDeletePageTemplateModal({
-					onDelete: () => {
-						const form = document.getElementById(
-							`${portletNamespace}fm`
-						);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-delete-this'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}fm`
+					);
 
-						if (form) {
-							submitForm(form);
-						}
-					},
-					title: Liferay.Language.get('page-templates'),
-				});
+					if (form) {
+						submitForm(form);
+					}
+				}
 			}
 		},
 	};

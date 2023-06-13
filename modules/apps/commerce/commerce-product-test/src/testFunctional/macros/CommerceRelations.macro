@@ -11,15 +11,13 @@ definition {
 
 		Type(
 			locator1 = "CommerceEntry#SEARCH_PRODUCT_RELATIONS",
-			value1 = ${key_product});
+			value1 = "${key_product}");
 
-		KeyPress(
-			locator1 = "CommerceEntry#SEARCH_PRODUCT_RELATIONS",
-			value1 = "\RETURN");
+		Click(locator1 = "Button#SEARCH");
 
 		Check.checkToggleSwitch(
 			locator1 = "CommerceAccelerators#SELECT_PRODUCT_RELATIONS",
-			productName = ${key_product});
+			productName = "${key_product}");
 
 		SelectFrameTop();
 
@@ -39,15 +37,13 @@ definition {
 
 		Type(
 			locator1 = "CommerceEntry#SEARCH_PRODUCT_RELATIONS",
-			value1 = ${productNameRelation});
+			value1 = "${productNameRelation}");
 
-		KeyPress(
-			locator1 = "CommerceEntry#SEARCH_PRODUCT_RELATIONS",
-			value1 = "\RETURN");
+		Click(locator1 = "Button#SEARCH");
 
 		Check.checkToggleSwitch(
 			locator1 = "CommerceAccelerators#SELECT_PRODUCT_RELATIONS",
-			productName = ${productNameRelation});
+			productName = "${productNameRelation}");
 
 		SelectFrameTop();
 
@@ -73,8 +69,8 @@ definition {
 
 		WaitForSPARefresh();
 
-		for (var entriesNames : list ${entriesList}) {
-			CommerceItemSelector.selectEntry(entryName = ${entriesNames});
+		for (var entriesNames : list "${entriesList}") {
+			CommerceItemSelector.selectEntry(entryName = "${entriesNames}");
 		}
 
 		Click(
@@ -82,69 +78,25 @@ definition {
 			value1 = "Add");
 	}
 
-	macro assignSingleRelationToEligibility {
-		var searchTerm = '''"${entryName}"''';
-
-		Type(
-			key_title = ${title},
-			locator1 = "CommerceEntry#ADD_RELATION_FIELD",
-			value1 = ${searchTerm});
-
-		WaitForElementPresent(
-			key_entryName = ${entryName},
-			key_title = ${title},
-			locator1 = "CommerceEntry#ADD_RELATION_FIELD_SELECT");
-
-		ClickNoError(
-			key_entryName = ${entryName},
-			key_title = ${title},
-			locator1 = "CommerceEntry#ADD_RELATION_FIELD_SELECT");
-	}
-
 	macro assignSingleRelationToProductsEntry {
 		var searchTerm = '''"${entryName}"''';
 
 		Type(
-			key_title = ${title},
+			key_title = "${title}",
 			locator1 = "CommerceEntry#ADD_RELATION_FIELD",
-			value1 = ${searchTerm});
+			value1 = "${searchTerm}");
 
-		while ((IsElementNotPresent(key_entryName = ${entryName}, key_title = ${title}, locator1 = "CommerceEntry#ADD_RELATION_FIELD_SELECT")) && (maxIterations = "5")) {
-			echo("The element is not present, retrying...");
-
-			Click(locator1 = "WorkflowMetricsProcessListView#METRICS_WORKFLOW_SEARCH_BAR_BUTTON");
-
-			Type(
-				key_title = ${title},
-				locator1 = "CommerceEntry#ADD_RELATION_FIELD",
-				value1 = ${searchTerm});
-		}
-
-		if (IsElementPresent(key_eventDescription = "No items were found.", locator1 = "CalendarViewEventDetails#EVENT_DESCRIPTION")) {
-			echo("The element is not present, refreshing the page and retrying...");
-
-			Refresh();
-
-			Type(
-				key_title = ${title},
-				locator1 = "CommerceEntry#ADD_RELATION_FIELD",
-				value1 = ${searchTerm});
-		}
-
-		WaitForElementPresent(
-			key_entryName = ${entryName},
-			key_title = ${title},
-			locator1 = "CommerceEntry#ADD_RELATION_FIELD_SELECT");
+		Pause(locator1 = "3000");
 
 		ClickNoError(
-			key_entryName = ${entryName},
-			key_title = ${title},
+			key_entryName = "${entryName}",
+			key_title = "${title}",
 			locator1 = "CommerceEntry#ADD_RELATION_FIELD_SELECT");
 	}
 
 	macro productRelationSetPriority {
 		Click(
-			key_value = ${productNameRelation},
+			key_value = "${productNameRelation}",
 			locator1 = "CommerceEntry#BODY_VERTICAL_ELLIPSIS");
 
 		MenuItem.click(menuItem = "Edit");
@@ -154,7 +106,7 @@ definition {
 		Type(
 			key_fieldLabel = "Priority",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
-			value1 = ${priorityValue});
+			value1 = "${priorityValue}");
 
 		Button.clickSubmitButton();
 	}

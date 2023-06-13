@@ -20,7 +20,6 @@ import com.liferay.multi.factor.authentication.fido2.credential.model.MFAFIDO2Cr
 import com.liferay.multi.factor.authentication.fido2.credential.model.impl.MFAFIDO2CredentialEntryImpl;
 import com.liferay.multi.factor.authentication.fido2.credential.model.impl.MFAFIDO2CredentialEntryModelImpl;
 import com.liferay.multi.factor.authentication.fido2.credential.service.persistence.MFAFIDO2CredentialEntryPersistence;
-import com.liferay.multi.factor.authentication.fido2.credential.service.persistence.MFAFIDO2CredentialEntryUtil;
 import com.liferay.multi.factor.authentication.fido2.credential.service.persistence.impl.constants.MFAFIDOTwoCredentialPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -46,7 +46,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -71,7 +70,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Arthur Chan
  * @generated
  */
-@Component(service = MFAFIDO2CredentialEntryPersistence.class)
+@Component(
+	service = {MFAFIDO2CredentialEntryPersistence.class, BasePersistence.class}
+)
 public class MFAFIDO2CredentialEntryPersistenceImpl
 	extends BasePersistenceImpl<MFAFIDO2CredentialEntry>
 	implements MFAFIDO2CredentialEntryPersistence {
@@ -188,7 +189,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<MFAFIDO2CredentialEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MFAFIDO2CredentialEntry mfaFIDO2CredentialEntry : list) {
@@ -557,7 +558,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -699,7 +700,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<MFAFIDO2CredentialEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MFAFIDO2CredentialEntry mfaFIDO2CredentialEntry : list) {
@@ -1072,7 +1073,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {credentialKeyHash};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1190,8 +1191,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByU_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByU_C, finderArgs);
 		}
 
 		if (result instanceof MFAFIDO2CredentialEntry) {
@@ -1294,7 +1294,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId, credentialKeyHash};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1799,7 +1799,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<MFAFIDO2CredentialEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1870,7 +1870,7 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1981,31 +1981,11 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId", "credentialKeyHash"}, false);
-
-		_setMFAFIDO2CredentialEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMFAFIDO2CredentialEntryUtilPersistence(null);
-
 		entityCache.removeCache(MFAFIDO2CredentialEntryImpl.class.getName());
-	}
-
-	private void _setMFAFIDO2CredentialEntryUtilPersistence(
-		MFAFIDO2CredentialEntryPersistence mfaFIDO2CredentialEntryPersistence) {
-
-		try {
-			Field field = MFAFIDO2CredentialEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mfaFIDO2CredentialEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2068,5 +2048,9 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private MFAFIDO2CredentialEntryModelArgumentsResolver
+		_mfaFIDO2CredentialEntryModelArgumentsResolver;
 
 }

@@ -14,11 +14,6 @@
 
 package com.liferay.batch.engine.model.impl;
 
-import com.liferay.batch.engine.model.BatchEngineImportTaskError;
-import com.liferay.batch.engine.service.BatchEngineImportTaskErrorLocalServiceUtil;
-
-import java.util.List;
-
 /**
  * The extended model implementation for the BatchEngineImportTask service.
  * Represents a row in the &quot;BatchEngineImportTask&quot; database table,
@@ -35,14 +30,12 @@ import java.util.List;
  */
 public class BatchEngineImportTaskImpl extends BatchEngineImportTaskBaseImpl {
 
-	public List<BatchEngineImportTaskError> getBatchEngineImportTaskErrors() {
-		return BatchEngineImportTaskErrorLocalServiceUtil.
-			getBatchEngineImportTaskErrors(getBatchEngineImportTaskId());
-	}
-
-	public int getBatchEngineImportTaskErrorsCount() {
-		return BatchEngineImportTaskErrorLocalServiceUtil.
-			getBatchEngineImportTaskErrorsCount(getBatchEngineImportTaskId());
-	}
+	/**
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never reference this class directly. All methods that expect a batch
+	 * engine import task model instance should use the {@link
+	 * com.liferay.batch.engine.model.BatchEngineImportTask} interface instead.
+	 */
 
 }

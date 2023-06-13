@@ -13,7 +13,7 @@
  */
 
 import ClayDropDown from '@clayui/drop-down';
-import {fetch} from 'frontend-js-web';
+import {ClayIconSpriteContext} from '@clayui/icon';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
@@ -28,13 +28,6 @@ import {selectAccount} from './util/index';
 import AccountsListView from './views/AccountsListView';
 import OrdersListView from './views/OrdersListView';
 
-const USER_RESOURCE_ENDPOINT = '/o/headless-admin-user/v1.0/accounts';
-
-const accountsApi = new URL(
-	`${themeDisplay.getPathContext()}${USER_RESOURCE_ENDPOINT}`,
-	themeDisplay.getPortalURL()
-);
-
 function AccountSelector({
 	accountEntryAllowedTypes,
 	alignmentPosition,
@@ -42,11 +35,11 @@ function AccountSelector({
 	createNewOrderURL,
 	currentCommerceAccount: account,
 	currentCommerceOrder: order,
-	namespace,
 	refreshPageOnAccountSelected: forceRefresh,
 	selectOrderURL,
 	setCurrentAccountURL,
 	showOrderTypeModal,
+	spritemap,
 }) {
 	const [active, setActive] = useState(false);
 	const [currentAccount, setCurrentAccount] = useState(account);
@@ -57,14 +50,6 @@ function AccountSelector({
 	const [currentView, setCurrentView] = useState(
 		account ? VIEWS.ORDERS_LIST : VIEWS.ACCOUNTS_LIST
 	);
-	const [currentUser, setCurrentUser] = useState({});
-
-	useEffect(() => {
-		fetch(accountsApi.toString())
-			.then((response) => response.json())
-			.then((response) => setCurrentUser(response))
-			.catch((error) => showErrorNotification(error.message));
-	}, []);
 
 	const changeAccount = (account) => {
 		selectAccount(account.id, setCurrentAccountURL)
@@ -84,7 +69,7 @@ function AccountSelector({
 	};
 
 	const updateOrderModel = useCallback(
-		({order}) => {
+		(order) => {
 			if (!currentOrder || currentOrder.id !== order.id) {
 				setCurrentOrder((current) => ({...current, ...order}));
 			}
@@ -101,48 +86,48 @@ function AccountSelector({
 	}, [updateOrderModel]);
 
 	return (
-		<ClayDropDown
-			active={active}
-			alignmentPosition={alignmentPosition}
-			className="account-selector account-selector-dropdown"
-			menuElementAttrs={{className: 'account-selector-dropdown-menu'}}
-			onActiveChange={setActive}
-			trigger={
-				<Trigger
-					active={active}
-					currentAccount={currentAccount}
-					currentOrder={currentOrder}
-				/>
-			}
-		>
-			{currentView === VIEWS.ACCOUNTS_LIST && (
-				<AccountsListView
-					accountEntryAllowedTypes={
-						accountEntryAllowedTypes
-							? JSON.parse(accountEntryAllowedTypes)
-							: ''
-					}
-					changeAccount={changeAccount}
-					currentAccount={currentAccount}
-					currentUser={currentUser}
-					disabled={!active}
-					setCurrentView={setCurrentView}
-				/>
-			)}
+		<ClayIconSpriteContext.Provider value={spritemap}>
+			<ClayDropDown
+				active={active}
+				alignmentPosition={alignmentPosition}
+				className="account-selector account-selector-dropdown"
+				menuElementAttrs={{className: 'account-selector-dropdown-menu'}}
+				onActiveChange={setActive}
+				trigger={
+					<Trigger
+						active={active}
+						currentAccount={currentAccount}
+						currentOrder={currentOrder}
+					/>
+				}
+			>
+				{currentView === VIEWS.ACCOUNTS_LIST && (
+					<AccountsListView
+						accountEntryAllowedTypes={
+							accountEntryAllowedTypes
+								? JSON.parse(accountEntryAllowedTypes)
+								: ''
+						}
+						changeAccount={changeAccount}
+						currentAccount={currentAccount}
+						disabled={!active}
+						setCurrentView={setCurrentView}
+					/>
+				)}
 
-			{currentView === VIEWS.ORDERS_LIST && (
-				<OrdersListView
-					commerceChannelId={commerceChannelId}
-					createOrderURL={createNewOrderURL}
-					currentAccount={currentAccount}
-					disabled={!active}
-					namespace={namespace}
-					selectOrderURL={selectOrderURL}
-					setCurrentView={setCurrentView}
-					showOrderTypeModal={showOrderTypeModal}
-				/>
-			)}
-		</ClayDropDown>
+				{currentView === VIEWS.ORDERS_LIST && (
+					<OrdersListView
+						commerceChannelId={commerceChannelId}
+						createOrderURL={createNewOrderURL}
+						currentAccount={currentAccount}
+						disabled={!active}
+						selectOrderURL={selectOrderURL}
+						setCurrentView={setCurrentView}
+						showOrderTypeModal={showOrderTypeModal}
+					/>
+				)}
+			</ClayDropDown>
+		</ClayIconSpriteContext.Provider>
 	);
 }
 
@@ -165,11 +150,11 @@ AccountSelector.propTypes = {
 			label_i18n: PropTypes.string,
 		}),
 	}),
-	namespace: PropTypes.string,
 	refreshPageOnAccountSelected: PropTypes.bool,
 	selectOrderURL: PropTypes.string.isRequired,
 	setCurrentAccountURL: PropTypes.string.isRequired,
 	showOrderTypeModal: PropTypes.bool,
+	spritemap: PropTypes.string.isRequired,
 };
 
 AccountSelector.defaultProps = {

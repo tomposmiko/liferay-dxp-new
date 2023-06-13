@@ -28,11 +28,9 @@ else {
 	wikiPage = (WikiPage)request.getAttribute("page_info_panel.jsp-wikiPage");
 }
 
-WikiListPagesDisplayContext wikiListPagesDisplayContext = new WikiListPagesDisplayContext(request, (TrashHelper)request.getAttribute(TrashWebKeys.TRASH_HELPER), wikiPage.getNode());
+WikiListPagesDisplayContext wikiListPagesDisplayContext = wikiDisplayContextProvider.getWikiListPagesDisplayContext(request, response, wikiPage.getNode());
 %>
 
-<clay:dropdown-actions
-	aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-	dropdownItems="<%= wikiListPagesDisplayContext.getActionDropdownItems(wikiPage) %>"
-	propsTransformer="wiki/js/WikiPageDropdownPropsTransformer"
+<liferay-ui:menu
+	menu="<%= wikiListPagesDisplayContext.getMenu(wikiPage) %>"
 />

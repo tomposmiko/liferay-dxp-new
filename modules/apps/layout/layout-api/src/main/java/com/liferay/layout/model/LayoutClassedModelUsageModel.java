@@ -306,8 +306,4 @@ public interface LayoutClassedModelUsageModel
 	@Override
 	public LayoutClassedModelUsage cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

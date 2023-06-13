@@ -19,7 +19,6 @@ import com.liferay.dynamic.data.mapping.constants.DDMConstants;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.dynamic.data.mapping.service.base.DDMDataProviderInstanceServiceBaseImpl;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -38,6 +37,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -168,28 +169,34 @@ public class DDMDataProviderInstanceServiceImpl
 		long companyId, long[] groupIds, String keywords, int start, int end,
 		OrderByComparator<DDMDataProviderInstance> orderByComparator) {
 
-		return TransformUtil.transform(
+		List<DDMDataProviderInstance> ddmDataProviderInstances =
 			ddmDataProviderInstanceFinder.filterByKeywords(
-				companyId, groupIds, keywords, start, end, orderByComparator),
+				companyId, groupIds, keywords, start, end, orderByComparator);
+
+		Stream<DDMDataProviderInstance> ddmDataProviderInstancesStream =
+			ddmDataProviderInstances.stream();
+
+		return ddmDataProviderInstancesStream.filter(
 			ddmDataProviderInstance -> {
 				try {
-					if (_ddmDataProviderInstanceModelResourcePermission.
-							contains(
-								getPermissionChecker(),
-								ddmDataProviderInstance.
-									getDataProviderInstanceId(),
-								ActionKeys.VIEW)) {
-
-						return _removeAuthenticationData(
-							ddmDataProviderInstance);
-					}
+					return _ddmDataProviderInstanceModelResourcePermission.
+						contains(
+							getPermissionChecker(),
+							ddmDataProviderInstance.getDataProviderInstanceId(),
+							ActionKeys.VIEW);
 				}
 				catch (PortalException portalException) {
-					_log.error(portalException);
-				}
+					_log.error(portalException, portalException);
 
-				return null;
-			});
+					return false;
+				}
+			}
+		).map(
+			ddmDataProviderInstance -> _removeAuthenticationData(
+				ddmDataProviderInstance)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
@@ -233,6 +240,11 @@ public class DDMDataProviderInstanceServiceImpl
 			ddmFormValues, serviceContext);
 	}
 
+	@Reference(unbind = "-")
+	protected void setJSONFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
+	}
+
 	private JSONArray _filterFieldValues(JSONArray fieldValuesJSONArray) {
 		JSONArray filteredFieldValuesJSONArray = _jsonFactory.createJSONArray();
 
@@ -273,7 +285,7 @@ public class DDMDataProviderInstanceServiceImpl
 				"fieldValues", _filterFieldValues(fieldValuesJSONArray));
 
 			ddmDataProviderInstance.setDefinition(
-				definitionJSONObject.toString());
+				definitionJSONObject.toJSONString());
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {

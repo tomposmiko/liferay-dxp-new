@@ -21,10 +21,8 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.PageWidgetInstanceDe
 import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -62,14 +60,10 @@ public class FragmentLayoutStructureItemMapper
 		JSONObject editableValuesJSONObject = null;
 
 		try {
-			editableValuesJSONObject = _jsonFactory.createJSONObject(
+			editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
 				fragmentEntryLink.getEditableValues());
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
 			return null;
 		}
 
@@ -104,8 +98,6 @@ public class FragmentLayoutStructureItemMapper
 					PageWidgetInstanceDefinitionUtil.
 						toPageWidgetInstanceDefinition(
 							fragmentEntryLink,
-							fragmentStyledLayoutStructureItem,
-							itemConfigJSONObject.getString("name", null),
 							toFragmentStyle(
 								itemConfigJSONObject.getJSONObject("styles"),
 								saveMappingConfiguration),
@@ -118,14 +110,8 @@ public class FragmentLayoutStructureItemMapper
 		};
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		FragmentLayoutStructureItemMapper.class);
-
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private PageFragmentInstanceDefinitionMapper

@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.frontend.taglib.servlet.taglib;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.frontend.taglib.internal.servlet.ServletContextUtil;
@@ -46,26 +46,29 @@ public class SearchResultsTag extends ComponentRendererTag {
 				CommerceWebKeys.COMMERCE_CONTEXT);
 
 		try {
-			AccountEntry accountEntry = commerceContext.getAccountEntry();
+			CommerceAccount commerceAccount =
+				commerceContext.getCommerceAccount();
 
-			if (accountEntry != null) {
-				putValue("commerceAccountId", accountEntry.getAccountEntryId());
+			if (commerceAccount != null) {
+				putValue(
+					"commerceAccountId",
+					commerceAccount.getCommerceAccountId());
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		putValue(
 			"searchAPI",
 			PortalUtil.getPortalURL(httpServletRequest) +
-				PortalUtil.getPathContext() + "/o/commerce-ui/search/");
+				"/o/commerce-ui/search/");
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		putValue("spritemap", themeDisplay.getPathThemeSpritemap());
+		putValue("spritemap", themeDisplay.getPathThemeImages() + "/icons.svg");
 
 		putValue("visible", false);
 

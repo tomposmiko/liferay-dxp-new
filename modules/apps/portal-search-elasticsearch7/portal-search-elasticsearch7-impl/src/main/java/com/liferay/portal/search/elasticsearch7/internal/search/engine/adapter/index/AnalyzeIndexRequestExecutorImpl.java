@@ -50,18 +50,18 @@ public class AnalyzeIndexRequestExecutorImpl
 		AnalyzeRequest analyzeRequest = createAnalyzeRequest(
 			analyzeIndexRequest);
 
-		AnalyzeResponse analyzeResponse = _getAnalyzeResponse(
+		AnalyzeResponse analyzeResponse = getAnalyzeResponse(
 			analyzeRequest, analyzeIndexRequest);
 
 		AnalyzeIndexResponse analyzeIndexResponse = new AnalyzeIndexResponse();
 
 		if (analyzeResponse.detail() != null) {
-			_processDetailAnalyzeResponse(
+			processDetailAnalyzeResponse(
 				analyzeIndexResponse, analyzeResponse.detail());
 		}
 		else {
 			List<AnalysisIndexResponseToken> analysisIndexResponseTokens =
-				_translateAnalyzeResponseTokens(analyzeResponse.getTokens());
+				translateAnalyzeResponseTokens(analyzeResponse.getTokens());
 
 			analyzeIndexResponse.addAnalysisIndexResponseTokens(
 				analysisIndexResponseTokens);
@@ -131,7 +131,7 @@ public class AnalyzeIndexRequestExecutorImpl
 		return customAnalyzerBuilder.build(analyzeIndexRequest.getTexts());
 	}
 
-	private AnalyzeResponse _getAnalyzeResponse(
+	protected AnalyzeResponse getAnalyzeResponse(
 		AnalyzeRequest analyzeRequest,
 		AnalyzeIndexRequest analyzeIndexRequest) {
 
@@ -151,7 +151,7 @@ public class AnalyzeIndexRequestExecutorImpl
 		}
 	}
 
-	private void _processDetailAnalyzeResponse(
+	protected void processDetailAnalyzeResponse(
 		AnalyzeIndexResponse analyzeIndexResponse,
 		DetailAnalyzeResponse detailAnalyzeResponse) {
 
@@ -162,7 +162,7 @@ public class AnalyzeIndexRequestExecutorImpl
 			String analyzerName = analyzeTokenList.getName();
 
 			List<AnalysisIndexResponseToken> analysisIndexResponseTokens =
-				_translateAnalyzeResponseTokens(
+				translateAnalyzeResponseTokens(
 					ListUtil.fromArray(analyzeTokenList.getTokens()));
 
 			AnalyzeIndexResponse.DetailsAnalyzer detailsAnalyzer =
@@ -205,7 +205,7 @@ public class AnalyzeIndexRequestExecutorImpl
 				String tokenFilterName = analyzeTokenList.getName();
 
 				List<AnalysisIndexResponseToken> analysisIndexResponseTokens =
-					_translateAnalyzeResponseTokens(
+					translateAnalyzeResponseTokens(
 						ListUtil.fromArray(analyzeTokenList.getTokens()));
 
 				AnalyzeIndexResponse.DetailsTokenFilter detailsTokenFilter =
@@ -223,7 +223,7 @@ public class AnalyzeIndexRequestExecutorImpl
 			String tokenizerName = tokenizerAnalyzeTokenList.getName();
 
 			List<AnalysisIndexResponseToken> analysisIndexResponseTokens =
-				_translateAnalyzeResponseTokens(
+				translateAnalyzeResponseTokens(
 					ListUtil.fromArray(tokenizerAnalyzeTokenList.getTokens()));
 
 			AnalyzeIndexResponse.DetailsTokenizer detailsTokenizer =
@@ -234,7 +234,14 @@ public class AnalyzeIndexRequestExecutorImpl
 		}
 	}
 
-	private List<AnalysisIndexResponseToken> _translateAnalyzeResponseTokens(
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	protected List<AnalysisIndexResponseToken> translateAnalyzeResponseTokens(
 		List<AnalyzeResponse.AnalyzeToken> analyzeTokens) {
 
 		List<AnalysisIndexResponseToken> analysisIndexResponseTokens =
@@ -261,7 +268,6 @@ public class AnalyzeIndexRequestExecutorImpl
 		return analysisIndexResponseTokens;
 	}
 
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

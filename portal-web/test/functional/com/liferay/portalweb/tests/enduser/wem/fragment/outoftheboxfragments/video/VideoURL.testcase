@@ -13,14 +13,14 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,8 +29,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-99176. A user should be able to add a Video URL fragment and display a video."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test DisplayVideoInVideoURL {
 		property portal.acceptance = "true";
 
@@ -56,7 +55,7 @@ definition {
 
 			PageEditor.addVideoFragmentURL(videoLink = "https://www.youtube.com/watch?v=2EPZxIC5ogU");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the video displayed in view mode") {
@@ -76,7 +75,7 @@ definition {
 
 			PageEditor.addVideoFragmentURL(videoLink = "https://www.youtube.com/watch?v=HOdbzGCI5ME");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the new video displayed in view mode") {

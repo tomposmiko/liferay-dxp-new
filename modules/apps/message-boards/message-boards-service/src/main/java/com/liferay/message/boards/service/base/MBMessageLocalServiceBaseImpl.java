@@ -48,8 +48,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -275,20 +273,47 @@ public abstract class MBMessageLocalServiceBaseImpl
 		return mbMessagePersistence.fetchByUUID_G(uuid, groupId);
 	}
 
+	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
 	@Override
 	public MBMessage fetchMBMessageByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
-		return mbMessagePersistence.fetchByERC_G(
-			externalReferenceCode, groupId);
+		return mbMessagePersistence.fetchByG_ERC(
+			groupId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchMBMessageByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public MBMessage fetchMBMessageByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return fetchMBMessageByExternalReferenceCode(
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message
+	 * @throws PortalException if a matching message-boards message could not be found
+	 */
 	@Override
 	public MBMessage getMBMessageByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
-		return mbMessagePersistence.findByERC_G(externalReferenceCode, groupId);
+		return mbMessagePersistence.findByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
@@ -513,11 +538,6 @@ public abstract class MBMessageLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement MBMessageLocalServiceImpl#deleteMBMessage(MBMessage) to avoid orphaned data");
-		}
-
 		return mbMessageLocalService.deleteMBMessage((MBMessage)persistedModel);
 	}
 
@@ -729,8 +749,5 @@ public abstract class MBMessageLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MBMessageLocalServiceBaseImpl.class);
 
 }

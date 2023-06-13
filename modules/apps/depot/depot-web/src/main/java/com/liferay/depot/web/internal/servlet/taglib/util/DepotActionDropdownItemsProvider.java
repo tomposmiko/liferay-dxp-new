@@ -64,6 +64,7 @@ public class DepotActionDropdownItemsProvider {
 					DepotEntryURLUtil.getEditDepotEntryPortletURL(
 						_depotEntry, _themeDisplay.getURLCurrent(),
 						_liferayPortletRequest));
+
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "edit"));
 			}

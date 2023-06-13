@@ -15,7 +15,6 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.document.library;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.constants.DDMFormConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
@@ -33,18 +32,17 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletURL;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -52,42 +50,46 @@ import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.HtmlImpl;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.portlet.MutableResourceParameters;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.hamcrest.CoreMatchers;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.MockedStatic;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.api.mockito.expectation.PowerMockitoStubber;
+import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Pedro Queiroz
  */
+@PrepareForTest(
+	{
+		ModelResourcePermissionUtil.class,
+		RequestBackedPortletURLFactoryUtil.class
+	}
+)
+@RunWith(PowerMockRunner.class)
 public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -95,7 +97,6 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		super.setUp();
 
 		_setUpCompanyLocalService();
-		_setUpDLAppLocalService();
 		_setUpDLAppService();
 		_setUpFileEntry();
 		_setUpGroupLocalService();
@@ -103,17 +104,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		_setUpItemSelector();
 		_setUpJSONFactory();
 		_setUpJSONFactoryUtil();
-		_setUpModelResourcePermission();
+		_setUpModelResourcePermissionUtil();
 		_setUpParamUtil();
 		_setUpPortal();
 		_setUpPortletFileRepository();
-		_setUpRequestBackedPortletURLFactory();
+		_setUpRequestBackedPortletURLFactoryUtil();
 		_setUpUserLocalService();
-	}
-
-	@After
-	public void tearDown() {
-		_requestBackedPortletURLFactoryUtilMockedStatic.close();
 	}
 
 	@Test
@@ -122,7 +118,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
 
-		Mockito.when(
+		when(
 			themeDisplay.isSignedIn()
 		).thenReturn(
 			Boolean.TRUE
@@ -203,7 +199,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	public void testGetParametersForSignedInUser() {
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
 
-		Mockito.when(
+		when(
 			themeDisplay.isSignedIn()
 		).thenReturn(
 			Boolean.TRUE
@@ -225,17 +221,18 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 
 	@Test
 	public void testGetParametersForUserWithoutPermission() throws Exception {
-		Mockito.when(
-			_modelResourcePermission.contains(
-				Mockito.nullable(PermissionChecker.class), Mockito.anyLong(),
-				Mockito.anyString())
+		when(
+			ModelResourcePermissionUtil.contains(
+				Matchers.any(), Matchers.any(PermissionChecker.class),
+				Matchers.eq(_GROUP_ID), Matchers.eq(_FORMS_FOLDER_ID),
+				Matchers.eq(ActionKeys.ADD_FOLDER))
 		).thenReturn(
 			false
 		);
 
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
 
-		Mockito.when(
+		when(
 			themeDisplay.isSignedIn()
 		).thenReturn(
 			Boolean.TRUE
@@ -316,7 +313,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	public void testGetParametersShouldUseExistingItemSelectorURL() {
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
 
-		Mockito.when(
+		when(
 			themeDisplay.isSignedIn()
 		).thenReturn(
 			Boolean.TRUE
@@ -362,13 +359,13 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 
 		ThemeDisplay themeDisplay = _mockThemeDisplay();
 
-		Mockito.when(
+		when(
 			themeDisplay.getScopeGroup()
 		).thenReturn(
 			_scopeGroup
 		);
 
-		Mockito.when(
+		when(
 			themeDisplay.isSignedIn()
 		).thenReturn(
 			Boolean.TRUE
@@ -407,53 +404,47 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private HttpServletRequest _createHttpServletRequest() {
-		MockHttpServletRequest mockHttpServletRequest =
+		MockHttpServletRequest httpServletRequest =
 			new MockHttpServletRequest();
 
-		mockHttpServletRequest.setParameter(
+		httpServletRequest.setParameter(
 			"formInstanceId", String.valueOf(_FORM_INSTANCE_ID));
 
-		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
-
-		themeDisplay.setPermissionChecker(
-			Mockito.mock(PermissionChecker.class));
-
-		mockHttpServletRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, themeDisplay);
-
-		return mockHttpServletRequest;
+		return httpServletRequest;
 	}
 
 	private DocumentLibraryDDMFormFieldTemplateContextContributor _createSpy(
 		ThemeDisplay themeDisplay) {
 
 		DocumentLibraryDDMFormFieldTemplateContextContributor
-			documentLibraryDDMFormFieldTemplateContextContributor = Mockito.spy(
-				_documentLibraryDDMFormFieldTemplateContextContributor);
+			documentLibraryDDMFormFieldTemplateContextContributor =
+				PowerMockito.spy(
+					_documentLibraryDDMFormFieldTemplateContextContributor);
 
-		Mockito.doReturn(
-			_resourceBundle
-		).when(
+		PowerMockitoStubber powerMockitoStubber = PowerMockito.doReturn(
+			_resourceBundle);
+
+		powerMockitoStubber.when(
 			documentLibraryDDMFormFieldTemplateContextContributor
 		).getResourceBundle(
-			Mockito.any(Locale.class)
+			Matchers.any(Locale.class)
 		);
 
-		Mockito.doReturn(
-			themeDisplay
-		).when(
+		powerMockitoStubber = PowerMockito.doReturn(themeDisplay);
+
+		powerMockitoStubber.when(
 			documentLibraryDDMFormFieldTemplateContextContributor
 		).getThemeDisplay(
-			Mockito.any(HttpServletRequest.class)
+			Matchers.any(HttpServletRequest.class)
 		);
 
 		return documentLibraryDDMFormFieldTemplateContextContributor;
 	}
 
 	private Company _mockCompany() {
-		Company company = Mockito.mock(Company.class);
+		Company company = mock(Company.class);
 
-		Mockito.when(
+		when(
 			company.getMx()
 		).thenReturn(
 			"liferay.com"
@@ -463,9 +454,10 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private void _mockDDMFormPortletItemSelector() {
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorURL(
-				Mockito.any(), Mockito.eq(_group), Mockito.eq(_GROUP_ID),
+				Mockito.eq(_requestBackedPortletURLFactory), Mockito.eq(_group),
+				Mockito.eq(_GROUP_ID),
 				Mockito.eq(
 					_PORTLET_NAMESPACE_DDM_FORM + "selectDocumentLibrary"),
 				Mockito.any(DDMUserPersonalFolderItemSelectorCriterion.class))
@@ -475,9 +467,9 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private Folder _mockFolder(long folderId) {
-		Folder folder = Mockito.mock(Folder.class);
+		Folder folder = mock(Folder.class);
 
-		Mockito.when(
+		when(
 			folder.getFolderId()
 		).thenReturn(
 			folderId
@@ -487,7 +479,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private void _mockGroupLocalServiceFetchGroup(Group group) {
-		Mockito.when(
+		when(
 			_groupLocalService.fetchGroup(_GROUP_ID)
 		).thenReturn(
 			group
@@ -495,9 +487,9 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private Repository _mockRepository() {
-		Repository repository = Mockito.mock(Repository.class);
+		Repository repository = mock(Repository.class);
 
-		Mockito.when(
+		when(
 			repository.getRepositoryId()
 		).thenReturn(
 			_REPOSITORY_ID
@@ -506,22 +498,38 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		return repository;
 	}
 
-	private ThemeDisplay _mockThemeDisplay() {
-		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
+	private RequestBackedPortletURLFactory
+		_mockRequestBackedPortletURLFactory() {
 
-		Mockito.when(
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory = mock(
+			RequestBackedPortletURLFactory.class);
+
+		when(
+			requestBackedPortletURLFactory.createActionURL(
+				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM)
+		).thenReturn(
+			new MockLiferayPortletURL()
+		);
+
+		return requestBackedPortletURLFactory;
+	}
+
+	private ThemeDisplay _mockThemeDisplay() {
+		ThemeDisplay themeDisplay = mock(ThemeDisplay.class);
+
+		when(
 			themeDisplay.getCompanyId()
 		).thenReturn(
 			_COMPANY_ID
 		);
 
-		Mockito.when(
+		when(
 			themeDisplay.getPathContext()
 		).thenReturn(
 			"/my/path/context/"
 		);
 
-		Mockito.when(
+		when(
 			themeDisplay.getPathThemeImages()
 		).thenReturn(
 			"/my/theme/images/"
@@ -529,7 +537,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 
 		User user = _mockUser();
 
-		Mockito.when(
+		when(
 			themeDisplay.getUser()
 		).thenReturn(
 			user
@@ -539,15 +547,15 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private User _mockUser() {
-		User user = Mockito.mock(User.class);
+		User user = mock(User.class);
 
-		Mockito.when(
+		when(
 			user.getScreenName()
 		).thenReturn(
 			"Test"
 		);
 
-		Mockito.when(
+		when(
 			user.getUserId()
 		).thenReturn(
 			0L
@@ -557,43 +565,45 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private void _setUpCompanyLocalService() throws Exception {
-		CompanyLocalService companyLocalService = Mockito.mock(
+		CompanyLocalService companyLocalService = mock(
 			CompanyLocalService.class);
 
 		Company company = _mockCompany();
 
-		Mockito.when(
+		when(
 			companyLocalService.getCompany(_COMPANY_ID)
 		).thenReturn(
 			company
 		);
 
-		ReflectionTestUtil.setFieldValue(
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_companyLocalService"
+		).set(
 			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_companyLocalService", companyLocalService);
-	}
-
-	private void _setUpDLAppLocalService() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_dlAppLocalService", _dlAppLocalService);
-
-		Mockito.when(
-			_dlAppLocalService.getFileEntryByUuidAndGroupId(
-				_FILE_ENTRY_UUID, _GROUP_ID)
-		).thenReturn(
-			_fileEntry
+			companyLocalService
 		);
 	}
 
 	private void _setUpDLAppService() throws Exception {
-		ReflectionTestUtil.setFieldValue(
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_dlAppService"
+		).set(
 			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_dlAppService", _dlAppService);
+			_dlAppService
+		);
+
+		when(
+			_dlAppService.getFileEntryByUuidAndGroupId(
+				_FILE_ENTRY_UUID, _GROUP_ID)
+		).thenReturn(
+			_fileEntry
+		);
 
 		Folder folder = _mockFolder(_PRIVATE_FOLDER_ID);
 
-		Mockito.when(
+		when(
 			_dlAppService.getFolder(_REPOSITORY_ID, _FORMS_FOLDER_ID, "Test")
 		).thenReturn(
 			folder
@@ -604,7 +614,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		_fileEntry.setUuid(_FILE_ENTRY_UUID);
 		_fileEntry.setGroupId(_GROUP_ID);
 
-		Mockito.when(
+		when(
 			_fileEntry.getTitle()
 		).thenReturn(
 			"New Title"
@@ -612,34 +622,51 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private void _setUpGroupLocalService() throws Exception {
-		ReflectionTestUtil.setFieldValue(
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_groupLocalService"
+		).set(
 			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_groupLocalService", _groupLocalService);
+			_groupLocalService
+		);
 
 		_mockGroupLocalServiceFetchGroup(_group);
 	}
 
 	private void _setUpHtml() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldTemplateContextContributor, "_html",
-			_html);
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class, "_html"
+		).set(
+			_documentLibraryDDMFormFieldTemplateContextContributor, _html
+		);
 	}
 
 	private void _setUpItemSelector() throws Exception {
-		ReflectionTestUtil.setFieldValue(
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_itemSelector"
+		).set(
 			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_itemSelector", _itemSelector);
+			_itemSelector
+		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorURL(
-				Mockito.any(),
+				Mockito.eq(_requestBackedPortletURLFactory),
 				Mockito.argThat(
-					argument -> {
-						if ((argument == _group) || (argument == _scopeGroup)) {
-							return true;
+					new ArgumentMatcher<Group>() {
+
+						@Override
+						public boolean matches(Object object) {
+							Group group = (Group)object;
+
+							if ((group == _group) || (group == _scopeGroup)) {
+								return true;
+							}
+
+							return false;
 						}
 
-						return false;
 					}),
 				Mockito.eq(_GROUP_ID),
 				Mockito.eq(_PORTLET_NAMESPACE + "selectDocumentLibrary"),
@@ -651,9 +678,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private void _setUpJSONFactory() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_jsonFactory", _jsonFactory);
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_jsonFactory"
+		).set(
+			_documentLibraryDDMFormFieldTemplateContextContributor, _jsonFactory
+		);
 	}
 
 	private void _setUpJSONFactoryUtil() {
@@ -662,18 +692,17 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
-	private void _setUpModelResourcePermission() throws Exception {
-		Mockito.when(
-			_modelResourcePermission.contains(
-				Mockito.nullable(PermissionChecker.class), Mockito.anyLong(),
-				Mockito.anyString())
+	private void _setUpModelResourcePermissionUtil() throws Exception {
+		mockStatic(ModelResourcePermissionUtil.class);
+
+		when(
+			ModelResourcePermissionUtil.contains(
+				Matchers.any(), Matchers.any(PermissionChecker.class),
+				Matchers.eq(_GROUP_ID), Matchers.eq(_FORMS_FOLDER_ID),
+				Matchers.eq(ActionKeys.ADD_FOLDER))
 		).thenReturn(
 			true
 		);
-
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_dlFolderModelResourcePermission", _modelResourcePermission);
 	}
 
 	private void _setUpParamUtil() {
@@ -681,11 +710,14 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private void _setUpPortal() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_documentLibraryDDMFormFieldTemplateContextContributor, "_portal",
-			_portal);
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_portal"
+		).set(
+			_documentLibraryDDMFormFieldTemplateContextContributor, _portal
+		);
 
-		Mockito.when(
+		when(
 			_portal.getPortletNamespace(
 				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM)
 		).thenReturn(
@@ -694,13 +726,17 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	}
 
 	private void _setUpPortletFileRepository() throws Exception {
-		ReflectionTestUtil.setFieldValue(
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_portletFileRepository"
+		).set(
 			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_portletFileRepository", _portletFileRepository);
+			_portletFileRepository
+		);
 
 		Folder folder = _mockFolder(_FORMS_FOLDER_ID);
 
-		Mockito.when(
+		when(
 			_portletFileRepository.getPortletFolder(
 				_REPOSITORY_ID, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 				DDMFormConstants.DDM_FORM_UPLOADED_FILES_FOLDER_NAME)
@@ -710,7 +746,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 
 		Repository repository = _mockRepository();
 
-		Mockito.when(
+		when(
 			_portletFileRepository.fetchPortletRepository(
 				_GROUP_ID, DDMFormConstants.SERVICE_NAME)
 		).thenReturn(
@@ -718,44 +754,29 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		);
 	}
 
-	private void _setUpRequestBackedPortletURLFactory() {
-		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
-			Mockito.mock(RequestBackedPortletURLFactory.class);
+	private void _setUpRequestBackedPortletURLFactoryUtil() {
+		mockStatic(RequestBackedPortletURLFactoryUtil.class);
 
-		Mockito.when(
+		when(
 			RequestBackedPortletURLFactoryUtil.create(
-				Mockito.any(HttpServletRequest.class))
+				Matchers.any(HttpServletRequest.class))
 		).thenReturn(
-			requestBackedPortletURLFactory
-		);
-
-		LiferayPortletURL liferayPortletURL = new TestMockLiferayPortletURL();
-
-		Mockito.doReturn(
-			liferayPortletURL
-		).when(
-			requestBackedPortletURLFactory
-		).createActionURL(
-			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM
-		);
-
-		Mockito.doReturn(
-			liferayPortletURL
-		).when(
-			requestBackedPortletURLFactory
-		).createResourceURL(
-			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM
+			_requestBackedPortletURLFactory
 		);
 	}
 
 	private void _setUpUserLocalService() throws Exception {
-		ReflectionTestUtil.setFieldValue(
+		MemberMatcher.field(
+			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
+			"_userLocalService"
+		).set(
 			_documentLibraryDDMFormFieldTemplateContextContributor,
-			"_userLocalService", _userLocalService);
+			_userLocalService
+		);
 
 		User user = _mockUser();
 
-		Mockito.when(
+		when(
 			_userLocalService.getUserByEmailAddress(
 				_COMPANY_ID,
 				DDMFormConstants.DDM_FORM_DEFAULT_USER_SCREEN_NAME +
@@ -786,40 +807,45 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 
 	private static final long _REPOSITORY_ID = RandomTestUtil.randomLong();
 
-	private final DLAppLocalService _dlAppLocalService = Mockito.mock(
-		DLAppLocalService.class);
-	private final DLAppService _dlAppService = Mockito.mock(DLAppService.class);
+	@Mock
+	private DLAppService _dlAppService;
+
 	private final DocumentLibraryDDMFormFieldTemplateContextContributor
 		_documentLibraryDDMFormFieldTemplateContextContributor =
 			new DocumentLibraryDDMFormFieldTemplateContextContributor();
-	private final FileEntry _fileEntry = Mockito.mock(FileEntry.class);
-	private final Group _group = Mockito.mock(Group.class);
-	private final GroupLocalService _groupLocalService = Mockito.mock(
-		GroupLocalService.class);
+
+	@Mock
+	private FileEntry _fileEntry;
+
+	@Mock
+	private Group _group;
+
+	@Mock
+	private GroupLocalService _groupLocalService;
+
 	private final Html _html = new HtmlImpl();
-	private final ItemSelector _itemSelector = Mockito.mock(ItemSelector.class);
+
+	@Mock
+	private ItemSelector _itemSelector;
+
 	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
-	private final ModelResourcePermission<?> _modelResourcePermission =
-		Mockito.mock(ModelResourcePermission.class);
-	private final Portal _portal = Mockito.mock(Portal.class);
-	private final PortletFileRepository _portletFileRepository = Mockito.mock(
-		PortletFileRepository.class);
-	private final MockedStatic<RequestBackedPortletURLFactoryUtil>
-		_requestBackedPortletURLFactoryUtilMockedStatic = Mockito.mockStatic(
-			RequestBackedPortletURLFactoryUtil.class);
-	private final ResourceBundle _resourceBundle = Mockito.mock(
-		ResourceBundle.class);
-	private final Group _scopeGroup = Mockito.mock(Group.class);
-	private final UserLocalService _userLocalService = Mockito.mock(
-		UserLocalService.class);
 
-	private class TestMockLiferayPortletURL extends MockLiferayPortletURL {
+	@Mock
+	private Portal _portal;
 
-		@Override
-		public MutableResourceParameters getResourceParameters() {
-			return Mockito.mock(MutableResourceParameters.class);
-		}
+	@Mock
+	private PortletFileRepository _portletFileRepository;
 
-	}
+	private final RequestBackedPortletURLFactory
+		_requestBackedPortletURLFactory = _mockRequestBackedPortletURLFactory();
+
+	@Mock
+	private ResourceBundle _resourceBundle;
+
+	@Mock
+	private Group _scopeGroup;
+
+	@Mock
+	private UserLocalService _userLocalService;
 
 }

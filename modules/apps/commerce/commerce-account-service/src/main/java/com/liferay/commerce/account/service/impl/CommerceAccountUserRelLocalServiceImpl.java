@@ -14,51 +14,40 @@
 
 package com.liferay.commerce.account.service.impl;
 
-import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryUserRel;
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.commerce.account.configuration.CommerceAccountServiceConfiguration;
 import com.liferay.commerce.account.exception.CommerceAccountTypeException;
 import com.liferay.commerce.account.exception.CommerceAccountUserRelEmailAddressException;
 import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.model.CommerceAccountUserRel;
-import com.liferay.commerce.account.model.impl.CommerceAccountImpl;
 import com.liferay.commerce.account.model.impl.CommerceAccountUserRelImpl;
 import com.liferay.commerce.account.service.base.CommerceAccountUserRelLocalServiceBaseImpl;
 import com.liferay.commerce.account.service.persistence.CommerceAccountUserRelPK;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.stream.Stream;
 
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.account.model.CommerceAccountUserRel",
-	service = AopService.class
-)
 public class CommerceAccountUserRelLocalServiceImpl
 	extends CommerceAccountUserRelLocalServiceBaseImpl {
 
@@ -79,7 +68,7 @@ public class CommerceAccountUserRelLocalServiceImpl
 			commerceAccountUserRelLocalService.addCommerceAccountUserRel(
 				commerceAccountId, commerceAccountUserId, serviceContext);
 
-		_updateRoles(
+		updateRoles(
 			commerceAccountUserRel.getCommerceAccountId(),
 			commerceAccountUserRel.getCommerceAccountUserId(), roleIds);
 
@@ -92,7 +81,7 @@ public class CommerceAccountUserRelLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_validate(commerceAccountId, commerceAccountUserId);
+		validate(commerceAccountId, commerceAccountUserId);
 
 		CommerceAccountUserRel commerceAccountUserRel =
 			CommerceAccountUserRelImpl.fromAccountEntryUserRel(
@@ -113,18 +102,12 @@ public class CommerceAccountUserRelLocalServiceImpl
 			long[] roleIds, ServiceContext serviceContext)
 		throws PortalException {
 
-		AccountEntry accountEntry = _accountEntryLocalService.getAccountEntry(
+		Group group = commerceAccountLocalService.getCommerceAccountGroup(
 			commerceAccountId);
-
-		Group group = accountEntry.getAccountEntryGroup();
-
-		if (group == null) {
-			throw new PortalException();
-		}
 
 		if (userIds != null) {
 			for (long userId : userIds) {
-				User user = _userLocalService.getUser(userId);
+				User user = userLocalService.getUser(userId);
 
 				commerceAccountUserRelLocalService.addCommerceAccountUserRel(
 					commerceAccountId, user.getUserId(), serviceContext);
@@ -132,14 +115,14 @@ public class CommerceAccountUserRelLocalServiceImpl
 				if (!ArrayUtil.contains(
 						user.getGroupIds(), group.getGroupId())) {
 
-					_userLocalService.addGroupUsers(
+					userLocalService.addGroupUsers(
 						group.getGroupId(), new long[] {userId});
 				}
 
 				if (!ArrayUtil.contains(
 						user.getGroupIds(), serviceContext.getScopeGroupId())) {
 
-					_userLocalService.addGroupUsers(
+					userLocalService.addGroupUsers(
 						serviceContext.getScopeGroupId(), new long[] {userId});
 				}
 
@@ -172,7 +155,7 @@ public class CommerceAccountUserRelLocalServiceImpl
 			return;
 		}
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		Set<Role> roles = new HashSet<>();
 
@@ -187,17 +170,22 @@ public class CommerceAccountUserRelLocalServiceImpl
 			roles.add(role);
 		}
 
-		long[] roleIds = TransformUtil.transformToLongArray(
-			roles, Role::getRoleId);
+		Stream<Role> stream = roles.stream();
+
+		long[] roleIds = stream.mapToLong(
+			Role::getRoleId
+		).toArray();
+
+		List<CommerceAccountUserRel> commerceAccountUserRels =
+			commerceAccountUserRelLocalService.
+				getCommerceAccountUserRelsByCommerceAccountUserId(userId);
 
 		for (CommerceAccountUserRel commerceAccountUserRel :
-				commerceAccountUserRelLocalService.
-					getCommerceAccountUserRelsByCommerceAccountUserId(userId)) {
+				commerceAccountUserRels) {
 
 			CommerceAccount commerceAccount =
-				CommerceAccountImpl.fromAccountEntry(
-					_accountEntryLocalService.getAccountEntry(
-						commerceAccountUserRel.getCommerceAccountId()));
+				commerceAccountLocalService.getCommerceAccount(
+					commerceAccountUserRel.getCommerceAccountId());
 
 			_userGroupRoleLocalService.addUserGroupRoles(
 				userId, commerceAccount.getCommerceAccountGroupId(), roleIds);
@@ -258,8 +246,8 @@ public class CommerceAccountUserRelLocalServiceImpl
 		_accountEntryUserRelLocalService.deleteAccountEntryUserRels(
 			commerceAccountId, userIds);
 
-		CommerceAccount commerceAccount = CommerceAccountImpl.fromAccountEntry(
-			_accountEntryLocalService.getAccountEntry(commerceAccountId));
+		CommerceAccount commerceAccount =
+			commerceAccountLocalService.getCommerceAccount(commerceAccountId);
 
 		_userGroupRoleLocalService.deleteUserGroupRoles(
 			userIds, commerceAccount.getCommerceAccountGroupId());
@@ -365,8 +353,8 @@ public class CommerceAccountUserRelLocalServiceImpl
 		User user = null;
 
 		if (Validator.isNotNull(userExternalReferenceCode)) {
-			user = _userLocalService.fetchUserByExternalReferenceCode(
-				userExternalReferenceCode, serviceContext.getCompanyId());
+			user = userLocalService.fetchUserByReferenceCode(
+				serviceContext.getCompanyId(), userExternalReferenceCode);
 		}
 
 		if (user == null) {
@@ -374,26 +362,20 @@ public class CommerceAccountUserRelLocalServiceImpl
 				throw new CommerceAccountUserRelEmailAddressException();
 			}
 
-			user = _userLocalService.fetchUserByEmailAddress(
+			user = userLocalService.fetchUserByEmailAddress(
 				serviceContext.getCompanyId(), emailAddress);
 		}
 
 		if (user == null) {
-			AccountEntry accountEntry =
-				_accountEntryLocalService.getAccountEntry(commerceAccountId);
+			Group group = commerceAccountLocalService.getCommerceAccountGroup(
+				commerceAccountId);
 
-			Group group = accountEntry.getAccountEntryGroup();
-
-			if (group == null) {
-				throw new PortalException();
-			}
-
-			user = _userLocalService.addUserWithWorkflow(
+			user = userLocalService.addUserWithWorkflow(
 				serviceContext.getUserId(), serviceContext.getCompanyId(), true,
 				StringPool.BLANK, StringPool.BLANK, true, StringPool.BLANK,
-				emailAddress, serviceContext.getLocale(), emailAddress,
-				StringPool.BLANK, emailAddress, 0, 0, true, 1, 1, 1970,
-				StringPool.BLANK, UserConstants.TYPE_REGULAR,
+				emailAddress, 0, StringPool.BLANK, serviceContext.getLocale(),
+				emailAddress, StringPool.BLANK, emailAddress, 0, 0, true, 1, 1,
+				1970, StringPool.BLANK,
 				new long[] {
 					group.getGroupId(), serviceContext.getScopeGroupId()
 				},
@@ -401,14 +383,14 @@ public class CommerceAccountUserRelLocalServiceImpl
 
 			user.setExternalReferenceCode(userExternalReferenceCode);
 
-			_userLocalService.updateUser(user);
+			userLocalService.updateUser(user);
 		}
 
 		CommerceAccountUserRel commerceAccountUserRel =
 			commerceAccountUserRelLocalService.addCommerceAccountUserRel(
 				commerceAccountId, user.getUserId(), serviceContext);
 
-		_updateRoles(
+		updateRoles(
 			commerceAccountUserRel.getCommerceAccountId(),
 			commerceAccountUserRel.getCommerceAccountUserId(), roleIds);
 
@@ -422,30 +404,24 @@ public class CommerceAccountUserRelLocalServiceImpl
 		throw new UnsupportedOperationException();
 	}
 
-	private void _updateRoles(
+	protected void updateRoles(
 			long commerceAccountId, long userId, long[] roleIds)
 		throws PortalException {
 
 		if (roleIds != null) {
-			AccountEntry accountEntry =
-				_accountEntryLocalService.getAccountEntry(commerceAccountId);
-
-			Group group = accountEntry.getAccountEntryGroup();
-
-			if (group == null) {
-				throw new PortalException();
-			}
+			Group group = commerceAccountLocalService.getCommerceAccountGroup(
+				commerceAccountId);
 
 			_userGroupRoleLocalService.addUserGroupRoles(
 				userId, group.getGroupId(), roleIds);
 		}
 	}
 
-	private void _validate(long commerceAccountId, long commerceAccountUserId)
+	protected void validate(long commerceAccountId, long commerceAccountUserId)
 		throws PortalException {
 
-		CommerceAccount commerceAccount = CommerceAccountImpl.fromAccountEntry(
-			_accountEntryLocalService.getAccountEntry(commerceAccountId));
+		CommerceAccount commerceAccount =
+			commerceAccountLocalService.getCommerceAccount(commerceAccountId);
 
 		if (commerceAccount.isPersonalAccount()) {
 			List<CommerceAccountUserRel> commerceAccountUserRels =
@@ -456,9 +432,8 @@ public class CommerceAccountUserRelLocalServiceImpl
 					commerceAccountUserRels) {
 
 				CommerceAccount curCommerceAccount =
-					CommerceAccountImpl.fromAccountEntry(
-						_accountEntryLocalService.getAccountEntry(
-							curCommerceAccountUserRel.getCommerceAccountId()));
+					commerceAccountLocalService.getCommerceAccount(
+						curCommerceAccountUserRel.getCommerceAccountId());
 
 				if (curCommerceAccount.isPersonalAccount()) {
 					throw new CommerceAccountTypeException();
@@ -467,22 +442,16 @@ public class CommerceAccountUserRelLocalServiceImpl
 		}
 	}
 
-	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Reference
+	@ServiceReference(type = AccountEntryUserRelLocalService.class)
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
 
-	@Reference
+	@ServiceReference(type = ConfigurationProvider.class)
 	private ConfigurationProvider _configurationProvider;
 
-	@Reference
+	@ServiceReference(type = RoleLocalService.class)
 	private RoleLocalService _roleLocalService;
 
-	@Reference
+	@ServiceReference(type = UserGroupRoleLocalService.class)
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

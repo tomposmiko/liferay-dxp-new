@@ -16,34 +16,22 @@ package com.liferay.commerce.util.comparator;
 
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.portal.kernel.util.CollatorUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.Serializable;
 
 import java.text.Collator;
 
+import java.util.Comparator;
 import java.util.Locale;
 
 /**
  * @author Alessio Antonio Rendina
  */
 public class CommerceShippingMethodNameComparator
-	extends OrderByComparator<CommerceShippingMethod> {
-
-	public static final String ORDER_BY_ASC = "CommerceShippingMethod.name ASC";
-
-	public static final String ORDER_BY_DESC =
-		"CommerceShippingMethod.name DESC";
-
-	public static final String[] ORDER_BY_FIELDS = {"name"};
-
-	public CommerceShippingMethodNameComparator(
-		boolean ascending, Locale locale) {
-
-		_ascending = ascending;
-		_locale = locale;
-	}
+	implements Comparator<CommerceShippingMethod>, Serializable {
 
 	public CommerceShippingMethodNameComparator(Locale locale) {
-		this(false, locale);
+		_locale = locale;
 	}
 
 	@Override
@@ -56,35 +44,9 @@ public class CommerceShippingMethodNameComparator
 		String name1 = commerceShippingMethod1.getName(_locale);
 		String name2 = commerceShippingMethod2.getName(_locale);
 
-		int value = collator.compare(name1, name2);
-
-		if (_ascending) {
-			return value;
-		}
-
-		return Math.negateExact(value);
+		return collator.compare(name1, name2);
 	}
 
-	@Override
-	public String getOrderBy() {
-		if (_ascending) {
-			return ORDER_BY_ASC;
-		}
-
-		return ORDER_BY_DESC;
-	}
-
-	@Override
-	public String[] getOrderByFields() {
-		return ORDER_BY_FIELDS;
-	}
-
-	@Override
-	public boolean isAscending() {
-		return _ascending;
-	}
-
-	private final boolean _ascending;
 	private final Locale _locale;
 
 }

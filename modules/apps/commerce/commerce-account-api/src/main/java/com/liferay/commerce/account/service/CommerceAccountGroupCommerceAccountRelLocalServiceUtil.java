@@ -128,29 +128,11 @@ public class CommerceAccountGroupCommerceAccountRelLocalServiceUtil {
 			commerceAccountGroupId, start, end);
 	}
 
-	public static List<CommerceAccountGroupCommerceAccountRel>
-		getCommerceAccountGroupCommerceAccountRelsByCommerceAccountId(
-			long commerceAccountId, int start, int end) {
-
-		return getService().
-			getCommerceAccountGroupCommerceAccountRelsByCommerceAccountId(
-				commerceAccountId, start, end);
-	}
-
 	public static int getCommerceAccountGroupCommerceAccountRelsCount(
 		long commerceAccountGroupId) {
 
 		return getService().getCommerceAccountGroupCommerceAccountRelsCount(
 			commerceAccountGroupId);
-	}
-
-	public static int
-		getCommerceAccountGroupCommerceAccountRelsCountByCommerceAccountId(
-			long commerceAccountId) {
-
-		return getService().
-			getCommerceAccountGroupCommerceAccountRelsCountByCommerceAccountId(
-				commerceAccountId);
 	}
 
 	/**

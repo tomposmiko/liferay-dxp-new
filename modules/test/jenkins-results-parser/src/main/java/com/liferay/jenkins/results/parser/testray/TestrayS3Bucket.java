@@ -30,12 +30,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.nio.charset.StandardCharsets;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,104 +43,13 @@ import org.apache.commons.io.FileUtils;
 public class TestrayS3Bucket {
 
 	public static TestrayS3Bucket getInstance() {
-		String name = null;
-
-		try {
-			name = JenkinsResultsParserUtil.getBuildProperty(
-				"testray.s3.bucket");
-		}
-		catch (IOException ioException) {
-			System.out.println(
-				"WARNING: Unable to get bucket name from mirrors.");
-		}
-
-		return getInstance(name);
-	}
-
-	public static TestrayS3Bucket getInstance(String name) {
-		if (JenkinsResultsParserUtil.isNullOrEmpty(name)) {
-			name = DEFAULT_BUCKET_NAME;
-		}
-
-		TestrayS3Bucket testrayS3Bucket = _testrayS3Buckets.get(name);
-
-		if (testrayS3Bucket == null) {
-			testrayS3Bucket = new TestrayS3Bucket(name);
-
-			_testrayS3Buckets.put(name, testrayS3Bucket);
-		}
-
-		return testrayS3Bucket;
-	}
-
-	public static boolean hasGoogleApplicationCredentials() {
-		return hasGoogleApplicationCredentials(null);
-	}
-
-	public static boolean hasGoogleApplicationCredentials(String name) {
-		if (_hasGoogleApplicationCredentials != null) {
-			return _hasGoogleApplicationCredentials;
-		}
-
-		String googleApplicationCredentials = System.getenv(
-			"GOOGLE_APPLICATION_CREDENTIALS");
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(
-				googleApplicationCredentials)) {
-
-			System.out.println(
-				"WARNING: GOOGLE_APPLICATION_CREDENTIALS is not set");
-
-			_hasGoogleApplicationCredentials = false;
-
-			return _hasGoogleApplicationCredentials;
-		}
-
-		File googleApplicationCredentialsFile = new File(
-			googleApplicationCredentials);
-
-		if (!googleApplicationCredentialsFile.exists()) {
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"WARNING: GOOGLE_APPLICATION_CREDENTIALS=",
-					googleApplicationCredentials, " does not exist"));
-
-			_hasGoogleApplicationCredentials = false;
-
-			return _hasGoogleApplicationCredentials;
-		}
-
-		try {
-			TestrayS3Bucket testrayS3Bucket = getInstance(name);
-
-			testrayS3Bucket._getBucket();
-
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"INFO: Using GOOGLE_APPLICATION_CREDENTIALS=",
-					googleApplicationCredentials));
-
-			_hasGoogleApplicationCredentials = true;
-		}
-		catch (Exception exception) {
-			exception.printStackTrace();
-
-			System.out.println(
-				JenkinsResultsParserUtil.combine(
-					"WARNING: GOOGLE_APPLICATION_CREDENTIALS=",
-					googleApplicationCredentials,
-					" is configured incorrectly"));
-
-			_hasGoogleApplicationCredentials = false;
-		}
-
-		return _hasGoogleApplicationCredentials;
+		return _testrayS3Bucket;
 	}
 
 	public TestrayS3Object createTestrayS3Object(String key, File file) {
 		long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
 
-		BlobId blobId = BlobId.of(getName(), key);
+		BlobId blobId = BlobId.of(_bucket.getName(), key);
 
 		String fileName = file.getName();
 
@@ -180,9 +85,7 @@ public class TestrayS3Bucket {
 		BlobInfo blobInfo = blobInfoBuilder.build();
 
 		try {
-			Storage storage = _getStorage();
-
-			Blob blob = storage.create(
+			Blob blob = _storage.create(
 				blobInfo, FileUtils.readFileToByteArray(file));
 
 			TestrayS3Object testrayS3Object =
@@ -201,32 +104,6 @@ public class TestrayS3Bucket {
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
 		}
-	}
-
-	public TestrayS3Object createTestrayS3Object(String key, String value) {
-		long start = JenkinsResultsParserUtil.getCurrentTimeMillis();
-
-		BlobId blobId = BlobId.of(getName(), key);
-
-		BlobInfo.Builder blobInfoBuilder = BlobInfo.newBuilder(blobId);
-
-		BlobInfo blobInfo = blobInfoBuilder.build();
-
-		Storage storage = _getStorage();
-
-		Blob blob = storage.create(
-			blobInfo, value.getBytes(StandardCharsets.UTF_8));
-
-		TestrayS3Object testrayS3Object =
-			TestrayS3ObjectFactory.newTestrayS3Object(this, blob);
-
-		System.out.println(
-			JenkinsResultsParserUtil.combine(
-				"Created S3 Object ", testrayS3Object.getURLString(), " in ",
-				JenkinsResultsParserUtil.toDurationString(
-					JenkinsResultsParserUtil.getCurrentTimeMillis() - start)));
-
-		return testrayS3Object;
 	}
 
 	public List<TestrayS3Object> createTestrayS3Objects(File dir) {
@@ -261,18 +138,16 @@ public class TestrayS3Bucket {
 	}
 
 	public String getName() {
-		return _name;
+		return _bucket.getName();
 	}
 
 	public String getTestrayS3BaseURL() {
 		return JenkinsResultsParserUtil.combine(
-			"https://storage.cloud.google.com/", getName());
+			"https://storage.cloud.google.com/", _bucket.getName());
 	}
 
 	public TestrayS3Object getTestrayS3Object(String key) {
-		Bucket bucket = _getBucket();
-
-		Blob blob = bucket.get(key);
+		Blob blob = _bucket.get(key);
 
 		if (blob == null) {
 			return null;
@@ -284,9 +159,7 @@ public class TestrayS3Bucket {
 	public List<TestrayS3Object> getTestrayS3Objects() {
 		List<TestrayS3Object> testrayS3Objects = new ArrayList<>();
 
-		Storage storage = _getStorage();
-
-		Page<Blob> blobPage = storage.list(getName());
+		Page<Blob> blobPage = _storage.list(_bucket.getName());
 
 		for (Blob blob : blobPage.iterateAll()) {
 			testrayS3Objects.add(
@@ -301,37 +174,44 @@ public class TestrayS3Bucket {
 			return new URL(
 				JenkinsResultsParserUtil.combine(
 					"https://console.cloud.google.com/storage/browser/",
-					getName(), "?authuser=0"));
+					_bucket.getName(), "?authuser=0"));
 		}
 		catch (MalformedURLException malformedURLException) {
 			throw new RuntimeException(malformedURLException);
 		}
 	}
 
-	protected static final String DEFAULT_BUCKET_NAME = "testray-results";
+	private TestrayS3Bucket() {
+		String googleApplicationCredentials = System.getenv(
+			"GOOGLE_APPLICATION_CREDENTIALS");
 
-	private TestrayS3Bucket(String name) {
-		_name = name;
-	}
+		if (JenkinsResultsParserUtil.isNullOrEmpty(
+				googleApplicationCredentials)) {
 
-	private Bucket _getBucket() {
-		Storage storage = _getStorage();
+			throw new RuntimeException(
+				"Please set the environment variable " +
+					"\"GOOGLE_APPLICATION_CREDENTIALS\"");
+		}
 
-		return storage.get(getName());
-	}
-
-	private Storage _getStorage() {
 		StorageOptions storageOptions = StorageOptions.getDefaultInstance();
 
-		return storageOptions.getService();
+		_storage = storageOptions.getService();
+
+		try {
+			_bucket = _storage.get(
+				JenkinsResultsParserUtil.getBuildProperty("testray.s3.bucket"));
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	private static final Pattern _fileNamePattern = Pattern.compile(
 		".*\\.(?!gz)(?<fileExtension>([^\\.]+))(?<gzipFileExtension>\\.gz)?");
-	private static Boolean _hasGoogleApplicationCredentials;
-	private static final Map<String, TestrayS3Bucket> _testrayS3Buckets =
-		new HashMap<>();
+	private static final TestrayS3Bucket _testrayS3Bucket =
+		new TestrayS3Bucket();
 
-	private final String _name;
+	private final Bucket _bucket;
+	private final Storage _storage;
 
 }

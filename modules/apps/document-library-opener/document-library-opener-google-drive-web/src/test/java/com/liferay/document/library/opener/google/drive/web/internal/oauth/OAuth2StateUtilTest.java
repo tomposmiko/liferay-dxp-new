@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -58,8 +59,10 @@ public class OAuth2StateUtilTest {
 
 		OAuth2StateUtil.cleanUp(mockHttpServletRequest);
 
-		Assert.assertNull(
-			OAuth2StateUtil.getOAuth2State(mockHttpServletRequest));
+		Optional<OAuth2State> oAuth2StateOptional =
+			OAuth2StateUtil.getOAuth2StateOptional(mockHttpServletRequest);
+
+		Assert.assertFalse(oAuth2StateOptional.isPresent());
 	}
 
 	@Test
@@ -75,9 +78,12 @@ public class OAuth2StateUtilTest {
 
 		OAuth2StateUtil.save(mockHttpServletRequest, initialOAuth2State);
 
-		_assertOAuth2State(
-			initialOAuth2State, state,
-			OAuth2StateUtil.getOAuth2State(mockHttpServletRequest));
+		Optional<OAuth2State> oAuth2StateOptional =
+			OAuth2StateUtil.getOAuth2StateOptional(mockHttpServletRequest);
+
+		OAuth2State oAuth2State = oAuth2StateOptional.get();
+
+		_assertOAuth2State(initialOAuth2State, state, oAuth2State);
 	}
 
 	@Test
@@ -87,8 +93,10 @@ public class OAuth2StateUtilTest {
 
 		mockHttpServletRequest.setSession(new MockHttpSession());
 
-		Assert.assertNull(
-			OAuth2StateUtil.getOAuth2State(mockHttpServletRequest));
+		Optional<OAuth2State> oAuth2StateOptional =
+			OAuth2StateUtil.getOAuth2StateOptional(mockHttpServletRequest);
+
+		Assert.assertFalse(oAuth2StateOptional.isPresent());
 	}
 
 	@Test
@@ -137,9 +145,12 @@ public class OAuth2StateUtilTest {
 
 		OAuth2StateUtil.save(mockHttpServletRequest, initialOAuth2State);
 
-		_assertOAuth2State(
-			initialOAuth2State, state,
-			OAuth2StateUtil.getOAuth2State(mockHttpServletRequest));
+		Optional<OAuth2State> oAuth2StateOptional =
+			OAuth2StateUtil.getOAuth2StateOptional(mockHttpServletRequest);
+
+		OAuth2State oAuth2State = oAuth2StateOptional.get();
+
+		_assertOAuth2State(initialOAuth2State, state, oAuth2State);
 	}
 
 	private void _assertOAuth2State(

@@ -16,25 +16,16 @@ package com.liferay.commerce.notification.service.impl;
 
 import com.liferay.commerce.notification.model.CommerceNotificationTemplateCommerceAccountGroupRel;
 import com.liferay.commerce.notification.service.base.CommerceNotificationTemplateCommerceAccountGroupRelLocalServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.notification.model.CommerceNotificationTemplateCommerceAccountGroupRel",
-	service = AopService.class
-)
 public class CommerceNotificationTemplateCommerceAccountGroupRelLocalServiceImpl
 	extends CommerceNotificationTemplateCommerceAccountGroupRelLocalServiceBaseImpl {
 
@@ -45,7 +36,7 @@ public class CommerceNotificationTemplateCommerceAccountGroupRelLocalServiceImpl
 				long commerceAccountGroupId, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(serviceContext.getUserId());
+		User user = userLocalService.getUser(serviceContext.getUserId());
 		long groupId = serviceContext.getScopeGroupId();
 
 		long commerceNotificationTemplateCommerceAccountGroupRelId =
@@ -113,8 +104,5 @@ public class CommerceNotificationTemplateCommerceAccountGroupRelLocalServiceImpl
 			findByCommerceNotificationTemplateId(
 				commerceNotificationTemplateId, start, end, orderByComparator);
 	}
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

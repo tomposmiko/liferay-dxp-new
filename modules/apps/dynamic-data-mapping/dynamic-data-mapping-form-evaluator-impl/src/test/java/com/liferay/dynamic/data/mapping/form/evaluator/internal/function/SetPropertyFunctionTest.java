@@ -27,10 +27,12 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import org.powermock.api.mockito.PowerMockito;
+
 /**
  * @author Leonardo Barros
  */
-public class SetPropertyFunctionTest {
+public class SetPropertyFunctionTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -41,8 +43,8 @@ public class SetPropertyFunctionTest {
 	public void testApply() {
 		SetMultipleFunction setMultipleFunction = new SetMultipleFunction();
 
-		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver =
-			Mockito.spy(new DefaultDDMExpressionObserver());
+		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver = spy(
+			new DefaultDDMExpressionObserver());
 
 		setMultipleFunction.setDDMExpressionObserver(
 			spyDefaultDDMExpressionObserver);

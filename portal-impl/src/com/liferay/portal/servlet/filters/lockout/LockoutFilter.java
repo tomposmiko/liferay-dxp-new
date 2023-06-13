@@ -70,7 +70,7 @@ public class LockoutFilter extends BasePortalFilter {
 			return false;
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return false;
 		}

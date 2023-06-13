@@ -214,11 +214,6 @@ public class CTMessageWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CTMessageWrapper wrap(CTMessage ctMessage) {
 		return new CTMessageWrapper(ctMessage);
 	}

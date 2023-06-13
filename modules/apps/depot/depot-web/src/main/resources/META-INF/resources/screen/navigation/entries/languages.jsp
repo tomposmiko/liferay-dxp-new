@@ -21,9 +21,9 @@ DepotEntry depotEntry = (DepotEntry)request.getAttribute(DepotAdminWebKeys.DEPOT
 
 Group group = depotEntry.getGroup();
 
-UnicodeProperties typeSettingsUnicodeProperties = group.getTypeSettingsProperties();
+UnicodeProperties typeSettingsProperties = group.getTypeSettingsProperties();
 
-boolean inheritLocales = GetterUtil.getBoolean(typeSettingsUnicodeProperties.getProperty(GroupConstants.TYPE_SETTINGS_KEY_INHERIT_LOCALES), true);
+boolean inheritLocales = GetterUtil.getBoolean(typeSettingsProperties.getProperty(GroupConstants.TYPE_SETTINGS_KEY_INHERIT_LOCALES), true);
 %>
 
 <liferay-ui:error exception="<%= LocaleException.class %>">
@@ -57,7 +57,7 @@ boolean inheritLocales = GetterUtil.getBoolean(typeSettingsUnicodeProperties.get
 <div class="site-languages">
 
 	<%
-	User guestUser = company.getGuestUser();
+	User defaultUser = company.getDefaultUser();
 	%>
 
 	<react:component
@@ -66,7 +66,7 @@ boolean inheritLocales = GetterUtil.getBoolean(typeSettingsUnicodeProperties.get
 			HashMapBuilder.<String, Object>put(
 				"availableLocales", DepotLanguageUtil.getAvailableLocalesJSONArray(locale)
 			).put(
-				"defaultLocaleId", LocaleUtil.toLanguageId(guestUser.getLocale())
+				"defaultLocaleId", LocaleUtil.toLanguageId(defaultUser.getLocale())
 			).put(
 				"inheritLocales", inheritLocales
 			).put(

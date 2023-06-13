@@ -19,7 +19,12 @@
 <%@ include file="/layout/view/embedded_js.jspf" %>
 
 <div id="iframe">
-	<iframe frameborder="0" id="embeddedIframe" width="100%"></iframe>
+
+	<%
+	UnicodeProperties typeSettingsProperties = layout.getTypeSettingsProperties();
+	%>
+
+	<iframe frameborder="0" id="embeddedIframe" src="<%= HtmlUtil.escapeHREF(typeSettingsProperties.getProperty("embeddedLayoutURL")) %>" width="100%"></iframe>
 </div>
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />

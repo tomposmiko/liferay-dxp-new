@@ -293,32 +293,7 @@ public class NoticeableThreadPoolExecutorTest {
 	}
 
 	@Test
-	public void testRejectedByShutdownNoticeableThreadPoolExecutor()
-		throws InterruptedException {
-
-		BlockingQueue<Runnable> rejectedTasks = new LinkedBlockingQueue<>();
-
-		NoticeableThreadPoolExecutor noticeableThreadPoolExecutor =
-			new NoticeableThreadPoolExecutor(
-				1, 1, 1, TimeUnit.NANOSECONDS, new SynchronousQueue<>(),
-				new MethodNameThreadFactory(),
-				(runnable, threadPoolExecutor) -> rejectedTasks.add(runnable),
-				new ThreadPoolHandlerAdapter());
-
-		noticeableThreadPoolExecutor.shutdown();
-
-		Runnable runnable = () -> {
-		};
-
-		noticeableThreadPoolExecutor.execute(runnable);
-
-		Assert.assertSame(runnable, rejectedTasks.take());
-	}
-
-	@Test
-	public void testRejectedByShutdownWorkerThreadPoolExecutor()
-		throws InterruptedException {
-
+	public void testRejectedByShutdown() throws InterruptedException {
 		BlockingQueue<Runnable> rejectedTasks = new LinkedBlockingQueue<>();
 
 		NoticeableThreadPoolExecutor noticeableThreadPoolExecutor =

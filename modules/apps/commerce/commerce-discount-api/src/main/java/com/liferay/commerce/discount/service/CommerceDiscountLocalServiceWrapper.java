@@ -27,10 +27,6 @@ public class CommerceDiscountLocalServiceWrapper
 	implements CommerceDiscountLocalService,
 			   ServiceWrapper<CommerceDiscountLocalService> {
 
-	public CommerceDiscountLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceDiscountLocalServiceWrapper(
 		CommerceDiscountLocalService commerceDiscountLocalService) {
 
@@ -564,14 +560,35 @@ public class CommerceDiscountLocalServiceWrapper
 			commerceDiscountId);
 	}
 
+	/**
+	 * Returns the commerce discount with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce discount's external reference code
+	 * @return the matching commerce discount, or <code>null</code> if a matching commerce discount could not be found
+	 */
 	@Override
 	public com.liferay.commerce.discount.model.CommerceDiscount
 		fetchCommerceDiscountByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
+			long companyId, String externalReferenceCode) {
 
 		return _commerceDiscountLocalService.
 			fetchCommerceDiscountByExternalReferenceCode(
-				externalReferenceCode, companyId);
+				companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceDiscountByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.commerce.discount.model.CommerceDiscount
+		fetchCommerceDiscountByReferenceCode(
+			long companyId, String externalReferenceCode) {
+
+		return _commerceDiscountLocalService.
+			fetchCommerceDiscountByReferenceCode(
+				companyId, externalReferenceCode);
 	}
 
 	/**
@@ -587,16 +604,6 @@ public class CommerceDiscountLocalServiceWrapper
 
 		return _commerceDiscountLocalService.
 			fetchCommerceDiscountByUuidAndCompanyId(uuid, companyId);
-	}
-
-	@Override
-	public com.liferay.commerce.discount.model.CommerceDiscount
-		fetchDefaultCommerceDiscount(
-			long commerceChannelAccountEntryRelId, long cpDefinitionId,
-			long cpInstanceId) {
-
-		return _commerceDiscountLocalService.fetchDefaultCommerceDiscount(
-			commerceChannelAccountEntryRelId, cpDefinitionId, cpInstanceId);
 	}
 
 	@Override
@@ -853,15 +860,23 @@ public class CommerceDiscountLocalServiceWrapper
 			commerceDiscountId);
 	}
 
+	/**
+	 * Returns the commerce discount with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce discount's external reference code
+	 * @return the matching commerce discount
+	 * @throws PortalException if a matching commerce discount could not be found
+	 */
 	@Override
 	public com.liferay.commerce.discount.model.CommerceDiscount
 			getCommerceDiscountByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
+				long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceDiscountLocalService.
 			getCommerceDiscountByExternalReferenceCode(
-				externalReferenceCode, companyId);
+				companyId, externalReferenceCode);
 	}
 
 	/**
@@ -909,15 +924,6 @@ public class CommerceDiscountLocalServiceWrapper
 
 		return _commerceDiscountLocalService.getCommerceDiscounts(
 			companyId, couponCode);
-	}
-
-	@Override
-	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
-		getCommerceDiscounts(
-			long companyId, String level, boolean active, int status) {
-
-		return _commerceDiscountLocalService.getCommerceDiscounts(
-			companyId, level, active, status);
 	}
 
 	/**
@@ -1029,14 +1035,6 @@ public class CommerceDiscountLocalServiceWrapper
 
 		return _commerceDiscountLocalService.getUnqualifiedCommerceDiscounts(
 			companyId, target);
-	}
-
-	@Override
-	public int getValidCommerceDiscountsCount(
-		long commerceDiscountId, long cpDefinitionId, long cpInstanceId) {
-
-		return _commerceDiscountLocalService.getValidCommerceDiscountsCount(
-			commerceDiscountId, cpDefinitionId, cpInstanceId);
 	}
 
 	@Override

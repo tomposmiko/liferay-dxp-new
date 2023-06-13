@@ -35,6 +35,7 @@
 						"maxWidth": "none",
 						"minHeight": "auto",
 						"minWidth": "auto",
+						"opacity": "100",
 						"overflow": "visible",
 						"shadow": "shadow-none",
 						"textAlign": "none",

@@ -14,15 +14,13 @@
 
 package com.liferay.portal.file.install.internal.configuration;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.file.install.constants.FileInstallConstants;
+import com.liferay.portal.file.install.internal.DirectoryWatcher;
 import com.liferay.portal.file.install.internal.activator.FileInstallImplBundleActivator;
-import com.liferay.portal.file.install.properties.ConfigurationProperties;
-import com.liferay.portal.file.install.properties.ConfigurationPropertiesFactory;
+import com.liferay.portal.file.install.internal.properties.ConfigurationProperties;
+import com.liferay.portal.file.install.internal.properties.ConfigurationPropertiesFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,6 +28,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+
+import java.net.URI;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -72,7 +72,7 @@ public class FileSyncConfigurationListener implements ConfigurationListener {
 
 					if (dictionary != null) {
 						fileName = (String)dictionary.get(
-							FileInstallConstants.FELIX_FILE_INSTALL_FILENAME);
+							DirectoryWatcher.FILENAME);
 					}
 
 					if (fileName != null) {
@@ -105,7 +105,7 @@ public class FileSyncConfigurationListener implements ConfigurationListener {
 
 				if (dictionary != null) {
 					fileName = (String)dictionary.get(
-						FileInstallConstants.FELIX_FILE_INSTALL_FILENAME);
+						DirectoryWatcher.FILENAME);
 				}
 
 				File file = null;
@@ -115,20 +115,6 @@ public class FileSyncConfigurationListener implements ConfigurationListener {
 				}
 
 				if ((file != null) && file.isFile()) {
-					if (!file.canWrite()) {
-						if (_log.isInfoEnabled()) {
-							_log.info(
-								StringBundler.concat(
-									"Unable to save configuration because the ",
-									"file ", file.getAbsolutePath(),
-									" is not writable"));
-						}
-
-						_pidToFile.remove(configuration.getPid(), fileName);
-
-						return;
-					}
-
 					_pidToFile.put(configuration.getPid(), fileName);
 
 					ConfigurationProperties configurationProperties =
@@ -141,10 +127,7 @@ public class FileSyncConfigurationListener implements ConfigurationListener {
 							!Objects.equals(Constants.SERVICE_PID, key) &&
 							!Objects.equals(
 								ConfigurationAdmin.SERVICE_FACTORYPID, key) &&
-							!Objects.equals(
-								FileInstallConstants.
-									FELIX_FILE_INSTALL_FILENAME,
-								key)) {
+							!Objects.equals(DirectoryWatcher.FILENAME, key)) {
 
 							toRemovePropertyKeys.add(key);
 						}
@@ -158,10 +141,7 @@ public class FileSyncConfigurationListener implements ConfigurationListener {
 						if (!Objects.equals(Constants.SERVICE_PID, key) &&
 							!Objects.equals(
 								ConfigurationAdmin.SERVICE_FACTORYPID, key) &&
-							!Objects.equals(
-								FileInstallConstants.
-									FELIX_FILE_INSTALL_FILENAME,
-								key)) {
+							!Objects.equals(DirectoryWatcher.FILENAME, key)) {
 
 							Object value = dictionary.get(key);
 
@@ -213,7 +193,7 @@ public class FileSyncConfigurationListener implements ConfigurationListener {
 	}
 
 	private File _fromConfigKey(String key) {
-		return new File(PropsValues.MODULE_FRAMEWORK_CONFIGS_DIR, key);
+		return new File(URI.create(key));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

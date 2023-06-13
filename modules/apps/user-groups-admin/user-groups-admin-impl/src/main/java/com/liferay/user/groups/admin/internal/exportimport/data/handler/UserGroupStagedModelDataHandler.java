@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Mendez Gonzalez
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class UserGroupStagedModelDataHandler
 	extends BaseStagedModelDataHandler<UserGroup> {
 
@@ -150,10 +150,19 @@ public class UserGroupStagedModelDataHandler
 		portletDataContext.importClassedModel(userGroup, importedUserGroup);
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setUserGroupLocalService(
+		UserGroupLocalService userGroupLocalService) {
+
+		_userGroupLocalService = userGroupLocalService;
+	}
+
+	private GroupLocalService _groupLocalService;
 	private UserGroupLocalService _userGroupLocalService;
 
 }

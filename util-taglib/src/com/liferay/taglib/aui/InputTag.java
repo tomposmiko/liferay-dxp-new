@@ -15,7 +15,6 @@
 package com.liferay.taglib.aui;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.servlet.taglib.aui.ValidatorTag;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -55,17 +54,7 @@ public class InputTag extends BaseInputTag {
 		addModelValidatorTags();
 
 		if (getRequired()) {
-			String label = getLabel();
-
-			if (label == null) {
-				label = LanguageUtil.get(
-					getRequest(),
-					TextFormatter.format(getName(), TextFormatter.K));
-			}
-
-			addRequiredValidatorTag(
-				LanguageUtil.format(
-					getRequest(), "the-x-field-is-required", label));
+			addRequiredValidatorTag();
 		}
 
 		return super.doStartTag();
@@ -88,7 +77,9 @@ public class InputTag extends BaseInputTag {
 
 				baseType = type;
 			}
-			else if (Objects.equals(type, "toggle-switch")) {
+			else if (Objects.equals(type, "toggle-card") ||
+					 Objects.equals(type, "toggle-switch")) {
+
 				baseType = "checkbox";
 			}
 		}
@@ -159,21 +150,6 @@ public class InputTag extends BaseInputTag {
 			String validatorErrorMessage = (String)modelValidator.getObject(2);
 			String validatorValue = (String)modelValidator.getObject(3);
 			boolean customValidator = (Boolean)modelValidator.getObject(4);
-
-			if (Objects.equals(validatorName, "required") &&
-				Validator.isNull(validatorErrorMessage)) {
-
-				String label = getLabel();
-
-				if (label == null) {
-					label = LanguageUtil.get(
-						getRequest(),
-						TextFormatter.format(getName(), TextFormatter.K));
-				}
-
-				validatorErrorMessage = LanguageUtil.format(
-					getRequest(), "the-x-field-is-required", label);
-			}
 
 			ValidatorTag validatorTag = new ValidatorTagImpl(
 				validatorName, validatorErrorMessage, validatorValue,
@@ -260,7 +236,9 @@ public class InputTag extends BaseInputTag {
 
 				id = AUIUtil.normalizeId(fieldParam);
 			}
-			else if (!Objects.equals(type, "radio")) {
+			else if (!Objects.equals(type, "assetTags") &&
+					 !Objects.equals(type, "radio")) {
+
 				id = AUIUtil.normalizeId(name);
 			}
 			else {
@@ -271,6 +249,10 @@ public class InputTag extends BaseInputTag {
 		}
 
 		String forLabel = id;
+
+		if (Objects.equals(type, "assetTags")) {
+			forLabel = forLabel.concat("assetTagNames");
+		}
 
 		String languageId = getLanguageId();
 

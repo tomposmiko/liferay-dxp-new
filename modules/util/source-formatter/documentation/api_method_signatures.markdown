@@ -23,33 +23,33 @@ the following exceptions are allowed:
 `Portal`, `Portlet`, `Renderer`, `Request`, `Session`, `Template`, `Theme`,
 `URL`
 
-1. The name of the method contains any of the following:
+2. The name of the method contains any of the following:
 
    `JSP`, `PortletURL`
 
-1. The name of the method starts with any of the following:
+3. The name of the method starts with any of the following:
 
    `include`, `render`
 
-1. The name of the package contains any of the following:
+4. The name of the package contains any of the following:
 
    `alloy.mvc`, `auth`, `axis`, `display.context`, `http`, `jsp`,
 `layoutconfiguration.util`, `portal.action`, `portal.events`, `portlet`,
 `server.manager`, `servlet`, `spi.agent`, `sso`, `struts`
 
-1. The name of the package starts with any of the following:
+5. The name of the package starts with any of the following:
 
    `com.liferay.frontend`, `com.liferay.portal.jsonwebservice`,
 `com.liferay.portal.language`, `com.liferay.portal.layoutconfiguration`
 
-1. The name of the package contains both `template` and `internal`
+6. The name of the package contains both `template` and `internal`
 
-1. The name of the package contains both `web` and `internal`
+7. The name of the package contains both `web` and `internal`
 
-1. The name of the package contains both `web` and `util`
+8. The name of the package contains both `web` and `util`
 ___
 For **`ServiceContext`**, the following exceptions are allowed:
 
 1. The name of the package contains `service`
 
-1. The class is inside a module and the name of the module ends with `-service`
+2. The class is inside a module and the name of the module ends with `-service`

@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.User",
 	service = ModelIndexerWriterContributor.class
 )
@@ -42,7 +43,7 @@ public class UserModelIndexerWriterContributor
 
 		batchIndexingActionable.setPerformActionMethod(
 			(User user) -> {
-				if (!user.isGuestUser()) {
+				if (!user.isDefaultUser()) {
 					batchIndexingActionable.addDocuments(
 						modelIndexerWriterDocumentHelper.getDocument(user));
 				}

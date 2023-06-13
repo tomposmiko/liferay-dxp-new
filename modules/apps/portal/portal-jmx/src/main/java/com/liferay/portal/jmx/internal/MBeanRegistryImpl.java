@@ -46,7 +46,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Michael C. Han
  */
-@Component(service = MBeanRegistry.class)
+@Component(immediate = true, service = MBeanRegistry.class)
 public class MBeanRegistryImpl implements MBeanRegistry {
 
 	@Override
@@ -86,7 +86,9 @@ public class MBeanRegistryImpl implements MBeanRegistry {
 		}
 		catch (InstanceAlreadyExistsException instanceAlreadyExistsException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(instanceAlreadyExistsException);
+				_log.debug(
+					instanceAlreadyExistsException,
+					instanceAlreadyExistsException);
 			}
 
 			unregister(objectCacheKey, objectName);

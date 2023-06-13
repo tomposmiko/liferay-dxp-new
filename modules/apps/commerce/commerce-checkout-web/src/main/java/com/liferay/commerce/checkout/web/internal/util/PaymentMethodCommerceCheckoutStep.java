@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.checkout.step.name=" + PaymentMethodCommerceCheckoutStep.NAME,
 		"commerce.checkout.step.order:Integer=40"
@@ -90,7 +91,7 @@ public class PaymentMethodCommerceCheckoutStep
 		throws Exception {
 
 		try {
-			_updateCommerceOrderPaymentMethod(actionRequest);
+			updateCommerceOrderPaymentMethod(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof CommerceOrderPaymentMethodException) {
@@ -123,7 +124,17 @@ public class PaymentMethodCommerceCheckoutStep
 			"/checkout_step/payment_method.jsp");
 	}
 
-	private void _updateCommerceOrderPaymentMethod(ActionRequest actionRequest)
+	@Reference(
+		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<CommerceOrder> modelResourcePermission) {
+
+		_commerceOrderModelResourcePermission = modelResourcePermission;
+	}
+
+	protected void updateCommerceOrderPaymentMethod(ActionRequest actionRequest)
 		throws Exception {
 
 		String commercePaymentMethodKey = ParamUtil.getString(
@@ -154,22 +165,15 @@ public class PaymentMethodCommerceCheckoutStep
 			return;
 		}
 
-		commerceOrder = _commerceOrderLocalService.updateCommerceOrder(
-			null, commerceOrder.getCommerceOrderId(),
+		_commerceOrderLocalService.updateCommerceOrder(
+			commerceOrder.getCommerceOrderId(),
 			commerceOrder.getBillingAddressId(),
+			commerceOrder.getShippingAddressId(), commercePaymentMethodKey,
 			commerceOrder.getCommerceShippingMethodId(),
-			commerceOrder.getShippingAddressId(),
-			commerceOrder.getAdvanceStatus(), commercePaymentMethodKey,
-			commerceOrder.getPurchaseOrderNumber(),
-			commerceOrder.getShippingAmount(),
-			commerceOrder.getShippingOptionName(), commerceOrder.getSubtotal(),
-			commerceOrder.getTotal(), commerceContext);
-
-		_commerceOrderLocalService.resetTermsAndConditions(
-			commerceOrder.getCommerceOrderId(), false, true);
-
-		actionRequest.setAttribute(
-			CommerceCheckoutWebKeys.COMMERCE_ORDER, commerceOrder);
+			commerceOrder.getShippingOptionName(),
+			commerceOrder.getPurchaseOrderNumber(), commerceOrder.getSubtotal(),
+			commerceOrder.getShippingAmount(), commerceOrder.getTotal(),
+			commerceOrder.getAdvanceStatus(), commerceContext);
 	}
 
 	@Reference
@@ -178,9 +182,6 @@ public class PaymentMethodCommerceCheckoutStep
 	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"
-	)
 	private ModelResourcePermission<CommerceOrder>
 		_commerceOrderModelResourcePermission;
 

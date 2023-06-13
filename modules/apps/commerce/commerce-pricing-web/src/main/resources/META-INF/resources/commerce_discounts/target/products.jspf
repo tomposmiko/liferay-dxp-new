@@ -40,7 +40,7 @@
 						.then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 								id:
-									'<%= CommercePricingFDSNames.DISCOUNT_PRODUCT_DEFINITIONS %>',
+									'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_PRODUCT_DEFINITIONS %>',
 							});
 						})
 						.catch((error) => {
@@ -61,7 +61,7 @@
 					itemSelectedMessage: '<%= LanguageUtil.get(request, "product-selected") %>',
 					itemsKey: 'id',
 					linkedDatasetsId: [
-						'<%= CommercePricingFDSNames.DISCOUNT_PRODUCT_DEFINITIONS %>',
+						'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_PRODUCT_DEFINITIONS %>',
 					],
 					onItemSelected: selectItem,
 					pageSize: 10,
@@ -78,7 +78,7 @@
 							fieldName: ['catalog', 'name'],
 						},
 					],
-					spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 					titleLabel: '<%= LanguageUtil.get(request, "add-existing-product") %>',
 				});
 			</aui:script>
@@ -89,12 +89,15 @@
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "products") %>'
 			>
-				<frontend-data-set:headless-display
+				<clay:headless-data-set-display
 					apiURL="<%= commerceDiscountDisplayContext.getDiscountCPDefinitionApiURL() %>"
-					fdsActionDropdownItems="<%= commerceDiscountDisplayContext.getDiscountCPDefinitionFDSActionDropdownItems() %>"
-					formName="fm"
-					id="<%= CommercePricingFDSNames.DISCOUNT_PRODUCT_DEFINITIONS %>"
+					clayDataSetActionDropdownItems="<%= commerceDiscountDisplayContext.getDiscountCPDefinitionClayDataSetActionDropdownItems() %>"
+					formId="fm"
+					id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_PRODUCT_DEFINITIONS %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= portletDiscountRuleURL %>"
 				/>
 			</commerce-ui:panel>
 		</div>

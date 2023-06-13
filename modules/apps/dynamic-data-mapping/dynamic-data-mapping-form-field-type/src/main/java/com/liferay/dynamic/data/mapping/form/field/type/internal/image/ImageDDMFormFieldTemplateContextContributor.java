@@ -25,14 +25,12 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.DownloadFileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
@@ -49,21 +47,26 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * @author Carlos Lancha
  */
 @Component(
-	property = "ddm.form.field.type.name=image",
-	service = DDMFormFieldTemplateContextContributor.class
+	immediate = true, property = "ddm.form.field.type.name=image",
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		ImageDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class ImageDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -75,7 +78,7 @@ public class ImageDDMFormFieldTemplateContextContributor
 
 		return HashMapBuilder.<String, Object>put(
 			"itemSelectorURL",
-			_getItemSelectorURL(
+			getItemSelectorURL(
 				ddmFormFieldRenderingContext.getHttpServletRequest(),
 				ddmFormFieldRenderingContext)
 		).put(
@@ -103,16 +106,46 @@ public class ImageDDMFormFieldTemplateContextContributor
 		).build();
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerList = ServiceTrackerListFactory.open(
-			bundleContext,
-			ImageDDMFormFieldItemSelectorCriterionContributor.class);
-	}
+	protected String getItemSelectorURL(
+		HttpServletRequest httpServletRequest,
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerList.close();
+		if (_itemSelector == null) {
+			return null;
+		}
+
+		List<ItemSelectorCriterion> itemSelectorCriteria = new ArrayList<>();
+
+		ImageItemSelectorCriterion imageItemSelectorCriterion =
+			new ImageItemSelectorCriterion();
+
+		imageItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			new DownloadFileEntryItemSelectorReturnType());
+
+		itemSelectorCriteria.add(imageItemSelectorCriterion);
+
+		for (ImageDDMFormFieldItemSelectorCriterionContributor
+				imageDDMFormFieldItemSelectorCriterionContributor :
+					_imageDDMFormFieldItemSelectorCriterionContributors) {
+
+			if (!imageDDMFormFieldItemSelectorCriterionContributor.isVisible(
+					ddmFormFieldRenderingContext)) {
+
+				continue;
+			}
+
+			itemSelectorCriteria.add(
+				imageDDMFormFieldItemSelectorCriterionContributor.
+					getItemSelectorCriterion(ddmFormFieldRenderingContext));
+		}
+
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
+			ddmFormFieldRenderingContext.getPortletNamespace() +
+				"selectDocumentLibrary",
+			itemSelectorCriteria.toArray(new ItemSelectorCriterion[0]));
+
+		return itemSelectorURL.toString();
 	}
 
 	protected String getValue(String value) {
@@ -142,11 +175,31 @@ public class ImageDDMFormFieldTemplateContextContributor
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return value;
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void setImageDDMFormFieldItemSelectorCriterionContributor(
+		ImageDDMFormFieldItemSelectorCriterionContributor
+			imageDDMFormFieldItemSelectorCriterionContributor) {
+
+		_imageDDMFormFieldItemSelectorCriterionContributors.add(
+			imageDDMFormFieldItemSelectorCriterionContributor);
+	}
+
+	protected void unsetImageDDMFormFieldItemSelectorCriterionContributor(
+		ImageDDMFormFieldItemSelectorCriterionContributor
+			imageDDMFormFieldItemSelectorCriterionContributor) {
+
+		_imageDDMFormFieldItemSelectorCriterionContributors.remove(
+			imageDDMFormFieldItemSelectorCriterionContributor);
 	}
 
 	private FileEntry _getFileEntry(JSONObject valueJSONObject) {
@@ -157,52 +210,11 @@ public class ImageDDMFormFieldTemplateContextContributor
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to get file entry", portalException);
+				_log.debug("Unable to retrieve file entry ", portalException);
 			}
 
 			return null;
 		}
-	}
-
-	private String _getItemSelectorURL(
-		HttpServletRequest httpServletRequest,
-		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
-
-		if (_itemSelector == null) {
-			return null;
-		}
-
-		List<ItemSelectorCriterion> itemSelectorCriteria = new ArrayList<>();
-
-		ImageItemSelectorCriterion imageItemSelectorCriterion =
-			new ImageItemSelectorCriterion();
-
-		imageItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new DownloadFileEntryItemSelectorReturnType());
-
-		itemSelectorCriteria.add(imageItemSelectorCriterion);
-
-		for (ImageDDMFormFieldItemSelectorCriterionContributor
-				imageDDMFormFieldItemSelectorCriterionContributor :
-					_serviceTrackerList) {
-
-			if (!imageDDMFormFieldItemSelectorCriterionContributor.isVisible(
-					ddmFormFieldRenderingContext)) {
-
-				continue;
-			}
-
-			itemSelectorCriteria.add(
-				imageDDMFormFieldItemSelectorCriterionContributor.
-					getItemSelectorCriterion(ddmFormFieldRenderingContext));
-		}
-
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
-				ddmFormFieldRenderingContext.getPortletNamespace() +
-					"selectDocumentLibrary",
-				itemSelectorCriteria.toArray(new ItemSelectorCriterion[0])));
 	}
 
 	private String _getMessage(Locale defaultLocale, String value) {
@@ -222,13 +234,13 @@ public class ImageDDMFormFieldTemplateContextContributor
 		FileEntry fileEntry = _getFileEntry(valueJSONObject);
 
 		if (fileEntry == null) {
-			return _language.get(
+			return LanguageUtil.get(
 				_getResourceBundle(defaultLocale),
 				"the-selected-image-was-deleted");
 		}
 
 		if (fileEntry.isInTrash()) {
-			return _language.get(
+			return LanguageUtil.get(
 				_getResourceBundle(defaultLocale),
 				"the-selected-image-was-moved-to-the-recycle-bin");
 		}
@@ -252,7 +264,7 @@ public class ImageDDMFormFieldTemplateContextContributor
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
+				_log.debug(jsonException, jsonException);
 			}
 
 			return null;
@@ -268,6 +280,10 @@ public class ImageDDMFormFieldTemplateContextContributor
 	@Reference
 	private DLURLHelper _dlURLHelper;
 
+	private final List<ImageDDMFormFieldItemSelectorCriterionContributor>
+		_imageDDMFormFieldItemSelectorCriterionContributors =
+			new CopyOnWriteArrayList<>();
+
 	@Reference
 	private ItemSelector _itemSelector;
 
@@ -275,12 +291,6 @@ public class ImageDDMFormFieldTemplateContextContributor
 	private JSONFactory _jsonFactory;
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
-
-	private ServiceTrackerList
-		<ImageDDMFormFieldItemSelectorCriterionContributor> _serviceTrackerList;
 
 }

@@ -18,30 +18,25 @@ import com.liferay.oauth2.provider.rest.spi.bearer.token.provider.BearerTokenPro
 import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PropsImpl;
 
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Tomas Polesovsky
  */
-public class DefaultBearerTokenProviderTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+@PrepareForTest(SecureRandomUtil.class)
+@RunWith(PowerMockRunner.class)
+public class DefaultBearerTokenProviderTest extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
@@ -61,16 +56,13 @@ public class DefaultBearerTokenProviderTest {
 
 		_defaultBearerTokenProvider.activate(properties);
 
-		Mockito.when(
+		mockStatic(SecureRandomUtil.class);
+
+		when(
 			SecureRandomUtil.nextLong()
 		).thenReturn(
 			_TOKEN_KEY_LONG
 		);
-	}
-
-	@After
-	public void tearDown() {
-		_secureRandomUtilMockedStatic.close();
 	}
 
 	@Test
@@ -102,18 +94,18 @@ public class DefaultBearerTokenProviderTest {
 
 		Assert.assertTrue(
 			_defaultBearerTokenProvider.isValid(
-				_generateAccessToken(_ACCESS_TOKEN_EXPIRES_IN, issuedAtNow)));
+				generateAccessToken(_ACCESS_TOKEN_EXPIRES_IN, issuedAtNow)));
 		Assert.assertFalse(
 			_defaultBearerTokenProvider.isValid(
-				_generateAccessToken(-1, issuedAtNow)));
+				generateAccessToken(-1, issuedAtNow)));
 		Assert.assertFalse(
 			_defaultBearerTokenProvider.isValid(
-				_generateAccessToken(
+				generateAccessToken(
 					_ACCESS_TOKEN_EXPIRES_IN,
 					issuedAtNow - (_ACCESS_TOKEN_EXPIRES_IN + 1))));
 		Assert.assertFalse(
 			_defaultBearerTokenProvider.isValid(
-				_generateAccessToken(
+				generateAccessToken(
 					_ACCESS_TOKEN_EXPIRES_IN,
 					issuedAtNow + _ACCESS_TOKEN_EXPIRES_IN)));
 	}
@@ -124,26 +116,25 @@ public class DefaultBearerTokenProviderTest {
 
 		Assert.assertTrue(
 			_defaultBearerTokenProvider.isValid(
-				_generateRefreshToken(_REFRESH_TOKEN_EXPIRES_IN, issuedAtNow)));
+				generateRefreshToken(_REFRESH_TOKEN_EXPIRES_IN, issuedAtNow)));
 		Assert.assertFalse(
 			_defaultBearerTokenProvider.isValid(
-				_generateRefreshToken(-1, issuedAtNow)));
+				generateRefreshToken(-1, issuedAtNow)));
 		Assert.assertFalse(
 			_defaultBearerTokenProvider.isValid(
-				_generateRefreshToken(
+				generateRefreshToken(
 					_REFRESH_TOKEN_EXPIRES_IN,
 					issuedAtNow - (_REFRESH_TOKEN_EXPIRES_IN + 1))));
 		Assert.assertFalse(
 			_defaultBearerTokenProvider.isValid(
-				_generateRefreshToken(
+				generateRefreshToken(
 					_REFRESH_TOKEN_EXPIRES_IN,
 					issuedAtNow + _REFRESH_TOKEN_EXPIRES_IN)));
 	}
 
 	@Test
 	public void testOnBeforeCreateAccessToken() {
-		BearerTokenProvider.AccessToken accessToken = _generateAccessToken(
-			0, 0);
+		BearerTokenProvider.AccessToken accessToken = generateAccessToken(0, 0);
 
 		_defaultBearerTokenProvider.onBeforeCreate(accessToken);
 
@@ -155,7 +146,7 @@ public class DefaultBearerTokenProviderTest {
 
 	@Test
 	public void testOnBeforeCreateRefreshToken() {
-		BearerTokenProvider.RefreshToken refreshToken = _generateRefreshToken(
+		BearerTokenProvider.RefreshToken refreshToken = generateRefreshToken(
 			0, 0);
 
 		_defaultBearerTokenProvider.onBeforeCreate(refreshToken);
@@ -166,7 +157,7 @@ public class DefaultBearerTokenProviderTest {
 			_TOKEN_KEY_STRING_32_BYTES_HEX, refreshToken.getTokenKey());
 	}
 
-	private BearerTokenProvider.AccessToken _generateAccessToken(
+	protected BearerTokenProvider.AccessToken generateAccessToken(
 		long expiresIn, long issuedAt) {
 
 		return new BearerTokenProvider.AccessToken(
@@ -174,7 +165,7 @@ public class DefaultBearerTokenProviderTest {
 			null, null, null, null, null, null, 0, null);
 	}
 
-	private BearerTokenProvider.RefreshToken _generateRefreshToken(
+	protected BearerTokenProvider.RefreshToken generateRefreshToken(
 		long expiresIn, long issuedAt) {
 
 		return new BearerTokenProvider.RefreshToken(
@@ -196,7 +187,5 @@ public class DefaultBearerTokenProviderTest {
 		"decadefeededbabedecadefeededbabedecadefeededbabedecadefeededbabe";
 
 	private DefaultBearerTokenProvider _defaultBearerTokenProvider;
-	private final MockedStatic<SecureRandomUtil> _secureRandomUtilMockedStatic =
-		Mockito.mockStatic(SecureRandomUtil.class);
 
 }

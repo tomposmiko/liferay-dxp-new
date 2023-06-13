@@ -18,7 +18,6 @@ import com.liferay.oauth2.provider.service.impl.OAuth2ApplicationScopeAliasesLoc
 import com.liferay.oauth2.provider.util.builder.OAuth2ScopeBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.AbstractMap;
 import java.util.Collection;
@@ -27,27 +26,27 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.apache.commons.compress.utils.Sets;
 
 import org.hamcrest.CoreMatchers;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Stian Sigvartsen
  */
-public class OAuth2ScopeBuilderImplTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+@RunWith(PowerMockRunner.class)
+public class OAuth2ScopeBuilderImplTest extends PowerMockito {
 
 	@Test
 	public void testApplicationIsolation() {
@@ -232,12 +231,17 @@ public class OAuth2ScopeBuilderImplTest {
 			simpeEntryScopeAliases2.toString(), simpeEntryScopeAliases1.size(),
 			simpeEntryScopeAliases2.size());
 
-		for (Map.Entry<Map.Entry<String, String>, Set<String>> entry :
-				simpeEntryScopeAliases1.entrySet()) {
+		Set<Map.Entry<Map.Entry<String, String>, Set<String>>> entrySet =
+			simpeEntryScopeAliases1.entrySet();
 
-			Assert.assertEquals(
-				entry.getValue(), simpeEntryScopeAliases2.get(entry.getKey()));
-		}
+		Stream<Map.Entry<Map.Entry<String, String>, Set<String>>> stream =
+			entrySet.stream();
+
+		Assert.assertTrue(
+			stream.allMatch(
+				entry -> Objects.equals(
+					entry.getValue(),
+					simpeEntryScopeAliases2.get(entry.getKey()))));
 
 		// Test separate calls result in each scope mapping to a different scope
 		// alias

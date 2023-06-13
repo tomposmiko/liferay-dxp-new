@@ -12,11 +12,11 @@
  * details.
  */
 
-import MapGoogleMaps from '@liferay/map-google-maps/js/MapGoogleMaps';
-import MapOpenStreetMap from '@liferay/map-openstreetmap/js/MapOpenStreetMap';
+import MapGoogleMaps from '@liferay/map-google-maps/js/MapGoogleMaps.es';
+import MapOpenStreetMap from '@liferay/map-openstreetmap/js/MapOpenStreetMap.es';
 import {parseName} from 'data-engine-js-components-web';
 import Leaflet from 'leaflet';
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 export const MAP_PROVIDER = {
 	googleMaps: 'GoogleMaps',
@@ -97,7 +97,7 @@ const setupGoogleMaps = (googleMapsAPIKey, callback) => {
 	}
 };
 
-export function useGeolocation({
+export const useGeolocation = ({
 	disabled,
 	googleMapsAPIKey,
 	instanceId,
@@ -106,8 +106,19 @@ export function useGeolocation({
 	onChange,
 	value,
 	viewMode,
-}) {
-	const mapRef = useRef(null);
+}) => {
+	const eventHandlerPositionChanged = useCallback(
+		(event) => {
+			const {
+				newVal: {location},
+			} = event;
+
+			onChange(JSON.stringify(location));
+		},
+		[onChange]
+	);
+
+	const map = useRef(null);
 
 	useEffect(() => {
 		if (!disabled || viewMode) {
@@ -124,11 +135,11 @@ export function useGeolocation({
 			}
 
 			const registerMapBase = (MapProvider, mapConfig) => {
-				mapRef.current = new MapProvider(mapConfig);
+				map.current = new MapProvider(mapConfig);
 
 				Liferay.MapBase.register(
 					getMapName(name),
-					mapRef.current,
+					map.current,
 					`#map_${instanceId}`
 				);
 			};
@@ -152,23 +163,23 @@ export function useGeolocation({
 		}
 
 		return () => {
-			if (mapRef.current) {
-				mapRef.current.dispose();
+			if (map.current) {
+				map.current.dispose();
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
-		if (mapRef.current) {
-			mapRef.current.removeAllListeners('positionChange');
+		if (map.current) {
+			map.current.removeAllListeners('positionChange');
 
-			mapRef.current.on('positionChange', onChange);
+			map.current.on('positionChange', eventHandlerPositionChanged);
 		}
-	}, [onChange]);
+	}, [eventHandlerPositionChanged]);
 
 	useEffect(() => {
-		if (value && mapRef.current) {
+		if (value && map.current) {
 			let _value = value;
 
 			if (typeof _value !== 'string') {
@@ -179,7 +190,7 @@ export function useGeolocation({
 				.getElementById(`input_value_${instanceId}`)
 				.setAttribute('value', _value);
 
-			mapRef.current.setCenter(parseJSONValue(value));
+			map.current.setCenter(parseJSONValue(value));
 		}
 	}, [instanceId, value]);
-}
+};

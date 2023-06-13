@@ -17,9 +17,9 @@ package com.liferay.asset.categories.navigation.web.internal.display.context;
 import com.liferay.asset.categories.navigation.web.internal.configuration.AssetCategoriesNavigationPortletInstanceConfiguration;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyConstants;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
 import com.liferay.depot.util.SiteConnectedGroupGroupProviderUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -28,13 +28,20 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.KeyValuePairComparator;
+import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -86,7 +93,7 @@ public class AssetCategoriesNavigationDisplayContext {
 		catch (PortalException portalException) {
 			groupIds = new long[] {themeDisplay.getScopeGroupId()};
 
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		_assetVocabularies = AssetVocabularyServiceUtil.getGroupVocabularies(
@@ -101,9 +108,34 @@ public class AssetCategoriesNavigationDisplayContext {
 			return _assetVocabularyIds;
 		}
 
-		_assetVocabularyIds = TransformUtil.transformToLongArray(
-			getDDMTemplateAssetVocabularies(),
-			AssetVocabulary::getVocabularyId);
+		_assetVocabularyIds = getAvailableAssetVocabularyIds();
+
+		String[] assetVocabularyIdsArray =
+			_assetCategoriesNavigationPortletInstanceConfiguration.
+				assetVocabularyIds();
+
+		if (!_assetCategoriesNavigationPortletInstanceConfiguration.
+				allAssetVocabularies() &&
+			(assetVocabularyIdsArray != null)) {
+
+			String assetVocabularyIds = StringUtil.merge(
+				assetVocabularyIdsArray);
+
+			long[] configuredAssetVocabularyIds = StringUtil.split(
+				assetVocabularyIds, 0L);
+
+			LongStream longStream = Arrays.stream(configuredAssetVocabularyIds);
+
+			_assetVocabularyIds = longStream.filter(
+				assetVocabularyId -> {
+					AssetVocabulary assetVocabulary =
+						AssetVocabularyLocalServiceUtil.fetchAssetVocabulary(
+							assetVocabularyId);
+
+					return assetVocabulary != null;
+				}
+			).toArray();
+		}
 
 		return _assetVocabularyIds;
 	}
@@ -113,71 +145,88 @@ public class AssetCategoriesNavigationDisplayContext {
 			return _availableAssetVocabularyIds;
 		}
 
-		_availableAssetVocabularyIds = TransformUtil.transformToLongArray(
-			getAssetVocabularies(), AssetVocabulary::getVocabularyId);
+		List<AssetVocabulary> assetVocabularies = getAssetVocabularies();
+
+		_availableAssetVocabularyIds = new long[assetVocabularies.size()];
+
+		for (int i = 0; i < assetVocabularies.size(); i++) {
+			AssetVocabulary assetVocabulary = assetVocabularies.get(i);
+
+			_availableAssetVocabularyIds[i] = assetVocabulary.getVocabularyId();
+		}
 
 		return _availableAssetVocabularyIds;
 	}
 
 	public List<KeyValuePair> getAvailableVocabularyNames() {
-		List<AssetVocabulary> ddmTemplateAssetVocabularies =
-			getDDMTemplateAssetVocabularies();
+		long[] assetVocabularyIds = getAssetVocabularyIds();
 
-		List<KeyValuePair> vocabularyNames = TransformUtil.transform(
-			getAssetVocabularies(),
-			assetVocabulary -> {
-				if (ddmTemplateAssetVocabularies.contains(assetVocabulary)) {
-					return null;
-				}
+		Arrays.sort(assetVocabularyIds);
 
-				return _toKeyValuePair(assetVocabulary);
-			});
+		Set<Long> availableAssetVocabularyIdsSet = SetUtil.fromArray(
+			getAvailableAssetVocabularyIds());
 
-		vocabularyNames.sort(new KeyValuePairComparator(false, true));
+		Stream<Long> availableAssetVocabularyIdsStream =
+			availableAssetVocabularyIdsSet.stream();
 
-		return vocabularyNames;
+		return availableAssetVocabularyIdsStream.filter(
+			assetVocabularyId ->
+				Arrays.binarySearch(assetVocabularyIds, assetVocabularyId) < 0
+		).map(
+			AssetVocabularyLocalServiceUtil::fetchAssetVocabulary
+		).map(
+			this::_toKeyValuePair
+		).sorted(
+			new KeyValuePairComparator(false, true)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public List<KeyValuePair> getCurrentVocabularyNames() {
-		return TransformUtil.transform(
-			getDDMTemplateAssetVocabularies(),
-			assetVocabulary -> _toKeyValuePair(assetVocabulary));
+		LongStream longStream = Arrays.stream(getAssetVocabularyIds());
+
+		return longStream.boxed(
+		).map(
+			AssetVocabularyLocalServiceUtil::fetchAssetVocabulary
+		).map(
+			this::_toKeyValuePair
+		).collect(
+			Collectors.toList()
+		);
 	}
 
-	public List<AssetVocabulary> getDDMTemplateAssetVocabularies() {
+	public List<AssetVocabulary> getDDMTemplateAssetVocabularies()
+		throws PortalException {
+
 		if (_ddmTemplateAssetVocabularies != null) {
 			return _ddmTemplateAssetVocabularies;
 		}
 
-		String[] assetVocabularyIds =
-			_assetCategoriesNavigationPortletInstanceConfiguration.
-				assetVocabularyIds();
+		_ddmTemplateAssetVocabularies = new ArrayList<>();
 
 		if (_assetCategoriesNavigationPortletInstanceConfiguration.
-				allAssetVocabularies() ||
-			(assetVocabularyIds == null)) {
+				allAssetVocabularies()) {
 
 			_ddmTemplateAssetVocabularies = getAssetVocabularies();
-		}
-		else {
-			_ddmTemplateAssetVocabularies = TransformUtil.transformToList(
-				assetVocabularyIds,
-				assetVocabularyId -> {
-					try {
-						return AssetVocabularyServiceUtil.fetchVocabulary(
-							GetterUtil.getLongStrict(assetVocabularyId));
-					}
-					catch (PrincipalException principalException) {
-						if (_log.isWarnEnabled()) {
-							_log.warn(
-								"User does not have permission to access " +
-									"asset vocabulary " + assetVocabularyId,
-								principalException);
-						}
-					}
 
-					return null;
-				});
+			return _ddmTemplateAssetVocabularies;
+		}
+
+		for (long assetVocabularyId : getAssetVocabularyIds()) {
+			try {
+				_ddmTemplateAssetVocabularies.add(
+					AssetVocabularyServiceUtil.fetchVocabulary(
+						assetVocabularyId));
+			}
+			catch (PrincipalException principalException) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"User does not have permission to access asset " +
+							"vocabulary " + assetVocabularyId,
+						principalException);
+				}
+			}
 		}
 
 		return _ddmTemplateAssetVocabularies;
@@ -203,7 +252,7 @@ public class AssetCategoriesNavigationDisplayContext {
 		return _displayStyleGroupId;
 	}
 
-	private String _getTitle(AssetVocabulary assetVocabulary) {
+	protected String getTitle(AssetVocabulary assetVocabulary) {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -222,7 +271,7 @@ public class AssetCategoriesNavigationDisplayContext {
 	private KeyValuePair _toKeyValuePair(AssetVocabulary assetVocabulary) {
 		return new KeyValuePair(
 			String.valueOf(assetVocabulary.getVocabularyId()),
-			_getTitle(assetVocabulary));
+			getTitle(assetVocabulary));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

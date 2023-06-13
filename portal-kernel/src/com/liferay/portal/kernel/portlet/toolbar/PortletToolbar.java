@@ -99,9 +99,10 @@ public class PortletToolbar {
 		return portletTitleMenus;
 	}
 
-	private static final ServiceTrackerList<PortletToolbarContributorLocator>
-		_portletToolbarContributorLocators = ServiceTrackerListFactory.open(
-			SystemBundleUtil.getBundleContext(),
-			PortletToolbarContributorLocator.class);
+	private static final ServiceTrackerList
+		<PortletToolbarContributorLocator, PortletToolbarContributorLocator>
+			_portletToolbarContributorLocators = ServiceTrackerListFactory.open(
+				SystemBundleUtil.getBundleContext(),
+				PortletToolbarContributorLocator.class);
 
 }

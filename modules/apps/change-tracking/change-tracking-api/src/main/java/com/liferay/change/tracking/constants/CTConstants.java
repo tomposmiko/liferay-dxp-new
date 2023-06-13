@@ -27,10 +27,6 @@ public interface CTConstants {
 
 	public static final long CT_COLLECTION_ID_PRODUCTION = 0;
 
-	public static final int CT_PROCESS_MOVE = 1;
-
-	public static final int CT_PROCESS_PUBLISH = 0;
-
 	public static final String RESOURCE_NAME = "com.liferay.change.tracking";
 
 	public static final String TYPE_AFTER = "after";

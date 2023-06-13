@@ -20,8 +20,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -35,6 +35,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -69,6 +70,12 @@ public class ApplicationContextServicePublisherUtil {
 						serviceRegistrations.add(serviceRegistration);
 					}
 				}
+				catch (BeanIsAbstractException beanIsAbstractException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							beanIsAbstractException, beanIsAbstractException);
+					}
+				}
 				catch (Exception exception) {
 					_log.error(
 						"Unable to register service " + beanName, exception);
@@ -94,10 +101,10 @@ public class ApplicationContextServicePublisherUtil {
 		List<ServiceRegistration<?>> serviceRegistrations) {
 
 		if (serviceRegistrations != null) {
-			for (ServiceRegistration<?> serviceRegistration :
+			for (ServiceRegistration<?> serviceReference :
 					serviceRegistrations) {
 
-				serviceRegistration.unregister();
+				serviceReference.unregister();
 			}
 
 			serviceRegistrations.clear();
@@ -124,7 +131,9 @@ public class ApplicationContextServicePublisherUtil {
 			}
 			catch (ReflectiveOperationException reflectiveOperationException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(reflectiveOperationException);
+					_log.debug(
+						reflectiveOperationException,
+						reflectiveOperationException);
 				}
 			}
 		}
@@ -134,8 +143,7 @@ public class ApplicationContextServicePublisherUtil {
 
 		Set<String> names = OSGiBeanProperties.Service.interfaceNames(
 			bean, osgiBeanProperties,
-			ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES);
+			PropsValues.MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES);
 
 		if (names.isEmpty()) {
 			if (_log.isDebugEnabled()) {

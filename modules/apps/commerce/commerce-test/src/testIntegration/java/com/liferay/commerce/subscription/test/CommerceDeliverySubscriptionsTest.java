@@ -15,7 +15,7 @@
 package com.liferay.commerce.subscription.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
+import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceSubscriptionEntryConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
@@ -32,6 +32,7 @@ import com.liferay.commerce.service.CommerceSubscriptionEntryLocalService;
 import com.liferay.commerce.subscription.CommerceSubscriptionEntryHelper;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUti
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.test.rule.Inject;
@@ -50,6 +52,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,16 +70,22 @@ public class CommerceDeliverySubscriptionsTest {
 		new LiferayIntegrationTestRule(),
 		PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
-
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(_user));
 
 		PrincipalThreadLocal.setName(_user.getUserId());
+
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
 			_group.getCompanyId());
@@ -95,7 +104,7 @@ public class CommerceDeliverySubscriptionsTest {
 			_commerceOrder, _user.getUserId(), true, true);
 
 		_commerceOrder.setPaymentStatus(
-			CommerceOrderPaymentConstants.STATUS_COMPLETED);
+			CommerceOrderConstants.PAYMENT_STATUS_PAID);
 
 		CommerceOrderLocalServiceUtil.updateCommerceOrder(_commerceOrder);
 
@@ -191,7 +200,7 @@ public class CommerceDeliverySubscriptionsTest {
 			_commerceOrder, _user.getUserId(), true, true);
 
 		_commerceOrder.setPaymentStatus(
-			CommerceOrderPaymentConstants.STATUS_COMPLETED);
+			CommerceOrderConstants.PAYMENT_STATUS_PAID);
 
 		CommerceOrderLocalServiceUtil.updateCommerceOrder(_commerceOrder);
 
@@ -247,6 +256,7 @@ public class CommerceDeliverySubscriptionsTest {
 			commerceShipments.toString(), 1, commerceShipments.size());
 	}
 
+	private static Company _company;
 	private static User _user;
 
 	@DeleteAfterTestRun

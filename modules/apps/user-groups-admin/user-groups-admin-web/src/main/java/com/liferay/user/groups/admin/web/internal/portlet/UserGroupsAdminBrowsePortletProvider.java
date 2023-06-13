@@ -14,10 +14,10 @@
 
 package com.liferay.user.groups.admin.web.internal.portlet;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.BasePortletProvider;
 import com.liferay.portal.kernel.portlet.BrowsePortletProvider;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.user.groups.admin.constants.UserGroupsAdminPortletKeys;
 
 import javax.portlet.PortletURL;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.UserGroup",
 	service = BrowsePortletProvider.class
 )

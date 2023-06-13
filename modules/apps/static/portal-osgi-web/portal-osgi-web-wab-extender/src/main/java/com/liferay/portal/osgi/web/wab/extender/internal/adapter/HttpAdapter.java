@@ -53,7 +53,7 @@ import org.osgi.service.http.runtime.HttpServiceRuntimeConstants;
 /**
  * @author Raymond Augé
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class HttpAdapter {
 
 	@Activate
@@ -74,13 +74,6 @@ public class HttpAdapter {
 
 		};
 
-		Class<?> clazz = getClass();
-
-		ServletContext servletContextProxy =
-			(ServletContext)Proxy.newProxyInstance(
-				clazz.getClassLoader(), _INTERFACES,
-				new ServletContextAdaptor(_servletContext));
-
 		ServletConfig servletConfig = new ServletConfig() {
 
 			@Override
@@ -88,21 +81,21 @@ public class HttpAdapter {
 				if (name.equals(
 						HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT)) {
 
-					return servletContextProxy.getContextPath() +
-						servletContextProxy.getInitParameter(name);
+					return _servletContext.getContextPath() +
+						_servletContext.getInitParameter(name);
 				}
 
-				return servletContextProxy.getInitParameter(name);
+				return _servletContext.getInitParameter(name);
 			}
 
 			@Override
 			public Enumeration<String> getInitParameterNames() {
-				return servletContextProxy.getInitParameterNames();
+				return _servletContext.getInitParameterNames();
 			}
 
 			@Override
 			public ServletContext getServletContext() {
-				return servletContextProxy;
+				return _servletContext;
 			}
 
 			@Override
@@ -116,7 +109,7 @@ public class HttpAdapter {
 			_httpServiceServlet.init(servletConfig);
 		}
 		catch (ServletException servletException) {
-			servletContextProxy.log(
+			_servletContext.log(
 				servletException.getMessage(), servletException);
 
 			return;
@@ -153,6 +146,15 @@ public class HttpAdapter {
 		_httpServiceServlet = null;
 	}
 
+	@Reference(target = "(original.bean=true)", unbind = "-")
+	protected void setServletContext(ServletContext servletContext) {
+		Class<?> clazz = getClass();
+
+		_servletContext = (ServletContext)Proxy.newProxyInstance(
+			clazz.getClassLoader(), _INTERFACES,
+			new ServletContextAdaptor(servletContext));
+	}
+
 	private static final Class<?>[] _INTERFACES = new Class<?>[] {
 		ServletContext.class
 	};
@@ -175,8 +177,6 @@ public class HttpAdapter {
 
 	private HttpServiceServlet _httpServiceServlet;
 	private ServiceRegistration<?> _serviceRegistration;
-
-	@Reference(target = "(original.bean=true)")
 	private ServletContext _servletContext;
 
 	private static class ServletContextAdaptor implements InvocationHandler {

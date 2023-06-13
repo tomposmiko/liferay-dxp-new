@@ -18,13 +18,13 @@ import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicyUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.site.admin.web.internal.constants.SiteAdminPortletKeys;
 import com.liferay.site.admin.web.internal.display.context.SiteAdminDisplayContext;
 import com.liferay.sites.kernel.util.SitesUtil;
 
@@ -71,68 +70,40 @@ public class SiteActionDropdownItemsProvider {
 		boolean hasUpdatePermission = GroupPermissionUtil.contains(
 			_themeDisplay.getPermissionChecker(), _group, ActionKeys.UPDATE);
 
-		return DropdownItemListBuilder.addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() ->
-							hasUpdatePermission && !_group.isActive() &&
-							!_group.isCompany(),
-						_getActivateSiteActionUnsafeConsumer()
-					).add(
-						() ->
-							hasUpdatePermission && _group.isActive() &&
-							!_group.isCompany() && !_group.isGuest(),
-						_getDeactivateSiteActionUnsafeConsumer()
-					).add(
-						() -> _hasEditAssignmentsPermission(),
-						_getLeaveSiteActionUnsafeConsumer()
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
-		).addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() ->
-							hasUpdatePermission &&
-							_siteAdminDisplayContext.hasAddChildSitePermission(
-								_group),
-						_getAddChildSiteActionUnsafeConsumer()
-					).add(
-						() -> hasUpdatePermission && (count > 0),
-						_getViewChildSitesActionUnsafeConsumer()
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
-		).addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() ->
-							_group.isActive() &&
-							(_group.getPrivateLayoutsPageCount() > 0),
-						_getViewSitePrivatePagesActionUnsafeConsumer()
-					).add(
-						() ->
-							_group.isActive() &&
-							(_group.getPublicLayoutsPageCount() > 0),
-						_getViewSitePublicPagesActionUnsafeConsumer()
-					).add(
-						() -> hasUpdatePermission,
-						_getViewSiteSettingsActionUnsafeConsumer()
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
-		).addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() -> _hasDeleteGroupPermission(),
-						_getDeleteSiteActionUnsafeConsumer()
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
+		return DropdownItemListBuilder.add(
+			() -> hasUpdatePermission && (count > 0),
+			_getViewChildSitesActionUnsafeConsumer()
+		).add(
+			() ->
+				hasUpdatePermission &&
+				_siteAdminDisplayContext.hasAddChildSitePermission(_group),
+			_getAddChildSiteActionUnsafeConsumer()
+		).add(
+			() -> hasUpdatePermission,
+			_getViewSiteSettingsActionUnsafeConsumer()
+		).add(
+			() -> _group.isActive() && (_group.getPublicLayoutsPageCount() > 0),
+			_getViewSitePublicPagesActionUnsafeConsumer()
+		).add(
+			() ->
+				_group.isActive() && (_group.getPrivateLayoutsPageCount() > 0),
+			_getViewSitePrivatePagesActionUnsafeConsumer()
+		).add(
+			() -> _hasEditAssignmentsPermission(),
+			_getLeaveSiteActionUnsafeConsumer()
+		).add(
+			() ->
+				hasUpdatePermission && _group.isActive() &&
+				!_group.isCompany() && !_group.isGuest(),
+			_getDeactivateSiteActionUnsafeConsumer()
+		).add(
+			() ->
+				hasUpdatePermission && !_group.isActive() &&
+				!_group.isCompany(),
+			_getActivateSiteActionUnsafeConsumer()
+		).add(
+			() -> _hasDeleteGroupPermission(),
+			_getDeleteSiteActionUnsafeConsumer()
 		).build();
 	}
 
@@ -204,27 +175,10 @@ public class SiteActionDropdownItemsProvider {
 				).setActionName(
 					"/site_admin/delete_groups"
 				).setRedirect(
-					() -> {
-						if (_themeDisplay.getScopeGroupId() ==
-								_group.getGroupId()) {
-
-							PortletURL redirectURL =
-								PortalUtil.getControlPanelPortletURL(
-									_httpServletRequest,
-									GroupLocalServiceUtil.fetchCompanyGroup(
-										_themeDisplay.getCompanyId()),
-									SiteAdminPortletKeys.SITE_ADMIN, 0, 0,
-									PortletRequest.RENDER_PHASE);
-
-							return redirectURL.toString();
-						}
-
-						return _getRedirect();
-					}
+					_getRedirect()
 				).setParameter(
 					"groupId", _group.getGroupId()
 				).buildString());
-			dropdownItem.setIcon("trash");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "delete"));
 		};
@@ -282,10 +236,7 @@ public class SiteActionDropdownItemsProvider {
 		return dropdownItem -> {
 			dropdownItem.setHref(_group.getDisplayURL(_themeDisplay, true));
 			dropdownItem.setLabel(
-				LanguageUtil.format(
-					_httpServletRequest, "go-to-x",
-					_group.getLayoutRootNodeName(
-						true, _themeDisplay.getLocale())));
+				LanguageUtil.get(_httpServletRequest, "go-to-private-pages"));
 			dropdownItem.setTarget("_blank");
 		};
 	}
@@ -298,10 +249,7 @@ public class SiteActionDropdownItemsProvider {
 				_group.getDisplayURL(_themeDisplay, false, true));
 			dropdownItem.setIcon("shortcut");
 			dropdownItem.setLabel(
-				LanguageUtil.format(
-					_httpServletRequest, "go-to-x",
-					_group.getLayoutRootNodeName(
-						false, _themeDisplay.getLocale())));
+				LanguageUtil.get(_httpServletRequest, "go-to-public-pages"));
 			dropdownItem.setTarget("_blank");
 		};
 	}

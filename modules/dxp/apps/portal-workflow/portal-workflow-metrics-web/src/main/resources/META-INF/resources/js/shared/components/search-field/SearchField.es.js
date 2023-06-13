@@ -11,7 +11,7 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayInput} from '@clayui/form';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React, {useEffect, useState} from 'react';
 
 import {useRouter} from '../../hooks/useRouter.es';
@@ -46,7 +46,7 @@ const SearchField = ({
 	};
 
 	return (
-		<ManagementToolbar.Search
+		<ClayManagementToolbar.Search
 			method="GET"
 			onSubmit={handleSubmit}
 			showMobile={true}
@@ -72,7 +72,7 @@ const SearchField = ({
 					</ClayInput.GroupInsetItem>
 				</ClayInput.GroupItem>
 			</ClayInput.Group>
-		</ManagementToolbar.Search>
+		</ClayManagementToolbar.Search>
 	);
 };
 

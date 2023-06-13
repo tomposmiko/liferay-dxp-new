@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.aggregation.bucket.TermsAggregation;
 import com.liferay.portal.search.aggregation.bucket.TermsAggregationResult;
@@ -38,9 +37,11 @@ import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.AssigneeU
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.AssigneeResource;
 import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsIndexNameBuilder;
 
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -76,30 +77,35 @@ public class AssigneeResourceImpl extends BaseAssigneeResourceImpl {
 			_createTasksBooleanQuery(
 				assigneeBulkSelection.getInstanceIds(), processId));
 
-		SearchSearchResponse searchSearchResponse =
-			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
-
-		Map<String, AggregationResult> aggregationResultsMap =
-			searchSearchResponse.getAggregationResultsMap();
-
-		TermsAggregationResult termsAggregationResult =
-			(TermsAggregationResult)aggregationResultsMap.get("assigneeId");
-
-		List<Assignee> assignees = transform(
-			termsAggregationResult.getBuckets(),
-			bucket -> AssigneeUtil.toAssignee(
-				_language, _portal,
-				ResourceBundleUtil.getModuleAndPortalResourceBundle(
-					contextAcceptLanguage.getPreferredLocale(),
-					AssigneeResourceImpl.class),
-				GetterUtil.getLong(bucket.getKey()),
-				_userLocalService::fetchUser));
-
-		assignees.sort(
-			Comparator.comparing(
-				Assignee::getName, String::compareToIgnoreCase));
-
-		return Page.of(assignees);
+		return Page.of(
+			Stream.of(
+				_searchRequestExecutor.executeSearchRequest(searchSearchRequest)
+			).map(
+				SearchSearchResponse::getAggregationResultsMap
+			).map(
+				aggregationResultsMap ->
+					(TermsAggregationResult)aggregationResultsMap.get(
+						"assigneeId")
+			).map(
+				TermsAggregationResult::getBuckets
+			).flatMap(
+				Collection::stream
+			).map(
+				bucket -> AssigneeUtil.toAssignee(
+					_language, _portal,
+					ResourceBundleUtil.getModuleAndPortalResourceBundle(
+						contextAcceptLanguage.getPreferredLocale(),
+						AssigneeResourceImpl.class),
+					GetterUtil.getLong(bucket.getKey()),
+					_userLocalService::fetchUser)
+			).filter(
+				Objects::nonNull
+			).sorted(
+				Comparator.comparing(
+					Assignee::getName, String::compareToIgnoreCase)
+			).collect(
+				Collectors.toList()
+			));
 	}
 
 	private BooleanQuery _createTasksBooleanQuery(
@@ -111,16 +117,15 @@ public class AssigneeResourceImpl extends BaseAssigneeResourceImpl {
 			TermsQuery termsQuery = _queries.terms("instanceId");
 
 			termsQuery.addValues(
-				transform(
-					instanceIds,
-					instanceId -> {
-						if (instanceId <= 0) {
-							return null;
-						}
-
-						return String.valueOf(instanceId);
-					},
-					Object.class));
+				Stream.of(
+					instanceIds
+				).filter(
+					instanceId -> instanceId > 0
+				).map(
+					String::valueOf
+				).toArray(
+					Object[]::new
+				));
 
 			booleanQuery.addMustQueryClauses(termsQuery);
 		}

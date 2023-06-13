@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Stian Sigvartsen
  */
-@Component(service = SSO.class)
+@Component(immediate = true, service = SSO.class)
 public class SSOImpl implements SSO {
 
 	@Override

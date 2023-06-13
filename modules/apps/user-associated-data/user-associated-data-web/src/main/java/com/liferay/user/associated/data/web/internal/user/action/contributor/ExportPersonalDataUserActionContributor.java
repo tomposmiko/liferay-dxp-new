@@ -21,7 +21,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = UserActionContributor.class)
+@Component(immediate = true, service = UserActionContributor.class)
 public class ExportPersonalDataUserActionContributor
 	extends BaseUADUserActionContributor {
 

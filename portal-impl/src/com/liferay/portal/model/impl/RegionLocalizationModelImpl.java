@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -218,85 +219,98 @@ public class RegionLocalizationModelImpl
 	public Map<String, Function<RegionLocalization, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<RegionLocalization, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, RegionLocalization>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<RegionLocalization, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			RegionLocalization.class.getClassLoader(), RegionLocalization.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<RegionLocalization, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<RegionLocalization, Object>>();
+		try {
+			Constructor<RegionLocalization> constructor =
+				(Constructor<RegionLocalization>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", RegionLocalization::getMvccVersion);
-			attributeGetterFunctions.put(
-				"regionLocalizationId",
-				RegionLocalization::getRegionLocalizationId);
-			attributeGetterFunctions.put(
-				"companyId", RegionLocalization::getCompanyId);
-			attributeGetterFunctions.put(
-				"regionId", RegionLocalization::getRegionId);
-			attributeGetterFunctions.put(
-				"languageId", RegionLocalization::getLanguageId);
-			attributeGetterFunctions.put("title", RegionLocalization::getTitle);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<RegionLocalization, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<RegionLocalization, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<RegionLocalization, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<RegionLocalization, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<RegionLocalization, Object>>();
+		Map<String, BiConsumer<RegionLocalization, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<RegionLocalization, ?>>();
 
-		static {
-			Map<String, BiConsumer<RegionLocalization, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<RegionLocalization, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", RegionLocalization::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<RegionLocalization, Long>)
+				RegionLocalization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"regionLocalizationId",
+			RegionLocalization::getRegionLocalizationId);
+		attributeSetterBiConsumers.put(
+			"regionLocalizationId",
+			(BiConsumer<RegionLocalization, Long>)
+				RegionLocalization::setRegionLocalizationId);
+		attributeGetterFunctions.put(
+			"companyId", RegionLocalization::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<RegionLocalization, Long>)
+				RegionLocalization::setCompanyId);
+		attributeGetterFunctions.put(
+			"regionId", RegionLocalization::getRegionId);
+		attributeSetterBiConsumers.put(
+			"regionId",
+			(BiConsumer<RegionLocalization, Long>)
+				RegionLocalization::setRegionId);
+		attributeGetterFunctions.put(
+			"languageId", RegionLocalization::getLanguageId);
+		attributeSetterBiConsumers.put(
+			"languageId",
+			(BiConsumer<RegionLocalization, String>)
+				RegionLocalization::setLanguageId);
+		attributeGetterFunctions.put("title", RegionLocalization::getTitle);
+		attributeSetterBiConsumers.put(
+			"title",
+			(BiConsumer<RegionLocalization, String>)
+				RegionLocalization::setTitle);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<RegionLocalization, Long>)
-					RegionLocalization::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"regionLocalizationId",
-				(BiConsumer<RegionLocalization, Long>)
-					RegionLocalization::setRegionLocalizationId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<RegionLocalization, Long>)
-					RegionLocalization::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"regionId",
-				(BiConsumer<RegionLocalization, Long>)
-					RegionLocalization::setRegionId);
-			attributeSetterBiConsumers.put(
-				"languageId",
-				(BiConsumer<RegionLocalization, String>)
-					RegionLocalization::setLanguageId);
-			attributeSetterBiConsumers.put(
-				"title",
-				(BiConsumer<RegionLocalization, String>)
-					RegionLocalization::setTitle);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -654,12 +668,41 @@ public class RegionLocalizationModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<RegionLocalization, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<RegionLocalization, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<RegionLocalization, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((RegionLocalization)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, RegionLocalization>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					RegionLocalization.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -672,8 +715,7 @@ public class RegionLocalizationModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<RegionLocalization, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

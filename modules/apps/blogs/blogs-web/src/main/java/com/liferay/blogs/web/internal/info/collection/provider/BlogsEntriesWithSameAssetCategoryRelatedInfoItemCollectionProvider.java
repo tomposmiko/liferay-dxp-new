@@ -24,7 +24,7 @@ import com.liferay.info.collection.provider.RelatedInfoItemCollectionProvider;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.info.sort.Sort;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -43,10 +43,12 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = RelatedInfoItemCollectionProvider.class)
+@Component(immediate = true, service = RelatedInfoItemCollectionProvider.class)
 public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 	implements RelatedInfoItemCollectionProvider<AssetCategory, BlogsEntry> {
 
@@ -62,7 +64,10 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 	public InfoPage<BlogsEntry> getCollectionInfoPage(
 		CollectionQuery collectionQuery) {
 
-		Object relatedItem = collectionQuery.getRelatedItem();
+		Optional<Object> relatedItemOptional =
+			collectionQuery.getRelatedItemObjectOptional();
+
+		Object relatedItem = relatedItemOptional.orElse(null);
 
 		if (!(relatedItem instanceof AssetCategory)) {
 			return InfoPage.of(
@@ -72,8 +77,6 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 		AssetEntryQuery assetEntryQuery = _getAssetEntryQuery(collectionQuery);
 
 		try {
-			List<BlogsEntry> blogsEntries = new ArrayList<>();
-
 			AssetCategory assetCategory = (AssetCategory)relatedItem;
 
 			SearchContext searchContext = _getSearchContext(assetCategory);
@@ -82,26 +85,26 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 				searchContext, assetEntryQuery, assetEntryQuery.getStart(),
 				assetEntryQuery.getEnd());
 
+			Long count = _assetHelper.searchCount(
+				searchContext, assetEntryQuery);
+
 			List<SearchResult> searchResults =
 				SearchResultUtil.getSearchResults(
 					hits, LocaleUtil.getDefault());
 
-			for (SearchResult searchResult : searchResults) {
-				BlogsEntry blogsEntry = _toBlogsEntry(searchResult);
-
-				if (blogsEntry == null) {
-					continue;
-				}
-
-				blogsEntries.add(blogsEntry);
-			}
-
-			Long count = _assetHelper.searchCount(
-				searchContext, assetEntryQuery);
+			Stream<SearchResult> stream = searchResults.stream();
 
 			return InfoPage.of(
-				blogsEntries, collectionQuery.getPagination(),
-				count.intValue());
+				stream.map(
+					this::_toBlogsEntryOptional
+				).filter(
+					Optional::isPresent
+				).map(
+					Optional::get
+				).collect(
+					Collectors.toList()
+				),
+				collectionQuery.getPagination(), count.intValue());
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get blogs entries", exception);
@@ -113,7 +116,7 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "blogs-with-this-category");
+		return LanguageUtil.get(locale, "blogs-with-this-category");
 	}
 
 	private AssetEntryQuery _getAssetEntryQuery(
@@ -136,9 +139,12 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 
 		assetEntryQuery.setGroupIds(
 			new long[] {serviceContext.getScopeGroupId()});
+
 		assetEntryQuery.setOrderByCol1(Field.MODIFIED_DATE);
 
-		Sort sort = collectionQuery.getSort();
+		Optional<Sort> sortOptional = collectionQuery.getSortOptional();
+
+		Sort sort = sortOptional.orElse(null);
 
 		if ((sort != null) && sort.isReverse()) {
 			assetEntryQuery.setOrderByType1("ASC");
@@ -173,9 +179,12 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 			serviceContext.getScopeGroupId(), null, serviceContext.getUserId());
 	}
 
-	private BlogsEntry _toBlogsEntry(SearchResult searchResult) {
+	private Optional<BlogsEntry> _toBlogsEntryOptional(
+		SearchResult searchResult) {
+
 		try {
-			return _blogsEntryService.getEntry(searchResult.getClassPK());
+			return Optional.of(
+				_blogsEntryService.getEntry(searchResult.getClassPK()));
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
@@ -185,7 +194,7 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 					exception);
 			}
 
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -198,9 +207,6 @@ public class BlogsEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 
 	@Reference
 	private BlogsEntryService _blogsEntryService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

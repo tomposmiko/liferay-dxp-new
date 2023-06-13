@@ -14,31 +14,23 @@
 
 package com.liferay.segments.internal.odata.search;
 
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.HitsImpl;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
-import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.TermRangeQuery;
+import com.liferay.portal.kernel.search.SearchResultPermissionFilterFactory;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.MatchAllQuery;
-import com.liferay.portal.kernel.search.generic.TermRangeQueryImpl;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Props;
-import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.Filter;
@@ -46,9 +38,6 @@ import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.InvalidFilterException;
 import com.liferay.segments.odata.search.ODataSearchAdapter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
@@ -57,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(service = ODataSearchAdapter.class)
+@Component(immediate = true, service = ODataSearchAdapter.class)
 public class ODataSearchAdapterImpl implements ODataSearchAdapter {
 
 	@Override
@@ -68,13 +57,18 @@ public class ODataSearchAdapterImpl implements ODataSearchAdapter {
 		throws PortalException {
 
 		try {
-			SearchContext searchContext = _createSearchContext(companyId);
+			SearchContext searchContext = _createSearchContext(
+				companyId, start, end);
 
-			return search(
-				_indexerRegistry.getIndexer(className), searchContext,
-				_getBooleanQuery(
-					filterString, entityModel, filterParser, locale),
-				start, end);
+			Indexer<?> indexer = _indexerRegistry.getIndexer(className);
+
+			searchContext.setBooleanClauses(
+				new BooleanClause[] {
+					_getBooleanClause(
+						filterString, entityModel, filterParser, locale)
+				});
+
+			return indexer.search(searchContext);
 		}
 		catch (Exception exception) {
 			throw new PortalException(
@@ -89,15 +83,14 @@ public class ODataSearchAdapterImpl implements ODataSearchAdapter {
 		throws PortalException {
 
 		try {
-			SearchContext searchContext = _createSearchContext(companyId);
+			SearchContext searchContext = _createSearchContext(companyId, 0, 0);
 
 			Indexer<?> indexer = _indexerRegistry.getIndexer(className);
 
 			searchContext.setBooleanClauses(
 				new BooleanClause[] {
 					_getBooleanClause(
-						_getBooleanQuery(
-							filterString, entityModel, filterParser, locale))
+						filterString, entityModel, filterParser, locale)
 				});
 
 			return (int)indexer.searchCount(searchContext);
@@ -108,75 +101,22 @@ public class ODataSearchAdapterImpl implements ODataSearchAdapter {
 		}
 	}
 
-	protected Hits search(
-			Indexer<?> indexer, SearchContext searchContext,
-			BooleanQuery booleanQuery, int start, int end)
-		throws PortalException {
+	private SearchContext _createSearchContext(
+		long companyId, int start, int end) {
 
-		List<Document> documentsList = new ArrayList<>();
-
-		if (end == QueryUtil.ALL_POS) {
-			end = Integer.MAX_VALUE;
-		}
-
-		int indexSearchLimit = GetterUtil.getInteger(
-			_props.get(PropsKeys.INDEX_SEARCH_LIMIT));
-		Document lastDocument = null;
-
-		Sort sort = new Sort(Field.ENTRY_CLASS_PK, Sort.LONG_TYPE, false);
-
-		searchContext.setSorts(sort);
-
-		if (start == QueryUtil.ALL_POS) {
-			start = 0;
-		}
-
-		while (start != end) {
-			searchContext.setBooleanClauses(
-				new BooleanClause[] {
-					_getBooleanClause(
-						_getLastDocumentBooleanQuery(
-							booleanQuery, lastDocument, sort.getFieldName()))
-				});
-			searchContext.setEnd(Math.min(end, indexSearchLimit));
-			searchContext.setStart(Math.min(start, indexSearchLimit - 1));
-
-			Hits hits = indexer.search(searchContext);
-
-			Document[] documents = hits.getDocs();
-
-			if (documents.length == 0) {
-				break;
-			}
-
-			if (start < indexSearchLimit) {
-				Collections.addAll(documentsList, documents);
-
-				if (end < indexSearchLimit) {
-					break;
-				}
-			}
-
-			lastDocument = documents[documents.length - 1];
-
-			start = Math.max(0, start - indexSearchLimit);
-			end = Math.max(0, end - indexSearchLimit);
-		}
-
-		Hits hits = new HitsImpl();
-
-		hits.setDocs(documentsList.toArray(new Document[0]));
-		hits.setLength(documentsList.size());
-		hits.setStart(0);
-
-		return hits;
-	}
-
-	private SearchContext _createSearchContext(long companyId) {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setEnd(end);
 		searchContext.setGroupIds(new long[] {-1L});
+		searchContext.setStart(start);
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (permissionChecker != null) {
+			searchContext.setUserId(permissionChecker.getUserId());
+		}
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 
@@ -186,11 +126,14 @@ public class ODataSearchAdapterImpl implements ODataSearchAdapter {
 		return searchContext;
 	}
 
-	private BooleanClause<Query> _getBooleanClause(BooleanQuery booleanQuery)
-		throws PortalException {
+	private BooleanClause<Query> _getBooleanClause(
+			String filterString, EntityModel entityModel,
+			FilterParser filterParser, Locale locale)
+		throws Exception {
 
 		return BooleanClauseFactoryUtil.create(
-			booleanQuery, BooleanClauseOccur.MUST.getName());
+			_getBooleanQuery(filterString, entityModel, filterParser, locale),
+			BooleanClauseOccur.MUST.getName());
 	}
 
 	private BooleanQuery _getBooleanQuery(
@@ -214,31 +157,6 @@ public class ODataSearchAdapterImpl implements ODataSearchAdapter {
 		booleanQuery.setPreBooleanFilter(booleanFilter);
 
 		return booleanQuery;
-	}
-
-	private BooleanQuery _getLastDocumentBooleanQuery(
-			BooleanQuery booleanQuery, Document lastDocument, String sortField)
-		throws ParseException {
-
-		if (lastDocument == null) {
-			return booleanQuery;
-		}
-
-		if (!lastDocument.hasField(sortField)) {
-			throw new IllegalArgumentException(
-				"Missing " + sortField + " in the last document");
-		}
-
-		BooleanQuery lastDocumentBooleanQuery = new BooleanQueryImpl();
-
-		lastDocumentBooleanQuery.add(booleanQuery, BooleanClauseOccur.MUST);
-
-		TermRangeQuery termRangeQuery = new TermRangeQueryImpl(
-			sortField, lastDocument.get(sortField), null, false, true);
-
-		lastDocumentBooleanQuery.add(termRangeQuery, BooleanClauseOccur.MUST);
-
-		return lastDocumentBooleanQuery;
 	}
 
 	private com.liferay.portal.kernel.search.filter.Filter _getSearchFilter(
@@ -272,6 +190,7 @@ public class ODataSearchAdapterImpl implements ODataSearchAdapter {
 	private IndexerRegistry _indexerRegistry;
 
 	@Reference
-	private Props _props;
+	private SearchResultPermissionFilterFactory
+		_searchResultPermissionFilterFactory;
 
 }

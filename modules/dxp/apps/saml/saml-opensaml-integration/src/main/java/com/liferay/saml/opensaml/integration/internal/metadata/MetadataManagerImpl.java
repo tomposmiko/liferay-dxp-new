@@ -14,18 +14,16 @@
 
 package com.liferay.saml.opensaml.integration.internal.metadata;
 
-import com.liferay.petra.concurrent.DCLSingleton;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.saml.opensaml.integration.internal.bootstrap.ParserPoolUtil;
+import com.liferay.saml.opensaml.integration.internal.bootstrap.SecurityConfigurationBootstrap;
 import com.liferay.saml.opensaml.integration.internal.provider.CachingChainingMetadataResolver;
-import com.liferay.saml.opensaml.integration.internal.provider.DBMetadataResolver;
 import com.liferay.saml.opensaml.integration.internal.util.OpenSamlUtil;
 import com.liferay.saml.persistence.model.SamlIdpSpConnection;
 import com.liferay.saml.persistence.model.SamlSpIdpConnection;
@@ -75,16 +73,21 @@ import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.opensaml.xmlsec.signature.support.impl.ChainingSignatureTrustEngine;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.service.component.annotations.ReferenceScope;
 
 /**
  * @author Mika Koivisto
  */
-@Component(service = {MetadataManager.class, SamlHttpRequestUtil.class})
+@Component(
+	immediate = true,
+	service = {MetadataManager.class, SamlHttpRequestUtil.class}
+)
 public class MetadataManagerImpl
 	implements MetadataManager, SamlHttpRequestUtil {
 
@@ -101,7 +104,7 @@ public class MetadataManagerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -125,7 +128,7 @@ public class MetadataManagerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -134,7 +137,7 @@ public class MetadataManagerImpl
 
 	@Override
 	public long getClockSkew() {
-		return _getSamlProviderConfiguration().clockSkew();
+		return getSamlProviderConfiguration().clockSkew();
 	}
 
 	@Override
@@ -178,19 +181,19 @@ public class MetadataManagerImpl
 		try {
 			String portalURL = _portal.getPortalURL(
 				httpServletRequest,
-				_isSSLRequired() || _portal.isSecure(httpServletRequest));
+				isSSLRequired() || _portal.isSecure(httpServletRequest));
 			String localEntityId = _localEntityManager.getLocalEntityId();
 
 			if (_samlProviderConfigurationHelper.isRoleIdp()) {
 				return MetadataGeneratorUtil.buildIdpEntityDescriptor(
-					portalURL, localEntityId, _isWantAuthnRequestSigned(),
-					_isSignMetadata(), getSigningCredential(),
+					portalURL, localEntityId, isWantAuthnRequestSigned(),
+					isSignMetadata(), getSigningCredential(),
 					encryptionCredential);
 			}
 			else if (_samlProviderConfigurationHelper.isRoleSp()) {
 				return MetadataGeneratorUtil.buildSpEntityDescriptor(
-					portalURL, localEntityId, _isSignAuthnRequest(),
-					_isSignMetadata(), _isWantAssertionsSigned(),
+					portalURL, localEntityId, isSignAuthnRequest(),
+					isSignMetadata(), isWantAssertionsSigned(),
 					getSigningCredential(), encryptionCredential);
 			}
 
@@ -217,14 +220,12 @@ public class MetadataManagerImpl
 
 	@Override
 	public MetadataCredentialResolver getMetadataCredentialResolver() {
-		return _metadataCredentialResolverDCLSingleton.getSingleton(
-			this::_createMetadataCredentialResolver);
+		return _metadataCredentialResolver;
 	}
 
 	@Override
 	public MetadataResolver getMetadataResolver() {
-		return _cachingChainingMetadataResolverDCLSingleton.getSingleton(
-			this::_createCachingChainingMetadataResolver);
+		return _cachingChainingMetadataResolver;
 	}
 
 	@Override
@@ -242,7 +243,7 @@ public class MetadataManagerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -267,7 +268,7 @@ public class MetadataManagerImpl
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -281,7 +282,7 @@ public class MetadataManagerImpl
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -301,7 +302,7 @@ public class MetadataManagerImpl
 			requestURI = requestURI.substring(contextPath.length());
 		}
 
-		return HttpComponentsUtil.removePathParameters(requestURI);
+		return _http.removePathParameters(requestURI);
 	}
 
 	@Override
@@ -344,8 +345,7 @@ public class MetadataManagerImpl
 
 				saml2HTTPPostSimpleSignSecurityHandler.setKeyInfoResolver(
 					keyInfoCredentialResolver);
-				saml2HTTPPostSimpleSignSecurityHandler.setParser(
-					ParserPoolUtil.getParserPool());
+				saml2HTTPPostSimpleSignSecurityHandler.setParser(_parserPool);
 
 				messageHandlers.add(saml2HTTPPostSimpleSignSecurityHandler);
 			}
@@ -374,7 +374,7 @@ public class MetadataManagerImpl
 			new HTTPRequestValidationHandler();
 
 		httpRequestValidationHandler.setHttpServletRequest(httpServletRequest);
-		httpRequestValidationHandler.setRequireSecured(_isSSLRequired());
+		httpRequestValidationHandler.setRequireSecured(isSSLRequired());
 
 		messageHandlers.add(httpRequestValidationHandler);
 
@@ -385,8 +385,7 @@ public class MetadataManagerImpl
 
 	@Override
 	public SignatureTrustEngine getSignatureTrustEngine() throws SamlException {
-		return _chainingSignatureTrustEngineDCLSingleton.getSingleton(
-			this::_createChainingSignatureTrustEngine);
+		return _chainingSignatureTrustEngine;
 	}
 
 	@Override
@@ -421,7 +420,7 @@ public class MetadataManagerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -441,7 +440,7 @@ public class MetadataManagerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -461,70 +460,95 @@ public class MetadataManagerImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return false;
 	}
 
+	@Reference(unbind = "-")
+	public void setCredentialResolver(CredentialResolver credentialResolver) {
+		_credentialResolver = credentialResolver;
+	}
+
+	@Reference(unbind = "-")
+	public void setHttp(Http http) {
+		_http = http;
+	}
+
+	@Reference(unbind = "-")
+	public void setLocalEntityManager(LocalEntityManager localEntityManager) {
+		_localEntityManager = localEntityManager;
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.AT_LEAST_ONE,
+		policyOption = ReferencePolicyOption.GREEDY,
+		scope = ReferenceScope.PROTOTYPE_REQUIRED
+	)
+	public void setMetadataResolver(MetadataResolver metadataResolver) {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Adding metadata resolver " + metadataResolver);
+		}
+
+		_cachingChainingMetadataResolver.addMetadataResolver(metadataResolver);
+	}
+
+	@Reference(unbind = "-")
+	public void setParserPool(ParserPool parserPool) {
+		_parserPool = parserPool;
+	}
+
+	@Reference(unbind = "-")
+	public void setPortal(Portal portal) {
+		_portal = portal;
+	}
+
+	@Reference(unbind = "-")
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		_samlProviderConfigurationHelper = samlProviderConfigurationHelper;
+	}
+
+	public void unsetMetadataResolver(MetadataResolver metadataResolver) {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Removing metadata resolver " + metadataResolver);
+		}
+
+		_cachingChainingMetadataResolver.removeMetadataResolver(
+			metadataResolver);
+	}
+
 	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_predicateRoleDescriptorResolverDCLSingleton.destroy(
-			PredicateRoleDescriptorResolver::destroy);
-
-		_cachingChainingMetadataResolverDCLSingleton.destroy(
-			CachingChainingMetadataResolver::destroy);
-	}
-
-	private CachingChainingMetadataResolver
-		_createCachingChainingMetadataResolver() {
-
-		CachingChainingMetadataResolver cachingChainingMetadataResolver =
-			new CachingChainingMetadataResolver(_bundleContext);
-
-		ParserPool parserPool = ParserPoolUtil.getParserPool();
-
-		cachingChainingMetadataResolver.addMetadataResolver(
-			new DBMetadataResolver(
-				parserPool, _samlIdpSpConnectionLocalService,
-				_samlProviderConfigurationHelper,
-				_samlSpIdpConnectionLocalService));
-
-		cachingChainingMetadataResolver.setId(
+	protected void activate() throws ComponentInitializationException {
+		_cachingChainingMetadataResolver.setId(
 			CachingChainingMetadataResolver.class.getName());
-		cachingChainingMetadataResolver.setParserPool(parserPool);
+		_cachingChainingMetadataResolver.setParserPool(_parserPool);
 
-		try {
-			cachingChainingMetadataResolver.initialize();
-		}
-		catch (ComponentInitializationException
-					componentInitializationException) {
+		_cachingChainingMetadataResolver.initialize();
 
-			throw new RuntimeException(componentInitializationException);
-		}
-
-		return cachingChainingMetadataResolver;
-	}
-
-	private ChainingSignatureTrustEngine _createChainingSignatureTrustEngine() {
-		List<SignatureTrustEngine> signatureTrustEngines = new ArrayList<>();
-
-		MetadataCredentialResolver metadataCredentialResolver =
-			_metadataCredentialResolverDCLSingleton.getSingleton(
-				this::_createMetadataCredentialResolver);
+		_predicateRoleDescriptorResolver.initialize();
 
 		KeyInfoCredentialResolver keyInfoCredentialResolver =
-			metadataCredentialResolver.getKeyInfoCredentialResolver();
+			DefaultSecurityConfigurationBootstrap.
+				buildBasicInlineKeyInfoCredentialResolver();
+
+		_metadataCredentialResolver = new MetadataCredentialResolver();
+
+		_metadataCredentialResolver.setKeyInfoCredentialResolver(
+			keyInfoCredentialResolver);
+		_metadataCredentialResolver.setRoleDescriptorResolver(
+			_predicateRoleDescriptorResolver);
+
+		_metadataCredentialResolver.initialize();
+
+		List<SignatureTrustEngine> signatureTrustEngines = new ArrayList<>();
 
 		SignatureTrustEngine signatureTrustEngine =
 			new ExplicitKeySignatureTrustEngine(
-				metadataCredentialResolver, keyInfoCredentialResolver);
+				_metadataCredentialResolver, keyInfoCredentialResolver);
 
 		signatureTrustEngines.add(signatureTrustEngine);
 
@@ -533,107 +557,67 @@ public class MetadataManagerImpl
 
 		signatureTrustEngines.add(signatureTrustEngine);
 
-		return new ChainingSignatureTrustEngine(signatureTrustEngines);
+		_chainingSignatureTrustEngine = new ChainingSignatureTrustEngine(
+			signatureTrustEngines);
 	}
 
-	private MetadataCredentialResolver _createMetadataCredentialResolver() {
-		MetadataCredentialResolver metadataCredentialResolver =
-			new MetadataCredentialResolver();
+	@Deactivate
+	protected void deactivate() {
+		_predicateRoleDescriptorResolver.destroy();
 
-		metadataCredentialResolver.setKeyInfoCredentialResolver(
-			DefaultSecurityConfigurationBootstrap.
-				buildBasicInlineKeyInfoCredentialResolver());
-		metadataCredentialResolver.setRoleDescriptorResolver(
-			_predicateRoleDescriptorResolverDCLSingleton.getSingleton(
-				this::_createPredicateRoleDescriptorResolver));
-
-		try {
-			metadataCredentialResolver.initialize();
-		}
-		catch (ComponentInitializationException
-					componentInitializationException) {
-
-			throw new RuntimeException(componentInitializationException);
-		}
-
-		return metadataCredentialResolver;
+		_cachingChainingMetadataResolver.destroy();
 	}
 
-	private PredicateRoleDescriptorResolver
-		_createPredicateRoleDescriptorResolver() {
-
-		PredicateRoleDescriptorResolver predicateRoleDescriptorResolver =
-			new PredicateRoleDescriptorResolver(
-				_cachingChainingMetadataResolverDCLSingleton.getSingleton(
-					this::_createCachingChainingMetadataResolver));
-
-		try {
-			predicateRoleDescriptorResolver.initialize();
-		}
-		catch (ComponentInitializationException
-					componentInitializationException) {
-
-			throw new RuntimeException(componentInitializationException);
-		}
-
-		return predicateRoleDescriptorResolver;
-	}
-
-	private SamlProviderConfiguration _getSamlProviderConfiguration() {
+	protected SamlProviderConfiguration getSamlProviderConfiguration() {
 		return _samlProviderConfigurationHelper.getSamlProviderConfiguration();
 	}
 
-	private boolean _isSignAuthnRequest() {
-		return _getSamlProviderConfiguration().signAuthnRequest();
+	protected boolean isSignAuthnRequest() {
+		return getSamlProviderConfiguration().signAuthnRequest();
 	}
 
-	private boolean _isSignMetadata() {
-		return _getSamlProviderConfiguration().signMetadata();
+	protected boolean isSignMetadata() {
+		return getSamlProviderConfiguration().signMetadata();
 	}
 
-	private boolean _isSSLRequired() {
-		return _getSamlProviderConfiguration().sslRequired();
+	protected boolean isSSLRequired() {
+		return getSamlProviderConfiguration().sslRequired();
 	}
 
-	private boolean _isWantAssertionsSigned() {
-		return _getSamlProviderConfiguration().assertionSignatureRequired();
+	protected boolean isWantAssertionsSigned() {
+		return getSamlProviderConfiguration().assertionSignatureRequired();
 	}
 
-	private boolean _isWantAuthnRequestSigned() {
-		return _getSamlProviderConfiguration().authnRequestSignatureRequired();
+	protected boolean isWantAuthnRequestSigned() {
+		return getSamlProviderConfiguration().authnRequestSignatureRequired();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		MetadataManagerImpl.class);
 
-	private BundleContext _bundleContext;
-	private final DCLSingleton<CachingChainingMetadataResolver>
-		_cachingChainingMetadataResolverDCLSingleton = new DCLSingleton<>();
-	private final DCLSingleton<ChainingSignatureTrustEngine>
-		_chainingSignatureTrustEngineDCLSingleton = new DCLSingleton<>();
-
-	@Reference
+	private final CachingChainingMetadataResolver
+		_cachingChainingMetadataResolver =
+			new CachingChainingMetadataResolver();
+	private ChainingSignatureTrustEngine _chainingSignatureTrustEngine;
 	private CredentialResolver _credentialResolver;
-
-	@Reference
+	private Http _http;
 	private LocalEntityManager _localEntityManager;
-
-	private final DCLSingleton<MetadataCredentialResolver>
-		_metadataCredentialResolverDCLSingleton = new DCLSingleton<>();
-
-	@Reference
+	private MetadataCredentialResolver _metadataCredentialResolver;
+	private ParserPool _parserPool;
 	private Portal _portal;
-
-	private final DCLSingleton<PredicateRoleDescriptorResolver>
-		_predicateRoleDescriptorResolverDCLSingleton = new DCLSingleton<>();
+	private final PredicateRoleDescriptorResolver
+		_predicateRoleDescriptorResolver = new PredicateRoleDescriptorResolver(
+			_cachingChainingMetadataResolver);
 
 	@Reference
 	private SamlIdpSpConnectionLocalService _samlIdpSpConnectionLocalService;
 
-	@Reference
 	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
 
 	@Reference
 	private SamlSpIdpConnectionLocalService _samlSpIdpConnectionLocalService;
+
+	@Reference
+	private SecurityConfigurationBootstrap _securityConfigurationBootstrap;
 
 }

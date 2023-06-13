@@ -40,53 +40,47 @@ boolean previewBeforeRestore = WorkflowWebKeys.WORKFLOW_PREVIEW_BEFORE_RESTORE_S
 	<portlet:param name="version" value="<%= String.valueOf(workflowDefinition.getVersion()) %>" />
 </liferay-portlet:renderURL>
 
-<div class="management-bar management-bar-light navbar navbar-expand-md">
+<liferay-frontend:info-bar>
 	<clay:container-fluid>
-		<ul class="m-auto navbar-nav"></ul>
+		<c:if test="<%= !previewBeforeRestore %>">
+			<div class="info-bar-item">
+				<c:choose>
+					<c:when test="<%= workflowDefinition.isActive() %>">
+						<clay:label
+							displayType="info"
+							label="published"
+							large="<%= true %>"
+						/>
+					</c:when>
+					<c:otherwise>
+						<clay:label
+							label="not-published"
+							large="<%= true %>"
+						/>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</c:if>
 
-		<ul class="middle navbar-nav">
-			<li class="nav-item">
-				<c:if test="<%= !previewBeforeRestore %>">
-					<c:choose>
-						<c:when test="<%= workflowDefinition.isActive() %>">
-							<clay:label
-								displayType="info"
-								label="published"
-								large="<%= true %>"
-							/>
-						</c:when>
-						<c:otherwise>
-							<clay:label
-								label="not-published"
-								large="<%= true %>"
-							/>
-						</c:otherwise>
-					</c:choose>
-				</c:if>
+		<%
+		String userName = workflowDefinitionDisplayContext.getUserName(workflowDefinition);
+		%>
 
-				<%
-				String userName = workflowDefinitionDisplayContext.getUserName(workflowDefinition);
-				%>
-
-				<span>
-					<c:choose>
-						<c:when test="<%= userName == null %>">
-							<%= dateFormatTime.format(workflowDefinition.getModifiedDate()) %>
-						</c:when>
-						<c:when test="<%= previewBeforeRestore %>">
-							<liferay-ui:message arguments="<%= new String[] {dateFormatTime.format(workflowDefinition.getModifiedDate()), HtmlUtil.escape(userName)} %>" key="revision-from-x-by-x" translateArguments="<%= false %>" />
-						</c:when>
-						<c:otherwise>
-							<liferay-ui:message arguments="<%= new String[] {dateFormatTime.format(workflowDefinition.getModifiedDate()), HtmlUtil.escape(userName)} %>" key="x,-by-x" translateArguments="<%= false %>" />
-						</c:otherwise>
-					</c:choose>
-				</span>
-			</li>
-		</ul>
-
-		<ul class="end m-auto navbar-nav"></ul>
+		<span>
+			<c:choose>
+				<c:when test="<%= userName == null %>">
+					<%= dateFormatTime.format(workflowDefinition.getModifiedDate()) %>
+				</c:when>
+				<c:when test="<%= previewBeforeRestore %>">
+					<liferay-ui:message arguments="<%= new String[] {dateFormatTime.format(workflowDefinition.getModifiedDate()), HtmlUtil.escape(userName)} %>" key="revision-from-x-by-x" translateArguments="<%= false %>" />
+				</c:when>
+				<c:otherwise>
+					<liferay-ui:message arguments="<%= new String[] {dateFormatTime.format(workflowDefinition.getModifiedDate()), HtmlUtil.escape(userName)} %>" key="x,-by-x" translateArguments="<%= false %>" />
+				</c:otherwise>
+			</c:choose>
+		</span>
 	</clay:container-fluid>
-</div>
+</liferay-frontend:info-bar>
 
 <div class="<%= previewBeforeRestore ? "" : "container-fluid container-fluid-max-xl container-form-lg" %>" id="container">
 	<aui:model-context bean="<%= workflowDefinition %>" model="<%= WorkflowDefinition.class %>" />
@@ -100,7 +94,7 @@ boolean previewBeforeRestore = WorkflowWebKeys.WORKFLOW_PREVIEW_BEFORE_RESTORE_S
 					<aui:field-wrapper label="title">
 						<liferay-ui:input-localized
 							disabled="<%= true %>"
-							name='<%= workflowDefinition.getName() + "_title" %>'
+							name=" <%= workflowDefinition.getName() %>_title"
 							xml='<%= BeanPropertiesUtil.getString(workflowDefinition, "title") %>'
 						/>
 					</aui:field-wrapper>

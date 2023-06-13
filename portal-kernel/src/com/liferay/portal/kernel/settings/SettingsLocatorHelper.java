@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.settings;
 
-import com.liferay.portal.kernel.settings.definition.ConfigurationPidMapping;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -31,9 +29,6 @@ public interface SettingsLocatorHelper {
 		long companyId, String settingsId, Settings parentSettings);
 
 	public Settings getConfigurationBeanSettings(String configurationPid);
-
-	public ConfigurationPidMapping getConfigurationPidMapping(
-		String configurationId);
 
 	public Settings getGroupConfigurationBeanSettings(
 		long groupId, String configurationPid, Settings parentSettings);
@@ -55,7 +50,5 @@ public interface SettingsLocatorHelper {
 		long companyId, long plid, String portletId, Settings parentSettings);
 
 	public Settings getServerSettings(String settingsId);
-
-	public SettingsDescriptor getSettingsDescriptor(String settingsId);
 
 }

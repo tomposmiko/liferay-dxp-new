@@ -17,16 +17,16 @@ package com.liferay.data.engine.internal.search.spi.model.index.contributor;
 import com.liferay.data.engine.model.DEDataListView;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jeyvison Nascimento
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.data.engine.model.DEDataListView",
 	service = ModelDocumentContributor.class
 )
@@ -38,26 +38,29 @@ public class DEDataListViewModelDocumentContributor
 		document.addKeyword(
 			"ddmStructureId", deDataListView.getDdmStructureId());
 
-		String[] languageIds = _getLanguageIds(
+		String[] languageIds = getLanguageIds(
 			deDataListView.getDefaultLanguageId(), deDataListView.getName());
 
 		for (String languageId : languageIds) {
 			document.addText(
-				_localization.getLocalizedName(Field.NAME, languageId),
+				LocalizationUtil.getLocalizedName(Field.NAME, languageId),
 				deDataListView.getName(languageId));
 		}
 
 		document.addLocalizedKeyword(
 			"localized_name",
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				deDataListView.getNameMap(),
 				deDataListView.getDefaultLanguageId(),
 				deDataListView.getGroupId()),
 			true, true);
 	}
 
-	private String[] _getLanguageIds(String defaultLanguageId, String content) {
-		String[] languageIds = _localization.getAvailableLanguageIds(content);
+	protected String[] getLanguageIds(
+		String defaultLanguageId, String content) {
+
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
+			content);
 
 		if (languageIds.length == 0) {
 			languageIds = new String[] {defaultLanguageId};
@@ -65,8 +68,5 @@ public class DEDataListViewModelDocumentContributor
 
 		return languageIds;
 	}
-
-	@Reference
-	private Localization _localization;
 
 }

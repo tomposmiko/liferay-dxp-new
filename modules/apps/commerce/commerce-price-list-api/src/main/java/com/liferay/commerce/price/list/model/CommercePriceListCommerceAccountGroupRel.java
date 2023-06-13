@@ -66,7 +66,8 @@ public interface CommercePriceListCommerceAccountGroupRel
 
 			};
 
-	public com.liferay.account.model.AccountGroup getAccountGroup()
+	public com.liferay.commerce.account.model.CommerceAccountGroup
+			getCommerceAccountGroup()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public CommercePriceList getCommercePriceList()

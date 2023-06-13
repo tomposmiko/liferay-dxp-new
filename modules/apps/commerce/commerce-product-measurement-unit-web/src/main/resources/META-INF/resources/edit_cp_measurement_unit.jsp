@@ -53,35 +53,33 @@ else {
 	<aui:input name="type" type="hidden" value="<%= type %>" />
 
 	<div class="lfr-form-content">
-		<liferay-ui:error exception="<%= DuplicateCPMeasurementUnitKeyException.class %>" message="please-enter-a-valid-key" />
+		<liferay-ui:error exception="<%= CPMeasurementUnitKeyException.class %>" message="please-enter-a-valid-key" />
 
 		<aui:model-context bean="<%= cpMeasurementUnit %>" model="<%= CPMeasurementUnit.class %>" />
 
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<aui:fieldset>
-					<aui:input name="name" />
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
+				<aui:input name="name" />
 
-					<aui:input name="key" />
+				<aui:input name="key" />
 
-					<aui:input inlineLabel="right" labelCssClass="simple-toggle-switch" name="primary" type="toggle-switch" value="<%= primary %>" />
+				<aui:input inlineLabel="right" labelCssClass="simple-toggle-switch" name="primary" type="toggle-switch" value="<%= primary %>" />
 
-					<%
-					String taglibLabel = "ratio-to-primary";
+				<%
+				String taglibLabel = "ratio-to-primary";
 
-					if (primaryCPMeasurementUnit != null) {
-						taglibLabel = LanguageUtil.format(request, "ratio-to-x", HtmlUtil.escape(primaryCPMeasurementUnit.getName(locale)), false);
-					}
-					%>
+				if (primaryCPMeasurementUnit != null) {
+					taglibLabel = LanguageUtil.format(request, "ratio-to-x", HtmlUtil.escape(primaryCPMeasurementUnit.getName(locale)), false);
+				}
+				%>
 
-					<div class="<%= primary ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />rateOptions">
-						<aui:input label="<%= taglibLabel %>" name="rate" />
-					</div>
+				<div class="<%= primary ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />rateOptions">
+					<aui:input label="<%= taglibLabel %>" name="rate" />
+				</div>
 
-					<aui:input name="priority" />
-				</aui:fieldset>
-			</div>
-		</div>
+				<aui:input name="priority" />
+			</aui:fieldset>
+		</aui:fieldset-group>
 	</div>
 
 	<aui:button-row>
@@ -92,9 +90,7 @@ else {
 </aui:form>
 
 <c:if test="<%= cpMeasurementUnit == null %>">
-	<aui:script require="frontend-js-web/index as frontendJsWeb, commerce-frontend-js/utilities/slugify as slugify">
-		var {debounce} = frontendJsWeb;
-
+	<aui:script require="commerce-frontend-js/utilities/debounce as debounce, commerce-frontend-js/utilities/slugify as slugify">
 		var form = document.getElementById('<portlet:namespace />fm');
 
 		var keyInput = form.querySelector('#<portlet:namespace />key');
@@ -104,7 +100,7 @@ else {
 			keyInput.value = slugify.default(nameInput.value);
 		};
 
-		nameInput.addEventListener('input', debounce(handleOnNameInput, 200));
+		nameInput.addEventListener('input', debounce.default(handleOnNameInput, 200));
 	</aui:script>
 </c:if>
 

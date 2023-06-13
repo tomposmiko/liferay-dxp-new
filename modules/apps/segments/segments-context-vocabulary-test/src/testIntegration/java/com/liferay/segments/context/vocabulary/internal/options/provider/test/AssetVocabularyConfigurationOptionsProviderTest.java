@@ -24,13 +24,14 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -63,15 +64,22 @@ public class AssetVocabularyConfigurationOptionsProviderTest {
 				null, null, ServiceContextTestUtil.getServiceContext());
 
 		try {
+			List<ConfigurationFieldOptionsProvider.Option> options =
+				_configurationFieldOptionsProvider.getOptions();
+
+			Stream<ConfigurationFieldOptionsProvider.Option> stream =
+				options.stream();
+
 			Assert.assertTrue(
-				ListUtil.exists(
-					_configurationFieldOptionsProvider.getOptions(),
+				stream.filter(
 					option -> Objects.equals(
-						assetVocabulary.getTitle(LocaleUtil.getDefault()),
-						option.getLabel(LocaleUtil.getDefault()))));
+						option.getLabel(LocaleUtil.getDefault()),
+						assetVocabulary.getTitle(LocaleUtil.getDefault()))
+				).findFirst(
+				).isPresent());
 		}
 		finally {
-			_assetVocabularyLocalService.deleteVocabulary(
+			_assetVocabularyLocalService.deleteAssetVocabulary(
 				assetVocabulary.getVocabularyId());
 		}
 	}
@@ -83,7 +91,7 @@ public class AssetVocabularyConfigurationOptionsProviderTest {
 	private CompanyLocalService _companyLocalService;
 
 	@Inject(
-		filter = "(&(configuration.pid=com.liferay.segments.context.vocabulary.internal.configuration.SegmentsContextVocabularyConfiguration)(configuration.field.name=assetVocabularyName))"
+		filter = "(&(configuration.pid=com.liferay.segments.context.vocabulary.internal.configuration.SegmentsContextVocabularyConfiguration)(configuration.field.name=assetVocabulary))"
 	)
 	private ConfigurationFieldOptionsProvider
 		_configurationFieldOptionsProvider;

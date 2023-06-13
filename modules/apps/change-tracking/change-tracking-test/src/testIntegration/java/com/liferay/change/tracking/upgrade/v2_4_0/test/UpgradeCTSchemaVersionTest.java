@@ -37,9 +37,6 @@ import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import java.sql.Connection;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -83,16 +80,13 @@ public class UpgradeCTSchemaVersionTest {
 					String toSchemaVersionString, UpgradeStep... upgradeSteps) {
 
 					for (UpgradeStep upgradeStep : upgradeSteps) {
-						if (fromSchemaVersionString.equals("2.3.0")) {
-							UpgradeProcess upgradeProcess =
+						Class<?> clazz = upgradeStep.getClass();
+
+						String className = clazz.getName();
+
+						if (className.contains(_CLASS_NAME)) {
+							_upgradeCTSchemaVersion =
 								(UpgradeProcess)upgradeStep;
-
-							for (UpgradeStep innerUpgradeStep :
-									upgradeProcess.getUpgradeSteps()) {
-
-								_upgradeSteps.add(
-									(UpgradeProcess)innerUpgradeStep);
-							}
 						}
 					}
 				}
@@ -113,14 +107,12 @@ public class UpgradeCTSchemaVersionTest {
 			}
 
 			if (dbInspector.hasColumn("CTCollection", "schemaVersionId")) {
-				db.alterTableDropColumn(
-					connection, "CTCollection", "schemaVersionId");
+				db.runSQL(
+					"alter table CTCollection drop column schemaVersionId");
 			}
 		}
 
-		for (UpgradeProcess upgradeProcess : _upgradeSteps) {
-			upgradeProcess.upgrade();
-		}
+		_upgradeCTSchemaVersion.upgrade();
 
 		CacheRegistryUtil.clear();
 
@@ -141,6 +133,10 @@ public class UpgradeCTSchemaVersionTest {
 			_ctPreferences.getPreviousCtCollectionId());
 	}
 
+	private static final String _CLASS_NAME =
+		"com.liferay.change.tracking.internal.upgrade.v2_4_0." +
+			"CTSchemaVersionUpgradeProcess";
+
 	@Inject
 	private static CTCollectionLocalService _ctCollectionLocalService;
 
@@ -148,7 +144,7 @@ public class UpgradeCTSchemaVersionTest {
 	private static CTPreferencesLocalService _ctPreferencesLocalService;
 
 	@Inject(
-		filter = "(&(component.name=com.liferay.change.tracking.internal.upgrade.registry.ChangeTrackingServiceUpgradeStepRegistrator))"
+		filter = "(&(component.name=com.liferay.change.tracking.internal.upgrade.ChangeTrackingServiceUpgrade))"
 	)
 	private static UpgradeStepRegistrator _upgradeStepRegistrator;
 
@@ -158,6 +154,6 @@ public class UpgradeCTSchemaVersionTest {
 	@DeleteAfterTestRun
 	private CTPreferences _ctPreferences;
 
-	private final List<UpgradeProcess> _upgradeSteps = new ArrayList<>();
+	private UpgradeProcess _upgradeCTSchemaVersion;
 
 }

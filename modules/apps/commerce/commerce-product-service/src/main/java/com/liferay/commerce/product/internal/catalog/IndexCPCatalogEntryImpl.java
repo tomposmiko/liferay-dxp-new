@@ -82,6 +82,11 @@ public class IndexCPCatalogEntryImpl implements CPCatalogEntry {
 	}
 
 	@Override
+	public String getDefaultImageFileUrl() {
+		return _document.get(CPField.DEFAULT_IMAGE_FILE_URL);
+	}
+
+	@Override
 	public double getDepth() {
 		return GetterUtil.getDouble(_document.get(CPField.DEPTH));
 	}

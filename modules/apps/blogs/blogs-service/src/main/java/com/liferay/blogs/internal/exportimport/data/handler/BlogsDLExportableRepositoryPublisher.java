@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = DLExportableRepositoryPublisher.class)
+@Component(immediate = true, service = DLExportableRepositoryPublisher.class)
 public class BlogsDLExportableRepositoryPublisher
 	implements DLExportableRepositoryPublisher {
 

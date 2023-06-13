@@ -128,8 +128,4 @@ public interface PortalPreferencesModel
 	@Override
 	public PortalPreferences cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

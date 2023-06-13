@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rodrigo Paulino
  */
 @Component(
-	property = {"exact.match.boost=2.0", "proximity.slop=50"},
+	immediate = true, property = {"exact.match.boost=2.0", "proximity.slop=50"},
 	service = DescriptionFieldQueryBuilder.class
 )
 public class DescriptionFieldQueryBuilder implements FieldQueryBuilder {
@@ -52,6 +52,7 @@ public class DescriptionFieldQueryBuilder implements FieldQueryBuilder {
 	protected void activate(Map<String, Object> properties) {
 		_exactMatchBoost = GetterUtil.getFloat(
 			properties.get("exact.match.boost"), _exactMatchBoost);
+
 		_proximitySlop = GetterUtil.getInteger(
 			properties.get("proximity.slop"), _proximitySlop);
 	}

@@ -62,14 +62,11 @@ public class BackgroundImageSerDes {
 
 			sb.append("\"description\": ");
 
-			if (backgroundImage.getDescription() instanceof String) {
-				sb.append("\"");
-				sb.append((String)backgroundImage.getDescription());
-				sb.append("\"");
-			}
-			else {
-				sb.append(backgroundImage.getDescription());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(backgroundImage.getDescription()));
+
+			sb.append("\"");
 		}
 
 		if (backgroundImage.getTitle() != null) {
@@ -79,14 +76,11 @@ public class BackgroundImageSerDes {
 
 			sb.append("\"title\": ");
 
-			if (backgroundImage.getTitle() instanceof String) {
-				sb.append("\"");
-				sb.append((String)backgroundImage.getTitle());
-				sb.append("\"");
-			}
-			else {
-				sb.append(backgroundImage.getTitle());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(backgroundImage.getTitle()));
+
+			sb.append("\"");
 		}
 
 		if (backgroundImage.getUrl() != null) {
@@ -96,14 +90,11 @@ public class BackgroundImageSerDes {
 
 			sb.append("\"url\": ");
 
-			if (backgroundImage.getUrl() instanceof String) {
-				sb.append("\"");
-				sb.append((String)backgroundImage.getUrl());
-				sb.append("\"");
-			}
-			else {
-				sb.append(backgroundImage.getUrl());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(backgroundImage.getUrl()));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");

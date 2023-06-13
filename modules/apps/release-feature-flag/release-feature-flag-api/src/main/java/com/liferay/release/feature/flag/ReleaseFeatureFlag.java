@@ -18,7 +18,4 @@ package com.liferay.release.feature.flag;
  * @author Alejandro Tardín
  */
 public enum ReleaseFeatureFlag {
-
-	DISABLE_PRIVATE_LAYOUTS
-
 }

@@ -21,10 +21,8 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPDefinitionOptionRelLocalService;
 import com.liferay.headless.commerce.delivery.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.delivery.catalog.dto.v1_0.ProductOption;
-import com.liferay.headless.commerce.delivery.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
+import com.liferay.headless.commerce.delivery.catalog.internal.dto.v1_0.converter.ProductOptionDTOConverter;
 import com.liferay.headless.commerce.delivery.catalog.resource.v1_0.ProductOptionResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
@@ -43,11 +41,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Andrea Sbarra
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/product-option.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, ProductOptionResource.class}
 )
-@CTAware
 public class ProductOptionResourceImpl
 	extends BaseProductOptionResourceImpl implements NestedFieldSupport {
 
@@ -105,8 +103,7 @@ public class ProductOptionResourceImpl
 	private CPDefinitionOptionRelLocalService
 		_cpDefinitionOptionRelLocalService;
 
-	@Reference(target = DTOConverterConstants.PRODUCT_OPTION_DTO_CONVERTER)
-	private DTOConverter<CPDefinitionOptionRel, ProductOption>
-		_productOptionDTOConverter;
+	@Reference
+	private ProductOptionDTOConverter _productOptionDTOConverter;
 
 }

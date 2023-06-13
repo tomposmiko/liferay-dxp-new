@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Victor Trajano
  */
-@Component(service = DSCustomFieldManager.class)
+@Component(immediate = true, service = DSCustomFieldManager.class)
 public class DSCustomFieldManagerImpl implements DSCustomFieldManager {
 
 	@Override
@@ -48,7 +48,16 @@ public class DSCustomFieldManagerImpl implements DSCustomFieldManager {
 					"textCustomFields",
 					JSONUtil.toJSONArray(
 						dsCustomFields,
-						dsCustomField -> dsCustomField.toJSONObject(), _log))));
+						dsCustomField -> JSONUtil.put(
+							"fieldId", dsCustomField.getDSCustomFieldId()
+						).put(
+							"name", dsCustomField.getName()
+						).put(
+							"show", dsCustomField.getShow()
+						).put(
+							"value", dsCustomField.getValue()
+						),
+						_log))));
 	}
 
 	private List<DSCustomField> _toDSCustomFields(JSONObject jsonObject) {

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -35,8 +34,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
-
-import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -85,37 +82,6 @@ public class PortalInstance implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean active;
-
-	@Schema(
-		description = "The portal instance's administrator. This field is optional and is only used in the portal instance creation."
-	)
-	@Valid
-	public Admin getAdmin() {
-		return admin;
-	}
-
-	public void setAdmin(Admin admin) {
-		this.admin = admin;
-	}
-
-	@JsonIgnore
-	public void setAdmin(UnsafeSupplier<Admin, Exception> adminUnsafeSupplier) {
-		try {
-			admin = adminUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "The portal instance's administrator. This field is optional and is only used in the portal instance creation."
-	)
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	protected Admin admin;
 
 	@Schema(description = "internal unique key.")
 	public Long getCompanyId() {
@@ -298,16 +264,6 @@ public class PortalInstance implements Serializable {
 			sb.append(active);
 		}
 
-		if (admin != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"admin\": ");
-
-			sb.append(String.valueOf(admin));
-		}
-
 		if (companyId != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -387,9 +343,9 @@ public class PortalInstance implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -415,7 +371,7 @@ public class PortalInstance implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -447,7 +403,7 @@ public class PortalInstance implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -463,10 +419,5 @@ public class PortalInstance implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

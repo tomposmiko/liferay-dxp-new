@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet",
 	service = {
 		DDMStructurePermissionSupport.class, DDMTemplatePermissionSupport.class

@@ -116,11 +116,11 @@
 			WHERE
 				(
 					(
-						([$FALSE$] = ?) AND
+						(NOT ?) AND
 						(MBMessage.parentMessageId = ?)
 					) OR
 					(
-						([$TRUE$] = ?) AND
+						(?) AND
 						(MBMessage.treePath LIKE ?)
 					)
 				) AND
@@ -185,11 +185,11 @@
 			WHERE
 				(
 					(
-						([$FALSE$] = ?) AND
+						(NOT ?) AND
 						(MBMessage.parentMessageId = ?)
 					) OR
 					(
-						([$TRUE$] = ?) AND
+						(?) AND
 						(MBMessage.treePath LIKE ?)
 					)
 				) AND

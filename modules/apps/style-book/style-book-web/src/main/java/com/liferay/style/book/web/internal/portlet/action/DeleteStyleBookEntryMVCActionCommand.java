@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StyleBookPortletKeys.STYLE_BOOK,
 		"mvc.command.name=/style_book/delete_style_book_entry"
@@ -67,7 +68,7 @@ public class DeleteStyleBookEntryMVCActionCommand extends BaseMVCActionCommand {
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 
 				SessionErrors.add(actionRequest, PortalException.class);

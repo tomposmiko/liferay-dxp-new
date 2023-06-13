@@ -14,19 +14,31 @@
 
 package com.liferay.staging;
 
-import com.liferay.osgi.util.service.Snapshot;
-
 /**
  * @author Máté Thurzó
  */
 public class StagingGroupHelperUtil {
 
 	public static StagingGroupHelper getStagingGroupHelper() {
-		return _stagingGroupHelperSnapshot.get();
+		if (_stagingGroupHelper != null) {
+			return _stagingGroupHelper;
+		}
+
+		throw new NullPointerException("StagingGroupHelper is null");
 	}
 
-	private static final Snapshot<StagingGroupHelper>
-		_stagingGroupHelperSnapshot = new Snapshot<>(
-			StagingGroupHelperUtil.class, StagingGroupHelper.class);
+	public static void setStagingGroupHelper(
+		StagingGroupHelper stagingGroupHelper) {
+
+		if (_stagingGroupHelper != null) {
+			stagingGroupHelper = _stagingGroupHelper;
+
+			return;
+		}
+
+		_stagingGroupHelper = stagingGroupHelper;
+	}
+
+	private static StagingGroupHelper _stagingGroupHelper;
 
 }

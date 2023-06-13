@@ -26,6 +26,7 @@ List<EmailAddress> emailAddresses = EmailAddressServiceUtil.getEmailAddresses(cl
 %>
 
 <clay:content-row
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -36,11 +37,11 @@ List<EmailAddress> emailAddresses = EmailAddressServiceUtil.getEmailAddresses(cl
 
 	<clay:content-col>
 		<span class="heading-end">
-			<clay:link
-				aria-label='<%= LanguageUtil.format(request, "add-x", "additional-email-addresses") %>'
-				cssClass="add-email-address-link btn btn-secondary btn-sm"
-				displayType="null"
-				href='<%=
+			<liferay-ui:icon
+				label="<%= true %>"
+				linkCssClass="add-email-address-link btn btn-secondary btn-sm"
+				message="add"
+				url='<%=
 					PortletURLBuilder.createRenderURL(
 						liferayPortletResponse
 					).setMVCPath(
@@ -53,8 +54,6 @@ List<EmailAddress> emailAddresses = EmailAddressServiceUtil.getEmailAddresses(cl
 						"classPK", classPK
 					).buildString()
 				%>'
-				label="add"
-				role="button"
 			/>
 		</span>
 	</clay:content-col>
@@ -72,8 +71,7 @@ List<EmailAddress> emailAddresses = EmailAddressServiceUtil.getEmailAddresses(cl
 	total="<%= emailAddresses.size() %>"
 >
 	<liferay-ui:search-container-results
-		calculateStartAndEnd="<%= true %>"
-		results="<%= emailAddresses %>"
+		results="<%= emailAddresses.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 	/>
 
 	<liferay-ui:search-container-row
@@ -89,7 +87,7 @@ List<EmailAddress> emailAddresses = EmailAddressServiceUtil.getEmailAddresses(cl
 		/>
 
 		<%
-		ListType emailAddressListType = ListTypeServiceUtil.getListType(emailAddress.getListTypeId());
+		ListType emailAddressListType = ListTypeServiceUtil.getListType(emailAddress.getTypeId());
 
 		String emailAddressTypeKey = emailAddressListType.getName();
 		%>

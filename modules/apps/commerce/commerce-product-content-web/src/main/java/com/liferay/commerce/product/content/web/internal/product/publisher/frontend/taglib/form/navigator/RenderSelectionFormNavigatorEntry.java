@@ -17,7 +17,7 @@ package com.liferay.commerce.product.content.web.internal.product.publisher.fron
 import com.liferay.commerce.product.content.web.internal.constants.CPPublisherConstants;
 import com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "form.navigator.entry.order:Integer=700",
+	enabled = false, property = "form.navigator.entry.order:Integer=700",
 	service = FormNavigatorEntry.class
 )
 public class RenderSelectionFormNavigatorEntry
@@ -53,25 +53,21 @@ public class RenderSelectionFormNavigatorEntry
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, getKey());
+		return LanguageUtil.get(locale, getKey());
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
 	protected String getJspPath() {
 		return "/product_publisher/configuration/render_selection.jsp";
 	}
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)"
-	)
-	private ServletContext _servletContext;
 
 }

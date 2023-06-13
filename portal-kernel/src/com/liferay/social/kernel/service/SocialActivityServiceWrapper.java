@@ -27,10 +27,6 @@ import com.liferay.social.kernel.model.SocialActivity;
 public class SocialActivityServiceWrapper
 	implements ServiceWrapper<SocialActivityService>, SocialActivityService {
 
-	public SocialActivityServiceWrapper() {
-		this(null);
-	}
-
 	public SocialActivityServiceWrapper(
 		SocialActivityService socialActivityService) {
 

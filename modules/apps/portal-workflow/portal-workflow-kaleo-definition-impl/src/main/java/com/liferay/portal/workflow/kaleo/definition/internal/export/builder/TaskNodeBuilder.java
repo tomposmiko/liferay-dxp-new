@@ -16,7 +16,7 @@ package com.liferay.portal.workflow.kaleo.definition.internal.export.builder;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
+import com.liferay.portal.workflow.kaleo.definition.Assignment;
 import com.liferay.portal.workflow.kaleo.definition.Task;
 import com.liferay.portal.workflow.kaleo.definition.TaskForm;
 import com.liferay.portal.workflow.kaleo.definition.TaskFormReference;
@@ -36,34 +36,13 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = NodeBuilder.class)
+@Component(
+	immediate = true, property = "node.type=TASK", service = NodeBuilder.class
+)
 public class TaskNodeBuilder
 	extends BaseNodeBuilder<Task> implements NodeBuilder {
 
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.TASK;
-	}
-
-	@Override
-	protected Task createNode(KaleoNode kaleoNode) throws PortalException {
-		KaleoTask kaleoTask = _kaleoTaskLocalService.getKaleoNodeKaleoTask(
-			kaleoNode.getKaleoNodeId());
-
-		Task task = new Task(kaleoNode.getName(), kaleoNode.getDescription());
-
-		task.setAssignments(
-			buildAssigments(
-				KaleoTask.class.getName(), kaleoTask.getKaleoTaskId()));
-
-		Set<TaskForm> taskForms = _buildTaskForms(kaleoTask.getKaleoTaskId());
-
-		task.addTaskForms(taskForms);
-
-		return task;
-	}
-
-	private Set<TaskForm> _buildTaskForms(long kaleoTaskId)
+	protected Set<TaskForm> buildTaskForms(String name, long kaleoTaskId)
 		throws PortalException {
 
 		List<KaleoTaskForm> kaleoTaskForms =
@@ -97,6 +76,26 @@ public class TaskNodeBuilder
 		}
 
 		return taskForms;
+	}
+
+	@Override
+	protected Task createNode(KaleoNode kaleoNode) throws PortalException {
+		KaleoTask kaleoTask = _kaleoTaskLocalService.getKaleoNodeKaleoTask(
+			kaleoNode.getKaleoNodeId());
+
+		Task task = new Task(kaleoNode.getName(), kaleoNode.getDescription());
+
+		Set<Assignment> assignments = buildAssigments(
+			KaleoTask.class.getName(), kaleoTask.getKaleoTaskId());
+
+		task.setAssignments(assignments);
+
+		Set<TaskForm> taskForms = buildTaskForms(
+			KaleoTask.class.getName(), kaleoTask.getKaleoTaskId());
+
+		task.addTaskForms(taskForms);
+
+		return task;
 	}
 
 	@Reference

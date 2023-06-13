@@ -99,21 +99,6 @@ public interface BatchEngineImportTaskModel
 	public void setUuid(String uuid);
 
 	/**
-	 * Returns the external reference code of this batch engine import task.
-	 *
-	 * @return the external reference code of this batch engine import task
-	 */
-	@AutoEscape
-	public String getExternalReferenceCode();
-
-	/**
-	 * Sets the external reference code of this batch engine import task.
-	 *
-	 * @param externalReferenceCode the external reference code of this batch engine import task
-	 */
-	public void setExternalReferenceCode(String externalReferenceCode);
-
-	/**
 	 * Returns the batch engine import task ID of this batch engine import task.
 	 *
 	 * @return the batch engine import task ID of this batch engine import task
@@ -335,20 +320,6 @@ public interface BatchEngineImportTaskModel
 	public void setFieldNameMapping(Map<String, Serializable> fieldNameMapping);
 
 	/**
-	 * Returns the import strategy of this batch engine import task.
-	 *
-	 * @return the import strategy of this batch engine import task
-	 */
-	public int getImportStrategy();
-
-	/**
-	 * Sets the import strategy of this batch engine import task.
-	 *
-	 * @param importStrategy the import strategy of this batch engine import task
-	 */
-	public void setImportStrategy(int importStrategy);
-
-	/**
 	 * Returns the operation of this batch engine import task.
 	 *
 	 * @return the operation of this batch engine import task
@@ -436,9 +407,5 @@ public interface BatchEngineImportTaskModel
 
 	@Override
 	public BatchEngineImportTask cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

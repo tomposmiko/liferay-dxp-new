@@ -17,10 +17,8 @@ package com.liferay.commerce.product.model;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedAuditedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -39,8 +37,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CPDefinitionLinkModel
-	extends BaseModel<CPDefinitionLink>, CTModel<CPDefinitionLink>,
-			GroupedModel, MVCCModel, ShardedModel, StagedAuditedModel {
+	extends BaseModel<CPDefinitionLink>, GroupedModel, ShardedModel,
+			StagedAuditedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -53,7 +51,6 @@ public interface CPDefinitionLinkModel
 	 *
 	 * @return the primary key of this cp definition link
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -61,40 +58,7 @@ public interface CPDefinitionLinkModel
 	 *
 	 * @param primaryKey the primary key of this cp definition link
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this cp definition link.
-	 *
-	 * @return the mvcc version of this cp definition link
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this cp definition link.
-	 *
-	 * @param mvccVersion the mvcc version of this cp definition link
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this cp definition link.
-	 *
-	 * @return the ct collection ID of this cp definition link
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this cp definition link.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp definition link
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this cp definition link.
@@ -299,9 +263,5 @@ public interface CPDefinitionLinkModel
 
 	@Override
 	public CPDefinitionLink cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

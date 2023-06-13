@@ -3,28 +3,42 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "Product Info Management";
 
 	setUp {
-		CommerceConfiguration.commerceSetUp(storeFront = "true");
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceStoreFrontSetUp();
 	}
 
 	tearDown {
-		CommerceConfiguration.commerceTearDown();
+		Navigator.openURL();
+
+		if (IsElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE")) {
+			User.logoutPG();
+		}
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceAdminTearDown();
+
+		CommerceConfiguration.commerceInitializersTearDown();
 	}
 
 	@description = "This is a test for COMMERCE-6088. AddAccountGroupFilter"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AddAccountGroupFilter {
+		property portal.acceptance = "false";
 
 		// TODO COMMERCE-6088 AddAccountGroupFilter
 
 	}
 
 	@description = "This is a test for COMMERCE-6086. AddAChannelFilter"
-	@priority = 3
+	@priority = "3"
 	test AddAChannelFilter {
 		property portal.acceptance = "false";
 
@@ -50,87 +64,31 @@ definition {
 			productName = "Simple T-Shirt",
 			productType = "Simple");
 
-		CommerceDiagram.setVisibility(
-			checkboxName = "Test Channel",
-			name = "Channels");
-	}
+		CommerceEntry.gotoMenuTab(menuTab = "Visibility");
 
-	@description = "This is a test for COMMERCE-10610. Regular users can assert the empty product channels visibility with the view permissions for products and catalogs of the admin panel"
-	@priority = 3
-	test CanAssertEmptyProductChannelsVisibilityWithProductsAndCatalogsViewPermissions {
-		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}company.security.strangers.verify=false";
-		property portal.acceptance = "false";
+		Click(
+			key_name = "Channels",
+			locator1 = "ToggleSwitch#ENABLE_SPECIFIC_TOGGLE_SWITCH");
 
-		task ("Given a Minium site") {
-			CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
-		}
+		Click(locator1 = "Button#PLUS");
 
-		task ("And a regular user is created") {
-			JSONUser.addUser(
-				userEmailAddress = "testuser@liferay.com",
-				userFirstName = "Test",
-				userLastName = "User",
-				userScreenName = "testuser");
+		SelectFrameTop();
 
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "testuser@liferay.com");
-		}
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
-		task ("And the user has permission to view products and catalogs in the both products and catalogs sections of the admin panel") {
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "ACCESS_IN_CONTROL_PANEL",
-				resourceName = "com_liferay_commerce_product_definitions_web_internal_portlet_CPDefinitionsPortlet",
-				roleTitle = "User");
+		Check(
+			key_checkboxName = "Test Channel",
+			locator1 = "Checkbox#ENABLE_CHECKBOX");
 
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW",
-				resourceName = "com_liferay_commerce_product_definitions_web_internal_portlet_CPDefinitionsPortlet",
-				roleTitle = "User");
+		SelectFrameTop();
 
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_CONTROL_PANEL",
-				resourceName = 90,
-				roleTitle = "User");
+		Button.click(button = "Add");
 
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "ACCESS_IN_CONTROL_PANEL",
-				resourceName = "com_liferay_commerce_catalog_web_internal_portlet_CommerceCatalogsPortlet",
-				roleTitle = "User");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW",
-				resourceName = "com.liferay.commerce.product.model.CommerceCatalog",
-				roleTitle = "User");
-
-			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "VIEW_COMMERCE_CATALOGS",
-				resourceName = "com.liferay.commerce.catalog",
-				roleTitle = "User");
-		}
-
-		task ("When the user logs in and goes to the Visibility tab of ABS Sensor product in the products admin panel") {
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "testuser@liferay.com",
-				userLoginFullName = "Test User");
-
-			CommerceProducts.openProductsAdmin();
-
-			CommerceNavigator.gotoEntry(entryName = "ABS Sensor");
-
-			CommerceEntry.gotoMenuTab(menuTab = "Visibility");
-		}
-
-		task ("Then no channels are displayed") {
-			AssertTextEquals(
-				locator1 = "Message#EMPTY_STATE_INFO",
-				value1 = "No Results Found");
-		}
+		Alert.viewSuccessMessage();
 	}
 
 	@description = "This is a test for COMMERCE-6089. RemoveAccountGroupFilter"
-	@priority = 3
+	@priority = "3"
 	test RemoveAccountGroupFilter {
 		property portal.acceptance = "false";
 		property portal.upstream = "quarantine";
@@ -154,10 +112,29 @@ definition {
 			productName = "Simple T-Shirt",
 			productType = "Simple");
 
-		CommerceDiagram.setVisibility(
-			checkboxName = "Guest",
-			name = "Account Groups",
-			webContentTitle = "Add Account Group Relation to Simple T-Shirt");
+		CommerceEntry.gotoMenuTab(menuTab = "Visibility");
+
+		Click(
+			key_name = "Account Groups",
+			locator1 = "ToggleSwitch#ENABLE_SPECIFIC_TOGGLE_SWITCH");
+
+		ClickNoError.clickNoMouseOver(
+			key_webContentTitle = "Add Account Group Relation to Simple T-Shirt",
+			locator1 = "Button#BUTTON_PLUS_PRODUCT_VISIBILITY");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		Check(
+			key_checkboxName = "Guest",
+			locator1 = "Checkbox#ENABLE_CHECKBOX");
+
+		SelectFrameTop();
+
+		Button.click(button = "Add");
+
+		SelectFrameTop();
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
 
 		Button.click(button = "Delete");
 
@@ -171,9 +148,9 @@ definition {
 	}
 
 	@description = "This is a test for COMMERCE-6087. RemoveAChannelFilter"
-	@priority = 5
+	@priority = "3"
 	test RemoveAChannelFilter {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 		property test.name.skip.portal.instance = "CPCommerceProductVisibility#RemoveAChannelFilter";
 
 		CommerceNavigator.gotoPortlet(
@@ -185,9 +162,25 @@ definition {
 			productName = "Simple T-Shirt",
 			productType = "Simple");
 
-		CommerceDiagram.setVisibility(
-			checkboxName = "Test Channel",
-			name = "Channels");
+		CommerceEntry.gotoMenuTab(menuTab = "Visibility");
+
+		Click(
+			key_name = "Channels",
+			locator1 = "ToggleSwitch#ENABLE_SPECIFIC_TOGGLE_SWITCH");
+
+		Click(locator1 = "Button#PLUS");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+		Check(
+			key_checkboxName = "Test Channel",
+			locator1 = "Checkbox#ENABLE_CHECKBOX");
+
+		SelectFrameTop();
+
+		Button.click(button = "Add");
+
+		Alert.viewSuccessMessage();
 
 		WaitForElementPresent(
 			key_productName = "Test Channel",

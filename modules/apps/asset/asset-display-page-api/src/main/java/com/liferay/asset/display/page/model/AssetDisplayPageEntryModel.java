@@ -329,8 +329,4 @@ public interface AssetDisplayPageEntryModel
 	@Override
 	public AssetDisplayPageEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

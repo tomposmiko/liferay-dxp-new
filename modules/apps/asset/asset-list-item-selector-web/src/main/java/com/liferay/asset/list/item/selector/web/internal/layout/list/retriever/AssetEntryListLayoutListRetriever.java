@@ -22,7 +22,7 @@ import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.info.filter.CategoriesInfoFilter;
 import com.liferay.info.filter.InfoFilter;
 import com.liferay.info.filter.KeywordsInfoFilter;
-import com.liferay.info.filter.TagsInfoFilter;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
 import com.liferay.layout.list.retriever.ClassedModelListObjectReference;
@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = LayoutListRetriever.class)
+@Component(immediate = true, service = LayoutListRetriever.class)
 public class AssetEntryListLayoutListRetriever
 	implements LayoutListRetriever
 		<InfoListItemSelectorReturnType, ClassedModelListObjectReference> {
@@ -61,24 +62,22 @@ public class AssetEntryListLayoutListRetriever
 			return Collections.emptyList();
 		}
 
-		long[] segmentsEntryIds =
-			layoutListRetrieverContext.getSegmentsEntryIds();
+		Optional<long[]> segmentsEntryIdsOptional =
+			layoutListRetrieverContext.getSegmentsEntryIdsOptional();
 
-		if (segmentsEntryIds == null) {
-			segmentsEntryIds = new long[] {0};
-		}
+		long[] segmentsEntryIds = segmentsEntryIdsOptional.orElse(
+			new long[] {0});
 
-		Pagination pagination = layoutListRetrieverContext.getPagination();
+		Optional<Pagination> paginationOptional =
+			layoutListRetrieverContext.getPaginationOptional();
 
-		if (pagination == null) {
-			pagination = Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-		}
+		Pagination pagination = paginationOptional.orElse(
+			Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
 
 		List<AssetEntry> assetEntries =
 			_assetListAssetEntryProvider.getAssetEntries(
 				assetListEntry, segmentsEntryIds,
 				_getAssetCategoryIds(layoutListRetrieverContext),
-				_getAssetTagNames(layoutListRetrieverContext),
 				_getKeywords(layoutListRetrieverContext), StringPool.BLANK,
 				pagination.getStart(), pagination.getEnd());
 
@@ -105,17 +104,15 @@ public class AssetEntryListLayoutListRetriever
 			return 0;
 		}
 
-		long[] segmentsEntryIds =
-			layoutListRetrieverContext.getSegmentsEntryIds();
+		Optional<long[]> segmentsEntryIdsOptional =
+			layoutListRetrieverContext.getSegmentsEntryIdsOptional();
 
-		if (segmentsEntryIds == null) {
-			segmentsEntryIds = new long[] {0};
-		}
+		long[] segmentsEntryIds = segmentsEntryIdsOptional.orElse(
+			new long[] {0});
 
 		return _assetListAssetEntryProvider.getAssetEntriesCount(
 			assetListEntry, segmentsEntryIds,
 			_getAssetCategoryIds(layoutListRetrieverContext),
-			_getAssetTagNames(layoutListRetrieverContext),
 			_getKeywords(layoutListRetrieverContext), StringPool.BLANK);
 	}
 
@@ -129,9 +126,12 @@ public class AssetEntryListLayoutListRetriever
 	private long[][] _getAssetCategoryIds(
 		LayoutListRetrieverContext layoutListRetrieverContext) {
 
-		CategoriesInfoFilter categoriesInfoFilter =
-			layoutListRetrieverContext.getInfoFilter(
+		Optional<CategoriesInfoFilter> infoFilterOptional =
+			layoutListRetrieverContext.getInfoFilterOptional(
 				CategoriesInfoFilter.class);
+
+		CategoriesInfoFilter categoriesInfoFilter = infoFilterOptional.orElse(
+			null);
 
 		if (categoriesInfoFilter == null) {
 			return new long[0][];
@@ -140,24 +140,14 @@ public class AssetEntryListLayoutListRetriever
 		return categoriesInfoFilter.getCategoryIds();
 	}
 
-	private String[][] _getAssetTagNames(
-		LayoutListRetrieverContext layoutListRetrieverContext) {
-
-		TagsInfoFilter tagsInfoFilter =
-			layoutListRetrieverContext.getInfoFilter(TagsInfoFilter.class);
-
-		if (tagsInfoFilter == null) {
-			return new String[0][];
-		}
-
-		return tagsInfoFilter.getTagNames();
-	}
-
 	private String _getKeywords(
 		LayoutListRetrieverContext layoutListRetrieverContext) {
 
-		KeywordsInfoFilter keywordsInfoFilter =
-			layoutListRetrieverContext.getInfoFilter(KeywordsInfoFilter.class);
+		Optional<KeywordsInfoFilter> infoFilterOptional =
+			layoutListRetrieverContext.getInfoFilterOptional(
+				KeywordsInfoFilter.class);
+
+		KeywordsInfoFilter keywordsInfoFilter = infoFilterOptional.orElse(null);
 
 		if (keywordsInfoFilter == null) {
 			return StringPool.BLANK;
@@ -179,13 +169,15 @@ public class AssetEntryListLayoutListRetriever
 	}
 
 	private static final List<InfoFilter> _supportedInfoFilters = Arrays.asList(
-		new CategoriesInfoFilter(), new KeywordsInfoFilter(),
-		new TagsInfoFilter());
+		new CategoriesInfoFilter(), new KeywordsInfoFilter());
 
 	@Reference
 	private AssetListAssetEntryProvider _assetListAssetEntryProvider;
 
 	@Reference
 	private AssetListEntryLocalService _assetListEntryLocalService;
+
+	@Reference
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 }

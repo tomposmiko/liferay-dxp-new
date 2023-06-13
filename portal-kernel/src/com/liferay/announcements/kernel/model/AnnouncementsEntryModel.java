@@ -373,8 +373,4 @@ public interface AnnouncementsEntryModel
 	@Override
 	public AnnouncementsEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

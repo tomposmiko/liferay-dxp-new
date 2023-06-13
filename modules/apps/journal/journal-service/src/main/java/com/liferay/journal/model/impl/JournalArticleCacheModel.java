@@ -117,8 +117,8 @@ public class JournalArticleCacheModel
 		sb.append(version);
 		sb.append(", urlTitle=");
 		sb.append(urlTitle);
-		sb.append(", DDMStructureId=");
-		sb.append(DDMStructureId);
+		sb.append(", DDMStructureKey=");
+		sb.append(DDMStructureKey);
 		sb.append(", DDMTemplateKey=");
 		sb.append(DDMTemplateKey);
 		sb.append(", defaultLanguageId=");
@@ -229,7 +229,12 @@ public class JournalArticleCacheModel
 			journalArticleImpl.setUrlTitle(urlTitle);
 		}
 
-		journalArticleImpl.setDDMStructureId(DDMStructureId);
+		if (DDMStructureKey == null) {
+			journalArticleImpl.setDDMStructureKey("");
+		}
+		else {
+			journalArticleImpl.setDDMStructureKey(DDMStructureKey);
+		}
 
 		if (DDMTemplateKey == null) {
 			journalArticleImpl.setDDMTemplateKey("");
@@ -310,11 +315,15 @@ public class JournalArticleCacheModel
 
 		journalArticleImpl.resetOriginalValues();
 
+		journalArticleImpl.setDocument(_document);
+
 		return journalArticleImpl;
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 
 		ctCollectionId = objectInput.readLong();
@@ -344,8 +353,7 @@ public class JournalArticleCacheModel
 
 		version = objectInput.readDouble();
 		urlTitle = objectInput.readUTF();
-
-		DDMStructureId = objectInput.readLong();
+		DDMStructureKey = objectInput.readUTF();
 		DDMTemplateKey = objectInput.readUTF();
 		defaultLanguageId = objectInput.readUTF();
 		layoutUuid = objectInput.readUTF();
@@ -366,6 +374,9 @@ public class JournalArticleCacheModel
 		statusByUserId = objectInput.readLong();
 		statusByUserName = objectInput.readUTF();
 		statusDate = objectInput.readLong();
+
+		_document =
+			(com.liferay.portal.kernel.xml.Document)objectInput.readObject();
 	}
 
 	@Override
@@ -437,7 +448,12 @@ public class JournalArticleCacheModel
 			objectOutput.writeUTF(urlTitle);
 		}
 
-		objectOutput.writeLong(DDMStructureId);
+		if (DDMStructureKey == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(DDMStructureKey);
+		}
 
 		if (DDMTemplateKey == null) {
 			objectOutput.writeUTF("");
@@ -491,6 +507,8 @@ public class JournalArticleCacheModel
 		}
 
 		objectOutput.writeLong(statusDate);
+
+		objectOutput.writeObject(_document);
 	}
 
 	public long mvccVersion;
@@ -512,7 +530,7 @@ public class JournalArticleCacheModel
 	public String articleId;
 	public double version;
 	public String urlTitle;
-	public long DDMStructureId;
+	public String DDMStructureKey;
 	public String DDMTemplateKey;
 	public String defaultLanguageId;
 	public String layoutUuid;
@@ -528,5 +546,6 @@ public class JournalArticleCacheModel
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+	public com.liferay.portal.kernel.xml.Document _document;
 
 }

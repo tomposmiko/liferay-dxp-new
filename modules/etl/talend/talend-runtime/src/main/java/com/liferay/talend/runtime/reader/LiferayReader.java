@@ -18,7 +18,6 @@ import com.liferay.talend.avro.JsonObjectIndexedRecordConverter;
 import com.liferay.talend.common.headless.HeadlessUtil;
 import com.liferay.talend.properties.input.LiferayInputProperties;
 import com.liferay.talend.runtime.LiferaySource;
-import com.liferay.talend.runtime.client.exception.ResponseContentClientException;
 
 import java.io.IOException;
 
@@ -27,6 +26,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -57,6 +57,7 @@ public class LiferayReader implements Reader<IndexedRecord> {
 		LiferayInputProperties liferayInputProperties) {
 
 		_liferaySource = liferaySource;
+
 		_liferayInputProperties = liferayInputProperties;
 
 		_jsonObjectIndexedRecordConverter =
@@ -87,16 +88,7 @@ public class LiferayReader implements Reader<IndexedRecord> {
 
 		_currentPage++;
 
-		try {
-			_readEndpointJsonObject();
-		}
-		catch (ResponseContentClientException responseContentClientException) {
-			if (responseContentClientException.getHttpStatus() == 404) {
-				return false;
-			}
-
-			throw responseContentClientException;
-		}
+		_readEndpointJsonObject();
 
 		if (_itemsJsonArray.size() <= 0) {
 			_hasMore = false;
@@ -222,14 +214,16 @@ public class LiferayReader implements Reader<IndexedRecord> {
 					resourceURI.toString());
 		}
 
-		JsonObject jsonObject = liferaySource.doGetRequest(
+		Optional<JsonObject> jsonObjectOptional = liferaySource.doGetRequest(
 			resourceURI.toString());
 
-		if (jsonObject == null) {
+		if (!jsonObjectOptional.isPresent()) {
 			throw new IOException(
 				"Unable to get JSON object for resource at " +
 					resourceURI.toASCIIString());
 		}
+
+		JsonObject jsonObject = jsonObjectOptional.get();
 
 		if (jsonObject.containsKey("page")) {
 			if (jsonObject.containsKey("items")) {

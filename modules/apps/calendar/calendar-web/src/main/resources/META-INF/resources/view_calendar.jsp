@@ -103,7 +103,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 							</div>
 
 							<c:if test="<%= userCalendarResource != null %>">
-								<span aria-controls="<portlet:namespace />calendarsMenu" aria-expanded="false" aria-label="<liferay-ui:message arguments='<%= LanguageUtil.get(request, "my-calendars") %>' key="manage-calendar-x" />" class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= userCalendarResource.getCalendarResourceId() %>" role="button" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
+								<span aria-label="<liferay-ui:message key="manage-calendars" />" class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= userCalendarResource.getCalendarResourceId() %>" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
 							</c:if>
 						</c:if>
 
@@ -119,7 +119,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 							</div>
 
 							<c:if test="<%= CalendarResourcePermission.contains(permissionChecker, groupCalendarResource, CalendarActionKeys.ADD_CALENDAR) %>">
-								<span aria-expanded="false" aria-label="<liferay-ui:message arguments="<%= HtmlUtil.escape(groupCalendarResource.getName(locale)) %>" key="manage-calendar-x" />" class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= groupCalendarResource.getCalendarResourceId() %>" role="button" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
+								<span class="calendar-list-item-arrow calendar-resource-arrow" data-calendarResourceId="<%= groupCalendarResource.getCalendarResourceId() %>" tabindex="0"><clay:icon symbol="caret-bottom" /></span>
 							</c:if>
 
 							<div class="calendar-portlet-calendar-list" id="<portlet:namespace />siteCalendarList"></div>
@@ -254,7 +254,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 	<c:if test="<%= themeDisplay.isSignedIn() || (groupCalendarResource != null) %>">
 		window.<portlet:namespace />myCalendarList = new Liferay.CalendarList({
 			after: {
-				'calendarsChange': syncCalendarsMap,
+				calendarsChange: syncCalendarsMap,
 				'scheduler-calendar:visibleChange': function (event) {
 					syncCalendarsMap();
 
@@ -284,7 +284,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 	<c:if test="<%= themeDisplay.isSignedIn() %>">
 		window.<portlet:namespace />otherCalendarList = new Liferay.CalendarList({
 			after: {
-				'calendarsChange': function (event) {
+				calendarsChange: function (event) {
 					syncCalendarsMap();
 
 					<portlet:namespace />scheduler.load();
@@ -318,7 +318,7 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 	<c:if test="<%= showSiteCalendars %>">
 		window.<portlet:namespace />siteCalendarList = new Liferay.CalendarList({
 			after: {
-				'calendarsChange': syncCalendarsMap,
+				calendarsChange: syncCalendarsMap,
 				'scheduler-calendar:visibleChange': function (event) {
 					syncCalendarsMap();
 
@@ -372,15 +372,6 @@ boolean columnOptionsVisible = GetterUtil.getBoolean(SessionClicks.get(request, 
 			.attr(
 				'title',
 				Liferay.Util.unescapeHTML(schedulerEvent.get('content'))
-			);
-
-		schedulerEvent
-			.get('node')
-			.attr(
-				'calendarResourceName',
-				Liferay.Util.unescapeHTML(
-					schedulerEvent.get('calendarResourceName')
-				)
 			);
 	};
 

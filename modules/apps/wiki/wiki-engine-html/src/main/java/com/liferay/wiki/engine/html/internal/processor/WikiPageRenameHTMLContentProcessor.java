@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Daniel Sanz
  */
 @Component(
-	property = "wiki.format.name=html",
+	immediate = true, property = "wiki.format.name=html",
 	service = WikiPageRenameContentProcessor.class
 )
 public class WikiPageRenameHTMLContentProcessor
@@ -59,7 +59,8 @@ public class WikiPageRenameHTMLContentProcessor
 		}
 		catch (UnsupportedEncodingException unsupportedEncodingException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(unsupportedEncodingException);
+				_log.warn(
+					unsupportedEncodingException, unsupportedEncodingException);
 			}
 		}
 

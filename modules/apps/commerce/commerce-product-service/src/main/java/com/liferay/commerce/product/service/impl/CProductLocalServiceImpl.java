@@ -18,31 +18,21 @@ import com.liferay.commerce.product.exception.DuplicateCProductException;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CProduct;
-import com.liferay.commerce.product.service.CPDefinitionLinkLocalService;
 import com.liferay.commerce.product.service.base.CProductLocalServiceBaseImpl;
-import com.liferay.commerce.product.service.persistence.CPInstancePersistence;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Validator;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 /**
  * @author Ethan Bustad
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.product.model.CProduct",
-	service = AopService.class
-)
 public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 
 	@Override
@@ -51,13 +41,13 @@ public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		if (Validator.isBlank(externalReferenceCode)) {
 			externalReferenceCode = null;
 		}
 
-		_validate(externalReferenceCode, user.getCompanyId());
+		validate(externalReferenceCode, user.getCompanyId());
 
 		CProduct cProduct = cProductLocalService.createCProduct(
 			counterLocalService.increment());
@@ -67,6 +57,7 @@ public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 		cProduct.setCompanyId(user.getCompanyId());
 		cProduct.setUserId(user.getUserId());
 		cProduct.setUserName(user.getFullName());
+
 		cProduct.setLatestVersion(1);
 
 		return cProductPersistence.update(cProduct);
@@ -75,10 +66,20 @@ public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public CProduct deleteCProduct(CProduct cProduct) throws PortalException {
-		cProduct = cProductPersistence.remove(cProduct);
 
-		_cpDefinitionLinkLocalService.deleteCPDefinitionLinksByCProductId(
+		// Commerce product definitions
+
+		cpDefinitionLocalService.deleteCPDefinitions(
+			cProduct.getCProductId(), WorkflowConstants.STATUS_ANY);
+
+		// Commerce product definition links
+
+		cpDefinitionLinkLocalService.deleteCPDefinitionLinksByCProductId(
 			cProduct.getCProductId());
+
+		// Commerce product
+
+		cProductPersistence.remove(cProduct);
 
 		return cProduct;
 	}
@@ -125,13 +126,13 @@ public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 			return cProduct;
 		}
 
-		_validate(externalReferenceCode, cProduct.getCompanyId());
+		validate(externalReferenceCode, cProduct.getCompanyId());
 
 		cProduct.setExternalReferenceCode(externalReferenceCode);
 
 		cProduct = cProductPersistence.update(cProduct);
 
-		_reindexCPDefinition(cProduct.getPublishedCPDefinitionId());
+		reindexCPDefinition(cProduct.getPublishedCPDefinitionId());
 
 		return cProduct;
 	}
@@ -154,16 +155,13 @@ public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 
 		cProduct = cProductPersistence.update(cProduct);
 
-		_reindexCPDefinition(originalPublishedCPDefinitionId);
-		_reindexCPDefinition(publishedCPDefinitionId);
+		reindexCPDefinition(originalPublishedCPDefinitionId);
+		reindexCPDefinition(publishedCPDefinitionId);
 
 		return cProduct;
 	}
 
-	@Reference
-	protected CPInstancePersistence cpInstancePersistence;
-
-	private void _reindexCPDefinition(long cpDefinitionId)
+	protected void reindexCPDefinition(long cpDefinitionId)
 		throws PortalException {
 
 		Indexer<CPDefinition> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
@@ -172,15 +170,15 @@ public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 		indexer.reindex(CPDefinition.class.getName(), cpDefinitionId);
 	}
 
-	private void _validate(String externalReferenceCode, long companyId)
+	protected void validate(String externalReferenceCode, long companyId)
 		throws PortalException {
 
 		if (Validator.isNull(externalReferenceCode)) {
 			return;
 		}
 
-		CProduct cProduct = cProductPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
+		CProduct cProduct = cProductPersistence.fetchByC_ERC(
+			companyId, externalReferenceCode);
 
 		if (cProduct != null) {
 			throw new DuplicateCProductException(
@@ -188,11 +186,5 @@ public class CProductLocalServiceImpl extends CProductLocalServiceBaseImpl {
 					"code " + externalReferenceCode);
 		}
 	}
-
-	@Reference
-	private CPDefinitionLinkLocalService _cpDefinitionLinkLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

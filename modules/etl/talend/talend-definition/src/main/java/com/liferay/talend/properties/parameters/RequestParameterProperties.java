@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 
@@ -72,20 +74,26 @@ public class RequestParameterProperties extends ComponentPropertiesImpl {
 	}
 
 	public List<RequestParameter> getProxyRequestParameters() {
-		List<RequestParameter> filteredRequestParameters = new ArrayList<>();
+		List<RequestParameter> requestParameters = getRequestParameters();
 
-		for (RequestParameter requestParameter : getRequestParameters()) {
-			if (Objects.equals(requestParameter.getLocation(), "header") &&
-				(Objects.equals(
-					requestParameter.getName(), "proxyIdentityId") ||
-				 Objects.equals(
-					 requestParameter.getName(), "proxyIdentitySecret"))) {
+		Stream<RequestParameter> stream = requestParameters.stream();
 
-				filteredRequestParameters.add(requestParameter);
+		return stream.filter(
+			requestParameter -> {
+				if (Objects.equals(requestParameter.getLocation(), "header") &&
+					(Objects.equals(
+						requestParameter.getName(), "proxyIdentityId") ||
+					 Objects.equals(
+						 requestParameter.getName(), "proxyIdentitySecret"))) {
+
+					return true;
+				}
+
+				return false;
 			}
-		}
-
-		return filteredRequestParameters;
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public List<RequestParameter> getRequestParameters() {

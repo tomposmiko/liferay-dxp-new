@@ -26,7 +26,8 @@ import org.osgi.service.component.annotations.Component;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	property = "reportDataSourceType=portal", service = ReportFillManager.class
+	immediate = true, property = "reportDataSourceType=portal",
+	service = ReportFillManager.class
 )
 public class PortalReportFillManager extends BaseReportFillManager {
 

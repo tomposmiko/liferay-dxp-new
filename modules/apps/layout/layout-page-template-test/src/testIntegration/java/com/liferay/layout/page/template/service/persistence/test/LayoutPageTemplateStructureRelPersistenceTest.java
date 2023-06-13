@@ -164,20 +164,6 @@ public class LayoutPageTemplateStructureRelPersistenceTest {
 		newLayoutPageTemplateStructureRel.setData(
 			RandomTestUtil.randomString());
 
-		newLayoutPageTemplateStructureRel.setLastPublishDate(
-			RandomTestUtil.nextDate());
-
-		newLayoutPageTemplateStructureRel.setStatus(RandomTestUtil.nextInt());
-
-		newLayoutPageTemplateStructureRel.setStatusByUserId(
-			RandomTestUtil.nextLong());
-
-		newLayoutPageTemplateStructureRel.setStatusByUserName(
-			RandomTestUtil.randomString());
-
-		newLayoutPageTemplateStructureRel.setStatusDate(
-			RandomTestUtil.nextDate());
-
 		_layoutPageTemplateStructureRels.add(
 			_persistence.update(newLayoutPageTemplateStructureRel));
 
@@ -232,25 +218,6 @@ public class LayoutPageTemplateStructureRelPersistenceTest {
 		Assert.assertEquals(
 			existingLayoutPageTemplateStructureRel.getData(),
 			newLayoutPageTemplateStructureRel.getData());
-		Assert.assertEquals(
-			Time.getShortTimestamp(
-				existingLayoutPageTemplateStructureRel.getLastPublishDate()),
-			Time.getShortTimestamp(
-				newLayoutPageTemplateStructureRel.getLastPublishDate()));
-		Assert.assertEquals(
-			existingLayoutPageTemplateStructureRel.getStatus(),
-			newLayoutPageTemplateStructureRel.getStatus());
-		Assert.assertEquals(
-			existingLayoutPageTemplateStructureRel.getStatusByUserId(),
-			newLayoutPageTemplateStructureRel.getStatusByUserId());
-		Assert.assertEquals(
-			existingLayoutPageTemplateStructureRel.getStatusByUserName(),
-			newLayoutPageTemplateStructureRel.getStatusByUserName());
-		Assert.assertEquals(
-			Time.getShortTimestamp(
-				existingLayoutPageTemplateStructureRel.getStatusDate()),
-			Time.getShortTimestamp(
-				newLayoutPageTemplateStructureRel.getStatusDate()));
 	}
 
 	@Test
@@ -339,9 +306,7 @@ public class LayoutPageTemplateStructureRelPersistenceTest {
 			"layoutPageTemplateStructureRelId", true, "groupId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "layoutPageTemplateStructureId", true,
-			"segmentsExperienceId", true, "lastPublishDate", true, "status",
-			true, "statusByUserId", true, "statusByUserName", true,
-			"statusDate", true);
+			"segmentsExperienceId", true);
 	}
 
 	@Test
@@ -715,19 +680,6 @@ public class LayoutPageTemplateStructureRelPersistenceTest {
 			RandomTestUtil.nextLong());
 
 		layoutPageTemplateStructureRel.setData(RandomTestUtil.randomString());
-
-		layoutPageTemplateStructureRel.setLastPublishDate(
-			RandomTestUtil.nextDate());
-
-		layoutPageTemplateStructureRel.setStatus(RandomTestUtil.nextInt());
-
-		layoutPageTemplateStructureRel.setStatusByUserId(
-			RandomTestUtil.nextLong());
-
-		layoutPageTemplateStructureRel.setStatusByUserName(
-			RandomTestUtil.randomString());
-
-		layoutPageTemplateStructureRel.setStatusDate(RandomTestUtil.nextDate());
 
 		_layoutPageTemplateStructureRels.add(
 			_persistence.update(layoutPageTemplateStructureRel));

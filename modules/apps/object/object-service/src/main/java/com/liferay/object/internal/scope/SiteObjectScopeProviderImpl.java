@@ -18,11 +18,10 @@ import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Locale;
 
@@ -35,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	immediate = true,
 	property = "object.scope.provider.key=" + ObjectDefinitionConstants.SCOPE_SITE,
 	service = ObjectScopeProvider.class
 )
@@ -44,11 +44,7 @@ public class SiteObjectScopeProviderImpl implements ObjectScopeProvider {
 	public long getGroupId(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getScopeGroupId();
+		return _portal.getScopeGroupId(httpServletRequest);
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public class SiteObjectScopeProviderImpl implements ObjectScopeProvider {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "site");
+		return LanguageUtil.get(locale, "site");
 	}
 
 	@Override
@@ -86,6 +82,6 @@ public class SiteObjectScopeProviderImpl implements ObjectScopeProvider {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private Language _language;
+	private Portal _portal;
 
 }

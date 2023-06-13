@@ -16,9 +16,7 @@ package com.liferay.commerce.pricing.service.persistence.impl;
 
 import com.liferay.commerce.pricing.model.CommercePricingClassCPDefinitionRel;
 import com.liferay.commerce.pricing.service.persistence.CommercePricingClassCPDefinitionRelPersistence;
-import com.liferay.commerce.pricing.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Riccardo Alberti
  * @generated
  */
-public abstract class CommercePricingClassCPDefinitionRelFinderBaseImpl
+public class CommercePricingClassCPDefinitionRelFinderBaseImpl
 	extends BasePersistenceImpl<CommercePricingClassCPDefinitionRel> {
 
 	public CommercePricingClassCPDefinitionRelFinderBaseImpl() {
@@ -52,37 +46,35 @@ public abstract class CommercePricingClassCPDefinitionRelFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commercePricingClassCPDefinitionRelPersistence.
+		return getCommercePricingClassCPDefinitionRelPersistence().
 			getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce pricing class cp definition rel persistence.
+	 *
+	 * @return the commerce pricing class cp definition rel persistence
+	 */
+	public CommercePricingClassCPDefinitionRelPersistence
+		getCommercePricingClassCPDefinitionRelPersistence() {
+
+		return commercePricingClassCPDefinitionRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce pricing class cp definition rel persistence.
+	 *
+	 * @param commercePricingClassCPDefinitionRelPersistence the commerce pricing class cp definition rel persistence
+	 */
+	public void setCommercePricingClassCPDefinitionRelPersistence(
+		CommercePricingClassCPDefinitionRelPersistence
+			commercePricingClassCPDefinitionRelPersistence) {
+
+		this.commercePricingClassCPDefinitionRelPersistence =
+			commercePricingClassCPDefinitionRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommercePricingClassCPDefinitionRelPersistence.class)
 	protected CommercePricingClassCPDefinitionRelPersistence
 		commercePricingClassCPDefinitionRelPersistence;
 

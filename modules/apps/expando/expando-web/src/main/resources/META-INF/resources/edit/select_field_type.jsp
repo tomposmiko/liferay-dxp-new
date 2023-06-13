@@ -33,7 +33,6 @@ if (columnId > 0) {
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
-portletDisplay.setURLBackTitle(ParamUtil.getString(request, "backTitle"));
 
 renderResponse.setTitle(modelResourceName + ": " + ((expandoColumn == null) ? LanguageUtil.get(request, "new-custom-field") : expandoColumn.getName()));
 
@@ -57,8 +56,11 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "new-cus
 <clay:container-fluid
 	cssClass="container-view"
 >
-	<liferay-site-navigation:breadcrumb
-		breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+	<liferay-ui:breadcrumb
+		showCurrentGroup="<%= false %>"
+		showGuestGroup="<%= false %>"
+		showLayout="<%= false %>"
+		showPortletBreadcrumb="<%= true %>"
 	/>
 
 	<liferay-frontend:edit-form>

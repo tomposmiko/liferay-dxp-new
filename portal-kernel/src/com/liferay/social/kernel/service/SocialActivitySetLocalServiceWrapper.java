@@ -30,10 +30,6 @@ public class SocialActivitySetLocalServiceWrapper
 	implements ServiceWrapper<SocialActivitySetLocalService>,
 			   SocialActivitySetLocalService {
 
-	public SocialActivitySetLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SocialActivitySetLocalServiceWrapper(
 		SocialActivitySetLocalService socialActivitySetLocalService) {
 

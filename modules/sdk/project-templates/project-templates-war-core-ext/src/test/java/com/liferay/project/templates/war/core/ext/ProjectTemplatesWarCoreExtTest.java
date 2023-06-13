@@ -39,15 +39,6 @@ public class ProjectTemplatesWarCoreExtTest
 			temporaryFolder, "gradle", "testWorkspace",
 			getDefaultLiferayVersion(), mavenExecutor);
 
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			getDefaultLiferayVersion());
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
 		File modulesDir = new File(workspaceDir, "modules");
 
 		File projectDir = buildTemplateWithGradle(

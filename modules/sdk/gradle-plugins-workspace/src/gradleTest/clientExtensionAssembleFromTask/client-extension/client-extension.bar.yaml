@@ -1,4 +1,0 @@
-assemble:
-    - fromTask: barTask
-foo-client-extension:
-    type: customElement

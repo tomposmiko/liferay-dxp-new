@@ -81,7 +81,7 @@ public class NodesChecker extends EmptyOnClickRowChecker {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return StringPool.BLANK;
@@ -98,7 +98,7 @@ public class NodesChecker extends EmptyOnClickRowChecker {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 

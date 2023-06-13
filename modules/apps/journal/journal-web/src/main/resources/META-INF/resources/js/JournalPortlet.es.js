@@ -12,570 +12,383 @@
  * details.
  */
 
-import {
-	debounce,
-	fetch,
-	navigate,
-	openConfirmModal,
-	openToast,
-	sub,
-} from 'frontend-js-web';
+import {PortletBase, delegate, openToast} from 'frontend-js-web';
+import {Config} from 'metal-state';
 
 import {LocaleChangedHandler} from './LocaleChangedHandler.es';
 
-const AUTO_SAVE_DELAY = 1500;
+const ACTION_INPUT_NAME = 'javax-portlet-action';
 
-export default function _JournalPortlet({
-	articleId: initialArticleId,
-	autoSaveDraftEnabled,
-	availableLocales: initialAvailableLocales,
-	classNameId,
-	contentTitle,
-	defaultLanguageId: initialDefaultLanguageId,
-	displayDate,
-	hasSavePermission,
-	namespace,
-}) {
-	const formId = `${namespace}fm1`;
+const ALERT_CONTAINER_CLASS = 'journal-alert-container';
 
-	const actionInput = document.getElementById(
-		`${namespace}javax-portlet-action`
-	);
-	const contextualSidebarButton = document.getElementById(
-		`${namespace}contextualSidebarButton`
-	);
-	const contextualSidebarContainer = document.getElementById(
-		`${namespace}contextualSidebarContainer`
-	);
-	const form = document.getElementById(formId);
-	const formDateInput = document.getElementById(`${namespace}formDate`);
-	const publishButton = document.getElementById(`${namespace}publishButton`);
-	const resetValuesButton = document.getElementById(
-		`${namespace}resetValuesButton`
-	);
-	const saveButton = document.getElementById(`${namespace}saveButton`);
+const BUTTON_ROW_CLASS = '.journal-article-button-row';
 
-	const availableLocales = [
-		...initialAvailableLocales,
-		initialDefaultLanguageId,
-	];
+const SIDEBAR_VISIBLE_CLASS = 'contextual-sidebar-visible';
 
-	let articleId = initialArticleId;
-	let defaultLanguageId = initialDefaultLanguageId;
-	let selectedLanguageId = initialDefaultLanguageId;
+/**
+ * JournalPortlet
+ *
+ * @abstract
+ * @extends {PortletBase}
+ */
+class JournalPortlet extends PortletBase {
 
-	const publishingLock = getLock('publishing', {
-		lockedIndicator: document.getElementById(
-			`${namespace}savingChangesIndicator`
-		),
-		triggerElements: [publishButton, resetValuesButton, saveButton],
-		unlockedIndicator: document.getElementById(
-			`${namespace}changesSavedIndicator`
-		),
-	});
+	/**
+	 * @inheritDoc
+	 */
+	attached() {
+		const buttonRow = this.one(BUTTON_ROW_CLASS);
 
-	const editingDefaultValues = classNameId && classNameId !== '0';
+		this._buttonClickUpdateAction = delegate(
+			buttonRow,
+			'click',
+			'button',
+			this._updateAction
+		);
 
-	if (editingDefaultValues) {
-		const getInput = (inputName) =>
-			document.getElementById(`${namespace}${inputName}`);
+		const form = this._getInputByName(this.ns('fm1'));
 
-		const resetInput = (inputName) => {
-			const input = getInput(inputName);
+		form.addEventListener('submit', this._onFormSubmit);
 
-			if (input && !displayDate) {
-				input.value = '';
-			}
-		};
+		const resetValuesButton = this._getInputByName(
+			this.ns('resetValuesButton')
+		);
 
-		resetInput('displayDate');
-		resetInput('displayDateAmPm');
-		resetInput('displayDateDay');
-		resetInput('displayDateHour');
-		resetInput('displayDateMinute');
-		resetInput('displayDateMonth');
-		resetInput('displayDateTime');
-		resetInput('displayDateYear');
+		if (resetValuesButton) {
+			resetValuesButton.addEventListener(
+				'click',
+				this._resetValuesDDMStructure
+			);
+		}
 
-		const displayDateInput = getInput('displayDate');
+		this._localeChangedHandler = new LocaleChangedHandler({
+			contentTitle: this.contentTitle,
+			context: this,
+			defaultLanguageId: this.defaultLanguageId,
+			namespace: this.namespace,
+			onDefaultLocaleChangedCallback: (languageId) => {
+				this.defaultLanguageId = languageId;
+			},
+			onLocaleChangedCallback: this._onLocaleChanged,
+		});
 
-		if (displayDateInput) {
-			displayDateInput.addEventListener('change', (event) => {
-				if (!event.target.value) {
-					getInput('displayDateDay').value = '';
-					getInput('displayDateMonth').value = '';
-					getInput('displayDateYear').value = '';
-				}
-			});
+		this._selectedLanguageId = this.defaultLanguageId;
+
+		this._setupSidebar();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	created() {
+		this._onContextualSidebarButtonClick = this._onContextualSidebarButtonClick.bind(
+			this
+		);
+		this._onFormSubmit = this._onFormSubmit.bind(this);
+		this._onLocaleChanged = this._onLocaleChanged.bind(this);
+		this._resetValuesDDMStructure = this._resetValuesDDMStructure.bind(
+			this
+		);
+		this._saveArticle = this._saveArticle.bind(this);
+		this._updateAction = this._updateAction.bind(this);
+		this._validTitle = this._validTitle.bind(this);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	detached() {
+		this._buttonClickUpdateAction.dispose();
+
+		const form = this._getInputByName(this.ns('fm1'));
+
+		if (form) {
+			form.removeEventListener('submit', this._onFormSubmit);
+		}
+
+		const resetValuesButton = this._getInputByName(
+			this.ns('resetValuesButton')
+		);
+
+		if (resetValuesButton) {
+			resetValuesButton.removeEventListener(
+				'click',
+				this._resetValuesDDMStructure
+			);
+		}
+
+		const contextualSidebarButton = document.getElementById(
+			this.ns('contextualSidebarButton')
+		);
+
+		if (contextualSidebarButton) {
+			contextualSidebarButton.removeEventListener(
+				'click',
+				this._onContextualSidebarButtonClick
+			);
+		}
+
+		this._localeChangedHandler.detachLocaleChangedEventListener();
+	}
+
+	/**
+	 * Clean the input if the language is not considered translated when
+	 * submitting the form
+	 * @param {string} name of the input
+	 */
+	_cleanInputIfNeeded(name) {
+		const inputComponent = Liferay.component(this.ns(name));
+		const translatedLanguages = inputComponent.get('translatedLanguages');
+
+		if (
+			!translatedLanguages.has(this._selectedLanguageId) &&
+			this._selectedLanguageId !== this.defaultLanguageId
+		) {
+			inputComponent.updateInput('');
+
+			const form = Liferay.Form.get(this.ns('fm1'));
+
+			form.removeRule(this.ns(name), 'required');
 		}
 	}
 
-	const handleContextualSidebarButton = () => {
-		contextualSidebarContainer?.classList.toggle(
-			'contextual-sidebar-visible'
+	/**
+	 * Query an input by its name
+	 * @param {string} name
+	 * @private
+	 */
+	_getInputByName(name) {
+		return document.getElementById(this.ns(name));
+	}
+
+	/**
+	 * @private
+	 */
+	_onContextualSidebarButtonClick() {
+		const contextualSidebarContainer = document.getElementById(
+			this.ns('contextualSidebarContainer')
 		);
-	};
 
-	const isContextualSidebarOpen = () =>
-		contextualSidebarContainer.classList.contains(
-			'contextual-sidebar-visible'
-		);
-
-	const updateContextualSidebarAriaAttributes = () => {
-		const isOpen = isContextualSidebarOpen();
-
-		const title = isOpen
-			? Liferay.Language.get('close-configuration-panel')
-			: Liferay.Language.get('open-configuration-panel');
-
-		contextualSidebarButton.setAttribute('aria-label', title);
-		contextualSidebarButton.setAttribute('aria-selected', isOpen);
-		contextualSidebarButton.setAttribute('title', title);
-	};
-
-	const handleContextualSidebarButtonClick = () => {
-		handleContextualSidebarButton();
-
-		updateContextualSidebarAriaAttributes();
-
-		if (isContextualSidebarOpen()) {
-			contextualSidebarContainer.focus();
+		if (contextualSidebarContainer) {
+			contextualSidebarContainer.classList.toggle(SIDEBAR_VISIBLE_CLASS);
 		}
-	};
+	}
 
-	const handleDDMFormError = (error) => {
-		publishingLock.unlock();
-		console.error(error);
+	/**
+	 * @private
+	 */
+	_onFormSubmit(event) {
+		event.preventDefault();
 
-		const workflowActionInput = document.getElementById(
-			`${namespace}workflowAction`
-		);
-
-		workflowActionInput.value = Liferay.Workflow.ACTION_SAVE_DRAFT;
-
-		const titleInputComponent = Liferay.component(
-			`${namespace}titleMapAsXML`
-		);
-
-		if (!titleInputComponent?.getValue(defaultLanguageId)) {
-			showAlert(
-				sub(
-					Liferay.Language.get(
-						'please-enter-a-valid-title-for-the-default-language-x'
-					),
-					defaultLanguageId.replaceAll('_', '-')
-				)
-			);
-		}
-	};
-
-	const handleDDMFormValid = (
-		{redirectOnSave, showErrors} = {
-			redirectOnSave: false,
-			showErrors: false,
-		}
-	) => {
-		const titleInputComponent = Liferay.component(
-			`${namespace}titleMapAsXML`
-		);
-
-		if (
-			titleInputComponent?.getValue(defaultLanguageId) ||
-			editingDefaultValues
-		) {
-			if (!articleId) {
-				const newArticleIdInput = document.getElementById(
-					`${namespace}newArticleId`
-				);
-
-				articleId = newArticleIdInput.value || '';
-			}
-
-			const articleIdInput = document.getElementById(
-				`${namespace}articleId`
+		if (!this._validTitle()) {
+			const alertContainer = document.querySelector(
+				`.${ALERT_CONTAINER_CLASS}`
 			);
 
-			articleIdInput.value = articleId;
-
-			const availableLocalesInput = document.getElementById(
-				`${namespace}availableLocales`
-			);
-
-			availableLocalesInput.value = availableLocales;
-
-			if (autoSaveDraftEnabled) {
-				submitAsyncForm(form, {redirectOnSave});
-			}
-			else {
-				form.submit();
-			}
-		}
-		else {
-			if (showErrors) {
-				showAlert(
-					sub(
+			if (!alertContainer) {
+				this._showAlert(
+					Liferay.Util.sub(
 						Liferay.Language.get(
 							'please-enter-a-valid-title-for-the-default-language-x'
 						),
-						defaultLanguageId.replaceAll('_', '-')
+						this.defaultLanguageId.replace('_', '-')
 					)
 				);
 			}
 
-			publishingLock.unlock();
+			event.stopImmediatePropagation();
+
+			return;
 		}
-	};
 
-	const handlePublishButtonClick = (event) => {
-		publishingLock.lock();
+		const actionInput = this._getInputByName(ACTION_INPUT_NAME);
 
-		document
-			.querySelectorAll('.journal-alert-container')
-			.forEach((alertElement) => {
-				alertElement.parentElement.removeChild(alertElement);
-			});
+		const actionName = actionInput.value;
 
-		const workflowActionInput = document.getElementById(
-			`${namespace}workflowAction`
-		);
+		this._saveArticle(actionName);
+	}
 
-		if (event.currentTarget.dataset.actionname === 'publish') {
+	/**
+	 * @private
+	 */
+	_onLocaleChanged({availableLocales}, languageId) {
+		if (!availableLocales.includes(languageId)) {
+			availableLocales.push(languageId);
+		}
+
+		this._selectedLanguageId = languageId;
+	}
+
+	/**
+	 * @private
+	 */
+	_resetValuesDDMStructure(event) {
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-reset-the-default-values'
+				)
+			)
+		) {
+			const button = event.currentTarget;
+
+			submitForm(document.hrefFm, button.dataset.url);
+		}
+	}
+
+	/**
+	 * Prepare action and articleId inputs to submit form
+	 * @param {string} actionName
+	 */
+	_saveArticle(actionName) {
+		if (actionName === 'publish') {
+			const workflowActionInput = this._getInputByName('workflowAction');
+
 			workflowActionInput.value = Liferay.Workflow.ACTION_PUBLISH;
+
+			actionName = null;
 		}
 
-		if (editingDefaultValues) {
-			Liferay.component(`${namespace}dataEngineLayoutRenderer`)
-				.reactComponentRef.current.getFields()
-				.forEach((field) => {
-					field.required = false;
-				});
-
-			actionInput.value = articleId
-				? '/journal/update_data_engine_default_values'
-				: '/journal/add_data_engine_default_values';
-		}
-		else {
-			actionInput.value = articleId
-				? '/journal/update_article'
-				: '/journal/add_article';
-		}
-
-		const descriptionInputComponent = Liferay.component(
-			`${namespace}descriptionMapAsXML`
-		);
-		const titleInputComponent = Liferay.component(
-			`${namespace}titleMapAsXML`
-		);
-
-		[titleInputComponent, descriptionInputComponent].forEach(
-			(inputComponent) => {
-				const translatedLanguages = inputComponent.get(
-					'translatedLanguages'
-				);
-
-				if (
-					!translatedLanguages.has(selectedLanguageId) &&
-					selectedLanguageId !== defaultLanguageId
-				) {
-					inputComponent.updateInput('');
-
-					Liferay.Form.get(formId).removeRule(
-						`${namespace}${inputComponent.get('id')}`,
-						'required'
-					);
-				}
+		if (!actionName) {
+			if (this.classNameId && this.classNameId !== '0') {
+				actionName = this.articleId
+					? '/journal/update_data_engine_default_values'
+					: '/journal/add_data_engine_default_values';
 			}
+			else {
+				actionName = this.articleId
+					? '/journal/update_article'
+					: '/journal/add_article';
+			}
+		}
+
+		this._setActionName(actionName);
+
+		this._setAvailableLocales(this.availableLocales);
+
+		if (!this.articleId) {
+			const articleIdInput = this._getInputByName('articleId');
+
+			const newArticleIdInput = this._getInputByName('newArticleId');
+
+			articleIdInput.value = newArticleIdInput.value;
+		}
+
+		const form = this._getInputByName(this.ns('fm1'));
+
+		this._cleanInputIfNeeded('titleMapAsXML');
+		this._cleanInputIfNeeded('descriptionMapAsXML');
+
+		submitForm(form);
+	}
+
+	/**
+	 * Set the action name in the corresponding input
+	 * @param {string} actionName
+	 */
+	_setActionName(actionName) {
+		const actionInput = this._getInputByName(ACTION_INPUT_NAME);
+
+		actionInput.value = actionName;
+	}
+
+	_setAvailableLocales(availableLocales) {
+		const availableLocalesInput = this._getInputByName(
+			this.ns('availableLocales')
 		);
-	};
 
-	const handleResetValuesButtonClick = (event) => {
-		publishingLock.lock();
+		availableLocalesInput.value = availableLocales;
+	}
 
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-reset-the-default-values'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					if (editingDefaultValues) {
-						actionInput.value = articleId
-							? '/journal/update_data_engine_default_values'
-							: '/journal/add_data_engine_default_values';
-					}
-
-					submitForm(
-						document.hrefFm,
-						event.currentTarget.dataset.url
-					);
-				}
-				else {
-					publishingLock.unlock();
-				}
-			},
-		});
-	};
-
-	const showAlert = (message) => {
-		const articleContentWrapper = document.querySelector(
-			'.article-content-content'
+	/**
+	 * @private
+	 */
+	_setupSidebar() {
+		const contextualSidebarButton = document.getElementById(
+			this.ns('contextualSidebarButton')
 		);
 
+		const contextualSidebarContainer = document.getElementById(
+			this.ns('contextualSidebarContainer')
+		);
+
+		if (
+			contextualSidebarContainer &&
+			window.innerWidth > Liferay.BREAKPOINTS.PHONE
+		) {
+			contextualSidebarContainer.classList.add(SIDEBAR_VISIBLE_CLASS);
+		}
+
+		if (contextualSidebarButton) {
+			contextualSidebarButton.addEventListener(
+				'click',
+				this._onContextualSidebarButtonClick
+			);
+		}
+	}
+
+	/**
+	 * @private
+	 */
+	_showAlert(message) {
 		const alertContainer = document.createElement('div');
 
-		alertContainer.classList.add('journal-alert-container');
-		articleContentWrapper.prepend(alertContainer);
+		alertContainer.classList.add(ALERT_CONTAINER_CLASS);
+
+		const content = document.querySelector('.article-content-content');
+
+		content.prepend(alertContainer);
 
 		openToast({
 			autoClose: false,
 			container: alertContainer,
 			message,
 			onClose: () => alertContainer.remove(),
-			title: Liferay.Language.get('error'),
 			type: 'danger',
 		});
-	};
-
-	const submitAsyncForm = (
-		formElement,
-		{redirectOnSave} = {redirectOnSave: false}
-	) => {
-		if (autoSaveDraftEnabled) {
-			formDateInput.value = Date.now().toString();
-		}
-
-		return fetch(formElement.action, {
-			body: new FormData(formElement),
-			method: formElement.method,
-		})
-			.then((response) => {
-				if (redirectOnSave) {
-					navigate(
-						response.redirected && response.url
-							? response.url
-							: window.location.href
-					);
-				}
-				else {
-					if (!articleId && response.url) {
-						const key = `${namespace}articleId`;
-						const url = new URL(response.url);
-
-						if (url.searchParams.has(key)) {
-							articleId = url.searchParams.get(key);
-						}
-					}
-
-					publishingLock.unlock();
-				}
-			})
-			.catch((error) => {
-				console.error(error);
-				publishingLock.unlock();
-			});
-	};
-
-	const eventHandlers = [
-		attachListener(
-			contextualSidebarButton,
-			'click',
-			handleContextualSidebarButtonClick
-		),
-		attachListener(publishButton, 'click', handlePublishButtonClick),
-		attachListener(saveButton, 'click', handlePublishButtonClick),
-		attachListener(
-			resetValuesButton,
-			'click',
-			handleResetValuesButtonClick
-		),
-
-		new LocaleChangedHandler({
-			contentTitle,
-			defaultLanguageId,
-			namespace,
-			onDefaultLocaleChangedCallback: (languageId) => {
-				defaultLanguageId = languageId;
-			},
-			onLocaleChangedCallback: (_context, languageId) => {
-				if (!availableLocales.includes(languageId)) {
-					availableLocales.push(languageId);
-				}
-
-				selectedLanguageId = languageId;
-			},
-		}),
-
-		Liferay.on('ddmFormError', handleDDMFormError),
-		Liferay.on('ddmFormValid', () =>
-			handleDDMFormValid({
-				redirectOnSave: true,
-				showErrors: true,
-			})
-		),
-	];
-
-	if (
-		autoSaveDraftEnabled &&
-		hasSavePermission &&
-		(!classNameId || classNameId === '0')
-	) {
-		eventHandlers.push(
-			attachFormChangeListener(
-				form,
-				() => {
-					return !publishingLock.isLocked();
-				},
-				(mutationRecord) => {
-					if (publishingLock.isLocked()) {
-						return false;
-					}
-
-					return [
-						mutationRecord.target,
-						...mutationRecord.addedNodes,
-						...mutationRecord.removedNodes,
-					].some(
-						(node) =>
-							node.name &&
-							node.name.startsWith(namespace) &&
-							node.name !== `${namespace}languageId`
-					);
-				},
-				() => {
-					if (publishingLock.isLocked()) {
-						return;
-					}
-
-					publishingLock.lock();
-
-					actionInput.value = articleId
-						? '/journal/update_article'
-						: '/journal/add_article';
-
-					handleDDMFormValid({
-						redirectOnSave: false,
-						showErrors: false,
-					});
-				}
-			)
-		);
 	}
 
-	if (window.innerWidth > Liferay.BREAKPOINTS.PHONE) {
-		handleContextualSidebarButton();
+	/**
+	 * Change the portlet action based on the button clicked
+	 * @param {Event} event
+	 * @private
+	 */
+	_updateAction(event) {
+		const button = event.delegateTarget;
+
+		const actionName = button.dataset.actionname;
+
+		if (actionName) {
+			this._setActionName(actionName);
+		}
 	}
 
-	updateContextualSidebarAriaAttributes();
+	/**
+	 * @private
+	 */
+	_validTitle() {
+		if (!this.classNameId || this.classNameId === '0') {
+			const inputComponent = Liferay.component(this.ns('titleMapAsXML'));
 
-	return {
-		dispose() {
-			eventHandlers.forEach((eventHandler) => {
-				eventHandler.detach();
-			});
-		},
-	};
-}
+			const value = inputComponent.getValue(this.defaultLanguageId);
 
-function attachFormChangeListener(
-	form,
-	accentChangeEvent,
-	acceptMutationRecord,
-	callback
-) {
-	const handleChange = debounce(() => {
-		callback();
-	}, AUTO_SAVE_DELAY);
-
-	const mutationObserver = new MutationObserver((mutationRecords) => {
-		const observedMutationRecords = mutationRecords
-			.filter((mutationRecord) => {
-				if (mutationRecord.type === 'attributes') {
-					return (
-						mutationRecord.oldValue !== null &&
-						mutationRecord.target.value.trim() !==
-							mutationRecord.oldValue.trim()
-					);
-				}
-				else if (mutationRecord.type === 'childList') {
-					return [
-						...mutationRecord.addedNodes,
-						...mutationRecord.removedNodes,
-					].some((node) => node.name);
-				}
-			})
-			.filter((mutationRecord) => acceptMutationRecord(mutationRecord));
-
-		if (observedMutationRecords.length) {
-			handleChange();
-		}
-	});
-
-	mutationObserver.observe(form, {
-		attributeFilter: ['value'],
-		attributeOldValue: true,
-		attributes: true,
-		childList: true,
-		subtree: true,
-	});
-
-	const handleFormChange = (event) => {
-		if (accentChangeEvent(event)) {
-			handleChange();
-		}
-	};
-
-	form.addEventListener('change', handleFormChange);
-
-	return {
-		detach() {
-			mutationObserver.disconnect();
-			form.removeEventListener('change', handleFormChange);
-		},
-	};
-}
-
-function attachListener(element, eventType, callback) {
-	element?.addEventListener(eventType, callback);
-
-	return {
-		detach() {
-			element?.removeEventListener(eventType, callback);
-		},
-	};
-}
-
-function getLock(name, {lockedIndicator, triggerElements, unlockedIndicator}) {
-	let locked = false;
-
-	const toggle = (nextValue) => {
-		if (nextValue === locked) {
-			throw new Error(
-				`${name} is already ${locked ? 'locked' : 'unlocked'}`
-			);
-		}
-
-		locked = nextValue;
-
-		requestAnimationFrame(() => {
-			triggerElements.forEach((triggerElement) => {
-				if (triggerElement) {
-					triggerElement.disabled = locked;
-				}
-			});
-
-			if (locked) {
-				lockedIndicator?.classList.replace('d-none', 'd-flex');
-				unlockedIndicator?.classList.replace('d-flex', 'd-none');
+			if (!value) {
+				return false;
 			}
-			else {
-				lockedIndicator?.classList.replace('d-flex', 'd-none');
-				unlockedIndicator?.classList.replace('d-none', 'd-flex');
-			}
-		});
-	};
+		}
 
-	return {
-		isLocked: () => locked,
-		lock: () => toggle(true),
-		unlock: () => toggle(false),
-	};
+		return true;
+	}
 }
+
+JournalPortlet.STATE = {
+	_selectedLanguageId: Config.internal().string(),
+	articleId: Config.string(),
+	availableLocales: Config.array(),
+	classNameId: Config.string(),
+	contentTitle: Config.string(),
+	defaultLanguageId: Config.string(),
+};
+
+export {JournalPortlet};
+export default JournalPortlet;

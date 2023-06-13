@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import getPortletNamespace from '../../../src/main/resources/META-INF/resources/liferay/util/get_portlet_namespace.es';
 
 describe('Liferay.Util.getPortletNamespace', () => {

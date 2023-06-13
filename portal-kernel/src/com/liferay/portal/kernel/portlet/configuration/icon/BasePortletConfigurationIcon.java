@@ -14,9 +14,11 @@
 
 package com.liferay.portal.kernel.portlet.configuration.icon;
 
-import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -37,19 +39,11 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class BasePortletConfigurationIcon
 	implements PortletConfigurationIcon {
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getAlt() {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getAriaRole() {
 		return null;
@@ -60,10 +54,6 @@ public abstract class BasePortletConfigurationIcon
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public Map<String, Object> getData() {
 		return null;
@@ -74,46 +64,26 @@ public abstract class BasePortletConfigurationIcon
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getId() {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getImage() {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getImageHover() {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getLang() {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getLinkCssClass() {
 		return null;
@@ -129,10 +99,6 @@ public abstract class BasePortletConfigurationIcon
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getOnClick(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
@@ -140,27 +106,15 @@ public abstract class BasePortletConfigurationIcon
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	public ResourceBundle getResourceBundle(Locale locale) {
 		return PortalUtil.getResourceBundle(locale);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getSrc() {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public String getSrcHover() {
 		return null;
@@ -195,19 +149,11 @@ public abstract class BasePortletConfigurationIcon
 		return false;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public boolean isLabel() {
 		return false;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
 	public boolean isToolTip() {
 		return false;
@@ -225,13 +171,21 @@ public abstract class BasePortletConfigurationIcon
 		return themeDisplay.getLocale();
 	}
 
-	protected String getNamespace(PortletRequest portletRequest) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+	protected boolean isEmbeddedPersonalApplicationLayout(Layout layout) {
+		if (layout.isTypeControlPanel()) {
+			return false;
+		}
 
-		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+		String layoutFriendlyURL = layout.getFriendlyURL();
 
-		return portletDisplay.getNamespace();
+		if (layout.isSystem() &&
+			layoutFriendlyURL.equals(
+				PropsUtil.get(PropsKeys.CONTROL_PANEL_LAYOUT_FRIENDLY_URL))) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 }

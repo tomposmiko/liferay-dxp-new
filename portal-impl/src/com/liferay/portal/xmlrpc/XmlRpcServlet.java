@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
@@ -80,11 +80,11 @@ public class XmlRpcServlet extends HttpServlet {
 				XmlRpcConstants.NOT_WELL_FORMED, "XML is not well formed");
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 		}
 		catch (XmlRpcException xmlRpcException) {
-			_log.error(xmlRpcException);
+			_log.error(xmlRpcException, xmlRpcException);
 		}
 
 		if (xmlRpcResponse == null) {
@@ -102,7 +102,7 @@ public class XmlRpcServlet extends HttpServlet {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			httpServletResponse.setStatus(
@@ -113,7 +113,7 @@ public class XmlRpcServlet extends HttpServlet {
 	protected String getToken(HttpServletRequest httpServletRequest) {
 		String token = httpServletRequest.getPathInfo();
 
-		return HttpComponentsUtil.fixPath(token);
+		return HttpUtil.fixPath(token);
 	}
 
 	protected Response invokeMethod(

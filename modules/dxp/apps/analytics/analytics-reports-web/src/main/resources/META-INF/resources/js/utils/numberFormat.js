@@ -14,17 +14,6 @@
  * en-US: `123456` => `123,456`
  * es-ES: `123456` => `123.456`
  */
-
-const DEFAULT_COMPACT_THRESHOLD = 10000;
-
-export function numberFormat(languageTag, number, options = {}) {
-	const {compactThreshold = DEFAULT_COMPACT_THRESHOLD, useCompact} = options;
-
-	const formatOptions = {};
-
-	if (useCompact && number >= compactThreshold) {
-		formatOptions.notation = 'compact';
-	}
-
-	return Intl.NumberFormat(languageTag, formatOptions).format(number);
+export function numberFormat(languageTag, number) {
+	return Intl.NumberFormat(languageTag).format(number);
 }

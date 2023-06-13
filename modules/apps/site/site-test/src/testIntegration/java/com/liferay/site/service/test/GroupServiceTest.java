@@ -62,7 +62,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -575,23 +575,24 @@ public class GroupServiceTest {
 		Company company = _companyLocalService.getCompany(
 			_group.getCompanyId());
 
-		User guestUser = company.getGuestUser();
+		User defaultUser = company.getDefaultUser();
 
-		String languageId = guestUser.getLanguageId();
+		String languageId = defaultUser.getLanguageId();
 
 		try {
-			guestUser.setLanguageId(_language.getLanguageId(LocaleUtil.BRAZIL));
+			defaultUser.setLanguageId(
+				_language.getLanguageId(LocaleUtil.BRAZIL));
 
-			guestUser = _userLocalService.updateUser(guestUser);
+			defaultUser = _userLocalService.updateUser(defaultUser);
 
 			Assert.assertEquals(
 				LocaleUtil.BRAZIL,
 				_portal.getSiteDefaultLocale(company.getGroupId()));
 		}
 		finally {
-			guestUser.setLanguageId(languageId);
+			defaultUser.setLanguageId(languageId);
 
-			_userLocalService.updateUser(guestUser);
+			_userLocalService.updateUser(defaultUser);
 		}
 	}
 
@@ -706,23 +707,24 @@ public class GroupServiceTest {
 		Company company = _companyLocalService.getCompany(
 			_group.getCompanyId());
 
-		User guestUser = company.getGuestUser();
+		User defaultUser = company.getDefaultUser();
 
-		String languageId = guestUser.getLanguageId();
+		String languageId = defaultUser.getLanguageId();
 
 		try {
-			guestUser.setLanguageId(_language.getLanguageId(LocaleUtil.CHINA));
+			defaultUser.setLanguageId(
+				_language.getLanguageId(LocaleUtil.CHINA));
 
-			guestUser = _userLocalService.updateUser(guestUser);
+			defaultUser = _userLocalService.updateUser(defaultUser);
 
 			Assert.assertEquals(
 				LocaleUtil.CHINA,
 				_portal.getSiteDefaultLocale(_group.getGroupId()));
 		}
 		finally {
-			guestUser.setLanguageId(languageId);
+			defaultUser.setLanguageId(languageId);
 
-			_userLocalService.updateUser(guestUser);
+			_userLocalService.updateUser(defaultUser);
 		}
 	}
 
@@ -1052,7 +1054,7 @@ public class GroupServiceTest {
 
 		_groups.addFirst(group);
 
-		Layout layout = LayoutTestUtil.addTypePortletLayout(group);
+		Layout layout = LayoutTestUtil.addLayout(group);
 
 		Assert.assertFalse(layout.hasScopeGroup());
 
@@ -1217,7 +1219,7 @@ public class GroupServiceTest {
 			_group.getGroupId(), friendlyURL);
 
 		Assert.assertEquals(
-			friendlyURL, HttpComponentsUtil.decodeURL(_group.getFriendlyURL()));
+			friendlyURL, HttpUtil.decodeURL(_group.getFriendlyURL()));
 	}
 
 	@Test
@@ -1283,7 +1285,7 @@ public class GroupServiceTest {
 	}
 
 	private Group _addScopeGroup(Group group) throws Exception {
-		Layout scopeLayout = LayoutTestUtil.addTypePortletLayout(group);
+		Layout scopeLayout = LayoutTestUtil.addLayout(group);
 
 		return _groupLocalService.addGroup(
 			TestPropsValues.getUserId(), GroupConstants.DEFAULT_PARENT_GROUP_ID,
@@ -1386,7 +1388,7 @@ public class GroupServiceTest {
 		}
 		catch (LocaleException localeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(localeException);
+				_log.debug(localeException, localeException);
 			}
 
 			Assert.assertTrue(expectFailure);

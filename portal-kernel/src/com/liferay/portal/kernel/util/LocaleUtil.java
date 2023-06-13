@@ -128,12 +128,6 @@ public class LocaleUtil {
 		return _localeUtil._getISOLanguages(locale);
 	}
 
-	public static String getLocaleDisplayName(
-		Locale displayLocale, Locale locale) {
-
-		return _localeUtil._getLocaleDisplayName(displayLocale, locale);
-	}
-
 	public static String getLongDisplayName(
 		Locale locale, Set<String> duplicateLanguages) {
 
@@ -221,7 +215,21 @@ public class LocaleUtil {
 		return StringUtil.equalsIgnoreCase(languageId1, languageId2);
 	}
 
-	private Locale _fromLanguageId(String languageId) {
+	private Locale _fromLanguageId(String languageId, boolean validate) {
+		return _fromLanguageId(languageId, validate, true);
+	}
+
+	private Locale _fromLanguageId(
+		String languageId, boolean validate, boolean useDefault) {
+
+		if (languageId == null) {
+			if (useDefault) {
+				return _getDefault();
+			}
+
+			return null;
+		}
+
 		Locale locale = _locales.get(languageId);
 
 		if (locale != null) {
@@ -265,51 +273,19 @@ public class LocaleUtil {
 			}
 		}
 
-		_locales.put(languageId, locale);
+		if (validate && !LanguageUtil.isAvailableLocale(locale)) {
+			locale = null;
 
-		return locale;
-	}
-
-	private Locale _fromLanguageId(String languageId, boolean validate) {
-		return _fromLanguageId(languageId, validate, true);
-	}
-
-	private Locale _fromLanguageId(
-		String languageId, boolean validate, boolean useDefault) {
-
-		if (languageId == null) {
-			if (useDefault) {
-				return _getDefault();
+			if (_log.isWarnEnabled()) {
+				_log.warn(languageId + " is not a valid language id");
 			}
-
-			return null;
+		}
+		else {
+			_locales.put(languageId, locale);
 		}
 
-		Locale locale = _fromLanguageId(languageId);
-
-		if (validate) {
-			boolean languageCode = false;
-
-			if ((languageId.indexOf(CharPool.UNDERLINE) < 0) &&
-				(languageId.indexOf(CharPool.MINUS) < 0)) {
-
-				languageCode = true;
-			}
-
-			if ((languageCode &&
-				 !LanguageUtil.isAvailableLanguageCode(languageId)) ||
-				(!languageCode && !LanguageUtil.isAvailableLocale(locale))) {
-
-				if (_log.isWarnEnabled()) {
-					_log.warn(languageId + " is not a valid language id");
-				}
-
-				if (useDefault) {
-					return _getDefault();
-				}
-
-				return null;
-			}
+		if ((locale == null) && useDefault) {
+			locale = _locale;
 		}
 
 		return locale;
@@ -345,27 +321,13 @@ public class LocaleUtil {
 		return _locale;
 	}
 
-	private String _getDisplayCountry(Locale displayLocale, Locale locale) {
-		String country = displayLocale.getDisplayCountry(locale);
-		String variant = displayLocale.getDisplayVariant(locale);
-
-		if (Validator.isNull(variant)) {
-			return country;
-		}
-
-		return StringUtil.merge(
-			new String[] {country, variant}, StringPool.COMMA_AND_SPACE);
-	}
-
 	private String _getDisplayName(
 		String language, String country, Locale locale,
 		Set<String> duplicateLanguages) {
 
 		String displayName = null;
 
-		if (duplicateLanguages.contains(locale.getLanguage()) &&
-			Validator.isNotNull(country)) {
-
+		if (duplicateLanguages.contains(locale.getLanguage())) {
 			displayName = StringUtil.appendParentheticalSuffix(
 				language, country);
 		}
@@ -394,32 +356,12 @@ public class LocaleUtil {
 		return isoLanguages;
 	}
 
-	private String _getLocaleDisplayName(Locale displayLocale, Locale locale) {
-		String key = "language." + displayLocale.getLanguage();
-
-		String displayName = LanguageUtil.get(locale, key);
-
-		if (displayName.equals(key)) {
-			return displayLocale.getDisplayName(locale);
-		}
-
-		String country = _getDisplayCountry(displayLocale, locale);
-
-		if (Validator.isNull(country)) {
-			return displayName;
-		}
-
-		return StringBundler.concat(
-			displayName, StringPool.SPACE, StringPool.OPEN_PARENTHESIS, country,
-			StringPool.CLOSE_PARENTHESIS);
-	}
-
 	private String _getLongDisplayName(
 		Locale locale, Set<String> duplicateLanguages) {
 
 		return _getDisplayName(
-			locale.getDisplayLanguage(locale),
-			_getDisplayCountry(locale, locale), locale, duplicateLanguages);
+			locale.getDisplayLanguage(locale), locale.getDisplayCountry(locale),
+			locale, duplicateLanguages);
 	}
 
 	private Locale _getMostRelevantLocale() {

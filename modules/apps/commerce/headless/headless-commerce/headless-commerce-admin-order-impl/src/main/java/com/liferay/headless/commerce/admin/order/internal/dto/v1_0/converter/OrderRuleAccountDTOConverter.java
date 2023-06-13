@@ -14,8 +14,8 @@
 
 package com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.commerce.order.rule.model.COREntry;
 import com.liferay.commerce.order.rule.model.COREntryRel;
 import com.liferay.commerce.order.rule.service.COREntryRelService;
@@ -31,8 +31,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.order.rule.model.COREntryRel-Account",
-	service = DTOConverter.class
+	service = {DTOConverter.class, OrderRuleAccountDTOConverter.class}
 )
 public class OrderRuleAccountDTOConverter
 	implements DTOConverter<COREntryRel, OrderRuleAccount> {
@@ -49,15 +50,16 @@ public class OrderRuleAccountDTOConverter
 		COREntryRel corEntryRel = _corEntryRelService.getCOREntryRel(
 			(Long)dtoConverterContext.getId());
 
-		AccountEntry accountEntry = _accountEntryLocalService.getAccountEntry(
-			corEntryRel.getClassPK());
+		CommerceAccount commerceAccount =
+			_commerceAccountService.getCommerceAccount(
+				corEntryRel.getClassPK());
 		COREntry corEntry = corEntryRel.getCOREntry();
 
 		return new OrderRuleAccount() {
 			{
 				accountExternalReferenceCode =
-					accountEntry.getExternalReferenceCode();
-				accountId = accountEntry.getAccountEntryId();
+					commerceAccount.getExternalReferenceCode();
+				accountId = commerceAccount.getCommerceAccountId();
 				actions = dtoConverterContext.getActions();
 				orderRuleAccountId = corEntryRel.getCOREntryRelId();
 				orderRuleExternalReferenceCode =
@@ -68,7 +70,7 @@ public class OrderRuleAccountDTOConverter
 	}
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private CommerceAccountService _commerceAccountService;
 
 	@Reference
 	private COREntryRelService _corEntryRelService;

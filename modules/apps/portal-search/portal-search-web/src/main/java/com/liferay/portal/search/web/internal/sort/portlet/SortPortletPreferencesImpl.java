@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.web.internal.portlet.preferences.BasePortletPreferences;
+import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
 
 import java.util.Optional;
 
@@ -31,13 +31,13 @@ import javax.portlet.PortletPreferences;
 /**
  * @author Wade Cao
  */
-public class SortPortletPreferencesImpl
-	extends BasePortletPreferences implements SortPortletPreferences {
+public class SortPortletPreferencesImpl implements SortPortletPreferences {
 
 	public SortPortletPreferencesImpl(
 		Optional<PortletPreferences> portletPreferencesOptional) {
 
-		super(portletPreferencesOptional.orElse(null));
+		_portletPreferencesHelper = new PortletPreferencesHelper(
+			portletPreferencesOptional);
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class SortPortletPreferencesImpl
 		String fieldsString = getFieldsString();
 
 		if (Validator.isBlank(fieldsString)) {
-			return _getDefaultFieldsJSONArray();
+			return getDefaultFieldsJSONArray();
 		}
 
 		try {
@@ -56,13 +56,13 @@ public class SortPortletPreferencesImpl
 				"Unable to create a JSON array from: " + fieldsString,
 				jsonException);
 
-			return _getDefaultFieldsJSONArray();
+			return getDefaultFieldsJSONArray();
 		}
 	}
 
 	@Override
 	public String getFieldsString() {
-		return getString(
+		return _portletPreferencesHelper.getString(
 			SortPortletPreferences.PREFERENCE_KEY_FIELDS, StringPool.BLANK);
 	}
 
@@ -71,7 +71,7 @@ public class SortPortletPreferencesImpl
 		return "sort";
 	}
 
-	private JSONArray _getDefaultFieldsJSONArray() {
+	protected JSONArray getDefaultFieldsJSONArray() {
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (Preset preset : _presets) {
@@ -97,6 +97,8 @@ public class SortPortletPreferencesImpl
 		new Preset("createDate+", "created-oldest-first"),
 		new Preset("userName", "user")
 	};
+
+	private final PortletPreferencesHelper _portletPreferencesHelper;
 
 	private static class Preset {
 

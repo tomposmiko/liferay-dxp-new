@@ -55,15 +55,13 @@ boolean showBackURL = ParamUtil.getBoolean(request, "showBackURL", true);
 
 	<aui:model-context bean="<%= template %>" model="<%= DDMTemplate.class %>" />
 
-	<div class="sheet">
-		<div class="panel-group panel-group-flush">
-			<aui:fieldset>
-				<aui:input name="name" />
+	<aui:fieldset-group markupView="lexicon">
+		<aui:fieldset>
+			<aui:input name="name" />
 
-				<aui:input name="description" />
-			</aui:fieldset>
-		</div>
-	</div>
+			<aui:input name="description" />
+		</aui:fieldset>
+	</aui:fieldset-group>
 
 	<aui:button-row>
 		<aui:button type="submit" value="copy" />

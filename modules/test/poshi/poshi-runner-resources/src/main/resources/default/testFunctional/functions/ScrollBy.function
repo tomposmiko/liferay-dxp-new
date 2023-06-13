@@ -1,8 +1,5 @@
-@default = "scrollBy"
-definition {
-
-	function scrollBy {
-		selenium.scrollBy();
-	}
-
-}
+<definition default="scrollBy">
+	<command name="scrollBy">
+		<execute selenium="scrollBy" />
+	</command>
+</definition>

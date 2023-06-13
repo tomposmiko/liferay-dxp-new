@@ -156,7 +156,7 @@ class EventEmitter extends Disposable {
 	 */
 	emit(event) {
 		const listeners = this._getRawListeners(event);
-		if (!listeners.length) {
+		if (listeners.length === 0) {
 			return false;
 		}
 
@@ -363,7 +363,7 @@ class EventEmitter extends Disposable {
 			}
 		}
 
-		return finalListeners.length ? finalListeners : null;
+		return finalListeners.length > 0 ? finalListeners : null;
 	}
 
 	/**

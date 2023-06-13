@@ -21,7 +21,7 @@ import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.collection.provider.SingleFormVariationInfoCollectionProvider;
 import com.liferay.info.item.InfoItemFormVariation;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.journal.constants.JournalFolderConstants;
@@ -91,12 +91,12 @@ public class JournalArticleSingleFormVariationInfoCollectionProviderTest {
 	@Test
 	public void testGetInfoItemFormVariation() {
 		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormVariationsProvider.class,
 				JournalArticle.class.getName());
 
 		InfoCollectionProvider<?> infoCollectionProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoCollectionProvider.class, JournalArticle.class.getName());
 
 		Assert.assertTrue(
@@ -126,7 +126,7 @@ public class JournalArticleSingleFormVariationInfoCollectionProviderTest {
 	@Test
 	public void testGetInfoPage() throws Exception {
 		InfoCollectionProvider<?> infoCollectionProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoCollectionProvider.class, JournalArticle.class.getName());
 
 		InfoPage<?> infoPage = infoCollectionProvider.getCollectionInfoPage(
@@ -163,7 +163,7 @@ public class JournalArticleSingleFormVariationInfoCollectionProviderTest {
 	private Group _group;
 
 	@Inject
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Inject
 	private JournalArticleLocalService _journalArticleLocalService;
@@ -188,10 +188,10 @@ public class JournalArticleSingleFormVariationInfoCollectionProviderTest {
 
 			return InfoPage.of(
 				_journalArticleLocalService.getStructureArticles(
-					_group.getGroupId(), _ddmStructure.getStructureId()),
+					_group.getGroupId(), _ddmStructure.getStructureKey()),
 				collectionQuery.getPagination(),
 				_journalArticleLocalService.getStructureArticlesCount(
-					_group.getGroupId(), _ddmStructure.getStructureId()));
+					_group.getGroupId(), _ddmStructure.getStructureKey()));
 		}
 
 		@Override

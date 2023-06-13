@@ -58,10 +58,10 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 
 	@Override
 	public void configure(ResourceInfo resourceInfo, FeatureContext context) {
-		CORS cors = _getCORS(resourceInfo);
+		CORS cors = getCORS(resourceInfo);
 
 		if (cors != null) {
-			CORSSupport corsSupport = _getCORSSupport(cors);
+			CORSSupport corsSupport = getCORSSupport(cors);
 
 			context.register(
 				new CORSPreflighContainerRequestFilter(corsSupport));
@@ -70,13 +70,13 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 		}
 	}
 
-	private CORS _getCORS(ResourceInfo resourceInfo) {
+	protected CORS getCORS(ResourceInfo resourceInfo) {
 		return AnnotationLocator.locate(
 			resourceInfo.getResourceMethod(), resourceInfo.getResourceClass(),
 			CORS.class);
 	}
 
-	private CORSSupport _getCORSSupport(CORS cors) {
+	protected CORSSupport getCORSSupport(CORS cors) {
 		CORSSupport corsSupport = new CORSSupport();
 
 		corsSupport.setCORSHeaders(
@@ -146,7 +146,7 @@ public class CORSAnnotationDynamicFeature implements DynamicFeature {
 
 			User user = permissionChecker.getUser();
 
-			return user.isGuestUser();
+			return user.isDefaultUser();
 		}
 
 		private final CORSSupport _corsSupport;

@@ -1,31 +1,35 @@
 @component-name = "portal-publications"
 definition {
 
-	property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config";
-	property osgi.module.configurations = "enabled=B\"true\"";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.component.names = "Sites Administration";
 	property testray.main.component.name = "Publications";
 
 	setUp {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
+
+		JSONPublications.enablePublications();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
+			ApplicationsMenu.gotoPortlet(
+				category = "Publications",
+				panel = "Applications",
+				portlet = "Publications");
+
 			Publications.disablePublications();
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PublishPrivateChildSite {
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
@@ -55,11 +59,11 @@ definition {
 			portlet = "Pages",
 			site = "Child Site Name");
 
-		PagesAdmin.addPage(pageName = "Child Site Page");
+		SitePages.addPublicPage(pageName = "Child Site Page");
 
-		PublicationsNavigator.gotoReviewChanges();
+		Publications.gotoReviewChanges();
 
-		PublicationsChanges.viewChanges(
+		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Site",
 			changeSite = "Site Name",
 			changeTitle = "Child Site Name",
@@ -77,7 +81,7 @@ definition {
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PublishSiteCreatedInPublication {
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
@@ -93,9 +97,9 @@ definition {
 
 		Site.viewCP(siteName = "Site Name");
 
-		PublicationsNavigator.gotoReviewChanges();
+		Publications.gotoReviewChanges();
 
-		PublicationsChanges.viewChanges(
+		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Site",
 			changeSite = "Global",
 			changeTitle = "Site Name",

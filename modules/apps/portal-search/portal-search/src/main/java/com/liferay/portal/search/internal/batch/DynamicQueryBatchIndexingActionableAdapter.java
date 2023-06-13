@@ -75,6 +75,11 @@ public class DynamicQueryBatchIndexingActionableAdapter
 			(T x) -> consumer.accept(x));
 	}
 
+	@Override
+	public void setSearchEngineId(String searchEngineId) {
+		_indexableActionableDynamicQuery.setSearchEngineId(searchEngineId);
+	}
+
 	private final IndexableActionableDynamicQuery
 		_indexableActionableDynamicQuery;
 

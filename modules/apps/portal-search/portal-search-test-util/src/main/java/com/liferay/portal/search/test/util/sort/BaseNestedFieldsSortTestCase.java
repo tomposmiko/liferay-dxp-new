@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.test.util.sort;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchResponse;
@@ -25,6 +24,9 @@ import com.liferay.portal.search.test.util.mappings.NestedDDMFieldArrayUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,11 +52,20 @@ public abstract class BaseNestedFieldsSortTestCase
 		assertSort("ddm__keyword__41523__Textp47b_en_US");
 	}
 
+	protected void addDocumentWithOneDDMField(
+		String name, String valueFieldName, Object value) {
+
+		addDocument(
+			DocumentCreationHelpers.oneDDMField(name, valueFieldName, value));
+	}
+
 	protected void assertSort(String fieldName) {
-		addDocuments(
-			value -> DocumentCreationHelpers.oneDDMField(
-				fieldName, "ddmFieldValueKeyword", value),
-			"C", "B", "A");
+		Stream.of(
+			"C", "B", "A"
+		).forEach(
+			value -> addDocumentWithOneDDMField(
+				fieldName, "ddmFieldValueKeyword", value)
+		);
 
 		FieldSort fieldSort = sorts.field("ddmFieldArray.ddmFieldValueKeyword");
 
@@ -90,16 +101,22 @@ public abstract class BaseNestedFieldsSortTestCase
 	protected Object getDDMFieldValue(String fieldName, Document document) {
 		List<?> values = document.getValues("ddmFieldArray");
 
-		return NestedDDMFieldArrayUtil.getFieldValue(
-			fieldName, (List<Map<String, Object>>)values);
+		Optional<Object> optional = NestedDDMFieldArrayUtil.getFieldValue(
+			fieldName, (Stream<Map<String, Object>>)values.stream());
+
+		return optional.get();
 	}
 
 	protected List<?> getDDMFieldValues(
 		String fieldName, SearchResponse searchResponse) {
 
-		return TransformUtil.transform(
-			searchResponse.getDocuments(),
-			document -> getDDMFieldValue(fieldName, document));
+		Stream<Document> stream = searchResponse.getDocumentsStream();
+
+		return stream.map(
+			document -> getDDMFieldValue(fieldName, document)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 }

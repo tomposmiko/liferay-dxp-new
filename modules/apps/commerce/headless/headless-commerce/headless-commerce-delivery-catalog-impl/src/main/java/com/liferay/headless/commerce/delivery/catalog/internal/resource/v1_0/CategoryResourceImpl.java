@@ -21,10 +21,9 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.headless.commerce.delivery.catalog.dto.v1_0.Category;
 import com.liferay.headless.commerce.delivery.catalog.dto.v1_0.Product;
+import com.liferay.headless.commerce.delivery.catalog.internal.dto.v1_0.converter.CategoryDTOConverter;
 import com.liferay.headless.commerce.delivery.catalog.resource.v1_0.CategoryResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
@@ -43,11 +42,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Andrea Sbarra
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/category.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {CategoryResource.class, NestedFieldSupport.class}
 )
-@CTAware
 public class CategoryResourceImpl
 	extends BaseCategoryResourceImpl implements NestedFieldSupport {
 
@@ -101,10 +100,8 @@ public class CategoryResourceImpl
 	@Reference
 	private AssetCategoryService _assetCategoryLocalService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.delivery.catalog.internal.dto.v1_0.converter.CategoryDTOConverter)"
-	)
-	private DTOConverter<AssetCategory, Category> _categoryDTOConverter;
+	@Reference
+	private CategoryDTOConverter _categoryDTOConverter;
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;

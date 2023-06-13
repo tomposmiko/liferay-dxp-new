@@ -61,7 +61,7 @@ public class IGDisplayPortletDataHandlerTest
 
 	@Override
 	protected String[] getDataPortletPreferences() {
-		return new String[] {"rootFolderId", "selectedRepositoryId"};
+		return new String[] {"rootFolderId"};
 	}
 
 	@Override

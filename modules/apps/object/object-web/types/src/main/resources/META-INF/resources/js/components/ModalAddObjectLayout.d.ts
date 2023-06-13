@@ -12,12 +12,9 @@
  * details.
  */
 
-import {Observer} from '@clayui/modal/lib/types';
 import React from 'react';
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
-	observer: Observer;
-	onClose: () => void;
 }
 declare const ModalWithProvider: React.FC<IProps>;
 export default ModalWithProvider;

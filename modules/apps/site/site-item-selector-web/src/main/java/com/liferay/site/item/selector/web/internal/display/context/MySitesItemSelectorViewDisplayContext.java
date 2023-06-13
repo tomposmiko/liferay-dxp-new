@@ -59,14 +59,14 @@ public class MySitesItemSelectorViewDisplayContext
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		_addBreadcrumbEntries();
+		addBreadcrumbEntries();
 	}
 
 	@Override
 	public GroupSearch getGroupSearch() throws Exception {
 		PortletURL portletURL = getPortletURL();
 
-		Group group = _getGroup();
+		Group group = getGroup();
 
 		if (group != null) {
 			portletURL.setParameter(
@@ -109,8 +109,8 @@ public class MySitesItemSelectorViewDisplayContext
 		return true;
 	}
 
-	private void _addBreadcrumbEntries() {
-		Group group = _getGroup();
+	protected void addBreadcrumbEntries() {
+		Group group = getGroup();
 
 		if (group == null) {
 			return;
@@ -134,7 +134,7 @@ public class MySitesItemSelectorViewDisplayContext
 		}
 	}
 
-	private Group _getGroup() {
+	protected Group getGroup() {
 		long groupId = ParamUtil.getLong(
 			httpServletRequest, "groupId",
 			GroupConstants.DEFAULT_PARENT_GROUP_ID);
@@ -147,10 +147,10 @@ public class MySitesItemSelectorViewDisplayContext
 	}
 
 	private void _prependGroup(GroupSearch groupSearch, Group group) {
-		groupSearch.setResultsAndTotal(
-			() -> ListUtil.concat(
-				Arrays.asList(group), groupSearch.getResults()),
-			groupSearch.getTotal() + 1);
+		groupSearch.setResults(
+			ListUtil.concat(Arrays.asList(group), groupSearch.getResults()));
+
+		groupSearch.setTotal(groupSearch.getTotal() + 1);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

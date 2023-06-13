@@ -17,10 +17,6 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-String backURL = ParamUtil.getString(request, "backURL", redirect);
-
 String navigation = ParamUtil.getString(request, "navigation", "all");
 
 boolean actionRequired = ParamUtil.getBoolean(request, "actionRequired");
@@ -42,14 +38,7 @@ notificationsSearchContainer.setId(searchContainerId);
 NotificationsManagementToolbarDisplayContext notificationsManagementToolbarDisplayContext = new NotificationsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, currentURLObj);
 
 NotificationsUtil.populateResults(themeDisplay.getUserId(), actionRequired, navigation, notificationsManagementToolbarDisplayContext.getOrderByType(), notificationsSearchContainer);
-
-if (Validator.isNotNull(backURL)) {
-	portletDisplay.setShowBackIcon(true);
-	portletDisplay.setURLBack(backURL);
-}
 %>
-
-<%@ include file="/notifications/view-ext-pre.jsp" %>
 
 <clay:navigation-bar
 	inverted="<%= layout.isTypeControlPanel() %>"
@@ -197,5 +186,3 @@ if (Validator.isNotNull(backURL)) {
 		'.user-notification-action'
 	);
 </aui:script>
-
-<%@ include file="/notifications/view-ext-post.jsp" %>

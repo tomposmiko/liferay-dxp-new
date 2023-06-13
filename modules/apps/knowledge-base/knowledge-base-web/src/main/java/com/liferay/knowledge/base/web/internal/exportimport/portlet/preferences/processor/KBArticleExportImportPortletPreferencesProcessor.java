@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sorin Pop
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_ARTICLE,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -118,10 +119,16 @@ public class KBArticleExportImportPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
+	@Reference(unbind = "-")
+	protected void seKBArticleLocalService(
+		KBArticleLocalService kbArticleLocalService) {
+
+		_kbArticleLocalService = kbArticleLocalService;
+	}
+
 	@Reference(target = "(name=ReferencedStagedModelImporter)")
 	private Capability _capability;
 
-	@Reference
 	private KBArticleLocalService _kbArticleLocalService;
 
 }

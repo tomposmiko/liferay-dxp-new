@@ -12,6 +12,49 @@
  * details.
  */
 
-export {default as FieldBase} from './FieldBase/FieldBase.es';
 export {FieldBase as ReactFieldBase} from './FieldBase/ReactFieldBase.es';
-export type {FieldChangeEventHandler} from './types';
+export {default as FieldBase} from './FieldBase/FieldBase.es';
+declare global {
+	type Direction = 'ltr' | 'rtl';
+	type FieldChangeEventHandler<T = any> = (event: {
+		target: {
+			value: T;
+		};
+	}) => void;
+	type Locale =
+		| 'ar_SA'
+		| 'ca_ES'
+		| 'de_DE'
+		| 'en_US'
+		| 'es_ES'
+		| 'fi_FI'
+		| 'fr_FR'
+		| 'hu_HU'
+		| 'nl_NL'
+		| 'ja_JP'
+		| 'pt_BR'
+		| 'sv_SE'
+		| 'zh_CN';
+	type LocalizedTextKey =
+		| 'choose-an-option'
+		| 'decimal-separator'
+		| 'input-mask-append-placeholder'
+		| 'prefix'
+		| 'prefix-or-suffix'
+		| 'suffix'
+		| 'the-maximum-length-is-10-characters'
+		| 'thousands-separator'
+		| 'for-security-reasons-upload-field-repeatability-is-limited-the-limit-is-defined-in-x-system-settings-x';
+	type LocalizedValue<T> = {
+		[key in Locale]?: T;
+	};
+	const Liferay: {
+		Language: {
+			direction: LocalizedValue<Direction>;
+			get: (key: LocalizedTextKey) => string;
+		};
+		Util: {
+			sub: (string: string, data: any, ...others: string[]) => string;
+		};
+	};
+}

@@ -26,15 +26,11 @@ import com.liferay.commerce.account.model.CommerceAccountGroup;
 import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRel;
 import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRelTable;
 import com.liferay.commerce.account.model.impl.CommerceAccountGroupImpl;
-import com.liferay.commerce.account.service.CommerceAccountGroupCommerceAccountRelLocalService;
-import com.liferay.commerce.account.service.CommerceAccountGroupRelLocalService;
 import com.liferay.commerce.account.service.base.CommerceAccountGroupLocalServiceBaseImpl;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -46,30 +42,24 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.stream.Stream;
 
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.account.model.CommerceAccountGroup",
-	service = AopService.class
-)
 public class CommerceAccountGroupLocalServiceImpl
 	extends CommerceAccountGroupLocalServiceBaseImpl {
 
@@ -86,14 +76,14 @@ public class CommerceAccountGroupLocalServiceImpl
 			externalReferenceCode = null;
 		}
 
-		_validate(companyId, 0, name, externalReferenceCode);
+		validate(companyId, 0, name, externalReferenceCode);
 
 		AccountGroup accountGroup = _accountGroupLocalService.addAccountGroup(
-			serviceContext.getUserId(), null, name, serviceContext);
+			serviceContext.getUserId(), null, name);
 
-		accountGroup.setExternalReferenceCode(externalReferenceCode);
 		accountGroup.setDefaultAccountGroup(system);
 		accountGroup.setType(CommerceAccountGroupImpl.toAccountGroupType(type));
+		accountGroup.setExternalReferenceCode(externalReferenceCode);
 		accountGroup.setExpandoBridgeAttributes(serviceContext);
 
 		CommerceAccountGroup commerceAccountGroup =
@@ -102,7 +92,7 @@ public class CommerceAccountGroupLocalServiceImpl
 
 		// Resources
 
-		_resourceLocalService.addResources(
+		resourceLocalService.addResources(
 			accountGroup.getCompanyId(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			accountGroup.getUserId(), CommerceAccountGroup.class.getName(),
 			commerceAccountGroup.getCommerceAccountGroupId(), false, false,
@@ -123,14 +113,14 @@ public class CommerceAccountGroupLocalServiceImpl
 			CommerceAccountGroupImpl.fromAccountGroup(
 				_accountGroupLocalService.checkGuestAccountGroup(companyId));
 
-		User user = _userLocalService.getGuestUser(companyId);
+		User user = userLocalService.getDefaultUser(companyId);
 
 		ServiceContext serviceContext = new ServiceContext();
 
 		serviceContext.setCompanyId(companyId);
 		serviceContext.setUserId(user.getUserId());
 
-		_commerceAccountGroupCommerceAccountRelLocalService.
+		commerceAccountGroupCommerceAccountRelLocalService.
 			addCommerceAccountGroupCommerceAccountRel(
 				commerceAccountGroup.getCommerceAccountGroupId(),
 				CommerceAccountConstants.ACCOUNT_ID_GUEST, serviceContext);
@@ -149,7 +139,7 @@ public class CommerceAccountGroupLocalServiceImpl
 
 		// Commerce account group generic rels
 
-		_commerceAccountGroupRelLocalService.deleteCommerceAccountGroupRels(
+		commerceAccountGroupRelLocalService.deleteCommerceAccountGroupRels(
 			commerceAccountGroup.getCommerceAccountGroupId());
 
 		// Commerce account group
@@ -159,7 +149,7 @@ public class CommerceAccountGroupLocalServiceImpl
 
 		// Resources
 
-		_resourceLocalService.deleteResource(
+		resourceLocalService.deleteResource(
 			commerceAccountGroup, ResourceConstants.SCOPE_INDIVIDUAL);
 
 		// Expando
@@ -185,8 +175,8 @@ public class CommerceAccountGroupLocalServiceImpl
 		long companyId, String externalReferenceCode) {
 
 		return CommerceAccountGroupImpl.fromAccountGroup(
-			_accountGroupLocalService.fetchAccountGroupByExternalReferenceCode(
-				externalReferenceCode, companyId));
+			_accountGroupLocalService.fetchAccountGroupByReferenceCode(
+				companyId, externalReferenceCode));
 	}
 
 	@Override
@@ -235,35 +225,29 @@ public class CommerceAccountGroupLocalServiceImpl
 
 	@Override
 	public List<CommerceAccountGroup>
-		getCommerceAccountGroupsByCommerceAccountId(
-			long commerceAccountId, int start, int end) {
+		getCommerceAccountGroupsByCommerceAccountId(long commerceAccountId) {
 
 		List<CommerceAccountGroupCommerceAccountRel>
 			commerceAccountGroupCommerceAccountRels =
-				_commerceAccountGroupCommerceAccountRelLocalService.
-					getCommerceAccountGroupCommerceAccountRelsByCommerceAccountId(
-						commerceAccountId, start, end);
+				commerceAccountGroupCommerceAccountRelLocalService.
+					getCommerceAccountGroupCommerceAccountRels(
+						commerceAccountId);
 
 		if (commerceAccountGroupCommerceAccountRels.isEmpty()) {
 			return new ArrayList<>();
 		}
 
+		Stream<CommerceAccountGroupCommerceAccountRel> stream =
+			commerceAccountGroupCommerceAccountRels.stream();
+
+		long[] commerceAccountGroupIds = stream.mapToLong(
+			CommerceAccountGroupCommerceAccountRel::getCommerceAccountGroupId
+		).toArray();
+
 		return TransformUtil.transform(
 			_accountGroupLocalService.getAccountGroupsByAccountGroupId(
-				TransformUtil.transformToLongArray(
-					commerceAccountGroupCommerceAccountRels,
-					CommerceAccountGroupCommerceAccountRel::
-						getCommerceAccountGroupId)),
+				commerceAccountGroupIds),
 			CommerceAccountGroupImpl::fromAccountGroup);
-	}
-
-	@Override
-	public int getCommerceAccountGroupsByCommerceAccountIdCount(
-		long commerceAccountId) {
-
-		return _commerceAccountGroupCommerceAccountRelLocalService.
-			getCommerceAccountGroupCommerceAccountRelsCountByCommerceAccountId(
-				commerceAccountId);
 	}
 
 	@Override
@@ -326,8 +310,8 @@ public class CommerceAccountGroupLocalServiceImpl
 	}
 
 	@Override
-	public int searchCommerceAccountsGroupCount(
-		long companyId, String keywords) {
+	public int searchCommerceAccountsGroupCount(long companyId, String keywords)
+		throws PortalException {
 
 		BaseModelSearchResult<AccountGroup> baseModelSearchResult =
 			_accountGroupLocalService.searchAccountGroups(
@@ -351,7 +335,7 @@ public class CommerceAccountGroupLocalServiceImpl
 			throw new SystemCommerceAccountGroupException();
 		}
 
-		_validate(
+		validate(
 			serviceContext.getCompanyId(), accountGroup.getAccountGroupId(),
 			name, accountGroup.getExternalReferenceCode());
 
@@ -362,7 +346,7 @@ public class CommerceAccountGroupLocalServiceImpl
 			_accountGroupLocalService.updateAccountGroup(accountGroup));
 	}
 
-	private void _validate(
+	protected void validate(
 			long companyId, long commerceAccountGroupId, String name,
 			String externalReferenceCode)
 		throws PortalException {
@@ -377,9 +361,8 @@ public class CommerceAccountGroupLocalServiceImpl
 
 		CommerceAccountGroup commerceAccountGroup =
 			CommerceAccountGroupImpl.fromAccountGroup(
-				_accountGroupLocalService.
-					fetchAccountGroupByExternalReferenceCode(
-						externalReferenceCode, companyId));
+				_accountGroupLocalService.fetchAccountGroupByReferenceCode(
+					companyId, externalReferenceCode));
 
 		if ((commerceAccountGroup != null) &&
 			(commerceAccountGroup.getCommerceAccountGroupId() !=
@@ -391,24 +374,10 @@ public class CommerceAccountGroupLocalServiceImpl
 		}
 	}
 
-	@Reference
+	@ServiceReference(type = AccountGroupLocalService.class)
 	private AccountGroupLocalService _accountGroupLocalService;
 
-	@Reference
-	private CommerceAccountGroupCommerceAccountRelLocalService
-		_commerceAccountGroupCommerceAccountRelLocalService;
-
-	@Reference
-	private CommerceAccountGroupRelLocalService
-		_commerceAccountGroupRelLocalService;
-
-	@Reference
+	@ServiceReference(type = ExpandoRowLocalService.class)
 	private ExpandoRowLocalService _expandoRowLocalService;
-
-	@Reference
-	private ResourceLocalService _resourceLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

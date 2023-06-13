@@ -121,12 +121,7 @@ public class LayoutPageTemplateEntryUpgradeProcess extends UpgradeProcess {
 		throws PortalException {
 
 		LayoutPrototype layoutPrototype =
-			_layoutPrototypeLocalService.fetchLayoutPrototype(
-				layoutPrototypeId);
-
-		if (layoutPrototype == null) {
-			return;
-		}
+			_layoutPrototypeLocalService.getLayoutPrototype(layoutPrototypeId);
 
 		Map<Locale, String> nameMap = layoutPrototype.getNameMap();
 
@@ -139,8 +134,7 @@ public class LayoutPageTemplateEntryUpgradeProcess extends UpgradeProcess {
 			return;
 		}
 
-		nameMap.put(
-			locale, StringUtil.replaceFirst(defaultName, oldName, newName));
+		nameMap.put(locale, defaultName.replaceFirst(oldName, newName));
 
 		_layoutPrototypeLocalService.updateLayoutPrototype(
 			layoutPrototypeId, nameMap, layoutPrototype.getDescriptionMap(),
@@ -157,10 +151,10 @@ public class LayoutPageTemplateEntryUpgradeProcess extends UpgradeProcess {
 						"from LayoutPageTemplateEntry");
 			PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update LayoutPageTemplateEntry set " +
-						"layoutPageTemplateEntryKey = ?, name = ? where " +
-							"layoutPageTemplateEntryId = ?")) {
+					connection.prepareStatement(
+						"update LayoutPageTemplateEntry set " +
+							"layoutPageTemplateEntryKey = ?, name = ? where " +
+								"layoutPageTemplateEntryId = ?"))) {
 
 			while (resultSet.next()) {
 				String name = resultSet.getString("name");

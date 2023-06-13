@@ -41,14 +41,14 @@ public class EmailAddressLocalServiceImpl
 	@Override
 	public EmailAddress addEmailAddress(
 			long userId, String className, long classPK, String address,
-			long listTypeId, boolean primary, ServiceContext serviceContext)
+			long typeId, boolean primary, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = _userPersistence.findByPrimaryKey(userId);
 		long classNameId = _classNameLocalService.getClassNameId(className);
 
 		validate(
-			0, user.getCompanyId(), classNameId, classPK, address, listTypeId,
+			0, user.getCompanyId(), classNameId, classPK, address, typeId,
 			primary);
 
 		long emailAddressId = counterLocalService.increment();
@@ -63,7 +63,7 @@ public class EmailAddressLocalServiceImpl
 		emailAddress.setClassNameId(classNameId);
 		emailAddress.setClassPK(classPK);
 		emailAddress.setAddress(address);
-		emailAddress.setListTypeId(listTypeId);
+		emailAddress.setTypeId(typeId);
 		emailAddress.setPrimary(primary);
 
 		return emailAddressPersistence.update(emailAddress);
@@ -119,17 +119,16 @@ public class EmailAddressLocalServiceImpl
 
 	@Override
 	public EmailAddress updateEmailAddress(
-			long emailAddressId, String address, long listTypeId,
-			boolean primary)
+			long emailAddressId, String address, long typeId, boolean primary)
 		throws PortalException {
 
-		validate(emailAddressId, 0, 0, 0, address, listTypeId, primary);
+		validate(emailAddressId, 0, 0, 0, address, typeId, primary);
 
 		EmailAddress emailAddress = emailAddressPersistence.findByPrimaryKey(
 			emailAddressId);
 
 		emailAddress.setAddress(address);
-		emailAddress.setListTypeId(listTypeId);
+		emailAddress.setTypeId(typeId);
 		emailAddress.setPrimary(primary);
 
 		return emailAddressPersistence.update(emailAddress);
@@ -162,7 +161,7 @@ public class EmailAddressLocalServiceImpl
 
 	protected void validate(
 			long emailAddressId, long companyId, long classNameId, long classPK,
-			String address, long listTypeId, boolean primary)
+			String address, long typeId, boolean primary)
 		throws PortalException {
 
 		if (!Validator.isEmailAddress(address)) {
@@ -179,7 +178,7 @@ public class EmailAddressLocalServiceImpl
 		}
 
 		_listTypeLocalService.validate(
-			listTypeId, classNameId, ListTypeConstants.EMAIL_ADDRESS);
+			typeId, classNameId, ListTypeConstants.EMAIL_ADDRESS);
 
 		validate(emailAddressId, companyId, classNameId, classPK, primary);
 	}

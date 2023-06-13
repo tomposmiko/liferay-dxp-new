@@ -20,6 +20,7 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import {withRouter} from 'react-router-dom';
 
 import {AppContext} from '../../AppContext.es';
+import Alert from '../../components/Alert.es';
 import DefaultQuestionsEditor from '../../components/DefaultQuestionsEditor.es';
 import Link from '../../components/Link.es';
 import TagSelector from '../../components/TagSelector.es';
@@ -28,15 +29,14 @@ import {
 	createQuestionInRootQuery,
 	getSectionBySectionTitleQuery,
 } from '../../utils/client.es';
+import lang from '../../utils/lang.es';
 import {
 	deleteCache,
 	getContextLink,
 	historyPushWithSlug,
-	processGraphQLError,
 	slugToText,
+	useDebounceCallback,
 } from '../../utils/utils.es';
-
-const HEADLINE_MAX_LENGTH = 75;
 
 export default withRouter(
 	({
@@ -45,10 +45,10 @@ export default withRouter(
 			params: {sectionTitle},
 		},
 	}) => {
-		const editorRef = useRef('');
+		const editor = useRef('');
 		const [hasEnoughContent, setHasEnoughContent] = useState(false);
 		const [headline, setHeadline] = useState('');
-		const [isPostButtonDisable, setIsPostButtonDisable] = useState(true);
+		const [error, setError] = useState({});
 		const [sectionId, setSectionId] = useState();
 		const [sections, setSections] = useState([]);
 		const [tags, setTags] = useState([]);
@@ -56,6 +56,11 @@ export default withRouter(
 
 		const context = useContext(AppContext);
 		const historyPushParser = historyPushWithSlug(history.push);
+
+		const [debounceCallback] = useDebounceCallback(
+			() => historyPushParser(`/questions/${sectionTitle}/`),
+			500
+		);
 
 		const [createQuestionInASection] = useMutation(
 			createQuestionInASectionQuery
@@ -73,12 +78,6 @@ export default withRouter(
 				},
 			}
 		);
-
-		useEffect(() => {
-			setIsPostButtonDisable(
-				hasEnoughContent || !headline || !tagsLoaded
-			);
-		}, [hasEnoughContent, headline, tagsLoaded]);
 
 		useEffect(() => {
 			getSectionBySectionTitle().then(({data}) => {
@@ -112,44 +111,56 @@ export default withRouter(
 			getSectionBySectionTitle,
 		]);
 
-		const createQuestion = async () => {
-			setIsPostButtonDisable(true);
+		const processError = (error) => {
+			if (error.message && error.message.includes('AssetTagException')) {
+				error.message = lang.sub(
+					Liferay.Language.get(
+						'the-x-cannot-contain-the-following-invalid-characters-x'
+					),
+					[
+						'Tag',
+						' & \' @ \\\\ ] } : , = > / < \\n [ {  | + # ` ? \\" \\r ; / * ~',
+					]
+				);
+			}
+
+			setError(error);
+		};
+
+		const processResponse = (error) =>
+			error ? processError(error.graphQLErrors[0]) : debounceCallback();
+
+		const createQuestion = () => {
 			deleteCache();
-
-			const shouldCreateQuestionInRoot =
-				sectionTitle === 'all' && Number(context.rootTopicId) === 0;
-
-			const payload = {
-				fetchOptionsOverrides: getContextLink(sectionTitle),
-				variables: {
-					articleBody: editorRef.current.getContent(),
-					headline,
-					keywords: tags.map((tag) => tag.label),
-					...(shouldCreateQuestionInRoot
-						? {siteKey: context.siteKey}
-						: {messageBoardSectionId: sectionId}),
-				},
-			};
-
-			const fn = shouldCreateQuestionInRoot
-				? createQuestionInRoot
-				: createQuestionInASection;
-
-			try {
-				const {error} = await fn(payload);
-
-				if (error) {
-					processGraphQLError(error);
-				}
-				else {
-					historyPushParser(`/questions/${sectionTitle}/`);
-				}
+			if (
+				sectionTitle === context.rootTopicId &&
+				+context.rootTopicId === 0
+			) {
+				createQuestionInRoot({
+					fetchOptionsOverrides: getContextLink(sectionTitle),
+					variables: {
+						articleBody: editor.current.getContent(),
+						headline,
+						keywords: tags.map((tag) => tag.label),
+						siteKey: context.siteKey,
+					},
+				})
+					.then(({error}) => processResponse(error))
+					.catch(processError);
 			}
-			catch (error) {
-				processGraphQLError(error);
+			else {
+				createQuestionInASection({
+					fetchOptionsOverrides: getContextLink(sectionTitle),
+					variables: {
+						articleBody: editor.current.getContent(),
+						headline,
+						keywords: tags.map((tag) => tag.label),
+						messageBoardSectionId: sectionId,
+					},
+				})
+					.then(({error}) => processResponse(error))
+					.catch(processError);
 			}
-
-			setIsPostButtonDisable(false);
 		};
 
 		return (
@@ -157,7 +168,6 @@ export default withRouter(
 				<div className="questions-container row">
 					<div className="c-mx-auto col-xl-10">
 						<h1>{Liferay.Language.get('new-question')}</h1>
-
 						<ClayForm className="c-mt-5">
 							<ClayForm.Group>
 								<label htmlFor="basicInput">
@@ -169,7 +179,7 @@ export default withRouter(
 								</label>
 
 								<ClayInput
-									maxLength={HEADLINE_MAX_LENGTH}
+									maxLength={75}
 									onChange={(event) =>
 										setHeadline(event.target.value)
 									}
@@ -183,15 +193,11 @@ export default withRouter(
 
 								<ClayForm.FeedbackGroup>
 									<ClayForm.FeedbackItem>
-										<div className="bd-highlight d-flex mb-3 text-secondary">
-											<span className="bd-highlight d-flex justify-content-start mr-auto p-2 small">
-												{Liferay.Language.get(
-													'be-specific-and-imagine-you-are-asking-a-question-to-another-person'
-												)}
-											</span>
-
-											<span className="bd-highlight p-2">{`${headline.length} / ${HEADLINE_MAX_LENGTH}`}</span>
-										</div>
+										<span className="small text-secondary">
+											{Liferay.Language.get(
+												'be-specific-and-imagine-you-are-asking-a-question-to-another-person'
+											)}
+										</span>
 									</ClayForm.FeedbackItem>
 								</ClayForm.FeedbackGroup>
 							</ClayForm.Group>
@@ -202,7 +208,7 @@ export default withRouter(
 								)}
 								label={Liferay.Language.get('body')}
 								onContentLengthValid={setHasEnoughContent}
-								ref={editorRef}
+								ref={editor}
 							/>
 
 							{sections.length > 1 && (
@@ -210,7 +216,6 @@ export default withRouter(
 									<label htmlFor="basicInput">
 										{Liferay.Language.get('topic')}
 									</label>
-
 									<ClaySelect
 										onChange={(event) =>
 											setSectionId(event.target.value)
@@ -239,7 +244,9 @@ export default withRouter(
 						<div className="c-mt-4 d-flex flex-column-reverse flex-sm-row">
 							<ClayButton
 								className="c-mt-4 c-mt-sm-0"
-								disabled={isPostButtonDisable}
+								disabled={
+									hasEnoughContent || !headline || !tagsLoaded
+								}
 								displayType="primary"
 								onClick={() => {
 									createQuestion();
@@ -248,7 +255,7 @@ export default withRouter(
 								{context.trustedUser
 									? Liferay.Language.get('post-your-question')
 									: Liferay.Language.get(
-											'submit-for-workflow'
+											'submit-for-publication'
 									  )}
 							</ClayButton>
 
@@ -261,6 +268,7 @@ export default withRouter(
 						</div>
 					</div>
 				</div>
+				<Alert info={error} />
 			</section>
 		);
 	}

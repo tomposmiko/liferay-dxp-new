@@ -15,7 +15,7 @@
 package com.liferay.info.internal.item;
 
 import com.liferay.info.exception.CapabilityVerificationException;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.InfoItemServiceVerifier;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jorge Ferrer
  */
-@Component(service = InfoItemServiceVerifier.class)
+@Component(immediate = true, service = InfoItemServiceVerifier.class)
 public class InfoItemServiceVerifierImpl implements InfoItemServiceVerifier {
 
 	@Override
@@ -39,7 +39,7 @@ public class InfoItemServiceVerifierImpl implements InfoItemServiceVerifier {
 
 		for (Class<?> serviceClass : requiredInfoItemServiceClasses) {
 			Object infoItemService =
-				_infoItemServiceRegistry.getFirstInfoItemService(
+				_infoItemServiceTracker.getFirstInfoItemService(
 					serviceClass, itemClassName);
 
 			if (infoItemService == null) {
@@ -51,6 +51,6 @@ public class InfoItemServiceVerifierImpl implements InfoItemServiceVerifier {
 	}
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 }

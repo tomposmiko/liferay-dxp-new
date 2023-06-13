@@ -22,11 +22,14 @@ CommercePricingClassDisplayContext commercePricingClassDisplayContext = (Commerc
 
 <div class="row">
 	<div class="col-12">
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			creationMenu="<%= commercePricingClassDisplayContext.getCreationMenu() %>"
-			dataProviderKey="<%= CommercePricingFDSNames.PRICING_CLASSES %>"
-			id="<%= CommercePricingFDSNames.PRICING_CLASSES %>"
+			dataProviderKey="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICING_CLASSES %>"
+			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICING_CLASSES %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= currentURLObj %>"
 			style="fluid"
 		/>
 	</div>

@@ -22,9 +22,9 @@ import {useGlobalContext} from '../../app/contexts/GlobalContext';
 import {useSelector} from '../../app/contexts/StoreContext';
 import selectLanguageId from '../../app/selectors/selectLanguageId';
 import ImageService from '../../app/services/ImageService';
-import isMapped from '../../app/utils/editable_value/isMapped';
-import resolveEditableValue from '../../app/utils/editable_value/resolveEditableValue';
-import {useId} from '../hooks/useId';
+import isMapped from '../../app/utils/editable-value/isMapped';
+import resolveEditableValue from '../../app/utils/editable-value/resolveEditableValue';
+import {useId} from '../../app/utils/useId';
 
 export const DEFAULT_IMAGE_SIZE_ID = 'auto';
 
@@ -36,12 +36,12 @@ const DEFAULT_IMAGE_SIZE = {
 	width: null,
 };
 
-export function ImageSelectorSize({
+export const ImageSelectorSize = ({
 	fieldValue,
 	getEditableElement = DEFAULT_GET_EDITABLE_ELEMENT,
 	imageSizeId,
 	onImageSizeIdChanged = null,
-}) {
+}) => {
 	const [fileEntryId, setFileEntryId] = useState(
 		fieldValue.fileEntryId || ''
 	);
@@ -165,7 +165,6 @@ export function ImageSelectorSize({
 					<label htmlFor={imageSizeSelectId}>
 						{Liferay.Language.get('resolution')}
 					</label>
-
 					<ClaySelectWithOption
 						className="form-control form-control-sm"
 						id={imageSizeSelectId}
@@ -183,25 +182,23 @@ export function ImageSelectorSize({
 			)}
 
 			{!!imageSize.width && (
-				<p className="m-0 small text-secondary">
+				<div className="small text-secondary">
 					<b>{Liferay.Language.get('width')}:</b>
-
 					<span className="ml-1">{imageSize.width}px</span>
-				</p>
+				</div>
 			)}
 
 			{!!imageSize.size && (
-				<p className="m-0 small text-secondary">
+				<div className="small text-secondary">
 					<b>{Liferay.Language.get('file-size')}:</b>
-
 					<span className="ml-1">
 						{Number(imageSize.size).toFixed(2)}kB
 					</span>
-				</p>
+				</div>
 			)}
 		</ClayForm.Group>
 	);
-}
+};
 
 ImageSelectorSize.propTypes = {
 	fieldValue: PropTypes.oneOfType([

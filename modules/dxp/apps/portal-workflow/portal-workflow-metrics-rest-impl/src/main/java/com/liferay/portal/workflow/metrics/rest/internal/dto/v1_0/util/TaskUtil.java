@@ -30,13 +30,15 @@ import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Task;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Rafael Praxedes
@@ -126,8 +128,8 @@ public class TaskUtil {
 		Function<Long, User> userFunction) {
 
 		Map<String, String> assetTitleMap = _createMap(
-			"assetTitle", sourcesMap);
-		Map<String, String> assetTypeMap = _createMap("assetType", sourcesMap);
+			sourcesMap, "assetTitle");
+		Map<String, String> assetTypeMap = _createMap(sourcesMap, "assetType");
 
 		return new Task() {
 			{
@@ -221,47 +223,51 @@ public class TaskUtil {
 	private static Map<String, String> _createMap(
 		Document document, String fieldName) {
 
-		Map<String, String> map = new HashMap<>();
-
-		Map<String, Field> fields = document.getFields();
-
-		for (Map.Entry<String, Field> entry : fields.entrySet()) {
-			String key = entry.getKey();
-
-			if (StringUtil.startsWith(key, fieldName + StringPool.UNDERLINE) &&
-				!StringUtil.endsWith(key, "_sortable")) {
-
-				Field field = entry.getValue();
-
-				map.put(
+		return Stream.of(
+			document.getFields()
+		).map(
+			Map::entrySet
+		).flatMap(
+			Collection::stream
+		).filter(
+			entry ->
+				StringUtil.startsWith(
+					entry.getKey(), fieldName + StringPool.UNDERLINE) &&
+				!StringUtil.endsWith(entry.getKey(), "_sortable")
+		).collect(
+			Collectors.toMap(
+				entry -> _toLanguageTag(
 					StringUtil.removeSubstring(
-						key, fieldName + StringPool.UNDERLINE),
-					String.valueOf(field.getValue()));
-			}
-		}
+						entry.getKey(), fieldName + StringPool.UNDERLINE)),
+				entry -> {
+					Field field = entry.getValue();
 
-		return map;
+					return String.valueOf(field.getValue());
+				})
+		);
 	}
 
 	private static Map<String, String> _createMap(
-		String fieldName, Map<String, Object> sourcesMap) {
+		Map<String, Object> sourcesMap, String fieldName) {
 
-		Map<String, String> map = new HashMap<>();
-
-		for (Map.Entry<String, Object> entry : sourcesMap.entrySet()) {
-			if (StringUtil.startsWith(
+		return Stream.of(
+			sourcesMap
+		).map(
+			Map::entrySet
+		).flatMap(
+			Collection::stream
+		).filter(
+			entry ->
+				StringUtil.startsWith(
 					entry.getKey(), fieldName + StringPool.UNDERLINE) &&
-				!StringUtil.endsWith(entry.getKey(), "_sortable")) {
-
-				map.put(
-					_toLanguageTag(
-						StringUtil.removeSubstring(
-							entry.getKey(), fieldName + StringPool.UNDERLINE)),
-					GetterUtil.getString(entry.getValue()));
-			}
-		}
-
-		return map;
+				!StringUtil.endsWith(entry.getKey(), "_sortable")
+		).collect(
+			Collectors.toMap(
+				entry -> _toLanguageTag(
+					StringUtil.removeSubstring(
+						entry.getKey(), fieldName + StringPool.UNDERLINE)),
+				entry -> GetterUtil.getString(entry.getValue()))
+		);
 	}
 
 	private static Date _parseDate(String dateString) {
@@ -271,7 +277,7 @@ public class TaskUtil {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return null;

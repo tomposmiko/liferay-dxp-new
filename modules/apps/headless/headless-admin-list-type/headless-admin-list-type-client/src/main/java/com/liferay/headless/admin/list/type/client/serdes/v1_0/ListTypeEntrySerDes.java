@@ -59,7 +59,7 @@ public class ListTypeEntrySerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (listTypeEntry.getActions() != null) {
 			if (sb.length() > 1) {
@@ -98,20 +98,6 @@ public class ListTypeEntrySerDes {
 			sb.append(
 				liferayToJSONDateFormat.format(
 					listTypeEntry.getDateModified()));
-
-			sb.append("\"");
-		}
-
-		if (listTypeEntry.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(listTypeEntry.getExternalReferenceCode()));
 
 			sb.append("\"");
 		}
@@ -198,7 +184,7 @@ public class ListTypeEntrySerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (listTypeEntry.getActions() == null) {
 			map.put("actions", null);
@@ -224,15 +210,6 @@ public class ListTypeEntrySerDes {
 				"dateModified",
 				liferayToJSONDateFormat.format(
 					listTypeEntry.getDateModified()));
-		}
-
-		if (listTypeEntry.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(listTypeEntry.getExternalReferenceCode()));
 		}
 
 		if (listTypeEntry.getId() == null) {
@@ -308,14 +285,6 @@ public class ListTypeEntrySerDes {
 				if (jsonParserFieldValue != null) {
 					listTypeEntry.setDateModified(
 						toDate((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					listTypeEntry.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {

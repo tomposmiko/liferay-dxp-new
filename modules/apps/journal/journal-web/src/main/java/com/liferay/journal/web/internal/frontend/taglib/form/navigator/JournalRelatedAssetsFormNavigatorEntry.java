@@ -37,16 +37,16 @@ public class JournalRelatedAssetsFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.journal.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
 	protected String getJspPath() {
 		return "/article/related_assets.jsp";
 	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.journal.web)")
-	private ServletContext _servletContext;
 
 }

@@ -14,9 +14,9 @@
 
 package com.liferay.commerce.model.impl;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalServiceUtil;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalServiceUtil;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
@@ -45,17 +45,6 @@ import java.util.List;
 public class CommerceOrderImpl extends CommerceOrderBaseImpl {
 
 	@Override
-	public AccountEntry getAccountEntry() throws PortalException {
-		if (getCommerceAccountId() == AccountConstants.ACCOUNT_ENTRY_ID_GUEST) {
-			return AccountEntryLocalServiceUtil.getGuestAccountEntry(
-				getCompanyId());
-		}
-
-		return AccountEntryLocalServiceUtil.getAccountEntry(
-			getCommerceAccountId());
-	}
-
-	@Override
 	public CommerceAddress getBillingAddress() throws PortalException {
 		long billingAddressId = getBillingAddressId();
 
@@ -68,14 +57,27 @@ public class CommerceOrderImpl extends CommerceOrderBaseImpl {
 	}
 
 	@Override
-	public String getCommerceAccountName() throws PortalException {
-		AccountEntry accountEntry = getAccountEntry();
+	public CommerceAccount getCommerceAccount() throws PortalException {
+		if (getCommerceAccountId() ==
+				CommerceAccountConstants.ACCOUNT_ID_GUEST) {
 
-		if (accountEntry.isPersonalAccount()) {
-			return accountEntry.getUserName();
+			return CommerceAccountLocalServiceUtil.getGuestCommerceAccount(
+				getCompanyId());
 		}
 
-		return accountEntry.getName();
+		return CommerceAccountLocalServiceUtil.getCommerceAccount(
+			getCommerceAccountId());
+	}
+
+	@Override
+	public String getCommerceAccountName() throws PortalException {
+		CommerceAccount commerceAccount = getCommerceAccount();
+
+		if (commerceAccount.isPersonalAccount()) {
+			return commerceAccount.getUserName();
+		}
+
+		return commerceAccount.getName();
 	}
 
 	@Override
@@ -119,10 +121,10 @@ public class CommerceOrderImpl extends CommerceOrderBaseImpl {
 
 	@Override
 	public long getScopeGroupId() throws PortalException {
-		AccountEntry accountEntry = getAccountEntry();
+		CommerceAccount commerceAccount = getCommerceAccount();
 
-		if (accountEntry.isBusinessAccount()) {
-			return accountEntry.getAccountEntryGroupId();
+		if (commerceAccount.isBusinessAccount()) {
+			return commerceAccount.getCommerceAccountGroupId();
 		}
 
 		return getGroupId();
@@ -182,9 +184,9 @@ public class CommerceOrderImpl extends CommerceOrderBaseImpl {
 
 	@Override
 	public boolean isB2B() throws PortalException {
-		AccountEntry accountEntry = getAccountEntry();
+		CommerceAccount commerceAccount = getCommerceAccount();
 
-		return accountEntry.isBusinessAccount();
+		return commerceAccount.isBusinessAccount();
 	}
 
 	@Override
@@ -202,9 +204,11 @@ public class CommerceOrderImpl extends CommerceOrderBaseImpl {
 
 	@Override
 	public boolean isGuestOrder() throws PortalException {
-		AccountEntry accountEntry = getAccountEntry();
+		CommerceAccount commerceAccount = getCommerceAccount();
 
-		if (accountEntry.isGuestAccount()) {
+		if (commerceAccount.getType() ==
+				CommerceAccountConstants.ACCOUNT_TYPE_GUEST) {
+
 			return true;
 		}
 
@@ -234,10 +238,6 @@ public class CommerceOrderImpl extends CommerceOrderBaseImpl {
 	@Override
 	public boolean isSubscriptionOrder() {
 		List<CommerceOrderItem> commerceOrderItems = getCommerceOrderItems();
-
-		if (commerceOrderItems.isEmpty()) {
-			return false;
-		}
 
 		CommerceOrderItem commerceOrderItem = commerceOrderItems.get(0);
 

@@ -14,27 +14,18 @@
 
 package com.liferay.portal.workflow.kaleo.definition;
 
-import java.util.Locale;
-import java.util.Map;
-
 /**
  * @author Michael C. Han
  */
 public class Transition {
 
 	public Transition(
-		boolean defaultValue, Map<Locale, String> labelMap, String name,
-		Node sourceNode, Node targetNode) {
+		String name, Node sourceNode, Node targetNode, boolean defaultValue) {
 
-		_defaultValue = defaultValue;
-		_labelMap = labelMap;
 		_name = name;
 		_sourceNode = sourceNode;
 		_targetNode = targetNode;
-	}
-
-	public Map<Locale, String> getLabelMap() {
-		return _labelMap;
+		_defaultValue = defaultValue;
 	}
 
 	public String getName() {
@@ -62,7 +53,6 @@ public class Transition {
 	}
 
 	private final boolean _defaultValue;
-	private final Map<Locale, String> _labelMap;
 	private final String _name;
 	private final Node _sourceNode;
 	private final Node _targetNode;

@@ -38,19 +38,21 @@ public class ExperimentResourceTest extends BaseExperimentResourceTestCase {
 
 	@Override
 	protected Experiment testDeleteExperiment_addExperiment() throws Exception {
-		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
+		Layout layout = LayoutTestUtil.addLayout(testGroup);
 
 		SegmentsExperience segmentsExperience =
 			SegmentsTestUtil.addSegmentsExperience(
-				testGroup.getGroupId(), layout.getPlid());
+				testGroup.getGroupId(),
+				ClassNameLocalServiceUtil.getClassNameId(
+					Layout.class.getName()),
+				layout.getPlid());
 
 		return _toExperiment(
 			SegmentsTestUtil.addSegmentsExperiment(
 				testGroup.getGroupId(),
 				segmentsExperience.getSegmentsExperienceId(),
-				ClassNameLocalServiceUtil.getClassNameId(
-					Layout.class.getName()),
-				segmentsExperience.getPlid()));
+				segmentsExperience.getClassNameId(),
+				segmentsExperience.getClassPK()));
 	}
 
 	@Override

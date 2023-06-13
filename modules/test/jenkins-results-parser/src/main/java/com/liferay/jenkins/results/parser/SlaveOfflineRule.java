@@ -76,20 +76,10 @@ public class SlaveOfflineRule {
 		if (consolePattern != null) {
 			String consoleText = build.getConsoleText();
 
-			if (JenkinsResultsParserUtil.isNullOrEmpty(consoleText)) {
-				return false;
-			}
-
 			for (String line : consoleText.split("\n")) {
 				Matcher matcher = consolePattern.matcher(line);
 
 				if (matcher.find()) {
-					System.out.println(
-						JenkinsResultsParserUtil.combine(
-							"Build ", build.getBuildURL(), " matched with ",
-							"slave offline rule ", getName(),
-							".\nMatching console log line:\n", line));
-
 					return true;
 				}
 			}
@@ -97,12 +87,7 @@ public class SlaveOfflineRule {
 			return false;
 		}
 
-		System.out.println(
-			JenkinsResultsParserUtil.combine(
-				"Slave offline rule ", getName(),
-				" has a null console pattern"));
-
-		return false;
+		return true;
 	}
 
 	public boolean shutdown() {

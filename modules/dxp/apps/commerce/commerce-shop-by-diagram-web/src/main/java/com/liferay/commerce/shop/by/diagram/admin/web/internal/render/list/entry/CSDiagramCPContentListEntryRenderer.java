@@ -16,10 +16,13 @@ package com.liferay.commerce.shop.by.diagram.admin.web.internal.render.list.entr
 
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRenderer;
+import com.liferay.commerce.shop.by.diagram.admin.web.internal.display.context.CSDiagramCPTypeDisplayContext;
 import com.liferay.commerce.shop.by.diagram.constants.CSDiagramWebKeys;
-import com.liferay.commerce.shop.by.diagram.util.CSDiagramCPTypeHelper;
+import com.liferay.commerce.shop.by.diagram.service.CSDiagramSettingService;
+import com.liferay.commerce.shop.by.diagram.type.CSDiagramTypeRegistry;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
@@ -36,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.product.content.list.entry.renderer.key=" + CSDiagramCPContentListEntryRenderer.KEY,
 		"commerce.product.content.list.entry.renderer.order=" + Integer.MIN_VALUE,
@@ -60,7 +64,7 @@ public class CSDiagramCPContentListEntryRenderer
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "default");
+		return LanguageUtil.get(resourceBundle, "default");
 	}
 
 	@Override
@@ -70,7 +74,10 @@ public class CSDiagramCPContentListEntryRenderer
 		throws Exception {
 
 		httpServletRequest.setAttribute(
-			CSDiagramWebKeys.CS_DIAGRAM_CP_TYPE_HELPER, _csDiagramCPTypeHelper);
+			CSDiagramWebKeys.CS_DIAGRAM_CP_TYPE_DISPLAY_CONTEXT,
+			new CSDiagramCPTypeDisplayContext(
+				_csDiagramSettingService, _csDiagramTypeRegistry,
+				_dlURLHelper));
 
 		_jspRenderer.renderJSP(
 			_servletContext, httpServletRequest, httpServletResponse,
@@ -78,13 +85,16 @@ public class CSDiagramCPContentListEntryRenderer
 	}
 
 	@Reference
-	private CSDiagramCPTypeHelper _csDiagramCPTypeHelper;
+	private CSDiagramSettingService _csDiagramSettingService;
+
+	@Reference
+	private CSDiagramTypeRegistry _csDiagramTypeRegistry;
+
+	@Reference
+	private DLURLHelper _dlURLHelper;
 
 	@Reference
 	private JSPRenderer _jspRenderer;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.shop.by.diagram.web)"

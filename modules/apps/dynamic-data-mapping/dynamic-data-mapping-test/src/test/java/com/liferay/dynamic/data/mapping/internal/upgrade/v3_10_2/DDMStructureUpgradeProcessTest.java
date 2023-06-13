@@ -14,12 +14,10 @@
 
 package com.liferay.dynamic.data.mapping.internal.upgrade.v3_10_2;
 
-import com.liferay.dynamic.data.mapping.BaseDDMTestCase;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.IOException;
 
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,25 +28,13 @@ import org.skyscreamer.jsonassert.JSONAssert;
  * @author Carolina Barbosa
  * @author Renato Rego
  */
-public class DDMStructureUpgradeProcessTest extends BaseDDMTestCase {
+public class DDMStructureUpgradeProcessTest
+	extends BaseDDMUpgradeProcessTestCase {
 
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@Before
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-
-		setUpDDMFormJSONDeserializer();
-		setUpDDMFormJSONSerializer();
-		setUpDDMFormLayoutJSONDeserializer();
-		setUpDDMFormLayoutJSONSerializer();
-		setUpJSONFactoryUtil();
-		setUpLanguageUtil();
-	}
 
 	@Test
 	public void testUpgradeDDMStructureLayoutDefinition()

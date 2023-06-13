@@ -12,16 +12,16 @@
  * details.
  */
 
-import ClayButton from '@clayui/button';
+import {ClayButtonWithIcon, default as ClayButton} from '@clayui/button';
 import ClayLayout from '@clayui/layout';
+import {useModal} from '@clayui/modal';
 import {ReactPortal, useIsMounted} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
-import {openConfirmModal} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
-import useLazy from '../../common/hooks/useLazy';
-import useLoad from '../../common/hooks/useLoad';
-import usePlugins from '../../common/hooks/usePlugins';
+import useLazy from '../../core/hooks/useLazy';
+import useLoad from '../../core/hooks/useLoad';
+import usePlugins from '../../core/hooks/usePlugins';
 import * as Actions from '../actions/index';
 import {LAYOUT_TYPES} from '../config/constants/layoutTypes';
 import {SERVICE_NETWORK_STATUS_TYPES} from '../config/constants/serviceNetworkStatusTypes';
@@ -32,16 +32,14 @@ import {useDispatch, useSelector} from '../contexts/StoreContext';
 import selectCanPublish from '../selectors/selectCanPublish';
 import redo from '../thunks/redo';
 import undo from '../thunks/undo';
-import {useDropClear} from '../utils/drag_and_drop/useDragAndDrop';
+import {useDropClear} from '../utils/drag-and-drop/useDragAndDrop';
 import EditModeSelector from './EditModeSelector';
 import ExperimentsLabel from './ExperimentsLabel';
-import HideSidebarButton from './HideSidebarButton';
 import NetworkStatusBar from './NetworkStatusBar';
-import PublishButton from './PublishButton';
+import PreviewModal from './PreviewModal';
 import Translation from './Translation';
 import UnsafeHTML from './UnsafeHTML';
 import ViewportSizeSelector from './ViewportSizeSelector';
-import ZoomAlert from './ZoomAlert';
 import Undo from './undo/Undo';
 
 const {Suspense, useCallback, useRef} = React;
@@ -60,7 +58,6 @@ function ToolbarBody({className}) {
 	const canPublish = selectCanPublish(store);
 
 	const [publishPending, setPublishPending] = useState(false);
-	const [enableDiscard, setEnableDiscard] = useState(false);
 
 	const {
 		network,
@@ -69,15 +66,17 @@ function ToolbarBody({className}) {
 		selectedViewportSize,
 	} = store;
 
-	useEffect(() => {
-		setEnableDiscard(
-			network.status === SERVICE_NETWORK_STATUS_TYPES.draftSaved ||
-				config.draft ||
-				config.isConversionDraft
-		);
-	}, [network]);
+	const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
-	const loadingRef = useRef(() => {
+	const {observer} = useModal({
+		onClose: () => {
+			if (isMounted()) {
+				setOpenPreviewModal(false);
+			}
+		},
+	});
+
+	const loading = useRef(() => {
 		Promise.all(
 			config.toolbarPlugins.map((toolbarPlugin) => {
 				const {pluginEntryPoint} = toolbarPlugin;
@@ -113,12 +112,12 @@ function ToolbarBody({className}) {
 		});
 	});
 
-	if (loadingRef.current) {
+	if (loading.current) {
 
 		// Do this once only.
 
-		loadingRef.current();
-		loadingRef.current = null;
+		loading.current();
+		loading.current = null;
 	}
 
 	const ToolbarSection = useLazy(
@@ -132,34 +131,30 @@ function ToolbarBody({className}) {
 		}, [])
 	);
 
-	const handleDiscardDraft = (event) => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
-			),
-			onConfirm: (isConfirmed) => {
-				if (!isConfirmed) {
-					event.preventDefault();
-				}
-			},
-		});
+	const handleDiscardVariant = (event) => {
+		if (
+			!confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
+				)
+			)
+		) {
+			event.preventDefault();
+		}
 	};
 
-	const onPublish = () => {
-		if (!config.masterUsed) {
-			setPublishPending(true);
-		}
-		else {
-			openConfirmModal({
-				message: Liferay.Language.get(
+	const handleSubmit = (event) => {
+		event.preventDefault();
+
+		if (
+			!config.masterUsed ||
+			confirm(
+				Liferay.Language.get(
 					'changes-made-on-this-master-are-going-to-be-propagated-to-all-page-templates,-display-page-templates,-and-pages-using-it.are-you-sure-you-want-to-proceed'
-				),
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						setPublishPending(true);
-					}
-				},
-			});
+				)
+			)
+		) {
+			setPublishPending(true);
 		}
 	};
 
@@ -177,15 +172,6 @@ function ToolbarBody({className}) {
 		}
 	};
 
-	let draftButtonLabel = Liferay.Language.get('discard-draft');
-
-	if (config.isConversionDraft) {
-		draftButtonLabel = Liferay.Language.get('discard-conversion-draft');
-	}
-	else if (config.singleSegmentsExperienceMode) {
-		draftButtonLabel = Liferay.Language.get('discard-variant');
-	}
-
 	let publishButtonLabel = Liferay.Language.get('publish');
 
 	if (config.layoutType === LAYOUT_TYPES.master) {
@@ -195,7 +181,7 @@ function ToolbarBody({className}) {
 		publishButtonLabel = Liferay.Language.get('save-variant');
 	}
 	else if (config.workflowEnabled) {
-		publishButtonLabel = Liferay.Language.get('submit-for-workflow');
+		publishButtonLabel = Liferay.Language.get('submit-for-publication');
 	}
 
 	useEffect(() => {
@@ -219,8 +205,6 @@ function ToolbarBody({className}) {
 			onClick={deselectItem}
 			ref={dropClearRef}
 		>
-			<ZoomAlert />
-
 			<ul className="navbar-nav start" onClick={deselectItem}>
 				{config.toolbarPlugins.map(
 					({loadingPlaceholder, pluginEntryPoint}) => {
@@ -230,9 +214,6 @@ function ToolbarBody({className}) {
 									<Suspense
 										fallback={
 											<UnsafeHTML
-												hideFromAccessibilityTree={
-													false
-												}
 												markup={loadingPlaceholder}
 											/>
 										}
@@ -247,7 +228,6 @@ function ToolbarBody({className}) {
 						);
 					}
 				)}
-
 				<li className="nav-item">
 					<Translation
 						availableLanguages={config.availableLanguages}
@@ -258,7 +238,6 @@ function ToolbarBody({className}) {
 						segmentsExperienceId={segmentsExperienceId}
 					/>
 				</li>
-
 				{!config.singleSegmentsExperienceMode &&
 					segmentsExperimentStatus && (
 						<li className="nav-item pl-2">
@@ -284,50 +263,73 @@ function ToolbarBody({className}) {
 			</ul>
 
 			<ul className="end navbar-nav" onClick={deselectItem}>
-				<li className="nav-item">
+				<div className="nav-item">
 					<NetworkStatusBar {...network} />
-				</li>
+				</div>
 
-				<li className="nav-item">
+				<div className="nav-item">
 					<Undo onRedo={onRedo} onUndo={onUndo} />
-				</li>
+				</div>
 
 				<li className="nav-item">
 					<EditModeSelector />
 				</li>
 
 				<li className="nav-item">
-					<ul className="navbar-nav">
-						<li className="nav-item">
-							<HideSidebarButton />
-						</li>
-					</ul>
+					<ClayButtonWithIcon
+						className="btn btn-secondary"
+						displayType="secondary"
+						onClick={() => setOpenPreviewModal(true)}
+						small
+						symbol="view"
+						title={Liferay.Language.get('preview')}
+						type="button"
+					>
+						{Liferay.Language.get('preview')}
+					</ClayButtonWithIcon>
 				</li>
+				{config.singleSegmentsExperienceMode && (
+					<li className="nav-item">
+						<form action={config.discardDraftURL} method="POST">
+							<ClayButton
+								className="btn btn-secondary"
+								displayType="secondary"
+								onClick={handleDiscardVariant}
+								small
+								type="submit"
+							>
+								{Liferay.Language.get('discard-variant')}
+							</ClayButton>
+						</form>
+					</li>
+				)}
 
 				<li className="nav-item">
-					<form action={config.discardDraftURL} method="POST">
+					<form
+						action={config.publishURL}
+						method="POST"
+						ref={formRef}
+					>
+						<input
+							name={`${config.portletNamespace}redirect`}
+							type="hidden"
+							value={config.redirectURL}
+						/>
+
 						<ClayButton
-							className="btn btn-secondary"
-							disabled={!enableDiscard}
-							displayType="secondary"
-							onClick={handleDiscardDraft}
-							size="sm"
+							disabled={config.pending || !canPublish}
+							displayType="primary"
+							onClick={handleSubmit}
+							small
 							type="submit"
 						>
-							{draftButtonLabel}
+							{publishButtonLabel}
 						</ClayButton>
 					</form>
 				</li>
-
-				<li className="nav-item">
-					<PublishButton
-						canPublish={canPublish}
-						formRef={formRef}
-						label={publishButtonLabel}
-						onPublish={onPublish}
-					/>
-				</li>
 			</ul>
+
+			{openPreviewModal && <PreviewModal observer={observer} />}
 		</ClayLayout.ContainerFluid>
 	);
 }

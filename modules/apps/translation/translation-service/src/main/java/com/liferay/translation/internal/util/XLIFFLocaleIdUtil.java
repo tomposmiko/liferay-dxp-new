@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import net.sf.okapi.common.LocaleId;
@@ -36,20 +37,20 @@ public class XLIFFLocaleIdUtil {
 		return _getLocaleId(document, "trgLang", "target-language");
 	}
 
-	private static <T> T _getAttributeValue(
+	private static <T> Optional<T> _getAttributeValueOptional(
 		Element element, String attributeName, Function<String, T> function) {
 
 		if (element == null) {
-			return null;
+			return Optional.empty();
 		}
 
 		Attribute attribute = element.attribute(attributeName);
 
 		if (attribute == null) {
-			return null;
+			return Optional.empty();
 		}
 
-		return function.apply(attribute.getValue());
+		return Optional.of(function.apply(attribute.getValue()));
 	}
 
 	private static LocaleId _getLocaleId(
@@ -58,22 +59,16 @@ public class XLIFFLocaleIdUtil {
 
 		Element rootElement = document.getRootElement();
 
-		LocaleId localeId = _getAttributeValue(
-			rootElement, attributeName, LocaleId::fromString);
-
-		if (localeId != null) {
-			return localeId;
-		}
-
-		localeId = _getAttributeValue(
-			rootElement.element("file"), alternateAttributeName,
-			LocaleId::fromString);
-
-		if (localeId != null) {
-			return localeId;
-		}
-
-		return _defaultLocaleId;
+		return _getAttributeValueOptional(
+			rootElement, attributeName, LocaleId::fromString
+		).orElseGet(
+			() -> _getAttributeValueOptional(
+				rootElement.element("file"), alternateAttributeName,
+				LocaleId::fromString
+			).orElse(
+				_defaultLocaleId
+			)
+		);
 	}
 
 	private static final LocaleId _defaultLocaleId = LocaleId.fromString(

@@ -14,7 +14,6 @@
 
 package com.liferay.change.tracking.internal;
 
-import com.liferay.change.tracking.internal.helper.CTTableMapperHelper;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.spi.exception.CTEventException;
 import com.liferay.change.tracking.spi.listener.CTEventListener;
@@ -46,18 +45,24 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Preston Crary
  */
-@Component(service = CTServiceRegistry.class)
+@Component(immediate = true, service = CTServiceRegistry.class)
 public class CTServiceRegistry {
 
 	public CTService<?> getCTService(long classNameId) {
-		return _serviceTrackerMap.getService(classNameId);
+		ServiceTrackerMap<Long, CTService<?>> serviceTrackerMap =
+			_getServiceTrackerMap();
+
+		return serviceTrackerMap.getService(classNameId);
 	}
 
 	public Collection<CTTableMapperHelper> getCTTableMapperHelpers() {
 		Map<String, CTTableMapperHelper> ctMappingTableHelpers =
 			new HashMap<>();
 
-		for (CTService<?> ctService : _serviceTrackerMap.values()) {
+		ServiceTrackerMap<Long, CTService<?>> serviceTrackerMap =
+			_getServiceTrackerMap();
+
+		for (CTService<?> ctService : serviceTrackerMap.values()) {
 			CTPersistence<?> ctPersistence = ctService.getCTPersistence();
 
 			List<String> mappingTableNames =
@@ -87,13 +92,10 @@ public class CTServiceRegistry {
 					(key, ctTableMapperHelper) -> {
 						if (ctTableMapperHelper == null) {
 							return new CTTableMapperHelper(
-								ctService, mappingTableName, primaryKeyName,
-								ctService.getModelClass());
+								ctService, mappingTableName, primaryKeyName);
 						}
 
 						ctTableMapperHelper.setRightColumnName(primaryKeyName);
-						ctTableMapperHelper.setRightModelClass(
-							ctService.getModelClass());
 
 						return ctTableMapperHelper;
 					});
@@ -106,7 +108,7 @@ public class CTServiceRegistry {
 	public void onAfterCopy(
 		CTCollection sourceCTCollection, CTCollection targetCTCollection) {
 
-		for (CTEventListener ctEventListener : _serviceTrackerList) {
+		for (CTEventListener ctEventListener : _getServiceTrackerList()) {
 			try {
 				ctEventListener.onAfterCopy(
 					sourceCTCollection.getCtCollectionId(),
@@ -124,7 +126,7 @@ public class CTServiceRegistry {
 	}
 
 	public void onAfterPublish(long ctCollectionId) {
-		for (CTEventListener ctEventListener : _serviceTrackerList) {
+		for (CTEventListener ctEventListener : _getServiceTrackerList()) {
 			try {
 				ctEventListener.onAfterPublish(ctCollectionId);
 			}
@@ -140,7 +142,7 @@ public class CTServiceRegistry {
 	}
 
 	public void onBeforePublish(long ctCollectionId) {
-		for (CTEventListener ctEventListener : _serviceTrackerList) {
+		for (CTEventListener ctEventListener : _getServiceTrackerList()) {
 			try {
 				ctEventListener.onBeforePublish(ctCollectionId);
 			}
@@ -156,7 +158,7 @@ public class CTServiceRegistry {
 	}
 
 	public void onBeforeRemove(long ctCollectionId) {
-		for (CTEventListener ctEventListener : _serviceTrackerList) {
+		for (CTEventListener ctEventListener : _getServiceTrackerList()) {
 			try {
 				ctEventListener.onBeforeRemove(ctCollectionId);
 			}
@@ -173,35 +175,84 @@ public class CTServiceRegistry {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerList = ServiceTrackerListFactory.open(
-			bundleContext, CTEventListener.class);
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, (Class<CTService<?>>)(Class<?>)CTService.class, null,
-			(serviceReference, emitter) -> {
-				CTService<?> ctService = bundleContext.getService(
-					serviceReference);
-
-				emitter.emit(
-					_classNameLocalService.getClassNameId(
-						ctService.getModelClass()));
-			});
+		_bundleContext = bundleContext;
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerList.close();
+		ServiceTrackerList<CTEventListener, CTEventListener>
+			serviceTrackerList = _serviceTrackerList;
 
-		_serviceTrackerMap.close();
+		if (serviceTrackerList != null) {
+			serviceTrackerList.close();
+		}
+
+		ServiceTrackerMap<Long, CTService<?>> serviceTrackerMap =
+			_serviceTrackerMap;
+
+		if (serviceTrackerMap != null) {
+			serviceTrackerMap.close();
+		}
+	}
+
+	private ServiceTrackerList<CTEventListener, CTEventListener>
+		_getServiceTrackerList() {
+
+		ServiceTrackerList<CTEventListener, CTEventListener>
+			serviceTrackerList = _serviceTrackerList;
+
+		if (serviceTrackerList != null) {
+			return serviceTrackerList;
+		}
+
+		synchronized (this) {
+			if (_serviceTrackerList == null) {
+				_serviceTrackerList = ServiceTrackerListFactory.open(
+					_bundleContext, CTEventListener.class);
+			}
+
+			return _serviceTrackerList;
+		}
+	}
+
+	private ServiceTrackerMap<Long, CTService<?>> _getServiceTrackerMap() {
+		ServiceTrackerMap<Long, CTService<?>> serviceTrackerMap =
+			_serviceTrackerMap;
+
+		if (serviceTrackerMap != null) {
+			return serviceTrackerMap;
+		}
+
+		synchronized (this) {
+			if (_serviceTrackerMap == null) {
+				_serviceTrackerMap =
+					ServiceTrackerMapFactory.openSingleValueMap(
+						_bundleContext,
+						(Class<CTService<?>>)(Class<?>)CTService.class, null,
+						(serviceReference, emitter) -> {
+							CTService<?> ctService = _bundleContext.getService(
+								serviceReference);
+
+							emitter.emit(
+								_classNameLocalService.getClassNameId(
+									ctService.getModelClass()));
+						});
+			}
+
+			return _serviceTrackerMap;
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CTServiceRegistry.class);
 
+	private BundleContext _bundleContext;
+
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
-	private ServiceTrackerList<CTEventListener> _serviceTrackerList;
-	private ServiceTrackerMap<Long, CTService<?>> _serviceTrackerMap;
+	private volatile ServiceTrackerList<CTEventListener, CTEventListener>
+		_serviceTrackerList;
+	private volatile ServiceTrackerMap<Long, CTService<?>> _serviceTrackerMap;
 
 }

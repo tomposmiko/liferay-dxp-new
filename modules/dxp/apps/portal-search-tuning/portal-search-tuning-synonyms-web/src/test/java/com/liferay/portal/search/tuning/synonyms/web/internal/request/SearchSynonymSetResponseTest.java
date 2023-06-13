@@ -21,6 +21,7 @@ import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,7 +29,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
 
 /**
  * @author Wade Cao
@@ -59,7 +60,8 @@ public class SearchSynonymSetResponseTest {
 		Assert.assertEquals(
 			_documents, _searchSynonymSetResponse.getDocuments());
 		Assert.assertEquals(
-			"keywords", _searchSynonymSetResponse.getKeywords());
+			Optional.of("keywords"),
+			_searchSynonymSetResponse.getKeywordsOptional());
 		Assert.assertEquals(1, _searchSynonymSetResponse.getPaginationDelta());
 		Assert.assertEquals(0, _searchSynonymSetResponse.getPaginationStart());
 		Assert.assertEquals(
@@ -71,12 +73,18 @@ public class SearchSynonymSetResponseTest {
 		Assert.assertEquals(10, _searchSynonymSetResponse.getTotalHits());
 	}
 
-	private final List<Document> _documents = Mockito.mock(List.class);
-	private final SearchContainer<Document> _searchContainer = Mockito.mock(
-		SearchContainer.class);
-	private final SearchHits _searchHits = Mockito.mock(SearchHits.class);
-	private final SearchResponse _searchResponse = Mockito.mock(
-		SearchResponse.class);
+	@Mock
+	private List<Document> _documents;
+
+	@Mock
+	private SearchContainer<Document> _searchContainer;
+
+	@Mock
+	private SearchHits _searchHits;
+
+	@Mock
+	private SearchResponse _searchResponse;
+
 	private SearchSynonymSetResponse _searchSynonymSetResponse;
 
 }

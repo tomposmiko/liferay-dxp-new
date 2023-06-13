@@ -14,9 +14,6 @@
 
 package com.liferay.portal.kernel.upload;
 
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,12 +29,11 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface FileItem {
 
-	public static final long THRESHOLD_SIZE = GetterUtil.getLong(
-		PropsUtil.get(FileItem.class.getName() + ".threshold.size"));
-
 	public void delete();
 
 	public String getContentType();
+
+	public String getEncodedString();
 
 	public String getFieldName();
 
@@ -66,6 +62,8 @@ public interface FileItem {
 	public boolean isFormField();
 
 	public boolean isInMemory();
+
+	public void setString(String encode);
 
 	public void write(File file) throws Exception;
 

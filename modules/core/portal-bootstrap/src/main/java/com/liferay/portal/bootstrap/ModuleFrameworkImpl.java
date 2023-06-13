@@ -15,14 +15,10 @@
 package com.liferay.portal.bootstrap;
 
 import com.liferay.petra.io.BigEndianCodec;
-import com.liferay.petra.process.ProcessExecutor;
-import com.liferay.petra.process.local.LocalProcessExecutor;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.bootstrap.log.BundleStartStopLogger;
-import com.liferay.portal.bootstrap.log.PortalSynchronousLogListener;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedInputStream;
@@ -32,9 +28,7 @@ import com.liferay.portal.kernel.lpkg.StaticLPKGResolver;
 import com.liferay.portal.kernel.module.framework.ThrowableCollector;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
 import com.liferay.portal.kernel.util.NamedThreadFactory;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -104,10 +98,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
@@ -118,9 +110,8 @@ import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.framework.wiring.FrameworkWiring;
-import org.osgi.service.log.LogListener;
-import org.osgi.service.log.LogReaderService;
 
+import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -218,24 +209,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			currentThread.setContextClassLoader(classLoader);
 		}
 
-		BundleContext bundleContext = _framework.getBundleContext();
-
-		_bundleListener = new BundleStartStopLogger(bundleContext);
-
-		bundleContext.addBundleListener(_bundleListener);
-
-		ServiceReference<LogReaderService> serviceReference =
-			bundleContext.getServiceReference(LogReaderService.class);
-
-		if (serviceReference != null) {
-			LogReaderService logReaderService = bundleContext.getService(
-				serviceReference);
-
-			_logListener = new PortalSynchronousLogListener();
-
-			logReaderService.addLogListener(_logListener);
-		}
-
 		if (_log.isDebugEnabled()) {
 			_log.debug("Initialized the OSGi framework");
 		}
@@ -287,7 +260,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			FrameworkStartLevel.class);
 
 		frameworkStartLevel.setStartLevel(
-			ModuleFrameworkPropsValues.MODULE_FRAMEWORK_RUNTIME_START_LEVEL);
+			PropsValues.MODULE_FRAMEWORK_RUNTIME_START_LEVEL);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Started the OSGi framework");
@@ -307,7 +280,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			new DefaultNoticeableFuture<>();
 
 		frameworkStartLevel.setStartLevel(
-			ModuleFrameworkPropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL,
+			PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL,
 			frameworkEvent -> defaultNoticeableFuture.set(frameworkEvent));
 
 		FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
@@ -315,20 +288,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		if (frameworkEvent.getType() != FrameworkEvent.STARTLEVEL_CHANGED) {
 			ReflectionUtil.throwException(frameworkEvent.getThrowable());
 		}
-
-		BundleContext bundleContext = _framework.getBundleContext();
-
-		ServiceReference<LogReaderService> serviceReference =
-			bundleContext.getServiceReference(LogReaderService.class);
-
-		if (serviceReference != null) {
-			LogReaderService logReaderService = bundleContext.getService(
-				serviceReference);
-
-			logReaderService.removeLogListener(_logListener);
-		}
-
-		bundleContext.removeBundleListener(_bundleListener);
 
 		_framework.stop();
 
@@ -414,7 +373,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			return bundleContext.installBundle(location, inputStream);
 		}
 		catch (BundleException bundleException) {
-			_log.error(bundleException);
+			_log.error(bundleException, bundleException);
 
 			throw new PortalException(bundleException);
 		}
@@ -437,6 +396,24 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		properties.put(Constants.BUNDLE_VENDOR, ReleaseInfo.getVendor());
 		properties.put(Constants.BUNDLE_VERSION, ReleaseInfo.getVersion());
 
+		// Fileinstall. See LPS-56385.
+
+		properties.put(
+			FrameworkPropsKeys.FILE_INSTALL_DIR, _getFileInstallDir());
+		properties.put(
+			FrameworkPropsKeys.FILE_INSTALL_POLL,
+			String.valueOf(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_INTERVAL));
+		properties.put(
+			FrameworkPropsKeys.FILE_INSTALL_START_LEVEL,
+			String.valueOf(
+				PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL));
+		properties.put(
+			FrameworkPropsKeys.FILE_INSTALL_TMPDIR,
+			SystemProperties.get(SystemProperties.TMP_DIR));
+		properties.put(
+			FrameworkPropsKeys.FILE_INSTALL_WEB_START_LEVEL,
+			String.valueOf(PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL));
+
 		// Framework
 
 		properties.put(
@@ -446,17 +423,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			Constants.FRAMEWORK_STORAGE,
 			PropsValues.MODULE_FRAMEWORK_STATE_DIR);
 
-		properties.put(
-			"ds.lock.timeout.milliseconds",
-			GetterUtil.getString(
-				SystemProperties.get("ds.lock.timeout.milliseconds"),
-				"1800000"));
-		properties.put(
-			"ds.stop.timeout.milliseconds",
-			GetterUtil.getString(
-				SystemProperties.get("ds.stop.timeout.milliseconds"),
-				"1800000"));
 		properties.put("eclipse.security", null);
+		properties.put(
+			"equinox.resolver.revision.batch.size",
+			PropsValues.MODULE_FRAMEWORK_RESOLVER_REVISION_BATCH_SIZE);
 		properties.put("java.security.manager", null);
 		properties.put("org.osgi.framework.security", null);
 
@@ -520,10 +490,11 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			properties.put(key, value);
 		}
 
+		String systemPackagesExtra = _getSystemPackagesExtra(
+			attributes.getValue(Constants.EXPORT_PACKAGE));
+
 		properties.put(
-			Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
-			_getSystemPackagesExtra(
-				attributes.getValue(Constants.EXPORT_PACKAGE)));
+			Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, systemPackagesExtra);
 
 		if (_log.isDebugEnabled()) {
 			for (Map.Entry<String, String> entry : properties.entrySet()) {
@@ -544,7 +515,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		crc32.update(fileName.getBytes());
 
-		_calculateChecksum(file.canWrite() ? 1000L : -1000L, crc32);
 		_calculateChecksum(file.lastModified(), crc32);
 		_calculateChecksum(file.length(), crc32);
 
@@ -744,6 +714,11 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 	}
 
+	private String _getFileInstallDir() {
+		return PropsValues.MODULE_FRAMEWORK_PORTAL_DIR + StringPool.COMMA +
+			StringUtil.merge(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_DIRS);
+	}
+
 	private String _getFragmentHost(Bundle bundle) {
 		Dictionary<String, String> dictionary = bundle.getHeaders(
 			StringPool.BLANK);
@@ -847,7 +822,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 	private String _getSystemPackagesExtra(String exportedPackages) {
 		String[] systemPackagesExtra =
-			ModuleFrameworkPropsValues.MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA;
+			PropsValues.MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA;
 
 		StringBundler sb = new StringBundler();
 
@@ -876,7 +851,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			_log.debug("Initializing required startup directories");
 		}
 
-		for (String dirName : PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_DIRS) {
+		String[] dirNames = StringUtil.split(_getFileInstallDir());
+
+		for (String dirName : dirNames) {
 			FileUtil.mkdirs(dirName);
 		}
 
@@ -935,13 +912,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 				if (header == null) {
 					bundleStartLevel.setStartLevel(
-						ModuleFrameworkPropsValues.
+						PropsValues.
 							MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL);
 				}
 				else {
 					bundleStartLevel.setStartLevel(
-						ModuleFrameworkPropsValues.
-							MODULE_FRAMEWORK_WEB_START_LEVEL);
+						PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL);
 				}
 
 				if (_isFragmentBundle(bundle)) {
@@ -979,12 +955,18 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			configurationFileInstallerClass.getDeclaredMethod(
 				"transformURL", File.class);
 
+		String encoding = bundleContext.getProperty(
+			"file.install.configEncoding");
+
+		if (encoding == null) {
+			encoding = StringPool.UTF8;
+		}
+
 		Object configurationFileInstaller = constructor.newInstance(
 			bundleContext.getService(
 				bundleContext.getServiceReference(
 					"org.osgi.service.cm.ConfigurationAdmin")),
-			ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_FILE_INSTALL_CONFIG_ENCODING);
+			encoding);
 
 		File dir = new File(PropsValues.MODULE_FRAMEWORK_CONFIGS_DIR);
 
@@ -1058,21 +1040,19 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				_log.debug(
 					StringBundler.concat(
 						"Setting bundle ", bundle, " at start level ",
-						ModuleFrameworkPropsValues.
-							MODULE_FRAMEWORK_BEGINNING_START_LEVEL));
+						PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL));
 			}
 
 			BundleStartLevel bundleStartLevel = bundle.adapt(
 				BundleStartLevel.class);
 
 			bundleStartLevel.setStartLevel(
-				ModuleFrameworkPropsValues.
-					MODULE_FRAMEWORK_BEGINNING_START_LEVEL);
+				PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL);
 
 			return bundle;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return null;
 		}
@@ -1216,8 +1196,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				try {
 					bean = configurableApplicationContext.getBean(beanName);
 				}
+				catch (BeanIsAbstractException beanIsAbstractException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							beanIsAbstractException, beanIsAbstractException);
+					}
+				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 
 				if (bean != null) {
@@ -1262,8 +1248,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		Set<String> names = OSGiBeanProperties.Service.interfaceNames(
 			bean, osgiBeanProperties,
-			ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES);
+			PropsValues.MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES);
 
 		if (names.isEmpty()) {
 			return null;
@@ -1338,7 +1323,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			});
 
 		for (String staticJarFileName :
-				ModuleFrameworkPropsValues.MODULE_FRAMEWORK_STATIC_JARS) {
+				PropsValues.MODULE_FRAMEWORK_STATIC_JARS) {
 
 			Path staticJarPath = Paths.get(
 				PropsValues.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR,
@@ -1415,7 +1400,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			}
 		}
 
-		String deployDir = PropsValues.MODULE_FRAMEWORK_MARKETPLACE_DIR;
+		String deployDir = bundleContext.getProperty("lpkg.deployer.dir");
 
 		for (String staticFileName :
 				StaticLPKGResolver.getStaticLPKGFileNames()) {
@@ -1495,7 +1480,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			new DefaultNoticeableFuture<>();
 
 		frameworkStartLevel.setStartLevel(
-			ModuleFrameworkPropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL,
+			PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL,
 			frameworkEvent -> defaultNoticeableFuture.set(frameworkEvent));
 
 		FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
@@ -1515,9 +1500,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		_installConfigs(bundleWiring.getClassLoader());
 
-		if (ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_CONCURRENT_STARTUP_ENABLED) {
-
+		if (PropsValues.MODULE_FRAMEWORK_CONCURRENT_STARTUP_ENABLED) {
 			Runtime runtime = Runtime.getRuntime();
 
 			Thread currentThread = Thread.currentThread();
@@ -1596,13 +1579,18 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			_log.debug("Setting up required service");
 		}
 
-		bundleContext.registerService(
-			ProcessExecutor.class, new LocalProcessExecutor(), null);
-
 		Props props = PropsUtil.getProps();
 
-		bundleContext.registerService(
-			Props.class, props, _getProperties(props, Props.class.getName()));
+		ServiceRegistration<Props> serviceRegistration =
+			bundleContext.registerService(
+				Props.class, props,
+				_getProperties(props, Props.class.getName()));
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Registered required service as " +
+					serviceRegistration.getReference());
+		}
 	}
 
 	private void _startConfigurationBundles(Collection<Bundle> bundles)
@@ -1639,8 +1627,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			new DefaultNoticeableFuture<>();
 
 		frameworkStartLevel.setStartLevel(
-			ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
+			PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
 			frameworkEvent -> defaultNoticeableFuture.set(frameworkEvent));
 
 		FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
@@ -1661,7 +1648,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 
 		frameworkStartLevel.setStartLevel(
-			ModuleFrameworkPropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL,
+			PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL,
 			webFrameworkEvent -> webDefaultNoticeableFuture.set(
 				webFrameworkEvent));
 
@@ -1774,12 +1761,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 	private static final List<String> _configurationBundleSymbolicNames =
 		Arrays.asList(
-			ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_CONFIGURATION_BUNDLE_SYMBOLIC_NAMES);
+			PropsValues.MODULE_FRAMEWORK_CONFIGURATION_BUNDLE_SYMBOLIC_NAMES);
 
-	private BundleListener _bundleListener;
 	private Framework _framework;
-	private LogListener _logListener;
 	private final Map
 		<ConfigurableApplicationContext, List<ServiceRegistration<?>>>
 			_springContextServices = new ConcurrentHashMap<>();

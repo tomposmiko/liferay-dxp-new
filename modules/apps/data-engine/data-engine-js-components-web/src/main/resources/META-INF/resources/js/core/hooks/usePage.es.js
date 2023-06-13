@@ -18,12 +18,10 @@ const PageContext = React.createContext({});
 
 PageContext.displayName = 'PageContext';
 
-export function PageProvider({children, value}) {
-	return (
-		<PageContext.Provider value={value}>{children}</PageContext.Provider>
-	);
-}
+export const PageProvider = ({children, value}) => (
+	<PageContext.Provider value={value}>{children}</PageContext.Provider>
+);
 
-export function usePage() {
+export const usePage = () => {
 	return useContext(PageContext);
-}
+};

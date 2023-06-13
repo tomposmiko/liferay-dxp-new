@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 
 import java.net.MalformedURLException;
@@ -704,10 +703,6 @@ public class Validator {
 	 *         <code>false</code> otherwise
 	 */
 	public static boolean isIPv4Address(String ipAddress) {
-		if (isNull(ipAddress)) {
-			return false;
-		}
-
 		Matcher matcher = _ipv4AddressPattern.matcher(ipAddress);
 
 		return matcher.matches();

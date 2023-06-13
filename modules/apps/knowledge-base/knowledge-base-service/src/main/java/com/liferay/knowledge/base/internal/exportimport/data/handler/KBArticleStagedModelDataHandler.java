@@ -17,7 +17,6 @@ package com.liferay.knowledge.base.internal.exportimport.data.handler;
 import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
 import com.liferay.document.library.kernel.exception.NoSuchFileException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -28,6 +27,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.knowledge.base.constants.KBArticleConstants;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
+import com.liferay.knowledge.base.internal.exportimport.content.processor.KBArticleExportImportContentProcessor;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.KBArticleLocalService;
@@ -61,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class KBArticleStagedModelDataHandler
 	extends BaseStagedModelDataHandler<KBArticle> {
 
@@ -153,7 +153,7 @@ public class KBArticleStagedModelDataHandler
 			}
 		}
 
-		_exportKBArticleAttachments(portletDataContext, kbArticle);
+		exportKBArticleAttachments(portletDataContext, kbArticle);
 
 		String content =
 			_kbArticleExportImportContentProcessor.
@@ -263,7 +263,7 @@ public class KBArticleStagedModelDataHandler
 			}
 		}
 
-		_importKBArticleAttachments(
+		importKBArticleAttachments(
 			portletDataContext, kbArticle, importedKBArticle);
 
 		portletDataContext.importClassedModel(kbArticle, importedKBArticle);
@@ -272,6 +272,74 @@ public class KBArticleStagedModelDataHandler
 			kbArticleResourcePrimKeys.put(
 				kbArticle.getResourcePrimKey(),
 				importedKBArticle.getResourcePrimKey());
+		}
+	}
+
+	protected void exportKBArticleAttachments(
+			PortletDataContext portletDataContext, KBArticle kbArticle)
+		throws Exception {
+
+		for (FileEntry fileEntry : kbArticle.getAttachmentsFileEntries()) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, kbArticle, fileEntry,
+				PortletDataContext.REFERENCE_TYPE_WEAK);
+		}
+	}
+
+	protected void importKBArticleAttachments(
+			PortletDataContext portletDataContext, KBArticle kbArticle,
+			KBArticle importedKBArticle)
+		throws Exception {
+
+		List<Element> dlFileEntryElements =
+			portletDataContext.getReferenceDataElements(
+				kbArticle, DLFileEntry.class);
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setCompanyId(portletDataContext.getCompanyId());
+		serviceContext.setScopeGroupId(portletDataContext.getScopeGroupId());
+
+		for (Element dlFileEntryElement : dlFileEntryElements) {
+			String path = dlFileEntryElement.attributeValue("path");
+
+			FileEntry fileEntry =
+				(FileEntry)portletDataContext.getZipEntryAsObject(path);
+
+			String binPath = dlFileEntryElement.attributeValue("bin-path");
+
+			try (InputStream inputStream = _getKBArticalAttachmentInputStream(
+					binPath, portletDataContext, fileEntry)) {
+
+				if (inputStream == null) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Unable to import attachment for file entry " +
+								fileEntry.getFileEntryId());
+					}
+
+					continue;
+				}
+
+				_portletFileRepository.addPortletFileEntry(
+					portletDataContext.getScopeGroupId(),
+					portletDataContext.getUserId(
+						importedKBArticle.getUserUuid()),
+					KBArticle.class.getName(), importedKBArticle.getClassPK(),
+					KBPortletKeys.KNOWLEDGE_BASE_ADMIN,
+					importedKBArticle.getAttachmentsFolderId(), inputStream,
+					fileEntry.getFileName(), fileEntry.getMimeType(), true);
+			}
+			catch (DuplicateFileEntryException duplicateFileEntryException) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						duplicateFileEntryException,
+						duplicateFileEntryException);
+				}
+			}
 		}
 	}
 
@@ -330,9 +398,8 @@ public class KBArticleStagedModelDataHandler
 			kbArticle.getExternalReferenceCode(), userId,
 			parentResourceClassNameId, parentResourcePrimKey,
 			kbArticle.getTitle(), kbArticle.getUrlTitle(),
-			kbArticle.getContent(), kbArticle.getDescription(), sections,
-			kbArticle.getSourceURL(), kbArticle.getExpirationDate(),
-			kbArticle.getReviewDate(), null, serviceContext);
+			kbArticle.getContent(), kbArticle.getDescription(),
+			kbArticle.getSourceURL(), sections, null, serviceContext);
 
 		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
@@ -346,17 +413,6 @@ public class KBArticleStagedModelDataHandler
 		}
 
 		return importedKBArticle;
-	}
-
-	private void _exportKBArticleAttachments(
-			PortletDataContext portletDataContext, KBArticle kbArticle)
-		throws Exception {
-
-		for (FileEntry fileEntry : kbArticle.getAttachmentsFileEntries()) {
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, kbArticle, fileEntry,
-				PortletDataContext.REFERENCE_TYPE_WEAK);
-		}
 	}
 
 	private KBArticle _findExistingKBArticle(
@@ -415,7 +471,7 @@ public class KBArticleStagedModelDataHandler
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchFileException);
+					_log.debug(noSuchFileException, noSuchFileException);
 				}
 
 				return null;
@@ -423,61 +479,6 @@ public class KBArticleStagedModelDataHandler
 		}
 
 		return portletDataContext.getZipEntryAsInputStream(binPath);
-	}
-
-	private void _importKBArticleAttachments(
-			PortletDataContext portletDataContext, KBArticle kbArticle,
-			KBArticle importedKBArticle)
-		throws Exception {
-
-		List<Element> dlFileEntryElements =
-			portletDataContext.getReferenceDataElements(
-				kbArticle, DLFileEntry.class);
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setCompanyId(portletDataContext.getCompanyId());
-		serviceContext.setScopeGroupId(portletDataContext.getScopeGroupId());
-
-		for (Element dlFileEntryElement : dlFileEntryElements) {
-			String path = dlFileEntryElement.attributeValue("path");
-
-			FileEntry fileEntry =
-				(FileEntry)portletDataContext.getZipEntryAsObject(path);
-
-			String binPath = dlFileEntryElement.attributeValue("bin-path");
-
-			try (InputStream inputStream = _getKBArticalAttachmentInputStream(
-					binPath, portletDataContext, fileEntry)) {
-
-				if (inputStream == null) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Unable to import attachment for file entry " +
-								fileEntry.getFileEntryId());
-					}
-
-					continue;
-				}
-
-				_portletFileRepository.addPortletFileEntry(
-					null, portletDataContext.getScopeGroupId(),
-					portletDataContext.getUserId(
-						importedKBArticle.getUserUuid()),
-					KBArticle.class.getName(), importedKBArticle.getClassPK(),
-					KBPortletKeys.KNOWLEDGE_BASE_ADMIN,
-					importedKBArticle.getAttachmentsFolderId(), inputStream,
-					fileEntry.getFileName(), fileEntry.getMimeType(), true);
-			}
-			catch (DuplicateFileEntryException duplicateFileEntryException) {
-
-				// LPS-52675
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(duplicateFileEntryException);
-				}
-			}
-		}
 	}
 
 	private KBArticle _updateKBArticle(
@@ -488,9 +489,8 @@ public class KBArticleStagedModelDataHandler
 
 		_kbArticleLocalService.updateKBArticle(
 			userId, resourcePrimKey, kbArticle.getTitle(),
-			kbArticle.getContent(), kbArticle.getDescription(), sections,
-			kbArticle.getSourceURL(), kbArticle.getExpirationDate(),
-			kbArticle.getReviewDate(), null, null, serviceContext);
+			kbArticle.getContent(), kbArticle.getDescription(),
+			kbArticle.getSourceURL(), sections, null, null, serviceContext);
 
 		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
@@ -516,10 +516,8 @@ public class KBArticleStagedModelDataHandler
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.knowledge.base.model.KBArticle)"
-	)
-	private ExportImportContentProcessor<String>
+	@Reference
+	private KBArticleExportImportContentProcessor
 		_kbArticleExportImportContentProcessor;
 
 	@Reference

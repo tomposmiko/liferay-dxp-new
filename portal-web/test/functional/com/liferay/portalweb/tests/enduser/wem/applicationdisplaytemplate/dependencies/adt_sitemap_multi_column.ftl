@@ -1,7 +1,7 @@
 <#if entries?has_content>
-	<@clay.row>
+	<@liferay_aui.row>
 		<#list entries as entry>
-			<@clay.col md="3">
+			<@liferay_aui.col width=25>
 				<div class="results-header">
 					<h3>
 						<a
@@ -20,9 +20,9 @@
 					depth=1
 					pages=entry.getChildren()
 				/>
-			</@clay.col>
+			</@liferay_aui.col>
 		</#list>
-	</@clay.row>
+	</@liferay_aui.row>
 </#if>
 
 <#macro displayPages

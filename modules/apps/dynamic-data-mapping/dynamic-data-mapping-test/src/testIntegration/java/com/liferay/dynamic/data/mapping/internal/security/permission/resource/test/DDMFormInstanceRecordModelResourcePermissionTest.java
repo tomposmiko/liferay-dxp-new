@@ -73,8 +73,8 @@ public class DDMFormInstanceRecordModelResourcePermissionTest
 
 		_siteUser = UserTestUtil.addUser(group.getGroupId());
 
-		_setUpPermissionThreadLocal();
-		_setUpPrincipalThreadLocal();
+		setUpPermissionThreadLocal();
+		setUpPrincipalThreadLocal();
 	}
 
 	@After
@@ -88,7 +88,7 @@ public class DDMFormInstanceRecordModelResourcePermissionTest
 	public void testUpdateApprovedFormInstanceRecordByOwnerShouldBeFalse()
 		throws Exception {
 
-		DDMFormInstance formInstance = _createFormInstance();
+		DDMFormInstance formInstance = createFormInstance();
 
 		DDMStructure structure = formInstance.getStructure();
 
@@ -115,7 +115,7 @@ public class DDMFormInstanceRecordModelResourcePermissionTest
 	public void testUpdateDraftFormInstanceRecordByOwnerShouldBeTrue()
 		throws Exception {
 
-		DDMFormInstance formInstance = _createFormInstance();
+		DDMFormInstance formInstance = createFormInstance();
 
 		DDMStructure structure = formInstance.getStructure();
 
@@ -142,19 +142,22 @@ public class DDMFormInstanceRecordModelResourcePermissionTest
 				formInstanceRecord, ActionKeys.UPDATE));
 	}
 
-	private DDMFormInstance _createFormInstance() throws Exception {
+	protected DDMFormInstance createFormInstance() throws Exception {
 		DDMStructure structure = addStructure(_classNameId, "Test Structure");
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group, TestPropsValues.getUserId());
 
 		return DDMFormInstanceLocalServiceUtil.addFormInstance(
 			structure.getUserId(), structure.getGroupId(),
 			structure.getStructureId(), structure.getNameMap(),
 			structure.getNameMap(),
 			DDMFormInstanceTestUtil.createSettingsDDMFormValues(),
-			ServiceContextTestUtil.getServiceContext(
-				group, TestPropsValues.getUserId()));
+			serviceContext);
 	}
 
-	private void _setUpPermissionThreadLocal() throws Exception {
+	protected void setUpPermissionThreadLocal() throws Exception {
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
@@ -162,7 +165,7 @@ public class DDMFormInstanceRecordModelResourcePermissionTest
 			PermissionCheckerFactoryUtil.create(_siteUser));
 	}
 
-	private void _setUpPrincipalThreadLocal() throws Exception {
+	protected void setUpPrincipalThreadLocal() throws Exception {
 		_originalName = PrincipalThreadLocal.getName();
 
 		PrincipalThreadLocal.setName(_siteUser.getUserId());

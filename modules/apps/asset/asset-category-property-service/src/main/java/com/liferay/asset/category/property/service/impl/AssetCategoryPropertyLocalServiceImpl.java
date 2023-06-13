@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 
@@ -50,9 +49,9 @@ public class AssetCategoryPropertyLocalServiceImpl
 			long userId, long categoryId, String key, String value)
 		throws PortalException {
 
-		_validate(key, value);
+		validate(key, value);
 
-		if (_hasCategoryProperty(categoryId, key)) {
+		if (hasCategoryProperty(categoryId, key)) {
 			throw new DuplicateCategoryPropertyException(
 				"A category property already exists with the key " + key);
 		}
@@ -153,13 +152,13 @@ public class AssetCategoryPropertyLocalServiceImpl
 		String categoryPropertyKey = categoryProperty.getKey();
 
 		if (!categoryPropertyKey.equals(key) &&
-			_hasCategoryProperty(categoryProperty.getCategoryId(), key)) {
+			hasCategoryProperty(categoryProperty.getCategoryId(), key)) {
 
 			throw new DuplicateCategoryPropertyException(
 				"A category property already exists with the key " + key);
 		}
 
-		_validate(key, value);
+		validate(key, value);
 
 		if (userId != 0) {
 			User user = _userLocalService.getUser(userId);
@@ -182,7 +181,7 @@ public class AssetCategoryPropertyLocalServiceImpl
 		return updateCategoryProperty(0, categoryPropertyId, key, value);
 	}
 
-	private boolean _hasCategoryProperty(long categoryId, String key) {
+	protected boolean hasCategoryProperty(long categoryId, String key) {
 		AssetCategoryProperty categoryProperty =
 			assetCategoryPropertyPersistence.fetchByCA_K(categoryId, key);
 
@@ -193,7 +192,7 @@ public class AssetCategoryPropertyLocalServiceImpl
 		return false;
 	}
 
-	private void _validate(String key, String value) throws PortalException {
+	protected void validate(String key, String value) throws PortalException {
 		if (!_assetHelper.isValidWord(key)) {
 			throw new CategoryPropertyKeyException("Invalid key " + key);
 		}
@@ -206,9 +205,8 @@ public class AssetCategoryPropertyLocalServiceImpl
 				"Maximum length of key exceeded");
 		}
 
-		if (Validator.isBlank(value)) {
-			throw new CategoryPropertyValueException(
-				"Property value cannot be an empty string");
+		if (!_assetHelper.isValidWord(value)) {
+			throw new CategoryPropertyValueException("Invalid value " + value);
 		}
 
 		int valueMaxLength = ModelHintsUtil.getMaxLength(

@@ -15,14 +15,17 @@
 package com.liferay.dispatch.web.internal.security.permisison.resource;
 
 import com.liferay.dispatch.model.DispatchTrigger;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Marco Leo
  */
+@Component(service = {})
 public class DispatchTriggerPermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class DispatchTriggerPermission {
 			DispatchTrigger dispatchTrigger, String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DispatchTrigger> modelResourcePermission =
-			_dispatchTriggerModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _dispatchTriggerModelResourcePermission.contains(
 			permissionChecker, dispatchTrigger.getDispatchTriggerId(),
 			actionId);
 	}
@@ -43,17 +43,21 @@ public class DispatchTriggerPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DispatchTrigger> modelResourcePermission =
-			_dispatchTriggerModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _dispatchTriggerModelResourcePermission.contains(
 			permissionChecker, dispatchTriggerId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<DispatchTrigger>>
-		_dispatchTriggerModelResourcePermissionSnapshot = new Snapshot<>(
-			DispatchTriggerPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.dispatch.model.DispatchTrigger)");
+	@Reference(
+		target = "(model.class.name=com.liferay.dispatch.model.DispatchTrigger)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<DispatchTrigger> modelResourcePermission) {
+
+		_dispatchTriggerModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<DispatchTrigger>
+		_dispatchTriggerModelResourcePermission;
 
 }

@@ -21,7 +21,7 @@ import com.liferay.layout.seo.open.graph.OpenGraphConfiguration;
 import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
 import com.liferay.layout.seo.web.internal.display.context.OpenGraphSettingsDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -68,7 +68,7 @@ public class OpenGraphSiteSettingsConfigurationScreenContributor
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(_getResourceBundle(locale), "open-graph");
+		return LanguageUtil.get(_getResourceBundle(locale), "open-graph");
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class OpenGraphSiteSettingsConfigurationScreenContributor
 			return true;
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return false;
 		}
@@ -144,9 +144,6 @@ public class OpenGraphSiteSettingsConfigurationScreenContributor
 
 	@Reference
 	private ItemSelector _itemSelector;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private LayoutSEOSiteLocalService _layoutSEOSiteLocalService;

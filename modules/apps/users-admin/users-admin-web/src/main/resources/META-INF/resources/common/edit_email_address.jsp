@@ -45,8 +45,11 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 
 	<clay:container-fluid>
 		<div class="sheet-lg" id="breadcrumb">
-			<liferay-site-navigation:breadcrumb
-				breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+			<liferay-ui:breadcrumb
+				showCurrentGroup="<%= false %>"
+				showGuestGroup="<%= false %>"
+				showLayout="<%= false %>"
+				showPortletBreadcrumb="<%= true %>"
 			/>
 		</div>
 
@@ -62,7 +65,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, editContactInformationDisplayConte
 
 				<liferay-ui:error key="<%= NoSuchListTypeException.class.getName() + editContactInformationDisplayContext.getClassName() + ListTypeConstants.EMAIL_ADDRESS %>" message="please-select-a-type" />
 
-				<aui:select inlineField="<%= true %>" label="type" listType="<%= editContactInformationDisplayContext.getClassName() + ListTypeConstants.EMAIL_ADDRESS %>" listTypeFieldName="listTypeId" name="emailAddressTypeId" />
+				<aui:select inlineField="<%= true %>" label="type" listType="<%= editContactInformationDisplayContext.getClassName() + ListTypeConstants.EMAIL_ADDRESS %>" name="emailAddressTypeId" />
 
 				<liferay-ui:error exception="<%= EmailAddressException.class %>" message="please-enter-a-valid-email-address" />
 

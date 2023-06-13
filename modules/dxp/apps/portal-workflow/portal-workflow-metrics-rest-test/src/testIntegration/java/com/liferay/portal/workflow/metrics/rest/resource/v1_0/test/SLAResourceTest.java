@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -163,14 +162,6 @@ public class SLAResourceTest extends BaseSLAResourceTestCase {
 		_slas.add(sla);
 
 		return sla;
-	}
-
-	@Override
-	protected Map<String, Map<String, String>>
-			testGetProcessSLAsPage_getExpectedActions(Long processId)
-		throws Exception {
-
-		return Collections.emptyMap();
 	}
 
 	@Override

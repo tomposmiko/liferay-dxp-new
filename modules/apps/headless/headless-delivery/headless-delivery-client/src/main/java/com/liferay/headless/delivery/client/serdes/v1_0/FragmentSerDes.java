@@ -95,20 +95,6 @@ public class FragmentSerDes {
 			sb.append("\"");
 		}
 
-		if (fragment.getSiteKey() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"siteKey\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(fragment.getSiteKey()));
-
-			sb.append("\"");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -149,13 +135,6 @@ public class FragmentSerDes {
 			map.put("name", String.valueOf(fragment.getName()));
 		}
 
-		if (fragment.getSiteKey() == null) {
-			map.put("siteKey", null);
-		}
-		else {
-			map.put("siteKey", String.valueOf(fragment.getSiteKey()));
-		}
-
 		return map;
 	}
 
@@ -189,11 +168,6 @@ public class FragmentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					fragment.setName((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "siteKey")) {
-				if (jsonParserFieldValue != null) {
-					fragment.setSiteKey((String)jsonParserFieldValue);
 				}
 			}
 		}

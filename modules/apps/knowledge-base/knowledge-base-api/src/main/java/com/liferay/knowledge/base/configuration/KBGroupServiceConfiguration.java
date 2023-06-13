@@ -123,42 +123,6 @@ public interface KBGroupServiceConfiguration {
 	public String emailKBArticleUpdatedBody();
 
 	@Meta.AD(
-		deflt = "true", name = "email-kb-article-review-enabled",
-		required = false
-	)
-	public boolean emailKBArticleReviewEnabled();
-
-	@Meta.AD(
-		deflt = "${resource:com/liferay/knowledge/base/dependencies/email_kb_article_review_subject.tmpl}",
-		name = "email-kb-article-review-subject", required = false
-	)
-	public String emailKBArticleReviewSubject();
-
-	@Meta.AD(
-		deflt = "${resource:com/liferay/knowledge/base/dependencies/email_kb_article_review_body.tmpl}",
-		name = "email-kb-article-review-body", required = false
-	)
-	public String emailKBArticleReviewBody();
-
-	@Meta.AD(
-		deflt = "true", name = "email-kb-article-expired-enabled",
-		required = false
-	)
-	public boolean emailKBArticleExpiredEnabled();
-
-	@Meta.AD(
-		deflt = "${resource:com/liferay/knowledge/base/dependencies/email_kb_article_expired_subject.tmpl}",
-		name = "email-kb-article-expired-subject", required = false
-	)
-	public String emailKBArticleExpiredSubject();
-
-	@Meta.AD(
-		deflt = "${resource:com/liferay/knowledge/base/dependencies/email_kb_article_expired_body.tmpl}",
-		name = "email-kb-article-expired-body", required = false
-	)
-	public String emailKBArticleExpiredBody();
-
-	@Meta.AD(
 		deflt = "true",
 		name = "email-kb-article-suggestion-in-progress-enabled",
 		required = false
@@ -215,19 +179,18 @@ public interface KBGroupServiceConfiguration {
 	public String emailKBArticleSuggestionResolvedBody();
 
 	@Meta.AD(deflt = "true", name = "enable-rss", required = false)
-	public boolean enableRss();
+	public boolean enableRSS();
+
+	@Meta.AD(deflt = "20", name = "rss-delta", required = false)
+	public int rssDelta();
 
 	@Meta.AD(
-		deflt = "${server-property://com.liferay.portal/search.container.page.default.delta}",
-		name = "rss-delta", required = false
-	)
-	public String rssDelta();
-
-	@Meta.AD(
-		deflt = "${server-property://com.liferay.portal/rss.feed.display.style.default}",
-		name = "rss-display-style", required = false
+		deflt = "full-content", name = "rss-display-style", required = false
 	)
 	public String rssDisplayStyle();
+
+	@Meta.AD(deflt = "atom10", name = "rss-format", required = false)
+	public String rssFormat();
 
 	@Meta.AD(
 		deflt = "${server-property://com.liferay.portal/rss.feed.type.default}",

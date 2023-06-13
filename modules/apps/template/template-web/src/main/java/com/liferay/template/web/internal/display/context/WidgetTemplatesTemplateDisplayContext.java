@@ -19,7 +19,7 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateServiceUtil;
 import com.liferay.dynamic.data.mapping.util.comparator.TemplateIdComparator;
 import com.liferay.dynamic.data.mapping.util.comparator.TemplateModifiedDateComparator;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -28,14 +28,12 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.template.web.internal.security.permissions.resource.DDMTemplatePermission;
@@ -43,6 +41,7 @@ import com.liferay.template.web.internal.util.DDMTemplateActionDropdownItemsProv
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * @author Lourdes Fernández Besada
@@ -66,10 +65,16 @@ public class WidgetTemplatesTemplateDisplayContext
 			return _classNameIds;
 		}
 
-		_classNameIds = TransformUtil.transformToLongArray(
-			_portletDisplayTemplate.getPortletDisplayTemplateHandlers(),
+		List<TemplateHandler> templateHandlers =
+			_portletDisplayTemplate.getPortletDisplayTemplateHandlers();
+
+		Stream<TemplateHandler> templateHandlersStream =
+			templateHandlers.stream();
+
+		_classNameIds = templateHandlersStream.mapToLong(
 			templateHandler -> PortalUtil.getClassNameId(
-				templateHandler.getClassName()));
+				templateHandler.getClassName())
+		).toArray();
 
 		return _classNameIds;
 	}
@@ -145,42 +150,23 @@ public class WidgetTemplatesTemplateDisplayContext
 		ddmTemplateSearchContainer.setOrderByComparator(
 			_getTemplateOrderByComparator());
 		ddmTemplateSearchContainer.setOrderByType(getOrderByType());
-
-		if (Validator.isNull(getKeywords())) {
-			ddmTemplateSearchContainer.setResultsAndTotal(
-				() -> DDMTemplateServiceUtil.getTemplates(
-					themeDisplay.getCompanyId(),
-					new long[] {themeDisplay.getScopeGroupId()},
-					getClassNameIds(), null, getResourceClassNameId(),
-					ddmTemplateSearchContainer.getStart(),
-					ddmTemplateSearchContainer.getEnd(),
-					ddmTemplateSearchContainer.getOrderByComparator()),
-				DDMTemplateServiceUtil.getTemplatesCount(
-					themeDisplay.getCompanyId(),
-					new long[] {themeDisplay.getScopeGroupId()},
-					getClassNameIds(), null, getResourceClassNameId()));
-		}
-		else {
-			ddmTemplateSearchContainer.setResultsAndTotal(
-				() -> DDMTemplateServiceUtil.search(
-					themeDisplay.getCompanyId(),
-					new long[] {themeDisplay.getScopeGroupId()},
-					getClassNameIds(), null, getResourceClassNameId(),
-					getKeywords(), StringPool.BLANK, StringPool.BLANK,
-					WorkflowConstants.STATUS_ANY,
-					ddmTemplateSearchContainer.getStart(),
-					ddmTemplateSearchContainer.getEnd(),
-					ddmTemplateSearchContainer.getOrderByComparator()),
-				DDMTemplateServiceUtil.searchCount(
-					themeDisplay.getCompanyId(),
-					new long[] {themeDisplay.getScopeGroupId()},
-					getClassNameIds(), null, getResourceClassNameId(),
-					getKeywords(), StringPool.BLANK, StringPool.BLANK,
-					WorkflowConstants.STATUS_ANY));
-		}
-
+		ddmTemplateSearchContainer.setResults(
+			DDMTemplateServiceUtil.search(
+				themeDisplay.getCompanyId(),
+				new long[] {themeDisplay.getScopeGroupId()}, getClassNameIds(),
+				null, getResourceClassNameId(), getKeywords(), StringPool.BLANK,
+				StringPool.BLANK, WorkflowConstants.STATUS_ANY,
+				ddmTemplateSearchContainer.getStart(),
+				ddmTemplateSearchContainer.getEnd(),
+				ddmTemplateSearchContainer.getOrderByComparator()));
 		ddmTemplateSearchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(liferayPortletResponse));
+		ddmTemplateSearchContainer.setTotal(
+			DDMTemplateServiceUtil.searchCount(
+				themeDisplay.getCompanyId(),
+				new long[] {themeDisplay.getScopeGroupId()}, getClassNameIds(),
+				null, getResourceClassNameId(), getKeywords(), StringPool.BLANK,
+				StringPool.BLANK, WorkflowConstants.STATUS_ANY));
 
 		_ddmTemplateSearchContainer = ddmTemplateSearchContainer;
 

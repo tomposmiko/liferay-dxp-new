@@ -1,7 +1,6 @@
 @component-name = "portal-staging"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Export/Import Framework";
@@ -15,83 +14,63 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@description = "This is a use case for LRQA-29297. Verify that Admin user can delete a custom export process."
-	@priority = 4
+	@priority = "4"
 	test DeleteCustomExportProcess {
-		task ("Export the LAR file of a site") {
-			LAR.exportSiteCP(
-				larFileName = "CustomExport",
-				siteScopeName = "Guest");
-		}
+		LAR.exportSiteCP(
+			larFileName = "CustomExport",
+			siteScopeName = "Guest");
 
-		task ("Delete the created custom export process and verify it was deleted") {
-			LAR.deleteCurrentAndPreviousProcess(larFileName = "CustomExport");
+		LAR.deleteCurrentAndPreviousProcess(larFileName = "CustomExport");
 
-			AssertElementNotPresent(locator1 = "ExportImport#CURRENT_AND_PREVIOUS_STATUS_1");
-		}
+		AssertElementNotPresent(locator1 = "SitePagesExport#CURRENT_AND_PREVIOUS_STATUS");
 	}
 
-	@description = "This is a use case for LRQA-29297. Verify that the Admin user can delete a portlet export process."
-	@priority = 4
+	@priority = "4"
 	test DeletePortletExportProcess {
-		task ("Go to DM admin and Export a process") {
-			Navigator.openURL();
+		Navigator.openURL();
 
-			ProductMenu.gotoPortlet(
-				category = "Content & Data",
-				portlet = "Documents and Media");
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Documents and Media");
 
-			LAR.exportPortlet(larFileName = "DMExport");
-		}
+		LAR.exportPortlet(larFileName = "DMExport");
 
-		task ("Delete the export process and verify that it was deleted") {
-			Refresh();
+		Refresh();
 
-			LAR.deleteCurrentAndPreviousProcess(
-				deleteFromPortlet = "true",
-				larFileName = "DMExport");
+		LAR.deleteCurrentAndPreviousProcess(
+			deleteFromPortlet = "true",
+			larFileName = "DMExport");
 
-			AssertElementNotPresent(locator1 = "ExportImport#CURRENT_AND_PREVIOUS_STATUS");
-		}
+		AssertElementNotPresent(locator1 = "ExportImport#CURRENT_AND_PREVIOUS_STATUS");
 	}
 
-	@description = "This is a use case for LRQA-47649. Verify that Admin user can relaunch a custom export process."
-	@priority = 4
+	@priority = "4"
 	test RelaunchCustomExportProcess {
-		task ("Export the LAR file of a site") {
-			LAR.exportSiteCP(
-				larFileName = "CustomExport",
-				siteScopeName = "Guest");
-		}
+		LAR.exportSiteCP(
+			larFileName = "CustomExport",
+			siteScopeName = "Guest");
 
-		task ("Relaunch the custom export process") {
-			LAR.relaunchCurrentAndPreviousProcess(larFileName = "CustomExport");
-		}
+		LAR.relaunchCurrentAndPreviousProcess(larFileName = "CustomExport");
 	}
 
-	@description = "This is a use case for LRQA-28935. Verify that the Admin user can filter and modify the Export list display."
-	@priority = 3
+	@priority = "3"
 	test ViewExportProcess {
-		task ("Export the LAR file of a site") {
-			LAR.exportSiteCP(
-				larFileName = "CustomExport",
-				siteScopeName = "Guest");
+		LAR.exportSiteCP(
+			larFileName = "CustomExport",
+			siteScopeName = "Guest");
 
-			Refresh();
-		}
+		Refresh();
 
-		task ("Change the Display to Table, Order by Completed and Toggle the View Order icon") {
-			LexiconEntry.changeExportDisplayStyle(displayStyle = "table");
+		LexiconEntry.changeExportDisplayStyle(displayStyle = "table");
 
-			ManagementBar.setFilterAndOrder(filterBy = "Completed");
+		ManagementBar.setFilterAndOrder(filterBy = "Completed");
 
-			ManagementBar.toggleViewOrder(order = "down");
-		}
+		ManagementBar.toggleViewOrder(order = "down");
 	}
 
 }

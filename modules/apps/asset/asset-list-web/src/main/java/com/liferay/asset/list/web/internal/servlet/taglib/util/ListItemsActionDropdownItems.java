@@ -24,17 +24,16 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.info.display.url.provider.InfoEditURLProvider;
-import com.liferay.info.display.url.provider.InfoEditURLProviderRegistry;
+import com.liferay.info.display.url.provider.InfoEditURLProviderTracker;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -53,20 +52,19 @@ public class ListItemsActionDropdownItems {
 	public ListItemsActionDropdownItems(
 		AssetDisplayPageFriendlyURLProvider assetDisplayPageFriendlyURLProvider,
 		DLAppService dlAppService,
-		InfoEditURLProviderRegistry infoEditURLProviderRegistry,
-		InfoItemServiceRegistry infoItemServiceRegistry,
-		InfoSearchClassMapperRegistry infoSearchClassMapperRegistry,
+		InfoEditURLProviderTracker infoEditURLProviderTracker,
+		InfoItemServiceTracker infoItemServiceTracker,
 		HttpServletRequest httpServletRequest) {
 
 		_assetDisplayPageFriendlyURLProvider =
 			assetDisplayPageFriendlyURLProvider;
 		_dlAppService = dlAppService;
-		_infoEditURLProviderRegistry = infoEditURLProviderRegistry;
-		_infoItemServiceRegistry = infoItemServiceRegistry;
-		_infoSearchClassMapperRegistry = infoSearchClassMapperRegistry;
+		_infoEditURLProviderTracker = infoEditURLProviderTracker;
+		_infoItemServiceTracker = infoItemServiceTracker;
+
 		_httpServletRequest = httpServletRequest;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -89,7 +87,7 @@ public class ListItemsActionDropdownItems {
 		}
 
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class, className);
 
 		InfoItemFieldValues infoItemFieldValues =
@@ -107,12 +105,15 @@ public class ListItemsActionDropdownItems {
 			className = assetEntry.getClassName();
 		}
 
+		if (Objects.equals(className, DLFileEntryConstants.getClassName())) {
+			className = FileEntry.class.getName();
+		}
+
 		String viewDisplayPageURL =
 			_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
-				_infoSearchClassMapperRegistry.getClassName(className), classPK,
-				_themeDisplay);
+				className, classPK, _themeDisplay);
 
-		return HttpComponentsUtil.setParameter(
+		return HttpUtil.setParameter(
 			viewDisplayPageURL, "p_l_back_url", _getRedirect());
 	}
 
@@ -172,7 +173,7 @@ public class ListItemsActionDropdownItems {
 		}
 
 		InfoEditURLProvider<Object> infoEditURLProvider =
-			_infoEditURLProviderRegistry.getInfoEditURLProvider(className);
+			_infoEditURLProviderTracker.getInfoEditURLProvider(className);
 
 		if (infoEditURLProvider == null) {
 			return null;
@@ -181,7 +182,7 @@ public class ListItemsActionDropdownItems {
 		String editContentURL = infoEditURLProvider.getURL(
 			object, _httpServletRequest);
 
-		return HttpComponentsUtil.setParameter(
+		return HttpUtil.setParameter(
 			editContentURL, "redirect", _getRedirect());
 	}
 
@@ -215,9 +216,8 @@ public class ListItemsActionDropdownItems {
 		_assetDisplayPageFriendlyURLProvider;
 	private final DLAppService _dlAppService;
 	private final HttpServletRequest _httpServletRequest;
-	private final InfoEditURLProviderRegistry _infoEditURLProviderRegistry;
-	private final InfoItemServiceRegistry _infoItemServiceRegistry;
-	private final InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
+	private final InfoEditURLProviderTracker _infoEditURLProviderTracker;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 	private String _redirect;
 	private final ThemeDisplay _themeDisplay;
 

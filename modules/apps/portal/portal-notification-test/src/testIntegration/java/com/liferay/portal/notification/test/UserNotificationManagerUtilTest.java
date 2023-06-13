@@ -164,7 +164,7 @@ public class UserNotificationManagerUtilTest {
 		_serviceRegistration;
 	private static final UserNotificationFeedEntry _userNotificationFeedEntry =
 		new UserNotificationFeedEntry(
-			false, StringPool.BLANK, StringPool.BLANK, false, StringPool.BLANK);
+			false, StringPool.BLANK, StringPool.BLANK, false);
 	private static UserNotificationHandler _userNotificationHandler;
 
 }

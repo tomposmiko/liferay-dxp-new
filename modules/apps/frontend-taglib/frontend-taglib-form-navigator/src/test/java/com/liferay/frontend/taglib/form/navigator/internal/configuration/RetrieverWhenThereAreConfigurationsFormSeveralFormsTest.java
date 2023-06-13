@@ -18,6 +18,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,7 +60,8 @@ public class RetrieverWhenThereAreConfigurationsFormSeveralFormsTest
 	public void testContainsValuesForForm1() {
 		List<String> formNavigatorEntryKeys =
 			formNavigatorEntryConfigurationRetriever.getFormNavigatorEntryKeys(
-				"form1", "general", "add");
+				"form1", "general", "add"
+			).get();
 
 		Assert.assertEquals(
 			formNavigatorEntryKeys.toString(), 3,
@@ -76,7 +78,8 @@ public class RetrieverWhenThereAreConfigurationsFormSeveralFormsTest
 	public void testContainsValuesForForm2() {
 		List<String> formNavigatorEntryKeys =
 			formNavigatorEntryConfigurationRetriever.getFormNavigatorEntryKeys(
-				"form2", "general", "add");
+				"form2", "general", "add"
+			).get();
 
 		Assert.assertEquals(
 			formNavigatorEntryKeys.toString(), 3,
@@ -93,9 +96,11 @@ public class RetrieverWhenThereAreConfigurationsFormSeveralFormsTest
 	public void testDoesContainValuesForEntry2IfItIsDeleted() {
 		deleteConfiguration("form2");
 
-		Assert.assertNull(
+		Optional<List<String>> formNavigatorEntryKeysOptional =
 			formNavigatorEntryConfigurationRetriever.getFormNavigatorEntryKeys(
-				"form2", "general", "update"));
+				"form2", "general", "update");
+
+		Assert.assertFalse(formNavigatorEntryKeysOptional.isPresent());
 	}
 
 }

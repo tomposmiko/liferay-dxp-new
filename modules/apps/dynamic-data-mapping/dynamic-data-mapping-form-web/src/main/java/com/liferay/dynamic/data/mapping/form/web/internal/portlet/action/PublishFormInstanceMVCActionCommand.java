@@ -27,6 +27,7 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
@@ -50,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Basto
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
 		"mvc.command.name=/dynamic_data_mapping_form/publish_form_instance"
@@ -71,13 +73,13 @@ public class PublishFormInstanceMVCActionCommand
 
 		boolean published = !_isFormInstancePublished(ddmFormInstance);
 
-		_updateFormInstancePermission(
+		updateFormInstancePermission(
 			actionRequest, ddmFormInstance.getFormInstanceId(), published);
 
 		DDMFormValues settingsDDMFormValues =
 			ddmFormInstance.getSettingsDDMFormValues();
 
-		_updatePublishedDDMFormFieldValue(settingsDDMFormValues, published);
+		updatePublishedDDMFormFieldValue(settingsDDMFormValues, published);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			DDMFormInstance.class.getName(), actionRequest);
@@ -114,18 +116,35 @@ public class PublishFormInstanceMVCActionCommand
 		portletURL.setParameter("showPublishAlert", Boolean.TRUE.toString());
 	}
 
-	private boolean _isFormInstancePublished(DDMFormInstance formInstance)
-		throws Exception {
+	@Reference(unbind = "-")
+	protected void setDDMFormInstanceService(
+		DDMFormInstanceService ddmFormInstanceService) {
 
-		DDMFormInstanceSettings ddmFormInstanceSettings =
-			formInstance.getSettingsModel();
-
-		return ddmFormInstanceSettings.published();
+		_ddmFormInstanceService = ddmFormInstanceService;
 	}
 
-	private void _updateFormInstancePermission(
+	@Reference(unbind = "-")
+	protected void setDDMFormValuesQueryFactory(
+		DDMFormValuesQueryFactory ddmFormValuesQueryFactory) {
+
+		_ddmFormValuesQueryFactory = ddmFormValuesQueryFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setResourcePermissionLocalService(
+		ResourcePermissionLocalService resourcePermissionLocalService) {
+
+		_resourcePermissionLocalService = resourcePermissionLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setRoleLocalService(RoleLocalService roleLocalService) {
+		_roleLocalService = roleLocalService;
+	}
+
+	protected void updateFormInstancePermission(
 			ActionRequest actionRequest, long formInstanceId, boolean published)
-		throws Exception {
+		throws PortalException {
 
 		Role role = _roleLocalService.getRole(
 			_portal.getCompanyId(actionRequest), RoleConstants.GUEST);
@@ -163,9 +182,9 @@ public class PublishFormInstanceMVCActionCommand
 			resourcePermission);
 	}
 
-	private void _updatePublishedDDMFormFieldValue(
+	protected void updatePublishedDDMFormFieldValue(
 			DDMFormValues ddmFormValues, boolean published)
-		throws Exception {
+		throws PortalException {
 
 		DDMFormValuesQuery ddmFormValuesQuery =
 			_ddmFormValuesQueryFactory.create(ddmFormValues, "/published");
@@ -179,19 +198,22 @@ public class PublishFormInstanceMVCActionCommand
 			ddmFormValues.getDefaultLocale(), Boolean.toString(published));
 	}
 
-	@Reference
-	private DDMFormInstanceService _ddmFormInstanceService;
+	private boolean _isFormInstancePublished(DDMFormInstance formInstance)
+		throws Exception {
 
-	@Reference
+		DDMFormInstanceSettings ddmFormInstanceSettings =
+			formInstance.getSettingsModel();
+
+		return ddmFormInstanceSettings.published();
+	}
+
+	private DDMFormInstanceService _ddmFormInstanceService;
 	private DDMFormValuesQueryFactory _ddmFormValuesQueryFactory;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
-
-	@Reference
 	private RoleLocalService _roleLocalService;
 
 }

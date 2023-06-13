@@ -20,7 +20,10 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+
+import java.util.Optional;
+
+import javax.ws.rs.core.UriInfo;
 
 /**
  * @author Jürgen Kappler
@@ -28,9 +31,9 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 public class CreatorUtil {
 
 	public static Creator toCreator(
-		DTOConverterContext dtoConverterContext, Portal portal, User user) {
+		Portal portal, Optional<UriInfo> uriInfoOptional, User user) {
 
-		if ((user == null) || user.isGuestUser()) {
+		if ((user == null) || user.isDefaultUser()) {
 			return null;
 		}
 
@@ -59,22 +62,30 @@ public class CreatorUtil {
 					});
 				setProfileURL(
 					() -> {
-						if (!dtoConverterContext.containsNestedFieldsValue(
-								"profileURL")) {
+						if (uriInfoOptional.map(
+								UriInfo::getQueryParameters
+							).map(
+								parameters -> parameters.getFirst(
+									"nestedFields")
+							).map(
+								fields -> fields.contains("profileURL")
+							).orElse(
+								false
+							)) {
 
-							return null;
+							Group group = user.getGroup();
+
+							ThemeDisplay themeDisplay = new ThemeDisplay() {
+								{
+									setPortalURL(StringPool.BLANK);
+									setSiteGroupId(group.getGroupId());
+								}
+							};
+
+							return group.getDisplayURL(themeDisplay);
 						}
 
-						Group group = user.getGroup();
-
-						ThemeDisplay themeDisplay = new ThemeDisplay() {
-							{
-								setPortalURL(StringPool.BLANK);
-								setSiteGroupId(group.getGroupId());
-							}
-						};
-
-						return group.getDisplayURL(themeDisplay);
+						return null;
 					});
 			}
 		};

@@ -38,11 +38,6 @@ public class OpenIdConnectFriendlyURLMapper extends DefaultFriendlyURLMapper {
 		return _MAPPING;
 	}
 
-	@Override
-	public String getPortletId() {
-		return PortletKeys.LOGIN;
-	}
-
 	private static final String _MAPPING = "login";
 
 }

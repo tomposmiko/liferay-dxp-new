@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Javier Gamarra
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class MBCategorySearcherRegistrar {
 
 	@Activate

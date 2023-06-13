@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -35,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SiteAdminPortletKeys.SITE_ADMIN,
 		"mvc.command.name=/site_admin/activate_group"
@@ -62,8 +64,8 @@ public class ActivateGroupMVCActionCommand extends BaseMVCActionCommand {
 
 		Group group = _groupService.getGroup(groupId);
 
-		ServiceContext serviceContext = ActionUtil.getServiceContext(
-			actionRequest, groupId);
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			Group.class.getName(), actionRequest);
 
 		_groupService.updateGroup(
 			groupId, group.getParentGroupId(), group.getNameMap(),

@@ -12,16 +12,17 @@
  * details.
  */
 
-import {
-	TObjectField,
-	TObjectLayoutRow,
-	TObjectRelationship,
-} from '../components/Layout/types';
+import {TObjectLayoutRow} from '../components/layout/types';
 
-export function findObjectLayoutRowIndex(
+type TFindObjectLayoutRowIndex = (
 	objectLayoutRows: TObjectLayoutRow[],
-	fieldSize: number
-): number {
+	size: number
+) => number;
+
+export const findObjectLayoutRowIndex: TFindObjectLayoutRowIndex = (
+	objectLayoutRows,
+	fieldSize
+) => {
 	let objectLayoutRowIndex = -1;
 
 	objectLayoutRows.some(({objectLayoutColumns}, rowIndex) => {
@@ -41,24 +42,16 @@ export function findObjectLayoutRowIndex(
 	});
 
 	return objectLayoutRowIndex;
-}
+};
 
-export function findObjectFieldIndexById(
-	objectFields: TObjectField[] | TObjectRelationship[],
-	objectFieldId: number
-): number {
+type TFindObjectFieldIndex = (object: any[], objectId: number) => number;
+
+export const findObjectFieldIndex: TFindObjectFieldIndex = (
+	objectFields,
+	objectFieldId
+) => {
 	const objIds = objectFields.map(({id}) => id);
 	const objectIndex = objIds.indexOf(objectFieldId);
 
 	return objectIndex;
-}
-
-export function findObjectFieldIndexByName(
-	objectFields: TObjectField[] | TObjectRelationship[],
-	objectFieldName: string
-): number {
-	const objIds = objectFields.map(({name}) => name);
-	const objectIndex = objIds.indexOf(objectFieldName);
-
-	return objectIndex;
-}
+};

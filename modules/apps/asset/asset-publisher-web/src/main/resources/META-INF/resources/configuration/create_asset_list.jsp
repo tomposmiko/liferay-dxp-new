@@ -21,18 +21,16 @@ String portletResource = ParamUtil.getString(request, "portletResource");
 %>
 
 <div class="mb-2">
-	<aui:a cssClass="create-collection-link" href="javascript:void(0);">
+	<aui:a cssClass="create-collection-link" href="javascript:;">
 		<liferay-ui:message key="create-a-collection-from-this-configuration" />
 	</aui:a>
 </div>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {delegate, openSimpleInputModal} = frontendJsWeb;
-
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as openSimpleInputModal">
 	function handleCreateAssetListLinkClick(event) {
 		event.preventDefault();
 
-		openSimpleInputModal({
+		openSimpleInputModal.default({
 			dialogTitle: '<liferay-ui:message key="collection-title" />',
 			formSubmitURL:
 				'<liferay-portlet:actionURL name="/asset_publisher/add_asset_list" portletName="<%= portletResource %>"><portlet:param name="portletResource" value="<%= portletResource %>" /><portlet:param name="redirect" value="<%= currentURL %>" /></liferay-portlet:actionURL>',
@@ -41,9 +39,11 @@ String portletResource = ParamUtil.getString(request, "portletResource");
 			mainFieldPlaceholder: '<liferay-ui:message key="title" />',
 			namespace:
 				'<%= PortalUtil.getPortletNamespace(HtmlUtil.escape(portletResource)) %>',
-			spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+			spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 		});
 	}
+
+	var delegate = delegateModule.default;
 
 	var createAssetListLinkClickHandler = delegate(
 		document.body,

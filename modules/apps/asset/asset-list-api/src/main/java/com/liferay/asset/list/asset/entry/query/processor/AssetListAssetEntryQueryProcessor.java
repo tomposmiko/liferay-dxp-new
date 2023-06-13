@@ -29,4 +29,14 @@ public interface AssetListAssetEntryQueryProcessor {
 		long companyId, String userId, UnicodeProperties unicodeProperties,
 		AssetEntryQuery assetEntryQuery);
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #processAssetEntryQuery(long, String, UnicodeProperties,
+	 *             AssetEntryQuery)}
+	 */
+	@Deprecated
+	public void processAssetEntryQuery(
+		String userId, UnicodeProperties unicodeProperties,
+		AssetEntryQuery assetEntryQuery);
+
 }

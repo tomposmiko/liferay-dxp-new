@@ -18,10 +18,10 @@ import com.liferay.asset.categories.item.selector.web.internal.constants.AssetCa
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -50,7 +50,7 @@ public class SelectAssetVocabularyDisplayContext {
 		_httpServletRequest = httpServletRequest;
 		_portletURL = portletURL;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -75,8 +75,8 @@ public class SelectAssetVocabularyDisplayContext {
 
 		List<AssetVocabulary> assetVocabularies = _getAssetVocabularies();
 
-		searchContainer.setResultsAndTotal(
-			() -> assetVocabularies, assetVocabularies.size());
+		searchContainer.setResults(assetVocabularies);
+		searchContainer.setTotal(assetVocabularies.size());
 
 		return searchContainer;
 	}

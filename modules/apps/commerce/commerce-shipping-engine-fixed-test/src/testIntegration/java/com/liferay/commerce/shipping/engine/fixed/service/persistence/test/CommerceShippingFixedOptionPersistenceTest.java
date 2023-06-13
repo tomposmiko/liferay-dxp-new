@@ -26,9 +26,7 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.test.AssertUtils;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -133,9 +131,6 @@ public class CommerceShippingFixedOptionPersistenceTest {
 		CommerceShippingFixedOption newCommerceShippingFixedOption =
 			_persistence.create(pk);
 
-		newCommerceShippingFixedOption.setMvccVersion(
-			RandomTestUtil.nextLong());
-
 		newCommerceShippingFixedOption.setGroupId(RandomTestUtil.nextLong());
 
 		newCommerceShippingFixedOption.setCompanyId(RandomTestUtil.nextLong());
@@ -153,15 +148,13 @@ public class CommerceShippingFixedOptionPersistenceTest {
 		newCommerceShippingFixedOption.setCommerceShippingMethodId(
 			RandomTestUtil.nextLong());
 
-		newCommerceShippingFixedOption.setAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		newCommerceShippingFixedOption.setName(RandomTestUtil.randomString());
 
 		newCommerceShippingFixedOption.setDescription(
 			RandomTestUtil.randomString());
 
-		newCommerceShippingFixedOption.setKey(RandomTestUtil.randomString());
-
-		newCommerceShippingFixedOption.setName(RandomTestUtil.randomString());
+		newCommerceShippingFixedOption.setAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		newCommerceShippingFixedOption.setPriority(RandomTestUtil.nextDouble());
 
@@ -172,9 +165,6 @@ public class CommerceShippingFixedOptionPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommerceShippingFixedOption.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceShippingFixedOption.getMvccVersion(),
-			newCommerceShippingFixedOption.getMvccVersion());
 		Assert.assertEquals(
 			existingCommerceShippingFixedOption.
 				getCommerceShippingFixedOptionId(),
@@ -205,17 +195,14 @@ public class CommerceShippingFixedOptionPersistenceTest {
 			existingCommerceShippingFixedOption.getCommerceShippingMethodId(),
 			newCommerceShippingFixedOption.getCommerceShippingMethodId());
 		Assert.assertEquals(
-			existingCommerceShippingFixedOption.getAmount(),
-			newCommerceShippingFixedOption.getAmount());
+			existingCommerceShippingFixedOption.getName(),
+			newCommerceShippingFixedOption.getName());
 		Assert.assertEquals(
 			existingCommerceShippingFixedOption.getDescription(),
 			newCommerceShippingFixedOption.getDescription());
 		Assert.assertEquals(
-			existingCommerceShippingFixedOption.getKey(),
-			newCommerceShippingFixedOption.getKey());
-		Assert.assertEquals(
-			existingCommerceShippingFixedOption.getName(),
-			newCommerceShippingFixedOption.getName());
+			existingCommerceShippingFixedOption.getAmount(),
+			newCommerceShippingFixedOption.getAmount());
 		AssertUtils.assertEquals(
 			existingCommerceShippingFixedOption.getPriority(),
 			newCommerceShippingFixedOption.getPriority());
@@ -226,15 +213,6 @@ public class CommerceShippingFixedOptionPersistenceTest {
 		_persistence.countByCommerceShippingMethodId(RandomTestUtil.nextLong());
 
 		_persistence.countByCommerceShippingMethodId(0L);
-	}
-
-	@Test
-	public void testCountByC_K() throws Exception {
-		_persistence.countByC_K(RandomTestUtil.nextLong(), "");
-
-		_persistence.countByC_K(0L, "null");
-
-		_persistence.countByC_K(0L, (String)null);
 	}
 
 	@Test
@@ -268,12 +246,11 @@ public class CommerceShippingFixedOptionPersistenceTest {
 		getOrderByComparator() {
 
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceShippingFixedOption", "mvccVersion", true,
-			"commerceShippingFixedOptionId", true, "groupId", true, "companyId",
-			true, "userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "commerceShippingMethodId", true, "amount",
-			true, "description", true, "key", true, "name", true, "priority",
-			true);
+			"CommerceShippingFixedOption", "commerceShippingFixedOptionId",
+			true, "groupId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"commerceShippingMethodId", true, "name", true, "description", true,
+			"amount", true, "priority", true);
 	}
 
 	@Test
@@ -523,76 +500,6 @@ public class CommerceShippingFixedOptionPersistenceTest {
 		Assert.assertEquals(0, result.size());
 	}
 
-	@Test
-	public void testResetOriginalValues() throws Exception {
-		CommerceShippingFixedOption newCommerceShippingFixedOption =
-			addCommerceShippingFixedOption();
-
-		_persistence.clearCache();
-
-		_assertOriginalValues(
-			_persistence.findByPrimaryKey(
-				newCommerceShippingFixedOption.getPrimaryKey()));
-	}
-
-	@Test
-	public void testResetOriginalValuesWithDynamicQueryLoadFromDatabase()
-		throws Exception {
-
-		_testResetOriginalValuesWithDynamicQuery(true);
-	}
-
-	@Test
-	public void testResetOriginalValuesWithDynamicQueryLoadFromSession()
-		throws Exception {
-
-		_testResetOriginalValuesWithDynamicQuery(false);
-	}
-
-	private void _testResetOriginalValuesWithDynamicQuery(boolean clearSession)
-		throws Exception {
-
-		CommerceShippingFixedOption newCommerceShippingFixedOption =
-			addCommerceShippingFixedOption();
-
-		if (clearSession) {
-			Session session = _persistence.openSession();
-
-			session.flush();
-
-			session.clear();
-		}
-
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
-			CommerceShippingFixedOption.class, _dynamicQueryClassLoader);
-
-		dynamicQuery.add(
-			RestrictionsFactoryUtil.eq(
-				"commerceShippingFixedOptionId",
-				newCommerceShippingFixedOption.
-					getCommerceShippingFixedOptionId()));
-
-		List<CommerceShippingFixedOption> result =
-			_persistence.findWithDynamicQuery(dynamicQuery);
-
-		_assertOriginalValues(result.get(0));
-	}
-
-	private void _assertOriginalValues(
-		CommerceShippingFixedOption commerceShippingFixedOption) {
-
-		Assert.assertEquals(
-			Long.valueOf(commerceShippingFixedOption.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(
-				commerceShippingFixedOption, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "companyId"));
-		Assert.assertEquals(
-			commerceShippingFixedOption.getKey(),
-			ReflectionTestUtil.invoke(
-				commerceShippingFixedOption, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "key_"));
-	}
-
 	protected CommerceShippingFixedOption addCommerceShippingFixedOption()
 		throws Exception {
 
@@ -600,8 +507,6 @@ public class CommerceShippingFixedOptionPersistenceTest {
 
 		CommerceShippingFixedOption commerceShippingFixedOption =
 			_persistence.create(pk);
-
-		commerceShippingFixedOption.setMvccVersion(RandomTestUtil.nextLong());
 
 		commerceShippingFixedOption.setGroupId(RandomTestUtil.nextLong());
 
@@ -618,15 +523,13 @@ public class CommerceShippingFixedOptionPersistenceTest {
 		commerceShippingFixedOption.setCommerceShippingMethodId(
 			RandomTestUtil.nextLong());
 
-		commerceShippingFixedOption.setAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		commerceShippingFixedOption.setName(RandomTestUtil.randomString());
 
 		commerceShippingFixedOption.setDescription(
 			RandomTestUtil.randomString());
 
-		commerceShippingFixedOption.setKey(RandomTestUtil.randomString());
-
-		commerceShippingFixedOption.setName(RandomTestUtil.randomString());
+		commerceShippingFixedOption.setAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		commerceShippingFixedOption.setPriority(RandomTestUtil.nextDouble());
 

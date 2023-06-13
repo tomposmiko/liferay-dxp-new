@@ -15,7 +15,9 @@
 package com.liferay.portal.search.similar.results.web.internal.portlet;
 
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.search.similar.results.web.internal.helper.PortletPreferencesHelper;
+import com.liferay.portal.search.similar.results.web.internal.util.PortletPreferencesHelper;
+
+import java.util.Optional;
 
 import javax.portlet.PortletPreferences;
 
@@ -27,20 +29,19 @@ public class SimilarResultsPortletPreferencesImpl
 	implements SimilarResultsPortletPreferences {
 
 	public SimilarResultsPortletPreferencesImpl(
-		PortletPreferences portletPreferences) {
+		Optional<PortletPreferences> optional) {
 
-		_portletPreferencesHelper = new PortletPreferencesHelper(
-			portletPreferences);
+		_portletPreferencesHelper = new PortletPreferencesHelper(optional);
 	}
 
 	@Override
 	public String getAnalyzer() {
-		return _getStringNullable(PREFERENCE_KEY_ANALYZER);
+		return getStringNullable(PREFERENCE_KEY_ANALYZER);
 	}
 
 	@Override
 	public String getDocType() {
-		return _getStringNullable(PREFERENCE_KEY_DOC_TYPE);
+		return getStringNullable(PREFERENCE_KEY_DOC_TYPE);
 	}
 
 	@Override
@@ -51,23 +52,17 @@ public class SimilarResultsPortletPreferencesImpl
 
 	@Override
 	public String getFields() {
-		return _getStringNullable(PREFERENCE_KEY_FIELDS);
+		return getStringNullable(PREFERENCE_KEY_FIELDS);
 	}
 
 	@Override
 	public String getIndexName() {
-		return _getStringNullable(PREFERENCE_KEY_INDEX_NAME);
-	}
-
-	@Override
-	public String getLinkBehavior() {
-		return _portletPreferencesHelper.getString(
-			PREFERENCE_KEY_LINK_BEHAVIOR, "show-content");
+		return getStringNullable(PREFERENCE_KEY_INDEX_NAME);
 	}
 
 	@Override
 	public Integer getMaxDocFrequency() {
-		return _getIntegerNullable(PREFERENCE_KEY_MAX_DOC_FREQUENCY);
+		return getIntegerNullable(PREFERENCE_KEY_MAX_DOC_FREQUENCY);
 	}
 
 	@Override
@@ -78,62 +73,58 @@ public class SimilarResultsPortletPreferencesImpl
 
 	@Override
 	public Integer getMaxQueryTerms() {
-		return _getIntegerNullable(PREFERENCE_KEY_MAX_QUERY_TERMS);
+		return getIntegerNullable(PREFERENCE_KEY_MAX_QUERY_TERMS);
 	}
 
 	@Override
 	public Integer getMaxWordLength() {
-		return _getIntegerNullable(PREFERENCE_KEY_MAX_WORD_LENGTH);
+		return getIntegerNullable(PREFERENCE_KEY_MAX_WORD_LENGTH);
 	}
 
 	@Override
 	public Integer getMinDocFrequency() {
-		return _getIntegerNullable(PREFERENCE_KEY_MIN_DOC_FREQUENCY);
+		return getIntegerNullable(PREFERENCE_KEY_MIN_DOC_FREQUENCY);
 	}
 
 	@Override
 	public String getMinShouldMatch() {
-		return _getStringNullable(PREFERENCE_KEY_MIN_SHOULD_MATCH);
+		return getStringNullable(PREFERENCE_KEY_MIN_SHOULD_MATCH);
 	}
 
 	@Override
 	public Integer getMinTermFrequency() {
-		return _getIntegerNullable(PREFERENCE_KEY_MIN_TERM_FREQUENCY);
+		return getIntegerNullable(PREFERENCE_KEY_MIN_TERM_FREQUENCY);
 	}
 
 	@Override
 	public Integer getMinWordLength() {
-		return _getIntegerNullable(PREFERENCE_KEY_MIN_WORD_LENGTH);
-	}
-
-	@Override
-	public String getSearchScope() {
-		return _portletPreferencesHelper.getString(
-			PREFERENCE_KEY_SEARCH_SCOPE, "this-site");
+		return getIntegerNullable(PREFERENCE_KEY_MIN_WORD_LENGTH);
 	}
 
 	@Override
 	public String getStopWords() {
-		return _getStringNullable(PREFERENCE_KEY_STOP_WORDS);
+		return getStringNullable(PREFERENCE_KEY_STOP_WORDS);
 	}
 
 	@Override
 	public Float getTermBoost() {
-		String string = _portletPreferencesHelper.getString(
+		Optional<String> optional = _portletPreferencesHelper.getString(
 			PREFERENCE_KEY_TERM_BOOST);
 
-		if (string == null) {
-			return null;
-		}
-
-		return GetterUtil.getFloat(string);
+		return optional.map(
+			GetterUtil::getFloat
+		).orElse(
+			null
+		);
 	}
 
-	private Integer _getIntegerNullable(String key) {
-		return _portletPreferencesHelper.getInteger(key);
+	protected Integer getIntegerNullable(String key) {
+		Optional<Integer> optional = _portletPreferencesHelper.getInteger(key);
+
+		return optional.orElse(null);
 	}
 
-	private String _getStringNullable(String key) {
+	protected String getStringNullable(String key) {
 		return _portletPreferencesHelper.getString(key, null);
 	}
 

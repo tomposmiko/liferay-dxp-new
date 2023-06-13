@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Activate local live staging") {
@@ -26,7 +26,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,7 +35,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-127548. The changes of web content won't be shown in Content Display in live site until publish to live."
-	@priority = 4
+	@priority = "4"
 	test PublishEditedWebContentToLive {
 		task ("Add a web content based on Basic Web Content") {
 			JSONWebcontent.addWebContent(
@@ -70,7 +70,7 @@ definition {
 				webContentContent = "Web Content Content",
 				webContentTitle = "Web Content Title");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the displayed content at view mode in staging site") {
@@ -79,7 +79,6 @@ definition {
 				siteName = "Test Site Name Staging");
 
 			AssertTextEquals(
-				index = 1,
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content");
 		}
@@ -96,7 +95,6 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertTextEquals(
-				index = 1,
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content");
 		}
@@ -117,7 +115,6 @@ definition {
 				siteName = "Test site Name Staging");
 
 			AssertTextEquals(
-				index = 1,
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content Edit");
 		}
@@ -128,7 +125,6 @@ definition {
 				siteName = "Test site Name");
 
 			AssertTextEquals(
-				index = 1,
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content");
 		}
@@ -149,14 +145,13 @@ definition {
 				siteName = "Test site Name");
 
 			AssertTextEquals(
-				index = 1,
 				locator1 = "WCD#WEB_CONTENT_CONTENT",
 				value1 = "Web Content Content Edit");
 		}
 	}
 
 	@description = "This is a test for LPS-101248. Can select a custom web content template as a "Template" for web content selected in Content Display when enable live."
-	@priority = 2
+	@priority = "2"
 	test SelectCustomWebContentTemplateInContentDisplay {
 		task ("Add a web content based on Basic Web Content") {
 			JSONWebcontent.addWebContent(
@@ -176,7 +171,7 @@ definition {
 			WebContentTemplates.addCP(
 				structureName = "Basic Web Content",
 				templateName = "WC Template Name",
-				templateScript = ${templateScript});
+				templateScript = "${templateScript}");
 		}
 
 		task ("Add a content page based on Blank") {
@@ -208,7 +203,7 @@ definition {
 				key_content = "//a[contains(.,'Web Content Content')]",
 				locator1 = "WCD#WEB_CONTENT_CONTENT_ANY");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the web content is shown in Content Display") {

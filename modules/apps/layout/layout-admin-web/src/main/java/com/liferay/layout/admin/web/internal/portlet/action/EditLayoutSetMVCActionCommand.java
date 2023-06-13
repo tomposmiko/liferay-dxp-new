@@ -14,33 +14,23 @@
 
 package com.liferay.layout.admin.web.internal.portlet.action;
 
-import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
-import com.liferay.client.extension.model.ClientExtensionEntryRel;
-import com.liferay.client.extension.service.ClientExtensionEntryRelLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.LayoutSetService;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -54,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
 		"mvc.command.name=/layout_admin/edit_layout_set"
@@ -80,167 +71,20 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 
 		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(layoutSetId);
 
-		_updateClientExtensions(actionRequest, layoutSet, themeDisplay);
-
-		_updateLogo(actionRequest, liveGroupId, stagingGroupId, privateLayout);
+		updateLogo(actionRequest, liveGroupId, stagingGroupId, privateLayout);
 
 		updateLookAndFeel(
 			actionRequest, themeDisplay.getCompanyId(), liveGroupId,
 			stagingGroupId, privateLayout, layoutSet.getSettingsProperties());
 
-		_updateMergePages(actionRequest, liveGroupId);
+		updateMergePages(actionRequest, liveGroupId);
 
-		_updateSettings(
+		updateSettings(
 			actionRequest, liveGroupId, stagingGroupId, privateLayout,
 			layoutSet.getSettingsProperties());
 	}
 
-	protected void updateLookAndFeel(
-			ActionRequest actionRequest, long companyId, long liveGroupId,
-			long stagingGroupId, boolean privateLayout,
-			UnicodeProperties typeSettingsUnicodeProperties)
-		throws Exception {
-
-		long groupId = liveGroupId;
-
-		if (stagingGroupId > 0) {
-			groupId = stagingGroupId;
-		}
-
-		_updateLookAndFeel(
-			actionRequest, companyId, groupId, privateLayout,
-			typeSettingsUnicodeProperties);
-
-		if (privateLayout) {
-			return;
-		}
-
-		Group group = _groupLocalService.getGroup(groupId);
-
-		if (!group.hasPrivateLayouts()) {
-			_updateLookAndFeel(
-				actionRequest, companyId, groupId, true,
-				typeSettingsUnicodeProperties);
-		}
-	}
-
-	private void _addClientExtensionEntryRel(
-			String cetExternalReferenceCode, LayoutSet layoutSet, String type,
-			long userId, ServiceContext serviceContext)
-		throws Exception {
-
-		if (Validator.isNotNull(cetExternalReferenceCode)) {
-			ClientExtensionEntryRel clientExtensionEntryRel =
-				_clientExtensionEntryRelLocalService.
-					fetchClientExtensionEntryRelByExternalReferenceCode(
-						cetExternalReferenceCode, layoutSet.getCompanyId());
-
-			if (clientExtensionEntryRel == null) {
-				_clientExtensionEntryRelLocalService.
-					deleteClientExtensionEntryRels(
-						_portal.getClassNameId(LayoutSet.class),
-						layoutSet.getLayoutSetId(), type);
-
-				_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
-					userId, layoutSet.getGroupId(),
-					_portal.getClassNameId(LayoutSet.class),
-					layoutSet.getLayoutSetId(), cetExternalReferenceCode, type,
-					StringPool.BLANK, serviceContext);
-			}
-		}
-		else {
-			_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
-				_portal.getClassNameId(LayoutSet.class),
-				layoutSet.getLayoutSetId(), type);
-		}
-	}
-
-	private void _updateClientExtensions(
-			ActionRequest actionRequest, LayoutSet layoutSet,
-			ThemeDisplay themeDisplay)
-		throws Exception {
-
-		_groupPermission.check(
-			themeDisplay.getPermissionChecker(), layoutSet.getGroupId(),
-			ActionKeys.MANAGE_LAYOUTS);
-
-		String themeFaviconCETExternalReferenceCode = ParamUtil.getString(
-			actionRequest, "themeFaviconCETExternalReferenceCode");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			actionRequest);
-
-		_addClientExtensionEntryRel(
-			themeFaviconCETExternalReferenceCode, layoutSet,
-			ClientExtensionEntryConstants.TYPE_THEME_FAVICON,
-			themeDisplay.getUserId(), serviceContext);
-
-		_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
-			_portal.getClassNameId(LayoutSet.class), layoutSet.getLayoutSetId(),
-			ClientExtensionEntryConstants.TYPE_GLOBAL_CSS);
-
-		String[] globalCSSCETExternalReferenceCodes = ParamUtil.getStringValues(
-			actionRequest, "globalCSSCETExternalReferenceCodes");
-
-		for (String globalCSSCETExternalReferenceCode :
-				globalCSSCETExternalReferenceCodes) {
-
-			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
-				themeDisplay.getUserId(), layoutSet.getGroupId(),
-				_portal.getClassNameId(LayoutSet.class),
-				layoutSet.getLayoutSetId(), globalCSSCETExternalReferenceCode,
-				ClientExtensionEntryConstants.TYPE_GLOBAL_CSS, StringPool.BLANK,
-				serviceContext);
-		}
-
-		_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
-			_portal.getClassNameId(LayoutSet.class), layoutSet.getLayoutSetId(),
-			ClientExtensionEntryConstants.TYPE_GLOBAL_JS);
-
-		String[] globalJSCETExternalReferenceCodes = ParamUtil.getStringValues(
-			actionRequest, "globalJSCETExternalReferenceCodes");
-
-		for (String globalJSCETExternalReferenceCode :
-				globalJSCETExternalReferenceCodes) {
-
-			String[] typeSettings = StringUtil.split(
-				globalJSCETExternalReferenceCode, StringPool.UNDERLINE);
-
-			UnicodeProperties typeSettingsUnicodeProperties =
-				UnicodePropertiesBuilder.create(
-					true
-				).put(
-					"loadType", typeSettings[1]
-				).put(
-					"scriptLocation", typeSettings[2]
-				).build();
-
-			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
-				themeDisplay.getUserId(), layoutSet.getGroupId(),
-				_portal.getClassNameId(LayoutSet.class),
-				layoutSet.getLayoutSetId(), typeSettings[0],
-				ClientExtensionEntryConstants.TYPE_GLOBAL_JS,
-				typeSettingsUnicodeProperties.toString(), serviceContext);
-		}
-
-		String themeCSSCETExternalReferenceCode = ParamUtil.getString(
-			actionRequest, "themeCSSCETExternalReferenceCode");
-
-		_addClientExtensionEntryRel(
-			themeCSSCETExternalReferenceCode, layoutSet,
-			ClientExtensionEntryConstants.TYPE_THEME_CSS,
-			themeDisplay.getUserId(), serviceContext);
-
-		String themeSpritemapCETExternalReferenceCode = ParamUtil.getString(
-			actionRequest, "themeSpritemapCETExternalReferenceCode");
-
-		_addClientExtensionEntryRel(
-			themeSpritemapCETExternalReferenceCode, layoutSet,
-			ClientExtensionEntryConstants.TYPE_THEME_SPRITEMAP,
-			themeDisplay.getUserId(), serviceContext);
-	}
-
-	private void _updateLogo(
+	protected void updateLogo(
 			ActionRequest actionRequest, long liveGroupId, long stagingGroupId,
 			boolean privateLayout)
 		throws Exception {
@@ -267,41 +111,45 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 			groupId, privateLayout, !deleteLogo, logoBytes);
 	}
 
-	private void _updateLookAndFeel(
-			ActionRequest actionRequest, long companyId, long groupId,
-			boolean privateLayout,
+	protected void updateLookAndFeel(
+			ActionRequest actionRequest, long companyId, long liveGroupId,
+			long stagingGroupId, boolean privateLayout,
 			UnicodeProperties typeSettingsUnicodeProperties)
 		throws Exception {
 
-		String deviceThemeId = ParamUtil.getString(
-			actionRequest, "regularThemeId");
-		String deviceColorSchemeId = ParamUtil.getString(
-			actionRequest, "regularColorSchemeId");
-		String deviceCss = ParamUtil.getString(actionRequest, "regularCss");
+		String[] devices = StringUtil.split(
+			ParamUtil.getString(actionRequest, "devices"));
 
-		if (Validator.isNotNull(deviceThemeId)) {
-			long layoutId = ParamUtil.getLong(actionRequest, "layoutId");
+		for (String device : devices) {
+			String deviceThemeId = ParamUtil.getString(
+				actionRequest, device + "ThemeId");
+			String deviceColorSchemeId = ParamUtil.getString(
+				actionRequest, device + "ColorSchemeId");
+			String deviceCss = ParamUtil.getString(
+				actionRequest, device + "Css");
 
-			deviceColorSchemeId = ActionUtil.getColorSchemeId(
-				companyId, deviceThemeId, deviceColorSchemeId);
+			if (Validator.isNotNull(deviceThemeId)) {
+				deviceColorSchemeId = ActionUtil.getColorSchemeId(
+					companyId, deviceThemeId, deviceColorSchemeId);
 
-			ActionUtil.updateThemeSettingsProperties(
-				actionRequest, companyId, groupId, layoutId, privateLayout,
-				typeSettingsUnicodeProperties, deviceThemeId, false);
+				ActionUtil.updateThemeSettingsProperties(
+					actionRequest, companyId, typeSettingsUnicodeProperties,
+					device, deviceThemeId, false);
+			}
+
+			long groupId = liveGroupId;
+
+			if (stagingGroupId > 0) {
+				groupId = stagingGroupId;
+			}
+
+			_layoutSetService.updateLookAndFeel(
+				groupId, privateLayout, deviceThemeId, deviceColorSchemeId,
+				deviceCss);
 		}
-
-		_layoutSetService.updateLookAndFeel(
-			groupId, privateLayout, deviceThemeId, deviceColorSchemeId,
-			deviceCss);
-
-		long faviconFileEntryId = ParamUtil.getLong(
-			actionRequest, "faviconFileEntryId");
-
-		_layoutSetService.updateFaviconFileEntryId(
-			groupId, privateLayout, faviconFileEntryId);
 	}
 
-	private void _updateMergePages(
+	protected void updateMergePages(
 			ActionRequest actionRequest, long liveGroupId)
 		throws Exception {
 
@@ -319,7 +167,7 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 		_groupService.updateGroup(liveGroupId, liveGroup.getTypeSettings());
 	}
 
-	private void _updateSettings(
+	protected void updateSettings(
 			ActionRequest actionRequest, long liveGroupId, long stagingGroupId,
 			boolean privateLayout, UnicodeProperties settingsUnicodeProperties)
 		throws Exception {
@@ -341,17 +189,10 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	@Reference
-	private ClientExtensionEntryRelLocalService
-		_clientExtensionEntryRelLocalService;
-
-	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private GroupPermission _groupPermission;
 
 	@Reference
 	private GroupService _groupService;
@@ -361,8 +202,5 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private LayoutSetService _layoutSetService;
-
-	@Reference
-	private Portal _portal;
 
 }

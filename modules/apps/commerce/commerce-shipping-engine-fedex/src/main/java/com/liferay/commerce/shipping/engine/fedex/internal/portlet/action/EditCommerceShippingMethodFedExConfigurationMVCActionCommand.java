@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
@@ -43,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
 		"mvc.command.name=/commerce_shipping_methods/edit_commerce_shipping_method_fedex_configuration"
@@ -78,13 +78,7 @@ public class EditCommerceShippingMethodFedExConfigurationMVCActionCommand
 			for (Map.Entry<String, String> entry :
 					unicodeProperties.entrySet()) {
 
-				String value = entry.getValue();
-
-				if (value.equals(Portal.TEMP_OBFUSCATION_VALUE)) {
-					continue;
-				}
-
-				modifiableSettings.setValue(entry.getKey(), value);
+				modifiableSettings.setValue(entry.getKey(), entry.getValue());
 			}
 
 			modifiableSettings.store();

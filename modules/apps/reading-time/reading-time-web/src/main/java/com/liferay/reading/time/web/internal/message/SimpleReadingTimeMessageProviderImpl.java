@@ -14,7 +14,7 @@
 
 package com.liferay.reading.time.web.internal.message;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.reading.time.message.ReadingTimeMessageProvider;
 import com.liferay.reading.time.model.ReadingTimeEntry;
 
@@ -23,13 +23,12 @@ import java.time.Duration;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
  */
 @Component(
-	property = "display.style=simple",
+	immediate = true, property = "display.style=simple",
 	service = ReadingTimeMessageProvider.class
 )
 public class SimpleReadingTimeMessageProviderImpl
@@ -43,7 +42,7 @@ public class SimpleReadingTimeMessageProviderImpl
 			readingTimeInMinutes = 1;
 		}
 
-		return _language.format(
+		return LanguageUtil.format(
 			locale, (readingTimeInMinutes == 1) ? "x-minute" : "x-minutes",
 			readingTimeInMinutes);
 	}
@@ -53,8 +52,5 @@ public class SimpleReadingTimeMessageProviderImpl
 		return provide(
 			Duration.ofMillis(readingTimeEntry.getReadingTime()), locale);
 	}
-
-	@Reference
-	private Language _language;
 
 }

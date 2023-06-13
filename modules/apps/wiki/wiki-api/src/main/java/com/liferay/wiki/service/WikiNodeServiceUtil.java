@@ -44,8 +44,8 @@ public class WikiNodeServiceUtil {
 	 */
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addNode(String,
-	 String, String, ServiceContext)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addNode(String, String, String, ServiceContext)}
 	 */
 	@Deprecated
 	public static WikiNode addNode(
@@ -124,20 +124,12 @@ public class WikiNodeServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static WikiNode getWikiNodeByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws PortalException {
-
-		return getService().getWikiNodeByExternalReferenceCode(
-			groupId, externalReferenceCode);
-	}
-
 	public static void importPages(
-			long nodeId, InputStream[] inputStreams,
+			long nodeId, String importer, InputStream[] inputStreams,
 			Map<String, String[]> options)
 		throws PortalException {
 
-		getService().importPages(nodeId, inputStreams, options);
+		getService().importPages(nodeId, importer, inputStreams, options);
 	}
 
 	public static WikiNode moveNodeToTrash(long nodeId) throws PortalException {

@@ -12,76 +12,58 @@
  * details.
  */
 
-import {Collapse} from '@liferay/layout-content-page-editor-web';
 import PropTypes from 'prop-types';
-import React, {useCallback} from 'react';
+import React, {useContext} from 'react';
 
+import Collapse from './Collapse';
+import {StyleBookContext} from './StyleBookContext';
 import {FRONTEND_TOKEN_TYPES} from './constants/frontendTokenTypes';
-import {
-	useFrontendTokensValues,
-	useSaveTokenValue,
-} from './contexts/StyleBookEditorContext';
 import BooleanFrontendToken from './frontend_tokens/BooleanFrontendToken';
 import ColorFrontendToken from './frontend_tokens/ColorFrontendToken';
-import LengthFrontendToken from './frontend_tokens/LengthFrontendToken';
 import SelectFrontendToken from './frontend_tokens/SelectFrontendToken';
 import TextFrontendToken from './frontend_tokens/TextFrontendToken';
 
-export default function FrontendTokenSet({
-	frontendTokens,
-	label,
-	open,
-	tokenValues,
-}) {
-	const frontendTokensValues = useFrontendTokensValues();
-	const saveTokenValue = useSaveTokenValue();
-
-	const updateFrontendTokensValues = useCallback(
-		(frontendToken, value) => {
-			const {mappings = [], label, name} = frontendToken;
-
-			const cssVariableMapping = mappings.find(
-				(mapping) => mapping.type === 'cssVariable'
-			);
-
-			if (value) {
-				saveTokenValue({
-					label,
-					name,
-					value: {
-						cssVariableMapping: cssVariableMapping.value,
-						name: tokenValues[value]?.name,
-						value: tokenValues[value]?.value || value,
-					},
-				});
-			}
-		},
-		[saveTokenValue, tokenValues]
+export default function FrontendTokenSet({frontendTokens, label}) {
+	const {frontendTokensValues = {}, setFrontendTokensValues} = useContext(
+		StyleBookContext
 	);
 
+	const updateFrontendTokensValues = (frontendToken, value) => {
+		const {mappings = [], name} = frontendToken;
+
+		const cssVariableMapping = mappings.find(
+			(mapping) => mapping.type === 'cssVariable'
+		);
+
+		if (value) {
+			setFrontendTokensValues({
+				...frontendTokensValues,
+				[name]: {
+					cssVariableMapping: cssVariableMapping.value,
+					value,
+				},
+			});
+		}
+	};
+
 	return (
-		<Collapse label={label} open={open}>
+		<Collapse label={label}>
 			{frontendTokens.map((frontendToken) => {
 				const FrontendTokenComponent = getFrontendTokenComponent(
 					frontendToken
 				);
 
-				const props = {
-					frontendToken,
-					frontendTokensValues,
-					onValueSelect: (value) =>
-						updateFrontendTokensValues(frontendToken, value),
-					tokenValues,
-					value:
-						frontendTokensValues[frontendToken.name]?.name ||
-						frontendTokensValues[frontendToken.name]?.value ||
-						frontendToken.defaultValue,
-				};
-
 				return (
 					<FrontendTokenComponent
+						frontendToken={frontendToken}
 						key={frontendToken.name}
-						{...props}
+						onValueSelect={(value) =>
+							updateFrontendTokensValues(frontendToken, value)
+						}
+						value={
+							frontendTokensValues[frontendToken.name]?.value ||
+							frontendToken.defaultValue
+						}
 					/>
 				);
 			})}
@@ -92,10 +74,6 @@ export default function FrontendTokenSet({
 function getFrontendTokenComponent(frontendToken) {
 	if (frontendToken.editorType === 'ColorPicker') {
 		return ColorFrontendToken;
-	}
-
-	if (frontendToken.editorType === 'Length') {
-		return LengthFrontendToken;
 	}
 
 	if (frontendToken.validValues) {
@@ -115,5 +93,5 @@ FrontendTokenSet.propTypes = {
 			name: PropTypes.string.isRequired,
 		})
 	),
-	name: PropTypes.string,
+	name: PropTypes.string.isRequired,
 };

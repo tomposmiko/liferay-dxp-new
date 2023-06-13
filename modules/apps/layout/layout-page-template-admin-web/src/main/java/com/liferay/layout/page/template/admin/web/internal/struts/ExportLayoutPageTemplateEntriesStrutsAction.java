@@ -16,7 +16,8 @@ package com.liferay.layout.page.template.admin.web.internal.struts;
 
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionService;
-import com.liferay.layout.exporter.LayoutsExporter;
+import com.liferay.fragment.service.FragmentCompositionService;
+import com.liferay.layout.page.template.admin.web.internal.exporter.LayoutPageTemplatesExporter;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -24,7 +25,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.kernel.zip.ZipWriterFactory;
+import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = "path=/portal/layout_page_template/export_layout_page_template_entries",
 	service = StrutsAction.class
 )
@@ -56,9 +58,10 @@ public class ExportLayoutPageTemplateEntriesStrutsAction
 
 		long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
 
-		File file = _layoutsExporter.exportLayoutPageTemplateEntries(groupId);
+		File file = _layoutPageTemplatesExporter.exportGroupLayoutPageTemplates(
+			groupId);
 
-		ZipWriter zipWriter = _zipWriterFactory.getZipWriter(file);
+		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter(file);
 
 		List<FragmentCollection> fragmentCollections =
 			_fragmentCollectionService.getFragmentCollections(groupId);
@@ -89,12 +92,12 @@ public class ExportLayoutPageTemplateEntriesStrutsAction
 	private FragmentCollectionService _fragmentCollectionService;
 
 	@Reference
-	private LayoutsExporter _layoutsExporter;
+	private FragmentCompositionService _fragmentCompositionService;
+
+	@Reference
+	private LayoutPageTemplatesExporter _layoutPageTemplatesExporter;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private ZipWriterFactory _zipWriterFactory;
 
 }

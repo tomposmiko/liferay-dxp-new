@@ -74,6 +74,11 @@ public class VideoEditorConfigContributor extends BaseEditorConfigContributor {
 		}
 	}
 
+	@Reference(unbind = "-")
+	public void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
+	}
+
 	@Override
 	protected List<ItemSelectorReturnType> getDesiredItemSelectorReturnTypes() {
 		return Arrays.asList(new VideoEmbeddableHTMLItemSelectorReturnType());
@@ -84,7 +89,6 @@ public class VideoEditorConfigContributor extends BaseEditorConfigContributor {
 		return _itemSelector;
 	}
 
-	@Reference
 	private ItemSelector _itemSelector;
 
 }

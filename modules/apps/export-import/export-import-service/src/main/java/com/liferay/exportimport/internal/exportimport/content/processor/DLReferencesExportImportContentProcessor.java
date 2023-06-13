@@ -35,21 +35,16 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
-import com.liferay.portal.kernel.repository.friendly.url.resolver.FileEntryFriendlyURLResolver;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
@@ -76,7 +71,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gergely Mathe
  */
 @Component(
-	property = "content.processor.type=DLReferences",
+	immediate = true, property = "content.processor.type=DLReferences",
 	service = ExportImportContentProcessor.class
 )
 public class DLReferencesExportImportContentProcessor
@@ -89,7 +84,7 @@ public class DLReferencesExportImportContentProcessor
 			boolean escapeContent)
 		throws Exception {
 
-		return _replaceExportDLReferences(
+		return replaceExportDLReferences(
 			portletDataContext, stagedModel, content, exportReferencedContent);
 	}
 
@@ -99,7 +94,7 @@ public class DLReferencesExportImportContentProcessor
 			String content)
 		throws Exception {
 
-		return _replaceImportDLReferences(
+		return replaceImportDLReferences(
 			portletDataContext, stagedModel, content);
 	}
 
@@ -107,18 +102,18 @@ public class DLReferencesExportImportContentProcessor
 	public void validateContentReferences(long groupId, String content)
 		throws PortalException {
 
-		if (_isValidateDLReferences()) {
-			_validateDLReferences(groupId, content);
+		if (isValidateDLReferences()) {
+			validateDLReferences(groupId, content);
 		}
 	}
 
-	private ObjectValuePair<String, Integer>
-		_getDLReferenceEndPosObjectValuePair(
+	protected ObjectValuePair<String, Integer>
+		getDLReferenceEndPosObjectValuePair(
 			String content, int beginPos, int endPos) {
 
 		String[] stopStrings = _DL_REFERENCE_LEGACY_STOP_STRINGS;
 
-		if (!_isLegacyURL(content, beginPos)) {
+		if (!isLegacyURL(content, beginPos)) {
 			stopStrings = _DL_REFERENCE_STOP_STRINGS;
 		}
 
@@ -137,17 +132,17 @@ public class DLReferencesExportImportContentProcessor
 			content.substring(beginPos, urlPatternPos), urlPatternPos);
 	}
 
-	private Map<String, String[]> _getDLReferenceParameters(
+	protected Map<String, String[]> getDLReferenceParameters(
 		long groupId, String content, int beginPos, int endPos) {
 
 		ObjectValuePair<String, Integer> dlReferenceEndPosObjectValuePair =
-			_getDLReferenceEndPosObjectValuePair(content, beginPos, endPos);
+			getDLReferenceEndPosObjectValuePair(content, beginPos, endPos);
 
 		if (dlReferenceEndPosObjectValuePair == null) {
 			return null;
 		}
 
-		boolean legacyURL = _isLegacyURL(content, beginPos);
+		boolean legacyURL = isLegacyURL(content, beginPos);
 
 		Map<String, String[]> map = new HashMap<>();
 
@@ -168,27 +163,13 @@ public class DLReferencesExportImportContentProcessor
 				return map;
 			}
 
-			if (Objects.equals(
-					pathArray[2],
-					FriendlyURLResolverConstants.URL_SEPARATOR_Y_FILE_ENTRY)) {
-
-				map.put(
-					"friendlyURL",
-					new String[] {
-						StringUtils.substringBefore(
-							HttpComponentsUtil.decodeURL(pathArray[4]),
-							StringPool.POUND)
-					});
-				map.put("groupName", new String[] {pathArray[3]});
-			}
-			else if (Objects.equals(pathArray[2], "portlet_file_entry")) {
+			if (Objects.equals(pathArray[2], "portlet_file_entry")) {
 				map.put("groupId", new String[] {pathArray[3]});
 				map.put(
 					"title",
 					new String[] {
 						StringUtils.substringBefore(
-							HttpComponentsUtil.decodeURL(pathArray[4]),
-							StringPool.POUND)
+							_http.decodeURL(pathArray[4]), StringPool.POUND)
 					});
 			}
 			else {
@@ -200,8 +181,7 @@ public class DLReferencesExportImportContentProcessor
 						"title",
 						new String[] {
 							StringUtils.substringBefore(
-								HttpComponentsUtil.decodeURL(pathArray[4]),
-								StringPool.POUND)
+								_http.decodeURL(pathArray[4]), StringPool.POUND)
 						});
 				}
 			}
@@ -216,7 +196,7 @@ public class DLReferencesExportImportContentProcessor
 			dlReference = dlReference.substring(
 				dlReference.indexOf(CharPool.QUESTION) + 1);
 
-			map = HttpComponentsUtil.parameterMapFromString(dlReference);
+			map = _http.parameterMapFromString(dlReference);
 
 			String[] imageIds = null;
 
@@ -247,7 +227,7 @@ public class DLReferencesExportImportContentProcessor
 		return map;
 	}
 
-	private FileEntry _getFileEntry(Map<String, String[]> map) {
+	protected FileEntry getFileEntry(Map<String, String[]> map) {
 		if (MapUtil.isEmpty(map)) {
 			return null;
 		}
@@ -263,19 +243,7 @@ public class DLReferencesExportImportContentProcessor
 					uuid, groupId);
 			}
 			else {
-				if (map.containsKey("friendlyURL")) {
-					String friendlyURL = MapUtil.getString(map, "friendlyURL");
-
-					fileEntry = _resolveFileEntry(
-						MapUtil.getString(map, "groupName"), friendlyURL);
-
-					if (fileEntry == null) {
-						throw new NoSuchFileEntryException(
-							"No file entry found for friendly URL " +
-								friendlyURL);
-					}
-				}
-				else if (map.containsKey("folderId")) {
+				if (map.containsKey("folderId")) {
 					long folderId = MapUtil.getLong(map, "folderId");
 					String name = MapUtil.getString(map, "name");
 					String title = MapUtil.getString(map, "title");
@@ -290,7 +258,9 @@ public class DLReferencesExportImportContentProcessor
 									noSuchFileEntryException) {
 
 							if (_log.isDebugEnabled()) {
-								_log.debug(noSuchFileEntryException);
+								_log.debug(
+									noSuchFileEntryException,
+									noSuchFileEntryException);
 							}
 
 							fileEntry = _dlAppLocalService.getFileEntry(
@@ -321,41 +291,18 @@ public class DLReferencesExportImportContentProcessor
 			}
 		}
 		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn(exception.getMessage());
 			}
 		}
 
 		return fileEntry;
 	}
 
-	private Group _getGroup(String name) throws Exception {
-		Group group = _groupLocalService.fetchFriendlyURLGroup(
-			CompanyThreadLocal.getCompanyId(), StringPool.SLASH + name);
-
-		if (group != null) {
-			return group;
-		}
-
-		User user = _userLocalService.getUserByScreenName(
-			CompanyThreadLocal.getCompanyId(), name);
-
-		return user.getGroup();
-	}
-
-	private String _getUuid(String s) {
-		Matcher matcher = _uuidPattern.matcher(s);
-
-		String uuid = StringPool.BLANK;
-
-		while (matcher.find()) {
-			uuid = matcher.group(0);
-		}
-
-		return uuid;
-	}
-
-	private boolean _isLegacyURL(String content, int beginPos) {
+	protected boolean isLegacyURL(String content, int beginPos) {
 		if (content.startsWith("/documents/", beginPos)) {
 			return false;
 		}
@@ -363,24 +310,23 @@ public class DLReferencesExportImportContentProcessor
 		return true;
 	}
 
-	private boolean _isValidateDLReferences() {
+	protected boolean isValidateDLReferences() {
 		try {
-			ExportImportServiceConfiguration exportImportServiceConfiguration =
+			ExportImportServiceConfiguration configuration =
 				_configurationProvider.getCompanyConfiguration(
 					ExportImportServiceConfiguration.class,
 					CompanyThreadLocal.getCompanyId());
 
-			return exportImportServiceConfiguration.
-				validateFileEntryReferences();
+			return configuration.validateFileEntryReferences();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return true;
 	}
 
-	private String _replaceExportDLReferences(
+	protected String replaceExportDLReferences(
 			PortletDataContext portletDataContext, StagedModel stagedModel,
 			String content, boolean exportReferencedContent)
 		throws Exception {
@@ -420,11 +366,11 @@ public class DLReferencesExportImportContentProcessor
 			}
 
 			Map<String, String[]> dlReferenceParameters =
-				_getDLReferenceParameters(
+				getDLReferenceParameters(
 					portletDataContext.getScopeGroupId(), content,
 					beginPos + contextPath.length(), endPos);
 
-			FileEntry fileEntry = _getFileEntry(dlReferenceParameters);
+			FileEntry fileEntry = getFileEntry(dlReferenceParameters);
 
 			if (fileEntry == null) {
 				endPos = beginPos - 1;
@@ -464,16 +410,9 @@ public class DLReferencesExportImportContentProcessor
 
 				exportedReferenceSB.append("[$dl-reference=");
 				exportedReferenceSB.append(path);
-
-				if (dlReferenceParameters.containsKey("friendlyURL")) {
-					exportedReferenceSB.append("$,$include-friendly-url=true");
-				}
-				else {
-					exportedReferenceSB.append("$,$include-uuid=");
-					exportedReferenceSB.append(
-						dlReferenceParameters.containsKey("uuid"));
-				}
-
+				exportedReferenceSB.append("$,$include-uuid=");
+				exportedReferenceSB.append(
+					dlReferenceParameters.containsKey("uuid"));
 				exportedReferenceSB.append("$]");
 
 				if (fileEntry.isInTrash()) {
@@ -481,17 +420,9 @@ public class DLReferencesExportImportContentProcessor
 
 					exportedReferenceSB.append("[#dl-reference=");
 					exportedReferenceSB.append(originalReference);
-
-					if (dlReferenceParameters.containsKey("friendlyURL")) {
-						exportedReferenceSB.append(
-							"#,#include-friendly-url=true");
-					}
-					else {
-						exportedReferenceSB.append("#,#include-uuid=");
-						exportedReferenceSB.append(
-							dlReferenceParameters.containsKey("uuid"));
-					}
-
+					exportedReferenceSB.append("#,#include-uuid=");
+					exportedReferenceSB.append(
+						dlReferenceParameters.containsKey("uuid"));
 					exportedReferenceSB.append("#]");
 				}
 
@@ -528,7 +459,7 @@ public class DLReferencesExportImportContentProcessor
 		return sb.toString();
 	}
 
-	private String _replaceImportDLReferences(
+	protected String replaceImportDLReferences(
 			PortletDataContext portletDataContext, StagedModel stagedModel,
 			String content)
 		throws Exception {
@@ -562,10 +493,7 @@ public class DLReferencesExportImportContentProcessor
 			}
 
 			while (content.contains(
-						"[$dl-reference=" + path +
-							"$,$include-friendly-url=true$]") ||
-				   content.contains(
-					   "[$dl-reference=" + path + "$,$include-uuid=false$]") ||
+						"[$dl-reference=" + path + "$,$include-uuid=false$]") ||
 				   content.contains(
 					   "[$dl-reference=" + path + "$,$include-uuid=true$]")) {
 
@@ -617,8 +545,11 @@ public class DLReferencesExportImportContentProcessor
 						fileEntryId);
 				}
 				catch (PortalException portalException) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(portalException);
+					if (_log.isDebugEnabled()) {
+						_log.debug(portalException, portalException);
+					}
+					else if (_log.isWarnEnabled()) {
+						_log.warn(portalException.getMessage());
 					}
 
 					if (content.startsWith("[#dl-reference=", endPos)) {
@@ -642,15 +573,9 @@ public class DLReferencesExportImportContentProcessor
 					continue;
 				}
 
-				boolean appendVersion = false;
-
-				if (!content.contains("$include-friendly-url=true$")) {
-					appendVersion = true;
-				}
-
 				String url = _dlURLHelper.getPreviewURL(
 					importedFileEntry, importedFileEntry.getFileVersion(), null,
-					StringPool.BLANK, appendVersion, false);
+					StringPool.BLANK, false, false);
 
 				if (url.contains(StringPool.QUESTION)) {
 					url = url.substring(
@@ -660,28 +585,14 @@ public class DLReferencesExportImportContentProcessor
 				String urlWithoutUUID = url.substring(
 					0, url.lastIndexOf(StringPool.SLASH));
 
-				String exportedReferenceFriendlyURL =
-					"[$dl-reference=" + path + "$,$include-friendly-url=true$]";
 				String exportedReferenceWithoutUUID =
 					"[$dl-reference=" + path + "$,$include-uuid=false$]";
 				String exportedReferenceWithUUID =
 					"[$dl-reference=" + path + "$,$include-uuid=true$]";
 
 				if (content.startsWith("[#dl-reference=", endPos)) {
-					if (content.contains("include-friendly-url=true")) {
-						int friendlyURLPosition = content.indexOf(
-							"#,#include-friendly-url=true", beginPos);
+					endPos = content.indexOf("#,#include-uuid=", beginPos) + 2;
 
-						endPos = friendlyURLPosition + 2;
-					}
-					else {
-						endPos =
-							content.indexOf("#,#include-uuid=", beginPos) + 2;
-					}
-
-					exportedReferenceFriendlyURL =
-						content.substring(beginPos, endPos) +
-							"#include-friendly-url=true#]";
 					exportedReferenceWithoutUUID =
 						content.substring(beginPos, endPos) +
 							"#include-uuid=false#]";
@@ -690,8 +601,6 @@ public class DLReferencesExportImportContentProcessor
 							"#include-uuid=true#]";
 				}
 
-				content = StringUtil.replace(
-					content, exportedReferenceFriendlyURL, url);
 				content = StringUtil.replace(
 					content, exportedReferenceWithUUID, url);
 				content = StringUtil.replace(
@@ -702,20 +611,14 @@ public class DLReferencesExportImportContentProcessor
 		return content;
 	}
 
-	private FileEntry _resolveFileEntry(String groupName, String friendlyURL)
-		throws Exception {
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
 
-		if (_fileEntryFriendlyURLResolver == null) {
-			return null;
-		}
-
-		Group group = _getGroup(groupName);
-
-		return _fileEntryFriendlyURLResolver.resolveFriendlyURL(
-			group.getGroupId(), friendlyURL);
+		_configurationProvider = configurationProvider;
 	}
 
-	private void _validateDLReferences(long groupId, String content)
+	protected void validateDLReferences(long groupId, String content)
 		throws PortalException {
 
 		String pathContext = _portal.getPathContext();
@@ -737,7 +640,7 @@ public class DLReferencesExportImportContentProcessor
 			}
 
 			Map<String, String[]> dlReferenceParameters =
-				_getDLReferenceParameters(
+				getDLReferenceParameters(
 					groupId, content, beginPos + pathContext.length(), endPos);
 
 			if (dlReferenceParameters == null) {
@@ -746,7 +649,7 @@ public class DLReferencesExportImportContentProcessor
 				continue;
 			}
 
-			FileEntry fileEntry = _getFileEntry(dlReferenceParameters);
+			FileEntry fileEntry = getFileEntry(dlReferenceParameters);
 
 			if (fileEntry == null) {
 				boolean absolutePortalURL = false;
@@ -825,7 +728,7 @@ public class DLReferencesExportImportContentProcessor
 
 					ObjectValuePair<String, Integer>
 						dlReferenceEndPosObjectValuePair =
-							_getDLReferenceEndPosObjectValuePair(
+							getDLReferenceEndPosObjectValuePair(
 								content, beginPos, endPos);
 
 					exportImportContentValidationException.setDlReference(
@@ -841,6 +744,18 @@ public class DLReferencesExportImportContentProcessor
 
 			endPos = beginPos - 1;
 		}
+	}
+
+	private String _getUuid(String s) {
+		Matcher matcher = _uuidPattern.matcher(s);
+
+		String uuid = StringPool.BLANK;
+
+		while (matcher.find()) {
+			uuid = matcher.group(0);
+		}
+
+		return uuid;
 	}
 
 	private static final String[] _DL_REFERENCE_LEGACY_STOP_STRINGS = {
@@ -876,7 +791,6 @@ public class DLReferencesExportImportContentProcessor
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
@@ -889,15 +803,12 @@ public class DLReferencesExportImportContentProcessor
 	private DLURLHelper _dlURLHelper;
 
 	@Reference
-	private FileEntryFriendlyURLResolver _fileEntryFriendlyURLResolver;
-
-	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private Portal _portal;
+	private Http _http;
 
 	@Reference
-	private UserLocalService _userLocalService;
+	private Portal _portal;
 
 }

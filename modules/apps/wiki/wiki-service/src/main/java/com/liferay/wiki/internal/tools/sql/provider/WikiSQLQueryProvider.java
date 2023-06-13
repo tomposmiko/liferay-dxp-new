@@ -25,15 +25,15 @@ public class WikiSQLQueryProvider implements SQLQueryProvider {
 
 	@Override
 	public InputStream getIndexesSQL() {
-		return _getInputStream("META-INF/sql/indexes.sql");
+		return getInputStream("META-INF/sql/indexes.sql");
 	}
 
 	@Override
 	public InputStream getTablesSQL() {
-		return _getInputStream("META-INF/sql/tables.sql");
+		return getInputStream("META-INF/sql/tables.sql");
 	}
 
-	private InputStream _getInputStream(String path) {
+	protected InputStream getInputStream(String path) {
 		Class<?> clazz = getClass();
 
 		ClassLoader classLoader = clazz.getClassLoader();

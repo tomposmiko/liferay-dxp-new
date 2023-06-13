@@ -19,10 +19,10 @@ import com.liferay.dynamic.data.mapping.demo.data.creator.DDMFormInstanceRecordD
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
+import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
-import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -66,7 +67,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
 public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 
 	@Override
@@ -112,46 +113,23 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 			_toDate(startLocalDateTime),
 			workflowDefinition.getWorkflowDefinitionId());
 
-		for (int i = 1; i < 201; i++) {
-			try {
-				LocalDateTime plusDaysLocalDateTime =
-					startLocalDateTime.plusDays(RandomUtil.nextInt(40));
+		IntStream.range(
+			1, 201
+		).forEach(
+			i -> {
+				try {
+					LocalDateTime plusDaysLocalDateTime =
+						startLocalDateTime.plusDays(RandomUtil.nextInt(40));
 
-				LocalDateTime createLocalDateTime =
-					plusDaysLocalDateTime.plusMinutes(1);
+					LocalDateTime createLocalDateTime =
+						plusDaysLocalDateTime.plusMinutes(1);
 
-				long creatorUserId = _getRandomElement(userIds);
+					long creatorUserId = _getRandomElement(userIds);
 
-				WorkflowInstance workflowInstance = _addWorkflowInstance(
-					company.getCompanyId(), _toDate(createLocalDateTime),
-					ddmFormInstance.getFormInstanceId(), group.getGroupId(),
-					creatorUserId);
-
-				_updateCreateDateWorkflowTask(
-					company.getCompanyId(), _toDate(createLocalDateTime),
-					workflowInstance.getWorkflowInstanceId());
-
-				if (RandomUtil.nextInt(10) > 8) {
-					return;
-				}
-
-				LocalDateTime plusHoursLocalDateTime =
-					createLocalDateTime.plusHours(RandomUtil.nextInt(i));
-
-				LocalDateTime completionLocalDateTime =
-					plusHoursLocalDateTime.plusMinutes(1);
-
-				if (completionLocalDateTime.isAfter(nowLocalDateTime)) {
-					completionLocalDateTime = nowLocalDateTime;
-				}
-
-				String transitionName = _completeWorkflowTask(
-					company.getCompanyId(), _toDate(completionLocalDateTime),
-					_getRandomElement(insuranceAgentUserIds),
-					workflowInstance.getWorkflowInstanceId());
-
-				if (Objects.equals(transitionName, "Payment")) {
-					createLocalDateTime = completionLocalDateTime;
+					WorkflowInstance workflowInstance = _addWorkflowInstance(
+						company.getCompanyId(), _toDate(createLocalDateTime),
+						ddmFormInstance.getFormInstanceId(), group.getGroupId(),
+						creatorUserId);
 
 					_updateCreateDateWorkflowTask(
 						company.getCompanyId(), _toDate(createLocalDateTime),
@@ -161,75 +139,49 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 						return;
 					}
 
-					plusHoursLocalDateTime = createLocalDateTime.plusHours(
-						RandomUtil.nextInt(i));
+					LocalDateTime plusHoursLocalDateTime =
+						createLocalDateTime.plusHours(RandomUtil.nextInt(i));
 
-					completionLocalDateTime =
+					LocalDateTime completionLocalDateTime =
 						plusHoursLocalDateTime.plusMinutes(1);
 
 					if (completionLocalDateTime.isAfter(nowLocalDateTime)) {
 						completionLocalDateTime = nowLocalDateTime;
 					}
 
-					transitionName = _completeWorkflowTask(
-						company.getCompanyId(),
-						_toDate(completionLocalDateTime), creatorUserId,
-						workflowInstance.getWorkflowInstanceId());
-
-					createLocalDateTime = completionLocalDateTime;
-
-					_updateCreateDateWorkflowTask(
-						company.getCompanyId(), _toDate(createLocalDateTime),
-						workflowInstance.getWorkflowInstanceId());
-
-					if (RandomUtil.nextInt(10) > 8) {
-						return;
-					}
-
-					plusHoursLocalDateTime = createLocalDateTime.plusHours(
-						RandomUtil.nextInt(i));
-
-					completionLocalDateTime =
-						plusHoursLocalDateTime.plusMinutes(1);
-
-					if (completionLocalDateTime.isAfter(nowLocalDateTime)) {
-						completionLocalDateTime = nowLocalDateTime;
-					}
-
-					_completeWorkflowTask(
+					String transitionName = _completeWorkflowTask(
 						company.getCompanyId(),
 						_toDate(completionLocalDateTime),
-						_getRandomElement(underwriterUserIds),
-						workflowInstance.getWorkflowInstanceId());
-				}
-				else {
-					createLocalDateTime = completionLocalDateTime;
-
-					_updateCreateDateWorkflowTask(
-						company.getCompanyId(), _toDate(createLocalDateTime),
+						_getRandomElement(insuranceAgentUserIds),
 						workflowInstance.getWorkflowInstanceId());
 
-					if (RandomUtil.nextInt(10) > 8) {
-						return;
-					}
+					if (Objects.equals(transitionName, "Payment")) {
+						createLocalDateTime = completionLocalDateTime;
 
-					plusHoursLocalDateTime = createLocalDateTime.plusHours(
-						RandomUtil.nextInt(i));
+						_updateCreateDateWorkflowTask(
+							company.getCompanyId(),
+							_toDate(createLocalDateTime),
+							workflowInstance.getWorkflowInstanceId());
 
-					completionLocalDateTime =
-						plusHoursLocalDateTime.plusMinutes(1);
+						if (RandomUtil.nextInt(10) > 8) {
+							return;
+						}
 
-					if (completionLocalDateTime.isAfter(nowLocalDateTime)) {
-						completionLocalDateTime = nowLocalDateTime;
-					}
+						plusHoursLocalDateTime = createLocalDateTime.plusHours(
+							RandomUtil.nextInt(i));
 
-					transitionName = _completeWorkflowTask(
-						company.getCompanyId(),
-						_toDate(completionLocalDateTime),
-						_getRandomElement(underwriterUserIds),
-						workflowInstance.getWorkflowInstanceId());
+						completionLocalDateTime =
+							plusHoursLocalDateTime.plusMinutes(1);
 
-					if (Objects.equals(transitionName, "Approve")) {
+						if (completionLocalDateTime.isAfter(nowLocalDateTime)) {
+							completionLocalDateTime = nowLocalDateTime;
+						}
+
+						transitionName = _completeWorkflowTask(
+							company.getCompanyId(),
+							_toDate(completionLocalDateTime), creatorUserId,
+							workflowInstance.getWorkflowInstanceId());
+
 						createLocalDateTime = completionLocalDateTime;
 
 						_updateCreateDateWorkflowTask(
@@ -253,19 +205,79 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 
 						_completeWorkflowTask(
 							company.getCompanyId(),
-							_toDate(completionLocalDateTime), creatorUserId,
+							_toDate(completionLocalDateTime),
+							_getRandomElement(underwriterUserIds),
 							workflowInstance.getWorkflowInstanceId());
 					}
-				}
+					else {
+						createLocalDateTime = completionLocalDateTime;
 
-				_workflowInstanceDemoDataCreator.updateCompletionDate(
-					workflowInstance.getWorkflowInstanceId(),
-					_toDate(completionLocalDateTime));
+						_updateCreateDateWorkflowTask(
+							company.getCompanyId(),
+							_toDate(createLocalDateTime),
+							workflowInstance.getWorkflowInstanceId());
+
+						if (RandomUtil.nextInt(10) > 8) {
+							return;
+						}
+
+						plusHoursLocalDateTime = createLocalDateTime.plusHours(
+							RandomUtil.nextInt(i));
+
+						completionLocalDateTime =
+							plusHoursLocalDateTime.plusMinutes(1);
+
+						if (completionLocalDateTime.isAfter(nowLocalDateTime)) {
+							completionLocalDateTime = nowLocalDateTime;
+						}
+
+						transitionName = _completeWorkflowTask(
+							company.getCompanyId(),
+							_toDate(completionLocalDateTime),
+							_getRandomElement(underwriterUserIds),
+							workflowInstance.getWorkflowInstanceId());
+
+						if (Objects.equals(transitionName, "Approve")) {
+							createLocalDateTime = completionLocalDateTime;
+
+							_updateCreateDateWorkflowTask(
+								company.getCompanyId(),
+								_toDate(createLocalDateTime),
+								workflowInstance.getWorkflowInstanceId());
+
+							if (RandomUtil.nextInt(10) > 8) {
+								return;
+							}
+
+							plusHoursLocalDateTime =
+								createLocalDateTime.plusHours(
+									RandomUtil.nextInt(i));
+
+							completionLocalDateTime =
+								plusHoursLocalDateTime.plusMinutes(1);
+
+							if (completionLocalDateTime.isAfter(
+									nowLocalDateTime)) {
+
+								completionLocalDateTime = nowLocalDateTime;
+							}
+
+							_completeWorkflowTask(
+								company.getCompanyId(),
+								_toDate(completionLocalDateTime), creatorUserId,
+								workflowInstance.getWorkflowInstanceId());
+						}
+					}
+
+					_workflowInstanceDemoDataCreator.updateCompletionDate(
+						workflowInstance.getWorkflowInstanceId(),
+						_toDate(completionLocalDateTime));
+				}
+				catch (Exception exception) {
+					_log.error(exception, exception);
+				}
 			}
-			catch (Exception exception) {
-				_log.error(exception);
-			}
-		}
+		);
 
 		_backgroundTaskLocalService.addBackgroundTask(
 			omniAdminUser.getUserId(), group.getGroupId(),
@@ -297,6 +309,11 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 
 		_omniAdminUserDemoDataCreator.delete();
 		_siteMemberUserDemoDataCreator.delete();
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	private WorkflowInstance _addWorkflowInstance(
@@ -355,21 +372,25 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 	private List<Long> _createUsers(long groupId, Role role) throws Exception {
 		List<Long> userIds = new ArrayList<>();
 
-		for (int i = 0; i < 10; i++) {
-			try {
-				User user = _siteMemberUserDemoDataCreator.create(groupId);
+		IntStream.range(
+			0, 10
+		).forEach(
+			i -> {
+				try {
+					User user = _siteMemberUserDemoDataCreator.create(groupId);
 
-				userIds.add(user.getUserId());
+					userIds.add(user.getUserId());
 
-				if (role != null) {
-					_roleLocalService.addUserRole(
-						user.getUserId(), role.getRoleId());
+					if (role != null) {
+						_roleLocalService.addUserRole(
+							user.getUserId(), role.getRoleId());
+					}
+				}
+				catch (Exception exception) {
+					_log.error(exception, exception);
 				}
 			}
-			catch (Exception exception) {
-				_log.error(exception);
-			}
-		}
+		);
 
 		return userIds;
 	}
@@ -412,9 +433,6 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private OmniAdminUserDemoDataCreator _omniAdminUserDemoDataCreator;

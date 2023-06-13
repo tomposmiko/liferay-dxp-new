@@ -79,19 +79,19 @@ public class KBCommentResultRowSplitter implements ResultRowSplitter {
 		if (!newResultRows.isEmpty()) {
 			resultRowSplitterEntries.add(
 				new ResultRowSplitterEntry(
-					_getNewKBCommentsLabel(), newResultRows));
+					getNewKBCommentsLabel(), newResultRows));
 		}
 
 		if (!inProgressResultRows.isEmpty()) {
 			resultRowSplitterEntries.add(
 				new ResultRowSplitterEntry(
-					_getInProgressKBCommentsLabel(), inProgressResultRows));
+					getInProgressKBCommentsLabel(), inProgressResultRows));
 		}
 
 		if (!completedResultRows.isEmpty()) {
 			resultRowSplitterEntries.add(
 				new ResultRowSplitterEntry(
-					_getCompletedKBCommentsLabel(), completedResultRows));
+					getCompletedKBCommentsLabel(), completedResultRows));
 		}
 
 		if (_orderByType.equals("asc")) {
@@ -101,7 +101,7 @@ public class KBCommentResultRowSplitter implements ResultRowSplitter {
 		return resultRowSplitterEntries;
 	}
 
-	private String _getCompletedKBCommentsLabel() {
+	protected String getCompletedKBCommentsLabel() {
 		int completedKBCommentsCount = 0;
 
 		try {
@@ -120,7 +120,7 @@ public class KBCommentResultRowSplitter implements ResultRowSplitter {
 			completedKBCommentsCount);
 	}
 
-	private String _getInProgressKBCommentsLabel() {
+	protected String getInProgressKBCommentsLabel() {
 		int inProgressKBCommentsCount = 0;
 
 		try {
@@ -140,7 +140,7 @@ public class KBCommentResultRowSplitter implements ResultRowSplitter {
 			inProgressKBCommentsCount);
 	}
 
-	private String _getNewKBCommentsLabel() {
+	protected String getNewKBCommentsLabel() {
 		int newKBCommentsCount = 0;
 
 		try {

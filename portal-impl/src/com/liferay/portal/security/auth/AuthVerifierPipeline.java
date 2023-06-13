@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.auth.registry.AuthVerifierRegistry;
-import com.liferay.portal.spring.context.PortalContextLoaderListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +59,12 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class AuthVerifierPipeline {
 
 	public static final String AUTH_TYPE = "auth.type";
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #getPortalAuthVerifierPipeline()}
+	 */
+	@Deprecated
+	public static volatile AuthVerifierPipeline PORTAL_AUTH_VERIFIER_PIPELINE;
 
 	public static String getAuthVerifierPropertyName(String className) {
 		String simpleClassName = StringUtil.extractLast(
@@ -180,9 +185,10 @@ public class AuthVerifierPipeline {
 		HttpServletRequest httpServletRequest =
 			accessControlContext.getRequest();
 
-		authVerifierResult.setUserId(
-			UserLocalServiceUtil.getGuestUserId(
-				PortalUtil.getCompanyId(httpServletRequest)));
+		long defaultUserId = UserLocalServiceUtil.getDefaultUserId(
+			PortalUtil.getCompanyId(httpServletRequest));
+
+		authVerifierResult.setUserId(defaultUserId);
 
 		return authVerifierResult;
 	}
@@ -379,8 +385,7 @@ public class AuthVerifierPipeline {
 		static {
 			AuthVerifierPipeline portalAuthVerifierPipeline =
 				new AuthVerifierPipeline(
-					Collections.emptyList(),
-					PortalContextLoaderListener.getPortalServletContextPath());
+					Collections.emptyList(), PortalUtil.getPathContext());
 
 			BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
@@ -436,6 +441,8 @@ public class AuthVerifierPipeline {
 			serviceTracker.open();
 
 			_PORTAL_AUTH_VERIFIER_PIPELINE = portalAuthVerifierPipeline;
+
+			PORTAL_AUTH_VERIFIER_PIPELINE = portalAuthVerifierPipeline;
 		}
 
 	}

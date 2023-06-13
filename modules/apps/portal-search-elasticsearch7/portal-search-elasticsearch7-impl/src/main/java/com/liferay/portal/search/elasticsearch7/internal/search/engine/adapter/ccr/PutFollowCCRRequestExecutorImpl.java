@@ -41,10 +41,10 @@ public class PutFollowCCRRequestExecutorImpl
 	public PutFollowCCRResponse execute(
 		PutFollowCCRRequest putFollowCCRRequest) {
 
-		PutFollowRequest putFollowRequest = _createPutFollowRequest(
+		PutFollowRequest putFollowRequest = createPutFollowRequest(
 			putFollowCCRRequest);
 
-		PutFollowResponse putFollowResponse = _getPutFollowResponse(
+		PutFollowResponse putFollowResponse = getPutFollowResponse(
 			putFollowRequest, putFollowCCRRequest);
 
 		return new PutFollowCCRResponse(
@@ -52,7 +52,7 @@ public class PutFollowCCRRequestExecutorImpl
 			putFollowResponse.isIndexFollowingStarted());
 	}
 
-	private PutFollowRequest _createPutFollowRequest(
+	protected PutFollowRequest createPutFollowRequest(
 		PutFollowCCRRequest putFollowCCRRequest) {
 
 		if (putFollowCCRRequest.getWaitForActiveShards() != 0) {
@@ -70,7 +70,7 @@ public class PutFollowCCRRequestExecutorImpl
 			putFollowCCRRequest.getFollowerIndexName());
 	}
 
-	private PutFollowResponse _getPutFollowResponse(
+	protected PutFollowResponse getPutFollowResponse(
 		PutFollowRequest putFollowRequest,
 		PutFollowCCRRequest putFollowCCRRequest) {
 
@@ -90,7 +90,13 @@ public class PutFollowCCRRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

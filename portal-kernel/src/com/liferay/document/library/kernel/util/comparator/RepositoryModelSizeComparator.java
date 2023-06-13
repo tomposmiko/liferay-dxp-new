@@ -34,7 +34,7 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 
 	public static final String ORDER_BY_DESC = "size_ DESC";
 
-	public static final String[] ORDER_BY_FIELDS = {"size_"};
+	public static final String[] ORDER_BY_FIELDS = {"size"};
 
 	public static final String ORDER_BY_MODEL_ASC =
 		"modelFolder DESC, size_ ASC";
@@ -142,7 +142,7 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return 0;
@@ -163,10 +163,11 @@ public class RepositoryModelSizeComparator<T> extends OrderByComparator<T> {
 		else if (object instanceof DLFolder || object instanceof Folder) {
 			return 0;
 		}
+		else {
+			FileEntry fileEntry = (FileEntry)object;
 
-		FileEntry fileEntry = (FileEntry)object;
-
-		return fileEntry.getSize();
+			return fileEntry.getSize();
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

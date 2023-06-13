@@ -43,15 +43,13 @@ else {
 	<div class="lfr-form-content">
 		<aui:model-context bean="<%= commerceAvailabilityEstimate %>" model="<%= CommerceAvailabilityEstimate.class %>" />
 
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<aui:fieldset>
-					<aui:input name="title" />
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
+				<aui:input name="title" />
 
-					<aui:input name="priority" />
-				</aui:fieldset>
-			</div>
-		</div>
+				<aui:input name="priority" />
+			</aui:fieldset>
+		</aui:fieldset-group>
 	</div>
 
 	<aui:button-row>

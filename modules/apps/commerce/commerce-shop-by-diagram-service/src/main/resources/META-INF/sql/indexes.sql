@@ -1,10 +1,6 @@
-create index IX_C8B33DE2 on CSDiagramEntry (CPDefinitionId, ctCollectionId);
-create unique index IX_4748C557 on CSDiagramEntry (CPDefinitionId, sequence[$COLUMN_LENGTH:75$], ctCollectionId);
-create index IX_9D8C9924 on CSDiagramEntry (CPInstanceId, ctCollectionId);
-create index IX_6DCBA0EE on CSDiagramEntry (CProductId, ctCollectionId);
+create unique index IX_C8D3E29 on CSDiagramEntry (CPDefinitionId, sequence[$COLUMN_LENGTH:75$]);
 
-create index IX_1BC6C985 on CSDiagramPin (CPDefinitionId, ctCollectionId);
+create index IX_B0DD2127 on CSDiagramPin (CPDefinitionId);
 
-create unique index IX_4F753100 on CSDiagramSetting (CPDefinitionId, ctCollectionId);
-create index IX_CC4A82A5 on CSDiagramSetting (uuid_[$COLUMN_LENGTH:75$], companyId, ctCollectionId);
-create index IX_9B51BB9F on CSDiagramSetting (uuid_[$COLUMN_LENGTH:75$], ctCollectionId);
+create unique index IX_13D84BD2 on CSDiagramSetting (CPDefinitionId);
+create index IX_E5371A47 on CSDiagramSetting (uuid_[$COLUMN_LENGTH:75$], companyId);

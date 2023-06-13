@@ -59,7 +59,7 @@ public class GetSnapshotRepositoriesRequestExecutorImpl
 
 		try {
 			GetRepositoriesResponse elasticsearchGetRepositoriesResponse =
-				_getGetRepositoriesResponse(
+				getGetRepositoriesResponse(
 					getRepositoriesRequest, getSnapshotRepositoriesRequest);
 
 			List<RepositoryMetadata> repositoriesMetadatas =
@@ -83,7 +83,8 @@ public class GetSnapshotRepositoriesRequestExecutorImpl
 		}
 		catch (RepositoryMissingException repositoryMissingException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(repositoryMissingException);
+				_log.debug(
+					repositoryMissingException, repositoryMissingException);
 			}
 		}
 
@@ -102,7 +103,7 @@ public class GetSnapshotRepositoriesRequestExecutorImpl
 		return getRepositoriesRequest;
 	}
 
-	private GetRepositoriesResponse _getGetRepositoriesResponse(
+	protected GetRepositoriesResponse getGetRepositoriesResponse(
 		GetRepositoriesRequest getRepositoriesRequest,
 		GetSnapshotRepositoriesRequest getSnapshotRepositoriesRequest) {
 
@@ -133,10 +134,16 @@ public class GetSnapshotRepositoriesRequestExecutorImpl
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		GetSnapshotRepositoriesRequestExecutorImpl.class);
 
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

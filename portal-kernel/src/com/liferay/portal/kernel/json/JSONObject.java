@@ -21,7 +21,6 @@ import java.io.Writer;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -96,8 +95,6 @@ public interface JSONObject extends Externalizable, JSONSerializable {
 	public JSONObject putException(Exception exception);
 
 	public Object remove(String key);
-
-	public Map<String, Object> toMap();
 
 	@Override
 	public String toString();

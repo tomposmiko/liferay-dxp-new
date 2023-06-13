@@ -14,11 +14,9 @@
 
 package com.liferay.tld.formatter;
 
-import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.petra.io.unsync.UnsyncStringReader;
-import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.Dom4jUtil;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.xml.SAXReaderFactory;
 
@@ -40,10 +38,7 @@ import java.util.TreeMap;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 
 /**
  * @author Brian Wing Shun Chan
@@ -108,10 +103,6 @@ public class TLDFormatter {
 	}
 
 	private void _formatTLD(Path file) throws Exception {
-		System.setProperty(
-			"javax.xml.parsers.SAXParserFactory",
-			"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
-
 		String content = new String(
 			Files.readAllBytes(file), StandardCharsets.UTF_8);
 
@@ -138,7 +129,7 @@ public class TLDFormatter {
 			}
 		}
 
-		String newContent = _toString(document);
+		String newContent = Dom4jUtil.toString(document);
 
 		int x = newContent.indexOf("<tlib-version");
 		int y = newContent.indexOf("</taglib>");
@@ -161,7 +152,7 @@ public class TLDFormatter {
 	}
 
 	private SAXReader _getSAXReader() {
-		return SAXReaderFactory.getSAXReader(null, false, true);
+		return SAXReaderFactory.getSAXReader(null, false, false);
 	}
 
 	private void _sortElements(
@@ -182,31 +173,6 @@ public class TLDFormatter {
 
 			parentElement.add(element);
 		}
-	}
-
-	private String _toString(Node node) throws Exception {
-		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
-			new UnsyncByteArrayOutputStream();
-
-		OutputFormat outputFormat = new OutputFormat(StringPool.TAB, true);
-
-		outputFormat.setOmitEncoding(true);
-		outputFormat.setPadText(true);
-		outputFormat.setTrimText(true);
-
-		XMLWriter xmlWriter = new XMLWriter(
-			unsyncByteArrayOutputStream, outputFormat);
-
-		xmlWriter.write(node);
-
-		String content = StringUtil.trimTrailing(
-			unsyncByteArrayOutputStream.toString(StringPool.UTF8));
-
-		while (content.contains(" \n")) {
-			content = StringUtil.replace(content, " \n", "\n");
-		}
-
-		return content;
 	}
 
 	private final Set<String> _modifiedFileNames = new HashSet<>();

@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
 import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil;
 import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil.Synchronizer;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.Language;
@@ -40,6 +38,7 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.FastDateFormatConstants;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -50,7 +49,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -58,6 +56,7 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.Serializable;
@@ -307,7 +306,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -477,7 +476,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -656,7 +655,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -796,7 +795,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -1044,7 +1043,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -1175,6 +1174,20 @@ public class LanguageImpl implements Language, Serializable {
 		return companyLocalesBag.getByLanguageCode(languageCode);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getResourceBundleLoader}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.util.ResourceBundleLoader
+		getPortalResourceBundleLoader() {
+
+		ResourceBundleLoader resourceBundleLoader = getResourceBundleLoader();
+
+		return locale -> resourceBundleLoader.loadResourceBundle(locale);
+	}
+
 	@Override
 	public ResourceBundleLoader getResourceBundleLoader() {
 		return LanguageResources.PORTAL_RESOURCE_BUNDLE_LOADER;
@@ -1291,7 +1304,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -1434,7 +1447,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -1560,7 +1573,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -1702,20 +1715,19 @@ public class LanguageImpl implements Language, Serializable {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		Cookie languageIdCookie = new Cookie(
-			CookiesConstants.NAME_GUEST_LANGUAGE_ID, languageId);
+			CookieKeys.GUEST_LANGUAGE_ID, languageId);
 
-		String domain = CookiesManagerUtil.getDomain(httpServletRequest);
+		String domain = CookieKeys.getDomain(httpServletRequest);
 
 		if (Validator.isNotNull(domain)) {
 			languageIdCookie.setDomain(domain);
 		}
 
-		languageIdCookie.setMaxAge(CookiesConstants.MAX_AGE);
+		languageIdCookie.setMaxAge(CookieKeys.MAX_AGE);
 		languageIdCookie.setPath(StringPool.SLASH);
 
-		CookiesManagerUtil.addCookie(
-			CookiesConstants.CONSENT_TYPE_FUNCTIONAL, languageIdCookie,
-			httpServletRequest, httpServletResponse);
+		CookieKeys.addCookie(
+			httpServletRequest, httpServletResponse, languageIdCookie);
 	}
 
 	private static CompanyLocalesBag _getCompanyLocalesBag() {
@@ -1759,7 +1771,7 @@ public class LanguageImpl implements Language, Serializable {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -2076,7 +2088,7 @@ public class LanguageImpl implements Language, Serializable {
 					// LPS-52675
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(systemException);
+						_log.debug(systemException, systemException);
 					}
 
 					languageIds = PropsValues.LOCALES_ENABLED;
@@ -2090,17 +2102,13 @@ public class LanguageImpl implements Language, Serializable {
 			if ((companyId != CompanyConstants.SYSTEM) &&
 				!ArrayUtil.contains(languageIds, defaultLanguageId)) {
 
-				User guestUser = UserLocalServiceUtil.fetchGuestUser(companyId);
+				User defaultUser = UserLocalServiceUtil.fetchDefaultUser(
+					companyId);
 
-				if (guestUser != null) {
-					Locale guestUserLocale = guestUser.getLocale();
+				if (defaultUser.getLocale() != null) {
+					defaultLocale = defaultUser.getLocale();
 
-					if (guestUserLocale != null) {
-						defaultLocale = guestUserLocale;
-
-						defaultLanguageId = LocaleUtil.toLanguageId(
-							defaultLocale);
-					}
+					defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 				}
 			}
 

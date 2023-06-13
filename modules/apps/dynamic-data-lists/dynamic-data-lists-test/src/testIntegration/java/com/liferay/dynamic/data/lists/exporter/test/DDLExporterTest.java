@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -575,13 +576,15 @@ public class DDLExporterTest {
 	}
 
 	protected String createDocumentLibraryDDMFormFieldValue() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "file.txt",
 			ContentTypes.TEXT_PLAIN, TestDataConstants.TEST_BYTE_ARRAY, null,
-			null,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			null, serviceContext);
 
 		return JSONUtil.put(
 			"groupId", fileEntry.getGroupId()
@@ -605,7 +608,7 @@ public class DDLExporterTest {
 	}
 
 	protected String createLinkToPageDDMFormFieldValue() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(
+		Layout layout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), "Link to Page content", false);
 
 		return JSONUtil.put(

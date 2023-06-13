@@ -14,13 +14,25 @@
 
 package com.liferay.commerce.order.web.internal.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.order.web.internal.constants.CommerceOrderScreenNavigationConstants;
+import com.liferay.commerce.model.CommerceOrderItem;
+import com.liferay.commerce.order.web.internal.servlet.taglib.ui.constants.CommerceOrderScreenNavigationConstants;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.taglib.util.CustomAttributesUtil;
+
+import java.io.IOException;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,11 +41,16 @@ import org.osgi.service.component.annotations.Reference;
  * @author Ethan Bustad
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=20",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=20",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CommerceOrderItemDetailsCustomFieldsScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<CommerceOrderItem> {
 
 	@Override
 	public String getCategoryKey() {
@@ -42,11 +59,16 @@ public class CommerceOrderItemDetailsCustomFieldsScreenNavigationCategory
 	}
 
 	@Override
+	public String getEntryKey() {
+		return getCategoryKey();
+	}
+
+	@Override
 	public String getLabel(Locale locale) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return language.get(resourceBundle, getCategoryKey());
+		return LanguageUtil.get(resourceBundle, getCategoryKey());
 	}
 
 	@Override
@@ -55,7 +77,40 @@ public class CommerceOrderItemDetailsCustomFieldsScreenNavigationCategory
 			SCREEN_NAVIGATION_KEY_COMMERCE_ORDER_ITEM_GENERAL;
 	}
 
+	@Override
+	public boolean isVisible(User user, CommerceOrderItem commerceOrderItem) {
+		boolean hasCustomAttributesAvailable = false;
+
+		try {
+			hasCustomAttributesAvailable =
+				CustomAttributesUtil.hasCustomAttributes(
+					user.getCompanyId(), CommerceOrderItem.class.getName(),
+					commerceOrderItem.getCommerceOrderItemId(), null);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+
+		return hasCustomAttributesAvailable;
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		_jspRenderer.renderJSP(
+			httpServletRequest, httpServletResponse,
+			"/commerce_order_item/custom_fields.jsp");
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CommerceOrderItemDetailsCustomFieldsScreenNavigationCategory.class);
+
 	@Reference
-	protected Language language;
+	private JSPRenderer _jspRenderer;
 
 }

@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class FragmentEntryStagedModelDataHandler
 	extends BaseStagedModelDataHandler<FragmentEntry> {
 
@@ -97,23 +97,12 @@ public class FragmentEntryStagedModelDataHandler
 			PortletDataContext.REFERENCE_TYPE_PARENT);
 
 		if (fragmentEntry.getPreviewFileEntryId() > 0) {
-			try {
-				FileEntry fileEntry =
-					PortletFileRepositoryUtil.getPortletFileEntry(
-						fragmentEntry.getPreviewFileEntryId());
+			FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
+				fragmentEntry.getPreviewFileEntryId());
 
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, fragmentEntry, fileEntry,
-					PortletDataContext.REFERENCE_TYPE_WEAK);
-			}
-			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to export file entry " +
-							fragmentEntry.getPreviewFileEntryId(),
-						portalException);
-				}
-			}
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, fragmentEntry, fileEntry,
+				PortletDataContext.REFERENCE_TYPE_WEAK);
 		}
 
 		String html =
@@ -171,11 +160,13 @@ public class FragmentEntryStagedModelDataHandler
 
 		importedFragmentEntry.setGroupId(portletDataContext.getScopeGroupId());
 		importedFragmentEntry.setFragmentCollectionId(fragmentCollectionId);
-		importedFragmentEntry.setHtml(
+
+		String html =
 			_dlReferencesExportImportContentProcessor.
 				replaceImportContentReferences(
-					portletDataContext, fragmentEntry,
-					fragmentEntry.getHtml()));
+					portletDataContext, fragmentEntry, fragmentEntry.getHtml());
+
+		importedFragmentEntry.setHtml(html);
 
 		FragmentEntry existingFragmentEntry =
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
@@ -197,17 +188,7 @@ public class FragmentEntryStagedModelDataHandler
 				portletDataContext, importedFragmentEntry);
 		}
 
-		if ((fragmentEntry.getPreviewFileEntryId() == 0) &&
-			(importedFragmentEntry.getPreviewFileEntryId() > 0)) {
-
-			PortletFileRepositoryUtil.deletePortletFileEntry(
-				importedFragmentEntry.getPreviewFileEntryId());
-
-			importedFragmentEntry =
-				_fragmentEntryLocalService.updateFragmentEntry(
-					importedFragmentEntry.getFragmentEntryId(), 0);
-		}
-		else if (fragmentEntry.getPreviewFileEntryId() > 0) {
+		if (fragmentEntry.getPreviewFileEntryId() > 0) {
 			Map<Long, Long> fileEntryIds =
 				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 					FileEntry.class);

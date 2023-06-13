@@ -15,7 +15,8 @@
 package com.liferay.headless.commerce.admin.order.internal.resource.v1_0;
 
 import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryService;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.commerce.order.rule.exception.NoSuchCOREntryException;
 import com.liferay.commerce.order.rule.model.COREntry;
 import com.liferay.commerce.order.rule.model.COREntryRel;
@@ -23,18 +24,19 @@ import com.liferay.commerce.order.rule.service.COREntryRelService;
 import com.liferay.commerce.order.rule.service.COREntryService;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderRule;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderRuleAccount;
+import com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderRuleAccountDTOConverter;
 import com.liferay.headless.commerce.admin.order.resource.v1_0.OrderRuleAccountResource;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Map;
 
@@ -46,6 +48,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Marco Leo
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/order-rule-account.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, OrderRuleAccountResource.class}
@@ -74,7 +77,7 @@ public class OrderRuleAccountResourceImpl
 		}
 
 		return Page.of(
-			transform(
+			TransformUtil.transform(
 				_corEntryRelService.getAccountEntryCOREntryRels(
 					corEntry.getCOREntryId(), null,
 					pagination.getStartPosition(), pagination.getEndPosition()),
@@ -99,7 +102,7 @@ public class OrderRuleAccountResourceImpl
 		}
 
 		return Page.of(
-			transform(
+			TransformUtil.transform(
 				_corEntryRelService.getAccountEntryCOREntryRels(
 					id, search, pagination.getStartPosition(),
 					pagination.getEndPosition()),
@@ -123,11 +126,12 @@ public class OrderRuleAccountResourceImpl
 					externalReferenceCode);
 		}
 
-		AccountEntry accountEntry = _getAccountEntry(orderRuleAccount);
+		CommerceAccount commerceAccount = _getCommerceAccount(orderRuleAccount);
 
 		return _toOrderRuleAccount(
 			_corEntryRelService.addCOREntryRel(
-				AccountEntry.class.getName(), accountEntry.getAccountEntryId(),
+				AccountEntry.class.getName(),
+				commerceAccount.getCommerceAccountId(),
 				corEntry.getCOREntryId()));
 	}
 
@@ -136,31 +140,12 @@ public class OrderRuleAccountResourceImpl
 			Long id, OrderRuleAccount orderRuleAccount)
 		throws Exception {
 
-		AccountEntry accountEntry = _getAccountEntry(orderRuleAccount);
+		CommerceAccount commerceAccount = _getCommerceAccount(orderRuleAccount);
 
 		return _toOrderRuleAccount(
 			_corEntryRelService.addCOREntryRel(
-				AccountEntry.class.getName(), accountEntry.getAccountEntryId(),
-				id));
-	}
-
-	private AccountEntry _getAccountEntry(OrderRuleAccount orderRuleAccount)
-		throws Exception {
-
-		AccountEntry accountEntry = null;
-
-		if (orderRuleAccount.getAccountId() > 0) {
-			accountEntry = _accountEntryService.getAccountEntry(
-				orderRuleAccount.getAccountId());
-		}
-		else {
-			accountEntry =
-				_accountEntryService.fetchAccountEntryByExternalReferenceCode(
-					contextCompany.getCompanyId(),
-					orderRuleAccount.getAccountExternalReferenceCode());
-		}
-
-		return accountEntry;
+				AccountEntry.class.getName(),
+				commerceAccount.getCommerceAccountId(), id));
 	}
 
 	private Map<String, Map<String, String>> _getActions(
@@ -173,6 +158,26 @@ public class OrderRuleAccountResourceImpl
 				"UPDATE", corEntryRel.getCOREntryRelId(),
 				"deleteOrderRuleAccount", _corEntryRelModelResourcePermission)
 		).build();
+	}
+
+	private CommerceAccount _getCommerceAccount(
+			OrderRuleAccount orderRuleAccount)
+		throws Exception {
+
+		CommerceAccount commerceAccount = null;
+
+		if (orderRuleAccount.getAccountId() > 0) {
+			commerceAccount = _commerceAccountService.getCommerceAccount(
+				orderRuleAccount.getAccountId());
+		}
+		else {
+			commerceAccount =
+				_commerceAccountService.fetchByExternalReferenceCode(
+					contextCompany.getCompanyId(),
+					orderRuleAccount.getAccountExternalReferenceCode());
+		}
+
+		return commerceAccount;
 	}
 
 	private OrderRuleAccount _toOrderRuleAccount(COREntryRel corEntryRel)
@@ -188,7 +193,7 @@ public class OrderRuleAccountResourceImpl
 	}
 
 	@Reference
-	private AccountEntryService _accountEntryService;
+	private CommerceAccountService _commerceAccountService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.order.rule.model.COREntryRel)"
@@ -205,10 +210,7 @@ public class OrderRuleAccountResourceImpl
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderRuleAccountDTOConverter)"
-	)
-	private DTOConverter<COREntryRel, OrderRuleAccount>
-		_orderRuleAccountDTOConverter;
+	@Reference
+	private OrderRuleAccountDTOConverter _orderRuleAccountDTOConverter;
 
 }

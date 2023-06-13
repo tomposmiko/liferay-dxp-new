@@ -20,7 +20,7 @@ import com.liferay.commerce.product.content.render.list.CPContentListRendererReg
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
 import com.liferay.commerce.product.content.search.web.internal.display.context.CPSearchResultsDisplayContext;
 import com.liferay.commerce.product.content.util.CPContentHelper;
-import com.liferay.commerce.product.type.CPTypeRegistry;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-cp-search-results",
@@ -64,8 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/search_results/view.jsp",
 		"javax.portlet.name=" + CPPortletKeys.CP_SEARCH_RESULTS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -87,7 +87,7 @@ public class CPSearchResultsPortlet extends MVCPortlet {
 				new CPSearchResultsDisplayContext(
 					_cpContentListEntryRendererRegistry,
 					_cpContentListRendererRegistry, _cpDefinitionHelper,
-					_cpTypeRegistry, httpServletRequest,
+					_cpTypeServicesTracker, httpServletRequest,
 					portletSharedSearchResponse);
 
 			renderRequest.setAttribute(
@@ -97,7 +97,7 @@ public class CPSearchResultsPortlet extends MVCPortlet {
 				CPContentWebKeys.CP_CONTENT_HELPER, _cpContentHelper);
 		}
 		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
+			_log.error(configurationException, configurationException);
 		}
 
 		super.render(renderRequest, renderResponse);
@@ -120,7 +120,7 @@ public class CPSearchResultsPortlet extends MVCPortlet {
 	private CPDefinitionHelper _cpDefinitionHelper;
 
 	@Reference
-	private CPTypeRegistry _cpTypeRegistry;
+	private CPTypeServicesTracker _cpTypeServicesTracker;
 
 	@Reference
 	private Portal _portal;

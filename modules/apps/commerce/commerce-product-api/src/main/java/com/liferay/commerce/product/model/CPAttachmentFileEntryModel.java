@@ -19,11 +19,9 @@ import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LocalizedModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 import java.util.Locale;
@@ -44,8 +42,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CPAttachmentFileEntryModel
-	extends AttachedModel, BaseModel<CPAttachmentFileEntry>,
-			CTModel<CPAttachmentFileEntry>, LocalizedModel, MVCCModel,
+	extends AttachedModel, BaseModel<CPAttachmentFileEntry>, LocalizedModel,
 			ShardedModel, StagedGroupedModel, WorkflowedModel {
 
 	/*
@@ -59,7 +56,6 @@ public interface CPAttachmentFileEntryModel
 	 *
 	 * @return the primary key of this cp attachment file entry
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -67,40 +63,7 @@ public interface CPAttachmentFileEntryModel
 	 *
 	 * @param primaryKey the primary key of this cp attachment file entry
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this cp attachment file entry.
-	 *
-	 * @return the mvcc version of this cp attachment file entry
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this cp attachment file entry.
-	 *
-	 * @param mvccVersion the mvcc version of this cp attachment file entry
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this cp attachment file entry.
-	 *
-	 * @return the ct collection ID of this cp attachment file entry
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this cp attachment file entry.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp attachment file entry
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this cp attachment file entry.
@@ -699,9 +662,5 @@ public interface CPAttachmentFileEntryModel
 
 	@Override
 	public CPAttachmentFileEntry cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

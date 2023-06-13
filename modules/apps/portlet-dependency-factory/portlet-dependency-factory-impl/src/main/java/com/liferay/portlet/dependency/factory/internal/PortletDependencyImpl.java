@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.model.portlet.PortletDependency;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilder;
-import com.liferay.portal.url.builder.facet.BuildableAbsolutePortalURLBuilder;
+import com.liferay.portal.url.builder.BuildableAbsolutePortalURLBuilder;
 import com.liferay.portal.util.PropsValues;
 
 /**
@@ -37,7 +37,7 @@ public class PortletDependencyImpl implements PortletDependency {
 		_markup = markup;
 		_absolutePortalURLBuilder = absolutePortalURLBuilder;
 
-		if (name == null) {
+		if (_name == null) {
 			_type = Type.OTHER;
 		}
 		else if (_name.endsWith(".css")) {

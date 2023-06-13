@@ -32,10 +32,10 @@ if (Validator.isNotNull(assetCategoryIdsString)) {
 
 String accountIds = "[]";
 
-AccountEntry accountEntry = commerceContext.getAccountEntry();
+CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
 
-if (accountEntry != null) {
-	accountIds = jsonSerializer.serializeDeep(new Long[] {accountEntry.getAccountEntryId()});
+if (commerceAccount != null) {
+	accountIds = jsonSerializer.serializeDeep(new Long[] {commerceAccount.getCommerceAccountId()});
 }
 %>
 
@@ -50,6 +50,8 @@ if (accountEntry != null) {
 				'/o/headless-commerce-machine-learning/v1.0/accountCategoryForecasts/by-monthlyRevenue',
 			accountIds: <%= accountIds %>,
 			categoryIds: <%= categoryIds %>,
+			noAccountErrorMessage: Liferay.Language.get('no-account-selected'),
+			noDataErrorMessage: Liferay.Language.get('no-data-available'),
 			portletId: '<%= portletDisplay.getId() %>',
 		});
 	</aui:script>

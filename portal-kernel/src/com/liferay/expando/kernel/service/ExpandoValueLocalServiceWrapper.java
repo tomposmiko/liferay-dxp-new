@@ -30,10 +30,6 @@ public class ExpandoValueLocalServiceWrapper
 	implements ExpandoValueLocalService,
 			   ServiceWrapper<ExpandoValueLocalService> {
 
-	public ExpandoValueLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ExpandoValueLocalServiceWrapper(
 		ExpandoValueLocalService expandoValueLocalService) {
 

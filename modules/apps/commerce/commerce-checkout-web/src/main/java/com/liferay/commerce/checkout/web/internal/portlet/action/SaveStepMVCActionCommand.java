@@ -16,10 +16,10 @@ package com.liferay.commerce.checkout.web.internal.portlet.action;
 
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.util.CommerceCheckoutStep;
-import com.liferay.commerce.util.CommerceCheckoutStepRegistry;
+import com.liferay.commerce.util.CommerceCheckoutStepServicesTracker;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_CHECKOUT,
 		"mvc.command.name=/commerce_checkout/save_step"
@@ -58,12 +59,12 @@ public class SaveStepMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		if (!SessionErrors.isEmpty(actionRequest)) {
-			return _getPortletURL(
+			return getPortletURL(
 				actionRequest, actionResponse, checkoutStepName);
 		}
 
 		CommerceCheckoutStep commerceCheckoutStep =
-			_commerceCheckoutStepRegistry.getNextCommerceCheckoutStep(
+			_commerceCheckoutStepServicesTracker.getNextCommerceCheckoutStep(
 				checkoutStepName, _portal.getHttpServletRequest(actionRequest),
 				_portal.getHttpServletResponse(actionResponse));
 
@@ -71,7 +72,7 @@ public class SaveStepMVCActionCommand extends BaseMVCActionCommand {
 			return ParamUtil.getString(actionRequest, "redirect");
 		}
 
-		return _getPortletURL(
+		return getPortletURL(
 			actionRequest, actionResponse, commerceCheckoutStep.getName());
 	}
 
@@ -84,7 +85,7 @@ public class SaveStepMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "checkoutStepName");
 
 		CommerceCheckoutStep commerceCheckoutStep =
-			_commerceCheckoutStepRegistry.getCommerceCheckoutStep(
+			_commerceCheckoutStepServicesTracker.getCommerceCheckoutStep(
 				checkoutStepName);
 
 		commerceCheckoutStep.processAction(actionRequest, actionResponse);
@@ -97,7 +98,7 @@ public class SaveStepMVCActionCommand extends BaseMVCActionCommand {
 		sendRedirect(actionRequest, actionResponse, redirect);
 	}
 
-	private String _getPortletURL(
+	protected String getPortletURL(
 		ActionRequest actionRequest, ActionResponse actionResponse,
 		String checkoutStepName) {
 
@@ -112,7 +113,8 @@ public class SaveStepMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	@Reference
-	private CommerceCheckoutStepRegistry _commerceCheckoutStepRegistry;
+	private CommerceCheckoutStepServicesTracker
+		_commerceCheckoutStepServicesTracker;
 
 	@Reference
 	private Portal _portal;

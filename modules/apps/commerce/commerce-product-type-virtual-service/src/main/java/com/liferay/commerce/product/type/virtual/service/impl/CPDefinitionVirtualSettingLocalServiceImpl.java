@@ -18,6 +18,7 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
+import com.liferay.commerce.product.service.CProductLocalService;
 import com.liferay.commerce.product.type.virtual.exception.CPDefinitionVirtualSettingException;
 import com.liferay.commerce.product.type.virtual.exception.CPDefinitionVirtualSettingFileEntryIdException;
 import com.liferay.commerce.product.type.virtual.exception.CPDefinitionVirtualSettingSampleException;
@@ -33,31 +34,22 @@ import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.product.type.virtual.model.CPDefinitionVirtualSetting",
-	service = AopService.class
-)
 public class CPDefinitionVirtualSettingLocalServiceImpl
 	extends CPDefinitionVirtualSettingLocalServiceBaseImpl {
 
@@ -72,7 +64,7 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(serviceContext.getUserId());
+		User user = userLocalService.getUser(serviceContext.getUserId());
 		long groupId = serviceContext.getScopeGroupId();
 
 		if (Validator.isNotNull(url)) {
@@ -108,7 +100,7 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 			termsOfUseJournalArticleResourcePrimKey = 0;
 		}
 
-		_validate(
+		validate(
 			fileEntryId, url, useSample, sampleFileEntryId, sampleUrl,
 			termsOfUseRequired, termsOfUseContentMap,
 			termsOfUseJournalArticleResourcePrimKey);
@@ -206,9 +198,10 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 			CPDefinitionVirtualSetting newCPDefinitionVirtualSetting =
 				(CPDefinitionVirtualSetting)cpDefinitionVirtualSetting.clone();
 
-			newCPDefinitionVirtualSetting.setUuid(_portalUUID.generate());
+			newCPDefinitionVirtualSetting.setUuid(PortalUUIDUtil.generate());
 			newCPDefinitionVirtualSetting.setCPDefinitionVirtualSettingId(
 				counterLocalService.increment());
+
 			newCPDefinitionVirtualSetting.setClassPK(newCPDefinitionId);
 
 			cpDefinitionVirtualSettingLocalService.
@@ -221,7 +214,7 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 			String className, long classPK)
 		throws PortalException {
 
-		long classNameId = _classNameLocalService.getClassNameId(className);
+		long classNameId = classNameLocalService.getClassNameId(className);
 
 		CPDefinitionVirtualSetting cpDefinitionVirtualSetting =
 			cpDefinitionVirtualSettingPersistence.fetchByC_C(
@@ -272,7 +265,7 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 		String className, long classPK) {
 
 		return cpDefinitionVirtualSettingPersistence.fetchByC_C(
-			_classNameLocalService.getClassNameId(className), classPK);
+			classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
@@ -281,7 +274,7 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 		throws PortalException {
 
 		return cpDefinitionVirtualSettingPersistence.fetchByC_C(
-			_classNameLocalService.getClassNameId(className), classPK);
+			classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
@@ -332,14 +325,14 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 			termsOfUseJournalArticleResourcePrimKey = 0;
 		}
 
-		_validate(
+		validate(
 			fileEntryId, url, useSample, sampleFileEntryId, sampleUrl,
 			termsOfUseRequired, termsOfUseContentMap,
 			termsOfUseJournalArticleResourcePrimKey);
 
-		long cpDefinitionClassNameId = _classNameLocalService.getClassNameId(
+		long cpDefinitionClassNameId = classNameLocalService.getClassNameId(
 			CPDefinition.class);
-		long cpInstanceClassNameId = _classNameLocalService.getClassNameId(
+		long cpInstanceClassNameId = classNameLocalService.getClassNameId(
 			CPInstance.class);
 
 		if ((cpDefinitionVirtualSetting.getClassNameId() ==
@@ -421,7 +414,7 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 				false, serviceContext);
 	}
 
-	private void _validate(
+	protected void validate(
 			long fileEntryId, String url, boolean useSample,
 			long sampleFileEntryId, String sampleUrl,
 			boolean termsOfUseRequired,
@@ -496,25 +489,19 @@ public class CPDefinitionVirtualSettingLocalServiceImpl
 		}
 	}
 
-	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
+	@ServiceReference(type = CPDefinitionLocalService.class)
 	private CPDefinitionLocalService _cpDefinitionLocalService;
 
-	@Reference
+	@ServiceReference(type = CPInstanceLocalService.class)
 	private CPInstanceLocalService _cpInstanceLocalService;
 
-	@Reference
+	@ServiceReference(type = CProductLocalService.class)
+	private CProductLocalService _cProductLocalService;
+
+	@ServiceReference(type = DLAppLocalService.class)
 	private DLAppLocalService _dlAppLocalService;
 
-	@Reference
+	@ServiceReference(type = JournalArticleLocalService.class)
 	private JournalArticleLocalService _journalArticleLocalService;
-
-	@Reference
-	private PortalUUID _portalUUID;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

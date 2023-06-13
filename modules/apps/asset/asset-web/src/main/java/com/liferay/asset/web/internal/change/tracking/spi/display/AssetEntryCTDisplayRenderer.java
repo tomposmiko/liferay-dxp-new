@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author David Truong
  */
-@Component(service = CTDisplayRenderer.class)
+@Component(immediate = true, service = CTDisplayRenderer.class)
 public class AssetEntryCTDisplayRenderer
 	extends BaseCTDisplayRenderer<AssetEntry> {
 

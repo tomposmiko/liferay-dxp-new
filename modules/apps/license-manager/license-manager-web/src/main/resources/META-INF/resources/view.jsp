@@ -16,19 +16,11 @@
 
 <%@ include file="/init.jsp" %>
 
-<clay:navigation-bar
-	navigationItems='<%=
-		new JSPNavigationItemList(pageContext) {
-			{
-				add(
-					navigationItem -> {
-						navigationItem.setActive(true);
-						navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "licenses"));
-					});
-			}
-		}
-	%>'
-/>
+<aui:nav-bar cssClass="navbar-expand navbar-underline navigation-bar navigation-bar-light" markupView="lexicon">
+	<aui:nav collapsible="<%= false %>" cssClass="navbar-nav">
+		<aui:nav-item label="licenses" selected="<%= true %>" />
+	</aui:nav>
+</aui:nav-bar>
 
 <clay:container-fluid
 	cssClass="container-form-lg"

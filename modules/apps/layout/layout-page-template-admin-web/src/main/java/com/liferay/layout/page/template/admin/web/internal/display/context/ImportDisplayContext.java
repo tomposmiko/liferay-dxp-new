@@ -14,8 +14,8 @@
 
 package com.liferay.layout.page.template.admin.web.internal.display.context;
 
-import com.liferay.layout.importer.LayoutsImporterResultEntry;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporterResultEntry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.RenderRequest;
 
@@ -49,37 +51,46 @@ public class ImportDisplayContext {
 			"some-page-templates-could-not-be-imported-but-other-page-" +
 				"templates-were-imported-correctly-or-with-warnings";
 
-		Map<Integer, List<LayoutsImporterResultEntry>>
-			importedLayoutsImporterResultEntriesMap =
-				getImportedLayoutsImporterResultEntriesMap();
+		Map<Integer, List<LayoutPageTemplatesImporterResultEntry>>
+			importedLayoutPageTemplatesImporterResultEntriesMap =
+				getImportedLayoutPageTemplatesImporterResultEntriesMap();
 
-		List<LayoutsImporterResultEntry>
-			layoutsImporterResultEntriesWithWarnings =
-				getLayoutsImporterResultEntriesWithWarnings();
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntriesWithWarnings =
+				getLayoutPageTemplatesImporterResultEntriesWithWarnings();
 
-		List<LayoutsImporterResultEntry>
-			notImportedLayoutsImporterResultEntries =
-				getNotImportedLayoutsImporterResultEntries();
+		List<LayoutPageTemplatesImporterResultEntry>
+			notImportedLayoutPageTemplatesImporterResultEntries =
+				getNotImportedLayoutPageTemplatesImporterResultEntries();
 
-		if (MapUtil.isNotEmpty(importedLayoutsImporterResultEntriesMap) &&
-			ListUtil.isNotEmpty(layoutsImporterResultEntriesWithWarnings) &&
-			ListUtil.isEmpty(notImportedLayoutsImporterResultEntries)) {
+		if (MapUtil.isNotEmpty(
+				importedLayoutPageTemplatesImporterResultEntriesMap) &&
+			ListUtil.isNotEmpty(
+				layoutPageTemplatesImporterResultEntriesWithWarnings) &&
+			ListUtil.isEmpty(
+				notImportedLayoutPageTemplatesImporterResultEntries)) {
 
 			dialogMessage =
 				"some-page-templates-were-imported-correctly-and-other-page-" +
 					"templates-were-imported-with-warnings";
 		}
-		else if (ListUtil.isEmpty(layoutsImporterResultEntriesWithWarnings) &&
-				 ListUtil.isEmpty(notImportedLayoutsImporterResultEntries)) {
+		else if (ListUtil.isEmpty(
+					layoutPageTemplatesImporterResultEntriesWithWarnings) &&
+				 ListUtil.isEmpty(
+					 notImportedLayoutPageTemplatesImporterResultEntries)) {
 
 			dialogMessage = "all-page-templates-were-imported-correctly";
 		}
-		else if (MapUtil.isEmpty(importedLayoutsImporterResultEntriesMap) &&
-				 ListUtil.isEmpty(layoutsImporterResultEntriesWithWarnings)) {
+		else if (MapUtil.isEmpty(
+					importedLayoutPageTemplatesImporterResultEntriesMap) &&
+				 ListUtil.isEmpty(
+					 layoutPageTemplatesImporterResultEntriesWithWarnings)) {
 
 			dialogMessage = "no-page-template-could-be-imported";
 		}
-		else if (MapUtil.isEmpty(importedLayoutsImporterResultEntriesMap)) {
+		else if (MapUtil.isEmpty(
+					importedLayoutPageTemplatesImporterResultEntriesMap)) {
+
 			dialogMessage = "some-page-templates-were-imported-with-warnings";
 		}
 
@@ -87,14 +98,18 @@ public class ImportDisplayContext {
 	}
 
 	public String getDialogType() {
-		if (MapUtil.isEmpty(getImportedLayoutsImporterResultEntriesMap()) &&
-			ListUtil.isEmpty(getLayoutsImporterResultEntriesWithWarnings())) {
+		if (MapUtil.isEmpty(
+				getImportedLayoutPageTemplatesImporterResultEntriesMap()) &&
+			ListUtil.isEmpty(
+				getLayoutPageTemplatesImporterResultEntriesWithWarnings())) {
 
 			return "danger";
 		}
 
-		if (ListUtil.isEmpty(getNotImportedLayoutsImporterResultEntries()) &&
-			ListUtil.isEmpty(getLayoutsImporterResultEntriesWithWarnings())) {
+		if (ListUtil.isEmpty(
+				getNotImportedLayoutPageTemplatesImporterResultEntries()) &&
+			ListUtil.isEmpty(
+				getLayoutPageTemplatesImporterResultEntriesWithWarnings())) {
 
 			return "success";
 		}
@@ -102,185 +117,220 @@ public class ImportDisplayContext {
 		return "warning";
 	}
 
-	public Map<Integer, List<LayoutsImporterResultEntry>>
-		getImportedLayoutsImporterResultEntriesMap() {
+	public Map<Integer, List<LayoutPageTemplatesImporterResultEntry>>
+		getImportedLayoutPageTemplatesImporterResultEntriesMap() {
 
-		if (_importedLayoutsImporterResultEntriesMap != null) {
-			return _importedLayoutsImporterResultEntriesMap;
+		if (_importedLayoutPageTemplatesImporterResultEntriesMap != null) {
+			return _importedLayoutPageTemplatesImporterResultEntriesMap;
 		}
 
-		Map<LayoutsImporterResultEntry.Status, List<LayoutsImporterResultEntry>>
-			layoutsImporterResultEntryMap = getLayoutsImporterResultEntryMap();
+		Map
+			<LayoutPageTemplatesImporterResultEntry.Status,
+			 List<LayoutPageTemplatesImporterResultEntry>>
+				layoutPageTemplatesImporterResultEntryMap =
+					getLayoutPageTemplatesImporterResultEntryMap();
 
-		if (MapUtil.isEmpty(layoutsImporterResultEntryMap)) {
+		if (MapUtil.isEmpty(layoutPageTemplatesImporterResultEntryMap)) {
 			return null;
 		}
 
-		List<LayoutsImporterResultEntry> layoutsImporterResultEntries =
-			layoutsImporterResultEntryMap.get(
-				LayoutsImporterResultEntry.Status.IMPORTED);
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries =
+				layoutPageTemplatesImporterResultEntryMap.get(
+					LayoutPageTemplatesImporterResultEntry.Status.IMPORTED);
 
-		if (layoutsImporterResultEntries == null) {
+		if (layoutPageTemplatesImporterResultEntries == null) {
 			return null;
 		}
 
-		Map<Integer, List<LayoutsImporterResultEntry>>
-			typeLayoutsImporterResultEntryMap = new HashMap<>();
+		Map<Integer, List<LayoutPageTemplatesImporterResultEntry>>
+			typeLayoutPageTemplatesImporterResultEntryMap = new HashMap<>();
 
-		for (LayoutsImporterResultEntry layoutsImporterResultEntry :
-				layoutsImporterResultEntries) {
+		for (LayoutPageTemplatesImporterResultEntry
+				layoutPageTemplatesImporterResultEntry :
+					layoutPageTemplatesImporterResultEntries) {
 
 			if (ArrayUtil.isNotEmpty(
-					layoutsImporterResultEntry.getWarningMessages())) {
+					layoutPageTemplatesImporterResultEntry.
+						getWarningMessages())) {
 
 				continue;
 			}
 
-			List<LayoutsImporterResultEntry> typeLayoutsImporterResultEntries =
-				new ArrayList<>();
+			List<LayoutPageTemplatesImporterResultEntry>
+				typeLayoutPageTemplatesImporterResultEntries =
+					new ArrayList<>();
 
-			int type = layoutsImporterResultEntry.getType();
+			int type = layoutPageTemplatesImporterResultEntry.getType();
 
-			if (typeLayoutsImporterResultEntryMap.get(type) != null) {
-				typeLayoutsImporterResultEntries =
-					typeLayoutsImporterResultEntryMap.get(type);
+			if (typeLayoutPageTemplatesImporterResultEntryMap.get(type) !=
+					null) {
+
+				typeLayoutPageTemplatesImporterResultEntries =
+					typeLayoutPageTemplatesImporterResultEntryMap.get(type);
 			}
 
-			typeLayoutsImporterResultEntries.add(layoutsImporterResultEntry);
+			typeLayoutPageTemplatesImporterResultEntries.add(
+				layoutPageTemplatesImporterResultEntry);
 
-			typeLayoutsImporterResultEntryMap.put(
-				type, typeLayoutsImporterResultEntries);
+			typeLayoutPageTemplatesImporterResultEntryMap.put(
+				type, typeLayoutPageTemplatesImporterResultEntries);
 		}
 
-		_importedLayoutsImporterResultEntriesMap =
-			typeLayoutsImporterResultEntryMap;
+		_importedLayoutPageTemplatesImporterResultEntriesMap =
+			typeLayoutPageTemplatesImporterResultEntryMap;
 
-		return _importedLayoutsImporterResultEntriesMap;
+		return _importedLayoutPageTemplatesImporterResultEntriesMap;
 	}
 
-	public List<LayoutsImporterResultEntry>
-		getLayoutsImporterResultEntriesWithWarnings() {
+	public List<LayoutPageTemplatesImporterResultEntry>
+		getLayoutPageTemplatesImporterResultEntriesWithWarnings() {
 
-		if (_layoutsImporterResultEntriesWithWarnings != null) {
-			return _layoutsImporterResultEntriesWithWarnings;
+		if (_layoutPageTemplatesImporterResultEntriesWithWarnings != null) {
+			return _layoutPageTemplatesImporterResultEntriesWithWarnings;
 		}
 
-		Map<LayoutsImporterResultEntry.Status, List<LayoutsImporterResultEntry>>
-			layoutsImporterResultEntryMap = getLayoutsImporterResultEntryMap();
+		Map
+			<LayoutPageTemplatesImporterResultEntry.Status,
+			 List<LayoutPageTemplatesImporterResultEntry>>
+				layoutPageTemplatesImporterResultEntryMap =
+					getLayoutPageTemplatesImporterResultEntryMap();
 
-		if (MapUtil.isEmpty(layoutsImporterResultEntryMap)) {
+		if (MapUtil.isEmpty(layoutPageTemplatesImporterResultEntryMap)) {
 			return null;
 		}
 
-		List<LayoutsImporterResultEntry> layoutsImporterResultEntries =
-			layoutsImporterResultEntryMap.get(
-				LayoutsImporterResultEntry.Status.IMPORTED);
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries =
+				layoutPageTemplatesImporterResultEntryMap.get(
+					LayoutPageTemplatesImporterResultEntry.Status.IMPORTED);
 
-		if (layoutsImporterResultEntries == null) {
+		if (layoutPageTemplatesImporterResultEntries == null) {
 			return null;
 		}
 
-		_layoutsImporterResultEntriesWithWarnings = ListUtil.filter(
-			layoutsImporterResultEntries,
-			layoutsImporterResultEntry -> ArrayUtil.isNotEmpty(
-				layoutsImporterResultEntry.getWarningMessages()));
+		Stream<LayoutPageTemplatesImporterResultEntry> stream =
+			layoutPageTemplatesImporterResultEntries.stream();
 
-		return _layoutsImporterResultEntriesWithWarnings;
+		_layoutPageTemplatesImporterResultEntriesWithWarnings = stream.filter(
+			layoutPageTemplatesImporterResultEntry -> ArrayUtil.isNotEmpty(
+				layoutPageTemplatesImporterResultEntry.getWarningMessages())
+		).collect(
+			Collectors.toList()
+		);
+
+		return _layoutPageTemplatesImporterResultEntriesWithWarnings;
 	}
 
 	public Map
-		<LayoutsImporterResultEntry.Status, List<LayoutsImporterResultEntry>>
-			getLayoutsImporterResultEntryMap() {
+		<LayoutPageTemplatesImporterResultEntry.Status,
+		 List<LayoutPageTemplatesImporterResultEntry>>
+			getLayoutPageTemplatesImporterResultEntryMap() {
 
-		if (MapUtil.isNotEmpty(_layoutsImporterResultEntryMap)) {
-			return _layoutsImporterResultEntryMap;
+		if (MapUtil.isNotEmpty(_layoutPageTemplatesImporterResultEntryMap)) {
+			return _layoutPageTemplatesImporterResultEntryMap;
 		}
 
-		List<LayoutsImporterResultEntry> layoutsImporterResultEntries =
-			(List<LayoutsImporterResultEntry>)SessionMessages.get(
-				_renderRequest, "layoutsImporterResultEntries");
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries =
+				(List<LayoutPageTemplatesImporterResultEntry>)
+					SessionMessages.get(
+						_renderRequest,
+						"layoutPageTemplatesImporterResultEntries");
 
-		if (layoutsImporterResultEntries == null) {
+		if (layoutPageTemplatesImporterResultEntries == null) {
 			return null;
 		}
 
-		_layoutsImporterResultEntryMap = new HashMap<>();
+		_layoutPageTemplatesImporterResultEntryMap = new HashMap<>();
 
-		for (LayoutsImporterResultEntry layoutsImporterResultEntry :
-				layoutsImporterResultEntries) {
+		for (LayoutPageTemplatesImporterResultEntry
+				layoutPageTemplatesImporterResultEntry :
+					layoutPageTemplatesImporterResultEntries) {
 
-			List<LayoutsImporterResultEntry>
-				statusLayoutsImporterResultEntries = new ArrayList<>();
+			List<LayoutPageTemplatesImporterResultEntry>
+				statusLayoutPageTemplatesImporterResultEntries =
+					new ArrayList<>();
 
-			LayoutsImporterResultEntry.Status status =
-				layoutsImporterResultEntry.getStatus();
+			LayoutPageTemplatesImporterResultEntry.Status status =
+				layoutPageTemplatesImporterResultEntry.getStatus();
 
-			if (_layoutsImporterResultEntryMap.get(status) != null) {
-				statusLayoutsImporterResultEntries =
-					_layoutsImporterResultEntryMap.get(status);
+			if (_layoutPageTemplatesImporterResultEntryMap.get(status) !=
+					null) {
+
+				statusLayoutPageTemplatesImporterResultEntries =
+					_layoutPageTemplatesImporterResultEntryMap.get(status);
 			}
 
-			statusLayoutsImporterResultEntries.add(layoutsImporterResultEntry);
+			statusLayoutPageTemplatesImporterResultEntries.add(
+				layoutPageTemplatesImporterResultEntry);
 
-			_layoutsImporterResultEntryMap.put(
-				status, statusLayoutsImporterResultEntries);
+			_layoutPageTemplatesImporterResultEntryMap.put(
+				status, statusLayoutPageTemplatesImporterResultEntries);
 		}
 
-		return _layoutsImporterResultEntryMap;
+		return _layoutPageTemplatesImporterResultEntryMap;
 	}
 
-	public List<LayoutsImporterResultEntry>
-		getNotImportedLayoutsImporterResultEntries() {
+	public List<LayoutPageTemplatesImporterResultEntry>
+		getNotImportedLayoutPageTemplatesImporterResultEntries() {
 
-		if (_notImportedLayoutsImporterResultEntries != null) {
-			return _notImportedLayoutsImporterResultEntries;
+		if (_notImportedLayoutPageTemplatesImporterResultEntries != null) {
+			return _notImportedLayoutPageTemplatesImporterResultEntries;
 		}
 
-		Map<LayoutsImporterResultEntry.Status, List<LayoutsImporterResultEntry>>
-			layoutsImporterResultEntryMap = getLayoutsImporterResultEntryMap();
+		Map
+			<LayoutPageTemplatesImporterResultEntry.Status,
+			 List<LayoutPageTemplatesImporterResultEntry>>
+				layoutPageTemplatesImporterResultEntryMap =
+					getLayoutPageTemplatesImporterResultEntryMap();
 
-		if (MapUtil.isEmpty(layoutsImporterResultEntryMap)) {
+		if (MapUtil.isEmpty(layoutPageTemplatesImporterResultEntryMap)) {
 			return null;
 		}
 
-		List<LayoutsImporterResultEntry>
-			notImportedLayoutsImporterResultEntries = new ArrayList<>();
+		List<LayoutPageTemplatesImporterResultEntry>
+			notImportedLayoutPageTemplatesImporterResultEntries =
+				new ArrayList<>();
 
 		for (Map.Entry
-				<LayoutsImporterResultEntry.Status,
-				 List<LayoutsImporterResultEntry>> entrySet :
-					layoutsImporterResultEntryMap.entrySet()) {
+				<LayoutPageTemplatesImporterResultEntry.Status,
+				 List<LayoutPageTemplatesImporterResultEntry>> entrySet :
+					layoutPageTemplatesImporterResultEntryMap.entrySet()) {
 
 			if (entrySet.getKey() !=
-					LayoutsImporterResultEntry.Status.IMPORTED) {
+					LayoutPageTemplatesImporterResultEntry.Status.IMPORTED) {
 
-				notImportedLayoutsImporterResultEntries.addAll(
+				notImportedLayoutPageTemplatesImporterResultEntries.addAll(
 					entrySet.getValue());
 			}
 		}
 
-		return notImportedLayoutsImporterResultEntries;
+		return notImportedLayoutPageTemplatesImporterResultEntries;
 	}
 
 	public String getSuccessMessage(
-		Map.Entry<Integer, List<LayoutsImporterResultEntry>> entrySet) {
+		Map.Entry<Integer, List<LayoutPageTemplatesImporterResultEntry>>
+			entrySet) {
 
-		List<LayoutsImporterResultEntry> layoutsImporterResultEntries =
-			entrySet.getValue();
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries = entrySet.getValue();
 
 		return LanguageUtil.format(
 			_httpServletRequest, "x-x-s-imported-correctly",
 			new Object[] {
-				layoutsImporterResultEntries.size(),
+				layoutPageTemplatesImporterResultEntries.size(),
 				_getTypeLabelKey(entrySet.getKey())
 			},
 			true);
 	}
 
-	public String getWarningMessage(String layoutsImporterResultEntryName) {
+	public String getWarningMessage(
+		String layoutPageTemplatesImporterResultEntryName) {
+
 		return LanguageUtil.format(
 			_httpServletRequest, "x-was-imported-with-warnings",
-			new Object[] {layoutsImporterResultEntryName}, true);
+			new Object[] {layoutPageTemplatesImporterResultEntryName}, true);
 	}
 
 	private String _getTypeLabelKey(int type) {
@@ -302,15 +352,16 @@ public class ImportDisplayContext {
 	}
 
 	private final HttpServletRequest _httpServletRequest;
-	private Map<Integer, List<LayoutsImporterResultEntry>>
-		_importedLayoutsImporterResultEntriesMap;
-	private List<LayoutsImporterResultEntry>
-		_layoutsImporterResultEntriesWithWarnings;
+	private Map<Integer, List<LayoutPageTemplatesImporterResultEntry>>
+		_importedLayoutPageTemplatesImporterResultEntriesMap;
+	private List<LayoutPageTemplatesImporterResultEntry>
+		_layoutPageTemplatesImporterResultEntriesWithWarnings;
 	private Map
-		<LayoutsImporterResultEntry.Status, List<LayoutsImporterResultEntry>>
-			_layoutsImporterResultEntryMap;
-	private List<LayoutsImporterResultEntry>
-		_notImportedLayoutsImporterResultEntries;
+		<LayoutPageTemplatesImporterResultEntry.Status,
+		 List<LayoutPageTemplatesImporterResultEntry>>
+			_layoutPageTemplatesImporterResultEntryMap;
+	private List<LayoutPageTemplatesImporterResultEntry>
+		_notImportedLayoutPageTemplatesImporterResultEntries;
 	private final RenderRequest _renderRequest;
 
 }

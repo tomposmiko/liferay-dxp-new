@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -47,8 +45,6 @@ public class CPDefinitionOptionRelWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("CPDefinitionOptionRelId", getCPDefinitionOptionRelId());
 		attributes.put("groupId", getGroupId());
@@ -74,18 +70,6 @@ public class CPDefinitionOptionRelWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -297,16 +281,6 @@ public class CPDefinitionOptionRelWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this cp definition option rel.
-	 *
-	 * @return the ct collection ID of this cp definition option rel
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the ddm form field type name of this cp definition option rel.
 	 *
 	 * @return the ddm form field type name of this cp definition option rel
@@ -435,16 +409,6 @@ public class CPDefinitionOptionRelWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this cp definition option rel.
-	 *
-	 * @return the mvcc version of this cp definition option rel
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -729,16 +693,6 @@ public class CPDefinitionOptionRelWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this cp definition option rel.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp definition option rel
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the ddm form field type name of this cp definition option rel.
 	 *
 	 * @param DDMFormFieldTypeName the ddm form field type name of this cp definition option rel
@@ -853,16 +807,6 @@ public class CPDefinitionOptionRelWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
-	 * Sets the mvcc version of this cp definition option rel.
-	 *
-	 * @param mvccVersion the mvcc version of this cp definition option rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -1016,25 +960,6 @@ public class CPDefinitionOptionRelWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CPDefinitionOptionRel, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CPDefinitionOptionRel, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

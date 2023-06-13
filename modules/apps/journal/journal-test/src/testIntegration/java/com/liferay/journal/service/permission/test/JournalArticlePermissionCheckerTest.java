@@ -82,12 +82,22 @@ public class JournalArticlePermissionCheckerTest
 
 		permissionChecksMap.clear();
 
-		Assert.assertFalse(
-			_journalArticleModelResourcePermission.contains(
-				permissionChecker, _article, ActionKeys.VIEW));
-		Assert.assertFalse(
-			_journalArticleModelResourcePermission.contains(
-				permissionChecker, _subarticle, ActionKeys.VIEW));
+		if (_journalServiceConfiguration.articleViewPermissionsCheckEnabled()) {
+			Assert.assertFalse(
+				_journalArticleModelResourcePermission.contains(
+					permissionChecker, _article, ActionKeys.VIEW));
+			Assert.assertFalse(
+				_journalArticleModelResourcePermission.contains(
+					permissionChecker, _subarticle, ActionKeys.VIEW));
+		}
+		else {
+			Assert.assertTrue(
+				_journalArticleModelResourcePermission.contains(
+					permissionChecker, _article, ActionKeys.VIEW));
+			Assert.assertTrue(
+				_journalArticleModelResourcePermission.contains(
+					permissionChecker, _subarticle, ActionKeys.VIEW));
+		}
 	}
 
 	@Override

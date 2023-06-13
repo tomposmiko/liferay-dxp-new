@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pedro Queiroz
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.GRID,
 	service = DDMFormFieldValueValidator.class
 )
@@ -73,7 +74,7 @@ public class GridDDMFormFieldValueValidator
 		}
 
 		for (Locale availableLocale : value.getAvailableLocales()) {
-			_validateSelectedValue(
+			validateSelectedValue(
 				ddmFormField, rowValues, columnValues,
 				value.getString(availableLocale));
 		}
@@ -88,7 +89,7 @@ public class GridDDMFormFieldValueValidator
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
+				_log.debug(jsonException, jsonException);
 			}
 
 			throw new IllegalStateException(
@@ -97,10 +98,7 @@ public class GridDDMFormFieldValueValidator
 		}
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private void _validateSelectedValue(
+	protected void validateSelectedValue(
 			DDMFormField ddmFormField, Set<String> rowValues,
 			Set<String> columnValues, String selectedValues)
 		throws DDMFormFieldValueValidationException {
@@ -125,6 +123,9 @@ public class GridDDMFormFieldValueValidator
 			}
 		}
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		GridDDMFormFieldValueValidator.class);

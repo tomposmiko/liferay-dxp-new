@@ -128,11 +128,6 @@ public class CounterWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CounterWrapper wrap(Counter counter) {
 		return new CounterWrapper(counter);
 	}

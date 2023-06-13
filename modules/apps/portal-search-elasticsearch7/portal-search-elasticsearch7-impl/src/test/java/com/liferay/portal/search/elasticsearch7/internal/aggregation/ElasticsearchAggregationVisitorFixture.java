@@ -14,24 +14,18 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.aggregation;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregationTranslator;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.DateHistogramAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.DateRangeAggregationTranslatorImpl;
-import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.FilterAggregationTranslator;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.FilterAggregationTranslatorImpl;
-import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.FiltersAggregationTranslator;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.FiltersAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.GeoDistanceAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.HistogramAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.RangeAggregationTranslatorImpl;
-import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.SignificantTermsAggregationTranslator;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.SignificantTermsAggregationTranslatorImpl;
-import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.SignificantTextAggregationTranslator;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.SignificantTextAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.bucket.TermsAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.metrics.ScriptedMetricAggregationTranslatorImpl;
-import com.liferay.portal.search.elasticsearch7.internal.aggregation.metrics.TopHitsAggregationTranslator;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.metrics.TopHitsAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.metrics.WeightedAvgAggregationTranslatorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.aggregation.pipeline.ElasticsearchPipelineAggregationVisitorFixture;
@@ -60,45 +54,39 @@ public class ElasticsearchAggregationVisitorFixture {
 					getElasticsearchPipelineAggregationVisitor();
 
 		AggregationBuilderAssemblerFactory aggregationBuilderAssemblerFactory =
-			new AggregationBuilderAssemblerFactoryImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			aggregationBuilderAssemblerFactory,
-			"_pipelineAggregationTranslator", pipelineAggregationTranslator);
+			new AggregationBuilderAssemblerFactoryImpl() {
+				{
+					setPipelineAggregationTranslator(
+						pipelineAggregationTranslator);
+				}
+			};
 
 		ElasticsearchAggregationVisitor elasticsearchAggregationVisitor =
-			new ElasticsearchAggregationVisitor();
+			new ElasticsearchAggregationVisitor() {
+				{
+					setAggregationBuilderAssemblerFactory(
+						aggregationBuilderAssemblerFactory);
+					setDateHistogramAggregationTranslator(
+						new DateHistogramAggregationTranslatorImpl());
+					setDateRangeAggregationTranslator(
+						new DateRangeAggregationTranslatorImpl());
+					setHistogramAggregationTranslator(
+						new HistogramAggregationTranslatorImpl());
+					setPipelineAggregationTranslator(
+						pipelineAggregationTranslator);
+					setRangeAggregationTranslator(
+						new RangeAggregationTranslatorImpl());
+					setTermsAggregationTranslator(
+						new TermsAggregationTranslatorImpl());
+				}
+			};
 
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor,
-			"_aggregationBuilderAssemblerFactory",
-			aggregationBuilderAssemblerFactory);
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor,
-			"_dateHistogramAggregationTranslator",
-			new DateHistogramAggregationTranslatorImpl());
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_dateRangeAggregationTranslator",
-			new DateRangeAggregationTranslatorImpl());
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_histogramAggregationTranslator",
-			new HistogramAggregationTranslatorImpl());
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_pipelineAggregationTranslator",
-			pipelineAggregationTranslator);
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_rangeAggregationTranslator",
-			new RangeAggregationTranslatorImpl());
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_termsAggregationTranslator",
-			new TermsAggregationTranslatorImpl());
-
-		_injectGeoAggregationTranslators(elasticsearchAggregationVisitor);
-		_injectQueryAggregationTranslators(
+		injectGeoAggregationTranslators(elasticsearchAggregationVisitor);
+		injectQueryAggregationTranslators(
 			elasticsearchAggregationVisitor,
 			elasticsearchQueryTranslatorFixture);
-		_injectScriptAggregationTranslators(elasticsearchAggregationVisitor);
-		_injectTopHitsAggregationTranslators(
+		injectScriptAggregationTranslators(elasticsearchAggregationVisitor);
+		injectTopHitsAggregationTranslators(
 			elasticsearchAggregationVisitor,
 			elasticsearchQueryTranslatorFixture);
 
@@ -111,87 +99,63 @@ public class ElasticsearchAggregationVisitorFixture {
 		return _elasticsearchAggregationVisitor;
 	}
 
-	private void _injectGeoAggregationTranslators(
+	protected static void injectGeoAggregationTranslators(
 		ElasticsearchAggregationVisitor elasticsearchAggregationVisitor) {
 
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor,
-			"_geoDistanceAggregationTranslator",
+		elasticsearchAggregationVisitor.setGeoDistanceAggregationTranslator(
 			new GeoDistanceAggregationTranslatorImpl());
 	}
 
-	private void _injectQueryAggregationTranslators(
+	protected static void injectQueryAggregationTranslators(
 		ElasticsearchAggregationVisitor elasticsearchAggregationVisitor,
 		ElasticsearchQueryTranslatorFixture
 			elasticsearchQueryTranslatorFixture) {
 
-		FilterAggregationTranslator filterAggregationTranslator =
-			new FilterAggregationTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			filterAggregationTranslator, "_queryTranslator",
-			elasticsearchQueryTranslatorFixture.
-				getElasticsearchQueryTranslator());
-
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_filterAggregationTranslator",
-			filterAggregationTranslator);
-
-		FiltersAggregationTranslator filtersAggregationTranslator =
-			new FiltersAggregationTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			filtersAggregationTranslator, "_queryTranslator",
-			elasticsearchQueryTranslatorFixture.
-				getElasticsearchQueryTranslator());
-
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_filtersAggregationTranslator",
-			filtersAggregationTranslator);
-
-		SignificantTermsAggregationTranslator
-			significantTermsAggregationTranslator =
-				new SignificantTermsAggregationTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			significantTermsAggregationTranslator, "_queryTranslator",
-			elasticsearchQueryTranslatorFixture.
-				getElasticsearchQueryTranslator());
-
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor,
-			"_significantTermsAggregationTranslator",
-			significantTermsAggregationTranslator);
-
-		SignificantTextAggregationTranslator
-			significantTextAggregationTranslator =
-				new SignificantTextAggregationTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			significantTextAggregationTranslator, "_queryTranslator",
-			elasticsearchQueryTranslatorFixture.
-				getElasticsearchQueryTranslator());
-
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor,
-			"_significantTextAggregationTranslator",
-			significantTextAggregationTranslator);
+		elasticsearchAggregationVisitor.setFilterAggregationTranslator(
+			new FilterAggregationTranslatorImpl() {
+				{
+					setQueryTranslator(
+						elasticsearchQueryTranslatorFixture.
+							getElasticsearchQueryTranslator());
+				}
+			});
+		elasticsearchAggregationVisitor.setFiltersAggregationTranslator(
+			new FiltersAggregationTranslatorImpl() {
+				{
+					setQueryTranslator(
+						elasticsearchQueryTranslatorFixture.
+							getElasticsearchQueryTranslator());
+				}
+			});
+		elasticsearchAggregationVisitor.
+			setSignificantTermsAggregationTranslator(
+				new SignificantTermsAggregationTranslatorImpl() {
+					{
+						setQueryTranslator(
+							elasticsearchQueryTranslatorFixture.
+								getElasticsearchQueryTranslator());
+					}
+				});
+		elasticsearchAggregationVisitor.setSignificantTextAggregationTranslator(
+			new SignificantTextAggregationTranslatorImpl() {
+				{
+					setQueryTranslator(
+						elasticsearchQueryTranslatorFixture.
+							getElasticsearchQueryTranslator());
+				}
+			});
 	}
 
-	private void _injectScriptAggregationTranslators(
+	protected static void injectScriptAggregationTranslators(
 		ElasticsearchAggregationVisitor elasticsearchAggregationVisitor) {
 
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor,
-			"_scriptedMetricAggregationTranslator",
+		elasticsearchAggregationVisitor.setScriptedMetricAggregationTranslator(
 			new ScriptedMetricAggregationTranslatorImpl());
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor,
-			"_weightedAvgAggregationTranslator",
+		elasticsearchAggregationVisitor.setWeightedAvgAggregationTranslator(
 			new WeightedAvgAggregationTranslatorImpl());
 	}
 
-	private void _injectTopHitsAggregationTranslators(
+	protected static void injectTopHitsAggregationTranslators(
 		ElasticsearchAggregationVisitor elasticsearchAggregationVisitor,
 		ElasticsearchQueryTranslatorFixture
 			elasticsearchQueryTranslatorFixture) {
@@ -202,21 +166,17 @@ public class ElasticsearchAggregationVisitorFixture {
 					elasticsearchQueryTranslatorFixture.
 						getElasticsearchQueryTranslator());
 
-		TopHitsAggregationTranslator topHitsAggregationTranslator =
-			new TopHitsAggregationTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			topHitsAggregationTranslator, "_queryTranslator",
-			elasticsearchQueryTranslatorFixture.
-				getElasticsearchQueryTranslator());
-		ReflectionTestUtil.setFieldValue(
-			topHitsAggregationTranslator, "_sortFieldTranslator",
-			elasticsearchSortFieldTranslatorFixture.
-				getElasticsearchSortFieldTranslator());
-
-		ReflectionTestUtil.setFieldValue(
-			elasticsearchAggregationVisitor, "_topHitsAggregationTranslator",
-			topHitsAggregationTranslator);
+		elasticsearchAggregationVisitor.setTopHitsAggregationTranslator(
+			new TopHitsAggregationTranslatorImpl() {
+				{
+					setQueryTranslator(
+						elasticsearchQueryTranslatorFixture.
+							getElasticsearchQueryTranslator());
+					setSortFieldTranslator(
+						elasticsearchSortFieldTranslatorFixture.
+							getElasticsearchSortFieldTranslator());
+				}
+			});
 	}
 
 	private final ElasticsearchAggregationVisitor

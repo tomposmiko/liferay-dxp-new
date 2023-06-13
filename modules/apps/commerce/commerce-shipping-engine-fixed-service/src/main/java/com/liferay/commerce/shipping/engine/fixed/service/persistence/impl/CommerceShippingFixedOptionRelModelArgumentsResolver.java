@@ -24,21 +24,12 @@ import com.liferay.portal.kernel.model.BaseModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CommerceShippingFixedOptionRel.
  *
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.shipping.engine.fixed.model.impl.CommerceShippingFixedOptionRelImpl",
-		"table.name=CShippingFixedOptionRel"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommerceShippingFixedOptionRelModelArgumentsResolver
 	implements ArgumentsResolver {
 

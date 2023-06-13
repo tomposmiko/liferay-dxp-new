@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.portlet.PortletURL;
+
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -67,12 +69,12 @@ public abstract class BaseWikiContentAlloyEditorLinkBrowseConfigContributor
 		if (documentBrowseLinkUrl == null) {
 			if (nodeId != 0) {
 				itemSelectorCriteria.add(
-					_getWikiPageItemSelectorCriterion(nodeId));
+					getWikiPageItemSelectorCriterion(nodeId));
 			}
 
 			if (wikiPageResourcePrimKey == 0) {
 				itemSelectorCriteria.add(
-					_getWikiAttachmentItemSelectorCriterion(
+					getWikiAttachmentItemSelectorCriterion(
 						wikiPageResourcePrimKey));
 			}
 
@@ -108,31 +110,26 @@ public abstract class BaseWikiContentAlloyEditorLinkBrowseConfigContributor
 			if (wikiPageResourcePrimKey != 0) {
 				itemSelectorCriteria.add(
 					0,
-					_getWikiAttachmentItemSelectorCriterion(
+					getWikiAttachmentItemSelectorCriterion(
 						wikiPageResourcePrimKey));
 			}
 
 			if (nodeId != 0) {
 				itemSelectorCriteria.add(
-					0, _getWikiPageItemSelectorCriterion(nodeId));
+					0, getWikiPageItemSelectorCriterion(nodeId));
 			}
 		}
 
-		jsonObject.put(
-			"documentBrowseLinkUrl",
-			String.valueOf(
-				itemSelector.getItemSelectorURL(
-					requestBackedPortletURLFactory, itemSelectedEventName,
-					itemSelectorCriteria.toArray(
-						new ItemSelectorCriterion[0]))));
+		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, itemSelectedEventName,
+			itemSelectorCriteria.toArray(new ItemSelectorCriterion[0]));
+
+		jsonObject.put("documentBrowseLinkUrl", itemSelectorURL.toString());
 	}
 
 	protected abstract ItemSelectorReturnType getItemSelectorReturnType();
 
-	@Reference
-	protected ItemSelector itemSelector;
-
-	private ItemSelectorCriterion _getWikiAttachmentItemSelectorCriterion(
+	protected ItemSelectorCriterion getWikiAttachmentItemSelectorCriterion(
 		long wikiPageResourcePrimKey) {
 
 		ItemSelectorCriterion itemSelectorCriterion =
@@ -144,7 +141,7 @@ public abstract class BaseWikiContentAlloyEditorLinkBrowseConfigContributor
 		return itemSelectorCriterion;
 	}
 
-	private ItemSelectorCriterion _getWikiPageItemSelectorCriterion(
+	protected ItemSelectorCriterion getWikiPageItemSelectorCriterion(
 		long nodeId) {
 
 		ItemSelectorCriterion itemSelectorCriterion =
@@ -156,5 +153,8 @@ public abstract class BaseWikiContentAlloyEditorLinkBrowseConfigContributor
 
 		return itemSelectorCriterion;
 	}
+
+	@Reference
+	protected ItemSelector itemSelector;
 
 }

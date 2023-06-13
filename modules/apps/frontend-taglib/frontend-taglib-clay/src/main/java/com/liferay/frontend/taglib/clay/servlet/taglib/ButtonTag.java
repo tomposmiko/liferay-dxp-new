@@ -149,7 +149,7 @@ public class ButtonTag extends BaseContainerTag {
 	@Override
 	protected String getHydratedModuleName() {
 		if ((getAdditionalProps() != null) || (getPropsTransformer() != null)) {
-			return "{Button} from frontend-taglib-clay";
+			return "frontend-taglib-clay/Button";
 		}
 
 		return null;
@@ -240,7 +240,11 @@ public class ButtonTag extends BaseContainerTag {
 					(ThemeDisplay)httpServletRequest.getAttribute(
 						WebKeys.THEME_DISPLAY);
 
-				jspWriter.write(themeDisplay.getPathThemeSpritemap());
+				String pathThemeImages = themeDisplay.getPathThemeImages();
+
+				String spritemap = pathThemeImages.concat("/clay/icons.svg");
+
+				jspWriter.write(spritemap);
 
 				jspWriter.write("#");
 				jspWriter.write(_icon);

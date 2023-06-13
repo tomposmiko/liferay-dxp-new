@@ -19,7 +19,7 @@ import com.liferay.commerce.inventory.type.CommerceInventoryAuditType;
 import com.liferay.commerce.inventory.type.constants.CommerceInventoryAuditTypeConstants;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 
@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.inventory.audit.type.key=" + CommerceInventoryConstants.AUDIT_TYPE_MOVE_QUANTITY,
 	service = CommerceInventoryAuditType.class
 )
@@ -47,7 +48,7 @@ public class MoveQuantityCommerceInventoryAuditTypeImpl
 
 		User user = _userLocalService.getUserById(userId);
 
-		return _language.format(
+		return LanguageUtil.format(
 			locale, "x-created-a-transfer-from-x-to-x",
 			new Object[] {
 				user.getFullName(),
@@ -79,9 +80,6 @@ public class MoveQuantityCommerceInventoryAuditTypeImpl
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private UserLocalService _userLocalService;

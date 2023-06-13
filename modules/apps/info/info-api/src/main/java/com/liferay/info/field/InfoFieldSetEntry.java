@@ -29,8 +29,4 @@ public interface InfoFieldSetEntry {
 
 	public String getName();
 
-	public default String getUniqueId() {
-		return getName();
-	}
-
 }

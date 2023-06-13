@@ -12,56 +12,25 @@
  * details.
  */
 
-import {COOKIE_TYPES, sessionStorage} from 'frontend-js-web';
-import React, {useCallback, useContext, useState} from 'react';
-
-import {useConstants} from './ConstantsContext';
+import React, {useContext, useState} from 'react';
 
 const SelectedMenuItemIdContext = React.createContext(null);
 const SetSelectedMenuItemIdContext = React.createContext(() => {});
 
-export function useSetSelectedMenuItemId() {
-	return useContext(SetSelectedMenuItemIdContext);
-}
+export const useSetSelectedMenuItemId = () =>
+	useContext(SetSelectedMenuItemIdContext);
 
-export function useSelectedMenuItemId() {
-	return useContext(SelectedMenuItemIdContext);
-}
+export const useSelectedMenuItemId = () =>
+	useContext(SelectedMenuItemIdContext);
 
-export function SelectedMenuItemIdProvider({children}) {
-	const {portletNamespace} = useConstants();
-	const selectedMenuItemIdKey = `${portletNamespace}_selectedMenuItemId`;
-
-	const [selectedMenuItemId, setSelectedMenuItemId] = useState(() => {
-		const persistedSelectedMenuItemId = window.sessionStorage.getItem(
-			selectedMenuItemIdKey
-		);
-
-		sessionStorage.removeItem(selectedMenuItemIdKey);
-
-		return persistedSelectedMenuItemId || null;
-	});
-
-	const updateSelectedMenuItemId = useCallback(
-		(nextMenuItemId, {persist = false} = {}) => {
-			setSelectedMenuItemId(nextMenuItemId);
-
-			if (persist && nextMenuItemId) {
-				sessionStorage.setItem(
-					selectedMenuItemIdKey,
-					nextMenuItemId,
-					COOKIE_TYPES.PERSONALIZATION
-				);
-			}
-		},
-		[selectedMenuItemIdKey]
-	);
+export const SelectedMenuItemIdProvider = ({children}) => {
+	const [selectedMenuItemId, setSelectedMenuItemId] = useState(null);
 
 	return (
-		<SetSelectedMenuItemIdContext.Provider value={updateSelectedMenuItemId}>
+		<SetSelectedMenuItemIdContext.Provider value={setSelectedMenuItemId}>
 			<SelectedMenuItemIdContext.Provider value={selectedMenuItemId}>
 				{children}
 			</SelectedMenuItemIdContext.Provider>
 		</SetSelectedMenuItemIdContext.Provider>
 	);
-}
+};

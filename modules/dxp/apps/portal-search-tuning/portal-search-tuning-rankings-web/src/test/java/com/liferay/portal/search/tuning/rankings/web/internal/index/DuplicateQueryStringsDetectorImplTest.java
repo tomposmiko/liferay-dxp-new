@@ -44,6 +44,8 @@ public class DuplicateQueryStringsDetectorImplTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_duplicateQueryStringsDetectorImpl =
 			new DuplicateQueryStringsDetectorImpl();
 

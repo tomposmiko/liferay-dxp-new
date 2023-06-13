@@ -57,7 +57,7 @@ public class SharepointServlet extends HttpServlet {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class SharepointServlet extends HttpServlet {
 			}
 		}
 		catch (SharepointException sharepointException) {
-			_log.error(sharepointException);
+			_log.error(sharepointException, sharepointException);
 		}
 	}
 

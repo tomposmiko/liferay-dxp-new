@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -148,64 +147,6 @@ public class OpenGraphSettings implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContentDocument image;
 
-	@Schema(description = "The Open Graph's image alt.")
-	public String getImageAlt() {
-		return imageAlt;
-	}
-
-	public void setImageAlt(String imageAlt) {
-		this.imageAlt = imageAlt;
-	}
-
-	@JsonIgnore
-	public void setImageAlt(
-		UnsafeSupplier<String, Exception> imageAltUnsafeSupplier) {
-
-		try {
-			imageAlt = imageAltUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The Open Graph's image alt.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String imageAlt;
-
-	@Schema(description = "The localized Open Graph's image alts.")
-	@Valid
-	public Map<String, String> getImageAlt_i18n() {
-		return imageAlt_i18n;
-	}
-
-	public void setImageAlt_i18n(Map<String, String> imageAlt_i18n) {
-		this.imageAlt_i18n = imageAlt_i18n;
-	}
-
-	@JsonIgnore
-	public void setImageAlt_i18n(
-		UnsafeSupplier<Map<String, String>, Exception>
-			imageAlt_i18nUnsafeSupplier) {
-
-		try {
-			imageAlt_i18n = imageAlt_i18nUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The localized Open Graph's image alts.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Map<String, String> imageAlt_i18n;
-
 	@Schema(description = "The Open Graph's title.")
 	public String getTitle() {
 		return title;
@@ -325,30 +266,6 @@ public class OpenGraphSettings implements Serializable {
 			sb.append(String.valueOf(image));
 		}
 
-		if (imageAlt != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"imageAlt\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(imageAlt));
-
-			sb.append("\"");
-		}
-
-		if (imageAlt_i18n != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"imageAlt_i18n\": ");
-
-			sb.append(_toJSON(imageAlt_i18n));
-		}
-
 		if (title != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -386,9 +303,9 @@ public class OpenGraphSettings implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -414,7 +331,7 @@ public class OpenGraphSettings implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -446,7 +363,7 @@ public class OpenGraphSettings implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -462,10 +379,5 @@ public class OpenGraphSettings implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

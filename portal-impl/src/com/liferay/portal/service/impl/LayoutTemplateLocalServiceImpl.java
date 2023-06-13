@@ -264,7 +264,7 @@ public class LayoutTemplateLocalServiceImpl
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return new ArrayList<>(layoutTemplates);

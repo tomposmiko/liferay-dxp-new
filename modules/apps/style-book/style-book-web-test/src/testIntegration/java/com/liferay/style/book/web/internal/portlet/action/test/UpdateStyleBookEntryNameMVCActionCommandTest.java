@@ -103,23 +103,22 @@ public class UpdateStyleBookEntryNameMVCActionCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(), oldName,
 				StringPool.BLANK, _serviceContext);
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
 		String newName = RandomTestUtil.randomString();
 
-		mockLiferayPortletActionRequest.addParameter("name", newName);
+		actionRequest.addParameter("name", newName);
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		ReflectionTestUtil.invoke(
 			_updateStyleBookEntryNameMVCActionCommandTest,
 			"_updateStyleBookEntry", new Class<?>[] {ActionRequest.class},
-			mockLiferayPortletActionRequest);
+			actionRequest);
 
 		Assert.assertEquals(
 			1,
@@ -145,20 +144,19 @@ public class UpdateStyleBookEntryNameMVCActionCommandTest {
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter("name", StringPool.BLANK);
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter("name", StringPool.BLANK);
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		ReflectionTestUtil.invoke(
 			_updateStyleBookEntryNameMVCActionCommandTest,
 			"_updateStyleBookEntry", new Class<?>[] {ActionRequest.class},
-			mockLiferayPortletActionRequest);
+			actionRequest);
 	}
 
 	@Test(expected = StyleBookEntryNameException.class)
@@ -170,20 +168,19 @@ public class UpdateStyleBookEntryNameMVCActionCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter("name", ".");
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter("name", ".");
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		ReflectionTestUtil.invoke(
 			_updateStyleBookEntryNameMVCActionCommandTest,
 			"_updateStyleBookEntry", new Class<?>[] {ActionRequest.class},
-			mockLiferayPortletActionRequest);
+			actionRequest);
 	}
 
 	@Test(expected = StyleBookEntryNameException.class)
@@ -195,20 +192,19 @@ public class UpdateStyleBookEntryNameMVCActionCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter("name", "/");
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter("name", "/");
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		ReflectionTestUtil.invoke(
 			_updateStyleBookEntryNameMVCActionCommandTest,
 			"_updateStyleBookEntry", new Class<?>[] {ActionRequest.class},
-			mockLiferayPortletActionRequest);
+			actionRequest);
 	}
 
 	@Test(expected = StyleBookEntryNameException.class)
@@ -220,21 +216,19 @@ public class UpdateStyleBookEntryNameMVCActionCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
-			"name", RandomTestUtil.randomString(256));
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter("name", RandomTestUtil.randomString(256));
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		ReflectionTestUtil.invoke(
 			_updateStyleBookEntryNameMVCActionCommandTest,
 			"_updateStyleBookEntry", new Class<?>[] {ActionRequest.class},
-			mockLiferayPortletActionRequest);
+			actionRequest);
 	}
 
 	@Inject

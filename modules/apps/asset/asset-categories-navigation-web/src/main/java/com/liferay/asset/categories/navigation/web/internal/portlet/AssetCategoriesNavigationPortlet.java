@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.fragment.entry.processor.portlet.alias=categories-nav",
 		"com.liferay.portlet.css-class-wrapper=portlet-asset-categories-navigation",
@@ -46,8 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=guest,power-user,user",
 		"javax.portlet.supported-public-render-parameter=categoryId",
-		"javax.portlet.supported-public-render-parameter=resetCur",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supported-public-render-parameter=resetCur"
 	},
 	service = Portlet.class
 )

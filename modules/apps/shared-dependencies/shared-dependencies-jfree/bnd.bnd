@@ -1,4 +1,0 @@
-Bundle-Name: Liferay Shared Dependencies Jfree
-Bundle-SymbolicName: com.liferay.shared.dependencies.jfree
-Bundle-Version: 1.0.2
--exportcontents: org.jfree.*

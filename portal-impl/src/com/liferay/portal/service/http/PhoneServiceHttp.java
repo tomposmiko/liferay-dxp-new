@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see PhoneServiceSoap
  * @generated
  */
 public class PhoneServiceHttp {

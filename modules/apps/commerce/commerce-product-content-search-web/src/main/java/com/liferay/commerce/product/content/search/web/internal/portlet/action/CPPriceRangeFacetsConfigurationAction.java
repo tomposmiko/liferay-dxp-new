@@ -17,7 +17,7 @@ package com.liferay.commerce.product.content.search.web.internal.portlet.action;
 import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.content.search.web.internal.display.context.CPPriceRangeFacetsDisplayContext;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
@@ -28,6 +28,7 @@ import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchRequest;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchResponse;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -37,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "javax.portlet.name=" + CPPortletKeys.CP_PRICE_RANGE_FACETS,
 	service = ConfigurationAction.class
 )
@@ -57,7 +59,7 @@ public class CPPriceRangeFacetsConfigurationAction
 				new CPPriceRangeFacetsDisplayContext(
 					_commercePriceFormatter, cpRequestHelper.getRenderRequest(),
 					null,
-					_getPaginationStartParameterName(
+					getPaginationStartParameterName(
 						portletSharedSearchResponse),
 					portletSharedSearchResponse);
 
@@ -66,13 +68,22 @@ public class CPPriceRangeFacetsConfigurationAction
 				cpPriceRangeFacetsDisplayContext);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return "/price_range_facets/configuration.jsp";
 	}
 
-	private String _getPaginationStartParameterName(
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.search.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected String getPaginationStartParameterName(
 		PortletSharedSearchResponse portletSharedSearchResponse) {
 
 		SearchResponse searchResponse =

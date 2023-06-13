@@ -87,7 +87,7 @@ public interface DDMStructureService extends BaseService {
 	 * extracted from the original one. The new structure supports a new name
 	 * and description.
 	 *
-	 * @param sourceStructureId the primary key of the structure to be copied
+	 * @param structureId the primary key of the structure to be copied
 	 * @param nameMap the new structure's locales and localized names
 	 * @param descriptionMap the new structure's locales and localized
 	 descriptions
@@ -97,12 +97,12 @@ public interface DDMStructureService extends BaseService {
 	 * @return the new structure
 	 */
 	public DDMStructure copyStructure(
-			long sourceStructureId, Map<Locale, String> nameMap,
+			long structureId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
 		throws PortalException;
 
 	public DDMStructure copyStructure(
-			long sourceStructureId, ServiceContext serviceContext)
+			long structureId, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -230,13 +230,6 @@ public interface DDMStructureService extends BaseService {
 			long structureId, String version, ServiceContext serviceContext)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DDMStructure> search(
-			long companyId, long[] groupIds, long classNameId, long classPK,
-			String keywords, int status, int start, int end,
-			OrderByComparator<DDMStructure> orderByComparator)
-		throws PortalException;
-
 	/**
 	 * Returns an ordered range of all the structures matching the groups and
 	 * class name IDs, and matching the keywords in the structure names and
@@ -347,12 +340,6 @@ public interface DDMStructureService extends BaseService {
 		String description, String storageType, int type, int status,
 		boolean andOperator, int start, int end,
 		OrderByComparator<DDMStructure> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(
-			long companyId, long[] groupIds, long classNameId, long classPK,
-			String keywords, int status)
-		throws PortalException;
 
 	/**
 	 * Returns the number of structures matching the groups and class name IDs,

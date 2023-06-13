@@ -68,7 +68,8 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
  */
 @Component(
 	configurationPid = "com.liferay.multi.factor.authentication.timebased.otp.web.internal.configuration.MFATimeBasedOTPConfiguration.scoped",
-	configurationPolicy = ConfigurationPolicy.REQUIRE, service = {}
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
+	service = {}
 )
 public class TimeBasedOTPBrowserSetupMFAChecker
 	implements BrowserMFAChecker, SetupMFAChecker {
@@ -110,7 +111,8 @@ public class TimeBasedOTPBrowserSetupMFAChecker
 					_mfaTimeBasedOTPConfiguration.algorithmKeySize());
 
 			httpServletRequest.setAttribute(
-				MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_ALGORITHM, "SHA1");
+				MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_ALGORITHM,
+				MFATimeBasedOTPUtil.MFA_TIMEBASED_OTP_ALGORITHM);
 			httpServletRequest.setAttribute(
 				MFATimeBasedOTPWebKeys.MFA_TIME_BASED_OTP_COMPANY_NAME,
 				company.getName());
@@ -163,7 +165,7 @@ public class TimeBasedOTPBrowserSetupMFAChecker
 
 		HttpSession httpSession = originalHttpServletRequest.getSession(false);
 
-		if (_isVerified(httpSession, userId)) {
+		if (isVerified(httpSession, userId)) {
 			return true;
 		}
 
@@ -361,13 +363,7 @@ public class TimeBasedOTPBrowserSetupMFAChecker
 		}
 	}
 
-	private String _getClassName() {
-		Class<?> clazz = getClass();
-
-		return clazz.getName();
-	}
-
-	private boolean _isVerified(HttpSession httpSession, long userId) {
+	protected boolean isVerified(HttpSession httpSession, long userId) {
 		User user = _userLocalService.fetchUser(userId);
 
 		if (user == null) {
@@ -417,6 +413,12 @@ public class TimeBasedOTPBrowserSetupMFAChecker
 		}
 
 		return true;
+	}
+
+	private String _getClassName() {
+		Class<?> clazz = getClass();
+
+		return clazz.getName();
 	}
 
 	private void _routeAuditMessage(AuditMessage auditMessage) {

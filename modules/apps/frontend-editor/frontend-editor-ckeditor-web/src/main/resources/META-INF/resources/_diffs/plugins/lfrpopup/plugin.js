@@ -13,13 +13,13 @@
  */
 
 (function () {
-	const pluginName = 'lfrpopup';
+	var pluginName = 'lfrpopup';
 
 	CKEDITOR.plugins.add(pluginName, {
 		init(editor) {
 			AUI().use('querystring-parse', (A) => {
 				editor.popup = function (url, width, height, options) {
-					const params = A.QueryString.parse(url.split('?')[1]);
+					var params = A.QueryString.parse(url.split('?')[1]);
 
 					if (params.p_p_id) {
 						url = url.replace(

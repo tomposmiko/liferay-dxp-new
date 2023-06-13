@@ -15,21 +15,21 @@
 AUI.add(
 	'liferay-marketplace-messenger',
 	(A) => {
-		const NATIVE_MSG = !!window.postMessage;
+		var NATIVE_MSG = !!window.postMessage;
 
-		const MarketplaceMessenger = {
+		var MarketplaceMessenger = {
 			_messages: [],
 			_targetFrame: null,
 			_targetURI: null,
 
 			init(options, initMessage) {
-				const instance = this;
+				var instance = this;
 
 				if (A.Lang.isString(options)) {
 					instance._targetURI = options;
 				}
 				else if (A.Lang.isObject(options)) {
-					const targetFrame = options.targetFrame;
+					var targetFrame = options.targetFrame;
 
 					instance._targetFrame = A.one(targetFrame);
 
@@ -42,7 +42,7 @@ AUI.add(
 			},
 
 			postMessage(message) {
-				const instance = this;
+				var instance = this;
 
 				if (NATIVE_MSG) {
 					A.postMessage(
@@ -54,7 +54,7 @@ AUI.add(
 				else {
 					instance._messages.push(message);
 
-					if (instance._messages.length === 1) {
+					if (instance._messages.length == 1) {
 						A.postMessage(
 							message,
 							instance._targetURI,
@@ -65,7 +65,7 @@ AUI.add(
 			},
 
 			receiveMessage(callback, validator) {
-				const instance = this;
+				var instance = this;
 
 				validator = validator || instance._targetURI;
 
@@ -73,16 +73,16 @@ AUI.add(
 					A.receiveMessage(callback, validator);
 				}
 				else {
-					const wrappedCallback = function (event) {
-						const response = event.responseData;
+					var wrappedCallback = function (event) {
+						var response = event.responseData;
 
 						callback(event);
 
 						instance._messages.shift();
 
-						let message = null;
+						var message = null;
 
-						if (instance._messages.length) {
+						if (instance._messages.length > 0) {
 							message = instance._messages[0];
 						}
 						else if (!response.empty) {
@@ -124,11 +124,11 @@ AUI.add(
 AUI.add(
 	'liferay-marketplace-util',
 	(A) => {
-		const MarketplaceUtil = {
+		var MarketplaceUtil = {
 			namespaceObject(namespace, object) {
-				const returnObject = {};
+				var returnObject = {};
 
-				const keys = Object.keys(object);
+				var keys = A.Object.keys(object);
 
 				A.Array.each(keys, (key) => {
 					returnObject[namespace + key] = object[key];

@@ -15,17 +15,17 @@
 package com.liferay.commerce.internal.starter;
 
 import com.liferay.commerce.starter.CommerceRegionsStarter;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.region.starter.key=" + SouthKoreaCommerceRegionsStarter.SOUTH_KOREA_NUMERIC_ISO_CODE,
 	service = CommerceRegionsStarter.class
 )
@@ -36,7 +36,7 @@ public class SouthKoreaCommerceRegionsStarter
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "country.south-korea");
+		return LanguageUtil.get(locale, "country.south-korea");
 	}
 
 	@Override
@@ -51,8 +51,5 @@ public class SouthKoreaCommerceRegionsStarter
 
 	private static final String _FILEPATH =
 		"com/liferay/commerce/internal/south-korea.json";
-
-	@Reference
-	private Language _language;
 
 }

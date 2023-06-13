@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 
@@ -46,14 +47,18 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+
+import org.powermock.api.mockito.PowerMockito;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Sergio González
  */
-public class AMJournalEditorConfigContributorTest {
+public class AMJournalEditorConfigContributorTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -62,6 +67,8 @@ public class AMJournalEditorConfigContributorTest {
 
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+
 		_inputEditorTaglibAttributes.put(
 			"liferay-ui:input-editor:name", "testEditor");
 	}
@@ -70,15 +77,15 @@ public class AMJournalEditorConfigContributorTest {
 	public void testAdaptiveMediaFileEntryAttributeNameIsAdded()
 		throws Exception {
 
-		PortletURL itemSelectorPortletURL = Mockito.mock(PortletURL.class);
+		PortletURL itemSelectorPortletURL = mock(PortletURL.class);
 
-		Mockito.when(
+		when(
 			itemSelectorPortletURL.toString()
 		).thenReturn(
 			"itemSelectorPortletURL"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorURL(
 				Mockito.any(RequestBackedPortletURLFactory.class),
 				Mockito.anyString(), Mockito.any(ItemSelectorCriterion.class))
@@ -86,13 +93,13 @@ public class AMJournalEditorConfigContributorTest {
 			itemSelectorPortletURL
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectedEventName(Mockito.anyString())
 		).thenReturn(
 			"selectedEventName"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorCriteria(
 				"journalItemSelectorCriterionFileEntryItemSelectorReturnType")
 		).thenReturn(
@@ -104,7 +111,7 @@ public class AMJournalEditorConfigContributorTest {
 			"journalItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -123,15 +130,15 @@ public class AMJournalEditorConfigContributorTest {
 
 	@Test
 	public void testAdaptiveMediaIsAddedToExtraPlugins() throws Exception {
-		PortletURL itemSelectorPortletURL = Mockito.mock(PortletURL.class);
+		PortletURL itemSelectorPortletURL = mock(PortletURL.class);
 
-		Mockito.when(
+		when(
 			itemSelectorPortletURL.toString()
 		).thenReturn(
 			"itemSelectorPortletURL"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorURL(
 				Mockito.any(RequestBackedPortletURLFactory.class),
 				Mockito.anyString(), Mockito.any(ItemSelectorCriterion.class))
@@ -139,13 +146,13 @@ public class AMJournalEditorConfigContributorTest {
 			itemSelectorPortletURL
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectedEventName(Mockito.anyString())
 		).thenReturn(
 			"selectedEventName"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorCriteria(
 				"journalItemSelectorCriterionFileEntryItemSelectorReturnType")
 		).thenReturn(
@@ -157,7 +164,7 @@ public class AMJournalEditorConfigContributorTest {
 			"journalItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -175,15 +182,15 @@ public class AMJournalEditorConfigContributorTest {
 
 	@Test
 	public void testAdaptiveMediaIsExtraPlugins() throws Exception {
-		PortletURL itemSelectorPortletURL = Mockito.mock(PortletURL.class);
+		PortletURL itemSelectorPortletURL = mock(PortletURL.class);
 
-		Mockito.when(
+		when(
 			itemSelectorPortletURL.toString()
 		).thenReturn(
 			"itemSelectorPortletURL"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorURL(
 				Mockito.any(RequestBackedPortletURLFactory.class),
 				Mockito.anyString(), Mockito.any(ItemSelectorCriterion.class))
@@ -191,26 +198,28 @@ public class AMJournalEditorConfigContributorTest {
 			itemSelectorPortletURL
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectedEventName(Mockito.anyString())
 		).thenReturn(
 			"selectedEventName"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorCriteria(
 				"journalItemSelectorCriterionFileEntryItemSelectorReturnType")
 		).thenReturn(
 			_getBlogsItemSelectorCriterionFileEntryItemSelectorReturnType()
 		);
 
+		JSONObject originalJSONObject = JSONUtil.put(
+			"extraPlugins", "ae_placeholder,ae_selectionregion,ae_uicore"
+		).put(
+			"filebrowserImageBrowseLinkUrl",
+			"journalItemSelectorCriterionFileEntryItemSelectorReturnType"
+		);
+
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			JSONUtil.put(
-				"extraPlugins", "ae_placeholder,ae_selectionregion,ae_uicore"
-			).put(
-				"filebrowserImageBrowseLinkUrl",
-				"journalItemSelectorCriterionFileEntryItemSelectorReturnType"
-			).toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -267,7 +276,7 @@ public class AMJournalEditorConfigContributorTest {
 			"allowedContent", "a[*](*); div(*);");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -280,7 +289,7 @@ public class AMJournalEditorConfigContributorTest {
 			"allowedContent", "a[*](*); div(*); img[*](*){*};");
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -288,7 +297,7 @@ public class AMJournalEditorConfigContributorTest {
 		JSONObject originalJSONObject = JSONFactoryUtil.createJSONObject();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -300,7 +309,7 @@ public class AMJournalEditorConfigContributorTest {
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject();
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -310,7 +319,7 @@ public class AMJournalEditorConfigContributorTest {
 		JSONObject originalJSONObject = JSONUtil.put("allowedContent", true);
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -322,7 +331,7 @@ public class AMJournalEditorConfigContributorTest {
 		JSONObject expectedJSONObject = JSONUtil.put("allowedContent", true);
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -333,7 +342,7 @@ public class AMJournalEditorConfigContributorTest {
 			"filebrowserImageBrowseLinkUrl", StringPool.BLANK);
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -353,17 +362,17 @@ public class AMJournalEditorConfigContributorTest {
 		);
 
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
 	public void testItemSelectorURLWithAudioItemSelectorCriterion()
 		throws Exception {
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorCriteria(
 				"audioItemSelectorCriterionFileEntryItemSelectorReturnType")
 		).thenReturn(
@@ -375,7 +384,7 @@ public class AMJournalEditorConfigContributorTest {
 			"audioItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -395,25 +404,25 @@ public class AMJournalEditorConfigContributorTest {
 		);
 
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
 	public void testItemSelectorURLWithBlogsItemSelectorCriterion()
 		throws Exception {
 
-		PortletURL itemSelectorPortletURL = Mockito.mock(PortletURL.class);
+		PortletURL itemSelectorPortletURL = mock(PortletURL.class);
 
-		Mockito.when(
+		when(
 			itemSelectorPortletURL.toString()
 		).thenReturn(
 			"itemSelectorPortletURL"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorURL(
 				Mockito.any(RequestBackedPortletURLFactory.class),
 				Mockito.anyString(), Mockito.any(ItemSelectorCriterion.class))
@@ -421,13 +430,13 @@ public class AMJournalEditorConfigContributorTest {
 			itemSelectorPortletURL
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectedEventName(Mockito.anyString())
 		).thenReturn(
 			"selectedEventName"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorCriteria(
 				"journalItemSelectorCriterionFileEntryItemSelectorReturnType")
 		).thenReturn(
@@ -439,7 +448,7 @@ public class AMJournalEditorConfigContributorTest {
 			"journalItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -463,15 +472,15 @@ public class AMJournalEditorConfigContributorTest {
 	public void testItemSelectorURLWithFileItemSelectorCriterion()
 		throws Exception {
 
-		PortletURL itemSelectorPortletURL = Mockito.mock(PortletURL.class);
+		PortletURL itemSelectorPortletURL = mock(PortletURL.class);
 
-		Mockito.when(
+		when(
 			itemSelectorPortletURL.toString()
 		).thenReturn(
 			"itemSelectorPortletURL"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorURL(
 				Mockito.any(RequestBackedPortletURLFactory.class),
 				Mockito.anyString(), Mockito.any(ItemSelectorCriterion.class))
@@ -479,13 +488,13 @@ public class AMJournalEditorConfigContributorTest {
 			itemSelectorPortletURL
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectedEventName(Mockito.anyString())
 		).thenReturn(
 			"selectedEventName"
 		);
 
-		Mockito.when(
+		when(
 			_itemSelector.getItemSelectorCriteria(
 				"fileItemSelectorCriterionFileEntryItemSelectorReturnType")
 		).thenReturn(
@@ -497,7 +506,7 @@ public class AMJournalEditorConfigContributorTest {
 			"fileItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMJournalEditorConfigContributor amJournalEditorConfigContributor =
 			new AMJournalEditorConfigContributor();
@@ -520,17 +529,9 @@ public class AMJournalEditorConfigContributorTest {
 	private <T> void _assertContains(
 		Collection<T> collection, Predicate<T> predicate) {
 
-		boolean match = false;
+		Stream<T> stream = collection.stream();
 
-		for (T t : collection) {
-			if (predicate.test(t)) {
-				match = true;
-
-				break;
-			}
-		}
-
-		Assert.assertTrue(match);
+		Assert.assertTrue(stream.anyMatch(predicate));
 	}
 
 	private List<ItemSelectorCriterion>
@@ -571,10 +572,14 @@ public class AMJournalEditorConfigContributorTest {
 
 	private final Map<String, Object> _inputEditorTaglibAttributes =
 		new HashMap<>();
-	private final ItemSelector _itemSelector = Mockito.mock(ItemSelector.class);
-	private final RequestBackedPortletURLFactory
-		_requestBackedPortletURLFactory = Mockito.mock(
-			RequestBackedPortletURLFactory.class);
-	private final ThemeDisplay _themeDisplay = Mockito.mock(ThemeDisplay.class);
+
+	@Mock
+	private ItemSelector _itemSelector;
+
+	@Mock
+	private RequestBackedPortletURLFactory _requestBackedPortletURLFactory;
+
+	@Mock
+	private ThemeDisplay _themeDisplay;
 
 }

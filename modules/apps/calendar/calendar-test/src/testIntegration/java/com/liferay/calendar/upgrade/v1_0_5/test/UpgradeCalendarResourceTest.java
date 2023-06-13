@@ -70,7 +70,7 @@ public class UpgradeCalendarResourceTest {
 
 	@Test
 	public void testUpgradeCalendarResourceUserId() throws Exception {
-		CalendarResource calendarResource = getGuestUserCalendarResource();
+		CalendarResource calendarResource = getDefaultUserCalendarResource();
 
 		long userId = calendarResource.getUserId();
 
@@ -85,7 +85,7 @@ public class UpgradeCalendarResourceTest {
 
 	@Test
 	public void testUpgradeCalendarUserId() throws Exception {
-		CalendarResource calendarResource = getGuestUserCalendarResource();
+		CalendarResource calendarResource = getDefaultUserCalendarResource();
 
 		Calendar calendar = calendarResource.getDefaultCalendar();
 
@@ -105,7 +105,7 @@ public class UpgradeCalendarResourceTest {
 
 		User user = _userLocalService.getUser(userId);
 
-		Assert.assertFalse(user.isGuestUser());
+		Assert.assertFalse(user.isDefaultUser());
 
 		Role administratorRole = _roleLocalService.getRole(
 			_group.getCompanyId(), RoleConstants.ADMINISTRATOR);
@@ -118,7 +118,7 @@ public class UpgradeCalendarResourceTest {
 	protected void assertUserIsDefault(long userId) throws PortalException {
 		User user = _userLocalService.getUser(userId);
 
-		Assert.assertTrue(user.isGuestUser());
+		Assert.assertTrue(user.isDefaultUser());
 	}
 
 	protected long getCalendarResourceUserId(CalendarResource calendarResource)
@@ -155,7 +155,7 @@ public class UpgradeCalendarResourceTest {
 		}
 	}
 
-	protected CalendarResource getGuestUserCalendarResource()
+	protected CalendarResource getDefaultUserCalendarResource()
 		throws PortalException {
 
 		CalendarResource calendarResource =
@@ -164,11 +164,11 @@ public class UpgradeCalendarResourceTest {
 
 		Calendar calendar = calendarResource.getDefaultCalendar();
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			_group.getCompanyId());
 
-		calendar.setUserId(guestUserId);
-		calendarResource.setUserId(guestUserId);
+		calendar.setUserId(defaultUserId);
+		calendarResource.setUserId(defaultUserId);
 
 		_calendarLocalService.updateCalendar(calendar);
 
@@ -195,7 +195,7 @@ public class UpgradeCalendarResourceTest {
 	private UpgradeProcess _upgradeProcess;
 
 	@Inject(
-		filter = "component.name=com.liferay.calendar.internal.upgrade.registry.CalendarServiceUpgradeStepRegistrator"
+		filter = "component.name=com.liferay.calendar.internal.upgrade.CalendarServiceUpgrade"
 	)
 	private UpgradeStepRegistrator _upgradeStepRegistrator;
 

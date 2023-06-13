@@ -80,13 +80,23 @@ else {
 		<clay:container-fluid>
 			<ul class="tbar-nav">
 				<li class="tbar-item tbar-item-expand">
-					<aui:input cssClass="form-control-inline" defaultLanguageId="<%= (ddmTemplate == null) ? LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()): ddmTemplate.getDefaultLanguageId() %>" label='<%= LanguageUtil.get(request, "name") %>' labelCssClass="sr-only" name="name" placeholder='<%= LanguageUtil.format(request, "untitled-x", "template") %>' wrapperCssClass="mb-0" />
+					<aui:input cssClass="form-control-inline" defaultLanguageId="<%= (ddmTemplate == null) ? LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()): ddmTemplate.getDefaultLanguageId() %>" label="" name="name" placeholder='<%= LanguageUtil.format(request, "untitled-x", "template") %>' wrapperCssClass="mb-0" />
 				</li>
 				<li class="tbar-item">
 					<div class="tbar-section text-right">
 						<aui:button cssClass="btn-outline-borderless btn-outline-secondary btn-sm mr-3" href="<%= redirect %>" type="cancel" />
-						<aui:button cssClass="btn-sm mr-3 save-and-continue-button" primary="<%= false %>" type="submit" value="save-and-continue" />
-						<aui:button cssClass="btn-sm save-button" type="submit" value="save" />
+
+						<%
+						String taglibOnClickSaveAndContinue = "Liferay.fire('" + liferayPortletResponse.getNamespace() + "saveAndContinue');";
+						%>
+
+						<aui:button cssClass="btn-secondary btn-sm mr-3" onClick="<%= taglibOnClickSaveAndContinue %>" primary="<%= false %>" type="submit" value="save-and-continue" />
+
+						<%
+						String taglibOnClickSaveTemplate = "Liferay.fire('" + liferayPortletResponse.getNamespace() + "saveTemplate');";
+						%>
+
+						<aui:button cssClass="btn-sm" onClick="<%= taglibOnClickSaveTemplate %>" type="submit" value="save" />
 					</div>
 				</li>
 			</ul>
@@ -107,3 +117,15 @@ else {
 		</div>
 	</div>
 </aui:form>
+
+<aui:script>
+	Liferay.after('<portlet:namespace />saveAndContinue', () => {
+		document.<portlet:namespace />fm.<portlet:namespace />saveAndContinue.value = true;
+
+		Liferay.fire('<portlet:namespace />saveTemplate');
+	});
+
+	Liferay.after('<portlet:namespace />saveTemplate', () => {
+		submitForm(document.<portlet:namespace />fm);
+	});
+</aui:script>

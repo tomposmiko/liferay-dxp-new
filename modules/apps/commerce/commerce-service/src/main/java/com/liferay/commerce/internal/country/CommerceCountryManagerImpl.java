@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"json.web.service.context.name=commerce",
 		"json.web.service.context.path=CommerceCountryManager"
@@ -47,7 +48,6 @@ import org.osgi.service.component.annotations.Reference;
 @JSONWebService
 public class CommerceCountryManagerImpl implements CommerceCountryManager {
 
-	@Override
 	public List<Country> getBillingCountries(
 		long companyId, boolean active, boolean billingAllowed) {
 
@@ -71,7 +71,6 @@ public class CommerceCountryManagerImpl implements CommerceCountryManager {
 			));
 	}
 
-	@Override
 	public List<Country> getBillingCountriesByChannelId(
 		long channelId, int start, int end) {
 
@@ -87,7 +86,6 @@ public class CommerceCountryManagerImpl implements CommerceCountryManager {
 			));
 	}
 
-	@Override
 	public List<Country> getShippingCountries(
 		long companyId, boolean active, boolean shippingAllowed) {
 
@@ -111,7 +109,6 @@ public class CommerceCountryManagerImpl implements CommerceCountryManager {
 			));
 	}
 
-	@Override
 	public List<Country> getShippingCountriesByChannelId(
 		long channelId, int start, int end) {
 
@@ -127,7 +124,6 @@ public class CommerceCountryManagerImpl implements CommerceCountryManager {
 			));
 	}
 
-	@Override
 	public List<Country> getWarehouseCountries(long companyId, boolean all) {
 		return _countryLocalService.dslQuery(
 			DSLQueryFactoryUtil.selectDistinct(
@@ -188,22 +184,13 @@ public class CommerceCountryManagerImpl implements CommerceCountryManager {
 						commerceChannelId));
 
 				groupFilterPredicate = groupFilterPredicate.or(
-					channelFilterPredicate.withParentheses());
+					channelFilterPredicate);
 
+				predicate = predicate.and(groupFilterPredicate);
 				predicate = predicate.and(
-					groupFilterPredicate.withParentheses());
-
-				if (billingAllowed) {
-					predicate = predicate.and(
-						CountryTable.INSTANCE.billingAllowed.eq(
-							billingAllowed));
-				}
-
-				if (shippingAllowed) {
-					predicate = predicate.and(
-						CountryTable.INSTANCE.shippingAllowed.eq(
-							shippingAllowed));
-				}
+					CountryTable.INSTANCE.billingAllowed.eq(billingAllowed));
+				predicate = predicate.and(
+					CountryTable.INSTANCE.shippingAllowed.eq(shippingAllowed));
 
 				return predicate;
 			});

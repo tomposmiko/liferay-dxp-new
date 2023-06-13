@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
@@ -41,6 +40,7 @@ import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 
@@ -98,9 +98,11 @@ public class AutocompleteUserMVCResourceCommandTest {
 		MockLiferayResourceResponse mockLiferayResourceResponse =
 			new MockLiferayResourceResponse();
 
+		ThemeDisplay themeDisplay = _getThemeDisplay(
+			TestPropsValues.getUser(), true);
+
 		_mvcResourceCommand.serveResource(
-			_getMockLiferayResourceRequest(
-				_getThemeDisplay(TestPropsValues.getUser(), true)),
+			_getMockLiferayResourceRequest(themeDisplay),
 			mockLiferayResourceResponse);
 
 		JSONArray jsonArray = _getUsersJSONArray(mockLiferayResourceResponse);
@@ -132,9 +134,11 @@ public class AutocompleteUserMVCResourceCommandTest {
 
 	@Test(expected = PortletException.class)
 	public void testServeResponseWithError() throws Exception {
+		ThemeDisplay themeDisplay = _getThemeDisplay(
+			TestPropsValues.getUser(), false);
+
 		_mvcResourceCommand.serveResource(
-			_getMockLiferayResourceRequest(
-				_getThemeDisplay(TestPropsValues.getUser(), false)),
+			_getMockLiferayResourceRequest(themeDisplay),
 			new MockLiferayResourceResponse());
 	}
 
@@ -179,10 +183,14 @@ public class AutocompleteUserMVCResourceCommandTest {
 		return themeDisplay;
 	}
 
-	private int _getUsersCount() {
-		return ListUtil.count(
-			UserLocalServiceUtil.getUsers(0, 20),
-			user -> !user.isGuestUser() && !user.isServiceAccountUser());
+	private long _getUsersCount() {
+		List<User> users = UserLocalServiceUtil.getUsers(0, 20);
+
+		Stream<User> stream = users.stream();
+
+		return stream.filter(
+			user -> !user.isDefaultUser()
+		).count();
 	}
 
 	private JSONArray _getUsersJSONArray(

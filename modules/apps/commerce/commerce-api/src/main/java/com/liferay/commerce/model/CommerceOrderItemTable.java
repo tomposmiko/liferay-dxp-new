@@ -36,11 +36,6 @@ public class CommerceOrderItemTable extends BaseTable<CommerceOrderItemTable> {
 	public static final CommerceOrderItemTable INSTANCE =
 		new CommerceOrderItemTable();
 
-	public final Column<CommerceOrderItemTable, Long> mvccVersion =
-		createColumn(
-			"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<CommerceOrderItemTable, String> uuid = createColumn(
-		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, String> externalReferenceCode =
 		createColumn(
 			"externalReferenceCode", String.class, Types.VARCHAR,
@@ -75,10 +70,6 @@ public class CommerceOrderItemTable extends BaseTable<CommerceOrderItemTable> {
 	public final Column<CommerceOrderItemTable, Long> CPInstanceId =
 		createColumn(
 			"CPInstanceId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
-	public final Column<CommerceOrderItemTable, Long> CPMeasurementUnitId =
-		createColumn(
-			"CPMeasurementUnitId", Long.class, Types.BIGINT,
-			Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, Long> CProductId = createColumn(
 		"CProductId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, Long>
@@ -88,10 +79,6 @@ public class CommerceOrderItemTable extends BaseTable<CommerceOrderItemTable> {
 	public final Column<CommerceOrderItemTable, Long> shippingAddressId =
 		createColumn(
 			"shippingAddressId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
-	public final Column<CommerceOrderItemTable, BigDecimal> decimalQuantity =
-		createColumn(
-			"decimalQuantity", BigDecimal.class, Types.DECIMAL,
-			Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, String> deliveryGroup =
 		createColumn(
 			"deliveryGroup", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
@@ -116,10 +103,6 @@ public class CommerceOrderItemTable extends BaseTable<CommerceOrderItemTable> {
 	public final Column<CommerceOrderItemTable, BigDecimal> discountAmount =
 		createColumn(
 			"discountAmount", BigDecimal.class, Types.DECIMAL,
-			Column.FLAG_DEFAULT);
-	public final Column<CommerceOrderItemTable, Boolean>
-		discountManuallyAdjusted = createColumn(
-			"discountManuallyAdjusted", Boolean.class, Types.BOOLEAN,
 			Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, BigDecimal>
 		discountPercentageLevel1 = createColumn(
@@ -181,10 +164,6 @@ public class CommerceOrderItemTable extends BaseTable<CommerceOrderItemTable> {
 			Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, String> name = createColumn(
 		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<CommerceOrderItemTable, Boolean> priceManuallyAdjusted =
-		createColumn(
-			"priceManuallyAdjusted", Boolean.class, Types.BOOLEAN,
-			Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, String> printedNote =
 		createColumn(
 			"printedNote", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
@@ -198,13 +177,6 @@ public class CommerceOrderItemTable extends BaseTable<CommerceOrderItemTable> {
 	public final Column<CommerceOrderItemTable, Integer> quantity =
 		createColumn(
 			"quantity", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
-	public final Column<CommerceOrderItemTable, Long> replacedCPInstanceId =
-		createColumn(
-			"replacedCPInstanceId", Long.class, Types.BIGINT,
-			Column.FLAG_DEFAULT);
-	public final Column<CommerceOrderItemTable, String> replacedSku =
-		createColumn(
-			"replacedSku", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<CommerceOrderItemTable, Date> requestedDeliveryDate =
 		createColumn(
 			"requestedDeliveryDate", Date.class, Types.TIMESTAMP,

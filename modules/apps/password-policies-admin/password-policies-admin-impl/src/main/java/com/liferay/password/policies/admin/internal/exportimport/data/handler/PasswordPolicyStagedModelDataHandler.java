@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniela Zapata Riesco
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class PasswordPolicyStagedModelDataHandler
 	extends BaseStagedModelDataHandler<PasswordPolicy> {
 
@@ -174,10 +174,19 @@ public class PasswordPolicyStagedModelDataHandler
 			passwordPolicy, importedPasswordPolicy);
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPasswordPolicyLocalService(
+		PasswordPolicyLocalService passwordPolicyLocalService) {
+
+		_passwordPolicyLocalService = passwordPolicyLocalService;
+	}
+
+	private GroupLocalService _groupLocalService;
 	private PasswordPolicyLocalService _passwordPolicyLocalService;
 
 }

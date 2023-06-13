@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class KaleoProcessServiceWrapper
 	implements KaleoProcessService, ServiceWrapper<KaleoProcessService> {
 
-	public KaleoProcessServiceWrapper() {
-		this(null);
-	}
-
 	public KaleoProcessServiceWrapper(KaleoProcessService kaleoProcessService) {
 		_kaleoProcessService = kaleoProcessService;
 	}

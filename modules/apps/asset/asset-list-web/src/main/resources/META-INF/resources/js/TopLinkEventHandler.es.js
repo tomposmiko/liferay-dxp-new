@@ -12,11 +12,11 @@
  * details.
  */
 
-import {delegate, getTop} from 'frontend-js-web';
+import {delegate} from 'frontend-js-web';
 
 export default function () {
 	const delegateHandler = delegate(document.body, 'click', 'a', (event) => {
-		const openerWindow = getTop();
+		const openerWindow = Liferay.Util.getTop();
 
 		if (openerWindow && event.delegateTarget.target === '_top') {
 			event.preventDefault();

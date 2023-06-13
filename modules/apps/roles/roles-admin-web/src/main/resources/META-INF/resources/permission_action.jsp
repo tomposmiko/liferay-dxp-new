@@ -23,7 +23,6 @@ Object[] objArray = (Object[])row.getObject();
 
 Permission permission = (Permission)objArray[0];
 Role role = (Role)objArray[1];
-String[] primKeys = (String[])objArray[2];
 %>
 
 <liferay-ui:icon-menu
@@ -33,16 +32,17 @@ String[] primKeys = (String[])objArray[2];
 	<portlet:actionURL name="deletePermission" var="deletePermissionURL">
 		<portlet:param name="mvcPath" value="/edit_role_permissions.jsp" />
 		<portlet:param name="tabs1" value="define-permissions" />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
 		<portlet:param name="roleId" value="<%= String.valueOf(role.getRoleId()) %>" />
 		<portlet:param name="name" value="<%= permission.getName() %>" />
 		<portlet:param name="scope" value="<%= String.valueOf(permission.getScope()) %>" />
-		<portlet:param name="primKeys" value="<%= StringUtil.merge(primKeys, StringPool.COMMA) %>" />
+		<portlet:param name="primKey" value="<%= permission.getPrimKey() %>" />
 		<portlet:param name="actionId" value="<%= String.valueOf(permission.getActionId()) %>" />
 	</portlet:actionURL>
 
 	<liferay-ui:icon-delete
 		confirmation="are-you-sure-you-want-to-remove-this-permission"
 		message="remove"
-		url='<%= "submitForm(document." + liferayPortletResponse.getNamespace() + "fm, '" + HtmlUtil.escapeJS(deletePermissionURL) + "');" %>'
+		url="<%= deletePermissionURL %>"
 	/>
 </liferay-ui:icon-menu>

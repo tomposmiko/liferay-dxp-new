@@ -1317,11 +1317,6 @@ public class AssetEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<AssetEntry, Object>>
 		getAttributeGetterFunctions() {
 

@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.asset.kernel.model.AssetTag",
-	service = DTOConverter.class
+	service = {DTOConverter.class, KeywordDTOConverter.class}
 )
 public class KeywordDTOConverter implements DTOConverter<AssetTag, Keyword> {
 
@@ -82,7 +82,7 @@ public class KeywordDTOConverter implements DTOConverter<AssetTag, Keyword> {
 						Hits hits = _assetEntryLocalService.search(
 							assetTag.getCompanyId(),
 							new long[] {assetTag.getGroupId()},
-							assetTag.getUserId(), null, -1, null, null, null,
+							assetTag.getUserId(), null, 0, null, null, null,
 							null, assetTag.getName(), true,
 							new int[] {
 								WorkflowConstants.STATUS_APPROVED,

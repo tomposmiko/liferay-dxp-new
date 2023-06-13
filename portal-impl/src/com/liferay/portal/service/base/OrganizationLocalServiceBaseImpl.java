@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -272,21 +270,48 @@ public abstract class OrganizationLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization, or <code>null</code> if a matching organization could not be found
+	 */
 	@Override
 	public Organization fetchOrganizationByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
-		return organizationPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
+		return organizationPersistence.fetchByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchOrganizationByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public Organization fetchOrganizationByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return fetchOrganizationByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization
+	 * @throws PortalException if a matching organization could not be found
+	 */
 	@Override
 	public Organization getOrganizationByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return organizationPersistence.findByERC_C(
-			externalReferenceCode, companyId);
+		return organizationPersistence.findByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -428,11 +453,6 @@ public abstract class OrganizationLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement OrganizationLocalServiceImpl#deleteOrganization(Organization) to avoid orphaned data");
-		}
 
 		return organizationLocalService.deleteOrganization(
 			(Organization)persistedModel);
@@ -969,9 +989,6 @@ public abstract class OrganizationLocalServiceBaseImpl
 
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		OrganizationLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

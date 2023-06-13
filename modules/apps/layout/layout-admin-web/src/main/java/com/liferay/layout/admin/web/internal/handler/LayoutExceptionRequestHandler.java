@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
@@ -45,12 +45,11 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jürgen Kappler
  */
-@Component(service = LayoutExceptionRequestHandler.class)
+@Component(immediate = true, service = LayoutExceptionRequestHandler.class)
 public class LayoutExceptionRequestHandler {
 
 	public void handleException(
@@ -94,10 +93,10 @@ public class LayoutExceptionRequestHandler {
 			"content.Language", themeDisplay.getLocale(),
 			layoutTypeController.getClass());
 
-		String layoutTypeName = _language.get(
+		String layoutTypeName = LanguageUtil.get(
 			layoutTypeResourceBundle, "layout.types." + type);
 
-		return _language.format(
+		return LanguageUtil.format(
 			themeDisplay.getRequest(), errorMessage, layoutTypeName);
 	}
 
@@ -107,7 +106,7 @@ public class LayoutExceptionRequestHandler {
 		throws Exception {
 
 		if (_log.isDebugEnabled()) {
-			_log.debug(portalException);
+			_log.debug(portalException, portalException);
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -132,7 +131,7 @@ public class LayoutExceptionRequestHandler {
 			if (assetCategoryException.getType() ==
 					AssetCategoryException.AT_LEAST_ONE_CATEGORY) {
 
-				errorMessage = _language.format(
+				errorMessage = LanguageUtil.format(
 					themeDisplay.getRequest(),
 					"please-select-at-least-one-category-for-x",
 					assetVocabularyTitle);
@@ -140,7 +139,7 @@ public class LayoutExceptionRequestHandler {
 			else if (assetCategoryException.getType() ==
 						AssetCategoryException.TOO_MANY_CATEGORIES) {
 
-				errorMessage = _language.format(
+				errorMessage = LanguageUtil.format(
 					themeDisplay.getRequest(),
 					"you-cannot-select-more-than-one-category-for-x",
 					assetVocabularyTitle);
@@ -149,7 +148,7 @@ public class LayoutExceptionRequestHandler {
 		else if (portalException instanceof
 					DuplicateFriendlyURLEntryException) {
 
-			errorMessage = _language.get(
+			errorMessage = LanguageUtil.get(
 				themeDisplay.getRequest(),
 				"the-friendly-url-is-already-in-use.-please-enter-a-unique-" +
 					"friendly-url");
@@ -159,14 +158,14 @@ public class LayoutExceptionRequestHandler {
 				(LayoutNameException)portalException;
 
 			if (layoutNameException.getType() == LayoutNameException.TOO_LONG) {
-				errorMessage = _language.format(
+				errorMessage = LanguageUtil.format(
 					themeDisplay.getRequest(),
 					"page-name-cannot-exceed-x-characters",
 					ModelHintsUtil.getMaxLength(
 						Layout.class.getName(), "friendlyURL"));
 			}
 			else {
-				errorMessage = _language.get(
+				errorMessage = LanguageUtil.get(
 					themeDisplay.getRequest(),
 					"please-enter-a-valid-name-for-the-page");
 			}
@@ -185,16 +184,16 @@ public class LayoutExceptionRequestHandler {
 			}
 		}
 		else if (portalException instanceof PrincipalException) {
-			errorMessage = _language.get(
+			errorMessage = LanguageUtil.get(
 				themeDisplay.getRequest(),
 				"you-do-not-have-the-required-permissions");
 		}
 
 		if (Validator.isNull(errorMessage)) {
-			errorMessage = _language.get(
+			errorMessage = LanguageUtil.get(
 				themeDisplay.getRequest(), "an-unexpected-error-occurred");
 
-			_log.error(portalException);
+			_log.error(portalException.getMessage());
 		}
 
 		JSONObject jsonObject = JSONUtil.put("errorMessage", errorMessage);
@@ -205,8 +204,5 @@ public class LayoutExceptionRequestHandler {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutExceptionRequestHandler.class);
-
-	@Reference
-	private Language _language;
 
 }

@@ -46,8 +46,7 @@ public class TestPropertiesUtil {
 	private TestPropertiesUtil() {
 		try (InputStream inputStream =
 				TestPropertiesUtil.class.getResourceAsStream(
-					"dependencies/test-jenkins-results-parser-util." +
-						"properties")) {
+					"/test-jenkins-results-parser-util.properties")) {
 
 			_properties.load(inputStream);
 		}
@@ -57,8 +56,7 @@ public class TestPropertiesUtil {
 
 		try (InputStream inputStream =
 				TestPropertiesUtil.class.getResourceAsStream(
-					"dependencies/test-jenkins-results-parser-util-ext." +
-						"properties")) {
+					"/test-jenkins-results-parser-util-ext.properties")) {
 
 			if (inputStream != null) {
 				_properties.load(inputStream);

@@ -11,13 +11,13 @@
 
 <tbody>
 <tr>
-	<td>ADD_VARIATION_ICON</td>
-	<td>xpath=((//div[contains(@class, 'justify-content-between')] | //ul[contains(@class, 'navbar-nav')])//*[contains(@class, 'btn-sm')])</td>
+	<td>ASSET_LIST_ELLIPSIS</td>
+	<td>//div[contains(@class,'dropdown')]//a[span/*[name()='svg'][contains(@class,'lexicon-icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ASSET_LIST_ENTRY_TITLE</td>
-	<td>//*[contains(@class,'name-column')]//a[contains(.,'${key_title}')] | //*[contains(@class,'list-group-item')]//p[contains(.,'${key_title}')]</td>
+	<td>//li[contains(@class,'list-group-item')]//a[contains(.,'${key_title}')] | //li[contains(@class,'list-group-item')]//p[contains(.,'${key_title}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -27,7 +27,7 @@
 </tr>
 <tr>
 	<td>ASSET_LIST_ENTRY_TYPE</td>
-	<td>//*[contains(@class,'list-group-item')]//h6[contains(.,'${key_type}')]</td>
+	<td>//li[contains(@class,'list-group-item')]//h6[contains(.,'${key_type}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -47,7 +47,7 @@
 </tr>
 <tr>
 	<td>ASSET_LIST_SCOPE_ITEM</td>
-	<td>//div[contains(@class,'dropdown-menu')]//button[contains(.,'${key_menuItem}')]</td>
+	<td>//span[contains(@class,'taglib-text-icon') and contains(.,'${key_menuItem}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -56,18 +56,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>VARIATION_ELLIPSIS</td>
-	<td>//div[contains(., '${key_variation}')]/following-sibling::div[contains(@class, 'more-icon')]</td>
+	<td>ASSET_LIST_SELECT_BUTTON</td>
+	<td>//div[contains(@class,'btn-group')]//a[contains(@title,'Select')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>VARIATION_INDEX</td>
-	<td>xpath=(//nav[contains(@role, 'navigation')]//p[contains(@class, 'list-group-title')]/a)[${key_index}]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>VARIATION_TITLE</td>
-	<td>//nav[@role='navigation']//a//span[text()='${key_variation}']</td>
+	<td>ASSET_TYPE_DROPDOWN_ITEM</td>
+	<td>//ul[contains(@class,'dropdown-menu')]//li[contains(@class,'asset-selector')]//a[contains(.,'${key_assetType}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -75,9 +70,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--VIEW_CONTENT-->
-
 <tr>
 	<td>ASSET_TITLE_ROW</td>
 	<td>//tr[contains(@data-qa-id,'row')][contains(.,'${key_assetTitle}')]//td[contains(@class,'lfr-title-column')]</td>
@@ -89,16 +82,24 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PERSONALIZATION_DROPDOWN_ITEM</td>
+	<td>//ul[contains(@class,'dropdown-menu')]//a[contains(.,'${key_menuItem}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--VIEW_USAGES-->
-
 <tr>
 	<td>ASSET_LIST_USAGES</td>
 	<td>//li[contains(@class,'nav-item')][contains(.,'${usageType} (${usageAmount})')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 </tbody>

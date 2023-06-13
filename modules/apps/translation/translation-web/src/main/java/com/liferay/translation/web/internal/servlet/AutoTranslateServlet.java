@@ -17,7 +17,7 @@ package com.liferay.translation.web.internal.servlet;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
@@ -31,7 +31,6 @@ import com.liferay.translation.exception.TranslatorException;
 import com.liferay.translation.translator.JSONTranslatorPacket;
 import com.liferay.translation.translator.Translator;
 import com.liferay.translation.translator.TranslatorPacket;
-import com.liferay.translation.translator.TranslatorRegistry;
 
 import java.io.IOException;
 
@@ -68,31 +67,16 @@ public class AutoTranslateServlet extends HttpServlet {
 			String content = StreamUtil.toString(
 				httpServletRequest.getInputStream());
 
-			long companyId = _portal.getCompanyId(httpServletRequest);
+			TranslatorPacket translatedTranslatorPacket = _translator.translate(
+				new JSONTranslatorPacket(
+					_portal.getCompanyId(httpServletRequest),
+					JSONFactoryUtil.createJSONObject(content)));
 
-			Translator translator = _translatorRegistry.getCompanyTranslator(
-				companyId);
-
-			if (translator != null) {
-				TranslatorPacket translatedTranslatorPacket =
-					translator.translate(
-						new JSONTranslatorPacket(
-							companyId, _jsonFactory.createJSONObject(content)));
-
-				_writeJSON(
-					httpServletResponse, _toJSON(translatedTranslatorPacket));
-			}
-			else {
-				_writeErrorJSON(
-					httpServletResponse,
-					_language.get(
-						_portal.getLocale(httpServletRequest),
-						"there-is-no-translation-service-enabled.-please-" +
-							"contact-your-administrator"));
-			}
+			_writeJSON(
+				httpServletResponse, _toJSON(translatedTranslatorPacket));
 		}
 		catch (TranslatorException translatorException) {
-			_log.error(translatorException);
+			_log.error(translatorException, translatorException);
 
 			_writeErrorJSON(
 				httpServletResponse,
@@ -100,7 +84,7 @@ public class AutoTranslateServlet extends HttpServlet {
 					translatorException.getMessage(), CharPool.QUOTE, "\\\""));
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			_writeErrorJSON(
 				httpServletResponse,
@@ -112,7 +96,7 @@ public class AutoTranslateServlet extends HttpServlet {
 	}
 
 	private JSONObject _getFieldsJSONObject(Map<String, String> fieldsMap) {
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		for (Map.Entry<String, String> entry : fieldsMap.entrySet()) {
 			jsonObject.put(entry.getKey(), entry.getValue());
@@ -156,15 +140,12 @@ public class AutoTranslateServlet extends HttpServlet {
 		AutoTranslateServlet.class);
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
 	private Language _language;
 
 	@Reference
 	private Portal _portal;
 
 	@Reference
-	private TranslatorRegistry _translatorRegistry;
+	private Translator _translator;
 
 }

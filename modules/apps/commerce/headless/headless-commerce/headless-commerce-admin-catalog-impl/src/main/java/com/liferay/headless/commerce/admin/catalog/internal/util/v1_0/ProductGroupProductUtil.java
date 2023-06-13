@@ -53,10 +53,9 @@ public class ProductGroupProductUtil {
 				productGroupProduct.getProductId());
 		}
 		else {
-			cProduct =
-				cProductLocalService.fetchCProductByExternalReferenceCode(
-					productGroupProduct.getProductExternalReferenceCode(),
-					serviceContext.getCompanyId());
+			cProduct = cProductLocalService.fetchCProductByReferenceCode(
+				serviceContext.getCompanyId(),
+				productGroupProduct.getProductExternalReferenceCode());
 
 			if (cProduct == null) {
 				throw new NoSuchCProductException(

@@ -16,12 +16,12 @@ package com.liferay.portal.workflow.metrics.internal.search.index;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
@@ -49,8 +49,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Inácio Nery
@@ -58,7 +63,7 @@ import org.osgi.service.component.annotations.Reference;
 public abstract class BaseWorkflowMetricsIndexer {
 
 	public void addDocuments(List<Document> documents) {
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (searchEngineAdapter == null) {
 			return;
 		}
 
@@ -101,7 +106,7 @@ public abstract class BaseWorkflowMetricsIndexer {
 	}
 
 	protected void addDocument(Document document) {
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (searchEngineAdapter == null) {
 			return;
 		}
 
@@ -132,7 +137,7 @@ public abstract class BaseWorkflowMetricsIndexer {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return null;
@@ -143,22 +148,35 @@ public abstract class BaseWorkflowMetricsIndexer {
 		DocumentBuilder documentBuilder, String fieldName,
 		Map<Locale, String> localizedMap) {
 
-		for (Map.Entry<Locale, String> entry : localizedMap.entrySet()) {
-			String localizedName = Field.getLocalizedName(
-				entry.getKey(), fieldName);
+		Stream.of(
+			localizedMap.entrySet()
+		).flatMap(
+			Set::stream
+		).forEach(
+			entry -> {
+				String localizedName = Field.getLocalizedName(
+					entry.getKey(), fieldName);
 
-			documentBuilder.setValue(
-				localizedName, entry.getValue()
-			).setValue(
-				Field.getSortableFieldName(localizedName), entry.getValue()
-			);
-		}
+				documentBuilder.setValue(
+					localizedName, entry.getValue()
+				).setValue(
+					Field.getSortableFieldName(localizedName), entry.getValue()
+				);
+			}
+		);
+	}
+
+	@Reference(
+		target = ModuleServiceLifecycle.PORTLETS_INITIALIZED, unbind = "-"
+	)
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	protected void updateDocuments(
 		long companyId, Map<String, Object> fieldsMap, Query filterQuery) {
 
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (searchEngineAdapter == null) {
 			return;
 		}
 
@@ -186,25 +204,33 @@ public abstract class BaseWorkflowMetricsIndexer {
 
 		BulkDocumentRequest bulkDocumentRequest = new BulkDocumentRequest();
 
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			Document document = searchHit.getDocument();
-			DocumentBuilder documentBuilder = documentBuilderFactory.builder();
+		Stream.of(
+			searchHits.getSearchHits()
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).forEach(
+			document -> {
+				DocumentBuilder documentBuilder =
+					documentBuilderFactory.builder();
 
-			documentBuilder.setString("uid", document.getString("uid"));
+				documentBuilder.setString("uid", document.getString("uid"));
 
-			fieldsMap.forEach(documentBuilder::setValue);
+				fieldsMap.forEach(documentBuilder::setValue);
 
-			UpdateDocumentRequest updateDocumentRequest =
-				new UpdateDocumentRequest(
-					getIndexName(companyId), document.getString("uid"),
-					documentBuilder.build());
+				UpdateDocumentRequest updateDocumentRequest =
+					new UpdateDocumentRequest(
+						getIndexName(companyId), document.getString("uid"),
+						documentBuilder.build());
 
-			updateDocumentRequest.setType(getIndexType());
-			updateDocumentRequest.setUpsert(true);
+				updateDocumentRequest.setType(getIndexType());
+				updateDocumentRequest.setUpsert(true);
 
-			bulkDocumentRequest.addBulkableDocumentRequest(
-				updateDocumentRequest);
-		}
+				bulkDocumentRequest.addBulkableDocumentRequest(
+					updateDocumentRequest);
+			}
+		);
 
 		if (ListUtil.isNotEmpty(
 				bulkDocumentRequest.getBulkableDocumentRequests())) {
@@ -226,17 +252,19 @@ public abstract class BaseWorkflowMetricsIndexer {
 	@Reference
 	protected Scripts scripts;
 
-	@Reference
-	protected SearchCapabilities searchCapabilities;
-
-	@Reference
-	protected SearchEngineAdapter searchEngineAdapter;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(search.engine.impl=Elasticsearch)"
+	)
+	protected volatile SearchEngineAdapter searchEngineAdapter;
 
 	@Reference
 	protected WorkflowMetricsPortalExecutor workflowMetricsPortalExecutor;
 
 	private void _updateDocument(Document document) {
-		if (!searchCapabilities.isWorkflowMetricsSupported()) {
+		if (searchEngineAdapter == null) {
 			return;
 		}
 

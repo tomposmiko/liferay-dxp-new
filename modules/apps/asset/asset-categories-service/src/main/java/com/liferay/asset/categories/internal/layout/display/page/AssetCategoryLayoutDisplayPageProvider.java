@@ -20,7 +20,6 @@ import com.liferay.info.item.InfoItemReference;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 
@@ -30,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = LayoutDisplayPageProvider.class)
+@Component(immediate = true, service = LayoutDisplayPageProvider.class)
 public class AssetCategoryLayoutDisplayPageProvider
 	implements LayoutDisplayPageProvider<AssetCategory> {
 
@@ -112,7 +111,7 @@ public class AssetCategoryLayoutDisplayPageProvider
 
 	@Override
 	public String getURLSeparator() {
-		return FriendlyURLResolverConstants.URL_SEPARATOR_ASSET_CATEGORY;
+		return "/v/";
 	}
 
 	@Override

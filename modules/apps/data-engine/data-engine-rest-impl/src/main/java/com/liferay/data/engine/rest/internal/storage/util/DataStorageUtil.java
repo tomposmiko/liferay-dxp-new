@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -46,7 +44,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Jeyvison Nascimento
@@ -95,14 +96,13 @@ public class DataStorageUtil {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		Map<String, DataDefinitionField> dataDefinitionFields = new HashMap<>();
-
-		for (DataDefinitionField dataDefinitionField :
-				dataDefinition.getDataDefinitionFields()) {
-
-			dataDefinitionFields.put(
-				dataDefinitionField.getName(), dataDefinitionField);
-		}
+		Map<String, DataDefinitionField> dataDefinitionFields = Stream.of(
+			dataDefinition.getDataDefinitionFields()
+		).collect(
+			Collectors.toMap(
+				dataDefinitionField -> dataDefinitionField.getName(),
+				Function.identity())
+		);
 
 		for (Map.Entry<String, DataDefinitionField> entry :
 				dataDefinitionFields.entrySet()) {
@@ -282,22 +282,22 @@ public class DataStorageUtil {
 	private static Map<String, Object> _toLocalizedMap(
 		String fieldType, LocalizedValue localizedValue) {
 
-		Map<String, Object> localizedMap = new HashMap<>();
+		Set<Locale> availableLocales = localizedValue.getAvailableLocales();
 
-		Function<Locale, Object> function = localizedValue::getString;
+		Stream<Locale> stream = availableLocales.stream();
 
 		if (fieldType.equals(DDMFormFieldType.CHECKBOX_MULTIPLE) ||
 			fieldType.equals(DDMFormFieldType.SELECT)) {
 
-			function = locale -> _toStringList(locale, localizedValue);
+			return stream.collect(
+				Collectors.toMap(
+					LanguageUtil::getLanguageId,
+					locale -> _toStringList(locale, localizedValue)));
 		}
 
-		for (Locale locale : localizedValue.getAvailableLocales()) {
-			localizedMap.put(
-				LanguageUtil.getLanguageId(locale), function.apply(locale));
-		}
-
-		return localizedMap;
+		return stream.collect(
+			Collectors.toMap(
+				LanguageUtil::getLanguageId, localizedValue::getString));
 	}
 
 	private static List<String> _toStringList(
@@ -309,10 +309,6 @@ public class DataStorageUtil {
 					localizedValue.getString(locale)));
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
 			return Collections.emptyList();
 		}
 	}
@@ -329,8 +325,5 @@ public class DataStorageUtil {
 
 		return ++repeatableIndex;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DataStorageUtil.class);
 
 }

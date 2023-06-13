@@ -14,17 +14,15 @@
 
 package com.liferay.portal.kernel.dao.orm;
 
-import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
-import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
-import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
+import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSenderUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,9 +88,15 @@ public class IndexableActionableDynamicQuery
 		}
 	}
 
+	public void setSearchEngineId(String searchEngineId) {
+		_searchEngineId = searchEngineId;
+	}
+
 	@Override
 	protected void actionsCompleted() throws PortalException {
-		_indexWriterHelper.commit(getCompanyId());
+		if (Validator.isNotNull(_searchEngineId)) {
+			_indexWriterHelper.commit(_searchEngineId, getCompanyId());
+		}
 	}
 
 	@Override
@@ -107,40 +111,29 @@ public class IndexableActionableDynamicQuery
 		}
 	}
 
+	protected String getSearchEngineId() {
+		return _searchEngineId;
+	}
+
 	protected void indexInterval() throws PortalException {
 		if ((_documents == null) || _documents.isEmpty()) {
 			return;
 		}
 
+		if (Validator.isNull(_searchEngineId)) {
+			_searchEngineId = SearchEngineHelperUtil.getSearchEngineId(
+				_documents);
+		}
+
 		_indexWriterHelper.updateDocuments(
-			getCompanyId(), new ArrayList<>(_documents), false);
+			_searchEngineId, getCompanyId(), new ArrayList<>(_documents),
+			false);
 
 		_count += _documents.size();
 
 		_documents.clear();
 
 		sendStatusMessage();
-	}
-
-	@Override
-	protected void performAction(Object object) throws PortalException {
-		long ctCollectionId = 0;
-
-		if (object instanceof CTModel) {
-			CTModel<?> ctModel = (CTModel<?>)object;
-
-			ctCollectionId = ctModel.getCtCollectionId();
-		}
-
-		try (SafeCloseable safeCloseable1 =
-				CTSQLModeThreadLocal.setCTSQLModeWithSafeCloseable(
-					CTSQLModeThreadLocal.CTSQLMode.DEFAULT);
-			SafeCloseable safeCloseable2 =
-				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
-					ctCollectionId)) {
-
-			super.performAction(object);
-		}
 	}
 
 	protected void sendStatusMessage() {
@@ -168,6 +161,7 @@ public class IndexableActionableDynamicQuery
 	private long _count;
 	private Collection<Document> _documents = new ArrayList<>();
 	private IndexWriterHelper _indexWriterHelper = _indexWriterHelperProxy;
+	private String _searchEngineId;
 	private long _total;
 
 }

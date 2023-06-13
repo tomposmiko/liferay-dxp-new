@@ -69,8 +69,8 @@ public class HistogramMetricTest {
 				"key", _formatDate(histogramMetric.getKey())
 			).put(
 				"value", histogramMetric.getValue()
-			).toString(),
-			jsonObject.toString());
+			).toJSONString(),
+			jsonObject.toJSONString());
 	}
 
 	private String _formatDate(Date date) {

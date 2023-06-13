@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Michael C. Han
  */
-@Component(service = PhraseSuggesterTranslator.class)
+@Component(immediate = true, service = PhraseSuggesterTranslator.class)
 public class PhraseSuggesterTranslatorImpl
 	extends BaseSuggesterTranslatorImpl implements PhraseSuggesterTranslator {
 

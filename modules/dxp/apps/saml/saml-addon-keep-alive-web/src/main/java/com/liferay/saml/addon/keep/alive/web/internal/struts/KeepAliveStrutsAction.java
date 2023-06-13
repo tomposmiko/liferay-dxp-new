@@ -15,13 +15,13 @@
 package com.liferay.saml.addon.keep.alive.web.internal.struts;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -54,7 +54,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  */
 @Component(
-	property = "path=/portal/saml/keep_alive", service = StrutsAction.class
+	immediate = true, property = "path=/portal/saml/keep_alive",
+	service = StrutsAction.class
 )
 public class KeepAliveStrutsAction implements StrutsAction {
 
@@ -69,16 +70,16 @@ public class KeepAliveStrutsAction implements StrutsAction {
 		}
 
 		if (_samlProviderConfigurationHelper.isRoleIdp()) {
-			_executeIdpKeepAlive(httpServletRequest, httpServletResponse);
+			executeIdpKeepAlive(httpServletRequest, httpServletResponse);
 		}
 		else if (_samlProviderConfigurationHelper.isRoleSp()) {
-			_executeSpKeepAlive(httpServletResponse);
+			executeSpKeepAlive(httpServletRequest, httpServletResponse);
 		}
 
 		return null;
 	}
 
-	private void _executeIdpKeepAlive(
+	protected void executeIdpKeepAlive(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
 		throws Exception {
@@ -94,11 +95,10 @@ public class KeepAliveStrutsAction implements StrutsAction {
 		String randomString = StringUtil.randomString();
 		PrintWriter printWriter = httpServletResponse.getWriter();
 
-		List<String> keepAliveURLs = _getSPsKeepAliveURLs(httpServletRequest);
+		List<String> keepAliveURLs = getSPsKeepAliveURLs(httpServletRequest);
 
 		for (String keepAliveURL : keepAliveURLs) {
-			keepAliveURL = HttpComponentsUtil.addParameter(
-				keepAliveURL, "r", randomString);
+			keepAliveURL = _http.addParameter(keepAliveURL, "r", randomString);
 
 			printWriter.write("document.write('<img alt=\"\" src=\"");
 			printWriter.write(
@@ -107,7 +107,9 @@ public class KeepAliveStrutsAction implements StrutsAction {
 		}
 	}
 
-	private void _executeSpKeepAlive(HttpServletResponse httpServletResponse)
+	protected void executeSpKeepAlive(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws Exception {
 
 		httpServletResponse.setHeader(
@@ -123,12 +125,12 @@ public class KeepAliveStrutsAction implements StrutsAction {
 		outputStream.write(Base64.decode(_BASE64_1X1_GIF));
 	}
 
-	private List<String> _getSPsKeepAliveURLs(
+	protected List<String> getSPsKeepAliveURLs(
 			HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		String samlSsoSessionId = CookiesManagerUtil.getCookieValue(
-			SamlWebKeys.SAML_SSO_SESSION_ID, httpServletRequest);
+		String samlSsoSessionId = CookieKeys.getCookie(
+			httpServletRequest, SamlWebKeys.SAML_SSO_SESSION_ID);
 
 		SamlIdpSsoSession samlIdpSsoSession =
 			_samlIdpSsoSessionLocalService.fetchSamlIdpSso(samlSsoSessionId);
@@ -179,6 +181,9 @@ public class KeepAliveStrutsAction implements StrutsAction {
 
 	private static final String _BASE64_1X1_GIF =
 		"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=";
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private SamlIdpSpConnectionLocalService _samlIdpSpConnectionLocalService;

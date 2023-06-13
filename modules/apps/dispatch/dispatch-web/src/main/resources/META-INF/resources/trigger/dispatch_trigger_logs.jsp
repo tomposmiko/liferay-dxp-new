@@ -34,13 +34,12 @@ SearchContainer<DispatchLog> dispatchLogSearchContainer = DispatchLogSearchConta
 
 <clay:management-toolbar
 	managementToolbarDisplayContext="<%= new ViewDispatchLogManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, dispatchLogSearchContainer) %>"
-	propsTransformer="trigger/js/DispatchLogManagementToolbarPropsTransformer"
 />
 
 <div id="<portlet:namespace />triggerLogsContainer">
 	<div class="closed container-fluid container-fluid-max-xl" id="<portlet:namespace />infoPanelId">
-		<aui:form action="<%= portletURL %>" method="post" name="fm">
-			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.DELETE %>" />
+		<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+			<aui:input name="<%= Constants.CMD %>" type="hidden" />
 			<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 			<aui:input name="deleteDispatchLogIds" type="hidden" />
 
@@ -55,7 +54,7 @@ SearchContainer<DispatchLog> dispatchLogSearchContainer = DispatchLogSearchConta
 						modelVar="dispatchLog"
 					>
 						<liferay-ui:search-container-column-text
-							cssClass="font-weight-bold important table-cell-expand"
+							cssClass="important table-cell-expand"
 							href='<%=
 								PortletURLBuilder.createRenderURL(
 									renderResponse
@@ -65,24 +64,11 @@ SearchContainer<DispatchLog> dispatchLogSearchContainer = DispatchLogSearchConta
 									currentURL
 								).setParameter(
 									"dispatchLogId", dispatchLog.getDispatchLogId()
-								).setParameter(
-									"dispatchTriggerId", dispatchTrigger.getDispatchTriggerId()
 								).buildPortletURL()
 							%>'
 							name="start-date"
 						>
-							<%= fastDateTimeFormat.format(dispatchLog.getStartDate()) %>
-						</liferay-ui:search-container-column-text>
-
-						<%
-						Format dateTimeFormat = FastDateFormatFactoryUtil.getDateTime(FastDateFormatConstants.SHORT, FastDateFormatConstants.LONG, locale, TimeZone.getTimeZone(dispatchTrigger.getTimeZoneId()));
-						%>
-
-						<liferay-ui:search-container-column-text
-							cssClass="table-cell-expand"
-							name="scheduled-start-date"
-						>
-							<%= dateTimeFormat.format(dispatchLog.getStartDate()) %>
+							<%= fastDateFormat.format(dispatchLog.getStartDate()) %>
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text

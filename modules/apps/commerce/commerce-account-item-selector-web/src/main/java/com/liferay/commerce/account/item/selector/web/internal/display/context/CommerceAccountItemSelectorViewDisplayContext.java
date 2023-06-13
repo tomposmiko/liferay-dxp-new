@@ -14,17 +14,18 @@
 
 package com.liferay.commerce.account.item.selector.web.internal.display.context;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
-import com.liferay.commerce.account.item.selector.web.internal.display.context.helper.CommerceAccountItemSelectorRequestHelper;
+import com.liferay.commerce.account.item.selector.web.internal.display.context.util.CommerceAccountItemSelectorRequestHelper;
 import com.liferay.commerce.account.item.selector.web.internal.search.CommerceAccountItemSelectorChecker;
-import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -37,13 +38,11 @@ import javax.servlet.http.HttpServletRequest;
 public class CommerceAccountItemSelectorViewDisplayContext {
 
 	public CommerceAccountItemSelectorViewDisplayContext(
-		AccountEntryLocalService accountEntryLocalService,
-		CommerceAccountHelper commerceAccountHelper,
+		CommerceAccountService commerceAccountService,
 		HttpServletRequest httpServletRequest, PortletURL portletURL,
 		String itemSelectedEventName) {
 
-		_accountEntryLocalService = accountEntryLocalService;
-		_commerceAccountHelper = commerceAccountHelper;
+		_commerceAccountService = commerceAccountService;
 		_itemSelectedEventName = itemSelectedEventName;
 
 		_commerceAccountItemSelectorRequestHelper =
@@ -79,7 +78,7 @@ public class CommerceAccountItemSelectorViewDisplayContext {
 		return _portletURL;
 	}
 
-	public SearchContainer<AccountEntry> getSearchContainer()
+	public SearchContainer<CommerceAccount> getSearchContainer()
 		throws PortalException {
 
 		if (_searchContainer != null) {
@@ -89,28 +88,42 @@ public class CommerceAccountItemSelectorViewDisplayContext {
 		_searchContainer = new SearchContainer<>(
 			_commerceAccountItemSelectorRequestHelper.
 				getLiferayPortletRequest(),
-			getPortletURL(), null, "there-are-no-accounts");
+			getPortletURL(), null, null);
+
+		_searchContainer.setEmptyResultsMessage("there-are-no-accounts");
 
 		_searchContainer.setOrderByCol(getOrderByCol());
 		_searchContainer.setOrderByType(getOrderByType());
-		_searchContainer.setResultsAndTotal(
-			() -> _accountEntryLocalService.getUserAccountEntries(
+
+		RowChecker rowChecker = new CommerceAccountItemSelectorChecker(
+			_commerceAccountItemSelectorRequestHelper.getRenderResponse(),
+			getCheckedCommerceAccountIds());
+
+		_searchContainer.setRowChecker(rowChecker);
+
+		List<CommerceAccount> results =
+			_commerceAccountService.getUserCommerceAccounts(
 				_commerceAccountItemSelectorRequestHelper.getUserId(),
-				AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, getKeywords(),
-				_commerceAccountHelper.toAccountEntryTypes(
-					CommerceAccountConstants.SITE_TYPE_B2X),
-				_searchContainer.getStart(), _searchContainer.getEnd()),
-			_accountEntryLocalService.getUserAccountEntriesCount(
-				_commerceAccountItemSelectorRequestHelper.getUserId(),
-				AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, getKeywords(),
-				_commerceAccountHelper.toAccountEntryTypes(
-					CommerceAccountConstants.SITE_TYPE_B2X)));
-		_searchContainer.setRowChecker(
-			new CommerceAccountItemSelectorChecker(
-				_commerceAccountItemSelectorRequestHelper.getRenderResponse(),
-				_getCheckedCommerceAccountIds()));
+				CommerceAccountConstants.DEFAULT_PARENT_ACCOUNT_ID,
+				CommerceAccountConstants.SITE_TYPE_B2X, getKeywords(),
+				_searchContainer.getStart(), _searchContainer.getEnd());
+
+		_searchContainer.setResults(results);
+
+		int total = _commerceAccountService.getUserCommerceAccountsCount(
+			_commerceAccountItemSelectorRequestHelper.getUserId(),
+			CommerceAccountConstants.DEFAULT_PARENT_ACCOUNT_ID,
+			CommerceAccountConstants.SITE_TYPE_B2X, getKeywords());
+
+		_searchContainer.setTotal(total);
 
 		return _searchContainer;
+	}
+
+	protected long[] getCheckedCommerceAccountIds() {
+		return ParamUtil.getLongValues(
+			_commerceAccountItemSelectorRequestHelper.getRenderRequest(),
+			"checkedCommerceAccountIds");
 	}
 
 	protected String getKeywords() {
@@ -125,19 +138,12 @@ public class CommerceAccountItemSelectorViewDisplayContext {
 		return _keywords;
 	}
 
-	private long[] _getCheckedCommerceAccountIds() {
-		return ParamUtil.getLongValues(
-			_commerceAccountItemSelectorRequestHelper.getRenderRequest(),
-			"checkedCommerceAccountIds");
-	}
-
-	private final AccountEntryLocalService _accountEntryLocalService;
-	private final CommerceAccountHelper _commerceAccountHelper;
 	private final CommerceAccountItemSelectorRequestHelper
 		_commerceAccountItemSelectorRequestHelper;
+	private final CommerceAccountService _commerceAccountService;
 	private final String _itemSelectedEventName;
 	private String _keywords;
 	private final PortletURL _portletURL;
-	private SearchContainer<AccountEntry> _searchContainer;
+	private SearchContainer<CommerceAccount> _searchContainer;
 
 }

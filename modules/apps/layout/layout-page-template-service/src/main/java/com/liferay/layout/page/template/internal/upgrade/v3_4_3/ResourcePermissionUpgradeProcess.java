@@ -82,7 +82,7 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 
 			ResourcePermission newResourcePermission =
 				_resourcePermissionLocalService.createResourcePermission(
-					increment(ResourcePermission.class.getName()));
+					increment());
 
 			newResourcePermission.setCompanyId(
 				resourcePermission.getCompanyId());
@@ -122,7 +122,7 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

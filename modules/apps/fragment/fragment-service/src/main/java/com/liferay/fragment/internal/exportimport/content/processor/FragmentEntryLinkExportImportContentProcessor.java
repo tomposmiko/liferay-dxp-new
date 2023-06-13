@@ -16,14 +16,13 @@ package com.liferay.fragment.internal.exportimport.content.processor;
 
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
-import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.StagedModel;
+import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -35,7 +34,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "model.class.name=com.liferay.fragment.model.FragmentEntryLink",
-	service = ExportImportContentProcessor.class
+	service = {
+		ExportImportContentProcessor.class,
+		FragmentEntryLinkExportImportContentProcessor.class
+	}
 )
 public class FragmentEntryLinkExportImportContentProcessor
 	implements ExportImportContentProcessor<String> {
@@ -47,9 +49,12 @@ public class FragmentEntryLinkExportImportContentProcessor
 			boolean escapeContent)
 		throws Exception {
 
-		FragmentEntryLink fragmentEntryLink = (FragmentEntryLink)stagedModel;
+		JSONObject editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
+			content);
 
-		if (fragmentEntryLink.isTypePortlet()) {
+		String portletId = editableValuesJSONObject.getString("portletId");
+
+		if (Validator.isNotNull(portletId)) {
 			return content;
 		}
 
@@ -64,8 +69,7 @@ public class FragmentEntryLinkExportImportContentProcessor
 					portletDataContext, stagedModel, content,
 					exportReferencedContent, escapeContent);
 
-		JSONObject editableValuesJSONObject = _jsonFactory.createJSONObject(
-			content);
+		editableValuesJSONObject = JSONFactoryUtil.createJSONObject(content);
 
 		for (ExportImportContentProcessor<JSONObject>
 				exportImportContentProcessor :
@@ -86,9 +90,12 @@ public class FragmentEntryLinkExportImportContentProcessor
 			String content)
 		throws Exception {
 
-		FragmentEntryLink fragmentEntryLink = (FragmentEntryLink)stagedModel;
+		JSONObject editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
+			content);
 
-		if (fragmentEntryLink.isTypePortlet()) {
+		String portletId = editableValuesJSONObject.getString("portletId");
+
+		if (Validator.isNotNull(portletId)) {
 			return content;
 		}
 
@@ -101,22 +108,7 @@ public class FragmentEntryLinkExportImportContentProcessor
 				replaceImportContentReferences(
 					portletDataContext, stagedModel, content);
 
-		JSONObject editableValuesJSONObject = _jsonFactory.createJSONObject(
-			content);
-
-		for (String fragmentEntryProcessorKey :
-				_FRAGMENT_ENTRY_PROCESSOR_KEYS) {
-
-			JSONObject fragmentEntryProcessorJSONObject =
-				editableValuesJSONObject.getJSONObject(
-					fragmentEntryProcessorKey);
-
-			if ((fragmentEntryProcessorJSONObject != null) &&
-				(fragmentEntryProcessorJSONObject.length() == 0)) {
-
-				editableValuesJSONObject.remove(fragmentEntryProcessorKey);
-			}
-		}
+		editableValuesJSONObject = JSONFactoryUtil.createJSONObject(content);
 
 		for (ExportImportContentProcessor<JSONObject>
 				exportImportContentProcessor :
@@ -145,22 +137,14 @@ public class FragmentEntryLinkExportImportContentProcessor
 				"(content.processor.type=FragmentEntryLinkEditableValues)");
 	}
 
-	private static final String[] _FRAGMENT_ENTRY_PROCESSOR_KEYS = {
-		FragmentEntryProcessorConstants.
-			KEY_BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
-		FragmentEntryProcessorConstants.KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
-		FragmentEntryProcessorConstants.KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
-	};
-
 	@Reference(target = "(content.processor.type=DLReferences)")
 	private ExportImportContentProcessor<String>
 		_dlReferencesExportImportContentProcessor;
 
-	private ServiceTrackerList<ExportImportContentProcessor<JSONObject>>
-		_fragmentEntryLinkEditableValuesExportImportProcessors;
-
-	@Reference
-	private JSONFactory _jsonFactory;
+	private ServiceTrackerList
+		<ExportImportContentProcessor<JSONObject>,
+		 ExportImportContentProcessor<JSONObject>>
+			_fragmentEntryLinkEditableValuesExportImportProcessors;
 
 	@Reference(target = "(content.processor.type=LayoutReferences)")
 	private ExportImportContentProcessor<String>

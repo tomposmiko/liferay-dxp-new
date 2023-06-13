@@ -64,12 +64,9 @@ const Panel = ({bottomContent, children, expression}) => (
 						</span>
 					</h4>
 				</FormGroupItem>
-
 				{children}
 			</div>
-
 			{bottomContent}
-
 			<TimelineIncrementIcon />
 		</ClayPanel.Body>
 	</ClayPanel>
@@ -136,7 +133,6 @@ const ListHeader = ({disabled, items, operator, title, ...otherProps}) => (
 							small
 						>
 							<span className="text-uppercase">{operator}</span>
-
 							<span className="inline-item inline-item-after">
 								<ClayIcon symbol="caret-bottom" />
 							</span>
@@ -144,7 +140,6 @@ const ListHeader = ({disabled, items, operator, title, ...otherProps}) => (
 					}
 				/>
 			)}
-
 			<TimelineIncrementIcon />
 		</ClayPanel>
 	</ListItem>

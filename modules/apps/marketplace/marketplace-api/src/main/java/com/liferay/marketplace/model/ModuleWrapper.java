@@ -273,11 +273,6 @@ public class ModuleWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected ModuleWrapper wrap(Module module) {
 		return new ModuleWrapper(module);
 	}

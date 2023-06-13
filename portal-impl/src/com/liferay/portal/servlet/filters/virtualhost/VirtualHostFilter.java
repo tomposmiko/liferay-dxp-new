@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.struts.LastPath;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -106,8 +106,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 		if (friendlyURL.startsWith(_PATH_DOCUMENTS) &&
 			WebServerServlet.hasFiles(httpServletRequest)) {
 
-			String path = HttpComponentsUtil.fixPath(
-				httpServletRequest.getPathInfo());
+			String path = HttpUtil.fixPath(httpServletRequest.getPathInfo());
 
 			String[] pathArray = StringUtil.split(path, CharPool.SLASH);
 
@@ -121,7 +120,8 @@ public class VirtualHostFilter extends BasePortalFilter {
 					// LPS-52675
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(noSuchLayoutException);
+						_log.debug(
+							noSuchLayoutException, noSuchLayoutException);
 					}
 
 					return true;
@@ -165,7 +165,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 			HttpServletResponse httpServletResponse, FilterChain filterChain)
 		throws Exception {
 
-		String originalFriendlyURL = HttpComponentsUtil.normalizePath(
+		String originalFriendlyURL = HttpUtil.normalizePath(
 			httpServletRequest.getRequestURI());
 
 		String friendlyURL = originalFriendlyURL;
@@ -261,9 +261,6 @@ public class VirtualHostFilter extends BasePortalFilter {
 				VirtualHostFilter.class.getName(), httpServletRequest,
 				httpServletResponse, filterChain);
 
-			WebServerServlet.sendMessageObjectEntryAttachmentDownload(
-				httpServletRequest, null);
-
 			return;
 		}
 
@@ -276,8 +273,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 			String parameters = StringPool.BLANK;
 
 			if (!parameterMap.isEmpty()) {
-				parameters = HttpComponentsUtil.parameterMapToString(
-					parameterMap);
+				parameters = HttpUtil.parameterMapToString(parameterMap);
 			}
 
 			LastPath lastPath = new LastPath(
@@ -329,22 +325,6 @@ public class VirtualHostFilter extends BasePortalFilter {
 					if (Validator.isNotNull(homeURL)) {
 						friendlyURL = homeURL;
 					}
-
-					if (friendlyURL.equals(StringPool.SLASH)) {
-						if (layoutSet.isPrivateLayout()) {
-							if (group.isUser()) {
-								sb.append(_PRIVATE_USER_SERVLET_MAPPING);
-							}
-							else {
-								sb.append(_PRIVATE_GROUP_SERVLET_MAPPING);
-							}
-						}
-						else {
-							sb.append(_PUBLIC_GROUP_SERVLET_MAPPING);
-						}
-
-						sb.append(group.getFriendlyURL());
-					}
 				}
 				else {
 					if (layoutSet.isPrivateLayout()) {
@@ -381,7 +361,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 			requestDispatcher.forward(httpServletRequest, httpServletResponse);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			processFilter(
 				VirtualHostFilter.class.getName(), httpServletRequest,

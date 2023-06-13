@@ -17,20 +17,41 @@ package com.liferay.portal.reports.engine;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 
 /**
  * @author Michael C. Han
  */
-public class ByteArrayReportResultContainer implements ReportResultContainer {
+public class ByteArrayReportResultContainer
+	implements ReportResultContainer, Serializable {
+
+	public static final int DEFAULT_INITIAL_CAPCITY = 15360;
+
+	public ByteArrayReportResultContainer() {
+		this(null, DEFAULT_INITIAL_CAPCITY);
+	}
 
 	public ByteArrayReportResultContainer(String reportName) {
+		this(reportName, DEFAULT_INITIAL_CAPCITY);
+	}
+
+	public ByteArrayReportResultContainer(
+		String reportName, int initialCapacity) {
+
 		_reportName = reportName;
+		_initialCapacity = initialCapacity;
+	}
+
+	@Override
+	public ReportResultContainer clone(String reportName) {
+		return new ByteArrayReportResultContainer(reportName, _initialCapacity);
 	}
 
 	@Override
 	public OutputStream getOutputStream() {
 		if (_unsyncByteArrayOutputStream == null) {
-			_unsyncByteArrayOutputStream = new UnsyncByteArrayOutputStream();
+			_unsyncByteArrayOutputStream = new UnsyncByteArrayOutputStream(
+				_initialCapacity);
 		}
 
 		return _unsyncByteArrayOutputStream;
@@ -67,6 +88,7 @@ public class ByteArrayReportResultContainer implements ReportResultContainer {
 		_reportGenerationException = reportGenerationException;
 	}
 
+	private final int _initialCapacity;
 	private ReportGenerationException _reportGenerationException;
 	private final String _reportName;
 	private UnsyncByteArrayOutputStream _unsyncByteArrayOutputStream;

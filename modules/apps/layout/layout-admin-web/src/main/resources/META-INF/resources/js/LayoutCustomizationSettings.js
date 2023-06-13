@@ -12,7 +12,6 @@
  * details.
  */
 
-import {getSpritemap} from '@liferay/frontend-icons-web';
 import {fetch, objectToFormData} from 'frontend-js-web';
 
 /**
@@ -114,7 +113,7 @@ function createOverlayElement(columnElement) {
 						</span>
 					</label>
 					<svg class="d-inline-block lexicon-icon lexicon-icon-question-circle-full small text-white" role="presentation">
-						<use xlink:href="${getSpritemap()}#question-circle-full" />
+						<use xlink:href="${themeDisplay.getPathThemeImages()}/lexicon/icons.svg#question-circle-full" />
 					</svg>
 				</div>
 			</div>

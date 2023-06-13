@@ -62,15 +62,7 @@ public abstract class BaseLocalGitRepository
 
 	@Override
 	public File getDirectory() {
-		String directoryPath = getString("directory");
-
-		if (JenkinsResultsParserUtil.isWindows() &&
-			directoryPath.startsWith("/")) {
-
-			directoryPath = "C:" + directoryPath;
-		}
-
-		return new File(directoryPath);
+		return getFile("directory");
 	}
 
 	@Override
@@ -167,29 +159,6 @@ public abstract class BaseLocalGitRepository
 		}
 
 		_setDirectory(directory);
-
-		validateKeys(_KEYS_REQUIRED);
-	}
-
-	protected BaseLocalGitRepository(
-		String name, String upstreamBranchName, File repositoryDir) {
-
-		super(name);
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(upstreamBranchName)) {
-			throw new IllegalArgumentException("Upstream branch name is null");
-		}
-
-		_setUpstreamBranchName(upstreamBranchName);
-
-		if (!repositoryDir.exists()) {
-			throw new IllegalArgumentException(
-				"Unable to find " + repositoryDir);
-		}
-
-		put("directory_name", repositoryDir.getName());
-
-		_setDirectory(repositoryDir);
 
 		validateKeys(_KEYS_REQUIRED);
 	}

@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CountryLocalizationPersistence;
 import com.liferay.portal.kernel.service.persistence.CountryPersistence;
-import com.liferay.portal.kernel.service.persistence.CountryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -50,7 +49,6 @@ import com.liferay.portal.model.impl.CountryModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -184,7 +182,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Country country : list) {
@@ -564,8 +562,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -722,7 +719,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Country country : list) {
@@ -1134,8 +1131,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1291,7 +1287,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Country country : list) {
@@ -1647,8 +1643,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1780,7 +1775,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Country country : list) {
@@ -2135,8 +2130,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {active};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2252,7 +2246,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_A2, finderArgs, this);
+				_finderPathFetchByC_A2, finderArgs);
 		}
 
 		if (result instanceof Country) {
@@ -2363,8 +2357,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, a2};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2500,7 +2493,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_A3, finderArgs, this);
+				_finderPathFetchByC_A3, finderArgs);
 		}
 
 		if (result instanceof Country) {
@@ -2611,8 +2604,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, a3};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2774,7 +2766,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Country country : list) {
@@ -3160,8 +3152,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, active};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3284,7 +3275,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_Name, finderArgs, this);
+				_finderPathFetchByC_Name, finderArgs);
 		}
 
 		if (result instanceof Country) {
@@ -3395,8 +3386,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, name};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3533,7 +3523,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_Number, finderArgs, this);
+				_finderPathFetchByC_Number, finderArgs);
 		}
 
 		if (result instanceof Country) {
@@ -3644,8 +3634,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, number};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3818,7 +3807,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Country country : list) {
@@ -4235,8 +4224,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, active, billingAllowed};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -4404,7 +4392,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Country country : list) {
@@ -4821,8 +4809,7 @@ public class CountryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, active, shippingAllowed};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -5352,7 +5339,7 @@ public class CountryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Country>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -5422,7 +5409,7 @@ public class CountryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -5673,29 +5660,10 @@ public class CountryPersistenceImpl
 				Boolean.class.getName()
 			},
 			new String[] {"companyId", "active_", "shippingAllowed"}, false);
-
-		_setCountryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setCountryUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(CountryImpl.class.getName());
-	}
-
-	private void _setCountryUtilPersistence(
-		CountryPersistence countryPersistence) {
-
-		try {
-			Field field = CountryUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, countryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@BeanReference(type = CountryLocalizationPersistence.class)

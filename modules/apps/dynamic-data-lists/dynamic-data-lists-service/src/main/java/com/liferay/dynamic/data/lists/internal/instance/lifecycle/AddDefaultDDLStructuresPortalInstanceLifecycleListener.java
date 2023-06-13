@@ -18,7 +18,6 @@ import com.liferay.dynamic.data.lists.internal.configuration.DDLServiceConfigura
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService;
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
-import com.liferay.osgi.util.configuration.ConfigurationPersistenceUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
@@ -34,6 +33,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -41,15 +41,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.dynamic.data.lists.internal.configuration.DDLServiceConfiguration",
-	service = PortalInstanceLifecycleListener.class
+	immediate = true, service = PortalInstanceLifecycleListener.class
 )
 public class AddDefaultDDLStructuresPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
-
-	@Override
-	public long getLastModifiedTime() {
-		return _lastModifiedTime;
-	}
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
@@ -67,13 +62,13 @@ public class AddDefaultDDLStructuresPortalInstanceLifecycleListener
 
 		serviceContext.setScopeGroupId(group.getGroupId());
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			company.getCompanyId());
 
-		serviceContext.setUserId(guestUserId);
+		serviceContext.setUserId(defaultUserId);
 
 		_defaultDDMStructureHelper.addDDMStructures(
-			guestUserId, group.getGroupId(),
+			defaultUserId, group.getGroupId(),
 			_portal.getClassNameId(DDLRecordSet.class),
 			AddDefaultDDLStructuresPortalInstanceLifecycleListener.class.
 				getClassLoader(),
@@ -83,34 +78,46 @@ public class AddDefaultDDLStructuresPortalInstanceLifecycleListener
 	}
 
 	@Activate
-	protected void activate(Map<String, Object> properties) throws Exception {
-		_lastModifiedTime = ConfigurationPersistenceUtil.update(
-			this, properties);
-
+	@Modified
+	protected void activate(Map<String, Object> properties) {
 		_ddlServiceConfiguration = ConfigurableUtil.createConfigurable(
 			DDLServiceConfiguration.class, properties);
 	}
 
-	@Reference
-	private DDLRecordSetLocalService _ddlRecordSetLocalService;
+	@Reference(unbind = "-")
+	protected void setDDLRecordSetLocalService(
+		DDLRecordSetLocalService ddlRecordSetLocalService) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setDefaultDDMStructureHelper(
+		DefaultDDMStructureHelper defaultDDMStructureHelper) {
+
+		_defaultDDMStructureHelper = defaultDDMStructureHelper;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
 
 	private volatile DDLServiceConfiguration _ddlServiceConfiguration;
-
-	@Reference
 	private DefaultDDMStructureHelper _defaultDDMStructureHelper;
-
-	@Reference
 	private GroupLocalService _groupLocalService;
-
-	private long _lastModifiedTime;
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

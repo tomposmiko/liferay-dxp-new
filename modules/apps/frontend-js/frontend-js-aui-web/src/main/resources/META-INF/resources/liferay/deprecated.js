@@ -12,19 +12,19 @@
  * details.
  */
 
-/* eslint-disable @liferay/aui/no-one */
-
 // For details about this file see: LPS-2155
 
 (function (A) {
-	const Util = Liferay.Util;
+	var Util = Liferay.Util;
 
-	const Lang = A.Lang;
+	var Lang = A.Lang;
 
-	const htmlEscapedValues = [];
-	const htmlUnescapedValues = [];
+	var AObject = A.Object;
 
-	const MAP_HTML_CHARS_ESCAPED = {
+	var htmlEscapedValues = [];
+	var htmlUnescapedValues = [];
+
+	var MAP_HTML_CHARS_ESCAPED = {
 		'"': '&#034;',
 		'&': '&amp;',
 		"'": '&#039;',
@@ -34,19 +34,18 @@
 		'`': '&#096;',
 	};
 
-	const MAP_HTML_CHARS_UNESCAPED = {};
+	var MAP_HTML_CHARS_UNESCAPED = {};
 
-	// eslint-disable-next-line @liferay/aui/no-object
-	A.Object.each(MAP_HTML_CHARS_ESCAPED, (item, index) => {
+	AObject.each(MAP_HTML_CHARS_ESCAPED, (item, index) => {
 		MAP_HTML_CHARS_UNESCAPED[item] = index;
 
 		htmlEscapedValues.push(item);
 		htmlUnescapedValues.push(index);
 	});
 
-	const REGEX_DASH = /-([a-z])/gi;
+	var REGEX_DASH = /-([a-z])/gi;
 
-	const STR_RIGHT_SQUARE_BRACKET = ']';
+	var STR_RIGHT_SQUARE_BRACKET = ']';
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -57,7 +56,7 @@
 
 		object.before = function (method, f) {
 			/* eslint-disable-next-line no-eval */
-			const original = eval('this.' + method);
+			var original = eval('this.' + method);
 
 			this[method] = function () {
 				f.apply(this, arguments);
@@ -68,7 +67,7 @@
 
 		object.after = function (method, f) {
 			/* eslint-disable-next-line no-eval */
-			const original = eval('this.' + method);
+			var original = eval('this.' + method);
 
 			this[method] = function () {
 				this.rv[method] = original.apply(this, arguments);
@@ -79,7 +78,7 @@
 
 		object.around = function (method, f) {
 			/* eslint-disable-next-line no-eval */
-			const original = eval('this.' + method);
+			var original = eval('this.' + method);
 
 			this[method] = function () {
 				this.yield = original;
@@ -94,22 +93,22 @@
 	 */
 	Util.addInputFocus = function () {
 		A.use('aui-base', (A) => {
-			const handleFocus = function (event) {
-				const target = event.target;
+			var handleFocus = function (event) {
+				var target = event.target;
 
-				let tagName = target.get('tagName');
+				var tagName = target.get('tagName');
 
 				if (tagName) {
 					tagName = tagName.toLowerCase();
 				}
 
-				const nodeType = target.get('type');
+				var nodeType = target.get('type');
 
 				if (
-					(tagName === 'input' && /text|password/.test(nodeType)) ||
-					tagName === 'textarea'
+					(tagName == 'input' && /text|password/.test(nodeType)) ||
+					tagName == 'textarea'
 				) {
-					let action = 'addClass';
+					var action = 'addClass';
 
 					if (/blur|focusout/.test(event.type)) {
 						action = 'removeClass';
@@ -139,7 +138,7 @@
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	Util.camelize = function (value, separator) {
-		let regex = REGEX_DASH;
+		var regex = REGEX_DASH;
 
 		if (separator) {
 			regex = new RegExp(separator + '([a-z])', 'gi');
@@ -181,7 +180,7 @@
 		element.select();
 
 		if (document.all) {
-			const textRange = element.createTextRange();
+			var textRange = element.createTextRange();
 
 			textRange.execCommand('copy');
 		}
@@ -191,11 +190,11 @@
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	Util.setBox = function (oldBox, newBox) {
-		for (let i = oldBox.length - 1; i > -1; i--) {
+		for (var i = oldBox.length - 1; i > -1; i--) {
 			oldBox.options[i] = null;
 		}
 
-		for (let i = 0; i < newBox.length; i++) {
+		for (i = 0; i < newBox.length; i++) {
 			oldBox.options[i] = new Option(newBox[i].value, i);
 		}
 
@@ -213,16 +212,16 @@
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	Util.textareaTabs = function (event) {
-		const element = event.currentTarget.getDOM();
+		var element = event.currentTarget.getDOM();
 
 		if (event.isKey('TAB')) {
 			event.halt();
 
-			const oldscroll = element.scrollTop;
+			var oldscroll = element.scrollTop;
 
 			if (element.setSelectionRange) {
-				const caretPos = element.selectionStart + 1;
-				const elValue = element.value;
+				var caretPos = element.selectionStart + 1;
+				var elValue = element.value;
 
 				element.value =
 					elValue.substring(0, element.selectionStart) +
@@ -266,7 +265,7 @@
 		Util,
 		'check',
 		(form, name, checked) => {
-			const checkbox = A.one(form[name]);
+			var checkbox = A.one(form[name]);
 
 			if (checkbox) {
 				checkbox.attr('checked', checked);
@@ -282,16 +281,16 @@
 		Util,
 		'disableSelectBoxes',
 		(toggleBoxId, value, selectBoxId) => {
-			const selectBox = A.one('#' + selectBoxId);
-			const toggleBox = A.one('#' + toggleBoxId);
+			var selectBox = A.one('#' + selectBoxId);
+			var toggleBox = A.one('#' + toggleBoxId);
 
 			if (selectBox && toggleBox) {
-				const dynamicValue = Lang.isFunction(value);
+				var dynamicValue = Lang.isFunction(value);
 
-				const disabled = function () {
-					const currentValue = selectBox.val();
+				var disabled = function () {
+					var currentValue = selectBox.val();
 
-					let visible = value === currentValue;
+					var visible = value == currentValue;
 
 					if (dynamicValue) {
 						visible = value(currentValue, value);
@@ -317,7 +316,7 @@
 		(textarea) => {
 			textarea = A.one(textarea);
 
-			if (textarea && textarea.attr('textareatabs') !== 'enabled') {
+			if (textarea && textarea.attr('textareatabs') != 'enabled') {
 				textarea.attr('textareatabs', 'disabled');
 
 				textarea.detach('keydown', Util.textareaTabs);
@@ -335,7 +334,7 @@
 		(textarea) => {
 			textarea = A.one(textarea);
 
-			if (textarea && textarea.attr('textareatabs') !== 'enabled') {
+			if (textarea && textarea.attr('textareatabs') != 'enabled') {
 				textarea.attr('textareatabs', 'disabled');
 
 				textarea.on('keydown', Util.textareaTabs);
@@ -353,7 +352,7 @@
 		(box, value) => {
 			box = A.one(box);
 
-			const selectedIndex = box.get('selectedIndex');
+			var selectedIndex = box.get('selectedIndex');
 
 			if (!value) {
 				box.all('option').item(selectedIndex).remove(true);
@@ -374,7 +373,7 @@
 		Util,
 		'resizeTextarea',
 		(elString, usingRichEditor) => {
-			let element = A.one('#' + elString);
+			var element = A.one('#' + elString);
 
 			if (!element) {
 				element = A.one(
@@ -383,18 +382,17 @@
 			}
 
 			if (element) {
-				// eslint-disable-next-line @liferay/aui/no-get-body
-				const pageBody = A.getBody();
+				var pageBody = A.getBody();
 
-				let diff;
+				var diff;
 
-				const resize = function (event) {
-					const pageBodyHeight = pageBody.get('winHeight');
+				var resize = function (event) {
+					var pageBodyHeight = pageBody.get('winHeight');
 
 					if (usingRichEditor) {
 						try {
 							if (
-								element.get('nodeName').toLowerCase() !==
+								element.get('nodeName').toLowerCase() !=
 								'iframe'
 							) {
 								element = window[elString];
@@ -404,13 +402,13 @@
 					}
 
 					if (!diff) {
-						const buttonRow = pageBody.one('.button-holder');
-						const templateEditor = pageBody.one(
+						var buttonRow = pageBody.one('.button-holder');
+						var templateEditor = pageBody.one(
 							'.lfr-template-editor'
 						);
 
 						if (buttonRow && templateEditor) {
-							const region = templateEditor.getXY();
+							var region = templateEditor.getXY();
 
 							diff = buttonRow.outerHeight(true) + region[1] + 25;
 						}
@@ -421,7 +419,7 @@
 
 					element = A.one(element);
 
-					const styles = {
+					var styles = {
 						width: '98%',
 					};
 
@@ -454,10 +452,10 @@
 
 				resize();
 
-				const dialog = Liferay.Util.getWindow();
+				var dialog = Liferay.Util.getWindow();
 
 				if (dialog) {
-					const resizeEventHandle = dialog.iframe.after(
+					var resizeEventHandle = dialog.iframe.after(
 						'resizeiframe:heightChange',
 						resize
 					);
@@ -480,7 +478,7 @@
 		Util,
 		'setSelectedValue',
 		(col, value) => {
-			const option = A.one(col).one(
+			var option = A.one(col).one(
 				'option[value=' + value + STR_RIGHT_SQUARE_BRACKET
 			);
 
@@ -498,11 +496,11 @@
 		Util,
 		'switchEditor',
 		(options) => {
-			const uri = options.uri;
+			var uri = options.uri;
 
-			const windowName = Liferay.Util.getWindowName();
+			var windowName = Liferay.Util.getWindowName();
 
-			const dialog = Liferay.Util.getWindow(windowName);
+			var dialog = Liferay.Util.getWindow(windowName);
 
 			if (dialog) {
 				dialog.iframe.set('uri', uri);

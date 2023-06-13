@@ -20,8 +20,6 @@ import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.service.CommerceShippingMethodService;
-import com.liferay.commerce.util.comparator.CommerceShippingMethodPriorityComparator;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Country;
@@ -50,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"mvc.command.name=/commerce_channels/edit_commerce_shipping_method_address_restriction"
@@ -91,7 +90,8 @@ public class EditCommerceShippingMethodAddressRestrictionMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceAddressRestrictions(ActionRequest actionRequest)
+	protected void updateCommerceAddressRestrictions(
+			ActionRequest actionRequest)
 		throws Exception {
 
 		long commerceChannelId = ParamUtil.getLong(
@@ -102,9 +102,7 @@ public class EditCommerceShippingMethodAddressRestrictionMVCActionCommand
 
 		List<CommerceShippingMethod> commerceShippingMethods =
 			_commerceShippingMethodService.getCommerceShippingMethods(
-				commerceChannel.getGroupId(), true, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS,
-				new CommerceShippingMethodPriorityComparator());
+				commerceChannel.getGroupId(), true);
 
 		for (CommerceShippingMethod commerceShippingMethod :
 				commerceShippingMethods) {
@@ -162,7 +160,7 @@ public class EditCommerceShippingMethodAddressRestrictionMVCActionCommand
 
 		@Override
 		public Object call() throws Exception {
-			_updateCommerceAddressRestrictions(_actionRequest);
+			updateCommerceAddressRestrictions(_actionRequest);
 
 			return null;
 		}

@@ -18,10 +18,9 @@
 
 <@liferay_util["include"] page=body_top_include />
 
-<div class="d-flex flex-column min-vh-100">
-	<@liferay.control_menu />
+<@liferay.control_menu />
 
-	<div class="d-flex flex-column flex-fill position-relative" id="wrapper">
+<div class="container-fluid" id="wrapper">
 	<header id="banner" role="banner">
 		<div id="heading">
 			<div aria-level="1" class="site-title" role="heading">
@@ -37,7 +36,7 @@
 			</div>
 		</div>
 
-		<#if !is_signed_in && show_sign_in>
+		<#if !is_signed_in>
 			<a data-redirect="${is_login_redirect_required?string}" href="${sign_in_url}" id="sign-in" rel="nofollow">${sign_in_text}</a>
 		</#if>
 
@@ -47,7 +46,7 @@
 	</header>
 
 	<section id="content">
-		<h2 class="hide-accessible sr-only" role="heading" aria-level="1">${htmlUtil.escape(the_title)}</h2>
+		<h2 class="hide-accessible" role="heading" aria-level="1">${the_title}</h2>
 
 		<#if selectable>
 			<@liferay_util["include"] page=content_include />
@@ -70,7 +69,6 @@
 			/>
 		</p>
 	</footer>
-	</div>
 </div>
 
 <@liferay_util["include"] page=body_bottom_include />

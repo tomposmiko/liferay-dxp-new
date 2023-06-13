@@ -12,16 +12,7 @@
  * details.
  */
 
-import {render} from '@liferay/frontend-js-react-web';
-import {
-	openConfirmModal,
-	openSelectionModal,
-	openSimpleInputModal,
-	setFormValues,
-} from 'frontend-js-web';
-
-import CopyFragmentModal from './CopyFragmentModal';
-import openDeleteFragmentModal from './openDeleteFragmentModal';
+import {openSelectionModal, openSimpleInputModal} from 'frontend-js-web';
 
 const ACTIONS = {
 	copyFragmentEntry(
@@ -33,7 +24,7 @@ const ACTIONS = {
 		);
 
 		if (form) {
-			setFormValues(form, {
+			Liferay.Util.setFormValues(form, {
 				fragmentCollectionId,
 				fragmentEntryIds: fragmentEntryId,
 			});
@@ -43,59 +34,54 @@ const ACTIONS = {
 	},
 
 	copyToFragmentEntry(
-		{copyFragmentEntryURL, fragmentEntryId},
-		portletNamespace,
-		fragmentCollections
+		{copyFragmentEntryURL, fragmentEntryId, selectFragmentCollectionURL},
+		portletNamespace
 	) {
-		render(
-			CopyFragmentModal,
-			{
-				copyFragmentEntriesURL: copyFragmentEntryURL,
-				fragmentCollections,
-				fragmentEntryIds: [fragmentEntryId],
-				portletNamespace,
+		openSelectionModal({
+			onSelect: (selectedItem) => {
+				if (selectedItem) {
+					const form = document.getElementById(
+						`${portletNamespace}fragmentEntryFm`
+					);
+
+					if (form) {
+						Liferay.Util.setFormValues(form, {
+							fragmentCollectionId: selectedItem.id,
+							fragmentEntryIds: fragmentEntryId,
+						});
+					}
+
+					submitForm(form, copyFragmentEntryURL);
+				}
 			},
-			document.createElement('div')
-		);
+			selectEventName: `${portletNamespace}selectFragmentCollection`,
+			title: Liferay.Language.get('select-collection'),
+			url: selectFragmentCollectionURL,
+		});
 	},
 
 	deleteDraftFragmentEntry({deleteDraftFragmentEntryURL}) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, deleteDraftFragmentEntryURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, deleteDraftFragmentEntryURL);
+		}
 	},
 
 	deleteFragmentEntry({deleteFragmentEntryURL}) {
-		openDeleteFragmentModal({
-			onDelete: () => {
-				submitForm(document.hrefFm, deleteFragmentEntryURL);
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, deleteFragmentEntryURL);
+		}
 	},
 
 	deleteFragmentEntryPreview({deleteFragmentEntryPreviewURL}) {
 		submitForm(document.hrefFm, deleteFragmentEntryPreviewURL);
-	},
-
-	markAsCacheableFragmentEntry({markAsCacheableFragmentEntryURL}) {
-		openConfirmModal({
-			message: Liferay.Language.get('cacheable-fragment-help'),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(
-						document.hrefFm,
-						markAsCacheableFragmentEntryURL
-					);
-				}
-			},
-		});
 	},
 
 	moveFragmentEntry(
@@ -110,7 +96,7 @@ const ACTIONS = {
 					);
 
 					if (form) {
-						setFormValues(form, {
+						Liferay.Util.setFormValues(form, {
 							fragmentCollectionId: selectedItem.id,
 							fragmentEntryIds: fragmentEntryId,
 						});
@@ -120,7 +106,7 @@ const ACTIONS = {
 				}
 			},
 			selectEventName: `${portletNamespace}selectFragmentCollection`,
-			title: Liferay.Language.get('select-fragment-set'),
+			title: Liferay.Language.get('select-collection'),
 			url: selectFragmentCollectionURL,
 		});
 	},
@@ -142,10 +128,6 @@ const ACTIONS = {
 		});
 	},
 
-	unmarkAsCacheableFragmentEntry({unmarkAsCacheableFragmentEntryURL}) {
-		submitForm(document.hrefFm, unmarkAsCacheableFragmentEntryURL);
-	},
-
 	updateFragmentEntryPreview(
 		{fragmentEntryId, itemSelectorURL},
 		portletNamespace
@@ -160,7 +142,7 @@ const ACTIONS = {
 					);
 
 					if (form) {
-						setFormValues(form, {
+						Liferay.Util.setFormValues(form, {
 							fileEntryId: itemValue.fileEntryId,
 							fragmentEntryId,
 						});
@@ -178,7 +160,6 @@ const ACTIONS = {
 
 export default function propsTransformer({
 	actions,
-	additionalProps: {fragmentCollections},
 	portletNamespace,
 	...props
 }) {
@@ -198,11 +179,7 @@ export default function propsTransformer({
 				if (action) {
 					event.preventDefault();
 
-					ACTIONS[action](
-						actionItem.data,
-						portletNamespace,
-						fragmentCollections
-					);
+					ACTIONS[action](actionItem.data, portletNamespace);
 				}
 			},
 		};
@@ -210,6 +187,6 @@ export default function propsTransformer({
 
 	return {
 		...props,
-		actions: (actions || []).map(transformAction),
+		actions: actions.map(transformAction),
 	};
 }

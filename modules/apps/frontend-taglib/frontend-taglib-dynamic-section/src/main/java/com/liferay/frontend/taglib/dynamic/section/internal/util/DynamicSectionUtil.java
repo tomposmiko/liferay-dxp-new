@@ -21,13 +21,15 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 
 import java.util.List;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Matthew Tambara
  */
+@Component(immediate = true, service = {})
 public class DynamicSectionUtil {
 
 	public static DynamicSectionReplace getReplace(String name) {
@@ -38,24 +40,23 @@ public class DynamicSectionUtil {
 		return _dynamicSectionServiceTrackerMap.getService(name);
 	}
 
-	private static final ServiceTrackerMap<String, DynamicSectionReplace>
-		_dynamicSectionReplaceServiceTrackerMap;
-	private static final ServiceTrackerMap<String, List<DynamicSection>>
-		_dynamicSectionServiceTrackerMap;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(DynamicSectionUtil.class);
-
+	@Activate
+	protected void activate(BundleContext bundleContext) {
 		_dynamicSectionServiceTrackerMap =
 			ServiceTrackerMapFactory.openMultiValueMap(
-				bundle.getBundleContext(), DynamicSection.class, "(name=*)",
+				bundleContext, DynamicSection.class, "(name=*)",
 				(serviceReference, emitter) -> emitter.emit(
 					(String)serviceReference.getProperty("name")),
 				ServiceReference::compareTo);
 
 		_dynamicSectionReplaceServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
-				bundle.getBundleContext(), DynamicSectionReplace.class, "name");
+				bundleContext, DynamicSectionReplace.class, "name");
 	}
+
+	private static ServiceTrackerMap<String, DynamicSectionReplace>
+		_dynamicSectionReplaceServiceTrackerMap;
+	private static ServiceTrackerMap<String, List<DynamicSection>>
+		_dynamicSectionServiceTrackerMap;
 
 }

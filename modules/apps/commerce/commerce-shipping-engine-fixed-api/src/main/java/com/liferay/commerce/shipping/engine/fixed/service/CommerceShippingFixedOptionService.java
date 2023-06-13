@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -44,6 +46,13 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @AccessControlled
 @JSONWebService
+@OSGiBeanProperties(
+	property = {
+		"json.web.service.context.name=commerce",
+		"json.web.service.context.path=CommerceShippingFixedOption"
+	},
+	service = CommerceShippingFixedOptionService.class
+)
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
@@ -57,9 +66,19 @@ public interface CommerceShippingFixedOptionService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.commerce.shipping.engine.fixed.service.impl.CommerceShippingFixedOptionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the commerce shipping fixed option remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link CommerceShippingFixedOptionServiceUtil} if injection and service tracking are not available.
 	 */
 	public CommerceShippingFixedOption addCommerceShippingFixedOption(
-			long groupId, long commerceShippingMethodId, BigDecimal amount,
-			Map<Locale, String> descriptionMap, String key,
-			Map<Locale, String> nameMap, double priority)
+			long groupId, long commerceShippingMethodId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			BigDecimal amount, double priority)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	public CommerceShippingFixedOption addCommerceShippingFixedOption(
+			long commerceShippingMethodId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, BigDecimal amount,
+			double priority, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void deleteCommerceShippingFixedOption(
@@ -69,11 +88,6 @@ public interface CommerceShippingFixedOptionService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceShippingFixedOption fetchCommerceShippingFixedOption(
 			long commerceShippingFixedOptionId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceShippingFixedOption fetchCommerceShippingFixedOption(
-			long companyId, String key)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -112,9 +126,9 @@ public interface CommerceShippingFixedOptionService extends BaseService {
 	public String getOSGiServiceIdentifier();
 
 	public CommerceShippingFixedOption updateCommerceShippingFixedOption(
-			long commerceShippingFixedOptionId, BigDecimal amount,
-			Map<Locale, String> descriptionMap, String key,
-			Map<Locale, String> nameMap, double priority)
+			long commerceShippingFixedOptionId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, BigDecimal amount,
+			double priority)
 		throws PortalException;
 
 }

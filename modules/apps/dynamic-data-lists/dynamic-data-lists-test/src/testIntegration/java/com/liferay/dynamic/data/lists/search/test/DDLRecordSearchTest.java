@@ -93,10 +93,10 @@ public class DDLRecordSearchTest {
 	}
 
 	@Test
-	public void testBasicSearchWithGuestUser() throws Exception {
+	public void testBasicSearchWithDefaultUser() throws Exception {
 		long companyId = TestPropsValues.getCompanyId();
 
-		User user = UserLocalServiceUtil.getGuestUser(companyId);
+		User user = UserLocalServiceUtil.getDefaultUser(companyId);
 
 		Group group = GroupTestUtil.addGroup(
 			companyId, user.getUserId(),
@@ -192,7 +192,7 @@ public class DDLRecordSearchTest {
 	public void testLocales() throws Exception {
 		long companyId = TestPropsValues.getCompanyId();
 
-		User user = UserLocalServiceUtil.getGuestUser(companyId);
+		User user = UserLocalServiceUtil.getDefaultUser(companyId);
 
 		Group group = GroupTestUtil.addGroup(
 			companyId, user.getUserId(),
@@ -485,11 +485,12 @@ public class DDLRecordSearchTest {
 	}
 
 	protected boolean isExactPhraseQueryImplementedForSearchEngine() {
-		SearchEngine searchEngine = SearchEngineHelperUtil.getSearchEngine();
+		SearchEngine searchEngine = SearchEngineHelperUtil.getSearchEngine(
+			SearchEngineHelperUtil.getDefaultSearchEngineId());
 
 		String vendor = searchEngine.getVendor();
 
-		if (vendor.equals("Elasticsearch") || vendor.equals("Solr")) {
+		if (vendor.equals("Elasticsearch")) {
 			return false;
 		}
 

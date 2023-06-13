@@ -41,7 +41,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = AssetRendererSharingEntryInterpreter.class)
+@Component(
+	immediate = true, service = AssetRendererSharingEntryInterpreter.class
+)
 public class AssetRendererSharingEntryInterpreter
 	implements SharingEntryInterpreter {
 
@@ -92,7 +94,7 @@ public class AssetRendererSharingEntryInterpreter
 			return assetEntry.getTitle();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return StringPool.BLANK;

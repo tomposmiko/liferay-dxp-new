@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = "layout.type=" + DDMFormPortletLayoutTypeConstants.LAYOUT_TYPE,
 	service = LayoutTypeController.class
 )
@@ -83,6 +84,22 @@ public class DDMFormPortletLayoutTypeController
 		return true;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
+	}
+
 	@Override
 	protected ServletResponse createServletResponse(
 		HttpServletResponse httpServletResponse,
@@ -98,13 +115,16 @@ public class DDMFormPortletLayoutTypeController
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	protected String getViewPage() {
 		return _VIEW_PAGE;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.dynamic.data.mapping.form.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 
 	private static final String _EDIT_PAGE = "/layout/edit/portlet.jsp";
@@ -114,10 +134,5 @@ public class DDMFormPortletLayoutTypeController
 			"&p_p_state=pop_up&p_v_l_s_g_id=${liferay:pvlsgid}";
 
 	private static final String _VIEW_PAGE = "/layout/view/portlet.jsp";
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.dynamic.data.mapping.form.web)"
-	)
-	private ServletContext _servletContext;
 
 }

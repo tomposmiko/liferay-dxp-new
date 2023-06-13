@@ -19,7 +19,7 @@ import aQute.bnd.annotation.metatype.Meta;
 import com.liferay.analytics.message.sender.client.AnalyticsMessageSenderClient;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -29,11 +29,8 @@ import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsFactory;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.net.UnknownHostException;
@@ -61,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rachael Koestartyo
  */
-@Component(service = AnalyticsMessageSenderClient.class)
+@Component(immediate = true, service = AnalyticsMessageSenderClient.class)
 public class AnalyticsMessageSenderClientImpl
 	extends BaseAnalyticsClientImpl implements AnalyticsMessageSenderClient {
 
@@ -72,7 +69,7 @@ public class AnalyticsMessageSenderClientImpl
 		}
 
 		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationRegistry.getAnalyticsConfiguration(companyId);
+			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
 
 		HttpUriRequest httpUriRequest = _buildHttpUriRequest(
 			body, analyticsConfiguration.liferayAnalyticsDataSourceId(),
@@ -93,7 +90,7 @@ public class AnalyticsMessageSenderClientImpl
 		}
 
 		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationRegistry.getAnalyticsConfiguration(companyId);
+			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
 
 		_checkEndpoints(analyticsConfiguration, companyId);
 
@@ -102,11 +99,18 @@ public class AnalyticsMessageSenderClientImpl
 			analyticsConfiguration.
 				liferayAnalyticsFaroBackendSecuritySignature(),
 			HttpMethods.GET, analyticsConfiguration.liferayAnalyticsProjectId(),
-			analyticsConfiguration.liferayAnalyticsFaroBackendURL() +
+			analyticsConfiguration.liferayAnalyticsEndpointURL() +
 				"/api/1.0/data-sources/" +
 					analyticsConfiguration.liferayAnalyticsDataSourceId());
 
 		_execute(analyticsConfiguration, companyId, httpUriRequest);
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.analytics.settings.web)(release.schema.version>=1.0.1))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	private HttpUriRequest _buildHttpUriRequest(
@@ -160,7 +164,7 @@ public class AnalyticsMessageSenderClientImpl
 			JSONObject responseJSONObject = null;
 
 			try {
-				responseJSONObject = _jsonFactory.createJSONObject(
+				responseJSONObject = JSONFactoryUtil.createJSONObject(
 					EntityUtils.toString(
 						closeableHttpResponse.getEntity(),
 						Charset.defaultCharset()));
@@ -187,16 +191,15 @@ public class AnalyticsMessageSenderClientImpl
 				return;
 			}
 
-			companyLocalService.updatePreferences(
-				companyId,
-				UnicodePropertiesBuilder.create(
-					true
-				).put(
-					"liferayAnalyticsEndpointURL", liferayAnalyticsEndpointURL
-				).put(
-					"liferayAnalyticsFaroBackendURL",
-					liferayAnalyticsFaroBackendURL
-				).build());
+			UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+
+			unicodeProperties.setProperty(
+				"liferayAnalyticsEndpointURL", liferayAnalyticsEndpointURL);
+			unicodeProperties.setProperty(
+				"liferayAnalyticsFaroBackendURL",
+				liferayAnalyticsFaroBackendURL);
+
+			companyLocalService.updatePreferences(companyId, unicodeProperties);
 
 			Dictionary<String, Object> configurationProperties =
 				_getConfigurationProperties(companyId);
@@ -223,29 +226,17 @@ public class AnalyticsMessageSenderClientImpl
 
 			StatusLine statusLine = closeableHttpResponse.getStatusLine();
 
-			boolean disconnected = false;
-			JSONObject responseJSONObject = _jsonFactory.createJSONObject();
-
-			String response = EntityUtils.toString(
-				closeableHttpResponse.getEntity(), Charset.defaultCharset());
-
-			if ((response != null) && response.startsWith("{")) {
-				responseJSONObject = _jsonFactory.createJSONObject(response);
-
-				disconnected = StringUtil.equals(
-					GetterUtil.getString(responseJSONObject.getString("state")),
-					"DISCONNECTED");
-			}
-
-			if ((statusLine.getStatusCode() != HttpStatus.SC_FORBIDDEN) &&
-				!disconnected) {
-
+			if (statusLine.getStatusCode() != HttpStatus.SC_FORBIDDEN) {
 				return closeableHttpResponse;
 			}
 
+			JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(
+				EntityUtils.toString(
+					closeableHttpResponse.getEntity(),
+					Charset.defaultCharset()));
+
 			processInvalidTokenMessage(
-				companyId, disconnected,
-				responseJSONObject.getString("message"));
+				companyId, responseJSONObject.getString("message"));
 
 			return closeableHttpResponse;
 		}
@@ -270,7 +261,7 @@ public class AnalyticsMessageSenderClientImpl
 			new CompanyServiceSettingsLocator(companyId, ocd.id()));
 
 		SettingsDescriptor settingsDescriptor =
-			_settingsLocatorHelper.getSettingsDescriptor(ocd.id());
+			_settingsFactory.getSettingsDescriptor(ocd.id());
 
 		if (settingsDescriptor == null) {
 			return configurationProperties;
@@ -300,17 +291,6 @@ public class AnalyticsMessageSenderClientImpl
 		AnalyticsMessageSenderClientImpl.class);
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.analytics.settings.web)(release.schema.version>=1.0.1))"
-	)
-	private Release _release;
-
-	@Reference
 	private SettingsFactory _settingsFactory;
-
-	@Reference
-	private SettingsLocatorHelper _settingsLocatorHelper;
 
 }

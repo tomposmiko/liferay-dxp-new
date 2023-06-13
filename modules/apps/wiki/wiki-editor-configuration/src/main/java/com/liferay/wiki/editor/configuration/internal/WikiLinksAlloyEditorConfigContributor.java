@@ -17,7 +17,7 @@ package com.liferay.wiki.editor.configuration.internal;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
@@ -27,7 +27,6 @@ import com.liferay.wiki.constants.WikiPortletKeys;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Chema Balsas
@@ -78,11 +77,11 @@ public class WikiLinksAlloyEditorConfigContributor
 				"buttons");
 
 			selectionJSONObject.put(
-				"buttons", _updateButtonsJSONArray(buttonsJSONArray));
+				"buttons", updateButtonsJSONArray(buttonsJSONArray));
 		}
 	}
 
-	private JSONObject _getWikiLinkButtonJSONObject(String buttonName) {
+	protected JSONObject getWikiLinkButtonJSONObject(String buttonName) {
 		return JSONUtil.put(
 			"cfg", JSONUtil.put("appendProtocol", false)
 		).put(
@@ -90,8 +89,8 @@ public class WikiLinksAlloyEditorConfigContributor
 		);
 	}
 
-	private JSONArray _updateButtonsJSONArray(JSONArray oldButtonsJSONArray) {
-		JSONArray newButtonsJSONArray = _jsonFactory.createJSONArray();
+	protected JSONArray updateButtonsJSONArray(JSONArray oldButtonsJSONArray) {
+		JSONArray newButtonsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		for (int j = 0; j < oldButtonsJSONArray.length(); j++) {
 			JSONObject buttonJSONObject = oldButtonsJSONArray.getJSONObject(j);
@@ -102,7 +101,7 @@ public class WikiLinksAlloyEditorConfigContributor
 				if (buttonName.equals("link") ||
 					buttonName.equals("linkEdit")) {
 
-					buttonJSONObject = _getWikiLinkButtonJSONObject(buttonName);
+					buttonJSONObject = getWikiLinkButtonJSONObject(buttonName);
 
 					newButtonsJSONArray.put(buttonJSONObject);
 				}
@@ -120,7 +119,7 @@ public class WikiLinksAlloyEditorConfigContributor
 						"cfg");
 
 					if (cfgJSONObject == null) {
-						cfgJSONObject = _jsonFactory.createJSONObject();
+						cfgJSONObject = JSONFactoryUtil.createJSONObject();
 
 						buttonJSONObject.put("cfg", cfgJSONObject);
 					}
@@ -134,8 +133,5 @@ public class WikiLinksAlloyEditorConfigContributor
 
 		return newButtonsJSONArray;
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

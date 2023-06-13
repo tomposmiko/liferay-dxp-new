@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReader;
@@ -33,13 +34,12 @@ import java.math.RoundingMode;
 
 import java.net.URL;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.currency.internal.configuration.ECBExchangeRateProviderConfiguration",
+	enabled = false, immediate = true,
 	property = "commerce.exchange.provider.key=european-central-bank",
 	service = ExchangeRateProvider.class
 )
@@ -59,17 +60,67 @@ public class ECBExchangeRateProvider implements ExchangeRateProvider {
 			CommerceCurrency secondaryCommerceCurrency)
 		throws Exception {
 
-		Map<String, BigDecimal> currencyRates = _getCurrencyRates();
+		String xml = null;
 
-		String primaryCurrencyCode = StringUtil.toUpperCase(
-			primaryCommerceCurrency.getCode());
-		String secondaryCurrencyCode = StringUtil.toUpperCase(
-			secondaryCommerceCurrency.getCode());
+		int i = 0;
 
-		BigDecimal rateToPrimary = currencyRates.getOrDefault(
-			primaryCurrencyCode, BigDecimal.ZERO);
-		BigDecimal rateToSecondary = currencyRates.getOrDefault(
-			secondaryCurrencyCode, BigDecimal.ZERO);
+		while (Validator.isNull(xml)) {
+			try {
+				xml = _http.URLtoString(_getURL());
+			}
+			catch (IOException ioException) {
+				if (i++ >= 10) {
+					throw ioException;
+				}
+			}
+
+			if (i >= 10) {
+				throw new PortalException("Impossible to load " + _url);
+			}
+		}
+
+		String primaryCurrencyCode = primaryCommerceCurrency.getCode();
+		String secondaryCurrencyCode = secondaryCommerceCurrency.getCode();
+
+		primaryCurrencyCode = StringUtil.toUpperCase(primaryCurrencyCode);
+		secondaryCurrencyCode = StringUtil.toUpperCase(secondaryCurrencyCode);
+
+		Document document = _saxReader.read(xml);
+
+		Element rootElement = document.getRootElement();
+
+		List<Element> rootCubeElements = rootElement.elements("Cube");
+
+		Element rootCubeElement = rootCubeElements.get(0);
+
+		List<Element> cubeParentElements = rootCubeElement.elements("Cube");
+
+		Element cubeParentElement = cubeParentElements.get(0);
+
+		List<Element> cubeElements = cubeParentElement.elements("Cube");
+
+		BigDecimal rateToPrimary = BigDecimal.ZERO;
+		BigDecimal rateToSecondary = BigDecimal.ZERO;
+
+		for (Element cubeElement : cubeElements) {
+			String currency = cubeElement.attributeValue("currency");
+			BigDecimal rate = new BigDecimal(
+				cubeElement.attributeValue("rate"));
+
+			if (currency.equals(primaryCurrencyCode)) {
+				rateToPrimary = rate;
+			}
+
+			if (currency.equals(secondaryCurrencyCode)) {
+				rateToSecondary = rate;
+			}
+
+			if ((rateToPrimary.compareTo(BigDecimal.ZERO) > 0) &&
+				(rateToSecondary.compareTo(BigDecimal.ZERO) > 0)) {
+
+				break;
+			}
+		}
 
 		if (primaryCurrencyCode.equals("EUR")) {
 			rateToPrimary = BigDecimal.ONE;
@@ -91,73 +142,11 @@ public class ECBExchangeRateProvider implements ExchangeRateProvider {
 					ECBExchangeRateProviderConfiguration.class, properties);
 
 		_url = ecbExchangeRateProviderConfiguration.europeanCentralBankURL();
-
-		_expirationTime = TimeUnit.SECONDS.toMillis(
-			ecbExchangeRateProviderConfiguration.
-				europeanCentralBankURLCacheExpirationTime());
-
-		_timeStamp = 0;
 	}
 
-	private Map<String, BigDecimal> _getCurrencyRates() throws Exception {
-		long currentTime = System.currentTimeMillis();
-
-		long timestamp = currentTime - _expirationTime;
-
-		if (timestamp < _timeStamp) {
-			return _currencyRates;
-		}
-
-		synchronized (this) {
-			if (timestamp < _timeStamp) {
-				return _currencyRates;
-			}
-
-			Document document = null;
-
-			int i = 0;
-
-			while (document == null) {
-				try {
-					document = _saxReader.read(_http.URLtoString(_getURL()));
-				}
-				catch (IOException ioException) {
-					if (i++ >= 10) {
-						throw ioException;
-					}
-				}
-
-				if (i >= 10) {
-					throw new PortalException("Impossible to load " + _url);
-				}
-			}
-
-			Element rootElement = document.getRootElement();
-
-			List<Element> rootCubeElements = rootElement.elements("Cube");
-
-			Element rootCubeElement = rootCubeElements.get(0);
-
-			List<Element> cubeParentElements = rootCubeElement.elements("Cube");
-
-			Element cubeParentElement = cubeParentElements.get(0);
-
-			List<Element> cubeElements = cubeParentElement.elements("Cube");
-
-			Map<String, BigDecimal> currencyRates = new HashMap<>();
-
-			for (Element cubeElement : cubeElements) {
-				currencyRates.put(
-					cubeElement.attributeValue("currency"),
-					new BigDecimal(cubeElement.attributeValue("rate")));
-			}
-
-			_currencyRates = currencyRates;
-
-			_timeStamp = currentTime;
-
-			return _currencyRates;
-		}
+	@Deactivate
+	protected void deactivate() {
+		_url = null;
 	}
 
 	private URL _getURL() throws Exception {
@@ -184,16 +173,12 @@ public class ECBExchangeRateProvider implements ExchangeRateProvider {
 			InetAddressUtil.getInetAddressByName(url.getHost()));
 	}
 
-	private volatile Map<String, BigDecimal> _currencyRates;
-	private volatile long _expirationTime;
-
 	@Reference
 	private Http _http;
 
 	@Reference
 	private SAXReader _saxReader;
 
-	private volatile long _timeStamp;
 	private volatile String _url;
 
 }

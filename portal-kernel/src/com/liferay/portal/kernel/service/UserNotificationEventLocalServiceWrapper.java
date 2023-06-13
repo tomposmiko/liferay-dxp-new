@@ -25,10 +25,6 @@ public class UserNotificationEventLocalServiceWrapper
 	implements ServiceWrapper<UserNotificationEventLocalService>,
 			   UserNotificationEventLocalService {
 
-	public UserNotificationEventLocalServiceWrapper() {
-		this(null);
-	}
-
 	public UserNotificationEventLocalServiceWrapper(
 		UserNotificationEventLocalService userNotificationEventLocalService) {
 
@@ -45,6 +41,22 @@ public class UserNotificationEventLocalServiceWrapper
 
 		return _userNotificationEventLocalService.addUserNotificationEvent(
 			userId, delivered, actionRequired, notificationEvent);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.model.UserNotificationEvent
+			addUserNotificationEvent(
+				long userId, boolean actionRequired,
+				com.liferay.portal.kernel.notifications.NotificationEvent
+					notificationEvent)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _userNotificationEventLocalService.addUserNotificationEvent(
+			userId, actionRequired, notificationEvent);
 	}
 
 	@Override
@@ -71,6 +83,24 @@ public class UserNotificationEventLocalServiceWrapper
 		return _userNotificationEventLocalService.addUserNotificationEvent(
 			userId, type, timestamp, deliveryType, deliverBy, delivered,
 			payload, actionRequired, archived, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.model.UserNotificationEvent
+			addUserNotificationEvent(
+				long userId, java.lang.String type, long timestamp,
+				int deliveryType, long deliverBy, java.lang.String payload,
+				boolean actionRequired, boolean archived,
+				ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _userNotificationEventLocalService.addUserNotificationEvent(
+			userId, type, timestamp, deliveryType, deliverBy, payload,
+			actionRequired, archived, serviceContext);
 	}
 
 	@Override
@@ -188,8 +218,7 @@ public class UserNotificationEventLocalServiceWrapper
 
 	@Override
 	public void deleteUserNotificationEvent(
-			java.lang.String uuid, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		java.lang.String uuid, long companyId) {
 
 		_userNotificationEventLocalService.deleteUserNotificationEvent(
 			uuid, companyId);
@@ -217,17 +246,14 @@ public class UserNotificationEventLocalServiceWrapper
 
 	@Override
 	public void deleteUserNotificationEvents(
-			java.util.Collection<java.lang.String> uuids, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		java.util.Collection<java.lang.String> uuids, long companyId) {
 
 		_userNotificationEventLocalService.deleteUserNotificationEvents(
 			uuids, companyId);
 	}
 
 	@Override
-	public void deleteUserNotificationEvents(long userId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public void deleteUserNotificationEvents(long userId) {
 		_userNotificationEventLocalService.deleteUserNotificationEvents(userId);
 	}
 

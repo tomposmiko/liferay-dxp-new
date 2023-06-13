@@ -3,49 +3,57 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testcase.url = "http://localhost:8080";
 	property testray.main.component.name = "Content Pages";
 
-	static var randomSiteName = StringUtil.randomString(8);
-
 	setUp {
-		task ("Sign in") {
+		task ("Set up instance and sign in") {
+			TestCase.setUpPortalInstance();
+
 			User.firstLoginPG();
 		}
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = ${randomSiteName});
+		task ("Add a site via JSON") {
+			JSONGroup.addGroup(groupName = "Test Site Name");
+		}
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
 	@description = "This is a use case for LPS-114438. Only can edit inline content, mapped content and comments of elements when select Content Editing."
-	@priority = 5
+	@priority = "5"
 	test CanOnlyEditContentInContentEditionMode {
 		property portal.acceptance = "true";
-
-		var siteName = StringUtil.randomString(8);
 
 		task ("Add a Web Content Article, a Blogs Entry and a Document") {
 			JSONWebcontent.addWebContent(
 				content = "Web Content Content",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				title = "Web Content Title");
 
 			HeadlessBlog.addBlogEntry(
 				content = "Blogs Entry Content",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				title = "Blogs Entry Title");
 
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentTitle = "Document Title",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
 				sourceFileName = "Document_1.jpg");
 		}
 
 		task ("Add a page based on Blank") {
 			JSONLayout.addPublicLayout(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				layoutName = "Test Page Name",
 				type = "content");
 		}
@@ -53,7 +61,7 @@ definition {
 		task ("Assert Edit Mode is Page Design") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			AssertTextEquals(
 				locator1 = "PageEditor#EDIT_MODE_SELECTOR",
@@ -91,7 +99,7 @@ definition {
 			PageEditor.addComment(
 				fragmentComment = "This is a fragment comment.",
 				fragmentName = "Heading",
-				position = 1);
+				position = "1");
 		}
 
 		task ("Map title of Web Content Article to Paragraph") {
@@ -111,10 +119,11 @@ definition {
 
 			PageEditor.waitForAutoSave();
 
-			PageEditor.viewFragmentEditableText(
-				editableText = "Web Content Title",
-				fragmentName = "Paragraph",
-				id = "element-text");
+			AssertTextEquals(
+				id = "element-text",
+				key_fragmentName = "Paragraph",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD",
+				value1 = "Web Content Title");
 		}
 
 		task ("Select document as inline content of Image") {
@@ -135,7 +144,7 @@ definition {
 		task ("Select Content Editing") {
 			ContentPagesNavigator.openEditContentPage(
 				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
+				siteName = "Test Site Name");
 
 			Click(locator1 = "PageEditor#EDIT_MODE_SELECTOR");
 
@@ -149,35 +158,35 @@ definition {
 		task ("Assert only Browser and Comments are shown in sidebar") {
 			for (var tabName : list "Browser,Comments") {
 				AssertVisible(
-					key_tabName = ${tabName},
+					key_tabName = "${tabName}",
 					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON");
 			}
 
 			for (var tabName : list "Fragments and Widgets,Page Design Options") {
 				AssertElementNotPresent(
-					key_tabName = ${tabName},
+					key_tabName = "${tabName}",
 					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON");
 			}
 		}
 
 		task ("Assert topper of elements are hidden") {
 			for (var elementName : list "Heading,Paragraph,Image,Asset Publisher") {
-				PageEditor.viewFragmentNotPresent(fragmentName = ${elementName});
+				AssertElementNotPresent(
+					key_fragmentName = "${elementName}",
+					locator1 = "Fragment#FRAGMENT_HEADER");
 			}
 		}
 
 		task ("Assert can edit editable field of Heading fragment") {
 			Click(
-				fragmentName = "heading",
 				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+				key_fragmentName = "heading",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_WITHOUT_TOPPER");
 
 			DoubleClick(
-				fragmentName = "heading",
 				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+				key_fragmentName = "heading",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_WITHOUT_TOPPER");
 
 			AssertElementPresent(locator1 = "//*[contains(@class,'component-heading') and contains(@data-lfr-editable-id,'element-text')]/div[contains(@class,'cke_editable_inline')]");
 
@@ -186,10 +195,9 @@ definition {
 
 		task ("Assert can select mapped content of Paragraph fragment") {
 			Click(
-				fragmentName = "paragraph",
 				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+				key_fragmentName = "paragraph",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_WITHOUT_TOPPER");
 
 			Navigator.gotoNavTab(navTab = "Mapping");
 
@@ -214,35 +222,37 @@ definition {
 		}
 
 		task ("Assert ellipsis button of Asset Publisher present") {
-			MouseOver.mouseOverNotVisible(locator1 = "//menu[contains(@class,'portlet-topper-toolbar')][contains(@id,'AssetPublisher')]//button[*//*[name()='svg'][contains(@class,'icon-ellipsis-v')]]");
+			MouseOver.mouseOverNotVisible(locator1 = "//div[contains(@class,'portlet-options')]/a[contains(@id,'AssetPublisher')]");
 		}
 
 		task ("Edit Web Content Article and Blogs Entry via Contents panel") {
 			for (var title : list "Web Content Title,Blogs Entry Title") {
-				PageEditor.gotoTab(tabName = "Page Content");
+				PageEditor.gotoTab(tabName = "Browser");
+
+				Navigator.gotoNavTab(navTab = "Page Content");
 
 				LexiconEntry.gotoFragmentPageContentEllipsisMenuItem(
 					menuItem = "Edit",
-					rowEntry = ${title});
+					rowEntry = "${title}");
 
-				if (${title} == "Web Content Title") {
+				if ("${title}" == "Web Content Title") {
 					WebContent.addCP(webContentTitle = "Web Content Title Edit");
 
 					CKEditor.addContentInWebContent(
 						content = "Web Content Content Edit",
-						fieldLabel = "Content");
+						fieldLabel = "content");
 
-					Button.clickPublish();
+					PortletEntry.publish();
 				}
 
-				if (${title} == "Blogs Entry Title") {
+				if ("${title}" == "Blogs Entry Title") {
 					BlogsEntry.editEntryContent(
 						entryContent = "Blogs Entry Content",
 						entryContentEdit = "Blogs Entry Content Edit",
 						entryTitle = "Blogs Entry Title",
 						entryTitleEdit = "Blogs Entry Title Edit");
 
-					Button.clickPublish();
+					PortletEntry.publish();
 				}
 
 				PageEditor.assertFragmentSidebarLoaded();
@@ -251,17 +261,16 @@ definition {
 
 				MenuItem.click(menuItem = "Content Editing");
 
-				AssertTextEquals(
-					locator1 = "PageEditor#EDIT_MODE_SELECTOR",
-					value1 = "Content Editing");
+				Pause(locator1 = "3000");
 			}
 		}
 
 		task ("Assert Edited Web Content") {
-			ContentPages.viewFragmentText(
-				fragmentName = "paragraph",
+			AssertTextEquals(
 				id = "element-text",
-				text = "Web Content Title Edit");
+				key_fragmentName = "paragraph",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_WITHOUT_TOPPER",
+				value1 = "Web Content Title Edit");
 		}
 
 		task ("Assert Edited Blogs Entry") {

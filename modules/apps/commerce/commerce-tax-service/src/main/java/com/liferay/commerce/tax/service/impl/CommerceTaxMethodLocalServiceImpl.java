@@ -18,11 +18,9 @@ import com.liferay.commerce.tax.exception.CommerceTaxMethodEngineKeyException;
 import com.liferay.commerce.tax.exception.CommerceTaxMethodNameException;
 import com.liferay.commerce.tax.model.CommerceTaxMethod;
 import com.liferay.commerce.tax.service.base.CommerceTaxMethodLocalServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -30,17 +28,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.tax.model.CommerceTaxMethod",
-	service = AopService.class
-)
 public class CommerceTaxMethodLocalServiceImpl
 	extends CommerceTaxMethodLocalServiceBaseImpl {
 
@@ -51,9 +42,9 @@ public class CommerceTaxMethodLocalServiceImpl
 			boolean percentage, boolean active)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
-		_validate(nameMap, engineKey);
+		validate(nameMap, engineKey);
 
 		long commerceTaxMethodId = counterLocalService.increment();
 
@@ -146,7 +137,7 @@ public class CommerceTaxMethodLocalServiceImpl
 		CommerceTaxMethod commerceTaxMethod =
 			commerceTaxMethodPersistence.findByPrimaryKey(commerceTaxMethodId);
 
-		_validate(nameMap, commerceTaxMethod.getEngineKey());
+		validate(nameMap, commerceTaxMethod.getEngineKey());
 
 		commerceTaxMethod.setNameMap(nameMap);
 		commerceTaxMethod.setDescriptionMap(descriptionMap);
@@ -156,7 +147,7 @@ public class CommerceTaxMethodLocalServiceImpl
 		return commerceTaxMethodPersistence.update(commerceTaxMethod);
 	}
 
-	private void _validate(Map<Locale, String> nameMap, String engineKey)
+	protected void validate(Map<Locale, String> nameMap, String engineKey)
 		throws PortalException {
 
 		Locale locale = LocaleUtil.getSiteDefault();
@@ -171,8 +162,5 @@ public class CommerceTaxMethodLocalServiceImpl
 			throw new CommerceTaxMethodEngineKeyException();
 		}
 	}
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

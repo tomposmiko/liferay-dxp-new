@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see DDMFormInstanceServiceSoap
  * @generated
  */
 public class DDMFormInstanceServiceHttp {
@@ -154,7 +155,7 @@ public class DDMFormInstanceServiceHttp {
 				HttpPrincipal httpPrincipal, long groupId,
 				java.util.Map<java.util.Locale, String> nameMap,
 				com.liferay.dynamic.data.mapping.model.DDMFormInstance
-					sourceDDMFormInstance,
+					ddmFormInstance,
 				com.liferay.dynamic.data.mapping.storage.DDMFormValues
 					settingsDDMFormValues,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -166,7 +167,7 @@ public class DDMFormInstanceServiceHttp {
 				_copyFormInstanceParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, groupId, nameMap, sourceDDMFormInstance,
+				methodKey, groupId, nameMap, ddmFormInstance,
 				settingsDDMFormValues, serviceContext);
 
 			Object returnObj = null;

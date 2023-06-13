@@ -29,47 +29,25 @@ portletDisplay.setURLBack(backURL);
 renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 %>
 
-<frontend-data-set:headless-display
+<clay:headless-data-set-display
 	apiURL="<%= objectDefinitionsFieldsDisplayContext.getAPIURL() %>"
+	clayDataSetActionDropdownItems="<%= objectDefinitionsFieldsDisplayContext.getClayDataSetActionDropdownItems() %>"
 	creationMenu="<%= objectDefinitionsFieldsDisplayContext.getCreationMenu(objectDefinition) %>"
-	fdsActionDropdownItems="<%= objectDefinitionsFieldsDisplayContext.getFDSActionDropdownItems() %>"
-	formName="fm"
-	id="<%= ObjectDefinitionsFDSNames.OBJECT_FIELDS %>"
-	propsTransformer="js/components/FDSPropsTransformer/ObjectFieldsFDSPropsTransformer"
+	formId="fm"
+	id="<%= ObjectDefinitionsClayDataSetDisplayNames.OBJECT_FIELDS %>"
+	itemsPerPage="<%= 20 %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+	pageNumber="<%= 1 %>"
+	portletURL="<%= liferayPortletResponse.createRenderURL() %>"
 	style="fluid"
 />
 
 <div id="<portlet:namespace />AddObjectField">
 	<react:component
-		module="js/components/ObjectField/AddObjectField"
+		module="js/components/ModalAddObjectField"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"apiURL", objectDefinitionsFieldsDisplayContext.getAPIURL()
-			).put(
-				"creationLanguageId", objectDefinition.getDefaultLanguageId()
-			).put(
-				"forbiddenChars", PropsUtil.getArray(PropsKeys.DL_CHAR_BLACKLIST)
-			).put(
-				"forbiddenLastChars", objectDefinitionsFieldsDisplayContext.getForbiddenLastCharacters()
-			).put(
-				"forbiddenNames", PropsUtil.getArray(PropsKeys.DL_NAME_BLACKLIST)
-			).put(
-				"objectDefinitionExternalReferenceCode", objectDefinition.getExternalReferenceCode()
-			).put(
-				"objectFieldTypes", objectDefinitionsFieldsDisplayContext.getObjectFieldBusinessTypeMaps(false, locale)
-			).put(
-				"objectName", objectDefinition.getShortName()
-			).build()
-		%>'
-	/>
-</div>
-
-<div>
-	<react:component
-		module="js/components/ExpressionBuilderModal"
-		props='<%=
-			HashMapBuilder.<String, Object>put(
-				"sidebarElements", objectDefinitionsFieldsDisplayContext.getObjectFieldCodeEditorElements(ObjectFieldConstants.BUSINESS_TYPE_FORMULA)
 			).build()
 		%>'
 	/>

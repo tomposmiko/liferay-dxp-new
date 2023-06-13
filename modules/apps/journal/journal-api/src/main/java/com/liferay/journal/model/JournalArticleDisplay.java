@@ -36,7 +36,7 @@ public interface JournalArticleDisplay extends Serializable {
 
 	public int getCurrentPage();
 
-	public long getDDMStructureId();
+	public String getDDMStructureKey();
 
 	public String getDDMTemplateKey();
 
@@ -74,7 +74,7 @@ public interface JournalArticleDisplay extends Serializable {
 
 	public void setCurrentPage(int currentPage);
 
-	public void setDDMStructureId(long ddmStructureId);
+	public void setDDMStructureKey(String ddmStructureKey);
 
 	public void setDDMTemplateKey(String ddmTemplateKey);
 

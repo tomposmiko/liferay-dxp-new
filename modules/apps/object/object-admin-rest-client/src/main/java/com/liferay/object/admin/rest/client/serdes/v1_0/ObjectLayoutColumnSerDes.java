@@ -65,18 +65,14 @@ public class ObjectLayoutColumnSerDes {
 			sb.append(objectLayoutColumn.getId());
 		}
 
-		if (objectLayoutColumn.getObjectFieldName() != null) {
+		if (objectLayoutColumn.getObjectFieldId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"objectFieldName\": ");
+			sb.append("\"objectFieldId\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(objectLayoutColumn.getObjectFieldName()));
-
-			sb.append("\"");
+			sb.append(objectLayoutColumn.getObjectFieldId());
 		}
 
 		if (objectLayoutColumn.getPriority() != null) {
@@ -127,13 +123,13 @@ public class ObjectLayoutColumnSerDes {
 			map.put("id", String.valueOf(objectLayoutColumn.getId()));
 		}
 
-		if (objectLayoutColumn.getObjectFieldName() == null) {
-			map.put("objectFieldName", null);
+		if (objectLayoutColumn.getObjectFieldId() == null) {
+			map.put("objectFieldId", null);
 		}
 		else {
 			map.put(
-				"objectFieldName",
-				String.valueOf(objectLayoutColumn.getObjectFieldName()));
+				"objectFieldId",
+				String.valueOf(objectLayoutColumn.getObjectFieldId()));
 		}
 
 		if (objectLayoutColumn.getPriority() == null) {
@@ -178,10 +174,10 @@ public class ObjectLayoutColumnSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "objectFieldName")) {
+			else if (Objects.equals(jsonParserFieldName, "objectFieldId")) {
 				if (jsonParserFieldValue != null) {
-					objectLayoutColumn.setObjectFieldName(
-						(String)jsonParserFieldValue);
+					objectLayoutColumn.setObjectFieldId(
+						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "priority")) {

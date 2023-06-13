@@ -1,91 +1,28 @@
 definition {
 
-	macro assertOSGiConfigDoesNotExist {
-		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
-		var osgiConfigExists = FileUtil.exists("${liferayHome}/osgi/configs/${osgiConfigFileName}");
-
-		if (${osgiConfigExists} == "true") {
-			fail("File ${osgiConfigFileName} exists");
-		}
-	}
-
-	macro assertTextInOSGiConfig {
-		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
-		var fileContent = FileUtil.read("${liferayHome}/osgi/configs/${osgiConfigFileName}");
-
-		if (contains(${fileContent}, ${text})) {
-			echo("File ${osgiConfigFileName} contains text ${text}");
-		}
-		else {
-			fail("File ${osgiConfigFileName} does not contain text ${text}");
-		}
-	}
-
-	macro assertTextNotInOSGiConfig {
-		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
-		var fileContent = FileUtil.read("${liferayHome}/osgi/configs/${osgiConfigFileName}");
-
-		if (contains(${fileContent}, ${text})) {
-			fail("File ${osgiConfigFileName} contains text ${text}");
-		}
-		else {
-			echo("File ${osgiConfigFileName} does not contain text ${text}");
-		}
-	}
-
-	macro copyOSGiConfigFile {
-		Variables.assertDefined(parameterList = "${osgiConfigFileBaseDir},${osgiConfigFileName}");
-
-		var configs = FileUtil.read("${osgiConfigFileBaseDir}/${osgiConfigFileName}");
-		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
-		FileUtil.write("${liferayHome}/osgi/configs/${osgiConfigFileName}", ${configs});
-	}
-
-	macro deleteOSGiConfigFile {
-		Variables.assertDefined(parameterList = ${osgiConfigFileName});
-
-		var liferayHome = PropsUtil.get("liferay.home.dir.name");
-
-		FileUtil.delete("${liferayHome}/osgi/configs/${osgiConfigFileName}");
-	}
-
 	macro deployOSGiConfigFile {
-		Variables.assertDefined(parameterList = "${osgiConfigs},${osgiConfigFileName}");
+		Variables.assertDefined(parameterList = "${OSGiConfigFileBaseDir},${OSGiConfigFileName}");
+
+		var configs = FileUtil.read("${OSGiConfigFileBaseDir}/${OSGiConfigFileName}");
+
+		var liferayHome = PropsUtil.get("liferay.home.dir.name");
+
+		FileUtil.write("${liferayHome}/osgi/configs/${OSGiConfigFileName}", "${configs}");
+	}
+
+	macro deployOSGiConfigs {
+		Variables.assertDefined(parameterList = "${OSGiConfigs},${OSGiConfigFileName}");
 
 		var configList = "";
 
-		for (var osgiConfig : list ${osgiConfigs}) {
-			var configList = '''${osgiConfig}
+		for (var OSGiConfig : list "${OSGiConfigs}") {
+			var configList = '''${OSGiConfig}
 ${configList}''';
 		}
 
 		var liferayHome = PropsUtil.get("liferay.home.dir.name");
 
-		FileUtil.write("${liferayHome}/osgi/configs/${osgiConfigFileName}", ${configList});
-	}
-
-	macro editOSGiConfigFileFromTempFolder {
-		var tempDir = PropsUtil.get("output.dir.name");
-
-		Variables.assertDefined(parameterList = "${tempDir},${osgiConfigFileName}");
-
-		var filePath = FileUtil.getCanonicalPath(${tempDir});
-
-		var filePath = "${filePath}/${osgiConfigFileName}";
-
-		FileUtil.replaceStringInFile(${filePath}, ${oldValue}, ${newValue});
-	}
-
-	@description = "Wait for OSGi Configuration to update in the Database"
-	macro waitForOSGiConfig {
-
-		// LRQA-78134 Current workaround to wait for OSGi configurations until we get a reliable way of waiting for them to update in the database
-
-		Pause(locator1 = 8000);
+		FileUtil.write("${liferayHome}/osgi/configs/${OSGiConfigFileName}", "${configList}");
 	}
 
 }

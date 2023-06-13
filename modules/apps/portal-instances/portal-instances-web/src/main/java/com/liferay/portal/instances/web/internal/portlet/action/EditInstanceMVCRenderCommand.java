@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + PortalInstancesPortletKeys.PORTAL_INSTANCES,
 		"mvc.command.name=/portal_instances/edit_instance"
@@ -53,7 +54,7 @@ public class EditInstanceMVCRenderCommand implements MVCRenderCommand {
 		throws PortletException {
 
 		try {
-			_getInstance(renderRequest);
+			getInstance(renderRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchCompanyException ||
@@ -70,7 +71,7 @@ public class EditInstanceMVCRenderCommand implements MVCRenderCommand {
 		return "/edit_instance.jsp";
 	}
 
-	private void _getInstance(PortletRequest portletRequest) throws Exception {
+	protected void getInstance(PortletRequest portletRequest) throws Exception {
 		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			portletRequest);
 

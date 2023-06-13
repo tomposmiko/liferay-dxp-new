@@ -17,7 +17,7 @@ package com.liferay.users.admin.web.internal.portlet.action;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.bean.BeanProperties;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.permission.PortalPermission;
+import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -68,6 +68,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/users_admin/export_users"
@@ -87,7 +88,7 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 				_portal.getPortletId(resourceRequest) +
 					SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 
-			String csv = _getUsersCSV(resourceRequest, resourceResponse);
+			String csv = getUsersCSV(resourceRequest, resourceResponse);
 
 			PortletResponseUtil.sendFile(
 				resourceRequest, resourceResponse, "users.csv", csv.getBytes(),
@@ -96,11 +97,11 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 		catch (Exception exception) {
 			SessionErrors.add(resourceRequest, exception.getClass());
 
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
-	private String _getUserCSV(User user) {
+	protected String getUserCSV(User user) {
 		StringBundler sb = new StringBundler(
 			PropsValues.USERS_EXPORT_CSV_FIELDS.length * 2);
 
@@ -123,7 +124,7 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 				}
 			}
 			else if (field.contains("Date")) {
-				Date date = (Date)_beanProperties.getObject(user, field);
+				Date date = (Date)BeanPropertiesUtil.getObject(user, field);
 
 				if (date instanceof Timestamp) {
 					date = new Date(date.getTime());
@@ -136,7 +137,7 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 			}
 			else {
 				sb.append(
-					CSVUtil.encode(_beanProperties.getString(user, field)));
+					CSVUtil.encode(BeanPropertiesUtil.getString(user, field)));
 			}
 
 			if ((i + 1) < PropsValues.USERS_EXPORT_CSV_FIELDS.length) {
@@ -149,7 +150,7 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 		return sb.toString();
 	}
 
-	private List<User> _getUsers(
+	protected List<User> getUsers(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
@@ -159,7 +160,7 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
 
-		boolean exportAllUsers = _portalPermission.contains(
+		boolean exportAllUsers = PortalPermissionUtil.contains(
 			permissionChecker, ActionKeys.EXPORT_USER);
 
 		if (!exportAllUsers &&
@@ -227,11 +228,11 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 			QueryUtil.ALL_POS, (OrderByComparator<User>)null);
 	}
 
-	private String _getUsersCSV(
+	protected String getUsersCSV(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		List<User> users = _getUsers(resourceRequest, resourceResponse);
+		List<User> users = getUsers(resourceRequest, resourceResponse);
 
 		if (users.isEmpty()) {
 			return StringPool.BLANK;
@@ -254,7 +255,7 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 		for (int i = 0; i < users.size(); i++) {
 			User user = users.get(i);
 
-			sb.append(_getUserCSV(user));
+			sb.append(getUserCSV(user));
 
 			percentage = Math.min(10 + ((i * 90) / total), 99);
 
@@ -266,19 +267,17 @@ public class ExportUsersMVCResourceCommand extends BaseMVCResourceCommand {
 		return sb.toString();
 	}
 
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportUsersMVCResourceCommand.class);
 
 	@Reference
-	private BeanProperties _beanProperties;
-
-	@Reference
 	private Portal _portal;
 
-	@Reference
-	private PortalPermission _portalPermission;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

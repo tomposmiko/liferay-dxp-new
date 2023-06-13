@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Alessio Antonio Rendina
+ * @see CommerceNotificationQueueEntryServiceSoap
  * @generated
  */
 public class CommerceNotificationQueueEntryServiceHttp {

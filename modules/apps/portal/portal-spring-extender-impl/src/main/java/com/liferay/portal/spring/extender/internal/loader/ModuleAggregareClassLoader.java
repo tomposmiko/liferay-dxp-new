@@ -15,8 +15,6 @@
 package com.liferay.portal.spring.extender.internal.loader;
 
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.io.IOException;
 
@@ -115,10 +113,6 @@ public class ModuleAggregareClassLoader extends ClassLoader {
 			return _extenderClassLoader.loadClass(name);
 		}
 		catch (ClassNotFoundException classNotFoundException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(classNotFoundException);
-			}
-
 			return _moduleClassLoader.loadClass(name);
 		}
 	}
@@ -141,9 +135,6 @@ public class ModuleAggregareClassLoader extends ClassLoader {
 	}
 
 	private static final Method _FIND_CLASS_METHOD;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ModuleAggregareClassLoader.class);
 
 	private static final ClassLoader _extenderClassLoader =
 		ModuleAggregareClassLoader.class.getClassLoader();

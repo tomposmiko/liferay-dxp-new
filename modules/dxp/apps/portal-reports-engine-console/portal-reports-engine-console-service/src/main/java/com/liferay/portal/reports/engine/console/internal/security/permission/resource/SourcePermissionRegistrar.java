@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Leon Chi
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class SourcePermissionRegistrar {
 
 	@Activate

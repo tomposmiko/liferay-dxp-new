@@ -61,25 +61,25 @@ public class AssetCategoryLocalServiceUtil {
 	}
 
 	public static AssetCategory addCategory(
-			long userId, long groupId, String title, long vocabularyId,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addCategory(
-			userId, groupId, title, vocabularyId, serviceContext);
-	}
-
-	public static AssetCategory addCategory(
-			String externalReferenceCode, long userId, long groupId,
-			long parentCategoryId, Map<java.util.Locale, String> titleMap,
+			long userId, long groupId, long parentCategoryId,
+			Map<java.util.Locale, String> titleMap,
 			Map<java.util.Locale, String> descriptionMap, long vocabularyId,
 			String[] categoryProperties,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCategory(
-			externalReferenceCode, userId, groupId, parentCategoryId, titleMap,
-			descriptionMap, vocabularyId, categoryProperties, serviceContext);
+			userId, groupId, parentCategoryId, titleMap, descriptionMap,
+			vocabularyId, categoryProperties, serviceContext);
+	}
+
+	public static AssetCategory addCategory(
+			long userId, long groupId, String title, long vocabularyId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addCategory(
+			userId, groupId, title, vocabularyId, serviceContext);
 	}
 
 	public static void addCategoryResources(
@@ -289,11 +289,29 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().fetchAssetCategory(categoryId);
 	}
 
+	/**
+	 * Returns the asset category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	 */
 	public static AssetCategory fetchAssetCategoryByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchAssetCategoryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetCategoryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static AssetCategory fetchAssetCategoryByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchAssetCategoryByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -395,12 +413,20 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getAssetCategory(categoryId);
 	}
 
+	/**
+	 * Returns the asset category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category
+	 * @throws PortalException if a matching asset category could not be found
+	 */
 	public static AssetCategory getAssetCategoryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getAssetCategoryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			companyId, externalReferenceCode);
 	}
 
 	/**

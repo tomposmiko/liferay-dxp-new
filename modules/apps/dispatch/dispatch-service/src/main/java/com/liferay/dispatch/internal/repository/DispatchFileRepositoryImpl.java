@@ -39,6 +39,7 @@ import java.io.InputStream;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -46,7 +47,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  * @author Igor Beslic
  */
-@Component(service = DispatchFileRepository.class)
+@Component(
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
+	service = DispatchFileRepository.class
+)
 public class DispatchFileRepositoryImpl implements DispatchFileRepository {
 
 	@Override
@@ -138,9 +142,8 @@ public class DispatchFileRepositoryImpl implements DispatchFileRepository {
 		}
 
 		return _portletFileRepository.addPortletFileEntry(
-			null, groupId, userId, DispatchTrigger.class.getName(),
-			dispatchTriggerId, DispatchPortletKeys.DISPATCH,
-			folder.getFolderId(), inputStream,
+			groupId, userId, DispatchTrigger.class.getName(), dispatchTriggerId,
+			DispatchPortletKeys.DISPATCH, folder.getFolderId(), inputStream,
 			String.valueOf(dispatchTriggerId), contentType, false);
 	}
 

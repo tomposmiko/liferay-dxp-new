@@ -53,19 +53,13 @@ public class OpenGraphConfigurationImpl implements OpenGraphConfiguration {
 	public boolean isLayoutTranslatedLanguagesEnabled(Group group)
 		throws PortalException {
 
-		Company company = _companyLocalService.getCompany(group.getCompanyId());
-
-		LayoutSEOCompanyConfiguration layoutSEOCompanyConfiguration =
-			_configurationProvider.getCompanyConfiguration(
-				LayoutSEOCompanyConfiguration.class, company.getCompanyId());
-
-		if (!layoutSEOCompanyConfiguration.enableOpenGraph() ||
-			!_isOpenGraphEnabled(group)) {
-
+		if (!isOpenGraphEnabled(group)) {
 			return false;
 		}
 
-		if (layoutSEOCompanyConfiguration.enableLayoutTranslatedLanguages()) {
+		if (isLayoutTranslatedLanguagesEnabled(
+				_companyLocalService.getCompany(group.getCompanyId()))) {
+
 			return true;
 		}
 
@@ -93,10 +87,6 @@ public class OpenGraphConfigurationImpl implements OpenGraphConfiguration {
 			return false;
 		}
 
-		return _isOpenGraphEnabled(group);
-	}
-
-	private boolean _isOpenGraphEnabled(Group group) {
 		LayoutSEOSite layoutSEOSite =
 			_layoutSEOSiteLocalService.fetchLayoutSEOSiteByGroupId(
 				group.getGroupId());

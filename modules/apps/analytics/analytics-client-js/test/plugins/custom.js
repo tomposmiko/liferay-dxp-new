@@ -81,12 +81,12 @@ describe('Custom Asset Plugin', () => {
 	});
 
 	describe('assetViewed event', () => {
-		it('is fired for every custom asset on the page', async () => {
+		it('is fired for every custom asset on the page', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const domContentLoaded = new Event('DOMContentLoaded');
 
-			await document.dispatchEvent(domContentLoaded);
+			document.dispatchEvent(domContentLoaded);
 
 			const events = Analytics.getEvents().filter(
 				({eventId}) => eventId === 'assetViewed'
@@ -107,12 +107,12 @@ describe('Custom Asset Plugin', () => {
 			document.body.removeChild(customAssetElement);
 		});
 
-		it('is fired with formEnabled if there is form element every custom asset on the page', async () => {
+		it('is fired with formEnabled if there is form element every custom asset on the page', () => {
 			const customAssetElement = createCustomAssetElementWithForm();
 
 			const domContentLoaded = new Event('DOMContentLoaded');
 
-			await document.dispatchEvent(domContentLoaded);
+			document.dispatchEvent(domContentLoaded);
 
 			const events = Analytics.getEvents().filter(
 				({eventId}) => eventId === 'assetViewed'
@@ -136,7 +136,7 @@ describe('Custom Asset Plugin', () => {
 	});
 
 	describe('assetClicked event', () => {
-		it('is fired when clicking an image inside a custom asset', async () => {
+		it('is fired when clicking an image inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const imageInsideCustomAsset = document.createElement('img');
@@ -145,7 +145,7 @@ describe('Custom Asset Plugin', () => {
 
 			customAssetElement.appendChild(imageInsideCustomAsset);
 
-			await userEvent.click(imageInsideCustomAsset);
+			userEvent.click(imageInsideCustomAsset);
 
 			expect(Analytics.getEvents()).toEqual([
 				expect.objectContaining({
@@ -162,7 +162,7 @@ describe('Custom Asset Plugin', () => {
 			document.body.removeChild(customAssetElement);
 		});
 
-		it('is fired when clicking a link inside a custom asset', async () => {
+		it('is fired when clicking a link inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const text = 'Link inside a Custom Asset';
@@ -175,7 +175,7 @@ describe('Custom Asset Plugin', () => {
 
 			customAssetElement.appendChild(linkInsideCustomAsset);
 
-			await userEvent.click(linkInsideCustomAsset);
+			userEvent.click(linkInsideCustomAsset);
 
 			expect(Analytics.getEvents()).toEqual([
 				expect.objectContaining({
@@ -193,7 +193,7 @@ describe('Custom Asset Plugin', () => {
 			document.body.removeChild(customAssetElement);
 		});
 
-		it('is fired when clicking any other element inside a custom asset', async () => {
+		it('is fired when clicking any other element inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const paragraphInsideCustomAsset = document.createElement('p');
@@ -207,7 +207,7 @@ describe('Custom Asset Plugin', () => {
 
 			customAssetElement.appendChild(paragraphInsideCustomAsset);
 
-			await userEvent.click(paragraphInsideCustomAsset);
+			userEvent.click(paragraphInsideCustomAsset);
 
 			expect(Analytics.getEvents()).toEqual([
 				expect.objectContaining({
@@ -225,7 +225,7 @@ describe('Custom Asset Plugin', () => {
 	});
 
 	describe('assetDownloaded', () => {
-		it('is fired when clicking a link inside a custom asset', async () => {
+		it('is fired when clicking a link inside a custom asset', () => {
 			const customAssetElement = createCustomAssetElement();
 
 			const text = 'Link inside a Custom Asset';
@@ -243,7 +243,7 @@ describe('Custom Asset Plugin', () => {
 
 			customAssetElement.appendChild(linkInsideCustomAsset);
 
-			await userEvent.click(linkInsideCustomAsset);
+			userEvent.click(linkInsideCustomAsset);
 
 			expect(Analytics.getEvents().length).toEqual(2);
 

@@ -87,18 +87,7 @@ public class ComponentBlacklistImpl implements ComponentBlacklist {
 		_disabledComponentNames.clear();
 	}
 
-	@Modified
-	protected void modified(Map<String, Object> properties) {
-		Set<String> reactivateComponentNames = _initBlacklistComponentNames(
-			properties);
-
-		_processBundles(reactivateComponentNames);
-	}
-
-	@Reference
-	protected ServiceComponentRuntime serviceComponentRuntime;
-
-	private void _disableComponents(
+	protected void disableComponents(
 		Bundle bundle, Set<String> blacklistComponentNames) {
 
 		_performComponentDescriptionDTOOperation(
@@ -118,7 +107,7 @@ public class ComponentBlacklistImpl implements ComponentBlacklist {
 			});
 	}
 
-	private void _enableComponents(
+	protected void enableComponents(
 		Bundle bundle, Set<String> reactivateComponentNames) {
 
 		_performComponentDescriptionDTOOperation(
@@ -137,6 +126,17 @@ public class ComponentBlacklistImpl implements ComponentBlacklist {
 				_disabledComponentNames.remove(componentDescriptionDTO.name);
 			});
 	}
+
+	@Modified
+	protected void modified(Map<String, Object> properties) {
+		Set<String> reactivateComponentNames = _initBlacklistComponentNames(
+			properties);
+
+		_processBundles(reactivateComponentNames);
+	}
+
+	@Reference
+	protected ServiceComponentRuntime serviceComponentRuntime;
 
 	private Set<String> _initBlacklistComponentNames(
 		Map<String, Object> properties) {
@@ -182,9 +182,9 @@ public class ComponentBlacklistImpl implements ComponentBlacklist {
 		Bundle[] bundles = _bundleContext.getBundles();
 
 		for (Bundle bundle : bundles) {
-			_disableComponents(bundle, _blacklistComponentNames);
+			disableComponents(bundle, _blacklistComponentNames);
 
-			_enableComponents(bundle, reactivateComponentNames);
+			enableComponents(bundle, reactivateComponentNames);
 		}
 	}
 
@@ -210,7 +210,7 @@ public class ComponentBlacklistImpl implements ComponentBlacklist {
 				return;
 			}
 
-			_disableComponents(
+			disableComponents(
 				bundleEvent.getBundle(), _blacklistComponentNames);
 		}
 

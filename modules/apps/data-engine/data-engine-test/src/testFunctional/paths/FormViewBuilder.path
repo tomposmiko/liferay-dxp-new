@@ -12,7 +12,6 @@
 <tbody>
 
 <!--APP-->
-
 <tr>
 	<td>LOCALIZABLE_APP_BUTTON</td>
 	<td>//div[@class='dropdown localizable-dropdown']</td>
@@ -23,14 +22,8 @@
 	<td>//span[contains(text(),'${changeAppLanguageTo}')]</td>
 	<td></td>
 </tr>
-<tr>
-	<td>TRANSLATED_TAB_INDEX</td>
-	<td>xpath=(//*[@id='translationManager']//button[span[text()='${key_language}']])[${key_index}]</td>
-	<td></td>
-</tr>
 
 <!--FIELDS_SIDEBAR-->
-
 <tr>
 	<td>SIDEBAR_FIELD_LABEL</td>
 	<td>//div[contains(@class,'tab-content')]//div[contains(@class,'field-type')]//span[text()='${key_fieldLabel}']</td>
@@ -123,7 +116,7 @@
 </tr>
 <tr>
 	<td>HELP_TEXT_AT_APP_DEPLOYED</td>
-	<td>//span[contains(text(),'${fieldValue}')] | //div[text()='${fieldValue}']</td>
+	<td>//span[contains(text(),'${fieldValue}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -261,10 +254,9 @@
 </tr>
 
 <!--SELECT-->
-
 <tr>
 	<td>SELECT_FIELD</td>
-	<td>//label[contains(text(),'${key_fieldName}')]/following-sibling::div//div[contains(@class,'option-selected')]</td>
+	<td>//label[contains(text(),'${key_fieldName}')]/following-sibling::div[contains(@class,'ddm-select-dropdown') or contains(@class,'input-group-container')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -274,7 +266,6 @@
 </tr>
 
 <!--CHECKBOX-->
-
 <tr>
 	<td>CHECKBOX</td>
 	<td>//input[contains(@type,'checkbox')]//following-sibling::span[contains(.,'${key_fieldName}')]/..//preceding-sibling::input[contains(@type,'checkbox')]</td>
@@ -302,7 +293,6 @@
 </tr>
 
 <!--RADIO_BUTTON-->
-
 <tr>
 	<td>RADIO_OPTION_LABEL</td>
 	<td>//legend[contains(text(),'${key_fieldName}')]/..//input[contains(@type,'radio')]//following-sibling::span[contains(.,'${key_radioOption}')]</td>
@@ -310,7 +300,6 @@
 </tr>
 
 <!--DATE-->
-
 <tr>
 	<td>DATE_FIELD</td>
 	<td>//label[contains(text(),'${key_fieldName}')]/..//input[@type!="hidden"]</td>
@@ -323,7 +312,6 @@
 </tr>
 
 <!--OBJECT_SIDEBAR-->
-
 <tr>
 	<td>OBJECT_FIELD_LABEL</td>
 	<td>//div[contains(@class,'custom-object-field')]//span[contains(text(),'${key_fieldLabel}')]</td>
@@ -346,7 +334,6 @@
 </tr>
 
 <!--DELETE_OBJECT-->
-
 <tr>
 	<td>DELETE_OBJECT_LABEL_CANCEL_BUTTON</td>
 	<td>//div[contains(@class,'modal d-block show')]//div[@class='btn-group-item']//*[contains(text(),'Cancel')]</td>
@@ -384,7 +371,6 @@
 </tr>
 
 <!--FIELD_ELLIPSIS-->
-
 <tr>
 	<td>FIELD_ELLIPSIS</td>
 	<td>//div[@class='dropdown dropdown-action']//*[contains(@class,'lexicon-icon-ellipsis-v')]</td>
@@ -425,7 +411,6 @@
 </tr>
 
 <!--TABS-->
-
 <tr>
 	<td>RULES_TAB</td>
 	<td>//button[@id='rules']</td>
@@ -643,7 +628,6 @@
 </tr>
 
 <!--ENTRIES-->
-
 <tr>
 	<td>ENTRY_NUMERIC</td>
 	<td>//*[contains(@class,'summary-item')][contains(.,'${key_value}')]//div[contains(text(),'${key_type}')]</td>
@@ -651,7 +635,7 @@
 </tr>
 <tr>
 	<td>ENTRIES_TITLE_CONTENT</td>
-	<td>//h2[contains(@class,'lfr-ddm__form-report__title') and contains(.,'${key_text}')]</td>
+	<td>//span[contains(@class,'title') and contains(text(),'${key_text}')]</td>
 	<td></td>
 </tr>
 <tr>

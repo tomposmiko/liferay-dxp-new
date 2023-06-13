@@ -126,8 +126,6 @@ public class KaleoInstanceTokenPersistenceTest {
 
 		newKaleoInstanceToken.setMvccVersion(RandomTestUtil.nextLong());
 
-		newKaleoInstanceToken.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newKaleoInstanceToken.setGroupId(RandomTestUtil.nextLong());
 
 		newKaleoInstanceToken.setCompanyId(RandomTestUtil.nextLong());
@@ -172,9 +170,6 @@ public class KaleoInstanceTokenPersistenceTest {
 		Assert.assertEquals(
 			existingKaleoInstanceToken.getMvccVersion(),
 			newKaleoInstanceToken.getMvccVersion());
-		Assert.assertEquals(
-			existingKaleoInstanceToken.getCtCollectionId(),
-			newKaleoInstanceToken.getCtCollectionId());
 		Assert.assertEquals(
 			existingKaleoInstanceToken.getKaleoInstanceTokenId(),
 			newKaleoInstanceToken.getKaleoInstanceTokenId());
@@ -294,14 +289,14 @@ public class KaleoInstanceTokenPersistenceTest {
 
 	protected OrderByComparator<KaleoInstanceToken> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"KaleoInstanceToken", "mvccVersion", true, "ctCollectionId", true,
-			"kaleoInstanceTokenId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "kaleoDefinitionId", true,
-			"kaleoDefinitionVersionId", true, "kaleoInstanceId", true,
-			"parentKaleoInstanceTokenId", true, "currentKaleoNodeId", true,
-			"currentKaleoNodeName", true, "className", true, "classPK", true,
-			"completed", true, "completionDate", true);
+			"KaleoInstanceToken", "mvccVersion", true, "kaleoInstanceTokenId",
+			true, "groupId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"kaleoDefinitionId", true, "kaleoDefinitionVersionId", true,
+			"kaleoInstanceId", true, "parentKaleoInstanceTokenId", true,
+			"currentKaleoNodeId", true, "currentKaleoNodeName", true,
+			"className", true, "classPK", true, "completed", true,
+			"completionDate", true);
 	}
 
 	@Test
@@ -533,8 +528,6 @@ public class KaleoInstanceTokenPersistenceTest {
 		KaleoInstanceToken kaleoInstanceToken = _persistence.create(pk);
 
 		kaleoInstanceToken.setMvccVersion(RandomTestUtil.nextLong());
-
-		kaleoInstanceToken.setCtCollectionId(RandomTestUtil.nextLong());
 
 		kaleoInstanceToken.setGroupId(RandomTestUtil.nextLong());
 

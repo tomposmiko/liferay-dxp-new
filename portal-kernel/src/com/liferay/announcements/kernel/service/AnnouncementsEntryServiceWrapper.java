@@ -27,10 +27,6 @@ public class AnnouncementsEntryServiceWrapper
 	implements AnnouncementsEntryService,
 			   ServiceWrapper<AnnouncementsEntryService> {
 
-	public AnnouncementsEntryServiceWrapper() {
-		this(null);
-	}
-
 	public AnnouncementsEntryServiceWrapper(
 		AnnouncementsEntryService announcementsEntryService) {
 

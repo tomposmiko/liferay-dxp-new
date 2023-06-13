@@ -16,9 +16,7 @@ package com.liferay.commerce.service.persistence.impl;
 
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.service.persistence.CommerceOrderItemPersistence;
-import com.liferay.commerce.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  * @generated
  */
-public abstract class CommerceOrderItemFinderBaseImpl
+public class CommerceOrderItemFinderBaseImpl
 	extends BasePersistenceImpl<CommerceOrderItem> {
 
 	public CommerceOrderItemFinderBaseImpl() {
@@ -43,7 +37,6 @@ public abstract class CommerceOrderItemFinderBaseImpl
 
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
-		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put(
 			"deliverySubscriptionTypeSettings", "deliverySubTypeSettings");
 		dbColumnNames.put(
@@ -64,36 +57,30 @@ public abstract class CommerceOrderItemFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commerceOrderItemPersistence.getBadColumnNames();
+		return getCommerceOrderItemPersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce order item persistence.
+	 *
+	 * @return the commerce order item persistence
+	 */
+	public CommerceOrderItemPersistence getCommerceOrderItemPersistence() {
+		return commerceOrderItemPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce order item persistence.
+	 *
+	 * @param commerceOrderItemPersistence the commerce order item persistence
+	 */
+	public void setCommerceOrderItemPersistence(
+		CommerceOrderItemPersistence commerceOrderItemPersistence) {
+
+		this.commerceOrderItemPersistence = commerceOrderItemPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommerceOrderItemPersistence.class)
 	protected CommerceOrderItemPersistence commerceOrderItemPersistence;
 
 	private static final Log _log = LogFactoryUtil.getLog(

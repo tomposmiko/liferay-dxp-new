@@ -17,9 +17,33 @@
 <%@ include file="/export/init.jsp" %>
 
 <%
-ExportLayoutsProcessesDisplayContext exportLayoutsProcessesDisplayContext = new ExportLayoutsProcessesDisplayContext(request, liferayPortletResponse);
+long groupId = ParamUtil.getLong(request, "groupId");
+boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
+String displayStyle = ParamUtil.getString(request, "displayStyle");
+String navigation = ParamUtil.getString(request, "navigation");
+String orderByCol = ParamUtil.getString(request, "orderByCol");
+String orderByType = ParamUtil.getString(request, "orderByType");
+String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 
-PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	liferayPortletResponse
+).setMVCRenderCommandName(
+	"/export_import/view_export_layouts"
+).setNavigation(
+	navigation
+).setParameter(
+	"displayStyle", displayStyle
+).setParameter(
+	"groupId", groupId
+).setParameter(
+	"orderByCol", orderByCol
+).setParameter(
+	"orderByType", orderByType
+).setParameter(
+	"privateLayout", privateLayout
+).setParameter(
+	"searchContainerId", searchContainerId
+).buildPortletURL();
 %>
 
 <portlet:actionURL name="/export_import/delete_layout_export_background_tasks" var="deleteBackgroundTasksURL">
@@ -32,8 +56,41 @@ PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
 	<aui:input name="deleteBackgroundTaskIds" type="hidden" />
 
 	<liferay-ui:search-container
-		searchContainer="<%= exportLayoutsProcessesDisplayContext.getSearchContainer() %>"
+		emptyResultsMessage="no-export-processes-were-found"
+		id="<%= searchContainerId %>"
+		iteratorURL="<%= portletURL %>"
+		orderByCol="<%= orderByCol %>"
+		orderByComparator="<%= BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType) %>"
+		orderByType="<%= orderByType %>"
+		rowChecker="<%= new EmptyOnClickRowChecker(liferayPortletResponse) %>"
 	>
+		<liferay-ui:search-container-results>
+
+			<%
+			int backgroundTasksCount = 0;
+			List<BackgroundTask> backgroundTasks = null;
+
+			if (navigation.equals("all")) {
+				backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR);
+				backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+			}
+			else {
+				boolean completed = false;
+
+				if (navigation.equals("completed")) {
+					completed = true;
+				}
+
+				backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, completed);
+				backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(groupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, completed, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+			}
+
+			searchContainer.setResults(backgroundTasks);
+			searchContainer.setTotal(backgroundTasksCount);
+			%>
+
+		</liferay-ui:search-container-results>
+
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.kernel.backgroundtask.BackgroundTask"
 			keyProperty="backgroundTaskId"
@@ -47,7 +104,7 @@ PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
 			%>
 
 			<c:choose>
-				<c:when test='<%= Objects.equals(exportLayoutsProcessesDisplayContext.getDisplayStyle(), "descriptive") %>'>
+				<c:when test='<%= displayStyle.equals("descriptive") %>'>
 					<liferay-ui:search-container-column-text>
 						<liferay-ui:user-portrait
 							userId="<%= backgroundTask.getUserId() %>"
@@ -154,7 +211,7 @@ PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
 
 						<c:if test="<%= Validator.isNotNull(backgroundTask.getStatusMessage()) %>">
 							<span class="background-task-status-row">
-								<a class="details-link" href="javascript:void(0);" onclick="<portlet:namespace />viewBackgroundTaskDetails(<%= backgroundTask.getBackgroundTaskId() %>);">
+								<a class="details-link" href="javascript:;" onclick="<portlet:namespace />viewBackgroundTaskDetails(<%= backgroundTask.getBackgroundTaskId() %>);">
 									<liferay-ui:message key="see-more-details" />
 								</a>
 							</span>
@@ -167,7 +224,7 @@ PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
 						</c:if>
 					</liferay-ui:search-container-column-text>
 				</c:when>
-				<c:when test='<%= Objects.equals(exportLayoutsProcessesDisplayContext.getDisplayStyle(), "list") %>'>
+				<c:when test='<%= displayStyle.equals("list") %>'>
 					<liferay-ui:search-container-column-text
 						name="user"
 					>
@@ -183,7 +240,7 @@ PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
 						cssClass="table-cell-expand table-cell-minw-200 table-title"
 						name="title"
 					>
-						<span id="<portlet:namespace />backgroundTaskName<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>">
+						<span id="<%= liferayPortletResponse.getNamespace() + "backgroundTaskName" + String.valueOf(backgroundTask.getBackgroundTaskId()) %>">
 							<liferay-ui:message key="<%= HtmlUtil.escape(backgroundTaskName) %>" />
 						</span>
 					</liferay-ui:search-container-column-text>
@@ -287,7 +344,7 @@ PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator
-			displayStyle="<%= exportLayoutsProcessesDisplayContext.getDisplayStyle() %>"
+			displayStyle="<%= displayStyle %>"
 			markupView="lexicon"
 			resultRowSplitter="<%= new ExportImportResultRowSplitter() %>"
 		/>
@@ -295,12 +352,12 @@ PortletURL portletURL = exportLayoutsProcessesDisplayContext.getPortletURL();
 </aui:form>
 
 <%
-int incompleteBackgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(exportLayoutsProcessesDisplayContext.getGroupId(), BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, false);
+int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, false);
 %>
 
 <div class="hide incomplete-process-message">
 	<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-		<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+		<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 	</liferay-util:include>
 </div>
 

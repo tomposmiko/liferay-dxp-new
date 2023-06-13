@@ -14,7 +14,7 @@
 
 package com.liferay.knowledge.base.util;
 
-import com.liferay.diff.DiffVersionsInfo;
+import com.liferay.portal.kernel.diff.DiffVersionsInfo;
 
 /**
  * @author Lance Ji

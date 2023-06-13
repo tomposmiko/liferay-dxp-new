@@ -15,11 +15,11 @@
 package com.liferay.wiki.web.internal.item.selector;
 
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
-	property = "service.ranking:Integer=100",
+	immediate = true, property = "service.ranking:Integer=100",
 	service = ItemSelectorReturnTypeResolver.class
 )
 public class WikiPageURLItemSelectorReturnTypeResolver
@@ -84,7 +84,7 @@ public class WikiPageURLItemSelectorReturnTypeResolver
 			}
 		}
 
-		return HttpComponentsUtil.removeDomain(
+		return _http.removeDomain(
 			PortletURLBuilder.create(
 				_portal.getControlPanelPortletURL(
 					themeDisplay.getRequest(), WikiPortletKeys.WIKI_ADMIN,
@@ -97,6 +97,9 @@ public class WikiPageURLItemSelectorReturnTypeResolver
 				"title", page.getTitle()
 			).buildString());
 	}
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private Portal _portal;

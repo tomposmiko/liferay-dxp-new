@@ -12,8 +12,6 @@
  * details.
  */
 
-import {openToast, postForm, sub} from 'frontend-js-web';
-
 const isElementInnerSelector = (element, ...selectors) =>
 	!selectors.some((selector) => element.closest(selector));
 
@@ -82,12 +80,12 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 		const description = getInputLocalizedValues('description');
 
 		if (!nameInput.value && !name[defaultLanguageId]) {
-			openToast({
-				message: sub(
+			Liferay.Util.openToast({
+				message: Liferay.Util.sub(
 					Liferay.Language.get(
 						'please-enter-a-valid-title-for-the-default-language-x'
 					),
-					defaultLanguageId.replaceAll('_', '-')
+					defaultLanguageId.replace('_', '-')
 				),
 				title: Liferay.Language.get('error'),
 				type: 'danger',
@@ -100,7 +98,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 
 		clearNameInputIfNeeded(defaultLanguageId);
 
-		postForm(form, {
+		Liferay.Util.postForm(form, {
 			data: {
 				dataDefinition: JSON.stringify({
 					...dataDefinition.serialize(),
@@ -124,11 +122,10 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 		if (
 			isElementInnerSelector(
 				target,
-				'.cke_dialog',
 				'.ddm-form-builder-wrapper',
-				'.input-localized-content',
+				'.multi-panel-sidebar',
 				'.lfr-icon-menu-open',
-				'.multi-panel-sidebar'
+				'.input-localized-content'
 			)
 		) {
 			const dataLayoutBuilder = await getDataLayoutBuilder();
@@ -140,7 +137,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 		}
 	};
 
-	window.addEventListener('mousedown', detectClickOutside, true);
+	window.addEventListener('click', detectClickOutside, true);
 
 	// Update editing language id in the data engine side
 
@@ -164,7 +161,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 	return {
 		dispose() {
 			form.removeEventListener('submit', saveDataEngineStructure);
-			window.removeEventListener('mousedown', detectClickOutside, true);
+			window.removeEventListener('click', detectClickOutside, true);
 		},
 	};
 }

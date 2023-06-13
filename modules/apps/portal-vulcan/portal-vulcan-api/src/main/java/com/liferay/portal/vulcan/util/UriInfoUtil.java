@@ -14,76 +14,56 @@
 
 package com.liferay.portal.vulcan.util;
 
-import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.Validator;
-
-import java.lang.reflect.Field;
-
-import java.net.URI;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
  * @author Javier Gamarra
- * @author Raymond Augé
  */
 public class UriInfoUtil {
 
+	public static String getAbsolutePath(UriInfo uriInfo) {
+		if (_isHttpsEnabled()) {
+			UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
+
+			return String.valueOf(
+				uriBuilder.scheme(
+					"https"
+				).build());
+		}
+
+		return String.valueOf(uriInfo.getAbsolutePath());
+	}
+
 	public static String getBasePath(UriInfo uriInfo) {
-		return String.valueOf(
-			getBaseUriBuilder(
-				uriInfo
-			).build());
+		UriBuilder uriBuilder = getBaseUriBuilder(uriInfo);
+
+		return String.valueOf(uriBuilder.build());
 	}
 
 	public static UriBuilder getBaseUriBuilder(UriInfo uriInfo) {
-		return _updateUriBuilder(uriInfo.getBaseUriBuilder());
-	}
+		if (_isHttpsEnabled()) {
+			UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
 
-	private static String _getHost(UriBuilder uriBuilder) {
-		try {
-			if (_uriBuilderHostField == null) {
-				_uriBuilderHostField = ReflectionUtil.getDeclaredField(
-					uriBuilder.getClass(), "host");
-			}
+			return uriBuilder.scheme("https");
+		}
 
-			return (String)_uriBuilderHostField.get(uriBuilder);
-		}
-		catch (Exception exception) {
-			return ReflectionUtil.throwException(exception);
-		}
+		return uriInfo.getBaseUriBuilder();
 	}
 
 	private static boolean _isHttpsEnabled() {
-		if (Http.HTTPS.equals(
-				PropsUtil.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL)) ||
-			Http.HTTPS.equals(PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL))) {
+		if (Http.HTTPS.equals(PropsUtil.get(PropsKeys.WEB_SERVER_PROTOCOL)) ||
+			Http.HTTPS.equals(
+				PropsUtil.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL))) {
 
 			return true;
 		}
 
 		return false;
 	}
-
-	private static UriBuilder _updateUriBuilder(UriBuilder uriBuilder) {
-		if (!Validator.isBlank(PortalUtil.getPathContext())) {
-			URI uri = uriBuilder.build();
-
-			uriBuilder.replacePath(PortalUtil.getPathContext(uri.getPath()));
-		}
-
-		if (Validator.isNotNull(_getHost(uriBuilder)) && _isHttpsEnabled()) {
-			uriBuilder.scheme(Http.HTTPS);
-		}
-
-		return uriBuilder;
-	}
-
-	private static volatile Field _uriBuilderHostField;
 
 }

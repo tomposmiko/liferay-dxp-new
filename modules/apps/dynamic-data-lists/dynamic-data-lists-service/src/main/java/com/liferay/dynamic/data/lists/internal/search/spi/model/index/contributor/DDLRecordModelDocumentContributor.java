@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcela Cunha
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.lists.model.DDLRecord",
 	service = ModelDocumentContributor.class
 )
@@ -68,24 +69,18 @@ public class DDLRecordModelDocumentContributor
 
 			DDMFormValues ddmFormValues = ddlRecordVersion.getDDMFormValues();
 
-			_addContent(ddlRecordVersion, ddmFormValues, document);
+			addContent(ddlRecordVersion, ddmFormValues, document);
 
 			ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 	}
 
-	@Reference
-	protected ClassNameLocalService classNameLocalService;
-
-	@Reference
-	protected DDMIndexer ddmIndexer;
-
-	private void _addContent(
+	protected void addContent(
 			DDLRecordVersion ddlRecordVersion, DDMFormValues ddmFormValues,
 			Document document)
 		throws Exception {
@@ -95,11 +90,11 @@ public class DDLRecordModelDocumentContributor
 		for (Locale locale : locales) {
 			document.addText(
 				"ddmContent_" + LocaleUtil.toLanguageId(locale),
-				_extractContent(ddlRecordVersion, locale));
+				extractContent(ddlRecordVersion, locale));
 		}
 	}
 
-	private String _extractContent(
+	protected String extractContent(
 			DDLRecordVersion ddlRecordVersion, Locale locale)
 		throws Exception {
 
@@ -114,6 +109,12 @@ public class DDLRecordModelDocumentContributor
 		return ddmIndexer.extractIndexableAttributes(
 			ddlRecordSet.getDDMStructure(), ddmFormValues, locale);
 	}
+
+	@Reference
+	protected ClassNameLocalService classNameLocalService;
+
+	@Reference
+	protected DDMIndexer ddmIndexer;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDLRecordModelDocumentContributor.class);

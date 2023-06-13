@@ -46,7 +46,7 @@ public class DefaultExportImportBackgroundTaskStatusMessageTranslator
 			translatePortletMessage(backgroundTaskStatus, message);
 		}
 		else if (messageType.equals("stagedModel")) {
-			_translateStagedModelMessage(backgroundTaskStatus, message);
+			translateStagedModelMessage(backgroundTaskStatus, message);
 		}
 	}
 
@@ -68,6 +68,22 @@ public class DefaultExportImportBackgroundTaskStatusMessageTranslator
 			new HashMap<String, LongWrapper>());
 	}
 
+	protected long getTotal(Map<String, LongWrapper> modelCounters) {
+		if (modelCounters == null) {
+			return 0;
+		}
+
+		long total = 0;
+
+		for (Map.Entry<String, LongWrapper> entry : modelCounters.entrySet()) {
+			LongWrapper longWrapper = entry.getValue();
+
+			total += longWrapper.getValue();
+		}
+
+		return total;
+	}
+
 	protected synchronized void translateLayoutMessage(
 		BackgroundTaskStatus backgroundTaskStatus, Message message) {
 
@@ -75,7 +91,7 @@ public class DefaultExportImportBackgroundTaskStatusMessageTranslator
 			(Map<String, LongWrapper>)message.get("modelAdditionCounters");
 
 		backgroundTaskStatus.setAttribute(
-			"allModelAdditionCountersTotal", _getTotal(modelAdditionCounters));
+			"allModelAdditionCountersTotal", getTotal(modelAdditionCounters));
 
 		long allPortletAdditionCounter = 0;
 
@@ -134,23 +150,7 @@ public class DefaultExportImportBackgroundTaskStatusMessageTranslator
 		backgroundTaskStatus.setAttribute("uuid", StringPool.BLANK);
 	}
 
-	private long _getTotal(Map<String, LongWrapper> modelCounters) {
-		if (modelCounters == null) {
-			return 0;
-		}
-
-		long total = 0;
-
-		for (Map.Entry<String, LongWrapper> entry : modelCounters.entrySet()) {
-			LongWrapper longWrapper = entry.getValue();
-
-			total += longWrapper.getValue();
-		}
-
-		return total;
-	}
-
-	private synchronized void _translateStagedModelMessage(
+	protected synchronized void translateStagedModelMessage(
 		BackgroundTaskStatus backgroundTaskStatus, Message message) {
 
 		String portletId = (String)backgroundTaskStatus.getAttribute(

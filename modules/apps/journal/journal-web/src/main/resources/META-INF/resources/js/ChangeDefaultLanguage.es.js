@@ -42,7 +42,6 @@ function ChangeDefaultLanguage(props) {
 				<b>{`${Liferay.Language.get(
 					'web-content-default-language'
 				)}: `}</b>
-
 				{props.strings[selectedDefaultLanguage]}
 			</p>
 

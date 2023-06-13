@@ -237,8 +237,4 @@ public interface SegmentsEntryRoleModel
 	@Override
 	public SegmentsEntryRole cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

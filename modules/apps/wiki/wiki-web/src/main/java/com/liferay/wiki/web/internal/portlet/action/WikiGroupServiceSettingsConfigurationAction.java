@@ -34,12 +34,12 @@ public class WikiGroupServiceSettingsConfigurationAction
 			ActionResponse actionResponse)
 		throws Exception {
 
-		_validateDisplaySettings(actionRequest);
+		validateDisplaySettings(actionRequest);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	private void _validateDisplaySettings(ActionRequest actionRequest) {
+	protected void validateDisplaySettings(ActionRequest actionRequest) {
 		String visibleNodes = getParameter(actionRequest, "visibleNodes");
 
 		if (Validator.isNull(visibleNodes)) {

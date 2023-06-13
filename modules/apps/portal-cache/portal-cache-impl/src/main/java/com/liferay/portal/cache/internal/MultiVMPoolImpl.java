@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @author Michael Young
  */
-@Component(service = MultiVMPool.class)
+@Component(immediate = true, service = MultiVMPool.class)
 public class MultiVMPoolImpl implements MultiVMPool {
 
 	@Override
@@ -43,19 +43,24 @@ public class MultiVMPoolImpl implements MultiVMPool {
 		return _portalCacheManager.getPortalCache(portalCacheName);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getPortalCache(String)}
+	 */
+	@Deprecated
 	@Override
 	public PortalCache<? extends Serializable, ? extends Serializable>
-		getPortalCache(String portalCacheName, boolean mvcc) {
+		getPortalCache(String portalCacheName, boolean blocking) {
 
-		return _portalCacheManager.getPortalCache(portalCacheName, mvcc);
+		return _portalCacheManager.getPortalCache(portalCacheName);
 	}
 
 	@Override
 	public PortalCache<? extends Serializable, ? extends Serializable>
-		getPortalCache(String portalCacheName, boolean mvcc, boolean sharded) {
+		getPortalCache(String portalCacheName, boolean blocking, boolean mvcc) {
 
 		return _portalCacheManager.getPortalCache(
-			portalCacheName, mvcc, sharded);
+			portalCacheName, blocking, mvcc);
 	}
 
 	@Override

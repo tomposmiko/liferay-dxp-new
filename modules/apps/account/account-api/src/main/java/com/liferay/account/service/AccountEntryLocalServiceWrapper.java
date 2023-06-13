@@ -27,10 +27,6 @@ public class AccountEntryLocalServiceWrapper
 	implements AccountEntryLocalService,
 			   ServiceWrapper<AccountEntryLocalService> {
 
-	public AccountEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AccountEntryLocalServiceWrapper(
 		AccountEntryLocalService accountEntryLocalService) {
 
@@ -46,8 +42,7 @@ public class AccountEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.account.model.AccountEntry activateAccountEntry(
-			com.liferay.account.model.AccountEntry accountEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		com.liferay.account.model.AccountEntry accountEntry) {
 
 		return _accountEntryLocalService.activateAccountEntry(accountEntry);
 	}
@@ -55,7 +50,7 @@ public class AccountEntryLocalServiceWrapper
 	@Override
 	public com.liferay.account.model.AccountEntry activateAccountEntry(
 			long accountEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws Exception {
 
 		return _accountEntryLocalService.activateAccountEntry(accountEntryId);
 	}
@@ -75,6 +70,58 @@ public class AccountEntryLocalServiceWrapper
 		com.liferay.account.model.AccountEntry accountEntry) {
 
 		return _accountEntryLocalService.addAccountEntry(accountEntry);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, String, int, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.account.model.AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryLocalService.addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			status);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addAccountEntry(long, long, String, String, String[],
+	 byte[], String, String, int, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.account.model.AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryLocalService.addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			status, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.account.model.AccountEntry addAccountEntry(
+			long userId, long parentAccountEntryId, String name,
+			String description, String[] domains, byte[] logoBytes,
+			String taxIdNumber, String type, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryLocalService.addAccountEntry(
+			userId, parentAccountEntryId, name, description, domains, logoBytes,
+			taxIdNumber, type, status, serviceContext);
 	}
 
 	@Override
@@ -138,8 +185,7 @@ public class AccountEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.account.model.AccountEntry deactivateAccountEntry(
-			com.liferay.account.model.AccountEntry accountEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		com.liferay.account.model.AccountEntry accountEntry) {
 
 		return _accountEntryLocalService.deactivateAccountEntry(accountEntry);
 	}
@@ -147,7 +193,7 @@ public class AccountEntryLocalServiceWrapper
 	@Override
 	public com.liferay.account.model.AccountEntry deactivateAccountEntry(
 			long accountEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws Exception {
 
 		return _accountEntryLocalService.deactivateAccountEntry(accountEntryId);
 	}
@@ -322,29 +368,34 @@ public class AccountEntryLocalServiceWrapper
 		return _accountEntryLocalService.fetchAccountEntry(accountEntryId);
 	}
 
-	@Override
-	public com.liferay.account.model.AccountEntry
-		fetchAccountEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return _accountEntryLocalService.
-			fetchAccountEntryByExternalReferenceCode(
-				externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the account entry with the matching UUID and company.
+	 * Returns the account entry with the matching external reference code and company.
 	 *
-	 * @param uuid the account entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
 	 * @return the matching account entry, or <code>null</code> if a matching account entry could not be found
 	 */
 	@Override
 	public com.liferay.account.model.AccountEntry
-		fetchAccountEntryByUuidAndCompanyId(String uuid, long companyId) {
+		fetchAccountEntryByExternalReferenceCode(
+			long companyId, String externalReferenceCode) {
 
-		return _accountEntryLocalService.fetchAccountEntryByUuidAndCompanyId(
-			uuid, companyId);
+		return _accountEntryLocalService.
+			fetchAccountEntryByExternalReferenceCode(
+				companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.account.model.AccountEntry
+		fetchAccountEntryByReferenceCode(
+			long companyId, String externalReferenceCode) {
+
+		return _accountEntryLocalService.fetchAccountEntryByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	@Override
@@ -422,31 +473,22 @@ public class AccountEntryLocalServiceWrapper
 		return _accountEntryLocalService.getAccountEntry(accountEntryId);
 	}
 
-	@Override
-	public com.liferay.account.model.AccountEntry
-			getAccountEntryByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryLocalService.getAccountEntryByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the account entry with the matching UUID and company.
+	 * Returns the account entry with the matching external reference code and company.
 	 *
-	 * @param uuid the account entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account entry's external reference code
 	 * @return the matching account entry
 	 * @throws PortalException if a matching account entry could not be found
 	 */
 	@Override
 	public com.liferay.account.model.AccountEntry
-			getAccountEntryByUuidAndCompanyId(String uuid, long companyId)
+			getAccountEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _accountEntryLocalService.getAccountEntryByUuidAndCompanyId(
-			uuid, companyId);
+		return _accountEntryLocalService.getAccountEntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	@Override
@@ -454,16 +496,6 @@ public class AccountEntryLocalServiceWrapper
 		getActionableDynamicQuery() {
 
 		return _accountEntryLocalService.getActionableDynamicQuery();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return _accountEntryLocalService.getExportActionableDynamicQuery(
-			portletDataContext);
 	}
 
 	@Override
@@ -586,9 +618,63 @@ public class AccountEntryLocalServiceWrapper
 		return _accountEntryLocalService.updateAccountEntry(accountEntry);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateAccountEntry(Long, long, String, String, boolean,
+	 String[], byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.account.model.AccountEntry updateAccountEntry(
-			long accountEntryId, long parentAccountEntryId, String name,
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, int status)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryLocalService.updateAccountEntry(
+			accountEntryId, parentAccountEntryId, name, description, deleteLogo,
+			domains, logoBytes, status);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateAccountEntry(Long, long, String, String, boolean,
+	 String[], byte[], String, int, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.account.model.AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryLocalService.updateAccountEntry(
+			accountEntryId, parentAccountEntryId, name, description, deleteLogo,
+			domains, logoBytes, status, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.account.model.AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			byte[] logoBytes, String taxIdNumber, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryLocalService.updateAccountEntry(
+			accountEntryId, parentAccountEntryId, name, description, deleteLogo,
+			domains, logoBytes, taxIdNumber, status, serviceContext);
+	}
+
+	@Override
+	public com.liferay.account.model.AccountEntry updateAccountEntry(
+			Long accountEntryId, long parentAccountEntryId, String name,
 			String description, boolean deleteLogo, String[] domains,
 			String emailAddress, byte[] logoBytes, String taxIdNumber,
 			int status,
@@ -620,14 +706,6 @@ public class AccountEntryLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.account.model.AccountEntry updateDomains(
-			long accountEntryId, String[] domains)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryLocalService.updateDomains(accountEntryId, domains);
-	}
-
-	@Override
 	public com.liferay.account.model.AccountEntry updateExternalReferenceCode(
 			com.liferay.account.model.AccountEntry accountEntry,
 			String externalReferenceCode)
@@ -647,18 +725,8 @@ public class AccountEntryLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.account.model.AccountEntry updateRestrictMembership(
-			long accountEntryId, boolean restrictMembership)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryLocalService.updateRestrictMembership(
-			accountEntryId, restrictMembership);
-	}
-
-	@Override
 	public com.liferay.account.model.AccountEntry updateStatus(
-			com.liferay.account.model.AccountEntry accountEntry, int status)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		com.liferay.account.model.AccountEntry accountEntry, int status) {
 
 		return _accountEntryLocalService.updateStatus(accountEntry, status);
 	}
@@ -669,17 +737,6 @@ public class AccountEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _accountEntryLocalService.updateStatus(accountEntryId, status);
-	}
-
-	@Override
-	public com.liferay.account.model.AccountEntry updateStatus(
-			long userId, long accountEntryId, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext,
-			java.util.Map<String, java.io.Serializable> workflowContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _accountEntryLocalService.updateStatus(
-			userId, accountEntryId, status, serviceContext, workflowContext);
 	}
 
 	@Override

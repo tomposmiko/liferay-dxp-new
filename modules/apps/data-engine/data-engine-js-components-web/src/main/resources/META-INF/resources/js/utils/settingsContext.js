@@ -17,11 +17,11 @@ import {generateInstanceId, getDefaultFieldName} from './fieldSupport';
 import {normalizeFieldName} from './fields.es';
 import {PagesVisitor} from './visitors.es';
 
-export function getSettingsContextProperty(
+export const getSettingsContextProperty = (
 	settingsContext,
 	propertyName,
 	propertyType = 'value'
-) {
+) => {
 	let propertyValue;
 	const visitor = new PagesVisitor(settingsContext.pages);
 
@@ -32,14 +32,14 @@ export function getSettingsContextProperty(
 	});
 
 	return propertyValue;
-}
+};
 
-export function setFieldReferenceErrorMessage(
+export const setFieldReferenceErrorMessage = (
 	settingsContext,
 	propertyName,
 	displayErrors = true,
 	shouldUpdateValue = false
-) {
+) => {
 	const visitor = new PagesVisitor(settingsContext.pages);
 
 	return {
@@ -60,15 +60,15 @@ export function setFieldReferenceErrorMessage(
 			return field;
 		}),
 	};
-}
+};
 
-export function updateSettingsContextProperty(
+export const updateSettingsContextProperty = (
 	defaultLanguageId = themeDisplay.getDefaultLanguageId(),
 	editingLanguageId,
 	settingsContext,
 	propertyName,
 	propertyValue
-) {
+) => {
 	const visitor = new PagesVisitor(settingsContext.pages);
 	const isLocalizablePropertyValue = typeof propertyValue === 'object';
 	const isLocalizableLabel =
@@ -108,9 +108,9 @@ export function updateSettingsContextProperty(
 			return field;
 		}),
 	};
-}
+};
 
-export function updateSettingsContextInstanceId({settingsContext}) {
+export const updateSettingsContextInstanceId = ({settingsContext}) => {
 	const visitor = new PagesVisitor(settingsContext.pages);
 
 	return {
@@ -124,15 +124,15 @@ export function updateSettingsContextInstanceId({settingsContext}) {
 			return newField;
 		}),
 	};
-}
+};
 
-export function updateFieldName(
+export const updateFieldName = (
 	defaultLanguageId,
 	editingLanguageId,
 	fieldNameGenerator,
 	focusedField,
 	value
-) {
+) => {
 	const {fieldName} = focusedField;
 	const normalizedFieldName = normalizeFieldName(value);
 
@@ -173,13 +173,13 @@ export function updateFieldName(
 	}
 
 	return focusedField;
-}
+};
 
-export function updateFieldReference(
+export const updateFieldReference = (
 	focusedField,
 	invalid = false,
 	shouldUpdateValue = false
-) {
+) => {
 	const {settingsContext} = focusedField;
 
 	focusedField = {
@@ -193,14 +193,14 @@ export function updateFieldReference(
 	};
 
 	return focusedField;
-}
+};
 
-export function updateFieldDataType(
+export const updateFieldDataType = (
 	defaultLanguageId,
 	editingLanguageId,
 	focusedField,
 	value
-) {
+) => {
 	let {settingsContext} = focusedField;
 
 	settingsContext = {
@@ -224,16 +224,16 @@ export function updateFieldDataType(
 			value
 		),
 	};
-}
+};
 
-export function updateFieldLabel(
+export const updateFieldLabel = (
 	defaultLanguageId,
 	editingLanguageId,
 	fieldNameGenerator,
 	focusedField,
 	generateFieldNameUsingFieldLabel,
 	value
-) {
+) => {
 	let {fieldName, settingsContext} = focusedField;
 	let label = value;
 
@@ -269,7 +269,7 @@ export function updateFieldLabel(
 			value
 		),
 	};
-}
+};
 
 const isLocalizedObjectValue = ({localizable, value}) => {
 	return typeof value === 'object' && localizable;
@@ -281,10 +281,6 @@ const getValueLocalized = (
 	defaultLanguageId,
 	editingLanguageId
 ) => {
-	if (value === null) {
-		return value;
-	}
-
 	if (
 		isLocalizedObjectValue({localizable, value}) &&
 		value[editingLanguageId] !== undefined
@@ -301,13 +297,13 @@ const getValueLocalized = (
 	return value;
 };
 
-export function updateFieldProperty(
+export const updateFieldProperty = (
 	defaultLanguageId,
 	editingLanguageId,
 	focusedField,
 	propertyName,
 	propertyValue
-) {
+) => {
 	return {
 		...focusedField,
 		[propertyName]: getValueLocalized(
@@ -324,14 +320,14 @@ export function updateFieldProperty(
 			propertyValue
 		),
 	};
-}
+};
 
-export function updateFieldOptions(
+export const updateFieldOptions = (
 	defaultLanguageId,
 	editingLanguageId,
 	focusedField,
 	value
-) {
+) => {
 	const options = value[editingLanguageId];
 
 	return {
@@ -345,9 +341,9 @@ export function updateFieldOptions(
 			value
 		),
 	};
-}
+};
 
-export function updateField(
+export const updateField = (
 	{
 		defaultLanguageId,
 		editingLanguageId,
@@ -357,7 +353,7 @@ export function updateField(
 	field,
 	propertyName,
 	propertyValue
-) {
+) => {
 	if (propertyName === 'dataType') {
 		field = {
 			...field,
@@ -425,4 +421,4 @@ export function updateField(
 	}
 
 	return field;
-}
+};

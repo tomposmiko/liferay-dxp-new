@@ -20,7 +20,6 @@ import com.liferay.batch.planner.model.BatchPlannerMappingTable;
 import com.liferay.batch.planner.model.impl.BatchPlannerMappingImpl;
 import com.liferay.batch.planner.model.impl.BatchPlannerMappingModelImpl;
 import com.liferay.batch.planner.service.persistence.BatchPlannerMappingPersistence;
-import com.liferay.batch.planner.service.persistence.BatchPlannerMappingUtil;
 import com.liferay.batch.planner.service.persistence.impl.constants.BatchPlannerPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -46,7 +46,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -72,7 +71,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Igor Beslic
  * @generated
  */
-@Component(service = BatchPlannerMappingPersistence.class)
+@Component(
+	service = {BatchPlannerMappingPersistence.class, BasePersistence.class}
+)
 public class BatchPlannerMappingPersistenceImpl
 	extends BasePersistenceImpl<BatchPlannerMapping>
 	implements BatchPlannerMappingPersistence {
@@ -196,7 +197,7 @@ public class BatchPlannerMappingPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BatchPlannerMapping>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BatchPlannerMapping batchPlannerMapping : list) {
@@ -569,7 +570,7 @@ public class BatchPlannerMappingPersistenceImpl
 
 		Object[] finderArgs = new Object[] {batchPlannerPlanId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -703,7 +704,7 @@ public class BatchPlannerMappingPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByBPPI_EFN_IFN, finderArgs, this);
+				_finderPathFetchByBPPI_EFN_IFN, finderArgs);
 		}
 
 		if (result instanceof BatchPlannerMapping) {
@@ -847,7 +848,7 @@ public class BatchPlannerMappingPersistenceImpl
 			batchPlannerPlanId, externalFieldName, internalFieldName
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -1378,7 +1379,7 @@ public class BatchPlannerMappingPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BatchPlannerMapping>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1448,7 +1449,7 @@ public class BatchPlannerMappingPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1554,31 +1555,11 @@ public class BatchPlannerMappingPersistenceImpl
 				"batchPlannerPlanId", "externalFieldName", "internalFieldName"
 			},
 			false);
-
-		_setBatchPlannerMappingUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setBatchPlannerMappingUtilPersistence(null);
-
 		entityCache.removeCache(BatchPlannerMappingImpl.class.getName());
-	}
-
-	private void _setBatchPlannerMappingUtilPersistence(
-		BatchPlannerMappingPersistence batchPlannerMappingPersistence) {
-
-		try {
-			Field field = BatchPlannerMappingUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, batchPlannerMappingPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -1640,5 +1621,9 @@ public class BatchPlannerMappingPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private BatchPlannerMappingModelArgumentsResolver
+		_batchPlannerMappingModelArgumentsResolver;
 
 }

@@ -24,8 +24,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PortalInstanceLifecycleManager {
 
-	public void preregisterCompany(Company company);
-
 	public void preunregisterCompany(Company company);
 
 	public void registerCompany(Company company);

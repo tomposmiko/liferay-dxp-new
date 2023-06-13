@@ -14,10 +14,10 @@
 
 import {fetch} from 'frontend-js-web';
 
-import {getProductMinQuantity} from './quantities';
+import createOdataFilter from './odata';
 
 export const fetchHeaders = new Headers({
-	'Accept': 'application/json',
+	Accept: 'application/json',
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 	'Content-Type': 'application/json',
 });
@@ -26,8 +26,8 @@ export const fetchParams = {
 	headers: fetchHeaders,
 };
 
-export function getData(apiURL, query, page, pageSize) {
-	const url = new URL(apiURL, Liferay.ThemeDisplay.getPortalURL());
+export function getData(apiUrl, query, page, pageSize) {
+	const url = new URL(apiUrl, Liferay.ThemeDisplay.getPortalURL());
 
 	if (query) {
 		url.searchParams.append('search', query);
@@ -41,7 +41,7 @@ export function getData(apiURL, query, page, pageSize) {
 		url.searchParams.append('pageSize', pageSize);
 	}
 
-	return fetch(url.pathname + url.search, {
+	return fetch(url, {
 		...fetchParams,
 	}).then((data) => data.json());
 }
@@ -100,10 +100,41 @@ export function getValueFromItem(item, fieldName) {
 	return item[fieldName];
 }
 
-export function formatActionUrl(url, item) {
-	let regex = new RegExp('{(.*?)}', 'mg');
+export function gHash(string) {
+	let hash = 0;
 
-	let replacedUrl = url.replace(regex, (matched) =>
+	if (string.length === 0) {
+		return hash;
+	}
+
+	[...string].forEach((char) => {
+		hash = (hash << 7) - hash + char.charCodeAt();
+		hash = hash & hash;
+	});
+
+	return hash;
+}
+
+export function excludeFromList(matchingList, againstList) {
+	const matcher = JSON.stringify(matchingList);
+
+	return againstList.filter(
+		(item) => !matcher.includes(JSON.stringify(item))
+	);
+}
+
+export function executeAsyncAction(url, method = 'GET', body = null) {
+	return fetch(url, {
+		...fetchParams,
+		body,
+		method,
+	});
+}
+
+export function formatActionUrl(url, item) {
+	var regex = new RegExp('{(.*?)}', 'mg');
+
+	var replacedUrl = url.replace(regex, (matched) =>
 		getValueFromItem(
 			item,
 			matched.substring(1, matched.length - 1).split('.')
@@ -124,6 +155,88 @@ export function formatActionUrl(url, item) {
 
 export function getRandomId() {
 	return Math.random().toString(36).substr(2, 9);
+}
+
+export function createSortingString(values) {
+	if (!values.length) {
+		return null;
+	}
+
+	return values
+		.map((value) => {
+			return `${
+				Array.isArray(value.fieldName)
+					? value.fieldName[0]
+					: value.fieldName
+			}:${value.direction}`;
+		})
+		.join(',');
+}
+
+export function getFiltersString(filters, providedFilters) {
+	let filtersString = '';
+
+	if (filters.length || providedFilters) {
+		filtersString = '&filter=';
+	}
+
+	if (providedFilters) {
+		filtersString += providedFilters;
+	}
+
+	if (providedFilters && filters.length) {
+		filtersString += ' and ';
+	}
+
+	if (filters.length) {
+		filtersString += createOdataFilter(filters);
+	}
+
+	return filtersString;
+}
+
+export function loadData(
+	apiUrl,
+	currentUrl,
+	delta,
+	filters,
+	page = 1,
+	searchQuery,
+	sorting = []
+) {
+	let formattedUrl = apiUrl;
+	let providedFilters = '';
+
+	const authParam = `p_auth=${window.Liferay.authToken}`;
+	const currentUrlParam = `&currentUrl=${encodeURIComponent(currentUrl)}`;
+	const pageSizeParam = `&pageSize=${delta}`;
+	const pageParam = `&page=${page}`;
+	const searchParam = searchQuery ? `&search=${searchQuery}` : '';
+	const sortingParam = sorting.length
+		? `&sort=${sorting
+				.map((item) => `${item.key}:${item.direction}`)
+				.join(',')}`
+		: ``;
+
+	const regex = new RegExp('[?|&]filter=(.*)[&.+]?', 'mg');
+
+	formattedUrl = formattedUrl.replace(regex, (matched) => {
+		providedFilters = matched.replace(/[?|&]filter=/, '');
+
+		return '';
+	});
+
+	const filtersParam = getFiltersString(filters, providedFilters);
+
+	const url = `${formattedUrl}${
+		formattedUrl.indexOf('?') > -1 ? '&' : '?'
+	}${authParam}${currentUrlParam}${pageSizeParam}${pageParam}${sortingParam}${searchParam}${filtersParam}`;
+
+	return executeAsyncAction(url, 'GET').then((response) => response.json());
+}
+
+export function serializeParameters(parameters) {
+	return Array.isArray(parameters) ? `?${parameters.join('&')}` : '';
 }
 
 export function sortByKey(items, keyName) {
@@ -157,26 +270,4 @@ export function sortByKey(items, keyName) {
 	];
 
 	return sortedItems;
-}
-
-export function isProductPurchasable(
-	availability,
-	productConfiguration,
-	purchasable
-) {
-	if (purchasable === false) {
-		return false;
-	}
-
-	if (productConfiguration.allowBackOrder) {
-		return true;
-	}
-
-	if (
-		availability.stockQuantity > getProductMinQuantity(productConfiguration)
-	) {
-		return true;
-	}
-
-	return false;
 }

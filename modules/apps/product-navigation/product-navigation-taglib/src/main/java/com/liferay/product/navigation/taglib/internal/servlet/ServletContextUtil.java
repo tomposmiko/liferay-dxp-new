@@ -16,57 +16,92 @@ package com.liferay.product.navigation.taglib.internal.servlet;
 
 import com.liferay.application.list.PanelAppRegistry;
 import com.liferay.application.list.PanelCategoryRegistry;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.product.navigation.control.menu.util.ProductNavigationControlMenuCategoryRegistry;
 import com.liferay.product.navigation.control.menu.util.ProductNavigationControlMenuEntryRegistry;
 
 import javax.servlet.ServletContext;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Julio Camarero
  */
+@Component(immediate = true, service = {})
 public class ServletContextUtil {
 
+	public static String getContextPath() {
+		return _servletContext.getContextPath();
+	}
+
 	public static PanelAppRegistry getPanelAppRegistry() {
-		return _panelAppRegistrySnapshot.get();
+		return _panelAppRegistry;
 	}
 
 	public static PanelCategoryRegistry getPanelCategoryRegistry() {
-		return _panelCategoryRegistrySnapshot.get();
+		return _panelCategoryRegistry;
 	}
 
 	public static ProductNavigationControlMenuCategoryRegistry
 		getProductNavigationControlMenuCategoryRegistry() {
 
-		return _productNavigationControlMenuCategoryRegistrySnapshot.get();
+		return _productNavigationControlMenuCategoryRegistry;
 	}
 
 	public static ProductNavigationControlMenuEntryRegistry
 		getProductNavigationControlMenuEntryRegistry() {
 
-		return _productNavigationControlMenuEntryRegistrySnapshot.get();
+		return _productNavigationControlMenuEntryRegistry;
 	}
 
 	public static ServletContext getServletContext() {
-		return _servletContextSnapshot.get();
+		return _servletContext;
 	}
 
-	private static final Snapshot<PanelAppRegistry> _panelAppRegistrySnapshot =
-		new Snapshot<>(ServletContextUtil.class, PanelAppRegistry.class);
-	private static final Snapshot<PanelCategoryRegistry>
-		_panelCategoryRegistrySnapshot = new Snapshot<>(
-			ServletContextUtil.class, PanelCategoryRegistry.class);
-	private static final Snapshot<ProductNavigationControlMenuCategoryRegistry>
-		_productNavigationControlMenuCategoryRegistrySnapshot = new Snapshot<>(
-			ServletContextUtil.class,
-			ProductNavigationControlMenuCategoryRegistry.class);
-	private static final Snapshot<ProductNavigationControlMenuEntryRegistry>
-		_productNavigationControlMenuEntryRegistrySnapshot = new Snapshot<>(
-			ServletContextUtil.class,
-			ProductNavigationControlMenuEntryRegistry.class);
-	private static final Snapshot<ServletContext> _servletContextSnapshot =
-		new Snapshot<>(
-			ServletContextUtil.class, ServletContext.class,
-			"(osgi.web.symbolicname=com.liferay.product.navigation.taglib)");
+	@Reference(unbind = "-")
+	protected void setPanelAppRegistry(PanelAppRegistry panelAppRegistry) {
+		_panelAppRegistry = panelAppRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPanelCategoryRegistry(
+		PanelCategoryRegistry panelCategoryRegistry) {
+
+		_panelCategoryRegistry = panelCategoryRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setProductNavigationControlMenuCategoryRegistry(
+		ProductNavigationControlMenuCategoryRegistry
+			productNavigationControlMenuCategoryRegistry) {
+
+		_productNavigationControlMenuCategoryRegistry =
+			productNavigationControlMenuCategoryRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setProductNavigationControlMenuEntryRegistry(
+		ProductNavigationControlMenuEntryRegistry
+			productNavigationControlMenuEntryRegistry) {
+
+		_productNavigationControlMenuEntryRegistry =
+			productNavigationControlMenuEntryRegistry;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.product.navigation.taglib)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	private static PanelAppRegistry _panelAppRegistry;
+	private static PanelCategoryRegistry _panelCategoryRegistry;
+	private static ProductNavigationControlMenuCategoryRegistry
+		_productNavigationControlMenuCategoryRegistry;
+	private static ProductNavigationControlMenuEntryRegistry
+		_productNavigationControlMenuEntryRegistry;
+	private static ServletContext _servletContext;
 
 }

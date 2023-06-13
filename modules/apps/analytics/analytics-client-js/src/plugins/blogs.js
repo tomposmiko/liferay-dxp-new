@@ -13,12 +13,12 @@
  */
 
 import {getNumberOfWords} from '../utils/assets';
-import {BLOG, DEBOUNCE} from '../utils/constants';
+import {DEBOUNCE} from '../utils/constants';
 import {debounce} from '../utils/debounce';
 import {clickEvent, onReady} from '../utils/events';
 import {ScrollTracker} from '../utils/scroll';
 
-const applicationId = BLOG;
+const applicationId = 'Blog';
 
 /**
  * Returns analytics payload with Blog information.

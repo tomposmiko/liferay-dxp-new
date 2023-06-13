@@ -427,12 +427,7 @@ public class PatchTask extends DefaultTask {
 
 		final File temporaryDir = new File(getTemporaryDir(), "src");
 
-		Map<String, Object> args = new HashMap<>();
-
-		args.put("dir", temporaryDir);
-		args.put("excludes", getFileNames());
-
-		project.delete(project.fileTree(args));
+		project.delete(temporaryDir);
 
 		project.copy(
 			new Action<CopySpec>() {

@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Alan Huang
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.fragment.entry.processor.portlet.alias=polls",
 		"com.liferay.portlet.add-default-resource=true",

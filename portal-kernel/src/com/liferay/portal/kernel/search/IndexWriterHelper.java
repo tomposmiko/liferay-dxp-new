@@ -31,28 +31,33 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface IndexWriterHelper {
 
 	public void addDocument(
-			long companyId, Document document, boolean commitImmediately)
-		throws SearchException;
-
-	public void addDocuments(
-			long companyId, Collection<Document> documents,
+			String searchEngineId, long companyId, Document document,
 			boolean commitImmediately)
 		throws SearchException;
 
-	public void commit() throws SearchException;
+	public void addDocuments(
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
+		throws SearchException;
 
-	public void commit(long companyId) throws SearchException;
+	public void commit(String searchEngineId) throws SearchException;
+
+	public void commit(String searchEngineId, long companyId)
+		throws SearchException;
 
 	public void deleteDocument(
-			long companyId, String uid, boolean commitImmediately)
+			String searchEngineId, long companyId, String uid,
+			boolean commitImmediately)
 		throws SearchException;
 
 	public void deleteDocuments(
-			long companyId, Collection<String> uids, boolean commitImmediately)
+			String searchEngineId, long companyId, Collection<String> uids,
+			boolean commitImmediately)
 		throws SearchException;
 
 	public void deleteEntityDocuments(
-			long companyId, String className, boolean commitImmediately)
+			String searchEngineId, long companyId, String className,
+			boolean commitImmediately)
 		throws SearchException;
 
 	public int getReindexTaskCount(long groupId, boolean completed)
@@ -63,16 +68,37 @@ public interface IndexWriterHelper {
 			String keywordType, Locale locale)
 		throws SearchException;
 
+	public void indexKeyword(
+			String searchEngineId, long companyId, String querySuggestion,
+			float weight, String keywordType, Locale locale)
+		throws SearchException;
+
 	public void indexQuerySuggestionDictionaries(long companyId)
+		throws SearchException;
+
+	public void indexQuerySuggestionDictionaries(
+			String searchEngineId, long companyId)
 		throws SearchException;
 
 	public void indexQuerySuggestionDictionary(long companyId, Locale locale)
 		throws SearchException;
 
+	public void indexQuerySuggestionDictionary(
+			String searchEngineId, long companyId, Locale locale)
+		throws SearchException;
+
 	public void indexSpellCheckerDictionaries(long companyId)
 		throws SearchException;
 
+	public void indexSpellCheckerDictionaries(
+			String searchEngineId, long companyId)
+		throws SearchException;
+
 	public void indexSpellCheckerDictionary(long companyId, Locale locale)
+		throws SearchException;
+
+	public void indexSpellCheckerDictionary(
+			String searchEngineId, long companyId, Locale locale)
 		throws SearchException;
 
 	/**
@@ -91,12 +117,13 @@ public interface IndexWriterHelper {
 	public boolean isIndexReadOnly(String className);
 
 	public void partiallyUpdateDocument(
-			long companyId, Document document, boolean commitImmediately)
+			String searchEngineId, long companyId, Document document,
+			boolean commitImmediately)
 		throws SearchException;
 
 	public void partiallyUpdateDocuments(
-			long companyId, Collection<Document> documents,
-			boolean commitImmediately)
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
 		throws SearchException;
 
 	public BackgroundTask reindex(
@@ -125,12 +152,14 @@ public interface IndexWriterHelper {
 	@Deprecated
 	public void setIndexReadOnly(String className, boolean indexReadOnly);
 
-	public void updateDocument(long companyId, Document document)
+	public void updateDocument(
+			String searchEngineId, long companyId, Document document,
+			boolean commitImmediately)
 		throws SearchException;
 
 	public void updateDocuments(
-			long companyId, Collection<Document> documents,
-			boolean commitImmediately)
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
 		throws SearchException;
 
 	public void updatePermissionFields(String name, String primKey);

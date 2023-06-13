@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = RoleUADTestHelper.class)
+@Component(immediate = true, service = RoleUADTestHelper.class)
 public class RoleUADTestHelper {
 
 	public Role addRole(long userId) throws Exception {

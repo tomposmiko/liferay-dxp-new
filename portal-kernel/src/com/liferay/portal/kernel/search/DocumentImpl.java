@@ -146,7 +146,7 @@ public class DocumentImpl implements Document {
 
 	@Override
 	public void addFile(String name, InputStream inputStream, String fileExt) {
-		addText(name, FileUtil.extractText(inputStream));
+		addText(name, FileUtil.extractText(inputStream, fileExt));
 	}
 
 	@Override
@@ -154,7 +154,8 @@ public class DocumentImpl implements Document {
 		String name, InputStream inputStream, String fileExt,
 		int maxStringLength) {
 
-		addText(name, FileUtil.extractText(inputStream, maxStringLength));
+		addText(
+			name, FileUtil.extractText(inputStream, fileExt, maxStringLength));
 	}
 
 	@Override
@@ -399,16 +400,9 @@ public class DocumentImpl implements Document {
 			return;
 		}
 
-		String[] filteredValues = ArrayUtil.filter(
-			values, Validator::isNotNull);
+		createField(name, values);
 
-		if (ArrayUtil.isEmpty(filteredValues)) {
-			return;
-		}
-
-		createField(name, filteredValues);
-
-		_createSortableTextField(name, true, filteredValues);
+		_createSortableTextField(name, true, values);
 	}
 
 	@Override
@@ -1060,6 +1054,22 @@ public class DocumentImpl implements Document {
 
 	protected void setSortableTextFields(Set<String> sortableTextFields) {
 		_sortableTextFields = sortableTextFields;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #toString(StringBundler, Collection)}
+	 */
+	@Deprecated
+	protected void toString(
+		com.liferay.portal.kernel.util.StringBundler sb,
+		Collection<Field> fields) {
+
+		StringBundler petraSB = new StringBundler();
+
+		toString(petraSB, fields);
+
+		sb.append(petraSB.getStrings());
 	}
 
 	protected void toString(StringBundler sb, Collection<Field> fields) {

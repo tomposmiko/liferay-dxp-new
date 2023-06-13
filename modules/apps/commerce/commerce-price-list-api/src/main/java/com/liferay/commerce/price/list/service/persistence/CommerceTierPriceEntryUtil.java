@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the commerce tier price entry service. This utility wraps <code>com.liferay.commerce.price.list.service.persistence.impl.CommerceTierPriceEntryPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1706,75 +1710,75 @@ public class CommerceTierPriceEntryUtil {
 	}
 
 	/**
-	 * Returns the commerce tier price entry where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchTierPriceEntryException</code> if it could not be found.
+	 * Returns the commerce tier price entry where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchTierPriceEntryException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching commerce tier price entry
 	 * @throws NoSuchTierPriceEntryException if a matching commerce tier price entry could not be found
 	 */
-	public static CommerceTierPriceEntry findByERC_C(
-			String externalReferenceCode, long companyId)
+	public static CommerceTierPriceEntry findByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.price.list.exception.
 			NoSuchTierPriceEntryException {
 
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
+		return getPersistence().findByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the commerce tier price entry where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the commerce tier price entry where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching commerce tier price entry, or <code>null</code> if a matching commerce tier price entry could not be found
 	 */
-	public static CommerceTierPriceEntry fetchByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static CommerceTierPriceEntry fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
+		return getPersistence().fetchByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the commerce tier price entry where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the commerce tier price entry where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce tier price entry, or <code>null</code> if a matching commerce tier price entry could not be found
 	 */
-	public static CommerceTierPriceEntry fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
+	public static CommerceTierPriceEntry fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
+		return getPersistence().fetchByC_ERC(
+			companyId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the commerce tier price entry where externalReferenceCode = &#63; and companyId = &#63; from the database.
+	 * Removes the commerce tier price entry where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the commerce tier price entry that was removed
 	 */
-	public static CommerceTierPriceEntry removeByERC_C(
-			String externalReferenceCode, long companyId)
+	public static CommerceTierPriceEntry removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.price.list.exception.
 			NoSuchTierPriceEntryException {
 
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
+		return getPersistence().removeByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of commerce tier price entries where externalReferenceCode = &#63; and companyId = &#63;.
+	 * Returns the number of commerce tier price entries where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching commerce tier price entries
 	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static int countByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
+		return getPersistence().countByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
@@ -1938,9 +1942,29 @@ public class CommerceTierPriceEntryUtil {
 	}
 
 	public static CommerceTierPriceEntryPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile CommerceTierPriceEntryPersistence _persistence;
+	private static ServiceTracker
+		<CommerceTierPriceEntryPersistence, CommerceTierPriceEntryPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			CommerceTierPriceEntryPersistence.class);
+
+		ServiceTracker
+			<CommerceTierPriceEntryPersistence,
+			 CommerceTierPriceEntryPersistence> serviceTracker =
+				new ServiceTracker
+					<CommerceTierPriceEntryPersistence,
+					 CommerceTierPriceEntryPersistence>(
+						 bundle.getBundleContext(),
+						 CommerceTierPriceEntryPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

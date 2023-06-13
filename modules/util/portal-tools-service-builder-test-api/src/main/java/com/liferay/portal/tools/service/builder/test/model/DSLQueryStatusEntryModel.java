@@ -116,8 +116,4 @@ public interface DSLQueryStatusEntryModel
 	@Override
 	public DSLQueryStatusEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

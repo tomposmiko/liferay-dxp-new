@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.CompanyVirtualHostException;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.osgi.service.component.annotations.Component;
@@ -42,7 +43,9 @@ public class PortalInstanceVirtualHostExceptionMapper
 	protected Problem getProblem(
 		CompanyVirtualHostException companyVirtualHostException) {
 
-		return new Problem(companyVirtualHostException);
+		return new Problem(
+			Response.Status.BAD_REQUEST,
+			companyVirtualHostException.getMessage());
 	}
 
 }

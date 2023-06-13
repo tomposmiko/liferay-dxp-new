@@ -20,94 +20,94 @@
 AUI.add(
 	'liferay-item-viewer',
 	(A) => {
-		const Do = A.Do;
+		var Do = A.Do;
 
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const CSS_ACTIVE = 'active';
+		var CSS_ACTIVE = 'active';
 
-		const CSS_CAPTION = A.getClassName('image', 'viewer', 'caption');
+		var CSS_CAPTION = A.getClassName('image', 'viewer', 'caption');
 
-		const CSS_ICON_MONOSPACED = 'icon-monospaced';
+		var CSS_ICON_MONOSPACED = 'icon-monospaced';
 
-		const CSS_IMAGE_VIEWER = A.getClassName('image', 'viewer');
+		var CSS_IMAGE_VIEWER = A.getClassName('image', 'viewer');
 
-		const CSS_IMAGE_VIEWER_BASE = A.getClassName(CSS_IMAGE_VIEWER, 'base');
+		var CSS_IMAGE_VIEWER_BASE = A.getClassName(CSS_IMAGE_VIEWER, 'base');
 
-		const CSS_IMAGE_VIEWER_FOOTER = A.getClassName(
+		var CSS_IMAGE_VIEWER_FOOTER = A.getClassName(
 			CSS_IMAGE_VIEWER,
 			'footer'
 		);
 
-		const CSS_FOOTER_CONTROL = A.getClassName(
+		var CSS_FOOTER_CONTROL = A.getClassName(
 			CSS_IMAGE_VIEWER_FOOTER,
 			'control'
 		);
 
-		const CSS_FOOTER_CONTROL_LEFT = A.getClassName(
+		var CSS_FOOTER_CONTROL_LEFT = A.getClassName(
 			CSS_IMAGE_VIEWER_FOOTER,
 			'control',
 			'left'
 		);
 
-		const CSS_FOOTER_CONTROL_LEFT_BASE = A.getClassName(
+		var CSS_FOOTER_CONTROL_LEFT_BASE = A.getClassName(
 			CSS_IMAGE_VIEWER_BASE,
 			'control',
 			'left'
 		);
 
-		const CSS_FOOTER_CONTROL_RIGHT = A.getClassName(
+		var CSS_FOOTER_CONTROL_RIGHT = A.getClassName(
 			CSS_IMAGE_VIEWER_FOOTER,
 			'control',
 			'right'
 		);
 
-		const CSS_FOOTER_CONTROL_RIGHT_BASE = A.getClassName(
+		var CSS_FOOTER_CONTROL_RIGHT_BASE = A.getClassName(
 			CSS_IMAGE_VIEWER_BASE,
 			'control',
 			'right'
 		);
 
-		const CSS_IMAGE_CONTAINER = A.getClassName(
+		var CSS_IMAGE_CONTAINER = A.getClassName(
 			CSS_IMAGE_VIEWER_BASE,
 			'image',
 			'container'
 		);
 
-		const CSS_IMAGE_INFO = A.getClassName(
+		var CSS_IMAGE_INFO = A.getClassName(
 			CSS_IMAGE_VIEWER_BASE,
 			'image',
 			'info'
 		);
 
-		const CSS_LOADING_ICON = A.getClassName(
+		var CSS_LOADING_ICON = A.getClassName(
 			CSS_IMAGE_VIEWER_BASE,
 			'loading',
 			'icon'
 		);
 
-		const CSS_PREVIEW_TIMEOUT_MESSAGE = 'preview-timeout-message';
+		var CSS_PREVIEW_TIMEOUT_MESSAGE = 'preview-timeout-message';
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const STR_DOT = '.';
+		var STR_DOT = '.';
 
-		const STR_RENDER_CONTROLS = 'renderControls';
+		var STR_RENDER_CONTROLS = 'renderControls';
 
-		const STR_RENDER_SIDEBAR = 'renderSidebar';
+		var STR_RENDER_SIDEBAR = 'renderSidebar';
 
-		const STR_SRC_NODE = 'srcNode';
+		var STR_SRC_NODE = 'srcNode';
 
-		const TPL_CLOSE =
+		var TPL_CLOSE =
 			'<button class="close image-viewer-base-control image-viewer-close lfr-item-viewer-close" type="button"><span class="' +
 			CSS_ICON_MONOSPACED +
 			'">' +
 			Liferay.Util.getLexiconIconTpl('angle-left') +
 			'</span><span class="lfr-item-viewer-close-text text-truncate">{0}</span></button>';
 
-		const TPL_EDIT_DIALOG_TITLE = '{edit} {title} ({copy})';
+		var TPL_EDIT_DIALOG_TITLE = '{edit} {title} ({copy})';
 
-		const TPL_EDIT_ICON =
+		var TPL_EDIT_ICON =
 			'<a class="lfr-item-viewer-icon-info-link" href="{editItemURL}" style="right: 60px;" title="' +
 			Liferay.Language.get('edit-image') +
 			'"><span class="' +
@@ -116,7 +116,7 @@ AUI.add(
 			Liferay.Util.getLexiconIconTpl('pencil', '') +
 			'</span></a>';
 
-		const TPL_INFO_ICON =
+		var TPL_INFO_ICON =
 			'<a class="lfr-item-viewer-icon-info-link" data-content=".image-viewer-focused" data-target=".image-viewer-sidenav" data-toggle="liferay-sidenav" data-type="fixed-push" href="" title="' +
 			Liferay.Language.get('image-info') +
 			'" ><span class="' +
@@ -125,16 +125,16 @@ AUI.add(
 			Liferay.Util.getLexiconIconTpl('info-circle', '') +
 			'</span></a>';
 
-		const TPL_INFO_TAB_BODY =
+		var TPL_INFO_TAB_BODY =
 			'<div class="{className} fade show tab-pane" id="{tabId}">{content}</div>';
 
-		const TPL_INFO_TAB_BODY_CONTENT =
+		var TPL_INFO_TAB_BODY_CONTENT =
 			'<dt class="{dtClassName}">{dt}</dt><dd class="{ddClassName}">{dd}</dd>';
 
-		const TPL_INFO_TAB_TITLE =
+		var TPL_INFO_TAB_TITLE =
 			'<li class="nav-item"><a aria-expanded="false" class="nav-link {className}" data-toggle="liferay-tab" href="#{tabId}">{tabTitle}</a></li>';
 
-		const LiferayItemViewer = A.Component.create({
+		var LiferayItemViewer = A.Component.create({
 			ATTRS: {
 				btnCloseCaption: {
 					validator: Lang.isString,
@@ -193,7 +193,7 @@ AUI.add(
 
 			prototype: {
 				_afterBindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = instance._eventHandles.concat(
 						instance._displacedMethodHandles
@@ -203,9 +203,9 @@ AUI.add(
 				},
 
 				_afterGetCurrentImage() {
-					const instance = this;
+					var instance = this;
 
-					let retVal;
+					var retVal;
 
 					if (instance._showPreviewError) {
 						retVal = new Do.AlterReturn(
@@ -220,7 +220,7 @@ AUI.add(
 				},
 
 				_afterShow() {
-					const instance = this;
+					var instance = this;
 
 					instance._showPreviewError = false;
 
@@ -232,15 +232,15 @@ AUI.add(
 				},
 
 				_afterShowCurrentImage() {
-					const instance = this;
+					var instance = this;
 
-					const link = instance
+					var link = instance
 						.get('links')
 						.item(instance.get('currentIndex'));
 
-					const metadata = link.getData('metadata');
+					var metadata = link.getData('metadata');
 
-					const image = instance._getCurrentImage();
+					var image = instance._getCurrentImage();
 
 					if (instance.get(STR_RENDER_CONTROLS) && metadata) {
 						instance._populateImageMetadata(image, metadata);
@@ -252,9 +252,9 @@ AUI.add(
 				},
 
 				_beforeSyncInfoUI() {
-					const instance = this;
+					var instance = this;
 
-					let retVal;
+					var retVal;
 
 					if (!instance.get(STR_RENDER_CONTROLS)) {
 						retVal = new Do.Halt();
@@ -264,13 +264,13 @@ AUI.add(
 				},
 
 				_bindSidebarEvents() {
-					const instance = this;
+					var instance = this;
 
 					if (
 						instance.get(STR_RENDER_CONTROLS) &&
 						instance.get(STR_RENDER_SIDEBAR)
 					) {
-						const togglers = document.querySelectorAll(
+						var togglers = document.querySelectorAll(
 							'[data-toggle="liferay-sidenav"]'
 						);
 
@@ -281,7 +281,7 @@ AUI.add(
 				},
 
 				_destroyPreviewTimer() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._timer) {
 						instance._timer.cancel();
@@ -290,7 +290,7 @@ AUI.add(
 				},
 
 				_getImageInfoNodes() {
-					const instance = this;
+					var instance = this;
 
 					if (!instance._imageInfoNodes) {
 						instance._imageInfoNodes = instance
@@ -322,26 +322,26 @@ AUI.add(
 				},
 
 				_onClickEditIcon(event) {
-					const instance = this;
+					var instance = this;
 
 					event.preventDefault();
 
-					const item = instance
+					var item = instance
 						.get('links')
 						.item(instance.get('currentIndex'));
 
-					const itemTitle = item.dataset.title;
-					const itemURL = item.dataset.url;
+					var itemTitle = item.getAttribute('data-title');
+					var itemURL = item.getAttribute('data-url');
 
-					const editDialogTitle = Lang.sub(TPL_EDIT_DIALOG_TITLE, {
+					var editDialogTitle = Lang.sub(TPL_EDIT_DIALOG_TITLE, {
 						copy: Liferay.Language.get('copy'),
 						edit: Liferay.Language.get('edit'),
 						title: itemTitle,
 					});
 
-					let editEntityBaseZIndex = Liferay.zIndex.WINDOW;
+					var editEntityBaseZIndex = Liferay.zIndex.WINDOW;
 
-					const iframeModalEl = window.parent.document.getElementsByClassName(
+					var iframeModalEl = window.parent.document.getElementsByClassName(
 						'dialog-iframe-modal'
 					);
 
@@ -373,15 +373,15 @@ AUI.add(
 				},
 
 				_onClickInfoIcon() {
-					const instance = this;
+					var instance = this;
 
 					instance._getImageInfoNodes().toggle();
 				},
 
 				_onSaveEditSuccess(event) {
-					const instance = this;
+					var instance = this;
 
-					const touchEnabled = A.UA.touchEnabled;
+					var touchEnabled = A.UA.touchEnabled;
 
 					// LPS-82848
 
@@ -409,12 +409,12 @@ AUI.add(
 				},
 
 				_populateImageMetadata(image, metadata) {
-					const imageViewer = image.ancestor('.image-viewer');
+					var imageViewer = image.ancestor('.image-viewer');
 
-					const sidenavTabContent = imageViewer.one(
+					var sidenavTabContent = imageViewer.one(
 						'.image-viewer-sidenav .tab-content'
 					);
-					const sidenavTabList = imageViewer.one(
+					var sidenavTabList = imageViewer.one(
 						'.image-viewer-sidenav ul'
 					);
 
@@ -424,9 +424,9 @@ AUI.add(
 					metadata = JSON.parse(metadata);
 
 					metadata.groups.forEach((group, index) => {
-						const groupId = A.guid();
+						var groupId = A.guid();
 
-						const tabTitleNode = A.Node.create(
+						var tabTitleNode = A.Node.create(
 							Lang.sub(TPL_INFO_TAB_TITLE, {
 								className: index === 0 ? CSS_ACTIVE : STR_BLANK,
 								tabId: groupId,
@@ -436,7 +436,7 @@ AUI.add(
 
 						sidenavTabList.append(tabTitleNode);
 
-						const dataStr = group.data.reduce(
+						var dataStr = group.data.reduce(
 							(previousValue, currentValue) => {
 								return (
 									previousValue +
@@ -451,7 +451,7 @@ AUI.add(
 							STR_BLANK
 						);
 
-						const tabContentNode = A.Node.create(
+						var tabContentNode = A.Node.create(
 							Lang.sub(TPL_INFO_TAB_BODY, {
 								className: index === 0 ? CSS_ACTIVE : STR_BLANK,
 								content: dataStr,
@@ -464,11 +464,11 @@ AUI.add(
 				},
 
 				_renderControls() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 
-					const imageViewerClose = boundingBox.one(
+					var imageViewerClose = boundingBox.one(
 						'.image-viewer-close'
 					);
 
@@ -480,15 +480,13 @@ AUI.add(
 				},
 
 				_renderFooter() {
-					const instance = this;
+					var instance = this;
 
-					const container = A.Node.create(
-						instance.TPL_FOOTER_CONTENT
-					);
+					var container = A.Node.create(instance.TPL_FOOTER_CONTENT);
 
 					instance.setStdModContent('footer', container);
 
-					const captionEl = A.Node.create(instance.TPL_CAPTION);
+					var captionEl = A.Node.create(instance.TPL_CAPTION);
 
 					captionEl.selectable();
 
@@ -497,10 +495,10 @@ AUI.add(
 					instance._captionEl = captionEl;
 
 					if (instance.get(STR_RENDER_CONTROLS)) {
-						const controlsContainer = A.Node.create(
+						var controlsContainer = A.Node.create(
 							'<div class="image-viewer-footer-controls"></div>'
 						);
-						const infoEl = A.Node.create(instance.TPL_INFO);
+						var infoEl = A.Node.create(instance.TPL_INFO);
 
 						controlsContainer.append(
 							instance.get('controlPrevious')
@@ -517,7 +515,7 @@ AUI.add(
 						container.append(controlsContainer);
 
 						if (instance.get(STR_RENDER_SIDEBAR)) {
-							const infoIconEl = A.Node.create(TPL_INFO_ICON);
+							var infoIconEl = A.Node.create(TPL_INFO_ICON);
 
 							container.append(infoIconEl);
 
@@ -525,7 +523,7 @@ AUI.add(
 						}
 
 						if (instance.get('editItemURL')) {
-							const editIconEl = A.Node.create(
+							var editIconEl = A.Node.create(
 								Lang.sub(TPL_EDIT_ICON, {
 									editItemURL: instance.get('editItemURL'),
 								})
@@ -544,9 +542,9 @@ AUI.add(
 				},
 
 				_renderSidenav() {
-					const instance = this;
+					var instance = this;
 
-					const imageViewerSidenav = A.Node.create(
+					var imageViewerSidenav = A.Node.create(
 						instance.TPL_SIDENAV
 					);
 
@@ -554,9 +552,9 @@ AUI.add(
 				},
 
 				_setLinks(val) {
-					const instance = this;
+					var instance = this;
 
-					let links;
+					var links;
 
 					if (val instanceof A.NodeList) {
 						links = val;
@@ -568,7 +566,7 @@ AUI.add(
 						links = new A.NodeList([val]);
 					}
 
-					const sources = [];
+					var sources = [];
 
 					links.each((item) => {
 						sources.push(
@@ -584,9 +582,9 @@ AUI.add(
 				},
 
 				_showPreviewErrorMessage() {
-					const instance = this;
+					var instance = this;
 
-					const loadingIcon = instance
+					var loadingIcon = instance
 						.get(STR_SRC_NODE)
 						.one('.' + CSS_LOADING_ICON);
 
@@ -600,14 +598,13 @@ AUI.add(
 				},
 
 				_syncCaptionUI() {
-					const instance = this;
+					var instance = this;
 
-					const links = instance.get('links');
+					var links = instance.get('links');
 
-					const link = links.item(instance.get('currentIndex'));
+					var link = links.item(instance.get('currentIndex'));
 
-					const caption =
-						link.attr('title') || link.attr('data-title');
+					var caption = link.attr('title') || link.attr('data-title');
 
 					instance._captionEl.set('text', caption);
 				},
@@ -621,7 +618,7 @@ AUI.add(
 					CSS_FOOTER_CONTROL_LEFT_BASE +
 					' ' +
 					CSS_FOOTER_CONTROL_LEFT +
-					'" href="javascript:void(0);">' +
+					'" href="javascript:;">' +
 					'<span class="' +
 					CSS_ICON_MONOSPACED +
 					'">' +
@@ -636,7 +633,7 @@ AUI.add(
 					CSS_FOOTER_CONTROL_RIGHT_BASE +
 					' ' +
 					CSS_FOOTER_CONTROL_RIGHT +
-					'" href="javascript:void(0);">' +
+					'" href="javascript:;">' +
 					'<span class="' +
 					CSS_ICON_MONOSPACED +
 					'">' +
@@ -675,15 +672,15 @@ AUI.add(
 					'</div>',
 
 				appendNewLink(imageData) {
-					const instance = this;
+					var instance = this;
 
-					const links = instance.get('links');
+					var links = instance.get('links');
 
-					const linkContainer = links.last().ancestor();
+					var linkContainer = links.last().ancestor();
 
-					const newLinkContainer = linkContainer.clone();
+					var newLinkContainer = linkContainer.clone();
 
-					const newLink = newLinkContainer.one('.item-preview');
+					var newLink = newLinkContainer.one('.item-preview');
 
 					newLink.setAttribute('data-href', imageData.file.url);
 					newLink.setAttribute('data-title', imageData.file.title);
@@ -691,7 +688,7 @@ AUI.add(
 					newLink.setAttribute('data-url', imageData.file.url);
 
 					newLink.all('[style]').each((node) => {
-						let styleAttr = node.getAttribute('style');
+						var styleAttr = node.getAttribute('style');
 
 						if (styleAttr) {
 							styleAttr = styleAttr.replace(
@@ -722,7 +719,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.TPL_CLOSE = Lang.sub(TPL_CLOSE, [
 						instance.get('btnCloseCaption'),
@@ -770,7 +767,7 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					LiferayItemViewer.superclass.renderUI.apply(
 						this,
@@ -786,7 +783,7 @@ AUI.add(
 				},
 
 				updateCurrentImage(itemData, link) {
-					const instance = this;
+					var instance = this;
 
 					link =
 						link ||
@@ -794,11 +791,11 @@ AUI.add(
 							.get('links')
 							.item(instance.get('currentIndex'));
 
-					const itemFile = itemData.file;
+					var itemFile = itemData.file;
 
-					const itemFileURL = itemFile.url;
+					var itemFileURL = itemFile.url;
 
-					const image = instance._getCurrentImage();
+					var image = instance._getCurrentImage();
 
 					if (!itemFile.mimeType.match(/image.*/)) {
 						image.attr(
@@ -815,7 +812,7 @@ AUI.add(
 						link.setData('value', itemFile.resolvedValue);
 					}
 					else {
-						const imageValue = {
+						var imageValue = {
 							fileEntryId: itemFile.fileEntryId,
 							groupId: itemFile.groupId,
 							title: itemFile.title,

@@ -34,7 +34,7 @@ import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.CartItem;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.Price;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.Settings;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -50,11 +50,11 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Andrea Sbarra
- * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.headless.commerce.delivery.cart.dto.v1_0.CartItem",
-	service = DTOConverter.class
+	service = {CartItemDTOConverter.class, DTOConverter.class}
 )
 public class CartItemDTOConverter
 	implements DTOConverter<CommerceOrderItem, CartItem> {
@@ -68,29 +68,26 @@ public class CartItemDTOConverter
 	public CartItem toDTO(DTOConverterContext dtoConverterContext)
 		throws Exception {
 
-		CartItemDTOConverterContext cartItemDTOConverterContext =
-			(CartItemDTOConverterContext)dtoConverterContext;
-
 		CommerceOrderItem commerceOrderItem =
 			_commerceOrderItemService.getCommerceOrderItem(
-				(Long)cartItemDTOConverterContext.getId());
+				(Long)dtoConverterContext.getId());
 
-		Locale locale = cartItemDTOConverterContext.getLocale();
+		Locale locale = dtoConverterContext.getLocale();
 
 		ExpandoBridge expandoBridge = commerceOrderItem.getExpandoBridge();
+
+		String languageId = LanguageUtil.getLanguageId(locale);
 
 		return new CartItem() {
 			{
 				adaptiveMediaImageHTMLTag =
 					_cpInstanceHelper.getCPInstanceAdaptiveMediaImageHTMLTag(
-						cartItemDTOConverterContext.getAccountId(),
 						commerceOrderItem.getCompanyId(),
 						commerceOrderItem.getCPInstanceId());
 				customFields = expandoBridge.getAttributes();
 				errorMessages = _getErrorMessages(commerceOrderItem, locale);
 				id = commerceOrderItem.getCommerceOrderItemId();
-				name = commerceOrderItem.getName(
-					_language.getLanguageId(locale));
+				name = commerceOrderItem.getName(languageId);
 				options = commerceOrderItem.getJson();
 				parentCartItemId =
 					commerceOrderItem.getParentCommerceOrderItemId();
@@ -100,14 +97,11 @@ public class CartItemDTOConverter
 					_cpDefinitionLocalService.getUrlTitleMap(
 						commerceOrderItem.getCPDefinitionId()));
 				quantity = commerceOrderItem.getQuantity();
-				replacedSku = commerceOrderItem.getReplacedSku();
-				replacedSkuId = commerceOrderItem.getReplacedCPInstanceId();
 				settings = _getSettings(commerceOrderItem.getCPInstanceId());
 				sku = commerceOrderItem.getSku();
 				skuId = commerceOrderItem.getCPInstanceId();
 				subscription = commerceOrderItem.isSubscription();
 				thumbnail = _cpInstanceHelper.getCPInstanceThumbnailSrc(
-					cartItemDTOConverterContext.getAccountId(),
 					commerceOrderItem.getCPInstanceId());
 			}
 		};
@@ -123,7 +117,7 @@ public class CartItemDTOConverter
 				locale);
 
 			return new String[] {
-				_language.get(
+				LanguageUtil.get(
 					resourceBundle, "the-product-is-no-longer-available")
 			};
 		}
@@ -283,8 +277,5 @@ public class CartItemDTOConverter
 
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
-
-	@Reference
-	private Language _language;
 
 }

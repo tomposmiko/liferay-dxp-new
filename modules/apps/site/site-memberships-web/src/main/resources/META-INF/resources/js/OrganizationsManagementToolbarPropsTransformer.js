@@ -12,26 +12,21 @@
  * details.
  */
 
-import {openConfirmModal, openSelectionModal, sub} from 'frontend-js-web';
+import {openSelectionModal} from 'frontend-js-web';
 
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const deleteSelectedOrganizations = () => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const form = document.getElementById(
-						`${portletNamespace}fm`
-					);
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			const form = document.getElementById(`${portletNamespace}fm`);
 
-					if (form) {
-						submitForm(form);
-					}
-				}
-			},
-		});
+			if (form) {
+				submitForm(form);
+			}
+		}
 	};
 
 	const selectOrganizations = (itemData) => {
@@ -58,7 +53,7 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 					submitForm(addGroupOrganizationsFm);
 				}
 			},
-			title: sub(
+			title: Liferay.Util.sub(
 				Liferay.Language.get('assign-organizations-to-this-x'),
 				itemData?.groupTypeLabel
 			),

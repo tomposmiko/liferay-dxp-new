@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -67,7 +67,7 @@ public class SharepointDocumentWorkspaceServlet extends HttpServlet {
 			getDwsMetaDataResponse(httpServletRequest, httpServletResponse);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -122,7 +122,7 @@ public class SharepointDocumentWorkspaceServlet extends HttpServlet {
 		if (beginPos != -1) {
 			documentName = xml.substring(beginPos + 10, endPos);
 
-			documentName = HttpComponentsUtil.decodeURL(documentName);
+			documentName = HttpUtil.decodeURL(documentName);
 		}
 
 		String path = documentName;

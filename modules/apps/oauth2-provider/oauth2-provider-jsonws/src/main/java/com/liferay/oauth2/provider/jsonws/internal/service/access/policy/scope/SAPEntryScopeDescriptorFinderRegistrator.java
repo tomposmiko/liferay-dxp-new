@@ -55,24 +55,21 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.jsonws.internal.configuration.OAuth2JSONWSConfiguration",
-	service = SAPEntryScopeDescriptorFinderRegistrator.class
+	immediate = true, service = SAPEntryScopeDescriptorFinderRegistrator.class
 )
 public class SAPEntryScopeDescriptorFinderRegistrator {
 
 	public List<SAPEntryScope> getRegisteredSAPEntryScopes(long companyId) {
-		SAPEntryScopeDescriptorFinder sapEntryScopeDescriptorFinder =
-			_registeredSAPEntryScopeDescriptorFinders.get(companyId);
-
-		return new ArrayList<>(
-			sapEntryScopeDescriptorFinder.getSAPEntryScopes());
+		return new ArrayList<>(_registeredSAPEntryScopes.get(companyId));
 	}
 
 	public void register(long companyId) {
 		try {
+			List<SAPEntryScope> sapEntryScopes = loadSAPEntryScopes(companyId);
+
 			SAPEntryScopeDescriptorFinder sapEntryScopeDescriptorFinder =
 				new SAPEntryScopeDescriptorFinder(
-					() -> _loadSAPEntryScopes(companyId),
-					_defaultScopeDescriptor);
+					sapEntryScopes, _defaultScopeDescriptor);
 
 			_scopeDescriptorServiceRegistrations.compute(
 				companyId,
@@ -106,8 +103,7 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 						ScopeFinder.class, sapEntryScopeDescriptorFinder,
 						properties);
 
-					_registeredSAPEntryScopeDescriptorFinders.put(
-						companyId, sapEntryScopeDescriptorFinder);
+					_registeredSAPEntryScopes.put(companyId, sapEntryScopes);
 
 					return serviceRegistration;
 				});
@@ -166,7 +162,7 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 			}
 			catch (IllegalStateException illegalStateException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(illegalStateException);
+					_log.debug(illegalStateException, illegalStateException);
 				}
 
 				// Concurrent unregistration from register(long)
@@ -194,6 +190,26 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 		_scopeDescriptorServiceRegistrations.clear();
 	}
 
+	protected boolean isOAuth2ExportedSAPEntry(SAPEntry sapEntry) {
+		return StringUtil.startsWith(sapEntry.getName(), _sapEntryOAuth2Prefix);
+	}
+
+	protected List<SAPEntryScope> loadSAPEntryScopes(long companyId) {
+		List<SAPEntryScope> sapEntryScopes = new ArrayList<>();
+
+		for (SAPEntry sapEntry :
+				_sapEntryLocalService.getCompanySAPEntries(
+					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
+
+			if (isOAuth2ExportedSAPEntry(sapEntry)) {
+				sapEntryScopes.add(
+					new SAPEntryScope(sapEntry, _parseScope(sapEntry)));
+			}
+		}
+
+		return sapEntryScopes;
+	}
+
 	protected void removeJaxRsApplicationName(
 		ServiceReference<ScopeFinder> serviceReference) {
 
@@ -213,7 +229,7 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 			}
 			catch (IllegalStateException illegalStateException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(illegalStateException);
+					_log.debug(illegalStateException, illegalStateException);
 				}
 
 				// Concurrent unregistration from register(long)
@@ -230,26 +246,6 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 		).put(
 			"osgi.jaxrs.name", _jaxRsApplicationNames.toArray(new String[0])
 		).build();
-	}
-
-	private boolean _isOAuth2ExportedSAPEntry(SAPEntry sapEntry) {
-		return StringUtil.startsWith(sapEntry.getName(), _sapEntryOAuth2Prefix);
-	}
-
-	private List<SAPEntryScope> _loadSAPEntryScopes(long companyId) {
-		List<SAPEntryScope> sapEntryScopes = new ArrayList<>();
-
-		for (SAPEntry sapEntry :
-				_sapEntryLocalService.getCompanySAPEntries(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
-
-			if (_isOAuth2ExportedSAPEntry(sapEntry)) {
-				sapEntryScopes.add(
-					new SAPEntryScope(sapEntry, _parseScope(sapEntry)));
-			}
-		}
-
-		return sapEntryScopes;
 	}
 
 	private String _parseScope(SAPEntry sapEntry) {
@@ -275,8 +271,8 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 
 	private final Set<String> _jaxRsApplicationNames =
 		Collections.newSetFromMap(new ConcurrentHashMap<>());
-	private final Map<Long, SAPEntryScopeDescriptorFinder>
-		_registeredSAPEntryScopeDescriptorFinders = new ConcurrentHashMap<>();
+	private final Map<Long, List<SAPEntryScope>> _registeredSAPEntryScopes =
+		new ConcurrentHashMap<>();
 	private boolean _removeSAPEntryOAuth2Prefix = true;
 
 	@Reference

@@ -21,8 +21,11 @@ int status = (Integer)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS);
 
 resourceClassNameId = ParamUtil.getLong(request, "resourceClassNameId");
 resourcePrimKey = ParamUtil.getLong(request, "resourcePrimKey");
+long parentResourceClassNameId = ParamUtil.getLong(request, "parentResourceClassNameId", kbFolderClassNameId);
+long parentResourcePrimKey = ParamUtil.getLong(request, "parentResourcePrimKey", KBFolderConstants.DEFAULT_PARENT_FOLDER_ID);
 long originalParentResourcePrimKey = ParamUtil.getLong(request, "originalParentResourcePrimKey");
 double priority = ParamUtil.getDouble(request, "priority", KBArticleConstants.DEFAULT_PRIORITY);
+int targetStatus = ParamUtil.getInteger(request, "targetStatus", status);
 
 long kbArticleClassNameId = PortalUtil.getClassNameId(KBArticleConstants.getClassName());
 
@@ -30,20 +33,72 @@ long[] selectableClassNameIds = ParamUtil.getLongValues(request, "selectableClas
 
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectKBObject");
 
-KBSelectParentDisplayContext kbSelectParentDisplayContext = new KBSelectParentDisplayContext(request, liferayPortletRequest, liferayPortletResponse, renderRequest);
+String parentTitle = LanguageUtil.get(request, "home");
 
-kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
+if (parentResourcePrimKey != KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+	if (parentResourceClassNameId == kbFolderClassNameId) {
+		KBFolder parentKBFolder = KBFolderLocalServiceUtil.fetchKBFolder(parentResourcePrimKey);
+
+		if ((parentKBFolder == null) || !KBFolderPermission.contains(permissionChecker, parentKBFolder, ActionKeys.VIEW)) {
+			parentResourceClassNameId = kbFolderClassNameId;
+
+			parentResourcePrimKey = KBFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+		}
+		else {
+			parentTitle = parentKBFolder.getName();
+		}
+	}
+	else {
+		KBArticle parentKBArticle = KBArticleLocalServiceUtil.fetchLatestKBArticle(parentResourcePrimKey, status);
+
+		if ((parentKBArticle == null) || !KBArticlePermission.contains(permissionChecker, parentKBArticle, ActionKeys.VIEW)) {
+			parentResourceClassNameId = kbFolderClassNameId;
+
+			parentResourcePrimKey = KBFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+		}
+		else {
+			parentTitle = parentKBArticle.getTitle();
+		}
+	}
+}
+
+SearchContainer<Object> kbObjectSearchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, currentURLObj, null, "there-are-no-entries");
+
+boolean kbFolderView = resourceClassNameId == kbFolderClassNameId;
+
+List<Object> results = new ArrayList<>();
+
+if (kbFolderView) {
+	kbObjectSearchContainer.setTotal(KBFolderServiceUtil.getKBFoldersCount(scopeGroupId, parentResourcePrimKey));
+
+	results.addAll(KBFolderServiceUtil.getKBFolders(scopeGroupId, parentResourcePrimKey, kbObjectSearchContainer.getStart(), kbObjectSearchContainer.getEnd()));
+}
+else {
+	kbObjectSearchContainer.setTotal(KBFolderServiceUtil.getKBFoldersAndKBArticlesCount(scopeGroupId, parentResourcePrimKey, targetStatus));
+
+	results.addAll(KBFolderServiceUtil.getKBFoldersAndKBArticles(scopeGroupId, parentResourcePrimKey, targetStatus, kbObjectSearchContainer.getStart(), kbObjectSearchContainer.getEnd(), new KBObjectsTitleComparator<Object>()));
+}
+
+kbObjectSearchContainer.setResults(results);
 %>
 
 <clay:container-fluid>
 	<aui:form method="post" name="fm">
-		<div class="mt-2">
-			<liferay-site-navigation:breadcrumb
-				breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, false, true) %>"
-			/>
-		</div>
 
-		<c:if test="<%= ArrayUtil.contains(selectableClassNameIds, kbSelectParentDisplayContext.getParentResourceClassNameId()) && ((kbSelectParentDisplayContext.getParentResourceClassNameId() != kbArticleClassNameId) || (kbSelectParentDisplayContext.getParentResourcePrimKey() != 0)) %>">
+		<%
+		KBSelectParentDisplayContext kbSelectParentDisplayContext = new KBSelectParentDisplayContext(parentResourceClassNameId, parentResourcePrimKey, request, liferayPortletResponse);
+
+		kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
+		%>
+
+		<liferay-ui:breadcrumb
+			showCurrentGroup="<%= false %>"
+			showGuestGroup="<%= false %>"
+			showLayout="<%= false %>"
+			showParentGroups="<%= false %>"
+		/>
+
+		<c:if test="<%= ArrayUtil.contains(selectableClassNameIds, parentResourceClassNameId) && ((parentResourceClassNameId != kbArticleClassNameId) || (parentResourcePrimKey != 0)) %>">
 			<aui:button-row cssClass="input-append">
 				<aui:button
 					cssClass="selector-button"
@@ -51,20 +106,20 @@ kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 						HashMapBuilder.<String, Object>put(
 							"priority", priority
 						).put(
-							"resourceClassNameId", kbSelectParentDisplayContext.getParentResourceClassNameId()
+							"resourceClassNameId", parentResourceClassNameId
 						).put(
-							"resourcePrimKey", kbSelectParentDisplayContext.getParentResourcePrimKey()
+							"resourcePrimKey", parentResourcePrimKey
 						).put(
-							"title", kbSelectParentDisplayContext.getParentTitle()
+							"title", parentTitle
 						).build()
 					%>'
-					value='<%= (kbSelectParentDisplayContext.getParentResourceClassNameId() == kbFolderClassNameId) ? "select-this-folder" : "select-this-article" %>'
+					value='<%= (parentResourceClassNameId == kbFolderClassNameId) ? "choose-this-folder" : "choose-this-article" %>'
 				/>
 			</aui:button-row>
 		</c:if>
 
 		<liferay-ui:search-container
-			searchContainer="<%= kbSelectParentDisplayContext.getSearchContainer() %>"
+			searchContainer="<%= kbObjectSearchContainer %>"
 		>
 			<liferay-ui:search-container-row
 				className="Object"
@@ -78,7 +133,7 @@ kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 						%>
 
 						<liferay-portlet:renderURL varImpl="rowURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-							<portlet:param name="mvcPath" value="/admin/common/select_parent.jsp" />
+							<portlet:param name="mvcPath" value='<%= templatePath + "select_parent.jsp" %>' />
 							<portlet:param name="resourceClassNameId" value="<%= String.valueOf(resourceClassNameId) %>" />
 							<portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" />
 							<portlet:param name="parentResourceClassNameId" value="<%= String.valueOf(kbFolder.getClassNameId()) %>" />
@@ -98,15 +153,7 @@ kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 						}
 						%>
 
-						<liferay-ui:search-container-column-text
-							cssClass="table-cell-expand-smallest"
-						>
-							<span class="mr-2 text-secondary">
-								<clay:icon
-									symbol="folder"
-								/>
-							</span>
-
+						<liferay-ui:search-container-column-text>
 							<c:choose>
 								<c:when test="<%= rowURL != null %>">
 									<aui:a href="<%= rowURL.toString() %>">
@@ -120,21 +167,21 @@ kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text
-							cssClass="text-right"
+							align="right"
 							href="<%= (rowURL == null) ? StringPool.BLANK : rowURL.toString() %>"
 							name="num-of-kb-folders"
 							value="<%= String.valueOf(kbFoldersCount) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
-							cssClass="text-right"
+							align="right"
 							href="<%= (rowURL == null) ? StringPool.BLANK : rowURL.toString() %>"
 							name="num-of-kb-articles"
 							value="<%= String.valueOf(kbArticlesCount) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
-							cssClass="text-right"
+							align="right"
 						>
 							<aui:button
 								cssClass="selector-button"
@@ -161,36 +208,28 @@ kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 						%>
 
 						<liferay-portlet:renderURL varImpl="rowURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-							<portlet:param name="mvcPath" value="/admin/common/select_parent.jsp" />
+							<portlet:param name="mvcPath" value='<%= templatePath + "select_parent.jsp" %>' />
 							<portlet:param name="resourceClassNameId" value="<%= String.valueOf(resourceClassNameId) %>" />
 							<portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" />
 							<portlet:param name="parentResourceClassNameId" value="<%= String.valueOf(kbArticle.getClassNameId()) %>" />
 							<portlet:param name="parentResourcePrimKey" value="<%= String.valueOf(kbArticle.getResourcePrimKey()) %>" />
 							<portlet:param name="originalParentResourcePrimKey" value="<%= String.valueOf(originalParentResourcePrimKey) %>" />
 							<portlet:param name="status" value="<%= String.valueOf(status) %>" />
-							<portlet:param name="targetStatus" value="<%= String.valueOf(kbSelectParentDisplayContext.getTargetStatus()) %>" />
+							<portlet:param name="targetStatus" value="<%= String.valueOf(targetStatus) %>" />
 							<portlet:param name="eventName" value="<%= eventName %>" />
 						</liferay-portlet:renderURL>
 
 						<%
 						rowURL.setParameter("selectableClassNameIds", ArrayUtil.toStringArray(selectableClassNameIds));
 
-						int kbArticlesCount = KBArticleServiceUtil.getKBArticlesCount(scopeGroupId, kbArticle.getResourcePrimKey(), kbSelectParentDisplayContext.getTargetStatus());
+						int kbArticlesCount = KBArticleServiceUtil.getKBArticlesCount(scopeGroupId, kbArticle.getResourcePrimKey(), targetStatus);
 
 						if ((kbArticle.getResourcePrimKey() == resourcePrimKey) || (kbArticlesCount == 0)) {
 							rowURL = null;
 						}
 						%>
 
-						<liferay-ui:search-container-column-text
-							cssClass="table-cell-expand-smallest"
-						>
-							<span class="mr-2 text-secondary">
-								<clay:icon
-									symbol="document"
-								/>
-							</span>
-
+						<liferay-ui:search-container-column-text>
 							<c:choose>
 								<c:when test="<%= rowURL != null %>">
 									<aui:a href="<%= rowURL.toString() %>">
@@ -204,21 +243,21 @@ kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text
-							cssClass="text-right"
+							align="right"
 							href="<%= (rowURL == null) ? StringPool.BLANK : rowURL.toString() %>"
-							name="num-of-kb-folders"
+							name="folders"
 							value="-"
 						/>
 
 						<liferay-ui:search-container-column-text
-							cssClass="text-right"
+							align="right"
 							href="<%= (rowURL == null) ? StringPool.BLANK : rowURL.toString() %>"
-							name="num-of-kb-articles"
+							name="articles"
 							value="<%= String.valueOf(kbArticlesCount) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
-							cssClass="text-right"
+							align="right"
 						>
 							<aui:button
 								cssClass="selector-button"
@@ -243,7 +282,7 @@ kbSelectParentDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 
 			<liferay-ui:search-iterator
 				markupView="lexicon"
-				resultRowSplitter="<%= kbSelectParentDisplayContext.isKBFolderView() ? null : new KBResultRowSplitter() %>"
+				resultRowSplitter="<%= kbFolderView ? null : new KBResultRowSplitter() %>"
 			/>
 		</liferay-ui:search-container>
 	</aui:form>

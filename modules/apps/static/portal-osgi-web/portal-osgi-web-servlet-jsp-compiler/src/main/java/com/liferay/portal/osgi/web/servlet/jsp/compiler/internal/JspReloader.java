@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Matthew Tambara
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class JspReloader {
 
 	@Activate

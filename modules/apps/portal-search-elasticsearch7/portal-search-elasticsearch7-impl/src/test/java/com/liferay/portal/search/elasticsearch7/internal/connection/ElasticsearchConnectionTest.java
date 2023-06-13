@@ -76,7 +76,7 @@ public class ElasticsearchConnectionTest {
 			Mockito.any()
 		);
 
-		_assertNetworkHostAddress("localhost", 9200);
+		assertNetworkHostAddress("localhost", 9200);
 
 		_elasticsearchConnection.close();
 
@@ -93,10 +93,10 @@ public class ElasticsearchConnectionTest {
 
 		Assert.assertTrue(_elasticsearchConnection.isConnected());
 
-		_assertNetworkHostAddress("127.0.0.1", 9999);
+		assertNetworkHostAddress("127.0.0.1", 9999);
 	}
 
-	private void _assertNetworkHostAddress(String hostString, int port) {
+	protected void assertNetworkHostAddress(String hostString, int port) {
 		RestHighLevelClient restHighLevelClient =
 			_elasticsearchConnection.getRestHighLevelClient();
 

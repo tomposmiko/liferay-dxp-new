@@ -65,9 +65,6 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 				"setPropertyValue('predefinedValue', 'inputMask', getValue('inputMask'))",
 				"setPropertyValue('predefinedValue', 'inputMaskFormat', getLocalizedValue('inputMaskFormat'))",
 				"setPropertyValue('predefinedValue', 'numericInputMask', getLocalizedValue('numericInputMask'))",
-				"setPropertyValue('validation', 'inputMask', getValue('inputMask'))",
-				"setPropertyValue('validation', 'inputMaskFormat', getLocalizedValue('inputMaskFormat'))",
-				"setPropertyValue('validation', 'numericInputMask', getLocalizedValue('numericInputMask'))",
 				"setValidationDataType('validation', getValue('dataType'))",
 				"setValidationFieldName('validation', getValue('name'))",
 				"setVisible('characterOptions', equals(getValue('dataType'), 'integer') and equals(getValue('inputMask'), TRUE))",
@@ -192,7 +189,7 @@ public interface NumericDDMFormFieldTypeSettings
 	public LocalizedValue inputMaskFormat();
 
 	@DDMFormField(
-		predefinedValue = "%{\"append\": \"\", \"appendType\": \"prefix\", \"decimalPlaces\": 2, \"symbols\": {\"decimalSymbol\": \".\", \"thousandsSeparator\": \"none\"}}",
+		predefinedValue = "%{\"append\": \"\", \"appendType\": \"prefix\", \"symbols\": {\"decimalSymbol\": \".\", \"thousandsSeparator\": \"none\"}}",
 		type = "numeric_input_mask"
 	)
 	public LocalizedValue numericInputMask();

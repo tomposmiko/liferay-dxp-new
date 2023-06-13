@@ -32,12 +32,9 @@ import java.lang.reflect.Method;
 
 import java.sql.Connection;
 
-import java.util.function.Function;
+import org.hibernate.engine.SessionFactoryImplementor;
 
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
-
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -104,7 +101,8 @@ public class VerifySessionFactoryWrapper implements SessionFactory {
 
 		Session session = _sessionFactoryImpl.openSession();
 
-		return _sessionProxyProviderFunction.apply(
+		return (Session)ProxyUtil.newProxyInstance(
+			Session.class.getClassLoader(), new Class<?>[] {Session.class},
 			new SessionInvocationHandler(session));
 	}
 
@@ -112,20 +110,15 @@ public class VerifySessionFactoryWrapper implements SessionFactory {
 		SessionFactoryImplementor currentSessionFactoryImplementor,
 		SessionFactoryImplementor targetSessionFactoryImplementor) {
 
-		MetamodelImplementor currentSessionMetamodelImplementor =
-			currentSessionFactoryImplementor.getMetamodel();
-		MetamodelImplementor targetSessionMetamodelImplementor =
-			targetSessionFactoryImplementor.getMetamodel();
-
 		_log.error(
 			"Failed session factory verification",
 			new IllegalStateException(
 				StringBundler.concat(
 					"Wrong current transaction manager, current session ",
 					"factory classes metadata: ",
-					currentSessionMetamodelImplementor.entityPersisters(),
+					currentSessionFactoryImplementor.getAllClassMetadata(),
 					", target session factory classes metadata: ",
-					targetSessionMetamodelImplementor.entityPersisters())));
+					targetSessionFactoryImplementor.getAllClassMetadata())));
 	}
 
 	private boolean _verify() {
@@ -196,10 +189,6 @@ public class VerifySessionFactoryWrapper implements SessionFactory {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		VerifySessionFactoryWrapper.class);
-
-	private static final Function<InvocationHandler, Session>
-		_sessionProxyProviderFunction = ProxyUtil.getProxyProviderFunction(
-			Session.class);
 
 	private final SessionFactoryImpl _sessionFactoryImpl;
 

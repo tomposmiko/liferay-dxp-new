@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class DLTrashServiceWrapper
 	implements DLTrashService, ServiceWrapper<DLTrashService> {
 
-	public DLTrashServiceWrapper() {
-		this(null);
-	}
-
 	public DLTrashServiceWrapper(DLTrashService dlTrashService) {
 		_dlTrashService = dlTrashService;
 	}

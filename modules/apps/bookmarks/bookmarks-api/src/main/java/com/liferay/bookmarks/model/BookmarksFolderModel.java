@@ -15,6 +15,7 @@
 package com.liferay.bookmarks.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.model.MVCCModel;
@@ -380,6 +381,15 @@ public interface BookmarksFolderModel
 	public void setStatusDate(Date statusDate);
 
 	/**
+	 * Returns the trash entry created when this bookmarks folder was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this bookmarks folder.
+	 *
+	 * @return the trash entry created when this bookmarks folder was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws PortalException;
+
+	/**
 	 * Returns the class primary key of the trash entry for this bookmarks folder.
 	 *
 	 * @return the class primary key of the trash entry for this bookmarks folder
@@ -388,12 +398,36 @@ public interface BookmarksFolderModel
 	public long getTrashEntryClassPK();
 
 	/**
+	 * Returns the trash handler for this bookmarks folder.
+	 *
+	 * @return the trash handler for this bookmarks folder
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler();
+
+	/**
 	 * Returns <code>true</code> if this bookmarks folder is in the Recycle Bin.
 	 *
 	 * @return <code>true</code> if this bookmarks folder is in the Recycle Bin; <code>false</code> otherwise
 	 */
 	@Override
 	public boolean isInTrash();
+
+	/**
+	 * Returns <code>true</code> if the parent of this bookmarks folder is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this bookmarks folder is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer();
+
+	@Override
+	public boolean isInTrashExplicitly();
+
+	@Override
+	public boolean isInTrashImplicitly();
 
 	/**
 	 * Returns <code>true</code> if this bookmarks folder is approved.
@@ -501,9 +535,5 @@ public interface BookmarksFolderModel
 
 	@Override
 	public BookmarksFolder cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

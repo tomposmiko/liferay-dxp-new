@@ -30,10 +30,6 @@ public class SocialActivityAchievementLocalServiceWrapper
 	implements ServiceWrapper<SocialActivityAchievementLocalService>,
 			   SocialActivityAchievementLocalService {
 
-	public SocialActivityAchievementLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SocialActivityAchievementLocalServiceWrapper(
 		SocialActivityAchievementLocalService
 			socialActivityAchievementLocalService) {

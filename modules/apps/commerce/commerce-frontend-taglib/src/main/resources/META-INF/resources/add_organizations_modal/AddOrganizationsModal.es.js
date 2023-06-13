@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import {debounce, fetch} from 'frontend-js-web';
 import Component from 'metal-component';
 import Soy, {Config} from 'metal-soy';
@@ -23,8 +25,6 @@ import 'clay-modal';
 import './OrganizationInputItem.es';
 
 import './OrganizationListItem.es';
-
-import '../css/main.scss';
 
 class AddOrganizationModal extends Component {
 	created() {

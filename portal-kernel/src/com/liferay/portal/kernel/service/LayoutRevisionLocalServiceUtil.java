@@ -427,10 +427,6 @@ public class LayoutRevisionLocalServiceUtil {
 		return getService().getLayoutRevisionsCount();
 	}
 
-	public static int getLayoutRevisionsCount(long plid) {
-		return getService().getLayoutRevisionsCount(plid);
-	}
-
 	public static int getLayoutRevisionsCount(
 		long layoutSetBranchId, long layoutBranchId, long plid) {
 

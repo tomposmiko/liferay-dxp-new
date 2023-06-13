@@ -323,8 +323,4 @@ public interface SystemEventModel
 	@Override
 	public SystemEvent cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -18,7 +18,6 @@ import com.liferay.asset.kernel.exception.NoSuchLinkException;
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.model.AssetLinkTable;
 import com.liferay.asset.kernel.service.persistence.AssetLinkPersistence;
-import com.liferay.asset.kernel.service.persistence.AssetLinkUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
@@ -48,7 +47,6 @@ import com.liferay.portlet.asset.model.impl.AssetLinkModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -189,7 +187,7 @@ public class AssetLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetLink>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetLink assetLink : list) {
@@ -555,8 +553,7 @@ public class AssetLinkPersistenceImpl
 
 			finderArgs = new Object[] {entryId1};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -696,7 +693,7 @@ public class AssetLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetLink>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetLink assetLink : list) {
@@ -1062,8 +1059,7 @@ public class AssetLinkPersistenceImpl
 
 			finderArgs = new Object[] {entryId2};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1212,7 +1208,7 @@ public class AssetLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetLink>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetLink assetLink : list) {
@@ -1609,8 +1605,7 @@ public class AssetLinkPersistenceImpl
 
 			finderArgs = new Object[] {entryId1, entryId2};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1765,7 +1760,7 @@ public class AssetLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetLink>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetLink assetLink : list) {
@@ -2160,8 +2155,7 @@ public class AssetLinkPersistenceImpl
 
 			finderArgs = new Object[] {entryId1, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2316,7 +2310,7 @@ public class AssetLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetLink>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetLink assetLink : list) {
@@ -2711,8 +2705,7 @@ public class AssetLinkPersistenceImpl
 
 			finderArgs = new Object[] {entryId2, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2845,7 +2838,7 @@ public class AssetLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByE_E_T, finderArgs, this);
+				_finderPathFetchByE_E_T, finderArgs);
 		}
 
 		if (result instanceof AssetLink) {
@@ -2959,8 +2952,7 @@ public class AssetLinkPersistenceImpl
 
 			finderArgs = new Object[] {entryId1, entryId2, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3372,9 +3364,7 @@ public class AssetLinkPersistenceImpl
 	 */
 	@Override
 	public AssetLink fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				AssetLink.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(AssetLink.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3589,7 +3579,7 @@ public class AssetLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetLink>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3665,7 +3655,7 @@ public class AssetLinkPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3903,29 +3893,10 @@ public class AssetLinkPersistenceImpl
 				Integer.class.getName()
 			},
 			new String[] {"entryId1", "entryId2", "type_"}, false);
-
-		_setAssetLinkUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setAssetLinkUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(AssetLinkImpl.class.getName());
-	}
-
-	private void _setAssetLinkUtilPersistence(
-		AssetLinkPersistence assetLinkPersistence) {
-
-		try {
-			Field field = AssetLinkUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, assetLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_ASSETLINK =

@@ -20,14 +20,13 @@
 LayoutInformationMessagesDisplayContext layoutInformationMessagesDisplayContext = new LayoutInformationMessagesDisplayContext(request);
 %>
 
-<li class="control-menu-nav-item lfr-portal-tooltip">
-	<clay:button
-		aria-label='<%= LanguageUtil.get(request, "additional-information") %>'
+<li class="control-menu-nav-item">
+	<liferay-ui:icon
 		cssClass="control-menu-icon icon-monospaced"
-		data-qa-id="info"
-		displayType="unstyled"
-		symbol="information-live"
-		title='<%= LanguageUtil.get(request, "additional-information") %>'
+		icon="information-live"
+		label="<%= false %>"
+		markupView="lexicon"
+		message="additional-information"
 	/>
 
 	<react:component

@@ -14,17 +14,18 @@
 
 package com.liferay.layout.page.template.admin.web.internal.display.context;
 
-import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminPortletKeys;
 import com.liferay.layout.page.template.admin.web.internal.util.LayoutPageTemplatePortletUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionServiceUtil;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.List;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -62,10 +63,8 @@ public class LayoutPageTemplateCollectionsDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
-			"layout-page-template-collections-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -82,44 +81,54 @@ public class LayoutPageTemplateCollectionsDisplayContext {
 		SearchContainer<LayoutPageTemplateCollection> searchContainer =
 			new SearchContainer(
 				_renderRequest, _renderResponse.createRenderURL(), null,
-				"there-are-no-page-template-sets");
-
-		searchContainer.setOrderByCol(_getOrderByCol());
-		searchContainer.setOrderByComparator(
-			LayoutPageTemplatePortletUtil.
-				getLayoutPageTemplateCollectionOrderByComparator(
-					_getOrderByCol(), getOrderByType()));
-		searchContainer.setOrderByType(getOrderByType());
-
-		if (_isSearch()) {
-			searchContainer.setResultsAndTotal(
-				() ->
-					LayoutPageTemplateCollectionServiceUtil.
-						getLayoutPageTemplateCollections(
-							themeDisplay.getScopeGroupId(), _getKeywords(),
-							searchContainer.getStart(),
-							searchContainer.getEnd(),
-							searchContainer.getOrderByComparator()),
-				LayoutPageTemplateCollectionServiceUtil.
-					getLayoutPageTemplateCollectionsCount(
-						themeDisplay.getScopeGroupId(), _getKeywords()));
-		}
-		else {
-			searchContainer.setResultsAndTotal(
-				() ->
-					LayoutPageTemplateCollectionServiceUtil.
-						getLayoutPageTemplateCollections(
-							themeDisplay.getScopeGroupId(),
-							searchContainer.getStart(),
-							searchContainer.getEnd(),
-							searchContainer.getOrderByComparator()),
-				LayoutPageTemplateCollectionServiceUtil.
-					getLayoutPageTemplateCollectionsCount(
-						themeDisplay.getScopeGroupId()));
-		}
+				"there-are-no-collections");
 
 		searchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(_renderResponse));
+
+		OrderByComparator<LayoutPageTemplateCollection> orderByComparator =
+			LayoutPageTemplatePortletUtil.
+				getLayoutPageTemplateCollectionOrderByComparator(
+					_getOrderByCol(), getOrderByType());
+
+		searchContainer.setOrderByCol(_getOrderByCol());
+		searchContainer.setOrderByComparator(orderByComparator);
+		searchContainer.setOrderByType(getOrderByType());
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
+
+		List<LayoutPageTemplateCollection> layoutPageTemplateCollections = null;
+		int layoutPageTemplateCollectionsCount = 0;
+
+		if (_isSearch()) {
+			layoutPageTemplateCollections =
+				LayoutPageTemplateCollectionServiceUtil.
+					getLayoutPageTemplateCollections(
+						themeDisplay.getScopeGroupId(), _getKeywords(),
+						searchContainer.getStart(), searchContainer.getEnd(),
+						orderByComparator);
+
+			layoutPageTemplateCollectionsCount =
+				LayoutPageTemplateCollectionServiceUtil.
+					getLayoutPageTemplateCollectionsCount(
+						themeDisplay.getScopeGroupId(), _getKeywords());
+		}
+		else {
+			layoutPageTemplateCollections =
+				LayoutPageTemplateCollectionServiceUtil.
+					getLayoutPageTemplateCollections(
+						themeDisplay.getScopeGroupId(),
+						searchContainer.getStart(), searchContainer.getEnd(),
+						orderByComparator);
+
+			layoutPageTemplateCollectionsCount =
+				LayoutPageTemplateCollectionServiceUtil.
+					getLayoutPageTemplateCollectionsCount(
+						themeDisplay.getScopeGroupId());
+		}
+
+		searchContainer.setTotal(layoutPageTemplateCollectionsCount);
+		searchContainer.setResults(layoutPageTemplateCollections);
 
 		_searchContainer = searchContainer;
 
@@ -141,10 +150,8 @@ public class LayoutPageTemplateCollectionsDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
-			"layout-page-template-collections-order-by-col", "create-date");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}

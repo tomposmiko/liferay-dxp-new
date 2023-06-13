@@ -148,7 +148,7 @@ const filterSettingsContext = ({
 	};
 };
 
-export function useSettingsContextFilter(settingsContext) {
+export const useSettingsContextFilter = (settingsContext) => {
 	const {defaultLanguageId, editingLanguageId} = useFormState();
 
 	const {
@@ -181,4 +181,4 @@ export function useSettingsContextFilter(settingsContext) {
 	);
 
 	return filteredSettingsContext;
-}
+};

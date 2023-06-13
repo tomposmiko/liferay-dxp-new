@@ -49,9 +49,10 @@ public class TagDynamicIncludeUtil {
 	public static boolean hasTagDynamicInclude(
 		String tagClassName, String tagDynamicId, String tagPoint) {
 
-		if (ListUtil.isEmpty(
-				getTagDynamicIncludes(tagClassName, tagDynamicId, tagPoint))) {
+		List<TagDynamicInclude> tagDynamicIncludes = getTagDynamicIncludes(
+			tagClassName, tagDynamicId, tagPoint);
 
+		if (ListUtil.isEmpty(tagDynamicIncludes)) {
 			return false;
 		}
 
@@ -88,7 +89,7 @@ public class TagDynamicIncludeUtil {
 					tagDynamicId, tagPoint);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
@@ -132,10 +133,10 @@ public class TagDynamicIncludeUtil {
 									String tagClassName, String tagDynamicId,
 									String tagPoint) {
 
-									emitter.emit(
-										_getKey(
-											tagClassName, tagDynamicId,
-											tagPoint));
+									String key = _getKey(
+										tagClassName, tagDynamicId, tagPoint);
+
+									emitter.emit(key);
 								}
 
 							});

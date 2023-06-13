@@ -22,13 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.WikiPageAttachment;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.resource.v1_0.WikiPageAttachmentResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.WikiPageAttachmentSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -53,24 +51,24 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.io.File;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -187,7 +185,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		wikiPageAttachment.setContentUrl(regex);
 		wikiPageAttachment.setContentValue(regex);
 		wikiPageAttachment.setEncodingFormat(regex);
-		wikiPageAttachment.setExternalReferenceCode(regex);
 		wikiPageAttachment.setFileExtension(regex);
 		wikiPageAttachment.setTitle(regex);
 
@@ -200,207 +197,8 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		Assert.assertEquals(regex, wikiPageAttachment.getContentUrl());
 		Assert.assertEquals(regex, wikiPageAttachment.getContentValue());
 		Assert.assertEquals(regex, wikiPageAttachment.getEncodingFormat());
-		Assert.assertEquals(
-			regex, wikiPageAttachment.getExternalReferenceCode());
 		Assert.assertEquals(regex, wikiPageAttachment.getFileExtension());
 		Assert.assertEquals(regex, wikiPageAttachment.getTitle());
-	}
-
-	@Test
-	public void testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode()
-		throws Exception {
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		WikiPageAttachment wikiPageAttachment =
-			testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_addWikiPageAttachment();
-
-		assertHttpResponseStatusCode(
-			204,
-			wikiPageAttachmentResource.
-				deleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCodeHttpResponse(
-					testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId(),
-					testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode(),
-					wikiPageAttachment.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			wikiPageAttachmentResource.
-				getSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCodeHttpResponse(
-					testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId(),
-					testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode(),
-					wikiPageAttachment.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			wikiPageAttachmentResource.
-				getSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCodeHttpResponse(
-					testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId(),
-					testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode(),
-					wikiPageAttachment.getExternalReferenceCode()));
-	}
-
-	protected Long
-			testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected WikiPageAttachment
-			testDeleteSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_addWikiPageAttachment()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode()
-		throws Exception {
-
-		WikiPageAttachment postWikiPageAttachment =
-			testGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_addWikiPageAttachment();
-
-		WikiPageAttachment getWikiPageAttachment =
-			wikiPageAttachmentResource.
-				getSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode(
-					testGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId(),
-					testGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode(),
-					postWikiPageAttachment.getExternalReferenceCode());
-
-		assertEquals(postWikiPageAttachment, getWikiPageAttachment);
-		assertValid(getWikiPageAttachment);
-	}
-
-	protected Long
-			testGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected WikiPageAttachment
-			testGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_addWikiPageAttachment()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode()
-		throws Exception {
-
-		WikiPageAttachment wikiPageAttachment =
-			testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_addWikiPageAttachment();
-
-		Assert.assertTrue(
-			equals(
-				wikiPageAttachment,
-				WikiPageAttachmentSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"wikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"siteKey",
-											"\"" +
-												testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId() +
-													"\"");
-
-										put(
-											"wikiPageExternalReferenceCode",
-											"\"" +
-												testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode() +
-													"\"");
-
-										put(
-											"externalReferenceCode",
-											"\"" +
-												wikiPageAttachment.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/wikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getSiteId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_getWikiPageExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCodeNotFound()
-		throws Exception {
-
-		String irrelevantWikiPageExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"wikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"siteKey",
-									"\"" + irrelevantGroup.getGroupId() + "\"");
-								put(
-									"wikiPageExternalReferenceCode",
-									irrelevantWikiPageExternalReferenceCode);
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected WikiPageAttachment
-			testGraphQLGetSiteWikiPageByExternalReferenceCodeWikiPageExternalReferenceCodeWikiPageAttachmentByExternalReferenceCode_addWikiPageAttachment()
-		throws Exception {
-
-		return testGraphQLWikiPageAttachment_addWikiPageAttachment();
 	}
 
 	@Test
@@ -435,7 +233,7 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	@Test
 	public void testGraphQLDeleteWikiPageAttachment() throws Exception {
 		WikiPageAttachment wikiPageAttachment =
-			testGraphQLDeleteWikiPageAttachment_addWikiPageAttachment();
+			testGraphQLWikiPageAttachment_addWikiPageAttachment();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -450,6 +248,7 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteWikiPageAttachment"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -465,13 +264,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected WikiPageAttachment
-			testGraphQLDeleteWikiPageAttachment_addWikiPageAttachment()
-		throws Exception {
-
-		return testGraphQLWikiPageAttachment_addWikiPageAttachment();
 	}
 
 	@Test
@@ -498,7 +290,7 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	@Test
 	public void testGraphQLGetWikiPageAttachment() throws Exception {
 		WikiPageAttachment wikiPageAttachment =
-			testGraphQLGetWikiPageAttachment_addWikiPageAttachment();
+			testGraphQLWikiPageAttachment_addWikiPageAttachment();
 
 		Assert.assertTrue(
 			equals(
@@ -541,13 +333,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 				"Object/code"));
 	}
 
-	protected WikiPageAttachment
-			testGraphQLGetWikiPageAttachment_addWikiPageAttachment()
-		throws Exception {
-
-		return testGraphQLWikiPageAttachment_addWikiPageAttachment();
-	}
-
 	@Test
 	public void testGetWikiPageWikiPageAttachmentsPage() throws Exception {
 		Long wikiPageId =
@@ -575,10 +360,7 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantWikiPageAttachment),
 				(List<WikiPageAttachment>)page.getItems());
-			assertValid(
-				page,
-				testGetWikiPageWikiPageAttachmentsPage_getExpectedActions(
-					irrelevantWikiPageId));
+			assertValid(page);
 		}
 
 		WikiPageAttachment wikiPageAttachment1 =
@@ -597,35 +379,13 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(wikiPageAttachment1, wikiPageAttachment2),
 			(List<WikiPageAttachment>)page.getItems());
-		assertValid(
-			page,
-			testGetWikiPageWikiPageAttachmentsPage_getExpectedActions(
-				wikiPageId));
+		assertValid(page);
 
 		wikiPageAttachmentResource.deleteWikiPageAttachment(
 			wikiPageAttachment1.getId());
 
 		wikiPageAttachmentResource.deleteWikiPageAttachment(
 			wikiPageAttachment2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetWikiPageWikiPageAttachmentsPage_getExpectedActions(
-				Long wikiPageId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/wiki-pages/{wikiPageId}/wiki-page-attachments/batch".
-				replace("{wikiPageId}", String.valueOf(wikiPageId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	protected WikiPageAttachment
@@ -779,14 +539,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("actions", additionalAssertFieldName)) {
-				if (wikiPageAttachment.getActions() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("contentUrl", additionalAssertFieldName)) {
 				if (wikiPageAttachment.getContentUrl() == null) {
 					valid = false;
@@ -805,16 +557,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 
 			if (Objects.equals("encodingFormat", additionalAssertFieldName)) {
 				if (wikiPageAttachment.getEncodingFormat() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (wikiPageAttachment.getExternalReferenceCode() == null) {
 					valid = false;
 				}
 
@@ -863,13 +605,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	}
 
 	protected void assertValid(Page<WikiPageAttachment> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<WikiPageAttachment> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<WikiPageAttachment> wikiPageAttachments =
@@ -885,20 +620,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -970,17 +691,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("actions", additionalAssertFieldName)) {
-				if (!equals(
-						(Map)wikiPageAttachment1.getActions(),
-						(Map)wikiPageAttachment2.getActions())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("contentUrl", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						wikiPageAttachment1.getContentUrl(),
@@ -1007,19 +717,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 				if (!Objects.deepEquals(
 						wikiPageAttachment1.getEncodingFormat(),
 						wikiPageAttachment2.getEncodingFormat())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						wikiPageAttachment1.getExternalReferenceCode(),
-						wikiPageAttachment2.getExternalReferenceCode())) {
 
 					return false;
 				}
@@ -1108,16 +805,14 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1134,10 +829,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1147,18 +838,18 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1174,11 +865,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
-
-		if (entityFieldName.equals("actions")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
 
 		if (entityFieldName.equals("contentUrl")) {
 			sb.append("'");
@@ -1199,15 +885,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 		if (entityFieldName.equals("encodingFormat")) {
 			sb.append("'");
 			sb.append(String.valueOf(wikiPageAttachment.getEncodingFormat()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("externalReferenceCode")) {
-			sb.append("'");
-			sb.append(
-				String.valueOf(wikiPageAttachment.getExternalReferenceCode()));
 			sb.append("'");
 
 			return sb.toString();
@@ -1294,8 +971,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 					RandomTestUtil.randomString());
 				encodingFormat = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				externalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				fileExtension = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
@@ -1324,115 +999,6 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1508,6 +1074,18 @@ public abstract class BaseWikiPageAttachmentResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseWikiPageAttachmentResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

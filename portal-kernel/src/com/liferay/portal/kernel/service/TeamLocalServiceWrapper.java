@@ -28,10 +28,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class TeamLocalServiceWrapper
 	implements ServiceWrapper<TeamLocalService>, TeamLocalService {
 
-	public TeamLocalServiceWrapper() {
-		this(null);
-	}
-
 	public TeamLocalServiceWrapper(TeamLocalService teamLocalService) {
 		_teamLocalService = teamLocalService;
 	}

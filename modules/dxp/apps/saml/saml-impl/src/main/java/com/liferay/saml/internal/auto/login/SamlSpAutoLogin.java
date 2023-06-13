@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Mika Koivisto
  */
-@Component(service = AutoLogin.class)
+@Component(immediate = true, service = AutoLogin.class)
 public class SamlSpAutoLogin extends BaseAutoLogin {
 
 	@Override
@@ -72,8 +72,11 @@ public class SamlSpAutoLogin extends BaseAutoLogin {
 			return credentials;
 		}
 		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn(exception.getMessage());
 			}
 
 			throw new AutoLoginException(exception);

@@ -444,11 +444,6 @@ public class MemberRequestWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected MemberRequestWrapper wrap(MemberRequest memberRequest) {
 		return new MemberRequestWrapper(memberRequest);
 	}

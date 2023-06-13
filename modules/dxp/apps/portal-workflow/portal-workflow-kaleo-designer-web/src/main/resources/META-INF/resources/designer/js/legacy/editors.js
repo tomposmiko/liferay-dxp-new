@@ -12,40 +12,41 @@
 AUI.add(
 	'liferay-kaleo-designer-editors',
 	(A) => {
-		const AArray = A.Array;
-		const getClassName = A.getClassName;
-		const Lang = A.Lang;
-		const Template = A.Template;
-		const WidgetStdMod = A.WidgetStdMod;
+		var AArray = A.Array;
+		var AObject = A.Object;
+		var getClassName = A.getClassName;
+		var Lang = A.Lang;
+		var Template = A.Template;
+		var WidgetStdMod = A.WidgetStdMod;
 
-		const emptyFn = Lang.emptyFn;
-		const isBoolean = Lang.isBoolean;
-		const isValue = Lang.isValue;
+		var emptyFn = Lang.emptyFn;
+		var isBoolean = Lang.isBoolean;
+		var isValue = Lang.isValue;
 
-		const KaleoDesignerRemoteServices = Liferay.KaleoDesignerRemoteServices;
-		const KaleoDesignerStrings = Liferay.KaleoDesignerStrings;
+		var KaleoDesignerRemoteServices = Liferay.KaleoDesignerRemoteServices;
+		var KaleoDesignerStrings = Liferay.KaleoDesignerStrings;
 
-		const serializeForm = Liferay.KaleoDesignerUtils.serializeForm;
+		var serializeForm = Liferay.KaleoDesignerUtils.serializeForm;
 
-		const CSS_CELLEDITOR_ASSIGNMENT_VIEW = getClassName(
+		var CSS_CELLEDITOR_ASSIGNMENT_VIEW = getClassName(
 			'celleditor',
 			'assignment',
 			'view'
 		);
 
-		const CSS_CELLEDITOR_VIEW_TYPE = getClassName(
+		var CSS_CELLEDITOR_VIEW_TYPE = getClassName(
 			'celleditor',
 			'view',
 			'type'
 		);
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const STR_DASH = '-';
+		var STR_DASH = '-';
 
-		const STR_DOT = '.';
+		var STR_DOT = '.';
 
-		const STR_REMOVE_DYNAMIC_VIEW_BUTTON =
+		var STR_REMOVE_DYNAMIC_VIEW_BUTTON =
 			'<div class="celleditor-view-menu">' +
 			'<a class="celleditor-view-menu-remove btn btn-link btn-sm" href="#" title="' +
 			KaleoDesignerStrings.remove +
@@ -54,10 +55,10 @@ AUI.add(
 			'</a>' +
 			'</div>';
 
-		const SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE =
+		var SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE =
 			STR_DOT + CSS_CELLEDITOR_VIEW_TYPE + STR_DASH;
 
-		const BaseAbstractEditor = A.Component.create({
+		var BaseAbstractEditor = A.Component.create({
 			ATTRS: {
 				builder: {},
 
@@ -80,24 +81,24 @@ AUI.add(
 
 			prototype: {
 				_afterEditorVisibleChange(event) {
-					const instance = this;
+					var instance = this;
 
 					if (event.newVal) {
-						const editorForm = instance.get('editorForm');
+						var editorForm = instance.get('editorForm');
 
 						editorForm.syncViewsUI();
 					}
 				},
 
 				_afterRender() {
-					const instance = this;
+					var instance = this;
 
 					BaseAbstractEditor.superclass._afterRender.apply(
 						this,
 						arguments
 					);
 
-					const editorForm = instance.get('editorForm');
+					var editorForm = instance.get('editorForm');
 
 					editorForm.addStaticViews();
 
@@ -109,13 +110,13 @@ AUI.add(
 				},
 
 				_getEditorForm(config) {
-					const instance = this;
+					var instance = this;
 
-					const editorFormClass = instance.get('editorFormClass');
+					var editorFormClass = instance.get('editorFormClass');
 
-					const editorForm = new editorFormClass(config);
+					var editorForm = new editorFormClass(config);
 
-					const bodyNode = editorForm.get('bodyNode');
+					var bodyNode = editorForm.get('bodyNode');
 
 					instance.set('bodyContent', bodyNode);
 
@@ -123,7 +124,7 @@ AUI.add(
 				},
 
 				_onClickViewMenu(event) {
-					const anchor = event.currentTarget;
+					var anchor = event.currentTarget;
 
 					if (anchor.hasClass('celleditor-view-menu-remove')) {
 						anchor.ancestor('.celleditor-view').remove();
@@ -133,15 +134,15 @@ AUI.add(
 				},
 
 				_onDestroyPortlet() {
-					const instance = this;
+					var instance = this;
 
 					instance.destroy(true);
 				},
 
 				_onValueChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const editorForm = instance.get('editorForm');
+					var editorForm = instance.get('editorForm');
 
 					editorForm.set('value', event.newVal);
 				},
@@ -155,17 +156,17 @@ AUI.add(
 				},
 
 				_syncElementsFocus() {
-					const instance = this;
+					var instance = this;
 
-					const editorForm = instance.get('editorForm');
+					var editorForm = instance.get('editorForm');
 
 					editorForm.syncElementsFocus();
 				},
 
 				customizeToolbar() {
-					const instance = this;
+					var instance = this;
 
-					const editorForm = instance.get('editorForm');
+					var editorForm = instance.get('editorForm');
 
 					instance.addSectionButton = editorForm.get(
 						'addSectionButton'
@@ -177,9 +178,9 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
-					const editorForm = instance.get('editorForm');
+					var editorForm = instance.get('editorForm');
 
 					if (editorForm) {
 						editorForm.destroy(true);
@@ -187,15 +188,15 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const editorForm = instance.get('editorForm');
+					var editorForm = instance.get('editorForm');
 
 					return editorForm.getValue();
 				},
 
 				initializer(config) {
-					const instance = this;
+					var instance = this;
 
 					instance.set('editorForm', instance._getEditorForm(config));
 
@@ -222,7 +223,7 @@ AUI.add(
 			},
 		});
 
-		const BaseAbstractEditorForm = A.Component.create({
+		var BaseAbstractEditorForm = A.Component.create({
 			ATTRS: {
 				addSectionButton: {
 					valueFn: '_valueAddSectionButton',
@@ -230,12 +231,12 @@ AUI.add(
 
 				bodyNode: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
 						if (!instance.bodyNode) {
-							const template = instance.get('bodyNodeTemplate');
+							var template = instance.get('bodyNodeTemplate');
 
-							const bodyNode = A.Node.create(template);
+							var bodyNode = A.Node.create(template);
 
 							bodyNode.addClass('celleditor-full-view');
 
@@ -288,7 +289,7 @@ AUI.add(
 				},
 
 				_afterRender() {
-					const instance = this;
+					var instance = this;
 
 					instance.addStaticViews();
 
@@ -298,11 +299,11 @@ AUI.add(
 				},
 
 				_onClickAddSectionButton(event) {
-					const instance = this;
+					var instance = this;
 
 					instance.handleAddViewSection(event);
 
-					const viewNodes = instance.getDynamicViews();
+					var viewNodes = instance.getDynamicViews();
 
 					instance._addRemoveDynamicViewButton(viewNodes.last());
 				},
@@ -316,19 +317,19 @@ AUI.add(
 				},
 
 				_uiSetValue(val) {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					instance.addDynamicViews(val);
 
 					A.each(val, (item1, index1) => {
-						const fields = bodyNode.all('[name="' + index1 + '"]');
+						var fields = bodyNode.all('[name="' + index1 + '"]');
 
 						item1 = AArray(item1);
 
 						fields.each((item2, index2) => {
-							const value = item1[index2];
+							var value = item1[index2];
 
 							if (
 								item2.test(
@@ -338,7 +339,7 @@ AUI.add(
 								item2.set(
 									'checked',
 									A.DataType.Boolean.parse(
-										value || typeof value === 'boolean'
+										value || typeof value == 'boolean'
 											? value
 											: true
 									)
@@ -349,7 +350,7 @@ AUI.add(
 								Lang.isArray(value)
 							) {
 								value.forEach((option) => {
-									for (const key in option) {
+									for (var key in option) {
 										item2
 											.one(
 												'option[value=' +
@@ -368,15 +369,15 @@ AUI.add(
 				},
 
 				_valueAddSectionButton() {
-					const instance = this;
+					var instance = this;
 
 					if (instance.get('dynamicViewSingleton')) {
 						instance._addSectionButton = null;
 					}
 					else if (!instance._addSectionButton) {
-						const strings = instance.get('strings');
+						var strings = instance.get('strings');
 
-						const addSectionButton = new A.Button({
+						var addSectionButton = new A.Button({
 							cssClass: 'btn-secondary',
 							disabled: true,
 							id: 'addSectionButton',
@@ -389,7 +390,7 @@ AUI.add(
 							},
 						}).render();
 
-						const bodyNode = instance.get('bodyNode');
+						var bodyNode = instance.get('bodyNode');
 
 						bodyNode.append(addSectionButton.get('boundingBox'));
 
@@ -404,11 +405,11 @@ AUI.add(
 				addStaticViews: emptyFn,
 
 				appendToDynamicView(view) {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicView = bodyNode.one(
+					var dynamicView = bodyNode.one(
 						'.celleditor-view-dynamic-views'
 					);
 
@@ -419,9 +420,7 @@ AUI.add(
 					dynamicView.append(view);
 
 					if (!instance.get('dynamicViewSingleton')) {
-						const dynamicViews = dynamicView.all(
-							'.celleditor-view'
-						);
+						var dynamicViews = dynamicView.all('.celleditor-view');
 
 						dynamicViews.each(
 							A.bind(
@@ -433,11 +432,11 @@ AUI.add(
 				},
 
 				appendToStaticView(view) {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const staticView = bodyNode.one(
+					var staticView = bodyNode.one(
 						'.celleditor-view-static-view'
 					);
 
@@ -449,11 +448,11 @@ AUI.add(
 				},
 
 				convertScriptLanguagesToJSONArray(scriptLanguages) {
-					const instance = this;
+					var instance = this;
 
-					const scriptLanguagesJSONArray = [];
+					var scriptLanguagesJSONArray = [];
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
 					scriptLanguages.forEach((item) => {
 						if (item) {
@@ -468,17 +467,17 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					instance.bodyNode.remove(true);
 				},
 
 				getDynamicViews() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicView = bodyNode.one(
+					var dynamicView = bodyNode.one(
 						'.celleditor-view-dynamic-views'
 					);
 
@@ -496,13 +495,13 @@ AUI.add(
 				},
 
 				getStrings() {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('strings');
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
 					return serializeForm(instance.get('bodyNode'));
 				},
@@ -510,15 +509,15 @@ AUI.add(
 				handleAddViewSection: emptyFn,
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.after('render', instance._afterRender);
 				},
 
 				removeAllViews(viewId) {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					if (bodyNode) {
 						bodyNode
@@ -530,9 +529,9 @@ AUI.add(
 				syncElementsFocus: emptyFn,
 
 				syncToolbarUI() {
-					const instance = this;
+					var instance = this;
 
-					const addSectionButton = instance.get('addSectionButton');
+					var addSectionButton = instance.get('addSectionButton');
 
 					if (addSectionButton) {
 						addSectionButton.set('disabled', !instance.viewId);
@@ -540,27 +539,26 @@ AUI.add(
 				},
 
 				syncViewsUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._uiSetValue(instance.get('value'));
 				},
 			},
 		});
 
-		const CompositeEditorFormBase = function () {};
+		var CompositeEditorFormBase = function () {};
 
 		CompositeEditorFormBase.prototype = {
 			getEmbeddedEditorForm(editorFormClass, container, config) {
-				const instance = this;
+				var instance = this;
 
-				const editorFormName = editorFormClass.NAME;
+				var editorFormName = editorFormClass.NAME;
 
-				let editorForm = container.getData(
+				var editorForm = container.getData(
 					editorFormName + '-instance'
 				);
 
 				if (!editorForm) {
-					// eslint-disable-next-line @liferay/aui/no-merge
 					config = A.merge(
 						{
 							builder: instance.get('builder'),
@@ -579,9 +577,8 @@ AUI.add(
 			},
 
 			showEditorForm(editorFormClass, container, value, config) {
-				const instance = this;
+				var instance = this;
 
-				// eslint-disable-next-line @liferay/aui/no-merge
 				config = A.merge(
 					{
 						render: container,
@@ -590,13 +587,13 @@ AUI.add(
 					config
 				);
 
-				const editor = instance.getEmbeddedEditorForm(
+				var editor = instance.getEmbeddedEditorForm(
 					editorFormClass,
 					container,
 					config
 				);
 
-				const bodyNode = editor.get('bodyNode');
+				var bodyNode = editor.get('bodyNode');
 
 				container.append(bodyNode);
 
@@ -604,7 +601,7 @@ AUI.add(
 			},
 		};
 
-		const AssignmentsEditorForm = A.Component.create({
+		var AssignmentsEditorForm = A.Component.create({
 			ATTRS: {
 				assignmentsType: {
 					valueFn: '_valueAssignmentsType',
@@ -612,9 +609,9 @@ AUI.add(
 
 				roleTypes: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const strings = instance.getStrings();
+						var strings = instance.getStrings();
 
 						return [
 							{
@@ -643,13 +640,13 @@ AUI.add(
 
 				scriptLanguages: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const scriptLanguages = [];
+						var scriptLanguages = [];
 
 						instance.getScriptLanguages(scriptLanguages);
 
-						const scriptLanguagesJSONArray = instance.convertScriptLanguagesToJSONArray(
+						var scriptLanguagesJSONArray = instance.convertScriptLanguagesToJSONArray(
 							scriptLanguages
 						);
 
@@ -659,7 +656,6 @@ AUI.add(
 
 				strings: {
 					valueFn() {
-						// eslint-disable-next-line @liferay/aui/no-merge
 						return A.merge(KaleoDesignerStrings, {
 							assignmentTypeLabel:
 								KaleoDesignerStrings.assignmentType,
@@ -686,7 +682,7 @@ AUI.add(
 
 			prototype: {
 				_countRoleTypeViews(val) {
-					let count = 0;
+					var count = 0;
 
 					if (val) {
 						count = val.roleType
@@ -698,7 +694,7 @@ AUI.add(
 				},
 
 				_countUserViews(val) {
-					let count = 0;
+					var count = 0;
 
 					if (val) {
 						count = Math.max(
@@ -716,15 +712,15 @@ AUI.add(
 				},
 
 				_onTypeValueChange(event) {
-					const instance = this;
+					var instance = this;
 
 					instance.showView(event.currentTarget.val());
 				},
 
 				_valueAssignmentsType() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
 					return [
 						{
@@ -755,7 +751,7 @@ AUI.add(
 				},
 
 				addDynamicViews(val) {
-					const instance = this;
+					var instance = this;
 
 					Liferay.KaleoDesignerAutoCompleteUtil.destroyAll();
 
@@ -773,16 +769,16 @@ AUI.add(
 				},
 
 				addStaticViews() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const assignmentsViewTpl = instance.get('viewTemplate');
-					const inputTpl = Template.get('input');
-					const selectTpl = Template.get('select');
-					const textareaTpl = Template.get('textarea');
+					var assignmentsViewTpl = instance.get('viewTemplate');
+					var inputTpl = Template.get('input');
+					var selectTpl = Template.get('select');
+					var textareaTpl = Template.get('textarea');
 
-					const select = selectTpl.render({
+					var select = selectTpl.render({
 						auiCssClass: 'form-control input-sm',
 						auiLabelCssClass: 'celleditor-label',
 						label: strings.assignmentTypeLabel,
@@ -790,11 +786,9 @@ AUI.add(
 						options: instance.get('assignmentsType'),
 					});
 
-					const selectWrapper = A.Node.create('<div/>').append(
-						select
-					);
+					var selectWrapper = A.Node.create('<div/>').append(select);
 
-					const typeSelect = selectWrapper.one('select');
+					var typeSelect = selectWrapper.one('select');
 
 					instance.set('typeSelect', typeSelect);
 
@@ -805,9 +799,9 @@ AUI.add(
 						A.bind(instance._onTypeValueChange, instance)
 					);
 
-					const buffer = [];
+					var buffer = [];
 
-					const resourceActionContent = textareaTpl.parse({
+					var resourceActionContent = textareaTpl.parse({
 						auiCssClass:
 							'celleditor-textarea-small form-control input-sm',
 						auiLabelCssClass: 'celleditor-label',
@@ -823,7 +817,7 @@ AUI.add(
 						})
 					);
 
-					const roleIdContent = [
+					var roleIdContent = [
 						inputTpl.parse({
 							auiCssClass:
 								'assignments-cell-editor-input form-control input-sm',
@@ -856,7 +850,7 @@ AUI.add(
 						})
 					);
 
-					const scriptedAssignmentContent = [
+					var scriptedAssignmentContent = [
 						textareaTpl.parse({
 							auiCssClass:
 								'celleditor-textarea-small form-control input-sm',
@@ -887,22 +881,22 @@ AUI.add(
 				},
 
 				addViewRoleType(num) {
-					const instance = this;
+					var instance = this;
 
 					num = num || 1;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const assignmentsViewTpl = instance.get('viewTemplate');
+					var assignmentsViewTpl = instance.get('viewTemplate');
 
-					const checkboxTpl = Template.get('checkbox');
-					const inputTpl = Template.get('input');
-					const selectTpl = Template.get('select');
+					var checkboxTpl = Template.get('checkbox');
+					var inputTpl = Template.get('input');
+					var selectTpl = Template.get('select');
 
-					const buffer = [];
+					var buffer = [];
 
-					for (let i = 0; i < num; i++) {
-						const roleTypeContent = [
+					for (var i = 0; i < num; i++) {
+						var roleTypeContent = [
 							selectTpl.parse({
 								auiCssClass:
 									'assignments-cell-editor-input form-control input-sm',
@@ -952,20 +946,20 @@ AUI.add(
 				},
 
 				addViewUser(num) {
-					const instance = this;
+					var instance = this;
 
 					num = num || 1;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const assignmentsViewTpl = instance.get('viewTemplate');
+					var assignmentsViewTpl = instance.get('viewTemplate');
 
-					const inputTpl = Template.get('input');
+					var inputTpl = Template.get('input');
 
-					const buffer = [];
+					var buffer = [];
 
-					for (let i = 0; i < num; i++) {
-						const userContent = [
+					for (var i = 0; i < num; i++) {
+						var userContent = [
 							inputTpl.parse({
 								auiCssClass:
 									'assignments-cell-editor-input form-control input-sm',
@@ -1028,9 +1022,9 @@ AUI.add(
 				},
 
 				getViewNodes() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					return bodyNode.all(
 						STR_DOT + CSS_CELLEDITOR_ASSIGNMENT_VIEW
@@ -1038,12 +1032,12 @@ AUI.add(
 				},
 
 				handleAddViewSection(event) {
-					const instance = this;
+					var instance = this;
 
-					const button = event.target;
+					var button = event.target;
 
 					if (!button.get('disabled')) {
-						const viewId = instance.viewId;
+						var viewId = instance.viewId;
 
 						if (viewId === 'user') {
 							instance.addViewUser();
@@ -1057,13 +1051,13 @@ AUI.add(
 				},
 
 				showView(viewId) {
-					const instance = this;
+					var instance = this;
 
 					instance.viewId = viewId;
 
 					instance.getViewNodes().hide();
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					bodyNode
 						.all(SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + viewId)
@@ -1073,21 +1067,21 @@ AUI.add(
 				},
 
 				syncElementsFocus() {
-					const instance = this;
+					var instance = this;
 
-					const typeSelect = instance.get('typeSelect');
+					var typeSelect = instance.get('typeSelect');
 
 					typeSelect.focus();
 				},
 
 				syncToolbarUI() {
-					const instance = this;
+					var instance = this;
 
-					const viewId = instance.viewId;
+					var viewId = instance.viewId;
 
-					const disabled = viewId !== 'roleType' && viewId !== 'user';
+					var disabled = viewId !== 'roleType' && viewId !== 'user';
 
-					const addSectionButton = instance.get('addSectionButton');
+					var addSectionButton = instance.get('addSectionButton');
 
 					if (addSectionButton) {
 						addSectionButton.set('disabled', disabled);
@@ -1095,21 +1089,21 @@ AUI.add(
 				},
 
 				syncViewsUI() {
-					const instance = this;
+					var instance = this;
 
 					AssignmentsEditorForm.superclass.syncViewsUI.apply(
 						this,
 						arguments
 					);
 
-					const typeSelect = instance.get('typeSelect');
+					var typeSelect = instance.get('typeSelect');
 
 					instance.showView(typeSelect.val());
 				},
 			},
 		});
 
-		const AssignmentsEditor = A.Component.create({
+		var AssignmentsEditor = A.Component.create({
 			ATTRS: {
 				editorFormClass: {
 					value: AssignmentsEditorForm,
@@ -1121,7 +1115,7 @@ AUI.add(
 			NAME: 'assignments-cell-editor',
 		});
 
-		const FormsEditorForm = A.Component.create({
+		var FormsEditorForm = A.Component.create({
 			ATTRS: {
 				viewTemplate: {
 					value: [
@@ -1136,17 +1130,17 @@ AUI.add(
 
 			prototype: {
 				addStaticViews() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const formsViewTpl = instance.get('viewTemplate');
+					var formsViewTpl = instance.get('viewTemplate');
 
-					const inputTpl = Template.get('input');
+					var inputTpl = Template.get('input');
 
-					const buffer = [];
+					var buffer = [];
 
-					const formsContent = [
+					var formsContent = [
 						inputTpl.parse({
 							auiCssClass:
 								'form-control forms-cell-editor-input input-sm',
@@ -1182,7 +1176,7 @@ AUI.add(
 			},
 		});
 
-		const FormsEditor = A.Component.create({
+		var FormsEditor = A.Component.create({
 			ATTRS: {
 				editorFormClass: {
 					value: FormsEditorForm,
@@ -1194,16 +1188,16 @@ AUI.add(
 			NAME: 'forms-cell-editor',
 		});
 
-		const ExecutionTypesEditorFormBase = function () {};
+		var ExecutionTypesEditorFormBase = function () {};
 
 		ExecutionTypesEditorFormBase.prototype = {
 			_executionTypesSetter(val) {
-				const instance = this;
+				var instance = this;
 
-				const strings = instance.getStrings();
+				var strings = instance.getStrings();
 
-				const selectedNode = instance.get('builder.selectedNode');
-				const type = selectedNode.get('type');
+				var selectedNode = instance.get('builder.selectedNode');
+				var type = selectedNode.get('type');
 
 				if (type === 'task') {
 					val.push({
@@ -1234,7 +1228,7 @@ AUI.add(
 			},
 		};
 
-		const NotificationRecipientsEditorFormConfig = {
+		var NotificationRecipientsEditorFormConfig = {
 			ATTRS: {
 				executionTypeSelect: {
 					value: null,
@@ -1242,7 +1236,6 @@ AUI.add(
 
 				strings: {
 					valueFn() {
-						// eslint-disable-next-line @liferay/aui/no-merge
 						return A.merge(KaleoDesignerStrings, {
 							assignmentTypeLabel:
 								KaleoDesignerStrings.recipientType,
@@ -1259,11 +1252,11 @@ AUI.add(
 
 			prototype: {
 				_valueAssignmentsType() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const assignmentsTypes = [
+					var assignmentsTypes = [
 						{
 							label: strings.defaultAssignmentLabel,
 							value: STR_BLANK,
@@ -1286,11 +1279,11 @@ AUI.add(
 						},
 					];
 
-					const executionTypeSelect = instance.get(
+					var executionTypeSelect = instance.get(
 						'executionTypeSelect'
 					);
 
-					const executionType = executionTypeSelect.val();
+					var executionType = executionTypeSelect.val();
 
 					if (executionType === 'onAssignment') {
 						assignmentsTypes.push({
@@ -1303,17 +1296,17 @@ AUI.add(
 				},
 
 				addStaticViews() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const assignmentsViewTpl = instance.get('viewTemplate');
+					var assignmentsViewTpl = instance.get('viewTemplate');
 
-					const inputTpl = Template.get('input');
-					const selectTpl = Template.get('select');
-					const textareaTpl = Template.get('textarea');
+					var inputTpl = Template.get('input');
+					var selectTpl = Template.get('select');
+					var textareaTpl = Template.get('textarea');
 
-					const select = selectTpl.render({
+					var select = selectTpl.render({
 						auiCssClass: 'form-control input-sm',
 						auiLabelCssClass: 'celleditor-label',
 						label: strings.assignmentTypeLabel,
@@ -1321,11 +1314,9 @@ AUI.add(
 						options: instance.get('assignmentsType'),
 					});
 
-					const selectWrapper = A.Node.create('<div/>').append(
-						select
-					);
+					var selectWrapper = A.Node.create('<div/>').append(select);
 
-					const typeSelect = selectWrapper.one('select');
+					var typeSelect = selectWrapper.one('select');
 
 					instance.set('typeSelect', typeSelect);
 
@@ -1336,7 +1327,7 @@ AUI.add(
 						A.bind(instance._onTypeValueChange, instance)
 					);
 
-					const receptionType = inputTpl.parse({
+					var receptionType = inputTpl.parse({
 						id: A.guid(),
 						name: 'receptionType',
 						type: 'hidden',
@@ -1344,9 +1335,9 @@ AUI.add(
 
 					instance.appendToStaticView(receptionType);
 
-					const buffer = [];
+					var buffer = [];
 
-					const roleIdContent = [
+					var roleIdContent = [
 						inputTpl.parse({
 							auiCssClass:
 								'assignments-cell-editor-input form-control input-sm',
@@ -1379,7 +1370,7 @@ AUI.add(
 						})
 					);
 
-					const scriptedRecipientContent = [
+					var scriptedRecipientContent = [
 						textareaTpl.parse({
 							auiCssClass:
 								'celleditor-textarea-small form-control input-sm',
@@ -1411,16 +1402,16 @@ AUI.add(
 			},
 		};
 
-		const NotificationRecipientsEditorForm = A.Component.create(
+		var NotificationRecipientsEditorForm = A.Component.create(
 			NotificationRecipientsEditorFormConfig
 		);
 
 		NotificationRecipientsEditorFormConfig.prototype._valueAssignmentsType = function () {
-			const instance = this;
+			var instance = this;
 
-			const strings = instance.getStrings();
+			var strings = instance.getStrings();
 
-			const assignmentsTypes = [
+			var assignmentsTypes = [
 				{
 					label: strings.defaultAssignmentLabel,
 					value: STR_BLANK,
@@ -1446,19 +1437,19 @@ AUI.add(
 			return assignmentsTypes;
 		};
 
-		const TimerNotificationRecipientsEditorForm = A.Component.create(
+		var TimerNotificationRecipientsEditorForm = A.Component.create(
 			NotificationRecipientsEditorFormConfig
 		);
 
-		let NotificationsEditorForm; // eslint-disable-line prefer-const
+		var NotificationsEditorForm;
 
-		const NotificationsEditorFormConfig = {
+		var NotificationsEditorFormConfig = {
 			ATTRS: {
 				notificationTypes: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const strings = instance.getStrings();
+						var strings = instance.getStrings();
 
 						return [
 							{
@@ -1480,9 +1471,9 @@ AUI.add(
 
 				templateLanguages: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const strings = instance.getStrings();
+						var strings = instance.getStrings();
 
 						return [
 							{
@@ -1519,15 +1510,15 @@ AUI.add(
 
 			prototype: {
 				_appendRecipientsEditorToLastSection() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'notification'
 					);
 
-					const lastDynamicView = dynamicViews.item(
+					var lastDynamicView = dynamicViews.item(
 						dynamicViews.size() - 1
 					);
 
@@ -1535,7 +1526,7 @@ AUI.add(
 				},
 
 				_countNotificationViews(val) {
-					let count = 0;
+					var count = 0;
 
 					if (val) {
 						count = val.notificationTypes
@@ -1547,17 +1538,17 @@ AUI.add(
 				},
 
 				_getRecipients(val) {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('value.recipients') || val;
 				},
 
 				_renderRecipientsEditor() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'notification'
 					);
 
@@ -1567,22 +1558,21 @@ AUI.add(
 				},
 
 				_showRecipientsEditor(bodyContentNode, index) {
-					const instance = this;
+					var instance = this;
 
-					const executionTypeSelect = bodyContentNode.one(
+					var executionTypeSelect = bodyContentNode.one(
 						'.execution-type-select'
 					);
 
-					const editorContainer = bodyContentNode.one(
+					var editorContainer = bodyContentNode.one(
 						'.recipients-editor-container'
 					);
 
-					const recipients = instance.get('recipients');
+					var recipients = instance.get('recipients');
 
-					const value = recipients[index];
+					var value = recipients[index];
 
-					// eslint-disable-next-line @liferay/aui/no-object
-					if (value && A.Object.isEmpty(value)) {
+					if (value && AObject.isEmpty(value)) {
 						value.assignmentType = 'taskAssignees';
 						value.receptionType = ['to'];
 						value.taskAssignees = [''];
@@ -1599,7 +1589,7 @@ AUI.add(
 				},
 
 				addDynamicViews(val) {
-					const instance = this;
+					var instance = this;
 
 					instance.removeAllViews('notification');
 
@@ -1609,23 +1599,23 @@ AUI.add(
 				},
 
 				addNotificationView(num) {
-					const instance = this;
+					var instance = this;
 
 					num = num || 1;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const notificationsViewTpl = instance.get('viewTemplate');
+					var notificationsViewTpl = instance.get('viewTemplate');
 
-					const inputTpl = Template.get('input');
-					const selectMultipleTpl = Template.get('select-multiple');
-					const selectTpl = Template.get('select');
-					const textareaTpl = Template.get('textarea');
+					var inputTpl = Template.get('input');
+					var selectMultipleTpl = Template.get('select-multiple');
+					var selectTpl = Template.get('select');
+					var textareaTpl = Template.get('textarea');
 
-					const buffer = [];
+					var buffer = [];
 
-					for (let i = 0; i < num; i++) {
-						const notificationContent = [
+					for (var i = 0; i < num; i++) {
+						var notificationContent = [
 							inputTpl.parse({
 								auiCssClass:
 									'form-control input-sm notifications-cell-editor-input',
@@ -1697,18 +1687,18 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const localRecipients = instance.get('recipients');
+					var localRecipients = instance.get('recipients');
 
-					const recipients = [];
+					var recipients = [];
 
 					instance.getDynamicViews().each((item, index) => {
-						const editorContainer = item.one(
+						var editorContainer = item.one(
 							'.recipients-editor-container'
 						);
 
-						const recipientsEditor = instance.getEmbeddedEditorForm(
+						var recipientsEditor = instance.getEmbeddedEditorForm(
 							NotificationRecipientsEditorForm,
 							editorContainer
 						);
@@ -1722,7 +1712,6 @@ AUI.add(
 
 					instance.set('recipients', localRecipients);
 
-					// eslint-disable-next-line @liferay/aui/no-merge
 					return A.merge(
 						NotificationsEditorForm.superclass.getValue.apply(
 							this,
@@ -1735,9 +1724,9 @@ AUI.add(
 				},
 
 				handleAddViewSection(event) {
-					const instance = this;
+					var instance = this;
 
-					const button = event.target;
+					var button = event.target;
 
 					if (!button.get('disabled')) {
 						instance.addNotificationView();
@@ -1747,17 +1736,17 @@ AUI.add(
 				},
 
 				syncElementsFocus() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					bodyNode.one(':input').focus();
 				},
 
 				syncToolbarUI() {
-					const instance = this;
+					var instance = this;
 
-					const addSectionButton = instance.get('addSectionButton');
+					var addSectionButton = instance.get('addSectionButton');
 
 					if (addSectionButton) {
 						addSectionButton.set('disabled', false);
@@ -1765,7 +1754,7 @@ AUI.add(
 				},
 
 				syncViewsUI() {
-					const instance = this;
+					var instance = this;
 
 					NotificationsEditorForm.superclass.syncViewsUI.apply(
 						this,
@@ -1781,7 +1770,7 @@ AUI.add(
 			NotificationsEditorFormConfig
 		);
 
-		const NotificationsEditor = A.Component.create({
+		var NotificationsEditor = A.Component.create({
 			ATTRS: {
 				cssClass: {
 					value: 'tall-editor',
@@ -1802,23 +1791,23 @@ AUI.add(
 		NotificationsEditorFormConfig.prototype.addNotificationView = function (
 			num
 		) {
-			const instance = this;
+			var instance = this;
 
 			num = num || 1;
 
-			const strings = instance.getStrings();
+			var strings = instance.getStrings();
 
-			const notificationsViewTpl = instance.get('viewTemplate');
+			var notificationsViewTpl = instance.get('viewTemplate');
 
-			const inputTpl = Template.get('input');
-			const selectMultipleTpl = Template.get('select-multiple');
-			const selectTpl = Template.get('select');
-			const textareaTpl = Template.get('textarea');
+			var inputTpl = Template.get('input');
+			var selectMultipleTpl = Template.get('select-multiple');
+			var selectTpl = Template.get('select');
+			var textareaTpl = Template.get('textarea');
 
-			const buffer = [];
+			var buffer = [];
 
-			for (let i = 0; i < num; i++) {
-				const notificationContent = [
+			for (var i = 0; i < num; i++) {
+				var notificationContent = [
 					inputTpl.parse({
 						auiCssClass:
 							'form-control input-sm notifications-cell-editor-input',
@@ -1880,18 +1869,16 @@ AUI.add(
 		};
 
 		NotificationsEditorFormConfig.prototype.getValue = function () {
-			const instance = this;
+			var instance = this;
 
-			const localRecipients = instance.get('recipients');
+			var localRecipients = instance.get('recipients');
 
-			const recipients = [];
+			var recipients = [];
 
 			instance.getDynamicViews().each((item, index) => {
-				const editorContainer = item.one(
-					'.recipients-editor-container'
-				);
+				var editorContainer = item.one('.recipients-editor-container');
 
-				const recipientsEditor = instance.getEmbeddedEditorForm(
+				var recipientsEditor = instance.getEmbeddedEditorForm(
 					TimerNotificationRecipientsEditorForm,
 					editorContainer
 				);
@@ -1905,7 +1892,6 @@ AUI.add(
 
 			instance.set('recipients', localRecipients);
 
-			// eslint-disable-next-line @liferay/aui/no-merge
 			return A.merge(
 				NotificationsEditorForm.superclass.getValue.apply(
 					this,
@@ -1921,19 +1907,19 @@ AUI.add(
 			bodyContentNode,
 			index
 		) {
-			const instance = this;
+			var instance = this;
 
-			const executionTypeSelect = bodyContentNode.one(
+			var executionTypeSelect = bodyContentNode.one(
 				'.execution-type-select'
 			);
 
-			const editorContainer = bodyContentNode.one(
+			var editorContainer = bodyContentNode.one(
 				'.recipients-editor-container'
 			);
 
-			const recipients = instance.get('recipients');
+			var recipients = instance.get('recipients');
 
-			const value = recipients[index];
+			var value = recipients[index];
 
 			instance.showEditorForm(
 				TimerNotificationRecipientsEditorForm,
@@ -1945,21 +1931,21 @@ AUI.add(
 			);
 		};
 
-		const TimerNotificationsEditorForm = A.Component.create(
+		var TimerNotificationsEditorForm = A.Component.create(
 			NotificationsEditorFormConfig
 		);
 
-		const ActionsEditorFormConfig = {
+		var ActionsEditorFormConfig = {
 			ATTRS: {
 				scriptLanguages: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const scriptLanguages = [];
+						var scriptLanguages = [];
 
 						instance.getScriptLanguages(scriptLanguages);
 
-						const scriptLanguagesJSONArray = instance.convertScriptLanguagesToJSONArray(
+						var scriptLanguagesJSONArray = instance.convertScriptLanguagesToJSONArray(
 							scriptLanguages
 						);
 
@@ -1984,7 +1970,7 @@ AUI.add(
 
 			prototype: {
 				_countActionViews(val) {
-					let count = 0;
+					var count = 0;
 
 					if (val) {
 						count = val.name ? val.name.filter(isValue).length : 1;
@@ -1994,22 +1980,22 @@ AUI.add(
 				},
 
 				addActionView(num) {
-					const instance = this;
+					var instance = this;
 
 					num = num || 1;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const actionsViewTpl = instance.get('viewTemplate');
+					var actionsViewTpl = instance.get('viewTemplate');
 
-					const inputTpl = Template.get('input');
-					const selectTpl = Template.get('select');
-					const textareaTpl = Template.get('textarea');
+					var inputTpl = Template.get('input');
+					var selectTpl = Template.get('select');
+					var textareaTpl = Template.get('textarea');
 
-					const buffer = [];
+					var buffer = [];
 
-					for (let i = 0; i < num; i++) {
-						const actionContent = [
+					for (var i = 0; i < num; i++) {
+						var actionContent = [
 							inputTpl.parse({
 								auiCssClass:
 									'actions-cell-editor-input form-control input-sm',
@@ -2081,7 +2067,7 @@ AUI.add(
 				},
 
 				addDynamicViews(val) {
-					const instance = this;
+					var instance = this;
 
 					instance.removeAllViews('action');
 
@@ -2089,9 +2075,9 @@ AUI.add(
 				},
 
 				handleAddViewSection(event) {
-					const instance = this;
+					var instance = this;
 
-					const button = event.target;
+					var button = event.target;
 
 					if (!button.get('disabled')) {
 						instance.addActionView();
@@ -2099,17 +2085,17 @@ AUI.add(
 				},
 
 				syncElementsFocus() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					bodyNode.one(':input').focus();
 				},
 
 				syncToolbarUI() {
-					const instance = this;
+					var instance = this;
 
-					const addSectionButton = instance.get('addSectionButton');
+					var addSectionButton = instance.get('addSectionButton');
 
 					if (addSectionButton) {
 						addSectionButton.set('disabled', false);
@@ -2118,9 +2104,9 @@ AUI.add(
 			},
 		};
 
-		const ActionsEditorForm = A.Component.create(ActionsEditorFormConfig);
+		var ActionsEditorForm = A.Component.create(ActionsEditorFormConfig);
 
-		const ActionsEditor = A.Component.create({
+		var ActionsEditor = A.Component.create({
 			ATTRS: {
 				cssClass: {
 					value: 'tall-editor',
@@ -2139,22 +2125,22 @@ AUI.add(
 		});
 
 		ActionsEditorFormConfig.prototype.addActionView = function (num) {
-			const instance = this;
+			var instance = this;
 
 			num = num || 1;
 
-			const strings = instance.getStrings();
+			var strings = instance.getStrings();
 
-			const actionsViewTpl = instance.get('viewTemplate');
+			var actionsViewTpl = instance.get('viewTemplate');
 
-			const inputTpl = Template.get('input');
-			const selectTpl = Template.get('select');
-			const textareaTpl = Template.get('textarea');
+			var inputTpl = Template.get('input');
+			var selectTpl = Template.get('select');
+			var textareaTpl = Template.get('textarea');
 
-			const buffer = [];
+			var buffer = [];
 
-			for (let i = 0; i < num; i++) {
-				const actionContent = [
+			for (var i = 0; i < num; i++) {
+				var actionContent = [
 					inputTpl.parse({
 						auiCssClass:
 							'actions-cell-editor-input form-control input-sm',
@@ -2216,17 +2202,17 @@ AUI.add(
 			instance.appendToDynamicView(buffer.join(STR_BLANK));
 		};
 
-		const TimerActionsEditorForm = A.Component.create(
+		var TimerActionsEditorForm = A.Component.create(
 			ActionsEditorFormConfig
 		);
 
-		const TaskTimerActionsEditorForm = A.Component.create({
+		var TaskTimerActionsEditorForm = A.Component.create({
 			ATTRS: {
 				actionTypes: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const strings = instance.getStrings();
+						var strings = instance.getStrings();
 
 						return [
 							{
@@ -2275,15 +2261,15 @@ AUI.add(
 
 			prototype: {
 				_appendEditorToLastSection() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'timerAction'
 					);
 
-					const lastDynamicView = dynamicViews.item(
+					var lastDynamicView = dynamicViews.item(
 						dynamicViews.size() - 1
 					);
 
@@ -2291,7 +2277,7 @@ AUI.add(
 				},
 
 				_countTimerActionViews(val) {
-					let count = 0;
+					var count = 0;
 
 					if (val) {
 						count = val.actionType
@@ -2303,11 +2289,11 @@ AUI.add(
 				},
 
 				_displayEditor(dynamicViewNode) {
-					const actionTypeSelect = dynamicViewNode.one(
+					var actionTypeSelect = dynamicViewNode.one(
 						'.select-action-type'
 					);
 
-					const actionType = actionTypeSelect.val();
+					var actionType = actionTypeSelect.val();
 
 					dynamicViewNode.all('.editor-container').hide();
 
@@ -2317,11 +2303,11 @@ AUI.add(
 				},
 
 				_displayEditors() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'timerAction'
 					);
 
@@ -2331,11 +2317,11 @@ AUI.add(
 				},
 
 				_onActionTypeValueChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const actionTypeSelect = event.currentTarget;
+					var actionTypeSelect = event.currentTarget;
 
-					const dynamicViewNode = actionTypeSelect.ancestor(
+					var dynamicViewNode = actionTypeSelect.ancestor(
 						'.celleditor-task-timer-actions-view'
 					);
 
@@ -2345,11 +2331,11 @@ AUI.add(
 				},
 
 				_renderEditor() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'timerAction'
 					);
 
@@ -2357,31 +2343,31 @@ AUI.add(
 				},
 
 				_showEditor(bodyContentNode, index) {
-					const instance = this;
+					var instance = this;
 
-					let actionType;
+					var actionType;
 
-					let timerAction;
+					var timerAction;
 
-					const value = instance.get('value');
+					var value = instance.get('value');
 
 					if (value && value.actionType && value.actionType[index]) {
 						actionType = value.actionType[index];
 						timerAction = value.timerAction[index];
 					}
 					else {
-						const actionTypeSelect = bodyContentNode.one(
+						var actionTypeSelect = bodyContentNode.one(
 							'.select-action-type'
 						);
 
 						actionType = actionTypeSelect.val();
 					}
 
-					const editorFormClass = instance.get(
+					var editorFormClass = instance.get(
 						'editorFormClasses.' + actionType
 					);
 
-					const editorContainer = bodyContentNode.one(
+					var editorContainer = bodyContentNode.one(
 						'.editor-container-' + actionType
 					);
 
@@ -2393,7 +2379,7 @@ AUI.add(
 				},
 
 				addDynamicViews(val) {
-					const instance = this;
+					var instance = this;
 
 					instance.removeAllViews('timerAction');
 
@@ -2403,20 +2389,20 @@ AUI.add(
 				},
 
 				addTimerActionView(num) {
-					const instance = this;
+					var instance = this;
 
 					num = num || 1;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const timerActionViewTpl = instance.get('viewTemplate');
+					var timerActionViewTpl = instance.get('viewTemplate');
 
-					const selectTpl = Template.get('select');
+					var selectTpl = Template.get('select');
 
-					const buffer = [];
+					var buffer = [];
 
-					for (let i = 0; i < num; i++) {
-						const timerActionContent = [
+					for (var i = 0; i < num; i++) {
+						var timerActionContent = [
 							selectTpl.parse({
 								auiCssClass:
 									'form-control input-sm select-action-type',
@@ -2440,33 +2426,31 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const value = {
+					var value = {
 						actionType: [],
 						timerAction: [],
 					};
 
-					const dynamicViews = instance.getDynamicViews();
+					var dynamicViews = instance.getDynamicViews();
 
 					dynamicViews.each((item) => {
-						const actionTypeSelect = item.one(
-							'.select-action-type'
-						);
+						var actionTypeSelect = item.one('.select-action-type');
 
-						const actionType = actionTypeSelect.val();
+						var actionType = actionTypeSelect.val();
 
 						value.actionType.push(actionType);
 
-						const editorContainer = item.one(
+						var editorContainer = item.one(
 							'.editor-container-' + actionType
 						);
 
-						const editorFormClass = instance.get(
+						var editorFormClass = instance.get(
 							'editorFormClasses.' + actionType
 						);
 
-						const editor = instance.getEmbeddedEditorForm(
+						var editor = instance.getEmbeddedEditorForm(
 							editorFormClass,
 							editorContainer
 						);
@@ -2478,9 +2462,9 @@ AUI.add(
 				},
 
 				handleAddViewSection(event) {
-					const instance = this;
+					var instance = this;
 
-					const button = event.target;
+					var button = event.target;
 
 					if (!button.get('disabled')) {
 						instance.addTimerActionView();
@@ -2492,9 +2476,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					bodyNode.delegate(
 						['change', 'keyup'],
@@ -2504,9 +2488,9 @@ AUI.add(
 				},
 
 				syncToolbarUI() {
-					const instance = this;
+					var instance = this;
 
-					const addSectionButton = instance.get('addSectionButton');
+					var addSectionButton = instance.get('addSectionButton');
 
 					if (addSectionButton) {
 						addSectionButton.set('disabled', false);
@@ -2514,7 +2498,7 @@ AUI.add(
 				},
 
 				syncViewsUI() {
-					const instance = this;
+					var instance = this;
 
 					TaskTimerActionsEditorForm.superclass.syncViewsUI.apply(
 						this,
@@ -2528,13 +2512,13 @@ AUI.add(
 			},
 		});
 
-		const TaskTimerDelaysEditorForm = A.Component.create({
+		var TaskTimerDelaysEditorForm = A.Component.create({
 			ATTRS: {
 				scales: {
 					valueFn() {
-						const instance = this;
+						var instance = this;
 
-						const strings = instance.getStrings();
+						var strings = instance.getStrings();
 
 						return [
 							{
@@ -2590,24 +2574,24 @@ AUI.add(
 
 			prototype: {
 				addStaticViews() {
-					const instance = this;
+					var instance = this;
 
-					const delayContent = instance.getDelayContent();
+					var delayContent = instance.getDelayContent();
 
 					instance.appendToStaticView(delayContent);
 
-					const recurrenceContent = instance.getRecurrenceContent();
+					var recurrenceContent = instance.getRecurrenceContent();
 
 					instance.appendToStaticView(recurrenceContent);
 				},
 
 				getDelayContent() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const inputTpl = Template.get('input');
-					const selectTpl = Template.get('select');
+					var inputTpl = Template.get('input');
+					var selectTpl = Template.get('select');
 
 					return [
 						inputTpl.parse({
@@ -2630,11 +2614,11 @@ AUI.add(
 				},
 
 				getRecurrenceContent() {
-					const instance = this;
+					var instance = this;
 
-					const timersViewTpl = instance.get('viewTemplate');
+					var timersViewTpl = instance.get('viewTemplate');
 
-					const delayContent = instance.getDelayContent();
+					var delayContent = instance.getDelayContent();
 
 					return [
 						timersViewTpl.parse({
@@ -2646,7 +2630,7 @@ AUI.add(
 			},
 		});
 
-		const TaskTimersEditorForm = A.Component.create({
+		var TaskTimersEditorForm = A.Component.create({
 			ATTRS: {
 				delays: {
 					getter: '_getDelays',
@@ -2675,15 +2659,15 @@ AUI.add(
 
 			prototype: {
 				_appendDelaysEditorToLastSection() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'timer'
 					);
 
-					const lastDynamicView = dynamicViews.item(
+					var lastDynamicView = dynamicViews.item(
 						dynamicViews.size() - 1
 					);
 
@@ -2691,15 +2675,15 @@ AUI.add(
 				},
 
 				_appendTimerActionsEditorToLastSection() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'timer'
 					);
 
-					const lastDynamicView = dynamicViews.item(
+					var lastDynamicView = dynamicViews.item(
 						dynamicViews.size() - 1
 					);
 
@@ -2707,7 +2691,7 @@ AUI.add(
 				},
 
 				_countTimerViews(val) {
-					let count = 0;
+					var count = 0;
 
 					if (val) {
 						count = val.name ? val.name.filter(isValue).length : 1;
@@ -2717,36 +2701,36 @@ AUI.add(
 				},
 
 				_getDelays(val) {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('value.delay') || val;
 				},
 
 				_getTimerActions() {
-					const instance = this;
+					var instance = this;
 
-					const actions = instance.get('value.timerActions') || [];
+					var actions = instance.get('value.timerActions') || [];
 
-					const notifications =
+					var notifications =
 						instance.get('value.timerNotifications') || [];
 
-					const reassignments =
+					var reassignments =
 						instance.get('value.reassignments') || [];
 
-					const count = Math.max(
+					var count = Math.max(
 						actions.length,
 						notifications.length,
 						reassignments.length
 					);
 
-					const timerActions = [];
+					var timerActions = [];
 
-					for (let i = 0; i < count; i++) {
-						let actionType = [];
+					for (var i = 0; i < count; i++) {
+						var actionType = [];
 
-						let splitTimerActions;
+						var splitTimerActions;
 
-						let timerAction = [];
+						var timerAction = [];
 
 						if (reassignments[i]) {
 							splitTimerActions = instance._splitTimerActions(
@@ -2812,11 +2796,11 @@ AUI.add(
 				},
 
 				_renderDelaysEditor() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'timer'
 					);
 
@@ -2826,11 +2810,11 @@ AUI.add(
 				},
 
 				_renderTimerActionsEditor() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const dynamicViews = bodyNode.all(
+					var dynamicViews = bodyNode.all(
 						SELECTOR_PREFIX_CELLEDITOR_VIEW_TYPE + 'timer'
 					);
 
@@ -2840,9 +2824,9 @@ AUI.add(
 				},
 
 				_repeat(value, times) {
-					const array = [];
+					var array = [];
 
-					for (let i = 0; i < times; i++) {
+					for (var i = 0; i < times; i++) {
 						array.push(value);
 					}
 
@@ -2850,15 +2834,15 @@ AUI.add(
 				},
 
 				_showDelaysEditor(bodyContentNode, index) {
-					const instance = this;
+					var instance = this;
 
-					const editorContainer = bodyContentNode.one(
+					var editorContainer = bodyContentNode.one(
 						'.delays-editor-container'
 					);
 
-					const delays = instance.get('delays');
+					var delays = instance.get('delays');
 
-					const value = delays[index];
+					var value = delays[index];
 
 					instance.showEditorForm(
 						TaskTimerDelaysEditorForm,
@@ -2868,15 +2852,15 @@ AUI.add(
 				},
 
 				_showTimerActionsEditor(bodyContentNode, index) {
-					const instance = this;
+					var instance = this;
 
-					const editorContainer = bodyContentNode.one(
+					var editorContainer = bodyContentNode.one(
 						'.timer-actions-editor-container'
 					);
 
-					const timerActions = instance.get('timerActions');
+					var timerActions = instance.get('timerActions');
 
-					const value = timerActions[index];
+					var value = timerActions[index];
 
 					instance.showEditorForm(
 						TaskTimerActionsEditorForm,
@@ -2886,7 +2870,7 @@ AUI.add(
 				},
 
 				_splitTimerActions(timerActions) {
-					const splitTimerActions = [];
+					var splitTimerActions = [];
 
 					A.each(timerActions, (item1, index1) => {
 						item1.forEach((item2, index2) => {
@@ -2894,7 +2878,7 @@ AUI.add(
 								splitTimerActions[index2] = {};
 							}
 
-							const timerAction = splitTimerActions[index2];
+							var timerAction = splitTimerActions[index2];
 
 							if (!timerAction[index1]) {
 								timerAction[index1] = [];
@@ -2908,7 +2892,7 @@ AUI.add(
 				},
 
 				addDynamicViews(val) {
-					const instance = this;
+					var instance = this;
 
 					instance.removeAllViews('timer');
 
@@ -2916,22 +2900,22 @@ AUI.add(
 				},
 
 				addTaskTimerView(num) {
-					const instance = this;
+					var instance = this;
 
 					num = num || 1;
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const timersViewTpl = instance.get('viewTemplate');
+					var timersViewTpl = instance.get('viewTemplate');
 
-					const checkboxTpl = Template.get('checkbox');
-					const inputTpl = Template.get('input');
-					const textareaTpl = Template.get('textarea');
+					var checkboxTpl = Template.get('checkbox');
+					var inputTpl = Template.get('input');
+					var textareaTpl = Template.get('textarea');
 
-					const buffer = [];
+					var buffer = [];
 
-					for (let i = 0; i < num; i++) {
-						const taskTimerContent = [
+					for (var i = 0; i < num; i++) {
+						var taskTimerContent = [
 							inputTpl.parse({
 								auiCssClass:
 									'task-timers-cell-editor-input form-control input-sm',
@@ -2979,9 +2963,9 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
-					const value = {
+					var value = {
 						blocking: [],
 						delay: [],
 						description: [],
@@ -2991,9 +2975,9 @@ AUI.add(
 						timerNotifications: [],
 					};
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
-					const taskTimerInputs = bodyNode.all(
+					var taskTimerInputs = bodyNode.all(
 						'.task-timers-cell-editor-input'
 					);
 
@@ -3009,25 +2993,25 @@ AUI.add(
 						}
 					});
 
-					const dynamicViews = instance.getDynamicViews();
+					var dynamicViews = instance.getDynamicViews();
 
 					dynamicViews.each((item1, index1) => {
-						const delaysEditorContainer = item1.one(
+						var delaysEditorContainer = item1.one(
 							'.delays-editor-container'
 						);
 
-						const delaysEditorForm = instance.getEmbeddedEditorForm(
+						var delaysEditorForm = instance.getEmbeddedEditorForm(
 							TaskTimerDelaysEditorForm,
 							delaysEditorContainer
 						);
 
 						value.delay.push(delaysEditorForm.getValue());
 
-						const timerActionsEditorContainer = item1.one(
+						var timerActionsEditorContainer = item1.one(
 							'.timer-actions-editor-container'
 						);
 
-						const timerActionsEditorForm = instance.getEmbeddedEditorForm(
+						var timerActionsEditorForm = instance.getEmbeddedEditorForm(
 							TaskTimerActionsEditorForm,
 							timerActionsEditorContainer
 						);
@@ -3038,14 +3022,14 @@ AUI.add(
 
 						value.reassignments.push({});
 
-						const timerActionValue = timerActionsEditorForm.getValue();
+						var timerActionValue = timerActionsEditorForm.getValue();
 
 						timerActionValue.actionType.forEach(
 							(actionType, index2) => {
-								const timerAction =
+								var timerAction =
 									timerActionValue.timerAction[index2];
 
-								let object;
+								var object;
 
 								if (actionType === 'action') {
 									object = value.timerActions[index1];
@@ -3068,9 +3052,9 @@ AUI.add(
 				},
 
 				handleAddViewSection(event) {
-					const instance = this;
+					var instance = this;
 
-					const button = event.target;
+					var button = event.target;
 
 					if (!button.get('disabled')) {
 						instance.addTaskTimerView();
@@ -3082,17 +3066,17 @@ AUI.add(
 				},
 
 				syncElementsFocus() {
-					const instance = this;
+					var instance = this;
 
-					const bodyNode = instance.get('bodyNode');
+					var bodyNode = instance.get('bodyNode');
 
 					bodyNode.one(':input').focus();
 				},
 
 				syncToolbarUI() {
-					const instance = this;
+					var instance = this;
 
-					const addSectionButton = instance.get('addSectionButton');
+					var addSectionButton = instance.get('addSectionButton');
 
 					if (addSectionButton) {
 						addSectionButton.set('disabled', false);
@@ -3100,7 +3084,7 @@ AUI.add(
 				},
 
 				syncViewsUI() {
-					const instance = this;
+					var instance = this;
 
 					TaskTimersEditorForm.superclass.syncViewsUI.apply(
 						this,
@@ -3114,7 +3098,7 @@ AUI.add(
 			},
 		});
 
-		const TaskTimersEditor = A.Component.create({
+		var TaskTimersEditor = A.Component.create({
 			ATTRS: {
 				cssClass: {
 					value: 'tall-editor',
@@ -3132,7 +3116,7 @@ AUI.add(
 			NAME: 'task-timers-cell-editor',
 		});
 
-		const ScriptEditor = A.Component.create({
+		var ScriptEditor = A.Component.create({
 			ATTRS: {
 				inputFormatter: {
 					value(val) {
@@ -3147,9 +3131,9 @@ AUI.add(
 
 			prototype: {
 				_afterRender() {
-					const instance = this;
+					var instance = this;
 
-					const editor = instance.editor;
+					var editor = instance.editor;
 
 					ScriptEditor.superclass._afterRender.apply(this, arguments);
 
@@ -3167,9 +3151,9 @@ AUI.add(
 				_syncElementsFocus: emptyFn,
 
 				_uiSetValue(val) {
-					const instance = this;
+					var instance = this;
 
-					const editor = instance.editor;
+					var editor = instance.editor;
 
 					if (editor && isValue(val)) {
 						editor.set('value', val);
@@ -3177,13 +3161,13 @@ AUI.add(
 				},
 
 				getValue() {
-					const instance = this;
+					var instance = this;
 
 					return instance.editor.get('value');
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.editor = new A.AceEditor({
 						height: 300,

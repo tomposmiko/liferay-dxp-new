@@ -18,23 +18,18 @@ import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.constants.AccountPortletKeys;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryUserRel;
-import com.liferay.account.service.AccountEntryService;
-import com.liferay.account.service.AccountEntryUserRelService;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.UserEmailAddressException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
-import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
+import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
-import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.File;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -55,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_MANAGEMENT,
@@ -63,11 +59,10 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = MVCActionCommand.class
 )
-public class AddAccountUserMVCActionCommand
-	extends BaseTransactionalMVCActionCommand {
+public class AddAccountUserMVCActionCommand extends BaseMVCActionCommand {
 
 	@Override
-	protected void doTransactionalCommand(
+	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -83,17 +78,14 @@ public class AddAccountUserMVCActionCommand
 		String firstName = ParamUtil.getString(actionRequest, "firstName");
 		String middleName = ParamUtil.getString(actionRequest, "middleName");
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
-		long prefixListTypeId = ParamUtil.getLong(
-			actionRequest, "prefixListTypeId");
-		long suffixListTypeId = ParamUtil.getLong(
-			actionRequest, "suffixListTypeId");
-		String jobTitle = ParamUtil.getString(actionRequest, "jobTitle");
+		long prefixId = ParamUtil.getLong(actionRequest, "prefixId");
+		long suffixId = ParamUtil.getLong(actionRequest, "suffixId");
 
 		try {
 			AccountEntryUserRel accountEntryUserRel = null;
 
-			AccountEntry accountEntry = _accountEntryService.fetchAccountEntry(
-				accountEntryId);
+			AccountEntry accountEntry =
+				_accountEntryLocalService.fetchAccountEntry(accountEntryId);
 
 			if ((accountEntry != null) &&
 				Objects.equals(
@@ -101,43 +93,19 @@ public class AddAccountUserMVCActionCommand
 					accountEntry.getType())) {
 
 				accountEntryUserRel =
-					_accountEntryUserRelService.
+					_accountEntryUserRelLocalService.
 						addPersonTypeAccountEntryUserRel(
 							accountEntryId, themeDisplay.getUserId(),
 							screenName, emailAddress,
 							LocaleUtil.fromLanguageId(languageId), firstName,
-							middleName, lastName, prefixListTypeId,
-							suffixListTypeId, jobTitle,
-							ServiceContextFactory.getInstance(
-								AccountEntryUserRel.class.getName(),
-								actionRequest));
+							middleName, lastName, prefixId, suffixId);
 			}
 			else {
 				accountEntryUserRel =
-					_accountEntryUserRelService.addAccountEntryUserRel(
+					_accountEntryUserRelLocalService.addAccountEntryUserRel(
 						accountEntryId, themeDisplay.getUserId(), screenName,
 						emailAddress, LocaleUtil.fromLanguageId(languageId),
-						firstName, middleName, lastName, prefixListTypeId,
-						suffixListTypeId, jobTitle,
-						ServiceContextFactory.getInstance(
-							AccountEntryUserRel.class.getName(),
-							actionRequest));
-			}
-
-			byte[] portraitBytes = null;
-
-			long fileEntryId = ParamUtil.getLong(actionRequest, "fileEntryId");
-
-			if (fileEntryId > 0) {
-				FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-					fileEntryId);
-
-				portraitBytes = _file.getBytes(fileEntry.getContentStream());
-			}
-
-			if (portraitBytes != null) {
-				_userService.updatePortrait(
-					accountEntryUserRel.getAccountUserId(), portraitBytes);
+						firstName, middleName, lastName, prefixId, suffixId);
 			}
 
 			String portletId = _portal.getPortletId(actionRequest);
@@ -164,7 +132,7 @@ public class AddAccountUserMVCActionCommand
 			String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 			if (Validator.isNotNull(redirect)) {
-				redirect = HttpComponentsUtil.setParameter(
+				redirect = _http.setParameter(
 					redirect, actionResponse.getNamespace() + "p_u_i_d",
 					accountEntryUserRel.getAccountUserId());
 
@@ -188,16 +156,13 @@ public class AddAccountUserMVCActionCommand
 	}
 
 	@Reference
-	private AccountEntryService _accountEntryService;
+	private AccountEntryLocalService _accountEntryLocalService;
 
 	@Reference
-	private AccountEntryUserRelService _accountEntryUserRelService;
+	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
 
 	@Reference
-	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private File _file;
+	private Http _http;
 
 	@Reference
 	private Portal _portal;
@@ -207,8 +172,5 @@ public class AddAccountUserMVCActionCommand
 
 	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference
-	private UserService _userService;
 
 }

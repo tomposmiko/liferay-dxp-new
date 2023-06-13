@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -61,7 +62,7 @@ public class MessageBoardMessageSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (messageBoardMessage.getActions() != null) {
 			if (sb.length() > 1) {
@@ -225,16 +226,6 @@ public class MessageBoardMessageSerDes {
 			sb.append("\"");
 		}
 
-		if (messageBoardMessage.getHasCompanyMx() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"hasCompanyMx\": ");
-
-			sb.append(messageBoardMessage.getHasCompanyMx());
-		}
-
 		if (messageBoardMessage.getHeadline() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -301,16 +292,6 @@ public class MessageBoardMessageSerDes {
 			sb.append("\"messageBoardThreadId\": ");
 
 			sb.append(messageBoardMessage.getMessageBoardThreadId());
-		}
-
-		if (messageBoardMessage.getModified() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"modified\": ");
-
-			sb.append(messageBoardMessage.getModified());
 		}
 
 		if (messageBoardMessage.getNumberOfMessageBoardAttachments() != null) {
@@ -447,7 +428,7 @@ public class MessageBoardMessageSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (messageBoardMessage.getActions() == null) {
 			map.put("actions", null);
@@ -557,15 +538,6 @@ public class MessageBoardMessageSerDes {
 				String.valueOf(messageBoardMessage.getFriendlyUrlPath()));
 		}
 
-		if (messageBoardMessage.getHasCompanyMx() == null) {
-			map.put("hasCompanyMx", null);
-		}
-		else {
-			map.put(
-				"hasCompanyMx",
-				String.valueOf(messageBoardMessage.getHasCompanyMx()));
-		}
-
 		if (messageBoardMessage.getHeadline() == null) {
 			map.put("headline", null);
 		}
@@ -605,14 +577,6 @@ public class MessageBoardMessageSerDes {
 			map.put(
 				"messageBoardThreadId",
 				String.valueOf(messageBoardMessage.getMessageBoardThreadId()));
-		}
-
-		if (messageBoardMessage.getModified() == null) {
-			map.put("modified", null);
-		}
-		else {
-			map.put(
-				"modified", String.valueOf(messageBoardMessage.getModified()));
 		}
 
 		if (messageBoardMessage.getNumberOfMessageBoardAttachments() == null) {
@@ -757,18 +721,14 @@ public class MessageBoardMessageSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					messageBoardMessage.setCustomFields(customFieldsArray);
+					messageBoardMessage.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
@@ -801,12 +761,6 @@ public class MessageBoardMessageSerDes {
 				if (jsonParserFieldValue != null) {
 					messageBoardMessage.setFriendlyUrlPath(
 						(String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "hasCompanyMx")) {
-				if (jsonParserFieldValue != null) {
-					messageBoardMessage.setHasCompanyMx(
-						(Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "headline")) {
@@ -843,12 +797,6 @@ public class MessageBoardMessageSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "modified")) {
-				if (jsonParserFieldValue != null) {
-					messageBoardMessage.setModified(
-						(Boolean)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(
 						jsonParserFieldName,
 						"numberOfMessageBoardAttachments")) {
@@ -876,19 +824,14 @@ public class MessageBoardMessageSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "relatedContents")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RelatedContent[] relatedContentsArray =
-						new RelatedContent[jsonParserFieldValues.length];
-
-					for (int i = 0; i < relatedContentsArray.length; i++) {
-						relatedContentsArray[i] = RelatedContentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
 					messageBoardMessage.setRelatedContents(
-						relatedContentsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RelatedContentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RelatedContent[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "showAsAnswer")) {

@@ -22,7 +22,7 @@ import java.util.Set;
 public class JavaParameter {
 
 	public JavaParameter(
-		String parameterName, JavaClassType parameterType,
+		String parameterName, String parameterType,
 		Set<String> parameterAnnotations, boolean isFinal) {
 
 		_parameterName = parameterName;
@@ -40,11 +40,7 @@ public class JavaParameter {
 	}
 
 	public String getParameterType() {
-		return getParameterType(false);
-	}
-
-	public String getParameterType(boolean fullyQualifiedName) {
-		return _parameterType.toString(fullyQualifiedName);
+		return _parameterType;
 	}
 
 	public boolean isFinal() {
@@ -54,6 +50,6 @@ public class JavaParameter {
 	private final boolean _isFinal;
 	private final Set<String> _parameterAnnotations;
 	private final String _parameterName;
-	private final JavaClassType _parameterType;
+	private final String _parameterType;
 
 }

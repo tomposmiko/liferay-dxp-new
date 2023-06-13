@@ -47,7 +47,7 @@
 </tr>
 <tr>
 	<td>DATE_INPUT_INDEXED</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::div/div[contains(@class, 'date-picker')]//input[contains(@type, 'text')])[${index}]</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::div[contains(@class,'date-picker')]//input[@type='text'])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -57,12 +57,7 @@
 </tr>
 <tr>
 	<td>BUTTON_LABEL_INDEXED</td>
-	<td>xpath=(//div[./label[normalize-space(text())='${key_fieldLabel}']]//button[normalize-space()='${key_text}'])[${key_index}] | //div[@class='ddm-field'][${key_index}]//label[text()='${key_fieldLabel}']/..//input[@class='form-control bg-light']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SELECTOR_INPUT_BY_CONTENT_NAME</td>
-	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//div[contains(@class,'input-group')]//input[contains(@value,'${key_contentName}')]</td>
+	<td>xpath=(//div[./label[normalize-space(text())='${key_fieldLabel}']]//button[normalize-space()='${key_text}'])[${key_index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -76,28 +71,18 @@
 	<td></td>
 </tr>
 <tr>
-	<td>TOOLBAR_BOLD_BUTTON</td>
-	<td>//a[contains(@class,'cke_button') and contains(@class,'bold')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TOOLBAR_BOLD_BUTTON_ON</td>
-	<td>//a[contains(@class,'cke_button_on') and contains(@class,'bold')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>IMAGE_DESCRIPTION_INDEXED</td>
-	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div[contains(@class,'form-group')]//input[contains(@name,'description')]</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div[contains(@class,'form-group')]//input[contains(@name,'description')])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>IMAGE_INPUT_INDEXED</td>
-	<td>//label[text()='${fieldLabel}']//following-sibling::div//input[contains(@class, 'field') and contains(@type, 'text')]</td>
+	<td>xpath=((//*[name()='label' or name()='legend'][normalize-space(text())='${key_fieldLabel}'])[${index}]/ancestor::div[contains(@class,'form-group')]//input[not(contains(@type,'hidden'))])</td>
 	<td></td>
 </tr>
 <tr>
 	<td>IMAGE_PICKER_PREVIEW_INDEXED</td>
-	<td>//label[text()='${key_fieldLabel}']//following-sibling::div[contains(@class,'image-picker-preview')]//img[contains(@src,'${key_image}')]</td>
+	<td>xpath=((//label[normalize-space(text())='${key_fieldLabel}'])[${index}]//following-sibling::div[contains(@class,'image-picker-preview')]//img[contains(@src,'${key_image}')])</td>
 	<td></td>
 </tr>
 <tr>
@@ -117,17 +102,17 @@
 </tr>
 <tr>
 	<td>SELECT_FROM_LIST_SELECT_OPTION_TRIGGER_INDEXED</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::div/div[contains(@class,'form-builder-select-field')]//div[contains(@class,'select-field-trigger')])[${index}]</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::div[contains(@class,'select-field')]//div[contains(@class,'select-field-trigger')])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SELECT_FROM_LIST_SELECTED_OPTION_INDEXED</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::div/div[contains(@class,'form-builder-select-field')]//div[contains(@class,'option-selected')])[${index}]</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::div[contains(@class,'form-builder-select-field')]//div[contains(@class,'option-selected')])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SEPARATOR_STYLE</td>
-	<td>//hr[contains(@class, 'separator') and contains(@style, '${key_styleValue}')]</td>
+	<td>//div[contains(@class, 'separator') and contains(@style, '${key_styleValue}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -137,17 +122,12 @@
 </tr>
 <tr>
 	<td>TEXT_INPUT_INDEXED</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldLabel}']/..//input[@type='text'])[${index}]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>UPLOAD_FIELD_VALUE</td>
-	<td>//input[contains(@aria-label,'File') and contains(@class,'form-control')][@value='${key_fileName}']</td>
+	<td>xpath=((//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::textarea) | (//label[normalize-space(text())='${key_fieldLabel}']//following-sibling::input[@type='text']))[${index}]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>WEB_CONTENT_DISABLED_FIELD</td>
-	<td>xpath=(//div[contains(@data-field-name, '${key_fieldName}')]//input[@disabled=''] | //legend[text()='${key_fieldName}']/..//input[@disabled=''])</td>
+	<td>xpath=(//div[contains(@data-field-name, '${key_fieldName}')]//input[@disabled=''])</td>
 	<td></td>
 </tr>
 </tbody>

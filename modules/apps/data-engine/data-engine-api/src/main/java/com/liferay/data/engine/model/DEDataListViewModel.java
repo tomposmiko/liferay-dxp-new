@@ -418,8 +418,4 @@ public interface DEDataListViewModel
 	@Override
 	public DEDataListView cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

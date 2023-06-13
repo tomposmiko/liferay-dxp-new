@@ -12,23 +12,17 @@
  * details.
  */
 
-import {openModal, sub} from 'frontend-js-web';
-
-import openDeleteTemplateModal from './modal/openDeleteTemplateModal';
+import {openModal} from 'frontend-js-web';
 
 const ACTIONS = {
-	deleteDDMTemplate({deleteDDMTemplateURL, usagesCount}) {
-		openDeleteTemplateModal({
-			message: sub(
-				Liferay.Language.get(
-					'this-template-is-being-used-in-x-pages.-are-you-sure-you-want-to-delete-this'
-				),
-				usagesCount
-			),
-			onDelete: () => {
-				submitForm(document.hrefFm, deleteDDMTemplateURL);
-			},
-		});
+	deleteDDMTemplate({deleteDDMTemplateURL}) {
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, deleteDDMTemplateURL);
+		}
 	},
 
 	permissionsDDMTemplate({permissionsDDMTemplateURL}) {

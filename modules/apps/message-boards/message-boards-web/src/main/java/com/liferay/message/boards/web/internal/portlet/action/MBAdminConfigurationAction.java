@@ -18,13 +18,13 @@ import com.liferay.message.boards.constants.MBPortletKeys;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.BaseJSPSettingsConfigurationAction;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.NaturalOrderStringComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -42,12 +42,12 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS_ADMIN,
 	service = ConfigurationAction.class
 )
@@ -67,15 +67,7 @@ public class MBAdminConfigurationAction
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	@Override
-	protected void updateMultiValuedKeys(ActionRequest actionRequest) {
-		super.updateMultiValuedKeys(actionRequest);
-
-		_updateThreadPriorities(actionRequest);
-		_updateUserRanks(actionRequest);
-	}
-
-	private boolean _isValidUserRank(String rank) {
+	protected boolean isValidUserRank(String rank) {
 		if ((StringUtil.count(rank, CharPool.EQUAL) != 1) ||
 			rank.startsWith(StringPool.EQUAL) ||
 			rank.endsWith(StringPool.EQUAL)) {
@@ -86,12 +78,21 @@ public class MBAdminConfigurationAction
 		return true;
 	}
 
-	private void _updateThreadPriorities(ActionRequest actionRequest) {
+	@Override
+	protected void updateMultiValuedKeys(ActionRequest actionRequest) {
+		super.updateMultiValuedKeys(actionRequest);
+
+		updateThreadPriorities(actionRequest);
+		updateUserRanks(actionRequest);
+	}
+
+	protected void updateThreadPriorities(ActionRequest actionRequest) {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		for (Locale locale :
-				_language.getAvailableLocales(themeDisplay.getSiteGroupId())) {
+				LanguageUtil.getAvailableLocales(
+					themeDisplay.getSiteGroupId())) {
 
 			String languageId = LocaleUtil.toLanguageId(locale);
 
@@ -118,7 +119,7 @@ public class MBAdminConfigurationAction
 				}
 			}
 
-			String preferenceName = _localization.getLocalizedName(
+			String preferenceName = LocalizationUtil.getLocalizedName(
 				"priorities", languageId);
 
 			setPreference(
@@ -127,12 +128,13 @@ public class MBAdminConfigurationAction
 		}
 	}
 
-	private void _updateUserRanks(ActionRequest actionRequest) {
+	protected void updateUserRanks(ActionRequest actionRequest) {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		for (Locale locale :
-				_language.getAvailableLocales(themeDisplay.getSiteGroupId())) {
+				LanguageUtil.getAvailableLocales(
+					themeDisplay.getSiteGroupId())) {
 
 			String languageId = LocaleUtil.toLanguageId(locale);
 
@@ -143,7 +145,7 @@ public class MBAdminConfigurationAction
 				new NaturalOrderStringComparator());
 
 			for (String rank : ranks) {
-				if (!_isValidUserRank(rank)) {
+				if (!isValidUserRank(rank)) {
 					SessionErrors.add(actionRequest, "userRank");
 
 					return;
@@ -168,17 +170,11 @@ public class MBAdminConfigurationAction
 				ranks[count++] = kvpName + StringPool.EQUAL + kvpValue;
 			}
 
-			String preferenceName = _localization.getLocalizedName(
+			String preferenceName = LocalizationUtil.getLocalizedName(
 				"ranks", languageId);
 
 			setPreference(actionRequest, preferenceName, ranks);
 		}
 	}
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private Localization _localization;
 
 }

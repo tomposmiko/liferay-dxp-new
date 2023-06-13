@@ -115,8 +115,8 @@ public class LDAPUser {
 		return _user.getPortraitId();
 	}
 
-	public long getPrefixListTypeId() {
-		return _contact.getPrefixListTypeId();
+	public long getPrefixId() {
+		return _contact.getPrefixId();
 	}
 
 	public String getReminderQueryAnswer() {
@@ -151,8 +151,8 @@ public class LDAPUser {
 		return _user.getStatus();
 	}
 
-	public long getSuffixListTypeId() {
-		return _contact.getSuffixListTypeId();
+	public long getSuffixId() {
+		return _contact.getSuffixId();
 	}
 
 	public String getTimeZoneId() {
@@ -305,8 +305,8 @@ public class LDAPUser {
 		_portraitBytes = portraitBytes;
 	}
 
-	public void setPrefixListTypeId(long prefixListTypeId) {
-		_contact.setPrefixListTypeId(prefixListTypeId);
+	public void setPrefixId(long prefixId) {
+		_contact.setPrefixId(prefixId);
 	}
 
 	public void setReminderQueryAnswer(String reminderQueryAnswer) {
@@ -345,8 +345,8 @@ public class LDAPUser {
 		_user.setStatus(status);
 	}
 
-	public void setSuffixListTypeId(long suffixListTypeId) {
-		_contact.setSuffixListTypeId(suffixListTypeId);
+	public void setSuffixId(long suffixId) {
+		_contact.setSuffixId(suffixId);
 	}
 
 	public void setTimeZoneId(String timeZoneId) {

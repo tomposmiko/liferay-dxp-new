@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * @author André de Oliveira
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SuggestionsPortletKeys.SUGGESTIONS,
 	service = PortletSharedSearchContributor.class
 )
@@ -41,15 +42,15 @@ public class SuggestionsPortletSharedSearchContributor
 			new SuggestionsPortletPreferencesImpl(
 				portletSharedSearchSettings.getPortletPreferencesOptional());
 
-		_setUpQueryIndexing(
+		setUpQueryIndexing(
 			suggestionsPortletPreferences, portletSharedSearchSettings);
-		_setUpRelatedSuggestions(
+		setUpRelatedSuggestions(
 			suggestionsPortletPreferences, portletSharedSearchSettings);
-		_setUpSpellCheckSuggestion(
+		setUpSpellCheckSuggestion(
 			suggestionsPortletPreferences, portletSharedSearchSettings);
 	}
 
-	private void _setUpQueryIndexing(
+	protected void setUpQueryIndexing(
 		SuggestionsPortletPreferences suggestionsPortletPreferences,
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
@@ -61,7 +62,7 @@ public class SuggestionsPortletSharedSearchContributor
 			suggestionsPortletPreferences.getQueryIndexingThreshold());
 	}
 
-	private void _setUpRelatedSuggestions(
+	protected void setUpRelatedSuggestions(
 		SuggestionsPortletPreferences suggestionsPortletPreferences,
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
@@ -76,7 +77,7 @@ public class SuggestionsPortletSharedSearchContributor
 			suggestionsPortletPreferences.getRelatedQueriesSuggestionsMax());
 	}
 
-	private void _setUpSpellCheckSuggestion(
+	protected void setUpSpellCheckSuggestion(
 		SuggestionsPortletPreferences suggestionsPortletPreferences,
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 

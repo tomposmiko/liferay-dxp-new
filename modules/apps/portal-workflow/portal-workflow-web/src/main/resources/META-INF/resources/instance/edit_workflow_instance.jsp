@@ -38,58 +38,56 @@ renderResponse.setTitle(workflowInstanceEditDisplayContext.getHeaderTitle());
 	<clay:col
 		cssClass="lfr-asset-column lfr-asset-column-details"
 	>
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<aui:fieldset>
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
 
-					<%
-					request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
-					%>
+				<%
+				request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
+				%>
 
-					<liferay-util:include page="/instance/workflow_instance_action.jsp" servletContext="<%= application %>" />
+				<liferay-util:include page="/instance/workflow_instance_action.jsp" servletContext="<%= application %>" />
 
-					<clay:col
-						md="7"
-					>
-						<aui:field-wrapper label="status">
-							<aui:fieldset>
-								<%= workflowInstanceEditDisplayContext.getStatus() %>
-							</aui:fieldset>
-						</aui:field-wrapper>
-					</clay:col>
-
-					<clay:col
-						md="4"
-					>
-						<aui:field-wrapper label="end-date">
-							<aui:fieldset>
-								<%= workflowInstanceEditDisplayContext.getWorkflowInstanceEndDate() %>
-							</aui:fieldset>
-						</aui:field-wrapper>
-					</clay:col>
-				</aui:fieldset>
-
-				<liferay-ui:panel-container
-					cssClass="task-panel-container"
-					extended="<%= false %>"
-					id="preview"
+				<clay:col
+					md="7"
 				>
+					<aui:field-wrapper label="state">
+						<aui:fieldset>
+							<%= workflowInstanceEditDisplayContext.getStatus() %>
+						</aui:fieldset>
+					</aui:field-wrapper>
+				</clay:col>
 
-					<%
-					AssetRenderer<?> assetRenderer = workflowInstanceEditDisplayContext.getAssetRenderer();
+				<clay:col
+					md="4"
+				>
+					<aui:field-wrapper label="end-date">
+						<aui:fieldset>
+							<%= workflowInstanceEditDisplayContext.getWorkflowInstanceEndDate() %>
+						</aui:fieldset>
+					</aui:field-wrapper>
+				</clay:col>
+			</aui:fieldset>
 
-					AssetEntry assetEntry = workflowInstanceEditDisplayContext.getAssetEntry();
+			<liferay-ui:panel-container
+				cssClass="task-panel-container"
+				extended="<%= false %>"
+				id="preview"
+			>
 
-					WorkflowHandler<?> workflowHandler = workflowInstanceEditDisplayContext.getWorkflowHandler();
-					%>
+				<%
+				AssetRenderer<?> assetRenderer = workflowInstanceEditDisplayContext.getAssetRenderer();
 
-					<c:if test="<%= assetRenderer != null %>">
-						<liferay-ui:panel
-							extended="<%= true %>"
-							markupView="lexicon"
-							title="<%= workflowInstanceEditDisplayContext.getPanelTitle() %>"
-						>
-							<div class="task-content-actions">
+				AssetEntry assetEntry = workflowInstanceEditDisplayContext.getAssetEntry();
+				%>
+
+				<c:if test="<%= assetRenderer != null %>">
+					<liferay-ui:panel
+						extended="<%= true %>"
+						markupView="lexicon"
+						title="<%= workflowInstanceEditDisplayContext.getPanelTitle() %>"
+					>
+						<div class="task-content-actions">
+							<liferay-ui:icon-list>
 								<c:if test="<%= assetRenderer.hasViewPermission(permissionChecker) %>">
 									<portlet:renderURL var="viewFullContentURL">
 										<portlet:param name="mvcPath" value="/instance/view_content.jsp" />
@@ -104,129 +102,115 @@ renderResponse.setTitle(workflowInstanceEditDisplayContext.getHeaderTitle());
 										<portlet:param name="showEditURL" value="<%= Boolean.FALSE.toString() %>" />
 									</portlet:renderURL>
 
-									<liferay-ui:icon
-										data='<%= Collections.singletonMap("title", "View") %>'
+									<liferay-frontend:management-bar-button
+										href="<%= assetRenderer.isPreviewInContext() ? assetRenderer.getURLViewInContext(liferayPortletRequest, liferayPortletResponse, null) : viewFullContentURL.toString() %>"
 										icon="view"
-										label="<%= false %>"
-										linkCssClass="btn btn-monospaced btn-outline-secondary"
-										markupView="lexicon"
-										message="view[action]"
-										toolTip="<%= true %>"
-										url="<%= assetRenderer.isPreviewInContext() ? workflowHandler.getURLViewInContext(assetRenderer.getClassPK(), liferayPortletRequest, liferayPortletResponse, null) : viewFullContentURL.toString() %>"
+										label="view[action]"
 									/>
 								</c:if>
-							</div>
+							</liferay-ui:icon-list>
+						</div>
 
-							<h3 class="task-content-title">
-								<liferay-ui:icon
-									icon="<%= workflowInstanceEditDisplayContext.getIconCssClass() %>"
-									label="<%= true %>"
-									markupView="lexicon"
-									message="<%= workflowInstanceEditDisplayContext.getTaskContentTitleMessage() %>"
-								/>
-							</h3>
-
-							<liferay-asset:asset-display
-								assetRenderer="<%= assetRenderer %>"
-								template="<%= AssetRenderer.TEMPLATE_ABSTRACT %>"
-							/>
-
-							<c:if test="<%= assetEntry != null %>">
-								<h4 class="task-content-author">
-									<liferay-ui:message key="author" />
-								</h4>
-
-								<liferay-asset:asset-metadata
-									className="<%= assetEntry.getClassName() %>"
-									classPK="<%= assetEntry.getClassPK() %>"
-									metadataFields='<%= new String[] {"author", "categories", "tags"} %>'
-								/>
-							</c:if>
-						</liferay-ui:panel>
-
-						<c:if test="<%= workflowHandler.isCommentable() %>">
-
-							<%
-							WorkflowInstance workflowInstance = (WorkflowInstance)renderRequest.getAttribute(WebKeys.WORKFLOW_INSTANCE);
-
-							long discussionClassPK = workflowHandler.getDiscussionClassPK(workflowInstance.getWorkflowContext());
-							%>
-
-							<liferay-ui:panel
+						<h3 class="task-content-title">
+							<liferay-ui:icon
+								icon="<%= workflowInstanceEditDisplayContext.getIconCssClass() %>"
+								label="<%= true %>"
 								markupView="lexicon"
-								title="comments"
-							>
-								<liferay-comment:discussion
-									className="<%= assetRenderer.getClassName() %>"
-									classPK="<%= discussionClassPK %>"
-									formName='<%= "fm" + discussionClassPK %>'
-									ratingsEnabled="<%= false %>"
-									redirect="<%= currentURL %>"
-									userId="<%= user.getUserId() %>"
-								/>
-							</liferay-ui:panel>
+								message="<%= workflowInstanceEditDisplayContext.getTaskContentTitleMessage() %>"
+							/>
+						</h3>
+
+						<liferay-asset:asset-display
+							assetRenderer="<%= assetRenderer %>"
+							template="<%= AssetRenderer.TEMPLATE_ABSTRACT %>"
+						/>
+
+						<c:if test="<%= assetEntry != null %>">
+							<h4 class="task-content-author">
+								<liferay-ui:message key="author" />
+							</h4>
+
+							<liferay-asset:asset-metadata
+								className="<%= assetEntry.getClassName() %>"
+								classPK="<%= assetEntry.getClassPK() %>"
+								metadataFields='<%= new String[] {"author", "categories", "tags"} %>'
+							/>
 						</c:if>
-					</c:if>
-
-					<c:if test="<%= !workflowInstanceEditDisplayContext.isWorkflowTasksEmpty() %>">
-						<liferay-ui:panel
-							extended="<%= false %>"
-							markupView="lexicon"
-							title="tasks"
-						>
-							<liferay-ui:search-container
-								emptyResultsMessage="there-are-no-tasks"
-								iteratorURL="<%= renderResponse.createRenderURL() %>"
-							>
-								<liferay-ui:search-container-results
-									results="<%= workflowInstanceEditDisplayContext.getWorkflowTasks() %>"
-								/>
-
-								<liferay-ui:search-container-row
-									className="com.liferay.portal.kernel.workflow.WorkflowTask"
-									modelVar="workflowTask"
-									stringKey="<%= true %>"
-								>
-									<liferay-ui:search-container-row-parameter
-										name="workflowTask"
-										value="<%= workflowTask %>"
-									/>
-
-									<liferay-ui:search-container-column-text
-										name="task"
-									>
-										<span class="task-name" id="<%= workflowTask.getWorkflowTaskId() %>">
-											<liferay-ui:message key="<%= workflowTask.getLabel(locale) %>" />
-										</span>
-									</liferay-ui:search-container-column-text>
-
-									<liferay-ui:search-container-column-text
-										name="due-date"
-										value="<%= workflowInstanceEditDisplayContext.getTaskDueDate(workflowTask) %>"
-									/>
-
-									<liferay-ui:search-container-column-text
-										name="completed"
-										value="<%= workflowInstanceEditDisplayContext.getTaskCompleted(workflowTask) %>"
-									/>
-								</liferay-ui:search-container-row>
-
-								<liferay-ui:search-iterator
-									displayStyle="list"
-									markupView="lexicon"
-								/>
-							</liferay-ui:search-container>
-						</liferay-ui:panel>
-					</c:if>
+					</liferay-ui:panel>
 
 					<liferay-ui:panel
 						markupView="lexicon"
-						title="activities"
+						title="comments"
 					>
-						<%@ include file="/instance/workflow_logs.jspf" %>
+						<liferay-comment:discussion
+							className="<%= assetRenderer.getClassName() %>"
+							classPK="<%= assetRenderer.getClassPK() %>"
+							formName='<%= "fm" + assetRenderer.getClassPK() %>'
+							ratingsEnabled="<%= false %>"
+							redirect="<%= currentURL %>"
+							userId="<%= user.getUserId() %>"
+						/>
 					</liferay-ui:panel>
-				</liferay-ui:panel-container>
-			</div>
-		</div>
+				</c:if>
+
+				<c:if test="<%= !workflowInstanceEditDisplayContext.isWorkflowTasksEmpty() %>">
+					<liferay-ui:panel
+						extended="<%= false %>"
+						markupView="lexicon"
+						title="tasks"
+					>
+						<liferay-ui:search-container
+							emptyResultsMessage="there-are-no-tasks"
+							iteratorURL="<%= renderResponse.createRenderURL() %>"
+						>
+							<liferay-ui:search-container-results
+								results="<%= workflowInstanceEditDisplayContext.getWorkflowTasks() %>"
+							/>
+
+							<liferay-ui:search-container-row
+								className="com.liferay.portal.kernel.workflow.WorkflowTask"
+								modelVar="workflowTask"
+								stringKey="<%= true %>"
+							>
+								<liferay-ui:search-container-row-parameter
+									name="workflowTask"
+									value="<%= workflowTask %>"
+								/>
+
+								<liferay-ui:search-container-column-text
+									name="task"
+								>
+									<span class="task-name" id="<%= workflowTask.getWorkflowTaskId() %>">
+										<liferay-ui:message key="<%= workflowInstanceEditDisplayContext.getTaskName(workflowTask) %>" />
+									</span>
+								</liferay-ui:search-container-column-text>
+
+								<liferay-ui:search-container-column-text
+									name="due-date"
+									value="<%= workflowInstanceEditDisplayContext.getTaskDueDate(workflowTask) %>"
+								/>
+
+								<liferay-ui:search-container-column-text
+									name="completed"
+									value="<%= workflowInstanceEditDisplayContext.getTaskCompleted(workflowTask) %>"
+								/>
+							</liferay-ui:search-container-row>
+
+							<liferay-ui:search-iterator
+								displayStyle="list"
+								markupView="lexicon"
+							/>
+						</liferay-ui:search-container>
+					</liferay-ui:panel>
+				</c:if>
+
+				<liferay-ui:panel
+					markupView="lexicon"
+					title="activities"
+				>
+					<%@ include file="/instance/workflow_logs.jspf" %>
+				</liferay-ui:panel>
+			</liferay-ui:panel-container>
+		</aui:fieldset-group>
 	</clay:col>
 </clay:container-fluid>

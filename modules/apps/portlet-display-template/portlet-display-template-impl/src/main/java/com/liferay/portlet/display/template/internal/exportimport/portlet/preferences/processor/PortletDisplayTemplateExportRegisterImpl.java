@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lance Ji
  */
 @Component(
+	immediate = true,
 	property = {
 		"name=PortletDisplayTemplateExporter",
 		"type=" + PortletDisplayTemplateConstants.DISPLAY_TEMPLATE_EXPORT
@@ -57,7 +58,7 @@ public class PortletDisplayTemplateExportRegisterImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -80,7 +81,7 @@ public class PortletDisplayTemplateExportRegisterImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

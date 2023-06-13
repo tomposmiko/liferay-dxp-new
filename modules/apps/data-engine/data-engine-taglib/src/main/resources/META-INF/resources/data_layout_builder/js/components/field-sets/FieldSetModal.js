@@ -19,7 +19,6 @@ import {
 	ConfigProvider,
 	EVENT_TYPES as CORE_EVENT_TYPES,
 	FormProvider,
-	KeyboardDNDContextProvider,
 	useConfig,
 	useForm,
 	useFormState,
@@ -31,7 +30,6 @@ import {
 	pagesStructureReducer,
 } from 'data-engine-js-components-web/js/core/reducers/index.es';
 import {pageReducer} from 'data-engine-js-components-web/js/custom/form/reducers/index.es';
-import {sub} from 'frontend-js-web';
 import {default as React, useCallback, useState} from 'react';
 
 import {FormBuilder} from '../../FormBuilder';
@@ -101,7 +99,7 @@ const ModalContent = ({
 
 			if (fieldsWithoutOptions.length) {
 				throw new Error(
-					sub(
+					Liferay.Util.sub(
 						Liferay.Language.get(
 							'at-least-one-option-should-be-set-for-field-x'
 						),
@@ -163,7 +161,7 @@ const ModalContent = ({
 	};
 
 	const isFieldSetInvalid = () =>
-		!Object.keys(name).length ||
+		Object.keys(name).length == 0 ||
 		!dataLayout?.dataLayoutPages ||
 		isDataLayoutEmpty(dataLayout.dataLayoutPages);
 
@@ -181,7 +179,6 @@ const ModalContent = ({
 					onEditingLanguageIdChange={changeEditingLanguageId}
 					translatedLanguageIds={name}
 				/>
-
 				<ClayInput.Group className="pl-4 pr-4">
 					<ClayInput.GroupItem>
 						<ClayInput
@@ -227,7 +224,6 @@ const ModalContent = ({
 						>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
-
 						<ClayButton
 							disabled={isFieldSetInvalid()}
 							onClick={onSave}
@@ -361,14 +357,12 @@ const FieldSetModal = ({fieldSet, onClose: onCloseProp}) => {
 						sidebarPanels,
 					}}
 				>
-					<KeyboardDNDContextProvider>
-						<ModalContent
-							fieldSet={fieldSet}
-							onClose={onClose}
-							onUpdate={showPropagationModal}
-							updateFieldSetList={updateFieldSetList}
-						/>
-					</KeyboardDNDContextProvider>
+					<ModalContent
+						fieldSet={fieldSet}
+						onClose={onClose}
+						onUpdate={showPropagationModal}
+						updateFieldSetList={updateFieldSetList}
+					/>
 				</FormProvider>
 			</ConfigProvider>
 		</ClayModal>

@@ -15,23 +15,27 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
+			Workflow.tearDownSiteWorkflow();
+
+			KBFolder.tearDownCP();
+
 			KBArticle.tearDownCP();
 
 			JSONUser.tearDownNonAdminUsers();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	@refactorneeded
 	test ViewUnchangedKBArticleTitleViaLocalizedPage {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -41,9 +45,9 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages",
-			site = ${siteName});
+			site = "${siteName}");
 
-		PagesAdmin.addChildPage(
+		SitePages.addPublicChildPage(
 			childPageName = "Knowledge Base Display Page",
 			parentPageName = "Home");
 
@@ -51,14 +55,16 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.configureChildPage(
+		SitePages.configureChildPage(
 			columnName = "1 Column",
 			pageName = "Knowledge Base Display Page",
 			parentPagesHierarchy = "Home",
+			privacy = "Public Pages",
 			sitePageType = "Widget Page");
 
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title");
 
@@ -70,7 +76,7 @@ definition {
 
 		Portlet.addPG(portletName = "Knowledge Base Display");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title");
 
@@ -80,17 +86,17 @@ definition {
 			sitePageURL = "${portalURL}/es/web/guest/knowledge-base-display-page",
 			translationLanguageLocalizationMessage = "This page is displayed in Spanish (Spain).");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title");
 
-		KBDisplayWidget.editPGViaLocalizedKBDisplay(
+		KBArticle.editPGViaLocalizedKBDisplay(
 			kbArticleContentEdit = "Knowledge Base Article Content Edited",
 			kbArticleTitle = "Knowledge Base Article Title",
 			kbArticleTitleEdit = "Knowledge Base Article Title Edited",
 			localizedSuccessMessage = "Su petición ha terminado con éxito.");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content Edited",
 			kbArticleTitle = "Knowledge Base Article Title Edited");
 	}

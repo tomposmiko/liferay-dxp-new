@@ -60,10 +60,8 @@
 				DLViewFileEntryHistoryDisplayContext dlViewFileEntryHistoryDisplayContext = dlDisplayContextProvider.getDLViewFileEntryHistoryDisplayContext(request, response, fileVersion);
 				%>
 
-				<clay:dropdown-actions
-					aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-					dropdownItems="<%= dlViewFileEntryHistoryDisplayContext.getActionDropdownItems() %>"
-					propsTransformer="document_library/js/DLFileEntryDropdownPropsTransformer"
+				<liferay-ui:menu
+					menu="<%= dlViewFileEntryHistoryDisplayContext.getMenu() %>"
 				/>
 			</clay:content-col>
 		</li>

@@ -14,9 +14,6 @@
 
 package com.liferay.talend.common.oas;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * @author Igor Beslic
  */
@@ -60,15 +57,5 @@ public class OASExtensions {
 
 		return false;
 	}
-
-	public boolean isObjectDefinitionReferenceFieldName(String name) {
-		Matcher matcher = _objectDefinitionReferenceFieldNamePattern.matcher(
-			name);
-
-		return matcher.matches();
-	}
-
-	private static final Pattern _objectDefinitionReferenceFieldNamePattern =
-		Pattern.compile("r_.+_c_.+Id");
 
 }

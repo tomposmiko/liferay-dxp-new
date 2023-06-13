@@ -157,7 +157,7 @@ public interface SiteNavigationMenuLocalService
 			SiteNavigationMenu siteNavigationMenu)
 		throws PortalException;
 
-	public void deleteSiteNavigationMenus(long groupId) throws PortalException;
+	public void deleteSiteNavigationMenus(long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> T dslQuery(DSLQuery dslQuery);

@@ -17,17 +17,19 @@ package com.liferay.portal.search.similar.results.web.internal.portlet.shared.se
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.CriteriaBuilder;
 
+import java.util.Optional;
+
 /**
  * @author André de Oliveira
  */
 public class CriteriaBuilderImpl implements CriteriaBuilder {
 
-	public Criteria build() {
+	public Optional<Criteria> build() {
 		if (Validator.isBlank(_criteriaImpl._uid)) {
-			return null;
+			return Optional.empty();
 		}
 
-		return new CriteriaImpl(_criteriaImpl);
+		return Optional.of(new CriteriaImpl(_criteriaImpl));
 	}
 
 	@Override
@@ -55,8 +57,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 		}
 
 		@Override
-		public String getType() {
-			return _className;
+		public Optional<String> getTypeOptional() {
+			return Optional.ofNullable(_className);
 		}
 
 		@Override

@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
-	property = "path=/document_library/sharepoint/oauth2",
+	immediate = true, property = "path=/document_library/sharepoint/oauth2",
 	service = StrutsAction.class
 )
 public class SharepointOAuth2StrutsAction implements StrutsAction {

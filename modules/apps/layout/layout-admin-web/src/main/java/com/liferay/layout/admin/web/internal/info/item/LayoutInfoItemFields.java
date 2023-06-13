@@ -18,7 +18,6 @@ import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
-import com.liferay.portal.kernel.model.Layout;
 
 /**
  * @author Adolfo Pérez
@@ -29,8 +28,6 @@ public class LayoutInfoItemFields {
 		InfoField.builder(
 		).infoFieldType(
 			TextInfoFieldType.INSTANCE
-		).namespace(
-			Layout.class.getSimpleName()
 		).name(
 			"name"
 		).labelInfoLocalizedValue(

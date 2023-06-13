@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Inácio Nery
  */
-@Component(service = XStreamConfigurator.class)
+@Component(immediate = true, service = XStreamConfigurator.class)
 public class ReportsEngineConsoleXStreamConfigurator
 	implements XStreamConfigurator {
 
@@ -41,7 +41,7 @@ public class ReportsEngineConsoleXStreamConfigurator
 
 	@Override
 	public List<XStreamAlias> getXStreamAliases() {
-		return ListUtil.fromArray(_xStreamAliases);
+		return ListUtil.toList(_xStreamAliases);
 	}
 
 	@Override

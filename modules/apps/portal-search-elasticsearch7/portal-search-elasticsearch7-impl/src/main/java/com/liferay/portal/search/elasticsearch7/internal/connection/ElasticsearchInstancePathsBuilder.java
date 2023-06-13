@@ -16,6 +16,8 @@ package com.liferay.portal.search.elasticsearch7.internal.connection;
 
 import java.nio.file.Path;
 
+import java.util.Optional;
+
 /**
  * @author André de Oliveira
  */
@@ -46,11 +48,13 @@ public class ElasticsearchInstancePathsBuilder {
 	}
 
 	protected Path toAbsolutePath(Path path) {
-		if (path == null) {
-			return null;
-		}
-
-		return path.toAbsolutePath();
+		return Optional.ofNullable(
+			path
+		).map(
+			Path::toAbsolutePath
+		).orElse(
+			null
+		);
 	}
 
 	private Path _dataPath;

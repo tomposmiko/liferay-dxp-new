@@ -15,14 +15,14 @@
 AUI.add(
 	'liferay-staging-version',
 	(A) => {
-		const StagingBar = Liferay.StagingBar;
+		var StagingBar = Liferay.StagingBar;
 
-		const MAP_CMD_REVISION = {
+		var MAP_CMD_REVISION = {
 			redo: 'redo_layout_revision',
 			undo: 'undo_layout_revision',
 		};
 
-		const MAP_TEXT_REVISION = {
+		var MAP_TEXT_REVISION = {
 			redo: Liferay.Language.get(
 				'are-you-sure-you-want-to-redo-your-last-changes'
 			),
@@ -33,7 +33,7 @@ AUI.add(
 
 		A.mix(StagingBar, {
 			_cleanup() {
-				const instance = this;
+				var instance = this;
 
 				if (instance._eventHandles) {
 					A.Array.invoke(instance._eventHandles, 'detach');
@@ -41,13 +41,13 @@ AUI.add(
 			},
 
 			_onInit() {
-				const instance = this;
+				var instance = this;
 
 				instance._cleanup();
 
-				const namespace = instance._namespace;
+				var namespace = instance._namespace;
 
-				const eventHandles = [
+				var eventHandles = [
 					Liferay.on(
 						namespace + 'redo',
 						instance._onRevisionChange,
@@ -72,10 +72,10 @@ AUI.add(
 					),
 				];
 
-				const layoutRevisionDetails = A.one(
+				var layoutRevisionDetails = A.one(
 					'#' + namespace + 'layoutRevisionDetails'
 				);
-				const layoutRevisionStatus = A.one(
+				var layoutRevisionStatus = A.one(
 					'#' + namespace + 'layoutRevisionStatus'
 				);
 
@@ -133,34 +133,29 @@ AUI.add(
 			},
 
 			_onRevisionChange(event, type) {
-				const instance = this;
+				var instance = this;
 
-				const cmd = MAP_CMD_REVISION[type];
-				const confirmText = MAP_TEXT_REVISION[type];
+				var cmd = MAP_CMD_REVISION[type];
+				var confirmText = MAP_TEXT_REVISION[type];
 
-				Liferay.Util.openConfirmModal({
-					message: confirmText,
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							instance._updateRevision(
-								cmd,
-								event.layoutRevisionId,
-								event.layoutSetBranchId
-							);
-						}
-					},
-				});
+				if (confirm(confirmText)) {
+					instance._updateRevision(
+						cmd,
+						event.layoutRevisionId,
+						event.layoutSetBranchId
+					);
+				}
 			},
 
 			_onSubmit(event) {
-				const instance = this;
+				var instance = this;
 
-				const namespace = instance._namespace;
+				var namespace = instance._namespace;
 
-				const layoutRevisionDetails = A.one(
+				var layoutRevisionDetails = A.one(
 					'#' + namespace + 'layoutRevisionDetails'
 				);
-				const layoutRevisionInfo = layoutRevisionDetails.one(
+				var layoutRevisionInfo = layoutRevisionDetails.one(
 					'.layout-revision-info'
 				);
 
@@ -168,7 +163,7 @@ AUI.add(
 					layoutRevisionInfo.addClass('loading');
 				}
 
-				const submitLink = A.one('#' + namespace + 'submitLink');
+				var submitLink = A.one('#' + namespace + 'submitLink');
 
 				if (submitLink) {
 					submitLink.html(Liferay.Language.get('loading') + '...');
@@ -210,8 +205,9 @@ AUI.add(
 			},
 
 			_updateRevision(cmd, layoutRevisionId, layoutSetBranchId) {
-				const updateLayoutData = {
+				var updateLayoutData = {
 					cmd,
+					doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
 					layoutRevisionId,
 					layoutSetBranchId,
 					p_auth: Liferay.authToken,
@@ -243,7 +239,7 @@ AUI.add(
 			},
 
 			destructor() {
-				const instance = this;
+				var instance = this;
 
 				instance._cleanup();
 			},

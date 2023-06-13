@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Tomas Polesovsky
  */
 @Component(
+	immediate = true,
 	property = "resource.name=" + OAuth2ProviderConstants.RESOURCE_NAME,
 	service = PortletResourcePermission.class
 )

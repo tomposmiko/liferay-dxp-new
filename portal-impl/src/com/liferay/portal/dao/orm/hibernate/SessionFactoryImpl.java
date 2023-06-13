@@ -33,12 +33,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.SessionBuilder;
-import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
-import org.hibernate.engine.jdbc.spi.JdbcServices;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.resource.jdbc.spi.LogicalConnectionImplementor;
-import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
+import org.hibernate.engine.SessionFactoryImplementor;
 
 /**
  * @author Brian Wing Shun Chan
@@ -67,10 +62,7 @@ public class SessionFactoryImpl implements SessionFactory {
 
 	@Override
 	public Dialect getDialect() throws ORMException {
-		JdbcServices jdbcServices =
-			_sessionFactoryImplementor.getJdbcServices();
-
-		return new DialectImpl(jdbcServices.getDialect());
+		return new DialectImpl(_sessionFactoryImplementor.getDialect());
 	}
 
 	public SessionFactoryImplementor getSessionFactoryImplementor() {
@@ -79,13 +71,7 @@ public class SessionFactoryImpl implements SessionFactory {
 
 	@Override
 	public Session openNewSession(Connection connection) throws ORMException {
-		SessionBuilder sessionBuilder =
-			_sessionFactoryImplementor.withOptions();
-
-		return wrapSession(
-			sessionBuilder.connection(
-				connection
-			).openSession());
+		return wrapSession(_sessionFactoryImplementor.openSession(connection));
 	}
 
 	@Override
@@ -100,20 +86,12 @@ public class SessionFactoryImpl implements SessionFactory {
 		}
 
 		if (_log.isDebugEnabled()) {
-			org.hibernate.internal.SessionImpl sessionImpl =
-				(org.hibernate.internal.SessionImpl)session;
-
-			JdbcCoordinator jdbcCoordinator = sessionImpl.getJdbcCoordinator();
-
-			LogicalConnectionImplementor logicalConnectionImplementor =
-				jdbcCoordinator.getLogicalConnection();
-
-			PhysicalConnectionHandlingMode physicalConnectionHandlingMode =
-				logicalConnectionImplementor.getConnectionHandlingMode();
+			org.hibernate.impl.SessionImpl sessionImpl =
+				(org.hibernate.impl.SessionImpl)session;
 
 			_log.debug(
 				"Session is using connection release mode " +
-					physicalConnectionHandlingMode.getReleaseMode());
+					sessionImpl.getConnectionReleaseMode());
 		}
 
 		return wrapSession(session);
@@ -174,8 +152,8 @@ public class SessionFactoryImpl implements SessionFactory {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SessionFactoryImpl.class);
 
-	private final ServiceTrackerList<SessionCustomizer> _sessionCustomizers =
-		ServiceTrackerListFactory.open(
+	private final ServiceTrackerList<SessionCustomizer, SessionCustomizer>
+		_sessionCustomizers = ServiceTrackerListFactory.open(
 			SystemBundleUtil.getBundleContext(), SessionCustomizer.class);
 	private ClassLoader _sessionFactoryClassLoader;
 	private SessionFactoryImplementor _sessionFactoryImplementor;

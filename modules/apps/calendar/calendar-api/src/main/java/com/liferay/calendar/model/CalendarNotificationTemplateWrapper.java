@@ -590,11 +590,6 @@ public class CalendarNotificationTemplateWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<CalendarNotificationTemplate, Object>>
 		getAttributeGetterFunctions() {
 

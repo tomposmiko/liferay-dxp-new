@@ -220,8 +220,4 @@ public interface AkismetEntryModel
 	@Override
 	public AkismetEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

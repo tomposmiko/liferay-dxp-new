@@ -21,6 +21,10 @@ import com.liferay.portal.kernel.audit.AuditMessage;
 import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.messaging.proxy.ProxyMessageListener;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.audit.AuditMessageProcessor;
@@ -35,8 +39,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -51,7 +58,8 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.portal.security.audit.configuration.AuditConfiguration",
-	service = AuditRouter.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = DefaultAuditRouter.class
 )
 public class DefaultAuditRouter implements AuditRouter {
 
@@ -102,6 +110,38 @@ public class DefaultAuditRouter implements AuditRouter {
 		BundleContext bundleContext, Map<String, Object> properties) {
 
 		modified(properties);
+
+		ProxyMessageListener proxyMessageListener = new ProxyMessageListener();
+
+		proxyMessageListener.setManager(this);
+		proxyMessageListener.setMessageBus(_messageBus);
+
+		_serviceRegistration = bundleContext.registerService(
+			ProxyMessageListener.class, proxyMessageListener,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", DestinationNames.AUDIT
+			).build());
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
+		}
+	}
+
+	protected String[] getEventTypes(
+		AuditMessageProcessor auditMessageProcessor,
+		Map<String, Object> properties) {
+
+		String eventTypes = (String)properties.get(AuditConstants.EVENT_TYPES);
+
+		if (Validator.isNull(eventTypes)) {
+			throw new IllegalArgumentException(
+				"The property \"" + AuditConstants.EVENT_TYPES + "\" is null");
+		}
+
+		return StringUtil.split(eventTypes);
 	}
 
 	@Modified
@@ -122,7 +162,7 @@ public class DefaultAuditRouter implements AuditRouter {
 		AuditMessageProcessor auditMessageProcessor,
 		Map<String, Object> properties) {
 
-		String[] eventTypes = _getEventTypes(properties);
+		String[] eventTypes = getEventTypes(auditMessageProcessor, properties);
 
 		if ((eventTypes.length == 1) && eventTypes[0].equals(StringPool.STAR)) {
 			_globalAuditMessageProcessors.add(auditMessageProcessor);
@@ -149,7 +189,7 @@ public class DefaultAuditRouter implements AuditRouter {
 		AuditMessageProcessor auditMessageProcessor,
 		Map<String, Object> properties) {
 
-		String[] eventTypes = _getEventTypes(properties);
+		String[] eventTypes = getEventTypes(auditMessageProcessor, properties);
 
 		if ((eventTypes.length == 1) && eventTypes[0].equals(StringPool.STAR)) {
 			_globalAuditMessageProcessors.remove(auditMessageProcessor);
@@ -169,17 +209,6 @@ public class DefaultAuditRouter implements AuditRouter {
 		}
 	}
 
-	private String[] _getEventTypes(Map<String, Object> properties) {
-		String eventTypes = (String)properties.get(AuditConstants.EVENT_TYPES);
-
-		if (Validator.isNull(eventTypes)) {
-			throw new IllegalArgumentException(
-				"The property \"" + AuditConstants.EVENT_TYPES + "\" is null");
-		}
-
-		return StringUtil.split(eventTypes);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		DefaultAuditRouter.class);
 
@@ -188,5 +217,10 @@ public class DefaultAuditRouter implements AuditRouter {
 		_auditMessageProcessors = new ConcurrentHashMap<>();
 	private final List<AuditMessageProcessor> _globalAuditMessageProcessors =
 		new CopyOnWriteArrayList<>();
+
+	@Reference
+	private MessageBus _messageBus;
+
+	private ServiceRegistration<ProxyMessageListener> _serviceRegistration;
 
 }

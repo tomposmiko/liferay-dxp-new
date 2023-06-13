@@ -22,6 +22,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = "configurationPid=com.liferay.users.admin.configuration.UserFileUploadsConfiguration",
 	service = ConfigurationDDMFormDeclaration.class
 )

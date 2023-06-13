@@ -43,8 +43,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -290,25 +288,6 @@ public abstract class BatchEngineExportTaskLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
-	@Override
-	public BatchEngineExportTask
-		fetchBatchEngineExportTaskByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return batchEngineExportTaskPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
-	}
-
-	@Override
-	public BatchEngineExportTask
-			getBatchEngineExportTaskByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return batchEngineExportTaskPersistence.findByERC_C(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the batch engine export task with the primary key.
 	 *
@@ -458,11 +437,6 @@ public abstract class BatchEngineExportTaskLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement BatchEngineExportTaskLocalServiceImpl#deleteBatchEngineExportTask(BatchEngineExportTask) to avoid orphaned data");
-		}
 
 		return batchEngineExportTaskLocalService.deleteBatchEngineExportTask(
 			(BatchEngineExportTask)persistedModel);
@@ -697,9 +671,6 @@ public abstract class BatchEngineExportTaskLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BatchEngineExportTaskLocalServiceBaseImpl.class);
 
 	@Reference
 	protected File _file;

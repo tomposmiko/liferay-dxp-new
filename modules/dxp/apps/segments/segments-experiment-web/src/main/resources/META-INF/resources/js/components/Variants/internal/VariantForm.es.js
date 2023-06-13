@@ -14,7 +14,7 @@ import ClayButton from '@clayui/button';
 import ClayModal from '@clayui/modal';
 import React, {useEffect, useRef, useState} from 'react';
 
-import LoadingButton from '../../LoadingButton/LoadingButton.es';
+import BusyButton from '../../BusyButton/BusyButton.es';
 import ValidatedInput from '../../ValidatedInput/ValidatedInput.es';
 
 export default function VariantForm({
@@ -28,64 +28,42 @@ export default function VariantForm({
 	const [inputName, setInputName] = useState(name);
 	const [error, setError] = useState(false);
 	const [invalidForm, setInvalidForm] = useState(false);
-	const [loading, setLoading] = useState(false);
-	const mountedRef = useRef();
-
-	const onSubmit = (event) => {
-		event.preventDefault();
-
-		if (!invalidForm) {
-			setLoading(true);
-
-			onSave({name: inputName, variantId})
-				.then(() => {
-					if (mountedRef.current) {
-						setLoading(false);
-						onClose();
-					}
-				})
-				.catch(() => {
-					if (mountedRef.current) {
-						setLoading(false);
-						setError(true);
-					}
-				});
-		}
-	};
+	const [busy, setBusy] = useState(false);
+	const mounted = useRef();
 
 	useEffect(() => {
-		mountedRef.current = true;
+		mounted.current = true;
 
 		return () => {
-			mountedRef.current = false;
+			mounted.current = false;
 		};
 	});
 
 	return (
-		<form onSubmit={onSubmit}>
+		<>
 			<ClayModal.Header>{title}</ClayModal.Header>
-
 			<ClayModal.Body>
-				{error && errorMessage && (
-					<ClayAlert
-						displayType="danger"
-						title={Liferay.Language.get('error')}
-					>
-						{errorMessage}
-					</ClayAlert>
-				)}
-
-				<ValidatedInput
-					autofocus
-					errorMessage={Liferay.Language.get(
-						'variant-name-is-required'
+				<form onSubmit={_handleSave}>
+					{error && errorMessage && (
+						<ClayAlert
+							displayType="danger"
+							title={Liferay.Language.get('error')}
+						>
+							{errorMessage}
+						</ClayAlert>
 					)}
-					label={Liferay.Language.get('name')}
-					onChange={(event) => setInputName(event.target.value)}
-					onValidationChange={setInvalidForm}
-					required
-					value={inputName}
-				/>
+
+					<ValidatedInput
+						autofocus
+						errorMessage={Liferay.Language.get(
+							'variant-name-is-required'
+						)}
+						label={Liferay.Language.get('name')}
+						onChange={(event) => setInputName(event.target.value)}
+						onValidationChange={setInvalidForm}
+						value={inputName}
+					/>
+				</form>
 			</ClayModal.Body>
 
 			<ClayModal.Footer
@@ -94,19 +72,38 @@ export default function VariantForm({
 						<ClayButton displayType="secondary" onClick={onClose}>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
-
-						<LoadingButton
-							disabled={loading || invalidForm}
+						<BusyButton
+							busy={busy}
+							disabled={busy || invalidForm}
 							displayType="primary"
-							loading={loading}
-							onClick={onSubmit}
-							type="submit"
+							onClick={_handleSave}
 						>
 							{Liferay.Language.get('save')}
-						</LoadingButton>
+						</BusyButton>
 					</ClayButton.Group>
 				}
 			/>
-		</form>
+		</>
 	);
+
+	function _handleSave(event) {
+		event.preventDefault();
+
+		if (!invalidForm) {
+			setBusy(true);
+			onSave({name: inputName, variantId})
+				.then(() => {
+					if (mounted.current) {
+						setBusy(false);
+						onClose();
+					}
+				})
+				.catch(() => {
+					if (mounted.current) {
+						setBusy(false);
+						setError(true);
+					}
+				});
+		}
+	}
 }

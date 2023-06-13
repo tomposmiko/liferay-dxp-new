@@ -30,10 +30,6 @@ public class LayoutClassedModelUsageLocalServiceWrapper
 	implements LayoutClassedModelUsageLocalService,
 			   ServiceWrapper<LayoutClassedModelUsageLocalService> {
 
-	public LayoutClassedModelUsageLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutClassedModelUsageLocalServiceWrapper(
 		LayoutClassedModelUsageLocalService
 			layoutClassedModelUsageLocalService) {
@@ -417,14 +413,6 @@ public class LayoutClassedModelUsageLocalServiceWrapper
 
 		return _layoutClassedModelUsageLocalService.getLayoutClassedModelUsages(
 			classNameId, classPK, start, end, orderByComparator);
-	}
-
-	@Override
-	public java.util.List<LayoutClassedModelUsage> getLayoutClassedModelUsages(
-		long companyId, long classNameId, long containerType) {
-
-		return _layoutClassedModelUsageLocalService.getLayoutClassedModelUsages(
-			companyId, classNameId, containerType);
 	}
 
 	@Override

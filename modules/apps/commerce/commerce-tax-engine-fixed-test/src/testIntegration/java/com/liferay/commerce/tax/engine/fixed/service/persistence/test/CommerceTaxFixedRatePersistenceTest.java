@@ -129,8 +129,6 @@ public class CommerceTaxFixedRatePersistenceTest {
 
 		CommerceTaxFixedRate newCommerceTaxFixedRate = _persistence.create(pk);
 
-		newCommerceTaxFixedRate.setMvccVersion(RandomTestUtil.nextLong());
-
 		newCommerceTaxFixedRate.setGroupId(RandomTestUtil.nextLong());
 
 		newCommerceTaxFixedRate.setCompanyId(RandomTestUtil.nextLong());
@@ -157,9 +155,6 @@ public class CommerceTaxFixedRatePersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommerceTaxFixedRate.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceTaxFixedRate.getMvccVersion(),
-			newCommerceTaxFixedRate.getMvccVersion());
 		Assert.assertEquals(
 			existingCommerceTaxFixedRate.getCommerceTaxFixedRateId(),
 			newCommerceTaxFixedRate.getCommerceTaxFixedRateId());
@@ -244,10 +239,9 @@ public class CommerceTaxFixedRatePersistenceTest {
 
 	protected OrderByComparator<CommerceTaxFixedRate> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceTaxFixedRate", "mvccVersion", true,
-			"commerceTaxFixedRateId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "CPTaxCategoryId", true,
+			"CommerceTaxFixedRate", "commerceTaxFixedRateId", true, "groupId",
+			true, "companyId", true, "userId", true, "userName", true,
+			"createDate", true, "modifiedDate", true, "CPTaxCategoryId", true,
 			"commerceTaxMethodId", true, "rate", true);
 	}
 
@@ -558,8 +552,6 @@ public class CommerceTaxFixedRatePersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceTaxFixedRate commerceTaxFixedRate = _persistence.create(pk);
-
-		commerceTaxFixedRate.setMvccVersion(RandomTestUtil.nextLong());
 
 		commerceTaxFixedRate.setGroupId(RandomTestUtil.nextLong());
 

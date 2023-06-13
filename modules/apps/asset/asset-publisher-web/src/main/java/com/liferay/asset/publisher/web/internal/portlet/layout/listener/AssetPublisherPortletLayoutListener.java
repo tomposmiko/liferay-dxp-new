@@ -20,10 +20,8 @@ import com.liferay.asset.list.model.AssetListEntryUsage;
 import com.liferay.asset.list.service.AssetListEntryUsageLocalService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
-import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherSelectionStyleConfigurationUtil;
 import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.asset.publisher.web.internal.helper.AssetPublisherWebHelper;
-import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
@@ -34,10 +32,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletLayoutListenerException;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -45,13 +44,14 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.util.List;
 import java.util.Objects;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -66,6 +66,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Zsolt Berentey
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + AssetPublisherPortletKeys.ASSET_PUBLISHER,
 	service = PortletLayoutListener.class
 )
@@ -94,6 +95,19 @@ public class AssetPublisherPortletLayoutListener
 					layout.getGroupId(), layout.getUuid());
 			}
 
+			long ownerId = PortletKeys.PREFS_OWNER_ID_DEFAULT;
+			int ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
+
+			if (PortletIdCodec.hasUserId(portletId)) {
+				ownerType = PortletKeys.PREFS_OWNER_TYPE_USER;
+				ownerId = PortletIdCodec.decodeUserId(portletId);
+			}
+
+			_subscriptionLocalService.deleteSubscriptions(
+				layout.getCompanyId(), PortletPreferences.class.getName(),
+				_assetPublisherWebHelper.getSubscriptionClassPK(
+					ownerId, ownerType, plid, portletId));
+
 			_deleteLayoutClassedModelUsages(layout, portletId);
 
 			_deleteAssetListEntryUsage(plid, portletId);
@@ -111,14 +125,13 @@ public class AssetPublisherPortletLayoutListener
 			return;
 		}
 
-		PortletPreferences portletPreferences =
+		javax.portlet.PortletPreferences portletPreferences =
 			PortletPreferencesFactoryUtil.getLayoutPortletSetup(
 				layout, portletId);
 
 		String selectionStyle = portletPreferences.getValue(
 			"selectionStyle",
-			AssetPublisherSelectionStyleConfigurationUtil.
-				defaultSelectionStyle());
+			AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC);
 
 		long assetListEntryId = GetterUtil.getLong(
 			portletPreferences.getValue("assetListEntryId", null));
@@ -222,7 +235,8 @@ public class AssetPublisherPortletLayoutListener
 	}
 
 	private void _addLayoutClassedModelUsages(
-			long plid, String portletId, PortletPreferences portletPreferences)
+			long plid, String portletId,
+			javax.portlet.PortletPreferences portletPreferences)
 		throws PortletLayoutListenerException {
 
 		try {
@@ -244,18 +258,8 @@ public class AssetPublisherPortletLayoutListener
 					themeDisplay.getPermissionChecker(), groupIds, false, true);
 
 			for (AssetEntry assetEntry : assetEntries) {
-				long classNameId = assetEntry.getClassNameId();
-
-				if (Objects.equals(
-						assetEntry.getClassName(),
-						DLFileEntry.class.getName())) {
-
-					classNameId = _portal.getClassNameId(
-						FileEntry.class.getName());
-				}
-
 				_layoutClassedModelUsageLocalService.addLayoutClassedModelUsage(
-					themeDisplay.getScopeGroupId(), classNameId,
+					themeDisplay.getScopeGroupId(), assetEntry.getClassNameId(),
 					assetEntry.getClassPK(), portletId,
 					_portal.getClassNameId(Portlet.class), plid,
 					serviceContext);
@@ -302,5 +306,8 @@ public class AssetPublisherPortletLayoutListener
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private SubscriptionLocalService _subscriptionLocalService;
 
 }

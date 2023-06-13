@@ -63,9 +63,10 @@ public class SearchContainerColumnTextTag<R>
 					_value = bodyContent.getString();
 				}
 				else {
-					_value = String.valueOf(
-						BeanPropertiesUtil.getObject(
-							resultRow.getObject(), getName()));
+					Object object = BeanPropertiesUtil.getObject(
+						resultRow.getObject(), getName());
+
+					_value = String.valueOf(object);
 				}
 			}
 
@@ -81,7 +82,7 @@ public class SearchContainerColumnTextTag<R>
 				index = searchEntries.size();
 			}
 
-			if (resultRow.isRestricted() || Validator.isBlank(_value)) {
+			if (resultRow.isRestricted()) {
 				_href = null;
 			}
 

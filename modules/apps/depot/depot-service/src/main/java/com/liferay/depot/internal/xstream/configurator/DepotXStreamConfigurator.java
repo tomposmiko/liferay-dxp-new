@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = XStreamConfigurator.class)
+@Component(immediate = true, service = XStreamConfigurator.class)
 public class DepotXStreamConfigurator implements XStreamConfigurator {
 
 	@Override

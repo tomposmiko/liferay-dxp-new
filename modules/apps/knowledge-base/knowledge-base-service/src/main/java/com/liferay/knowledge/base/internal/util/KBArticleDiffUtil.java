@@ -14,12 +14,12 @@
 
 package com.liferay.knowledge.base.internal.util;
 
-import com.liferay.diff.DiffHtml;
 import com.liferay.knowledge.base.constants.KBArticleConstants;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
+import com.liferay.portal.kernel.diff.DiffHtmlUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -40,8 +40,7 @@ public class KBArticleDiffUtil {
 	public static String getKBArticleDiff(
 			UnsafeFunction<Integer, KBArticle, Exception>
 				versionToKBArticleUnsafeFunction,
-			int sourceVersion, int targetVersion, String param,
-			DiffHtml diffHtml)
+			int sourceVersion, int targetVersion, String param)
 		throws Exception {
 
 		if (sourceVersion < KBArticleConstants.DEFAULT_VERSION) {
@@ -65,7 +64,7 @@ public class KBArticleDiffUtil {
 		String targetHtml = BeanPropertiesUtil.getString(
 			targetKBArticle, param);
 
-		String diff = diffHtml.diff(
+		String diff = DiffHtmlUtil.diff(
 			new UnsyncStringReader(sourceHtml),
 			new UnsyncStringReader(targetHtml));
 

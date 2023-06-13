@@ -41,7 +41,7 @@ public class DDMStructureVersionImpl extends DDMStructureVersionBaseImpl {
 						getStructureVersionDDMForm(this);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				return new DDMForm();
 			}

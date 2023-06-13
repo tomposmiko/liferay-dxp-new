@@ -15,10 +15,9 @@
 package com.liferay.portal.tools;
 
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
-import com.liferay.document.library.kernel.store.Store;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
-import com.liferay.portal.db.index.IndexUpdaterUtil;
 import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
@@ -27,29 +26,28 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.module.util.ServiceLatch;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.version.Version;
+import com.liferay.portal.module.framework.ModuleFrameworkUtil;
 import com.liferay.portal.transaction.TransactionsUtil;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
-import com.liferay.portal.upgrade.log.UpgradeLogContext;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalClassPathUtil;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.verify.VerifyProcessSuite;
+import com.liferay.portal.verify.VerifyException;
+import com.liferay.portal.verify.VerifyGroup;
 import com.liferay.portal.verify.VerifyProperties;
+import com.liferay.portal.verify.VerifyResourcePermissions;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.sql.Connection;
@@ -57,13 +55,13 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import java.util.Collection;
-
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.logging.log4j.core.Appender;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Michael C. Han
@@ -74,16 +72,6 @@ public class DBUpgrader {
 	public static void checkReleaseState() throws Exception {
 		if (_getReleaseColumnValue("state_") == ReleaseConstants.STATE_GOOD) {
 			return;
-		}
-
-		if (StartupHelperUtil.isUpgrading()) {
-			try (Connection connection = DataAccess.getConnection()) {
-				if (PortalUpgradeProcess.supportsRetry(connection)) {
-					System.out.println("Retrying upgrade");
-
-					return;
-				}
-			}
 		}
 
 		throw new IllegalStateException(
@@ -119,209 +107,81 @@ public class DBUpgrader {
 		}
 	}
 
-	public static long getUpgradeTime() {
-		if (_stopWatch == null) {
-			return 0;
-		}
-
-		return _stopWatch.getTime();
-	}
-
-	public static boolean isUpgradeClient() {
-		return _upgradeClient;
-	}
-
 	public static void main(String[] args) {
-		String result = "Completed";
-
-		_upgradeClient = true;
-
 		try {
-			_initUpgradeStopwatch();
+			StopWatch stopWatch = new StopWatch();
+
+			stopWatch.start();
 
 			PortalClassPathUtil.initializeClassPaths(null);
 
-			InitUtil.initWithSpring(
-				ListUtil.fromArray(
-					PropsUtil.getArray(PropsKeys.SPRING_CONFIGS)),
-				true, false, () -> StartupHelperUtil.setUpgrading(true));
+			InitUtil.initWithSpring(true, false);
 
 			StartupHelperUtil.printPatchLevel();
 
-			upgradePortal();
+			try (SafeCloseable safeCloseable =
+					ProxyModeThreadLocal.setWithSafeCloseable(false)) {
 
-			InitUtil.registerContext();
+				if (PropsValues.UPGRADE_REPORT_ENABLED) {
+					_startUpgradeReportLogAppender();
+				}
 
-			upgradeModules();
-
-			BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-			Collection<?> collection = bundleContext.getServiceReferences(
-				Store.class, "(default=true)");
-
-			if (collection.isEmpty()) {
-				throw new IllegalStateException("Missing default Store");
+				upgrade();
 			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
 
-			result = "Failed";
-		}
-		finally {
-			StartupHelperUtil.setUpgrading(false);
+			_registerModuleServiceLifecycle("portlets.initialized");
 
 			System.out.println(
-				StringBundler.concat(
-					"\n", result, " Liferay upgrade process in ",
-					_stopWatch.getTime() / Time.SECOND, " seconds"));
+				"\nCompleted Liferay core upgrade process in " +
+					(stopWatch.getTime() / Time.SECOND) + " seconds");
+		}
+		catch (Exception exception) {
+			exception.printStackTrace();
+
+			System.exit(1);
+		}
+		finally {
+			if (PropsValues.UPGRADE_REPORT_ENABLED) {
+				_stopUpgradeReportLogAppender();
+			}
 		}
 
 		System.out.println("Exiting DBUpgrader#main(String[]).");
 	}
 
-	public static void startUpgradeLogAppender() {
-		if (_stopWatch == null) {
-			_initUpgradeStopwatch();
-		}
-
-		ServiceLatch serviceLatch = SystemBundleUtil.newServiceLatch();
-
-		serviceLatch.<Appender>waitFor(
-			StringBundler.concat(
-				"(&(appender.name=UpgradeLogAppender)(objectClass=",
-				Appender.class.getName(), "))"),
-			appender -> {
-				_appender = appender;
-
-				_appender.start();
-			});
-		serviceLatch.openOn(
-			() -> {
-			});
+	public static void upgrade() throws Exception {
+		upgrade(null);
 	}
 
-	public static void stopUpgradeLogAppender() {
-		if (_appender != null) {
-			_stopWatch.stop();
+	public static void upgrade(ApplicationContext applicationContext)
+		throws Exception {
 
-			_appender.stop();
-		}
+		StartupHelperUtil.setUpgrading(true);
 
-		if (_appenderServiceReference != null) {
-			BundleContext bundleContext = SystemBundleUtil.getBundleContext();
+		_upgradePortal();
 
-			bundleContext.ungetService(_appenderServiceReference);
+		DLFileEntryTypeLocalServiceUtil.getBasicDocumentDLFileEntryType();
+
+		_upgradeModules(applicationContext);
+
+		if (applicationContext == null) {
+			DependencyManagerSyncUtil.sync();
 		}
 	}
 
-	public static void upgradeModules() {
-		_registerModuleServiceLifecycle("portal.initialized");
+	public static void verify() throws VerifyException {
+		VerifyProperties verifyProperties = new VerifyProperties();
 
-		DependencyManagerSyncUtil.sync();
+		verifyProperties.verify();
 
-		PortalCacheHelperUtil.clearPortalCaches(
-			PortalCacheManagerNames.MULTI_VM);
+		VerifyGroup verifyGroup = new VerifyGroup();
 
-		_registerModuleServiceLifecycle("portlets.initialized");
-	}
+		verifyGroup.verify();
 
-	public static void upgradePortal() throws Exception {
-		try {
-			UpgradeLogContext.setContext(
-				ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME);
+		VerifyResourcePermissions verifyResourcePermissions =
+			new VerifyResourcePermissions();
 
-			VerifyProperties.verify();
-
-			if (FeatureFlagManagerUtil.isEnabled("LPS-157670")) {
-				checkRequiredBuildNumber(
-					ReleaseInfo.RELEASE_6_1_0_BUILD_NUMBER);
-			}
-			else {
-				checkRequiredBuildNumber(
-					ReleaseInfo.RELEASE_6_2_0_BUILD_NUMBER);
-			}
-
-			checkReleaseState();
-
-			int buildNumber = _getReleaseColumnValue("buildNumber");
-
-			try (Connection connection = DataAccess.getConnection()) {
-				if (PortalUpgradeProcess.isInLatestSchemaVersion(connection) &&
-					(buildNumber == ReleaseInfo.getParentBuildNumber())) {
-
-					_checkClassNamesAndResourceActions();
-
-					return;
-				}
-			}
-
-			if (_log.isDebugEnabled()) {
-				_log.debug("Disable cache registry");
-			}
-
-			CacheRegistryUtil.setActive(false);
-
-			if (_log.isDebugEnabled()) {
-				_log.debug("Update build " + buildNumber);
-			}
-
-			if (PropsValues.UPGRADE_DATABASE_TRANSACTIONS_DISABLED) {
-				TransactionsUtil.disableTransactions();
-			}
-
-			try {
-				buildNumber = _getBuildNumberForMissedUpgradeProcesses(
-					buildNumber);
-
-				StartupHelperUtil.upgradeProcess(buildNumber);
-
-				_updateReleaseState(ReleaseConstants.STATE_GOOD);
-			}
-			catch (Exception exception) {
-				_updateReleaseState(ReleaseConstants.STATE_UPGRADE_FAILURE);
-
-				throw exception;
-			}
-			finally {
-				if (PropsValues.UPGRADE_DATABASE_TRANSACTIONS_DISABLED) {
-					TransactionsUtil.enableTransactions();
-				}
-			}
-
-			IndexUpdaterUtil.updatePortalIndexes();
-
-			_updateReleaseBuildInfo();
-
-			CustomSQLUtil.reloadCustomSQL();
-			SQLTransformer.reloadSQLTransformer();
-
-			if (_log.isDebugEnabled()) {
-				_log.debug("Update company key");
-			}
-
-			_updateCompanyKey();
-
-			PortalCacheHelperUtil.clearPortalCaches(
-				PortalCacheManagerNames.MULTI_VM);
-
-			CacheRegistryUtil.setActive(true);
-
-			_checkClassNamesAndResourceActions();
-
-			verify();
-
-			DLFileEntryTypeLocalServiceUtil.getBasicDocumentDLFileEntryType();
-		}
-		finally {
-			UpgradeLogContext.clearContext();
-		}
-	}
-
-	public static void verify() throws Exception {
-		VerifyProcessSuite verifyProcessSuite = new VerifyProcessSuite();
-
-		verifyProcessSuite.verify();
+		verifyResourcePermissions.verify();
 	}
 
 	private static void _checkClassNamesAndResourceActions() {
@@ -377,12 +237,6 @@ public class DBUpgrader {
 		}
 	}
 
-	private static void _initUpgradeStopwatch() {
-		_stopWatch = new StopWatch();
-
-		_stopWatch.start();
-	}
-
 	private static void _registerModuleServiceLifecycle(
 		String moduleServiceLifecycle) {
 
@@ -399,6 +253,35 @@ public class DBUpgrader {
 			).put(
 				"service.version", ReleaseInfo.getVersion()
 			).build());
+	}
+
+	private static void _startUpgradeReportLogAppender() {
+		ServiceLatch serviceLatch = SystemBundleUtil.newServiceLatch();
+
+		serviceLatch.<Appender>waitFor(
+			StringBundler.concat(
+				"(&(appender.name=UpgradeReportLogAppender)(objectClass=",
+				Appender.class.getName(), "))"),
+			appender -> {
+				_appender = appender;
+
+				_appender.start();
+			});
+		serviceLatch.openOn(
+			() -> {
+			});
+	}
+
+	private static void _stopUpgradeReportLogAppender() {
+		if (_appender != null) {
+			_appender.stop();
+		}
+
+		if (_appenderServiceReference != null) {
+			BundleContext bundleContext = SystemBundleUtil.getBundleContext();
+
+			bundleContext.ungetService(_appenderServiceReference);
+		}
 	}
 
 	private static void _updateCompanyKey() throws Exception {
@@ -439,6 +322,92 @@ public class DBUpgrader {
 		}
 	}
 
+	private static void _upgradeModules(ApplicationContext applicationContext) {
+		_registerModuleServiceLifecycle("database.initialized");
+
+		if (applicationContext == null) {
+			InitUtil.registerContext();
+		}
+		else {
+			ModuleFrameworkUtil.registerContext(applicationContext);
+		}
+
+		_registerModuleServiceLifecycle("portal.initialized");
+
+		PortalCacheHelperUtil.clearPortalCaches(
+			PortalCacheManagerNames.MULTI_VM);
+	}
+
+	private static void _upgradePortal() throws Exception {
+		checkRequiredBuildNumber(ReleaseInfo.RELEASE_6_2_0_BUILD_NUMBER);
+
+		checkReleaseState();
+
+		int buildNumber = _getReleaseColumnValue("buildNumber");
+
+		try (Connection connection = DataAccess.getConnection()) {
+			if (PortalUpgradeProcess.isInLatestSchemaVersion(connection) &&
+				(buildNumber == ReleaseInfo.getParentBuildNumber())) {
+
+				_checkClassNamesAndResourceActions();
+
+				return;
+			}
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Disable cache registry");
+		}
+
+		CacheRegistryUtil.setActive(false);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Update build " + buildNumber);
+		}
+
+		if (PropsValues.UPGRADE_DATABASE_TRANSACTIONS_DISABLED) {
+			TransactionsUtil.disableTransactions();
+		}
+
+		try {
+			buildNumber = _getBuildNumberForMissedUpgradeProcesses(buildNumber);
+
+			StartupHelperUtil.upgradeProcess(buildNumber);
+		}
+		catch (Exception exception) {
+			_updateReleaseState(ReleaseConstants.STATE_UPGRADE_FAILURE);
+
+			throw exception;
+		}
+		finally {
+			if (PropsValues.UPGRADE_DATABASE_TRANSACTIONS_DISABLED) {
+				TransactionsUtil.enableTransactions();
+			}
+		}
+
+		StartupHelperUtil.updateIndexes(true);
+
+		_updateReleaseBuildInfo();
+
+		CustomSQLUtil.reloadCustomSQL();
+		SQLTransformer.reloadSQLTransformer();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Update company key");
+		}
+
+		_updateCompanyKey();
+
+		PortalCacheHelperUtil.clearPortalCaches(
+			PortalCacheManagerNames.MULTI_VM);
+
+		CacheRegistryUtil.setActive(true);
+
+		_checkClassNamesAndResourceActions();
+
+		verify();
+	}
+
 	private static final Version _VERSION_7010 = new Version(0, 0, 6);
 
 	private static final Log _log = LogFactoryUtil.getLog(DBUpgrader.class);
@@ -446,7 +415,5 @@ public class DBUpgrader {
 	private static volatile Appender _appender;
 	private static volatile ServiceReference<Appender>
 		_appenderServiceReference;
-	private static volatile StopWatch _stopWatch;
-	private static volatile boolean _upgradeClient;
 
 }

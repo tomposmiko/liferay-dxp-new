@@ -44,41 +44,131 @@ import java.io.InputStream;
  * String dirName = "portlet_name/1234";
  *
  * try {
- *     DLStoreUtil.addDirectory(companyId, repositoryId, dirName);
+ * DLStoreUtil.addDirectory(companyId, repositoryId, dirName);
  * }
  * catch (PortalException pe) {
  * }
  *
  * DLStoreUtil.addFile(
- *     companyId, repositoryId, dirName + "/" + fileName, file);
+ * companyId, repositoryId, dirName + "/" + fileName, file);
  * </code>
  * </pre></p>
  *
  * @author Brian Wing Shun Chan
  * @author Alexander Chow
  * @author Edward Han
- * @author Raymond Augé
  * @see    DLStoreImpl
  */
 public class DLStoreUtil {
 
-	public static void addFile(DLStoreRequest dlStoreRequest, byte[] bytes)
-		throws PortalException {
-
-		_store.addFile(dlStoreRequest, bytes);
-	}
-
-	public static void addFile(DLStoreRequest dlStoreRequest, File file)
-		throws PortalException {
-
-		_store.addFile(dlStoreRequest, file);
-	}
-
+	/**
+	 * Adds a file based on a byte array.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param repositoryId the primary key of the data repository (optionally
+	 *        {@link com.liferay.portal.kernel.model.CompanyConstants#SYSTEM})
+	 * @param fileName the file name
+	 * @param validateFileExtension whether to validate the file's extension
+	 * @param bytes the files's data
+	 */
 	public static void addFile(
-			DLStoreRequest dlStoreRequest, InputStream inputStream)
+			long companyId, long repositoryId, String fileName,
+			boolean validateFileExtension, byte[] bytes)
 		throws PortalException {
 
-		_store.addFile(dlStoreRequest, inputStream);
+		_store.addFile(
+			companyId, repositoryId, fileName, validateFileExtension, bytes);
+	}
+
+	/**
+	 * Adds a file based on a {@link File} object.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param repositoryId the primary key of the data repository (optionally
+	 *        {@link com.liferay.portal.kernel.model.CompanyConstants#SYSTEM})
+	 * @param fileName the file name
+	 * @param validateFileExtension whether to validate the file's extension
+	 * @param file Name the file name
+	 */
+	public static void addFile(
+			long companyId, long repositoryId, String fileName,
+			boolean validateFileExtension, File file)
+		throws PortalException {
+
+		_store.addFile(
+			companyId, repositoryId, fileName, validateFileExtension, file);
+	}
+
+	/**
+	 * Adds a file based on a {@link InputStream} object.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param repositoryId the primary key of the data repository (optionally
+	 *        {@link com.liferay.portal.kernel.model.CompanyConstants#SYSTEM})
+	 * @param fileName the file name
+	 * @param validateFileExtension whether to validate the file's extension
+	 * @param inputStream the files's data
+	 */
+	public static void addFile(
+			long companyId, long repositoryId, String fileName,
+			boolean validateFileExtension, InputStream inputStream)
+		throws PortalException {
+
+		_store.addFile(
+			companyId, repositoryId, fileName, validateFileExtension,
+			inputStream);
+	}
+
+	/**
+	 * Adds a file based on a byte array. Enforces validation of file's
+	 * extension.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param repositoryId the primary key of the data repository (optionally
+	 *        {@link com.liferay.portal.kernel.model.CompanyConstants#SYSTEM})
+	 * @param fileName the file name
+	 * @param bytes the files's data
+	 */
+	public static void addFile(
+			long companyId, long repositoryId, String fileName, byte[] bytes)
+		throws PortalException {
+
+		_store.addFile(companyId, repositoryId, fileName, bytes);
+	}
+
+	/**
+	 * Adds a file based on a {@link File} object. Enforces validation of file's
+	 * extension.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param repositoryId the primary key of the data repository (optionally
+	 *        {@link com.liferay.portal.kernel.model.CompanyConstants#SYSTEM})
+	 * @param fileName the file name
+	 * @param file Name the file name
+	 */
+	public static void addFile(
+			long companyId, long repositoryId, String fileName, File file)
+		throws PortalException {
+
+		_store.addFile(companyId, repositoryId, fileName, file);
+	}
+
+	/**
+	 * Adds a file based on an {@link InputStream} object. Enforces validation
+	 * of file's extension.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param repositoryId the primary key of the data repository (optionally
+	 *        {@link com.liferay.portal.kernel.model.CompanyConstants#SYSTEM})
+	 * @param fileName the file name
+	 * @param inputStream the files's data
+	 */
+	public static void addFile(
+			long companyId, long repositoryId, String fileName,
+			InputStream inputStream)
+		throws PortalException {
+
+		_store.addFile(companyId, repositoryId, fileName, inputStream);
 	}
 
 	/**
@@ -110,8 +200,7 @@ public class DLStoreUtil {
 	 * @param dirName the directory's name
 	 */
 	public static void deleteDirectory(
-			long companyId, long repositoryId, String dirName)
-		throws PortalException {
+		long companyId, long repositoryId, String dirName) {
 
 		_store.deleteDirectory(companyId, repositoryId, dirName);
 	}
@@ -309,19 +398,6 @@ public class DLStoreUtil {
 		return _store.hasFile(companyId, repositoryId, fileName, versionLabel);
 	}
 
-	public static void updateFile(DLStoreRequest dlStoreRequest, File file)
-		throws PortalException {
-
-		_store.updateFile(dlStoreRequest, file);
-	}
-
-	public static void updateFile(
-			DLStoreRequest dlStoreRequest, InputStream inputStream)
-		throws PortalException {
-
-		_store.updateFile(dlStoreRequest, inputStream);
-	}
-
 	/**
 	 * Moves a file to a new data repository.
 	 *
@@ -510,8 +586,11 @@ public class DLStoreUtil {
 			inputStream);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public void setStore(DLStore store) {
-		_store = store;
 	}
 
 	private static volatile DLStore _store =

@@ -15,8 +15,6 @@
 package com.liferay.journal.model.impl;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
-import com.liferay.dynamic.data.mapping.model.DDMFieldAttribute;
-import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMFieldLocalServiceUtil;
@@ -24,7 +22,6 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Fields;
-import com.liferay.dynamic.data.mapping.util.DDMFormValuesConverterUtil;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesToFieldsConverter;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -33,7 +30,9 @@ import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalServiceUtil;
 import com.liferay.journal.constants.JournalConstants;
 import com.liferay.journal.constants.JournalFolderConstants;
+import com.liferay.journal.internal.transformer.JournalTransformerListenerRegistryUtil;
 import com.liferay.journal.internal.transformer.LocaleTransformerListener;
+import com.liferay.journal.internal.util.JournalHelperUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.model.JournalFolder;
@@ -43,7 +42,6 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
@@ -52,15 +50,15 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Repository;
+import com.liferay.portal.kernel.model.cache.CacheField;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.ImageLocalServiceUtil;
-import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.templateparser.TransformerListener;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -99,8 +97,12 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	public static String getContentByLocale(
 		Document document, String languageId, Map<String, String> tokens) {
 
-		if (_localeTransformerListener != null) {
-			document = _localeTransformerListener.onXml(
+		TransformerListener transformerListener =
+			JournalTransformerListenerRegistryUtil.getTransformerListener(
+				LocaleTransformerListener.class.getName());
+
+		if (transformerListener != null) {
+			document = transformerListener.onXml(
 				document.clone(), languageId, tokens);
 		}
 
@@ -115,12 +117,6 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 
 	public static void setJournalConverter(JournalConverter journalConverter) {
 		_journalConverter = journalConverter;
-	}
-
-	public static void setLocaleTransformerListener(
-		LocaleTransformerListener localeTransformerListener) {
-
-		_localeTransformerListener = localeTransformerListener;
 	}
 
 	@Override
@@ -207,15 +203,14 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 			JournalArticleLocalServiceUtil.getArticleLocalizationLanguageIds(
 				getId()));
 
-		List<DDMFieldAttribute> ddmFieldAttributes =
-			DDMFieldLocalServiceUtil.getDDMFieldAttributes(
-				getId(), "availableLanguageIds");
+		Document document = getDocument();
 
-		if (ListUtil.isNotEmpty(ddmFieldAttributes)) {
-			DDMFieldAttribute ddmFieldAttribute = ddmFieldAttributes.get(0);
+		if (document != null) {
+			for (String availableLanguageId :
+					LocalizationUtil.getAvailableLanguageIds(document)) {
 
-			availableLanguageIds.addAll(
-				StringUtil.split(ddmFieldAttribute.getAttributeValue()));
+				availableLanguageIds.add(availableLanguageId);
+			}
 		}
 
 		return availableLanguageIds.toArray(new String[0]);
@@ -224,16 +219,33 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	@JSON
 	@Override
 	public String getContent() {
+		String content = null;
+
 		DDMStructure ddmStructure = getDDMStructure();
 
 		if (ddmStructure == null) {
-			return null;
+			return content;
 		}
 
-		return _getContent(
-			ddmStructure,
-			DDMFieldLocalServiceUtil.getDDMFormValues(
-				ddmStructure.getDDMForm(), getId()));
+		DDMFormValues ddmFormValues = DDMFieldLocalServiceUtil.getDDMFormValues(
+			ddmStructure.getDDMForm(), getId());
+
+		if (ddmFormValues != null) {
+			try {
+				Fields fields = _ddmFormValuesToFieldsConverter.convert(
+					ddmStructure, ddmFormValues);
+
+				content = _journalConverter.getContent(
+					ddmStructure, fields, getGroupId());
+			}
+			catch (Exception exception) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(exception, exception);
+				}
+			}
+		}
+
+		return content;
 	}
 
 	@Override
@@ -252,31 +264,11 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	}
 
 	@Override
-	public DDMFormValues getDDMFormValues() {
-		DDMStructure ddmStructure = getDDMStructure();
-
-		if (ddmStructure == null) {
-			return null;
-		}
-
-		DDMForm ddmForm = ddmStructure.getDDMForm();
-
-		DDMFormValues ddmFormValues = DDMFieldLocalServiceUtil.getDDMFormValues(
-			ddmForm, getId());
-
-		if (ddmFormValues != null) {
-			ddmFormValues.setDDMFormFieldValues(
-				DDMFormValuesConverterUtil.addMissingDDMFormFieldValues(
-					ddmForm.getDDMFormFields(),
-					ddmFormValues.getDDMFormFieldValuesMap(true)));
-		}
-
-		return ddmFormValues;
-	}
-
-	@Override
 	public DDMStructure getDDMStructure() {
-		return DDMStructureLocalServiceUtil.fetchStructure(getDDMStructureId());
+		return DDMStructureLocalServiceUtil.fetchStructure(
+			PortalUtil.getSiteGroupId(getGroupId()),
+			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
+			getDDMStructureKey(), true);
 	}
 
 	@Override
@@ -388,34 +380,21 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	@Override
 	public Document getDocument() {
 		if (_document == null) {
-			_document = _getDocument(getContent());
-		}
+			String content = getContent();
 
-		return _document;
-	}
-
-	@Override
-	public Document getDocumentByLocale(String languageId) {
-		if (_documentMap == null) {
-			_documentMap = new HashMap<>();
-		}
-
-		if (!_documentMap.containsKey(languageId)) {
-			DDMStructure ddmStructure = getDDMStructure();
-
-			if (ddmStructure != null) {
-				_documentMap.put(
-					languageId,
-					_getDocument(
-						_getContent(
-							ddmStructure,
-							DDMFieldLocalServiceUtil.getDDMFormValues(
-								ddmStructure.getDDMForm(), getId(),
-								languageId))));
+			if (content != null) {
+				try {
+					_document = SAXReaderUtil.read(getContent());
+				}
+				catch (DocumentException documentException) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(documentException, documentException);
+					}
+				}
 			}
 		}
 
-		return _documentMap.get(languageId);
+		return _document;
 	}
 
 	@JSON
@@ -434,11 +413,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	@Override
 	public JournalFolder getFolder() throws PortalException {
 		if (getFolderId() <= 0) {
-			JournalFolder journalFolder = new JournalFolderImpl();
-
-			journalFolder.setCompanyId(getCompanyId());
-
-			return journalFolder;
+			return new JournalFolderImpl();
 		}
 
 		return JournalFolderLocalServiceUtil.getFolder(getFolderId());
@@ -575,21 +550,26 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 
 	@Override
 	public Layout getLayout() {
-		if (Validator.isNull(getLayoutUuid())) {
-			return null;
-		}
+		return JournalHelperUtil.getArticleLayout(
+			getLayoutUuid(), getGroupId());
+	}
 
-		// The layout and journal article must belong to the same group
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public String getLegacyDescription() {
+		return _description;
+	}
 
-		Layout layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
-			getLayoutUuid(), getGroupId(), false);
-
-		if (layout == null) {
-			layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
-				getLayoutUuid(), getGroupId(), true);
-		}
-
-		return layout;
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public String getLegacyTitle() {
+		return _title;
 	}
 
 	@JSON
@@ -620,6 +600,26 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	@Override
 	public StagedModelType getStagedModelType() {
 		return new StagedModelType(JournalArticle.class);
+	}
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #getDDMStructureKey()}
+	 */
+	@Deprecated
+	@Override
+	public String getStructureId() {
+		return getDDMStructureKey();
+	}
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #getDDMTemplateKey()}
+	 */
+	@Deprecated
+	@Override
+	public String getTemplateId() {
+		return getDDMTemplateKey();
 	}
 
 	@JSON
@@ -732,6 +732,24 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		return true;
 	}
 
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public boolean isTemplateDriven() {
+		return true;
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public void setDescription(String description) {
+		_description = description;
+	}
+
 	@Override
 	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
 		_descriptionMap = descriptionMap;
@@ -752,49 +770,38 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		_smallImageType = smallImageType;
 	}
 
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #setDDMStructureKey(String)}
+	 */
+	@Deprecated
+	@Override
+	public void setStructureId(String ddmStructureKey) {
+		setDDMStructureKey(ddmStructureKey);
+	}
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 *             #setDDMTemplateKey(String)}
+	 */
+	@Deprecated
+	@Override
+	public void setTemplateId(String ddmTemplateKey) {
+		setDDMTemplateKey(ddmTemplateKey);
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	@Override
+	public void setTitle(String title) {
+		_title = title;
+	}
+
 	@Override
 	public void setTitleMap(Map<Locale, String> titleMap) {
 		_titleMap = titleMap;
-	}
-
-	private String _getContent(
-		DDMStructure ddmStructure, DDMFormValues ddmFormValues) {
-
-		if (ddmFormValues == null) {
-			return null;
-		}
-
-		try {
-			Fields fields = _ddmFormValuesToFieldsConverter.convert(
-				ddmStructure, ddmFormValues);
-
-			return _journalConverter.getContent(
-				ddmStructure, fields, getGroupId());
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
-			}
-
-			return null;
-		}
-	}
-
-	private Document _getDocument(String content) {
-		if (content == null) {
-			return null;
-		}
-
-		try {
-			return SAXReaderUtil.read(content);
-		}
-		catch (DocumentException documentException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(documentException);
-			}
-
-			return null;
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -803,14 +810,27 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 	private static volatile DDMFormValuesToFieldsConverter
 		_ddmFormValuesToFieldsConverter;
 	private static volatile JournalConverter _journalConverter;
-	private static volatile LocaleTransformerListener
-		_localeTransformerListener;
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	private String _description;
 
 	private Map<Locale, String> _descriptionMap;
+
+	@CacheField(propagateToInterface = true)
 	private Document _document;
-	private Map<String, Document> _documentMap;
+
 	private long _imagesFolderId;
 	private String _smallImageType;
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	private String _title;
+
 	private Map<Locale, String> _titleMap;
 
 }

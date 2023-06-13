@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the ct auto resolution info service. This utility wraps <code>com.liferay.change.tracking.service.persistence.impl.CTAutoResolutionInfoPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -567,7 +571,7 @@ public class CTAutoResolutionInfoUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param sourceModelClassPKs the source model class pks
+	 * @param sourceModelClassPK the source model class pk
 	 * @param start the lower bound of the range of ct auto resolution infos
 	 * @param end the upper bound of the range of ct auto resolution infos (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -789,9 +793,29 @@ public class CTAutoResolutionInfoUtil {
 	}
 
 	public static CTAutoResolutionInfoPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile CTAutoResolutionInfoPersistence _persistence;
+	private static ServiceTracker
+		<CTAutoResolutionInfoPersistence, CTAutoResolutionInfoPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			CTAutoResolutionInfoPersistence.class);
+
+		ServiceTracker
+			<CTAutoResolutionInfoPersistence, CTAutoResolutionInfoPersistence>
+				serviceTracker =
+					new ServiceTracker
+						<CTAutoResolutionInfoPersistence,
+						 CTAutoResolutionInfoPersistence>(
+							 bundle.getBundleContext(),
+							 CTAutoResolutionInfoPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

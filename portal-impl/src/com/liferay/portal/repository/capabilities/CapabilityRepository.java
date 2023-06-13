@@ -59,7 +59,7 @@ public class CapabilityRepository
 	public FileEntry addFileEntry(
 			String externalReferenceCode, long userId, long folderId,
 			String sourceFileName, String mimeType, String title,
-			String urlTitle, String description, String changeLog, File file,
+			String description, String changeLog, File file,
 			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -67,8 +67,8 @@ public class CapabilityRepository
 
 		FileEntry fileEntry = repository.addFileEntry(
 			externalReferenceCode, userId, folderId, sourceFileName, mimeType,
-			title, urlTitle, description, changeLog, file, expirationDate,
-			reviewDate, serviceContext);
+			title, description, changeLog, file, expirationDate, reviewDate,
+			serviceContext);
 
 		_repositoryEventTrigger.trigger(
 			RepositoryEventType.Add.class, FileEntry.class, fileEntry);
@@ -80,17 +80,17 @@ public class CapabilityRepository
 	public FileEntry addFileEntry(
 			String externalReferenceCode, long userId, long folderId,
 			String sourceFileName, String mimeType, String title,
-			String urlTitle, String description, String changeLog,
-			InputStream inputStream, long size, Date expirationDate,
-			Date reviewDate, ServiceContext serviceContext)
+			String description, String changeLog, InputStream inputStream,
+			long size, Date expirationDate, Date reviewDate,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		Repository repository = getRepository();
 
 		FileEntry fileEntry = repository.addFileEntry(
 			externalReferenceCode, userId, folderId, sourceFileName, mimeType,
-			title, urlTitle, description, changeLog, inputStream, size,
-			expirationDate, reviewDate, serviceContext);
+			title, description, changeLog, inputStream, size, expirationDate,
+			reviewDate, serviceContext);
 
 		_repositoryEventTrigger.trigger(
 			RepositoryEventType.Add.class, FileEntry.class, fileEntry);
@@ -117,15 +117,14 @@ public class CapabilityRepository
 
 	@Override
 	public Folder addFolder(
-			String externalReferenceCode, long userId, long parentFolderId,
-			String name, String description, ServiceContext serviceContext)
+			long userId, long parentFolderId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		Repository repository = getRepository();
 
 		Folder folder = repository.addFolder(
-			externalReferenceCode, userId, parentFolderId, name, description,
-			serviceContext);
+			userId, parentFolderId, name, description, serviceContext);
 
 		_repositoryEventTrigger.trigger(
 			RepositoryEventType.Add.class, Folder.class, folder);
@@ -348,13 +347,6 @@ public class CapabilityRepository
 	}
 
 	@Override
-	public FileEntry fetchFileEntry(long folderId, String title)
-		throws PortalException {
-
-		return getRepository().fetchFileEntry(folderId, title);
-	}
-
-	@Override
 	public List<FileEntry> getFileEntries(
 			long folderId, int status, int start, int end,
 			OrderByComparator<FileEntry> orderByComparator)
@@ -521,14 +513,6 @@ public class CapabilityRepository
 		throws PortalException {
 
 		return getRepository().getFolder(parentFolderId, name);
-	}
-
-	@Override
-	public Folder getFolderByExternalReferenceCode(String externalReferenceCode)
-		throws PortalException {
-
-		return getRepository().getFolderByExternalReferenceCode(
-			externalReferenceCode);
 	}
 
 	@Override
@@ -843,18 +827,17 @@ public class CapabilityRepository
 	@Override
 	public FileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog, DLVersionNumberIncrease dlVersionNumberIncrease,
-			File file, Date expirationDate, Date reviewDate,
-			ServiceContext serviceContext)
+			String mimeType, String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease, File file,
+			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
 
 		Repository repository = getRepository();
 
 		FileEntry fileEntry = repository.updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, urlTitle,
-			description, changeLog, dlVersionNumberIncrease, file,
-			expirationDate, reviewDate, serviceContext);
+			userId, fileEntryId, sourceFileName, mimeType, title, description,
+			changeLog, dlVersionNumberIncrease, file, expirationDate,
+			reviewDate, serviceContext);
 
 		_repositoryEventTrigger.trigger(
 			RepositoryEventType.Update.class, FileEntry.class, fileEntry);
@@ -865,8 +848,8 @@ public class CapabilityRepository
 	@Override
 	public FileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog, DLVersionNumberIncrease dlVersionNumberIncrease,
+			String mimeType, String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease,
 			InputStream inputStream, long size, Date expirationDate,
 			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException {
@@ -874,8 +857,8 @@ public class CapabilityRepository
 		Repository repository = getRepository();
 
 		FileEntry fileEntry = repository.updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, urlTitle,
-			description, changeLog, dlVersionNumberIncrease, inputStream, size,
+			userId, fileEntryId, sourceFileName, mimeType, title, description,
+			changeLog, dlVersionNumberIncrease, inputStream, size,
 			expirationDate, reviewDate, serviceContext);
 
 		_repositoryEventTrigger.trigger(

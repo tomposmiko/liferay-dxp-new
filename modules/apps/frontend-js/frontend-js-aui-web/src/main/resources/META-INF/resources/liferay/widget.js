@@ -20,17 +20,17 @@ window.Liferay = window.Liferay || {};
 Liferay.Widget = function (options) {
 	options = options || {};
 
-	const height = options.height || '100%';
-	const width = options.width || '100%';
+	var height = options.height || '100%';
+	var width = options.width || '100%';
 
-	const id =
+	var id =
 		options.id ||
 		'_Liferay_widget' + Math.ceil(Math.random() * new Date().getTime());
-	const url =
+	var url =
 		options.url ||
 		'http://www.liferay.com/widget/web/guest/community/forums/-/message_boards';
 
-	const html =
+	var html =
 		'<iframe frameborder="0" height="' +
 		height +
 		'" id="' +

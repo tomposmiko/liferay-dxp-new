@@ -14,10 +14,8 @@
 
 package com.liferay.object.service.impl;
 
-import com.liferay.object.constants.ObjectLayoutBoxConstants;
 import com.liferay.object.exception.DefaultObjectLayoutException;
-import com.liferay.object.exception.ObjectDefinitionModifiableException;
-import com.liferay.object.exception.ObjectLayoutBoxCategorizationTypeException;
+import com.liferay.object.exception.NoSuchObjectDefinitionException;
 import com.liferay.object.exception.ObjectLayoutColumnSizeException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -27,14 +25,13 @@ import com.liferay.object.model.ObjectLayoutColumn;
 import com.liferay.object.model.ObjectLayoutRow;
 import com.liferay.object.model.ObjectLayoutTab;
 import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.service.ObjectLayoutTabLocalService;
 import com.liferay.object.service.base.ObjectLayoutLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -43,11 +40,10 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -78,11 +74,18 @@ public class ObjectLayoutLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		if (objectDefinition.isUnmodifiableSystemObject()) {
-			throw new ObjectDefinitionModifiableException.MustBeModifiable();
+		if (objectDefinition.isSystem()) {
+
+			// TODO Add test
+
+			throw new NoSuchObjectDefinitionException(
+				"Object layouts require a custom object definition");
 		}
 
-		_validate(0, objectDefinitionId, defaultObjectLayout, objectLayoutTabs);
+		if (defaultObjectLayout) {
+			_validate(
+				0, objectDefinitionId, defaultObjectLayout, objectLayoutTabs);
+		}
 
 		ObjectLayout objectLayout = objectLayoutPersistence.create(
 			counterLocalService.increment());
@@ -102,7 +105,8 @@ public class ObjectLayoutLocalServiceImpl
 
 		objectLayout.setObjectLayoutTabs(
 			_addObjectLayoutTabs(
-				user, objectDefinitionId, objectLayout, objectLayoutTabs));
+				user, objectDefinitionId, objectLayout.getObjectLayoutId(),
+				objectLayoutTabs));
 
 		return objectLayout;
 	}
@@ -132,33 +136,6 @@ public class ObjectLayoutLocalServiceImpl
 	}
 
 	@Override
-	public void deleteObjectLayouts(long objectDefinitionId)
-		throws PortalException {
-
-		for (ObjectLayout objectLayout :
-				objectLayoutPersistence.findByObjectDefinitionId(
-					objectDefinitionId)) {
-
-			objectLayoutLocalService.deleteObjectLayout(objectLayout);
-		}
-	}
-
-	@Override
-	public ObjectLayout fetchDefaultObjectLayout(long objectDefinitionId) {
-		ObjectLayout objectLayout =
-			objectLayoutPersistence.fetchByODI_DOL_First(
-				objectDefinitionId, true, null);
-
-		if (objectLayout == null) {
-			return null;
-		}
-
-		objectLayout.setObjectLayoutTabs(_getObjectLayoutTabs(objectLayout));
-
-		return objectLayout;
-	}
-
-	@Override
 	public ObjectLayout getDefaultObjectLayout(long objectDefinitionId)
 		throws PortalException {
 
@@ -180,20 +157,6 @@ public class ObjectLayoutLocalServiceImpl
 		objectLayout.setObjectLayoutTabs(_getObjectLayoutTabs(objectLayout));
 
 		return objectLayout;
-	}
-
-	@Override
-	public List<ObjectLayout> getObjectLayouts(long objectDefinitionId) {
-		List<ObjectLayout> objectLayouts =
-			objectLayoutPersistence.findByObjectDefinitionId(
-				objectDefinitionId);
-
-		for (ObjectLayout objectLayout : objectLayouts) {
-			objectLayout.setObjectLayoutTabs(
-				_getObjectLayoutTabs(objectLayout));
-		}
-
-		return objectLayouts;
 	}
 
 	@Override
@@ -220,9 +183,11 @@ public class ObjectLayoutLocalServiceImpl
 		ObjectLayout objectLayout = objectLayoutPersistence.findByPrimaryKey(
 			objectLayoutId);
 
-		_validate(
-			objectLayoutId, objectLayout.getObjectDefinitionId(),
-			defaultObjectLayout, objectLayoutTabs);
+		if (defaultObjectLayout) {
+			_validate(
+				objectLayoutId, objectLayout.getObjectDefinitionId(),
+				defaultObjectLayout, objectLayoutTabs);
+		}
 
 		_deleteObjectLayoutTabs(objectLayoutId);
 
@@ -235,41 +200,37 @@ public class ObjectLayoutLocalServiceImpl
 
 		objectLayout.setObjectLayoutTabs(
 			_addObjectLayoutTabs(
-				user, objectLayout.getObjectDefinitionId(), objectLayout,
-				objectLayoutTabs));
+				user, objectLayout.getObjectDefinitionId(),
+				objectLayout.getObjectLayoutId(), objectLayoutTabs));
 
 		return objectLayout;
 	}
 
 	private ObjectLayoutBox _addObjectLayoutBox(
 			User user, long objectDefinitionId, long objectLayoutTabId,
-			ObjectLayoutBox objectLayoutBox)
+			boolean collapsable, Map<Locale, String> nameMap, int priority,
+			List<ObjectLayoutRow> objectLayoutRows)
 		throws PortalException {
 
-		ObjectLayoutBox newObjectLayoutBox = _objectLayoutBoxPersistence.create(
+		ObjectLayoutBox objectLayoutBox = _objectLayoutBoxPersistence.create(
 			counterLocalService.increment());
 
-		newObjectLayoutBox.setCompanyId(user.getCompanyId());
-		newObjectLayoutBox.setUserId(user.getUserId());
-		newObjectLayoutBox.setUserName(user.getFullName());
-		newObjectLayoutBox.setObjectLayoutTabId(objectLayoutTabId);
-		newObjectLayoutBox.setCollapsable(objectLayoutBox.isCollapsable());
-		newObjectLayoutBox.setNameMap(objectLayoutBox.getNameMap());
-		newObjectLayoutBox.setObjectLayoutRows(
-			objectLayoutBox.getObjectLayoutRows());
-		newObjectLayoutBox.setPriority(objectLayoutBox.getPriority());
-		newObjectLayoutBox.setType(objectLayoutBox.getType());
+		objectLayoutBox.setCompanyId(user.getCompanyId());
+		objectLayoutBox.setUserId(user.getUserId());
+		objectLayoutBox.setUserName(user.getFullName());
+		objectLayoutBox.setObjectLayoutTabId(objectLayoutTabId);
+		objectLayoutBox.setCollapsable(collapsable);
+		objectLayoutBox.setNameMap(nameMap);
+		objectLayoutBox.setPriority(priority);
 
-		newObjectLayoutBox = _objectLayoutBoxPersistence.update(
-			newObjectLayoutBox);
+		objectLayoutBox = _objectLayoutBoxPersistence.update(objectLayoutBox);
 
-		newObjectLayoutBox.setObjectLayoutRows(
+		objectLayoutBox.setObjectLayoutRows(
 			_addObjectLayoutRows(
 				user, objectDefinitionId,
-				newObjectLayoutBox.getObjectLayoutBoxId(),
-				newObjectLayoutBox.getObjectLayoutRows()));
+				objectLayoutBox.getObjectLayoutBoxId(), objectLayoutRows));
 
-		return newObjectLayoutBox;
+		return objectLayoutBox;
 	}
 
 	private List<ObjectLayoutBox> _addObjectLayoutBoxes(
@@ -277,10 +238,13 @@ public class ObjectLayoutLocalServiceImpl
 			List<ObjectLayoutBox> objectLayoutBoxes)
 		throws PortalException {
 
-		return TransformUtil.unsafeTransform(
+		return TransformUtil.transform(
 			objectLayoutBoxes,
 			objectLayoutBox -> _addObjectLayoutBox(
-				user, objectDefinitionId, objectLayoutTabId, objectLayoutBox));
+				user, objectDefinitionId, objectLayoutTabId,
+				objectLayoutBox.isCollapsable(), objectLayoutBox.getNameMap(),
+				objectLayoutBox.getPriority(),
+				objectLayoutBox.getObjectLayoutRows()));
 	}
 
 	private ObjectLayoutColumn _addObjectLayoutColumn(
@@ -367,7 +331,7 @@ public class ObjectLayoutLocalServiceImpl
 			List<ObjectLayoutRow> objectLayoutRows)
 		throws PortalException {
 
-		return TransformUtil.unsafeTransform(
+		return TransformUtil.transform(
 			objectLayoutRows,
 			objectLayoutRow -> _addObjectLayoutRow(
 				user, objectDefinitionId, objectLayoutBoxId,
@@ -381,10 +345,18 @@ public class ObjectLayoutLocalServiceImpl
 			int priority, List<ObjectLayoutBox> objectLayoutBoxes)
 		throws PortalException {
 
-		ObjectLayoutTab objectLayoutTab =
-			_objectLayoutTabLocalService.addObjectLayoutTab(
-				user.getUserId(), objectLayoutId, objectRelationshipId, nameMap,
-				priority);
+		ObjectLayoutTab objectLayoutTab = _objectLayoutTabPersistence.create(
+			counterLocalService.increment());
+
+		objectLayoutTab.setCompanyId(user.getCompanyId());
+		objectLayoutTab.setUserId(user.getUserId());
+		objectLayoutTab.setUserName(user.getFullName());
+		objectLayoutTab.setObjectLayoutId(objectLayoutId);
+		objectLayoutTab.setObjectRelationshipId(objectRelationshipId);
+		objectLayoutTab.setNameMap(nameMap);
+		objectLayoutTab.setPriority(priority);
+
+		objectLayoutTab = _objectLayoutTabPersistence.update(objectLayoutTab);
 
 		objectLayoutTab.setObjectLayoutBoxes(
 			_addObjectLayoutBoxes(
@@ -395,41 +367,29 @@ public class ObjectLayoutLocalServiceImpl
 	}
 
 	private List<ObjectLayoutTab> _addObjectLayoutTabs(
-			User user, long objectDefinitionId, ObjectLayout objectLayout,
+			User user, long objectDefinitionId, long objectLayoutId,
 			List<ObjectLayoutTab> objectLayoutTabs)
 		throws PortalException {
 
-		objectLayoutTabs = TransformUtil.unsafeTransform(
+		return TransformUtil.transform(
 			objectLayoutTabs,
 			objectLayoutTab -> _addObjectLayoutTab(
-				user, objectDefinitionId, objectLayout.getObjectLayoutId(),
+				user, objectDefinitionId, objectLayoutId,
 				objectLayoutTab.getObjectRelationshipId(),
 				objectLayoutTab.getNameMap(), objectLayoutTab.getPriority(),
 				objectLayoutTab.getObjectLayoutBoxes()));
-
-		if (objectLayout.isDefaultObjectLayout()) {
-			_objectLayoutTabLocalService.
-				registerObjectLayoutTabScreenNavigationCategories(
-					_objectDefinitionPersistence.fetchByPrimaryKey(
-						objectDefinitionId),
-					objectLayoutTabs);
-		}
-
-		return objectLayoutTabs;
 	}
 
 	private void _deleteObjectLayoutBoxes(
 		List<ObjectLayoutTab> objectLayoutTabs) {
 
 		for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
-			List<ObjectLayoutBox> objectLayoutBoxes =
-				_objectLayoutBoxPersistence.findByObjectLayoutTabId(
-					objectLayoutTab.getObjectLayoutTabId());
-
 			_objectLayoutBoxPersistence.removeByObjectLayoutTabId(
 				objectLayoutTab.getObjectLayoutTabId());
 
-			_deleteObjectLayoutRows(objectLayoutBoxes);
+			_deleteObjectLayoutRows(
+				_objectLayoutBoxPersistence.findByObjectLayoutTabId(
+					objectLayoutTab.getObjectLayoutTabId()));
 		}
 	}
 
@@ -446,28 +406,20 @@ public class ObjectLayoutLocalServiceImpl
 		List<ObjectLayoutBox> objectLayoutBoxes) {
 
 		for (ObjectLayoutBox objectLayoutBox : objectLayoutBoxes) {
-			List<ObjectLayoutRow> objectLayoutRows =
-				_objectLayoutRowPersistence.findByObjectLayoutBoxId(
-					objectLayoutBox.getObjectLayoutBoxId());
-
 			_objectLayoutRowPersistence.removeByObjectLayoutBoxId(
 				objectLayoutBox.getObjectLayoutBoxId());
 
-			_deleteObjectLayoutColumns(objectLayoutRows);
+			_deleteObjectLayoutColumns(
+				_objectLayoutRowPersistence.findByObjectLayoutBoxId(
+					objectLayoutBox.getObjectLayoutBoxId()));
 		}
 	}
 
-	private void _deleteObjectLayoutTabs(long objectLayoutId)
-		throws PortalException {
+	private void _deleteObjectLayoutTabs(long objectLayoutId) {
+		_objectLayoutTabPersistence.removeByObjectLayoutId(objectLayoutId);
 
-		List<ObjectLayoutTab> objectLayoutTabs =
-			_objectLayoutTabLocalService.getObjectLayoutObjectLayoutTabs(
-				objectLayoutId);
-
-		_deleteObjectLayoutBoxes(objectLayoutTabs);
-
-		_objectLayoutTabLocalService.deleteObjectLayoutObjectLayoutTabs(
-			objectLayoutId);
+		_deleteObjectLayoutBoxes(
+			_objectLayoutTabPersistence.findByObjectLayoutId(objectLayoutId));
 	}
 
 	private List<ObjectLayoutBox> _getObjectLayoutBoxes(
@@ -505,7 +457,7 @@ public class ObjectLayoutLocalServiceImpl
 		ObjectLayout objectLayout) {
 
 		List<ObjectLayoutTab> objectLayoutTabs =
-			_objectLayoutTabLocalService.getObjectLayoutObjectLayoutTabs(
+			_objectLayoutTabPersistence.findByObjectLayoutId(
 				objectLayout.getObjectLayoutId());
 
 		for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
@@ -521,105 +473,65 @@ public class ObjectLayoutLocalServiceImpl
 			boolean defaultObjectLayout, List<ObjectLayoutTab> objectLayoutTabs)
 		throws PortalException {
 
-		if (defaultObjectLayout) {
-			Set<Long> objectFieldIds = new HashSet<>();
+		Set<Long> objectFieldIds = new HashSet<>();
 
-			ObjectLayoutTab objectLayoutTab = objectLayoutTabs.get(0);
+		ObjectLayoutTab objectLayoutTab = objectLayoutTabs.get(0);
 
-			List<ObjectLayoutBox> objectLayoutBoxes =
-				objectLayoutTab.getObjectLayoutBoxes();
+		List<ObjectLayoutBox> objectLayoutBoxes =
+			objectLayoutTab.getObjectLayoutBoxes();
 
-			for (ObjectLayoutBox objectLayoutBox : objectLayoutBoxes) {
-				List<ObjectLayoutRow> objectLayoutRows =
-					objectLayoutBox.getObjectLayoutRows();
+		if (objectLayoutBoxes == null) {
+			objectLayoutBoxes = Collections.<ObjectLayoutBox>emptyList();
+		}
 
-				for (ObjectLayoutRow objectLayoutRow : objectLayoutRows) {
-					List<ObjectLayoutColumn> objectLayoutColumns =
-						objectLayoutRow.getObjectLayoutColumns();
+		for (ObjectLayoutBox objectLayoutBox : objectLayoutBoxes) {
+			List<ObjectLayoutRow> objectLayoutRows =
+				objectLayoutBox.getObjectLayoutRows();
 
-					for (ObjectLayoutColumn objectLayoutColumn :
-							objectLayoutColumns) {
-
-						objectFieldIds.add(
-							objectLayoutColumn.getObjectFieldId());
-					}
-				}
+			if (objectLayoutRows == null) {
+				continue;
 			}
 
-			List<ObjectField> objectFields =
-				_objectFieldLocalService.getObjectFields(objectDefinitionId);
+			for (ObjectLayoutRow objectLayoutRow : objectLayoutRows) {
+				List<ObjectLayoutColumn> objectLayoutColumns =
+					objectLayoutRow.getObjectLayoutColumns();
 
-			for (ObjectField objectField : objectFields) {
-				if (!objectField.isRequired()) {
+				if (objectLayoutColumns == null) {
 					continue;
 				}
 
-				if (!objectFieldIds.contains(objectField.getObjectFieldId())) {
-					throw new DefaultObjectLayoutException(
-						"All required object fields must be associated to " +
-							"the first tab of a default object layout");
+				for (ObjectLayoutColumn objectLayoutColumn :
+						objectLayoutColumns) {
+
+					objectFieldIds.add(objectLayoutColumn.getObjectFieldId());
 				}
-			}
-
-			ObjectLayout objectLayout =
-				objectLayoutPersistence.fetchByODI_DOL_First(
-					objectDefinitionId, true, null);
-
-			if ((objectLayout != null) &&
-				(objectLayout.getObjectLayoutId() != objectLayoutId)) {
-
-				throw new DefaultObjectLayoutException(
-					"There can only be one default object layout");
 			}
 		}
 
-		int countObjectLayoutBoxCategorizationType = 0;
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId);
+		List<ObjectField> objectFields =
+			_objectFieldLocalService.getObjectFields(objectDefinitionId);
 
-		for (ObjectLayoutTab objectLayoutTab : objectLayoutTabs) {
-			List<ObjectLayoutBox> objectLayoutBoxes =
-				objectLayoutTab.getObjectLayoutBoxes();
-
-			for (ObjectLayoutBox objectLayoutBox : objectLayoutBoxes) {
-				if (Validator.isNull(objectLayoutBox.getType())) {
-					throw new ObjectLayoutBoxCategorizationTypeException(
-						"Object layout box must have a type");
-				}
-
-				if (!StringUtil.equals(
-						objectLayoutBox.getType(),
-						ObjectLayoutBoxConstants.TYPE_CATEGORIZATION)) {
-
-					continue;
-				}
-
-				if (!objectDefinition.isEnableCategorization()) {
-					throw new ObjectLayoutBoxCategorizationTypeException(
-						"Categorization layout box must be enabled to be used");
-				}
-
-				if (!objectDefinition.isDefaultStorageType()) {
-					throw new ObjectLayoutBoxCategorizationTypeException(
-						"Categorization layout box can only be used in " +
-							"object definitions with a default storage type");
-				}
-
-				countObjectLayoutBoxCategorizationType++;
-
-				if (countObjectLayoutBoxCategorizationType > 1) {
-					throw new ObjectLayoutBoxCategorizationTypeException(
-						"There can only be one categorization layout box per " +
-							"layout");
-				}
-
-				if (ListUtil.isNotEmpty(
-						objectLayoutBox.getObjectLayoutRows())) {
-
-					throw new ObjectLayoutBoxCategorizationTypeException(
-						"Categorization layout box must not have layout rows");
-				}
+		for (ObjectField objectField : objectFields) {
+			if (!objectField.isRequired()) {
+				continue;
 			}
+
+			if (!objectFieldIds.contains(objectField.getObjectFieldId())) {
+				throw new DefaultObjectLayoutException(
+					"All required object fields must be associated to the " +
+						"first tab of a default object layout");
+			}
+		}
+
+		ObjectLayout objectLayout =
+			objectLayoutPersistence.fetchByODI_DOL_First(
+				objectDefinitionId, defaultObjectLayout, null);
+
+		if ((objectLayout != null) &&
+			(objectLayout.getObjectLayoutId() != objectLayoutId)) {
+
+			throw new DefaultObjectLayoutException(
+				"There can only be one default object layout");
 		}
 	}
 
@@ -642,7 +554,7 @@ public class ObjectLayoutLocalServiceImpl
 	private ObjectLayoutRowPersistence _objectLayoutRowPersistence;
 
 	@Reference
-	private ObjectLayoutTabLocalService _objectLayoutTabLocalService;
+	private ObjectLayoutTabPersistence _objectLayoutTabPersistence;
 
 	@Reference
 	private UserLocalService _userLocalService;

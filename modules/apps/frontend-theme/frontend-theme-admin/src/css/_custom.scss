@@ -21,7 +21,7 @@ body {
 	padding: 0;
 
 	.portlet-layout {
-		margin: 0;
+		margin: 0 0 25px;
 
 		.portlet-column {
 			padding: 0;
@@ -30,15 +30,11 @@ body {
 		.portlet-body .container-fluid-max-xl {
 			max-width: map-get($container-max-widths, xl);
 			position: relative;
-
-			.custom-control {
-				margin-bottom: 8px;
-			}
 		}
 	}
 
 	.main-content-nav {
-		margin-left: $grid-gutter-width * -0.5;
+		margin-left: -($grid-gutter-width / 2);
 		margin-top: 20px;
 	}
 }

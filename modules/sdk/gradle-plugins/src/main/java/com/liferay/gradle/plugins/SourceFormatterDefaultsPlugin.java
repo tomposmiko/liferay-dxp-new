@@ -292,14 +292,6 @@ public class SourceFormatterDefaultsPlugin
 				Boolean.parseBoolean(includeSubrepositories));
 		}
 
-		String javaParserEnabled = GradleUtil.getProperty(
-			project, "java.parser.enabled", (String)null);
-
-		if (Validator.isNotNull(javaParserEnabled)) {
-			formatSourceTask.setJavaParserEnabled(
-				Boolean.parseBoolean(javaParserEnabled));
-		}
-
 		String maxLineLength = GradleUtil.getProperty(
 			project, "source.formatter.max.line.length", (String)null);
 
@@ -328,6 +320,22 @@ public class SourceFormatterDefaultsPlugin
 		if (Validator.isNotNull(showDebugInformation)) {
 			formatSourceTask.setShowDebugInformation(
 				Boolean.parseBoolean(showDebugInformation));
+		}
+
+		String showDocumentation = GradleUtil.getProperty(
+			project, "source.formatter.show.documentation", (String)null);
+
+		if (Validator.isNotNull(showDocumentation)) {
+			formatSourceTask.setShowDocumentation(
+				Boolean.parseBoolean(showDocumentation));
+		}
+
+		String showStatusUpdates = GradleUtil.getProperty(
+			project, "source.formatter.show.status.updates", (String)null);
+
+		if (Validator.isNotNull(showStatusUpdates)) {
+			formatSourceTask.setShowStatusUpdates(
+				Boolean.parseBoolean(showStatusUpdates));
 		}
 
 		String sourceFileNames = GradleUtil.getProperty(

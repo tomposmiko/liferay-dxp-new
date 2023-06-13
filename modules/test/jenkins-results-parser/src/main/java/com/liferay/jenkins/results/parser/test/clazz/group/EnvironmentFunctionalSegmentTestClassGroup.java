@@ -18,15 +18,12 @@ import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.PortalFixpackEnvironmentJob;
 import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
-import com.liferay.jenkins.results.parser.job.property.JobProperty;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
@@ -70,31 +67,27 @@ public class EnvironmentFunctionalSegmentTestClassGroup
 	}
 
 	protected EnvironmentFunctionalSegmentTestClassGroup(
-		BatchTestClassGroup parentBatchTestClassGroup) {
+		EnvironmentFunctionalBatchTestClassGroup
+			parentEnvironmentFunctionalBatchTestClassGroup) {
 
-		super(parentBatchTestClassGroup);
-	}
-
-	protected EnvironmentFunctionalSegmentTestClassGroup(
-		BatchTestClassGroup parentBatchTestClassGroup, JSONObject jsonObject) {
-
-		super(parentBatchTestClassGroup, jsonObject);
+		super(parentEnvironmentFunctionalBatchTestClassGroup);
 	}
 
 	private String _getAppServerType() {
-		BatchTestClassGroup batchTestClassGroup = getBatchTestClassGroup();
+		BatchTestClassGroup parentBatchTestClassGroup =
+			getParentBatchTestClassGroup();
 
-		JobProperty jobProperty = batchTestClassGroup.getJobProperty(
-			"environment.app.server.type");
+		String appServerType = JenkinsResultsParserUtil.getProperty(
+			parentBatchTestClassGroup.getJobProperties(),
+			"environment.app.server.type",
+			parentBatchTestClassGroup.getBatchName());
 
-		String jobPropertyValue = jobProperty.getValue();
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(jobPropertyValue)) {
-			return jobPropertyValue;
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(appServerType)) {
+			return appServerType;
 		}
 
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
-			batchTestClassGroup.getPortalGitWorkingDirectory();
+			parentBatchTestClassGroup.getPortalGitWorkingDirectory();
 
 		if (portalGitWorkingDirectory == null) {
 			return null;
@@ -116,19 +109,20 @@ public class EnvironmentFunctionalSegmentTestClassGroup
 	}
 
 	private String _getAppServerVersion() {
-		BatchTestClassGroup batchTestClassGroup = getBatchTestClassGroup();
+		BatchTestClassGroup parentBatchTestClassGroup =
+			getParentBatchTestClassGroup();
 
-		JobProperty jobProperty = batchTestClassGroup.getJobProperty(
-			"environment.app.server.version");
+		String appServerVersion = JenkinsResultsParserUtil.getProperty(
+			parentBatchTestClassGroup.getJobProperties(),
+			"environment.app.server.version",
+			parentBatchTestClassGroup.getBatchName());
 
-		String jobPropertyValue = jobProperty.getValue();
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(jobPropertyValue)) {
-			return jobPropertyValue;
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(appServerVersion)) {
+			return appServerVersion;
 		}
 
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
-			batchTestClassGroup.getPortalGitWorkingDirectory();
+			parentBatchTestClassGroup.getPortalGitWorkingDirectory();
 		String appServerType = _getAppServerType();
 
 		if ((portalGitWorkingDirectory == null) ||

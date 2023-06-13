@@ -14,11 +14,14 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.Ranking;
-import com.liferay.portal.search.tuning.rankings.web.internal.searcher.helper.RankingSearchRequestHelper;
+import com.liferay.portal.search.tuning.rankings.web.internal.searcher.RankingSearchRequestHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +29,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -41,6 +45,8 @@ public class RankingGetVisibleResultsBuilderTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_setUpRankingSearchRequestHelper();
 
 		_rankingGetVisibleResultsBuilder = new RankingGetVisibleResultsBuilder(
@@ -55,9 +61,8 @@ public class RankingGetVisibleResultsBuilderTest
 		setUpComplexQueryPartBuilderFactory(setUpComplexQueryPartBuilder());
 		setUpDLAppLocalService();
 		setUpFastDateFormatFactory();
-		setUpPortalUtil();
-		setUpPropsUtil();
 		setUpQuery();
+		setUpPropsUtil();
 
 		Ranking ranking = Mockito.mock(Ranking.class);
 
@@ -67,8 +72,9 @@ public class RankingGetVisibleResultsBuilderTest
 			ranking
 		).getQueryString();
 
-		setUpRankingIndexReader(ranking);
+		setUpRankingIndexReader(Optional.of(ranking));
 
+		setUpRankingResultUtil();
 		setUpResourceRequest();
 		setUpSearchRequestBuilderFactory(setUpSearchRequestBuilder());
 		setUpSearcher(setUpSearchResponse(setUpDocumentWithGetString()));
@@ -81,8 +87,8 @@ public class RankingGetVisibleResultsBuilderTest
 	}
 
 	@Test
-	public void testBuildWithRankingNotPresent() {
-		setUpRankingIndexReader(null);
+	public void testBuildWithOptionalRankingNotPresent() {
+		setUpRankingIndexReader(Optional.empty());
 
 		Assert.assertEquals(
 			JSONUtil.put(
@@ -95,9 +101,11 @@ public class RankingGetVisibleResultsBuilderTest
 	}
 
 	private String _getExpectedDocumentsString() {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
 		return JSONUtil.put(
 			"documents",
-			JSONUtil.put(
+			jsonArray.put(
 				JSONUtil.put(
 					"author", "theAuthor"
 				).put(
@@ -123,7 +131,7 @@ public class RankingGetVisibleResultsBuilderTest
 				))
 		).put(
 			"total", 1
-		).toString();
+		).toJSONString();
 	}
 
 	private void _setUpRankingSearchRequestHelper() {
@@ -131,12 +139,13 @@ public class RankingGetVisibleResultsBuilderTest
 		).when(
 			_rankingSearchRequestHelper
 		).contribute(
-			Mockito.any(), Mockito.any()
+			Mockito.anyObject(), Mockito.anyObject()
 		);
 	}
 
 	private RankingGetVisibleResultsBuilder _rankingGetVisibleResultsBuilder;
-	private final RankingSearchRequestHelper _rankingSearchRequestHelper =
-		Mockito.mock(RankingSearchRequestHelper.class);
+
+	@Mock
+	private RankingSearchRequestHelper _rankingSearchRequestHelper;
 
 }

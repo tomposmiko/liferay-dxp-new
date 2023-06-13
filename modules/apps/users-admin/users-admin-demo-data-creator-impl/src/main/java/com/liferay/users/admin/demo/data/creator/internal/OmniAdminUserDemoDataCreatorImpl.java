@@ -50,7 +50,11 @@ public class OmniAdminUserDemoDataCreatorImpl
 		return userLocalService.getUser(user.getUserId());
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setRoleLocalService(RoleLocalService roleLocalService) {
+		_roleLocalService = roleLocalService;
+	}
+
 	private RoleLocalService _roleLocalService;
 
 }

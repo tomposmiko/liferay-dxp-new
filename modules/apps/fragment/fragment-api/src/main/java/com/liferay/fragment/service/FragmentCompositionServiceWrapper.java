@@ -28,10 +28,6 @@ public class FragmentCompositionServiceWrapper
 	implements FragmentCompositionService,
 			   ServiceWrapper<FragmentCompositionService> {
 
-	public FragmentCompositionServiceWrapper() {
-		this(null);
-	}
-
 	public FragmentCompositionServiceWrapper(
 		FragmentCompositionService fragmentCompositionService) {
 

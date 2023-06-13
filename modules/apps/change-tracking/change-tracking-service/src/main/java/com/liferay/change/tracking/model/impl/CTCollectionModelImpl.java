@@ -16,6 +16,7 @@ package com.liferay.change.tracking.model.impl;
 
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTCollectionModel;
+import com.liferay.change.tracking.model.CTCollectionSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -35,15 +36,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -154,6 +158,60 @@ public class CTCollectionModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static CTCollection toModel(CTCollectionSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		CTCollection model = new CTCollectionImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setSchemaVersionId(soapModel.getSchemaVersionId());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setStatus(soapModel.getStatus());
+		model.setStatusByUserId(soapModel.getStatusByUserId());
+		model.setStatusDate(soapModel.getStatusDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<CTCollection> toModels(CTCollectionSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<CTCollection> models = new ArrayList<CTCollection>(
+			soapModels.length);
+
+		for (CTCollectionSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public CTCollectionModelImpl() {
 	}
 
@@ -230,107 +288,111 @@ public class CTCollectionModelImpl
 	public Map<String, Function<CTCollection, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CTCollection, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CTCollection>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CTCollection, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTCollection.class.getClassLoader(), CTCollection.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<CTCollection, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<CTCollection, Object>>();
+		try {
+			Constructor<CTCollection> constructor =
+				(Constructor<CTCollection>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CTCollection::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", CTCollection::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"companyId", CTCollection::getCompanyId);
-			attributeGetterFunctions.put("userId", CTCollection::getUserId);
-			attributeGetterFunctions.put(
-				"createDate", CTCollection::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", CTCollection::getModifiedDate);
-			attributeGetterFunctions.put(
-				"schemaVersionId", CTCollection::getSchemaVersionId);
-			attributeGetterFunctions.put("name", CTCollection::getName);
-			attributeGetterFunctions.put(
-				"description", CTCollection::getDescription);
-			attributeGetterFunctions.put("status", CTCollection::getStatus);
-			attributeGetterFunctions.put(
-				"statusByUserId", CTCollection::getStatusByUserId);
-			attributeGetterFunctions.put(
-				"statusDate", CTCollection::getStatusDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<CTCollection, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CTCollection, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<CTCollection, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<CTCollection, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTCollection, Object>>();
+		Map<String, BiConsumer<CTCollection, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CTCollection, ?>>();
 
-		static {
-			Map<String, BiConsumer<CTCollection, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<CTCollection, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", CTCollection::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CTCollection, Long>)CTCollection::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTCollection::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<CTCollection, Long>)CTCollection::setCtCollectionId);
+		attributeGetterFunctions.put("companyId", CTCollection::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CTCollection, Long>)CTCollection::setCompanyId);
+		attributeGetterFunctions.put("userId", CTCollection::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<CTCollection, Long>)CTCollection::setUserId);
+		attributeGetterFunctions.put("createDate", CTCollection::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CTCollection, Date>)CTCollection::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CTCollection::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<CTCollection, Date>)CTCollection::setModifiedDate);
+		attributeGetterFunctions.put(
+			"schemaVersionId", CTCollection::getSchemaVersionId);
+		attributeSetterBiConsumers.put(
+			"schemaVersionId",
+			(BiConsumer<CTCollection, Long>)CTCollection::setSchemaVersionId);
+		attributeGetterFunctions.put("name", CTCollection::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<CTCollection, String>)CTCollection::setName);
+		attributeGetterFunctions.put(
+			"description", CTCollection::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<CTCollection, String>)CTCollection::setDescription);
+		attributeGetterFunctions.put("status", CTCollection::getStatus);
+		attributeSetterBiConsumers.put(
+			"status",
+			(BiConsumer<CTCollection, Integer>)CTCollection::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", CTCollection::getStatusByUserId);
+		attributeSetterBiConsumers.put(
+			"statusByUserId",
+			(BiConsumer<CTCollection, Long>)CTCollection::setStatusByUserId);
+		attributeGetterFunctions.put("statusDate", CTCollection::getStatusDate);
+		attributeSetterBiConsumers.put(
+			"statusDate",
+			(BiConsumer<CTCollection, Date>)CTCollection::setStatusDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CTCollection, Long>)CTCollection::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<CTCollection, Long>)
-					CTCollection::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CTCollection, Long>)CTCollection::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<CTCollection, Long>)CTCollection::setUserId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CTCollection, Date>)CTCollection::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<CTCollection, Date>)CTCollection::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"schemaVersionId",
-				(BiConsumer<CTCollection, Long>)
-					CTCollection::setSchemaVersionId);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<CTCollection, String>)CTCollection::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<CTCollection, String>)CTCollection::setDescription);
-			attributeSetterBiConsumers.put(
-				"status",
-				(BiConsumer<CTCollection, Integer>)CTCollection::setStatus);
-			attributeSetterBiConsumers.put(
-				"statusByUserId",
-				(BiConsumer<CTCollection, Long>)
-					CTCollection::setStatusByUserId);
-			attributeSetterBiConsumers.put(
-				"statusDate",
-				(BiConsumer<CTCollection, Date>)CTCollection::setStatusDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -877,12 +939,41 @@ public class CTCollectionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CTCollection, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CTCollection, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CTCollection, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((CTCollection)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTCollection>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTCollection.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -901,9 +992,8 @@ public class CTCollectionModelImpl
 	private Date _statusDate;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<CTCollection, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<CTCollection, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

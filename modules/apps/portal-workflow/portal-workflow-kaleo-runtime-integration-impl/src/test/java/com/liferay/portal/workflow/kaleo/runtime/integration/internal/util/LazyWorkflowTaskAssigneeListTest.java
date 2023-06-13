@@ -55,7 +55,7 @@ public class LazyWorkflowTaskAssigneeListTest {
 
 		KaleoTaskAssignmentInstanceLocalService
 			kaleoTaskAssignmentInstanceLocalService =
-				new KaleoTaskAssignmentInstanceLocalServiceWrapper() {
+				new KaleoTaskAssignmentInstanceLocalServiceWrapper(null) {
 
 					@Override
 					public int getKaleoTaskAssignmentInstancesCount(
@@ -102,7 +102,7 @@ public class LazyWorkflowTaskAssigneeListTest {
 
 		KaleoTaskAssignmentInstanceLocalService
 			kaleoTaskAssignmentInstanceLocalService =
-				new KaleoTaskAssignmentInstanceLocalServiceWrapper() {
+				new KaleoTaskAssignmentInstanceLocalServiceWrapper(null) {
 
 					@Override
 					public int getKaleoTaskAssignmentInstancesCount(

@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -79,6 +80,8 @@ public interface PortletApp extends Serializable {
 
 	public int getSpecMinorVersion();
 
+	public SpriteImage getSpriteImage(String fileName);
+
 	public Set<String> getUserAttributes();
 
 	public boolean isWARFile();
@@ -92,6 +95,8 @@ public interface PortletApp extends Serializable {
 	public void setSpecMajorVersion(int specMajorVersion);
 
 	public void setSpecMinorVersion(int specMinorVersion);
+
+	public void setSpriteImages(String spriteFileName, Properties properties);
 
 	public void setWARFile(boolean warFile);
 

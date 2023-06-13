@@ -9,14 +9,9 @@
  * distribution rights of the Software.
  */
 
-import {isProductPurchasable} from 'commerce-frontend-js/utilities/index';
-import {getProductMinQuantity} from 'commerce-frontend-js/utilities/quantities';
-
 import {DIAGRAM_LABELS_MAX_LENGTH, DRAG_AND_DROP_THRESHOLD} from './constants';
 
-export const TOOLTIP_DISTANCE_FROM_TARGET = 10;
-
-export function calculateTooltipStyleFromTarget(target) {
+export function calculateTooltipStyleFromTarget(target, containerRef) {
 	const {
 		height: targetHeight,
 		left: targetLeft,
@@ -24,17 +19,33 @@ export function calculateTooltipStyleFromTarget(target) {
 		width: targetWidth,
 	} = target.getBoundingClientRect();
 
-	const distanceFromTop = window.pageYOffset + targetTop;
 	const targetRight = window.innerWidth - targetLeft - targetWidth;
+	const targetBottom = window.innerHeight - targetTop - targetHeight;
+
+	const {
+		height: containerHeight,
+		left: containerLeft,
+		top: containerTop,
+		width: containerWidth,
+	} = containerRef.current.getBoundingClientRect();
+
+	const containerRight = window.innerWidth - containerLeft - containerWidth;
+	const containerBottom = window.innerHeight - containerTop - containerHeight;
+
 	const style = {};
 
-	style.top = distanceFromTop + targetHeight / 2;
-
 	if (targetLeft + targetWidth / 2 < window.innerWidth / 2) {
-		style.left = targetLeft + targetWidth + TOOLTIP_DISTANCE_FROM_TARGET;
+		style.left = targetLeft - containerLeft + targetWidth;
 	}
 	else {
-		style.right = targetRight + targetWidth + TOOLTIP_DISTANCE_FROM_TARGET;
+		style.right = targetRight - containerRight + targetWidth;
+	}
+
+	if (targetTop + targetHeight / 2 < window.innerHeight / 2) {
+		style.top = targetTop - containerTop + targetHeight;
+	}
+	else {
+		style.bottom = targetBottom - containerBottom + targetHeight;
 	}
 
 	return style;
@@ -50,7 +61,6 @@ export function formatMappedProduct(type, quantity, sequence, selectedProduct) {
 		case 'sku':
 			return {
 				...definition,
-				productId: selectedProduct.productId,
 				quantity,
 				sku: selectedProduct.sku,
 				skuId: selectedProduct.id,
@@ -110,62 +120,4 @@ export function formatLabel(label) {
 	}
 
 	return label;
-}
-
-export function formatMappedProductForTable(mappedProducts, isAdmin) {
-	return mappedProducts.map((mappedProduct) => {
-		const firstAvailableProduct =
-			mappedProduct.firstAvailableReplacementMappedProduct ||
-			mappedProduct;
-
-		return {
-			...firstAvailableProduct,
-			initialQuantity:
-				isAdmin || firstAvailableProduct.type !== 'sku'
-					? 0
-					: getProductMinQuantity(
-							firstAvailableProduct.productConfiguration
-					  ),
-			selectable:
-				isAdmin || firstAvailableProduct.type !== 'sku'
-					? false
-					: isProductPurchasable(
-							firstAvailableProduct.availability,
-							firstAvailableProduct.productConfiguration,
-							firstAvailableProduct.purchasable
-					  ),
-		};
-	});
-}
-
-export function formatProductOptions(skuOptions, productOptions) {
-	return skuOptions.map(({key: optionId, value: optionValueId}) => {
-		const option = productOptions.find(
-			(productOption) => String(productOption.id) === String(optionId)
-		);
-
-		const optionValue =
-			option &&
-			option.productOptionValues.find(
-				(productOptionValue) =>
-					String(productOptionValue.id) === String(optionValueId)
-			);
-
-		return {key: option.key, value: [optionValue.key]};
-	});
-}
-
-export function getProductURL(productBaseURL, productURLs) {
-	const productShortLink =
-		productURLs[Liferay.ThemeDisplay.getLanguageId()] ||
-		productURLs[Liferay.ThemeDisplay.getDefaultLanguageId()];
-
-	return productBaseURL + productShortLink;
-}
-
-export function getProductName(product) {
-	return (
-		product.productName[Liferay.ThemeDisplay.getLanguageId()] ||
-		product.productName[Liferay.ThemeDisplay.getDefaultLanguageId()]
-	);
 }

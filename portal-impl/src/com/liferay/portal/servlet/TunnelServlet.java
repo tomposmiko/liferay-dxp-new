@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProtectedClassLoaderObjectInputStream;
-import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -76,7 +75,7 @@ public class TunnelServlet extends HttpServlet {
 		}
 		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioException);
+				_log.warn(ioException, ioException);
 			}
 
 			return;
@@ -95,19 +94,10 @@ public class TunnelServlet extends HttpServlet {
 
 			MethodHandler methodHandler = ovp.getValue();
 
-			if (_log.isDebugEnabled()) {
-				_log.debug("Method handler " + methodHandler);
-			}
-
 			if (methodHandler != null) {
 				MethodKey methodKey = methodHandler.getMethodKey();
 
 				if (!isValidRequest(methodKey.getDeclaringClass())) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Invalid request " + methodKey.getDeclaringClass());
-					}
-
 					return;
 				}
 
@@ -115,14 +105,11 @@ public class TunnelServlet extends HttpServlet {
 			}
 		}
 		catch (InvocationTargetException invocationTargetException) {
-			_log.error(invocationTargetException);
+			_log.error(invocationTargetException, invocationTargetException);
 
 			Throwable throwable = invocationTargetException.getCause();
 
-			if (throwable == null) {
-				returnObject = new SystemException();
-			}
-			else if (PropsValues.TUNNEL_SERVLET_HIDE_EXCEPTION_DATA) {
+			if (throwable != null) {
 				Class<?> clazz = throwable.getClass();
 
 				if (throwable instanceof PortalException) {
@@ -134,22 +121,15 @@ public class TunnelServlet extends HttpServlet {
 						"Invocation failed due to " + clazz.getName());
 				}
 			}
-			else if (throwable instanceof PortalException) {
-				returnObject = throwable;
-			}
 			else {
-				returnObject = new SystemException(throwable.getMessage());
+				returnObject = new SystemException();
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 		finally {
 			AccessControlThreadLocal.setRemoteAccess(remoteAccess);
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Return object " + returnObject);
 		}
 
 		if (returnObject != null) {
@@ -159,7 +139,7 @@ public class TunnelServlet extends HttpServlet {
 				objectOutputStream.writeObject(returnObject);
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 
 				throw ioException;
 			}

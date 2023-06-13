@@ -14,9 +14,6 @@
 
 package com.liferay.poshi.runner.util;
 
-import com.liferay.poshi.runner.var.type.DefaultTable;
-import com.liferay.poshi.runner.var.type.Table;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -79,18 +76,6 @@ public class TableUtil {
 		}
 
 		return transposedRawDataList;
-	}
-
-	public static Table newTable(String tableData) {
-		return new DefaultTable(tableData);
-	}
-
-	public static Table newTableWithColumnNames(String tableData) {
-		return new DefaultTable(tableData, false, true);
-	}
-
-	public static Table newTableWithRowNames(String tableData) {
-		return new DefaultTable(tableData, true, false);
 	}
 
 	private static final Pattern _entryPattern = Pattern.compile(

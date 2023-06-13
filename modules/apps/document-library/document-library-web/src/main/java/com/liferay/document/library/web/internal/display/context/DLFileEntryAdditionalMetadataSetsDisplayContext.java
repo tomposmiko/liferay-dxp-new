@@ -14,25 +14,17 @@
 
 package com.liferay.document.library.web.internal.display.context;
 
-import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeServiceUtil;
-import com.liferay.document.library.util.DLFileEntryTypeUtil;
-import com.liferay.dynamic.data.mapping.item.selector.DDMStructureItemSelectorReturnType;
-import com.liferay.dynamic.data.mapping.item.selector.criterion.DDMStructureItemSelectorCriterion;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.item.selector.ItemSelector;
+import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Collections;
 import java.util.List;
-
-import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,13 +34,20 @@ import javax.servlet.http.HttpServletRequest;
 public class DLFileEntryAdditionalMetadataSetsDisplayContext {
 
 	public DLFileEntryAdditionalMetadataSetsDisplayContext(
-		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
+		HttpServletRequest httpServletRequest) {
 
 		_httpServletRequest = httpServletRequest;
-		_renderResponse = renderResponse;
 	}
 
-	public List<DDMStructure> getDDMStructures() throws PortalException {
+	public long getDDMStructureId() throws PortalException {
+		return BeanParamUtil.getLong(
+			_getDDMStructure(), _httpServletRequest, "structureId");
+	}
+
+	public List<com.liferay.dynamic.data.mapping.kernel.DDMStructure>
+			getDDMStructures()
+		throws PortalException {
+
 		if (_ddmStructures != null) {
 			return _ddmStructures;
 		}
@@ -64,12 +63,11 @@ public class DLFileEntryAdditionalMetadataSetsDisplayContext {
 		DDMStructure ddmStructure = _getDDMStructure();
 
 		if (ddmStructure == null) {
-			_ddmStructures = DLFileEntryTypeUtil.getDDMStructures(
-				dlFileEntryType);
+			_ddmStructures = dlFileEntryType.getDDMStructures();
 		}
 		else {
 			_ddmStructures = ListUtil.filter(
-				DLFileEntryTypeUtil.getDDMStructures(dlFileEntryType),
+				dlFileEntryType.getDDMStructures(),
 				currentDDMStructure ->
 					currentDDMStructure.getStructureId() !=
 						ddmStructure.getStructureId());
@@ -79,7 +77,8 @@ public class DLFileEntryAdditionalMetadataSetsDisplayContext {
 	}
 
 	public int getDDMStructuresCount() throws PortalException {
-		List<DDMStructure> ddmStructures = getDDMStructures();
+		List<com.liferay.dynamic.data.mapping.kernel.DDMStructure>
+			ddmStructures = getDDMStructures();
 
 		return ddmStructures.size();
 	}
@@ -98,26 +97,6 @@ public class DLFileEntryAdditionalMetadataSetsDisplayContext {
 		}
 
 		return _dlFileEntryType;
-	}
-
-	public String getSelectDDMStructureURL() {
-		ItemSelector itemSelector =
-			(ItemSelector)_httpServletRequest.getAttribute(
-				ItemSelector.class.getName());
-
-		DDMStructureItemSelectorCriterion ddmStructureItemSelectorCriterion =
-			new DDMStructureItemSelectorCriterion();
-
-		ddmStructureItemSelectorCriterion.setClassNameId(
-			PortalUtil.getClassNameId(DLFileEntryMetadata.class));
-		ddmStructureItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new DDMStructureItemSelectorReturnType());
-
-		return String.valueOf(
-			itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
-				_renderResponse.getNamespace() + "selectDDMStructure",
-				ddmStructureItemSelectorCriterion));
 	}
 
 	private DDMStructure _getDDMStructure() throws PortalException {
@@ -140,9 +119,9 @@ public class DLFileEntryAdditionalMetadataSetsDisplayContext {
 	}
 
 	private DDMStructure _ddmStructure;
-	private List<DDMStructure> _ddmStructures;
+	private List<com.liferay.dynamic.data.mapping.kernel.DDMStructure>
+		_ddmStructures;
 	private DLFileEntryType _dlFileEntryType;
 	private final HttpServletRequest _httpServletRequest;
-	private final RenderResponse _renderResponse;
 
 }

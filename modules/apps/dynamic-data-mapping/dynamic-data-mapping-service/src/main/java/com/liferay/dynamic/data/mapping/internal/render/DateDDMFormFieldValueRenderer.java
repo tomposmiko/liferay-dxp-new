@@ -79,7 +79,7 @@ public class DateDDMFormFieldValueRenderer
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return LanguageUtil.format(

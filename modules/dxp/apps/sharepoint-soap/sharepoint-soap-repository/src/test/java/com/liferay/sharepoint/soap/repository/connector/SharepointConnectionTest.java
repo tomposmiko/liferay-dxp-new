@@ -146,9 +146,13 @@ public class SharepointConnectionTest {
 			_filePath1);
 
 		Assert.assertNull(sharepointObject.getCheckedOutBy());
-		Assert.assertEquals(
-			_CONTENT_BYE_WORLD,
-			getString(_sharepointConnection.getInputStream(sharepointObject)));
+
+		InputStream inputStream = _sharepointConnection.getInputStream(
+			sharepointObject);
+
+		String inputStreamString = getString(inputStream);
+
+		Assert.assertEquals(_CONTENT_BYE_WORLD, inputStreamString);
 	}
 
 	@Test
@@ -341,11 +345,10 @@ public class SharepointConnectionTest {
 	public void testGetSharepointObjectInputStream() throws Exception {
 		addSharepointObjects(true, false, false, false);
 
-		Assert.assertEquals(
-			_CONTENT_HELLO_WORLD,
-			getString(
-				_sharepointConnection.getInputStream(
-					_sharepointConnection.getSharepointObject(_filePath1))));
+		InputStream inputStream = _sharepointConnection.getInputStream(
+			_sharepointConnection.getSharepointObject(_filePath1));
+
+		Assert.assertEquals(_CONTENT_HELLO_WORLD, getString(inputStream));
 	}
 
 	@Test
@@ -458,16 +461,15 @@ public class SharepointConnectionTest {
 		List<SharepointVersion> sharepointVersions =
 			_sharepointConnection.getSharepointVersions(_filePath1);
 
-		Assert.assertEquals(
-			_CONTENT_BYE_WORLD,
-			getString(
-				_sharepointConnection.getInputStream(
-					sharepointVersions.get(0))));
-		Assert.assertEquals(
-			_CONTENT_HELLO_WORLD,
-			getString(
-				_sharepointConnection.getInputStream(
-					sharepointVersions.get(1))));
+		InputStream inputStream = _sharepointConnection.getInputStream(
+			sharepointVersions.get(0));
+
+		Assert.assertEquals(_CONTENT_BYE_WORLD, getString(inputStream));
+
+		inputStream = _sharepointConnection.getInputStream(
+			sharepointVersions.get(1));
+
+		Assert.assertEquals(_CONTENT_HELLO_WORLD, getString(inputStream));
 	}
 
 	@Test

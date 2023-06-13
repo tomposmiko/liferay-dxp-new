@@ -14,11 +14,14 @@
 
 package com.liferay.portal.search.permission;
 
+import java.util.Optional;
+
 /**
  * @author Bryan Engler
  */
 public interface SearchPermissionFilterContributor {
 
-	public String getParentEntryClassName(String entryClassName);
+	public Optional<String> getParentEntryClassNameOptional(
+		String entryClassName);
 
 }

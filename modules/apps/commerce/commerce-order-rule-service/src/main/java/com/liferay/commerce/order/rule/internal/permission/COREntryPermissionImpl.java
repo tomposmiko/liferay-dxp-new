@@ -28,7 +28,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = COREntryPermission.class)
+@Component(
+	enabled = false, immediate = true, service = COREntryPermission.class
+)
 public class COREntryPermissionImpl implements COREntryPermission {
 
 	@Override

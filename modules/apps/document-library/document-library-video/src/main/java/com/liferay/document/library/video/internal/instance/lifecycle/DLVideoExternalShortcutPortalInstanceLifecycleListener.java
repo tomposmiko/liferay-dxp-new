@@ -20,6 +20,7 @@ import com.liferay.document.library.video.internal.helper.DLVideoExternalShortcu
 import com.liferay.dynamic.data.mapping.kernel.DDMStructureManager;
 import com.liferay.dynamic.data.mapping.kernel.DDMStructureManagerUtil;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalService;
 import com.liferay.dynamic.data.mapping.util.DDMStructurePermissionSupport;
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -33,7 +34,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 
 import java.lang.reflect.Field;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  * @author Alejandro Tardín
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
 public class DLVideoExternalShortcutPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
@@ -58,19 +58,35 @@ public class DLVideoExternalShortcutPortalInstanceLifecycleListener
 						_userLocalService);
 
 			dlVideoExternalShortcutDLFileEntryTypeHelper.
-				addDLVideoExternalShortcutDLFileEntryType(true);
+				addDLVideoExternalShortcutDLFileEntryType();
 		}
 		catch (PortalException portalException) {
 			throw new ModelListenerException(portalException);
 		}
 	}
 
-	@Activate
-	protected void activate() throws Exception {
+	@Reference(unbind = "-")
+	protected void setDDMStructureManager(
+			DDMStructureManager ddmStructureManager)
+		throws Exception {
+
 		Field field = ReflectionUtil.getDeclaredField(
 			DDMStructureManagerUtil.class, "_ddmStructureManager");
 
-		field.set(null, _ddmStructureManager);
+		field.set(null, ddmStructureManager);
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.document.library.kernel.model.DLFileEntryMetadata)",
+		unbind = "-"
+	)
+	protected void setDDMStructurePermissionSupport(
+		DDMStructurePermissionSupport ddmStructurePermissionSupport) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureVersionLocalService(
+		DDMStructureVersionLocalService ddmStructureVersionLocalService) {
 	}
 
 	@Reference
@@ -78,14 +94,6 @@ public class DLVideoExternalShortcutPortalInstanceLifecycleListener
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
-	private DDMStructureManager _ddmStructureManager;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.document.library.kernel.model.DLFileEntryMetadata)"
-	)
-	private DDMStructurePermissionSupport _ddmStructurePermissionSupport;
 
 	@Reference
 	private DefaultDDMStructureHelper _defaultDDMStructureHelper;

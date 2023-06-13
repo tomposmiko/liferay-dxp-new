@@ -164,8 +164,6 @@ public class FragmentEntryLinkPersistenceTest {
 
 		newFragmentEntryLink.setConfiguration(RandomTestUtil.randomString());
 
-		newFragmentEntryLink.setDeleted(RandomTestUtil.randomBoolean());
-
 		newFragmentEntryLink.setEditableValues(RandomTestUtil.randomString());
 
 		newFragmentEntryLink.setNamespace(RandomTestUtil.randomString());
@@ -173,8 +171,6 @@ public class FragmentEntryLinkPersistenceTest {
 		newFragmentEntryLink.setPosition(RandomTestUtil.nextInt());
 
 		newFragmentEntryLink.setRendererKey(RandomTestUtil.randomString());
-
-		newFragmentEntryLink.setType(RandomTestUtil.nextInt());
 
 		newFragmentEntryLink.setLastPropagationDate(RandomTestUtil.nextDate());
 
@@ -244,9 +240,6 @@ public class FragmentEntryLinkPersistenceTest {
 			existingFragmentEntryLink.getConfiguration(),
 			newFragmentEntryLink.getConfiguration());
 		Assert.assertEquals(
-			existingFragmentEntryLink.isDeleted(),
-			newFragmentEntryLink.isDeleted());
-		Assert.assertEquals(
 			existingFragmentEntryLink.getEditableValues(),
 			newFragmentEntryLink.getEditableValues());
 		Assert.assertEquals(
@@ -258,9 +251,6 @@ public class FragmentEntryLinkPersistenceTest {
 		Assert.assertEquals(
 			existingFragmentEntryLink.getRendererKey(),
 			newFragmentEntryLink.getRendererKey());
-		Assert.assertEquals(
-			existingFragmentEntryLink.getType(),
-			newFragmentEntryLink.getType());
 		Assert.assertEquals(
 			Time.getShortTimestamp(
 				existingFragmentEntryLink.getLastPropagationDate()),
@@ -314,12 +304,6 @@ public class FragmentEntryLinkPersistenceTest {
 	}
 
 	@Test
-	public void testCountByFragmentEntryIdArrayable() throws Exception {
-		_persistence.countByFragmentEntryId(
-			new long[] {RandomTestUtil.nextLong(), 0L});
-	}
-
-	@Test
 	public void testCountByRendererKey() throws Exception {
 		_persistence.countByRendererKey("");
 
@@ -342,48 +326,6 @@ public class FragmentEntryLinkPersistenceTest {
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
 		_persistence.countByG_P(0L, 0L);
-	}
-
-	@Test
-	public void testCountByC_R() throws Exception {
-		_persistence.countByC_R(RandomTestUtil.nextLong(), "");
-
-		_persistence.countByC_R(0L, "null");
-
-		_persistence.countByC_R(0L, (String)null);
-	}
-
-	@Test
-	public void testCountByC_RArrayable() throws Exception {
-		_persistence.countByC_R(
-			RandomTestUtil.nextLong(),
-			new String[] {
-				RandomTestUtil.randomString(), "", "null", null, null
-			});
-	}
-
-	@Test
-	public void testCountByF_D() throws Exception {
-		_persistence.countByF_D(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
-
-		_persistence.countByF_D(0L, RandomTestUtil.randomBoolean());
-	}
-
-	@Test
-	public void testCountByF_DArrayable() throws Exception {
-		_persistence.countByF_D(
-			new long[] {RandomTestUtil.nextLong(), 0L},
-			RandomTestUtil.randomBoolean());
-	}
-
-	@Test
-	public void testCountByG_OFELI_P() throws Exception {
-		_persistence.countByG_OFELI_P(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong());
-
-		_persistence.countByG_OFELI_P(0L, 0L, 0L);
 	}
 
 	@Test
@@ -414,29 +356,12 @@ public class FragmentEntryLinkPersistenceTest {
 	}
 
 	@Test
-	public void testCountByG_S_PArrayable() throws Exception {
-		_persistence.countByG_S_P(
-			RandomTestUtil.nextLong(),
-			new long[] {RandomTestUtil.nextLong(), 0L},
-			RandomTestUtil.nextLong());
-	}
-
-	@Test
 	public void testCountByG_C_C() throws Exception {
 		_persistence.countByG_C_C(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
 			RandomTestUtil.nextLong());
 
 		_persistence.countByG_C_C(0L, 0L, 0L);
-	}
-
-	@Test
-	public void testCountByG_P_D() throws Exception {
-		_persistence.countByG_P_D(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
-			RandomTestUtil.randomBoolean());
-
-		_persistence.countByG_P_D(0L, 0L, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
@@ -498,9 +423,9 @@ public class FragmentEntryLinkPersistenceTest {
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "originalFragmentEntryLinkId", true,
 			"fragmentEntryId", true, "segmentsExperienceId", true,
-			"classNameId", true, "classPK", true, "plid", true, "deleted", true,
-			"namespace", true, "position", true, "rendererKey", true, "type",
-			true, "lastPropagationDate", true, "lastPublishDate", true);
+			"classNameId", true, "classPK", true, "plid", true, "namespace",
+			true, "position", true, "rendererKey", true, "lastPropagationDate",
+			true, "lastPublishDate", true);
 	}
 
 	@Test
@@ -832,8 +757,6 @@ public class FragmentEntryLinkPersistenceTest {
 
 		fragmentEntryLink.setConfiguration(RandomTestUtil.randomString());
 
-		fragmentEntryLink.setDeleted(RandomTestUtil.randomBoolean());
-
 		fragmentEntryLink.setEditableValues(RandomTestUtil.randomString());
 
 		fragmentEntryLink.setNamespace(RandomTestUtil.randomString());
@@ -841,8 +764,6 @@ public class FragmentEntryLinkPersistenceTest {
 		fragmentEntryLink.setPosition(RandomTestUtil.nextInt());
 
 		fragmentEntryLink.setRendererKey(RandomTestUtil.randomString());
-
-		fragmentEntryLink.setType(RandomTestUtil.nextInt());
 
 		fragmentEntryLink.setLastPropagationDate(RandomTestUtil.nextDate());
 

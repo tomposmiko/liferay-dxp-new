@@ -9,8 +9,6 @@
  * distribution rights of the Software.
  */
 
-/* eslint-disable @liferay/empty-line-between-elements */
-
 import ClayAlert from '@clayui/alert';
 import ClayLayout from '@clayui/layout';
 import React, {useContext, useEffect, useState} from 'react';
@@ -26,28 +24,11 @@ function SLAInfo({processId}) {
 
 	const url = `/processes/${processId}/slas?page=1&pageSize=1`;
 
-	const {fetchData} = useFetch({
-		callback: ({totalCount}) => {
-			if (totalCount === 0) {
-				setAlert({
-					content: `${Liferay.Language.get(
-						'no-slas-are-defined-for-this-process'
-					)}`,
-					link: `/sla/${processId}/new`,
-					linkText: Liferay.Language.get('add-a-new-sla'),
-				});
+	const {fetchData} = useFetch({url});
+	const {fetchData: fetchSLABlocked} = useFetch({url: `${url}&status=2`});
 
-				setFetchDateModified(false);
-			}
-			else {
-				setFetchDateModified(true);
-				fetchSLABlocked();
-			}
-		},
-		url,
-	});
-	const {fetchData: fetchSLABlocked} = useFetch({
-		callback: ({totalCount}) => {
+	const getSLABlockedCount = () => {
+		fetchSLABlocked().then(({totalCount}) => {
 			if (totalCount > 0) {
 				setAlert({
 					content: `${sub(
@@ -62,13 +43,31 @@ function SLAInfo({processId}) {
 					linkText: Liferay.Language.get('set-up-slas'),
 				});
 			}
-		},
-		url: `${url}&status=2`,
-	});
+		});
+	};
+
+	const getSLACount = () => {
+		fetchData().then(({totalCount}) => {
+			if (totalCount === 0) {
+				setAlert({
+					content: `${Liferay.Language.get(
+						'no-slas-are-defined-for-this-process'
+					)}`,
+					link: `/sla/${processId}/new`,
+					linkText: Liferay.Language.get('add-a-new-sla'),
+				});
+
+				setFetchDateModified(false);
+			}
+			else {
+				setFetchDateModified(true);
+				getSLABlockedCount();
+			}
+		});
+	};
 
 	useEffect(() => {
-		fetchData();
-
+		getSLACount();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

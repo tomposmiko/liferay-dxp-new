@@ -85,6 +85,17 @@ public interface AssetListEntryUsageLocalService
 	public AssetListEntryUsage addAssetListEntryUsage(
 		AssetListEntryUsage assetListEntryUsage);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addAssetListEntryUsage(long, long, long, long, long, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
+	public AssetListEntryUsage addAssetListEntryUsage(
+			long userId, long groupId, long assetListEntryId, long classNameId,
+			long classPK, String portletId, ServiceContext serviceContext)
+		throws PortalException;
+
 	public AssetListEntryUsage addAssetListEntryUsage(
 			long userId, long groupId, long classNameId, String containerKey,
 			long containerType, String key, long plid,
@@ -136,8 +147,6 @@ public interface AssetListEntryUsageLocalService
 	public AssetListEntryUsage deleteAssetListEntryUsage(
 			long assetListEntryUsageId)
 		throws PortalException;
-
-	public void deleteAssetListEntryUsages(long containerType, long plid);
 
 	public void deleteAssetListEntryUsages(
 		String containerKey, long containerType, long plid);
@@ -225,6 +234,15 @@ public interface AssetListEntryUsageLocalService
 	public AssetListEntryUsage fetchAssetListEntryUsage(
 		long assetListEntryUsageId);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(String, long, long)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetListEntryUsage fetchAssetListEntryUsage(
+		long classNameId, long classPK, String portletId);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetListEntryUsage fetchAssetListEntryUsage(
 		long groupId, long classNameId, String containerKey, long containerType,
@@ -243,10 +261,6 @@ public interface AssetListEntryUsageLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AssetListEntryUsage> getAssetEntryListUsages(
-		long containerType, long plid);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetListEntryUsage> getAssetEntryListUsagesByPlid(long plid);
@@ -290,6 +304,46 @@ public interface AssetListEntryUsageLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetListEntryUsage> getAssetListEntryUsages(
 		int start, int end);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId, int start, int end,
+		OrderByComparator<AssetListEntryUsage> orderByComparator);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String, int)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId, long classNameId);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String, int, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId, long classNameId, int start, int end,
+		OrderByComparator<AssetListEntryUsage> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<AssetListEntryUsage> getAssetListEntryUsages(
@@ -347,6 +401,23 @@ public interface AssetListEntryUsageLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getAssetListEntryUsagesCount();
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsagesCount(long, long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getAssetListEntryUsagesCount(long assetListEntryId);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsagesCount(long, long, String, int)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getAssetListEntryUsagesCount(
+		long assetListEntryId, long classNameId);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getAssetListEntryUsagesCount(
 		long groupId, long classNameId, String key);
@@ -354,10 +425,6 @@ public interface AssetListEntryUsageLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getAssetListEntryUsagesCount(
 		long groupId, long classNameId, String key, int type);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCompanyAssetListEntryUsagesCount(
-		long companyId, long classNameId, String key);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(

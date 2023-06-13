@@ -16,9 +16,7 @@ package com.liferay.commerce.product.service;
 
 import com.liferay.commerce.product.model.CPMeasurementUnit;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -33,8 +31,6 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -59,15 +55,13 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CPMeasurementUnitLocalServiceUtil
  * @generated
  */
-@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface CPMeasurementUnitLocalService
-	extends BaseLocalService, CTService<CPMeasurementUnit>,
-			PersistedModelLocalService {
+	extends BaseLocalService, PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -90,8 +84,8 @@ public interface CPMeasurementUnitLocalService
 		CPMeasurementUnit cpMeasurementUnit);
 
 	public CPMeasurementUnit addCPMeasurementUnit(
-			String externalReferenceCode, Map<Locale, String> nameMap,
-			String key, double rate, boolean primary, double priority, int type,
+			Map<Locale, String> nameMap, String key, double rate,
+			boolean primary, double priority, int type,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -224,19 +218,6 @@ public interface CPMeasurementUnitLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPMeasurementUnit fetchCPMeasurementUnit(long CPMeasurementUnitId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPMeasurementUnit fetchCPMeasurementUnitByExternalReferenceCode(
-		long companyId, String externalReferenceCode);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPMeasurementUnit fetchCPMeasurementUnitByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPMeasurementUnit fetchCPMeasurementUnitByKey(
-			long companyId, String key)
-		throws PortalException;
-
 	/**
 	 * Returns the cp measurement unit matching the UUID and group.
 	 *
@@ -253,10 +234,6 @@ public interface CPMeasurementUnitLocalService
 		long companyId, int type);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPMeasurementUnit fetchPrimaryCPMeasurementUnitByType(
-		long companyId, int type);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	/**
@@ -268,16 +245,6 @@ public interface CPMeasurementUnitLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPMeasurementUnit getCPMeasurementUnit(long CPMeasurementUnitId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPMeasurementUnit getCPMeasurementUnitByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPMeasurementUnit getCPMeasurementUnitByKey(
-			long companyId, String key)
 		throws PortalException;
 
 	/**
@@ -322,18 +289,7 @@ public interface CPMeasurementUnitLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CPMeasurementUnit> getCPMeasurementUnits(
-		long companyId, String[] keys);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CPMeasurementUnit> getCPMeasurementUnitsByType(
-			long companyId, int type)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CPMeasurementUnit> getCPMeasurementUnitsByType(
-			long companyId, int type, int start, int end,
-			OrderByComparator<CPMeasurementUnit> orderByComparator)
-		throws PortalException;
+		long companyId, String[] keys, int type);
 
 	/**
 	 * Returns all the cp measurement units matching the UUID and company.
@@ -419,25 +375,9 @@ public interface CPMeasurementUnitLocalService
 		CPMeasurementUnit cpMeasurementUnit);
 
 	public CPMeasurementUnit updateCPMeasurementUnit(
-			String externalReferenceCode, long cpMeasurementUnitId,
-			Map<Locale, String> nameMap, String key, double rate,
-			boolean primary, double priority, int type,
+			long cpMeasurementUnitId, Map<Locale, String> nameMap, String key,
+			double rate, boolean primary, double priority, int type,
 			ServiceContext serviceContext)
 		throws PortalException;
-
-	@Override
-	@Transactional(enabled = false)
-	public CTPersistence<CPMeasurementUnit> getCTPersistence();
-
-	@Override
-	@Transactional(enabled = false)
-	public Class<CPMeasurementUnit> getModelClass();
-
-	@Override
-	@Transactional(rollbackFor = Throwable.class)
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CPMeasurementUnit>, R, E>
-				updateUnsafeFunction)
-		throws E;
 
 }

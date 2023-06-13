@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class ExpandoValueServiceWrapper
 	implements ExpandoValueService, ServiceWrapper<ExpandoValueService> {
 
-	public ExpandoValueServiceWrapper() {
-		this(null);
-	}
-
 	public ExpandoValueServiceWrapper(ExpandoValueService expandoValueService) {
 		_expandoValueService = expandoValueService;
 	}

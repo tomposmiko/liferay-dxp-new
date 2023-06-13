@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author William Newbury
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.footer-portlet-javascript=/js/main.js",
@@ -39,8 +40,7 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.init-param.view-template=/review_uad_data.jsp",
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )

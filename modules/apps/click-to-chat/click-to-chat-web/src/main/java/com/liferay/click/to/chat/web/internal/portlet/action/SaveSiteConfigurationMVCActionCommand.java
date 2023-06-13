@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author José Abelenda
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
 		"mvc.command.name=/click_to_chat/save_site_configuration"
@@ -79,9 +80,6 @@ public class SaveSiteConfigurationMVCActionCommand
 			).put(
 				"guestUsersAllowed",
 				ParamUtil.getBoolean(actionRequest, "guestUsersAllowed")
-			).put(
-				"hideInControlPanel",
-				ParamUtil.getBoolean(actionRequest, "hideInControlPanel")
 			).put(
 				"siteSettingsStrategy",
 				ParamUtil.getBoolean(actionRequest, "siteSettingsStrategy")

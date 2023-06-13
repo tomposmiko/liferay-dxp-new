@@ -21,6 +21,7 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
+import com.liferay.portal.kernel.nio.intraband.PortalExecutorManagerInvocationHandler;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.SwappableSecurityManager;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -357,12 +358,10 @@ public class AutoBatchPreparedStatementUtilTest {
 
 		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					(Connection)ProxyUtil.newProxyInstance(
+					(PreparedStatement)ProxyUtil.newProxyInstance(
 						ClassLoader.getSystemClassLoader(),
-						new Class<?>[] {Connection.class},
-						new ConnectionInvocationHandler(
-							preparedStatementInvocationHandler)),
-					"")) {
+						new Class<?>[] {PreparedStatement.class},
+						preparedStatementInvocationHandler))) {
 
 			Assert.assertTrue(methods.toString(), methods.isEmpty());
 
@@ -394,18 +393,6 @@ public class AutoBatchPreparedStatementUtilTest {
 		Assert.assertEquals(methods.toString(), 1, methods.size());
 		Assert.assertEquals(
 			PreparedStatement.class.getMethod("close"), methods.remove(0));
-
-		try (PreparedStatement preparedStatement =
-				AutoBatchPreparedStatementUtil.autoBatch(
-					(Connection)ProxyUtil.newProxyInstance(
-						ClassLoader.getSystemClassLoader(),
-						new Class<?>[] {Connection.class},
-						new ConnectionInvocationHandler(
-							preparedStatementInvocationHandler)),
-					"")) {
-		}
-
-		Assert.assertTrue(methods.toString(), methods.isEmpty());
 	}
 
 	protected void doTestNotSupportBatchUpdatesConcurrent() throws Exception {
@@ -451,6 +438,10 @@ public class AutoBatchPreparedStatementUtilTest {
 				PreparedStatement.class.getMethod("execute"),
 				methods.remove(0));
 		}
+
+		Assert.assertEquals(methods.toString(), 1, methods.size());
+		Assert.assertEquals(
+			PreparedStatement.class.getMethod("close"), methods.remove(0));
 	}
 
 	protected void doTestSupportBaseUpdates() throws Exception {
@@ -459,16 +450,12 @@ public class AutoBatchPreparedStatementUtilTest {
 
 		List<Method> methods = preparedStatementInvocationHandler.getMethods();
 
-		Connection connection = (Connection)ProxyUtil.newProxyInstance(
-			ClassLoader.getSystemClassLoader(),
-			new Class<?>[] {Connection.class},
-			new ConnectionInvocationHandler(
-				preparedStatementInvocationHandler));
-
 		try (PreparedStatement preparedStatement =
-				AutoBatchPreparedStatementUtil.autoBatch(connection, "")) {
-
-			Assert.assertSame(connection, preparedStatement.getConnection());
+				AutoBatchPreparedStatementUtil.autoBatch(
+					(PreparedStatement)ProxyUtil.newProxyInstance(
+						ClassLoader.getSystemClassLoader(),
+						new Class<?>[] {PreparedStatement.class},
+						preparedStatementInvocationHandler))) {
 
 			InvocationHandler invocationHandler =
 				ProxyUtil.getInvocationHandler(preparedStatement);
@@ -663,6 +650,10 @@ public class AutoBatchPreparedStatementUtilTest {
 				Integer.valueOf(0),
 				ReflectionTestUtil.getFieldValue(invocationHandler, "_count"));
 		}
+
+		Assert.assertEquals(methods.toString(), 1, methods.size());
+		Assert.assertEquals(
+			PreparedStatement.class.getMethod("close"), methods.remove(0));
 	}
 
 	private ServiceRegistration<?> _serviceRegistration;
@@ -743,6 +734,15 @@ public class AutoBatchPreparedStatementUtilTest {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
 			throws NoSuchMethodException {
+
+			if (method.equals(
+					PreparedStatement.class.getMethod("getConnection"))) {
+
+				return ProxyUtil.newProxyInstance(
+					ClassLoader.getSystemClassLoader(),
+					new Class<?>[] {Connection.class},
+					new ConnectionInvocationHandler(this));
+			}
 
 			_methods.add(method);
 

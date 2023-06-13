@@ -96,7 +96,8 @@ public class CommerceAccountGroupRelServiceUtil {
 	}
 
 	public static int getCommerceAccountGroupRelsCount(
-		String className, long classPK) {
+			String className, long classPK)
+		throws PortalException {
 
 		return getService().getCommerceAccountGroupRelsCount(
 			className, classPK);

@@ -51,7 +51,7 @@ public class AccessControlAdvisorImpl implements AccessControlAdvisor {
 			}
 			catch (SecurityException securityException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(securityException);
+					_log.debug(securityException, securityException);
 				}
 
 				if (PropsValues.ACCESS_CONTROL_SANITIZE_SECURITY_EXCEPTION) {
@@ -74,8 +74,9 @@ public class AccessControlAdvisorImpl implements AccessControlAdvisor {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AccessControlAdvisorImpl.class.getName());
 
-	private static final ServiceTrackerList<AccessControlPolicy>
-		_accessControlPolicies = ServiceTrackerListFactory.open(
-			SystemBundleUtil.getBundleContext(), AccessControlPolicy.class);
+	private static final ServiceTrackerList
+		<AccessControlPolicy, AccessControlPolicy> _accessControlPolicies =
+			ServiceTrackerListFactory.open(
+				SystemBundleUtil.getBundleContext(), AccessControlPolicy.class);
 
 }

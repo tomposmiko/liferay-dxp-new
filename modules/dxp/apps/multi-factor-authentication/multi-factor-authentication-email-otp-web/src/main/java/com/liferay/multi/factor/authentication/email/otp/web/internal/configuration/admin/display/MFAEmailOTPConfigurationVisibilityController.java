@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marta Medio
  */
 @Component(
+	immediate = true,
 	property = "configuration.pid=com.liferay.multi.factor.authentication.email.otp.configuration.MFAEmailOTPConfiguration",
 	service = ConfigurationVisibilityController.class
 )

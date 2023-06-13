@@ -14,12 +14,11 @@
 
 package com.liferay.account.internal.model.listener.test;
 
+import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountRoleLocalService;
-import com.liferay.account.service.test.util.AccountEntryArgs;
-import com.liferay.account.service.test.util.AccountEntryTestUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -28,6 +27,8 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -53,10 +54,14 @@ public class CompanyModelListenerTest {
 	public void setUp() throws Exception {
 		_company = CompanyTestUtil.addCompany();
 
-		_guestUser = _company.getGuestUser();
+		_defaultUser = _company.getDefaultUser();
 
-		_accountEntry = AccountEntryTestUtil.addAccountEntry(
-			AccountEntryArgs.withOwner(_guestUser));
+		_accountEntry = _accountEntryLocalService.addAccountEntry(
+			_defaultUser.getUserId(), 0L, RandomTestUtil.randomString(50),
+			RandomTestUtil.randomString(50), null, null, null, null,
+			AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
+			WorkflowConstants.STATUS_APPROVED,
+			ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -71,7 +76,7 @@ public class CompanyModelListenerTest {
 	@Test
 	public void testCleanUpAccountRoles() throws Exception {
 		AccountRole accountRole = _accountRoleLocalService.addAccountRole(
-			_guestUser.getUserId(), _accountEntry.getAccountEntryId(),
+			_defaultUser.getUserId(), _accountEntry.getAccountEntryId(),
 			RandomTestUtil.randomString(), null, null);
 
 		_deleteCompany();
@@ -101,6 +106,6 @@ public class CompanyModelListenerTest {
 	@Inject
 	private CompanyLocalService _companyLocalService;
 
-	private User _guestUser;
+	private User _defaultUser;
 
 }

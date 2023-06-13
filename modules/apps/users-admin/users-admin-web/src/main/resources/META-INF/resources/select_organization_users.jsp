@@ -55,7 +55,7 @@ SearchContainer<User> userSearchContainer = selectOrganizationUsersManagementToo
 	viewTypeItems="<%= selectOrganizationUsersManagementToolbarDisplayContext.getViewTypeItems() %>"
 />
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<liferay-ui:search-container
 		id="users"
 		searchContainer="<%= userSearchContainer %>"
@@ -87,8 +87,13 @@ SearchContainer<User> userSearchContainer = selectOrganizationUsersManagementToo
 				</c:when>
 				<c:when test='<%= displayStyle.equals("icon") %>'>
 					<liferay-ui:search-container-column-text>
-						<clay:user-card
-							userCard="<%= new UserVerticalCard(renderRequest, userSearchContainer.getRowChecker(), user2) %>"
+						<liferay-frontend:user-vertical-card
+							actionJspServletContext="<%= application %>"
+							resultRow="<%= row %>"
+							rowChecker="<%= userSearchContainer.getRowChecker() %>"
+							subtitle="<%= user2.getScreenName() %>"
+							title="<%= user2.getFullName() %>"
+							userId="<%= user2.getUserId() %>"
 						/>
 					</liferay-ui:search-container-column-text>
 				</c:when>

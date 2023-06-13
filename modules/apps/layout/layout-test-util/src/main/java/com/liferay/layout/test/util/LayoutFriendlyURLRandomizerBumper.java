@@ -52,7 +52,8 @@ public class LayoutFriendlyURLRandomizerBumper
 		}
 		catch (LayoutFriendlyURLException layoutFriendlyURLException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(layoutFriendlyURLException);
+				_log.debug(
+					layoutFriendlyURLException, layoutFriendlyURLException);
 			}
 
 			return false;

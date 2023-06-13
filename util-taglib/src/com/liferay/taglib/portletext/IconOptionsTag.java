@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfiguration
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.util.comparator.PortletConfigurationIconComparator;
 import com.liferay.taglib.servlet.PipingServletResponseFactory;
@@ -37,10 +36,7 @@ import javax.servlet.jsp.PageContext;
 
 /**
  * @author Brian Wing Shun Chan
- * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
- *             com.liferay.frontend.taglib.servlet.taglib.IconOptionsTag}
  */
-@Deprecated
 public class IconOptionsTag extends IconTag {
 
 	public String getDirection() {
@@ -124,20 +120,6 @@ public class IconOptionsTag extends IconTag {
 
 		iconMenuTag.setCssClass("portlet-options");
 		iconMenuTag.setDirection(_direction);
-
-		for (PortletConfigurationIcon portletConfigurationIcon :
-				getPortletConfigurationIcons()) {
-
-			if (Validator.isNotNull(
-					portletConfigurationIcon.getIconCssClass())) {
-
-				iconMenuTag.setDropdownCssClass(
-					"dropdown-menu-indicator-start");
-
-				break;
-			}
-		}
-
 		iconMenuTag.setExtended(false);
 		iconMenuTag.setIcon("ellipsis-v");
 		iconMenuTag.setMarkupView("lexicon");
@@ -196,15 +178,8 @@ public class IconOptionsTag extends IconTag {
 				iconTag.setAriaRole(portletConfigurationIcon.getAriaRole());
 				iconTag.setCssClass(portletConfigurationIcon.getCssClass());
 				iconTag.setData(portletConfigurationIcon.getData());
-
-				if (Validator.isNotNull(
-						portletConfigurationIcon.getIconCssClass())) {
-
-					iconTag.setIcon(portletConfigurationIcon.getIconCssClass());
-					iconTag.setIconCssClass("dropdown-item-indicator-start");
-					iconTag.setMarkupView("lexicon");
-				}
-
+				iconTag.setIconCssClass(
+					portletConfigurationIcon.getIconCssClass());
 				iconTag.setId(portletConfigurationIcon.getId());
 				iconTag.setImage(portletConfigurationIcon.getImage());
 				iconTag.setImageHover(portletConfigurationIcon.getImageHover());

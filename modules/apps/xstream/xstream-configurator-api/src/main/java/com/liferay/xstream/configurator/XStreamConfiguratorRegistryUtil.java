@@ -15,25 +15,27 @@
 package com.liferay.xstream.configurator;
 
 import com.liferay.exportimport.kernel.xstream.XStreamAliasRegistryUtil;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.util.AggregateClassLoader;
 
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Máté Thurzó
  */
+@Component(immediate = true, service = {})
 public class XStreamConfiguratorRegistryUtil {
 
 	public static ClassLoader getConfiguratorsClassLoader(
@@ -41,7 +43,9 @@ public class XStreamConfiguratorRegistryUtil {
 
 		Set<ClassLoader> classLoaders = new HashSet<>();
 
-		for (XStreamConfigurator xStreamConfigurator : _xStreamConfigurators) {
+		Set<XStreamConfigurator> xStreamConfigurators = _xStreamConfigurators;
+
+		for (XStreamConfigurator xStreamConfigurator : xStreamConfigurators) {
 			Class<?> clazz = xStreamConfigurator.getClass();
 
 			classLoaders.add(clazz.getClassLoader());
@@ -65,51 +69,74 @@ public class XStreamConfiguratorRegistryUtil {
 		return _modifiedCount.get();
 	}
 
-	public static List<XStreamConfigurator> getXStreamConfigurators() {
-		return _xStreamConfigurators.toList();
+	public static Set<XStreamConfigurator> getXStreamConfigurators() {
+		return _xStreamConfigurators;
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
+
+		_serviceTracker = new ServiceTracker<>(
+			bundleContext, XStreamConfigurator.class,
+			new XStreamConfiguratorServiceTrackerCustomizer());
+
+		_serviceTracker.open();
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTracker.close();
 	}
 
 	private static final AtomicLong _modifiedCount = new AtomicLong(0);
-	private static final ServiceTrackerList<XStreamConfigurator>
-		_xStreamConfigurators;
+	private static final Set<XStreamConfigurator> _xStreamConfigurators =
+		Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			XStreamConfiguratorRegistryUtil.class);
+	private BundleContext _bundleContext;
+	private ServiceTracker<XStreamConfigurator, XStreamConfigurator>
+		_serviceTracker;
 
-		BundleContext bundleContext = bundle.getBundleContext();
+	private class XStreamConfiguratorServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<XStreamConfigurator, XStreamConfigurator> {
 
-		_xStreamConfigurators = ServiceTrackerListFactory.open(
-			bundleContext, XStreamConfigurator.class, null,
-			new ServiceTrackerCustomizer
-				<XStreamConfigurator, XStreamConfigurator>() {
+		@Override
+		public XStreamConfigurator addingService(
+			ServiceReference<XStreamConfigurator> serviceReference) {
 
-				@Override
-				public XStreamConfigurator addingService(
-					ServiceReference<XStreamConfigurator> serviceReference) {
+			XStreamConfigurator xStreamConfigurator = _bundleContext.getService(
+				serviceReference);
 
-					_modifiedCount.getAndIncrement();
+			_xStreamConfigurators.add(xStreamConfigurator);
 
-					return bundleContext.getService(serviceReference);
-				}
+			_modifiedCount.getAndIncrement();
 
-				@Override
-				public void modifiedService(
-					ServiceReference<XStreamConfigurator> serviceReference,
-					XStreamConfigurator xStreamConfigurator) {
-				}
+			return xStreamConfigurator;
+		}
 
-				@Override
-				public void removedService(
-					ServiceReference<XStreamConfigurator> serviceReference,
-					XStreamConfigurator xStreamConfigurator) {
+		@Override
+		public void modifiedService(
+			ServiceReference<XStreamConfigurator> serviceReference,
+			XStreamConfigurator xStreamConfigurator) {
 
-					_modifiedCount.getAndIncrement();
+			removedService(serviceReference, xStreamConfigurator);
 
-					bundleContext.ungetService(serviceReference);
-				}
+			addingService(serviceReference);
+		}
 
-			});
+		@Override
+		public void removedService(
+			ServiceReference<XStreamConfigurator> serviceReference,
+			XStreamConfigurator xStreamConfigurator) {
+
+			_bundleContext.ungetService(serviceReference);
+
+			_xStreamConfigurators.remove(xStreamConfigurator);
+
+			_modifiedCount.getAndIncrement();
+		}
+
 	}
 
 }

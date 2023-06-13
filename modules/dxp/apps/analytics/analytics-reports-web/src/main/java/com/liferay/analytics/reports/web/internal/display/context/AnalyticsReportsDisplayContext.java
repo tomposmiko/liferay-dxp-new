@@ -15,19 +15,18 @@
 package com.liferay.analytics.reports.web.internal.display.context;
 
 import com.liferay.analytics.reports.info.item.ClassNameClassPKInfoItemIdentifier;
+import com.liferay.analytics.reports.web.internal.util.AnalyticsReportsUtil;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
 import java.util.Map;
 
-import javax.portlet.MimeResponse;
-import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceURL;
@@ -39,16 +38,16 @@ import javax.portlet.ResourceURL;
 public class AnalyticsReportsDisplayContext<T> {
 
 	public AnalyticsReportsDisplayContext(
-		InfoItemReference infoItemReference, Portal portal,
-		RenderRequest renderRequest, RenderResponse renderResponse) {
+		InfoItemReference infoItemReference, RenderRequest renderRequest,
+		RenderResponse renderResponse, ThemeDisplay themeDisplay) {
 
 		_infoItemReference = infoItemReference;
-		_portal = portal;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
+		_themeDisplay = themeDisplay;
 	}
 
-	public Map<String, Object> getData() throws PortalException {
+	public Map<String, Object> getData() {
 		if (_data != null) {
 			return _data;
 		}
@@ -63,23 +62,44 @@ public class AnalyticsReportsDisplayContext<T> {
 		return _data;
 	}
 
-	private ResourceURL _getResourceURL(String resourceID)
-		throws PortalException {
+	public String getHideAnalyticsReportsPanelURL() {
+		return PortletURLBuilder.createActionURL(
+			_renderResponse
+		).setActionName(
+			"/analytics_reports/hide_panel"
+		).setRedirect(
+			() -> {
+				String redirect = ParamUtil.getString(
+					_renderRequest, "redirect");
 
-		LiferayPortletRequest liferayPortletRequest =
-			_portal.getLiferayPortletRequest(_renderRequest);
+				if (Validator.isNotNull(redirect)) {
+					return redirect;
+				}
 
-		ResourceURL resourceURL =
-			(ResourceURL)PortletURLBuilder.createLiferayPortletURL(
-				_portal.getLiferayPortletResponse(_renderResponse),
-				liferayPortletRequest.getPlid(),
-				liferayPortletRequest.getPortletName(),
-				PortletRequest.RESOURCE_PHASE, MimeResponse.Copy.PUBLIC
-			).setRedirect(
-				ParamUtil.getString(_renderRequest, "redirect")
-			).setParameter(
-				"className", _infoItemReference.getClassName()
-			).buildPortletURL();
+				return _themeDisplay.getLayoutFriendlyURL(
+					_themeDisplay.getLayout());
+			}
+		).buildString();
+	}
+
+	public String getLiferayAnalyticsURL() {
+		return PrefsPropsUtil.getString(
+			_themeDisplay.getCompanyId(), "liferayAnalyticsURL");
+	}
+
+	public boolean isAnalyticsSynced() {
+		long groupId = ParamUtil.getLong(
+			_renderRequest, "groupId", _themeDisplay.getScopeGroupId());
+
+		return AnalyticsReportsUtil.isAnalyticsSynced(
+			_themeDisplay.getCompanyId(), groupId);
+	}
+
+	private ResourceURL _getResourceURL(String resourceID) {
+		ResourceURL resourceURL = _renderResponse.createResourceURL();
+
+		resourceURL.setParameter(
+			"className", _infoItemReference.getClassName());
 
 		if (_infoItemReference.getInfoItemIdentifier() instanceof
 				ClassNameClassPKInfoItemIdentifier) {
@@ -116,8 +136,8 @@ public class AnalyticsReportsDisplayContext<T> {
 
 	private Map<String, Object> _data;
 	private final InfoItemReference _infoItemReference;
-	private final Portal _portal;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
+	private final ThemeDisplay _themeDisplay;
 
 }

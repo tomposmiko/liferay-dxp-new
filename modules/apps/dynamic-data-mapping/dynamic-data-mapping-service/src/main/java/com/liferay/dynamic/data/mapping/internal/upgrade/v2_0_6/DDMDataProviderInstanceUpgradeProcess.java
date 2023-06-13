@@ -63,6 +63,7 @@ public class DDMDataProviderInstanceUpgradeProcess extends UpgradeProcess {
 						resultSet.getLong("dataProviderInstanceId"),
 						resultSet.getString("definition"),
 						resultSet.getString("uuid_")));
+
 				preparedStatement2.setLong(
 					2, resultSet.getLong("dataProviderInstanceId"));
 
@@ -83,7 +84,7 @@ public class DDMDataProviderInstanceUpgradeProcess extends UpgradeProcess {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return 0;
@@ -98,7 +99,7 @@ public class DDMDataProviderInstanceUpgradeProcess extends UpgradeProcess {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return StringPool.BLANK;
@@ -304,6 +305,7 @@ public class DDMDataProviderInstanceUpgradeProcess extends UpgradeProcess {
 						!_updatedStructureIds.contains(structureId)) {
 
 						preparedStatement2.setString(1, jsonObject.toString());
+
 						preparedStatement2.setLong(2, structureId);
 
 						preparedStatement2.addBatch();
@@ -331,6 +333,7 @@ public class DDMDataProviderInstanceUpgradeProcess extends UpgradeProcess {
 
 								preparedStatement4.setString(
 									1, jsonObject.toString());
+
 								preparedStatement4.setLong(
 									2, structureVersionId);
 

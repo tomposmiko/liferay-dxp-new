@@ -12,8 +12,6 @@
  * details.
  */
 
-import {getTop} from 'frontend-js-web';
-
 const ACTIONS = {
 	editContent(itemData) {
 		this.navigate(itemData.editContentURL);
@@ -24,7 +22,7 @@ const ACTIONS = {
 	},
 
 	navigate(url) {
-		const openerWindow = getTop();
+		const openerWindow = Liferay.Util.getTop();
 
 		openerWindow.Liferay.Util.navigate(url);
 	},

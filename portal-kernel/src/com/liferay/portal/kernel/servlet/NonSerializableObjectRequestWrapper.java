@@ -84,7 +84,7 @@ public class NonSerializableObjectRequestWrapper
 			String message = exception.getMessage();
 
 			if ((message == null) || !message.contains("BEA-101362")) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 
 			return null;

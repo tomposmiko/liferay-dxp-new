@@ -18,28 +18,21 @@ import com.liferay.osgi.util.ServiceTrackerFactory;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
-import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
-import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.upgrade.PortalUpgradeProcess;
+import com.liferay.portal.output.stream.container.constants.OutputStreamContainerConstants;
+import com.liferay.portal.upgrade.internal.executor.SwappedLogExecutor;
 import com.liferay.portal.upgrade.internal.executor.UpgradeExecutor;
-import com.liferay.portal.upgrade.log.UpgradeLogContext;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portal.util.PropsValues;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.osgi.framework.Bundle;
@@ -47,88 +40,55 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Carlos Sierra Andrés
  */
+@Component(immediate = true, service = {})
 public class UpgradeStepRegistratorTracker {
 
-	public UpgradeStepRegistratorTracker(
-		BundleContext bundleContext, ReleaseLocalService releaseLocalService,
-		UpgradeExecutor upgradeExecutor) {
-
+	@Activate
+	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
-		_releaseLocalService = releaseLocalService;
-		_upgradeExecutor = upgradeExecutor;
 
-		try (Connection connection = DataAccess.getConnection()) {
-			_portalUpgraded = PortalUpgradeProcess.isInLatestSchemaVersion(
-				connection);
-		}
-		catch (SQLException sqlException) {
-			throw new RuntimeException(sqlException);
-		}
-	}
-
-	public void close() {
-		_serviceTracker.close();
-	}
-
-	public Release fetchUpgradedRelease(String bundleSymbolicName) {
-		Release release = _releaseLocalService.fetchRelease(bundleSymbolicName);
-
-		if (release == null) {
-			List<UpgradeStep> releaseUpgradeSteps = _releaseUpgradeStepsMap.get(
-				bundleSymbolicName);
-
-			if (releaseUpgradeSteps != null) {
-				for (UpgradeStep releaseUpgradeStep : releaseUpgradeSteps) {
-					try {
-						UpgradeLogContext.setContext(bundleSymbolicName);
-
-						releaseUpgradeStep.upgrade();
-					}
-					catch (UpgradeException upgradeException) {
-						_log.error(upgradeException);
-					}
-					finally {
-						UpgradeLogContext.clearContext();
-					}
-				}
-
-				release = _releaseLocalService.fetchRelease(bundleSymbolicName);
-			}
-		}
-
-		return release;
-	}
-
-	public void open() {
 		_serviceTracker = ServiceTrackerFactory.open(
-			_bundleContext, UpgradeStepRegistrator.class,
+			bundleContext, UpgradeStepRegistrator.class,
 			new UpgradeStepRegistratorServiceTrackerCustomizer());
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		UpgradeStepRegistratorTracker.class);
+	@Deactivate
+	protected void deactivate() {
+		_serviceTracker.close();
+	}
 
-	private final BundleContext _bundleContext;
-	private final boolean _portalUpgraded;
-	private final ReleaseLocalService _releaseLocalService;
-	private final Map<String, List<UpgradeStep>> _releaseUpgradeStepsMap =
-		new HashMap<>();
-	private ServiceTracker<UpgradeStepRegistrator, SafeCloseable>
-		_serviceTracker;
-	private final UpgradeExecutor _upgradeExecutor;
+	private BundleContext _bundleContext;
+
+	@Reference
+	private ReleaseLocalService _releaseLocalService;
+
+	private ServiceTracker
+		<UpgradeStepRegistrator, Collection<ServiceRegistration<UpgradeStep>>>
+			_serviceTracker;
+
+	@Reference
+	private SwappedLogExecutor _swappedLogExecutor;
+
+	@Reference
+	private UpgradeExecutor _upgradeExecutor;
 
 	private class UpgradeStepRegistratorServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer
-			<UpgradeStepRegistrator, SafeCloseable> {
+			<UpgradeStepRegistrator,
+			 Collection<ServiceRegistration<UpgradeStep>>> {
 
 		@Override
-		public SafeCloseable addingService(
+		public Collection<ServiceRegistration<UpgradeStep>> addingService(
 			ServiceReference<UpgradeStepRegistrator> serviceReference) {
 
 			UpgradeStepRegistrator upgradeStepRegistrator =
@@ -165,29 +125,26 @@ public class UpgradeStepRegistratorTracker {
 
 			upgradeStepRegistrator.register(upgradeStepRegistry);
 
-			List<UpgradeStep> releaseUpgradeSteps =
-				upgradeStepRegistry.getReleaseCreationUpgradeSteps();
-
-			if (!releaseUpgradeSteps.isEmpty()) {
-				_releaseUpgradeStepsMap.put(
-					bundleSymbolicName, releaseUpgradeSteps);
-			}
-
 			List<UpgradeInfo> upgradeInfos =
-				upgradeStepRegistry.getUpgradeInfos(_portalUpgraded);
+				upgradeStepRegistry.getUpgradeInfos();
 
 			if (PropsValues.UPGRADE_DATABASE_AUTO_RUN ||
 				(_releaseLocalService.fetchRelease(bundleSymbolicName) ==
 					null)) {
 
 				try {
-					_upgradeExecutor.execute(bundleSymbolicName, upgradeInfos);
+					_upgradeExecutor.execute(
+						bundleSymbolicName, upgradeInfos,
+						OutputStreamContainerConstants.FACTORY_NAME_DUMMY);
 				}
 				catch (Throwable throwable) {
-					_log.error(
-						"Failed upgrade process for module ".concat(
-							bundleSymbolicName),
-						throwable);
+					_swappedLogExecutor.execute(
+						bundleSymbolicName,
+						() -> _log.error(
+							"Failed upgrade process for module ".concat(
+								bundleSymbolicName),
+							throwable),
+						null);
 				}
 			}
 
@@ -207,6 +164,8 @@ public class UpgradeStepRegistratorTracker {
 								"upgrade.bundle.symbolic.name",
 								bundleSymbolicName
 							).put(
+								"upgrade.db.type", "any"
+							).put(
 								"upgrade.from.schema.version",
 								upgradeInfo.getFromSchemaVersionString()
 							).put(
@@ -218,30 +177,29 @@ public class UpgradeStepRegistratorTracker {
 				}
 			}
 
-			return () -> {
-				for (ServiceRegistration<UpgradeStep> serviceRegistration :
-						serviceRegistrations) {
-
-					serviceRegistration.unregister();
-				}
-
-				_releaseUpgradeStepsMap.remove(bundleSymbolicName);
-			};
+			return serviceRegistrations;
 		}
 
 		@Override
 		public void modifiedService(
 			ServiceReference<UpgradeStepRegistrator> serviceReference,
-			SafeCloseable safeCloseable) {
+			Collection<ServiceRegistration<UpgradeStep>> serviceRegistrations) {
 		}
 
 		@Override
 		public void removedService(
 			ServiceReference<UpgradeStepRegistrator> serviceReference,
-			SafeCloseable safeCloseable) {
+			Collection<ServiceRegistration<UpgradeStep>> serviceRegistrations) {
 
-			safeCloseable.close();
+			for (ServiceRegistration<UpgradeStep> serviceRegistration :
+					serviceRegistrations) {
+
+				serviceRegistration.unregister();
+			}
 		}
+
+		private final Log _log = LogFactoryUtil.getLog(
+			UpgradeStepRegistratorTracker.class);
 
 	}
 

@@ -19,17 +19,13 @@ import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
@@ -70,27 +66,6 @@ public abstract class BaseBackgroundTaskTestCase {
 		backgroundTaskThreadLocalManagerImpl.companyLocalService =
 			companyLocalService;
 
-		GroupLocalService groupLocalService = Mockito.mock(
-			GroupLocalService.class);
-
-		Group group = Mockito.mock(Group.class);
-
-		Mockito.when(
-			group.getCompanyId()
-		).thenReturn(
-			_COMPANY_ID
-		);
-
-		Mockito.when(
-			groupLocalService.fetchGroup(_GROUP_ID)
-		).thenReturn(
-			group
-		);
-
-		ReflectionTestUtil.setFieldValue(
-			backgroundTaskThreadLocalManagerImpl, "_groupLocalService",
-			groupLocalService);
-
 		PermissionCheckerFactory permissionCheckerFactory = Mockito.mock(
 			PermissionCheckerFactory.class);
 
@@ -103,47 +78,42 @@ public abstract class BaseBackgroundTaskTestCase {
 			permissionChecker
 		);
 
-		ReflectionTestUtil.setFieldValue(
-			backgroundTaskThreadLocalManagerImpl, "_permissionCheckerFactory",
+		backgroundTaskThreadLocalManagerImpl.setPermissionCheckerFactory(
 			permissionCheckerFactory);
 
 		UserLocalService userLocalService = Mockito.mock(
 			UserLocalService.class);
 
-		User user = Mockito.mock(User.class);
-
-		Mockito.when(
-			user.getCompanyId()
-		).thenReturn(
-			_COMPANY_ID
-		);
-
 		Mockito.when(
 			userLocalService.fetchUser(Mockito.anyLong())
 		).thenReturn(
-			user
+			Mockito.mock(User.class)
 		);
 
-		ReflectionTestUtil.setFieldValue(
-			backgroundTaskThreadLocalManagerImpl, "_userLocalService",
+		backgroundTaskThreadLocalManagerImpl.setUserLocalService(
 			userLocalService);
+
+		_companyId = 1234L;
+		_groupId = 1234L;
+
+		_principalName = String.valueOf(1234L);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_resetThreadLocals();
+		resetThreadLocals();
 	}
 
 	protected void assertThreadLocalValues() {
 		Assert.assertEquals(
-			Long.valueOf(_COMPANY_ID), CompanyThreadLocal.getCompanyId());
+			Long.valueOf(_companyId), CompanyThreadLocal.getCompanyId());
 		Assert.assertEquals(
 			_CLUSTER_INVOKE_ENABLED, ClusterInvokeThreadLocal.isEnabled());
 		Assert.assertEquals(
 			_defaultLocale, LocaleThreadLocal.getDefaultLocale());
 		Assert.assertEquals(
-			Long.valueOf(_GROUP_ID), GroupThreadLocal.getGroupId());
-		Assert.assertEquals(_PRINCIPAL_NAME, PrincipalThreadLocal.getName());
+			Long.valueOf(_groupId), GroupThreadLocal.getGroupId());
+		Assert.assertEquals(_principalName, PrincipalThreadLocal.getName());
 		Assert.assertEquals(
 			_siteDefaultLocale, LocaleThreadLocal.getSiteDefaultLocale());
 		Assert.assertEquals(
@@ -157,14 +127,14 @@ public abstract class BaseBackgroundTaskTestCase {
 		Assert.assertTrue(MapUtil.isNotEmpty(threadLocalValues));
 		Assert.assertEquals(
 			threadLocalValues.toString(), 7, threadLocalValues.size());
-		Assert.assertEquals(_COMPANY_ID, threadLocalValues.get("companyId"));
+		Assert.assertEquals(_companyId, threadLocalValues.get("companyId"));
 		Assert.assertEquals(
 			_CLUSTER_INVOKE_ENABLED, threadLocalValues.get("clusterInvoke"));
 		Assert.assertEquals(
 			_defaultLocale, threadLocalValues.get("defaultLocale"));
-		Assert.assertEquals(_GROUP_ID, threadLocalValues.get("groupId"));
+		Assert.assertEquals(_groupId, threadLocalValues.get("groupId"));
 		Assert.assertEquals(
-			_PRINCIPAL_NAME, threadLocalValues.get("principalName"));
+			_principalName, threadLocalValues.get("principalName"));
 		Assert.assertNull(threadLocalValues.get("principalPassword"));
 		Assert.assertEquals(
 			_siteDefaultLocale, threadLocalValues.get("siteDefaultLocale"));
@@ -173,26 +143,26 @@ public abstract class BaseBackgroundTaskTestCase {
 	}
 
 	protected void initalizeThreadLocals() {
-		CompanyThreadLocal.setCompanyId(_COMPANY_ID);
+		CompanyThreadLocal.setCompanyId(_companyId);
 		ClusterInvokeThreadLocal.setEnabled(true);
-		GroupThreadLocal.setGroupId(_GROUP_ID);
+		GroupThreadLocal.setGroupId(_groupId);
 		LocaleThreadLocal.setDefaultLocale(_defaultLocale);
 		LocaleThreadLocal.setSiteDefaultLocale(_siteDefaultLocale);
 		LocaleThreadLocal.setThemeDisplayLocale(_themeDisplayLocale);
-		PrincipalThreadLocal.setName(_PRINCIPAL_NAME);
+		PrincipalThreadLocal.setName(_principalName);
 	}
 
 	protected HashMap<String, Serializable> initializeThreadLocalValues() {
 		return HashMapBuilder.<String, Serializable>put(
 			"clusterInvoke", _CLUSTER_INVOKE_ENABLED
 		).put(
-			"companyId", _COMPANY_ID
+			"companyId", _companyId
 		).put(
 			"defaultLocale", _defaultLocale
 		).put(
-			"groupId", _GROUP_ID
+			"groupId", _groupId
 		).put(
-			"principalName", _PRINCIPAL_NAME
+			"principalName", _principalName
 		).put(
 			"siteDefaultLocale", _siteDefaultLocale
 		).put(
@@ -200,25 +170,21 @@ public abstract class BaseBackgroundTaskTestCase {
 		).build();
 	}
 
-	protected BackgroundTaskThreadLocalManagerImpl
-		backgroundTaskThreadLocalManagerImpl;
-
-	private void _resetThreadLocals() {
+	protected void resetThreadLocals() {
 		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 
 		CentralizedThreadLocal.clearShortLivedThreadLocals();
 	}
 
+	protected BackgroundTaskThreadLocalManagerImpl
+		backgroundTaskThreadLocalManagerImpl;
+
 	private static final boolean _CLUSTER_INVOKE_ENABLED = true;
 
-	private static final long _COMPANY_ID = RandomTestUtil.randomLong();
-
-	private static final long _GROUP_ID = RandomTestUtil.randomLong();
-
-	private static final String _PRINCIPAL_NAME = String.valueOf(
-		RandomTestUtil.randomLong());
-
+	private long _companyId;
 	private final Locale _defaultLocale = LocaleUtil.US;
+	private long _groupId;
+	private String _principalName;
 	private final Locale _siteDefaultLocale = LocaleUtil.CANADA;
 	private final Locale _themeDisplayLocale = LocaleUtil.FRANCE;
 

@@ -14,39 +14,24 @@
 
 package com.liferay.object.web.internal.object.definitions.display.context;
 
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
-import com.liferay.list.type.service.ListTypeDefinitionService;
-import com.liferay.object.admin.rest.dto.v1_0.util.ObjectFieldUtil;
-import com.liferay.object.constants.ObjectFieldConstants;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.service.ObjectFieldSettingLocalService;
-import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.web.internal.object.definitions.display.context.util.ObjectCodeEditorUtil;
-import com.liferay.object.web.internal.util.ObjectFieldBusinessTypeUtil;
+import com.liferay.object.web.internal.constants.ObjectWebKeys;
+import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeFormatter;
-import com.liferay.portal.util.PropsValues;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+
+import javax.portlet.PortletException;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -54,52 +39,30 @@ import javax.servlet.http.HttpServletRequest;
  * @author Marco Leo
  * @author Gabriel Albuquerque
  */
-public class ObjectDefinitionsFieldsDisplayContext
-	extends BaseObjectDefinitionsDisplayContext {
+public class ObjectDefinitionsFieldsDisplayContext {
 
 	public ObjectDefinitionsFieldsDisplayContext(
 		HttpServletRequest httpServletRequest,
-		ListTypeDefinitionService listTypeDefinitionService,
 		ModelResourcePermission<ObjectDefinition>
-			objectDefinitionModelResourcePermission,
-		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
-		ObjectFieldSettingLocalService objectFieldSettingLocalService,
-		ObjectRelationshipLocalService objectRelationshipLocalService) {
+			objectDefinitionModelResourcePermission) {
 
-		super(httpServletRequest, objectDefinitionModelResourcePermission);
+		_objectDefinitionModelResourcePermission =
+			objectDefinitionModelResourcePermission;
 
-		_listTypeDefinitionService = listTypeDefinitionService;
-		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
-		_objectFieldSettingLocalService = objectFieldSettingLocalService;
-		_objectRelationshipLocalService = objectRelationshipLocalService;
+		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 	}
 
-	public CreationMenu getCreationMenu(ObjectDefinition objectDefinition)
-		throws PortalException {
-
-		CreationMenu creationMenu = new CreationMenu();
-
-		if (!hasUpdateObjectDefinitionPermission()) {
-			return creationMenu;
-		}
-
-		creationMenu.addDropdownItem(
-			dropdownItem -> {
-				dropdownItem.setHref("addObjectField");
-				dropdownItem.setLabel(
-					LanguageUtil.get(
-						objectRequestHelper.getRequest(), "add-object-field"));
-				dropdownItem.setTarget("event");
-			});
-
-		return creationMenu;
+	public String getAPIURL() {
+		return "/o/object-admin/v1.0/object-definitions/" +
+			getObjectDefinitionId() + "/object-fields";
 	}
 
-	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getClayDataSetActionDropdownItems()
 		throws Exception {
 
 		return Arrays.asList(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				PortletURLBuilder.create(
 					getPortletURL()
 				).setMVCRenderCommandName(
@@ -110,117 +73,62 @@ public class ObjectDefinitionsFieldsDisplayContext
 					LiferayWindowState.POP_UP
 				).buildString(),
 				"view", "view",
-				LanguageUtil.get(objectRequestHelper.getRequest(), "view"),
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				"/o/object-admin/v1.0/object-fields/{id}", "trash", "delete",
-				LanguageUtil.get(objectRequestHelper.getRequest(), "delete"),
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", "async"));
 	}
 
-	public String[] getForbiddenLastCharacters() {
-		List<String> forbiddenLastCharacters = new ArrayList<>();
+	public CreationMenu getCreationMenu(ObjectDefinition objectDefinition)
+		throws PortalException {
 
-		for (String forbiddenLastCharacter :
-				PropsValues.DL_CHAR_LAST_BLACKLIST) {
+		CreationMenu creationMenu = new CreationMenu();
 
-			if (forbiddenLastCharacter.startsWith(
-					UnicodeFormatter.UNICODE_PREFIX)) {
-
-				forbiddenLastCharacter = UnicodeFormatter.parseString(
-					forbiddenLastCharacter);
-			}
-
-			forbiddenLastCharacters.add(forbiddenLastCharacter);
+		if (objectDefinition.isSystem() || !_hasAddObjectFieldPermission()) {
+			return creationMenu;
 		}
 
-		return forbiddenLastCharacters.toArray(new String[0]);
+		creationMenu.addDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref("addObjectField");
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						_objectRequestHelper.getRequest(), "add-object-field"));
+				dropdownItem.setTarget("event");
+			});
+
+		return creationMenu;
 	}
 
-	public List<Map<String, String>> getObjectFieldBusinessTypeMaps(
-		boolean includeRelationshipObjectFieldBusinessType, Locale locale) {
+	public long getObjectDefinitionId() {
+		HttpServletRequest httpServletRequest =
+			_objectRequestHelper.getRequest();
 
-		return ObjectFieldBusinessTypeUtil.getObjectFieldBusinessTypeMaps(
-			locale,
-			ListUtil.filter(
-				_objectFieldBusinessTypeRegistry.getObjectFieldBusinessTypes(),
-				objectFieldBusinessType ->
-					objectFieldBusinessType.isVisible() &&
-					(!StringUtil.equals(
-						objectFieldBusinessType.getName(),
-						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP) ||
-					 includeRelationshipObjectFieldBusinessType)));
+		ObjectDefinition objectDefinition =
+			(ObjectDefinition)httpServletRequest.getAttribute(
+				ObjectWebKeys.OBJECT_DEFINITION);
+
+		return objectDefinition.getObjectDefinitionId();
 	}
 
-	public List<Map<String, Object>> getObjectFieldCodeEditorElements(
-		String businessType) {
-
-		if (StringUtil.equals(
-				businessType, ObjectFieldConstants.BUSINESS_TYPE_FORMULA) &&
-			FeatureFlagManagerUtil.isEnabled("LPS-164948")) {
-
-			return ObjectCodeEditorUtil.getCodeEditorElements(
-				ddmExpressionOperator ->
-					_filterableDDMExpressionOperators.contains(
-						ddmExpressionOperator),
-				objectRequestHelper.getLocale(), getObjectDefinitionId(),
-				objectField -> _filterableObjectFieldBusinessTypes.contains(
-					objectField.getBusinessType()));
-		}
-
-		return ObjectCodeEditorUtil.getCodeEditorElements(
-			true, false, objectRequestHelper.getLocale(),
-			getObjectDefinitionId(), objectField -> !objectField.isSystem());
+	public PortletURL getPortletURL() throws PortletException {
+		return PortletURLUtil.clone(
+			PortletURLUtil.getCurrent(
+				_objectRequestHelper.getLiferayPortletRequest(),
+				_objectRequestHelper.getLiferayPortletResponse()),
+			_objectRequestHelper.getLiferayPortletResponse());
 	}
 
-	public JSONObject getObjectFieldJSONObject(ObjectField objectField) {
-		return ObjectFieldUtil.toJSONObject(
-			_listTypeDefinitionService, objectField,
-			_objectFieldSettingLocalService);
+	private boolean _hasAddObjectFieldPermission() throws PortalException {
+		return _objectDefinitionModelResourcePermission.contains(
+			_objectRequestHelper.getPermissionChecker(),
+			getObjectDefinitionId(), ActionKeys.UPDATE);
 	}
 
-	public Long getObjectRelationshipId(ObjectField objectField) {
-		if (StringUtil.equals(
-				objectField.getBusinessType(),
-				ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
-
-			ObjectRelationship objectRelationship =
-				_objectRelationshipLocalService.
-					fetchObjectRelationshipByObjectFieldId2(
-						objectField.getObjectFieldId());
-
-			return objectRelationship.getObjectRelationshipId();
-		}
-
-		return null;
-	}
-
-	@Override
-	protected String getAPIURI() {
-		return "/object-fields";
-	}
-
-	private static final Set<ObjectCodeEditorUtil.DDMExpressionOperator>
-		_filterableDDMExpressionOperators = Collections.unmodifiableSet(
-			SetUtil.fromArray(
-				ObjectCodeEditorUtil.DDMExpressionOperator.DIVIDED_BY,
-				ObjectCodeEditorUtil.DDMExpressionOperator.MINUS,
-				ObjectCodeEditorUtil.DDMExpressionOperator.PLUS,
-				ObjectCodeEditorUtil.DDMExpressionOperator.TIMES));
-	private static final Set<String> _filterableObjectFieldBusinessTypes =
-		Collections.unmodifiableSet(
-			SetUtil.fromArray(
-				ObjectFieldConstants.BUSINESS_TYPE_DECIMAL,
-				ObjectFieldConstants.BUSINESS_TYPE_INTEGER,
-				ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
-				ObjectFieldConstants.BUSINESS_TYPE_PRECISION_DECIMAL));
-
-	private final ListTypeDefinitionService _listTypeDefinitionService;
-	private final ObjectFieldBusinessTypeRegistry
-		_objectFieldBusinessTypeRegistry;
-	private final ObjectFieldSettingLocalService
-		_objectFieldSettingLocalService;
-	private final ObjectRelationshipLocalService
-		_objectRelationshipLocalService;
+	private final ModelResourcePermission<ObjectDefinition>
+		_objectDefinitionModelResourcePermission;
+	private final ObjectRequestHelper _objectRequestHelper;
 
 }

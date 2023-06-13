@@ -26,7 +26,8 @@ import org.osgi.service.component.annotations.Component;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	property = "reportDataSourceType=xml", service = ReportFillManager.class
+	immediate = true, property = "reportDataSourceType=xml",
+	service = ReportFillManager.class
 )
 public class XmlReportFillManager extends BaseReportFillManager {
 

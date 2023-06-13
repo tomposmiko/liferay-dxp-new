@@ -35,12 +35,11 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetCategoriesCompanyConfiguration {
 
 	@Meta.AD(
-		deflt = "true",
-		description = "include-children-categories-when-searching-parent-categories-description",
-		name = "include-children-categories-when-searching-parent-categories",
-		required = false
+		deflt = "https://learn.liferay.com/dxp/7.x/en/content-authoring-and-management/tags-and-categories/defining-categories-and-vocabularies-for-content.html",
+		description = "link-to-documentation-url-description",
+		name = "link-to-documentation-url", required = false
 	)
-	public boolean includeChildrenCategoriesWhenSearchingParentCategories();
+	public String linkToDocumentationURL();
 
 	@Meta.AD(
 		deflt = "150",

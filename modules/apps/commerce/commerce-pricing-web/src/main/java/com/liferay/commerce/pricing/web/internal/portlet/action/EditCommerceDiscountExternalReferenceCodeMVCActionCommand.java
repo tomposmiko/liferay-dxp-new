@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePricingPortletKeys.COMMERCE_DISCOUNT,
 		"mvc.command.name=/commerce_discount/edit_commerce_discount_external_reference_code"
@@ -51,7 +52,7 @@ public class EditCommerceDiscountExternalReferenceCodeMVCActionCommand
 		throws Exception {
 
 		try {
-			_updateCommerceDiscountExternalReferenceCode(actionRequest);
+			updateCommerceDiscountExternalReferenceCode(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchDiscountException ||
@@ -62,7 +63,7 @@ public class EditCommerceDiscountExternalReferenceCodeMVCActionCommand
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				String redirect = ParamUtil.getString(
 					actionRequest, "redirect");
@@ -72,7 +73,7 @@ public class EditCommerceDiscountExternalReferenceCodeMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceDiscountExternalReferenceCode(
+	protected void updateCommerceDiscountExternalReferenceCode(
 			ActionRequest actionRequest)
 		throws Exception {
 

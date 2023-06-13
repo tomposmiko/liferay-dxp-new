@@ -96,7 +96,7 @@ describe('A11yChecker', () => {
 		}
 
 		function isLogEmpty() {
-			return !eventLog.length;
+			return eventLog.length === 0;
 		}
 
 		function advanceTime(ms: number) {

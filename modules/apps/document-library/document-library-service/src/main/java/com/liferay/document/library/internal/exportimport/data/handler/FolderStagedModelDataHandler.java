@@ -14,6 +14,8 @@
 
 package com.liferay.document.library.internal.exportimport.data.handler;
 
+import com.liferay.changeset.service.ChangesetCollectionLocalService;
+import com.liferay.changeset.service.ChangesetEntryLocalService;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolder;
@@ -36,6 +38,7 @@ import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.RepositoryEntry;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.trash.TrashHandler;
@@ -47,7 +50,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.repository.portletrepository.PortletRepository;
 import com.liferay.portal.util.RepositoryUtil;
-import com.liferay.trash.TrashHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,7 +184,7 @@ public class FolderStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
-		_exportFolderFileEntryTypes(portletDataContext, folderElement, folder);
+		exportFolderFileEntryTypes(portletDataContext, folderElement, folder);
 
 		portletDataContext.addClassedModel(
 			folderElement, folderPath, folder, DLFolder.class);
@@ -283,9 +285,8 @@ public class FolderStagedModelDataHandler
 					folder.getName(), 2);
 
 				importedFolder = _dlAppLocalService.addFolder(
-					folder.getExternalReferenceCode(), userId, repositoryId,
-					parentFolderId, name, folder.getDescription(),
-					serviceContext);
+					userId, repositoryId, parentFolderId, name,
+					folder.getDescription(), serviceContext);
 			}
 			else {
 				String name = _dlFolderLocalService.getUniqueFolderName(
@@ -298,7 +299,7 @@ public class FolderStagedModelDataHandler
 			}
 		}
 
-		_importFolderFileEntryTypes(
+		importFolderFileEntryTypes(
 			portletDataContext, folderElement, folder, importedFolder,
 			serviceContext);
 
@@ -342,54 +343,7 @@ public class FolderStagedModelDataHandler
 		}
 	}
 
-	@Override
-	protected void validateExport(
-			PortletDataContext portletDataContext, Folder folder)
-		throws PortletDataException {
-
-		if ((folder.getGroupId() != portletDataContext.getGroupId()) &&
-			(folder.getGroupId() != portletDataContext.getScopeGroupId()) &&
-			!ExportImportGroupedModelUtil.
-				isReferenceInLayoutGroupWithinExportScope(
-					portletDataContext, folder)) {
-
-			PortletDataException portletDataException =
-				new PortletDataException(PortletDataException.INVALID_GROUP);
-
-			portletDataException.setStagedModelDisplayName(folder.getName());
-			portletDataException.setStagedModelClassName(
-				folder.getModelClassName());
-			portletDataException.setStagedModelClassPK(
-				GetterUtil.getString(folder.getFolderId()));
-
-			throw portletDataException;
-		}
-
-		if (folder instanceof LiferayFolder) {
-			LiferayFolder liferayFolder = (LiferayFolder)folder;
-
-			DLFolder dlFolder = (DLFolder)liferayFolder.getModel();
-
-			if (dlFolder.isInTrash() ||
-				_trashHelper.isInTrashContainer(dlFolder)) {
-
-				PortletDataException portletDataException =
-					new PortletDataException(
-						PortletDataException.STATUS_IN_TRASH);
-
-				portletDataException.setStagedModelDisplayName(
-					folder.getName());
-				portletDataException.setStagedModelClassName(
-					folder.getModelClassName());
-				portletDataException.setStagedModelClassPK(
-					GetterUtil.getString(folder.getFolderId()));
-
-				throw portletDataException;
-			}
-		}
-	}
-
-	private void _exportFolderFileEntryTypes(
+	protected void exportFolderFileEntryTypes(
 			PortletDataContext portletDataContext, Element folderElement,
 			Folder folder)
 		throws Exception {
@@ -439,10 +393,10 @@ public class FolderStagedModelDataHandler
 			"defaultFileEntryTypeUuid", defaultFileEntryTypeUuid);
 	}
 
-	private void _importFolderFileEntryTypes(
+	protected void importFolderFileEntryTypes(
 			PortletDataContext portletDataContext, Element folderElement,
 			Folder folder, Folder importedFolder, ServiceContext serviceContext)
-		throws Exception {
+		throws PortalException {
 
 		if (!folder.isDefaultRepository()) {
 			return;
@@ -514,6 +468,60 @@ public class FolderStagedModelDataHandler
 		}
 	}
 
+	@Override
+	protected void validateExport(
+			PortletDataContext portletDataContext, Folder folder)
+		throws PortletDataException {
+
+		if ((folder.getGroupId() != portletDataContext.getGroupId()) &&
+			(folder.getGroupId() != portletDataContext.getScopeGroupId()) &&
+			!ExportImportGroupedModelUtil.
+				isReferenceInLayoutGroupWithinExportScope(
+					portletDataContext, folder)) {
+
+			PortletDataException portletDataException =
+				new PortletDataException(PortletDataException.INVALID_GROUP);
+
+			portletDataException.setStagedModelDisplayName(folder.getName());
+			portletDataException.setStagedModelClassName(
+				folder.getModelClassName());
+			portletDataException.setStagedModelClassPK(
+				GetterUtil.getString(folder.getFolderId()));
+
+			throw portletDataException;
+		}
+
+		if (folder instanceof LiferayFolder) {
+			LiferayFolder liferayFolder = (LiferayFolder)folder;
+
+			DLFolder dlFolder = (DLFolder)liferayFolder.getModel();
+
+			if (dlFolder.isInTrash() || dlFolder.isInTrashContainer()) {
+				PortletDataException portletDataException =
+					new PortletDataException(
+						PortletDataException.STATUS_IN_TRASH);
+
+				portletDataException.setStagedModelDisplayName(
+					folder.getName());
+				portletDataException.setStagedModelClassName(
+					folder.getModelClassName());
+				portletDataException.setStagedModelClassPK(
+					GetterUtil.getString(folder.getFolderId()));
+
+				throw portletDataException;
+			}
+		}
+	}
+
+	@Reference
+	private ChangesetCollectionLocalService _changesetCollectionLocalService;
+
+	@Reference
+	private ChangesetEntryLocalService _changesetEntryLocalService;
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
@@ -528,8 +536,5 @@ public class FolderStagedModelDataHandler
 
 	@Reference
 	private RepositoryLocalService _repositoryLocalService;
-
-	@Reference
-	private TrashHelper _trashHelper;
 
 }

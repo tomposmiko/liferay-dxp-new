@@ -20,7 +20,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 
-import javax.ws.rs.core.MultivaluedMap;
+import java.util.Optional;
+
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -47,20 +48,22 @@ public class CreatorStatisticsUtil {
 
 				setLastPostDate(
 					() -> {
-						if (uriInfo != null) {
-							MultivaluedMap<String, String> parameters =
-								uriInfo.getQueryParameters();
+						boolean hasLastPostDateField = Optional.ofNullable(
+							uriInfo
+						).map(
+							UriInfo::getQueryParameters
+						).map(
+							parameters -> parameters.getFirst("nestedFields")
+						).map(
+							fields -> fields.contains("lastPostDate")
+						).orElse(
+							false
+						);
 
-							String nestedFields = parameters.getFirst(
-								"nestedFields");
-
-							if ((nestedFields != null) &&
-								nestedFields.contains("lastPostDate")) {
-
-								return mbStatsUserLocalService.
-									getLastPostDateByUserId(
-										user.getGroupId(), user.getUserId());
-							}
+						if (hasLastPostDateField) {
+							return mbStatsUserLocalService.
+								getLastPostDateByUserId(
+									user.getGroupId(), user.getUserId());
 						}
 
 						return null;

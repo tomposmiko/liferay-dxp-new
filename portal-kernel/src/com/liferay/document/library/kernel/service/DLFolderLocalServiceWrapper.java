@@ -29,10 +29,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class DLFolderLocalServiceWrapper
 	implements DLFolderLocalService, ServiceWrapper<DLFolderLocalService> {
 
-	public DLFolderLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLFolderLocalServiceWrapper(
 		DLFolderLocalService dlFolderLocalService) {
 
@@ -88,15 +84,15 @@ public class DLFolderLocalServiceWrapper
 
 	@Override
 	public DLFolder addFolder(
-			String externalReferenceCode, long userId, long groupId,
-			long repositoryId, boolean mountPoint, long parentFolderId,
-			String name, String description, boolean hidden,
+			long userId, long groupId, long repositoryId, boolean mountPoint,
+			long parentFolderId, String name, String description,
+			boolean hidden,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _dlFolderLocalService.addFolder(
-			externalReferenceCode, userId, groupId, repositoryId, mountPoint,
-			parentFolderId, name, description, hidden, serviceContext);
+			userId, groupId, repositoryId, mountPoint, parentFolderId, name,
+			description, hidden, serviceContext);
 	}
 
 	@Override
@@ -363,14 +359,6 @@ public class DLFolderLocalServiceWrapper
 		return _dlFolderLocalService.fetchDLFolder(folderId);
 	}
 
-	@Override
-	public DLFolder fetchDLFolderByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
-
-		return _dlFolderLocalService.fetchDLFolderByExternalReferenceCode(
-			externalReferenceCode, groupId);
-	}
-
 	/**
 	 * Returns the document library folder matching the UUID and group.
 	 *
@@ -475,15 +463,6 @@ public class DLFolderLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _dlFolderLocalService.getDLFolder(folderId);
-	}
-
-	@Override
-	public DLFolder getDLFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _dlFolderLocalService.getDLFolderByExternalReferenceCode(
-			externalReferenceCode, groupId);
 	}
 
 	/**
@@ -611,14 +590,6 @@ public class DLFolderLocalServiceWrapper
 
 	@Override
 	public java.util.List<DLFolder> getFolders(
-		long groupId, boolean mountPoint, String treePath, boolean hidden) {
-
-		return _dlFolderLocalService.getFolders(
-			groupId, mountPoint, treePath, hidden);
-	}
-
-	@Override
-	public java.util.List<DLFolder> getFolders(
 		long groupId, long parentFolderId) {
 
 		return _dlFolderLocalService.getFolders(groupId, parentFolderId);
@@ -656,6 +627,24 @@ public class DLFolderLocalServiceWrapper
 			orderByComparator);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getFolders(long, long, boolean, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
+	@Override
+	public java.util.List<DLFolder> getFolders(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<DLFolder>
+			orderByComparator) {
+
+		return _dlFolderLocalService.getFolders(
+			groupId, parentFolderId, status, includeMountfolders, start, end,
+			orderByComparator);
+	}
+
 	@Override
 	public java.util.List<DLFolder> getFolders(
 		long groupId, long parentFolderId, int start, int end,
@@ -664,13 +653,6 @@ public class DLFolderLocalServiceWrapper
 
 		return _dlFolderLocalService.getFolders(
 			groupId, parentFolderId, start, end, orderByComparator);
-	}
-
-	@Override
-	public java.util.List<DLFolder> getFolders(
-		long classNameId, String treePath) {
-
-		return _dlFolderLocalService.getFolders(classNameId, treePath);
 	}
 
 	@Override
@@ -779,14 +761,6 @@ public class DLFolderLocalServiceWrapper
 	@Override
 	public java.util.List<DLFolder> getNoAssetFolders() {
 		return _dlFolderLocalService.getNoAssetFolders();
-	}
-
-	@Override
-	public java.util.List<DLFolder> getNotInTrashFolders(
-		long groupId, boolean mountPoint, String treePath, boolean hidden) {
-
-		return _dlFolderLocalService.getNotInTrashFolders(
-			groupId, mountPoint, treePath, hidden);
 	}
 
 	/**

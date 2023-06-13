@@ -14,12 +14,10 @@
 
 package com.liferay.headless.commerce.delivery.catalog.internal.dto.v1_0.converter;
 
-import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -28,30 +26,22 @@ import java.util.Locale;
 public class ProductDTOConverterContext extends DefaultDTOConverterContext {
 
 	public ProductDTOConverterContext(
-		CommerceContext commerceContext, CPCatalogEntry cpCatalogEntry,
-		Object id, Locale locale) {
+		Locale locale, long resourcePrimKey, CPCatalogEntry cpCatalogEntry) {
 
-		super(false, new HashMap<>(), null, id, locale, null, null);
+		super(resourcePrimKey, locale);
 
-		_commerceContext = commerceContext;
 		_cpCatalogEntry = cpCatalogEntry;
 	}
 
 	public ProductDTOConverterContext(
-		CommerceContext commerceContext, CPDefinition cpDefinition, Object id,
-		Locale locale) {
+		Locale locale, long resourcePrimKey, CPDefinition cpDefinition) {
 
-		super(false, new HashMap<>(), null, id, locale, null, null);
+		super(resourcePrimKey, locale);
 
-		_commerceContext = commerceContext;
 		_cpDefinition = cpDefinition;
 	}
 
-	public CommerceContext getCommerceContext() {
-		return _commerceContext;
-	}
-
-	public CPCatalogEntry getCPCatalogEntry() {
+	public CPCatalogEntry getCpCatalogEntry() {
 		return _cpCatalogEntry;
 	}
 
@@ -59,7 +49,6 @@ public class ProductDTOConverterContext extends DefaultDTOConverterContext {
 		return _cpDefinition;
 	}
 
-	private final CommerceContext _commerceContext;
 	private CPCatalogEntry _cpCatalogEntry;
 	private CPDefinition _cpDefinition;
 

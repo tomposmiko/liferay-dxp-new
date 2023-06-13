@@ -28,8 +28,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.discount.model.CommerceDiscount",
-	service = DTOConverter.class
+	service = {DiscountDTOConverter.class, DTOConverter.class}
 )
 public class DiscountDTOConverter
 	implements DTOConverter<CommerceDiscount, Discount> {

@@ -38,18 +38,22 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsEntryModel;
+import com.liferay.segments.model.SegmentsEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -196,6 +200,66 @@ public class SegmentsEntryModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static SegmentsEntry toModel(SegmentsEntrySoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		SegmentsEntry model = new SegmentsEntryImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setUuid(soapModel.getUuid());
+		model.setSegmentsEntryId(soapModel.getSegmentsEntryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setSegmentsEntryKey(soapModel.getSegmentsEntryKey());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setActive(soapModel.isActive());
+		model.setCriteria(soapModel.getCriteria());
+		model.setSource(soapModel.getSource());
+		model.setType(soapModel.getType());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<SegmentsEntry> toModels(SegmentsEntrySoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<SegmentsEntry> models = new ArrayList<SegmentsEntry>(
+			soapModels.length);
+
+		for (SegmentsEntrySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public SegmentsEntryModelImpl() {
 	}
 
@@ -272,137 +336,137 @@ public class SegmentsEntryModelImpl
 	public Map<String, Function<SegmentsEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<SegmentsEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, SegmentsEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<SegmentsEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SegmentsEntry.class.getClassLoader(), SegmentsEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<SegmentsEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<SegmentsEntry, Object>>();
+		try {
+			Constructor<SegmentsEntry> constructor =
+				(Constructor<SegmentsEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", SegmentsEntry::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", SegmentsEntry::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", SegmentsEntry::getUuid);
-			attributeGetterFunctions.put(
-				"segmentsEntryId", SegmentsEntry::getSegmentsEntryId);
-			attributeGetterFunctions.put("groupId", SegmentsEntry::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", SegmentsEntry::getCompanyId);
-			attributeGetterFunctions.put("userId", SegmentsEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", SegmentsEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", SegmentsEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", SegmentsEntry::getModifiedDate);
-			attributeGetterFunctions.put(
-				"segmentsEntryKey", SegmentsEntry::getSegmentsEntryKey);
-			attributeGetterFunctions.put("name", SegmentsEntry::getName);
-			attributeGetterFunctions.put(
-				"description", SegmentsEntry::getDescription);
-			attributeGetterFunctions.put("active", SegmentsEntry::getActive);
-			attributeGetterFunctions.put(
-				"criteria", SegmentsEntry::getCriteria);
-			attributeGetterFunctions.put("source", SegmentsEntry::getSource);
-			attributeGetterFunctions.put("type", SegmentsEntry::getType);
-			attributeGetterFunctions.put(
-				"lastPublishDate", SegmentsEntry::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<SegmentsEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<SegmentsEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<SegmentsEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<SegmentsEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<SegmentsEntry, Object>>();
+		Map<String, BiConsumer<SegmentsEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<SegmentsEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<SegmentsEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<SegmentsEntry, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", SegmentsEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SegmentsEntry::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", SegmentsEntry::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<SegmentsEntry, String>)SegmentsEntry::setUuid);
+		attributeGetterFunctions.put(
+			"segmentsEntryId", SegmentsEntry::getSegmentsEntryId);
+		attributeSetterBiConsumers.put(
+			"segmentsEntryId",
+			(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setSegmentsEntryId);
+		attributeGetterFunctions.put("groupId", SegmentsEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", SegmentsEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", SegmentsEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setUserId);
+		attributeGetterFunctions.put("userName", SegmentsEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", SegmentsEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<SegmentsEntry, Date>)SegmentsEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", SegmentsEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<SegmentsEntry, Date>)SegmentsEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"segmentsEntryKey", SegmentsEntry::getSegmentsEntryKey);
+		attributeSetterBiConsumers.put(
+			"segmentsEntryKey",
+			(BiConsumer<SegmentsEntry, String>)
+				SegmentsEntry::setSegmentsEntryKey);
+		attributeGetterFunctions.put("name", SegmentsEntry::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<SegmentsEntry, String>)SegmentsEntry::setName);
+		attributeGetterFunctions.put(
+			"description", SegmentsEntry::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setDescription);
+		attributeGetterFunctions.put("active", SegmentsEntry::getActive);
+		attributeSetterBiConsumers.put(
+			"active",
+			(BiConsumer<SegmentsEntry, Boolean>)SegmentsEntry::setActive);
+		attributeGetterFunctions.put("criteria", SegmentsEntry::getCriteria);
+		attributeSetterBiConsumers.put(
+			"criteria",
+			(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setCriteria);
+		attributeGetterFunctions.put("source", SegmentsEntry::getSource);
+		attributeSetterBiConsumers.put(
+			"source",
+			(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setSource);
+		attributeGetterFunctions.put("type", SegmentsEntry::getType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<SegmentsEntry, String>)SegmentsEntry::setType);
+		attributeGetterFunctions.put(
+			"lastPublishDate", SegmentsEntry::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<SegmentsEntry, Date>)SegmentsEntry::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<SegmentsEntry, Long>)
-					SegmentsEntry::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setUuid);
-			attributeSetterBiConsumers.put(
-				"segmentsEntryId",
-				(BiConsumer<SegmentsEntry, Long>)
-					SegmentsEntry::setSegmentsEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<SegmentsEntry, Long>)SegmentsEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<SegmentsEntry, Date>)SegmentsEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<SegmentsEntry, Date>)
-					SegmentsEntry::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"segmentsEntryKey",
-				(BiConsumer<SegmentsEntry, String>)
-					SegmentsEntry::setSegmentsEntryKey);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<SegmentsEntry, String>)
-					SegmentsEntry::setDescription);
-			attributeSetterBiConsumers.put(
-				"active",
-				(BiConsumer<SegmentsEntry, Boolean>)SegmentsEntry::setActive);
-			attributeSetterBiConsumers.put(
-				"criteria",
-				(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setCriteria);
-			attributeSetterBiConsumers.put(
-				"source",
-				(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setSource);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<SegmentsEntry, String>)SegmentsEntry::setType);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<SegmentsEntry, Date>)
-					SegmentsEntry::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1434,12 +1498,41 @@ public class SegmentsEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<SegmentsEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<SegmentsEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<SegmentsEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((SegmentsEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SegmentsEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SegmentsEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1469,8 +1562,7 @@ public class SegmentsEntryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<SegmentsEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

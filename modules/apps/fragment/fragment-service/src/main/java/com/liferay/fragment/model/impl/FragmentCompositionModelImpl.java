@@ -19,6 +19,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentCompositionModel;
+import com.liferay.fragment.model.FragmentCompositionSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -37,15 +38,18 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -117,7 +121,7 @@ public class FragmentCompositionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table FragmentComposition (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,fragmentCompositionId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,fragmentCollectionId LONG,fragmentCompositionKey VARCHAR(75) null,name VARCHAR(75) null,description STRING null,data_ TEXT null,previewFileEntryId LONG,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,primary key (fragmentCompositionId, ctCollectionId))";
+		"create table FragmentComposition (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,fragmentCompositionId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,fragmentCollectionId LONG,fragmentCompositionKey VARCHAR(75) null,name VARCHAR(75) null,description VARCHAR(75) null,data_ TEXT null,previewFileEntryId LONG,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,primary key (fragmentCompositionId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table FragmentComposition";
@@ -188,6 +192,73 @@ public class FragmentCompositionModelImpl
 	 */
 	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static FragmentComposition toModel(
+		FragmentCompositionSoap soapModel) {
+
+		if (soapModel == null) {
+			return null;
+		}
+
+		FragmentComposition model = new FragmentCompositionImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setUuid(soapModel.getUuid());
+		model.setFragmentCompositionId(soapModel.getFragmentCompositionId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setFragmentCollectionId(soapModel.getFragmentCollectionId());
+		model.setFragmentCompositionKey(soapModel.getFragmentCompositionKey());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setData(soapModel.getData());
+		model.setPreviewFileEntryId(soapModel.getPreviewFileEntryId());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+		model.setStatus(soapModel.getStatus());
+		model.setStatusByUserId(soapModel.getStatusByUserId());
+		model.setStatusByUserName(soapModel.getStatusByUserName());
+		model.setStatusDate(soapModel.getStatusDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<FragmentComposition> toModels(
+		FragmentCompositionSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<FragmentComposition> models = new ArrayList<FragmentComposition>(
+			soapModels.length);
+
+		for (FragmentCompositionSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public FragmentCompositionModelImpl() {
@@ -266,177 +337,186 @@ public class FragmentCompositionModelImpl
 	public Map<String, Function<FragmentComposition, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<FragmentComposition, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, FragmentComposition>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<FragmentComposition, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			FragmentComposition.class.getClassLoader(),
+			FragmentComposition.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<FragmentComposition, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<FragmentComposition, Object>>();
+		try {
+			Constructor<FragmentComposition> constructor =
+				(Constructor<FragmentComposition>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", FragmentComposition::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", FragmentComposition::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", FragmentComposition::getUuid);
-			attributeGetterFunctions.put(
-				"fragmentCompositionId",
-				FragmentComposition::getFragmentCompositionId);
-			attributeGetterFunctions.put(
-				"groupId", FragmentComposition::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", FragmentComposition::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", FragmentComposition::getUserId);
-			attributeGetterFunctions.put(
-				"userName", FragmentComposition::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", FragmentComposition::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", FragmentComposition::getModifiedDate);
-			attributeGetterFunctions.put(
-				"fragmentCollectionId",
-				FragmentComposition::getFragmentCollectionId);
-			attributeGetterFunctions.put(
-				"fragmentCompositionKey",
-				FragmentComposition::getFragmentCompositionKey);
-			attributeGetterFunctions.put("name", FragmentComposition::getName);
-			attributeGetterFunctions.put(
-				"description", FragmentComposition::getDescription);
-			attributeGetterFunctions.put("data", FragmentComposition::getData);
-			attributeGetterFunctions.put(
-				"previewFileEntryId",
-				FragmentComposition::getPreviewFileEntryId);
-			attributeGetterFunctions.put(
-				"lastPublishDate", FragmentComposition::getLastPublishDate);
-			attributeGetterFunctions.put(
-				"status", FragmentComposition::getStatus);
-			attributeGetterFunctions.put(
-				"statusByUserId", FragmentComposition::getStatusByUserId);
-			attributeGetterFunctions.put(
-				"statusByUserName", FragmentComposition::getStatusByUserName);
-			attributeGetterFunctions.put(
-				"statusDate", FragmentComposition::getStatusDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<FragmentComposition, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<FragmentComposition, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<FragmentComposition, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<FragmentComposition, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<FragmentComposition, Object>>();
+		Map<String, BiConsumer<FragmentComposition, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<FragmentComposition, ?>>();
 
-		static {
-			Map<String, BiConsumer<FragmentComposition, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<FragmentComposition, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", FragmentComposition::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", FragmentComposition::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", FragmentComposition::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<FragmentComposition, String>)
+				FragmentComposition::setUuid);
+		attributeGetterFunctions.put(
+			"fragmentCompositionId",
+			FragmentComposition::getFragmentCompositionId);
+		attributeSetterBiConsumers.put(
+			"fragmentCompositionId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setFragmentCompositionId);
+		attributeGetterFunctions.put(
+			"groupId", FragmentComposition::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", FragmentComposition::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setCompanyId);
+		attributeGetterFunctions.put("userId", FragmentComposition::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setUserId);
+		attributeGetterFunctions.put(
+			"userName", FragmentComposition::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<FragmentComposition, String>)
+				FragmentComposition::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", FragmentComposition::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<FragmentComposition, Date>)
+				FragmentComposition::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", FragmentComposition::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<FragmentComposition, Date>)
+				FragmentComposition::setModifiedDate);
+		attributeGetterFunctions.put(
+			"fragmentCollectionId",
+			FragmentComposition::getFragmentCollectionId);
+		attributeSetterBiConsumers.put(
+			"fragmentCollectionId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setFragmentCollectionId);
+		attributeGetterFunctions.put(
+			"fragmentCompositionKey",
+			FragmentComposition::getFragmentCompositionKey);
+		attributeSetterBiConsumers.put(
+			"fragmentCompositionKey",
+			(BiConsumer<FragmentComposition, String>)
+				FragmentComposition::setFragmentCompositionKey);
+		attributeGetterFunctions.put("name", FragmentComposition::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<FragmentComposition, String>)
+				FragmentComposition::setName);
+		attributeGetterFunctions.put(
+			"description", FragmentComposition::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<FragmentComposition, String>)
+				FragmentComposition::setDescription);
+		attributeGetterFunctions.put("data", FragmentComposition::getData);
+		attributeSetterBiConsumers.put(
+			"data",
+			(BiConsumer<FragmentComposition, String>)
+				FragmentComposition::setData);
+		attributeGetterFunctions.put(
+			"previewFileEntryId", FragmentComposition::getPreviewFileEntryId);
+		attributeSetterBiConsumers.put(
+			"previewFileEntryId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setPreviewFileEntryId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", FragmentComposition::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<FragmentComposition, Date>)
+				FragmentComposition::setLastPublishDate);
+		attributeGetterFunctions.put("status", FragmentComposition::getStatus);
+		attributeSetterBiConsumers.put(
+			"status",
+			(BiConsumer<FragmentComposition, Integer>)
+				FragmentComposition::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", FragmentComposition::getStatusByUserId);
+		attributeSetterBiConsumers.put(
+			"statusByUserId",
+			(BiConsumer<FragmentComposition, Long>)
+				FragmentComposition::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", FragmentComposition::getStatusByUserName);
+		attributeSetterBiConsumers.put(
+			"statusByUserName",
+			(BiConsumer<FragmentComposition, String>)
+				FragmentComposition::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", FragmentComposition::getStatusDate);
+		attributeSetterBiConsumers.put(
+			"statusDate",
+			(BiConsumer<FragmentComposition, Date>)
+				FragmentComposition::setStatusDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<FragmentComposition, String>)
-					FragmentComposition::setUuid);
-			attributeSetterBiConsumers.put(
-				"fragmentCompositionId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setFragmentCompositionId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<FragmentComposition, String>)
-					FragmentComposition::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<FragmentComposition, Date>)
-					FragmentComposition::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<FragmentComposition, Date>)
-					FragmentComposition::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"fragmentCollectionId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setFragmentCollectionId);
-			attributeSetterBiConsumers.put(
-				"fragmentCompositionKey",
-				(BiConsumer<FragmentComposition, String>)
-					FragmentComposition::setFragmentCompositionKey);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<FragmentComposition, String>)
-					FragmentComposition::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<FragmentComposition, String>)
-					FragmentComposition::setDescription);
-			attributeSetterBiConsumers.put(
-				"data",
-				(BiConsumer<FragmentComposition, String>)
-					FragmentComposition::setData);
-			attributeSetterBiConsumers.put(
-				"previewFileEntryId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setPreviewFileEntryId);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<FragmentComposition, Date>)
-					FragmentComposition::setLastPublishDate);
-			attributeSetterBiConsumers.put(
-				"status",
-				(BiConsumer<FragmentComposition, Integer>)
-					FragmentComposition::setStatus);
-			attributeSetterBiConsumers.put(
-				"statusByUserId",
-				(BiConsumer<FragmentComposition, Long>)
-					FragmentComposition::setStatusByUserId);
-			attributeSetterBiConsumers.put(
-				"statusByUserName",
-				(BiConsumer<FragmentComposition, String>)
-					FragmentComposition::setStatusByUserName);
-			attributeSetterBiConsumers.put(
-				"statusDate",
-				(BiConsumer<FragmentComposition, Date>)
-					FragmentComposition::setStatusDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1364,12 +1444,41 @@ public class FragmentCompositionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<FragmentComposition, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<FragmentComposition, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<FragmentComposition, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((FragmentComposition)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, FragmentComposition>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					FragmentComposition.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1400,8 +1509,7 @@ public class FragmentCompositionModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<FragmentComposition, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

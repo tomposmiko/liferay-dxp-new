@@ -12,7 +12,7 @@
  * details.
  */
 
-import ClayEmptyState from '@clayui/empty-state';
+import classNames from 'classnames';
 import React from 'react';
 
 import {sub} from '../../utils/lang.es';
@@ -44,22 +44,44 @@ const EmptyState = ({emptyState, keywords = '', small = false}) => {
 	const {button, description, title} = isSearch ? search : emptyState;
 
 	return (
-		<ClayEmptyState
-			description={description}
-			imgSrc={
-				isSearch
-					? `${themeDisplay.getPathThemeImages()}/states/search_state.gif`
-					: `${themeDisplay.getPathThemeImages()}/states/empty_state.gif`
-			}
-			small={small}
-			title={title}
-		>
-			{button && button()}
-		</ClayEmptyState>
+		<div className="taglib-empty-result-message">
+			<div className="text-center">
+				<div
+					className={classNames(
+						{
+							'taglib-empty-state': !isSearch,
+							'taglib-search-state': isSearch,
+						},
+						{
+							'empty-state-small': small,
+						}
+					)}
+				/>
+
+				{title && (
+					<h1
+						className={classNames(
+							'taglib-empty-result-message-title',
+							{'empty-state-title-small': small}
+						)}
+					>
+						{title}
+					</h1>
+				)}
+
+				{description && (
+					<p className="empty-message-color taglib-empty-result-message-description">
+						{description}
+					</p>
+				)}
+
+				{button && button()}
+			</div>
+		</div>
 	);
 };
 
-export function withEmpty(Component) {
+export const withEmpty = (Component) => {
 	const Wrapper = ({emptyState, isEmpty, keywords, ...restProps}) => {
 		if (isEmpty) {
 			return <EmptyState emptyState={emptyState} keywords={keywords} />;
@@ -69,6 +91,6 @@ export function withEmpty(Component) {
 	};
 
 	return Wrapper;
-}
+};
 
 export default EmptyState;

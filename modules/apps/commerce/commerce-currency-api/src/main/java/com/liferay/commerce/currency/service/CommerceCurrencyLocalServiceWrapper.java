@@ -27,10 +27,6 @@ public class CommerceCurrencyLocalServiceWrapper
 	implements CommerceCurrencyLocalService,
 			   ServiceWrapper<CommerceCurrencyLocalService> {
 
-	public CommerceCurrencyLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceCurrencyLocalServiceWrapper(
 		CommerceCurrencyLocalService commerceCurrencyLocalService) {
 
@@ -454,12 +450,10 @@ public class CommerceCurrencyLocalServiceWrapper
 
 	@Override
 	public void importDefaultValues(
-			boolean updateExchangeRate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws Exception {
 
-		_commerceCurrencyLocalService.importDefaultValues(
-			updateExchangeRate, serviceContext);
+		_commerceCurrencyLocalService.importDefaultValues(serviceContext);
 	}
 
 	@Override

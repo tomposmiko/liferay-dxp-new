@@ -20,14 +20,15 @@
 DLAccessFromDesktopDisplayContext dlAccessFromDesktopDisplayContext = new DLAccessFromDesktopDisplayContext(request);
 %>
 
+<liferay-ui:icon
+	cssClass='<%= dlAccessFromDesktopDisplayContext.getRandomNamespace() + "-webdav-action" %>'
+	message="access-from-desktop"
+	url="javascript:;"
+/>
+
 <div id="<%= dlAccessFromDesktopDisplayContext.getRandomNamespace() %>webDav" style="display: none;">
 	<div class="portlet-document-library">
 		<liferay-ui:message key="<%= dlAccessFromDesktopDisplayContext.getWebDAVHelpMessage() %>" />
-
-		<liferay-learn:message
-			key="webdav"
-			resource="document-library-web"
-		/>
 
 		<br /><br />
 
@@ -36,35 +37,44 @@ DLAccessFromDesktopDisplayContext dlAccessFromDesktopDisplayContext = new DLAcce
 </div>
 
 <aui:script>
-	Liferay.Util.setPortletConfigurationIconAction(
-		'<portlet:namespace />accessFromDesktop',
-		() => {
-			var webdavContentContainer = document.getElementById(
-				'<%= dlAccessFromDesktopDisplayContext.getRandomNamespace() %>webDav'
-			);
+	(function () {
+		var webdavContentContainer = document.getElementById(
+			'<%= dlAccessFromDesktopDisplayContext.getRandomNamespace() %>webDav'
+		);
 
-			var html = '';
+		var html = '';
 
-			if (webdavContentContainer) {
-				html = webdavContentContainer.innerHTML;
+		if (webdavContentContainer) {
+			html = webdavContentContainer.innerHTML;
 
-				webdavContentContainer.remove();
-
-				Liferay.Util.openModal({
-					bodyHTML: html,
-					onOpen: function (event) {
-						var webdavURLInput = document.getElementById(
-							'<portlet:namespace /><%= dlAccessFromDesktopDisplayContext.getRandomNamespace() %>webDavURL'
-						);
-
-						if (webdavURLInput) {
-							webdavURLInput.focus();
-						}
-					},
-					title:
-						'<%= UnicodeLanguageUtil.get(request, "access-from-desktop") %>',
-				});
-			}
+			webdavContentContainer.remove();
 		}
-	);
+
+		var webdavActionLink = document.querySelector(
+			'.<%= dlAccessFromDesktopDisplayContext.getRandomNamespace() %>-webdav-action'
+		);
+
+		if (webdavActionLink) {
+			webdavActionLink.addEventListener('click', (event) => {
+				event.preventDefault();
+
+				if (webdavContentContainer) {
+					Liferay.Util.openModal({
+						bodyHTML: html,
+						onOpen: function (event) {
+							var webdavURLInput = document.getElementById(
+								'<portlet:namespace /><%= dlAccessFromDesktopDisplayContext.getRandomNamespace() %>webDavURL'
+							);
+
+							if (webdavURLInput) {
+								webdavURLInput.focus();
+							}
+						},
+						title:
+							'<%= UnicodeLanguageUtil.get(request, "access-from-desktop") %>',
+					});
+				}
+			});
+		}
+	})();
 </aui:script>

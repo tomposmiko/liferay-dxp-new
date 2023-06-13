@@ -58,9 +58,7 @@ renderResponse.setTitle(GetterUtil.get(title, LanguageUtil.get(request, "view-fo
 		<aui:input name="formInstanceId" type="hidden" value="<%= ddmFormDisplayContext.getFormInstanceId() %>" />
 		<aui:input name="defaultLanguageId" type="hidden" value='<%= ParamUtil.getString(request, "defaultLanguageId") %>' />
 
-		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/dynamic_data_mapping_form/validate_csrf_token" var="validateCSRFTokenURL" />
-
-		<div id=<%= ddmFormDisplayContext.getContainerId() %>>
+		<div class="ddm-form-basic-info">
 
 			<%
 			String languageId = ddmFormDisplayContext.getDefaultLanguageId();
@@ -68,14 +66,24 @@ renderResponse.setTitle(GetterUtil.get(title, LanguageUtil.get(request, "view-fo
 			Locale displayLocale = LocaleUtil.fromLanguageId(languageId);
 			%>
 
+			<h1 class="ddm-form-name"><%= HtmlUtil.escape(formInstance.getName(displayLocale)) %></h1>
+
+			<%
+			String description = HtmlUtil.escape(formInstance.getDescription(displayLocale));
+			%>
+
+			<c:if test="<%= Validator.isNotNull(description) %>">
+				<h5 class="ddm-form-description"><%= description %></h5>
+			</c:if>
+		</div>
+
+		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/dynamic_data_mapping_form/validate_csrf_token" var="validateCSRFTokenURL" />
+
+		<div id=<%= ddmFormDisplayContext.getContainerId() %>>
 			<react:component
-				module="admin/js/FormView"
+				module="admin/js/FormView.link.es"
 				props='<%=
 					HashMapBuilder.<String, Object>put(
-						"description", formInstance.getDescription(displayLocale)
-					).put(
-						"title", formInstance.getName(displayLocale)
-					).put(
 						"validateCSRFTokenURL", validateCSRFTokenURL.toString()
 					).putAll(
 						ddmFormDisplayContext.getDDMFormContext()

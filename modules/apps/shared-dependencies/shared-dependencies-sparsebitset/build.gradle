@@ -1,3 +1,0 @@
-dependencies {
-	compileInclude group: "com.zaxxer", name: "SparseBitSet", version: "1.2"
-}

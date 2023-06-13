@@ -31,53 +31,55 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 	name="fm"
 >
 	<liferay-frontend:edit-form-body>
-		<liferay-ui:message key="import-help" />
+		<liferay-frontend:fieldset-group>
+			<liferay-ui:message key="import-help" />
 
-		<a href="https://portal.liferay.dev/docs" target="_blank">
-			<liferay-ui:message key="read-more" />
-		</a>
+			<a href="https://portal.liferay.dev/docs" target="_blank">
+				<liferay-ui:message key="read-more" />
+			</a>
 
-		<br /><br />
+			<br /><br />
 
-		<liferay-frontend:fieldset>
-			<aui:input label="file" name="file" type="file">
-				<aui:validator name="required" />
+			<liferay-frontend:fieldset>
+				<aui:input label="file" name="file" type="file">
+					<aui:validator name="required" />
 
-				<aui:validator name="acceptFiles">
-					'zip'
-				</aui:validator>
-			</aui:input>
+					<aui:validator name="acceptFiles">
+						'zip'
+					</aui:validator>
+				</aui:input>
 
-			<aui:input checked="<%= true %>" label="overwrite-existing-page-templates" name="overwrite" type="checkbox" />
-		</liferay-frontend:fieldset>
+				<aui:input checked="<%= true %>" label="overwrite-existing-page-templates" name="overwrite" type="checkbox" />
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 
 		<%
-		Map<LayoutsImporterResultEntry.Status, List<LayoutsImporterResultEntry>> layoutsImporterResultEntryMap = importDisplayContext.getLayoutsImporterResultEntryMap();
+		Map<LayoutPageTemplatesImporterResultEntry.Status, List<LayoutPageTemplatesImporterResultEntry>> layoutPageTemplatesImporterResultEntryMap = importDisplayContext.getLayoutPageTemplatesImporterResultEntryMap();
 		%>
 
-		<c:if test="<%= MapUtil.isNotEmpty(layoutsImporterResultEntryMap) %>">
+		<c:if test="<%= MapUtil.isNotEmpty(layoutPageTemplatesImporterResultEntryMap) %>">
 
 			<%
 			String dialogType = importDisplayContext.getDialogType();
 			%>
 
 			<div class="alert alert-<%= dialogType %> <%= dialogType %>-dialog">
-				<span class="font-weight-bold"><%= importDisplayContext.getDialogMessage() %></span>
+				<span class="<%= dialogType %>-message"><%= importDisplayContext.getDialogMessage() %></span>
 
-				<ul>
+				<ul class="<%= dialogType %>-list-items">
 
 					<%
-					Map<Integer, List<LayoutsImporterResultEntry>> importedLayoutsImporterResultEntriesMap = importDisplayContext.getImportedLayoutsImporterResultEntriesMap();
+					Map<Integer, List<LayoutPageTemplatesImporterResultEntry>> importedLayoutPageTemplatesImporterResultEntriesMap = importDisplayContext.getImportedLayoutPageTemplatesImporterResultEntriesMap();
 					%>
 
-					<c:if test="<%= MapUtil.isNotEmpty(importedLayoutsImporterResultEntriesMap) %>">
+					<c:if test="<%= MapUtil.isNotEmpty(importedLayoutPageTemplatesImporterResultEntriesMap) %>">
 
 						<%
-						for (Map.Entry<Integer, List<LayoutsImporterResultEntry>> entrySet : importedLayoutsImporterResultEntriesMap.entrySet()) {
+						for (Map.Entry<Integer, List<LayoutPageTemplatesImporterResultEntry>> entrySet : importedLayoutPageTemplatesImporterResultEntriesMap.entrySet()) {
 						%>
 
 							<li>
-								<span class="font-italic"><%= HtmlUtil.escape(importDisplayContext.getSuccessMessage(entrySet)) %></span>
+								<span class="<%= dialogType %>-info"><%= HtmlUtil.escape(importDisplayContext.getSuccessMessage(entrySet)) %></span>
 							</li>
 
 						<%
@@ -87,18 +89,20 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 					</c:if>
 
 					<%
-					List<LayoutsImporterResultEntry> layoutsImporterResultEntriesWithWarnings = importDisplayContext.getLayoutsImporterResultEntriesWithWarnings();
+					List<LayoutPageTemplatesImporterResultEntry> layoutPageTemplatesImporterResultEntriesWithWarnings = importDisplayContext.getLayoutPageTemplatesImporterResultEntriesWithWarnings();
 					%>
 
-					<c:if test="<%= ListUtil.isNotEmpty(layoutsImporterResultEntriesWithWarnings) %>">
+					<c:if test="<%= ListUtil.isNotEmpty(layoutPageTemplatesImporterResultEntriesWithWarnings) %>">
 
 						<%
-						for (LayoutsImporterResultEntry layoutsImporterResultEntry : layoutsImporterResultEntriesWithWarnings) {
-							String[] warningMessages = layoutsImporterResultEntry.getWarningMessages();
+						for (int i = 0; i < layoutPageTemplatesImporterResultEntriesWithWarnings.size(); i++) {
+							LayoutPageTemplatesImporterResultEntry layoutPageTemplatesImporterResultEntry = layoutPageTemplatesImporterResultEntriesWithWarnings.get(i);
+
+							String[] warningMessages = layoutPageTemplatesImporterResultEntry.getWarningMessages();
 						%>
 
 							<li>
-								<span class="font-italic"><%= HtmlUtil.escape(importDisplayContext.getWarningMessage(layoutsImporterResultEntry.getName())) %></span>
+								<span class="<%= dialogType %>-info"><%= HtmlUtil.escape(importDisplayContext.getWarningMessage(layoutPageTemplatesImporterResultEntry.getName())) %></span>
 
 								<ul>
 
@@ -106,7 +110,7 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 									for (String warningMessage : warningMessages) {
 									%>
 
-										<li><span class="font-italic"><%= HtmlUtil.escape(warningMessage) %></span></li>
+										<li><span class="<%= dialogType %>-info"><%= HtmlUtil.escape(warningMessage) %></span></li>
 
 									<%
 									}
@@ -122,20 +126,25 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 					</c:if>
 
 					<%
-					int i = 0;
+					int total = 0;
+					int viewTotal = 0;
 
-					List<LayoutsImporterResultEntry> notImportedLayoutsImporterResultEntries = importDisplayContext.getNotImportedLayoutsImporterResultEntries();
+					List<LayoutPageTemplatesImporterResultEntry> notImportedLayoutPageTemplatesImporterResultEntries = importDisplayContext.getNotImportedLayoutPageTemplatesImporterResultEntries();
 					%>
 
-					<c:if test="<%= ListUtil.isNotEmpty(notImportedLayoutsImporterResultEntries) %>">
+					<c:if test="<%= ListUtil.isNotEmpty(notImportedLayoutPageTemplatesImporterResultEntries) %>">
 
 						<%
-						for (; (i < notImportedLayoutsImporterResultEntries.size()) && (i < 10); i++) {
-							LayoutsImporterResultEntry layoutsImporterResultEntry = notImportedLayoutsImporterResultEntries.get(i);
+						total = notImportedLayoutPageTemplatesImporterResultEntries.size();
+
+						viewTotal = (total > 10) ? 10 : total;
+
+						for (int i = 0; i < viewTotal; i++) {
+							LayoutPageTemplatesImporterResultEntry layoutPageTemplatesImporterResultEntry = notImportedLayoutPageTemplatesImporterResultEntries.get(i);
 						%>
 
 							<li>
-								<span class="font-italic"><%= HtmlUtil.escape(layoutsImporterResultEntry.getErrorMessage()) %></span>
+								<span class="<%= dialogType %>-info"><%= HtmlUtil.escape(layoutPageTemplatesImporterResultEntry.getErrorMessage()) %></span>
 							</li>
 
 						<%
@@ -145,16 +154,16 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 					</c:if>
 				</ul>
 
-				<c:if test="<%= notImportedLayoutsImporterResultEntries.size() > 10 %>">
-					<span><%= LanguageUtil.format(request, "x-more-entries-could-also-not-be-imported", "<strong>" + (notImportedLayoutsImporterResultEntries.size() - i) + "</strong>", false) %></span>
+				<c:if test="<%= total > 10 %>">
+					<span class="<%= dialogType %>-info"><%= LanguageUtil.format(request, "x-more-entries-could-also-not-be-imported", "<strong>" + (total - viewTotal) + "</strong>", false) %></span>
 				</c:if>
 			</div>
 		</c:if>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons
-			submitLabel="import"
-		/>
+		<aui:button type="submit" value="import" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>

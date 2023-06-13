@@ -14,16 +14,16 @@
 
 package com.liferay.fragment.model.impl;
 
-import com.liferay.document.library.util.DLURLHelperUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentExportImportConstants;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
+import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -51,7 +51,7 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public String getContent() {
-		return StringPool.BLANK;
+		return FragmentEntryRenderUtil.renderFragmentEntry(this);
 	}
 
 	@Override
@@ -62,11 +62,8 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public String getIcon() {
-		if (Validator.isNull(_icon)) {
-			if (isTypeInput()) {
-				_icon = "forms";
-			}
-			else if (isTypeReact()) {
+		if (_icon == null) {
+			if (getType() == FragmentConstants.TYPE_REACT) {
 				_icon = "react";
 			}
 			else {
@@ -79,9 +76,7 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public String getImagePreviewURL(ThemeDisplay themeDisplay) {
-		if (Validator.isNotNull(_imagePreviewURL) &&
-			!_imagePreviewURL.endsWith(StringPool.SLASH)) {
-
+		if (Validator.isNotNull(_imagePreviewURL)) {
 			return _imagePreviewURL;
 		}
 
@@ -92,10 +87,10 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 				return StringPool.BLANK;
 			}
 
-			return DLURLHelperUtil.getImagePreviewURL(fileEntry, themeDisplay);
+			return DLUtil.getImagePreviewURL(fileEntry, themeDisplay);
 		}
 		catch (Exception exception) {
-			_log.error("Unable to get image preview URL", exception);
+			_log.error("Unable to get preview entry image URL", exception);
 		}
 
 		return StringPool.BLANK;
@@ -118,9 +113,8 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public int getUsageCount() {
-		return FragmentEntryLinkLocalServiceUtil.
-			getAllFragmentEntryLinksCountByFragmentEntryId(
-				getGroupId(), getFragmentEntryId());
+		return FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinksCount(
+			getGroupId(), getFragmentEntryId());
 	}
 
 	@Override
@@ -142,62 +136,17 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 	}
 
 	@Override
-	public boolean isTypeComponent() {
-		if (getType() == FragmentConstants.TYPE_COMPONENT) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isTypeInput() {
-		if (getType() == FragmentConstants.TYPE_INPUT) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isTypeReact() {
-		if (getType() == FragmentConstants.TYPE_REACT) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isTypeSection() {
-		if (getType() == FragmentConstants.TYPE_SECTION) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
 	public void populateZipWriter(ZipWriter zipWriter, String path)
 		throws Exception {
 
 		path = path + StringPool.SLASH + getFragmentEntryKey();
 
 		JSONObject jsonObject = JSONUtil.put(
-			"configurationPath", "configuration.json"
+			"configurationPath", "index.json"
 		).put(
 			"cssPath", "index.css"
 		).put(
 			"htmlPath", "index.html"
-		).put(
-			"icon",
-			() -> {
-				if (Validator.isNotNull(_icon)) {
-					return _icon;
-				}
-
-				return null;
-			}
 		).put(
 			"jsPath", "index.js"
 		).put(
@@ -218,21 +167,14 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 			jsonObject.put("type", typeLabel);
 		}
 
-		String typeOptions = getTypeOptions();
-
-		if (Validator.isNotNull(typeOptions)) {
-			jsonObject.put(
-				"typeOptions", JSONFactoryUtil.createJSONObject(typeOptions));
-		}
-
 		zipWriter.addEntry(
 			path + StringPool.SLASH +
 				FragmentExportImportConstants.FILE_NAME_FRAGMENT,
-			jsonObject.toString(2));
+			jsonObject.toString());
 
-		zipWriter.addEntry(path + "/configuration.json", getConfiguration());
 		zipWriter.addEntry(path + "/index.css", getCss());
 		zipWriter.addEntry(path + "/index.js", getJs());
+		zipWriter.addEntry(path + "/index.json", getConfiguration());
 		zipWriter.addEntry(path + "/index.html", getHtml());
 
 		if (previewFileEntry != null) {

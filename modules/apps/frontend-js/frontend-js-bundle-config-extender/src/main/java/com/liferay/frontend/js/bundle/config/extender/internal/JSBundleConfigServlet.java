@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Chema Balsas
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.http.whiteboard.servlet.name=com.liferay.frontend.js.bundle.config.extender.internal.JSBundleConfigServlet",
 		"osgi.http.whiteboard.servlet.pattern=/js_bundle_config",
@@ -76,6 +77,10 @@ public class JSBundleConfigServlet extends HttpServlet {
 		_componentContext = componentContext;
 	}
 
+	protected JSBundleConfigTracker getJSBundleConfigTracker() {
+		return _jsBundleConfigTracker;
+	}
+
 	@Override
 	protected void service(
 			HttpServletRequest httpServletRequest,
@@ -89,13 +94,13 @@ public class JSBundleConfigServlet extends HttpServlet {
 
 		PrintWriter printWriter = new PrintWriter(servletOutputStream, true);
 
-		Collection<JSBundleConfigRegistry.JSConfig> jsConfigs =
-			_jsBundleConfigRegistry.getJSConfigs();
+		Collection<JSBundleConfigTracker.JSConfig> jsConfigs =
+			_jsBundleConfigTracker.getJSConfigs();
 
 		if (!jsConfigs.isEmpty()) {
 			printWriter.print("(function(){");
 
-			for (JSBundleConfigRegistry.JSConfig jsConfig : jsConfigs) {
+			for (JSBundleConfigTracker.JSConfig jsConfig : jsConfigs) {
 				URL url = jsConfig.getURL();
 
 				try (InputStream inputStream = url.openStream()) {
@@ -127,13 +132,18 @@ public class JSBundleConfigServlet extends HttpServlet {
 		printWriter.close();
 	}
 
+	@Reference(unbind = "-")
+	protected void setJSBundleConfigTracker(
+		JSBundleConfigTracker jsBundleConfigTracker) {
+
+		_jsBundleConfigTracker = jsBundleConfigTracker;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		JSBundleConfigServlet.class);
 
 	private volatile ComponentContext _componentContext;
-
-	@Reference
-	private JSBundleConfigRegistry _jsBundleConfigRegistry;
+	private JSBundleConfigTracker _jsBundleConfigTracker;
 
 	@Reference
 	private Portal _portal;

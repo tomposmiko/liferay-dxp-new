@@ -35,7 +35,7 @@ export default withRouter(
 	}) => {
 		const context = useContext(AppContext);
 
-		const editorRef = useRef('');
+		const editor = useRef('');
 		const [hasEnoughContent, setHasEnoughContent] = useState(false);
 
 		const [headline, setHeadline] = useState('');
@@ -44,7 +44,6 @@ export default withRouter(
 		const [tagsLoaded, setTagsLoaded] = useState(true);
 
 		const {data = {}} = useQuery(getThreadContentQuery, {
-			useCache: false,
 			variables: {
 				friendlyUrlPath: questionId,
 				siteKey: context.siteKey,
@@ -53,7 +52,7 @@ export default withRouter(
 
 		useEffect(() => {
 			if (data.messageBoardThreadByFriendlyUrlPath) {
-				editorRef.current.setContent(
+				editor.current.setContent(
 					data.messageBoardThreadByFriendlyUrlPath.articleBody
 				);
 				setHeadline(data.messageBoardThreadByFriendlyUrlPath.headline);
@@ -118,7 +117,7 @@ export default withRouter(
 								)}
 								label={Liferay.Language.get('body')}
 								onContentLengthValid={setHasEnoughContent}
-								ref={editorRef}
+								ref={editor}
 							/>
 
 							<ClayForm.Group className="c-mt-4">
@@ -141,7 +140,7 @@ export default withRouter(
 									updateThread(
 										{
 											variables: {
-												articleBody: editorRef.current.getContent(),
+												articleBody: editor.current.getContent(),
 												headline,
 												keywords: tags.map(
 													(tag) => tag.value
@@ -162,7 +161,7 @@ export default withRouter(
 											'update-your-question'
 									  )
 									: Liferay.Language.get(
-											'submit-for-workflow'
+											'submit-for-publication'
 									  )}
 							</ClayButton>
 

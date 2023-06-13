@@ -37,7 +37,11 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(enabled = false, service = ActionExecutor.class)
+@Component(
+	enabled = false, immediate = true,
+	property = "com.liferay.portal.workflow.kaleo.runtime.action.executor.language=drl",
+	service = ActionExecutor.class
+)
 public class DRLActionExecutor implements ActionExecutor {
 
 	@Override
@@ -51,11 +55,6 @@ public class DRLActionExecutor implements ActionExecutor {
 		catch (Exception exception) {
 			throw new ActionExecutorException(exception);
 		}
-	}
-
-	@Override
-	public String[] getActionExecutorKeys() {
-		return _ACTION_EXECUTOR_KEYS;
 	}
 
 	protected void doExecute(
@@ -79,8 +78,6 @@ public class DRLActionExecutor implements ActionExecutor {
 		WorkflowContextUtil.mergeWorkflowContexts(
 			executionContext, resultsWorkflowContext);
 	}
-
-	private static final String[] _ACTION_EXECUTOR_KEYS = {"drl"};
 
 	@Reference
 	private RulesContextBuilder _rulesContextBuilder;

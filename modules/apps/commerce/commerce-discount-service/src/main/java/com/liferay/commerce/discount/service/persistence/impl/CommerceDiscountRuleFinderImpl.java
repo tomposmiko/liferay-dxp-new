@@ -29,17 +29,14 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Riccardo Alberti
  */
-@Component(service = CommerceDiscountRuleFinder.class)
 public class CommerceDiscountRuleFinderImpl
 	extends CommerceDiscountRuleFinderBaseImpl
 	implements CommerceDiscountRuleFinder {
@@ -72,7 +69,7 @@ public class CommerceDiscountRuleFinderImpl
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
 					sql, CommerceDiscount.class.getName(),
-					"CommerceDiscountRule.commerceDiscountId", null, null,
+					"CommerceDiscount.commerceDiscountId", null, null,
 					new long[] {0}, null);
 			}
 
@@ -149,7 +146,7 @@ public class CommerceDiscountRuleFinderImpl
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
 					sql, CommerceDiscount.class.getName(),
-					"CommerceDiscountRule.commerceDiscountId", null, null,
+					"CommerceDiscount.commerceDiscountId", null, null,
 					new long[] {0}, null);
 			}
 
@@ -191,7 +188,7 @@ public class CommerceDiscountRuleFinderImpl
 		}
 	}
 
-	@Reference
+	@ServiceReference(type = CustomSQL.class)
 	private CustomSQL _customSQL;
 
 }

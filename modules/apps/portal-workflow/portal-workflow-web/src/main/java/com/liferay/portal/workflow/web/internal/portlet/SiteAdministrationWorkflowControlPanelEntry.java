@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Adam Brandizzi
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + WorkflowPortletKeys.SITE_ADMINISTRATION_WORKFLOW,
 	service = ControlPanelEntry.class
 )

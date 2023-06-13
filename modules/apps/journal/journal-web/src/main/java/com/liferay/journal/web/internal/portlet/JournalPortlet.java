@@ -17,7 +17,6 @@ package com.liferay.journal.web.internal.portlet;
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
-import com.liferay.change.tracking.spi.constants.CTTimelineKeys;
 import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.dynamic.data.mapping.configuration.DDMWebConfiguration;
@@ -31,7 +30,6 @@ import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.journal.configuration.JournalFileUploadsConfiguration;
-import com.liferay.journal.constants.JournalConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.exception.ArticleContentException;
@@ -58,32 +56,22 @@ import com.liferay.journal.exception.MaxAddMenuFavItemsException;
 import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.exception.NoSuchFeedException;
 import com.liferay.journal.exception.NoSuchFolderException;
-import com.liferay.journal.model.JournalFolder;
-import com.liferay.journal.service.JournalFolderService;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.JournalConverter;
-import com.liferay.journal.util.JournalHelper;
-import com.liferay.journal.web.internal.configuration.FFJournalAutoSaveDraftConfiguration;
+import com.liferay.journal.web.internal.configuration.FFTranslationManagerAdminMode;
 import com.liferay.journal.web.internal.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.helper.JournalDDMTemplateHelper;
 import com.liferay.journal.web.internal.portlet.action.ActionUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.LocaleException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.LiferayFileItemException;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.translation.security.permission.TranslationPermission;
 import com.liferay.translation.url.provider.TranslationURLProvider;
 import com.liferay.trash.TrashHelper;
@@ -101,10 +89,9 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -115,9 +102,10 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPid = {
 		"com.liferay.dynamic.data.mapping.configuration.DDMWebConfiguration",
 		"com.liferay.journal.configuration.JournalFileUploadsConfiguration",
-		"com.liferay.journal.web.internal.configuration.FFJournalAutoSaveDraftConfiguration",
+		"com.liferay.journal.web.internal.configuration.FFTranslationManagerAdminMode",
 		"com.liferay.journal.web.internal.configuration.JournalWebConfiguration"
 	},
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-journal",
@@ -139,10 +127,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {JournalPortlet.class, Portlet.class}
 )
 public class JournalPortlet extends MVCPortlet {
 
@@ -159,10 +146,14 @@ public class JournalPortlet extends MVCPortlet {
 
 		renderRequest.setAttribute(TrashWebKeys.TRASH_HELPER, _trashHelper);
 
-		if (Objects.equals(
-				getPath(renderRequest, renderResponse),
-				"/edit_ddm_template.jsp")) {
+		String path = getPath(renderRequest, renderResponse);
 
+		if (Objects.equals(path, "/edit_article.jsp")) {
+			renderRequest.setAttribute(
+				JournalWebKeys.ITEM_SELECTOR, _itemSelector);
+		}
+
+		if (Objects.equals(path, "/edit_ddm_template.jsp")) {
 			renderRequest.setAttribute(
 				DDMTemplateHelper.class.getName(), _ddmTemplateHelper);
 			renderRequest.setAttribute(
@@ -178,14 +169,11 @@ public class JournalPortlet extends MVCPortlet {
 		renderRequest.setAttribute(
 			DDMWebConfiguration.class.getName(), _ddmWebConfiguration);
 		renderRequest.setAttribute(
-			FFJournalAutoSaveDraftConfiguration.class.getName(),
-			_ffJournalAutoSaveDraftConfiguration);
+			FFTranslationManagerAdminMode.class.getName(),
+			_ffTranslationManagerAdminMode);
 		renderRequest.setAttribute(
 			FieldsToDDMFormValuesConverter.class.getName(),
 			_fieldsToDDMFormValuesConverter);
-		renderRequest.setAttribute(ItemSelector.class.getName(), _itemSelector);
-		renderRequest.setAttribute(
-			JournalHelper.class.getName(), _journalHelper);
 		renderRequest.setAttribute(
 			JournalFileUploadsConfiguration.class.getName(),
 			_journalFileUploadsConfiguration);
@@ -214,13 +202,6 @@ public class JournalPortlet extends MVCPortlet {
 		resourceRequest.setAttribute(
 			DDMTemplateHelper.class.getName(), _ddmTemplateHelper);
 		resourceRequest.setAttribute(
-			FFJournalAutoSaveDraftConfiguration.class.getName(),
-			_ffJournalAutoSaveDraftConfiguration);
-		resourceRequest.setAttribute(
-			ItemSelector.class.getName(), _itemSelector);
-		resourceRequest.setAttribute(
-			JournalHelper.class.getName(), _journalHelper);
-		resourceRequest.setAttribute(
 			JournalWebConfiguration.class.getName(), _journalWebConfiguration);
 		resourceRequest.setAttribute(
 			TranslationPermission.class.getName(), _translationPermission);
@@ -236,9 +217,8 @@ public class JournalPortlet extends MVCPortlet {
 	protected void activate(Map<String, Object> properties) {
 		_ddmWebConfiguration = ConfigurableUtil.createConfigurable(
 			DDMWebConfiguration.class, properties);
-		_ffJournalAutoSaveDraftConfiguration =
-			ConfigurableUtil.createConfigurable(
-				FFJournalAutoSaveDraftConfiguration.class, properties);
+		_ffTranslationManagerAdminMode = ConfigurableUtil.createConfigurable(
+			FFTranslationManagerAdminMode.class, properties);
 		_journalFileUploadsConfiguration = ConfigurableUtil.createConfigurable(
 			JournalFileUploadsConfiguration.class, properties);
 		_journalWebConfiguration = ConfigurableUtil.createConfigurable(
@@ -256,19 +236,18 @@ public class JournalPortlet extends MVCPortlet {
 			if (Objects.equals(path, "/edit_article.jsp") ||
 				Objects.equals(path, "/view_article_history.jsp")) {
 
-				ActionUtil.getArticle(
-					_portal.getHttpServletRequest(renderRequest));
+				ActionUtil.getArticle(renderRequest);
 			}
 			else {
-				_getFolder(_portal.getHttpServletRequest(renderRequest));
+				ActionUtil.getFolder(renderRequest);
 			}
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception.getMessage());
 			}
 
 			SessionErrors.add(renderRequest, exception.getClass());
@@ -339,27 +318,11 @@ public class JournalPortlet extends MVCPortlet {
 		return false;
 	}
 
-	private void _getFolder(HttpServletRequest httpServletRequest)
-		throws PortalException {
-
-		long folderId = ParamUtil.getLong(httpServletRequest, "folderId");
-
-		if (folderId > 0) {
-			_journalFolderService.fetchFolder(folderId);
-
-			httpServletRequest.setAttribute(
-				CTTimelineKeys.CLASS_NAME, JournalFolder.class.getName());
-			httpServletRequest.setAttribute(CTTimelineKeys.CLASS_PK, folderId);
-		}
-		else {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			_portletResourcePermission.check(
-				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroup(), ActionKeys.VIEW);
-		}
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.journal.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(JournalPortlet.class);
@@ -378,8 +341,8 @@ public class JournalPortlet extends MVCPortlet {
 	private DDMTemplateHelper _ddmTemplateHelper;
 
 	private volatile DDMWebConfiguration _ddmWebConfiguration;
-	private volatile FFJournalAutoSaveDraftConfiguration
-		_ffJournalAutoSaveDraftConfiguration;
+	private volatile FFTranslationManagerAdminMode
+		_ffTranslationManagerAdminMode;
 
 	@Reference
 	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
@@ -398,27 +361,7 @@ public class JournalPortlet extends MVCPortlet {
 
 	private volatile JournalFileUploadsConfiguration
 		_journalFileUploadsConfiguration;
-
-	@Reference
-	private JournalFolderService _journalFolderService;
-
-	@Reference
-	private JournalHelper _journalHelper;
-
 	private volatile JournalWebConfiguration _journalWebConfiguration;
-
-	@Reference
-	private Portal _portal;
-
-	@Reference(
-		target = "(resource.name=" + JournalConstants.RESOURCE_NAME + ")"
-	)
-	private PortletResourcePermission _portletResourcePermission;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.journal.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
-	)
-	private Release _release;
 
 	@Reference
 	private TranslationPermission _translationPermission;

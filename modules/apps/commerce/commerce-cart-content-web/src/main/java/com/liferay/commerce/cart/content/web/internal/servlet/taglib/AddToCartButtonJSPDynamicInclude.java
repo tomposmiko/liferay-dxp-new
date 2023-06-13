@@ -27,13 +27,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = DynamicInclude.class)
+@Component(enabled = false, immediate = true, service = DynamicInclude.class)
 public class AddToCartButtonJSPDynamicInclude extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
@@ -51,12 +46,16 @@ public class AddToCartButtonJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.cart.content.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		AddToCartButtonJSPDynamicInclude.class);
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.commerce.cart.content.web)"
-	)
-	private ServletContext _servletContext;
 
 }

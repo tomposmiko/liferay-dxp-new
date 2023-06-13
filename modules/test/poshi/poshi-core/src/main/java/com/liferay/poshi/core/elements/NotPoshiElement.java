@@ -72,30 +72,11 @@ public class NotPoshiElement extends PoshiElement {
 		StringBuilder sb = new StringBuilder();
 
 		for (PoshiElement poshiElement : toPoshiElements(elements())) {
-			if (poshiElement instanceof EqualsPoshiElement) {
-				PoshiElement parentPoshiElement = (PoshiElement)getParent();
+			sb.append("!(");
 
-				if (parentPoshiElement instanceof AndPoshiElement ||
-					parentPoshiElement instanceof OrPoshiElement) {
+			sb.append(poshiElement.toPoshiScript());
 
-					sb.append("(");
-					sb.append(
-						_toNotEqualsPoshiScript(
-							(EqualsPoshiElement)poshiElement));
-					sb.append(")");
-				}
-				else {
-					sb.append(
-						_toNotEqualsPoshiScript(
-							(EqualsPoshiElement)poshiElement));
-				}
-			}
-			else {
-				sb.append("!(");
-
-				sb.append(poshiElement.toPoshiScript());
-				sb.append(")");
-			}
+			sb.append(")");
 		}
 
 		return sb.toString();
@@ -136,36 +117,9 @@ public class NotPoshiElement extends PoshiElement {
 		return isConditionElementType(parentPoshiElement, poshiScript);
 	}
 
-	private String _toNotEqualsPoshiScript(
-		EqualsPoshiElement equalsPoshiElement) {
-
-		StringBuilder sb = new StringBuilder();
-
-		String arg1 = equalsPoshiElement.attributeValue("arg1");
-
-		if (isQuotedContent(arg1)) {
-			arg1 = "\"" + arg1 + "\"";
-		}
-
-		sb.append(arg1);
-
-		sb.append(" != ");
-
-		String arg2 = equalsPoshiElement.attributeValue("arg2");
-
-		if (isQuotedContent(arg2)) {
-			arg2 = "\"" + arg2 + "\"";
-		}
-
-		sb.append(arg2);
-
-		return sb.toString();
-	}
-
 	private static final String _ELEMENT_NAME = "not";
 
 	private static final Pattern _conditionPattern = Pattern.compile(
-		"^(![\\s\\S]*|(?:\\d+|(?:\\$\\{|\\\")[\\s\\S]*" +
-			"(?:\\}|\"))[\\s]*!=[\\s]*[\\s\\S]*(?:\\d+|(?:\\}|\")))$");
+		"^(![\\s\\S]*|\"[\\s\\S]*\"[\\s]*!=[\\s]*\"[\\s\\S]*\")$");
 
 }

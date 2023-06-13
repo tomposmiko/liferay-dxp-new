@@ -17,59 +17,48 @@ package com.liferay.layout.content.page.editor.web.internal.display.context;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.exportimport.kernel.staging.Staging;
-import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.fragment.service.FragmentEntryLocalService;
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.renderer.FragmentRendererController;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
 import com.liferay.info.collection.provider.item.selector.criterion.RelatedInfoItemCollectionProviderItemSelectorCriterion;
 import com.liferay.info.item.InfoItemClassDetails;
 import com.liferay.info.item.InfoItemFormVariation;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
 import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.layout.content.page.editor.sidebar.panel.ContentPageEditorSidebarPanel;
+import com.liferay.layout.content.page.editor.web.internal.configuration.FFLayoutContentPageEditorConfiguration;
 import com.liferay.layout.content.page.editor.web.internal.configuration.PageEditorConfiguration;
-import com.liferay.layout.content.page.editor.web.internal.util.ContentManager;
-import com.liferay.layout.content.page.editor.web.internal.util.FragmentCollectionManager;
-import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkManager;
 import com.liferay.layout.content.page.editor.web.internal.util.MappingContentUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.LayoutSetLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
-import com.liferay.portal.kernel.service.permission.LayoutPermission;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.segments.configuration.provider.SegmentsConfigurationProvider;
-import com.liferay.segments.manager.SegmentsExperienceManager;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
-import com.liferay.segments.service.SegmentsExperimentRelLocalService;
-import com.liferay.staging.StagingGroupHelper;
-import com.liferay.style.book.service.StyleBookEntryLocalService;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -84,51 +73,35 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 	extends ContentPageEditorDisplayContext {
 
 	public ContentPageEditorLayoutPageTemplateDisplayContext(
+		CommentManager commentManager,
 		List<ContentPageEditorSidebarPanel> contentPageEditorSidebarPanels,
-		ContentManager contentManager,
-		FragmentCollectionManager fragmentCollectionManager,
-		FragmentEntryLinkManager fragmentEntryLinkManager,
-		FragmentEntryLinkLocalService fragmentEntryLinkLocalService,
-		FragmentEntryLocalService fragmentEntryLocalService,
+		FFLayoutContentPageEditorConfiguration
+			ffLayoutContentPageEditorConfiguration,
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
+		FragmentRendererController fragmentRendererController,
+		FragmentRendererTracker fragmentRendererTracker,
 		FrontendTokenDefinitionRegistry frontendTokenDefinitionRegistry,
 		HttpServletRequest httpServletRequest,
-		InfoItemServiceRegistry infoItemServiceRegistry,
-		InfoSearchClassMapperRegistry infoSearchClassMapperRegistry,
-		ItemSelector itemSelector, JSONFactory jsonFactory, Language language,
-		LayoutLocalService layoutLocalService,
-		LayoutSetLocalService layoutSetLocalService,
-		LayoutPageTemplateEntryLocalService layoutPageTemplateEntryLocalService,
-		LayoutPageTemplateEntryService layoutPageTemplateEntryService,
-		LayoutPermission layoutPermission,
+		InfoItemServiceTracker infoItemServiceTracker,
+		ItemSelector itemSelector,
 		PageEditorConfiguration pageEditorConfiguration,
-		boolean pageIsDisplayPage, Portal portal, PortletRequest portletRequest,
-		PortletURLFactory portletURLFactory, RenderResponse renderResponse,
-		SegmentsConfigurationProvider segmentsConfigurationProvider,
-		SegmentsExperienceManager segmentsExperienceManager,
-		SegmentsExperienceLocalService segmentsExperienceLocalService,
-		SegmentsExperimentRelLocalService segmentsExperimentRelLocalService,
-		Staging staging, StagingGroupHelper stagingGroupHelper,
-		StyleBookEntryLocalService styleBookEntryLocalService,
-		UserLocalService userLocalService,
-		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
+		boolean pageIsDisplayPage, PortletRequest portletRequest,
+		RenderResponse renderResponse) {
 
 		super(
-			contentPageEditorSidebarPanels, contentManager,
-			fragmentCollectionManager, fragmentEntryLinkManager,
-			fragmentEntryLinkLocalService, fragmentEntryLocalService,
-			frontendTokenDefinitionRegistry, httpServletRequest,
-			infoItemServiceRegistry, infoSearchClassMapperRegistry,
-			itemSelector, jsonFactory, language, layoutLocalService,
-			layoutPageTemplateEntryLocalService, layoutPageTemplateEntryService,
-			layoutPermission, layoutSetLocalService, pageEditorConfiguration,
-			portal, portletRequest, portletURLFactory, renderResponse,
-			segmentsConfigurationProvider, segmentsExperienceManager,
-			segmentsExperienceLocalService, segmentsExperimentRelLocalService,
-			staging, stagingGroupHelper, styleBookEntryLocalService,
-			userLocalService, workflowDefinitionLinkLocalService);
+			commentManager, contentPageEditorSidebarPanels,
+			ffLayoutContentPageEditorConfiguration,
+			fragmentCollectionContributorTracker,
+			fragmentEntryConfigurationParser, fragmentRendererController,
+			fragmentRendererTracker, frontendTokenDefinitionRegistry,
+			httpServletRequest, infoItemServiceTracker, itemSelector,
+			pageEditorConfiguration, portletRequest, renderResponse);
 
 		_itemSelector = itemSelector;
 		_pageIsDisplayPage = pageIsDisplayPage;
+		_renderResponse = renderResponse;
 	}
 
 	@Override
@@ -200,9 +173,16 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 
 		sourceItemTypes.add(className);
 
+		if (Objects.equals(className, FileEntry.class.getName())) {
+
+			// LPS-111037
+
+			className = DLFileEntry.class.getName();
+		}
+
 		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				infoSearchClassMapperRegistry.getSearchClassName(className));
+				className);
 
 		if (assetRendererFactory != null) {
 			sourceItemTypes.add(AssetEntry.class.getName());
@@ -233,7 +213,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 				key,
 				MappingContentUtil.getMappingFieldsJSONArray(
 					String.valueOf(layoutPageTemplateEntry.getClassTypeId()),
-					themeDisplay.getScopeGroupId(), infoItemServiceRegistry,
+					themeDisplay.getScopeGroupId(), infoItemServiceTracker,
 					layoutPageTemplateEntry.getClassName(),
 					themeDisplay.getLocale()));
 		}
@@ -263,7 +243,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 
 		PortletURL infoItemSelectorURL = _itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
-			renderResponse.getNamespace() + "selectInfoItem",
+			_renderResponse.getNamespace() + "selectInfoItem",
 			itemSelectorCriterion);
 
 		if (infoItemSelectorURL == null) {
@@ -278,6 +258,13 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 			return StringPool.BLANK;
 		}
 
+		DDMStructure ddmStructure =
+			DDMStructureLocalServiceUtil.fetchDDMStructure(classTypeId);
+
+		if (ddmStructure != null) {
+			return ddmStructure.getStructureKey();
+		}
+
 		return String.valueOf(classTypeId);
 	}
 
@@ -289,7 +276,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 		Layout draftLayout = themeDisplay.getLayout();
 
 		_layoutPageTemplateEntry =
-			layoutPageTemplateEntryLocalService.
+			LayoutPageTemplateEntryLocalServiceUtil.
 				fetchLayoutPageTemplateEntryByPlid(draftLayout.getClassPK());
 
 		return _layoutPageTemplateEntry;
@@ -300,7 +287,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 			_getLayoutPageTemplateEntry();
 
 		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
-			infoItemServiceRegistry.getFirstInfoItemService(
+			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormVariationsProvider.class,
 				layoutPageTemplateEntry.getClassName());
 
@@ -325,7 +312,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 			_getLayoutPageTemplateEntry();
 
 		InfoItemFormProvider<?> infoItemFormProvider =
-			infoItemServiceRegistry.getFirstInfoItemService(
+			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormProvider.class,
 				layoutPageTemplateEntry.getClassName());
 
@@ -334,7 +321,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 		}
 
 		InfoItemDetailsProvider<?> infoItemDetailsProvider =
-			infoItemServiceRegistry.getFirstInfoItemService(
+			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemDetailsProvider.class,
 				layoutPageTemplateEntry.getClassName());
 
@@ -360,9 +347,19 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 
 		return HashMapBuilder.<String, Object>put(
 			"mappingDescription",
-			language.get(
+			LanguageUtil.get(
 				httpServletRequest,
 				"content-source-selected-for-this-display-page-template")
+		).put(
+			"type",
+			HashMapBuilder.<String, Object>put(
+				"groupTypeTitle",
+				LanguageUtil.get(httpServletRequest, "content-type")
+			).put(
+				"id", layoutPageTemplateEntry.getClassNameId()
+			).put(
+				"label", _getMappingTypeLabel()
+			).build()
 		).put(
 			"subtype",
 			() -> {
@@ -374,28 +371,19 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 
 				return HashMapBuilder.<String, Object>put(
 					"groupSubtypeTitle",
-					language.get(httpServletRequest, "subtype")
+					LanguageUtil.get(httpServletRequest, "subtype")
 				).put(
 					"id", layoutPageTemplateEntry.getClassTypeId()
 				).put(
 					"label", subtypeLabel
 				).build();
 			}
-		).put(
-			"type",
-			HashMapBuilder.<String, Object>put(
-				"groupTypeTitle",
-				language.get(httpServletRequest, "content-type")
-			).put(
-				"id", layoutPageTemplateEntry.getClassNameId()
-			).put(
-				"label", _getMappingTypeLabel()
-			).build()
 		).build();
 	}
 
 	private final ItemSelector _itemSelector;
 	private LayoutPageTemplateEntry _layoutPageTemplateEntry;
 	private final boolean _pageIsDisplayPage;
+	private final RenderResponse _renderResponse;
 
 }

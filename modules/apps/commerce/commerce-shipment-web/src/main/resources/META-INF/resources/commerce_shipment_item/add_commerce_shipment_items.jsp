@@ -26,7 +26,6 @@ CommerceShipment commerceShipment = commerceShipmentDisplayContext.getCommerceSh
 
 <commerce-ui:modal-content
 	contentCssClasses="p-0"
-	redirect="<%= redirect %>"
 	showSubmitButton="<%= true %>"
 	title='<%= LanguageUtil.get(request, "add-shipment-items") %>'
 >
@@ -35,17 +34,20 @@ CommerceShipment commerceShipment = commerceShipmentDisplayContext.getCommerceSh
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="commerceShipmentId" type="hidden" value="<%= commerceShipment.getCommerceShipmentId() %>" />
 
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			bulkActionDropdownItems="<%= commerceShipmentDisplayContext.getShipmentItemBulkActions() %>"
 			contextParams='<%=
 				HashMapBuilder.<String, String>put(
 					"commerceShipmentId", String.valueOf(commerceShipment.getCommerceShipmentId())
 				).build()
 			%>'
-			dataProviderKey="<%= CommerceShipmentFDSNames.SHIPPABLE_ORDER_ITEMS %>"
-			formName="fm"
-			id="<%= CommerceShipmentFDSNames.SHIPPABLE_ORDER_ITEMS %>"
+			dataProviderKey="<%= CommerceShipmentDataSetConstants.COMMERCE_DATA_SET_KEY_SHIPPABLE_ORDER_ITEMS %>"
+			formId='<%= liferayPortletResponse.getNamespace() + "fm" %>'
+			id="<%= CommerceShipmentDataSetConstants.COMMERCE_DATA_SET_KEY_SHIPPABLE_ORDER_ITEMS %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= currentURLObj %>"
 			selectedItemsKey="orderItemId"
 			selectionType="multiple"
 			showManagementBar="<%= false %>"

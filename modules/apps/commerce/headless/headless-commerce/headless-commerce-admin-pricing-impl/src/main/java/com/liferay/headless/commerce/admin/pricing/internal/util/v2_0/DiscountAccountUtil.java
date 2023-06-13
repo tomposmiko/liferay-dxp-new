@@ -14,9 +14,9 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.util.v2_0;
 
-import com.liferay.account.exception.NoSuchEntryException;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryService;
+import com.liferay.commerce.account.exception.NoSuchAccountException;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountAccountRel;
 import com.liferay.commerce.discount.service.CommerceDiscountAccountRelService;
@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 public class DiscountAccountUtil {
 
 	public static CommerceDiscountAccountRel addCommerceDiscountAccountRel(
-			AccountEntryService accountEntryService,
+			CommerceAccountService commerceAccountService,
 			CommerceDiscountAccountRelService commerceDiscountAccountRelService,
 			DiscountAccount discountAccount, CommerceDiscount commerceDiscount,
 			ServiceContextHelper serviceContextHelper)
@@ -41,22 +41,22 @@ public class DiscountAccountUtil {
 		ServiceContext serviceContext =
 			serviceContextHelper.getServiceContext();
 
-		AccountEntry accountEntry;
+		CommerceAccount commerceAccount;
 
 		if (Validator.isNull(
 				discountAccount.getAccountExternalReferenceCode())) {
 
-			accountEntry = accountEntryService.getAccountEntry(
+			commerceAccount = commerceAccountService.getCommerceAccount(
 				discountAccount.getAccountId());
 		}
 		else {
-			accountEntry =
-				accountEntryService.fetchAccountEntryByExternalReferenceCode(
+			commerceAccount =
+				commerceAccountService.fetchByExternalReferenceCode(
 					serviceContext.getCompanyId(),
 					discountAccount.getAccountExternalReferenceCode());
 
-			if (accountEntry == null) {
-				throw new NoSuchEntryException(
+			if (commerceAccount == null) {
+				throw new NoSuchAccountException(
 					"Unable to find account with external reference code " +
 						discountAccount.getAccountExternalReferenceCode());
 			}
@@ -64,7 +64,7 @@ public class DiscountAccountUtil {
 
 		return commerceDiscountAccountRelService.addCommerceDiscountAccountRel(
 			commerceDiscount.getCommerceDiscountId(),
-			accountEntry.getAccountEntryId(), serviceContext);
+			commerceAccount.getCommerceAccountId(), serviceContext);
 	}
 
 }

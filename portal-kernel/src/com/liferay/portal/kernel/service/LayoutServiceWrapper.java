@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.model.Layout;
 public class LayoutServiceWrapper
 	implements LayoutService, ServiceWrapper<LayoutService> {
 
-	public LayoutServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutServiceWrapper(LayoutService layoutService) {
 		_layoutService = layoutService;
 	}
@@ -274,19 +270,6 @@ public class LayoutServiceWrapper
 			groupId, folderName, fileName, inputStream, mimeType);
 	}
 
-	@Override
-	public Layout copyLayout(
-			long groupId, boolean privateLayout,
-			java.util.Map<java.util.Locale, String> localeNamesMap,
-			boolean hidden, boolean system, boolean copyPermissions,
-			long sourcePlid, ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutService.copyLayout(
-			groupId, privateLayout, localeNamesMap, hidden, system,
-			copyPermissions, sourcePlid, serviceContext);
-	}
-
 	/**
 	 * Deletes the layout with the primary key, also deleting the layout's child
 	 * layouts, and associated resources.
@@ -511,16 +494,6 @@ public class LayoutServiceWrapper
 
 	@Override
 	public java.util.List<Layout> getLayouts(
-			long groupId, boolean privateLayout, long parentLayoutId, int start,
-			int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutService.getLayouts(
-			groupId, privateLayout, parentLayoutId, start, end);
-	}
-
-	@Override
-	public java.util.List<Layout> getLayouts(
 			long groupId, boolean privateLayout, String type)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -691,7 +664,7 @@ public class LayoutServiceWrapper
 	 DestinationNames#LAYOUTS_LOCAL_PUBLISHER}). See {@link
 	 DestinationNames}.
 	 * @param cronText the cron text. See {@link
-	 com.liferay.portal.kernel.scheduler.CronTextUtil#getCronText}
+	 com.liferay.portal.kernel.cal.RecurrenceSerializer #toCronText}
 	 * @param schedulerStartDate the scheduler start date
 	 * @param schedulerEndDate the scheduler end date
 	 * @param description the scheduler description
@@ -734,7 +707,7 @@ public class LayoutServiceWrapper
 	 DestinationNames#LAYOUTS_LOCAL_PUBLISHER}). See {@link
 	 DestinationNames}.
 	 * @param cronText the cron text. See {@link
-	 com.liferay.portal.kernel.scheduler.CronTextUtil#getCronText}
+	 com.liferay.portal.kernel.cal.RecurrenceSerializer #toCronText}
 	 * @param schedulerStartDate the scheduler start date
 	 * @param schedulerEndDate the scheduler end date
 	 * @param description the scheduler description
@@ -847,9 +820,8 @@ public class LayoutServiceWrapper
 	 String)}.
 	 * @param hasIconImage if the layout has a custom icon image
 	 * @param iconBytes the byte array of the layout's new icon image
-	 * @param styleBookEntryId the primary key of the style book entry
-	 * @param faviconFileEntryId the file entry ID of the layout's new favicon
 	 * @param masterLayoutPlid the primary key of the master layout
+	 * @param styleBookEntryId the primary key of the style book entry
 	 * @param serviceContext the service context to be applied. Can set the
 	 modification date and expando bridge attributes for the layout.
 	 * @return the updated layout
@@ -866,16 +838,15 @@ public class LayoutServiceWrapper
 			java.util.Map<java.util.Locale, String> robotsMap, String type,
 			boolean hidden,
 			java.util.Map<java.util.Locale, String> friendlyURLMap,
-			boolean hasIconImage, byte[] iconBytes, long styleBookEntryId,
-			long faviconFileEntryId, long masterLayoutPlid,
-			ServiceContext serviceContext)
+			boolean hasIconImage, byte[] iconBytes, long masterLayoutPlid,
+			long styleBookEntryId, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutService.updateLayout(
 			groupId, privateLayout, layoutId, parentLayoutId, localeNamesMap,
 			localeTitlesMap, descriptionMap, keywordsMap, robotsMap, type,
-			hidden, friendlyURLMap, hasIconImage, iconBytes, styleBookEntryId,
-			faviconFileEntryId, masterLayoutPlid, serviceContext);
+			hidden, friendlyURLMap, hasIconImage, iconBytes, masterLayoutPlid,
+			styleBookEntryId, serviceContext);
 	}
 
 	/**

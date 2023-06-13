@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.PasswordPolicy;
 import com.liferay.portal.kernel.model.PasswordPolicyModel;
+import com.liferay.portal.kernel.model.PasswordPolicySoap;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -36,15 +37,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -200,6 +204,85 @@ public class PasswordPolicyModelImpl
 	@Deprecated
 	public static final long PASSWORDPOLICYID_COLUMN_BITMASK = 16L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static PasswordPolicy toModel(PasswordPolicySoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		PasswordPolicy model = new PasswordPolicyImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setPasswordPolicyId(soapModel.getPasswordPolicyId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setDefaultPolicy(soapModel.isDefaultPolicy());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setChangeable(soapModel.isChangeable());
+		model.setChangeRequired(soapModel.isChangeRequired());
+		model.setMinAge(soapModel.getMinAge());
+		model.setCheckSyntax(soapModel.isCheckSyntax());
+		model.setAllowDictionaryWords(soapModel.isAllowDictionaryWords());
+		model.setMinAlphanumeric(soapModel.getMinAlphanumeric());
+		model.setMinLength(soapModel.getMinLength());
+		model.setMinLowerCase(soapModel.getMinLowerCase());
+		model.setMinNumbers(soapModel.getMinNumbers());
+		model.setMinSymbols(soapModel.getMinSymbols());
+		model.setMinUpperCase(soapModel.getMinUpperCase());
+		model.setRegex(soapModel.getRegex());
+		model.setHistory(soapModel.isHistory());
+		model.setHistoryCount(soapModel.getHistoryCount());
+		model.setExpireable(soapModel.isExpireable());
+		model.setMaxAge(soapModel.getMaxAge());
+		model.setWarningTime(soapModel.getWarningTime());
+		model.setGraceLimit(soapModel.getGraceLimit());
+		model.setLockout(soapModel.isLockout());
+		model.setMaxFailure(soapModel.getMaxFailure());
+		model.setLockoutDuration(soapModel.getLockoutDuration());
+		model.setRequireUnlock(soapModel.isRequireUnlock());
+		model.setResetFailureCount(soapModel.getResetFailureCount());
+		model.setResetTicketMaxAge(soapModel.getResetTicketMaxAge());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<PasswordPolicy> toModels(
+		PasswordPolicySoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<PasswordPolicy> models = new ArrayList<PasswordPolicy>(
+			soapModels.length);
+
+		for (PasswordPolicySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.portal.kernel.model.PasswordPolicy"));
@@ -280,244 +363,236 @@ public class PasswordPolicyModelImpl
 	public Map<String, Function<PasswordPolicy, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<PasswordPolicy, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, PasswordPolicy>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<PasswordPolicy, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PasswordPolicy.class.getClassLoader(), PasswordPolicy.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<PasswordPolicy, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<PasswordPolicy, Object>>();
+		try {
+			Constructor<PasswordPolicy> constructor =
+				(Constructor<PasswordPolicy>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", PasswordPolicy::getMvccVersion);
-			attributeGetterFunctions.put("uuid", PasswordPolicy::getUuid);
-			attributeGetterFunctions.put(
-				"passwordPolicyId", PasswordPolicy::getPasswordPolicyId);
-			attributeGetterFunctions.put(
-				"companyId", PasswordPolicy::getCompanyId);
-			attributeGetterFunctions.put("userId", PasswordPolicy::getUserId);
-			attributeGetterFunctions.put(
-				"userName", PasswordPolicy::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", PasswordPolicy::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", PasswordPolicy::getModifiedDate);
-			attributeGetterFunctions.put(
-				"defaultPolicy", PasswordPolicy::getDefaultPolicy);
-			attributeGetterFunctions.put("name", PasswordPolicy::getName);
-			attributeGetterFunctions.put(
-				"description", PasswordPolicy::getDescription);
-			attributeGetterFunctions.put(
-				"changeable", PasswordPolicy::getChangeable);
-			attributeGetterFunctions.put(
-				"changeRequired", PasswordPolicy::getChangeRequired);
-			attributeGetterFunctions.put("minAge", PasswordPolicy::getMinAge);
-			attributeGetterFunctions.put(
-				"checkSyntax", PasswordPolicy::getCheckSyntax);
-			attributeGetterFunctions.put(
-				"allowDictionaryWords",
-				PasswordPolicy::getAllowDictionaryWords);
-			attributeGetterFunctions.put(
-				"minAlphanumeric", PasswordPolicy::getMinAlphanumeric);
-			attributeGetterFunctions.put(
-				"minLength", PasswordPolicy::getMinLength);
-			attributeGetterFunctions.put(
-				"minLowerCase", PasswordPolicy::getMinLowerCase);
-			attributeGetterFunctions.put(
-				"minNumbers", PasswordPolicy::getMinNumbers);
-			attributeGetterFunctions.put(
-				"minSymbols", PasswordPolicy::getMinSymbols);
-			attributeGetterFunctions.put(
-				"minUpperCase", PasswordPolicy::getMinUpperCase);
-			attributeGetterFunctions.put("regex", PasswordPolicy::getRegex);
-			attributeGetterFunctions.put("history", PasswordPolicy::getHistory);
-			attributeGetterFunctions.put(
-				"historyCount", PasswordPolicy::getHistoryCount);
-			attributeGetterFunctions.put(
-				"expireable", PasswordPolicy::getExpireable);
-			attributeGetterFunctions.put("maxAge", PasswordPolicy::getMaxAge);
-			attributeGetterFunctions.put(
-				"warningTime", PasswordPolicy::getWarningTime);
-			attributeGetterFunctions.put(
-				"graceLimit", PasswordPolicy::getGraceLimit);
-			attributeGetterFunctions.put("lockout", PasswordPolicy::getLockout);
-			attributeGetterFunctions.put(
-				"maxFailure", PasswordPolicy::getMaxFailure);
-			attributeGetterFunctions.put(
-				"lockoutDuration", PasswordPolicy::getLockoutDuration);
-			attributeGetterFunctions.put(
-				"requireUnlock", PasswordPolicy::getRequireUnlock);
-			attributeGetterFunctions.put(
-				"resetFailureCount", PasswordPolicy::getResetFailureCount);
-			attributeGetterFunctions.put(
-				"resetTicketMaxAge", PasswordPolicy::getResetTicketMaxAge);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<PasswordPolicy, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<PasswordPolicy, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<PasswordPolicy, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<PasswordPolicy, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<PasswordPolicy, Object>>();
+		Map<String, BiConsumer<PasswordPolicy, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<PasswordPolicy, ?>>();
 
-		static {
-			Map<String, BiConsumer<PasswordPolicy, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<PasswordPolicy, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", PasswordPolicy::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMvccVersion);
+		attributeGetterFunctions.put("uuid", PasswordPolicy::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setUuid);
+		attributeGetterFunctions.put(
+			"passwordPolicyId", PasswordPolicy::getPasswordPolicyId);
+		attributeSetterBiConsumers.put(
+			"passwordPolicyId",
+			(BiConsumer<PasswordPolicy, Long>)
+				PasswordPolicy::setPasswordPolicyId);
+		attributeGetterFunctions.put("companyId", PasswordPolicy::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setCompanyId);
+		attributeGetterFunctions.put("userId", PasswordPolicy::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setUserId);
+		attributeGetterFunctions.put("userName", PasswordPolicy::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", PasswordPolicy::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<PasswordPolicy, Date>)PasswordPolicy::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", PasswordPolicy::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<PasswordPolicy, Date>)PasswordPolicy::setModifiedDate);
+		attributeGetterFunctions.put(
+			"defaultPolicy", PasswordPolicy::getDefaultPolicy);
+		attributeSetterBiConsumers.put(
+			"defaultPolicy",
+			(BiConsumer<PasswordPolicy, Boolean>)
+				PasswordPolicy::setDefaultPolicy);
+		attributeGetterFunctions.put("name", PasswordPolicy::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setName);
+		attributeGetterFunctions.put(
+			"description", PasswordPolicy::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setDescription);
+		attributeGetterFunctions.put(
+			"changeable", PasswordPolicy::getChangeable);
+		attributeSetterBiConsumers.put(
+			"changeable",
+			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setChangeable);
+		attributeGetterFunctions.put(
+			"changeRequired", PasswordPolicy::getChangeRequired);
+		attributeSetterBiConsumers.put(
+			"changeRequired",
+			(BiConsumer<PasswordPolicy, Boolean>)
+				PasswordPolicy::setChangeRequired);
+		attributeGetterFunctions.put("minAge", PasswordPolicy::getMinAge);
+		attributeSetterBiConsumers.put(
+			"minAge",
+			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMinAge);
+		attributeGetterFunctions.put(
+			"checkSyntax", PasswordPolicy::getCheckSyntax);
+		attributeSetterBiConsumers.put(
+			"checkSyntax",
+			(BiConsumer<PasswordPolicy, Boolean>)
+				PasswordPolicy::setCheckSyntax);
+		attributeGetterFunctions.put(
+			"allowDictionaryWords", PasswordPolicy::getAllowDictionaryWords);
+		attributeSetterBiConsumers.put(
+			"allowDictionaryWords",
+			(BiConsumer<PasswordPolicy, Boolean>)
+				PasswordPolicy::setAllowDictionaryWords);
+		attributeGetterFunctions.put(
+			"minAlphanumeric", PasswordPolicy::getMinAlphanumeric);
+		attributeSetterBiConsumers.put(
+			"minAlphanumeric",
+			(BiConsumer<PasswordPolicy, Integer>)
+				PasswordPolicy::setMinAlphanumeric);
+		attributeGetterFunctions.put("minLength", PasswordPolicy::getMinLength);
+		attributeSetterBiConsumers.put(
+			"minLength",
+			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMinLength);
+		attributeGetterFunctions.put(
+			"minLowerCase", PasswordPolicy::getMinLowerCase);
+		attributeSetterBiConsumers.put(
+			"minLowerCase",
+			(BiConsumer<PasswordPolicy, Integer>)
+				PasswordPolicy::setMinLowerCase);
+		attributeGetterFunctions.put(
+			"minNumbers", PasswordPolicy::getMinNumbers);
+		attributeSetterBiConsumers.put(
+			"minNumbers",
+			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMinNumbers);
+		attributeGetterFunctions.put(
+			"minSymbols", PasswordPolicy::getMinSymbols);
+		attributeSetterBiConsumers.put(
+			"minSymbols",
+			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMinSymbols);
+		attributeGetterFunctions.put(
+			"minUpperCase", PasswordPolicy::getMinUpperCase);
+		attributeSetterBiConsumers.put(
+			"minUpperCase",
+			(BiConsumer<PasswordPolicy, Integer>)
+				PasswordPolicy::setMinUpperCase);
+		attributeGetterFunctions.put("regex", PasswordPolicy::getRegex);
+		attributeSetterBiConsumers.put(
+			"regex",
+			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setRegex);
+		attributeGetterFunctions.put("history", PasswordPolicy::getHistory);
+		attributeSetterBiConsumers.put(
+			"history",
+			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setHistory);
+		attributeGetterFunctions.put(
+			"historyCount", PasswordPolicy::getHistoryCount);
+		attributeSetterBiConsumers.put(
+			"historyCount",
+			(BiConsumer<PasswordPolicy, Integer>)
+				PasswordPolicy::setHistoryCount);
+		attributeGetterFunctions.put(
+			"expireable", PasswordPolicy::getExpireable);
+		attributeSetterBiConsumers.put(
+			"expireable",
+			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setExpireable);
+		attributeGetterFunctions.put("maxAge", PasswordPolicy::getMaxAge);
+		attributeSetterBiConsumers.put(
+			"maxAge",
+			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMaxAge);
+		attributeGetterFunctions.put(
+			"warningTime", PasswordPolicy::getWarningTime);
+		attributeSetterBiConsumers.put(
+			"warningTime",
+			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setWarningTime);
+		attributeGetterFunctions.put(
+			"graceLimit", PasswordPolicy::getGraceLimit);
+		attributeSetterBiConsumers.put(
+			"graceLimit",
+			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setGraceLimit);
+		attributeGetterFunctions.put("lockout", PasswordPolicy::getLockout);
+		attributeSetterBiConsumers.put(
+			"lockout",
+			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setLockout);
+		attributeGetterFunctions.put(
+			"maxFailure", PasswordPolicy::getMaxFailure);
+		attributeSetterBiConsumers.put(
+			"maxFailure",
+			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMaxFailure);
+		attributeGetterFunctions.put(
+			"lockoutDuration", PasswordPolicy::getLockoutDuration);
+		attributeSetterBiConsumers.put(
+			"lockoutDuration",
+			(BiConsumer<PasswordPolicy, Long>)
+				PasswordPolicy::setLockoutDuration);
+		attributeGetterFunctions.put(
+			"requireUnlock", PasswordPolicy::getRequireUnlock);
+		attributeSetterBiConsumers.put(
+			"requireUnlock",
+			(BiConsumer<PasswordPolicy, Boolean>)
+				PasswordPolicy::setRequireUnlock);
+		attributeGetterFunctions.put(
+			"resetFailureCount", PasswordPolicy::getResetFailureCount);
+		attributeSetterBiConsumers.put(
+			"resetFailureCount",
+			(BiConsumer<PasswordPolicy, Long>)
+				PasswordPolicy::setResetFailureCount);
+		attributeGetterFunctions.put(
+			"resetTicketMaxAge", PasswordPolicy::getResetTicketMaxAge);
+		attributeSetterBiConsumers.put(
+			"resetTicketMaxAge",
+			(BiConsumer<PasswordPolicy, Long>)
+				PasswordPolicy::setResetTicketMaxAge);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<PasswordPolicy, Long>)
-					PasswordPolicy::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setUuid);
-			attributeSetterBiConsumers.put(
-				"passwordPolicyId",
-				(BiConsumer<PasswordPolicy, Long>)
-					PasswordPolicy::setPasswordPolicyId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<PasswordPolicy, String>)
-					PasswordPolicy::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<PasswordPolicy, Date>)
-					PasswordPolicy::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<PasswordPolicy, Date>)
-					PasswordPolicy::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"defaultPolicy",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setDefaultPolicy);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<PasswordPolicy, String>)
-					PasswordPolicy::setDescription);
-			attributeSetterBiConsumers.put(
-				"changeable",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setChangeable);
-			attributeSetterBiConsumers.put(
-				"changeRequired",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setChangeRequired);
-			attributeSetterBiConsumers.put(
-				"minAge",
-				(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMinAge);
-			attributeSetterBiConsumers.put(
-				"checkSyntax",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setCheckSyntax);
-			attributeSetterBiConsumers.put(
-				"allowDictionaryWords",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setAllowDictionaryWords);
-			attributeSetterBiConsumers.put(
-				"minAlphanumeric",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setMinAlphanumeric);
-			attributeSetterBiConsumers.put(
-				"minLength",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setMinLength);
-			attributeSetterBiConsumers.put(
-				"minLowerCase",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setMinLowerCase);
-			attributeSetterBiConsumers.put(
-				"minNumbers",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setMinNumbers);
-			attributeSetterBiConsumers.put(
-				"minSymbols",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setMinSymbols);
-			attributeSetterBiConsumers.put(
-				"minUpperCase",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setMinUpperCase);
-			attributeSetterBiConsumers.put(
-				"regex",
-				(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setRegex);
-			attributeSetterBiConsumers.put(
-				"history",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setHistory);
-			attributeSetterBiConsumers.put(
-				"historyCount",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setHistoryCount);
-			attributeSetterBiConsumers.put(
-				"expireable",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setExpireable);
-			attributeSetterBiConsumers.put(
-				"maxAge",
-				(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMaxAge);
-			attributeSetterBiConsumers.put(
-				"warningTime",
-				(BiConsumer<PasswordPolicy, Long>)
-					PasswordPolicy::setWarningTime);
-			attributeSetterBiConsumers.put(
-				"graceLimit",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setGraceLimit);
-			attributeSetterBiConsumers.put(
-				"lockout",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setLockout);
-			attributeSetterBiConsumers.put(
-				"maxFailure",
-				(BiConsumer<PasswordPolicy, Integer>)
-					PasswordPolicy::setMaxFailure);
-			attributeSetterBiConsumers.put(
-				"lockoutDuration",
-				(BiConsumer<PasswordPolicy, Long>)
-					PasswordPolicy::setLockoutDuration);
-			attributeSetterBiConsumers.put(
-				"requireUnlock",
-				(BiConsumer<PasswordPolicy, Boolean>)
-					PasswordPolicy::setRequireUnlock);
-			attributeSetterBiConsumers.put(
-				"resetFailureCount",
-				(BiConsumer<PasswordPolicy, Long>)
-					PasswordPolicy::setResetFailureCount);
-			attributeSetterBiConsumers.put(
-				"resetTicketMaxAge",
-				(BiConsumer<PasswordPolicy, Long>)
-					PasswordPolicy::setResetTicketMaxAge);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1605,12 +1680,41 @@ public class PasswordPolicyModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<PasswordPolicy, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<PasswordPolicy, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<PasswordPolicy, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((PasswordPolicy)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, PasswordPolicy>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					PasswordPolicy.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1655,8 +1759,7 @@ public class PasswordPolicyModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<PasswordPolicy, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -414,10 +414,6 @@
 			}
 		],
 		"properties": {
-			"active": {
-				"store": true,
-				"type": "boolean"
-			},
 			"assetTitle": {
 				"store": true,
 				"term_vector": "with_positions_offsets",
@@ -571,17 +567,6 @@
 					},
 					"match": "*_sortable",
 					"match_mapping_type": "long"
-				}
-			},
-			{
-				"template_string_sortable": {
-					"mapping": {
-						"normalizer": "keyword_lowercase",
-						"store": true,
-						"type": "keyword"
-					},
-					"match": "*_sortable",
-					"match_mapping_type": "string"
 				}
 			}
 		],
@@ -1137,14 +1122,6 @@
 			}
 		],
 		"properties": {
-			"active": {
-				"store": true,
-				"type": "boolean"
-			},
-			"blocked": {
-				"store": true,
-				"type": "boolean"
-			},
 			"companyId": {
 				"store": true,
 				"type": "long"
@@ -1221,10 +1198,6 @@
 			}
 		],
 		"properties": {
-			"active": {
-				"store": true,
-				"type": "boolean"
-			},
 			"assigneeIds": {
 				"store": true,
 				"type": "long"
@@ -1721,10 +1694,6 @@
 			}
 		],
 		"properties": {
-			"active": {
-				"store": true,
-				"type": "boolean"
-			},
 			"assetTitle": {
 				"store": true,
 				"term_vector": "with_positions_offsets",

@@ -14,7 +14,7 @@ import ClayForm, {ClayInput, ClayRadio, ClayRadioGroup} from '@clayui/form';
 import ClayModal from '@clayui/modal';
 import ClayMultiSelect from '@clayui/multi-select';
 import classNames from 'classnames';
-import {openToast, sub} from 'frontend-js-web';
+import {openToast} from 'frontend-js-web';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 
 import ChartContext from '../ChartContext';
@@ -22,7 +22,7 @@ import {createAccount, getAccounts, updateAccount} from '../data/accounts';
 
 function showNotFoundError(name) {
 	openToast({
-		message: sub(Liferay.Language.get('x-not-found'), name),
+		message: Liferay.Util.sub(Liferay.Language.get('x-not-found'), name),
 		type: 'danger',
 	});
 }
@@ -39,7 +39,7 @@ export default function AddOrganizationModal({
 	const [fetchedAccounts, setFetchedAccounts] = useState([]);
 	const [selectedAccounts, setSelectedAccounts] = useState([]);
 	const [errors, setErrors] = useState([]);
-	const [newAccountMode, setNewAccountMode] = useState(false);
+	const [newAccountMode, updateNewAccountMode] = useState(false);
 
 	useEffect(() => {
 		if (accountsQuery) {
@@ -73,7 +73,7 @@ export default function AddOrganizationModal({
 			createAccount(newAccountName, [parentData.id])
 				.then((accountData) => {
 					openToast({
-						message: sub(
+						message: Liferay.Util.sub(
 							Liferay.Language.get('1-account-was-added-to-x'),
 							parentData.name
 						),
@@ -133,13 +133,13 @@ export default function AddOrganizationModal({
 
 					const message =
 						nodeChildren.length === 1
-							? sub(
+							? Liferay.Util.sub(
 									Liferay.Language.get(
 										'1-account-was-added-to-x'
 									),
 									parentData.name
 							  )
-							: sub(
+							: Liferay.Util.sub(
 									Liferay.Language.get(
 										'x-accounts-were-added-to-x'
 									),
@@ -191,7 +191,6 @@ export default function AddOrganizationModal({
 			{errors.map((error, i) => (
 				<ClayForm.FeedbackItem key={i}>
 					<ClayForm.FeedbackIndicator symbol="info-circle" />
-
 					{error}
 				</ClayForm.FeedbackItem>
 			))}
@@ -207,8 +206,8 @@ export default function AddOrganizationModal({
 			<ClayModal.Body>
 				<ClayRadioGroup
 					className="mb-4"
-					onChange={setNewAccountMode}
-					value={newAccountMode}
+					onSelectedValueChange={updateNewAccountMode}
+					selectedValue={newAccountMode}
 				>
 					<ClayRadio
 						label={Liferay.Language.get('select-accounts')}
@@ -249,12 +248,12 @@ export default function AddOrganizationModal({
 
 						<ClayMultiSelect
 							id="searchAccountInput"
+							inputValue={accountsQuery}
 							items={selectedAccounts}
 							locator={{label: 'name', value: 'id'}}
 							onChange={setAccountsQuery}
 							onItemsChange={handleItemsChange}
 							sourceItems={accountOptions}
-							value={accountsQuery}
 						/>
 
 						{errorsContainer}

@@ -46,7 +46,7 @@ public class EditRankingDisplayBuilder {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -88,7 +88,7 @@ public class EditRankingDisplayBuilder {
 		).put(
 			"namespace", _renderResponse.getNamespace()
 		).put(
-			"spritemap", _themeDisplay.getPathThemeSpritemap()
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).build();
 	}
 
@@ -188,9 +188,10 @@ public class EditRankingDisplayBuilder {
 	private void _setBackURL(
 		EditRankingDisplayContext editRankingDisplayContext) {
 
-		editRankingDisplayContext.setBackURL(
-			ParamUtil.getString(
-				_httpServletRequest, "backURL", _getRedirect()));
+		String backURL = ParamUtil.getString(
+			_httpServletRequest, "backURL", _getRedirect());
+
+		editRankingDisplayContext.setBackURL(backURL);
 	}
 
 	private void _setCompanyId(

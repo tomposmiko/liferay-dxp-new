@@ -1,8 +1,5 @@
-@default = "selectFrameTop"
-definition {
-
-	function selectFrameTop {
-		selenium.selectFrame("relative=top");
-	}
-
-}
+<definition default="selectFrameTop">
+	<command name="selectFrameTop">
+		<execute argument1="relative=top" selenium="selectFrame" />
+	</command>
+</definition>

@@ -117,7 +117,7 @@ function Table({items, totalCount}) {
 
 			<ClayTable.Body>
 				{items &&
-					!!items.length &&
+					items.length > 0 &&
 					items.map((item, index) => (
 						<Table.Item
 							{...item}

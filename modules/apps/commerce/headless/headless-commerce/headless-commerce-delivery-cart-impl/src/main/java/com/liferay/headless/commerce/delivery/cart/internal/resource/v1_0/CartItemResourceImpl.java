@@ -23,13 +23,12 @@ import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.Cart;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.CartItem;
-import com.liferay.headless.commerce.delivery.cart.internal.dto.v1_0.CartItemDTOConverterContext;
-import com.liferay.headless.commerce.delivery.cart.internal.dto.v1_0.constants.DTOConverterConstants;
+import com.liferay.headless.commerce.delivery.cart.internal.dto.v1_0.CartItemDTOConverter;
 import com.liferay.headless.commerce.delivery.cart.resource.v1_0.CartItemResource;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
@@ -37,11 +36,9 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.ws.rs.core.Response;
 
@@ -51,9 +48,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 
 /**
  * @author Andrea Sbarra
- * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/cart-item.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {CartItemResource.class, NestedFieldSupport.class}
@@ -83,45 +80,20 @@ public class CartItemResourceImpl
 
 	@Override
 	public CartItem getCartItem(Long cartItemId) throws Exception {
-		CommerceOrderItem commerceOrderItem =
-			_commerceOrderItemService.getCommerceOrderItem(cartItemId);
-
-		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
-
 		return _toCartItem(
-			commerceOrder.getCommerceAccountId(), commerceOrderItem);
+			_commerceOrderItemService.getCommerceOrderItem(cartItemId));
 	}
 
 	@NestedField(parentClass = Cart.class, value = "cartItems")
 	@Override
 	public Page<CartItem> getCartItemsPage(
-			@NestedFieldId("id") Long cartId, Long skuId, Pagination pagination)
+			@NestedFieldId("id") Long cartId, Pagination pagination)
 		throws Exception {
 
-		if (cartId == 0) {
-			return Page.of(Collections.emptyList());
-		}
-
 		return Page.of(
-			_filterCartItems(
-				transform(
-					_commerceOrderItemService.getCommerceOrderItems(
-						cartId, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-					commerceOrderItem -> {
-						if ((skuId != null) &&
-							!Objects.equals(
-								commerceOrderItem.getCPInstanceId(), skuId)) {
-
-							return null;
-						}
-
-						CommerceOrder commerceOrder =
-							commerceOrderItem.getCommerceOrder();
-
-						return _toCartItem(
-							commerceOrder.getCommerceAccountId(),
-							commerceOrderItem);
-					})));
+			_toCartItems(
+				_commerceOrderItemService.getCommerceOrderItems(
+					cartId, QueryUtil.ALL_POS, QueryUtil.ALL_POS)));
 	}
 
 	@Override
@@ -138,19 +110,19 @@ public class CartItemResourceImpl
 		CommerceOrder commerceOrder = _commerceOrderService.getCommerceOrder(
 			cartId);
 
+		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
+			commerceOrder.getGroupId());
+
+		CommerceContext commerceContext = _commerceContextFactory.create(
+			contextCompany.getCompanyId(), commerceOrder.getGroupId(),
+			contextUser.getUserId(), cartId,
+			commerceOrder.getCommerceAccountId());
+
 		return _toCartItem(
-			commerceOrder.getCommerceAccountId(),
 			_commerceOrderItemService.addOrUpdateCommerceOrderItem(
 				commerceOrder.getCommerceOrderId(), cartItem.getSkuId(),
-				cartItem.getOptions(),
-				GetterUtil.get(cartItem.getQuantity(), 1),
-				GetterUtil.getLong(cartItem.getReplacedSkuId()), 0,
-				_commerceContextFactory.create(
-					contextCompany.getCompanyId(), commerceOrder.getGroupId(),
-					contextUser.getUserId(), cartId,
-					commerceOrder.getCommerceAccountId()),
-				_serviceContextHelper.getServiceContext(
-					commerceOrder.getGroupId())));
+				cartItem.getOptions(), cartItem.getQuantity(), 0,
+				commerceContext, serviceContext));
 	}
 
 	@Override
@@ -160,62 +132,70 @@ public class CartItemResourceImpl
 		CommerceOrderItem commerceOrderItem =
 			_commerceOrderItemService.getCommerceOrderItem(cartItemId);
 
+		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
+			commerceOrderItem.getGroupId());
+
 		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
 
+		CommerceContext commerceContext = _commerceContextFactory.create(
+			contextCompany.getCompanyId(), commerceOrder.getGroupId(),
+			contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
+			commerceOrder.getCommerceAccountId());
+
 		return _toCartItem(
-			commerceOrder.getCommerceAccountId(),
 			_commerceOrderItemService.updateCommerceOrderItem(
 				commerceOrderItem.getCommerceOrderItemId(),
-				cartItem.getQuantity(),
-				_commerceContextFactory.create(
-					contextCompany.getCompanyId(), commerceOrder.getGroupId(),
-					contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
-					commerceOrder.getCommerceAccountId()),
-				_serviceContextHelper.getServiceContext(
-					commerceOrder.getGroupId())));
+				cartItem.getQuantity(), commerceContext, serviceContext));
 	}
 
-	private List<CartItem> _filterCartItems(List<CartItem> cartItems) {
-		Map<Long, CartItem> cartItemsMap = new HashMap<>();
+	private List<CartItem> _handleProductBundle(List<CartItem> cartItems) {
+		Map<Long, CartItem> cartItemMap = new HashMap<>();
 
 		for (CartItem cartItem : cartItems) {
-			cartItemsMap.put(cartItem.getId(), cartItem);
+			cartItemMap.put(cartItem.getId(), cartItem);
 		}
 
 		for (CartItem cartItem : cartItems) {
-			Long parentCartItemId = cartItem.getParentCartItemId();
+			Long parentId = cartItem.getParentCartItemId();
 
-			if (parentCartItemId == null) {
-				continue;
+			if (parentId != null) {
+				CartItem parent = cartItemMap.get(parentId);
+
+				if (parent != null) {
+					if (parent.getCartItems() == null) {
+						parent.setCartItems(new CartItem[0]);
+					}
+
+					parent.setCartItems(
+						ArrayUtil.append(parent.getCartItems(), cartItem));
+					cartItemMap.remove(cartItem.getId());
+				}
 			}
-
-			CartItem parentCartItem = cartItemsMap.get(parentCartItemId);
-
-			if (parentCartItem == null) {
-				continue;
-			}
-
-			if (parentCartItem.getCartItems() == null) {
-				parentCartItem.setCartItems(new CartItem[0]);
-			}
-
-			parentCartItem.setCartItems(
-				ArrayUtil.append(parentCartItem.getCartItems(), cartItem));
-
-			cartItemsMap.remove(cartItem.getId());
 		}
 
-		return new ArrayList(cartItemsMap.values());
+		return new ArrayList(cartItemMap.values());
 	}
 
-	private CartItem _toCartItem(
-			long commerceAccountId, CommerceOrderItem commerceOrderItem)
+	private CartItem _toCartItem(CommerceOrderItem commerceOrderItem)
 		throws Exception {
 
 		return _orderItemDTOConverter.toDTO(
-			new CartItemDTOConverterContext(
-				commerceAccountId, commerceOrderItem.getCommerceOrderItemId(),
+			new DefaultDTOConverterContext(
+				commerceOrderItem.getCommerceOrderItemId(),
 				contextAcceptLanguage.getPreferredLocale()));
+	}
+
+	private List<CartItem> _toCartItems(
+			List<CommerceOrderItem> commerceOrderItems)
+		throws Exception {
+
+		List<CartItem> cartItems = new ArrayList<>();
+
+		for (CommerceOrderItem commerceOrderItem : commerceOrderItems) {
+			cartItems.add(_toCartItem(commerceOrderItem));
+		}
+
+		return _handleProductBundle(cartItems);
 	}
 
 	@Reference
@@ -227,8 +207,8 @@ public class CartItemResourceImpl
 	@Reference
 	private CommerceOrderService _commerceOrderService;
 
-	@Reference(target = DTOConverterConstants.CART_ITEM_DTO_CONVERTER)
-	private DTOConverter<CommerceOrderItem, CartItem> _orderItemDTOConverter;
+	@Reference
+	private CartItemDTOConverter _orderItemDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

@@ -29,5 +29,5 @@ if (exportImportConfiguration != null) {
 	settingsMap = exportImportConfiguration.getSettingsMap();
 }
 
-UnicodeProperties liveGroupTypeSettingsUnicodeProperties = liveGroup.getTypeSettingsProperties();
+UnicodeProperties liveGroupTypeSettings = liveGroup.getTypeSettingsProperties();
 %>

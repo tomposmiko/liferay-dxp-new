@@ -14,9 +14,7 @@
 
 package com.liferay.portal.workflow.metrics.internal.petra.executor;
 
-import com.liferay.petra.concurrent.DefaultNoticeableFuture;
 import com.liferay.petra.concurrent.NoticeableExecutorService;
-import com.liferay.petra.concurrent.NoticeableFuture;
 import com.liferay.petra.concurrent.ThreadPoolHandlerAdapter;
 import com.liferay.petra.executor.PortalExecutorConfig;
 import com.liferay.petra.executor.PortalExecutorManager;
@@ -41,10 +39,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shuyang Zhou
  */
-@Component(service = WorkflowMetricsPortalExecutor.class)
+@Component(immediate = true, service = WorkflowMetricsPortalExecutor.class)
 public class WorkflowMetricsPortalExecutor {
 
-	public <T extends Throwable> NoticeableFuture<?> execute(
+	public <T extends Throwable> void execute(
 		UnsafeRunnable<T> unsafeRunnable) {
 
 		if (PortalRunMode.isTestMode()) {
@@ -54,24 +52,18 @@ public class WorkflowMetricsPortalExecutor {
 			catch (Throwable throwable) {
 				_log.error(throwable, throwable);
 			}
-
-			DefaultNoticeableFuture<Object> defaultNoticeableFuture =
-				new DefaultNoticeableFuture<>();
-
-			defaultNoticeableFuture.set(null);
-
-			return defaultNoticeableFuture;
 		}
-
-		return _noticeableExecutorService.submit(
-			() -> {
-				try {
-					unsafeRunnable.run();
-				}
-				catch (Throwable throwable) {
-					_log.error(throwable, throwable);
-				}
-			});
+		else {
+			_noticeableExecutorService.submit(
+				() -> {
+					try {
+						unsafeRunnable.run();
+					}
+					catch (Throwable throwable) {
+						_log.error(throwable, throwable);
+					}
+				});
+		}
 	}
 
 	@Activate

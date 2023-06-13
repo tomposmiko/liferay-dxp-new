@@ -15,12 +15,13 @@
 package com.liferay.captcha.internal.upgrade.v1_1_0;
 
 import com.liferay.captcha.internal.constants.LegacyCaptchaPropsKeys;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
 
+import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.stream.Stream;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -90,9 +91,13 @@ public class CaptchaConfigurationPreferencesUpgradeProcess
 	private String[] _replaceArrayValue(
 		String[] array, String target, String replacement) {
 
-		return TransformUtil.transform(
-			array, s -> target.equals(s.trim()) ? replacement : s,
-			String.class);
+		Stream<String> stream = Arrays.stream(array);
+
+		return stream.map(
+			s -> target.equals(s.trim()) ? replacement : s
+		).toArray(
+			size -> new String[size]
+		);
 	}
 
 	private final ConfigurationAdmin _configurationAdmin;

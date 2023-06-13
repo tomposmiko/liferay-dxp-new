@@ -68,16 +68,17 @@ public class AudioDLPreviewRendererProvider
 		}
 
 		return (request, response) -> {
-			_checkForPreviewGenerationExceptions(fileVersion);
+			checkForPreviewGenerationExceptions(fileVersion);
 
 			RequestDispatcher requestDispatcher =
 				_servletContext.getRequestDispatcher("/preview/view.jsp");
 
 			request.setAttribute(
+				WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, fileVersion);
+
+			request.setAttribute(
 				DLPreviewAudioWebKeys.PREVIEW_FILE_URLS,
 				_getPreviewFileURLs(fileVersion, request));
-			request.setAttribute(
-				WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, fileVersion);
 
 			requestDispatcher.include(request, response);
 		};
@@ -90,7 +91,7 @@ public class AudioDLPreviewRendererProvider
 		return null;
 	}
 
-	private void _checkForPreviewGenerationExceptions(FileVersion fileVersion)
+	protected void checkForPreviewGenerationExceptions(FileVersion fileVersion)
 		throws PortalException {
 
 		if (_dlFileVersionPreviewLocalService.hasDLFileVersionPreview(

@@ -14,13 +14,13 @@
 
 package com.liferay.journal.web.internal.portlet.action;
 
+import com.liferay.asset.kernel.action.AssetEntryAction;
 import com.liferay.asset.kernel.model.AssetRenderer;
-import com.liferay.asset.publisher.action.AssetEntryAction;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -51,7 +51,7 @@ public class JournalPermissionAssetEntryAction
 
 	@Override
 	public String getDialogTitle(Locale locale) {
-		return _language.get(locale, "permissions");
+		return LanguageUtil.get(locale, "permissions");
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class JournalPermissionAssetEntryAction
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -87,7 +87,7 @@ public class JournalPermissionAssetEntryAction
 
 	@Override
 	public String getMessage(Locale locale) {
-		return _language.get(locale, "permissions");
+		return LanguageUtil.get(locale, "permissions");
 	}
 
 	@Override
@@ -110,8 +110,5 @@ public class JournalPermissionAssetEntryAction
 	)
 	private ModelResourcePermission<JournalArticle>
 		_journalArticleModelResourcePermission;
-
-	@Reference
-	private Language _language;
 
 }

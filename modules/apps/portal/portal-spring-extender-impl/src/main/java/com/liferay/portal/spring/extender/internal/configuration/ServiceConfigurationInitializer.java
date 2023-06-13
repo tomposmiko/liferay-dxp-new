@@ -18,17 +18,19 @@ import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ServiceComponentLocalService;
 import com.liferay.portal.kernel.service.configuration.ServiceComponentConfiguration;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.internal.loader.ModuleResourceLoader;
+import com.liferay.portal.util.PropsValues;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.net.URL;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.osgi.framework.Bundle;
@@ -42,35 +44,49 @@ public class ServiceConfigurationInitializer {
 
 	public ServiceConfigurationInitializer(
 		Bundle bundle, ClassLoader classLoader,
-		Configuration serviceConfiguration,
+		Configuration portletConfiguration, Configuration serviceConfiguration,
+		ResourceActions resourceActions,
 		ServiceComponentLocalService serviceComponentLocalService) {
 
 		_bundle = bundle;
 		_classLoader = classLoader;
+		_portletConfiguration = portletConfiguration;
 		_serviceConfiguration = serviceConfiguration;
+		_resourceActions = resourceActions;
 		_serviceComponentLocalService = serviceComponentLocalService;
+
+		_serviceComponentConfiguration = new ModuleResourceLoader(bundle);
 	}
 
 	public void stop() {
-		if (_configurationServiceRegistration != null) {
-			_configurationServiceRegistration.unregister();
+		_serviceComponentLocalService.destroyServiceComponent(
+			_serviceComponentConfiguration, _classLoader);
 
-			_configurationServiceRegistration = null;
+		for (ServiceRegistration<?> serviceRegistration :
+				_serviceRegistrations) {
+
+			serviceRegistration.unregister();
 		}
+
+		_serviceRegistrations.clear();
 	}
 
 	protected void start() {
-		_initServiceComponent();
-
 		BundleContext bundleContext = _bundle.getBundleContext();
 
-		_configurationServiceRegistration = bundleContext.registerService(
-			Configuration.class, _serviceConfiguration,
-			HashMapDictionaryBuilder.<String, Object>put(
-				"name", "service"
-			).put(
-				"origin.bundle.symbolic.name", _bundle.getSymbolicName()
-			).build());
+		if (_portletConfiguration != null) {
+			_readResourceActions();
+
+			_registerConfiguration(
+				bundleContext, _portletConfiguration, "portlet");
+		}
+
+		if (_serviceConfiguration != null) {
+			_initServiceComponent();
+
+			_registerConfiguration(
+				bundleContext, _serviceConfiguration, "service");
+		}
 	}
 
 	private void _initServiceComponent() {
@@ -108,79 +124,54 @@ public class ServiceConfigurationInitializer {
 		}
 	}
 
+	private void _readResourceActions() {
+		try {
+			_resourceActions.populateModelResources(
+				_classLoader,
+				StringUtil.split(
+					_portletConfiguration.get(
+						PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+
+			if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED) {
+				_resourceActions.populatePortletResources(
+					_classLoader,
+					StringUtil.split(
+						_portletConfiguration.get(
+							PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+			}
+		}
+		catch (Exception exception) {
+			_log.error(
+				"Unable to read resource actions config in " +
+					PropsKeys.RESOURCE_ACTIONS_CONFIGS,
+				exception);
+		}
+	}
+
+	private void _registerConfiguration(
+		BundleContext bundleContext, Configuration configuration, String name) {
+
+		_serviceRegistrations.add(
+			bundleContext.registerService(
+				Configuration.class, configuration,
+				HashMapDictionaryBuilder.<String, Object>put(
+					"name", name
+				).put(
+					"origin.bundle.symbolic.name", _bundle.getSymbolicName()
+				).build()));
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ServiceConfigurationInitializer.class);
 
 	private final Bundle _bundle;
 	private final ClassLoader _classLoader;
-	private ServiceRegistration<Configuration>
-		_configurationServiceRegistration;
-	private final ServiceComponentConfiguration _serviceComponentConfiguration =
-		new ModuleResourceLoader();
+	private final Configuration _portletConfiguration;
+	private final ResourceActions _resourceActions;
+	private final ServiceComponentConfiguration _serviceComponentConfiguration;
 	private final ServiceComponentLocalService _serviceComponentLocalService;
 	private final Configuration _serviceConfiguration;
-
-	private class ModuleResourceLoader
-		implements ServiceComponentConfiguration {
-
-		@Override
-		public InputStream getHibernateInputStream() {
-			return _getInputStream("/META-INF/module-hbm.xml");
-		}
-
-		@Override
-		public InputStream getModelHintsExtInputStream() {
-			return _getInputStream("/META-INF/portlet-model-hints-ext.xml");
-		}
-
-		@Override
-		public InputStream getModelHintsInputStream() {
-			return _getInputStream("/META-INF/portlet-model-hints.xml");
-		}
-
-		@Override
-		public String getServletContextName() {
-			return _bundle.getSymbolicName();
-		}
-
-		@Override
-		public InputStream getSQLIndexesInputStream() {
-			return _getInputStream("/META-INF/sql/indexes.sql");
-		}
-
-		@Override
-		public InputStream getSQLSequencesInputStream() {
-			return _getInputStream("/META-INF/sql/sequences.sql");
-		}
-
-		@Override
-		public InputStream getSQLTablesInputStream() {
-			return _getInputStream("/META-INF/sql/tables.sql");
-		}
-
-		private InputStream _getInputStream(String location) {
-			URL url = _bundle.getResource(location);
-
-			if (url == null) {
-				if (_log.isDebugEnabled()) {
-					_log.debug("Unable to find " + location);
-				}
-
-				return null;
-			}
-
-			InputStream inputStream = null;
-
-			try {
-				inputStream = url.openStream();
-			}
-			catch (IOException ioException) {
-				_log.error("Unable to read " + location, ioException);
-			}
-
-			return inputStream;
-		}
-
-	}
+	private final List<ServiceRegistration<?>> _serviceRegistrations =
+		new ArrayList<>();
 
 }

@@ -14,21 +14,24 @@
 
 package com.liferay.staging.processes.web.internal.portlet.configuration.icon;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.staging.constants.StagingProcessesPortletKeys;
+
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -40,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + StagingProcessesPortletKeys.STAGING_PROCESSES,
 	service = PortletConfigurationIcon.class
 )
@@ -48,7 +52,10 @@ public class PublishTemplatesConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "publish-templates");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getLocale(portletRequest), getClass());
+
+		return LanguageUtil.get(resourceBundle, "publish-templates");
 	}
 
 	@Override
@@ -85,7 +92,7 @@ public class PublishTemplatesConfigurationIcon
 		Group scopeGroup = themeDisplay.getScopeGroup();
 
 		try {
-			if (!_groupPermission.contains(
+			if (!GroupPermissionUtil.contains(
 					themeDisplay.getPermissionChecker(), scopeGroup,
 					ActionKeys.PUBLISH_STAGING)) {
 
@@ -94,7 +101,7 @@ public class PublishTemplatesConfigurationIcon
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -111,21 +118,25 @@ public class PublishTemplatesConfigurationIcon
 
 		User user = themeDisplay.getUser();
 
-		if (user.isGuestUser()) {
+		if (user.isDefaultUser()) {
 			return false;
 		}
 
 		return true;
 	}
 
+	@Override
+	public boolean isToolTip() {
+		return false;
+	}
+
+	@Override
+	public boolean isUseDialog() {
+		return false;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		PublishTemplatesConfigurationIcon.class);
-
-	@Reference
-	private GroupPermission _groupPermission;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

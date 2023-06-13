@@ -15,7 +15,6 @@
 package com.liferay.document.library.asset.auto.tagger.tensorflow.internal.util;
 
 import com.liferay.document.library.asset.auto.tagger.tensorflow.internal.configuration.TensorFlowImageAssetAutoTagProviderDownloadConfiguration;
-import com.liferay.document.library.kernel.store.DLStoreRequest;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -30,8 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URL;
-
-import java.nio.file.Files;
 
 /**
  * @author Alejandro Tardín
@@ -56,16 +53,12 @@ public class TensorFlowDownloadUtil {
 			_downloadFile(
 				_getModelFileName(),
 				tensorFlowImageAssetAutoTagProviderDownloadConfiguration.
-					modelDownloadURL(),
-				tensorFlowImageAssetAutoTagProviderDownloadConfiguration.
-					modelDownloadSHA1());
+					modelDownloadURL());
 
 			_downloadFile(
 				_getNativeLibraryFileName(),
 				tensorFlowImageAssetAutoTagProviderDownloadConfiguration.
-					nativeLibraryDownloadURL(),
-				tensorFlowImageAssetAutoTagProviderDownloadConfiguration.
-					nativeLibraryDownloadSHA1());
+					nativeLibraryDownloadURL());
 		}
 		catch (Exception exception) {
 			_downloadFailed = true;
@@ -110,22 +103,15 @@ public class TensorFlowDownloadUtil {
 		return _downloadFailed;
 	}
 
-	private static void _downloadFile(String fileName, String url, String sha1)
+	private static void _downloadFile(String fileName, String url)
 		throws Exception {
 
 		File tempFile = FileUtil.createTempFile();
 
-		JarUtil.downloadAndInstallJar(new URL(url), tempFile.toPath(), sha1);
+		JarUtil.downloadAndInstallJar(new URL(url), tempFile.toPath());
 
 		DLStoreUtil.addFile(
-			DLStoreRequest.builder(
-				_COMPANY_ID, CompanyConstants.SYSTEM, fileName
-			).className(
-				TensorFlowDownloadUtil.class.getName()
-			).size(
-				Files.size(tempFile.toPath())
-			).build(),
-			tempFile);
+			_COMPANY_ID, CompanyConstants.SYSTEM, fileName, false, tempFile);
 	}
 
 	private static String _getFileName(String fileName) {

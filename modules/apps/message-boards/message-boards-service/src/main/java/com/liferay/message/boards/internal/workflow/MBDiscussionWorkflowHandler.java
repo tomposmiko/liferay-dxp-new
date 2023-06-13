@@ -61,11 +61,6 @@ public class MBDiscussionWorkflowHandler extends MBMessageWorkflowHandler {
 	}
 
 	@Override
-	public boolean isCommentable() {
-		return false;
-	}
-
-	@Override
 	public void startWorkflowInstance(
 			long companyId, long groupId, long userId, long classPK,
 			MBMessage model, Map<String, Serializable> workflowContext)

@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SegmentsSimulationDisplayContext segmentsSimulationDisplayContext = (SegmentsSimulationDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+SegmentsSimulationDisplayContext segmentsSimulationDisplayContext = new SegmentsSimulationDisplayContext(request, renderResponse);
 %>
 
 <clay:container-fluid
@@ -33,37 +33,16 @@ SegmentsSimulationDisplayContext segmentsSimulationDisplayContext = (SegmentsSim
 		<c:otherwise>
 			<aui:form method="post" name="segmentsSimulationFm">
 				<ul class="list-unstyled">
-					<c:if test="<%= !segmentsSimulationDisplayContext.isSegmentationEnabled() %>">
-						<clay:alert
-							defaultTitleDisabled="<%= true %>"
-							dismissible="<%= true %>"
-							displayType="warning"
-						>
-							<strong><liferay-ui:message key="experiences-cannot-be-displayed-because-segmentation-is-disabled" /></strong>
-
-							<c:choose>
-								<c:when test="<%= segmentsSimulationDisplayContext.getSegmentsCompanyConfigurationURL() != null %>">
-									<clay:link
-										href="<%= segmentsSimulationDisplayContext.getSegmentsCompanyConfigurationURL() %>"
-										label='<%= LanguageUtil.get(request, "to-enable,-go-to-instance-settings") %>'
-									/>
-								</c:when>
-								<c:otherwise>
-									<span><liferay-ui:message key="contact-your-system-administrator-to-enable-it" /></span>
-								</c:otherwise>
-							</c:choose>
-						</clay:alert>
-					</c:if>
 
 					<%
 					for (SegmentsEntry segmentsEntry : segmentsSimulationDisplayContext.getSegmentsEntries()) {
 					%>
 
-						<li class="bg-transparent border-0 list-group-item list-group-item-flex pb-3 pt-0 px-0">
+						<li class="bg-transparent list-group-item list-group-item-flex pb-3 pt-0 px-0">
 							<span>
 								<div class="custom-checkbox">
 									<label class="position-relative">
-										<input class="custom-control-input simulated-segment" name="<%= segmentsSimulationDisplayContext.getPortletNamespace() %>segmentsEntryId" type="checkbox" value="<%= String.valueOf(segmentsEntry.getSegmentsEntryId()) %>" />
+										<input class="custom-control-input simulated-segment" name="<%= segmentsSimulationDisplayContext.getPortletNamespace() + "segmentsEntryId" %>" type="checkbox" value="<%= String.valueOf(segmentsEntry.getSegmentsEntryId()) %>" />
 
 										<span class="custom-control-label">
 											<span class="custom-control-label-text">
@@ -82,16 +61,15 @@ SegmentsSimulationDisplayContext segmentsSimulationDisplayContext = (SegmentsSim
 				</ul>
 			</aui:form>
 
-			<liferay-frontend:component
-				context='<%=
-					HashMapBuilder.<String, Object>put(
-						"deactivateSimulationURL", segmentsSimulationDisplayContext.getDeactivateSimulationURL()
-					).put(
-						"simulateSegmentsEntriesURL", segmentsSimulationDisplayContext.getSimulateSegmentsEntriesURL()
-					).build()
-				%>'
-				module="js/main"
-			/>
+			<aui:script use="liferay-portlet-segments-simulation">
+				new Liferay.Portlet.SegmentsSimulation({
+					deactivateSimulationUrl:
+						'<%= segmentsSimulationDisplayContext.getDeactivateSimulationURL() %>',
+					form: document.<portlet:namespace />segmentsSimulationFm,
+					simulateSegmentsEntriesUrl:
+						'<%= segmentsSimulationDisplayContext.getSimulateSegmentsEntriesURL() %>',
+				});
+			</aui:script>
 		</c:otherwise>
 	</c:choose>
 </clay:container-fluid>

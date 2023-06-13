@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,8 +78,7 @@ public class GitWorkingDirectory {
 				removeGitRemote(getGitRemote(gitRemoteName));
 			}
 			else {
-				throw new GitWorkingDirectoryIllegalArgumentException(
-					this,
+				throw new IllegalArgumentException(
 					JenkinsResultsParserUtil.combine(
 						"Git remote ", gitRemoteName, " already exists"));
 			}
@@ -105,8 +102,7 @@ public class GitWorkingDirectory {
 				});
 
 			if (executionResult.getExitValue() != 0) {
-				throw new GitWorkingDirectoryRuntimeException(
-					this,
+				throw new RuntimeException(
 					JenkinsResultsParserUtil.combine(
 						"Unable to write Git remote ", gitRemoteName, "\n",
 						executionResult.getStandardError()));
@@ -186,8 +182,7 @@ public class GitWorkingDirectory {
 			1000 * 60 * 10, sb.toString());
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to checkout ", branchName, "\n",
 					executionResult.getStandardError()));
@@ -207,9 +202,8 @@ public class GitWorkingDirectory {
 				headContent = JenkinsResultsParserUtil.read(headFile);
 			}
 			catch (IOException ioException) {
-				throw new GitWorkingDirectoryRuntimeException(
-					this, "Unable to read file " + headFile.getPath(),
-					ioException);
+				throw new RuntimeException(
+					"Unable to read file " + headFile.getPath(), ioException);
 			}
 
 			headContent = headContent.trim();
@@ -232,8 +226,8 @@ public class GitWorkingDirectory {
 					return;
 				}
 
-				throw new GitWorkingDirectoryRuntimeException(
-					this, "Unable to checkout branch " + branchName);
+				throw new RuntimeException(
+					"Unable to checkout branch " + branchName);
 			}
 		}
 	}
@@ -257,8 +251,7 @@ public class GitWorkingDirectory {
 			GitUtil.MILLIS_TIMEOUT, cherryPickCommand);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to cherry pick commit ", localGitCommitSHA, "\n",
 					executionResult.getStandardError()));
@@ -271,8 +264,7 @@ public class GitWorkingDirectory {
 			1000 * 60 * 10, "git clean -dfx");
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to clean Git repository\n",
 					executionResult.getStandardError()));
@@ -316,8 +308,7 @@ public class GitWorkingDirectory {
 			GitUtil.MILLIS_TIMEOUT, commitCommand);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to commit file ", fileName, "\n",
 					executionResult.getStandardError()));
@@ -333,8 +324,7 @@ public class GitWorkingDirectory {
 			GitUtil.MILLIS_TIMEOUT, commitCommand);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to commit staged files", "\n",
 					executionResult.getStandardError()));
@@ -370,8 +360,7 @@ public class GitWorkingDirectory {
 			GitUtil.MILLIS_TIMEOUT, commands);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				"Unable to configure Git repository.\n" +
 					executionResult.getStandardError());
 		}
@@ -410,70 +399,93 @@ public class GitWorkingDirectory {
 	}
 
 	public LocalGitBranch createLocalGitBranch(
-		final String localGitBranchName, final boolean force,
-		final String startPoint) {
+		String localGitBranchName, boolean force, String startPoint) {
 
-		Retryable<LocalGitBranch> createLocalGitBranchRetryable =
-			new Retryable<LocalGitBranch>(true, 3, 0, true) {
+		String currentBranchName = getCurrentBranchName();
 
-				@Override
-				public LocalGitBranch execute() {
-					return _createLocalGitBranch(
-						localGitBranchName, force, startPoint);
-				}
+		List<String> commands = new ArrayList<>();
 
-			};
+		if ((currentBranchName == null) ||
+			currentBranchName.equals(localGitBranchName)) {
 
-		return createLocalGitBranchRetryable.executeWithRetries();
+			String tempBranchName =
+				"temp-" + JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+			RemoteGitBranch upstreamRemoteGitBranch =
+				getUpstreamRemoteGitBranch();
+
+			String upstreamGitBranchSHA = upstreamRemoteGitBranch.getSHA();
+
+			if (!localSHAExists(upstreamGitBranchSHA)) {
+				fetch(upstreamRemoteGitBranch);
+			}
+
+			commands.add(
+				JenkinsResultsParserUtil.combine(
+					"git branch -f ", tempBranchName, " ",
+					upstreamGitBranchSHA));
+
+			commands.add(
+				JenkinsResultsParserUtil.combine(
+					"git checkout -f ", tempBranchName));
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("git branch ");
+
+		if (force) {
+			sb.append("-f ");
+		}
+
+		sb.append(localGitBranchName);
+
+		if (startPoint != null) {
+			sb.append(" ");
+			sb.append(startPoint);
+		}
+
+		commands.add(sb.toString());
+
+		GitUtil.ExecutionResult executionResult = executeBashCommands(
+			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
+			GitUtil.MILLIS_TIMEOUT, commands.toArray(new String[0]));
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to create local branch ", localGitBranchName,
+					" at ", startPoint, "\n",
+					executionResult.getStandardError()));
+		}
+
+		return getLocalGitBranch(localGitBranchName, true);
 	}
 
 	public String createPullRequest(
-			final String body, final String pullRequestBranchName,
-			final String receiverUserName, final String senderUserName,
-			final String title)
+			String body, String pullRequestBranchName, String receiverUserName,
+			String senderUserName, String title)
 		throws IOException {
 
-		Retryable<String> retryable = new Retryable<String>(true, 5, 0, true) {
+		JSONObject requestJSONObject = new JSONObject();
 
-			@Override
-			public String execute() {
-				JSONObject requestJSONObject = new JSONObject();
+		requestJSONObject.put("base", _upstreamBranchName);
+		requestJSONObject.put("body", body);
+		requestJSONObject.put(
+			"head", senderUserName + ":" + pullRequestBranchName);
+		requestJSONObject.put("title", title);
 
-				requestJSONObject.put(
-					"base", _upstreamBranchName
-				).put(
-					"body", body
-				).put(
-					"head", senderUserName + ":" + pullRequestBranchName
-				).put(
-					"title", title
-				);
+		String url = JenkinsResultsParserUtil.getGitHubApiUrl(
+			_gitRepositoryName, receiverUserName, "pulls");
 
-				String url = JenkinsResultsParserUtil.getGitHubApiUrl(
-					_gitRepositoryName, receiverUserName, "pulls");
+		JSONObject responseJSONObject = JenkinsResultsParserUtil.toJSONObject(
+			url, requestJSONObject.toString());
 
-				JSONObject responseJSONObject;
+		String pullRequestURL = responseJSONObject.getString("html_url");
 
-				try {
-					responseJSONObject = JenkinsResultsParserUtil.toJSONObject(
-						url, requestJSONObject.toString());
-				}
-				catch (IOException ioException) {
-					throw new RuntimeException(ioException);
-				}
+		System.out.println("Created a pull request at " + pullRequestURL);
 
-				String pullRequestURL = responseJSONObject.getString(
-					"html_url");
-
-				System.out.println(
-					"Created a pull request at " + pullRequestURL);
-
-				return pullRequestURL;
-			}
-
-		};
-
-		return retryable.executeWithRetries();
+		return pullRequestURL;
 	}
 
 	public void deleteLocalGitBranch(LocalGitBranch localGitBranch) {
@@ -508,29 +520,6 @@ public class GitWorkingDirectory {
 		}
 	}
 
-	public void deleteLockFiles() {
-		File gitDirectory = getGitDirectory();
-
-		String[] lockFileNames = gitDirectory.list(
-			JenkinsResultsParserUtil.newFilenameFilter(".*\\.lock"));
-
-		for (String lockFileName : lockFileNames) {
-			boolean deleted = false;
-
-			File lockFile = new File(gitDirectory, lockFileName);
-
-			if (lockFile.exists() && lockFile.canWrite()) {
-				System.out.println("Deleting lock file " + lockFile.getPath());
-
-				deleted = lockFile.delete();
-			}
-
-			if (!deleted) {
-				System.out.println("Unable to delete " + lockFile.getPath());
-			}
-		}
-	}
-
 	public void deleteRemoteGitBranch(RemoteGitBranch remoteGitBranch) {
 		deleteRemoteGitBranches(Arrays.asList(remoteGitBranch));
 	}
@@ -552,10 +541,6 @@ public class GitWorkingDirectory {
 	public void deleteRemoteGitBranches(
 		List<RemoteGitBranch> remoteGitBranches) {
 
-		if (remoteGitBranches.isEmpty()) {
-			return;
-		}
-
 		Map<String, Set<String>> remoteURLGitBranchNameMap = new HashMap<>();
 
 		for (RemoteGitBranch remoteGitBranch : remoteGitBranches) {
@@ -576,48 +561,21 @@ public class GitWorkingDirectory {
 			remoteURLGitBranchNameMap.put(remoteURL, remoteGitBranchNames);
 		}
 
-		List<Callable<Boolean>> callables = new ArrayList<>(
-			remoteURLGitBranchNameMap.size());
-
-		for (final Map.Entry<String, Set<String>> remoteURLBranchNamesEntry :
+		for (Map.Entry<String, Set<String>> remoteURLBranchNamesEntry :
 				remoteURLGitBranchNameMap.entrySet()) {
 
-			Callable<Boolean> callable = new Callable<Boolean>() {
+			String remoteURL = remoteURLBranchNamesEntry.getKey();
 
-				@Override
-				public Boolean call() throws Exception {
-					Set<String> allBranchNames =
-						remoteURLBranchNamesEntry.getValue();
+			for (List<String> branchNames :
+					Lists.partition(
+						new ArrayList<String>(
+							remoteURLBranchNamesEntry.getValue()),
+						_BRANCHES_DELETE_BATCH_SIZE)) {
 
-					if (allBranchNames.isEmpty()) {
-						return true;
-					}
-
-					String remoteURL = remoteURLBranchNamesEntry.getKey();
-
-					for (List<String> branchNames :
-							Lists.partition(
-								new ArrayList<String>(allBranchNames),
-								_BRANCHES_DELETE_BATCH_SIZE)) {
-
-						_deleteRemoteGitBranches(
-							remoteURL, branchNames.toArray(new String[0]));
-					}
-
-					return true;
-				}
-
-			};
-
-			callables.add(callable);
+				_deleteRemoteGitBranches(
+					remoteURL, branchNames.toArray(new String[0]));
+			}
 		}
-
-		ParallelExecutor<Boolean> parallelExecutor = new ParallelExecutor<>(
-			callables, true,
-			JenkinsResultsParserUtil.getNewThreadPoolExecutor(
-				callables.size(), true));
-
-		parallelExecutor.execute();
 	}
 
 	public void displayLog() {
@@ -632,8 +590,7 @@ public class GitWorkingDirectory {
 			command);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to display log");
+			throw new RuntimeException("Unable to display log");
 		}
 
 		System.out.println();
@@ -665,8 +622,7 @@ public class GitWorkingDirectory {
 		RemoteGitRef remoteGitRef, int retries) {
 
 		if (remoteGitRef == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Remote Git reference is null");
+			throw new IllegalArgumentException("Remote Git reference is null");
 		}
 
 		String remoteGitRefSHA = remoteGitRef.getSHA();
@@ -759,8 +715,7 @@ public class GitWorkingDirectory {
 
 			System.out.println(gitBranchesSHAReportStringBuilder.toString());
 
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to fetch remote Git ref ", remoteGitRefName,
 					" after ",
@@ -846,13 +801,12 @@ public class GitWorkingDirectory {
 
 	public void fetch(String remoteURL, boolean noTags) {
 		if (remoteURL == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Remote URL is null");
+			throw new IllegalArgumentException("Remote URL is null");
 		}
 
 		if (!GitUtil.isValidRemoteURL(remoteURL)) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Invalid remote url " + remoteURL);
+			throw new IllegalArgumentException(
+				"Invalid remote url " + remoteURL);
 		}
 
 		StringBuilder gitBranchesSHAReportStringBuilder = new StringBuilder();
@@ -888,8 +842,7 @@ public class GitWorkingDirectory {
 		if (executionResult.getExitValue() != 0) {
 			System.out.println(gitBranchesSHAReportStringBuilder.toString());
 
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to fetch remote url ", remoteURL, " after ",
 					JenkinsResultsParserUtil.toDurationString(duration), "\n",
@@ -909,8 +862,7 @@ public class GitWorkingDirectory {
 		String branchName, LocalGitBranch localGitBranch) {
 
 		if (localGitBranch == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Local Git branch is null");
+			throw new IllegalArgumentException("Local Git branch is null");
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -931,8 +883,7 @@ public class GitWorkingDirectory {
 			3, GitUtil.MILLIS_RETRY_DELAY, 1000 * 60 * 30, sb.toString());
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to fetch from local Git repository ",
 					String.valueOf(localGitBranch.getDirectory()), "\n",
@@ -981,8 +932,7 @@ public class GitWorkingDirectory {
 				}
 
 				if (retries > 1) {
-					throw new GitWorkingDirectoryRuntimeException(
-						this,
+					throw new RuntimeException(
 						JenkinsResultsParserUtil.combine(
 							"Unable to garbage collect Git\n", standardError));
 				}
@@ -1014,8 +964,7 @@ public class GitWorkingDirectory {
 				return Collections.emptyList();
 			}
 
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to get branches with SHA ", sha, "\n",
 					standardError));
@@ -1063,8 +1012,8 @@ public class GitWorkingDirectory {
 			System.out.println(executionResult.getStandardError());
 
 			if (required) {
-				throw new GitWorkingDirectoryRuntimeException(
-					this, "Unable to find required local branch HEAD");
+				throw new RuntimeException(
+					"Unable to find required local branch HEAD");
 			}
 
 			return null;
@@ -1095,84 +1044,13 @@ public class GitWorkingDirectory {
 		return getLocalGitBranch(currentBranchName);
 	}
 
-	public List<File> getDeletedFilesList() {
-		return getDeletedFilesList(false, null, null);
-	}
-
-	public List<File> getDeletedFilesList(
-		boolean checkUnstagedFiles, List<PathMatcher> excludesPathMatchers,
-		List<PathMatcher> includesPathMatchers) {
-
-		LocalGitBranch currentLocalGitBranch = getCurrentLocalGitBranch();
-
-		if (currentLocalGitBranch == null) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to determine the current branch");
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("git diff --diff-filter=ADMR --name-only ");
-
-		sb.append(
-			getMergeBaseCommitSHA(
-				currentLocalGitBranch,
-				getLocalGitBranch(getUpstreamBranchName(), true)));
-
-		if (!checkUnstagedFiles) {
-			sb.append(" ");
-			sb.append(currentLocalGitBranch.getSHA());
-		}
-
-		String gitDiffCommandString = sb.toString();
-
-		List<File> deletedFiles = _deletedFilesMap.get(gitDiffCommandString);
-
-		if (deletedFiles == null) {
-			GitUtil.ExecutionResult executionResult = executeBashCommands(
-				GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-				GitUtil.MILLIS_TIMEOUT, gitDiffCommandString);
-
-			if (executionResult.getExitValue() == 1) {
-				return Collections.emptyList();
-			}
-
-			if (executionResult.getExitValue() != 0) {
-				throw new GitWorkingDirectoryRuntimeException(
-					this,
-					"Unable to get current branch modified files\n" +
-						executionResult.getStandardError());
-			}
-
-			deletedFiles = new ArrayList<>();
-
-			String gitDiffOutput = executionResult.getStandardOut();
-
-			for (String line : gitDiffOutput.split("\n")) {
-				File deletedFile = new File(_workingDirectory, line);
-
-				if (deletedFile.exists()) {
-					continue;
-				}
-
-				deletedFiles.add(deletedFile);
-			}
-
-			_deletedFilesMap.put(gitDiffCommandString, deletedFiles);
-		}
-
-		return JenkinsResultsParserUtil.getIncludedFiles(
-			excludesPathMatchers, includesPathMatchers, deletedFiles);
-	}
-
 	public String getGitConfigProperty(String gitConfigPropertyName) {
 		GitUtil.ExecutionResult executionResult = executeBashCommands(
 			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
 			GitUtil.MILLIS_TIMEOUT, "git config " + gitConfigPropertyName);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to read Git config property ",
 					gitConfigPropertyName, "\n",
@@ -1251,8 +1129,7 @@ public class GitWorkingDirectory {
 				GitUtil.MILLIS_TIMEOUT, "git remote -v");
 
 			if (executionResult.getExitValue() != 0) {
-				throw new GitWorkingDirectoryRuntimeException(
-					this,
+				throw new RuntimeException(
 					JenkinsResultsParserUtil.combine(
 						"Unable to get list of Git remotes\n",
 						executionResult.getStandardError()));
@@ -1339,7 +1216,7 @@ public class GitWorkingDirectory {
 			List<File> javaFiles = JenkinsResultsParserUtil.findFiles(
 				getWorkingDirectory(), ".*\\.java");
 
-			_javaDirPaths = ConcurrentHashMap.newKeySet();
+			_javaDirPaths = new HashSet<>();
 
 			for (File javaFile : javaFiles) {
 				File parentFile = javaFile.getParentFile();
@@ -1404,8 +1281,7 @@ public class GitWorkingDirectory {
 
 		LocalGitRepository localGitRepository =
 			GitRepositoryFactory.getLocalGitRepository(
-				getGitRepositoryName(), upstreamBranchName,
-				getWorkingDirectory());
+				getGitRepositoryName(), upstreamBranchName);
 
 		if (branchName != null) {
 			try {
@@ -1449,8 +1325,7 @@ public class GitWorkingDirectory {
 
 	public String getLocalGitBranchSHA(String localGitBranchName) {
 		if (localGitBranchName == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Local branch name is null");
+			throw new IllegalArgumentException("Local branch name is null");
 		}
 
 		GitUtil.ExecutionResult executionResult = executeBashCommands(
@@ -1458,40 +1333,10 @@ public class GitWorkingDirectory {
 			"git rev-parse " + localGitBranchName);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to determine SHA of branch ", localGitBranchName,
 					"\n", executionResult.getStandardError()));
-		}
-
-		return executionResult.getStandardOut();
-	}
-
-	public String getMergeBaseCommitSHA(LocalGitBranch... localGitBranches) {
-		if (localGitBranches.length < 2) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this,
-				"Unable to perform merge-base with less than two branches");
-		}
-
-		StringBuilder sb = new StringBuilder("git merge-base");
-
-		for (LocalGitBranch localGitBranch : localGitBranches) {
-			sb.append(" ");
-			sb.append(localGitBranch.getName());
-		}
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			GitUtil.MILLIS_TIMEOUT, sb.toString());
-
-		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
-				JenkinsResultsParserUtil.combine(
-					"Unable to get merge base commit SHA\n",
-					executionResult.getStandardError()));
 		}
 
 		return executionResult.getStandardOut();
@@ -1533,8 +1378,8 @@ public class GitWorkingDirectory {
 		LocalGitBranch currentLocalGitBranch = getCurrentLocalGitBranch();
 
 		if (currentLocalGitBranch == null) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to determine the current branch");
+			throw new RuntimeException(
+				"Unable to determine the current branch");
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -1542,7 +1387,7 @@ public class GitWorkingDirectory {
 		sb.append("git diff --diff-filter=ADMR --name-only ");
 
 		sb.append(
-			getMergeBaseCommitSHA(
+			_getMergeBaseCommitSHA(
 				currentLocalGitBranch,
 				getLocalGitBranch(getUpstreamBranchName(), true)));
 
@@ -1565,8 +1410,7 @@ public class GitWorkingDirectory {
 			}
 
 			if (executionResult.getExitValue() != 0) {
-				throw new GitWorkingDirectoryRuntimeException(
-					this,
+				throw new RuntimeException(
 					"Unable to get current branch modified files\n" +
 						executionResult.getStandardError());
 			}
@@ -1576,13 +1420,7 @@ public class GitWorkingDirectory {
 			String gitDiffOutput = executionResult.getStandardOut();
 
 			for (String line : gitDiffOutput.split("\n")) {
-				File modifiedFile = new File(_workingDirectory, line);
-
-				if (!modifiedFile.exists()) {
-					continue;
-				}
-
-				modifiedFiles.add(modifiedFile);
+				modifiedFiles.add(new File(_workingDirectory, line));
 			}
 
 			_modifiedFilesMap.put(gitDiffCommandString, modifiedFiles);
@@ -1714,8 +1552,7 @@ public class GitWorkingDirectory {
 		}
 
 		if (required) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to find required branch ", remoteGitBranchName,
 					" from remote URL ", remoteURL));
@@ -1800,18 +1637,16 @@ public class GitWorkingDirectory {
 		String remoteGitBranchName, String remoteURL) {
 
 		if (remoteGitBranchName == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Remote branch name is null");
+			throw new IllegalArgumentException("Remote branch name is null");
 		}
 
 		if (remoteURL == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Remote URL is null");
+			throw new IllegalArgumentException("Remote URL is null");
 		}
 
 		if (!GitUtil.isValidRemoteURL(remoteURL)) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Invalid remote url " + remoteURL);
+			throw new IllegalArgumentException(
+				"Invalid remote url " + remoteURL);
 		}
 
 		String command = JenkinsResultsParserUtil.combine(
@@ -1821,8 +1656,7 @@ public class GitWorkingDirectory {
 			3, GitUtil.MILLIS_RETRY_DELAY, 1000 * 60 * 10, command);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to get remote branch SHA ", remoteURL, " ",
 					remoteGitBranchName, "\n",
@@ -1862,8 +1696,7 @@ public class GitWorkingDirectory {
 		}
 
 		if (required) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to find required ref ", remoteGitRefName,
 					" from remote URL ", remoteURL));
@@ -2040,18 +1873,16 @@ public class GitWorkingDirectory {
 		String remoteGitBranchName, String remoteURL) {
 
 		if (localGitBranch == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Local Git branch is null");
+			throw new IllegalArgumentException("Local Git branch is null");
 		}
 
 		if (remoteURL == null) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Remote URL is null");
+			throw new IllegalArgumentException("Remote URL is null");
 		}
 
 		if (!GitUtil.isValidRemoteURL(remoteURL)) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Invalid remote url " + remoteURL);
+			throw new IllegalArgumentException(
+				"Invalid remote url " + remoteURL);
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -2078,6 +1909,35 @@ public class GitWorkingDirectory {
 
 			if (executionResult.getExitValue() != 0) {
 				return null;
+			}
+
+			JenkinsSlave jenkinsSlave = new JenkinsSlave();
+
+			if (jenkinsSlave != null) {
+				String standardOut = executionResult.getStandardOut();
+
+				if ((standardOut != null) &&
+					standardOut.contains("(forced update)")) {
+
+					StringBuilder messageStringBuilder = new StringBuilder();
+
+					messageStringBuilder.append(
+						"Git branch force-push detected.\n");
+
+					Build currentBuild = jenkinsSlave.getCurrentBuild();
+
+					messageStringBuilder.append("BuildURL: ");
+					messageStringBuilder.append(currentBuild.getBuildURL());
+					messageStringBuilder.append("\n");
+
+					messageStringBuilder.append("git push command: ");
+					messageStringBuilder.append(sb.toString());
+
+					NotificationUtil.sendEmail(
+						messageStringBuilder.toString(), "jenkins",
+						"Git branch force-push detected",
+						"qa-slave-verify-fail@liferay.com");
+				}
 			}
 		}
 		catch (RuntimeException runtimeException) {
@@ -2121,8 +1981,7 @@ public class GitWorkingDirectory {
 				rebaseAbort();
 			}
 
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to rebase ", localGitBranch.getName(), " to ",
 					baseLocalGitBranch.getName(), "\n",
@@ -2142,8 +2001,7 @@ public class GitWorkingDirectory {
 			GitUtil.MILLIS_TIMEOUT, "git rebase --abort");
 
 		if (!ignoreFailure && (executionResult.getExitValue() != 0)) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to abort rebase\n",
 					executionResult.getStandardError()));
@@ -2204,8 +2062,7 @@ public class GitWorkingDirectory {
 			2, GitUtil.MILLIS_RETRY_DELAY, 1000 * 60 * 5, command);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to reset\n", executionResult.getStandardError()));
 		}
@@ -2219,8 +2076,7 @@ public class GitWorkingDirectory {
 			GitUtil.MILLIS_TIMEOUT, command);
 
 		if (result.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to stage file " + fileName);
+			throw new RuntimeException("Unable to stage file " + fileName);
 		}
 	}
 
@@ -2233,8 +2089,7 @@ public class GitWorkingDirectory {
 					"Finished executing Bash commands.", "");
 
 				if (!gitStatus.startsWith("On branch")) {
-					throw new GitWorkingDirectoryRuntimeException(
-						this, "Unable to run: git status");
+					throw new RuntimeException("Unable to run: git status");
 				}
 
 				return gitStatus;
@@ -2246,8 +2101,7 @@ public class GitWorkingDirectory {
 			}
 		}
 
-		throw new GitWorkingDirectoryRuntimeException(
-			this, "Unable to run: git status");
+		throw new RuntimeException("Unable to run: git status");
 	}
 
 	protected GitWorkingDirectory(
@@ -2317,8 +2171,7 @@ public class GitWorkingDirectory {
 			1000 * 60 * 10, command);
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to get local Git branch SHAs\n",
 					executionResult.getStandardError()));
@@ -2349,8 +2202,7 @@ public class GitWorkingDirectory {
 			"git for-each-ref refs/heads --format=\"%(refname)\"");
 
 		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to get local branch names\n",
 					executionResult.getStandardError()));
@@ -2365,8 +2217,7 @@ public class GitWorkingDirectory {
 		Matcher matcher = _gitLogEntityPattern.matcher(gitLogEntity);
 
 		if (!matcher.matches()) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this, "Unable to find Git SHA");
+			throw new IllegalArgumentException("Unable to find Git SHA");
 		}
 
 		int unixTimestamp = Integer.valueOf(matcher.group("commitTime"));
@@ -2385,8 +2236,8 @@ public class GitWorkingDirectory {
 			gitFileContent = JenkinsResultsParserUtil.read(gitFile);
 		}
 		catch (IOException ioException) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to find real .git directory", ioException);
+			throw new RuntimeException(
+				"Unable to find real .git directory", ioException);
 		}
 
 		for (String line : gitFileContent.split("\n")) {
@@ -2399,16 +2250,18 @@ public class GitWorkingDirectory {
 			return new File(matcher.group(1));
 		}
 
-		throw new GitWorkingDirectoryIllegalArgumentException(
-			this, "Unable to find real Git directory in " + gitFile.getPath());
+		throw new IllegalArgumentException(
+			"Unable to find real Git directory in " + gitFile.getPath());
 	}
 
 	protected List<File> getSubdirectoriesContainingFiles(
 		int depth, List<File> files, File rootDirectory) {
 
+		List<File> subdirectories = JenkinsResultsParserUtil.getSubdirectories(
+			depth, rootDirectory);
+
 		return JenkinsResultsParserUtil.getDirectoriesContainingFiles(
-			JenkinsResultsParserUtil.getSubdirectories(depth, rootDirectory),
-			files);
+			subdirectories, files);
 	}
 
 	protected boolean isOnlyMatchingFilesModified(MultiPattern multiPattern) {
@@ -2500,8 +2353,8 @@ public class GitWorkingDirectory {
 		_workingDirectory = new File(workingDirectoryPath);
 
 		if (!_workingDirectory.exists()) {
-			throw new GitWorkingDirectoryFileNotFoundException(
-				this, _workingDirectory.getPath() + " is unavailable");
+			throw new FileNotFoundException(
+				_workingDirectory.getPath() + " is unavailable");
 		}
 
 		_gitDirectory = new File(workingDirectoryPath, ".git");
@@ -2511,8 +2364,8 @@ public class GitWorkingDirectory {
 		}
 
 		if (!_gitDirectory.exists()) {
-			throw new GitWorkingDirectoryFileNotFoundException(
-				this, _gitDirectory.getPath() + " is unavailable");
+			throw new FileNotFoundException(
+				_gitDirectory.getPath() + " is unavailable");
 		}
 	}
 
@@ -2544,82 +2397,6 @@ public class GitWorkingDirectory {
 		}
 	}
 
-	protected static class GitWorkingDirectoryFileNotFoundException
-		extends FileNotFoundException {
-
-		public GitWorkingDirectoryFileNotFoundException(
-			GitWorkingDirectory gitWorkingDirectory, String message) {
-
-			this("File not found exception", gitWorkingDirectory, message);
-		}
-
-		protected GitWorkingDirectoryFileNotFoundException(
-			String exceptionName, GitWorkingDirectory gitWorkingDirectory,
-			String message) {
-
-			super(
-				JenkinsResultsParserUtil.combine(
-					exceptionName, "  occurred in ",
-					gitWorkingDirectory.getGitRepositoryName(), "\n", message));
-		}
-
-	}
-
-	protected static class GitWorkingDirectoryIllegalArgumentException
-		extends GitWorkingDirectoryRuntimeException {
-
-		public GitWorkingDirectoryIllegalArgumentException(
-			GitWorkingDirectory gitWorkingDirectory, String message) {
-
-			this(gitWorkingDirectory, message, null);
-		}
-
-		public GitWorkingDirectoryIllegalArgumentException(
-			GitWorkingDirectory gitWorkingDirectory, String message,
-			Throwable throwable) {
-
-			super(
-				"Illegal argument exception", gitWorkingDirectory, message,
-				throwable);
-		}
-
-		public GitWorkingDirectoryIllegalArgumentException(
-			GitWorkingDirectory gitWorkingDirectory, Throwable throwable) {
-
-			this(gitWorkingDirectory, null, throwable);
-		}
-
-	}
-
-	protected static class GitWorkingDirectoryRuntimeException
-		extends RuntimeException {
-
-		public GitWorkingDirectoryRuntimeException(
-			GitWorkingDirectory gitWorkingDirectory, String message) {
-
-			this(gitWorkingDirectory, message, null);
-		}
-
-		public GitWorkingDirectoryRuntimeException(
-			GitWorkingDirectory gitWorkingDirectory, String message,
-			Throwable throwable) {
-
-			this("Runtime exception", gitWorkingDirectory, message, throwable);
-		}
-
-		protected GitWorkingDirectoryRuntimeException(
-			String exceptionName, GitWorkingDirectory gitWorkingDirectory,
-			String message, Throwable throwable) {
-
-			super(
-				JenkinsResultsParserUtil.combine(
-					exceptionName, "  occurred in ",
-					gitWorkingDirectory.getGitRepositoryName(), "\n", message),
-				throwable);
-		}
-
-	}
-
 	private static List<String> _getBuildPropertyAsList(String key) {
 		try {
 			return JenkinsResultsParserUtil.getBuildPropertyAsList(true, key);
@@ -2630,75 +2407,9 @@ public class GitWorkingDirectory {
 		}
 	}
 
-	private LocalGitBranch _createLocalGitBranch(
-		String localGitBranchName, boolean force, String startPoint) {
-
-		String currentBranchName = getCurrentBranchName();
-
-		List<String> commands = new ArrayList<>();
-
-		if ((currentBranchName == null) ||
-			currentBranchName.equals(localGitBranchName)) {
-
-			String tempBranchName =
-				"temp-" + JenkinsResultsParserUtil.getCurrentTimeMillis();
-
-			RemoteGitBranch upstreamRemoteGitBranch =
-				getUpstreamRemoteGitBranch();
-
-			String upstreamGitBranchSHA = upstreamRemoteGitBranch.getSHA();
-
-			if (!localSHAExists(upstreamGitBranchSHA)) {
-				fetch(upstreamRemoteGitBranch);
-			}
-
-			commands.add(
-				JenkinsResultsParserUtil.combine(
-					"git branch -f ", tempBranchName, " ",
-					upstreamGitBranchSHA));
-
-			commands.add(
-				JenkinsResultsParserUtil.combine(
-					"git checkout -f ", tempBranchName));
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("git branch ");
-
-		if (force) {
-			sb.append("-f ");
-		}
-
-		sb.append(localGitBranchName);
-
-		if (startPoint != null) {
-			sb.append(" ");
-			sb.append(startPoint);
-		}
-
-		commands.add(sb.toString());
-
-		GitUtil.ExecutionResult executionResult = executeBashCommands(
-			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
-			GitUtil.MILLIS_TIMEOUT, commands.toArray(new String[0]));
-
-		if (executionResult.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
-				JenkinsResultsParserUtil.combine(
-					"Unable to create local branch ", localGitBranchName,
-					" at ", startPoint, "\n",
-					executionResult.getStandardError()));
-		}
-
-		return getLocalGitBranch(localGitBranchName, true);
-	}
-
 	private boolean _deleteLocalGitBranches(String... branchNames) {
 		if (branchNames.length > _BRANCHES_DELETE_BATCH_SIZE) {
-			throw new GitWorkingDirectoryIllegalArgumentException(
-				this,
+			throw new IllegalArgumentException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to delete more than ",
 					String.valueOf(_BRANCHES_DELETE_BATCH_SIZE),
@@ -2803,8 +2514,7 @@ public class GitWorkingDirectory {
 		}
 
 		if (required) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this,
+			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
 					"Unable to find required branch ", branchName, " from ",
 					String.valueOf(getWorkingDirectory())));
@@ -2825,6 +2535,33 @@ public class GitWorkingDirectory {
 		}
 
 		return sb.toString();
+	}
+
+	private String _getMergeBaseCommitSHA(LocalGitBranch... localGitBranches) {
+		if (localGitBranches.length < 2) {
+			throw new IllegalArgumentException(
+				"Unable to perform merge-base with less than two branches");
+		}
+
+		StringBuilder sb = new StringBuilder("git merge-base");
+
+		for (LocalGitBranch localGitBranch : localGitBranches) {
+			sb.append(" ");
+			sb.append(localGitBranch.getName());
+		}
+
+		GitUtil.ExecutionResult executionResult = executeBashCommands(
+			GitUtil.RETRIES_SIZE_MAX, GitUtil.MILLIS_RETRY_DELAY,
+			GitUtil.MILLIS_TIMEOUT, sb.toString());
+
+		if (executionResult.getExitValue() != 0) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to get merge base commit SHA\n",
+					executionResult.getStandardError()));
+		}
+
+		return executionResult.getStandardOut();
 	}
 
 	private String _getRemoteGitBranchesSHAReport(
@@ -2902,8 +2639,7 @@ public class GitWorkingDirectory {
 			5, 1000, 30 * 1000, sb.toString());
 
 		if (result.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to run: git log");
+			throw new RuntimeException("Unable to run: git log");
 		}
 
 		return result.getStandardOut();
@@ -2917,8 +2653,7 @@ public class GitWorkingDirectory {
 			GitUtil.MILLIS_TIMEOUT, command);
 
 		if (result.getExitValue() != 0) {
-			throw new GitWorkingDirectoryRuntimeException(
-				this, "Unable to run: git status");
+			throw new RuntimeException("Unable to run: git status");
 		}
 
 		return result.getStandardOut();
@@ -2928,31 +2663,26 @@ public class GitWorkingDirectory {
 
 	private static final Pattern _badRefPattern = Pattern.compile(
 		"fatal: bad object (?<badRef>.+/HEAD)");
-	private static final Map<String, List<File>> _deletedFilesMap =
-		new ConcurrentHashMap<>();
 	private static final Pattern _gitDirectoryPathPattern = Pattern.compile(
 		"gitdir\\: (.*)\\s*");
 	private static final Pattern _gitLogEntityPattern = Pattern.compile(
-		"(?<sha>[0-9a-f]{40}) (?<commitTime>\\d+) (?<email>[^\\s]*) " +
+		"(?<sha>[0-9a-f]{40}) (?<commitTime>\\d+) (?<email>[^\\s]+) " +
 			"(?<message>.*)");
 	private static final Map<String, List<File>> _modifiedFilesMap =
-		new ConcurrentHashMap<>();
+		new HashMap<>();
 	private static final MultiPattern _poshiFileNamesMultiPattern =
 		new MultiPattern(
 			".*\\.function", ".*\\.macro", ".*\\.path", ".*\\.prose",
 			".*\\.testcase");
 	private static final List<String> _privateOnlyGitRepositoryNames =
-		Collections.synchronizedList(
-			_getBuildPropertyAsList(
-				"git.working.directory.private.only.repository.names"));
+		_getBuildPropertyAsList(
+			"git.working.directory.private.only.repository.names");
 	private static final List<String> _publicOnlyGitRepositoryNames =
-		Collections.synchronizedList(
-			_getBuildPropertyAsList(
-				"git.working.directory.public.only.repository.names"));
+		_getBuildPropertyAsList(
+			"git.working.directory.public.only.repository.names");
 
 	private File _gitDirectory;
-	private final Map<String, GitRemote> _gitRemotes =
-		new ConcurrentHashMap<>();
+	private final Map<String, GitRemote> _gitRemotes = new HashMap<>();
 	private final String _gitRepositoryName;
 	private final String _gitRepositoryUsername;
 	private Set<String> _javaDirPaths;

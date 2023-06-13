@@ -12,9 +12,7 @@
  * details.
  */
 
-import {openModal, openSelectionModal, openToast} from 'frontend-js-web';
-
-import openDeleteFragmentCollectionModal from './openDeleteFragmentCollectionModal';
+import {openModal, openSelectionModal} from 'frontend-js-web';
 
 export const ACTIONS = {
 	deleteCollections({
@@ -24,7 +22,7 @@ export const ACTIONS = {
 	}) {
 		this.openFragmentCollectionsItemSelector(
 			Liferay.Language.get('delete'),
-			Liferay.Language.get('delete-fragment-set'),
+			Liferay.Language.get('delete-collection'),
 			viewDeleteFragmentCollectionsURL,
 			(selectedItems) => {
 				if (!selectedItems?.length) {
@@ -37,23 +35,22 @@ export const ACTIONS = {
 					return;
 				}
 
-				openDeleteFragmentCollectionModal({
-					multiple: true,
-					onDelete: () => {
-						let input = form.elements[`${portletNamespace}rowIds`];
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-delete-the-selected-entries'
+						)
+					)
+				) {
+					const input = document.createElement('input');
 
-						if (!input) {
-							input = document.createElement('input');
-							input.name = `${portletNamespace}rowIds`;
-						}
+					input.name = `${portletNamespace}rowIds`;
+					input.value = selectedItems.map((item) => item.value);
 
-						input.value = selectedItems.map((item) => item.value);
+					form.appendChild(input);
+				}
 
-						form.appendChild(input);
-
-						submitForm(form, deleteFragmentCollectionURL);
-					},
-				});
+				submitForm(form, deleteFragmentCollectionURL);
 			},
 			null,
 			portletNamespace
@@ -69,7 +66,7 @@ export const ACTIONS = {
 
 		this.openFragmentCollectionsItemSelector(
 			Liferay.Language.get('export'),
-			Liferay.Language.get('export-fragment-set'),
+			Liferay.Language.get('export-collection'),
 			viewExportFragmentCollectionsURL,
 			(selectedItems) => {
 				if (!selectedItems?.length) {
@@ -82,15 +79,10 @@ export const ACTIONS = {
 					return;
 				}
 
-				let input = form.elements[`${portletNamespace}rowIds`];
+				const input = document.createElement('input');
 
-				if (!input) {
-					input = document.createElement('input');
-					input.name = `${portletNamespace}rowIds`;
-				}
-
+				input.name = `${portletNamespace}rowIds`;
 				input.value = selectedItems.map((item) => item.value);
-				input.setAttribute('type', 'hidden');
 
 				form.appendChild(input);
 
@@ -100,7 +92,7 @@ export const ACTIONS = {
 			},
 			() => {
 				if (processed) {
-					openToast({
+					Liferay.Util.openToast({
 						message: Liferay.Language.get(
 							'your-request-processed-successfully'
 						),

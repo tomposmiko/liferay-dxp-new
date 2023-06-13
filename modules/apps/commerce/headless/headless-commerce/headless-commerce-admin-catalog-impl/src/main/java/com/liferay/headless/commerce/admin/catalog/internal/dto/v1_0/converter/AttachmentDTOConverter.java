@@ -14,7 +14,7 @@
 
 package com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter;
 
-import com.liferay.account.constants.AccountConstants;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.media.CommerceMediaResolver;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryService;
@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
@@ -43,8 +42,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Igor Beslic
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.product.model.CPAttachmentFileEntry",
-	service = DTOConverter.class
+	service = {AttachmentDTOConverter.class, DTOConverter.class}
 )
 public class AttachmentDTOConverter
 	implements DTOConverter<CPAttachmentFileEntry, Attachment> {
@@ -65,12 +65,10 @@ public class AttachmentDTOConverter
 		Company company = _companyLocalService.getCompany(
 			cpAttachmentFileEntry.getCompanyId());
 
-		String portalURL = _portal.getPortalURL(
-			company.getVirtualHostname(), _portal.getPortalServerPort(false),
-			true);
+		String portalURL = company.getPortalURL(0);
 
 		String downloadURL = _commerceMediaResolver.getDownloadURL(
-			AccountConstants.ACCOUNT_ENTRY_ID_ADMIN,
+			CommerceAccountConstants.ACCOUNT_ID_GUEST,
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 
 		return new Attachment() {
@@ -137,8 +135,5 @@ public class AttachmentDTOConverter
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Portal _portal;
 
 }

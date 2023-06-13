@@ -344,11 +344,6 @@ public class ChangesetCollectionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected ChangesetCollectionWrapper wrap(
 		ChangesetCollection changesetCollection) {
 

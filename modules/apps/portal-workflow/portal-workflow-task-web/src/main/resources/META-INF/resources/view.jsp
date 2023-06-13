@@ -17,21 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-String backURL = ParamUtil.getString(request, "backURL", redirect);
-
 DateSearchEntry dateSearchEntry = new DateSearchEntry();
 
 String displayStyle = workflowTaskDisplayContext.getDisplayStyle();
 
-if (Validator.isNotNull(backURL)) {
-	portletDisplay.setShowBackIcon(true);
-	portletDisplay.setURLBack(backURL);
-}
-else {
-	portletDisplay.setShowBackIcon(false);
-}
+portletDisplay.setShowBackIcon(false);
 %>
 
 <liferay-util:include page="/toolbar.jsp" servletContext="<%= application %>" />

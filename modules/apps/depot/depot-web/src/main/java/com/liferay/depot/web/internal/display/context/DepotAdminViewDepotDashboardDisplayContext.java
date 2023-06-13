@@ -20,13 +20,12 @@ import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.PanelCategoryRegistry;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPortletKeys;
-import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.tags.constants.AssetTagsAdminPortletKeys;
 import com.liferay.depot.web.internal.constants.DepotPortletKeys;
-import com.liferay.depot.web.internal.frontend.taglib.clay.servlet.taglib.DepotDashboardApplicationNavigationCard;
+import com.liferay.depot.web.internal.servlet.taglib.clay.DepotDashboardApplicationNavigationCard;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
-import com.liferay.frontend.taglib.clay.servlet.taglib.NavigationCard;
+import com.liferay.frontend.taglib.clay.servlet.taglib.soy.NavigationCard;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -35,7 +34,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.workflow.constants.WorkflowPortletKeys;
 import com.liferay.site.memberships.constants.SiteMembershipsPortletKeys;
-import com.liferay.staging.constants.StagingProcessesPortletKeys;
 import com.liferay.trash.constants.TrashPortletKeys;
 
 import java.util.ArrayList;
@@ -79,8 +77,17 @@ public class DepotAdminViewDepotDashboardDisplayContext {
 	public Collection<PanelApp> getPanelApps(PanelCategory panelCategory)
 		throws PortalException {
 
-		return _panelAppRegistry.getPanelApps(
-			panelCategory.getKey(), _permissionChecker, _group);
+		Collection<PanelApp> panelApps = new ArrayList<>();
+
+		for (PanelApp panelApp :
+				_panelAppRegistry.getPanelApps(panelCategory.getKey())) {
+
+			if (panelApp.isShow(_permissionChecker, _group)) {
+				panelApps.add(panelApp);
+			}
+		}
+
+		return panelApps;
 	}
 
 	public Iterable<PanelCategory> getPanelCategories() throws PortalException {
@@ -136,23 +143,19 @@ public class DepotAdminViewDepotDashboardDisplayContext {
 		HashMapBuilder.put(
 			AssetCategoriesAdminPortletKeys.ASSET_CATEGORIES_ADMIN, "categories"
 		).put(
-			AssetListPortletKeys.ASSET_LIST, "closed-book"
-		).put(
 			AssetTagsAdminPortletKeys.ASSET_TAGS_ADMIN, "tag"
 		).put(
 			DepotPortletKeys.DEPOT_SETTINGS, "cog"
 		).put(
 			DLPortletKeys.DOCUMENT_LIBRARY_ADMIN, "documents-and-media"
 		).put(
-			ExportImportPortletKeys.EXPORT, "upload"
+			ExportImportPortletKeys.EXPORT, "download"
 		).put(
-			ExportImportPortletKeys.IMPORT, "download"
+			ExportImportPortletKeys.IMPORT, "upload"
 		).put(
 			JournalPortletKeys.JOURNAL, "web-content"
 		).put(
 			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN, "users"
-		).put(
-			StagingProcessesPortletKeys.STAGING_PROCESSES, "staging"
 		).put(
 			TrashPortletKeys.TRASH, "trash"
 		).put(

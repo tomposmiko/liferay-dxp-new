@@ -21,6 +21,7 @@ CPInstanceCommercePriceEntryDisplayContext cpInstanceCommercePriceEntryDisplayCo
 
 CPInstance cpInstance = cpInstanceCommercePriceEntryDisplayContext.getCPInstance();
 long cpInstanceId = cpInstanceCommercePriceEntryDisplayContext.getCPInstanceId();
+PortletURL portletURL = cpInstanceCommercePriceEntryDisplayContext.getPortletURL();
 %>
 
 <portlet:actionURL name="/cp_definitions/edit_cp_instance_commerce_price_entry" var="addCommercePriceEntryURL" />
@@ -33,26 +34,27 @@ long cpInstanceId = cpInstanceCommercePriceEntryDisplayContext.getCPInstanceId()
 </aui:form>
 
 <div id="<portlet:namespace />entriesContainer">
-	<aui:form action="<%= cpInstanceCommercePriceEntryDisplayContext.getPortletURL() %>" method="post" name="fm">
+	<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="deleteCommercePriceEntryIds" type="hidden" />
 
 		<liferay-ui:error exception="<%= DuplicateCommercePriceEntryException.class %>" message="one-or-more-selected-entries-already-exist" />
 
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			contextParams='<%=
 				HashMapBuilder.<String, String>put(
-					"cpDefinitionId", String.valueOf(cpInstance.getCPDefinitionId())
-				).put(
 					"cpInstanceId", String.valueOf(cpInstanceId)
 				).build()
 			%>'
 			creationMenu="<%= cpInstanceCommercePriceEntryDisplayContext.getCreationMenu() %>"
-			dataProviderKey="<%= CommercePricingFDSNames.INSTANCE_PRICE_ENTRIES %>"
-			formName="fm"
-			id="<%= CommercePricingFDSNames.INSTANCE_PRICE_ENTRIES %>"
+			dataProviderKey="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_INSTANCE_PRICE_ENTRIES %>"
+			formId="fm"
+			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_INSTANCE_PRICE_ENTRIES %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= portletURL %>"
 			style="stacked"
 		/>
 	</aui:form>

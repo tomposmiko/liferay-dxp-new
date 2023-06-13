@@ -1,19 +1,19 @@
-@default = "isElementNotPresent"
-definition {
+<definition default="isElementNotPresent">
+	<command name="isElementNotPresent">
+		<if>
+			<condition selenium="isElementPresent" />
+			<then>
+				<execute selenium="isNotVisible" />
+			</then>
+			<else>
+				<execute selenium="isElementNotPresent" />
+			</else>
+		</if>
+	</command>
 
-	function isElementNotPresent {
-		if (selenium.isElementPresent()) {
-			selenium.isNotVisible();
-		}
-		else {
-			selenium.isElementNotPresent();
-		}
-	}
+	<command name="isNotVisible">
+		<execute selenium="waitForElementPresent" />
 
-	function isNotVisible {
-		selenium.waitForElementPresent();
-
-		selenium.isNotVisible();
-	}
-
-}
+		<execute selenium="isNotVisible" />
+	</command>
+</definition>

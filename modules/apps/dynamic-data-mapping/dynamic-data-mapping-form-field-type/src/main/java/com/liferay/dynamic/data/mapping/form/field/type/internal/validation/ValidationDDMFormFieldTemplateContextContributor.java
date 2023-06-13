@@ -16,7 +16,6 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.validation;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
-import com.liferay.dynamic.data.mapping.form.field.type.internal.util.NumericDDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.portal.kernel.json.JSONException;
@@ -37,8 +36,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Basto
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.VALIDATION,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		ValidationDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class ValidationDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -48,16 +51,10 @@ public class ValidationDDMFormFieldTemplateContextContributor
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-		String dataType = getDataType(
-			ddmFormField, ddmFormFieldRenderingContext);
-
 		return HashMapBuilder.<String, Object>put(
-			"dataType", dataType
+			"dataType", getDataType(ddmFormField, ddmFormFieldRenderingContext)
 		).put(
 			"value", _getValue(ddmFormFieldRenderingContext)
-		).putAll(
-			NumericDDMFormFieldTypeUtil.getParameters(
-				dataType, ddmFormField, ddmFormFieldRenderingContext)
 		).build();
 	}
 
@@ -105,7 +102,7 @@ public class ValidationDDMFormFieldTemplateContextContributor
 			}
 			catch (JSONException jsonException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(jsonException);
+					_log.warn(jsonException, jsonException);
 				}
 			}
 		}

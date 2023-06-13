@@ -20,6 +20,7 @@ import com.liferay.layout.friendly.url.LayoutFriendlyURLEntryHelper;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 import org.osgi.service.component.annotations.Component;
@@ -28,9 +29,17 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = ServiceWrapper.class)
+@Component(immediate = true, service = ServiceWrapper.class)
 public class LayoutLocalServiceWrapper
 	extends com.liferay.portal.kernel.service.LayoutLocalServiceWrapper {
+
+	public LayoutLocalServiceWrapper() {
+		super(null);
+	}
+
+	public LayoutLocalServiceWrapper(LayoutLocalService layoutLocalService) {
+		super(layoutLocalService);
+	}
 
 	@Override
 	public Layout fetchLayoutByFriendlyURL(

@@ -6,13 +6,13 @@
 .portlet-msg-info,
 .portlet-msg-progress,
 .portlet-msg-success {
-	@extend .alert !optional;
+	@extend .alert;
 }
 
 .portlet-msg-help,
 .portlet-msg-info,
 .portlet-msg-progress {
-	@extend .alert-info !optional;
+	@extend .alert-info;
 }
 
 .portlet-msg-progress {
@@ -25,19 +25,19 @@
 // ---------- Error messages ----------
 
 .portlet-msg-error {
-	@extend .alert-danger !optional;
+	@extend .alert-danger;
 }
 
 // ---------- Alert messages ----------
 
 .portlet-msg-alert {
-	@extend .alert-warning !optional;
+	@extend .alert-warning;
 }
 
 // ---------- Success messages ----------
 
 .portlet-msg-success {
-	@extend .alert-success !optional;
+	@extend .alert-success;
 }
 
 // ---------- Misc ----------

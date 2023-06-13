@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
-import java.util.Objects;
-
 /**
  * @author Brian Wing Shun Chan
  */
@@ -50,14 +48,6 @@ public class PrincipalThreadLocal {
 	}
 
 	public static void setName(String name) {
-		if (Objects.equals(_name.get(), name)) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Skip setName " + name);
-			}
-
-			return;
-		}
-
 		if (_log.isDebugEnabled()) {
 			_log.debug("setName " + name);
 		}

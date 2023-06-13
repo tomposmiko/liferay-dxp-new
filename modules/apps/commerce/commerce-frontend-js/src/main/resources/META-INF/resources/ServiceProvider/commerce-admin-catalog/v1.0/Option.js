@@ -28,10 +28,8 @@ function resolveOptionValuesPath(basePath = '', optionId = '') {
 	return `${basePath}${VERSION}${OPTIONS_PATH}/${optionId}${OPTION_VALUES_PATH}`;
 }
 
-export default function Option(basePath) {
-	return {
-		createOption: (json) => AJAX.POST(resolveOptionsPath(basePath), json),
-		createOptionValue: (optionId, json) =>
-			AJAX.POST(resolveOptionValuesPath(basePath, optionId), json),
-	};
-}
+export default (basePath) => ({
+	createOption: (json) => AJAX.POST(resolveOptionsPath(basePath), json),
+	createOptionValue: (optionId, json) =>
+		AJAX.POST(resolveOptionValuesPath(basePath, optionId), json),
+});

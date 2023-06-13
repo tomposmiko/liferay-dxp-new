@@ -109,8 +109,11 @@ public class TransactionInvokerUtilTest {
 		}
 		catch (Throwable throwable) {
 			Assert.assertSame(exception1, throwable);
-			Assert.assertNull(
-				_classNameLocalService.fetchClassName(classNameId));
+
+			ClassName className = _classNameLocalService.fetchClassName(
+				classNameId);
+
+			Assert.assertNull(className);
 		}
 		finally {
 			try {

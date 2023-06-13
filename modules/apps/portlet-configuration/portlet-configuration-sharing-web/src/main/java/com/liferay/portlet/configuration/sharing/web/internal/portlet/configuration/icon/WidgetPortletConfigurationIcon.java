@@ -16,7 +16,7 @@ package com.liferay.portlet.configuration.sharing.web.internal.portlet.configura
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
@@ -29,9 +29,12 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.configuration.sharing.web.internal.constants.PortletConfigurationSharingPortletKeys;
+
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -43,13 +46,16 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class WidgetPortletConfigurationIcon
 	extends BasePortletConfigurationIcon {
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "add-to-any-website");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getLocale(portletRequest), getClass());
+
+		return LanguageUtil.get(resourceBundle, "add-to-any-website");
 	}
 
 	@Override
@@ -69,7 +75,7 @@ public class WidgetPortletConfigurationIcon
 			return portletURL.toString();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return StringPool.BLANK;
 		}
@@ -119,9 +125,6 @@ public class WidgetPortletConfigurationIcon
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		WidgetPortletConfigurationIcon.class);
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

@@ -19,7 +19,7 @@ import com.liferay.asset.info.item.provider.AssetEntryInfoItemFieldSetProvider;
 import com.liferay.dynamic.data.mapping.info.item.provider.DDMFormValuesInfoFieldValuesProvider;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.dynamic.data.mapping.service.DDMFieldLocalService;
+import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
 import com.liferay.expando.info.item.provider.ExpandoInfoItemFieldSetProvider;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.request.attributes.contributor.InfoDisplayRequestAttributesContributor;
@@ -29,22 +29,21 @@ import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.info.type.WebImage;
-import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.util.JournalContent;
-import com.liferay.journal.util.JournalHelper;
+import com.liferay.journal.util.JournalConverter;
+import com.liferay.journal.util.comparator.ArticleVersionComparator;
+import com.liferay.journal.web.internal.asset.JournalArticleDDMFormValuesReader;
 import com.liferay.journal.web.internal.info.item.JournalArticleInfoItemFields;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -76,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
-	property = Constants.SERVICE_RANKING + ":Integer=10",
+	immediate = true, property = Constants.SERVICE_RANKING + ":Integer=10",
 	service = InfoItemFieldValuesProvider.class
 )
 public class JournalArticleInfoItemFieldValuesProvider
@@ -124,8 +123,21 @@ public class JournalArticleInfoItemFieldValuesProvider
 	private List<InfoFieldValue<Object>> _getDDMStructureInfoFieldValues(
 		JournalArticle article) {
 
-		return _ddmFormValuesInfoFieldValuesProvider.getInfoFieldValues(
-			article, article.getDDMFormValues());
+		JournalArticleDDMFormValuesReader journalArticleDDMFormValuesReader =
+			new JournalArticleDDMFormValuesReader(article);
+
+		journalArticleDDMFormValuesReader.setFieldsToDDMFormValuesConverter(
+			_fieldsToDDMFormValuesConverter);
+		journalArticleDDMFormValuesReader.setJournalConverter(
+			_journalConverter);
+
+		try {
+			return _ddmFormValuesInfoFieldValuesProvider.getInfoFieldValues(
+				article, journalArticleDDMFormValuesReader.getDDMFormValues());
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
 	}
 
 	private List<InfoFieldValue<Object>> _getDDMTemplateInfoFieldValues(
@@ -153,24 +165,9 @@ public class JournalArticleInfoItemFieldValuesProvider
 			JournalArticle journalArticle, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		String friendlyURL =
-			_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
-				JournalArticle.class.getName(),
-				journalArticle.getResourcePrimKey(), themeDisplay);
-
-		if (Validator.isNotNull(friendlyURL)) {
-			return friendlyURL;
-		}
-
-		Layout layout = journalArticle.getLayout();
-
-		if (layout == null) {
-			return StringPool.BLANK;
-		}
-
-		return _journalHelper.createURLPattern(
-			journalArticle, themeDisplay.getLocale(), layout.isPrivateLayout(),
-			JournalArticleConstants.CANONICAL_URL_SEPARATOR, themeDisplay);
+		return _assetDisplayPageFriendlyURLProvider.getFriendlyURL(
+			JournalArticle.class.getName(), journalArticle.getResourcePrimKey(),
+			themeDisplay);
 	}
 
 	private String _getInfoItemFormVariationKey(JournalArticle journalArticle) {
@@ -224,17 +221,12 @@ public class JournalArticleInfoItemFieldValuesProvider
 				if (Validator.isNotNull(articleImageURL)) {
 					journalArticleFieldValues.add(
 						new InfoFieldValue<>(
-							JournalArticleInfoItemFields.previewImageInfoField,
-							new WebImage(articleImageURL)));
-
-					journalArticleFieldValues.add(
-						new InfoFieldValue<>(
 							JournalArticleInfoItemFields.smallImageInfoField,
 							new WebImage(articleImageURL)));
 				}
 			}
 
-			User user = _userLocalService.fetchUser(journalArticle.getUserId());
+			User user = _getLastVersionUser(journalArticle);
 
 			if (user != null) {
 				journalArticleFieldValues.add(
@@ -257,7 +249,7 @@ public class JournalArticleInfoItemFieldValuesProvider
 			}
 
 			User lastEditorUser = _userLocalService.fetchUser(
-				journalArticle.getStatusByUserId());
+				journalArticle.getUserId());
 
 			if (lastEditorUser != null) {
 				journalArticleFieldValues.add(
@@ -318,12 +310,8 @@ public class JournalArticleInfoItemFieldValuesProvider
 			InfoField.builder(
 			).infoFieldType(
 				TextInfoFieldType.INSTANCE
-			).namespace(
-				StringPool.BLANK
 			).name(
 				fieldName
-			).attribute(
-				TextInfoFieldType.HTML, true
 			).labelInfoLocalizedValue(
 				InfoLocalizedValue.localize(getClass(), fieldName)
 			).build(),
@@ -334,7 +322,7 @@ public class JournalArticleInfoItemFieldValuesProvider
 					themeDisplay.getRequest();
 
 				InfoItemDetailsProvider infoItemDetailsProvider =
-					_infoItemServiceRegistry.getFirstInfoItemService(
+					_infoItemServiceTracker.getFirstInfoItemService(
 						InfoItemDetailsProvider.class,
 						JournalArticle.class.getName());
 
@@ -392,6 +380,16 @@ public class JournalArticleInfoItemFieldValuesProvider
 			});
 	}
 
+	private User _getLastVersionUser(JournalArticle journalArticle) {
+		List<JournalArticle> articles = _journalArticleLocalService.getArticles(
+			journalArticle.getGroupId(), journalArticle.getArticleId(), 0, 1,
+			new ArticleVersionComparator(true));
+
+		journalArticle = articles.get(0);
+
+		return _userLocalService.fetchUser(journalArticle.getUserId());
+	}
+
 	private String _getTemplateKey(DDMTemplate ddmTemplate) {
 		String templateKey = ddmTemplate.getTemplateKey();
 
@@ -419,14 +417,14 @@ public class JournalArticleInfoItemFieldValuesProvider
 		_assetEntryInfoItemFieldSetProvider;
 
 	@Reference
-	private DDMFieldLocalService _ddmFieldLocalService;
-
-	@Reference
 	private DDMFormValuesInfoFieldValuesProvider
 		_ddmFormValuesInfoFieldValuesProvider;
 
 	@Reference
 	private ExpandoInfoItemFieldSetProvider _expandoInfoItemFieldSetProvider;
+
+	@Reference
+	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
 
 	@Reference
 	private volatile List<InfoDisplayRequestAttributesContributor>
@@ -437,7 +435,7 @@ public class JournalArticleInfoItemFieldValuesProvider
 		_infoItemFieldReaderFieldSetProvider;
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
@@ -446,7 +444,7 @@ public class JournalArticleInfoItemFieldValuesProvider
 	private JournalContent _journalContent;
 
 	@Reference
-	private JournalHelper _journalHelper;
+	private JournalConverter _journalConverter;
 
 	@Reference
 	private TemplateInfoItemFieldSetProvider _templateInfoItemFieldSetProvider;

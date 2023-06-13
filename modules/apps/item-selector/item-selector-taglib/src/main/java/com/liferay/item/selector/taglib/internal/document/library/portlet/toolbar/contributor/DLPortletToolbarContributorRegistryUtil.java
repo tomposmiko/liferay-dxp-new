@@ -33,7 +33,9 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = {})
+@Component(
+	immediate = true, service = DLPortletToolbarContributorRegistryUtil.class
+)
 public class DLPortletToolbarContributorRegistryUtil {
 
 	public static DLPortletToolbarContributor getDLPortletToolbarContributor() {
@@ -55,7 +57,9 @@ public class DLPortletToolbarContributorRegistryUtil {
 
 	private static DLPortletToolbarContributor _dlPortletToolbarContributor;
 
-	private ServiceTrackerList<DLPortletToolbarContributor> _serviceTrackerList;
+	private ServiceTrackerList
+		<DLPortletToolbarContributor, DLPortletToolbarContributor>
+			_serviceTrackerList;
 
 	private class AggregateDLPortletToolbarContributor
 		implements DLPortletToolbarContributor {

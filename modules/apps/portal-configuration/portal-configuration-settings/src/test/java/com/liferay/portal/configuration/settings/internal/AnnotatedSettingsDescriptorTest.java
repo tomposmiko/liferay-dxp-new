@@ -38,47 +38,32 @@ public class AnnotatedSettingsDescriptorTest {
 
 	@Test
 	public void testGetAllKeys() {
-		Set<String> allKeys1 = _annotatedSettingsDescriptor.getAllKeys();
+		Set<String> allKeys = _annotatedSettingsDescriptor.getAllKeys();
 
 		Collection<String> expectedAllKeys = Arrays.asList(
 			"boolean", "long", "string", "stringArray1", "stringArray2",
 			"unrenamedProperty");
 
 		Assert.assertEquals(
-			allKeys1.toString(), expectedAllKeys.size(), allKeys1.size());
-		Assert.assertTrue(allKeys1.containsAll(expectedAllKeys));
-
-		allKeys1.remove("long");
-
-		Set<String> allKeys2 = _annotatedSettingsDescriptor.getAllKeys();
-
-		Assert.assertTrue(allKeys2.containsAll(expectedAllKeys));
+			allKeys.toString(), expectedAllKeys.size(), allKeys.size());
+		Assert.assertTrue(allKeys.containsAll(expectedAllKeys));
 	}
 
 	@Test
 	public void testGetMultiValuedKeys() {
-		Set<String> multiValuedKeys1 =
+		Set<String> multiValuedKeys =
 			_annotatedSettingsDescriptor.getMultiValuedKeys();
 
 		Collection<String> expectedMultiValuedKeys = Arrays.asList(
 			"stringArray1", "stringArray2");
 
 		Assert.assertEquals(
-			multiValuedKeys1.toString(), expectedMultiValuedKeys.size(),
-			multiValuedKeys1.size());
-		Assert.assertTrue(
-			multiValuedKeys1.containsAll(expectedMultiValuedKeys));
-
-		multiValuedKeys1.remove("stringArray1");
-
-		Set<String> multiValuedKeys2 =
-			_annotatedSettingsDescriptor.getMultiValuedKeys();
-
-		Assert.assertTrue(
-			multiValuedKeys2.containsAll(expectedMultiValuedKeys));
+			multiValuedKeys.toString(), expectedMultiValuedKeys.size(),
+			multiValuedKeys.size());
+		Assert.assertTrue(multiValuedKeys.containsAll(expectedMultiValuedKeys));
 	}
 
-	@Settings.Config
+	@Settings.Config(settingsIds = {"settingsId.1", "settingsId.2"})
 	public class MockSettings {
 
 		public boolean getBoolean() {

@@ -19,10 +19,10 @@
 <%
 Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 
-UnicodeProperties layoutTypeSettingsUnicodeProperties = null;
+UnicodeProperties layoutTypeSettings = null;
 
 if (selLayout != null) {
-	layoutTypeSettingsUnicodeProperties = selLayout.getTypeSettingsProperties();
+	layoutTypeSettings = selLayout.getTypeSettingsProperties();
 }
 %>
 
@@ -33,29 +33,4 @@ if (selLayout != null) {
 
 <aui:model-context bean="<%= selLayout %>" model="<%= Layout.class %>" />
 
-<%
-LayoutLookAndFeelDisplayContext layoutLookAndFeelDisplayContext = new LayoutLookAndFeelDisplayContext(request, layoutsAdminDisplayContext, liferayPortletResponse);
-%>
-
-<liferay-frontend:fieldset
-	collapsed="<%= false %>"
-	collapsible="<%= true %>"
-	label="javascript-client-extensions"
->
-	<react:component
-		module="js/layout/look_and_feel/GlobalJSCETsConfiguration"
-		props="<%= layoutLookAndFeelDisplayContext.getGlobalJSCETsConfigurationProps(Layout.class.getName(), selLayout.getPlid()) %>"
-	/>
-</liferay-frontend:fieldset>
-
-<liferay-frontend:fieldset
-	collapsed="<%= false %>"
-	collapsible="<%= true %>"
-	label="custom-javascript"
->
-	<aui:input cssClass="propagatable-field" disabled="<%= selLayout.isLayoutPrototypeLinkActive() %>" label="javascript" name="TypeSettingsProperties--javascript--" placeholder="javascript" type="textarea" value='<%= layoutTypeSettingsUnicodeProperties.getProperty("javascript") %>' wrap="soft" wrapperCssClass="mb-0" />
-
-	<p class="text-secondary">
-		<liferay-ui:message key="this-javascript-code-is-executed-at-the-bottom-of-the-page" />
-	</p>
-</liferay-frontend:fieldset>
+<aui:input cssClass="propagatable-field" disabled="<%= selLayout.isLayoutPrototypeLinkActive() %>" label="paste-javascript-code-that-is-executed-at-the-bottom-of-the-page" name="TypeSettingsProperties--javascript--" placeholder="javascript" type="textarea" value='<%= layoutTypeSettings.getProperty("javascript") %>' wrap="soft" />

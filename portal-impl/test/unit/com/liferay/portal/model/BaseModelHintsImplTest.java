@@ -172,13 +172,19 @@ public class BaseModelHintsImplTest {
 
 	@Test
 	public void testGetMaxLength() {
-		Assert.assertEquals(
-			75, _testBaseModelHintsImpl.getMaxLength(_MODEL, "simpleField"));
-		Assert.assertEquals(
-			150, _testBaseModelHintsImpl.getMaxLength(_MODEL, "hintField"));
-		Assert.assertEquals(
-			4000,
-			_testBaseModelHintsImpl.getMaxLength(_MODEL, "combinedField"));
+		int maxLength = _testBaseModelHintsImpl.getMaxLength(
+			_MODEL, "simpleField");
+
+		Assert.assertEquals(75, maxLength);
+
+		maxLength = _testBaseModelHintsImpl.getMaxLength(_MODEL, "hintField");
+
+		Assert.assertEquals(150, maxLength);
+
+		maxLength = _testBaseModelHintsImpl.getMaxLength(
+			_MODEL, "combinedField");
+
+		Assert.assertEquals(4000, maxLength);
 	}
 
 	@Test

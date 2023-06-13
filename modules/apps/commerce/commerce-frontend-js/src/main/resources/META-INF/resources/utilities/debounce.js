@@ -12,14 +12,41 @@
  * details.
  */
 
-export function debouncePromise(f, interval) {
+export default function debounce(func, wait, immediate) {
+	let timeout;
+
+	return () => {
+		const context = this;
+		const args = arguments;
+
+		function later() {
+			timeout = null;
+			if (!immediate) {
+				func.apply(context, args);
+			}
+		}
+		const callNow = immediate && !timeout;
+
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) {
+			func.apply(context, args);
+		}
+	};
+}
+
+export function debouncePromise(inner, ms = 0) {
 	let timer = null;
+	let resolves = [];
 
-	return (...args) => {
+	return function (...args) {
 		clearTimeout(timer);
+		timer = setTimeout(() => {
+			const result = inner(...args);
+			resolves.forEach((r) => r(result));
+			resolves = [];
+		}, ms);
 
-		return new Promise((resolve) => {
-			timer = setTimeout(() => resolve(f(...args)), interval);
-		});
+		return new Promise((r) => resolves.push(r));
 	};
 }

@@ -37,6 +37,8 @@ import com.liferay.portal.kernel.xml.Element;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -44,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = StagingAssetEntryHelper.class)
+@Component(immediate = true, service = StagingAssetEntryHelper.class)
 public class StagingAssetEntryHelperImpl implements StagingAssetEntryHelper {
 
 	@Override
@@ -64,7 +66,7 @@ public class StagingAssetEntryHelperImpl implements StagingAssetEntryHelper {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return;
@@ -138,9 +140,13 @@ public class StagingAssetEntryHelperImpl implements StagingAssetEntryHelper {
 
 		// Try to fetch the existing staged model from the company
 
-		List<AssetEntry> companyAssetEntries = ListUtil.filter(
-			assetEntries,
-			entry -> entry.getCompanyId() == group.getCompanyId());
+		Stream<AssetEntry> assetEntryStream = assetEntries.stream();
+
+		List<AssetEntry> companyAssetEntries = assetEntryStream.filter(
+			entry -> entry.getCompanyId() == group.getCompanyId()
+		).collect(
+			Collectors.toList()
+		);
 
 		if (ListUtil.isEmpty(companyAssetEntries)) {
 			return null;
@@ -154,7 +160,7 @@ public class StagingAssetEntryHelperImpl implements StagingAssetEntryHelper {
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}
@@ -179,7 +185,7 @@ public class StagingAssetEntryHelperImpl implements StagingAssetEntryHelper {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;

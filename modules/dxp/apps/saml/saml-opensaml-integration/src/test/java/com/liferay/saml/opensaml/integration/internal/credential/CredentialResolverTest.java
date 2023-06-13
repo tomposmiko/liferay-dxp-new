@@ -14,33 +14,29 @@
 
 package com.liferay.saml.opensaml.integration.internal.credential;
 
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.saml.opensaml.integration.internal.BaseSamlTestCase;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.security.credential.Credential;
 
+import org.powermock.modules.junit4.PowerMockRunner;
+
 /**
  * @author Mika Koivisto
  */
+@RunWith(PowerMockRunner.class)
 public class CredentialResolverTest extends BaseSamlTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testResolveIdpCredential() throws Exception {
 		prepareIdentityProvider(IDP_ENTITY_ID);
-		_testResolveCredential(IDP_ENTITY_ID);
+		testResolveCredential(IDP_ENTITY_ID);
 	}
 
 	@Test
@@ -59,10 +55,10 @@ public class CredentialResolverTest extends BaseSamlTestCase {
 	@Test
 	public void testResolveSpCredential() throws Exception {
 		prepareServiceProvider(SP_ENTITY_ID);
-		_testResolveCredential(SP_ENTITY_ID);
+		testResolveCredential(SP_ENTITY_ID);
 	}
 
-	private void _testResolveCredential(String spEntityId) throws Exception {
+	protected void testResolveCredential(String spEntityId) throws Exception {
 		EntityIdCriterion entityIDCriterion = new EntityIdCriterion(spEntityId);
 
 		CriteriaSet criteriaSet = new CriteriaSet();

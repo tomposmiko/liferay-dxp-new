@@ -42,8 +42,8 @@ public class RoleUpgradeProcess extends UpgradeProcess {
 						"'");
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"delete from ResourcePermission where roleId = ?")) {
+					connection.prepareStatement(
+						"delete from ResourcePermission where roleId = ?"))) {
 
 			try (ResultSet resultSet = preparedStatement1.executeQuery()) {
 				while (resultSet.next()) {

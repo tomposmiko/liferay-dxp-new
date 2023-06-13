@@ -28,10 +28,6 @@ public class SocialActivityInterpreterLocalServiceWrapper
 	implements ServiceWrapper<SocialActivityInterpreterLocalService>,
 			   SocialActivityInterpreterLocalService {
 
-	public SocialActivityInterpreterLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SocialActivityInterpreterLocalServiceWrapper(
 		SocialActivityInterpreterLocalService
 			socialActivityInterpreterLocalService) {

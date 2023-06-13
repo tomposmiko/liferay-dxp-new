@@ -20,7 +20,6 @@ import com.liferay.calendar.model.CalendarTable;
 import com.liferay.calendar.model.impl.CalendarImpl;
 import com.liferay.calendar.model.impl.CalendarModelImpl;
 import com.liferay.calendar.service.persistence.CalendarPersistence;
-import com.liferay.calendar.service.persistence.CalendarUtil;
 import com.liferay.calendar.service.persistence.impl.constants.CalendarPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -40,6 +39,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -49,11 +49,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo Lundgren
  * @generated
  */
-@Component(service = CalendarPersistence.class)
+@Component(service = {CalendarPersistence.class, BasePersistence.class})
 public class CalendarPersistenceImpl
 	extends BasePersistenceImpl<Calendar> implements CalendarPersistence {
 
@@ -203,7 +202,7 @@ public class CalendarPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Calendar>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Calendar calendar : list) {
@@ -592,7 +591,7 @@ public class CalendarPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -728,7 +727,7 @@ public class CalendarPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof Calendar) {
@@ -848,7 +847,7 @@ public class CalendarPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1019,7 +1018,7 @@ public class CalendarPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Calendar>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Calendar calendar : list) {
@@ -1440,7 +1439,7 @@ public class CalendarPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1610,7 +1609,7 @@ public class CalendarPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Calendar>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Calendar calendar : list) {
@@ -2352,7 +2351,7 @@ public class CalendarPersistenceImpl
 
 			finderArgs = new Object[] {groupId, calendarResourceId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2574,7 +2573,7 @@ public class CalendarPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Calendar>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Calendar calendar : list) {
@@ -3364,7 +3363,7 @@ public class CalendarPersistenceImpl
 				groupId, calendarResourceId, defaultCalendar
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3611,7 +3610,7 @@ public class CalendarPersistenceImpl
 		calendar.setNew(true);
 		calendar.setPrimaryKey(calendarId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		calendar.setUuid(uuid);
 
@@ -3726,7 +3725,7 @@ public class CalendarPersistenceImpl
 		CalendarModelImpl calendarModelImpl = (CalendarModelImpl)calendar;
 
 		if (Validator.isNull(calendar.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			calendar.setUuid(uuid);
 		}
@@ -3849,7 +3848,7 @@ public class CalendarPersistenceImpl
 	 */
 	@Override
 	public Calendar fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(Calendar.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(Calendar.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4063,7 +4062,7 @@ public class CalendarPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Calendar>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4139,7 +4138,7 @@ public class CalendarPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -4373,30 +4372,11 @@ public class CalendarPersistenceImpl
 			},
 			new String[] {"groupId", "calendarResourceId", "defaultCalendar"},
 			false);
-
-		_setCalendarUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCalendarUtilPersistence(null);
-
 		entityCache.removeCache(CalendarImpl.class.getName());
-	}
-
-	private void _setCalendarUtilPersistence(
-		CalendarPersistence calendarPersistence) {
-
-		try {
-			Field field = CalendarUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, calendarPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -4489,6 +4469,6 @@ public class CalendarPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private CalendarModelArgumentsResolver _calendarModelArgumentsResolver;
 
 }

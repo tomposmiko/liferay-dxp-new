@@ -43,7 +43,6 @@ export default function BasicInformation({
 					</ClayLayout.ContentRow>
 				</div>
 			</ClayLayout.ContentCol>
-
 			<ClayLayout.ContentCol expand>
 				<ClayLayout.ContentRow>
 					<span className="font-weight-semi-bold text-truncate-inline">
@@ -56,7 +55,6 @@ export default function BasicInformation({
 						</span>
 					</span>
 				</ClayLayout.ContentRow>
-
 				<ClayLayout.ContentRow>
 					<span
 						className="text-truncate text-truncate-reverse"

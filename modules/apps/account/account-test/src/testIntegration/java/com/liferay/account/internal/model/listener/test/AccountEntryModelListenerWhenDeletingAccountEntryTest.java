@@ -59,7 +59,8 @@ public class AccountEntryModelListenerWhenDeletingAccountEntryTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_accountEntry = AccountEntryTestUtil.addAccountEntry();
+		_accountEntry = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
 	}
 
 	@Test

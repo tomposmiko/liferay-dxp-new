@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Akos Thurzo
  */
-@Component(service = XStreamConfigurator.class)
+@Component(immediate = true, service = XStreamConfigurator.class)
 public class ExpandoXStreamConfigurator implements XStreamConfigurator {
 
 	@Override

@@ -17,10 +17,11 @@ package com.liferay.commerce.machine.learning.forecast.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.machine.learning.forecast.SkuCommerceMLForecast;
 import com.liferay.commerce.machine.learning.forecast.SkuCommerceMLForecastManager;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -35,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,7 +61,10 @@ public class SkuCommerceMLForecastManagerTest {
 	public void setUp() throws Exception {
 		_actualDate = RandomTestUtil.nextDate();
 
-		_skuCommerceMLForecasts = _addSkuCommerceMLForecasts();
+		_company = CompanyTestUtil.addCompany();
+
+		_skuCommerceMLForecasts = _populateEntries(
+			4, _FORECAST_LENGTH + _HISTORY_LENGTH);
 	}
 
 	@Test
@@ -69,7 +75,7 @@ public class SkuCommerceMLForecastManagerTest {
 					0, _skuCommerceMLForecasts.size() - 1));
 
 		IdempotentRetryAssert.retryAssert(
-			5, TimeUnit.SECONDS, 1, TimeUnit.SECONDS,
+			1, TimeUnit.SECONDS, 3, TimeUnit.SECONDS,
 			() -> {
 				_assertResultEquals(
 					skuCommerceMLForecast.getForecastId(),
@@ -86,52 +92,25 @@ public class SkuCommerceMLForecastManagerTest {
 				RandomTestUtil.randomInt(
 					0, _skuCommerceMLForecasts.size() - 1));
 
+		Stream<SkuCommerceMLForecast> skuCommerceMLForecastStream =
+			_skuCommerceMLForecasts.stream();
+
+		List<SkuCommerceMLForecast> skuCommerceMLForecasts =
+			skuCommerceMLForecastStream.filter(
+				forecast -> Objects.equals(
+					forecast.getSku(), skuCommerceMLForecast.getSku())
+			).collect(
+				Collectors.toList()
+			);
+
 		IdempotentRetryAssert.retryAssert(
-			5, TimeUnit.SECONDS, 1, TimeUnit.SECONDS,
+			1, TimeUnit.SECONDS, 3, TimeUnit.SECONDS,
 			() -> {
 				_assertResultEquals(
-					skuCommerceMLForecast.getSku(),
-					ListUtil.filter(
-						_skuCommerceMLForecasts,
-						forecast -> Objects.equals(
-							skuCommerceMLForecast.getSku(),
-							forecast.getSku())));
+					skuCommerceMLForecast.getSku(), skuCommerceMLForecasts);
 
 				return null;
 			});
-	}
-
-	private List<SkuCommerceMLForecast> _addSkuCommerceMLForecasts()
-		throws Exception {
-
-		List<SkuCommerceMLForecast> skuCommerceMLForecasts = new ArrayList<>();
-
-		LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(
-			_actualDate.toInstant(), ZoneOffset.systemDefault());
-
-		endLocalDateTime = endLocalDateTime.truncatedTo(ChronoUnit.DAYS);
-
-		endLocalDateTime = endLocalDateTime.withDayOfMonth(1);
-
-		endLocalDateTime = endLocalDateTime.plusMonths(_FORECAST_LENGTH);
-
-		for (int i = 0; i < _FORECAST_COUNT; i++) {
-			String sku = RandomTestUtil.randomString();
-
-			for (int j = 0; j < (_FORECAST_LENGTH + _HISTORY_LENGTH); j++) {
-				SkuCommerceMLForecast skuCommerceMLForecast =
-					_createSkuCommerceMLForecast(
-						sku, _toDate(endLocalDateTime.minusMonths(j)));
-
-				skuCommerceMLForecast =
-					_skuCommerceMLForecastManager.addSkuCommerceMLForecast(
-						skuCommerceMLForecast);
-
-				skuCommerceMLForecasts.add(skuCommerceMLForecast);
-			}
-		}
-
-		return skuCommerceMLForecasts;
 	}
 
 	private void _assertResultEquals(
@@ -141,7 +120,7 @@ public class SkuCommerceMLForecastManagerTest {
 
 		SkuCommerceMLForecast skuCommerceMLForecast =
 			_skuCommerceMLForecastManager.getSkuCommerceMLForecast(
-				TestPropsValues.getCompanyId(), forecastId);
+				_company.getCompanyId(), forecastId);
 
 		Assert.assertNotNull(skuCommerceMLForecast);
 
@@ -162,8 +141,8 @@ public class SkuCommerceMLForecastManagerTest {
 		List<SkuCommerceMLForecast> skuCommerceMLForecasts =
 			_skuCommerceMLForecastManager.
 				getMonthlyQuantitySkuCommerceMLForecasts(
-					TestPropsValues.getCompanyId(), sku, _actualDate,
-					_HISTORY_LENGTH, _FORECAST_LENGTH);
+					_company.getCompanyId(), sku, _actualDate, _HISTORY_LENGTH,
+					_FORECAST_LENGTH);
 
 		Assert.assertEquals(
 			"Forecast list size", expectedSkuCommerceMLForecasts.size(),
@@ -199,19 +178,18 @@ public class SkuCommerceMLForecastManagerTest {
 	}
 
 	private SkuCommerceMLForecast _createSkuCommerceMLForecast(
-			String sku, Date timestamp)
-		throws Exception {
+		String sku, Date timestamp) {
 
 		SkuCommerceMLForecast skuCommerceMLForecast =
 			_skuCommerceMLForecastManager.create();
 
-		skuCommerceMLForecast.setActual((float)RandomTestUtil.randomDouble());
-		skuCommerceMLForecast.setCompanyId(TestPropsValues.getCompanyId());
-		skuCommerceMLForecast.setForecast((float)RandomTestUtil.randomDouble());
+		skuCommerceMLForecast.setActual((float)RandomTestUtil.nextDouble());
+		skuCommerceMLForecast.setCompanyId(_company.getCompanyId());
+		skuCommerceMLForecast.setForecast((float)RandomTestUtil.nextDouble());
 		skuCommerceMLForecast.setForecastLowerBound(
-			(float)RandomTestUtil.randomDouble());
+			(float)RandomTestUtil.nextDouble());
 		skuCommerceMLForecast.setForecastUpperBound(
-			(float)RandomTestUtil.randomDouble());
+			(float)RandomTestUtil.nextDouble());
 		skuCommerceMLForecast.setSku(sku);
 		skuCommerceMLForecast.setJobId(RandomTestUtil.randomString());
 		skuCommerceMLForecast.setPeriod("month");
@@ -221,6 +199,40 @@ public class SkuCommerceMLForecastManagerTest {
 		return skuCommerceMLForecast;
 	}
 
+	private List<SkuCommerceMLForecast> _populateEntries(
+			int forecastCount, int seriesLength)
+		throws Exception {
+
+		List<SkuCommerceMLForecast> skuCommerceMLForecasts = new ArrayList<>();
+
+		LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(
+			_actualDate.toInstant(), ZoneOffset.systemDefault());
+
+		endLocalDateTime = endLocalDateTime.truncatedTo(ChronoUnit.DAYS);
+
+		endLocalDateTime = endLocalDateTime.withDayOfMonth(1);
+
+		endLocalDateTime = endLocalDateTime.plusMonths(_FORECAST_LENGTH);
+
+		for (int i = 0; i < forecastCount; i++) {
+			String sku = RandomTestUtil.randomString();
+
+			for (int j = 0; j < seriesLength; j++) {
+				SkuCommerceMLForecast skuCommerceMLForecast =
+					_createSkuCommerceMLForecast(
+						sku, _toDate(endLocalDateTime.minusMonths(j)));
+
+				skuCommerceMLForecast =
+					_skuCommerceMLForecastManager.addSkuCommerceMLForecast(
+						skuCommerceMLForecast);
+
+				skuCommerceMLForecasts.add(skuCommerceMLForecast);
+			}
+		}
+
+		return skuCommerceMLForecasts;
+	}
+
 	private Date _toDate(LocalDateTime localDateTime) {
 		ZonedDateTime zonedDateTime = localDateTime.atZone(
 			ZoneOffset.systemDefault());
@@ -228,13 +240,14 @@ public class SkuCommerceMLForecastManagerTest {
 		return Date.from(zonedDateTime.toInstant());
 	}
 
-	private static final int _FORECAST_COUNT = 4;
-
 	private static final int _FORECAST_LENGTH = 2;
 
 	private static final int _HISTORY_LENGTH = 9;
 
 	private Date _actualDate;
+
+	@DeleteAfterTestRun
+	private Company _company;
 
 	@Inject
 	private SkuCommerceMLForecastManager _skuCommerceMLForecastManager;

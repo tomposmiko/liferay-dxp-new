@@ -16,12 +16,12 @@ package com.liferay.fragment.entry.processor.internal.util;
 
 import com.liferay.info.formatter.InfoCollectionTextFormatter;
 import com.liferay.info.type.Labeled;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Jorge Ferrer
@@ -31,19 +31,21 @@ public class CommaSeparatedInfoCollectionTextFormatter
 
 	@Override
 	public String format(Collection<Object> collection, Locale locale) {
-		return StringUtil.merge(
-			TransformUtil.transform(
-				collection,
-				collectionItem -> {
-					if (!(collectionItem instanceof Labeled)) {
-						return collectionItem.toString();
-					}
+		Stream<Object> stream = collection.stream();
 
+		return stream.map(
+			collectionItem -> {
+				if (collectionItem instanceof Labeled) {
 					Labeled collectionItemLabeled = (Labeled)collectionItem;
 
 					return collectionItemLabeled.getLabel(locale);
-				}),
-			StringPool.COMMA_AND_SPACE);
+				}
+
+				return collectionItem.toString();
+			}
+		).collect(
+			Collectors.joining(StringPool.COMMA_AND_SPACE)
+		);
 	}
 
 }

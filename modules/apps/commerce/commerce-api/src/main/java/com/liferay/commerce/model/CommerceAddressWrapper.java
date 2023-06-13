@@ -43,7 +43,6 @@ public class CommerceAddressWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("commerceAddressId", getCommerceAddressId());
 		attributes.put("groupId", getGroupId());
@@ -75,12 +74,6 @@ public class CommerceAddressWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		String externalReferenceCode = (String)attributes.get(
 			"externalReferenceCode");
 
@@ -416,16 +409,6 @@ public class CommerceAddressWrapper
 	}
 
 	/**
-	 * Returns the mvcc version of this commerce address.
-	 *
-	 * @return the mvcc version of this commerce address
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
 	 * Returns the name of this commerce address.
 	 *
 	 * @return the name of this commerce address
@@ -738,16 +721,6 @@ public class CommerceAddressWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce address.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce address
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the name of this commerce address.
 	 *
 	 * @param name the name of this commerce address
@@ -865,11 +838,6 @@ public class CommerceAddressWrapper
 	@Override
 	public void setZip(String zip) {
 		model.setZip(zip);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

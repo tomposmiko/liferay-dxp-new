@@ -528,6 +528,17 @@ public class SamlSpSessionPersistenceTest {
 			ReflectionTestUtil.invoke(
 				samlSpSession, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "samlSpSessionKey"));
+
+		Assert.assertEquals(
+			Long.valueOf(samlSpSession.getCompanyId()),
+			ReflectionTestUtil.<Long>invoke(
+				samlSpSession, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			samlSpSession.getSessionIndex(),
+			ReflectionTestUtil.invoke(
+				samlSpSession, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "sessionIndex"));
 	}
 
 	protected SamlSpSession addSamlSpSession() throws Exception {

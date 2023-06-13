@@ -574,11 +574,6 @@ public class CommerceAccountWrapper
 		return model.isExpired();
 	}
 
-	@Override
-	public boolean isGuestAccount() {
-		return model.isGuestAccount();
-	}
-
 	/**
 	 * Returns <code>true</code> if this commerce account is inactive.
 	 *
@@ -887,11 +882,6 @@ public class CommerceAccountWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

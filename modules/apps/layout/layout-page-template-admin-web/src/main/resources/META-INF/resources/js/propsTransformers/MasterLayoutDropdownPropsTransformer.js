@@ -13,13 +13,10 @@
  */
 
 import {
-	openConfirmModal,
 	openModal,
 	openSelectionModal,
 	openSimpleInputModal,
 } from 'frontend-js-web';
-
-import openDeletePageTemplateModal from '../modal/openDeletePageTemplateModal';
 
 const ACTIONS = {
 	copyMasterLayout({copyMasterLayoutURL}) {
@@ -27,12 +24,13 @@ const ACTIONS = {
 	},
 
 	deleteMasterLayout({deleteMasterLayoutURL}) {
-		openDeletePageTemplateModal({
-			onDelete: () => {
-				send(deleteMasterLayoutURL);
-			},
-			title: Liferay.Language.get('master'),
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			send(deleteMasterLayoutURL);
+		}
 	},
 
 	deleteMasterLayoutPreview({deleteMasterLayoutPreviewURL}) {
@@ -40,28 +38,22 @@ const ACTIONS = {
 	},
 
 	discardDraft({discardDraftURL}) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					send(discardDraftURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
+				)
+			)
+		) {
+			send(discardDraftURL);
+		}
 	},
 
 	markAsDefaultMasterLayout({markAsDefaultMasterLayoutURL, message}) {
 		if (message !== '') {
-			openConfirmModal({
-				message: Liferay.Language.get(message),
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						send(markAsDefaultMasterLayoutURL);
-					}
-				},
-			});
+			if (confirm(Liferay.Language.get(message))) {
+				send(markAsDefaultMasterLayoutURL);
+			}
 		}
 		else {
 			send(markAsDefaultMasterLayoutURL);

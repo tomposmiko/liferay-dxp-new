@@ -49,7 +49,6 @@ public class CTProcessWrapper
 		attributes.put("createDate", getCreateDate());
 		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("backgroundTaskId", getBackgroundTaskId());
-		attributes.put("type", getType());
 
 		return attributes;
 	}
@@ -96,12 +95,6 @@ public class CTProcessWrapper
 
 		if (backgroundTaskId != null) {
 			setBackgroundTaskId(backgroundTaskId);
-		}
-
-		Integer type = (Integer)attributes.get("type");
-
-		if (type != null) {
-			setType(type);
 		}
 	}
 
@@ -178,16 +171,6 @@ public class CTProcessWrapper
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
-	}
-
-	/**
-	 * Returns the type of this ct process.
-	 *
-	 * @return the type of this ct process
-	 */
-	@Override
-	public int getType() {
-		return model.getType();
 	}
 
 	/**
@@ -286,16 +269,6 @@ public class CTProcessWrapper
 	}
 
 	/**
-	 * Sets the type of this ct process.
-	 *
-	 * @param type the type of this ct process
-	 */
-	@Override
-	public void setType(int type) {
-		model.setType(type);
-	}
-
-	/**
 	 * Sets the user ID of this ct process.
 	 *
 	 * @param userId the user ID of this ct process
@@ -313,11 +286,6 @@ public class CTProcessWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

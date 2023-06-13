@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -89,7 +88,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AttachmentBase64 attachmentBase64;
 
-	@Schema(example = "black")
+	@Schema
 	public String getColor() {
 		return color;
 	}
@@ -118,7 +117,7 @@ public class Diagram implements Serializable {
 	protected String color;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -145,7 +144,7 @@ public class Diagram implements Serializable {
 	protected Long id;
 
 	@DecimalMin("0")
-	@Schema(example = "33132")
+	@Schema
 	public Long getImageId() {
 		return imageId;
 	}
@@ -173,7 +172,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long imageId;
 
-	@Schema(example = "Name 1")
+	@Schema
 	public String getImageURL() {
 		return imageURL;
 	}
@@ -201,7 +200,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String imageURL;
 
-	@Schema(example = "exampleERC")
+	@Schema
 	public String getProductExternalReferenceCode() {
 		return productExternalReferenceCode;
 	}
@@ -234,7 +233,7 @@ public class Diagram implements Serializable {
 	protected String productExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "33131")
+	@Schema
 	public Long getProductId() {
 		return productId;
 	}
@@ -262,7 +261,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long productId;
 
-	@Schema(example = "33.54")
+	@Schema
 	public Double getRadius() {
 		return radius;
 	}
@@ -290,7 +289,7 @@ public class Diagram implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double radius;
 
-	@Schema(example = "default")
+	@Schema
 	public String getType() {
 		return type;
 	}
@@ -462,9 +461,9 @@ public class Diagram implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -490,7 +489,7 @@ public class Diagram implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -522,7 +521,7 @@ public class Diagram implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -538,10 +537,5 @@ public class Diagram implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

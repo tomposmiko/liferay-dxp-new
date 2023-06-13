@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -37,6 +36,7 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Generated("")
 @GraphQLName("MeasurementUnit")
 @JsonFilter("Liferay.Vulcan")
-@Schema(requiredProperties = {"key", "name", "type"})
+@Schema(requiredProperties = {"key", "name"})
 @XmlRootElement(name = "MeasurementUnit")
 public class MeasurementUnit implements Serializable {
 
@@ -63,21 +63,21 @@ public class MeasurementUnit implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
-	public Long getCompanyId() {
-		return companyId;
+	@Schema
+	public Long getGroupId() {
+		return groupId;
 	}
 
-	public void setCompanyId(Long companyId) {
-		this.companyId = companyId;
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
 	}
 
 	@JsonIgnore
-	public void setCompanyId(
-		UnsafeSupplier<Long, Exception> companyIdUnsafeSupplier) {
+	public void setGroupId(
+		UnsafeSupplier<Long, Exception> groupIdUnsafeSupplier) {
 
 		try {
-			companyId = companyIdUnsafeSupplier.get();
+			groupId = groupIdUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -89,38 +89,10 @@ public class MeasurementUnit implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Long companyId;
-
-	@Schema(example = "AB-34098-789-N")
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	@JsonIgnore
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String externalReferenceCode;
+	protected Long groupId;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -146,7 +118,7 @@ public class MeasurementUnit implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "kg")
+	@Schema
 	public String getKey() {
 		return key;
 	}
@@ -173,7 +145,7 @@ public class MeasurementUnit implements Serializable {
 	@NotEmpty
 	protected String key;
 
-	@Schema(example = "{en_US=Croatia, hr_HR=Hrvatska, hu_HU=Horvatorszag}")
+	@Schema
 	@Valid
 	public Map<String, String> getName() {
 		return name;
@@ -203,7 +175,7 @@ public class MeasurementUnit implements Serializable {
 	@NotNull
 	protected Map<String, String> name;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getPrimary() {
 		return primary;
 	}
@@ -232,7 +204,7 @@ public class MeasurementUnit implements Serializable {
 	protected Boolean primary;
 
 	@DecimalMin("0")
-	@Schema(example = "1.1")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -261,7 +233,7 @@ public class MeasurementUnit implements Serializable {
 	protected Double priority;
 
 	@DecimalMin("0")
-	@Schema(example = "1")
+	@Schema
 	public Double getRate() {
 		return rate;
 	}
@@ -287,17 +259,19 @@ public class MeasurementUnit implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double rate;
 
-	@Schema(example = "Dimensions")
-	public String getType() {
+	@DecimalMax("1")
+	@DecimalMin("0")
+	@Schema
+	public Integer getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 
 	@JsonIgnore
-	public void setType(UnsafeSupplier<String, Exception> typeUnsafeSupplier) {
+	public void setType(UnsafeSupplier<Integer, Exception> typeUnsafeSupplier) {
 		try {
 			type = typeUnsafeSupplier.get();
 		}
@@ -311,8 +285,7 @@ public class MeasurementUnit implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	@NotEmpty
-	protected String type;
+	protected Integer type;
 
 	@Override
 	public boolean equals(Object object) {
@@ -341,28 +314,14 @@ public class MeasurementUnit implements Serializable {
 
 		sb.append("{");
 
-		if (companyId != null) {
+		if (groupId != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"companyId\": ");
+			sb.append("\"groupId\": ");
 
-			sb.append(companyId);
-		}
-
-		if (externalReferenceCode != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(externalReferenceCode));
-
-			sb.append("\"");
+			sb.append(groupId);
 		}
 
 		if (id != null) {
@@ -436,11 +395,7 @@ public class MeasurementUnit implements Serializable {
 
 			sb.append("\"type\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(type));
-
-			sb.append("\"");
+			sb.append(type);
 		}
 
 		sb.append("}");
@@ -456,9 +411,9 @@ public class MeasurementUnit implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -484,7 +439,7 @@ public class MeasurementUnit implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -516,7 +471,7 @@ public class MeasurementUnit implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -532,10 +487,5 @@ public class MeasurementUnit implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

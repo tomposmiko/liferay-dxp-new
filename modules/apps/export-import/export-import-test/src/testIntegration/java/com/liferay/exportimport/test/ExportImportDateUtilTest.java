@@ -88,7 +88,7 @@ public class ExportImportDateUtilTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_layout = LayoutTestUtil.addTypePortletLayout(_group);
+		_layout = LayoutTestUtil.addLayout(_group);
 
 		_layoutSet = _layout.getLayoutSet();
 
@@ -112,10 +112,10 @@ public class ExportImportDateUtilTest {
 
 		updateLastPublishDate(_portletPreferences, new Date());
 
-		Assert.assertEquals(
-			portletDataContextLastPublishDate,
-			ExportImportDateUtil.getLastPublishDate(
-				portletDataContext, _portletPreferences));
+		Date lastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			portletDataContext, _portletPreferences);
+
+		Assert.assertEquals(portletDataContextLastPublishDate, lastPublishDate);
 	}
 
 	@Test
@@ -135,10 +135,10 @@ public class ExportImportDateUtilTest {
 
 		updateLastPublishDate(_portletPreferences, new Date());
 
-		Assert.assertEquals(
-			portletDataContextLastPublishDate,
-			ExportImportDateUtil.getLastPublishDate(
-				portletDataContext, _portletPreferences));
+		Date lastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			portletDataContext, _portletPreferences);
+
+		Assert.assertEquals(portletDataContextLastPublishDate, lastPublishDate);
 	}
 
 	@Test
@@ -154,9 +154,10 @@ public class ExportImportDateUtilTest {
 			portletDataContext,
 			ExportImportDateUtil.RANGE_FROM_LAST_PUBLISH_DATE, new Date());
 
-		Assert.assertNull(
-			ExportImportDateUtil.getLastPublishDate(
-				portletDataContext, _portletPreferences));
+		Date lastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			portletDataContext, _portletPreferences);
+
+		Assert.assertNull(lastPublishDate);
 	}
 
 	@Test
@@ -176,10 +177,10 @@ public class ExportImportDateUtilTest {
 
 		updateLastPublishDate(_portletPreferences, portletLastPublishDate);
 
-		Assert.assertEquals(
-			portletLastPublishDate,
-			ExportImportDateUtil.getLastPublishDate(
-				portletDataContext, _portletPreferences));
+		Date lastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			portletDataContext, _portletPreferences);
+
+		Assert.assertEquals(portletLastPublishDate, lastPublishDate);
 	}
 
 	@Test
@@ -376,8 +377,10 @@ public class ExportImportDateUtilTest {
 	public void testUpdateLastPublishDateWithoutExistingLastPublishDate()
 		throws Exception {
 
-		Assert.assertNull(
-			ExportImportDateUtil.getLastPublishDate(_portletPreferences));
+		Date lastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			_portletPreferences);
+
+		Assert.assertNull(lastPublishDate);
 
 		Date date = new Date();
 
@@ -386,16 +389,20 @@ public class ExportImportDateUtilTest {
 		ExportImportDateUtil.updateLastPublishDate(
 			PortletKeys.EXPORT_IMPORT, _portletPreferences, dateRange, date);
 
-		Assert.assertNull(
-			ExportImportDateUtil.getLastPublishDate(_portletPreferences));
+		lastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			_portletPreferences);
+
+		Assert.assertNull(lastPublishDate);
 
 		dateRange = new DateRange(null, date);
 
 		ExportImportDateUtil.updateLastPublishDate(
 			PortletKeys.EXPORT_IMPORT, _portletPreferences, dateRange, date);
 
-		Assert.assertEquals(
-			date, ExportImportDateUtil.getLastPublishDate(_portletPreferences));
+		lastPublishDate = ExportImportDateUtil.getLastPublishDate(
+			_portletPreferences);
+
+		Assert.assertEquals(date, lastPublishDate);
 	}
 
 	@Test

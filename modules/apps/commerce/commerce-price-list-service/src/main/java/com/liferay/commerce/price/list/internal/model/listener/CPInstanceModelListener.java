@@ -16,7 +16,6 @@ package com.liferay.commerce.price.list.internal.model.listener;
 
 import com.liferay.commerce.price.list.service.CommercePriceEntryLocalService;
 import com.liferay.commerce.product.model.CPInstance;
-import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -29,23 +28,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = ModelListener.class)
+@Component(enabled = false, immediate = true, service = ModelListener.class)
 public class CPInstanceModelListener extends BaseModelListener<CPInstance> {
 
 	@Override
 	public void onBeforeRemove(CPInstance cpInstance) {
 		try {
-			int cpInstancesCount = _cpInstanceLocalService.getCPInstancesCount(
-				cpInstance.getCPInstanceUuid());
-
-			if (cpInstancesCount == 1) {
-				_commercePriceEntryLocalService.deleteCommercePriceEntries(
-					cpInstance.getCPInstanceUuid());
-			}
+			_commercePriceEntryLocalService.
+				deleteCommercePriceEntriesByCPInstanceId(
+					cpInstance.getCPInstanceId());
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 	}
@@ -55,8 +50,5 @@ public class CPInstanceModelListener extends BaseModelListener<CPInstance> {
 
 	@Reference
 	private CommercePriceEntryLocalService _commercePriceEntryLocalService;
-
-	@Reference
-	private CPInstanceLocalService _cpInstanceLocalService;
 
 }

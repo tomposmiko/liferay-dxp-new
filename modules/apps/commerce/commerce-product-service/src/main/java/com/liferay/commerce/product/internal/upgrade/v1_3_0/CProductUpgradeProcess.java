@@ -14,11 +14,11 @@
 
 package com.liferay.commerce.product.internal.upgrade.v1_3_0;
 
+import com.liferay.commerce.product.internal.upgrade.base.BaseCommerceProductServiceUpgradeProcess;
+import com.liferay.commerce.product.model.impl.CPDefinitionModelImpl;
+import com.liferay.commerce.product.model.impl.CProductModelImpl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.sql.Date;
@@ -30,10 +30,22 @@ import java.sql.Statement;
  * @author Ethan Bustad
  * @author Alessio Antonio Rendina
  */
-public class CProductUpgradeProcess extends UpgradeProcess {
+public class CProductUpgradeProcess
+	extends BaseCommerceProductServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		if (!hasTable(CProductModelImpl.TABLE_NAME)) {
+			runSQL(CProductModelImpl.TABLE_SQL_CREATE);
+		}
+
+		addColumn(
+			CPDefinitionModelImpl.class, CPDefinitionModelImpl.TABLE_NAME,
+			"CProductId", "LONG");
+		addColumn(
+			CPDefinitionModelImpl.class, CPDefinitionModelImpl.TABLE_NAME,
+			"version", "INTEGER");
+
 		String insertCProductSQL = StringBundler.concat(
 			"insert into CProduct (uuid_, CProductId, groupId, companyId, ",
 			"userId, userName, createDate, modifiedDate, ",
@@ -89,14 +101,6 @@ public class CProductUpgradeProcess extends UpgradeProcess {
 			preparedStatement1.executeBatch();
 			preparedStatement2.executeBatch();
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CPDefinition", "CProductId LONG", "version INTEGER")
-		};
 	}
 
 }

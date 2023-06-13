@@ -23,6 +23,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.util.DLURLHelperUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.petra.string.StringBundler;
@@ -34,18 +35,18 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatConstants;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
 import com.liferay.portal.search.similar.results.web.internal.display.context.SimilarResultsDocumentDisplayContext;
-import com.liferay.portal.search.similar.results.web.internal.portlet.SimilarResultsPortletPreferences;
-import com.liferay.portal.search.similar.results.web.internal.portlet.SimilarResultsPortletPreferencesImpl;
 import com.liferay.portal.search.similar.results.web.internal.util.SearchStringUtil;
 import com.liferay.portal.search.similar.results.web.spi.contributor.SimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.DestinationHelper;
@@ -60,7 +61,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Optional;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -84,21 +85,18 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 				).build();
 			}
 
-			String className = _getFieldValueString(Field.ENTRY_CLASS_NAME);
+			String className = getFieldValueString(Field.ENTRY_CLASS_NAME);
 
-			long classPK = _getEntryClassPK();
+			long classPK = getEntryClassPK();
 
 			return build(className, classPK);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-			else if (_log.isWarnEnabled()) {
-				_log.warn(exception.toString());
+				_log.debug(exception, exception);
 			}
 
-			return _buildTemporarilyUnavailable();
+			return buildTemporarilyUnavailable();
 		}
 	}
 
@@ -148,6 +146,12 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		boolean highlightEnabled) {
 
 		_highlightEnabled = highlightEnabled;
+
+		return this;
+	}
+
+	public SimilarResultsDocumentDisplayContextBuilder setHttp(Http http) {
+		_http = http;
 
 		return this;
 	}
@@ -228,7 +232,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 
 		if (assetRendererFactory != null) {
 			long resourcePrimKey = GetterUtil.getLong(
-				_getFieldValueString(Field.ROOT_ENTRY_CLASS_PK));
+				getFieldValueString(Field.ROOT_ENTRY_CLASS_PK));
 
 			if (resourcePrimKey > 0) {
 				classPK = resourcePrimKey;
@@ -238,7 +242,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 				className, classPK, assetRendererFactory);
 		}
 
-		Summary summary = _getSummary(className, assetRenderer);
+		Summary summary = getSummary(className, assetRenderer);
 
 		if (summary == null) {
 			SummaryBuilder summaryBuilder =
@@ -270,54 +274,27 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
 			className, classPK);
 
-		_buildCreationDateString(similarResultsDocumentDisplayContext);
-		_buildCreatorUserName(similarResultsDocumentDisplayContext);
+		buildCreationDateString(similarResultsDocumentDisplayContext);
+		buildCreatorUserName(similarResultsDocumentDisplayContext);
 
-		_buildImage(
+		buildImage(
 			similarResultsDocumentDisplayContext, className, classPK,
 			assetRenderer);
 
-		_buildModelResource(similarResultsDocumentDisplayContext, className);
+		buildModelResource(similarResultsDocumentDisplayContext, className);
 
-		_buildCategoriesString(
-			similarResultsDocumentDisplayContext, assetEntry);
+		buildCategoriesString(similarResultsDocumentDisplayContext, assetEntry);
 
 		similarResultsDocumentDisplayContext.setTitle(
 			getTitle(assetEntry, summary));
 
 		similarResultsDocumentDisplayContext.setViewURL(
-			_getViewURL(assetEntry, assetRenderer, className, classPK));
+			getViewURL(assetEntry, assetRenderer, className, classPK));
 
 		return similarResultsDocumentDisplayContext;
 	}
 
-	protected AssetRenderer<?> getAssetRenderer(
-		String className, long classPK,
-		AssetRendererFactory<?> assetRendererFactory) {
-
-		try {
-			return assetRendererFactory.getAssetRenderer(classPK);
-		}
-		catch (Exception exception) {
-			throw new IllegalStateException(
-				StringBundler.concat(
-					"Unable to get asset renderer for class ", className,
-					" with primary key ", classPK),
-				exception);
-		}
-	}
-
-	protected String getTitle(AssetEntry assetEntry, Summary summary) {
-		String title = summary.getTitle();
-
-		if (Validator.isBlank(title)) {
-			title = assetEntry.getTitle(_locale);
-		}
-
-		return title;
-	}
-
-	private void _buildCategoriesString(
+	protected void buildCategoriesString(
 		SimilarResultsDocumentDisplayContext
 			similarResultsDocumentDisplayContext,
 		AssetEntry assetEntry) {
@@ -347,38 +324,26 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 			});
 	}
 
-	private void _buildCreationDateString(
+	protected void buildCreationDateString(
 		SimilarResultsDocumentDisplayContext
 			similarResultsDocumentDisplayContext) {
 
-		String dateString = SearchStringUtil.maybe(
-			_getFieldValueString(Field.CREATE_DATE));
+		Optional<String> dateStringOptional = SearchStringUtil.maybe(
+			getFieldValueString(Field.CREATE_DATE));
 
-		if (dateString == null) {
-			return;
-		}
+		Optional<Date> dateOptional = dateStringOptional.map(
+			this::parseDateStringFieldValue);
 
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-
-		try {
-			Date date = dateFormat.parse(dateString);
-
-			if (date != null) {
-				similarResultsDocumentDisplayContext.setCreationDateString(
-					_formatCreationDate(date));
-			}
-		}
-		catch (Exception exception) {
-			throw new IllegalArgumentException(
-				"Unable to parse date string: " + dateString, exception);
-		}
+		dateOptional.ifPresent(
+			date -> similarResultsDocumentDisplayContext.setCreationDateString(
+				formatCreationDate(date)));
 	}
 
-	private void _buildCreatorUserName(
+	protected void buildCreatorUserName(
 		SimilarResultsDocumentDisplayContext
 			similarResultsDocumentDisplayContext) {
 
-		String creatorUserName = _getFieldValueString(Field.USER_NAME);
+		String creatorUserName = getFieldValueString(Field.USER_NAME);
 
 		if (!Validator.isBlank(creatorUserName)) {
 			similarResultsDocumentDisplayContext.setCreatorUserName(
@@ -390,7 +355,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		}
 	}
 
-	private void _buildImage(
+	protected void buildImage(
 		SimilarResultsDocumentDisplayContext
 			similarResultsDocumentDisplayContext,
 		String className, long classPK, AssetRenderer<?> assetRenderer) {
@@ -494,7 +459,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		}
 	}
 
-	private void _buildModelResource(
+	protected void buildModelResource(
 		SimilarResultsDocumentDisplayContext
 			similarResultsDocumentDisplayContext,
 		String className) {
@@ -508,8 +473,8 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		}
 	}
 
-	private SimilarResultsDocumentDisplayContext
-		_buildTemporarilyUnavailable() {
+	protected SimilarResultsDocumentDisplayContext
+		buildTemporarilyUnavailable() {
 
 		SimilarResultsDocumentDisplayContext
 			similarResultsDocumentDisplayContext =
@@ -520,7 +485,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		return similarResultsDocumentDisplayContext;
 	}
 
-	private String _formatCreationDate(Date date) {
+	protected String formatCreationDate(Date date) {
 		Format format = _fastDateFormatFactory.getDateTime(
 			FastDateFormatConstants.MEDIUM, FastDateFormatConstants.SHORT,
 			_locale, _themeDisplay.getTimeZone());
@@ -528,11 +493,34 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		return format.format(date);
 	}
 
-	private long _getEntryClassPK() {
-		return _getFieldValueLong(Field.ENTRY_CLASS_PK);
+	protected AssetRenderer<?> getAssetRenderer(
+		String className, long classPK,
+		AssetRendererFactory<?> assetRendererFactory) {
+
+		try {
+			return assetRendererFactory.getAssetRenderer(classPK);
+		}
+		catch (Exception exception) {
+			throw new IllegalStateException(
+				StringBundler.concat(
+					"Unable to get asset renderer for class ", className,
+					" with primary key ", classPK),
+				exception);
+		}
 	}
 
-	private long _getFieldValueLong(String fieldName) {
+	protected AssetRendererFactory<?> getAssetRendererFactoryByClassName(
+		String className) {
+
+		return AssetRendererFactoryRegistryUtil.
+			getAssetRendererFactoryByClassName(className);
+	}
+
+	protected long getEntryClassPK() {
+		return getFieldValueLong(Field.ENTRY_CLASS_PK);
+	}
+
+	protected long getFieldValueLong(String fieldName) {
 		if (_document != null) {
 			return GetterUtil.getLong(_document.getLong(fieldName));
 		}
@@ -540,7 +528,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		return GetterUtil.getLong(_legacyDocument.get(fieldName));
 	}
 
-	private String _getFieldValueString(String fieldName) {
+	protected String getFieldValueString(String fieldName) {
 		if (_document != null) {
 			return _document.getString(fieldName);
 		}
@@ -548,7 +536,25 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		return _legacyDocument.get(fieldName);
 	}
 
-	private Indexer<Object> _getIndexer(String className) {
+	protected FileEntry getFileEntryByClassPK(long fileEntryId) {
+		FileEntry fileEntry = null;
+
+		try {
+			fileEntry = DLAppLocalServiceUtil.getFileEntry(fileEntryId);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Documents and Media search index is stale and contains " +
+						"file entry " + fileEntryId,
+					exception);
+			}
+		}
+
+		return fileEntry;
+	}
+
+	protected Indexer<Object> getIndexer(String className) {
 		if (_indexerRegistry != null) {
 			return _indexerRegistry.getIndexer(className);
 		}
@@ -556,15 +562,15 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		return IndexerRegistryUtil.getIndexer(className);
 	}
 
-	private Summary _getSummary(
+	protected Summary getSummary(
 			String className, AssetRenderer<?> assetRenderer)
-		throws Exception {
+		throws SearchException {
 
 		SummaryBuilder summaryBuilder = _summaryBuilderFactory.newInstance();
 
 		summaryBuilder.setHighlight(_highlightEnabled);
 
-		Indexer<?> indexer = _getIndexer(className);
+		Indexer<?> indexer = getIndexer(className);
 
 		if (indexer != null) {
 			String snippet = _document.getString(Field.SNIPPET);
@@ -602,33 +608,19 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		return null;
 	}
 
-	private String _getViewURL(
+	protected String getTitle(AssetEntry assetEntry, Summary summary) {
+		String title = summary.getTitle();
+
+		if (Validator.isBlank(title)) {
+			title = assetEntry.getTitle(_locale);
+		}
+
+		return title;
+	}
+
+	protected String getViewURL(
 		AssetEntry assetEntry, AssetRenderer<?> assetRenderer, String className,
 		long classPK) {
-
-		SimilarResultsPortletPreferences similarResultsPortletPreferences =
-			new SimilarResultsPortletPreferencesImpl(
-				_renderRequest.getPreferences());
-
-		if (Objects.equals(
-				similarResultsPortletPreferences.getLinkBehavior(),
-				"view-in-context")) {
-
-			try {
-				String url = assetRenderer.getURLViewInContext(
-					_portal.getLiferayPortletRequest(_renderRequest),
-					_portal.getLiferayPortletResponse(_renderResponse), null);
-
-				if (!Validator.isBlank(url)) {
-					return url;
-				}
-			}
-			catch (Exception exception) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
-				}
-			}
-		}
 
 		String currentURL = _portal.getCurrentURL(_renderRequest);
 
@@ -640,7 +632,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 			_similarResultsRoute.getContributor();
 
 		DestinationBuilderImpl destinationBuilderImpl =
-			new DestinationBuilderImpl(currentURL);
+			new DestinationBuilderImpl(currentURL, _http);
 
 		DestinationHelper destinationHelper = new DestinationHelper() {
 
@@ -652,22 +644,6 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 			@Override
 			public AssetRenderer<?> getAssetRenderer() {
 				return assetRenderer;
-			}
-
-			@Override
-			public String getAssetViewURL() {
-				try {
-					return assetRenderer.getURLView(
-						_portal.getLiferayPortletResponse(_renderResponse),
-						_renderRequest.getWindowState());
-				}
-				catch (Exception exception) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
-					}
-				}
-
-				return null;
 			}
 
 			@Override
@@ -686,13 +662,8 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 			}
 
 			@Override
-			public long getScopeGroupId() {
-				return _themeDisplay.getScopeGroupId();
-			}
-
-			@Override
 			public String getUID() {
-				return _getFieldValueString(Field.UID);
+				return getFieldValueString(Field.UID);
 			}
 
 		};
@@ -703,6 +674,19 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 		return destinationBuilderImpl.build();
 	}
 
+	protected Date parseDateStringFieldValue(String dateStringFieldValue) {
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+
+		try {
+			return dateFormat.parse(dateStringFieldValue);
+		}
+		catch (Exception exception) {
+			throw new IllegalArgumentException(
+				"Unable to parse date string: " + dateStringFieldValue,
+				exception);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		SimilarResultsDocumentDisplayContextBuilder.class);
 
@@ -711,6 +695,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 	private DocumentBuilderFactory _documentBuilderFactory;
 	private FastDateFormatFactory _fastDateFormatFactory;
 	private boolean _highlightEnabled;
+	private Http _http;
 	private IndexerRegistry _indexerRegistry;
 	private com.liferay.portal.kernel.search.Document _legacyDocument;
 	private Locale _locale;

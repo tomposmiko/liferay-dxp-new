@@ -17,17 +17,19 @@ package com.liferay.commerce.internal.notification.type;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.notification.type.CommerceNotificationType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.notification.type.key=" + CommerceOrderConstants.ORDER_NOTIFICATION_PLACED,
 		"commerce.notification.type.order:Integer=30"
@@ -64,11 +66,11 @@ public class OrderPlacedCommerceNotificationTypeImpl
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
-			locale, CommerceOrderConstants.ORDER_NOTIFICATION_PLACED);
-	}
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
 
-	@Reference
-	private Language _language;
+		return LanguageUtil.get(
+			resourceBundle, CommerceOrderConstants.ORDER_NOTIFICATION_PLACED);
+	}
 
 }

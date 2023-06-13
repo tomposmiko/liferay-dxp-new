@@ -20,8 +20,6 @@ import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
-import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
@@ -29,11 +27,12 @@ import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.search.index.ConcurrentReindexManager;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
@@ -49,14 +48,15 @@ public class SearchEngineInitializer implements Runnable {
 
 	public SearchEngineInitializer(
 		BundleContext bundleContext, long companyId,
-		ConcurrentReindexManager concurrentReindexManager, String executionMode,
 		PortalExecutorManager portalExecutorManager) {
 
 		_bundleContext = bundleContext;
 		_companyId = companyId;
-		_concurrentReindexManager = concurrentReindexManager;
-		_executionMode = executionMode;
 		_portalExecutorManager = portalExecutorManager;
+	}
+
+	public Set<String> getUsedSearchEngineIds() {
+		return _usedSearchEngineIds;
 	}
 
 	public void halt() {
@@ -71,7 +71,7 @@ public class SearchEngineInitializer implements Runnable {
 	}
 
 	public void reindex(int delay) {
-		_reindex(delay);
+		doReIndex(delay);
 	}
 
 	@Override
@@ -79,41 +79,7 @@ public class SearchEngineInitializer implements Runnable {
 		reindex(PropsValues.INDEX_ON_STARTUP_DELAY);
 	}
 
-	protected void reindex(Indexer<?> indexer) throws Exception {
-		StopWatch stopWatch = new StopWatch();
-
-		stopWatch.start();
-
-		if (_log.isInfoEnabled()) {
-			_log.info(
-				"Reindexing of " + indexer.getClassName() +
-					" entities started");
-		}
-
-		indexer.reindex(new String[] {String.valueOf(_companyId)});
-
-		if (_log.isInfoEnabled()) {
-			_log.info(
-				StringBundler.concat(
-					"Reindexing of ", indexer.getClassName(),
-					" entities completed in ",
-					stopWatch.getTime() / Time.SECOND, " seconds"));
-		}
-	}
-
-	private boolean _isExecuteConcurrentReindex() {
-		if (FeatureFlagManagerUtil.isEnabled("LPS-177664") &&
-			(_concurrentReindexManager != null) && (_executionMode != null) &&
-			_executionMode.equals("concurrent") &&
-			(_companyId != CompanyConstants.SYSTEM)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private void _reindex(int delay) {
+	protected void doReIndex(int delay) {
 		if (IndexWriterHelperUtil.isIndexReadOnly()) {
 			return;
 		}
@@ -133,7 +99,7 @@ public class SearchEngineInitializer implements Runnable {
 		}
 		catch (InterruptedException interruptedException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(interruptedException);
+				_log.debug(interruptedException, interruptedException);
 			}
 		}
 
@@ -146,14 +112,9 @@ public class SearchEngineInitializer implements Runnable {
 		stopWatch.start();
 
 		try {
-			if (_isExecuteConcurrentReindex()) {
-				_concurrentReindexManager.createNextIndex(_companyId);
-			}
-			else {
-				SearchEngineHelperUtil.removeCompany(_companyId);
+			SearchEngineHelperUtil.removeCompany(_companyId);
 
-				SearchEngineHelperUtil.initialize(_companyId);
-			}
+			SearchEngineHelperUtil.initialize(_companyId);
 
 			long backgroundTaskId =
 				BackgroundTaskThreadLocal.getBackgroundTaskId();
@@ -176,25 +137,14 @@ public class SearchEngineInitializer implements Runnable {
 
 						@Override
 						public Void call() throws Exception {
-							CTSQLModeThreadLocal.CTSQLMode ctSQLMode =
-								CTSQLModeThreadLocal.getCTSQLMode();
-
 							try (SafeCloseable safeCloseable =
 									BackgroundTaskThreadLocal.
 										setBackgroundTaskIdWithSafeCloseable(
 											backgroundTaskId)) {
 
-								CTSQLModeThreadLocal.
-									setCTSQLModeWithSafeCloseable(
-										CTSQLModeThreadLocal.CTSQLMode.CT_ALL);
-
 								reindex(indexer);
 
 								return null;
-							}
-							finally {
-								CTSQLModeThreadLocal.
-									setCTSQLModeWithSafeCloseable(ctSQLMode);
 							}
 						}
 
@@ -211,11 +161,6 @@ public class SearchEngineInitializer implements Runnable {
 				futureTask.get();
 			}
 
-			if (_isExecuteConcurrentReindex()) {
-				_concurrentReindexManager.replaceCurrentIndexWithNextIndex(
-					_companyId);
-			}
-
 			if (_log.isInfoEnabled()) {
 				_log.info(
 					"Reindexing completed in " +
@@ -223,10 +168,6 @@ public class SearchEngineInitializer implements Runnable {
 			}
 		}
 		catch (Exception exception) {
-			if (_isExecuteConcurrentReindex()) {
-				_concurrentReindexManager.deleteNextIndex(_companyId);
-			}
-
 			_log.error("Error encountered while reindexing", exception);
 
 			if (_log.isInfoEnabled()) {
@@ -237,15 +178,38 @@ public class SearchEngineInitializer implements Runnable {
 		_finished = true;
 	}
 
+	protected void reindex(Indexer<?> indexer) throws Exception {
+		StopWatch stopWatch = new StopWatch();
+
+		stopWatch.start();
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				"Reindexing of " + indexer.getClassName() +
+					" entities started");
+		}
+
+		indexer.reindex(new String[] {String.valueOf(_companyId)});
+
+		_usedSearchEngineIds.add(indexer.getSearchEngineId());
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				StringBundler.concat(
+					"Reindexing of ", indexer.getClassName(),
+					" entities completed in ",
+					stopWatch.getTime() / Time.SECOND, " seconds"));
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		SearchEngineInitializer.class);
 
 	private final BundleContext _bundleContext;
 	private final long _companyId;
-	private final ConcurrentReindexManager _concurrentReindexManager;
-	private final String _executionMode;
 	private boolean _finished;
-	private ServiceTrackerList<Indexer<?>> _indexers;
+	private ServiceTrackerList<Indexer<?>, Indexer<?>> _indexers;
 	private final PortalExecutorManager _portalExecutorManager;
+	private final Set<String> _usedSearchEngineIds = new HashSet<>();
 
 }

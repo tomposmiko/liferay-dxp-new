@@ -20,7 +20,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
-import com.liferay.portal.kernel.util.HtmlParser;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
@@ -102,9 +102,9 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addPage(String,
-	 *             long, String, String, String, boolean, String, String,
-	 *             String, ServiceContext)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 * #addPage(String, long, String, String, String, boolean, String, String,
+	 * String, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -121,20 +121,6 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 			getUserId(), nodeId, title, WikiPageConstants.VERSION_DEFAULT,
 			content, summary, minorEdit, format, true, parentTitle,
 			redirectTitle, serviceContext);
-	}
-
-	@Override
-	public WikiPage addPage(
-			String externalReferenceCode, long nodeId, String title,
-			double version, String content, String summary, boolean minorEdit,
-			String format, boolean head, String parentTitle,
-			String redirectTitle, ServiceContext serviceContext)
-		throws PortalException {
-
-		return wikiPageLocalService.addPage(
-			externalReferenceCode, getUserId(), nodeId, title, version, content,
-			summary, minorEdit, format, head, parentTitle, redirectTitle,
-			serviceContext);
 	}
 
 	@Override
@@ -332,8 +318,8 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 	 * Returns the latest wiki page matching the group and the external
 	 * reference code
 	 *
-	 * @param  groupId the primary key of the group
-	 * @param  externalReferenceCode the wiki page external reference code
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the wiki page external reference code
 	 * @return the latest matching wiki page, or <code>null</code> if no
 	 *         matching wiki page could be found
 	 */
@@ -397,8 +383,8 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 	 * Returns the latest wiki page matching the group and the external
 	 * reference code
 	 *
-	 * @param  groupId the primary key of the group
-	 * @param  externalReferenceCode the wiki page external reference code
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the wiki page external reference code
 	 * @return the latest matching wiki page
 	 * @throws PortalException if a portal exception occurred
 	 */
@@ -463,7 +449,7 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 
 		List<WikiPage> pages = getNodePages(nodeId, max);
 
-		return _exportToRSS(
+		return exportToRSS(
 			node.getName(), node.getDescription(), type, version, displayStyle,
 			feedURL, entryURL, attachmentURLPrefix, pages, false, null);
 	}
@@ -532,16 +518,6 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 		throws PortalException {
 
 		WikiPage page = wikiPageLocalService.getPage(nodeId, title, version);
-
-		_wikiPageModelResourcePermission.check(
-			getPermissionChecker(), page, ActionKeys.VIEW);
-
-		return page;
-	}
-
-	@Override
-	public WikiPage getPageByPageId(long pageId) throws PortalException {
-		WikiPage page = wikiPageLocalService.getPageByPageId(pageId);
 
 		_wikiPageModelResourcePermission.check(
 			getPermissionChecker(), page, ActionKeys.VIEW);
@@ -671,7 +647,7 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 		List<WikiPage> pages = wikiPageLocalService.getPages(
 			nodeId, title, 0, max, new PageCreateDateComparator(true));
 
-		return _exportToRSS(
+		return exportToRSS(
 			title, title, type, version, displayStyle, feedURL, entryURL,
 			attachmentURLPrefix, pages, true, locale);
 	}
@@ -769,9 +745,10 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
+		WikiPage page = wikiPageLocalService.fetchPage(nodeId, title);
+
 		_wikiPageModelResourcePermission.check(
-			getPermissionChecker(),
-			wikiPageLocalService.fetchPage(nodeId, title), ActionKeys.UPDATE);
+			getPermissionChecker(), page, ActionKeys.UPDATE);
 
 		_wikiNodeModelResourcePermission.check(
 			getPermissionChecker(), nodeId, ActionKeys.ADD_PAGE);
@@ -870,7 +847,7 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 			format, parentTitle, redirectTitle, serviceContext);
 	}
 
-	private String _exportToRSS(
+	protected String exportToRSS(
 			String name, String description, String type, double version,
 			String displayStyle, String feedURL, String entryURL,
 			String attachmentURLPrefix, List<WikiPage> pages, boolean diff,
@@ -957,7 +934,7 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 									WikiConstants.SERVICE_NAME));
 
 					value = StringUtil.shorten(
-						_htmlParser.extractText(page.getContent()),
+						HtmlUtil.extractText(page.getContent()),
 						wikiGroupServiceOverriddenConfiguration.
 							rssAbstractLength(),
 						StringPool.BLANK);
@@ -986,7 +963,7 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 			if (page.isMinorEdit()) {
 				title += StringBundler.concat(
 					StringPool.SPACE, StringPool.OPEN_PARENTHESIS,
-					_language.get(locale, "minor-edit"),
+					LanguageUtil.get(locale, "minor-edit"),
 					StringPool.CLOSE_PARENTHESIS);
 			}
 
@@ -1020,12 +997,6 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private HtmlParser _htmlParser;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

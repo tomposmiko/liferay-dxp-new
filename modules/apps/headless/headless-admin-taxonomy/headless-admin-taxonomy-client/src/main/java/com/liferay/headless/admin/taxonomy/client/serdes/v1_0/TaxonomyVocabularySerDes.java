@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class TaxonomyVocabularySerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (taxonomyVocabulary.getActions() != null) {
 			if (sb.length() > 1) {
@@ -308,7 +309,7 @@ public class TaxonomyVocabularySerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (taxonomyVocabulary.getActions() == null) {
 			map.put("actions", null);
@@ -482,18 +483,14 @@ public class TaxonomyVocabularySerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "assetTypes")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AssetType[] assetTypesArray =
-						new AssetType[jsonParserFieldValues.length];
-
-					for (int i = 0; i < assetTypesArray.length; i++) {
-						assetTypesArray[i] = AssetTypeSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					taxonomyVocabulary.setAssetTypes(assetTypesArray);
+					taxonomyVocabulary.setAssetTypes(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AssetTypeSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AssetType[size]
+						));
 				}
 			}
 			else if (Objects.equals(

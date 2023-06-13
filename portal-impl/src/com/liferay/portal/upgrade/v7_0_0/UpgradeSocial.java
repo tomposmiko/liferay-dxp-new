@@ -29,13 +29,15 @@ import java.sql.Statement;
 public class UpgradeSocial extends UpgradeProcess {
 
 	protected void addSocialActivitySets(long delta) throws Exception {
-		runSQL(
-			StringBundler.concat(
-				"insert into SocialActivitySet select (activityId + ", delta,
-				") as activitySetId, groupId, companyId, userId, createDate, ",
-				"createDate AS modifiedDate, classNameId, classPK, type_, ",
-				"extraData, 1 as activityCount from SocialActivity where ",
-				"mirrorActivityId = 0"));
+		try (Statement s = connection.createStatement()) {
+			s.execute(
+				StringBundler.concat(
+					"insert into SocialActivitySet select (activityId + ",
+					delta, ") as activitySetId, groupId, companyId, userId, ",
+					"createDate, createDate AS modifiedDate, classNameId, ",
+					"classPK, type_, extraData, 1 as activityCount from ",
+					"SocialActivity where mirrorActivityId = 0"));
+		}
 	}
 
 	protected void deleteOrphanedSocialRequests() throws Exception {

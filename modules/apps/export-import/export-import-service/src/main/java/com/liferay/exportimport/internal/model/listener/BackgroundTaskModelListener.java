@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Levente Hudák
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class BackgroundTaskModelListener
 	extends BaseModelListener<BackgroundTask> {
 
@@ -68,7 +68,15 @@ public class BackgroundTaskModelListener
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setExportImportConfigurationLocalService(
+		ExportImportConfigurationLocalService
+			exportImportConfigurationLocalService) {
+
+		_exportImportConfigurationLocalService =
+			exportImportConfigurationLocalService;
+	}
+
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
 

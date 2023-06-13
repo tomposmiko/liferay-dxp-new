@@ -40,27 +40,28 @@ public class PortalCacheHelperUtil {
 			portalCacheName);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getPortalCache(String, String)}
+	 */
+	@Deprecated
 	public static <K extends Serializable, V> PortalCache<K, V> getPortalCache(
-		String portalCacheManagerName, String portalCacheName, boolean mvcc) {
+		String portalCacheManagerName, String portalCacheName,
+		boolean blocking) {
 
-		PortalCacheManager<?, ?> portalCacheManager =
-			PortalCacheManagerProvider.getPortalCacheManager(
-				portalCacheManagerName);
-
-		return (PortalCache<K, V>)portalCacheManager.getPortalCache(
-			portalCacheName, mvcc);
+		return getPortalCache(portalCacheManagerName, portalCacheName);
 	}
 
 	public static <K extends Serializable, V> PortalCache<K, V> getPortalCache(
-		String portalCacheManagerName, String portalCacheName, boolean mvcc,
-		boolean sharded) {
+		String portalCacheManagerName, String portalCacheName, boolean blocking,
+		boolean mvcc) {
 
 		PortalCacheManager<?, ?> portalCacheManager =
 			PortalCacheManagerProvider.getPortalCacheManager(
 				portalCacheManagerName);
 
 		return (PortalCache<K, V>)portalCacheManager.getPortalCache(
-			portalCacheName, mvcc, sharded);
+			portalCacheName, blocking, mvcc);
 	}
 
 	public static <K extends Serializable, V> void putWithoutReplicator(
@@ -116,16 +117,6 @@ public class PortalCacheHelperUtil {
 				portalCacheManagerName);
 
 		portalCacheManager.removePortalCache(portalCacheName);
-	}
-
-	public static void removePortalCaches(
-		String portalCacheManagerName, long companyId) {
-
-		PortalCacheManager<?, ?> portalCacheManager =
-			PortalCacheManagerProvider.getPortalCacheManager(
-				portalCacheManagerName);
-
-		portalCacheManager.removePortalCaches(companyId);
 	}
 
 	public static <K extends Serializable> void removeWithoutReplicator(

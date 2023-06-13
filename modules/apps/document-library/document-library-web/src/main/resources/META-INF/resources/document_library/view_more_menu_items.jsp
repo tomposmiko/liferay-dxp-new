@@ -55,7 +55,7 @@ DLViewMoreMenuItemsDisplayContext dlViewMoreMenuItemsDisplayContext = new DLView
 							"fileEntryTypeId", String.valueOf(fileEntryType.getFileEntryTypeId())
 						).build()
 					%>'
-					href="javascript:void(0);"
+					href="javascript:;"
 				>
 					<%= HtmlUtil.escape(fileEntryType.getName(locale)) %>
 				</aui:a>

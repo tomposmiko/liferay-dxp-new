@@ -39,12 +39,6 @@ public interface MBModerationGroupConfiguration {
 	public boolean enableMessageBoardsModeration();
 
 	@Meta.AD(
-		description = "authorized-domain-names-help",
-		name = "authorized-domain-names", required = false
-	)
-	public String[] authorizedDomainNames();
-
-	@Meta.AD(
 		deflt = "1", description = "minimum-contributed-messages-help",
 		min = "1", name = "minimum-contributed-messages", required = false
 	)

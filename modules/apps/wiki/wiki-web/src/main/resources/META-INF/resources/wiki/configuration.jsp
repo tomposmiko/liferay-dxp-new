@@ -32,92 +32,96 @@
 	<liferay-frontend:edit-form-body>
 		<liferay-ui:error key="visibleNodesCount" message="please-specify-at-least-one-visible-node" />
 
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			label="display-settings"
-		>
-			<aui:input label="show-related-assets" name="preferences--enableRelatedAssets--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableRelatedAssets() %>" />
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				label="display-settings"
+			>
+				<aui:input label="show-related-assets" name="preferences--enableRelatedAssets--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableRelatedAssets() %>" />
 
-			<aui:input name="preferences--enablePageRatings--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnablePageRatings() %>" />
+				<aui:input name="preferences--enablePageRatings--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnablePageRatings() %>" />
 
-			<aui:input name="preferences--enableComments--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableComments() %>" />
+				<aui:input name="preferences--enableComments--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableComments() %>" />
 
-			<aui:input label="enable-ratings-for-comments" name="preferences--enableCommentRatings--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableCommentRatings() %>" />
+				<aui:input label="enable-ratings-for-comments" name="preferences--enableCommentRatings--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableCommentRatings() %>" />
 
-			<aui:input name="preferences--enableHighlighting--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableHighlighting() %>" />
+				<aui:input name="preferences--enableHighlighting--" type="checkbox" value="<%= wikiPortletInstanceSettingsHelper.isEnableHighlighting() %>" />
 
-			<div class="display-template">
-				<liferay-template:template-selector
-					className="<%= WikiPage.class.getName() %>"
-					displayStyle="<%= wikiPortletInstanceSettingsHelper.getDisplayStyle() %>"
-					displayStyleGroupId="<%= wikiPortletInstanceSettingsHelper.getDisplayStyleGroupId() %>"
-					refreshURL="<%= configurationRenderURL %>"
-					showEmptyOption="<%= true %>"
+				<div class="display-template">
+					<liferay-template:template-selector
+						className="<%= WikiPage.class.getName() %>"
+						displayStyle="<%= wikiPortletInstanceSettingsHelper.getDisplayStyle() %>"
+						displayStyleGroupId="<%= wikiPortletInstanceSettingsHelper.getDisplayStyleGroupId() %>"
+						refreshURL="<%= configurationRenderURL %>"
+						showEmptyOption="<%= true %>"
+					/>
+				</div>
+			</liferay-frontend:fieldset>
+
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				label="visible-wikis"
+			>
+				<aui:input name="preferences--visibleNodes--" type="hidden" />
+				<aui:input name="preferences--hiddenNodes--" type="hidden" />
+
+				<%
+				Set<String> currentVisibleNodes = new HashSet<String>(wikiPortletInstanceSettingsHelper.getAllNodeNames());
+
+				// Left list
+
+				List<KeyValuePair> leftList = new ArrayList<KeyValuePair>();
+
+				String[] visibleNodeNames = wikiPortletInstanceSettingsHelper.getVisibleNodeNames();
+
+				for (String folderColumn : visibleNodeNames) {
+					if (currentVisibleNodes.contains(folderColumn)) {
+						leftList.add(new KeyValuePair(folderColumn, HtmlUtil.escape(LanguageUtil.get(request, folderColumn))));
+					}
+				}
+
+				Arrays.sort(visibleNodeNames);
+
+				String[] hiddenNodes = wikiPortletInstanceSettingsHelper.getHiddenNodes();
+
+				Arrays.sort(hiddenNodes);
+
+				for (String folderColumn : currentVisibleNodes) {
+					if ((Arrays.binarySearch(hiddenNodes, folderColumn) < 0) && (Arrays.binarySearch(visibleNodeNames, folderColumn) < 0)) {
+						leftList.add(new KeyValuePair(folderColumn, HtmlUtil.escape(LanguageUtil.get(request, folderColumn))));
+					}
+				}
+
+				// Right list
+
+				List<KeyValuePair> rightList = new ArrayList<KeyValuePair>();
+
+				for (String folderColumn : hiddenNodes) {
+					if (currentVisibleNodes.contains(folderColumn) && (Arrays.binarySearch(visibleNodeNames, folderColumn) < 0)) {
+						rightList.add(new KeyValuePair(folderColumn, HtmlUtil.escape(LanguageUtil.get(request, folderColumn))));
+					}
+				}
+
+				rightList = ListUtil.sort(rightList, new KeyValuePairComparator(false, true));
+				%>
+
+				<liferay-ui:input-move-boxes
+					leftBoxName="currentVisibleNodes"
+					leftList="<%= leftList %>"
+					leftReorder="<%= Boolean.TRUE.toString() %>"
+					leftTitle="visible"
+					rightBoxName="availableVisibleNodes"
+					rightList="<%= rightList %>"
+					rightTitle="hidden"
 				/>
-			</div>
-		</liferay-frontend:fieldset>
-
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			label="visible-wikis"
-		>
-			<aui:input name="preferences--visibleNodes--" type="hidden" />
-			<aui:input name="preferences--hiddenNodes--" type="hidden" />
-
-			<%
-			Set<String> currentVisibleNodes = new HashSet<String>(wikiPortletInstanceSettingsHelper.getAllNodeNames());
-
-			// Left list
-
-			List<KeyValuePair> leftList = new ArrayList<KeyValuePair>();
-
-			String[] visibleNodeNames = wikiPortletInstanceSettingsHelper.getVisibleNodeNames();
-
-			for (String folderColumn : visibleNodeNames) {
-				if (currentVisibleNodes.contains(folderColumn)) {
-					leftList.add(new KeyValuePair(folderColumn, HtmlUtil.escape(LanguageUtil.get(request, folderColumn))));
-				}
-			}
-
-			Arrays.sort(visibleNodeNames);
-
-			String[] hiddenNodes = wikiPortletInstanceSettingsHelper.getHiddenNodes();
-
-			Arrays.sort(hiddenNodes);
-
-			for (String folderColumn : currentVisibleNodes) {
-				if ((Arrays.binarySearch(hiddenNodes, folderColumn) < 0) && (Arrays.binarySearch(visibleNodeNames, folderColumn) < 0)) {
-					leftList.add(new KeyValuePair(folderColumn, HtmlUtil.escape(LanguageUtil.get(request, folderColumn))));
-				}
-			}
-
-			// Right list
-
-			List<KeyValuePair> rightList = new ArrayList<KeyValuePair>();
-
-			for (String folderColumn : hiddenNodes) {
-				if (currentVisibleNodes.contains(folderColumn) && (Arrays.binarySearch(visibleNodeNames, folderColumn) < 0)) {
-					rightList.add(new KeyValuePair(folderColumn, HtmlUtil.escape(LanguageUtil.get(request, folderColumn))));
-				}
-			}
-
-			rightList = ListUtil.sort(rightList, new KeyValuePairComparator(false, true));
-			%>
-
-			<liferay-ui:input-move-boxes
-				leftBoxName="currentVisibleNodes"
-				leftList="<%= leftList %>"
-				leftReorder="<%= Boolean.TRUE.toString() %>"
-				leftTitle="visible"
-				rightBoxName="availableVisibleNodes"
-				rightList="<%= rightList %>"
-				rightTitle="hidden"
-			/>
-		</liferay-frontend:fieldset>
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
@@ -137,12 +141,8 @@
 		if (availableVisibleNodes && currentVisibleNodes) {
 			Liferay.Util.postForm(form, {
 				data: {
-					hiddenNodes: Liferay.Util.getSelectedOptionValues(
-						availableVisibleNodes
-					),
-					visibleNodes: Liferay.Util.getSelectedOptionValues(
-						currentVisibleNodes
-					),
+					hiddenNodes: Liferay.Util.listSelect(availableVisibleNodes),
+					visibleNodes: Liferay.Util.listSelect(currentVisibleNodes),
 				},
 			});
 		}

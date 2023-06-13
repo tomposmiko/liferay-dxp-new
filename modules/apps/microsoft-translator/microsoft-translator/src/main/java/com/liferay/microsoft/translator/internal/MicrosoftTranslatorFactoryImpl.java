@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.microsoft.translator.internal.configuration.MicrosoftTranslatorConfiguration",
-	service = MicrosoftTranslatorFactory.class
+	immediate = true, service = MicrosoftTranslatorFactory.class
 )
 public class MicrosoftTranslatorFactoryImpl
 	implements MicrosoftTranslatorFactory {

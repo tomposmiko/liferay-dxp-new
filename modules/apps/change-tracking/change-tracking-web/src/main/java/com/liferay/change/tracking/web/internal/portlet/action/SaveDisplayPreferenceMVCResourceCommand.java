@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/save_display_preference"

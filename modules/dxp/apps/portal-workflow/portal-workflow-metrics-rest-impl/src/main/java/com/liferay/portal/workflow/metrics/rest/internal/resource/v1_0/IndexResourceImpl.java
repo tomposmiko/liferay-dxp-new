@@ -16,8 +16,8 @@ package com.liferay.portal.workflow.metrics.rest.internal.resource.v1_0;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
-import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -25,10 +25,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.index.RefreshIndexRequest;
-import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Index;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.IndexUtil;
@@ -36,14 +34,17 @@ import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.Inde
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.IndexResource;
 import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsBackgroundTaskExecutorNames;
 import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsIndexNameBuilder;
-import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexerRegistry;
+import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexer;
 
 import java.io.Serializable;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -65,7 +66,7 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 	public Page<Index> getIndexesPage() throws Exception {
 		return Page.of(
 			transform(
-				_workflowMetricsReindexerRegistry.getIndexEntityNames(),
+				_indexEntityNameSet,
 				indexEntityName -> IndexUtil.toIndex(
 					indexEntityName, _language,
 					ResourceBundleUtil.getModuleAndPortalResourceBundle(
@@ -75,10 +76,6 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 
 	@Override
 	public void patchIndexRefresh(Index index) throws Exception {
-		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
-			return;
-		}
-
 		if (Objects.isNull(index) || Validator.isNull(index.getKey())) {
 			throw new IndexKeyException();
 		}
@@ -91,17 +88,17 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 
 		_searchEngineAdapter.execute(
 			new RefreshIndexRequest(
-				transform(
-					indexEntityNames,
-					indexEntityName -> {
-						IndexNameBuilder indexNameBuilder =
-							_workflowMetricsIndexNameBuilderMap.get(
-								indexEntityName);
-
-						return indexNameBuilder.getIndexName(
-							contextCompany.getCompanyId());
-					},
-					String.class)));
+				Stream.of(
+					indexEntityNames
+				).map(
+					_workflowMetricsIndexNameBuilderMap::get
+				).map(
+					workflowMetricsIndexNameBuilder ->
+						workflowMetricsIndexNameBuilder.getIndexName(
+							contextCompany.getCompanyId())
+				).toArray(
+					String[]::new
+				)));
 	}
 
 	@Override
@@ -151,6 +148,25 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 			workflowMetricsIndexEntityName, workflowMetricsIndexNameBuilder);
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addWorkflowMetricsReindexer(
+		WorkflowMetricsReindexer workflowMetricsReindexer,
+		Map<String, Object> properties) {
+
+		String workflowMetricsIndexEntityName = GetterUtil.getString(
+			properties.get("workflow.metrics.index.entity.name"));
+
+		if (Validator.isNull(workflowMetricsIndexEntityName)) {
+			return;
+		}
+
+		_indexEntityNameSet.add(workflowMetricsIndexEntityName);
+	}
+
 	protected void removeWorkflowMetricsIndexNameBuilder(
 		WorkflowMetricsIndexNameBuilder workflowMetricsIndexNameBuilder,
 		Map<String, Object> properties) {
@@ -162,6 +178,20 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 			workflowMetricsIndexEntityName);
 	}
 
+	protected void removeWorkflowMetricsReindexer(
+		WorkflowMetricsReindexer workflowMetricsReindexer,
+		Map<String, Object> properties) {
+
+		String workflowMetricsIndexEntityName = GetterUtil.getString(
+			properties.get("workflow.metrics.index.entity.name"));
+
+		if (Validator.isNull(workflowMetricsIndexEntityName)) {
+			return;
+		}
+
+		_indexEntityNameSet.remove(workflowMetricsIndexEntityName);
+	}
+
 	private String _getBackgroundTaskName(Index index) {
 		return StringBundler.concat(
 			IndexResourceImpl.class.getSimpleName(), StringPool.DASH,
@@ -169,31 +199,41 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 	}
 
 	private String[] _getIndexEntityNames(Index index) {
-		Set<String> indexEntityNames =
-			_workflowMetricsReindexerRegistry.getIndexEntityNames();
-
 		if (Objects.equals(index.getKey(), Index.Group.ALL.getValue())) {
-			return indexEntityNames.toArray(new String[0]);
+			return _indexEntityNameSet.toArray(new String[0]);
 		}
 		else if (Objects.equals(
 					index.getKey(), Index.Group.METRIC.getValue())) {
 
-			return ArrayUtil.filter(
-				indexEntityNames.toArray(new String[0]),
-				value -> !value.startsWith("sla"));
+			return Stream.of(
+				_indexEntityNameSet
+			).flatMap(
+				Collection::stream
+			).filter(
+				value -> !value.startsWith("sla")
+			).toArray(
+				String[]::new
+			);
 		}
 		else if (Objects.equals(index.getKey(), Index.Group.SLA.getValue())) {
-			return ArrayUtil.filter(
-				indexEntityNames.toArray(new String[0]),
-				value -> value.startsWith("sla"));
+			return Stream.of(
+				_indexEntityNameSet
+			).flatMap(
+				Collection::stream
+			).filter(
+				value -> value.startsWith("sla")
+			).toArray(
+				String[]::new
+			);
 		}
-		else if (indexEntityNames.contains(index.getKey())) {
+		else if (_indexEntityNameSet.contains(index.getKey())) {
 			return new String[] {index.getKey()};
 		}
 
 		return new String[0];
 	}
 
+	private static final Set<String> _indexEntityNameSet = new HashSet<>();
 	private static final Map<String, WorkflowMetricsIndexNameBuilder>
 		_workflowMetricsIndexNameBuilderMap = new ConcurrentHashMap<>();
 
@@ -203,13 +243,12 @@ public class IndexResourceImpl extends BaseIndexResourceImpl {
 	@Reference
 	private Language _language;
 
-	@Reference
-	private SearchCapabilities _searchCapabilities;
-
-	@Reference
-	private SearchEngineAdapter _searchEngineAdapter;
-
-	@Reference
-	private WorkflowMetricsReindexerRegistry _workflowMetricsReindexerRegistry;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(search.engine.impl=Elasticsearch)"
+	)
+	private volatile SearchEngineAdapter _searchEngineAdapter;
 
 }

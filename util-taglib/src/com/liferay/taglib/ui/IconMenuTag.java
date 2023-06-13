@@ -33,7 +33,6 @@ import com.liferay.taglib.util.PortalIncludeUtil;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
 import java.util.Map;
-import java.util.Objects;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -92,14 +91,12 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 			_cssClass = null;
 			_data = null;
 			_direction = "left";
-			_dropdownCssClass = null;
 			_endPage = null;
 			_extended = true;
 			_icon = null;
 			_id = null;
 			_localizeMessage = true;
 			_maxDisplayItems = _DEFAULT_MAX_DISPLAY_ITEMS;
-			_triggerAriaLabel = null;
 			_message = "actions";
 			_scroll = false;
 			_select = false;
@@ -178,10 +175,6 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 		_disabled = disabled;
 	}
 
-	public void setDropdownCssClass(String dropdownCssClass) {
-		_dropdownCssClass = dropdownCssClass;
-	}
-
 	public void setEndPage(String endPage) {
 		_endPage = endPage;
 	}
@@ -244,10 +237,6 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 		_startPage = startPage;
 	}
 
-	public void setTriggerAriaLabel(String triggerAriaLabel) {
-		_triggerAriaLabel = triggerAriaLabel;
-	}
-
 	public void setTriggerCssClass(String triggerCssClass) {
 		_triggerCssClass = triggerCssClass;
 	}
@@ -269,12 +258,20 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 			return _endPage;
 		}
 
+		if (Validator.isNotNull(_markupView)) {
+			return "/html/taglib/ui/icon_menu/" + _markupView + "/end.jsp";
+		}
+
 		return "/html/taglib/ui/icon_menu/end.jsp";
 	}
 
 	protected String getStartPage() {
 		if (Validator.isNotNull(_startPage)) {
 			return _startPage;
+		}
+
+		if (Validator.isNotNull(_markupView)) {
+			return "/html/taglib/ui/icon_menu/" + _markupView + "/start.jsp";
 		}
 
 		return "/html/taglib/ui/icon_menu/start.jsp";
@@ -304,8 +301,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 			if (!FileAvailabilityUtil.isAvailable(
 					(ServletContext)httpServletRequest.getAttribute(
 						WebKeys.CTX),
-					getStartPage()) ||
-				!Objects.equals(_markupView, "lexicon")) {
+					getStartPage())) {
 
 				if (_showExpanded) {
 					jspWriter.write("<ul class=\"lfr-menu-expanded ");
@@ -362,9 +358,9 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 							_message);
 					}
 
-					jspWriter.write("\" href=\"javascript:void(0);\" id=\"");
+					jspWriter.write("\" href=\"javascript:;\" id=\"");
 					jspWriter.write(_id);
-					jspWriter.write("\" role=\"button\" title=\"");
+					jspWriter.write("\" title=\"");
 					jspWriter.write(message);
 					jspWriter.write("\">");
 
@@ -445,8 +441,7 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 			if (!FileAvailabilityUtil.isAvailable(
 					(ServletContext)httpServletRequest.getAttribute(
 						WebKeys.CTX),
-					getEndPage()) ||
-				!Objects.equals(_markupView, "lexicon")) {
+					getEndPage())) {
 
 				jspWriter.write("</ul>");
 
@@ -480,8 +475,6 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 		httpServletRequest.setAttribute("liferay-ui:icon-menu:data", _data);
 		httpServletRequest.setAttribute(
 			"liferay-ui:icon-menu:direction", _direction);
-		httpServletRequest.setAttribute(
-			"liferay-ui:icon-menu:dropdownCssClass", _dropdownCssClass);
 		httpServletRequest.setAttribute("liferay-ui:icon-menu:icon", _icon);
 		httpServletRequest.setAttribute("liferay-ui:icon-menu:id", _id);
 
@@ -497,11 +490,11 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 
 		httpServletRequest.setAttribute("liferay-ui:icon-menu:scroll", _scroll);
 		httpServletRequest.setAttribute(
-			"liferay-ui:icon-menu:triggerAriaLabel", _triggerAriaLabel);
-		httpServletRequest.setAttribute(
 			"liferay-ui:icon-menu:triggerCssClass", _triggerCssClass);
+
 		httpServletRequest.setAttribute(
 			"liferay-ui:icon-menu:triggerLabel", _triggerLabel);
+
 		httpServletRequest.setAttribute(
 			"liferay-ui:icon-menu:triggerType", _triggerType);
 	}
@@ -515,7 +508,6 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 	private Map<String, Object> _data;
 	private String _direction = "left";
 	private boolean _disabled;
-	private String _dropdownCssClass;
 	private String _endPage;
 	private boolean _extended = true;
 	private String _icon;
@@ -530,7 +522,6 @@ public class IconMenuTag extends BaseBodyTagSupport implements BodyTag {
 	private boolean _showExpanded;
 	private boolean _showWhenSingleIcon;
 	private String _startPage;
-	private String _triggerAriaLabel;
 	private String _triggerCssClass;
 	private String _triggerLabel;
 	private String _triggerType;

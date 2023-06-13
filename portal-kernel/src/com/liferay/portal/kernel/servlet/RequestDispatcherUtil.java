@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RequestDispatcherUtil {
 
-	public static BufferCacheServletResponse getBufferCacheServletResponse(
+	public static ObjectValuePair<String, Long> getContentAndLastModifiedTime(
 			RequestDispatcher requestDispatcher,
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
@@ -81,27 +81,8 @@ public class RequestDispatcherUtil {
 					return HttpMethods.GET;
 				}
 
-				@Override
-				public String getPathInfo() {
-					return (String)getAttribute(
-						RequestDispatcher.INCLUDE_PATH_INFO);
-				}
-
 			},
 			bufferCacheServletResponse);
-
-		return bufferCacheServletResponse;
-	}
-
-	public static ObjectValuePair<String, Long> getContentAndLastModifiedTime(
-			RequestDispatcher requestDispatcher,
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws Exception {
-
-		BufferCacheServletResponse bufferCacheServletResponse =
-			getBufferCacheServletResponse(
-				requestDispatcher, httpServletRequest, httpServletResponse);
 
 		return new ObjectValuePair<>(
 			bufferCacheServletResponse.getString(),

@@ -20,9 +20,11 @@
 String tabs1 = ParamUtil.getString(request, "tabs1", "published");
 
 String redirect = ParamUtil.getString(request, "redirect");
-String backURL = HttpComponentsUtil.setParameter(currentURL, liferayPortletResponse.getNamespace() + "historyKey", "workflow");
+String backURL = HttpUtil.setParameter(currentURL, liferayPortletResponse.getNamespace() + "historyKey", "workflow");
 
 KaleoProcess kaleoProcess = (KaleoProcess)request.getAttribute(KaleoFormsWebKeys.KALEO_PROCESS);
+
+long kaleoProcessId = BeanParamUtil.getLong(kaleoProcess, request, "kaleoProcessId");
 
 String workflowDefinition = KaleoFormsUtil.getWorkflowDefinition(kaleoProcess, portletSession);
 
@@ -38,6 +40,12 @@ if (Validator.isNotNull(workflowDefinition)) {
 	if (!KaleoFormsUtil.isWorkflowDefinitionActive(themeDisplay.getCompanyId(), workflowDefinitionName, workflowDefinitionVersion)) {
 		workflowDefinition = StringPool.BLANK;
 	}
+}
+
+int status = WorkflowConstants.STATUS_DRAFT;
+
+if (tabs1.equals("published")) {
+	status = WorkflowConstants.STATUS_APPROVED;
 }
 %>
 
@@ -70,8 +78,17 @@ if (Validator.isNotNull(workflowDefinition)) {
 	<aui:input name="workflowDefinitionVersion" type="hidden" value="<%= workflowDefinitionVersion %>" />
 </aui:field-wrapper>
 
+<liferay-portlet:renderURL varImpl="iteratorURL">
+	<portlet:param name="mvcPath" value="/admin/edit_kaleo_process.jsp" />
+	<portlet:param name="tabs1" value="<%= tabs1 %>" />
+	<portlet:param name="redirect" value="<%= redirect %>" />
+	<portlet:param name="historyKey" value="workflow" />
+	<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcessId) %>" />
+</liferay-portlet:renderURL>
+
 <liferay-ui:search-container
-	searchContainer="<%= kaleoFormsAdminDisplayContext.getSearchContainer() %>"
+	emptyResultsMessage='<%= tabs1.equals("published") ? "there-are-no-published-definitions" : "there-are-no-unpublished-definitions" %>'
+	iteratorURL="<%= iteratorURL %>"
 >
 	<liferay-portlet:renderURL portletName="<%= KaleoDesignerPortletKeys.KALEO_DESIGNER %>" var="addURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 		<portlet:param name="mvcPath" value="/designer/edit_kaleo_definition_version.jsp" />
@@ -82,40 +99,49 @@ if (Validator.isNotNull(workflowDefinition)) {
 		<aui:button onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "editWorkflow('" + addURL + "');" %>' primary="<%= true %>" value="add-workflow" />
 	</c:if>
 
-	<hr class="separator" />
+	<div class="separator"><!-- --></div>
 
 	<liferay-portlet:renderURL varImpl="portletURL">
 		<portlet:param name="mvcPath" value="/admin/edit_kaleo_process.jsp" />
 		<portlet:param name="tabs1" value="<%= tabs1 %>" />
 		<portlet:param name="redirect" value="<%= redirect %>" />
 		<portlet:param name="historyKey" value="workflow" />
-		<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoFormsAdminDisplayContext.getKaleoProcessId()) %>" />
+		<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcessId) %>" />
 	</liferay-portlet:renderURL>
 
-	<clay:navigation-bar
-		navigationItems='<%=
-			new JSPNavigationItemList(pageContext) {
-				{
-					add(
-						navigationItem -> {
-							navigationItem.setActive(kaleoFormsAdminDisplayContext.isTabs1Published());
-							navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/admin/edit_kaleo_process.jsp", "tabs1", "published", "redirect", redirect, "historyKey", "workflow", "kaleoProcessId", kaleoFormsAdminDisplayContext.getKaleoProcessId());
-							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "published"));
-						});
+	<aui:nav cssClass="kaleo-process-workflow-nav-tabs nav-bar-workflow nav-tabs">
+		<liferay-portlet:renderURL var="viewPublishedURL">
+			<portlet:param name="mvcPath" value="/admin/edit_kaleo_process.jsp" />
+			<portlet:param name="tabs1" value="published" />
+			<portlet:param name="redirect" value="<%= redirect %>" />
+			<portlet:param name="historyKey" value="workflow" />
+			<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcessId) %>" />
+		</liferay-portlet:renderURL>
 
-					add(
-						navigationItem -> {
-							navigationItem.setActive(kaleoFormsAdminDisplayContext.isTabs1Unpublished());
-							navigationItem.setHref(renderResponse.createRenderURL(), "mvcPath", "/admin/edit_kaleo_process.jsp", "tabs1", "unpublished", "redirect", redirect, "historyKey", "workflow", "kaleoProcessId", kaleoFormsAdminDisplayContext.getKaleoProcessId());
-							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "unpublished"));
-						});
-				}
-			}
-		%>'
-	/>
+		<aui:nav-item href="<%= viewPublishedURL %>" label="published" selected='<%= tabs1.equals("published") %>' />
+
+		<liferay-portlet:renderURL var="viewUnpublishedURL">
+			<portlet:param name="mvcPath" value="/admin/edit_kaleo_process.jsp" />
+			<portlet:param name="tabs1" value="unpublished" />
+			<portlet:param name="redirect" value="<%= redirect %>" />
+			<portlet:param name="historyKey" value="workflow" />
+			<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcessId) %>" />
+		</liferay-portlet:renderURL>
+
+		<aui:nav-item href="<%= viewUnpublishedURL %>" label="unpublished" selected='<%= tabs1.equals("unpublished") %>' />
+	</aui:nav>
 
 	<c:choose>
-		<c:when test="<%= kaleoFormsAdminDisplayContext.isTabs1Published() %>">
+		<c:when test='<%= tabs1.equals("published") %>'>
+
+			<%
+			searchContainer.setTotal(WorkflowDefinitionManagerUtil.getActiveWorkflowDefinitionsCount(company.getCompanyId()));
+			%>
+
+			<liferay-ui:search-container-results
+				results="<%= WorkflowDefinitionManagerUtil.getActiveWorkflowDefinitions(company.getCompanyId(), searchContainer.getStart(), searchContainer.getEnd(), null) %>"
+			/>
+
 			<liferay-ui:search-container-row
 				className="com.liferay.portal.kernel.workflow.WorkflowDefinition"
 				modelVar="workflowDefinitionVar"
@@ -150,6 +176,10 @@ if (Validator.isNotNull(workflowDefinition)) {
 			</liferay-ui:search-container-row>
 		</c:when>
 		<c:otherwise>
+			<liferay-ui:search-container-results
+				results="<%= kaleoFormsAdminDisplayContext.getSearchContainerResults(searchContainer, status) %>"
+			/>
+
 			<liferay-ui:search-container-row
 				className="com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion"
 				keyProperty="kaleoDefinitionVersionId"

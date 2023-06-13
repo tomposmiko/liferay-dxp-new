@@ -55,27 +55,21 @@ public class PullRequestFactory {
 			return pullRequest;
 		}
 
-		BuildDatabase buildDatabase = null;
+		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase(build);
 
-		if (build != null) {
-			buildDatabase = BuildDatabaseUtil.getBuildDatabase(build);
+		if (buildDatabase.hasPullRequest(gitHubURL)) {
+			pullRequest = buildDatabase.getPullRequest(gitHubURL);
 
-			if (buildDatabase.hasPullRequest(gitHubURL)) {
-				pullRequest = buildDatabase.getPullRequest(gitHubURL);
+			_pullRequests.put(gitHubURL, pullRequest);
 
-				_pullRequests.put(gitHubURL, pullRequest);
-
-				return pullRequest;
-			}
+			return pullRequest;
 		}
 
 		pullRequest = new PullRequest(gitHubURL);
 
 		_pullRequests.put(gitHubURL, pullRequest);
 
-		if (buildDatabase != null) {
-			buildDatabase.putPullRequest(gitHubURL, pullRequest);
-		}
+		buildDatabase.putPullRequest(gitHubURL, pullRequest);
 
 		return pullRequest;
 	}

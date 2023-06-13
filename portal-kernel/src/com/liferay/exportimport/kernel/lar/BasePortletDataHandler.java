@@ -268,9 +268,11 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	public PortletDataHandlerControl[] getImportConfigurationControls(
 		Portlet portlet, ManifestSummary manifestSummary) {
 
-		return getImportConfigurationControls(
+		String[] configurationPortletOptions =
 			manifestSummary.getConfigurationPortletOptions(
-				portlet.getRootPortletId()));
+				portlet.getRootPortletId());
+
+		return getImportConfigurationControls(configurationPortletOptions);
 	}
 
 	@Override
@@ -500,7 +502,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -674,7 +676,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 
 			return StringPool.BLANK;

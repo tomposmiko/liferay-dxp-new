@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Andrew Betts
  */
-@Component(service = ReindexStatusMessageSender.class)
+@Component(immediate = true, service = ReindexStatusMessageSender.class)
 public class ReindexStatusMessageSenderImpl
 	implements ReindexStatusMessageSender {
 
@@ -45,7 +45,7 @@ public class ReindexStatusMessageSenderImpl
 		message.put(ReindexBackgroundTaskConstants.TOTAL, total);
 		message.put("status", BackgroundTaskConstants.STATUS_IN_PROGRESS);
 
-		_sendBackgroundTaskStatusMessage(message);
+		sendBackgroundTaskStatusMessage(message);
 	}
 
 	@Override
@@ -62,10 +62,10 @@ public class ReindexStatusMessageSenderImpl
 		message.put(ReindexBackgroundTaskConstants.PHASE, phase);
 		message.put("status", BackgroundTaskConstants.STATUS_IN_PROGRESS);
 
-		_sendBackgroundTaskStatusMessage(message);
+		sendBackgroundTaskStatusMessage(message);
 	}
 
-	private void _sendBackgroundTaskStatusMessage(Message message) {
+	protected void sendBackgroundTaskStatusMessage(Message message) {
 		_backgroundTaskStatusMessageSender.sendBackgroundTaskStatusMessage(
 			message);
 

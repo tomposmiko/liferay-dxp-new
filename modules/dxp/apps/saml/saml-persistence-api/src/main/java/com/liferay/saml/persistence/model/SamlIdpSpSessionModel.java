@@ -200,8 +200,4 @@ public interface SamlIdpSpSessionModel
 	@Override
 	public SamlIdpSpSession cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

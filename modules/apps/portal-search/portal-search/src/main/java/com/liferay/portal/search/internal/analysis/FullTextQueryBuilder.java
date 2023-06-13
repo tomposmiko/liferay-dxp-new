@@ -54,17 +54,17 @@ public class FullTextQueryBuilder {
 
 		for (String phrase : phrases) {
 			booleanQueryImpl.add(
-				_createPhraseQuery(field, phrase), BooleanClauseOccur.MUST);
+				createPhraseQuery(field, phrase), BooleanClauseOccur.MUST);
 		}
 
 		if (!words.isEmpty()) {
-			_addSentenceQueries(
+			addSentenceQueries(
 				field, StringUtil.merge(words, StringPool.SPACE),
 				booleanQueryImpl);
 		}
 
 		booleanQueryImpl.add(
-			_createExactMatchQuery(field, keywords), BooleanClauseOccur.SHOULD);
+			createExactMatchQuery(field, keywords), BooleanClauseOccur.SHOULD);
 
 		return booleanQueryImpl;
 	}
@@ -85,20 +85,20 @@ public class FullTextQueryBuilder {
 		_proximitySlop = proximitySlop;
 	}
 
-	private void _addSentenceQueries(
+	protected void addSentenceQueries(
 		String field, String sentence, BooleanQueryImpl booleanQueryImpl) {
 
 		booleanQueryImpl.add(
-			_createMandatoryQuery(field, sentence), BooleanClauseOccur.MUST);
+			createMandatoryQuery(field, sentence), BooleanClauseOccur.MUST);
 
 		if (_proximitySlop != null) {
 			booleanQueryImpl.add(
-				_createProximityQuery(field, sentence),
+				createProximityQuery(field, sentence),
 				BooleanClauseOccur.SHOULD);
 		}
 	}
 
-	private Query _createAutocompleteQuery(String field, String value) {
+	protected Query createAutocompleteQuery(String field, String value) {
 		PhraseQueryBuilder builder = new PhraseQueryBuilder();
 
 		builder.setMaxExpansions(_maxExpansions);
@@ -108,7 +108,7 @@ public class FullTextQueryBuilder {
 		return builder.build(field, value);
 	}
 
-	private Query _createExactMatchQuery(String field, String keywords) {
+	protected Query createExactMatchQuery(String field, String keywords) {
 		PhraseQueryBuilder builder = new PhraseQueryBuilder();
 
 		builder.setBoost(_exactMatchBoost);
@@ -116,8 +116,8 @@ public class FullTextQueryBuilder {
 		return builder.build(field, keywords);
 	}
 
-	private Query _createMandatoryQuery(String field, String sentence) {
-		Query matchQuery = _createMatchQuery(field, sentence);
+	protected Query createMandatoryQuery(String field, String sentence) {
+		Query matchQuery = createMatchQuery(field, sentence);
 
 		if (!_autocomplete) {
 			return matchQuery;
@@ -128,17 +128,17 @@ public class FullTextQueryBuilder {
 		booleanQueryImpl.add(matchQuery, BooleanClauseOccur.SHOULD);
 
 		booleanQueryImpl.add(
-			_createAutocompleteQuery(field, sentence),
+			createAutocompleteQuery(field, sentence),
 			BooleanClauseOccur.SHOULD);
 
 		return booleanQueryImpl;
 	}
 
-	private Query _createMatchQuery(String field, String value) {
+	protected Query createMatchQuery(String field, String value) {
 		return new MatchQuery(field, value);
 	}
 
-	private Query _createPhraseQuery(String field, String phrase) {
+	protected Query createPhraseQuery(String field, String phrase) {
 		PhraseQueryBuilder builder = new PhraseQueryBuilder();
 
 		builder.setTrailingStarAware(true);
@@ -146,7 +146,7 @@ public class FullTextQueryBuilder {
 		return builder.build(field, phrase);
 	}
 
-	private Query _createProximityQuery(String field, String value) {
+	protected Query createProximityQuery(String field, String value) {
 		PhraseQueryBuilder builder = new PhraseQueryBuilder();
 
 		builder.setSlop(_proximitySlop);

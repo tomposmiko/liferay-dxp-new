@@ -21,6 +21,6 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = UADExporter.class)
+@Component(immediate = true, service = UADExporter.class)
 public class JournalFeedUADExporter extends BaseJournalFeedUADExporter {
 }

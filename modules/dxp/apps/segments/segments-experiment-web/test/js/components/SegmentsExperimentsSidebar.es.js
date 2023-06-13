@@ -11,7 +11,11 @@
 
 import '@testing-library/jest-dom/extend-expect';
 import {
+	cleanup,
 	fireEvent,
+	wait,
+	waitForDomChange,
+	waitForElement,
 	waitForElementToBeRemoved,
 	within,
 } from '@testing-library/react';
@@ -27,6 +31,7 @@ import {
 } from '../../../src/main/resources/META-INF/resources/js/util/statuses.es';
 import {
 	controlVariant,
+	segmentsExperiences,
 	segmentsExperiment,
 	segmentsVariants,
 } from '../fixtures.es';
@@ -43,6 +48,8 @@ jest.mock(
 );
 
 describe('SegmentsExperimentsSidebar', () => {
+	afterEach(cleanup);
+
 	it('Renders info message ab testing panel only available for content pages', () => {
 		const {getByText} = renderApp({
 			type: 'widget',
@@ -55,18 +62,27 @@ describe('SegmentsExperimentsSidebar', () => {
 		expect(message).not.toBe(null);
 	});
 
-	it('Renders ab testing panel with zero experiments', () => {
-		const {getByText} = renderApp();
+	it('Renders ab testing panel with experience selected and zero experiments', () => {
+		const {getByDisplayValue, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
+		});
 
+		getByDisplayValue(segmentsExperiences[0].name);
 		getByText('no-active-tests-were-found-for-the-selected-experience');
 		getByText('create-test-help-message');
 		getByText('create-test');
 	});
 
-	it('Renders ab testing panel with an experiment', () => {
-		const {getByText} = renderApp({
+	it('Renders ab testing panel with experience selected and an experiment', () => {
+		const {getByDisplayValue, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: segmentsExperiment,
 		});
+
+		const defaultExperience = getByDisplayValue(
+			segmentsExperiences[0].name
+		);
+		expect(defaultExperience).not.toBe(null);
 
 		getByText(segmentsExperiment.name);
 		getByText(segmentsExperiment.description);
@@ -74,31 +90,22 @@ describe('SegmentsExperimentsSidebar', () => {
 		getByText(segmentsExperiment.goal.label);
 
 		getByText('edit');
-		expect(
-			document.querySelectorAll(
-				'.dropdown-item .lexicon-icon.lexicon-icon-pencil'
-			).length
-		).toBe(1);
-
 		getByText('delete');
-		expect(
-			document.querySelectorAll(
-				'.dropdown-item .lexicon-icon.lexicon-icon-trash'
-			).length
-		).toBe(1);
 
 		getByText('review-and-run-test');
 		getByText('view-data-in-analytics-cloud');
 	});
 
 	it('Renders modal to create experiment when the user clicks on create test button', async () => {
-		const {findByText, getByText} = renderApp();
+		const {getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
+		});
 
 		const createTestButton = getByText('create-test');
 
 		fireEvent.click(createTestButton);
 
-		await findByText('create-new-test');
+		await waitForElement(() => getByText('create-new-test'));
 
 		getByText('test-name');
 		getByText('description');
@@ -149,8 +156,11 @@ describe('SegmentsExperimentsSidebar', () => {
 });
 
 describe('Variants', () => {
+	afterEach(cleanup);
+
 	it('Renders no variants message', () => {
 		const {getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: [segmentsVariants[0]],
 			selectedSegmentsExperienceId:
@@ -168,6 +178,7 @@ describe('Variants', () => {
 
 	it('Renders variant list', () => {
 		const {getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: segmentsVariants,
 			selectedSegmentsExperienceId:
@@ -179,25 +190,11 @@ describe('Variants', () => {
 
 		expect(control).not.toBe(null);
 		expect(variant).not.toBe(null);
-		expect(
-			document.querySelectorAll(
-				'.dropdown-item .lexicon-icon.lexicon-icon-pencil'
-			).length
-		).toBe(2);
-		expect(
-			document.querySelectorAll(
-				'.dropdown-item .lexicon-icon.lexicon-icon-trash'
-			).length
-		).toBe(2);
 	});
 
 	it('Create variant button', async () => {
-		const {
-			APIServiceMocks,
-			findByText,
-			getByLabelText,
-			getByText,
-		} = renderApp({
+		const {APIServiceMocks, getByLabelText, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: segmentsVariants,
 			selectedSegmentsExperienceId:
@@ -210,20 +207,19 @@ describe('Variants', () => {
 
 		userEvent.click(button);
 
-		await findByText('create-new-variant');
+		await waitForElement(() => getByText('create-new-variant'));
 
-		const variantNameInput = getByLabelText(/name/);
+		const variantNameInput = getByLabelText('name');
 		expect(variantNameInput.value).toBe('');
 
-		fireEvent.focus(variantNameInput);
 		await userEvent.type(variantNameInput, 'Variant Name');
 
 		const saveButton = getByText('save');
 
-		fireEvent.click(saveButton);
+		userEvent.click(saveButton);
 
-		await waitForElementToBeRemoved(() => getByLabelText(/name/));
-		await findByText('Variant Name');
+		await waitForElementToBeRemoved(() => getByLabelText('name'));
+		await wait(() => getByText('Variant Name'));
 
 		expect(createVariant).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -246,19 +242,16 @@ describe('Variants', () => {
 });
 
 describe('Review and Run test', () => {
-	beforeAll(() => {
-		window.Liferay = {
-			...Liferay,
-			CustomDialogs: {},
-			FeatureFlags: {},
-		};
-	});
+	afterEach(cleanup);
 
 	it('Can view review experiment modal', async () => {
-		const {findByText, getAllByDisplayValue, getByText} = renderApp({
+		const {getAllByDisplayValue, getByDisplayValue, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: segmentsVariants,
 		});
+
+		getByDisplayValue(segmentsExperiences[0].name);
 
 		getByText(segmentsExperiment.name);
 
@@ -266,7 +259,7 @@ describe('Review and Run test', () => {
 
 		userEvent.click(reviewAndRunTestButton);
 
-		await findByText('traffic-split');
+		await waitForElement(() => getByText('traffic-split'));
 
 		const confidenceSlider = getAllByDisplayValue(
 			INITIAL_CONFIDENCE_LEVEL.toString()
@@ -286,9 +279,12 @@ describe('Review and Run test', () => {
 			},
 		};
 
-		const {getByText} = renderApp({
+		const {getByDisplayValue, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: experiment,
 		});
+
+		getByDisplayValue(segmentsExperiences[0].name);
 
 		getByText(experiment.name);
 
@@ -300,10 +296,13 @@ describe('Review and Run test', () => {
 	});
 
 	it('Error messages appears when the user clicks in review and run and there is only the control variant created', async () => {
-		const {getByText} = renderApp({
+		const {getByDisplayValue, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: controlVariant,
 		});
+
+		getByDisplayValue(segmentsExperiences[0].name);
 
 		getByText(segmentsExperiment.name);
 
@@ -315,12 +314,8 @@ describe('Review and Run test', () => {
 	});
 
 	it("Can run test that won't be editable", async () => {
-		const {
-			APIServiceMocks,
-			findByText,
-			getByText,
-			queryAllByLabelText,
-		} = renderApp({
+		const {APIServiceMocks, getByText, queryAllByLabelText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: segmentsVariants,
 		});
@@ -337,13 +332,13 @@ describe('Review and Run test', () => {
 
 		userEvent.click(reviewAndRunTestButton);
 
-		await findByText('traffic-split');
+		await waitForElement(() => getByText('traffic-split'));
 
 		const confirmRunExperimentButton = getByText('run');
 
 		userEvent.click(confirmRunExperimentButton);
 
-		await findByText('test-running-message');
+		await waitForElement(() => getByText('test-running-message'));
 
 		expect(runExperiment).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -353,7 +348,7 @@ describe('Review and Run test', () => {
 			})
 		);
 
-		await findByText('ok');
+		await waitForElement(() => getByText('ok'));
 		const okButton = getByText('ok');
 
 		userEvent.click(okButton);
@@ -375,6 +370,7 @@ describe('Review and Run test', () => {
 		};
 
 		const {queryAllByLabelText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: runningExperiment,
 			initialSegmentsVariants: segmentsVariants,
 		});
@@ -394,6 +390,8 @@ describe('Review and Run test', () => {
 });
 
 describe('Experiment History Tab', () => {
+	afterEach(cleanup);
+
 	it('Experiment is archived after terminating it', async () => {
 		window.confirm = jest.fn(() => true);
 
@@ -406,7 +404,8 @@ describe('Experiment History Tab', () => {
 			},
 		};
 
-		const {APIServiceMocks, findByText, getByText} = renderApp({
+		const {APIServiceMocks, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: runningExperiment,
 			initialSegmentsVariants: segmentsVariants,
 		});
@@ -429,7 +428,7 @@ describe('Experiment History Tab', () => {
 		/*
 		 * Terminated test should be archived now
 		 */
-		await findByText('history[record] (1)');
+		await waitForElement(() => getByText('history (1)'));
 		getByText('create-test');
 	});
 
@@ -443,12 +442,8 @@ describe('Experiment History Tab', () => {
 			},
 		};
 
-		const {
-			APIServiceMocks,
-			findByText,
-			getByText,
-			queryAllByText,
-		} = renderApp({
+		const {APIServiceMocks, getByText, queryAllByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: noWinnerDeclaredExperiment,
 			initialSegmentsVariants: segmentsVariants,
 		});
@@ -465,7 +460,7 @@ describe('Experiment History Tab', () => {
 
 		userEvent.click(publishButtons[0]);
 
-		await findByText('completed');
+		await waitForElement(() => getByText('completed'));
 
 		expect(publishExperience).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -477,11 +472,13 @@ describe('Experiment History Tab', () => {
 			})
 		);
 
-		const historyTab = getByText('history[record] (1)');
+		const historyTab = getByText('history (1)');
 
 		userEvent.click(historyTab);
 
-		await findByText(segmentsExperiment.name);
+		await waitForDomChange();
+
+		await waitForElement(() => getByText(segmentsExperiment.name));
 	});
 
 	it('Experiments have name, description and status label', async () => {
@@ -507,18 +504,20 @@ describe('Experiment History Tab', () => {
 			},
 		];
 
-		const {findByText, getByText} = renderApp({
+		const {getByText} = renderApp({
 			initialExperimentHistory: experimentHistory,
 		});
 
 		/*
 		 * History tab has the number of arhived Experiments
 		 */
-		const historyTab = getByText('history[record] (2)');
+		const historyTab = getByText('history (2)');
 
 		userEvent.click(historyTab);
 
-		await findByText(experimentHistory[0].name);
+		await waitForDomChange();
+
+		await waitForElement(() => getByText(experimentHistory[0].name));
 
 		/*
 		 * Experiment 1 is present in the UI
@@ -537,8 +536,11 @@ describe('Experiment History Tab', () => {
 });
 
 describe('No Winner Declared', () => {
+	afterEach(cleanup);
+
 	it('Experiment has basic no winner declared elements', () => {
 		const {getAllByText, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -565,7 +567,8 @@ describe('No Winner Declared', () => {
 		 */
 		global.confirm = jest.fn(() => true);
 
-		const {APIServiceMocks, findByText, getByText} = renderApp({
+		const {APIServiceMocks, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -595,7 +598,7 @@ describe('No Winner Declared', () => {
 				segmentsVariants[1].segmentsExperienceId,
 		});
 
-		await findByText('completed');
+		await waitForElement(() => getByText('completed'));
 	});
 
 	it('Variant publish action button when not confirming in no winner declared status', async () => {
@@ -606,6 +609,7 @@ describe('No Winner Declared', () => {
 		global.confirm = jest.fn(() => false);
 
 		const {APIServiceMocks, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -636,8 +640,11 @@ describe('No Winner Declared', () => {
 });
 
 describe('Winner declared', () => {
+	afterEach(cleanup);
+
 	it('Experiment has basic winner declared elements', () => {
 		const {getAllByText, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -649,6 +656,9 @@ describe('Winner declared', () => {
 			initialSegmentsVariants: segmentsVariants,
 			winnerSegmentsVariantId: '1',
 		});
+
+		const winner = getByText('-is-the-winner-variant');
+		within(winner).getByText('Variant');
 
 		getByText('publish-winner');
 		getByText('discard-test');
@@ -665,7 +675,8 @@ describe('Winner declared', () => {
 		 */
 		global.confirm = jest.fn(() => true);
 
-		const {APIServiceMocks, findByText, getByText} = renderApp({
+		const {APIServiceMocks, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -695,7 +706,7 @@ describe('Winner declared', () => {
 				segmentsVariants[1].segmentsExperienceId,
 		});
 
-		await findByText('completed');
+		await waitForElement(() => getByText('completed'));
 	});
 
 	it('Variant publish action button when confirming in winner declared status', async () => {
@@ -705,7 +716,8 @@ describe('Winner declared', () => {
 		 */
 		global.confirm = jest.fn(() => true);
 
-		const {APIServiceMocks, findByText, getByText} = renderApp({
+		const {APIServiceMocks, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -735,7 +747,7 @@ describe('Winner declared', () => {
 				segmentsVariants[1].segmentsExperienceId,
 		});
 
-		await findByText('completed');
+		await waitForElement(() => getByText('completed'));
 	});
 
 	it('Variant publish action button when not confirming in winner declared status', async () => {
@@ -746,6 +758,7 @@ describe('Winner declared', () => {
 		global.confirm = jest.fn(() => false);
 
 		const {APIServiceMocks, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -775,7 +788,8 @@ describe('Winner declared', () => {
 	});
 
 	it('Discard button action', async () => {
-		const {APIServiceMocks, findByText, getByText} = renderApp({
+		const {APIServiceMocks, getByText} = renderApp({
+			initialSegmentsExperiences: segmentsExperiences,
 			initialSegmentsExperiment: {
 				...segmentsExperiment,
 				editable: false,
@@ -799,6 +813,6 @@ describe('Winner declared', () => {
 			winnerSegmentsExperienceId: segmentsExperiment.segmentsExperienceId,
 		});
 
-		await findByText('completed');
+		await waitForElement(() => getByText('completed'));
 	});
 });

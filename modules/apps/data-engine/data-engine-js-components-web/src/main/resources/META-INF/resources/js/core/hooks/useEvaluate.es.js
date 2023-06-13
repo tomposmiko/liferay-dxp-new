@@ -22,7 +22,7 @@ import {useFormState} from './useForm.es';
  * properties every time they are called, this is only for thunks that use
  * the `evaluate` function.
  */
-export function useEvaluate(thunk) {
+export const useEvaluate = (thunk) => {
 	const {groupId, portletNamespace, viewMode} = useConfig();
 	const {
 		defaultLanguageId,
@@ -30,7 +30,6 @@ export function useEvaluate(thunk) {
 		objectFields,
 		pages,
 		rules,
-		title,
 	} = useFormState();
 
 	return useCallback(
@@ -43,7 +42,6 @@ export function useEvaluate(thunk) {
 				pages,
 				portletNamespace,
 				rules,
-				title,
 				viewMode,
 				...args,
 			}),
@@ -56,8 +54,7 @@ export function useEvaluate(thunk) {
 			portletNamespace,
 			rules,
 			thunk,
-			title,
 			viewMode,
 		]
 	);
-}
+};

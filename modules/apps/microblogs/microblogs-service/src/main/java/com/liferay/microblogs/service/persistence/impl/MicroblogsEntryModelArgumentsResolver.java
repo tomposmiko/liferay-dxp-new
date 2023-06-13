@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.microblogs.model.impl.MicroblogsEntryImpl",
-		"table.name=MicroblogsEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		MicroblogsEntryModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class MicroblogsEntryModelArgumentsResolver
 	implements ArgumentsResolver {

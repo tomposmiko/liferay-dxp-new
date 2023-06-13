@@ -14,19 +14,19 @@
 
 package com.liferay.portal.module.framework;
 
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.io.IOException;
 
-import java.util.function.Supplier;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Miguel Pastor
@@ -40,9 +40,9 @@ public class ModuleFrameworkServletAdapter extends HttpServlet {
 			HttpServletResponse httpServletResponse)
 		throws IOException, ServletException {
 
-		HttpServlet httpServlet = _supplier.get();
+		Iterator<HttpServlet> iterator = _servlets.iterator();
 
-		if (httpServlet == null) {
+		if (!iterator.hasNext()) {
 			PortalUtil.sendError(
 				HttpServletResponse.SC_SERVICE_UNAVAILABLE,
 				new ServletException("Module framework is unavailable"),
@@ -51,23 +51,15 @@ public class ModuleFrameworkServletAdapter extends HttpServlet {
 			return;
 		}
 
+		HttpServlet httpServlet = iterator.next();
+
 		httpServlet.service(httpServletRequest, httpServletResponse);
 	}
 
-	private static final Supplier<HttpServlet> _supplier;
-
-	static {
-		ServiceTracker<HttpServlet, HttpServlet> serviceTracker =
-			new ServiceTracker<>(
-				SystemBundleUtil.getBundleContext(),
-				SystemBundleUtil.createFilter(
-					"(&(bean.id=" + HttpServlet.class.getName() +
-						")(original.bean=*))"),
-				null);
-
-		serviceTracker.open();
-
-		_supplier = serviceTracker::getService;
-	}
+	private final ServiceTrackerList<HttpServlet, HttpServlet> _servlets =
+		ServiceTrackerListFactory.open(
+			SystemBundleUtil.getBundleContext(), HttpServlet.class,
+			"(&(bean.id=" + HttpServlet.class.getName() +
+				")(original.bean=*))");
 
 }

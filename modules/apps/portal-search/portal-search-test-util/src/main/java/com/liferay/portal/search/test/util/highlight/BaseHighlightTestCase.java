@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.test.util.highlight;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Query;
@@ -31,6 +30,8 @@ import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.mockito.Mockito;
 
@@ -102,15 +103,23 @@ public abstract class BaseHighlightTestCase extends BaseIndexingTestCase {
 		return null;
 	}
 
+	protected String toFullHighlight(String s) {
+		return StringUtil.replace(
+			s, new String[] {"[H]", "[/H]"},
+			new String[] {
+				HighlightUtil.HIGHLIGHT_TAG_OPEN,
+				HighlightUtil.HIGHLIGHT_TAG_CLOSE
+			});
+	}
+
 	protected List<String> toFullHighlights(String... strings) {
-		return TransformUtil.transformToList(
-			strings,
-			string -> StringUtil.replace(
-				string, new String[] {"[H]", "[/H]"},
-				new String[] {
-					HighlightUtil.HIGHLIGHT_TAG_OPEN,
-					HighlightUtil.HIGHLIGHT_TAG_CLOSE
-				}));
+		return Stream.of(
+			strings
+		).map(
+			this::toFullHighlight
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 }

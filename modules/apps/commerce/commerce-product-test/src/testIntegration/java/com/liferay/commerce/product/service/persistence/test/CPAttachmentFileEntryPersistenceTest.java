@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.product.exception.DuplicateCPAttachmentFileEntryExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPAttachmentFileEntryException;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryLocalServiceUtil;
@@ -130,10 +129,6 @@ public class CPAttachmentFileEntryPersistenceTest {
 		CPAttachmentFileEntry newCPAttachmentFileEntry = _persistence.create(
 			pk);
 
-		newCPAttachmentFileEntry.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCPAttachmentFileEntry.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newCPAttachmentFileEntry.setUuid(RandomTestUtil.randomString());
 
 		newCPAttachmentFileEntry.setExternalReferenceCode(
@@ -191,12 +186,6 @@ public class CPAttachmentFileEntryPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCPAttachmentFileEntry.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCPAttachmentFileEntry.getMvccVersion(),
-			newCPAttachmentFileEntry.getMvccVersion());
-		Assert.assertEquals(
-			existingCPAttachmentFileEntry.getCtCollectionId(),
-			newCPAttachmentFileEntry.getCtCollectionId());
 		Assert.assertEquals(
 			existingCPAttachmentFileEntry.getUuid(),
 			newCPAttachmentFileEntry.getUuid());
@@ -282,32 +271,6 @@ public class CPAttachmentFileEntryPersistenceTest {
 			Time.getShortTimestamp(newCPAttachmentFileEntry.getStatusDate()));
 	}
 
-	@Test(
-		expected = DuplicateCPAttachmentFileEntryExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CPAttachmentFileEntry cpAttachmentFileEntry =
-			addCPAttachmentFileEntry();
-
-		CPAttachmentFileEntry newCPAttachmentFileEntry =
-			addCPAttachmentFileEntry();
-
-		newCPAttachmentFileEntry.setCompanyId(
-			cpAttachmentFileEntry.getCompanyId());
-
-		newCPAttachmentFileEntry = _persistence.update(
-			newCPAttachmentFileEntry);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCPAttachmentFileEntry);
-
-		newCPAttachmentFileEntry.setExternalReferenceCode(
-			cpAttachmentFileEntry.getExternalReferenceCode());
-
-		_persistence.update(newCPAttachmentFileEntry);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -349,15 +312,6 @@ public class CPAttachmentFileEntryPersistenceTest {
 			RandomTestUtil.nextDate(), RandomTestUtil.nextInt());
 
 		_persistence.countByLtD_S(RandomTestUtil.nextDate(), 0);
-	}
-
-	@Test
-	public void testCountByG_C_F() throws Exception {
-		_persistence.countByG_C_F(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong());
-
-		_persistence.countByG_C_F(0L, 0L, 0L);
 	}
 
 	@Test
@@ -407,12 +361,12 @@ public class CPAttachmentFileEntryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -443,10 +397,9 @@ public class CPAttachmentFileEntryPersistenceTest {
 
 	protected OrderByComparator<CPAttachmentFileEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CPAttachmentFileEntry", "mvccVersion", true, "ctCollectionId",
-			true, "uuid", true, "externalReferenceCode", true,
-			"CPAttachmentFileEntryId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
+			"CPAttachmentFileEntry", "uuid", true, "externalReferenceCode",
+			true, "CPAttachmentFileEntryId", true, "groupId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "classNameId", true, "classPK", true,
 			"fileEntryId", true, "cdnEnabled", true, "cdnURL", true,
 			"displayDate", true, "expirationDate", true, "title", true,
@@ -760,15 +713,15 @@ public class CPAttachmentFileEntryPersistenceTest {
 				new Class<?>[] {String.class}, "groupId"));
 
 		Assert.assertEquals(
-			cpAttachmentFileEntry.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				cpAttachmentFileEntry, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(cpAttachmentFileEntry.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				cpAttachmentFileEntry, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			cpAttachmentFileEntry.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				cpAttachmentFileEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CPAttachmentFileEntry addCPAttachmentFileEntry()
@@ -777,10 +730,6 @@ public class CPAttachmentFileEntryPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CPAttachmentFileEntry cpAttachmentFileEntry = _persistence.create(pk);
-
-		cpAttachmentFileEntry.setMvccVersion(RandomTestUtil.nextLong());
-
-		cpAttachmentFileEntry.setCtCollectionId(RandomTestUtil.nextLong());
 
 		cpAttachmentFileEntry.setUuid(RandomTestUtil.randomString());
 

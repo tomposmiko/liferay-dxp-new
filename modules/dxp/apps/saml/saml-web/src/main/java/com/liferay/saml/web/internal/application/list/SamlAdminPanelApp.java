@@ -27,8 +27,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  */
 @Component(
+	immediate = true,
 	property = {
-		"panel.app.order:Integer=600",
+		"panel.app.order:Integer=500",
 		"panel.category.key=" + PanelCategoryKeys.CONTROL_PANEL_SECURITY
 	},
 	service = PanelApp.class
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class SamlAdminPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return SamlPortletKeys.SAML_ADMIN;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN + ")"
+		target = "(javax.portlet.name=" + SamlPortletKeys.SAML_ADMIN + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

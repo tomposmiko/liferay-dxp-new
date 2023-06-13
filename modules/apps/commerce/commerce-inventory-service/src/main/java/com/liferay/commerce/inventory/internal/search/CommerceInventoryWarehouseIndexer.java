@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommerceInventoryWarehouseIndexer
 	extends BaseIndexer<CommerceInventoryWarehouse> {
 
@@ -154,7 +154,7 @@ public class CommerceInventoryWarehouseIndexer
 			FIELD_STREET_1, commerceInventoryWarehouse.getStreet1());
 		document.addKeyword(FIELD_ZIP, commerceInventoryWarehouse.getZip());
 		document.addNumber(
-			"itemsQuantity", _getItemsQuantity(commerceInventoryWarehouse));
+			"itemsQuantity", getItemsQuantity(commerceInventoryWarehouse));
 		document.addNumber(
 			"latitude", commerceInventoryWarehouse.getLatitude());
 		document.addNumber(
@@ -188,8 +188,8 @@ public class CommerceInventoryWarehouseIndexer
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commerceInventoryWarehouse.getCompanyId(),
-			getDocument(commerceInventoryWarehouse));
+			getSearchEngineId(), commerceInventoryWarehouse.getCompanyId(),
+			getDocument(commerceInventoryWarehouse), isCommitImmediately());
 	}
 
 	@Override
@@ -203,7 +203,22 @@ public class CommerceInventoryWarehouseIndexer
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommerceInventoryWarehouses(companyId);
+		reindexCommerceInventoryWarehouses(companyId);
+	}
+
+	protected int getItemsQuantity(
+		CommerceInventoryWarehouse commerceInventoryWarehouse) {
+
+		int count = 0;
+
+		for (CommerceInventoryWarehouseItem commerceInventoryWarehouseItem :
+				commerceInventoryWarehouse.
+					getCommerceInventoryWarehouseItems()) {
+
+			count += commerceInventoryWarehouseItem.getQuantity();
+		}
+
+		return count;
 	}
 
 	@Override
@@ -221,22 +236,7 @@ public class CommerceInventoryWarehouseIndexer
 		return super.isUseSearchResultPermissionFilter(searchContext);
 	}
 
-	private int _getItemsQuantity(
-		CommerceInventoryWarehouse commerceInventoryWarehouse) {
-
-		int count = 0;
-
-		for (CommerceInventoryWarehouseItem commerceInventoryWarehouseItem :
-				commerceInventoryWarehouse.
-					getCommerceInventoryWarehouseItems()) {
-
-			count += commerceInventoryWarehouseItem.getQuantity();
-		}
-
-		return count;
-	}
-
-	private void _reindexCommerceInventoryWarehouses(long companyId)
+	protected void reindexCommerceInventoryWarehouses(long companyId)
 		throws Exception {
 
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
@@ -263,6 +263,7 @@ public class CommerceInventoryWarehouseIndexer
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

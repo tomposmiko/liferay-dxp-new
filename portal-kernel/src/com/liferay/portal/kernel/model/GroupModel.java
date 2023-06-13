@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
-import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
@@ -166,20 +165,6 @@ public interface GroupModel
 	 * @param creatorUserUuid the creator user uuid of this group
 	 */
 	public void setCreatorUserUuid(String creatorUserUuid);
-
-	/**
-	 * Returns the modified date of this group.
-	 *
-	 * @return the modified date of this group
-	 */
-	public Date getModifiedDate();
-
-	/**
-	 * Sets the modified date of this group.
-	 *
-	 * @param modifiedDate the modified date of this group
-	 */
-	public void setModifiedDate(Date modifiedDate);
 
 	/**
 	 * Returns the fully qualified class name of this group.
@@ -652,9 +637,5 @@ public interface GroupModel
 
 	@Override
 	public Group cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

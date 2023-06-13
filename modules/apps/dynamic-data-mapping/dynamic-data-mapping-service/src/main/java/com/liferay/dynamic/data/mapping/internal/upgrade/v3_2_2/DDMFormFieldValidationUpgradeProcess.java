@@ -203,7 +203,7 @@ public class DDMFormFieldValidationUpgradeProcess extends UpgradeProcess {
 			jsonObject.getJSONArray("availableLanguageIds"),
 			jsonObject.getJSONArray("fields"));
 
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
 	}
 
 	private void _upgradeFields(

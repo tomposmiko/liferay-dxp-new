@@ -13,8 +13,7 @@
  */
 
 import 'leaflet/dist/leaflet.css';
-import ClayIcon from '@clayui/icon';
-import React, {useCallback, useState} from 'react';
+import React from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import {MAP_PROVIDER, useGeolocation} from './useGeolocation.es';
@@ -43,23 +42,13 @@ const Geolocation = ({
 	viewMode,
 	...otherProps
 }) => {
-	const [address, setAddress] = useState();
-
-	const handleChange = useCallback(
-		({newVal: {address, location}}) => {
-			setAddress(address);
-			onChange(JSON.stringify(location));
-		},
-		[onChange, setAddress]
-	);
-
 	useGeolocation({
 		disabled,
 		googleMapsAPIKey,
 		instanceId,
 		mapProviderKey,
 		name,
-		onChange: handleChange,
+		onChange,
 		value,
 		viewMode,
 	});
@@ -67,31 +56,21 @@ const Geolocation = ({
 	return (
 		<div {...otherProps} className="ddm-geolocation field-labels-inline">
 			{!disabled || viewMode ? (
-				<div>
-					<div>
-						<ClayIcon symbol="geolocation" />
-
-						{address}
-					</div>
-
-					<dl>
-						<dt className="text-capitalize"></dt>
-
-						<dd>
-							<NoRender
-								className="lfr-map"
-								id={`map_${instanceId}`}
-								style={{height: '280px'}}
-							/>
-
-							<input
-								id={`input_value_${instanceId}`}
-								name={name}
-								type="hidden"
-							/>
-						</dd>
-					</dl>
-				</div>
+				<dl>
+					<dt className="text-capitalize"></dt>
+					<dd>
+						<NoRender
+							className="lfr-map"
+							id={`map_${instanceId}`}
+							style={{height: '280px'}}
+						/>
+						<input
+							id={`input_value_${instanceId}`}
+							name={name}
+							type="hidden"
+						/>
+					</dd>
+				</dl>
 			) : (
 				<img
 					alt={Liferay.Language.get('geolocation')}

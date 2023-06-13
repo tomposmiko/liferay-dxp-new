@@ -19,13 +19,9 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.db.Index;
-import com.liferay.portal.kernel.dao.db.IndexMetadata;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -33,7 +29,6 @@ import com.liferay.portal.kernel.util.Validator;
 import java.io.IOException;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,80 +48,6 @@ public class OracleDB extends BaseDB {
 
 	public OracleDB(int majorVersion, int minorVersion) {
 		super(DBType.ORACLE, majorVersion, minorVersion);
-	}
-
-	@Override
-	public void alterColumnType(
-			Connection connection, String tableName, String columnName,
-			String newColumnType)
-		throws Exception {
-
-		DBInspector dbInspector = new DBInspector(connection);
-
-		if (!dbInspector.hasColumn(tableName, columnName)) {
-			throw new SQLException(
-				StringBundler.concat(
-					"Unknown column ", columnName, " in table ", tableName));
-		}
-
-		try {
-			super.alterColumnType(
-				connection, tableName, columnName, newColumnType);
-		}
-		catch (SQLException sqlException) {
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					StringBundler.concat(
-						"Attempting to upgrade table ", tableName,
-						" by adding a temporary column due to: ",
-						sqlException.getMessage()));
-			}
-
-			String tempColumnName = "temp" + columnName;
-
-			alterTableAddColumn(
-				connection, tableName, tempColumnName, newColumnType);
-
-			runSQL(
-				StringBundler.concat(
-					"update ", tableName, " set ", tempColumnName, " = ",
-					columnName));
-
-			List<IndexMetadata> indexMetadatas = dropIndexes(
-				connection, tableName, columnName);
-
-			String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(
-				connection, tableName);
-
-			boolean primaryKey = ArrayUtil.contains(
-				primaryKeyColumnNames, columnName);
-
-			if (primaryKey) {
-				removePrimaryKey(connection, tableName);
-			}
-
-			alterColumnName(
-				connection, tableName, columnName,
-				tempColumnName + "2 " + newColumnType);
-
-			alterColumnName(
-				connection, tableName, tempColumnName,
-				columnName + StringPool.SPACE + newColumnType);
-
-			if (!indexMetadatas.isEmpty()) {
-				addIndexes(connection, indexMetadatas);
-			}
-
-			if (primaryKey) {
-				addPrimaryKey(connection, tableName, primaryKeyColumnNames);
-			}
-
-			alterTableDropColumn(connection, tableName, tempColumnName + "2");
-
-			if (_log.isInfoEnabled()) {
-				_log.info("Successfully upgraded table " + tableName);
-			}
-		}
 	}
 
 	@Override
@@ -167,19 +88,6 @@ public class OracleDB extends BaseDB {
 		}
 
 		return indexes;
-	}
-
-	@Override
-	public ResultSet getIndexResultSet(Connection connection, String tableName)
-		throws SQLException {
-
-		DatabaseMetaData databaseMetaData = connection.getMetaData();
-
-		DBInspector dbInspector = new DBInspector(connection);
-
-		return databaseMetaData.getIndexInfo(
-			dbInspector.getCatalog(), dbInspector.getSchema(), tableName, false,
-			true);
 	}
 
 	@Override
@@ -225,11 +133,6 @@ public class OracleDB extends BaseDB {
 	}
 
 	@Override
-	protected int[] getSQLVarcharSizes() {
-		return _SQL_VARCHAR_SIZES;
-	}
-
-	@Override
 	protected String[] getTemplate() {
 		return _ORACLE;
 	}
@@ -242,15 +145,6 @@ public class OracleDB extends BaseDB {
 
 			return dbInspector.isNullable(tableName, columnName);
 		}
-	}
-
-	protected boolean isSupportsDuplicatedIndexName() {
-		return _SUPPORTS_DUPLICATED_INDEX_NAME;
-	}
-
-	@Override
-	protected String limitColumnLength(String column, int length) {
-		return StringBundler.concat("substr(", column, ", 1, ", length, ")");
 	}
 
 	@Override
@@ -345,30 +239,17 @@ public class OracleDB extends BaseDB {
 	private static final String[] _ORACLE = {
 		"--", "1", "0",
 		"to_date('1970-01-01 00:00:00','YYYY-MM-DD HH24:MI:SS')", "sysdate",
-		" blob", " blob", " number(1, 0)", " timestamp", " binary_double",
+		" blob", " blob", " number(1, 0)", " timestamp", " number(30,20)",
 		" number(30,0)", " number(30,0)", " varchar2(4000 char)", " clob",
 		" varchar2", "", "commit"
 	};
 
-	private static final int _SQL_STRING_SIZE = 4000;
-
-	private static final int _SQL_TYPE_BINARY_DOUBLE = 101;
-
 	private static final int[] _SQL_TYPES = {
-		Types.BLOB, Types.BLOB, Types.NUMERIC, Types.TIMESTAMP,
-		_SQL_TYPE_BINARY_DOUBLE, Types.NUMERIC, Types.NUMERIC, Types.VARCHAR,
-		Types.CLOB, Types.VARCHAR
+		Types.BLOB, Types.BLOB, Types.NUMERIC, Types.TIMESTAMP, Types.NUMERIC,
+		Types.NUMERIC, Types.NUMERIC, Types.VARCHAR, Types.CLOB, Types.VARCHAR
 	};
-
-	private static final int[] _SQL_VARCHAR_SIZES = {
-		_SQL_STRING_SIZE, SQL_SIZE_NONE
-	};
-
-	private static final boolean _SUPPORTS_DUPLICATED_INDEX_NAME = false;
 
 	private static final boolean _SUPPORTS_INLINE_DISTINCT = false;
-
-	private static final Log _log = LogFactoryUtil.getLog(OracleDB.class);
 
 	private static final Pattern _varchar2CharPattern = Pattern.compile(
 		"VARCHAR2\\((\\d+) CHAR\\)", Pattern.CASE_INSENSITIVE);

@@ -18,18 +18,18 @@ import {MockRouter} from '../../mock/MockRouter.es';
 import '@testing-library/jest-dom/extend-expect';
 
 describe('The SLAInfo component should', () => {
-	let container;
-	let getByText;
+	let container, getByText;
 
 	describe('SLA count 0', () => {
-		beforeAll(async () => {
-			fetch.mockResolvedValue({
-				json: () => Promise.resolve({items: [], totalCount: 0}),
-				ok: true,
-			});
+		const clientMock = {
+			get: jest
+				.fn()
+				.mockResolvedValue({data: {items: [], totalCount: 0}}),
+		};
 
+		beforeAll(async () => {
 			const renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<SLAInfo processId="1" />
 				</MockRouter>
 			);
@@ -60,14 +60,15 @@ describe('The SLAInfo component should', () => {
 	});
 
 	describe('SLA blocked count 1', () => {
-		beforeAll(async () => {
-			fetch.mockResolvedValue({
-				json: () => Promise.resolve({items: [], totalCount: 1}),
-				ok: true,
-			});
+		const clientMock = {
+			get: jest
+				.fn()
+				.mockResolvedValue({data: {items: [], totalCount: 1}}),
+		};
 
+		beforeAll(async () => {
 			const renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<SLAInfo processId="1" />
 				</MockRouter>
 			);
@@ -98,14 +99,15 @@ describe('The SLAInfo component should', () => {
 	});
 
 	describe('SLA blocked count greater than 1', () => {
-		beforeAll(async () => {
-			fetch.mockResolvedValue({
-				json: () => Promise.resolve({items: [], totalCount: 2}),
-				ok: true,
-			});
+		const clientMock = {
+			get: jest
+				.fn()
+				.mockResolvedValue({data: {items: [], totalCount: 2}}),
+		};
 
+		beforeAll(async () => {
 			const renderResult = render(
-				<MockRouter>
+				<MockRouter client={clientMock}>
 					<SLAInfo processId="1" />
 				</MockRouter>
 			);

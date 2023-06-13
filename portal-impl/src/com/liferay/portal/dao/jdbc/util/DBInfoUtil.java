@@ -50,6 +50,7 @@ public class DBInfoUtil {
 
 					return new DBInfo(
 						databaseMetaData.getDatabaseProductName(),
+						databaseMetaData.getDriverName(),
 						databaseMetaData.getDatabaseMajorVersion(),
 						databaseMetaData.getDatabaseMinorVersion());
 				}

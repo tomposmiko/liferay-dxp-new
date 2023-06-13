@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Display Page Templates";
+	property testray.main.component.name = "Display Pages";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Add a display page") {
@@ -28,7 +28,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-122142. View the visual style of mapped editable field items in Selection panel of display page template."
-	@priority = 4
+	@priority = "4"
 	test ViewVisualStyleOfMappedEditableFieldItems {
 		task ("Add a Heading fragment to display page template") {
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
@@ -54,14 +54,12 @@ definition {
 				fragmentName = "Heading",
 				id = "element-text");
 
-			WaitForEditable(locator1 = "PageEditorEditableLink#FIELD");
+			Pause(locator1 = "3000");
 
 			Select(
 				key_fieldLabel = "Field",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Content");
-
-			PageEditor.waitForAutoSave();
 		}
 
 		task ("View the visual style of Content item in Selection panel") {
@@ -97,14 +95,12 @@ definition {
 				fragmentName = "Button",
 				id = "link");
 
-			WaitForEditable(locator1 = "PageEditorEditableLink#FIELD");
+			Pause(locator1 = "3000");
 
 			Select(
 				key_fieldLabel = "Field",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Title");
-
-			PageEditor.waitForAutoSave();
 		}
 
 		task ("View the visual style of Title item in Selection panel") {

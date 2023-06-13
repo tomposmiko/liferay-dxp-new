@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleModel;
+import com.liferay.portal.kernel.model.RoleSoap;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -40,15 +41,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -85,7 +89,7 @@ public class RoleModelImpl extends BaseModelImpl<Role> implements RoleModel {
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
 		{"modifiedDate", Types.TIMESTAMP}, {"classNameId", Types.BIGINT},
 		{"classPK", Types.BIGINT}, {"name", Types.VARCHAR},
-		{"title", Types.VARCHAR}, {"description", Types.CLOB},
+		{"title", Types.VARCHAR}, {"description", Types.VARCHAR},
 		{"type_", Types.INTEGER}, {"subtype", Types.VARCHAR}
 	};
 
@@ -106,13 +110,13 @@ public class RoleModelImpl extends BaseModelImpl<Role> implements RoleModel {
 		TABLE_COLUMNS_MAP.put("classPK", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("title", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("description", Types.CLOB);
+		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("type_", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("subtype", Types.VARCHAR);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table Role_ (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,roleId LONG not null,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,name VARCHAR(75) null,title STRING null,description TEXT null,type_ INTEGER,subtype VARCHAR(75) null,primary key (roleId, ctCollectionId))";
+		"create table Role_ (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,roleId LONG not null,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,name VARCHAR(75) null,title STRING null,description STRING null,type_ INTEGER,subtype VARCHAR(75) null,primary key (roleId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table Role_";
 
@@ -185,6 +189,63 @@ public class RoleModelImpl extends BaseModelImpl<Role> implements RoleModel {
 	 */
 	@Deprecated
 	public static final long UUID_COLUMN_BITMASK = 64L;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static Role toModel(RoleSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		Role model = new RoleImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setUuid(soapModel.getUuid());
+		model.setRoleId(soapModel.getRoleId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
+		model.setName(soapModel.getName());
+		model.setTitle(soapModel.getTitle());
+		model.setDescription(soapModel.getDescription());
+		model.setType(soapModel.getType());
+		model.setSubtype(soapModel.getSubtype());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<Role> toModels(RoleSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<Role> models = new ArrayList<Role>(soapModels.length);
+
+		for (RoleSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
 
 	public static final String MAPPING_TABLE_GROUPS_ROLES_NAME = "Groups_Roles";
 
@@ -293,95 +354,106 @@ public class RoleModelImpl extends BaseModelImpl<Role> implements RoleModel {
 	}
 
 	public Map<String, Function<Role, Object>> getAttributeGetterFunctions() {
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<Role, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, Role>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<Role, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Role.class.getClassLoader(), Role.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<Role, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<Role, Object>>();
+		try {
+			Constructor<Role> constructor =
+				(Constructor<Role>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put("mvccVersion", Role::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", Role::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", Role::getUuid);
-			attributeGetterFunctions.put("roleId", Role::getRoleId);
-			attributeGetterFunctions.put("companyId", Role::getCompanyId);
-			attributeGetterFunctions.put("userId", Role::getUserId);
-			attributeGetterFunctions.put("userName", Role::getUserName);
-			attributeGetterFunctions.put("createDate", Role::getCreateDate);
-			attributeGetterFunctions.put("modifiedDate", Role::getModifiedDate);
-			attributeGetterFunctions.put("classNameId", Role::getClassNameId);
-			attributeGetterFunctions.put("classPK", Role::getClassPK);
-			attributeGetterFunctions.put("name", Role::getName);
-			attributeGetterFunctions.put("title", Role::getTitle);
-			attributeGetterFunctions.put("description", Role::getDescription);
-			attributeGetterFunctions.put("type", Role::getType);
-			attributeGetterFunctions.put("subtype", Role::getSubtype);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<Role, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<Role, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<Role, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<Role, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Role, Object>>();
+		Map<String, BiConsumer<Role, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<Role, ?>>();
 
-		static {
-			Map<String, BiConsumer<Role, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<Role, ?>>();
+		attributeGetterFunctions.put("mvccVersion", Role::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion", (BiConsumer<Role, Long>)Role::setMvccVersion);
+		attributeGetterFunctions.put("ctCollectionId", Role::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId", (BiConsumer<Role, Long>)Role::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", Role::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<Role, String>)Role::setUuid);
+		attributeGetterFunctions.put("roleId", Role::getRoleId);
+		attributeSetterBiConsumers.put(
+			"roleId", (BiConsumer<Role, Long>)Role::setRoleId);
+		attributeGetterFunctions.put("companyId", Role::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<Role, Long>)Role::setCompanyId);
+		attributeGetterFunctions.put("userId", Role::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<Role, Long>)Role::setUserId);
+		attributeGetterFunctions.put("userName", Role::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<Role, String>)Role::setUserName);
+		attributeGetterFunctions.put("createDate", Role::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate", (BiConsumer<Role, Date>)Role::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Role::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate", (BiConsumer<Role, Date>)Role::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", Role::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId", (BiConsumer<Role, Long>)Role::setClassNameId);
+		attributeGetterFunctions.put("classPK", Role::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK", (BiConsumer<Role, Long>)Role::setClassPK);
+		attributeGetterFunctions.put("name", Role::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<Role, String>)Role::setName);
+		attributeGetterFunctions.put("title", Role::getTitle);
+		attributeSetterBiConsumers.put(
+			"title", (BiConsumer<Role, String>)Role::setTitle);
+		attributeGetterFunctions.put("description", Role::getDescription);
+		attributeSetterBiConsumers.put(
+			"description", (BiConsumer<Role, String>)Role::setDescription);
+		attributeGetterFunctions.put("type", Role::getType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<Role, Integer>)Role::setType);
+		attributeGetterFunctions.put("subtype", Role::getSubtype);
+		attributeSetterBiConsumers.put(
+			"subtype", (BiConsumer<Role, String>)Role::setSubtype);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion", (BiConsumer<Role, Long>)Role::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<Role, Long>)Role::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<Role, String>)Role::setUuid);
-			attributeSetterBiConsumers.put(
-				"roleId", (BiConsumer<Role, Long>)Role::setRoleId);
-			attributeSetterBiConsumers.put(
-				"companyId", (BiConsumer<Role, Long>)Role::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<Role, Long>)Role::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName", (BiConsumer<Role, String>)Role::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate", (BiConsumer<Role, Date>)Role::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate", (BiConsumer<Role, Date>)Role::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"classNameId", (BiConsumer<Role, Long>)Role::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK", (BiConsumer<Role, Long>)Role::setClassPK);
-			attributeSetterBiConsumers.put(
-				"name", (BiConsumer<Role, String>)Role::setName);
-			attributeSetterBiConsumers.put(
-				"title", (BiConsumer<Role, String>)Role::setTitle);
-			attributeSetterBiConsumers.put(
-				"description", (BiConsumer<Role, String>)Role::setDescription);
-			attributeSetterBiConsumers.put(
-				"type", (BiConsumer<Role, Integer>)Role::setType);
-			attributeSetterBiConsumers.put(
-				"subtype", (BiConsumer<Role, String>)Role::setSubtype);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1348,12 +1420,40 @@ public class RoleModelImpl extends BaseModelImpl<Role> implements RoleModel {
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<Role, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<Role, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<Role, Object> attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((Role)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Role>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Role.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1380,9 +1480,8 @@ public class RoleModelImpl extends BaseModelImpl<Role> implements RoleModel {
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<Role, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<Role, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

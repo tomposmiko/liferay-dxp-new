@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -35,8 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface WikiPageResourceModel
-	extends BaseModel<WikiPageResource>, CTModel<WikiPageResource>, MVCCModel,
-			ShardedModel {
+	extends BaseModel<WikiPageResource>, MVCCModel, ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -49,7 +47,6 @@ public interface WikiPageResourceModel
 	 *
 	 * @return the primary key of this wiki page resource
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -57,7 +54,6 @@ public interface WikiPageResourceModel
 	 *
 	 * @param primaryKey the primary key of this wiki page resource
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -75,22 +71,6 @@ public interface WikiPageResourceModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this wiki page resource.
-	 *
-	 * @return the ct collection ID of this wiki page resource
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this wiki page resource.
-	 *
-	 * @param ctCollectionId the ct collection ID of this wiki page resource
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this wiki page resource.
@@ -182,9 +162,5 @@ public interface WikiPageResourceModel
 
 	@Override
 	public WikiPageResource cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

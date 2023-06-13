@@ -17,11 +17,11 @@ package com.liferay.trash.web.internal.servlet.taglib.util;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
@@ -50,25 +50,13 @@ public class TrashViewContentActionDropdownItemsProvider {
 		_trashHandler = TrashHandlerRegistryUtil.getTrashHandler(className);
 	}
 
-	public List<DropdownItem> getActionDropdownItems() {
-		return DropdownItemListBuilder.addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() -> _trashHandler.isMovable(_classPK),
-						_getMoveActionDropdownItem()
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
-		).addGroup(
-			dropdownGroupItem -> {
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						() -> _trashHandler.isDeletable(_classPK),
-						_getDeleteActionDropdownItem()
-					).build());
-				dropdownGroupItem.setSeparator(true);
-			}
+	public List<DropdownItem> getActionDropdownItems() throws Exception {
+		return DropdownItemListBuilder.add(
+			() -> _trashHandler.isMovable(_classPK),
+			_getMoveActionDropdownItem()
+		).add(
+			() -> _trashHandler.isDeletable(_classPK),
+			_getDeleteActionDropdownItem()
 		).build();
 	}
 
@@ -88,8 +76,6 @@ public class TrashViewContentActionDropdownItemsProvider {
 			).setParameter(
 				"classPK", _classPK
 			).buildString()
-		).setIcon(
-			"trash"
 		).setLabel(
 			LanguageUtil.get(_themeDisplay.getLocale(), "delete")
 		).build();
@@ -115,8 +101,6 @@ public class TrashViewContentActionDropdownItemsProvider {
 			).setWindowState(
 				LiferayWindowState.POP_UP
 			).buildString()
-		).setIcon(
-			"restore"
 		).setLabel(
 			LanguageUtil.get(_themeDisplay.getLocale(), "restore")
 		).build();

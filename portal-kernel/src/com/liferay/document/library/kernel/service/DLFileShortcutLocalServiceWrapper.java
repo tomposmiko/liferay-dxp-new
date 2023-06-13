@@ -30,10 +30,6 @@ public class DLFileShortcutLocalServiceWrapper
 	implements DLFileShortcutLocalService,
 			   ServiceWrapper<DLFileShortcutLocalService> {
 
-	public DLFileShortcutLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLFileShortcutLocalServiceWrapper(
 		DLFileShortcutLocalService dlFileShortcutLocalService) {
 
@@ -473,13 +469,6 @@ public class DLFileShortcutLocalServiceWrapper
 	@Override
 	public java.util.List<DLFileShortcut> getFileShortcuts(long toFileEntryId) {
 		return _dlFileShortcutLocalService.getFileShortcuts(toFileEntryId);
-	}
-
-	@Override
-	public java.util.List<DLFileShortcut> getFileShortcuts(
-		long groupId, long folderId) {
-
-		return _dlFileShortcutLocalService.getFileShortcuts(groupId, folderId);
 	}
 
 	@Override

@@ -18,18 +18,16 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
@@ -39,6 +37,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Rubén Pulido
@@ -104,22 +104,29 @@ public class FragmentCollectionFilterCategoryDisplayContext {
 			() -> {
 				List<AssetCategory> assetCategories = _getAssetCategories();
 
-				if (assetCategories.isEmpty()) {
+				if (assetCategories == null) {
 					return new ArrayList<>();
 				}
 
-				return TransformUtil.transform(
-					assetCategories,
+				Stream<AssetCategory> stream = assetCategories.stream();
+
+				return stream.map(
 					assetCategory -> HashMapBuilder.put(
 						"id", String.valueOf(assetCategory.getCategoryId())
 					).put(
 						"label",
 						assetCategory.getTitle(
 							_fragmentRendererContext.getLocale())
-					).build());
+					).build()
+				).collect(
+					Collectors.toList()
+				);
 			}
 		).put(
-			"enableDropdown", !_fragmentRendererContext.isEditMode()
+			"enableDropdown",
+			!Objects.equals(
+				_fragmentRendererContext.getMode(),
+				FragmentEntryLinkConstants.EDIT)
 		).put(
 			"fragmentEntryLinkId",
 			String.valueOf(_fragmentEntryLink.getFragmentEntryLinkId())
@@ -223,10 +230,6 @@ public class FragmentCollectionFilterCategoryDisplayContext {
 				sourceObject.toString());
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
 			_sourceJSONObject = JSONFactoryUtil.createJSONObject();
 		}
 
@@ -240,9 +243,6 @@ public class FragmentCollectionFilterCategoryDisplayContext {
 	private boolean _isSingleSelection() {
 		return GetterUtil.getBoolean(_getFieldValue("singleSelection"));
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FragmentCollectionFilterCategoryDisplayContext.class);
 
 	private List<AssetCategory> _assetCategories;
 	private Long _assetCategoryTreeNodeId;

@@ -21,7 +21,6 @@ const FALLBACK_CONFIG = {
 	bracketSpacing: false,
 	endOfLine: 'lf',
 	jsxSingleQuote: false,
-	quoteProps: 'consistent',
 	singleQuote: true,
 	tabWidth: 4,
 	trailingComma: 'es5',

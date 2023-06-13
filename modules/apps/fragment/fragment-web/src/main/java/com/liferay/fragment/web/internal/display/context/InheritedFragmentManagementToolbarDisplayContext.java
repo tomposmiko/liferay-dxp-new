@@ -18,11 +18,11 @@ import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.web.internal.security.permission.resource.FragmentPermission;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -63,7 +63,7 @@ public class InheritedFragmentManagementToolbarDisplayContext
 			dropdownItem -> {
 				dropdownItem.putData(
 					"action", "exportFragmentCompositionsAndFragmentEntries");
-				dropdownItem.setIcon("upload");
+				dropdownItem.setIcon("import-export");
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "export"));
 				dropdownItem.setQuickAction(true);
@@ -75,7 +75,7 @@ public class InheritedFragmentManagementToolbarDisplayContext
 				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES),
 			dropdownItem -> {
 				dropdownItem.putData("action", "copyToSelectedFragmentEntries");
-				dropdownItem.setIcon("copy");
+				dropdownItem.setIcon("paste");
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "copy-to"));
 				dropdownItem.setQuickAction(true);

@@ -192,8 +192,4 @@ public interface CTAutoResolutionInfoModel
 	@Override
 	public CTAutoResolutionInfo cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

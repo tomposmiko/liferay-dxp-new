@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = AutoLogin.class)
+@Component(immediate = true, service = AutoLogin.class)
 public class OpenIdConnectAutoLogin extends BaseAutoLogin {
 
 	@Override

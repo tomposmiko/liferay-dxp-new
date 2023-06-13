@@ -15,8 +15,8 @@
 package com.liferay.application.list;
 
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
+import com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
-import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Deactivate;
  *
  * @author Adolfo Pérez
  */
-@Component(service = PanelCategoryRegistry.class)
+@Component(immediate = true, service = PanelCategoryRegistry.class)
 public class PanelCategoryRegistry {
 
 	public List<PanelCategory> getChildPanelCategories(
@@ -92,7 +92,7 @@ public class PanelCategoryRegistry {
 					return panelCategory.isShow(permissionChecker, group);
 				}
 				catch (PortalException portalException) {
-					_log.error(portalException);
+					_log.error(portalException, portalException);
 				}
 
 				return false;
@@ -119,7 +119,7 @@ public class PanelCategoryRegistry {
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -140,7 +140,7 @@ public class PanelCategoryRegistry {
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -162,12 +162,15 @@ public class PanelCategoryRegistry {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_childPanelCategoriesServiceTrackerMap =
-			ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, PanelCategory.class, null,
-				new PropertyServiceReferenceMapper<>("panel.category.key"),
+			ServiceTrackerMapBuilder.SelectorFactory.newSelector(
+				bundleContext, PanelCategory.class
+			).map(
+				"panel.category.key"
+			).collectMultiValue(
 				Collections.reverseOrder(
 					new PropertyServiceReferenceComparator<>(
-						"panel.category.order")));
+						"panel.category.order"))
+			).build();
 
 		_panelCategoryServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(

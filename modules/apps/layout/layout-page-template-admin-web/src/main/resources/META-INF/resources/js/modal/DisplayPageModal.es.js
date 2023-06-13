@@ -24,7 +24,7 @@ import DisplayPageModalForm from './DisplayPageModalForm.es';
 const DisplayPageModal = (props) => {
 	const {formSubmitURL, onClose} = props;
 
-	const formRef = useRef();
+	const form = useRef();
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const {observer} = useModal({onClose});
@@ -63,7 +63,7 @@ const DisplayPageModal = (props) => {
 		(event) => {
 			event.preventDefault();
 
-			const error = validateForm(formRef.current);
+			const error = validateForm(form.current);
 
 			if (Object.keys(error).length !== 0) {
 				setError(error);
@@ -74,7 +74,7 @@ const DisplayPageModal = (props) => {
 			setLoading(true);
 
 			fetch(formSubmitURL, {
-				body: new FormData(formRef.current),
+				body: new FormData(form.current),
 				method: 'POST',
 			})
 				.then((response) => response.json())
@@ -105,7 +105,6 @@ const DisplayPageModal = (props) => {
 	return (
 		<ClayModal observer={observer} size="md">
 			<ClayModal.Header>{props.title}</ClayModal.Header>
-
 			<ClayModal.Body>
 				{error && error.other && (
 					<ClayAlert
@@ -116,7 +115,6 @@ const DisplayPageModal = (props) => {
 						{error.other}
 					</ClayAlert>
 				)}
-
 				{visible && (
 					<DisplayPageModalForm
 						displayPageName={props.displayPageName}
@@ -124,18 +122,16 @@ const DisplayPageModal = (props) => {
 						mappingTypes={props.mappingTypes}
 						namespace={props.namespace}
 						onSubmit={handleSubmit}
-						ref={formRef}
+						ref={form}
 					/>
 				)}
 			</ClayModal.Body>
-
 			<ClayModal.Footer
 				last={
 					<ClayButton.Group spaced>
 						<ClayButton displayType="secondary" onClick={onClose}>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
-
 						<ClayButton
 							displayType="primary"
 							onClick={handleSubmit}
@@ -148,7 +144,6 @@ const DisplayPageModal = (props) => {
 									></span>
 								</span>
 							)}
-
 							{Liferay.Language.get('save')}
 						</ClayButton>
 					</ClayButton.Group>

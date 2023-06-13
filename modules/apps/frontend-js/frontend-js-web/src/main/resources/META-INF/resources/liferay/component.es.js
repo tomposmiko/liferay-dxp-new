@@ -107,7 +107,7 @@ const _onStartNavigate = function (event) {
 	});
 
 	if (cacheableUri) {
-		let componentIds = Object.keys(components);
+		var componentIds = Object.keys(components);
 
 		componentIds = componentIds.filter((componentId) => {
 			const component = components[componentId];
@@ -270,7 +270,7 @@ const componentReady = function () {
 	else {
 		component = [];
 
-		for (let i = 0; i < arguments.length; i++) {
+		for (var i = 0; i < arguments.length; i++) {
 			component[i] = arguments[i];
 		}
 	}
@@ -328,7 +328,7 @@ const destroyComponent = function (componentId) {
  *        component should be destroyed.
  */
 const destroyComponents = function (filterFn) {
-	let componentIds = Object.keys(components);
+	var componentIds = Object.keys(components);
 
 	if (filterFn) {
 		componentIds = componentIds.filter((componentId) => {

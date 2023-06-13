@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class AssetEntryServiceWrapper
 	implements AssetEntryService, ServiceWrapper<AssetEntryService> {
 
-	public AssetEntryServiceWrapper() {
-		this(null);
-	}
-
 	public AssetEntryServiceWrapper(AssetEntryService assetEntryService) {
 		_assetEntryService = assetEntryService;
 	}

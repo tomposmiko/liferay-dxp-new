@@ -16,10 +16,8 @@ package com.liferay.portlet.expando.service.impl;
 
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoValue;
-import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.permission.ExpandoColumnPermissionUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -46,11 +44,11 @@ public class ExpandoValueServiceImpl extends ExpandoValueServiceBaseImpl {
 			String columnName, long classPK, Object data)
 		throws PortalException {
 
+		ExpandoColumn column = expandoColumnLocalService.getColumn(
+			companyId, className, tableName, columnName);
+
 		ExpandoColumnPermissionUtil.check(
-			getPermissionChecker(),
-			_expandoColumnLocalService.getColumn(
-				companyId, className, tableName, columnName),
-			ActionKeys.UPDATE);
+			getPermissionChecker(), column, ActionKeys.UPDATE);
 
 		return expandoValueLocalService.addValue(
 			companyId, className, tableName, columnName, classPK, data);
@@ -63,11 +61,11 @@ public class ExpandoValueServiceImpl extends ExpandoValueServiceBaseImpl {
 			String columnName, long classPK, String data)
 		throws PortalException {
 
+		ExpandoColumn column = expandoColumnLocalService.getColumn(
+			companyId, className, tableName, columnName);
+
 		ExpandoColumnPermissionUtil.check(
-			getPermissionChecker(),
-			_expandoColumnLocalService.getColumn(
-				companyId, className, tableName, columnName),
-			ActionKeys.UPDATE);
+			getPermissionChecker(), column, ActionKeys.UPDATE);
 
 		return expandoValueLocalService.addValue(
 			companyId, className, tableName, columnName, classPK, data);
@@ -99,11 +97,11 @@ public class ExpandoValueServiceImpl extends ExpandoValueServiceBaseImpl {
 				companyId, className, tableName, columnNames, classPK);
 
 		for (String columnName : columnNames) {
+			ExpandoColumn column = expandoColumnLocalService.getColumn(
+				companyId, className, tableName, columnName);
+
 			if (!ExpandoColumnPermissionUtil.contains(
-					getPermissionChecker(),
-					_expandoColumnLocalService.getColumn(
-						companyId, className, tableName, columnName),
-					ActionKeys.VIEW)) {
+					getPermissionChecker(), column, ActionKeys.VIEW)) {
 
 				attributeValues.remove(columnName);
 			}
@@ -118,7 +116,7 @@ public class ExpandoValueServiceImpl extends ExpandoValueServiceBaseImpl {
 			String columnName, long classPK)
 		throws PortalException {
 
-		ExpandoColumn column = _expandoColumnLocalService.getColumn(
+		ExpandoColumn column = expandoColumnLocalService.getColumn(
 			companyId, className, tableName, columnName);
 
 		if ((column != null) &&
@@ -138,7 +136,7 @@ public class ExpandoValueServiceImpl extends ExpandoValueServiceBaseImpl {
 			String columnName, long classPK)
 		throws PortalException {
 
-		ExpandoColumn column = _expandoColumnLocalService.getColumn(
+		ExpandoColumn column = expandoColumnLocalService.getColumn(
 			companyId, className, tableName, columnName);
 
 		if ((column == null) ||
@@ -162,8 +160,5 @@ public class ExpandoValueServiceImpl extends ExpandoValueServiceBaseImpl {
 
 		return JSONUtil.put("data", data);
 	}
-
-	@BeanReference(type = ExpandoColumnLocalService.class)
-	private ExpandoColumnLocalService _expandoColumnLocalService;
 
 }

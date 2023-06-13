@@ -12,7 +12,7 @@
  * details.
  */
 
-import {delegate, openConfirmModal} from 'frontend-js-web';
+import {delegate} from 'frontend-js-web';
 
 export default function ({namespace}) {
 	const ratingSettingsContainer = document.getElementById(
@@ -33,17 +33,17 @@ export default function ({namespace}) {
 	const form = document.getElementById(`${namespace}fm`);
 
 	const onSubmit = (event) => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'existing-ratings-data-values-will-be-adapted-to-match-the-new-ratings-type-even-though-it-may-not-be-accurate'
-			),
-			onConfirm: (isConfirmed) => {
-				if (ratingTypeChanged && !isConfirmed) {
-					event.preventDefault();
-					event.stopImmediatePropagation();
-				}
-			},
-		});
+		if (
+			ratingTypeChanged &&
+			!confirm(
+				Liferay.Language.get(
+					'existing-ratings-data-values-will-be-adapted-to-match-the-new-ratings-type-even-though-it-may-not-be-accurate'
+				)
+			)
+		) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}
 	};
 
 	form.addEventListener('submit', onSubmit);

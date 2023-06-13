@@ -53,7 +53,7 @@ import com.liferay.wiki.model.WikiPageResource;
 import com.liferay.wiki.service.WikiPageLocalService;
 import com.liferay.wiki.service.WikiPageResourceLocalService;
 import com.liferay.wiki.service.WikiPageService;
-import com.liferay.wiki.web.internal.helper.WikiAttachmentsHelper;
+import com.liferay.wiki.web.internal.WikiAttachmentsHelper;
 import com.liferay.wiki.web.internal.util.WikiWebComponentProvider;
 
 import java.util.ArrayList;
@@ -73,6 +73,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
@@ -83,94 +84,14 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
+	@Reference(unbind = "-")
+	public void setWikiAttachmentsHelper(
+		WikiAttachmentsHelper wikiAttachmentsHelper) {
 
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		WikiPage page = null;
-
-		try {
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				page = _updatePage(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deletePage(actionRequest, false);
-			}
-			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
-				_deletePage(actionRequest, true);
-			}
-			else if (cmd.equals(Constants.RESTORE)) {
-				_restorePage(actionRequest);
-			}
-			else if (cmd.equals(Constants.REVERT)) {
-				_revertPage(actionRequest);
-			}
-			else if (cmd.equals(Constants.SUBSCRIBE)) {
-				_subscribePage(actionRequest);
-			}
-			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
-				_unsubscribePage(actionRequest);
-			}
-
-			if (Validator.isNotNull(cmd)) {
-				String redirect = ParamUtil.getString(
-					actionRequest, "redirect");
-
-				if (page != null) {
-					int workflowAction = ParamUtil.getInteger(
-						actionRequest, "workflowAction",
-						WorkflowConstants.ACTION_PUBLISH);
-
-					if (workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT) {
-						redirect = _getSaveAndContinueRedirect(
-							actionRequest, actionResponse, page, redirect);
-					}
-					else if (redirect.endsWith("title=")) {
-						redirect += page.getTitle();
-					}
-				}
-
-				sendRedirect(actionRequest, actionResponse, redirect);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchNodeException ||
-				exception instanceof NoSuchPageException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-			}
-			else if (exception instanceof DuplicatePageException ||
-					 exception instanceof PageContentException ||
-					 exception instanceof PageTitleException ||
-					 exception instanceof PageVersionException ||
-					 exception instanceof SanitizerException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-			}
-			else if (exception instanceof AssetCategoryException ||
-					 exception instanceof AssetTagException) {
-
-				SessionErrors.add(
-					actionRequest, exception.getClass(), exception);
-			}
-			else {
-				Throwable throwable = exception.getCause();
-
-				if (throwable instanceof SanitizerException) {
-					SessionErrors.add(actionRequest, SanitizerException.class);
-				}
-				else {
-					throw exception;
-				}
-			}
-		}
+		_wikiAttachmentsHelper = wikiAttachmentsHelper;
 	}
 
-	private void _deletePage(ActionRequest actionRequest, boolean moveToTrash)
+	protected void deletePage(ActionRequest actionRequest, boolean moveToTrash)
 		throws Exception {
 
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
@@ -224,7 +145,94 @@ public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private String _getSaveAndContinueRedirect(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		WikiPage page = null;
+
+		try {
+			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				page = updatePage(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deletePage(actionRequest, false);
+			}
+			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
+				deletePage(actionRequest, true);
+			}
+			else if (cmd.equals(Constants.RESTORE)) {
+				restorePage(actionRequest);
+			}
+			else if (cmd.equals(Constants.REVERT)) {
+				revertPage(actionRequest);
+			}
+			else if (cmd.equals(Constants.SUBSCRIBE)) {
+				subscribePage(actionRequest);
+			}
+			else if (cmd.equals(Constants.UNSUBSCRIBE)) {
+				unsubscribePage(actionRequest);
+			}
+
+			if (Validator.isNotNull(cmd)) {
+				String redirect = ParamUtil.getString(
+					actionRequest, "redirect");
+
+				if (page != null) {
+					int workflowAction = ParamUtil.getInteger(
+						actionRequest, "workflowAction",
+						WorkflowConstants.ACTION_PUBLISH);
+
+					if (workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT) {
+						redirect = getSaveAndContinueRedirect(
+							actionRequest, actionResponse, page, redirect);
+					}
+					else if (redirect.endsWith("title=")) {
+						redirect += page.getTitle();
+					}
+				}
+
+				sendRedirect(actionRequest, actionResponse, redirect);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchNodeException ||
+				exception instanceof NoSuchPageException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+			}
+			else if (exception instanceof DuplicatePageException ||
+					 exception instanceof PageContentException ||
+					 exception instanceof PageTitleException ||
+					 exception instanceof PageVersionException ||
+					 exception instanceof SanitizerException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+			}
+			else if (exception instanceof AssetCategoryException ||
+					 exception instanceof AssetTagException) {
+
+				SessionErrors.add(
+					actionRequest, exception.getClass(), exception);
+			}
+			else {
+				Throwable throwable = exception.getCause();
+
+				if (throwable instanceof SanitizerException) {
+					SessionErrors.add(actionRequest, SanitizerException.class);
+				}
+				else {
+					throw exception;
+				}
+			}
+		}
+	}
+
+	protected String getSaveAndContinueRedirect(
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			WikiPage page, String redirect)
 		throws Exception {
@@ -259,7 +267,7 @@ public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 		return liferayPortletURL.toString();
 	}
 
-	private void _restorePage(ActionRequest actionRequest) throws Exception {
+	protected void restorePage(ActionRequest actionRequest) throws Exception {
 		long[] restoreEntryIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "restoreTrashEntryIds"), 0L);
 
@@ -298,7 +306,7 @@ public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _revertPage(ActionRequest actionRequest) throws Exception {
+	protected void revertPage(ActionRequest actionRequest) throws Exception {
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
 		String title = ParamUtil.getString(actionRequest, "title");
 		double version = ParamUtil.getDouble(actionRequest, "version");
@@ -309,14 +317,14 @@ public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 		_wikiPageService.revertPage(nodeId, title, version, serviceContext);
 	}
 
-	private void _subscribePage(ActionRequest actionRequest) throws Exception {
+	protected void subscribePage(ActionRequest actionRequest) throws Exception {
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
 		String title = ParamUtil.getString(actionRequest, "title");
 
 		_wikiPageService.subscribePage(nodeId, title);
 	}
 
-	private void _unsubscribePage(ActionRequest actionRequest)
+	protected void unsubscribePage(ActionRequest actionRequest)
 		throws Exception {
 
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
@@ -325,7 +333,9 @@ public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 		_wikiPageService.unsubscribePage(nodeId, title);
 	}
 
-	private WikiPage _updatePage(ActionRequest actionRequest) throws Exception {
+	protected WikiPage updatePage(ActionRequest actionRequest)
+		throws Exception {
+
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
@@ -342,8 +352,6 @@ public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 			WikiPage.class.getName(), actionRequest);
 
 		WikiPage page = null;
-
-		_wikiAttachmentsHelper.addAttachments(actionRequest);
 
 		if (cmd.equals(Constants.UPDATE)) {
 			double version = ParamUtil.getDouble(actionRequest, "version");
@@ -371,6 +379,8 @@ public class EditPageMVCActionCommand extends BaseMVCActionCommand {
 					page.getTitle());
 			}
 		}
+
+		_wikiAttachmentsHelper.addAttachments(actionRequest);
 
 		return page;
 	}

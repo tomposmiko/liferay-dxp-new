@@ -17,38 +17,28 @@ package com.liferay.commerce.price.list.service.impl;
 import com.liferay.commerce.price.list.model.CommercePriceEntry;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.service.base.CommercePriceEntryServiceBaseImpl;
-import com.liferay.commerce.price.list.service.persistence.CommercePriceListFinder;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPInstanceService;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.math.BigDecimal;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  * @author Zoltán Takács
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommercePriceEntry"
-	},
-	service = AopService.class
-)
 public class CommercePriceEntryServiceImpl
 	extends CommercePriceEntryServiceBaseImpl {
 
@@ -324,7 +314,7 @@ public class CommercePriceEntryServiceImpl
 	public CommercePriceEntry getInstanceBaseCommercePriceEntry(
 		String cpInstanceUuid, String priceListType) {
 
-		return _commercePriceListFinder.findBasePriceEntry(
+		return commercePriceListFinder.findBasePriceEntry(
 			cpInstanceUuid, priceListType, true);
 	}
 
@@ -340,7 +330,7 @@ public class CommercePriceEntryServiceImpl
 			return Collections.emptyList();
 		}
 
-		return _commercePriceListFinder.findByCPInstanceUuid(
+		return commercePriceListFinder.findByCPInstanceUuid(
 			cpInstance.getCPInstanceUuid(), start, end, true);
 	}
 
@@ -368,7 +358,7 @@ public class CommercePriceEntryServiceImpl
 			return 0;
 		}
 
-		return _commercePriceListFinder.countByCPInstanceUuid(
+		return commercePriceListFinder.countByCPInstanceUuid(
 			cpInstance.getCPInstanceUuid(), true);
 	}
 
@@ -576,16 +566,14 @@ public class CommercePriceEntryServiceImpl
 			neverExpire, skuExternalReferenceCode, serviceContext);
 	}
 
-	@Reference
-	private CommercePriceListFinder _commercePriceListFinder;
+	private static volatile ModelResourcePermission<CommercePriceList>
+		_commercePriceListModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CommercePriceEntryServiceImpl.class,
+				"_commercePriceListModelResourcePermission",
+				CommercePriceList.class);
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.price.list.model.CommercePriceList)"
-	)
-	private ModelResourcePermission<CommercePriceList>
-		_commercePriceListModelResourcePermission;
-
-	@Reference
+	@ServiceReference(type = CPInstanceService.class)
 	private CPInstanceService _cpInstanceService;
 
 }

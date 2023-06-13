@@ -36,7 +36,7 @@
 				<#if portlet_configuration_icons?has_content>
 					<#if (portlet_configuration_icons?size > 1)>
 						<menu class="portlet-topper-toolbar" id="portlet-topper-toolbar_${portlet_id}" type="toolbar">
-							<@liferay_frontend["icon-options"]
+							<@liferay_portlet["icon-options"]
 								direction="right cadmin"
 								portletConfigurationIcons=portlet_configuration_icons
 							/>
@@ -50,10 +50,10 @@
 									icon="${portletConfigurationIcon.getIconCssClass()}"
 									markupView="lexicon"
 									onClick="${portletConfigurationIcon.getOnClick(renderRequest, renderResponse)}"
-									url="javascript:void(0);"
+									url="javascript:;"
 								/>
 							<#else>
-								<@liferay_frontend["icon-options"] portletConfigurationIcons=portlet_configuration_icons />
+								<@liferay_portlet["icon-options"] portletConfigurationIcons=portlet_configuration_icons />
 							</#if>
 						</menu>
 					</#if>

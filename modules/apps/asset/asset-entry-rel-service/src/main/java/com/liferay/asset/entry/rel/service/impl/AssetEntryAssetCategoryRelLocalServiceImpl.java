@@ -23,7 +23,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistry;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -221,7 +221,7 @@ public class AssetEntryAssetCategoryRelLocalServiceImpl
 		}
 
 		try {
-			Indexer<Object> indexer = _indexerRegistry.getIndexer(
+			Indexer<Object> indexer = IndexerRegistryUtil.getIndexer(
 				assetEntry.getClassName());
 
 			if (indexer == null) {
@@ -234,7 +234,13 @@ public class AssetEntryAssetCategoryRelLocalServiceImpl
 				return;
 			}
 
-			indexer.reindex(assetRenderer.getAssetObject());
+			Object assetObject = assetRenderer.getAssetObject();
+
+			if (assetObject == null) {
+				return;
+			}
+
+			indexer.reindex(assetObject);
 		}
 		catch (SearchException searchException) {
 			_log.error("Unable to reindex asset entry", searchException);
@@ -246,8 +252,5 @@ public class AssetEntryAssetCategoryRelLocalServiceImpl
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
-
-	@Reference
-	private IndexerRegistry _indexerRegistry;
 
 }

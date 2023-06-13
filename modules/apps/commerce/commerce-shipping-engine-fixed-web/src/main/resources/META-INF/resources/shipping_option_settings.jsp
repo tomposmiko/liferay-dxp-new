@@ -22,16 +22,19 @@ CommerceShippingFixedOptionRelsDisplayContext commerceShippingFixedOptionRelsDis
 
 <c:choose>
 	<c:when test="<%= commerceShippingFixedOptionRelsDisplayContext.isVisible() %>">
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			contextParams='<%=
 				HashMapBuilder.<String, String>put(
 					"commerceShippingMethodId", String.valueOf(commerceShippingFixedOptionRelsDisplayContext.getCommerceShippingMethodId())
 				).build()
 			%>'
 			creationMenu="<%= commerceShippingFixedOptionRelsDisplayContext.getCreationMenu() %>"
-			dataProviderKey="<%= CommerceShippingFixedOptionFDSNames.SHIPPING_FIXED_OPTION_SETTINGS %>"
-			id="<%= CommerceShippingFixedOptionFDSNames.SHIPPING_FIXED_OPTION_SETTINGS %>"
+			dataProviderKey="<%= CommerceShippingFixedOptionSettingClayTable.NAME %>"
+			id="<%= CommerceShippingFixedOptionSettingClayTable.NAME %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= commerceShippingFixedOptionRelsDisplayContext.getPortletURL() %>"
 			showManagementBar="<%= true %>"
 		/>
 	</c:when>

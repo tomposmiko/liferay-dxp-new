@@ -12,9 +12,17 @@
  * details.
  */
 
-import memoize from './memoize';
+import memoize from 'lodash.memoize';
 
-const nsCached = memoize((namespace, str) => {
+const cached = (fn) => {
+	return memoize(fn, (...args) => {
+		return args.length > 1
+			? Array.prototype.join.call(args, '_')
+			: String(args[0]);
+	});
+};
+
+const nsCached = cached((namespace, str) => {
 	if (typeof str !== 'undefined' && !(str.lastIndexOf(namespace, 0) === 0)) {
 		str = `${namespace}${str}`;
 	}
@@ -22,7 +30,7 @@ const nsCached = memoize((namespace, str) => {
 	return str;
 });
 
-export default function ns(namespace, object) {
+export default function (namespace, object) {
 	let value;
 
 	if (typeof object !== 'object') {
@@ -37,7 +45,6 @@ export default function ns(namespace, object) {
 			const originalItem = item;
 
 			item = nsCached(namespace, item);
-
 			value[item] = object[originalItem];
 		});
 	}

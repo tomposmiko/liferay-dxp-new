@@ -21,26 +21,17 @@ import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.service.base.CPDAvailabilityEstimateServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CPDAvailabilityEstimate"
-	},
-	service = AopService.class
-)
 public class CPDAvailabilityEstimateServiceImpl
 	extends CPDAvailabilityEstimateServiceBaseImpl {
 
@@ -69,10 +60,10 @@ public class CPDAvailabilityEstimateServiceImpl
 				commerceAvailabilityEstimateId, serviceContext);
 	}
 
-	@Reference
+	@ServiceReference(type = CommerceCatalogLocalService.class)
 	protected CommerceCatalogLocalService commerceCatalogLocalService;
 
-	@Reference
+	@ServiceReference(type = CPDefinitionLocalService.class)
 	protected CPDefinitionLocalService cpDefinitionLocalService;
 
 	private void _checkCommerceCatalog(long cpDefinitionId, String actionId)
@@ -97,10 +88,11 @@ public class CPDAvailabilityEstimateServiceImpl
 			getPermissionChecker(), commerceCatalog, actionId);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CommerceCatalog)"
-	)
-	private ModelResourcePermission<CommerceCatalog>
-		_commerceCatalogModelResourcePermission;
+	private static volatile ModelResourcePermission<CommerceCatalog>
+		_commerceCatalogModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CPDAvailabilityEstimateServiceImpl.class,
+				"_commerceCatalogModelResourcePermission",
+				CommerceCatalog.class);
 
 }

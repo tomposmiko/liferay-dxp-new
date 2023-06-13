@@ -17,7 +17,6 @@ package com.liferay.portal.workflow.kaleo.internal.util;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountRoleLocalServiceUtil;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.DuplicateRoleException;
 import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -49,15 +48,20 @@ public class RoleUtil {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Role role = RoleLocalServiceUtil.fetchRole(
-			serviceContext.getCompanyId(), name);
+		Role role = null;
 
-		if (role == null) {
+		try {
+			role = RoleLocalServiceUtil.getRole(
+				serviceContext.getCompanyId(), name);
+
+			if (role.getType() != roleType) {
+				throw new DuplicateRoleException(
+					"Role already exists with name " + name);
+			}
+		}
+		catch (NoSuchRoleException noSuchRoleException) {
 			if (!autoCreate) {
-				throw new NoSuchRoleException(
-					StringBundler.concat(
-						"No Role exists with the key {companyId=",
-						serviceContext.getCompanyId(), ", name=", name, "}"));
+				throw noSuchRoleException;
 			}
 
 			Map<Locale, String> descriptionMap = HashMapBuilder.put(
@@ -79,10 +83,6 @@ public class RoleUtil {
 					serviceContext.getUserId(), null, 0, name, null,
 					descriptionMap, roleType, null, null);
 			}
-		}
-		else if (role.getType() != roleType) {
-			throw new DuplicateRoleException(
-				"Role already exists with name " + name);
 		}
 
 		return role;

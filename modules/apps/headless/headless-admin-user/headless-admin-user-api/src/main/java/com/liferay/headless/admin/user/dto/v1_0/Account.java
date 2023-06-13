@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -39,7 +38,6 @@ import java.util.Set;
 import javax.annotation.Generated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -53,10 +51,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 	value = "Account"
 )
 @JsonFilter("Liferay.Vulcan")
-@Schema(
-	description = "An account represents an external account, for example a customer business.",
-	requiredProperties = {"name"}
-)
 @XmlRootElement(name = "Account")
 public class Account implements Serializable {
 
@@ -131,35 +125,6 @@ public class Account implements Serializable {
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
-
-	@Schema
-	@Valid
-	public CustomField[] getCustomFields() {
-		return customFields;
-	}
-
-	public void setCustomFields(CustomField[] customFields) {
-		this.customFields = customFields;
-	}
-
-	@JsonIgnore
-	public void setCustomFields(
-		UnsafeSupplier<CustomField[], Exception> customFieldsUnsafeSupplier) {
-
-		try {
-			customFields = customFieldsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected CustomField[] customFields;
 
 	@Schema
 	public String getDescription() {
@@ -246,7 +211,7 @@ public class Account implements Serializable {
 	}
 
 	@GraphQLField(description = "The optional external key of this account.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String externalReferenceCode;
 
 	@Schema
@@ -299,7 +264,6 @@ public class Account implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	@NotEmpty
 	protected String name;
 
 	@Schema(description = "The number of this account's associated users.")
@@ -509,26 +473,6 @@ public class Account implements Serializable {
 			sb.append(_toJSON(actions));
 		}
 
-		if (customFields != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"customFields\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < customFields.length; i++) {
-				sb.append(String.valueOf(customFields[i]));
-
-				if ((i + 1) < customFields.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		if (description != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -720,9 +664,9 @@ public class Account implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -748,7 +692,7 @@ public class Account implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -780,7 +724,7 @@ public class Account implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -796,10 +740,5 @@ public class Account implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

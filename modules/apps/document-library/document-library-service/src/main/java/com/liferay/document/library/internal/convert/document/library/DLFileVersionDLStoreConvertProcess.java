@@ -80,7 +80,7 @@ public class DLFileVersionDLStoreConvertProcess
 					transferFile(
 						sourceStore, targetStore, dlFileVersion.getCompanyId(),
 						repositoryId, dlFileEntry.getName(),
-						dlFileVersion.getStoreFileName(), delete);
+						dlFileVersion.getVersion(), delete);
 				}
 				catch (Exception exception) {
 					_log.error(

@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.price.list.service;
 
-import com.liferay.commerce.price.list.model.CommercePriceListAccountRel;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -28,10 +27,6 @@ public class CommercePriceListAccountRelServiceWrapper
 	implements CommercePriceListAccountRelService,
 			   ServiceWrapper<CommercePriceListAccountRelService> {
 
-	public CommercePriceListAccountRelServiceWrapper() {
-		this(null);
-	}
-
 	public CommercePriceListAccountRelServiceWrapper(
 		CommercePriceListAccountRelService commercePriceListAccountRelService) {
 
@@ -40,9 +35,10 @@ public class CommercePriceListAccountRelServiceWrapper
 	}
 
 	@Override
-	public CommercePriceListAccountRel addCommercePriceListAccountRel(
-			long commercePriceListId, long commerceAccountId, int order,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.price.list.model.CommercePriceListAccountRel
+			addCommercePriceListAccountRel(
+				long commercePriceListId, long commerceAccountId, int order,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListAccountRelService.
@@ -70,8 +66,9 @@ public class CommercePriceListAccountRelServiceWrapper
 	}
 
 	@Override
-	public CommercePriceListAccountRel fetchCommercePriceListAccountRel(
-			long commercePriceListId, long commerceAccountId)
+	public com.liferay.commerce.price.list.model.CommercePriceListAccountRel
+			fetchCommercePriceListAccountRel(
+				long commercePriceListId, long commerceAccountId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListAccountRelService.
@@ -80,8 +77,8 @@ public class CommercePriceListAccountRelServiceWrapper
 	}
 
 	@Override
-	public CommercePriceListAccountRel getCommercePriceListAccountRel(
-			long commercePriceListAccountRelId)
+	public com.liferay.commerce.price.list.model.CommercePriceListAccountRel
+			getCommercePriceListAccountRel(long commercePriceListAccountRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListAccountRelService.
@@ -89,21 +86,24 @@ public class CommercePriceListAccountRelServiceWrapper
 	}
 
 	@Override
-	public java.util.List<CommercePriceListAccountRel>
-			getCommercePriceListAccountRels(long commercePriceListId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public java.util.List
+		<com.liferay.commerce.price.list.model.CommercePriceListAccountRel>
+				getCommercePriceListAccountRels(long commercePriceListId)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListAccountRelService.
 			getCommercePriceListAccountRels(commercePriceListId);
 	}
 
 	@Override
-	public java.util.List<CommercePriceListAccountRel>
-			getCommercePriceListAccountRels(
-				long commercePriceListId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<CommercePriceListAccountRel> orderByComparator)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public java.util.List
+		<com.liferay.commerce.price.list.model.CommercePriceListAccountRel>
+				getCommercePriceListAccountRels(
+					long commercePriceListId, int start, int end,
+					com.liferay.portal.kernel.util.OrderByComparator
+						<com.liferay.commerce.price.list.model.
+							CommercePriceListAccountRel> orderByComparator)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListAccountRelService.
 			getCommercePriceListAccountRels(
@@ -111,9 +111,10 @@ public class CommercePriceListAccountRelServiceWrapper
 	}
 
 	@Override
-	public java.util.List<CommercePriceListAccountRel>
-		getCommercePriceListAccountRels(
-			long commercePriceListId, String name, int start, int end) {
+	public java.util.List
+		<com.liferay.commerce.price.list.model.CommercePriceListAccountRel>
+			getCommercePriceListAccountRels(
+				long commercePriceListId, String name, int start, int end) {
 
 		return _commercePriceListAccountRelService.
 			getCommercePriceListAccountRels(

@@ -42,12 +42,6 @@ public interface VelocityEngineConfiguration {
 	public int resourceModificationCheckInterval();
 
 	@Meta.AD(
-		deflt = "true", name = "include-navigation-items-in-the-context",
-		required = false
-	)
-	public boolean includeNavItemsInTheContext();
-
-	@Meta.AD(
 		deflt = "com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist|java.lang.Class|java.lang.ClassLoader|java.lang.Compiler|java.lang.Package|java.lang.Process|java.lang.Runtime|java.lang.RuntimePermission|java.lang.SecurityManager|java.lang.System|java.lang.Thread|java.lang.ThreadGroup|java.lang.ThreadLocal",
 		name = "restricted-classes", required = false
 	)
@@ -66,7 +60,7 @@ public interface VelocityEngineConfiguration {
 	public String[] restrictedPackages();
 
 	@Meta.AD(
-		deflt = "httpUtilUnsafe|serviceLocator|staticFieldGetter",
+		deflt = "httpUtilUnsafe|serviceLocator|staticFieldGetter|utilLocator",
 		name = "restricted-variables", required = false
 	)
 	public String[] restrictedVariables();

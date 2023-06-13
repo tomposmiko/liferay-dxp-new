@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lourdes Fernández Besada
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.journal.model.JournalFolder",
 	service = ModelIndexerWriterContributor.class
 )
@@ -48,10 +49,9 @@ public class JournalFolderModelIndexerWriterContributor
 
 	@Override
 	public BatchIndexingActionable getBatchIndexingActionable() {
-		return _dynamicQueryBatchIndexingActionableFactory.
+		return dynamicQueryBatchIndexingActionableFactory.
 			getBatchIndexingActionable(
-				_journalFolderLocalService.
-					getIndexableActionableDynamicQuery());
+				journalFolderLocalService.getIndexableActionableDynamicQuery());
 	}
 
 	@Override
@@ -60,10 +60,10 @@ public class JournalFolderModelIndexerWriterContributor
 	}
 
 	@Reference
-	private DynamicQueryBatchIndexingActionableFactory
-		_dynamicQueryBatchIndexingActionableFactory;
+	protected DynamicQueryBatchIndexingActionableFactory
+		dynamicQueryBatchIndexingActionableFactory;
 
 	@Reference
-	private JournalFolderLocalService _journalFolderLocalService;
+	protected JournalFolderLocalService journalFolderLocalService;
 
 }

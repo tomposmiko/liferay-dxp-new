@@ -14,44 +14,23 @@
 
 import ClayDropDown, {Align} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
-import {ReactPortal} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 
-import {useId} from '../../common/hooks/useId';
-import {openItemSelector} from '../../common/openItemSelector';
-import {LAYOUT_TYPES} from '../config/constants/layoutTypes';
+import {openItemSelector} from '../../core/openItemSelector';
 import {config} from '../config/index';
 import {
 	useDisplayPagePreviewItem,
 	useDisplayPageRecentPreviewItemList,
 	useSelectDisplayPagePreviewItem,
 } from '../contexts/DisplayPagePreviewItemContext';
-import itemSelectorValueToInfoItem from '../utils/item_selector_value/itemSelectorValueToInfoItem';
+import itemSelectorValueToInfoItem from '../utils/item-selector-value/itemSelectorValueToInfoItem';
+import {useId} from '../utils/useId';
 
 const NO_ITEM_LABEL = `-- ${Liferay.Language.get('none')} --`;
 
-export function DisplayPagePreviewItemSelector({dark = false}) {
-	const displayPagePreviewItemSelectorWrapper = useMemo(
-		() =>
-			config.layoutType === LAYOUT_TYPES.display &&
-			document.getElementById('infoItemSelectorContainer'),
-		[]
-	);
-
-	return displayPagePreviewItemSelectorWrapper ? (
-		<ReactPortal container={displayPagePreviewItemSelectorWrapper}>
-			<DisplayPagePreviewItemSelectorContent dark={dark} />
-		</ReactPortal>
-	) : null;
-}
-
-DisplayPagePreviewItemSelector.propTypes = {
-	dark: PropTypes.bool,
-};
-
-export function DisplayPagePreviewItemSelectorContent({dark = false}) {
+export const DisplayPagePreviewItemSelector = ({dark = false}) => {
 	const [active, setActive] = useState(false);
 	const previewItem = useDisplayPagePreviewItem();
 	const recentPreviewItemList = useDisplayPageRecentPreviewItemList();
@@ -102,7 +81,6 @@ export function DisplayPagePreviewItemSelectorContent({dark = false}) {
 					>
 						{Liferay.Language.get('preview-with')}:
 					</strong>
-
 					<button
 						className={classNames(
 							'align-items-center btn btn-sm d-flex page-editor__display-page-preview-item-selector-button',
@@ -113,7 +91,6 @@ export function DisplayPagePreviewItemSelectorContent({dark = false}) {
 						<span className="flex-grow-1 overflow-hidden text-left text-truncate">
 							{previewItem ? previewItem.label : NO_ITEM_LABEL}
 						</span>
-
 						<ClayIcon
 							className="flex-shrink-0 text-secondary"
 							symbol="caret-bottom"
@@ -158,8 +135,8 @@ export function DisplayPagePreviewItemSelectorContent({dark = false}) {
 			</ClayDropDown.ItemList>
 		</ClayDropDown>
 	);
-}
+};
 
-DisplayPagePreviewItemSelectorContent.propTypes = {
+DisplayPagePreviewItemSelector.propTypes = {
 	dark: PropTypes.bool,
 };

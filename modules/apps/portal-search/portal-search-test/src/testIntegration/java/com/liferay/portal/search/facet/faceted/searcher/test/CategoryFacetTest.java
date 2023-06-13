@@ -136,11 +136,13 @@ public class CategoryFacetTest extends BaseFacetedSearcherTestCase {
 	}
 
 	protected AssetCategory addCategory(String title) throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetCategory assetCategory = assetCategoryLocalService.addCategory(
 			TestPropsValues.getUserId(), _group.getGroupId(), title,
-			_assetVocabulary.getVocabularyId(),
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			_assetVocabulary.getVocabularyId(), serviceContext);
 
 		_assetCategory = assetCategory;
 

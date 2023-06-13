@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -497,34 +496,6 @@ public class MessageBoardThread implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
-	@Schema
-	public Date getLastPostDate() {
-		return lastPostDate;
-	}
-
-	public void setLastPostDate(Date lastPostDate) {
-		this.lastPostDate = lastPostDate;
-	}
-
-	@JsonIgnore
-	public void setLastPostDate(
-		UnsafeSupplier<Date, Exception> lastPostDateUnsafeSupplier) {
-
-		try {
-			lastPostDate = lastPostDateUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Date lastPostDate;
-
 	@Schema(
 		description = "A flag that indicates whether this thread is locked."
 	)
@@ -556,36 +527,6 @@ public class MessageBoardThread implements Serializable {
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean locked;
-
-	@Schema(description = "The ID of the thread's message.")
-	public Long getMessageBoardRootMessageId() {
-		return messageBoardRootMessageId;
-	}
-
-	public void setMessageBoardRootMessageId(Long messageBoardRootMessageId) {
-		this.messageBoardRootMessageId = messageBoardRootMessageId;
-	}
-
-	@JsonIgnore
-	public void setMessageBoardRootMessageId(
-		UnsafeSupplier<Long, Exception>
-			messageBoardRootMessageIdUnsafeSupplier) {
-
-		try {
-			messageBoardRootMessageId =
-				messageBoardRootMessageIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The ID of the thread's message.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Long messageBoardRootMessageId;
 
 	@Schema(
 		description = "The ID of the Message Board Section to which this message is scoped."
@@ -1245,20 +1186,6 @@ public class MessageBoardThread implements Serializable {
 			sb.append("]");
 		}
 
-		if (lastPostDate != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"lastPostDate\": ");
-
-			sb.append("\"");
-
-			sb.append(liferayToJSONDateFormat.format(lastPostDate));
-
-			sb.append("\"");
-		}
-
 		if (locked != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1267,16 +1194,6 @@ public class MessageBoardThread implements Serializable {
 			sb.append("\"locked\": ");
 
 			sb.append(locked);
-		}
-
-		if (messageBoardRootMessageId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"messageBoardRootMessageId\": ");
-
-			sb.append(messageBoardRootMessageId);
 		}
 
 		if (messageBoardSectionId != null) {
@@ -1512,9 +1429,9 @@ public class MessageBoardThread implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -1540,7 +1457,7 @@ public class MessageBoardThread implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -1572,7 +1489,7 @@ public class MessageBoardThread implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -1588,10 +1505,5 @@ public class MessageBoardThread implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

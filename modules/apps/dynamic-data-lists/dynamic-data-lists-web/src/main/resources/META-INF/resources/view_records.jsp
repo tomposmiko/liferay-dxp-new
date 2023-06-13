@@ -67,7 +67,7 @@ if (!ddlDisplayContext.isAdminPortlet()) {
 	cssClass="view-records-container"
 	id='<%= liferayPortletResponse.getNamespace() + "formContainer" %>'
 >
-	<aui:form action="<%= portletURL %>" method="post" name="fm">
+	<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 		<aui:input name="recordIds" type="hidden" />
 
 		<liferay-ui:search-container
@@ -178,5 +178,3 @@ if (!ddlDisplayContext.isAdminPortlet()) {
 </clay:container-fluid>
 
 <%@ include file="/export_record_set.jspf" %>
-
-<aui:script use="liferay-portlet-dynamic-data-lists"></aui:script>

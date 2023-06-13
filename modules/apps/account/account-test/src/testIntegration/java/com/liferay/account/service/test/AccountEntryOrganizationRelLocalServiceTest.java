@@ -57,7 +57,8 @@ public class AccountEntryOrganizationRelLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_accountEntry = AccountEntryTestUtil.addAccountEntry();
+		_accountEntry = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
 
 		_organization = OrganizationTestUtil.addOrganization();
 	}
@@ -97,10 +98,13 @@ public class AccountEntryOrganizationRelLocalServiceTest {
 				getAccountEntryOrganizationRelsCount(
 					_accountEntry.getAccountEntryId()));
 
-		long[] accountEntryOrganizationIds = ListUtil.toLongArray(
+		List<AccountEntryOrganizationRel> accountEntryOrganizationRels =
 			_accountEntryOrganizationRelLocalService.
 				getAccountEntryOrganizationRels(
-					_accountEntry.getAccountEntryId()),
+					_accountEntry.getAccountEntryId());
+
+		long[] accountEntryOrganizationIds = ListUtil.toLongArray(
+			accountEntryOrganizationRels,
 			AccountEntryOrganizationRelModel::getOrganizationId);
 
 		Assert.assertTrue(
@@ -209,8 +213,10 @@ public class AccountEntryOrganizationRelLocalServiceTest {
 	public void testGetAccountEntryOrganizationRelsByOrganizationId()
 		throws Exception {
 
-		_accountEntries.add(AccountEntryTestUtil.addAccountEntry());
-		_accountEntries.add(AccountEntryTestUtil.addAccountEntry());
+		_accountEntries.add(
+			AccountEntryTestUtil.addAccountEntry(_accountEntryLocalService));
+		_accountEntries.add(
+			AccountEntryTestUtil.addAccountEntry(_accountEntryLocalService));
 
 		long[] expectedAccountEntryIds = ListUtil.toLongArray(
 			_accountEntries, AccountEntry.ACCOUNT_ENTRY_ID_ACCESSOR);

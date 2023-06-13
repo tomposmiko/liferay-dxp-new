@@ -1,4 +1,4 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
 	property custom.properties = "default.layout.template.id=1_column${line.separator}jsonws.web.service.paths.excludes=";
@@ -13,8 +13,8 @@ definition {
 			User.firstLoginPG();
 		}
 
-		task ("Add a site via Headless API") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+		task ("Add a site via JSON") {
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Import test fragments from dependencies folder") {
@@ -48,7 +48,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -59,7 +59,7 @@ definition {
 	}
 
 	@description = "This case ensures a user can be mentioned in a comment when he has valid permission."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanMentionUserWithValidPermissions {
 		JSONUser.addUser(
@@ -108,8 +108,10 @@ definition {
 			fragmentName = "Title");
 
 		PageEditor.gotoCommentViaFragment(
+			content = "Lorem ipsum dolor sit amet",
+			fragmentClass = "header",
 			fragmentName = "Title",
-			position = 1);
+			position = "1");
 
 		PageEditor.viewMentionsDisplayOption(
 			fragmentComment = "@user",
@@ -118,7 +120,7 @@ definition {
 	}
 
 	@description = "This case ensures that the user can mention the other user in a comment."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewCommentMentionedUser {
 		JSONRole.assignRoleToUser(
@@ -151,7 +153,7 @@ definition {
 	}
 
 	@description = "This case ensures a user cannot access a comment he is mentioned on after his permissions are revoked."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewMentionAfterRevokingPermissions {
 		JSONRole.addRegularRole(
@@ -202,36 +204,7 @@ definition {
 
 		Notifications.viewNoPermissions(
 			contentBody = "user2",
-			notificationCount = 1);
-	}
-
-	@description = "This case ensures that the mention popup disappears."
-	@priority = 4
-	test CanViewMentionPopUpDisappear {
-		JSONRole.assignRoleToUser(
-			roleTitle = "Administrator",
-			userEmailAddress = "user2@liferay.com");
-
-		JSONLayout.addPublicLayout(
-			groupName = "Test Site Name",
-			layoutName = "Content Page Name",
-			type = "content");
-
-		ContentPagesNavigator.openEditContentPage(
-			pageName = "Content Page Name",
-			siteName = "Test Site Name");
-
-		PageEditor.addFragment(
-			collectionName = "Collection Name",
-			fragmentName = "Title");
-
-		PageEditor.addComment(
-			fragmentComment = "Comment by Test",
-			fragmentName = "Title",
-			mentionsUserFullName = "userfn userln",
-			mentionsUserScreenName = "user2");
-
-		PageEditor.viewMentionPopupDisapper();
+			notificationCount = "1");
 	}
 
 }

@@ -21,11 +21,11 @@
 			</c:if>
 
 			<c:if test="<%= Validator.isNotNull(onSubmit) %>">
-				</div>
+				</fieldset>
 			</c:if>
 		</div>
 
-	<c:if test="<%= wrappedFormContent %>">
+	<c:if test="<%= !themeDisplay.isStatePopUp() %>">
 		</div>
 	</c:if>
 </form>
@@ -52,20 +52,13 @@ String fullName = namespace + HtmlUtil.escapeJS(name);
 			List<ValidatorTag> validatorTags = entry.getValue();
 
 			for (ValidatorTag validatorTag : validatorTags) {
-				String errorMessage = validatorTag.getErrorMessage();
-
-				if (Objects.equals(validatorTag.getName(), "required") && Validator.isNull(errorMessage)) {
-					errorMessage = UnicodeLanguageUtil.format(resourceBundle, "the-x-field-is-required", TextFormatter.format(fieldName, TextFormatter.K), true);
-				}
-				else {
-					errorMessage = UnicodeLanguageUtil.get(resourceBundle, validatorTag.getErrorMessage());
-				}
 		%>
 
 				config.fieldRules.push({
 					body: <%= validatorTag.getBody() %>,
 					custom: <%= validatorTag.isCustom() %>,
-					errorMessage: '<%= errorMessage %>',
+					errorMessage:
+						'<%= UnicodeLanguageUtil.get(resourceBundle, validatorTag.getErrorMessage()) %>',
 					fieldName: '<%= namespace + HtmlUtil.escapeJS(fieldName) %>',
 					validatorName: '<%= validatorTag.getName() %>',
 				});

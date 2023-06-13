@@ -19,20 +19,27 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
-import com.liferay.asset.util.LinkedAssetEntryIdsUtil;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemDetails;
+import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemIdentifier;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
+import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.info.item.provider.InfoItemPermissionProvider;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,14 +50,14 @@ public class DisplayPageLayoutTypeControllerDisplayContext {
 
 	public DisplayPageLayoutTypeControllerDisplayContext(
 			HttpServletRequest httpServletRequest,
-			InfoItemServiceRegistry infoItemServiceRegistry,
-			InfoSearchClassMapperRegistry infoSearchClassMapperRegistry)
+			InfoItemServiceTracker infoItemServiceTracker)
 		throws Exception {
 
-		_infoItemServiceRegistry = infoItemServiceRegistry;
+		_httpServletRequest = httpServletRequest;
+		_infoItemServiceTracker = infoItemServiceTracker;
 
 		long assetEntryId = ParamUtil.getLong(
-			httpServletRequest, "assetEntryId");
+			_httpServletRequest, "assetEntryId");
 
 		Object infoItem = httpServletRequest.getAttribute(
 			InfoDisplayWebKeys.INFO_ITEM);
@@ -64,12 +71,15 @@ public class DisplayPageLayoutTypeControllerDisplayContext {
 			AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
 				assetEntryId);
 
-			String className = infoSearchClassMapperRegistry.getClassName(
-				assetEntry.getClassName());
+			String className = assetEntry.getClassName();
+
+			if (Objects.equals(className, DLFileEntry.class.getName())) {
+				className = FileEntry.class.getName();
+			}
 
 			InfoItemObjectProvider<Object> infoItemObjectProvider =
 				(InfoItemObjectProvider<Object>)
-					infoItemServiceRegistry.getFirstInfoItemService(
+					infoItemServiceTracker.getFirstInfoItemService(
 						InfoItemObjectProvider.class, className);
 
 			InfoItemIdentifier infoItemIdentifier =
@@ -83,20 +93,20 @@ public class DisplayPageLayoutTypeControllerDisplayContext {
 
 			if (assetRenderer != null) {
 				InfoItemDetailsProvider infoItemDetailsProvider =
-					infoItemServiceRegistry.getFirstInfoItemService(
+					infoItemServiceTracker.getFirstInfoItemService(
 						InfoItemDetailsProvider.class, className);
 
 				infoItemDetails = infoItemDetailsProvider.getInfoItemDetails(
 					assetRenderer.getAssetObject());
 			}
 
-			httpServletRequest.setAttribute(
-				InfoDisplayWebKeys.INFO_ITEM, infoItem);
-			httpServletRequest.setAttribute(
-				WebKeys.LAYOUT_ASSET_ENTRY, assetEntry);
+			_httpServletRequest.setAttribute(
+				InfoDisplayWebKeys.INFO_ITEM_FIELD_VALUES_PROVIDER,
+				infoItemServiceTracker.getFirstInfoItemService(
+					InfoItemFieldValuesProvider.class, className));
 
-			LinkedAssetEntryIdsUtil.addLinkedAssetEntryId(
-				httpServletRequest, assetEntry.getEntryId());
+			_httpServletRequest.setAttribute(
+				WebKeys.LAYOUT_ASSET_ENTRY, assetEntry);
 		}
 
 		_infoItem = infoItem;
@@ -109,7 +119,27 @@ public class DisplayPageLayoutTypeControllerDisplayContext {
 		}
 
 		return AssetRendererFactoryRegistryUtil.
-			getAssetRendererFactoryByClassName(_infoItemDetails.getClassName());
+			getAssetRendererFactoryByClassNameId(
+				PortalUtil.getClassNameId(_infoItemDetails.getClassName()));
+	}
+
+	public Map<String, Object> getInfoDisplayFieldsValues() {
+		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
+			(InfoItemFieldValuesProvider)_httpServletRequest.getAttribute(
+				InfoDisplayWebKeys.INFO_ITEM_FIELD_VALUES_PROVIDER);
+
+		if (infoItemFieldValuesProvider == null) {
+			return null;
+		}
+
+		InfoItemFieldValues infoItemFieldValues =
+			infoItemFieldValuesProvider.getInfoItemFieldValues(_infoItem);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return infoItemFieldValues.getMap(themeDisplay.getLocale());
 	}
 
 	public boolean hasPermission(
@@ -121,7 +151,7 @@ public class DisplayPageLayoutTypeControllerDisplayContext {
 		}
 
 		InfoItemPermissionProvider infoItemPermissionProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemPermissionProvider.class,
 				_infoItemDetails.getClassName());
 
@@ -144,8 +174,9 @@ public class DisplayPageLayoutTypeControllerDisplayContext {
 		return true;
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final Object _infoItem;
 	private final InfoItemDetails _infoItemDetails;
-	private final InfoItemServiceRegistry _infoItemServiceRegistry;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 
 }

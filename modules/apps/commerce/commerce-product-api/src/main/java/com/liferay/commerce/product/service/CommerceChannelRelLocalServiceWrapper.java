@@ -14,10 +14,7 @@
 
 package com.liferay.commerce.product.service;
 
-import com.liferay.commerce.product.model.CommerceChannelRel;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link CommerceChannelRelLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class CommerceChannelRelLocalServiceWrapper
 	implements CommerceChannelRelLocalService,
 			   ServiceWrapper<CommerceChannelRelLocalService> {
-
-	public CommerceChannelRelLocalServiceWrapper() {
-		this(null);
-	}
 
 	public CommerceChannelRelLocalServiceWrapper(
 		CommerceChannelRelLocalService commerceChannelRelLocalService) {
@@ -51,17 +44,20 @@ public class CommerceChannelRelLocalServiceWrapper
 	 * @return the commerce channel rel that was added
 	 */
 	@Override
-	public CommerceChannelRel addCommerceChannelRel(
-		CommerceChannelRel commerceChannelRel) {
+	public com.liferay.commerce.product.model.CommerceChannelRel
+		addCommerceChannelRel(
+			com.liferay.commerce.product.model.CommerceChannelRel
+				commerceChannelRel) {
 
 		return _commerceChannelRelLocalService.addCommerceChannelRel(
 			commerceChannelRel);
 	}
 
 	@Override
-	public CommerceChannelRel addCommerceChannelRel(
-			String className, long classPK, long commerceChannelId,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.product.model.CommerceChannelRel
+			addCommerceChannelRel(
+				String className, long classPK, long commerceChannelId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceChannelRelLocalService.addCommerceChannelRel(
@@ -75,8 +71,8 @@ public class CommerceChannelRelLocalServiceWrapper
 	 * @return the new commerce channel rel
 	 */
 	@Override
-	public CommerceChannelRel createCommerceChannelRel(
-		long commerceChannelRelId) {
+	public com.liferay.commerce.product.model.CommerceChannelRel
+		createCommerceChannelRel(long commerceChannelRelId) {
 
 		return _commerceChannelRelLocalService.createCommerceChannelRel(
 			commerceChannelRelId);
@@ -105,8 +101,10 @@ public class CommerceChannelRelLocalServiceWrapper
 	 * @return the commerce channel rel that was removed
 	 */
 	@Override
-	public CommerceChannelRel deleteCommerceChannelRel(
-		CommerceChannelRel commerceChannelRel) {
+	public com.liferay.commerce.product.model.CommerceChannelRel
+		deleteCommerceChannelRel(
+			com.liferay.commerce.product.model.CommerceChannelRel
+				commerceChannelRel) {
 
 		return _commerceChannelRelLocalService.deleteCommerceChannelRel(
 			commerceChannelRel);
@@ -124,8 +122,8 @@ public class CommerceChannelRelLocalServiceWrapper
 	 * @throws PortalException if a commerce channel rel with the primary key could not be found
 	 */
 	@Override
-	public CommerceChannelRel deleteCommerceChannelRel(
-			long commerceChannelRelId)
+	public com.liferay.commerce.product.model.CommerceChannelRel
+			deleteCommerceChannelRel(long commerceChannelRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceChannelRelLocalService.deleteCommerceChannelRel(
@@ -260,16 +258,17 @@ public class CommerceChannelRelLocalServiceWrapper
 	}
 
 	@Override
-	public CommerceChannelRel fetchCommerceChannelRel(
-		long commerceChannelRelId) {
+	public com.liferay.commerce.product.model.CommerceChannelRel
+		fetchCommerceChannelRel(long commerceChannelRelId) {
 
 		return _commerceChannelRelLocalService.fetchCommerceChannelRel(
 			commerceChannelRelId);
 	}
 
 	@Override
-	public CommerceChannelRel fetchCommerceChannelRel(
-		String className, long classPK, long commerceChannelId) {
+	public com.liferay.commerce.product.model.CommerceChannelRel
+		fetchCommerceChannelRel(
+			String className, long classPK, long commerceChannelId) {
 
 		return _commerceChannelRelLocalService.fetchCommerceChannelRel(
 			className, classPK, commerceChannelId);
@@ -290,7 +289,8 @@ public class CommerceChannelRelLocalServiceWrapper
 	 * @throws PortalException if a commerce channel rel with the primary key could not be found
 	 */
 	@Override
-	public CommerceChannelRel getCommerceChannelRel(long commerceChannelRelId)
+	public com.liferay.commerce.product.model.CommerceChannelRel
+			getCommerceChannelRel(long commerceChannelRelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceChannelRelLocalService.getCommerceChannelRel(
@@ -309,36 +309,41 @@ public class CommerceChannelRelLocalServiceWrapper
 	 * @return the range of commerce channel rels
 	 */
 	@Override
-	public java.util.List<CommerceChannelRel> getCommerceChannelRels(
-		int start, int end) {
+	public java.util.List<com.liferay.commerce.product.model.CommerceChannelRel>
+		getCommerceChannelRels(int start, int end) {
 
 		return _commerceChannelRelLocalService.getCommerceChannelRels(
 			start, end);
 	}
 
 	@Override
-	public java.util.List<CommerceChannelRel> getCommerceChannelRels(
-		long commerceChannelId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<CommerceChannelRel>
-			orderByComparator) {
+	public java.util.List<com.liferay.commerce.product.model.CommerceChannelRel>
+		getCommerceChannelRels(
+			long commerceChannelId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.commerce.product.model.CommerceChannelRel>
+					orderByComparator) {
 
 		return _commerceChannelRelLocalService.getCommerceChannelRels(
 			commerceChannelId, start, end, orderByComparator);
 	}
 
 	@Override
-	public java.util.List<CommerceChannelRel> getCommerceChannelRels(
-		String className, long classPK, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<CommerceChannelRel>
-			orderByComparator) {
+	public java.util.List<com.liferay.commerce.product.model.CommerceChannelRel>
+		getCommerceChannelRels(
+			String className, long classPK, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.commerce.product.model.CommerceChannelRel>
+					orderByComparator) {
 
 		return _commerceChannelRelLocalService.getCommerceChannelRels(
 			className, classPK, start, end, orderByComparator);
 	}
 
 	@Override
-	public java.util.List<CommerceChannelRel> getCommerceChannelRels(
-		String className, long classPK, String name, int start, int end) {
+	public java.util.List<com.liferay.commerce.product.model.CommerceChannelRel>
+		getCommerceChannelRels(
+			String className, long classPK, String name, int start, int end) {
 
 		return _commerceChannelRelLocalService.getCommerceChannelRels(
 			className, classPK, name, start, end);
@@ -414,31 +419,13 @@ public class CommerceChannelRelLocalServiceWrapper
 	 * @return the commerce channel rel that was updated
 	 */
 	@Override
-	public CommerceChannelRel updateCommerceChannelRel(
-		CommerceChannelRel commerceChannelRel) {
+	public com.liferay.commerce.product.model.CommerceChannelRel
+		updateCommerceChannelRel(
+			com.liferay.commerce.product.model.CommerceChannelRel
+				commerceChannelRel) {
 
 		return _commerceChannelRelLocalService.updateCommerceChannelRel(
 			commerceChannelRel);
-	}
-
-	@Override
-	public CTPersistence<CommerceChannelRel> getCTPersistence() {
-		return _commerceChannelRelLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<CommerceChannelRel> getModelClass() {
-		return _commerceChannelRelLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CommerceChannelRel>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _commerceChannelRelLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

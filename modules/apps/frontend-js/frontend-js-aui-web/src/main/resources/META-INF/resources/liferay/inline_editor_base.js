@@ -15,31 +15,31 @@
 AUI.add(
 	'liferay-inline-editor-base',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const isNumber = Lang.isNumber;
-		const isString = Lang.isString;
+		var isNumber = Lang.isNumber;
+		var isString = Lang.isString;
 
-		const BODY_CONTENT = 'bodyContent';
+		var BODY_CONTENT = 'bodyContent';
 
-		const CSS_ERROR = 'alert alert-danger';
+		var CSS_ERROR = 'alert alert-danger';
 
-		const CSS_SUCCESS = 'alert alert-success';
+		var CSS_SUCCESS = 'alert alert-success';
 
-		const EDITOR = 'editor';
+		var EDITOR = 'editor';
 
-		const EDITOR_NAME = 'editorName';
+		var EDITOR_NAME = 'editorName';
 
-		const EDITOR_PREFIX = 'editorPrefix';
+		var EDITOR_PREFIX = 'editorPrefix';
 
-		const TPL_NOTICE =
+		var TPL_NOTICE =
 			'<div class="alert alert-success lfr-editable-notice">' +
 			'<span class="lfr-editable-notice-text yui3-widget-bd"></span>' +
-			'<a class="lfr-editable-notice-close ml-3 yui3-widget-ft" href="javascript:void(0);" tabindex="0"></a>' +
+			'<a class="lfr-editable-notice-close yui3-widget-ft" href="javascript:;" tabindex="0"></a>' +
 			'</div>';
 
 		function InlineEditorBase() {
-			const instance = this;
+			var instance = this;
 
 			instance.publish('saveFailure', {
 				defaultFn: instance._defSaveFailureFn,
@@ -97,25 +97,25 @@ AUI.add(
 
 		InlineEditorBase.prototype = {
 			_attachCloseListener() {
-				const instance = this;
+				var instance = this;
 
-				const notice = instance.getEditNotice();
+				var notice = instance.getEditNotice();
 
 				notice.footerNode.on('click', A.bind('hide', notice));
 			},
 
 			_closeNoticeFn() {
-				const instance = this;
+				var instance = this;
 
 				instance.getEditNotice().hide();
 			},
 
 			_defSaveFailureFn() {
-				const instance = this;
+				var instance = this;
 
 				instance.resetDirty();
 
-				const notice = instance.getEditNotice();
+				var notice = instance.getEditNotice();
 
 				instance._editNoticeNode.replaceClass(CSS_SUCCESS, CSS_ERROR);
 
@@ -130,15 +130,15 @@ AUI.add(
 			},
 
 			_defSaveSuccessFn(autosaved) {
-				const instance = this;
+				var instance = this;
 
 				instance.resetDirty();
 
-				const notice = instance.getEditNotice();
+				var notice = instance.getEditNotice();
 
 				instance._editNoticeNode.replaceClass(CSS_ERROR, CSS_SUCCESS);
 
-				let message = Liferay.Language.get(
+				var message = Liferay.Language.get(
 					'the-draft-was-saved-successfully-at-x'
 				);
 
@@ -158,7 +158,7 @@ AUI.add(
 			},
 
 			_saveFn(autosaved) {
-				const instance = this;
+				var instance = this;
 
 				if (instance.isContentDirty()) {
 					instance.save(autosaved);
@@ -166,9 +166,9 @@ AUI.add(
 			},
 
 			closeNotice(delay) {
-				const instance = this;
+				var instance = this;
 
-				let closeNoticeTask = instance._closeNoticeTask;
+				var closeNoticeTask = instance._closeNoticeTask;
 
 				if (!closeNoticeTask) {
 					closeNoticeTask = A.debounce(
@@ -189,7 +189,7 @@ AUI.add(
 			},
 
 			destructor() {
-				const instance = this;
+				var instance = this;
 
 				instance.getEditNotice().destroy();
 
@@ -203,16 +203,16 @@ AUI.add(
 			},
 
 			getEditNotice() {
-				const instance = this;
+				var instance = this;
 
-				let editNotice = instance._editNotice;
+				var editNotice = instance._editNotice;
 
 				if (!editNotice) {
-					const triggerNode = A.one(
+					var triggerNode = A.one(
 						instance.get(EDITOR_PREFIX) + instance.get(EDITOR_NAME)
 					);
 
-					const editNoticeNode = A.Node.create(TPL_NOTICE);
+					var editNoticeNode = A.Node.create(TPL_NOTICE);
 
 					editNotice = new A.OverlayBase({
 						contentBox: editNoticeNode,
@@ -231,13 +231,13 @@ AUI.add(
 			},
 
 			save(autosaved) {
-				const instance = this;
+				var instance = this;
 
-				const data = {
+				var data = {
 					content: instance.get(EDITOR).getData(),
 				};
 
-				const namespacedData = Liferay.Util.ns(
+				var namespacedData = Liferay.Util.ns(
 					instance.get('namespace'),
 					data
 				);
@@ -259,9 +259,9 @@ AUI.add(
 			},
 
 			startSaveTask() {
-				const instance = this;
+				var instance = this;
 
-				let saveTask = instance._saveTask;
+				var saveTask = instance._saveTask;
 
 				if (saveTask) {
 					saveTask.cancel();
@@ -281,9 +281,9 @@ AUI.add(
 			},
 
 			stopSaveTask() {
-				const instance = this;
+				var instance = this;
 
-				const saveTask = instance._saveTask;
+				var saveTask = instance._saveTask;
 
 				if (saveTask) {
 					saveTask.cancel();

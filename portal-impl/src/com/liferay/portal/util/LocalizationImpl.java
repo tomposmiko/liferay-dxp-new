@@ -14,12 +14,12 @@
 
 package com.liferay.portal.util;
 
-import com.liferay.petra.concurrent.ConcurrentReferenceKeyHashMap;
+import com.liferay.petra.content.ContentUtil;
 import com.liferay.petra.io.unsync.UnsyncStringReader;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
-import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.XMLUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -40,9 +40,7 @@ import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.XMLUtil;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.Collection;
@@ -64,6 +62,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.commons.collections.map.ReferenceMap;
 
 /**
  * @author Alexander Chow
@@ -345,7 +345,7 @@ public class LocalizationImpl implements Localization {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -359,7 +359,7 @@ public class LocalizationImpl implements Localization {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -463,16 +463,8 @@ public class LocalizationImpl implements Localization {
 			return map;
 		}
 
-		try {
-			map.put(
-				defaultLocale,
-				StringUtil.read(classLoader, defaultPropertyValue));
-		}
-		catch (IOException ioException) {
-			_log.error(
-				"Unable to read the content for " + defaultPropertyValue,
-				ioException);
-		}
+		map.put(
+			defaultLocale, ContentUtil.get(classLoader, defaultPropertyValue));
 
 		return map;
 	}
@@ -837,14 +829,6 @@ public class LocalizationImpl implements Localization {
 	public String getXml(
 		Map<String, String> map, String defaultLanguageId, String key) {
 
-		return getXml(map, defaultLanguageId, key, false);
-	}
-
-	@Override
-	public String getXml(
-		Map<String, String> map, String defaultLanguageId, String key,
-		boolean cdata) {
-
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		XMLStreamWriter xmlStreamWriter = null;
@@ -889,15 +873,8 @@ public class LocalizationImpl implements Localization {
 				xmlStreamWriter.writeStartElement(key);
 
 				xmlStreamWriter.writeAttribute(_LANGUAGE_ID, languageId);
-
-				if (cdata) {
-					xmlStreamWriter.writeCData(
-						XMLUtil.stripInvalidChars(entry.getValue()));
-				}
-				else {
-					xmlStreamWriter.writeCharacters(
-						XMLUtil.stripInvalidChars(entry.getValue()));
-				}
+				xmlStreamWriter.writeCharacters(
+					XMLUtil.stripInvalidChars(entry.getValue()));
 
 				xmlStreamWriter.writeEndElement();
 			}
@@ -909,7 +886,7 @@ public class LocalizationImpl implements Localization {
 			return unsyncStringWriter.toString();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 		finally {
 			if (contextClassLoader != portalClassLoader) {
@@ -921,7 +898,7 @@ public class LocalizationImpl implements Localization {
 					xmlStreamWriter.close();
 				}
 				catch (XMLStreamException xmlStreamException) {
-					_log.error(xmlStreamException);
+					_log.error(xmlStreamException, xmlStreamException);
 				}
 			}
 		}
@@ -1061,7 +1038,7 @@ public class LocalizationImpl implements Localization {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -1075,7 +1052,7 @@ public class LocalizationImpl implements Localization {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -1086,7 +1063,7 @@ public class LocalizationImpl implements Localization {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -1310,7 +1287,7 @@ public class LocalizationImpl implements Localization {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -1324,7 +1301,7 @@ public class LocalizationImpl implements Localization {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -1335,7 +1312,7 @@ public class LocalizationImpl implements Localization {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -1351,7 +1328,7 @@ public class LocalizationImpl implements Localization {
 			}
 			catch (XMLStreamException xmlStreamException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(xmlStreamException);
+					_log.debug(xmlStreamException, xmlStreamException);
 				}
 			}
 		}
@@ -1437,7 +1414,7 @@ public class LocalizationImpl implements Localization {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -1451,10 +1428,6 @@ public class LocalizationImpl implements Localization {
 
 	private String _getRootAttributeValue(
 		Document document, String name, String defaultValue) {
-
-		if (document == null) {
-			return defaultValue;
-		}
 
 		Element rootElement = document.getRootElement();
 
@@ -1497,7 +1470,7 @@ public class LocalizationImpl implements Localization {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -1511,7 +1484,7 @@ public class LocalizationImpl implements Localization {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -1537,17 +1510,19 @@ public class LocalizationImpl implements Localization {
 		String value) {
 
 		if (Validator.isNotNull(xml) && !xml.equals(_EMPTY_ROOT_NODE)) {
-			_cache.compute(
-				xml,
-				(key, map) -> {
-					if (map == null) {
-						map = new HashMap<>();
-					}
+			synchronized (_cache) {
+				Map<Tuple, String> map = _cache.get(xml);
 
-					map.put(new Tuple(useDefault, requestedLanguageId), value);
+				if (map == null) {
+					map = new HashMap<>();
+				}
 
-					return map;
-				});
+				Tuple subkey = new Tuple(useDefault, requestedLanguageId);
+
+				map.put(subkey, value);
+
+				_cache.put(xml, map);
+			}
 		}
 	}
 
@@ -1564,8 +1539,7 @@ public class LocalizationImpl implements Localization {
 	private static final Log _log = LogFactoryUtil.getLog(
 		LocalizationImpl.class);
 
-	private final Map<String, Map<Tuple, String>> _cache =
-		new ConcurrentReferenceKeyHashMap<>(
-			FinalizeManager.SOFT_REFERENCE_FACTORY);
+	private final Map<String, Map<Tuple, String>> _cache = new ReferenceMap(
+		ReferenceMap.SOFT, ReferenceMap.HARD);
 
 }

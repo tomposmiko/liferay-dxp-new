@@ -15,7 +15,6 @@
 package com.liferay.headless.batch.engine.resource.v1_0;
 
 import com.liferay.headless.batch.engine.dto.v1_0.ImportTask;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -23,7 +22,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 
@@ -37,7 +35,6 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -54,60 +51,41 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface ImportTaskResource {
 
-	public ImportTask getImportTaskByExternalReferenceCode(
-			String externalReferenceCode)
-		throws Exception;
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
 
-	public Response getImportTaskByExternalReferenceCodeContent(
-			String externalReferenceCode)
-		throws Exception;
-
-	public Response getImportTaskByExternalReferenceCodeFailedItemReport(
-			String externalReferenceCode)
+	public ImportTask deleteImportTask(
+			String className, String callbackURL, String taskItemDelegateName,
+			Object object)
 		throws Exception;
 
 	public ImportTask deleteImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName, Object object)
-		throws Exception;
-
-	public ImportTask deleteImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
+			String className, String callbackURL, String taskItemDelegateName,
 			MultipartBody multipartBody)
 		throws Exception;
 
 	public ImportTask postImportTask(
-			String className, String callbackURL, String createStrategy,
-			String externalReferenceCode, String fieldNameMapping,
-			String importStrategy, String taskItemDelegateName, Object object)
+			String className, String callbackURL, String fieldNameMapping,
+			String taskItemDelegateName, Object object)
 		throws Exception;
 
 	public ImportTask postImportTask(
-			String className, String callbackURL, String createStrategy,
-			String externalReferenceCode, String fieldNameMapping,
-			String importStrategy, String taskItemDelegateName,
+			String className, String callbackURL, String fieldNameMapping,
+			String taskItemDelegateName, MultipartBody multipartBody)
+		throws Exception;
+
+	public ImportTask putImportTask(
+			String className, String callbackURL, String taskItemDelegateName,
+			Object object)
+		throws Exception;
+
+	public ImportTask putImportTask(
+			String className, String callbackURL, String taskItemDelegateName,
 			MultipartBody multipartBody)
-		throws Exception;
-
-	public ImportTask putImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, Object object)
-		throws Exception;
-
-	public ImportTask putImportTask(
-			String className, String callbackURL, String externalReferenceCode,
-			String importStrategy, String taskItemDelegateName,
-			String updateStrategy, MultipartBody multipartBody)
 		throws Exception;
 
 	public ImportTask getImportTask(Long importTaskId) throws Exception;
-
-	public Response getImportTaskContent(Long importTaskId) throws Exception;
-
-	public Response getImportTaskFailedItemReport(Long importTaskId)
-		throws Exception;
 
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {
@@ -146,8 +124,6 @@ public interface ImportTaskResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -159,8 +135,10 @@ public interface ImportTaskResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

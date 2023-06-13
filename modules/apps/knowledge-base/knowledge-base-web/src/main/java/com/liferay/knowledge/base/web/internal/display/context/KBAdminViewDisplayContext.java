@@ -19,9 +19,9 @@ import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.KBArticleServiceUtil;
 import com.liferay.knowledge.base.service.KBFolderServiceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -59,6 +59,14 @@ public class KBAdminViewDisplayContext {
 			PortletURL portletURL)
 		throws Exception {
 
+		PortletURL currentURL = PortletURLBuilder.create(
+			PortletURLUtil.clone(portletURL, _liferayPortletResponse)
+		).setParameter(
+			"parentResourceClassNameId", parentResourceClassNameId
+		).setParameter(
+			"parentResourcePrimKey", parentResourcePrimKey
+		).buildPortletURL();
+
 		long kbFolderClassNameId = PortalUtil.getClassNameId(
 			KBFolderConstants.getClassName());
 
@@ -69,31 +77,24 @@ public class KBAdminViewDisplayContext {
 				(ThemeDisplay)_httpServletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
 
+			currentURL = _liferayPortletResponse.createRenderURL();
+
 			PortalUtil.addPortletBreadcrumbEntry(
 				_httpServletRequest, themeDisplay.translate("home"),
-				String.valueOf(_liferayPortletResponse.createRenderURL()));
+				currentURL.toString());
 		}
 		else if (parentResourceClassNameId == kbFolderClassNameId) {
 			KBFolder kbFolder = KBFolderServiceUtil.getKBFolder(
 				parentResourcePrimKey);
 
+			currentURL.setParameter("mvcPath", "/admin/view_folders.jsp");
+
 			_populatePortletBreadcrumbEntries(
 				kbFolder.getClassNameId(), kbFolder.getParentKBFolderId(),
-				portletURL);
+				currentURL);
 
 			PortalUtil.addPortletBreadcrumbEntry(
-				_httpServletRequest, kbFolder.getName(),
-				PortletURLBuilder.create(
-					PortletURLUtil.clone(portletURL, _liferayPortletResponse)
-				).setMVCPath(
-					"/admin/view_kb_folders.jsp"
-				).setParameter(
-					"parentResourceClassNameId", parentResourceClassNameId
-				).setParameter(
-					"parentResourcePrimKey", parentResourcePrimKey
-				).setParameter(
-					"selectedItemId", parentResourcePrimKey
-				).buildString());
+				_httpServletRequest, kbFolder.getName(), currentURL.toString());
 		}
 		else {
 			KBArticle kbArticle = KBArticleServiceUtil.getLatestKBArticle(
@@ -101,19 +102,11 @@ public class KBAdminViewDisplayContext {
 
 			_populatePortletBreadcrumbEntries(
 				kbArticle.getParentResourceClassNameId(),
-				kbArticle.getParentResourcePrimKey(), portletURL);
+				kbArticle.getParentResourcePrimKey(), currentURL);
 
 			PortalUtil.addPortletBreadcrumbEntry(
 				_httpServletRequest, kbArticle.getTitle(),
-				PortletURLBuilder.create(
-					PortletURLUtil.clone(portletURL, _liferayPortletResponse)
-				).setParameter(
-					"parentResourceClassNameId", parentResourceClassNameId
-				).setParameter(
-					"parentResourcePrimKey", parentResourcePrimKey
-				).setParameter(
-					"selectedItemId", parentResourcePrimKey
-				).buildString());
+				currentURL.toString());
 		}
 	}
 

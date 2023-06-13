@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Akos Thurzo
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
 		"mvc.command.name=/export_import_changeset/export_import_changeset"

@@ -192,7 +192,6 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 			<StateContext.Provider value={state}>
 				<h4 className="mb-3 mt-4 sheet-subtitle">
 					{Liferay.Language.get('click-goal')}
-
 					<ClayIcon
 						className="lexicon-icon-sm ml-1 reference-mark text-warning"
 						style={{verticalAlign: 'super'}}
@@ -212,7 +211,6 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 							className="c-mr-2"
 							symbol="exclamation-full"
 						/>
-
 						{Liferay.Language.get(
 							'an-element-needs-to-be-selected'
 						)}
@@ -236,18 +234,14 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 					<label htmlFor="clickableElement">
 						{Liferay.Language.get('element-id')}
 
-						<span
+						<ClayIcon
+							className="c-ml-1 text-secondary"
 							data-tooltip-align="top"
+							small="true"
+							symbol="question-circle"
 							title={Liferay.Language.get('element-id-help')}
-						>
-							<ClayIcon
-								className="c-ml-1 text-secondary"
-								small="true"
-								symbol="question-circle"
-							/>
-						</span>
+						/>
 					</label>
-
 					<ClayInput.Group
 						className={classNames({
 							'has-error': !isValidTarget,
@@ -256,7 +250,6 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 						<ClayInput.GroupItem prepend shrink>
 							<ClayInput.GroupText>#</ClayInput.GroupText>
 						</ClayInput.GroupItem>
-
 						<ClayInput.GroupItem append>
 							<ClayInput
 								className={classNames({
@@ -288,7 +281,6 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 								</ClayInput.GroupInsetItem>
 							)}
 						</ClayInput.GroupItem>
-
 						<ClayInput.GroupItem shrink>
 							<ClayButtonWithIcon
 								data-tooltip-align="bottom-right"
@@ -299,12 +291,10 @@ function ClickGoalPicker({allowEdit = true, onSelectClickGoalTarget, target}) {
 								title={Liferay.Language.get('show-element')}
 							/>
 						</ClayInput.GroupItem>
-
 						{!isValidTarget && (
 							<ClayForm.FeedbackGroup>
 								<ClayForm.FeedbackItem>
 									<ClayForm.FeedbackIndicator symbol="exclamation-full" />
-
 									{Liferay.Language.get('id-was-not-found')}
 								</ClayForm.FeedbackItem>
 							</ClayForm.FeedbackGroup>
@@ -341,11 +331,11 @@ function OverlayContainer({allowEdit, root}) {
 	const dispatch = useContext(DispatchContext);
 	const {selectedTarget} = useContext(StateContext);
 
-	const targetableElementsRef = useRef();
+	const targetableElements = useRef();
 
 	// Before mount.
 
-	if (!targetableElementsRef.current) {
+	if (!targetableElements.current) {
 
 		// Apply CSS overrides.
 
@@ -381,7 +371,7 @@ function OverlayContainer({allowEdit, root}) {
 
 		// This must happen after hiding the toppers.
 
-		targetableElementsRef.current = getTargetableElements(
+		targetableElements.current = getTargetableElements(
 			root,
 			selectedTarget
 		);
@@ -442,7 +432,7 @@ function OverlayContainer({allowEdit, root}) {
 			<ClickGoalPicker.Overlay
 				allowEdit={allowEdit}
 				root={root}
-				targetableElements={targetableElementsRef.current}
+				targetableElements={targetableElements.current}
 			/>
 		</ReactPortal>
 	);
@@ -606,7 +596,6 @@ function Target({allowEdit, element, geometry, mode, selector}) {
 					selector={selector}
 				/>
 			)}
-
 			{mode === 'editing' && (
 				<ClickGoalPicker.TargetPopover selector={selector} />
 			)}
@@ -665,7 +654,7 @@ function TargetTopper({allowEdit, geometry, isEditing, selector}) {
 				'lfr-segments-experiment-click-goal-target-topper': true,
 				'lfr-segments-experiment-click-goal-target-topper-editing': isEditing,
 				'px-2': true,
-				'small': true,
+				small: true,
 				'text-white': true,
 			})}
 			onClick={stopImmediatePropagation}
@@ -678,7 +667,6 @@ function TargetTopper({allowEdit, geometry, isEditing, selector}) {
 			<span className="mr-2 text-truncate">
 				{isEditing ? selector : Liferay.Language.get('target')}
 			</span>
-
 			{allowEdit && (
 				<ClayButton
 					className="lfr-segments-experiment-click-goal-target-delete small text-white"
@@ -738,7 +726,6 @@ function TargetPopover({selector}) {
 			<div className="mb-2 text-secondary text-truncate" title={selector}>
 				{selector}
 			</div>
-
 			<ClayButton onClick={handleClick} ref={buttonRef}>
 				{Liferay.Language.get('set-element-as-click-target')}
 			</ClayButton>

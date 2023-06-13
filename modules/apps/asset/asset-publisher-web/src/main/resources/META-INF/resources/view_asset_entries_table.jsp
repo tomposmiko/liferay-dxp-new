@@ -70,7 +70,7 @@ if (stageableGroup.isLayout()) {
 
 					<%
 					for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
-						AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
+						AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(assetEntry.getClassNameId());
 
 						if (assetRendererFactory == null) {
 							continue;
@@ -88,7 +88,7 @@ if (stageableGroup.isLayout()) {
 						}
 						catch (Exception e) {
 							if (_log.isWarnEnabled()) {
-								_log.warn(e);
+								_log.warn(e, e);
 							}
 						}
 

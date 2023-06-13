@@ -23,8 +23,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.NoSuchResourceActionException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
@@ -188,10 +186,6 @@ public class ResourceActionLocalServiceImpl
 						resourceAction);
 				}
 				catch (Throwable throwable) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(throwable);
-					}
-
 					resourceAction =
 						resourceActionLocalService.addResourceAction(
 							name, actionId, bitwiseValue);
@@ -349,9 +343,6 @@ public class ResourceActionLocalServiceImpl
 	protected String encodeKey(String name, String actionId) {
 		return StringBundler.concat(name, StringPool.POUND, actionId);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ResourceActionLocalServiceImpl.class);
 
 	private static final Map<String, ResourceAction> _resourceActions =
 		new ConcurrentHashMap<>();

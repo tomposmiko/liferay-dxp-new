@@ -16,7 +16,6 @@ package com.liferay.object.web.internal.asset.display.page.portlet.portlet;
 
 import com.liferay.asset.display.page.portlet.BaseAssetDisplayPageFriendlyURLResolver;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -29,7 +28,7 @@ public class ObjectEntryDisplayPageFriendlyURLResolver
 
 	@Override
 	public String getURLSeparator() {
-		return FriendlyURLResolverConstants.URL_SEPARATOR_OBJECT_ENTRY;
+		return "/o/";
 	}
 
 }

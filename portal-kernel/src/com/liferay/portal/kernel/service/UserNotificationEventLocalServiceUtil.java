@@ -55,6 +55,20 @@ public class UserNotificationEventLocalServiceUtil {
 			userId, delivered, actionRequired, notificationEvent);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	public static UserNotificationEvent addUserNotificationEvent(
+			long userId, boolean actionRequired,
+			com.liferay.portal.kernel.notifications.NotificationEvent
+				notificationEvent)
+		throws PortalException {
+
+		return getService().addUserNotificationEvent(
+			userId, actionRequired, notificationEvent);
+	}
+
 	public static UserNotificationEvent addUserNotificationEvent(
 			long userId,
 			com.liferay.portal.kernel.notifications.NotificationEvent
@@ -74,6 +88,21 @@ public class UserNotificationEventLocalServiceUtil {
 		return getService().addUserNotificationEvent(
 			userId, type, timestamp, deliveryType, deliverBy, delivered,
 			payload, actionRequired, archived, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	public static UserNotificationEvent addUserNotificationEvent(
+			long userId, String type, long timestamp, int deliveryType,
+			long deliverBy, String payload, boolean actionRequired,
+			boolean archived, ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addUserNotificationEvent(
+			userId, type, timestamp, deliveryType, deliverBy, payload,
+			actionRequired, archived, serviceContext);
 	}
 
 	public static UserNotificationEvent addUserNotificationEvent(
@@ -174,8 +203,8 @@ public class UserNotificationEventLocalServiceUtil {
 			userNotificationEventId);
 	}
 
-	public static void deleteUserNotificationEvent(String uuid, long companyId)
-		throws PortalException {
+	public static void deleteUserNotificationEvent(
+		String uuid, long companyId) {
 
 		getService().deleteUserNotificationEvent(uuid, companyId);
 	}
@@ -197,15 +226,12 @@ public class UserNotificationEventLocalServiceUtil {
 	}
 
 	public static void deleteUserNotificationEvents(
-			java.util.Collection<String> uuids, long companyId)
-		throws PortalException {
+		java.util.Collection<String> uuids, long companyId) {
 
 		getService().deleteUserNotificationEvents(uuids, companyId);
 	}
 
-	public static void deleteUserNotificationEvents(long userId)
-		throws PortalException {
-
+	public static void deleteUserNotificationEvents(long userId) {
 		getService().deleteUserNotificationEvents(userId);
 	}
 

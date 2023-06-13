@@ -19,87 +19,51 @@ import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.captcha.simplecaptcha.SimpleCaptchaImpl;
 import com.liferay.headless.admin.user.client.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.client.dto.v1_0.PostalAddress;
-import com.liferay.headless.admin.user.client.dto.v1_0.RoleBrief;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.client.dto.v1_0.UserAccountContactInformation;
 import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
-import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.headless.admin.user.client.pagination.Pagination;
-import com.liferay.headless.admin.user.client.problem.Problem;
-import com.liferay.headless.admin.user.client.resource.v1_0.UserAccountResource;
+import com.liferay.headless.admin.user.client.serdes.v1_0.EmailAddressSerDes;
+import com.liferay.headless.admin.user.client.serdes.v1_0.PhoneSerDes;
+import com.liferay.headless.admin.user.client.serdes.v1_0.PostalAddressSerDes;
 import com.liferay.headless.admin.user.client.serdes.v1_0.UserAccountSerDes;
-import com.liferay.petra.function.UnsafeRunnable;
-import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.headless.admin.user.client.serdes.v1_0.WebUrlSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
-import com.liferay.portal.kernel.captcha.Captcha;
-import com.liferay.portal.kernel.captcha.CaptchaException;
-import com.liferay.portal.kernel.exception.UserPasswordException;
-import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserGroup;
-import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.security.auth.Authenticator;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.OrganizationLocalService;
-import com.liferay.portal.kernel.service.RoleLocalService;
-import com.liferay.portal.kernel.service.UserGroupLocalService;
-import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.DataGuard;
-import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.test.util.UserGroupTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityField;
-import com.liferay.portal.security.service.access.policy.model.SAPEntry;
-import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
-import com.liferay.portal.test.log.LogCapture;
-import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
-import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
-import javax.servlet.http.HttpServletRequest;
-
-import javax.ws.rs.core.Response;
+import org.apache.commons.beanutils.BeanUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -107,11 +71,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Javier Gamarra
@@ -322,37 +281,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 
 	@Override
 	@Test
-	public void testGetUserAccount() throws Exception {
-		super.testGetUserAccount();
-
-		User user = UserTestUtil.addUser();
-
-		Group group = GroupTestUtil.addGroup();
-
-		_testGetUserAccountWithInheritedRoles(
-			group,
-			() -> _groupLocalService.addUserGroup(user.getUserId(), group),
-			user);
-
-		Organization organization = OrganizationTestUtil.addOrganization();
-
-		_testGetUserAccountWithInheritedRoles(
-			organization.getGroup(),
-			() -> _organizationLocalService.addUserOrganization(
-				user.getUserId(), organization),
-			user);
-
-		UserGroup userGroup = UserGroupTestUtil.addUserGroup();
-
-		_testGetUserAccountWithInheritedRoles(
-			userGroup.getGroup(),
-			() -> _userGroupLocalService.addUserUserGroup(
-				user.getUserId(), userGroup),
-			user);
-	}
-
-	@Override
-	@Test
 	public void testGetUserAccountsPage() throws Exception {
 		UserAccount userAccount1 = testGetUserAccountsPage_addUserAccount(
 			randomUserAccount());
@@ -361,85 +289,15 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		UserAccount userAccount3 = userAccountResource.getUserAccount(
 			_testUser.getUserId());
 
-		String idFilterString = String.format(
-			"id in ('%s','%s','%s')", userAccount1.getId(),
-			userAccount2.getId(), userAccount3.getId());
+		Page<UserAccount> page = userAccountResource.getUserAccountsPage(
+			null, null, Pagination.of(1, 3), null);
 
-		_testGetUserAccountsPage(
-			idFilterString, userAccount1, userAccount2, userAccount3);
+		Assert.assertEquals(3, page.getTotalCount());
 
-		_userLocalService.updateLastLogin(userAccount2.getId(), null);
-		_userLocalService.updateLastLogin(userAccount3.getId(), null);
-
-		_testGetUserAccountsPage(
-			String.format(
-				"%s and %s", idFilterString,
-				"lastLoginDate gt 1900-01-01T01:01:28Z"),
-			userAccount2, userAccount3);
-		_testGetUserAccountsPage(
-			String.format("%s and %s", idFilterString, "lastLoginDate ne null"),
-			userAccount2, userAccount3);
-		_testGetUserAccountsPage(
-			String.format(
-				"%s and %s", idFilterString,
-				"not (lastLoginDate gt 1900-01-01T01:01:28Z)"),
-			userAccount1);
-		_testGetUserAccountsPage(
-			String.format("%s and %s", idFilterString, "lastLoginDate eq null"),
-			userAccount1);
-
-		_testGetUserAccountsPage(
-			String.format("name eq '%s'", userAccount1.getName()),
-			userAccount1);
-
-		String familyName = RandomTestUtil.randomString();
-
-		UserAccount userAccount4 = randomUserAccount();
-
-		userAccount4.setFamilyName(familyName);
-
-		userAccount4 = testGetUserAccountsPage_addUserAccount(userAccount4);
-
-		UserAccount userAccount5 = randomUserAccount();
-
-		userAccount5.setFamilyName(familyName);
-
-		userAccount5 = testGetUserAccountsPage_addUserAccount(userAccount5);
-
-		_testGetUserAccountsPage(
-			String.format("contains(name, '%s')", familyName), userAccount4,
-			userAccount5);
-
-		String roleName = "Test role " + RandomTestUtil.randomString();
-
-		Role role = RoleTestUtil.addRole(roleName, RoleConstants.TYPE_REGULAR);
-
-		_userLocalService.addRoleUser(role.getRoleId(), userAccount1.getId());
-
-		_testGetUserAccountsPage(
-			String.format("roleNames/any(f:f eq '%s')", roleName),
-			userAccount1);
-		_testGetUserAccountsPage(
-			"roleNames/any(f:contains(f, 'Test role '))", userAccount1);
-		_testGetUserAccountsPage("roleNames/any(f:f eq 'Test Role')");
-
-		String groupRoleName =
-			"Test group role " + RandomTestUtil.randomString();
-
-		Role groupRole = RoleTestUtil.addRole(
-			groupRoleName, RoleConstants.TYPE_SITE);
-
-		UserGroupRoleLocalServiceUtil.addUserGroupRole(
-			userAccount2.getId(), TestPropsValues.getGroupId(),
-			groupRole.getRoleId());
-
-		_testGetUserAccountsPage(
-			String.format("userGroupRoleNames/any(f:f eq '%s')", groupRoleName),
-			userAccount2);
-		_testGetUserAccountsPage(
-			"userGroupRoleNames/any(f:contains(f, 'Test group role '))",
-			userAccount2);
-		_testGetUserAccountsPage("userGroupRoleNames/any(f:f eq 'Test Role')");
+		assertEqualsIgnoringOrder(
+			Arrays.asList(userAccount1, userAccount2, userAccount3),
+			(List<UserAccount>)page.getItems());
+		assertValid(page);
 	}
 
 	@Override
@@ -506,9 +364,12 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	@Override
 	@Test
 	public void testGraphQLGetMyUserAccount() throws Exception {
+		UserAccount userAccount = userAccountResource.getUserAccount(
+			_testUser.getUserId());
+
 		Assert.assertTrue(
 			equals(
-				userAccountResource.getUserAccount(_testUser.getUserId()),
+				userAccount,
 				UserAccountSerDes.toDTO(
 					JSONUtil.getValueAsString(
 						invokeGraphQLQuery(
@@ -545,89 +406,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			Arrays.asList(
 				UserAccountSerDes.toDTOs(
 					userAccountsJSONObject.getString("items"))));
-	}
-
-	@Override
-	@Test
-	public void testPatchUserAccount() throws Exception {
-		super.testPatchUserAccount();
-
-		User user = UserTestUtil.addUser();
-
-		long portraitId = RandomTestUtil.randomLong();
-
-		user.setPortraitId(portraitId);
-
-		user = _userLocalService.updateUser(user);
-
-		UserAccount userAccount = new UserAccount();
-
-		userAccount.setJobTitle(RandomTestUtil.randomString());
-
-		userAccount = userAccountResource.patchUserAccount(
-			user.getUserId(), userAccount);
-
-		user = _userLocalService.getUser(userAccount.getId());
-
-		Assert.assertEquals(portraitId, user.getPortraitId());
-
-		String newPassword = RandomTestUtil.randomString();
-		UserAccount patchUserAccount = testPatchUserAccount_addUserAccount();
-
-		_assertAuthenticationResult(
-			Authenticator.FAILURE, patchUserAccount.getEmailAddress(),
-			newPassword);
-
-		userAccountResource.patchUserAccount(
-			patchUserAccount.getId(),
-			new UserAccount() {
-				{
-					password = newPassword;
-				}
-			});
-
-		_assertAuthenticationResult(
-			Authenticator.SUCCESS, patchUserAccount.getEmailAddress(),
-			newPassword);
-
-		_setUpTestUserAccountResource();
-
-		_assertProblem(
-			UserPasswordException.MustMatchCurrentPassword.class,
-			() -> _regularUserAccountResource.patchUserAccountHttpResponse(
-				_regularUserAccount.getId(),
-				new UserAccount() {
-					{
-						password = newPassword;
-					}
-				}));
-
-		_assertAuthenticationResult(
-			Authenticator.FAILURE, _regularUserAccount.getEmailAddress(),
-			newPassword);
-
-		_regularUserAccountResource.patchUserAccount(
-			_regularUserAccount.getId(),
-			new UserAccount() {
-				{
-					currentPassword = _regularUserAccountCurrentPassword;
-					password = newPassword;
-				}
-			});
-
-		_assertAuthenticationResult(
-			Authenticator.SUCCESS, _regularUserAccount.getEmailAddress(),
-			newPassword);
-
-		_setUpTestUserAccountResource();
-
-		_regularUserAccountResource.patchUserAccount(
-			_regularUserAccount.getId(),
-			new UserAccount() {
-				{
-					givenName = RandomTestUtil.randomString();
-				}
-			});
 	}
 
 	@Override
@@ -768,197 +546,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	}
 
 	@Override
-	@Test
-	public void testPostUserAccount() throws Exception {
-		UserAccount userAccount = randomUserAccount();
-
-		String password = RandomTestUtil.randomString();
-
-		userAccount.setPassword(password);
-
-		UserAccount postUserAccount = userAccountResource.postUserAccount(
-			userAccount);
-
-		assertEquals(userAccount, postUserAccount);
-		assertValid(postUserAccount);
-
-		_assertAuthenticationResult(
-			Authenticator.SUCCESS, postUserAccount.getEmailAddress(), password);
-
-		SAPEntry sapEntry = _sapEntryLocalService.addSAPEntry(
-			TestPropsValues.getUserId(),
-			"com.liferay.headless.admin.user.internal.resource.v1_0." +
-				"UserAccountResourceImpl#postUserAccount",
-			true, true, "Guest",
-			HashMapBuilder.put(
-				LocaleUtil.getDefault(), "Guest"
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
-
-		_testPostUserAccount(new TestSimpleCaptchaImpl(Assert::fail), false);
-		_testPostUserAccount(
-			new TestSimpleCaptchaImpl(
-				() -> {
-				}),
-			true);
-
-		try {
-			_testPostUserAccount(
-				new TestSimpleCaptchaImpl(
-					() -> {
-						throw new CaptchaException();
-					}),
-				true);
-
-			Assert.fail();
-		}
-		catch (Problem.ProblemException problemException) {
-			Problem problem = problemException.getProblem();
-
-			Assert.assertEquals(
-				CaptchaException.class.getName(), problem.getType());
-		}
-
-		_sapEntryLocalService.deleteSAPEntry(sapEntry);
-	}
-
-	@Override
-	@Test
-	public void testPostUserAccountImage() throws Exception {
-		UserAccount postUserAccount = userAccountResource.postUserAccount(
-			randomUserAccount());
-
-		Assert.assertNull(postUserAccount.getImage());
-
-		userAccountResource.postUserAccountImage(
-			postUserAccount.getId(), postUserAccount,
-			Collections.singletonMap(
-				"image",
-				FileUtil.createTempFile(
-					FileUtil.getBytes(getClass(), "/images/liferay.png"))));
-
-		postUserAccount = userAccountResource.getUserAccount(
-			postUserAccount.getId());
-
-		Assert.assertNotNull(postUserAccount.getImage());
-	}
-
-	@Override
-	@Test
-	public void testPutUserAccount() throws Exception {
-		super.testPutUserAccount();
-
-		String newPassword = RandomTestUtil.randomString();
-		UserAccount putUserAccount = testPutUserAccount_addUserAccount();
-
-		_assertAuthenticationResult(
-			Authenticator.FAILURE, putUserAccount.getEmailAddress(),
-			newPassword);
-
-		putUserAccount.setPassword(newPassword);
-
-		userAccountResource.putUserAccount(
-			putUserAccount.getId(), putUserAccount);
-
-		_assertAuthenticationResult(
-			Authenticator.SUCCESS, putUserAccount.getEmailAddress(),
-			newPassword);
-
-		_setUpTestUserAccountResource();
-
-		_regularUserAccount.setPassword(newPassword);
-
-		_assertProblem(
-			UserPasswordException.MustMatchCurrentPassword.class,
-			() -> _regularUserAccountResource.putUserAccountHttpResponse(
-				_regularUserAccount.getId(), _regularUserAccount));
-
-		_assertAuthenticationResult(
-			Authenticator.FAILURE, _regularUserAccount.getEmailAddress(),
-			newPassword);
-
-		_regularUserAccount.setCurrentPassword(
-			_regularUserAccountCurrentPassword);
-
-		_regularUserAccountResource.putUserAccount(
-			_regularUserAccount.getId(), _regularUserAccount);
-
-		_assertAuthenticationResult(
-			Authenticator.SUCCESS, _regularUserAccount.getEmailAddress(),
-			newPassword);
-
-		_setUpTestUserAccountResource();
-
-		_regularUserAccountResource.putUserAccount(
-			_regularUserAccount.getId(),
-			_randomUserAccount(
-				userAccount -> {
-					userAccount.setCurrentPassword(() -> null);
-					userAccount.setPassword(() -> null);
-				}));
-	}
-
-	@Override
-	@Test
-	public void testPutUserAccountByExternalReferenceCode() throws Exception {
-		super.testPutUserAccountByExternalReferenceCode();
-
-		String newPassword = RandomTestUtil.randomString();
-		UserAccount putUserAccount =
-			testPutUserAccountByExternalReferenceCode_addUserAccount();
-
-		_assertAuthenticationResult(
-			Authenticator.FAILURE, putUserAccount.getEmailAddress(),
-			newPassword);
-
-		putUserAccount.setPassword(newPassword);
-
-		userAccountResource.putUserAccountByExternalReferenceCode(
-			putUserAccount.getExternalReferenceCode(), putUserAccount);
-
-		_assertAuthenticationResult(
-			Authenticator.SUCCESS, putUserAccount.getEmailAddress(),
-			newPassword);
-
-		_setUpTestUserAccountResource();
-
-		_regularUserAccount.setPassword(newPassword);
-
-		_assertProblem(
-			UserPasswordException.MustMatchCurrentPassword.class,
-			() ->
-				_regularUserAccountResource.
-					putUserAccountByExternalReferenceCodeHttpResponse(
-						_regularUserAccount.getExternalReferenceCode(),
-						_regularUserAccount));
-
-		_assertAuthenticationResult(
-			Authenticator.FAILURE, _regularUserAccount.getEmailAddress(),
-			newPassword);
-
-		_regularUserAccount.setCurrentPassword(
-			_regularUserAccountCurrentPassword);
-
-		_regularUserAccountResource.putUserAccountByExternalReferenceCode(
-			_regularUserAccount.getExternalReferenceCode(),
-			_regularUserAccount);
-
-		_assertAuthenticationResult(
-			Authenticator.SUCCESS, _regularUserAccount.getEmailAddress(),
-			newPassword);
-
-		_setUpTestUserAccountResource();
-
-		_regularUserAccountResource.putUserAccountByExternalReferenceCode(
-			_regularUserAccount.getExternalReferenceCode(),
-			_randomUserAccount(
-				userAccount -> {
-					userAccount.setCurrentPassword(() -> null);
-					userAccount.setPassword(() -> null);
-				}));
-	}
-
-	@Override
 	protected void assertEquals(
 		UserAccount userAccount1, UserAccount userAccount2) {
 
@@ -987,16 +574,17 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 
 		_assertUserAccountContactInformation(
 			userAccountContactInformation1, userAccountContactInformation2,
-			"emailAddresses", "emailAddress");
+			"emailAddresses", "emailAddress", EmailAddressSerDes::toDTO);
 		_assertUserAccountContactInformation(
 			userAccountContactInformation1, userAccountContactInformation2,
-			"postalAddresses", "streetAddressLine1");
+			"postalAddresses", "streetAddressLine1",
+			PostalAddressSerDes::toDTO);
 		_assertUserAccountContactInformation(
 			userAccountContactInformation1, userAccountContactInformation2,
-			"telephones", "phoneNumber");
+			"telephones", "phoneNumber", PhoneSerDes::toDTO);
 		_assertUserAccountContactInformation(
 			userAccountContactInformation1, userAccountContactInformation2,
-			"webUrls", "url");
+			"webUrls", "url", WebUrlSerDes::toDTO);
 	}
 
 	@Override
@@ -1006,9 +594,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 
 	@Override
 	protected String[] getIgnoredEntityFieldNames() {
-		return new String[] {
-			"alternateName", "emailAddress", "lastLoginDate", "name"
-		};
+		return new String[] {"alternateName", "emailAddress"};
 	}
 
 	@Override
@@ -1064,7 +650,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		return _addUserAccount(testGroup.getGroupId(), randomUserAccount());
 	}
 
-	@Override
 	protected UserAccount
 			testDeleteUserAccountByExternalReferenceCode_addUserAccount()
 		throws Exception {
@@ -1104,14 +689,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	@Override
 	protected Long testGetAccountUserAccountsPage_getAccountId() {
 		return _getAccountEntryId();
-	}
-
-	@Override
-	protected Map<String, Map<String, String>>
-			testGetAccountUserAccountsPage_getExpectedActions(Long accountId)
-		throws Exception {
-
-		return Collections.emptyMap();
 	}
 
 	@Override
@@ -1252,71 +829,41 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		return userAccount;
 	}
 
-	private void _assertAuthenticationResult(
-			int authenticatorResult, String emailAddress, String password)
-		throws Exception {
-
-		Assert.assertEquals(
-			authenticatorResult,
-			_userLocalService.authenticateByEmailAddress(
-				testCompany.getCompanyId(), emailAddress, password,
-				Collections.emptyMap(), Collections.emptyMap(),
-				new HashMap<>()));
-	}
-
-	private <T extends Exception> void _assertProblem(
-			Class<T> exceptionClass,
-			UnsafeSupplier<HttpInvoker.HttpResponse, Exception>
-				httpResponseUnsafeSupplier)
-		throws Exception {
-
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				BaseExceptionMapper.class.getName(), LoggerTestUtil.OFF)) {
-
-			HttpInvoker.HttpResponse httpResponse =
-				httpResponseUnsafeSupplier.get();
-
-			Assert.assertEquals(
-				Response.Status.BAD_REQUEST.getStatusCode(),
-				httpResponse.getStatusCode());
-
-			if (exceptionClass != null) {
-				JSONObject jsonObject = _jsonFactory.createJSONObject(
-					httpResponse.getContent());
-
-				Assert.assertEquals(
-					exceptionClass.getSimpleName(), jsonObject.get("type"));
-			}
-		}
-	}
-
 	private void _assertUserAccountContactInformation(
 		UserAccountContactInformation userAccountContactInformation1,
 		UserAccountContactInformation userAccountContactInformation2,
-		String fieldName, String subfieldName) {
+		String fieldName, String subfieldName,
+		Function<String, ?> deserializerFunction) {
 
 		try {
-			Object[] objects1 = ReflectionTestUtil.getFieldValue(
+			String[] jsons1 = BeanUtils.getArrayProperty(
 				userAccountContactInformation1, fieldName);
-			Object[] objects2 = ReflectionTestUtil.getFieldValue(
+			String[] jsons2 = BeanUtils.getArrayProperty(
 				userAccountContactInformation2, fieldName);
 
 			Assert.assertEquals(
-				Arrays.toString(objects1), objects1.length, objects2.length);
+				Arrays.toString(jsons1), jsons1.length, jsons2.length);
 
-			Comparator<Object> comparator = Comparator.comparing(
-				object -> ReflectionTestUtil.getFieldValue(
-					object, subfieldName));
+			Comparator<String> comparator = Comparator.comparing(
+				json -> {
+					try {
+						return BeanUtils.getProperty(
+							deserializerFunction.apply(json), subfieldName);
+					}
+					catch (Exception exception) {
+						return null;
+					}
+				});
 
-			Arrays.sort(objects1, comparator);
-			Arrays.sort(objects2, comparator);
+			Arrays.sort(jsons1, comparator);
+			Arrays.sort(jsons2, comparator);
 
-			for (int i = 0; i < objects1.length; i++) {
+			for (int i = 0; i < jsons1.length; i++) {
 				Assert.assertEquals(
-					(String)ReflectionTestUtil.getFieldValue(
-						objects1[i], subfieldName),
-					(String)ReflectionTestUtil.getFieldValue(
-						objects2[i], subfieldName));
+					BeanUtils.getProperty(
+						deserializerFunction.apply(jsons1[i]), subfieldName),
+					BeanUtils.getProperty(
+						deserializerFunction.apply(jsons2[i]), subfieldName));
 			}
 		}
 		catch (Exception exception) {
@@ -1343,19 +890,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 
 	private Long _getAccountEntryId() {
 		return _accountEntry.getAccountEntryId();
-	}
-
-	private boolean _hasRole(Role role, User user) throws Exception {
-		UserAccount userAccount = userAccountResource.getUserAccount(
-			user.getUserId());
-
-		for (RoleBrief roleBrief : userAccount.getRoleBriefs()) {
-			if (Objects.equals(role.getRoleId(), roleBrief.getId())) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	private EmailAddress _randomEmailAddress() throws Exception {
@@ -1395,17 +929,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		};
 	}
 
-	private UserAccount _randomUserAccount(
-			Consumer<UserAccount> userAccountConsumer)
-		throws Exception {
-
-		UserAccount randomUserAccount = randomUserAccount();
-
-		userAccountConsumer.accept(randomUserAccount);
-
-		return randomUserAccount;
-	}
-
 	private UserAccountContactInformation _randomUserAccountContactInformation()
 		throws Exception {
 
@@ -1435,108 +958,6 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		};
 	}
 
-	private void _setUpTestUserAccountResource() throws Exception {
-		_regularUserAccountCurrentPassword = RandomTestUtil.randomString();
-
-		_regularUserAccount = _addUserAccount(
-			testGroup.getGroupId(), randomUserAccount());
-
-		_userLocalService.updatePassword(
-			_regularUserAccount.getId(), _regularUserAccountCurrentPassword,
-			_regularUserAccountCurrentPassword, false, true);
-
-		UserAccountResource.Builder builder = UserAccountResource.builder();
-
-		_regularUserAccountResource = builder.authentication(
-			_regularUserAccount.getEmailAddress(),
-			_regularUserAccountCurrentPassword
-		).locale(
-			LocaleUtil.getDefault()
-		).build();
-	}
-
-	private void _testGetUserAccountsPage(
-			String filterString, UserAccount... expectedUserAccounts)
-		throws Exception {
-
-		Page<UserAccount> page = userAccountResource.getUserAccountsPage(
-			null, filterString,
-			Pagination.of(1, expectedUserAccounts.length + 1), null);
-
-		Assert.assertEquals(expectedUserAccounts.length, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(expectedUserAccounts),
-			(List<UserAccount>)page.getItems());
-
-		if (expectedUserAccounts.length > 0) {
-			assertValid(page);
-		}
-	}
-
-	private void _testGetUserAccountWithInheritedRoles(
-			Group group, UnsafeRunnable<Exception> unsafeRunnable, User user)
-		throws Exception {
-
-		Role inheritedRole = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
-
-		_roleLocalService.addGroupRole(group.getGroupId(), inheritedRole);
-
-		Assert.assertFalse(_hasRole(inheritedRole, user));
-
-		unsafeRunnable.run();
-
-		Assert.assertTrue(_hasRole(inheritedRole, user));
-	}
-
-	private void _testPostUserAccount(Captcha captcha, boolean enableCaptcha)
-		throws Exception {
-
-		Bundle bundle = FrameworkUtil.getBundle(UserAccountResourceTest.class);
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		ServiceRegistration<?> serviceRegistration =
-			bundleContext.registerService(
-				Captcha.class, captcha,
-				HashMapDictionaryBuilder.put(
-					"captcha.engine.impl", TestSimpleCaptchaImpl.class.getName()
-				).build());
-
-		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
-				new ConfigurationTemporarySwapper(
-					"com.liferay.captcha.configuration.CaptchaConfiguration",
-					HashMapDictionaryBuilder.<String, Object>put(
-						"captchaEngine", TestSimpleCaptchaImpl.class.getName()
-					).put(
-						"createAccountCaptchaEnabled", enableCaptcha
-					).build())) {
-
-			UserAccount userAccount = randomUserAccount();
-
-			Assert.assertNull(
-				_userLocalService.fetchUserByEmailAddress(
-					TestPropsValues.getCompanyId(),
-					userAccount.getEmailAddress()));
-
-			UserAccountResource.Builder builder = UserAccountResource.builder();
-
-			userAccountResource = builder.locale(
-				LocaleUtil.getDefault()
-			).build();
-
-			userAccountResource.postUserAccount(userAccount);
-
-			Assert.assertNotNull(
-				_userLocalService.fetchUserByEmailAddress(
-					TestPropsValues.getCompanyId(),
-					userAccount.getEmailAddress()));
-		}
-		finally {
-			serviceRegistration.unregister();
-		}
-	}
-
 	private String[] _toEmailAddresses(List<User> users) {
 		return TransformUtil.transformToArray(
 			users, User::getEmailAddress, String.class);
@@ -1554,52 +975,10 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	@Inject
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
 
-	@Inject
-	private GroupLocalService _groupLocalService;
-
-	@Inject
-	private JSONFactory _jsonFactory;
-
 	private Organization _organization;
-
-	@Inject
-	private OrganizationLocalService _organizationLocalService;
-
-	private UserAccount _regularUserAccount;
-	private String _regularUserAccountCurrentPassword;
-	private UserAccountResource _regularUserAccountResource;
-
-	@Inject
-	private RoleLocalService _roleLocalService;
-
-	@Inject
-	private SAPEntryLocalService _sapEntryLocalService;
-
 	private User _testUser;
 
 	@Inject
-	private UserGroupLocalService _userGroupLocalService;
-
-	@Inject
 	private UserLocalService _userLocalService;
-
-	private class TestSimpleCaptchaImpl extends SimpleCaptchaImpl {
-
-		public TestSimpleCaptchaImpl(
-			UnsafeRunnable<CaptchaException> unsafeRunnable) {
-
-			_unsafeRunnable = unsafeRunnable;
-		}
-
-		@Override
-		public void check(HttpServletRequest httpServletRequest)
-			throws CaptchaException {
-
-			_unsafeRunnable.run();
-		}
-
-		private final UnsafeRunnable<CaptchaException> _unsafeRunnable;
-
-	}
 
 }

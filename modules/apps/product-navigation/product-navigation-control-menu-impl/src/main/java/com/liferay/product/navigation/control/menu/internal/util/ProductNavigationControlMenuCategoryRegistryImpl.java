@@ -14,10 +14,9 @@
 
 package com.liferay.product.navigation.control.menu.internal.util;
 
+import com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder;
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
-import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -42,7 +41,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Julio Camarero
  */
-@Component(service = ProductNavigationControlMenuCategoryRegistry.class)
+@Component(
+	immediate = true,
+	service = ProductNavigationControlMenuCategoryRegistry.class
+)
 public class ProductNavigationControlMenuCategoryRegistryImpl
 	implements ProductNavigationControlMenuCategoryRegistry {
 
@@ -102,7 +104,7 @@ public class ProductNavigationControlMenuCategoryRegistryImpl
 					return true;
 				}
 				catch (PortalException portalException) {
-					_log.error(portalException);
+					_log.error(portalException, portalException);
 				}
 
 				return false;
@@ -112,18 +114,29 @@ public class ProductNavigationControlMenuCategoryRegistryImpl
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_productNavigationControlMenuCategoryServiceTrackerMap =
-			ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, ProductNavigationControlMenuCategory.class, null,
-				new PropertyServiceReferenceMapper<>(
-					"product.navigation.control.menu.category.key"),
+			ServiceTrackerMapBuilder.SelectorFactory.newSelector(
+				bundleContext, ProductNavigationControlMenuCategory.class
+			).map(
+				"product.navigation.control.menu.category.key"
+			).collectMultiValue(
 				Collections.reverseOrder(
 					new PropertyServiceReferenceComparator<>(
-						"product.navigation.control.menu.category.order")));
+						"product.navigation.control.menu.category.order"))
+			).build();
 	}
 
 	@Deactivate
 	protected void deactivate() {
 		_productNavigationControlMenuCategoryServiceTrackerMap.close();
+	}
+
+	@Reference(unbind = "-")
+	protected void setProductNavigationControlMenuEntryRegistry(
+		ProductNavigationControlMenuEntryRegistry
+			productNavigationControlMenuEntryRegistry) {
+
+		_productNavigationControlMenuEntryRegistry =
+			productNavigationControlMenuEntryRegistry;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -132,8 +145,6 @@ public class ProductNavigationControlMenuCategoryRegistryImpl
 	private ServiceTrackerMap
 		<String, List<ProductNavigationControlMenuCategory>>
 			_productNavigationControlMenuCategoryServiceTrackerMap;
-
-	@Reference
 	private ProductNavigationControlMenuEntryRegistry
 		_productNavigationControlMenuEntryRegistry;
 

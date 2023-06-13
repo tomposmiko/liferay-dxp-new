@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.model.PortalPreferenceValue;
 import com.liferay.portal.kernel.model.PortalPreferenceValueTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.PortalPreferenceValuePersistence;
-import com.liferay.portal.kernel.service.persistence.PortalPreferenceValueUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -44,7 +43,6 @@ import com.liferay.portal.model.impl.PortalPreferenceValueModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -186,7 +184,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PortalPreferenceValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PortalPreferenceValue portalPreferenceValue : list) {
@@ -559,8 +557,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		Object[] finderArgs = new Object[] {portalPreferencesId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -710,7 +707,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PortalPreferenceValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PortalPreferenceValue portalPreferenceValue : list) {
@@ -1132,8 +1129,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		Object[] finderArgs = new Object[] {portalPreferencesId, namespace};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1311,7 +1307,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PortalPreferenceValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PortalPreferenceValue portalPreferenceValue : list) {
@@ -1785,8 +1781,7 @@ public class PortalPreferenceValuePersistenceImpl
 			portalPreferencesId, key, namespace
 		};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -1964,7 +1959,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByP_I_K_N, finderArgs, this);
+				_finderPathFetchByP_I_K_N, finderArgs);
 		}
 
 		if (result instanceof PortalPreferenceValue) {
@@ -2110,8 +2105,7 @@ public class PortalPreferenceValuePersistenceImpl
 			portalPreferencesId, index, key, namespace
 		};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -2327,7 +2321,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PortalPreferenceValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PortalPreferenceValue portalPreferenceValue : list) {
@@ -2857,8 +2851,7 @@ public class PortalPreferenceValuePersistenceImpl
 			portalPreferencesId, key, namespace, smallValue
 		};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -3402,7 +3395,7 @@ public class PortalPreferenceValuePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PortalPreferenceValue>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3472,7 +3465,7 @@ public class PortalPreferenceValuePersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3657,30 +3650,10 @@ public class PortalPreferenceValuePersistenceImpl
 				"portalPreferencesId", "key_", "namespace", "smallValue"
 			},
 			false);
-
-		_setPortalPreferenceValueUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setPortalPreferenceValueUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(PortalPreferenceValueImpl.class.getName());
-	}
-
-	private void _setPortalPreferenceValueUtilPersistence(
-		PortalPreferenceValuePersistence portalPreferenceValuePersistence) {
-
-		try {
-			Field field = PortalPreferenceValueUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, portalPreferenceValuePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_PORTALPREFERENCEVALUE =

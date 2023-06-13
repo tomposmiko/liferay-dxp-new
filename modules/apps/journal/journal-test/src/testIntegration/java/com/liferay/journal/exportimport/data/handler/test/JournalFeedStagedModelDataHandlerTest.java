@@ -77,7 +77,7 @@ public class JournalFeedStagedModelDataHandlerTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_layout = LayoutTestUtil.addTypePortletLayout(stagingGroup);
+		_layout = LayoutTestUtil.addLayout(stagingGroup);
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -277,7 +277,7 @@ public class JournalFeedStagedModelDataHandlerTest
 
 		return JournalTestUtil.addFeed(
 			group.getGroupId(), _layout.getPlid(),
-			RandomTestUtil.randomString(), ddmStructure.getStructureId(),
+			RandomTestUtil.randomString(), ddmStructure.getStructureKey(),
 			ddmTemplate.getTemplateKey(), rendererDDMTemplate.getTemplateKey());
 	}
 

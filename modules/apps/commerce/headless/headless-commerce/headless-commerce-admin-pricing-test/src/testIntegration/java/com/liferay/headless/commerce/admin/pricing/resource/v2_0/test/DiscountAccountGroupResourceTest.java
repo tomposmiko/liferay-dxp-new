@@ -14,17 +14,15 @@
 
 package com.liferay.headless.commerce.admin.pricing.resource.v2_0.test;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountGroup;
-import com.liferay.account.service.AccountGroupLocalServiceUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.commerce.account.model.CommerceAccountGroup;
+import com.liferay.commerce.account.service.CommerceAccountGroupLocalServiceUtil;
 import com.liferay.commerce.discount.constants.CommerceDiscountConstants;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountCommerceAccountGroupRel;
 import com.liferay.commerce.discount.service.CommerceDiscountCommerceAccountGroupRelLocalServiceUtil;
 import com.liferay.commerce.discount.service.CommerceDiscountLocalService;
 import com.liferay.commerce.discount.service.CommerceDiscountLocalServiceUtil;
-import com.liferay.commerce.test.util.CommerceAccountGroupTestUtil;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.DiscountAccountGroup;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
@@ -90,7 +88,7 @@ public class DiscountAccountGroupResourceTest
 					deleteCommerceDiscountCommerceAccountGroupRel(
 						commerceDiscountCommerceAccountGroupRel.
 							getCommerceDiscountCommerceAccountGroupRelId());
-				AccountGroupLocalServiceUtil.deleteAccountGroup(
+				CommerceAccountGroupLocalServiceUtil.deleteCommerceAccountGroup(
 					commerceDiscountCommerceAccountGroupRelIterator.
 						getCommerceAccountGroupId());
 				CommerceDiscountLocalServiceUtil.deleteCommerceDiscount(
@@ -138,7 +136,7 @@ public class DiscountAccountGroupResourceTest
 					deleteCommerceDiscountCommerceAccountGroupRel(
 						commerceDiscountCommerceAccountGroupRel.
 							getCommerceDiscountCommerceAccountGroupRelId());
-				AccountGroupLocalServiceUtil.deleteAccountGroup(
+				CommerceAccountGroupLocalServiceUtil.deleteCommerceAccountGroup(
 					commerceDiscountCommerceAccountGroupRelIterator.
 						getCommerceAccountGroupId());
 				CommerceDiscountLocalServiceUtil.deleteCommerceDiscount(
@@ -179,12 +177,6 @@ public class DiscountAccountGroupResourceTest
 
 	@Override
 	@Test
-	public void testGetDiscountIdDiscountAccountGroupsPageWithFilterDoubleEquals()
-		throws Exception {
-	}
-
-	@Override
-	@Test
 	public void testGetDiscountIdDiscountAccountGroupsPageWithFilterStringEquals()
 		throws Exception {
 	}
@@ -192,12 +184,6 @@ public class DiscountAccountGroupResourceTest
 	@Override
 	@Test
 	public void testGetDiscountIdDiscountAccountGroupsPageWithSortDateTime()
-		throws Exception {
-	}
-
-	@Override
-	@Test
-	public void testGetDiscountIdDiscountAccountGroupsPageWithSortDouble()
 		throws Exception {
 	}
 
@@ -263,15 +249,17 @@ public class DiscountAccountGroupResourceTest
 				calendar.get(Calendar.YEAR), calendar.get(Calendar.HOUR_OF_DAY),
 				calendar.get(Calendar.MINUTE), true, _serviceContext);
 
-		AccountGroup discountAccountGroup =
-			CommerceAccountGroupTestUtil.addAccountGroup(
-				_serviceContext.getScopeGroupId());
+		CommerceAccountGroup commerceAccountGroup =
+			CommerceAccountGroupLocalServiceUtil.addCommerceAccountGroup(
+				testCompany.getCompanyId(), RandomTestUtil.randomString(), 0,
+				false, null, _serviceContext);
 
 		return new DiscountAccountGroup() {
 			{
 				accountGroupExternalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				accountGroupId = discountAccountGroup.getAccountGroupId();
+				accountGroupId =
+					commerceAccountGroup.getCommerceAccountGroupId();
 				discountExternalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				discountId = commerceDiscount.getCommerceDiscountId();
@@ -342,21 +330,13 @@ public class DiscountAccountGroupResourceTest
 				Long id, DiscountAccountGroup discountAccountGroup)
 		throws Exception {
 
-		AccountGroup accountGroup =
-			AccountGroupLocalServiceUtil.addAccountGroup(
-				_serviceContext.getUserId(), null,
-				RandomTestUtil.randomString(), _serviceContext);
-
-		accountGroup.setExternalReferenceCode(null);
-		accountGroup.setDefaultAccountGroup(false);
-		accountGroup.setType(AccountConstants.ACCOUNT_GROUP_TYPE_STATIC);
-		accountGroup.setExpandoBridgeAttributes(_serviceContext);
-
-		accountGroup = AccountGroupLocalServiceUtil.updateAccountGroup(
-			accountGroup);
+		CommerceAccountGroup commerceAccountGroup =
+			CommerceAccountGroupLocalServiceUtil.addCommerceAccountGroup(
+				testCompany.getCompanyId(), RandomTestUtil.randomString(), 0,
+				false, null, _serviceContext);
 
 		discountAccountGroup.setAccountGroupId(
-			accountGroup.getAccountGroupId());
+			commerceAccountGroup.getCommerceAccountGroupId());
 
 		discountAccountGroup.setDiscountId(id);
 
@@ -443,17 +423,17 @@ public class DiscountAccountGroupResourceTest
 				commerceDiscountCommerceAccountGroupRel)
 		throws Exception {
 
-		AccountGroup discountAccountGroup =
-			commerceDiscountCommerceAccountGroupRel.getAccountGroup();
-
+		CommerceAccountGroup commerceAccountGroup =
+			commerceDiscountCommerceAccountGroupRel.getCommerceAccountGroup();
 		CommerceDiscount commerceDiscount =
 			commerceDiscountCommerceAccountGroupRel.getCommerceDiscount();
 
 		return new DiscountAccountGroup() {
 			{
 				accountGroupExternalReferenceCode =
-					discountAccountGroup.getExternalReferenceCode();
-				accountGroupId = discountAccountGroup.getAccountGroupId();
+					commerceAccountGroup.getExternalReferenceCode();
+				accountGroupId =
+					commerceAccountGroup.getCommerceAccountGroupId();
 				discountAccountGroupId =
 					commerceDiscountCommerceAccountGroupRel.
 						getCommerceDiscountCommerceAccountGroupRelId();

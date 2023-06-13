@@ -20,7 +20,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
-import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
@@ -39,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class LayoutPageTemplateStructureStagedModelDataHandler
 	extends BaseStagedModelDataHandler<LayoutPageTemplateStructure> {
 
@@ -88,7 +87,9 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 		Element element = portletDataContext.getImportDataElement(
 			importedLayoutPageTemplateStructure);
 
-		importedLayoutPageTemplateStructure.setPlid(
+		importedLayoutPageTemplateStructure.setClassNameId(
+			_portal.getClassNameId(element.attributeValue("className")));
+		importedLayoutPageTemplateStructure.setClassPK(
 			GetterUtil.getLong(element.attributeValue("classPK")));
 
 		LayoutPageTemplateStructure existingLayoutPageTemplateStructure =
@@ -101,7 +102,7 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 				_layoutPageTemplateStructureLocalService.
 					fetchLayoutPageTemplateStructure(
 						portletDataContext.getScopeGroupId(),
-						importedLayoutPageTemplateStructure.getPlid());
+						importedLayoutPageTemplateStructure.getClassPK());
 		}
 
 		if ((existingLayoutPageTemplateStructure == null) ||
@@ -182,15 +183,6 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 			deleteLayoutPageTemplateStructureRels(
 				layoutPageTemplateStructureId);
 
-		LayoutPageTemplateStructure referrerLayoutPageTemplateStructure =
-			_layoutPageTemplateStructureLocalService.
-				fetchLayoutPageTemplateStructure(layoutPageTemplateStructureId);
-
-		_fragmentEntryLinkLocalService.
-			deleteLayoutPageTemplateEntryFragmentEntryLinks(
-				portletDataContext.getScopeGroupId(),
-				referrerLayoutPageTemplateStructure.getPlid());
-
 		List<Element> layoutPageTemplateStructureRelElements =
 			portletDataContext.getReferenceDataElements(
 				layoutPageTemplateStructure,
@@ -204,9 +196,6 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 				portletDataContext, layoutPageTemplateStructureRelElement);
 		}
 	}
-
-	@Reference
-	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@Reference
 	private LayoutPageTemplateStructureLocalService

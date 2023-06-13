@@ -15,15 +15,18 @@
 package com.liferay.journal.web.internal.security.permission.resource;
 
 import com.liferay.journal.model.JournalFolder;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class JournalFolderPermission {
 
 	public static boolean contains(
@@ -31,10 +34,7 @@ public class JournalFolderPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<JournalFolder> modelResourcePermission =
-			_journalFolderModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _journalFolderModelResourcePermission.contains(
 			permissionChecker, folder, actionId);
 	}
 
@@ -43,18 +43,22 @@ public class JournalFolderPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<JournalFolder> modelResourcePermission =
-			_journalFolderModelResourcePermissionSnapshot.get();
-
 		return ModelResourcePermissionUtil.contains(
-			modelResourcePermission, permissionChecker, groupId, folderId,
-			actionId);
+			_journalFolderModelResourcePermission, permissionChecker, groupId,
+			folderId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<JournalFolder>>
-		_journalFolderModelResourcePermissionSnapshot = new Snapshot<>(
-			JournalFolderPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.journal.model.JournalFolder)");
+	@Reference(
+		target = "(model.class.name=com.liferay.journal.model.JournalFolder)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<JournalFolder> modelResourcePermission) {
+
+		_journalFolderModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<JournalFolder>
+		_journalFolderModelResourcePermission;
 
 }

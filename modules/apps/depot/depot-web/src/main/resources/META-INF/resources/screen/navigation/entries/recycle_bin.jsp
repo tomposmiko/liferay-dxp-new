@@ -21,10 +21,11 @@ DepotEntry depotEntry = (DepotEntry)request.getAttribute(DepotAdminWebKeys.DEPOT
 
 Group group = depotEntry.getGroup();
 
-UnicodeProperties typeSettingsUnicodeProperties = group.getTypeSettingsProperties();
+UnicodeProperties typeSettingsProperties = group.getTypeSettingsProperties();
 
-boolean groupTrashEnabled = PropertiesParamUtil.getBoolean(typeSettingsUnicodeProperties, request, "trashEnabled", true);
-int trashEntriesMaxAge = PropertiesParamUtil.getInteger(typeSettingsUnicodeProperties, request, "trashEntriesMaxAge", PrefsPropsUtil.getInteger(depotEntry.getCompanyId(), PropsKeys.TRASH_ENTRIES_MAX_AGE));
+boolean groupTrashEnabled = PropertiesParamUtil.getBoolean(typeSettingsProperties, request, "trashEnabled", true);
+
+int trashEntriesMaxAge = PropertiesParamUtil.getInteger(typeSettingsProperties, request, "trashEntriesMaxAge", PrefsPropsUtil.getInteger(depotEntry.getCompanyId(), PropsKeys.TRASH_ENTRIES_MAX_AGE));
 %>
 
 <liferay-frontend:fieldset
@@ -52,38 +53,23 @@ int trashEntriesMaxAge = PropertiesParamUtil.getInteger(typeSettingsUnicodePrope
 				var trashEnabled = trashEnabledCheckbox.checked;
 
 				if (!trashEnabled && trashEnabledDefault) {
-					var trashEntriesMaxAge = document.getElementById(
-						'<portlet:namespace />trashEntriesMaxAge'
-					);
+					if (
+						!confirm(
+							'<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "disabling-the-recycle-bin-prevents-the-restoring-of-content-that-has-been-moved-to-the-recycle-bin")) %>'
+						)
+					) {
+						trashEnabledCheckbox.checked = true;
 
-					Liferay.Util.openConfirmModal({
-						message:
-							'<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "disabling-the-recycle-bin-prevents-the-restoring-of-content-that-has-been-moved-to-the-recycle-bin")) %>',
-						onConfirm: (isConfirmed) => {
-							if (isConfirmed) {
-								if (trashEntriesMaxAge) {
-									Liferay.Util.toggleDisabled(
-										trashEntriesMaxAge,
-										!trashEnabled
-									);
-								}
-							}
-							else {
-								trashEnabledCheckbox.checked = true;
-
-								trashEnabled = true;
-
-								if (trashEntriesMaxAge) {
-									Liferay.Util.toggleDisabled(
-										trashEntriesMaxAge,
-										!trashEnabled
-									);
-								}
-							}
-						},
-					});
+						trashEnabled = true;
+					}
 				}
-				else {
+
+				var trashEntriesMaxAge = document.getElementById(
+					'<portlet:namespace />trashEntriesMaxAge'
+				);
+
+				if (trashEntriesMaxAge) {
+					Liferay.Util.toggleDisabled(trashEntriesMaxAge, !trashEnabled);
 				}
 			});
 		}

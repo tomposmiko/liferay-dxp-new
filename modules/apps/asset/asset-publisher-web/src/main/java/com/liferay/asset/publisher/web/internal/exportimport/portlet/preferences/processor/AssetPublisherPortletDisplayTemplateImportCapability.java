@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"name=AssetPublisherImportCapability",
 		"type=" + PortletDisplayTemplateConstants.DISPLAY_TEMPLATE_IMPORT

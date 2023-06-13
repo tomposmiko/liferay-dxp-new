@@ -18,31 +18,20 @@ import com.liferay.headless.admin.user.dto.v1_0.Account;
 import com.liferay.headless.admin.user.dto.v1_0.AccountRole;
 import com.liferay.headless.admin.user.dto.v1_0.Organization;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
-import com.liferay.headless.admin.user.dto.v1_0.UserGroup;
 import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
 import com.liferay.headless.admin.user.resource.v1_0.AccountRoleResource;
-import com.liferay.headless.admin.user.resource.v1_0.EmailAddressResource;
 import com.liferay.headless.admin.user.resource.v1_0.OrganizationResource;
-import com.liferay.headless.admin.user.resource.v1_0.PhoneResource;
-import com.liferay.headless.admin.user.resource.v1_0.PostalAddressResource;
 import com.liferay.headless.admin.user.resource.v1_0.RoleResource;
-import com.liferay.headless.admin.user.resource.v1_0.SegmentResource;
 import com.liferay.headless.admin.user.resource.v1_0.SubscriptionResource;
 import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
-import com.liferay.headless.admin.user.resource.v1_0.UserGroupResource;
-import com.liferay.headless.admin.user.resource.v1_0.WebUrlResource;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
-import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 
 import java.util.function.BiFunction;
@@ -82,14 +71,6 @@ public class Mutation {
 			accountRoleResourceComponentServiceObjects;
 	}
 
-	public static void setEmailAddressResourceComponentServiceObjects(
-		ComponentServiceObjects<EmailAddressResource>
-			emailAddressResourceComponentServiceObjects) {
-
-		_emailAddressResourceComponentServiceObjects =
-			emailAddressResourceComponentServiceObjects;
-	}
-
 	public static void setOrganizationResourceComponentServiceObjects(
 		ComponentServiceObjects<OrganizationResource>
 			organizationResourceComponentServiceObjects) {
@@ -98,36 +79,12 @@ public class Mutation {
 			organizationResourceComponentServiceObjects;
 	}
 
-	public static void setPhoneResourceComponentServiceObjects(
-		ComponentServiceObjects<PhoneResource>
-			phoneResourceComponentServiceObjects) {
-
-		_phoneResourceComponentServiceObjects =
-			phoneResourceComponentServiceObjects;
-	}
-
-	public static void setPostalAddressResourceComponentServiceObjects(
-		ComponentServiceObjects<PostalAddressResource>
-			postalAddressResourceComponentServiceObjects) {
-
-		_postalAddressResourceComponentServiceObjects =
-			postalAddressResourceComponentServiceObjects;
-	}
-
 	public static void setRoleResourceComponentServiceObjects(
 		ComponentServiceObjects<RoleResource>
 			roleResourceComponentServiceObjects) {
 
 		_roleResourceComponentServiceObjects =
 			roleResourceComponentServiceObjects;
-	}
-
-	public static void setSegmentResourceComponentServiceObjects(
-		ComponentServiceObjects<SegmentResource>
-			segmentResourceComponentServiceObjects) {
-
-		_segmentResourceComponentServiceObjects =
-			segmentResourceComponentServiceObjects;
 	}
 
 	public static void setSubscriptionResourceComponentServiceObjects(
@@ -144,41 +101,6 @@ public class Mutation {
 
 		_userAccountResourceComponentServiceObjects =
 			userAccountResourceComponentServiceObjects;
-	}
-
-	public static void setUserGroupResourceComponentServiceObjects(
-		ComponentServiceObjects<UserGroupResource>
-			userGroupResourceComponentServiceObjects) {
-
-		_userGroupResourceComponentServiceObjects =
-			userGroupResourceComponentServiceObjects;
-	}
-
-	public static void setWebUrlResourceComponentServiceObjects(
-		ComponentServiceObjects<WebUrlResource>
-			webUrlResourceComponentServiceObjects) {
-
-		_webUrlResourceComponentServiceObjects =
-			webUrlResourceComponentServiceObjects;
-	}
-
-	@GraphQLField
-	public Response createAccountsPageExportBatch(
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_accountResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			accountResource -> accountResource.postAccountsPageExportBatch(
-				search, _filterBiFunction.apply(accountResource, filterString),
-				_sortsBiFunction.apply(accountResource, sortsString),
-				callbackURL, contentType, fieldNames));
 	}
 
 	@GraphQLField(description = "Creates a new account")
@@ -368,28 +290,6 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public Response createOrganizationAccountsPageExportBatch(
-			@GraphQLName("organizationId") String organizationId,
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_accountResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			accountResource ->
-				accountResource.postOrganizationAccountsPageExportBatch(
-					organizationId, search,
-					_filterBiFunction.apply(accountResource, filterString),
-					_sortsBiFunction.apply(accountResource, sortsString),
-					callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
 	public boolean createOrganizationAccounts(
 			@GraphQLName("organizationId") Long organizationId,
 			@GraphQLName("longs") Long[] longs)
@@ -445,8 +345,8 @@ public class Mutation {
 				@GraphQLName("accountExternalReferenceCode") String
 					accountExternalReferenceCode,
 				@GraphQLName("accountRoleId") Long accountRoleId,
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode)
+				@GraphQLName("userAccountExternalReferenceCode") String
+					userAccountExternalReferenceCode)
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(
@@ -456,7 +356,7 @@ public class Mutation {
 				accountRoleResource.
 					deleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode(
 						accountExternalReferenceCode, accountRoleId,
-						externalReferenceCode));
+						userAccountExternalReferenceCode));
 
 		return true;
 	}
@@ -469,8 +369,8 @@ public class Mutation {
 				@GraphQLName("accountExternalReferenceCode") String
 					accountExternalReferenceCode,
 				@GraphQLName("accountRoleId") Long accountRoleId,
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode)
+				@GraphQLName("userAccountExternalReferenceCode") String
+					userAccountExternalReferenceCode)
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(
@@ -480,7 +380,7 @@ public class Mutation {
 				accountRoleResource.
 					postAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode(
 						accountExternalReferenceCode, accountRoleId,
-						externalReferenceCode));
+						userAccountExternalReferenceCode));
 
 		return true;
 	}
@@ -542,28 +442,6 @@ public class Mutation {
 						externalReferenceCode, accountRoleId, emailAddress));
 
 		return true;
-	}
-
-	@GraphQLField
-	public Response createAccountAccountRolesPageExportBatch(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("keywords") String keywords,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_accountRoleResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			accountRoleResource ->
-				accountRoleResource.postAccountAccountRolesPageExportBatch(
-					accountId, keywords,
-					_filterBiFunction.apply(accountRoleResource, filterString),
-					_sortsBiFunction.apply(accountRoleResource, sortsString),
-					callbackURL, contentType, fieldNames));
 	}
 
 	@GraphQLField(description = "Adds a role for the account")
@@ -630,149 +508,6 @@ public class Mutation {
 		return true;
 	}
 
-	@GraphQLField
-	public Response createOrganizationEmailAddressesPageExportBatch(
-			@GraphQLName("organizationId") String organizationId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_emailAddressResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			emailAddressResource ->
-				emailAddressResource.
-					postOrganizationEmailAddressesPageExportBatch(
-						organizationId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createUserAccountEmailAddressesPageExportBatch(
-			@GraphQLName("userAccountId") Long userAccountId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_emailAddressResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			emailAddressResource ->
-				emailAddressResource.
-					postUserAccountEmailAddressesPageExportBatch(
-						userAccountId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public boolean deleteAccountByExternalReferenceCodeOrganization(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("organizationId") String organizationId)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.
-					deleteAccountByExternalReferenceCodeOrganization(
-						externalReferenceCode, organizationId));
-
-		return true;
-	}
-
-	@GraphQLField
-	public boolean createAccountByExternalReferenceCodeOrganization(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("organizationId") String organizationId)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.
-					postAccountByExternalReferenceCodeOrganization(
-						externalReferenceCode, organizationId));
-
-		return true;
-	}
-
-	@GraphQLField
-	public Response createAccountOrganizationsPageExportBatch(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.postAccountOrganizationsPageExportBatch(
-					accountId, search,
-					_filterBiFunction.apply(organizationResource, filterString),
-					_sortsBiFunction.apply(organizationResource, sortsString),
-					callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public boolean deleteAccountOrganization(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("organizationId") String organizationId)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.deleteAccountOrganization(
-					accountId, organizationId));
-
-		return true;
-	}
-
-	@GraphQLField
-	public boolean createAccountOrganization(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("organizationId") String organizationId)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.postAccountOrganization(
-					accountId, organizationId));
-
-		return true;
-	}
-
-	@GraphQLField
-	public Response createOrganizationsPageExportBatch(
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.postOrganizationsPageExportBatch(
-					search,
-					_filterBiFunction.apply(organizationResource, filterString),
-					_sortsBiFunction.apply(organizationResource, sortsString),
-					callbackURL, contentType, fieldNames));
-	}
-
 	@GraphQLField(description = "Creates a new organization")
 	public Organization createOrganization(
 			@GraphQLName("organization") Organization organization)
@@ -796,53 +531,6 @@ public class Mutation {
 			this::_populateResourceContext,
 			organizationResource -> organizationResource.postOrganizationBatch(
 				callbackURL, object));
-	}
-
-	@GraphQLField(description = "Deletes an organization.")
-	public boolean deleteOrganizationByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.deleteOrganizationByExternalReferenceCode(
-					externalReferenceCode));
-
-		return true;
-	}
-
-	@GraphQLField(
-		description = "Updates the organization with information sent in the request body. Only the provided fields are updated."
-	)
-	public Organization patchOrganizationByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("organization") Organization organization)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.patchOrganizationByExternalReferenceCode(
-					externalReferenceCode, organization));
-	}
-
-	@GraphQLField(
-		description = "Replaces the organization with information sent in the request body. Any missing fields are deleted unless they are required."
-	)
-	public Organization updateOrganizationByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("organization") Organization organization)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.putOrganizationByExternalReferenceCode(
-					externalReferenceCode, organization));
 	}
 
 	@GraphQLField(description = "Deletes an organization.")
@@ -989,103 +677,6 @@ public class Mutation {
 					organizationId, emailAddress));
 	}
 
-	@GraphQLField
-	public Response createOrganizationPhonesPageExportBatch(
-			@GraphQLName("organizationId") String organizationId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_phoneResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			phoneResource ->
-				phoneResource.postOrganizationPhonesPageExportBatch(
-					organizationId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createUserAccountPhonesPageExportBatch(
-			@GraphQLName("userAccountId") Long userAccountId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_phoneResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			phoneResource -> phoneResource.postUserAccountPhonesPageExportBatch(
-				userAccountId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createAccountPostalAddressesPageExportBatch(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_postalAddressResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			postalAddressResource ->
-				postalAddressResource.postAccountPostalAddressesPageExportBatch(
-					accountId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createOrganizationPostalAddressesPageExportBatch(
-			@GraphQLName("organizationId") String organizationId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_postalAddressResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			postalAddressResource ->
-				postalAddressResource.
-					postOrganizationPostalAddressesPageExportBatch(
-						organizationId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createUserAccountPostalAddressesPageExportBatch(
-			@GraphQLName("userAccountId") Long userAccountId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_postalAddressResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			postalAddressResource ->
-				postalAddressResource.
-					postUserAccountPostalAddressesPageExportBatch(
-						userAccountId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createRolesPageExportBatch(
-			@GraphQLName("types") Integer[] types,
-			@GraphQLName("search") String search,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_roleResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			roleResource -> roleResource.postRolesPageExportBatch(
-				types, search, callbackURL, contentType, fieldNames));
-	}
-
 	@GraphQLField(description = "Unassociates a role with a user account")
 	public boolean deleteRoleUserAccountAssociation(
 			@GraphQLName("roleId") Long roleId,
@@ -1187,21 +778,6 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public Response createSiteSegmentsPageExportBatch(
-			@GraphQLName("siteKey") @NotEmpty String siteKey,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_segmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			segmentResource -> segmentResource.postSiteSegmentsPageExportBatch(
-				Long.valueOf(siteKey), callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
 	public boolean deleteMyUserAccountSubscription(
 			@GraphQLName("subscriptionId") Long subscriptionId)
 		throws Exception {
@@ -1223,8 +799,8 @@ public class Mutation {
 			deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
 				@GraphQLName("accountExternalReferenceCode") String
 					accountExternalReferenceCode,
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode)
+				@GraphQLName("userAccountExternalReferenceCode") String
+					userAccountExternalReferenceCode)
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(
@@ -1233,7 +809,8 @@ public class Mutation {
 			userAccountResource ->
 				userAccountResource.
 					deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
-						accountExternalReferenceCode, externalReferenceCode));
+						accountExternalReferenceCode,
+						userAccountExternalReferenceCode));
 
 		return true;
 	}
@@ -1245,8 +822,8 @@ public class Mutation {
 			createAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
 				@GraphQLName("accountExternalReferenceCode") String
 					accountExternalReferenceCode,
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode)
+				@GraphQLName("userAccountExternalReferenceCode") String
+					userAccountExternalReferenceCode)
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(
@@ -1255,7 +832,8 @@ public class Mutation {
 			userAccountResource ->
 				userAccountResource.
 					postAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
-						accountExternalReferenceCode, externalReferenceCode));
+						accountExternalReferenceCode,
+						userAccountExternalReferenceCode));
 
 		return true;
 	}
@@ -1361,28 +939,6 @@ public class Mutation {
 		return true;
 	}
 
-	@GraphQLField
-	public Response createAccountUserAccountsPageExportBatch(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userAccountResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userAccountResource ->
-				userAccountResource.postAccountUserAccountsPageExportBatch(
-					accountId, search,
-					_filterBiFunction.apply(userAccountResource, filterString),
-					_sortsBiFunction.apply(userAccountResource, sortsString),
-					callbackURL, contentType, fieldNames));
-	}
-
 	@GraphQLField(
 		description = "Creates a user and assigns them to the account"
 	)
@@ -1485,71 +1041,6 @@ public class Mutation {
 			userAccountResource ->
 				userAccountResource.postAccountUserAccountByEmailAddress(
 					accountId, emailAddress));
-	}
-
-	@GraphQLField
-	public Response createOrganizationUserAccountsPageExportBatch(
-			@GraphQLName("organizationId") String organizationId,
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userAccountResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userAccountResource ->
-				userAccountResource.postOrganizationUserAccountsPageExportBatch(
-					organizationId, search,
-					_filterBiFunction.apply(userAccountResource, filterString),
-					_sortsBiFunction.apply(userAccountResource, sortsString),
-					callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createSiteUserAccountsPageExportBatch(
-			@GraphQLName("siteKey") @NotEmpty String siteKey,
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userAccountResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userAccountResource ->
-				userAccountResource.postSiteUserAccountsPageExportBatch(
-					Long.valueOf(siteKey), search,
-					_filterBiFunction.apply(userAccountResource, filterString),
-					_sortsBiFunction.apply(userAccountResource, sortsString),
-					callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createUserAccountsPageExportBatch(
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userAccountResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userAccountResource ->
-				userAccountResource.postUserAccountsPageExportBatch(
-					search,
-					_filterBiFunction.apply(userAccountResource, filterString),
-					_sortsBiFunction.apply(userAccountResource, sortsString),
-					callbackURL, contentType, fieldNames));
 	}
 
 	@GraphQLField(description = "Creates a new user account")
@@ -1676,238 +1167,6 @@ public class Mutation {
 				callbackURL, object));
 	}
 
-	@GraphQLField
-	@GraphQLName(
-		description = "null",
-		value = "postUserAccountImageUserAccountIdMultipartBody"
-	)
-	public Response createUserAccountImage(
-			@GraphQLName("userAccountId") Long userAccountId,
-			@GraphQLName("multipartBody") MultipartBody multipartBody)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userAccountResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userAccountResource -> userAccountResource.postUserAccountImage(
-				userAccountId, multipartBody));
-	}
-
-	@GraphQLField
-	public Response createUserGroupsPageExportBatch(
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource ->
-				userGroupResource.postUserGroupsPageExportBatch(
-					search,
-					_filterBiFunction.apply(userGroupResource, filterString),
-					_sortsBiFunction.apply(userGroupResource, sortsString),
-					callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public UserGroup createUserGroup(
-			@GraphQLName("userGroup") UserGroup userGroup)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.postUserGroup(userGroup));
-	}
-
-	@GraphQLField
-	public Response createUserGroupBatch(
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.postUserGroupBatch(
-				callbackURL, object));
-	}
-
-	@GraphQLField
-	public boolean deleteUserGroupByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource ->
-				userGroupResource.deleteUserGroupByExternalReferenceCode(
-					externalReferenceCode));
-
-		return true;
-	}
-
-	@GraphQLField
-	public UserGroup patchUserGroupByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("userGroup") UserGroup userGroup)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource ->
-				userGroupResource.patchUserGroupByExternalReferenceCode(
-					externalReferenceCode, userGroup));
-	}
-
-	@GraphQLField
-	public UserGroup updateUserGroupByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("userGroup") UserGroup userGroup)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource ->
-				userGroupResource.putUserGroupByExternalReferenceCode(
-					externalReferenceCode, userGroup));
-	}
-
-	@GraphQLField
-	public boolean deleteUserGroup(@GraphQLName("userGroupId") Long userGroupId)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.deleteUserGroup(
-				userGroupId));
-
-		return true;
-	}
-
-	@GraphQLField
-	public Response deleteUserGroupBatch(
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.deleteUserGroupBatch(
-				callbackURL, object));
-	}
-
-	@GraphQLField
-	public UserGroup patchUserGroup(
-			@GraphQLName("userGroupId") Long userGroupId,
-			@GraphQLName("userGroup") UserGroup userGroup)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.patchUserGroup(
-				userGroupId, userGroup));
-	}
-
-	@GraphQLField
-	public UserGroup updateUserGroup(
-			@GraphQLName("userGroupId") Long userGroupId,
-			@GraphQLName("userGroup") UserGroup userGroup)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.putUserGroup(
-				userGroupId, userGroup));
-	}
-
-	@GraphQLField
-	public Response updateUserGroupBatch(
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("object") Object object)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.putUserGroupBatch(
-				callbackURL, object));
-	}
-
-	@GraphQLField
-	public boolean deleteUserGroupUsers(
-			@GraphQLName("userGroupId") Long userGroupId,
-			@GraphQLName("longs") Long[] longs)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.deleteUserGroupUsers(
-				userGroupId, longs));
-
-		return true;
-	}
-
-	@GraphQLField
-	public boolean createUserGroupUsers(
-			@GraphQLName("userGroupId") Long userGroupId,
-			@GraphQLName("longs") Long[] longs)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.postUserGroupUsers(
-				userGroupId, longs));
-
-		return true;
-	}
-
-	@GraphQLField
-	public Response createOrganizationWebUrlsPageExportBatch(
-			@GraphQLName("organizationId") String organizationId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_webUrlResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			webUrlResource ->
-				webUrlResource.postOrganizationWebUrlsPageExportBatch(
-					organizationId, callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
-	public Response createUserAccountWebUrlsPageExportBatch(
-			@GraphQLName("userAccountId") Long userAccountId,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_webUrlResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			webUrlResource ->
-				webUrlResource.postUserAccountWebUrlsPageExportBatch(
-					userAccountId, callbackURL, contentType, fieldNames));
-	}
-
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
 			_applyComponentServiceObjects(
 				ComponentServiceObjects<T> componentServiceObjects,
@@ -1957,12 +1216,6 @@ public class Mutation {
 		accountResource.setContextUser(_user);
 		accountResource.setGroupLocalService(_groupLocalService);
 		accountResource.setRoleLocalService(_roleLocalService);
-
-		accountResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		accountResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -1977,33 +1230,6 @@ public class Mutation {
 		accountRoleResource.setContextUser(_user);
 		accountRoleResource.setGroupLocalService(_groupLocalService);
 		accountRoleResource.setRoleLocalService(_roleLocalService);
-
-		accountRoleResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		accountRoleResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
-	}
-
-	private void _populateResourceContext(
-			EmailAddressResource emailAddressResource)
-		throws Exception {
-
-		emailAddressResource.setContextAcceptLanguage(_acceptLanguage);
-		emailAddressResource.setContextCompany(_company);
-		emailAddressResource.setContextHttpServletRequest(_httpServletRequest);
-		emailAddressResource.setContextHttpServletResponse(
-			_httpServletResponse);
-		emailAddressResource.setContextUriInfo(_uriInfo);
-		emailAddressResource.setContextUser(_user);
-		emailAddressResource.setGroupLocalService(_groupLocalService);
-		emailAddressResource.setRoleLocalService(_roleLocalService);
-
-		emailAddressResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		emailAddressResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2019,52 +1245,6 @@ public class Mutation {
 		organizationResource.setContextUser(_user);
 		organizationResource.setGroupLocalService(_groupLocalService);
 		organizationResource.setRoleLocalService(_roleLocalService);
-
-		organizationResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		organizationResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
-	}
-
-	private void _populateResourceContext(PhoneResource phoneResource)
-		throws Exception {
-
-		phoneResource.setContextAcceptLanguage(_acceptLanguage);
-		phoneResource.setContextCompany(_company);
-		phoneResource.setContextHttpServletRequest(_httpServletRequest);
-		phoneResource.setContextHttpServletResponse(_httpServletResponse);
-		phoneResource.setContextUriInfo(_uriInfo);
-		phoneResource.setContextUser(_user);
-		phoneResource.setGroupLocalService(_groupLocalService);
-		phoneResource.setRoleLocalService(_roleLocalService);
-
-		phoneResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		phoneResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
-	}
-
-	private void _populateResourceContext(
-			PostalAddressResource postalAddressResource)
-		throws Exception {
-
-		postalAddressResource.setContextAcceptLanguage(_acceptLanguage);
-		postalAddressResource.setContextCompany(_company);
-		postalAddressResource.setContextHttpServletRequest(_httpServletRequest);
-		postalAddressResource.setContextHttpServletResponse(
-			_httpServletResponse);
-		postalAddressResource.setContextUriInfo(_uriInfo);
-		postalAddressResource.setContextUser(_user);
-		postalAddressResource.setGroupLocalService(_groupLocalService);
-		postalAddressResource.setRoleLocalService(_roleLocalService);
-
-		postalAddressResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		postalAddressResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(RoleResource roleResource)
@@ -2078,31 +1258,6 @@ public class Mutation {
 		roleResource.setContextUser(_user);
 		roleResource.setGroupLocalService(_groupLocalService);
 		roleResource.setRoleLocalService(_roleLocalService);
-
-		roleResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		roleResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
-	}
-
-	private void _populateResourceContext(SegmentResource segmentResource)
-		throws Exception {
-
-		segmentResource.setContextAcceptLanguage(_acceptLanguage);
-		segmentResource.setContextCompany(_company);
-		segmentResource.setContextHttpServletRequest(_httpServletRequest);
-		segmentResource.setContextHttpServletResponse(_httpServletResponse);
-		segmentResource.setContextUriInfo(_uriInfo);
-		segmentResource.setContextUser(_user);
-		segmentResource.setGroupLocalService(_groupLocalService);
-		segmentResource.setRoleLocalService(_roleLocalService);
-
-		segmentResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		segmentResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2118,12 +1273,6 @@ public class Mutation {
 		subscriptionResource.setContextUser(_user);
 		subscriptionResource.setGroupLocalService(_groupLocalService);
 		subscriptionResource.setRoleLocalService(_roleLocalService);
-
-		subscriptionResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		subscriptionResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2138,80 +1287,23 @@ public class Mutation {
 		userAccountResource.setContextUser(_user);
 		userAccountResource.setGroupLocalService(_groupLocalService);
 		userAccountResource.setRoleLocalService(_roleLocalService);
-
-		userAccountResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		userAccountResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
-	}
-
-	private void _populateResourceContext(UserGroupResource userGroupResource)
-		throws Exception {
-
-		userGroupResource.setContextAcceptLanguage(_acceptLanguage);
-		userGroupResource.setContextCompany(_company);
-		userGroupResource.setContextHttpServletRequest(_httpServletRequest);
-		userGroupResource.setContextHttpServletResponse(_httpServletResponse);
-		userGroupResource.setContextUriInfo(_uriInfo);
-		userGroupResource.setContextUser(_user);
-		userGroupResource.setGroupLocalService(_groupLocalService);
-		userGroupResource.setRoleLocalService(_roleLocalService);
-
-		userGroupResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		userGroupResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
-	}
-
-	private void _populateResourceContext(WebUrlResource webUrlResource)
-		throws Exception {
-
-		webUrlResource.setContextAcceptLanguage(_acceptLanguage);
-		webUrlResource.setContextCompany(_company);
-		webUrlResource.setContextHttpServletRequest(_httpServletRequest);
-		webUrlResource.setContextHttpServletResponse(_httpServletResponse);
-		webUrlResource.setContextUriInfo(_uriInfo);
-		webUrlResource.setContextUser(_user);
-		webUrlResource.setGroupLocalService(_groupLocalService);
-		webUrlResource.setRoleLocalService(_roleLocalService);
-
-		webUrlResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		webUrlResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private static ComponentServiceObjects<AccountResource>
 		_accountResourceComponentServiceObjects;
 	private static ComponentServiceObjects<AccountRoleResource>
 		_accountRoleResourceComponentServiceObjects;
-	private static ComponentServiceObjects<EmailAddressResource>
-		_emailAddressResourceComponentServiceObjects;
 	private static ComponentServiceObjects<OrganizationResource>
 		_organizationResourceComponentServiceObjects;
-	private static ComponentServiceObjects<PhoneResource>
-		_phoneResourceComponentServiceObjects;
-	private static ComponentServiceObjects<PostalAddressResource>
-		_postalAddressResourceComponentServiceObjects;
 	private static ComponentServiceObjects<RoleResource>
 		_roleResourceComponentServiceObjects;
-	private static ComponentServiceObjects<SegmentResource>
-		_segmentResourceComponentServiceObjects;
 	private static ComponentServiceObjects<SubscriptionResource>
 		_subscriptionResourceComponentServiceObjects;
 	private static ComponentServiceObjects<UserAccountResource>
 		_userAccountResourceComponentServiceObjects;
-	private static ComponentServiceObjects<UserGroupResource>
-		_userGroupResourceComponentServiceObjects;
-	private static ComponentServiceObjects<WebUrlResource>
-		_webUrlResourceComponentServiceObjects;
 
 	private AcceptLanguage _acceptLanguage;
 	private com.liferay.portal.kernel.model.Company _company;
-	private BiFunction<Object, String, Filter> _filterBiFunction;
 	private GroupLocalService _groupLocalService;
 	private HttpServletRequest _httpServletRequest;
 	private HttpServletResponse _httpServletResponse;
@@ -2219,9 +1311,5 @@ public class Mutation {
 	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
-	private VulcanBatchEngineExportTaskResource
-		_vulcanBatchEngineExportTaskResource;
-	private VulcanBatchEngineImportTaskResource
-		_vulcanBatchEngineImportTaskResource;
 
 }

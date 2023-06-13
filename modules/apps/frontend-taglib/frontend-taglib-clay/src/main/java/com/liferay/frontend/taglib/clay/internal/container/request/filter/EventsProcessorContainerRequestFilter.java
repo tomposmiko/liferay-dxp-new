@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marco Leo
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Frontend.Clay)",
 		"osgi.jaxrs.extension=true",
@@ -61,7 +62,7 @@ public class EventsProcessorContainerRequestFilter
 				_httpServletResponse);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 

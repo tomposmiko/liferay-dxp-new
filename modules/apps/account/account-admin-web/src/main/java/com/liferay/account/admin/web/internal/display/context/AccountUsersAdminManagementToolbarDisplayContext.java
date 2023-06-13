@@ -26,6 +26,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -37,7 +38,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
@@ -285,7 +285,7 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 		return new LabelItemList() {
 			{
 				if (Objects.equals(
-						_getAccountEntriesNavigation(), "selected-accounts")) {
+						_getAccountEntriesNavigation(), "accounts")) {
 
 					long[] accountEntryIds = ParamUtil.getLongValues(
 						httpServletRequest, "accountEntryIds");
@@ -318,6 +318,7 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 									removeLabelURL.toString());
 
 								labelItem.setCloseable(true);
+
 								labelItem.setLabel(
 									LanguageUtil.get(
 										httpServletRequest,
@@ -339,7 +340,9 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 								).setParameter(
 									"accountEntriesNavigation", (String)null
 								).buildString());
+
 							labelItem.setCloseable(true);
+
 							labelItem.setLabel(
 								LanguageUtil.get(
 									httpServletRequest, "no-assigned-account"));
@@ -356,14 +359,16 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 								).setNavigation(
 									(String)null
 								).buildString());
+
 							labelItem.setCloseable(true);
-							labelItem.setLabel(
-								String.format(
-									"%s: %s",
-									LanguageUtil.get(
-										httpServletRequest, "status"),
-									LanguageUtil.get(
-										httpServletRequest, getNavigation())));
+
+							String label = String.format(
+								"%s: %s",
+								LanguageUtil.get(httpServletRequest, "status"),
+								LanguageUtil.get(
+									httpServletRequest, getNavigation()));
+
+							labelItem.setLabel(label);
 						});
 				}
 			}
@@ -382,11 +387,23 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return liferayPortletResponse.createRenderURL();
 		}
+	}
+
+	@Override
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
+
+		return searchActionURL.toString();
+	}
+
+	@Override
+	public Boolean isDisabled() {
+		return false;
 	}
 
 	@Override
@@ -419,26 +436,26 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 
 	private String _getAccountEntriesNavigation() {
 		return ParamUtil.getString(
-			liferayPortletRequest, "accountEntriesNavigation", "any-account");
+			liferayPortletRequest, "accountEntriesNavigation", "all");
 	}
 
 	private List<DropdownItem> _getFilterByAccountEntriesDropdownItems() {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.setActive(
-					Objects.equals(
-						_getAccountEntriesNavigation(), "any-account"));
+					Objects.equals(_getAccountEntriesNavigation(), "all"));
+
+				dropdownItem.setLabel(
+					LanguageUtil.get(httpServletRequest, "all"));
+
 				dropdownItem.setHref(
 					PortletURLUtil.clone(currentURLObj, liferayPortletResponse),
-					"accountEntriesNavigation", "any-account");
-				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "any-account"));
+					"accountEntriesNavigation", "all");
 			}
 		).add(
 			dropdownItem -> {
 				dropdownItem.setActive(
-					Objects.equals(
-						_getAccountEntriesNavigation(), "selected-accounts"));
+					Objects.equals(_getAccountEntriesNavigation(), "accounts"));
 
 				dropdownItem.putData("action", "selectAccountEntries");
 
@@ -449,7 +466,7 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 					).setMVCPath(
 						"/account_users_admin/select_account_entries.jsp"
 					).setParameter(
-						"accountEntriesNavigation", "selected-accounts"
+						"accountEntriesNavigation", "accounts"
 					).setWindowState(
 						LiferayWindowState.POP_UP
 					).buildString());
@@ -460,26 +477,27 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 				dropdownItem.putData("redirectURL", currentURLObj.toString());
 
 				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "selected-accounts"));
+					LanguageUtil.get(httpServletRequest, "accounts"));
 			}
 		).add(
 			dropdownItem -> {
 				dropdownItem.setActive(
 					Objects.equals(
 						_getAccountEntriesNavigation(), "no-assigned-account"));
-				dropdownItem.setHref(
-					PortletURLUtil.clone(currentURLObj, liferayPortletResponse),
-					"accountEntriesNavigation", "no-assigned-account");
+
 				dropdownItem.setLabel(
 					LanguageUtil.get(
 						httpServletRequest, "no-assigned-account"));
+
+				dropdownItem.setHref(
+					PortletURLUtil.clone(currentURLObj, liferayPortletResponse),
+					"accountEntriesNavigation", "no-assigned-account");
 			}
 		).build();
 	}
 
 	private String _getFilterByAccountEntriesDropdownItemsLabel() {
-		return LanguageUtil.get(
-			httpServletRequest, "filter-by-account-memberships");
+		return LanguageUtil.get(httpServletRequest, "filter-by-accounts");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.petra.string.StringPool;
 
 import java.util.Locale;
+import java.util.function.IntFunction;
 
 /**
  * @author Marcellus Tavares
@@ -27,8 +28,8 @@ public class DefaultDDMFormFieldValueAccessor
 	implements DDMFormFieldValueAccessor<String> {
 
 	@Override
-	public String[] getArrayGenericType() {
-		return new String[0];
+	public IntFunction<String[]> getArrayGeneratorIntFunction() {
+		return String[]::new;
 	}
 
 	@Override

@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = DeleteDocumentRequestExecutor.class)
+@Component(immediate = true, service = DeleteDocumentRequestExecutor.class)
 public class DeleteDocumentRequestExecutorImpl
 	implements DeleteDocumentRequestExecutor {
 
@@ -44,7 +44,7 @@ public class DeleteDocumentRequestExecutorImpl
 			_elasticsearchBulkableDocumentRequestTranslator.translate(
 				deleteDocumentRequest);
 
-		DeleteResponse deleteResponse = _getDeleteResponse(
+		DeleteResponse deleteResponse = getDeleteResponse(
 			deleteRequest, deleteDocumentRequest);
 
 		RestStatus restStatus = deleteResponse.status();
@@ -52,7 +52,7 @@ public class DeleteDocumentRequestExecutorImpl
 		return new DeleteDocumentResponse(restStatus.getStatus());
 	}
 
-	private DeleteResponse _getDeleteResponse(
+	protected DeleteResponse getDeleteResponse(
 		DeleteRequest deleteRequest,
 		DeleteDocumentRequest deleteDocumentRequest) {
 
@@ -70,11 +70,24 @@ public class DeleteDocumentRequestExecutorImpl
 		}
 	}
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setBulkableDocumentRequestTranslator(
+		ElasticsearchBulkableDocumentRequestTranslator
+			elasticsearchBulkableDocumentRequestTranslator) {
+
+		_elasticsearchBulkableDocumentRequestTranslator =
+			elasticsearchBulkableDocumentRequestTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchBulkableDocumentRequestTranslator
 		_elasticsearchBulkableDocumentRequestTranslator;
-
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

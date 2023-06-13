@@ -327,11 +327,6 @@ public interface DEDataDefinitionFieldLinkLocalService
 	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
 		long ddmStructureId, String[] fieldNames);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DEDataDefinitionFieldLink>
-		getDEDataDefinitionFieldLinksByClassNameIdAndClassPK(
-			long classNameId, long classPK);
-
 	/**
 	 * Returns all the de data definition field links matching the UUID and company.
 	 *

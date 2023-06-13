@@ -21,20 +21,19 @@ import com.liferay.adaptive.media.image.model.AMImageEntry;
 import com.liferay.adaptive.media.image.processor.AMImageProcessor;
 import com.liferay.adaptive.media.image.scaler.AMImageScaledImage;
 import com.liferay.adaptive.media.image.scaler.AMImageScaler;
-import com.liferay.adaptive.media.image.scaler.AMImageScalerRegistry;
+import com.liferay.adaptive.media.image.scaler.AMImageScalerTracker;
 import com.liferay.adaptive.media.image.service.AMImageEntryLocalService;
 import com.liferay.adaptive.media.image.validator.AMImageValidator;
 import com.liferay.adaptive.media.processor.AMProcessor;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.repository.model.FileVersionWrapper;
-import com.liferay.portal.kernel.util.ContentTypes;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.repository.model.FileVersion",
 	service = {AMImageProcessor.class, AMProcessor.class}
 )
@@ -82,20 +82,23 @@ public final class AMImageProcessorImpl implements AMImageProcessor {
 			return;
 		}
 
-		AMImageConfigurationEntry amImageConfigurationEntry =
+		Optional<AMImageConfigurationEntry> amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				fileVersion.getCompanyId(), configurationEntryUuid);
 
-		if (amImageConfigurationEntry == null) {
+		if (!amImageConfigurationEntryOptional.isPresent()) {
 			return;
 		}
+
+		AMImageConfigurationEntry amImageConfigurationEntry =
+			amImageConfigurationEntryOptional.get();
 
 		AMImageEntry amImageEntry = _amImageEntryLocalService.fetchAMImageEntry(
 			amImageConfigurationEntry.getUUID(),
 			fileVersion.getFileVersionId());
 
 		try {
-			if (!_isUpdateImageEntry(amImageEntry, fileVersion)) {
+			if (!_isUpdateImageEntry(fileVersion, amImageEntry)) {
 				return;
 			}
 
@@ -105,7 +108,7 @@ public final class AMImageProcessorImpl implements AMImageProcessor {
 			}
 
 			AMImageScaler amImageScaler =
-				_amImageScalerRegistry.getAMImageScaler(
+				_amImageScalerTracker.getAMImageScaler(
 					fileVersion.getMimeType());
 
 			if (amImageScaler == null) {
@@ -119,8 +122,7 @@ public final class AMImageProcessorImpl implements AMImageProcessor {
 					amImageScaledImage.getInputStream()) {
 
 				_amImageEntryLocalService.addAMImageEntry(
-					amImageConfigurationEntry,
-					_getScaledFileVersion(amImageScaledImage, fileVersion),
+					amImageConfigurationEntry, fileVersion,
 					amImageScaledImage.getHeight(),
 					amImageScaledImage.getWidth(), inputStream,
 					amImageScaledImage.getSize());
@@ -131,35 +133,11 @@ public final class AMImageProcessorImpl implements AMImageProcessor {
 		}
 	}
 
-	private FileVersion _getScaledFileVersion(
-		AMImageScaledImage amImageScaledImage, FileVersion fileVersion) {
-
-		String mimeType = amImageScaledImage.getMimeType();
-
-		if ((mimeType == null) || !mimeType.equals(fileVersion.getMimeType()) ||
-			mimeType.equals(ContentTypes.APPLICATION_OCTET_STREAM)) {
-
-			return fileVersion;
-		}
-
-		return new FileVersionWrapper(fileVersion) {
-
-			@Override
-			public String getMimeType() {
-				return mimeType;
-			}
-
-		};
-	}
-
 	private boolean _isUpdateImageEntry(
-			AMImageEntry amImageEntry, FileVersion fileVersion)
+			FileVersion fileVersion, AMImageEntry amImageEntry)
 		throws PortalException {
 
-		if ((amImageEntry == null) ||
-			!_amImageEntryLocalService.hasAMImageEntryContent(
-				amImageEntry.getConfigurationUuid(), fileVersion)) {
-
+		if (amImageEntry == null) {
 			return true;
 		}
 
@@ -183,7 +161,7 @@ public final class AMImageProcessorImpl implements AMImageProcessor {
 	private AMImageEntryLocalService _amImageEntryLocalService;
 
 	@Reference
-	private AMImageScalerRegistry _amImageScalerRegistry;
+	private AMImageScalerTracker _amImageScalerTracker;
 
 	@Reference
 	private AMImageValidator _amImageValidator;

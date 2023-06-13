@@ -39,21 +39,15 @@ const getErrorAlertComponent = ({data = null, error = null} = {}) => {
 			}}
 		>
 			<SidebarHeader />
-
 			<BasicInformation
 				defaultLanguageId={pageURLs[0].languageId}
 				pageURLs={pageURLs}
 				selectedLanguageId={pageURLs[0].languageId}
 			/>
-
 			<ErrorAlert />
 		</StoreContextProvider>
 	);
 };
-
-function getParentAlert(element) {
-	return element.parentElement.parentElement;
-}
 
 describe('Error Alert', () => {
 	afterEach(cleanup);
@@ -61,14 +55,13 @@ describe('Error Alert', () => {
 	describe('Unknown error cases', () => {
 		it('Renders unknown error alert if no data nor error objects are available', () => {
 			const {getByRole, getByText} = render(getErrorAlertComponent());
+			const {className} = getByRole('alert');
 
 			expect(
 				getByText('an-unexpected-error-occurred')
 			).toBeInTheDocument();
 
-			expect(getParentAlert(getByRole('alert')).className).toContain(
-				'danger'
-			);
+			expect(className).toContain('danger');
 		});
 
 		it('Renders unknown error alert if no error is specified', () => {
@@ -80,14 +73,13 @@ describe('Error Alert', () => {
 					},
 				})
 			);
+			const {className} = getByRole('alert');
 
 			expect(
 				getByText('an-unexpected-error-occurred')
 			).toBeInTheDocument();
 
-			expect(getParentAlert(getByRole('alert')).className).toContain(
-				'danger'
-			);
+			expect(className).toContain('danger');
 		});
 	});
 
@@ -115,9 +107,8 @@ describe('Error Alert', () => {
 				)
 			).not.toBeInTheDocument();
 
-			expect(getParentAlert(getByRole('alert')).className).toContain(
-				'danger'
-			);
+			const {className} = getByRole('alert');
+			expect(className).toContain('danger');
 		});
 
 		it('Renders dange alert component with proper message and without button if user has not enough privileges or no URL is provided', () => {
@@ -222,9 +213,8 @@ describe('Error Alert', () => {
 			).toBeInTheDocument();
 			expect(getByText('show-details')).toBeInTheDocument();
 
-			expect(getParentAlert(getByRole('alert')).className).toContain(
-				'warning'
-			);
+			const {className} = getByRole('alert');
+			expect(className).toContain('warning');
 
 			expect(getByTitle('relaunch')).toBeInTheDocument();
 		});
@@ -252,9 +242,8 @@ describe('Error Alert', () => {
 			).toBeInTheDocument();
 			expect(queryByText('show-details')).not.toBeInTheDocument();
 
-			expect(getParentAlert(getByRole('alert')).className).toContain(
-				'warning'
-			);
+			const {className} = getByRole('alert');
+			expect(className).toContain('warning');
 		});
 
 		it('Renders warning alert component with page language selector', () => {

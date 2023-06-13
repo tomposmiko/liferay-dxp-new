@@ -14,8 +14,6 @@
 
 package com.liferay.asset.search.test;
 
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -27,7 +25,6 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,18 +51,14 @@ public class JournalArticleFixture {
 			LocaleUtil.US, RandomTestUtil.randomString()
 		).build();
 
-		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
-			PortalUtil.getSiteGroupId(_group.getGroupId()),
-			PortalUtil.getClassNameId(JournalArticle.class.getName()),
-			"BASIC-WEB-CONTENT", true);
-
+		String ddmStructureKey = "BASIC-WEB-CONTENT";
 		String ddmTemplateKey = "BASIC-WEB-CONTENT";
 
 		JournalArticle journalArticle = _journalArticleLocalService.addArticle(
 			null, TestPropsValues.getUserId(), _group.getGroupId(), 0, titleMap,
 			descriptionMap,
 			DDMStructureTestUtil.getSampleStructuredContent("content", "title"),
-			ddmStructure.getStructureId(), ddmTemplateKey, serviceContext);
+			ddmStructureKey, ddmTemplateKey, serviceContext);
 
 		_journalArticles.add(journalArticle);
 
@@ -87,12 +80,6 @@ public class JournalArticleFixture {
 		return _journalArticles;
 	}
 
-	public void setDDMStructureLocalService(
-		DDMStructureLocalService ddmStructureLocalService) {
-
-		_ddmStructureLocalService = ddmStructureLocalService;
-	}
-
 	public void setGroup(Group group) {
 		_group = group;
 	}
@@ -103,7 +90,6 @@ public class JournalArticleFixture {
 		_journalArticleLocalService = journalArticleLocalService;
 	}
 
-	private DDMStructureLocalService _ddmStructureLocalService;
 	private Group _group;
 	private JournalArticleLocalService _journalArticleLocalService;
 	private final List<JournalArticle> _journalArticles = new ArrayList<>();

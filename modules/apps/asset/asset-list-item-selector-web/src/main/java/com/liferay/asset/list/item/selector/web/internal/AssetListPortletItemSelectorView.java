@@ -16,14 +16,12 @@ package com.liferay.asset.list.item.selector.web.internal;
 
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.item.selector.web.internal.display.context.AssetListEntryItemSelectorDisplayContext;
-import com.liferay.info.collection.provider.item.selector.criterion.InfoCollectionProviderItemSelectorCriterion;
-import com.liferay.info.item.InfoItemServiceRegistry;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.ItemSelectorViewDescriptorRenderer;
 import com.liferay.item.selector.PortletItemSelectorView;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
+import com.liferay.item.selector.criteria.info.item.criterion.InfoListItemSelectorCriterion;
 import com.liferay.portal.kernel.language.Language;
 
 import java.io.IOException;
@@ -34,6 +32,8 @@ import java.util.Locale;
 
 import javax.portlet.PortletURL;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -45,19 +45,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(
-	property = "item.selector.view.order:Integer=100",
-	service = ItemSelectorView.class
-)
+@Component(service = ItemSelectorView.class)
 public class AssetListPortletItemSelectorView
-	implements PortletItemSelectorView
-		<InfoCollectionProviderItemSelectorCriterion> {
+	implements PortletItemSelectorView<InfoListItemSelectorCriterion> {
 
 	@Override
-	public Class<? extends InfoCollectionProviderItemSelectorCriterion>
+	public Class<? extends InfoListItemSelectorCriterion>
 		getItemSelectorCriterionClass() {
 
-		return InfoCollectionProviderItemSelectorCriterion.class;
+		return InfoListItemSelectorCriterion.class;
 	}
 
 	@Override
@@ -78,22 +74,20 @@ public class AssetListPortletItemSelectorView
 	@Override
 	public void renderHTML(
 			ServletRequest servletRequest, ServletResponse servletResponse,
-			InfoCollectionProviderItemSelectorCriterion
-				infoCollectionProviderItemSelectorCriterion,
+			InfoListItemSelectorCriterion infoListItemSelectorCriterion,
 			PortletURL portletURL, String itemSelectedEventName, boolean search)
 		throws IOException, ServletException {
 
-		_itemSelectorViewDescriptorRenderer.renderHTML(
-			servletRequest, servletResponse,
-			infoCollectionProviderItemSelectorCriterion, portletURL,
-			itemSelectedEventName, search,
-			new AssetListItemSelectorViewDescriptor(
-				new AssetListEntryItemSelectorDisplayContext(
-					(HttpServletRequest)servletRequest,
-					_infoItemServiceRegistry, _infoSearchClassMapperRegistry,
-					_language, portletURL,
-					infoCollectionProviderItemSelectorCriterion),
-				(HttpServletRequest)servletRequest));
+		RequestDispatcher requestDispatcher =
+			_servletContext.getRequestDispatcher("/view.jsp");
+
+		servletRequest.setAttribute(
+			AssetListEntryItemSelectorDisplayContext.class.getName(),
+			new AssetListEntryItemSelectorDisplayContext(
+				(HttpServletRequest)servletRequest, itemSelectedEventName,
+				_language, portletURL, infoListItemSelectorCriterion));
+
+		requestDispatcher.include(servletRequest, servletResponse);
 	}
 
 	private static final List<ItemSelectorReturnType>
@@ -101,17 +95,15 @@ public class AssetListPortletItemSelectorView
 			new InfoListItemSelectorReturnType());
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
-
-	@Reference
-	private InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
-
-	@Reference
-	private ItemSelectorViewDescriptorRenderer
-		<InfoCollectionProviderItemSelectorCriterion>
-			_itemSelectorViewDescriptorRenderer;
+	private ItemSelectorViewDescriptorRenderer<InfoListItemSelectorCriterion>
+		_itemSelectorViewDescriptorRenderer;
 
 	@Reference
 	private Language _language;
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.asset.list.item.selector.web)"
+	)
+	private ServletContext _servletContext;
 
 }

@@ -18,7 +18,6 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
-import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -26,7 +25,9 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.journal.exception.FeedTargetLayoutFriendlyUrlException;
+import com.liferay.journal.internal.exportimport.content.processor.JournalFeedExportImportContentProcessor;
 import com.liferay.journal.internal.exportimport.creation.strategy.JournalCreationStrategy;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.service.JournalFeedLocalService;
 import com.liferay.petra.string.StringBundler;
@@ -50,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class JournalFeedStagedModelDataHandler
 	extends BaseStagedModelDataHandler<JournalFeed> {
 
@@ -103,7 +104,8 @@ public class JournalFeedStagedModelDataHandler
 		Element feedElement = portletDataContext.getExportDataElement(feed);
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
-			feed.getDDMStructureId());
+			feed.getGroupId(), _portal.getClassNameId(JournalArticle.class),
+			feed.getDDMStructureKey(), true);
 
 		if (ddmStructure != null) {
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
@@ -113,8 +115,8 @@ public class JournalFeedStagedModelDataHandler
 		else {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to find DDM structure with id " +
-						feed.getDDMStructureId());
+					"Unable to find DDM structure with key " +
+						feed.getDDMStructureKey());
 			}
 		}
 
@@ -197,13 +199,13 @@ public class JournalFeedStagedModelDataHandler
 			}
 		}
 
-		Map<Long, Long> ddmStructureIds =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				DDMStructure.class);
+		Map<String, String> ddmStructureKeys =
+			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
+				DDMStructure.class + ".ddmStructureKey");
 
-		long parentDDMStructureId = MapUtil.getLong(
-			ddmStructureIds, feed.getDDMStructureId(),
-			feed.getDDMStructureId());
+		String parentDDMStructureKey = MapUtil.getString(
+			ddmStructureKeys, feed.getDDMStructureKey(),
+			feed.getDDMStructureKey());
 
 		Map<String, String> ddmTemplateKeys =
 			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
@@ -232,7 +234,7 @@ public class JournalFeedStagedModelDataHandler
 					importedFeed = _journalFeedLocalService.addFeed(
 						userId, portletDataContext.getScopeGroupId(), feedId,
 						autoFeedId, feed.getName(), feed.getDescription(),
-						parentDDMStructureId, parentDDMTemplateKey,
+						parentDDMStructureKey, parentDDMTemplateKey,
 						parentRendererDDMTemplateKey, feed.getDelta(),
 						feed.getOrderByCol(), feed.getOrderByType(),
 						feed.getTargetLayoutFriendlyUrl(),
@@ -244,7 +246,7 @@ public class JournalFeedStagedModelDataHandler
 					importedFeed = _journalFeedLocalService.updateFeed(
 						existingFeed.getGroupId(), existingFeed.getFeedId(),
 						feed.getName(), feed.getDescription(),
-						parentDDMStructureId, parentDDMTemplateKey,
+						parentDDMStructureKey, parentDDMTemplateKey,
 						parentRendererDDMTemplateKey, feed.getDelta(),
 						feed.getOrderByCol(), feed.getOrderByType(),
 						feed.getTargetLayoutFriendlyUrl(),
@@ -257,7 +259,7 @@ public class JournalFeedStagedModelDataHandler
 				importedFeed = _journalFeedLocalService.addFeed(
 					userId, portletDataContext.getScopeGroupId(), feedId,
 					autoFeedId, feed.getName(), feed.getDescription(),
-					parentDDMStructureId, parentDDMTemplateKey,
+					parentDDMStructureKey, parentDDMTemplateKey,
 					parentRendererDDMTemplateKey, feed.getDelta(),
 					feed.getOrderByCol(), feed.getOrderByType(),
 					feed.getTargetLayoutFriendlyUrl(),
@@ -292,25 +294,51 @@ public class JournalFeedStagedModelDataHandler
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setDDMStructureLocalService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		_ddmStructureLocalService = ddmStructureLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJournalCreationStrategy(
+		JournalCreationStrategy journalCreationStrategy) {
+
+		_journalCreationStrategy = journalCreationStrategy;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJournalFeedExportImportContentProcessor(
+		JournalFeedExportImportContentProcessor
+			journalFeedExportImportContentProcessor) {
+
+		_journalFeedExportImportContentProcessor =
+			journalFeedExportImportContentProcessor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJournalFeedLocalService(
+		JournalFeedLocalService journalFeedLocalService) {
+
+		_journalFeedLocalService = journalFeedLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalFeedStagedModelDataHandler.class);
 
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
-
-	@Reference
 	private JournalCreationStrategy _journalCreationStrategy;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.journal.model.JournalFeed)"
-	)
-	private ExportImportContentProcessor<String>
+	private JournalFeedExportImportContentProcessor
 		_journalFeedExportImportContentProcessor;
-
-	@Reference
 	private JournalFeedLocalService _journalFeedLocalService;
 
 	@Reference

@@ -2,10 +2,8 @@
 definition {
 
 	property app.server.bundles.size = "1";
-	property ci.retries.disabled = "true";
 	property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 	property databases.size = "1";
-	property minimum.slave.ram = "24";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Staging";
@@ -15,7 +13,7 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -23,13 +21,13 @@ definition {
 
 		Staging.remoteStagingSetUpViaJson(
 			groupName = "Site Name",
-			remotePort = 9080);
+			remotePort = "9080");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,114 +35,22 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPP-8122. Verify that when remote publishing, the child pages are not published when they are unselected."
-	@priority = 3
-	test AssertCannotPublishChildPageWhenUnselected {
-		property test.name.skip.portal.instance = "RemoteStaging#AssertCannotPublishChildPageWhenUnselected";
-
-		task ("Given: Add two children pages for Staging Test Page") {
-			for (var i : list "1,2") {
-				JSONLayout.addPublicLayout(
-					groupName = "Site Name",
-					layoutName = "Test Child Page ${i}",
-					parentLayoutName = "Staging Test Page");
-			}
-		}
-
-		task ("When: Publish only the Parent Page and not the child pages to remote live") {
-			Navigator.gotoSitePage(
-				pageName = "Staging Test Page",
-				siteName = "Site Name");
-
-			Staging.gotoPublishToLive();
-
-			Staging.configurePublishToLive(uncheckChildPagesNameList = "Test Child Page 1,Test Child Page 2");
-
-			Staging.publishToLive(remoteStaging = "true");
-		}
-
-		task ("Then: Assert that child pages aren't published on the remote site") {
-			User.logoutPG();
-
-			User.firstLoginUI(
-				password = "test",
-				specificURL = "http://localhost:9080",
-				userEmailAddress = "test@liferay.com");
-
-			Navigator.gotoSitePage(
-				baseURL = "http://localhost:9080",
-				pageName = "Staging Test Page",
-				siteName = "Remote Site");
-
-			PagesAdmin.viewPageItemPresent(pageName = "Staging Test Page");
-
-			PagesAdmin.viewPageItemNotPresent(pageName = "Test Child Page 1");
-
-			PagesAdmin.viewPageItemNotPresent(pageName = "Test Child Page 2");
-		}
-	}
-
-	@description = "This is a use case for LPS-154557 TC-1: Verify detailed error message should show up with default configuration."
-	@priority = 4
-	test AssertDetailedErrorMessageWithDefaultConfiguration {
-		property test.name.skip.portal.instance = "RemoteStaging#AssertDetailedErrorMessageWithDefaultConfiguration";
-
-		task ("Given: Delete the remote live site") {
-			JSONGroup.deleteGroupByName(
-				groupName = "Remote Site",
-				portalURL = "http://localhost:9080");
-		}
-
-		task ("When: Publsih to remote live") {
-			Navigator.openSiteURL(siteName = "Site Name");
-
-			Staging.gotoPublishToLive();
-		}
-
-		task ("Then: Assert the detailed UI error pops up") {
-			Staging.publishToLive(
-				failureExpected = "true",
-				remoteStaging = "true",
-				validateErrorMessage = "No Group exists with the primary key");
-
-			AssertConsoleTextPresent(value1 = "No Group exists with the primary key");
-		}
-	}
-
-	@description = "This is a use case for LPS-154557 TC-2: Verify only generic error message should show up when set property to true."
-	@priority = 4
-	test AssertExceptionDataIsHiddenWhenSetPropertyToTrue {
-		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=${line.separator}tunnel.servlet.hide.exception.data=true";
-		property test.name.skip.portal.instance = "RemoteStaging#AssertExceptionDataIsHiddenWhenSetPropertyToTrue";
-
-		task ("Given: Delete the remote live site") {
-			JSONGroup.deleteGroupByName(
-				groupName = "Remote Site",
-				portalURL = "http://localhost:9080");
-		}
-
-		task ("When: Publsih to remote live") {
-			Navigator.openSiteURL(siteName = "Site Name");
-
-			Staging.gotoPublishToLive();
-		}
-
-		task ("Then: Assert only generic error message pops up") {
-			Staging.publishToLive(
-				failureExpected = "true",
-				remoteStaging = "true",
-				validateErrorMessage = "Invocation failed due to com.liferay.portal.kernel.exception.NoSuchGroupException");
-
-			AssertConsoleTextPresent(value1 = "Invocation failed due to com.liferay.portal.kernel.exception.NoSuchGroupException");
-		}
-	}
-
-	@description = "This is a use case for LPS-123156. Verify that the publication process message is shown while the publication is in progress."
-	@priority = 4
+	@description = "This is a use case for LPS-123156."
+	@priority = "4"
 	test AssertLongPublicationProcessMessage {
 		property test.name.skip.portal.instance = "RemoteStaging#AssertLongPublicationProcessMessage";
 
-		Staging.runGroovyScript();
+		ServerAdministration.openServerAdmin();
+
+		var script = TestCase.getFileContent(
+			fileName = "create-300-web-content-articles.groovy",
+			filePath = "enduser/staging/usecase");
+
+		ServerAdministration.executeScript(
+			language = "Groovy",
+			script = "${script}");
+
+		Pause(locator1 = "60000");
 
 		Staging.openStagingAdmin(siteURLKey = "site-name");
 
@@ -154,59 +60,20 @@ definition {
 			locator1 = "Message#TOOLTIP",
 			value1 = "Custom Publish Process");
 
-		Staging.publishCustomPublication(remoteStaging = "true");
-
 		Staging.publishCustomPublication(
-			checkContentNameList = "Web Content",
 			headerTitle = "New Publish Process",
 			inProcess = "true",
-			rangeAll = "true",
 			remoteStaging = "true");
 	}
 
-	@description = "This is a use case for LPS-83187. Add a publish template to the staging site then verify the title of the scheduled publication after it is finished."
-	@priority = 3
-	test AssertTemplatesTitleOfScheduledStagingPublishes {
-		property test.name.skip.portal.instance = "RemoteStaging#AssertTemplatesTitleOfScheduledStagingPublishes";
-
-		HeadlessSite.addSite(
-			portalURL = "http://localhost:9080",
-			siteName = "Remote Site 2");
-
-		Staging.openStagingAdmin(siteURLKey = "site-name");
-
-		Staging.addPublishTemplate(
-			publishTemplateDescription = "Publish Template Description",
-			publishTemplateName = "My Template Title");
-
-		Staging.editPublishTemplateRemoteSiteID(
-			groupName = "Remote Site 2",
-			remotePort = 9080);
-
-		Staging.savePublishTemplate(
-			publishTemplateDescription = "Publish Template Description",
-			publishTemplateName = "My Template Title");
-
-		Staging.openStagingAdmin(siteURLKey = "site-name");
-
-		Staging.publishCustomPublication(
-			editPublishTemplateName = "My Publish Title",
-			publishTemplateName = "My Template Title",
-			scheduleProcess = "true");
-
-		Staging.openStagingAdmin(siteURLKey = "site-name");
-
-		Staging.viewPublishTask(publicationTitle = "My Publish Title");
-	}
-
-	@description = "This is a use case for LPS-123156. Verify that correct error message will appear when the publishing process encounters an error."
-	@priority = 4
+	@description = "This is a use case for LPS-123156."
+	@priority = "4"
 	test AssertValidationErrors {
 		property test.name.skip.portal.instance = "RemoteStaging#AssertValidationErrors";
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "site-name");
+		SitePages.openPagesAdmin(siteURLKey = "site-name");
 
-		PagesAdmin.addPage(pageName = "Second Test Page");
+		SitePages.addPublicPage(pageName = "Second Test Page");
 
 		JSONGroup.deleteGroupByName(
 			groupName = "Remote Site",
@@ -222,200 +89,195 @@ definition {
 			validateErrorMessage = "An unexpected error occurred with the publish process. Please check your portal and publishing configuration.");
 	}
 
-	@description = "This is a use case for LPS-52285. Verify that remote staging can be disabled after shutting down the remote site."
-	@priority = 4
-	test CanDisableRemoteStagingAfterShuttingDownRemoteSite {
-		property test.name.skip.portal.instance = "RemoteStaging#CanDisableRemoteStagingAfterShuttingDownRemoteSite";
+	@description = "This is a use case for LPS-72545."
+	@priority = "4"
+	test PublishCustomFieldDeletionviaRemoteStaging {
+		property test.name.skip.portal.instance = "RemoteStaging#PublishCustomFieldDeletionviaRemoteStaging";
 
-		task ("When: Shut down the remote live environment and attempt to disable staging settings") {
-			Clustering.shutdownSpecificServer(nodePort = 9080);
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Custom Fields");
 
-			Staging.openStagingAdmin(siteURLKey = "site-name");
+		CustomFields.addCP(
+			customFieldName = "Text Field",
+			customFieldType = "Input Field",
+			customInputDataType = "Text",
+			resourceName = "Document");
 
-			LexiconEntry.gotoHeaderMenuItem(menuItem = "Staging Configuration");
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Custom Fields");
 
-			Check.checkHiddenToggleSwitch(locator1 = "SiteSettingsStaging#NONE_RADIO");
+		LAR.exportPortlet(
+			larFileName = "custom_fields.portlet.lar",
+			portletName = "Custom Fields");
 
-			AssertClickNoError(
-				locator1 = "Button#SAVE",
-				value1 = "Save");
+		User.logoutPG();
 
-			AssertConfirm(value1 = "Are you sure you want to deactivate staging for Site Name?");
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
 
-			AssertElementPresent(
-				locator1 = "Message#ERROR",
-				value1 = "Your request failed to complete.");
-		}
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Custom Fields");
 
-		task ("Then: Assert there is an option to forcibly disable the remote staging in UI") {
-			Alert.viewErrorMessage(errorMessage = "You can also forcibly disable remote staging.");
-		}
+		LAR.importPortlet(larFileName = "custom_fields.portlet.lar");
 
-		task ("When: Click on forcibly disable") {
-			AssertClickNoError(
-				locator1 = "Message#ERROR_DISMISSIBLE_LINK",
-				value1 = "forcibly disable");
-		}
+		User.logoutPG(specificURL = "http://localhost:9080");
 
-		task ("Then: Assert the remote staging is disabled") {
-			AssertConfirm(value1 = "Are you sure you want to deactivate staging for Site Name?");
+		User.loginPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
 
-			AssertTextEquals.assertPartialText(
-				locator1 = "Message#SUCCESS",
-				value1 = "Staging is successfully disabled.");
-		}
-	}
+		Navigator.openSiteURL(siteName = "Site Name");
 
-	@description = "This test covers LPS-163951. Verify the image thumbnail in asset publisher can be published when using image URL."
-	@ignore = "true"
-	@priority = 4
-	test CanPublishWCWithImagesViaAP {
-		property test.name.skip.portal.instance = "RemoteStaging#CanPublishWCWithImagesViaAP";
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Documents and Media");
 
-		task ("Given: Dm image and AP widget on staged site") {
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentDescription = "DM Image Description",
-				dmDocumentTitle = "Document_2.jpg",
-				groupName = "Site Name",
-				mimeType = "image/jpeg",
-				sourceFileName = "Document_2.jpg");
-
-			JSONLayout.addWidgetToPublicLayout(
-				groupName = "Site Name",
-				layoutName = "Staging Test Page",
-				widgetName = "Asset Publisher");
-		}
-
-		task ("And: Get the latest version URL of the added image") {
-			DMNavigator.openToEntryInAdmin(
-				dmDocumentTitle = "Document_2.jpg",
-				groupName = "Site Name",
-				siteURLKey = "site-name");
-
-			var latestVersionURL = DMDocument.getLatestVersionURL();
-		}
-
-		task ("And: Create basic web content with a new image") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-			WebContentNavigator.gotoAddCP();
-
-			WebContent.addCP(
-				embedImage = "true",
-				navTab = "Documents and Media",
-				uploadFileName = "Document_1.jpg",
-				webContentContent = "Web Content Content A",
-				webContentTitle = "Web Content Title A");
-
-			PortletEntry.publish();
-		}
-
-		task ("And: Create basic web content using the latest version URL") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-			WebContentNavigator.gotoAddCP();
-
-			WebContent.addCP(
-				embedImage = "true",
-				imageSourceURL = ${latestVersionURL},
-				webContentContent = "Web Content Content B",
-				webContentTitle = "Web Content Title B");
-
-			PortletEntry.publish();
-		}
-
-		task ("And: Configure that only shows the WC in AP") {
-			Navigator.openSitePage(
-				pageName = "Staging Test Page",
-				siteName = "Site Name");
-
-			AssetPublisherPortlet.configureAssetTypePG(
-				assetSubtype = "Basic Web Content",
-				selectedAsset = "Web Content Article");
-		}
-
-		task ("When: Publsih to remote live") {
-			Navigator.openSitePage(
-				pageName = "Staging Test Page",
-				siteName = "Site Name");
-
-			Staging.gotoPublishToLive();
-
-			Staging.publishToLive(remoteStaging = "true");
-		}
-
-		task ("Then: Assert the images are display in AP on remote live site") {
-			User.logoutPG();
-
-			User.firstLoginUI(
-				password = "test",
-				specificURL = "http://localhost:9080",
-				userEmailAddress = "test@liferay.com");
-
-			Navigator.openSitePage(
-				baseURL = "http://localhost:9080",
-				pageName = "Staging Test Page",
-				siteName = "Remote Site");
-
-			AssetPublisherPortlet.viewAssetDetailsPG(
-				assetContent = "Web Content Content A",
-				assetTitle = "Web Content Title A",
-				imageThumbnailName = "document_1");
-
-			Navigator.openSitePage(
-				baseURL = "http://localhost:9080",
-				pageName = "Staging Test Page",
-				siteName = "Remote Site");
-
-			AssetPublisherPortlet.viewAssetDetailsPG(
-				assetContent = "Web Content Content B",
-				assetTitle = "Web Content Title B",
-				imageThumbnailName = "document_2");
-		}
-	}
-
-	@description = "This is a use case for LPS-146399. In the publish summary of a remote staging site only the previously published pages should be present."
-	@priority = 3
-	test OnlyPublishedPagesShouldBePresentInSummary {
-		property test.name.skip.portal.instance = "RemoteStaging#OnlyPublishedPagesShouldBePresentInSummary";
-
-		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
-			layoutName = "Staging Test Page 1");
-
-		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
-			layoutName = "Staging Test Page 2");
+		DMDocument.addCP(
+			customFieldText = "DM Document Custom Field",
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.txt",
+			dmDocumentTitle = "DM Document Title");
 
 		Navigator.gotoSitePage(
-			pageName = "Staging Test Page 1",
+			pageName = "Staging Test Page",
 			siteName = "Site Name");
 
 		Staging.gotoPublishToLive();
 
-		Staging.configurePublishToLive(checkPageName = "Staging Test Page 1");
+		Staging.publishToLive(remoteStaging = "true");
 
-		Staging.publishToLive(
-			publicationName = "sumCheck",
-			remoteStaging = "true");
+		User.logoutPG();
 
-		Staging.openStagingAdmin(siteURLKey = "site-name");
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
 
-		Staging.viewPublicationSummary(
-			pagesNotToPublish = '''Staging Test Page 2''',
-			pagesToPublish = '''Staging Test Page 1''',
-			publicationTitle = "sumCheck");
+		Navigator.gotoSitePage(
+			baseURL = "http://localhost:9080",
+			pageName = "Staging Test Page",
+			siteName = "Remote Site");
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Documents and Media");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.viewCP(
+			customFieldName = "Text Field",
+			customFieldValue = "DM Document Custom Field",
+			dmDocumentTitle = "DM Document Title");
+
+		User.logoutPG(specificURL = "http://localhost:9080");
+
+		User.loginPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Custom Fields");
+
+		CustomFields.deleteCP(
+			customFieldName = "Text Field",
+			resourceName = "Document");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Custom Fields");
+
+		LAR.exportPortlet(
+			exportIndividualDeletions = "true",
+			larFileName = "custom_fields_deletion.portlet.lar",
+			portletName = "Custom Fields");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Custom Fields");
+
+		LAR.importPortlet(
+			importDeletions = "true",
+			larFileName = "custom_fields_deletion.portlet.lar");
+
+		User.logoutPG(specificURL = "http://localhost:9080");
+
+		User.loginPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSiteURL(siteName = "Site Name");
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Documents and Media");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.viewDocumentNoCustomFieldCP(
+			customFieldName = "Text Field",
+			customFieldValue = "DM Document Custom Field",
+			dmDocumentTitle = "DM Document Title");
+
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive(remoteStaging = "true");
+
+		User.logoutPG();
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://localhost:9080",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.gotoSitePage(
+			baseURL = "http://localhost:9080",
+			pageName = "Staging Test Page",
+			siteName = "Remote Site");
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Documents and Media");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.viewDocumentNoCustomFieldCP(
+			customFieldName = "Text Field",
+			customFieldValue = "DM Document Custom Field",
+			dmDocumentTitle = "DM Document Title");
 	}
 
-	@description = "This is a use case for LPS-80494. Documents can be published with link to page fields."
-	@priority = 3
+	@description = "This is a use case for LPS-80494."
+	@priority = "3"
 	test StagingRemoteDMDocumentType {
 		property test.name.skip.portal.instance = "RemoteStaging#StagingRemoteDMDocumentType";
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMNavigator.gotoDocumentType();
@@ -426,7 +288,7 @@ definition {
 			dmDocumentTypeName = "DM Document Type Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMDocument.addCP(
@@ -466,7 +328,7 @@ definition {
 			siteName = "Remote Site");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Type Title");
@@ -488,8 +350,7 @@ definition {
 			assetTitle = "DM Document Type Title");
 	}
 
-	@description = "Web contents are only published if their content date is in correspondence with the content data range of the publish configuration."
-	@priority = 4
+	@priority = "4"
 	test StagingRemoteLiveWebContent {
 		property test.name.skip.portal.instance = "RemoteStaging#StagingRemoteLiveWebContent";
 
@@ -527,10 +388,10 @@ definition {
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "Structure Name");
 
 		WebContent.addWithStructureCP(
-			column = 1,
+			column = "1",
 			dmNavTab = "User Personal Folder",
 			navTab = "Web Content Images",
-			row = 1,
+			row = "1",
 			structureName = "Structure Name",
 			templateName = "Template Name",
 			webContentColor = "FF0D0D",
@@ -538,7 +399,7 @@ definition {
 			webContentGrid = "true",
 			webContentImage = "Document_3.png",
 			webContentMultipleSelection = "Option 1",
-			webContentNumeric = 9,
+			webContentNumeric = "9",
 			webContentRichText = "Staging Web Content Body",
 			webContentSelectFromList = "Option 2",
 			webContentSingleSelection = "Option 3",
@@ -549,22 +410,21 @@ definition {
 
 		WebContent.viewTitle(webContentTitle = "Web Content Title");
 
-		Staging.openStagingAdmin(siteURLKey = "site-name");
+		Navigator.gotoSitePage(
+			pageName = "Staging Test Page",
+			siteName = "Site Name");
 
-		Staging.addCustomPublication();
+		var dateRangeEndDate = '''1/2''';
 
-		Staging.configurePublishToLive(
-			contentDateRange = "Date Range",
-			dateRangeEndDate = '''10/12/2019''',
-			dateRangeStartDate = '''10/11/2019''');
+		var dateRangeStartDate = '''1/1''';
 
-		Staging.viewDateRange(
-			dateRangeEndDate = '''10/12/2019''',
-			dateRangeStartDate = '''10/11/2019''');
+		Staging.setContentDateRange(
+			dateRangeEndDate = "${dateRangeEndDate}",
+			dateRangeStartDate = "${dateRangeStartDate}");
 
-		AssertElementNotPresent(
-			key_contentName = "Web Content",
-			locator1 = "PagesConfiguration#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX");
+		var key_contentName = "Web Content";
+
+		AssertElementNotPresent(locator1 = "PagesConfiguration#CONTENT_CHOOSE_CONTENT_CONTENT_CHECKBOX");
 
 		Navigator.gotoSitePage(
 			pageName = "Staging Test Page",
@@ -602,8 +462,8 @@ definition {
 			structureName = "Structure Name");
 	}
 
-	@description = "This is a use case for LPS-82839. Web contents can be published on remote staging."
-	@priority = 5
+	@description = "This is a use case for LPS-82839."
+	@priority = "5"
 	test StagingRemoteLiveWebContentViaPortletCP {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "RemoteStaging#StagingRemoteLiveWebContentViaPortletCP";
@@ -640,8 +500,8 @@ definition {
 			webContentTitle = "Web Content Title");
 	}
 
-	@description = "This is a use case for LPS-81950. Web contents can be published via their portlet."
-	@priority = 5
+	@description = "This is a use case for LPS-81950."
+	@priority = "5"
 	test StagingRemoteLiveWebContentViaPortletPG {
 		property test.name.skip.portal.instance = "RemoteStaging#StagingRemoteLiveWebContentViaPortletPG";
 
@@ -675,13 +535,11 @@ definition {
 			pageName = "Staging Test Page",
 			siteName = "Site Name");
 
-		WebContentDisplayPortlet.add(
+		WebContent.addPGViaWCD(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title");
 
-		WebContentDisplayPortlet.viewContent(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
+		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content");
 
 		Navigator.gotoSitePage(
 			pageName = "Staging Test Page",
@@ -701,13 +559,11 @@ definition {
 			pageName = "Staging Test Page",
 			siteName = "Remote Site");
 
-		WebContentDisplayPortlet.viewContent(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
+		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content");
 	}
 
-	@description = "This is a use case for LPS-81953. Web contents can be published with manually chosen ID."
-	@priority = 3
+	@description = "This is a use case for LPS-81953"
+	@priority = "3"
 	test StagingRemoteLiveWebContentWithManualChosenID {
 		property test.name.skip.portal.instance = "RemoteStaging#StagingRemoteLiveWebContentWithManualChosenID";
 
@@ -758,7 +614,7 @@ definition {
 
 		WebContent.addCP(
 			webContentContent = "WC WebContent Content",
-			webContentId = 12345,
+			webContentId = "12345",
 			webContentTitle = "WC WebContent Title");
 
 		PortletEntry.publish();
@@ -785,75 +641,15 @@ definition {
 		AssertTextEquals(
 			key_webContentTitle = "WC WebContent Title",
 			locator1 = "WC#ENTRY_TABLE_ID",
-			value1 = 12345);
+			value1 = "12345");
 	}
 
-	@description = "This is a use case for LPS-178088. Verify the error message displays the missing reference information with the implicated Site's name."
-	@priority = 4
-	test VerifyErrorMessageWithMissingReferenceInformation {
-		property test.name.skip.portal.instance = "RemoteStaging#VerifyErrorMessageWithMissingReferenceInformation";
-
-		task ("Given: Add site-name SiteB in 8080 remote-site in 9080 add structureA with image field in site-name") {
-			HeadlessSite.addSite(siteName = "SiteB");
-
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentDescription = "DM Document Description",
-				dmDocumentTitle = "DM Document Title1",
-				groupName = "SiteB",
-				mimeType = "image/jpeg",
-				sourceFileName = "Document_1.jpg");
-
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-			NavItem.gotoStructures();
-
-			WebContentStructures.addCP(structureName = "StructureA");
-
-			DataEngine.addField(
-				fieldFieldLabel = "Image",
-				fieldName = "Image");
-
-			Button.clickSave();
-		}
-
-		task ("And: Create a Web Content based on StructureA and select the image uploaded previously in the SiteB") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-			WebContentNavigator.gotoAddWithStructureCP(structureName = "StructureA");
-
-			WebContent.addWithStructureCP(
-				imageFileName = "DM Document Title1",
-				navTab = "Documents and Media",
-				otherSiteName = "SiteB",
-				structureName = "StructureA",
-				webContentImage = "Document Title",
-				webContentTitle = "WebContentA");
-
-			PortletEntry.publish();
-		}
-
-		task ("When: Publish to live") {
-			Navigator.openSiteURL(siteName = "Site Name");
-
-			ProductMenu.gotoStagingSite(site = "Site Name");
-
-			Staging.gotoPublishToLive();
-		}
-
-		task ("Then: Publish failed assert error message displays the missing reference information with the implicated Site's name.") {
-			Staging.publishToLive(
-				failureExpected = "true",
-				remoteStaging = "true",
-				validateErrorMessage = "The publish process did not start due to validation errors. There are missing references that could not be found in the Live Environment. Please publish again to Live ensuring the following elements are published from their own environment: Document In Environment SiteB: DM Document Title1 (Referenced by a Web Content Article: WebContentA)");
-		}
-	}
-
-	@description = "This is a use case for LPS-74038. Expected error message will appear on the UI when the live instance is not running on remote staging and the link to it is not visible."
-	@priority = 5
+	@description = "This is a use case for LPS-74038."
+	@priority = "5"
 	test ViewInfoMessageAfterShutDownRemoteSite {
 		property test.name.skip.portal.instance = "RemoteStaging#ViewInfoMessageAfterShutDownRemoteSite";
 
-		Clustering.shutdownSpecificServer(nodePort = 9080);
+		Clustering.shutdownSpecificServer(nodePort = "9080");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -866,8 +662,8 @@ definition {
 		AssertConsoleTextNotPresent(value1 = "SocketTimeoutException");
 	}
 
-	@description = "This is a use case for LPS-81836. Web contents can be published via SAP."
-	@priority = 4
+	@description = "This is a use case for LPS-81836."
+	@priority = "4"
 	test ViewSingleAssetRemotePublication {
 		property test.name.skip.portal.instance = "RemoteStaging#ViewSingleAssetRemotePublication";
 

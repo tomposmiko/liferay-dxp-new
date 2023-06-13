@@ -31,7 +31,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -61,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = DDMFormValuesFactory.class)
+@Component(immediate = true, service = DDMFormValuesFactory.class)
 public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 
 	@Override
@@ -70,11 +70,11 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 
 		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
-		_setDDMFormValuesAvailableLocales(
+		setDDMFormValuesAvailableLocales(
 			httpServletRequest, ddmForm, ddmFormValues);
-		_setDDMFormValuesDefaultLocale(
+		setDDMFormValuesDefaultLocale(
 			httpServletRequest, ddmForm, ddmFormValues);
-		_setDDMFormFieldValues(httpServletRequest, ddmFormValues);
+		setDDMFormFieldValues(httpServletRequest, ddmFormValues);
 
 		return ddmFormValues;
 	}
@@ -93,58 +93,48 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 			"ddm.form.field.type.name");
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
-	}
-
-	private void _checkDDMFormFieldParameterNames(
+	protected void checkDDMFormFieldParameterNames(
 		DDMForm ddmForm, Set<String> ddmFormFieldParameterNames) {
 
 		if (ddmFormFieldParameterNames.isEmpty()) {
 			ddmFormFieldParameterNames.addAll(
-				_createDefaultDDMFormFieldParameterNames(ddmForm));
+				createDefaultDDMFormFieldParameterNames(ddmForm));
 
 			return;
 		}
 
-		Set<String> checkedDDMFormFieldNames = new HashSet<>();
-
-		_checkDDMFormFieldParameterNames(
-			checkedDDMFormFieldNames, ddmForm.getDDMFormFields(),
-			StringPool.BLANK, ddmFormFieldParameterNames);
+		checkDDMFormFieldParameterNames(
+			ddmForm.getDDMFormFields(), StringPool.BLANK,
+			ddmFormFieldParameterNames);
 	}
 
-	private void _checkDDMFormFieldParameterNames(
-		Set<String> checkedDDMFormFieldNames, List<DDMFormField> ddmFormFields,
+	protected void checkDDMFormFieldParameterNames(
+		List<DDMFormField> ddmFormFields,
 		String parentDDMFormFieldParameterName,
 		Set<String> ddmFormFieldParameterNames) {
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
-			if (checkedDDMFormFieldNames.contains(ddmFormField.getName())) {
-				continue;
-			}
-
 			Set<String> filteredDDMFormFieldParameterNames =
-				_filterDDMFormFieldParameterNames(
+				filterDDMFormFieldParameterNames(
 					ddmFormField, ddmFormFieldParameterNames);
 
+			String ddmFormFieldParameterPrefix = getDDMFormFieldParameterPrefix(
+				ddmFormField, parentDDMFormFieldParameterName);
+
 			boolean containsDefaultDDMFormFieldParameterName =
-				_containsDefaultDDMFormFieldParameterName(
+				containsDefaultDDMFormFieldParameterName(
 					filteredDDMFormFieldParameterNames,
-					_getDDMFormFieldParameterPrefix(
-						ddmFormField, parentDDMFormFieldParameterName));
+					ddmFormFieldParameterPrefix);
 
 			if (!containsDefaultDDMFormFieldParameterName) {
 				String defaultDDMFormFieldParameterName =
-					_createDefaultDDMFormFieldParameterName(
+					createDefaultDDMFormFieldParameterName(
 						ddmFormField, parentDDMFormFieldParameterName);
 
 				ddmFormFieldParameterNames.add(
 					defaultDDMFormFieldParameterName);
 
-				_checkDDMFormFieldParameterNames(
-					checkedDDMFormFieldNames,
+				checkDDMFormFieldParameterNames(
 					ddmFormField.getNestedDDMFormFields(), StringPool.BLANK,
 					ddmFormFieldParameterNames);
 			}
@@ -152,18 +142,15 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 			for (String filteredDDMFormFieldParameterName :
 					filteredDDMFormFieldParameterNames) {
 
-				_checkDDMFormFieldParameterNames(
-					checkedDDMFormFieldNames,
+				checkDDMFormFieldParameterNames(
 					ddmFormField.getNestedDDMFormFields(),
 					filteredDDMFormFieldParameterName,
 					ddmFormFieldParameterNames);
 			}
-
-			checkedDDMFormFieldNames.add(ddmFormField.getName());
 		}
 	}
 
-	private boolean _containsDefaultDDMFormFieldParameterName(
+	protected boolean containsDefaultDDMFormFieldParameterName(
 		Set<String> filteredDDMFormFieldParameterNames,
 		String ddmFormFieldParameterPrefix) {
 
@@ -180,9 +167,9 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return false;
 	}
 
-	private DDMFormFieldValue _createDDMFormFieldValue(
-		HttpServletRequest httpServletRequest, DDMFormValues ddmFormValues,
-		String ddmFormFieldParameterName,
+	protected DDMFormFieldValue createDDMFormFieldValue(
+		HttpServletRequest httpServletRequest, DDMForm ddmForm,
+		DDMFormValues ddmFormValues, String ddmFormFieldParameterName,
 		Map<String, DDMFormField> ddmFormFieldsMap) {
 
 		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
@@ -203,10 +190,6 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 
 		DDMFormField ddmFormField = ddmFormFieldsMap.get(fieldName);
 
-		if (ddmFormField == null) {
-			return ddmFormFieldValue;
-		}
-
 		ddmFormFieldValue.setFieldReference(ddmFormField.getFieldReference());
 
 		if (ddmFormField.isTransient()) {
@@ -214,14 +197,14 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		}
 
 		if (ddmFormField.isLocalizable()) {
-			_setDDMFormFieldValueLocalizedValue(
+			setDDMFormFieldValueLocalizedValue(
 				httpServletRequest, ddmFormField.getType(),
 				ddmFormFieldParameterName, ddmFormField.getPredefinedValue(),
 				ddmFormFieldValue, ddmFormValues.getAvailableLocales(),
 				ddmFormValues.getDefaultLocale());
 		}
 		else {
-			_setDDMFormFieldValueUnlocalizedValue(
+			setDDMFormFieldValueUnlocalizedValue(
 				httpServletRequest, ddmFormField.getType(),
 				ddmFormFieldParameterName, ddmFormField.getPredefinedValue(),
 				ddmFormFieldValue, ddmFormValues.getDefaultLocale());
@@ -230,22 +213,22 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return ddmFormFieldValue;
 	}
 
-	private Map<String, DDMFormFieldValue> _createDDMFormFieldValuesMap(
+	protected Map<String, DDMFormFieldValue> createDDMFormFieldValuesMap(
 		HttpServletRequest httpServletRequest, DDMForm ddmForm,
 		DDMFormValues ddmFormValues) {
 
 		Map<String, DDMFormFieldValue> ddmFormFieldValuesMap = new HashMap<>();
 
-		Set<String> ddmFormFieldParameterNames = _getDDMFormFieldParameterNames(
+		Set<String> ddmFormFieldParameterNames = getDDMFormFieldParameterNames(
 			httpServletRequest, ddmForm);
 
 		Map<String, DDMFormField> ddmFormFieldsMap =
 			ddmForm.getDDMFormFieldsMap(true);
 
 		for (String ddmFormFieldParameterName : ddmFormFieldParameterNames) {
-			DDMFormFieldValue ddmFormFieldValue = _createDDMFormFieldValue(
-				httpServletRequest, ddmFormValues, ddmFormFieldParameterName,
-				ddmFormFieldsMap);
+			DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(
+				httpServletRequest, ddmForm, ddmFormValues,
+				ddmFormFieldParameterName, ddmFormFieldsMap);
 
 			ddmFormFieldValuesMap.put(
 				ddmFormFieldParameterName, ddmFormFieldValue);
@@ -254,7 +237,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return ddmFormFieldValuesMap;
 	}
 
-	private String _createDefaultDDMFormFieldParameterName(
+	protected String createDefaultDDMFormFieldParameterName(
 		DDMFormField ddmFormField,
 		String parentDefaultDDMFormFieldParameterName) {
 
@@ -274,32 +257,37 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return sb.toString();
 	}
 
-	private Set<String> _createDefaultDDMFormFieldParameterNames(
+	protected Set<String> createDefaultDDMFormFieldParameterNames(
 		DDMForm ddmForm) {
 
 		Set<String> defaultDDMFormFieldParameterNames = new TreeSet<>();
 
-		_poupulateDefaultDDMFormFieldParameterNames(
+		poupulateDefaultDDMFormFieldParameterNames(
 			ddmForm.getDDMFormFields(), StringPool.BLANK,
 			defaultDDMFormFieldParameterNames);
 
 		return defaultDDMFormFieldParameterNames;
 	}
 
-	private String _extractPrefix(String ddmFormFieldParameterName) {
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
+	}
+
+	protected String extractPrefix(String ddmFormFieldParameterName) {
 		return StringUtil.extractLast(
 			ddmFormFieldParameterName,
 			DDMFormRendererConstants.DDM_FORM_FIELD_NAME_PREFIX);
 	}
 
-	private String _extractSuffix(String ddmFormFieldParameterName) {
+	protected String extractSuffix(String ddmFormFieldParameterName) {
 		int pos = ddmFormFieldParameterName.lastIndexOf(
 			DDMFormRendererConstants.DDM_FORM_FIELD_LANGUAGE_ID_SEPARATOR);
 
 		return ddmFormFieldParameterName.substring(0, pos);
 	}
 
-	private Set<String> _filterDDMFormFieldParameterNames(
+	protected Set<String> filterDDMFormFieldParameterNames(
 		DDMFormField ddmFormField, Set<String> ddmFormFieldParameterNames) {
 
 		Set<String> filteredDDMFormFieldParameterNames = new HashSet<>();
@@ -322,7 +310,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return filteredDDMFormFieldParameterNames;
 	}
 
-	private Set<String> _getDDMFormFieldParameterNames(
+	protected Set<String> getDDMFormFieldParameterNames(
 		HttpServletRequest httpServletRequest, DDMForm ddmForm) {
 
 		Set<String> ddmFormFieldParameterNames = new TreeSet<>();
@@ -331,26 +319,26 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 			httpServletRequest.getParameterMap();
 
 		for (String parameterName : parameterMap.keySet()) {
-			if (!_isDDMFormFieldParameter(parameterName)) {
+			if (!isDDMFormFieldParameter(parameterName)) {
 				continue;
 			}
 
 			ddmFormFieldParameterNames.addAll(
-				_getDDMFormFieldParameterNames(parameterName));
+				getDDMFormFieldParameterNames(parameterName));
 		}
 
-		_checkDDMFormFieldParameterNames(ddmForm, ddmFormFieldParameterNames);
+		checkDDMFormFieldParameterNames(ddmForm, ddmFormFieldParameterNames);
 
 		return ddmFormFieldParameterNames;
 	}
 
-	private Set<String> _getDDMFormFieldParameterNames(
+	protected Set<String> getDDMFormFieldParameterNames(
 		String ddmFormFieldParameterName) {
 
 		Set<String> ddmFormFieldParameterNames = new TreeSet<>();
 
-		ddmFormFieldParameterName = _extractPrefix(ddmFormFieldParameterName);
-		ddmFormFieldParameterName = _extractSuffix(ddmFormFieldParameterName);
+		ddmFormFieldParameterName = extractPrefix(ddmFormFieldParameterName);
+		ddmFormFieldParameterName = extractSuffix(ddmFormFieldParameterName);
 
 		ddmFormFieldParameterNames.add(ddmFormFieldParameterName);
 
@@ -368,7 +356,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return ddmFormFieldParameterNames;
 	}
 
-	private String _getDDMFormFieldParameterPrefix(
+	protected String getDDMFormFieldParameterPrefix(
 		DDMFormField ddmFormField, String parentDDMFormFieldParameterName) {
 
 		if (Validator.isNull(parentDDMFormFieldParameterName)) {
@@ -380,22 +368,22 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 			ddmFormField.getName());
 	}
 
-	private String _getDDMFormFieldParameterValue(
+	protected String getDDMFormFieldParameterValue(
 		String defaultDDMFormFieldParameterValue, String fieldType,
 		String fullDDMFormFieldParameterName,
 		HttpServletRequest httpServletRequest) {
 
 		DDMFormFieldValueRequestParameterRetriever
 			ddmFormFieldValueRequestParameterRetriever =
-				_getDDMFormFieldValueRequestParameterRetriever(fieldType);
+				getDDMFormFieldValueRequestParameterRetriever(fieldType);
 
 		return ddmFormFieldValueRequestParameterRetriever.get(
 			httpServletRequest, fullDDMFormFieldParameterName,
 			GetterUtil.getString(defaultDDMFormFieldParameterValue));
 	}
 
-	private DDMFormFieldValueRequestParameterRetriever
-		_getDDMFormFieldValueRequestParameterRetriever(String fieldType) {
+	protected DDMFormFieldValueRequestParameterRetriever
+		getDDMFormFieldValueRequestParameterRetriever(String fieldType) {
 
 		if (!_serviceTrackerMap.containsKey(fieldType)) {
 			return _defaultDDMFormFieldValueRequestParameterRetriever;
@@ -404,19 +392,19 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return _serviceTrackerMap.getService(fieldType);
 	}
 
-	private List<DDMFormFieldValue> _getDDMFormFieldValues(
+	protected List<DDMFormFieldValue> getDDMFormFieldValues(
 		HttpServletRequest httpServletRequest, DDMForm ddmForm,
 		DDMFormValues ddmFormValues) {
 
 		Map<String, DDMFormFieldValue> ddmFormFieldValuesMap =
-			_createDDMFormFieldValuesMap(
+			createDDMFormFieldValuesMap(
 				httpServletRequest, ddmForm, ddmFormValues);
 
 		return DDMFormValuesFactoryUtil.getDDMFormFieldValues(
 			ddmFormFieldValuesMap, ddmForm.getDDMFormFields());
 	}
 
-	private Locale _getDefaultLocale(
+	protected Locale getDefaultLocale(
 		HttpServletRequest httpServletRequest, Locale defaultLocale,
 		Set<Locale> availableLocales) {
 
@@ -428,7 +416,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		}
 
 		Locale httpServletRequestLocale = LocaleUtil.fromLanguageId(
-			_language.getLanguageId(httpServletRequest));
+			LanguageUtil.getLanguageId(httpServletRequest));
 
 		if (availableLocales.contains(httpServletRequestLocale)) {
 			return httpServletRequestLocale;
@@ -437,17 +425,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return defaultLocale;
 	}
 
-	private String _getFullDDMFormFieldParameterName(
-		String ddmFormFieldParameterName, Locale locale) {
-
-		return StringBundler.concat(
-			DDMFormRendererConstants.DDM_FORM_FIELD_NAME_PREFIX,
-			ddmFormFieldParameterName,
-			DDMFormRendererConstants.DDM_FORM_FIELD_LANGUAGE_ID_SEPARATOR,
-			LocaleUtil.toLanguageId(locale));
-	}
-
-	private boolean _isDDMFormFieldParameter(String parameterName) {
+	protected boolean isDDMFormFieldParameter(String parameterName) {
 		if (parameterName.startsWith(
 				DDMFormRendererConstants.DDM_FORM_FIELD_NAME_PREFIX)) {
 
@@ -457,27 +435,27 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		return false;
 	}
 
-	private void _poupulateDefaultDDMFormFieldParameterNames(
+	protected void poupulateDefaultDDMFormFieldParameterNames(
 		List<DDMFormField> ddmFormFields,
 		String parentDefaultDDMFormFieldParameterName,
 		Set<String> defaultDDMFormFieldParameterNames) {
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
 			String defaultDDMFormFieldParameterName =
-				_createDefaultDDMFormFieldParameterName(
+				createDefaultDDMFormFieldParameterName(
 					ddmFormField, parentDefaultDDMFormFieldParameterName);
 
 			defaultDDMFormFieldParameterNames.add(
 				defaultDDMFormFieldParameterName);
 
-			_poupulateDefaultDDMFormFieldParameterNames(
+			poupulateDefaultDDMFormFieldParameterNames(
 				ddmFormField.getNestedDDMFormFields(),
 				defaultDDMFormFieldParameterName,
 				defaultDDMFormFieldParameterNames);
 		}
 	}
 
-	private void _setDDMFormFieldValueLocalizedValue(
+	protected void setDDMFormFieldValueLocalizedValue(
 		HttpServletRequest httpServletRequest, String fieldType,
 		String ddmFormFieldParameterName, LocalizedValue predefinedValue,
 		DDMFormFieldValue ddmFormFieldValue, Set<Locale> availableLocales,
@@ -504,7 +482,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 				 (parameterValue != null))) {
 
 				String ddmFormFieldParameterValue =
-					_getDDMFormFieldParameterValue(
+					getDDMFormFieldParameterValue(
 						predefinedValue.getString(availableLocale), fieldType,
 						fullDDMFormFieldParameterName, httpServletRequest);
 
@@ -515,21 +493,21 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		ddmFormFieldValue.setValue(value);
 	}
 
-	private void _setDDMFormFieldValues(
+	protected void setDDMFormFieldValues(
 		HttpServletRequest httpServletRequest, DDMFormValues ddmFormValues) {
 
-		List<DDMFormFieldValue> ddmFormFieldValues = _getDDMFormFieldValues(
+		List<DDMFormFieldValue> ddmFormFieldValues = getDDMFormFieldValues(
 			httpServletRequest, ddmFormValues.getDDMForm(), ddmFormValues);
 
 		ddmFormValues.setDDMFormFieldValues(ddmFormFieldValues);
 	}
 
-	private void _setDDMFormFieldValueUnlocalizedValue(
+	protected void setDDMFormFieldValueUnlocalizedValue(
 		HttpServletRequest httpServletRequest, String fieldType,
 		String ddmFormFieldParameterName, LocalizedValue predefinedValue,
 		DDMFormFieldValue ddmFormFieldValue, Locale defaultLocale) {
 
-		String ddmFormFieldParameterValue = _getDDMFormFieldParameterValue(
+		String ddmFormFieldParameterValue = getDDMFormFieldParameterValue(
 			predefinedValue.getString(defaultLocale), fieldType,
 			_getFullDDMFormFieldParameterName(
 				ddmFormFieldParameterName, defaultLocale),
@@ -540,7 +518,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		ddmFormFieldValue.setValue(value);
 	}
 
-	private void _setDDMFormValuesAvailableLocales(
+	protected void setDDMFormValuesAvailableLocales(
 		HttpServletRequest httpServletRequest, DDMForm ddmForm,
 		DDMFormValues ddmFormValues) {
 
@@ -555,7 +533,7 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		else {
 			long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
 
-			Set<Locale> siteAvailableLocales = _language.getAvailableLocales(
+			Set<Locale> siteAvailableLocales = LanguageUtil.getAvailableLocales(
 				groupId);
 
 			String[] siteAvailableLocaleStrings = LocaleUtil.toLanguageIds(
@@ -573,22 +551,29 @@ public class DDMFormValuesFactoryImpl implements DDMFormValuesFactory {
 		}
 	}
 
-	private void _setDDMFormValuesDefaultLocale(
+	protected void setDDMFormValuesDefaultLocale(
 		HttpServletRequest httpServletRequest, DDMForm ddmForm,
 		DDMFormValues ddmFormValues) {
 
 		ddmFormValues.setDefaultLocale(
-			_getDefaultLocale(
+			getDefaultLocale(
 				httpServletRequest, ddmForm.getDefaultLocale(),
 				ddmForm.getAvailableLocales()));
+	}
+
+	private String _getFullDDMFormFieldParameterName(
+		String ddmFormFieldParameterName, Locale locale) {
+
+		return StringBundler.concat(
+			DDMFormRendererConstants.DDM_FORM_FIELD_NAME_PREFIX,
+			ddmFormFieldParameterName,
+			DDMFormRendererConstants.DDM_FORM_FIELD_LANGUAGE_ID_SEPARATOR,
+			LocaleUtil.toLanguageId(locale));
 	}
 
 	private final DDMFormFieldValueRequestParameterRetriever
 		_defaultDDMFormFieldValueRequestParameterRetriever =
 			new DefaultDDMFormFieldValueRequestParameterRetriever();
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

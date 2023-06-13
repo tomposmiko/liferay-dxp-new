@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lourdes Fernández Besada
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=350",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_DESIGN
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class TemplatePortletPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return TemplatePortletKeys.TEMPLATE;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + TemplatePortletKeys.TEMPLATE + ")"
+		target = "(javax.portlet.name=" + TemplatePortletKeys.TEMPLATE + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

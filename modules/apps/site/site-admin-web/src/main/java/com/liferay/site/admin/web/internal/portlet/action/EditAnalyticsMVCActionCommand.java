@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
 		"mvc.command.name=/site_admin/edit_analytics"
@@ -98,27 +99,6 @@ public class EditAnalyticsMVCActionCommand
 
 				typeSettingsUnicodeProperties.setProperty(
 					"googleAnalyticsId", googleAnalyticsId);
-			}
-			else if (StringUtil.equalsIgnoreCase(
-						analyticsType, "googleAnalytics4")) {
-
-				String googleAnalytics4CustomConfiguration =
-					ParamUtil.getString(
-						actionRequest, "googleAnalytics4CustomConfiguration",
-						typeSettingsUnicodeProperties.getProperty(
-							"googleAnalytics4CustomConfiguration"));
-
-				typeSettingsUnicodeProperties.setProperty(
-					"googleAnalytics4CustomConfiguration",
-					googleAnalytics4CustomConfiguration);
-
-				String googleAnalytics4Id = ParamUtil.getString(
-					actionRequest, "googleAnalytics4Id",
-					typeSettingsUnicodeProperties.getProperty(
-						"googleAnalytics4Id"));
-
-				typeSettingsUnicodeProperties.setProperty(
-					"googleAnalytics4Id", googleAnalytics4Id);
 			}
 			else {
 				String analyticsScript = ParamUtil.getString(

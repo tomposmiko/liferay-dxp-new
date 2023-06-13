@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lucas Marques
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.asset.kernel.model.AssetVocabulary",
 	service = ModelIndexerWriterContributor.class
 )

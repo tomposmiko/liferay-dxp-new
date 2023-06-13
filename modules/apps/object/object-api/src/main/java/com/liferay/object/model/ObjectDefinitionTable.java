@@ -37,10 +37,6 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
 	public final Column<ObjectDefinitionTable, String> uuid = createColumn(
 		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, String> externalReferenceCode =
-		createColumn(
-			"externalReferenceCode", String.class, Types.VARCHAR,
-			Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, Long> objectDefinitionId =
 		createColumn(
 			"objectDefinitionId", Long.class, Types.BIGINT,
@@ -56,10 +52,6 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 	public final Column<ObjectDefinitionTable, Date> modifiedDate =
 		createColumn(
 			"modifiedDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Long>
-		accountEntryRestrictedObjectFieldId = createColumn(
-			"accountERObjectFieldId", Long.class, Types.BIGINT,
-			Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, Long> descriptionObjectFieldId =
 		createColumn(
 			"descriptionObjectFieldId", Long.class, Types.BIGINT,
@@ -67,10 +59,6 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 	public final Column<ObjectDefinitionTable, Long> titleObjectFieldId =
 		createColumn(
 			"titleObjectFieldId", Long.class, Types.BIGINT,
-			Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Boolean> accountEntryRestricted =
-		createColumn(
-			"accountEntryRestricted", Boolean.class, Types.BOOLEAN,
 			Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, Boolean> active = createColumn(
 		"active_", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
@@ -81,25 +69,6 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 		"label", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, String> className = createColumn(
 		"className", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Boolean> enableCategorization =
-		createColumn(
-			"enableCategorization", Boolean.class, Types.BOOLEAN,
-			Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Boolean> enableComments =
-		createColumn(
-			"enableComments", Boolean.class, Types.BOOLEAN,
-			Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Boolean> enableLocalization =
-		createColumn(
-			"enableLocalization", Boolean.class, Types.BOOLEAN,
-			Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Boolean>
-		enableObjectEntryHistory = createColumn(
-			"enableObjectEntryHistory", Boolean.class, Types.BOOLEAN,
-			Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Boolean> modifiable =
-		createColumn(
-			"modifiable", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, String> name = createColumn(
 		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, String> panelAppOrder =
@@ -120,13 +89,8 @@ public class ObjectDefinitionTable extends BaseTable<ObjectDefinitionTable> {
 	public final Column<ObjectDefinitionTable, String> pluralLabel =
 		createColumn(
 			"pluralLabel", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, Boolean> portlet = createColumn(
-		"portlet", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, String> scope = createColumn(
 		"scope", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<ObjectDefinitionTable, String> storageType =
-		createColumn(
-			"storageType", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, Boolean> system = createColumn(
 		"system_", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<ObjectDefinitionTable, Integer> version = createColumn(

@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class FVSEntryLocalServiceWrapper
 	implements FVSEntryLocalService, ServiceWrapper<FVSEntryLocalService> {
 
-	public FVSEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public FVSEntryLocalServiceWrapper(
 		FVSEntryLocalService fvsEntryLocalService) {
 

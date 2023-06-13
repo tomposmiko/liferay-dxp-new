@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = IndexDocumentRequestExecutor.class)
+@Component(immediate = true, service = IndexDocumentRequestExecutor.class)
 public class IndexDocumentRequestExecutorImpl
 	implements IndexDocumentRequestExecutor {
 
@@ -44,7 +44,7 @@ public class IndexDocumentRequestExecutorImpl
 			_elasticsearchBulkableDocumentRequestTranslator.translate(
 				indexDocumentRequest);
 
-		IndexResponse indexResponse = _getIndexResponse(
+		IndexResponse indexResponse = getIndexResponse(
 			indexRequest, indexDocumentRequest);
 
 		RestStatus restStatus = indexResponse.status();
@@ -53,7 +53,7 @@ public class IndexDocumentRequestExecutorImpl
 			restStatus.getStatus(), indexResponse.getId());
 	}
 
-	private IndexResponse _getIndexResponse(
+	protected IndexResponse getIndexResponse(
 		IndexRequest indexRequest, IndexDocumentRequest indexDocumentRequest) {
 
 		RestHighLevelClient restHighLevelClient =
@@ -70,11 +70,24 @@ public class IndexDocumentRequestExecutorImpl
 		}
 	}
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setBulkableDocumentRequestTranslator(
+		ElasticsearchBulkableDocumentRequestTranslator
+			elasticsearchBulkableDocumentRequestTranslator) {
+
+		_elasticsearchBulkableDocumentRequestTranslator =
+			elasticsearchBulkableDocumentRequestTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchBulkableDocumentRequestTranslator
 		_elasticsearchBulkableDocumentRequestTranslator;
-
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo Lundgren
  */
 @Component(
+	immediate = true,
 	property = "assignee.class.name=com.liferay.portal.kernel.model.ResourceAction",
 	service = KaleoTaskAssignmentSelector.class
 )

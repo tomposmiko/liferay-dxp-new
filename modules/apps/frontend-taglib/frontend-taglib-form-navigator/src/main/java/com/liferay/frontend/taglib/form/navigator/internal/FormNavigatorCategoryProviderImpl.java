@@ -39,7 +39,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * @author Sergio González
  */
-@Component(service = FormNavigatorCategoryProvider.class)
+@Component(immediate = true, service = FormNavigatorCategoryProvider.class)
 public class FormNavigatorCategoryProviderImpl
 	implements FormNavigatorCategoryProvider {
 
@@ -48,7 +48,7 @@ public class FormNavigatorCategoryProviderImpl
 		String formNavigatorId) {
 
 		List<FormNavigatorCategory> formNavigatorCategories =
-			_serviceTrackerMap.getService(formNavigatorId);
+			_formNavigatorCategories.getService(formNavigatorId);
 
 		if (formNavigatorCategories != null) {
 			return formNavigatorCategories;
@@ -107,7 +107,7 @@ public class FormNavigatorCategoryProviderImpl
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
+		_formNavigatorCategories = ServiceTrackerMapFactory.openMultiValueMap(
 			bundleContext, FormNavigatorCategory.class, null,
 			ServiceReferenceMapperFactory.createFromFunction(
 				bundleContext, FormNavigatorCategory::getFormNavigatorId),
@@ -126,13 +126,13 @@ public class FormNavigatorCategoryProviderImpl
 	protected void deactivate() {
 		_serviceTracker.close();
 
-		_serviceTrackerMap.close();
+		_formNavigatorCategories.close();
 	}
 
+	private ServiceTrackerMap<String, List<FormNavigatorCategory>>
+		_formNavigatorCategories;
 	private ServiceTracker
 		<com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategory, ?>
 			_serviceTracker;
-	private ServiceTrackerMap<String, List<FormNavigatorCategory>>
-		_serviceTrackerMap;
 
 }

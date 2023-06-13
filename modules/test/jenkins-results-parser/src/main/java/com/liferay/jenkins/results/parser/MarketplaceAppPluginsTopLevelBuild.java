@@ -79,7 +79,6 @@ public class MarketplaceAppPluginsTopLevelBuild
 		return getParameterValue("TEST_PACKAGE_FILE_NAME");
 	}
 
-	@Override
 	public PortalRelease getPortalRelease() {
 		if (_portalRelease != null) {
 			return _portalRelease;

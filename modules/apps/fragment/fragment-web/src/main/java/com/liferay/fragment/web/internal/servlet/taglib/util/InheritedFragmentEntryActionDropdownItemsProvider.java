@@ -20,10 +20,9 @@ import com.liferay.fragment.web.internal.security.permission.resource.FragmentPe
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -67,20 +66,11 @@ public class InheritedFragmentEntryActionDropdownItemsProvider {
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception>
-		_getCopyToFragmentEntryActionUnsafeConsumer() {
-
-		LiferayPortletURL addFragmentCollectionURL =
-			(LiferayPortletURL)_renderResponse.createResourceURL();
-
-		addFragmentCollectionURL.setCopyCurrentRenderParameters(false);
-		addFragmentCollectionURL.setResourceID(
-			"/fragment/add_fragment_collection");
+			_getCopyToFragmentEntryActionUnsafeConsumer()
+		throws Exception {
 
 		return dropdownItem -> {
 			dropdownItem.putData("action", "copyToFragmentEntry");
-			dropdownItem.putData(
-				"addFragmentCollectionURL",
-				addFragmentCollectionURL.toString());
 			dropdownItem.putData(
 				"copyFragmentEntryURL",
 				PortletURLBuilder.createActionURL(
@@ -102,7 +92,6 @@ public class InheritedFragmentEntryActionDropdownItemsProvider {
 				).setWindowState(
 					LiferayWindowState.POP_UP
 				).buildString());
-			dropdownItem.setIcon("copy");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "copy-to"));
 		};
@@ -122,7 +111,6 @@ public class InheritedFragmentEntryActionDropdownItemsProvider {
 
 		return dropdownItem -> {
 			dropdownItem.setHref(exportFragmentEntryURL);
-			dropdownItem.setIcon("upload");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "export"));
 		};

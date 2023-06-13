@@ -31,7 +31,7 @@ import DragLayer from './drag-and-drop/DragLayer.es';
 import {EVENT_TYPES} from './eventTypes';
 import {getItem} from './utils/client.es';
 
-export function FormBuilder() {
+export const FormBuilder = () => {
 	const dispatch = useForm();
 	const [{onClose}, modalDispatch] = useContext(ModalContext);
 	const {
@@ -75,12 +75,9 @@ export function FormBuilder() {
 				);
 			}
 
-			const groupFieldSetsPromise =
-				groupId === themeDisplay.getCompanyGroupId()
-					? Promise.resolve({})
-					: getItem(
-							`/o/data-engine/v2.0/data-definitions/by-content-type/${contentType}`
-					  );
+			const groupFieldSetsPromise = getItem(
+				`/o/data-engine/v2.0/data-definitions/by-content-type/${contentType}`
+			);
 
 			const fetchFieldSets = async () => {
 				try {
@@ -133,7 +130,7 @@ export function FormBuilder() {
 	 * Opens the sidebar whenever a field is focused
 	 */
 	useEffect(() => {
-		const hasFocusedField = !!Object.keys(focusedField).length;
+		const hasFocusedField = Object.keys(focusedField).length > 0;
 
 		if (hasFocusedField) {
 			setSidebarState(({sidebarPanelId}) => ({
@@ -156,7 +153,6 @@ export function FormBuilder() {
 				<div className="ddm-form-builder-wrapper">
 					<div className="container ddm-form-builder">
 						<DragLayer />
-
 						<Pages
 							editable={true}
 							fieldActions={[
@@ -189,17 +185,14 @@ export function FormBuilder() {
 								},
 							]}
 						/>
-
 						<MultiPanelSidebar
 							createPlugin={({
 								panel,
-								setSidebarState,
 								sidebarOpen,
 								sidebarPanelId,
 							}) => ({
 								dispatch,
 								panel,
-								setSidebarState,
 								sidebarOpen,
 								sidebarPanelId,
 							})}
@@ -215,4 +208,4 @@ export function FormBuilder() {
 			</ClayLayout.Sheet>
 		</div>
 	);
-}
+};

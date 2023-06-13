@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.product.exception.DuplicateCPOptionExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPOptionException;
 import com.liferay.commerce.product.model.CPOption;
 import com.liferay.commerce.product.service.CPOptionLocalServiceUtil;
@@ -125,10 +124,6 @@ public class CPOptionPersistenceTest {
 
 		CPOption newCPOption = _persistence.create(pk);
 
-		newCPOption.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCPOption.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newCPOption.setUuid(RandomTestUtil.randomString());
 
 		newCPOption.setExternalReferenceCode(RandomTestUtil.randomString());
@@ -164,11 +159,6 @@ public class CPOptionPersistenceTest {
 		CPOption existingCPOption = _persistence.findByPrimaryKey(
 			newCPOption.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCPOption.getMvccVersion(), newCPOption.getMvccVersion());
-		Assert.assertEquals(
-			existingCPOption.getCtCollectionId(),
-			newCPOption.getCtCollectionId());
 		Assert.assertEquals(existingCPOption.getUuid(), newCPOption.getUuid());
 		Assert.assertEquals(
 			existingCPOption.getExternalReferenceCode(),
@@ -206,26 +196,6 @@ public class CPOptionPersistenceTest {
 			Time.getShortTimestamp(newCPOption.getLastPublishDate()));
 	}
 
-	@Test(expected = DuplicateCPOptionExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CPOption cpOption = addCPOption();
-
-		CPOption newCPOption = addCPOption();
-
-		newCPOption.setCompanyId(cpOption.getCompanyId());
-
-		newCPOption = _persistence.update(newCPOption);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCPOption);
-
-		newCPOption.setExternalReferenceCode(
-			cpOption.getExternalReferenceCode());
-
-		_persistence.update(newCPOption);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -261,12 +231,12 @@ public class CPOptionPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -294,12 +264,12 @@ public class CPOptionPersistenceTest {
 
 	protected OrderByComparator<CPOption> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CPOption", "mvccVersion", true, "ctCollectionId", true, "uuid",
-			true, "externalReferenceCode", true, "CPOptionId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "name", true, "description", true,
-			"DDMFormFieldTypeName", true, "facetable", true, "required", true,
-			"skuContributor", true, "key", true, "lastPublishDate", true);
+			"CPOption", "uuid", true, "externalReferenceCode", true,
+			"CPOptionId", true, "companyId", true, "userId", true, "userName",
+			true, "createDate", true, "modifiedDate", true, "name", true,
+			"description", true, "DDMFormFieldTypeName", true, "facetable",
+			true, "required", true, "skuContributor", true, "key", true,
+			"lastPublishDate", true);
 	}
 
 	@Test
@@ -571,25 +541,21 @@ public class CPOptionPersistenceTest {
 				new Class<?>[] {String.class}, "key_"));
 
 		Assert.assertEquals(
-			cpOption.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				cpOption, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(cpOption.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				cpOption, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			cpOption.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				cpOption, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CPOption addCPOption() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		CPOption cpOption = _persistence.create(pk);
-
-		cpOption.setMvccVersion(RandomTestUtil.nextLong());
-
-		cpOption.setCtCollectionId(RandomTestUtil.nextLong());
 
 		cpOption.setUuid(RandomTestUtil.randomString());
 

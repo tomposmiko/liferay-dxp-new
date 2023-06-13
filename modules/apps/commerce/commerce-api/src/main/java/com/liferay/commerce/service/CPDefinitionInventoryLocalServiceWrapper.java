@@ -14,10 +14,7 @@
 
 package com.liferay.commerce.service;
 
-import com.liferay.commerce.model.CPDefinitionInventory;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link CPDefinitionInventoryLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class CPDefinitionInventoryLocalServiceWrapper
 	implements CPDefinitionInventoryLocalService,
 			   ServiceWrapper<CPDefinitionInventoryLocalService> {
-
-	public CPDefinitionInventoryLocalServiceWrapper() {
-		this(null);
-	}
 
 	public CPDefinitionInventoryLocalServiceWrapper(
 		CPDefinitionInventoryLocalService cpDefinitionInventoryLocalService) {
@@ -51,21 +44,24 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the cp definition inventory that was added
 	 */
 	@Override
-	public CPDefinitionInventory addCPDefinitionInventory(
-		CPDefinitionInventory cpDefinitionInventory) {
+	public com.liferay.commerce.model.CPDefinitionInventory
+		addCPDefinitionInventory(
+			com.liferay.commerce.model.CPDefinitionInventory
+				cpDefinitionInventory) {
 
 		return _cpDefinitionInventoryLocalService.addCPDefinitionInventory(
 			cpDefinitionInventory);
 	}
 
 	@Override
-	public CPDefinitionInventory addCPDefinitionInventory(
-			long userId, long cpDefinitionId,
-			String cpDefinitionInventoryEngine, String lowStockActivity,
-			boolean displayAvailability, boolean displayStockQuantity,
-			int minStockQuantity, boolean backOrders, int minOrderQuantity,
-			int maxOrderQuantity, String allowedOrderQuantities,
-			int multipleOrderQuantity)
+	public com.liferay.commerce.model.CPDefinitionInventory
+			addCPDefinitionInventory(
+				long userId, long cpDefinitionId,
+				String cpDefinitionInventoryEngine, String lowStockActivity,
+				boolean displayAvailability, boolean displayStockQuantity,
+				int minStockQuantity, boolean backOrders, int minOrderQuantity,
+				int maxOrderQuantity, String allowedOrderQuantities,
+				int multipleOrderQuantity)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionInventoryLocalService.addCPDefinitionInventory(
@@ -90,8 +86,8 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the new cp definition inventory
 	 */
 	@Override
-	public CPDefinitionInventory createCPDefinitionInventory(
-		long CPDefinitionInventoryId) {
+	public com.liferay.commerce.model.CPDefinitionInventory
+		createCPDefinitionInventory(long CPDefinitionInventoryId) {
 
 		return _cpDefinitionInventoryLocalService.createCPDefinitionInventory(
 			CPDefinitionInventoryId);
@@ -120,8 +116,10 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the cp definition inventory that was removed
 	 */
 	@Override
-	public CPDefinitionInventory deleteCPDefinitionInventory(
-		CPDefinitionInventory cpDefinitionInventory) {
+	public com.liferay.commerce.model.CPDefinitionInventory
+		deleteCPDefinitionInventory(
+			com.liferay.commerce.model.CPDefinitionInventory
+				cpDefinitionInventory) {
 
 		return _cpDefinitionInventoryLocalService.deleteCPDefinitionInventory(
 			cpDefinitionInventory);
@@ -139,8 +137,8 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @throws PortalException if a cp definition inventory with the primary key could not be found
 	 */
 	@Override
-	public CPDefinitionInventory deleteCPDefinitionInventory(
-			long CPDefinitionInventoryId)
+	public com.liferay.commerce.model.CPDefinitionInventory
+			deleteCPDefinitionInventory(long CPDefinitionInventoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionInventoryLocalService.deleteCPDefinitionInventory(
@@ -272,16 +270,16 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	}
 
 	@Override
-	public CPDefinitionInventory fetchCPDefinitionInventory(
-		long CPDefinitionInventoryId) {
+	public com.liferay.commerce.model.CPDefinitionInventory
+		fetchCPDefinitionInventory(long CPDefinitionInventoryId) {
 
 		return _cpDefinitionInventoryLocalService.fetchCPDefinitionInventory(
 			CPDefinitionInventoryId);
 	}
 
 	@Override
-	public CPDefinitionInventory fetchCPDefinitionInventoryByCPDefinitionId(
-		long cpDefinitionId) {
+	public com.liferay.commerce.model.CPDefinitionInventory
+		fetchCPDefinitionInventoryByCPDefinitionId(long cpDefinitionId) {
 
 		return _cpDefinitionInventoryLocalService.
 			fetchCPDefinitionInventoryByCPDefinitionId(cpDefinitionId);
@@ -295,8 +293,8 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the matching cp definition inventory, or <code>null</code> if a matching cp definition inventory could not be found
 	 */
 	@Override
-	public CPDefinitionInventory fetchCPDefinitionInventoryByUuidAndGroupId(
-		String uuid, long groupId) {
+	public com.liferay.commerce.model.CPDefinitionInventory
+		fetchCPDefinitionInventoryByUuidAndGroupId(String uuid, long groupId) {
 
 		return _cpDefinitionInventoryLocalService.
 			fetchCPDefinitionInventoryByUuidAndGroupId(uuid, groupId);
@@ -321,8 +319,8 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the range of cp definition inventories
 	 */
 	@Override
-	public java.util.List<CPDefinitionInventory> getCPDefinitionInventories(
-		int start, int end) {
+	public java.util.List<com.liferay.commerce.model.CPDefinitionInventory>
+		getCPDefinitionInventories(int start, int end) {
 
 		return _cpDefinitionInventoryLocalService.getCPDefinitionInventories(
 			start, end);
@@ -336,7 +334,7 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the matching cp definition inventories, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<CPDefinitionInventory>
+	public java.util.List<com.liferay.commerce.model.CPDefinitionInventory>
 		getCPDefinitionInventoriesByUuidAndCompanyId(
 			String uuid, long companyId) {
 
@@ -355,11 +353,12 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the range of matching cp definition inventories, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<CPDefinitionInventory>
+	public java.util.List<com.liferay.commerce.model.CPDefinitionInventory>
 		getCPDefinitionInventoriesByUuidAndCompanyId(
 			String uuid, long companyId, int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
-				<CPDefinitionInventory> orderByComparator) {
+				<com.liferay.commerce.model.CPDefinitionInventory>
+					orderByComparator) {
 
 		return _cpDefinitionInventoryLocalService.
 			getCPDefinitionInventoriesByUuidAndCompanyId(
@@ -385,8 +384,8 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @throws PortalException if a cp definition inventory with the primary key could not be found
 	 */
 	@Override
-	public CPDefinitionInventory getCPDefinitionInventory(
-			long CPDefinitionInventoryId)
+	public com.liferay.commerce.model.CPDefinitionInventory
+			getCPDefinitionInventory(long CPDefinitionInventoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionInventoryLocalService.getCPDefinitionInventory(
@@ -402,8 +401,8 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @throws PortalException if a matching cp definition inventory could not be found
 	 */
 	@Override
-	public CPDefinitionInventory getCPDefinitionInventoryByUuidAndGroupId(
-			String uuid, long groupId)
+	public com.liferay.commerce.model.CPDefinitionInventory
+			getCPDefinitionInventoryByUuidAndGroupId(String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionInventoryLocalService.
@@ -461,20 +460,24 @@ public class CPDefinitionInventoryLocalServiceWrapper
 	 * @return the cp definition inventory that was updated
 	 */
 	@Override
-	public CPDefinitionInventory updateCPDefinitionInventory(
-		CPDefinitionInventory cpDefinitionInventory) {
+	public com.liferay.commerce.model.CPDefinitionInventory
+		updateCPDefinitionInventory(
+			com.liferay.commerce.model.CPDefinitionInventory
+				cpDefinitionInventory) {
 
 		return _cpDefinitionInventoryLocalService.updateCPDefinitionInventory(
 			cpDefinitionInventory);
 	}
 
 	@Override
-	public CPDefinitionInventory updateCPDefinitionInventory(
-			long cpDefinitionInventoryId, String cpDefinitionInventoryEngine,
-			String lowStockActivity, boolean displayAvailability,
-			boolean displayStockQuantity, int minStockQuantity,
-			boolean backOrders, int minOrderQuantity, int maxOrderQuantity,
-			String allowedOrderQuantities, int multipleOrderQuantity)
+	public com.liferay.commerce.model.CPDefinitionInventory
+			updateCPDefinitionInventory(
+				long cpDefinitionInventoryId,
+				String cpDefinitionInventoryEngine, String lowStockActivity,
+				boolean displayAvailability, boolean displayStockQuantity,
+				int minStockQuantity, boolean backOrders, int minOrderQuantity,
+				int maxOrderQuantity, String allowedOrderQuantities,
+				int multipleOrderQuantity)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionInventoryLocalService.updateCPDefinitionInventory(
@@ -482,26 +485,6 @@ public class CPDefinitionInventoryLocalServiceWrapper
 			lowStockActivity, displayAvailability, displayStockQuantity,
 			minStockQuantity, backOrders, minOrderQuantity, maxOrderQuantity,
 			allowedOrderQuantities, multipleOrderQuantity);
-	}
-
-	@Override
-	public CTPersistence<CPDefinitionInventory> getCTPersistence() {
-		return _cpDefinitionInventoryLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<CPDefinitionInventory> getModelClass() {
-		return _cpDefinitionInventoryLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CPDefinitionInventory>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _cpDefinitionInventoryLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

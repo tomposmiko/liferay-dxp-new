@@ -14,6 +14,8 @@
 
 package com.liferay.exportimport.changeset;
 
+import java.util.Optional;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -23,6 +25,34 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ChangesetManager {
 
 	public void addChangeset(Changeset changeset);
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public void clearChangesets();
+
+	public boolean hasChangeset(String changesetUuid);
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public Optional<Changeset> peekChangeset(String changesetUuid);
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #removeChangeset(String changesetUuid)}
+	 */
+	@Deprecated
+	public Optional<Changeset> popChangeset(String changesetUuid);
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public long publishChangeset(
+		Changeset changeset, ChangesetEnvironment changesetEnvironment);
 
 	public Changeset removeChangeset(String changesetUuid);
 

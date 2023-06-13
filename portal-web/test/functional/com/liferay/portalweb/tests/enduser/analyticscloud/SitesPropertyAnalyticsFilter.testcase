@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -21,46 +19,41 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
-		else {
-			JSONGroup.deleteGroupByName(groupName = "Site Name");
-		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8319 | Test Summary: Custom Range time period filter in Sites"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CustomRangeTimePeriodFilterSites {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8744
 
 		task ("Site and page creation and connection with AC") {
-			ACUtils.addSiteAndPage();
+			ACUtils.addSiteAndPage(layoutName = "AC Page");
 
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Interation with page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			ACUtils.closeAllSessionsAndWait();
+			ACUtils.closeAllSessions();
 		}
 
 		task ("AC launch") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset Custom Range time period filter") {
@@ -79,23 +72,59 @@ definition {
 
 			var cardNameList = "${propertyName} Activities,Top Pages,Acquisitions,Visitors by Day and Time,Search Terms,Interests,Sessions by Location,Session Technology";
 
-			for (var cardName : list ${cardNameList}) {
+			for (var cardName : list "${cardNameList}") {
 				ACTimeFilter.setCustomRange(
-					cardName = ${cardName},
-					endDay = ${displayDateDay},
-					endMonth = ${displayDateMonth},
-					endYear = ${displayDateYear},
-					startDay = ${previousDay},
-					startMonth = ${previousMonth},
-					startYear = ${previousYear});
+					cardName = "${cardName}",
+					endDay = "${displayDateDay}",
+					endMonth = "${displayDateMonth}",
+					endYear = "${displayDateYear}",
+					startDay = "${previousDay}",
+					startMonth = "${previousMonth}",
+					startYear = "${previousYear}");
 			}
 		}
 	}
 
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8321 | Test Summary: 1st user access and no property was selected yet"
+	@priority = "4"
+	test FirstAccessAndNoProperty {
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: this test needs to simulate the first access
+		// AC Refactor ticket: LRAC-8752
+
+		task ("AC launch") {
+
+			// This test needs to simulate the first access, it would be when the user is creating a new/fresh workspace.
+
+			ACUtils.launchAC();
+		}
+
+		task ("Asset that no longer properties exists") {
+			ACNavigation.goToSettings();
+
+			ACSettings.goToProperties();
+
+			AssertElementPresent(locator1 = "ACSettings#NO_PROPERTIES_FOUND");
+		}
+
+		task ("Asset that there are no more properties on the sites page") {
+			Navigator.gotoBack();
+
+			AssertTextEquals(
+				locator1 = "ACSidebar#PROPERTY_MENU_NO_PROPERTIES",
+				value1 = "No Properties");
+
+			AssertElementPresent(locator1 = "TextInput#NO_PROPERTIES_AVAILABLE_TEXT");
+
+			AssertElementNotPresent(locator1 = "ACSidebar#PROPERTY_MENU_ITEM_BY_NAME");
+		}
+	}
+
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8317 | Test Summary: 180 Days time period filter in Sites"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test PeriodFilter180Days {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8723
@@ -109,19 +138,19 @@ definition {
 		}
 
 		task ("Interation with pages") {
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Test 2",
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			ACUtils.closeAllSessionsAndWait();
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
 		}
 
 		task ("AC launch") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset 180 Days time period filter") {
@@ -137,9 +166,9 @@ definition {
 			ACUtils.assertXAxisTimedGraph(parentName = "${propertyName} Activities");
 
 			for (var cardTitle : list "Top Pages,Acquisitions,Visitors by Day and Time,Search Terms,Interests,Sessions by Location,Session Technology") {
-				ACCards.viewCards(cardTitle = ${cardTitle});
+				ACCards.viewCards(cardTitle = "${cardTitle}");
 
-				ACTimeFilter.clickTimeFilterButton(cardName = ${cardTitle});
+				ACTimeFilter.clickTimeFilterButton(cardName = "${cardTitle}");
 
 				ACTimeFilter.setLast180Days();
 			}
@@ -147,9 +176,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8318 | Test Summary: Last Year time period filter in Sites"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test PeriodFilterLastYear {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8726
@@ -163,19 +192,19 @@ definition {
 		}
 
 		task ("Interation with pages") {
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Test 2",
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			ACUtils.closeAllSessionsAndWait();
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
 		}
 
 		task ("AC launch") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset Last Year time period filter") {
@@ -191,22 +220,44 @@ definition {
 			ACUtils.assertXAxisTimedGraph(parentName = "${propertyName} Activities");
 
 			for (var cardTitle : list "Top Pages,Acquisitions,Visitors by Day and Time,Search Terms,Interests,Sessions by Location,Session Technology") {
-				ACCards.viewCards(cardTitle = ${cardTitle});
+				ACCards.viewCards(cardTitle = "${cardTitle}");
 
-				ACTimeFilter.clickTimeFilterButton(cardName = ${cardTitle});
+				ACTimeFilter.clickTimeFilterButton(cardName = "${cardTitle}");
 
 				ACTimeFilter.setLastYear();
 			}
 		}
 	}
 
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8320 | Test Summary: Property field is displayed in empty state when no property is available"
+	@priority = "4"
+	test PropertyFieldWhenNoProperty {
+		task ("AC launch and delete all properties") {
+			ACUtils.launchAC();
+
+			ACSettings.deleteAllProperties();
+		}
+
+		task ("Asset that no longer properties exists") {
+			AssertElementPresent(locator1 = "ACSettings#NO_PROPERTIES_FOUND");
+		}
+
+		task ("Asset that there are no more properties on the sites page") {
+			Navigator.gotoBack();
+
+			AssertTextEquals(
+				locator1 = "ACSidebar#PROPERTY_MENU_NO_PROPERTIES",
+				value1 = "No Properties");
+
+			AssertElementPresent(locator1 = "TextInput#NO_PROPERTIES_AVAILABLE_TEXT");
+
+			AssertElementNotPresent(locator1 = "ACSidebar#PROPERTY_MENU_ITEM_BY_NAME");
+		}
+	}
+
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8323 | Test Summary: A user lost access to a given property (because the admin removed the user's access or someone deleted the property of the system)"
-	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test UserLostAccess {
-
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
 		task ("AC launch and go to the porpreties menu") {
 			ACUtils.launchAC();
 
@@ -254,8 +305,7 @@ definition {
 
 			ACSettings.goToProperties();
 
-			//ACSettings.deleteAllProperties();
-
+			ACSettings.deleteAllProperties();
 		}
 
 		task ("Log in as the user corbin.murakami@faro.io, go to the properties menu and checks if the property has been deleted for the user") {
@@ -276,7 +326,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8322 | Test Summary: A user (independent of user role) should only see the properties they are invited to by the AC admin or the properties which the user is owner"
-	@priority = 4
+	@priority = "4"
 	test UserShouldOnlySeePropertiesAreInvitedByACAdminOrPropertiesWhichUserOwner {
 		task ("AC launch and go to the porpreties menu") {
 			ACUtils.launchAC();
@@ -285,7 +335,6 @@ definition {
 
 			ACSettings.goToProperties();
 		}
-
 		task ("Create property 1, check if it was created and add an admin user") {
 			ACProperties.addNewProperty(propertyName = "Property Name 1");
 
@@ -293,7 +342,6 @@ definition {
 
 			ACProperties.addUserProperty(emailAddress = "bryan.cheung@faro.io");
 		}
-
 		task ("Go back to the properties menu, create property 2, check if it was created and add an admin user") {
 			ACSettings.goToProperties();
 
@@ -303,7 +351,6 @@ definition {
 
 			ACProperties.addUserProperty(emailAddress = "corbin.murakami@faro.io");
 		}
-
 		task ("Go back to the properties menu, create property 3, check if it was created and select all users as admin") {
 			ACSettings.goToProperties();
 
@@ -313,7 +360,6 @@ definition {
 
 			ACSettings.goToProperties();
 		}
-
 		task ("Log in as the user corbin.murakami@faro.io and go to the properties menu") {
 			ACWorkspace.signOut();
 
@@ -327,7 +373,6 @@ definition {
 
 			ACSettings.goToProperties();
 		}
-
 		task ("Checks if only property 2 and property 3 are present") {
 			ACProperties.assertPropertyNotPresent(propertyName = "Property Name 1");
 

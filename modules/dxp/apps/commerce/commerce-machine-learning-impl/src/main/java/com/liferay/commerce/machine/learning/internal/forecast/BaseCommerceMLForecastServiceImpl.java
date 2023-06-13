@@ -18,7 +18,6 @@ import com.liferay.commerce.machine.learning.forecast.CommerceMLForecast;
 import com.liferay.commerce.machine.learning.internal.forecast.constants.CommerceMLForecastField;
 import com.liferay.commerce.machine.learning.internal.forecast.constants.CommerceMLForecastPeriod;
 import com.liferay.commerce.machine.learning.internal.search.api.CommerceMLIndexer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -62,6 +61,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Reference;
 
@@ -192,7 +193,7 @@ public abstract class BaseCommerceMLForecastServiceImpl
 		}
 		catch (ParseException parseException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(parseException);
+				_log.debug(parseException, parseException);
 			}
 		}
 
@@ -298,9 +299,16 @@ public abstract class BaseCommerceMLForecastServiceImpl
 		SearchSearchResponse searchSearchResponse = searchEngineAdapter.execute(
 			searchSearchRequest);
 
-		return TransformUtil.transform(
-			_getDocuments(searchSearchResponse.getHits()),
-			this::toForecastModel);
+		List<Document> documents = _getDocuments(
+			searchSearchResponse.getHits());
+
+		Stream<Document> stream = documents.stream();
+
+		return stream.map(
+			this::toForecastModel
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected SearchSearchRequest getSearchSearchRequest(
@@ -310,9 +318,9 @@ public abstract class BaseCommerceMLForecastServiceImpl
 			{
 				setIndexNames(new String[] {indexName});
 				setQuery(query);
+				setStart(Integer.valueOf(start));
 				setSize(Integer.valueOf(size));
 				setSorts(sorts);
-				setStart(Integer.valueOf(start));
 				setStats(Collections.emptyMap());
 			}
 		};

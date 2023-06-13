@@ -15,11 +15,9 @@
 package com.liferay.commerce.inventory.service;
 
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -41,8 +39,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -84,13 +80,30 @@ public interface CommerceInventoryWarehouseLocalService
 	public CommerceInventoryWarehouse addCommerceInventoryWarehouse(
 		CommerceInventoryWarehouse commerceInventoryWarehouse);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addCommerceInventoryWarehouse(String,
+	 String, String, String, boolean, String, String, String,
+	 String, String, String, String, double, double,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceInventoryWarehouse addCommerceInventoryWarehouse(
-			String externalReferenceCode, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, boolean active, String street1,
+			String name, String description, boolean active, String street1,
 			String street2, String street3, String city, String zip,
 			String commerceRegionCode, String commerceCountryCode,
-			double latitude, double longitude, ServiceContext serviceContext)
+			double latitude, double longitude, String externalReferenceCode,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	@Indexable(type = IndexableType.REINDEX)
+	public CommerceInventoryWarehouse addCommerceInventoryWarehouse(
+			String externalReferenceCode, String name, String description,
+			boolean active, String street1, String street2, String street3,
+			String city, String zip, String commerceRegionCode,
+			String commerceCountryCode, double latitude, double longitude,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -225,27 +238,31 @@ public interface CommerceInventoryWarehouseLocalService
 	public CommerceInventoryWarehouse fetchCommerceInventoryWarehouse(
 		long commerceInventoryWarehouseId);
 
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByExternalReferenceCode(
-			String externalReferenceCode, long companyId);
+			long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public CommerceInventoryWarehouse
+		fetchCommerceInventoryWarehouseByReferenceCode(
+			long companyId, String externalReferenceCode);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByReferenceCode(
 			String externalReferenceCode, long companyId);
-
-	/**
-	 * Returns the commerce inventory warehouse with the matching UUID and company.
-	 *
-	 * @param uuid the commerce inventory warehouse's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
-	 */
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceInventoryWarehouse
-		fetchCommerceInventoryWarehouseByUuidAndCompanyId(
-			String uuid, long companyId);
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceInventoryWarehouse geolocateCommerceInventoryWarehouse(
@@ -268,24 +285,18 @@ public interface CommerceInventoryWarehouseLocalService
 			long commerceInventoryWarehouseId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceInventoryWarehouse
-			getCommerceInventoryWarehouseByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws PortalException;
-
 	/**
-	 * Returns the commerce inventory warehouse with the matching UUID and company.
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce inventory warehouse's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
 	 * @return the matching commerce inventory warehouse
 	 * @throws PortalException if a matching commerce inventory warehouse could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceInventoryWarehouse
-			getCommerceInventoryWarehouseByUuidAndCompanyId(
-				String uuid, long companyId)
+			getCommerceInventoryWarehouseByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -351,10 +362,6 @@ public interface CommerceInventoryWarehouseLocalService
 		long companyId, boolean active, String commerceCountryCode);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
@@ -405,18 +412,11 @@ public interface CommerceInventoryWarehouseLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceInventoryWarehouse updateCommerceInventoryWarehouse(
-			long commerceInventoryWarehouseId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, boolean active, String street1,
-			String street2, String street3, String city, String zip,
-			String commerceRegionCode, String commerceCountryCode,
-			double latitude, double longitude, long mvccVersion,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public CommerceInventoryWarehouse
-			updateCommerceInventoryWarehouseExternalReferenceCode(
-				String externalReferenceCode, long commerceInventoryWarehouseId)
+			long commerceInventoryWarehouseId, String name, String description,
+			boolean active, String street1, String street2, String street3,
+			String city, String zip, String commerceRegionCode,
+			String commerceCountryCode, double latitude, double longitude,
+			long mvccVersion, ServiceContext serviceContext)
 		throws PortalException;
 
 }

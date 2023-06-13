@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER_TYPE,
 		"mvc.command.name=/commerce_order_type/edit_commerce_order_type_external_reference_code"
@@ -72,7 +73,7 @@ public class EditCommerceOrderTypeExternalReferenceCodeMVCActionCommand
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				String redirect = ParamUtil.getString(
 					actionRequest, "redirect");

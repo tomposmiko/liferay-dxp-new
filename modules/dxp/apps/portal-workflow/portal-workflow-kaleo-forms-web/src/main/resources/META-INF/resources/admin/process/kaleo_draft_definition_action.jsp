@@ -42,7 +42,7 @@ KaleoDefinitionVersion kaleoDefinitionVersion = (KaleoDefinitionVersion)row.getO
 		<liferay-ui:icon
 			message="edit"
 			onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "editWorkflow('" + editURL + "');" %>'
-			url="javascript:void(0);"
+			url="javascript:;"
 		/>
 
 		<portlet:actionURL name="/kaleo_forms_admin/delete_kaleo_definition_versions" var="deleteURL">

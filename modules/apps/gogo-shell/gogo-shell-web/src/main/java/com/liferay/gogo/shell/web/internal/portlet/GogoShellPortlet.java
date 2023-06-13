@@ -18,7 +18,7 @@ import com.liferay.gogo.shell.web.internal.constants.GogoShellPortletKeys;
 import com.liferay.gogo.shell.web.internal.constants.GogoShellWebKeys;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.TransientValue;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -60,6 +61,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author David Truong
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-gogo-shell",
@@ -71,8 +73,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + GogoShellPortletKeys.GOGO_SHELL,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -83,7 +84,7 @@ public class GogoShellPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		_initCommandSession(renderRequest);
+		initCommandSession(renderRequest);
 
 		CommandSession commandSession = _getSessionAttribute(
 			renderRequest, GogoShellWebKeys.COMMAND_SESSION);
@@ -103,7 +104,7 @@ public class GogoShellPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		_initCommandSession(actionRequest);
+		initCommandSession(actionRequest);
 
 		CommandSession commandSession = _getSessionAttribute(
 			actionRequest, GogoShellWebKeys.COMMAND_SESSION);
@@ -123,7 +124,7 @@ public class GogoShellPortlet extends MVCPortlet {
 		try {
 			SessionMessages.add(actionRequest, "command", command);
 
-			_checkCommand(command, themeDisplay);
+			checkCommand(command, themeDisplay);
 
 			Object result = commandSession.execute(command);
 
@@ -161,7 +162,7 @@ public class GogoShellPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.processAction(actionRequest, actionResponse);
 	}
@@ -171,25 +172,25 @@ public class GogoShellPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.render(renderRequest, renderResponse);
 	}
 
-	private void _checkCommand(String command, ThemeDisplay themeDisplay)
+	protected void checkCommand(String command, ThemeDisplay themeDisplay)
 		throws Exception {
 
 		Matcher matcher = _pattern.matcher(command);
 
 		if (matcher.find()) {
 			throw new Exception(
-				_language.format(
+				LanguageUtil.format(
 					themeDisplay.getLocale(), "the-command-x-is-not-supported",
 					command));
 		}
 	}
 
-	private void _checkOmniAdmin() throws PortletException {
+	protected void checkOmniAdmin() throws PortletException {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
@@ -201,24 +202,7 @@ public class GogoShellPortlet extends MVCPortlet {
 		}
 	}
 
-	private <T> T _getSessionAttribute(
-		PortletRequest portletRequest, String name) {
-
-		PortletSession portletSession = portletRequest.getPortletSession();
-
-		Object sessionAttribute = portletSession.getAttribute(name);
-
-		if (sessionAttribute instanceof TransientValue) {
-			TransientValue<T> transientValue =
-				(TransientValue<T>)sessionAttribute;
-
-			return transientValue.getValue();
-		}
-
-		return null;
-	}
-
-	private void _initCommandSession(PortletRequest portletRequest) {
+	protected void initCommandSession(PortletRequest portletRequest) {
 		PortletSession portletSession = portletRequest.getPortletSession();
 
 		Object commandSessionAttribute = portletSession.getAttribute(
@@ -261,6 +245,23 @@ public class GogoShellPortlet extends MVCPortlet {
 			new TransientValue<>(outputUnsyncByteArrayOutputStream));
 	}
 
+	private <T> T _getSessionAttribute(
+		PortletRequest portletRequest, String name) {
+
+		PortletSession portletSession = portletRequest.getPortletSession();
+
+		Object sessionAttribute = portletSession.getAttribute(name);
+
+		if (sessionAttribute instanceof TransientValue) {
+			TransientValue<T> transientValue =
+				(TransientValue<T>)sessionAttribute;
+
+			return transientValue.getValue();
+		}
+
+		return null;
+	}
+
 	private static final InputStream _emptyInputStream =
 		new UnsyncByteArrayInputStream(new byte[0]);
 	private static final Pattern _pattern = Pattern.compile(
@@ -271,6 +272,6 @@ public class GogoShellPortlet extends MVCPortlet {
 	private CommandProcessor _commandProcessor;
 
 	@Reference
-	private Language _language;
+	private Portal _portal;
 
 }

@@ -66,7 +66,7 @@ public class LiferayProcessorCapability
 	@Override
 	public void copy(FileEntry fileEntry, FileVersion fileVersion) {
 		if (_resourceGenerationStrategy == ResourceGenerationStrategy.REUSE) {
-			_registerDLProcessorCallback(fileEntry, fileVersion);
+			registerDLProcessorCallback(fileEntry, fileVersion);
 		}
 		else {
 			generateNew(fileEntry);
@@ -75,7 +75,7 @@ public class LiferayProcessorCapability
 
 	@Override
 	public void generateNew(FileEntry fileEntry) {
-		_registerDLProcessorCallback(fileEntry, null);
+		registerDLProcessorCallback(fileEntry, null);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class LiferayProcessorCapability
 		return new LiferayProcessorRepositoryWrapper(repository, this);
 	}
 
-	private void _registerDLProcessorCallback(
+	protected void registerDLProcessorCallback(
 		FileEntry fileEntry, FileVersion fileVersion) {
 
 		TransactionCommitCallbackUtil.registerCallback(

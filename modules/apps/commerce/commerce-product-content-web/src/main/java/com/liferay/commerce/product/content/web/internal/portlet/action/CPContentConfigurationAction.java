@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -35,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "javax.portlet.name=" + CPPortletKeys.CP_CONTENT_WEB,
 	service = ConfigurationAction.class
 )
@@ -53,13 +55,22 @@ public class CPContentConfigurationAction extends DefaultConfigurationAction {
 				cpContentConfigurationDisplayContext);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		httpServletRequest.setAttribute(
 			CPContentWebKeys.CP_CONTENT_HELPER, _cpContentHelper);
 
 		return "/product_detail/configuration.jsp";
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

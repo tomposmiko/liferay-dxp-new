@@ -18,10 +18,10 @@ import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -31,6 +31,7 @@ import com.liferay.site.teams.web.internal.constants.SiteTeamsPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -103,9 +104,8 @@ public class EditSiteTeamAssignmentsUsersDisplayContext
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			httpServletRequest, SiteTeamsPortletKeys.SITE_TEAMS,
-			"users-order-by-col", "first-name");
+		_orderByCol = ParamUtil.getString(
+			httpServletRequest, "orderByCol", "first-name");
 
 		return _orderByCol;
 	}
@@ -115,9 +115,8 @@ public class EditSiteTeamAssignmentsUsersDisplayContext
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			httpServletRequest, SiteTeamsPortletKeys.SITE_TEAMS,
-			"users-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -134,11 +133,16 @@ public class EditSiteTeamAssignmentsUsersDisplayContext
 		SearchContainer<User> userSearchContainer = new UserSearch(
 			renderRequest, getEditTeamAssignmentsURL());
 
-		userSearchContainer.setOrderByCol(getOrderByCol());
-		userSearchContainer.setOrderByComparator(
+		OrderByComparator<User> orderByComparator =
 			UsersAdminUtil.getUserOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+				getOrderByCol(), getOrderByType());
+
+		userSearchContainer.setOrderByCol(getOrderByCol());
+		userSearchContainer.setOrderByComparator(orderByComparator);
 		userSearchContainer.setOrderByType(getOrderByType());
+
+		userSearchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(renderResponse));
 
 		UserSearchTerms searchTerms =
 			(UserSearchTerms)userSearchContainer.getSearchTerms();
@@ -150,18 +154,19 @@ public class EditSiteTeamAssignmentsUsersDisplayContext
 				"usersTeams", getTeamId()
 			).build();
 
-		userSearchContainer.setResultsAndTotal(
-			() -> UserLocalServiceUtil.search(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), userParams,
-				userSearchContainer.getStart(), userSearchContainer.getEnd(),
-				userSearchContainer.getOrderByComparator()),
-			UserLocalServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), userParams));
+		int usersCount = UserLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), userParams);
 
-		userSearchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(renderResponse));
+		userSearchContainer.setTotal(usersCount);
+
+		List<User> users = UserLocalServiceUtil.search(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), userParams, userSearchContainer.getStart(),
+			userSearchContainer.getEnd(),
+			userSearchContainer.getOrderByComparator());
+
+		userSearchContainer.setResults(users);
 
 		_userSearchContainer = userSearchContainer;
 

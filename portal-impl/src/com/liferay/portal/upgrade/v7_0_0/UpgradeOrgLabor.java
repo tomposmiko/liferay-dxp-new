@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.upgrade.v7_0_0.util.OrgLaborTable;
 
 /**
  * @author Brian Wing Shun Chan
@@ -23,7 +24,7 @@ public class UpgradeOrgLabor extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("OrgLabor", "typeId", "LONG");
+		alter(OrgLaborTable.class, new AlterColumnType("typeId", "LONG"));
 	}
 
 }

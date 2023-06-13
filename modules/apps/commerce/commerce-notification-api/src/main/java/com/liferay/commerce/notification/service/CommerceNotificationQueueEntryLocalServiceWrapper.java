@@ -27,10 +27,6 @@ public class CommerceNotificationQueueEntryLocalServiceWrapper
 	implements CommerceNotificationQueueEntryLocalService,
 			   ServiceWrapper<CommerceNotificationQueueEntryLocalService> {
 
-	public CommerceNotificationQueueEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceNotificationQueueEntryLocalServiceWrapper(
 		CommerceNotificationQueueEntryLocalService
 			commerceNotificationQueueEntryLocalService) {

@@ -14,13 +14,11 @@
 
 package com.liferay.search.experiences.internal.blueprint.search.request.body.contributor;
 
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
-import com.liferay.search.experiences.rest.dto.v1_0.GeneralConfiguration;
+import com.liferay.search.experiences.rest.dto.v1_0.General;
+import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
 /**
  * @author André de Oliveira
@@ -30,75 +28,35 @@ public class GeneralSXPSearchRequestBodyContributor
 
 	@Override
 	public void contribute(
-		Configuration configuration, SearchRequestBuilder searchRequestBuilder,
+		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint,
 		SXPParameterData sxpParameterData) {
 
-		GeneralConfiguration generalConfiguration =
-			configuration.getGeneralConfiguration();
+		Configuration configuration = sxpBlueprint.getConfiguration();
 
-		if (generalConfiguration == null) {
+		General general = configuration.getGeneral();
+
+		if (general == null) {
 			return;
 		}
 
-		if (generalConfiguration.getClauseContributorsExcludes() != null) {
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setAttribute(
-					"search.full.query.clause.contributors.excludes",
-					StringUtil.merge(
-						generalConfiguration.getClauseContributorsExcludes())));
-		}
-
-		if (generalConfiguration.getClauseContributorsIncludes() != null) {
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setAttribute(
-					"search.full.query.clause.contributors.includes",
-					StringUtil.merge(
-						generalConfiguration.getClauseContributorsIncludes())));
-		}
-
-		if (generalConfiguration.getEmptySearchEnabled() != null) {
+		if (general.getEmptySearchEnabled() != null) {
 			searchRequestBuilder.emptySearchEnabled(
-				generalConfiguration.getEmptySearchEnabled());
+				general.getEmptySearchEnabled());
 		}
 
-		if (generalConfiguration.getExplain() != null) {
-			searchRequestBuilder.explain(generalConfiguration.getExplain());
+		if (general.getExplain() != null) {
+			searchRequestBuilder.explain(general.getExplain());
 		}
 
-		if (generalConfiguration.getIncludeResponseString() != null) {
+		if (general.getIncludeResponseString() != null) {
 			searchRequestBuilder.includeResponseString(
-				generalConfiguration.getIncludeResponseString());
-		}
-
-		if (generalConfiguration.getQueryString() != null) {
-			searchRequestBuilder.queryString(
-				generalConfiguration.getQueryString());
-		}
-
-		if (generalConfiguration.getSearchableAssetTypes() != null) {
-			searchRequestBuilder.entryClassNames(
-				generalConfiguration.getSearchableAssetTypes());
-			searchRequestBuilder.modelIndexerClassNames(
-				generalConfiguration.getSearchableAssetTypes());
-		}
-
-		if (generalConfiguration.getLanguageId() != null) {
-			searchRequestBuilder.locale(
-				LocaleUtil.fromLanguageId(
-					generalConfiguration.getLanguageId()));
-		}
-
-		if (generalConfiguration.getTimeZoneId() != null) {
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setTimeZone(
-					TimeZoneUtil.getTimeZone(
-						generalConfiguration.getTimeZoneId())));
+				general.getIncludeResponseString());
 		}
 	}
 
 	@Override
 	public String getName() {
-		return "generalConfiguration";
+		return "general";
 	}
 
 }

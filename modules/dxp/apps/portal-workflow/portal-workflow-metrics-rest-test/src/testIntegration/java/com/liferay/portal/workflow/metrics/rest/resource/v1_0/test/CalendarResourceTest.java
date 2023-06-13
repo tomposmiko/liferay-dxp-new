@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.rule.DataGuard;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Calendar;
 import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
@@ -173,11 +174,6 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 				}
 
 				@Override
-				public String getKey() {
-					return "custom";
-				}
-
-				@Override
 				public LocalDateTime getOverdueLocalDateTime(
 					LocalDateTime nowLocalDateTime,
 					Duration remainingDuration) {
@@ -191,7 +187,9 @@ public class CalendarResourceTest extends BaseCalendarResourceTestCase {
 				}
 
 			},
-			null);
+			HashMapDictionaryBuilder.put(
+				"sla.calendar.key", "custom"
+			).build());
 	}
 
 	private static BundleContext _bundleContext;

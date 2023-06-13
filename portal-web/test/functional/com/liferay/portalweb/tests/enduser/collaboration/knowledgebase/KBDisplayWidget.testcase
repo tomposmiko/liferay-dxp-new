@@ -15,7 +15,7 @@ definition {
 			layoutName = "Knowledge Base Display Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 2,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page",
 			widgetName = "Knowledge Base Display");
@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -34,16 +34,14 @@ definition {
 
 			KBArticle.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@e2etest
-	@priority = 4
+	@priority = "4"
 	@refactordone
+	@uitest
 	test CanAddChildArticle {
-		property portal.acceptance = "true";
-
 		JSONKnowledgeBase.addkBArticle(
 			groupName = "Guest",
 			kbArticleContent = "Knowledge Base Article Content",
@@ -51,7 +49,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.addChildPGViaKBDisplay(
+		KBArticle.addChildPGViaKBDisplay(
 			kbArticleContent = "Child Article Content",
 			kbArticleTitle = "Child Article Title");
 
@@ -63,18 +61,16 @@ definition {
 			kbChildArticleTitle = "Child Article Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test CanAddMultipleSuggestions {
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
-			kbArticleContent = "Knowledge Base Article1 Content",
-			kbArticleTitle = "Knowledge Base Article1 Title");
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
-			kbArticleContent = "Knowledge Base Article2 Content",
-			kbArticleTitle = "Knowledge Base Article2 Title");
+		for (var articleCount : list "1,2") {
+			KBArticle.addCP(
+				kbArticleContent = "Knowledge Base Article${articleCount} Content",
+				kbArticleTitle = "Knowledge Base Article${articleCount} Title");
+		}
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
@@ -100,7 +96,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanCancelAddingChildArticle {
 		JSONKnowledgeBase.addkBArticle(
@@ -110,7 +106,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.addChildPGViaKBDisplay(
+		KBArticle.addChildPGViaKBDisplay(
 			cancel = "true",
 			kbArticleContent = "Child Article Content",
 			kbArticleTitle = "Child Article Title");
@@ -124,7 +120,7 @@ definition {
 		AssertElementNotPresent(locator1 = "KnowledgeBase#HIERARCHY_NAVIGATION_CHILD");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanDeleteArticle {
 		JSONKnowledgeBase.addkBArticle(
@@ -136,10 +132,10 @@ definition {
 
 		KBArticle.deletePG(kbArticleTitle = "Knowledge Base Article Title");
 
-		KBDisplayWidget.viewDefaultViaKBDisplayPG();
+		KBArticle.viewDefaultViaKBDisplayPG();
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanDeleteChildArticle {
 		JSONKnowledgeBase.addkBArticle(
@@ -163,11 +159,9 @@ definition {
 		KBArticle.deletePG();
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanEditArticle {
-		property portal.acceptance = "true";
-
 		JSONKnowledgeBase.addkBArticle(
 			groupName = "Guest",
 			kbArticleContent = "Knowledge Base Article Content",
@@ -175,19 +169,19 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.editPGViaKBDisplay(
+		KBArticle.editPGViaKBDisplay(
 			kbArticleContentEdit = "Knowledge Base Article Content Edit",
 			kbArticleTitle = "Knowledge Base Article Title",
 			kbArticleTitleEdit = "Knowledge Base Article Title Edit");
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content Edit",
 			kbArticleTitle = "Knowledge Base Article Title Edit");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test CanEditChildArticle {
 		JSONKnowledgeBase.addkBArticle(
@@ -207,18 +201,18 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Parent Title 1",
 			kbChildArticleTitle = "Knowledge Base Article Parent Title 1 Child 1");
 
-		KBDisplayWidget.editPGViaKBDisplay(
+		KBArticle.editPGViaKBDisplay(
 			kbArticleContentEdit = "Knowledge Base Child Article Content Edited 1",
 			kbArticleTitleEdit = "Knowledge Base Article Parent Title 1 Child 1");
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
 
-		KBDisplayWidget.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test CanEditDisplaySettings {
 		JSONKnowledgeBase.addkBArticle(
@@ -228,22 +222,22 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewDefaultKBDisplaySettingsPG();
+		KBArticle.viewDefaultKBDisplaySettingsPG();
 
-		KBDisplayWidget.configureKBDisplaySettingsPG(
+		KBArticle.configureKBDisplaySettingsPG(
 			history = "false",
 			print = "false",
 			subscribe = "false");
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewKBDisplayPG(
+		KBArticle.viewKBDisplayPG(
 			history = "false",
 			print = "false",
 			subscribe = "false");
 	}
 
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CannotViewDuplicateBreadcrumbsWhenAddingParentArticle {
 		JSONKnowledgeBase.addkBArticle(
@@ -260,7 +254,7 @@ definition {
 
 		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Title Child");
 
-		KBDisplayWidget.moveArticleViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Title Child");
+		KBArticle.moveArticleViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Title Child");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -269,7 +263,7 @@ definition {
 		AssertElementNotPresent(locator1 = "//ul[contains(@class,'breadcrumb')]//a[contains(.,'Home')]/following-sibling::ul[contains(@class,'breadcrumb')]");
 	}
 
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanSaveChildArticleAsDraft {
 		JSONKnowledgeBase.addkBArticle(
@@ -279,7 +273,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.addChildPGViaKBDisplay(
+		KBArticle.addChildPGViaKBDisplay(
 			kbArticleContent = "Knowledge Base Child Article Content",
 			kbArticleTitle = "Knowledge Base Child Article Title",
 			saveAsDraft = "true");
@@ -298,7 +292,7 @@ definition {
 			kbStatus = "Draft");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSelectParentArticle {
 		JSONKnowledgeBase.addkBArticle(
@@ -315,16 +309,16 @@ definition {
 
 		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Parent Title 1 Child 1");
 
-		KBDisplayWidget.moveArticleViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1 Child 1");
+		KBArticle.moveArticleViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1 Child 1");
 
-		KBDisplayWidget.selectParentViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+		KBArticle.selectParentViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
 
-		KBDisplayWidget.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
 
-		KBDisplayWidget.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewArticlesInFolder {
 		JSONKnowledgeBase.addkBFolder(
@@ -346,29 +340,26 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content 1",
 			kbArticleTitle = "Knowledge Base Article Title 1");
 
 		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Title 2");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content 2",
 			kbArticleTitle = "Knowledge Base Article Title 2");
 	}
 
-	@description = "Skip the instance for performance improvement."
-	@priority = 3
+	@priority = "3"
 	@refactorneeded
 	test CanViewArticlesWithDifferentSiteScopes {
-		property test.name.skip.portal.instance = "KBDisplayWidget#CanViewArticlesWithDifferentSiteScopes";
-
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page 2");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page 2",
 			widgetName = "Knowledge Base Display");
@@ -388,11 +379,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoScopedPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Knowledge Base",
 			scope = "Knowledge Base Display Page");
-
-		WaitForElementPresent(locator1 = "KnowledgeBase#PAGE_TREE_PANEL_OPENED");
 
 		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
@@ -401,11 +390,9 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoScopedPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Knowledge Base",
 			scope = "Knowledge Base Display Page 2");
-
-		WaitForElementPresent(locator1 = "KnowledgeBase#PAGE_TREE_PANEL_OPENED");
 
 		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
@@ -424,7 +411,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title for Page 2");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test CanViewArticleViaDefaultFriendlyURL {
 		JSONKnowledgeBase.addkBArticle(
@@ -441,14 +428,14 @@ definition {
 
 		var kbArticleFriendlyURL = selenium.getAttribute("//div[@class='kbarticle-navigation']/ul/li/a[contains(.,'Knowledge Base Article2 Title')]@href");
 
-		Navigator.openSpecificURL(url = ${kbArticleFriendlyURL});
+		Navigator.openSpecificURL(url = "${kbArticleFriendlyURL}");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article2 Content",
 			kbArticleTitle = "Knowledge Base Article2 Title");
 	}
 
-	@priority = 3
+	@priority = "3"
 	@refactorneeded
 	test CanViewArticleViaNavigationLinks {
 		JSONKnowledgeBase.addkBArticle(
@@ -468,7 +455,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content 1",
 			kbArticleTitle = "Knowledge Base Article Title 1");
 
@@ -478,7 +465,7 @@ definition {
 
 		Click(locator1 = "KnowledgeBaseArticle#NEXT");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content 2",
 			kbArticleTitle = "Knowledge Base Article Title 2");
 
@@ -488,7 +475,7 @@ definition {
 
 		Click(locator1 = "KnowledgeBaseArticle#NEXT");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content 3",
 			kbArticleTitle = "Knowledge Base Article Title 3");
 
@@ -498,7 +485,7 @@ definition {
 
 		Click(locator1 = "KnowledgeBaseArticle#PREVIOUS");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content 2",
 			kbArticleTitle = "Knowledge Base Article Title 2");
 
@@ -508,7 +495,7 @@ definition {
 
 		Click(locator1 = "KnowledgeBaseArticle#PREVIOUS");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content 1",
 			kbArticleTitle = "Knowledge Base Article Title 1");
 
@@ -517,15 +504,14 @@ definition {
 			previous = "false");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test CanViewArticleViaUserDefinedFriendlyURL {
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title");
-
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
 		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article2 Content",
@@ -534,18 +520,18 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		var kbArticleFriendlyURL = selenium.getAttribute("//div[@class='kbarticle-navigation']/ul/li/a[contains(.,'Knowledge Base Article2 Title')]@href");
+		var kbAricleFriendlyURL = selenium.getAttribute("//div[@class='kbarticle-navigation']/ul/li/a[contains(.,'Knowledge Base Article2 Title')]@href");
 
 		Navigator.gotoPage(pageName = "Home");
 
-		Navigator.openSpecificURL(url = ${kbArticleFriendlyURL});
+		Navigator.openSpecificURL(url = "${kbAricleFriendlyURL}");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article2 Content",
 			kbArticleTitle = "Knowledge Base Article2 Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewChildArticleViaNextLink {
 		JSONKnowledgeBase.addkBArticle(
@@ -561,7 +547,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
 
 		KBArticle.viewViaNextLinkPG(
 			kbArticleContent = "This is a child article. Lengthy articles are no longer summarized on the KB Display portlet, and the Read More link has been deprecated. To access a child article, one must click on the parent article and then click on the child page link found either: under the article navigation, or under the parent article entry.",
@@ -569,7 +555,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-91303. It ensures that the content of a selected root folder is viewable."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanViewContentOfConfiguredRootFolder {
 		JSONKnowledgeBase.addkBFolder(
@@ -592,16 +578,14 @@ definition {
 
 		KBFolder.gotoViaKBDisplayPG(kbFolderName = "KB Folder 1");
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Folder Content 1",
 			kbArticleTitle = "Knowledge Base Article Folder Title 1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewCustomFriendlyURL {
-		property portal.acceptance = "true";
-
 		var portalURL = PropsUtil.get("portal.url");
 
 		for (var num : list "1,2") {
@@ -615,13 +599,13 @@ definition {
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
 		for (var num : list "1,2") {
-			KBDisplayWidget.gotoViaKBDisplayPG(kbArticleTitle = "KB Article Title${num}");
+			KBArticle.gotoViaKBDisplayPG(kbArticleTitle = "KB Article Title${num}");
 
 			AssertLocation(value1 = "${portalURL}/web/guest/knowledge-base-display-page/-/knowledge_base/custom-friendly-url${num}");
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewDefaultFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
@@ -636,38 +620,13 @@ definition {
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
 		for (var num : list "1,2") {
-			KBDisplayWidget.gotoViaKBDisplayPG(kbArticleTitle = "KB Article Title${num}");
+			KBArticle.gotoViaKBDisplayPG(kbArticleTitle = "KB Article Title${num}");
 
 			AssertLocation(value1 = "${portalURL}/web/guest/knowledge-base-display-page/-/knowledge_base/kb-article-title${num}");
 		}
 	}
 
-	@description = "This test ensures that the description can be displayed on the KB display widget after enabling it in the configuration."
-	@priority = 4
-	test CanViewDescriptionAfterEnablingInConfiguration {
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
-			kbArticleContent = "KB Article Content",
-			kbArticleTitle = "KB Article Title",
-			kbDescription = "KB Article Description");
-
-		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
-
-		KBArticle.viewPG(
-			description = "Disabled",
-			kbArticleContent = "KB Article Content",
-			kbArticleTitle = "KB Article Title",
-			kbDescription = "KB Article Description");
-
-		KBArticle.enableDescriptionOnPortlet(portletName = "Knowledge Base Display");
-
-		KBArticle.viewPG(
-			kbArticleContent = "KB Article Content",
-			kbArticleTitle = "KB Article Title",
-			kbDescription = "KB Article Description");
-	}
-
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewEditedKBArticleTitleHistory {
 		JSONKnowledgeBase.addkBArticle(
@@ -687,20 +646,20 @@ definition {
 		KBArticle.viewArticleHistoryPG(
 			kbArticleContent = "KB Article Content Edit",
 			kbArticleContentAddedDiff = "Edit",
-			kbArticleVersionNew = 2,
-			kbArticleVersionOld = 1,
-			viewNoXmlInTitle = "true");
+			kbArticleVersionNew = "2",
+			kbArticleVersionOld = "1",
+			viewNoXMLInTitle = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewEmptyState {
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
-		KBDisplayWidget.viewDefaultViaKBDisplayPG();
+		KBArticle.viewDefaultViaKBDisplayPG();
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewSuggestionsWorkflow {
 		JSONKnowledgeBase.addkBArticle(
@@ -716,7 +675,7 @@ definition {
 
 		KBArticleSuggestion.gotoSuggestionStatusNew(
 			kbSuggestionBody = "Knowledge Base Article1 Suggestion",
-			suggestionCount = 1);
+			suggestionCount = "1");
 
 		KBArticleSuggestion.viewPG(
 			kbSuggestionBody = "Knowledge Base Article1 Suggestion",
@@ -742,8 +701,8 @@ definition {
 			status = "Resolved");
 	}
 
-	@priority = 3
-	@refactordone
+	@priority = "3"
+	@refactorneeded
 	test JavascriptIsEscapedFromArticleTitle {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -753,20 +712,378 @@ definition {
 			kbArticleTitle = '''><img onerror="alert('xss')" src="xx" /><''',
 			specialCharacters = "true");
 
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.addCP(
+			kbArticleContent = "Knowledge Base Article Content",
+			kbArticleTitle = "Knowledge Base Article Title");
+
 		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
 
 		AssertAlertNotPresent();
 
-		KBDisplayWidget.viewViaKBDisplayPG(
+		KBArticle.viewViaKBDisplayPG(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = '''><img onerror="alert('xss')" src="xx" /><''');
 	}
 
-	@priority = 3
+	@priority = "4"
+	@refactorneeded
+	test ViewImportedKBArticlesInHierarchyWithMarkdownFormat {
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.importCP(
+			applyNumericalPrefix = "true",
+			kbZipFile = "KBArticlesWithMarkdown.zip");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 3");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 4");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 5");
+
+		KBArticle.gotoKBChildArticleViaKBDisplayHierarchyNavigationPG(
+			kbArticleTitle = "Knowledge Base Article Parent Title 2",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 2 Child 1");
+
+		KBArticle.viewImageViaContentCmd(
+			kbMarkdownImage = "lds-first-launch-3.png",
+			kbMarkdownImageCaption = "Figure 1: The First Start wizard makes it easy to configure the runtime that ships with Liferay Developer Studio.");
+	}
+
+	@priority = "4"
+	@refactorneeded
+	test ViewImportedKBArticlesWithMultiplePeerHierarchies {
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.importCP(
+			applyNumericalPrefix = "true",
+			kbZipFile = "KBArticlesWithMarkdown.zip");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 3");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 4");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 5");
+	}
+
+	@priority = "4"
+	@refactorneeded
+	test ViewImportedKBArticleWithImagesAsKBAttachments {
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.importCP(
+			applyNumericalPrefix = "true",
+			kbZipFile = "KBArticlesWithMetadata.zip");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.gotoKBChildArticleViaKBDisplayHierarchyNavigationPG(
+			kbArticleTitle = "Knowledge Base Article Parent Title 2",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 2 Child 2");
+
+		KBArticle.viewImageViaContentCmd();
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.viewDefault();
+
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.gotoChildArticleDescriptiveDetails(kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewAttachmentCP(kbArticleTitle = "Knowledge Base Article Parent Title 2 Child 2");
+	}
+
+	@priority = "4"
+	@refactorneeded
+	test ViewImportedKBArticleWithSourceURLMetadata {
+		property test.name.skip.portal.instance = "KBDisplayWidget#ViewImportedKBArticleWithSourceURLMetadata";
+
+		SystemSettings.openSystemSettingsAdmin();
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Knowledge Base",
+			configurationName = "Service",
+			configurationScope = "Site Scope");
+
+		FormFields.enableCheckbox(fieldName = "sourceURLEnabled");
+
+		SystemSettings.saveConfiguration();
+
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.importCP(
+			applyNumericalPrefix = "true",
+			kbZipFile = "KBArticlesWithMetadata.zip");
+
+		KBArticle.gotoViaKBAdminCP(
+			hasChildArticle = "true",
+			kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewChildArticleCP(
+			kbChildArticleContent = "Using tabs is a good way to keep your portlet’s UI clean and organized.",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 2 Child 2");
+
+		KBArticle.viewSourceURLCP(
+			kbArticleSourceURL = "https://github.com/liferay/liferay-docs/blob/master/develop/tutorials/articles/liferayui-taglibs/knowledge-base-article-parent-title-2-child-2.markdown",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 2 Child 2");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.viewSourceURLPG(
+			kbArticleSourceURL = "https://github.com/liferay/liferay-docs/blob/master/develop/tutorials/articles/adt/intro.markdown",
+			kbArticleTitle = "Knowledge Base Article Parent Title 1 Child 1");
+	}
+
+	@priority = "3"
+	@refactorneeded
+	test ViewKBArticlesWithTheSamePriorityViaNavigationLinks {
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		for (var kbCount : list "1,2,3") {
+			KBArticle.addCP(
+				kbArticleContent = "Knowledge Base Article Parent Content ${kbCount}",
+				kbArticleTitle = "Knowledge Base Article Parent Title ${kbCount}");
+		}
+
+		for (var kbCount : list "1,2,3") {
+			KBArticle.viewKBArticlePriorityCP(
+				kbArticleTitle = "Knowledge Base Article Parent Title ${kbCount}",
+				kbPriority = "${kbCount}.0");
+		}
+
+		KBArticle.viewKBArticlePriorityCP(
+			kbArticleTitle = "Knowledge Base Article Parent Title 2",
+			kbPriority = "2.0");
+
+		KBArticle.viewKBArticlePriorityCP(
+			kbArticleTitle = "Knowledge Base Article Parent Title 3",
+			kbPriority = "3.0");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 1",
+			kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.gotoNextArticlePG(kbDisplayNextArticle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 2",
+			kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.gotoNextArticlePG(kbDisplayNextArticle = "Knowledge Base Article Parent Title 3");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 3",
+			kbArticleTitle = "Knowledge Base Article Parent Title 3");
+
+		KBArticle.gotoPreviousArticle(kbDisplayPreviousArticle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 2",
+			kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.gotoPreviousArticle(kbDisplayPreviousArticle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 1",
+			kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 1",
+			kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.gotoNextArticlePG(kbDisplayNextArticle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 2",
+			kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.gotoNextArticlePG(kbDisplayNextArticle = "Knowledge Base Article Parent Title 3");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 3",
+			kbArticleTitle = "Knowledge Base Article Parent Title 3");
+
+		KBArticle.gotoPreviousArticle(kbDisplayPreviousArticle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 2",
+			kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.gotoPreviousArticle(kbDisplayPreviousArticle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 1",
+			kbArticleTitle = "Knowledge Base Article Parent Title 1");
+	}
+
+	@priority = "4"
+	@refactorneeded
+	test ViewKBArticleWithKBChildArticleHierarchyNavigation {
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		for (var articleCount : list "1,2,3") {
+			KBArticle.addCP(
+				kbArticleContent = "Knowledge Base Article Parent Content ${articleCount}",
+				kbArticleTitle = "Knowledge Base Article Parent Title ${articleCount}");
+		}
+
+		for (var articleCount : list "1,2,3") {
+			KBArticle.addChildArticleViaKBAdmin(
+				kbArticleTitle = "Knowledge Base Article Parent Title 1",
+				kbChildArticleContent = "Knowledge Base Article Parent Content 1 Child ${articleCount}",
+				kbChildArticleTitle = "Knowledge Base Article Parent Title 1 Child ${articleCount}");
+		}
+
+		KBArticle.addChildArticleViaKBAdmin(
+			kbArticleTitle = "Knowledge Base Article Parent Title 2",
+			kbChildArticleContent = "Knowledge Base Article Parent Content 2 Child 1",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 2 Child 1");
+
+		KBArticle.addChildArticleViaKBAdmin(
+			kbArticleTitle = "Knowledge Base Article Parent Title 2",
+			kbChildArticleContent = "Knowledge Base Article Parent Content 2 Child 2",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 2 Child 2");
+
+		KBArticle.addChildArticleViaKBAdmin(
+			kbArticleTitle = "Knowledge Base Article Parent Title 3",
+			kbChildArticleContent = "Knowledge Base Article Parent Content 3 Child 1",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 3 Child 1");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 1",
+			kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewParentArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 1");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 2");
+
+		KBArticle.viewChildArticleHierarchyViaKBDisplayPG(kbArticleTitle = "Knowledge Base Article Parent Title 3");
+
+		KBArticle.gotoKBChildArticleViaKBDisplayHierarchyNavigationPG(
+			kbArticleTitle = "Knowledge Base Article Parent Title 2",
+			kbChildArticleTitle = "Knowledge Base Article Parent Title 2 Child 2");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Parent Content 2 Child 2",
+			kbArticleTitle = "Knowledge Base Article Parent Title 2 Child 2");
+	}
+
+	@priority = "3"
+	@refactorneeded
+	test ViewKBArticleWithTheSameTitleAndPriorityInDifferentFolders {
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBFolder.addCP(
+			kbFolderDescription = "KB Folder Description",
+			kbFolderName = "KB Root Folder");
+
+		KBFolder.gotoCP(kbFolderName = "KB Root Folder");
+
+		KBFolder.addCP(
+			kbFolderDescription = "KB Folder 1",
+			kbFolderName = "KB Folder 1");
+
+		KBFolder.gotoCP(kbFolderName = "KB Folder 1");
+
+		KBArticle.addCP(
+			kbArticleContent = "Knowledge Base Article Content 1",
+			kbArticleTitle = "Knowledge Base Article Title 1");
+
+		KBArticle.addCP(
+			kbArticleContent = "Knowledge Base Article Content 2",
+			kbArticleTitle = "Knowledge Base Article Title 2");
+
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBFolder.gotoCP(kbFolderName = "KB Root Folder");
+
+		KBFolder.addCP(
+			kbFolderDescription = "KB Folder 2",
+			kbFolderName = "KB Folder 2");
+
+		KBFolder.gotoCP(kbFolderName = "KB Folder 2");
+
+		KBArticle.addCP(
+			kbArticleContent = "Knowledge Base Article Content 1",
+			kbArticleTitle = "Knowledge Base Article Title 1");
+
+		KBArticle.addCP(
+			kbArticleContent = "Knowledge Base Article Content 2",
+			kbArticleTitle = "Knowledge Base Article Title 2");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.configureKBFolderDisplay(kbFolderName = "KB Root Folder");
+
+		Navigator.gotoPage(pageName = "Knowledge Base Display Page");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Title 1");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Content 1",
+			kbArticleTitle = "Knowledge Base Article Title 1");
+
+		KBArticle.gotoKBArticleViaKBDisplayHierarchyNavigationPG(kbArticleTitle = "Knowledge Base Article Title 2");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Content 2",
+			kbArticleTitle = "Knowledge Base Article Title 2");
+
+		KBFolder.gotoViaKBDisplayPG(kbFolderName = "KB Folder 2");
+
+		KBArticle.viewViaKBDisplayPG(
+			kbArticleContent = "Knowledge Base Article Content 2",
+			kbArticleTitle = "Knowledge Base Article Title 2");
+	}
+
+	@priority = "3"
 	@refactorneeded
 	test ViewNoDuplicateKBSuggestionAfterRefresh {
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title");
 
@@ -788,29 +1105,6 @@ definition {
 			kbSuggestionUserName = "Test Test",
 			kbThereAreSuggestionsLink = "There is one suggestion. (1 Pending)",
 			status = "New");
-	}
-
-	@description = "This test ensures that the blogs widgets follow W3C accessibility standards."
-	@ignore = "true"
-	@priority = 4
-	test WidgetsFollowAccessibilityStandards {
-		JSONLayout.addPublicLayout(
-			groupName = "Guest",
-			layoutName = "Knowledge Base Display Page");
-
-		for (var widgetName : list "Knowledge Base Display,Knowledge Base Article,Knowledge Base Search,Knowledge Base Section") {
-			JSONLayout.addWidgetToPublicLayout(
-				column = 1,
-				groupName = "Guest",
-				layoutName = "Knowledge Base Display Page",
-				widgetName = ${widgetName});
-		}
-
-		Navigator.openSitePage(
-			pageName = "Knowledge Base Display Page",
-			siteName = "Guest");
-
-		AssertAccessible();
 	}
 
 }

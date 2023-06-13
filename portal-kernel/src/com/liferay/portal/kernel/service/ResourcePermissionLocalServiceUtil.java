@@ -166,16 +166,18 @@ public class ResourcePermissionLocalServiceUtil {
 	 optionally an empty string if no instance exists
 	 * @param portletActions whether to associate portlet actions with the
 	 resource
+	 * @param addGroupPermissions whether to add group permissions
+	 * @param addGuestPermissions whether to add guest permissions
 	 */
 	public static void addResourcePermissions(
 			long companyId, long groupId, long userId, String name,
-			String primKey, boolean portletActions,
-			ServiceContext serviceContext)
+			String primKey, boolean portletActions, boolean addGroupPermissions,
+			boolean addGuestPermissions)
 		throws PortalException {
 
 		getService().addResourcePermissions(
 			companyId, groupId, userId, name, primKey, portletActions,
-			serviceContext);
+			addGroupPermissions, addGuestPermissions);
 	}
 
 	/**
@@ -204,11 +206,11 @@ public class ResourcePermissionLocalServiceUtil {
 	}
 
 	public static void copyModelResourcePermissions(
-			long companyId, String name, long sourcePrimKey, long targetPrimKey)
+			long companyId, String name, long oldPrimKey, long newPrimKey)
 		throws PortalException {
 
 		getService().copyModelResourcePermissions(
-			companyId, name, sourcePrimKey, targetPrimKey);
+			companyId, name, oldPrimKey, newPrimKey);
 	}
 
 	/**

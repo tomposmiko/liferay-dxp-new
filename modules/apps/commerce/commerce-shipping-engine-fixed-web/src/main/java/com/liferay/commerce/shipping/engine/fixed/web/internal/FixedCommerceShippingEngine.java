@@ -29,17 +29,12 @@ import com.liferay.commerce.service.CommerceAddressRestrictionLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionLocalService;
-import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionQualifierLocalService;
-import com.liferay.commerce.shipping.engine.fixed.util.comparator.CommerceShippingFixedOptionPriorityComparator;
-import com.liferay.commerce.shipping.engine.fixed.web.internal.util.CommerceShippingFixedOptionEngineUtil;
 import com.liferay.commerce.util.CommerceShippingHelper;
-import com.liferay.commerce.util.comparator.CommerceShippingOptionPriorityComparator;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.math.BigDecimal;
@@ -58,6 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.shipping.engine.key=" + FixedCommerceShippingEngine.KEY,
 	service = CommerceShippingEngine.class
 )
@@ -81,11 +77,11 @@ public class FixedCommerceShippingEngine implements CommerceShippingEngine {
 
 		try {
 			commerceShippingOptions = _getCommerceShippingOptions(
-				false, commerceOrder, locale);
+				commerceOrder.getGroupId(), commerceOrder, locale);
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -94,35 +90,13 @@ public class FixedCommerceShippingEngine implements CommerceShippingEngine {
 
 	@Override
 	public String getDescription(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			_getResourceBundle(locale), "fixed-shipping-description");
 	}
 
 	@Override
-	public List<CommerceShippingOption> getEnabledCommerceShippingOptions(
-			CommerceContext commerceContext, CommerceOrder commerceOrder,
-			Locale locale)
-		throws CommerceShippingEngineException {
-
-		List<CommerceShippingOption> commerceShippingOptions =
-			new ArrayList<>();
-
-		try {
-			commerceShippingOptions = _getCommerceShippingOptions(
-				true, commerceOrder, locale);
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		return commerceShippingOptions;
-	}
-
-	@Override
 	public String getName(Locale locale) {
-		return _language.get(_getResourceBundle(locale), "flat-rate");
+		return LanguageUtil.get(_getResourceBundle(locale), "flat-rate");
 	}
 
 	private List<CommerceShippingFixedOption> _getCommerceShippingFixedOptions(
@@ -139,13 +113,11 @@ public class FixedCommerceShippingEngine implements CommerceShippingEngine {
 		return _commerceShippingFixedOptionLocalService.
 			getCommerceShippingFixedOptions(
 				commerceShippingMethod.getCommerceShippingMethodId(),
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new CommerceShippingFixedOptionPriorityComparator());
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 	}
 
 	private List<CommerceShippingOption> _getCommerceShippingOptions(
-			boolean checkEligibility, CommerceOrder commerceOrder,
-			Locale locale)
+			long groupId, CommerceOrder commerceOrder, Locale locale)
 		throws PortalException {
 
 		List<CommerceShippingOption> commerceShippingOptions =
@@ -159,21 +131,8 @@ public class FixedCommerceShippingEngine implements CommerceShippingEngine {
 			commerceCountryId = commerceAddress.getCountryId();
 		}
 
-		List<CommerceShippingFixedOption> commerceShippingFixedOptions = null;
-
-		if (checkEligibility) {
-			commerceShippingFixedOptions =
-				CommerceShippingFixedOptionEngineUtil.
-					getEligibleCommerceShippingFixedOptions(
-						commerceOrder.getCommerceOrderTypeId(),
-						_commerceShippingFixedOptionQualifierLocalService,
-						_getCommerceShippingFixedOptions(
-							commerceOrder.getGroupId()));
-		}
-		else {
-			commerceShippingFixedOptions = _getCommerceShippingFixedOptions(
-				commerceOrder.getGroupId());
-		}
+		List<CommerceShippingFixedOption> commerceShippingFixedOptions =
+			_getCommerceShippingFixedOptions(groupId);
 
 		for (CommerceShippingFixedOption commerceShippingFixedOption :
 				commerceShippingFixedOptions) {
@@ -189,14 +148,11 @@ public class FixedCommerceShippingEngine implements CommerceShippingEngine {
 				continue;
 			}
 
-			String key = commerceShippingFixedOption.getKey();
 			String name = commerceShippingFixedOption.getName(locale);
-			double priority = commerceShippingFixedOption.getPriority();
 
 			if (_commerceShippingHelper.isFreeShipping(commerceOrder)) {
 				commerceShippingOptions.add(
-					new CommerceShippingOption(
-						BigDecimal.ZERO, KEY, key, name, priority));
+					new CommerceShippingOption(name, name, BigDecimal.ZERO));
 
 				continue;
 			}
@@ -229,12 +185,10 @@ public class FixedCommerceShippingEngine implements CommerceShippingEngine {
 			}
 
 			commerceShippingOptions.add(
-				new CommerceShippingOption(amount, KEY, key, name, priority));
+				new CommerceShippingOption(name, name, amount));
 		}
 
-		return ListUtil.sort(
-			commerceShippingOptions,
-			new CommerceShippingOptionPriorityComparator());
+		return commerceShippingOptions;
 	}
 
 	private ResourceBundle _getResourceBundle(Locale locale) {
@@ -260,17 +214,10 @@ public class FixedCommerceShippingEngine implements CommerceShippingEngine {
 		_commerceShippingFixedOptionLocalService;
 
 	@Reference
-	private CommerceShippingFixedOptionQualifierLocalService
-		_commerceShippingFixedOptionQualifierLocalService;
-
-	@Reference
 	private CommerceShippingHelper _commerceShippingHelper;
 
 	@Reference
 	private CommerceShippingMethodLocalService
 		_commerceShippingMethodLocalService;
-
-	@Reference
-	private Language _language;
 
 }

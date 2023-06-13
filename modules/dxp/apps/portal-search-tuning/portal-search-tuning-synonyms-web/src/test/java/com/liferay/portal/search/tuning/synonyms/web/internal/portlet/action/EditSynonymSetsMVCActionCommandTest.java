@@ -23,6 +23,8 @@ import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSet;
 import com.liferay.portal.search.tuning.synonyms.web.internal.synchronizer.IndexToFilterSynchronizer;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.util.Optional;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
@@ -34,6 +36,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -49,6 +52,8 @@ public class EditSynonymSetsMVCActionCommandTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_editSynonymSetsMVCActionCommand =
 			new EditSynonymSetsMVCActionCommand();
 
@@ -88,17 +93,22 @@ public class EditSynonymSetsMVCActionCommandTest
 	}
 
 	@Test
-	public void testGetSynonymSet() {
-		Assert.assertNull(
-			_editSynonymSetsMVCActionCommand.getSynonymSet(
-				Mockito.mock(SynonymSetIndexName.class), _actionRequest));
+	public void testGetSynonymSetOptional() {
+		Optional<SynonymSet> synonymSetOptional =
+			_editSynonymSetsMVCActionCommand.getSynonymSetOptional(
+				Mockito.mock(SynonymSetIndexName.class), _actionRequest);
+
+		Assert.assertFalse(synonymSetOptional.isPresent());
 
 		setUpPortletRequestParameterValue(
 			_actionRequest, "synonymSetId", "synonymSetIdValue");
 		setUpSynonymSetIndexReader("id", "car,automobile");
 
-		SynonymSet synonymSet = _editSynonymSetsMVCActionCommand.getSynonymSet(
-			Mockito.mock(SynonymSetIndexName.class), _actionRequest);
+		synonymSetOptional =
+			_editSynonymSetsMVCActionCommand.getSynonymSetOptional(
+				Mockito.mock(SynonymSetIndexName.class), _actionRequest);
+
+		SynonymSet synonymSet = synonymSetOptional.get();
 
 		Assert.assertEquals("car,automobile", synonymSet.getSynonyms());
 		Assert.assertEquals("id", synonymSet.getSynonymSetDocumentId());
@@ -111,49 +121,60 @@ public class EditSynonymSetsMVCActionCommandTest
 		Mockito.verify(
 			_indexToFilterSynchronizer, Mockito.times(1)
 		).copyToFilter(
-			Mockito.any(), Mockito.nullable(String.class), Mockito.anyBoolean()
+			Mockito.anyObject(), Mockito.anyString(), Mockito.anyBoolean()
 		);
 	}
 
 	@Test
 	public void testUpdateSynonymSetIndex() throws PortalException {
+		Optional<SynonymSet> synonymSetOptional = Optional.empty();
+
 		_editSynonymSetsMVCActionCommand.updateSynonymSetIndex(
-			Mockito.mock(SynonymSetIndexName.class), "car,automobile", null);
+			Mockito.mock(SynonymSetIndexName.class), "car,automobile",
+			synonymSetOptional);
 
 		Mockito.verify(
 			synonymSetStorageAdapter, Mockito.times(1)
 		).create(
-			Mockito.any(), Mockito.any()
+			Mockito.anyObject(), Mockito.anyObject()
 		);
 
 		SynonymSet.SynonymSetBuilder synonymSetBuilder =
 			new SynonymSet.SynonymSetBuilder();
 
-		_editSynonymSetsMVCActionCommand.updateSynonymSetIndex(
-			Mockito.mock(SynonymSetIndexName.class), "car,automobile",
+		synonymSetOptional = Optional.of(
 			synonymSetBuilder.synonyms(
 				"car,atumobile"
 			).synonymSetDocumentId(
 				"id-1"
 			).build());
 
+		_editSynonymSetsMVCActionCommand.updateSynonymSetIndex(
+			Mockito.mock(SynonymSetIndexName.class), "car,automobile",
+			synonymSetOptional);
+
 		Mockito.verify(
 			synonymSetStorageAdapter, Mockito.times(1)
 		).update(
-			Mockito.any(), Mockito.any()
+			Mockito.anyObject(), Mockito.anyObject()
 		);
 	}
 
-	private final ActionRequest _actionRequest = Mockito.mock(
-		ActionRequest.class);
-	private final ActionResponse _actionResponse = Mockito.mock(
-		ActionResponse.class);
+	@Mock
+	private ActionRequest _actionRequest;
+
+	@Mock
+	private ActionResponse _actionResponse;
+
 	private EditSynonymSetsMVCActionCommand _editSynonymSetsMVCActionCommand;
-	private final HttpServletRequest _httpServletRequest = Mockito.mock(
-		HttpServletRequest.class);
-	private final IndexNameBuilder _indexNameBuilder = Mockito.mock(
-		IndexNameBuilder.class);
-	private final IndexToFilterSynchronizer _indexToFilterSynchronizer =
-		Mockito.mock(IndexToFilterSynchronizer.class);
+
+	@Mock
+	private HttpServletRequest _httpServletRequest;
+
+	@Mock
+	private IndexNameBuilder _indexNameBuilder;
+
+	@Mock
+	private IndexToFilterSynchronizer _indexToFilterSynchronizer;
 
 }

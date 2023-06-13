@@ -15,7 +15,6 @@
 package com.liferay.object.admin.rest.client.serdes.v1_0;
 
 import com.liferay.object.admin.rest.client.dto.v1_0.ObjectField;
-import com.liferay.object.admin.rest.client.dto.v1_0.ObjectFieldSetting;
 import com.liferay.object.admin.rest.client.json.BaseJSONParser;
 
 import java.util.Iterator;
@@ -56,20 +55,6 @@ public class ObjectFieldSerDes {
 
 		sb.append("{");
 
-		if (objectField.getDBType() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"DBType\": ");
-
-			sb.append("\"");
-
-			sb.append(objectField.getDBType());
-
-			sb.append("\"");
-		}
-
 		if (objectField.getActions() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -78,48 +63,6 @@ public class ObjectFieldSerDes {
 			sb.append("\"actions\": ");
 
 			sb.append(_toJSON(objectField.getActions()));
-		}
-
-		if (objectField.getBusinessType() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"businessType\": ");
-
-			sb.append("\"");
-
-			sb.append(objectField.getBusinessType());
-
-			sb.append("\"");
-		}
-
-		if (objectField.getDefaultValue() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"defaultValue\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(objectField.getDefaultValue()));
-
-			sb.append("\"");
-		}
-
-		if (objectField.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(objectField.getExternalReferenceCode()));
-
-			sb.append("\"");
 		}
 
 		if (objectField.getId() != null) {
@@ -176,22 +119,6 @@ public class ObjectFieldSerDes {
 			sb.append(_toJSON(objectField.getLabel()));
 		}
 
-		if (objectField.getListTypeDefinitionExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"listTypeDefinitionExternalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(
-				_escape(
-					objectField.getListTypeDefinitionExternalReferenceCode()));
-
-			sb.append("\"");
-		}
-
 		if (objectField.getListTypeDefinitionId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -200,16 +127,6 @@ public class ObjectFieldSerDes {
 			sb.append("\"listTypeDefinitionId\": ");
 
 			sb.append(objectField.getListTypeDefinitionId());
-		}
-
-		if (objectField.getLocalized() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"localized\": ");
-
-			sb.append(objectField.getLocalized());
 		}
 
 		if (objectField.getName() != null) {
@@ -226,43 +143,6 @@ public class ObjectFieldSerDes {
 			sb.append("\"");
 		}
 
-		if (objectField.getObjectFieldSettings() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectFieldSettings\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < objectField.getObjectFieldSettings().length;
-				 i++) {
-
-				sb.append(
-					String.valueOf(objectField.getObjectFieldSettings()[i]));
-
-				if ((i + 1) < objectField.getObjectFieldSettings().length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (objectField.getRelationshipType() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"relationshipType\": ");
-
-			sb.append("\"");
-
-			sb.append(objectField.getRelationshipType());
-
-			sb.append("\"");
-		}
-
 		if (objectField.getRequired() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -271,26 +151,6 @@ public class ObjectFieldSerDes {
 			sb.append("\"required\": ");
 
 			sb.append(objectField.getRequired());
-		}
-
-		if (objectField.getState() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"state\": ");
-
-			sb.append(objectField.getState());
-		}
-
-		if (objectField.getSystem() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"system\": ");
-
-			sb.append(objectField.getSystem());
 		}
 
 		if (objectField.getType() != null) {
@@ -326,43 +186,11 @@ public class ObjectFieldSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (objectField.getDBType() == null) {
-			map.put("DBType", null);
-		}
-		else {
-			map.put("DBType", String.valueOf(objectField.getDBType()));
-		}
-
 		if (objectField.getActions() == null) {
 			map.put("actions", null);
 		}
 		else {
 			map.put("actions", String.valueOf(objectField.getActions()));
-		}
-
-		if (objectField.getBusinessType() == null) {
-			map.put("businessType", null);
-		}
-		else {
-			map.put(
-				"businessType", String.valueOf(objectField.getBusinessType()));
-		}
-
-		if (objectField.getDefaultValue() == null) {
-			map.put("defaultValue", null);
-		}
-		else {
-			map.put(
-				"defaultValue", String.valueOf(objectField.getDefaultValue()));
-		}
-
-		if (objectField.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(objectField.getExternalReferenceCode()));
 		}
 
 		if (objectField.getId() == null) {
@@ -404,16 +232,6 @@ public class ObjectFieldSerDes {
 			map.put("label", String.valueOf(objectField.getLabel()));
 		}
 
-		if (objectField.getListTypeDefinitionExternalReferenceCode() == null) {
-			map.put("listTypeDefinitionExternalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"listTypeDefinitionExternalReferenceCode",
-				String.valueOf(
-					objectField.getListTypeDefinitionExternalReferenceCode()));
-		}
-
 		if (objectField.getListTypeDefinitionId() == null) {
 			map.put("listTypeDefinitionId", null);
 		}
@@ -423,13 +241,6 @@ public class ObjectFieldSerDes {
 				String.valueOf(objectField.getListTypeDefinitionId()));
 		}
 
-		if (objectField.getLocalized() == null) {
-			map.put("localized", null);
-		}
-		else {
-			map.put("localized", String.valueOf(objectField.getLocalized()));
-		}
-
 		if (objectField.getName() == null) {
 			map.put("name", null);
 		}
@@ -437,43 +248,11 @@ public class ObjectFieldSerDes {
 			map.put("name", String.valueOf(objectField.getName()));
 		}
 
-		if (objectField.getObjectFieldSettings() == null) {
-			map.put("objectFieldSettings", null);
-		}
-		else {
-			map.put(
-				"objectFieldSettings",
-				String.valueOf(objectField.getObjectFieldSettings()));
-		}
-
-		if (objectField.getRelationshipType() == null) {
-			map.put("relationshipType", null);
-		}
-		else {
-			map.put(
-				"relationshipType",
-				String.valueOf(objectField.getRelationshipType()));
-		}
-
 		if (objectField.getRequired() == null) {
 			map.put("required", null);
 		}
 		else {
 			map.put("required", String.valueOf(objectField.getRequired()));
-		}
-
-		if (objectField.getState() == null) {
-			map.put("state", null);
-		}
-		else {
-			map.put("state", String.valueOf(objectField.getState()));
-		}
-
-		if (objectField.getSystem() == null) {
-			map.put("system", null);
-		}
-		else {
-			map.put("system", String.valueOf(objectField.getSystem()));
 		}
 
 		if (objectField.getType() == null) {
@@ -504,38 +283,11 @@ public class ObjectFieldSerDes {
 			ObjectField objectField, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "DBType")) {
-				if (jsonParserFieldValue != null) {
-					objectField.setDBType(
-						ObjectField.DBType.create(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "actions")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
 				if (jsonParserFieldValue != null) {
 					objectField.setActions(
 						(Map)ObjectFieldSerDes.toMap(
 							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "businessType")) {
-				if (jsonParserFieldValue != null) {
-					objectField.setBusinessType(
-						ObjectField.BusinessType.create(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "defaultValue")) {
-				if (jsonParserFieldValue != null) {
-					objectField.setDefaultValue((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					objectField.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -569,15 +321,6 @@ public class ObjectFieldSerDes {
 				}
 			}
 			else if (Objects.equals(
-						jsonParserFieldName,
-						"listTypeDefinitionExternalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					objectField.setListTypeDefinitionExternalReferenceCode(
-						(String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(
 						jsonParserFieldName, "listTypeDefinitionId")) {
 
 				if (jsonParserFieldValue != null) {
@@ -585,56 +328,14 @@ public class ObjectFieldSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "localized")) {
-				if (jsonParserFieldValue != null) {
-					objectField.setLocalized((Boolean)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					objectField.setName((String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(
-						jsonParserFieldName, "objectFieldSettings")) {
-
-				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ObjectFieldSetting[] objectFieldSettingsArray =
-						new ObjectFieldSetting[jsonParserFieldValues.length];
-
-					for (int i = 0; i < objectFieldSettingsArray.length; i++) {
-						objectFieldSettingsArray[i] =
-							ObjectFieldSettingSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
-					objectField.setObjectFieldSettings(
-						objectFieldSettingsArray);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "relationshipType")) {
-				if (jsonParserFieldValue != null) {
-					objectField.setRelationshipType(
-						ObjectField.RelationshipType.create(
-							(String)jsonParserFieldValue));
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "required")) {
 				if (jsonParserFieldValue != null) {
 					objectField.setRequired((Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "state")) {
-				if (jsonParserFieldValue != null) {
-					objectField.setState((Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "system")) {
-				if (jsonParserFieldValue != null) {
-					objectField.setSystem((Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {

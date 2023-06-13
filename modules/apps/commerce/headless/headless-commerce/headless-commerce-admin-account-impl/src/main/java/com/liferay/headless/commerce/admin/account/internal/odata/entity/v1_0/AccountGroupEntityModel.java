@@ -20,6 +20,9 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.StringEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Andrea Sbarra
@@ -27,9 +30,12 @@ import java.util.Map;
 public class AccountGroupEntityModel implements EntityModel {
 
 	public AccountGroupEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = Stream.of(
 			new StringEntityField(
-				"name", locale -> Field.getSortableFieldName(Field.NAME)));
+				"name", locale -> Field.getSortableFieldName(Field.NAME))
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

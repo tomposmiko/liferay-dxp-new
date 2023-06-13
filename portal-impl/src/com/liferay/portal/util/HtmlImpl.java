@@ -27,9 +27,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.htmlparser.jericho.Source;
+
 /**
  * Provides the implementation of the HTML utility interface for escaping,
- * replacing, and stripping HTML text. This class uses XSS
+ * rendering, replacing, and stripping HTML text. This class uses XSS
  * recommendations from <a
  * href="http://www.owasp.org/index.php/Cross_Site_Scripting#How_to_Protect_Yourself">http://www.owasp.org/index.php/Cross_Site_Scripting#How_to_Protect_Yourself</a>
  * when escaping HTML text.
@@ -42,6 +44,37 @@ import java.util.regex.Pattern;
  * @author Shuyang Zhou
  */
 public class HtmlImpl implements Html {
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #escapeAttribute(String)}
+	 */
+	@Deprecated
+	public static final int ESCAPE_MODE_ATTRIBUTE = 1;
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #escapeCSS(String)}
+	 */
+	@Deprecated
+	public static final int ESCAPE_MODE_CSS = 2;
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #escapeJS(String)}
+	 */
+	@Deprecated
+	public static final int ESCAPE_MODE_JS = 3;
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #escape(String)}
+	 */
+	@Deprecated
+	public static final int ESCAPE_MODE_TEXT = 4;
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #escapeURL(String)}
+	 */
+	@Deprecated
+	public static final int ESCAPE_MODE_URL = 5;
 
 	/**
 	 * Generates a string with the data-* attributes generated from the keys and
@@ -164,6 +197,56 @@ public class HtmlImpl implements Html {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Escapes the input text as a hexadecimal value, based on the mode (type).
+	 * The encoding types include: {@link #ESCAPE_MODE_ATTRIBUTE}, {@link
+	 * #ESCAPE_MODE_CSS}, {@link #ESCAPE_MODE_JS}, {@link #ESCAPE_MODE_TEXT},
+	 * and {@link #ESCAPE_MODE_URL}.
+	 *
+	 * <p>
+	 * Note that <code>escape(text, ESCAPE_MODE_TEXT)</code> returns the same as
+	 * <code>escape(text)</code>.
+	 * </p>
+	 *
+	 * @param      text the text to escape
+	 * @param      mode the encoding type
+	 * @return     the escaped hexadecimal value of the input text, based on the
+	 *             mode, or <code>null</code> if the text is <code>null</code>
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #escapeAttribute(String)}, {@link #escapeCSS(String)}, {@link
+	 *             #escapeJS(String)}, {@link #escape(String)}, {@link
+	 *             #escapeURL(String)}
+	 */
+	@Deprecated
+	@Override
+	public String escape(String text, int mode) {
+		if (text == null) {
+			return null;
+		}
+
+		if (text.length() == 0) {
+			return StringPool.BLANK;
+		}
+
+		if (mode == ESCAPE_MODE_ATTRIBUTE) {
+			return escapeAttribute(text);
+		}
+
+		if (mode == ESCAPE_MODE_JS) {
+			return escapeJS(text);
+		}
+
+		if (mode == ESCAPE_MODE_CSS) {
+			return escapeCSS(text);
+		}
+
+		if (mode == ESCAPE_MODE_URL) {
+			return escapeURL(text);
+		}
+
+		return escape(text);
 	}
 
 	/**
@@ -499,6 +582,30 @@ public class HtmlImpl implements Html {
 			StringPool.QUOTE, xPathAttribute, StringPool.QUOTE);
 	}
 
+	/**
+	 * Extracts the raw text from the HTML input, compressing its whitespace and
+	 * removing all attributes, scripts, and styles.
+	 *
+	 * <p>
+	 * For example, raw text returned by this method can be stored in a search
+	 * index.
+	 * </p>
+	 *
+	 * @param  html the HTML text
+	 * @return the raw text from the HTML input, or <code>null</code> if the
+	 *         HTML input is <code>null</code>
+	 */
+	@Override
+	public String extractText(String html) {
+		if (html == null) {
+			return null;
+		}
+
+		Source source = new Source(html);
+
+		return String.valueOf(source.getTextExtractor());
+	}
+
 	@Override
 	public String fromInputSafe(String text) {
 		return StringUtil.replace(
@@ -554,6 +661,33 @@ public class HtmlImpl implements Html {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Renders the HTML content into text. This provides a human readable
+	 * version of the content that is modeled on the way Mozilla
+	 * Thunderbird&reg; and other email clients provide an automatic conversion
+	 * of HTML content to text in their alternative MIME encoding of emails.
+	 *
+	 * <p>
+	 * Using the default settings, the output complies with the
+	 * <code>Text/Plain; Format=Flowed (DelSp=No)</code> protocol described in
+	 * <a href="http://tools.ietf.org/html/rfc3676">RFC-3676</a>.
+	 * </p>
+	 *
+	 * @param  html the HTML text
+	 * @return the rendered HTML text, or <code>null</code> if the HTML text is
+	 *         <code>null</code>
+	 */
+	@Override
+	public String render(String html) {
+		if (html == null) {
+			return null;
+		}
+
+		Source source = new Source(html);
+
+		return String.valueOf(source.getRenderer());
 	}
 
 	/**

@@ -24,6 +24,7 @@ import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMFieldLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Preston Crary
  */
 @Component(
+	immediate = true,
 	property = {"data.storage.type=default", "service.ranking:Integer=100"},
 	service = DataStorage.class
 )
@@ -54,10 +56,10 @@ public class DefaultDataStorage implements DataStorage {
 		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
 			dataDefinitionId);
 
-		return DataStorageUtil.toDataRecordValues(
-			_ddmFieldLocalService.getDDMFormValues(
-				ddmStructure.getFullHierarchyDDMForm(), dataStorageId),
-			ddmStructure);
+		DDMFormValues ddmFormValues = _ddmFieldLocalService.getDDMFormValues(
+			ddmStructure.getFullHierarchyDDMForm(), dataStorageId);
+
+		return DataStorageUtil.toDataRecordValues(ddmFormValues, ddmStructure);
 	}
 
 	@Override

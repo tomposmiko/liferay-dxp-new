@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Roberto Díaz
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class CompanyModelListener extends BaseModelListener<Company> {
 
 	@Override
@@ -50,7 +50,13 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setMicroblogsEntryLocalService(
+		MicroblogsEntryLocalService microblogsEntryLocalService) {
+
+		_microblogsEntryLocalService = microblogsEntryLocalService;
+	}
+
 	private MicroblogsEntryLocalService _microblogsEntryLocalService;
 
 }

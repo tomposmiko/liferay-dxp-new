@@ -14,8 +14,9 @@
 
 package com.liferay.commerce.payment.method.authorize.net.internal;
 
+import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
-import com.liferay.commerce.constants.CommercePaymentMethodConstants;
+import com.liferay.commerce.constants.CommercePaymentConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.payment.method.CommercePaymentMethod;
@@ -30,7 +31,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.util.Portal;
@@ -68,6 +69,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.payment.engine.method.key=" + AuthorizeNetCommercePaymentMethod.KEY,
 	service = CommercePaymentMethod.class
 )
@@ -99,14 +101,13 @@ public class AuthorizeNetCommercePaymentMethod
 		return new CommercePaymentResult(
 			commercePaymentRequest.getTransactionId(),
 			authorizeNetCommercePaymentRequest.getCommerceOrderId(),
-			CommerceOrderPaymentConstants.STATUS_COMPLETED, false, null, null,
+			CommerceOrderConstants.PAYMENT_STATUS_PAID, false, null, null,
 			Collections.emptyList(), true);
 	}
 
 	@Override
 	public String getDescription(Locale locale) {
-		return _language.get(
-			_getResourceBundle(locale), "authorize-net-description");
+		return null;
 	}
 
 	@Override
@@ -116,12 +117,13 @@ public class AuthorizeNetCommercePaymentMethod
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(_getResourceBundle(locale), KEY);
+		return LanguageUtil.get(_getResourceBundle(locale), KEY);
 	}
 
 	@Override
 	public int getPaymentType() {
-		return CommercePaymentMethodConstants.TYPE_ONLINE_REDIRECT;
+		return CommercePaymentConstants.
+			COMMERCE_PAYMENT_METHOD_TYPE_ONLINE_REDIRECT;
 	}
 
 	@Override
@@ -156,50 +158,45 @@ public class AuthorizeNetCommercePaymentMethod
 		CommerceOrder commerceOrder = _commerceOrderService.getCommerceOrder(
 			authorizeNetCommercePaymentRequest.getCommerceOrderId());
 
-		AuthorizeNetGroupServiceConfiguration
-			authorizeNetGroupServiceConfiguration =
-				_getAuthorizeNetGroupServiceConfiguration(
-					commerceOrder.getGroupId());
+		AuthorizeNetGroupServiceConfiguration configuration = _getConfiguration(
+			commerceOrder.getGroupId());
 
 		Environment environment = Environment.valueOf(
-			StringUtil.toUpperCase(
-				authorizeNetGroupServiceConfiguration.environment()));
+			StringUtil.toUpperCase(configuration.environment()));
 
 		ApiOperationBase.setEnvironment(environment);
 
 		MerchantAuthenticationType merchantAuthenticationType =
 			new MerchantAuthenticationType();
 
-		merchantAuthenticationType.setName(
-			authorizeNetGroupServiceConfiguration.apiLoginId());
+		merchantAuthenticationType.setName(configuration.apiLoginId());
 		merchantAuthenticationType.setTransactionKey(
-			authorizeNetGroupServiceConfiguration.transactionKey());
+			configuration.transactionKey());
 
 		ApiOperationBase.setMerchantAuthentication(merchantAuthenticationType);
 
 		GetHostedPaymentPageRequest getHostedPaymentPageRequest =
 			new GetHostedPaymentPageRequest();
 
-		getHostedPaymentPageRequest.setHostedPaymentSettings(
-			_getArrayOfSetting(
-				commerceOrder.getGroupId(),
-				authorizeNetCommercePaymentRequest.getCancelUrl(),
-				authorizeNetCommercePaymentRequest.getReturnUrl()));
 		getHostedPaymentPageRequest.setTransactionRequest(
 			_getTransactionRequestType(commerceOrder));
 
-		GetHostedPaymentPageController getHostedPaymentPageController =
+		ArrayOfSetting arrayOfSetting = _getArrayOfSetting(
+			commerceOrder.getGroupId(),
+			authorizeNetCommercePaymentRequest.getCancelUrl(),
+			authorizeNetCommercePaymentRequest.getReturnUrl());
+
+		getHostedPaymentPageRequest.setHostedPaymentSettings(arrayOfSetting);
+
+		GetHostedPaymentPageController controller =
 			new GetHostedPaymentPageController(getHostedPaymentPageRequest);
 
-		getHostedPaymentPageController.execute();
+		controller.execute();
 
-		GetHostedPaymentPageResponse getHostedPaymentPageResponse =
-			getHostedPaymentPageController.getApiResponse();
+		GetHostedPaymentPageResponse response = controller.getApiResponse();
 
-		if ((getHostedPaymentPageResponse != null) &&
-			(getHostedPaymentPageResponse.getToken() != null)) {
-
-			String token = getHostedPaymentPageResponse.getToken();
+		if ((response != null) && (response.getToken() != null)) {
+			String token = response.getToken();
 
 			String redirectURL =
 				AuthorizeNetCommercePaymentMethodConstants.SANDBOX_REDIRECT_URL;
@@ -219,10 +216,9 @@ public class AuthorizeNetCommercePaymentMethod
 
 			List<String> resultMessages = new ArrayList<>();
 
-			MessagesType messagesType =
-				getHostedPaymentPageResponse.getMessages();
+			MessagesType responseMessages = response.getMessages();
 
-			List<MessagesType.Message> messages = messagesType.getMessage();
+			List<MessagesType.Message> messages = responseMessages.getMessage();
 
 			for (MessagesType.Message message : messages) {
 				resultMessages.add(message.getText());
@@ -230,7 +226,7 @@ public class AuthorizeNetCommercePaymentMethod
 
 			return new CommercePaymentResult(
 				token, authorizeNetCommercePaymentRequest.getCommerceOrderId(),
-				CommerceOrderPaymentConstants.STATUS_PENDING, true, url, null,
+				CommerceOrderConstants.PAYMENT_STATUS_PENDING, true, url, null,
 				resultMessages, true);
 		}
 
@@ -266,9 +262,8 @@ public class AuthorizeNetCommercePaymentMethod
 			long groupId, String cancelURL, String returnURL)
 		throws Exception {
 
-		AuthorizeNetGroupServiceConfiguration
-			authorizeNetGroupServiceConfiguration =
-				_getAuthorizeNetGroupServiceConfiguration(groupId);
+		AuthorizeNetGroupServiceConfiguration configuration = _getConfiguration(
+			groupId);
 
 		ArrayOfSetting arrayOfSetting = new ArrayOfSetting();
 
@@ -291,35 +286,32 @@ public class AuthorizeNetCommercePaymentMethod
 
 		_addSetting(
 			settings, "hostedPaymentReturnOptions",
-			hostedPaymentReturnOptionsJSONObject.toString());
+			hostedPaymentReturnOptionsJSONObject.toJSONString());
 
 		JSONObject hostedPaymentPaymentOptionsJSONObject =
 			_jsonFactory.createJSONObject();
 
 		hostedPaymentPaymentOptionsJSONObject.put(
-			"cardCodeRequired",
-			authorizeNetGroupServiceConfiguration.requireCardCodeVerification()
+			"cardCodeRequired", configuration.requireCardCodeVerification()
 		).put(
-			"showBankAccount",
-			authorizeNetGroupServiceConfiguration.showBankAccount()
+			"showBankAccount", configuration.showBankAccount()
 		).put(
-			"showCreditCard",
-			authorizeNetGroupServiceConfiguration.showCreditCard()
+			"showCreditCard", configuration.showCreditCard()
 		);
 
 		_addSetting(
 			settings, "hostedPaymentPaymentOptions",
-			hostedPaymentPaymentOptionsJSONObject.toString());
+			hostedPaymentPaymentOptionsJSONObject.toJSONString());
 
 		JSONObject hostedPaymentSecurityOptionsJSONObject =
 			_jsonFactory.createJSONObject();
 
 		hostedPaymentSecurityOptionsJSONObject.put(
-			"captcha", authorizeNetGroupServiceConfiguration.requireCaptcha());
+			"captcha", configuration.requireCaptcha());
 
 		_addSetting(
 			settings, "hostedPaymentSecurityOptions",
-			hostedPaymentSecurityOptionsJSONObject.toString());
+			hostedPaymentSecurityOptionsJSONObject.toJSONString());
 
 		JSONObject hostedPaymentShippingAddressOptionsJSONObject =
 			_jsonFactory.createJSONObject();
@@ -332,7 +324,7 @@ public class AuthorizeNetCommercePaymentMethod
 
 		_addSetting(
 			settings, "hostedPaymentShippingAddressOptions",
-			hostedPaymentShippingAddressOptionsJSONObject.toString());
+			hostedPaymentShippingAddressOptionsJSONObject.toJSONString());
 
 		JSONObject hostedPaymentBillingAddressOptionsJSONObject =
 			_jsonFactory.createJSONObject();
@@ -345,7 +337,7 @@ public class AuthorizeNetCommercePaymentMethod
 
 		_addSetting(
 			settings, "hostedPaymentBillingAddressOptions",
-			hostedPaymentBillingAddressOptionsJSONObject.toString());
+			hostedPaymentBillingAddressOptionsJSONObject.toJSONString());
 
 		JSONObject hostedPaymentCustomerOptionsJSJSONObject =
 			_jsonFactory.createJSONObject();
@@ -360,7 +352,7 @@ public class AuthorizeNetCommercePaymentMethod
 
 		_addSetting(
 			settings, "hostedPaymentCustomerOptions",
-			hostedPaymentCustomerOptionsJSJSONObject.toString());
+			hostedPaymentCustomerOptionsJSJSONObject.toJSONString());
 
 		JSONObject hostedPaymentOrderOptionsJSONObject =
 			_jsonFactory.createJSONObject();
@@ -371,18 +363,18 @@ public class AuthorizeNetCommercePaymentMethod
 		hostedPaymentOrderOptionsJSONObject.put(
 			"merchantName", commerceChannel.getName()
 		).put(
-			"show", authorizeNetGroupServiceConfiguration.showStoreName()
+			"show", configuration.showStoreName()
 		);
 
 		_addSetting(
 			settings, "hostedPaymentOrderOptions",
-			hostedPaymentOrderOptionsJSONObject.toString());
+			hostedPaymentOrderOptionsJSONObject.toJSONString());
 
 		return arrayOfSetting;
 	}
 
-	private AuthorizeNetGroupServiceConfiguration
-			_getAuthorizeNetGroupServiceConfiguration(long groupId)
+	private AuthorizeNetGroupServiceConfiguration _getConfiguration(
+			long groupId)
 		throws Exception {
 
 		return _configurationProvider.getConfiguration(
@@ -441,9 +433,6 @@ public class AuthorizeNetCommercePaymentMethod
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

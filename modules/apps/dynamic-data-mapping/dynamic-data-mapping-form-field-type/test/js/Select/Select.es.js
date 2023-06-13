@@ -13,7 +13,13 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {act, fireEvent, render, screen} from '@testing-library/react';
+import {
+	act,
+	cleanup,
+	fireEvent,
+	render,
+	waitForElement,
+} from '@testing-library/react';
 import {PageProvider} from 'data-engine-js-components-web';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -63,6 +69,8 @@ describe('Select', () => {
 			return element;
 		});
 	});
+
+	afterEach(cleanup);
 
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -212,24 +220,6 @@ describe('Select', () => {
 		expect(container).toMatchSnapshot();
 	});
 
-	it('renders fixed options', () => {
-		render(
-			<SelectWithProvider
-				fixedOptions={[
-					{
-						dataType: 'user',
-						label: 'User',
-						name: 'user',
-						value: 'user',
-					},
-				]}
-				showEmptyOption={false}
-			/>
-		);
-
-		expect(screen.getByText('User')).toBeInTheDocument();
-	});
-
 	it('renders no options when options come empty', () => {
 		const {container} = render(
 			<SelectWithProvider options={[]} spritemap={spritemap} />
@@ -375,7 +365,7 @@ describe('Select', () => {
 	it('calls onChange callback when an item is selected', async () => {
 		const handleFieldEdited = jest.fn();
 
-		const {container, findByTestId} = render(
+		const {container, getByTestId} = render(
 			<SelectWithProvider
 				dataSourceType="manual"
 				onChange={handleFieldEdited}
@@ -398,7 +388,9 @@ describe('Select', () => {
 			jest.runAllTimers();
 		});
 
-		const dropdownItem = await findByTestId('dropdownItem-0');
+		const dropdownItem = await waitForElement(() =>
+			getByTestId('dropdownItem-0')
+		);
 
 		fireEvent.click(dropdownItem);
 
@@ -412,7 +404,7 @@ describe('Select', () => {
 	it('calls onChange callback when an item is selected using multiselect', async () => {
 		const handleFieldEdited = jest.fn();
 
-		const {container, findByTestId} = render(
+		const {container, getByTestId} = render(
 			<SelectWithProvider
 				dataSourceType="manual"
 				multiple={true}
@@ -432,7 +424,9 @@ describe('Select', () => {
 			jest.runAllTimers();
 		});
 
-		const labelItem = await findByTestId('labelItem-item7');
+		const labelItem = await waitForElement(() =>
+			getByTestId('labelItem-item7')
+		);
 
 		fireEvent.click(labelItem);
 
@@ -500,7 +494,7 @@ describe('Select', () => {
 	it('filters according to the input and calls onChange callback when an item is selected using search', async () => {
 		const handleFieldEdited = jest.fn();
 
-		const {container, findByTestId} = render(
+		const {container, getByTestId} = render(
 			<SelectWithProvider
 				dataSourceType="manual"
 				multiple={true}
@@ -534,7 +528,9 @@ describe('Select', () => {
 
 		expect(container).toMatchSnapshot();
 
-		const labelItem = await findByTestId('labelItem-item11');
+		const labelItem = await waitForElement(() =>
+			getByTestId('labelItem-item11')
+		);
 
 		fireEvent.click(labelItem);
 

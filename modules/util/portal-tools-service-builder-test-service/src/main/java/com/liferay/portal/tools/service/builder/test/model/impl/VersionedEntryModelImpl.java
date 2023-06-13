@@ -31,6 +31,7 @@ import com.liferay.portal.tools.service.builder.test.model.VersionedEntryVersion
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -224,68 +225,78 @@ public class VersionedEntryModelImpl
 	public Map<String, Function<VersionedEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<VersionedEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, VersionedEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<VersionedEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			VersionedEntry.class.getClassLoader(), VersionedEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<VersionedEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<VersionedEntry, Object>>();
+		try {
+			Constructor<VersionedEntry> constructor =
+				(Constructor<VersionedEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", VersionedEntry::getMvccVersion);
-			attributeGetterFunctions.put("headId", VersionedEntry::getHeadId);
-			attributeGetterFunctions.put(
-				"versionedEntryId", VersionedEntry::getVersionedEntryId);
-			attributeGetterFunctions.put("groupId", VersionedEntry::getGroupId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<VersionedEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<VersionedEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<VersionedEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<VersionedEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<VersionedEntry, Object>>();
+		Map<String, BiConsumer<VersionedEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<VersionedEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<VersionedEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<VersionedEntry, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", VersionedEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<VersionedEntry, Long>)VersionedEntry::setMvccVersion);
+		attributeGetterFunctions.put("headId", VersionedEntry::getHeadId);
+		attributeSetterBiConsumers.put(
+			"headId",
+			(BiConsumer<VersionedEntry, Long>)VersionedEntry::setHeadId);
+		attributeGetterFunctions.put(
+			"versionedEntryId", VersionedEntry::getVersionedEntryId);
+		attributeSetterBiConsumers.put(
+			"versionedEntryId",
+			(BiConsumer<VersionedEntry, Long>)
+				VersionedEntry::setVersionedEntryId);
+		attributeGetterFunctions.put("groupId", VersionedEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<VersionedEntry, Long>)VersionedEntry::setGroupId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<VersionedEntry, Long>)
-					VersionedEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"headId",
-				(BiConsumer<VersionedEntry, Long>)VersionedEntry::setHeadId);
-			attributeSetterBiConsumers.put(
-				"versionedEntryId",
-				(BiConsumer<VersionedEntry, Long>)
-					VersionedEntry::setVersionedEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<VersionedEntry, Long>)VersionedEntry::setGroupId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -619,12 +630,41 @@ public class VersionedEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<VersionedEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<VersionedEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<VersionedEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((VersionedEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, VersionedEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					VersionedEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -640,8 +680,7 @@ public class VersionedEntryModelImpl
 		}
 
 		Function<VersionedEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -16,7 +16,6 @@ package com.liferay.layout.admin.web.internal.frontend.taglib.form.navigator;
 
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstants;
-import com.liferay.layout.admin.web.internal.constants.LayoutAdminFormNavigatorConstants;
 
 import javax.servlet.ServletContext;
 
@@ -39,27 +38,22 @@ public class LayoutSetRobotsFormNavigatorEntry
 	}
 
 	@Override
-	public String getFormNavigatorId() {
-		return LayoutAdminFormNavigatorConstants.
-			FORM_NAVIGATOR_ID_LAYOUT_SET_ADVANCED;
-	}
-
-	@Override
 	public String getKey() {
 		return "robots";
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
 	protected String getJspPath() {
 		return "/layout_set/robots.jsp";
 	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")
-	private ServletContext _servletContext;
 
 }

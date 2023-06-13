@@ -33,9 +33,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = ServiceWrapper.class)
+@Component(immediate = true, service = ServiceWrapper.class)
 public class TranslationEntryResourcePermissionLocalServiceWrapper
 	extends ResourcePermissionLocalServiceWrapper {
+
+	public TranslationEntryResourcePermissionLocalServiceWrapper() {
+		super(null);
+	}
+
+	public TranslationEntryResourcePermissionLocalServiceWrapper(
+		ResourcePermissionLocalService resourcePermissionLocalService) {
+
+		super(resourcePermissionLocalService);
+	}
 
 	@Override
 	public boolean hasResourcePermission(

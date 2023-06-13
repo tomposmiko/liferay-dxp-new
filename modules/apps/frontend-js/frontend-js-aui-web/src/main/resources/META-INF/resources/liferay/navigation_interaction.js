@@ -15,15 +15,15 @@
 AUI.add(
 	'liferay-navigation-interaction',
 	(A) => {
-		const ACTIVE_DESCENDANT = 'activeDescendant';
+		var ACTIVE_DESCENDANT = 'activeDescendant';
 
-		const DIRECTION_LEFT = 'left';
+		var DIRECTION_LEFT = 'left';
 
-		const DIRECTION_RIGHT = 'right';
+		var DIRECTION_RIGHT = 'right';
 
-		const NAME = 'liferaynavigationinteraction';
+		var NAME = 'liferaynavigationinteraction';
 
-		const NavigationInteraction = A.Component.create({
+		var NavigationInteraction = A.Component.create({
 			EXTENDS: A.Plugin.Base,
 
 			NAME,
@@ -32,9 +32,9 @@ AUI.add(
 
 			prototype: {
 				_handleExit() {
-					const instance = this;
+					var instance = this;
 
-					const focusManager = instance._focusManager;
+					var focusManager = instance._focusManager;
 
 					if (focusManager.get(ACTIVE_DESCENDANT)) {
 						focusManager.set(ACTIVE_DESCENDANT, 0);
@@ -52,20 +52,20 @@ AUI.add(
 				},
 
 				_handleKey(event, direction) {
-					const instance = this;
+					var instance = this;
 
 					if (!instance._isTriggerVisible()) {
-						let item;
+						var item;
 
-						const target = event.target;
+						var target = event.target;
 
-						const parent = target
+						var parent = target
 							.ancestors(instance._directChildLi)
 							.item(0);
 
-						let fallbackFirst = true;
+						var fallbackFirst = true;
 
-						if (direction === DIRECTION_LEFT) {
+						if (direction == DIRECTION_LEFT) {
 							item = parent.previous();
 
 							fallbackFirst = false;
@@ -75,7 +75,7 @@ AUI.add(
 						}
 
 						if (!item) {
-							const siblings = parent.siblings();
+							var siblings = parent.siblings();
 
 							if (fallbackFirst) {
 								item = siblings.first();
@@ -96,9 +96,9 @@ AUI.add(
 				},
 
 				_handleKeyDown(event) {
-					const instance = this;
+					var instance = this;
 
-					let handler;
+					var handler;
 
 					if (event.isKey('LEFT')) {
 						handler = '_handleLeft';
@@ -116,19 +116,19 @@ AUI.add(
 				},
 
 				_handleLeft(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._handleKey(event, DIRECTION_LEFT);
 				},
 
 				_handleRight(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._handleKey(event, DIRECTION_RIGHT);
 				},
 
 				_handleShowNavigationMenu(menuNew, menuOld, event) {
-					const instance = this;
+					var instance = this;
 
 					if (
 						!(
@@ -136,9 +136,9 @@ AUI.add(
 							event.type.indexOf('focusedChange') > -1
 						)
 					) {
-						const mapHover = instance.MAP_HOVER;
+						var mapHover = instance.MAP_HOVER;
 
-						const menuOldDistinct = menuOld && menuOld !== menuNew;
+						var menuOldDistinct = menuOld && menuOld != menuNew;
 
 						if (menuOldDistinct) {
 							Liferay.fire('hideNavigationMenu', mapHover);
@@ -153,19 +153,19 @@ AUI.add(
 
 					if (instance._isTriggerVisible()) {
 						if (menuOld) {
-							let exitDirection;
+							var exitDirection;
 
-							const descendants = instance._focusManager.get(
+							var descendants = instance._focusManager.get(
 								'descendants'
 							);
 
-							const first = descendants.first();
+							var first = descendants.first();
 
-							const last = descendants.last();
+							var last = descendants.last();
 
-							const oldMenuLink = menuOld.one('a');
+							var oldMenuLink = menuOld.one('a');
 
-							const newMenuLink = menuNew.one('a');
+							var newMenuLink = menuNew.one('a');
 
 							if (oldMenuLink === last && newMenuLink === first) {
 								exitDirection = 'down';
@@ -188,9 +188,9 @@ AUI.add(
 				},
 
 				_hideMenu() {
-					const instance = this;
+					var instance = this;
 
-					const mapHover = instance.MAP_HOVER;
+					var mapHover = instance.MAP_HOVER;
 
 					if (mapHover.menu) {
 						Liferay.fire('hideNavigationMenu', mapHover);
@@ -200,7 +200,7 @@ AUI.add(
 				},
 
 				_initChildMenuHandlers(navigation) {
-					const instance = this;
+					var instance = this;
 
 					if (navigation) {
 						navigation.delegate(
@@ -220,9 +220,9 @@ AUI.add(
 				},
 
 				_initNodeFocusManager() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get('host');
+					var host = instance.get('host');
 
 					host.plug(A.Plugin.NodeFocusManager, {
 						descendants: 'a',
@@ -233,7 +233,7 @@ AUI.add(
 						},
 					});
 
-					const focusManager = host.focusManager;
+					var focusManager = host.focusManager;
 
 					focusManager.after(
 						['activeDescendantChange', 'focusedChange'],
@@ -251,7 +251,7 @@ AUI.add(
 				},
 
 				_isTriggerVisible() {
-					const instance = this;
+					var instance = this;
 
 					return !!(
 						instance._triggerNode &&
@@ -260,13 +260,13 @@ AUI.add(
 				},
 
 				_onMouseToggle(event) {
-					const instance = this;
+					var instance = this;
 
-					const mapHover = instance.MAP_HOVER;
+					var mapHover = instance.MAP_HOVER;
 
-					let eventType = 'hideNavigationMenu';
+					var eventType = 'hideNavigationMenu';
 
-					if (event.type === 'mouseenter') {
+					if (event.type == 'mouseenter') {
 						eventType = 'showNavigationMenu';
 					}
 
@@ -276,29 +276,29 @@ AUI.add(
 				},
 
 				_showMenu(event) {
-					const instance = this;
+					var instance = this;
 
 					event.halt();
 
-					const mapHover = instance.MAP_HOVER;
+					var mapHover = instance.MAP_HOVER;
 
-					const menuOld = mapHover.menu;
+					var menuOld = mapHover.menu;
 
-					const newMenuIndex = event.newVal;
+					var newMenuIndex = event.newVal;
 
-					const handleMenuToggle = newMenuIndex || newMenuIndex === 0;
+					var handleMenuToggle = newMenuIndex || newMenuIndex === 0;
 
 					if (handleMenuToggle) {
-						const focusManager = instance._focusManager;
+						var focusManager = instance._focusManager;
 
-						const activeDescendant = focusManager.get(
+						var activeDescendant = focusManager.get(
 							ACTIVE_DESCENDANT
 						);
-						const descendants = focusManager.get('descendants');
+						var descendants = focusManager.get('descendants');
 
-						const menuLink = descendants.item(activeDescendant);
+						var menuLink = descendants.item(activeDescendant);
 
-						const menuNew = menuLink.ancestor(
+						var menuNew = menuLink.ancestor(
 							instance._directChildLi
 						);
 
@@ -318,16 +318,16 @@ AUI.add(
 				MAP_HOVER: {},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get('host');
+					var host = instance.get('host');
 
-					const navInteractionSelector =
+					var navInteractionSelector =
 						Liferay.Data.NAV_INTERACTION_LIST_SELECTOR || 'ul';
 
-					const navigation = host.one(navInteractionSelector);
+					var navigation = host.one(navInteractionSelector);
 
-					const hostULId = '#' + navigation.guid();
+					var hostULId = '#' + navigation.guid();
 
 					instance._directChildLi =
 						Liferay.Data.NAV_INTERACTION_ITEM_SELECTOR ||
@@ -340,12 +340,12 @@ AUI.add(
 					Liferay.on(
 						['hideNavigationMenu', 'showNavigationMenu'],
 						(event) => {
-							const menu = event.menu;
+							var menu = event.menu;
 
 							if (menu) {
 								instance._lastShownMenu = null;
 
-								const showMenu =
+								var showMenu =
 									event.type === 'showNavigationMenu' &&
 									menu.hasClass('dropdown');
 

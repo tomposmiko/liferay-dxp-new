@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.model.DDMStructureVersionTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureVersionImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureVersionModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureVersionPersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureVersionUtil;
 import com.liferay.dynamic.data.mapping.service.persistence.impl.constants.DDMPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -81,7 +80,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DDMStructureVersionPersistence.class)
+@Component(
+	service = {DDMStructureVersionPersistence.class, BasePersistence.class}
+)
 public class DDMStructureVersionPersistenceImpl
 	extends BasePersistenceImpl<DDMStructureVersion>
 	implements DDMStructureVersionPersistence {
@@ -205,7 +206,7 @@ public class DDMStructureVersionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureVersion ddmStructureVersion : list) {
@@ -582,7 +583,7 @@ public class DDMStructureVersionPersistenceImpl
 
 			finderArgs = new Object[] {structureId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -704,8 +705,7 @@ public class DDMStructureVersionPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByS_V, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByS_V, finderArgs);
 		}
 
 		if (result instanceof DDMStructureVersion) {
@@ -827,7 +827,7 @@ public class DDMStructureVersionPersistenceImpl
 
 			finderArgs = new Object[] {structureId, version};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -997,7 +997,7 @@ public class DDMStructureVersionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureVersion ddmStructureVersion : list) {
@@ -1398,7 +1398,7 @@ public class DDMStructureVersionPersistenceImpl
 
 			finderArgs = new Object[] {structureId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1835,9 +1835,7 @@ public class DDMStructureVersionPersistenceImpl
 	 */
 	@Override
 	public DDMStructureVersion fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMStructureVersion.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMStructureVersion.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2060,7 +2058,7 @@ public class DDMStructureVersionPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureVersion>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2136,7 +2134,7 @@ public class DDMStructureVersionPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2323,31 +2321,11 @@ public class DDMStructureVersionPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByS_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"structureId", "status"}, false);
-
-		_setDDMStructureVersionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMStructureVersionUtilPersistence(null);
-
 		entityCache.removeCache(DDMStructureVersionImpl.class.getName());
-	}
-
-	private void _setDDMStructureVersionUtilPersistence(
-		DDMStructureVersionPersistence ddmStructureVersionPersistence) {
-
-		try {
-			Field field = DDMStructureVersionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmStructureVersionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2415,5 +2393,9 @@ public class DDMStructureVersionPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private DDMStructureVersionModelArgumentsResolver
+		_ddmStructureVersionModelArgumentsResolver;
 
 }

@@ -16,24 +16,12 @@ package com.liferay.layout.util;
 
 import com.liferay.portal.kernel.model.Layout;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author Pavel Savinov
  */
-@ProviderType
 public interface LayoutCopyHelper {
 
-	public Layout copyLayoutContent(Layout sourceLayout, Layout targetLayout)
-		throws Exception;
-
-	public Layout copyLayoutContent(
-			long segmentsExperienceId, Layout sourceLayout, Layout targetLayout)
-		throws Exception;
-
-	public Layout copyLayoutContent(
-			long[] segmentsExperienceIds, Layout sourceLayout,
-			Layout targetLayout)
+	public Layout copyLayout(Layout sourceLayout, Layout targetLayout)
 		throws Exception;
 
 }

@@ -19,16 +19,16 @@ import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.xuggler.XugglerUtil;
 
 import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Antonio Pol
@@ -49,23 +49,23 @@ public class JournalMediaEditorConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		if (!AudioProcessorUtil.isEnabled()) {
+		if (!AudioProcessorUtil.isEnabled() && !XugglerUtil.isEnabled()) {
 			return;
 		}
 
 		JSONObject toolbarsJSONObject = jsonObject.getJSONObject("toolbars");
 
 		if (toolbarsJSONObject == null) {
-			toolbarsJSONObject = _jsonFactory.createJSONObject();
+			toolbarsJSONObject = JSONFactoryUtil.createJSONObject();
 		}
 
 		JSONObject addJSONObject = toolbarsJSONObject.getJSONObject("add");
 
 		if (addJSONObject == null) {
-			addJSONObject = _jsonFactory.createJSONObject();
+			addJSONObject = JSONFactoryUtil.createJSONObject();
 		}
 
-		JSONArray buttonsJSONArray = _jsonFactory.createJSONArray();
+		JSONArray buttonsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		JSONArray currentButtonsJSONArray = addJSONObject.getJSONArray(
 			"buttons");
@@ -91,8 +91,5 @@ public class JournalMediaEditorConfigContributor
 
 		jsonObject.put("toolbars", toolbarsJSONObject);
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

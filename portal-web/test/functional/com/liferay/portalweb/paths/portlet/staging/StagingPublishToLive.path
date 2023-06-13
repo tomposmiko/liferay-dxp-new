@@ -65,9 +65,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DATE-->
-
 <tr>
 	<td>DATE_SCHEDULE_RADIO</td>
 	<td>//span[contains(@class,'custom-control-label-text') and contains(.,'Schedule')]</td>
@@ -113,32 +111,30 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--PAGES-->
-
 <tr>
 	<td>PAGES_CHOOSE_PAGE_DELETION_CHECKBOX</td>
-	<td>//input[contains(@data-qa-id,'DELETE_LAYOUTS')]</td>
+	<td>//span[contains(.,'Publish Page Deletions')]//span[contains(@class,'deletions')]/../../input</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGES_TO_PUBLISH_CHECKBOX_CHECKED</td>
-	<td>//div[contains(@class,'layout-selector')]//div[contains(@class,'treeview-link')][*//div[normalize-space()='${key_entryName}']]//input[@type='checkbox'][@checked]</td>
+	<td>//div[@class='pages-selector']//div[normalize-space()='${key_entryName}' and contains(@class,'checked')]//span[contains(@class,'icon-check')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGES_TO_PUBLISH_CHECKBOX_UNCHECKED</td>
-	<td>//div[contains(@class,'layout-selector')]//div[contains(@class,'treeview-link')][*//div[normalize-space()='${key_entryName}']]//input[@type='checkbox'][not(@checked)]</td>
+	<td>//div[@class='pages-selector']//div[normalize-space()='${key_entryName}' and not(contains(@class,'checked'))]//span[contains(@class,'icon-check')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGES_TO_PUBLISH_PAGE_NAME</td>
-	<td>//span[contains(@id,'pages-tree') and contains(.,'${key_pageName}')]</td>
+	<td>//span[contains(@class,'tree-label') and contains(.,'${key_pageName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGES_TO_PUBLISH_PAGE_NAME_SPAN_TITLE</td>
-	<td>//span[contains(@data-restore-title,'${key_title}')]</td>
+	<td>//span[contains(@class,'tree-label') and contains(.,'${key_pageName}')]//span[contains(@title,'${key_title}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -146,9 +142,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CONTENT-->
-
 <tr>
 	<td>CONTENT_CHOOSE_CONTENT_DELETION_CHECKBOX</td>
 	<td>//input[contains(@name,'DELETIONS')]//following-sibling::span</td>
@@ -169,17 +163,18 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DELETIONS-->
-
+<tr>
+	<td>DELETIONS_REPLICATE_INDIVIDUAL_DELETIONS_CHECKBOX</td>
+	<td>//input[contains(@id,'StagingProcessesPortlet_DELETIONS')]</td>
+	<td></td>
+</tr>
 <tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SCHEDULED_TABLE-->
-
 <tr>
 	<td>SCHEDULED_TABLE_TITLE</td>
 	<td>//tr[contains(.,'${key_scheduleTitleName}')]/td[2]</td>
@@ -195,9 +190,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--PUBLISH_TEMPLATES_TABLE-->
-
 <tr>
 	<td>PUBLISH_TEMPLATES_TABLE_NAME</td>
 	<td>//div[contains(@id,'Configurations')]//tr[contains(.,'${key_publishTemplateName}')]/td[2]//a</td>

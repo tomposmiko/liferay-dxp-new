@@ -3,24 +3,18 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Sites Administration";
+	property testray.main.component.name = "Site Administration";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
-
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		User.firstLoginPG();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,15 +29,15 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-124620. Assert no pop up when viewing membership request detail."
-	@priority = 4
+	@priority = "4"
 	test AddXSSRequestMembershipComment {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
-		property testray.component.names = "Sites Administration,XSS";
+		property testray.component.names = "Site Administration,XSS";
 
 		task ("Add a site") {
-			HeadlessSite.addSite(
-				membershipType = "Restricted",
-				siteName = "Site Name");
+			JSONGroup.addGroup(
+				groupName = "Site Name",
+				membershipType = "Restricted");
 		}
 
 		task ("Add a My Sites widget to Liferay Home page and add view permission to it") {
@@ -61,7 +55,7 @@ definition {
 
 			IFrame.selectPermissionsFrame();
 
-			Check.checkNotVisible(
+			Check(
 				key_roleTitle = "user",
 				locator1 = "Permissions#CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX");
 
@@ -71,7 +65,7 @@ definition {
 
 			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a user and login with the user") {
@@ -126,38 +120,6 @@ definition {
 			Click(
 				key_card = "userfn userln",
 				locator1 = "Card#CARD_TITLE");
-
-			AssertAlertNotPresent();
-		}
-	}
-
-	@description = "This is a test for LPS-135079. View no pop up when select user card with XSS name in memberships."
-	@priority = 4
-	test SelectUserWithXSSNameInMemberships {
-		var firstName = '''"><script>alert(1)</script>''';
-		var lastName = '''"><script>alert(2)</script>''';
-
-		task ("Add a user with XSS name") {
-			User.openUsersAdmin();
-
-			User.addCP(
-				userEmailAddress = "userea@liferay.com",
-				userFirstName = ${firstName},
-				userLastName = ${lastName},
-				userScreenName = "usersn");
-		}
-
-		task ("Assign the new user as member") {
-			Site.openSiteMembershipsAdmin(siteURLKey = "test-site-name");
-
-			Site.assignUserAsMemberCP(
-				userFirstName = ${firstName},
-				userLastName = ${lastName},
-				userScreenName = "usersn");
-		}
-
-		task ("View alert not shown when select user card") {
-			LexiconCard.checkCardCheckbox(card = "${firstName} ${lastName}");
 
 			AssertAlertNotPresent();
 		}

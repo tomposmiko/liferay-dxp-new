@@ -23,7 +23,7 @@ import com.liferay.commerce.discount.service.CommerceDiscountService;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Discount;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
@@ -41,8 +41,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.discount.model.CommerceDiscount",
-	service = DTOConverter.class
+	service = {DiscountDTOConverter.class, DTOConverter.class}
 )
 public class DiscountDTOConverter
 	implements DTOConverter<CommerceDiscount, Discount> {
@@ -92,7 +93,7 @@ public class DiscountDTOConverter
 				percentageLevel3 = commerceDiscount.getLevel3();
 				percentageLevel4 = commerceDiscount.getLevel4();
 				rulesConjunction = commerceDiscount.isRulesConjunction();
-				target = _language.get(
+				target = LanguageUtil.get(
 					resourceBundle, commerceDiscount.getTarget());
 				title = commerceDiscount.getTitle();
 				useCouponCode = commerceDiscount.isUseCouponCode();
@@ -164,9 +165,6 @@ public class DiscountDTOConverter
 
 	@Reference
 	private CommercePriceFormatter _commercePriceFormatter;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private PercentageFormatter _percentageFormatter;

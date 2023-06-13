@@ -19,7 +19,7 @@ import com.liferay.commerce.product.content.web.internal.constants.CPCompareCont
 import com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "form.navigator.entry.order:Integer=450",
+	enabled = false, property = "form.navigator.entry.order:Integer=450",
 	service = FormNavigatorEntry.class
 )
 public class CPTypeRendererFormNavigatorEntry
@@ -67,17 +67,21 @@ public class CPTypeRendererFormNavigatorEntry
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, getKey());
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+		return LanguageUtil.get(resourceBundle, getKey());
 	}
 
 	@Override
 	public boolean isVisible(User user, Void object) {
 		return _isSelectionStyleCustomRenderer();
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
@@ -106,7 +110,7 @@ public class CPTypeRendererFormNavigatorEntry
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -115,13 +119,5 @@ public class CPTypeRendererFormNavigatorEntry
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CPTypeRendererFormNavigatorEntry.class);
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)"
-	)
-	private ServletContext _servletContext;
 
 }

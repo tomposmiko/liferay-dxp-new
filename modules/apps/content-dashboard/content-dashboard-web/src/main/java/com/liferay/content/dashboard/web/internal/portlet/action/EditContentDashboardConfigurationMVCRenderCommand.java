@@ -16,13 +16,13 @@ package com.liferay.content.dashboard.web.internal.portlet.action;
 
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.content.dashboard.web.internal.constants.ContentDashboardPortletKeys;
+import com.liferay.content.dashboard.web.internal.constants.ContentDashboardWebKeys;
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminConfigurationDisplayContext;
-import com.liferay.content.dashboard.web.internal.util.ContentDashboardUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.Portal;
 
 import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  + * @author David Arques
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentDashboardPortletKeys.CONTENT_DASHBOARD_ADMIN,
 		"mvc.command.name=/content_dashboard/edit_content_dashboard_configuration"
@@ -47,12 +48,15 @@ public class EditContentDashboardConfigurationMVCRenderCommand
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws PortletException {
 
+		PortletPreferences portletPreferences = renderRequest.getPreferences();
+
 		renderRequest.setAttribute(
-			ContentDashboardAdminConfigurationDisplayContext.class.getName(),
+			ContentDashboardWebKeys.
+				CONTENT_DASHBOARD_ADMIN_CONFIGURATION_DISPLAY_CONTEXT,
 			new ContentDashboardAdminConfigurationDisplayContext(
 				_assetVocabularyLocalService,
-				ContentDashboardUtil.getAssetVocabularyIds(renderRequest),
-				_groupLocalService,
+				portletPreferences.getValues(
+					"assetVocabularyNames", new String[0]),
 				_portal.getHttpServletRequest(renderRequest), renderResponse));
 
 		return "/edit_content_dashboard_configuration.jsp";
@@ -60,9 +64,6 @@ public class EditContentDashboardConfigurationMVCRenderCommand
 
 	@Reference
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private Portal _portal;

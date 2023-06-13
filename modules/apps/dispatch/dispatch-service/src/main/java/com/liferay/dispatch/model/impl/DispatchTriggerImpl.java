@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * @author Alessio Antonio Rendina
@@ -79,16 +78,6 @@ public class DispatchTriggerImpl extends DispatchTriggerBaseImpl {
 	}
 
 	@Override
-	public Date getTimeZoneEndDate() {
-		return _getTimeZoneDate(getEndDate(), getTimeZoneId());
-	}
-
-	@Override
-	public Date getTimeZoneStartDate() {
-		return _getTimeZoneDate(getStartDate(), getTimeZoneId());
-	}
-
-	@Override
 	public void setDispatchTaskSettings(String dispatchTaskSettings) {
 		super.setDispatchTaskSettings(dispatchTaskSettings);
 
@@ -108,16 +97,6 @@ public class DispatchTriggerImpl extends DispatchTriggerBaseImpl {
 
 		super.setDispatchTaskSettings(
 			_dispatchTaskSettingsUnicodeProperties.toString());
-	}
-
-	private Date _getTimeZoneDate(Date date, String timeZoneId) {
-		if (date == null) {
-			return null;
-		}
-
-		TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
-
-		return new Date(date.getTime() + timeZone.getOffset(date.getTime()));
 	}
 
 	private transient UnicodeProperties _dispatchTaskSettingsUnicodeProperties;

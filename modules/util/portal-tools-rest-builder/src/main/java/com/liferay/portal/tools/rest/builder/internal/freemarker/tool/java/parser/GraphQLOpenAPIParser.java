@@ -118,9 +118,11 @@ public class GraphQLOpenAPIParser {
 					javaMethodParameter, operation);
 			}
 
-			sb.append(
-				OpenAPIParserUtil.getParameter(
-					javaMethodParameter, parameterAnnotation));
+			String parameter = OpenAPIParserUtil.getParameter(
+				javaMethodParameter, parameterAnnotation);
+
+			sb.append(parameter);
+
 			sb.append(',');
 		}
 

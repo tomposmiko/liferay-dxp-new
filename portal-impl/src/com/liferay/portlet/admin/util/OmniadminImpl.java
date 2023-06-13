@@ -50,7 +50,7 @@ public class OmniadminImpl implements Omniadmin {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(systemException);
+				_log.debug(systemException, systemException);
 			}
 
 			return false;
@@ -76,7 +76,7 @@ public class OmniadminImpl implements Omniadmin {
 				return false;
 			}
 
-			if (user.isGuestUser() ||
+			if (user.isDefaultUser() ||
 				(user.getCompanyId() !=
 					PortalInstances.getDefaultCompanyId())) {
 

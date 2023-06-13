@@ -19,8 +19,6 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.request.attributes.contributor.InfoDisplayRequestAttributesContributor;
 import com.liferay.info.item.InfoItemDetails;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.InvokerPortlet;
 import com.liferay.portal.kernel.portlet.LiferayRenderRequest;
@@ -30,6 +28,7 @@ import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.RenderRequestFactory;
 import com.liferay.portlet.RenderResponseFactory;
@@ -47,7 +46,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = InfoDisplayRequestAttributesContributor.class)
+@Component(
+	immediate = true, service = InfoDisplayRequestAttributesContributor.class
+)
 public class BasicInfoDisplayRequestAttributesContributor
 	implements InfoDisplayRequestAttributesContributor {
 
@@ -94,7 +95,7 @@ public class BasicInfoDisplayRequestAttributesContributor
 						themeDisplay.getResponse(), liferayRenderRequest));
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				exception.printStackTrace();
 			}
 		}
 	}
@@ -111,11 +112,12 @@ public class BasicInfoDisplayRequestAttributesContributor
 		}
 
 		return AssetRendererFactoryRegistryUtil.
-			getAssetRendererFactoryByClassName(infoItemDetails.getClassName());
+			getAssetRendererFactoryByClassNameId(
+				_portal.getClassNameId(infoItemDetails.getClassName()));
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		BasicInfoDisplayRequestAttributesContributor.class);
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private PortletLocalService _portletLocalService;

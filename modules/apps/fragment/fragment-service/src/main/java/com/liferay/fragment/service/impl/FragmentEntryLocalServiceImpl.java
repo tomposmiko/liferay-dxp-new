@@ -41,8 +41,7 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
@@ -53,13 +52,11 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -68,10 +65,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,9 +88,22 @@ public class FragmentEntryLocalServiceImpl
 	@Override
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
+			String fragmentEntryKey, String name, long previewFileEntryId,
+			int type, int status, ServiceContext serviceContext)
+		throws PortalException {
+
+		return addFragmentEntry(
+			userId, groupId, fragmentCollectionId, fragmentEntryKey, name,
+			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+			StringPool.BLANK, previewFileEntryId, type, status, serviceContext);
+	}
+
+	@Override
+	public FragmentEntry addFragmentEntry(
+			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
-			String js, boolean cacheable, String configuration, String icon,
-			long previewFileEntryId, int type, String typeOptions, int status,
+			String js, boolean cacheable, String configuration,
+			long previewFileEntryId, int type, int status,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -116,13 +126,12 @@ public class FragmentEntryLocalServiceImpl
 
 		fragmentEntryKey = _getFragmentEntryKey(fragmentEntryKey);
 
-		_validate(name);
-		_validateFragmentEntryKey(groupId, fragmentEntryKey);
+		validate(name);
+		validateFragmentEntryKey(groupId, fragmentEntryKey);
 
 		if (WorkflowConstants.STATUS_APPROVED == status) {
 			_fragmentEntryValidator.validateConfiguration(configuration);
-			_fragmentEntryValidator.validateTypeOptions(type, typeOptions);
-			_validateContent(html, configuration);
+			validateContent(html, configuration);
 		}
 
 		FragmentEntry draftFragmentEntry = create();
@@ -144,10 +153,8 @@ public class FragmentEntryLocalServiceImpl
 		draftFragmentEntry.setJs(js);
 		draftFragmentEntry.setCacheable(cacheable);
 		draftFragmentEntry.setConfiguration(configuration);
-		draftFragmentEntry.setIcon(icon);
 		draftFragmentEntry.setPreviewFileEntryId(previewFileEntryId);
 		draftFragmentEntry.setType(type);
-		draftFragmentEntry.setTypeOptions(typeOptions);
 		draftFragmentEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
 		draftFragmentEntry.setStatusByUserId(userId);
 		draftFragmentEntry.setStatusByUserName(user.getFullName());
@@ -164,19 +171,32 @@ public class FragmentEntryLocalServiceImpl
 	}
 
 	@Override
+	public FragmentEntry addFragmentEntry(
+			long userId, long groupId, long fragmentCollectionId,
+			String fragmentEntryKey, String name, String css, String html,
+			String js, String configuration, long previewFileEntryId, int type,
+			int status, ServiceContext serviceContext)
+		throws PortalException {
+
+		return addFragmentEntry(
+			userId, groupId, fragmentCollectionId, fragmentEntryKey, name, css,
+			html, js, false, configuration, previewFileEntryId, type, status,
+			serviceContext);
+	}
+
+	@Override
 	public FragmentEntry copyFragmentEntry(
-			long userId, long groupId, long sourceFragmentEntryId,
+			long userId, long groupId, long fragmentEntryId,
 			long fragmentCollectionId, ServiceContext serviceContext)
 		throws PortalException {
 
-		FragmentEntry sourceFragmentEntry = getFragmentEntry(
-			sourceFragmentEntryId);
+		FragmentEntry fragmentEntry = getFragmentEntry(fragmentEntryId);
 
 		FragmentEntry draftFragmentEntry = null;
 		FragmentEntry publishedFragmentEntry = null;
 
-		if (sourceFragmentEntry.isDraft()) {
-			draftFragmentEntry = sourceFragmentEntry;
+		if (fragmentEntry.isDraft()) {
+			draftFragmentEntry = fragmentEntry;
 
 			if (draftFragmentEntry.getFragmentEntryId() !=
 					draftFragmentEntry.getHeadId()) {
@@ -186,22 +206,22 @@ public class FragmentEntryLocalServiceImpl
 			}
 		}
 		else {
-			publishedFragmentEntry = sourceFragmentEntry;
+			publishedFragmentEntry = fragmentEntry;
 
 			draftFragmentEntry =
 				publishedFragmentEntry.fetchDraftFragmentEntry();
 		}
 
 		String name = StringBundler.concat(
-			sourceFragmentEntry.getName(), StringPool.SPACE,
+			fragmentEntry.getName(), StringPool.SPACE,
 			StringPool.OPEN_PARENTHESIS,
-			_language.get(LocaleUtil.getMostRelevantLocale(), "copy"),
+			LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "copy"),
 			StringPool.CLOSE_PARENTHESIS);
 
 		FragmentEntry copyPublishedFragmentEntry = null;
 
 		long originalFragmentCollectionId =
-			sourceFragmentEntry.getFragmentCollectionId();
+			fragmentEntry.getFragmentCollectionId();
 
 		if (publishedFragmentEntry != null) {
 			copyPublishedFragmentEntry = addFragmentEntry(
@@ -210,10 +230,8 @@ public class FragmentEntryLocalServiceImpl
 				publishedFragmentEntry.getHtml(),
 				publishedFragmentEntry.getJs(),
 				publishedFragmentEntry.isCacheable(),
-				publishedFragmentEntry.getConfiguration(),
-				publishedFragmentEntry.getIcon(), 0,
+				publishedFragmentEntry.getConfiguration(), 0,
 				publishedFragmentEntry.getType(),
-				publishedFragmentEntry.getTypeOptions(),
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 			_copyFragmentEntryPreviewFileEntry(
@@ -225,22 +243,21 @@ public class FragmentEntryLocalServiceImpl
 				fragmentCollectionId);
 		}
 
-		FragmentEntry targetDraftFragmentEntry = null;
+		FragmentEntry copyDraftFragmentEntry = null;
 
 		if ((draftFragmentEntry != null) &&
 			(copyPublishedFragmentEntry == null)) {
 
-			targetDraftFragmentEntry = addFragmentEntry(
+			copyDraftFragmentEntry = addFragmentEntry(
 				userId, groupId, fragmentCollectionId, null, name,
 				draftFragmentEntry.getCss(), draftFragmentEntry.getHtml(),
 				draftFragmentEntry.getJs(), draftFragmentEntry.isCacheable(),
-				draftFragmentEntry.getConfiguration(),
-				draftFragmentEntry.getIcon(), 0, draftFragmentEntry.getType(),
-				draftFragmentEntry.getTypeOptions(),
-				WorkflowConstants.STATUS_DRAFT, serviceContext);
+				draftFragmentEntry.getConfiguration(), 0,
+				draftFragmentEntry.getType(), WorkflowConstants.STATUS_DRAFT,
+				serviceContext);
 
 			_copyFragmentEntryPreviewFileEntry(
-				userId, groupId, draftFragmentEntry, targetDraftFragmentEntry);
+				userId, groupId, draftFragmentEntry, copyDraftFragmentEntry);
 
 			_copyFragmentEntryResources(
 				draftFragmentEntry, originalFragmentCollectionId,
@@ -250,27 +267,24 @@ public class FragmentEntryLocalServiceImpl
 		if ((draftFragmentEntry != null) &&
 			(copyPublishedFragmentEntry != null)) {
 
-			targetDraftFragmentEntry = getDraft(copyPublishedFragmentEntry);
+			copyDraftFragmentEntry = getDraft(copyPublishedFragmentEntry);
 
-			targetDraftFragmentEntry.setCss(draftFragmentEntry.getCss());
-			targetDraftFragmentEntry.setHtml(draftFragmentEntry.getHtml());
-			targetDraftFragmentEntry.setJs(draftFragmentEntry.getJs());
-			targetDraftFragmentEntry.setCacheable(
+			copyDraftFragmentEntry.setCss(draftFragmentEntry.getCss());
+			copyDraftFragmentEntry.setHtml(draftFragmentEntry.getHtml());
+			copyDraftFragmentEntry.setJs(draftFragmentEntry.getJs());
+			copyDraftFragmentEntry.setCacheable(
 				draftFragmentEntry.isCacheable());
-			targetDraftFragmentEntry.setConfiguration(
+			copyDraftFragmentEntry.setConfiguration(
 				draftFragmentEntry.getConfiguration());
-			targetDraftFragmentEntry.setIcon(draftFragmentEntry.getIcon());
-			targetDraftFragmentEntry.setTypeOptions(
-				draftFragmentEntry.getTypeOptions());
 
-			updateDraft(targetDraftFragmentEntry);
+			updateDraft(copyDraftFragmentEntry);
 		}
 
 		if (copyPublishedFragmentEntry != null) {
 			return copyPublishedFragmentEntry;
 		}
 
-		return targetDraftFragmentEntry;
+		return copyDraftFragmentEntry;
 	}
 
 	@Override
@@ -288,21 +302,24 @@ public class FragmentEntryLocalServiceImpl
 	public FragmentEntry deleteFragmentEntry(FragmentEntry fragmentEntry)
 		throws PortalException {
 
-		long fragmentEntryLinkCount = _fragmentEntryLinkPersistence.countByF_D(
-			fragmentEntry.getFragmentEntryId(), false);
+		// Fragment entry
+
+		long fragmentEntryLinkCount =
+			_fragmentEntryLinkPersistence.countByFragmentEntryId(
+				fragmentEntry.getFragmentEntryId());
 
 		if (fragmentEntryLinkCount > 0) {
 			throw new RequiredFragmentEntryException();
 		}
+
+		// Resources
 
 		_resourceLocalService.deleteResource(
 			fragmentEntry.getCompanyId(), FragmentEntry.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			fragmentEntry.getFragmentEntryId());
 
-		_fragmentEntryLinkLocalService.
-			deleteFragmentEntryLinksByFragmentEntryId(
-				fragmentEntry.getFragmentEntryId(), true);
+		// Preview image
 
 		if (fragmentEntry.getPreviewFileEntryId() > 0) {
 			boolean deletePreviewFileEntry = true;
@@ -352,20 +369,8 @@ public class FragmentEntryLocalServiceImpl
 	public FragmentEntry fetchFragmentEntry(
 		long groupId, String fragmentEntryKey) {
 
-		FragmentEntry fragmentEntry =
-			fragmentEntryPersistence.fetchByG_FEK_First(
-				groupId, _getFragmentEntryKey(fragmentEntryKey), null);
-
-		if (fragmentEntry == null) {
-			return null;
-		}
-
-		if (!fragmentEntry.isDraft()) {
-			return fragmentEntry;
-		}
-
-		return fetchFragmentEntryByUuidAndGroupId(
-			fragmentEntry.getUuid(), groupId);
+		return fragmentEntryPersistence.fetchByG_FEK_First(
+			groupId, _getFragmentEntryKey(fragmentEntryKey), null);
 	}
 
 	@Override
@@ -530,20 +535,16 @@ public class FragmentEntryLocalServiceImpl
 
 		if (publishedFragmentEntry != null) {
 			draftFragmentEntry.setName(publishedFragmentEntry.getName());
-			draftFragmentEntry.setCacheable(
-				publishedFragmentEntry.isCacheable());
 			draftFragmentEntry.setPreviewFileEntryId(
 				publishedFragmentEntry.getPreviewFileEntryId());
 		}
 		else {
-			_validate(draftFragmentEntry.getName());
+			validate(draftFragmentEntry.getName());
 		}
 
 		_fragmentEntryValidator.validateConfiguration(
 			draftFragmentEntry.getConfiguration());
-		_fragmentEntryValidator.validateTypeOptions(
-			draftFragmentEntry.getType(), draftFragmentEntry.getTypeOptions());
-		_validateContent(
+		validateContent(
 			draftFragmentEntry.getHtml(),
 			draftFragmentEntry.getConfiguration());
 
@@ -597,25 +598,13 @@ public class FragmentEntryLocalServiceImpl
 
 	@Override
 	public FragmentEntry updateFragmentEntry(
-			long fragmentEntryId, boolean cacheable)
-		throws PortalException {
-
-		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
-			fragmentEntryId);
-
-		fragmentEntry.setCacheable(cacheable);
-
-		return fragmentEntryPersistence.update(fragmentEntry);
-	}
-
-	@Override
-	public FragmentEntry updateFragmentEntry(
 			long fragmentEntryId, long previewFileEntryId)
 		throws PortalException {
 
 		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
 			fragmentEntryId);
 
+		fragmentEntry.setModifiedDate(new Date());
 		fragmentEntry.setPreviewFileEntryId(previewFileEntryId);
 
 		return fragmentEntryPersistence.update(fragmentEntry);
@@ -625,38 +614,17 @@ public class FragmentEntryLocalServiceImpl
 	public FragmentEntry updateFragmentEntry(
 			long userId, long fragmentEntryId, long fragmentCollectionId,
 			String name, String css, String html, String js, boolean cacheable,
-			String configuration, String icon, long previewFileEntryId,
-			int status)
+			String configuration, long previewFileEntryId, int status)
 		throws PortalException {
 
 		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
 			fragmentEntryId);
 
-		return fragmentEntryLocalService.updateFragmentEntry(
-			userId, fragmentEntryId, fragmentCollectionId, name, css, html, js,
-			cacheable, configuration, icon, previewFileEntryId,
-			fragmentEntry.getTypeOptions(), status);
-	}
-
-	@Override
-	public FragmentEntry updateFragmentEntry(
-			long userId, long fragmentEntryId, long fragmentCollectionId,
-			String name, String css, String html, String js, boolean cacheable,
-			String configuration, String icon, long previewFileEntryId,
-			String typeOptions, int status)
-		throws PortalException {
-
-		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
-			fragmentEntryId);
-
-		_validate(name);
+		validate(name);
 
 		if (WorkflowConstants.STATUS_APPROVED == status) {
 			_fragmentEntryValidator.validateConfiguration(configuration);
-			_fragmentEntryValidator.validateTypeOptions(
-				fragmentEntry.getType(), typeOptions);
-
-			_validateContent(html, configuration);
+			validateContent(html, configuration);
 		}
 
 		User user = _userLocalService.getUser(userId);
@@ -669,9 +637,7 @@ public class FragmentEntryLocalServiceImpl
 		fragmentEntry.setJs(js);
 		fragmentEntry.setCacheable(cacheable);
 		fragmentEntry.setConfiguration(configuration);
-		fragmentEntry.setIcon(icon);
 		fragmentEntry.setPreviewFileEntryId(previewFileEntryId);
-		fragmentEntry.setTypeOptions(typeOptions);
 		fragmentEntry.setStatus(status);
 		fragmentEntry.setStatusByUserId(userId);
 		fragmentEntry.setStatusByUserName(user.getFullName());
@@ -699,6 +665,53 @@ public class FragmentEntryLocalServiceImpl
 		return fragmentEntry;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 * #updateFragmentEntry(long, long, long, String, String, String, String, boolean, String, long, int)}
+	 */
+	@Deprecated
+	@Override
+	public FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, boolean cacheable, String configuration,
+			long previewFileEntryId, int status)
+		throws PortalException {
+
+		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
+			fragmentEntryId);
+
+		return updateFragmentEntry(
+			userId, fragmentEntryId, fragmentEntry.getFragmentCollectionId(),
+			name, css, html, js, cacheable, configuration, previewFileEntryId,
+			status);
+	}
+
+	@Override
+	public FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, String configuration, int status)
+		throws PortalException {
+
+		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
+			fragmentEntryId);
+
+		return updateFragmentEntry(
+			userId, fragmentEntryId, name, css, html, js, configuration,
+			fragmentEntry.getPreviewFileEntryId(), status);
+	}
+
+	@Override
+	public FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, String configuration,
+			long previewFileEntryId, int status)
+		throws PortalException {
+
+		return updateFragmentEntry(
+			userId, fragmentEntryId, name, css, html, js, false, configuration,
+			previewFileEntryId, status);
+	}
+
 	@Override
 	public FragmentEntry updateFragmentEntry(long fragmentEntryId, String name)
 		throws PortalException {
@@ -710,97 +723,63 @@ public class FragmentEntryLocalServiceImpl
 			return fragmentEntry;
 		}
 
-		_validate(name);
+		validate(name);
 
 		fragmentEntry.setName(name);
 
 		return fragmentEntryPersistence.update(fragmentEntry);
 	}
 
-	private void _addFragmentCollectionResources(
-			FragmentEntry fragmentEntry, ServiceContext serviceContext,
-			Map<String, FileEntry> fileEntries,
-			FragmentCollection targetFragmentCollection)
-		throws PortalException {
+	protected void validate(String name) throws PortalException {
+		if (Validator.isNull(name)) {
+			throw new FragmentEntryNameException("Name must not be null");
+		}
 
-		for (Map.Entry<String, FileEntry> entry : fileEntries.entrySet()) {
-			FileEntry fileEntry = entry.getValue();
+		if (name.contains(StringPool.PERIOD) ||
+			name.contains(StringPool.SLASH)) {
 
-			FileEntry existingFileEntry =
-				PortletFileRepositoryUtil.fetchPortletFileEntry(
-					fragmentEntry.getGroupId(),
-					targetFragmentCollection.getResourcesFolderId(),
-					fileEntry.getFileName());
+			throw new FragmentEntryNameException(
+				"Name contains invalid characters");
+		}
 
-			if (existingFileEntry == null) {
-				PortletFileRepositoryUtil.addPortletFileEntry(
-					null, serviceContext.getScopeGroupId(),
-					serviceContext.getUserId(),
-					FragmentCollection.class.getName(),
-					targetFragmentCollection.getFragmentCollectionId(),
-					FragmentPortletKeys.FRAGMENT,
-					targetFragmentCollection.getResourcesFolderId(),
-					fileEntry.getContentStream(), fileEntry.getFileName(),
-					fileEntry.getMimeType(), false);
-			}
+		int nameMaxLength = ModelHintsUtil.getMaxLength(
+			FragmentEntry.class.getName(), "name");
+
+		if (name.length() > nameMaxLength) {
+			throw new FragmentEntryNameException(
+				"Maximum length of name exceeded");
 		}
 	}
 
-	private void _addFragmentCollectionResourcesWithFolders(
-			FragmentEntry fragmentEntry, ServiceContext serviceContext,
-			Map<String, FileEntry> fileEntries,
-			FragmentCollection targetFragmentCollection)
-		throws Exception {
+	protected void validateContent(String html, String configuration)
+		throws PortalException {
 
-		Repository repository = _getRepository(
-			targetFragmentCollection.getGroupId());
+		_fragmentEntryProcessorRegistry.validateFragmentEntryHTML(
+			html, configuration);
+	}
 
-		Map<String, Long> folderIdMap = HashMapBuilder.put(
-			StringPool.BLANK, targetFragmentCollection.getResourcesFolderId()
-		).build();
+	protected void validateFragmentEntryKey(
+			long groupId, String fragmentEntryKey)
+		throws PortalException {
 
-		for (Map.Entry<String, FileEntry> entry : fileEntries.entrySet()) {
-			String fileName = entry.getKey();
-			String folderPath = StringPool.BLANK;
+		fragmentEntryKey = _getFragmentEntryKey(fragmentEntryKey);
 
-			int index = fileName.lastIndexOf(StringPool.SLASH);
+		FragmentEntry fragmentEntry = fetchFragmentEntry(
+			groupId, fragmentEntryKey);
 
-			if (index != -1) {
-				folderPath = fileName.substring(0, index);
-				fileName = fileName.substring(index + 1);
-			}
-
-			long folderId = _getOrCreateFolderId(
-				folderIdMap, folderPath, repository.getRepositoryId(),
-				fragmentEntry.getUserId());
-
-			FileEntry existingFileEntry =
-				PortletFileRepositoryUtil.fetchPortletFileEntry(
-					fragmentEntry.getGroupId(), folderId, fileName);
-
-			if (existingFileEntry == null) {
-				FileEntry fileEntry = entry.getValue();
-
-				PortletFileRepositoryUtil.addPortletFileEntry(
-					null, serviceContext.getScopeGroupId(),
-					serviceContext.getUserId(),
-					FragmentCollection.class.getName(),
-					targetFragmentCollection.getFragmentCollectionId(),
-					FragmentPortletKeys.FRAGMENT, folderId,
-					fileEntry.getContentStream(), fileName,
-					fileEntry.getMimeType(), false);
-			}
+		if (fragmentEntry != null) {
+			throw new DuplicateFragmentEntryKeyException();
 		}
 	}
 
 	private void _copyFragmentEntryPreviewFileEntry(
-			long userId, long groupId, FragmentEntry sourceFragmentEntry,
-			FragmentEntry targetFragmentEntry)
+			long userId, long groupId, FragmentEntry fragmentEntry,
+			FragmentEntry copyFragmentEntry)
 		throws PortalException {
 
-		if (sourceFragmentEntry.getPreviewFileEntryId() != 0) {
+		if (fragmentEntry.getPreviewFileEntryId() != 0) {
 			FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-				sourceFragmentEntry.getPreviewFileEntryId());
+				fragmentEntry.getPreviewFileEntryId());
 
 			Repository repository =
 				PortletFileRepositoryUtil.fetchPortletRepository(
@@ -819,25 +798,26 @@ public class FragmentEntryLocalServiceImpl
 			}
 
 			String fileName =
-				targetFragmentEntry.getFragmentEntryId() + "_preview." +
+				copyFragmentEntry.getFragmentEntryId() + "_preview." +
 					fileEntry.getExtension();
 
 			fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-				null, groupId, userId, FragmentEntry.class.getName(),
-				targetFragmentEntry.getFragmentEntryId(),
+				groupId, userId, FragmentEntry.class.getName(),
+				copyFragmentEntry.getFragmentEntryId(),
 				FragmentPortletKeys.FRAGMENT, repository.getDlFolderId(),
 				fileEntry.getContentStream(), fileName, fileEntry.getMimeType(),
 				false);
 
 			updateFragmentEntry(
-				targetFragmentEntry.getFragmentEntryId(),
+				copyFragmentEntry.getFragmentEntryId(),
 				fileEntry.getFileEntryId());
 		}
 	}
 
 	private void _copyFragmentEntryResources(
-		FragmentEntry fragmentEntry, long sourceFragmentCollectionId,
-		long targetFragmentCollectionId) {
+			FragmentEntry fragmentEntry, long sourceFragmentCollectionId,
+			long targetFragmentCollectionId)
+		throws PortalException {
 
 		if (sourceFragmentCollectionId == targetFragmentCollectionId) {
 			return;
@@ -846,7 +826,7 @@ public class FragmentEntryLocalServiceImpl
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		Map<String, FileEntry> fileEntries = _getFileEntries(
+		Set<FileEntry> fileEntries = _getFileEntries(
 			sourceFragmentCollectionId, fragmentEntry);
 
 		if ((serviceContext == null) || fileEntries.isEmpty()) {
@@ -858,28 +838,38 @@ public class FragmentEntryLocalServiceImpl
 				targetFragmentCollectionId);
 
 		try {
-			if (FeatureFlagManagerUtil.isEnabled("LPS-158675")) {
-				_addFragmentCollectionResourcesWithFolders(
-					fragmentEntry, serviceContext, fileEntries,
-					targetFragmentCollection);
-			}
-			else {
-				_addFragmentCollectionResources(
-					fragmentEntry, serviceContext, fileEntries,
-					targetFragmentCollection);
+			for (FileEntry fileEntry : fileEntries) {
+				FileEntry existingFileEntry =
+					PortletFileRepositoryUtil.fetchPortletFileEntry(
+						fragmentEntry.getGroupId(),
+						targetFragmentCollection.getResourcesFolderId(),
+						fileEntry.getFileName());
+
+				if (existingFileEntry == null) {
+					PortletFileRepositoryUtil.addPortletFileEntry(
+						serviceContext.getScopeGroupId(),
+						serviceContext.getUserId(),
+						FragmentCollection.class.getName(),
+						targetFragmentCollection.getFragmentCollectionId(),
+						FragmentPortletKeys.FRAGMENT,
+						targetFragmentCollection.getResourcesFolderId(),
+						fileEntry.getContentStream(), fileEntry.getFileName(),
+						fileEntry.getMimeType(), false);
+				}
 			}
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 	}
 
-	private Map<String, FileEntry> _getFileEntries(
-		long fragmentCollectionId, FragmentEntry fragmentEntry) {
+	private Set<FileEntry> _getFileEntries(
+			long fragmentCollectionId, FragmentEntry fragmentEntry)
+		throws PortalException {
 
-		Map<String, FileEntry> fileEntries = new HashMap<>();
+		Set<FileEntry> fileEntries = new HashSet<>();
 
 		FragmentCollection fragmentCollection =
 			_fragmentCollectionPersistence.fetchByPrimaryKey(
@@ -888,11 +878,14 @@ public class FragmentEntryLocalServiceImpl
 		Matcher matcher = _pattern.matcher(fragmentEntry.getHtml());
 
 		while (matcher.find()) {
-			FileEntry fileEntry = fragmentCollection.getResource(
-				matcher.group(1));
+			FileEntry fileEntry =
+				PortletFileRepositoryUtil.fetchPortletFileEntry(
+					fragmentEntry.getGroupId(),
+					fragmentCollection.getResourcesFolderId(),
+					matcher.group(1));
 
 			if (fileEntry != null) {
-				fileEntries.put(matcher.group(1), fileEntry);
+				fileEntries.add(fileEntry);
 			}
 		}
 
@@ -907,56 +900,6 @@ public class FragmentEntryLocalServiceImpl
 		}
 
 		return StringPool.BLANK;
-	}
-
-	private long _getOrCreateFolderId(
-			Map<String, Long> folderIdMap, String folderPath, long repositoryId,
-			long userId)
-		throws Exception {
-
-		if (folderIdMap.containsKey(folderPath)) {
-			return folderIdMap.get(folderPath);
-		}
-
-		String folderName = folderPath;
-
-		String parentFolderPath = StringPool.BLANK;
-
-		int index = folderName.lastIndexOf(StringPool.SLASH);
-
-		if (index != -1) {
-			folderName = folderName.substring(index + 1);
-
-			parentFolderPath = folderPath.substring(0, index);
-		}
-
-		Folder folder = PortletFileRepositoryUtil.addPortletFolder(
-			userId, repositoryId,
-			_getOrCreateFolderId(
-				folderIdMap, parentFolderPath, repositoryId, userId),
-			folderName, ServiceContextThreadLocal.getServiceContext());
-
-		folderIdMap.put(folderPath, folder.getFolderId());
-
-		return folder.getFolderId();
-	}
-
-	private Repository _getRepository(long groupId) throws Exception {
-		Repository repository =
-			PortletFileRepositoryUtil.fetchPortletRepository(
-				groupId, FragmentPortletKeys.FRAGMENT);
-
-		if (repository == null) {
-			ServiceContext serviceContext = new ServiceContext();
-
-			serviceContext.setAddGroupPermissions(true);
-			serviceContext.setAddGuestPermissions(true);
-
-			repository = PortletFileRepositoryUtil.addPortletRepository(
-				groupId, FragmentPortletKeys.FRAGMENT, serviceContext);
-		}
-
-		return repository;
 	}
 
 	private void _propagateChanges(long fragmentEntryId)
@@ -978,48 +921,6 @@ public class FragmentEntryLocalServiceImpl
 					fragmentEntryLink.getFragmentEntryLinkId()));
 
 		actionableDynamicQuery.performActions();
-	}
-
-	private void _validate(String name) throws PortalException {
-		if (Validator.isNull(name)) {
-			throw new FragmentEntryNameException("Name must not be null");
-		}
-
-		if (name.contains(StringPool.PERIOD) ||
-			name.contains(StringPool.SLASH)) {
-
-			throw new FragmentEntryNameException(
-				"Name contains invalid characters");
-		}
-
-		int nameMaxLength = ModelHintsUtil.getMaxLength(
-			FragmentEntry.class.getName(), "name");
-
-		if (name.length() > nameMaxLength) {
-			throw new FragmentEntryNameException(
-				"Maximum length of name exceeded");
-		}
-	}
-
-	private void _validateContent(String html, String configuration)
-		throws PortalException {
-
-		_fragmentEntryProcessorRegistry.validateFragmentEntryHTML(
-			html, configuration);
-	}
-
-	private void _validateFragmentEntryKey(
-			long groupId, String fragmentEntryKey)
-		throws PortalException {
-
-		fragmentEntryKey = _getFragmentEntryKey(fragmentEntryKey);
-
-		FragmentEntry fragmentEntry = fetchFragmentEntry(
-			groupId, fragmentEntryKey);
-
-		if (fragmentEntry != null) {
-			throw new DuplicateFragmentEntryKeyException();
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -1051,9 +952,6 @@ public class FragmentEntryLocalServiceImpl
 
 	@Reference
 	private FragmentEntryValidator _fragmentEntryValidator;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;

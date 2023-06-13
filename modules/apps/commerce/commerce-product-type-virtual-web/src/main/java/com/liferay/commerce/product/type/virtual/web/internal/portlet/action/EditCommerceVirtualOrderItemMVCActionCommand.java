@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER,
 		"mvc.command.name=/commerce_order/edit_commerce_virtual_order_item"
@@ -56,7 +57,7 @@ public class EditCommerceVirtualOrderItemMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.UPDATE)) {
-				_updateCommerceVirtualOrderItem(actionRequest);
+				updateCommerceVirtualOrderItem(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -87,7 +88,7 @@ public class EditCommerceVirtualOrderItemMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceVirtualOrderItem(ActionRequest actionRequest)
+	protected void updateCommerceVirtualOrderItem(ActionRequest actionRequest)
 		throws Exception {
 
 		long commerceVirtualOrderItemId = ParamUtil.getLong(

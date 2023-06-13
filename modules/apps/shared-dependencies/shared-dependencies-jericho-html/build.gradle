@@ -1,3 +1,0 @@
-dependencies {
-	compileInclude group: "net.htmlparser.jericho", name: "jericho-html", version: "3.1"
-}

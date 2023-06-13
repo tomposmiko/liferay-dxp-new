@@ -27,10 +27,6 @@ import com.liferay.social.kernel.model.SocialRequest;
 public class SocialRequestServiceWrapper
 	implements ServiceWrapper<SocialRequestService>, SocialRequestService {
 
-	public SocialRequestServiceWrapper() {
-		this(null);
-	}
-
 	public SocialRequestServiceWrapper(
 		SocialRequestService socialRequestService) {
 

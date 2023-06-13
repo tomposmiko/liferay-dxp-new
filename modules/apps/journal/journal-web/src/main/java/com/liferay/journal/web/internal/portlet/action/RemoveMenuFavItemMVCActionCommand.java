@@ -15,7 +15,6 @@
 package com.liferay.journal.web.internal.portlet.action;
 
 import com.liferay.journal.constants.JournalPortletKeys;
-import com.liferay.journal.util.JournalHelper;
 import com.liferay.journal.web.internal.util.JournalPortletUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -28,12 +27,12 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"mvc.command.name=/journal/remove_menu_fav_item"
@@ -47,24 +46,21 @@ public class RemoveMenuFavItemMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long ddmStructureId = ParamUtil.getLong(
-			actionRequest, "ddmStructureId");
+		String ddmStructureKey = ParamUtil.getString(
+			actionRequest, "ddmStructureKey");
 
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(actionRequest);
 
 		String key = JournalPortletUtil.getAddMenuFavItemKey(
-			_journalHelper, actionRequest);
+			actionRequest, actionResponse);
 
 		String[] addMenuFavItems = portalPreferences.getValues(
 			JournalPortletKeys.JOURNAL, key);
 
 		portalPreferences.setValues(
 			JournalPortletKeys.JOURNAL, key,
-			ArrayUtil.remove(addMenuFavItems, String.valueOf(ddmStructureId)));
+			ArrayUtil.remove(addMenuFavItems, ddmStructureKey));
 	}
-
-	@Reference
-	private JournalHelper _journalHelper;
 
 }

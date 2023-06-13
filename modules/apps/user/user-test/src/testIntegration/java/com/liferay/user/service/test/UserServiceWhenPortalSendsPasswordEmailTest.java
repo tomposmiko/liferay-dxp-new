@@ -16,6 +16,7 @@ package com.liferay.user.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -24,13 +25,13 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.PrefsProps;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.test.mail.MailServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
+import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 
 import java.util.Objects;
@@ -122,9 +123,11 @@ public class UserServiceWhenPortalSendsPasswordEmailTest {
 	public void setUp() throws Exception {
 		_user = UserTestUtil.addUser();
 
-		ServiceContextThreadLocal.pushServiceContext(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_user.getGroupId(), _user.getUserId()));
+				_user.getGroupId(), _user.getUserId());
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 	}
 
 	@After
@@ -207,8 +210,8 @@ public class UserServiceWhenPortalSendsPasswordEmailTest {
 	protected PortletPreferences givenThatCompanySendsResetPasswordLink()
 		throws Exception {
 
-		PortletPreferences portletPreferences = _prefsProps.getPreferences(
-			_user.getCompanyId());
+		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
+			_user.getCompanyId(), false);
 
 		portletPreferences.setValue(
 			PropsKeys.COMPANY_SECURITY_SEND_PASSWORD_RESET_LINK,
@@ -235,9 +238,6 @@ public class UserServiceWhenPortalSendsPasswordEmailTest {
 
 	@Inject
 	private static LocalizationUtil _localizationUtil;
-
-	@Inject
-	private PrefsProps _prefsProps;
 
 	@DeleteAfterTestRun
 	private User _user;

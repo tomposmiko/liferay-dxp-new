@@ -22,6 +22,8 @@ import java.io.OutputStream;
  */
 public interface ReportResultContainer {
 
+	public ReportResultContainer clone(String reportName);
+
 	public OutputStream getOutputStream() throws IOException;
 
 	public ReportGenerationException getReportGenerationException();

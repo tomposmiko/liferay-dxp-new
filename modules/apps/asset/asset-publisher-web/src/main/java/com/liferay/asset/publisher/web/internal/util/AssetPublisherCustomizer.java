@@ -17,8 +17,6 @@ package com.liferay.asset.publisher.web.internal.util;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.util.AssetEntryQueryProcessor;
 
-import javax.portlet.PortletPreferences;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -27,8 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 public interface AssetPublisherCustomizer {
 
 	public Integer getDelta(HttpServletRequest httpServletRequest);
-
-	public Integer getDelta(PortletPreferences portletPreferences);
 
 	public String getPortletId();
 

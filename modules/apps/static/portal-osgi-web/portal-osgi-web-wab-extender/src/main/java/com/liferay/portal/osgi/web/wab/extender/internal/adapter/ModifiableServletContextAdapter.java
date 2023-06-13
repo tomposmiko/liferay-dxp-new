@@ -17,7 +17,6 @@ package com.liferay.portal.osgi.web.wab.extender.internal.adapter;
 import com.liferay.petra.io.BigEndianCodec;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.web.servlet.JSPServletFactory;
 import com.liferay.portal.osgi.web.servlet.context.helper.definition.FilterDefinition;
@@ -32,6 +31,7 @@ import java.io.IOException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -45,7 +45,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -70,7 +69,8 @@ public class ModifiableServletContextAdapter
 		JSPServletFactory jspServletFactory,
 		WebXMLDefinition webXMLDefinition) {
 
-		return _servletContextProxyProviderFunction.apply(
+		return (ServletContext)Proxy.newProxyInstance(
+			ModifiableServletContextAdapter.class.getClassLoader(), _INTERFACES,
 			new ModifiableServletContextAdapter(
 				servletContext, bundleContext, jspServletFactory,
 				webXMLDefinition));
@@ -143,7 +143,7 @@ public class ModifiableServletContextAdapter
 		_jspServletFactory = jspServletFactory;
 		_webXMLDefinition = webXMLDefinition;
 
-		_bundle = bundleContext.getBundle();
+		_bundle = _bundleContext.getBundle();
 	}
 
 	public FilterRegistration.Dynamic addFilter(
@@ -350,7 +350,7 @@ public class ModifiableServletContextAdapter
 				}
 				catch (IOException ioException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(ioException);
+						_log.debug(ioException, ioException);
 					}
 				}
 
@@ -646,7 +646,7 @@ public class ModifiableServletContextAdapter
 				}
 				catch (IOException ioException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(ioException);
+						_log.debug(ioException, ioException);
 					}
 				}
 			}
@@ -684,25 +684,19 @@ public class ModifiableServletContextAdapter
 			Class<?>[] parameterTypes = adapterMethod.getParameterTypes();
 
 			try {
-				methods.put(
-					ServletContext.class.getMethod(name, parameterTypes),
-					adapterMethod);
+				Method method = ServletContext.class.getMethod(
+					name, parameterTypes);
+
+				methods.put(method, adapterMethod);
 			}
 			catch (NoSuchMethodException noSuchMethodException1) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchMethodException1);
-				}
-
 				try {
-					methods.put(
-						ModifiableServletContext.class.getMethod(
-							name, parameterTypes),
-						adapterMethod);
+					Method method = ModifiableServletContext.class.getMethod(
+						name, parameterTypes);
+
+					methods.put(method, adapterMethod);
 				}
 				catch (NoSuchMethodException noSuchMethodException2) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(noSuchMethodException2);
-					}
 				}
 			}
 		}
@@ -728,12 +722,16 @@ public class ModifiableServletContextAdapter
 		}
 		catch (NoSuchMethodException noSuchMethodException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchMethodException);
+				_log.debug(noSuchMethodException, noSuchMethodException);
 			}
 		}
 
 		return Collections.unmodifiableMap(methods);
 	}
+
+	private static final Class<?>[] _INTERFACES = new Class<?>[] {
+		ModifiableServletContext.class, ServletContext.class
+	};
 
 	private static final String _LIFERAY_WAB_BUNDLE_RESOURCES_LAST_MODIFIED =
 		"LIFERAY_WAB_BUNDLE_RESOURCES_LAST_MODIFIED";
@@ -742,10 +740,6 @@ public class ModifiableServletContextAdapter
 		ModifiableServletContextAdapter.class);
 
 	private static final Map<Method, Method> _contextAdapterMethods;
-	private static final Function<InvocationHandler, ServletContext>
-		_servletContextProxyProviderFunction =
-			ProxyUtil.getProxyProviderFunction(
-				ModifiableServletContext.class, ServletContext.class);
 
 	static {
 		_contextAdapterMethods = _createContextAdapterMethods();

@@ -36,6 +36,10 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.Optional;
+
+import javax.portlet.PortletURL;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -71,29 +75,30 @@ public class OpenGraphSettingsDisplayContext {
 			new FileEntryItemSelectorReturnType(),
 			new URLItemSelectorReturnType());
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
-				_liferayPortletResponse.getNamespace() +
-					"openGraphImageSelectedItem",
-				imageItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
+			_liferayPortletResponse.getNamespace() +
+				"openGraphImageSelectedItem",
+			imageItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	public LayoutSEOSite getLayoutSEOSite() {
-		Group group = _themeDisplay.getScopeGroup();
+		Group group = _getGroup();
 
 		return _layoutSEOSiteLocalService.fetchLayoutSEOSiteByGroupId(
 			group.getGroupId());
 	}
 
 	public long getOpenGraphImageFileEntryId() {
-		LayoutSEOSite layoutSEOSite = getLayoutSEOSite();
-
-		if (layoutSEOSite != null) {
-			return layoutSEOSite.getOpenGraphImageFileEntryId();
-		}
-
-		return 0L;
+		return Optional.ofNullable(
+			getLayoutSEOSite()
+		).map(
+			LayoutSEOSite::getOpenGraphImageFileEntryId
+		).orElse(
+			0L
+		);
 	}
 
 	public String getOpenGraphImageTitle() {
@@ -114,7 +119,7 @@ public class OpenGraphSettingsDisplayContext {
 			return fileEntry.getTitle();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return StringPool.BLANK;
 		}
@@ -138,15 +143,22 @@ public class OpenGraphSettingsDisplayContext {
 			return _dlurlHelper.getImagePreviewURL(fileEntry, _themeDisplay);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return StringPool.BLANK;
 		}
 	}
 
 	public boolean isOpenGraphEnabled() throws PortalException {
-		return _openGraphConfiguration.isOpenGraphEnabled(
-			_themeDisplay.getScopeGroup());
+		return _openGraphConfiguration.isOpenGraphEnabled(_getGroup());
+	}
+
+	private Group _getGroup() {
+		return Optional.ofNullable(
+			(Group)_httpServletRequest.getAttribute("site.liveGroup")
+		).orElseGet(
+			() -> (Group)_httpServletRequest.getAttribute("site.group")
+		);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

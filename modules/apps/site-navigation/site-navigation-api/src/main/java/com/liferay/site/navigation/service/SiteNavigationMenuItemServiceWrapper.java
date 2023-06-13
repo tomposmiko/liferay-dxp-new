@@ -28,10 +28,6 @@ public class SiteNavigationMenuItemServiceWrapper
 	implements ServiceWrapper<SiteNavigationMenuItemService>,
 			   SiteNavigationMenuItemService {
 
-	public SiteNavigationMenuItemServiceWrapper() {
-		this(null);
-	}
-
 	public SiteNavigationMenuItemServiceWrapper(
 		SiteNavigationMenuItemService siteNavigationMenuItemService) {
 
@@ -58,15 +54,6 @@ public class SiteNavigationMenuItemServiceWrapper
 
 		return _siteNavigationMenuItemService.deleteSiteNavigationMenuItem(
 			siteNavigationMenuItemId);
-	}
-
-	@Override
-	public SiteNavigationMenuItem deleteSiteNavigationMenuItem(
-			long siteNavigationMenuItemId, boolean deleteChildren)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _siteNavigationMenuItemService.deleteSiteNavigationMenuItem(
-			siteNavigationMenuItemId, deleteChildren);
 	}
 
 	@Override

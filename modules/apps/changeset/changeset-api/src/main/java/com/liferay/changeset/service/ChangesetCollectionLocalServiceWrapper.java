@@ -27,10 +27,6 @@ public class ChangesetCollectionLocalServiceWrapper
 	implements ChangesetCollectionLocalService,
 			   ServiceWrapper<ChangesetCollectionLocalService> {
 
-	public ChangesetCollectionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ChangesetCollectionLocalServiceWrapper(
 		ChangesetCollectionLocalService changesetCollectionLocalService) {
 

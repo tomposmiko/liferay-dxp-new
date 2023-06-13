@@ -27,10 +27,6 @@ public class MemberRequestLocalServiceWrapper
 	implements MemberRequestLocalService,
 			   ServiceWrapper<MemberRequestLocalService> {
 
-	public MemberRequestLocalServiceWrapper() {
-		this(null);
-	}
-
 	public MemberRequestLocalServiceWrapper(
 		MemberRequestLocalService memberRequestLocalService) {
 

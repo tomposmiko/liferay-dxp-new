@@ -45,8 +45,8 @@ public class NodeWorkflowMetricsIndexerTest
 
 		startState.addOutgoingTransition(
 			new Transition(
-				true, null, "review", startState,
-				new Task("review", StringPool.BLANK)));
+				"review", startState, new Task("review", StringPool.BLANK),
+				true));
 
 		KaleoNode kaleoNode = addKaleoNode(startState);
 

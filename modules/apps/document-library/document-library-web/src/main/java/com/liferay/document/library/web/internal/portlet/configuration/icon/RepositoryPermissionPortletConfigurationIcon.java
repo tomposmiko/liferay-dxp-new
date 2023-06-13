@@ -19,13 +19,13 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.web.internal.portlet.action.ActionUtil;
 import com.liferay.document.library.web.internal.util.DLPortletConfigurationIconUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.security.PermissionsURLTag;
 
@@ -33,7 +33,6 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Roberto Díaz
@@ -50,7 +49,8 @@ public class RepositoryPermissionPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "permissions");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "permissions");
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class RepositoryPermissionPortletConfigurationIcon
 
 			return PermissionsURLTag.doTag(
 				null, DLFolderConstants.getClassName(),
-				_html.unescape(repository.getName()), null,
+				HtmlUtil.unescape(repository.getName()), null,
 				String.valueOf(repository.getDlFolderId()),
 				LiferayWindowState.POP_UP.toString(), null,
 				themeDisplay.getRequest());
@@ -98,14 +98,13 @@ public class RepositoryPermissionPortletConfigurationIcon
 	}
 
 	@Override
+	public boolean isToolTip() {
+		return false;
+	}
+
+	@Override
 	public boolean isUseDialog() {
 		return true;
 	}
-
-	@Reference
-	private Html _html;
-
-	@Reference
-	private Language _language;
 
 }

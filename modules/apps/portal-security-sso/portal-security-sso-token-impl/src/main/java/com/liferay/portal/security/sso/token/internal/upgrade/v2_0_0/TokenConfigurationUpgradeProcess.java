@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelperUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -53,7 +52,7 @@ public class TokenConfigurationUpgradeProcess extends UpgradeProcess {
 			settings.getModifiableSettings();
 
 		SettingsDescriptor settingsDescriptor =
-			SettingsLocatorHelperUtil.getSettingsDescriptor(settingsId);
+			SettingsFactoryUtil.getSettingsDescriptor(settingsId);
 
 		for (String name : settingsDescriptor.getAllKeys()) {
 			String value = dictionary.get(name);

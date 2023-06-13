@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -62,7 +61,7 @@ public class AccountMember implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getAccountId() {
 		return accountId;
 	}
@@ -90,9 +89,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long accountId;
 
-	@Schema(
-		example = "[{description={en_US=Account Administrator Description US, hr_HR=Account Administrator Description HR, hu_HU=Account Administrator Description HU}}, {description={en_US=Order Manager Description US, hr_HR=Order Manager Description HR, hu_HU=Order Manager Description HU}}]"
-	)
+	@Schema
 	@Valid
 	public AccountRole[] getAccountRoles() {
 		return accountRoles;
@@ -121,7 +118,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AccountRole[] accountRoles;
 
-	@Schema(example = "joe.1@commerce.com")
+	@Schema
 	public String getEmail() {
 		return email;
 	}
@@ -150,7 +147,7 @@ public class AccountMember implements Serializable {
 	@NotEmpty
 	protected String email;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -178,7 +175,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@Schema(example = "User Name")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -204,7 +201,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	@Schema(example = "UAB-34098-789-N")
+	@Schema
 	public String getUserExternalReferenceCode() {
 		return userExternalReferenceCode;
 	}
@@ -235,7 +232,7 @@ public class AccountMember implements Serializable {
 	protected String userExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30002")
+	@Schema
 	public Long getUserId() {
 		return userId;
 	}
@@ -399,9 +396,9 @@ public class AccountMember implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -427,7 +424,7 @@ public class AccountMember implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -459,7 +456,7 @@ public class AccountMember implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -475,10 +472,5 @@ public class AccountMember implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

@@ -35,10 +35,8 @@ public abstract class BaseJSPDynamicInclude extends BaseDynamicInclude {
 			HttpServletResponse httpServletResponse, String key)
 		throws IOException {
 
-		ServletContext servletContext = getServletContext();
-
 		RequestDispatcher requestDispatcher =
-			servletContext.getRequestDispatcher(getJspPath());
+			_servletContext.getRequestDispatcher(getJspPath());
 
 		try {
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
@@ -63,6 +61,10 @@ public abstract class BaseJSPDynamicInclude extends BaseDynamicInclude {
 
 	protected abstract Log getLog();
 
-	protected abstract ServletContext getServletContext();
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	private ServletContext _servletContext;
 
 }

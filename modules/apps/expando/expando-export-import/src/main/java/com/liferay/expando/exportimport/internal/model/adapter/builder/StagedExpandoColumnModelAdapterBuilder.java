@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Akos Thurzo
  */
-@Component(service = ModelAdapterBuilder.class)
+@Component(immediate = true, service = ModelAdapterBuilder.class)
 public class StagedExpandoColumnModelAdapterBuilder
 	implements ModelAdapterBuilder<ExpandoColumn, StagedExpandoColumn> {
 

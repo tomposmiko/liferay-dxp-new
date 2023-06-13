@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -66,8 +65,7 @@ public class ExportTask implements Serializable {
 	}
 
 	@Schema(
-		description = "The item class name for which data will be exported in batch.",
-		example = "com.liferay.headless.delivery.dto.v1_0.BlogPosting"
+		description = "The item class name for which data will be exported in batch."
 	)
 	public String getClassName() {
 		return className;
@@ -98,7 +96,7 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String className;
 
-	@Schema(description = "The file content type.", example = "JSON")
+	@Schema(description = "The file content type.")
 	public String getContentType() {
 		return contentType;
 	}
@@ -126,10 +124,7 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String contentType;
 
-	@Schema(
-		description = "The end time of export task operation.",
-		example = "2019-27-09'T'08:33:33'Z'"
-	)
+	@Schema(description = "The end time of export task operation.")
 	public Date getEndTime() {
 		return endTime;
 	}
@@ -158,8 +153,7 @@ public class ExportTask implements Serializable {
 	protected Date endTime;
 
 	@Schema(
-		description = "The error message in case of export task's failed execution.",
-		example = "File import failed"
+		description = "The error message in case of export task's failed execution."
 	)
 	public String getErrorMessage() {
 		return errorMessage;
@@ -190,10 +184,7 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String errorMessage;
 
-	@Schema(
-		description = "The status of export task's execution.",
-		example = "INITIALIZED"
-	)
+	@Schema(description = "The status of export task's execution.")
 	@Valid
 	public ExecuteStatus getExecuteStatus() {
 		return executeStatus;
@@ -231,36 +222,8 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ExecuteStatus executeStatus;
 
-	@Schema(description = "The optional external key of this account.")
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	@JsonIgnore
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The optional external key of this account.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String externalReferenceCode;
-
 	@DecimalMin("0")
-	@Schema(description = "The task's ID.", example = "30130")
+	@Schema(description = "The task's ID.")
 	public Long getId() {
 		return id;
 	}
@@ -287,10 +250,7 @@ public class ExportTask implements Serializable {
 	protected Long id;
 
 	@DecimalMin("0")
-	@Schema(
-		description = "Number of items processed by export task opeartion.",
-		example = "100"
-	)
+	@Schema(description = "Number of items processed by export task opeartion.")
 	public Integer getProcessedItemsCount() {
 		return processedItemsCount;
 	}
@@ -320,10 +280,7 @@ public class ExportTask implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer processedItemsCount;
 
-	@Schema(
-		description = "The start time of export task operation.",
-		example = "2019-27-09'T'08:23:33'Z'"
-	)
+	@Schema(description = "The start time of export task operation.")
 	public Date getStartTime() {
 		return startTime;
 	}
@@ -353,8 +310,7 @@ public class ExportTask implements Serializable {
 
 	@DecimalMin("0")
 	@Schema(
-		description = "Total number of items that will be processed by export task operation.",
-		example = "1000"
+		description = "Total number of items that will be processed by export task operation."
 	)
 	public Integer getTotalItemsCount() {
 		return totalItemsCount;
@@ -485,20 +441,6 @@ public class ExportTask implements Serializable {
 			sb.append("\"");
 		}
 
-		if (externalReferenceCode != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(externalReferenceCode));
-
-			sb.append("\"");
-		}
-
 		if (id != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -595,9 +537,9 @@ public class ExportTask implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -623,7 +565,7 @@ public class ExportTask implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -655,7 +597,7 @@ public class ExportTask implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -671,10 +613,5 @@ public class ExportTask implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

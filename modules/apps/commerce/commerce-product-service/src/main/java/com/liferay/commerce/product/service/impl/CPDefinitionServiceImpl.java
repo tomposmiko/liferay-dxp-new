@@ -17,22 +17,17 @@ package com.liferay.commerce.product.service.impl;
 import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPDefinition;
-import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CommerceCatalog;
-import com.liferay.commerce.product.service.CPDisplayLayoutLocalService;
-import com.liferay.commerce.product.service.CProductLocalService;
-import com.liferay.commerce.product.service.CommerceCatalogLocalService;
-import com.liferay.commerce.product.service.CommerceCatalogService;
 import com.liferay.commerce.product.service.base.CPDefinitionServiceBaseImpl;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -42,21 +37,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.stream.Stream;
 
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CPDefinition"
-	},
-	service = AopService.class
-)
 public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 
 	@Override
@@ -84,8 +70,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			long maxSubscriptionCycles, boolean deliverySubscriptionEnabled,
 			int deliverySubscriptionLength, String deliverySubscriptionType,
 			UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties,
-			long deliveryMaxSubscriptionCycles, int status,
-			ServiceContext serviceContext)
+			long deliveryMaxSubscriptionCycles, ServiceContext serviceContext)
 		throws PortalException {
 
 		_checkCommerceCatalog(groupId, ActionKeys.UPDATE);
@@ -105,7 +90,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			maxSubscriptionCycles, deliverySubscriptionEnabled,
 			deliverySubscriptionLength, deliverySubscriptionType,
 			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, status, serviceContext);
+			deliveryMaxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
@@ -130,8 +115,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
 			int subscriptionLength, String subscriptionType,
 			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, int status,
-			ServiceContext serviceContext)
+			long maxSubscriptionCycles, ServiceContext serviceContext)
 		throws PortalException {
 
 		_checkCommerceCatalog(groupId, ActionKeys.UPDATE);
@@ -148,7 +132,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
 			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, status, serviceContext);
+			maxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
@@ -176,8 +160,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			long maxSubscriptionCycles, boolean deliverySubscriptionEnabled,
 			int deliverySubscriptionLength, String deliverySubscriptionType,
 			UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties,
-			long deliveryMaxSubscriptionCycles, int status,
-			ServiceContext serviceContext)
+			long deliveryMaxSubscriptionCycles, ServiceContext serviceContext)
 		throws PortalException {
 
 		_checkCommerceCatalog(groupId, ActionKeys.UPDATE);
@@ -197,7 +180,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			maxSubscriptionCycles, deliverySubscriptionEnabled,
 			deliverySubscriptionLength, deliverySubscriptionType,
 			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, status, serviceContext);
+			deliveryMaxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
@@ -222,8 +205,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
 			int subscriptionLength, String subscriptionType,
 			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, int status,
-			ServiceContext serviceContext)
+			long maxSubscriptionCycles, ServiceContext serviceContext)
 		throws PortalException {
 
 		_checkCommerceCatalog(groupId, ActionKeys.UPDATE);
@@ -240,29 +222,17 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
 			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, status, serviceContext);
+			maxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
-	public CPDefinition cloneCPDefinition(
-			long cpDefinitionId, long groupId, ServiceContext serviceContext)
-		throws PortalException {
-
-		_checkCommerceCatalog(groupId, ActionKeys.UPDATE);
-
-		return cpDefinitionLocalService.cloneCPDefinition(
-			getUserId(), cpDefinitionId, groupId, serviceContext);
-	}
-
-	@Override
-	public CPDefinition copyCPDefinition(
-			long sourceCPDefinitionId, long groupId, int status)
+	public CPDefinition copyCPDefinition(long cpDefinitionId, long groupId)
 		throws PortalException {
 
 		_checkCommerceCatalog(groupId, ActionKeys.UPDATE);
 
 		return cpDefinitionLocalService.copyCPDefinition(
-			sourceCPDefinitionId, groupId, status);
+			cpDefinitionId, groupId);
 	}
 
 	@Override
@@ -364,31 +334,6 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 	}
 
 	@Override
-	public CPDefinition getCProductCPDefinition(long cProductId, int version)
-		throws PortalException {
-
-		CProduct cProduct = _cProductLocalService.getCProduct(cProductId);
-
-		_checkCommerceCatalog(cProduct.getGroupId(), ActionKeys.VIEW);
-
-		return cpDefinitionLocalService.getCProductCPDefinition(
-			cProductId, version);
-	}
-
-	@Override
-	public List<CPDefinition> getCProductCPDefinitions(
-			long cProductId, int status, int start, int end)
-		throws PortalException {
-
-		CProduct cProduct = _cProductLocalService.getCProduct(cProductId);
-
-		_checkCommerceCatalog(cProduct.getGroupId(), ActionKeys.VIEW);
-
-		return cpDefinitionLocalService.getCProductCPDefinitions(
-			cProduct.getCProductId(), status, start, end);
-	}
-
-	@Override
 	public CPAttachmentFileEntry getDefaultImageCPAttachmentFileEntry(
 			long cpDefinitionId)
 		throws PortalException {
@@ -397,6 +342,18 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 
 		return cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
 			cpDefinitionId);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public String getLayoutUuid(long cpDefinitionId) throws PortalException {
+		_checkCommerceCatalogByCPDefinitionId(cpDefinitionId, ActionKeys.VIEW);
+
+		return cpDefinitionLocalService.getLayoutUuid(
+			GroupConstants.DEFAULT_LIVE_GROUP_ID, cpDefinitionId);
 	}
 
 	@Override
@@ -419,17 +376,22 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 
 	@Override
 	public BaseModelSearchResult<CPDefinition> searchCPDefinitions(
-			long companyId, String keywords, int status,
-			boolean ignoreCommerceAccountGroup, int start, int end, Sort sort)
+			long companyId, String keywords, int status, int start, int end,
+			Sort sort)
 		throws PortalException {
 
+		List<CommerceCatalog> commerceCatalogs =
+			commerceCatalogService.getCommerceCatalogs(
+				companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		long[] groupIds = stream.mapToLong(
+			CommerceCatalog::getGroupId
+		).toArray();
+
 		return cpDefinitionLocalService.searchCPDefinitions(
-			companyId,
-			TransformUtil.transformToLongArray(
-				_commerceCatalogService.getCommerceCatalogs(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-				CommerceCatalog::getGroupId),
-			keywords, status, ignoreCommerceAccountGroup, start, end, sort);
+			companyId, groupIds, keywords, status, start, end, sort);
 	}
 
 	@Override
@@ -438,31 +400,41 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			String filterValues, int start, int end, Sort sort)
 		throws PortalException {
 
+		List<CommerceCatalog> commerceCatalogs =
+			commerceCatalogService.getCommerceCatalogs(
+				companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		long[] groupIds = stream.mapToLong(
+			CommerceCatalog::getGroupId
+		).toArray();
+
 		return cpDefinitionLocalService.searchCPDefinitions(
-			companyId,
-			TransformUtil.transformToLongArray(
-				_commerceCatalogService.getCommerceCatalogs(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-				CommerceCatalog::getGroupId),
-			keywords, filterFields, filterValues, start, end, sort);
+			companyId, groupIds, keywords, filterFields, filterValues, start,
+			end, sort);
 	}
 
 	@Override
 	public BaseModelSearchResult<CPDefinition>
 			searchCPDefinitionsByChannelGroupId(
 				long companyId, long commerceChannelGroupId, String keywords,
-				int status, boolean ignoreCommerceAccountGroup, int start,
-				int end, Sort sort)
+				int status, int start, int end, Sort sort)
 		throws PortalException {
 
+		List<CommerceCatalog> commerceCatalogs =
+			commerceCatalogService.getCommerceCatalogs(
+				companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		long[] groupIds = stream.mapToLong(
+			CommerceCatalog::getGroupId
+		).toArray();
+
 		return cpDefinitionLocalService.searchCPDefinitionsByChannelGroupId(
-			companyId,
-			TransformUtil.transformToLongArray(
-				_commerceCatalogService.getCommerceCatalogs(
-					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-				CommerceCatalog::getGroupId),
-			commerceChannelGroupId, keywords, status,
-			ignoreCommerceAccountGroup, start, end, sort);
+			companyId, groupIds, commerceChannelGroupId, keywords, status,
+			start, end, sort);
 	}
 
 	@Override
@@ -530,6 +502,24 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			cpDefinitionId, enable);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public void updateCPDisplayLayout(
+			long cpDefinitionId, String layoutUuid,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_checkCommerceCatalogByCPDefinitionId(
+			cpDefinitionId, ActionKeys.UPDATE);
+
+		cpDisplayLayoutLocalService.addCPDisplayLayout(
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			CPDefinition.class, cpDefinitionId, layoutUuid);
+	}
+
 	@Override
 	public CPDefinition updateExternalReferenceCode(
 			String externalReferenceCode, long cpDefinitionId)
@@ -595,6 +585,27 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 			deliveryMaxSubscriptionCycles);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	@Override
+	public CPDefinition updateSubscriptionInfo(
+			long cpDefinitionId, boolean subscriptionEnabled,
+			int subscriptionLength, String subscriptionType,
+			UnicodeProperties subscriptionTypeSettingsUnicodeProperties,
+			long maxSubscriptionCycles, ServiceContext serviceContext)
+		throws PortalException {
+
+		_checkCommerceCatalogByCPDefinitionId(
+			cpDefinitionId, ActionKeys.UPDATE);
+
+		return cpDefinitionLocalService.updateSubscriptionInfo(
+			cpDefinitionId, subscriptionEnabled, subscriptionLength,
+			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
+			maxSubscriptionCycles, serviceContext);
+	}
+
 	@Override
 	public CPDefinition updateTaxCategoryInfo(
 			long cpDefinitionId, long cpTaxCategoryId, boolean taxExempt,
@@ -612,7 +623,7 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 		throws PortalException {
 
 		CommerceCatalog commerceCatalog =
-			_commerceCatalogLocalService.fetchCommerceCatalogByGroupId(groupId);
+			commerceCatalogLocalService.fetchCommerceCatalogByGroupId(groupId);
 
 		if (commerceCatalog == null) {
 			throw new PrincipalException();
@@ -634,29 +645,18 @@ public class CPDefinitionServiceImpl extends CPDefinitionServiceBaseImpl {
 		}
 
 		CommerceCatalog commerceCatalog =
-			_commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
+			commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
 				cpDefinition.getGroupId());
 
 		_commerceCatalogModelResourcePermission.check(
 			getPermissionChecker(), commerceCatalog, actionId);
 	}
 
-	@Reference
-	private CommerceCatalogLocalService _commerceCatalogLocalService;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CommerceCatalog)"
-	)
-	private ModelResourcePermission<CommerceCatalog>
-		_commerceCatalogModelResourcePermission;
-
-	@Reference
-	private CommerceCatalogService _commerceCatalogService;
-
-	@Reference
-	private CPDisplayLayoutLocalService _cpDisplayLayoutLocalService;
-
-	@Reference
-	private CProductLocalService _cProductLocalService;
+	private static volatile ModelResourcePermission<CommerceCatalog>
+		_commerceCatalogModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CPDefinitionServiceImpl.class,
+				"_commerceCatalogModelResourcePermission",
+				CommerceCatalog.class);
 
 }

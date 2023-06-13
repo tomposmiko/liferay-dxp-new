@@ -23,7 +23,7 @@ DepotAdminRolesDisplayContext depotAdminRolesDisplayContext = (DepotAdminRolesDi
 <aui:input name="<%= ActionRequest.ACTION_NAME %>" type="hidden" value="/depot/update_roles" />
 
 <clay:content-row
-	containerElement="div"
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -34,15 +34,18 @@ DepotAdminRolesDisplayContext depotAdminRolesDisplayContext = (DepotAdminRolesDi
 
 	<c:if test="<%= depotAdminRolesDisplayContext.isSelectable() %>">
 		<clay:content-col>
-			<clay:button
-				aria-label='<%= LanguageUtil.format(request, "select-x", "asset-library-roles") %>'
-				cssClass="heading-end modify-link"
-				displayType="secondary"
-				id='<%= liferayPortletResponse.getNamespace() + "selectDepotRoleLink" %>'
-				label='<%= LanguageUtil.get(request, "select") %>'
-				small="<%= true %>"
-			/>
-		</clay:content-col>
+			<span class="heading-end">
+				<liferay-ui:icon
+					cssClass="modify-link"
+					id="selectDepotRoleLink"
+					label="<%= true %>"
+					linkCssClass="btn btn-secondary btn-sm"
+					message="select"
+					method="get"
+					url="javascript:;"
+				/>
+			</clay:content-col>
+		</span>
 	</c:if>
 </clay:content-row>
 
@@ -103,7 +106,7 @@ DepotAdminRolesDisplayContext depotAdminRolesDisplayContext = (DepotAdminRolesDi
 
 		<c:if test="<%= depotAdminRolesDisplayContext.isDeletable() %>">
 			<liferay-ui:search-container-column-text>
-				<a class="modify-link" data-entityId="<%= userGroupRole.getGroupId() %>-<%= userGroupRole.getRoleId() %>" href="javascript:void(0);"><%= removeDepotRoleIcon %></a>
+				<a class="modify-link" data-entityId="<%= userGroupRole.getGroupId() %>-<%= userGroupRole.getRoleId() %>" href="javascript:;"><%= removeDepotRoleIcon %></a>
 			</liferay-ui:search-container-column-text>
 		</c:if>
 	</liferay-ui:search-container-row>

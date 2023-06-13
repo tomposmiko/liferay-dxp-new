@@ -29,7 +29,7 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 <clay:container-fluid
 	id='<%= liferayPortletResponse.getNamespace() + "formContainer" %>'
 >
-	<aui:form action="<%= portletURL %>" method="post" name="searchContainerForm">
+	<aui:form action="<%= portletURL.toString() %>" method="post" name="searchContainerForm">
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="deleteFormInstanceIds" type="hidden" />
 
@@ -73,23 +73,15 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 									path="/admin/view_form_instance_descriptive.jsp"
 								/>
 
-								<liferay-ui:search-container-column-text>
-									<clay:dropdown-actions
-										aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-										dropdownItems="<%= ddmFormAdminDisplayContext.getActionDropdownItems(formInstance) %>"
-										propsTransformer="admin/js/DDMFormAdminActionDropdownPropsTransformer"
-									/>
-								</liferay-ui:search-container-column-text>
+								<liferay-ui:search-container-column-jsp
+									path="/admin/form_instance_action.jsp"
+								/>
 							</c:when>
 							<c:otherwise>
 
 								<%
 								boolean hasValidDDMFormFields = ddmFormAdminDisplayContext.hasValidDDMFormFields(formInstance);
-
-								ObjectDefinition objectDefinition = ddmFormAdminDisplayContext.getObjectDefinition(formInstance);
-
-								boolean hasValidMappedObject = ddmFormAdminDisplayContext.hasValidMappedObject(formInstance, objectDefinition);
-
+								boolean hasValidMappedObject = ddmFormAdminDisplayContext.hasValidMappedObject(formInstance);
 								boolean hasValidStorageType = ddmFormAdminDisplayContext.hasValidStorageType(formInstance);
 								%>
 
@@ -99,7 +91,7 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 											cssClass="table-cell-expand table-title"
 											href="<%= rowURL %>"
 											name="name"
-											value="<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(formInstance.getName(locale))) %>"
+											value="<%= HtmlUtil.escape(formInstance.getName(locale)) %>"
 										/>
 									</c:when>
 									<c:otherwise>
@@ -115,12 +107,7 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 												errorMessage = LanguageUtil.format(request, "this-form-was-created-using-a-custom-field-type-x-that-is-not-available-for-this-liferay-dxp-installation.-instal-x-to-make-it-available-for-editing", ddmFormAdminDisplayContext.getInvalidDDMFormFieldType(formInstance));
 											}
 											else if (!hasValidMappedObject) {
-												if (objectDefinition == null) {
-													errorMessage = "this-form-was-created-using-a-deleted-object-as-storage-type";
-												}
-												else {
-													errorMessage = LanguageUtil.format(request, "this-form-was-created-using-an-inactive-object-as-storage-type.-activate-x-object-to-make-it-available-for-editing", ddmFormAdminDisplayContext.getObjectDefinitionLabel(formInstance, locale));
-												}
+												errorMessage = LanguageUtil.format(request, "this-form-was-created-using-an-inactive-object-as-storage-type.-activate-x-object-to-make-it-available-for-editing", ddmFormAdminDisplayContext.getObjectDefinitionLabel(formInstance, locale));
 											}
 											else if (!hasValidStorageType) {
 												errorMessage = LanguageUtil.format(request, "this-form-was-created-using-a-storage-type-x-that-is-not-available-for-this-liferay-dxp-installation.-install-x-to-make-it-available-for-editing", formInstance.getStorageType());
@@ -136,7 +123,7 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 												/>
 											</span>
 											<span class="invalid-form-instance">
-												<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(formInstance.getName(locale))) %>
+												<%= HtmlUtil.escape(formInstance.getName(locale)) %>
 											</span>
 										</liferay-ui:search-container-column-text>
 									</c:otherwise>
@@ -145,28 +132,8 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 								<liferay-ui:search-container-column-text
 									cssClass="table-cell-expand"
 									name="description"
-									value="<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(formInstance.getDescription(locale))) %>"
+									value="<%= HtmlUtil.escape(formInstance.getDescription(locale)) %>"
 								/>
-
-								<liferay-ui:search-container-column-text
-									cssClass="text-nowrap"
-									name="status"
-								>
-									<c:choose>
-										<c:when test="<%= !DDMFormInstanceExpirationStatusUtil.isFormExpired(formInstance, timeZone) %>">
-											<clay:label
-												displayType="success"
-												label="available"
-											/>
-										</c:when>
-										<c:otherwise>
-											<clay:label
-												displayType="danger"
-												label="expired"
-											/>
-										</c:otherwise>
-									</c:choose>
-								</liferay-ui:search-container-column-text>
 
 								<liferay-ui:search-container-column-date
 									cssClass="table-cell-expand-smaller"
@@ -174,13 +141,9 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 									value="<%= formInstance.getModifiedDate() %>"
 								/>
 
-								<liferay-ui:search-container-column-text>
-									<clay:dropdown-actions
-										aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-										dropdownItems="<%= ddmFormAdminDisplayContext.getActionDropdownItems(formInstance) %>"
-										propsTransformer="admin/js/DDMFormAdminActionDropdownPropsTransformer"
-									/>
-								</liferay-ui:search-container-column-text>
+								<liferay-ui:search-container-column-jsp
+									path="/admin/form_instance_action.jsp"
+								/>
 							</c:otherwise>
 						</c:choose>
 					</liferay-ui:search-container-row>
@@ -203,6 +166,42 @@ FormInstancePermissionCheckerHelper formInstancePermissionCheckerHelper = ddmFor
 		</c:choose>
 	</aui:form>
 </clay:container-fluid>
+
+<aui:script require='<%= mainRequire + "/admin/js/components/share-form/openShareFormModal.es as Modal" %>'>
+	var spritemap = themeDisplay.getPathThemeImages() + '/clay/icons.svg';
+
+	var afterOpenShareFormModal = function (data) {
+		Liferay.namespace('DDM').FormSettings = {
+			portletNamespace: '<portlet:namespace />',
+			spritemap: spritemap,
+		};
+
+		Modal.openShareFormModal({
+			autocompleteUserURL:
+				'<%= ddmFormAdminDisplayContext.getAutocompleteUserURL() %>',
+			localizedName: data.localizedName,
+			portletNamespace: '<portlet:namespace />',
+			shareFormInstanceURL: data.shareFormInstanceURL,
+			spritemap: spritemap,
+			url: data.url,
+		});
+	};
+
+	Liferay.after(
+		'<portlet:namespace />openShareFormModal',
+		afterOpenShareFormModal
+	);
+
+	function handleDestroyPortlet() {
+		Liferay.detach(
+			'<portlet:namespace />openShareFormModal',
+			afterOpenShareFormModal
+		);
+		Liferay.detach('destroyPortlet', handleDestroyPortlet);
+	}
+
+	Liferay.on('destroyPortlet', handleDestroyPortlet);
+</aui:script>
 
 <%@ include file="/admin/copy_form_publish_url.jspf" %>
 

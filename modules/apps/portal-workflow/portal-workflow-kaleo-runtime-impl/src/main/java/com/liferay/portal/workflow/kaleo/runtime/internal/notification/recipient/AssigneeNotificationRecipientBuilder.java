@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.runtime.internal.notification.recipient;
 
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.workflow.kaleo.definition.NotificationReceptionType;
 import com.liferay.portal.workflow.kaleo.model.KaleoNotificationRecipient;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance;
@@ -34,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	property = "recipient.type=ASSIGNEES",
+	immediate = true, property = "recipient.type=ASSIGNEES",
 	service = NotificationRecipientBuilder.class
 )
 public class AssigneeNotificationRecipientBuilder
@@ -48,7 +47,7 @@ public class AssigneeNotificationRecipientBuilder
 			ExecutionContext executionContext)
 		throws Exception {
 
-		_addAssignedRecipients(
+		addAssignedRecipients(
 			notificationRecipients, notificationReceptionType,
 			executionContext);
 	}
@@ -61,12 +60,12 @@ public class AssigneeNotificationRecipientBuilder
 			ExecutionContext executionContext)
 		throws Exception {
 
-		_addAssignedRecipients(
+		addAssignedRecipients(
 			notificationRecipients, notificationReceptionType,
 			executionContext);
 	}
 
-	private void _addAssignedRecipients(
+	protected void addAssignedRecipients(
 			Set<NotificationRecipient> notificationRecipients,
 			NotificationReceptionType notificationReceptionType,
 			ExecutionContext executionContext)
@@ -94,15 +93,6 @@ public class AssigneeNotificationRecipientBuilder
 			if (assigneeClassName.equals(User.class.getName())) {
 				notificationRecipientBuilder =
 					_userNotificationRecipientBuilder;
-
-				ServiceContext serviceContext =
-					executionContext.getServiceContext();
-
-				if (serviceContext.getUserId() ==
-						kaleoTaskAssignmentInstance.getAssigneeClassPK()) {
-
-					continue;
-				}
 			}
 
 			notificationRecipientBuilder.processKaleoTaskAssignmentInstance(

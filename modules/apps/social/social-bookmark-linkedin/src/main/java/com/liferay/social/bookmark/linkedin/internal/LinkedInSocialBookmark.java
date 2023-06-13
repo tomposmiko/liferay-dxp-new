@@ -14,7 +14,7 @@
 
 package com.liferay.social.bookmark.linkedin.internal;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.social.bookmarks.SocialBookmark;
 
@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"social.bookmarks.priority:Integer=1", "social.bookmarks.type=linkedin"
 	},
@@ -44,7 +45,7 @@ public class LinkedInSocialBookmark implements SocialBookmark {
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(locale, "linkedin");
+		return LanguageUtil.get(locale, "linkedin");
 	}
 
 	@Override
@@ -67,9 +68,6 @@ public class LinkedInSocialBookmark implements SocialBookmark {
 
 		requestDispatcher.include(httpServletRequest, httpServletResponse);
 	}
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.social.bookmark.linkedin)"

@@ -49,7 +49,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
-	property = "adaptive.media.key=blogs", service = AMImageOptimizer.class
+	immediate = true, property = "adaptive.media.key=blogs",
+	service = AMImageOptimizer.class
 )
 public class BlogsAMImageOptimizer implements AMImageOptimizer {
 
@@ -104,10 +105,10 @@ public class BlogsAMImageOptimizer implements AMImageOptimizer {
 				Property classNameIdProperty = PropertyFactoryUtil.forName(
 					"classNameId");
 
-				dynamicQuery.add(
-					classNameIdProperty.eq(
-						_classNameLocalService.getClassNameId(
-							BlogsEntry.class.getName())));
+				long classNameId = _classNameLocalService.getClassNameId(
+					BlogsEntry.class.getName());
+
+				dynamicQuery.add(classNameIdProperty.eq(classNameId));
 
 				Property mimeTypeProperty = PropertyFactoryUtil.forName(
 					"mimeType");
@@ -151,7 +152,7 @@ public class BlogsAMImageOptimizer implements AMImageOptimizer {
 			actionableDynamicQuery.performActions();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 	}
 

@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.messaging;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
@@ -58,11 +57,6 @@ public class DestinationConfiguration implements Serializable {
 		String destinationType, String destinationName) {
 
 		_destinationType = destinationType;
-
-		if (Validator.isNull(destinationName)) {
-			throw new IllegalArgumentException("Destination name is null");
-		}
-
 		_destinationName = destinationName;
 	}
 

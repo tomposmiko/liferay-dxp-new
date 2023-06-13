@@ -52,24 +52,24 @@ public class DocumentImplTest {
 
 	@Test
 	public void testAddDate() throws Exception {
-		_clearDateFormat();
+		clearDateFormat();
 
 		documentImpl.addDate(RandomTestUtil.randomString(), new Date());
 	}
 
 	@Test
 	public void testAddDateSortable() throws Exception {
-		_clearDateFormat();
+		clearDateFormat();
 
 		documentImpl.addDateSortable(RandomTestUtil.randomString(), new Date());
 	}
 
-	protected DocumentFixture documentFixture = new DocumentFixture();
-	protected DocumentImpl documentImpl;
-
-	private void _clearDateFormat() {
+	protected void clearDateFormat() {
 		ReflectionTestUtil.setFieldValue(
 			DocumentImpl.class, "_dateFormat", null);
 	}
+
+	protected DocumentFixture documentFixture = new DocumentFixture();
+	protected DocumentImpl documentImpl;
 
 }

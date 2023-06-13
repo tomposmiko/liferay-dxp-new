@@ -17,18 +17,18 @@ package com.liferay.product.navigation.simulation.web.internal.application.list;
 import com.liferay.application.list.BasePanelCategory;
 import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.PanelCategoryKeys;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.product.navigation.simulation.constants.ProductNavigationSimulationConstants;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.category.key=" + PanelCategoryKeys.HIDDEN,
 		"panel.category.order:Integer=500"
@@ -45,10 +45,7 @@ public class SimulationPanelCategory extends BasePanelCategory {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "simulation");
+		return LanguageUtil.get(locale, "simulation");
 	}
-
-	@Reference
-	private Language _language;
 
 }

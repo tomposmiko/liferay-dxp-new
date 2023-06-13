@@ -23,7 +23,6 @@ import com.liferay.asset.list.exception.AssetListEntryTitleException;
 import com.liferay.asset.list.exception.DuplicateAssetListEntryTitleException;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.model.AssetListEntryAssetEntryRel;
-import com.liferay.asset.list.model.AssetListEntryAssetEntryRelTable;
 import com.liferay.asset.list.model.AssetListEntrySegmentsEntryRel;
 import com.liferay.asset.list.service.AssetListEntryAssetEntryRelLocalService;
 import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalService;
@@ -32,7 +31,6 @@ import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelPer
 import com.liferay.asset.list.service.persistence.AssetListEntrySegmentsEntryRelPersistence;
 import com.liferay.asset.util.AssetRendererFactoryWrapper;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
-import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -49,14 +47,12 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.segments.constants.SegmentsEntryConstants;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -111,37 +107,14 @@ public class AssetListEntryLocalServiceImpl
 					assetListEntryId, segmentsEntryId);
 
 		if (assetListEntrySegmentsEntryRel == null) {
-			assetListEntrySegmentsEntryRel =
-				_assetListEntrySegmentsEntryRelLocalService.
-					addAssetListEntrySegmentsEntryRel(
-						serviceContext.getUserId(),
-						serviceContext.getScopeGroupId(), assetListEntryId,
-						segmentsEntryId, StringPool.BLANK, serviceContext);
+			_assetListEntrySegmentsEntryRelLocalService.
+				addAssetListEntrySegmentsEntryRel(
+					serviceContext.getUserId(),
+					serviceContext.getScopeGroupId(), assetListEntryId,
+					segmentsEntryId, StringPool.BLANK, serviceContext);
 		}
 
-		List<Long> selectedAssetEntryIds = new ArrayList<>(
-			dslQuery(
-				DSLQueryFactoryUtil.selectDistinct(
-					AssetListEntryAssetEntryRelTable.INSTANCE.assetEntryId
-				).from(
-					AssetListEntryAssetEntryRelTable.INSTANCE
-				).where(
-					AssetListEntryAssetEntryRelTable.INSTANCE.assetListEntryId.
-						eq(
-							assetListEntryId
-						).and(
-							AssetListEntryAssetEntryRelTable.INSTANCE.
-								segmentsEntryId.eq(
-									assetListEntrySegmentsEntryRel.
-										getSegmentsEntryId())
-						)
-				)));
-
-		for (long assetEntryId : SetUtil.fromArray(assetEntryIds)) {
-			if (selectedAssetEntryIds.contains(assetEntryId)) {
-				continue;
-			}
-
+		for (long assetEntryId : assetEntryIds) {
 			_assetListEntryAssetEntryRelLocalService.
 				addAssetListEntryAssetEntryRel(
 					assetListEntryId, assetEntryId, segmentsEntryId,
@@ -225,7 +198,8 @@ public class AssetListEntryLocalServiceImpl
 		if (!ExportImportThreadLocal.isImportInProcess()) {
 			_assetListEntrySegmentsEntryRelLocalService.
 				addAssetListEntrySegmentsEntryRel(
-					userId, groupId, assetListEntryId,
+					serviceContext.getUserId(),
+					serviceContext.getScopeGroupId(), assetListEntryId,
 					SegmentsEntryConstants.ID_DEFAULT, typeSettings,
 					serviceContext);
 		}
@@ -288,13 +262,11 @@ public class AssetListEntryLocalServiceImpl
 
 		assetListEntry.setModifiedDate(new Date());
 
-		if (Validator.isNull(assetListEntry.getAssetEntryType())) {
-			String assetEntryType = _getManualAssetEntryType(assetListEntryId);
+		String assetEntryType = _getManualAssetEntryType(assetListEntryId);
 
-			assetListEntry.setAssetEntrySubtype(
-				_getManualAssetEntrySubtype(assetEntryType, assetListEntryId));
-			assetListEntry.setAssetEntryType(assetEntryType);
-		}
+		assetListEntry.setAssetEntrySubtype(
+			_getManualAssetEntrySubtype(assetEntryType, assetListEntryId));
+		assetListEntry.setAssetEntryType(assetEntryType);
 
 		assetListEntryPersistence.update(assetListEntry);
 	}

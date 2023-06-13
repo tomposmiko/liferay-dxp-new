@@ -27,7 +27,7 @@ JournalFolder folder = journalDisplayContext.getFolder();
 		<div class="aspect-ratio-item-center-middle aspect-ratio-item-fluid card-type-asset-icon">
 			<div class="text-secondary">
 				<svg aria-hidden="true" class="h4 lexicon-icon lexicon-icon-folder reference-mark">
-					<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#folder" />
+					<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#folder" />
 				</svg>
 			</div>
 		</div>

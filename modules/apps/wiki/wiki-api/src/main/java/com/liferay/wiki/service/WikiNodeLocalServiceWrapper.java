@@ -14,10 +14,7 @@
 
 package com.liferay.wiki.service;
 
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
-import com.liferay.wiki.model.WikiNode;
 
 /**
  * Provides a wrapper for {@link WikiNodeLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.wiki.model.WikiNode;
 public class WikiNodeLocalServiceWrapper
 	implements ServiceWrapper<WikiNodeLocalService>, WikiNodeLocalService {
 
-	public WikiNodeLocalServiceWrapper() {
-		this(null);
-	}
-
 	public WikiNodeLocalServiceWrapper(
 		WikiNodeLocalService wikiNodeLocalService) {
 
@@ -40,7 +33,7 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public WikiNode addDefaultNode(
+	public com.liferay.wiki.model.WikiNode addDefaultNode(
 			long userId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -49,12 +42,12 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addNode(String,
-	 long, String, String, ServiceContext)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addNode(String, long, String, String, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
-	public WikiNode addNode(
+	public com.liferay.wiki.model.WikiNode addNode(
 			long userId, String name, String description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -64,7 +57,7 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public WikiNode addNode(
+	public com.liferay.wiki.model.WikiNode addNode(
 			String externalReferenceCode, long userId, String name,
 			String description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -86,7 +79,7 @@ public class WikiNodeLocalServiceWrapper
 
 	@Override
 	public void addNodeResources(
-			WikiNode node, boolean addGroupPermissions,
+			com.liferay.wiki.model.WikiNode node, boolean addGroupPermissions,
 			boolean addGuestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -96,7 +89,7 @@ public class WikiNodeLocalServiceWrapper
 
 	@Override
 	public void addNodeResources(
-			WikiNode node,
+			com.liferay.wiki.model.WikiNode node,
 			com.liferay.portal.kernel.service.permission.ModelPermissions
 				modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -115,7 +108,9 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the wiki node that was added
 	 */
 	@Override
-	public WikiNode addWikiNode(WikiNode wikiNode) {
+	public com.liferay.wiki.model.WikiNode addWikiNode(
+		com.liferay.wiki.model.WikiNode wikiNode) {
+
 		return _wikiNodeLocalService.addWikiNode(wikiNode);
 	}
 
@@ -137,7 +132,7 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the new wiki node
 	 */
 	@Override
-	public WikiNode createWikiNode(long nodeId) {
+	public com.liferay.wiki.model.WikiNode createWikiNode(long nodeId) {
 		return _wikiNodeLocalService.createWikiNode(nodeId);
 	}
 
@@ -149,7 +144,7 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteNode(WikiNode node)
+	public void deleteNode(com.liferay.wiki.model.WikiNode node)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_wikiNodeLocalService.deleteNode(node);
@@ -185,7 +180,7 @@ public class WikiNodeLocalServiceWrapper
 	 * @throws PortalException if a wiki node with the primary key could not be found
 	 */
 	@Override
-	public WikiNode deleteWikiNode(long nodeId)
+	public com.liferay.wiki.model.WikiNode deleteWikiNode(long nodeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.deleteWikiNode(nodeId);
@@ -202,7 +197,9 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the wiki node that was removed
 	 */
 	@Override
-	public WikiNode deleteWikiNode(WikiNode wikiNode) {
+	public com.liferay.wiki.model.WikiNode deleteWikiNode(
+		com.liferay.wiki.model.WikiNode wikiNode) {
+
 		return _wikiNodeLocalService.deleteWikiNode(wikiNode);
 	}
 
@@ -309,26 +306,49 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public WikiNode fetchNode(long groupId, String name) {
+	public com.liferay.wiki.model.WikiNode fetchNode(
+		long groupId, String name) {
+
 		return _wikiNodeLocalService.fetchNode(groupId, name);
 	}
 
 	@Override
-	public WikiNode fetchNodeByUuidAndGroupId(String uuid, long groupId) {
+	public com.liferay.wiki.model.WikiNode fetchNodeByUuidAndGroupId(
+		String uuid, long groupId) {
+
 		return _wikiNodeLocalService.fetchNodeByUuidAndGroupId(uuid, groupId);
 	}
 
 	@Override
-	public WikiNode fetchWikiNode(long nodeId) {
+	public com.liferay.wiki.model.WikiNode fetchWikiNode(long nodeId) {
 		return _wikiNodeLocalService.fetchWikiNode(nodeId);
 	}
 
+	/**
+	 * Returns the wiki node with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the wiki node's external reference code
+	 * @return the matching wiki node, or <code>null</code> if a matching wiki node could not be found
+	 */
 	@Override
-	public WikiNode fetchWikiNodeByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+	public com.liferay.wiki.model.WikiNode fetchWikiNodeByExternalReferenceCode(
+		long groupId, String externalReferenceCode) {
 
 		return _wikiNodeLocalService.fetchWikiNodeByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchWikiNodeByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.wiki.model.WikiNode fetchWikiNodeByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return _wikiNodeLocalService.fetchWikiNodeByReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -339,7 +359,9 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the matching wiki node, or <code>null</code> if a matching wiki node could not be found
 	 */
 	@Override
-	public WikiNode fetchWikiNodeByUuidAndGroupId(String uuid, long groupId) {
+	public com.liferay.wiki.model.WikiNode fetchWikiNodeByUuidAndGroupId(
+		String uuid, long groupId) {
+
 		return _wikiNodeLocalService.fetchWikiNodeByUuidAndGroupId(
 			uuid, groupId);
 	}
@@ -352,14 +374,14 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<WikiNode> getCompanyNodes(
+	public java.util.List<com.liferay.wiki.model.WikiNode> getCompanyNodes(
 		long companyId, int start, int end) {
 
 		return _wikiNodeLocalService.getCompanyNodes(companyId, start, end);
 	}
 
 	@Override
-	public java.util.List<WikiNode> getCompanyNodes(
+	public java.util.List<com.liferay.wiki.model.WikiNode> getCompanyNodes(
 		long companyId, int status, int start, int end) {
 
 		return _wikiNodeLocalService.getCompanyNodes(
@@ -394,42 +416,46 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public WikiNode getNode(long nodeId)
+	public com.liferay.wiki.model.WikiNode getNode(long nodeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getNode(nodeId);
 	}
 
 	@Override
-	public WikiNode getNode(long groupId, String nodeName)
+	public com.liferay.wiki.model.WikiNode getNode(
+			long groupId, String nodeName)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getNode(groupId, nodeName);
 	}
 
 	@Override
-	public java.util.List<WikiNode> getNodes(long groupId)
+	public java.util.List<com.liferay.wiki.model.WikiNode> getNodes(
+			long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getNodes(groupId);
 	}
 
 	@Override
-	public java.util.List<WikiNode> getNodes(long groupId, int status)
+	public java.util.List<com.liferay.wiki.model.WikiNode> getNodes(
+			long groupId, int status)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getNodes(groupId, status);
 	}
 
 	@Override
-	public java.util.List<WikiNode> getNodes(long groupId, int start, int end)
+	public java.util.List<com.liferay.wiki.model.WikiNode> getNodes(
+			long groupId, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getNodes(groupId, start, end);
 	}
 
 	@Override
-	public java.util.List<WikiNode> getNodes(
+	public java.util.List<com.liferay.wiki.model.WikiNode> getNodes(
 			long groupId, int status, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -475,19 +501,27 @@ public class WikiNodeLocalServiceWrapper
 	 * @throws PortalException if a wiki node with the primary key could not be found
 	 */
 	@Override
-	public WikiNode getWikiNode(long nodeId)
+	public com.liferay.wiki.model.WikiNode getWikiNode(long nodeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getWikiNode(nodeId);
 	}
 
+	/**
+	 * Returns the wiki node with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the wiki node's external reference code
+	 * @return the matching wiki node
+	 * @throws PortalException if a matching wiki node could not be found
+	 */
 	@Override
-	public WikiNode getWikiNodeByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+	public com.liferay.wiki.model.WikiNode getWikiNodeByExternalReferenceCode(
+			long groupId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getWikiNodeByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -499,7 +533,8 @@ public class WikiNodeLocalServiceWrapper
 	 * @throws PortalException if a matching wiki node could not be found
 	 */
 	@Override
-	public WikiNode getWikiNodeByUuidAndGroupId(String uuid, long groupId)
+	public com.liferay.wiki.model.WikiNode getWikiNodeByUuidAndGroupId(
+			String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.getWikiNodeByUuidAndGroupId(uuid, groupId);
@@ -517,7 +552,9 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the range of wiki nodes
 	 */
 	@Override
-	public java.util.List<WikiNode> getWikiNodes(int start, int end) {
+	public java.util.List<com.liferay.wiki.model.WikiNode> getWikiNodes(
+		int start, int end) {
+
 		return _wikiNodeLocalService.getWikiNodes(start, end);
 	}
 
@@ -529,8 +566,8 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the matching wiki nodes, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<WikiNode> getWikiNodesByUuidAndCompanyId(
-		String uuid, long companyId) {
+	public java.util.List<com.liferay.wiki.model.WikiNode>
+		getWikiNodesByUuidAndCompanyId(String uuid, long companyId) {
 
 		return _wikiNodeLocalService.getWikiNodesByUuidAndCompanyId(
 			uuid, companyId);
@@ -547,10 +584,11 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the range of matching wiki nodes, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<WikiNode> getWikiNodesByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<WikiNode>
-			orderByComparator) {
+	public java.util.List<com.liferay.wiki.model.WikiNode>
+		getWikiNodesByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.wiki.model.WikiNode> orderByComparator) {
 
 		return _wikiNodeLocalService.getWikiNodesByUuidAndCompanyId(
 			uuid, companyId, start, end, orderByComparator);
@@ -568,30 +606,34 @@ public class WikiNodeLocalServiceWrapper
 
 	@Override
 	public void importPages(
-			long userId, long nodeId, java.io.InputStream[] inputStreams,
+			long userId, long nodeId, String importer,
+			java.io.InputStream[] inputStreams,
 			java.util.Map<String, String[]> options)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_wikiNodeLocalService.importPages(
-			userId, nodeId, inputStreams, options);
+			userId, nodeId, importer, inputStreams, options);
 	}
 
 	@Override
-	public WikiNode moveNodeToTrash(long userId, long nodeId)
+	public com.liferay.wiki.model.WikiNode moveNodeToTrash(
+			long userId, long nodeId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.moveNodeToTrash(userId, nodeId);
 	}
 
 	@Override
-	public WikiNode moveNodeToTrash(long userId, WikiNode node)
+	public com.liferay.wiki.model.WikiNode moveNodeToTrash(
+			long userId, com.liferay.wiki.model.WikiNode node)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiNodeLocalService.moveNodeToTrash(userId, node);
 	}
 
 	@Override
-	public void restoreNodeFromTrash(long userId, WikiNode node)
+	public void restoreNodeFromTrash(
+			long userId, com.liferay.wiki.model.WikiNode node)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_wikiNodeLocalService.restoreNodeFromTrash(userId, node);
@@ -612,7 +654,7 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public WikiNode updateNode(
+	public com.liferay.wiki.model.WikiNode updateNode(
 			long nodeId, String name, String description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -622,8 +664,8 @@ public class WikiNodeLocalServiceWrapper
 	}
 
 	@Override
-	public WikiNode updateStatus(
-			long userId, WikiNode node, int status,
+	public com.liferay.wiki.model.WikiNode updateStatus(
+			long userId, com.liferay.wiki.model.WikiNode node, int status,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -642,27 +684,10 @@ public class WikiNodeLocalServiceWrapper
 	 * @return the wiki node that was updated
 	 */
 	@Override
-	public WikiNode updateWikiNode(WikiNode wikiNode) {
+	public com.liferay.wiki.model.WikiNode updateWikiNode(
+		com.liferay.wiki.model.WikiNode wikiNode) {
+
 		return _wikiNodeLocalService.updateWikiNode(wikiNode);
-	}
-
-	@Override
-	public CTPersistence<WikiNode> getCTPersistence() {
-		return _wikiNodeLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<WikiNode> getModelClass() {
-		return _wikiNodeLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<WikiNode>, R, E> updateUnsafeFunction)
-		throws E {
-
-		return _wikiNodeLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

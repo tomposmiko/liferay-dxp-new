@@ -458,27 +458,6 @@ public class StructuredContent implements Cloneable, Serializable {
 
 	protected Integer numberOfComments;
 
-	public Double getPriority() {
-		return priority;
-	}
-
-	public void setPriority(Double priority) {
-		this.priority = priority;
-	}
-
-	public void setPriority(
-		UnsafeSupplier<Double, Exception> priorityUnsafeSupplier) {
-
-		try {
-			priority = priorityUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Double priority;
-
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
 	}
@@ -543,29 +522,6 @@ public class StructuredContent implements Cloneable, Serializable {
 	}
 
 	protected Long siteId;
-
-	public Long getStructuredContentFolderId() {
-		return structuredContentFolderId;
-	}
-
-	public void setStructuredContentFolderId(Long structuredContentFolderId) {
-		this.structuredContentFolderId = structuredContentFolderId;
-	}
-
-	public void setStructuredContentFolderId(
-		UnsafeSupplier<Long, Exception>
-			structuredContentFolderIdUnsafeSupplier) {
-
-		try {
-			structuredContentFolderId =
-				structuredContentFolderIdUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long structuredContentFolderId;
 
 	public Boolean getSubscribed() {
 		return subscribed;

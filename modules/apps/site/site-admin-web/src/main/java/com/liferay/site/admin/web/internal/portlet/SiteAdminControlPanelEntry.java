@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Miguel Pastor
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SiteAdminPortletKeys.SITE_ADMIN,
 	service = ControlPanelEntry.class
 )
@@ -61,7 +62,11 @@ public class SiteAdminControlPanelEntry extends BaseControlPanelEntry {
 			permissionChecker, group, portlet);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
 	private GroupLocalService _groupLocalService;
 
 }

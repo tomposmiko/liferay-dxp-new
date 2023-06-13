@@ -14,6 +14,8 @@
 
 package com.liferay.segments.field.customizer;
 
+import java.util.Optional;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -25,7 +27,15 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface SegmentsFieldCustomizerRegistry {
 
-	public SegmentsFieldCustomizer getSegmentsFieldCustomizer(
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getSegmentsFieldCustomizerOptional(String, String)}
+	 */
+	@Deprecated
+	public Optional<SegmentsFieldCustomizer> getSegmentFieldCustomizerOptional(
+		String entityName, String fieldName);
+
+	public Optional<SegmentsFieldCustomizer> getSegmentsFieldCustomizerOptional(
 		String entityName, String fieldName);
 
 }

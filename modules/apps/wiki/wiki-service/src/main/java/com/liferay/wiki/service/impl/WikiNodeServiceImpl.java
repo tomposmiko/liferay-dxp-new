@@ -53,8 +53,8 @@ import org.osgi.service.component.annotations.Reference;
 public class WikiNodeServiceImpl extends WikiNodeServiceBaseImpl {
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addNode(String,
-	 *             String, String, ServiceContext)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 * #addNode(String, String, String, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -177,22 +177,8 @@ public class WikiNodeServiceImpl extends WikiNodeServiceBaseImpl {
 	}
 
 	@Override
-	public WikiNode getWikiNodeByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws PortalException {
-
-		WikiNode node = wikiNodeLocalService.getWikiNodeByExternalReferenceCode(
-			externalReferenceCode, groupId);
-
-		_wikiNodeModelResourcePermission.check(
-			getPermissionChecker(), node, ActionKeys.VIEW);
-
-		return node;
-	}
-
-	@Override
 	public void importPages(
-			long nodeId, InputStream[] inputStreams,
+			long nodeId, String importer, InputStream[] inputStreams,
 			Map<String, String[]> options)
 		throws PortalException {
 
@@ -200,7 +186,7 @@ public class WikiNodeServiceImpl extends WikiNodeServiceBaseImpl {
 			getPermissionChecker(), nodeId, ActionKeys.IMPORT);
 
 		wikiNodeLocalService.importPages(
-			getUserId(), nodeId, inputStreams, options);
+			getUserId(), nodeId, importer, inputStreams, options);
 	}
 
 	@Override

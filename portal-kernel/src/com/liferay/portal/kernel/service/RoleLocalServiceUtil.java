@@ -476,23 +476,22 @@ public class RoleLocalServiceUtil {
 	}
 
 	public static List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end) {
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId, int start,
+		int end) {
 
 		return getService().getGroupRolesAndTeamRoles(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId, start, end);
+			companyId, keywords, excludedNames, types, excludedTeamRoleId,
+			teamGroupId, start, end);
 	}
 
 	public static int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId) {
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId) {
 
 		return getService().getGroupRolesAndTeamRolesCount(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId);
+			companyId, keywords, excludedNames, types, excludedTeamRoleId,
+			teamGroupId);
 	}
 
 	public static int getGroupRolesCount(long groupId) {
@@ -833,9 +832,7 @@ public class RoleLocalServiceUtil {
 	}
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groups are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param userId the primary key of the user
 	 * @param groups the groups (optionally <code>null</code>)
@@ -859,9 +856,7 @@ public class RoleLocalServiceUtil {
 	}
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groupIds are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param userId the primary key of the user
 	 * @param groupIds the primary keys of the groups
@@ -946,6 +941,37 @@ public class RoleLocalServiceUtil {
 		throws PortalException {
 
 		return getService().hasUserRoles(userId, companyId, names, inherited);
+	}
+
+	/**
+	 * Returns a role with the name in the company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param name the role's name (optionally <code>null</code>)
+	 * @return the role with the name, or <code>null</code> if a role with the
+	 name could not be found in the company
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #fetchRole(long, String)}
+	 */
+	@Deprecated
+	public static Role loadFetchRole(long companyId, String name) {
+		return getService().loadFetchRole(companyId, name);
+	}
+
+	/**
+	 * Returns a role with the name in the company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param name the role's name
+	 * @return the role with the name in the company
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getRole(long, String)}
+	 */
+	@Deprecated
+	public static Role loadGetRole(long companyId, String name)
+		throws PortalException {
+
+		return getService().loadGetRole(companyId, name);
 	}
 
 	/**

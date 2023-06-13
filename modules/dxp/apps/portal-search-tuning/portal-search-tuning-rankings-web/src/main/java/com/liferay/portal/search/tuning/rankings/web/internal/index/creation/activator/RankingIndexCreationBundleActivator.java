@@ -22,12 +22,10 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.uuid.PortalUUID;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.tuning.rankings.web.internal.background.task.RankingIndexCreationBackgroundTaskExecutor;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.importer.SingleIndexToMultipleIndexImporter;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -37,17 +35,13 @@ import org.osgi.service.component.annotations.Reference;
  * @author Wade Cao
  * @author Adam Brandizzi
  */
-@Component(service = {})
+@Component(
+	immediate = true, service = RankingIndexCreationBundleActivator.class
+)
 public class RankingIndexCreationBundleActivator {
 
 	@Activate
 	protected void activate() {
-		if (Objects.equals(
-				_searchEngineInformation.getVendorString(), "Solr")) {
-
-			return;
-		}
-
 		if (_singleIndexToMultipleIndexImporter.needImport()) {
 			_addBackgroundTask();
 		}
@@ -80,9 +74,6 @@ public class RankingIndexCreationBundleActivator {
 	@Reference
 	private RankingIndexCreationBackgroundTaskExecutor
 		_rankingIndexRenameBackgroundTaskExecutor;
-
-	@Reference
-	private SearchEngineInformation _searchEngineInformation;
 
 	@Reference
 	private SingleIndexToMultipleIndexImporter

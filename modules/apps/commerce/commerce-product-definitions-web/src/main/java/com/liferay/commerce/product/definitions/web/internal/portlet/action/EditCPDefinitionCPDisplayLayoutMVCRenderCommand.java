@@ -22,7 +22,6 @@ import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.service.CPDisplayLayoutService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.item.selector.ItemSelector;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.constants.MVCRenderConstants;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -48,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"mvc.command.name=/commerce_channels/edit_cp_definition_cp_display_layout"
@@ -78,8 +78,7 @@ public class EditCPDefinitionCPDisplayLayoutMVCRenderCommand
 						_actionHelper, httpServletRequest,
 						_commerceChannelLocalService, _cpDefinitionService,
 						_cpDisplayLayoutService, _groupLocalService,
-						_itemSelector, _layoutLocalService,
-						_layoutPageTemplateEntryLocalService);
+						_itemSelector, _layoutLocalService);
 
 			httpServletRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
@@ -96,7 +95,9 @@ public class EditCPDefinitionCPDisplayLayoutMVCRenderCommand
 				return "/error.jsp";
 			}
 
-			throw new PortletException(exception);
+			throw new PortletException(
+				"Unable to include edit_definition_display_page.jsp",
+				exception);
 		}
 
 		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;
@@ -122,10 +123,6 @@ public class EditCPDefinitionCPDisplayLayoutMVCRenderCommand
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private LayoutPageTemplateEntryLocalService
-		_layoutPageTemplateEntryLocalService;
 
 	@Reference
 	private Portal _portal;

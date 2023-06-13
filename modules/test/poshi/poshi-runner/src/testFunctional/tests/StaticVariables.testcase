@@ -1,256 +1,224 @@
-@component-name = "portal-tools"
-definition {
-
-	property poshi.runner.acceptance = "true";
-	property testray.main.component.name = "Smoke";
-
-	var nonStaticVariable = "OLD - Non-Static Value";
-	static var staticVariable = "OLD - Static Value";
-
-	setUp {
-		echo("");
-
-		echo("#");
-
-		echo("# set-up:");
-
-		echo("#");
-
-		echo("");
-
-		var actual = ${staticVariable};
-		var expected = "OLD - Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-
-		echo("");
-
-		var staticVariable = "NEW - Static Value";
-
-		var actual = ${staticVariable};
-		var expected = "NEW - Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-
-		echo("");
-
-		var nonStaticVariable = "NEW - Non-Static Value";
-
-		var actual = ${nonStaticVariable};
-		var expected = "NEW - Non-Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the non-static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the non-static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-	}
-
-	tearDown {
-		echo("");
-
-		echo("#");
-
-		echo("# tear-down:");
-
-		echo("#");
-
-		echo("");
-
-		var actual = ${staticVariable};
-		var expected = "NEW - Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-
-		echo("");
-
-		var actual = ${nonStaticVariable};
-		var expected = "OLD - Non-Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the non-static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the non-static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-	}
-
-	@disable-webdriver = "true"
-	@priority = 5
-	test StaticVariables1 {
-		echo("");
-
-		echo("#");
-
-		echo("# command:");
-
-		echo("#");
-
-		echo("");
-
-		var actual = ${staticVariable};
-		var expected = "NEW - Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-
-		echo("");
-
-		var actual = ${nonStaticVariable};
-		var expected = "OLD - Non-Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the non-static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the non-static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-	}
-
-	@disable-webdriver = "true"
-	@priority = 5
-	test StaticVariables2 {
-		echo("");
-
-		echo("#");
-
-		echo("# command:");
-
-		echo("#");
-
-		echo("");
-
-		var actual = ${staticVariable};
-		var expected = "NEW - Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-
-		echo("");
-
-		var actual = ${nonStaticVariable};
-		var expected = "OLD - Non-Static Value";
-
-		if (${actual} == ${expected}) {
-			echo("The value set to the non-static variable was a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-		}
-		else {
-			echo("The value set to the non-static variable was NOT a match to the expected value.");
-
-			echo("actual: '${actual}'");
-
-			echo("expected: '${expected}'");
-
-			fail("Found the wrong value!");
-		}
-	}
-
-}
+<definition component-name="portal-tools">
+	<property name="poshi.runner.acceptance" value="true" />
+	<property name="testray.main.component.name" value="Smoke" />
+
+	<var name="nonStaticVariable" value="OLD - Non-Static Value" />
+	<var name="staticVariable" static="true" value="OLD - Static Value" />
+
+	<set-up>
+		<echo message="" />
+		<echo message="#" />
+		<echo message="# set-up:" />
+		<echo message="#" />
+		<echo message="" />
+
+		<var name="actual" value="${staticVariable}" />
+		<var name="expected" value="OLD - Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+
+		<echo message="" />
+
+		<var name="staticVariable" value="NEW - Static Value" />
+
+		<var name="actual" value="${staticVariable}" />
+		<var name="expected" value="NEW - Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+
+		<echo message="" />
+
+		<var name="nonStaticVariable" value="NEW - Non-Static Value" />
+
+		<var name="actual" value="${nonStaticVariable}" />
+		<var name="expected" value="NEW - Non-Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the non-static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the non-static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+	</set-up>
+
+	<tear-down>
+		<echo message="" />
+		<echo message="#" />
+		<echo message="# tear-down:" />
+		<echo message="#" />
+		<echo message="" />
+
+		<var name="actual" value="${staticVariable}" />
+		<var name="expected" value="NEW - Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+
+		<echo message="" />
+
+		<var name="actual" value="${nonStaticVariable}" />
+		<var name="expected" value="OLD - Non-Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the non-static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the non-static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+	</tear-down>
+
+	<command name="StaticVariables1" priority="5">
+		<echo message="" />
+		<echo message="#" />
+		<echo message="# command:" />
+		<echo message="#" />
+		<echo message="" />
+
+		<var name="actual" value="${staticVariable}" />
+		<var name="expected" value="NEW - Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+
+		<echo message="" />
+
+		<var name="actual" value="${nonStaticVariable}" />
+		<var name="expected" value="OLD - Non-Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the non-static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the non-static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+	</command>
+
+	<command name="StaticVariables2" priority="5">
+		<echo message="" />
+		<echo message="#" />
+		<echo message="# command:" />
+		<echo message="#" />
+		<echo message="" />
+
+		<var name="actual" value="${staticVariable}" />
+		<var name="expected" value="NEW - Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+
+		<echo message="" />
+
+		<var name="actual" value="${nonStaticVariable}" />
+		<var name="expected" value="OLD - Non-Static Value" />
+
+		<if>
+			<equals arg1="${actual}" arg2="${expected}" />
+			<then>
+				<echo message="The value set to the non-static variable was a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+			</then>
+			<else>
+				<echo message="The value set to the non-static variable was NOT a match to the expected value." />
+				<echo message="actual: '${actual}'" />
+				<echo message="expected: '${expected}'" />
+
+				<fail message="Found the wrong value!" />
+			</else>
+		</if>
+	</command>
+</definition>

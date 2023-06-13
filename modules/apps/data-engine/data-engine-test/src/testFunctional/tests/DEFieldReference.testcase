@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68737. This test verifies that the field reference can be edited."
-	@priority = 5
+	@priority = "5"
 	test CanBeEdited {
 		NavItem.gotoStructures();
 
@@ -55,7 +55,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68737. This test verifies that the field reference can be edited for the Options of a field."
-	@priority = 5
+	@priority = "5"
 	test CanEditReferenceForOptions {
 		NavItem.gotoStructures();
 
@@ -87,7 +87,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68737. This test verifies that the field reference can not be blank."
-	@priority = 5
+	@priority = "5"
 	test CanNotBeBlank {
 		NavItem.gotoStructures();
 
@@ -97,23 +97,23 @@ definition {
 			fieldLabel = "Text",
 			fieldName = "Text");
 
+		var originalFieldReference = DEBuilder.getFieldReference(fieldLabel = "Text");
+
 		DEBuilder.editFieldReference(
 			fieldLabel = "Text",
 			fieldReference = "");
 
-		Button.click(button = "Save");
+		WebContentStructures.saveCP();
 
 		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
 
-		DEBuilder.openField(fieldLabel = "Text");
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertVisible(locator1 = "DataEngineBuilder#FIELD_REFERENCE_DEFAULT_VALUE");
+		DEBuilder.assertFieldReference(
+			fieldLabel = "Text",
+			fieldReference = "${originalFieldReference}");
 	}
 
 	@description = "This is a test for LRQA-68737. This test verifies that field reference can not be blank for the Options of a field."
-	@priority = 5
+	@priority = "5"
 	test CanNotBeBlankForOptions {
 		NavItem.gotoStructures();
 
@@ -129,22 +129,23 @@ definition {
 
 		var originalOptionReference = DEBuilder.getOptionReference(
 			fieldLabel = "Single Selection",
-			optionIndex = 1);
+			optionIndex = "1");
 
 		DEBuilder.editOptionReferences(
 			fieldLabel = "Single Selection",
 			optionReferenceList = "");
 
-		DEBuilder.openField(fieldLabel = "Single Selection");
+		WebContentStructures.saveCP();
 
-		AssertTextEquals.assertValue(
-			index = 1,
-			locator1 = "Sidebar#OPTION_WITHOUT_LABEL_FIELD_REFERENCE_INPUT",
-			value1 = ${originalOptionReference});
+		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
+
+		DEBuilder.assertOptionReferences(
+			fieldLabel = "Single Selection",
+			optionReferenceList = "${originalOptionReference}");
 	}
 
 	@description = "This is a test for LRQA-68737. This test verifies that the field reference can not be the same for two fields."
-	@priority = 5
+	@priority = "5"
 	test CanNotBeTheSameForTwoFields {
 		NavItem.gotoStructures();
 
@@ -154,11 +155,9 @@ definition {
 			fieldLabel = "First Text",
 			fieldName = "Text");
 
-		var textReference = "TextReference";
-
 		DEBuilder.editFieldReference(
 			fieldLabel = "First Text",
-			fieldReference = ${textReference});
+			fieldReference = "TextReference");
 
 		DEBuilder.addField(
 			fieldLabel = "Second Text",
@@ -169,16 +168,22 @@ definition {
 		DEBuilder.editFieldReference(
 			assertErrorMessage = "This reference is already being used. Try a different one.",
 			fieldLabel = "Second Text",
-			fieldReference = ${textReference});
+			fieldReference = "TextReference");
 
-		Button.click(button = "Save");
+		WebContentStructures.saveCP();
 
-		Alert.viewErrorMessage(errorMessage = "Your request failed to complete.");
+		WebContentNavigator.gotoEditStructure(structureName = "WC Structure Title");
+
+		DEBuilder.assertFieldReference(
+			fieldLabel = "Second Text",
+			fieldReference = "${originalFieldReference}");
 	}
 
 	@description = "This is a test for LRQA-68737. This test verifies that field reference can not be the same for two Options of fields."
-	@priority = 5
+	@priority = "5"
 	test CanNotBeTheSameForTwoOptionsOfFields {
+		property portal.upstream = "quarantine";
+
 		NavItem.gotoStructures();
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
@@ -193,11 +198,11 @@ definition {
 
 		var originalOptionReference = DEBuilder.getOptionReference(
 			fieldLabel = "Single Selection",
-			optionIndex = 2);
+			optionIndex = "2");
 
 		DEBuilder.editOptionReferences(
 			assertErrorMessage = "This reference is already being used. Try a different one.",
-			assertOptionIndex = 2,
+			assertOptionIndex = "2",
 			fieldLabel = "Single Selection",
 			optionReferenceList = "OptionReference,OptionReference");
 

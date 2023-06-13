@@ -52,31 +52,31 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 	<aui:script use="liferay-upload">
 		var liferayUpload = new Liferay.Upload({
-			'boundingBox': '#<portlet:namespace />fileUpload',
+			boundingBox: '#<portlet:namespace />fileUpload',
 
 			<%
 			DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
 			%>
 
-			'decimalSeparator': '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+			decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
 
-			'deleteFile':
+			deleteFile:
 				'<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>" name="/export_import/export_import"><portlet:param name="mvcRenderCommandName" value="/export_import/export_import" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /><portlet:param name="redirect" value="<%= redirect %>" /><portlet:param name="portletResource" value="<%= portletResource %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= Group.class.getName() %>" />',
 
 			<%
 			DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 			%>
 
-			'fileDescription':
+			fileDescription:
 				'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
 
-			'maxFileSize':
-				'<%= UploadServletRequestConfigurationProviderUtil.getMaxSize() %> B',
-			'metadataContainer': '#<portlet:namespace />commonFileMetadataContainer',
-			'metadataExplanationContainer':
+			maxFileSize:
+				'<%= UploadServletRequestConfigurationHelperUtil.getMaxSize() %> B',
+			metadataContainer: '#<portlet:namespace />commonFileMetadataContainer',
+			metadataExplanationContainer:
 				'#<portlet:namespace />metadataExplanationContainer',
-			'multipleFiles': false,
-			'namespace': '<portlet:namespace />',
+			multipleFiles: false,
+			namespace: '<portlet:namespace />',
 			'strings.dropFileText':
 				'<liferay-ui:message key="drop-a-lar-file-here-to-import" />',
 			'strings.fileCannotBeSavedText':
@@ -85,7 +85,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				'<liferay-ui:message key="this-file-was-previously-uploaded-but-not-actually-imported" />',
 			'strings.uploadsCompleteText':
 				'<liferay-ui:message key="the-file-is-ready-to-be-imported" />',
-			'tempFileURL': {
+			tempFileURL: {
 				method: Liferay.Service.bind('/layout/get-temp-file-names'),
 				params: {
 					folderName:
@@ -93,7 +93,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 					groupId: <%= scopeGroupId %>,
 				},
 			},
-			'uploadFile':
+			uploadFile:
 				'<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>" name="/export_import/export_import"><portlet:param name="mvcRenderCommandName" value="/export_import/export_import" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" /><portlet:param name="redirect" value="<%= redirect %>" /><portlet:param name="plid" value="<%= String.valueOf(plid) %>" /> <portlet:param name="groupId" value="<%= String.valueOf(themeDisplay.getScopeGroupId()) %>" /><portlet:param name="portletResource" value="<%= portletResource %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= Group.class.getName() %>" />',
 		});
 
@@ -123,9 +123,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 	</aui:script>
 </aui:form>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {runScriptsInElement} = frontendJsWeb;
-
+<aui:script require="frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 	var continueButton = document.getElementById(
 		'<portlet:namespace />continueButton'
 	);
@@ -146,7 +144,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				.then((response) => {
 					exportImportOptions.innerHTML = response;
 
-					runScriptsInElement(exportImportOptions);
+					runScriptsInElement.default(exportImportOptions);
 				});
 		});
 	}

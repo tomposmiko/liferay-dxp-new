@@ -32,11 +32,14 @@ import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.layout.dynamic.data.mapping.form.field.type.constants.LayoutDDMFormFieldTypeConstants;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -47,14 +50,15 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -64,7 +68,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "model.class.name=com.liferay.dynamic.data.mapping.storage.DDMFormValues",
-	service = ExportImportContentProcessor.class
+	service = {
+		DDMFormValuesExportImportContentProcessor.class,
+		ExportImportContentProcessor.class
+	}
 )
 public class DDMFormValuesExportImportContentProcessor
 	implements ExportImportContentProcessor<DDMFormValues> {
@@ -122,6 +129,18 @@ public class DDMFormValuesExportImportContentProcessor
 		long groupId, DDMFormValues ddmFormValues) {
 	}
 
+	@Reference(unbind = "-")
+	protected void setDLAppLocalService(DLAppLocalService dlAppLocalService) {
+		_dlAppLocalService = dlAppLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
 	private boolean _hasNotExportableStatus(
 		StagedModel stagedModel, int status) {
 
@@ -136,16 +155,11 @@ public class DDMFormValuesExportImportContentProcessor
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormValuesExportImportContentProcessor.class);
 
-	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
 
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	private class FileEntryExportDDMFormFieldValueTransformer
@@ -177,7 +191,7 @@ public class DDMFormValuesExportImportContentProcessor
 				JSONObject jsonObject = null;
 
 				try {
-					jsonObject = _jsonFactory.createJSONObject(valueString);
+					jsonObject = JSONFactoryUtil.createJSONObject(valueString);
 				}
 				catch (JSONException jsonException) {
 					if (_log.isDebugEnabled()) {
@@ -271,7 +285,7 @@ public class DDMFormValuesExportImportContentProcessor
 				JSONObject jsonObject = null;
 
 				try {
-					jsonObject = _jsonFactory.createJSONObject(valueString);
+					jsonObject = JSONFactoryUtil.createJSONObject(valueString);
 				}
 				catch (JSONException jsonException) {
 					if (_log.isDebugEnabled()) {
@@ -394,7 +408,7 @@ public class DDMFormValuesExportImportContentProcessor
 				JSONObject jsonObject = null;
 
 				try {
-					jsonObject = _jsonFactory.createJSONObject(valueString);
+					jsonObject = JSONFactoryUtil.createJSONObject(valueString);
 				}
 				catch (JSONException jsonException) {
 					if (_log.isDebugEnabled()) {
@@ -490,7 +504,7 @@ public class DDMFormValuesExportImportContentProcessor
 				JSONObject jsonObject = null;
 
 				try {
-					jsonObject = _jsonFactory.createJSONObject(valueString);
+					jsonObject = JSONFactoryUtil.createJSONObject(valueString);
 				}
 				catch (JSONException jsonException) {
 					if (_log.isDebugEnabled()) {
@@ -589,7 +603,7 @@ public class DDMFormValuesExportImportContentProcessor
 				JSONObject jsonObject = null;
 
 				try {
-					jsonObject = _jsonFactory.createJSONObject(valueString);
+					jsonObject = JSONFactoryUtil.createJSONObject(valueString);
 				}
 				catch (JSONException jsonException) {
 					if (_log.isDebugEnabled()) {
@@ -651,17 +665,13 @@ public class DDMFormValuesExportImportContentProcessor
 				JSONObject jsonObject = null;
 
 				try {
-					jsonObject = _jsonFactory.createJSONObject(valueString);
+					jsonObject = JSONFactoryUtil.createJSONObject(valueString);
 				}
 				catch (JSONException jsonException) {
 					if (_log.isDebugEnabled()) {
 						_log.debug("Unable to parse JSON", jsonException);
 					}
 
-					continue;
-				}
-
-				if (jsonObject.length() == 0) {
 					continue;
 				}
 
@@ -684,13 +694,6 @@ public class DDMFormValuesExportImportContentProcessor
 
 					if (className.equals(Layout.class.getName())) {
 						String uuid = element.attributeValue("uuid");
-
-						if (jsonObject.has("id") &&
-							!Objects.equals(uuid, jsonObject.getString("id"))) {
-
-							continue;
-						}
-
 						String privateLayout = element.attributeValue(
 							"private-layout");
 
@@ -737,12 +740,45 @@ public class DDMFormValuesExportImportContentProcessor
 			).put(
 				"layoutId", layout.getLayoutId()
 			).put(
-				"name", layout.getBreadcrumb(locale)
+				"name", _getLayoutBreadcrumb(layout, locale)
 			).put(
 				"privateLayout", layout.isPrivateLayout()
 			).put(
 				"value", layout.getFriendlyURL(locale)
 			).toString();
+		}
+
+		private String _getLayoutBreadcrumb(Layout layout, Locale locale)
+			throws PortalException {
+
+			List<Layout> ancestorLayouts = layout.getAncestors();
+
+			StringBundler sb = new StringBundler(
+				(4 * ancestorLayouts.size()) + 5);
+
+			if (layout.isPrivateLayout()) {
+				sb.append(LanguageUtil.get(locale, "private-pages"));
+			}
+			else {
+				sb.append(LanguageUtil.get(locale, "public-pages"));
+			}
+
+			sb.append(StringPool.SPACE);
+			sb.append(StringPool.GREATER_THAN);
+			sb.append(StringPool.SPACE);
+
+			Collections.reverse(ancestorLayouts);
+
+			for (Layout ancestorLayout : ancestorLayouts) {
+				sb.append(HtmlUtil.escape(ancestorLayout.getName(locale)));
+				sb.append(StringPool.SPACE);
+				sb.append(StringPool.GREATER_THAN);
+				sb.append(StringPool.SPACE);
+			}
+
+			sb.append(HtmlUtil.escape(layout.getName(locale)));
+
+			return sb.toString();
 		}
 
 		private final PortletDataContext _portletDataContext;

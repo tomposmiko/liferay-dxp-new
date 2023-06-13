@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -77,10 +76,6 @@ public class StringUtil {
 		return s;
 	}
 
-	public static String center(String s, String size) {
-		return StringUtils.center(s, GetterUtil.getInteger(size));
-	}
-
 	public static String combine(String... strings) {
 		if ((strings == null) || (strings.length == 0)) {
 			return "";
@@ -93,14 +88,6 @@ public class StringUtil {
 		}
 
 		return sb.toString();
-	}
-
-	public static int compareTo(String s, String comparison) {
-		return s.compareTo(comparison);
-	}
-
-	public static String concat(String s, String text) {
-		return s.concat(text);
 	}
 
 	public static boolean contains(String s, String text) {
@@ -131,10 +118,6 @@ public class StringUtil {
 		}
 
 		return true;
-	}
-
-	public static boolean contentEquals(String s, String charSequence) {
-		return s.contentEquals(charSequence);
 	}
 
 	public static int count(String s, String text) {
@@ -193,10 +176,6 @@ public class StringUtil {
 		}
 
 		return false;
-	}
-
-	public static boolean equals(String s, String text) {
-		return s.equals(text);
 	}
 
 	public static boolean equalsIgnoreCase(String s1, String s2) {
@@ -323,24 +302,6 @@ public class StringUtil {
 		}
 
 		return sb.toString();
-	}
-
-	public static String format(String format, String s) {
-		try {
-			return String.format(format, s);
-		}
-		catch (IllegalFormatConversionException
-					illegalFormatConversionException) {
-
-			System.out.println(
-				"Please use a format specifier that utilizes a string");
-
-			throw illegalFormatConversionException;
-		}
-	}
-
-	public static boolean isEmpty(String s) {
-		return s.isEmpty();
 	}
 
 	public static boolean isLowerCase(String s) {
@@ -1020,8 +981,9 @@ public class StringUtil {
 		else if (x == 0) {
 			return s;
 		}
-
-		return s.substring(x);
+		else {
+			return s.substring(x);
+		}
 	}
 
 	public static String trimTrailing(String s) {
@@ -1052,8 +1014,9 @@ public class StringUtil {
 		else if (x == len) {
 			return s;
 		}
-
-		return s.substring(0, x);
+		else {
+			return s.substring(0, x);
+		}
 	}
 
 	public static String unquote(String s) {
@@ -1080,10 +1043,6 @@ public class StringUtil {
 	}
 
 	public static String upperCaseFirstLetter(String s) {
-		if ((s == null) || s.isEmpty()) {
-			return s;
-		}
-
 		char[] chars = s.toCharArray();
 
 		if ((chars[0] >= 97) && (chars[0] <= 122)) {

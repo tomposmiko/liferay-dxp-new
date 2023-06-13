@@ -28,10 +28,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class GroupLocalServiceWrapper
 	implements GroupLocalService, ServiceWrapper<GroupLocalService> {
 
-	public GroupLocalServiceWrapper() {
-		this(null);
-	}
-
 	public GroupLocalServiceWrapper(GroupLocalService groupLocalService) {
 		_groupLocalService = groupLocalService;
 	}

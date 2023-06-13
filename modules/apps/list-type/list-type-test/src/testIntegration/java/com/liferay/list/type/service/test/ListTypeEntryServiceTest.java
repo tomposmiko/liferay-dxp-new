@@ -58,18 +58,18 @@ public class ListTypeEntryServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_guestUser = _userLocalService.getGuestUser(
+		_defaultUser = _userLocalService.getDefaultUser(
 			TestPropsValues.getCompanyId());
-		_listTypeDefinition =
-			_listTypeDefinitionLocalService.addListTypeDefinition(
-				null, TestPropsValues.getUserId(),
-				Collections.singletonMap(
-					LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-				Collections.emptyList());
 		_originalName = PrincipalThreadLocal.getName();
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 		_user = TestPropsValues.getUser();
+
+		_listTypeDefinition =
+			_listTypeDefinitionLocalService.addListTypeDefinition(
+				TestPropsValues.getUserId(),
+				Collections.singletonMap(
+					LocaleUtil.getDefault(), RandomTestUtil.randomString()));
 	}
 
 	@After
@@ -82,7 +82,7 @@ public class ListTypeEntryServiceTest {
 	@Test
 	public void testAddListTypeEntry() throws Exception {
 		try {
-			_testAddListTypeEntry(_guestUser);
+			_testAddListTypeEntry(_defaultUser);
 
 			Assert.fail();
 		}
@@ -91,7 +91,7 @@ public class ListTypeEntryServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have UPDATE permission for"));
 		}
 
@@ -101,7 +101,7 @@ public class ListTypeEntryServiceTest {
 	@Test
 	public void testDeleteListTypeEntry() throws Exception {
 		try {
-			_testDeleteListTypeEntry(_guestUser);
+			_testDeleteListTypeEntry(_defaultUser);
 
 			Assert.fail();
 		}
@@ -110,7 +110,7 @@ public class ListTypeEntryServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have UPDATE permission for"));
 		}
 
@@ -120,14 +120,14 @@ public class ListTypeEntryServiceTest {
 	@Test
 	public void testGetListTypeEntry() throws Exception {
 		try {
-			_testGetListTypeEntry(_guestUser);
+			_testGetListTypeEntry(_defaultUser);
 		}
 		catch (PrincipalException.MustHavePermission principalException) {
 			String message = principalException.getMessage();
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have VIEW permission for"));
 		}
 
@@ -135,26 +135,9 @@ public class ListTypeEntryServiceTest {
 	}
 
 	@Test
-	public void testGetListTypeEntryByExternalReferenceCode() throws Exception {
-		try {
-			_testGetListTypeEntryByExternalReferenceCode(_guestUser);
-		}
-		catch (PrincipalException.MustHavePermission principalException) {
-			String message = principalException.getMessage();
-
-			Assert.assertTrue(
-				message.contains(
-					"User " + _guestUser.getUserId() +
-						" must have VIEW permission for"));
-		}
-
-		_testGetListTypeEntryByExternalReferenceCode(_user);
-	}
-
-	@Test
 	public void testUpdateListTypeEntry() throws Exception {
 		try {
-			_testUpdateListTypeEntry(_guestUser);
+			_testUpdateListTypeEntry(_defaultUser);
 
 			Assert.fail();
 		}
@@ -163,7 +146,7 @@ public class ListTypeEntryServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _guestUser.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have UPDATE permission for"));
 		}
 
@@ -172,8 +155,7 @@ public class ListTypeEntryServiceTest {
 
 	private ListTypeEntry _addListTypeEntry(User user) throws Exception {
 		return _listTypeEntryLocalService.addListTypeEntry(
-			null, user.getUserId(),
-			_listTypeDefinition.getListTypeDefinitionId(),
+			user.getUserId(), _listTypeDefinition.getListTypeDefinitionId(),
 			RandomTestUtil.randomString(),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()));
@@ -193,7 +175,7 @@ public class ListTypeEntryServiceTest {
 			_setUser(user);
 
 			listTypeEntry = _listTypeEntryService.addListTypeEntry(
-				null, _listTypeDefinition.getListTypeDefinitionId(),
+				_listTypeDefinition.getListTypeDefinitionId(),
 				RandomTestUtil.randomString(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()));
@@ -242,28 +224,6 @@ public class ListTypeEntryServiceTest {
 		}
 	}
 
-	private void _testGetListTypeEntryByExternalReferenceCode(User user)
-		throws Exception {
-
-		ListTypeEntry listTypeEntry = null;
-
-		try {
-			_setUser(user);
-
-			listTypeEntry = _addListTypeEntry(user);
-
-			_listTypeEntryService.getListTypeEntryByExternalReferenceCode(
-				listTypeEntry.getExternalReferenceCode(),
-				listTypeEntry.getCompanyId(),
-				_listTypeDefinition.getListTypeDefinitionId());
-		}
-		finally {
-			if (listTypeEntry != null) {
-				_listTypeEntryLocalService.deleteListTypeEntry(listTypeEntry);
-			}
-		}
-	}
-
 	private void _testUpdateListTypeEntry(User user) throws Exception {
 		ListTypeEntry listTypeEntry = null;
 
@@ -272,16 +232,10 @@ public class ListTypeEntryServiceTest {
 
 			listTypeEntry = _addListTypeEntry(user);
 
-			String externalReferenceCode = RandomTestUtil.randomString();
-
 			listTypeEntry = _listTypeEntryService.updateListTypeEntry(
-				externalReferenceCode, listTypeEntry.getListTypeEntryId(),
+				listTypeEntry.getListTypeEntryId(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()));
-
-			Assert.assertEquals(
-				externalReferenceCode,
-				listTypeEntry.getExternalReferenceCode());
 		}
 		finally {
 			if (listTypeEntry != null) {
@@ -290,7 +244,7 @@ public class ListTypeEntryServiceTest {
 		}
 	}
 
-	private User _guestUser;
+	private User _defaultUser;
 
 	@DeleteAfterTestRun
 	private ListTypeDefinition _listTypeDefinition;

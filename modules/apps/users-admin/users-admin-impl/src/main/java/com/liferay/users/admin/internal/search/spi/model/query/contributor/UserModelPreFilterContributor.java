@@ -15,7 +15,6 @@
 package com.liferay.users.admin.internal.search.spi.model.query.contributor;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -39,6 +38,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.User",
 	service = ModelPreFilterContributor.class
 )
@@ -52,11 +52,10 @@ public class UserModelPreFilterContributor
 		ModelSearchSettings modelSearchSettings, SearchContext searchContext) {
 
 		contextBooleanFilter.addTerm(
-			Field.TYPE, String.valueOf(UserConstants.TYPE_GUEST),
+			"defaultUser", Boolean.TRUE.toString(),
 			BooleanClauseOccur.MUST_NOT);
 
 		_filterByEmailAddress(contextBooleanFilter, searchContext);
-		_filterByType(contextBooleanFilter, searchContext);
 
 		int status = GetterUtil.getInteger(
 			searchContext.getAttribute(Field.STATUS),
@@ -90,12 +89,14 @@ public class UserModelPreFilterContributor
 				}
 			}
 
-			_addContextQueryParams(contextBooleanFilter, entry.getKey(), value);
+			addContextQueryParams(
+				contextBooleanFilter, searchContext, entry.getKey(), value);
 		}
 	}
 
-	private void _addContextQueryParams(
-		BooleanFilter contextFilter, String key, Object value) {
+	protected void addContextQueryParams(
+		BooleanFilter contextFilter, SearchContext searchContext, String key,
+		Object value) {
 
 		if (key.equals("usersGroups")) {
 			if (value instanceof Long[]) {
@@ -206,22 +207,6 @@ public class UserModelPreFilterContributor
 					"emailAddressDomain", emailAddress + StringPool.STAR)));
 
 		booleanFilter.add(emailAddressBooleanFilter, BooleanClauseOccur.MUST);
-	}
-
-	private void _filterByType(
-		BooleanFilter contextBooleanFilter, SearchContext searchContext) {
-
-		long[] types = GetterUtil.getLongValues(
-			searchContext.getAttribute("types"),
-			new long[] {UserConstants.TYPE_REGULAR});
-
-		if (ArrayUtil.isNotEmpty(types)) {
-			TermsFilter termsFilter = new TermsFilter(Field.TYPE);
-
-			termsFilter.addValues(ArrayUtil.toStringArray(types));
-
-			contextBooleanFilter.add(termsFilter, BooleanClauseOccur.MUST);
-		}
 	}
 
 }

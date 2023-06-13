@@ -18,16 +18,15 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.saml.persistence.exception.DuplicateSamlIdpSsoSessionException;
 import com.liferay.saml.persistence.model.SamlIdpSsoSession;
 import com.liferay.saml.persistence.service.base.SamlIdpSsoSessionLocalServiceBaseImpl;
-import com.liferay.saml.persistence.service.persistence.SamlIdpSpSessionPersistence;
 import com.liferay.saml.runtime.configuration.SamlProviderConfiguration;
 import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
 
 import java.util.Date;
 
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -55,7 +54,7 @@ public class SamlIdpSsoSessionLocalServiceImpl
 				"Duplicate SAML IDP SSO session for " + samlIdpSsoSessionKey);
 		}
 
-		User user = _userLocalService.getUserById(serviceContext.getUserId());
+		User user = userLocalService.getUserById(serviceContext.getUserId());
 		Date date = new Date();
 
 		long samlIdpSsoSessionId = counterLocalService.increment(
@@ -86,7 +85,7 @@ public class SamlIdpSsoSessionLocalServiceImpl
 				samlProviderConfiguration.sessionMaximumAge());
 
 		samlIdpSsoSessionPersistence.removeByLtCreateDate(createDate);
-		_samlIdpSpSessionPersistence.removeByLtCreateDate(createDate);
+		samlIdpSpSessionPersistence.removeByLtCreateDate(createDate);
 	}
 
 	@Override
@@ -117,12 +116,9 @@ public class SamlIdpSsoSessionLocalServiceImpl
 	}
 
 	@Reference
-	private SamlIdpSpSessionPersistence _samlIdpSpSessionPersistence;
+	private ConfigurationAdmin _configurationAdmin;
 
 	@Reference
 	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

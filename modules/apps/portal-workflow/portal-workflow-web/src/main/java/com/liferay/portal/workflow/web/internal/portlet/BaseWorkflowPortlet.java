@@ -16,7 +16,6 @@ package com.liferay.portal.workflow.web.internal.portlet;
 
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.workflow.constants.WorkflowWebKeys;
@@ -25,6 +24,8 @@ import com.liferay.portal.workflow.portlet.tab.WorkflowPortletTab;
 import java.io.IOException;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -50,9 +51,15 @@ public abstract class BaseWorkflowPortlet extends MVCPortlet {
 	public abstract List<String> getWorkflowPortletTabNames();
 
 	public List<WorkflowPortletTab> getWorkflowPortletTabs() {
-		return TransformUtil.transform(
-			getWorkflowPortletTabNames(),
-			_workflowPortletTabServiceTrackerMap::getService);
+		List<String> workflowPortletTabNames = getWorkflowPortletTabNames();
+
+		Stream<String> stream = workflowPortletTabNames.stream();
+
+		return stream.map(
+			name -> _workflowPortletTabServiceTrackerMap.getService(name)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
@@ -93,7 +100,7 @@ public abstract class BaseWorkflowPortlet extends MVCPortlet {
 	protected void addRenderRequestAttributes(RenderRequest renderRequest) {
 		renderRequest.setAttribute(
 			WorkflowWebKeys.SELECTED_WORKFLOW_PORTLET_TAB,
-			_getSelectedWorkflowPortletTab(renderRequest));
+			getSelectedWorkflowPortletTab(renderRequest));
 		renderRequest.setAttribute(
 			WorkflowWebKeys.WORKFLOW_PORTLET_TABS, getWorkflowPortletTabs());
 	}
@@ -115,7 +122,7 @@ public abstract class BaseWorkflowPortlet extends MVCPortlet {
 		super.doDispatch(renderRequest, renderResponse);
 	}
 
-	private WorkflowPortletTab _getSelectedWorkflowPortletTab(
+	protected WorkflowPortletTab getSelectedWorkflowPortletTab(
 		RenderRequest renderRequest) {
 
 		String workflowPortletTabName = ParamUtil.get(
@@ -123,6 +130,10 @@ public abstract class BaseWorkflowPortlet extends MVCPortlet {
 
 		return _workflowPortletTabServiceTrackerMap.getService(
 			workflowPortletTabName);
+	}
+
+	protected WorkflowPortletTab getWorkflowPortletTab(String name) {
+		return _workflowPortletTabServiceTrackerMap.getService(name);
 	}
 
 	private ServiceTrackerMap<String, WorkflowPortletTab>

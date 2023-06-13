@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class FriendlyURLEntryStagedModelDataHandler
 	extends BaseStagedModelDataHandler<FriendlyURLEntry> {
 
@@ -76,20 +76,11 @@ public class FriendlyURLEntryStagedModelDataHandler
 		friendlyURLEntryElement.addAttribute(
 			"resource-class-name", friendlyURLEntry.getClassName());
 
+		String modelPath = ExportImportPathUtil.getModelPath(
+			friendlyURLEntry, friendlyURLEntry.getUuid());
+
 		portletDataContext.addZipEntry(
-			ExportImportPathUtil.getModelPath(
-				friendlyURLEntry, friendlyURLEntry.getUuid()),
-			friendlyURLEntry.getUrlTitleMapAsXML());
-
-		FriendlyURLEntry mainFriendlyURLEntry =
-			_friendlyURLEntryLocalService.fetchMainFriendlyURLEntry(
-				friendlyURLEntry.getClassNameId(),
-				friendlyURLEntry.getClassPK());
-
-		if (mainFriendlyURLEntry == null) {
-			_friendlyURLEntryLocalService.setMainFriendlyURLEntry(
-				friendlyURLEntry);
-		}
+			modelPath, friendlyURLEntry.getUrlTitleMapAsXML());
 
 		if (friendlyURLEntry.isMain()) {
 			friendlyURLEntryElement.addAttribute(
@@ -133,28 +124,23 @@ public class FriendlyURLEntryStagedModelDataHandler
 			importedFriendlyURLEntry =
 				(FriendlyURLEntry)friendlyURLEntry.clone();
 
-			importedFriendlyURLEntry.setDefaultLanguageId(
-				friendlyURLEntry.getDefaultLanguageId());
 			importedFriendlyURLEntry.setGroupId(
 				portletDataContext.getScopeGroupId());
 			importedFriendlyURLEntry.setCompanyId(
 				portletDataContext.getCompanyId());
 			importedFriendlyURLEntry.setClassNameId(classNameId);
-			importedFriendlyURLEntry.setClassPK(
-				MapUtil.getLong(
-					newPrimaryKeysMap, friendlyURLEntry.getClassPK(),
-					friendlyURLEntry.getClassPK()));
+
+			long classPK = MapUtil.getLong(
+				newPrimaryKeysMap, friendlyURLEntry.getClassPK(),
+				friendlyURLEntry.getClassPK());
+
+			importedFriendlyURLEntry.setClassPK(classPK);
+
+			importedFriendlyURLEntry.setDefaultLanguageId(
+				friendlyURLEntry.getDefaultLanguageId());
 
 			importedFriendlyURLEntry = _stagedModelRepository.addStagedModel(
 				portletDataContext, importedFriendlyURLEntry);
-
-			boolean mainEntry = GetterUtil.getBoolean(
-				friendlyURLEntryElement.attributeValue("mainEntry"));
-
-			if (mainEntry) {
-				_friendlyURLEntryLocalService.setMainFriendlyURLEntry(
-					importedFriendlyURLEntry);
-			}
 		}
 		else {
 			importedFriendlyURLEntry = _stagedModelRepository.updateStagedModel(

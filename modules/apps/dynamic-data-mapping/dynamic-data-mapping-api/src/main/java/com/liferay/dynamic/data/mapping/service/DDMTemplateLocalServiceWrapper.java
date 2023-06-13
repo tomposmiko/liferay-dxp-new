@@ -30,10 +30,6 @@ public class DDMTemplateLocalServiceWrapper
 	implements DDMTemplateLocalService,
 			   ServiceWrapper<DDMTemplateLocalService> {
 
-	public DDMTemplateLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DDMTemplateLocalServiceWrapper(
 		DDMTemplateLocalService ddmTemplateLocalService) {
 
@@ -189,7 +185,7 @@ public class DDMTemplateLocalServiceWrapper
 	 * and description.
 	 *
 	 * @param userId the primary key of the template's creator/owner
-	 * @param sourceTemplateId the primary key of the template to be copied
+	 * @param templateId the primary key of the template to be copied
 	 * @param nameMap the new template's locales and localized names
 	 * @param descriptionMap the new template's locales and localized
 	 descriptions
@@ -201,24 +197,24 @@ public class DDMTemplateLocalServiceWrapper
 	 */
 	@Override
 	public DDMTemplate copyTemplate(
-			long userId, long sourceTemplateId,
+			long userId, long templateId,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmTemplateLocalService.copyTemplate(
-			userId, sourceTemplateId, nameMap, descriptionMap, serviceContext);
+			userId, templateId, nameMap, descriptionMap, serviceContext);
 	}
 
 	@Override
 	public DDMTemplate copyTemplate(
-			long userId, long sourceTemplateId,
+			long userId, long templateId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmTemplateLocalService.copyTemplate(
-			userId, sourceTemplateId, serviceContext);
+			userId, templateId, serviceContext);
 	}
 
 	/**
@@ -229,8 +225,8 @@ public class DDMTemplateLocalServiceWrapper
 	 * @param userId the primary key of the template's creator/owner
 	 * @param classNameId the primary key of the class name for the template's
 	 related model
-	 * @param sourceClassPK the primary key of the old template's related entity
-	 * @param targetClassPK the primary key of the new template's related entity
+	 * @param oldClassPK the primary key of the old template's related entity
+	 * @param newClassPK the primary key of the new template's related entity
 	 * @param type the template's type. For more information, see
 	 DDMTemplateConstants in the dynamic-data-mapping-api module.
 	 * @param serviceContext the service context to be applied. Can set the
@@ -241,14 +237,13 @@ public class DDMTemplateLocalServiceWrapper
 	 */
 	@Override
 	public java.util.List<DDMTemplate> copyTemplates(
-			long userId, long classNameId, long sourceClassPK,
-			long targetClassPK, String type,
+			long userId, long classNameId, long oldClassPK, long newClassPK,
+			String type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmTemplateLocalService.copyTemplates(
-			userId, classNameId, sourceClassPK, targetClassPK, type,
-			serviceContext);
+			userId, classNameId, oldClassPK, newClassPK, type, serviceContext);
 	}
 
 	/**

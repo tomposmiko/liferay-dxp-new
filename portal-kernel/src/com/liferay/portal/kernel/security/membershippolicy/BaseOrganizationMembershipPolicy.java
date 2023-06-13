@@ -58,7 +58,7 @@ public abstract class BaseOrganizationMembershipPolicy
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -116,7 +116,7 @@ public abstract class BaseOrganizationMembershipPolicy
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return true;
@@ -148,7 +148,7 @@ public abstract class BaseOrganizationMembershipPolicy
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -214,7 +214,7 @@ public abstract class BaseOrganizationMembershipPolicy
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return true;

@@ -14,7 +14,6 @@
 
 import {ClayInput} from '@clayui/form';
 import {SettingsContext, useFormState} from 'data-engine-js-components-web';
-import {openToast} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
@@ -36,7 +35,7 @@ const getClassNameBasedOnLayout = (layout, visibleField) => {
 };
 
 const isEmpty = (object) => {
-	return object && !Object.keys(object).length;
+	return object && Object.keys(object).length === 0;
 };
 
 const Field = ({
@@ -67,17 +66,6 @@ const Field = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [initialValid, pageValidationFailed]);
 
-	const accessibleProps = {
-		...(otherProps.tip && {
-			'aria-describedby': `${id ?? name}_fieldHelp`,
-		}),
-		...(otherProps.errorMessage && {
-			'aria-errormessage': `${id ?? name}_fieldError`,
-		}),
-		'aria-invalid': !valid,
-		'aria-required': otherProps.required,
-	};
-
 	return (
 		<FieldBase
 			{...otherProps}
@@ -91,7 +79,6 @@ const Field = ({
 			valid={!!parsedValue[visibleField] || valid}
 		>
 			<ClayInput
-				{...accessibleProps}
 				className="ddm-field-text"
 				dir={Liferay.Language.direction[editingLanguageId]}
 				disabled={disabled}
@@ -166,7 +153,7 @@ const Main = ({
 
 	useEffect(() => {
 		window.gm_authFailure = function () {
-			openToast({
+			Liferay.Util.openToast({
 				message: Liferay.Language.get(
 					'communication-with-the-api-provider-failed'
 				),
@@ -230,9 +217,8 @@ const Main = ({
 				showLabel={showLabel}
 				visibleField="place"
 			/>
-
 			<div className="row">
-				{!!availableVisibleFields.length &&
+				{availableVisibleFields.length > 0 &&
 					availableVisibleFields.map((visibleField, index) => {
 						if (currentVisibleFields.includes(visibleField)) {
 							const visibleFieldName = name + '#' + visibleField;
@@ -267,7 +253,6 @@ const Main = ({
 						}
 					})}
 			</div>
-
 			<ClayInput name={name} type="hidden" value={value} />
 		</FieldBase>
 	);

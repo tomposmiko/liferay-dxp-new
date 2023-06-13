@@ -15,6 +15,4 @@
 import launcher from '../../utilities/launcher';
 import MiniCart from './MiniCart';
 
-export default function entry(...data) {
-	return launcher(MiniCart, ...data);
-}
+export default (...data) => launcher(MiniCart, ...data);

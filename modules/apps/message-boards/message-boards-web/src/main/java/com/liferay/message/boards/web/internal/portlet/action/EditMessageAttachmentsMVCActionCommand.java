@@ -19,7 +19,7 @@ import com.liferay.message.boards.constants.MBPortletKeys;
 import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.message.boards.web.internal.upload.TempAttachmentMBUploadFileEntryHandler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -58,6 +58,70 @@ import org.osgi.service.component.annotations.Reference;
 public class EditMessageAttachmentsMVCActionCommand
 	extends BaseMVCActionCommand {
 
+	protected void addTempAttachment(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		_uploadHandler.upload(
+			_tempAttachmentMBUploadFileEntryHandler,
+			_multipleUploadResponseHandler, actionRequest, actionResponse);
+	}
+
+	protected void deleteAttachment(
+			ActionRequest actionRequest, boolean moveToTrash)
+		throws PortalException {
+
+		long messageId = ParamUtil.getLong(actionRequest, "messageId");
+
+		String fileName = ParamUtil.getString(actionRequest, "fileName");
+
+		if (moveToTrash) {
+			_mbMessageService.moveMessageAttachmentToTrash(messageId, fileName);
+		}
+		else {
+			_mbMessageService.deleteMessageAttachment(messageId, fileName);
+		}
+	}
+
+	protected void deleteTempAttachment(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		UploadPortletRequest uploadPortletRequest =
+			_portal.getUploadPortletRequest(actionRequest);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long categoryId = ParamUtil.getLong(uploadPortletRequest, "categoryId");
+		String fileName = ParamUtil.getString(actionRequest, "fileName");
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		try {
+			_mbMessageService.deleteTempAttachment(
+				themeDisplay.getScopeGroupId(), categoryId,
+				MBMessageConstants.TEMP_FOLDER_NAME, fileName);
+
+			jsonObject.put("deleted", Boolean.TRUE);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			jsonObject.put("deleted", Boolean.FALSE);
+
+			String errorMessage = themeDisplay.translate(
+				"an-unexpected-error-occurred-while-deleting-the-file");
+
+			jsonObject.put("errorMessage", errorMessage);
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			actionRequest, actionResponse, jsonObject);
+	}
+
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -67,22 +131,22 @@ public class EditMessageAttachmentsMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.ADD_TEMP)) {
-				_addTempAttachment(actionRequest, actionResponse);
+				addTempAttachment(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteAttachment(actionRequest, false);
+				deleteAttachment(actionRequest, false);
 			}
 			else if (cmd.equals(Constants.DELETE_TEMP)) {
-				_deleteTempAttachment(actionRequest, actionResponse);
+				deleteTempAttachment(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.EMPTY_TRASH)) {
-				_emptyTrash(actionRequest);
+				emptyTrash(actionRequest);
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
-				_deleteAttachment(actionRequest, true);
+				deleteAttachment(actionRequest, true);
 			}
 			else if (cmd.equals(Constants.RESTORE)) {
-				_restoreEntries(actionRequest);
+				restoreEntries(actionRequest);
 			}
 
 			if (Validator.isNotNull(cmd)) {
@@ -100,77 +164,15 @@ public class EditMessageAttachmentsMVCActionCommand
 		}
 	}
 
-	private void _addTempAttachment(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		_uploadHandler.upload(
-			_tempAttachmentMBUploadFileEntryHandler,
-			_multipleUploadResponseHandler, actionRequest, actionResponse);
-	}
-
-	private void _deleteAttachment(
-			ActionRequest actionRequest, boolean moveToTrash)
-		throws PortalException {
-
-		long messageId = ParamUtil.getLong(actionRequest, "messageId");
-
-		String fileName = ParamUtil.getString(actionRequest, "fileName");
-
-		if (moveToTrash) {
-			_mbMessageService.moveMessageAttachmentToTrash(messageId, fileName);
-		}
-		else {
-			_mbMessageService.deleteMessageAttachment(messageId, fileName);
-		}
-	}
-
-	private void _deleteTempAttachment(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		UploadPortletRequest uploadPortletRequest =
-			_portal.getUploadPortletRequest(actionRequest);
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long categoryId = ParamUtil.getLong(uploadPortletRequest, "categoryId");
-		String fileName = ParamUtil.getString(actionRequest, "fileName");
-
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
-
-		try {
-			_mbMessageService.deleteTempAttachment(
-				themeDisplay.getScopeGroupId(), categoryId,
-				MBMessageConstants.TEMP_FOLDER_NAME, fileName);
-
-			jsonObject.put("deleted", Boolean.TRUE);
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			jsonObject.put("deleted", Boolean.FALSE);
-
-			String errorMessage = themeDisplay.translate(
-				"an-unexpected-error-occurred-while-deleting-the-file");
-
-			jsonObject.put("errorMessage", errorMessage);
-		}
-
-		JSONPortletResponseUtil.writeJSON(
-			actionRequest, actionResponse, jsonObject);
-	}
-
-	private void _emptyTrash(ActionRequest actionRequest) throws Exception {
+	protected void emptyTrash(ActionRequest actionRequest) throws Exception {
 		long messageId = ParamUtil.getLong(actionRequest, "messageId");
 
 		_mbMessageService.emptyMessageAttachments(messageId);
 	}
 
-	private void _restoreEntries(ActionRequest actionRequest) throws Exception {
+	protected void restoreEntries(ActionRequest actionRequest)
+		throws Exception {
+
 		long messageId = ParamUtil.getLong(actionRequest, "messageId");
 
 		String fileName = ParamUtil.getString(actionRequest, "fileName");
@@ -181,9 +183,6 @@ public class EditMessageAttachmentsMVCActionCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditMessageAttachmentsMVCActionCommand.class);
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private MBMessageService _mbMessageService;

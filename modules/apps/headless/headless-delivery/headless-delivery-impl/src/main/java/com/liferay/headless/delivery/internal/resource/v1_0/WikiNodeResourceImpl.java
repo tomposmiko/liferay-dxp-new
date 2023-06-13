@@ -16,9 +16,9 @@ package com.liferay.headless.delivery.internal.resource.v1_0;
 
 import com.liferay.headless.common.spi.service.context.ServiceContextRequestUtil;
 import com.liferay.headless.delivery.dto.v1_0.WikiNode;
+import com.liferay.headless.delivery.internal.dto.v1_0.converter.WikiNodeDTOConverter;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.WikiNodeEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.WikiNodeResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -30,11 +30,11 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.wiki.constants.WikiConstants;
 import com.liferay.wiki.service.WikiNodeLocalService;
@@ -53,8 +53,8 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/wiki-node.properties",
 	scope = ServiceScope.PROTOTYPE, service = WikiNodeResource.class
 )
-@CTAware
-public class WikiNodeResourceImpl extends BaseWikiNodeResourceImpl {
+public class WikiNodeResourceImpl
+	extends BaseWikiNodeResourceImpl implements EntityModelResource {
 
 	@Override
 	public void deleteSiteWikiNodeByExternalReferenceCode(
@@ -63,7 +63,7 @@ public class WikiNodeResourceImpl extends BaseWikiNodeResourceImpl {
 
 		com.liferay.wiki.model.WikiNode wikiNode =
 			_wikiNodeLocalService.getWikiNodeByExternalReferenceCode(
-				externalReferenceCode, siteId);
+				siteId, externalReferenceCode);
 
 		_wikiNodeService.deleteNode(wikiNode.getNodeId());
 	}
@@ -84,7 +84,7 @@ public class WikiNodeResourceImpl extends BaseWikiNodeResourceImpl {
 		throws Exception {
 
 		return _toWikiNode(
-			_wikiNodeService.getWikiNodeByExternalReferenceCode(
+			_wikiNodeLocalService.getWikiNodeByExternalReferenceCode(
 				siteId, externalReferenceCode));
 	}
 
@@ -100,21 +100,6 @@ public class WikiNodeResourceImpl extends BaseWikiNodeResourceImpl {
 				addAction(
 					ActionKeys.ADD_NODE, "postSiteWikiNode",
 					WikiConstants.RESOURCE_NAME, siteId)
-			).put(
-				"createBatch",
-				addAction(
-					ActionKeys.ADD_NODE, "postSiteWikiNodeBatch",
-					WikiConstants.RESOURCE_NAME, siteId)
-			).put(
-				"deleteBatch",
-				addAction(
-					ActionKeys.DELETE, "deleteWikiNodeBatch",
-					WikiConstants.RESOURCE_NAME, null)
-			).put(
-				"updateBatch",
-				addAction(
-					ActionKeys.UPDATE, "putWikiNodeBatch",
-					WikiConstants.RESOURCE_NAME, null)
 			).build(),
 			booleanQuery -> {
 				BooleanFilter booleanFilter =
@@ -158,7 +143,7 @@ public class WikiNodeResourceImpl extends BaseWikiNodeResourceImpl {
 
 		com.liferay.wiki.model.WikiNode serviceBuilderWikiNode =
 			_wikiNodeLocalService.fetchWikiNodeByExternalReferenceCode(
-				externalReferenceCode, siteId);
+				siteId, externalReferenceCode);
 
 		if (serviceBuilderWikiNode != null) {
 			return _updateWikiNode(serviceBuilderWikiNode, wikiNode);
@@ -268,11 +253,8 @@ public class WikiNodeResourceImpl extends BaseWikiNodeResourceImpl {
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.delivery.internal.dto.v1_0.converter.WikiNodeDTOConverter)"
-	)
-	private DTOConverter<com.liferay.wiki.model.WikiNode, WikiNode>
-		_wikiNodeDTOConverter;
+	@Reference
+	private WikiNodeDTOConverter _wikiNodeDTOConverter;
 
 	@Reference
 	private WikiNodeLocalService _wikiNodeLocalService;

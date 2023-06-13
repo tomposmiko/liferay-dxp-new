@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.MembershipRequest;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1007,9 +1008,15 @@ public class MembershipRequestUtil {
 	}
 
 	public static MembershipRequestPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(MembershipRequestPersistence)PortalBeanLocatorUtil.locate(
+					MembershipRequestPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile MembershipRequestPersistence _persistence;
+	private static MembershipRequestPersistence _persistence;
 
 }

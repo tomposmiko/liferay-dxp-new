@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.product.content.search.web.internal.portlet.shared.search;
 
-import com.liferay.account.model.AccountEntry;
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.product.constants.CPField;
 import com.liferay.commerce.product.constants.CPPortletKeys;
@@ -27,7 +27,6 @@ import com.liferay.commerce.product.service.CPOptionLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.search.facet.SerializableFacet;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Indexer;
@@ -39,10 +38,7 @@ import com.liferay.portal.kernel.search.facet.MultiValueFacet;
 import com.liferay.portal.kernel.search.facet.SimpleFacet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
-import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
@@ -52,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -62,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shuyang Zhou
  */
 @Component(
+	enabled = false,
 	property = "javax.portlet.name=" + CPPortletKeys.CP_OPTION_FACETS,
 	service = PortletSharedSearchContributor.class
 )
@@ -72,6 +68,9 @@ public class CPOptionFacetsPortletSharedSearchContributor
 	public void contribute(
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
+		RenderRequest renderRequest =
+			portletSharedSearchSettings.getRenderRequest();
+
 		try {
 			SearchContext searchContext =
 				portletSharedSearchSettings.getSearchContext();
@@ -79,70 +78,45 @@ public class CPOptionFacetsPortletSharedSearchContributor
 			SerializableFacet serializableFacet = new SerializableFacet(
 				CPField.OPTION_NAMES, searchContext);
 
-			String[] parameterValues =
-				portletSharedSearchSettings.getParameterValues(
+			Optional<String[]> parameterValuesOptional =
+				portletSharedSearchSettings.getParameterValues71(
 					CPField.OPTION_NAMES);
 
-			if (ArrayUtil.isNotEmpty(parameterValues)) {
-				serializableFacet.select(parameterValues);
+			if (parameterValuesOptional.isPresent()) {
+				serializableFacet.select(parameterValuesOptional.get());
 
 				searchContext.setAttribute(
-					CPField.OPTION_NAMES, parameterValues);
+					CPField.OPTION_NAMES, parameterValuesOptional.get());
 			}
-
-			RenderRequest renderRequest =
-				portletSharedSearchSettings.getRenderRequest();
-
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-			int frequencyThreshold = 1;
-			int maxTerms = 10;
-
-			Optional<PortletPreferences> portletPreferencesOptional =
-				portletSharedSearchSettings.getPortletPreferencesOptional();
-
-			if (portletPreferencesOptional.isPresent()) {
-				PortletPreferences portletPreferences =
-					portletPreferencesOptional.get();
-
-				frequencyThreshold = GetterUtil.getInteger(
-					portletPreferences.getValue("frequencyThreshold", null),
-					frequencyThreshold);
-				maxTerms = GetterUtil.getInteger(
-					portletPreferences.getValue("maxTerms", null), maxTerms);
-			}
-
-			serializableFacet.setFacetConfiguration(
-				buildFacetConfiguration(
-					frequencyThreshold, maxTerms, serializableFacet));
 
 			portletSharedSearchSettings.addFacet(serializableFacet);
 
-			for (Facet facet : getFacets(renderRequest)) {
+			List<Facet> facets = getFacets(renderRequest);
+
+			for (Facet facet : facets) {
 				String cpOptionKey =
 					CPOptionFacetsUtil.getCPOptionKeyFromIndexFieldName(
 						facet.getFieldName());
 
-				parameterValues =
-					portletSharedSearchSettings.getParameterValues(cpOptionKey);
+				parameterValuesOptional =
+					portletSharedSearchSettings.getParameterValues71(
+						cpOptionKey);
 
 				serializableFacet = new SerializableFacet(
 					facet.getFieldName(), searchContext);
 
-				serializableFacet.setFacetConfiguration(
-					buildFacetConfiguration(
-						frequencyThreshold, maxTerms, serializableFacet));
-
-				if (ArrayUtil.isNotEmpty(parameterValues)) {
-					serializableFacet.select(parameterValues);
+				if (parameterValuesOptional.isPresent()) {
+					serializableFacet.select(parameterValuesOptional.get());
 
 					searchContext.setAttribute(
-						facet.getFieldName(), parameterValues);
+						facet.getFieldName(), parameterValuesOptional.get());
 				}
 
 				portletSharedSearchSettings.addFacet(serializableFacet);
 			}
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 			long commerceChannelGroupId = 0;
 
@@ -159,16 +133,16 @@ public class CPOptionFacetsPortletSharedSearchContributor
 					CPField.COMMERCE_CHANNEL_GROUP_ID, commerceChannelGroupId);
 				searchContext.setAttribute("secure", Boolean.TRUE);
 
-				AccountEntry accountEntry =
-					_commerceAccountHelper.getCurrentAccountEntry(
+				CommerceAccount commerceAccount =
+					_commerceAccountHelper.getCurrentCommerceAccount(
 						commerceChannelGroupId, themeDisplay.getRequest());
 
 				long[] commerceAccountGroupIds = null;
 
-				if (accountEntry != null) {
+				if (commerceAccount != null) {
 					commerceAccountGroupIds =
 						_commerceAccountHelper.getCommerceAccountGroupIds(
-							accountEntry.getAccountEntryId());
+							commerceAccount.getCommerceAccountId());
 				}
 
 				searchContext.setAttribute(
@@ -176,27 +150,8 @@ public class CPOptionFacetsPortletSharedSearchContributor
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
-	}
-
-	protected FacetConfiguration buildFacetConfiguration(
-		int frequencyThreshold, int maxTerms,
-		SerializableFacet serializableFacet) {
-
-		FacetConfiguration facetConfiguration = new FacetConfiguration();
-
-		facetConfiguration.setFieldName(serializableFacet.getFieldName());
-
-		JSONObject jsonObject = facetConfiguration.getData();
-
-		jsonObject.put(
-			"frequencyThreshold", frequencyThreshold
-		).put(
-			"maxTerms", maxTerms
-		);
-
-		return facetConfiguration;
 	}
 
 	protected SearchContext buildSearchContext(RenderRequest renderRequest)
@@ -227,16 +182,18 @@ public class CPOptionFacetsPortletSharedSearchContributor
 			searchContext.setAttribute(
 				"commerceChannelGroupId", commerceChannel.getGroupId());
 
-			AccountEntry accountEntry =
-				_commerceAccountHelper.getCurrentAccountEntry(
+			CommerceAccount commerceAccount =
+				_commerceAccountHelper.getCurrentCommerceAccount(
 					commerceChannel.getGroupId(),
 					_portal.getHttpServletRequest(renderRequest));
 
-			if (accountEntry != null) {
-				searchContext.setAttribute(
-					"commerceAccountGroupIds",
+			if (commerceAccount != null) {
+				long[] commerceAccountGroupIds =
 					_commerceAccountHelper.getCommerceAccountGroupIds(
-						accountEntry.getAccountEntryId()));
+						commerceAccount.getCommerceAccountId());
+
+				searchContext.setAttribute(
+					"commerceAccountGroupIds", commerceAccountGroupIds);
 			}
 		}
 

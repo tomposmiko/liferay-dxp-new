@@ -41,6 +41,7 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 	itemsTotal="<%= ddmDisplayContext.getTotalItems(DDMWebKeys.DYNAMIC_DATA_MAPPING_TEMPLATE) %>"
 	searchActionURL="<%= ddmDisplayContext.getSelectTemplateSearchActionURL() %>"
 	searchFormName="searchForm"
+	searchInputAutoFocus="<%= true %>"
 	selectable="<%= false %>"
 	sortingOrder="<%= ddmDisplayContext.getOrderByType() %>"
 	sortingURL="<%= ddmDisplayContext.getSortingURL() %>"
@@ -83,7 +84,7 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 							data.put("name", template.getName(locale));
 							%>
 
-							<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:void(0);">
+							<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
 								<%= HtmlUtil.escape(template.getName(locale)) %>
 							</aui:a>
 						</c:when>

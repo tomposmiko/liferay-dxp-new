@@ -22,11 +22,11 @@ describe('UnsafeHTML', () => {
 	afterEach(cleanup);
 
 	it('renders the given HTML markup', () => {
-		const {container} = render(
+		const {getByRole} = render(
 			<UnsafeHTML markup="<h1>Hello <strong>Gürjen</strong></h1>" />
 		);
 
-		expect(container.querySelector('h1')).toBeInTheDocument();
+		expect(getByRole('heading')).toBeInTheDocument();
 	});
 
 	it('allows adding any id', () => {
@@ -46,11 +46,11 @@ describe('UnsafeHTML', () => {
 	});
 
 	it('allows using a custom HTML tag as container', () => {
-		const {container} = render(
+		const {getByRole} = render(
 			<UnsafeHTML TagName="h1" markup="The Title" />
 		);
 
-		expect(container.querySelector('h1')).toBeInTheDocument();
+		expect(getByRole('heading')).toBeInTheDocument();
 	});
 
 	it('calls onRender prop whenever the content is updated', () => {

@@ -94,7 +94,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(C2InterwikiLinkNode c2InterwikiLinkNode) {
-		_appendInterwikiLinkNode(c2InterwikiLinkNode);
+		appendInterwikiLinkNode(c2InterwikiLinkNode);
 	}
 
 	@Override
@@ -106,12 +106,12 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(DokuWikiInterwikiLinkNode dokuWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(dokuWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(dokuWikiInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(FlickrInterwikiLinkNode flickrInterwikiLinkNode) {
-		_appendInterwikiLinkNode(flickrInterwikiLinkNode);
+		appendInterwikiLinkNode(flickrInterwikiLinkNode);
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(GoogleInterwikiLinkNode googleInterwikiLinkNode) {
-		_appendInterwikiLinkNode(googleInterwikiLinkNode);
+		appendInterwikiLinkNode(googleInterwikiLinkNode);
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(JSPWikiInterwikiLinkNode jspWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(jspWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(jspWikiInterwikiLinkNode);
 	}
 
 	@Override
@@ -219,17 +219,17 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(MeatballInterwikiLinkNode meatballInterwikiLinkNode) {
-		_appendInterwikiLinkNode(meatballInterwikiLinkNode);
+		appendInterwikiLinkNode(meatballInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(MediaWikiInterwikiLinkNode mediaWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(mediaWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(mediaWikiInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(MoinMoinInterwikiLinkNode moinMoinInterwikiLinkNode) {
-		_appendInterwikiLinkNode(moinMoinInterwikiLinkNode);
+		appendInterwikiLinkNode(moinMoinInterwikiLinkNode);
 	}
 
 	@Override
@@ -248,12 +248,12 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(OddmuseInterwikiLinkNode oddmuseInterwikiLinkNode) {
-		_appendInterwikiLinkNode(oddmuseInterwikiLinkNode);
+		appendInterwikiLinkNode(oddmuseInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(OhanaInterwikiLinkNode ohanaInterwikiLinkNode) {
-		_appendInterwikiLinkNode(ohanaInterwikiLinkNode);
+		appendInterwikiLinkNode(ohanaInterwikiLinkNode);
 	}
 
 	@Override
@@ -277,22 +277,22 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(PmWikiInterwikiLinkNode pmWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(pmWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(pmWikiInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(PukiWikiInterwikiLinkNode pukiWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(pukiWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(pukiWikiInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(PurpleWikiInterwikiLinkNode purpleWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(purpleWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(purpleWikiInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(RadeoxInterwikiLinkNode radeoxInterwikiLinkNode) {
-		_appendInterwikiLinkNode(radeoxInterwikiLinkNode);
+		appendInterwikiLinkNode(radeoxInterwikiLinkNode);
 	}
 
 	@Override
@@ -302,7 +302,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(SnipSnapInterwikiLinkNode snipSnapInterwikiLinkNode) {
-		_appendInterwikiLinkNode(snipSnapInterwikiLinkNode);
+		appendInterwikiLinkNode(snipSnapInterwikiLinkNode);
 	}
 
 	@Override
@@ -319,7 +319,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 	public void visit(TableNode tableNode) {
 		append("<table>");
 
-		_traverseAndWriteForEach(tableNode.getChildASTNodes(), "<tr>", "</tr>");
+		traverseAndWriteForEach(tableNode.getChildASTNodes(), "<tr>", "</tr>");
 
 		append("</table>");
 	}
@@ -330,12 +330,12 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(TiddlyWikiInterwikiLinkNode tiddlyWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(tiddlyWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(tiddlyWikiInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(TWikiInterwikiLinkNode tWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(tWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(tWikiInterwikiLinkNode);
 	}
 
 	@Override
@@ -364,7 +364,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(UsemodInterwikiLinkNode usemodInterwikiLinkNode) {
-		_appendInterwikiLinkNode(usemodInterwikiLinkNode);
+		appendInterwikiLinkNode(usemodInterwikiLinkNode);
 	}
 
 	@Override
@@ -374,18 +374,28 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 
 	@Override
 	public void visit(WikipediaInterwikiLinkNode wikipediaInterwikiLinkNode) {
-		_appendInterwikiLinkNode(wikipediaInterwikiLinkNode);
+		appendInterwikiLinkNode(wikipediaInterwikiLinkNode);
 	}
 
 	@Override
 	public void visit(XWikiInterwikiLinkNode xWikiInterwikiLinkNode) {
-		_appendInterwikiLinkNode(xWikiInterwikiLinkNode);
+		appendInterwikiLinkNode(xWikiInterwikiLinkNode);
 	}
 
 	protected void append(Object object) {
 		if (object != null) {
 			_sb.append(object);
 		}
+	}
+
+	protected void appendInterwikiLinkNode(
+		InterwikiLinkNode interwikiLinkNode) {
+
+		append("<a href=\"");
+		append(HtmlUtil.escape(interwikiLinkNode.getURL()));
+		append("\">");
+		append(HtmlUtil.escape(interwikiLinkNode.getTitle()));
+		append("</a>");
 	}
 
 	protected void traverse(List<ASTNode> astNodes) {
@@ -410,15 +420,7 @@ public class XhtmlTranslationVisitor implements ASTVisitor {
 		append(close);
 	}
 
-	private void _appendInterwikiLinkNode(InterwikiLinkNode interwikiLinkNode) {
-		append("<a href=\"");
-		append(HtmlUtil.escape(interwikiLinkNode.getURL()));
-		append("\">");
-		append(HtmlUtil.escape(interwikiLinkNode.getTitle()));
-		append("</a>");
-	}
-
-	private void _traverseAndWriteForEach(
+	protected void traverseAndWriteForEach(
 		List<ASTNode> astNodes, String open, String close) {
 
 		for (ASTNode curNode : astNodes) {

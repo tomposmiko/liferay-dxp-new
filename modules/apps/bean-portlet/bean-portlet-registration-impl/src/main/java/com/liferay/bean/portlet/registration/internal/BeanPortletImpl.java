@@ -430,14 +430,6 @@ public class BeanPortletImpl implements BeanPortlet {
 				_multipartConfig.getMaxRequestSize());
 		}
 
-		// javax.portlet.portlet-class
-
-		String portletClassName = getPortletClassName();
-
-		if (portletClassName != null) {
-			dictionary.put("javax.portlet.portlet-class", portletClassName);
-		}
-
 		// javax.portlet.portlet-mode
 
 		Set<String> allPortletModes = new HashSet<>(liferayPortletModes);

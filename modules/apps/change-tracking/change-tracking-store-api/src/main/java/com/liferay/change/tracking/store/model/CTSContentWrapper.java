@@ -353,11 +353,6 @@ public class CTSContentWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<CTSContent, Object>>
 		getAttributeGetterFunctions() {
 

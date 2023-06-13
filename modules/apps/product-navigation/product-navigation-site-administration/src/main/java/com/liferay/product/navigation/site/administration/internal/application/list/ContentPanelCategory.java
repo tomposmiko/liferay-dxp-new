@@ -14,12 +14,14 @@
 
 package com.liferay.product.navigation.site.administration.internal.application.list;
 
-import com.liferay.application.list.BasePanelCategory;
+import com.liferay.application.list.BaseJSPPanelCategory;
 import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.PanelCategoryKeys;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
+
+import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -28,13 +30,19 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION,
 		"panel.category.order:Integer=300"
 	},
 	service = PanelCategory.class
 )
-public class ContentPanelCategory extends BasePanelCategory {
+public class ContentPanelCategory extends BaseJSPPanelCategory {
+
+	@Override
+	public String getJspPath() {
+		return "/content/content.jsp";
+	}
 
 	@Override
 	public String getKey() {
@@ -43,15 +51,16 @@ public class ContentPanelCategory extends BasePanelCategory {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "category.site_administration.content");
+		return LanguageUtil.get(locale, "category.site_administration.content");
 	}
 
 	@Override
-	public boolean isAllowScopeLayouts() {
-		return true;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.product.navigation.site.administration)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
-
-	@Reference
-	private Language _language;
 
 }

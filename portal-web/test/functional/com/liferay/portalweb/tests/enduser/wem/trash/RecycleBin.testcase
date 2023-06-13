@@ -10,7 +10,7 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,7 +33,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109555. Can bulk restore multiple items from recycle bin."
-	@priority = 5
+	@priority = "5"
 	test BulkRestoreMultipleAssetsFromRecycleBin {
 		property portal.acceptance = "true";
 
@@ -108,7 +108,7 @@ definition {
 	}
 
 	@description = "Restore blog entry from recycle bin."
-	@priority = 3
+	@priority = "3"
 	test RecycleBinBlogs {
 		task ("Add a blogs widget to page and an entry to blogs") {
 			JSONLayout.addWidgetToPublicLayout(
@@ -162,8 +162,114 @@ definition {
 		}
 	}
 
+	@description = "Restore bookmark subfolder and bookmark from recycle bin."
+	@priority = "3"
+	test RecycleBinBookmarks {
+		property portal.release = "false";
+
+		task ("Add bookmarks widget to page") {
+			JSONLayout.addWidgetToPublicLayout(
+				groupName = "Site Name",
+				layoutName = "Test Page",
+				widgetName = "Bookmarks");
+		}
+
+		task ("Add a folder and a subfolder to the folder") {
+			JSONBookmarks.addFolder(
+				folderDescription = "Folder Description",
+				folderName = "Folder Name",
+				groupName = "Site Name");
+
+			JSONBookmarks.addFolder(
+				folderDescription = "Subfolder Description",
+				folderName = "Subfolder Name",
+				groupName = "Site Name",
+				parentFolderName = "Folder Name");
+		}
+
+		task ("Add a bookmark to subfolder") {
+			JSONBookmarks.addBookmarks(
+				description = "Bookmark Description",
+				folderName = "Subfolder Name",
+				groupName = "Site Name",
+				name = "Bookmark Name",
+				url = "https://www.liferay.com");
+		}
+		task ("Go to page and move subfolder to recycle bin") {
+			Navigator.gotoSitePage(
+				pageName = "Test Page",
+				siteName = "Site Name");
+
+			BookmarksFolder.gotoPG(folderName = "Folder Name");
+
+			BookmarksFolder.moveSubfolderToRecycleBinPG(subfolderName = "Subfolder Name");
+		}
+
+		task ("View and restore subfolder") {
+			RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
+
+			RecycleBin.viewCP(
+				assetName = "Subfolder Name",
+				assetType = "Bookmarks Folder",
+				deleteUser = "Test Test");
+
+			RecycleBin.restoreCP(
+				assetName = "Subfolder Name",
+				assetRestoreLocation = "Folder Name",
+				assetType = "Bookmarks Folder");
+		}
+
+		task ("Go to view the bookmark in subfolder") {
+			BookmarksFolder.gotoSubfolderPG(
+				folderName = "Folder Name",
+				pageName = "Test Page",
+				siteName = "Site Name",
+				subfolderName = "Subfolder Name");
+
+			Bookmark.viewBookmark(
+				bookmarkName = "Bookmark Name",
+				bookmarkURL = "https://www.liferay.com");
+		}
+
+		task ("Move the bookmark in subfolder to recycle bin") {
+			BookmarksFolder.gotoSubfolderPG(
+				folderName = "Folder Name",
+				pageName = "Test Page",
+				siteName = "Site Name",
+				subfolderName = "Subfolder Name");
+
+			Bookmark.moveToRecycleBinPG(bookmarkName = "Bookmark Name");
+		}
+
+		task ("Restore the bookmark in recycle bin") {
+			RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
+
+			RecycleBin.viewCP(
+				assetName = "Bookmark Name",
+				assetType = "Bookmarks Entry",
+				deleteUser = "Test Test");
+
+			RecycleBin.restoreCP(
+				assetName = "Bookmark Name",
+				assetRestoreLocation = "Subfolder Name",
+				assetType = "Bookmarks Entry");
+		}
+
+		task ("Go to subfolder and view the bookmark is restored") {
+			BookmarksFolder.gotoSubfolderPG(
+				folderName = "Folder Name",
+				pageName = "Test Page",
+				siteName = "Site Name",
+				subfolderName = "Subfolder Name");
+
+			Bookmark.viewBookmark(
+				bookmarkName = "Bookmark Name",
+				bookmarkURL = "https://www.liferay.com");
+		}
+	}
+
 	@description = "Restore MB attachment from recycle bin."
-	@priority = 3
+	@priority = "3"
 	test RecycleBinMBAttachment {
 		task ("Add a message and attachement to mb") {
 			JSONMBMessage.addMessage(
@@ -184,17 +290,14 @@ definition {
 			MessageboardsThread.editCP(
 				mbAttachmentFile = "Document_1.doc",
 				threadAttachmentRemove = "true",
-				threadBodyEdit = "MB Body Edit",
-				threadSubject = "MB Subject");
-
-			PortletEntry.publish();
+				threadBodyEdit = "MB Body Edit");
 		}
 
 		task ("View attachement is removed") {
 			MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "site-name");
 
 			MessageboardsThread.viewCP(
-				replyCount = 0,
+				replyCount = "0",
 				threadBody = "MB Body Edit",
 				threadSubject = "MB Subject",
 				userName = "Test Test");
@@ -211,7 +314,7 @@ definition {
 
 			MessageboardsThread.viewCP(
 				mbAttachmentFile = "Document_1.doc",
-				replyCount = 0,
+				replyCount = "0",
 				threadBody = "MB Body Edit",
 				threadSubject = "MB Subject",
 				userName = "Test Test");
@@ -219,7 +322,7 @@ definition {
 	}
 
 	@description = "Assert scheduled clean up in recycle bin works."
-	@priority = 3
+	@priority = "3"
 	test RecycleBinScheduledCleanup {
 		property custom.properties = "trash.entry.check.interval=1${line.separator}trash.entries.max.age=1";
 
@@ -255,12 +358,8 @@ definition {
 				customMaxAge = "1 minute",
 				deleteUser = "Test Test");
 
-			// We need this pause to check issue due trash.entry.check.interval=1
-			// To be investigated in LPS-157883
-
-			Pause(locator1 = 120000);
+			Pause(locator1 = "120000");
 		}
-
 		task ("Refresh and assert no blog entry") {
 			Refresh();
 
@@ -269,7 +368,7 @@ definition {
 	}
 
 	@description = "Assert 3 blog entries moved to recycle bin are searchable."
-	@priority = 3
+	@priority = "3"
 	test RecycleBinSearchBlogsEntries {
 		task ("Add blogs to page and 3 blog entries") {
 			JSONLayout.addWidgetToPublicLayout(
@@ -302,7 +401,7 @@ definition {
 			RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
 			for (var n : list "1,2,3") {
-				Search.searchCP(searchTerm = ${n});
+				Search.searchCP(searchTerm = "${n}");
 
 				RecycleBin.viewCP(
 					assetName = "Blogs Entry Title ${n}",
@@ -313,7 +412,7 @@ definition {
 	}
 
 	@description = "Assert 2 documents moved to recycle bin are searchable."
-	@priority = 3
+	@priority = "3"
 	test RecycleBinSearchDMEntriesInFolder {
 		property custom.properties = "default.layout.template.id=1_column";
 
@@ -367,7 +466,6 @@ definition {
 				dmDocumentFile = "Document_2.doc",
 				dmDocumentTitle = "DM Document Title 2");
 		}
-
 		task ("Go to page and delete the DM folder") {
 			Navigator.gotoSitePage(
 				pageName = "Test Page",
@@ -379,7 +477,7 @@ definition {
 		task ("Assert 2 documents are moved to recycle bin") {
 			RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-			Search.searchCP(searchTerm = 1);
+			Search.searchCP(searchTerm = "1");
 
 			RecycleBin.viewCP(
 				assetName = "DM Document Title 1",
@@ -388,7 +486,7 @@ definition {
 
 			RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-			Search.searchCP(searchTerm = 2);
+			Search.searchCP(searchTerm = "2");
 
 			RecycleBin.viewCP(
 				assetName = "DM Document Title 2",
@@ -398,7 +496,7 @@ definition {
 	}
 
 	@description = "Restore Wiki node and Wiki page in recycle bin."
-	@priority = 3
+	@priority = "3"
 	test RecycleBinWiki {
 		task ("Add 2 wiki node and a wiki page") {
 			JSONWiki.addWikiNode(
@@ -468,7 +566,7 @@ definition {
 			WikiNavigator.openWikiAdmin(siteURLKey = "site-name");
 
 			WikiNode.viewCP(
-				numberOfWikiPages = 2,
+				numberOfWikiPages = "2",
 				wikiNodeName = "Wiki Node Name");
 
 			LexiconEntry.changeDisplayStyle(displayStyle = "list");
@@ -482,7 +580,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109555. Automatically rename documents when bulk restore them from recycle bin if document names already exist in the destination."
-	@priority = 5
+	@priority = "5"
 	test RenameBulkRestoreDocumentsAutomaticallyWhenDocumentNamesAlreadyExistInTheDestination {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -526,7 +624,7 @@ definition {
 
 			for (var entryName : list "Document_1.png,Document_1.txt") {
 				RecycleBin.viewCP(
-					assetName = ${entryName},
+					assetName = "${entryName}",
 					assetType = "Document",
 					deleteUser = "Test Test");
 			}
@@ -538,13 +636,13 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 			for (var assetName : list "Document_1.png,Document_1.txt,Document_1 (1).png,Document_1 (1).txt") {
-				DMDocument.viewCardTitle(dmDocumentTitle = ${assetName});
+				DMDocument.viewCardTitle(dmDocumentTitle = "${assetName}");
 			}
 		}
 	}
 
 	@description = "Restore DM document in DM folder in recycle bin."
-	@priority = 5
+	@priority = "5"
 	test RestoreDMDocumentFromFolderCP {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -590,7 +688,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-44099. The blogs entry moved to the recycle bin shouldn't be searchable by its comments."
-	@priority = 4
+	@priority = "4"
 	test SearchBlogsEntryByComments {
 		task ("Add a Blogs widget to page") {
 			JSONLayout.addWidgetToPublicLayout(
@@ -609,21 +707,29 @@ definition {
 		}
 
 		task ("Add comments for both blogs entries via Blogs widget") {
-			for (var i : list "1,2") {
-				Navigator.gotoSitePage(
-					pageName = "Test Page",
-					siteName = "Site Name");
+			Navigator.gotoSitePage(
+				pageName = "Test Page",
+				siteName = "Site Name");
 
-				BlogsNavigator.gotoEntryPG(
-					entryContent = "Blogs Entry Content ${i}",
-					entryTitle = "Blogs Entry Title ${i}");
+			BlogsNavigator.gotoEntryPG(
+				entryContent = "Blogs Entry Content 1",
+				entryTitle = "Blogs Entry Title 1");
 
-				WaitForElementPresent(
-					key_label = "Type your comment here.",
-					locator1 = "TextArea#ANY_LABELED");
+			Pause(locator1 = "3000");
 
-				Comments.addPG(entryComment = "Blogs Entry Comment");
-			}
+			Comments.addPG(entryComment = "Blogs Entry Comment");
+
+			Navigator.gotoSitePage(
+				pageName = "Test Page",
+				siteName = "Site Name");
+
+			BlogsNavigator.gotoEntryPG(
+				entryContent = "Blogs Entry Content 2",
+				entryTitle = "Blogs Entry Title 2");
+
+			Pause(locator1 = "3000");
+
+			Comments.addPG(entryComment = "Blogs Entry Comment");
 		}
 
 		task ("Search by comments in Blogs admin") {
@@ -635,10 +741,10 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "Search#SEARCH_INFO",
-				value1 = "2 Results for \"Comment\"");
+				value1 = "2 Results for Comment");
 
 			for (var title : list "Blogs Entry Title 1,Blogs Entry Title 2") {
-				Blogs.viewEntryTitle(entryTitle = ${title});
+				Blogs.viewEntryTitle(entryTitle = "${title}");
 			}
 		}
 
@@ -653,7 +759,7 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "Search#SEARCH_INFO",
-				value1 = "1 Result for \"Comment\"");
+				value1 = "1 Results for Comment");
 
 			Blogs.viewEntryTitle(entryTitle = "Blogs Entry Title 2");
 
@@ -662,7 +768,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-109555 and LPS-33785. The error message should be shown when restore a document from recycle bin when it has the same name as existing document. Keep both document entries and rename the document entry from the Recycle Bin."
-	@priority = 4
+	@priority = "4"
 	test ViewErrorMessageWhenRestoreDocumentHasTheSameNameWithExistingOne {
 		task ("Add a document entry named DM Document Title") {
 			JSONDocument.addFileWithUploadedFile(
@@ -703,13 +809,13 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 			for (var assetName : list "DM Document Title,Previous Document Title") {
-				DMDocument.viewCardTitle(dmDocumentTitle = ${assetName});
+				DMDocument.viewCardTitle(dmDocumentTitle = "${assetName}");
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-44554. View restored document in subfolder after restore parent folder from the recycle bin."
-	@priority = 4
+	@priority = "4"
 	test ViewRestoredDocumentInSubFolderAfterRestoreParentFolder {
 		task ("Add a dm folder") {
 			JSONFolder.addFolder(
@@ -754,7 +860,7 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 			for (var folderName : list "DM Folder Name,DM Subfolder Name") {
-				DMFolder.gotoEntry(dmFolderName = ${folderName});
+				DMFolder.gotoEntry(dmFolderName = "${folderName}");
 			}
 
 			DMDocument.viewCardTitle(dmDocumentTitle = "DM Document Title");

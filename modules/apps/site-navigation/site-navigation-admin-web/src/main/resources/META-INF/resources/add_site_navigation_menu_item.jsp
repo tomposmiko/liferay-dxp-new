@@ -38,43 +38,45 @@ if (addURL == null) {
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-renderResponse.setTitle(siteNavigationMenuItemType.getAddTitle(locale));
+renderResponse.setTitle(LanguageUtil.format(request, "add-x", siteNavigationMenuItemType.getLabel(locale)));
 %>
 
 <liferay-ui:error exception="<%= SiteNavigationMenuItemNameException.class %>">
 	<liferay-ui:message arguments='<%= ModelHintsUtil.getMaxLength(SiteNavigationMenuItem.class.getName(), "name") %>' key="please-enter-a-name-with-fewer-than-x-characters" translateArguments="<%= false %>" />
 </liferay-ui:error>
 
-<aui:form action="<%= addURL %>" cssClass="add-site-navigation-menu-item container-fluid container-fluid-max-xl" name="fm" onSubmit="event.preventDefault();">
+<aui:form action="<%= addURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" name="fm" onSubmit="event.preventDefault();">
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="siteNavigationMenuId" type="hidden" value="<%= siteNavigationMenuId %>" />
 	<aui:input name="type" type="hidden" value="<%= type %>" />
 
-	<div class="sheet">
-		<div class="panel-group panel-group-flush">
-			<aui:fieldset>
+	<aui:fieldset-group markupView="lexicon">
+		<aui:fieldset>
 
-				<%
-				siteNavigationMenuItemType.renderAddPage(request, PipingServletResponseFactory.createPipingServletResponse(pageContext));
-				%>
+			<%
+			siteNavigationMenuItemType.renderAddPage(request, PipingServletResponseFactory.createPipingServletResponse(pageContext));
+			%>
 
-			</aui:fieldset>
-		</div>
-	</div>
+		</aui:fieldset>
+	</aui:fieldset-group>
 
-	<aui:button-row cssClass="modal-footer position-fixed">
-		<aui:button name="addButton" type="submit" value='<%= type.equals("layout") ? "select" : "add" %>' />
+	<aui:button-row>
+		<aui:button name="addButton" type="submit" value="add" />
 
 		<aui:button href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
 </aui:form>
 
+<%
+Portlet selPortlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), portletDisplay.getId());
+%>
+
 <liferay-frontend:component
 	context='<%=
 		HashMapBuilder.<String, Object>put(
-			"order", ParamUtil.getLong(request, "order", -1)
+			"selPortletId", HtmlUtil.escapeJS(selPortlet.getPortletId())
 		).put(
-			"parentSiteNavigationMenuItemId", ParamUtil.getLong(request, "parentSiteNavigationMenuItemId")
+			"selPortletIsAjaxable", selPortlet.isAjaxable()
 		).build()
 	%>'
 	module="js/AddSiteNavigationMenuItem"

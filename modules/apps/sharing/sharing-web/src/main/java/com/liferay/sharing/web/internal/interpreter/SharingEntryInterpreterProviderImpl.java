@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = SharingEntryInterpreterProvider.class)
+@Component(immediate = true, service = SharingEntryInterpreterProvider.class)
 public class SharingEntryInterpreterProviderImpl
 	implements SharingEntryInterpreterProvider {
 
@@ -44,7 +44,7 @@ public class SharingEntryInterpreterProviderImpl
 			_serviceTrackerMap.getService(sharingEntry.getClassNameId());
 
 		if ((sharingEntryInterpreter == null) &&
-			_isAssetObject(sharingEntry.getClassName())) {
+			_isAssetObject(sharingEntry.getClassNameId())) {
 
 			return _assetRendererSharingEntryInterpreter;
 		}
@@ -67,10 +67,10 @@ public class SharingEntryInterpreterProviderImpl
 		_serviceTrackerMap.close();
 	}
 
-	private boolean _isAssetObject(String className) {
+	private boolean _isAssetObject(long classNameId) {
 		AssetRendererFactory<?> assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				className);
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(classNameId);
 
 		if (assetRendererFactory != null) {
 			return true;

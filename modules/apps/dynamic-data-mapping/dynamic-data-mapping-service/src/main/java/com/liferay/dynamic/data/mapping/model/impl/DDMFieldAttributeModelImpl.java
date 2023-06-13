@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -234,111 +235,120 @@ public class DDMFieldAttributeModelImpl
 	public Map<String, Function<DDMFieldAttribute, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<DDMFieldAttribute, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, DDMFieldAttribute>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<DDMFieldAttribute, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMFieldAttribute.class.getClassLoader(), DDMFieldAttribute.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<DDMFieldAttribute, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<DDMFieldAttribute, Object>>();
+		try {
+			Constructor<DDMFieldAttribute> constructor =
+				(Constructor<DDMFieldAttribute>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", DDMFieldAttribute::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", DDMFieldAttribute::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"fieldAttributeId", DDMFieldAttribute::getFieldAttributeId);
-			attributeGetterFunctions.put(
-				"companyId", DDMFieldAttribute::getCompanyId);
-			attributeGetterFunctions.put(
-				"fieldId", DDMFieldAttribute::getFieldId);
-			attributeGetterFunctions.put(
-				"storageId", DDMFieldAttribute::getStorageId);
-			attributeGetterFunctions.put(
-				"attributeName", DDMFieldAttribute::getAttributeName);
-			attributeGetterFunctions.put(
-				"languageId", DDMFieldAttribute::getLanguageId);
-			attributeGetterFunctions.put(
-				"largeAttributeValue",
-				DDMFieldAttribute::getLargeAttributeValue);
-			attributeGetterFunctions.put(
-				"smallAttributeValue",
-				DDMFieldAttribute::getSmallAttributeValue);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<DDMFieldAttribute, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DDMFieldAttribute, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<DDMFieldAttribute, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<DDMFieldAttribute, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<DDMFieldAttribute, Object>>();
+		Map<String, BiConsumer<DDMFieldAttribute, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<DDMFieldAttribute, ?>>();
 
-		static {
-			Map<String, BiConsumer<DDMFieldAttribute, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<DDMFieldAttribute, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMFieldAttribute::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<DDMFieldAttribute, Long>)
+				DDMFieldAttribute::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMFieldAttribute::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<DDMFieldAttribute, Long>)
+				DDMFieldAttribute::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"fieldAttributeId", DDMFieldAttribute::getFieldAttributeId);
+		attributeSetterBiConsumers.put(
+			"fieldAttributeId",
+			(BiConsumer<DDMFieldAttribute, Long>)
+				DDMFieldAttribute::setFieldAttributeId);
+		attributeGetterFunctions.put(
+			"companyId", DDMFieldAttribute::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DDMFieldAttribute, Long>)
+				DDMFieldAttribute::setCompanyId);
+		attributeGetterFunctions.put("fieldId", DDMFieldAttribute::getFieldId);
+		attributeSetterBiConsumers.put(
+			"fieldId",
+			(BiConsumer<DDMFieldAttribute, Long>)DDMFieldAttribute::setFieldId);
+		attributeGetterFunctions.put(
+			"storageId", DDMFieldAttribute::getStorageId);
+		attributeSetterBiConsumers.put(
+			"storageId",
+			(BiConsumer<DDMFieldAttribute, Long>)
+				DDMFieldAttribute::setStorageId);
+		attributeGetterFunctions.put(
+			"attributeName", DDMFieldAttribute::getAttributeName);
+		attributeSetterBiConsumers.put(
+			"attributeName",
+			(BiConsumer<DDMFieldAttribute, String>)
+				DDMFieldAttribute::setAttributeName);
+		attributeGetterFunctions.put(
+			"languageId", DDMFieldAttribute::getLanguageId);
+		attributeSetterBiConsumers.put(
+			"languageId",
+			(BiConsumer<DDMFieldAttribute, String>)
+				DDMFieldAttribute::setLanguageId);
+		attributeGetterFunctions.put(
+			"largeAttributeValue", DDMFieldAttribute::getLargeAttributeValue);
+		attributeSetterBiConsumers.put(
+			"largeAttributeValue",
+			(BiConsumer<DDMFieldAttribute, String>)
+				DDMFieldAttribute::setLargeAttributeValue);
+		attributeGetterFunctions.put(
+			"smallAttributeValue", DDMFieldAttribute::getSmallAttributeValue);
+		attributeSetterBiConsumers.put(
+			"smallAttributeValue",
+			(BiConsumer<DDMFieldAttribute, String>)
+				DDMFieldAttribute::setSmallAttributeValue);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<DDMFieldAttribute, Long>)
-					DDMFieldAttribute::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<DDMFieldAttribute, Long>)
-					DDMFieldAttribute::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"fieldAttributeId",
-				(BiConsumer<DDMFieldAttribute, Long>)
-					DDMFieldAttribute::setFieldAttributeId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<DDMFieldAttribute, Long>)
-					DDMFieldAttribute::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"fieldId",
-				(BiConsumer<DDMFieldAttribute, Long>)
-					DDMFieldAttribute::setFieldId);
-			attributeSetterBiConsumers.put(
-				"storageId",
-				(BiConsumer<DDMFieldAttribute, Long>)
-					DDMFieldAttribute::setStorageId);
-			attributeSetterBiConsumers.put(
-				"attributeName",
-				(BiConsumer<DDMFieldAttribute, String>)
-					DDMFieldAttribute::setAttributeName);
-			attributeSetterBiConsumers.put(
-				"languageId",
-				(BiConsumer<DDMFieldAttribute, String>)
-					DDMFieldAttribute::setLanguageId);
-			attributeSetterBiConsumers.put(
-				"largeAttributeValue",
-				(BiConsumer<DDMFieldAttribute, String>)
-					DDMFieldAttribute::setLargeAttributeValue);
-			attributeSetterBiConsumers.put(
-				"smallAttributeValue",
-				(BiConsumer<DDMFieldAttribute, String>)
-					DDMFieldAttribute::setSmallAttributeValue);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -826,12 +836,41 @@ public class DDMFieldAttributeModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<DDMFieldAttribute, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<DDMFieldAttribute, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<DDMFieldAttribute, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((DDMFieldAttribute)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDMFieldAttribute>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDMFieldAttribute.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -848,8 +887,7 @@ public class DDMFieldAttributeModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<DDMFieldAttribute, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

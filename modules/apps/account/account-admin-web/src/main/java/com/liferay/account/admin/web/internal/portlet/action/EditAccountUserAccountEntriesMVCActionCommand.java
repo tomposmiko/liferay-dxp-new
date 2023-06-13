@@ -16,12 +16,9 @@ package com.liferay.account.admin.web.internal.portlet.action;
 
 import com.liferay.account.constants.AccountPortletKeys;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -33,11 +30,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Albert Lee
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_MANAGEMENT,
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_USERS_ADMIN,
-		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
-		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/account_admin/edit_account_user_account_entries"
 	},
 	service = MVCActionCommand.class
@@ -54,18 +50,13 @@ public class EditAccountUserAccountEntriesMVCActionCommand
 			actionRequest, "addAccountEntryIds");
 		long[] deleteAccountEntryIds = ParamUtil.getLongValues(
 			actionRequest, "deleteAccountEntryIds");
-
-		User selectedUser = _portal.getSelectedUser(actionRequest);
+		long accountUserId = ParamUtil.getLong(actionRequest, "accountUserId");
 
 		_accountEntryUserRelLocalService.updateAccountEntryUserRels(
-			addAccountEntryIds, deleteAccountEntryIds,
-			selectedUser.getUserId());
+			addAccountEntryIds, deleteAccountEntryIds, accountUserId);
 	}
 
 	@Reference
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
-
-	@Reference
-	private Portal _portal;
 
 }

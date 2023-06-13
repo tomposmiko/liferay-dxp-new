@@ -59,39 +59,37 @@ renderResponse.setTitle(LanguageUtil.format(request, "reply-membership-request-f
 
 	<aui:model-context bean="<%= membershipRequest %>" model="<%= MembershipRequest.class %>" />
 
-	<div class="sheet">
-		<div class="panel-group panel-group-flush">
-			<aui:fieldset>
+	<aui:fieldset-group markupView="lexicon">
+		<aui:fieldset>
 
-				<%
-				Group group = GroupLocalServiceUtil.getGroup(themeDisplay.getSiteGroupIdOrLiveGroupId());
-				%>
+			<%
+			Group group = GroupLocalServiceUtil.getGroup(themeDisplay.getSiteGroupIdOrLiveGroupId());
+			%>
 
-				<c:if test="<%= Validator.isNotNull(group.getDescription()) %>">
-					<h4 class="text-default"><liferay-ui:message key="description" /></h4>
+			<c:if test="<%= Validator.isNotNull(group.getDescription()) %>">
+				<h4 class="text-default"><liferay-ui:message key="description" /></h4>
 
-					<p class="text-default">
-						<%= HtmlUtil.escape(group.getDescription(locale)) %>
-					</p>
-				</c:if>
+				<p class="text-default">
+					<%= HtmlUtil.escape(group.getDescription(locale)) %>
+				</p>
+			</c:if>
 
-				<liferay-ui:user-portrait
-					userId="<%= membershipRequest.getUserId() %>"
-				/>
+			<liferay-ui:user-portrait
+				userId="<%= membershipRequest.getUserId() %>"
+			/>
 
-				<aui:input name="userName" type="resource" value="<%= userName %>" />
+			<aui:input name="userName" type="resource" value="<%= userName %>" />
 
-				<aui:input name="userComments" readonly="<%= true %>" type="textarea" value="<%= membershipRequest.getComments() %>" />
+			<aui:input name="userComments" readonly="<%= true %>" type="textarea" value="<%= membershipRequest.getComments() %>" />
 
-				<aui:select label="status" name="statusId">
-					<aui:option label="approve" value="<%= MembershipRequestConstants.STATUS_APPROVED %>" />
-					<aui:option label="deny" value="<%= MembershipRequestConstants.STATUS_DENIED %>" />
-				</aui:select>
+			<aui:select autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" label="status" name="statusId">
+				<aui:option label="approve" value="<%= MembershipRequestConstants.STATUS_APPROVED %>" />
+				<aui:option label="deny" value="<%= MembershipRequestConstants.STATUS_DENIED %>" />
+			</aui:select>
 
-				<aui:input name="replyComments" />
-			</aui:fieldset>
-		</div>
-	</div>
+			<aui:input name="replyComments" />
+		</aui:fieldset>
+	</aui:fieldset-group>
 
 	<aui:button-row>
 		<aui:button type="submit" />

@@ -14,12 +14,14 @@
 
 package com.liferay.portal.search.similar.results.web.internal.portlet.shared.search;
 
+import java.util.Optional;
+
 /**
  * @author André de Oliveira
  */
 public interface Criteria {
 
-	public String getType();
+	public Optional<String> getTypeOptional();
 
 	public String getUID();
 

@@ -30,10 +30,6 @@ public class TemplateEntryLocalServiceWrapper
 	implements ServiceWrapper<TemplateEntryLocalService>,
 			   TemplateEntryLocalService {
 
-	public TemplateEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public TemplateEntryLocalServiceWrapper(
 		TemplateEntryLocalService templateEntryLocalService) {
 
@@ -350,18 +346,6 @@ public class TemplateEntryLocalServiceWrapper
 	@Override
 	public java.util.List<TemplateEntry> getTemplateEntries(long[] groupIds) {
 		return _templateEntryLocalService.getTemplateEntries(groupIds);
-	}
-
-	@Override
-	public java.util.List<TemplateEntry> getTemplateEntries(
-		long[] groupIds, String infoItemClassName,
-		String infoItemFormVariationKey, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<TemplateEntry>
-			orderByComparator) {
-
-		return _templateEntryLocalService.getTemplateEntries(
-			groupIds, infoItemClassName, infoItemFormVariationKey, start, end,
-			orderByComparator);
 	}
 
 	/**

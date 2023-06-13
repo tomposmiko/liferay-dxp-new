@@ -127,8 +127,6 @@ public class KBArticlePersistenceTest {
 
 		newKBArticle.setMvccVersion(RandomTestUtil.nextLong());
 
-		newKBArticle.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newKBArticle.setUuid(RandomTestUtil.randomString());
 
 		newKBArticle.setResourcePrimKey(RandomTestUtil.nextLong());
@@ -175,10 +173,6 @@ public class KBArticlePersistenceTest {
 
 		newKBArticle.setSourceURL(RandomTestUtil.randomString());
 
-		newKBArticle.setExpirationDate(RandomTestUtil.nextDate());
-
-		newKBArticle.setReviewDate(RandomTestUtil.nextDate());
-
 		newKBArticle.setLastPublishDate(RandomTestUtil.nextDate());
 
 		newKBArticle.setStatus(RandomTestUtil.nextInt());
@@ -196,9 +190,6 @@ public class KBArticlePersistenceTest {
 
 		Assert.assertEquals(
 			existingKBArticle.getMvccVersion(), newKBArticle.getMvccVersion());
-		Assert.assertEquals(
-			existingKBArticle.getCtCollectionId(),
-			newKBArticle.getCtCollectionId());
 		Assert.assertEquals(
 			existingKBArticle.getUuid(), newKBArticle.getUuid());
 		Assert.assertEquals(
@@ -253,12 +244,6 @@ public class KBArticlePersistenceTest {
 		Assert.assertEquals(existingKBArticle.isMain(), newKBArticle.isMain());
 		Assert.assertEquals(
 			existingKBArticle.getSourceURL(), newKBArticle.getSourceURL());
-		Assert.assertEquals(
-			Time.getShortTimestamp(existingKBArticle.getExpirationDate()),
-			Time.getShortTimestamp(newKBArticle.getExpirationDate()));
-		Assert.assertEquals(
-			Time.getShortTimestamp(existingKBArticle.getReviewDate()),
-			Time.getShortTimestamp(newKBArticle.getReviewDate()));
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingKBArticle.getLastPublishDate()),
 			Time.getShortTimestamp(newKBArticle.getLastPublishDate()));
@@ -743,17 +728,16 @@ public class KBArticlePersistenceTest {
 
 	protected OrderByComparator<KBArticle> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"KBArticle", "mvccVersion", true, "ctCollectionId", true, "uuid",
-			true, "kbArticleId", true, "resourcePrimKey", true, "groupId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "externalReferenceCode", true,
+			"KBArticle", "mvccVersion", true, "uuid", true, "kbArticleId", true,
+			"resourcePrimKey", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "externalReferenceCode", true,
 			"rootResourcePrimKey", true, "parentResourceClassNameId", true,
 			"parentResourcePrimKey", true, "kbFolderId", true, "version", true,
 			"title", true, "urlTitle", true, "description", true, "priority",
 			true, "sections", true, "latest", true, "main", true, "sourceURL",
-			true, "expirationDate", true, "reviewDate", true, "lastPublishDate",
-			true, "status", true, "statusByUserId", true, "statusByUserName",
-			true, "statusDate", true);
+			true, "lastPublishDate", true, "status", true, "statusByUserId",
+			true, "statusByUserName", true, "statusDate", true);
 	}
 
 	@Test
@@ -1078,8 +1062,6 @@ public class KBArticlePersistenceTest {
 
 		kbArticle.setMvccVersion(RandomTestUtil.nextLong());
 
-		kbArticle.setCtCollectionId(RandomTestUtil.nextLong());
-
 		kbArticle.setUuid(RandomTestUtil.randomString());
 
 		kbArticle.setResourcePrimKey(RandomTestUtil.nextLong());
@@ -1125,10 +1107,6 @@ public class KBArticlePersistenceTest {
 		kbArticle.setMain(RandomTestUtil.randomBoolean());
 
 		kbArticle.setSourceURL(RandomTestUtil.randomString());
-
-		kbArticle.setExpirationDate(RandomTestUtil.nextDate());
-
-		kbArticle.setReviewDate(RandomTestUtil.nextDate());
 
 		kbArticle.setLastPublishDate(RandomTestUtil.nextDate());
 

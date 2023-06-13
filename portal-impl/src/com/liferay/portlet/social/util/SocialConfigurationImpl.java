@@ -207,10 +207,15 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 			(SocialAchievement)ProxyFactory.newInstance(
 				classLoader, SocialAchievement.class, achievementClassName);
 
-		achievement.setName(
-			GetterUtil.getString(achievementElement.elementText("name")));
-		achievement.setIcon(
-			GetterUtil.getString(achievementElement.elementText("icon")));
+		String name = GetterUtil.getString(
+			achievementElement.elementText("name"));
+
+		achievement.setName(name);
+
+		String icon = GetterUtil.getString(
+			achievementElement.elementText("icon"));
+
+		achievement.setIcon(icon);
 
 		List<Element> propertyElements = achievementElement.elements(
 			"property");
@@ -246,8 +251,10 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 			SocialActivityDefinition activityDefinition)
 		throws Exception {
 
-		activityDefinition.setLogActivity(
-			GetterUtil.getBoolean(activityElement.elementText("log-activity")));
+		boolean logActivity = GetterUtil.getBoolean(
+			activityElement.elementText("log-activity"));
+
+		activityDefinition.setLogActivity(logActivity);
 
 		boolean countersEnabled = GetterUtil.getBoolean(
 			activityElement.elementText("counters-enabled"), true);
@@ -258,8 +265,10 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 			return;
 		}
 
-		activityDefinition.setLanguageKey(
-			GetterUtil.getString(activityElement.elementText("language-key")));
+		String languageKey = GetterUtil.getString(
+			activityElement.elementText("language-key"));
+
+		activityDefinition.setLanguageKey(languageKey);
 
 		String processorClassName = GetterUtil.getString(
 			activityElement.elementText("processor-class"));
@@ -375,8 +384,10 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 				activityCounterDefinition.setLimitPeriod(limitPeriod);
 			}
 
-			activityCounterDefinition.setLimitValue(
-				GetterUtil.getInteger(contributionLimitElement.getText()));
+			int limitValue = GetterUtil.getInteger(
+				contributionLimitElement.getText());
+
+			activityCounterDefinition.setLimitValue(limitValue);
 		}
 
 		activityDefinition.addCounter(activityCounterDefinition);
@@ -447,8 +458,10 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 				activityCounterDefinition.setLimitPeriod(limitPeriod);
 			}
 
-			activityCounterDefinition.setLimitValue(
-				GetterUtil.getInteger(participationLimitElement.getText()));
+			int limitValue = GetterUtil.getInteger(
+				participationLimitElement.getText());
+
+			activityCounterDefinition.setLimitValue(limitValue);
 		}
 
 		activityDefinition.addCounter(activityCounterDefinition);
@@ -461,10 +474,16 @@ public class SocialConfigurationImpl implements SocialConfiguration {
 		SocialActivityCounterDefinition activityCounterDefinition =
 			new SocialActivityCounterDefinition();
 
-		activityCounterDefinition.setIncrement(
-			GetterUtil.getInteger(counterElement.elementText("increment"), 1));
-		activityCounterDefinition.setEnabled(
-			GetterUtil.getBoolean(counterElement.elementText("enabled"), true));
+		int increment = GetterUtil.getInteger(
+			counterElement.elementText("increment"), 1);
+
+		activityCounterDefinition.setIncrement(increment);
+
+		boolean enabled = GetterUtil.getBoolean(
+			counterElement.elementText("enabled"), true);
+
+		activityCounterDefinition.setEnabled(enabled);
+
 		activityCounterDefinition.setName(
 			GetterUtil.getString(counterElement.elementText("name")));
 

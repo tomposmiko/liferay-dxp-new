@@ -56,27 +56,15 @@ PortalSettingsConfigurationScreenContributor portalSettingsConfigurationScreenCo
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 						</portlet:actionURL>
 
-						<aui:script>
-							function <portlet:namespace />handleResetValues(event) {
-								event.preventDefault();
-
-								Liferay.Util.openConfirmModal({
-									message:
-										'<%= request.getAttribute(PortalSettingsWebKeys.DELETE_CONFIRMATION_TEXT) %>',
-									onConfirm: (isConfirmed) => {
-										if (isConfirmed) {
-											submitForm(document.hrefFm, '<%= resetValuesURL.toString() %>');
-										}
-									},
-								});
-							}
-						</aui:script>
+						<%
+						String taglibOnClick = "if (confirm('" + request.getAttribute(PortalSettingsWebKeys.DELETE_CONFIRMATION_TEXT) + "')) {submitForm(document.hrefFm, '" + resetValuesURL.toString() + "');}";
+						%>
 
 						<liferay-ui:icon
 							message="reset-values"
 							method="post"
-							onClick='<%= liferayPortletResponse.getNamespace() + "handleResetValues(event)" %>'
-							url="javascript:void(0);"
+							onClick="<%= taglibOnClick %>"
+							url="javascript:;"
 						/>
 					</c:if>
 
@@ -85,7 +73,7 @@ PortalSettingsConfigurationScreenContributor portalSettingsConfigurationScreenCo
 							message='<%= GetterUtil.getString(portalSettingsConfigurationScreenContributor.getTestButtonLabel(locale), LanguageUtil.get(request, "test")) %>'
 							method="post"
 							onClick="<%= portalSettingsConfigurationScreenContributor.getTestButtonOnClick(renderRequest, renderResponse) %>"
-							url="javascript:void(0);"
+							url="javascript:;"
 						/>
 					</c:if>
 				</liferay-ui:icon-menu>

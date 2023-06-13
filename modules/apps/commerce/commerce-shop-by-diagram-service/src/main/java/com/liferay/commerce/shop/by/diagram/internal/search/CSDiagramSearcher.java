@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "model.class.name=com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry",
 	service = BaseSearcher.class
 )

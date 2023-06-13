@@ -15,27 +15,27 @@
 AUI.add(
 	'liferay-admin',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const IN_PROGRESS_SELECTOR = '.background-task-status-in-progress';
+		var IN_PROGRESS_SELECTOR = '.background-task-status-in-progress';
 
-		const INTERVAL_RENDER_IDLE = 60000;
+		var INTERVAL_RENDER_IDLE = 60000;
 
-		const INTERVAL_RENDER_IN_PROGRESS = 2000;
+		var INTERVAL_RENDER_IN_PROGRESS = 2000;
 
-		const MAP_DATA_PARAMS = {
+		var MAP_DATA_PARAMS = {
 			classname: 'className',
 		};
 
-		const STR_CLICK = 'click';
+		var STR_CLICK = 'click';
 
-		const STR_FORM = 'form';
+		var STR_FORM = 'form';
 
-		const STR_INDEX_ACTIONS_PANEL = 'indexActionsPanel';
+		var STR_INDEX_ACTIONS_PANEL = 'indexActionsPanel';
 
-		const STR_URL = 'url';
+		var STR_URL = 'url';
 
-		const Admin = A.Component.create({
+		var Admin = A.Component.create({
 			ATTRS: {
 				controlMenuCategoryKey: {
 					validator: Lang.isString,
@@ -80,15 +80,14 @@ AUI.add(
 
 			prototype: {
 				_addInputsFromData(data) {
-					const instance = this;
+					var instance = this;
 
-					const form = instance.get(STR_FORM);
+					var form = instance.get(STR_FORM);
 
-					// eslint-disable-next-line @liferay/aui/no-object
-					const inputsArray = A.Object.map(data, (value, key) => {
+					var inputsArray = A.Object.map(data, (value, key) => {
 						key = MAP_DATA_PARAMS[key] || key;
 
-						const nsKey = instance.ns(key);
+						var nsKey = instance.ns(key);
 
 						return (
 							'<input id="' +
@@ -127,9 +126,9 @@ AUI.add(
 				},
 
 				_isBackgroundTaskInProgress() {
-					const instance = this;
+					var instance = this;
 
-					const indexActionsNode = A.one(
+					var indexActionsNode = A.one(
 						instance.get(STR_INDEX_ACTIONS_PANEL)
 					);
 
@@ -140,12 +139,12 @@ AUI.add(
 				},
 
 				_onSubmit(event) {
-					const instance = this;
+					var instance = this;
 
-					const data = event.currentTarget.getData();
-					const form = instance.get(STR_FORM);
+					var data = event.currentTarget.getData();
+					var form = instance.get(STR_FORM);
 
-					const redirect = instance.one('#redirect', form);
+					var redirect = instance.one('#redirect', form);
 
 					if (redirect) {
 						redirect.val(instance.get('redirectUrl'));
@@ -153,7 +152,7 @@ AUI.add(
 
 					instance._addInputsFromData(data);
 
-					const companyIds = document.getElementsByName(
+					var companyIds = document.getElementsByName(
 						instance.ns('companyIds')
 					)[0].value;
 
@@ -176,9 +175,9 @@ AUI.add(
 				},
 
 				_updateIndexActions() {
-					const instance = this;
+					var instance = this;
 
-					const currentAdminIndexPanel = A.one(
+					var currentAdminIndexPanel = A.one(
 						instance.get(STR_INDEX_ACTIONS_PANEL)
 					);
 
@@ -190,13 +189,11 @@ AUI.add(
 								return response.text();
 							})
 							.then((response) => {
-								const responseDataNode = A.Node.create(
-									response
-								);
+								var responseDataNode = A.Node.create(response);
 
 								// Replace each progress bar
 
-								const responseAdminIndexPanel = responseDataNode.one(
+								var responseAdminIndexPanel = responseDataNode.one(
 									instance.get(STR_INDEX_ACTIONS_PANEL)
 								);
 
@@ -204,13 +201,13 @@ AUI.add(
 									currentAdminIndexPanel &&
 									responseAdminIndexPanel
 								) {
-									const responseAdminIndexNodeList = responseAdminIndexPanel.all(
+									var responseAdminIndexNodeList = responseAdminIndexPanel.all(
 										instance.get(
 											'indexActionWrapperSelector'
 										)
 									);
 
-									const currentAdminIndexNodeList = currentAdminIndexPanel.all(
+									var currentAdminIndexNodeList = currentAdminIndexPanel.all(
 										instance.get(
 											'indexActionWrapperSelector'
 										)
@@ -218,11 +215,11 @@ AUI.add(
 
 									currentAdminIndexNodeList.each(
 										(currentNode, index) => {
-											const responseAdminIndexNode = responseAdminIndexNodeList.item(
+											var responseAdminIndexNode = responseAdminIndexNodeList.item(
 												index
 											);
 
-											const inProgress =
+											var inProgress =
 												currentNode.one(
 													IN_PROGRESS_SELECTOR
 												) ||
@@ -296,7 +293,7 @@ AUI.add(
 
 								// Start timeout for refreshing the data
 
-								let renderInterval = INTERVAL_RENDER_IDLE;
+								var renderInterval = INTERVAL_RENDER_IDLE;
 
 								if (instance._isBackgroundTaskInProgress()) {
 									renderInterval = INTERVAL_RENDER_IN_PROGRESS;
@@ -312,7 +309,7 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles.push(
 						instance
@@ -326,7 +323,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					A.Array.invoke(instance._eventHandles, 'detach');
 
@@ -336,7 +333,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = [];
 

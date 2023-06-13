@@ -16,7 +16,6 @@ package com.liferay.dynamic.data.mapping.model;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
@@ -127,20 +126,6 @@ public class DDMFormFieldOptions implements Serializable {
 
 	public Set<String> getOptionsValues() {
 		return _options.keySet();
-	}
-
-	public String getOptionValue(String optionReference) {
-		for (Map.Entry<String, String> optionsReference :
-				_optionsReferences.entrySet()) {
-
-			if (StringUtil.equals(
-					optionsReference.getValue(), optionReference)) {
-
-				return optionsReference.getKey();
-			}
-		}
-
-		return null;
 	}
 
 	@Override

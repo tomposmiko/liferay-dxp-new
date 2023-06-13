@@ -19,9 +19,13 @@
 <%
 String backURL = ParamUtil.getString(request, "backURL");
 
-ExportImportProcessDisplayContext exportImportProcessDisplayContext = new ExportImportProcessDisplayContext(request);
+long backgroundTaskId = ParamUtil.getLong(request, "backgroundTaskId");
 
-BackgroundTask backgroundTask = exportImportProcessDisplayContext.getBackgroundTask();
+BackgroundTask backgroundTask = null;
+
+if (backgroundTaskId > 0) {
+	backgroundTask = BackgroundTaskManagerUtil.getBackgroundTask(backgroundTaskId);
+}
 
 if (Validator.isNotNull(backURL)) {
 	portletDisplay.setShowBackIcon(true);
@@ -30,8 +34,25 @@ if (Validator.isNotNull(backURL)) {
 %>
 
 <liferay-ui:search-container
-	searchContainer="<%= exportImportProcessDisplayContext.getSearchContainer() %>"
+	emptyResultsMessage="no-processes-were-found"
 >
+	<liferay-ui:search-container-results>
+
+		<%
+		List<BackgroundTask> backgroundTasks = new ArrayList<>();
+		int backgroundTasksCount = 0;
+
+		if (backgroundTask != null) {
+			backgroundTasks.add(backgroundTask);
+			backgroundTasksCount = 1;
+		}
+
+		searchContainer.setResults(backgroundTasks);
+		searchContainer.setTotal(backgroundTasksCount);
+		%>
+
+	</liferay-ui:search-container-results>
+
 	<liferay-ui:search-container-row
 		className="com.liferay.portal.kernel.backgroundtask.BackgroundTask"
 		keyProperty="backgroundTaskId"
@@ -73,7 +94,7 @@ if (Validator.isNotNull(backURL)) {
 			</h6>
 
 			<h5>
-				<span id="<portlet:namespace />backgroundTaskName<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>">
+				<span id="<%= liferayPortletResponse.getNamespace() + "backgroundTaskName" + String.valueOf(backgroundTask.getBackgroundTaskId()) %>">
 					<%= HtmlUtil.escape(backgroundTaskName) %>
 				</span>
 
@@ -145,7 +166,7 @@ if (Validator.isNotNull(backURL)) {
 
 			<c:if test="<%= Validator.isNotNull(curBackgroundTask.getStatusMessage()) %>">
 				<h6 class="background-task-status-row">
-					<a class="details-link" href="javascript:void(0);" onclick="<portlet:namespace />viewBackgroundTaskDetails(<%= curBackgroundTask.getBackgroundTaskId() %>);">
+					<a class="details-link" href="javascript:;" onclick="<portlet:namespace />viewBackgroundTaskDetails(<%= curBackgroundTask.getBackgroundTaskId() %>);">
 						<liferay-ui:message key="see-more-details" />
 					</a>
 				</h6>
@@ -166,16 +187,16 @@ if (Validator.isNotNull(backURL)) {
 </liferay-ui:search-container>
 
 <%
-int incompleteBackgroundTasksCount = 0;
+int incompleteBackgroundTaskCount = 0;
 
 if ((backgroundTask != null) && backgroundTask.isInProgress()) {
-	incompleteBackgroundTasksCount = 1;
+	incompleteBackgroundTaskCount = 1;
 }
 %>
 
 <div class="hide incomplete-process-message">
 	<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-		<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+		<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 	</liferay-util:include>
 </div>
 

@@ -55,6 +55,8 @@ public class SerialDestinationPrototype implements DestinationPrototype {
 		serialDestination.setUserLocalService(_userLocalService);
 		serialDestination.setWorkersSize(_WORKERS_CORE_SIZE, _WORKERS_MAX_SIZE);
 
+		serialDestination.afterPropertiesSet();
+
 		return serialDestination;
 	}
 

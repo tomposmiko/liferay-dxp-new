@@ -14,9 +14,6 @@
 
 package com.liferay.portal.executor.internal;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.concurrent.NoticeableExecutorService;
 import com.liferay.petra.concurrent.NoticeableFuture;
 import com.liferay.petra.concurrent.NoticeableThreadPoolExecutor;
@@ -33,16 +30,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Shuyang Zhou
  * @author Preston Crary
  */
-@Component(service = PortalExecutorManager.class)
+@Component(immediate = true, service = PortalExecutorManager.class)
 public class DefaultPortalExecutorManager implements PortalExecutorManager {
 
 	public static final String DEFAULT_CONFIG_NAME = "default";
@@ -113,21 +112,28 @@ public class DefaultPortalExecutorManager implements PortalExecutorManager {
 		}
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, PortalExecutorConfig.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(portalExecutorConfig, emitter) -> emitter.emit(
-					portalExecutorConfig.getName())));
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addPortalExecutorConfig(
+		PortalExecutorConfig portalExecutorConfig) {
+
+		_portalExecutorConfigs.putIfAbsent(
+			portalExecutorConfig.getName(), portalExecutorConfig);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
-
 		shutdown(true);
+	}
+
+	protected void removePortalExecutorConfig(
+		PortalExecutorConfig portalExecutorConfig) {
+
+		_portalExecutorConfigs.remove(
+			portalExecutorConfig.getName(), portalExecutorConfig);
 	}
 
 	private NoticeableExecutorService _createPortalExecutor(
@@ -148,21 +154,15 @@ public class DefaultPortalExecutorManager implements PortalExecutorManager {
 	}
 
 	private PortalExecutorConfig _getPortalExecutorConfig(String name) {
-		PortalExecutorConfig portalExecutorConfig =
-			_serviceTrackerMap.getService(name);
+		PortalExecutorConfig portalExecutorConfig = _portalExecutorConfigs.get(
+			name);
 
 		if (portalExecutorConfig != null) {
 			return portalExecutorConfig;
 		}
 
-		PortalExecutorConfig defaultPortalExecutorConfig =
-			_serviceTrackerMap.getService(DEFAULT_CONFIG_NAME);
-
-		if (defaultPortalExecutorConfig != null) {
-			return defaultPortalExecutorConfig;
-		}
-
-		return _defaultPortalExecutorConfig;
+		return _portalExecutorConfigs.getOrDefault(
+			DEFAULT_CONFIG_NAME, _defaultPortalExecutorConfig);
 	}
 
 	private final PortalExecutorConfig _defaultPortalExecutorConfig =
@@ -185,6 +185,7 @@ public class DefaultPortalExecutorManager implements PortalExecutorManager {
 
 	private final ConcurrentMap<String, NoticeableExecutorService>
 		_noticeableExecutorServices = new ConcurrentHashMap<>();
-	private ServiceTrackerMap<String, PortalExecutorConfig> _serviceTrackerMap;
+	private final ConcurrentMap<String, PortalExecutorConfig>
+		_portalExecutorConfigs = new ConcurrentHashMap<>();
 
 }

@@ -27,13 +27,14 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = SearchPermissionIndexWriter.class)
+@Component(immediate = true, service = SearchPermissionIndexWriter.class)
 public class SearchPermissionIndexWriterImpl
 	implements SearchPermissionIndexWriter {
 
 	@Override
 	public void updatePermissionFields(
-		BaseModel<?> baseModel, long companyId, boolean commitImmediately) {
+		BaseModel<?> baseModel, long companyId, String searchEngineId,
+		boolean commitImmediately) {
 
 		Document document = baseModelDocumentFactory.createDocument(baseModel);
 
@@ -41,7 +42,7 @@ public class SearchPermissionIndexWriterImpl
 			companyId, document);
 
 		updateDocumentIndexWriter.updateDocumentPartially(
-			companyId, document, commitImmediately);
+			searchEngineId, companyId, document, commitImmediately);
 	}
 
 	@Reference

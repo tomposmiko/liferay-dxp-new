@@ -12,28 +12,19 @@
  * details.
  */
 
-import ServiceProvider from '../../ServiceProvider/index';
+import AJAX from '../AJAX/index';
 import {CP_INSTANCE_CHANGED} from '../eventsDefinitions';
 import {getDefaultFieldsShape, updateFields} from './formsHelper';
 
 class DDMFormHandler {
-	constructor({
-		DDMFormInstance,
-		accountId,
-		channelId,
-		namespace,
-		productId,
-		quantity,
-	}) {
+	constructor({DDMFormInstance, actionURL, namespace, portletId}) {
+		this.actionURL = actionURL;
 		this.DDMFormInstance = DDMFormInstance;
-		this.accountId = accountId;
-		this.channelId = channelId;
+		this.namespace = namespace;
+		this.portletId = portletId;
 		this.fields = getDefaultFieldsShape(
 			DDMFormInstance.reactComponentRef.current.toJSON()
 		);
-		this.namespace = namespace;
-		this.productId = productId;
-		this.quantity = quantity;
 
 		this._attachFormListener();
 		this.checkCPInstance();
@@ -51,59 +42,31 @@ class DDMFormHandler {
 	}
 
 	checkCPInstance() {
-		const SkuResource = ServiceProvider.DeliveryCatalogAPI('v1');
+		const ddmFormValues = JSON.stringify(this.fields);
+		const fieldsParam = new FormData();
 
-		SkuResource.postChannelProductSku(
-			this.channelId,
-			this.productId,
-			this.accountId,
-			this.quantity,
-			this.fields
-		).then((cpInstance) => {
-			cpInstance.disabled = this.checkCPInstanceOptions();
-			cpInstance.skuOptions = JSON.stringify(this.fields);
-			cpInstance.skuId = parseInt(cpInstance.id, 10);
+		fieldsParam.append(`_${this.portletId}_ddmFormValues`, ddmFormValues);
 
-			const dispatchedPayload = {
-				cpInstance,
-				formFields: this.fields,
-				namespace: this.namespace,
-			};
+		AJAX.POST(this.actionURL, null, {
+			body: fieldsParam,
+			headers: new Headers({'x-csrf-token': Liferay.authToken}),
+		}).then((cpInstance) => {
+			if (cpInstance.cpInstanceExist) {
+				cpInstance.options = ddmFormValues;
+				cpInstance.skuId = parseInt(cpInstance.cpInstanceId, 10);
 
-			Liferay.fire(
-				`${this.namespace}${CP_INSTANCE_CHANGED}`,
-				dispatchedPayload
-			);
+				const dispatchedPayload = {
+					cpInstance,
+					formFields: this.fields,
+					namespace: this.namespace,
+				};
+
+				Liferay.fire(
+					`${this.namespace}${CP_INSTANCE_CHANGED}`,
+					dispatchedPayload
+				);
+			}
 		});
-	}
-
-	checkCPInstanceOptions() {
-		let disabled = false;
-
-		for (const ddmFormValue of this.fields) {
-			if (ddmFormValue.required) {
-				if (!ddmFormValue.value.length) {
-					disabled = true;
-				}
-				else {
-					for (const value of ddmFormValue.value) {
-						if (value === null || value === '') {
-							disabled = true;
-							break;
-						}
-						else {
-							disabled = false;
-						}
-					}
-				}
-			}
-
-			if (disabled) {
-				break;
-			}
-		}
-
-		return disabled;
 	}
 }
 

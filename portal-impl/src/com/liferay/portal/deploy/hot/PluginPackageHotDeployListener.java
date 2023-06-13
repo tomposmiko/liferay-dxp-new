@@ -14,6 +14,7 @@
 
 package com.liferay.portal.deploy.hot;
 
+import com.liferay.petra.log4j.Log4JUtil;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.deploy.hot.BaseHotDeployListener;
@@ -23,15 +24,17 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.service.ServiceComponentLocalServiceUtil;
+import com.liferay.portal.kernel.service.configuration.ServiceComponentConfiguration;
 import com.liferay.portal.kernel.service.configuration.servlet.ServletServiceContextComponentConfiguration;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.log4j.Log4JUtil;
 import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.util.portlet.PortletProps;
 
 import java.lang.reflect.Method;
+
+import java.net.URL;
 
 import java.util.Properties;
 
@@ -69,6 +72,15 @@ public class PluginPackageHotDeployListener extends BaseHotDeployListener {
 			throwHotDeployException(
 				hotDeployEvent, "Error unregistering plugins for ", throwable);
 		}
+	}
+
+	protected void destroyServiceComponent(
+			ServiceComponentConfiguration serviceComponentConfiguration,
+			ClassLoader classLoader)
+		throws Exception {
+
+		ServiceComponentLocalServiceUtil.destroyServiceComponent(
+			serviceComponentConfiguration, classLoader);
 	}
 
 	protected void doInvokeDeploy(HotDeployEvent hotDeployEvent)
@@ -140,11 +152,32 @@ public class PluginPackageHotDeployListener extends BaseHotDeployListener {
 
 		ServletContextPool.remove(servletContextName);
 
+		destroyServiceComponent(
+			new ServletServiceContextComponentConfiguration(servletContext),
+			hotDeployEvent.getContextClassLoader());
+
 		if (_log.isInfoEnabled()) {
 			_log.info(
 				"Plugin package " + pluginPackage.getModuleId() +
 					" unregistered successfully");
 		}
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	protected URL getPortalCacheConfigurationURL(
+		Configuration configuration, ClassLoader classLoader,
+		String configLocation) {
+
+		String cacheConfigurationLocation = configuration.get(configLocation);
+
+		if (Validator.isNull(cacheConfigurationLocation)) {
+			return null;
+		}
+
+		return classLoader.getResource(cacheConfigurationLocation);
 	}
 
 	protected void initLogger(ClassLoader classLoader) {
@@ -168,12 +201,16 @@ public class PluginPackageHotDeployListener extends BaseHotDeployListener {
 			ServletContext servletContext, ClassLoader classLoader)
 		throws Exception {
 
-		Configuration serviceBuilderPropertiesConfiguration =
-			ConfigurationFactoryUtil.getConfiguration(classLoader, "service");
+		Configuration serviceBuilderPropertiesConfiguration = null;
 
-		if (serviceBuilderPropertiesConfiguration == null) {
+		try {
+			serviceBuilderPropertiesConfiguration =
+				ConfigurationFactoryUtil.getConfiguration(
+					classLoader, "service");
+		}
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to read service.properties");
+				_log.debug("Unable to read service.properties", exception);
 			}
 
 			return;

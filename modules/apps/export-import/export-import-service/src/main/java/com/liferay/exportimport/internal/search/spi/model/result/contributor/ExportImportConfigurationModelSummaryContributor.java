@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.exportimport.kernel.model.ExportImportConfiguration",
 	service = ModelSummaryContributor.class
 )
@@ -40,10 +41,10 @@ public class ExportImportConfigurationModelSummaryContributor
 	public Summary getSummary(
 		Document document, Locale locale, String snippet) {
 
-		return _createSummary(document, Field.TITLE, Field.DESCRIPTION);
+		return createSummary(document, Field.TITLE, Field.DESCRIPTION);
 	}
 
-	private Summary _createSummary(
+	protected Summary createSummary(
 		Document document, String titleField, String contentField) {
 
 		String prefix = Field.SNIPPET + StringPool.UNDERLINE;

@@ -19,7 +19,7 @@ import com.liferay.invitation.invite.members.service.MemberRequestLocalService;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -51,6 +51,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -61,6 +62,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Ryan Park
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=so-portlet-invite-members",
@@ -75,8 +77,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.name=" + InviteMembersPortletKeys.INVITE_MEMBERS,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.supported-public-render-parameter=invitedMembersCount",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supported-public-render-parameter=invitedMembersCount"
 	},
 	service = Portlet.class
 )
@@ -113,7 +114,7 @@ public class InviteMembersPortlet extends MVCPortlet {
 			themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
 			keywords, start, end);
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (User user : users) {
 			jsonArray.put(
@@ -140,11 +141,11 @@ public class InviteMembersPortlet extends MVCPortlet {
 		throws Exception {
 
 		try {
-			_sendInvite(actionRequest);
+			doSendInvite(actionRequest);
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 	}
@@ -180,7 +181,7 @@ public class InviteMembersPortlet extends MVCPortlet {
 			actionRequest, "memberRequestId");
 		int status = ParamUtil.getInteger(actionRequest, "status");
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		try {
 			_memberRequestLocalService.updateMemberRequest(
@@ -190,13 +191,85 @@ public class InviteMembersPortlet extends MVCPortlet {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			jsonObject.put("success", Boolean.FALSE);
 		}
 
 		writeJSON(actionRequest, actionResponse, jsonObject);
+	}
+
+	protected void doSendInvite(ActionRequest actionRequest) throws Exception {
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (!_userLocalService.hasGroupUser(
+				groupId, themeDisplay.getUserId())) {
+
+			return;
+		}
+
+		long invitedTeamId = ParamUtil.getLong(actionRequest, "invitedTeamId");
+		long[] receiverUserIds = getLongArray(actionRequest, "receiverUserIds");
+		long invitedRoleId = ParamUtil.getLong(actionRequest, "invitedRoleId");
+		String[] receiverEmailAddresses = getStringArray(
+			actionRequest, "receiverEmailAddresses");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			actionRequest, _groupLocalService.getGroup(groupId),
+			UserNotificationEvent.class.getName(), PortletProvider.Action.VIEW);
+
+		serviceContext.setAttribute("redirectURL", portletURL.toString());
+
+		String createAccountURL = _portal.getCreateAccountURL(
+			_portal.getHttpServletRequest(actionRequest), themeDisplay);
+
+		serviceContext.setAttribute("createAccountURL", createAccountURL);
+
+		serviceContext.setAttribute("loginURL", themeDisplay.getURLSignIn());
+
+		_memberRequestLocalService.addMemberRequests(
+			themeDisplay.getUserId(), groupId, receiverUserIds, invitedRoleId,
+			invitedTeamId, serviceContext);
+
+		_memberRequestLocalService.addMemberRequests(
+			themeDisplay.getUserId(), groupId, receiverEmailAddresses,
+			invitedRoleId, invitedTeamId, serviceContext);
+	}
+
+	protected long[] getLongArray(PortletRequest portletRequest, String name) {
+		String value = portletRequest.getParameter(name);
+
+		if (value == null) {
+			return null;
+		}
+
+		return StringUtil.split(GetterUtil.getString(value), 0L);
+	}
+
+	protected String[] getStringArray(
+		PortletRequest portletRequest, String name) {
+
+		String value = portletRequest.getParameter(name);
+
+		if (value == null) {
+			return null;
+		}
+
+		return StringUtil.split(GetterUtil.getString(value));
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.invitation.invite.members.service)(&(release.schema.version>=2.0.0)(!(release.schema.version>=3.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
 	}
 
 	private List<User> _getAvailableUsers(
@@ -234,72 +307,6 @@ public class InviteMembersPortlet extends MVCPortlet {
 			).build());
 	}
 
-	private long[] _getLongArray(PortletRequest portletRequest, String name) {
-		String value = portletRequest.getParameter(name);
-
-		if (value == null) {
-			return null;
-		}
-
-		return StringUtil.split(GetterUtil.getString(value), 0L);
-	}
-
-	private String[] _getStringArray(
-		PortletRequest portletRequest, String name) {
-
-		String value = portletRequest.getParameter(name);
-
-		if (value == null) {
-			return null;
-		}
-
-		return StringUtil.split(GetterUtil.getString(value));
-	}
-
-	private void _sendInvite(ActionRequest actionRequest) throws Exception {
-		long groupId = ParamUtil.getLong(actionRequest, "groupId");
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		if (!_userLocalService.hasGroupUser(
-				groupId, themeDisplay.getUserId())) {
-
-			return;
-		}
-
-		long invitedTeamId = ParamUtil.getLong(actionRequest, "invitedTeamId");
-		long[] receiverUserIds = _getLongArray(
-			actionRequest, "receiverUserIds");
-		long invitedRoleId = ParamUtil.getLong(actionRequest, "invitedRoleId");
-		String[] receiverEmailAddresses = _getStringArray(
-			actionRequest, "receiverEmailAddresses");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			actionRequest);
-
-		serviceContext.setAttribute(
-			"createAccountURL",
-			_portal.getCreateAccountURL(
-				_portal.getHttpServletRequest(actionRequest), themeDisplay));
-		serviceContext.setAttribute("loginURL", themeDisplay.getURLSignIn());
-		serviceContext.setAttribute(
-			"redirectURL",
-			String.valueOf(
-				PortletProviderUtil.getPortletURL(
-					actionRequest, _groupLocalService.getGroup(groupId),
-					UserNotificationEvent.class.getName(),
-					PortletProvider.Action.VIEW)));
-
-		_memberRequestLocalService.addMemberRequests(
-			themeDisplay.getUserId(), groupId, receiverUserIds, invitedRoleId,
-			invitedTeamId, serviceContext);
-
-		_memberRequestLocalService.addMemberRequests(
-			themeDisplay.getUserId(), groupId, receiverEmailAddresses,
-			invitedRoleId, invitedTeamId, serviceContext);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		InviteMembersPortlet.class);
 
@@ -310,18 +317,10 @@ public class InviteMembersPortlet extends MVCPortlet {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
 	private MemberRequestLocalService _memberRequestLocalService;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.invitation.invite.members.service)(&(release.schema.version>=2.0.0)(!(release.schema.version>=3.0.0))))"
-	)
-	private Release _release;
 
 	@Reference
 	private UserLocalService _userLocalService;

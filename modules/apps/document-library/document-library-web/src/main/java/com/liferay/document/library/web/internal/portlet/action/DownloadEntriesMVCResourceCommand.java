@@ -27,8 +27,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -37,7 +35,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.kernel.zip.ZipWriterFactory;
+import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.util.RepositoryUtil;
 
 import java.io.File;
@@ -113,67 +111,65 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortalException {
 
-		List<FileEntry> fileEntries = ActionUtil.getFileEntries(
-			resourceRequest);
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		List<FileShortcut> fileShortcuts = ActionUtil.getFileShortcuts(
-			resourceRequest);
+		long folderId = ParamUtil.getLong(resourceRequest, "folderId");
 
-		List<Folder> folders = ActionUtil.getFolders(resourceRequest);
+		File file = null;
 
-		if (fileEntries.isEmpty() && fileShortcuts.isEmpty() &&
-			folders.isEmpty()) {
+		try {
+			List<FileEntry> fileEntries = ActionUtil.getFileEntries(
+				resourceRequest);
 
-			return;
-		}
+			List<FileShortcut> fileShortcuts = ActionUtil.getFileShortcuts(
+				resourceRequest);
 
-		if ((fileEntries.size() == 1) && fileShortcuts.isEmpty() &&
-			folders.isEmpty()) {
+			List<Folder> folders = ActionUtil.getFolders(resourceRequest);
 
-			FileEntry fileEntry = fileEntries.get(0);
+			if (fileEntries.isEmpty() && fileShortcuts.isEmpty() &&
+				folders.isEmpty()) {
 
-			PortletResponseUtil.sendFile(
-				resourceRequest, resourceResponse, fileEntry.getFileName(),
-				fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
-				HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
-		}
-		else if ((fileShortcuts.size() == 1) && fileEntries.isEmpty() &&
-				 folders.isEmpty()) {
+				return;
+			}
 
-			FileShortcut fileShortcut = fileShortcuts.get(0);
+			if ((fileEntries.size() == 1) && fileShortcuts.isEmpty() &&
+				folders.isEmpty()) {
 
-			FileEntry fileEntry = _dlAppService.getFileEntry(
-				fileShortcut.getToFileEntryId());
+				FileEntry fileEntry = fileEntries.get(0);
 
-			PortletResponseUtil.sendFile(
-				resourceRequest, resourceResponse, fileEntry.getFileName(),
-				fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
-				HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
-		}
-		else {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)resourceRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
+				PortletResponseUtil.sendFile(
+					resourceRequest, resourceResponse, fileEntry.getFileName(),
+					fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
+					HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
+			}
+			else if ((fileShortcuts.size() == 1) && fileEntries.isEmpty() &&
+					 folders.isEmpty()) {
 
-			long folderId = ParamUtil.getLong(resourceRequest, "folderId");
+				FileShortcut fileShortcut = fileShortcuts.get(0);
 
-			String zipFileName = _getZipFileName(folderId, themeDisplay);
+				FileEntry fileEntry = _dlAppService.getFileEntry(
+					fileShortcut.getToFileEntryId());
 
-			ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
+				PortletResponseUtil.sendFile(
+					resourceRequest, resourceResponse, fileEntry.getFileName(),
+					fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
+					HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
+			}
+			else {
+				String zipFileName = _getZipFileName(folderId, themeDisplay);
 
-			try {
+				ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+
 				for (FileEntry fileEntry : fileEntries) {
-					_zipFileEntry(
-						fileEntry, StringPool.SLASH,
-						themeDisplay.getPermissionChecker(), zipWriter);
+					_zipFileEntry(fileEntry, StringPool.SLASH, zipWriter);
 				}
 
 				for (FileShortcut fileShortcut : fileShortcuts) {
-					_zipFileEntry(
-						_dlAppService.getFileEntry(
-							fileShortcut.getToFileEntryId()),
-						StringPool.SLASH, themeDisplay.getPermissionChecker(),
-						zipWriter);
+					FileEntry fileEntry = _dlAppService.getFileEntry(
+						fileShortcut.getToFileEntryId());
+
+					_zipFileEntry(fileEntry, StringPool.SLASH, zipWriter);
 				}
 
 				for (Folder folder : folders) {
@@ -181,21 +177,21 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 						_zipFolder(
 							folder.getRepositoryId(), folder.getFolderId(),
 							StringPool.SLASH.concat(folder.getName()),
-							themeDisplay.getPermissionChecker(), zipWriter);
+							zipWriter);
 					}
 				}
 
-				try (InputStream inputStream = new FileInputStream(
-						zipWriter.getFile())) {
+				file = zipWriter.getFile();
 
+				try (InputStream inputStream = new FileInputStream(file)) {
 					PortletResponseUtil.sendFile(
 						resourceRequest, resourceResponse, zipFileName,
 						inputStream, ContentTypes.APPLICATION_ZIP);
 				}
 			}
-			finally {
-				File file = zipWriter.getFile();
-
+		}
+		finally {
+			if (file != null) {
 				file.delete();
 			}
 		}
@@ -212,30 +208,30 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 
 		_checkFolder(folderId);
 
-		ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
+		File file = null;
 
 		try {
 			String zipFileName = _getZipFileName(folderId, themeDisplay);
 
+			ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+
 			long repositoryId = ParamUtil.getLong(
 				resourceRequest, "repositoryId");
 
-			_zipFolder(
-				repositoryId, folderId, StringPool.SLASH,
-				themeDisplay.getPermissionChecker(), zipWriter);
+			_zipFolder(repositoryId, folderId, StringPool.SLASH, zipWriter);
 
-			try (InputStream inputStream = new FileInputStream(
-					zipWriter.getFile())) {
+			file = zipWriter.getFile();
 
+			try (InputStream inputStream = new FileInputStream(file)) {
 				PortletResponseUtil.sendFile(
 					resourceRequest, resourceResponse, zipFileName, inputStream,
 					ContentTypes.APPLICATION_ZIP);
 			}
 		}
 		finally {
-			File file = zipWriter.getFile();
-
-			file.delete();
+			if (file != null) {
+				file.delete();
+			}
 		}
 	}
 
@@ -277,22 +273,16 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 	}
 
 	private void _zipFileEntry(
-			FileEntry fileEntry, String path,
-			PermissionChecker permissionChecker, ZipWriter zipWriter)
+			FileEntry fileEntry, String path, ZipWriter zipWriter)
 		throws IOException, PortalException {
 
-		if (fileEntry.containsPermission(
-				permissionChecker, ActionKeys.DOWNLOAD)) {
-
-			zipWriter.addEntry(
-				path + StringPool.SLASH + fileEntry.getFileName(),
-				fileEntry.getContentStream());
-		}
+		zipWriter.addEntry(
+			path + StringPool.SLASH + fileEntry.getFileName(),
+			fileEntry.getContentStream());
 	}
 
 	private void _zipFolder(
-			long repositoryId, long folderId, String path,
-			PermissionChecker permissionChecker, ZipWriter zipWriter)
+			long repositoryId, long folderId, String path, ZipWriter zipWriter)
 		throws IOException, PortalException {
 
 		List<Object> foldersAndFileEntriesAndFileShortcuts =
@@ -308,26 +298,23 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 					folder.getRepositoryId(), folder.getFolderId(),
 					StringBundler.concat(
 						path, StringPool.SLASH, folder.getName()),
-					permissionChecker, zipWriter);
+					zipWriter);
 			}
 			else if (entry instanceof FileEntry) {
-				_zipFileEntry(
-					(FileEntry)entry, path, permissionChecker, zipWriter);
+				_zipFileEntry((FileEntry)entry, path, zipWriter);
 			}
 			else if (entry instanceof FileShortcut) {
 				FileShortcut fileShortcut = (FileShortcut)entry;
 
-				_zipFileEntry(
-					_dlAppService.getFileEntry(fileShortcut.getToFileEntryId()),
-					path, permissionChecker, zipWriter);
+				FileEntry fileEntry = _dlAppService.getFileEntry(
+					fileShortcut.getToFileEntryId());
+
+				_zipFileEntry(fileEntry, path, zipWriter);
 			}
 		}
 	}
 
 	@Reference
 	private DLAppService _dlAppService;
-
-	@Reference
-	private ZipWriterFactory _zipWriterFactory;
 
 }

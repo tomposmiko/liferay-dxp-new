@@ -46,6 +46,7 @@ import com.liferay.portal.security.audit.storage.service.AuditEventServiceUtil;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see AuditEventServiceSoap
  * @generated
  */
 public class AuditEventServiceHttp {

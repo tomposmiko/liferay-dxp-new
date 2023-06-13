@@ -27,10 +27,6 @@ public class LocalizedEntryLocalServiceWrapper
 	implements LocalizedEntryLocalService,
 			   ServiceWrapper<LocalizedEntryLocalService> {
 
-	public LocalizedEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LocalizedEntryLocalServiceWrapper(
 		LocalizedEntryLocalService localizedEntryLocalService) {
 

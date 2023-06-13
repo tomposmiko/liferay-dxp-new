@@ -14,15 +14,18 @@
 
 package com.liferay.portal.security.service.access.policy.web.internal.security.permission.resource;
 
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class SAPEntryPermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class SAPEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<SAPEntry> modelResourcePermission =
-			_sapEntryFolderModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _sapEntryFolderModelResourcePermission.contains(
 			permissionChecker, sapEntryId, actionId);
 	}
 
@@ -42,18 +42,21 @@ public class SAPEntryPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<SAPEntry> modelResourcePermission =
-			_sapEntryFolderModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _sapEntryFolderModelResourcePermission.contains(
 			permissionChecker, sapEntry, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<SAPEntry>>
-		_sapEntryFolderModelResourcePermissionSnapshot = new Snapshot<>(
-			SAPEntryPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.portal.security.service.access." +
-				"policy.model.SAPEntry)");
+	@Reference(
+		target = "(model.class.name=com.liferay.portal.security.service.access.policy.model.SAPEntry)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<SAPEntry> modelResourcePermission) {
+
+		_sapEntryFolderModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<SAPEntry>
+		_sapEntryFolderModelResourcePermission;
 
 }

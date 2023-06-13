@@ -28,7 +28,6 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -37,6 +36,8 @@ import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.File;
@@ -48,6 +49,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Assume;
@@ -109,8 +111,12 @@ public class ExportedMissingReferenceBackwardCompatbilityExportImportTest
 
 		long[] layoutIds = {layout.getLayoutId()};
 
-		try {
-			exportImportLayouts(layoutIds, getExportParameterMap(), true);
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.exportimport.internal.lifecycle." +
+					"LoggerExportImportLifecycleListener",
+				LoggerTestUtil.ERROR)) {
+
+			exportImportLayouts(layoutIds, getExportParameterMap());
 		}
 		catch (PortletDataException portletDataException) {
 			Throwable throwable = portletDataException.getCause();
@@ -143,11 +149,12 @@ public class ExportedMissingReferenceBackwardCompatbilityExportImportTest
 
 			@Override
 			public void evaluate() throws Throwable {
-				Assume.assumeFalse(
-					ListUtil.exists(
-						_parentTestMethods,
-						method -> Objects.equals(
-							description.getMethodName(), method.getName())));
+				Stream<Method> methodStream = _parentTestMethods.stream();
+
+				Assume.assumeTrue(
+					methodStream.noneMatch(
+						m -> Objects.equals(
+							m.getName(), description.getMethodName())));
 
 				statement.evaluate();
 			}
@@ -212,50 +219,55 @@ public class ExportedMissingReferenceBackwardCompatbilityExportImportTest
 			ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter(
 				new File(larFilePath));
 
-			for (String zipEntry : zipReader.getEntries()) {
-				try {
-					if (zipEntry.equals("manifest.xml")) {
-						Document document = SAXReaderUtil.read(
-							zipReader.getEntryAsInputStream(zipEntry));
+			List<String> entries = zipReader.getEntries();
 
-						Element rootElement = document.getRootElement();
+			Stream<String> entriesStream = entries.stream();
 
-						List<Element> missingReferencesElements =
-							rootElement.elements("missing-references");
+			entriesStream.forEach(
+				zipEntry -> {
+					try {
+						if (zipEntry.equals("manifest.xml")) {
+							Document document = SAXReaderUtil.read(
+								zipReader.getEntryAsInputStream(zipEntry));
 
-						Element missingReferencesElement =
-							missingReferencesElements.get(0);
+							Element rootElement = document.getRootElement();
 
-						List<Element> missingReferenceElements =
-							missingReferencesElement.elements(
-								"missing-reference");
+							List<Element> missingReferencesElements =
+								rootElement.elements("missing-references");
 
-						for (Element missingReferenceElement :
-								missingReferenceElements) {
+							Element missingReferencesElement =
+								missingReferencesElements.get(0);
 
-							Attribute elementPathAttribute =
-								missingReferenceElement.attribute(
-									"element-path");
+							List<Element> missingReferenceElements =
+								missingReferencesElement.elements(
+									"missing-reference");
 
-							if (elementPathAttribute != null) {
-								missingReferencesElement.remove(
-									missingReferenceElement);
+							for (Element missingReferenceElement :
+									missingReferenceElements) {
+
+								Attribute elementPathAttribute =
+									missingReferenceElement.attribute(
+										"element-path");
+
+								if (elementPathAttribute != null) {
+									missingReferencesElement.remove(
+										missingReferenceElement);
+								}
 							}
-						}
 
-						zipWriter.addEntry(
-							zipEntry, document.formattedString());
+							zipWriter.addEntry(
+								zipEntry, document.formattedString());
+						}
+						else {
+							zipWriter.addEntry(
+								zipEntry,
+								zipReader.getEntryAsInputStream(zipEntry));
+						}
 					}
-					else {
-						zipWriter.addEntry(
-							zipEntry,
-							zipReader.getEntryAsInputStream(zipEntry));
+					catch (Exception exception) {
+						throw new RuntimeException(exception);
 					}
-				}
-				catch (Exception exception) {
-					throw new RuntimeException(exception);
-				}
-			}
+				});
 
 			FileUtil.delete(file);
 		}

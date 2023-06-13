@@ -28,8 +28,8 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.user.associated.data.constants.UserAssociatedDataPortletKeys;
-import com.liferay.user.associated.data.web.internal.helper.SelectedUserHelper;
-import com.liferay.user.associated.data.web.internal.helper.UADApplicationSummaryHelper;
+import com.liferay.user.associated.data.web.internal.util.SelectedUserHelper;
+import com.liferay.user.associated.data.web.internal.util.UADApplicationSummaryHelper;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
 		"mvc.command.name=/user_associated_data/erase_personal_data"

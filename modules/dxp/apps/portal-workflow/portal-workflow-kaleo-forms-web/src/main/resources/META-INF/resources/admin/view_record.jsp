@@ -42,13 +42,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "view-x", kaleoProcess.getN
 		<aui:model-context bean="<%= ddlRecordVersion %>" model="<%= DDLRecordVersion.class %>" />
 
 		<div class="panel text-center">
-			<liferay-portal-workflow:status
-				bean="<%= ddlRecord %>"
-				modelClass="<%= KaleoProcess.class %>"
-				showInstanceTracker="<%= true %>"
-				showStatusLabel="<%= false %>"
-				version="<%= ddlRecordVersion.getVersion() %>"
-			/>
+			<aui:workflow-status markupView="lexicon" model="<%= DDLRecord.class %>" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= ddlRecordVersion.getStatus() %>" version="<%= ddlRecordVersion.getVersion() %>" />
 		</div>
 	</c:if>
 

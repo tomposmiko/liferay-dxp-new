@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING,
 		"mvc.command.name=/dynamic_data_mapping/revert_template"
@@ -55,7 +56,13 @@ public class RevertTemplateMVCActionCommand extends BaseMVCActionCommand {
 		_ddmTemplateService.revertTemplate(templateId, version, serviceContext);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDMTemplateService(
+		DDMTemplateService ddmTemplateService) {
+
+		_ddmTemplateService = ddmTemplateService;
+	}
+
 	private DDMTemplateService _ddmTemplateService;
 
 }

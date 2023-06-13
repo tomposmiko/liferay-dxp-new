@@ -29,6 +29,7 @@ import com.liferay.revert.schema.version.model.RSVEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -191,58 +192,69 @@ public class RSVEntryModelImpl
 	public Map<String, Function<RSVEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<RSVEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, RSVEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<RSVEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			RSVEntry.class.getClassLoader(), RSVEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<RSVEntry, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<RSVEntry, Object>>();
+		try {
+			Constructor<RSVEntry> constructor =
+				(Constructor<RSVEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", RSVEntry::getMvccVersion);
-			attributeGetterFunctions.put("rsvEntryId", RSVEntry::getRsvEntryId);
-			attributeGetterFunctions.put("companyId", RSVEntry::getCompanyId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<RSVEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<RSVEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<RSVEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<RSVEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<RSVEntry, Object>>();
+		Map<String, BiConsumer<RSVEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<RSVEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<RSVEntry, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<RSVEntry, ?>>();
+		attributeGetterFunctions.put("mvccVersion", RSVEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<RSVEntry, Long>)RSVEntry::setMvccVersion);
+		attributeGetterFunctions.put("rsvEntryId", RSVEntry::getRsvEntryId);
+		attributeSetterBiConsumers.put(
+			"rsvEntryId", (BiConsumer<RSVEntry, Long>)RSVEntry::setRsvEntryId);
+		attributeGetterFunctions.put("companyId", RSVEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<RSVEntry, Long>)RSVEntry::setCompanyId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<RSVEntry, Long>)RSVEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"rsvEntryId",
-				(BiConsumer<RSVEntry, Long>)RSVEntry::setRsvEntryId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<RSVEntry, Long>)RSVEntry::setCompanyId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -495,12 +507,41 @@ public class RSVEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<RSVEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<RSVEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<RSVEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((RSVEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, RSVEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					RSVEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -509,9 +550,8 @@ public class RSVEntryModelImpl
 	private long _companyId;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<RSVEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<RSVEntry, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -16,6 +16,7 @@ package com.liferay.commerce.product.model.impl;
 
 import com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValue;
 import com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValueModel;
+import com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValueSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -40,15 +41,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -81,7 +85,6 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	public static final String TABLE_NAME = "CPDSpecificationOptionValue";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
 		{"uuid_", Types.VARCHAR},
 		{"CPDSpecificationOptionValueId", Types.BIGINT},
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
@@ -97,8 +100,6 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 		new HashMap<String, Integer>();
 
 	static {
-		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("CPDSpecificationOptionValueId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -116,7 +117,7 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CPDSpecificationOptionValue (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,CPDSpecificationOptionValueId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPDefinitionId LONG,CPSpecificationOptionId LONG,CPOptionCategoryId LONG,value STRING null,priority DOUBLE,lastPublishDate DATE null,primary key (CPDSpecificationOptionValueId, ctCollectionId))";
+		"create table CPDSpecificationOptionValue (uuid_ VARCHAR(75) null,CPDSpecificationOptionValueId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPDefinitionId LONG,CPSpecificationOptionId LONG,CPOptionCategoryId LONG,value STRING null,priority DOUBLE,lastPublishDate DATE null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CPDSpecificationOptionValue";
@@ -132,6 +133,24 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean ENTITY_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean FINDER_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean COLUMN_BITMASK_ENABLED = true;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
@@ -184,18 +203,72 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	public static final long PRIORITY_COLUMN_BITMASK = 128L;
 
 	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+	public static CPDefinitionSpecificationOptionValue toModel(
+		CPDefinitionSpecificationOptionValueSoap soapModel) {
+
+		if (soapModel == null) {
+			return null;
+		}
+
+		CPDefinitionSpecificationOptionValue model =
+			new CPDefinitionSpecificationOptionValueImpl();
+
+		model.setUuid(soapModel.getUuid());
+		model.setCPDefinitionSpecificationOptionValueId(
+			soapModel.getCPDefinitionSpecificationOptionValueId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setCPDefinitionId(soapModel.getCPDefinitionId());
+		model.setCPSpecificationOptionId(
+			soapModel.getCPSpecificationOptionId());
+		model.setCPOptionCategoryId(soapModel.getCPOptionCategoryId());
+		model.setValue(soapModel.getValue());
+		model.setPriority(soapModel.getPriority());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
 	}
 
 	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	public static List<CPDefinitionSpecificationOptionValue> toModels(
+		CPDefinitionSpecificationOptionValueSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<CPDefinitionSpecificationOptionValue> models =
+			new ArrayList<CPDefinitionSpecificationOptionValue>(
+				soapModels.length);
+
+		for (CPDefinitionSpecificationOptionValueSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.commerce.product.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValue"));
 
 	public CPDefinitionSpecificationOptionValueModelImpl() {
 	}
@@ -277,195 +350,161 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	public Map<String, Function<CPDefinitionSpecificationOptionValue, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CPDefinitionSpecificationOptionValue, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function
+		<InvocationHandler, CPDefinitionSpecificationOptionValue>
+			_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<CPDefinitionSpecificationOptionValue, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CPDefinitionSpecificationOptionValue.class.getClassLoader(),
+			CPDefinitionSpecificationOptionValue.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<CPDefinitionSpecificationOptionValue, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String,
-						 Function
-							 <CPDefinitionSpecificationOptionValue, Object>>();
+		try {
+			Constructor<CPDefinitionSpecificationOptionValue> constructor =
+				(Constructor<CPDefinitionSpecificationOptionValue>)
+					proxyClass.getConstructor(InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion",
-				CPDefinitionSpecificationOptionValue::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId",
-				CPDefinitionSpecificationOptionValue::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"uuid", CPDefinitionSpecificationOptionValue::getUuid);
-			attributeGetterFunctions.put(
-				"CPDefinitionSpecificationOptionValueId",
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
+	private static final Map
+		<String, Function<CPDefinitionSpecificationOptionValue, Object>>
+			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CPDefinitionSpecificationOptionValue, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
+		Map<String, Function<CPDefinitionSpecificationOptionValue, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String,
+					 Function<CPDefinitionSpecificationOptionValue, Object>>();
+		Map<String, BiConsumer<CPDefinitionSpecificationOptionValue, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String,
+					 BiConsumer<CPDefinitionSpecificationOptionValue, ?>>();
+
+		attributeGetterFunctions.put(
+			"uuid", CPDefinitionSpecificationOptionValue::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
+				CPDefinitionSpecificationOptionValue::setUuid);
+		attributeGetterFunctions.put(
+			"CPDefinitionSpecificationOptionValueId",
+			CPDefinitionSpecificationOptionValue::
+				getCPDefinitionSpecificationOptionValueId);
+		attributeSetterBiConsumers.put(
+			"CPDefinitionSpecificationOptionValueId",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::
-					getCPDefinitionSpecificationOptionValueId);
-			attributeGetterFunctions.put(
-				"groupId", CPDefinitionSpecificationOptionValue::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId",
-				CPDefinitionSpecificationOptionValue::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", CPDefinitionSpecificationOptionValue::getUserId);
-			attributeGetterFunctions.put(
-				"userName", CPDefinitionSpecificationOptionValue::getUserName);
-			attributeGetterFunctions.put(
-				"createDate",
-				CPDefinitionSpecificationOptionValue::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate",
-				CPDefinitionSpecificationOptionValue::getModifiedDate);
-			attributeGetterFunctions.put(
-				"CPDefinitionId",
-				CPDefinitionSpecificationOptionValue::getCPDefinitionId);
-			attributeGetterFunctions.put(
-				"CPSpecificationOptionId",
+					setCPDefinitionSpecificationOptionValueId);
+		attributeGetterFunctions.put(
+			"groupId", CPDefinitionSpecificationOptionValue::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
+				CPDefinitionSpecificationOptionValue::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CPDefinitionSpecificationOptionValue::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
+				CPDefinitionSpecificationOptionValue::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CPDefinitionSpecificationOptionValue::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
+				CPDefinitionSpecificationOptionValue::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CPDefinitionSpecificationOptionValue::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
+				CPDefinitionSpecificationOptionValue::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPDefinitionSpecificationOptionValue::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
+				CPDefinitionSpecificationOptionValue::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate",
+			CPDefinitionSpecificationOptionValue::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
+				CPDefinitionSpecificationOptionValue::setModifiedDate);
+		attributeGetterFunctions.put(
+			"CPDefinitionId",
+			CPDefinitionSpecificationOptionValue::getCPDefinitionId);
+		attributeSetterBiConsumers.put(
+			"CPDefinitionId",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
+				CPDefinitionSpecificationOptionValue::setCPDefinitionId);
+		attributeGetterFunctions.put(
+			"CPSpecificationOptionId",
+			CPDefinitionSpecificationOptionValue::getCPSpecificationOptionId);
+		attributeSetterBiConsumers.put(
+			"CPSpecificationOptionId",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
 				CPDefinitionSpecificationOptionValue::
-					getCPSpecificationOptionId);
-			attributeGetterFunctions.put(
-				"CPOptionCategoryId",
-				CPDefinitionSpecificationOptionValue::getCPOptionCategoryId);
-			attributeGetterFunctions.put(
-				"value", CPDefinitionSpecificationOptionValue::getValue);
-			attributeGetterFunctions.put(
-				"priority", CPDefinitionSpecificationOptionValue::getPriority);
-			attributeGetterFunctions.put(
-				"lastPublishDate",
-				CPDefinitionSpecificationOptionValue::getLastPublishDate);
+					setCPSpecificationOptionId);
+		attributeGetterFunctions.put(
+			"CPOptionCategoryId",
+			CPDefinitionSpecificationOptionValue::getCPOptionCategoryId);
+		attributeSetterBiConsumers.put(
+			"CPOptionCategoryId",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
+				CPDefinitionSpecificationOptionValue::setCPOptionCategoryId);
+		attributeGetterFunctions.put(
+			"value", CPDefinitionSpecificationOptionValue::getValue);
+		attributeSetterBiConsumers.put(
+			"value",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
+				CPDefinitionSpecificationOptionValue::setValue);
+		attributeGetterFunctions.put(
+			"priority", CPDefinitionSpecificationOptionValue::getPriority);
+		attributeSetterBiConsumers.put(
+			"priority",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Double>)
+				CPDefinitionSpecificationOptionValue::setPriority);
+		attributeGetterFunctions.put(
+			"lastPublishDate",
+			CPDefinitionSpecificationOptionValue::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
+				CPDefinitionSpecificationOptionValue::setLastPublishDate);
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
-		}
-
-	}
-
-	private static class AttributeSetterBiConsumersHolder {
-
-		private static final Map
-			<String, BiConsumer<CPDefinitionSpecificationOptionValue, Object>>
-				_attributeSetterBiConsumers;
-
-		static {
-			Map<String, BiConsumer<CPDefinitionSpecificationOptionValue, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String,
-						 BiConsumer<CPDefinitionSpecificationOptionValue, ?>>();
-
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
-					CPDefinitionSpecificationOptionValue::setUuid);
-			attributeSetterBiConsumers.put(
-				"CPDefinitionSpecificationOptionValueId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::
-						setCPDefinitionSpecificationOptionValueId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
-					CPDefinitionSpecificationOptionValue::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
-					CPDefinitionSpecificationOptionValue::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
-					CPDefinitionSpecificationOptionValue::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"CPDefinitionId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::setCPDefinitionId);
-			attributeSetterBiConsumers.put(
-				"CPSpecificationOptionId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::
-						setCPSpecificationOptionId);
-			attributeSetterBiConsumers.put(
-				"CPOptionCategoryId",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Long>)
-					CPDefinitionSpecificationOptionValue::
-						setCPOptionCategoryId);
-			attributeSetterBiConsumers.put(
-				"value",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, String>)
-					CPDefinitionSpecificationOptionValue::setValue);
-			attributeSetterBiConsumers.put(
-				"priority",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Double>)
-					CPDefinitionSpecificationOptionValue::setPriority);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<CPDefinitionSpecificationOptionValue, Date>)
-					CPDefinitionSpecificationOptionValue::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
-	}
-
-	@JSON
-	@Override
-	public long getMvccVersion() {
-		return _mvccVersion;
-	}
-
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_mvccVersion = mvccVersion;
-	}
-
-	@JSON
-	@Override
-	public long getCtCollectionId() {
-		return _ctCollectionId;
-	}
-
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_ctCollectionId = ctCollectionId;
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1008,10 +1047,6 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 			cpDefinitionSpecificationOptionValueImpl =
 				new CPDefinitionSpecificationOptionValueImpl();
 
-		cpDefinitionSpecificationOptionValueImpl.setMvccVersion(
-			getMvccVersion());
-		cpDefinitionSpecificationOptionValueImpl.setCtCollectionId(
-			getCtCollectionId());
 		cpDefinitionSpecificationOptionValueImpl.setUuid(getUuid());
 		cpDefinitionSpecificationOptionValueImpl.
 			setCPDefinitionSpecificationOptionValueId(
@@ -1045,10 +1080,6 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 			cpDefinitionSpecificationOptionValueImpl =
 				new CPDefinitionSpecificationOptionValueImpl();
 
-		cpDefinitionSpecificationOptionValueImpl.setMvccVersion(
-			this.<Long>getColumnOriginalValue("mvccVersion"));
-		cpDefinitionSpecificationOptionValueImpl.setCtCollectionId(
-			this.<Long>getColumnOriginalValue("ctCollectionId"));
 		cpDefinitionSpecificationOptionValueImpl.setUuid(
 			this.<String>getColumnOriginalValue("uuid_"));
 		cpDefinitionSpecificationOptionValueImpl.
@@ -1146,7 +1177,7 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return true;
+		return ENTITY_CACHE_ENABLED;
 	}
 
 	/**
@@ -1155,7 +1186,7 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return true;
+		return FINDER_CACHE_ENABLED;
 	}
 
 	@Override
@@ -1172,12 +1203,6 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 		CPDefinitionSpecificationOptionValueCacheModel
 			cpDefinitionSpecificationOptionValueCacheModel =
 				new CPDefinitionSpecificationOptionValueCacheModel();
-
-		cpDefinitionSpecificationOptionValueCacheModel.mvccVersion =
-			getMvccVersion();
-
-		cpDefinitionSpecificationOptionValueCacheModel.ctCollectionId =
-			getCtCollectionId();
 
 		cpDefinitionSpecificationOptionValueCacheModel.uuid = getUuid();
 
@@ -1313,19 +1338,49 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CPDefinitionSpecificationOptionValue, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry
+				<String, Function<CPDefinitionSpecificationOptionValue, Object>>
+					entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CPDefinitionSpecificationOptionValue, Object>
+				attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply(
+					(CPDefinitionSpecificationOptionValue)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, CPDefinitionSpecificationOptionValue>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CPDefinitionSpecificationOptionValue.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
-	private long _mvccVersion;
-	private long _ctCollectionId;
 	private String _uuid;
 	private long _CPDefinitionSpecificationOptionValueId;
 	private long _groupId;
@@ -1347,8 +1402,7 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<CPDefinitionSpecificationOptionValue, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -1373,8 +1427,6 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
-		_columnOriginalValues.put("mvccVersion", _mvccVersion);
-		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"CPDSpecificationOptionValueId",
@@ -1418,37 +1470,33 @@ public class CPDefinitionSpecificationOptionValueModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("mvccVersion", 1L);
+		columnBitmasks.put("uuid_", 1L);
 
-		columnBitmasks.put("ctCollectionId", 2L);
+		columnBitmasks.put("CPDSpecificationOptionValueId", 2L);
 
-		columnBitmasks.put("uuid_", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("CPDSpecificationOptionValueId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("groupId", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("companyId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userId", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("userName", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("createDate", 256L);
+		columnBitmasks.put("CPDefinitionId", 256L);
 
-		columnBitmasks.put("modifiedDate", 512L);
+		columnBitmasks.put("CPSpecificationOptionId", 512L);
 
-		columnBitmasks.put("CPDefinitionId", 1024L);
+		columnBitmasks.put("CPOptionCategoryId", 1024L);
 
-		columnBitmasks.put("CPSpecificationOptionId", 2048L);
+		columnBitmasks.put("value", 2048L);
 
-		columnBitmasks.put("CPOptionCategoryId", 4096L);
+		columnBitmasks.put("priority", 4096L);
 
-		columnBitmasks.put("value", 8192L);
-
-		columnBitmasks.put("priority", 16384L);
-
-		columnBitmasks.put("lastPublishDate", 32768L);
+		columnBitmasks.put("lastPublishDate", 8192L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

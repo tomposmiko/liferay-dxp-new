@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @author Michael Young
  */
-@Component(service = SingleVMPool.class)
+@Component(immediate = true, service = SingleVMPool.class)
 public class SingleVMPoolImpl implements SingleVMPool {
 
 	@Override
@@ -43,6 +43,18 @@ public class SingleVMPoolImpl implements SingleVMPool {
 	@Override
 	public PortalCache<? extends Serializable, ?> getPortalCache(
 		String portalCacheName) {
+
+		return _portalCacheManager.getPortalCache(portalCacheName);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getPortalCache(String)}
+	 */
+	@Deprecated
+	@Override
+	public PortalCache<? extends Serializable, ?> getPortalCache(
+		String portalCacheName, boolean blocking) {
 
 		return _portalCacheManager.getPortalCache(portalCacheName);
 	}
@@ -66,8 +78,16 @@ public class SingleVMPoolImpl implements SingleVMPool {
 	}
 
 	@Reference(
-		target = "(portal.cache.manager.name=" + PortalCacheManagerNames.SINGLE_VM + ")"
+		target = "(portal.cache.manager.name=" + PortalCacheManagerNames.SINGLE_VM + ")",
+		unbind = "-"
 	)
+	protected void setPortalCacheManager(
+		PortalCacheManager<? extends Serializable, ? extends Serializable>
+			portalCacheManager) {
+
+		_portalCacheManager = portalCacheManager;
+	}
+
 	private PortalCacheManager<? extends Serializable, ?> _portalCacheManager;
 
 }

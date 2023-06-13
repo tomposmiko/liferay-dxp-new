@@ -57,15 +57,13 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()) + " -
 	<div class="lfr-form-content">
 		<liferay-ui:error exception="<%= CPDefinitionGroupedEntryQuantityException.class %>" message="please-enter-a-valid-quantity" />
 
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<aui:fieldset>
-					<aui:input name="priority" />
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
+				<aui:input name="priority" />
 
-					<aui:input name="quantity" />
-				</aui:fieldset>
-			</div>
-		</div>
+				<aui:input name="quantity" />
+			</aui:fieldset>
+		</aui:fieldset-group>
 	</div>
 
 	<aui:button-row>

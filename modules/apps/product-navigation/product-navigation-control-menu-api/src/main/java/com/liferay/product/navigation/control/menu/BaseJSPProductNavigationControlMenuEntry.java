@@ -72,7 +72,9 @@ public abstract class BaseJSPProductNavigationControlMenuEntry
 			httpServletRequest, httpServletResponse, getIconJspPath());
 	}
 
-	protected abstract ServletContext getServletContext();
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
 
 	protected boolean include(
 			HttpServletRequest httpServletRequest,
@@ -83,10 +85,8 @@ public abstract class BaseJSPProductNavigationControlMenuEntry
 			return false;
 		}
 
-		ServletContext servletContext = getServletContext();
-
 		RequestDispatcher requestDispatcher =
-			servletContext.getRequestDispatcher(jspPath);
+			_servletContext.getRequestDispatcher(jspPath);
 
 		try {
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
@@ -102,5 +102,7 @@ public abstract class BaseJSPProductNavigationControlMenuEntry
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseJSPProductNavigationControlMenuEntry.class);
+
+	private ServletContext _servletContext;
 
 }

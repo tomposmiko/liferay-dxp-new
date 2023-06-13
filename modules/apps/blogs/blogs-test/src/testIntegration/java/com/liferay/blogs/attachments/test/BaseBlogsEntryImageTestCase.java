@@ -52,10 +52,12 @@ public abstract class BaseBlogsEntryImageTestCase {
 	public void testAddImage() throws Exception {
 		BlogsEntry blogsEntry = addBlogsEntry((ImageSelector)null);
 
-		FileEntry fileEntry = getTempFileEntry(
-			user.getUserId(), "image1.jpg",
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), user.getUserId()));
+				group.getGroupId(), user.getUserId());
+
+		FileEntry fileEntry = getTempFileEntry(
+			user.getUserId(), "image1.jpg", serviceContext);
 
 		ImageSelector imageSelector = new ImageSelector(
 			FileUtil.getBytes(fileEntry.getContentStream()),
@@ -207,7 +209,7 @@ public abstract class BaseBlogsEntryImageTestCase {
 			"com/liferay/blogs/dependencies/test.jpg");
 
 		return _portletFileRepository.addPortletFileEntry(
-			null, serviceContext.getScopeGroupId(), userId,
+			serviceContext.getScopeGroupId(), userId,
 			BlogsEntry.class.getName(), 0, StringUtil.randomString(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, inputStream, title,
 			MimeTypesUtil.getContentType(title), false);

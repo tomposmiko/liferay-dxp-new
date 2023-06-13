@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.exception.DuplicateCommerceOrderItemExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.service.CommerceOrderItemLocalServiceUtil;
@@ -129,10 +128,6 @@ public class CommerceOrderItemPersistenceTest {
 
 		CommerceOrderItem newCommerceOrderItem = _persistence.create(pk);
 
-		newCommerceOrderItem.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCommerceOrderItem.setUuid(RandomTestUtil.randomString());
-
 		newCommerceOrderItem.setExternalReferenceCode(
 			RandomTestUtil.randomString());
 
@@ -156,17 +151,12 @@ public class CommerceOrderItemPersistenceTest {
 
 		newCommerceOrderItem.setCPInstanceId(RandomTestUtil.nextLong());
 
-		newCommerceOrderItem.setCPMeasurementUnitId(RandomTestUtil.nextLong());
-
 		newCommerceOrderItem.setCProductId(RandomTestUtil.nextLong());
 
 		newCommerceOrderItem.setParentCommerceOrderItemId(
 			RandomTestUtil.nextLong());
 
 		newCommerceOrderItem.setShippingAddressId(RandomTestUtil.nextLong());
-
-		newCommerceOrderItem.setDecimalQuantity(
-			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		newCommerceOrderItem.setDeliveryGroup(RandomTestUtil.randomString());
 
@@ -186,9 +176,6 @@ public class CommerceOrderItemPersistenceTest {
 
 		newCommerceOrderItem.setDiscountAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrderItem.setDiscountManuallyAdjusted(
-			RandomTestUtil.randomBoolean());
 
 		newCommerceOrderItem.setDiscountPercentageLevel1(
 			new BigDecimal(RandomTestUtil.nextDouble()));
@@ -237,9 +224,6 @@ public class CommerceOrderItemPersistenceTest {
 
 		newCommerceOrderItem.setName(RandomTestUtil.randomString());
 
-		newCommerceOrderItem.setPriceManuallyAdjusted(
-			RandomTestUtil.randomBoolean());
-
 		newCommerceOrderItem.setPrintedNote(RandomTestUtil.randomString());
 
 		newCommerceOrderItem.setPromoPrice(
@@ -249,10 +233,6 @@ public class CommerceOrderItemPersistenceTest {
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		newCommerceOrderItem.setQuantity(RandomTestUtil.nextInt());
-
-		newCommerceOrderItem.setReplacedCPInstanceId(RandomTestUtil.nextLong());
-
-		newCommerceOrderItem.setReplacedSku(RandomTestUtil.randomString());
 
 		newCommerceOrderItem.setRequestedDeliveryDate(
 			RandomTestUtil.nextDate());
@@ -292,12 +272,6 @@ public class CommerceOrderItemPersistenceTest {
 			_persistence.findByPrimaryKey(newCommerceOrderItem.getPrimaryKey());
 
 		Assert.assertEquals(
-			existingCommerceOrderItem.getMvccVersion(),
-			newCommerceOrderItem.getMvccVersion());
-		Assert.assertEquals(
-			existingCommerceOrderItem.getUuid(),
-			newCommerceOrderItem.getUuid());
-		Assert.assertEquals(
 			existingCommerceOrderItem.getExternalReferenceCode(),
 			newCommerceOrderItem.getExternalReferenceCode());
 		Assert.assertEquals(
@@ -334,9 +308,6 @@ public class CommerceOrderItemPersistenceTest {
 			existingCommerceOrderItem.getCPInstanceId(),
 			newCommerceOrderItem.getCPInstanceId());
 		Assert.assertEquals(
-			existingCommerceOrderItem.getCPMeasurementUnitId(),
-			newCommerceOrderItem.getCPMeasurementUnitId());
-		Assert.assertEquals(
 			existingCommerceOrderItem.getCProductId(),
 			newCommerceOrderItem.getCProductId());
 		Assert.assertEquals(
@@ -345,9 +316,6 @@ public class CommerceOrderItemPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceOrderItem.getShippingAddressId(),
 			newCommerceOrderItem.getShippingAddressId());
-		Assert.assertEquals(
-			existingCommerceOrderItem.getDecimalQuantity(),
-			newCommerceOrderItem.getDecimalQuantity());
 		Assert.assertEquals(
 			existingCommerceOrderItem.getDeliveryGroup(),
 			newCommerceOrderItem.getDeliveryGroup());
@@ -369,9 +337,6 @@ public class CommerceOrderItemPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceOrderItem.getDiscountAmount(),
 			newCommerceOrderItem.getDiscountAmount());
-		Assert.assertEquals(
-			existingCommerceOrderItem.isDiscountManuallyAdjusted(),
-			newCommerceOrderItem.isDiscountManuallyAdjusted());
 		Assert.assertEquals(
 			existingCommerceOrderItem.getDiscountPercentageLevel1(),
 			newCommerceOrderItem.getDiscountPercentageLevel1());
@@ -428,9 +393,6 @@ public class CommerceOrderItemPersistenceTest {
 			existingCommerceOrderItem.getName(),
 			newCommerceOrderItem.getName());
 		Assert.assertEquals(
-			existingCommerceOrderItem.isPriceManuallyAdjusted(),
-			newCommerceOrderItem.isPriceManuallyAdjusted());
-		Assert.assertEquals(
 			existingCommerceOrderItem.getPrintedNote(),
 			newCommerceOrderItem.getPrintedNote());
 		Assert.assertEquals(
@@ -442,12 +404,6 @@ public class CommerceOrderItemPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceOrderItem.getQuantity(),
 			newCommerceOrderItem.getQuantity());
-		Assert.assertEquals(
-			existingCommerceOrderItem.getReplacedCPInstanceId(),
-			newCommerceOrderItem.getReplacedCPInstanceId());
-		Assert.assertEquals(
-			existingCommerceOrderItem.getReplacedSku(),
-			newCommerceOrderItem.getReplacedSku());
 		Assert.assertEquals(
 			Time.getShortTimestamp(
 				existingCommerceOrderItem.getRequestedDeliveryDate()),
@@ -491,55 +447,6 @@ public class CommerceOrderItemPersistenceTest {
 		AssertUtils.assertEquals(
 			existingCommerceOrderItem.getWidth(),
 			newCommerceOrderItem.getWidth());
-	}
-
-	@Test(
-		expected = DuplicateCommerceOrderItemExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceOrderItem commerceOrderItem = addCommerceOrderItem();
-
-		CommerceOrderItem newCommerceOrderItem = addCommerceOrderItem();
-
-		newCommerceOrderItem.setCompanyId(commerceOrderItem.getCompanyId());
-
-		newCommerceOrderItem = _persistence.update(newCommerceOrderItem);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceOrderItem);
-
-		newCommerceOrderItem.setExternalReferenceCode(
-			commerceOrderItem.getExternalReferenceCode());
-
-		_persistence.update(newCommerceOrderItem);
-	}
-
-	@Test
-	public void testCountByUuid() throws Exception {
-		_persistence.countByUuid("");
-
-		_persistence.countByUuid("null");
-
-		_persistence.countByUuid((String)null);
-	}
-
-	@Test
-	public void testCountByUUID_G() throws Exception {
-		_persistence.countByUUID_G("", RandomTestUtil.nextLong());
-
-		_persistence.countByUUID_G("null", 0L);
-
-		_persistence.countByUUID_G((String)null, 0L);
-	}
-
-	@Test
-	public void testCountByUuid_C() throws Exception {
-		_persistence.countByUuid_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByUuid_C("null", 0L);
-
-		_persistence.countByUuid_C((String)null, 0L);
 	}
 
 	@Test
@@ -595,12 +502,12 @@ public class CommerceOrderItemPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -628,20 +535,19 @@ public class CommerceOrderItemPersistenceTest {
 
 	protected OrderByComparator<CommerceOrderItem> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceOrderItem", "mvccVersion", true, "uuid", true,
-			"externalReferenceCode", true, "commerceOrderItemId", true,
-			"groupId", true, "companyId", true, "userId", true, "userName",
-			true, "createDate", true, "modifiedDate", true, "bookedQuantityId",
-			true, "commerceOrderId", true, "commercePriceListId", true,
-			"CPInstanceId", true, "CPMeasurementUnitId", true, "CProductId",
-			true, "parentCommerceOrderItemId", true, "shippingAddressId", true,
-			"decimalQuantity", true, "deliveryGroup", true,
+			"CommerceOrderItem", "externalReferenceCode", true,
+			"commerceOrderItemId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "bookedQuantityId", true, "commerceOrderId",
+			true, "commercePriceListId", true, "CPInstanceId", true,
+			"CProductId", true, "parentCommerceOrderItemId", true,
+			"shippingAddressId", true, "deliveryGroup", true,
 			"deliveryMaxSubscriptionCycles", true, "deliverySubscriptionLength",
 			true, "deliverySubscriptionType", true,
 			"deliverySubscriptionTypeSettings", true, "depth", true,
-			"discountAmount", true, "discountManuallyAdjusted", true,
-			"discountPercentageLevel1", true, "discountPercentageLevel2", true,
-			"discountPercentageLevel3", true, "discountPercentageLevel4", true,
+			"discountAmount", true, "discountPercentageLevel1", true,
+			"discountPercentageLevel2", true, "discountPercentageLevel3", true,
+			"discountPercentageLevel4", true,
 			"discountPercentageLevel1WithTaxAmount", true,
 			"discountPercentageLevel2WithTaxAmount", true,
 			"discountPercentageLevel3WithTaxAmount", true,
@@ -649,9 +555,8 @@ public class CommerceOrderItemPersistenceTest {
 			"discountWithTaxAmount", true, "finalPrice", true,
 			"finalPriceWithTaxAmount", true, "freeShipping", true, "height",
 			true, "manuallyAdjusted", true, "maxSubscriptionCycles", true,
-			"name", true, "priceManuallyAdjusted", true, "printedNote", true,
-			"promoPrice", true, "promoPriceWithTaxAmount", true, "quantity",
-			true, "replacedCPInstanceId", true, "replacedSku", true,
+			"name", true, "printedNote", true, "promoPrice", true,
+			"promoPriceWithTaxAmount", true, "quantity", true,
 			"requestedDeliveryDate", true, "shipSeparately", true, "shippable",
 			true, "shippedQuantity", true, "shippingExtraPrice", true, "sku",
 			true, "subscription", true, "subscriptionLength", true,
@@ -934,42 +839,27 @@ public class CommerceOrderItemPersistenceTest {
 
 	private void _assertOriginalValues(CommerceOrderItem commerceOrderItem) {
 		Assert.assertEquals(
-			commerceOrderItem.getUuid(),
-			ReflectionTestUtil.invoke(
-				commerceOrderItem, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "uuid_"));
-		Assert.assertEquals(
-			Long.valueOf(commerceOrderItem.getGroupId()),
-			ReflectionTestUtil.<Long>invoke(
-				commerceOrderItem, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "groupId"));
-
-		Assert.assertEquals(
 			Long.valueOf(commerceOrderItem.getBookedQuantityId()),
 			ReflectionTestUtil.<Long>invoke(
 				commerceOrderItem, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "bookedQuantityId"));
 
 		Assert.assertEquals(
-			commerceOrderItem.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				commerceOrderItem, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(commerceOrderItem.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				commerceOrderItem, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			commerceOrderItem.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				commerceOrderItem, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CommerceOrderItem addCommerceOrderItem() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceOrderItem commerceOrderItem = _persistence.create(pk);
-
-		commerceOrderItem.setMvccVersion(RandomTestUtil.nextLong());
-
-		commerceOrderItem.setUuid(RandomTestUtil.randomString());
 
 		commerceOrderItem.setExternalReferenceCode(
 			RandomTestUtil.randomString());
@@ -994,17 +884,12 @@ public class CommerceOrderItemPersistenceTest {
 
 		commerceOrderItem.setCPInstanceId(RandomTestUtil.nextLong());
 
-		commerceOrderItem.setCPMeasurementUnitId(RandomTestUtil.nextLong());
-
 		commerceOrderItem.setCProductId(RandomTestUtil.nextLong());
 
 		commerceOrderItem.setParentCommerceOrderItemId(
 			RandomTestUtil.nextLong());
 
 		commerceOrderItem.setShippingAddressId(RandomTestUtil.nextLong());
-
-		commerceOrderItem.setDecimalQuantity(
-			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		commerceOrderItem.setDeliveryGroup(RandomTestUtil.randomString());
 
@@ -1024,9 +909,6 @@ public class CommerceOrderItemPersistenceTest {
 
 		commerceOrderItem.setDiscountAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrderItem.setDiscountManuallyAdjusted(
-			RandomTestUtil.randomBoolean());
 
 		commerceOrderItem.setDiscountPercentageLevel1(
 			new BigDecimal(RandomTestUtil.nextDouble()));
@@ -1073,9 +955,6 @@ public class CommerceOrderItemPersistenceTest {
 
 		commerceOrderItem.setName(RandomTestUtil.randomString());
 
-		commerceOrderItem.setPriceManuallyAdjusted(
-			RandomTestUtil.randomBoolean());
-
 		commerceOrderItem.setPrintedNote(RandomTestUtil.randomString());
 
 		commerceOrderItem.setPromoPrice(
@@ -1085,10 +964,6 @@ public class CommerceOrderItemPersistenceTest {
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		commerceOrderItem.setQuantity(RandomTestUtil.nextInt());
-
-		commerceOrderItem.setReplacedCPInstanceId(RandomTestUtil.nextLong());
-
-		commerceOrderItem.setReplacedSku(RandomTestUtil.randomString());
 
 		commerceOrderItem.setRequestedDeliveryDate(RandomTestUtil.nextDate());
 

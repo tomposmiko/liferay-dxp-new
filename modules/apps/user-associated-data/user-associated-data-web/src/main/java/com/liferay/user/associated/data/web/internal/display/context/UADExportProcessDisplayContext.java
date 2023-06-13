@@ -14,30 +14,27 @@
 
 package com.liferay.user.associated.data.web.internal.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.user.associated.data.constants.UserAssociatedDataPortletKeys;
 import com.liferay.user.associated.data.web.internal.export.background.task.UADExportBackgroundTaskManagerUtil;
-import com.liferay.user.associated.data.web.internal.util.UADLanguageUtil;
 
 import java.io.Serializable;
 
 import java.util.Comparator;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -73,7 +70,7 @@ public class UADExportProcessDisplayContext {
 	}
 
 	public Comparator<BackgroundTask> getComparator(
-		Locale locale, String orderByCol, String orderByType) {
+		String orderByCol, String orderByType) {
 
 		Comparator<BackgroundTask> comparator = Comparator.comparing(
 			BackgroundTask::getCreateDate);
@@ -88,16 +85,12 @@ public class UADExportProcessDisplayContext {
 					Map<String, Serializable> taskContextMap2 =
 						backgroundTask2.getTaskContextMap();
 
-					String applicationName1 =
-						UADLanguageUtil.getApplicationName(
-							(String)taskContextMap1.get("applicationKey"),
-							locale);
-					String applicationName2 =
-						UADLanguageUtil.getApplicationName(
-							(String)taskContextMap2.get("applicationKey"),
-							locale);
+					String applicationKey1 = (String)taskContextMap1.get(
+						"applicationKey");
+					String applicationKey2 = (String)taskContextMap2.get(
+						"applicationKey");
 
-					return applicationName1.compareTo(applicationName2);
+					return applicationKey1.compareTo(applicationKey2);
 				};
 		}
 
@@ -120,27 +113,23 @@ public class UADExportProcessDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
-			"export-order-by-col", "name");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
-			"export-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "desc");
 
 		return _orderByType;
 	}
@@ -202,32 +191,46 @@ public class UADExportProcessDisplayContext {
 
 		User selectedUser = PortalUtil.getSelectedUser(_httpServletRequest);
 
+		List<BackgroundTask> results = null;
+
 		if (navigation.equals("failed") || navigation.equals("in-progress") ||
 			navigation.equals("successful")) {
 
 			int status = getBackgroundTaskStatus(navigation);
 
-			searchContainer.setResultsAndTotal(
-				ListUtil.sort(
-					UADExportBackgroundTaskManagerUtil.getBackgroundTasks(
-						themeDisplay.getScopeGroupId(),
-						selectedUser.getUserId(), status),
-					getComparator(
-						themeDisplay.getLocale(),
-						searchContainer.getOrderByCol(),
-						searchContainer.getOrderByType())));
+			searchContainer.setTotal(
+				UADExportBackgroundTaskManagerUtil.getBackgroundTasksCount(
+					themeDisplay.getScopeGroupId(), selectedUser.getUserId(),
+					status));
+
+			results = UADExportBackgroundTaskManagerUtil.getBackgroundTasks(
+				themeDisplay.getScopeGroupId(), selectedUser.getUserId(),
+				status);
 		}
 		else {
-			searchContainer.setResultsAndTotal(
-				ListUtil.sort(
-					UADExportBackgroundTaskManagerUtil.getBackgroundTasks(
-						themeDisplay.getScopeGroupId(),
-						selectedUser.getUserId()),
-					getComparator(
-						themeDisplay.getLocale(),
-						searchContainer.getOrderByCol(),
-						searchContainer.getOrderByType())));
+			searchContainer.setTotal(
+				UADExportBackgroundTaskManagerUtil.getBackgroundTasksCount(
+					themeDisplay.getScopeGroupId(), selectedUser.getUserId()));
+
+			results = UADExportBackgroundTaskManagerUtil.getBackgroundTasks(
+				themeDisplay.getScopeGroupId(), selectedUser.getUserId());
 		}
+
+		Stream<BackgroundTask> backgroundTaskStream = results.stream();
+
+		results = backgroundTaskStream.sorted(
+			getComparator(
+				searchContainer.getOrderByCol(),
+				searchContainer.getOrderByType())
+		).skip(
+			searchContainer.getStart()
+		).limit(
+			searchContainer.getDelta()
+		).collect(
+			Collectors.toList()
+		);
+
+		searchContainer.setResults(results);
 
 		_searchContainer = searchContainer;
 

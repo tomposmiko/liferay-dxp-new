@@ -46,36 +46,24 @@ public class ProjectTemplatesSpringPortletMVCTest
 	public static final MavenExecutor mavenExecutor = new MavenExecutor();
 
 	@Parameterized.Parameters(
-		name = "Testcase-{index}: testing {0}, {1}, {2}, {3}, {4}"
+		name = "Testcase-{index}: testing {0}, {1}, {2}, {3}"
 	)
 	public static Iterable<Object[]> data() {
 		return Arrays.asList(
 			new Object[][] {
-				{"springportletmvc", "embedded", "jsp", "dxp", "7.0.10.17"},
-				{"springportletmvc", "embedded", "jsp", "dxp", "7.1.10.7"},
-				{"springportletmvc", "embedded", "jsp", "dxp", "7.2.10.7"},
-				{"springportletmvc", "embedded", "jsp", "portal", "7.3.7"},
-				{"springportletmvc", "embedded", "jsp", "portal", "7.4.3.29"},
-				{"portletmvc4spring", "embedded", "jsp", "dxp", "7.1.10.7"},
-				{"portletmvc4spring", "embedded", "jsp", "dxp", "7.2.10.7"},
-				{"portletmvc4spring", "embedded", "jsp", "portal", "7.3.7"},
-				{"portletmvc4spring", "embedded", "jsp", "portal", "7.4.3.29"},
-				{
-					"portletmvc4spring", "embedded", "thymeleaf", "dxp",
-					"7.1.10.7"
-				},
-				{
-					"portletmvc4spring", "embedded", "thymeleaf", "dxp",
-					"7.2.10.7"
-				},
-				{
-					"portletmvc4spring", "embedded", "thymeleaf", "portal",
-					"7.3.7"
-				},
-				{
-					"portletmvc4spring", "embedded", "thymeleaf", "portal",
-					"7.4.3.29"
-				}
+				{"springportletmvc", "embedded", "jsp", "7.0.6-2"},
+				{"springportletmvc", "embedded", "jsp", "7.1.3-1"},
+				{"springportletmvc", "embedded", "jsp", "7.2.1-1"},
+				{"springportletmvc", "embedded", "jsp", "7.3.7"},
+				{"springportletmvc", "embedded", "jsp", "7.4.2-1"},
+				{"portletmvc4spring", "embedded", "jsp", "7.1.3-1"},
+				{"portletmvc4spring", "embedded", "jsp", "7.2.1-1"},
+				{"portletmvc4spring", "embedded", "jsp", "7.3.7"},
+				{"portletmvc4spring", "embedded", "jsp", "7.4.2-1"},
+				{"portletmvc4spring", "embedded", "thymeleaf", "7.1.3-1"},
+				{"portletmvc4spring", "embedded", "thymeleaf", "7.2.1-1"},
+				{"portletmvc4spring", "embedded", "thymeleaf", "7.3.7"},
+				{"portletmvc4spring", "embedded", "thymeleaf", "7.4.2-1"}
 			});
 	}
 
@@ -97,12 +85,11 @@ public class ProjectTemplatesSpringPortletMVCTest
 
 	public ProjectTemplatesSpringPortletMVCTest(
 		String framework, String frameworkDependencies, String viewType,
-		String liferayProduct, String liferayVersion) {
+		String liferayVersion) {
 
 		_framework = framework;
 		_frameworkDependencies = frameworkDependencies;
 		_viewType = viewType;
-		_liferayProduct = liferayProduct;
 		_liferayVersion = liferayVersion;
 	}
 
@@ -111,15 +98,6 @@ public class ProjectTemplatesSpringPortletMVCTest
 		File gradleWorkspaceDir = buildWorkspace(
 			temporaryFolder, "gradle", "gradleWS", _liferayVersion,
 			mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			_liferayVersion);
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				gradleWorkspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
 
 		File gradleWorkspaceModulesDir = new File(
 			gradleWorkspaceDir, "modules");
@@ -230,26 +208,23 @@ public class ProjectTemplatesSpringPortletMVCTest
 
 			return buildTemplateWithMaven(
 				destinationDir, destinationDir, template, name, groupId,
-				mavenExecutor, "-DclassName=Sample", "-Dframework=" + framework,
+				mavenExecutor, "-Dpackage=com.test", "-DclassName=Sample",
+				"-Dframework=" + framework,
 				"-DframeworkDependencies=" + frameworkDependencies,
-				"-DliferayProduct=" + _liferayProduct,
-				"-DliferayVersion=" + liferayVersion, "-Dpackage=com.test",
-				"-DviewType=" + viewType);
+				"-DviewType=" + viewType, "-DliferayVersion=" + liferayVersion);
 		}
 
 		return buildTemplateWithGradle(
-			destinationDir, template, name, "--class-name", "Sample",
-			"--framework", framework, "--framework-dependencies",
-			frameworkDependencies, "--liferay-product", _liferayProduct,
-			"--liferay-version", liferayVersion, "--package-name", "com.test",
-			"--view-type", viewType);
+			destinationDir, template, name, "--package-name", "com.test",
+			"--class-name", "Sample", "--framework", framework,
+			"--framework-dependencies", frameworkDependencies, "--view-type",
+			viewType, "--liferay-version", liferayVersion);
 	}
 
 	private static URI _gradleDistribution;
 
 	private final String _framework;
 	private final String _frameworkDependencies;
-	private final String _liferayProduct;
 	private final String _liferayVersion;
 	private final String _viewType;
 

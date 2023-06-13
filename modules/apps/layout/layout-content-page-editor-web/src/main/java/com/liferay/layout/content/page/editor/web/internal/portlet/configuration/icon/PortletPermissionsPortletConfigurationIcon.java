@@ -14,8 +14,11 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.configuration.icon;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -25,13 +28,14 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -44,6 +48,7 @@ import java.util.Objects;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,29 +58,40 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class PortletPermissionsPortletConfigurationIcon
 	extends BasePortletConfigurationIcon {
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "permissions");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "permissions");
+	}
+
+	@Override
+	public String getOnClick(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		try {
+			return StringBundler.concat(
+				"Liferay.Util.openModal({title: '",
+				HtmlUtil.escapeJS(getMessage(portletRequest)), "', url: '",
+				_generatePermissionURL(portletRequest), "'});");
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+
+		return StringPool.BLANK;
 	}
 
 	@Override
 	public String getURL(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		try {
-			return _generatePermissionURL(portletRequest);
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-		}
-
-		return null;
+		return "javascript:;";
 	}
 
 	@Override
@@ -127,16 +143,16 @@ public class PortletPermissionsPortletConfigurationIcon
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 
 				showPermissionsIcon = false;
 			}
 		}
 
-		if (layout.isEmbeddedPersonalApplication() ||
-			layout.isLayoutPrototypeLinkActive() ||
-			layout.isTypeControlPanel()) {
+		if (layout.isLayoutPrototypeLinkActive() ||
+			layout.isTypeControlPanel() ||
+			isEmbeddedPersonalApplicationLayout(layout)) {
 
 			showPermissionsIcon = false;
 		}
@@ -151,11 +167,18 @@ public class PortletPermissionsPortletConfigurationIcon
 
 	@Override
 	public boolean isUseDialog() {
-		return true;
+		return false;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortletLocalService(
+		PortletLocalService portletLocalService) {
+
+		_portletLocalService = portletLocalService;
 	}
 
 	private String _generatePermissionURL(PortletRequest portletRequest)
-		throws PortalException {
+		throws PortalException, WindowStateException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -194,9 +217,8 @@ public class PortletPermissionsPortletConfigurationIcon
 		PortletPermissionsPortletConfigurationIcon.class);
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
+
+	private PortletLocalService _portletLocalService;
 
 }

@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -210,17 +210,17 @@ public class SecurityTest extends BaseClientTestCase {
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE),
 				Collections.singletonList("everything"));
 
-			createOAuth2ApplicationWithNone(
-				defaultCompanyId, user, "oauthTestApplicationCodePKCE",
+			createOAuth2Application(
+				defaultCompanyId, user, "oauthTestApplicationCodePKCE", null,
 				Collections.singletonList(GrantType.AUTHORIZATION_CODE_PKCE),
-				Collections.singletonList("http://redirecturi:8080"), false,
-				Collections.singletonList("everything"), false);
+				Collections.singletonList("http://redirecturi:8080"),
+				Collections.singletonList("everything"));
 
 			Company company = CompanyLocalServiceUtil.getCompany(
 				defaultCompanyId);
 
 			createOAuth2Application(
-				defaultCompanyId, company.getGuestUser(),
+				defaultCompanyId, company.getDefaultUser(),
 				"oauthTestApplicationDefaultUser");
 		}
 
@@ -248,7 +248,7 @@ public class SecurityTest extends BaseClientTestCase {
 					"from which state is extracted");
 		}
 
-		Map<String, String[]> parameterMap = HttpComponentsUtil.getParameterMap(
+		Map<String, String[]> parameterMap = HttpUtil.getParameterMap(
 			uri.getQuery());
 
 		if (!parameterMap.containsKey("state")) {

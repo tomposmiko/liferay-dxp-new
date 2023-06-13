@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.web.internal.facet.display.context.builder.AssetTagsSearchFacetDisplayContextBuilder;
+import com.liferay.portal.search.web.internal.facet.display.builder.AssetTagsSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.tag.facet.constants.TagFacetPortletKeys;
 
 import javax.portlet.PortletConfig;
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + TagFacetPortletKeys.TAG_FACET,
 	service = ConfigurationAction.class
 )
@@ -54,23 +55,21 @@ public class TagFacetConfigurationAction extends DefaultConfigurationAction {
 			(RenderRequest)httpServletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_REQUEST);
 
-		AssetTagsSearchFacetDisplayContextBuilder
-			assetTagsSearchFacetDisplayContextBuilder =
-				_createAssetTagsSearchFacetDisplayContextBuilder(renderRequest);
+		AssetTagsSearchFacetDisplayBuilder assetTagsSearchFacetDisplayBuilder =
+			createAssetTagsSearchFacetDisplayBuilder(renderRequest);
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			assetTagsSearchFacetDisplayContextBuilder.build());
+			assetTagsSearchFacetDisplayBuilder.build());
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
 
-	private AssetTagsSearchFacetDisplayContextBuilder
-		_createAssetTagsSearchFacetDisplayContextBuilder(
-			RenderRequest renderRequest) {
+	protected AssetTagsSearchFacetDisplayBuilder
+		createAssetTagsSearchFacetDisplayBuilder(RenderRequest renderRequest) {
 
 		try {
-			return new AssetTagsSearchFacetDisplayContextBuilder(renderRequest);
+			return new AssetTagsSearchFacetDisplayBuilder(renderRequest);
 		}
 		catch (ConfigurationException configurationException) {
 			throw new RuntimeException(configurationException);

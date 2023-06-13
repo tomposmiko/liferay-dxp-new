@@ -17,29 +17,17 @@
 <%@ include file="/add_to_cart/init.jsp" %>
 
 <%
-String spaceDirection = GetterUtil.getBoolean(inline) ? "ml" : "mt";
-String spacer = size.equals("sm") ? "1" : "3";
-
-String buttonCssClasses = "btn btn-add-to-cart btn-" + size + " " + spaceDirection + "-" + spacer;
-
-String selectorCssClasses = "form-control quantity-selector form-control-" + size;
+String buttonCssClasses = "btn btn-add-to-cart";
+String selectorCssClasses = "form-control quantity-selector";
 String wrapperCssClasses = "add-to-cart-wrapper align-items-center d-flex";
 
-if (GetterUtil.getBoolean(iconOnly)) {
-	buttonCssClasses = buttonCssClasses.concat(" icon-only");
-}
-
-if (!GetterUtil.getBoolean(inline)) {
+if (GetterUtil.getBoolean(block)) {
+	buttonCssClasses = buttonCssClasses.concat(" btn-block");
 	wrapperCssClasses = wrapperCssClasses.concat(" flex-column");
 }
-
-if (alignment.equals("center")) {
-	wrapperCssClasses = wrapperCssClasses.concat(" align-items-center");
-}
-
-if (alignment.equals("full-width")) {
-	buttonCssClasses = buttonCssClasses.concat(" btn-block");
-	wrapperCssClasses = wrapperCssClasses.concat(" align-items-center");
+else {
+	buttonCssClasses = buttonCssClasses.concat(" btn-lg");
+	selectorCssClasses = selectorCssClasses.concat(" form-control-lg");
 }
 %>
 
@@ -54,28 +42,26 @@ if (alignment.equals("full-width")) {
 </div>
 
 <aui:script require="commerce-frontend-js/components/add_to_cart/entry as AddToCart">
-	const props = {
-		accountId: <%= commerceAccountId %>,
-		cartId: <%= commerceOrderId %>,
+	const initialProps = {
 		channel: {
 			currencyCode: '<%= commerceCurrencyCode %>',
 			groupId: <%= commerceChannelGroupId %>,
 			id: <%= commerceChannelId %>,
 		},
 		cpInstance: {
+			accountId: <%= commerceAccountId %>,
 			inCart: <%= inCart %>,
+			options: '<%= options %>',
 			skuId: <%= cpInstanceId %>,
-			skuOptions: <%= skuOptions %> || [],
 			stockQuantity: <%= stockQuantity %>,
 		},
-		disabled: <%= disabled %>,
+		orderId: <%= commerceOrderId %>,
 		settings: {
-			alignment: '<%= alignment %>',
-			iconOnly: <%= iconOnly %>,
-			inline: <%= inline %>,
+			block: <%= block %>,
+			disabled: <%= disabled %>,
 			namespace: '<%= namespace %>',
-			size: '<%= size %>',
 		},
+		spritemap: '<%= spritemap %>',
 	};
 
 	<c:if test="<%= productSettingsModel != null %>">
@@ -84,16 +70,8 @@ if (alignment.equals("full-width")) {
 		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
 		%>
 
-		const productConfiguration = <%= jsonSerializer.serializeDeep(productSettingsModel) %>;
-
-		props.settings.productConfiguration = {
-			allowBackOrder: productConfiguration.backOrders,
-			allowedOrderQuantities: productConfiguration.allowedQuantities,
-			maxOrderQuantity: productConfiguration.maxQuantity,
-			minOrderQuantity: productConfiguration.minQuantity,
-			multipleOrderQuantity: productConfiguration.multipleQuantity,
-		};
+		initialProps.settings.withQuantity = <%= jsonSerializer.serializeDeep(productSettingsModel) %>;
 	</c:if>
 
-	AddToCart.default('<%= addToCartId %>', '<%= addToCartId %>', props);
+	AddToCart.default('<%= addToCartId %>', '<%= addToCartId %>', initialProps);
 </aui:script>

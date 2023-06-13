@@ -16,9 +16,10 @@ package com.liferay.frontend.editor.alloyeditor.web.internal.editor.configuratio
 
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
@@ -27,7 +28,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Sergio González
@@ -81,43 +81,46 @@ public class AlloyEditorConfigContributor
 	protected JSONArray getStyleFormatsJSONArray(Locale locale) {
 		return JSONUtil.putAll(
 			getStyleFormatJSONObject(
-				_language.get(locale, "normal"), "p", null,
+				LanguageUtil.get(locale, "normal"), "p", null,
 				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "1"), "h1", null,
+				LanguageUtil.format(locale, "heading-x", "1"), "h1", null,
 				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "2"), "h2", null,
+				LanguageUtil.format(locale, "heading-x", "2"), "h2", null,
 				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "3"), "h3", null,
+				LanguageUtil.format(locale, "heading-x", "3"), "h3", null,
 				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "4"), "h4", null,
+				LanguageUtil.format(locale, "heading-x", "4"), "h4", null,
 				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.get(locale, "preformatted-text"), "pre", null,
+				LanguageUtil.get(locale, "preformatted-text"), "pre", null,
 				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.get(locale, "cited-work"), "cite", null,
+				LanguageUtil.get(locale, "cited-work"), "cite", null,
 				_CKEDITOR_STYLE_INLINE),
 			getStyleFormatJSONObject(
-				_language.get(locale, "computer-code"), "code", null,
+				LanguageUtil.get(locale, "computer-code"), "code", null,
 				_CKEDITOR_STYLE_INLINE),
 			getStyleFormatJSONObject(
-				_language.get(locale, "info-message"), "div",
+				LanguageUtil.get(locale, "info-message"), "div",
 				"overflow-auto portlet-msg-info", _CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.get(locale, "alert-message"), "div",
+				LanguageUtil.get(locale, "alert-message"), "div",
 				"overflow-auto portlet-msg-alert", _CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.get(locale, "error-message"), "div",
+				LanguageUtil.get(locale, "error-message"), "div",
 				"overflow-auto portlet-msg-error", _CKEDITOR_STYLE_BLOCK));
 	}
 
 	protected JSONObject getStyleFormatsJSONObject(Locale locale) {
+		JSONObject stylesJSONObject = JSONUtil.put(
+			"styles", getStyleFormatsJSONArray(locale));
+
 		return JSONUtil.put(
-			"cfg", JSONUtil.put("styles", getStyleFormatsJSONArray(locale))
+			"cfg", stylesJSONObject
 		).put(
 			"name", "styles"
 		);
@@ -126,20 +129,21 @@ public class AlloyEditorConfigContributor
 	protected JSONObject getStyleJSONObject(
 		String element, String cssClass, int type) {
 
-		return JSONUtil.put(
-			"attributes",
-			() -> {
-				if (Validator.isNotNull(cssClass)) {
-					return JSONUtil.put("class", cssClass);
-				}
+		JSONObject styleJSONObject = JSONFactoryUtil.createJSONObject();
 
-				return null;
-			}
-		).put(
+		if (Validator.isNotNull(cssClass)) {
+			JSONObject attributesJSONObject = JSONUtil.put("class", cssClass);
+
+			styleJSONObject.put("attributes", attributesJSONObject);
+		}
+
+		styleJSONObject.put(
 			"element", element
 		).put(
 			"type", type
 		);
+
+		return styleJSONObject;
 	}
 
 	protected JSONObject getToolbarsAddJSONObject() {
@@ -166,11 +170,36 @@ public class AlloyEditorConfigContributor
 		);
 	}
 
+	protected JSONObject getToolbarsStylesSelectionsEmbedURLJSONObject() {
+		return JSONUtil.put(
+			"buttons", toJSONArray("['imageLeft', 'imageCenter', 'imageRight']")
+		).put(
+			"name", "embedurl"
+		).put(
+			"test", "AlloyEditor.SelectionTest.embedUrl"
+		);
+	}
+
+	protected JSONObject getToolbarsStylesSelectionsImageJSONObject() {
+		return JSONUtil.put(
+			"buttons",
+			toJSONArray(
+				"['imageLeft', 'imageCenter', 'imageRight', 'linkBrowse', " +
+					"'imageAlt']")
+		).put(
+			"name", "image"
+		).put(
+			"setPosition", "AlloyEditor.SelectionSetPosition.image"
+		).put(
+			"test", "AlloyEditor.SelectionTest.image"
+		);
+	}
+
 	protected JSONArray getToolbarsStylesSelectionsJSONArray(Locale locale) {
 		return JSONUtil.putAll(
-			_getToolbarsStylesSelectionsEmbedURLJSONObject(),
+			getToolbarsStylesSelectionsEmbedURLJSONObject(),
 			getToolbarsStylesSelectionsLinkJSONObject(),
-			_getToolbarsStylesSelectionsImageJSONObject(),
+			getToolbarsStylesSelectionsImageJSONObject(),
 			getToolbarsStylesSelectionsTextJSONObject(locale),
 			getToolbarsStylesSelectionsTableJSONObject());
 	}
@@ -218,36 +247,8 @@ public class AlloyEditorConfigContributor
 		);
 	}
 
-	private JSONObject _getToolbarsStylesSelectionsEmbedURLJSONObject() {
-		return JSONUtil.put(
-			"buttons", toJSONArray("['imageLeft', 'imageCenter', 'imageRight']")
-		).put(
-			"name", "embedurl"
-		).put(
-			"test", "AlloyEditor.SelectionTest.embedUrl"
-		);
-	}
-
-	private JSONObject _getToolbarsStylesSelectionsImageJSONObject() {
-		return JSONUtil.put(
-			"buttons",
-			toJSONArray(
-				"['imageLeft', 'imageCenter', 'imageRight', 'linkBrowse', " +
-					"'imageAlt']")
-		).put(
-			"name", "image"
-		).put(
-			"setPosition", "AlloyEditor.SelectionSetPosition.image"
-		).put(
-			"test", "AlloyEditor.SelectionTest.image"
-		);
-	}
-
 	private static final int _CKEDITOR_STYLE_BLOCK = 1;
 
 	private static final int _CKEDITOR_STYLE_INLINE = 2;
-
-	@Reference
-	private Language _language;
 
 }

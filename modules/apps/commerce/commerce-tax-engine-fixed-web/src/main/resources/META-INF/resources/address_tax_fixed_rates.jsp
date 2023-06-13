@@ -40,7 +40,7 @@ CommerceTaxFixedRateAddressRelsDisplayContext commerceTaxFixedRateAddressRelsDis
 	<commerce-ui:panel
 		bodyClasses="p-0"
 	>
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			contextParams='<%=
 				HashMapBuilder.<String, String>put(
 					"commerceChannelId", String.valueOf(commerceTaxFixedRateAddressRelsDisplayContext.getCommerceChannelId())
@@ -49,9 +49,12 @@ CommerceTaxFixedRateAddressRelsDisplayContext commerceTaxFixedRateAddressRelsDis
 				).build()
 			%>'
 			creationMenu="<%= commerceTaxFixedRateAddressRelsDisplayContext.getCreationMenu() %>"
-			dataProviderKey="<%= CommerceTaxRateSettingFDSNames.TAX_RATE_SETTING %>"
+			dataProviderKey="<%= CommerceTaxRateSettingDataSetConstants.COMMERCE_DATA_SET_KEY_TAX_RATE_SETTING %>"
 			id="<%= commerceTaxFixedRateAddressRelsDisplayContext.getDatasetView() %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= commerceTaxFixedRateAddressRelsDisplayContext.getPortletURL() %>"
 			selectedItemsKey="taxRateSettingId"
 		/>
 	</commerce-ui:panel>

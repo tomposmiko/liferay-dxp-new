@@ -15,6 +15,4 @@
 import launcher from '../../utilities/launcher';
 import Price from './Price';
 
-export default function entry(...data) {
-	return launcher(Price, ...data);
-}
+export default (...data) => launcher(Price, ...data);

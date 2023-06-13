@@ -14,9 +14,6 @@
 
 package com.liferay.portal.bean;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -49,10 +46,6 @@ public class VelocityBeanHandler implements InvocationHandler {
 			return method.invoke(_bean, arguments);
 		}
 		catch (InvocationTargetException invocationTargetException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(invocationTargetException);
-			}
-
 			return null;
 		}
 		finally {
@@ -63,9 +56,6 @@ public class VelocityBeanHandler implements InvocationHandler {
 			}
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		VelocityBeanHandler.class);
 
 	private final Object _bean;
 	private final ClassLoader _classLoader;

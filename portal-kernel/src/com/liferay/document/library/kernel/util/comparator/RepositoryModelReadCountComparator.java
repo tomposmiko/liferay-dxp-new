@@ -144,7 +144,7 @@ public class RepositoryModelReadCountComparator<T>
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return 0;
@@ -165,10 +165,11 @@ public class RepositoryModelReadCountComparator<T>
 		else if (object instanceof DLFolder || object instanceof Folder) {
 			return 0;
 		}
+		else {
+			FileEntry fileEntry = (FileEntry)object;
 
-		FileEntry fileEntry = (FileEntry)object;
-
-		return fileEntry.getReadCount();
+			return fileEntry.getReadCount();
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

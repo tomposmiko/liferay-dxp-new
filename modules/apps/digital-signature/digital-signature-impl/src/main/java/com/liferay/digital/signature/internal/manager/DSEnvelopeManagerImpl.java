@@ -49,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = DSEnvelopeManager.class)
+@Component(immediate = true, service = DSEnvelopeManager.class)
 public class DSEnvelopeManagerImpl implements DSEnvelopeManager {
 
 	@Override
@@ -197,7 +197,6 @@ public class DSEnvelopeManagerImpl implements DSEnvelopeManager {
 					emailAddress = signerJSONObject.getString("email");
 					name = signerJSONObject.getString("name");
 					status = signerJSONObject.getString("status");
-					tabsJSONObject = signerJSONObject.getJSONObject("tabs");
 				}
 			},
 			_log);
@@ -258,10 +257,6 @@ public class DSEnvelopeManagerImpl implements DSEnvelopeManager {
 	}
 
 	private LocalDateTime _toLocalDateTime(String localDateTimeString) {
-		if (Validator.isNull(localDateTimeString)) {
-			return null;
-		}
-
 		try {
 			return LocalDateTime.parse(
 				localDateTimeString,
@@ -269,9 +264,7 @@ public class DSEnvelopeManagerImpl implements DSEnvelopeManager {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Invalid local date time " + localDateTimeString,
-					exception);
+				_log.warn("Invalid local date time " + localDateTimeString);
 			}
 
 			return null;

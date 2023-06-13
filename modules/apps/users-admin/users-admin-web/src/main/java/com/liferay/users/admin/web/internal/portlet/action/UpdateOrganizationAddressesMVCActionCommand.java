@@ -28,13 +28,15 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.OrganizationService;
-import com.liferay.portal.kernel.service.permission.OrganizationPermission;
+import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.List;
 
@@ -48,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
@@ -64,7 +67,7 @@ public class UpdateOrganizationAddressesMVCActionCommand
 		throws Exception {
 
 		try {
-			_updateAddresses(actionRequest);
+			updateAddresses(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchOrganizationException ||
@@ -93,7 +96,7 @@ public class UpdateOrganizationAddressesMVCActionCommand
 		}
 	}
 
-	private void _updateAddresses(ActionRequest actionRequest)
+	protected void updateAddresses(ActionRequest actionRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -102,12 +105,12 @@ public class UpdateOrganizationAddressesMVCActionCommand
 		long organizationId = ParamUtil.getLong(
 			actionRequest, "organizationId");
 
-		_organizationPermission.check(
+		OrganizationPermissionUtil.check(
 			themeDisplay.getPermissionChecker(),
 			_organizationService.getOrganization(organizationId),
 			ActionKeys.UPDATE);
 
-		List<Address> addresses = _usersAdmin.getAddresses(actionRequest);
+		List<Address> addresses = UsersAdminUtil.getAddresses(actionRequest);
 
 		if (addresses != null) {
 			_usersAdmin.updateAddresses(
@@ -116,10 +119,10 @@ public class UpdateOrganizationAddressesMVCActionCommand
 	}
 
 	@Reference
-	private OrganizationPermission _organizationPermission;
+	private OrganizationService _organizationService;
 
 	@Reference
-	private OrganizationService _organizationService;
+	private Portal _portal;
 
 	@Reference
 	private UsersAdmin _usersAdmin;

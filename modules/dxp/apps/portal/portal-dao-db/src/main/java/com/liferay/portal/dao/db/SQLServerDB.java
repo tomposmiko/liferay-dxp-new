@@ -16,15 +16,11 @@ package com.liferay.portal.dao.db;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.db.Index;
-import com.liferay.portal.kernel.dao.db.IndexMetadata;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 
@@ -47,50 +43,6 @@ public class SQLServerDB extends BaseDB {
 
 	public SQLServerDB(int majorVersion, int minorVersion) {
 		super(DBType.SQLSERVER, majorVersion, minorVersion);
-	}
-
-	@Override
-	public void alterColumnType(
-			Connection connection, String tableName, String columnName,
-			String newColumnType)
-		throws Exception {
-
-		List<IndexMetadata> indexMetadatas = dropIndexes(
-			connection, tableName, columnName);
-
-		String[] primaryKeyColumnNames = getPrimaryKeyColumnNames(
-			connection, tableName);
-
-		DBInspector dbInspector = new DBInspector(connection);
-
-		boolean primaryKey = ArrayUtil.contains(
-			primaryKeyColumnNames, dbInspector.normalizeName(columnName));
-
-		if (primaryKey) {
-			removePrimaryKey(connection, tableName);
-		}
-
-		super.alterColumnType(connection, tableName, columnName, newColumnType);
-
-		if (primaryKey) {
-			addPrimaryKey(connection, tableName, primaryKeyColumnNames);
-		}
-
-		if (!indexMetadatas.isEmpty()) {
-			addIndexes(connection, indexMetadatas);
-		}
-	}
-
-	@Override
-	public void alterTableDropColumn(
-			Connection connection, String tableName, String columnName)
-		throws Exception {
-
-		dropIndexes(connection, tableName, columnName);
-
-		_dropDefaultConstraint(connection, tableName, columnName);
-
-		super.alterTableDropColumn(connection, tableName, columnName);
 	}
 
 	@Override
@@ -160,74 +112,8 @@ public class SQLServerDB extends BaseDB {
 	}
 
 	@Override
-	public void removePrimaryKey(Connection connection, String tableName)
-		throws Exception {
-
-		DatabaseMetaData databaseMetaData = connection.getMetaData();
-
-		DBInspector dbInspector = new DBInspector(connection);
-
-		String normalizedTableName = dbInspector.normalizeName(
-			tableName, databaseMetaData);
-
-		if (!dbInspector.hasTable(normalizedTableName)) {
-			throw new SQLException(
-				StringBundler.concat(
-					"Table ", normalizedTableName, " does not exist"));
-		}
-
-		String primaryKeyConstraintName = null;
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				"select name from sys.key_constraints where type = 'PK' and " +
-					"OBJECT_NAME(parent_object_id) = ?")) {
-
-			preparedStatement.setString(1, normalizedTableName);
-
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				if (resultSet.next()) {
-					primaryKeyConstraintName = resultSet.getString("name");
-				}
-			}
-		}
-
-		if (primaryKeyConstraintName == null) {
-			throw new SQLException(
-				"No primary key constraint found for " + normalizedTableName);
-		}
-
-		if (dbInspector.hasIndex(
-				normalizedTableName, primaryKeyConstraintName)) {
-
-			runSQL(
-				StringBundler.concat(
-					"alter table ", normalizedTableName, " drop constraint ",
-					primaryKeyConstraintName));
-		}
-		else {
-			throw new SQLException(
-				StringBundler.concat(
-					"Primary key with name ", primaryKeyConstraintName,
-					" does not exist"));
-		}
-	}
-
-	protected String getCopyTableStructureSQL(
-		String tableName, String newTableName) {
-
-		return StringBundler.concat(
-			"select * into ", newTableName, " from ", tableName,
-			" where 1 = 0");
-	}
-
-	@Override
 	protected int[] getSQLTypes() {
 		return _SQL_TYPES;
-	}
-
-	@Override
-	protected int[] getSQLVarcharSizes() {
-		return _SQL_VARCHAR_SIZES;
 	}
 
 	@Override
@@ -293,42 +179,6 @@ public class SQLServerDB extends BaseDB {
 		}
 	}
 
-	private void _dropDefaultConstraint(
-			Connection connection, String tableName, String columnName)
-		throws Exception {
-
-		String defaultConstraintName = null;
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				StringBundler.concat(
-					"select default_constraints.name from sys.",
-					"default_constraints inner join sys.tables on ",
-					"default_constraints.parent_object_id = tables.object_id ",
-					"inner join sys.columns on default_constraints.",
-					"parent_object_id = columns.object_id and ",
-					"default_constraints.parent_column_id = columns.column_id ",
-					"where tables.name = ? and columns.name = ?"))) {
-
-			preparedStatement.setString(1, tableName);
-			preparedStatement.setString(2, columnName);
-
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				if (resultSet.next()) {
-					defaultConstraintName = resultSet.getString("name");
-				}
-			}
-		}
-
-		if (Validator.isNull(defaultConstraintName)) {
-			return;
-		}
-
-		runSQL(
-			StringBundler.concat(
-				"alter table ", tableName, " drop constraint ",
-				defaultConstraintName));
-	}
-
 	private static final String[] _SQL_SERVER = {
 		"--", "1", "0", "'19700101'", "GetDate()", " image", " image", " bit",
 		" datetime2(6)", " float", " int", " bigint", " nvarchar(4000)",
@@ -337,16 +187,10 @@ public class SQLServerDB extends BaseDB {
 
 	private static final int _SQL_SERVER_2000 = 8;
 
-	private static final int _SQL_STRING_SIZE = 4000;
-
 	private static final int[] _SQL_TYPES = {
 		Types.LONGVARBINARY, Types.LONGVARBINARY, Types.BIT, Types.TIMESTAMP,
 		Types.DOUBLE, Types.INTEGER, Types.BIGINT, Types.NVARCHAR,
 		Types.NVARCHAR, Types.NVARCHAR
-	};
-
-	private static final int[] _SQL_VARCHAR_SIZES = {
-		_SQL_STRING_SIZE, SQL_VARCHAR_MAX_SIZE
 	};
 
 	private static final boolean _SUPPORTS_NEW_UUID_FUNCTION = true;

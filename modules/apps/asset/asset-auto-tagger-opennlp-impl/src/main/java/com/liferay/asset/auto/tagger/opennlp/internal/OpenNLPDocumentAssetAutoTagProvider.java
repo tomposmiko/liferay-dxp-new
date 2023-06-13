@@ -17,7 +17,7 @@ package com.liferay.asset.auto.tagger.opennlp.internal;
 import com.liferay.asset.auto.tagger.AssetAutoTagProvider;
 import com.liferay.asset.auto.tagger.opennlp.internal.configuration.OpenNLPDocumentAssetAutoTaggerCompanyConfiguration;
 import com.liferay.asset.auto.tagger.text.extractor.TextExtractor;
-import com.liferay.asset.auto.tagger.text.extractor.TextExtractorRegistry;
+import com.liferay.asset.auto.tagger.text.extractor.TextExtractorTracker;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.portal.kernel.log.Log;
@@ -50,7 +50,7 @@ public class OpenNLPDocumentAssetAutoTagProvider
 			if (_isEnabled(assetEntry)) {
 				TextExtractor<Object> textExtractor =
 					(TextExtractor<Object>)
-						_textExtractorRegistry.getTextExtractor(
+						_textExtractorTracker.getTextExtractor(
 							assetEntry.getClassName());
 
 				if (textExtractor != null) {
@@ -67,7 +67,7 @@ public class OpenNLPDocumentAssetAutoTagProvider
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -84,13 +84,13 @@ public class OpenNLPDocumentAssetAutoTagProvider
 		throws ConfigurationException {
 
 		OpenNLPDocumentAssetAutoTaggerCompanyConfiguration
-			openNLPDocumentAssetAutoTaggerCompanyConfiguration =
+			openNLPDocumentAssetAutoTagProviderCompanyConfiguration =
 				_configurationProvider.getCompanyConfiguration(
 					OpenNLPDocumentAssetAutoTaggerCompanyConfiguration.class,
 					assetEntry.getCompanyId());
 
 		return ArrayUtil.contains(
-			openNLPDocumentAssetAutoTaggerCompanyConfiguration.
+			openNLPDocumentAssetAutoTagProviderCompanyConfiguration.
 				enabledClassNames(),
 			assetEntry.getClassName());
 	}
@@ -106,6 +106,6 @@ public class OpenNLPDocumentAssetAutoTagProvider
 		_openNLPDocumentAssetAutoTaggerImpl;
 
 	@Reference
-	private TextExtractorRegistry _textExtractorRegistry;
+	private TextExtractorTracker _textExtractorTracker;
 
 }

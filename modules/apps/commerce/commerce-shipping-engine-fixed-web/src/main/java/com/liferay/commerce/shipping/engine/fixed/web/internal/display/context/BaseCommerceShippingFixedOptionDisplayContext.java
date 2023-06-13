@@ -20,9 +20,9 @@ import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -143,7 +143,7 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 			}
 		).setParameter(
 			"screenNavigationCategoryKey",
-			_getSelectedScreenNavigationCategoryKey()
+			getSelectedScreenNavigationCategoryKey()
 		).buildPortletURL();
 	}
 
@@ -152,7 +152,7 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 	}
 
 	public BigDecimal round(BigDecimal value) throws PortalException {
-		CommerceCurrency commerceCurrency = _getCommerceCurrency();
+		CommerceCurrency commerceCurrency = getCommerceCurrency();
 
 		if (commerceCurrency == null) {
 			return value;
@@ -161,13 +161,7 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 		return commerceCurrency.round(value);
 	}
 
-	protected final CommerceChannelLocalService commerceChannelLocalService;
-	protected final CommerceCurrencyLocalService commerceCurrencyLocalService;
-	protected final CommerceShippingMethodService commerceShippingMethodService;
-	protected final RenderRequest renderRequest;
-	protected final RenderResponse renderResponse;
-
-	private CommerceCurrency _getCommerceCurrency() throws PortalException {
+	protected CommerceCurrency getCommerceCurrency() throws PortalException {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -182,11 +176,17 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 			themeDisplay.getCompanyId(), commerceCurrencyCode);
 	}
 
-	private String _getSelectedScreenNavigationCategoryKey() {
+	protected String getSelectedScreenNavigationCategoryKey() {
 		return ParamUtil.getString(
 			renderRequest, "screenNavigationCategoryKey",
 			getScreenNavigationCategoryKey());
 	}
+
+	protected final CommerceChannelLocalService commerceChannelLocalService;
+	protected final CommerceCurrencyLocalService commerceCurrencyLocalService;
+	protected final CommerceShippingMethodService commerceShippingMethodService;
+	protected final RenderRequest renderRequest;
+	protected final RenderResponse renderResponse;
 
 	private CommerceShippingMethod _commerceShippingMethod;
 

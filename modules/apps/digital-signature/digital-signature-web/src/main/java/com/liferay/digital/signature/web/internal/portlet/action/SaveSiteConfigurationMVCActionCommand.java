@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author José Abelenda
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
 		"mvc.command.name=/digital_signature/save_site_configuration"

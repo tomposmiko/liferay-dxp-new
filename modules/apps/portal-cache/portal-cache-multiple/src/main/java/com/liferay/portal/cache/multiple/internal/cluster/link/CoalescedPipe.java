@@ -14,9 +14,6 @@
 
 package com.liferay.portal.cache.multiple.internal.cluster.link;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -184,9 +181,6 @@ public class CoalescedPipe<E> {
 			}
 		}
 		catch (InterruptedException interruptedException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(interruptedException);
-			}
 
 			// Continue to let the current element enter the pipe
 
@@ -194,8 +188,6 @@ public class CoalescedPipe<E> {
 
 		return false;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(CoalescedPipe.class);
 
 	private final AtomicLong _coalescedCount = new AtomicLong(0);
 	private final Comparator<E> _comparator;

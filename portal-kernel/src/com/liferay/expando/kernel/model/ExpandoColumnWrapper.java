@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.io.Serializable;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -50,7 +49,6 @@ public class ExpandoColumnWrapper
 		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("columnId", getColumnId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("tableId", getTableId());
 		attributes.put("name", getName());
 		attributes.put("type", getType());
@@ -84,12 +82,6 @@ public class ExpandoColumnWrapper
 
 		if (companyId != null) {
 			setCompanyId(companyId);
-		}
-
-		Date modifiedDate = (Date)attributes.get("modifiedDate");
-
-		if (modifiedDate != null) {
-			setModifiedDate(modifiedDate);
 		}
 
 		Long tableId = (Long)attributes.get("tableId");
@@ -176,16 +168,6 @@ public class ExpandoColumnWrapper
 	@Override
 	public String getDisplayName(java.util.Locale locale) {
 		return model.getDisplayName(locale);
-	}
-
-	/**
-	 * Returns the modified date of this expando column.
-	 *
-	 * @return the modified date of this expando column
-	 */
-	@Override
-	public Date getModifiedDate() {
-		return model.getModifiedDate();
 	}
 
 	/**
@@ -301,16 +283,6 @@ public class ExpandoColumnWrapper
 	}
 
 	/**
-	 * Sets the modified date of this expando column.
-	 *
-	 * @param modifiedDate the modified date of this expando column
-	 */
-	@Override
-	public void setModifiedDate(Date modifiedDate) {
-		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
 	 * Sets the mvcc version of this expando column.
 	 *
 	 * @param mvccVersion the mvcc version of this expando column
@@ -376,11 +348,6 @@ public class ExpandoColumnWrapper
 			typeSettingsUnicodeProperties) {
 
 		model.setTypeSettingsProperties(typeSettingsUnicodeProperties);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

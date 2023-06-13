@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class MBBanStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MBBan> {
 
@@ -130,13 +130,20 @@ public class MBBanStagedModelDataHandler
 		return true;
 	}
 
+	@Reference(unbind = "-")
+	protected void setMBBanLocalService(MBBanLocalService mbBanLocalService) {
+		_mbBanLocalService = mbBanLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		MBBanStagedModelDataHandler.class);
 
-	@Reference
 	private MBBanLocalService _mbBanLocalService;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

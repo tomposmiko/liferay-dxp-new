@@ -62,9 +62,6 @@ public interface CommerceOrderItem
 
 	public com.liferay.commerce.product.model.CPInstance fetchCPInstance();
 
-	public com.liferay.commerce.product.model.CPMeasurementUnit
-		fetchCPMeasurementUnit();
-
 	public com.liferay.commerce.product.model.CProduct fetchCProduct();
 
 	public java.util.List<CommerceOrderItem> getChildCommerceOrderItems();

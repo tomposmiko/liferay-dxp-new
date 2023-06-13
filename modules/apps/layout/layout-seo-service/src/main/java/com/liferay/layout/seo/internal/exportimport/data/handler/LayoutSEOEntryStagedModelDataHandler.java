@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -72,8 +73,9 @@ public class LayoutSEOEntryStagedModelDataHandler
 	public List<LayoutSEOEntry> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return _layoutSEOEntryLocalService.
-			getLayoutSEOEntriesByUuidAndCompanyId(uuid, companyId);
+		return Collections.singletonList(
+			_layoutSEOEntryLocalService.fetchLayoutSEOEntryByUuidAndGroupId(
+				uuid, companyId));
 	}
 
 	@Override
@@ -170,9 +172,7 @@ public class LayoutSEOEntryStagedModelDataHandler
 				openGraphImageFileEntryId,
 				layoutSEOEntry.isOpenGraphTitleEnabled(),
 				layoutSEOEntry.getOpenGraphTitleMap(),
-				_createServiceContext(
-					layoutSEOEntry, existingLayoutSEOEntry,
-					portletDataContext));
+				_createServiceContext(layoutSEOEntry, portletDataContext));
 		}
 		else {
 			_layoutSEOEntryLocalService.updateLayoutSEOEntry(
@@ -188,15 +188,12 @@ public class LayoutSEOEntryStagedModelDataHandler
 				openGraphImageFileEntryId,
 				layoutSEOEntry.isOpenGraphTitleEnabled(),
 				layoutSEOEntry.getOpenGraphTitleMap(),
-				_createServiceContext(
-					layoutSEOEntry, existingLayoutSEOEntry,
-					portletDataContext));
+				_createServiceContext(layoutSEOEntry, portletDataContext));
 		}
 	}
 
 	private ServiceContext _createServiceContext(
 			LayoutSEOEntry layoutSEOEntry,
-			LayoutSEOEntry existingLayoutSEOEntry,
 			PortletDataContext portletDataContext)
 		throws Exception {
 
@@ -218,12 +215,6 @@ public class LayoutSEOEntryStagedModelDataHandler
 		serviceContext.setAttribute(
 			ddmStructure.getStructureId() + "ddmFormValues",
 			serializedDDMFormValues);
-
-		if (portletDataContext.isDataStrategyMirror() &&
-			(existingLayoutSEOEntry == null)) {
-
-			serviceContext.setUuid(layoutSEOEntry.getUuid());
-		}
 
 		return serviceContext;
 	}

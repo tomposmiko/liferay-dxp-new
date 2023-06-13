@@ -17,13 +17,87 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ViewPortalPropertiesDisplayContext viewPortalPropertiesDisplayContext = new ViewPortalPropertiesDisplayContext(request, liferayPortletRequest, liferayPortletResponse, renderResponse);
+int delta = ParamUtil.getInteger(request, SearchContainer.DEFAULT_DELTA_PARAM, SearchContainer.DEFAULT_DELTA);
+String keywords = ParamUtil.getString(request, "keywords");
+String screenNavigationCategoryKey = ParamUtil.getString(request, "screenNavigationCategoryKey", ServerAdminNavigationEntryConstants.CATEGORY_KEY_PORTAL_PROPERTIES);
+String screenNavigationEntryKey = ParamUtil.getString(request, "screenNavigationEntryKey", ServerAdminNavigationEntryConstants.ENTRY_KEY_PORTAL_PROPERTIES);
+
+PortletURL serverURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/server_admin/view"
+).setTabs1(
+	tabs1
+).setParameter(
+	"delta", delta
+).setParameter(
+	"screenNavigationCategoryKey", screenNavigationCategoryKey
+).setParameter(
+	"screenNavigationEntryKey", screenNavigationEntryKey
+).buildPortletURL();
+
+PortletURL clearResultsURL = PortletURLBuilder.create(
+	PortletURLUtil.clone(serverURL, liferayPortletResponse)
+).setKeywords(
+	StringPool.BLANK
+).setNavigation(
+	(String)null
+).buildPortletURL();
+
+Map<String, String> filteredProperties = new TreeMap<String, String>();
+
+List<String> overriddenProperties = new ArrayList<>();
+
+PortletPreferences serverPortletPreferences = PrefsPropsUtil.getPreferences();
+
+Map<String, String[]> serverPortletPreferencesMap = serverPortletPreferences.getMap();
+
+PortletPreferences companyPortletPreferences = PrefsPropsUtil.getPreferences(company.getCompanyId());
+
+Map<String, String[]> companyPortletPreferencesMap = companyPortletPreferences.getMap();
+
+Properties properties = PropsUtil.getProperties(true);
+
+for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+	String property = (String)entry.getKey();
+	String value = StringPool.BLANK;
+
+	boolean overriddenPropertyValue = serverPortletPreferencesMap.containsKey(property) || companyPortletPreferencesMap.containsKey(property);
+
+	if (ArrayUtil.contains(PropsValues.ADMIN_OBFUSCATED_PROPERTIES, property)) {
+		value = StringPool.EIGHT_STARS;
+	}
+	else if (serverPortletPreferencesMap.containsKey(property)) {
+		value = serverPortletPreferences.getValue(property, StringPool.BLANK);
+	}
+	else if (companyPortletPreferencesMap.containsKey(property)) {
+		value = companyPortletPreferences.getValue(property, StringPool.BLANK);
+	}
+	else {
+		value = (String)entry.getValue();
+	}
+
+	if (Validator.isNull(keywords) || property.contains(keywords) || value.contains(keywords)) {
+		filteredProperties.put(property, value);
+
+		if (overriddenPropertyValue) {
+			overriddenProperties.add(property);
+		}
+	}
+}
+
+List<Map.Entry<String, String>> filteredPropertiesList = ListUtil.fromCollection(filteredProperties.entrySet());
+
+SearchContainer<Map.Entry<String, String>> propertiesSearchContainer = new SearchContainer(liferayPortletRequest, serverURL, null, null);
+
+propertiesSearchContainer.setResults(ListUtil.subList(filteredPropertiesList, propertiesSearchContainer.getStart(), propertiesSearchContainer.getEnd()));
+propertiesSearchContainer.setTotal(filteredPropertiesList.size());
 %>
 
 <clay:management-toolbar
-	clearResultsURL="<%= String.valueOf(viewPortalPropertiesDisplayContext.getClearResultsURL()) %>"
-	itemsTotal="<%= viewPortalPropertiesDisplayContext.getSearchContainerTotal() %>"
-	searchActionURL="<%= String.valueOf(viewPortalPropertiesDisplayContext.getPortletURL()) %>"
+	clearResultsURL="<%= String.valueOf(clearResultsURL) %>"
+	itemsTotal="<%= propertiesSearchContainer.getTotal() %>"
+	searchActionURL="<%= String.valueOf(serverURL) %>"
 	searchFormName="searchFm"
 	selectable="<%= false %>"
 	showSearch="<%= true %>"
@@ -31,8 +105,14 @@ ViewPortalPropertiesDisplayContext viewPortalPropertiesDisplayContext = new View
 
 <clay:container-fluid>
 	<liferay-ui:search-container
-		searchContainer="<%= viewPortalPropertiesDisplayContext.getSearchContainer() %>"
+		emptyResultsMessage='<%= tabs2.equals("portal-properties") ? "no-portal-properties-were-found-that-matched-the-keywords" : "no-system-properties-were-found-that-matched-the-keywords" %>'
+		iteratorURL="<%= serverURL %>"
+		total="<%= filteredPropertiesList.size() %>"
 	>
+		<liferay-ui:search-container-results
+			results="<%= ListUtil.subList(filteredPropertiesList, searchContainer.getStart(), searchContainer.getEnd()) %>"
+		/>
+
 		<liferay-ui:search-container-row
 			className="java.util.Map.Entry"
 			modelVar="entry"
@@ -42,82 +122,43 @@ ViewPortalPropertiesDisplayContext viewPortalPropertiesDisplayContext = new View
 			String property = (String)entry.getKey();
 			String value = (String)entry.getValue();
 
-			List<String> overriddenProperties = viewPortalPropertiesDisplayContext.getOverriddenProperties();
-
 			boolean overriddenPropertyValue = overriddenProperties.contains(property);
-
-			String featureFlagPrefix = "feature.flag.";
 			%>
 
-			<c:choose>
-				<c:when test="<%= StringUtil.startsWith(property, featureFlagPrefix) %>">
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand"
-						name="property"
-						value="<%= HtmlUtil.escape(StringUtil.shorten(property, 80)) %>"
-					/>
+			<liferay-ui:search-container-column-text
+				name="property"
+				value="<%= HtmlUtil.escape(StringUtil.shorten(property, 80)) %>"
+			/>
 
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand"
-						name="value"
-					>
-						<select name="<portlet:namespace />portalProperty<%= HtmlUtil.escapeAttribute(property) %>">
-							<option <%= Objects.equals("true", value) ? "selected" : StringPool.BLANK %> value="true"><liferay-ui:message key="true" /></option>
-							<option <%= Objects.equals("false", value) ? "selected" : StringPool.BLANK %> value="false"><liferay-ui:message key="false" /></option>
-						</select>
-					</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text
+				name="value"
+			>
+				<c:if test="<%= Validator.isNotNull(value) %>">
+					<c:choose>
+						<c:when test="<%= value.length() > 80 %>">
+							<span class="lfr-portal-tooltip" title="<%= HtmlUtil.escape(value) %>">
+								<%= HtmlUtil.escape(StringUtil.shorten(value, 80)) %>
+							</span>
+						</c:when>
+						<c:otherwise>
+							<%= HtmlUtil.escape(value) %>
+						</c:otherwise>
+					</c:choose>
+				</c:if>
+			</liferay-ui:search-container-column-text>
 
-					<liferay-ui:search-container-column-text
-						name="source"
-					>
-						<liferay-ui:icon
-							iconCssClass='<%= overriddenPropertyValue ? "icon-hdd" : "icon-file-alt" %>'
-							message='<%= LanguageUtil.get(request, overriddenPropertyValue ? "the-value-of-this-property-was-overridden-using-the-control-panel-and-is-stored-in-the-database" : "the-value-of-this-property-is-read-from-a-portal.properties-file-or-one-of-its-extension-files") %>'
-						/>
-					</liferay-ui:search-container-column-text>
-				</c:when>
-				<c:otherwise>
-					<liferay-ui:search-container-column-text
-						name="property"
-						value="<%= HtmlUtil.escape(StringUtil.shorten(property, 80)) %>"
-					/>
-
-					<liferay-ui:search-container-column-text
-						name="value"
-					>
-						<c:if test="<%= Validator.isNotNull(value) %>">
-							<c:choose>
-								<c:when test="<%= value.length() > 80 %>">
-									<span class="lfr-portal-tooltip" title="<%= HtmlUtil.escape(value) %>">
-										<%= HtmlUtil.escape(StringUtil.shorten(value, 80)) %>
-									</span>
-								</c:when>
-								<c:otherwise>
-									<%= HtmlUtil.escape(value) %>
-								</c:otherwise>
-							</c:choose>
-						</c:if>
-					</liferay-ui:search-container-column-text>
-
-					<liferay-ui:search-container-column-text
-						name="source"
-					>
-						<liferay-ui:icon
-							icon='<%= overriddenPropertyValue ? "hdd" : "document" %>'
-							markupView="lexicon"
-							message='<%= LanguageUtil.get(request, overriddenPropertyValue ? "the-value-of-this-property-was-overridden-using-the-control-panel-and-is-stored-in-the-database" : "the-value-of-this-property-is-read-from-a-portal.properties-file-or-one-of-its-extension-files") %>'
-						/>
-					</liferay-ui:search-container-column-text>
-				</c:otherwise>
-			</c:choose>
+			<liferay-ui:search-container-column-text
+				name="source"
+			>
+				<liferay-ui:icon
+					iconCssClass='<%= overriddenPropertyValue ? "icon-hdd" : "icon-file-alt" %>'
+					message='<%= LanguageUtil.get(request, overriddenPropertyValue ? "the-value-of-this-property-was-overridden-using-the-control-panel-and-is-stored-in-the-database" : "the-value-of-this-property-is-read-from-a-portal.properties-file-or-one-of-its-extension-files") %>'
+				/>
+			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator
 			markupView="lexicon"
 		/>
 	</liferay-ui:search-container>
-
-	<aui:button-row>
-		<aui:button cssClass="save-server-button" data-cmd="updatePortalProperties" value="save" />
-	</aui:button-row>
 </clay:container-fluid>

@@ -24,10 +24,11 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
-import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,9 +54,13 @@ public class MFAPolicy {
 			return Collections.emptyList();
 		}
 
-		return ListUtil.filter(
-			browserMFACheckers,
-			browserMFAChecker -> browserMFAChecker.isAvailable(userId));
+		Stream<BrowserMFAChecker> stream = browserMFACheckers.stream();
+
+		return stream.filter(
+			browserMFAChecker -> browserMFAChecker.isAvailable(userId)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public List<HeadlessMFAChecker> getAvailableHeadlessMFACheckers(
@@ -68,9 +73,13 @@ public class MFAPolicy {
 			return Collections.emptyList();
 		}
 
-		return ListUtil.filter(
-			headlessMFACheckers,
-			headlessMFAChecker -> headlessMFAChecker.isAvailable(userId));
+		Stream<HeadlessMFAChecker> stream = headlessMFACheckers.stream();
+
+		return stream.filter(
+			headlessMFAChecker -> headlessMFAChecker.isAvailable(userId)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public boolean isMFAEnabled(long companyId) {

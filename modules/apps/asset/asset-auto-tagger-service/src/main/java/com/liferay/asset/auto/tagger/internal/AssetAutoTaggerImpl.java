@@ -18,7 +18,6 @@ import com.liferay.asset.auto.tagger.AssetAutoTagProvider;
 import com.liferay.asset.auto.tagger.AssetAutoTagger;
 import com.liferay.asset.auto.tagger.configuration.AssetAutoTaggerConfiguration;
 import com.liferay.asset.auto.tagger.configuration.AssetAutoTaggerConfigurationFactory;
-import com.liferay.asset.auto.tagger.internal.helper.AssetAutoTaggerHelper;
 import com.liferay.asset.auto.tagger.model.AssetAutoTaggerEntry;
 import com.liferay.asset.auto.tagger.service.AssetAutoTaggerEntryLocalService;
 import com.liferay.asset.kernel.exception.AssetTagException;
@@ -47,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
-	configurationPid = "com.liferay.asset.auto.tagger.configuration.AssetAutoTaggerConfiguration",
+	configurationPid = "com.liferay.asset.auto.tagger.internal.configuration.AssetAutoTaggerConfiguration",
 	service = AopService.class
 )
 public class AssetAutoTaggerImpl implements AopService, AssetAutoTagger {
@@ -178,19 +177,9 @@ public class AssetAutoTaggerImpl implements AopService, AssetAutoTagger {
 		Indexer<Object> indexer = _indexerRegistry.getIndexer(
 			assetEntry.getClassName());
 
-		if (indexer == null) {
-			return;
-		}
-
-		AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
-
-		if (assetRenderer == null) {
+		if (indexer != null) {
 			indexer.reindex(assetEntry.getClassName(), assetEntry.getClassPK());
-
-			return;
 		}
-
-		indexer.reindex(assetRenderer.getAssetObject());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

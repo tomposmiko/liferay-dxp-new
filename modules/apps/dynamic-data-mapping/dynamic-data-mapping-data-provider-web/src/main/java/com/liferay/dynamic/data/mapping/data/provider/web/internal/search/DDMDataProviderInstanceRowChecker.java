@@ -47,7 +47,7 @@ public class DDMDataProviderInstanceRowChecker extends EmptyOnClickRowChecker {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return super.isDisabled(object);

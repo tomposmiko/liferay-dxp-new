@@ -23,6 +23,7 @@ import com.liferay.commerce.discount.CommerceDiscountValue;
 import com.liferay.commerce.frontend.model.PriceModel;
 import com.liferay.commerce.frontend.model.ProductSettingsModel;
 import com.liferay.commerce.frontend.util.ProductHelper;
+import com.liferay.commerce.inventory.CPDefinitionInventoryEngineRegistry;
 import com.liferay.commerce.model.CPDefinitionInventory;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.price.CommerceProductPrice;
@@ -33,12 +34,13 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.option.CommerceOptionValue;
 import com.liferay.commerce.product.option.CommerceOptionValueHelper;
+import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CPDefinitionInventoryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -57,7 +59,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(service = ProductHelper.class)
+@Component(enabled = false, service = ProductHelper.class)
 public class ProductHelperImpl implements ProductHelper {
 
 	@Override
@@ -73,7 +75,7 @@ public class ProductHelperImpl implements ProductHelper {
 			"content.Language", locale, getClass());
 
 		return new PriceModel(
-			_language.format(
+			LanguageUtil.format(
 				resourceBundle, "from-x",
 				cpDefinitionMinimumPriceCommerceMoney.format(locale), false));
 	}
@@ -145,7 +147,7 @@ public class ProductHelperImpl implements ProductHelper {
 	}
 
 	@Override
-	public ProductSettingsModel getProductSettingsModel(long cpDefinitionId)
+	public ProductSettingsModel getProductSettingsModel(long cpInstanceId)
 		throws PortalException {
 
 		ProductSettingsModel productSettingsModel = new ProductSettingsModel();
@@ -157,9 +159,17 @@ public class ProductHelperImpl implements ProductHelper {
 		int multipleQuantity =
 			CPDefinitionInventoryConstants.DEFAULT_MULTIPLE_ORDER_QUANTITY;
 
-		CPDefinitionInventory cpDefinitionInventory =
-			_cpDefinitionInventoryLocalService.
-				fetchCPDefinitionInventoryByCPDefinitionId(cpDefinitionId);
+		CPDefinitionInventory cpDefinitionInventory = null;
+
+		CPInstance cpInstance = _cpInstanceLocalService.fetchCPInstance(
+			cpInstanceId);
+
+		if (cpInstance != null) {
+			cpDefinitionInventory =
+				_cpDefinitionInventoryLocalService.
+					fetchCPDefinitionInventoryByCPDefinitionId(
+						cpInstance.getCPDefinitionId());
+		}
 
 		if (cpDefinitionInventory != null) {
 			minOrderQuantity = cpDefinitionInventory.getMinOrderQuantity();
@@ -293,6 +303,7 @@ public class ProductHelperImpl implements ProductHelper {
 		priceModel.setDiscountPercentages(
 			_getFormattedDiscountPercentages(
 				commerceDiscountValue.getPercentages(), locale));
+
 		priceModel.setFinalPrice(finalPriceCommerceMoney.format(locale));
 
 		return priceModel;
@@ -311,14 +322,18 @@ public class ProductHelperImpl implements ProductHelper {
 	private CommerceProductPriceCalculation _commerceProductPriceCalculation;
 
 	@Reference
+	private CPDefinitionInventoryEngineRegistry
+		_cpDefinitionInventoryEngineRegistry;
+
+	@Reference
 	private CPDefinitionInventoryLocalService
 		_cpDefinitionInventoryLocalService;
 
 	@Reference
-	private CPInstanceLocalService _cpInstanceLocalService;
+	private CPDefinitionLocalService _cpDefinitionLocalService;
 
 	@Reference
-	private Language _language;
+	private CPInstanceLocalService _cpInstanceLocalService;
 
 	@Reference
 	private PercentageFormatter _percentageFormatter;

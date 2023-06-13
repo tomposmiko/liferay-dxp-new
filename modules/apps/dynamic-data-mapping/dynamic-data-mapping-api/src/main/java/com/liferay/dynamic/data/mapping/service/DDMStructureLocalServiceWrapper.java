@@ -30,10 +30,6 @@ public class DDMStructureLocalServiceWrapper
 	implements DDMStructureLocalService,
 			   ServiceWrapper<DDMStructureLocalService> {
 
-	public DDMStructureLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DDMStructureLocalServiceWrapper(
 		DDMStructureLocalService ddmStructureLocalService) {
 
@@ -162,7 +158,7 @@ public class DDMStructureLocalServiceWrapper
 	 * and description.
 	 *
 	 * @param userId the primary key of the structure's creator/owner
-	 * @param sourceStructureId the primary key of the structure to be copied
+	 * @param structureId the primary key of the structure to be copied
 	 * @param nameMap the new structure's locales and localized names
 	 * @param descriptionMap the new structure's locales and localized
 	 descriptions
@@ -173,24 +169,24 @@ public class DDMStructureLocalServiceWrapper
 	 */
 	@Override
 	public DDMStructure copyStructure(
-			long userId, long sourceStructureId,
+			long userId, long structureId,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmStructureLocalService.copyStructure(
-			userId, sourceStructureId, nameMap, descriptionMap, serviceContext);
+			userId, structureId, nameMap, descriptionMap, serviceContext);
 	}
 
 	@Override
 	public DDMStructure copyStructure(
-			long userId, long sourceStructureId,
+			long userId, long structureId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmStructureLocalService.copyStructure(
-			userId, sourceStructureId, serviceContext);
+			userId, structureId, serviceContext);
 	}
 
 	/**
@@ -1132,14 +1128,6 @@ public class DDMStructureLocalServiceWrapper
 	public int getStructuresCount(long[] groupIds, long classNameId) {
 		return _ddmStructureLocalService.getStructuresCount(
 			groupIds, classNameId);
-	}
-
-	@Override
-	public boolean hasStructure(
-		long groupId, long classNameId, String structureKey) {
-
-		return _ddmStructureLocalService.hasStructure(
-			groupId, classNameId, structureKey);
 	}
 
 	@Override

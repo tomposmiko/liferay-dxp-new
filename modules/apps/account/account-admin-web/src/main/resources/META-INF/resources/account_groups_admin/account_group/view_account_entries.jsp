@@ -44,6 +44,7 @@ renderResponse.setTitle(accountGroupDisplay.getName());
 	<portlet:param name="mvcPath" value="/account_users_admin/select_account_entry.jsp" />
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 	<portlet:param name="accountGroupId" value="<%= String.valueOf(accountGroupDisplay.getAccountGroupId()) %>" />
+	<portlet:param name="openModalOnRedirect" value="<%= Boolean.TRUE.toString() %>" />
 	<portlet:param name="showCreateButton" value="<%= Boolean.TRUE.toString() %>" />
 	<portlet:param name="singleSelect" value="<%= Boolean.FALSE.toString() %>" />
 </portlet:renderURL>
@@ -106,23 +107,21 @@ renderResponse.setTitle(accountGroupDisplay.getName());
 					/>
 				</liferay-ui:search-container-column-text>
 
-				<c:if test="<%= AccountGroupPermission.contains(permissionChecker, accountGroupDisplay.getAccountGroupId(), AccountActionKeys.ASSIGN_ACCOUNTS) %>">
-					<liferay-ui:search-container-column-text>
-						<portlet:actionURL name="/account_admin/remove_account_group_account_entries" var="removeAccountGroupAccountEntryURL">
-							<portlet:param name="redirect" value="<%= currentURL %>" />
-							<portlet:param name="accountEntryIds" value="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>" />
-							<portlet:param name="accountGroupId" value="<%= String.valueOf(accountGroupDisplay.getAccountGroupId()) %>" />
-						</portlet:actionURL>
+				<liferay-ui:search-container-column-text>
+					<portlet:actionURL name="/account_admin/remove_account_group_account_entries" var="removeAccountGroupAccountEntryURL">
+						<portlet:param name="redirect" value="<%= currentURL %>" />
+						<portlet:param name="accountEntryIds" value="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>" />
+						<portlet:param name="accountGroupId" value="<%= String.valueOf(accountGroupDisplay.getAccountGroupId()) %>" />
+					</portlet:actionURL>
 
-						<liferay-ui:icon-delete
-							confirmation="are-you-sure-you-want-to-remove-this-account"
-							icon="times-circle"
-							message="remove"
-							showIcon="<%= true %>"
-							url="<%= removeAccountGroupAccountEntryURL %>"
-						/>
-					</liferay-ui:search-container-column-text>
-				</c:if>
+					<liferay-ui:icon-delete
+						confirmation="are-you-sure-you-want-to-remove-this-account"
+						icon="times-circle"
+						message="remove"
+						showIcon="<%= true %>"
+						url="<%= removeAccountGroupAccountEntryURL %>"
+					/>
+				</liferay-ui:search-container-column-text>
 			</liferay-ui:search-container-row>
 
 			<liferay-ui:search-iterator

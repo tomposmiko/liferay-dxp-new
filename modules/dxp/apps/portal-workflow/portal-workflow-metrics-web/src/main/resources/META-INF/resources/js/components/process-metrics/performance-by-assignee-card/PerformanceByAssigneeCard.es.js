@@ -101,9 +101,7 @@ function PerformanceByAssigneeCard({routeParams}) {
 		}
 
 		return [new Promise((_, reject) => reject(filtersError))];
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [filtersError, routeParams, timeRange.dateEnd, timeRange.dateStart]);
+	}, [filtersError, postData, timeRange.dateEnd, timeRange.dateStart]);
 
 	return (
 		<ClayPanel className="mt-4 tabs-card">
@@ -122,7 +120,7 @@ function PerformanceByAssigneeCard({routeParams}) {
 				<PerformanceByAssigneeCard.Footer
 					processStep={taskName}
 					timeRange={{key, ...timeRange}}
-					totalCount={data?.totalCount}
+					totalCount={data.totalCount}
 					{...routeParams}
 				/>
 			</PromisesResolver>

@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gavin Wan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ReportsEngineConsolePortletKeys.DISPLAY_REPORTS,
 		"javax.portlet.name=" + ReportsEngineConsolePortletKeys.REPORTS_ADMIN,

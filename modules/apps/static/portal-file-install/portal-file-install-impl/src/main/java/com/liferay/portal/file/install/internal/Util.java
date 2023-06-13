@@ -14,19 +14,13 @@
 
 package com.liferay.portal.file.install.internal;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import java.net.URI;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -37,25 +31,6 @@ import org.osgi.framework.BundleContext;
  * @author Matthew Tambara
  */
 public class Util {
-
-	public static String getFilePath(String dir) {
-		File file = new File(dir);
-
-		try {
-			file = file.getCanonicalFile();
-		}
-		catch (IOException ioException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
-			}
-		}
-
-		URI uri = file.toURI();
-
-		uri = uri.normalize();
-
-		return uri.getPath();
-	}
 
 	public static long loadChecksum(
 		Bundle bundle, BundleContext bundleContext) {
@@ -75,10 +50,6 @@ public class Util {
 			return dataInputStream.readLong();
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
 			return Long.MIN_VALUE;
 		}
 	}
@@ -97,7 +68,7 @@ public class Util {
 			dataOutputStream.writeLong(checksum);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 		}
 	}
 
@@ -106,7 +77,5 @@ public class Util {
 	}
 
 	private static final String _CHECKSUM_SUFFIX = ".checksum";
-
-	private static final Log _log = LogFactoryUtil.getLog(Util.class);
 
 }

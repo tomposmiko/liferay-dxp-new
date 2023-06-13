@@ -91,7 +91,6 @@ const RatingsLike = ({
 						<span className="off">
 							<ClayIcon symbol="heart" />
 						</span>
-
 						<span
 							className="on"
 							onAnimationEnd={HandleAnimationEnd}
@@ -99,7 +98,6 @@ const RatingsLike = ({
 							<ClayIcon symbol="heart-full" />
 						</span>
 					</span>
-
 					<span className="inline-item likes">
 						<AnimatedCounter counter={totalLikes} />
 					</span>

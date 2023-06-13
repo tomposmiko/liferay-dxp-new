@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.CacheFieldEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -208,63 +209,74 @@ public class CacheFieldEntryModelImpl
 	public Map<String, Function<CacheFieldEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CacheFieldEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CacheFieldEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CacheFieldEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CacheFieldEntry.class.getClassLoader(), CacheFieldEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<CacheFieldEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<CacheFieldEntry, Object>>();
+		try {
+			Constructor<CacheFieldEntry> constructor =
+				(Constructor<CacheFieldEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"cacheFieldEntryId", CacheFieldEntry::getCacheFieldEntryId);
-			attributeGetterFunctions.put(
-				"groupId", CacheFieldEntry::getGroupId);
-			attributeGetterFunctions.put("name", CacheFieldEntry::getName);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<CacheFieldEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CacheFieldEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<CacheFieldEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<CacheFieldEntry, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<CacheFieldEntry, Object>>();
+		Map<String, BiConsumer<CacheFieldEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CacheFieldEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<CacheFieldEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<CacheFieldEntry, ?>>();
+		attributeGetterFunctions.put(
+			"cacheFieldEntryId", CacheFieldEntry::getCacheFieldEntryId);
+		attributeSetterBiConsumers.put(
+			"cacheFieldEntryId",
+			(BiConsumer<CacheFieldEntry, Long>)
+				CacheFieldEntry::setCacheFieldEntryId);
+		attributeGetterFunctions.put("groupId", CacheFieldEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<CacheFieldEntry, Long>)CacheFieldEntry::setGroupId);
+		attributeGetterFunctions.put("name", CacheFieldEntry::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<CacheFieldEntry, String>)CacheFieldEntry::setName);
 
-			attributeSetterBiConsumers.put(
-				"cacheFieldEntryId",
-				(BiConsumer<CacheFieldEntry, Long>)
-					CacheFieldEntry::setCacheFieldEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<CacheFieldEntry, Long>)CacheFieldEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<CacheFieldEntry, String>)CacheFieldEntry::setName);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -551,12 +563,41 @@ public class CacheFieldEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CacheFieldEntry, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CacheFieldEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CacheFieldEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((CacheFieldEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CacheFieldEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CacheFieldEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -566,8 +607,7 @@ public class CacheFieldEntryModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<CacheFieldEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

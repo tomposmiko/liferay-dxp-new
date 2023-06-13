@@ -427,11 +427,6 @@ public class MBThreadFlagWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<MBThreadFlag, Object>>
 		getAttributeGetterFunctions() {
 

@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchTaskInstanceTokenException;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 
@@ -34,8 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoTaskInstanceTokenPersistence
-	extends BasePersistence<KaleoTaskInstanceToken>,
-			CTPersistence<KaleoTaskInstanceToken> {
+	extends BasePersistence<KaleoTaskInstanceToken> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

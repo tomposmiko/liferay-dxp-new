@@ -13,7 +13,7 @@
  */
 
 (function () {
-	const STR_DIV = 'div';
+	var STR_DIV = 'div';
 
 	CKEDITOR.plugins.add('media', {
 		TPL_SCRIPT_PREFIX_CONFIG: 'var mediaConfig = {',
@@ -35,33 +35,33 @@
 		TPL_SCRIPT_SUFFIX_RENDER: 'new A.{mediaAUI}(mediaConfig).render();',
 
 		afterInit(editor) {
-			const dataProcessor = editor.dataProcessor;
+			var dataProcessor = editor.dataProcessor;
 
-			const dataFilter = dataProcessor && dataProcessor.dataFilter;
-			const htmlFilter = dataProcessor && dataProcessor.htmlFilter;
+			var dataFilter = dataProcessor && dataProcessor.dataFilter;
+			var htmlFilter = dataProcessor && dataProcessor.htmlFilter;
 
 			if (dataFilter) {
 				dataFilter.addRules({
 					elements: {
 						div(realElement) {
-							const attributeClass =
+							var attributeClass =
 								realElement.attributes['class'];
 
-							let fakeElement;
+							var fakeElement;
 
-							const mediaPlugin = editor.plugins.media;
+							var mediaPlugin = editor.plugins.media;
 
-							const audio = mediaPlugin.hasClass(
+							var audio = mediaPlugin.hasClass(
 								attributeClass,
 								'liferayckeaudio'
 							);
-							const video = mediaPlugin.hasClass(
+							var video = mediaPlugin.hasClass(
 								attributeClass,
 								'liferayckevideo'
 							);
 
 							if (video || audio) {
-								const realChild =
+								var realChild =
 									realElement.children &&
 									realElement.children[0];
 
@@ -81,8 +81,8 @@
 									realChild.children[0].value = '';
 								}
 
-								let cssClass = 'liferay_cke_audio';
-								let element = 'audio';
+								var cssClass = 'liferay_cke_audio';
+								var element = 'audio';
 
 								if (video) {
 									cssClass = 'liferay_cke_video';
@@ -97,13 +97,13 @@
 								);
 
 								if (video) {
-									const attributes = realElement.attributes;
-									let fakeStyle =
+									var attributes = realElement.attributes;
+									var fakeStyle =
 										fakeElement.attributes.style || '';
 
-									const height = attributes['data-height'];
-									const poster = attributes['data-poster'];
-									const width = attributes['data-width'];
+									var height = attributes['data-height'];
+									var poster = attributes['data-poster'];
+									var width = attributes['data-width'];
 
 									if (poster) {
 										fakeStyle +=
@@ -114,7 +114,7 @@
 										fakeElement.attributes.style = fakeStyle;
 									}
 
-									if (typeof height !== 'undefined') {
+									if (typeof height != 'undefined') {
 										fakeStyle +=
 											'height:' +
 											CKEDITOR.tools.cssLength(height) +
@@ -123,7 +123,7 @@
 										fakeElement.attributes.style = fakeStyle;
 									}
 
-									if (typeof width !== 'undefined') {
+									if (typeof width != 'undefined') {
 										fakeStyle +=
 											'width:' +
 											CKEDITOR.tools.cssLength(width) +
@@ -143,10 +143,10 @@
 				htmlFilter.addRules({
 					elements: {
 						div(realElement) {
-							const attributeClass =
+							var attributeClass =
 								realElement.attributes['class'];
 
-							const mediaPlugin = editor.plugins.media;
+							var mediaPlugin = editor.plugins.media;
 
 							if (
 								(mediaPlugin.hasClass(
@@ -171,35 +171,35 @@
 		},
 
 		applyMediaScript(mediaNode, dialog, configText) {
-			const instance = this;
+			var instance = this;
 
-			const dialogReplace = {
+			var dialogReplace = {
 				dialog,
 			};
 
-			let mediaAUI = 'Audio';
+			var mediaAUI = 'Audio';
 
 			if (dialog === 'video') {
 				mediaAUI = 'Video';
 			}
 
-			const scriptUse = new CKEDITOR.template(
+			var scriptUse = new CKEDITOR.template(
 				instance.TPL_SCRIPT_PREFIX_USE
 			);
 
-			const textScriptUse = scriptUse.output(dialogReplace);
+			var textScriptUse = scriptUse.output(dialogReplace);
 
-			const scriptLogic = new CKEDITOR.template(
+			var scriptLogic = new CKEDITOR.template(
 				instance.TPL_SCRIPT_PREFIX_LOGIC
 			);
 
-			const textScriptLogic = scriptLogic.output(dialogReplace);
+			var textScriptLogic = scriptLogic.output(dialogReplace);
 
-			const scriptRender = new CKEDITOR.template(
+			var scriptRender = new CKEDITOR.template(
 				instance.TPL_SCRIPT_SUFFIX_RENDER
 			);
 
-			const textScriptRender = scriptRender.output({
+			var textScriptRender = scriptRender.output({
 				mediaAUI,
 			});
 
@@ -217,15 +217,15 @@
 		},
 
 		createDivStructure(editor, containerClass, boundingBoxClass) {
-			const divNode = editor.document.createElement(STR_DIV);
+			var divNode = editor.document.createElement(STR_DIV);
 
 			divNode.setAttribute('class', containerClass);
 
-			const boundingBoxTmp = editor.document.createElement(STR_DIV);
+			var boundingBoxTmp = editor.document.createElement(STR_DIV);
 
 			boundingBoxTmp.setAttribute('class', boundingBoxClass);
 
-			const scriptTmp = editor.document.createElement('script');
+			var scriptTmp = editor.document.createElement('script');
 
 			scriptTmp.setAttribute('type', 'text/javascript');
 
@@ -236,7 +236,7 @@
 		},
 
 		getPlaceholderCss() {
-			const instance = this;
+			var instance = this;
 
 			return (
 				'img.liferay_cke_audio {' +
@@ -261,11 +261,11 @@
 		},
 
 		hasClass(attributeClass, target) {
-			return attributeClass && attributeClass.indexOf(target) !== -1;
+			return attributeClass && attributeClass.indexOf(target) != -1;
 		},
 
 		init(editor) {
-			const instance = this;
+			var instance = this;
 
 			CKEDITOR.dialog.add('audio', instance.path + 'dialogs/audio.js');
 			CKEDITOR.dialog.add('video', instance.path + 'dialogs/video.js');
@@ -301,9 +301,9 @@
 			}
 
 			editor.on('doubleclick', (event) => {
-				const element = event.data.element;
+				var element = event.data.element;
 
-				let type;
+				var type;
 
 				if (instance.isElementType(element, 'audio')) {
 					type = 'audio';
@@ -319,10 +319,10 @@
 
 			if (editor.contextMenu) {
 				editor.contextMenu.addListener((element) => {
-					const value = {};
+					var value = {};
 
 					if (!element.isReadOnly()) {
-						let type;
+						var type;
 
 						if (instance.isElementType(element, 'audio')) {
 							type = 'audio';
@@ -353,7 +353,7 @@
 		},
 
 		onLoad() {
-			const instance = this;
+			var instance = this;
 
 			if (CKEDITOR.addCss) {
 				CKEDITOR.addCss(instance.getPlaceholderCss());
@@ -361,21 +361,21 @@
 		},
 
 		onOkCallback(callerInstance, editor, dialog) {
-			const instance = this;
+			var instance = this;
 
-			const extraStyles = {};
+			var extraStyles = {};
 
-			const video = dialog === 'video';
+			var video = dialog === 'video';
 
-			let containerCss = 'liferayckeaudio audio-container';
-			let nonProcessedClass = 'ckaudio-no-id';
+			var containerCss = 'liferayckeaudio audio-container';
+			var nonProcessedClass = 'ckaudio-no-id';
 
 			if (video) {
 				containerCss = 'liferayckevideo video-container';
 				nonProcessedClass = 'ckvideo-no-id';
 			}
 
-			const divNode = instance.createDivStructure(
+			var divNode = instance.createDivStructure(
 				editor,
 				containerCss,
 				nonProcessedClass
@@ -388,13 +388,13 @@
 				callerInstance.commitContent(divNode);
 			}
 
-			let fakeClass = 'liferay_cke_audio';
+			var fakeClass = 'liferay_cke_audio';
 
 			if (video) {
 				fakeClass = 'liferay_cke_video';
 			}
 
-			const newFakeImage = editor.createFakeElement(
+			var newFakeImage = editor.createFakeElement(
 				divNode,
 				fakeClass,
 				dialog,
@@ -418,19 +418,19 @@
 		onShowCallback(instance, editor, dialog) {
 			instance.fakeImage = null;
 
-			const fakeImage = instance.getSelectedElement();
+			var fakeImage = instance.getSelectedElement();
 
 			this.restoreElement(editor, instance, fakeImage, dialog);
 		},
 
 		replaceScriptContent(divNode, scriptContent) {
-			if (divNode.getChildCount() === 2) {
-				let scriptTmp = null;
+			if (divNode.getChildCount() == 2) {
+				var scriptTmp = null;
 
 				divNode.getChild(1).remove();
 
 				AUI().use('aui-node', (A) => {
-					const scriptNode = A.Node.create(
+					var scriptNode = A.Node.create(
 						'<script type="text/javascript">' +
 							scriptContent +
 							'</script>'
@@ -444,7 +444,7 @@
 		},
 
 		restoreElement(editor, instance, fakeImage, type) {
-			let content = null;
+			var content = null;
 
 			if (
 				fakeImage &&

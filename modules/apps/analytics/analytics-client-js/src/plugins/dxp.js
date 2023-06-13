@@ -17,7 +17,6 @@ import {
 	MARK_NAVIGATION_START,
 	MARK_PAGE_LOAD_TIME,
 	MARK_VIEW_DURATION,
-	PAGE,
 	PARAM_CONFIGURATION_PORTLET_NAME,
 	PARAM_MODE_KEY,
 	PARAM_PAGE_EDITOR_PORTLET_NAME,
@@ -27,7 +26,7 @@ import {
 import {getSearchParams} from '../utils/params';
 import {createMark, getDuration} from '../utils/performance';
 
-const pageApplicationId = PAGE;
+const pageApplicationId = 'Page';
 
 /**
  * Plugin function that registers listeners related to DXP
@@ -35,7 +34,6 @@ const pageApplicationId = PAGE;
  */
 
 function dxp(analytics) {
-	const Liferay = window.Liferay;
 
 	/**
 	 * Sends view duration information on the window unload event
@@ -89,7 +87,7 @@ function dxp(analytics) {
 		return mode === PARAM_VIEW_MODE;
 	}
 
-	if (Liferay) {
+	if (window.Liferay) {
 		const searchParams = getSearchParams();
 
 		if (
@@ -100,7 +98,7 @@ function dxp(analytics) {
 			return analytics._disposeInternal();
 		}
 
-		if (Liferay.SPA) {
+		if (window.Liferay.SPA) {
 			const loadingStartMarks = window.performance.getEntriesByName(
 				MARK_LOAD_EVENT_START
 			);
@@ -114,14 +112,14 @@ function dxp(analytics) {
 				);
 
 				createMark(MARK_LOAD_EVENT_START);
-				Liferay.on('beforeNavigate', createLoadMark);
+				window.Liferay.on('beforeNavigate', createLoadMark);
 			}
 
 			if (document.readyState === 'complete') {
 				sendLoadEvent();
 			}
 
-			Liferay.once('beforeNavigate', sendUnloadEvent);
+			window.Liferay.once('beforeNavigate', sendUnloadEvent);
 		}
 	}
 }

@@ -19,7 +19,7 @@ export default function RegistrationTransformer({
 	return {
 		...otherProps,
 		onClick() {
-			const button = window.document.activeElement;
+			const button = this.document.activeElement;
 			const form = button.form;
 
 			if (!pkccOptions) {

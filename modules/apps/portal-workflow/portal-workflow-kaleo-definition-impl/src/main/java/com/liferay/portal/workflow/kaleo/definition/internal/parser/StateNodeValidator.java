@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.definition.internal.parser;
 
 import com.liferay.portal.workflow.kaleo.definition.Definition;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.definition.State;
 import com.liferay.portal.workflow.kaleo.definition.exception.KaleoDefinitionValidationException;
 import com.liferay.portal.workflow.kaleo.definition.parser.NodeValidator;
@@ -28,28 +27,26 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  * @author Marcellus Tavares
  */
-@Component(service = NodeValidator.class)
+@Component(
+	immediate = true, property = "node.type=STATE",
+	service = NodeValidator.class
+)
 public class StateNodeValidator extends BaseNodeValidator<State> {
-
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.STATE;
-	}
 
 	@Override
 	protected void doValidate(Definition definition, State state)
 		throws KaleoDefinitionValidationException {
 
 		if (state.isInitial()) {
-			_validateInitialState(definition, state);
+			validateInitialState(definition, state);
 		}
 		else if (state.getIncomingTransitionsCount() == 0) {
 			throw new KaleoDefinitionValidationException.
-				MustSetIncomingTransition(state.getDefaultLabel());
+				MustSetIncomingTransition(state.getName());
 		}
 	}
 
-	private void _validateInitialState(Definition definition, State state)
+	protected void validateInitialState(Definition definition, State state)
 		throws KaleoDefinitionValidationException {
 
 		State initialState = definition.getInitialState();
@@ -57,17 +54,17 @@ public class StateNodeValidator extends BaseNodeValidator<State> {
 		if (!Objects.equals(initialState, state)) {
 			throw new KaleoDefinitionValidationException.
 				MultipleInitialStateNodes(
-					state.getDefaultLabel(), initialState.getDefaultLabel());
+					state.getName(), initialState.getName());
 		}
 
 		if (state.getIncomingTransitionsCount() > 0) {
 			throw new KaleoDefinitionValidationException.
-				MustNotSetIncomingTransition(state.getDefaultLabel());
+				MustNotSetIncomingTransition(state.getName());
 		}
 
 		if (state.getOutgoingTransitionsCount() == 0) {
 			throw new KaleoDefinitionValidationException.
-				MustSetOutgoingTransition(state.getDefaultLabel());
+				MustSetOutgoingTransition(state.getName());
 		}
 	}
 

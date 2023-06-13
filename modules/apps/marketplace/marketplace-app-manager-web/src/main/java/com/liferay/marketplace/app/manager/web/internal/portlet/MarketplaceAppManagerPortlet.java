@@ -26,6 +26,7 @@ import com.liferay.marketplace.service.AppService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.bundle.blacklist.BundleBlacklistManager;
+import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.model.LayoutTemplate;
 import com.liferay.portal.kernel.model.Plugin;
 import com.liferay.portal.kernel.model.PluginSetting;
@@ -85,6 +86,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Joan Kim
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=marketplace-app-manager-portlet",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -100,8 +102,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + MarketplaceAppManagerPortletKeys.MARKETPLACE_APP_MANAGER,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = javax.portlet.Portlet.class
 )
@@ -191,10 +192,10 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 			String host = urlObj.getHost();
 
 			if (host.endsWith("sf.net") || host.endsWith("sourceforge.net")) {
-				_installSourceForgeApp(urlObj.getPath(), actionRequest);
+				doInstallSourceForgeApp(urlObj.getPath(), actionRequest);
 			}
 			else {
-				_installRemoteApp(url, actionRequest, true);
+				doInstallRemoteApp(url, actionRequest, true);
 			}
 		}
 		catch (MalformedURLException malformedURLException) {
@@ -208,7 +209,7 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.processAction(actionRequest, actionResponse);
 	}
@@ -218,7 +219,7 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.render(renderRequest, renderResponse);
 	}
@@ -228,7 +229,7 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.serveResource(resourceRequest, resourceResponse);
 	}
@@ -241,6 +242,14 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 
 		if (remoteAppId > 0) {
 			_appService.uninstallApp(remoteAppId);
+		}
+		else {
+			String[] contextNames = StringUtil.split(
+				ParamUtil.getString(actionRequest, "contextNames"));
+
+			for (String contextName : contextNames) {
+				DeployManagerUtil.undeploy(contextName);
+			}
 		}
 
 		SessionMessages.add(actionRequest, "triggeredPortletUndeploy");
@@ -368,6 +377,19 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 		}
 	}
 
+	protected void checkOmniAdmin() throws PortletException {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (!permissionChecker.isOmniadmin()) {
+			PrincipalException principalException =
+				new PrincipalException.MustBeCompanyAdmin(
+					permissionChecker.getUserId());
+
+			throw new PortletException(principalException);
+		}
+	}
+
 	@Override
 	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -389,20 +411,7 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 		super.doDispatch(renderRequest, renderResponse);
 	}
 
-	private void _checkOmniAdmin() throws PortletException {
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		if (!permissionChecker.isOmniadmin()) {
-			PrincipalException principalException =
-				new PrincipalException.MustBeCompanyAdmin(
-					permissionChecker.getUserId());
-
-			throw new PortletException(principalException);
-		}
-	}
-
-	private int _installRemoteApp(
+	protected int doInstallRemoteApp(
 			String url, ActionRequest actionRequest, boolean failOnError)
 		throws Exception {
 
@@ -458,7 +467,7 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 		return responseCode;
 	}
 
-	private void _installSourceForgeApp(
+	protected void doInstallSourceForgeApp(
 			String path, ActionRequest actionRequest)
 		throws Exception {
 
@@ -475,7 +484,7 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 					failOnError = true;
 				}
 
-				int responseCode = _installRemoteApp(
+				int responseCode = doInstallRemoteApp(
 					url, actionRequest, failOnError);
 
 				if (responseCode == HttpServletResponse.SC_OK) {
@@ -489,7 +498,42 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setAppService(AppService appService) {
+		_appService = appService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPanelAppRegistry(PanelAppRegistry panelAppRegistry) {
+		_panelAppRegistry = panelAppRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPanelCategoryRegistry(
+		PanelCategoryRegistry panelCategoryRegistry) {
+
+		_panelCategoryRegistry = panelCategoryRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPluginSettingLocalService(
+		PluginSettingLocalService pluginSettingLocalService) {
+
+		_pluginSettingLocalService = pluginSettingLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPluginSettingService(
+		PluginSettingService pluginSettingService) {
+
+		_pluginSettingService = pluginSettingService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortletService(PortletService portletService) {
+		_portletService = portletService;
+	}
+
 	private AppService _appService;
 
 	@Reference
@@ -501,22 +545,14 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 	@Reference
 	private Http _http;
 
-	@Reference
 	private PanelAppRegistry _panelAppRegistry;
-
-	@Reference
 	private PanelCategoryRegistry _panelCategoryRegistry;
-
-	@Reference
 	private PluginSettingLocalService _pluginSettingLocalService;
-
-	@Reference
 	private PluginSettingService _pluginSettingService;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private PortletService _portletService;
 
 }

@@ -42,7 +42,7 @@ function PerformanceByStepPage({query, routeParams}) {
 			completed: true,
 			key: search,
 			processVersion:
-				processVersion?.indexOf('allVersions') === -1
+				processVersion?.indexOf('allVersions') == -1
 					? processVersion
 					: undefined,
 			...paginationParams,
@@ -51,12 +51,7 @@ function PerformanceByStepPage({query, routeParams}) {
 		url: `/processes/${processId}/nodes/metrics`,
 	});
 
-	const promises = useMemo(
-		() => [fetchData()],
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[routeParams]
-	);
+	const promises = useMemo(() => [fetchData()], [fetchData]);
 
 	return (
 		<PromisesResolver promises={promises}>
@@ -65,12 +60,12 @@ function PerformanceByStepPage({query, routeParams}) {
 				hideFilters={hideFilters}
 				routeParams={{...routeParams, search}}
 				selectedFilters={selectedFilters}
-				totalCount={data?.totalCount}
+				totalCount={data.totalCount}
 			/>
 
 			<PerformanceByStepPage.Body
 				{...data}
-				filtered={search || !!selectedFilters.length}
+				filtered={search || selectedFilters.length > 0}
 			/>
 		</PromisesResolver>
 	);

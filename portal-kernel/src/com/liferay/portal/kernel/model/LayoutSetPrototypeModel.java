@@ -455,8 +455,4 @@ public interface LayoutSetPrototypeModel
 	@Override
 	public LayoutSetPrototype cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

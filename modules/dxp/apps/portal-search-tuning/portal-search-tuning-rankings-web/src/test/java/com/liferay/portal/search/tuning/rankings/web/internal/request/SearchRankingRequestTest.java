@@ -33,6 +33,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -47,9 +48,10 @@ public class SearchRankingRequestTest extends BaseRankingsWebTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_setUpQuery();
 
-		setUpPortletPreferencesFactoryUtil();
 		setUpPropsUtil();
 
 		HttpServletRequest httpServletRequest =
@@ -102,9 +104,12 @@ public class SearchRankingRequestTest extends BaseRankingsWebTestCase {
 		).matchAll();
 	}
 
-	private final RankingIndexName _rankingIndexName = Mockito.mock(
-		RankingIndexName.class);
+	@Mock
+	private RankingIndexName _rankingIndexName;
+
 	private SearchRankingRequest _searchRankingRequest;
-	private final Sorts _sorts = Mockito.mock(Sorts.class);
+
+	@Mock
+	private Sorts _sorts;
 
 }

@@ -141,13 +141,22 @@ public class DateRangeFactory {
 
 			from = from.substring(1);
 
-			_validateDateFormat(from);
+			validateDateFormat(from);
 
 			String to = range.split("TO")[1].trim();
 
 			to = to.substring(0, to.length() - 1);
 
-			_validateDateFormat(to);
+			validateDateFormat(to);
+		}
+	}
+
+	protected void validateDateFormat(String date) throws ParseException {
+		if (!ArrayUtil.contains(_ALIASES, date)) {
+			DateFormat dateFormat = _dateFormatFactory.getSimpleDateFormat(
+				"yyyyMMddHHmmss");
+
+			dateFormat.parse(date);
 		}
 	}
 
@@ -155,15 +164,6 @@ public class DateRangeFactory {
 		dateString = StringUtil.replace(dateString, '-', "");
 
 		return dateString + pad;
-	}
-
-	private void _validateDateFormat(String date) throws ParseException {
-		if (!ArrayUtil.contains(_ALIASES, date)) {
-			DateFormat dateFormat = _dateFormatFactory.getSimpleDateFormat(
-				"yyyyMMddHHmmss");
-
-			dateFormat.parse(date);
-		}
 	}
 
 	private static final String[] _ALIASES = {

@@ -14,6 +14,7 @@
 
 package com.liferay.document.library.internal.repository.capabilities;
 
+import com.liferay.document.library.configuration.DLConfiguration;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.versioning.VersionPurger;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
@@ -82,8 +83,8 @@ public class LiferayVersioningCapability
 			@Override
 			public FileEntry updateFileEntry(
 					long userId, long fileEntryId, String sourceFileName,
-					String mimeType, String title, String urlTitle,
-					String description, String changeLog,
+					String mimeType, String title, String description,
+					String changeLog,
 					DLVersionNumberIncrease dlVersionNumberIncrease, File file,
 					Date expirationDate, Date reviewDate,
 					ServiceContext serviceContext)
@@ -93,16 +94,15 @@ public class LiferayVersioningCapability
 					dlAppServiceAdapter,
 					super.updateFileEntry(
 						userId, fileEntryId, sourceFileName, mimeType, title,
-						urlTitle, description, changeLog,
-						dlVersionNumberIncrease, file, expirationDate,
-						reviewDate, serviceContext));
+						description, changeLog, dlVersionNumberIncrease, file,
+						expirationDate, reviewDate, serviceContext));
 			}
 
 			@Override
 			public FileEntry updateFileEntry(
 					long userId, long fileEntryId, String sourceFileName,
-					String mimeType, String title, String urlTitle,
-					String description, String changeLog,
+					String mimeType, String title, String description,
+					String changeLog,
 					DLVersionNumberIncrease dlVersionNumberIncrease,
 					InputStream inputStream, long size, Date expirationDate,
 					Date reviewDate, ServiceContext serviceContext)
@@ -112,9 +112,9 @@ public class LiferayVersioningCapability
 					dlAppServiceAdapter,
 					super.updateFileEntry(
 						userId, fileEntryId, sourceFileName, mimeType, title,
-						urlTitle, description, changeLog,
-						dlVersionNumberIncrease, inputStream, size,
-						expirationDate, reviewDate, serviceContext));
+						description, changeLog, dlVersionNumberIncrease,
+						inputStream, size, expirationDate, reviewDate,
+						serviceContext));
 			}
 
 		};
@@ -145,8 +145,8 @@ public class LiferayVersioningCapability
 			@Override
 			public FileEntry updateFileEntry(
 					long userId, long fileEntryId, String sourceFileName,
-					String mimeType, String title, String urlTitle,
-					String description, String changeLog,
+					String mimeType, String title, String description,
+					String changeLog,
 					DLVersionNumberIncrease dlVersionNumberIncrease, File file,
 					Date expirationDate, Date reviewDate,
 					ServiceContext serviceContext)
@@ -156,16 +156,15 @@ public class LiferayVersioningCapability
 					dlAppServiceAdapter,
 					super.updateFileEntry(
 						userId, fileEntryId, sourceFileName, mimeType, title,
-						urlTitle, description, changeLog,
-						dlVersionNumberIncrease, file, expirationDate,
-						reviewDate, serviceContext));
+						description, changeLog, dlVersionNumberIncrease, file,
+						expirationDate, reviewDate, serviceContext));
 			}
 
 			@Override
 			public FileEntry updateFileEntry(
 					long userId, long fileEntryId, String sourceFileName,
-					String mimeType, String title, String urlTitle,
-					String description, String changeLog,
+					String mimeType, String title, String description,
+					String changeLog,
 					DLVersionNumberIncrease dlVersionNumberIncrease,
 					InputStream inputStream, long size, Date expirationDate,
 					Date reviewDate, ServiceContext serviceContext)
@@ -175,9 +174,9 @@ public class LiferayVersioningCapability
 					dlAppServiceAdapter,
 					super.updateFileEntry(
 						userId, fileEntryId, sourceFileName, mimeType, title,
-						urlTitle, description, changeLog,
-						dlVersionNumberIncrease, inputStream, size,
-						expirationDate, reviewDate, serviceContext));
+						description, changeLog, dlVersionNumberIncrease,
+						inputStream, size, expirationDate, reviewDate,
+						serviceContext));
 			}
 
 		};
@@ -222,8 +221,12 @@ public class LiferayVersioningCapability
 		return fileEntry;
 	}
 
-	private ServiceTrackerList<VersionPurger.VersionPurgedListener>
-		_versionPurgedListeners;
+	@Reference
+	private DLConfiguration _dlConfiguration;
+
+	private ServiceTrackerList
+		<VersionPurger.VersionPurgedListener,
+		 VersionPurger.VersionPurgedListener> _versionPurgedListeners;
 
 	@Reference(
 		policy = ReferencePolicy.DYNAMIC,

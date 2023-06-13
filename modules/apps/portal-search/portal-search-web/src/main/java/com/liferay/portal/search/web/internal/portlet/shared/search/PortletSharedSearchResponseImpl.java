@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.web.internal.display.context.PortletRequestThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.display.context.ThemeDisplaySupplier;
-import com.liferay.portal.search.web.internal.portlet.shared.task.helper.PortletSharedRequestHelper;
+import com.liferay.portal.search.web.internal.portlet.shared.task.PortletSharedRequestHelper;
 import com.liferay.portal.search.web.internal.search.request.SearchResponseImpl;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchResponse;
 import com.liferay.portal.search.web.search.request.SearchSettings;
@@ -62,15 +62,15 @@ public class PortletSharedSearchResponseImpl
 
 	@Override
 	public SearchResponse getFederatedSearchResponse(
-		String federatedSearchKey) {
+		Optional<String> federatedSearchKeyOptional) {
 
 		return _searchResponseImpl.getFederatedSearchResponse(
-			federatedSearchKey);
+			federatedSearchKeyOptional);
 	}
 
 	@Override
-	public String getKeywords() {
-		return _searchResponseImpl.getKeywords();
+	public Optional<String> getKeywordsOptional() {
+		return _searchResponseImpl.getKeywordsOptional();
 	}
 
 	@Override
@@ -87,17 +87,15 @@ public class PortletSharedSearchResponseImpl
 	public Optional<String> getParameter(
 		String name, RenderRequest renderRequest) {
 
-		return Optional.ofNullable(
-			_portletSharedRequestHelper.getParameter(name, renderRequest));
+		return _portletSharedRequestHelper.getParameter(name, renderRequest);
 	}
 
 	@Override
 	public Optional<String[]> getParameterValues(
 		String name, RenderRequest renderRequest) {
 
-		return Optional.ofNullable(
-			_portletSharedRequestHelper.getParameterValues(
-				name, renderRequest));
+		return _portletSharedRequestHelper.getParameterValues(
+			name, renderRequest);
 	}
 
 	@Override
@@ -123,8 +121,8 @@ public class PortletSharedSearchResponseImpl
 	}
 
 	@Override
-	public String getSpellCheckSuggestion() {
-		return _searchResponseImpl.getSpellCheckSuggestion();
+	public Optional<String> getSpellCheckSuggestionOptional() {
+		return _searchResponseImpl.getSpellCheckSuggestionOptional();
 	}
 
 	@Override

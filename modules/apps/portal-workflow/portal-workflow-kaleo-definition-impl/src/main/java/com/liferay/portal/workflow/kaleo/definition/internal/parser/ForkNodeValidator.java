@@ -37,13 +37,10 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  * @author Norbert Kocsis
  */
-@Component(service = NodeValidator.class)
+@Component(
+	immediate = true, property = "node.type=FORK", service = NodeValidator.class
+)
 public class ForkNodeValidator extends BaseNodeValidator<Fork> {
-
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.FORK;
-	}
 
 	@Override
 	protected void doValidate(Definition definition, Fork fork)
@@ -51,18 +48,18 @@ public class ForkNodeValidator extends BaseNodeValidator<Fork> {
 
 		if (fork.getIncomingTransitionsCount() == 0) {
 			throw new KaleoDefinitionValidationException.
-				MustSetIncomingTransition(fork.getDefaultLabel());
+				MustSetIncomingTransition(fork.getName());
 		}
 
 		if (fork.getOutgoingTransitionsCount() < 2) {
 			throw new KaleoDefinitionValidationException.
-				MustSetMultipleOutgoingTransition(fork.getDefaultLabel());
+				MustSetMultipleOutgoingTransition(fork.getName());
 		}
 
-		_traverse(fork);
+		traverse(fork);
 	}
 
-	private List<Node> _getUnvisitedNodes(
+	protected List<Node> getUnvisitedNodes(
 		List<Node> nodes, Collection<Transition> transitions, boolean target) {
 
 		List<Node> unvisitedNodes = new ArrayList<>();
@@ -82,7 +79,7 @@ public class ForkNodeValidator extends BaseNodeValidator<Fork> {
 		return unvisitedNodes;
 	}
 
-	private void _reverseTraverse(
+	protected void reverseTraverse(
 			Fork fork, Join join, List<Node> targetNodes,
 			Map<Join, Fork> joinForkMap)
 		throws KaleoDefinitionValidationException {
@@ -113,7 +110,7 @@ public class ForkNodeValidator extends BaseNodeValidator<Fork> {
 				sourceNodes.set(i, sourceNode);
 			}
 
-			List<Node> unvisitedSourceNodes = _getUnvisitedNodes(
+			List<Node> unvisitedSourceNodes = getUnvisitedNodes(
 				sourceNodes, sourceNode.getIncomingTransitions(), false);
 
 			sourceNodes.addAll(unvisitedSourceNodes);
@@ -123,12 +120,11 @@ public class ForkNodeValidator extends BaseNodeValidator<Fork> {
 			!sourceNodes.containsAll(targetNodes)) {
 
 			throw new KaleoDefinitionValidationException.
-				UnbalancedForkAndJoinNode(
-					fork.getDefaultLabel(), join.getDefaultLabel());
+				UnbalancedForkAndJoinNode(fork.getName(), join.getName());
 		}
 	}
 
-	private Join _traverse(Fork fork)
+	protected Join traverse(Fork fork)
 		throws KaleoDefinitionValidationException {
 
 		Join join = null;
@@ -149,11 +145,11 @@ public class ForkNodeValidator extends BaseNodeValidator<Fork> {
 			NodeType nodeType = targetNode.getNodeType();
 
 			if (nodeType.equals(NodeType.FORK)) {
-				Join localJoin = _traverse((Fork)targetNode);
+				Join localJoin = traverse((Fork)targetNode);
 
 				joinForkMap.put(localJoin, (Fork)targetNode);
 
-				List<Node> unvisitedTargetNodes = _getUnvisitedNodes(
+				List<Node> unvisitedTargetNodes = getUnvisitedNodes(
 					targetNodes, localJoin.getOutgoingTransitionsList(), true);
 
 				targetNodes.addAll(unvisitedTargetNodes);
@@ -167,12 +163,11 @@ public class ForkNodeValidator extends BaseNodeValidator<Fork> {
 				else if (!Objects.equals(join, targetNode)) {
 					throw new KaleoDefinitionValidationException.
 						MustPairedForkAndJoinNodes(
-							fork.getDefaultLabel(),
-							targetNode.getDefaultLabel());
+							fork.getName(), targetNode.getName());
 				}
 			}
 			else {
-				List<Node> unvisitedTargetNodes = _getUnvisitedNodes(
+				List<Node> unvisitedTargetNodes = getUnvisitedNodes(
 					targetNodes, targetNode.getOutgoingTransitionsList(), true);
 
 				targetNodes.addAll(unvisitedTargetNodes);
@@ -181,10 +176,10 @@ public class ForkNodeValidator extends BaseNodeValidator<Fork> {
 
 		if (join == null) {
 			throw new KaleoDefinitionValidationException.MustSetJoinNode(
-				fork.getDefaultLabel());
+				fork.getName());
 		}
 
-		_reverseTraverse(fork, join, targetNodes, joinForkMap);
+		reverseTraverse(fork, join, targetNodes, joinForkMap);
 
 		return join;
 	}

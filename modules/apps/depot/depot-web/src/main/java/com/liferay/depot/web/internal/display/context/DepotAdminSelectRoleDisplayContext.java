@@ -16,6 +16,7 @@ package com.liferay.depot.web.internal.display.context;
 
 import com.liferay.depot.constants.DepotRolesConstants;
 import com.liferay.depot.model.DepotEntry;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -27,7 +28,6 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicyUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -56,11 +56,14 @@ import com.liferay.portlet.usersadmin.search.GroupSearchTerms;
 import com.liferay.roles.admin.kernel.util.RolesAdminUtil;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -177,9 +180,17 @@ public class DepotAdminSelectRoleDisplayContext {
 				_getPortletURL(_renderRequest, _renderResponse, _user));
 
 			groupSearch.setEmptyResultsMessage("no-asset-libraries-were-found");
-			groupSearch.setResultsAndTotal(
-				_getDepotGroups(
-					(GroupSearchTerms)groupSearch.getSearchTerms()));
+
+			GroupSearchTerms groupSearchTerms =
+				(GroupSearchTerms)groupSearch.getSearchTerms();
+
+			List<Group> groups = _getDepotGroups(groupSearchTerms);
+
+			groupSearch.setTotal(groups.size());
+
+			groupSearch.setResults(
+				ListUtil.subList(
+					groups, groupSearch.getStart(), groupSearch.getEnd()));
 
 			_groupSearch = groupSearch;
 
@@ -206,7 +217,19 @@ public class DepotAdminSelectRoleDisplayContext {
 			}
 
 			if (!groupSearchTerms.hasSearchTerms()) {
-				return ListUtil.filter(_user.getGroups(), Group::isDepot);
+				List<Group> groups = ListUtil.copy(_user.getGroups());
+
+				Iterator<Group> iterator = groups.iterator();
+
+				while (iterator.hasNext()) {
+					Group group = iterator.next();
+
+					if (!group.isDepot()) {
+						iterator.remove();
+					}
+				}
+
+				return groups;
 			}
 
 			return GroupLocalServiceUtil.search(
@@ -317,7 +340,13 @@ public class DepotAdminSelectRoleDisplayContext {
 				roles = _filterGroupRoles(roles);
 			}
 
-			roleSearch.setResultsAndTotal(roles);
+			int rolesCount = roles.size();
+
+			roleSearch.setTotal(rolesCount);
+
+			roleSearch.setResults(
+				ListUtil.subList(
+					roles, roleSearch.getStart(), roleSearch.getEnd()));
 
 			_roleSearch = roleSearch;
 
@@ -337,12 +366,13 @@ public class DepotAdminSelectRoleDisplayContext {
 				return false;
 			}
 
-			for (UserGroupRole userGroupRole :
-					UserGroupRoleLocalServiceUtil.getUserGroupRoles(
-						_user.getUserId())) {
+			List<UserGroupRole> userGroupRoles =
+				UserGroupRoleLocalServiceUtil.getUserGroupRoles(
+					_user.getUserId());
 
+			for (UserGroupRole userGroupRole : userGroupRoles) {
 				if ((_group.getGroupId() == userGroupRole.getGroupId()) &&
-					(role.getRoleId() == userGroupRole.getRoleId())) {
+					(userGroupRole.getRoleId() == role.getRoleId())) {
 
 					return true;
 				}
@@ -386,16 +416,20 @@ public class DepotAdminSelectRoleDisplayContext {
 			if (permissionChecker.isCompanyAdmin() ||
 				permissionChecker.isGroupOwner(_group.getGroupId())) {
 
-				return ListUtil.filter(
-					roles,
+				Stream<Role> stream = roles.stream();
+
+				return stream.filter(
 					role ->
 						!Objects.equals(
+							role.getName(),
 							DepotRolesConstants.
-								ASSET_LIBRARY_CONNECTED_SITE_MEMBER,
-							role.getName()) &&
+								ASSET_LIBRARY_CONNECTED_SITE_MEMBER) &&
 						!Objects.equals(
-							DepotRolesConstants.ASSET_LIBRARY_MEMBER,
-							role.getName()));
+							role.getName(),
+							DepotRolesConstants.ASSET_LIBRARY_MEMBER)
+				).collect(
+					Collectors.toList()
+				);
 			}
 
 			if (!GroupPermissionUtil.contains(
@@ -404,24 +438,29 @@ public class DepotAdminSelectRoleDisplayContext {
 				return Collections.emptyList();
 			}
 
-			return ListUtil.filter(
-				roles,
+			Stream<Role> stream = roles.stream();
+
+			return stream.filter(
 				role ->
 					!Objects.equals(
-						DepotRolesConstants.ASSET_LIBRARY_CONNECTED_SITE_MEMBER,
-						role.getName()) &&
+						role.getName(),
+						DepotRolesConstants.
+							ASSET_LIBRARY_CONNECTED_SITE_MEMBER) &&
 					!Objects.equals(
-						DepotRolesConstants.ASSET_LIBRARY_MEMBER,
-						role.getName()) &&
+						role.getName(),
+						DepotRolesConstants.ASSET_LIBRARY_MEMBER) &&
 					!Objects.equals(
-						DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR,
-						role.getName()) &&
+						role.getName(),
+						DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR) &&
 					!Objects.equals(
-						DepotRolesConstants.ASSET_LIBRARY_OWNER,
-						role.getName()) &&
+						role.getName(),
+						DepotRolesConstants.ASSET_LIBRARY_OWNER) &&
 					RolePermissionUtil.contains(
 						permissionChecker, _group.getGroupId(),
-						role.getRoleId(), ActionKeys.ASSIGN_MEMBERS));
+						role.getRoleId(), ActionKeys.ASSIGN_MEMBERS)
+			).collect(
+				Collectors.toList()
+			);
 		}
 
 		private Group _getGroup(RenderRequest renderRequest)
@@ -429,11 +468,11 @@ public class DepotAdminSelectRoleDisplayContext {
 
 			long groupId = ParamUtil.getLong(renderRequest, "groupId");
 
-			if (groupId <= 0) {
-				return null;
+			if (groupId > 0) {
+				return GroupServiceUtil.getGroup(groupId);
 			}
 
-			return GroupServiceUtil.getGroup(groupId);
+			return null;
 		}
 
 		private final Group _group;

@@ -12,36 +12,36 @@
 AUI.add(
 	'liferay-kaleo-designer-nodes',
 	(A) => {
-		const AArray = A.Array;
-		const DiagramBuilder = A.DiagramBuilder;
-		const Lang = A.Lang;
+		var AArray = A.Array;
+		var DiagramBuilder = A.DiagramBuilder;
+		var Lang = A.Lang;
 
-		const isNumber = Lang.isNumber;
-		const isObject = Lang.isObject;
-		const isString = Lang.isString;
+		var isNumber = Lang.isNumber;
+		var isObject = Lang.isObject;
+		var isString = Lang.isString;
 
-		const DiagramBuilderTypes = DiagramBuilder.types;
+		var DiagramBuilderTypes = DiagramBuilder.types;
 
-		const KaleoDesignerEditors = Liferay.KaleoDesignerEditors;
-		const KaleoDesignerRemoteServices = Liferay.KaleoDesignerRemoteServices;
-		const KaleoDesignerStrings = Liferay.KaleoDesignerStrings;
+		var KaleoDesignerEditors = Liferay.KaleoDesignerEditors;
+		var KaleoDesignerRemoteServices = Liferay.KaleoDesignerRemoteServices;
+		var KaleoDesignerStrings = Liferay.KaleoDesignerStrings;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const PropertyListFormatter =
+		var PropertyListFormatter =
 			Liferay.KaleoDesignerUtils.PropertyListFormatter;
 
-		const renderShapeBoundary = function () {
-			const instance = this;
+		var renderShapeBoundary = function () {
+			var instance = this;
 
-			const boundary = (instance.boundary = instance
+			var boundary = (instance.boundary = instance
 				.get('graphic')
 				.addShape(instance.get('shapeBoundary')));
 
 			return boundary;
 		};
 
-		const Connector = A.Component.create({
+		var Connector = A.Component.create({
 			ATTRS: {
 				default: {
 					setter: A.DataType.Boolean.parse,
@@ -61,7 +61,7 @@ AUI.add(
 				),
 
 				getPropertyModel() {
-					const parentModel = A.Connector.superclass.getPropertyModel.apply(
+					var parentModel = A.Connector.superclass.getPropertyModel.apply(
 						this,
 						arguments
 					);
@@ -79,7 +79,7 @@ AUI.add(
 			},
 		});
 
-		const DiagramNodeState = A.Component.create({
+		var DiagramNodeState = A.Component.create({
 			ATTRS: {
 				actions: {},
 
@@ -118,9 +118,9 @@ AUI.add(
 
 			prototype: {
 				_afterNodeRender() {
-					const instance = this;
+					var instance = this;
 
-					const icon = A.Node.create(
+					var icon = A.Node.create(
 						Liferay.Util.getLexiconIconTpl(
 							instance.get('iconClass')
 						)
@@ -175,7 +175,7 @@ AUI.add(
 				},
 
 				_uiSetXY(val) {
-					const instance = this;
+					var instance = this;
 
 					DiagramNodeState.superclass._uiSetXY.apply(this, arguments);
 
@@ -183,7 +183,7 @@ AUI.add(
 				},
 
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeState.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeState.prototype._valueShapeBoundary();
 
 					shape.radius = 17;
 
@@ -205,28 +205,26 @@ AUI.add(
 				),
 
 				getConnectionNode() {
-					const node = new Liferay.KaleoDesignerNodes.DiagramNodeTask(
-						{
-							xy: [100, 100],
-						}
-					);
+					var node = new Liferay.KaleoDesignerNodes.DiagramNodeTask({
+						xy: [100, 100],
+					});
 
 					return node;
 				},
 
 				getPropertyModel() {
-					const instance = this;
+					var instance = this;
 
-					const builder = instance.get('builder');
+					var builder = instance.get('builder');
 
-					const availablePropertyModels = builder.get(
+					var availablePropertyModels = builder.get(
 						'availablePropertyModels'
 					);
 
-					const strings = instance.getStrings();
-					const type = instance.get('type');
+					var strings = instance.getStrings();
+					var type = instance.get('type');
 
-					const model = AArray([
+					var model = AArray([
 						{
 							attributeName: 'actions',
 							editor: new KaleoDesignerEditors.ActionsEditor({
@@ -247,14 +245,14 @@ AUI.add(
 						},
 					]);
 
-					const typeModel = availablePropertyModels[type];
+					var typeModel = availablePropertyModels[type];
 
-					const parentModel = DiagramNodeState.superclass.getPropertyModel.apply(
+					var parentModel = DiagramNodeState.superclass.getPropertyModel.apply(
 						this,
 						arguments
 					);
 
-					let returnValue;
+					var returnValue;
 
 					if (typeModel) {
 						returnValue = typeModel.call(
@@ -272,7 +270,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.after('render', instance._afterNodeRender);
 				},
@@ -280,9 +278,9 @@ AUI.add(
 				renderShapeBoundary,
 
 				updateMetadata(key, value) {
-					const instance = this;
+					var instance = this;
 
-					const metadata = instance.get('metadata');
+					var metadata = instance.get('metadata');
 
 					metadata[key] = value;
 
@@ -293,7 +291,7 @@ AUI.add(
 
 		DiagramBuilderTypes.state = DiagramNodeState;
 
-		const DiagramNodeCondition = A.Component.create({
+		var DiagramNodeCondition = A.Component.create({
 			ATTRS: {
 				height: {
 					value: 60,
@@ -334,7 +332,7 @@ AUI.add(
 
 			prototype: {
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeCondition.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeCondition.prototype._valueShapeBoundary();
 
 					shape.width = 41;
 					shape.height = 41;
@@ -343,19 +341,19 @@ AUI.add(
 				},
 
 				getPropertyModel() {
-					const instance = this;
+					var instance = this;
 
-					const builder = instance.get('builder');
+					var builder = instance.get('builder');
 
-					const availablePropertyModels = builder.get(
+					var availablePropertyModels = builder.get(
 						'availablePropertyModels'
 					);
 
-					const type = instance.get('type');
+					var type = instance.get('type');
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
-					const model = AArray([
+					var model = AArray([
 						{
 							attributeName: 'script',
 							editor: new KaleoDesignerEditors.ScriptEditor(),
@@ -371,14 +369,14 @@ AUI.add(
 						},
 					]);
 
-					const typeModel = availablePropertyModels[type];
+					var typeModel = availablePropertyModels[type];
 
-					const parentModel = DiagramNodeCondition.superclass.getPropertyModel.apply(
+					var parentModel = DiagramNodeCondition.superclass.getPropertyModel.apply(
 						this,
 						arguments
 					);
 
-					let returnValue;
+					var returnValue;
 
 					if (typeModel) {
 						returnValue = typeModel.call(
@@ -396,15 +394,15 @@ AUI.add(
 				},
 
 				getScriptLanguageOptions() {
-					const instance = this;
+					var instance = this;
 
-					const scriptLanguages = [];
+					var scriptLanguages = [];
 
 					instance.getScriptLanguages(scriptLanguages);
 
-					const scriptLanguageOptions = {};
+					var scriptLanguageOptions = {};
 
-					const strings = instance.getStrings();
+					var strings = instance.getStrings();
 
 					scriptLanguages.forEach((item) => {
 						if (item) {
@@ -433,7 +431,7 @@ AUI.add(
 
 		DiagramBuilderTypes.condition = DiagramNodeCondition;
 
-		const DiagramNodeJoin = A.Component.create({
+		var DiagramNodeJoin = A.Component.create({
 			ATTRS: {
 				height: {
 					value: 60,
@@ -464,7 +462,7 @@ AUI.add(
 
 			prototype: {
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeJoin.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeJoin.prototype._valueShapeBoundary();
 
 					shape.width = 41;
 					shape.height = 41;
@@ -480,7 +478,7 @@ AUI.add(
 
 		DiagramBuilderTypes.join = DiagramNodeJoin;
 
-		const DiagramNodeJoinXOR = A.Component.create({
+		var DiagramNodeJoinXOR = A.Component.create({
 			ATTRS: {
 				iconClass: {
 					value: 'arrow-xor',
@@ -503,7 +501,7 @@ AUI.add(
 
 			prototype: {
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeJoin.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeJoin.prototype._valueShapeBoundary();
 
 					shape.width = 41;
 					shape.height = 41;
@@ -517,7 +515,7 @@ AUI.add(
 
 		DiagramBuilderTypes['join-xor'] = DiagramNodeJoinXOR;
 
-		const DiagramNodeFork = A.Component.create({
+		var DiagramNodeFork = A.Component.create({
 			ATTRS: {
 				height: {
 					value: 60,
@@ -548,7 +546,7 @@ AUI.add(
 
 			prototype: {
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeFork.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeFork.prototype._valueShapeBoundary();
 
 					shape.width = 41;
 					shape.height = 41;
@@ -557,7 +555,7 @@ AUI.add(
 				},
 
 				getConnectionNode() {
-					const node = new DiagramNodeJoin({
+					var node = new DiagramNodeJoin({
 						xy: [100, 100],
 					});
 
@@ -572,7 +570,7 @@ AUI.add(
 
 		DiagramBuilderTypes.fork = DiagramNodeFork;
 
-		const DiagramNodeStart = A.Component.create({
+		var DiagramNodeStart = A.Component.create({
 			ATTRS: {
 				iconClass: {
 					value: 'arrow-start',
@@ -599,7 +597,7 @@ AUI.add(
 
 			prototype: {
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeStart.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeStart.prototype._valueShapeBoundary();
 
 					shape.radius = 17;
 
@@ -607,7 +605,7 @@ AUI.add(
 				},
 
 				getConnectionNode() {
-					const node = new DiagramNodeCondition({
+					var node = new DiagramNodeCondition({
 						xy: [100, 100],
 					});
 
@@ -620,7 +618,7 @@ AUI.add(
 
 		DiagramBuilderTypes.start = DiagramNodeStart;
 
-		const DiagramNodeEnd = A.Component.create({
+		var DiagramNodeEnd = A.Component.create({
 			ATTRS: {
 				iconClass: {
 					value: 'arrow-end',
@@ -644,7 +642,7 @@ AUI.add(
 
 			prototype: {
 				_handleAddAnchorEvent() {
-					const instance = this;
+					var instance = this;
 
 					instance.addField({
 						maxTargets: 0,
@@ -652,14 +650,14 @@ AUI.add(
 				},
 
 				_handleAddNodeEvent() {
-					const instance = this;
+					var instance = this;
 
-					const builder = instance.get('builder');
+					var builder = instance.get('builder');
 
-					const source = instance.findAvailableAnchor();
+					var source = instance.findAvailableAnchor();
 
 					if (source) {
-						const diagramNode = instance.getConnectionNode();
+						var diagramNode = instance.getConnectionNode();
 
 						builder.addField(diagramNode);
 						diagramNode.addField({}).connect(source);
@@ -667,7 +665,7 @@ AUI.add(
 				},
 
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeEnd.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeEnd.prototype._valueShapeBoundary();
 
 					shape.radius = 17;
 
@@ -680,7 +678,7 @@ AUI.add(
 
 		DiagramBuilderTypes.end = DiagramNodeEnd;
 
-		const DiagramNodeTask = A.Component.create({
+		var DiagramNodeTask = A.Component.create({
 			ATTRS: {
 				assignments: {
 					validator: isObject,
@@ -723,7 +721,7 @@ AUI.add(
 
 			prototype: {
 				_valueShapeBoundary() {
-					const shape = A.DiagramNodeTask.prototype._valueShapeBoundary();
+					var shape = A.DiagramNodeTask.prototype._valueShapeBoundary();
 
 					shape.width = 55;
 					shape.height = 55;
@@ -736,18 +734,18 @@ AUI.add(
 				),
 
 				getPropertyModel() {
-					const instance = this;
+					var instance = this;
 
-					const builder = instance.get('builder');
+					var builder = instance.get('builder');
 
-					const availablePropertyModels = builder.get(
+					var availablePropertyModels = builder.get(
 						'availablePropertyModels'
 					);
 
-					const strings = instance.getStrings();
-					const type = instance.get('type');
+					var strings = instance.getStrings();
+					var type = instance.get('type');
 
-					const model = AArray([
+					var model = AArray([
 						{
 							attributeName: 'actions',
 							editor: new KaleoDesignerEditors.ActionsEditor({
@@ -776,14 +774,14 @@ AUI.add(
 						},
 					]);
 
-					const typeModel = availablePropertyModels[type];
+					var typeModel = availablePropertyModels[type];
 
-					const parentModel = DiagramNodeState.superclass.getPropertyModel.apply(
+					var parentModel = DiagramNodeState.superclass.getPropertyModel.apply(
 						this,
 						arguments
 					);
 
-					let returnValue;
+					var returnValue;
 
 					if (typeModel) {
 						returnValue = typeModel.call(

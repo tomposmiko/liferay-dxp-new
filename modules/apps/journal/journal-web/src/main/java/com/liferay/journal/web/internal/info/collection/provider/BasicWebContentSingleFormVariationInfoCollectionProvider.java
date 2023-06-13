@@ -29,26 +29,33 @@ import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.filter.InfoFilter;
 import com.liferay.info.filter.KeywordsInfoFilter;
 import com.liferay.info.form.InfoForm;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.localized.InfoLocalizedValue;
-import com.liferay.info.localized.SingleValueInfoLocalizedValue;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.info.sort.Sort;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.journal.web.internal.util.JournalSearcherUtil;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.journal.web.internal.search.JournalSearcher;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portlet.asset.util.comparator.AssetTagNameComparator;
 
 import java.io.Serializable;
@@ -59,6 +66,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -66,7 +74,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(enabled = false, service = InfoCollectionProvider.class)
+@Component(
+	enabled = false, immediate = true, service = InfoCollectionProvider.class
+)
 public class BasicWebContentSingleFormVariationInfoCollectionProvider
 	implements ConfigurableInfoCollectionProvider<JournalArticle>,
 			   FilteredInfoCollectionProvider<JournalArticle>,
@@ -76,15 +86,42 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 	public InfoPage<JournalArticle> getCollectionInfoPage(
 		CollectionQuery collectionQuery) {
 
-		SearchResponse searchResponse =
-			JournalSearcherUtil.searchJournalArticles(
-				searchContext -> _populateSearchContext(
-					collectionQuery, searchContext));
+		try {
+			Indexer<?> indexer = JournalSearcher.getInstance();
 
-		return InfoPage.of(
-			JournalSearcherUtil.transformJournalArticles(
-				searchResponse.getDocuments71(), false),
-			collectionQuery.getPagination(), searchResponse.getTotalHits());
+			SearchContext searchContext = _buildSearchContext(collectionQuery);
+
+			Hits hits = indexer.search(searchContext);
+
+			List<JournalArticle> articles = new ArrayList<>();
+
+			for (Document document : hits.getDocs()) {
+				String className = document.get(Field.ENTRY_CLASS_NAME);
+
+				if (className.equals(JournalArticle.class.getName())) {
+					long classPK = GetterUtil.getLong(
+						document.get(Field.ENTRY_CLASS_PK));
+
+					JournalArticle article =
+						_journalArticleLocalService.fetchLatestArticle(
+							classPK, WorkflowConstants.STATUS_ANY, false);
+
+					if (article != null) {
+						articles.add(article);
+					}
+				}
+			}
+
+			return InfoPage.of(
+				articles, collectionQuery.getPagination(), hits.getLength());
+		}
+		catch (SearchException searchException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(searchException, searchException);
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -96,8 +133,6 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 			InfoField.builder(
 			).infoFieldType(
 				TextInfoFieldType.INSTANCE
-			).namespace(
-				StringPool.BLANK
 			).name(
 				Field.TITLE
 			).labelInfoLocalizedValue(
@@ -110,59 +145,6 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 
 	@Override
 	public String getFormVariationKey() {
-		return String.valueOf(_getDDDMStructureId());
-	}
-
-	@Override
-	public String getLabel(Locale locale) {
-		return _language.get(locale, "basic-web-content");
-	}
-
-	@Override
-	public List<InfoFilter> getSupportedInfoFilters() {
-		return Arrays.asList(new KeywordsInfoFilter());
-	}
-
-	private InfoField<?> _getAssetTagsInfoField() {
-		List<SelectInfoFieldType.Option> options = new ArrayList<>();
-
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		List<AssetTag> assetTags = new ArrayList<>(
-			_assetTagLocalService.getGroupTags(
-				serviceContext.getScopeGroupId()));
-
-		assetTags.sort(new AssetTagNameComparator(true));
-
-		for (AssetTag assetTag : assetTags) {
-			options.add(
-				new SelectInfoFieldType.Option(
-					new SingleValueInfoLocalizedValue<>(assetTag.getName()),
-					assetTag.getName()));
-		}
-
-		InfoField.FinalStep<?> finalStep = InfoField.builder(
-		).infoFieldType(
-			SelectInfoFieldType.INSTANCE
-		).namespace(
-			StringPool.BLANK
-		).name(
-			Field.ASSET_TAG_NAMES
-		).attribute(
-			SelectInfoFieldType.MULTIPLE, true
-		).attribute(
-			SelectInfoFieldType.OPTIONS, options
-		).labelInfoLocalizedValue(
-			InfoLocalizedValue.localize(getClass(), "tag")
-		).localizable(
-			true
-		);
-
-		return finalStep.build();
-	}
-
-	private long _getDDDMStructureId() {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -171,25 +153,39 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 			_portal.getClassNameId(JournalArticle.class.getName()),
 			"BASIC-WEB-CONTENT", true);
 
-		return ddmStructure.getStructureId();
+		return String.valueOf(ddmStructure.getStructureId());
 	}
 
-	private SearchContext _populateSearchContext(
-		CollectionQuery collectionQuery, SearchContext searchContext) {
+	@Override
+	public String getLabel(Locale locale) {
+		return LanguageUtil.get(locale, "basic-web-content");
+	}
 
-		Map<String, Serializable> attributes = searchContext.getAttributes();
+	@Override
+	public List<InfoFilter> getSupportedInfoFilters() {
+		return Arrays.asList(new KeywordsInfoFilter());
+	}
 
-		attributes.put(Field.STATUS, WorkflowConstants.STATUS_APPROVED);
-		attributes.put("head", true);
+	private SearchContext _buildSearchContext(CollectionQuery collectionQuery) {
+		SearchContext searchContext = new SearchContext();
 
-		searchContext.setAttributes(attributes);
+		searchContext.setAndSearch(true);
+		searchContext.setAttributes(
+			HashMapBuilder.<String, Serializable>put(
+				Field.STATUS, WorkflowConstants.STATUS_APPROVED
+			).put(
+				"ddmStructureKey", "BASIC-WEB-CONTENT"
+			).put(
+				"head", true
+			).put(
+				"latest", true
+			).build());
 
-		Map<String, String[]> configuration =
-			collectionQuery.getConfiguration();
+		Optional<Map<String, String[]>> configurationOptional =
+			collectionQuery.getConfigurationOptional();
 
-		if (configuration == null) {
-			configuration = Collections.emptyMap();
-		}
+		Map<String, String[]> configuration = configurationOptional.orElse(
+			Collections.emptyMap());
 
 		String[] assetTagNames = configuration.get(Field.ASSET_TAG_NAMES);
 
@@ -202,10 +198,11 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 		String[] title = configuration.get(Field.TITLE);
 
 		if (ArrayUtil.isNotEmpty(title) && Validator.isNotNull(title[0])) {
-			searchContext.setAttribute(Field.TITLE, title[0]);
-		}
+			String localizedName = Field.getLocalizedName(
+				LocaleUtil.getSiteDefault(), Field.TITLE);
 
-		searchContext.setClassTypeIds(new long[] {_getDDDMStructureId()});
+			searchContext.setAttribute(localizedName, title[0]);
+		}
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -219,16 +216,21 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 		searchContext.setGroupIds(
 			new long[] {serviceContext.getScopeGroupId()});
 
-		KeywordsInfoFilter keywordsInfoFilter = collectionQuery.getInfoFilter(
-			KeywordsInfoFilter.class);
+		Optional<KeywordsInfoFilter> keywordsInfoFilterOptional =
+			collectionQuery.getInfoFilterOptional(KeywordsInfoFilter.class);
 
-		if (keywordsInfoFilter != null) {
+		if (keywordsInfoFilterOptional.isPresent()) {
+			KeywordsInfoFilter keywordsInfoFilter =
+				keywordsInfoFilterOptional.get();
+
 			searchContext.setKeywords(keywordsInfoFilter.getKeywords());
 		}
 
-		Sort sort = collectionQuery.getSort();
+		Optional<Sort> sortOptional = collectionQuery.getSortOptional();
 
-		if (sort != null) {
+		if (sortOptional.isPresent()) {
+			Sort sort = sortOptional.get();
+
 			searchContext.setSorts(
 				new com.liferay.portal.kernel.search.Sort(
 					sort.getFieldName(),
@@ -252,6 +254,45 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 		return searchContext;
 	}
 
+	private InfoField<?> _getAssetTagsInfoField() {
+		List<SelectInfoFieldType.Option> options = new ArrayList<>();
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		List<AssetTag> assetTags = new ArrayList<>(
+			_assetTagLocalService.getGroupTags(
+				serviceContext.getScopeGroupId()));
+
+		assetTags.sort(new AssetTagNameComparator(true));
+
+		for (AssetTag assetTag : assetTags) {
+			options.add(
+				new SelectInfoFieldType.Option(
+					assetTag.getName(), assetTag.getName()));
+		}
+
+		InfoField.FinalStep<?> finalStep = InfoField.builder(
+		).infoFieldType(
+			SelectInfoFieldType.INSTANCE
+		).name(
+			Field.ASSET_TAG_NAMES
+		).attribute(
+			SelectInfoFieldType.MULTIPLE, true
+		).attribute(
+			SelectInfoFieldType.OPTIONS, options
+		).labelInfoLocalizedValue(
+			InfoLocalizedValue.localize(getClass(), "tag")
+		).localizable(
+			true
+		);
+
+		return finalStep.build();
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BasicWebContentSingleFormVariationInfoCollectionProvider.class);
+
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;
 
@@ -259,10 +300,10 @@ public class BasicWebContentSingleFormVariationInfoCollectionProvider
 	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
-	private JournalArticleLocalService _journalArticleLocalService;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
-	private Language _language;
+	private JournalArticleLocalService _journalArticleLocalService;
 
 	@Reference
 	private Portal _portal;

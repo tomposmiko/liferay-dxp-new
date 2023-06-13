@@ -47,7 +47,6 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 	>
 		<liferay-ui:search-container-row
 			className="Object"
-			keyProperty="<%= itemSelectorViewDescriptor.getKeyProperty() %>"
 			modelVar="entry"
 		>
 
@@ -67,17 +66,11 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 
 							<%
 							row.setCssClass("card-page-item card-page-item-directory entry " + row.getCssClass());
-
-							HorizontalCard horizontalCard = itemDescriptor.getHorizontalCard(renderRequest, searchContainer.getRowChecker());
-
-							if (horizontalCard == null) {
-								horizontalCard = new ItemDescriptorHorizontalCard(itemDescriptor, renderRequest, searchContainer.getRowChecker());
-							}
 							%>
 
 							<liferay-ui:search-container-column-text>
 								<clay:horizontal-card
-									horizontalCard="<%= horizontalCard %>"
+									horizontalCard="<%= new ItemDescriptorHorizontalCard(itemDescriptor, renderRequest, searchContainer.getRowChecker()) %>"
 								/>
 							</liferay-ui:search-container-column-text>
 						</c:when>
@@ -85,20 +78,11 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 
 							<%
 							row.setCssClass("card-page-item card-page-item-asset entry " + row.getCssClass());
-
-							VerticalCard verticalCard = itemDescriptor.getVerticalCard(renderRequest, searchContainer.getRowChecker());
-
-							if (verticalCard == null) {
-								verticalCard = new ItemDescriptorVerticalCard(itemDescriptor, renderRequest, searchContainer.getRowChecker());
-							}
 							%>
 
 							<liferay-ui:search-container-column-text>
 								<clay:vertical-card
-									aria-label='<%= LanguageUtil.format(request, "select-x", verticalCard.getTitle()) %>'
-									role="button"
-									tabIndex="0"
-									verticalCard="<%= verticalCard %>"
+									verticalCard="<%= new ItemDescriptorVerticalCard(itemDescriptor, renderRequest, searchContainer.getRowChecker()) %>"
 								/>
 							</liferay-ui:search-container-column-text>
 						</c:otherwise>
@@ -156,30 +140,39 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 						<p class="h6 text-default">
 							<%= itemDescriptor.getSubtitle(locale) %>
 						</p>
-
-						<c:if test="<%= itemDescriptor.getStatus() != null %>">
-							<span class="text-default">
-								<aui:workflow-status markupView="lexicon" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= itemDescriptor.getStatus() %>" />
-							</span>
-						</c:if>
 					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:otherwise>
+					<liferay-ui:search-container-column-text
+						cssClass="table-cell-expand table-cell-minw-200"
+						name="title"
+					>
+						<a class="entry" title="<%= itemDescriptor.getTitle(locale) %>">
+							<%= itemDescriptor.getTitle(locale) %>
+						</a>
+					</liferay-ui:search-container-column-text>
 
-					<%
-					TableItemView tableItemView = itemSelectorViewDescriptor.getTableItemView(row.getObject());
+					<liferay-ui:search-container-column-text
+						cssClass="table-cell-expand-smaller table-cell-minw-150"
+						name="user"
+						value="<%= itemDescriptor.getUserName() %>"
+					/>
 
-					if (tableItemView == null) {
-						tableItemView = new DefaultTableItemView(itemDescriptor);
-					}
+					<liferay-ui:search-container-column-text
+						cssClass="table-cell-expand-smaller table-cell-minw-150"
+						name="modified-date"
+					>
+						<c:if test="<%= Objects.nonNull(itemDescriptor.getModifiedDate()) %>">
 
-					searchContainer.setHeaderNames(tableItemView.getHeaderNames());
+							<%
+							Date modifiedDate = itemDescriptor.getModifiedDate();
+							%>
 
-					for (SearchEntry searchEntry : tableItemView.getSearchEntries(locale)) {
-						row.addSearchEntry(searchEntry);
-					}
-					%>
-
+							<span class="text-default">
+								<liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true) %>" key="modified-x-ago" />
+							</span>
+						</c:if>
+					</liferay-ui:search-container-column-text>
 				</c:otherwise>
 			</c:choose>
 		</liferay-ui:search-container-row>
@@ -211,10 +204,6 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 						domElement = this.ancestor('tr');
 					}
 
-					if (domElement == null) {
-						domElement = this.ancestor('dd');
-					}
-
 					if (domElement != null) {
 						var itemValue = domElement.getDOM().dataset.value;
 
@@ -236,77 +225,57 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 		</aui:script>
 	</c:when>
 	<c:otherwise>
-		<aui:script require="frontend-js-web/index as frontendJsWeb">
-			var {delegate} = frontendJsWeb;
+		<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+			var delegate = delegateModule.default;
 
-			var selectItem = () => {
-				var activeCards = document.querySelectorAll('.form-check-card.active');
-
-				if (activeCards.length) {
-					activeCards.forEach((card) => {
-						card.classList.remove('active');
-					});
-				}
-
-				var target = event.delegateTarget;
-
-				var newSelectedCard = target.closest('.form-check-card');
-
-				if (newSelectedCard) {
-					newSelectedCard.classList.add('active');
-				}
-
-				var domElement = target.closest('li');
-
-				if (domElement == null) {
-					domElement = target.closest('tr');
-				}
-
-				if (domElement == null) {
-					domElement = target.closest('dd');
-				}
-
-				var itemValue = '';
-
-				if (domElement != null) {
-					itemValue = domElement.dataset.value;
-				}
-
-				Liferay.Util.getOpener().Liferay.fire(
-					'<%= itemSelectorViewDescriptorRendererDisplayContext.getItemSelectedEventName() %>',
-					{
-						data: {
-							returnType:
-								'<%= itemSelectorViewDescriptorRendererDisplayContext.getReturnType() %>',
-							value: itemValue,
-						},
-					}
-				);
-			};
-
-			var onClickHandler = delegate(
+			var selectItemHandler = delegate(
 				document.querySelector('#<portlet:namespace />entriesContainer'),
 				'click',
 				'.entry',
 				(event) => {
-					selectItem();
-				}
-			);
+					var activeCards = document.querySelectorAll('.form-check-card.active');
 
-			var onKeydownHandler = delegate(
-				document.querySelector('#<portlet:namespace />entriesContainer'),
-				'keydown',
-				'.entry',
-				(event) => {
-					if (event.code === 'Enter') {
-						selectItem();
+					if (activeCards.length) {
+						activeCards.forEach((card) => {
+							card.classList.remove('active');
+						});
 					}
+
+					var target = event.delegateTarget;
+
+					var newSelectedCard = target.closest('.form-check-card');
+
+					if (newSelectedCard) {
+						newSelectedCard.classList.add('active');
+					}
+
+					var domElement = target.closest('li');
+
+					if (domElement == null) {
+						domElement = target.closest('tr');
+					}
+
+					var itemValue = '';
+
+					if (domElement != null) {
+						itemValue = domElement.dataset.value;
+					}
+
+					Liferay.Util.getOpener().Liferay.fire(
+						'<%= itemSelectorViewDescriptorRendererDisplayContext.getItemSelectedEventName() %>',
+						{
+							data: {
+								returnType:
+									'<%= itemSelectorViewDescriptorRendererDisplayContext.getReturnType() %>',
+								value: itemValue,
+							},
+						}
+					);
 				}
 			);
 
 			Liferay.on('destroyPortlet', function removeListener() {
-				onClickHandler.dispose();
-				onKeydownHandler.dispose();
+				selectItemHandler.dispose();
 
 				Liferay.detach('destroyPortlet', removeListener);
 			});

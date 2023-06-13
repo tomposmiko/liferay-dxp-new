@@ -20,7 +20,6 @@ import com.liferay.asset.entry.rel.model.AssetEntryAssetCategoryRelTable;
 import com.liferay.asset.entry.rel.model.impl.AssetEntryAssetCategoryRelImpl;
 import com.liferay.asset.entry.rel.model.impl.AssetEntryAssetCategoryRelModelImpl;
 import com.liferay.asset.entry.rel.service.persistence.AssetEntryAssetCategoryRelPersistence;
-import com.liferay.asset.entry.rel.service.persistence.AssetEntryAssetCategoryRelUtil;
 import com.liferay.asset.entry.rel.service.persistence.impl.constants.AssetPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -36,6 +35,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -77,7 +76,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = AssetEntryAssetCategoryRelPersistence.class)
+@Component(
+	service = {
+		AssetEntryAssetCategoryRelPersistence.class, BasePersistence.class
+	}
+)
 public class AssetEntryAssetCategoryRelPersistenceImpl
 	extends BasePersistenceImpl<AssetEntryAssetCategoryRel>
 	implements AssetEntryAssetCategoryRelPersistence {
@@ -203,7 +206,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetEntryAssetCategoryRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetEntryAssetCategoryRel assetEntryAssetCategoryRel :
@@ -585,7 +588,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 			finderArgs = new Object[] {assetEntryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -732,7 +735,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetEntryAssetCategoryRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetEntryAssetCategoryRel assetEntryAssetCategoryRel :
@@ -1115,7 +1118,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 			finderArgs = new Object[] {assetCategoryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1239,8 +1242,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByA_A, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByA_A, finderArgs);
 		}
 
 		if (result instanceof AssetEntryAssetCategoryRel) {
@@ -1370,7 +1372,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 			finderArgs = new Object[] {assetEntryId, assetCategoryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1804,7 +1806,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				AssetEntryAssetCategoryRel.class, primaryKey)) {
+				AssetEntryAssetCategoryRel.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2033,7 +2035,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetEntryAssetCategoryRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2112,7 +2114,7 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2278,32 +2280,11 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_A",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"assetEntryId", "assetCategoryId"}, false);
-
-		_setAssetEntryAssetCategoryRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setAssetEntryAssetCategoryRelUtilPersistence(null);
-
 		entityCache.removeCache(AssetEntryAssetCategoryRelImpl.class.getName());
-	}
-
-	private void _setAssetEntryAssetCategoryRelUtilPersistence(
-		AssetEntryAssetCategoryRelPersistence
-			assetEntryAssetCategoryRelPersistence) {
-
-		try {
-			Field field = AssetEntryAssetCategoryRelUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, assetEntryAssetCategoryRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2369,5 +2350,9 @@ public class AssetEntryAssetCategoryRelPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private AssetEntryAssetCategoryRelModelArgumentsResolver
+		_assetEntryAssetCategoryRelModelArgumentsResolver;
 
 }

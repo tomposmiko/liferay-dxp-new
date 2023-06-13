@@ -88,14 +88,11 @@ public class EqualsSerDes {
 
 			sb.append("\"value\": ");
 
-			if (equals.getValue() instanceof String) {
-				sb.append("\"");
-				sb.append((String)equals.getValue());
-				sb.append("\"");
-			}
-			else {
-				sb.append(equals.getValue());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(equals.getValue()));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");

@@ -27,10 +27,6 @@ public class BookmarksFolderLocalServiceWrapper
 	implements BookmarksFolderLocalService,
 			   ServiceWrapper<BookmarksFolderLocalService> {
 
-	public BookmarksFolderLocalServiceWrapper() {
-		this(null);
-	}
-
 	public BookmarksFolderLocalServiceWrapper(
 		BookmarksFolderLocalService bookmarksFolderLocalService) {
 

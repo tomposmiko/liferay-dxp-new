@@ -29,13 +29,13 @@ const openNotification = ({error, message}) => {
 	openToast(openToastParams);
 };
 
-export function submitEmailContent({
+export const submitEmailContent = ({
 	addresses,
 	message,
 	portletNamespace,
 	shareFormInstanceURL,
 	subject,
-}) {
+}) => {
 	if (!addresses || !addresses.length) {
 		return;
 	}
@@ -64,4 +64,4 @@ export function submitEmailContent({
 		.catch((error) => {
 			throw new Error(error);
 		});
-}
+};

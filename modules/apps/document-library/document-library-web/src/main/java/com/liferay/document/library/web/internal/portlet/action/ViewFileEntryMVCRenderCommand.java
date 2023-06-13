@@ -17,7 +17,6 @@ package com.liferay.document.library.web.internal.portlet.action;
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
-import com.liferay.asset.util.LinkedAssetEntryIdsUtil;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.display.context.DLDisplayContextProvider;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
@@ -171,11 +170,6 @@ public class ViewFileEntryMVCRenderCommand
 
 		renderRequest.setAttribute(
 			WebKeys.LAYOUT_ASSET_ENTRY, layoutAssetEntry);
-
-		if (layoutAssetEntry != null) {
-			LinkedAssetEntryIdsUtil.addLinkedAssetEntryId(
-				renderRequest, layoutAssetEntry.getEntryId());
-		}
 	}
 
 	@Reference

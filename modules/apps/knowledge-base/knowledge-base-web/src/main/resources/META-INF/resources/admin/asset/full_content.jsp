@@ -43,9 +43,16 @@ if (kbArticle != null) {
 				<clay:col
 					md="4"
 				>
-					<clay:horizontal-card
-						horizontalCard="<%= new KBArticleAttachmentHorizontalCard(fileEntry, request) %>"
-					/>
+					<liferay-frontend:horizontal-card
+						text="<%= fileEntry.getTitle() %>"
+						url='<%= PortletFileRepositoryUtil.getDownloadPortletFileEntryURL(themeDisplay, fileEntry, "status=" + WorkflowConstants.STATUS_APPROVED) %>'
+					>
+						<liferay-frontend:horizontal-card-col>
+							<liferay-document-library:mime-type-sticker
+								fileVersion="<%= fileEntry.getFileVersion() %>"
+							/>
+						</liferay-frontend:horizontal-card-col>
+					</liferay-frontend:horizontal-card>
 				</clay:col>
 
 			<%

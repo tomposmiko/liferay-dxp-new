@@ -17,13 +17,8 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -32,51 +27,28 @@ import java.util.concurrent.TimeoutException;
  */
 public class BuildDatabaseUtil {
 
-	public static void clear() {
-		File buildDir = _getBuildDir(null);
-
-		File buildDatabaseFile = new File(
-			buildDir, BuildDatabase.FILE_NAME_BUILD_DATABASE);
-
-		if (buildDatabaseFile.exists()) {
-			buildDatabaseFile.delete();
-		}
-	}
-
 	public static BuildDatabase getBuildDatabase() {
 		return getBuildDatabase(null);
 	}
 
 	public static BuildDatabase getBuildDatabase(Build build) {
-		TopLevelBuild topLevelBuild = null;
+		File buildDir = _getBuildDir(build);
 
-		if (build != null) {
-			topLevelBuild = build.getTopLevelBuild();
-		}
+		synchronized (_buildDatabases) {
+			BuildDatabase buildDatabase = _buildDatabases.get(buildDir);
 
-		if ((build instanceof TopLevelBuild) || (topLevelBuild == null)) {
-			File buildDir = _getBuildDir(build);
-
-			synchronized (_buildDatabases) {
-				BuildDatabase buildDatabase = _buildDatabases.get(buildDir);
-
-				if (buildDatabase != null) {
-					buildDatabase.readBuildDatabaseFile();
-
-					return buildDatabase;
-				}
-
-				_downloadBuildDatabaseFile(buildDir, build);
-
-				buildDatabase = new DefaultBuildDatabase(buildDir);
-
-				_buildDatabases.put(buildDir, buildDatabase);
-
+			if (buildDatabase != null) {
 				return buildDatabase;
 			}
-		}
 
-		return getBuildDatabase(topLevelBuild);
+			_downloadBuildDatabaseFile(buildDir, build);
+
+			buildDatabase = new DefaultBuildDatabase(buildDir);
+
+			_buildDatabases.put(buildDir, buildDatabase);
+
+			return buildDatabase;
+		}
 	}
 
 	private static void _downloadBuildDatabaseFile(File buildDir, Build build) {
@@ -101,50 +73,13 @@ public class BuildDatabaseUtil {
 				buildDatabaseFile, distNodes, distPath);
 		}
 
-		if (buildDatabaseFile.exists() || (build == null)) {
-			return;
-		}
-
-		if (build.isFromArchive()) {
-			try {
-				JenkinsResultsParserUtil.write(
-					buildDatabaseFile,
-					JenkinsResultsParserUtil.toString(
-						build.getBuildURL() + "/build-database.json"));
-			}
-			catch (IOException ioException) {
-				throw new RuntimeException(
-					"Unable to write build-database.json", ioException);
-			}
-
+		if (buildDatabaseFile.exists()) {
 			return;
 		}
 
 		if (build instanceof TopLevelBuild) {
 			_downloadBuildDatabaseFileFromTopLevelBuild(
 				buildDatabaseFile, (TopLevelBuild)build);
-
-			if (!JenkinsResultsParserUtil.isCINode()) {
-				File defaultBuildDir = new File(
-					JenkinsResultsParserUtil.getBuildDirPath());
-
-				if (!defaultBuildDir.exists()) {
-					defaultBuildDir.mkdirs();
-				}
-
-				File defaultBuildDatabaseFile = new File(
-					defaultBuildDir, BuildDatabase.FILE_NAME_BUILD_DATABASE);
-
-				try {
-					Files.copy(
-						buildDatabaseFile.toPath(),
-						defaultBuildDatabaseFile.toPath(),
-						StandardCopyOption.REPLACE_EXISTING);
-				}
-				catch (IOException ioException) {
-					throw new RuntimeException(ioException);
-				}
-			}
 		}
 	}
 
@@ -155,90 +90,33 @@ public class BuildDatabaseUtil {
 			return;
 		}
 
-		List<String> distNodesList = new ArrayList<>(
-			Arrays.asList(distNodes.split(",")));
+		int maxRetries = 5;
+		int retries = 0;
 
-		while (!distNodesList.isEmpty()) {
+		while (retries < maxRetries) {
 			try {
+				retries++;
+
 				String distNode = JenkinsResultsParserUtil.getRandomString(
-					distNodesList);
+					Arrays.asList(distNodes.split(",")));
 
-				distNodesList.remove(distNode);
+				String command = JenkinsResultsParserUtil.combine(
+					"time rsync -Iq --timeout=1200 \"", distNode, ":", distPath,
+					"/", BuildDatabase.FILE_NAME_BUILD_DATABASE, "\" ",
+					JenkinsResultsParserUtil.getCanonicalPath(
+						buildDatabaseFile));
 
-				String[] commands = new String[2];
-
-				commands[0] = JenkinsResultsParserUtil.combine(
-					"mkdir -p ",
-					JenkinsResultsParserUtil.escapeForBash(
-						JenkinsResultsParserUtil.getCanonicalPath(
-							buildDatabaseFile.getParentFile())));
-
-				if (JenkinsResultsParserUtil.isOSX()) {
-					commands[1] = JenkinsResultsParserUtil.combine(
-						"timeout 1200 rsync -Iq \"root@", distNode, ":",
-						JenkinsResultsParserUtil.escapeForBash(distPath), "/",
-						BuildDatabase.FILE_NAME_BUILD_DATABASE, "\" ",
-						JenkinsResultsParserUtil.escapeForBash(
-							JenkinsResultsParserUtil.getCanonicalPath(
-								buildDatabaseFile)));
-				}
-				else if (JenkinsResultsParserUtil.isWindows()) {
-					commands[0] = JenkinsResultsParserUtil.combine(
-						"mkdir -p ",
-						JenkinsResultsParserUtil.getCanonicalPath(
-							buildDatabaseFile.getParentFile()));
-
-					distPath = distPath.replaceAll(
-						"C:.*TEMP/dist", "/tmp/dist");
-
-					File bashFile = new File(
-						"C:/tmp/jenkins/" +
-							JenkinsResultsParserUtil.getCurrentTimeMillis() +
-								".sh");
-
-					JenkinsResultsParserUtil.write(
-						bashFile,
-						JenkinsResultsParserUtil.combine(
-							"#!/bin/sh\nscp \"", distNode, ":",
-							JenkinsResultsParserUtil.escapeForBash(distPath),
-							"/", BuildDatabase.FILE_NAME_BUILD_DATABASE, "\" ",
-							JenkinsResultsParserUtil.escapeForBash(
-								JenkinsResultsParserUtil.getCanonicalPath(
-									buildDatabaseFile))));
-
-					commands[1] =
-						"/bin/sh " +
-							JenkinsResultsParserUtil.getCanonicalPath(bashFile);
-				}
-				else {
-					commands[1] = JenkinsResultsParserUtil.combine(
-						"if ! ", "timeout 1200 rsync -Iq \"", distNode, ":",
-						JenkinsResultsParserUtil.escapeForBash(distPath), "/",
-						BuildDatabase.FILE_NAME_BUILD_DATABASE, "\" ",
-						JenkinsResultsParserUtil.escapeForBash(
-							JenkinsResultsParserUtil.getCanonicalPath(
-								buildDatabaseFile)),
-						"; then ", "timeout 1200 rsync -Iq ", distNode, ":",
-						JenkinsResultsParserUtil.escapeForBash(distPath), "/",
-						BuildDatabase.FILE_NAME_BUILD_DATABASE, " ",
-						JenkinsResultsParserUtil.escapeForBash(
-							JenkinsResultsParserUtil.getCanonicalPath(
-								buildDatabaseFile)),
-						"; fi");
-				}
+				command = command.replaceAll("\\(", "\\\\(");
+				command = command.replaceAll("\\)", "\\\\)");
 
 				Process process = JenkinsResultsParserUtil.executeBashCommands(
-					true, new File("."), 10 * 60 * 1000, commands);
+					true, new File("."), 10 * 60 * 1000, command);
 
 				if (process.exitValue() != 0) {
-					String errorText = JenkinsResultsParserUtil.readInputStream(
-						process.getErrorStream());
-
 					throw new RuntimeException(
 						JenkinsResultsParserUtil.combine(
 							"Unable to download ",
-							BuildDatabase.FILE_NAME_BUILD_DATABASE, "\n\n",
-							errorText));
+							BuildDatabase.FILE_NAME_BUILD_DATABASE));
 				}
 
 				break;
@@ -246,7 +124,7 @@ public class BuildDatabaseUtil {
 			catch (IOException | RuntimeException | TimeoutException
 						exception) {
 
-				if (distNodesList.isEmpty()) {
+				if (retries == maxRetries) {
 					throw new RuntimeException(
 						JenkinsResultsParserUtil.combine(
 							"Unable to get ",
@@ -267,26 +145,13 @@ public class BuildDatabaseUtil {
 	private static void _downloadBuildDatabaseFileFromTopLevelBuild(
 		File buildDatabaseFile, TopLevelBuild topLevelBuild) {
 
-		String buildDatabaseURL = JenkinsResultsParserUtil.getLocalURL(
-			JenkinsResultsParserUtil.getBuildArtifactURL(
-				topLevelBuild.getBuildURL(), buildDatabaseFile.getName()));
-
-		if (!JenkinsResultsParserUtil.isCINode()) {
-			try {
-				JenkinsResultsParserUtil.write(
-					buildDatabaseFile,
-					JenkinsResultsParserUtil.toString(buildDatabaseURL));
-			}
-			catch (IOException ioException) {
-				ioException.printStackTrace();
-			}
-
-			return;
-		}
-
 		if (buildDatabaseFile.exists()) {
 			return;
 		}
+
+		String buildDatabaseURL = JenkinsResultsParserUtil.getLocalURL(
+			JenkinsResultsParserUtil.getBuildArtifactURL(
+				topLevelBuild.getBuildURL(), buildDatabaseFile.getName()));
 
 		String buildDatabaseFilePath = buildDatabaseURL.replaceAll(
 			".*/(userContent/.*)", "/opt/java/jenkins/$1");

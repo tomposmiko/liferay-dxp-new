@@ -12,15 +12,15 @@
  * details.
  */
 
-import {DATA_SET_EVENT} from '@liferay/frontend-data-set-web';
-import {getOpener, getTop} from 'frontend-js-web';
+import {
+	CLOSE_SIDE_PANEL,
+	OPEN_MODAL,
+	OPEN_MODAL_FROM_IFRAME,
+} from 'frontend-taglib-clay/data_set_display/utils/eventsDefinitions';
 
 class SidePanelListenersInitializer {
 	constructor() {
-		Liferay.on(
-			DATA_SET_EVENT.OPEN_MODAL,
-			this.handleOpenModalFromSidePanel
-		);
+		Liferay.on(OPEN_MODAL, this.handleOpenModalFromSidePanel);
 
 		document.body.classList.remove('open');
 
@@ -30,24 +30,21 @@ class SidePanelListenersInitializer {
 				trigger.addEventListener('click', (event) => {
 					event.preventDefault();
 
-					const parentWindow = getOpener();
+					const parentWindow = Liferay.Util.getOpener();
 
-					parentWindow.Liferay.fire(DATA_SET_EVENT.CLOSE_SIDE_PANEL);
+					parentWindow.Liferay.fire(CLOSE_SIDE_PANEL);
 				});
 			});
 	}
 
 	dispose() {
-		Liferay.detach(
-			DATA_SET_EVENT.OPEN_MODAL,
-			this.handleOpenModalFromSidePanel
-		);
+		Liferay.detach(OPEN_MODAL, this.handleOpenModalFromSidePanel);
 	}
 
 	handleOpenModalFromSidePanel(payload) {
-		const topWindow = getTop();
+		const topWindow = Liferay.Util.getTop();
 
-		topWindow.Liferay.fire(DATA_SET_EVENT.OPEN_MODAL_FROM_IFRAME, payload);
+		topWindow.Liferay.fire(OPEN_MODAL_FROM_IFRAME, payload);
 	}
 }
 

@@ -39,7 +39,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Preston Crary
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class AopServiceManager {
 
 	@Activate
@@ -66,7 +66,7 @@ public class AopServiceManager {
 			bundleContext, TransactionHandler.class,
 			new TransactionHandlerServiceTrackerCustomizer());
 
-		_transactionHandlerServiceTracker.open();
+		_transactionHandlerServiceTracker.open(true);
 	}
 
 	@Deactivate

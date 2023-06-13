@@ -44,7 +44,6 @@ const Header = ({
 								<ClayIcon symbol="angle-left" />
 							</ClayButton>
 						</li>
-
 						<li className="d-none d-sm-inline-flex nav-item">
 							<strong>{headerTitle}</strong>
 						</li>
@@ -68,7 +67,6 @@ const Header = ({
 									</ClayButton>
 								</li>
 							)}
-
 							{showInfoIcon && (
 								<li className="btn-group-item nav-item">
 									<ClayButton
@@ -82,7 +80,6 @@ const Header = ({
 									</ClayButton>
 								</li>
 							)}
-
 							<li className="nav-item">
 								<ClayButton
 									disabled={disabledAddButton}

@@ -43,11 +43,9 @@ import com.liferay.social.kernel.exception.NoSuchActivityException;
 import com.liferay.social.kernel.model.SocialActivity;
 import com.liferay.social.kernel.model.SocialActivityTable;
 import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
-import com.liferay.social.kernel.service.persistence.SocialActivityUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -190,7 +188,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -558,8 +556,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -703,7 +700,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -1071,8 +1068,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1211,7 +1207,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -1579,8 +1575,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {userId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1725,7 +1720,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -2100,8 +2095,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {activitySetId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2216,7 +2210,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByMirrorActivityId, finderArgs, this);
+				_finderPathFetchByMirrorActivityId, finderArgs);
 		}
 
 		if (result instanceof SocialActivity) {
@@ -2332,8 +2326,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {mirrorActivityId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2479,7 +2472,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -2854,8 +2847,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {receiverUserId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3004,7 +2996,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -3403,8 +3395,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3573,7 +3564,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -4000,8 +3991,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {mirrorActivityId, classNameId, classPK};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4171,7 +4161,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -4592,8 +4582,7 @@ public class SocialActivityPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4785,7 +4774,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialActivity socialActivity : list) {
@@ -5292,8 +5281,7 @@ public class SocialActivityPersistenceImpl
 				groupId, userId, classNameId, classPK, type, receiverUserId
 			};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5491,7 +5479,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByG_U_CD_C_C_T_R, finderArgs, this);
+				_finderPathFetchByG_U_CD_C_C_T_R, finderArgs);
 		}
 
 		if (result instanceof SocialActivity) {
@@ -5643,8 +5631,7 @@ public class SocialActivityPersistenceImpl
 				receiverUserId
 			};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6103,9 +6090,7 @@ public class SocialActivityPersistenceImpl
 	 */
 	@Override
 	public SocialActivity fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				SocialActivity.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(SocialActivity.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6324,7 +6309,7 @@ public class SocialActivityPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialActivity>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -6400,7 +6385,7 @@ public class SocialActivityPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -6772,30 +6757,10 @@ public class SocialActivityPersistenceImpl
 				"type_", "receiverUserId"
 			},
 			false);
-
-		_setSocialActivityUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setSocialActivityUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(SocialActivityImpl.class.getName());
-	}
-
-	private void _setSocialActivityUtilPersistence(
-		SocialActivityPersistence socialActivityPersistence) {
-
-		try {
-			Field field = SocialActivityUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, socialActivityPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_SOCIALACTIVITY =

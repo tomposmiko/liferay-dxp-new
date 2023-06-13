@@ -14,17 +14,22 @@
 
 package com.liferay.document.library.web.internal.display.context;
 
-import com.liferay.document.library.display.context.IGDisplayContextFactory;
-import com.liferay.document.library.display.context.IGViewFileVersionDisplayContext;
 import com.liferay.document.library.kernel.versioning.VersioningStrategy;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.helper.DLTrashHelper;
+import com.liferay.image.gallery.display.kernel.display.context.IGDisplayContextFactory;
+import com.liferay.image.gallery.display.kernel.display.context.IGViewFileVersionDisplayContext;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,10 +55,18 @@ public class IGDisplayContextProvider {
 			FileShortcut fileShortcut) {
 
 		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+				themeDisplay.getLocale(), getClass());
+
 			IGViewFileVersionDisplayContext igViewFileVersionDisplayContext =
 				new DefaultIGViewFileVersionDisplayContext(
-					_dlTrashHelper, _dlURLHelper, fileShortcut,
-					httpServletRequest, _versioningStrategy);
+					httpServletRequest, httpServletResponse, fileShortcut,
+					resourceBundle, _dlTrashHelper, _versioningStrategy,
+					_dlURLHelper);
 
 			if (fileShortcut == null) {
 				return igViewFileVersionDisplayContext;
@@ -81,10 +94,18 @@ public class IGDisplayContextProvider {
 			HttpServletResponse httpServletResponse, FileVersion fileVersion) {
 
 		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+				themeDisplay.getLocale(), getClass());
+
 			IGViewFileVersionDisplayContext igViewFileVersionDisplayContext =
 				new DefaultIGViewFileVersionDisplayContext(
-					httpServletRequest, fileVersion, _dlTrashHelper,
-					_versioningStrategy, _dlURLHelper);
+					httpServletRequest, httpServletResponse, fileVersion,
+					resourceBundle, _dlTrashHelper, _versioningStrategy,
+					_dlURLHelper);
 
 			if (fileVersion == null) {
 				return igViewFileVersionDisplayContext;
@@ -123,7 +144,7 @@ public class IGDisplayContextProvider {
 	@Reference
 	private DLURLHelper _dlURLHelper;
 
-	private ServiceTrackerList<IGDisplayContextFactory>
+	private ServiceTrackerList<IGDisplayContextFactory, IGDisplayContextFactory>
 		_igDisplayContextFactories;
 
 	@Reference(

@@ -30,10 +30,10 @@ class LocaleChangedHandler {
 		this.onLocaleChangedCallback = onLocaleChangedCallback;
 		this.context = context;
 
-		this.attach();
+		this.attachLocaleChangedEventListener();
 	}
 
-	attach() {
+	attachLocaleChangedEventListener() {
 		this._defaultLocaleChangedHandler = Liferay.after(
 			'inputLocalized:defaultLocaleChanged',
 			this._onDefaultLocaleChange.bind(this)
@@ -45,7 +45,7 @@ class LocaleChangedHandler {
 		);
 	}
 
-	detach() {
+	detachLocaleChangedEventListener() {
 		this._defaultLocaleChangedHandler.detach();
 		this._localeChangedHandler.detach();
 	}

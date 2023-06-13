@@ -28,6 +28,7 @@ const props = {
 	id: 'test-modal-id',
 	showCancel: true,
 	size: 'full-screen',
+	spritemap: './assets/clay/icons.svg',
 	submitLabel: 'Create',
 	title: 'Title',
 	url: 'http://localhost:9000/modal-content.html',

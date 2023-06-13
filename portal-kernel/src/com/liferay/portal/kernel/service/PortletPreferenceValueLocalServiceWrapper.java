@@ -29,10 +29,6 @@ public class PortletPreferenceValueLocalServiceWrapper
 	implements PortletPreferenceValueLocalService,
 			   ServiceWrapper<PortletPreferenceValueLocalService> {
 
-	public PortletPreferenceValueLocalServiceWrapper() {
-		this(null);
-	}
-
 	public PortletPreferenceValueLocalServiceWrapper(
 		PortletPreferenceValueLocalService portletPreferenceValueLocalService) {
 
@@ -327,14 +323,6 @@ public class PortletPreferenceValueLocalServiceWrapper
 	public int getPortletPreferenceValuesCount() {
 		return _portletPreferenceValueLocalService.
 			getPortletPreferenceValuesCount();
-	}
-
-	@Override
-	public int getPortletPreferenceValuesCount(
-		long companyId, String name, String smallValue) {
-
-		return _portletPreferenceValueLocalService.
-			getPortletPreferenceValuesCount(companyId, name, smallValue);
 	}
 
 	@Override

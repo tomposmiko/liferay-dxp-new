@@ -12,7 +12,6 @@
  * details.
  */
 
-import {ClayInput} from '@clayui/form';
 import React, {FocusEventHandler, useEffect, useMemo, useState} from 'react';
 
 // @ts-ignore
@@ -26,16 +25,9 @@ import Select from '../Select/Select.es';
 // @ts-ignore
 
 import Text from '../Text/Text.es';
-import {limitValue} from '../util/numericalOperations';
-
-import type {FieldChangeEventHandler, Locale, LocalizedValue} from '../types';
 
 type DecimalSymbol = ',' | '.';
 type ThousandsSeparator = DecimalSymbol | ' ' | "'" | 'none';
-
-const DEFAULT_DECIMAL_PLACES = 2;
-const MAX_DECIMAL_PLACES = 10;
-const MIN_DECIMAL_PLACES = 1;
 
 interface INumericInputMaskValue {
 	append?: string;
@@ -47,20 +39,18 @@ interface INumericInputMaskValue {
 interface IProps {
 	append?: string;
 	appendType?: 'prefix' | 'suffix';
-	decimalPlaces: number;
 	decimalSymbol: DecimalSymbol[];
 	decimalSymbols: ISelectProps<DecimalSymbol>[];
 	defaultLanguageId: Locale;
 	editingLanguageId: Locale;
-	ffDecimalPlacesSettingsEnabled: boolean;
-	onBlur: FocusEventHandler<HTMLInputElement>;
-	onChange: FieldChangeEventHandler<unknown>;
-	onFocus: FocusEventHandler<HTMLInputElement>;
 	readOnly: boolean;
 	thousandsSeparator?: ThousandsSeparator[];
 	thousandsSeparators: ISelectProps<ThousandsSeparator>[];
 	value: INumericInputMaskValue;
 	visible: boolean;
+	onBlur: FocusEventHandler<HTMLInputElement>;
+	onChange: FieldChangeEventHandler;
+	onFocus: FocusEventHandler<HTMLInputElement>;
 }
 
 export interface ISymbols {
@@ -78,7 +68,6 @@ interface ISelectProps<T> {
 const NumericInputMask: React.FC<IProps> = ({
 	append: appendInitial,
 	appendType: appendTypeInitial,
-	decimalPlaces: decimalPlacesInitial,
 	decimalSymbol: decimalSymbolInitial,
 	decimalSymbols: decimalSymbolsProp,
 	editingLanguageId,
@@ -94,10 +83,6 @@ const NumericInputMask: React.FC<IProps> = ({
 	const [thousandsSeparator, setThousandsSeparator] = useState(
 		thousandsSeparatorInitial
 	);
-	const [currentDecimalPlaces, setCurrentDecimalPlaces] = useState(
-		decimalPlacesInitial
-	);
-	const [decimalPlaces, setDecimalPlaces] = useState(decimalPlacesInitial);
 	const [decimalSymbol, setDecimalSymbol] = useState(decimalSymbolInitial);
 	const [append, setAppend] = useState(appendInitial);
 	const [appendType, setAppendType] = useState(appendTypeInitial);
@@ -116,12 +101,10 @@ const NumericInputMask: React.FC<IProps> = ({
 			return {
 				...item,
 				disabled: item.reference === decimalSymbol?.[0],
-				label:
-					item.label?.[Liferay.ThemeDisplay.getLanguageId()] ??
-					item.label,
+				label: item.label?.[editingLanguageId] ?? item.label,
 			};
 		});
-	}, [decimalSymbol, thousandsSeparatorsProp]);
+	}, [decimalSymbol, editingLanguageId, thousandsSeparatorsProp]);
 
 	useEffect(() => {
 		const newValue =
@@ -130,8 +113,6 @@ const NumericInputMask: React.FC<IProps> = ({
 		setAppend(newValue.append ?? append);
 
 		setAppendType(newValue.appendType ?? appendType);
-
-		setDecimalPlaces(newValue.decimalPlaces ?? decimalPlaces);
 
 		const symbols = newValue.symbols;
 
@@ -143,20 +124,19 @@ const NumericInputMask: React.FC<IProps> = ({
 	}, [
 		append,
 		appendType,
-		decimalPlaces,
 		decimalSymbol,
 		editingLanguageId,
 		thousandsSeparator,
 		value,
 	]);
 
-	const handleChange = (key: string, value: string | number | ISymbols) => {
+	const handleChange = (key: string, value: string | ISymbols) => {
 		onChange({
 			target: {
 				value: {
 					append,
 					appendType,
-					decimalPlaces,
+					// eslint-disable-next-line sort-keys
 					symbols: {
 						decimalSymbol,
 						thousandsSeparator,
@@ -193,7 +173,6 @@ const NumericInputMask: React.FC<IProps> = ({
 						visible={visible}
 					/>
 				</div>
-
 				<div className="pl-2 w-50">
 					<Select
 						label={Liferay.Language.get('decimal-separator')}
@@ -221,78 +200,8 @@ const NumericInputMask: React.FC<IProps> = ({
 					/>
 				</div>
 			</div>
-			{visible && (
-				<div>
-					<div className="form-group">
-						<label htmlFor="decimal_places ">
-							{Liferay.Language.get('decimal-places')}
-						</label>
-
-						<ClayInput
-							className="ddm-field-text"
-							disabled={readOnly}
-							id="decimal_places"
-							max={MAX_DECIMAL_PLACES}
-							min={MIN_DECIMAL_PLACES}
-							name="decimal_places"
-							onBlur={(event: any) => {
-								let {value: newValue} = event.target;
-
-								newValue = limitValue({
-									defaultValue: DEFAULT_DECIMAL_PLACES,
-									max: MAX_DECIMAL_PLACES,
-									min: MIN_DECIMAL_PLACES,
-									value: newValue,
-								});
-
-								setDecimalPlaces(newValue);
-								setCurrentDecimalPlaces(newValue);
-								handleChange(
-									'decimalPlaces',
-									parseInt(newValue, 10)
-								);
-							}}
-							onChange={(event: any) => {
-								let {value: newValue} = event.target;
-								newValue = newValue.includes('-')
-									? newValue.replace('-', '')
-									: newValue;
-
-								if (
-									newValue.length > 2 ||
-									newValue > MAX_DECIMAL_PLACES ||
-									newValue === '0'
-								) {
-									return;
-								}
-
-								if (newValue === '') {
-									setDecimalPlaces(DEFAULT_DECIMAL_PLACES);
-
-									handleChange(
-										'decimalPlaces',
-										DEFAULT_DECIMAL_PLACES
-									);
-								}
-								else {
-									newValue = parseInt(newValue, 10);
-
-									setDecimalPlaces(newValue);
-
-									handleChange('decimalPlaces', newValue);
-								}
-
-								setCurrentDecimalPlaces(newValue);
-							}}
-							type="number"
-							value={currentDecimalPlaces}
-						/>
-					</div>
-				</div>
-			)}
 			<Text
 				label={Liferay.Language.get('prefix-or-suffix')}
-				locale={editingLanguageId}
 				maxLength={10}
 				name="append"
 				onBlur={onBlur}
@@ -315,7 +224,6 @@ const NumericInputMask: React.FC<IProps> = ({
 			/>
 			{append !== '' && (
 				<Radio
-					editingLanguageId={editingLanguageId}
 					inline={false}
 					name="appendType"
 					onBlur={onBlur}

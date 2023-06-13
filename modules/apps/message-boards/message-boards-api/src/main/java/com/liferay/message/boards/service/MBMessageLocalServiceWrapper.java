@@ -29,10 +29,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class MBMessageLocalServiceWrapper
 	implements MBMessageLocalService, ServiceWrapper<MBMessageLocalService> {
 
-	public MBMessageLocalServiceWrapper() {
-		this(null);
-	}
-
 	public MBMessageLocalServiceWrapper(
 		MBMessageLocalService mbMessageLocalService) {
 
@@ -51,15 +47,15 @@ public class MBMessageLocalServiceWrapper
 
 	@Override
 	public MBMessage addDiscussionMessage(
-			String externalReferenceCode, long userId, String userName,
-			long groupId, String className, long classPK, long threadId,
-			long parentMessageId, String subject, String body,
+			long userId, String userName, long groupId, String className,
+			long classPK, long threadId, long parentMessageId, String subject,
+			String body,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _mbMessageLocalService.addDiscussionMessage(
-			externalReferenceCode, userId, userName, groupId, className,
-			classPK, threadId, parentMessageId, subject, body, serviceContext);
+			userId, userName, groupId, className, classPK, threadId,
+			parentMessageId, subject, body, serviceContext);
 	}
 
 	/**
@@ -493,12 +489,31 @@ public class MBMessageLocalServiceWrapper
 		return _mbMessageLocalService.fetchMBMessage(messageId);
 	}
 
+	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
 	@Override
 	public MBMessage fetchMBMessageByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
 		return _mbMessageLocalService.fetchMBMessageByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchMBMessageByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public MBMessage fetchMBMessageByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return _mbMessageLocalService.fetchMBMessageByReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	@Override
@@ -753,13 +768,21 @@ public class MBMessageLocalServiceWrapper
 		return _mbMessageLocalService.getMBMessage(messageId);
 	}
 
+	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message
+	 * @throws PortalException if a matching message-boards message could not be found
+	 */
 	@Override
 	public MBMessage getMBMessageByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _mbMessageLocalService.getMBMessageByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -1092,19 +1115,17 @@ public class MBMessageLocalServiceWrapper
 	}
 
 	@Override
-	public MBMessage updateAnswer(
-			long messageId, boolean answer, boolean cascade)
+	public void updateAnswer(long messageId, boolean answer, boolean cascade)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _mbMessageLocalService.updateAnswer(messageId, answer, cascade);
+		_mbMessageLocalService.updateAnswer(messageId, answer, cascade);
 	}
 
 	@Override
-	public MBMessage updateAnswer(
-			MBMessage message, boolean answer, boolean cascade)
+	public void updateAnswer(MBMessage message, boolean answer, boolean cascade)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _mbMessageLocalService.updateAnswer(message, answer, cascade);
+		_mbMessageLocalService.updateAnswer(message, answer, cascade);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ import com.liferay.captcha.configuration.CaptchaConfiguration;
 import com.liferay.captcha.util.CaptchaUtil;
 import com.liferay.login.web.constants.LoginPortletKeys;
 import com.liferay.login.web.internal.portlet.util.LoginUtil;
-import com.liferay.petra.string.StringPool;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.captcha.CaptchaConfigurationException;
 import com.liferay.portal.kernel.captcha.CaptchaException;
 import com.liferay.portal.kernel.exception.AddressCityException;
@@ -58,7 +58,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.DynamicActionRequest;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -75,7 +74,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.portal.kernel.util.Validator;
@@ -125,19 +123,18 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		boolean autoPassword = true;
 		String password1 = null;
 		String password2 = null;
-		boolean autoScreenName = _AUTO_SCREEN_NAME;
+		boolean autoScreenName = isAutoScreenName();
 		String screenName = ParamUtil.getString(actionRequest, "screenName");
 		String emailAddress = ParamUtil.getString(
 			actionRequest, "emailAddress");
 		long facebookId = ParamUtil.getLong(actionRequest, "facebookId");
+		String openId = ParamUtil.getString(actionRequest, "openId");
 		String languageId = ParamUtil.getString(actionRequest, "languageId");
 		String firstName = ParamUtil.getString(actionRequest, "firstName");
 		String middleName = ParamUtil.getString(actionRequest, "middleName");
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
-		long prefixListTypeId = ParamUtil.getInteger(
-			actionRequest, "prefixListTypeId");
-		long suffixListTypeId = ParamUtil.getInteger(
-			actionRequest, "suffixListTypeId");
+		long prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
+		long suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
 		boolean male = ParamUtil.getBoolean(actionRequest, "male", true);
 		int birthdayMonth = ParamUtil.getInteger(
 			actionRequest, "birthdayMonth");
@@ -153,11 +150,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			User.class.getName(), actionRequest);
 
-		if (PrefsPropsUtil.getBoolean(
-				company.getCompanyId(),
-				PropsKeys.LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD,
-				PropsValues.LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD)) {
-
+		if (PropsValues.LOGIN_CREATE_ACCOUNT_ALLOW_CUSTOM_PASSWORD) {
 			autoPassword = false;
 
 			password1 = ParamUtil.getString(actionRequest, "password1");
@@ -166,11 +159,11 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 
 		User user = _userService.addUserWithWorkflow(
 			company.getCompanyId(), autoPassword, password1, password2,
-			autoScreenName, screenName, emailAddress, facebookId,
-			StringPool.BLANK, LocaleUtil.fromLanguageId(languageId), firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
+			autoScreenName, screenName, emailAddress, facebookId, openId,
+			LocaleUtil.fromLanguageId(languageId), firstName, middleName,
+			lastName, prefixId, suffixId, male, birthdayMonth, birthdayDay,
+			birthdayYear, jobTitle, groupIds, organizationIds, roleIds,
+			userGroupIds, sendEmail, serviceContext);
 
 		// Session messages
 
@@ -221,7 +214,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 				addUser(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.RESET)) {
-				_resetUser(actionRequest, actionResponse);
+				resetUser(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.UPDATE)) {
 				updateIncompleteUser(actionRequest, actionResponse);
@@ -302,7 +295,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchLayoutException);
+				_log.debug(noSuchLayoutException, noSuchLayoutException);
 			}
 		}
 	}
@@ -317,6 +310,46 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		catch (Exception exception) {
 			throw new CaptchaConfigurationException(exception);
 		}
+	}
+
+	protected long getListTypeId(
+			PortletRequest portletRequest, String parameterName, String type)
+		throws Exception {
+
+		String parameterValue = ParamUtil.getString(
+			portletRequest, parameterName);
+
+		ListType listType = _listTypeLocalService.addListType(
+			parameterValue, type);
+
+		return listType.getListTypeId();
+	}
+
+	protected boolean isAutoScreenName() {
+		return _AUTO_SCREEN_NAME;
+	}
+
+	protected void resetUser(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		String emailAddress = ParamUtil.getString(
+			actionRequest, "emailAddress");
+
+		User anonymousUser = _userLocalService.getUserByEmailAddress(
+			themeDisplay.getCompanyId(), emailAddress);
+
+		if (anonymousUser.getStatus() != WorkflowConstants.STATUS_INCOMPLETE) {
+			throw new PrincipalException.MustBeAuthenticated(
+				anonymousUser.getUuid());
+		}
+
+		_userLocalService.deleteUser(anonymousUser.getUserId());
+
+		addUser(actionRequest, actionResponse);
 	}
 
 	protected void sendRedirect(
@@ -364,6 +397,23 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		actionResponse.sendRedirect(redirect);
 	}
 
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserService(UserService userService) {
+		_userService = userService;
+	}
+
 	protected void updateIncompleteUser(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
@@ -401,13 +451,12 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			password2 = password1;
 		}
 
+		String openId = ParamUtil.getString(actionRequest, "openId");
 		String firstName = ParamUtil.getString(actionRequest, "firstName");
 		String middleName = ParamUtil.getString(actionRequest, "middleName");
 		String lastName = ParamUtil.getString(actionRequest, "lastName");
-		long prefixListTypeId = ParamUtil.getInteger(
-			actionRequest, "prefixListTypeId");
-		long suffixListTypeId = ParamUtil.getInteger(
-			actionRequest, "suffixListTypeId");
+		long prefixId = ParamUtil.getInteger(actionRequest, "prefixId");
+		long suffixId = ParamUtil.getInteger(actionRequest, "suffixId");
 		boolean male = ParamUtil.getBoolean(actionRequest, "male", true);
 		int birthdayMonth = ParamUtil.getInteger(
 			actionRequest, "birthdayMonth");
@@ -427,16 +476,15 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 
 		User user = _userService.updateIncompleteUser(
 			themeDisplay.getCompanyId(), autoPassword, password1, password2,
-			autoScreenName, screenName, emailAddress, facebookId,
-			StringPool.BLANK, themeDisplay.getLocale(), firstName, middleName,
-			lastName, prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, jobTitle, updateUserInformation,
-			sendEmail, serviceContext);
+			autoScreenName, screenName, emailAddress, facebookId, openId,
+			themeDisplay.getLocale(), firstName, middleName, lastName, prefixId,
+			suffixId, male, birthdayMonth, birthdayDay, birthdayYear, jobTitle,
+			updateUserInformation, sendEmail, serviceContext);
 
 		if (facebookId > 0) {
 			httpSession.removeAttribute(WebKeys.FACEBOOK_INCOMPLETE_USER_ID);
 
-			_updateUserAndSendRedirect(
+			updateUserAndSendRedirect(
 				actionRequest, actionResponse, themeDisplay, user, password1);
 
 			return;
@@ -448,7 +496,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 
 			httpSession.removeAttribute(WebKeys.GOOGLE_INCOMPLETE_USER_ID);
 
-			_updateUserAndSendRedirect(
+			updateUserAndSendRedirect(
 				actionRequest, actionResponse, themeDisplay, user, password1);
 
 			return;
@@ -472,43 +520,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			user.getPasswordUnencrypted());
 	}
 
-	private long _getListTypeId(
-			PortletRequest portletRequest, String parameterName, String type)
-		throws Exception {
-
-		String parameterValue = ParamUtil.getString(
-			portletRequest, parameterName);
-
-		ListType listType = _listTypeLocalService.addListType(
-			parameterValue, type);
-
-		return listType.getListTypeId();
-	}
-
-	private void _resetUser(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		String emailAddress = ParamUtil.getString(
-			actionRequest, "emailAddress");
-
-		User anonymousUser = _userLocalService.getUserByEmailAddress(
-			themeDisplay.getCompanyId(), emailAddress);
-
-		if (anonymousUser.getStatus() != WorkflowConstants.STATUS_INCOMPLETE) {
-			throw new PrincipalException.MustBeAuthenticated(
-				anonymousUser.getUuid());
-		}
-
-		_userLocalService.deleteUser(anonymousUser.getUserId());
-
-		addUser(actionRequest, actionResponse);
-	}
-
-	private void _updateUserAndSendRedirect(
+	protected void updateUserAndSendRedirect(
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			ThemeDisplay themeDisplay, User user, String password1)
 		throws Exception {
@@ -529,19 +541,15 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		DynamicActionRequest dynamicActionRequest = new DynamicActionRequest(
 			actionRequest);
 
-		long prefixListTypeId = _getListTypeId(
-			actionRequest, "prefixListTypeValue",
-			ListTypeConstants.CONTACT_PREFIX);
+		long prefixId = getListTypeId(
+			actionRequest, "prefixValue", ListTypeConstants.CONTACT_PREFIX);
 
-		dynamicActionRequest.setParameter(
-			"prefixListTypeId", String.valueOf(prefixListTypeId));
+		dynamicActionRequest.setParameter("prefixId", String.valueOf(prefixId));
 
-		long suffixListTypeId = _getListTypeId(
-			actionRequest, "suffixListTypeValue",
-			ListTypeConstants.CONTACT_SUFFIX);
+		long suffixId = getListTypeId(
+			actionRequest, "suffixValue", ListTypeConstants.CONTACT_SUFFIX);
 
-		dynamicActionRequest.setParameter(
-			"suffixListTypeId", String.valueOf(suffixListTypeId));
+		dynamicActionRequest.setParameter("suffixId", String.valueOf(suffixId));
 
 		return dynamicActionRequest;
 	}
@@ -557,7 +565,6 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
-	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
@@ -566,10 +573,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference
 	private UserService _userService;
 
 }

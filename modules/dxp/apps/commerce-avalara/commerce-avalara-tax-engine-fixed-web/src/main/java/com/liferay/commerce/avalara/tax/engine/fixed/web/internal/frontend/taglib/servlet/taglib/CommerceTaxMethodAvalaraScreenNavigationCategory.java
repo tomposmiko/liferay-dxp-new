@@ -14,11 +14,29 @@
 
 package com.liferay.commerce.avalara.tax.engine.fixed.web.internal.frontend.taglib.servlet.taglib;
 
+import com.liferay.commerce.avalara.connector.configuration.CommerceAvalaraConnectorConfiguration;
 import com.liferay.commerce.constants.CommerceTaxScreenNavigationConstants;
+import com.liferay.commerce.tax.model.CommerceTaxMethod;
+import com.liferay.commerce.tax.service.CommerceTaxMethodService;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
+import com.liferay.portal.kernel.settings.ParameterMapSettingsLocator;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+
+import java.io.IOException;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -27,24 +45,37 @@ import org.osgi.service.component.annotations.Reference;
  * @author Calvin Keum
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=20",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=20",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CommerceTaxMethodAvalaraScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<CommerceTaxMethod> {
+
+	public static final String CATEGORY_KEY = "settings";
+
+	public static final String ENTRY_KEY = "settings";
 
 	@Override
 	public String getCategoryKey() {
-		return CommerceTaxScreenNavigationConstants.
-			CATEGORY_KEY_COMMERCE_SETTINGS;
+		return CATEGORY_KEY;
+	}
+
+	@Override
+	public String getEntryKey() {
+		return ENTRY_KEY;
 	}
 
 	@Override
 	public String getLabel(Locale locale) {
-		return language.get(
-			locale,
-			CommerceTaxScreenNavigationConstants.
-				CATEGORY_KEY_COMMERCE_SETTINGS);
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return LanguageUtil.get(resourceBundle, ENTRY_KEY);
 	}
 
 	@Override
@@ -53,7 +84,71 @@ public class CommerceTaxMethodAvalaraScreenNavigationCategory
 			SCREEN_NAVIGATION_KEY_COMMERCE_TAX_METHOD;
 	}
 
+	@Override
+	public boolean isVisible(User user, CommerceTaxMethod commerceTaxMethod) {
+		if (commerceTaxMethod == null) {
+			return false;
+		}
+
+		String engineKey = commerceTaxMethod.getEngineKey();
+
+		if (engineKey.equals("avalara")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		try {
+			long commerceTaxMethodId = ParamUtil.getLong(
+				httpServletRequest, "commerceTaxMethodId");
+
+			CommerceTaxMethod commerceTaxMethod =
+				_commerceTaxMethodService.getCommerceTaxMethod(
+					commerceTaxMethodId);
+
+			CommerceAvalaraConnectorConfiguration
+				commerceAvalaraConnectorConfiguration =
+					_configurationProvider.getConfiguration(
+						CommerceAvalaraConnectorConfiguration.class,
+						new ParameterMapSettingsLocator(
+							httpServletRequest.getParameterMap(),
+							new GroupServiceSettingsLocator(
+								commerceTaxMethod.getGroupId(),
+								CommerceAvalaraConnectorConfiguration.class.
+									getName())));
+
+			httpServletRequest.setAttribute(
+				CommerceAvalaraConnectorConfiguration.class.getName(),
+				commerceAvalaraConnectorConfiguration);
+		}
+		catch (Exception exception) {
+			throw new IOException(exception);
+		}
+
+		_jspRenderer.renderJSP(
+			_servletContext, httpServletRequest, httpServletResponse,
+			"/avalara_settings.jsp");
+	}
+
 	@Reference
-	protected Language language;
+	private CommerceTaxMethodService _commerceTaxMethodService;
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private JSPRenderer _jspRenderer;
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.avalara.tax.engine.fixed.web)"
+	)
+	private ServletContext _servletContext;
 
 }

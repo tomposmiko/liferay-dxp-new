@@ -16,9 +16,6 @@ package com.liferay.portal.search.web.internal.low.level.search.options.portlet.
 
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.web.internal.low.level.search.options.constants.LowLevelSearchOptionsPortletKeys;
 import com.liferay.portal.search.web.internal.low.level.search.options.portlet.preferences.LowLevelSearchOptionsPortletPreferences;
@@ -29,15 +26,15 @@ import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSe
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Wade Cao
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + LowLevelSearchOptionsPortletKeys.LOW_LEVEL_SEARCH_OPTIONS,
 	service = PortletSharedSearchContributor.class
 )
@@ -54,61 +51,38 @@ public class LowLevelSearchOptionsPortletSharedSearchContributor
 					portletSharedSearchSettings.
 						getPortletPreferencesOptional());
 
+		Optional<String> connectionIdOptional =
+			lowLevelSearchOptionsPortletPreferences.getConnectionIdOptional();
+
 		SearchRequestBuilder searchRequestBuilder =
 			portletSharedSearchSettings.getFederatedSearchRequestBuilder(
 				lowLevelSearchOptionsPortletPreferences.
-					getFederatedSearchKey());
+					getFederatedSearchKeyOptional());
 
 		searchRequestBuilder.connectionId(
-			lowLevelSearchOptionsPortletPreferences.getConnectionId()
+			connectionIdOptional.orElse(null)
 		).excludeContributors(
 			SearchStringUtil.splitAndUnquote(
 				lowLevelSearchOptionsPortletPreferences.
-					getContributorsToExclude())
+					getContributorsToExcludeOptional())
 		).fields(
 			SearchStringUtil.splitAndUnquote(
-				lowLevelSearchOptionsPortletPreferences.getFieldsToReturn())
+				lowLevelSearchOptionsPortletPreferences.
+					getFieldsToReturnOptional())
 		).includeContributors(
 			SearchStringUtil.splitAndUnquote(
 				lowLevelSearchOptionsPortletPreferences.
-					getContributorsToInclude())
+					getContributorsToIncludeOptional())
 		).indexes(
 			SearchStringUtil.splitAndUnquote(
-				lowLevelSearchOptionsPortletPreferences.getIndexes())
+				lowLevelSearchOptionsPortletPreferences.getIndexesOptional())
 		).withSearchContext(
-			searchContext -> {
-				if (Validator.isNull(
-						searchContext.getAttribute(
-							"search.experiences.ip.address"))) {
-
-					HttpServletRequest httpServletRequest =
-						_portal.getHttpServletRequest(
-							portletSharedSearchSettings.getRenderRequest());
-
-					searchContext.setAttribute(
-						"search.experiences.ip.address",
-						httpServletRequest.getRemoteAddr());
-				}
-
-				if (Validator.isNull(
-						searchContext.getAttribute(
-							"search.experiences.scope.group.id"))) {
-
-					ThemeDisplay themeDisplay =
-						portletSharedSearchSettings.getThemeDisplay();
-
-					searchContext.setAttribute(
-						"search.experiences.scope.group.id",
-						themeDisplay.getScopeGroupId());
-				}
-
-				_applyAttributes(
-					lowLevelSearchOptionsPortletPreferences, searchContext);
-			}
+			searchContext -> applyAttributes(
+				lowLevelSearchOptionsPortletPreferences, searchContext)
 		);
 	}
 
-	private void _applyAttributes(
+	protected void applyAttributes(
 		LowLevelSearchOptionsPortletPreferences
 			lowLevelSearchOptionsPortletPreferences,
 		SearchContext searchContext) {
@@ -124,8 +98,5 @@ public class LowLevelSearchOptionsPortletSharedSearchContributor
 				(Serializable)jsonObject.get("value"));
 		}
 	}
-
-	@Reference
-	private Portal _portal;
 
 }

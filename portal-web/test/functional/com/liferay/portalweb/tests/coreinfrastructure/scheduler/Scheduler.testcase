@@ -1,7 +1,6 @@
 @component-name = "portal-scheduler"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Scheduler";
@@ -15,12 +14,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	test CanStartPortalWithSchedulerDisabled {
 		property custom.properties = "scheduler.enabled=false";
 		property test.assert.warning.exceptions = "true";
@@ -28,7 +27,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Web Content");
 	}
 

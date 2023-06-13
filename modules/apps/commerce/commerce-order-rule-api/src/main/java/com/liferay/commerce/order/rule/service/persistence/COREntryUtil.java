@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the cor entry service. This utility wraps <code>com.liferay.commerce.order.rule.service.persistence.impl.COREntryPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -118,519 +122,6 @@ public class COREntryUtil {
 		COREntry corEntry, ServiceContext serviceContext) {
 
 		return getPersistence().update(corEntry, serviceContext);
-	}
-
-	/**
-	 * Returns all the cor entries where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the matching cor entries
-	 */
-	public static List<COREntry> findByUuid(String uuid) {
-		return getPersistence().findByUuid(uuid);
-	}
-
-	/**
-	 * Returns a range of all the cor entries where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @return the range of matching cor entries
-	 */
-	public static List<COREntry> findByUuid(String uuid, int start, int end) {
-		return getPersistence().findByUuid(uuid, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the cor entries where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching cor entries
-	 */
-	public static List<COREntry> findByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().findByUuid(uuid, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the cor entries where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching cor entries
-	 */
-	public static List<COREntry> findByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<COREntry> orderByComparator, boolean useFinderCache) {
-
-		return getPersistence().findByUuid(
-			uuid, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first cor entry in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching cor entry
-	 * @throws NoSuchCOREntryException if a matching cor entry could not be found
-	 */
-	public static COREntry findByUuid_First(
-			String uuid, OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().findByUuid_First(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the first cor entry in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching cor entry, or <code>null</code> if a matching cor entry could not be found
-	 */
-	public static COREntry fetchByUuid_First(
-		String uuid, OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().fetchByUuid_First(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the last cor entry in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching cor entry
-	 * @throws NoSuchCOREntryException if a matching cor entry could not be found
-	 */
-	public static COREntry findByUuid_Last(
-			String uuid, OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().findByUuid_Last(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the last cor entry in the ordered set where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching cor entry, or <code>null</code> if a matching cor entry could not be found
-	 */
-	public static COREntry fetchByUuid_Last(
-		String uuid, OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().fetchByUuid_Last(uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns the cor entries before and after the current cor entry in the ordered set where uuid = &#63;.
-	 *
-	 * @param COREntryId the primary key of the current cor entry
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next cor entry
-	 * @throws NoSuchCOREntryException if a cor entry with the primary key could not be found
-	 */
-	public static COREntry[] findByUuid_PrevAndNext(
-			long COREntryId, String uuid,
-			OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().findByUuid_PrevAndNext(
-			COREntryId, uuid, orderByComparator);
-	}
-
-	/**
-	 * Returns all the cor entries that the user has permission to view where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the matching cor entries that the user has permission to view
-	 */
-	public static List<COREntry> filterFindByUuid(String uuid) {
-		return getPersistence().filterFindByUuid(uuid);
-	}
-
-	/**
-	 * Returns a range of all the cor entries that the user has permission to view where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @return the range of matching cor entries that the user has permission to view
-	 */
-	public static List<COREntry> filterFindByUuid(
-		String uuid, int start, int end) {
-
-		return getPersistence().filterFindByUuid(uuid, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the cor entries that the user has permissions to view where uuid = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching cor entries that the user has permission to view
-	 */
-	public static List<COREntry> filterFindByUuid(
-		String uuid, int start, int end,
-		OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().filterFindByUuid(
-			uuid, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns the cor entries before and after the current cor entry in the ordered set of cor entries that the user has permission to view where uuid = &#63;.
-	 *
-	 * @param COREntryId the primary key of the current cor entry
-	 * @param uuid the uuid
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next cor entry
-	 * @throws NoSuchCOREntryException if a cor entry with the primary key could not be found
-	 */
-	public static COREntry[] filterFindByUuid_PrevAndNext(
-			long COREntryId, String uuid,
-			OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().filterFindByUuid_PrevAndNext(
-			COREntryId, uuid, orderByComparator);
-	}
-
-	/**
-	 * Removes all the cor entries where uuid = &#63; from the database.
-	 *
-	 * @param uuid the uuid
-	 */
-	public static void removeByUuid(String uuid) {
-		getPersistence().removeByUuid(uuid);
-	}
-
-	/**
-	 * Returns the number of cor entries where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the number of matching cor entries
-	 */
-	public static int countByUuid(String uuid) {
-		return getPersistence().countByUuid(uuid);
-	}
-
-	/**
-	 * Returns the number of cor entries that the user has permission to view where uuid = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @return the number of matching cor entries that the user has permission to view
-	 */
-	public static int filterCountByUuid(String uuid) {
-		return getPersistence().filterCountByUuid(uuid);
-	}
-
-	/**
-	 * Returns all the cor entries where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the matching cor entries
-	 */
-	public static List<COREntry> findByUuid_C(String uuid, long companyId) {
-		return getPersistence().findByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns a range of all the cor entries where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @return the range of matching cor entries
-	 */
-	public static List<COREntry> findByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
-		return getPersistence().findByUuid_C(uuid, companyId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the cor entries where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching cor entries
-	 */
-	public static List<COREntry> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().findByUuid_C(
-			uuid, companyId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the cor entries where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching cor entries
-	 */
-	public static List<COREntry> findByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<COREntry> orderByComparator, boolean useFinderCache) {
-
-		return getPersistence().findByUuid_C(
-			uuid, companyId, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first cor entry in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching cor entry
-	 * @throws NoSuchCOREntryException if a matching cor entry could not be found
-	 */
-	public static COREntry findByUuid_C_First(
-			String uuid, long companyId,
-			OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().findByUuid_C_First(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the first cor entry in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching cor entry, or <code>null</code> if a matching cor entry could not be found
-	 */
-	public static COREntry fetchByUuid_C_First(
-		String uuid, long companyId,
-		OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().fetchByUuid_C_First(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last cor entry in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching cor entry
-	 * @throws NoSuchCOREntryException if a matching cor entry could not be found
-	 */
-	public static COREntry findByUuid_C_Last(
-			String uuid, long companyId,
-			OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().findByUuid_C_Last(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last cor entry in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching cor entry, or <code>null</code> if a matching cor entry could not be found
-	 */
-	public static COREntry fetchByUuid_C_Last(
-		String uuid, long companyId,
-		OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().fetchByUuid_C_Last(
-			uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns the cor entries before and after the current cor entry in the ordered set where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param COREntryId the primary key of the current cor entry
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next cor entry
-	 * @throws NoSuchCOREntryException if a cor entry with the primary key could not be found
-	 */
-	public static COREntry[] findByUuid_C_PrevAndNext(
-			long COREntryId, String uuid, long companyId,
-			OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().findByUuid_C_PrevAndNext(
-			COREntryId, uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Returns all the cor entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the matching cor entries that the user has permission to view
-	 */
-	public static List<COREntry> filterFindByUuid_C(
-		String uuid, long companyId) {
-
-		return getPersistence().filterFindByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns a range of all the cor entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @return the range of matching cor entries that the user has permission to view
-	 */
-	public static List<COREntry> filterFindByUuid_C(
-		String uuid, long companyId, int start, int end) {
-
-		return getPersistence().filterFindByUuid_C(uuid, companyId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the cor entries that the user has permissions to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>COREntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param start the lower bound of the range of cor entries
-	 * @param end the upper bound of the range of cor entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching cor entries that the user has permission to view
-	 */
-	public static List<COREntry> filterFindByUuid_C(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<COREntry> orderByComparator) {
-
-		return getPersistence().filterFindByUuid_C(
-			uuid, companyId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns the cor entries before and after the current cor entry in the ordered set of cor entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param COREntryId the primary key of the current cor entry
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next cor entry
-	 * @throws NoSuchCOREntryException if a cor entry with the primary key could not be found
-	 */
-	public static COREntry[] filterFindByUuid_C_PrevAndNext(
-			long COREntryId, String uuid, long companyId,
-			OrderByComparator<COREntry> orderByComparator)
-		throws com.liferay.commerce.order.rule.exception.
-			NoSuchCOREntryException {
-
-		return getPersistence().filterFindByUuid_C_PrevAndNext(
-			COREntryId, uuid, companyId, orderByComparator);
-	}
-
-	/**
-	 * Removes all the cor entries where uuid = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 */
-	public static void removeByUuid_C(String uuid, long companyId) {
-		getPersistence().removeByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns the number of cor entries where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the number of matching cor entries
-	 */
-	public static int countByUuid_C(String uuid, long companyId) {
-		return getPersistence().countByUuid_C(uuid, companyId);
-	}
-
-	/**
-	 * Returns the number of cor entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
-	 *
-	 * @param uuid the uuid
-	 * @param companyId the company ID
-	 * @return the number of matching cor entries that the user has permission to view
-	 */
-	public static int filterCountByUuid_C(String uuid, long companyId) {
-		return getPersistence().filterCountByUuid_C(uuid, companyId);
 	}
 
 	/**
@@ -2022,75 +1513,75 @@ public class COREntryUtil {
 	}
 
 	/**
-	 * Returns the cor entry where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchCOREntryException</code> if it could not be found.
+	 * Returns the cor entry where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchCOREntryException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching cor entry
 	 * @throws NoSuchCOREntryException if a matching cor entry could not be found
 	 */
-	public static COREntry findByERC_C(
-			String externalReferenceCode, long companyId)
+	public static COREntry findByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.order.rule.exception.
 			NoSuchCOREntryException {
 
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
+		return getPersistence().findByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the cor entry where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the cor entry where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching cor entry, or <code>null</code> if a matching cor entry could not be found
 	 */
-	public static COREntry fetchByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static COREntry fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
+		return getPersistence().fetchByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the cor entry where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the cor entry where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching cor entry, or <code>null</code> if a matching cor entry could not be found
 	 */
-	public static COREntry fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
+	public static COREntry fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
+		return getPersistence().fetchByC_ERC(
+			companyId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the cor entry where externalReferenceCode = &#63; and companyId = &#63; from the database.
+	 * Removes the cor entry where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the cor entry that was removed
 	 */
-	public static COREntry removeByERC_C(
-			String externalReferenceCode, long companyId)
+	public static COREntry removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.order.rule.exception.
 			NoSuchCOREntryException {
 
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
+		return getPersistence().removeByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of cor entries where externalReferenceCode = &#63; and companyId = &#63;.
+	 * Returns the number of cor entries where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching cor entries
 	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static int countByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
+		return getPersistence().countByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
@@ -2243,9 +1734,23 @@ public class COREntryUtil {
 	}
 
 	public static COREntryPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile COREntryPersistence _persistence;
+	private static ServiceTracker<COREntryPersistence, COREntryPersistence>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(COREntryPersistence.class);
+
+		ServiceTracker<COREntryPersistence, COREntryPersistence>
+			serviceTracker =
+				new ServiceTracker<COREntryPersistence, COREntryPersistence>(
+					bundle.getBundleContext(), COREntryPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

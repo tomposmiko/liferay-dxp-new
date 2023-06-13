@@ -16,17 +16,12 @@ package com.liferay.adaptive.media.image.content.transformer.backwards.compatibi
 
 import com.liferay.adaptive.media.content.transformer.constants.ContentTransformerContentTypes;
 import com.liferay.adaptive.media.image.html.AMImageHTMLTagFactory;
-import com.liferay.adaptive.media.image.mime.type.AMImageMimeTypeProvider;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.repository.friendly.url.resolver.FileEntryFriendlyURLResolver;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
@@ -56,11 +51,9 @@ public class AMBackwardsCompatibilityHtmlContentTransformerTest {
 			"[REPLACED]"
 		);
 
-		Mockito.when(
-			_amImageMimeTypeProvider.isMimeTypeSupported(Mockito.anyString())
-		).thenReturn(
-			true
-		);
+		ReflectionTestUtil.setFieldValue(
+			_contentTransformer, "_amImageHTMLTagFactory",
+			_amImageHTMLTagFactory);
 
 		Mockito.when(
 			_dlAppLocalService.getFileEntryByUuidAndGroupId(
@@ -69,39 +62,8 @@ public class AMBackwardsCompatibilityHtmlContentTransformerTest {
 			_fileEntry
 		);
 
-		Mockito.when(
-			_fileEntry.getMimeType()
-		).thenReturn(
-			ContentTypes.IMAGE_JPEG
-		);
-
-		Mockito.when(
-			_fileEntryFriendlyURLResolver.resolveFriendlyURL(
-				Mockito.anyLong(), Mockito.anyString())
-		).thenReturn(
-			_fileEntry
-		);
-
-		Mockito.when(
-			_groupLocalService.fetchFriendlyURLGroup(
-				Mockito.anyLong(), Mockito.anyString())
-		).thenReturn(
-			_group
-		);
-
-		ReflectionTestUtil.setFieldValue(
-			_contentTransformer, "_amImageHTMLTagFactory",
-			_amImageHTMLTagFactory);
-		ReflectionTestUtil.setFieldValue(
-			_contentTransformer, "_amImageMimeTypeProvider",
-			_amImageMimeTypeProvider);
 		ReflectionTestUtil.setFieldValue(
 			_contentTransformer, "_dlAppLocalService", _dlAppLocalService);
-		ReflectionTestUtil.setFieldValue(
-			_contentTransformer, "_fileEntryFriendlyURLResolver",
-			_fileEntryFriendlyURLResolver);
-		ReflectionTestUtil.setFieldValue(
-			_contentTransformer, "_groupLocalService", _groupLocalService);
 	}
 
 	@Test
@@ -109,15 +71,6 @@ public class AMBackwardsCompatibilityHtmlContentTransformerTest {
 		Assert.assertEquals(
 			ContentTransformerContentTypes.HTML,
 			_contentTransformer.getContentTransformerContentType());
-	}
-
-	@Test
-	public void testReplacesFriendlyURLImageTagsWithDoubleQuotes()
-		throws Exception {
-
-		Assert.assertEquals(
-			_CONTENT_PREFIX + "[REPLACED]" + _CONTENT_SUFFIX,
-			_contentTransformer.transform(_CONTENT_WITH_IMAGE_FRIENDLY_URL));
 	}
 
 	@Test
@@ -140,16 +93,6 @@ public class AMBackwardsCompatibilityHtmlContentTransformerTest {
 			_CONTENT_PREFIX + "[REPLACED]" + _CONTENT_SUFFIX,
 			_contentTransformer.transform(
 				_LEGACY_CONTENT_WITH_IMAGE_AND_SINGLE_QUOTES));
-	}
-
-	@Test(timeout = 1000)
-	public void testReplacesImageTagsWithLongTitleWithSpaces()
-		throws Exception {
-
-		Assert.assertEquals(
-			_CONTENT_PREFIX + "[REPLACED]" + _CONTENT_SUFFIX,
-			_contentTransformer.transform(
-				_CONTENT_WITH_IMAGE_AND_LONG_TITLE_WITH_SPACES));
 	}
 
 	@Test
@@ -195,13 +138,6 @@ public class AMBackwardsCompatibilityHtmlContentTransformerTest {
 			"/1710bfe2-2b7c-1f69-f8b7-23ff6bd5dd4b?t=1506075653544\" />",
 			_CONTENT_SUFFIX);
 
-	private static final String _CONTENT_WITH_IMAGE_AND_LONG_TITLE_WITH_SPACES =
-		StringBundler.concat(
-			_CONTENT_PREFIX, "<img src=\"/documents/20138/0/sample.jpg",
-			"/1710bfe2-2b7c-1f69-f8b7-23ff6bd5dd4b?t=1506075653544\" ",
-			"title=\"1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 ",
-			"9 0 1 2 3 4 5 \" />", _CONTENT_SUFFIX);
-
 	private static final String _CONTENT_WITH_IMAGE_AND_NEWLINES =
 		StringBundler.concat(
 			_CONTENT_PREFIX, "<img\nsrc=\"/documents/20138/0/sample.jpg",
@@ -214,11 +150,6 @@ public class AMBackwardsCompatibilityHtmlContentTransformerTest {
 			"/1710bfe2-2b7c-1f69-f8b7-23ff6bd5dd4b?t=1506075653544' />",
 			_CONTENT_SUFFIX);
 
-	private static final String _CONTENT_WITH_IMAGE_FRIENDLY_URL =
-		StringBundler.concat(
-			_CONTENT_PREFIX, "<img src=\"/documents/d/site_name/sample\" />",
-			_CONTENT_SUFFIX);
-
 	private static final String _LEGACY_CONTENT_WITH_IMAGE_AND_SINGLE_QUOTES =
 		StringBundler.concat(
 			_CONTENT_PREFIX, "<img src='/documents/20138/0/sample.jpg?t=",
@@ -226,18 +157,11 @@ public class AMBackwardsCompatibilityHtmlContentTransformerTest {
 
 	private final AMImageHTMLTagFactory _amImageHTMLTagFactory = Mockito.mock(
 		AMImageHTMLTagFactory.class);
-	private final AMImageMimeTypeProvider _amImageMimeTypeProvider =
-		Mockito.mock(AMImageMimeTypeProvider.class);
 	private final AMBackwardsCompatibilityHtmlContentTransformer
 		_contentTransformer =
 			new AMBackwardsCompatibilityHtmlContentTransformer();
 	private final DLAppLocalService _dlAppLocalService = Mockito.mock(
 		DLAppLocalService.class);
 	private final FileEntry _fileEntry = Mockito.mock(FileEntry.class);
-	private final FileEntryFriendlyURLResolver _fileEntryFriendlyURLResolver =
-		Mockito.mock(FileEntryFriendlyURLResolver.class);
-	private final Group _group = Mockito.mock(Group.class);
-	private final GroupLocalService _groupLocalService = Mockito.mock(
-		GroupLocalService.class);
 
 }

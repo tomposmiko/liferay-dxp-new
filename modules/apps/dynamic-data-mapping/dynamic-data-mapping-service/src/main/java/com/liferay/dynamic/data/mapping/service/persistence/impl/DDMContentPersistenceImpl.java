@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.model.DDMContentTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMContentImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMContentModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMContentPersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMContentUtil;
 import com.liferay.dynamic.data.mapping.service.persistence.impl.constants.DDMPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ import org.osgi.service.component.annotations.Reference;
  * @deprecated
  * @generated
  */
-@Component(service = DDMContentPersistence.class)
+@Component(service = {DDMContentPersistence.class, BasePersistence.class})
 @Deprecated
 public class DDMContentPersistenceImpl
 	extends BasePersistenceImpl<DDMContent> implements DDMContentPersistence {
@@ -204,7 +203,7 @@ public class DDMContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMContent ddmContent : list) {
@@ -593,7 +592,7 @@ public class DDMContentPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -729,7 +728,7 @@ public class DDMContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof DDMContent) {
@@ -849,7 +848,7 @@ public class DDMContentPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1021,7 +1020,7 @@ public class DDMContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMContent ddmContent : list) {
@@ -1442,7 +1441,7 @@ public class DDMContentPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1603,7 +1602,7 @@ public class DDMContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMContent ddmContent : list) {
@@ -1968,7 +1967,7 @@ public class DDMContentPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2112,7 +2111,7 @@ public class DDMContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMContent ddmContent : list) {
@@ -2479,7 +2478,7 @@ public class DDMContentPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2654,7 +2653,7 @@ public class DDMContentPersistenceImpl
 		ddmContent.setNew(true);
 		ddmContent.setPrimaryKey(contentId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		ddmContent.setUuid(uuid);
 
@@ -2772,7 +2771,7 @@ public class DDMContentPersistenceImpl
 			(DDMContentModelImpl)ddmContent;
 
 		if (Validator.isNull(ddmContent.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			ddmContent.setUuid(uuid);
 		}
@@ -2896,9 +2895,7 @@ public class DDMContentPersistenceImpl
 	 */
 	@Override
 	public DDMContent fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMContent.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMContent.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3114,7 +3111,7 @@ public class DDMContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3190,7 +3187,7 @@ public class DDMContentPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3407,30 +3404,11 @@ public class DDMContentPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
-
-		_setDDMContentUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMContentUtilPersistence(null);
-
 		entityCache.removeCache(DDMContentImpl.class.getName());
-	}
-
-	private void _setDDMContentUtilPersistence(
-		DDMContentPersistence ddmContentPersistence) {
-
-		try {
-			Field field = DDMContentUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmContentPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3500,6 +3478,6 @@ public class DDMContentPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private DDMContentModelArgumentsResolver _ddmContentModelArgumentsResolver;
 
 }

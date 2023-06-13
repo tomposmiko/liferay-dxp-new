@@ -21,12 +21,13 @@ import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 
-import com.liferay.petra.function.transform.TransformUtil;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Alejandro Hernández
@@ -87,19 +88,20 @@ public class VulcanPropertyFilter
 
 	private boolean _isFilteredWithoutNested(String path) {
 		if (_isFiltered(path)) {
-			for (String fieldName : _fieldNames) {
-				if (fieldName.startsWith(path + ".")) {
-					return false;
-				}
+			Stream<String> fieldNamesStream = _fieldNames.stream();
+
+			Predicate<String> stringPredicate = field -> field.startsWith(
+				path + ".");
+
+			Stream<String> restrictFieldStream = _restrictFieldNames.stream();
+
+			if (fieldNamesStream.noneMatch(stringPredicate) &&
+				restrictFieldStream.noneMatch(stringPredicate)) {
+
+				return true;
 			}
 
-			for (String restrictFieldName : _restrictFieldNames) {
-				if (restrictFieldName.startsWith(path + ".")) {
-					return false;
-				}
-			}
-
-			return true;
+			return false;
 		}
 
 		return false;
@@ -148,8 +150,13 @@ public class VulcanPropertyFilter
 			}
 
 			if (currentName != null) {
-				paths = TransformUtil.transform(
-					paths, (currentName + ".")::concat);
+				Stream<String> stream = paths.stream();
+
+				paths = stream.map(
+					(currentName + ".")::concat
+				).collect(
+					Collectors.toList()
+				);
 
 				paths.add(currentName);
 			}

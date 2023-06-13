@@ -90,7 +90,7 @@ int index = 0;
 						).build();
 						%>
 
-						<aui:a cssClass='<%= (Validator.isNull(fieldParamSelection) || fieldParamSelection.equals("0")) ? "facet-term-selected" : "facet-term-unselected" %>' href="javascript:void(0);">
+						<aui:a cssClass='<%= (Validator.isNull(fieldParamSelection) || fieldParamSelection.equals("0")) ? "facet-term-selected" : "facet-term-unselected" %>' href="javascript:;">
 							<liferay-ui:message key="<%= HtmlUtil.escape(facetConfiguration.getLabel()) %>" />
 						</aui:a>
 					</li>
@@ -121,7 +121,7 @@ int index = 0;
 							).build();
 							%>
 
-							<aui:a cssClass="<%= rangeCssClass %>" data="<%= data %>" href="javascript:void(0);">
+							<aui:a cssClass="<%= rangeCssClass %>" data="<%= data %>" href="javascript:;">
 								<liferay-ui:message key="<%= label %>" />
 
 								<%
@@ -157,7 +157,7 @@ int index = 0;
 						}
 						%>
 
-						<aui:a cssClass="<%= customRangeCssClass %>" href="javascript:void(0);">
+						<aui:a cssClass="<%= customRangeCssClass %>" href="javascript:;">
 							<liferay-ui:message key="custom-range" />&hellip;
 
 							<c:if test="<%= termCollector != null %>">
@@ -396,6 +396,6 @@ int index = 0;
 	A.one('.<%= randomNamespace %>custom-range-toggle').on('click', (event) => {
 		event.halt();
 
-		A.one('#<%= randomNamespace %>customRange').toggle();
+		A.one('#<%= randomNamespace + "customRange" %>').toggle();
 	});
 </aui:script>

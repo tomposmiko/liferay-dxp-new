@@ -30,10 +30,6 @@ public class DDMDataProviderInstanceLinkLocalServiceWrapper
 	implements DDMDataProviderInstanceLinkLocalService,
 			   ServiceWrapper<DDMDataProviderInstanceLinkLocalService> {
 
-	public DDMDataProviderInstanceLinkLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DDMDataProviderInstanceLinkLocalServiceWrapper(
 		DDMDataProviderInstanceLinkLocalService
 			ddmDataProviderInstanceLinkLocalService) {

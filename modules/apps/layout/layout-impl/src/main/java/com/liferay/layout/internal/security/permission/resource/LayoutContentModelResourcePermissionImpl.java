@@ -17,22 +17,27 @@ package com.liferay.layout.internal.security.permission.resource;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.security.permission.resource.LayoutContentModelResourcePermission;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionRegistryUtil;
 
 import java.util.List;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Rubén Pulido
  */
-@Component(service = LayoutContentModelResourcePermission.class)
+@Component(
+	immediate = true, service = LayoutContentModelResourcePermission.class
+)
 public class LayoutContentModelResourcePermissionImpl
 	implements LayoutContentModelResourcePermission {
 
@@ -64,8 +69,7 @@ public class LayoutContentModelResourcePermissionImpl
 		String actionId) {
 
 		ModelResourcePermission<?> modelResourcePermission =
-			ModelResourcePermissionRegistryUtil.getModelResourcePermission(
-				className);
+			_modelResourcePermissionServiceTrackerMap.getService(className);
 
 		if (modelResourcePermission == null) {
 			return false;
@@ -87,8 +91,21 @@ public class LayoutContentModelResourcePermissionImpl
 		return false;
 	}
 
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_modelResourcePermissionServiceTrackerMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext,
+				(Class<ModelResourcePermission<?>>)
+					(Class<?>)ModelResourcePermission.class,
+				"model.class.name");
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutContentModelResourcePermissionImpl.class);
+
+	private static ServiceTrackerMap<String, ModelResourcePermission<?>>
+		_modelResourcePermissionServiceTrackerMap;
 
 	@Reference
 	private LayoutClassedModelUsageLocalService

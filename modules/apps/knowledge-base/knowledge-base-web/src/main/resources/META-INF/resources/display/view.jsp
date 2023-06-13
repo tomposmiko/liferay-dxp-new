@@ -38,7 +38,13 @@ request.setAttribute(KBWebKeys.KNOWLEDGE_BASE_KB_NAVIGATION_DISPLAY_CONTEXT, kbN
 			<clay:col
 				md='<%= kbNavigationDisplayContext.isLeftNavigationVisible() ? "9" : "12" %>'
 			>
-				<liferay-util:include page="/display/view_kb_article.jsp" servletContext="<%= application %>" />
+				<c:if test="<%= kbNavigationDisplayContext.isTopNavigationVisible() %>">
+					<div class="kbarticle-navigation">
+						<liferay-util:include page="/display/content_root_selector.jsp" servletContext="<%= application %>" />
+					</div>
+				</c:if>
+
+				<liferay-util:include page="/display/view_article.jsp" servletContext="<%= application %>" />
 			</clay:col>
 		</clay:row>
 	</c:when>
@@ -49,7 +55,7 @@ request.setAttribute(KBWebKeys.KNOWLEDGE_BASE_KB_NAVIGATION_DISPLAY_CONTEXT, kbN
 		%>
 
 		<div class="alert alert-info portlet-configuration">
-			<aui:a href="<%= portletDisplay.getURLConfiguration() %>" label="<%= kbNavigationDisplayContext.getLabel() %>" onClick="<%= portletDisplay.getURLConfigurationJS() %>" />
+			<aui:a href="<%= portletDisplay.getURLConfiguration() %>" label="please-configure-this-portlet-to-make-it-visible-to-all-users" onClick="<%= portletDisplay.getURLConfigurationJS() %>" />
 		</div>
 	</c:otherwise>
 </c:choose>

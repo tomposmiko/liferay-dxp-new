@@ -187,7 +187,7 @@ public class Entity implements Comparable<Entity> {
 			sessionFactory, _SESSION_FACTORY_DEFAULT);
 		_txManager = GetterUtil.getString(txManager, _TX_MANAGER_DEFAULT);
 
-		if (entityColumns == null) {
+		if (_entityColumns == null) {
 			_databaseRegularEntityColumns = null;
 		}
 		else {
@@ -195,7 +195,7 @@ public class Entity implements Comparable<Entity> {
 				regularEntityColumns);
 		}
 
-		if (entityFinders != null) {
+		if (_entityFinders != null) {
 			Set<EntityColumn> finderEntityColumns = new HashSet<>();
 
 			for (EntityFinder entityFinder : _entityFinders) {
@@ -210,7 +210,7 @@ public class Entity implements Comparable<Entity> {
 			_finderEntityColumns = Collections.emptyList();
 		}
 
-		if ((blobEntityColumns != null) && !blobEntityColumns.isEmpty()) {
+		if ((_blobEntityColumns != null) && !_blobEntityColumns.isEmpty()) {
 			for (EntityColumn entityColumn : _blobEntityColumns) {
 				if (!entityColumn.isLazy()) {
 					cacheEnabled = false;
@@ -224,7 +224,7 @@ public class Entity implements Comparable<Entity> {
 
 		boolean containerModel = false;
 
-		if ((entityColumns != null) && !entityColumns.isEmpty()) {
+		if ((_entityColumns != null) && !_entityColumns.isEmpty()) {
 			for (EntityColumn entityColumn : _entityColumns) {
 				if (entityColumn.isContainerModel() ||
 					entityColumn.isParentContainerModel()) {
@@ -1166,9 +1166,7 @@ public class Entity implements Comparable<Entity> {
 
 	public boolean isShardedModel() {
 		if (_packagePath.equals("com.liferay.portal") &&
-			(_name.equals("Company") ||
-			 (_serviceBuilder.isVersionGTE_7_4_0() &&
-			  _name.equals("VirtualHost")))) {
+			_name.equals("Company")) {
 
 			return false;
 		}

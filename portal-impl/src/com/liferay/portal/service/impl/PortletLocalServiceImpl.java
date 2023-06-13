@@ -17,19 +17,21 @@ package com.liferay.portal.service.impl;
 import com.liferay.admin.kernel.util.PortalMyAccountApplicationType;
 import com.liferay.expando.kernel.model.CustomAttributesDisplay;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
+import com.liferay.petra.content.ContentUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.ConfigurationFactoryImpl;
 import com.liferay.portal.kernel.application.type.ApplicationType;
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.PortletIdException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.image.SpriteProcessor;
+import com.liferay.portal.kernel.image.SpriteProcessorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -64,7 +66,8 @@ import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletQNameUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEntryImpl;
 import com.liferay.portal.kernel.scheduler.TimeUnit;
-import com.liferay.portal.kernel.scheduler.TriggerConfiguration;
+import com.liferay.portal.kernel.scheduler.Trigger;
+import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -77,6 +80,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
+import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -108,7 +112,7 @@ import com.liferay.portlet.extra.config.ExtraPortletAppConfig;
 import com.liferay.portlet.extra.config.ExtraPortletAppConfigRegistry;
 import com.liferay.util.JS;
 
-import java.io.IOException;
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,6 +125,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -234,7 +239,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		return (Portlet)portlet.clone();
 	}
 
-	@CTAware
 	@Override
 	public void deletePortlet(long companyId, String portletId, long plid)
 		throws PortalException {
@@ -291,7 +295,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		}
 	}
 
-	@CTAware
 	@Override
 	public void deletePortlets(long companyId, String[] portletIds, long plid)
 		throws PortalException {
@@ -374,7 +377,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		throws PortalException {
 
 		long[] companyIds = ListUtil.toLongArray(
-			_companyLocalService.getCompanies(), Company::getCompanyId);
+			_companyLocalService.getCompanies(false), Company::getCompanyId);
 
 		deployRemotePortlet(
 			companyIds, portlet, categoryNames, eagerDestroy, true);
@@ -813,19 +816,28 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				if (!Objects.equals(
 						portletModel.getPortletId(),
 						PortletKeys.SERVER_ADMIN) &&
-					!portletModel.isInclude() &&
-					!Objects.equals(
-						portletModel.getPortletId(),
-						PortletProviderUtil.getPortletId(
-							PortalMyAccountApplicationType.MyAccount.CLASS_NAME,
-							PortletProvider.Action.VIEW))) {
+					!portletModel.isInclude()) {
 
-					iterator.remove();
+					String portletId = PortletProviderUtil.getPortletId(
+						PortalMyAccountApplicationType.MyAccount.CLASS_NAME,
+						PortletProvider.Action.VIEW);
+
+					if (!Objects.equals(
+							portletModel.getPortletId(), portletId)) {
+
+						iterator.remove();
+					}
 				}
+			}
+
+			// Sprite images
+
+			if (PropsValues.SPRITE_ENABLED) {
+				setSpriteImages(servletContext, portletApp, "/html/icons/");
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -870,7 +882,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				portletIdsByStrutsPath, _getConfiguration(portletApp));
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return Collections.emptyList();
 		}
@@ -928,10 +940,16 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				_portletsMap.put(entry.getKey(), portlet);
 			}
 
+			// Sprite images
+
+			if (PropsValues.SPRITE_ENABLED) {
+				setSpriteImages(servletContext, portletApp, "/icons/");
+			}
+
 			return ListUtil.fromMapValues(portletsMap);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			// Clean up portlets added prior to error
 
@@ -1279,16 +1297,9 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		if (xml == null) {
 			Class<?> clazz = getClass();
 
-			String filePath =
-				"com/liferay/portal/deploy/dependencies/liferay-display.xml";
-
-			try {
-				xml = StringUtil.read(clazz.getClassLoader(), filePath);
-			}
-			catch (IOException ioException) {
-				_log.error(
-					"Unable to read the content for " + filePath, ioException);
-			}
+			xml = ContentUtil.get(
+				clazz.getClassLoader(),
+				"com/liferay/portal/deploy/dependencies/liferay-display.xml");
 		}
 
 		Document document = UnsecureSAXReaderUtil.read(xml, true);
@@ -1436,12 +1447,12 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 				schedulerEntryElement.elementText(
 					"scheduler-event-listener-class"));
 
+			Trigger trigger = null;
+
 			Element triggerElement = schedulerEntryElement.element("trigger");
 
 			Element cronElement = triggerElement.element("cron");
 			Element simpleElement = triggerElement.element("simple");
-
-			TriggerConfiguration triggerConfiguration = null;
 
 			if (cronElement != null) {
 				Element propertyKeyElement = cronElement.element(
@@ -1458,9 +1469,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 						"cron-trigger-value");
 				}
 
-				triggerConfiguration =
-					TriggerConfiguration.createTriggerConfiguration(
-						cronException);
+				trigger = TriggerFactoryUtil.createTrigger(
+					eventListenerClass, eventListenerClass, cronException);
 			}
 			else if (simpleElement != null) {
 				Element propertyKeyElement = simpleElement.element(
@@ -1484,14 +1494,14 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 						simpleElement.elementText("time-unit"),
 						TimeUnit.SECOND.getValue()));
 
-				triggerConfiguration =
-					TriggerConfiguration.createTriggerConfiguration(
-						GetterUtil.getIntegerStrict(intervalString),
-						TimeUnit.valueOf(timeUnitString));
+				trigger = TriggerFactoryUtil.createTrigger(
+					eventListenerClass, eventListenerClass,
+					GetterUtil.getIntegerStrict(intervalString),
+					TimeUnit.valueOf(timeUnitString));
 			}
 
 			SchedulerEntryImpl schedulerEntryImpl = new SchedulerEntryImpl(
-				eventListenerClass, triggerConfiguration, description);
+				eventListenerClass, trigger, description);
 
 			portletModel.addSchedulerEntry(schedulerEntryImpl);
 		}
@@ -1537,15 +1547,14 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			GetterUtil.getString(
 				portletElement.elementText("template-handler"),
 				portletModel.getTemplateHandlerClass()));
-		portletModel.setPortletConfigurationListenerClass(
-			GetterUtil.getString(
-				portletElement.elementText(
-					"portlet-configuration-listener-class"),
-				portletModel.getPortletLayoutListenerClass()));
 		portletModel.setPortletLayoutListenerClass(
 			GetterUtil.getString(
 				portletElement.elementText("portlet-layout-listener-class"),
 				portletModel.getPortletLayoutListenerClass()));
+		portletModel.setPollerProcessorClass(
+			GetterUtil.getString(
+				portletElement.elementText("poller-processor-class"),
+				portletModel.getPollerProcessorClass()));
 		portletModel.setPopMessageListenerClass(
 			GetterUtil.getString(
 				portletElement.elementText("pop-message-listener-class"),
@@ -1638,6 +1647,18 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		portletModel.setAssetRendererFactoryClasses(
 			assetRendererFactoryClasses);
+
+		List<String> atomCollectionAdapterClasses = new ArrayList<>();
+
+		for (Element atomCollectionAdapterClassElement :
+				portletElement.elements("atom-collection-adapter")) {
+
+			atomCollectionAdapterClasses.add(
+				atomCollectionAdapterClassElement.getText());
+		}
+
+		portletModel.setAtomCollectionAdapterClasses(
+			atomCollectionAdapterClasses);
 
 		List<String> customAttributesDisplayClasses = new ArrayList<>();
 
@@ -2259,10 +2280,10 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			Element nameElement = supportedPublishingEventElement.element(
 				"name");
 
-			publishingEvents.add(
-				PortletQNameUtil.getQName(
-					qNameElement, nameElement,
-					portletApp.getDefaultNamespace()));
+			QName qName = PortletQNameUtil.getQName(
+				qNameElement, nameElement, portletApp.getDefaultNamespace());
+
+			publishingEvents.add(qName);
 		}
 
 		portletModel.setPublishingEvents(publishingEvents);
@@ -2431,9 +2452,10 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			List<Element> aliases = eventDefinitionElement.elements("alias");
 
 			for (Element alias : aliases) {
-				eventDefinition.addAliasQName(
-					PortletQNameUtil.getQName(
-						alias, null, portletApp.getDefaultNamespace()));
+				qName = PortletQNameUtil.getQName(
+					alias, null, portletApp.getDefaultNamespace());
+
+				eventDefinition.addAliasQName(qName);
 			}
 
 			portletApp.addEventDefinition(eventDefinition);
@@ -2632,6 +2654,59 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		}
 
 		return servletURLPatterns;
+	}
+
+	protected void setSpriteImages(
+			ServletContext servletContext, PortletApp portletApp,
+			String resourcePath)
+		throws Exception {
+
+		Set<String> resourcePaths = servletContext.getResourcePaths(
+			resourcePath);
+
+		if ((resourcePaths == null) || resourcePaths.isEmpty()) {
+			return;
+		}
+
+		List<URL> imageURLs = new ArrayList<>(resourcePaths.size());
+
+		for (String curResourcePath : resourcePaths) {
+			if (curResourcePath.endsWith(StringPool.SLASH)) {
+				setSpriteImages(servletContext, portletApp, curResourcePath);
+			}
+			else if (curResourcePath.endsWith(".png")) {
+				URL imageURL = servletContext.getResource(curResourcePath);
+
+				if (imageURL != null) {
+					imageURLs.add(imageURL);
+				}
+				else {
+					_log.error(
+						"Resource URL for " + curResourcePath + " is null");
+				}
+			}
+		}
+
+		String spriteRootDirName = PropsValues.SPRITE_ROOT_DIR;
+		String spriteFileName = resourcePath.concat(
+			PropsValues.SPRITE_FILE_NAME);
+		String spritePropertiesFileName = resourcePath.concat(
+			PropsValues.SPRITE_PROPERTIES_FILE_NAME);
+		String rootPath = ServletContextUtil.getRootPath(servletContext);
+
+		Properties spriteProperties = SpriteProcessorUtil.generate(
+			servletContext, imageURLs, spriteRootDirName, spriteFileName,
+			spritePropertiesFileName, rootPath, 16, 16, 10240);
+
+		if (spriteProperties == null) {
+			return;
+		}
+
+		spriteFileName = StringBundler.concat(
+			servletContext.getContextPath(), SpriteProcessor.PATH,
+			spriteFileName);
+
+		portletApp.setSpriteImages(spriteFileName, spriteProperties);
 	}
 
 	protected Portlet updatePortlet(

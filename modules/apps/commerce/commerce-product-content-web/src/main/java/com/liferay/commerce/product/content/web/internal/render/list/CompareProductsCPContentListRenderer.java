@@ -17,7 +17,8 @@ package com.liferay.commerce.product.content.web.internal.render.list;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.content.render.list.CPContentListRenderer;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
@@ -33,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.product.content.list.renderer.key=" + CPPortletKeys.CP_COMPARE_CONTENT_WEB,
 		"commerce.product.content.list.renderer.order=" + Integer.MIN_VALUE,
@@ -53,7 +55,7 @@ public class CompareProductsCPContentListRenderer
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "default");
+		return LanguageUtil.get(resourceBundle, "default");
 	}
 
 	@Override
@@ -71,6 +73,6 @@ public class CompareProductsCPContentListRenderer
 	private JSPRenderer _jspRenderer;
 
 	@Reference
-	private Language _language;
+	private Portal _portal;
 
 }

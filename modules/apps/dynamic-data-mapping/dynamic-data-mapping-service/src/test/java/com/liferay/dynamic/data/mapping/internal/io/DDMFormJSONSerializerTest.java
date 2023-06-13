@@ -16,7 +16,7 @@ package com.liferay.dynamic.data.mapping.internal.io;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldRenderer;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeSettings;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeResponse;
@@ -46,7 +46,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -66,7 +68,7 @@ public class DDMFormJSONSerializerTest extends BaseDDMFormSerializerTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_setUpDDMFormJSONSerializer();
+		setUpDDMFormJSONSerializer();
 		setUpPortalUtil();
 	}
 
@@ -76,9 +78,9 @@ public class DDMFormJSONSerializerTest extends BaseDDMFormSerializerTestCase {
 
 		DDMForm ddmForm = createDDMForm();
 
-		ddmForm.setDDMFormRules(_createDDMFormRules());
+		ddmForm.setDDMFormRules(createDDMFormRules());
 		ddmForm.setDDMFormSuccessPageSettings(
-			_createDDMFormSuccessPageSettings());
+			createDDMFormSuccessPageSettings());
 
 		String actualJSON = serialize(ddmForm);
 
@@ -99,84 +101,7 @@ public class DDMFormJSONSerializerTest extends BaseDDMFormSerializerTestCase {
 		JSONAssert.assertEquals(expectedJSON, actualJSON, false);
 	}
 
-	protected DDMFormFieldTypeServicesRegistry
-		getMockedDDMFormFieldTypeServicesRegistry() {
-
-		setUpDefaultDDMFormFieldType();
-
-		DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry =
-			Mockito.mock(DDMFormFieldTypeServicesRegistry.class);
-
-		DDMFormFieldRenderer ddmFormFieldRenderer = Mockito.mock(
-			DDMFormFieldRenderer.class);
-
-		Mockito.when(
-			ddmFormFieldTypeServicesRegistry.getDDMFormFieldRenderer(
-				Mockito.anyString())
-		).thenReturn(
-			ddmFormFieldRenderer
-		);
-
-		Mockito.when(
-			ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(
-				Mockito.anyString())
-		).thenReturn(
-			_defaultDDMFormFieldType
-		);
-
-		Mockito.when(
-			ddmFormFieldTypeServicesRegistry.getDDMFormFieldTypeProperties(
-				Mockito.anyString())
-		).thenReturn(
-			HashMapBuilder.<String, Object>put(
-				"ddm.form.field.type.icon", "my-icon"
-			).put(
-				"ddm.form.field.type.js.class.name", "myJavaScriptClass"
-			).put(
-				"ddm.form.field.type.js.module", "myJavaScriptModule"
-			).build()
-		);
-
-		return ddmFormFieldTypeServicesRegistry;
-	}
-
-	protected String serialize(DDMForm ddmForm) {
-		DDMFormSerializerSerializeRequest.Builder builder =
-			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
-
-		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
-			_ddmFormJSONSerializer.serialize(builder.build());
-
-		return ddmFormSerializerSerializeResponse.getContent();
-	}
-
-	protected void setUpDefaultDDMFormFieldType() {
-		Mockito.when(
-			_defaultDDMFormFieldType.getDDMFormFieldTypeSettings()
-		).then(
-			(Answer<Class<? extends DDMFormFieldTypeSettings>>)
-				invocationOnMock ->
-					DDMFormFieldTypeSettingsTestUtil.getSettings()
-		);
-	}
-
-	protected void setUpPortalUtil() {
-		PortalUtil portalUtil = new PortalUtil();
-
-		Portal portal = Mockito.mock(Portal.class);
-
-		ResourceBundle resourceBundle = Mockito.mock(ResourceBundle.class);
-
-		Mockito.when(
-			portal.getResourceBundle(Mockito.any(Locale.class))
-		).thenReturn(
-			resourceBundle
-		);
-
-		portalUtil.setPortal(portal);
-	}
-
-	private List<DDMFormRule> _createDDMFormRules() {
+	protected List<DDMFormRule> createDDMFormRules() {
 		List<DDMFormRule> ddmFormRules = new ArrayList<>();
 
 		DDMFormRule ddmFormRule1 = new DDMFormRule(
@@ -194,7 +119,7 @@ public class DDMFormJSONSerializerTest extends BaseDDMFormSerializerTestCase {
 		return ddmFormRules;
 	}
 
-	private DDMFormSuccessPageSettings _createDDMFormSuccessPageSettings() {
+	protected DDMFormSuccessPageSettings createDDMFormSuccessPageSettings() {
 		LocalizedValue body = new LocalizedValue(LocaleUtil.US);
 
 		body.addString(LocaleUtil.US, "Body Text");
@@ -208,16 +133,66 @@ public class DDMFormJSONSerializerTest extends BaseDDMFormSerializerTestCase {
 		return new DDMFormSuccessPageSettings(body, title, true);
 	}
 
-	private void _setUpDDMFormJSONSerializer() throws Exception {
+	protected DDMFormFieldTypeServicesTracker
+		getMockedDDMFormFieldTypeServicesTracker() {
+
+		setUpDefaultDDMFormFieldType();
+
+		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker = mock(
+			DDMFormFieldTypeServicesTracker.class);
+
+		DDMFormFieldRenderer ddmFormFieldRenderer = mock(
+			DDMFormFieldRenderer.class);
+
+		when(
+			ddmFormFieldTypeServicesTracker.getDDMFormFieldRenderer(
+				Matchers.anyString())
+		).thenReturn(
+			ddmFormFieldRenderer
+		);
+
+		when(
+			ddmFormFieldTypeServicesTracker.getDDMFormFieldType(
+				Matchers.anyString())
+		).thenReturn(
+			_defaultDDMFormFieldType
+		);
+
+		when(
+			ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeProperties(
+				Matchers.anyString())
+		).thenReturn(
+			HashMapBuilder.<String, Object>put(
+				"ddm.form.field.type.icon", "my-icon"
+			).put(
+				"ddm.form.field.type.js.class.name", "myJavaScriptClass"
+			).put(
+				"ddm.form.field.type.js.module", "myJavaScriptModule"
+			).build()
+		);
+
+		return ddmFormFieldTypeServicesTracker;
+	}
+
+	protected String serialize(DDMForm ddmForm) {
+		DDMFormSerializerSerializeRequest.Builder builder =
+			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
+
+		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
+			_ddmFormJSONSerializer.serialize(builder.build());
+
+		return ddmFormSerializerSerializeResponse.getContent();
+	}
+
+	protected void setUpDDMFormJSONSerializer() throws Exception {
 
 		// DDM form field type services tracker
 
 		Field field = ReflectionUtil.getDeclaredField(
-			DDMFormJSONSerializer.class, "_ddmFormFieldTypeServicesRegistry");
+			DDMFormJSONSerializer.class, "_ddmFormFieldTypeServicesTracker");
 
 		field.set(
-			_ddmFormJSONSerializer,
-			getMockedDDMFormFieldTypeServicesRegistry());
+			_ddmFormJSONSerializer, getMockedDDMFormFieldTypeServicesTracker());
 
 		// JSON factory
 
@@ -227,9 +202,44 @@ public class DDMFormJSONSerializerTest extends BaseDDMFormSerializerTestCase {
 		field.set(_ddmFormJSONSerializer, new JSONFactoryImpl());
 	}
 
+	protected void setUpDefaultDDMFormFieldType() {
+		when(
+			_defaultDDMFormFieldType.getDDMFormFieldTypeSettings()
+		).then(
+			new Answer<Class<? extends DDMFormFieldTypeSettings>>() {
+
+				@Override
+				public Class<? extends DDMFormFieldTypeSettings> answer(
+						InvocationOnMock invocationOnMock)
+					throws Throwable {
+
+					return DDMFormFieldTypeSettingsTestUtil.getSettings();
+				}
+
+			}
+		);
+	}
+
+	protected void setUpPortalUtil() {
+		PortalUtil portalUtil = new PortalUtil();
+
+		Portal portal = mock(Portal.class);
+
+		ResourceBundle resourceBundle = mock(ResourceBundle.class);
+
+		when(
+			portal.getResourceBundle(Matchers.any(Locale.class))
+		).thenReturn(
+			resourceBundle
+		);
+
+		portalUtil.setPortal(portal);
+	}
+
 	private final DDMFormJSONSerializer _ddmFormJSONSerializer =
 		new DDMFormJSONSerializer();
-	private final DDMFormFieldType _defaultDDMFormFieldType = Mockito.mock(
-		DDMFormFieldType.class);
+
+	@Mock
+	private DDMFormFieldType _defaultDDMFormFieldType;
 
 }

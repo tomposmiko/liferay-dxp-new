@@ -14,17 +14,16 @@
 
 package com.liferay.analytics.web.internal.servlet.taglib;
 
-import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.analytics.web.internal.constants.AnalyticsWebKeys;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.taglib.BaseJSPDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
@@ -32,6 +31,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -50,13 +50,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class AnalyticsTopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -68,42 +63,34 @@ public class AnalyticsTopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		AnalyticsConfiguration analyticsConfiguration = null;
-
-		try {
-			analyticsConfiguration =
-				_analyticsSettingsManager.getAnalyticsConfiguration(
-					themeDisplay.getCompanyId());
-		}
-		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
-		}
-
-		if (!_isAnalyticsTrackingEnabled(
-				analyticsConfiguration, httpServletRequest, themeDisplay)) {
-
+		if (!_isAnalyticsTrackingEnabled(httpServletRequest, themeDisplay)) {
 			return;
 		}
 
 		httpServletRequest.setAttribute(
 			AnalyticsWebKeys.ANALYTICS_CLIENT_CHANNEL_ID,
 			_getLiferayAnalyticsChannelId(httpServletRequest, themeDisplay));
+
 		httpServletRequest.setAttribute(
 			AnalyticsWebKeys.ANALYTICS_CLIENT_CONFIG,
 			_serialize(
 				HashMapBuilder.put(
 					"dataSourceId",
-					analyticsConfiguration.liferayAnalyticsDataSourceId()
+					_getLiferayAnalyticsDataSourceId(themeDisplay.getCompany())
 				).put(
 					"endpointUrl",
-					analyticsConfiguration.liferayAnalyticsEndpointURL()
+					_getLiferayAnalyticsEndpointURL(themeDisplay.getCompany())
 				).put(
 					"projectId",
-					analyticsConfiguration.liferayAnalyticsProjectId()
+					_getLiferayAnalyticsProjectId(themeDisplay.getCompany())
 				).build()));
+
 		httpServletRequest.setAttribute(
 			AnalyticsWebKeys.ANALYTICS_CLIENT_GROUP_IDS,
-			_serialize(analyticsConfiguration.syncedGroupIds()));
+			_serialize(
+				PrefsPropsUtil.getStringArray(
+					themeDisplay.getCompanyId(), "liferayAnalyticsGroupIds",
+					StringPool.COMMA)));
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -132,6 +119,15 @@ public class AnalyticsTopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.analytics.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private String _getLiferayAnalyticsChannelId(
 		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
 
@@ -153,31 +149,59 @@ public class AnalyticsTopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return group.getTypeSettingsProperty("analyticsChannelId");
 	}
 
+	private String _getLiferayAnalyticsDataSourceId(Company company) {
+		return PrefsPropsUtil.getString(
+			company.getCompanyId(), "liferayAnalyticsDataSourceId");
+	}
+
+	private String _getLiferayAnalyticsEndpointURL(Company company) {
+		return PrefsPropsUtil.getString(
+			company.getCompanyId(), "liferayAnalyticsEndpointURL");
+	}
+
+	private String _getLiferayAnalyticsProjectId(Company company) {
+		return PrefsPropsUtil.getString(
+			company.getCompanyId(), "liferayAnalyticsProjectId");
+	}
+
 	private boolean _isAnalyticsTrackingEnabled(
-		AnalyticsConfiguration analyticsConfiguration,
 		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
 
 		Layout layout = themeDisplay.getLayout();
 
-		if ((analyticsConfiguration == null) || (layout == null) ||
-			layout.isTypeControlPanel() ||
-			Validator.isNull(
-				analyticsConfiguration.liferayAnalyticsDataSourceId()) ||
-			Validator.isNull(
-				analyticsConfiguration.liferayAnalyticsEndpointURL()) ||
+		if ((layout == null) || layout.isTypeControlPanel()) {
+			return false;
+		}
+
+		Company company = themeDisplay.getCompany();
+
+		if (Validator.isNull(_getLiferayAnalyticsDataSourceId(company)) ||
+			Validator.isNull(_getLiferayAnalyticsEndpointURL(company)) ||
 			Objects.equals(
 				httpServletRequest.getRequestURI(), "/c/portal/api/jsonws")) {
 
 			return false;
 		}
 
-		String[] syncedGroupIds = analyticsConfiguration.syncedGroupIds();
+		String[] liferayAnalyticsGroupIds = PrefsPropsUtil.getStringArray(
+			company.getCompanyId(), "liferayAnalyticsGroupIds",
+			StringPool.COMMA);
 
 		if (_isSharedFormEnabled(
-				syncedGroupIds, layout.getGroup(), httpServletRequest) ||
-			analyticsConfiguration.liferayAnalyticsEnableAllGroupIds() ||
+				liferayAnalyticsGroupIds, layout.getGroup(),
+				httpServletRequest)) {
+
+			return true;
+		}
+
+		Group group = layout.getGroup();
+
+		boolean liferayAnalyticsEnableAllGroupIds = PrefsPropsUtil.getBoolean(
+			company.getCompanyId(), "liferayAnalyticsEnableAllGroupIds");
+
+		if (liferayAnalyticsEnableAllGroupIds ||
 			ArrayUtil.contains(
-				syncedGroupIds, String.valueOf(layout.getGroupId()))) {
+				liferayAnalyticsGroupIds, String.valueOf(group.getGroupId()))) {
 
 			return true;
 		}
@@ -219,15 +243,9 @@ public class AnalyticsTopHeadJSPDynamicInclude extends BaseJSPDynamicInclude {
 		AnalyticsTopHeadJSPDynamicInclude.class);
 
 	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
-
-	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.analytics.web)")
-	private ServletContext _servletContext;
 
 }

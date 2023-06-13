@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.product.navigation.control.menu.BaseJSPProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
-import com.liferay.sites.kernel.util.Sites;
+import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.io.IOException;
 
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.TOOLS,
 		"product.navigation.control.menu.entry.order:Integer=300"
@@ -89,13 +90,13 @@ public class InformationMessagesProductNavigationControlMenuEntry
 		try {
 			httpServletRequest.setAttribute(
 				INFORMATION_MESSAGES_LINKED_LAYOUT,
-				_isLinkedLayout(themeDisplay));
+				isLinkedLayout(themeDisplay));
 			httpServletRequest.setAttribute(
 				INFORMATION_MESSAGES_MODIFIED_LAYOUT,
-				_isModifiedLayout(themeDisplay));
+				isModifiedLayout(themeDisplay));
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return super.includeIcon(httpServletRequest, httpServletResponse);
@@ -112,8 +113,8 @@ public class InformationMessagesProductNavigationControlMenuEntry
 		Layout layout = themeDisplay.getLayout();
 
 		if (layout.isTypeControlPanel() ||
-			(!_isLinkedLayout(themeDisplay) &&
-			 !_isModifiedLayout(themeDisplay))) {
+			(!isLinkedLayout(themeDisplay) &&
+			 !isModifiedLayout(themeDisplay))) {
 
 			return false;
 		}
@@ -122,18 +123,22 @@ public class InformationMessagesProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
-	private boolean _isLinkedLayout(ThemeDisplay themeDisplay)
+	protected boolean isLinkedLayout(ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		Layout layout = themeDisplay.getLayout();
 
 		Group group = layout.getGroup();
 
-		if (!_sites.isLayoutUpdateable(layout) ||
+		if (!SitesUtil.isLayoutUpdateable(layout) ||
 			(layout.isLayoutPrototypeLinkActive() &&
 			 !group.hasStagingGroup())) {
 
@@ -150,7 +155,7 @@ public class InformationMessagesProductNavigationControlMenuEntry
 		return false;
 	}
 
-	private boolean _isModifiedLayout(ThemeDisplay themeDisplay)
+	protected boolean isModifiedLayout(ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		Layout layout = themeDisplay.getLayout();
@@ -158,7 +163,7 @@ public class InformationMessagesProductNavigationControlMenuEntry
 		LayoutSet layoutSet = layout.getLayoutSet();
 
 		if (!layoutSet.isLayoutSetPrototypeLinkActive() ||
-			!_sites.isLayoutModifiedSinceLastMerge(layout) ||
+			!SitesUtil.isLayoutModifiedSinceLastMerge(layout) ||
 			!hasUpdateLayoutPermission(themeDisplay)) {
 
 			return false;
@@ -169,11 +174,5 @@ public class InformationMessagesProductNavigationControlMenuEntry
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		InformationMessagesProductNavigationControlMenuEntry.class);
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")
-	private ServletContext _servletContext;
-
-	@Reference
-	private Sites _sites;
 
 }

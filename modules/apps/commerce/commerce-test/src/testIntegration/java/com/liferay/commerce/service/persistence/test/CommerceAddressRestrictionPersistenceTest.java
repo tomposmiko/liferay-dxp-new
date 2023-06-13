@@ -129,8 +129,6 @@ public class CommerceAddressRestrictionPersistenceTest {
 		CommerceAddressRestriction newCommerceAddressRestriction =
 			_persistence.create(pk);
 
-		newCommerceAddressRestriction.setMvccVersion(RandomTestUtil.nextLong());
-
 		newCommerceAddressRestriction.setGroupId(RandomTestUtil.nextLong());
 
 		newCommerceAddressRestriction.setCompanyId(RandomTestUtil.nextLong());
@@ -158,9 +156,6 @@ public class CommerceAddressRestrictionPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommerceAddressRestriction.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceAddressRestriction.getMvccVersion(),
-			newCommerceAddressRestriction.getMvccVersion());
 		Assert.assertEquals(
 			existingCommerceAddressRestriction.
 				getCommerceAddressRestrictionId(),
@@ -252,11 +247,10 @@ public class CommerceAddressRestrictionPersistenceTest {
 		getOrderByComparator() {
 
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceAddressRestriction", "mvccVersion", true,
-			"commerceAddressRestrictionId", true, "groupId", true, "companyId",
-			true, "userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "classNameId", true, "classPK", true,
-			"countryId", true);
+			"CommerceAddressRestriction", "commerceAddressRestrictionId", true,
+			"groupId", true, "companyId", true, "userId", true, "userName",
+			true, "createDate", true, "modifiedDate", true, "classNameId", true,
+			"classPK", true, "countryId", true);
 	}
 
 	@Test
@@ -586,8 +580,6 @@ public class CommerceAddressRestrictionPersistenceTest {
 
 		CommerceAddressRestriction commerceAddressRestriction =
 			_persistence.create(pk);
-
-		commerceAddressRestriction.setMvccVersion(RandomTestUtil.nextLong());
 
 		commerceAddressRestriction.setGroupId(RandomTestUtil.nextLong());
 

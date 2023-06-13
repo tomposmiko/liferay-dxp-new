@@ -17,6 +17,7 @@ package com.liferay.commerce.product.definitions.web.internal.upload;
 import com.liferay.commerce.product.configuration.AttachmentsConfiguration;
 import com.liferay.commerce.product.exception.CPAttachmentFileEntryNameException;
 import com.liferay.commerce.product.exception.CPAttachmentFileEntrySizeException;
+import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -26,7 +27,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.File;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.upload.UniqueFileNameProvider;
@@ -39,6 +41,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -46,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.product.configuration.AttachmentsConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
 	service = TempAttachmentsUploadFileEntryHandler.class
 )
 public class TempAttachmentsUploadFileEntryHandler
@@ -59,6 +63,12 @@ public class TempAttachmentsUploadFileEntryHandler
 			(ThemeDisplay)uploadPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		long cpDefinitionId = ParamUtil.getLong(
+			uploadPortletRequest, "cpDefinitionId");
+
+		CPDefinition cpDefinition = cpDefinitionService.getCPDefinition(
+			cpDefinitionId);
+
 		String fileName = uploadPortletRequest.getFileName(_PARAMETER_NAME);
 
 		_validateFile(fileName, uploadPortletRequest.getSize(_PARAMETER_NAME));
@@ -69,8 +79,9 @@ public class TempAttachmentsUploadFileEntryHandler
 		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
 				_PARAMETER_NAME)) {
 
-			return _addFileEntry(
-				fileName, contentType, inputStream, themeDisplay);
+			return addFileEntry(
+				cpDefinition.getCPDefinitionId(), fileName, contentType,
+				inputStream, themeDisplay);
 		}
 	}
 
@@ -80,12 +91,9 @@ public class TempAttachmentsUploadFileEntryHandler
 			AttachmentsConfiguration.class, properties);
 	}
 
-	@Reference
-	protected CPDefinitionService cpDefinitionService;
-
-	private FileEntry _addFileEntry(
-			String fileName, String contentType, InputStream inputStream,
-			ThemeDisplay themeDisplay)
+	protected FileEntry addFileEntry(
+			long cpDefinitionId, String fileName, String contentType,
+			InputStream inputStream, ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		String uniqueFileName = _uniqueFileNameProvider.provide(
@@ -95,6 +103,9 @@ public class TempAttachmentsUploadFileEntryHandler
 			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
 			_TEMP_FOLDER_NAME, uniqueFileName, inputStream, contentType);
 	}
+
+	@Reference
+	protected CPDefinitionService cpDefinitionService;
 
 	private boolean _exists(ThemeDisplay themeDisplay, String curFileName) {
 		try {
@@ -110,7 +121,7 @@ public class TempAttachmentsUploadFileEntryHandler
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -126,7 +137,7 @@ public class TempAttachmentsUploadFileEntryHandler
 			throw new CPAttachmentFileEntrySizeException();
 		}
 
-		String extension = _file.getExtension(fileName);
+		String extension = FileUtil.getExtension(fileName);
 
 		String[] imageExtensions = _attachmentsConfiguration.imageExtensions();
 
@@ -151,9 +162,6 @@ public class TempAttachmentsUploadFileEntryHandler
 		TempAttachmentsUploadFileEntryHandler.class);
 
 	private volatile AttachmentsConfiguration _attachmentsConfiguration;
-
-	@Reference
-	private File _file;
 
 	@Reference
 	private UniqueFileNameProvider _uniqueFileNameProvider;

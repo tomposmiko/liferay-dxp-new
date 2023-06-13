@@ -27,12 +27,12 @@ export default function InlineConfirm({
 	onConfirmButtonClick,
 }) {
 	const [performingAction, setPerformingAction] = useState(false);
-	const wrapperRef = useRef(null);
+	const wrapper = useRef(null);
 	const isMounted = useIsMounted();
 
 	const _handleConfirmButtonClick = () => {
-		if (wrapperRef.current) {
-			wrapperRef.current.focus();
+		if (wrapper.current) {
+			wrapper.current.focus();
 		}
 
 		setPerformingAction(true);
@@ -45,14 +45,14 @@ export default function InlineConfirm({
 	};
 
 	useEffect(() => {
-		if (wrapperRef.current) {
-			wrapperRef.current.focus();
+		if (wrapper.current) {
+			wrapper.current.focus();
 		}
 	}, []);
 
 	useEffect(() => {
-		if (wrapperRef.current) {
-			const confirmButton = wrapperRef.current.querySelector(
+		if (wrapper.current) {
+			const confirmButton = wrapper.current.querySelector(
 				'page-editor__inline-confirm-button'
 			);
 
@@ -63,10 +63,10 @@ export default function InlineConfirm({
 
 		const _handleDocumentFocusOut = () => {
 			requestAnimationFrame(() => {
-				if (wrapperRef.current && !performingAction) {
+				if (wrapper.current && !performingAction) {
 					if (
-						!wrapperRef.current.contains(document.activeElement) &&
-						wrapperRef.current !== document.activeElement
+						!wrapper.current.contains(document.activeElement) &&
+						wrapper.current !== document.activeElement
 					) {
 						onCancelButtonClick();
 					}
@@ -90,7 +90,7 @@ export default function InlineConfirm({
 			onKeyDown={(event) =>
 				event.key === 'Escape' && onCancelButtonClick()
 			}
-			ref={wrapperRef}
+			ref={wrapper}
 			role="alertdialog"
 			tabIndex="-1"
 		>
@@ -105,7 +105,7 @@ export default function InlineConfirm({
 					displayType="primary"
 					loading={performingAction}
 					onClick={_handleConfirmButtonClick}
-					size="sm"
+					small
 				>
 					{confirmButtonLabel}
 				</Button>
@@ -114,7 +114,7 @@ export default function InlineConfirm({
 					disabled={performingAction}
 					displayType="secondary"
 					onClick={onCancelButtonClick}
-					size="sm"
+					small
 					type="button"
 				>
 					{cancelButtonLabel}

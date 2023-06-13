@@ -23,9 +23,10 @@ import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.commerce.product.util.comparator.CPInstanceCreateDateComparator;
 import com.liferay.commerce.product.util.comparator.CPInstanceDisplayDateComparator;
 import com.liferay.commerce.product.util.comparator.CPInstanceSkuComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -33,6 +34,8 @@ import com.liferay.portal.kernel.search.SortFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -92,7 +95,7 @@ public class CommerceProductInstanceItemSelectorViewDisplayContext
 		).setParameter(
 			"commerceCatalogGroupId", getGroupId()
 		).setParameter(
-			"commercePriceListId", _getCommercePriceListId()
+			"commercePriceListId", getCommercePriceListId()
 		).buildPortletURL();
 	}
 
@@ -105,13 +108,23 @@ public class CommerceProductInstanceItemSelectorViewDisplayContext
 		}
 
 		searchContainer = new SearchContainer<>(
-			cpRequestHelper.getRenderRequest(), getPortletURL(), null,
-			"no-skus-were-found");
+			cpRequestHelper.getRenderRequest(), getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage("no-skus-were-found");
+
+		OrderByComparator<CPInstance> orderByComparator =
+			getCPInstanceOrderByComparator(getOrderByCol(), getOrderByType());
+
+		RowChecker rowChecker = new CommerceProductInstanceItemSelectorChecker(
+			cpRequestHelper.getRenderResponse(),
+			_commercePriceListService.fetchCommercePriceList(
+				getCommercePriceListId()),
+			_commercePriceEntryLocalService);
 
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
-			_getCPInstanceOrderByComparator(getOrderByCol(), getOrderByType()));
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
+		searchContainer.setRowChecker(rowChecker);
 
 		Sort sort = getCPInstanceSort(getOrderByCol(), getOrderByType());
 
@@ -132,26 +145,21 @@ public class CommerceProductInstanceItemSelectorViewDisplayContext
 					searchContainer.getStart(), searchContainer.getEnd(), sort);
 		}
 
-		searchContainer.setResultsAndTotal(cpInstanceBaseModelSearchResult);
-		searchContainer.setRowChecker(
-			new CommerceProductInstanceItemSelectorChecker(
-				cpRequestHelper.getRenderResponse(),
-				_commercePriceListService.fetchCommercePriceList(
-					_getCommercePriceListId()),
-				_commercePriceEntryLocalService));
+		List<CPInstance> cpInstances =
+			cpInstanceBaseModelSearchResult.getBaseModels();
+		int totalCPInstances = cpInstanceBaseModelSearchResult.getLength();
+
+		searchContainer.setResults(cpInstances);
+		searchContainer.setTotal(totalCPInstances);
 
 		return searchContainer;
 	}
 
-	protected long getGroupId() {
-		return ParamUtil.getLong(httpServletRequest, "commerceCatalogGroupId");
-	}
-
-	private long _getCommercePriceListId() {
+	protected long getCommercePriceListId() {
 		return ParamUtil.getLong(httpServletRequest, "commercePriceListId");
 	}
 
-	private OrderByComparator<CPInstance> _getCPInstanceOrderByComparator(
+	protected OrderByComparator<CPInstance> getCPInstanceOrderByComparator(
 		String orderByCol, String orderByType) {
 
 		boolean orderByAsc = false;
@@ -173,6 +181,10 @@ public class CommerceProductInstanceItemSelectorViewDisplayContext
 		}
 
 		return orderByComparator;
+	}
+
+	protected long getGroupId() {
+		return ParamUtil.getLong(httpServletRequest, "commerceCatalogGroupId");
 	}
 
 	private final CommercePriceEntryLocalService

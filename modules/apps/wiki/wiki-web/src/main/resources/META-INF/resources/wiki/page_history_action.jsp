@@ -71,7 +71,7 @@ else {
 			label="<%= true %>"
 			message="compare-to"
 			onClick="<%= taglibOnClick %>"
-			url="javascript:void(0);"
+			url="javascript:;"
 		/>
 
 		<%@ include file="/wiki/compare_versions_pop_up.jspf" %>

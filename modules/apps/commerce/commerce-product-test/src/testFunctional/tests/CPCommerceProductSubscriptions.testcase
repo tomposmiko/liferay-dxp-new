@@ -3,84 +3,34 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "Product Info Management";
 
 	setUp {
-		CommerceConfiguration.commerceSetUp(storeFront = "true");
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceStoreFrontSetUp();
 	}
 
 	tearDown {
-		CommerceConfiguration.commerceTearDown();
-	}
+		Navigator.openURL();
 
-	@description = "This is a test for COMMERCE-9806. Verify exact day of year subscription configuration is correctly saved"
-	@priority = 3
-	test CanViewExactDayOfYearSubscriptionConfigurationCorrectlySaved {
-		property portal.acceptance = "false";
-
-		var subscriptionType = "Year";
-		var subscriptionMode = "Exact Day of Year";
-		var subscriptionMonth = "March";
-
-		task ("Given a Minium site") {
-			CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
+		if (IsElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE")) {
+			User.logoutPG();
 		}
 
-		task ("When the admin navigates to Commerce -> Product Management -> Products -> ABS Sensor -> Subscription") {
-			CommerceNavigator.gotoPortlet(
-				category = "Product Management",
-				portlet = "Products");
+		User.firstLoginPG();
 
-			CommerceProducts.searchAndGoToProductEntry(entryProductName = "ABS Sensor");
+		CommerceConfiguration.commerceAdminTearDown();
 
-			CommerceEntry.gotoMenuTab(menuTab = "Subscription");
-		}
-
-		task ("And configures a subscription with exact day of year") {
-			CommerceProducts.configureSubscription(
-				subscriptionExactDay = 5,
-				subscriptionLength = 5,
-				subscriptionMode = ${subscriptionMode},
-				subscriptionMonth = ${subscriptionMonth},
-				subscriptionName = "Delivery Subscription",
-				subscriptionType = ${subscriptionType});
-		}
-
-		task ("And navigates back again to subscription tab") {
-			for (var tabName : list "Details,Subscription") {
-				CommerceEntry.gotoMenuTab(menuTab = ${tabName});
-			}
-		}
-
-		task ("Then all subscription fields are correctly saved") {
-			for (var subscriptionFieldLabel : list "Subscription Type:${subscriptionType},Mode:${subscriptionMode},Month:${subscriptionMonth}") {
-				var subscriptionFieldName = StringUtil.extractFirst(${subscriptionFieldLabel}, ":");
-				var subscriptionValue = StringUtil.extractLast(${subscriptionFieldLabel}, ":");
-
-				AssertElementPresent(
-					key_fieldLabel = ${subscriptionFieldName},
-					key_value = ${subscriptionValue},
-					locator1 = "CreateObject#ASSERT_SELECTED_VALUE");
-			}
-
-			AssertTextEquals(
-				key_text = "Day",
-				locator1 = "TextInput#ANY",
-				value1 = 5);
-
-			AssertTextEquals(
-				key_fieldLabel = "Subscription Length",
-				key_indexNumber = 2,
-				locator1 = "TextInput#GENERIC_TEXT_INPUT_N",
-				value1 = 5);
-		}
+		CommerceConfiguration.commerceInitializersTearDown();
 	}
 
 	@description = "This is a test for COMMERCE-6085. UseSubscriptions"
-	@priority = 5
+	@priority = "3"
 	test UseSubscriptions {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 
 		// TODO Review
 

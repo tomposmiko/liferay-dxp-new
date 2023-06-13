@@ -18,14 +18,12 @@ export default function deleteItem({
 	fragmentEntryLinkIds,
 	itemId,
 	layoutData,
-	pageContents,
 	portletIds = [],
 }) {
 	return {
 		fragmentEntryLinkIds,
 		itemId,
 		layoutData,
-		pageContents,
 		portletIds,
 		type: DELETE_ITEM,
 	};

@@ -15,7 +15,7 @@
 package com.liferay.account.admin.web.internal.portlet.action;
 
 import com.liferay.account.constants.AccountPortletKeys;
-import com.liferay.account.service.AccountEntryService;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.Constants;
@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_MANAGEMENT,
@@ -53,10 +54,10 @@ public class UpdateAccountEntryStatusMVCActionCommand
 			actionRequest, "accountEntryIds");
 
 		if (cmd.equals(Constants.DEACTIVATE)) {
-			_accountEntryService.deactivateAccountEntries(accountEntryIds);
+			_accountEntryLocalService.deactivateAccountEntries(accountEntryIds);
 		}
 		else if (cmd.equals(Constants.RESTORE)) {
-			_accountEntryService.activateAccountEntries(accountEntryIds);
+			_accountEntryLocalService.activateAccountEntries(accountEntryIds);
 		}
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
@@ -67,6 +68,6 @@ public class UpdateAccountEntryStatusMVCActionCommand
 	}
 
 	@Reference
-	private AccountEntryService _accountEntryService;
+	private AccountEntryLocalService _accountEntryLocalService;
 
 }

@@ -24,6 +24,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -36,6 +37,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -51,6 +53,8 @@ public class DeleteSynonymSetsMVCActionCommandTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_deleteSynonymSetsMVCActionCommand =
 			new DeleteSynonymSetsMVCActionCommand();
 
@@ -107,7 +111,9 @@ public class DeleteSynonymSetsMVCActionCommandTest
 
 		Assert.assertEquals(1, synonymSets.size(), 0.0);
 
-		synonymSets.forEach(
+		Stream<SynonymSet> synonymSetsStream = synonymSets.stream();
+
+		synonymSetsStream.forEach(
 			synonymSet -> {
 				Assert.assertEquals("car,automobile", synonymSet.getSynonyms());
 				Assert.assertEquals("id", synonymSet.getSynonymSetDocumentId());
@@ -136,21 +142,26 @@ public class DeleteSynonymSetsMVCActionCommandTest
 		Mockito.verify(
 			synonymSetStorageAdapter, Mockito.times(2)
 		).delete(
-			Mockito.any(), Mockito.anyString()
+			Mockito.anyObject(), Mockito.anyString()
 		);
 	}
 
-	private final ActionRequest _actionRequest = Mockito.mock(
-		ActionRequest.class);
-	private final ActionResponse _actionResponse = Mockito.mock(
-		ActionResponse.class);
+	@Mock
+	private ActionRequest _actionRequest;
+
+	@Mock
+	private ActionResponse _actionResponse;
+
 	private DeleteSynonymSetsMVCActionCommand
 		_deleteSynonymSetsMVCActionCommand;
-	private final HttpServletRequest _httpServletRequest = Mockito.mock(
-		HttpServletRequest.class);
-	private final IndexNameBuilder _indexNameBuilder = Mockito.mock(
-		IndexNameBuilder.class);
-	private final IndexToFilterSynchronizer _indexToFilterSynchronizer =
-		Mockito.mock(IndexToFilterSynchronizer.class);
+
+	@Mock
+	private HttpServletRequest _httpServletRequest;
+
+	@Mock
+	private IndexNameBuilder _indexNameBuilder;
+
+	@Mock
+	private IndexToFilterSynchronizer _indexToFilterSynchronizer;
 
 }

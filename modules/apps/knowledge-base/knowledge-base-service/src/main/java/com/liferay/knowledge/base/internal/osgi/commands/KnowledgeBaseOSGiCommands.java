@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.command.function=addImportArticlePermissions",
 		"osgi.command.scope=knowledgeBase"
@@ -64,6 +65,20 @@ public class KnowledgeBaseOSGiCommands {
 		actionableDynamicQuery.performActions();
 	}
 
+	@Reference(unbind = "-")
+	protected void setResourceActionLocalService(
+		ResourceActionLocalService resourceActionLocalService) {
+
+		_resourceActionLocalService = resourceActionLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setResourcePermissionLocalService(
+		ResourcePermissionLocalService resourcePermissionLocalService) {
+
+		_resourcePermissionLocalService = resourcePermissionLocalService;
+	}
+
 	private void _addResourceAction(
 			ResourcePermission permission, ResourceAction action)
 		throws PortalException {
@@ -89,10 +104,7 @@ public class KnowledgeBaseOSGiCommands {
 		return _resourcePermissionLocalService.hasActionId(permission, action);
 	}
 
-	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
-
-	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
 
 }

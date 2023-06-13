@@ -18,7 +18,7 @@ import com.liferay.data.engine.constants.DataActionKeys;
 import com.liferay.data.engine.content.type.DataDefinitionContentType;
 import com.liferay.data.engine.field.type.util.LocalizedValueUtil;
 import com.liferay.data.engine.rest.dto.v2_0.DataRecordCollection;
-import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeRegistry;
+import com.liferay.data.engine.rest.internal.content.type.DataDefinitionContentTypeTracker;
 import com.liferay.data.engine.rest.internal.dto.v2_0.util.DataRecordCollectionUtil;
 import com.liferay.data.engine.rest.internal.security.permission.resource.DataDefinitionModelResourcePermission;
 import com.liferay.data.engine.rest.internal.security.permission.resource.DataRecordCollectionModelResourcePermission;
@@ -30,8 +30,8 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -50,6 +50,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.permission.Permission;
 import com.liferay.portal.vulcan.permission.PermissionUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -133,7 +134,7 @@ public class DataRecordCollectionResourceImpl
 			Long dataRecordCollectionId)
 		throws Exception {
 
-		JSONArray actionIdsJSONArray = _jsonFactory.createJSONArray();
+		JSONArray actionIdsJSONArray = JSONFactoryUtil.createJSONArray();
 
 		DDLRecordSet ddlRecordSet = _ddlRecordSetLocalService.getRecordSet(
 			dataRecordCollectionId);
@@ -307,7 +308,8 @@ public class DataRecordCollectionResourceImpl
 
 		if (pagination.getPageSize() > 250) {
 			throw new ValidationException(
-				_language.format(locale, "page-size-is-greater-than-x", 250));
+				LanguageUtil.format(
+					locale, "page-size-is-greater-than-x", 250));
 		}
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
@@ -315,7 +317,7 @@ public class DataRecordCollectionResourceImpl
 
 		if (Validator.isNull(keywords)) {
 			return Page.of(
-				transform(
+				TransformUtil.transform(
 					_ddlRecordSetLocalService.search(
 						ddmStructure.getCompanyId(), ddmStructure.getGroupId(),
 						keywords, DDLRecordSetConstants.SCOPE_DATA_ENGINE,
@@ -376,7 +378,7 @@ public class DataRecordCollectionResourceImpl
 		throws Exception {
 
 		DataDefinitionContentType dataDefinitionContentType =
-			_dataDefinitionContentTypeRegistry.getDataDefinitionContentType(
+			_dataDefinitionContentTypeTracker.getDataDefinitionContentType(
 				ddmStructure.getClassNameId());
 
 		return dataDefinitionContentType.
@@ -404,8 +406,7 @@ public class DataRecordCollectionResourceImpl
 	}
 
 	@Reference
-	private DataDefinitionContentTypeRegistry
-		_dataDefinitionContentTypeRegistry;
+	private DataDefinitionContentTypeTracker _dataDefinitionContentTypeTracker;
 
 	@Reference
 	private DataDefinitionModelResourcePermission
@@ -420,12 +421,6 @@ public class DataRecordCollectionResourceImpl
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

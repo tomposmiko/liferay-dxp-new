@@ -17,22 +17,23 @@ package com.liferay.headless.commerce.admin.catalog.internal.resource.v1_0;
 import com.liferay.commerce.product.model.CPOptionCategory;
 import com.liferay.commerce.product.service.CPOptionCategoryService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.OptionCategory;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.OptionCategoryDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.odata.entity.v1_0.OptionCategoryEntityModel;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionCategoryResource;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.Collections;
@@ -50,11 +51,12 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Igor Beslic
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/option-category.properties",
 	scope = ServiceScope.PROTOTYPE, service = OptionCategoryResource.class
 )
-@CTAware
-public class OptionCategoryResourceImpl extends BaseOptionCategoryResourceImpl {
+public class OptionCategoryResourceImpl
+	extends BaseOptionCategoryResourceImpl implements EntityModelResource {
 
 	@Override
 	public Response deleteOptionCategory(Long id) throws Exception {
@@ -83,8 +85,15 @@ public class OptionCategoryResourceImpl extends BaseOptionCategoryResourceImpl {
 			CPOptionCategory.class.getName(), StringPool.BLANK, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
-			searchContext -> searchContext.setCompanyId(
-				contextCompany.getCompanyId()),
+			new UnsafeConsumer() {
+
+				public void accept(Object object) throws Exception {
+					SearchContext searchContext = (SearchContext)object;
+
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+				}
+
+			},
 			sorts,
 			document -> _toOptionCategory(
 				GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
@@ -170,9 +179,8 @@ public class OptionCategoryResourceImpl extends BaseOptionCategoryResourceImpl {
 	@Reference
 	private CPOptionCategoryService _cpOptionCategoryService;
 
-	@Reference(target = DTOConverterConstants.OPTION_CATEGORY_DTO_CONVERTER)
-	private DTOConverter<CPOptionCategory, OptionCategory>
-		_optionCategoryDTOConverter;
+	@Reference
+	private OptionCategoryDTOConverter _optionCategoryDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

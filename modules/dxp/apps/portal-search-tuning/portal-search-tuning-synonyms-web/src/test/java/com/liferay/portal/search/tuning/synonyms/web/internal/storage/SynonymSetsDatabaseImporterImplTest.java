@@ -20,7 +20,6 @@ import com.liferay.portal.search.tuning.synonyms.web.internal.BaseSynonymsWebTes
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.DocumentToSynonymSetTranslator;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.DocumentToSynonymSetTranslatorImpl;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexReindexer;
-import com.liferay.portal.search.tuning.synonyms.web.internal.storage.helper.SynonymSetJSONStorageHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Before;
@@ -28,6 +27,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -43,6 +43,8 @@ public class SynonymSetsDatabaseImporterImplTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_synonymSetsDatabaseImporterImpl =
 			new SynonymSetsDatabaseImporterImpl();
 		_documentToSynonymSetTranslator =
@@ -78,7 +80,7 @@ public class SynonymSetsDatabaseImporterImplTest
 		Mockito.verify(
 			_synonymSetIndexReindexer, Mockito.times(1)
 		).reindex(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 	}
 
@@ -89,16 +91,21 @@ public class SynonymSetsDatabaseImporterImplTest
 		Mockito.verify(
 			_synonymSetIndexReindexer, Mockito.never()
 		).reindex(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 	}
 
 	private DocumentToSynonymSetTranslator _documentToSynonymSetTranslator;
-	private final Queries _queries = Mockito.mock(Queries.class);
-	private final SynonymSetIndexReindexer _synonymSetIndexReindexer =
-		Mockito.mock(SynonymSetIndexReindexer.class);
-	private final SynonymSetJSONStorageHelper _synonymSetJSONStorageHelper =
-		Mockito.mock(SynonymSetJSONStorageHelper.class);
+
+	@Mock
+	private Queries _queries;
+
+	@Mock
+	private SynonymSetIndexReindexer _synonymSetIndexReindexer;
+
+	@Mock
+	private SynonymSetJSONStorageHelper _synonymSetJSONStorageHelper;
+
 	private SynonymSetsDatabaseImporterImpl _synonymSetsDatabaseImporterImpl;
 
 }

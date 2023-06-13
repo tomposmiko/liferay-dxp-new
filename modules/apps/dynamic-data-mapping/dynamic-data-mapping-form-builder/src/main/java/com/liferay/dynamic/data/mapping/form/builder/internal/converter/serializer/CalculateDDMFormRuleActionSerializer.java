@@ -24,9 +24,10 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Leonardo Barros
@@ -53,16 +54,18 @@ public class CalculateDDMFormRuleActionSerializer
 		Map<String, DDMFormField> ddmFormFieldsMap =
 			ddmForm.getDDMFormFieldsMap(true);
 
-		String expression = _removeBrackets(
+		String expression = removeBrackets(
 			_calculateDDMFormRuleAction.getExpression());
 
-		Set<String> ddmFormFieldNames = new HashSet<>();
+		Set<String> keySet = ddmFormFieldsMap.keySet();
 
-		for (String ddmFormField : ddmFormFieldsMap.keySet()) {
-			if (expression.contains(ddmFormField)) {
-				ddmFormFieldNames.add(ddmFormField);
-			}
-		}
+		Stream<String> ddmFormFieldsStream = keySet.stream();
+
+		Set<String> ddmFormFieldNames = ddmFormFieldsStream.filter(
+			ddmFormField -> expression.contains(ddmFormField)
+		).collect(
+			Collectors.toSet()
+		);
 
 		String newExpression = buildExpression(expression, ddmFormFieldNames);
 
@@ -88,7 +91,7 @@ public class CalculateDDMFormRuleActionSerializer
 
 			String compareStr = sb.toString();
 
-			boolean match = _matchAnyField(compareStr, ddmFormFieldNames);
+			boolean match = matchAnyField(compareStr, ddmFormFieldNames);
 
 			if (match) {
 				newExpressionSB.append(token);
@@ -103,7 +106,7 @@ public class CalculateDDMFormRuleActionSerializer
 			}
 			else {
 				if (i > start) {
-					_replace(expression, newExpressionSB, start, i);
+					replace(expression, newExpressionSB, start, i);
 				}
 
 				newExpressionSB.append(token);
@@ -116,13 +119,13 @@ public class CalculateDDMFormRuleActionSerializer
 		}
 
 		if (end > start) {
-			_replace(expression, newExpressionSB, start, end);
+			replace(expression, newExpressionSB, start, end);
 		}
 
 		return newExpressionSB.toString();
 	}
 
-	private boolean _matchAnyField(
+	protected boolean matchAnyField(
 		String compareStr, Set<String> ddmFormFields) {
 
 		for (String ddmFormField : ddmFormFields) {
@@ -134,12 +137,12 @@ public class CalculateDDMFormRuleActionSerializer
 		return false;
 	}
 
-	private String _removeBrackets(String expression) {
+	protected String removeBrackets(String expression) {
 		return StringUtil.removeChars(
 			expression, CharPool.OPEN_BRACKET, CharPool.CLOSE_BRACKET);
 	}
 
-	private void _replace(
+	protected void replace(
 		String expression, StringBuilder newExpressionSB, int start, int end) {
 
 		String fieldName = expression.substring(start, end);

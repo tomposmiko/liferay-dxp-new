@@ -20,7 +20,6 @@ import com.liferay.click.to.chat.web.internal.constants.ClickToChatWebKeys;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.taglib.BaseJSPDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
@@ -40,13 +39,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author José Abelenda
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class ClickToChatBottomJSPDynamicInclude extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -91,16 +85,6 @@ public class ClickToChatBottomJSPDynamicInclude extends BaseJSPDynamicInclude {
 			return;
 		}
 
-		Layout layout = themeDisplay.getLayout();
-
-		if (clickToChatConfiguration.hideInControlPanel() &&
-			layout.isTypeControlPanel()) {
-
-			super.include(httpServletRequest, httpServletResponse, key);
-
-			return;
-		}
-
 		httpServletRequest.setAttribute(
 			ClickToChatWebKeys.CLICK_TO_CHAT_CHAT_PROVIDER_ACCOUNT_ID,
 			clickToChatConfiguration.chatProviderAccountId());
@@ -126,10 +110,16 @@ public class ClickToChatBottomJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.click.to.chat.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ClickToChatBottomJSPDynamicInclude.class);
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.click.to.chat.web)")
-	private ServletContext _servletContext;
 
 }

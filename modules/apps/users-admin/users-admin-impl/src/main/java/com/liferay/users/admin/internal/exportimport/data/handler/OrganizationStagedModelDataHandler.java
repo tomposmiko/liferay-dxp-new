@@ -44,7 +44,7 @@ import com.liferay.portal.kernel.service.WebsiteLocalService;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.users.admin.kernel.util.UsersAdmin;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Mendez Gonzalez
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class OrganizationStagedModelDataHandler
 	extends BaseStagedModelDataHandler<Organization> {
 
@@ -127,12 +127,12 @@ public class OrganizationStagedModelDataHandler
 					PortletDataContext.REFERENCE_TYPE_PARENT);
 			}
 
-			_exportAddresses(portletDataContext, exportedOrganization);
-			_exportEmailAddresses(portletDataContext, exportedOrganization);
-			_exportOrgLabors(portletDataContext, exportedOrganization);
-			_exportPasswordPolicyRel(portletDataContext, exportedOrganization);
-			_exportPhones(portletDataContext, exportedOrganization);
-			_exportWebsites(portletDataContext, exportedOrganization);
+			exportAddresses(portletDataContext, exportedOrganization);
+			exportEmailAddresses(portletDataContext, exportedOrganization);
+			exportOrgLabors(portletDataContext, exportedOrganization);
+			exportPasswordPolicyRel(portletDataContext, exportedOrganization);
+			exportPhones(portletDataContext, exportedOrganization);
+			exportWebsites(portletDataContext, exportedOrganization);
 
 			Element organizationElement =
 				portletDataContext.getExportDataElement(exportedOrganization);
@@ -183,7 +183,7 @@ public class OrganizationStagedModelDataHandler
 			importedOrganization = _organizationLocalService.addOrganization(
 				userId, parentOrganizationId, organization.getName(),
 				organization.getType(), organization.getRegionId(),
-				organization.getCountryId(), organization.getStatusListTypeId(),
+				organization.getCountryId(), organization.getStatusId(),
 				organization.getComments(), false, serviceContext);
 		}
 		else {
@@ -192,42 +192,26 @@ public class OrganizationStagedModelDataHandler
 				existingOrganization.getOrganizationId(), parentOrganizationId,
 				organization.getName(), organization.getType(),
 				organization.getRegionId(), organization.getCountryId(),
-				organization.getStatusListTypeId(), organization.getComments(),
-				true, null, false, serviceContext);
+				organization.getStatusId(), organization.getComments(), true,
+				null, false, serviceContext);
 		}
 
-		_importAddresses(
+		importAddresses(portletDataContext, organization, importedOrganization);
+		importEmailAddresses(
 			portletDataContext, organization, importedOrganization);
-		_importEmailAddresses(
+		importOrgLabors(portletDataContext, organization, importedOrganization);
+		importPasswordPolicyRel(
 			portletDataContext, organization, importedOrganization);
-		_importOrgLabors(
-			portletDataContext, organization, importedOrganization);
-		_importPasswordPolicyRel(
-			portletDataContext, organization, importedOrganization);
-		_importPhones(portletDataContext, organization, importedOrganization);
-		_importWebsites(portletDataContext, organization, importedOrganization);
+		importPhones(portletDataContext, organization, importedOrganization);
+		importWebsites(portletDataContext, organization, importedOrganization);
 
 		portletDataContext.importClassedModel(
 			organization, importedOrganization);
 	}
 
-	@Override
-	protected void importReferenceStagedModels(
+	protected void exportAddresses(
 			PortletDataContext portletDataContext, Organization organization)
-		throws PortletDataException {
-
-		if (organization.getParentOrganizationId() !=
-				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
-
-			StagedModelDataHandlerUtil.importReferenceStagedModel(
-				portletDataContext, organization, Organization.class,
-				organization.getParentOrganizationId());
-		}
-	}
-
-	private void _exportAddresses(
-			PortletDataContext portletDataContext, Organization organization)
-		throws Exception {
+		throws PortalException {
 
 		List<Address> addresses = _addressLocalService.getAddresses(
 			organization.getCompanyId(), organization.getModelClassName(),
@@ -240,9 +224,9 @@ public class OrganizationStagedModelDataHandler
 		}
 	}
 
-	private void _exportEmailAddresses(
+	protected void exportEmailAddresses(
 			PortletDataContext portletDataContext, Organization organization)
-		throws Exception {
+		throws PortalException {
 
 		List<EmailAddress> emailAddresses =
 			_emailAddressLocalService.getEmailAddresses(
@@ -256,7 +240,7 @@ public class OrganizationStagedModelDataHandler
 		}
 	}
 
-	private void _exportOrgLabors(
+	protected void exportOrgLabors(
 		PortletDataContext portletDataContext, Organization organization) {
 
 		List<OrgLabor> orgLabors = _orgLaborLocalService.getOrgLabors(
@@ -268,9 +252,9 @@ public class OrganizationStagedModelDataHandler
 		portletDataContext.addZipEntry(path, orgLabors);
 	}
 
-	private void _exportPasswordPolicyRel(
+	protected void exportPasswordPolicyRel(
 			PortletDataContext portletDataContext, Organization organization)
-		throws Exception {
+		throws PortalException {
 
 		PasswordPolicyRel passwordPolicyRel =
 			_passwordPolicyRelLocalService.fetchPasswordPolicyRel(
@@ -280,16 +264,18 @@ public class OrganizationStagedModelDataHandler
 			return;
 		}
 
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, organization,
+		PasswordPolicy passwordPolicy =
 			_passwordPolicyLocalService.getPasswordPolicy(
-				passwordPolicyRel.getPasswordPolicyId()),
+				passwordPolicyRel.getPasswordPolicyId());
+
+		StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			portletDataContext, organization, passwordPolicy,
 			PortletDataContext.REFERENCE_TYPE_STRONG);
 	}
 
-	private void _exportPhones(
+	protected void exportPhones(
 			PortletDataContext portletDataContext, Organization organization)
-		throws Exception {
+		throws PortalException {
 
 		List<Phone> phones = _phoneLocalService.getPhones(
 			organization.getCompanyId(), organization.getModelClassName(),
@@ -302,9 +288,9 @@ public class OrganizationStagedModelDataHandler
 		}
 	}
 
-	private void _exportWebsites(
+	protected void exportWebsites(
 			PortletDataContext portletDataContext, Organization organization)
-		throws Exception {
+		throws PortalException {
 
 		List<Website> websites = _websiteLocalService.getWebsites(
 			organization.getCompanyId(), organization.getModelClassName(),
@@ -317,10 +303,10 @@ public class OrganizationStagedModelDataHandler
 		}
 	}
 
-	private void _importAddresses(
+	protected void importAddresses(
 			PortletDataContext portletDataContext, Organization organization,
 			Organization importedOrganization)
-		throws Exception {
+		throws PortalException {
 
 		List<Element> addressElements =
 			portletDataContext.getReferenceDataElements(
@@ -348,15 +334,15 @@ public class OrganizationStagedModelDataHandler
 			addresses.add(address);
 		}
 
-		_usersAdmin.updateAddresses(
+		UsersAdminUtil.updateAddresses(
 			Organization.class.getName(),
 			importedOrganization.getOrganizationId(), addresses);
 	}
 
-	private void _importEmailAddresses(
+	protected void importEmailAddresses(
 			PortletDataContext portletDataContext, Organization organization,
 			Organization importedOrganization)
-		throws Exception {
+		throws PortalException {
 
 		List<Element> emailAddressElements =
 			portletDataContext.getReferenceDataElements(
@@ -390,15 +376,15 @@ public class OrganizationStagedModelDataHandler
 			emailAddresses.add(emailAddress);
 		}
 
-		_usersAdmin.updateEmailAddresses(
+		UsersAdminUtil.updateEmailAddresses(
 			Organization.class.getName(),
 			importedOrganization.getOrganizationId(), emailAddresses);
 	}
 
-	private void _importOrgLabors(
+	protected void importOrgLabors(
 			PortletDataContext portletDataContext, Organization organization,
 			Organization importedOrganization)
-		throws Exception {
+		throws PortalException {
 
 		String path = ExportImportPathUtil.getModelPath(
 			organization, OrgLabor.class.getSimpleName());
@@ -410,14 +396,14 @@ public class OrganizationStagedModelDataHandler
 			orgLabor.setOrgLaborId(0);
 		}
 
-		_usersAdmin.updateOrgLabors(
+		UsersAdminUtil.updateOrgLabors(
 			importedOrganization.getOrganizationId(), orgLabors);
 	}
 
-	private void _importPasswordPolicyRel(
+	protected void importPasswordPolicyRel(
 			PortletDataContext portletDataContext, Organization organization,
 			Organization importedOrganization)
-		throws Exception {
+		throws PortalException {
 
 		List<Element> passwordPolicyElements =
 			portletDataContext.getReferenceDataElements(
@@ -451,10 +437,10 @@ public class OrganizationStagedModelDataHandler
 			new long[] {importedOrganization.getOrganizationId()});
 	}
 
-	private void _importPhones(
+	protected void importPhones(
 			PortletDataContext portletDataContext, Organization organization,
 			Organization importedOrganization)
-		throws Exception {
+		throws PortalException {
 
 		List<Element> phoneElements =
 			portletDataContext.getReferenceDataElements(
@@ -482,15 +468,29 @@ public class OrganizationStagedModelDataHandler
 			phones.add(phone);
 		}
 
-		_usersAdmin.updatePhones(
+		UsersAdminUtil.updatePhones(
 			Organization.class.getName(),
 			importedOrganization.getOrganizationId(), phones);
 	}
 
-	private void _importWebsites(
+	@Override
+	protected void importReferenceStagedModels(
+			PortletDataContext portletDataContext, Organization organization)
+		throws PortletDataException {
+
+		if (organization.getParentOrganizationId() !=
+				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
+
+			StagedModelDataHandlerUtil.importReferenceStagedModel(
+				portletDataContext, organization, Organization.class,
+				organization.getParentOrganizationId());
+		}
+	}
+
+	protected void importWebsites(
 			PortletDataContext portletDataContext, Organization organization,
 			Organization importedOrganization)
-		throws Exception {
+		throws PortalException {
 
 		List<Element> websiteElements =
 			portletDataContext.getReferenceDataElements(
@@ -518,39 +518,78 @@ public class OrganizationStagedModelDataHandler
 			websites.add(website);
 		}
 
-		_usersAdmin.updateWebsites(
+		UsersAdminUtil.updateWebsites(
 			Organization.class.getName(),
 			importedOrganization.getOrganizationId(), websites);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setAddressLocalService(
+		AddressLocalService addressLocalService) {
+
+		_addressLocalService = addressLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setEmailAddressLocalService(
+		EmailAddressLocalService emailAddressLocalService) {
+
+		_emailAddressLocalService = emailAddressLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setOrganizationLocalService(
+		OrganizationLocalService organizationLocalService) {
+
+		_organizationLocalService = organizationLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setOrgLaborLocalService(
+		OrgLaborLocalService orgLaborLocalService) {
+
+		_orgLaborLocalService = orgLaborLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPasswordPolicyLocalService(
+		PasswordPolicyLocalService passwordPolicyLocalService) {
+
+		_passwordPolicyLocalService = passwordPolicyLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPasswordPolicyRelLocalService(
+		PasswordPolicyRelLocalService passwordPolicyRelLocalService) {
+
+		_passwordPolicyRelLocalService = passwordPolicyRelLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPhoneLocalService(PhoneLocalService phoneLocalService) {
+		_phoneLocalService = phoneLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWebsiteLocalService(
+		WebsiteLocalService websiteLocalService) {
+
+		_websiteLocalService = websiteLocalService;
+	}
+
 	private AddressLocalService _addressLocalService;
-
-	@Reference
 	private EmailAddressLocalService _emailAddressLocalService;
-
-	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
 	private OrganizationLocalService _organizationLocalService;
-
-	@Reference
 	private OrgLaborLocalService _orgLaborLocalService;
-
-	@Reference
 	private PasswordPolicyLocalService _passwordPolicyLocalService;
-
-	@Reference
 	private PasswordPolicyRelLocalService _passwordPolicyRelLocalService;
-
-	@Reference
 	private PhoneLocalService _phoneLocalService;
-
-	@Reference
-	private UsersAdmin _usersAdmin;
-
-	@Reference
 	private WebsiteLocalService _websiteLocalService;
 
 }

@@ -1,26 +1,5 @@
 definition {
 
-	@summary = "Change site default language in Site Settings."
-	macro changeDefaultLanguage {
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			portlet = "Site Settings");
-
-		Click(
-			key_itemName = "Localization",
-			locator1 = "ListGroupItem#ITEM_TEXT");
-
-		Click(
-			key_fieldLabel = "Define a custom default language",
-			locator1 = "SystemSettings#LABEL");
-
-		Select(
-			locator1 = "Select#SITE_DEFAULT_LANGUAGE",
-			value1 = ${defaultPortalLanguage});
-
-		Button.clickSave();
-	}
-
 	macro gotoHomePage {
 		ProductMenuHelper.openProductMenu();
 
@@ -30,29 +9,22 @@ definition {
 	@summary = "Navigate to the Live site"
 	macro gotoLiveSite {
 		if (IsElementNotPresent(locator1 = "ProductMenu#TOGGLE")) {
-			ApplicationsMenu.gotoSite(site = ${site});
+			ApplicationsMenu.gotoSite(site = "${site}");
 		}
 
 		ProductMenuHelper.openProductMenu();
 
-		if (isSet(remoteStaging)) {
-			AssertClick(
-				locator1 = "ProductMenu#LIVE_LINK",
-				value1 = "Remote Live");
-		}
-		else {
-			AssertClick(
-				locator1 = "ProductMenu#LIVE_LINK",
-				value1 = "Live");
-		}
+		AssertClick(
+			locator1 = "ProductMenu#LIVE_LINK",
+			value1 = "Live");
 	}
 
 	@summary = "Navigate to Product Menu > Sites > Sites Modal > ${site}"
 	macro gotoLocalizedSite {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		if (IsElementNotPresent(locator1 = "ProductMenu#TOGGLE")) {
-			ApplicationsMenu.gotoSite(site = ${siteName});
+			ApplicationsMenu.gotoSite(site = "${siteName}");
 		}
 
 		ProductMenuHelper.openProductMenu();
@@ -63,13 +35,13 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		Navigator.gotoNavItem(navItem = ${navItem});
+		Navigator.gotoNavItem(navItem = "${navItem}");
 
-		LexiconEntry.changeDisplayStyle(displayStyle = ${displayStyle});
+		LexiconEntry.changeDisplayStyle(displayStyle = "${displayStyle}");
 
-		SiteSelector._searchSite(site = ${site});
+		SiteSelector._searchSite(site = "${site}");
 
-		LexiconEntry.gotoEntry(rowEntry = ${site});
+		LexiconEntry.gotoEntry(rowEntry = "${site}");
 
 		SelectFrameTop();
 
@@ -77,46 +49,46 @@ definition {
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "ProductMenu#PRODUCT_MENU_PANEL_SITE_ADMINISTRATION_SITE_NAME",
-			value1 = ${site});
+			value1 = "${site}");
 	}
 
 	@summary = "Navigate to Product Menu > ${category} > ${portlet}"
 	macro gotoPortlet {
 		if (IsElementNotPresent(locator1 = "ProductMenu#TOGGLE")) {
-			ApplicationsMenu.gotoSite(site = ${site});
+			ApplicationsMenu.gotoSite(site = "${site}");
 		}
 
 		ProductMenuHelper.openProductMenu();
 
-		ProductMenuHelper.expandCategory(category = ${category});
+		ProductMenuHelper.expandCategory(category = "${category}");
 
-		ProductMenuHelper.gotoPortlet(portlet = ${portlet});
+		ProductMenuHelper.gotoPortlet(portlet = "${portlet}");
 	}
 
 	@summary = "Navigate to Product Menu > ${panel} > ${category} > ${portlet}"
 	macro gotoPortletWhenDisableApplicationsMenu {
-		ProductMenuHelper.expandPanel(panel = ${panel});
+		ProductMenuHelper.expandPanel(panel = "${panel}");
 
-		ProductMenuHelper.expandCategory(category = ${category});
+		ProductMenuHelper.expandCategory(category = "${category}");
 
-		ProductMenuHelper.gotoPortlet(portlet = ${portlet});
+		ProductMenuHelper.gotoPortlet(portlet = "${portlet}");
 	}
 
 	@summary = "Navigate to Product Menu > ${category} > ${scope} > ${portlet}"
 	macro gotoScopedPortlet {
 		ProductMenuHelper.openProductMenu();
 
-		ProductMenuHelper.expandCategory(category = ${category});
+		ProductMenuHelper.expandCategory(category = "${category}");
 
-		ProductMenuHelper.selectScope(scope = ${scope});
+		ProductMenuHelper.selectScope(scope = "${scope}");
 
-		ProductMenuHelper.gotoPortlet(portlet = ${portlet});
+		ProductMenuHelper.gotoPortlet(portlet = "${portlet}");
 	}
 
 	@summary = "Navigate to Product Menu > Sites > Sites Modal > ${site}"
 	macro gotoSite {
 		if (IsElementNotPresent(locator1 = "ProductMenu#TOGGLE")) {
-			ApplicationsMenu.gotoSite(site = ${site});
+			ApplicationsMenu.gotoSite(site = "${site}");
 		}
 
 		ProductMenuHelper.openProductMenu();
@@ -125,34 +97,28 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		Navigator.gotoNavItem(navItem = "All Sites");
+		Pause(locator1 = "3000");
 
-		SiteSelector.selectSite(site = ${site});
+		Navigator.gotoNavItem(navItem = "My Sites");
+
+		SiteSelector.selectSite(site = "${site}");
 
 		ProductMenuHelper.openProductMenu();
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "ProductMenu#PRODUCT_MENU_PANEL_SITE_ADMINISTRATION_SITE_NAME",
-			value1 = ${site});
+			value1 = "${site}");
 	}
 
 	@summary = "Navigate to the Staging site"
 	macro gotoStagingSite {
 		if (IsElementNotPresent(locator1 = "ProductMenu#TOGGLE")) {
-			ApplicationsMenu.gotoSite(site = ${site});
-		}
-
-		ProductMenuHelper.openProductMenu();
-
-		if (IsElementPresent(key_text = "Back to Menu", locator1 = "Button#ANY")) {
-			Button.click(button = "Back to Menu");
-		}
-
-		if (IsTextNotEqual(key_siteName = "", locator1 = "ProductMenu#SITE_NAME", value1 = ${site})) {
-			ApplicationsMenu.gotoSite(site = ${site});
+			ApplicationsMenu.gotoSite(site = "${site}");
 		}
 
 		if (IsElementNotPresent(locator1 = "ProductMenu#STAGING_SELECTED")) {
+			ProductMenuHelper.openProductMenu();
+
 			AssertClick(
 				locator1 = "ProductMenu#STAGING_LINK",
 				value1 = "Staging");
@@ -163,10 +129,10 @@ definition {
 
 	@summary = "View ${site} is not available in the product menu."
 	macro viewNoSite {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		if (IsElementNotPresent(locator1 = "ProductMenu#TOGGLE")) {
-			ApplicationsMenu.gotoSite(site = ${siteName});
+			ApplicationsMenu.gotoSite(site = "${siteName}");
 		}
 
 		ProductMenuHelper.openProductMenu();
@@ -175,7 +141,7 @@ definition {
 			Click(locator1 = "ProductMenu#BACK_ARROW");
 		}
 
-		ProductMenuHelper.viewNoSite(site = ${site});
+		ProductMenuHelper.viewNoSite(site = "${site}");
 	}
 
 }

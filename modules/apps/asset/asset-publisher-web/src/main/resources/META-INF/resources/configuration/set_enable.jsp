@@ -102,12 +102,7 @@ String helpMessage2 = "<em>" + LanguageUtil.format(request, "content-with-tag-x"
 	<p class="h4 sheet-tertiary-title">
 		<liferay-ui:message key="enable-conversion-to" />
 
-		<clay:icon
-			aria-label='<%= LanguageUtil.get(request, "enabling-openoffice-integration-provides-document-conversion-functionality") %>'
-			cssClass="lfr-portal-tooltip"
-			symbol="question-circle-full"
-			title='<%= LanguageUtil.get(request, "enabling-openoffice-integration-provides-document-conversion-functionality") %>'
-		/>
+		<liferay-ui:icon-help message="enabling-openoffice-integration-provides-document-conversion-functionality" />
 	</p>
 
 	<clay:row>

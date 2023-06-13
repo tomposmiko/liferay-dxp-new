@@ -14,10 +14,9 @@
 
 package com.liferay.commerce.internal.upgrade.v2_2_0;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.account.service.AccountEntryUserRelLocalService;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
+import com.liferay.commerce.internal.upgrade.base.BaseCommerceServiceUpgradeProcess;
 import com.liferay.commerce.model.impl.CommerceOrderModelImpl;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
@@ -26,10 +25,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,25 +34,27 @@ import java.sql.Statement;
 /**
  * @author Ethan Bustad
  */
-public class CommerceOrderUpgradeProcess extends UpgradeProcess {
+public class CommerceOrderUpgradeProcess
+	extends BaseCommerceServiceUpgradeProcess {
 
 	public CommerceOrderUpgradeProcess(
-		AccountEntryLocalService accountEntryLocalService,
-		AccountEntryUserRelLocalService accountEntryUserRelLocalService,
+		CommerceAccountLocalService commerceAccountLocalService,
 		UserLocalService userLocalService) {
 
-		_accountEntryLocalService = accountEntryLocalService;
-		_accountEntryUserRelLocalService = accountEntryUserRelLocalService;
+		_commerceAccountLocalService = commerceAccountLocalService;
 		_userLocalService = userLocalService;
 	}
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CommerceOrderModelImpl.class, CommerceOrderModelImpl.TABLE_NAME,
+			"commerceAccountId", "LONG");
+
 		if (hasColumn(CommerceOrderModelImpl.TABLE_NAME, "siteGroupId")) {
 			runSQL("update CommerceOrder set groupId = siteGroupId");
 
-			alterTableDropColumn(
-				CommerceOrderModelImpl.TABLE_NAME, "siteGroupId");
+			dropColumn(CommerceOrderModelImpl.TABLE_NAME, "siteGroupId");
 		}
 
 		if (!hasColumn(
@@ -116,20 +113,13 @@ public class CommerceOrderUpgradeProcess extends UpgradeProcess {
 					serviceContext.setCompanyId(user.getCompanyId());
 					serviceContext.setUserId(user.getUserId());
 
-					AccountEntry accountEntry =
-						_accountEntryLocalService.addAccountEntry(
-							user.getUserId(),
-							AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT,
-							user.getFullName(), null, null,
-							user.getEmailAddress(), null, StringPool.BLANK,
-							AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON,
-							WorkflowConstants.STATUS_APPROVED, serviceContext);
-
-					_accountEntryUserRelLocalService.addAccountEntryUserRel(
-						accountEntry.getAccountEntryId(), user.getUserId());
+					CommerceAccount commerceAccount =
+						_commerceAccountLocalService.addPersonalCommerceAccount(
+							user.getUserId(), StringPool.BLANK,
+							StringPool.BLANK, serviceContext);
 
 					preparedStatement2.setLong(
-						1, accountEntry.getAccountEntryId());
+						1, commerceAccount.getCommerceAccountId());
 
 					preparedStatement2.setLong(2, orderUserId);
 
@@ -140,23 +130,9 @@ public class CommerceOrderUpgradeProcess extends UpgradeProcess {
 			preparedStatement1.executeBatch();
 			preparedStatement2.executeBatch();
 		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns(
-				CommerceOrderModelImpl.TABLE_NAME, "orderOrganizationId",
-				"orderUserId")
-		};
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommerceOrder", "commerceAccountId LONG")
-		};
+		dropColumn(CommerceOrderModelImpl.TABLE_NAME, "orderOrganizationId");
+		dropColumn(CommerceOrderModelImpl.TABLE_NAME, "orderUserId");
 	}
 
 	private long _getCommerceAccountId(long organizationId)
@@ -180,9 +156,7 @@ public class CommerceOrderUpgradeProcess extends UpgradeProcess {
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceOrderUpgradeProcess.class);
 
-	private final AccountEntryLocalService _accountEntryLocalService;
-	private final AccountEntryUserRelLocalService
-		_accountEntryUserRelLocalService;
+	private final CommerceAccountLocalService _commerceAccountLocalService;
 	private final UserLocalService _userLocalService;
 
 }

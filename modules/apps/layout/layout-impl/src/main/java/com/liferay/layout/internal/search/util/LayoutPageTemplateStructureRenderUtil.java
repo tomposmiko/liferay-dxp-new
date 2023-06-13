@@ -18,65 +18,83 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
+import com.liferay.layout.adaptive.media.LayoutAdaptiveMediaProcessor;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
-import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
-import com.liferay.layout.util.structure.FormStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @author Lourdes Fernández Besada
+ * @author Eudaldo Alonso
  */
 public class LayoutPageTemplateStructureRenderUtil {
 
 	public static String renderLayoutContent(
-		FragmentRendererController fragmentRendererController,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		LayoutPageTemplateStructure layoutPageTemplateStructure, String mode,
-		Locale locale, long segmentsExperienceId) {
+			FragmentRendererController fragmentRendererController,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse,
+			LayoutAdaptiveMediaProcessor layoutAdaptiveMediaProcessor,
+			LayoutPageTemplateStructure layoutPageTemplateStructure,
+			String mode, Map<String, Object> parameterMap, Locale locale,
+			long[] segmentsExperienceIds)
+		throws PortalException {
 
 		if (fragmentRendererController == null) {
 			return StringPool.BLANK;
 		}
 
-		String data = layoutPageTemplateStructure.getData(segmentsExperienceId);
+		String data = layoutPageTemplateStructure.getData(
+			segmentsExperienceIds);
 
 		if (Validator.isNull(data)) {
 			return StringPool.BLANK;
 		}
 
-		LayoutStructure layoutStructure = LayoutStructure.of(data);
+		String content = _renderLayoutData(
+			data, fragmentRendererController, httpServletRequest,
+			httpServletResponse, mode, parameterMap, locale,
+			segmentsExperienceIds);
 
-		LayoutStructureItem layoutStructureItem =
-			layoutStructure.getLayoutStructureItem(
-				layoutStructure.getMainItemId());
+		if (layoutAdaptiveMediaProcessor == null) {
+			return content;
+		}
 
-		StringBundler sb = new StringBundler();
+		return layoutAdaptiveMediaProcessor.processAdaptiveMediaContent(
+			content);
+	}
 
-		_renderLayoutStructure(
-			layoutStructureItem.getChildrenItemIds(),
+	public static String renderLayoutContent(
+			FragmentRendererController fragmentRendererController,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse,
+			LayoutPageTemplateStructure layoutPageTemplateStructure,
+			String mode, Map<String, Object> parameterMap, Locale locale,
+			long[] segmentsExperienceIds)
+		throws PortalException {
+
+		return renderLayoutContent(
 			fragmentRendererController, httpServletRequest, httpServletResponse,
-			layoutStructure, locale, mode, sb);
-
-		return sb.toString();
+			null, layoutPageTemplateStructure, mode, parameterMap, locale,
+			segmentsExperienceIds);
 	}
 
 	private static String _renderFragmentEntryLink(
 		long fragmentEntryLinkId,
 		FragmentRendererController fragmentRendererController,
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, String mode, Locale locale) {
+		HttpServletResponse httpServletResponse, String mode,
+		Map<String, Object> parameterMap, Locale locale,
+		long[] segmentsExperienceIds) {
 
 		FragmentEntryLink fragmentEntryLink =
 			FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
@@ -89,75 +107,54 @@ public class LayoutPageTemplateStructureRenderUtil {
 		DefaultFragmentRendererContext fragmentRendererContext =
 			new DefaultFragmentRendererContext(fragmentEntryLink);
 
+		fragmentRendererContext.setFieldValues(parameterMap);
 		fragmentRendererContext.setLocale(locale);
 		fragmentRendererContext.setMode(mode);
+		fragmentRendererContext.setSegmentsExperienceIds(segmentsExperienceIds);
 
 		return fragmentRendererController.render(
 			fragmentRendererContext, httpServletRequest, httpServletResponse);
 	}
 
-	private static void _renderLayoutStructure(
-		List<String> childrenItemIds,
-		FragmentRendererController fragmentRendererController,
+	private static String _renderLayoutData(
+		String data, FragmentRendererController fragmentRendererController,
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		LayoutStructure layoutStructure, Locale locale, String mode,
-		StringBundler sb) {
+		HttpServletResponse httpServletResponse, String mode,
+		Map<String, Object> parameterMap, Locale locale,
+		long[] segmentsExperienceIds) {
 
-		for (String childrenItemId : childrenItemIds) {
-			LayoutStructureItem layoutStructureItem =
-				layoutStructure.getLayoutStructureItem(childrenItemId);
+		StringBundler sb = new StringBundler();
 
-			if (layoutStructureItem instanceof
-					ContainerStyledLayoutStructureItem) {
+		LayoutStructure layoutStructure = LayoutStructure.of(data);
 
-				ContainerStyledLayoutStructureItem
-					containerStyledLayoutStructureItem =
-						(ContainerStyledLayoutStructureItem)layoutStructureItem;
+		for (LayoutStructureItem layoutStructureItem :
+				layoutStructure.getLayoutStructureItems()) {
 
-				if (!containerStyledLayoutStructureItem.isIndexed()) {
-					continue;
-				}
-			}
-			else if (layoutStructureItem instanceof
-						FormStyledLayoutStructureItem) {
-
-				FormStyledLayoutStructureItem formStyledLayoutStructureItem =
-					(FormStyledLayoutStructureItem)layoutStructureItem;
-
-				if (!formStyledLayoutStructureItem.isIndexed()) {
-					continue;
-				}
-			}
-			else if (layoutStructureItem instanceof
-						FragmentStyledLayoutStructureItem) {
-
-				FragmentStyledLayoutStructureItem
-					fragmentStyledLayoutStructureItem =
-						(FragmentStyledLayoutStructureItem)layoutStructureItem;
-
-				long fragmentEntryLinkId =
-					fragmentStyledLayoutStructureItem.getFragmentEntryLinkId();
-
-				if (fragmentStyledLayoutStructureItem.isIndexed() &&
-					(fragmentEntryLinkId > 0)) {
-
-					sb.append(
-						_renderFragmentEntryLink(
-							fragmentStyledLayoutStructureItem.
-								getFragmentEntryLinkId(),
-							fragmentRendererController, httpServletRequest,
-							httpServletResponse, mode, locale));
-				}
+			if (!(layoutStructureItem instanceof
+					FragmentStyledLayoutStructureItem)) {
 
 				continue;
 			}
 
-			_renderLayoutStructure(
-				layoutStructureItem.getChildrenItemIds(),
-				fragmentRendererController, httpServletRequest,
-				httpServletResponse, layoutStructure, locale, mode, sb);
+			FragmentStyledLayoutStructureItem
+				fragmentStyledLayoutStructureItem =
+					(FragmentStyledLayoutStructureItem)layoutStructureItem;
+
+			if (fragmentStyledLayoutStructureItem.getFragmentEntryLinkId() <=
+					0) {
+
+				continue;
+			}
+
+			sb.append(
+				_renderFragmentEntryLink(
+					fragmentStyledLayoutStructureItem.getFragmentEntryLinkId(),
+					fragmentRendererController, httpServletRequest,
+					httpServletResponse, mode, parameterMap, locale,
+					segmentsExperienceIds));
 		}
+
+		return sb.toString();
 	}
 
 }

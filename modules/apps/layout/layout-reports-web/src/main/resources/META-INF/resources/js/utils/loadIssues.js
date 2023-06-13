@@ -18,6 +18,7 @@ import APIService from './APIService';
 export default function loadIssues({
 	dispatch,
 	languageId,
+	portletNamespace,
 	refreshCache = true,
 	url,
 }) {
@@ -26,6 +27,7 @@ export default function loadIssues({
 
 		APIService.getLayoutReportsIssues(
 			url.layoutReportsIssuesURL,
+			portletNamespace,
 			refreshCache
 		)
 			.then(({layoutReportsIssues}) => {

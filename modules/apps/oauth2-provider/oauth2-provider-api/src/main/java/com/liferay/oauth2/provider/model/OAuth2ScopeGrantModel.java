@@ -163,8 +163,4 @@ public interface OAuth2ScopeGrantModel
 	@Override
 	public OAuth2ScopeGrant cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

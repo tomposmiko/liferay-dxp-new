@@ -18,13 +18,16 @@ import com.liferay.commerce.notification.model.CommerceNotificationAttachment;
 import com.liferay.commerce.notification.service.CommerceNotificationAttachmentLocalService;
 import com.liferay.commerce.notification.service.CommerceNotificationAttachmentLocalServiceUtil;
 import com.liferay.commerce.notification.service.persistence.CommerceNotificationAttachmentPersistence;
+import com.liferay.commerce.notification.service.persistence.CommerceNotificationQueueEntryPersistence;
+import com.liferay.commerce.notification.service.persistence.CommerceNotificationTemplateCommerceAccountGroupRelPersistence;
+import com.liferay.commerce.notification.service.persistence.CommerceNotificationTemplatePersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -38,18 +41,19 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
-import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
+import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -58,9 +62,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the commerce notification attachment local service.
@@ -75,7 +76,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class CommerceNotificationAttachmentLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements AopService, CommerceNotificationAttachmentLocalService,
+	implements CommerceNotificationAttachmentLocalService,
 			   IdentifiableOSGiService {
 
 	/*
@@ -438,11 +439,6 @@ public abstract class CommerceNotificationAttachmentLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement CommerceNotificationAttachmentLocalServiceImpl#deleteCommerceNotificationAttachment(CommerceNotificationAttachment) to avoid orphaned data");
-		}
-
 		return commerceNotificationAttachmentLocalService.
 			deleteCommerceNotificationAttachment(
 				(CommerceNotificationAttachment)persistedModel);
@@ -568,25 +564,348 @@ public abstract class CommerceNotificationAttachmentLocalServiceBaseImpl
 			commerceNotificationAttachment);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+	/**
+	 * Returns the commerce notification attachment local service.
+	 *
+	 * @return the commerce notification attachment local service
+	 */
+	public CommerceNotificationAttachmentLocalService
+		getCommerceNotificationAttachmentLocalService() {
+
+		return commerceNotificationAttachmentLocalService;
 	}
 
-	@Override
-	public Class<?>[] getAopInterfaces() {
-		return new Class<?>[] {
-			CommerceNotificationAttachmentLocalService.class,
-			IdentifiableOSGiService.class, PersistedModelLocalService.class
-		};
+	/**
+	 * Sets the commerce notification attachment local service.
+	 *
+	 * @param commerceNotificationAttachmentLocalService the commerce notification attachment local service
+	 */
+	public void setCommerceNotificationAttachmentLocalService(
+		CommerceNotificationAttachmentLocalService
+			commerceNotificationAttachmentLocalService) {
+
+		this.commerceNotificationAttachmentLocalService =
+			commerceNotificationAttachmentLocalService;
 	}
 
-	@Override
-	public void setAopProxy(Object aopProxy) {
-		commerceNotificationAttachmentLocalService =
-			(CommerceNotificationAttachmentLocalService)aopProxy;
+	/**
+	 * Returns the commerce notification attachment persistence.
+	 *
+	 * @return the commerce notification attachment persistence
+	 */
+	public CommerceNotificationAttachmentPersistence
+		getCommerceNotificationAttachmentPersistence() {
+
+		return commerceNotificationAttachmentPersistence;
+	}
+
+	/**
+	 * Sets the commerce notification attachment persistence.
+	 *
+	 * @param commerceNotificationAttachmentPersistence the commerce notification attachment persistence
+	 */
+	public void setCommerceNotificationAttachmentPersistence(
+		CommerceNotificationAttachmentPersistence
+			commerceNotificationAttachmentPersistence) {
+
+		this.commerceNotificationAttachmentPersistence =
+			commerceNotificationAttachmentPersistence;
+	}
+
+	/**
+	 * Returns the commerce notification queue entry local service.
+	 *
+	 * @return the commerce notification queue entry local service
+	 */
+	public com.liferay.commerce.notification.service.
+		CommerceNotificationQueueEntryLocalService
+			getCommerceNotificationQueueEntryLocalService() {
+
+		return commerceNotificationQueueEntryLocalService;
+	}
+
+	/**
+	 * Sets the commerce notification queue entry local service.
+	 *
+	 * @param commerceNotificationQueueEntryLocalService the commerce notification queue entry local service
+	 */
+	public void setCommerceNotificationQueueEntryLocalService(
+		com.liferay.commerce.notification.service.
+			CommerceNotificationQueueEntryLocalService
+				commerceNotificationQueueEntryLocalService) {
+
+		this.commerceNotificationQueueEntryLocalService =
+			commerceNotificationQueueEntryLocalService;
+	}
+
+	/**
+	 * Returns the commerce notification queue entry persistence.
+	 *
+	 * @return the commerce notification queue entry persistence
+	 */
+	public CommerceNotificationQueueEntryPersistence
+		getCommerceNotificationQueueEntryPersistence() {
+
+		return commerceNotificationQueueEntryPersistence;
+	}
+
+	/**
+	 * Sets the commerce notification queue entry persistence.
+	 *
+	 * @param commerceNotificationQueueEntryPersistence the commerce notification queue entry persistence
+	 */
+	public void setCommerceNotificationQueueEntryPersistence(
+		CommerceNotificationQueueEntryPersistence
+			commerceNotificationQueueEntryPersistence) {
+
+		this.commerceNotificationQueueEntryPersistence =
+			commerceNotificationQueueEntryPersistence;
+	}
+
+	/**
+	 * Returns the commerce notification template local service.
+	 *
+	 * @return the commerce notification template local service
+	 */
+	public com.liferay.commerce.notification.service.
+		CommerceNotificationTemplateLocalService
+			getCommerceNotificationTemplateLocalService() {
+
+		return commerceNotificationTemplateLocalService;
+	}
+
+	/**
+	 * Sets the commerce notification template local service.
+	 *
+	 * @param commerceNotificationTemplateLocalService the commerce notification template local service
+	 */
+	public void setCommerceNotificationTemplateLocalService(
+		com.liferay.commerce.notification.service.
+			CommerceNotificationTemplateLocalService
+				commerceNotificationTemplateLocalService) {
+
+		this.commerceNotificationTemplateLocalService =
+			commerceNotificationTemplateLocalService;
+	}
+
+	/**
+	 * Returns the commerce notification template persistence.
+	 *
+	 * @return the commerce notification template persistence
+	 */
+	public CommerceNotificationTemplatePersistence
+		getCommerceNotificationTemplatePersistence() {
+
+		return commerceNotificationTemplatePersistence;
+	}
+
+	/**
+	 * Sets the commerce notification template persistence.
+	 *
+	 * @param commerceNotificationTemplatePersistence the commerce notification template persistence
+	 */
+	public void setCommerceNotificationTemplatePersistence(
+		CommerceNotificationTemplatePersistence
+			commerceNotificationTemplatePersistence) {
+
+		this.commerceNotificationTemplatePersistence =
+			commerceNotificationTemplatePersistence;
+	}
+
+	/**
+	 * Returns the commerce notification template commerce account group rel local service.
+	 *
+	 * @return the commerce notification template commerce account group rel local service
+	 */
+	public com.liferay.commerce.notification.service.
+		CommerceNotificationTemplateCommerceAccountGroupRelLocalService
+			getCommerceNotificationTemplateCommerceAccountGroupRelLocalService() {
+
+		return commerceNotificationTemplateCommerceAccountGroupRelLocalService;
+	}
+
+	/**
+	 * Sets the commerce notification template commerce account group rel local service.
+	 *
+	 * @param commerceNotificationTemplateCommerceAccountGroupRelLocalService the commerce notification template commerce account group rel local service
+	 */
+	public void
+		setCommerceNotificationTemplateCommerceAccountGroupRelLocalService(
+			com.liferay.commerce.notification.service.
+				CommerceNotificationTemplateCommerceAccountGroupRelLocalService
+					commerceNotificationTemplateCommerceAccountGroupRelLocalService) {
+
+		this.commerceNotificationTemplateCommerceAccountGroupRelLocalService =
+			commerceNotificationTemplateCommerceAccountGroupRelLocalService;
+	}
+
+	/**
+	 * Returns the commerce notification template commerce account group rel persistence.
+	 *
+	 * @return the commerce notification template commerce account group rel persistence
+	 */
+	public CommerceNotificationTemplateCommerceAccountGroupRelPersistence
+		getCommerceNotificationTemplateCommerceAccountGroupRelPersistence() {
+
+		return commerceNotificationTemplateCommerceAccountGroupRelPersistence;
+	}
+
+	/**
+	 * Sets the commerce notification template commerce account group rel persistence.
+	 *
+	 * @param commerceNotificationTemplateCommerceAccountGroupRelPersistence the commerce notification template commerce account group rel persistence
+	 */
+	public void
+		setCommerceNotificationTemplateCommerceAccountGroupRelPersistence(
+			CommerceNotificationTemplateCommerceAccountGroupRelPersistence
+				commerceNotificationTemplateCommerceAccountGroupRelPersistence) {
+
+		this.commerceNotificationTemplateCommerceAccountGroupRelPersistence =
+			commerceNotificationTemplateCommerceAccountGroupRelPersistence;
+	}
+
+	/**
+	 * Returns the counter local service.
+	 *
+	 * @return the counter local service
+	 */
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
+		return counterLocalService;
+	}
+
+	/**
+	 * Sets the counter local service.
+	 *
+	 * @param counterLocalService the counter local service
+	 */
+	public void setCounterLocalService(
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
+		this.counterLocalService = counterLocalService;
+	}
+
+	/**
+	 * Returns the class name local service.
+	 *
+	 * @return the class name local service
+	 */
+	public com.liferay.portal.kernel.service.ClassNameLocalService
+		getClassNameLocalService() {
+
+		return classNameLocalService;
+	}
+
+	/**
+	 * Sets the class name local service.
+	 *
+	 * @param classNameLocalService the class name local service
+	 */
+	public void setClassNameLocalService(
+		com.liferay.portal.kernel.service.ClassNameLocalService
+			classNameLocalService) {
+
+		this.classNameLocalService = classNameLocalService;
+	}
+
+	/**
+	 * Returns the class name persistence.
+	 *
+	 * @return the class name persistence
+	 */
+	public ClassNamePersistence getClassNamePersistence() {
+		return classNamePersistence;
+	}
+
+	/**
+	 * Sets the class name persistence.
+	 *
+	 * @param classNamePersistence the class name persistence
+	 */
+	public void setClassNamePersistence(
+		ClassNamePersistence classNamePersistence) {
+
+		this.classNamePersistence = classNamePersistence;
+	}
+
+	/**
+	 * Returns the resource local service.
+	 *
+	 * @return the resource local service
+	 */
+	public com.liferay.portal.kernel.service.ResourceLocalService
+		getResourceLocalService() {
+
+		return resourceLocalService;
+	}
+
+	/**
+	 * Sets the resource local service.
+	 *
+	 * @param resourceLocalService the resource local service
+	 */
+	public void setResourceLocalService(
+		com.liferay.portal.kernel.service.ResourceLocalService
+			resourceLocalService) {
+
+		this.resourceLocalService = resourceLocalService;
+	}
+
+	/**
+	 * Returns the user local service.
+	 *
+	 * @return the user local service
+	 */
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
+		return userLocalService;
+	}
+
+	/**
+	 * Sets the user local service.
+	 *
+	 * @param userLocalService the user local service
+	 */
+	public void setUserLocalService(
+		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
+		this.userLocalService = userLocalService;
+	}
+
+	/**
+	 * Returns the user persistence.
+	 *
+	 * @return the user persistence
+	 */
+	public UserPersistence getUserPersistence() {
+		return userPersistence;
+	}
+
+	/**
+	 * Sets the user persistence.
+	 *
+	 * @param userPersistence the user persistence
+	 */
+	public void setUserPersistence(UserPersistence userPersistence) {
+		this.userPersistence = userPersistence;
+	}
+
+	public void afterPropertiesSet() {
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.commerce.notification.model.CommerceNotificationAttachment",
+			commerceNotificationAttachmentLocalService);
 
 		_setLocalServiceUtilService(commerceNotificationAttachmentLocalService);
+	}
+
+	public void destroy() {
+		persistedModelLocalServiceRegistry.unregister(
+			"com.liferay.commerce.notification.model.CommerceNotificationAttachment");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -650,18 +969,81 @@ public abstract class CommerceNotificationAttachmentLocalServiceBaseImpl
 		}
 	}
 
+	@BeanReference(type = CommerceNotificationAttachmentLocalService.class)
 	protected CommerceNotificationAttachmentLocalService
 		commerceNotificationAttachmentLocalService;
 
-	@Reference
+	@BeanReference(type = CommerceNotificationAttachmentPersistence.class)
 	protected CommerceNotificationAttachmentPersistence
 		commerceNotificationAttachmentPersistence;
 
-	@Reference
+	@BeanReference(
+		type = com.liferay.commerce.notification.service.CommerceNotificationQueueEntryLocalService.class
+	)
+	protected com.liferay.commerce.notification.service.
+		CommerceNotificationQueueEntryLocalService
+			commerceNotificationQueueEntryLocalService;
+
+	@BeanReference(type = CommerceNotificationQueueEntryPersistence.class)
+	protected CommerceNotificationQueueEntryPersistence
+		commerceNotificationQueueEntryPersistence;
+
+	@BeanReference(
+		type = com.liferay.commerce.notification.service.CommerceNotificationTemplateLocalService.class
+	)
+	protected com.liferay.commerce.notification.service.
+		CommerceNotificationTemplateLocalService
+			commerceNotificationTemplateLocalService;
+
+	@BeanReference(type = CommerceNotificationTemplatePersistence.class)
+	protected CommerceNotificationTemplatePersistence
+		commerceNotificationTemplatePersistence;
+
+	@BeanReference(
+		type = com.liferay.commerce.notification.service.CommerceNotificationTemplateCommerceAccountGroupRelLocalService.class
+	)
+	protected com.liferay.commerce.notification.service.
+		CommerceNotificationTemplateCommerceAccountGroupRelLocalService
+			commerceNotificationTemplateCommerceAccountGroupRelLocalService;
+
+	@BeanReference(
+		type = CommerceNotificationTemplateCommerceAccountGroupRelPersistence.class
+	)
+	protected CommerceNotificationTemplateCommerceAccountGroupRelPersistence
+		commerceNotificationTemplateCommerceAccountGroupRelPersistence;
+
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceNotificationAttachmentLocalServiceBaseImpl.class);
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@ServiceReference(type = ClassNamePersistence.class)
+	protected ClassNamePersistence classNamePersistence;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ResourceLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@ServiceReference(type = UserPersistence.class)
+	protected UserPersistence userPersistence;
+
+	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
 
 }

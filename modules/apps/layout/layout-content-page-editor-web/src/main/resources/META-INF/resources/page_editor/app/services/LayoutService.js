@@ -92,26 +92,6 @@ export default {
 		);
 	},
 
-	createLayoutPageTemplateEntry({
-		segmentsExperienceId,
-		templateSetDescription,
-		templateSetId,
-		templateSetName,
-	}) {
-		return layoutServiceFetch(
-			config.createLayoutPageTemplateEntryURL,
-			{
-				body: {
-					layoutPageTemplateCollectionDescription: templateSetDescription,
-					layoutPageTemplateCollectionId: templateSetId,
-					layoutPageTemplateCollectionName: templateSetName,
-					segmentsExperienceId,
-				},
-			},
-			() => {}
-		);
-	},
-
 	/**
 	 * @param {object} layout
 	 * @returns {Promise<{error: Error, friendlyURL: string}>}
@@ -122,14 +102,6 @@ export default {
 			{
 				body: layout,
 			},
-			() => {}
-		);
-	},
-
-	getLayoutPageTemplateCollections() {
-		return layoutServiceFetch(
-			config.getLayoutPageTemplateCollectionsURL,
-			{},
 			() => {}
 		);
 	},
@@ -230,17 +202,17 @@ export default {
 	/**
 	 * Unmarks an item for deletion
 	 * @param {object} options
-	 * @param {string[]} options.itemIds id of the item to be updated
+	 * @param {string} options.itemId id of the item to be updated
 	 * @param {string} options.segmentsExperienceId Segments experience id
 	 * @param {function} options.onNetworkStatus
 	 * @return {Promise<void>}
 	 */
-	unmarkItemsForDeletion({itemIds, onNetworkStatus, segmentsExperienceId}) {
+	unmarkItemForDeletion({itemId, onNetworkStatus, segmentsExperienceId}) {
 		return layoutServiceFetch(
-			config.unmarkItemsForDeletionURL,
+			config.unmarkItemForDeletionURL,
 			{
 				body: {
-					itemIds: JSON.stringify(itemIds),
+					itemId,
 					segmentsExperienceId,
 				},
 			},
@@ -335,7 +307,7 @@ export default {
 	 * @param {number} options.numberOfColumns New number of columns
 	 * @param {string} options.segmentsExperienceId Segments experience id
 	 * @param {function} options.onNetworkStatus
-	 * @return {Promise<object>}
+	 * @return {Promise<void>}
 	 */
 	updateRowColumns({
 		itemId,

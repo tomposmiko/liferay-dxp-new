@@ -27,22 +27,15 @@
 	<liferay-ui:error key="MustNotUseCompanyMx" message="the-email-address-associated-with-your-openid-connect-account-cannot-be-used-to-register-a-new-user-because-its-email-domain-is-reserved" />
 	<liferay-ui:error key="StrangersNotAllowedException" message="only-known-users-are-allowed-to-sign-in-using-openid-connect" />
 
-	<aui:select label="openid-connect-client-name" name="oAuthClientEntryId">
+	<aui:select label="openid-connect-provider-name" name="<%= OpenIdConnectWebKeys.OPEN_ID_CONNECT_PROVIDER_NAME %>">
 
 		<%
-		List<OAuthClientEntry> oAuthClientEntries = (List<OAuthClientEntry>)request.getAttribute(OpenIdConnectWebKeys.OAUTH_CLIENT_ENTRIES);
+		Collection<String> openIdConnectProviderNames = (Collection<String>)request.getAttribute(OpenIdConnectWebKeys.OPEN_ID_CONNECT_PROVIDER_NAMES);
 
-		for (OAuthClientEntry oAuthClientEntry : oAuthClientEntries) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(oAuthClientEntry.getInfoJSON());
-
-			String clientName = jsonObject.getString("client_name", null);
-
-			if (clientName == null) {
-				clientName = oAuthClientEntry.getClientId() + " at Provider: " + oAuthClientEntry.getAuthServerWellKnownURI();
-			}
+		for (String openIdConnectProviderName : openIdConnectProviderNames) {
 		%>
 
-			<aui:option label="<%= HtmlUtil.escape(clientName) %>" value="<%= oAuthClientEntry.getOAuthClientEntryId() %>" />
+			<aui:option label="<%= HtmlUtil.escape(openIdConnectProviderName) %>" value="<%= HtmlUtil.escapeAttribute(openIdConnectProviderName) %>" />
 
 		<%
 		}

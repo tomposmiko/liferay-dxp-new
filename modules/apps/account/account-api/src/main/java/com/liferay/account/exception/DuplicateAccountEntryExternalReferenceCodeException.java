@@ -14,13 +14,13 @@
 
 package com.liferay.account.exception;
 
-import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class DuplicateAccountEntryExternalReferenceCodeException
-	extends DuplicateExternalReferenceCodeException {
+	extends PortalException {
 
 	public DuplicateAccountEntryExternalReferenceCodeException() {
 	}

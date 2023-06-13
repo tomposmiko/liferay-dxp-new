@@ -14,17 +14,23 @@
 
 import updateItemConfig from '../../actions/updateItemConfig';
 import LayoutService from '../../services/LayoutService';
-import {setIn} from '../../utils/setIn';
 
 function undoAction({action, store}) {
-	const {config, itemId, pageContents} = action;
+	const {config, itemId} = action;
 	const {layoutData} = store;
 
-	const nextLayoutData = setIn(
-		layoutData,
-		['items', itemId, 'config'],
-		config
-	);
+	const item = layoutData.items[itemId];
+
+	const nextLayoutData = {
+		...layoutData,
+		items: {
+			...layoutData.items,
+			[itemId]: {
+				...item,
+				config,
+			},
+		},
+	};
 
 	return (dispatch) => {
 		return LayoutService.updateLayoutData({
@@ -32,20 +38,13 @@ function undoAction({action, store}) {
 			onNetworkStatus: dispatch,
 			segmentsExperienceId: store.segmentsExperienceId,
 		}).then(() => {
-			dispatch(
-				updateItemConfig({
-					itemId,
-					layoutData: nextLayoutData,
-					overridePreviousConfig: true,
-					pageContents,
-				})
-			);
+			dispatch(updateItemConfig({itemId, layoutData: nextLayoutData}));
 		});
 	};
 }
 
 function getDerivedStateForUndo({action, state}) {
-	const {itemId, pageContents} = action;
+	const {itemId} = action;
 	const {layoutData} = state;
 
 	const item = layoutData.items[itemId];
@@ -53,7 +52,6 @@ function getDerivedStateForUndo({action, state}) {
 	return {
 		config: item.config,
 		itemId,
-		pageContents,
 	};
 }
 

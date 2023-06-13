@@ -17,9 +17,9 @@ package com.liferay.frontend.taglib.clay.servlet.taglib;
 import com.liferay.frontend.taglib.clay.internal.servlet.taglib.BaseContainerTag;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.PaginationBarDelta;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.PaginationBarLabels;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
@@ -73,10 +73,11 @@ public class PaginationBarTag extends BaseContainerTag {
 				TagResourceBundleUtil.getResourceBundle(pageContext);
 
 			paginationBarLabels.setPaginationResults(
-				LanguageUtil.format(
-					PortalUtil.getLocale(getRequest()),
-					"showing-x-to-x-of-x-entries",
-					new String[] {"{0}", "{1}", "{2}"}));
+				StringBundler.concat(
+					LanguageUtil.get(resourceBundle, "showing"), " {0} ",
+					StringUtil.toLowerCase(
+						LanguageUtil.get(resourceBundle, "to")),
+					" {1} ", LanguageUtil.get(resourceBundle, "of"), " {2}"));
 
 			String perPageItems =
 				"{0} " + LanguageUtil.get(resourceBundle, "items");
@@ -174,7 +175,7 @@ public class PaginationBarTag extends BaseContainerTag {
 
 	@Override
 	protected String getHydratedModuleName() {
-		return "{PaginationBar} from frontend-taglib-clay";
+		return "frontend-taglib-clay/PaginationBar";
 	}
 
 	@Override
@@ -257,39 +258,15 @@ public class PaginationBarTag extends BaseContainerTag {
 		jspWriter.write(_totalItems.toString());
 		jspWriter.write(StringPool.SPACE);
 		jspWriter.write("</div><ul class=\"pagination pagination-root\">");
-		jspWriter.write("<li class=\"page-item\"");
+		jspWriter.write("<li class=\"page-item disabled\">");
 
-		boolean firstPage = false;
+		ButtonTag buttonTag = new ButtonTag();
 
-		if (_activePage == 1) {
-			firstPage = true;
-		}
+		buttonTag.setCssClass("page-link");
+		buttonTag.setDisplayType("unstyled");
+		buttonTag.setIcon("angle-left");
 
-		if (firstPage) {
-			jspWriter.write(" disabled\"");
-		}
-
-		jspWriter.write(">");
-
-		if (firstPage) {
-			jspWriter.write("<div class=\"page-link\">");
-
-			IconTag iconTag = new IconTag();
-
-			iconTag.setSymbol("angle-left");
-			iconTag.doTag(pageContext);
-
-			jspWriter.write("</div>");
-		}
-		else {
-			LinkTag linkTag = new LinkTag();
-
-			linkTag.setCssClass("page-link");
-			linkTag.setDisplayType("unstyled");
-			linkTag.setIcon("angle-left");
-
-			linkTag.doTag(pageContext);
-		}
+		buttonTag.doTag(pageContext);
 
 		jspWriter.write("</li>");
 
@@ -311,60 +288,44 @@ public class PaginationBarTag extends BaseContainerTag {
 
 			int leftIndex = activeIndex - _ellipsisBuffer;
 
-			int leftItemsStartIndex = 1;
-			int leftItemsEndIndex = Math.max(leftIndex, 1);
+			int[] leftItems = Arrays.copyOfRange(
+				pageNumberItems, 1, Math.max(leftIndex, 1));
 
-			if (leftItemsStartIndex < leftItemsEndIndex) {
-				int[] leftItems = Arrays.copyOfRange(
-					pageNumberItems, leftItemsStartIndex, leftItemsEndIndex);
+			if (leftItems.length > 1) {
+				_processEllipsis(pageContext);
+			}
+			else if (leftItems.length == 1) {
+				int leftItem = leftItems[0];
 
-				if (leftItems.length > 1) {
-					_processEllipsis(pageContext);
-				}
-				else if (leftItems.length == 1) {
-					int leftItem = leftItems[0];
-
-					_processItem(pageContext, leftItem);
-				}
+				_processItem(pageContext, leftItem);
 			}
 
 			int lastIndex = pageNumberItems.length - 1;
 
-			int centerItemsStartIndex = Math.max(
-				activeIndex - _ellipsisBuffer, 1);
-			int centerItemsEndIndex = Math.min(
-				activeIndex + _ellipsisBuffer + 1, lastIndex);
+			int[] centerItems = Arrays.copyOfRange(
+				pageNumberItems, Math.max(activeIndex - _ellipsisBuffer, 1),
+				Math.min(activeIndex + _ellipsisBuffer + 1, lastIndex));
 
-			if (centerItemsStartIndex < centerItemsEndIndex) {
-				int[] centerItems = Arrays.copyOfRange(
-					pageNumberItems, centerItemsStartIndex,
-					centerItemsEndIndex);
-
-				for (int centerItem : centerItems) {
-					_processItem(pageContext, centerItem);
-				}
+			for (int centerItem : centerItems) {
+				_processItem(pageContext, centerItem);
 			}
 
-			int rightItemsStartIndex = activeIndex + _ellipsisBuffer + 1;
+			int rightIndex = activeIndex + _ellipsisBuffer + 1;
 
-			if (rightItemsStartIndex > lastIndex) {
-				rightItemsStartIndex = lastIndex;
+			if (rightIndex > lastIndex) {
+				rightIndex = lastIndex;
 			}
 
-			int rightItemsEndIndex = Math.max(lastIndex, rightItemsStartIndex);
+			int[] rightItems = Arrays.copyOfRange(
+				pageNumberItems, rightIndex, Math.max(lastIndex, rightIndex));
 
-			if (rightItemsStartIndex < rightItemsEndIndex) {
-				int[] rightItems = Arrays.copyOfRange(
-					pageNumberItems, rightItemsStartIndex, rightItemsEndIndex);
+			if (rightItems.length > 1) {
+				_processEllipsis(pageContext);
+			}
+			else if (rightItems.length == 1) {
+				int rightItem = rightItems[0];
 
-				if (rightItems.length > 1) {
-					_processEllipsis(pageContext);
-				}
-				else if (rightItems.length == 1) {
-					int rightItem = rightItems[0];
-
-					_processItem(pageContext, rightItem);
-				}
+				_processItem(pageContext, rightItem);
 			}
 
 			if (totalPages > 1) {
@@ -379,40 +340,15 @@ public class PaginationBarTag extends BaseContainerTag {
 			}
 		}
 
-		jspWriter.write("<li class=\"page-item\"");
+		jspWriter.write("<li class=\"page-item\">");
 
-		boolean lastPage = false;
+		buttonTag = new ButtonTag();
 
-		if (_activePage == totalPages) {
-			lastPage = true;
-		}
+		buttonTag.setCssClass("page-link");
+		buttonTag.setDisplayType("unstyled");
+		buttonTag.setIcon("angle-right");
 
-		if (lastPage) {
-			jspWriter.write(" disabled\"");
-		}
-
-		jspWriter.write(">");
-
-		if (lastPage) {
-			jspWriter.write("<div class=\"page-link\">");
-
-			IconTag iconTag = new IconTag();
-
-			iconTag.setSymbol("angle-right");
-
-			iconTag.doTag(pageContext);
-
-			jspWriter.write("</div>");
-		}
-		else {
-			LinkTag linkTag = new LinkTag();
-
-			linkTag.setCssClass("page-link");
-			linkTag.setDisplayType("unstyled");
-			linkTag.setIcon("angle-right");
-
-			linkTag.doTag(pageContext);
-		}
+		buttonTag.doTag(pageContext);
 
 		jspWriter.write("</li></ul>");
 
@@ -454,13 +390,13 @@ public class PaginationBarTag extends BaseContainerTag {
 
 		jspWriter.write("\">");
 
-		LinkTag linkTag = new LinkTag();
+		ButtonTag buttonTag = new ButtonTag();
 
-		linkTag.setCssClass("page-link");
-		linkTag.setDisplayType("unstyled");
-		linkTag.setLabel(String.valueOf(item));
+		buttonTag.setCssClass("page-link");
+		buttonTag.setDisplayType("unstyled");
+		buttonTag.setLabel(String.valueOf(item));
 
-		linkTag.doTag(pageContext);
+		buttonTag.doTag(pageContext);
 
 		jspWriter.write("</li>");
 	}

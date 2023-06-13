@@ -19,11 +19,11 @@
 <%
 long liveGroupId = (long)request.getAttribute("site.liveGroupId");
 
-UnicodeProperties groupTypeSettingsUnicodeProperties = (UnicodeProperties)request.getAttribute("site.groupTypeSettings");
+UnicodeProperties groupTypeSettings = (UnicodeProperties)request.getAttribute("site.groupTypeSettings");
 
 List<Role> defaultSiteRoles = new ArrayList<>();
 
-long[] defaultSiteRoleIds = StringUtil.split(groupTypeSettingsUnicodeProperties.getProperty("defaultSiteRoleIds"), 0L);
+long[] defaultSiteRoleIds = StringUtil.split(groupTypeSettings.getProperty("defaultSiteRoleIds"), 0L);
 
 for (long defaultSiteRoleId : defaultSiteRoleIds) {
 	defaultSiteRoles.add(RoleLocalServiceUtil.getRole(defaultSiteRoleId));
@@ -31,7 +31,7 @@ for (long defaultSiteRoleId : defaultSiteRoleIds) {
 
 List<Team> defaultTeams = new ArrayList<>();
 
-long[] defaultTeamIds = StringUtil.split(groupTypeSettingsUnicodeProperties.getProperty("defaultTeamIds"), 0L);
+long[] defaultTeamIds = StringUtil.split(groupTypeSettings.getProperty("defaultTeamIds"), 0L);
 
 for (long defaultTeamId : defaultTeamIds) {
 	defaultTeams.add(TeamLocalServiceUtil.getTeam(defaultTeamId));
@@ -41,8 +41,10 @@ for (long defaultTeamId : defaultTeamIds) {
 <liferay-util:buffer
 	var="removeRoleIcon"
 >
-	<clay:icon
-		symbol="times-circle"
+	<liferay-ui:icon
+		icon="times-circle"
+		markupView="lexicon"
+		message="remove"
 	/>
 </liferay-util:buffer>
 
@@ -61,15 +63,9 @@ for (long defaultTeamId : defaultTeamIds) {
 	</clay:content-col>
 
 	<clay:content-col>
-		<clay:button
-			aria-label='<%= LanguageUtil.get(request, "select") %>'
-			cssClass="modify-link"
-			displayType="secondary"
-			id='<%= liferayPortletResponse.getNamespace() + "selectSiteRoleLink" %>'
-			label='<%= LanguageUtil.get(request, "select") %>'
-			small="<%= true %>"
-			title='<%= LanguageUtil.get(request, "select") %>'
-		/>
+		<span class="heading-end">
+			<aui:button cssClass="btn-sm modify-link" id="selectSiteRoleLink" value="select" />
+		</span>
 	</clay:content-col>
 </clay:content-row>
 
@@ -96,17 +92,7 @@ for (long defaultTeamId : defaultTeamIds) {
 		/>
 
 		<liferay-ui:search-container-column-text>
-			<clay:button
-				aria-label='<%= LanguageUtil.get(request, "remove") %>'
-				borderless="<%= true %>"
-				cssClass="lfr-portal-tooltip modify-link"
-				data-rowId="<%= role.getRoleId() %>"
-				displayType="secondary"
-				icon="times-circle"
-				monospaced="<%= true %>"
-				title='<%= LanguageUtil.get(request, "remove") %>'
-				type="button"
-			/>
+			<a class="modify-link" data-rowId="<%= role.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
@@ -127,15 +113,9 @@ for (long defaultTeamId : defaultTeamIds) {
 	</clay:content-col>
 
 	<clay:content-col>
-		<clay:button
-			aria-label='<%= LanguageUtil.get(request, "select") %>'
-			cssClass="modify-link"
-			displayType="secondary"
-			id='<%= liferayPortletResponse.getNamespace() + "selectTeamLink" %>'
-			label='<%= LanguageUtil.get(request, "select") %>'
-			small="<%= true %>"
-			title='<%= LanguageUtil.get(request, "select") %>'
-		/>
+		<span class="heading-end">
+			<aui:button cssClass="btn-sm modify-link" id="selectTeamLink" value="select" />
+		</span>
 	</clay:content-col>
 </clay:content-row>
 
@@ -162,17 +142,7 @@ for (long defaultTeamId : defaultTeamIds) {
 		/>
 
 		<liferay-ui:search-container-column-text>
-			<clay:button
-				aria-label='<%= LanguageUtil.get(request, "remove") %>'
-				borderless="<%= true %>"
-				cssClass="lfr-portal-tooltip modify-link"
-				data-rowId="<%= team.getTeamId() %>"
-				displayType="secondary"
-				icon="times-circle"
-				monospaced="<%= true %>"
-				title='<%= LanguageUtil.get(request, "remove") %>'
-				type="button"
-			/>
+			<a class="modify-link" data-rowId="<%= team.getTeamId() %>" href="javascript:;"><%= removeRoleIcon %></a>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
@@ -182,14 +152,14 @@ for (long defaultTeamId : defaultTeamIds) {
 	/>
 </liferay-ui:search-container>
 
-<aui:script use="liferay-search-container">
-	const bindModifyLink = function (config) {
-		const searchContainer = config.searchContainer;
+<aui:script use="escape,liferay-search-container">
+	var bindModifyLink = function (config) {
+		var searchContainer = config.searchContainer;
 
 		searchContainer.get('contentBox').delegate(
 			'click',
 			(event) => {
-				const link = event.currentTarget;
+				var link = event.currentTarget;
 
 				searchContainer.deleteRow(
 					link.ancestor('tr'),
@@ -200,13 +170,11 @@ for (long defaultTeamId : defaultTeamIds) {
 		);
 	};
 
-	const bindSelectLink = function (config) {
-		const searchContainer = config.searchContainer;
+	var bindSelectLink = function (config) {
+		var searchContainer = config.searchContainer;
 
-		const selectLink = document.getElementById(config.linkId);
-
-		selectLink.addEventListener('click', (event) => {
-			let searchContainerData = searchContainer.getData();
+		A.one(config.linkId).on('click', (event) => {
+			var searchContainerData = searchContainer.getData();
 
 			if (!searchContainerData.length) {
 				searchContainerData = [];
@@ -215,21 +183,22 @@ for (long defaultTeamId : defaultTeamIds) {
 				searchContainerData = searchContainerData.split(',');
 			}
 
-			const ids = document.getElementById(config.inputId).value;
+			var ids = A.one(config.inputId).val();
 
-			const uri = new URL(config.uri);
-
-			uri.searchParams.set(config.urlParam, ids);
+			var uri = Liferay.Util.addParams(
+				config.urlParam + '=' + ids,
+				config.uri
+			);
 
 			Liferay.Util.openSelectionModal({
 				onSelect: function (event) {
-					const entityId = event.entityid;
+					var entityId = event.entityid;
 
-					const rowColumns = [
-						Liferay.Util.escape(event.entityname),
-						'<button aria-label="<%= LanguageUtil.get(request, "remove") %>" class="btn btn-monospaced btn-outline-borderless btn-outline-secondary float-right lfr-portal-tooltip modify-link" data-rowId="' +
+					var rowColumns = [
+						A.Escape.html(event.entityname),
+						'<a class="modify-link" data-rowId="' +
 							entityId +
-							'" title="<%= LanguageUtil.get(request, "remove") %>" type="button"><%= UnicodeFormatter.toString(removeRoleIcon) %></button>',
+							'" href="javascript:;"><%= UnicodeFormatter.toString(removeRoleIcon) %></a>',
 					];
 
 					searchContainer.addRow(rowColumns, entityId);
@@ -239,7 +208,7 @@ for (long defaultTeamId : defaultTeamIds) {
 				selectEventName: config.id,
 				selectedData: searchContainerData,
 				title: config.title,
-				url: uri.toString(),
+				url: uri,
 			});
 		});
 	};
@@ -262,11 +231,11 @@ for (long defaultTeamId : defaultTeamIds) {
 	String selectSiteRolePortletId = PortletProviderUtil.getPortletId(Role.class.getName(), PortletProvider.Action.BROWSE);
 	%>
 
-	const siteRolesConfig = {
+	var siteRolesConfig = {
 		id: '<portlet:namespace />selectSiteRole',
 		idAttr: 'roleid',
-		inputId: '<portlet:namespace />siteRolesSearchContainerPrimaryKeys',
-		linkId: '<portlet:namespace />selectSiteRoleLink',
+		inputId: '#<portlet:namespace />siteRolesSearchContainerPrimaryKeys',
+		linkId: '#<portlet:namespace />selectSiteRoleLink',
 		searchContainer: Liferay.SearchContainer.get(
 			'<portlet:namespace />siteRolesSearchContainer'
 		),
@@ -294,11 +263,11 @@ for (long defaultTeamId : defaultTeamIds) {
 	String selectTeamPortletId = PortletProviderUtil.getPortletId(Team.class.getName(), PortletProvider.Action.BROWSE);
 	%>
 
-	const teamsConfig = {
+	var teamsConfig = {
 		id: '<portlet:namespace />selectTeam',
 		idAttr: 'teamid',
-		inputId: '<portlet:namespace />teamsSearchContainerPrimaryKeys',
-		linkId: '<portlet:namespace />selectTeamLink',
+		inputId: '#<portlet:namespace />teamsSearchContainerPrimaryKeys',
+		linkId: '#<portlet:namespace />selectTeamLink',
 		searchContainer: Liferay.SearchContainer.get(
 			'<portlet:namespace />teamsSearchContainer'
 		),

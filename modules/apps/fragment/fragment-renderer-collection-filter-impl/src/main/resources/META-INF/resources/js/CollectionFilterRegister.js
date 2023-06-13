@@ -22,15 +22,15 @@ let _filterPrefix = '';
  *  are found for the given filterType (Java's filterKey) and
  *  fragmentEntryLinkId.
  */
-export function getCollectionFilterValue(
+export const getCollectionFilterValue = (
 	filterType,
 	filterFragmentEntryLinkId
-) {
+) => {
 	let value = new URL(window.location.href).searchParams.getAll(
 		`${_filterPrefix}${filterType}_${filterFragmentEntryLinkId}`
 	);
 
-	if (!value.length) {
+	if (value.length === 0) {
 		value = null;
 	}
 	else if (value.length === 1) {
@@ -38,7 +38,7 @@ export function getCollectionFilterValue(
 	}
 
 	return value;
-}
+};
 
 /**
  * Replaces all existing filter values with the new one, only for given
@@ -47,11 +47,11 @@ export function getCollectionFilterValue(
  * @param {string} filterFragmentEntryLinkId
  * @param {string|string[]} value
  */
-export function setCollectionFilterValue(
+export const setCollectionFilterValue = (
 	filterType,
 	filterFragmentEntryLinkId,
 	value
-) {
+) => {
 	if (document.body.classList.contains('has-edit-mode-menu')) {
 		return;
 	}
@@ -71,7 +71,7 @@ export function setCollectionFilterValue(
 	}
 
 	window.location.href = url.toString();
-}
+};
 
 /**
  *

@@ -14,7 +14,6 @@
 
 package com.liferay.login.authentication.openid.connect.web.internal.portlet.action;
 
-import com.liferay.oauth.client.persistence.service.OAuthClientEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -24,6 +23,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnect;
+import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProviderRegistry;
 import com.liferay.portal.security.sso.openid.connect.constants.OpenIdConnectWebKeys;
 
 import javax.portlet.PortletException;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + PortletKeys.FAST_LOGIN,
 		"javax.portlet.name=" + PortletKeys.LOGIN,
@@ -74,10 +75,9 @@ public class OpenIdConnectLoginRequestMVCRenderCommand
 		}
 
 		httpServletRequest.setAttribute(
-			OpenIdConnectWebKeys.OAUTH_CLIENT_ENTRIES,
-			_oAuthClientEntryLocalService.
-				getAuthServerWellKnownURISuffixOAuthClientEntries(
-					themeDisplay.getCompanyId(), "openid-configuration"));
+			OpenIdConnectWebKeys.OPEN_ID_CONNECT_PROVIDER_NAMES,
+			_openIdConnectProviderRegistry.getOpenIdConnectProviderNames(
+				themeDisplay.getCompanyId()));
 
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher(_JSP_PATH);
@@ -109,10 +109,10 @@ public class OpenIdConnectLoginRequestMVCRenderCommand
 		OpenIdConnectLoginRequestMVCRenderCommand.class);
 
 	@Reference
-	private OAuthClientEntryLocalService _oAuthClientEntryLocalService;
+	private OpenIdConnect _openIdConnect;
 
 	@Reference
-	private OpenIdConnect _openIdConnect;
+	private OpenIdConnectProviderRegistry<?, ?> _openIdConnectProviderRegistry;
 
 	@Reference
 	private Portal _portal;

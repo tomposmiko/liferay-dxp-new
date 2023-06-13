@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -42,13 +41,11 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.asset.service.impl.AssetEntryServiceImpl;
 import com.liferay.ratings.kernel.model.RatingsStats;
-import com.liferay.ratings.kernel.service.RatingsEntryLocalServiceUtil;
 import com.liferay.ratings.kernel.service.RatingsEntryServiceUtil;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalServiceUtil;
 
@@ -408,23 +405,18 @@ public class AssetEntryQueryTest {
 	}
 
 	@Test
-	public void testLinkedAssetMultipleLayoutContents() throws Exception {
-		testLinkedAsset(3, true);
-	}
-
-	@Test
 	public void testLinkedAssetMultipleLinked() throws Exception {
-		testLinkedAsset(3, false);
+		testLinkedAsset(3);
 	}
 
 	@Test
 	public void testLinkedAssetNoLinked() throws Exception {
-		testLinkedAsset(0, false);
+		testLinkedAsset(0);
 	}
 
 	@Test
 	public void testLinkedAssetOneLinked() throws Exception {
-		testLinkedAsset(1, false);
+		testLinkedAsset(1);
 	}
 
 	@Test
@@ -544,18 +536,6 @@ public class AssetEntryQueryTest {
 		testOrderByRatings(
 			new double[] {0.44, 0.2, 0.6, 0.22, 0.86},
 			new double[] {0.86, 0.6, 0.44, 0.22, 0.2}, "DESC");
-	}
-
-	@Test
-	public void testOrderByRatingsTotalScoreAsc() throws Exception {
-		testOrderByRatingsTotalScore(
-			new int[] {2, 3, 1, 5, 4}, new int[] {1, 2, 3, 4, 5}, "ASC");
-	}
-
-	@Test
-	public void testOrderByRatingsTotalScoreDesc() throws Exception {
-		testOrderByRatingsTotalScore(
-			new int[] {2, 3, 1, 5, 4}, new int[] {5, 4, 3, 2, 1}, "DESC");
 	}
 
 	protected AssetEntryQuery buildAssetEntryQuery(
@@ -821,8 +801,7 @@ public class AssetEntryQueryTest {
 			not, expectedAssetEntriesCount);
 	}
 
-	protected void testLinkedAsset(
-			int expectedAssetEntriesCount, boolean multipleLayoutContents)
+	protected void testLinkedAsset(int expectedAssetEntriesCount)
 		throws Exception {
 
 		ThreadLocalCache<Object[]> threadLocalCache =
@@ -850,10 +829,6 @@ public class AssetEntryQueryTest {
 
 		AssetEntry assetEntry1 = AssetEntryLocalServiceUtil.getEntry(
 			BlogsEntry.class.getName(), blogsEntry1.getEntryId());
-
-		List<Long> layoutAssetEntryIds = new ArrayList<>();
-
-		layoutAssetEntryIds.add(assetEntry1.getEntryId());
 
 		List<BlogsEntry> blogsEntries = new ArrayList<>();
 
@@ -884,52 +859,6 @@ public class AssetEntryQueryTest {
 			linkedAssetEntryIds.add(linkedAssetEntry.getEntryId());
 		}
 
-		if (multipleLayoutContents) {
-			BlogsEntry blogsEntry2 = BlogsEntryLocalServiceUtil.addEntry(
-				TestPropsValues.getUserId(), StringUtil.randomString(),
-				StringPool.BLANK, StringUtil.randomString(),
-				RandomTestUtil.randomString(), 1, 1, 1965, 0, 0, true, true,
-				null, StringPool.BLANK, null, null, serviceContext);
-
-			AssetEntry assetEntry2 = AssetEntryLocalServiceUtil.getEntry(
-				BlogsEntry.class.getName(), blogsEntry2.getEntryId());
-
-			layoutAssetEntryIds.add(assetEntry2.getEntryId());
-
-			blogsEntries.add(blogsEntry2);
-
-			AssetLink commonAssetLink = AssetLinkLocalServiceUtil.addLink(
-				TestPropsValues.getUserId(), assetEntry1.getEntryId(),
-				assetEntry2.getEntryId(), 0, 0);
-
-			assetLinks.add(commonAssetLink);
-
-			for (int i = 0; i < expectedAssetEntriesCount; i++) {
-				BlogsEntry linkedBlogsEntry =
-					BlogsEntryLocalServiceUtil.addEntry(
-						TestPropsValues.getUserId(), StringUtil.randomString(),
-						StringPool.BLANK, StringUtil.randomString(),
-						RandomTestUtil.randomString(), 1, 1, 1965, 0, 0, true,
-						true, null, StringPool.BLANK, null, null,
-						serviceContext);
-
-				AssetEntry linkedAssetEntry =
-					AssetEntryLocalServiceUtil.getEntry(
-						BlogsEntry.class.getName(),
-						linkedBlogsEntry.getEntryId());
-
-				AssetLink assetLink = AssetLinkLocalServiceUtil.addLink(
-					TestPropsValues.getUserId(), assetEntry2.getEntryId(),
-					linkedAssetEntry.getEntryId(), 0, 0);
-
-				blogsEntries.add(linkedBlogsEntry);
-
-				assetLinks.add(assetLink);
-
-				linkedAssetEntryIds.add(linkedAssetEntry.getEntryId());
-			}
-		}
-
 		BlogsEntry notLinkedBlogsEntry = BlogsEntryLocalServiceUtil.addEntry(
 			TestPropsValues.getUserId(), StringUtil.randomString(),
 			StringPool.BLANK, StringUtil.randomString(),
@@ -938,8 +867,7 @@ public class AssetEntryQueryTest {
 
 		blogsEntries.add(notLinkedBlogsEntry);
 
-		assetEntryQuery.setLinkedAssetEntryIds(
-			ArrayUtil.toLongArray(layoutAssetEntryIds));
+		assetEntryQuery.setLinkedAssetEntryId(assetEntry1.getEntryId());
 
 		threadLocalCache.removeAll();
 
@@ -947,8 +875,7 @@ public class AssetEntryQueryTest {
 			assetEntryQuery);
 
 		Assert.assertEquals(
-			initialAssetEntriesCount +
-				(expectedAssetEntriesCount * layoutAssetEntryIds.size()),
+			initialAssetEntriesCount + expectedAssetEntriesCount,
 			assetEntriesCount);
 
 		List<AssetEntry> assetEntries = AssetEntryServiceUtil.getEntries(
@@ -956,8 +883,7 @@ public class AssetEntryQueryTest {
 
 		Assert.assertEquals(
 			assetEntries.toString(),
-			initialAssetEntriesCount +
-				(expectedAssetEntriesCount * layoutAssetEntryIds.size()),
+			initialAssetEntriesCount + expectedAssetEntriesCount,
 			assetEntries.size());
 
 		for (AssetEntry assetEntry : assetEntries) {
@@ -1023,62 +949,6 @@ public class AssetEntryQueryTest {
 		}
 	}
 
-	protected void testOrderByRatingsTotalScore(
-			int[] scores, int[] orderedScores, String orderByType)
-		throws Exception {
-
-		ThreadLocalCache<Object[]> threadLocalCache =
-			ThreadLocalCacheManager.getThreadLocalCache(
-				Lifecycle.REQUEST, AssetEntryServiceImpl.class.getName());
-
-		threadLocalCache.removeAll();
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId());
-
-		Calendar displayDateCalendar = CalendarFactoryUtil.getCalendar(
-			2012, 1, 1);
-
-		for (int score : scores) {
-			BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
-				TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), displayDateCalendar.getTime(),
-				serviceContext);
-
-			for (int i = 0; i < score; i++) {
-				User user = UserTestUtil.addUser();
-
-				_users.add(user);
-
-				RatingsEntryLocalServiceUtil.updateEntry(
-					user.getUserId(), BlogsEntry.class.getName(),
-					blogsEntry.getEntryId(), 1, serviceContext);
-			}
-		}
-
-		threadLocalCache.removeAll();
-
-		AssetEntryQuery assetEntryQuery = buildAssetEntryQuery(
-			_group.getGroupId(), null, null, false, false);
-
-		assetEntryQuery.setOrderByCol1("ratingsTotalScore");
-		assetEntryQuery.setOrderByType1(orderByType);
-
-		List<AssetEntry> assetEntries = AssetEntryServiceUtil.getEntries(
-			assetEntryQuery);
-
-		for (int i = 0; i < assetEntries.size(); i++) {
-			AssetEntry assetEntry = assetEntries.get(i);
-
-			RatingsStats ratingsStats = RatingsStatsLocalServiceUtil.getStats(
-				assetEntry.getClassName(), assetEntry.getClassPK());
-
-			Assert.assertEquals(
-				ratingsStats.getTotalScore(), orderedScores[i], 0);
-		}
-	}
-
 	private long[] _assetCategoryIds1;
 	private long[] _assetCategoryIds2;
 	private long _assetVocabularyId;
@@ -1091,8 +961,5 @@ public class AssetEntryQueryTest {
 	private long _healthAssetCategoryId;
 	private long _sportAssetCategoryId;
 	private long _travelAssetCategoryId;
-
-	@DeleteAfterTestRun
-	private List<User> _users = new ArrayList<>();
 
 }

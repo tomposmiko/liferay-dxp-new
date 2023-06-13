@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.EmailAddress;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1559,9 +1560,15 @@ public class EmailAddressUtil {
 	}
 
 	public static EmailAddressPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(EmailAddressPersistence)PortalBeanLocatorUtil.locate(
+					EmailAddressPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile EmailAddressPersistence _persistence;
+	private static EmailAddressPersistence _persistence;
 
 }

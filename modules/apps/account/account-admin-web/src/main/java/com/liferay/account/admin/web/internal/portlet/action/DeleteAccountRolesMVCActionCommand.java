@@ -15,7 +15,7 @@
 package com.liferay.account.admin.web.internal.portlet.action;
 
 import com.liferay.account.constants.AccountPortletKeys;
-import com.liferay.account.service.AccountRoleService;
+import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_MANAGEMENT,
@@ -48,11 +49,11 @@ public class DeleteAccountRolesMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "accountRoleIds");
 
 		for (long accountRoleId : accountRoleIds) {
-			_accountRoleService.deleteAccountRole(accountRoleId);
+			_accountRoleLocalService.deleteAccountRole(accountRoleId);
 		}
 	}
 
 	@Reference
-	private AccountRoleService _accountRoleService;
+	private AccountRoleLocalService _accountRoleLocalService;
 
 }

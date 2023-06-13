@@ -28,6 +28,21 @@ public class BackgroundTaskExecutorRegistryUtil {
 			backgroundTaskExecutorClassName);
 	}
 
+	public static void registerBackgroundTaskExecutor(
+		String backgroundTaskExecutorClassName,
+		BackgroundTaskExecutor backgroundTaskExecutor) {
+
+		_backgroundTaskExecutorRegistry.registerBackgroundTaskExecutor(
+			backgroundTaskExecutorClassName, backgroundTaskExecutor);
+	}
+
+	public static void unregisterBackgroundTaskExecutor(
+		String backgroundTaskExecutorClassName) {
+
+		_backgroundTaskExecutorRegistry.unregisterBackgroundTaskExecutor(
+			backgroundTaskExecutorClassName);
+	}
+
 	private static volatile BackgroundTaskExecutorRegistry
 		_backgroundTaskExecutorRegistry =
 			ServiceProxyFactory.newServiceTrackedInstance(

@@ -28,8 +28,6 @@ public class WorkflowConstants {
 
 	public static final String CONTEXT_COMPANY_ID = "companyId";
 
-	public static final String CONTEXT_CT_COLLECTION_ID = "ctCollectionId";
-
 	public static final String CONTEXT_ENTRY_CLASS_NAME = "entryClassName";
 
 	public static final String CONTEXT_ENTRY_CLASS_PK = "entryClassPK";
@@ -82,8 +80,6 @@ public class WorkflowConstants {
 	public static final String LABEL_PENDING = "pending";
 
 	public static final String LABEL_SCHEDULED = "scheduled";
-
-	public static final String RESOURCE_NAME = "com.liferay.portal.workflow";
 
 	public static final String SERVICE_NAME = "com.liferay.portal.workflow";
 

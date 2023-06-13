@@ -14,8 +14,8 @@
 
 package com.liferay.fragment.web.internal.display.context;
 
-import com.liferay.fragment.constants.FragmentConstants;
-import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -25,13 +25,7 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
-import com.liferay.portal.kernel.upload.UploadRequest;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
-
-import java.io.File;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,29 +35,25 @@ import javax.servlet.http.HttpServletRequest;
 public class RenderFragmentEntryDisplayContext {
 
 	public RenderFragmentEntryDisplayContext(
-		HttpServletRequest httpServletRequest,
-		LiferayPortletRequest liferayPortletRequest) {
+		HttpServletRequest httpServletRequest) {
 
 		_httpServletRequest = httpServletRequest;
-		_liferayPortletRequest = liferayPortletRequest;
 
-		_fragmentCollectionContributorRegistry =
-			(FragmentCollectionContributorRegistry)
-				httpServletRequest.getAttribute(
+		_fragmentCollectionContributorTracker =
+			(FragmentCollectionContributorTracker)
+				_httpServletRequest.getAttribute(
 					FragmentWebKeys.FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER);
 	}
 
-	public DefaultFragmentRendererContext getDefaultFragmentRendererContext()
-		throws Exception {
-
+	public DefaultFragmentRendererContext getDefaultFragmentRendererContext() {
 		FragmentEntry fragmentEntry = _getFragmentEntry();
 
-		UploadRequest uploadRequest = _getUploadRequest();
-
-		String css = _readParameter(fragmentEntry, "css", uploadRequest);
-		String html = _readParameter(fragmentEntry, "html", uploadRequest);
-		String js = _readParameter(fragmentEntry, "js", uploadRequest);
-
+		String css = BeanParamUtil.getString(
+			fragmentEntry, _httpServletRequest, "css");
+		String html = BeanParamUtil.getString(
+			fragmentEntry, _httpServletRequest, "html");
+		String js = BeanParamUtil.getString(
+			fragmentEntry, _httpServletRequest, "js");
 		String configuration = BeanParamUtil.getString(
 			fragmentEntry, _httpServletRequest, "configuration");
 
@@ -83,26 +73,10 @@ public class RenderFragmentEntryDisplayContext {
 		fragmentEntryLink.setJs(js);
 		fragmentEntryLink.setConfiguration(configuration);
 
-		String rendererKey = null;
-
-		if ((fragmentEntry != null) && (fragmentEntryId == 0)) {
-			rendererKey = fragmentEntry.getFragmentEntryKey();
-		}
-
-		fragmentEntryLink.setRendererKey(rendererKey);
-
-		int type = FragmentConstants.TYPE_COMPONENT;
-
-		if (fragmentEntry != null) {
-			type = fragmentEntry.getType();
-		}
-
-		fragmentEntryLink.setType(type);
-
 		DefaultFragmentRendererContext defaultFragmentRendererContext =
 			new DefaultFragmentRendererContext(fragmentEntryLink);
 
-		defaultFragmentRendererContext.setUseCachedContent(false);
+		defaultFragmentRendererContext.setMode(FragmentEntryLinkConstants.VIEW);
 
 		return defaultFragmentRendererContext;
 	}
@@ -129,39 +103,15 @@ public class RenderFragmentEntryDisplayContext {
 
 		if (fragmentEntry == null) {
 			fragmentEntry =
-				_fragmentCollectionContributorRegistry.getFragmentEntry(
+				_fragmentCollectionContributorTracker.getFragmentEntry(
 					fragmentEntryKey);
 		}
 
 		return fragmentEntry;
 	}
 
-	private UploadRequest _getUploadRequest() {
-		if (_liferayPortletRequest != null) {
-			return PortalUtil.getUploadPortletRequest(_liferayPortletRequest);
-		}
-
-		return PortalUtil.getUploadServletRequest(_httpServletRequest);
-	}
-
-	private String _readParameter(
-			FragmentEntry fragmentEntry, String parameterName,
-			UploadRequest uploadRequest)
-		throws Exception {
-
-		File file = uploadRequest.getFile(parameterName);
-
-		if (file != null) {
-			return FileUtil.read(file);
-		}
-
-		return BeanParamUtil.getString(
-			fragmentEntry, _httpServletRequest, parameterName);
-	}
-
-	private final FragmentCollectionContributorRegistry
-		_fragmentCollectionContributorRegistry;
+	private final FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 	private final HttpServletRequest _httpServletRequest;
-	private final LiferayPortletRequest _liferayPortletRequest;
 
 }

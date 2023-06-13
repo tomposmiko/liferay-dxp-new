@@ -1219,11 +1219,13 @@ public class BlogsEntryServiceTest {
 
 	@Test
 	public void testOwnerCanDeleteEntry() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group, _groupUser.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_groupUser.getUserId(), "1", RandomTestUtil.randomString(),
-			new Date(),
-			ServiceContextTestUtil.getServiceContext(
-				_group, _groupUser.getUserId()));
+			new Date(), serviceContext);
 
 		PermissionChecker permissionChecker =
 			PermissionCheckerFactoryUtil.create(_groupUser);
@@ -1237,11 +1239,13 @@ public class BlogsEntryServiceTest {
 
 	@Test
 	public void testOwnerCanMoveEntryToTrash() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group, _groupUser.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_groupUser.getUserId(), "1", RandomTestUtil.randomString(),
-			new Date(),
-			ServiceContextTestUtil.getServiceContext(
-				_group, _groupUser.getUserId()));
+			new Date(), serviceContext);
 
 		PermissionChecker permissionChecker =
 			PermissionCheckerFactoryUtil.create(_groupUser);
@@ -1255,11 +1259,13 @@ public class BlogsEntryServiceTest {
 
 	@Test
 	public void testOwnerCanRestoreEntryFromTrash() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group, _groupUser.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_groupUser.getUserId(), "1", RandomTestUtil.randomString(),
-			new Date(),
-			ServiceContextTestUtil.getServiceContext(
-				_group, _groupUser.getUserId()));
+			new Date(), serviceContext);
 
 		BlogsEntryLocalServiceUtil.moveEntryToTrash(
 			_groupUser.getUserId(), entry);
@@ -1410,10 +1416,12 @@ public class BlogsEntryServiceTest {
 
 	@Test(expected = PrincipalException.MustHavePermission.class)
 	public void testUpdateEntryWithoutUpdatePermission1() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_user.getUserId(), "1", RandomTestUtil.randomString(), new Date(),
-			ServiceContextTestUtil.getServiceContext(
-				_group, _user.getUserId()));
+			serviceContext);
 
 		PermissionChecker permissionChecker =
 			PermissionCheckerFactoryUtil.create(_groupUser);
@@ -1421,22 +1429,26 @@ public class BlogsEntryServiceTest {
 		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
 				_groupUser, permissionChecker)) {
 
+			serviceContext = ServiceContextTestUtil.getServiceContext(
+				_group, _groupUser.getUserId());
+
 			BlogsEntryServiceUtil.updateEntry(
 				entry.getEntryId(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), 1, 1, 1990, 1, 1, true, false,
 				new String[0], RandomTestUtil.randomString(), null, null,
-				ServiceContextTestUtil.getServiceContext(
-					_group, _groupUser.getUserId()));
+				serviceContext);
 		}
 	}
 
 	@Test(expected = PrincipalException.MustHavePermission.class)
 	public void testUpdateEntryWithoutUpdatePermission2() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_user.getUserId(), "1", RandomTestUtil.randomString(), new Date(),
-			ServiceContextTestUtil.getServiceContext(
-				_group, _user.getUserId()));
+			serviceContext);
 
 		PermissionChecker permissionChecker =
 			PermissionCheckerFactoryUtil.create(_groupUser);
@@ -1444,23 +1456,26 @@ public class BlogsEntryServiceTest {
 		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
 				_groupUser, permissionChecker)) {
 
+			serviceContext = ServiceContextTestUtil.getServiceContext(
+				_group, _groupUser.getUserId());
+
 			BlogsEntryServiceUtil.updateEntry(
 				entry.getEntryId(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(), 1,
 				1, 1990, 1, 1, true, false, new String[0],
-				RandomTestUtil.randomString(), null, null,
-				ServiceContextTestUtil.getServiceContext(
-					_group, _groupUser.getUserId()));
+				RandomTestUtil.randomString(), null, null, serviceContext);
 		}
 	}
 
 	@Test
 	public void testUpdateEntryWithUpdatePermission1() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_user.getUserId(), "1", RandomTestUtil.randomString(), new Date(),
-			ServiceContextTestUtil.getServiceContext(
-				_group, _user.getUserId()));
+			serviceContext);
 
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(
 			_company.getCompanyId(), RoleConstants.SITE_MEMBER);
@@ -1475,23 +1490,27 @@ public class BlogsEntryServiceTest {
 
 		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
 				_groupUser, permissionChecker)) {
+
+			serviceContext = ServiceContextTestUtil.getServiceContext(
+				_group, _groupUser.getUserId());
 
 			BlogsEntryServiceUtil.updateEntry(
 				entry.getEntryId(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), 1, 1, 1990, 1, 1, true, false,
 				new String[0], RandomTestUtil.randomString(), null, null,
-				ServiceContextTestUtil.getServiceContext(
-					_group, _groupUser.getUserId()));
+				serviceContext);
 		}
 	}
 
 	@Test
 	public void testUpdateEntryWithUpdatePermission2() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group, _user.getUserId());
+
 		BlogsEntry entry = BlogsEntryLocalServiceUtil.addEntry(
 			_user.getUserId(), "1", RandomTestUtil.randomString(), new Date(),
-			ServiceContextTestUtil.getServiceContext(
-				_group, _user.getUserId()));
+			serviceContext);
 
 		Role siteMemberRole = RoleLocalServiceUtil.getRole(
 			_company.getCompanyId(), RoleConstants.SITE_MEMBER);
@@ -1507,14 +1526,15 @@ public class BlogsEntryServiceTest {
 		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
 				_groupUser, permissionChecker)) {
 
+			serviceContext = ServiceContextTestUtil.getServiceContext(
+				_group, _groupUser.getUserId());
+
 			BlogsEntryServiceUtil.updateEntry(
 				entry.getEntryId(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(), 1,
 				1, 1990, 1, 1, true, false, new String[0],
-				RandomTestUtil.randomString(), null, null,
-				ServiceContextTestUtil.getServiceContext(
-					_group, _groupUser.getUserId()));
+				RandomTestUtil.randomString(), null, null, serviceContext);
 		}
 	}
 

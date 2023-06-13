@@ -16,6 +16,7 @@ package com.liferay.portlet.asset.model.impl;
 
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetTagModel;
+import com.liferay.asset.kernel.model.AssetTagSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -36,15 +37,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -158,6 +162,60 @@ public class AssetTagModelImpl
 	@Deprecated
 	public static final long UUID_COLUMN_BITMASK = 8L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AssetTag toModel(AssetTagSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		AssetTag model = new AssetTagImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setUuid(soapModel.getUuid());
+		model.setTagId(soapModel.getTagId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setName(soapModel.getName());
+		model.setAssetCount(soapModel.getAssetCount());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AssetTag> toModels(AssetTagSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AssetTag> models = new ArrayList<AssetTag>(soapModels.length);
+
+		for (AssetTagSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final String MAPPING_TABLE_ASSETENTRIES_ASSETTAGS_NAME =
 		"AssetEntries_AssetTags";
 
@@ -256,96 +314,105 @@ public class AssetTagModelImpl
 	public Map<String, Function<AssetTag, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AssetTag, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AssetTag>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AssetTag, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetTag.class.getClassLoader(), AssetTag.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AssetTag, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<AssetTag, Object>>();
+		try {
+			Constructor<AssetTag> constructor =
+				(Constructor<AssetTag>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AssetTag::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", AssetTag::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", AssetTag::getUuid);
-			attributeGetterFunctions.put("tagId", AssetTag::getTagId);
-			attributeGetterFunctions.put("groupId", AssetTag::getGroupId);
-			attributeGetterFunctions.put("companyId", AssetTag::getCompanyId);
-			attributeGetterFunctions.put("userId", AssetTag::getUserId);
-			attributeGetterFunctions.put("userName", AssetTag::getUserName);
-			attributeGetterFunctions.put("createDate", AssetTag::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", AssetTag::getModifiedDate);
-			attributeGetterFunctions.put("name", AssetTag::getName);
-			attributeGetterFunctions.put("assetCount", AssetTag::getAssetCount);
-			attributeGetterFunctions.put(
-				"lastPublishDate", AssetTag::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AssetTag, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AssetTag, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AssetTag, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AssetTag, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetTag, Object>>();
+		Map<String, BiConsumer<AssetTag, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AssetTag, ?>>();
 
-		static {
-			Map<String, BiConsumer<AssetTag, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<AssetTag, ?>>();
+		attributeGetterFunctions.put("mvccVersion", AssetTag::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AssetTag, Long>)AssetTag::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetTag::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<AssetTag, Long>)AssetTag::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", AssetTag::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<AssetTag, String>)AssetTag::setUuid);
+		attributeGetterFunctions.put("tagId", AssetTag::getTagId);
+		attributeSetterBiConsumers.put(
+			"tagId", (BiConsumer<AssetTag, Long>)AssetTag::setTagId);
+		attributeGetterFunctions.put("groupId", AssetTag::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId", (BiConsumer<AssetTag, Long>)AssetTag::setGroupId);
+		attributeGetterFunctions.put("companyId", AssetTag::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<AssetTag, Long>)AssetTag::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetTag::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<AssetTag, Long>)AssetTag::setUserId);
+		attributeGetterFunctions.put("userName", AssetTag::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<AssetTag, String>)AssetTag::setUserName);
+		attributeGetterFunctions.put("createDate", AssetTag::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate", (BiConsumer<AssetTag, Date>)AssetTag::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", AssetTag::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<AssetTag, Date>)AssetTag::setModifiedDate);
+		attributeGetterFunctions.put("name", AssetTag::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<AssetTag, String>)AssetTag::setName);
+		attributeGetterFunctions.put("assetCount", AssetTag::getAssetCount);
+		attributeSetterBiConsumers.put(
+			"assetCount",
+			(BiConsumer<AssetTag, Integer>)AssetTag::setAssetCount);
+		attributeGetterFunctions.put(
+			"lastPublishDate", AssetTag::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<AssetTag, Date>)AssetTag::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AssetTag, Long>)AssetTag::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<AssetTag, Long>)AssetTag::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<AssetTag, String>)AssetTag::setUuid);
-			attributeSetterBiConsumers.put(
-				"tagId", (BiConsumer<AssetTag, Long>)AssetTag::setTagId);
-			attributeSetterBiConsumers.put(
-				"groupId", (BiConsumer<AssetTag, Long>)AssetTag::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AssetTag, Long>)AssetTag::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<AssetTag, Long>)AssetTag::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<AssetTag, String>)AssetTag::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<AssetTag, Date>)AssetTag::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<AssetTag, Date>)AssetTag::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"name", (BiConsumer<AssetTag, String>)AssetTag::setName);
-			attributeSetterBiConsumers.put(
-				"assetCount",
-				(BiConsumer<AssetTag, Integer>)AssetTag::setAssetCount);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<AssetTag, Date>)AssetTag::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -915,12 +982,41 @@ public class AssetTagModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AssetTag, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AssetTag, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AssetTag, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((AssetTag)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetTag>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetTag.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -942,9 +1038,8 @@ public class AssetTagModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<AssetTag, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<AssetTag, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

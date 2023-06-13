@@ -15,14 +15,13 @@
 import {config} from '../config/index';
 import serviceFetch from './serviceFetch';
 
-function getExperienceData({body, dispatch}) {
-	const {loadFragmentEntryLinks, segmentsExperienceId} = body;
+function getExperienceUsedPortletIds({body, dispatch}) {
+	const {segmentsExperienceId} = body;
 
 	return serviceFetch(
-		config.getExperienceDataURL,
+		config.getExperienceUsedPortletsURL,
 		{
 			body: {
-				loadFragmentEntryLinks,
 				segmentsExperienceId,
 			},
 		},
@@ -99,10 +98,10 @@ export default {
 	},
 
 	selectExperience({body, dispatch}) {
-		const {loadFragmentEntryLinks, segmentsExperienceId} = body;
+		const {segmentsExperienceId} = body;
 
-		return getExperienceData({
-			body: {loadFragmentEntryLinks, segmentsExperienceId},
+		return getExperienceUsedPortletIds({
+			body: {segmentsExperienceId},
 			dispatch,
 		});
 	},

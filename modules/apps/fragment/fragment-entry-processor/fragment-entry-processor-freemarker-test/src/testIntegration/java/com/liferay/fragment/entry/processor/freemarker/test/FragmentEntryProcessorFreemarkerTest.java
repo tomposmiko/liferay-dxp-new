@@ -19,7 +19,6 @@ import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
@@ -31,7 +30,6 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
@@ -41,6 +39,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -75,8 +74,6 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.hamcrest.CoreMatchers;
 
@@ -114,7 +111,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 
-		_layout = LayoutTestUtil.addTypePortletLayout(_group);
+		_layout = LayoutTestUtil.addLayout(_group);
 	}
 
 	@Test
@@ -150,9 +147,8 @@ public class FragmentEntryProcessorFreemarkerTest {
 					"fragment-entry", "Fragment Entry", null,
 					_readFileToString(
 						"fragment_entry_with_invalid_freemarker_variable.html"),
-					null, false, null, null, 0,
-					FragmentConstants.TYPE_COMPONENT, null,
-					WorkflowConstants.STATUS_DRAFT, serviceContext);
+					null, null, 0, 0, WorkflowConstants.STATUS_DRAFT,
+					serviceContext);
 
 			ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
@@ -373,23 +369,27 @@ public class FragmentEntryProcessorFreemarkerTest {
 	public void testProcessFragmentEntryLinkHTMLWithConfigurationItemSelectorJournalArticle()
 		throws Exception {
 
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			LocaleUtil.SPAIN, "t1-es"
+		).put(
+			LocaleUtil.US, "t1"
+		).build();
+
+		Map<Locale, String> contentMap = HashMapBuilder.put(
+			LocaleUtil.SPAIN, "c1-es"
+		).put(
+			LocaleUtil.US, "c1"
+		).build();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		JournalArticle journalArticle = JournalTestUtil.addArticle(
 			_group.getGroupId(), 0,
-			PortalUtil.getClassNameId(JournalArticle.class),
-			HashMapBuilder.put(
-				LocaleUtil.SPAIN, "t1-es"
-			).put(
-				LocaleUtil.US, "t1"
-			).build(),
-			null,
-			HashMapBuilder.put(
-				LocaleUtil.SPAIN, "c1-es"
-			).put(
-				LocaleUtil.US, "c1"
-			).build(),
-			LocaleUtil.getSiteDefault(), false, true,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			PortalUtil.getClassNameId(JournalArticle.class), titleMap, null,
+			contentMap, LocaleUtil.getSiteDefault(), false, true,
+			serviceContext);
 
 		FragmentEntry fragmentEntry = _addFragmentEntry(
 			"fragment_entry_with_configuration_itemselector_journal_article." +
@@ -422,9 +422,6 @@ public class FragmentEntryProcessorFreemarkerTest {
 		String actualProcessedHTML = _getProcessedHTML(
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
-
-		journalArticle = _journalArticleLocalService.getArticle(
-			journalArticle.getId());
 
 		String expectedProcessedHTML = _getProcessedHTML(
 			_readFileToString(
@@ -521,7 +518,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 			defaultFragmentEntryProcessorContext =
 				new DefaultFragmentEntryProcessorContext(
 					_getMockHttpServletRequest(), new MockHttpServletResponse(),
-					null, LocaleUtil.getDefault());
+					null, null);
 
 		expectedException.expect(FragmentEntryContentException.class);
 		expectedException.expectMessage("FreeMarker syntax is invalid");
@@ -569,8 +566,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		return _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), fragmentCollection.getFragmentCollectionId(),
 			"fragment-entry", "Fragment Entry", null,
-			_readFileToString(htmlFile), null, false, configuration, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
+			_readFileToString(htmlFile), null, configuration, 0, 0,
 			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
@@ -581,7 +577,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 			new MockHttpServletRequest();
 
 		mockHttpServletRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _getThemeDisplay(mockHttpServletRequest));
+			WebKeys.THEME_DISPLAY, _getThemeDisplay());
 
 		return mockHttpServletRequest;
 	}
@@ -607,9 +603,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		return processedHTML;
 	}
 
-	private ThemeDisplay _getThemeDisplay(HttpServletRequest httpServletRequest)
-		throws Exception {
-
+	private ThemeDisplay _getThemeDisplay() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		themeDisplay.setCompany(_company);
@@ -618,13 +612,12 @@ public class FragmentEntryProcessorFreemarkerTest {
 		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
 			_group.getGroupId(), false);
 
-		themeDisplay.setLookAndFeel(
-			_themeLocalService.getTheme(
-				_company.getCompanyId(), layoutSet.getThemeId()),
-			null);
+		Theme theme = _themeLocalService.getTheme(
+			_company.getCompanyId(), layoutSet.getThemeId());
+
+		themeDisplay.setLookAndFeel(theme, null);
 
 		themeDisplay.setRealUser(TestPropsValues.getUser());
-		themeDisplay.setRequest(httpServletRequest);
 		themeDisplay.setUser(TestPropsValues.getUser());
 
 		return themeDisplay;
@@ -719,9 +712,6 @@ public class FragmentEntryProcessorFreemarkerTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
-
-	@Inject
-	private JournalArticleLocalService _journalArticleLocalService;
 
 	@DeleteAfterTestRun
 	private Layout _layout;

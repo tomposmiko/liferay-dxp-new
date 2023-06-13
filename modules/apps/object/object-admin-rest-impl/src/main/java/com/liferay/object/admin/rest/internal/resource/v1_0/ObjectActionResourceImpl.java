@@ -14,23 +14,22 @@
 
 package com.liferay.object.admin.rest.internal.resource.v1_0;
 
-import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectAction;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
-import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectActionResource;
 import com.liferay.object.service.ObjectActionService;
-import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
+
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -58,22 +57,6 @@ public class ObjectActionResourceImpl
 			_objectActionService.getObjectAction(objectActionId));
 	}
 
-	@Override
-	public Page<ObjectAction>
-			getObjectDefinitionByExternalReferenceCodeObjectActionsPage(
-				String externalReferenceCode, String search,
-				Pagination pagination)
-		throws Exception {
-
-		com.liferay.object.model.ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				getObjectDefinitionByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId());
-
-		return getObjectDefinitionObjectActionsPage(
-			objectDefinition.getObjectDefinitionId(), search, pagination);
-	}
-
 	@NestedField(parentClass = ObjectDefinition.class, value = "objectActions")
 	@Override
 	public Page<ObjectAction> getObjectDefinitionObjectActionsPage(
@@ -88,29 +71,11 @@ public class ObjectActionResourceImpl
 					com.liferay.object.model.ObjectDefinition.class.getName(),
 					objectDefinitionId)
 			).put(
-				"createBatch",
-				addAction(
-					ActionKeys.UPDATE, "postObjectDefinitionObjectActionBatch",
-					com.liferay.object.model.ObjectDefinition.class.getName(),
-					objectDefinitionId)
-			).put(
-				"deleteBatch",
-				addAction(
-					ActionKeys.DELETE, "deleteObjectActionBatch",
-					com.liferay.object.model.ObjectDefinition.class.getName(),
-					null)
-			).put(
 				"get",
 				addAction(
 					ActionKeys.VIEW, "getObjectDefinitionObjectActionsPage",
 					com.liferay.object.model.ObjectDefinition.class.getName(),
 					objectDefinitionId)
-			).put(
-				"updateBatch",
-				addAction(
-					ActionKeys.UPDATE, "putObjectActionBatch",
-					com.liferay.object.model.ObjectDefinition.class.getName(),
-					null)
 			).build(),
 			booleanQuery -> {
 			},
@@ -120,7 +85,6 @@ public class ObjectActionResourceImpl
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
 				searchContext.setAttribute(Field.NAME, search);
-				searchContext.setAttribute("label", search);
 				searchContext.setAttribute(
 					"objectDefinitionId", objectDefinitionId);
 				searchContext.setCompanyId(contextCompany.getCompanyId());
@@ -132,37 +96,18 @@ public class ObjectActionResourceImpl
 	}
 
 	@Override
-	public ObjectAction postObjectDefinitionByExternalReferenceCodeObjectAction(
-			String externalReferenceCode, ObjectAction objectAction)
-		throws Exception {
-
-		com.liferay.object.model.ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				getObjectDefinitionByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId());
-
-		return postObjectDefinitionObjectAction(
-			objectDefinition.getObjectDefinitionId(), objectAction);
-	}
-
-	@Override
 	public ObjectAction postObjectDefinitionObjectAction(
 			Long objectDefinitionId, ObjectAction objectAction)
 		throws Exception {
 
 		return _toObjectAction(
 			_objectActionService.addObjectAction(
-				objectAction.getExternalReferenceCode(), objectDefinitionId,
-				objectAction.getActive(), objectAction.getConditionExpression(),
-				objectAction.getDescription(),
-				LocalizedMapUtil.getLocalizedMap(
-					objectAction.getErrorMessage()),
-				LocalizedMapUtil.getLocalizedMap(objectAction.getLabel()),
+				objectDefinitionId, objectAction.getActive(),
 				objectAction.getName(),
 				objectAction.getObjectActionExecutorKey(),
 				objectAction.getObjectActionTriggerKey(),
-				ObjectActionUtil.toParametersUnicodeProperties(
-					objectAction.getParameters())));
+				new UnicodeProperties(
+					(Map<String, String>)objectAction.getParameters(), true)));
 	}
 
 	@Override
@@ -172,58 +117,51 @@ public class ObjectActionResourceImpl
 
 		return _toObjectAction(
 			_objectActionService.updateObjectAction(
-				objectAction.getExternalReferenceCode(), objectActionId,
-				objectAction.getActive(), objectAction.getConditionExpression(),
-				objectAction.getDescription(),
-				LocalizedMapUtil.getLocalizedMap(
-					objectAction.getErrorMessage()),
-				LocalizedMapUtil.getLocalizedMap(objectAction.getLabel()),
+				objectActionId, objectAction.getActive(),
 				objectAction.getName(),
-				objectAction.getObjectActionExecutorKey(),
-				objectAction.getObjectActionTriggerKey(),
-				ObjectActionUtil.toParametersUnicodeProperties(
-					objectAction.getParameters())));
+				new UnicodeProperties(
+					(Map<String, String>)objectAction.getParameters(), true)));
 	}
 
 	private ObjectAction _toObjectAction(
 		com.liferay.object.model.ObjectAction objectAction) {
 
-		if (objectAction == null) {
-			return null;
-		}
-
 		String permissionName =
 			com.liferay.object.model.ObjectDefinition.class.getName();
 
-		return ObjectActionUtil.toObjectAction(
-			HashMapBuilder.put(
-				"delete",
-				addAction(
-					ActionKeys.DELETE, "deleteObjectAction", permissionName,
-					objectAction.getObjectDefinitionId())
-			).put(
-				"get",
-				addAction(
-					ActionKeys.VIEW, "getObjectAction", permissionName,
-					objectAction.getObjectDefinitionId())
-			).put(
-				"update",
-				addAction(
-					ActionKeys.UPDATE, "putObjectAction", permissionName,
-					objectAction.getObjectDefinitionId())
-			).build(),
-			contextAcceptLanguage.getPreferredLocale(),
-			_notificationTemplateLocalService, _objectDefinitionLocalService,
-			objectAction);
+		return new ObjectAction() {
+			{
+				actions = HashMapBuilder.put(
+					"delete",
+					addAction(
+						ActionKeys.DELETE, "deleteObjectAction", permissionName,
+						objectAction.getObjectDefinitionId())
+				).put(
+					"get",
+					addAction(
+						ActionKeys.VIEW, "getObjectAction", permissionName,
+						objectAction.getObjectDefinitionId())
+				).put(
+					"update",
+					addAction(
+						ActionKeys.UPDATE, "putObjectAction", permissionName,
+						objectAction.getObjectDefinitionId())
+				).build();
+				active = objectAction.isActive();
+				dateCreated = objectAction.getCreateDate();
+				dateModified = objectAction.getModifiedDate();
+				id = objectAction.getObjectActionId();
+				name = objectAction.getName();
+				objectActionExecutorKey =
+					objectAction.getObjectActionExecutorKey();
+				objectActionTriggerKey =
+					objectAction.getObjectActionTriggerKey();
+				parameters = objectAction.getParametersUnicodeProperties();
+			}
+		};
 	}
 
 	@Reference
-	private NotificationTemplateLocalService _notificationTemplateLocalService;
-
-	@Reference
 	private ObjectActionService _objectActionService;
-
-	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 }

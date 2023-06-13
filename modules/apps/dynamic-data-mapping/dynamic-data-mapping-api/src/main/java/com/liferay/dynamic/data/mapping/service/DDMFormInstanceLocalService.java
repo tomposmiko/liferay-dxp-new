@@ -124,7 +124,7 @@ public interface DDMFormInstanceLocalService
 
 	public DDMFormInstance copyFormInstance(
 			long userId, long groupId, Map<Locale, String> nameMap,
-			DDMFormInstance sourceDDMFormInstance,
+			DDMFormInstance ddmFormInstance,
 			DDMFormValues settingsDDMFormValues, ServiceContext serviceContext)
 		throws PortalException;
 

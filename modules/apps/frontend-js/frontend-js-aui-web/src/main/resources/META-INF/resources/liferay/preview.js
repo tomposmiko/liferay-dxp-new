@@ -22,55 +22,55 @@
 AUI.add(
 	'liferay-preview',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const ATTR_DATA_IMAGE_INDEX = 'data-imageIndex';
+		var ATTR_DATA_IMAGE_INDEX = 'data-imageIndex';
 
-		const BUFFER = [];
+		var BUFFER = [];
 
-		const CSS_IMAGE_SELECTED = 'lfr-preview-file-image-selected';
+		var CSS_IMAGE_SELECTED = 'lfr-preview-file-image-selected';
 
-		const MAP_IMAGE_DATA = {};
+		var MAP_IMAGE_DATA = {};
 
-		const STR_CLICK = 'click';
+		var STR_CLICK = 'click';
 
-		const STR_CURRENT_INDEX = 'currentIndex';
+		var STR_CURRENT_INDEX = 'currentIndex';
 
-		const STR_MAX_INDEX = 'maxIndex';
+		var STR_MAX_INDEX = 'maxIndex';
 
-		const STR_SCROLLER = 'scroller';
+		var STR_SCROLLER = 'scroller';
 
-		const STR_SRC = 'src';
+		var STR_SRC = 'src';
 
-		const TPL_IMAGES =
+		var TPL_IMAGES =
 			'<a class="lfr-preview-file-image {selectedCssClass}" data-imageIndex="{index}" href="{url}" title="{displayedIndex}">' +
 			'<img src="{url}" />' +
 			'</a>';
 
-		const TPL_LOADING_COUNT =
+		var TPL_LOADING_COUNT =
 			'<span class="lfr-preview-file-loading-count"></span>';
 
-		const TPL_LOADING_INDICATOR =
+		var TPL_LOADING_INDICATOR =
 			'<div class="lfr-preview-file-loading-indicator hide">{0}&nbsp;</div>';
 
-		const TPL_MAX_ARROW_LEFT =
-			'<a href="javascript:void(0);" class="image-viewer-control carousel-control carousel-control-prev left lfr-preview-file-arrow">' +
+		var TPL_MAX_ARROW_LEFT =
+			'<a href="javascript:;" class="image-viewer-control carousel-control carousel-control-prev left lfr-preview-file-arrow">' +
 			Liferay.Util.getLexiconIconTpl('angle-left') +
 			'</a>';
 
-		const TPL_MAX_ARROW_RIGHT =
-			'<a href="javascript:void(0);" class="image-viewer-control carousel-control carousel-control-next right lfr-preview-file-arrow">' +
+		var TPL_MAX_ARROW_RIGHT =
+			'<a href="javascript:;" class="image-viewer-control carousel-control carousel-control-next right lfr-preview-file-arrow">' +
 			Liferay.Util.getLexiconIconTpl('angle-right') +
 			'</a>';
 
-		const TPL_MAX_CONTROLS =
+		var TPL_MAX_CONTROLS =
 			'<span class="lfr-preview-file-image-overlay-controls"></span>';
 
-		const MAP_EVENT_SCROLLER = {
+		var MAP_EVENT_SCROLLER = {
 			src: STR_SCROLLER,
 		};
 
-		const Preview = A.Component.create({
+		var Preview = A.Component.create({
 			ATTRS: {
 				actionContent: {
 					setter: A.one,
@@ -107,7 +107,7 @@ AUI.add(
 
 			prototype: {
 				_afterCurrentIndexChange(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._uiSetCurrentIndex(
 						event.newVal,
@@ -117,9 +117,9 @@ AUI.add(
 				},
 
 				_getLoadingCountNode() {
-					const instance = this;
+					var instance = this;
 
-					let loadingCountNode = instance._loadingCountNode;
+					var loadingCountNode = instance._loadingCountNode;
 
 					if (!loadingCountNode) {
 						loadingCountNode = A.Node.create(TPL_LOADING_COUNT);
@@ -131,9 +131,9 @@ AUI.add(
 				},
 
 				_getLoadingIndicator() {
-					const instance = this;
+					var instance = this;
 
-					let loadingIndicator = instance._loadingIndicator;
+					var loadingIndicator = instance._loadingIndicator;
 
 					if (!loadingIndicator) {
 						loadingIndicator = A.Node.create(
@@ -157,13 +157,13 @@ AUI.add(
 				},
 
 				_getMaxOverlay() {
-					const instance = this;
+					var instance = this;
 
-					let maxOverlay = instance._maxOverlay;
+					var maxOverlay = instance._maxOverlay;
 
 					if (!maxOverlay) {
-						const maxOverlayMask = instance._getMaxOverlayMask();
-						// eslint-disable-next-line @liferay/aui/no-modal
+						var maxOverlayMask = instance._getMaxOverlayMask();
+
 						maxOverlay = new A.Modal({
 							after: {
 								render() {
@@ -195,9 +195,9 @@ AUI.add(
 				},
 
 				_getMaxOverlayMask() {
-					const instance = this;
+					var instance = this;
 
-					let maxOverlayMask = instance._maxOverlayMask;
+					var maxOverlayMask = instance._maxOverlayMask;
 
 					if (!maxOverlayMask) {
 						maxOverlayMask = new A.OverlayMask({
@@ -211,13 +211,13 @@ AUI.add(
 				},
 
 				_getMaxPreviewControls() {
-					const instance = this;
+					var instance = this;
 
-					let maxPreviewControls = instance._maxPreviewControls;
+					var maxPreviewControls = instance._maxPreviewControls;
 
 					if (!maxPreviewControls) {
-						const arrowLeft = A.Node.create(TPL_MAX_ARROW_LEFT);
-						const arrowRight = A.Node.create(TPL_MAX_ARROW_RIGHT);
+						var arrowLeft = A.Node.create(TPL_MAX_ARROW_LEFT);
+						var arrowRight = A.Node.create(TPL_MAX_ARROW_RIGHT);
 
 						maxPreviewControls = A.Node.create(TPL_MAX_CONTROLS);
 
@@ -238,16 +238,16 @@ AUI.add(
 				},
 
 				_getMaxPreviewImage() {
-					const instance = this;
+					var instance = this;
 
-					let maxPreviewImage = instance._maxPreviewImage;
+					var maxPreviewImage = instance._maxPreviewImage;
 
 					if (!maxPreviewImage) {
 						maxPreviewImage = instance._currentPreviewImage
 							.clone()
 							.removeClass('lfr-preview-file-image-current');
 
-						const id = maxPreviewImage.get('id');
+						var id = maxPreviewImage.get('id');
 
 						maxPreviewImage.set('id', id + 'Preview');
 
@@ -258,7 +258,7 @@ AUI.add(
 				},
 
 				_maximizePreview() {
-					const instance = this;
+					var instance = this;
 
 					instance
 						._getMaxPreviewImage()
@@ -272,13 +272,13 @@ AUI.add(
 				},
 
 				_onImageListClick(event) {
-					const instance = this;
+					var instance = this;
 
 					event.preventDefault();
 
-					const previewImage = event.currentTarget;
+					var previewImage = event.currentTarget;
 
-					const imageIndex = previewImage.attr(ATTR_DATA_IMAGE_INDEX);
+					var imageIndex = previewImage.attr(ATTR_DATA_IMAGE_INDEX);
 
 					instance.set(STR_CURRENT_INDEX, imageIndex, {
 						src: 'scroller',
@@ -286,13 +286,13 @@ AUI.add(
 				},
 
 				_onImageListMouseEnter(event) {
-					const instance = this;
+					var instance = this;
 
 					event.preventDefault();
 
-					const previewImage = event.currentTarget;
+					var previewImage = event.currentTarget;
 
-					const imageIndex = previewImage.attr(ATTR_DATA_IMAGE_INDEX);
+					var imageIndex = previewImage.attr(ATTR_DATA_IMAGE_INDEX);
 
 					instance.set(
 						STR_CURRENT_INDEX,
@@ -302,27 +302,27 @@ AUI.add(
 				},
 
 				_onImageListScroll() {
-					const instance = this;
+					var instance = this;
 
-					const imageListContentEl = instance._imageListContent.getDOM();
+					var imageListContentEl = instance._imageListContent.getDOM();
 
-					const maxIndex = instance.get(STR_MAX_INDEX);
+					var maxIndex = instance.get(STR_MAX_INDEX);
 
-					const previewFileCountDown = instance._previewFileCountDown;
+					var previewFileCountDown = instance._previewFileCountDown;
 
 					if (
 						previewFileCountDown < maxIndex &&
 						imageListContentEl.scrollTop >=
 							imageListContentEl.scrollHeight - 700
 					) {
-						const loadingIndicator = instance._getLoadingIndicator();
+						var loadingIndicator = instance._getLoadingIndicator();
 
 						if (loadingIndicator.hasClass('hide')) {
-							const end = Math.min(
+							var end = Math.min(
 								maxIndex,
 								previewFileCountDown + 10
 							);
-							const start = Math.max(0, previewFileCountDown + 1);
+							var start = Math.max(0, previewFileCountDown + 1);
 
 							instance
 								._getLoadingCountNode()
@@ -338,9 +338,9 @@ AUI.add(
 				},
 
 				_onMaxPreviewControlsClick(event) {
-					const instance = this;
+					var instance = this;
 
-					const target = event.currentTarget;
+					var target = event.currentTarget;
 
 					instance._getMaxOverlay();
 
@@ -365,17 +365,17 @@ AUI.add(
 				_previewFileCountDown: 0,
 
 				_renderImages(maxIndex) {
-					const instance = this;
+					var instance = this;
 
-					let i = 0;
-					let previewFileCountDown = instance._previewFileCountDown;
-					let displayedIndex;
+					var i = 0;
+					var previewFileCountDown = instance._previewFileCountDown;
+					var displayedIndex;
 
-					const currentIndex = instance.get(STR_CURRENT_INDEX);
+					var currentIndex = instance.get(STR_CURRENT_INDEX);
 
 					maxIndex = maxIndex || instance.get(STR_MAX_INDEX);
 
-					const baseImageURL = instance._baseImageURL;
+					var baseImageURL = instance._baseImageURL;
 
 					while (
 						instance._previewFileCountDown < maxIndex &&
@@ -385,7 +385,7 @@ AUI.add(
 
 						MAP_IMAGE_DATA.displayedIndex = displayedIndex;
 						MAP_IMAGE_DATA.selectedCssClass =
-							previewFileCountDown === currentIndex
+							previewFileCountDown == currentIndex
 								? CSS_IMAGE_SELECTED
 								: '';
 						MAP_IMAGE_DATA.index = previewFileCountDown;
@@ -400,7 +400,7 @@ AUI.add(
 					}
 
 					if (BUFFER.length) {
-						const nodeList = A.NodeList.create(BUFFER.join(''));
+						var nodeList = A.NodeList.create(BUFFER.join(''));
 
 						if (!instance._nodeList) {
 							instance._nodeList = nodeList;
@@ -420,7 +420,7 @@ AUI.add(
 				},
 
 				_renderToolbar() {
-					const instance = this;
+					var instance = this;
 
 					instance._toolbar = new A.Toolbar({
 						boundingBox: instance.get('toolbar'),
@@ -461,7 +461,7 @@ AUI.add(
 				},
 
 				_setCurrentIndex(value) {
-					const instance = this;
+					var instance = this;
 
 					value = parseInt(value, 10);
 
@@ -479,9 +479,9 @@ AUI.add(
 				},
 
 				_uiSetCurrentIndex(value, src, prevVal) {
-					const instance = this;
+					var instance = this;
 
-					const displayedIndex = value + 1;
+					var displayedIndex = value + 1;
 
 					instance._currentPreviewImage.attr(
 						STR_SRC,
@@ -489,16 +489,16 @@ AUI.add(
 					);
 					instance._previewFileIndexNode.setContent(displayedIndex);
 
-					const nodeList = instance._nodeList;
+					var nodeList = instance._nodeList;
 
-					const prevItem = nodeList.item(prevVal || 0);
+					var prevItem = nodeList.item(prevVal || 0);
 
 					if (prevItem) {
 						prevItem.removeClass(CSS_IMAGE_SELECTED);
 					}
 
-					if (src !== STR_SCROLLER) {
-						const newItem = nodeList.item(value);
+					if (src != STR_SCROLLER) {
+						var newItem = nodeList.item(value);
 
 						if (newItem) {
 							instance._imageListContent.set(
@@ -512,9 +512,9 @@ AUI.add(
 				},
 
 				_updateIndex(increment) {
-					const instance = this;
+					var instance = this;
 
-					let currentIndex = instance.get(STR_CURRENT_INDEX);
+					var currentIndex = instance.get(STR_CURRENT_INDEX);
 
 					currentIndex += increment;
 
@@ -522,14 +522,14 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance.after(
 						'currentIndexChange',
 						instance._afterCurrentIndexChange
 					);
 
-					const imageListContent = instance._imageListContent;
+					var imageListContent = instance._imageListContent;
 
 					imageListContent.delegate(
 						'mouseenter',
@@ -552,7 +552,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._actionContent = instance.get('actionContent');
 					instance._baseImageURL = instance.get('baseImageURL');
@@ -572,7 +572,7 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._renderToolbar();
 					instance._renderImages();

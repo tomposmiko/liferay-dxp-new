@@ -55,28 +55,14 @@ public class MeasurementUnitSerDes {
 
 		sb.append("{");
 
-		if (measurementUnit.getCompanyId() != null) {
+		if (measurementUnit.getGroupId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"companyId\": ");
+			sb.append("\"groupId\": ");
 
-			sb.append(measurementUnit.getCompanyId());
-		}
-
-		if (measurementUnit.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(measurementUnit.getExternalReferenceCode()));
-
-			sb.append("\"");
+			sb.append(measurementUnit.getGroupId());
 		}
 
 		if (measurementUnit.getId() != null) {
@@ -150,11 +136,7 @@ public class MeasurementUnitSerDes {
 
 			sb.append("\"type\": ");
 
-			sb.append("\"");
-
-			sb.append(_escape(measurementUnit.getType()));
-
-			sb.append("\"");
+			sb.append(measurementUnit.getType());
 		}
 
 		sb.append("}");
@@ -176,21 +158,11 @@ public class MeasurementUnitSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (measurementUnit.getCompanyId() == null) {
-			map.put("companyId", null);
+		if (measurementUnit.getGroupId() == null) {
+			map.put("groupId", null);
 		}
 		else {
-			map.put(
-				"companyId", String.valueOf(measurementUnit.getCompanyId()));
-		}
-
-		if (measurementUnit.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(measurementUnit.getExternalReferenceCode()));
+			map.put("groupId", String.valueOf(measurementUnit.getGroupId()));
 		}
 
 		if (measurementUnit.getId() == null) {
@@ -263,18 +235,10 @@ public class MeasurementUnitSerDes {
 			MeasurementUnit measurementUnit, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "companyId")) {
+			if (Objects.equals(jsonParserFieldName, "groupId")) {
 				if (jsonParserFieldValue != null) {
-					measurementUnit.setCompanyId(
+					measurementUnit.setGroupId(
 						Long.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					measurementUnit.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -314,7 +278,8 @@ public class MeasurementUnitSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {
 				if (jsonParserFieldValue != null) {
-					measurementUnit.setType((String)jsonParserFieldValue);
+					measurementUnit.setType(
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 		}

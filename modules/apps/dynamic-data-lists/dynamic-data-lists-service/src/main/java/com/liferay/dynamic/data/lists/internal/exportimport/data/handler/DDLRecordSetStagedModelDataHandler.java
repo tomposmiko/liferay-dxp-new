@@ -31,6 +31,7 @@ import com.liferay.exportimport.kernel.lar.ExportImportClassedModelUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
@@ -47,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class DDLRecordSetStagedModelDataHandler
 	extends BaseStagedModelDataHandler<DDLRecordSet> {
 
@@ -82,7 +83,7 @@ public class DDLRecordSetStagedModelDataHandler
 
 		DDMStructure ddmStructure = recordSet.getDDMStructure();
 
-		_exportReferencedStagedModel(
+		exportReferencedStagedModel(
 			ddmStructure, portletDataContext, recordSet);
 
 		List<DDMTemplate> ddmTemplates = ddmStructure.getTemplates();
@@ -97,7 +98,7 @@ public class DDLRecordSetStagedModelDataHandler
 		}
 
 		if (recordSet.getScope() == DDLRecordSetConstants.SCOPE_FORMS) {
-			_exportRecordSetSettings(
+			exportRecordSetSettings(
 				portletDataContext, recordSet, recordSetElement);
 		}
 
@@ -167,7 +168,7 @@ public class DDLRecordSetStagedModelDataHandler
 			Element recordSetElement = portletDataContext.getImportDataElement(
 				recordSet);
 
-			DDMFormValues settingsDDMFormValues = _getImportRecordSetSettings(
+			DDMFormValues settingsDDMFormValues = getImportRecordSetSettings(
 				portletDataContext, recordSetElement);
 
 			_ddlRecordSetLocalService.updateRecordSet(
@@ -177,12 +178,7 @@ public class DDLRecordSetStagedModelDataHandler
 		portletDataContext.importClassedModel(recordSet, importedRecordSet);
 	}
 
-	@Override
-	protected StagedModelRepository<DDLRecordSet> getStagedModelRepository() {
-		return _stagedModelRepository;
-	}
-
-	private void _exportRecordSetSettings(
+	protected void exportRecordSetSettings(
 		PortletDataContext portletDataContext, DDLRecordSet recordSet,
 		Element recordSetElement) {
 
@@ -196,10 +192,10 @@ public class DDLRecordSetStagedModelDataHandler
 			settingsDDMFormValuesPath, recordSet.getSettings());
 	}
 
-	private void _exportReferencedStagedModel(
+	protected void exportReferencedStagedModel(
 			DDMStructure ddmStructure, PortletDataContext portletDataContext,
 			DDLRecordSet recordSet)
-		throws Exception {
+		throws PortletDataException {
 
 		if (!_exportImportHelper.isAlwaysIncludeReference(
 				portletDataContext, ddmStructure)) {
@@ -229,7 +225,7 @@ public class DDLRecordSetStagedModelDataHandler
 			ddmStructure, PortletDataContext.REFERENCE_TYPE_STRONG, false);
 	}
 
-	private DDMFormValues _getImportRecordSetSettings(
+	protected DDMFormValues getImportRecordSetSettings(
 			PortletDataContext portletDataContext, Element recordSetElement)
 		throws Exception {
 
@@ -244,7 +240,28 @@ public class DDLRecordSetStagedModelDataHandler
 		return deserialize(serializedSettingsDDMFormValues, ddmForm);
 	}
 
-	@Reference
+	@Override
+	protected StagedModelRepository<DDLRecordSet> getStagedModelRepository() {
+		return _stagedModelRepository;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDLRecordSetLocalService(
+		DDLRecordSetLocalService ddlRecordSetLocalService) {
+
+		_ddlRecordSetLocalService = ddlRecordSetLocalService;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet)",
+		unbind = "-"
+	)
+	protected void setStagedModelRepository(
+		StagedModelRepository<DDLRecordSet> stagedModelRepository) {
+
+		_stagedModelRepository = stagedModelRepository;
+	}
+
 	private DDLRecordSetLocalService _ddlRecordSetLocalService;
 
 	@Reference
@@ -253,9 +270,6 @@ public class DDLRecordSetStagedModelDataHandler
 	@Reference(target = "(ddm.form.values.deserializer.type=json)")
 	private DDMFormValuesDeserializer _jsonDDMFormValuesDeserializer;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet)"
-	)
 	private StagedModelRepository<DDLRecordSet> _stagedModelRepository;
 
 }

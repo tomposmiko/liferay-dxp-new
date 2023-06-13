@@ -17,20 +17,20 @@ package com.liferay.dynamic.data.mapping.uad.display;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.uad.util.DDMUADUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -47,6 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,7 +58,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = UADDisplay.class)
+@Component(
+	immediate = true,
+	service = {DDMFormInstanceRecordUADDisplay.class, UADDisplay.class}
+)
 public class DDMFormInstanceRecordUADDisplay
 	extends BaseDDMFormInstanceRecordUADDisplay {
 
@@ -108,7 +113,7 @@ public class DDMFormInstanceRecordUADDisplay
 				new String[] {
 					StringBundler.concat(
 						ddmFormInstanceRecord.getUserName(), " - ",
-						_language.get(
+						LanguageUtil.get(
 							httpServletRequest, "personal-data-erasure"))
 				}
 			).build());
@@ -140,7 +145,7 @@ public class DDMFormInstanceRecordUADDisplay
 			sb.append(DDMUADUtil.getFormattedName(ddmFormInstance));
 
 			sb.append(StringPool.SPACE);
-			sb.append(_language.get(locale, "record"));
+			sb.append(LanguageUtil.get(locale, "record"));
 			sb.append(StringPool.SPACE);
 			sb.append(StringPool.POUND);
 			sb.append(_getIndex(ddmFormInstanceRecord) + 1);
@@ -148,7 +153,7 @@ public class DDMFormInstanceRecordUADDisplay
 			return sb.toString();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return StringPool.BLANK;
@@ -193,17 +198,24 @@ public class DDMFormInstanceRecordUADDisplay
 			return ddmFormInstanceRecords;
 		}
 
-		return ListUtil.filter(
-			ddmFormInstanceRecords,
+		Stream<DDMFormInstanceRecord> ddmFormInstanceRecordsStream =
+			ddmFormInstanceRecords.stream();
+
+		return ddmFormInstanceRecordsStream.filter(
 			ddmFormInstanceRecord -> {
+				String formattedName = getName(
+					ddmFormInstanceRecord,
+					LocaleThreadLocal.getThemeDisplayLocale());
+
 				String lowerCaseFormattedName = StringUtil.toLowerCase(
-					getName(
-						ddmFormInstanceRecord,
-						LocaleThreadLocal.getThemeDisplayLocale()));
+					formattedName);
 
 				return lowerCaseFormattedName.contains(
 					StringUtil.toLowerCase(keywords));
-			});
+			}
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private List<DDMFormInstanceRecord> _getDDMFormInstanceRecords(
@@ -252,16 +264,14 @@ public class DDMFormInstanceRecordUADDisplay
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceRecordUADDisplay.class);
 
+	@Reference
+	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
+
 	private final Map<Long, DDMFormInstanceRecordUADUserCache>
 		_ddmFormInstanceRecordUADUserCacheMap = new HashMap<>();
 
-	@Reference(
-		target = "(component.name=com.liferay.dynamic.data.mapping.uad.display.DDMFormInstanceUADDisplay)"
-	)
-	private UADDisplay<?> _ddmFormInstanceUADDisplay;
-
 	@Reference
-	private Language _language;
+	private DDMFormInstanceUADDisplay _ddmFormInstanceUADDisplay;
 
 	@Reference
 	private Portal _portal;
@@ -283,14 +293,19 @@ public class DDMFormInstanceRecordUADDisplay
 		}
 
 		public void putDDMFormInstanceRecords(long userId) {
+			List<DDMFormInstanceRecord> ddmFormInstanceRecords =
+				new ArrayList<>();
+
+			ddmFormInstanceRecords.addAll(
+				ddmFormInstanceRecordLocalService.getFormInstanceRecords(
+					_formInstanceId, userId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null));
+
+			ddmFormInstanceRecords.sort(
+				Comparator.comparing(DDMFormInstanceRecord::getCreateDate));
+
 			_ddmFormInstanceRecordUADUserMap.put(
-				userId,
-				ListUtil.sort(
-					ddmFormInstanceRecordLocalService.getFormInstanceRecords(
-						_formInstanceId, userId, QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS, null),
-					Comparator.comparing(
-						DDMFormInstanceRecord::getCreateDate)));
+				userId, ddmFormInstanceRecords);
 		}
 
 		private final Map<Long, List<DDMFormInstanceRecord>>

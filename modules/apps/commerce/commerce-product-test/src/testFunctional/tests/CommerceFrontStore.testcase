@@ -3,19 +3,33 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "Shopping Experience";
 
 	setUp {
-		CommerceConfiguration.commerceSetUp(storeFront = "true");
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceStoreFrontSetUp();
 	}
 
 	tearDown {
-		CommerceConfiguration.commerceTearDown(doLogout = "true");
+		Navigator.openURL();
+
+		if (IsElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE")) {
+			User.logoutPG();
+		}
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceAdminTearDown();
+
+		User.logoutPG();
 	}
 
 	test ViewStoreFrontSimpleProduct {
-		property portal.acceptance = "false";
+		property portal.acceptance = "quarantine";
+		property portal.upstream = "quarantine";
 
 		CommerceNavigator.gotoPortlet(
 			category = "Product Management",
@@ -23,13 +37,12 @@ definition {
 
 		echo("Creating new Option complete with Values...");
 
-		WaitForElementPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER");
+		Pause(locator1 = "2000");
 
 		CPCommerceCatalog.newOptionsEntry(
 			optionDescription = "Option Description",
 			optionFieldType = "Select from List",
-			optionName = "Color",
-			skuContributor = "true");
+			optionName = "Color");
 
 		Button.clickSave();
 
@@ -72,9 +85,8 @@ definition {
 		CommerceNavigator.gotoFrontStoreProductPage(productName = "Simple T-Shirt");
 
 		FrontStore.viewProductDetail(
-			fsOptionName = "Color",
-			fsOptionValuesList = "Black:10.0,Blue:20.0,White:30.0",
-			fsProductName = "Simple T-Shirt");
+			FSOptionValuesList = "Black:10.0,Blue:20.0,White:30.0",
+			FSProductName = "Simple T-Shirt");
 	}
 
 }

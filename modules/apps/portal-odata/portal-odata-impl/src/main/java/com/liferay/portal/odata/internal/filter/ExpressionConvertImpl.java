@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Cristina González
  */
 @Component(
+	immediate = true,
 	property = "result.class.name=com.liferay.portal.kernel.search.filter.Filter",
 	service = ExpressionConvert.class
 )

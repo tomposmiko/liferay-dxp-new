@@ -13,7 +13,7 @@
  */
 
 (function () {
-	const pluginName = 'ajaxsave';
+	var pluginName = 'ajaxsave';
 
 	CKEDITOR.plugins.add(pluginName, {
 		init(editor) {

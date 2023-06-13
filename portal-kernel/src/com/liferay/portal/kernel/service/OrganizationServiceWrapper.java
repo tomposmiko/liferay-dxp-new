@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.model.Organization;
 public class OrganizationServiceWrapper
 	implements OrganizationService, ServiceWrapper<OrganizationService> {
 
-	public OrganizationServiceWrapper() {
-		this(null);
-	}
-
 	public OrganizationServiceWrapper(OrganizationService organizationService) {
 		_organizationService = organizationService;
 	}
@@ -61,7 +57,7 @@ public class OrganizationServiceWrapper
 	 * @param type the organization's type
 	 * @param regionId the primary key of the organization's region
 	 * @param countryId the primary key of the organization's country
-	 * @param statusListTypeId the organization's workflow status
+	 * @param statusId the organization's workflow status
 	 * @param comments the comments about the organization
 	 * @param site whether the organization is to be associated with a main
 	 site
@@ -78,8 +74,7 @@ public class OrganizationServiceWrapper
 	@Override
 	public Organization addOrganization(
 			long parentOrganizationId, String name, String type, long regionId,
-			long countryId, long statusListTypeId, String comments,
-			boolean site,
+			long countryId, long statusId, String comments, boolean site,
 			java.util.List<com.liferay.portal.kernel.model.Address> addresses,
 			java.util.List<com.liferay.portal.kernel.model.EmailAddress>
 				emailAddresses,
@@ -90,9 +85,9 @@ public class OrganizationServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationService.addOrganization(
-			parentOrganizationId, name, type, regionId, countryId,
-			statusListTypeId, comments, site, addresses, emailAddresses,
-			orgLabors, phones, websites, serviceContext);
+			parentOrganizationId, name, type, regionId, countryId, statusId,
+			comments, site, addresses, emailAddresses, orgLabors, phones,
+			websites, serviceContext);
 	}
 
 	/**
@@ -109,7 +104,7 @@ public class OrganizationServiceWrapper
 	 * @param type the organization's type
 	 * @param regionId the primary key of the organization's region
 	 * @param countryId the primary key of the organization's country
-	 * @param statusListTypeId the organization's workflow status
+	 * @param statusId the organization's workflow status
 	 * @param comments the comments about the organization
 	 * @param site whether the organization is to be associated with a main
 	 site
@@ -121,13 +116,13 @@ public class OrganizationServiceWrapper
 	@Override
 	public Organization addOrganization(
 			long parentOrganizationId, String name, String type, long regionId,
-			long countryId, long statusListTypeId, String comments,
-			boolean site, ServiceContext serviceContext)
+			long countryId, long statusId, String comments, boolean site,
+			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationService.addOrganization(
-			parentOrganizationId, name, type, regionId, countryId,
-			statusListTypeId, comments, site, serviceContext);
+			parentOrganizationId, name, type, regionId, countryId, statusId,
+			comments, site, serviceContext);
 	}
 
 	@Override
@@ -139,28 +134,6 @@ public class OrganizationServiceWrapper
 
 		return _organizationService.addOrganizationUserByEmailAddress(
 			emailAddress, organizationId, serviceContext);
-	}
-
-	@Override
-	public Organization addOrUpdateOrganization(
-			String externalReferenceCode, long parentOrganizationId,
-			String name, String type, long regionId, long countryId,
-			long statusListTypeId, String comments, boolean hasLogo,
-			byte[] logoBytes, boolean site,
-			java.util.List<com.liferay.portal.kernel.model.Address> addresses,
-			java.util.List<com.liferay.portal.kernel.model.EmailAddress>
-				emailAddresses,
-			java.util.List<com.liferay.portal.kernel.model.OrgLabor> orgLabors,
-			java.util.List<com.liferay.portal.kernel.model.Phone> phones,
-			java.util.List<com.liferay.portal.kernel.model.Website> websites,
-			ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _organizationService.addOrUpdateOrganization(
-			externalReferenceCode, parentOrganizationId, name, type, regionId,
-			countryId, statusListTypeId, comments, hasLogo, logoBytes, site,
-			addresses, emailAddresses, orgLabors, phones, websites,
-			serviceContext);
 	}
 
 	/**
@@ -257,15 +230,6 @@ public class OrganizationServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationService.getOrganization(organizationId);
-	}
-
-	@Override
-	public Organization getOrganizationByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _organizationService.getOrganizationByExternalReferenceCode(
-			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -435,13 +399,6 @@ public class OrganizationServiceWrapper
 			passwordPolicyId, organizationIds);
 	}
 
-	@Override
-	public Organization updateLogo(long organizationId, byte[] logoBytes)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _organizationService.updateLogo(organizationId, logoBytes);
-	}
-
 	/**
 	 * Updates the organization with additional parameters.
 	 *
@@ -452,7 +409,7 @@ public class OrganizationServiceWrapper
 	 * @param type the organization's type
 	 * @param regionId the primary key of the organization's region
 	 * @param countryId the primary key of the organization's country
-	 * @param statusListTypeId the organization's workflow status
+	 * @param statusId the organization's workflow status
 	 * @param comments the comments about the organization
 	 * @param hasLogo if the organization has a custom logo
 	 * @param logoBytes the new logo image data
@@ -472,7 +429,7 @@ public class OrganizationServiceWrapper
 	@Override
 	public Organization updateOrganization(
 			long organizationId, long parentOrganizationId, String name,
-			String type, long regionId, long countryId, long statusListTypeId,
+			String type, long regionId, long countryId, long statusId,
 			String comments, boolean hasLogo, byte[] logoBytes, boolean site,
 			java.util.List<com.liferay.portal.kernel.model.Address> addresses,
 			java.util.List<com.liferay.portal.kernel.model.EmailAddress>
@@ -485,9 +442,8 @@ public class OrganizationServiceWrapper
 
 		return _organizationService.updateOrganization(
 			organizationId, parentOrganizationId, name, type, regionId,
-			countryId, statusListTypeId, comments, hasLogo, logoBytes, site,
-			addresses, emailAddresses, orgLabors, phones, websites,
-			serviceContext);
+			countryId, statusId, comments, hasLogo, logoBytes, site, addresses,
+			emailAddresses, orgLabors, phones, websites, serviceContext);
 	}
 
 	/**
@@ -500,7 +456,7 @@ public class OrganizationServiceWrapper
 	 * @param type the organization's type
 	 * @param regionId the primary key of the organization's region
 	 * @param countryId the primary key of the organization's country
-	 * @param statusListTypeId the organization's workflow status
+	 * @param statusId the organization's workflow status
 	 * @param comments the comments about the organization
 	 * @param site whether the organization is to be associated with a main
 	 site
@@ -513,13 +469,13 @@ public class OrganizationServiceWrapper
 	@Override
 	public Organization updateOrganization(
 			long organizationId, long parentOrganizationId, String name,
-			String type, long regionId, long countryId, long statusListTypeId,
+			String type, long regionId, long countryId, long statusId,
 			String comments, boolean site, ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _organizationService.updateOrganization(
 			organizationId, parentOrganizationId, name, type, regionId,
-			countryId, statusListTypeId, comments, site, serviceContext);
+			countryId, statusId, comments, site, serviceContext);
 	}
 
 	@Override

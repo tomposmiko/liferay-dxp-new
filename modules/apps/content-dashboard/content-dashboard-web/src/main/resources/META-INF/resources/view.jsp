@@ -17,10 +17,10 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (ContentDashboardAdminDisplayContext)request.getAttribute(ContentDashboardAdminDisplayContext.class.getName());
+ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (ContentDashboardAdminDisplayContext)request.getAttribute(ContentDashboardWebKeys.CONTENT_DASHBOARD_ADMIN_DISPLAY_CONTEXT);
 %>
 
-<div class="cadmin sidebar-wrapper">
+<div class="sidebar-wrapper">
 	<clay:container-fluid
 		cssClass="container-form-lg"
 	>
@@ -78,7 +78,7 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 				</div>
 
 				<react:component
-					module="js/components/AuditGraphApp/AuditGraphApp"
+					module="js/AuditGraphApp"
 					props="<%= contentDashboardAdminDisplayContext.getData() %>"
 				/>
 			</div>
@@ -88,24 +88,15 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 			cssClass="c-mt-5"
 			size="<%= StringPool.BLANK %>"
 		>
-			<div class="align-items-center d-flex justify-content-between mb-4">
-				<h2 class="mb-0 sheet-title">
-					<span class="component-title">
-						<%= LanguageUtil.format(request, "content-x", contentDashboardAdminDisplayContext.getSearchContainer().getTotal(), false) %>
-					</span>
-				</h2>
-
-				<div>
-					<react:component
-						module="js/components/DownloadSpreadsheetButton/DownloadSpreadsheetButton"
-						props="<%= contentDashboardAdminDisplayContext.getXlsProps() %>"
-					/>
-				</div>
-			</div>
+			<h2 class="sheet-title">
+				<span class="component-title">
+					<%= LanguageUtil.format(request, "content-x", contentDashboardAdminDisplayContext.getSearchContainer().getTotal(), false) %>
+				</span>
+			</h2>
 
 			<clay:management-toolbar
 				cssClass="content-dashboard-management-toolbar"
-				managementToolbarDisplayContext="<%= (ContentDashboardAdminManagementToolbarDisplayContext)request.getAttribute(ContentDashboardAdminManagementToolbarDisplayContext.class.getName()) %>"
+				managementToolbarDisplayContext="<%= (ContentDashboardAdminManagementToolbarDisplayContext)request.getAttribute(ContentDashboardWebKeys.CONTENT_DASHBOARD_ADMIN_MANAGEMENT_TOOLBAR_DISPLAY_CONTEXT) %>"
 				propsTransformer="js/ContentDashboardManagementToolbarPropsTransformer"
 			/>
 
@@ -115,7 +106,7 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 				searchContainer="<%= contentDashboardAdminDisplayContext.getSearchContainer() %>"
 			>
 				<liferay-ui:search-container-row
-					className="com.liferay.content.dashboard.item.ContentDashboardItem"
+					className="com.liferay.content.dashboard.web.internal.item.ContentDashboardItem"
 					keyProperty="id"
 					modelVar="contentDashboardItem"
 				>
@@ -177,39 +168,47 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
-						cssClass="lfr-small-column table-cell-expand-smaller"
+						cssClass="table-cell-expand-smaller text-truncate"
 						name="type"
-					>
-						<span class="lfr-portal-tooltip text-truncate" title="<%= HtmlUtil.escape(contentDashboardItem.getTypeLabel(locale)) %>">
-							<%= HtmlUtil.escape(contentDashboardItem.getTypeLabel(locale)) %>
-						</span>
-					</liferay-ui:search-container-column-text>
+						value="<%= HtmlUtil.escape(contentDashboardItem.getTypeLabel(locale)) %>"
+					/>
 
 					<%
 					ContentDashboardItemSubtype contentDashboardItemSubtype = contentDashboardItem.getContentDashboardItemSubtype();
 					%>
 
 					<liferay-ui:search-container-column-text
-						cssClass="lfr-small-column table-cell-expand-smaller"
+						cssClass="table-cell-expand-smaller text-truncate"
 						name="subtype"
-					>
-						<c:choose>
-							<c:when test="<%= contentDashboardItemSubtype != null %>">
-								<span class="lfr-portal-tooltip text-truncate" title="<%= HtmlUtil.escape(contentDashboardItemSubtype.getLabel(locale)) %>">
-									<%= HtmlUtil.escape(contentDashboardItemSubtype.getLabel(locale)) %>
-								</span>
-							</c:when>
-							<c:otherwise>
-								<span class="lfr-portal-tooltip text-truncate" />
-							</c:otherwise>
-						</c:choose>
-					</liferay-ui:search-container-column-text>
+						value="<%= HtmlUtil.escape(contentDashboardItemSubtype.getLabel(locale)) %>"
+					/>
 
 					<liferay-ui:search-container-column-text
-						cssClass="text-truncate"
 						name="site-or-asset-library"
 						value="<%= HtmlUtil.escape(contentDashboardItem.getScopeName(locale)) %>"
 					/>
+
+					<liferay-ui:search-container-column-text
+						cssClass="text-nowrap"
+						name="status"
+					>
+
+						<%
+						List<ContentDashboardItem.Version> versions = contentDashboardItem.getVersions(locale);
+
+						for (ContentDashboardItem.Version version : versions) {
+						%>
+
+							<clay:label
+								displayType="<%= version.getStyle() %>"
+								label="<%= version.getLabel() %>"
+							/>
+
+						<%
+						}
+						%>
+
+					</liferay-ui:search-container-column-text>
 
 					<%
 					for (AssetVocabulary assetVocabulary : contentDashboardAdminDisplayContext.getAssetVocabularies()) {
@@ -224,102 +223,44 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 							List<String> assetCategories = contentDashboardAdminDisplayContext.getAssetCategoryTitles(contentDashboardItem, assetVocabulary.getVocabularyId());
 							%>
 
-							<div class="d-flex">
-								<c:if test="<%= !assetCategories.isEmpty() %>">
+							<c:if test="<%= !assetCategories.isEmpty() %>">
+								<clay:label
+									displayType="secondary"
+									large="<%= true %>"
+								>
+									<clay:label-item-expand><%= assetCategories.get(0) %></clay:label-item-expand>
+								</clay:label>
+							</c:if>
+
+							<c:if test="<%= assetCategories.size() > 1 %>">
+
+								<%
+								String assetCategoriesSummary = StringUtil.merge(assetCategories.subList(1, assetCategories.size()), "\n");
+								%>
+
+								<span class="lfr-portal-tooltip" title="<%= assetCategoriesSummary %>">
 									<clay:label
-										cssClass="category-label text-truncate-inline"
+										aria-title="<%= assetCategoriesSummary %>"
 										displayType="secondary"
 										large="<%= true %>"
 									>
-										<clay:label-item-expand cssClass="text-truncate"><%= assetCategories.get(0) %></clay:label-item-expand>
+										<span>...</span>
 									</clay:label>
-								</c:if>
-
-								<c:if test="<%= assetCategories.size() > 1 %>">
-
-									<%
-									List<String> restOfAssetCategories = assetCategories.subList(1, assetCategories.size());
-									%>
-
-									<div>
-										<react:component
-											module="js/components/CategoriesPopover"
-											props='<%=
-												HashMapBuilder.<String, Object>put(
-													"categories", restOfAssetCategories
-												).put(
-													"vocabulary", assetVocabulary.getTitle(locale)
-												).build()
-											%>'
-										/>
-									</div>
-								</c:if>
-							</div>
+								</span>
+							</c:if>
 						</liferay-ui:search-container-column-text>
 
 					<%
 					}
 					%>
 
-					<liferay-ui:search-container-column-text
-						cssClass="text-nowrap"
-						name="status"
-					>
-
-						<%
-						List<ContentDashboardItemVersion> contentDashboardItemVersions = contentDashboardItem.getLatestContentDashboardItemVersions(locale);
-
-						for (ContentDashboardItemVersion contentDashboardItemVersion : contentDashboardItemVersions) {
-						%>
-
-							<clay:label
-								displayType="<%= contentDashboardItemVersion.getStyle() %>"
-								label="<%= contentDashboardItemVersion.getLabel() %>"
-							/>
-
-						<%
-						}
-						%>
-
-					</liferay-ui:search-container-column-text>
-
 					<liferay-ui:search-container-column-date
 						name="modified-date"
 						value="<%= contentDashboardItem.getModifiedDate() %>"
 					/>
 
-					<liferay-ui:search-container-column-text
-						cssClass="text-nowrap"
-						name="review-date"
-					>
-						<c:choose>
-							<c:when test="<%= contentDashboardItem.getReviewDate() != null %>">
-								<%= contentDashboardAdminDisplayContext.toString(contentDashboardItem.getReviewDate()) %>
-							</c:when>
-							<c:otherwise>
-								-
-							</c:otherwise>
-						</c:choose>
-					</liferay-ui:search-container-column-text>
-
 					<liferay-ui:search-container-column-text>
 						<clay:dropdown-actions
-							additionalProps='<%=
-								HashMapBuilder.<String, Object>put(
-									"currentRowId", rowId
-								).put(
-									"namespace", liferayPortletResponse.getNamespace()
-								).put(
-									"panelState", contentDashboardAdminDisplayContext.getPanelState()
-								).put(
-									"selectedItemFetchURL", contentDashboardAdminDisplayContext.getSelectedItemFetchURL(contentDashboardItem)
-								).put(
-									"selectedItemRowId", contentDashboardAdminDisplayContext.getSelectedItemRowId()
-								).put(
-									"singlePageApplicationEnabled", contentDashboardAdminDisplayContext.getSinglePageApplicationEnabled()
-								).build()
-							%>'
-							aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 							dropdownItems="<%= contentDashboardAdminDisplayContext.getDropdownItems(contentDashboardItem) %>"
 							propsTransformer="js/transformers/ActionsComponentPropsTransformer"
 						/>

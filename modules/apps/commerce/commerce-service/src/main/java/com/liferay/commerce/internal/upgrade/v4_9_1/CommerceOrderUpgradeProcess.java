@@ -14,12 +14,13 @@
 
 package com.liferay.commerce.internal.upgrade.v4_9_1;
 
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.commerce.internal.upgrade.base.BaseCommerceServiceUpgradeProcess;
 
 /**
  * @author Riccardo Alberti
  */
-public class CommerceOrderUpgradeProcess extends UpgradeProcess {
+public class CommerceOrderUpgradeProcess
+	extends BaseCommerceServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {

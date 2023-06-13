@@ -24,9 +24,6 @@ import com.liferay.commerce.shop.by.diagram.exception.NoSuchCSDiagramEntryExcept
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramSettingService;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -34,18 +31,14 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-
-import java.io.IOException;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -54,8 +47,6 @@ import java.util.concurrent.Callable;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -63,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cs_diagram_setting"
@@ -77,7 +69,6 @@ public class EditCSDiagramSettingMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-		boolean publish = ParamUtil.getBoolean(actionRequest, "publish", true);
 
 		try {
 			if (cmd.equals("updateCSDiagramSetting")) {
@@ -86,12 +77,6 @@ public class EditCSDiagramSettingMVCActionCommand extends BaseMVCActionCommand {
 
 				TransactionInvokerUtil.invoke(
 					_transactionConfig, csDiagramSettingCallable);
-
-				if (!publish) {
-					_writeJSON(
-						_portal.getHttpServletResponse(actionResponse),
-						JSONUtil.put("success", true));
-				}
 			}
 		}
 		catch (Throwable throwable) {
@@ -105,39 +90,15 @@ public class EditCSDiagramSettingMVCActionCommand extends BaseMVCActionCommand {
 
 				SessionErrors.add(actionRequest, throwable.getClass());
 
-				if (publish) {
-					String redirect = ParamUtil.getString(
-						actionRequest, "redirect");
+				String redirect = ParamUtil.getString(
+					actionRequest, "redirect");
 
-					sendRedirect(actionRequest, actionResponse, redirect);
-				}
-				else {
-					_writeJSON(
-						_portal.getHttpServletResponse(actionResponse),
-						JSONUtil.put(
-							"error",
-							_language.get(
-								_portal.getHttpServletRequest(actionRequest),
-								"please-select-an-existing-file")
-						).put(
-							"success", false
-						));
-				}
+				sendRedirect(actionRequest, actionResponse, redirect);
 			}
 			else {
 				_log.error(throwable, throwable);
 
-				if (publish) {
-					throw new Exception(throwable);
-				}
-
-				_writeJSON(
-					_portal.getHttpServletResponse(actionResponse),
-					JSONUtil.put(
-						"error", throwable.getMessage()
-					).put(
-						"success", false
-					));
+				throw new Exception(throwable);
 			}
 		}
 	}
@@ -229,17 +190,6 @@ public class EditCSDiagramSettingMVCActionCommand extends BaseMVCActionCommand {
 			type);
 	}
 
-	private void _writeJSON(
-			HttpServletResponse httpServletResponse, JSONObject jsonObject)
-		throws IOException {
-
-		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
-
-		ServletResponseUtil.write(httpServletResponse, jsonObject.toString());
-
-		httpServletResponse.flushBuffer();
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditCSDiagramSettingMVCActionCommand.class);
 
@@ -252,9 +202,6 @@ public class EditCSDiagramSettingMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CSDiagramSettingService _csDiagramSettingService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

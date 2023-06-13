@@ -19,10 +19,10 @@
 <%
 int aspectRatio = ParamUtil.getInteger(request, "aspectRatio");
 String currentImageURL = ParamUtil.getString(request, "currentLogoURL");
-long maxFileSize = UploadImageUtil.getMaxFileSize(renderRequest);
+long maxFileSize = ParamUtil.getLong(request, "maxFileSize");
 boolean preserveRatio = ParamUtil.getBoolean(request, "preserveRatio");
-String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
+String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 %>
 
 <liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/image_uploader/upload_image" var="previewURL">
@@ -36,27 +36,15 @@ String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 		<%
 		FileEntry fileEntry = (FileEntry)SessionMessages.get(renderRequest, "imageUploaded");
 
-		previewURL = HttpComponentsUtil.addParameter(previewURL, liferayPortletResponse.getNamespace() + "tempImageFileName", tempImageFileName);
+		previewURL = HttpUtil.addParameter(previewURL, liferayPortletResponse.getNamespace() + "tempImageFileName", tempImageFileName);
 		%>
 
 		<aui:script>
 			<c:if test="<%= fileEntry != null %>">
-				const onChangeLogo = Liferay.Util.getOpener()
-					.<%= HtmlUtil.escapeJS(randomNamespace) %>changeLogo;
-
-				if (onChangeLogo) {
-					Liferay.Util.getOpener().<%= HtmlUtil.escapeJS(randomNamespace) %>changeLogo(
-						'<%= previewURL %>',
-						'<%= fileEntry.getFileEntryId() %>'
-					);
-				}
-				else {
-					Liferay.Util.getOpener().Liferay.fire('changeLogo', {
-						previewURL: '<%= previewURL %>',
-						fileEntryId: '<%= fileEntry.getFileEntryId() %>',
-						tempImageFileName: '<%= HtmlUtil.escape(tempImageFileName) %>',
-					});
-				}
+				Liferay.Util.getOpener().<%= HtmlUtil.escapeJS(randomNamespace) %>changeLogo(
+					'<%= previewURL %>',
+					'<%= fileEntry.getFileEntryId() %>'
+				);
 			</c:if>
 
 			Liferay.Util.getWindow().hide();
@@ -65,6 +53,7 @@ String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 	<c:otherwise>
 		<portlet:actionURL name="/image_uploader/upload_image" var="uploadImageURL">
 			<portlet:param name="mvcRenderCommandName" value="/image_uploader/upload_image" />
+			<portlet:param name="maxFileSize" value="<%= String.valueOf(maxFileSize) %>" />
 		</portlet:actionURL>
 
 		<aui:form action="<%= uploadImageURL %>" enctype="multipart/form-data" method="post" name="fm">
@@ -98,14 +87,14 @@ String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 						<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(maxFileSize, locale) %>" key="request-is-larger-than-x-and-could-not-be-processed" translateArguments="<%= false %>" />
 					</liferay-ui:error>
 
-					<div class="sheet">
-						<div class="panel-group panel-group-flush">
-							<div class="h4 text-default" id="<portlet:namespace />sizeDescription">
+					<aui:fieldset-group markupView="lexicon">
+						<aui:fieldset cssClass="lfr-portrait-editor">
+							<h4 class="text-default">
 								<liferay-ui:message arguments="<%= LanguageUtil.formatStorageSize(maxFileSize, locale) %>" key="upload-images-no-larger-than-x" />
-							</div>
+							</h4>
 
 							<div class="lfr-change-logo lfr-portrait-preview" id="<portlet:namespace />portraitPreview">
-								<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" class="img-fluid lfr-portrait-preview-img" id="<portlet:namespace />portraitPreviewImg" src="<%= HtmlUtil.escape(currentImageURL) %>" />
+								<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="image-preview" />" class="lfr-portrait-preview-img" id="<portlet:namespace />portraitPreviewImg" src="<%= HtmlUtil.escape(currentImageURL) %>" />
 							</div>
 
 							<c:if test='<%= Validator.isNull(currentImageURL) || currentImageURL.contains("/spacer.png") %>'>
@@ -115,24 +104,20 @@ String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 							</c:if>
 
 							<div class="button-holder">
-								<label for="<portlet:namespace />fileName" id="<portlet:namespace />uploadImage">
-									<span aria-describedby="<portlet:namespace />sizeDescription" aria-label="<%= LanguageUtil.format(request, "select-x", "image") %>" class="btn btn-secondary mt-2" role="button" tabindex="0">
-										<liferay-ui:message key="select" />
-									<span>
-								</label>
+								<label class="btn btn-secondary" for="<portlet:namespace />fileName" id="<portlet:namespace />uploadImage" tabindex="0"><liferay-ui:message key="select" /></label>
 
-								<aui:input cssClass="hide" label="" name="fileName" type="file">
+								<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) || windowState.equals(LiferayWindowState.POP_UP) %>" cssClass="hide" label="" name="fileName" type="file">
 									<aui:validator name="acceptFiles">
 										'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>'
 									</aui:validator>
 
-									<aui:validator errorMessage='<%= LanguageUtil.format(locale, "please-enter-a-file-with-a-valid-file-size-no-larger-than-x", LanguageUtil.formatStorageSize(maxFileSize, locale)) %>' name="maxFileSize">
+									<aui:validator name="maxFileSize">
 										'<%= String.valueOf(maxFileSize) %>'
 									</aui:validator>
 								</aui:input>
 							</div>
-						</div>
-					</div>
+						</aui:fieldset>
+					</aui:fieldset-group>
 				</clay:container-fluid>
 			</div>
 
@@ -151,9 +136,9 @@ String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 
 				if (uploadImageButton) {
 					uploadImageButton.addEventListener('keydown', (event) => {
-						if (event.key == 'Enter' || event.key == ' ') {
-							event.preventDefault();
+						event.preventDefault();
 
+						if (event.key == 'Enter' || event.key == ' ') {
 							uploadImageButton.click();
 						}
 					});
@@ -166,6 +151,7 @@ String tempImageFileName = ParamUtil.getString(request, "tempImageFileName");
 				<portlet:param name="mvcRenderCommandName" value="/image_uploader/upload_image" />
 				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" />
 				<portlet:param name="aspectRatio" value="<%= String.valueOf(aspectRatio) %>" />
+				<portlet:param name="maxFileSize" value="<%= String.valueOf(maxFileSize) %>" />
 				<portlet:param name="preserveRatio" value="<%= String.valueOf(preserveRatio) %>" />
 			</portlet:actionURL>
 

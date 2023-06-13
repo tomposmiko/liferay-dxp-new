@@ -41,8 +41,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -57,6 +55,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.workflow.metrics.model.WorkflowMetricsSLADefinitionVersion;
 import com.liferay.portal.workflow.metrics.service.WorkflowMetricsSLADefinitionVersionLocalService;
 import com.liferay.portal.workflow.metrics.service.WorkflowMetricsSLADefinitionVersionLocalServiceUtil;
+import com.liferay.portal.workflow.metrics.service.persistence.WorkflowMetricsSLADefinitionPersistence;
 import com.liferay.portal.workflow.metrics.service.persistence.WorkflowMetricsSLADefinitionVersionFinder;
 import com.liferay.portal.workflow.metrics.service.persistence.WorkflowMetricsSLADefinitionVersionPersistence;
 
@@ -493,11 +492,6 @@ public abstract class WorkflowMetricsSLADefinitionVersionLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement WorkflowMetricsSLADefinitionVersionLocalServiceImpl#deleteWorkflowMetricsSLADefinitionVersion(WorkflowMetricsSLADefinitionVersion) to avoid orphaned data");
-		}
-
 		return workflowMetricsSLADefinitionVersionLocalService.
 			deleteWorkflowMetricsSLADefinitionVersion(
 				(WorkflowMetricsSLADefinitionVersion)persistedModel);
@@ -709,6 +703,10 @@ public abstract class WorkflowMetricsSLADefinitionVersionLocalServiceBaseImpl
 		}
 	}
 
+	@Reference
+	protected WorkflowMetricsSLADefinitionPersistence
+		workflowMetricsSLADefinitionPersistence;
+
 	protected WorkflowMetricsSLADefinitionVersionLocalService
 		workflowMetricsSLADefinitionVersionLocalService;
 
@@ -724,7 +722,16 @@ public abstract class WorkflowMetricsSLADefinitionVersionLocalServiceBaseImpl
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		WorkflowMetricsSLADefinitionVersionLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

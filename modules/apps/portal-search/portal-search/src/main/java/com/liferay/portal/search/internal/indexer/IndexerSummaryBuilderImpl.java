@@ -15,13 +15,10 @@
 package com.liferay.portal.search.internal.indexer;
 
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.IndexerPostProcessor;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.search.indexer.IndexerSummaryBuilder;
 import com.liferay.portal.search.spi.model.result.contributor.ModelSummaryContributor;
 
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -30,10 +27,11 @@ import java.util.Locale;
 public class IndexerSummaryBuilderImpl implements IndexerSummaryBuilder {
 
 	public IndexerSummaryBuilderImpl(
-		ModelSummaryContributor modelSummaryContributor, String className) {
+		ModelSummaryContributor modelSummaryContributor,
+		IndexerPostProcessorsHolder indexerPostProcessorsHolder) {
 
 		_modelSummaryContributor = modelSummaryContributor;
-		_className = className;
+		_indexerPostProcessorsHolder = indexerPostProcessorsHolder;
 	}
 
 	@Override
@@ -47,17 +45,14 @@ public class IndexerSummaryBuilderImpl implements IndexerSummaryBuilder {
 		Summary summary = _modelSummaryContributor.getSummary(
 			document, locale, snippet);
 
-		List<IndexerPostProcessor> indexerPostProcessors =
-			IndexerRegistryUtil.getIndexerPostProcessors(_className);
-
-		indexerPostProcessors.forEach(
+		_indexerPostProcessorsHolder.forEach(
 			indexerPostProcessor -> indexerPostProcessor.postProcessSummary(
 				summary, document, locale, snippet));
 
 		return summary;
 	}
 
-	private final String _className;
+	private final IndexerPostProcessorsHolder _indexerPostProcessorsHolder;
 	private final ModelSummaryContributor _modelSummaryContributor;
 
 }

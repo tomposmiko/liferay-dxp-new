@@ -300,11 +300,6 @@ public class CTPreferencesWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CTPreferencesWrapper wrap(CTPreferences ctPreferences) {
 		return new CTPreferencesWrapper(ctPreferences);
 	}

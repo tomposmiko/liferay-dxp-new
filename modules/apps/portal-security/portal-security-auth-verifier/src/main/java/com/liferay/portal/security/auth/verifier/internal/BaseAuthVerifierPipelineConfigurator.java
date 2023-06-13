@@ -27,6 +27,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Tomas Polesovsky
@@ -76,6 +77,15 @@ public abstract class BaseAuthVerifierPipelineConfigurator {
 	}
 
 	protected abstract Class<? extends AuthVerifier> getAuthVerifierClass();
+
+	@Modified
+	protected void modified(
+		BundleContext bundleContext, Map<String, Object> properties) {
+
+		deactivate();
+
+		activate(bundleContext, properties);
+	}
 
 	protected String translateKey(String authVerifierPropertyName, String key) {
 		if (key.equals("hostsAllowed")) {

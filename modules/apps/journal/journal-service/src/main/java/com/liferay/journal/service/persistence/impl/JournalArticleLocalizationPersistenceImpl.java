@@ -20,7 +20,6 @@ import com.liferay.journal.model.JournalArticleLocalizationTable;
 import com.liferay.journal.model.impl.JournalArticleLocalizationImpl;
 import com.liferay.journal.model.impl.JournalArticleLocalizationModelImpl;
 import com.liferay.journal.service.persistence.JournalArticleLocalizationPersistence;
-import com.liferay.journal.service.persistence.JournalArticleLocalizationUtil;
 import com.liferay.journal.service.persistence.impl.constants.JournalPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -36,6 +35,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -78,7 +77,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = JournalArticleLocalizationPersistence.class)
+@Component(
+	service = {
+		JournalArticleLocalizationPersistence.class, BasePersistence.class
+	}
+)
 public class JournalArticleLocalizationPersistenceImpl
 	extends BasePersistenceImpl<JournalArticleLocalization>
 	implements JournalArticleLocalizationPersistence {
@@ -201,7 +204,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<JournalArticleLocalization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JournalArticleLocalization journalArticleLocalization :
@@ -583,7 +586,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 			finderArgs = new Object[] {articlePK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -705,8 +708,7 @@ public class JournalArticleLocalizationPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_A, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_A, finderArgs);
 		}
 
 		if (result instanceof JournalArticleLocalization) {
@@ -834,7 +836,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 			finderArgs = new Object[] {companyId, articlePK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -966,8 +968,7 @@ public class JournalArticleLocalizationPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByA_L, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByA_L, finderArgs);
 		}
 
 		if (result instanceof JournalArticleLocalization) {
@@ -1092,7 +1093,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 			finderArgs = new Object[] {articlePK, languageId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1245,8 +1246,7 @@ public class JournalArticleLocalizationPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_A_L, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_A_L, finderArgs);
 		}
 
 		if (result instanceof JournalArticleLocalization) {
@@ -1378,7 +1378,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 			finderArgs = new Object[] {companyId, articlePK, languageId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1546,7 +1546,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_A_T_L, finderArgs, this);
+				_finderPathFetchByC_A_T_L, finderArgs);
 		}
 
 		if (result instanceof JournalArticleLocalization) {
@@ -1699,7 +1699,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 			finderArgs = new Object[] {companyId, articlePK, title, languageId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2231,7 +2231,7 @@ public class JournalArticleLocalizationPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				JournalArticleLocalization.class, primaryKey)) {
+				JournalArticleLocalization.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2460,7 +2460,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<JournalArticleLocalization>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2539,7 +2539,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2740,32 +2740,11 @@ public class JournalArticleLocalizationPersistenceImpl
 			},
 			new String[] {"companyId", "articlePK", "title", "languageId"},
 			false);
-
-		_setJournalArticleLocalizationUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setJournalArticleLocalizationUtilPersistence(null);
-
 		entityCache.removeCache(JournalArticleLocalizationImpl.class.getName());
-	}
-
-	private void _setJournalArticleLocalizationUtilPersistence(
-		JournalArticleLocalizationPersistence
-			journalArticleLocalizationPersistence) {
-
-		try {
-			Field field = JournalArticleLocalizationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, journalArticleLocalizationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2831,5 +2810,9 @@ public class JournalArticleLocalizationPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private JournalArticleLocalizationModelArgumentsResolver
+		_journalArticleLocalizationModelArgumentsResolver;
 
 }

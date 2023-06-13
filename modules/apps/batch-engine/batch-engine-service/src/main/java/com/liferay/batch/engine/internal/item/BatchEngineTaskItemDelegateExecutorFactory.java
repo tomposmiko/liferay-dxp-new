@@ -14,8 +14,7 @@
 
 package com.liferay.batch.engine.internal.item;
 
-import com.liferay.batch.engine.BatchEngineTaskItemDelegate;
-import com.liferay.batch.engine.BatchEngineTaskItemDelegateRegistry;
+import com.liferay.batch.engine.internal.BatchEngineTaskMethodRegistry;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -33,13 +32,12 @@ import java.util.Map;
 public class BatchEngineTaskItemDelegateExecutorFactory {
 
 	public BatchEngineTaskItemDelegateExecutorFactory(
-		BatchEngineTaskItemDelegateRegistry batchEngineTaskItemDelegateRegistry,
+		BatchEngineTaskMethodRegistry batchEngineTaskMethodRegistry,
 		ExpressionConvert<Filter> expressionConvert,
 		FilterParserProvider filterParserProvider,
 		SortParserProvider sortParserProvider) {
 
-		_batchEngineTaskItemDelegateRegistry =
-			batchEngineTaskItemDelegateRegistry;
+		_batchEngineTaskMethodRegistry = batchEngineTaskMethodRegistry;
 		_expressionConvert = expressionConvert;
 		_filterParserProvider = filterParserProvider;
 		_sortParserProvider = sortParserProvider;
@@ -50,23 +48,24 @@ public class BatchEngineTaskItemDelegateExecutorFactory {
 			Map<String, Serializable> parameters, User user)
 		throws ReflectiveOperationException {
 
-		BatchEngineTaskItemDelegate<?> batchEngineTaskItemDelegate =
-			_batchEngineTaskItemDelegateRegistry.getBatchEngineTaskItemDelegate(
-				className, taskItemDelegateName);
+		BatchEngineTaskItemDelegateExecutorCreator
+			batchEngineTaskItemDelegateExecutorCreator =
+				_batchEngineTaskMethodRegistry.
+					getBatchEngineTaskItemDelegateExecutorCreator(
+						className, taskItemDelegateName);
 
-		if (batchEngineTaskItemDelegate == null) {
+		if (batchEngineTaskItemDelegateExecutorCreator == null) {
 			throw new IllegalStateException(
 				"No batch engine delegate available for class name " +
 					className);
 		}
 
-		return new BatchEngineTaskItemDelegateExecutor(
-			batchEngineTaskItemDelegate, company, _expressionConvert,
-			_filterParserProvider, parameters, _sortParserProvider, user);
+		return batchEngineTaskItemDelegateExecutorCreator.create(
+			company, _expressionConvert, _filterParserProvider, parameters,
+			_sortParserProvider, user);
 	}
 
-	private final BatchEngineTaskItemDelegateRegistry
-		_batchEngineTaskItemDelegateRegistry;
+	private final BatchEngineTaskMethodRegistry _batchEngineTaskMethodRegistry;
 	private final ExpressionConvert<Filter> _expressionConvert;
 	private final FilterParserProvider _filterParserProvider;
 	private final SortParserProvider _sortParserProvider;

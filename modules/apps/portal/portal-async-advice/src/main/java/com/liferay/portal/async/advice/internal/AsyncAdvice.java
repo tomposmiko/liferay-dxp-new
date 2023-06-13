@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.async.advice.internal.configuration.AsyncAdviceConfiguration",
-	service = ChainableMethodAdvice.class
+	immediate = true, service = ChainableMethodAdvice.class
 )
 public class AsyncAdvice extends ChainableMethodAdvice {
 
@@ -136,7 +136,7 @@ public class AsyncAdvice extends ChainableMethodAdvice {
 				Message message = new Message();
 
 				message.setPayload(
-					new AsyncCallable(aopMethodInvocation, arguments));
+					new AsyncProcessCallable(aopMethodInvocation, arguments));
 
 				_messageBus.sendMessage(destinationName, message);
 

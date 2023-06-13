@@ -44,35 +44,33 @@ renderResponse.setTitle((node == null) ? LanguageUtil.get(request, "new-wiki-nod
 
 		<aui:model-context bean="<%= node %>" model="<%= WikiNode.class %>" />
 
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<aui:fieldset>
-					<aui:input name="name">
-						<aui:validator errorMessage="please-enter-a-nonnumeric-name" name="custom">
-							function(val) {
-								return !/^\d+$/.test(val);
-							}
-						</aui:validator>
-					</aui:input>
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
+				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="name">
+					<aui:validator errorMessage="please-enter-a-nonnumeric-name" name="custom">
+						function(val) {
+							return !/^\d+$/.test(val);
+						}
+					</aui:validator>
+				</aui:input>
 
-					<aui:input name="description" />
+				<aui:input name="description" />
+			</aui:fieldset>
+
+			<c:if test="<%= node == null %>">
+				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
+					<liferay-ui:input-permissions
+						modelName="<%= WikiNode.class.getName() %>"
+					/>
 				</aui:fieldset>
+			</c:if>
 
-				<c:if test="<%= node == null %>">
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-						<liferay-ui:input-permissions
-							modelName="<%= WikiNode.class.getName() %>"
-						/>
-					</aui:fieldset>
-				</c:if>
+			<div class="sheet-footer">
+				<aui:button type="submit" />
 
-				<div class="sheet-footer">
-					<aui:button type="submit" />
-
-					<aui:button href="<%= redirect %>" type="cancel" />
-				</div>
+				<aui:button href="<%= redirect %>" type="cancel" />
 			</div>
-		</div>
+		</aui:fieldset-group>
 	</aui:form>
 </clay:container-fluid>
 

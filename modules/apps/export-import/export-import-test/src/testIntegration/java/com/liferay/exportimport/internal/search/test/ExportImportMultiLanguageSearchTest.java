@@ -109,6 +109,12 @@ public class ExportImportMultiLanguageSearchTest {
 		FieldValuesAssert.assertFieldValues(map, prefix, document, searchTerm);
 	}
 
+	protected void setTestLocale(Locale locale) throws Exception {
+		exportImportFixture.updateDisplaySettings(locale);
+
+		LocaleThreadLocal.setDefaultLocale(locale);
+	}
+
 	protected void setUpExportImportFixture() {
 		exportImportFixture = new ExportImportFixture(_group);
 
@@ -152,16 +158,10 @@ public class ExportImportMultiLanguageSearchTest {
 		).build();
 	}
 
-	private void _setTestLocale(Locale locale) throws Exception {
-		exportImportFixture.updateDisplaySettings(locale);
-
-		LocaleThreadLocal.setDefaultLocale(locale);
-	}
-
 	private void _testKeywordsLocale(Locale locale, String keywords)
 		throws Exception {
 
-		_setTestLocale(locale);
+		setTestLocale(locale);
 
 		exportImportFixture.createExportImport(keywords);
 

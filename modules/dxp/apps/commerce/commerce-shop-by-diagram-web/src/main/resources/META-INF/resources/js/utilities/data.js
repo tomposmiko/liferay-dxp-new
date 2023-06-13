@@ -13,64 +13,48 @@ import {fetch} from 'frontend-js-web';
 
 import {HEADERS} from './constants';
 
-export const CART_FRONTSTORE_ENDPOINT_BASE =
-	'/o/headless-commerce-delivery-cart/v1.0/carts';
-export const PINS_ADMIN_ENDPOINT_BASE =
-	'/o/headless-commerce-admin-catalog/v1.0';
-export const PINS_FRONTSTORE_ENDPOINT_BASE =
-	'/o/headless-commerce-delivery-catalog/v1.0';
+const PINS_ENDPOINT = '/o/headless-commerce-admin-catalog/v1.0';
 
-export function loadPins(productId, channelId = null, accountId) {
+export const loadPins = (productId) => {
 	const url = new URL(
-		channelId
-			? `${themeDisplay.getPathContext()}${PINS_FRONTSTORE_ENDPOINT_BASE}/channels/${channelId}/products/${productId}/pins`
-			: `${themeDisplay.getPathContext()}${PINS_ADMIN_ENDPOINT_BASE}/products/${productId}/pins`,
+		`${PINS_ENDPOINT}/products/${productId}/pins`,
 		themeDisplay.getPortalURL()
 	);
 
-	if (accountId) {
-		url.searchParams.set('accountId', accountId);
-	}
-
-	url.searchParams.set('pageSize', 200);
+	url.searchParams.set('pageSize', 100);
 
 	return fetch(url, {
 		headers: HEADERS,
 	})
 		.then((response) => response.json())
-		.then((jsonResponse) =>
-			jsonResponse.items.filter((item) => item.mappedProduct)
-		);
-}
+		.then((jsonResponse) => jsonResponse.items);
+};
 
-export function deletePin(pinId) {
-	return fetch(`${PINS_ADMIN_ENDPOINT_BASE}/pins/${pinId}`, {
+export const deletePin = (pinId) => {
+	const url = new URL(
+		`${PINS_ENDPOINT}/pins/${pinId}`,
+		themeDisplay.getPortalURL()
+	);
+
+	return fetch(url, {
 		headers: HEADERS,
 		method: 'DELETE',
 	});
-}
+};
 
-export function deleteMappedProduct(mappedProductId) {
-	return fetch(
-		`${PINS_ADMIN_ENDPOINT_BASE}/mapped-products/${mappedProductId}`,
-		{
-			headers: HEADERS,
-			method: 'DELETE',
-		}
-	);
-}
-
-export function savePin(
+export const savePin = (
 	pinId,
 	mappedProduct,
 	sequence,
 	positionX,
 	positionY,
 	productId
-) {
+) => {
 	const baseURL = pinId
-		? `${PINS_ADMIN_ENDPOINT_BASE}/pins/${pinId}`
-		: `${PINS_ADMIN_ENDPOINT_BASE}/products/${productId}/pins`;
+		? `${PINS_ENDPOINT}/pins/${pinId}`
+		: `${PINS_ENDPOINT}/products/${productId}/pins`;
+
+	const url = new URL(baseURL, themeDisplay.getPortalURL());
 
 	const body = {};
 
@@ -87,38 +71,20 @@ export function savePin(
 		body.sequence = sequence;
 	}
 
-	return fetch(baseURL, {
+	return fetch(url, {
 		body: JSON.stringify(body),
 		headers: HEADERS,
 		method: pinId ? 'PATCH' : 'POST',
 	}).then((response) => response.json());
-}
+};
 
-export function saveMappedProduct(
-	mappedProductId,
-	mappedProduct,
-	sequence,
-	productId
-) {
-	const baseURL = mappedProductId
-		? `${PINS_ADMIN_ENDPOINT_BASE}/mapped-products/${mappedProductId}`
-		: `${PINS_ADMIN_ENDPOINT_BASE}/products/${productId}/mapped-products`;
+export const updateGlobalPinsRadius = (diagramId, radius, namespace) => {
+	const url = new URL(
+		`${PINS_ENDPOINT}/diagrams/${diagramId}`,
+		themeDisplay.getPortalURL()
+	);
 
-	const body = {...mappedProduct};
-
-	if (sequence) {
-		body.sequence = sequence;
-	}
-
-	return fetch(baseURL, {
-		body: JSON.stringify(body),
-		headers: HEADERS,
-		method: mappedProductId ? 'PATCH' : 'POST',
-	}).then((response) => response.json());
-}
-
-export function updateGlobalPinsRadius(diagramId, radius, namespace) {
-	return fetch(`${PINS_ADMIN_ENDPOINT_BASE}/diagrams/${diagramId}`, {
+	return fetch(url, {
 		body: JSON.stringify({radius}),
 		headers: HEADERS,
 		method: 'PATCH',
@@ -131,27 +97,13 @@ export function updateGlobalPinsRadius(diagramId, radius, namespace) {
 			}
 		}
 	});
-}
+};
 
-export function getMappedProducts(
-	productId,
-	channelId,
-	query,
-	page,
-	pageSize,
-	accountId
-) {
+export const getMappedProducts = (productId, query, page, pageSize) => {
 	const url = new URL(
-		channelId
-			? `${themeDisplay.getPathContext()}${PINS_FRONTSTORE_ENDPOINT_BASE}/channels/${channelId}/products/${productId}/mapped-products`
-			: `${themeDisplay.getPathContext()}${PINS_ADMIN_ENDPOINT_BASE}/products/${productId}/mapped-products`,
-
+		`${PINS_ENDPOINT}/products/${productId}/mapped-products`,
 		themeDisplay.getPortalURL()
 	);
-
-	if (accountId) {
-		url.searchParams.set('accountId', accountId);
-	}
 
 	if (query) {
 		url.searchParams.set('search', query);
@@ -165,24 +117,5 @@ export function getMappedProducts(
 
 	return fetch(url, {
 		headers: HEADERS,
-	}).then((response) => {
-		if (!response.ok) {
-			throw new Error(Liferay.Language.get('unexpected-error'));
-		}
-
-		return response.json();
-	});
-}
-
-export function getCartItems(cartId, skuId) {
-	const url = new URL(
-		`${themeDisplay.getPathContext()}${CART_FRONTSTORE_ENDPOINT_BASE}/${cartId}/items`,
-		themeDisplay.getPortalURL()
-	);
-
-	url.searchParams.set('skuId', skuId);
-
-	return fetch(url, {
-		headers: HEADERS,
 	}).then((response) => response.json());
-}
+};

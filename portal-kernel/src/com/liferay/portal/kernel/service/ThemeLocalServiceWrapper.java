@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class ThemeLocalServiceWrapper
 	implements ServiceWrapper<ThemeLocalService>, ThemeLocalService {
 
-	public ThemeLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ThemeLocalServiceWrapper(ThemeLocalService themeLocalService) {
 		_themeLocalService = themeLocalService;
 	}

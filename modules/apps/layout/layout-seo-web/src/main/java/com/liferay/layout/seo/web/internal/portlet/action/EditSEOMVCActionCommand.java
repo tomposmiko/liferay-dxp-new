@@ -19,7 +19,9 @@ import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.seo.service.LayoutSEOEntryService;
 import com.liferay.layout.seo.web.internal.util.LayoutTypeSettingsUtil;
+import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -28,10 +30,12 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -49,6 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
 		"mvc.command.name=/layout/edit_seo"
@@ -62,6 +67,9 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		UploadPortletRequest uploadPortletRequest =
+			_portal.getUploadPortletRequest(actionRequest);
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -73,14 +81,14 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 		Layout layout = _layoutLocalService.getLayout(
 			groupId, privateLayout, layoutId);
 
-		Map<Locale, String> titleMap = _localization.getLocalizationMap(
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "title");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 
-		Map<Locale, String> keywordsMap = _localization.getLocalizationMap(
+		Map<Locale, String> keywordsMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "keywords");
-		Map<Locale, String> robotsMap = _localization.getLocalizationMap(
+		Map<Locale, String> robotsMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "robots");
 
 		ServiceContext serviceContext = _getServiceContent(
@@ -91,13 +99,13 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 			layout.getNameMap(), titleMap, descriptionMap, keywordsMap,
 			robotsMap, layout.getType(), layout.isHidden(),
 			layout.getFriendlyURLMap(), layout.isIconImage(), null,
-			layout.getStyleBookEntryId(), layout.getFaviconFileEntryId(),
-			layout.getMasterLayoutPlid(), serviceContext);
+			layout.getMasterLayoutPlid(), layout.getStyleBookEntryId(),
+			serviceContext);
 
 		boolean canonicalURLEnabled = ParamUtil.getBoolean(
 			actionRequest, "canonicalURLEnabled");
-		Map<Locale, String> canonicalURLMap = _localization.getLocalizationMap(
-			actionRequest, "canonicalURL");
+		Map<Locale, String> canonicalURLMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "canonicalURL");
 
 		_layoutSEOEntryService.updateLayoutSEOEntry(
 			groupId, privateLayout, layoutId, canonicalURLEnabled,
@@ -107,10 +115,39 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 			PropertiesParamUtil.getProperties(
 				actionRequest, "TypeSettingsProperties--");
 
+		Layout draftLayout = layout.fetchDraftLayout();
+
+		if (draftLayout != null) {
+			draftLayout = _layoutService.updateLayout(
+				groupId, privateLayout, draftLayout.getLayoutId(),
+				draftLayout.getParentLayoutId(), draftLayout.getNameMap(),
+				titleMap, descriptionMap, keywordsMap, robotsMap,
+				draftLayout.getType(), draftLayout.isHidden(),
+				draftLayout.getFriendlyURLMap(), draftLayout.isIconImage(),
+				null, draftLayout.getMasterLayoutPlid(),
+				draftLayout.getStyleBookEntryId(), serviceContext);
+
+			draftLayout = LayoutTypeSettingsUtil.updateTypeSettings(
+				draftLayout, _layoutService, formTypeSettingsUnicodeProperties);
+
+			_layoutSEOEntryService.updateLayoutSEOEntry(
+				groupId, privateLayout, draftLayout.getLayoutId(),
+				canonicalURLEnabled, canonicalURLMap, serviceContext);
+		}
+
 		themeDisplay.clearLayoutFriendlyURL(layout);
 
 		layout = LayoutTypeSettingsUtil.updateTypeSettings(
 			layout, _layoutService, formTypeSettingsUnicodeProperties);
+
+		LayoutTypePortlet layoutTypePortlet =
+			(LayoutTypePortlet)layout.getLayoutType();
+
+		EventsProcessorUtil.process(
+			PropsKeys.LAYOUT_CONFIGURATION_ACTION_UPDATE,
+			layoutTypePortlet.getConfigurationActionUpdate(),
+			uploadPortletRequest,
+			_portal.getHttpServletResponse(actionResponse));
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
@@ -159,9 +196,6 @@ public class EditSEOMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private LayoutService _layoutService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

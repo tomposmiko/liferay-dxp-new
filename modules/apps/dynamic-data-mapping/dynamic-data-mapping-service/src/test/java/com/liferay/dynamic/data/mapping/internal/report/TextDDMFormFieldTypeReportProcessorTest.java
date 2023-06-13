@@ -15,7 +15,7 @@
 package com.liferay.dynamic.data.mapping.internal.report;
 
 import com.liferay.dynamic.data.mapping.constants.DDMFormInstanceReportConstants;
-import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -23,7 +23,6 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -43,13 +42,19 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Marcos Martins
  */
-public class TextDDMFormFieldTypeReportProcessorTest {
+@RunWith(MockitoJUnitRunner.class)
+public class TextDDMFormFieldTypeReportProcessorTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -60,28 +65,24 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 	public void setUp() {
 		_textDDMFormFieldTypeReportProcessor.ddmFormInstanceRecordLocalService =
 			_ddmFormInstanceRecordLocalService;
-
-		_textDDMFormFieldTypeReportProcessor.jsonFactory =
-			new JSONFactoryImpl();
 	}
 
 	@Test
 	public void testProcessDDMFormInstanceReportEditLastFiveRecords()
 		throws Exception {
 
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getName()
 		).thenReturn(
 			"field1"
 		);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getType()
 		).thenReturn(
-			DDMFormFieldTypeConstants.TEXT
+			DDMFormFieldType.TEXT
 		);
 
 		Value value = new LocalizedValue();
@@ -89,16 +90,16 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 		value.addString(value.getDefaultLocale(), "text 6");
 		value.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			value
 		);
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getFormInstanceId()
 		).thenReturn(
 			0L
@@ -106,7 +107,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 
 		long formInstanceRecordId = 3;
 
-		Mockito.when(
+		when(
 			_ddmFormInstanceRecordLocalService.getFormInstanceRecord(
 				formInstanceRecordId)
 		).thenReturn(
@@ -117,7 +118,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 			_textDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.TEXT
+					"type", DDMFormFieldType.TEXT
 				).put(
 					"values",
 					JSONUtil.putAll(
@@ -151,8 +152,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
 
 		Assert.assertEquals(
-			DDMFormFieldTypeConstants.TEXT,
-			processedFieldJSONObject.getString("type"));
+			DDMFormFieldType.TEXT, processedFieldJSONObject.getString("type"));
 
 		JSONArray valuesJSONArray = processedFieldJSONObject.getJSONArray(
 			"values");
@@ -170,10 +170,9 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 	public void testProcessDDMFormInstanceReportOnDeleteEvent()
 		throws Exception {
 
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getName()
 		).thenReturn(
 			"field1"
@@ -184,24 +183,24 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 		value.addString(value.getDefaultLocale(), "text 6");
 		value.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			value
 		);
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getFormInstanceId()
 		).thenReturn(
 			0L
 		);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getFormInstance()
 		).thenReturn(
 			ddmFormInstance
@@ -209,7 +208,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 
 		long formInstanceRecordId = 3;
 
-		Mockito.when(
+		when(
 			_ddmFormInstanceRecordLocalService.getFormInstanceRecord(
 				formInstanceRecordId)
 		).thenReturn(
@@ -222,26 +221,24 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 			ddmFormInstanceRecords.add(_createFormInstanceRecord("text " + i));
 		}
 
-		Mockito.when(
+		when(
 			_ddmFormInstanceRecordLocalService.searchFormInstanceRecords(
 				Mockito.eq(0L), Mockito.eq(new String[] {"field1"}),
 				Mockito.eq(WorkflowConstants.STATUS_APPROVED), Mockito.eq(0),
 				Mockito.eq(_VALUES_MAX_LENGTH + 1), Mockito.any())
 		).thenReturn(
-			new BaseModelSearchResult<>(
+			new BaseModelSearchResult<DDMFormInstanceRecord>(
 				ddmFormInstanceRecords, ddmFormInstanceRecords.size())
 		);
 
 		JSONObject processedFieldJSONObject =
 			_textDDMFormFieldTypeReportProcessor.process(
-				ddmFormFieldValue,
-				JSONUtil.put("type", DDMFormFieldTypeConstants.TEXT),
+				ddmFormFieldValue, JSONUtil.put("type", DDMFormFieldType.TEXT),
 				formInstanceRecordId,
 				DDMFormInstanceReportConstants.EVENT_DELETE_RECORD_VERSION);
 
 		Assert.assertEquals(
-			DDMFormFieldTypeConstants.TEXT,
-			processedFieldJSONObject.getString("type"));
+			DDMFormFieldType.TEXT, processedFieldJSONObject.getString("type"));
 
 		JSONArray valuesJSONArray = processedFieldJSONObject.getJSONArray(
 			"values");
@@ -255,19 +252,18 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 	public void testProcessDDMFormInstanceReportWithEmptyData()
 		throws Exception {
 
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getName()
 		).thenReturn(
 			"field1"
 		);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getType()
 		).thenReturn(
-			DDMFormFieldTypeConstants.TEXT
+			DDMFormFieldType.TEXT
 		);
 
 		Value value = new LocalizedValue();
@@ -275,16 +271,16 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 		value.addString(value.getDefaultLocale(), "text");
 		value.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			value
 		);
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getFormInstanceId()
 		).thenReturn(
 			0L
@@ -292,7 +288,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 
 		long formInstanceRecordId = 1;
 
-		Mockito.when(
+		when(
 			_ddmFormInstanceRecordLocalService.getFormInstanceRecord(
 				formInstanceRecordId)
 		).thenReturn(
@@ -303,7 +299,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 			_textDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.TEXT
+					"type", DDMFormFieldType.TEXT
 				).put(
 					"values", JSONFactoryUtil.createJSONObject()
 				),
@@ -311,8 +307,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
 
 		Assert.assertEquals(
-			DDMFormFieldTypeConstants.TEXT,
-			processedFieldJSONObject.getString("type"));
+			DDMFormFieldType.TEXT, processedFieldJSONObject.getString("type"));
 
 		JSONArray valuesJSONArray = processedFieldJSONObject.getJSONArray(
 			"values");
@@ -326,19 +321,18 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 	public void testProcessDDMFormInstanceReportWithExistingData()
 		throws Exception {
 
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getName()
 		).thenReturn(
 			"field1"
 		);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getType()
 		).thenReturn(
-			DDMFormFieldTypeConstants.TEXT
+			DDMFormFieldType.TEXT
 		);
 
 		Value value = new LocalizedValue();
@@ -346,16 +340,16 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 		value.addString(value.getDefaultLocale(), "text 2");
 		value.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			value
 		);
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getFormInstanceId()
 		).thenReturn(
 			0L
@@ -363,7 +357,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 
 		long formInstanceRecordId = 0;
 
-		Mockito.when(
+		when(
 			_ddmFormInstanceRecordLocalService.getFormInstanceRecord(
 				formInstanceRecordId)
 		).thenReturn(
@@ -374,7 +368,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 			_textDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.TEXT
+					"type", DDMFormFieldType.TEXT
 				).put(
 					"values",
 					JSONUtil.put(
@@ -388,8 +382,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
 
 		Assert.assertEquals(
-			DDMFormFieldTypeConstants.TEXT,
-			processedFieldJSONObject.getString("type"));
+			DDMFormFieldType.TEXT, processedFieldJSONObject.getString("type"));
 
 		JSONArray valuesJSONArray = processedFieldJSONObject.getJSONArray(
 			"values");
@@ -407,19 +400,18 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 	public void testProcessDDMFormInstanceReportWithFiveExistingEntries()
 		throws Exception {
 
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getName()
 		).thenReturn(
 			"field1"
 		);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getType()
 		).thenReturn(
-			DDMFormFieldTypeConstants.TEXT
+			DDMFormFieldType.TEXT
 		);
 
 		Value value = new LocalizedValue();
@@ -427,16 +419,16 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 		value.addString(value.getDefaultLocale(), "text 6");
 		value.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			value
 		);
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getFormInstanceId()
 		).thenReturn(
 			0L
@@ -444,7 +436,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 
 		long formInstanceRecordId = 6;
 
-		Mockito.when(
+		when(
 			_ddmFormInstanceRecordLocalService.getFormInstanceRecord(
 				formInstanceRecordId)
 		).thenReturn(
@@ -455,7 +447,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 			_textDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.TEXT
+					"type", DDMFormFieldType.TEXT
 				).put(
 					"values",
 					JSONUtil.putAll(
@@ -489,8 +481,7 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
 
 		Assert.assertEquals(
-			DDMFormFieldTypeConstants.TEXT,
-			processedFieldJSONObject.getString("type"));
+			DDMFormFieldType.TEXT, processedFieldJSONObject.getString("type"));
 
 		JSONArray valuesJSONArray = processedFieldJSONObject.getJSONArray(
 			"values");
@@ -507,34 +498,33 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 	private DDMFormInstanceRecord _createFormInstanceRecord(String valueString)
 		throws Exception {
 
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
 		Value value = new LocalizedValue();
 
 		value.addString(value.getDefaultLocale(), valueString);
 		value.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			value
 		);
 
-		DDMFormValues ddmFormValues = Mockito.mock(DDMFormValues.class);
+		DDMFormValues ddmFormValues = mock(DDMFormValues.class);
 
-		Mockito.when(
-			ddmFormValues.getDDMFormFieldValuesMap(true)
+		when(
+			ddmFormValues.getDDMFormFieldValuesMap(false)
 		).thenReturn(
-			HashMapBuilder.put(
+			HashMapBuilder.<String, List<DDMFormFieldValue>>put(
 				"field1", Arrays.asList(ddmFormFieldValue)
 			).build()
 		);
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getDDMFormValues()
 		).thenReturn(
 			ddmFormValues
@@ -545,9 +535,10 @@ public class TextDDMFormFieldTypeReportProcessorTest {
 
 	private static final int _VALUES_MAX_LENGTH = 5;
 
-	private final DDMFormInstanceRecordLocalService
-		_ddmFormInstanceRecordLocalService = Mockito.mock(
-			DDMFormInstanceRecordLocalService.class);
+	@Mock
+	private DDMFormInstanceRecordLocalService
+		_ddmFormInstanceRecordLocalService;
+
 	private final TextDDMFormFieldTypeReportProcessor
 		_textDDMFormFieldTypeReportProcessor =
 			new TextDDMFormFieldTypeReportProcessor();

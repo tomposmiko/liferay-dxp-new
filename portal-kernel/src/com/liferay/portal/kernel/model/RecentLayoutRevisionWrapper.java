@@ -317,11 +317,6 @@ public class RecentLayoutRevisionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected RecentLayoutRevisionWrapper wrap(
 		RecentLayoutRevision recentLayoutRevision) {
 

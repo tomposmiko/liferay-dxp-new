@@ -16,10 +16,10 @@ package com.liferay.exportimport.internal.background.task;
 
 import com.liferay.exportimport.internal.background.task.display.PortletExportImportBackgroundTaskDisplay;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
-import com.liferay.exportimport.kernel.service.ExportImportLocalService;
+import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
 import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplay;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -29,18 +29,11 @@ import java.io.Serializable;
 
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Daniel Kocsis
  * @author Michael C. Han
  * @author Akos Thurzo
  */
-@Component(
-	property = "background.task.executor.class.name=com.liferay.exportimport.internal.background.task.PortletExportBackgroundTaskExecutor",
-	service = BackgroundTaskExecutor.class
-)
 public class PortletExportBackgroundTaskExecutor
 	extends BaseExportImportBackgroundTaskExecutor {
 
@@ -51,7 +44,17 @@ public class PortletExportBackgroundTaskExecutor
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return this;
+		PortletExportBackgroundTaskExecutor
+			portletExportBackgroundTaskExecutor =
+				new PortletExportBackgroundTaskExecutor();
+
+		portletExportBackgroundTaskExecutor.
+			setBackgroundTaskStatusMessageTranslator(
+				getBackgroundTaskStatusMessageTranslator());
+		portletExportBackgroundTaskExecutor.setIsolationLevel(
+			getIsolationLevel());
+
+		return portletExportBackgroundTaskExecutor;
 	}
 
 	@Override
@@ -67,10 +70,10 @@ public class PortletExportBackgroundTaskExecutor
 		long userId = MapUtil.getLong(settingsMap, "userId");
 		String fileName = MapUtil.getString(settingsMap, "fileName");
 
-		File larFile = _exportImportLocalService.exportPortletInfoAsFile(
+		File larFile = ExportImportLocalServiceUtil.exportPortletInfoAsFile(
 			exportImportConfiguration);
 
-		_backgroundTaskManager.addBackgroundTaskAttachment(
+		BackgroundTaskManagerUtil.addBackgroundTaskAttachment(
 			userId, backgroundTask.getBackgroundTaskId(), fileName, larFile);
 
 		return BackgroundTaskResult.SUCCESS;
@@ -82,11 +85,5 @@ public class PortletExportBackgroundTaskExecutor
 
 		return new PortletExportImportBackgroundTaskDisplay(backgroundTask);
 	}
-
-	@Reference
-	private BackgroundTaskManager _backgroundTaskManager;
-
-	@Reference
-	private ExportImportLocalService _exportImportLocalService;
 
 }

@@ -19,25 +19,17 @@ import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutBox;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutColumn;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutRow;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectLayoutTab;
-import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectLayoutUtil;
 import com.liferay.object.admin.rest.resource.v1_0.ObjectLayoutResource;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectField;
-import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectLayoutService;
 import com.liferay.object.service.persistence.ObjectLayoutBoxPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutRowPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutTabPersistence;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.vulcan.fields.NestedField;
-import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -52,37 +44,15 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/object-layout.properties",
-	scope = ServiceScope.PROTOTYPE,
-	service = {NestedFieldSupport.class, ObjectLayoutResource.class}
+	scope = ServiceScope.PROTOTYPE, service = ObjectLayoutResource.class
 )
-public class ObjectLayoutResourceImpl
-	extends BaseObjectLayoutResourceImpl implements NestedFieldSupport {
+public class ObjectLayoutResourceImpl extends BaseObjectLayoutResourceImpl {
 
 	@Override
 	public void deleteObjectLayout(Long objectLayoutId) throws Exception {
 		_objectLayoutService.deleteObjectLayout(objectLayoutId);
 	}
 
-	@Override
-	public Page<ObjectLayout>
-			getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-				String externalReferenceCode, String search,
-				Pagination pagination)
-		throws Exception {
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				getObjectDefinitionByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId());
-
-		return getObjectDefinitionObjectLayoutsPage(
-			objectDefinition.getObjectDefinitionId(), search, pagination);
-	}
-
-	@NestedField(
-		parentClass = com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition.class,
-		value = "objectLayouts"
-	)
 	@Override
 	public Page<ObjectLayout> getObjectDefinitionObjectLayoutsPage(
 			Long objectDefinitionId, String search, Pagination pagination)
@@ -95,25 +65,10 @@ public class ObjectLayoutResourceImpl
 					ActionKeys.UPDATE, "postObjectDefinitionObjectLayout",
 					ObjectDefinition.class.getName(), objectDefinitionId)
 			).put(
-				"createBatch",
-				addAction(
-					ActionKeys.UPDATE, "postObjectDefinitionObjectLayoutBatch",
-					ObjectDefinition.class.getName(), objectDefinitionId)
-			).put(
-				"deleteBatch",
-				addAction(
-					ActionKeys.DELETE, "deleteObjectLayoutBatch",
-					ObjectDefinition.class.getName(), null)
-			).put(
 				"get",
 				addAction(
 					ActionKeys.VIEW, "getObjectDefinitionObjectLayoutsPage",
 					ObjectDefinition.class.getName(), objectDefinitionId)
-			).put(
-				"updateBatch",
-				addAction(
-					ActionKeys.UPDATE, "putObjectLayoutBatch",
-					ObjectDefinition.class.getName(), null)
 			).build(),
 			booleanQuery -> {
 			},
@@ -140,20 +95,6 @@ public class ObjectLayoutResourceImpl
 	}
 
 	@Override
-	public ObjectLayout postObjectDefinitionByExternalReferenceCodeObjectLayout(
-			String externalReferenceCode, ObjectLayout objectLayout)
-		throws Exception {
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				getObjectDefinitionByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId());
-
-		return postObjectDefinitionObjectLayout(
-			objectDefinition.getObjectDefinitionId(), objectLayout);
-	}
-
-	@Override
 	public ObjectLayout postObjectDefinitionObjectLayout(
 			Long objectDefinitionId, ObjectLayout objectLayout)
 		throws Exception {
@@ -165,8 +106,7 @@ public class ObjectLayoutResourceImpl
 				LocalizedMapUtil.getLocalizedMap(objectLayout.getName()),
 				transformToList(
 					objectLayout.getObjectLayoutTabs(),
-					objectLayoutTab -> _toObjectLayoutTab(
-						objectDefinitionId, objectLayoutTab))));
+					this::_toObjectLayoutTab)));
 	}
 
 	@Override
@@ -174,61 +114,77 @@ public class ObjectLayoutResourceImpl
 			Long objectLayoutId, ObjectLayout objectLayout)
 		throws Exception {
 
-		if (Validator.isNotNull(
-				objectLayout.getObjectDefinitionExternalReferenceCode())) {
-
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.
-					getObjectDefinitionByExternalReferenceCode(
-						objectLayout.getObjectDefinitionExternalReferenceCode(),
-						contextCompany.getCompanyId());
-
-			objectLayout.setObjectDefinitionId(
-				objectDefinition.getObjectDefinitionId());
-		}
-
 		return _toObjectLayout(
 			_objectLayoutService.updateObjectLayout(
 				objectLayoutId, objectLayout.getDefaultObjectLayout(),
 				LocalizedMapUtil.getLocalizedMap(objectLayout.getName()),
 				transformToList(
 					objectLayout.getObjectLayoutTabs(),
-					objectLayoutTab -> _toObjectLayoutTab(
-						objectLayout.getObjectDefinitionId(),
-						objectLayoutTab))));
+					this::_toObjectLayoutTab)));
 	}
 
 	private ObjectLayout _toObjectLayout(
-			com.liferay.object.model.ObjectLayout serviceBuilderObjectLayout)
-		throws PortalException {
+		com.liferay.object.model.ObjectLayout serviceBuilderObjectLayout) {
 
-		return ObjectLayoutUtil.toObjectLayout(
-			HashMapBuilder.put(
-				"delete",
-				addAction(
-					ActionKeys.DELETE, "deleteObjectLayout",
-					ObjectDefinition.class.getName(),
-					serviceBuilderObjectLayout.getObjectDefinitionId())
-			).put(
-				"get",
-				addAction(
-					ActionKeys.VIEW, "getObjectLayout",
-					ObjectDefinition.class.getName(),
-					serviceBuilderObjectLayout.getObjectDefinitionId())
-			).put(
-				"update",
-				addAction(
-					ActionKeys.UPDATE, "putObjectLayout",
-					ObjectDefinition.class.getName(),
-					serviceBuilderObjectLayout.getObjectDefinitionId())
-			).build(),
-			_objectDefinitionLocalService, _objectFieldLocalService,
-			serviceBuilderObjectLayout);
+		return new ObjectLayout() {
+			{
+				actions = HashMapBuilder.put(
+					"delete",
+					addAction(
+						ActionKeys.DELETE, "deleteObjectLayout",
+						ObjectDefinition.class.getName(),
+						serviceBuilderObjectLayout.getObjectDefinitionId())
+				).put(
+					"get",
+					addAction(
+						ActionKeys.VIEW, "getObjectLayout",
+						ObjectDefinition.class.getName(),
+						serviceBuilderObjectLayout.getObjectDefinitionId())
+				).put(
+					"update",
+					addAction(
+						ActionKeys.UPDATE, "putObjectLayout",
+						ObjectDefinition.class.getName(),
+						serviceBuilderObjectLayout.getObjectDefinitionId())
+				).build();
+				dateCreated = serviceBuilderObjectLayout.getCreateDate();
+				dateModified = serviceBuilderObjectLayout.getModifiedDate();
+				defaultObjectLayout =
+					serviceBuilderObjectLayout.getDefaultObjectLayout();
+				id = serviceBuilderObjectLayout.getObjectLayoutId();
+				name = LocalizedMapUtil.getI18nMap(
+					serviceBuilderObjectLayout.getNameMap());
+				objectDefinitionId =
+					serviceBuilderObjectLayout.getObjectDefinitionId();
+				objectLayoutTabs = transformToArray(
+					serviceBuilderObjectLayout.getObjectLayoutTabs(),
+					objectLayoutTab -> _toObjectLayoutTab(objectLayoutTab),
+					ObjectLayoutTab.class);
+			}
+		};
+	}
+
+	private ObjectLayoutBox _toObjectLayoutBox(
+		com.liferay.object.model.ObjectLayoutBox
+			serviceBuilderObjectLayoutBox) {
+
+		return new ObjectLayoutBox() {
+			{
+				collapsable = serviceBuilderObjectLayoutBox.getCollapsable();
+				id = serviceBuilderObjectLayoutBox.getObjectLayoutBoxId();
+				name = LocalizedMapUtil.getI18nMap(
+					serviceBuilderObjectLayoutBox.getNameMap());
+				objectLayoutRows = transformToArray(
+					serviceBuilderObjectLayoutBox.getObjectLayoutRows(),
+					objectLayoutRow -> _toObjectLayoutRow(objectLayoutRow),
+					ObjectLayoutRow.class);
+				priority = serviceBuilderObjectLayoutBox.getPriority();
+			}
+		};
 	}
 
 	private com.liferay.object.model.ObjectLayoutBox _toObjectLayoutBox(
-			long objectDefinitionId, ObjectLayoutBox objectLayoutBox)
-		throws PortalException {
+		ObjectLayoutBox objectLayoutBox) {
 
 		com.liferay.object.model.ObjectLayoutBox serviceBuilderObjectLayoutBox =
 			_objectLayoutBoxPersistence.create(0L);
@@ -240,30 +196,37 @@ public class ObjectLayoutResourceImpl
 		serviceBuilderObjectLayoutBox.setObjectLayoutRows(
 			transformToList(
 				objectLayoutBox.getObjectLayoutRows(),
-				objectLayoutRow -> _toObjectLayoutRow(
-					objectDefinitionId, objectLayoutRow)));
+				this::_toObjectLayoutRow));
 		serviceBuilderObjectLayoutBox.setPriority(
 			objectLayoutBox.getPriority());
-		serviceBuilderObjectLayoutBox.setType(
-			objectLayoutBox.getTypeAsString());
 
 		return serviceBuilderObjectLayoutBox;
 	}
 
+	private ObjectLayoutColumn _toObjectLayoutColumn(
+		com.liferay.object.model.ObjectLayoutColumn
+			serviceBuilderObjectLayoutColumn) {
+
+		return new ObjectLayoutColumn() {
+			{
+				id = serviceBuilderObjectLayoutColumn.getObjectLayoutColumnId();
+				objectFieldId =
+					serviceBuilderObjectLayoutColumn.getObjectFieldId();
+				priority = serviceBuilderObjectLayoutColumn.getPriority();
+				size = serviceBuilderObjectLayoutColumn.getSize();
+			}
+		};
+	}
+
 	private com.liferay.object.model.ObjectLayoutColumn _toObjectLayoutColumn(
-			long objectDefinitionId, ObjectLayoutColumn objectLayoutColumn)
-		throws PortalException {
+		ObjectLayoutColumn objectLayoutColumn) {
 
 		com.liferay.object.model.ObjectLayoutColumn
 			serviceBuilderObjectLayoutColumn =
 				_objectLayoutColumnPersistence.create(0L);
 
-		ObjectField objectField = _objectFieldLocalService.getObjectField(
-			objectDefinitionId, objectLayoutColumn.getObjectFieldName());
-
 		serviceBuilderObjectLayoutColumn.setObjectFieldId(
-			objectField.getObjectFieldId());
-
+			objectLayoutColumn.getObjectFieldId());
 		serviceBuilderObjectLayoutColumn.setPriority(
 			objectLayoutColumn.getPriority());
 		serviceBuilderObjectLayoutColumn.setSize(
@@ -272,9 +235,25 @@ public class ObjectLayoutResourceImpl
 		return serviceBuilderObjectLayoutColumn;
 	}
 
+	private ObjectLayoutRow _toObjectLayoutRow(
+		com.liferay.object.model.ObjectLayoutRow
+			serviceBuilderObjectLayoutRow) {
+
+		return new ObjectLayoutRow() {
+			{
+				id = serviceBuilderObjectLayoutRow.getObjectLayoutRowId();
+				objectLayoutColumns = transformToArray(
+					serviceBuilderObjectLayoutRow.getObjectLayoutColumns(),
+					objectLayoutColumn -> _toObjectLayoutColumn(
+						objectLayoutColumn),
+					ObjectLayoutColumn.class);
+				priority = serviceBuilderObjectLayoutRow.getPriority();
+			}
+		};
+	}
+
 	private com.liferay.object.model.ObjectLayoutRow _toObjectLayoutRow(
-			long objectDefinitionId, ObjectLayoutRow objectLayoutRow)
-		throws PortalException {
+		ObjectLayoutRow objectLayoutRow) {
 
 		com.liferay.object.model.ObjectLayoutRow serviceBuilderObjectLayoutRow =
 			_objectLayoutRowPersistence.create(0L);
@@ -282,17 +261,35 @@ public class ObjectLayoutResourceImpl
 		serviceBuilderObjectLayoutRow.setObjectLayoutColumns(
 			transformToList(
 				objectLayoutRow.getObjectLayoutColumns(),
-				objectLayoutColumn -> _toObjectLayoutColumn(
-					objectDefinitionId, objectLayoutColumn)));
+				this::_toObjectLayoutColumn));
 		serviceBuilderObjectLayoutRow.setPriority(
 			objectLayoutRow.getPriority());
 
 		return serviceBuilderObjectLayoutRow;
 	}
 
+	private ObjectLayoutTab _toObjectLayoutTab(
+		com.liferay.object.model.ObjectLayoutTab
+			serviceBuilderObjectLayoutTab) {
+
+		return new ObjectLayoutTab() {
+			{
+				id = serviceBuilderObjectLayoutTab.getObjectLayoutTabId();
+				name = LocalizedMapUtil.getI18nMap(
+					serviceBuilderObjectLayoutTab.getNameMap());
+				objectLayoutBoxes = transformToArray(
+					serviceBuilderObjectLayoutTab.getObjectLayoutBoxes(),
+					objectLayoutBox -> _toObjectLayoutBox(objectLayoutBox),
+					ObjectLayoutBox.class);
+				objectRelationshipId =
+					serviceBuilderObjectLayoutTab.getObjectRelationshipId();
+				priority = serviceBuilderObjectLayoutTab.getPriority();
+			}
+		};
+	}
+
 	private com.liferay.object.model.ObjectLayoutTab _toObjectLayoutTab(
-			long objectDefinitionId, ObjectLayoutTab objectLayoutTab)
-		throws PortalException {
+		ObjectLayoutTab objectLayoutTab) {
 
 		com.liferay.object.model.ObjectLayoutTab serviceBuilderObjectLayoutTab =
 			_objectLayoutTabPersistence.create(0L);
@@ -302,21 +299,14 @@ public class ObjectLayoutResourceImpl
 		serviceBuilderObjectLayoutTab.setObjectLayoutBoxes(
 			transformToList(
 				objectLayoutTab.getObjectLayoutBoxes(),
-				objectLayoutBox -> _toObjectLayoutBox(
-					objectDefinitionId, objectLayoutBox)));
+				this::_toObjectLayoutBox));
 		serviceBuilderObjectLayoutTab.setObjectRelationshipId(
-			GetterUtil.getLong(objectLayoutTab.getObjectRelationshipId()));
+			objectLayoutTab.getObjectRelationshipId());
 		serviceBuilderObjectLayoutTab.setPriority(
 			objectLayoutTab.getPriority());
 
 		return serviceBuilderObjectLayoutTab;
 	}
-
-	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@Reference
-	private ObjectFieldLocalService _objectFieldLocalService;
 
 	@Reference
 	private ObjectLayoutBoxPersistence _objectLayoutBoxPersistence;

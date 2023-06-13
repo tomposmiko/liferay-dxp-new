@@ -26,20 +26,17 @@ import com.liferay.asset.list.web.internal.display.context.AssetListItemsDisplay
 import com.liferay.asset.list.web.internal.display.context.EditAssetListDisplayContext;
 import com.liferay.asset.list.web.internal.display.context.InfoCollectionProviderDisplayContext;
 import com.liferay.asset.list.web.internal.display.context.InfoCollectionProviderItemsDisplayContext;
-import com.liferay.asset.list.web.internal.display.context.SelectStructureFieldDisplayContext;
 import com.liferay.asset.list.web.internal.servlet.taglib.util.ListItemsActionDropdownItems;
 import com.liferay.asset.util.AssetRendererFactoryClassProvider;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
-import com.liferay.info.display.url.provider.InfoEditURLProviderRegistry;
-import com.liferay.info.item.InfoItemServiceRegistry;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
+import com.liferay.info.display.url.provider.InfoEditURLProviderTracker;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
-import com.liferay.segments.configuration.provider.SegmentsConfigurationProvider;
 
 import java.io.IOException;
 
@@ -71,8 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + AssetListPortletKeys.ASSET_LIST,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -101,32 +97,27 @@ public class AssetListPortlet extends MVCPortlet {
 		renderRequest.setAttribute(
 			AssetListWebKeys.EDIT_ASSET_LIST_DISPLAY_CONTEXT,
 			new EditAssetListDisplayContext(
-				_assetRendererFactoryClassProvider,
-				_infoSearchClassMapperRegistry, _itemSelector, renderRequest,
-				renderResponse, _segmentsConfigurationProvider,
+				_assetRendererFactoryClassProvider, _itemSelector,
+				renderRequest, renderResponse,
 				_getUnicodeProperties(assetListDisplayContext)));
+
 		renderRequest.setAttribute(
 			AssetListWebKeys.INFO_COLLECTION_PROVIDER_DISPLAY_CONTEXT,
 			new InfoCollectionProviderDisplayContext(
-				_infoItemServiceRegistry, renderRequest, renderResponse));
+				_infoItemServiceTracker, renderRequest, renderResponse));
 		renderRequest.setAttribute(
 			AssetListWebKeys.INFO_COLLECTION_PROVIDER_ITEMS_DISPLAY_CONTEXT,
 			new InfoCollectionProviderItemsDisplayContext(
-				_infoItemServiceRegistry, renderRequest, renderResponse));
-		renderRequest.setAttribute(
-			AssetListWebKeys.ITEM_SELECTOR, _itemSelector);
+				_infoItemServiceTracker, renderRequest, renderResponse));
 		renderRequest.setAttribute(
 			AssetListWebKeys.LIST_ITEMS_ACTION_DROPDOWN_ITEMS,
 			new ListItemsActionDropdownItems(
 				_assetDisplayPageFriendlyURLProvider, _dlAppService,
-				_infoEditURLProviderRegistry, _infoItemServiceRegistry,
-				_infoSearchClassMapperRegistry,
+				_infoEditURLProviderTracker, _infoItemServiceTracker,
 				_portal.getHttpServletRequest(renderRequest)));
+
 		renderRequest.setAttribute(
-			AssetListWebKeys.SELECT_STRUCTURE_FIELD_DISPLAY_CONTEXT,
-			new SelectStructureFieldDisplayContext(
-				_assetRendererFactoryClassProvider, renderRequest,
-				renderResponse));
+			AssetListWebKeys.ITEM_SELECTOR, _itemSelector);
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
@@ -177,21 +168,15 @@ public class AssetListPortlet extends MVCPortlet {
 	private DLAppService _dlAppService;
 
 	@Reference
-	private InfoEditURLProviderRegistry _infoEditURLProviderRegistry;
+	private InfoEditURLProviderTracker _infoEditURLProviderTracker;
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
-
-	@Reference
-	private InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
 	private ItemSelector _itemSelector;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private SegmentsConfigurationProvider _segmentsConfigurationProvider;
 
 }

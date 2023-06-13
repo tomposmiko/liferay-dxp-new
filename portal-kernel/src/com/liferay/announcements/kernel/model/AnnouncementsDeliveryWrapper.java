@@ -347,11 +347,6 @@ public class AnnouncementsDeliveryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected AnnouncementsDeliveryWrapper wrap(
 		AnnouncementsDelivery announcementsDelivery) {
 

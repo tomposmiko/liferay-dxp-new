@@ -14,13 +14,28 @@
 
 package com.liferay.commerce.shipping.web.internal.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.shipping.web.internal.constants.CommerceShippingScreenNavigationConstants;
+import com.liferay.commerce.product.model.CommerceChannel;
+import com.liferay.commerce.product.service.CommerceChannelLocalService;
+import com.liferay.commerce.service.CommerceShippingMethodService;
+import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionService;
+import com.liferay.commerce.shipping.web.internal.display.context.CommerceShippingMethodsDisplayContext;
+import com.liferay.commerce.util.CommerceShippingEngineRegistry;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+
+import java.io.IOException;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,16 +44,25 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=70",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=70",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CommerceChannelShippingRestrictionsScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<CommerceChannel> {
 
 	@Override
 	public String getCategoryKey() {
-		return CommerceShippingScreenNavigationConstants.
-			CATEGORY_KEY_COMMERCE_SHIPPING_RESTRICTIONS;
+		return "shipping-restrictions";
+	}
+
+	@Override
+	public String getEntryKey() {
+		return getCategoryKey();
 	}
 
 	@Override
@@ -46,16 +70,60 @@ public class CommerceChannelShippingRestrictionsScreenNavigationCategory
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return language.get(resourceBundle, getCategoryKey());
+		return LanguageUtil.get(resourceBundle, getCategoryKey());
 	}
 
 	@Override
 	public String getScreenNavigationKey() {
-		return CommerceShippingScreenNavigationConstants.
-			SCREEN_NAVIGATION_KEY_COMMERCE_CHANNEL_GENERAL;
+		return "commerce.channel.general";
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		CommerceShippingMethodsDisplayContext
+			commerceShippingMethodsDisplayContext =
+				new CommerceShippingMethodsDisplayContext(
+					_commerceChannelLocalService,
+					_commerceShippingEngineRegistry,
+					_commerceShippingFixedOptionService,
+					_commerceShippingMethodService, _countryService,
+					httpServletRequest);
+
+		httpServletRequest.setAttribute(
+			WebKeys.PORTLET_DISPLAY_CONTEXT,
+			commerceShippingMethodsDisplayContext);
+
+		_jspRenderer.renderJSP(
+			_servletContext, httpServletRequest, httpServletResponse,
+			"/commerce_shipping_method/restrictions.jsp");
 	}
 
 	@Reference
-	protected Language language;
+	private CommerceChannelLocalService _commerceChannelLocalService;
+
+	@Reference
+	private CommerceShippingEngineRegistry _commerceShippingEngineRegistry;
+
+	@Reference
+	private CommerceShippingFixedOptionService
+		_commerceShippingFixedOptionService;
+
+	@Reference
+	private CommerceShippingMethodService _commerceShippingMethodService;
+
+	@Reference
+	private CountryService _countryService;
+
+	@Reference
+	private JSPRenderer _jspRenderer;
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.shipping.web)"
+	)
+	private ServletContext _servletContext;
 
 }

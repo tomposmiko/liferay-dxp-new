@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the asset entry asset category rel service. This utility wraps <code>com.liferay.asset.entry.rel.service.persistence.impl.AssetEntryAssetCategoryRelPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -717,9 +721,29 @@ public class AssetEntryAssetCategoryRelUtil {
 	}
 
 	public static AssetEntryAssetCategoryRelPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile AssetEntryAssetCategoryRelPersistence _persistence;
+	private static ServiceTracker
+		<AssetEntryAssetCategoryRelPersistence,
+		 AssetEntryAssetCategoryRelPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			AssetEntryAssetCategoryRelPersistence.class);
+
+		ServiceTracker
+			<AssetEntryAssetCategoryRelPersistence,
+			 AssetEntryAssetCategoryRelPersistence> serviceTracker =
+				new ServiceTracker
+					<AssetEntryAssetCategoryRelPersistence,
+					 AssetEntryAssetCategoryRelPersistence>(
+						 bundle.getBundleContext(),
+						 AssetEntryAssetCategoryRelPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

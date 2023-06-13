@@ -35,8 +35,4 @@ public class AccountPortletKeys {
 		"com_liferay_account_admin_web_internal_portlet_" +
 			"AccountUsersAdminPortlet";
 
-	public static final String ACCOUNT_USERS_REGISTRATION =
-		"com_liferay_account_admin_web_internal_portlet_" +
-			"AccountUsersRegistrationPortlet";
-
 }

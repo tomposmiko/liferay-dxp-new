@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.captcha.CaptchaException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -51,7 +51,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tagnaouti Boubker
@@ -61,6 +60,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.captcha.configuration.CaptchaConfiguration",
+	immediate = true,
 	property = "captcha.engine.impl=com.liferay.captcha.recaptcha.ReCaptchaImpl",
 	service = Captcha.class
 )
@@ -134,7 +134,7 @@ public class ReCaptchaImpl extends SimpleCaptchaImpl {
 				"secret", _captchaConfiguration.reCaptchaPrivateKey());
 		}
 		catch (SystemException systemException) {
-			_log.error(systemException);
+			_log.error(systemException, systemException);
 		}
 
 		options.addPart("remoteip", httpServletRequest.getRemoteAddr());
@@ -147,7 +147,7 @@ public class ReCaptchaImpl extends SimpleCaptchaImpl {
 			content = HttpUtil.URLtoString(options);
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			_log.error(ioException, ioException);
 
 			throw new CaptchaConfigurationException();
 		}
@@ -159,7 +159,7 @@ public class ReCaptchaImpl extends SimpleCaptchaImpl {
 		}
 
 		try {
-			JSONObject jsonObject = _jsonFactory.createJSONObject(content);
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(content);
 
 			String success = jsonObject.getString("success");
 
@@ -211,8 +211,5 @@ public class ReCaptchaImpl extends SimpleCaptchaImpl {
 	private static final Log _log = LogFactoryUtil.getLog(ReCaptchaImpl.class);
 
 	private volatile CaptchaConfiguration _captchaConfiguration;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

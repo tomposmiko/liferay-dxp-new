@@ -18,11 +18,11 @@ import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.model.CTEntryTable;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.UserTable;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -59,11 +59,11 @@ public class ViewDiscardDisplayContext {
 		_renderResponse = renderResponse;
 		_userLocalService = userLocalService;
 
-		_ctCollectionId = ParamUtil.getLong(renderRequest, "ctCollectionId");
+		_ctCollectionId = ParamUtil.getLong(_renderRequest, "ctCollectionId");
 		_modelClassNameId = ParamUtil.getLong(
-			renderRequest, "modelClassNameId");
-		_modelClassPK = ParamUtil.getLong(renderRequest, "modelClassPK");
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+			_renderRequest, "modelClassNameId");
+		_modelClassPK = ParamUtil.getLong(_renderRequest, "modelClassPK");
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -120,7 +120,7 @@ public class ViewDiscardDisplayContext {
 				return ctEntriesJSONArray;
 			}
 		).put(
-			"spritemap", _themeDisplay.getPathThemeSpritemap()
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"typeNames",
 			DisplayContextUtil.getTypeNamesJSONObject(

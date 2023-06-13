@@ -14,7 +14,6 @@
 
 package com.liferay.portal.reports.engine.console.service.impl;
 
-import com.liferay.document.library.kernel.store.DLStoreRequest;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.petra.memory.DeleteFileFinalizeAction;
 import com.liferay.petra.memory.FinalizeManager;
@@ -32,19 +31,19 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
-import com.liferay.portal.kernel.scheduler.TriggerFactory;
-import com.liferay.portal.kernel.service.ResourceLocalService;
+import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -57,18 +56,17 @@ import com.liferay.portal.reports.engine.ReportRequest;
 import com.liferay.portal.reports.engine.ReportRequestContext;
 import com.liferay.portal.reports.engine.console.configuration.ReportsGroupServiceEmailConfiguration;
 import com.liferay.portal.reports.engine.console.constants.ReportsEngineConsoleConstants;
+import com.liferay.portal.reports.engine.console.constants.ReportsEngineConsoleDestinationNames;
 import com.liferay.portal.reports.engine.console.exception.DefinitionNameException;
 import com.liferay.portal.reports.engine.console.exception.EntryEmailDeliveryException;
 import com.liferay.portal.reports.engine.console.exception.EntryEmailNotificationsException;
-import com.liferay.portal.reports.engine.console.internal.constants.ReportsEngineDestinationNames;
 import com.liferay.portal.reports.engine.console.internal.util.ReportsEngineConsoleSubscriptionSender;
 import com.liferay.portal.reports.engine.console.model.Definition;
 import com.liferay.portal.reports.engine.console.model.Entry;
 import com.liferay.portal.reports.engine.console.model.Source;
 import com.liferay.portal.reports.engine.console.service.base.EntryLocalServiceBaseImpl;
-import com.liferay.portal.reports.engine.console.service.persistence.DefinitionPersistence;
-import com.liferay.portal.reports.engine.console.service.persistence.SourcePersistence;
 import com.liferay.portal.reports.engine.console.status.ReportStatus;
+import com.liferay.portal.reports.engine.constants.ReportsEngineDestinationNames;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,10 +104,10 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		// Entry
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 		Date date = new Date();
 
-		_validate(emailNotifications, emailDelivery, reportName);
+		validate(emailNotifications, emailDelivery, reportName);
 
 		long entryId = counterLocalService.increment();
 
@@ -144,12 +142,12 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.addModelResources(entry, serviceContext);
+		resourceLocalService.addModelResources(entry, serviceContext);
 
 		// Scheduler
 
 		if (schedulerRequest) {
-			_scheduleEntry(entry, reportName);
+			scheduleEntry(entry, reportName);
 		}
 
 		// Report
@@ -167,7 +165,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 			boolean addGuestPermissions)
 		throws PortalException {
 
-		_resourceLocalService.addResources(
+		resourceLocalService.addResources(
 			entry.getCompanyId(), entry.getGroupId(), entry.getUserId(),
 			Entry.class.getName(), entry.getEntryId(), false,
 			addCommunityPermissions, addGuestPermissions);
@@ -179,7 +177,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 			String[] guestPermissions)
 		throws PortalException {
 
-		_resourceLocalService.addModelResources(
+		resourceLocalService.addModelResources(
 			entry.getCompanyId(), entry.getGroupId(), entry.getUserId(),
 			Entry.class.getName(), entry.getEntryId(), communityPermissions,
 			guestPermissions);
@@ -202,7 +200,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.deleteResource(
+		resourceLocalService.deleteResource(
 			entry.getCompanyId(), Entry.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL, entry.getEntryId());
 
@@ -234,7 +232,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 	public void generateReport(long entryId) throws PortalException {
 		Entry entry = entryPersistence.findByPrimaryKey(entryId);
 
-		Definition definition = _definitionPersistence.findByPrimaryKey(
+		Definition definition = definitionPersistence.findByPrimaryKey(
 			entry.getDefinitionId());
 
 		generateReport(entryId, definition.getReportName());
@@ -246,7 +244,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		Entry entry = entryPersistence.findByPrimaryKey(entryId);
 
-		Definition definition = _definitionPersistence.findByPrimaryKey(
+		Definition definition = definitionPersistence.findByPrimaryKey(
 			entry.getDefinitionId());
 
 		String[] existingFiles = definition.getAttachmentsFiles();
@@ -282,7 +280,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 				ReportDataSourceType.PORTAL);
 		}
 		else {
-			Source source = _sourcePersistence.findByPrimaryKey(sourceId);
+			Source source = sourcePersistence.findByPrimaryKey(sourceId);
 
 			reportRequestContext = new ReportRequestContext(
 				ReportDataSourceType.JDBC);
@@ -306,6 +304,8 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		Message message = new Message();
 
 		message.setPayload(reportRequest);
+		message.setResponseDestinationName(
+			ReportsEngineConsoleDestinationNames.REPORTS_ADMIN);
 		message.setResponseId(String.valueOf(entry.getEntryId()));
 
 		_messageBus.sendMessage(
@@ -342,7 +342,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		Entry entry = entryLocalService.getEntry(entryId);
 
 		try {
-			_notifySubscribers(entry, emailAddresses, fileName, notification);
+			notifySubscribers(entry, emailAddresses, fileName, notification);
 		}
 		catch (IOException ioException) {
 			throw new PortalException(ioException.getMessage());
@@ -394,13 +394,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 			entry.getAttachmentsDir() + StringPool.SLASH + reportName;
 
 		DLStoreUtil.addFile(
-			DLStoreRequest.builder(
-				entry.getCompanyId(), CompanyConstants.SYSTEM, fileName
-			).className(
-				this
-			).size(
-				reportResults.length
-			).build(),
+			entry.getCompanyId(), CompanyConstants.SYSTEM, fileName, false,
 			reportResults);
 
 		String[] emailAddresses = StringUtil.split(entry.getEmailDelivery());
@@ -430,9 +424,9 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		entryPersistence.update(entry);
 	}
 
-	private ReportsGroupServiceEmailConfiguration
-			_getReportsGroupServiceEmailConfiguration(long groupId)
-		throws Exception {
+	protected ReportsGroupServiceEmailConfiguration
+			getReportsGroupServiceEmailConfiguration(long groupId)
+		throws ConfigurationException {
 
 		return _configurationProvider.getConfiguration(
 			ReportsGroupServiceEmailConfiguration.class,
@@ -440,9 +434,9 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 				groupId, ReportsEngineConsoleConstants.SERVICE_NAME));
 	}
 
-	private File _getTemporaryReportFile(
+	protected File getTemporaryReportFile(
 			Entry entry, String fileName, boolean notification)
-		throws Exception {
+		throws IOException, PortalException {
 
 		if (notification) {
 			return null;
@@ -459,7 +453,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		}
 	}
 
-	private void _notifySubscribers(
+	protected void notifySubscribers(
 			Entry entry, String[] emailAddresses, String fileName,
 			boolean notification)
 		throws Exception {
@@ -472,7 +466,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		ReportsGroupServiceEmailConfiguration
 			reportsGroupServiceEmailConfiguration =
-				_getReportsGroupServiceEmailConfiguration(entry.getGroupId());
+				getReportsGroupServiceEmailConfiguration(entry.getGroupId());
 
 		String fromName = reportsGroupServiceEmailConfiguration.emailFromName();
 
@@ -483,18 +477,18 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		Map<Locale, String> localizedBodyMap = null;
 
 		if (notification) {
-			localizedBodyMap = _localization.getMap(
+			localizedBodyMap = LocalizationUtil.getMap(
 				reportsGroupServiceEmailConfiguration.emailNotificationsBody());
 
-			localizedSubjectMap = _localization.getMap(
+			localizedSubjectMap = LocalizationUtil.getMap(
 				reportsGroupServiceEmailConfiguration.
 					emailNotificationsSubject());
 		}
 		else {
-			localizedBodyMap = _localization.getMap(
+			localizedBodyMap = LocalizationUtil.getMap(
 				reportsGroupServiceEmailConfiguration.emailDeliveryBody());
 
-			localizedSubjectMap = _localization.getMap(
+			localizedSubjectMap = LocalizationUtil.getMap(
 				reportsGroupServiceEmailConfiguration.emailDeliverySubject());
 		}
 
@@ -505,7 +499,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 			fileName, StringPool.FORWARD_SLASH);
 
 		if (!notification) {
-			File file = _getTemporaryReportFile(entry, fileName, notification);
+			File file = getTemporaryReportFile(entry, fileName, notification);
 
 			FinalizeManager.register(
 				subscriptionSender,
@@ -547,10 +541,10 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 		subscriptionSender.flushNotificationsAsync();
 	}
 
-	private void _scheduleEntry(Entry entry, String reportName)
+	protected void scheduleEntry(Entry entry, String reportName)
 		throws PortalException {
 
-		Trigger trigger = _triggerFactory.createTrigger(
+		Trigger trigger = TriggerFactoryUtil.createTrigger(
 			entry.getJobName(), entry.getSchedulerRequestName(),
 			entry.getStartDate(), entry.getEndDate(), entry.getRecurrence());
 
@@ -562,10 +556,10 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 
 		_schedulerEngineHelper.schedule(
 			trigger, StorageType.PERSISTED, null,
-			ReportsEngineDestinationNames.REPORTS_SCHEDULER_EVENT, message);
+			"liferay/reports_scheduler_event", message, 0);
 	}
 
-	private void _validate(
+	protected void validate(
 			String emailNotifications, String emailDelivery, String reportName)
 		throws PortalException {
 
@@ -590,13 +584,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
-	private DefinitionPersistence _definitionPersistence;
-
-	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private MessageBus _messageBus;
@@ -605,16 +593,7 @@ public class EntryLocalServiceImpl extends EntryLocalServiceBaseImpl {
 	private Portal _portal;
 
 	@Reference
-	private ResourceLocalService _resourceLocalService;
-
-	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
-
-	@Reference
-	private SourcePersistence _sourcePersistence;
-
-	@Reference
-	private TriggerFactory _triggerFactory;
 
 	@Reference
 	private UserLocalService _userLocalService;

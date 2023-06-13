@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING,
 		"mvc.command.name=/dynamic_data_mapping/copy_structure"
@@ -53,12 +54,63 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class CopyStructureMVCActionCommand extends BaseDDMMVCActionCommand {
 
+	protected DDMStructure copyStructure(ActionRequest actionRequest)
+		throws Exception {
+
+		long classPK = ParamUtil.getLong(actionRequest, "classPK");
+
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+			actionRequest, "name");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DDMStructure.class.getName(), actionRequest);
+
+		DDMStructure structure = _ddmStructureService.copyStructure(
+			classPK, nameMap, descriptionMap, serviceContext);
+
+		copyTemplates(actionRequest, classPK, structure.getStructureId());
+
+		return structure;
+	}
+
+	protected void copyTemplates(
+			ActionRequest actionRequest, long oldClassPK, long newClassPK)
+		throws Exception {
+
+		long classNameId = _portal.getClassNameId(DDMStructure.class);
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DDMTemplate.class.getName(), actionRequest);
+
+		long resourceClassNameId = ParamUtil.getLong(
+			actionRequest, "resourceClassNameId");
+		boolean copyDisplayTemplates = ParamUtil.getBoolean(
+			actionRequest, "copyDisplayTemplates");
+
+		if (copyDisplayTemplates) {
+			_ddmTemplateService.copyTemplates(
+				classNameId, oldClassPK, resourceClassNameId, newClassPK,
+				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, serviceContext);
+		}
+
+		boolean copyFormTemplates = ParamUtil.getBoolean(
+			actionRequest, "copyFormTemplates");
+
+		if (copyFormTemplates) {
+			_ddmTemplateService.copyTemplates(
+				classNameId, oldClassPK, resourceClassNameId, newClassPK,
+				DDMTemplateConstants.TEMPLATE_TYPE_FORM, serviceContext);
+		}
+	}
+
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		DDMStructure structure = _copyStructure(actionRequest);
+		DDMStructure structure = copyStructure(actionRequest);
 
 		setRedirectAttribute(actionRequest, structure);
 	}
@@ -93,65 +145,22 @@ public class CopyStructureMVCActionCommand extends BaseDDMMVCActionCommand {
 		return portletURL.toString();
 	}
 
-	private DDMStructure _copyStructure(ActionRequest actionRequest)
-		throws Exception {
+	@Reference(unbind = "-")
+	protected void setDDMStructureService(
+		DDMStructureService ddmStructureService) {
 
-		long classPK = ParamUtil.getLong(actionRequest, "classPK");
-
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
-			actionRequest, "name");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DDMStructure.class.getName(), actionRequest);
-
-		DDMStructure structure = _ddmStructureService.copyStructure(
-			classPK, nameMap, descriptionMap, serviceContext);
-
-		_copyTemplates(actionRequest, classPK, structure.getStructureId());
-
-		return structure;
+		_ddmStructureService = ddmStructureService;
 	}
 
-	private void _copyTemplates(
-			ActionRequest actionRequest, long oldClassPK, long newClassPK)
-		throws Exception {
+	@Reference(unbind = "-")
+	protected void setDDMTemplateService(
+		DDMTemplateService ddmTemplateService) {
 
-		long classNameId = _portal.getClassNameId(DDMStructure.class);
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DDMTemplate.class.getName(), actionRequest);
-
-		long resourceClassNameId = ParamUtil.getLong(
-			actionRequest, "resourceClassNameId");
-		boolean copyDisplayTemplates = ParamUtil.getBoolean(
-			actionRequest, "copyDisplayTemplates");
-
-		if (copyDisplayTemplates) {
-			_ddmTemplateService.copyTemplates(
-				classNameId, oldClassPK, resourceClassNameId, newClassPK,
-				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, serviceContext);
-		}
-
-		boolean copyFormTemplates = ParamUtil.getBoolean(
-			actionRequest, "copyFormTemplates");
-
-		if (copyFormTemplates) {
-			_ddmTemplateService.copyTemplates(
-				classNameId, oldClassPK, resourceClassNameId, newClassPK,
-				DDMTemplateConstants.TEMPLATE_TYPE_FORM, serviceContext);
-		}
+		_ddmTemplateService = ddmTemplateService;
 	}
 
-	@Reference
 	private DDMStructureService _ddmStructureService;
-
-	@Reference
 	private DDMTemplateService _ddmTemplateService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

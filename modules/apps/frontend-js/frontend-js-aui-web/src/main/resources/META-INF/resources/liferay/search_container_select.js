@@ -15,43 +15,38 @@
 AUI.add(
 	'liferay-search-container-select',
 	(A) => {
-		const AArray = A.Array;
-		const Lang = A.Lang;
+		var AArray = A.Array;
+		var Lang = A.Lang;
 
-		const REGEX_MATCH_EVERYTHING = /.*/;
+		var REGEX_MATCH_EVERYTHING = /.*/;
 
 		// eslint-disable-next-line no-empty-character-class
-		const REGEX_MATCH_NOTHING = /^[]/;
+		var REGEX_MATCH_NOTHING = /^[]/;
 
-		const STR_ACTIONS_WILDCARD = '*';
+		var STR_ACTIONS_WILDCARD = '*';
 
-		const STR_CHECKBOX_SELECTOR = 'input[type="checkbox"]';
+		var STR_CHECKBOX_SELECTOR = 'input[type=checkbox]:enabled';
 
-		const STR_CHECKBOX_ENABLED_SELECTOR = `${STR_CHECKBOX_SELECTOR}:enabled`;
+		var STR_CHECKED = 'checked';
 
-		const STR_CHECKED = 'checked';
+		var STR_CLICK = 'click';
 
-		const STR_CLICK = 'click';
+		var STR_CONTENT_BOX = 'contentBox';
 
-		const STR_CONTENT_BOX = 'contentBox';
+		var STR_HOST = 'host';
 
-		const STR_HOST = 'host';
+		var STR_ROW_CLASS_NAME_ACTIVE = 'rowClassNameActive';
 
-		const STR_ROW_CLASS_NAME_ACTIVE = 'rowClassNameActive';
+		var STR_ROW_SELECTOR = 'rowSelector';
 
-		const STR_ROW_SELECTOR = 'rowSelector';
-
-		const TPL_HIDDEN_INPUT_CHECKED =
+		var TPL_HIDDEN_INPUT =
 			'<input class="hide" name="{name}" value="{value}" type="checkbox" ' +
 			STR_CHECKED +
 			' />';
 
-		const TPL_HIDDEN_INPUT_UNCHECKED =
-			'<input class="hide" name="{name}" value="{value}" type="checkbox"/>';
+		var TPL_INPUT_SELECTOR = 'input[type="checkbox"][value="{value}"]';
 
-		const TPL_INPUT_SELECTOR = 'input[type="checkbox"][value="{value}"]';
-
-		const SearchContainerSelect = A.Component.create({
+		var SearchContainerSelect = A.Component.create({
 			ATTRS: {
 				bulkSelection: {
 					validator: Lang.isBoolean,
@@ -87,12 +82,7 @@ AUI.add(
 				rowSelector: {
 					validator: Lang.isString,
 					value:
-						'dd[data-selectable="true"],li[data-selectable="true"],tr[data-selectable="true"]',
-				},
-
-				sessionStorageItemKey: {
-					validator: Lang.isString,
-					value: '',
+						'li[data-selectable="true"],tr[data-selectable="true"]',
 				},
 			},
 
@@ -104,9 +94,9 @@ AUI.add(
 
 			prototype: {
 				_addRestoreTask() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
 					Liferay.DOMTaskRunner.addTask({
 						action: A.Plugin.SearchContainerSelect.restoreTask,
@@ -124,17 +114,16 @@ AUI.add(
 				},
 
 				_addRestoreTaskState() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const elements = [];
+					var elements = [];
 
-					const allElements = instance._getAllElements(false);
+					var selectedElements = instance.getAllSelectedElements();
 
-					allElements.each((item) => {
+					selectedElements.each((item) => {
 						elements.push({
-							checked: item.attr('checked'),
 							name: item.attr('name'),
 							value: item.val(),
 						});
@@ -147,26 +136,16 @@ AUI.add(
 							selector:
 								instance.get(STR_ROW_SELECTOR) +
 								' ' +
-								STR_CHECKBOX_ENABLED_SELECTOR,
+								STR_CHECKBOX_SELECTOR,
 						},
 						owner: host.get('id'),
 					});
 				},
 
-				_clearSessionStorage() {
-					const instance = this;
-
-					const sessionStorageItemKey = instance.get(
-						'sessionStorageItemKey'
-					);
-
-					sessionStorage.removeItem(sessionStorageItemKey);
-				},
-
 				_getActions(elements) {
-					const instance = this;
+					var instance = this;
 
-					const actions = elements
+					var actions = elements
 						.getDOMNodes()
 						.map((node) => {
 							return A.one(node).ancestor(
@@ -174,7 +153,7 @@ AUI.add(
 							);
 						})
 						.filter((item) => {
-							let itemActions;
+							var itemActions;
 
 							if (item) {
 								itemActions = item.getData('actions');
@@ -191,37 +170,37 @@ AUI.add(
 
 					return actions.reduce((commonActions, elementActions) => {
 						return commonActions.filter((action) => {
-							return elementActions.indexOf(action) !== -1;
+							return elementActions.indexOf(action) != -1;
 						});
 					}, actions[0]);
 				},
 
 				_getAllElements(onlySelected) {
-					const instance = this;
+					var instance = this;
 
 					return instance._getElements(
-						STR_CHECKBOX_ENABLED_SELECTOR,
+						STR_CHECKBOX_SELECTOR,
 						onlySelected
 					);
 				},
 
 				_getCurrentPageElements(onlySelected) {
-					const instance = this;
+					var instance = this;
 
 					return instance._getElements(
 						instance.get(STR_ROW_SELECTOR) +
 							' ' +
-							STR_CHECKBOX_ENABLED_SELECTOR,
+							STR_CHECKBOX_SELECTOR,
 						onlySelected
 					);
 				},
 
 				_getElements(selector, onlySelected) {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const checked = onlySelected ? ':' + STR_CHECKED : '';
+					var checked = onlySelected ? ':' + STR_CHECKED : '';
 
 					return host.get(STR_CONTENT_BOX).all(selector + checked);
 				},
@@ -233,11 +212,11 @@ AUI.add(
 				},
 
 				_notifyRowToggle() {
-					const instance = this;
+					var instance = this;
 
-					const allSelectedElements = instance.getAllSelectedElements();
+					var allSelectedElements = instance.getAllSelectedElements();
 
-					const payload = {
+					var payload = {
 						actions: instance._getActions(allSelectedElements),
 						elements: {
 							allElements: instance._getAllElements(),
@@ -251,9 +230,9 @@ AUI.add(
 				},
 
 				_onClickRowSelector(config, event) {
-					const instance = this;
+					var instance = this;
 
-					const row = event.currentTarget.ancestor(
+					var row = event.currentTarget.ancestor(
 						instance.get(STR_ROW_SELECTOR)
 					);
 
@@ -261,7 +240,7 @@ AUI.add(
 				},
 
 				_onStartNavigate(event) {
-					const instance = this;
+					var instance = this;
 
 					if (
 						!instance._isActionUrl(event.path) &&
@@ -272,136 +251,47 @@ AUI.add(
 					}
 				},
 
-				_restoreFromSessionStorage(host) {
-					const instance = this;
-
-					const sessionStorageItemKey = instance.get(
-						'sessionStorageItemKey'
-					);
-
-					if (sessionStorage.getItem(sessionStorageItemKey)) {
-						const container = A.one(host._getNodeToParse());
-
-						const selections = sessionStorage
-							.getItem(sessionStorageItemKey)
-							.split(',');
-
-						const itemName = host
-							.get('contentBox')
-							.one(STR_CHECKBOX_SELECTOR)
-							?.get('name');
-
-						let offScreenElementsHtml = '';
-
-						selections.map((item) => {
-							const input = container.one(
-								A.Lang.sub(TPL_INPUT_SELECTOR, {value: item})
-							);
-
-							if (input) {
-								input.attr('checked', true);
-								input
-									.ancestor(instance.get(STR_ROW_SELECTOR))
-									.addClass('active');
-							}
-							else {
-								offScreenElementsHtml += A.Lang.sub(
-									TPL_HIDDEN_INPUT_CHECKED,
-									{name: itemName, value: item}
-								);
-							}
-						});
-
-						container.append(offScreenElementsHtml);
-
-						instance._clearSessionStorage();
-					}
-				},
-
-				_updateSessionWithSelections() {
-					const instance = this;
-
-					const sessionStorageItemKey = instance.get(
-						'sessionStorageItemKey'
-					);
-
-					let selectedItems = [];
-
-					if (instance.getAllSelectedElements().size() > 0) {
-						selectedItems = instance.getAllSelectedElements().val();
-					}
-
-					if (sessionStorage.getItem(sessionStorageItemKey)) {
-						if (selectedItems.length) {
-							sessionStorage.setItem(
-								sessionStorageItemKey,
-								selectedItems
-							);
-						}
-						else {
-							instance._clearSessionStorage();
-						}
-					}
-					else if (selectedItems.length) {
-						sessionStorage.setItem(
-							sessionStorageItemKey,
-							selectedItems
-						);
-					}
-				},
-
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					new A.EventHandle(instance._eventHandles).detach();
 				},
 
 				getAllSelectedElements() {
-					const instance = this;
+					var instance = this;
 
 					return instance._getAllElements(true);
 				},
 
 				getCurrentPageElements() {
-					const instance = this;
+					var instance = this;
 
 					return instance._getCurrentPageElements();
 				},
 
 				getCurrentPageSelectedElements() {
-					const instance = this;
+					var instance = this;
 
 					return instance._getCurrentPageElements(true);
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const hostContentBox = host.get(STR_CONTENT_BOX);
+					var hostContentBox = host.get(STR_CONTENT_BOX);
 
 					instance.set(
 						'bulkSelection',
 						hostContentBox.getData('bulkSelection')
 					);
 
-					instance.set(
-						'sessionStorageItemKey',
-						`${host.get(
-							'id'
-						)}${themeDisplay.getUserId()}_selections`
-					);
+					var toggleRowFn = A.bind('_onClickRowSelector', instance, {
+						toggleCheckbox: true,
+					});
 
-					const toggleRowFn = A.bind(
-						'_onClickRowSelector',
-						instance,
-						{
-							toggleCheckbox: true,
-						}
-					);
-
-					const toggleRowCSSFn = A.bind(
+					var toggleRowCSSFn = A.bind(
 						'_onClickRowSelector',
 						instance,
 						{}
@@ -415,7 +305,7 @@ AUI.add(
 								toggleRowCSSFn,
 								instance.get(STR_ROW_SELECTOR) +
 									' ' +
-									STR_CHECKBOX_ENABLED_SELECTOR,
+									STR_CHECKBOX_SELECTOR,
 								instance
 							),
 						host
@@ -434,38 +324,16 @@ AUI.add(
 							instance
 						),
 					];
-
-					if (!Liferay.SPA) {
-						instance._restoreFromSessionStorage(host);
-
-						host.on('clearFilter', () =>
-							instance._updateSessionWithSelections()
-						);
-
-						window.addEventListener('beforeunload', () => {
-							if (
-								document
-									.getElementById(
-										host.get('id') + 'PageIteratorBottom'
-									)
-									.contains(document.activeElement)
-							) {
-								instance._updateSessionWithSelections();
-							}
-						});
-					}
 				},
 
 				isSelected(element) {
-					return element
-						.one(STR_CHECKBOX_ENABLED_SELECTOR)
-						.attr(STR_CHECKED);
+					return element.one(STR_CHECKBOX_SELECTOR).attr(STR_CHECKED);
 				},
 
 				toggleAllRows(selected, bulkSelection) {
-					const instance = this;
+					var instance = this;
 
-					const elements = bulkSelection
+					var elements = bulkSelection
 						? instance._getAllElements()
 						: instance._getCurrentPageElements();
 
@@ -486,10 +354,10 @@ AUI.add(
 				},
 
 				toggleRow(config, row) {
-					const instance = this;
+					var instance = this;
 
 					if (config && config.toggleCheckbox) {
-						const checkbox = row.one(STR_CHECKBOX_ENABLED_SELECTOR);
+						var checkbox = row.one(STR_CHECKBOX_SELECTOR);
 
 						checkbox.attr(STR_CHECKED, !checkbox.attr(STR_CHECKED));
 					}
@@ -503,7 +371,7 @@ AUI.add(
 			},
 
 			restoreTask(state, params, node) {
-				const container = A.one(node).one('#' + params.containerId);
+				var container = A.one(node).one('#' + params.containerId);
 
 				container.setData('bulkSelection', state.data.bulkSelection);
 
@@ -516,30 +384,22 @@ AUI.add(
 					});
 				}
 				else {
-					let offScreenElementsHtml = '';
+					var offScreenElementsHtml = '';
 
 					AArray.each(state.data.elements, (item) => {
-						const input = container.one(
+						var input = container.one(
 							Lang.sub(TPL_INPUT_SELECTOR, item)
 						);
 
 						if (input) {
-							if (item.checked) {
-								input.attr(STR_CHECKED, true);
-								input
-									.ancestor(params.rowSelector)
-									.addClass(params.rowClassNameActive);
-							}
-						}
-						else if (item.checked) {
-							offScreenElementsHtml += Lang.sub(
-								TPL_HIDDEN_INPUT_CHECKED,
-								item
-							);
+							input.attr(STR_CHECKED, true);
+							input
+								.ancestor(params.rowSelector)
+								.addClass(params.rowClassNameActive);
 						}
 						else {
 							offScreenElementsHtml += Lang.sub(
-								TPL_HIDDEN_INPUT_UNCHECKED,
+								TPL_HIDDEN_INPUT,
 								item
 							);
 						}

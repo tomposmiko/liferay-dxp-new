@@ -22,13 +22,12 @@ import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.content.render.list.CPContentListRendererRegistry;
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
 import com.liferay.commerce.product.content.web.internal.display.context.CPPublisherConfigurationDisplayContext;
-import com.liferay.commerce.product.content.web.internal.helper.CPPublisherWebHelper;
+import com.liferay.commerce.product.content.web.internal.util.CPPublisherWebHelper;
 import com.liferay.commerce.product.content.web.internal.util.CPQueryRule;
 import com.liferay.commerce.product.data.source.CPDataSourceRegistry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPDefinitionService;
-import com.liferay.commerce.product.type.CPTypeRegistry;
-import com.liferay.commerce.product.util.CPDefinitionHelper;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPInstanceHelper;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.petra.string.StringPool;
@@ -62,6 +61,7 @@ import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -71,6 +71,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "javax.portlet.name=" + CPPortletKeys.CP_PUBLISHER_WEB,
 	service = ConfigurationAction.class
 )
@@ -85,16 +86,16 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 						_assetCategoryLocalService, _assetTagLocalService,
 						_cpContentListEntryRendererRegistry,
 						_cpContentListRendererRegistry, _cpDataSourceRegistry,
-						_cpDefinitionHelper, _cpInstanceHelper,
-						_cpPublisherWebHelper, _cpTypeRegistry,
-						httpServletRequest, _itemSelector);
+						_cpInstanceHelper, _cpPublisherWebHelper,
+						_cpTypeServicesTracker, httpServletRequest,
+						_itemSelector);
 
 			httpServletRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
 				cpPublisherConfigurationDisplayContext);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return "/product_publisher/configuration.jsp";
@@ -122,7 +123,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 					actionRequest, "selectionStyle");
 
 				if (selectionStyle.equals("dynamic")) {
-					_updateQueryLogic(actionRequest, preferences);
+					updateQueryLogic(actionRequest, preferences);
 				}
 
 				super.processAction(
@@ -141,16 +142,16 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 			}
 		}
 		else if (cmd.equals("add-selection")) {
-			_addSelection(actionRequest, preferences);
+			addSelection(actionRequest, preferences);
 		}
 		else if (cmd.equals("move-selection-down")) {
-			_moveSelectionDown(actionRequest, preferences);
+			moveSelectionDown(actionRequest, preferences);
 		}
 		else if (cmd.equals("move-selection-up")) {
-			_moveSelectionUp(actionRequest, preferences);
+			moveSelectionUp(actionRequest, preferences);
 		}
 		else if (cmd.equals("remove-selection")) {
-			_removeSelection(actionRequest, preferences);
+			removeSelection(actionRequest, preferences);
 		}
 		else if (cmd.equals("render-selection")) {
 			String renderSelection = getParameter(
@@ -159,10 +160,10 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 			preferences.setValue("renderSelection", renderSelection);
 		}
 		else if (cmd.equals("select-data-source")) {
-			_setDataSource(actionRequest, preferences);
+			setDataSource(actionRequest, preferences);
 		}
 		else if (cmd.equals("selection-style")) {
-			_setSelectionStyle(actionRequest, preferences);
+			setSelectionStyle(actionRequest, preferences);
 		}
 
 		if (SessionErrors.isEmpty(actionRequest)) {
@@ -188,7 +189,16 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		}
 	}
 
-	private void _addSelection(
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected void addSelection(
 			PortletPreferences portletPreferences, long cpDefinitionId,
 			int productEntryOrder)
 		throws Exception {
@@ -222,7 +232,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		}
 	}
 
-	private void _addSelection(
+	protected void addSelection(
 			PortletRequest portletRequest,
 			PortletPreferences portletPreferences)
 		throws Exception {
@@ -231,42 +241,11 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 			portletRequest, "cpDefinitionIds");
 
 		for (long cpDefinitionId : cpDefinitionIds) {
-			_addSelection(portletPreferences, cpDefinitionId, -1);
+			addSelection(portletPreferences, cpDefinitionId, -1);
 		}
 	}
 
-	private String _getAssetEntryXml(
-		String productEntryType, long cpDefinitionId) {
-
-		String xml = null;
-
-		try {
-			Document document = SAXReaderUtil.createDocument(StringPool.UTF8);
-
-			Element productEntryElement = document.addElement("product-entry");
-
-			Element productEntryTypeElement = productEntryElement.addElement(
-				"product-entry-type");
-
-			productEntryTypeElement.addText(productEntryType);
-
-			Element productEntryIdElement = productEntryElement.addElement(
-				"product-id");
-
-			productEntryIdElement.addText(String.valueOf(cpDefinitionId));
-
-			xml = document.formattedString(StringPool.BLANK);
-		}
-		catch (IOException ioException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(ioException);
-			}
-		}
-
-		return xml;
-	}
-
-	private CPQueryRule _getQueryRule(ActionRequest actionRequest, int index) {
+	protected CPQueryRule getQueryRule(ActionRequest actionRequest, int index) {
 		boolean contains = ParamUtil.getBoolean(
 			actionRequest, "queryContains" + index);
 		boolean andOperator = ParamUtil.getBoolean(
@@ -288,7 +267,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		return new CPQueryRule(contains, andOperator, name, values);
 	}
 
-	private void _moveSelectionDown(
+	protected void moveSelectionDown(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
 
@@ -312,7 +291,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		preferences.setValues("catalogEntryXml", manualEntries);
 	}
 
-	private void _moveSelectionUp(
+	protected void moveSelectionUp(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
 
@@ -336,7 +315,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		preferences.setValues("catalogEntryXml", manualEntries);
 	}
 
-	private void _removeSelection(
+	protected void removeSelection(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
 
@@ -364,7 +343,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		preferences.setValues("catalogEntryXml", newEntries);
 	}
 
-	private void _setDataSource(
+	protected void setDataSource(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
 
@@ -373,7 +352,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		preferences.setValue("dataSource", dataSource);
 	}
 
-	private void _setSelectionStyle(
+	protected void setSelectionStyle(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
 
@@ -386,7 +365,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		}
 	}
 
-	private void _updateQueryLogic(
+	protected void updateQueryLogic(
 			ActionRequest actionRequest, PortletPreferences preferences)
 		throws Exception {
 
@@ -404,10 +383,10 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		List<CPQueryRule> queryRules = new ArrayList<>();
 
 		for (int queryRulesIndex : queryRulesIndexes) {
-			CPQueryRule queryRule = _getQueryRule(
+			CPQueryRule queryRule = getQueryRule(
 				actionRequest, queryRulesIndex);
 
-			_validateQueryRule(userId, groupId, queryRules, queryRule);
+			validateQueryRule(userId, groupId, queryRules, queryRule);
 
 			queryRules.add(queryRule);
 
@@ -442,7 +421,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 		}
 	}
 
-	private void _validateQueryRule(
+	protected void validateQueryRule(
 			long userId, long groupId, List<CPQueryRule> queryRules,
 			CPQueryRule queryRule)
 		throws Exception {
@@ -459,6 +438,37 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 				queryRule.isContains(), queryRule.isAndOperator(),
 				queryRule.getName());
 		}
+	}
+
+	private String _getAssetEntryXml(
+		String productEntryType, long cpDefinitionId) {
+
+		String xml = null;
+
+		try {
+			Document document = SAXReaderUtil.createDocument(StringPool.UTF8);
+
+			Element productEntryElement = document.addElement("product-entry");
+
+			Element productEntryTypeElement = productEntryElement.addElement(
+				"product-entry-type");
+
+			productEntryTypeElement.addText(productEntryType);
+
+			Element productEntryIdElement = productEntryElement.addElement(
+				"product-id");
+
+			productEntryIdElement.addText(String.valueOf(cpDefinitionId));
+
+			xml = document.formattedString(StringPool.BLANK);
+		}
+		catch (IOException ioException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(ioException, ioException);
+			}
+		}
+
+		return xml;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -481,9 +491,6 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 	private CPDataSourceRegistry _cpDataSourceRegistry;
 
 	@Reference
-	private CPDefinitionHelper _cpDefinitionHelper;
-
-	@Reference
 	private CPDefinitionService _cpDefinitionService;
 
 	@Reference
@@ -493,7 +500,7 @@ public class CPPublisherConfigurationAction extends DefaultConfigurationAction {
 	private CPPublisherWebHelper _cpPublisherWebHelper;
 
 	@Reference
-	private CPTypeRegistry _cpTypeRegistry;
+	private CPTypeServicesTracker _cpTypeServicesTracker;
 
 	@Reference
 	private ItemSelector _itemSelector;

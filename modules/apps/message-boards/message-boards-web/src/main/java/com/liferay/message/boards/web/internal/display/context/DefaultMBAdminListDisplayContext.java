@@ -112,14 +112,15 @@ public class DefaultMBAdminListDisplayContext
 			long searchCategoryId = ParamUtil.getLong(
 				_httpServletRequest, "searchCategoryId");
 
-			List<Long> categoryIds = new ArrayList<Long>() {
-				{
-					add(Long.valueOf(searchCategoryId));
-				}
-			};
+			List<Long> categoryIds = new ArrayList<>();
+
+			categoryIds.add(Long.valueOf(searchCategoryId));
 
 			MBCategoryServiceUtil.getSubcategoryIds(
 				categoryIds, themeDisplay.getScopeGroupId(), searchCategoryId);
+
+			long[] categoryIdsArray = StringUtil.split(
+				StringUtil.merge(categoryIds), 0L);
 
 			Indexer<MBMessage> indexer = IndexerRegistryUtil.getIndexer(
 				MBMessage.class);
@@ -128,16 +129,20 @@ public class DefaultMBAdminListDisplayContext
 				_httpServletRequest);
 
 			searchContext.setAttribute("paginationType", "more");
-			searchContext.setCategoryIds(
-				StringUtil.split(StringUtil.merge(categoryIds), 0L));
+			searchContext.setCategoryIds(categoryIdsArray);
 			searchContext.setEnd(searchContainer.getEnd());
 			searchContext.setIncludeAttachments(true);
 			searchContext.setIncludeInternalAssetCategories(true);
-			searchContext.setKeywords(
-				ParamUtil.getString(_httpServletRequest, "keywords"));
+
+			String keywords = ParamUtil.getString(
+				_httpServletRequest, "keywords");
+
+			searchContext.setKeywords(keywords);
 
 			String orderByCol = searchContainer.getOrderByCol();
 			String orderByType = searchContainer.getOrderByType();
+
+			Sort sort = null;
 
 			boolean orderByAsc = false;
 
@@ -145,18 +150,15 @@ public class DefaultMBAdminListDisplayContext
 				orderByAsc = true;
 			}
 
-			Sort sort = null;
-
 			if (Objects.equals(orderByCol, "modified-date")) {
 				sort = new Sort(
 					Field.MODIFIED_DATE, Sort.LONG_TYPE, !orderByAsc);
 			}
 			else if (Objects.equals(orderByCol, "title")) {
-				sort = new Sort(
-					Field.getSortableFieldName(
-						"localized_title_".concat(
-							themeDisplay.getLanguageId())),
-					Sort.STRING_TYPE, !orderByAsc);
+				String sortFieldName = Field.getSortableFieldName(
+					"localized_title_".concat(themeDisplay.getLanguageId()));
+
+				sort = new Sort(sortFieldName, Sort.STRING_TYPE, !orderByAsc);
 			}
 
 			searchContext.setSorts(sort);
@@ -165,15 +167,11 @@ public class DefaultMBAdminListDisplayContext
 
 			Hits hits = indexer.search(searchContext);
 
-			try {
-				searchContainer.setResultsAndTotal(
-					() -> SearchResultUtil.getSearchResults(
-						hits, _httpServletRequest.getLocale()),
-					hits.getLength());
-			}
-			catch (Throwable throwable) {
-				throw new PortalException(throwable);
-			}
+			searchContainer.setResults(
+				SearchResultUtil.getSearchResults(
+					hits, _httpServletRequest.getLocale()));
+
+			searchContainer.setTotal(hits.getLength());
 		}
 		else {
 			String entriesNavigation = ParamUtil.getString(
@@ -197,18 +195,14 @@ public class DefaultMBAdminListDisplayContext
 					searchContainer.getStart(), searchContainer.getEnd(),
 					searchContainer.getOrderByComparator());
 
-				try {
-					searchContainer.setResultsAndTotal(
-						() -> MBCategoryServiceUtil.getCategoriesAndThreads(
-							themeDisplay.getScopeGroupId(), _categoryId,
-							queryDefinition),
-						MBCategoryServiceUtil.getCategoriesAndThreadsCount(
-							themeDisplay.getScopeGroupId(), _categoryId,
-							queryDefinition));
-				}
-				catch (Throwable throwable) {
-					throw new PortalException(throwable);
-				}
+				searchContainer.setTotal(
+					MBCategoryServiceUtil.getCategoriesAndThreadsCount(
+						themeDisplay.getScopeGroupId(), _categoryId,
+						queryDefinition));
+				searchContainer.setResults(
+					MBCategoryServiceUtil.getCategoriesAndThreads(
+						themeDisplay.getScopeGroupId(), _categoryId,
+						queryDefinition));
 			}
 			else if (Objects.equals(entriesNavigation, "threads")) {
 				int status = WorkflowConstants.STATUS_APPROVED;
@@ -229,18 +223,14 @@ public class DefaultMBAdminListDisplayContext
 						searchContainer.getStart(), searchContainer.getEnd(),
 						searchContainer.getOrderByComparator());
 
-				try {
-					searchContainer.setResultsAndTotal(
-						() -> MBThreadServiceUtil.getThreads(
-							themeDisplay.getScopeGroupId(), _categoryId,
-							queryDefinition),
-						MBThreadServiceUtil.getThreadsCount(
-							themeDisplay.getScopeGroupId(), _categoryId,
-							queryDefinition));
-				}
-				catch (Throwable throwable) {
-					throw new PortalException(throwable);
-				}
+				searchContainer.setTotal(
+					MBThreadServiceUtil.getThreadsCount(
+						themeDisplay.getScopeGroupId(), _categoryId,
+						queryDefinition));
+				searchContainer.setResults(
+					MBThreadServiceUtil.getThreads(
+						themeDisplay.getScopeGroupId(), _categoryId,
+						queryDefinition));
 			}
 			else if (Objects.equals(entriesNavigation, "categories")) {
 				int status = WorkflowConstants.STATUS_APPROVED;
@@ -261,18 +251,14 @@ public class DefaultMBAdminListDisplayContext
 						searchContainer.getStart(), searchContainer.getEnd(),
 						searchContainer.getOrderByComparator());
 
-				try {
-					searchContainer.setResultsAndTotal(
-						() -> MBCategoryServiceUtil.getCategories(
-							themeDisplay.getScopeGroupId(), _categoryId,
-							queryDefinition),
-						MBCategoryServiceUtil.getCategoriesCount(
-							themeDisplay.getScopeGroupId(), _categoryId,
-							queryDefinition));
-				}
-				catch (Throwable throwable) {
-					throw new PortalException(throwable);
-				}
+				searchContainer.setTotal(
+					MBCategoryServiceUtil.getCategoriesCount(
+						themeDisplay.getScopeGroupId(), _categoryId,
+						queryDefinition));
+				searchContainer.setResults(
+					MBCategoryServiceUtil.getCategories(
+						themeDisplay.getScopeGroupId(), _categoryId,
+						queryDefinition));
 			}
 		}
 	}

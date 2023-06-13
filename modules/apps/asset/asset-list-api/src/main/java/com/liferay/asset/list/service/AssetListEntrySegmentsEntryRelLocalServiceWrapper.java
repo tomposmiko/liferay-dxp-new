@@ -30,10 +30,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceWrapper
 	implements AssetListEntrySegmentsEntryRelLocalService,
 			   ServiceWrapper<AssetListEntrySegmentsEntryRelLocalService> {
 
-	public AssetListEntrySegmentsEntryRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AssetListEntrySegmentsEntryRelLocalServiceWrapper(
 		AssetListEntrySegmentsEntryRelLocalService
 			assetListEntrySegmentsEntryRelLocalService) {
@@ -321,16 +317,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<AssetListEntrySegmentsEntryRel>
-		fetchAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds) {
-
-		return _assetListEntrySegmentsEntryRelLocalService.
-			fetchAssetListEntrySegmentsEntryRels(
-				assetListEntryId, segmentsEntryIds);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
@@ -408,19 +394,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceWrapper
 
 		return _assetListEntrySegmentsEntryRelLocalService.
 			getAssetListEntrySegmentsEntryRels(assetListEntryId, start, end);
-	}
-
-	@Override
-	public java.util.List<AssetListEntrySegmentsEntryRel>
-		getAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<AssetListEntrySegmentsEntryRel> orderByComparator) {
-
-		return _assetListEntrySegmentsEntryRelLocalService.
-			getAssetListEntrySegmentsEntryRels(
-				assetListEntryId, segmentsEntryIds, start, end,
-				orderByComparator);
 	}
 
 	/**
@@ -547,12 +520,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceWrapper
 		return _assetListEntrySegmentsEntryRelLocalService.
 			updateAssetListEntrySegmentsEntryRelTypeSettings(
 				assetListEntryId, segmentsEntryId, typeSettings);
-	}
-
-	@Override
-	public void updateVariationsPriority(long[] variationsPriority) {
-		_assetListEntrySegmentsEntryRelLocalService.updateVariationsPriority(
-			variationsPriority);
 	}
 
 	@Override

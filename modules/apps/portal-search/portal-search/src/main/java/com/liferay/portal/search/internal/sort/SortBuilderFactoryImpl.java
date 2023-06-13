@@ -32,7 +32,11 @@ public class SortBuilderFactoryImpl implements SortBuilderFactory {
 		return new SortBuilderImpl(_sorts);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setSorts(Sorts sorts) {
+		_sorts = sorts;
+	}
+
 	private Sorts _sorts;
 
 }

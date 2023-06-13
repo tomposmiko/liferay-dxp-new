@@ -39,7 +39,7 @@ public class QuartzConnectionProvider implements ConnectionProvider {
 			connection = dataSource.getConnection();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return connection;

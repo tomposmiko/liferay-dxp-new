@@ -14,69 +14,10 @@
 
 import {addParams, navigate, openSelectionModal} from 'frontend-js-web';
 
-const DEFAULT_VALUES = {
-	buttonAddLabel: Liferay.Language.get('select'),
-	iframeBodyCssClass: '',
-	modalHeight: '70vh',
-	size: 'md',
-};
-
-/**
- * Returns true if the specified value is an object. Not arrays, custom events or functions.
- * @param {?} value Variable to test.
- * @return {boolean} Whether variable is an object.
- */
-const _isObjectStrict = (value) =>
-	typeof value === 'object' &&
-	!Array.isArray(value) &&
-	value !== null &&
-	!Object.prototype.hasOwnProperty.call(value, 'currentTarget');
-
-/**
- * Returns URL with proper search params.
- */
-const _getRedirectURLWithParams = ({data, portletNamespace, selection}) => {
-	const {itemValueKey, redirectURL, urlParamName} = data;
-
-	return [selection]
-		.reduce((acc, val) => acc.concat(val), []) // replace with flat()
-		.reduce((acc, item) => {
-			let paramValue;
-
-			if (itemValueKey) {
-				paramValue = item[itemValueKey];
-			}
-			else {
-				paramValue =
-					typeof item === 'string' ? item : JSON.stringify(item);
-			}
-
-			return addParams(
-				`${portletNamespace}${urlParamName}=${paramValue}`,
-				acc
-			);
-		}, redirectURL);
-};
-
-const _handleOnSelect = ({data, portletNamespace, selection}) => {
-	if (_isObjectStrict(selection)) {
-		selection = Object.values(selection).filter((item) => !item.unchecked);
-	}
-
-	navigate(
-		_getRedirectURLWithParams({
-			data,
-			portletNamespace,
-			selection,
-		})
-	);
-};
-
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const selectAuthor = (itemData) => {
 		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('select'),
-			height: '70vh',
 			multiple: true,
 			onSelect: (selectedItem) => {
 				if (selectedItem) {
@@ -93,7 +34,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 				}
 			},
 			selectEventName: `${portletNamespace}selectedAuthorItem`,
-			size: 'lg',
 			title: itemData?.dialogTitle,
 			url: itemData?.selectAuthorURL,
 		});
@@ -102,7 +42,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const selectAssetCategory = (itemData) => {
 		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('select'),
-			height: '70vh',
 			iframeBodyCssClass: '',
 			multiple: true,
 			onSelect: (selectedItem) => {
@@ -124,7 +63,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 				}
 			},
 			selectEventName: `${portletNamespace}selectedAssetCategory`,
-			size: 'md',
 			title: itemData?.dialogTitle,
 			url: itemData?.selectAssetCategoryURL,
 		});
@@ -133,7 +71,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const selectAssetTag = (itemData) => {
 		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('select'),
-			height: '70vh',
 			multiple: true,
 			onSelect: (selectedItem) => {
 				if (selectedItem) {
@@ -152,7 +89,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 				}
 			},
 			selectEventName: `${portletNamespace}selectedAssetTag`,
-			size: 'lg',
 			title: itemData?.dialogTitle,
 			url: itemData?.selectTagURL,
 		});
@@ -184,9 +120,32 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 		});
 	};
 
+	const selectFileExtension = (itemData) => {
+		openSelectionModal({
+			buttonAddLabel: Liferay.Language.get('select'),
+			height: '70vh',
+			multiple: true,
+			onSelect: (selectedItems) => {
+				let redirectURL = itemData?.redirectURL;
+
+				selectedItems.forEach((item) => {
+					redirectURL = addParams(
+						`${portletNamespace}fileExtension=${item}`,
+						redirectURL
+					);
+				});
+
+				navigate(redirectURL);
+			},
+			selectEventName: `${portletNamespace}selectedFileExtension`,
+			size: 'md',
+			title: itemData?.dialogTitle,
+			url: itemData?.selectFileExtensionURL,
+		});
+	};
+
 	const selectScope = (itemData) => {
 		openSelectionModal({
-			height: '70vh',
 			id: `${portletNamespace}selectedScopeIdItem`,
 			onSelect: (selectedItem) => {
 				navigate(
@@ -197,7 +156,6 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 				);
 			},
 			selectEventName: `${portletNamespace}selectedScopeIdItem`,
-			size: 'lg',
 			title: itemData?.dialogTitle,
 			url: itemData?.selectScopeURL,
 		});
@@ -205,21 +163,10 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 
 	return {
 		...otherProps,
-		onFilterDropdownItemClick(_event, {item = {}}) {
-			const {data} = item;
+		onFilterDropdownItemClick(event, {item}) {
+			const data = item?.data;
 
-			if (!Object.keys(data).length) {
-				return;
-			}
-
-			const {
-				action,
-				dialogTitle,
-				selectEventName,
-				selectItemURL,
-				multiple,
-				size = DEFAULT_VALUES.size,
-			} = data;
+			const action = data?.action;
 
 			if (action === 'selectAssetCategory') {
 				selectAssetCategory(data);
@@ -236,23 +183,8 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 			else if (action === 'selectScope') {
 				selectScope(data);
 			}
-			else {
-				openSelectionModal({
-					buttonAddLabel: DEFAULT_VALUES.buttonAddLabel,
-					height: DEFAULT_VALUES.modalHeight,
-					iframeBodyCssClass: DEFAULT_VALUES.iframeBodyCssClass,
-					multiple: multiple === 'true',
-					onSelect: (selection) =>
-						_handleOnSelect({
-							data,
-							portletNamespace,
-							selection,
-						}),
-					selectEventName: portletNamespace + selectEventName,
-					size,
-					title: dialogTitle,
-					url: selectItemURL,
-				});
+			else if (action === 'selectFileExtension') {
+				selectFileExtension(data);
 			}
 		},
 	};

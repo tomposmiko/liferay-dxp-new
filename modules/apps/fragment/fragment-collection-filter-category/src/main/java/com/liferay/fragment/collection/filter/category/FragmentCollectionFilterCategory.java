@@ -22,8 +22,8 @@ import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pablo Molina
  */
-@Component(service = FragmentCollectionFilter.class)
+@Component(immediate = true, service = FragmentCollectionFilter.class)
 public class FragmentCollectionFilterCategory
 	implements FragmentCollectionFilter {
 
@@ -61,13 +61,9 @@ public class FragmentCollectionFilterCategory
 					"/dependencies/configuration.json");
 
 			return _fragmentEntryConfigurationParser.translateConfiguration(
-				_jsonFactory.createJSONObject(json), resourceBundle);
+				JSONFactoryUtil.createJSONObject(json), resourceBundle);
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
 			return StringPool.BLANK;
 		}
 	}
@@ -92,7 +88,7 @@ public class FragmentCollectionFilterCategory
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "category");
+		return LanguageUtil.get(locale, "category");
 	}
 
 	@Override
@@ -127,12 +123,6 @@ public class FragmentCollectionFilterCategory
 
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.fragment.collection.filter.category)"

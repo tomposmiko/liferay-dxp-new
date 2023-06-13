@@ -21,9 +21,7 @@ import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoValue;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
@@ -49,18 +47,19 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portlet.expando.util.test.ExpandoTestUtil;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockPortletRequest;
-import com.liferay.segments.criteria.Criteria;
 import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributor;
 import com.liferay.segments.field.Field;
 
 import java.io.Serializable;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -135,42 +134,6 @@ public class UserSegmentsCriteriaContributorTest {
 	}
 
 	@Test
-	public void testGetCriteriaJSONObject() throws Exception {
-		SegmentsCriteriaContributor segmentsCriteriaContributor =
-			_getSegmentsCriteriaContributor();
-
-		Criteria criteria = new Criteria();
-
-		segmentsCriteriaContributor.contribute(
-			criteria, "(lastName eq 'Xing')", Criteria.Conjunction.AND);
-
-		JSONObject jsonObject =
-			segmentsCriteriaContributor.getCriteriaJSONObject(criteria);
-
-		Assert.assertEquals(
-			String.valueOf(Criteria.Conjunction.AND),
-			jsonObject.getString("conjunctionName"));
-
-		Assert.assertEquals(
-			JSONUtil.put(
-				"conjunctionName", String.valueOf(Criteria.Conjunction.AND)
-			).put(
-				"groupId", "group_0"
-			).put(
-				"items",
-				JSONUtil.putAll(
-					JSONUtil.put(
-						"operatorName", "eq"
-					).put(
-						"propertyName", "lastName"
-					).put(
-						"value", "Xing"
-					))
-			).toString(),
-			String.valueOf(jsonObject.getString("query")));
-	}
-
-	@Test
 	public void testGetFieldsWithComplexEntity() throws Exception {
 		_addExpandoColumn(
 			_expandoTable, RandomTestUtil.randomString(),
@@ -193,15 +156,15 @@ public class UserSegmentsCriteriaContributorTest {
 		List<Field> fields = segmentsCriteriaContributor.getFields(
 			_getMockPortletRequest());
 
-		Set<String> complexEntityFieldNames = new HashSet<>();
+		Stream<Field> stream = fields.stream();
 
-		for (Field field : fields) {
-			if (StringUtil.startsWith(field.getName(), "customField/")) {
-				complexEntityFieldNames.add(
-					StringUtil.removeSubstring(
-						field.getName(), "customField/"));
-			}
-		}
+		Set<String> complexEntityFieldNames = stream.filter(
+			field -> StringUtil.startsWith(field.getName(), "customField/")
+		).map(
+			field -> StringUtil.removeSubstring(field.getName(), "customField/")
+		).collect(
+			Collectors.toSet()
+		);
 
 		Assert.assertFalse(complexEntityFieldNames.isEmpty());
 
@@ -224,47 +187,51 @@ public class UserSegmentsCriteriaContributorTest {
 		SegmentsCriteriaContributor segmentsCriteriaContributor =
 			_getSegmentsCriteriaContributor();
 
-		Field field = null;
+		List<Field> fields = segmentsCriteriaContributor.getFields(
+			_getMockPortletRequest());
 
-		for (Field curField :
-				segmentsCriteriaContributor.getFields(
-					_getMockPortletRequest())) {
+		Stream<Field> fieldsStream = fields.stream();
 
-			if (StringUtil.endsWith(
-					curField.getName(),
-					Normalizer.normalizeIdentifier(expandoColumn.getName()))) {
+		Optional<Field> fieldOptional = fieldsStream.filter(
+			field -> StringUtil.endsWith(
+				field.getName(),
+				Normalizer.normalizeIdentifier(expandoColumn.getName()))
+		).findFirst();
 
-				field = curField;
+		Assert.assertTrue(fieldOptional.isPresent());
 
-				break;
-			}
-		}
+		Field field = fieldOptional.get();
 
-		Assert.assertNotNull(field);
+		List<Field.Option> options = field.getOptions();
+
+		Stream<Field.Option> optionsStream = options.stream();
 
 		Assert.assertEquals(
 			Arrays.asList(defaultValue),
-			TransformUtil.transform(
-				field.getOptions(), Field.Option::getValue));
+			optionsStream.map(
+				Field.Option::getValue
+			).collect(
+				Collectors.toList()
+			));
 	}
 
 	@Test
 	public void testGetFieldsWithSelectEntity() throws Exception {
-		Field field = null;
-
 		SegmentsCriteriaContributor segmentsCriteriaContributor =
 			_getSegmentsCriteriaContributor();
 
-		for (Field curField :
-				segmentsCriteriaContributor.getFields(
-					_getMockPortletRequest())) {
+		List<Field> fields = segmentsCriteriaContributor.getFields(
+			_getMockPortletRequest());
 
-			if (Objects.equals(curField.getName(), "groupIds")) {
-				field = curField;
-			}
-		}
+		Stream<Field> fieldsStream = fields.stream();
 
-		Assert.assertNotNull(field);
+		Optional<Field> fieldOptional = fieldsStream.filter(
+			field -> Objects.equals(field.getName(), "groupIds")
+		).findFirst();
+
+		Assert.assertTrue(fieldOptional.isPresent());
+
+		Field field = fieldOptional.get();
 
 		Assert.assertEquals("id", field.getType());
 
@@ -306,10 +273,12 @@ public class UserSegmentsCriteriaContributorTest {
 	private MockPortletRequest _getMockPortletRequest() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		themeDisplay.setCompany(
-			_companyLocalService.getCompany(TestPropsValues.getCompanyId()));
+		Company company = _companyLocalService.getCompany(
+			TestPropsValues.getCompanyId());
 
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		themeDisplay.setCompany(company);
+
+		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		themeDisplay.setLayout(layout);
 		themeDisplay.setLayoutSet(layout.getLayoutSet());

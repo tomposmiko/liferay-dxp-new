@@ -18,7 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.collection.provider.SingleFormVariationInfoCollectionProvider;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.test.rule.Inject;
@@ -63,7 +63,7 @@ public class SingleFormVariationInfoCollectionProviderTest {
 				new TestSingleFormVariationInfoCollectionProvider(), null);
 
 		InfoCollectionProvider<?> infoCollectionProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoCollectionProvider.class, Object.class.getName());
 
 		Assert.assertNotNull(infoCollectionProvider);
@@ -84,7 +84,7 @@ public class SingleFormVariationInfoCollectionProviderTest {
 	}
 
 	@Inject
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	private static class TestSingleFormVariationInfoCollectionProvider
 		implements SingleFormVariationInfoCollectionProvider<Object> {

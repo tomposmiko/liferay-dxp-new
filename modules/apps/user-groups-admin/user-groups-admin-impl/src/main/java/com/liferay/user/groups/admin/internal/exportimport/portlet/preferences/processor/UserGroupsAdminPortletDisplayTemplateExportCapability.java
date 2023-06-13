@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"name=UserGroupsAdminExportCapability",
 		"type=" + PortletDisplayTemplateConstants.DISPLAY_TEMPLATE_EXPORT

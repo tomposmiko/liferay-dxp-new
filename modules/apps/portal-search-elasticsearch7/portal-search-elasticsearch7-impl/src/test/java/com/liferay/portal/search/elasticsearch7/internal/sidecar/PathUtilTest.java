@@ -18,6 +18,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.IOException;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.nio.file.Files;
@@ -53,30 +54,30 @@ public class PathUtilTest {
 
 	@Test
 	public void testCopyDirectory() throws Exception {
-		Path fromPath = _getResourcePath("root");
+		Path fromPath = getResourcePath("root");
 
-		Path excludedPaths = _getResourcePath("root/excluded");
+		Path excludedPaths = getResourcePath("root/excluded");
 
 		PathUtil.copyDirectory(fromPath, _toPath, excludedPaths);
 
-		_assertExists(_toPath, "directory1/file1.txt");
-		_assertExists(_toPath, "directory2/file2.txt");
-		_assertDoesNotExist(_toPath, "excluded/excluded.txt");
+		assertExists(_toPath, "directory1/file1.txt");
+		assertExists(_toPath, "directory2/file2.txt");
+		assertDoesNotExist(_toPath, "excluded/excluded.txt");
 	}
 
-	private void _assertDoesNotExist(Path path, String name) {
+	protected void assertDoesNotExist(Path path, String name) {
 		Path fullPath = path.resolve(name);
 
 		Assert.assertFalse(Files.exists(fullPath));
 	}
 
-	private void _assertExists(Path path, String name) {
+	protected void assertExists(Path path, String name) {
 		Path fullPath = path.resolve(name);
 
 		Assert.assertTrue(Files.exists(fullPath));
 	}
 
-	private Path _getResourcePath(String name) throws Exception {
+	protected Path getResourcePath(String name) throws URISyntaxException {
 		Class<? extends PathUtilTest> clazz = getClass();
 
 		URL url = clazz.getResource(name);

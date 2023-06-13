@@ -87,7 +87,7 @@ else if (metadataField.equals("view-count")) {
 	<c:when test='<%= Objects.equals(value, "author") %>'>
 
 		<%
-		User assetRendererUser = UserLocalServiceUtil.fetchUser(assetRenderer.getUserId());
+		User assetRendererUser = UserLocalServiceUtil.getUser(assetRenderer.getUserId());
 
 		String displayDate = StringPool.BLANK;
 
@@ -103,50 +103,50 @@ else if (metadataField.equals("view-count")) {
 		}
 		%>
 
-		<div class="autofit-padded autofit-row">
-			<div class="autofit-col">
+		<div class="metadata-author">
+			<div class="asset-avatar">
 				<liferay-ui:user-portrait
 					user="<%= assetRendererUser %>"
 				/>
 			</div>
 
-			<div class="autofit-col autofit-col-expand">
-				<c:choose>
-					<c:when test="<%= assetRendererUser != null %>">
-						<h4 class="component-title mt-0"><%= HtmlUtil.escape(assetRendererUser.getFullName()) %></h4>
-					</c:when>
-					<c:otherwise>
-						<h4 class="component-title mt-0"><liferay-ui:message key="anonymous"></liferay-ui:message></h4>
-					</c:otherwise>
-				</c:choose>
+			<div class="asset-user-info">
+				<span class="user-info"><%= HtmlUtil.escape(assetRendererUser.getFullName()) %></span>
 
-				<h5 class="component-subtitle"><%= displayDate %></h5>
+				<span class="date-info"><%= displayDate %></span>
 			</div>
 		</div>
 	</c:when>
 	<c:when test="<%= Validator.isNotNull(value) %>">
-		<dt class="metadata-entry-label <%= showLabel ? StringPool.BLANK : "hide" %>"><%= label %></dt>
+		<clay:col
+			cssClass="form-feedback-item"
+			md="3"
+			size="6"
+			sm="4"
+		>
+			<dt class="metadata-entry-label <%= showLabel ? StringPool.BLANK : "hide" %>"><%= label %></dt>
 
-		<dd class="metadata-entry <%= metadataFieldCssClass %>">
-			<c:choose>
-				<c:when test='<%= value.equals("categories") %>'>
-					<liferay-asset:asset-categories-summary
-						className="<%= assetEntry.getClassName() %>"
-						classPK="<%= assetEntry.getClassPK() %>"
-						portletURL="<%= filterByMetadata ? renderResponse.createRenderURL() : null %>"
-					/>
-				</c:when>
-				<c:when test='<%= value.equals("tags") %>'>
-					<liferay-asset:asset-tags-summary
-						className="<%= assetEntry.getClassName() %>"
-						classPK="<%= assetEntry.getClassPK() %>"
-						portletURL="<%= filterByMetadata ? renderResponse.createRenderURL() : null %>"
-					/>
-				</c:when>
-				<c:otherwise>
-					<%= value %>
-				</c:otherwise>
-			</c:choose>
-		</dd>
+			<dd class="metadata-entry <%= metadataFieldCssClass %>">
+				<c:choose>
+					<c:when test='<%= value.equals("categories") %>'>
+						<liferay-asset:asset-categories-summary
+							className="<%= assetEntry.getClassName() %>"
+							classPK="<%= assetEntry.getClassPK() %>"
+							portletURL="<%= filterByMetadata ? renderResponse.createRenderURL() : null %>"
+						/>
+					</c:when>
+					<c:when test='<%= value.equals("tags") %>'>
+						<liferay-asset:asset-tags-summary
+							className="<%= assetEntry.getClassName() %>"
+							classPK="<%= assetEntry.getClassPK() %>"
+							portletURL="<%= filterByMetadata ? renderResponse.createRenderURL() : null %>"
+						/>
+					</c:when>
+					<c:otherwise>
+						<%= value %>
+					</c:otherwise>
+				</c:choose>
+			</dd>
+		</clay:col>
 	</c:when>
 </c:choose>

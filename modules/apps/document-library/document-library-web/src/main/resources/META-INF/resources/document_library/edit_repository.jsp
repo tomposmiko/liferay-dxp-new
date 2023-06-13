@@ -54,91 +54,87 @@ renderResponse.setTitle(headerTitle);
 
 		<aui:model-context bean="<%= repository %>" model="<%= Repository.class %>" />
 
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<aui:fieldset>
-					<aui:input name="name">
-						<aui:validator errorMessage='<%= LanguageUtil.get(request, "name-is-required") %>' name="required" />
-					</aui:input>
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
+				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="name" />
 
-					<aui:input name="description" />
-				</aui:fieldset>
+				<aui:input name="description" />
+			</aui:fieldset>
 
-				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="repository-configuration">
-					<c:choose>
-						<c:when test="<%= repository == null %>">
-							<aui:select id="repositoryTypes" label="repository-type" name="className">
-
-								<%
-								for (RepositoryClassDefinition repositoryClassDefinition : RepositoryClassDefinitionCatalogUtil.getExternalRepositoryClassDefinitions()) {
-								%>
-
-									<aui:option label="<%= HtmlUtil.escape(repositoryClassDefinition.getRepositoryTypeLabel(locale)) %>" value="<%= HtmlUtil.escapeAttribute(repositoryClassDefinition.getClassName()) %>" />
-
-								<%
-								}
-								%>
-
-							</aui:select>
-
-							<div id="<portlet:namespace />settingsParameters"></div>
-						</c:when>
-						<c:otherwise>
+			<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="repository-configuration">
+				<c:choose>
+					<c:when test="<%= repository == null %>">
+						<aui:select id="repositoryTypes" label="repository-type" name="className">
 
 							<%
-							RepositoryClassDefinition repositoryClassDefinition = RepositoryClassDefinitionCatalogUtil.getRepositoryClassDefinition(repository.getClassName());
+							for (RepositoryClassDefinition repositoryClassDefinition : RepositoryClassDefinitionCatalogUtil.getExternalRepositoryClassDefinitions()) {
 							%>
 
-							<div class="repository-settings-display">
-								<dt>
-									<liferay-ui:message key="repository-type" />
-								</dt>
-								<dd>
-									<%= repositoryClassDefinition.getRepositoryTypeLabel(locale) %>
-								</dd>
+								<aui:option label="<%= HtmlUtil.escape(repositoryClassDefinition.getRepositoryTypeLabel(locale)) %>" value="<%= HtmlUtil.escapeAttribute(repositoryClassDefinition.getClassName()) %>" />
 
-								<%
-								UnicodeProperties typeSettingsUnicodeProperties = repository.getTypeSettingsProperties();
+							<%
+							}
+							%>
 
-								RepositoryConfiguration repositoryConfiguration = repositoryClassDefinition.getRepositoryConfiguration();
+						</aui:select>
 
-								for (RepositoryConfiguration.Parameter repositoryConfigurationParameter : repositoryConfiguration.getParameters()) {
-									String parameterValue = typeSettingsUnicodeProperties.getProperty(repositoryConfigurationParameter.getName());
-								%>
+						<div id="<portlet:namespace />settingsParameters"></div>
+					</c:when>
+					<c:otherwise>
 
-									<c:if test="<%= Validator.isNotNull(parameterValue) %>">
-										<dt>
-											<%= HtmlUtil.escape(repositoryConfigurationParameter.getLabel(locale)) %>
-										</dt>
-										<dd>
-											<%= HtmlUtil.escape(parameterValue) %>
-										</dd>
-									</c:if>
+						<%
+						RepositoryClassDefinition repositoryClassDefinition = RepositoryClassDefinitionCatalogUtil.getRepositoryClassDefinition(repository.getClassName());
+						%>
 
-								<%
-								}
-								%>
+						<div class="repository-settings-display">
+							<dt>
+								<liferay-ui:message key="repository-type" />
+							</dt>
+							<dd>
+								<%= repositoryClassDefinition.getRepositoryTypeLabel(locale) %>
+							</dd>
 
-							</div>
-						</c:otherwise>
-					</c:choose>
+							<%
+							UnicodeProperties typeSettingsProperties = repository.getTypeSettingsProperties();
+
+							RepositoryConfiguration repositoryConfiguration = repositoryClassDefinition.getRepositoryConfiguration();
+
+							for (RepositoryConfiguration.Parameter repositoryConfigurationParameter : repositoryConfiguration.getParameters()) {
+								String parameterValue = typeSettingsProperties.getProperty(repositoryConfigurationParameter.getName());
+							%>
+
+								<c:if test="<%= Validator.isNotNull(parameterValue) %>">
+									<dt>
+										<%= HtmlUtil.escape(repositoryConfigurationParameter.getLabel(locale)) %>
+									</dt>
+									<dd>
+										<%= HtmlUtil.escape(parameterValue) %>
+									</dd>
+								</c:if>
+
+							<%
+							}
+							%>
+
+						</div>
+					</c:otherwise>
+				</c:choose>
+			</aui:fieldset>
+
+			<c:if test="<%= repository == null %>">
+				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
+					<liferay-ui:input-permissions
+						modelName="<%= DLFolderConstants.getClassName() %>"
+					/>
 				</aui:fieldset>
+			</c:if>
 
-				<c:if test="<%= repository == null %>">
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-						<liferay-ui:input-permissions
-							modelName="<%= DLFolderConstants.getClassName() %>"
-						/>
-					</aui:fieldset>
-				</c:if>
+			<div class="sheet-footer">
+				<aui:button type="submit" />
 
-				<div class="sheet-footer">
-					<aui:button type="submit" />
-
-					<aui:button href="<%= redirect %>" type="cancel" />
-				</div>
+				<aui:button href="<%= redirect %>" type="cancel" />
 			</div>
-		</div>
+		</aui:fieldset-group>
 	</aui:form>
 
 	<div class="hide" id="<portlet:namespace />settingsSupported">
@@ -167,7 +163,7 @@ renderResponse.setTitle(headerTitle);
 		<%
 			}
 			catch (Exception e) {
-				_log.error(e);
+				_log.error(e, e);
 			}
 		}
 		%>

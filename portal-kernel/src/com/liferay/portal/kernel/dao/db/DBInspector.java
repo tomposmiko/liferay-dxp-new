@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.lang.reflect.Field;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -29,7 +31,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,10 +76,25 @@ public class DBInspector {
 			return true;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #hasColumnType(String, String, String)}
+	 */
+	@Deprecated
+	public boolean hasColumnType(
+			Class<?> tableClass, String columnName, String columnType)
+		throws Exception {
+
+		Field tableNameField = tableClass.getField("TABLE_NAME");
+
+		return hasColumnType(
+			(String)tableNameField.get(null), columnName, columnType);
 	}
 
 	public boolean hasColumnType(
@@ -100,17 +116,13 @@ public class DBInspector {
 
 			int actualColumnSize = resultSet.getInt("COLUMN_SIZE");
 
-			if ((expectedColumnSize != DB.SQL_SIZE_NONE) &&
-				(((expectedColumnSize != DB.SQL_VARCHAR_MAX_SIZE) &&
-				  (expectedColumnSize != actualColumnSize)) ||
-				 ((expectedColumnSize == DB.SQL_VARCHAR_MAX_SIZE) &&
-				  (actualColumnSize < DB.SQL_VARCHAR_MAX_SIZE_THRESHOLD)))) {
+			if ((expectedColumnSize != -1) &&
+				(expectedColumnSize != actualColumnSize)) {
 
 				return false;
 			}
 
-			Integer expectedColumnDataType = _getByColumnType(
-				columnType, DB::getSQLType);
+			Integer expectedColumnDataType = _getColumnDataType(columnType);
 
 			int actualColumnDataType = resultSet.getInt("DATA_TYPE");
 
@@ -139,11 +151,11 @@ public class DBInspector {
 	public boolean hasIndex(String tableName, String indexName)
 		throws Exception {
 
-		DB db = DBManagerUtil.getDB();
 		DatabaseMetaData databaseMetaData = _connection.getMetaData();
 
-		try (ResultSet resultSet = db.getIndexResultSet(
-				_connection, normalizeName(tableName, databaseMetaData))) {
+		try (ResultSet resultSet = databaseMetaData.getIndexInfo(
+				_connection.getCatalog(), _connection.getSchema(),
+				normalizeName(tableName, databaseMetaData), false, false)) {
 
 			while (resultSet.next()) {
 				if (Objects.equals(
@@ -155,7 +167,7 @@ public class DBInspector {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;
@@ -175,7 +187,7 @@ public class DBInspector {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;
@@ -250,23 +262,23 @@ public class DBInspector {
 		return name;
 	}
 
-	private Integer _getByColumnType(
-		String columnType, BiFunction<DB, String, Integer> biFunction) {
-
+	private Integer _getColumnDataType(String columnType) {
 		Matcher matcher = _columnTypePattern.matcher(columnType);
 
 		if (!matcher.lookingAt()) {
 			return null;
 		}
 
-		return biFunction.apply(DBManagerUtil.getDB(), matcher.group(1));
+		DB db = DBManagerUtil.getDB();
+
+		return db.getSQLType(matcher.group(1));
 	}
 
 	private int _getColumnSize(String columnType) throws UpgradeException {
 		Matcher matcher = _columnSizePattern.matcher(columnType);
 
 		if (!matcher.matches()) {
-			return DB.SQL_SIZE_NONE;
+			return -1;
 		}
 
 		String columnSize = matcher.group(1);
@@ -284,14 +296,7 @@ public class DBInspector {
 			}
 		}
 
-		Integer dataTypeSize = _getByColumnType(
-			columnType, DB::getSQLVarcharSize);
-
-		if (dataTypeSize != null) {
-			return dataTypeSize;
-		}
-
-		return DB.SQL_SIZE_NONE;
+		return -1;
 	}
 
 	private boolean _hasTable(String tableName) throws Exception {

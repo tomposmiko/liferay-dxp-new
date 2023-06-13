@@ -24,13 +24,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
 	@description = "LPS-102664 - Verify that the user can reassign several tasks to a different users and All Items page is updated accordingly"
-	@priority = 4
+	@priority = "4"
 	test AllItemsPageIsUpdatedAfterReassignTasksToDifferentUser {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -52,12 +52,12 @@ definition {
 			roleTitle = "Administrator",
 			userScreenName = "usertest");
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Configuration",
 			portlet = "Workflow",
-			site = ${siteName});
+			site = "${siteName}");
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
@@ -113,7 +113,7 @@ definition {
 	}
 
 	@description = "LPS-106219 - Verify that, in the modal Select Tasks to Reassign, the Assignee filter contains only the options that are displayed in the modal"
-	@priority = 3
+	@priority = "3"
 	test AssigneeFilterContainsOnlyOptionDisplayedInModal {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -129,7 +129,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -147,7 +147,7 @@ definition {
 
 		WorkflowMetrics.goToReassignSelectTask();
 
-		WorkflowMetrics.selectNewAssignee(taskList = 1);
+		WorkflowMetrics.selectNewAssignee(taskList = "1");
 
 		WorkflowMetrics.goToBulkReassignSelectTasks();
 
@@ -163,7 +163,7 @@ definition {
 	}
 
 	@description = "LPS-106219 - Verify that when all items are selected to be reassigned in a filtered All Items page, the bulk modal is considering the filter results"
-	@priority = 4
+	@priority = "4"
 	test BulkReassignConsiderFilteredResultsFromAllItemsPage {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -176,14 +176,13 @@ definition {
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Blogs Entry");
 
-		var count = 0;
-		var blogTitle = 1;
+		var count = "0";
+		var blogTitle = "1";
 
-		while (${count} != 3) {
+		while ("${count}" != "3") {
 			JSONBlog.addEntry(
 				entryContent = "Blogs Entry",
 				entryTitle = "Blogs Entry ${blogTitle}");
-
 			var count = ${count} + 1;
 			var blogTitle = ${blogTitle} + 1;
 		}
@@ -196,13 +195,15 @@ definition {
 
 		WorkflowMetrics.selectNewAssignee(taskList = "Blogs Entry: Blogs Entry 1");
 
+		Pause(locator1 = "1000");
+
 		Refresh();
 
 		Click(locator1 = "WorkflowAllItems#WORKFLOW_ALL_ITEMS_ASSIGNEE_HEADER");
 
 		Click(
 			locator1 = "WorkflowAllItems#KEBAB_DROPDOWN",
-			task = 1);
+			task = "1");
 
 		Click(locator1 = "WorkflowAllItems#REJECT_DROPDOWN");
 
@@ -216,7 +217,7 @@ definition {
 
 		Click(
 			locator1 = "WorkflowAllItems#REASSIGN_ICON",
-			task = 1);
+			task = "1");
 
 		AssertElementNotPresent(
 			key_workflowInstanceName = "Blogs Entry 1",
@@ -224,7 +225,7 @@ definition {
 	}
 
 	@description = "LPS-106219 - Verify that the user is able to select multiple filter options and combine filter queries"
-	@priority = 3
+	@priority = "3"
 	test CanSelectMultipleFilterOption {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -269,11 +270,11 @@ definition {
 
 	@description = "LPS-106219 - Verify that, in the modal Select Tasks to Reassign, the filters options are ordered alphabetically"
 	@ignore = "Test Stub"
-	@priority = 3
+	@priority = "3"
 	test FilterOptionsAreAlphabeticallyOrdered {
 		property test.name.skip.portal.instance = "WorkflowMetricsAllItemsListReassignTasks#FilterOptionsAreAlphabeticallyOrdered";
 
-		WorkflowMetrics.createUsersGroovy(numberOfUsers = 1);
+		WorkflowMetrics.createUsersGroovy(numberOfUsers = "1");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -286,14 +287,13 @@ definition {
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Blogs Entry");
 
-		var count = 0;
-		var blogTitle = 1;
+		var count = "0";
+		var blogTitle = "1";
 
-		while (${count} != 2) {
+		while ("${count}" != "2") {
 			JSONBlog.addEntry(
 				entryContent = "Blogs Entry",
 				entryTitle = "Blogs Entry ${blogTitle}");
-
 			var count = ${count} + 1;
 			var blogTitle = ${blogTitle} + 1;
 		}
@@ -306,17 +306,21 @@ definition {
 
 		WorkflowMetrics.selectNewAssignee(taskList = "Blogs Entry: Blogs Entry 1");
 
+		Pause(locator1 = "1000");
+
 		Refresh();
 
 		Click(locator1 = "WorkflowAllItems#WORKFLOW_ALL_ITEMS_ASSIGNEE_HEADER");
 
 		Click(
 			locator1 = "WorkflowAllItems#KEBAB_DROPDOWN",
-			task = 1);
+			task = "1");
 
 		Click(locator1 = "WorkflowAllItems#REJECT_DROPDOWN");
 
 		Button.clickDone();
+
+		Pause(locator1 = "1000");
 
 		Refresh();
 
@@ -340,7 +344,7 @@ definition {
 	}
 
 	@description = "LPS-106219 - Verify that, in the modal Select Tasks to Reassign, the filter query should only be applied after the user moves the cursor out of the dropdown card"
-	@priority = 3
+	@priority = "3"
 	test FilterQueryIsAppliedAfterMouseMovesOutTheCard {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -406,7 +410,7 @@ definition {
 	}
 
 	@description = "LPS-102664 - Verify that, in Select New Assignee table, there is a tooltip next to New Assignee title that says Possible assignees must have permissions to be assigned to the corresponding step"
-	@priority = 3
+	@priority = "3"
 	test InfoIconDisplaysMessageOnHover {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -454,7 +458,7 @@ definition {
 	}
 
 	@description = "LPS-102664 - Verify that tasks within a single instance with concurrent pending tasks can be reassigned using the bulk reassign task modal"
-	@priority = 5
+	@priority = "5"
 	test InstanceWithPendingTasksCanBeReassignedUsingBulkReassignModal {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -491,7 +495,7 @@ definition {
 	}
 
 	@description = "LPS-102664 - Verify that in Select Tasks to Reassign, the tasks are displayed in the same order rule displayed in All Items page"
-	@priority = 3
+	@priority = "3"
 	test TasksAreDisplayedInSameOrderRuleInAllItemsPage {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -518,8 +522,9 @@ definition {
 			workflowProcess = "Single Approver");
 
 		for (var orderNumber : list "1,2") {
-			var key_order = ${orderNumber};
-			var key_title = "Blogs Entry: Blogs Entry Title ${orderNumber}";
+			key_order = "${orderNumber}";
+
+			key_title = "Blogs Entry: Blogs Entry Title ${orderNumber}";
 
 			AssertElementPresent(locator1 = "WorkflowMetricsAllItemsListReassignTasks#METRICS_ALL_ITEMS_LIST_ORDER");
 		}
@@ -527,15 +532,16 @@ definition {
 		WorkflowMetrics.goToBulkReassignSelectTasks();
 
 		for (var orderNumber : list "1,2") {
-			var key_order = ${orderNumber};
-			var key_title = "Blogs Entry: Blogs Entry Title ${orderNumber}";
+			key_order = "${orderNumber}";
+
+			key_title = "Blogs Entry: Blogs Entry Title ${orderNumber}";
 
 			AssertElementPresent(locator1 = "WorkflowMetricsAllItemsListReassignTasks#METRICS_REASSIGN_LIST_ORDER");
 		}
 	}
 
 	@description = "LPS-102664 - Verify that the user is able to filter the info inside Select Tasks to Reassign by Step and Assignee, search for any of the available field values and the table is updated accordingly"
-	@priority = 4
+	@priority = "4"
 	test UserCanFilterbyStepAndAssignee {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -605,7 +611,7 @@ definition {
 	}
 
 	@description = "LPS-106219 - Verify that the user can filter, by Process Step, instances with pending tasks in parallel"
-	@priority = 3
+	@priority = "3"
 	test UserCanFilterInstanceWithPendingTasksInParallelByStep {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WorkflowMetricsAllItemsListReassignTasks#UserCanFilterInstanceWithPendingTasksInParallelByStep";
@@ -615,15 +621,9 @@ definition {
 			panel = "Applications",
 			portlet = "Process Builder");
 
-		Workflow.addNewDefinition(workflowDefinitionTitle = "Multi Task Process");
-
-		ProcessBuilderKaleoDesignerReact.uploadDefinition(workflowDefinitionFile = "multi-task-process-workflow-definition.xml");
-
-		ProcessBuilderKaleoDesignerReact.diagramSourceSwitchView();
-
-		Button.clickPublish();
-
-		Navigator.gotoBack();
+		Workflow.uploadDefinition(
+			workflowDefinitionFile = "multi-task-process-workflow-definition.xml",
+			workflowDefinitionTitle = "Multi Task Process");
 
 		Navigator.gotoNavItem(navItem = "Configuration");
 
@@ -651,7 +651,7 @@ definition {
 	}
 
 	@description = "LPS-102664 - Verify that the Bulk Reassign is letting the user reassign only pending tasks"
-	@priority = 5
+	@priority = "5"
 	test UserCanReassignOnlyPendingTasks {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -676,11 +676,13 @@ definition {
 
 		WorkflowMetrics.selectNewAssignee(taskList = "Blogs Entry: Blogs Entry 1");
 
+		Pause(locator1 = "1000");
+
 		Refresh();
 
 		Click(
 			locator1 = "WorkflowAllItems#KEBAB_DROPDOWN",
-			task = 1);
+			task = "1");
 
 		Click(locator1 = "WorkflowAllItems#APPROVE_DROPDOWN");
 
@@ -692,10 +694,8 @@ definition {
 	}
 
 	@description = "LPS-102664 - Verify that the Bulk Reassign is letting the user reassign only pending tasks assigned to the user's role"
-	@priority = 5
+	@priority = "5"
 	test UserCanReassignOnlyTasksAssignedToHisRole {
-		property portal.upstream = "quarantine";
-
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
 			userFirstName = "user1",

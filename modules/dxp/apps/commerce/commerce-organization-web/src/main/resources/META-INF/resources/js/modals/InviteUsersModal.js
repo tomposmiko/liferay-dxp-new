@@ -15,7 +15,7 @@ import ClayIcon from '@clayui/icon';
 import ClayModal from '@clayui/modal';
 import ClayMultiSelect from '@clayui/multi-select';
 import classNames from 'classnames';
-import {openToast, sub} from 'frontend-js-web';
+import {openToast} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
 
 import ChartContext from '../ChartContext';
@@ -64,11 +64,11 @@ export default function InviteUserModal({closeModal, observer, parentData}) {
 			.then((users) => {
 				const message =
 					users.length === 1
-						? sub(
+						? Liferay.Util.sub(
 								Liferay.Language.get('1-user-was-added-to-x'),
 								parentData.name
 						  )
-						: sub(
+						: Liferay.Util.sub(
 								Liferay.Language.get('x-users-were-added-to-x'),
 								users.length,
 								parentData.name
@@ -116,6 +116,7 @@ export default function InviteUserModal({closeModal, observer, parentData}) {
 						<ClayInput.GroupItem>
 							<ClayMultiSelect
 								id="inviteUsersEmailInput"
+								inputValue={emailsQuery}
 								items={selectedEmails}
 								locator={{
 									label: 'emailAddress',
@@ -126,7 +127,6 @@ export default function InviteUserModal({closeModal, observer, parentData}) {
 								placeholder={Liferay.Language.get(
 									'users-emails'
 								)}
-								value={emailsQuery}
 							/>
 						</ClayInput.GroupItem>
 					</ClayInput.Group>
@@ -137,7 +137,6 @@ export default function InviteUserModal({closeModal, observer, parentData}) {
 				>
 					<label htmlFor="inviteUsersRoleInput">
 						{Liferay.Language.get('roles')}
-
 						<ClayIcon
 							className="ml-1 reference-mark"
 							symbol="asterisk"
@@ -163,7 +162,6 @@ export default function InviteUserModal({closeModal, observer, parentData}) {
 									{errors.map((error, i) => (
 										<ClayForm.FeedbackItem key={i}>
 											<ClayForm.FeedbackIndicator symbol="info-circle" />
-
 											{error}
 										</ClayForm.FeedbackItem>
 									))}

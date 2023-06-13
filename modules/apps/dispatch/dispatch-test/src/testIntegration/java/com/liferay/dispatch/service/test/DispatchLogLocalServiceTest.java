@@ -19,7 +19,6 @@ import com.liferay.dispatch.exception.DispatchLogStartDateException;
 import com.liferay.dispatch.exception.DispatchLogStatusException;
 import com.liferay.dispatch.exception.NoSuchTriggerException;
 import com.liferay.dispatch.executor.DispatchTaskStatus;
-import com.liferay.dispatch.internal.messaging.TestDispatchTaskExecutor;
 import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchLogLocalService;
@@ -27,13 +26,14 @@ import com.liferay.dispatch.service.DispatchTriggerLocalService;
 import com.liferay.dispatch.service.test.util.DispatchLogTestUtil;
 import com.liferay.dispatch.service.test.util.DispatchTriggerTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -41,6 +41,8 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -65,7 +67,9 @@ public class DispatchLogLocalServiceTest {
 
 	@Test
 	public void testAddDispatchLogExceptions() throws Exception {
-		User user = UserTestUtil.addUser();
+		Company company = CompanyTestUtil.addCompany();
+
+		User user = UserTestUtil.addUser(company);
 
 		Class<?> exceptionClass = Exception.class;
 
@@ -88,9 +92,7 @@ public class DispatchLogLocalServiceTest {
 			NoSuchTriggerException.class, exceptionClass);
 
 		DispatchTrigger dispatchTrigger = _addDispatchTrigger(
-			DispatchTriggerTestUtil.randomDispatchTrigger(
-				user, TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST,
-				1));
+			DispatchTriggerTestUtil.randomDispatchTrigger(user, 1));
 
 		try {
 			Date startDate = dispatchLog.getStartDate();
@@ -139,51 +141,15 @@ public class DispatchLogLocalServiceTest {
 	}
 
 	@Test
-	public void testDeleteDispatchLogWhileInProgress() throws Exception {
-		User user = UserTestUtil.addUser();
-
-		Class<?> exceptionClass = Exception.class;
-
-		for (DispatchTaskStatus dispatchTaskStatus :
-				DispatchTaskStatus.values()) {
-
-			DispatchLog dispatchLog = DispatchLogTestUtil.randomDispatchLog(
-				user, dispatchTaskStatus);
-
-			dispatchLog = _dispatchLogLocalService.addDispatchLog(dispatchLog);
-
-			try {
-				_dispatchLogLocalService.deleteDispatchLog(
-					dispatchLog.getDispatchLogId());
-
-				Assert.assertNotEquals(
-					DispatchTaskStatus.IN_PROGRESS, dispatchTaskStatus);
-
-				Assert.assertNull(
-					_dispatchLogLocalService.fetchDispatchLog(
-						dispatchLog.getDispatchLogId()));
-
-				continue;
-			}
-			catch (Exception exception) {
-				exceptionClass = exception.getClass();
-			}
-
-			Assert.assertEquals(
-				DispatchLogStatusException.class, exceptionClass);
-		}
-	}
-
-	@Test
 	public void testFetchLatestDispatchLog() throws Exception {
 		int dispatchLogsCount = RandomTestUtil.randomInt(10, 40);
 
-		User user = UserTestUtil.addUser();
+		Company company = CompanyTestUtil.addCompany();
+
+		User user = UserTestUtil.addUser(company);
 
 		DispatchTrigger dispatchTrigger = _addDispatchTrigger(
-			DispatchTriggerTestUtil.randomDispatchTrigger(
-				user, TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST,
-				1));
+			DispatchTriggerTestUtil.randomDispatchTrigger(user, 1));
 
 		DispatchLog dispatchLog =
 			_dispatchLogLocalService.fetchLatestDispatchLog(
@@ -215,16 +181,17 @@ public class DispatchLogLocalServiceTest {
 
 		_assertLatestStartDate(dispatchLog, dispatchLogs);
 
-		dispatchLog = _dispatchLogLocalService.fetchLatestDispatchLog(
+		_dispatchLogLocalService.fetchLatestDispatchLog(
 			dispatchTrigger.getDispatchTriggerId(),
 			DispatchTaskStatus.SUCCESSFUL);
 
 		Assert.assertNotNull(dispatchLog);
 
+		Stream<DispatchLog> stream = dispatchLogs.stream();
+
 		_assertLatestStartDate(
 			dispatchLog,
-			ListUtil.filter(
-				dispatchLogs,
+			stream.filter(
 				item -> {
 					if (DispatchTaskStatus.valueOf(item.getStatus()) ==
 							DispatchTaskStatus.SUCCESSFUL) {
@@ -233,19 +200,22 @@ public class DispatchLogLocalServiceTest {
 					}
 
 					return false;
-				}));
+				}
+			).collect(
+				Collectors.toList()
+			));
 	}
 
 	@Test
 	public void testGetDispatchLogs() throws Exception {
 		int dispatchLogsCount = RandomTestUtil.randomInt(10, 40);
 
-		User user = UserTestUtil.addUser();
+		Company company = CompanyTestUtil.addCompany();
+
+		User user = UserTestUtil.addUser(company);
 
 		DispatchTrigger dispatchTrigger = _addDispatchTrigger(
-			DispatchTriggerTestUtil.randomDispatchTrigger(
-				user, TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST,
-				1));
+			DispatchTriggerTestUtil.randomDispatchTrigger(user, 1));
 
 		_addDispatchLogs(
 			user, dispatchTrigger.getDispatchTriggerId(),
@@ -262,12 +232,12 @@ public class DispatchLogLocalServiceTest {
 
 	@Test
 	public void testUpdateDispatchLog() throws Exception {
-		User user = UserTestUtil.addUser();
+		Company company = CompanyTestUtil.addCompany();
+
+		User user = UserTestUtil.addUser(company);
 
 		DispatchTrigger dispatchTrigger = _addDispatchTrigger(
-			DispatchTriggerTestUtil.randomDispatchTrigger(
-				user, TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST,
-				1));
+			DispatchTriggerTestUtil.randomDispatchTrigger(user, 1));
 
 		DispatchLog expectedDispatchLog = DispatchLogTestUtil.randomDispatchLog(
 			user, DispatchTaskStatus.FAILED);
@@ -299,12 +269,12 @@ public class DispatchLogLocalServiceTest {
 
 	@Test
 	public void testUpdateDispatchLogExceptions() throws Exception {
-		User user = UserTestUtil.addUser();
+		Company company = CompanyTestUtil.addCompany();
+
+		User user = UserTestUtil.addUser(company);
 
 		DispatchTrigger dispatchTrigger = _addDispatchTrigger(
-			DispatchTriggerTestUtil.randomDispatchTrigger(
-				user, TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST,
-				1));
+			DispatchTriggerTestUtil.randomDispatchTrigger(user, 1));
 
 		DispatchLog expectedDispatchLog = DispatchLogTestUtil.randomDispatchLog(
 			user, DispatchTaskStatus.IN_PROGRESS);
@@ -372,7 +342,7 @@ public class DispatchLogLocalServiceTest {
 		throws Exception {
 
 		return _dispatchTriggerLocalService.addDispatchTrigger(
-			null, dispatchTrigger.getUserId(),
+			dispatchTrigger.getUserId(),
 			dispatchTrigger.getDispatchTaskExecutorType(),
 			dispatchTrigger.getDispatchTaskSettingsUnicodeProperties(),
 			dispatchTrigger.getName(), dispatchTrigger.isSystem());
@@ -415,7 +385,7 @@ public class DispatchLogLocalServiceTest {
 
 			Assert.assertTrue(
 				"Latest dispatch log start date",
-				currentStartDate.getTime() >= startDate.getTime());
+				currentStartDate.getTime() > startDate.getTime());
 		}
 	}
 

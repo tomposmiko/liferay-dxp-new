@@ -30,7 +30,7 @@ const setCollapseHeight = (collapseElementRef) => {
 	}
 };
 
-export default function useHeightTransition(visible, setVisible, contentRef) {
+export default (visible, setVisible, contentRef) => {
 	const [transitioning, setTransitioning] = useState(false);
 
 	useEffect(() => {
@@ -67,4 +67,4 @@ export default function useHeightTransition(visible, setVisible, contentRef) {
 	};
 
 	return [transitioning, handleTransitionEnd, startTransition];
-}
+};

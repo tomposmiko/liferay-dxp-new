@@ -15,30 +15,18 @@
 package com.liferay.object.rest.internal.resource.v1_0;
 
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
-import com.liferay.object.scope.ObjectScopeProvider;
-import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.service.ObjectRelationshipService;
-import com.liferay.object.system.SystemObjectDefinitionManager;
-import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
-import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.petra.sql.dsl.expression.Predicate;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -49,36 +37,21 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Javier Gamarra
  */
+@Component(
+	factory = "com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResource",
+	properties = "OSGI-INF/liferay/rest/v1_0/object-entry.properties",
+	service = ObjectEntryResource.class
+)
 public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
-
-	public ObjectEntryResourceImpl(
-		DTOConverterRegistry dtoConverterRegistry,
-		ObjectDefinitionLocalService objectDefinitionLocalService,
-		ObjectEntryLocalService objectEntryLocalService,
-		ObjectEntryManagerRegistry objectEntryManagerRegistry,
-		ObjectFieldLocalService objectFieldLocalService,
-		ObjectRelationshipService objectRelationshipService,
-		ObjectScopeProviderRegistry objectScopeProviderRegistry,
-		SystemObjectDefinitionManagerRegistry
-			systemObjectDefinitionManagerRegistry) {
-
-		_dtoConverterRegistry = dtoConverterRegistry;
-		_objectDefinitionLocalService = objectDefinitionLocalService;
-		_objectEntryLocalService = objectEntryLocalService;
-		_objectEntryManagerRegistry = objectEntryManagerRegistry;
-		_objectFieldLocalService = objectFieldLocalService;
-		_objectRelationshipService = objectRelationshipService;
-		_objectScopeProviderRegistry = objectScopeProviderRegistry;
-		_systemObjectDefinitionManagerRegistry =
-			systemObjectDefinitionManagerRegistry;
-	}
 
 	@Override
 	public void create(
@@ -88,41 +61,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 		_loadObjectDefinition(parameters);
 
-		ObjectScopeProvider objectScopeProvider =
-			_objectScopeProviderRegistry.getObjectScopeProvider(
-				_objectDefinition.getScope());
-
-		if (objectScopeProvider.isGroupAware()) {
-			UnsafeConsumer<ObjectEntry, Exception> objectEntryUnsafeConsumer =
-				null;
-
-			String createStrategy = (String)parameters.getOrDefault(
-				"createStrategy", "INSERT");
-
-			if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
-				objectEntryUnsafeConsumer = objectEntry -> postScopeScopeKey(
-					(String)parameters.get("scopeKey"), objectEntry);
-			}
-
-			if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
-				objectEntryUnsafeConsumer =
-					objectEntry -> putScopeScopeKeyByExternalReferenceCode(
-						(String)parameters.get("scopeKey"),
-						objectEntry.getExternalReferenceCode(), objectEntry);
-			}
-
-			if (objectEntryUnsafeConsumer == null) {
-				throw new NotSupportedException(
-					"Create strategy \"" + createStrategy +
-						"\" is not supported for object entry");
-			}
-
-			contextBatchUnsafeConsumer.accept(
-				objectEntries, objectEntryUnsafeConsumer);
-		}
-		else {
-			super.create(objectEntries, parameters);
-		}
+		super.create(objectEntries, parameters);
 	}
 
 	@Override
@@ -140,22 +79,14 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	public void deleteByExternalReferenceCode(String externalReferenceCode)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		objectEntryManager.deleteObjectEntry(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, _objectDefinition, null);
+		_objectEntryManager.deleteObjectEntry(
+			externalReferenceCode, contextCompany.getCompanyId(),
+			_objectDefinition, null);
 	}
 
 	@Override
 	public void deleteObjectEntry(Long objectEntryId) throws Exception {
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		objectEntryManager.deleteObjectEntry(_objectDefinition, objectEntryId);
+		_objectEntryManager.deleteObjectEntry(objectEntryId);
 	}
 
 	@Override
@@ -163,36 +94,29 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			String scopeKey, String externalReferenceCode)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		objectEntryManager.deleteObjectEntry(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, _objectDefinition, scopeKey);
+		_objectEntryManager.deleteObjectEntry(
+			externalReferenceCode, contextCompany.getCompanyId(),
+			_objectDefinition, scopeKey);
 	}
 
 	@Override
 	public ObjectEntry getByExternalReferenceCode(String externalReferenceCode)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.getObjectEntry(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, _objectDefinition, null);
+		return _objectEntryManager.getObjectEntry(
+			_getDTOConverterContext(null), externalReferenceCode,
+			contextCompany.getCompanyId(), _objectDefinition, null);
 	}
 
 	@Override
-	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
-		throws Exception {
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap) {
+		if (_entityModel == null) {
+			_entityModel = new ObjectEntryEntityModel(
+				_objectFieldLocalService.getObjectFields(
+					_objectDefinition.getObjectDefinitionId()));
+		}
 
-		return new ObjectEntryEntityModel(
-			_objectDefinition.getObjectDefinitionId(),
-			_objectFieldLocalService.getObjectFields(
-				_objectDefinition.getObjectDefinitionId()));
+		return _entityModel;
 	}
 
 	@Override
@@ -201,23 +125,14 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.getObjectEntries(
+		return _objectEntryManager.getObjectEntries(
 			contextCompany.getCompanyId(), _objectDefinition, null, aggregation,
-			_getDTOConverterContext(null), pagination, _predicate, search,
-			sorts);
+			_getDTOConverterContext(null), filter, pagination, search, sorts);
 	}
 
 	@Override
 	public ObjectEntry getObjectEntry(Long objectEntryId) throws Exception {
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.getObjectEntry(
+		return _objectEntryManager.getObjectEntry(
 			_getDTOConverterContext(objectEntryId), _objectDefinition,
 			objectEntryId);
 	}
@@ -227,13 +142,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			String scopeKey, String externalReferenceCode)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.getObjectEntry(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, _objectDefinition, scopeKey);
+		return _objectEntryManager.getObjectEntry(
+			_getDTOConverterContext(null), externalReferenceCode,
+			contextCompany.getCompanyId(), _objectDefinition, scopeKey);
 	}
 
 	@Override
@@ -243,13 +154,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			Sort[] sorts)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.getObjectEntries(
+		return _objectEntryManager.getObjectEntries(
 			contextCompany.getCompanyId(), _objectDefinition, scopeKey,
-			aggregation, _getDTOConverterContext(null), pagination, _predicate,
+			aggregation, _getDTOConverterContext(null), filter, pagination,
 			search, sorts);
 	}
 
@@ -257,11 +164,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	public ObjectEntry postObjectEntry(ObjectEntry objectEntry)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.addObjectEntry(
+		return _objectEntryManager.addObjectEntry(
 			_getDTOConverterContext(null), _objectDefinition, objectEntry,
 			null);
 	}
@@ -271,11 +174,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			String scopeKey, ObjectEntry objectEntry)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.addObjectEntry(
+		return _objectEntryManager.addObjectEntry(
 			_getDTOConverterContext(null), _objectDefinition, objectEntry,
 			scopeKey);
 	}
@@ -285,60 +184,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			String externalReferenceCode, ObjectEntry objectEntry)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.addOrUpdateObjectEntry(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, _objectDefinition, objectEntry, null);
-	}
-
-	@Override
-	public ObjectEntry
-			putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode(
-				String currentExternalReferenceCode,
-				String objectRelationshipName,
-				String relatedExternalReferenceCode)
-		throws Exception {
-
-		ObjectRelationship objectRelationship =
-			_objectRelationshipService.getObjectRelationship(
-				_objectDefinition.getObjectDefinitionId(),
-				objectRelationshipName);
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		long primaryKey1 = _getPrimaryKey(
-			currentExternalReferenceCode,
-			objectRelationship.getObjectDefinitionId1());
-		long primaryKey2 = _getPrimaryKey(
-			relatedExternalReferenceCode,
-			objectRelationship.getObjectDefinitionId2());
-
-		return _getRelatedObjectEntry(
-			_objectDefinitionLocalService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId2()),
-			objectEntryManager.addObjectRelationshipMappingTableValues(
-				_getDTOConverterContext(primaryKey1), objectRelationship,
-				primaryKey1, primaryKey2));
-	}
-
-	@Override
-	public void
-			putByExternalReferenceCodeObjectEntryExternalReferenceCodeObjectActionObjectActionName(
-				String externalReferenceCode, String objectActionName)
-		throws Exception {
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		objectEntryManager.executeObjectAction(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, objectActionName, _objectDefinition, null);
+		return _objectEntryManager.addOrUpdateObjectEntry(
+			_getDTOConverterContext(null), externalReferenceCode,
+			_objectDefinition, objectEntry, null);
 	}
 
 	@Override
@@ -346,27 +194,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			Long objectEntryId, ObjectEntry objectEntry)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.updateObjectEntry(
+		return _objectEntryManager.updateObjectEntry(
 			_getDTOConverterContext(objectEntryId), _objectDefinition,
 			objectEntryId, objectEntry);
-	}
-
-	@Override
-	public void putObjectEntryObjectActionObjectActionName(
-			Long objectEntryId, String objectActionName)
-		throws Exception {
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		objectEntryManager.executeObjectAction(
-			_getDTOConverterContext(objectEntryId), objectActionName,
-			_objectDefinition, objectEntryId);
 	}
 
 	@Override
@@ -375,58 +205,9 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			ObjectEntry objectEntry)
 		throws Exception {
 
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		return objectEntryManager.addOrUpdateObjectEntry(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, _objectDefinition, objectEntry, scopeKey);
-	}
-
-	@Override
-	public void
-			putScopeScopeKeyByExternalReferenceCodeObjectActionObjectActionName(
-				String scopeKey, String externalReferenceCode,
-				String objectActionName)
-		throws Exception {
-
-		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerRegistry.getObjectEntryManager(
-				_objectDefinition.getStorageType());
-
-		objectEntryManager.executeObjectAction(
-			contextCompany.getCompanyId(), _getDTOConverterContext(null),
-			externalReferenceCode, objectActionName, _objectDefinition,
-			scopeKey);
-	}
-
-	@Override
-	public Page<ObjectEntry> read(
-			Filter filter, Pagination pagination, Sort[] sorts,
-			Map<String, Serializable> parameters, String search)
-		throws Exception {
-
-		_loadObjectDefinition(parameters);
-
-		ObjectScopeProvider objectScopeProvider =
-			_objectScopeProviderRegistry.getObjectScopeProvider(
-				_objectDefinition.getScope());
-
-		if (objectScopeProvider.isGroupAware()) {
-			return getScopeScopeKeyPage(
-				(String)parameters.get("scopeKey"),
-				Boolean.parseBoolean((String)parameters.get("flatten")), search,
-				null, filter, pagination, sorts);
-		}
-
-		return getObjectEntriesPage(
-			Boolean.parseBoolean((String)parameters.get("flatten")), search,
-			null, filter, pagination, sorts);
-	}
-
-	public void setObjectDefinition(ObjectDefinition objectDefinition) {
-		_objectDefinition = objectDefinition;
+		return _objectEntryManager.addOrUpdateObjectEntry(
+			_getDTOConverterContext(null), externalReferenceCode,
+			_objectDefinition, objectEntry, scopeKey);
 	}
 
 	@Override
@@ -440,108 +221,18 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		super.update(objectEntries, parameters);
 	}
 
-	@Override
-	protected Long getPermissionCheckerGroupId(Object id) throws Exception {
-		com.liferay.object.model.ObjectEntry objectEntry =
-			_objectEntryLocalService.getObjectEntry(GetterUtil.getLong(id));
-
-		return objectEntry.getGroupId();
-	}
-
-	@Override
-	protected String getPermissionCheckerResourceName(Object id)
-		throws Exception {
-
-		return ObjectDefinition.class.getName() + "#" +
-			_objectDefinition.getObjectDefinitionId();
-	}
-
 	private DefaultDTOConverterContext _getDTOConverterContext(
 		Long objectEntryId) {
 
 		return new DefaultDTOConverterContext(
-			contextAcceptLanguage.isAcceptAllLanguages(), null,
-			_dtoConverterRegistry, contextHttpServletRequest, objectEntryId,
+			contextAcceptLanguage.isAcceptAllLanguages(), null, null,
+			contextHttpServletRequest, objectEntryId,
 			contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
 			contextUser);
 	}
 
-	private long _getPrimaryKey(
-			String externalReferenceCode, long objectDefinitionId)
-		throws Exception {
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinition(
-				objectDefinitionId);
-
-		if (objectDefinition.isUnmodifiableSystemObject()) {
-			SystemObjectDefinitionManager systemObjectDefinitionManager =
-				_systemObjectDefinitionManagerRegistry.
-					getSystemObjectDefinitionManager(
-						objectDefinition.getName());
-
-			BaseModel<?> baseModel =
-				systemObjectDefinitionManager.
-					getBaseModelByExternalReferenceCode(
-						externalReferenceCode, objectDefinition.getCompanyId());
-
-			return (long)baseModel.getPrimaryKeyObj();
-		}
-
-		com.liferay.object.model.ObjectEntry objectEntry =
-			_objectEntryLocalService.getObjectEntry(
-				externalReferenceCode,
-				objectDefinition.getObjectDefinitionId());
-
-		return objectEntry.getObjectEntryId();
-	}
-
-	private ObjectEntry _getRelatedObjectEntry(
-		ObjectDefinition objectDefinition, ObjectEntry objectEntry) {
-
-		Map<String, Map<String, String>> actions = objectEntry.getActions();
-
-		for (Map.Entry<String, Map<String, String>> entry :
-				actions.entrySet()) {
-
-			Map<String, String> map = entry.getValue();
-
-			if (map == null) {
-				continue;
-			}
-
-			String href = map.get("href");
-
-			map.put(
-				"href",
-				StringUtil.replace(
-					href,
-					StringUtil.lowerCaseFirstLetter(
-						_objectDefinition.getPluralLabel(
-							contextAcceptLanguage.getPreferredLocale())),
-					StringUtil.lowerCaseFirstLetter(
-						objectDefinition.getPluralLabel(
-							contextAcceptLanguage.getPreferredLocale()))));
-		}
-
-		return objectEntry;
-	}
-
 	private void _loadObjectDefinition(Map<String, Serializable> parameters)
 		throws Exception {
-
-		String taskItemDelegateName = (String)parameters.get(
-			"taskItemDelegateName");
-
-		if (Validator.isNotNull(taskItemDelegateName)) {
-			_objectDefinition =
-				_objectDefinitionLocalService.fetchObjectDefinition(
-					contextCompany.getCompanyId(), taskItemDelegateName);
-
-			if (_objectDefinition != null) {
-				return;
-			}
-		}
 
 		String parameterValue = (String)parameters.get("objectDefinitionId");
 
@@ -561,22 +252,18 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throw new NotFoundException("Missing parameter \"objectDefinitionId\"");
 	}
 
-	private final DTOConverterRegistry _dtoConverterRegistry;
+	private EntityModel _entityModel;
 
 	@Context
 	private ObjectDefinition _objectDefinition;
 
-	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
-	private final ObjectEntryLocalService _objectEntryLocalService;
-	private final ObjectEntryManagerRegistry _objectEntryManagerRegistry;
-	private final ObjectFieldLocalService _objectFieldLocalService;
-	private final ObjectRelationshipService _objectRelationshipService;
-	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
-	@Context
-	private Predicate _predicate;
+	@Reference
+	private ObjectEntryManager _objectEntryManager;
 
-	private final SystemObjectDefinitionManagerRegistry
-		_systemObjectDefinitionManagerRegistry;
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
 
 }

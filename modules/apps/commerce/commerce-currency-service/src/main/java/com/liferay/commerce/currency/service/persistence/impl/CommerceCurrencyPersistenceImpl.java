@@ -20,10 +20,7 @@ import com.liferay.commerce.currency.model.CommerceCurrencyTable;
 import com.liferay.commerce.currency.model.impl.CommerceCurrencyImpl;
 import com.liferay.commerce.currency.model.impl.CommerceCurrencyModelImpl;
 import com.liferay.commerce.currency.service.persistence.CommerceCurrencyPersistence;
-import com.liferay.commerce.currency.service.persistence.CommerceCurrencyUtil;
-import com.liferay.commerce.currency.service.persistence.impl.constants.CommercePersistenceConstants;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -31,7 +28,6 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -45,11 +41,11 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -58,13 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * The persistence implementation for the commerce currency service.
@@ -76,7 +65,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  * @generated
  */
-@Component(service = CommerceCurrencyPersistence.class)
 public class CommerceCurrencyPersistenceImpl
 	extends BasePersistenceImpl<CommerceCurrency>
 	implements CommerceCurrencyPersistence {
@@ -193,7 +181,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceCurrency>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceCurrency commerceCurrency : list) {
@@ -578,7 +566,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -737,7 +725,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceCurrency>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceCurrency commerceCurrency : list) {
@@ -1154,7 +1142,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1313,7 +1301,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceCurrency>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceCurrency commerceCurrency : list) {
@@ -1676,7 +1664,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1791,8 +1779,7 @@ public class CommerceCurrencyPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C, finderArgs);
 		}
 
 		if (result instanceof CommerceCurrency) {
@@ -1903,7 +1890,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, code};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2067,7 +2054,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceCurrency>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceCurrency commerceCurrency : list) {
@@ -2458,7 +2445,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, primary};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2608,7 +2595,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceCurrency>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceCurrency commerceCurrency : list) {
@@ -2999,7 +2986,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, active};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3156,7 +3143,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceCurrency>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceCurrency commerceCurrency : list) {
@@ -3571,7 +3558,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, primary, active};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3758,7 +3745,7 @@ public class CommerceCurrencyPersistenceImpl
 		commerceCurrency.setNew(true);
 		commerceCurrency.setPrimaryKey(commerceCurrencyId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		commerceCurrency.setUuid(uuid);
 
@@ -3878,7 +3865,7 @@ public class CommerceCurrencyPersistenceImpl
 			(CommerceCurrencyModelImpl)commerceCurrency;
 
 		if (Validator.isNull(commerceCurrency.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			commerceCurrency.setUuid(uuid);
 		}
@@ -4077,7 +4064,7 @@ public class CommerceCurrencyPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceCurrency>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4147,7 +4134,7 @@ public class CommerceCurrencyPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -4201,8 +4188,7 @@ public class CommerceCurrencyPersistenceImpl
 	/**
 	 * Initializes the commerce currency persistence.
 	 */
-	@Activate
-	public void activate() {
+	public void afterPropertiesSet() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
@@ -4345,63 +4331,16 @@ public class CommerceCurrencyPersistenceImpl
 				Boolean.class.getName()
 			},
 			new String[] {"companyId", "primary_", "active_"}, false);
-
-		_setCommerceCurrencyUtilPersistence(this);
 	}
 
-	@Deactivate
-	public void deactivate() {
-		_setCommerceCurrencyUtilPersistence(null);
-
+	public void destroy() {
 		entityCache.removeCache(CommerceCurrencyImpl.class.getName());
 	}
 
-	private void _setCommerceCurrencyUtilPersistence(
-		CommerceCurrencyPersistence commerceCurrencyPersistence) {
-
-		try {
-			Field field = CommerceCurrencyUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, commerceCurrencyPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
-	}
-
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
 
-	@Reference
+	@ServiceReference(type = FinderCache.class)
 	protected FinderCache finderCache;
 
 	private static final String _SQL_SELECT_COMMERCECURRENCY =
@@ -4434,8 +4373,5 @@ public class CommerceCurrencyPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
-
-	@Reference
-	private PortalUUID _portalUUID;
 
 }

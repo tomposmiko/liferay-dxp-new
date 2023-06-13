@@ -35,17 +35,16 @@ public class OrderRuleAccountGroup implements Cloneable, Serializable {
 		return OrderRuleAccountGroupSerDes.toDTO(json);
 	}
 
-	public OrderAccountGroup getAccountGroup() {
+	public AccountGroup getAccountGroup() {
 		return accountGroup;
 	}
 
-	public void setAccountGroup(OrderAccountGroup accountGroup) {
+	public void setAccountGroup(AccountGroup accountGroup) {
 		this.accountGroup = accountGroup;
 	}
 
 	public void setAccountGroup(
-		UnsafeSupplier<OrderAccountGroup, Exception>
-			accountGroupUnsafeSupplier) {
+		UnsafeSupplier<AccountGroup, Exception> accountGroupUnsafeSupplier) {
 
 		try {
 			accountGroup = accountGroupUnsafeSupplier.get();
@@ -55,7 +54,7 @@ public class OrderRuleAccountGroup implements Cloneable, Serializable {
 		}
 	}
 
-	protected OrderAccountGroup accountGroup;
+	protected AccountGroup accountGroup;
 
 	public String getAccountGroupExternalReferenceCode() {
 		return accountGroupExternalReferenceCode;

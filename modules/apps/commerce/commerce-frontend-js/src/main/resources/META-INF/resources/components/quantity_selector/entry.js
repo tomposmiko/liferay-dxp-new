@@ -15,6 +15,4 @@
 import launcher from '../../utilities/launcher';
 import QuantitySelector from './QuantitySelector';
 
-export default function entry(...data) {
-	return launcher(QuantitySelector, ...data);
-}
+export default (...data) => launcher(QuantitySelector, ...data);

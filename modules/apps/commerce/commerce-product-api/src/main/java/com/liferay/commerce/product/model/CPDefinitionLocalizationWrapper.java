@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -47,7 +45,6 @@ public class CPDefinitionLocalizationWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put(
 			"cpDefinitionLocalizationId", getCpDefinitionLocalizationId());
 		attributes.put("companyId", getCompanyId());
@@ -69,12 +66,6 @@ public class CPDefinitionLocalizationWrapper
 
 		if (mvccVersion != null) {
 			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
 		}
 
 		Long cpDefinitionLocalizationId = (Long)attributes.get(
@@ -172,16 +163,6 @@ public class CPDefinitionLocalizationWrapper
 	@Override
 	public long getCpDefinitionLocalizationId() {
 		return model.getCpDefinitionLocalizationId();
-	}
-
-	/**
-	 * Returns the ct collection ID of this cp definition localization.
-	 *
-	 * @return the ct collection ID of this cp definition localization
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
 	}
 
 	/**
@@ -305,16 +286,6 @@ public class CPDefinitionLocalizationWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this cp definition localization.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp definition localization
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the description of this cp definition localization.
 	 *
 	 * @param description the description of this cp definition localization
@@ -402,25 +373,6 @@ public class CPDefinitionLocalizationWrapper
 	@Override
 	public void setShortDescription(String shortDescription) {
 		model.setShortDescription(shortDescription);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CPDefinitionLocalization, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CPDefinitionLocalization, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

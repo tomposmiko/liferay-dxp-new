@@ -13,12 +13,7 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import {
-	FieldType,
-	FieldTypeName,
-	useConfig,
-	useForm,
-} from 'data-engine-js-components-web';
+import {useConfig, useForm} from 'data-engine-js-components-web';
 import React from 'react';
 
 // @ts-ignore
@@ -45,15 +40,12 @@ const FieldsSidebarSettingsHeader: React.FC<IProps> = ({field}) => {
 	return (
 		<div className="de__sidebar-field-settings-title">
 			<ClayButtonWithIcon
-				aria-label={Liferay.Language.get('back')}
 				className="mr-3"
 				displayType="secondary"
 				monospaced={false}
 				onClick={() => dispatch({type: EVENT_TYPES.SIDEBAR.FIELD.BLUR})}
 				symbol="angle-left"
-				title={Liferay.Language.get('back')}
 			/>
-
 			<Sidebar.Title title={label} />
 		</div>
 	);
@@ -75,10 +67,6 @@ const SidebarFieldSettings: React.FC<IProps> = ({field}) => {
 
 export default SidebarFieldSettings;
 
-interface Field {
-	name: string;
-	type: FieldTypeName;
-}
 interface IProps {
 	field: Field;
 }

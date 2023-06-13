@@ -522,9 +522,10 @@ public class PortletDescriptorParser {
 			Element nameElement = supportedProcessingEventElement.element(
 				"name");
 
-			supportedProcessingEvents.add(
-				PortletQNameUtil.getQName(
-					beanApp.getDefaultNamespace(), qNameElement, nameElement));
+			QName qName = PortletQNameUtil.getQName(
+				beanApp.getDefaultNamespace(), qNameElement, nameElement);
+
+			supportedProcessingEvents.add(qName);
 		}
 
 		Set<QName> supportedPublishingEvents = new HashSet<>();
@@ -537,9 +538,10 @@ public class PortletDescriptorParser {
 			Element nameElement = supportedPublishingEventElement.element(
 				"name");
 
-			supportedPublishingEvents.add(
-				PortletQNameUtil.getQName(
-					beanApp.getDefaultNamespace(), qNameElement, nameElement));
+			QName qName = PortletQNameUtil.getQName(
+				beanApp.getDefaultNamespace(), qNameElement, nameElement);
+
+			supportedPublishingEvents.add(qName);
 		}
 
 		BeanMethodIndexUtil.scanSupportedEvents(

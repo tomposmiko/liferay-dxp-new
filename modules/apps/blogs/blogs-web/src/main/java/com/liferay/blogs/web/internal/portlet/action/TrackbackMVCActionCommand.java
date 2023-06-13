@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -52,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alexander Chow
  */
 @Component(
+	immediate = true,
 	property = {
 		"auth.token.ignore.mvc.action=true",
 		"javax.portlet.name=" + BlogsPortletKeys.BLOGS,
@@ -68,9 +69,9 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		try {
-			BlogsEntry entry = _getBlogsEntry(actionRequest);
+			BlogsEntry entry = getBlogsEntry(actionRequest);
 
-			_validate(entry);
+			validate(entry);
 
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -89,21 +90,21 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 			String title = ParamUtil.getString(
 				originalHttpServletRequest, "title");
 
-			_validate(actionRequest, httpServletRequest.getRemoteAddr(), url);
+			validate(actionRequest, httpServletRequest.getRemoteAddr(), url);
 
 			_trackback.addTrackback(
 				entry, themeDisplay, excerpt, url, blogName, title,
 				new ServiceContextFunction(actionRequest));
 		}
 		catch (TrackbackValidationException trackbackValidationException) {
-			_sendError(
+			sendError(
 				actionRequest, actionResponse,
 				trackbackValidationException.getMessage());
 
 			return;
 		}
 
-		_sendSuccess(actionRequest, actionResponse);
+		sendSuccess(actionRequest, actionResponse);
 	}
 
 	@Override
@@ -116,15 +117,15 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 		}
 		catch (NoSuchEntryException noSuchEntryException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(noSuchEntryException);
+				_log.warn(noSuchEntryException, noSuchEntryException);
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
-	private BlogsEntry _getBlogsEntry(ActionRequest actionRequest)
+	protected BlogsEntry getBlogsEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		try {
@@ -138,7 +139,7 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private boolean _isCommentsEnabled(ActionRequest actionRequest)
+	protected boolean isCommentsEnabled(ActionRequest actionRequest)
 		throws Exception {
 
 		PortletPreferences portletPreferences =
@@ -153,15 +154,15 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 			portletPreferences.getValue("enableComments", null), true);
 	}
 
-	private void _sendError(
+	protected void sendError(
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			String msg)
 		throws Exception {
 
-		_sendResponse(actionRequest, actionResponse, msg, false);
+		sendResponse(actionRequest, actionResponse, msg, false);
 	}
 
-	private void _sendResponse(
+	protected void sendResponse(
 			ActionRequest actionRequest, ActionResponse actionResponse,
 			String msg, boolean success)
 		throws Exception {
@@ -195,18 +196,18 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 			s.getBytes(StringPool.UTF8), ContentTypes.TEXT_XML_UTF8);
 	}
 
-	private void _sendSuccess(
+	protected void sendSuccess(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		_sendResponse(actionRequest, actionResponse, null, true);
+		sendResponse(actionRequest, actionResponse, null, true);
 	}
 
-	private void _validate(
+	protected void validate(
 			ActionRequest actionRequest, String remoteIP, String url)
 		throws Exception {
 
-		if (!_isCommentsEnabled(actionRequest)) {
+		if (!isCommentsEnabled(actionRequest)) {
 			throw new TrackbackValidationException("Comments are disabled");
 		}
 
@@ -215,7 +216,7 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 				"Trackback requires a valid permanent URL");
 		}
 
-		String trackbackIP = HttpComponentsUtil.getIpAddress(url);
+		String trackbackIP = _http.getIpAddress(url);
 
 		if (!remoteIP.equals(trackbackIP)) {
 			throw new TrackbackValidationException(
@@ -223,7 +224,7 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _validate(BlogsEntry entry)
+	protected void validate(BlogsEntry entry)
 		throws TrackbackValidationException {
 
 		if (!entry.isAllowTrackbacks()) {
@@ -234,6 +235,9 @@ public class TrackbackMVCActionCommand extends BaseMVCActionCommand {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		TrackbackMVCActionCommand.class);
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private Portal _portal;

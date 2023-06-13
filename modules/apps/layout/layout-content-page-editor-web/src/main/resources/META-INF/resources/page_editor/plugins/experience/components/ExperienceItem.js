@@ -19,7 +19,6 @@ import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import ClayList from '@clayui/list';
 import classNames from 'classnames';
-import {navigate, openConfirmModal, setSessionValue} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -68,14 +67,11 @@ const ExperienceItem = ({
 			  )
 			: Liferay.Language.get('do-you-want-to-delete-this-experience');
 
-		openConfirmModal({
-			message: confirmationMessage,
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					onDeleteExperience(experience.segmentsExperienceId);
-				}
-			},
-		});
+		const confirmed = confirm(confirmationMessage);
+
+		if (confirmed) {
+			onDeleteExperience(experience.segmentsExperienceId);
+		}
 	};
 	const handleExperienceDuplicate = () => {
 		onDuplicateExperience(experience.segmentsExperienceId);
@@ -83,11 +79,11 @@ const ExperienceItem = ({
 	const handleExperimentNavigation = (event) => {
 		event.preventDefault();
 
-		setSessionValue(
+		Liferay.Util.Session.set(
 			'com.liferay.segments.experiment.web_panelState',
 			'open'
 		).then(() => {
-			navigate(experience.segmentsExperimentURL);
+			Liferay.Util.navigate(experience.segmentsExperimentURL);
 		});
 	};
 
@@ -96,7 +92,11 @@ const ExperienceItem = ({
 	});
 
 	return (
-		<ClayList.Item aria-current={active} className={itemClassName}>
+		<ClayList.Item
+			aria-checked={active}
+			className={itemClassName}
+			role="listitem"
+		>
 			<ClayList.ItemField expand>
 				<ClayButton displayType="unstyled" onClick={handleSelect}>
 					<div className="c-inner" tabIndex="-1">
@@ -118,21 +118,12 @@ const ExperienceItem = ({
 											<ExperienceLockIcon />
 										)}
 
-										{experience.active ? (
+										{experience.active && (
 											<ClayLabel
-												className="flex-shrink-0 inline-item-after"
+												className="inline-item-after"
 												displayType="success"
 											>
 												{Liferay.Language.get('active')}
-											</ClayLabel>
-										) : (
-											<ClayLabel
-												className="flex-shrink-0 inline-item-after"
-												displayType="secondary"
-											>
-												{Liferay.Language.get(
-													'inactive'
-												)}
 											</ClayLabel>
 										)}
 									</span>
@@ -141,7 +132,6 @@ const ExperienceItem = ({
 										<span className="mr-1 text-secondary">
 											{Liferay.Language.get('audience')}
 										</span>
-
 										{experience.segmentsEntryName}
 									</span>
 
@@ -173,7 +163,6 @@ const ExperienceItem = ({
 					</div>
 				</ClayButton>
 			</ClayList.ItemField>
-
 			<ClayList.ItemField className="align-self-center">
 				<ExperienceActions
 					editable={editable}
@@ -276,7 +265,7 @@ const ExperienceActions = ({
 						monospaced
 						onClick={handleExperienceDelete}
 						outline
-						symbol="trash"
+						symbol="times-circle"
 						title={Liferay.Language.get('delete-experience')}
 						type="button"
 					/>

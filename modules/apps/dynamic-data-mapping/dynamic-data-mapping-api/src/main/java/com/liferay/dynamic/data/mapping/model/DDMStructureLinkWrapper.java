@@ -292,11 +292,6 @@ public class DDMStructureLinkWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DDMStructureLink, Object>>
 		getAttributeGetterFunctions() {
 

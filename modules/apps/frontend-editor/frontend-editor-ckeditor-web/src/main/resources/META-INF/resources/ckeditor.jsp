@@ -54,7 +54,7 @@ if (Validator.isNotNull(onInitMethod)) {
 }
 
 String placeholder = GetterUtil.getString((String)request.getAttribute(CKEditorConstants.ATTRIBUTE_NAMESPACE + ":placeholder"));
-boolean required = GetterUtil.getBoolean((String)request.getAttribute(CKEditorConstants.ATTRIBUTE_NAMESPACE + ":required"));
+
 boolean skipEditorLoading = GetterUtil.getBoolean((String)request.getAttribute(CKEditorConstants.ATTRIBUTE_NAMESPACE + ":skipEditorLoading"));
 String toolbarSet = (String)request.getAttribute(CKEditorConstants.ATTRIBUTE_NAMESPACE + ":toolbarSet");
 
@@ -105,12 +105,8 @@ if (inlineEdit && Validator.isNotNull(inlineEditSaveURL)) {
 	var="editor"
 >
 	<c:if test="<%= Validator.isNotNull(placeholder) %>">
-		<label class="control-label" for="<%= HtmlUtil.escapeAttribute(name) %>">
+		<label class="control-label" for="<%= name %>">
 			<liferay-ui:message key="<%= placeholder %>" />
-
-			<c:if test="<%= required %>">
-				<span class="text-warning">*</span>
-			</c:if>
 		</label>
 	</c:if>
 
@@ -179,9 +175,7 @@ name = HtmlUtil.escapeJS(name);
 	});
 
 	var preventImageDropHandler = windowNode.on('drop', (event) => {
-		var element = event.target.getDOMNode();
-		var validDropTarget =
-			element.isContentEditable || !!element.getAttribute('droppable');
+		var validDropTarget = event.target.getDOMNode().isContentEditable;
 
 		if (!validDropTarget) {
 			event.preventDefault();
@@ -347,14 +341,6 @@ name = HtmlUtil.escapeJS(name);
 
 		if (ckEditor) {
 			var iframe = ckEditor.one('iframe');
-
-			if (iframe) {
-				iframe.attr(
-					'aria-labelledby',
-					'<%= namespace %>Aria ' +
-						iframe._node.attributes['aria-describedby'].value
-				);
-			}
 
 			addAUIClass(iframe);
 
@@ -625,9 +611,7 @@ name = HtmlUtil.escapeJS(name);
 
 										window['<%= name %>'].create();
 
-										CKEDITOR.instances['<%= name %>'].setData(
-											ckEditorContent
-										);
+										window['<%= name %>'].setHTML(ckEditorContent);
 
 										initialEditor =
 											CKEDITOR.instances['<%= name %>'].id;

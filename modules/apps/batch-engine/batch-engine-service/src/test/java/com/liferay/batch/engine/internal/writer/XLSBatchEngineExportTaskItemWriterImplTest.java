@@ -16,9 +16,6 @@ package com.liferay.batch.engine.internal.writer;
 
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.util.CSVUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ByteArrayInputStream;
@@ -33,7 +30,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -69,18 +65,20 @@ public class XLSBatchEngineExportTaskItemWriterImplTest
 	@Test
 	public void testWriteRowsWithDefinedFieldNames2() throws Exception {
 		_testWriteRows(
-			Arrays.asList("createDate", "description", "id", "name"));
+			Arrays.asList(
+				"createDate", "description", "id", "name_en", "name_hr"));
 	}
 
 	@Test
 	public void testWriteRowsWithDefinedFieldNames3() throws Exception {
-		_testWriteRows(Arrays.asList("createDate", "id", "name"));
+		_testWriteRows(Arrays.asList("createDate", "id", "name_en"));
 	}
 
 	@Test
 	public void testWriteRowsWithDefinedFieldNames4() throws Exception {
 		_testWriteRows(
-			Arrays.asList("id", "name", "description", "createDate"));
+			Arrays.asList(
+				"id", "name_hr", "name_en", "description", "createDate"));
 	}
 
 	@Test
@@ -112,12 +110,12 @@ public class XLSBatchEngineExportTaskItemWriterImplTest
 					int index = fieldName.indexOf(CharPool.UNDERLINE);
 
 					if (index == -1) {
-						Field field = fieldsMap.get(fieldName);
+						Field field = fieldMap.get(fieldName);
 
 						values.add(field.get(item));
 					}
 					else {
-						Field field = fieldsMap.get(
+						Field field = fieldMap.get(
 							fieldName.substring(0, index));
 
 						Map<?, ?> valueMap = (Map<?, ?>)field.get(item);
@@ -174,50 +172,13 @@ public class XLSBatchEngineExportTaskItemWriterImplTest
 
 				cell.setCellValue((Date)value);
 			}
-			else if (value instanceof Map) {
-				Map<?, ?> map = (Map<?, ?>)value;
-
-				StringBundler sb = new StringBundler(map.size() * 3);
-
-				Set<? extends Map.Entry<?, ?>> entries = map.entrySet();
-
-				Iterator<? extends Map.Entry<?, ?>> iterator =
-					entries.iterator();
-
-				while (iterator.hasNext()) {
-					Map.Entry<?, ?> entry = iterator.next();
-
-					sb.append(CSVUtil.encode(entry.getKey()));
-
-					sb.append(StringPool.COLON);
-
-					if (entry.getValue() != null) {
-						sb.append(CSVUtil.encode(entry.getValue()));
-					}
-					else {
-						sb.append(StringPool.BLANK);
-					}
-
-					if (iterator.hasNext()) {
-						sb.append(StringPool.COMMA_AND_SPACE);
-					}
-				}
-
-				cell.setCellValue(sb.toString());
-			}
 			else if (value instanceof Number) {
 				Number cellValue = (Number)value;
 
 				cell.setCellValue(cellValue.doubleValue());
 			}
 			else {
-				if (value == null) {
-					cell.setCellValue(StringPool.BLANK);
-
-					continue;
-				}
-
-				cell.setCellValue(String.valueOf(value));
+				cell.setCellValue((String)value);
 			}
 		}
 	}
@@ -229,7 +190,7 @@ public class XLSBatchEngineExportTaskItemWriterImplTest
 		try (XLSBatchEngineExportTaskItemWriterImpl
 				xlsBatchEngineExportTaskItemWriterImpl =
 					new XLSBatchEngineExportTaskItemWriterImpl(
-						fieldsMap, fieldNames, unsyncByteArrayOutputStream)) {
+						fieldMap, fieldNames, unsyncByteArrayOutputStream)) {
 
 			for (Item[] items : getItemGroups()) {
 				xlsBatchEngineExportTaskItemWriterImpl.write(

@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class DepotEntryLocalServiceWrapper
 	implements DepotEntryLocalService, ServiceWrapper<DepotEntryLocalService> {
 
-	public DepotEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DepotEntryLocalServiceWrapper(
 		DepotEntryLocalService depotEntryLocalService) {
 
@@ -106,12 +102,10 @@ public class DepotEntryLocalServiceWrapper
 	 *
 	 * @param depotEntry the depot entry
 	 * @return the depot entry that was removed
-	 * @throws PortalException
 	 */
 	@Override
 	public com.liferay.depot.model.DepotEntry deleteDepotEntry(
-			com.liferay.depot.model.DepotEntry depotEntry)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		com.liferay.depot.model.DepotEntry depotEntry) {
 
 		return _depotEntryLocalService.deleteDepotEntry(depotEntry);
 	}

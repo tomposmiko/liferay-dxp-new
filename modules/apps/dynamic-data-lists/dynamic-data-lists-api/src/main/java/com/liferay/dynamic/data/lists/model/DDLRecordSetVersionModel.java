@@ -619,8 +619,4 @@ public interface DDLRecordSetVersionModel
 	@Override
 	public DDLRecordSetVersion cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

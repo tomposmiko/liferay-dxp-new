@@ -14,7 +14,6 @@
 
 package com.liferay.layout.internal.model.listener;
 
-import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.layout.friendly.url.LayoutFriendlyURLEntryHelper;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -33,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class LayoutFriendlyURLModelListener
 	extends BaseModelListener<LayoutFriendlyURL> {
 
@@ -41,9 +40,7 @@ public class LayoutFriendlyURLModelListener
 	public void onAfterCreate(LayoutFriendlyURL layoutFriendlyURL)
 		throws ModelListenerException {
 
-		if (!ExportImportThreadLocal.isImportInProcess()) {
-			_addFriendlyURLEntry(layoutFriendlyURL);
-		}
+		_addFriendlyURLEntry(layoutFriendlyURL);
 	}
 
 	@Override
@@ -52,9 +49,7 @@ public class LayoutFriendlyURLModelListener
 			LayoutFriendlyURL layoutFriendlyURL)
 		throws ModelListenerException {
 
-		if (!ExportImportThreadLocal.isImportInProcess()) {
-			_addFriendlyURLEntry(layoutFriendlyURL);
-		}
+		_addFriendlyURLEntry(layoutFriendlyURL);
 	}
 
 	private void _addFriendlyURLEntry(LayoutFriendlyURL layoutFriendlyURL) {

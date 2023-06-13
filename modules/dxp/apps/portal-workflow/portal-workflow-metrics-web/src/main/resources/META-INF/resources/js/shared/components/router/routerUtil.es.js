@@ -14,29 +14,31 @@ import React from 'react';
 
 import {FilterContextProvider} from '../filter/FilterContext.es';
 
-export function withParams(...components) {
-	return ({history, location: {search}, match: {params}}) => {
-		return (
-			<FilterContextProvider>
-				{components.map((Component, index) => {
-					if (params.sort) {
-						params.sort = decodeURIComponent(params.sort);
-					}
+export const withParams = (...components) => ({
+	history,
+	location: {search},
+	match: {params},
+}) => {
+	return (
+		<FilterContextProvider>
+			{components.map((Component, index) => {
+				if (params.sort) {
+					params.sort = decodeURIComponent(params.sort);
+				}
 
-					return (
-						<Component
-							{...params}
-							history={history}
-							key={index}
-							query={search}
-							routeParams={params}
-						/>
-					);
-				})}
-			</FilterContextProvider>
-		);
-	};
-}
+				return (
+					<Component
+						{...params}
+						history={history}
+						key={index}
+						query={search}
+						routeParams={params}
+					/>
+				);
+			})}
+		</FilterContextProvider>
+	);
+};
 
 export function getPathname(params, path) {
 	return pathToRegexp.compile(path)(params);

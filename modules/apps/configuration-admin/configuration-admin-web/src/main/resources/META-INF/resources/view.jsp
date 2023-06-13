@@ -29,25 +29,20 @@ ConfigurationScopeDisplayContext configurationScopeDisplayContext = Configuratio
 	<portlet:param name="redirect" value="<%= redirectURL %>" />
 </portlet:renderURL>
 
-<div class="sticky-top" style="top: 56px; z-index: 999;">
-	<clay:management-toolbar
-		searchActionURL="<%= searchURL %>"
-		selectable="<%= false %>"
-		showSearch="<%= true %>"
-	/>
-</div>
+<clay:management-toolbar
+	searchActionURL="<%= searchURL %>"
+	selectable="<%= false %>"
+	showSearch="<%= true %>"
+/>
 
-<liferay-ui:success key='<%= ConfigurationAdminPortletKeys.SITE_SETTINGS + "requestProcessed" %>'>
-	<liferay-ui:message key="site-was-successfully-added" />
-</liferay-ui:success>
+<liferay-ui:success key='<%= ConfigurationAdminPortletKeys.SITE_SETTINGS + "requestProcessed" %>' message="site-was-added" />
 
 <clay:container-fluid
 	cssClass="container-view"
 >
 	<c:if test="<%= configurationCategorySectionDisplays.isEmpty() %>">
-		<liferay-frontend:empty-result-message
-			animationType="<%= EmptyResultMessageKeys.AnimationType.SEARCH %>"
-			title='<%= LanguageUtil.get(resourceBundle, "no-configurations-were-found") %>'
+		<liferay-ui:empty-result-message
+			message="no-configurations-were-found"
 		/>
 	</c:if>
 
@@ -58,9 +53,9 @@ ConfigurationScopeDisplayContext configurationScopeDisplayContext = Configuratio
 		%>
 
 			<li class="list-group-header">
-				<p class="list-group-header-title text-uppercase">
+				<h3 class="list-group-header-title text-uppercase">
 					<%= HtmlUtil.escape(configurationCategorySectionDisplay.getConfigurationCategorySectionLabel(locale)) %>
-				</p>
+				</h3>
 			</li>
 			<li class="list-group-card">
 				<ul class="list-group">

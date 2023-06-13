@@ -16,12 +16,10 @@ package com.liferay.account.admin.web.internal.dao.search;
 
 import com.liferay.account.admin.web.internal.constants.AccountWebKeys;
 import com.liferay.account.admin.web.internal.display.AccountEntryDisplay;
-import com.liferay.account.admin.web.internal.display.AccountEntryDisplayFactoryUtil;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalServiceUtil;
 import com.liferay.account.service.AccountEntryServiceUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -35,8 +33,10 @@ import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -54,17 +54,6 @@ public class AccountEntryDisplaySearchContainerFactory {
 			new LinkedHashMap<>(), true);
 	}
 
-	public static SearchContainer<AccountEntryDisplay> create(
-			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse,
-			boolean filterManageableAccountEntries)
-		throws PortalException {
-
-		return _create(
-			liferayPortletRequest, liferayPortletResponse,
-			new LinkedHashMap<>(), filterManageableAccountEntries);
-	}
-
 	public static SearchContainer<AccountEntryDisplay> createWithAccountGroupId(
 			long accountGroupId, LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse)
@@ -76,18 +65,6 @@ public class AccountEntryDisplaySearchContainerFactory {
 				"accountGroupIds", new long[] {accountGroupId}
 			).build(),
 			false);
-	}
-
-	public static SearchContainer<AccountEntryDisplay> createWithParams(
-			LiferayPortletRequest liferayPortletRequest,
-			LiferayPortletResponse liferayPortletResponse,
-			LinkedHashMap<String, Object> params,
-			boolean filterManageableAccountEntries)
-		throws PortalException {
-
-		return _create(
-			liferayPortletRequest, liferayPortletResponse, params,
-			filterManageableAccountEntries);
 	}
 
 	public static SearchContainer<AccountEntryDisplay> createWithUserId(
@@ -129,6 +106,9 @@ public class AccountEntryDisplaySearchContainerFactory {
 
 		accountEntryDisplaySearchContainer.setOrderByType(orderByType);
 
+		accountEntryDisplaySearchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(liferayPortletResponse));
+
 		String keywords = ParamUtil.getString(
 			liferayPortletRequest, "keywords");
 
@@ -169,24 +149,24 @@ public class AccountEntryDisplaySearchContainerFactory {
 					_isReverseOrder(orderByType));
 		}
 
-		accountEntryDisplaySearchContainer.setResultsAndTotal(
-			() -> TransformUtil.transform(
-				baseModelSearchResult.getBaseModels(),
-				accountEntry -> AccountEntryDisplayFactoryUtil.create(
-					accountEntry, liferayPortletRequest)),
+		List<AccountEntryDisplay> accountEntryDisplays =
+			TransformUtil.transform(
+				baseModelSearchResult.getBaseModels(), AccountEntryDisplay::of);
+
+		accountEntryDisplaySearchContainer.setResults(accountEntryDisplays);
+
+		accountEntryDisplaySearchContainer.setTotal(
 			baseModelSearchResult.getLength());
-		accountEntryDisplaySearchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(liferayPortletResponse));
 
 		return accountEntryDisplaySearchContainer;
 	}
 
 	private static int _getStatus(String navigation) {
-		if (Objects.equals(navigation, "active")) {
-			return WorkflowConstants.getLabelStatus("approved");
+		if (Objects.equals(navigation, "inactive")) {
+			return WorkflowConstants.STATUS_INACTIVE;
 		}
 
-		return WorkflowConstants.getLabelStatus(navigation);
+		return WorkflowConstants.STATUS_APPROVED;
 	}
 
 	private static boolean _isReverseOrder(String orderByType) {

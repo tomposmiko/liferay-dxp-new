@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Noah Sherrill
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
 		"mvc.command.name=/user_associated_data/anonymize_uad_entities"
@@ -96,21 +97,22 @@ public class AnonymizeUADEntitiesMVCActionCommand
 					entity, selectedUserId, anonymousUser);
 			}
 
-			Map<String, List<Serializable>> containerItemPKsMap =
+			Map<Class<?>, List<Serializable>> containerItemPKsMap =
 				uadHierarchyDisplay.getContainerItemPKsMap(
-					entityUADDisplay.getTypeKey(),
+					entityUADDisplay.getTypeClass(),
 					uadHierarchyDisplay.getPrimaryKey(entity), selectedUserId);
 
-			for (Map.Entry<String, List<Serializable>> entry :
+			for (Map.Entry<Class<?>, List<Serializable>> entry :
 					containerItemPKsMap.entrySet()) {
 
-				String typeKey = entry.getKey();
+				Class<?> containerItemClass = entry.getKey();
 
 				UADAnonymizer<Object> containerItemUADAnonymizer =
 					(UADAnonymizer<Object>)uadRegistry.getUADAnonymizer(
-						typeKey);
+						containerItemClass.getName());
 				UADDisplay<Object> containerItemUADDisplay =
-					(UADDisplay<Object>)uadRegistry.getUADDisplay(typeKey);
+					(UADDisplay<Object>)uadRegistry.getUADDisplay(
+						containerItemClass.getName());
 
 				doMultipleAction(
 					entry.getValue(),

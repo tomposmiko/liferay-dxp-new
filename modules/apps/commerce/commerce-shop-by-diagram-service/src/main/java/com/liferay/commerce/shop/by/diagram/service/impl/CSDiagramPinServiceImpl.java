@@ -21,16 +21,17 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = {
 		"json.web.service.context.name=commerce",
 		"json.web.service.context.path=CSDiagramPin"
@@ -53,8 +54,9 @@ public class CSDiagramPinServiceImpl extends CSDiagramPinServiceBaseImpl {
 	}
 
 	@Override
-	public void deleteCSDiagramPin(CSDiagramPin csDiagramPin)
-		throws PortalException {
+	public void deleteCSDiagramPin(long csDiagramPinId) throws PortalException {
+		CSDiagramPin csDiagramPin = csDiagramPinLocalService.getCSDiagramPin(
+			csDiagramPinId);
 
 		_cpDefinitionModelResourcePermission.check(
 			getPermissionChecker(), csDiagramPin.getCPDefinitionId(),
@@ -131,10 +133,10 @@ public class CSDiagramPinServiceImpl extends CSDiagramPinServiceBaseImpl {
 			csDiagramPinId, positionX, positionY, sequence);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CPDefinition)"
-	)
-	private ModelResourcePermission<CPDefinition>
-		_cpDefinitionModelResourcePermission;
+	private static volatile ModelResourcePermission<CPDefinition>
+		_cpDefinitionModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CSDiagramPinServiceImpl.class,
+				"_cpDefinitionModelResourcePermission", CPDefinition.class);
 
 }

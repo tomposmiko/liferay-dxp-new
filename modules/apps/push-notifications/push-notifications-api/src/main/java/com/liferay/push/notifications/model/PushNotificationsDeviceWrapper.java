@@ -266,11 +266,6 @@ public class PushNotificationsDeviceWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected PushNotificationsDeviceWrapper wrap(
 		PushNotificationsDevice pushNotificationsDevice) {
 

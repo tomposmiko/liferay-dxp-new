@@ -17,6 +17,8 @@ package com.liferay.site.navigation.type;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 
+import java.util.Optional;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -27,6 +29,6 @@ public interface SiteNavigationMenuItemTypeContext {
 
 	public Company getCompany();
 
-	public Group getGroup();
+	public Optional<Group> getGroupOptional();
 
 }

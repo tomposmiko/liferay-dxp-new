@@ -15,7 +15,6 @@
 package com.liferay.portal.messaging.internal.jmx;
 
 import com.liferay.portal.kernel.messaging.Destination;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.lang.management.ManagementFactory;
 
@@ -23,30 +22,32 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Michael C. Han
  */
+@PowerMockIgnore("javax.management.*")
+@RunWith(PowerMockRunner.class)
 public class DestinationStatisticsManagerTest {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+	@Before
+	public void setUp() throws Exception {
+		_mBeanServer = ManagementFactory.getPlatformMBeanServer();
+	}
 
 	@Test
 	public void testRegisterMBean() throws Exception {
-		MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-
-		Destination destination = Mockito.mock(Destination.class);
-
-		Mockito.when(
-			destination.getName()
+		PowerMockito.when(
+			_destination.getName()
 		).thenReturn(
 			"test"
 		);
@@ -54,12 +55,17 @@ public class DestinationStatisticsManagerTest {
 		ObjectName objectName = new ObjectName(
 			"com.liferay.portal.messaging:classification=" +
 				"messaging_destination,name=MessagingDestinationStatistics-" +
-					destination.getName());
+					_destination.getName());
 
-		mBeanServer.registerMBean(
-			new DestinationStatisticsManager(destination), objectName);
+		_mBeanServer.registerMBean(
+			new DestinationStatisticsManager(_destination), objectName);
 
-		Assert.assertTrue(mBeanServer.isRegistered(objectName));
+		Assert.assertTrue(_mBeanServer.isRegistered(objectName));
 	}
+
+	@Mock
+	private Destination _destination;
+
+	private MBeanServer _mBeanServer;
 
 }

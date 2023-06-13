@@ -93,7 +93,7 @@ public class ContactsUtil {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -110,11 +110,11 @@ public class ContactsUtil {
 	public static JSONObject getUserJSONObject(long userId, User user)
 		throws PortalException {
 
+		boolean block = SocialRelationLocalServiceUtil.hasRelation(
+			userId, user.getUserId(), SocialRelationConstants.TYPE_UNI_ENEMY);
+
 		JSONObject jsonObject = JSONUtil.put(
-			"block",
-			SocialRelationLocalServiceUtil.hasRelation(
-				userId, user.getUserId(),
-				SocialRelationConstants.TYPE_UNI_ENEMY)
+			"block", block
 		).put(
 			"contactId", String.valueOf(user.getContactId())
 		).put(
@@ -212,9 +212,11 @@ public class ContactsUtil {
 
 		for (Address address : addresses) {
 			sb.append("ADR;TYPE=");
-			sb.append(
-				StringUtil.toUpperCase(
-					_getVCardListTypeName(address.getListType())));
+
+			ListType listType = address.getType();
+
+			sb.append(StringUtil.toUpperCase(_getVCardListTypeName(listType)));
+
 			sb.append(StringPool.COLON);
 			sb.append(StringPool.SEMICOLON);
 			sb.append(StringPool.SEMICOLON);
@@ -286,7 +288,7 @@ public class ContactsUtil {
 		for (EmailAddress emailAddress : emailAddresses) {
 			sb.append("EMAIL;TYPE=INTERNET;TYPE=");
 
-			ListType listType = emailAddress.getListType();
+			ListType listType = emailAddress.getType();
 
 			sb.append(StringUtil.toUpperCase(listType.getName()));
 
@@ -348,22 +350,20 @@ public class ContactsUtil {
 		sb.append(user.getMiddleName());
 		sb.append(StringPool.SEMICOLON);
 
-		long prefixListTypeId = contact.getPrefixListTypeId();
+		long prefixId = contact.getPrefixId();
 
-		if (prefixListTypeId > 0) {
-			ListType listType = ListTypeServiceUtil.getListType(
-				prefixListTypeId);
+		if (prefixId > 0) {
+			ListType listType = ListTypeServiceUtil.getListType(prefixId);
 
 			sb.append(listType.getName());
 		}
 
 		sb.append(StringPool.SEMICOLON);
 
-		long suffixListTypeId = contact.getSuffixListTypeId();
+		long suffixId = contact.getSuffixId();
 
-		if (suffixListTypeId > 0) {
-			ListType listType = ListTypeServiceUtil.getListType(
-				suffixListTypeId);
+		if (suffixId > 0) {
+			ListType listType = ListTypeServiceUtil.getListType(suffixId);
 
 			sb.append(listType.getName());
 		}
@@ -384,9 +384,11 @@ public class ContactsUtil {
 
 		for (Phone phone : phones) {
 			sb.append("TEL;TYPE=");
-			sb.append(
-				StringUtil.toUpperCase(
-					_getVCardListTypeName(phone.getListType())));
+
+			ListType listType = phone.getType();
+
+			sb.append(StringUtil.toUpperCase(_getVCardListTypeName(listType)));
+
 			sb.append(StringPool.COLON);
 			sb.append(phone.getNumber());
 			sb.append(StringPool.SPACE);
@@ -419,9 +421,9 @@ public class ContactsUtil {
 		for (Website website : websites) {
 			sb.append("URL;TYPE=");
 
-			sb.append(
-				StringUtil.toUpperCase(
-					_getVCardListTypeName(website.getListType())));
+			ListType listType = website.getType();
+
+			sb.append(StringUtil.toUpperCase(_getVCardListTypeName(listType)));
 
 			sb.append(StringPool.COLON);
 

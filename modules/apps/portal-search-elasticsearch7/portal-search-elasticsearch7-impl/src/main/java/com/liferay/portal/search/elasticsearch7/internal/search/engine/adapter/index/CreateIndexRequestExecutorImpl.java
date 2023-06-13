@@ -17,8 +17,8 @@ package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
-import com.liferay.portal.search.elasticsearch7.internal.helper.SearchLogHelperUtil;
 import com.liferay.portal.search.elasticsearch7.internal.util.ClassLoaderUtil;
+import com.liferay.portal.search.elasticsearch7.internal.util.SearchLogHelperUtil;
 import com.liferay.portal.search.engine.adapter.index.CreateIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.CreateIndexResponse;
 
@@ -27,7 +27,7 @@ import java.io.IOException;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.xcontent.XContentType;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,7 +46,7 @@ public class CreateIndexRequestExecutorImpl
 				createIndexRequest);
 
 		org.elasticsearch.action.admin.indices.create.CreateIndexResponse
-			elasticsearchCreateIndexResponse = _getCreateIndexResponse(
+			elasticsearchCreateIndexResponse = getCreateIndexResponse(
 				elasticsearchCreateIndexRequest, createIndexRequest);
 
 		SearchLogHelperUtil.logActionResponse(
@@ -75,8 +75,8 @@ public class CreateIndexRequestExecutorImpl
 		return elasticsearchCreateIndexRequest;
 	}
 
-	private org.elasticsearch.action.admin.indices.create.CreateIndexResponse
-		_getCreateIndexResponse(
+	protected org.elasticsearch.action.admin.indices.create.CreateIndexResponse
+		getCreateIndexResponse(
 			org.elasticsearch.action.admin.indices.create.CreateIndexRequest
 				elasticsearchCreateIndexRequest,
 			CreateIndexRequest createIndexRequest) {
@@ -97,10 +97,16 @@ public class CreateIndexRequestExecutorImpl
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CreateIndexRequestExecutorImpl.class);
 
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

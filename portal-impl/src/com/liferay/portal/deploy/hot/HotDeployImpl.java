@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.BasePortalLifecycle;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalLifecycle;
@@ -102,7 +103,7 @@ public class HotDeployImpl implements HotDeploy {
 				hotDeployListener.invokeUndeploy(hotDeployEvent);
 			}
 			catch (HotDeployException hotDeployException) {
-				_log.error(hotDeployException);
+				_log.error(hotDeployException, hotDeployException);
 			}
 			finally {
 				PortletClassLoaderUtil.setServletContextName(null);
@@ -111,6 +112,10 @@ public class HotDeployImpl implements HotDeploy {
 
 		_deployedServletContextNames.remove(
 			hotDeployEvent.getServletContextName());
+
+		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
+
+		TemplateManagerUtil.destroy(classLoader);
 	}
 
 	@Override
@@ -201,7 +206,7 @@ public class HotDeployImpl implements HotDeploy {
 					hotDeployListener.invokeDeploy(hotDeployEvent);
 				}
 				catch (HotDeployException hotDeployException) {
-					_log.error(hotDeployException);
+					_log.error(hotDeployException, hotDeployException);
 				}
 				finally {
 					PortletClassLoaderUtil.setServletContextName(null);

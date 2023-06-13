@@ -41,10 +41,6 @@ public class BatchEngineImportTaskTable
 			"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
 	public final Column<BatchEngineImportTaskTable, String> uuid = createColumn(
 		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<BatchEngineImportTaskTable, String>
-		externalReferenceCode = createColumn(
-			"externalReferenceCode", String.class, Types.VARCHAR,
-			Column.FLAG_DEFAULT);
 	public final Column<BatchEngineImportTaskTable, Long>
 		batchEngineImportTaskId = createColumn(
 			"batchEngineImportTaskId", Long.class, Types.BIGINT,
@@ -86,10 +82,6 @@ public class BatchEngineImportTaskTable
 	public final Column<BatchEngineImportTaskTable, Clob> fieldNameMapping =
 		createColumn(
 			"fieldNameMapping", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
-	public final Column<BatchEngineImportTaskTable, Integer> importStrategy =
-		createColumn(
-			"importStrategy", Integer.class, Types.INTEGER,
-			Column.FLAG_DEFAULT);
 	public final Column<BatchEngineImportTaskTable, String> operation =
 		createColumn(
 			"operation", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);

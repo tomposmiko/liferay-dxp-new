@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.sort;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.query.QueryTranslator;
 
 import org.elasticsearch.index.query.QueryBuilder;
@@ -27,9 +26,12 @@ public class ElasticsearchSortFieldTranslatorFixture {
 	public ElasticsearchSortFieldTranslatorFixture(
 		QueryTranslator<QueryBuilder> queryTranslator) {
 
-		ReflectionTestUtil.setFieldValue(
-			_elasticsearchSortFieldTranslator, "_queryTranslator",
-			queryTranslator);
+		_elasticsearchSortFieldTranslator =
+			new ElasticsearchSortFieldTranslator() {
+				{
+					setQueryTranslator(queryTranslator);
+				}
+			};
 	}
 
 	public ElasticsearchSortFieldTranslator
@@ -39,7 +41,6 @@ public class ElasticsearchSortFieldTranslatorFixture {
 	}
 
 	private final ElasticsearchSortFieldTranslator
-		_elasticsearchSortFieldTranslator =
-			new ElasticsearchSortFieldTranslator();
+		_elasticsearchSortFieldTranslator;
 
 }

@@ -15,9 +15,11 @@
 package com.liferay.portal.kernel.deploy.hot;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -26,6 +28,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
@@ -56,7 +59,7 @@ public class HotDeployEvent {
 			initDependentServletContextNames();
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			_log.error(ioException, ioException);
 		}
 	}
 
@@ -99,6 +102,27 @@ public class HotDeployEvent {
 	protected void initDependentServletContextNames() throws IOException {
 		if (!DependencyManagementThreadLocal.isEnabled() || isWAB()) {
 			return;
+		}
+
+		List<String[]> levelsRequiredDeploymentContexts =
+			DeployManagerUtil.getLevelsRequiredDeploymentContexts();
+
+		for (String[] levelRequiredDeploymentContexts :
+				levelsRequiredDeploymentContexts) {
+
+			if (ArrayUtil.contains(
+					levelRequiredDeploymentContexts,
+					_servletContext.getServletContextName())) {
+
+				break;
+			}
+
+			for (String levelRequiredDeploymentContext :
+					levelRequiredDeploymentContexts) {
+
+				_dependentServletContextNames.add(
+					levelRequiredDeploymentContext);
+			}
 		}
 
 		InputStream inputStream = _servletContext.getResourceAsStream(

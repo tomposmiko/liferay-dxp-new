@@ -15,11 +15,11 @@
 package com.liferay.portlet.display.template.internal;
 
 import com.liferay.dynamic.data.mapping.kernel.DDMTemplate;
+import com.liferay.petra.model.adapter.util.ModelAdapterUtil;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateManager;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.model.adapter.ModelAdapterUtil;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 
 import java.lang.reflect.InvocationHandler;
@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Leonardo Barros
  */
-@Component(service = PortletDisplayTemplateManager.class)
+@Component(immediate = true, service = PortletDisplayTemplateManager.class)
 public class PortletDisplayTemplateManagerImpl
 	implements PortletDisplayTemplateManager {
 
@@ -97,11 +97,17 @@ public class PortletDisplayTemplateManagerImpl
 			contextObjects);
 	}
 
+	@Reference(unbind = "-")
+	protected void setPortletDisplayTemplate(
+		PortletDisplayTemplate portletDisplayTemplate) {
+
+		_portletDisplayTemplate = portletDisplayTemplate;
+	}
+
 	private static final Function<InvocationHandler, DDMTemplate>
 		_ddmTemplateProxyProviderFunction = ProxyUtil.getProxyProviderFunction(
 			DDMTemplate.class, ModelWrapper.class);
 
-	@Reference
 	private PortletDisplayTemplate _portletDisplayTemplate;
 
 }

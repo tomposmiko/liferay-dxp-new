@@ -33,7 +33,7 @@ CPOptionCategory cpOptionCategory = (CPOptionCategory)request.getAttribute(CPWeb
 	elementClasses="mt-4"
 >
 	<aui:fieldset>
-		<aui:input name="title" />
+		<aui:input autoFocus="<%= true %>" name="title" />
 
 		<aui:input name="description" />
 
@@ -44,9 +44,7 @@ CPOptionCategory cpOptionCategory = (CPOptionCategory)request.getAttribute(CPWeb
 </commerce-ui:panel>
 
 <c:if test="<%= cpOptionCategory == null %>">
-	<aui:script require="frontend-js-web/index as frontendJsWeb">
-		var {debounce} = frontendJsWeb;
-
+	<aui:script require="commerce-frontend-js/utilities/debounce as debounce">
 		var form = document.getElementById('<portlet:namespace />fm');
 
 		var keyInput = form.querySelector('#<portlet:namespace />key');
@@ -56,6 +54,6 @@ CPOptionCategory cpOptionCategory = (CPOptionCategory)request.getAttribute(CPWeb
 			keyInput.value = titleInput.value;
 		};
 
-		titleInput.addEventListener('input', debounce(handleOnTitleInput, 200));
+		titleInput.addEventListener('input', debounce.default(handleOnTitleInput, 200));
 	</aui:script>
 </c:if>

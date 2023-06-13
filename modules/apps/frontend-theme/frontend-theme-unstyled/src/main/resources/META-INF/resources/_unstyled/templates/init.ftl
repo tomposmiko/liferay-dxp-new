@@ -39,8 +39,6 @@
 	company_logo_height = theme_display.getCompanyLogoHeight()
 	company_logo_width = theme_display.getCompanyLogoWidth()
 	company_url = theme_display.getURLHome()
-
-	show_control_menu = theme_display.isShowControlMenu()
 />
 
 <#if !request.isRequestedSessionIdFromCookie()>
@@ -60,7 +58,6 @@
 	<#assign
 		is_default_user = user.isDefaultUser()
 		is_female = user.isFemale()
-		is_guest_user = user.isGuestUser()
 		is_male = user.isMale()
 		is_setup_complete = user.isSetupComplete()
 		language = locale.getLanguage()
@@ -263,7 +260,7 @@
 />
 
 <#if validator.isNotNull(portlet_id) && layout.isSystem() && !layout.isTypeControlPanel() && stringUtil.equals(layout_friendly_url, "/manage")>
-	<#assign the_title = htmlUtil.escape(portalUtil.getPortletTitle(portlet_id, locale)) />
+	<#assign the_title = portalUtil.getPortletTitle(portlet_id, locale) />
 </#if>
 
 <#if the_title ?has_content && !stringUtil.equals(company_name, site_name) && !page_group.isLayoutPrototype()>

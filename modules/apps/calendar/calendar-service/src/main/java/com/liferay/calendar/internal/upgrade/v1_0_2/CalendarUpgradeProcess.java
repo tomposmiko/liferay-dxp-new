@@ -38,7 +38,9 @@ public class CalendarUpgradeProcess extends UpgradeProcess {
 
 	public void updateCalendarTable() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			alterTableAddColumn("Calendar", "timeZoneId", "VARCHAR(75) null");
+			if (!hasColumn("Calendar", "timeZoneId")) {
+				runSQL("alter table Calendar add timeZoneId VARCHAR(75) null");
+			}
 		}
 	}
 

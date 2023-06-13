@@ -27,10 +27,6 @@ public class AkismetEntryLocalServiceWrapper
 	implements AkismetEntryLocalService,
 			   ServiceWrapper<AkismetEntryLocalService> {
 
-	public AkismetEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AkismetEntryLocalServiceWrapper(
 		AkismetEntryLocalService akismetEntryLocalService) {
 

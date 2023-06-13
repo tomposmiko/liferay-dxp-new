@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -245,91 +246,101 @@ public class OAuth2ScopeGrantModelImpl
 	public Map<String, Function<OAuth2ScopeGrant, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<OAuth2ScopeGrant, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, OAuth2ScopeGrant>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<OAuth2ScopeGrant, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			OAuth2ScopeGrant.class.getClassLoader(), OAuth2ScopeGrant.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<OAuth2ScopeGrant, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<OAuth2ScopeGrant, Object>>();
+		try {
+			Constructor<OAuth2ScopeGrant> constructor =
+				(Constructor<OAuth2ScopeGrant>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"oAuth2ScopeGrantId", OAuth2ScopeGrant::getOAuth2ScopeGrantId);
-			attributeGetterFunctions.put(
-				"companyId", OAuth2ScopeGrant::getCompanyId);
-			attributeGetterFunctions.put(
-				"oAuth2ApplicationScopeAliasesId",
-				OAuth2ScopeGrant::getOAuth2ApplicationScopeAliasesId);
-			attributeGetterFunctions.put(
-				"applicationName", OAuth2ScopeGrant::getApplicationName);
-			attributeGetterFunctions.put(
-				"bundleSymbolicName", OAuth2ScopeGrant::getBundleSymbolicName);
-			attributeGetterFunctions.put("scope", OAuth2ScopeGrant::getScope);
-			attributeGetterFunctions.put(
-				"scopeAliases", OAuth2ScopeGrant::getScopeAliases);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<OAuth2ScopeGrant, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<OAuth2ScopeGrant, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<OAuth2ScopeGrant, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<OAuth2ScopeGrant, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<OAuth2ScopeGrant, Object>>();
+		Map<String, BiConsumer<OAuth2ScopeGrant, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<OAuth2ScopeGrant, ?>>();
 
-		static {
-			Map<String, BiConsumer<OAuth2ScopeGrant, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<OAuth2ScopeGrant, ?>>();
+		attributeGetterFunctions.put(
+			"oAuth2ScopeGrantId", OAuth2ScopeGrant::getOAuth2ScopeGrantId);
+		attributeSetterBiConsumers.put(
+			"oAuth2ScopeGrantId",
+			(BiConsumer<OAuth2ScopeGrant, Long>)
+				OAuth2ScopeGrant::setOAuth2ScopeGrantId);
+		attributeGetterFunctions.put(
+			"companyId", OAuth2ScopeGrant::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<OAuth2ScopeGrant, Long>)OAuth2ScopeGrant::setCompanyId);
+		attributeGetterFunctions.put(
+			"oAuth2ApplicationScopeAliasesId",
+			OAuth2ScopeGrant::getOAuth2ApplicationScopeAliasesId);
+		attributeSetterBiConsumers.put(
+			"oAuth2ApplicationScopeAliasesId",
+			(BiConsumer<OAuth2ScopeGrant, Long>)
+				OAuth2ScopeGrant::setOAuth2ApplicationScopeAliasesId);
+		attributeGetterFunctions.put(
+			"applicationName", OAuth2ScopeGrant::getApplicationName);
+		attributeSetterBiConsumers.put(
+			"applicationName",
+			(BiConsumer<OAuth2ScopeGrant, String>)
+				OAuth2ScopeGrant::setApplicationName);
+		attributeGetterFunctions.put(
+			"bundleSymbolicName", OAuth2ScopeGrant::getBundleSymbolicName);
+		attributeSetterBiConsumers.put(
+			"bundleSymbolicName",
+			(BiConsumer<OAuth2ScopeGrant, String>)
+				OAuth2ScopeGrant::setBundleSymbolicName);
+		attributeGetterFunctions.put("scope", OAuth2ScopeGrant::getScope);
+		attributeSetterBiConsumers.put(
+			"scope",
+			(BiConsumer<OAuth2ScopeGrant, String>)OAuth2ScopeGrant::setScope);
+		attributeGetterFunctions.put(
+			"scopeAliases", OAuth2ScopeGrant::getScopeAliases);
+		attributeSetterBiConsumers.put(
+			"scopeAliases",
+			(BiConsumer<OAuth2ScopeGrant, String>)
+				OAuth2ScopeGrant::setScopeAliases);
 
-			attributeSetterBiConsumers.put(
-				"oAuth2ScopeGrantId",
-				(BiConsumer<OAuth2ScopeGrant, Long>)
-					OAuth2ScopeGrant::setOAuth2ScopeGrantId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<OAuth2ScopeGrant, Long>)
-					OAuth2ScopeGrant::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"oAuth2ApplicationScopeAliasesId",
-				(BiConsumer<OAuth2ScopeGrant, Long>)
-					OAuth2ScopeGrant::setOAuth2ApplicationScopeAliasesId);
-			attributeSetterBiConsumers.put(
-				"applicationName",
-				(BiConsumer<OAuth2ScopeGrant, String>)
-					OAuth2ScopeGrant::setApplicationName);
-			attributeSetterBiConsumers.put(
-				"bundleSymbolicName",
-				(BiConsumer<OAuth2ScopeGrant, String>)
-					OAuth2ScopeGrant::setBundleSymbolicName);
-			attributeSetterBiConsumers.put(
-				"scope",
-				(BiConsumer<OAuth2ScopeGrant, String>)
-					OAuth2ScopeGrant::setScope);
-			attributeSetterBiConsumers.put(
-				"scopeAliases",
-				(BiConsumer<OAuth2ScopeGrant, String>)
-					OAuth2ScopeGrant::setScopeAliases);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -758,12 +769,41 @@ public class OAuth2ScopeGrantModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<OAuth2ScopeGrant, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<OAuth2ScopeGrant, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<OAuth2ScopeGrant, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((OAuth2ScopeGrant)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, OAuth2ScopeGrant>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					OAuth2ScopeGrant.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -779,8 +819,7 @@ public class OAuth2ScopeGrantModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<OAuth2ScopeGrant, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

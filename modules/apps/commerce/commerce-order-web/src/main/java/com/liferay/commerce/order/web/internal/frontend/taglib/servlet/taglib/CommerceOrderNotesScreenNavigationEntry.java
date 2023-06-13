@@ -15,10 +15,10 @@
 package com.liferay.commerce.order.web.internal.frontend.taglib.servlet.taglib;
 
 import com.liferay.commerce.model.CommerceOrder;
-import com.liferay.commerce.order.web.internal.constants.CommerceOrderScreenNavigationConstants;
+import com.liferay.commerce.order.web.internal.servlet.taglib.ui.constants.CommerceOrderScreenNavigationConstants;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
-	property = "screen.navigation.entry.order:Integer=10",
+	enabled = false, property = "screen.navigation.entry.order:Integer=10",
 	service = ScreenNavigationEntry.class
 )
 public class CommerceOrderNotesScreenNavigationEntry
@@ -61,7 +61,7 @@ public class CommerceOrderNotesScreenNavigationEntry
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, KEY);
+		return LanguageUtil.get(resourceBundle, KEY);
 	}
 
 	@Override
@@ -83,8 +83,5 @@ public class CommerceOrderNotesScreenNavigationEntry
 
 	@Reference
 	private JSPRenderer _jspRenderer;
-
-	@Reference
-	private Language _language;
 
 }

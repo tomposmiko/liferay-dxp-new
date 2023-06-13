@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.webdav.methods.Method;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PortalInstances;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,6 +79,8 @@ public class DisplayPageFriendlyURLResolverTest {
 
 	@Before
 	public void setUp() throws Exception {
+		PortalInstances.addCompanyId(TestPropsValues.getCompanyId());
+
 		UserTestUtil.setUser(TestPropsValues.getUser());
 
 		_group = GroupTestUtil.addGroup();
@@ -130,22 +133,22 @@ public class DisplayPageFriendlyURLResolverTest {
 
 	@Test
 	public void testJournalArticleFriendlyURL() throws Exception {
-		Assert.assertNotNull(
-			PortalUtil.getActualURL(
-				_group.getGroupId(), false, Portal.PATH_MAIN,
-				"/-/test-journal-article", new HashMap<>(),
-				_getRequestContext()));
+		String actualURL = PortalUtil.getActualURL(
+			_group.getGroupId(), false, Portal.PATH_MAIN,
+			"/-/test-journal-article", new HashMap<>(), _getRequestContext());
+
+		Assert.assertNotNull(actualURL);
 	}
 
 	@Test
 	public void testJournalArticleFriendlyURLWithEndingSlash()
 		throws Exception {
 
-		Assert.assertNotNull(
-			PortalUtil.getActualURL(
-				_group.getGroupId(), false, Portal.PATH_MAIN,
-				"/-/test-journal-article/", new HashMap<>(),
-				_getRequestContext()));
+		String actualURL = PortalUtil.getActualURL(
+			_group.getGroupId(), false, Portal.PATH_MAIN,
+			"/-/test-journal-article/", new HashMap<>(), _getRequestContext());
+
+		Assert.assertNotNull(actualURL);
 	}
 
 	@Test

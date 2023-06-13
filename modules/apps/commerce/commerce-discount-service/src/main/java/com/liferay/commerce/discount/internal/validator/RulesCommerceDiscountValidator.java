@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.discount.validator.key=" + RulesCommerceDiscountValidator.KEY,
 		"commerce.discount.validator.priority:Integer=30",

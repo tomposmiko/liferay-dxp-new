@@ -205,16 +205,16 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 					<%
 					String taskExecutorClassName = localPublishing ? BackgroundTaskExecutorNames.LAYOUT_STAGING_BACKGROUND_TASK_EXECUTOR : BackgroundTaskExecutorNames.LAYOUT_REMOTE_STAGING_BACKGROUND_TASK_EXECUTOR;
 
-					int incompleteBackgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(stagingGroupId, taskExecutorClassName, false);
+					int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(stagingGroupId, taskExecutorClassName, false);
 
 					if (localPublishing) {
-						incompleteBackgroundTasksCount += BackgroundTaskManagerUtil.getBackgroundTasksCount(liveGroupId, taskExecutorClassName, false);
+						incompleteBackgroundTaskCount += BackgroundTaskManagerUtil.getBackgroundTasksCount(liveGroupId, taskExecutorClassName, false);
 					}
 					%>
 
-					<div class="<%= (incompleteBackgroundTasksCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
+					<div class="<%= (incompleteBackgroundTaskCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
 						<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-							<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+							<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 						</liferay-util:include>
 					</div>
 
@@ -236,71 +236,69 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 					}
 					%>
 
-					<div class="sheet">
-						<div class="panel-group panel-group-flush">
-							<aui:fieldset>
-								<c:choose>
-									<c:when test="<%= exportImportConfiguration == null %>">
-										<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" placeholder="process-name-placeholder" />
-									</c:when>
-									<c:otherwise>
-										<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" value="<%= exportImportConfiguration.getName() %>" />
-									</c:otherwise>
-								</c:choose>
-							</aui:fieldset>
+					<aui:fieldset-group markupView="lexicon">
+						<aui:fieldset>
+							<c:choose>
+								<c:when test="<%= exportImportConfiguration == null %>">
+									<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" placeholder="process-name-placeholder" />
+								</c:when>
+								<c:otherwise>
+									<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" value="<%= exportImportConfiguration.getName() %>" />
+								</c:otherwise>
+							</c:choose>
+						</aui:fieldset>
 
-							<aui:fieldset cssClass="options-group">
-								<clay:sheet-section>
-									<h3 class="sheet-subtitle"><liferay-ui:message key="date" /></h3>
+						<aui:fieldset cssClass="options-group">
+							<clay:sheet-section>
+								<h3 class="sheet-subtitle"><liferay-ui:message key="date" /></h3>
 
-									<%@ include file="/publish/publish_layouts_scheduler.jspf" %>
-								</clay:sheet-section>
-							</aui:fieldset>
+								<%@ include file="/publish/publish_layouts_scheduler.jspf" %>
+							</clay:sheet-section>
+						</aui:fieldset>
 
-							<liferay-staging:deletions
-								cmd="<%= Constants.PUBLISH %>"
+						<liferay-staging:deletions
+							cmd="<%= Constants.PUBLISH %>"
+							disableInputs="<%= configuredPublish %>"
+							exportImportConfigurationId="<%= exportImportConfigurationId %>"
+						/>
+
+						<c:if test="<%= GroupCapabilityUtil.isSupportsPages(group) && !group.isCompany() %>">
+							<liferay-staging:select-pages
+								action="<%= Constants.PUBLISH %>"
 								disableInputs="<%= configuredPublish %>"
 								exportImportConfigurationId="<%= exportImportConfigurationId %>"
+								groupId="<%= groupId %>"
+								privateLayout="<%= privateLayout %>"
+								treeId="<%= treeId %>"
 							/>
+						</c:if>
 
-							<c:if test="<%= GroupCapabilityUtil.isSupportsPages(group) && !group.isCompany() %>">
-								<liferay-staging:select-pages
-									action="<%= Constants.PUBLISH %>"
+						<liferay-staging:content
+							cmd="<%= cmd %>"
+							disableInputs="<%= configuredPublish %>"
+							exportImportConfigurationId="<%= exportImportConfigurationId %>"
+							type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>"
+						/>
+
+						<liferay-staging:permissions
+							action="<%= Constants.PUBLISH %>"
+							descriptionCSSClass="permissions-description"
+							disableInputs="<%= configuredPublish %>"
+							exportImportConfigurationId="<%= exportImportConfigurationId %>"
+							global="<%= group.isCompany() %>"
+							labelCSSClass="permissions-label"
+						/>
+
+						<c:if test="<%= !localPublishing %>">
+							<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" cssClass="options-group" label="remote-live-connection-settings">
+								<liferay-staging:remote-options
 									disableInputs="<%= configuredPublish %>"
 									exportImportConfigurationId="<%= exportImportConfigurationId %>"
-									groupId="<%= groupId %>"
 									privateLayout="<%= privateLayout %>"
-									treeId="<%= treeId %>"
 								/>
-							</c:if>
-
-							<liferay-staging:content
-								cmd="<%= cmd %>"
-								disableInputs="<%= configuredPublish %>"
-								exportImportConfigurationId="<%= exportImportConfigurationId %>"
-								type="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>"
-							/>
-
-							<liferay-staging:permissions
-								action="<%= Constants.PUBLISH %>"
-								descriptionCSSClass="permissions-description"
-								disableInputs="<%= configuredPublish %>"
-								exportImportConfigurationId="<%= exportImportConfigurationId %>"
-								global="<%= group.isCompany() %>"
-								labelCSSClass="permissions-label"
-							/>
-
-							<c:if test="<%= !localPublishing %>">
-								<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" cssClass="options-group" label="remote-live-connection-settings">
-									<liferay-staging:remote-options
-										disableInputs="<%= configuredPublish %>"
-										exportImportConfigurationId="<%= exportImportConfigurationId %>"
-										privateLayout="<%= privateLayout %>"
-									/>
-								</aui:fieldset>
-							</c:if>
-						</div>
-					</div>
+							</aui:fieldset>
+						</c:if>
+					</aui:fieldset-group>
 				</clay:container-fluid>
 			</div>
 
@@ -323,32 +321,10 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 			'<portlet:namespace />ExportImportComponent'
 		);
 
-		var deletePortletDataBeforeImportingCheckbox = document.getElementById(
-			'<portlet:namespace /><%= PortletDataHandlerKeys.DELETE_PORTLET_DATA %>'
-		);
-
 		var dateChecker = exportImport.getDateRangeChecker();
 
 		if (dateChecker.validRange) {
-			var form = document.<portlet:namespace />publishPagesFm;
-
-			if (
-				deletePortletDataBeforeImportingCheckbox &&
-				deletePortletDataBeforeImportingCheckbox.checked
-			) {
-				Liferay.Util.openConfirmModal({
-					message:
-						'<%= UnicodeLanguageUtil.get(request, "delete-application-data-before-importing-confirmation") %>',
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							submitForm(form);
-						}
-					},
-				});
-			}
-			else {
-				submitForm(form);
-			}
+			submitForm(document.<portlet:namespace />publishPagesFm);
 		}
 		else {
 			exportImport.showNotification(dateChecker);

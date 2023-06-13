@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -206,38 +205,6 @@ public class UserAccount implements Serializable {
 	@GraphQLField(description = "The user's date of birth, in ISO 8601 format.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date birthDate;
-
-	@Schema(
-		description = "The user's current password. Used to authenticate a user when they attempt to update their own password."
-	)
-	public String getCurrentPassword() {
-		return currentPassword;
-	}
-
-	public void setCurrentPassword(String currentPassword) {
-		this.currentPassword = currentPassword;
-	}
-
-	@JsonIgnore
-	public void setCurrentPassword(
-		UnsafeSupplier<String, Exception> currentPasswordUnsafeSupplier) {
-
-		try {
-			currentPassword = currentPasswordUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "The user's current password. Used to authenticate a user when they attempt to update their own password."
-	)
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	protected String currentPassword;
 
 	@Schema
 	@Valid
@@ -722,34 +689,6 @@ public class UserAccount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected OrganizationBrief[] organizationBriefs;
 
-	@Schema(description = "The user's password.")
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	@JsonIgnore
-	public void setPassword(
-		UnsafeSupplier<String, Exception> passwordUnsafeSupplier) {
-
-		try {
-			password = passwordUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The user's password.")
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	protected String password;
-
 	@Schema(description = "A relative URL to the user's profile.")
 	public String getProfileURL() {
 		return profileURL;
@@ -869,36 +808,6 @@ public class UserAccount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected UserAccountContactInformation userAccountContactInformation;
 
-	@Schema(description = "A list of the user's userGroups.")
-	@Valid
-	public UserGroupBrief[] getUserGroupBriefs() {
-		return userGroupBriefs;
-	}
-
-	public void setUserGroupBriefs(UserGroupBrief[] userGroupBriefs) {
-		this.userGroupBriefs = userGroupBriefs;
-	}
-
-	@JsonIgnore
-	public void setUserGroupBriefs(
-		UnsafeSupplier<UserGroupBrief[], Exception>
-			userGroupBriefsUnsafeSupplier) {
-
-		try {
-			userGroupBriefs = userGroupBriefsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "A list of the user's userGroups.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected UserGroupBrief[] userGroupBriefs;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -997,20 +906,6 @@ public class UserAccount implements Serializable {
 			sb.append("\"");
 
 			sb.append(liferayToJSONDateFormat.format(birthDate));
-
-			sb.append("\"");
-		}
-
-		if (currentPassword != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"currentPassword\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(currentPassword));
 
 			sb.append("\"");
 		}
@@ -1271,20 +1166,6 @@ public class UserAccount implements Serializable {
 			sb.append("]");
 		}
 
-		if (password != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"password\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(password));
-
-			sb.append("\"");
-		}
-
 		if (profileURL != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1349,26 +1230,6 @@ public class UserAccount implements Serializable {
 			sb.append(String.valueOf(userAccountContactInformation));
 		}
 
-		if (userGroupBriefs != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"userGroupBriefs\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < userGroupBriefs.length; i++) {
-				sb.append(String.valueOf(userGroupBriefs[i]));
-
-				if ((i + 1) < userGroupBriefs.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -1382,9 +1243,9 @@ public class UserAccount implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -1410,7 +1271,7 @@ public class UserAccount implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -1442,7 +1303,7 @@ public class UserAccount implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -1458,10 +1319,5 @@ public class UserAccount implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

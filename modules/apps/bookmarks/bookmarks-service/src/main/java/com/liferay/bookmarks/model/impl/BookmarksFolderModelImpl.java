@@ -16,15 +16,19 @@ package com.liferay.bookmarks.model.impl;
 
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.BookmarksFolderModel;
+import com.liferay.bookmarks.model.BookmarksFolderSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -33,19 +37,23 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -183,6 +191,68 @@ public class BookmarksFolderModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static BookmarksFolder toModel(BookmarksFolderSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		BookmarksFolder model = new BookmarksFolderImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setFolderId(soapModel.getFolderId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setParentFolderId(soapModel.getParentFolderId());
+		model.setTreePath(soapModel.getTreePath());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+		model.setStatus(soapModel.getStatus());
+		model.setStatusByUserId(soapModel.getStatusByUserId());
+		model.setStatusByUserName(soapModel.getStatusByUserName());
+		model.setStatusDate(soapModel.getStatusDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<BookmarksFolder> toModels(
+		BookmarksFolderSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<BookmarksFolder> models = new ArrayList<BookmarksFolder>(
+			soapModels.length);
+
+		for (BookmarksFolderSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public BookmarksFolderModelImpl() {
 	}
 
@@ -259,148 +329,148 @@ public class BookmarksFolderModelImpl
 	public Map<String, Function<BookmarksFolder, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<BookmarksFolder, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, BookmarksFolder>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<BookmarksFolder, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			BookmarksFolder.class.getClassLoader(), BookmarksFolder.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<BookmarksFolder, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<BookmarksFolder, Object>>();
+		try {
+			Constructor<BookmarksFolder> constructor =
+				(Constructor<BookmarksFolder>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", BookmarksFolder::getMvccVersion);
-			attributeGetterFunctions.put("uuid", BookmarksFolder::getUuid);
-			attributeGetterFunctions.put(
-				"folderId", BookmarksFolder::getFolderId);
-			attributeGetterFunctions.put(
-				"groupId", BookmarksFolder::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", BookmarksFolder::getCompanyId);
-			attributeGetterFunctions.put("userId", BookmarksFolder::getUserId);
-			attributeGetterFunctions.put(
-				"userName", BookmarksFolder::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", BookmarksFolder::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", BookmarksFolder::getModifiedDate);
-			attributeGetterFunctions.put(
-				"parentFolderId", BookmarksFolder::getParentFolderId);
-			attributeGetterFunctions.put(
-				"treePath", BookmarksFolder::getTreePath);
-			attributeGetterFunctions.put("name", BookmarksFolder::getName);
-			attributeGetterFunctions.put(
-				"description", BookmarksFolder::getDescription);
-			attributeGetterFunctions.put(
-				"lastPublishDate", BookmarksFolder::getLastPublishDate);
-			attributeGetterFunctions.put("status", BookmarksFolder::getStatus);
-			attributeGetterFunctions.put(
-				"statusByUserId", BookmarksFolder::getStatusByUserId);
-			attributeGetterFunctions.put(
-				"statusByUserName", BookmarksFolder::getStatusByUserName);
-			attributeGetterFunctions.put(
-				"statusDate", BookmarksFolder::getStatusDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<BookmarksFolder, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<BookmarksFolder, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<BookmarksFolder, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<BookmarksFolder, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<BookmarksFolder, Object>>();
+		Map<String, BiConsumer<BookmarksFolder, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<BookmarksFolder, ?>>();
 
-		static {
-			Map<String, BiConsumer<BookmarksFolder, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<BookmarksFolder, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", BookmarksFolder::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<BookmarksFolder, Long>)BookmarksFolder::setMvccVersion);
+		attributeGetterFunctions.put("uuid", BookmarksFolder::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<BookmarksFolder, String>)BookmarksFolder::setUuid);
+		attributeGetterFunctions.put("folderId", BookmarksFolder::getFolderId);
+		attributeSetterBiConsumers.put(
+			"folderId",
+			(BiConsumer<BookmarksFolder, Long>)BookmarksFolder::setFolderId);
+		attributeGetterFunctions.put("groupId", BookmarksFolder::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<BookmarksFolder, Long>)BookmarksFolder::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", BookmarksFolder::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<BookmarksFolder, Long>)BookmarksFolder::setCompanyId);
+		attributeGetterFunctions.put("userId", BookmarksFolder::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<BookmarksFolder, Long>)BookmarksFolder::setUserId);
+		attributeGetterFunctions.put("userName", BookmarksFolder::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<BookmarksFolder, String>)BookmarksFolder::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", BookmarksFolder::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<BookmarksFolder, Date>)BookmarksFolder::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", BookmarksFolder::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<BookmarksFolder, Date>)
+				BookmarksFolder::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentFolderId", BookmarksFolder::getParentFolderId);
+		attributeSetterBiConsumers.put(
+			"parentFolderId",
+			(BiConsumer<BookmarksFolder, Long>)
+				BookmarksFolder::setParentFolderId);
+		attributeGetterFunctions.put("treePath", BookmarksFolder::getTreePath);
+		attributeSetterBiConsumers.put(
+			"treePath",
+			(BiConsumer<BookmarksFolder, String>)BookmarksFolder::setTreePath);
+		attributeGetterFunctions.put("name", BookmarksFolder::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<BookmarksFolder, String>)BookmarksFolder::setName);
+		attributeGetterFunctions.put(
+			"description", BookmarksFolder::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<BookmarksFolder, String>)
+				BookmarksFolder::setDescription);
+		attributeGetterFunctions.put(
+			"lastPublishDate", BookmarksFolder::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<BookmarksFolder, Date>)
+				BookmarksFolder::setLastPublishDate);
+		attributeGetterFunctions.put("status", BookmarksFolder::getStatus);
+		attributeSetterBiConsumers.put(
+			"status",
+			(BiConsumer<BookmarksFolder, Integer>)BookmarksFolder::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", BookmarksFolder::getStatusByUserId);
+		attributeSetterBiConsumers.put(
+			"statusByUserId",
+			(BiConsumer<BookmarksFolder, Long>)
+				BookmarksFolder::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", BookmarksFolder::getStatusByUserName);
+		attributeSetterBiConsumers.put(
+			"statusByUserName",
+			(BiConsumer<BookmarksFolder, String>)
+				BookmarksFolder::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", BookmarksFolder::getStatusDate);
+		attributeSetterBiConsumers.put(
+			"statusDate",
+			(BiConsumer<BookmarksFolder, Date>)BookmarksFolder::setStatusDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<BookmarksFolder, Long>)
-					BookmarksFolder::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<BookmarksFolder, String>)BookmarksFolder::setUuid);
-			attributeSetterBiConsumers.put(
-				"folderId",
-				(BiConsumer<BookmarksFolder, Long>)
-					BookmarksFolder::setFolderId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<BookmarksFolder, Long>)BookmarksFolder::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<BookmarksFolder, Long>)
-					BookmarksFolder::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<BookmarksFolder, Long>)BookmarksFolder::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<BookmarksFolder, String>)
-					BookmarksFolder::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<BookmarksFolder, Date>)
-					BookmarksFolder::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<BookmarksFolder, Date>)
-					BookmarksFolder::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"parentFolderId",
-				(BiConsumer<BookmarksFolder, Long>)
-					BookmarksFolder::setParentFolderId);
-			attributeSetterBiConsumers.put(
-				"treePath",
-				(BiConsumer<BookmarksFolder, String>)
-					BookmarksFolder::setTreePath);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<BookmarksFolder, String>)BookmarksFolder::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<BookmarksFolder, String>)
-					BookmarksFolder::setDescription);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<BookmarksFolder, Date>)
-					BookmarksFolder::setLastPublishDate);
-			attributeSetterBiConsumers.put(
-				"status",
-				(BiConsumer<BookmarksFolder, Integer>)
-					BookmarksFolder::setStatus);
-			attributeSetterBiConsumers.put(
-				"statusByUserId",
-				(BiConsumer<BookmarksFolder, Long>)
-					BookmarksFolder::setStatusByUserId);
-			attributeSetterBiConsumers.put(
-				"statusByUserName",
-				(BiConsumer<BookmarksFolder, String>)
-					BookmarksFolder::setStatusByUserName);
-			attributeSetterBiConsumers.put(
-				"statusDate",
-				(BiConsumer<BookmarksFolder, Date>)
-					BookmarksFolder::setStatusDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -831,8 +901,74 @@ public class BookmarksFolderModelImpl
 	}
 
 	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws PortalException {
+
+		if (!isInTrash()) {
+			return null;
+		}
+
+		com.liferay.trash.kernel.model.TrashEntry trashEntry =
+			com.liferay.trash.kernel.service.TrashEntryLocalServiceUtil.
+				fetchEntry(getModelClassName(), getTrashEntryClassPK());
+
+		if (trashEntry != null) {
+			return trashEntry;
+		}
+
+		com.liferay.portal.kernel.trash.TrashHandler trashHandler =
+			getTrashHandler();
+
+		if (Validator.isNotNull(
+				trashHandler.getContainerModelClassName(getPrimaryKey()))) {
+
+			ContainerModel containerModel = null;
+
+			try {
+				containerModel = trashHandler.getParentContainerModel(this);
+			}
+			catch (NoSuchModelException noSuchModelException) {
+				return null;
+			}
+
+			while (containerModel != null) {
+				if (containerModel instanceof TrashedModel) {
+					TrashedModel trashedModel = (TrashedModel)containerModel;
+
+					return trashedModel.getTrashEntry();
+				}
+
+				trashHandler =
+					com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil.
+						getTrashHandler(
+							trashHandler.getContainerModelClassName(
+								containerModel.getContainerModelId()));
+
+				if (trashHandler == null) {
+					return null;
+				}
+
+				containerModel = trashHandler.getContainerModel(
+					containerModel.getParentContainerModelId());
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public long getTrashEntryClassPK() {
 		return getPrimaryKey();
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
+		return com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil.
+			getTrashHandler(getModelClassName());
 	}
 
 	@Override
@@ -843,6 +979,70 @@ public class BookmarksFolderModelImpl
 		else {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean isInTrashContainer() {
+		com.liferay.portal.kernel.trash.TrashHandler trashHandler =
+			getTrashHandler();
+
+		if ((trashHandler == null) ||
+			Validator.isNull(
+				trashHandler.getContainerModelClassName(getPrimaryKey()))) {
+
+			return false;
+		}
+
+		try {
+			ContainerModel containerModel =
+				trashHandler.getParentContainerModel(this);
+
+			if (containerModel == null) {
+				return false;
+			}
+
+			if (containerModel instanceof TrashedModel) {
+				return ((TrashedModel)containerModel).isInTrash();
+			}
+		}
+		catch (Exception exception) {
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isInTrashExplicitly() {
+		if (!isInTrash()) {
+			return false;
+		}
+
+		com.liferay.trash.kernel.model.TrashEntry trashEntry =
+			com.liferay.trash.kernel.service.TrashEntryLocalServiceUtil.
+				fetchEntry(getModelClassName(), getTrashEntryClassPK());
+
+		if (trashEntry != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		if (!isInTrash()) {
+			return false;
+		}
+
+		com.liferay.trash.kernel.model.TrashEntry trashEntry =
+			com.liferay.trash.kernel.service.TrashEntryLocalServiceUtil.
+				fetchEntry(getModelClassName(), getTrashEntryClassPK());
+
+		if (trashEntry != null) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -1288,12 +1488,41 @@ public class BookmarksFolderModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<BookmarksFolder, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<BookmarksFolder, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<BookmarksFolder, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((BookmarksFolder)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, BookmarksFolder>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					BookmarksFolder.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1321,8 +1550,7 @@ public class BookmarksFolderModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<BookmarksFolder, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

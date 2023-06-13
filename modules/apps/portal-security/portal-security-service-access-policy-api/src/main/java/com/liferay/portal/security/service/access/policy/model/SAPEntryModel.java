@@ -378,8 +378,4 @@ public interface SAPEntryModel
 	@Override
 	public SAPEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

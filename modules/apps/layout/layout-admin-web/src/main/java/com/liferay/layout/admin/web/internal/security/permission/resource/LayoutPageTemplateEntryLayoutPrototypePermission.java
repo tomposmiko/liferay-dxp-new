@@ -31,7 +31,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Daniel Couso
  */
 @Component(
-	property = "extended=true", service = LayoutPrototypePermission.class
+	immediate = true, property = "extended=true",
+	service = LayoutPrototypePermission.class
 )
 public class LayoutPageTemplateEntryLayoutPrototypePermission
 	implements LayoutPrototypePermission {
@@ -64,7 +65,7 @@ public class LayoutPageTemplateEntryLayoutPrototypePermission
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 

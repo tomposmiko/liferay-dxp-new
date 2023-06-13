@@ -14,9 +14,9 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.resource.v1_0;
 
-import com.liferay.account.service.AccountGroupService;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.commerce.account.service.CommerceAccountGroupService;
 import com.liferay.commerce.discount.exception.NoSuchDiscountException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountCommerceAccountGroupRel;
@@ -35,6 +35,7 @@ import com.liferay.headless.commerce.admin.pricing.dto.v1_0.DiscountAccountGroup
 import com.liferay.headless.commerce.admin.pricing.dto.v1_0.DiscountCategory;
 import com.liferay.headless.commerce.admin.pricing.dto.v1_0.DiscountProduct;
 import com.liferay.headless.commerce.admin.pricing.dto.v1_0.DiscountRule;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v1_0.converter.DiscountDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v1_0.DiscountAccountGroupUtil;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v1_0.DiscountCategoryUtil;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v1_0.DiscountProductUtil;
@@ -49,7 +50,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -72,6 +72,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/discount.properties",
 	scope = ServiceScope.PROTOTYPE, service = DiscountResource.class
 )
@@ -362,10 +363,11 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 					continue;
 				}
 
-				DiscountAccountGroupUtil.addCommerceDiscountAccountGroupRel(
-					_accountGroupService,
-					_commerceDiscountCommerceAccountGroupRelService,
-					discountAccountGroup, commerceDiscount, serviceContext);
+				DiscountAccountGroupUtil.
+					addCommerceDiscountCommerceAccountGroupRel(
+						_commerceAccountGroupService,
+						_commerceDiscountCommerceAccountGroupRelService,
+						discountAccountGroup, commerceDiscount, serviceContext);
 			}
 		}
 
@@ -386,9 +388,8 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 				}
 
 				DiscountCategoryUtil.addCommerceDiscountRel(
-					contextCompany.getGroupId(), _assetCategoryLocalService,
-					_commerceDiscountRelService, discountCategory,
-					commerceDiscount, serviceContext);
+					_assetCategoryLocalService, _commerceDiscountRelService,
+					discountCategory, commerceDiscount, serviceContext);
 			}
 		}
 
@@ -405,9 +406,9 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 					cProduct =
 						_cProductLocalService.
 							fetchCProductByExternalReferenceCode(
+								contextCompany.getCompanyId(),
 								discountProduct.
-									getProductExternalReferenceCode(),
-								contextCompany.getCompanyId());
+									getProductExternalReferenceCode());
 				}
 
 				if (cProduct == null) {
@@ -455,10 +456,10 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 	}
 
 	@Reference
-	private AccountGroupService _accountGroupService;
+	private AssetCategoryLocalService _assetCategoryLocalService;
 
 	@Reference
-	private AssetCategoryLocalService _assetCategoryLocalService;
+	private CommerceAccountGroupService _commerceAccountGroupService;
 
 	@Reference
 	private CommerceDiscountCommerceAccountGroupRelService
@@ -476,10 +477,8 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 	@Reference
 	private CProductLocalService _cProductLocalService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v1_0.converter.DiscountDTOConverter)"
-	)
-	private DTOConverter<CommerceDiscount, Discount> _discountDTOConverter;
+	@Reference
+	private DiscountDTOConverter _discountDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

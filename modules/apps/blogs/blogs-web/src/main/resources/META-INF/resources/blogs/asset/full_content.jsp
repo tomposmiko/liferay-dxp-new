@@ -19,7 +19,7 @@
 <liferay-util:html-top
 	outputKey="blogs_css"
 >
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/blogs/css/common_main.css") %>" rel="stylesheet" type="text/css" />
+	<link href="<%= PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/blogs/css/common_main.css") %>" rel="stylesheet" type="text/css" />
 </liferay-util:html-top>
 
 <liferay-util:dynamic-include key="com.liferay.blogs.web#/blogs/asset/full_content.jsp#pre" />
@@ -34,10 +34,19 @@ String entryTitle = BlogsEntryUtil.getDisplayTitle(resourceBundle, entry);
 	<div class="widget-mode-simple" data-analytics-asset-id="<%= String.valueOf(entry.getEntryId()) %>" data-analytics-asset-title="<%= HtmlUtil.escapeAttribute(entryTitle) %>" data-analytics-asset-type="blog">
 		<div class="widget-mode-simple-entry">
 			<div class="widget-content" id="<portlet:namespace /><%= entry.getEntryId() %>">
-				<liferay-util:include page="/blogs/entry_cover_image_caption.jsp" servletContext="<%= application %>">
-					<liferay-util:param name="coverImageCaption" value="<%= entry.getCoverImageCaption() %>" />
-					<liferay-util:param name="coverImageURL" value="<%= entry.getCoverImageURL(themeDisplay) %>" />
-				</liferay-util:include>
+
+				<%
+				String coverImageURL = entry.getCoverImageURL(themeDisplay);
+				%>
+
+				<c:if test="<%= Validator.isNotNull(coverImageURL) %>">
+
+					<%
+					String coverImageCaption = HtmlUtil.escapeAttribute(HtmlUtil.stripHtml(entry.getCoverImageCaption()));
+					%>
+
+					<div <c:if test="<%= Validator.isNotNull(coverImageCaption) %>">aria-label="<%= coverImageCaption %>" role="img"</c:if> class="aspect-ratio aspect-ratio-8-to-3 aspect-ratio-bg-cover cover-image" style="background-image: url(<%= coverImageURL %>);"></div>
+				</c:if>
 
 				<%= entry.getContent() %>
 			</div>

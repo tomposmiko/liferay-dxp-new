@@ -85,8 +85,7 @@ const RatingsStars = ({
 	);
 
 	const handleVote = (index) => {
-		let value;
-		let label;
+		let value, label;
 		const starScore = starScores[index];
 
 		if (starScore) {

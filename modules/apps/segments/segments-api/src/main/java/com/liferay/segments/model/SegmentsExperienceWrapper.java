@@ -57,7 +57,8 @@ public class SegmentsExperienceWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("segmentsEntryId", getSegmentsEntryId());
 		attributes.put("segmentsExperienceKey", getSegmentsExperienceKey());
-		attributes.put("plid", getPlid());
+		attributes.put("classNameId", getClassNameId());
+		attributes.put("classPK", getClassPK());
 		attributes.put("name", getName());
 		attributes.put("priority", getPriority());
 		attributes.put("active", isActive());
@@ -143,10 +144,16 @@ public class SegmentsExperienceWrapper
 			setSegmentsExperienceKey(segmentsExperienceKey);
 		}
 
-		Long plid = (Long)attributes.get("plid");
+		Long classNameId = (Long)attributes.get("classNameId");
 
-		if (plid != null) {
-			setPlid(plid);
+		if (classNameId != null) {
+			setClassNameId(classNameId);
+		}
+
+		Long classPK = (Long)attributes.get("classPK");
+
+		if (classPK != null) {
+			setClassPK(classPK);
 		}
 
 		String name = (String)attributes.get("name");
@@ -198,6 +205,36 @@ public class SegmentsExperienceWrapper
 	@Override
 	public String[] getAvailableLanguageIds() {
 		return model.getAvailableLanguageIds();
+	}
+
+	/**
+	 * Returns the fully qualified class name of this segments experience.
+	 *
+	 * @return the fully qualified class name of this segments experience
+	 */
+	@Override
+	public String getClassName() {
+		return model.getClassName();
+	}
+
+	/**
+	 * Returns the class name ID of this segments experience.
+	 *
+	 * @return the class name ID of this segments experience
+	 */
+	@Override
+	public long getClassNameId() {
+		return model.getClassNameId();
+	}
+
+	/**
+	 * Returns the class pk of this segments experience.
+	 *
+	 * @return the class pk of this segments experience
+	 */
+	@Override
+	public long getClassPK() {
+		return model.getClassPK();
 	}
 
 	/**
@@ -352,16 +389,6 @@ public class SegmentsExperienceWrapper
 	}
 
 	/**
-	 * Returns the plid of this segments experience.
-	 *
-	 * @return the plid of this segments experience
-	 */
-	@Override
-	public long getPlid() {
-		return model.getPlid();
-	}
-
-	/**
 	 * Returns the primary key of this segments experience.
 	 *
 	 * @return the primary key of this segments experience
@@ -513,6 +540,31 @@ public class SegmentsExperienceWrapper
 		model.setActive(active);
 	}
 
+	@Override
+	public void setClassName(String className) {
+		model.setClassName(className);
+	}
+
+	/**
+	 * Sets the class name ID of this segments experience.
+	 *
+	 * @param classNameId the class name ID of this segments experience
+	 */
+	@Override
+	public void setClassNameId(long classNameId) {
+		model.setClassNameId(classNameId);
+	}
+
+	/**
+	 * Sets the class pk of this segments experience.
+	 *
+	 * @param classPK the class pk of this segments experience
+	 */
+	@Override
+	public void setClassPK(long classPK) {
+		model.setClassPK(classPK);
+	}
+
 	/**
 	 * Sets the company ID of this segments experience.
 	 *
@@ -647,16 +699,6 @@ public class SegmentsExperienceWrapper
 	}
 
 	/**
-	 * Sets the plid of this segments experience.
-	 *
-	 * @param plid the plid of this segments experience
-	 */
-	@Override
-	public void setPlid(long plid) {
-		model.setPlid(plid);
-	}
-
-	/**
 	 * Sets the primary key of this segments experience.
 	 *
 	 * @param primaryKey the primary key of this segments experience
@@ -762,11 +804,6 @@ public class SegmentsExperienceWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

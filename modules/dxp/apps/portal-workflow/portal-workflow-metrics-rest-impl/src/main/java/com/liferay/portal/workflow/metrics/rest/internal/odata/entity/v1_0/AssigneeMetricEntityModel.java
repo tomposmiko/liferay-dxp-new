@@ -21,6 +21,9 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.IntegerEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Rafael Praxedes
@@ -28,14 +31,17 @@ import java.util.Map;
 public class AssigneeMetricEntityModel implements EntityModel {
 
 	public AssigneeMetricEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = Stream.of(
 			new IntegerEntityField(
 				"durationTaskAvg", locale -> "durationTaskAvg"),
 			new IntegerEntityField(
 				"onTimeTaskCount", locale -> "onTimeTaskCount"),
 			new IntegerEntityField(
 				"overdueTaskCount", locale -> "overdueTaskCount"),
-			new IntegerEntityField("taskCount", locale -> "taskCount"));
+			new IntegerEntityField("taskCount", locale -> "taskCount")
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

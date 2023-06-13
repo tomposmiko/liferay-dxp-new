@@ -101,18 +101,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 						</h6>
 					</liferay-ui:search-container-column-text>
 
-					<liferay-ui:search-container-column-text>
-
-						<%
-						JournalFeedActionDropdownItemsProvider journalFeedActionDropdownItemsProvider = new JournalFeedActionDropdownItemsProvider(feed, liferayPortletRequest, liferayPortletResponse);
-						%>
-
-						<clay:dropdown-actions
-							aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-							dropdownItems="<%= journalFeedActionDropdownItemsProvider.getActionDropdownItems() %>"
-							propsTransformer="js/FeedElementsDefaultPropsTransformer"
-						/>
-					</liferay-ui:search-container-column-text>
+					<liferay-ui:search-container-column-jsp
+						path="/feed_action.jsp"
+					/>
 				</c:when>
 				<c:when test='<%= Objects.equals(journalFeedsDisplayContext.getDisplayStyle(), "list") %>'>
 					<liferay-ui:search-container-column-text
@@ -133,18 +124,9 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 						truncate="<%= true %>"
 					/>
 
-					<liferay-ui:search-container-column-text>
-
-						<%
-						JournalFeedActionDropdownItemsProvider journalFeedActionDropdownItemsProvider = new JournalFeedActionDropdownItemsProvider(feed, liferayPortletRequest, liferayPortletResponse);
-						%>
-
-						<clay:dropdown-actions
-							aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-							dropdownItems="<%= journalFeedActionDropdownItemsProvider.getActionDropdownItems() %>"
-							propsTransformer="js/FeedElementsDefaultPropsTransformer"
-						/>
-					</liferay-ui:search-container-column-text>
+					<liferay-ui:search-container-column-jsp
+						path="/feed_action.jsp"
+					/>
 				</c:when>
 			</c:choose>
 		</liferay-ui:search-container-row>

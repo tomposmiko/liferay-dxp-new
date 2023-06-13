@@ -78,22 +78,10 @@ if (editorOptions != null) {
 	CKEDITOR.env.isCompatible = true;
 </script>
 
-<liferay-util:html-top>
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/main.css") %>" rel="stylesheet" type="text/css" />
-</liferay-util:html-top>
-
 <liferay-util:buffer
 	var="alloyEditor"
 >
-	<div class="alloy-editor <%= HtmlUtil.escapeAttribute(cssClass) %>" contenteditable="false" data-placeholder="<%= LanguageUtil.get(request, placeholder) %>" data-required="<%= required %>" id="<%= HtmlUtil.escapeAttribute(name) %>" name="<%= HtmlUtil.escapeAttribute(name) %>"></div>
-
-	<div class="alloy-editor-placeholder <%= HtmlUtil.escapeAttribute(cssClass) %>">
-		<liferay-ui:message key="<%= placeholder %>" />
-
-		<c:if test="<%= Boolean.parseBoolean(required) %>">
-			<span class="text-warning">*</span>
-		</c:if>
-	</div>
+	<div class="alloy-editor alloy-editor-placeholder <%= HtmlUtil.escapeAttribute(cssClass) %>" contenteditable="false" data-placeholder="<%= LanguageUtil.get(request, placeholder) %>" data-required="<%= required %>" id="<%= HtmlUtil.escapeAttribute(name) %>" name="<%= HtmlUtil.escapeAttribute(name) %>"></div>
 
 	<aui:icon cssClass="alloy-editor-icon" image="text-editor" markupView="lexicon" />
 </liferay-util:buffer>
@@ -230,7 +218,7 @@ name = HtmlUtil.escapeJS(name);
 			{
 				documentBrowseLinkCallback: documentBrowseLinkCallback,
 				htmlEncodeOutput: true,
-				spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+				spritemap: themeDisplay.getPathThemeImages() + '/clay/icons.svg',
 				title: false,
 				uiNode: uiNode,
 			},

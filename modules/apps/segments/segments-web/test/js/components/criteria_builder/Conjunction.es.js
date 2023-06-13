@@ -17,7 +17,17 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import Conjunction from '../../../../src/main/resources/META-INF/resources/js/components/criteria_builder/Conjunction.es';
-import {SUPPORTED_CONJUNCTIONS} from '../../../../src/main/resources/META-INF/resources/js/utils/constants';
+
+const conjunctions = [
+	{
+		label: 'AND',
+		name: 'and',
+	},
+	{
+		label: 'OR',
+		name: 'or',
+	},
+];
 
 describe('Conjunction', () => {
 	afterEach(cleanup);
@@ -26,13 +36,14 @@ describe('Conjunction', () => {
 		const {
 			label: initialConjunctionLabel,
 			name: initialConjunctionName,
-		} = SUPPORTED_CONJUNCTIONS[0];
+		} = conjunctions[0];
 
 		const {getAllByText} = render(
 			<Conjunction
 				conjunctionName={initialConjunctionName}
 				editing={true}
 				onSelect={() => {}}
+				supportedConjunctions={conjunctions}
 			/>,
 			{
 				baseElement: document.body,
@@ -48,13 +59,14 @@ describe('Conjunction', () => {
 		const {
 			label: initialConjunctionLabel,
 			name: initialConjunctionName,
-		} = SUPPORTED_CONJUNCTIONS[0];
+		} = conjunctions[0];
 
 		const {getByText} = render(
 			<Conjunction
 				conjunctionName={initialConjunctionName}
 				editing={false}
 				onSelect={() => {}}
+				supportedConjunctions={conjunctions}
 			/>,
 			{
 				baseElement: document.body,
@@ -70,13 +82,14 @@ describe('Conjunction', () => {
 		const {
 			label: initialConjunctionLabel,
 			name: initialConjunctionName,
-		} = SUPPORTED_CONJUNCTIONS[0];
+		} = conjunctions[0];
 
 		const {getAllByText} = render(
 			<Conjunction
 				conjunctionName={initialConjunctionName}
 				editing={true}
 				onSelect={() => {}}
+				supportedConjunctions={conjunctions}
 			/>,
 			{
 				baseElement: document.body,
@@ -98,13 +111,14 @@ describe('Conjunction', () => {
 		const {
 			label: initialConjunctionLabel,
 			name: initialConjunctionName,
-		} = SUPPORTED_CONJUNCTIONS[0];
+		} = conjunctions[0];
 
 		const {getAllByText, getByText} = render(
 			<Conjunction
 				conjunctionName={initialConjunctionName}
 				editing={true}
 				onSelect={onSelectMock}
+				supportedConjunctions={conjunctions}
 			/>,
 			{
 				baseElement: document.body,
@@ -115,7 +129,7 @@ describe('Conjunction', () => {
 
 		userEvent.click(selectedConjunction);
 
-		const conjunctionToSelect = SUPPORTED_CONJUNCTIONS[1];
+		const conjunctionToSelect = conjunctions[1];
 
 		const orOption = getByText(conjunctionToSelect.label);
 

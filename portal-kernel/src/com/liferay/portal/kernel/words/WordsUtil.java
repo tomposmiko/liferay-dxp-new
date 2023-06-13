@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.words;
 
 import com.liferay.portal.kernel.jazzy.InvalidWord;
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -49,8 +48,10 @@ public class WordsUtil {
 		return _words.isDictionaryWord(word);
 	}
 
-	private static volatile Words _words =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			Words.class, WordsUtil.class, "_words", true);
+	public void setWords(Words words) {
+		_words = words;
+	}
+
+	private static Words _words;
 
 }

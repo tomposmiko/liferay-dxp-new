@@ -24,7 +24,7 @@ export default function ({currentURL, namespace, searchParam, selector}) {
 
 	const handleSelectChange = (event) => {
 		if (event.target.checked) {
-			portletURL.searchParams.set(
+			portletURL.searchParams.append(
 				`${namespace}${searchParam}`,
 				event.target.value
 			);

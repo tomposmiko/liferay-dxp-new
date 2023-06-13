@@ -47,6 +47,7 @@ import javax.portlet.RenderResponse;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -57,6 +58,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	property = {
 		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
 		"mvc.command.name=/oauth2_provider/assign_scopes"
@@ -93,13 +95,13 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 						_oAuth2ApplicationService, _oAuth2ProviderConfiguration,
 						_oAuth2ScopeGrantLocalService, renderRequest,
 						_scopeDescriptorLocator, _scopeLocator,
-						_getScopeMatcherFactory(themeDisplay.getCompanyId()),
+						getScopeMatcherFactory(themeDisplay.getCompanyId()),
 						themeDisplay));
 			}
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException.getMessage(), portalException);
 			}
 		}
 
@@ -122,11 +124,7 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		_scopeMatcherFactoryServiceTrackerMap.close();
 	}
 
-	protected ThemeDisplay getThemeDisplay(PortletRequest portletRequest) {
-		return (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-	}
-
-	private ScopeMatcherFactory _getScopeMatcherFactory(long companyId) {
+	protected ScopeMatcherFactory getScopeMatcherFactory(long companyId) {
 		ScopeMatcherFactory scopeMatcherFactory =
 			_scopeMatcherFactoryServiceTrackerMap.getService(
 				String.valueOf(companyId));
@@ -136,6 +134,10 @@ public class AssignScopesMVCRenderCommand implements MVCRenderCommand {
 		}
 
 		return scopeMatcherFactory;
+	}
+
+	protected ThemeDisplay getThemeDisplay(PortletRequest portletRequest) {
+		return (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

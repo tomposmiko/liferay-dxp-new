@@ -36,13 +36,12 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -54,6 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS,
 		"javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY,
@@ -171,17 +171,15 @@ public class UpdateRecordMVCResourceCommand extends BaseMVCResourceCommand {
 	private DDMFormValues _updateDDMFormValues(
 		DDMFormValues ddmFormValues, JSONObject jsonObject) {
 
-		Set<Locale> locales = new HashSet<>();
-
-		for (String languageId :
+		ddmFormValues.setAvailableLocales(
+			Stream.of(
 				JSONUtil.toStringArray(
-					jsonObject.getJSONArray("availableLanguageIds"))) {
-
-			locales.add(LocaleUtil.fromLanguageId(languageId));
-		}
-
-		ddmFormValues.setAvailableLocales(locales);
-
+					jsonObject.getJSONArray("availableLanguageIds"))
+			).map(
+				LocaleUtil::fromLanguageId
+			).collect(
+				Collectors.toSet()
+			));
 		ddmFormValues.setDefaultLocale(
 			LocaleUtil.fromLanguageId(
 				jsonObject.getString("defaultLanguageId")));

@@ -25,6 +25,11 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.File;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -56,20 +61,20 @@ public class DDMFormUploadValidator {
 	public void validateFileExtension(String fileName)
 		throws FileExtensionException {
 
-		String extension = null;
+		List<String> guestUploadFileExtensions = Arrays.asList(
+			getGuestUploadFileExtensions());
 
-		for (String guestUploadFileExtension : getGuestUploadFileExtensions()) {
-			if (StringUtil.equalsIgnoreCase(
+		Stream<String> guestUploadFileExtensionsStream =
+			guestUploadFileExtensions.stream();
+
+		Optional<String> guestUploadFileExtensionOptional =
+			guestUploadFileExtensionsStream.filter(
+				guestUploadFileExtension -> StringUtil.equalsIgnoreCase(
 					FileUtil.getExtension(fileName),
-					StringUtil.trim(guestUploadFileExtension))) {
+					StringUtil.trim(guestUploadFileExtension))
+			).findFirst();
 
-				extension = guestUploadFileExtension;
-
-				break;
-			}
-		}
-
-		if (extension == null) {
+		if (!guestUploadFileExtensionOptional.isPresent()) {
 			throw new FileExtensionException(
 				"Invalid file extension for " + fileName);
 		}
@@ -90,8 +95,7 @@ public class DDMFormUploadValidator {
 					"File ", fileName,
 					" exceeds the maximum permitted size of ",
 					(double)guestUploadMaximumFileSize / _FILE_LENGTH_MB,
-					" MB"),
-				guestUploadMaximumFileSize);
+					" MB"));
 		}
 	}
 

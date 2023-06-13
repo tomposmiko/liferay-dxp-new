@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + KaleoFormsPortletKeys.KALEO_FORMS_ADMIN,
 		"mvc.command.name=/kaleo_forms_admin/delete_kaleo_process"
@@ -52,7 +53,7 @@ public class DeleteKaleoProcessMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long[] kaleoProcessIds = _getKaleoProcessIds(actionRequest);
+		long[] kaleoProcessIds = getKaleoProcessIds(actionRequest);
 
 		for (final long kaleoProcessId : kaleoProcessIds) {
 			kaleoProcessService.deleteKaleoProcess(kaleoProcessId);
@@ -66,7 +67,7 @@ public class DeleteKaleoProcessMVCActionCommand
 	 *         parameters
 	 * @return an array of the Kaleo process IDs
 	 */
-	private long[] _getKaleoProcessIds(ActionRequest actionRequest) {
+	protected long[] getKaleoProcessIds(ActionRequest actionRequest) {
 		long kaleoProcessId = ParamUtil.getLong(
 			actionRequest, "kaleoProcessId");
 

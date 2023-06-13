@@ -20,7 +20,7 @@ import com.liferay.asset.util.AssetHelper;
 import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.pagination.InfoPage;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = InfoCollectionProvider.class)
+@Component(immediate = true, service = InfoCollectionProvider.class)
 public class RecentContentInfoCollectionProvider
 	extends BaseAssetsInfoCollectionProvider
 	implements InfoCollectionProvider<AssetEntry> {
@@ -52,13 +52,8 @@ public class RecentContentInfoCollectionProvider
 	public InfoPage<AssetEntry> getCollectionInfoPage(
 		CollectionQuery collectionQuery) {
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
 		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
-			serviceContext.getCompanyId(), serviceContext.getScopeGroupId(),
-			collectionQuery.getPagination(),
-			new com.liferay.info.sort.Sort(Field.MODIFIED_DATE, true), null);
+			Field.MODIFIED_DATE, "DESC", collectionQuery.getPagination());
 
 		try {
 			SearchContext searchContext = _getSearchContext();
@@ -67,12 +62,12 @@ public class RecentContentInfoCollectionProvider
 				searchContext, assetEntryQuery, assetEntryQuery.getStart(),
 				assetEntryQuery.getEnd());
 
-			long count = _assetHelper.searchCount(
+			Long count = _assetHelper.searchCount(
 				searchContext, assetEntryQuery);
 
 			return InfoPage.of(
 				_assetHelper.getAssetEntries(hits),
-				collectionQuery.getPagination(), (int)count);
+				collectionQuery.getPagination(), count.intValue());
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get asset entries", exception);
@@ -84,7 +79,7 @@ public class RecentContentInfoCollectionProvider
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "recent-content");
+		return LanguageUtil.get(locale, "recent-content");
 	}
 
 	private SearchContext _getSearchContext() {
@@ -110,8 +105,5 @@ public class RecentContentInfoCollectionProvider
 
 	@Reference
 	private AssetHelper _assetHelper;
-
-	@Reference
-	private Language _language;
 
 }

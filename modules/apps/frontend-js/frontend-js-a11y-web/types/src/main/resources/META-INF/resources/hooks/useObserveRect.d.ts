@@ -12,7 +12,7 @@
  * details.
  */
 
-export declare function useObserveRect(
+export declare const useObserveRect: (
 	callback: (rect: DOMRect | undefined) => void,
 	node: Element | null
-): void;
+) => void;

@@ -23,6 +23,23 @@ PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configurat
 List<CPCatalogEntry> catalogEntries = cpPublisherConfigurationDisplayContext.getCPCatalogEntries();
 %>
 
+<liferay-frontend:management-bar
+	includeCheckBox="<%= false %>"
+	searchContainerId="catalogEntries"
+>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:add-menu
+			inline="<%= true %>"
+		>
+			<liferay-frontend:add-menu-item
+				id="addCommerceProductDefinition"
+				title="add"
+				url="javascript:;"
+			/>
+		</liferay-frontend:add-menu>
+	</liferay-frontend:management-bar-buttons>
+</liferay-frontend:management-bar>
+
 <liferay-ui:search-container
 	compactEmptyResultsMessage="<%= true %>"
 	emptyResultsMessage="none"
@@ -30,8 +47,7 @@ List<CPCatalogEntry> catalogEntries = cpPublisherConfigurationDisplayContext.get
 	total="<%= catalogEntries.size() %>"
 >
 	<liferay-ui:search-container-results
-		calculateStartAndEnd="<%= true %>"
-		results="<%= catalogEntries %>"
+		results="<%= catalogEntries.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 	/>
 
 	<liferay-ui:search-container-row
@@ -42,14 +58,14 @@ List<CPCatalogEntry> catalogEntries = cpPublisherConfigurationDisplayContext.get
 	>
 
 		<%
-		String defaultImageFileURL = cpPublisherConfigurationDisplayContext.getDefaultImageFileURL(cpCatalogEntry);
+		String thumbnailSrc = cpCatalogEntry.getDefaultImageFileUrl();
 		%>
 
 		<c:choose>
-			<c:when test="<%= Validator.isNotNull(defaultImageFileURL) %>">
+			<c:when test="<%= Validator.isNotNull(thumbnailSrc) %>">
 				<liferay-ui:search-container-column-image
 					name="image"
-					src="<%= defaultImageFileURL %>"
+					src="<%= thumbnailSrc %>"
 				/>
 			</c:when>
 			<c:otherwise>
@@ -61,7 +77,7 @@ List<CPCatalogEntry> catalogEntries = cpPublisherConfigurationDisplayContext.get
 		</c:choose>
 
 		<liferay-ui:search-container-column-text
-			cssClass="font-weight-bold important table-cell-expand"
+			cssClass="important table-cell-expand"
 			name="name"
 			value="<%= HtmlUtil.escape(cpCatalogEntry.getName()) %>"
 		/>
@@ -92,13 +108,11 @@ List<CPCatalogEntry> catalogEntries = cpPublisherConfigurationDisplayContext.get
 	/>
 </liferay-ui:search-container>
 
-<liferay-ui:icon
-	id="addCommerceProductDefinition"
-	label="<%= true %>"
-	linkCssClass="btn btn-secondary"
-	message="select"
-	url="javascript:void(0);"
-/>
+<div class="select-asset-selector">
+	<div class="c-mt-3 edit-controls">
+
+	</div>
+</div>
 
 <aui:script>
 	function <portlet:namespace />moveSelectionDown(productEntryOrder) {

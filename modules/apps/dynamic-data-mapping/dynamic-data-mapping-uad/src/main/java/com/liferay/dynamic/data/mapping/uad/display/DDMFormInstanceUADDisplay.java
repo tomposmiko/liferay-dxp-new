@@ -39,7 +39,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = UADDisplay.class)
+@Component(
+	immediate = true,
+	service = {DDMFormInstanceUADDisplay.class, UADDisplay.class}
+)
 public class DDMFormInstanceUADDisplay extends BaseDDMFormInstanceUADDisplay {
 
 	@Override
@@ -88,7 +91,7 @@ public class DDMFormInstanceUADDisplay extends BaseDDMFormInstanceUADDisplay {
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 

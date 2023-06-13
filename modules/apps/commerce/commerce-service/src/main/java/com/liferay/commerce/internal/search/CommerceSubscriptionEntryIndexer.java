@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommerceSubscriptionEntryIndexer
 	extends BaseIndexer<CommerceSubscriptionEntry> {
 
@@ -180,8 +180,8 @@ public class CommerceSubscriptionEntryIndexer
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commerceSubscriptionEntry.getCompanyId(),
-			getDocument(commerceSubscriptionEntry));
+			getSearchEngineId(), commerceSubscriptionEntry.getCompanyId(),
+			getDocument(commerceSubscriptionEntry), isCommitImmediately());
 	}
 
 	@Override
@@ -195,11 +195,11 @@ public class CommerceSubscriptionEntryIndexer
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommerceSubscriptionEntries(companyId);
+		reindexCommerceSubscriptionEntries(companyId);
 	}
 
-	private void _reindexCommerceSubscriptionEntries(long companyId)
-		throws Exception {
+	protected void reindexCommerceSubscriptionEntries(long companyId)
+		throws PortalException {
 
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_commerceSubscriptionEntryLocalService.
@@ -225,6 +225,7 @@ public class CommerceSubscriptionEntryIndexer
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

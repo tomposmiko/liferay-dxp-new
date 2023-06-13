@@ -14,15 +14,13 @@
 
 package com.liferay.wiki.web.internal.portlet.action;
 
-import com.liferay.petra.lang.SafeCloseable;
-import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -166,13 +164,8 @@ public class ActionUtil {
 				serviceContext.setAddGuestPermissions(false);
 			}
 
-			try (SafeCloseable safeCloseable =
-					CTCollectionThreadLocal.
-						setProductionModeWithSafeCloseable()) {
-
-				node = WikiNodeLocalServiceUtil.addDefaultNode(
-					themeDisplay.getGuestUserId(), serviceContext);
-			}
+			node = WikiNodeLocalServiceUtil.addDefaultNode(
+				themeDisplay.getDefaultUserId(), serviceContext);
 		}
 		else {
 			node = getFirstNode(portletRequest);
@@ -201,8 +194,6 @@ public class ActionUtil {
 			nodeId, wikiGroupServiceConfiguration.frontPageName(), 0);
 
 		if (page == null) {
-			WikiNode node = WikiNodeLocalServiceUtil.getNode(nodeId);
-
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)portletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
@@ -215,14 +206,11 @@ public class ActionUtil {
 
 			boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
 
-			try (SafeCloseable safeCloseable =
-					CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
-						node.getCtCollectionId())) {
-
+			try {
 				WorkflowThreadLocal.setEnabled(false);
 
 				page = WikiPageLocalServiceUtil.addPage(
-					themeDisplay.getGuestUserId(), nodeId,
+					themeDisplay.getDefaultUserId(), nodeId,
 					wikiGroupServiceConfiguration.frontPageName(), null,
 					WikiPageConstants.NEW, true, serviceContext);
 			}
@@ -267,20 +255,22 @@ public class ActionUtil {
 			}
 		).buildPortletURL();
 
+		PortletURL editPageURL = PortletURLBuilder.createRenderURL(
+			liferayPortletResponse
+		).setMVCRenderCommandName(
+			"wiki/edit_page"
+		).setParameter(
+			"nodeId", nodeId
+		).setParameter(
+			"title", title
+		).buildPortletURL();
+
+		String attachmentURLPrefix = WikiUtil.getAttachmentURLPrefix(
+			themeDisplay.getPathMain(), themeDisplay.getPlid(), nodeId, title);
+
 		return wikiEngineRenderer.diffHtml(
-			sourcePage, targetPage, viewPageURL,
-			PortletURLBuilder.createRenderURL(
-				liferayPortletResponse
-			).setMVCRenderCommandName(
-				"wiki/edit_page"
-			).setParameter(
-				"nodeId", nodeId
-			).setParameter(
-				"title", title
-			).buildPortletURL(),
-			WikiUtil.getAttachmentURLPrefix(
-				themeDisplay.getPathMain(), themeDisplay.getPlid(), nodeId,
-				title));
+			sourcePage, targetPage, viewPageURL, editPageURL,
+			attachmentURLPrefix);
 	}
 
 	public static WikiNode getNode(PortletRequest portletRequest)
@@ -312,7 +302,7 @@ public class ActionUtil {
 		}
 		catch (NoSuchNodeException noSuchNodeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchNodeException);
+				_log.debug(noSuchNodeException, noSuchNodeException);
 			}
 
 			node = getFirstVisibleNode(portletRequest);
@@ -361,7 +351,7 @@ public class ActionUtil {
 		}
 		catch (NoSuchNodeException noSuchNodeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchNodeException);
+				_log.debug(noSuchNodeException, noSuchNodeException);
 			}
 		}
 

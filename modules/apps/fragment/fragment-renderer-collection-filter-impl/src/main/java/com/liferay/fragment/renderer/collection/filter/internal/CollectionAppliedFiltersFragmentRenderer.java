@@ -14,17 +14,19 @@
 
 package com.liferay.fragment.renderer.collection.filter.internal;
 
-import com.liferay.fragment.collection.filter.FragmentCollectionFilterRegistry;
+import com.liferay.fragment.collection.filter.FragmentCollectionFilterTracker;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.renderer.collection.filter.internal.display.context.CollectionAppliedFiltersFragmentRendererDisplayContext;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -53,7 +55,10 @@ public class CollectionAppliedFiltersFragmentRenderer
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "applied-filters");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getClass());
+
+		return LanguageUtil.get(resourceBundle, "applied-filters");
 	}
 
 	@Override
@@ -66,7 +71,7 @@ public class CollectionAppliedFiltersFragmentRenderer
 			CollectionAppliedFiltersFragmentRendererDisplayContext.class.
 				getName(),
 			new CollectionAppliedFiltersFragmentRendererDisplayContext(
-				_fragmentCollectionFilterRegistry,
+				_fragmentCollectionFilterTracker,
 				_fragmentEntryConfigurationParser,
 				_fragmentEntryLinkLocalService, fragmentRendererContext,
 				httpServletRequest));
@@ -86,16 +91,13 @@ public class CollectionAppliedFiltersFragmentRenderer
 		CollectionAppliedFiltersFragmentRenderer.class);
 
 	@Reference
-	private FragmentCollectionFilterRegistry _fragmentCollectionFilterRegistry;
+	private FragmentCollectionFilterTracker _fragmentCollectionFilterTracker;
 
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.fragment.renderer.collection.filter.impl)"

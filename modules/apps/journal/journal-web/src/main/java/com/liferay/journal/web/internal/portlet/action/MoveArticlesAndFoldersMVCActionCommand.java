@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"mvc.command.name=/journal/move_articles_and_folders"
@@ -88,7 +89,7 @@ public class MoveArticlesAndFoldersMVCActionCommand
 			}
 			catch (InvalidDDMStructureException invalidDDMStructureException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(invalidDDMStructureException);
+					_log.warn(invalidDDMStructureException.getMessage());
 				}
 
 				invalidArticleIds.add(articleId);

@@ -15,13 +15,14 @@
 package com.liferay.template.web.internal.portlet.template;
 
 import com.liferay.info.item.provider.InfoItemFormProvider;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.template.BaseTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.template.constants.TemplatePortletKeys;
 import com.liferay.template.web.internal.constants.TemplateConstants;
 
@@ -37,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lourdes Fernández Besada
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + TemplatePortletKeys.TEMPLATE,
 	service = TemplateHandler.class
 )
@@ -50,9 +52,10 @@ public class InformationTemplatesTemplateHandler extends BaseTemplateHandler {
 	@Override
 	public String getName(Locale locale) {
 		String portletTitle = _portal.getPortletTitle(
-			TemplatePortletKeys.TEMPLATE, locale);
+			TemplatePortletKeys.TEMPLATE,
+			ResourceBundleUtil.getBundle(locale, getClass()));
 
-		return _language.format(locale, "x-template", portletTitle, false);
+		return LanguageUtil.format(locale, "x-template", portletTitle, false);
 	}
 
 	@Override
@@ -106,9 +109,6 @@ public class InformationTemplatesTemplateHandler extends BaseTemplateHandler {
 	public boolean isDisplayTemplateHandler() {
 		return false;
 	}
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

@@ -19,13 +19,15 @@ import com.liferay.commerce.product.model.CPOption;
 import com.liferay.commerce.product.service.CPOptionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Option;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.OptionValue;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.OptionDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.odata.entity.v1_0.OptionEntityModel;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionValueResource;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -34,11 +36,11 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.Collections;
@@ -55,11 +57,12 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/option.properties",
 	scope = ServiceScope.PROTOTYPE, service = OptionResource.class
 )
-@CTAware
-public class OptionResourceImpl extends BaseOptionResourceImpl {
+public class OptionResourceImpl
+	extends BaseOptionResourceImpl implements EntityModelResource {
 
 	@Override
 	public Response deleteOption(Long id) throws Exception {
@@ -126,8 +129,15 @@ public class OptionResourceImpl extends BaseOptionResourceImpl {
 			CPOption.class.getName(), search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
-			searchContext -> searchContext.setCompanyId(
-				contextCompany.getCompanyId()),
+			new UnsafeConsumer() {
+
+				public void accept(Object object) throws Exception {
+					SearchContext searchContext = (SearchContext)object;
+
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+				}
+
+			},
 			sorts,
 			document -> _toOption(
 				GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
@@ -194,7 +204,6 @@ public class OptionResourceImpl extends BaseOptionResourceImpl {
 		}
 
 		_optionValueResource.setContextAcceptLanguage(contextAcceptLanguage);
-		_optionValueResource.setContextUriInfo(contextUriInfo);
 
 		for (OptionValue optionValue : optionValues) {
 			_optionValueResource.postOptionIdOptionValue(
@@ -262,10 +271,8 @@ public class OptionResourceImpl extends BaseOptionResourceImpl {
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.OptionDTOConverter)"
-	)
-	private DTOConverter<CPOption, Option> _optionDTOConverter;
+	@Reference
+	private OptionDTOConverter _optionDTOConverter;
 
 	@Reference
 	private OptionValueResource _optionValueResource;

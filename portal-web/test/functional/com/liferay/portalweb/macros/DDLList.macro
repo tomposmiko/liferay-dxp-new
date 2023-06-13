@@ -8,19 +8,19 @@ definition {
 		LexiconEntry.gotoAdd();
 
 		Type.clickAtType(
-			locator1 = "DDL#NAME_INPUT",
-			value1 = ${ddlListName});
+			locator1 = "TextInput#NAME",
+			value1 = "${ddlListName}");
 
 		if (isSet(ddlListDescription)) {
 			Type.clickAtType(
 				locator1 = "TextArea#DESCRIPTION",
-				value1 = ${ddlListDescription});
+				value1 = "${ddlListDescription}");
 		}
 
 		if (isSet(workflowDefinition)) {
 			Select(
 				locator1 = "DDLEditList#WORKFLOW_SELECT",
-				value1 = ${workflowDefinition});
+				value1 = "${workflowDefinition}");
 		}
 
 		AssertClick(
@@ -39,16 +39,16 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		PortletEntry.inputName(name = ${ddlListName});
+		PortletEntry.inputName(name = "${ddlListName}");
 
 		if (isSet(ddlListDescription)) {
-			PortletEntry.inputDescription(description = ${ddlListDescription});
+			PortletEntry.inputDescription(description = "${ddlListDescription}");
 		}
 
 		if (isSet(workflowDefinition)) {
 			Select(
 				locator1 = "DDLEditList#WORKFLOW_SELECT",
-				value1 = ${workflowDefinition});
+				value1 = "${workflowDefinition}");
 		}
 
 		AssertClick(
@@ -67,32 +67,30 @@ definition {
 	}
 
 	macro deleteCP {
-		LexiconEntry.viewEntryName(rowEntry = ${ddlListName});
+		LexiconEntry.viewEntryName(rowEntry = "${ddlListName}");
 
-		ClickNoError(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
-
-		MenuItem.clickNoError(menuItem = "Delete");
+		LexiconEntry.gotoEllipsisMenuItemNoError(menuItem = "Delete");
 
 		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
 
 		Alert.viewSuccessMessage();
 
-		LexiconEntry.viewNoEntry(rowEntry = ${ddlListName});
+		LexiconEntry.viewNoEntry(rowEntry = "${ddlListName}");
 	}
 
 	macro editCP {
-		LexiconEntry.viewEntryName(rowEntry = ${ddlListName});
+		LexiconEntry.viewEntryName(rowEntry = "${ddlListName}");
 
 		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Edit");
 
 		Type.clickAtType(
 			locator1 = "TextInput#NAME",
-			value1 = ${ddlListNameEdit});
+			value1 = "${ddlListNameEdit}");
 
 		if (isSet(ddlListDescriptionEdit)) {
 			Type.clickAtType(
 				locator1 = "TextArea#DESCRIPTION",
-				value1 = ${ddlListDescriptionEdit});
+				value1 = "${ddlListDescriptionEdit}");
 		}
 
 		Click(locator1 = "Button#SAVE");
@@ -101,25 +99,9 @@ definition {
 	}
 
 	macro editPermissions {
-		Search.searchCP(searchTerm = ${ddlListName});
+		Search.searchCP(searchTerm = "${ddlListName}");
 
 		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Permissions");
-	}
-
-	macro editUserViewPermissionCP {
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Dynamic Data Lists");
-
-		DDLList.editPermissions(ddlListName = ${ddlListName});
-
-		if (IsElementPresent.isElementPresentAfterWait(locator1 = "IFrame#MODAL_BODY")) {
-			SelectFrame(locator1 = "IFrame#MODAL_BODY");
-		}
-
-		PermissionsInline.addOrRemoveViewPermissionFromAllRoles(
-			addOrRemoveViewPermission = ${addOrRemoveViewPermission},
-			roleList = ${roleList});
 	}
 
 	macro editViaDDLDisplayPG {
@@ -129,40 +111,15 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		PortletEntry.inputName(name = ${ddlListNameEdit});
+		PortletEntry.inputName(name = "${ddlListNameEdit}");
 
 		if (isSet(ddlListDescription)) {
-			PortletEntry.inputDescription(description = ${ddlListDescriptionEdit});
+			PortletEntry.inputDescription(description = "${ddlListDescriptionEdit}");
 		}
 
 		AssertClick(
 			locator1 = "Button#SAVE",
 			value1 = "Save");
-	}
-
-	macro expandCollapsedIcon {
-		if (isSet(classNameList)) {
-			for (var className : list ${classNameList}) {
-				var key_sectionName = ${className};
-
-				if (IsElementPresent(key_tab = ${className}, locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_EXPANDED")) {
-					AssertElementPresent(locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_EXPANDED");
-				}
-				else {
-					Click(locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_COLLAPSED");
-				}
-			}
-		}
-		else {
-			var key_sectionName = ${className};
-
-			if (IsElementPresent(key_tab = ${className}, locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_EXPANDED")) {
-				AssertElementPresent(locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_EXPANDED");
-			}
-			else {
-				Click(locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_COLLAPSED");
-			}
-		}
 	}
 
 	macro openDynamicDataListsAdmin {
@@ -171,6 +128,8 @@ definition {
 
 	macro saveViaDDLDisplayPG {
 		DDLDataDefinition.save();
+
+		Pause(locator1 = "5000");
 	}
 
 	macro selectViaDDLDisplayPG {
@@ -180,11 +139,11 @@ definition {
 
 		SelectFrame(locator1 = "DDLConfiguration#CONFIGURATION_IFRAME");
 
-		var key_ddlListName = ${ddlListName};
+		var key_ddlListName = "${ddlListName}";
 
 		AssertClick(
 			locator1 = "DDLConfiguration#LIST_TABLE_NAME",
-			value1 = ${ddlListName});
+			value1 = "${ddlListName}");
 
 		AssertTextEquals(
 			locator1 = "Message#INFO",
@@ -203,7 +162,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Dynamic Data Lists");
 
 		while (IsElementPresent(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS")) {
@@ -216,19 +175,19 @@ definition {
 	}
 
 	macro viewCP {
-		LexiconEntry.viewEntryName(rowEntry = ${ddlListName});
+		LexiconEntry.viewEntryName(rowEntry = "${ddlListName}");
 
 		if (isSet(ddlListDescription)) {
-			var key_ddlListDescription = ${ddlListDescription};
+			var key_ddlListDescription = "${ddlListDescription}";
 
 			AssertTextEquals(
 				locator1 = "DDL#LIST_TABLE_DESCRIPTION",
-				value1 = ${ddlListDescription});
+				value1 = "${ddlListDescription}");
 		}
 
-		LexiconEntry.gotoEntry(rowEntry = ${ddlListName});
+		LexiconEntry.gotoEntry(rowEntry = "${ddlListName}");
 
-		SiteAdmin.viewPortletTitle(portletTitle = ${ddlListName});
+		SiteAdmin.viewPortletTitle(portletTitle = "${ddlListName}");
 	}
 
 	macro viewDeleteRecordOptionViaDDLDisplayPG {
@@ -240,7 +199,7 @@ definition {
 	macro viewViaDDLDisplayPG {
 		AssertTextEquals(
 			locator1 = "Portlet#H2_HEADER",
-			value1 = ${ddlListName});
+			value1 = "${ddlListName}");
 	}
 
 }

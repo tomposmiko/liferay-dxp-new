@@ -93,9 +93,7 @@ public class CSDiagramEntryLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
-	public static void deleteCSDiagramEntries(long cpDefinitionId)
-		throws PortalException {
-
+	public static void deleteCSDiagramEntries(long cpDefinitionId) {
 		getService().deleteCSDiagramEntries(cpDefinitionId);
 	}
 
@@ -108,11 +106,9 @@ public class CSDiagramEntryLocalServiceUtil {
 	 *
 	 * @param csDiagramEntry the cs diagram entry
 	 * @return the cs diagram entry that was removed
-	 * @throws PortalException
 	 */
 	public static CSDiagramEntry deleteCSDiagramEntry(
-			CSDiagramEntry csDiagramEntry)
-		throws PortalException {
+		CSDiagramEntry csDiagramEntry) {
 
 		return getService().deleteCSDiagramEntry(csDiagramEntry);
 	}
@@ -243,22 +239,6 @@ public class CSDiagramEntryLocalServiceUtil {
 		getActionableDynamicQuery() {
 
 		return getService().getActionableDynamicQuery();
-	}
-
-	public static List<CSDiagramEntry> getCPDefinitionRelatedCSDiagramEntries(
-		long cpDefinitionId) {
-
-		return getService().getCPDefinitionRelatedCSDiagramEntries(
-			cpDefinitionId);
-	}
-
-	public static List<CSDiagramEntry> getCProductCSDiagramEntries(
-			long cProductId, int start, int end,
-			OrderByComparator<CSDiagramEntry> orderByComparator)
-		throws PortalException {
-
-		return getService().getCProductCSDiagramEntries(
-			cProductId, start, end, orderByComparator);
 	}
 
 	/**

@@ -15,7 +15,7 @@ definition {
 		User.firstLoginPG();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Kaleo Forms Admin");
 
 		KaleoFormsAdmin.addProcess();
@@ -27,7 +27,7 @@ definition {
 		KaleoFormsAdmin.next();
 
 		KaleoFormsAdmin.chooseFieldSet(
-			kfFieldSetName = ${kfFieldSetName},
+			kfFieldSetName = "${kfFieldSetName}",
 			kfProcessName = "Kaleo Forms Process");
 
 		KaleoFormsAdmin.next();
@@ -54,7 +54,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -68,175 +68,53 @@ definition {
 
 			Workflow.tearDownWorkflowDefinitions();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
 	@description = "Verify that user can insert especial caracter in the submission."
-	@priority = 3
+	@ignore = "Test Stub"
+	@priority = "3"
 	test CanInsertEspecialCaracter {
-		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
 
-		KaleoFormsNewSubmissions.addNewContacts(
-			ddlCompany = "ライフレイ",
-			ddlEmail = "ライフレイ@liferay.com",
-			ddlFirstName = "ライフレイ");
+		// TODO LRQA-70702 CanInsertEspecialCaracter pending implementation
 
-		KaleoFormsAdmin.saveProcessRecord();
-
-		Alert.viewSuccessMessage();
-
-		KaleoFormsNewSubmissions.viewEllipsisMenu(menuItem = "View");
-
-		KaleoFormsNewSubmissions.viewColumnsOnDetails(
-			companyName = "ライフレイ",
-			email = "ライフレイ@liferay.com",
-			firstName = "ライフレイ");
 	}
 
 	@description = "Verify that the details page shows the process Status is Approved after the user approve."
-	@priority = 4
+	@ignore = "Test Stub"
+	@priority = "4"
 	test CanViewProcessStatusApproved {
-		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
 
-		KaleoFormsNewSubmissions.addNewContacts(
-			ddlCompany = "Liferay",
-			ddlEmail = "userfn@liferay.com",
-			ddlFirstName = "Userfn",
-			ddlInstantMessegerService = "Google Hangouts",
-			ddlJobTitle = "QA Engineer",
-			ddlLastName = "Userln",
-			ddlnotes = "Notes",
-			ddlPhoneMobile = "(123) 9999-9999",
-			ddlPhoneOffice = "(123) 1111-2222",
-			ddlUserName = "testliferay");
+		// TODO LRQA-70704 CanViewProcessStatusApproved pending implementation
 
-		KaleoFormsAdmin.saveProcessRecord();
-
-		KaleoFormsNewSubmissions.viewEllipsisMenu(menuItem = "View");
-
-		KaleoFormsNewSubmissions.viewStatusLabel(lbstatus = "Pending");
-
-		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
-
-		Workflow.assignToMeTaskByActions(
-			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = "Process",
-			workflowTask = "Review");
-
-		Workflow.approveTaskByActions(
-			workflowAssetTitle = "Kaleo Forms Process",
-			workflowAssetType = "Process",
-			workflowTask = "Review");
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Kaleo Forms Admin");
-
-		KaleoFormsAdmin.viewProcessRecord(kfProcessName = "Kaleo Forms Process");
-
-		KaleoFormsNewSubmissions.viewEllipsisMenu(menuItem = "View");
-
-		KaleoFormsNewSubmissions.viewStatusLabel(lbstatus = "Approved");
 	}
 
 	@description = "Verify that the details page shows the process Status is Pending before the user approve."
-	@priority = 4
+	@ignore = "Test Stub"
+	@priority = "4"
 	test CanViewProcessStatusPending {
-		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
 
-		KaleoFormsNewSubmissions.addNewContacts(
-			ddlCompany = "Liferay",
-			ddlEmail = "userfn@liferay.com",
-			ddlFirstName = "Userfn",
-			ddlInstantMessegerService = "Google Hangouts",
-			ddlJobTitle = "QA Engineer",
-			ddlLastName = "Userln",
-			ddlnotes = "Notes",
-			ddlPhoneMobile = "(123) 9999-9999",
-			ddlPhoneOffice = "(123) 1111-2222",
-			ddlUserName = "testliferay");
+		// TODO LRQA-70703 CanViewProcessStatusPending pending implementation
 
-		KaleoFormsAdmin.saveProcessRecord();
-
-		KaleoFormsNewSubmissions.viewEllipsisMenu(menuItem = "View");
-
-		KaleoFormsNewSubmissions.viewStatusLabel(lbstatus = "Pending");
-	}
-
-	@description = "Verify that the basic structure of workflow track approval is available."
-	@priority = 5
-	test CanViewTrackApprovalBasicStructure {
-		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
-
-		KaleoFormsNewSubmissions.addNewContacts(
-			ddlCompany = "Liferay",
-			ddlFirstName = "Userfn");
-
-		KaleoFormsAdmin.saveProcessRecord();
-
-		KaleoFormsNewSubmissions.viewEllipsisMenu(menuItem = "View");
-
-		KaleoFormsNewSubmissions.gotoStatusLabel(status = "Pending");
-
-		KaleoFormsNewSubmissions.viewTrackWorkflowStructure(throughLabel = "true");
 	}
 
 	@description = "Verify that the fields filled on submissions appears on the details page."
-	@priority = 5
+	@ignore = "Test Stub"
+	@priority = "5"
 	test FieldsAppearsOnTheDetailsPage {
-		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
 
-		KaleoFormsNewSubmissions.addNewContacts(
-			ddlCompany = "Liferay",
-			ddlEmail = "userfn@liferay.com",
-			ddlFirstName = "Userfn",
-			ddlInstantMessegerService = "Google Hangouts",
-			ddlJobTitle = "QA Engineer",
-			ddlLastName = "Userln",
-			ddlnotes = "Notes",
-			ddlPhoneMobile = "(123) 9999-9999",
-			ddlPhoneOffice = "(123) 1111-2222",
-			ddlUserName = "testliferay");
+		// TODO LRQA-70700 FieldsAppearsOnTheDetailsPage pending implementation
 
-		KaleoFormsAdmin.saveProcessRecord();
-
-		KaleoFormsNewSubmissions.viewEllipsisMenu(menuItem = "View");
-
-		KaleoFormsNewSubmissions.viewColumnsOnDetails(
-			ddlCompany = "Liferay",
-			ddlEmail = "userfn@liferay.com",
-			ddlFirstName = "Userfn",
-			ddlimService = "Google Hangouts",
-			ddlJobTitle = "QA Engineer",
-			ddlLastName = "Userln",
-			ddlnotes = "Notes",
-			ddlPhoneMobile = "(123) 9999-9999",
-			ddlPhoneOffice = "(123) 1111-2222",
-			ddlUserName = "testliferay");
 	}
 
 	@description = "Verify that the details page shows the version."
 	@ignore = "Test Stub"
-	@priority = 3
+	@priority = "3"
 	test VersionOnDetailsPage {
-		KaleoFormsAdmin.submitNewProcess(kfProcessName = "Kaleo Forms Process");
 
-		KaleoFormsNewSubmissions.addNewContacts(
-			ddlCompany = "Liferay",
-			ddlEmail = "userfn@liferay.com",
-			ddlFirstName = "Userfn",
-			ddlInstantMessegerService = "Google Hangouts",
-			ddlJobTitle = "QA Engineer",
-			ddlLastName = "Userln",
-			ddlnotes = "Notes",
-			ddlPhoneMobile = "(123) 9999-9999",
-			ddlPhoneOffice = "(123) 1111-2222",
-			ddlUserName = "testliferay");
+		// TODO LRQA-70701 VersionOnDetailsPage pending implementation
 
-		KaleoFormsAdmin.saveProcessRecord();
-
-		KaleoFormsNewSubmissions.viewVersionOnDetails(workflowVersion = "1.0");
 	}
 
 }

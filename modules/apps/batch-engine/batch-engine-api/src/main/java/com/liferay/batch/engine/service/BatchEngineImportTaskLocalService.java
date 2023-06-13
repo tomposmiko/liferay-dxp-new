@@ -83,13 +83,11 @@ public interface BatchEngineImportTaskLocalService
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public BatchEngineImportTask addBatchEngineImportTask(
-			String externalReferenceCode, long companyId, long userId,
-			long batchSize, String callbackURL, String className,
-			byte[] content, String contentType, String executeStatus,
-			Map<String, String> fieldNameMappingMap, int importStrategy,
-			String operation, Map<String, Serializable> parameters,
-			String taskItemDelegateName)
-		throws PortalException;
+		long companyId, long userId, long batchSize, String callbackURL,
+		String className, byte[] content, String contentType,
+		String executeStatus, Map<String, String> fieldNameMappingMap,
+		String operation, Map<String, Serializable> parameters,
+		String taskItemDelegateName);
 
 	/**
 	 * Creates a new batch engine import task with the primary key. Does not add the batch engine import task to the database.
@@ -220,11 +218,6 @@ public interface BatchEngineImportTaskLocalService
 	public BatchEngineImportTask fetchBatchEngineImportTask(
 		long batchEngineImportTaskId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BatchEngineImportTask
-		fetchBatchEngineImportTaskByExternalReferenceCode(
-			String externalReferenceCode, long companyId);
-
 	/**
 	 * Returns the batch engine import task with the matching UUID and company.
 	 *
@@ -249,12 +242,6 @@ public interface BatchEngineImportTaskLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BatchEngineImportTask getBatchEngineImportTask(
 			long batchEngineImportTaskId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BatchEngineImportTask
-			getBatchEngineImportTaskByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
 		throws PortalException;
 
 	/**

@@ -332,8 +332,7 @@ public interface CommerceCurrencyLocalService
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	public void importDefaultValues(
-			boolean updateExchangeRate, ServiceContext serviceContext)
+	public void importDefaultValues(ServiceContext serviceContext)
 		throws Exception;
 
 	public CommerceCurrency setActive(long commerceCurrencyId, boolean active)

@@ -110,11 +110,6 @@ public class JenkinsSlave implements JenkinsNode<JenkinsSlave> {
 	}
 
 	@Override
-	public JenkinsCohort getJenkinsCohort() {
-		return _jenkinsMaster.getJenkinsCohort();
-	}
-
-	@Override
 	public JenkinsMaster getJenkinsMaster() {
 		return _jenkinsMaster;
 	}
@@ -140,7 +135,7 @@ public class JenkinsSlave implements JenkinsNode<JenkinsSlave> {
 	}
 
 	public boolean isReachable() {
-		return JenkinsResultsParserUtil.isServerPortReachable(getName(), 22);
+		return JenkinsResultsParserUtil.isReachable(getName());
 	}
 
 	public void takeSlavesOffline(String offlineReason) {
@@ -190,9 +185,8 @@ public class JenkinsSlave implements JenkinsNode<JenkinsSlave> {
 			script = script.replace(
 				"${offline.status}", String.valueOf(offlineStatus));
 
-			System.out.println(
-				JenkinsResultsParserUtil.executeJenkinsScript(
-					_jenkinsMaster.getName(), script));
+			JenkinsResultsParserUtil.executeJenkinsScript(
+				_jenkinsMaster.getName(), script);
 		}
 		catch (IOException ioException) {
 			System.out.println("Unable to set the status for slaves: " + _name);

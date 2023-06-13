@@ -21,11 +21,7 @@ import java.util.List;
 /**
  * @author André de Oliveira
  */
-public class AssetTagsSearchFacetDisplayContext implements FacetDisplayContext {
-
-	public List<BucketDisplayContext> getBucketDisplayContexts() {
-		return _bucketDisplayContexts;
-	}
+public class AssetTagsSearchFacetDisplayContext {
 
 	public long getDisplayStyleGroupId() {
 		return _displayStyleGroupId;
@@ -57,6 +53,12 @@ public class AssetTagsSearchFacetDisplayContext implements FacetDisplayContext {
 		return _tagFacetPortletInstanceConfiguration;
 	}
 
+	public List<AssetTagsSearchFacetTermDisplayContext>
+		getTermDisplayContexts() {
+
+		return _assetTagsSearchFacetTermDisplayContexts;
+	}
+
 	public boolean isCloudWithCount() {
 		return _cloudWithCount;
 	}
@@ -67,12 +69,6 @@ public class AssetTagsSearchFacetDisplayContext implements FacetDisplayContext {
 
 	public boolean isRenderNothing() {
 		return _renderNothing;
-	}
-
-	public void setBucketDisplayContexts(
-		List<BucketDisplayContext> bucketDisplayContexts) {
-
-		_bucketDisplayContexts = bucketDisplayContexts;
 	}
 
 	public void setCloudWithCount(boolean cloudWithCount) {
@@ -121,7 +117,16 @@ public class AssetTagsSearchFacetDisplayContext implements FacetDisplayContext {
 			tagFacetPortletInstanceConfiguration;
 	}
 
-	private List<BucketDisplayContext> _bucketDisplayContexts;
+	public void setTermDisplayContexts(
+		List<AssetTagsSearchFacetTermDisplayContext>
+			assetTagsSearchFacetTermDisplayContexts) {
+
+		_assetTagsSearchFacetTermDisplayContexts =
+			assetTagsSearchFacetTermDisplayContexts;
+	}
+
+	private List<AssetTagsSearchFacetTermDisplayContext>
+		_assetTagsSearchFacetTermDisplayContexts;
 	private boolean _cloudWithCount;
 	private long _displayStyleGroupId;
 	private String _facetLabel;

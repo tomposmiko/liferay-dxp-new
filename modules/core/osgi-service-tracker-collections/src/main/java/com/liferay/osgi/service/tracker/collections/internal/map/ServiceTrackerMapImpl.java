@@ -14,8 +14,6 @@
 
 package com.liferay.osgi.service.tracker.collections.internal.map;
 
-import com.liferay.osgi.service.tracker.collections.EagerServiceTrackerCustomizer;
-import com.liferay.osgi.service.tracker.collections.internal.ServiceTrackerManager;
 import com.liferay.osgi.service.tracker.collections.internal.ServiceTrackerUtil;
 import com.liferay.osgi.service.tracker.collections.map.KeyedServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapper;
@@ -59,38 +57,21 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 			bundleContext, clazz, filterString,
 			new ServiceReferenceServiceTrackerCustomizer());
 
-		boolean trackAllServices = false;
-
-		if (clazz == null) {
-			trackAllServices = true;
-		}
-
-		_serviceTrackerManager = new ServiceTrackerManager(
-			_serviceTracker, trackAllServices);
-
-		if (_serviceTrackerCustomizer instanceof
-				EagerServiceTrackerCustomizer) {
-
-			_serviceTrackerManager.open();
-		}
+		_serviceTracker.open();
 	}
 
 	@Override
 	public void close() {
-		_serviceTrackerManager.close();
+		_serviceTracker.close();
 	}
 
 	@Override
 	public boolean containsKey(K key) {
-		_serviceTrackerManager.open();
-
 		return _serviceTrackerBuckets.containsKey(key);
 	}
 
 	@Override
 	public R getService(K key) {
-		_serviceTrackerManager.open();
-
 		ServiceTrackerBucket<SR, TS, R> serviceTrackerBucket =
 			_serviceTrackerBuckets.get(key);
 
@@ -103,19 +84,15 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 
 	@Override
 	public Set<K> keySet() {
-		_serviceTrackerManager.open();
-
 		return Collections.unmodifiableSet(_serviceTrackerBuckets.keySet());
 	}
 
 	@Override
 	public Collection<R> values() {
-		_serviceTrackerManager.open();
-
-		return Collections.unmodifiableCollection(_getServices());
+		return Collections.unmodifiableCollection(getServices());
 	}
 
-	private Collection<R> _getServices() {
+	protected Collection<R> getServices() {
 		Collection<R> services = new ArrayList<>();
 
 		for (ServiceTrackerBucket<SR, TS, R> serviceTrackerBucket :
@@ -190,7 +167,6 @@ public class ServiceTrackerMapImpl<K, SR, TS, R>
 	private final ConcurrentMap<K, ServiceTrackerBucket<SR, TS, R>>
 		_serviceTrackerBuckets = new ConcurrentHashMap<>();
 	private final ServiceTrackerCustomizer<SR, TS> _serviceTrackerCustomizer;
-	private final ServiceTrackerManager _serviceTrackerManager;
 	private final ServiceTrackerBucketFactory<SR, TS, R>
 		_serviceTrackerMapBucketFactory;
 	private final ServiceTrackerMapListener<K, TS, R>

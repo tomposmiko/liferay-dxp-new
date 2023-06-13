@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.search.query.QueryHelper;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
 import com.liferay.portal.search.spi.model.query.contributor.helper.KeywordQueryContributorHelper;
@@ -29,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rubén Pulido
  */
-@Component(service = KeywordQueryContributor.class)
+@Component(immediate = true, service = KeywordQueryContributor.class)
 public class AssetInternalCategoryTitlesKeywordQueryContributor
 	implements KeywordQueryContributor {
 
@@ -45,18 +46,30 @@ public class AssetInternalCategoryTitlesKeywordQueryContributor
 			return;
 		}
 
+		Localization localization = getLocalization();
+
 		queryHelper.addSearchTerm(
 			booleanQuery, searchContext,
-			_localization.getLocalizedName(
+			localization.getLocalizedName(
 				Field.ASSET_INTERNAL_CATEGORY_TITLES,
 				LocaleUtil.toLanguageId(searchContext.getLocale())),
 			false);
 	}
 
-	@Reference
-	protected QueryHelper queryHelper;
+	protected Localization getLocalization() {
+
+		// See LPS-72507 and LPS-76500
+
+		if (localization != null) {
+			return localization;
+		}
+
+		return LocalizationUtil.getLocalization();
+	}
+
+	protected Localization localization;
 
 	@Reference
-	private Localization _localization;
+	protected QueryHelper queryHelper;
 
 }

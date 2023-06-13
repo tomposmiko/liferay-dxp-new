@@ -150,7 +150,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			},
 			Priorities.AUTHORIZATION - 9);
 
-		_registerDescriptors(osgiJaxRsName);
+		registerDescriptors(osgiJaxRsName);
 
 		return true;
 	}
@@ -177,7 +177,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -187,10 +187,7 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 		}
 	}
 
-	protected static final String OAUTH2_SERVICE_ACCESS_POLICY_NAME =
-		"oauth2.service.access.policy.name";
-
-	private void _registerDescriptors(String osgiJaxRsName) {
+	protected void registerDescriptors(String osgiJaxRsName) {
 		String bundleSymbolicName = _bundle.getSymbolicName();
 
 		ServiceTracker<ResourceBundleLoader, ResourceBundleLoader>
@@ -217,6 +214,9 @@ public class LiferayOAuth2OSGiFeature implements Feature {
 				new ApplicationDescriptorsImpl(serviceTracker, osgiJaxRsName),
 				properties));
 	}
+
+	protected static final String OAUTH2_SERVICE_ACCESS_POLICY_NAME =
+		"oauth2.service.access.policy.name";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LiferayOAuth2OSGiFeature.class);

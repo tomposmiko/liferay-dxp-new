@@ -69,7 +69,7 @@
 
 .calendar-list-item-hover,
 .calendar-list-item-active {
-	background-color: $dropdown-link-hover-bg;
+	background-color: #dce3ea;
 	white-space: -moz-pre-wrap;
 	white-space: pre-line;
 	white-space: pre-wrap;
@@ -173,8 +173,7 @@
 		}
 
 		.scheduler-event {
-			opacity: 1;
-			z-index: 99;
+			z-index: 300;
 		}
 	}
 
@@ -184,7 +183,6 @@
 			display: block;
 			left: unset;
 			padding: 10px 0;
-			position: relative !important;
 
 			.btn {
 				margin-left: 0;
@@ -210,19 +208,13 @@
 
 		.popover-content .close {
 			position: absolute;
-			right: 12px;
-			top: 12px;
-		}
-
-		.popover-footer {
-			padding: 5px 4px 14px;
+			right: 10px;
+			top: 5px;
 		}
 	}
 
 	.scheduler-event-content,
-	.scheduler-event-name,
 	.scheduler-event-title {
-		color: $dark;
 		font-family: inherit;
 		font-size: inherit;
 		line-height: inherit;
@@ -241,10 +233,6 @@
 				padding: 10px 0 10px 8px;
 			}
 		}
-	}
-
-	.scheduler-view-table-data-col-title-today {
-		color: $primary-d2;
 	}
 }
 
@@ -464,6 +452,12 @@
 	max-width: 232px;
 }
 
+.modal-open .modal {
+	min-height: 570px;
+	min-width: 870px;
+	overflow-y: hidden !important;
+}
+
 .portal-popup .calendar-portlet .fieldset {
 	margin-bottom: 2em;
 }
@@ -531,6 +525,10 @@
 	font-size: 16px;
 }
 
+.scheduler-event-past {
+	opacity: 0.4;
+}
+
 .scheduler-event-recorder-body select {
 	max-width: 340px;
 	width: 100%;
@@ -576,7 +574,6 @@
 
 .simple-menu {
 	position: absolute;
-	z-index: 100 !important;
 
 	.simple-menu-content {
 		background: none repeat scroll 0 0 #fff;
@@ -600,9 +597,9 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 
-	&:hover:not([data-id='colorPicker']) {
-		background-color: $dropdown-link-hover-bg;
-		border: dotted $dropdown-link-hover-bg;
+	&:hover {
+		background-color: #eee;
+		border: dotted #eee;
 		border-width: 1px 0;
 		padding-bottom: 5px;
 		padding-top: 5px;
@@ -660,7 +657,7 @@
 
 // ---------- YUI calendar ----------
 
-.yui3-skin-sam .calendar-portlet-mini-calendar {
+.yui3-skin-sam .calendar-portlet {
 	.yui3-calendar-day,
 	.yui3-calendar-header-label,
 	.yui3-calendar-weekday {
@@ -675,7 +672,7 @@
 	}
 
 	.yui3-calendar-weekday {
-		color: $primary-d2;
+		color: #4599e2;
 	}
 
 	.yui3-calendar-day {
@@ -1064,30 +1061,5 @@
 @media (min-width: 767px) {
 	.portal-popup .calendar-portlet .dialog-footer {
 		position: relative;
-	}
-}
-
-.definition-of-terms {
-	dt {
-		color: $dark;
-		font-weight: normal;
-		margin-bottom: 2em;
-		width: 25em;
-		word-break: break-word;
-	}
-
-	@include media-breakpoint-up(sm) {
-		dt {
-			float: left;
-			width: auto;
-		}
-
-		dd:after {
-			clear: both;
-			content: '';
-			display: block;
-			height: 0;
-			visibility: hidden;
-		}
 	}
 }

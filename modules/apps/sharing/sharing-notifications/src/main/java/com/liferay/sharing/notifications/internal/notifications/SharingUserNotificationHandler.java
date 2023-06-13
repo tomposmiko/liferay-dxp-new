@@ -15,7 +15,7 @@
 package com.liferay.sharing.notifications.internal.notifications;
 
 import com.liferay.asset.kernel.model.AssetRenderer;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.notifications.BaseModelUserNotificationHandler;
@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SharingPortletKeys.SHARING,
 	service = UserNotificationHandler.class
 )
@@ -53,28 +54,12 @@ public class SharingUserNotificationHandler
 			ServiceContext serviceContext)
 		throws Exception {
 
-		return _getMessage(
-			_jsonFactory.createJSONObject(userNotificationEvent.getPayload()),
-			userNotificationEvent);
-	}
-
-	@Override
-	protected String getTitle(
-			UserNotificationEvent userNotificationEvent,
-			ServiceContext serviceContext)
-		throws Exception {
-
-		return _getMessage(
-			_jsonFactory.createJSONObject(userNotificationEvent.getPayload()),
-			userNotificationEvent);
-	}
-
-	private String _getMessage(
-			JSONObject jsonObject, UserNotificationEvent userNotificationEvent)
-		throws Exception {
+		JSONObject userNotificationEventPayloadJSONObject =
+			JSONFactoryUtil.createJSONObject(
+				userNotificationEvent.getPayload());
 
 		SharingEntry sharingEntry = _sharingEntryLocalService.fetchSharingEntry(
-			jsonObject.getLong("classPK"));
+			userNotificationEventPayloadJSONObject.getLong("classPK"));
 
 		if (sharingEntry == null) {
 			_userNotificationEventLocalService.deleteUserNotificationEvent(
@@ -96,7 +81,8 @@ public class SharingUserNotificationHandler
 			return null;
 		}
 
-		String message = jsonObject.getString("message");
+		String message = userNotificationEventPayloadJSONObject.getString(
+			"message");
 
 		if (Validator.isNull(message)) {
 			_userNotificationEventLocalService.deleteUserNotificationEvent(
@@ -118,9 +104,6 @@ public class SharingUserNotificationHandler
 
 		return trashHandler.isInTrash(classPK);
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private SharingEntryLocalService _sharingEntryLocalService;

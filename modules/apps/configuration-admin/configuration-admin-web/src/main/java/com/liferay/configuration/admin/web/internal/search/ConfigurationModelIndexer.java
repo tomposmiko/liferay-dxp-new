@@ -23,7 +23,7 @@ import com.liferay.configuration.admin.web.internal.util.ResourceBundleLoaderPro
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
@@ -74,6 +74,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = {"index.on.startup=false", "system.index=true"},
 	service = {ConfigurationModelIndexer.class, Indexer.class}
 )
@@ -168,7 +169,7 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 			}
 
 			_indexWriterHelper.updateDocuments(
-				CompanyConstants.SYSTEM, documents, false);
+				getSearchEngineId(), CompanyConstants.SYSTEM, documents, false);
 		}
 		catch (SearchException searchException) {
 			_log.error(
@@ -254,8 +255,8 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		throws Exception {
 
 		_indexWriterHelper.deleteDocument(
-			CompanyConstants.SYSTEM, _getUID(configurationModel),
-			isCommitImmediately());
+			getSearchEngineId(), CompanyConstants.SYSTEM,
+			_getUID(configurationModel), isCommitImmediately());
 	}
 
 	@Override
@@ -296,7 +297,7 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 			_resourceBundleLoaderProvider.getResourceBundleLoader(
 				configurationModel.getBundleSymbolicName());
 
-		for (Locale locale : _language.getAvailableLocales()) {
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			String fieldNameSuffix = StringBundler.concat(
 				StringPool.UNDERLINE, locale.getLanguage(),
 				StringPool.UNDERLINE, locale.getCountry());
@@ -360,7 +361,8 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			CompanyConstants.SYSTEM, getDocument(configurationModel));
+			getSearchEngineId(), CompanyConstants.SYSTEM,
+			getDocument(configurationModel), isCommitImmediately());
 	}
 
 	@Override
@@ -384,7 +386,7 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		Document document, ResourceBundleLoader resourceBundleLoader,
 		List<TranslationHelper> translationHelpers) {
 
-		for (Locale locale : _language.getAvailableLocales()) {
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
 			for (TranslationHelper translationHelper : translationHelpers) {
 				ResourceBundle resourceBundle = _getResourceBundle(
 					locale, resourceBundleLoader);
@@ -403,7 +405,7 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 
 	private void _commit() {
 		try {
-			_indexWriterHelper.commit();
+			_indexWriterHelper.commit(getSearchEngineId());
 		}
 		catch (SearchException searchException) {
 			if (_log.isWarnEnabled()) {
@@ -486,9 +488,6 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private ResourceBundleLoaderProvider _resourceBundleLoaderProvider;

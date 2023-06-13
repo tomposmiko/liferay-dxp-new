@@ -18,7 +18,6 @@ import java.util.List;
 
 /**
  * @author Marco Leo
- * @author Alessio Antonio Rendina
  */
 public interface CPCatalogEntry {
 
@@ -27,6 +26,8 @@ public interface CPCatalogEntry {
 	public long getCProductId();
 
 	public List<CPSku> getCPSkus();
+
+	public String getDefaultImageFileUrl();
 
 	public double getDepth();
 

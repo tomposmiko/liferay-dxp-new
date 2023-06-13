@@ -30,7 +30,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Jaclyn Ong
  */
-@Component(property = "key=logout.events.pre", service = LifecycleAction.class)
+@Component(
+	enabled = false, immediate = true, property = "key=logout.events.pre",
+	service = LifecycleAction.class
+)
 public class PunchOutTokenLogoutAction extends Action {
 
 	@Override
@@ -81,7 +84,7 @@ public class PunchOutTokenLogoutAction extends Action {
 			httpServletResponse.sendRedirect(redirectURL);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 

@@ -16,7 +16,7 @@ import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayProgressBar from '@clayui/progress-bar';
 import {useIsMounted, useTimeout} from '@liferay/frontend-js-react-web';
-import {fetch, sub} from 'frontend-js-web';
+import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
@@ -141,13 +141,11 @@ const AdaptiveMediaProgress = ({
 		<div className="progress-error-container">
 			<span className="text-danger">
 				<ClayIcon symbol="exclamation-full" />
-
 				<span>
 					<strong>{Liferay.Language.get('error')}: </strong>
-
 					{imagesFailed === 1
 						? Liferay.Language.get('1-image-failed-process')
-						: sub(
+						: Liferay.Util.sub(
 								Liferay.Language.get('x-images-failed-process'),
 								imagesFailed
 						  )}

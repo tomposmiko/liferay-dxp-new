@@ -12,28 +12,25 @@
  * details.
  */
 
-/* eslint-disable @liferay/aui/no-one */
-
 (function () {
-	const A = AUI();
+	var A = AUI();
 
-	// eslint-disable-next-line @liferay/aui/no-array
-	const AArray = A.Array;
-	const KeyMap = A.Event.KeyMap;
-	const Lang = A.Lang;
+	var AArray = A.Array;
+	var KeyMap = A.Event.KeyMap;
+	var Lang = A.Lang;
 
-	const BR_TAG = 'BR';
+	var BR_TAG = 'BR';
 
-	const CSS_LFR_AC_CONTENT = 'lfr-ac-content';
+	var CSS_LFR_AC_CONTENT = 'lfr-ac-content';
 
-	const STR_EDITOR = 'editor';
+	var STR_EDITOR = 'editor';
 
-	const STR_SPACE = ' ';
+	var STR_SPACE = ' ';
 
-	const TPL_REPLACE_HTML =
+	var TPL_REPLACE_HTML =
 		'<span class="' + CSS_LFR_AC_CONTENT + '">{html}</span>';
 
-	const AutoCompleteCKEditor = function () {};
+	var AutoCompleteCKEditor = function () {};
 
 	AutoCompleteCKEditor.ATTRS = {
 		editor: {
@@ -49,20 +46,20 @@
 
 	AutoCompleteCKEditor.prototype = {
 		_bindUIACCKEditor() {
-			const instance = this;
+			var instance = this;
 
 			instance._processCaret = A.bind('_processCaretPosition', instance);
 
 			instance._processCaretTask = A.debounce(instance._processCaret, 50);
 
-			const editor = instance.get(STR_EDITOR);
+			var editor = instance.get(STR_EDITOR);
 
 			instance._eventHandles = [
 				editor.on('key', A.bind('_onEditorKey', instance)),
 			];
 
 			editor.once('instanceReady', (event) => {
-				const editorBody = A.one(event.editor.element.$);
+				var editorBody = A.one(event.editor.element.$);
 
 				instance._eventHandles.push(
 					editorBody.on(
@@ -74,12 +71,12 @@
 		},
 
 		_getACPositionBase() {
-			const instance = this;
+			var instance = this;
 
-			const inline = this.get(STR_EDITOR).editable().isInline();
+			var inline = this.get(STR_EDITOR).editable().isInline();
 
 			if (!instance._contentsContainer) {
-				const inputElement = instance._getInputElement();
+				var inputElement = instance._getInputElement();
 
 				instance._contentsContainer =
 					inputElement.siblings('.cke').one('.cke_contents') ||
@@ -90,29 +87,29 @@
 		},
 
 		_getACPositionOffset() {
-			const instance = this;
+			var instance = this;
 
-			const caretContainer = instance._getCaretContainer();
+			var caretContainer = instance._getCaretContainer();
 
-			const containerAscendantElement = instance._getContainerAscendant(
+			var containerAscendantElement = instance._getContainerAscendant(
 				caretContainer
 			);
 
-			const containerAscendantNode = A.one(containerAscendantElement.$);
+			var containerAscendantNode = A.one(containerAscendantElement.$);
 
 			return [0, Lang.toInt(containerAscendantNode.getStyle('fontSize'))];
 		},
 
 		_getCaretContainer() {
-			const instance = this;
+			var instance = this;
 
 			return instance._getCaretRange().startContainer;
 		},
 
 		_getCaretIndex() {
-			const instance = this;
+			var instance = this;
 
-			const range = instance._getCaretRange();
+			var range = instance._getCaretRange();
 
 			return {
 				end: range.endOffset,
@@ -121,17 +118,17 @@
 		},
 
 		_getCaretOffset() {
-			const instance = this;
+			var instance = this;
 
-			const editor = instance.get(STR_EDITOR);
+			var editor = instance.get(STR_EDITOR);
 
-			const bookmarks = editor.getSelection().createBookmarks();
+			var bookmarks = editor.getSelection().createBookmarks();
 
-			const bookmarkNode = A.one(bookmarks[0].startNode.$);
+			var bookmarkNode = A.one(bookmarks[0].startNode.$);
 
 			bookmarkNode.setStyle('display', 'inline-block');
 
-			const bookmarkXY = bookmarkNode.getXY();
+			var bookmarkXY = bookmarkNode.getXY();
 
 			bookmarkNode.remove();
 
@@ -142,9 +139,9 @@
 		},
 
 		_getCaretRange() {
-			const instance = this;
+			var instance = this;
 
-			const editor = instance.get(STR_EDITOR);
+			var editor = instance.get(STR_EDITOR);
 
 			return editor.getSelection().getRanges()[0];
 		},
@@ -158,29 +155,29 @@
 		},
 
 		_getInputElement() {
-			const instance = this;
+			var instance = this;
 
 			return A.one(instance.get(STR_EDITOR).element.$);
 		},
 
 		_getPrevTriggerPosition() {
-			const instance = this;
+			var instance = this;
 
-			const caretContainer = instance._getCaretContainer();
-			const caretIndex = instance._getCaretIndex();
+			var caretContainer = instance._getCaretContainer();
+			var caretIndex = instance._getCaretIndex();
 
-			let query = caretContainer.getText().substring(0, caretIndex.start);
+			var query = caretContainer.getText().substring(0, caretIndex.start);
 
-			let triggerContainer = caretContainer;
+			var triggerContainer = caretContainer;
 
-			let triggerIndex = -1;
+			var triggerIndex = -1;
 
-			let trigger = null;
+			var trigger = null;
 
-			const triggers = instance._getTriggers();
+			var triggers = instance._getTriggers();
 
 			AArray.each(triggers, (item) => {
-				const triggerPosition = query.lastIndexOf(item);
+				var triggerPosition = query.lastIndexOf(item);
 
 				if (triggerPosition !== -1 && triggerPosition > triggerIndex) {
 					trigger = item;
@@ -210,19 +207,19 @@
 			// has no additional characters.
 
 			if (triggerIndex === -1) {
-				const triggerWalker = instance._getWalker(triggerContainer);
+				var triggerWalker = instance._getWalker(triggerContainer);
 
 				triggerWalker.guard = function (node) {
-					let hasTrigger = false;
+					var hasTrigger = false;
 
 					if (
 						node.type === CKEDITOR.NODE_TEXT &&
 						node.$ !== caretContainer.$
 					) {
-						const nodeText = node.getText();
+						var nodeText = node.getText();
 
 						AArray.each(triggers, (item) => {
-							const triggerPosition = nodeText.lastIndexOf(item);
+							var triggerPosition = nodeText.lastIndexOf(item);
 
 							if (
 								triggerPosition !== -1 &&
@@ -271,11 +268,11 @@
 		},
 
 		_getQuery() {
-			const instance = this;
+			var instance = this;
 
-			const prevTriggerPosition = instance._getPrevTriggerPosition();
+			var prevTriggerPosition = instance._getPrevTriggerPosition();
 
-			let query = prevTriggerPosition.query;
+			var query = prevTriggerPosition.query;
 
 			if (
 				query &&
@@ -286,11 +283,11 @@
 				query = null;
 			}
 
-			const trigger = prevTriggerPosition.value;
+			var trigger = prevTriggerPosition.value;
 
-			const res = instance._getRegExp().exec(query);
+			var res = instance._getRegExp().exec(query);
 
-			let result;
+			var result;
 
 			if (res) {
 				if (
@@ -305,33 +302,33 @@
 		},
 
 		_getWalker(endContainer, startContainer) {
-			const instance = this;
+			var instance = this;
 
 			endContainer = endContainer || instance._getCaretContainer();
 
 			startContainer =
 				startContainer || instance._getContainerAscendant(endContainer);
 
-			const range = new CKEDITOR.dom.range(startContainer);
+			var range = new CKEDITOR.dom.range(startContainer);
 
 			range.setStart(startContainer, 0);
 			range.setEnd(endContainer, endContainer.getText().length);
 
-			const walker = new CKEDITOR.dom.walker(range);
+			var walker = new CKEDITOR.dom.walker(range);
 
 			return walker;
 		},
 
 		_isEmptySelection() {
-			const instance = this;
+			var instance = this;
 
-			const editor = instance.get(STR_EDITOR);
+			var editor = instance.get(STR_EDITOR);
 
-			const selection = editor.getSelection();
+			var selection = editor.getSelection();
 
-			const ranges = selection.getRanges();
+			var ranges = selection.getRanges();
 
-			const collapsedRange = ranges.length === 1 && ranges[0].collapsed;
+			var collapsedRange = ranges.length === 1 && ranges[0].collapsed;
 
 			return (
 				selection.getType() === CKEDITOR.SELECTION_NONE ||
@@ -349,8 +346,8 @@
 		},
 
 		_onEditorKey(event) {
-			const instance = this;
-			const editor = instance.get(STR_EDITOR);
+			var instance = this;
+			var editor = instance.get(STR_EDITOR);
 
 			if (editor.mode !== 'wysiwyg') {
 				return;
@@ -359,13 +356,13 @@
 			if (instance._isEmptySelection()) {
 				event = instance._normalizeCKEditorKeyEvent(event);
 
-				const acVisible = instance.get('visible');
+				var acVisible = instance.get('visible');
 
 				if (
 					acVisible &&
 					KeyMap.isKeyInSet(event.keyCode, 'down', 'enter', 'up')
 				) {
-					const inlineEditor = editor.editable().isInline();
+					var inlineEditor = editor.editable().isInline();
 
 					if (KeyMap.isKey(event.keyCode, 'enter') || !inlineEditor) {
 						instance._onInputKey(event);
@@ -381,17 +378,17 @@
 		},
 
 		_processCaretPosition() {
-			const instance = this;
+			var instance = this;
 
-			const query = instance._getQuery();
+			var query = instance._getQuery();
 
 			instance._processKeyUp(query);
 		},
 
 		_replaceHtml(text, prevTriggerPosition) {
-			const instance = this;
+			var instance = this;
 
-			let replaceContainer = instance._getContainerAscendant(
+			var replaceContainer = instance._getContainerAscendant(
 				prevTriggerPosition.container,
 				'span'
 			);
@@ -406,7 +403,7 @@
 				);
 			}
 
-			const newElement = CKEDITOR.dom.element.createFromHtml(
+			var newElement = CKEDITOR.dom.element.createFromHtml(
 				Lang.sub(TPL_REPLACE_HTML, {
 					html: text,
 				})
@@ -414,7 +411,7 @@
 
 			newElement.replace(replaceContainer);
 
-			let nextElement = newElement.getNext(function () {
+			var nextElement = newElement.getNext(function () {
 				return (
 					this.type !== CKEDITOR.NODE_TEXT || this.getText().trim()
 				);
@@ -425,23 +422,23 @@
 			}
 
 			if (nextElement) {
-				const containerAscendant = instance._getContainerAscendant(
+				var containerAscendant = instance._getContainerAscendant(
 					prevTriggerPosition.container
 				);
 
-				const updateWalker = instance._getWalker(
+				var updateWalker = instance._getWalker(
 					containerAscendant,
 					nextElement
 				);
 
-				let node = updateWalker.next();
+				var node = updateWalker.next();
 
-				const removeNodes = [];
+				var removeNodes = [];
 
 				while (node) {
-					const nodeText = node.getText();
+					var nodeText = node.getText();
 
-					const spaceIndex = nodeText.indexOf(STR_SPACE);
+					var spaceIndex = nodeText.indexOf(STR_SPACE);
 
 					if (spaceIndex !== -1) {
 						node.setText(nodeText.substring(spaceIndex));
@@ -474,11 +471,11 @@
 		},
 
 		_setCaretIndex(node, caretIndex) {
-			const instance = this;
+			var instance = this;
 
-			const editor = instance.get(STR_EDITOR);
+			var editor = instance.get(STR_EDITOR);
 
-			const caretRange = editor.createRange();
+			var caretRange = editor.createRange();
 
 			caretRange.setStart(node, caretIndex);
 			caretRange.setEnd(node, caretIndex);
@@ -488,24 +485,24 @@
 		},
 
 		_updateValue(value) {
-			const instance = this;
+			var instance = this;
 
-			const prevTriggerPosition = instance._getPrevTriggerPosition();
+			var prevTriggerPosition = instance._getPrevTriggerPosition();
 
-			const caretPosition = instance._replaceHtml(
+			var caretPosition = instance._replaceHtml(
 				value,
 				prevTriggerPosition
 			);
 
 			instance._setCaretIndex(caretPosition.node, caretPosition.index);
 
-			const editor = instance.get('editor');
+			var editor = instance.get('editor');
 
 			editor.fire('saveSnapshot');
 		},
 
 		initializer() {
-			const instance = this;
+			var instance = this;
 
 			instance._bindUIACCKEditor();
 		},

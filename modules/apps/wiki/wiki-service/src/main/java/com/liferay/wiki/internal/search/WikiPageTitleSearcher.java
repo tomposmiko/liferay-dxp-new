@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.wiki.model.WikiPage",
 	service = BaseSearcher.class
 )
@@ -115,10 +116,14 @@ public class WikiPageTitleSearcher extends BaseSearcher {
 		return Collections.emptyMap();
 	}
 
+	@Reference(unbind = "-")
+	protected void setWikiNodeService(WikiNodeService wikiNodeService) {
+		_wikiNodeService = wikiNodeService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		WikiPageTitleSearcher.class);
 
-	@Reference
 	private WikiNodeService _wikiNodeService;
 
 }

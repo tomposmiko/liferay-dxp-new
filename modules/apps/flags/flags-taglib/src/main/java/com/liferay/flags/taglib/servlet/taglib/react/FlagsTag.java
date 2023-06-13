@@ -15,7 +15,7 @@
 package com.liferay.flags.taglib.servlet.taglib.react;
 
 import com.liferay.flags.taglib.internal.servlet.ServletContextUtil;
-import com.liferay.flags.taglib.servlet.taglib.util.FlagsTagUtil;
+import com.liferay.flags.taglib.internal.servlet.taglib.util.FlagsTagUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -26,9 +26,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
@@ -38,7 +36,6 @@ import com.liferay.taglib.util.IncludeTag;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -165,7 +162,7 @@ public class FlagsTag extends IncludeTag {
 				"liferay-flags:flags:onlyIcon", !_label);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -223,13 +220,6 @@ public class FlagsTag extends IncludeTag {
 					"signedIn", themeDisplay.isSignedIn()
 				).put(
 					"uri", FlagsTagUtil.getURI(httpServletRequest)
-				).put(
-					"viewMode",
-					Objects.equals(
-						Constants.VIEW,
-						ParamUtil.getString(
-							themeDisplay.getRequest(), "p_l_mode",
-							Constants.VIEW))
 				).build();
 			}
 		).build();
@@ -244,7 +234,7 @@ public class FlagsTag extends IncludeTag {
 			contentURL = FlagsTagUtil.getCurrentURL(getRequest());
 		}
 
-		return JSONUtil.put(
+		JSONObject dataJSONObject = JSONUtil.put(
 			namespace + "className", _className
 		).put(
 			namespace + "classPK", _classPK
@@ -254,18 +244,16 @@ public class FlagsTag extends IncludeTag {
 			namespace + "contentURL", contentURL
 		).put(
 			namespace + "reportedUserId", _reportedUserId
-		).put(
-			namespace + "reporterEmailAddress",
-			() -> {
-				if (themeDisplay.isSignedIn()) {
-					User user = themeDisplay.getUser();
-
-					return user.getEmailAddress();
-				}
-
-				return null;
-			}
 		);
+
+		if (themeDisplay.isSignedIn()) {
+			User user = themeDisplay.getUser();
+
+			dataJSONObject.put(
+				namespace + "reporterEmailAddress", user.getEmailAddress());
+		}
+
+		return dataJSONObject;
 	}
 
 	private String _getMessage() {

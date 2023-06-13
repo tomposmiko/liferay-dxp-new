@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.facet.Facet;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -34,7 +35,7 @@ public interface SearchResponse {
 
 	public Facet getFacet(String fieldName);
 
-	public String getKeywords();
+	public Optional<String> getKeywordsOptional();
 
 	public int getPaginationDelta();
 
@@ -51,6 +52,8 @@ public interface SearchResponse {
 		getSearchResponse();
 
 	public SearchSettings getSearchSettings();
+
+	public Optional<String> getSpellCheckSuggestionOptional();
 
 	public int getTotalHits();
 

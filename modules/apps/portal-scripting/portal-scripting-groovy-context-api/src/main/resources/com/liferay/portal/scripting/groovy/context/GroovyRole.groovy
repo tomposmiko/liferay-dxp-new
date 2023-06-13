@@ -17,7 +17,8 @@ package com.liferay.portal.scripting.groovy.context;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.role.RoleConstants
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.service.ResourceBlockLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 
@@ -65,7 +66,7 @@ class GroovyRole {
 		}
 
 		role = RoleLocalServiceUtil.addRole(
-			groovyScriptingContext.guestUserId, null, 0, name,
+			groovyScriptingContext.defaultUserId, null, 0, name,
 			GroovyScriptingContext.getLocalizationMap(name),
 			GroovyScriptingContext.getLocalizationMap(description), type, null,
 			groovyScriptingContext.serviceContext);

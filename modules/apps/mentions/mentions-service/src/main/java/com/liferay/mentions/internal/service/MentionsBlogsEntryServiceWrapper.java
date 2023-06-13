@@ -38,9 +38,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Sergio González
  */
-@Component(service = ServiceWrapper.class)
+@Component(immediate = true, service = ServiceWrapper.class)
 public class MentionsBlogsEntryServiceWrapper
 	extends BlogsEntryLocalServiceWrapper {
+
+	public MentionsBlogsEntryServiceWrapper() {
+		super(null);
+	}
+
+	public MentionsBlogsEntryServiceWrapper(
+		BlogsEntryLocalService blogsEntryLocalService) {
+
+		super(blogsEntryLocalService);
+	}
 
 	@Override
 	public BlogsEntry updateStatus(
@@ -85,13 +95,27 @@ public class MentionsBlogsEntryServiceWrapper
 		return entry;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setBlogsEntryLocalService(
+		BlogsEntryLocalService blogsEntryLocalService) {
+
+		_blogsEntryLocalService = blogsEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMentionsNotifier(MentionsNotifier mentionsNotifier) {
+		_mentionsNotifier = mentionsNotifier;
+	}
+
 	private BlogsEntryLocalService _blogsEntryLocalService;
-
-	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	@Reference
 	private MentionsNotifier _mentionsNotifier;
 
 	@Reference

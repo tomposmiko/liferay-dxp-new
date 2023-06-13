@@ -25,10 +25,6 @@ public class LayoutSetBranchLocalServiceWrapper
 	implements LayoutSetBranchLocalService,
 			   ServiceWrapper<LayoutSetBranchLocalService> {
 
-	public LayoutSetBranchLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutSetBranchLocalServiceWrapper(
 		LayoutSetBranchLocalService layoutSetBranchLocalService) {
 

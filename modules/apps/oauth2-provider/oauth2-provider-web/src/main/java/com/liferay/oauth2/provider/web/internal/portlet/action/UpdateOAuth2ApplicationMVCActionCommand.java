@@ -84,7 +84,7 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 
 		int clientProfileId = ParamUtil.getInteger(request, "clientProfile");
 
-		ClientProfile clientProfile = _getClientProfile(clientProfileId);
+		ClientProfile clientProfile = getClientProfile(clientProfileId);
 
 		PortletPreferences portletPreferences = request.getPreferences();
 
@@ -120,8 +120,6 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 			}
 		}
 
-		String clientAuthenticationMethod = ParamUtil.get(
-			request, "clientAuthenticationMethod", StringPool.BLANK);
 		long clientCredentialUserId = ParamUtil.get(
 			request, "clientCredentialUserId", themeDisplay.getUserId());
 		String clientId = ParamUtil.get(request, "clientId", StringPool.BLANK);
@@ -131,7 +129,6 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 			request, "description", StringPool.BLANK);
 		String homePageURL = ParamUtil.get(
 			request, "homePageURL", StringPool.BLANK);
-		String jwks = ParamUtil.get(request, "jwks", StringPool.BLANK);
 		String name = ParamUtil.get(request, "name", StringPool.BLANK);
 		String privacyPolicyURL = ParamUtil.get(
 			request, "privacyPolicyURL", StringPool.BLANK);
@@ -174,12 +171,11 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 
 				OAuth2Application oAuth2Application =
 					_oAuth2ApplicationService.addOAuth2Application(
-						allowedGrantTypesList, clientAuthenticationMethod,
-						clientCredentialUserId, clientId, clientProfile.id(),
-						clientSecret, description, featuresList, homePageURL, 0,
-						jwks, name, privacyPolicyURL, redirectURIsList,
-						rememberDevice, scopeAliasesList, trustedApplication,
-						serviceContext);
+						allowedGrantTypesList, clientCredentialUserId, clientId,
+						clientProfile.id(), clientSecret, description,
+						featuresList, homePageURL, 0, name, privacyPolicyURL,
+						redirectURIsList, rememberDevice, scopeAliasesList,
+						trustedApplication, serviceContext);
 
 				response.setRenderParameter(
 					"oAuth2ApplicationId",
@@ -193,10 +189,9 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 				_oAuth2ApplicationService.updateOAuth2Application(
 					oAuth2ApplicationId,
 					oAuth2Application.getOAuth2ApplicationScopeAliasesId(),
-					allowedGrantTypesList, clientAuthenticationMethod,
-					clientCredentialUserId, clientId, clientProfile.id(),
-					clientSecret, description, featuresList, homePageURL,
-					oAuth2Application.getIconFileEntryId(), jwks, name,
+					allowedGrantTypesList, clientCredentialUserId, clientId,
+					clientProfile.id(), clientSecret, description, featuresList,
+					homePageURL, oAuth2Application.getIconFileEntryId(), name,
 					privacyPolicyURL, redirectURIsList, rememberDevice,
 					trustedApplication);
 
@@ -221,7 +216,7 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			Class<?> peClass = portalException.getClass();
@@ -242,7 +237,7 @@ public class UpdateOAuth2ApplicationMVCActionCommand
 			OAuth2ProviderConfiguration.class, properties);
 	}
 
-	private ClientProfile _getClientProfile(int clientProfileId) {
+	protected ClientProfile getClientProfile(int clientProfileId) {
 		for (ClientProfile clientProfile : ClientProfile.values()) {
 			if (clientProfile.id() == clientProfileId) {
 				return clientProfile;

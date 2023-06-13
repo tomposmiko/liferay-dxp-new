@@ -14,18 +14,13 @@
 
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
-import com.liferay.jenkins.results.parser.BatchHistory;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.Job;
-import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 
 import java.io.File;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
@@ -50,66 +45,36 @@ public class SegmentTestClassGroup extends BaseTestClassGroup {
 		return new ArrayList<>(_axisTestClassGroups);
 	}
 
-	public BatchHistory getBatchHistory() {
-		return _batchTestClassGroup.getBatchHistory();
-	}
-
 	public int getBatchIndex() {
 		List<SegmentTestClassGroup> segmentTestClassGroups =
-			_batchTestClassGroup.getSegmentTestClassGroups();
+			_parentBatchTestClassGroup.getSegmentTestClassGroups();
 
 		return segmentTestClassGroups.indexOf(this);
 	}
 
 	public String getBatchJobName() {
-		return _batchTestClassGroup.getBatchJobName();
+		return _parentBatchTestClassGroup.getBatchJobName();
 	}
 
 	public String getBatchName() {
-		return _batchTestClassGroup.getBatchName();
-	}
-
-	public BatchTestClassGroup getBatchTestClassGroup() {
-		return _batchTestClassGroup;
-	}
-
-	public String getCohortName() {
-		return _batchTestClassGroup.getCohortName();
-	}
-
-	public String getDownstreamJobName() {
-		return _batchTestClassGroup.getDownstreamJobName();
+		return _parentBatchTestClassGroup.getBatchName();
 	}
 
 	@Override
 	public Job getJob() {
-		return _batchTestClassGroup.getJob();
-	}
-
-	public JSONObject getJSONObject() {
-		JSONObject jsonObject = new JSONObject();
-
-		JSONArray axesJSONArray = new JSONArray();
-
-		for (AxisTestClassGroup axisTestClassGroup : getAxisTestClassGroups()) {
-			axesJSONArray.put(axisTestClassGroup.getJSONObject());
-		}
-
-		jsonObject.put(
-			"axes", axesJSONArray
-		).put(
-			"segment_name", getSegmentName()
-		);
-
-		return jsonObject;
+		return _parentBatchTestClassGroup.getJob();
 	}
 
 	public Integer getMaximumSlavesPerHost() {
-		return _batchTestClassGroup.getMaximumSlavesPerHost();
+		return _parentBatchTestClassGroup.getMaximumSlavesPerHost();
 	}
 
 	public Integer getMinimumSlaveRAM() {
-		return _batchTestClassGroup.getMinimumSlaveRAM();
+		return _parentBatchTestClassGroup.getMinimumSlaveRAM();
+	}
+
+	public BatchTestClassGroup getParentBatchTestClassGroup() {
+		return _parentBatchTestClassGroup;
 	}
 
 	public String getSegmentName() {
@@ -118,7 +83,8 @@ public class SegmentTestClassGroup extends BaseTestClassGroup {
 	}
 
 	public String getSlaveLabel() {
-		BatchTestClassGroup batchTestClassGroup = getBatchTestClassGroup();
+		BatchTestClassGroup batchTestClassGroup =
+			getParentBatchTestClassGroup();
 
 		return batchTestClassGroup.getSlaveLabel();
 	}
@@ -146,22 +112,12 @@ public class SegmentTestClassGroup extends BaseTestClassGroup {
 			sb.append("\n");
 		}
 
-		Job job = getJob();
-
-		String companyDefaultLocale = job.getCompanyDefaultLocale();
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(companyDefaultLocale)) {
-			sb.append("TEST_COMPANY_DEFAULT_LOCALE=");
-			sb.append(companyDefaultLocale);
-			sb.append("\n");
-		}
-
 		return sb.toString();
 	}
 
 	@Override
-	public List<TestClass> getTestClasses() {
-		List<TestClass> testClasses = new ArrayList<>();
+	public List<TestClassGroup.TestClass> getTestClasses() {
+		List<TestClassGroup.TestClass> testClasses = new ArrayList<>();
 
 		for (AxisTestClassGroup axisTestClassGroup : getAxisTestClassGroups()) {
 			testClasses.addAll(axisTestClassGroup.getTestClasses());
@@ -173,39 +129,11 @@ public class SegmentTestClassGroup extends BaseTestClassGroup {
 	protected SegmentTestClassGroup(
 		BatchTestClassGroup parentBatchTestClassGroup) {
 
-		_batchTestClassGroup = parentBatchTestClassGroup;
-	}
-
-	protected SegmentTestClassGroup(
-		BatchTestClassGroup parentBatchTestClassGroup, JSONObject jsonObject) {
-
-		_batchTestClassGroup = parentBatchTestClassGroup;
-
-		JSONArray axesJSONArray = jsonObject.getJSONArray("axes");
-
-		if ((axesJSONArray == null) || axesJSONArray.isEmpty()) {
-			return;
-		}
-
-		for (int i = 0; i < axesJSONArray.length(); i++) {
-			JSONObject axisJSONObject = axesJSONArray.getJSONObject(i);
-
-			if (axisJSONObject == null) {
-				continue;
-			}
-
-			AxisTestClassGroup axisTestClassGroup =
-				TestClassGroupFactory.newAxisTestClassGroup(
-					axisJSONObject, this);
-
-			_axisTestClassGroups.add(axisTestClassGroup);
-
-			_batchTestClassGroup.addAxisTestClassGroup(axisTestClassGroup);
-		}
+		_parentBatchTestClassGroup = parentBatchTestClassGroup;
 	}
 
 	private final List<AxisTestClassGroup> _axisTestClassGroups =
 		new ArrayList<>();
-	private final BatchTestClassGroup _batchTestClassGroup;
+	private final BatchTestClassGroup _parentBatchTestClassGroup;
 
 }

@@ -26,19 +26,14 @@ import com.liferay.account.service.AccountGroupRelLocalService;
 import com.liferay.account.service.test.util.AccountEntryTestUtil;
 import com.liferay.account.service.test.util.AccountGroupTestUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.test.log.LogCapture;
-import com.liferay.portal.test.log.LogEntry;
-import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -62,7 +57,8 @@ public class AccountGroupRelLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_accountEntry = AccountEntryTestUtil.addAccountEntry();
+		_accountEntry = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
 
 		_accountGroup = AccountGroupTestUtil.addAccountGroup(
 			_accountGroupLocalService, RandomTestUtil.randomString(),
@@ -80,55 +76,20 @@ public class AccountGroupRelLocalServiceTest {
 		Assert.assertNotNull(
 			_accountGroupRelLocalService.fetchAccountGroupRel(
 				accountGroupRel.getPrimaryKey()));
-
-		String name = PrincipalThreadLocal.getName();
-
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.account.service.impl." +
-					"AccountGroupRelLocalServiceImpl",
-				LoggerTestUtil.WARN)) {
-
-			PrincipalThreadLocal.setName(TestPropsValues.getUserId());
-
-			AccountEntry accountEntry = AccountEntryTestUtil.addAccountEntry();
-
-			accountGroupRel = _accountGroupRelLocalService.addAccountGroupRel(
-				_accountGroup.getAccountGroupId(), AccountEntry.class.getName(),
-				accountEntry.getAccountEntryId());
-
-			List<LogEntry> logEntries = logCapture.getLogEntries();
-
-			Assert.assertTrue(logEntries.isEmpty());
-
-			Assert.assertEquals(
-				TestPropsValues.getUserId(), accountGroupRel.getUserId());
-
-			PrincipalThreadLocal.setName(RandomTestUtil.randomLong());
-
-			accountEntry = AccountEntryTestUtil.addAccountEntry();
-
-			accountGroupRel = _accountGroupRelLocalService.addAccountGroupRel(
-				_accountGroup.getAccountGroupId(), AccountEntry.class.getName(),
-				accountEntry.getAccountEntryId());
-
-			logEntries = logCapture.getLogEntries();
-
-			Assert.assertFalse(logEntries.isEmpty());
-
-			Assert.assertEquals(
-				_userLocalService.getGuestUserId(
-					accountGroupRel.getCompanyId()),
-				accountGroupRel.getUserId());
-		}
-		finally {
-			PrincipalThreadLocal.setName(name);
-		}
 	}
 
 	@Test
 	public void testAddAccountGroupRels() throws Exception {
-		List<AccountEntry> accountEntries =
-			AccountEntryTestUtil.addAccountEntries(2);
+		List<AccountEntry> accountEntries = new ArrayList<>();
+
+		accountEntries.add(
+			AccountEntryTestUtil.addAccountEntry(
+				_accountEntryLocalService, RandomTestUtil.randomString(),
+				RandomTestUtil.randomString()));
+		accountEntries.add(
+			AccountEntryTestUtil.addAccountEntry(
+				_accountEntryLocalService, RandomTestUtil.randomString(),
+				RandomTestUtil.randomString()));
 
 		_accountGroupRelLocalService.addAccountGroupRels(
 			_accountGroup.getAccountGroupId(), AccountEntry.class.getName(),
@@ -226,8 +187,5 @@ public class AccountGroupRelLocalServiceTest {
 
 	@Inject
 	private AccountGroupRelLocalService _accountGroupRelLocalService;
-
-	@Inject
-	private UserLocalService _userLocalService;
 
 }

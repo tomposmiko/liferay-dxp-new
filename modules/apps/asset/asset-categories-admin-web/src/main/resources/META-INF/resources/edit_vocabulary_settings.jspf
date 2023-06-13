@@ -128,7 +128,7 @@ if (vocabulary != null) {
 	}
 	%>
 
-	<aui:input name="indexes" type="hidden" value="<%= StringUtil.merge(indexes) %>" />
+	<aui:input name="indexes" type="hidden" value="<%= indexes.toString() %>" />
 </liferay-frontend:fieldset>
 
 <aui:script use="liferay-auto-fields">

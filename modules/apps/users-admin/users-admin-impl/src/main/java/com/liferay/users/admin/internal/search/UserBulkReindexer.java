@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.User",
 	service = BulkReindexer.class
 )
@@ -49,7 +50,7 @@ public class UserBulkReindexer implements BulkReindexer {
 		indexableActionableDynamicQuery.setCompanyId(companyId);
 		indexableActionableDynamicQuery.setPerformActionMethod(
 			(User user) -> {
-				if (!user.isGuestUser()) {
+				if (!user.isDefaultUser()) {
 					try {
 						indexableActionableDynamicQuery.addDocuments(
 							indexer.getDocument(user));
@@ -63,6 +64,8 @@ public class UserBulkReindexer implements BulkReindexer {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(
+			indexer.getSearchEngineId());
 
 		try {
 			indexableActionableDynamicQuery.performActions();

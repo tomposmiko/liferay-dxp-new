@@ -15,22 +15,22 @@
 AUI.add(
 	'liferay-progress',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const STR_EMPTY = '';
+		var STR_EMPTY = '';
 
-		const STR_UPDATE_PERIOD = 'updatePeriod';
+		var STR_UPDATE_PERIOD = 'updatePeriod';
 
-		const STR_VALUE = 'value';
+		var STR_VALUE = 'value';
 
-		const TPL_FRAME =
-			'<iframe frameborder="0" height="0" id="{0}-poller" src="javascript:void(0);" style="display:none" tabindex="-1" title="empty" width="0"></iframe>';
+		var TPL_FRAME =
+			'<iframe frameborder="0" height="0" id="{0}-poller" src="javascript:;" style="display:none" tabindex="-1" title="empty" width="0"></iframe>';
 
-		const TPL_URL_UPDATE =
+		var TPL_URL_UPDATE =
 			themeDisplay.getPathMain() +
 			'/portal/progress_poller?progressId={0}&sessionKey={1}&updatePeriod={2}';
 
-		const Progress = A.Component.create({
+		var Progress = A.Component.create({
 			ATTRS: {
 				message: {
 					validator: Lang.isString,
@@ -54,7 +54,7 @@ AUI.add(
 
 			prototype: {
 				_afterComplete() {
-					const instance = this;
+					var instance = this;
 
 					instance
 						.get('boundingBox')
@@ -66,9 +66,9 @@ AUI.add(
 				},
 
 				_afterValueChange(event) {
-					const instance = this;
+					var instance = this;
 
-					let label = instance.get('message');
+					var label = instance.get('message');
 
 					if (!label) {
 						label = event.newVal + '%';
@@ -78,7 +78,7 @@ AUI.add(
 				},
 
 				_onIframeLoad() {
-					const instance = this;
+					var instance = this;
 
 					setTimeout(() => {
 						instance._frame
@@ -88,7 +88,7 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					Progress.superclass.bindUI.call(instance, arguments);
 
@@ -103,13 +103,13 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					Progress.superclass.renderUI.call(instance, arguments);
 
-					const tplFrame = Lang.sub(TPL_FRAME, [instance.get('id')]);
+					var tplFrame = Lang.sub(TPL_FRAME, [instance.get('id')]);
 
-					const frame = A.Node.create(tplFrame);
+					var frame = A.Node.create(tplFrame);
 
 					instance.get('boundingBox').placeBefore(frame);
 
@@ -117,7 +117,7 @@ AUI.add(
 				},
 
 				startProgress() {
-					const instance = this;
+					var instance = this;
 
 					if (!instance.get('rendered')) {
 						instance.render();
@@ -133,9 +133,9 @@ AUI.add(
 				},
 
 				updateProgress() {
-					const instance = this;
+					var instance = this;
 
-					const url = Lang.sub(TPL_URL_UPDATE, [
+					var url = Lang.sub(TPL_URL_UPDATE, [
 						instance.get('id'),
 						instance.get('sessionKey'),
 						instance.get(STR_UPDATE_PERIOD),

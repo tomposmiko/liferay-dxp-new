@@ -15,7 +15,7 @@
 package com.liferay.account.admin.web.internal.portlet.action;
 
 import com.liferay.account.constants.AccountPortletKeys;
-import com.liferay.account.service.AccountGroupService;
+import com.liferay.account.service.AccountGroupLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Albert Lee
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_GROUPS_ADMIN,
 		"mvc.command.name=/account_admin/delete_account_groups"
@@ -47,7 +48,9 @@ public class DeleteAccountGroupsMVCActionCommand extends BaseMVCActionCommand {
 		long[] accountGroupIds = ParamUtil.getLongValues(
 			actionRequest, "accountGroupIds");
 
-		_accountGroupService.deleteAccountGroups(accountGroupIds);
+		for (long accountGroupId : accountGroupIds) {
+			_accountGroupLocalService.deleteAccountGroup(accountGroupId);
+		}
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
@@ -57,6 +60,6 @@ public class DeleteAccountGroupsMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	@Reference
-	private AccountGroupService _accountGroupService;
+	private AccountGroupLocalService _accountGroupLocalService;
 
 }

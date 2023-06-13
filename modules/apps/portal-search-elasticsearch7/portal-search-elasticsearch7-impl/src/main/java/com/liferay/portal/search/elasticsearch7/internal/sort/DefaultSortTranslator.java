@@ -63,7 +63,7 @@ public class DefaultSortTranslator implements SortTranslator {
 				continue;
 			}
 
-			String sortFieldName = _getSortFieldName(sort, "_score");
+			String sortFieldName = getSortFieldName(sort, "_score");
 
 			if (sortFieldNames.contains(sortFieldName)) {
 				continue;
@@ -71,11 +71,11 @@ public class DefaultSortTranslator implements SortTranslator {
 
 			sortFieldNames.add(sortFieldName);
 
-			searchSourceBuilder.sort(_getSortBuilder(sort, sortFieldName));
+			searchSourceBuilder.sort(getSortBuilder(sort, sortFieldName));
 		}
 	}
 
-	private SortBuilder<?> _getFieldSortBuilder(Sort sort, String fieldName) {
+	protected SortBuilder<?> getFieldSortBuilder(Sort sort, String fieldName) {
 		FieldSortBuilder fieldSortBuilder = SortBuilders.fieldSort(fieldName);
 
 		fieldSortBuilder.unmappedType("keyword");
@@ -87,7 +87,7 @@ public class DefaultSortTranslator implements SortTranslator {
 		return fieldSortBuilder;
 	}
 
-	private SortBuilder<?> _getGeoDistanceSortBuilder(
+	protected SortBuilder<?> getGeoDistanceSortBuilder(
 		Sort sort, String fieldName) {
 
 		GeoDistanceSort geoDistanceSort = (GeoDistanceSort)sort;
@@ -122,7 +122,7 @@ public class DefaultSortTranslator implements SortTranslator {
 		return geoDistanceSortBuilder;
 	}
 
-	private SortBuilder<?> _getNestedFieldSortBuilder(
+	protected SortBuilder<?> getNestedFieldSortBuilder(
 		Sort sort, String sortFieldName) {
 
 		String[] parts = StringUtil.split(sortFieldName, StringPool.POUND);
@@ -148,7 +148,7 @@ public class DefaultSortTranslator implements SortTranslator {
 		return fieldSortBuilder;
 	}
 
-	private SortBuilder<?> _getScoreSortBuilder(Sort sort) {
+	protected SortBuilder<?> getScoreSortBuilder(Sort sort) {
 		SortBuilder<?> sortBuilder = SortBuilders.scoreSort();
 
 		if (sort.isReverse()) {
@@ -158,23 +158,23 @@ public class DefaultSortTranslator implements SortTranslator {
 		return sortBuilder;
 	}
 
-	private SortBuilder<?> _getSortBuilder(Sort sort, String fieldName) {
+	protected SortBuilder<?> getSortBuilder(Sort sort, String fieldName) {
 		if (fieldName.equals("_score")) {
-			return _getScoreSortBuilder(sort);
+			return getScoreSortBuilder(sort);
 		}
 
 		if (sort.getType() == Sort.GEO_DISTANCE_TYPE) {
-			return _getGeoDistanceSortBuilder(sort, fieldName);
+			return getGeoDistanceSortBuilder(sort, fieldName);
 		}
 
 		if (fieldName.startsWith("nestedFieldArray.")) {
-			return _getNestedFieldSortBuilder(sort, fieldName);
+			return getNestedFieldSortBuilder(sort, fieldName);
 		}
 
-		return _getFieldSortBuilder(sort, fieldName);
+		return getFieldSortBuilder(sort, fieldName);
 	}
 
-	private String _getSortFieldName(Sort sort, String scoreFieldName) {
+	protected String getSortFieldName(Sort sort, String scoreFieldName) {
 		String sortFieldName = sort.getFieldName();
 
 		if (Objects.equals(sortFieldName, Field.PRIORITY) ||

@@ -17,32 +17,45 @@ package com.liferay.portal.dao.orm.hibernate;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 
-import org.hibernate.property.access.internal.PropertyAccessFieldImpl;
-import org.hibernate.property.access.internal.PropertyAccessStrategyFieldImpl;
-import org.hibernate.property.access.spi.PropertyAccess;
+import org.hibernate.PropertyNotFoundException;
+import org.hibernate.property.DirectPropertyAccessor;
+import org.hibernate.property.Getter;
+import org.hibernate.property.Setter;
 
 /**
- * @author Dante Wang
+ * @author Shuyang Zhou
  */
 @SuppressWarnings("rawtypes")
-public class PrivatePropertyAccessor extends PropertyAccessStrategyFieldImpl {
+public class PrivatePropertyAccessor extends DirectPropertyAccessor {
 
 	@Override
-	public PropertyAccess buildPropertyAccess(
-		Class containerJavaType, String propertyName) {
+	public Getter getGetter(Class clazz, String propertyName)
+		throws PropertyNotFoundException {
 
 		Class<?> superClass = null;
 
-		while ((superClass = containerJavaType.getSuperclass()) !=
-					BaseModelImpl.class) {
-
-			containerJavaType = superClass;
+		while ((superClass = clazz.getSuperclass()) != BaseModelImpl.class) {
+			clazz = superClass;
 		}
 
 		propertyName = StringPool.UNDERLINE.concat(propertyName);
 
-		return new PropertyAccessFieldImpl(
-			this, containerJavaType, propertyName);
+		return super.getGetter(clazz, propertyName);
+	}
+
+	@Override
+	public Setter getSetter(Class clazz, String propertyName)
+		throws PropertyNotFoundException {
+
+		Class<?> superClass = null;
+
+		while ((superClass = clazz.getSuperclass()) != BaseModelImpl.class) {
+			clazz = superClass;
+		}
+
+		propertyName = StringPool.UNDERLINE.concat(propertyName);
+
+		return super.getSetter(clazz, propertyName);
 	}
 
 }

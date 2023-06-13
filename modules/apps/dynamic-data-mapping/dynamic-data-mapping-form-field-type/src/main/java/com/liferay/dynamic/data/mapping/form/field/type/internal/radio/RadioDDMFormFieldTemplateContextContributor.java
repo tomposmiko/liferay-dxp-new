@@ -16,7 +16,6 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.radio;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
-import com.liferay.dynamic.data.mapping.form.field.type.internal.radio.helper.RadioDDMFormFieldContextHelper;
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
@@ -41,8 +40,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.RADIO,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		RadioDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class RadioDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -55,7 +58,7 @@ public class RadioDDMFormFieldTemplateContextContributor
 		return HashMapBuilder.<String, Object>put(
 			"inline", GetterUtil.getBoolean(ddmFormField.getProperty("inline"))
 		).put(
-			"options", _getOptions(ddmFormField, ddmFormFieldRenderingContext)
+			"options", getOptions(ddmFormField, ddmFormFieldRenderingContext)
 		).put(
 			"predefinedValue",
 			getValue(
@@ -100,25 +103,7 @@ public class RadioDDMFormFieldTemplateContextContributor
 		return ddmFormFieldOptions;
 	}
 
-	protected String getValue(String valueString) {
-		try {
-			JSONArray jsonArray = jsonFactory.createJSONArray(valueString);
-
-			return GetterUtil.getString(jsonArray.get(0));
-		}
-		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
-			return valueString;
-		}
-	}
-
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private List<Object> _getOptions(
+	protected List<Object> getOptions(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -131,6 +116,24 @@ public class RadioDDMFormFieldTemplateContextContributor
 		return radioDDMFormFieldContextHelper.getOptions(
 			ddmFormFieldRenderingContext);
 	}
+
+	protected String getValue(String valueString) {
+		try {
+			JSONArray jsonArray = jsonFactory.createJSONArray(valueString);
+
+			return GetterUtil.getString(jsonArray.get(0));
+		}
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(jsonException, jsonException);
+			}
+
+			return valueString;
+		}
+	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		RadioDDMFormFieldTemplateContextContributor.class);

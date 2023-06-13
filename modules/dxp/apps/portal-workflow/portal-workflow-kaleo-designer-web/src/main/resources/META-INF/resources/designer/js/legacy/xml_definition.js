@@ -12,12 +12,12 @@
 AUI.add(
 	'liferay-kaleo-designer-xml-definition',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const isNumber = Lang.isNumber;
-		const isString = Lang.isString;
+		var isNumber = Lang.isNumber;
+		var isString = Lang.isString;
 
-		const COL_TYPES_FIELD = [
+		var COL_TYPES_FIELD = [
 			'condition',
 			'fork',
 			'join',
@@ -26,10 +26,10 @@ AUI.add(
 			'task',
 		];
 
-		const STR_BLANK = '';
-		const XMLUtil = Liferay.XMLUtil;
+		var STR_BLANK = '';
+		var XMLUtil = Liferay.XMLUtil;
 
-		const XMLDefinition = A.Component.create({
+		var XMLDefinition = A.Component.create({
 			ATTRS: {
 				description: {
 					validator: isString,
@@ -49,7 +49,7 @@ AUI.add(
 
 				xmlNamespace: {
 					value: {
-						'xmlns': 'urn:liferay.com:liferay-workflow_7.4.0',
+						xmlns: 'urn:liferay.com:liferay-workflow_7.4.0',
 						'xmlns:xsi':
 							'http://www.w3.org/2001/XMLSchema-instance',
 						'xsi:schemaLocation':
@@ -232,7 +232,7 @@ AUI.add(
 					assignmentKey,
 					assignmentTagName
 				) {
-					const instance = this;
+					var instance = this;
 
 					assignmentKey = assignmentKey || 'recipients';
 					assignmentTagName = assignmentTagName || 'recipients';
@@ -284,7 +284,7 @@ AUI.add(
 				},
 
 				_getSchemaTaskTimers(key, tagNode) {
-					const instance = this;
+					var instance = this;
 
 					return {
 						key: key || 'taskTimers',
@@ -376,7 +376,7 @@ AUI.add(
 				},
 
 				_sanitizeDefinitionXML(val) {
-					const instance = this;
+					var instance = this;
 
 					val = decodeURIComponent(val);
 
@@ -392,26 +392,24 @@ AUI.add(
 				},
 
 				_updateXMLNamespace(definition) {
-					const instance = this;
+					var instance = this;
 
-					const workflowDefinition = /(<workflow-definition)[^>]*(>)/.exec(
+					var workflowDefinition = /(<workflow-definition)[^>]*(>)/.exec(
 						definition
 					);
 
 					if (workflowDefinition) {
-						const xmlns = /xmlns="([^"]*)"/.exec(
+						var xmlns = /xmlns="([^"]*)"/.exec(workflowDefinition);
+						var xmlnsXsi = /xmlns:xsi="([^"]*)"/.exec(
 							workflowDefinition
 						);
-						const xmlnsXsi = /xmlns:xsi="([^"]*)"/.exec(
-							workflowDefinition
-						);
-						const xsiSchemaLocation = /xsi:schemaLocation="([^"]*)"/.exec(
+						var xsiSchemaLocation = /xsi:schemaLocation="([^"]*)"/.exec(
 							workflowDefinition
 						);
 
 						if (xmlns && xmlnsXsi && xsiSchemaLocation) {
 							instance.set('xmlNamespace', {
-								'xmlns': xmlns[1],
+								xmlns: xmlns[1],
 								'xmlns:xsi': xmlnsXsi[1],
 								'xsi:schemaLocation': xsiSchemaLocation[1],
 							});
@@ -420,10 +418,10 @@ AUI.add(
 				},
 
 				forEachField(fn) {
-					const instance = this;
+					var instance = this;
 
 					COL_TYPES_FIELD.forEach((item) => {
-						const fieldData = instance.translate(item);
+						var fieldData = instance.translate(item);
 
 						if (fn && !fieldData.error) {
 							fn.call(instance, item, fieldData);
@@ -432,9 +430,9 @@ AUI.add(
 				},
 
 				getDefinitionMetadata() {
-					const instance = this;
+					var instance = this;
 
-					const output = A.DataSchema.XML.apply(
+					var output = A.DataSchema.XML.apply(
 						{
 							metaFields: {
 								description:
@@ -450,15 +448,15 @@ AUI.add(
 				},
 
 				initializer(config) {
-					const instance = this;
+					var instance = this;
 
-					const val = instance._sanitizeDefinitionXML(config.value);
+					var val = instance._sanitizeDefinitionXML(config.value);
 
 					if (!val || XMLUtil.validateDefinition(val)) {
 						instance.definitionDoc = A.DataType.XML.parse(val);
 					}
 
-					const metadata = instance.getDefinitionMetadata();
+					var metadata = instance.getDefinitionMetadata();
 
 					if (metadata) {
 						instance.setAttrs(metadata);
@@ -466,9 +464,9 @@ AUI.add(
 				},
 
 				translate(tagName) {
-					const instance = this;
+					var instance = this;
 
-					const schema = {
+					var schema = {
 						resultFields: [
 							'description',
 							'initial',

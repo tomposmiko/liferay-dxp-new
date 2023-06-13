@@ -22,12 +22,12 @@ const ENDPOINT_FIELD_TYPES = `${
 }${themeDisplay.getPathContext()}/o/dynamic-data-mapping-form-field-types`;
 
 const HEADERS = {
-	'Accept': 'application/json',
+	Accept: 'application/json',
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 	'Content-Type': 'application/json',
 };
 
-export function useFieldTypesResource() {
+export const useFieldTypesResource = () => {
 	const storage = useStorage();
 
 	return useResource({
@@ -42,4 +42,4 @@ export function useFieldTypesResource() {
 			p_auth: Liferay.authToken,
 		},
 	});
-}
+};

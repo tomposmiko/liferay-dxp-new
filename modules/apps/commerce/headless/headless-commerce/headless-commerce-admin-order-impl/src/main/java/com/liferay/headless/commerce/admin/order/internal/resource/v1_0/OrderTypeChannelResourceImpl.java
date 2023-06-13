@@ -24,6 +24,7 @@ import com.liferay.commerce.service.CommerceOrderTypeRelService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderType;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderTypeChannel;
+import com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderTypeChannelDTOConverter;
 import com.liferay.headless.commerce.admin.order.resource.v1_0.OrderTypeChannelResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
 import com.liferay.portal.kernel.search.Sort;
@@ -31,7 +32,6 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/order-type-channel.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, OrderTypeChannelResource.class}
@@ -232,11 +233,8 @@ public class OrderTypeChannelResourceImpl
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderTypeChannelDTOConverter)"
-	)
-	private DTOConverter<CommerceOrderTypeRel, OrderTypeChannel>
-		_orderTypeChannelDTOConverter;
+	@Reference
+	private OrderTypeChannelDTOConverter _orderTypeChannelDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

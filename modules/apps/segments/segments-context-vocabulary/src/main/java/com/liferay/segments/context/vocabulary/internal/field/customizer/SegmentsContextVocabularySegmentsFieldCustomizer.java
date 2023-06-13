@@ -16,16 +16,15 @@ package com.liferay.segments.context.vocabulary.internal.field.customizer;
 
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.segments.context.vocabulary.internal.configuration.SegmentsContextVocabularyConfiguration;
 import com.liferay.segments.field.Field;
 import com.liferay.segments.field.customizer.SegmentsFieldCustomizer;
@@ -34,6 +33,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -57,7 +59,7 @@ import org.osgi.service.component.annotations.Reference;
 public class SegmentsContextVocabularySegmentsFieldCustomizer
 	implements SegmentsFieldCustomizer {
 
-	public static final String KEY = "assetVocabularyName";
+	public static final String KEY = "assetVocabulary";
 
 	@Override
 	public List<String> getFieldNames() {
@@ -76,8 +78,11 @@ public class SegmentsContextVocabularySegmentsFieldCustomizer
 
 	@Override
 	public String getLabel(String fieldName, Locale locale) {
-		return _language.get(
-			locale, "field." + CamelCaseUtil.fromCamelCase(fieldName));
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return ResourceBundleUtil.getString(
+			resourceBundle, "field." + CamelCaseUtil.fromCamelCase(fieldName));
 	}
 
 	@Override
@@ -92,25 +97,29 @@ public class SegmentsContextVocabularySegmentsFieldCustomizer
 
 		Group group = _groupLocalService.fetchCompanyGroup(companyId);
 
-		AssetVocabulary groupAssetVocabulary =
+		return Optional.ofNullable(
 			_assetVocabularyLocalService.fetchGroupVocabulary(
-				group.getGroupId(), assetVocabulary);
+				group.getGroupId(), assetVocabulary)
+		).map(
+			AssetVocabulary::getCategories
+		).orElseGet(
+			() -> {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						StringBundler.concat(
+							"No vocabulary was found with name ",
+							assetVocabulary, " in company ", companyId));
+				}
 
-		if (groupAssetVocabulary == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					StringBundler.concat(
-						"No asset vocabulary was found with name ",
-						assetVocabulary, " in company ", companyId));
+				return Collections.emptyList();
 			}
-
-			return Collections.emptyList();
-		}
-
-		return TransformUtil.transform(
-			groupAssetVocabulary.getCategories(),
+		).stream(
+		).map(
 			assetCategory -> new Field.Option(
-				assetCategory.getTitle(locale), assetCategory.getName()));
+				assetCategory.getTitle(locale), assetCategory.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Activate
@@ -121,10 +130,10 @@ public class SegmentsContextVocabularySegmentsFieldCustomizer
 				ConfigurableUtil.createConfigurable(
 					SegmentsContextVocabularyConfiguration.class, properties);
 
-		_entityField = segmentsContextVocabularyConfiguration.entityFieldName();
+		_entityField = segmentsContextVocabularyConfiguration.entityField();
 
 		_assetVocabulary =
-			segmentsContextVocabularyConfiguration.assetVocabularyName();
+			segmentsContextVocabularyConfiguration.assetVocabulary();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -139,8 +148,5 @@ public class SegmentsContextVocabularySegmentsFieldCustomizer
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
 
 }

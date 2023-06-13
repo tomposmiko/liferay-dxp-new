@@ -20,14 +20,13 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.util.AssetEntryResult;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
-import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherSelectionStyleConfigurationUtil;
 import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.asset.publisher.web.internal.display.context.AssetPublisherDisplayContext;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -64,7 +63,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @author Julio Camarero
  */
-@Component(service = AssetRSSHelper.class)
+@Component(immediate = true, service = AssetRSSHelper.class)
 public class AssetRSSHelper {
 
 	public byte[] getRSS(
@@ -75,8 +74,7 @@ public class AssetRSSHelper {
 
 		String selectionStyle = portletPreferences.getValue(
 			"selectionStyle",
-			AssetPublisherSelectionStyleConfigurationUtil.
-				defaultSelectionStyle());
+			AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC);
 
 		if (!selectionStyle.equals(
 				AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC)) {
@@ -95,15 +93,15 @@ public class AssetRSSHelper {
 		String format = RSSUtil.getFeedTypeFormat(rssFeedType);
 		double version = RSSUtil.getFeedTypeVersion(rssFeedType);
 
-		String rss = _exportToRSS(
+		String rss = exportToRSS(
 			portletRequest, portletResponse, rssName, format, version,
 			rssDisplayStyle, assetLinkBehavior,
-			_getAssetEntries(portletRequest, portletPreferences));
+			getAssetEntries(portletRequest, portletPreferences));
 
 		return rss.getBytes(StringPool.UTF8);
 	}
 
-	private String _exportToRSS(
+	protected String exportToRSS(
 			PortletRequest portletRequest, PortletResponse portletResponse,
 			String name, String format, double version, String displayStyle,
 			String linkBehavior, List<AssetEntry> assetEntries)
@@ -131,7 +129,7 @@ public class AssetRSSHelper {
 
 			String value = null;
 
-			String languageId = _language.getLanguageId(portletRequest);
+			String languageId = LanguageUtil.getLanguageId(portletRequest);
 
 			if (displayStyle.equals(RSSUtil.DISPLAY_STYLE_TITLE)) {
 				value = StringPool.BLANK;
@@ -144,7 +142,7 @@ public class AssetRSSHelper {
 
 			syndEntry.setDescription(syndContent);
 
-			String link = _getEntryURL(
+			String link = getEntryURL(
 				portletRequest, portletResponse, linkBehavior, assetEntry);
 
 			syndEntry.setLink(link);
@@ -167,7 +165,7 @@ public class AssetRSSHelper {
 
 		syndLinks.add(selfSyndLink);
 
-		String feedURL = _getFeedURL(portletRequest);
+		String feedURL = getFeedURL(portletRequest);
 
 		selfSyndLink.setHref(feedURL);
 
@@ -187,7 +185,7 @@ public class AssetRSSHelper {
 		return _rssExporter.export(syndFeed);
 	}
 
-	private List<AssetEntry> _getAssetEntries(
+	protected List<AssetEntry> getAssetEntries(
 			PortletRequest portletRequest,
 			PortletPreferences portletPreferences)
 		throws Exception {
@@ -228,7 +226,7 @@ public class AssetRSSHelper {
 		return assetEntries;
 	}
 
-	private String _getAssetPublisherURL(PortletRequest portletRequest)
+	protected String getAssetPublisherURL(PortletRequest portletRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
@@ -258,20 +256,20 @@ public class AssetRSSHelper {
 		return sb.toString();
 	}
 
-	private String _getEntryURL(
+	protected String getEntryURL(
 			PortletRequest portletRequest, PortletResponse portletResponse,
 			String linkBehavior, AssetEntry assetEntry)
 		throws Exception {
 
 		if (linkBehavior.equals("viewInPortlet")) {
-			return _getEntryURLViewInContext(
+			return getEntryURLViewInContext(
 				portletRequest, portletResponse, assetEntry);
 		}
 
-		return _getEntryURLAssetPublisher(portletRequest, assetEntry);
+		return getEntryURLAssetPublisher(portletRequest, assetEntry);
 	}
 
-	private String _getEntryURLAssetPublisher(
+	protected String getEntryURLAssetPublisher(
 			PortletRequest portletRequest, AssetEntry assetEntry)
 		throws Exception {
 
@@ -280,11 +278,11 @@ public class AssetRSSHelper {
 				assetEntry.getClassName());
 
 		return StringBundler.concat(
-			_getAssetPublisherURL(portletRequest),
+			getAssetPublisherURL(portletRequest),
 			assetRendererFactory.getType(), "/id/", assetEntry.getEntryId());
 	}
 
-	private String _getEntryURLViewInContext(
+	protected String getEntryURLViewInContext(
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		AssetEntry assetEntry) {
 
@@ -307,8 +305,10 @@ public class AssetRSSHelper {
 		return assetViewURL;
 	}
 
-	private String _getFeedURL(PortletRequest portletRequest) throws Exception {
-		String feedURL = _getAssetPublisherURL(portletRequest);
+	protected String getFeedURL(PortletRequest portletRequest)
+		throws Exception {
+
+		String feedURL = getAssetPublisherURL(portletRequest);
 
 		return feedURL.concat("rss");
 	}
@@ -318,9 +318,6 @@ public class AssetRSSHelper {
 
 	@Reference
 	private AssetPublisherHelper _assetPublisherHelper;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

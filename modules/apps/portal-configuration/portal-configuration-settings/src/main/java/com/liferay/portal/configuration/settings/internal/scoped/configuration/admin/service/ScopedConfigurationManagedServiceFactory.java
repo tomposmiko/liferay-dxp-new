@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.settings.LocationVariableResolver;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -36,6 +37,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 
@@ -46,9 +50,10 @@ public class ScopedConfigurationManagedServiceFactory
 	implements ManagedServiceFactory {
 
 	public ScopedConfigurationManagedServiceFactory(
-		Class<?> configurationBeanClass,
+		BundleContext bundleContext, Class<?> configurationBeanClass,
 		LocationVariableResolver locationVariableResolver) {
 
+		_bundleContext = bundleContext;
 		_configurationBeanClass = configurationBeanClass;
 		_locationVariableResolver = locationVariableResolver;
 
@@ -67,7 +72,7 @@ public class ScopedConfigurationManagedServiceFactory
 		Map<String, Object> scopeConfigurationBeans = _configurationBeans.get(
 			new ScopeKey(scopePK, scope));
 
-		if (MapUtil.isNotEmpty(scopeConfigurationBeans)) {
+		if (!MapUtil.isEmpty(scopeConfigurationBeans)) {
 			List<Object> valuesList = ListUtil.fromCollection(
 				scopeConfigurationBeans.values());
 
@@ -84,6 +89,19 @@ public class ScopedConfigurationManagedServiceFactory
 	@Override
 	public String getName() {
 		return _factoryPid;
+	}
+
+	public void register() {
+		_managedServiceFactoryServiceRegistration =
+			_bundleContext.registerService(
+				ManagedServiceFactory.class, this,
+				HashMapDictionaryBuilder.<String, Object>put(
+					Constants.SERVICE_PID, _factoryPid + ".scoped"
+				).build());
+	}
+
+	public void unregister() {
+		_managedServiceFactoryServiceRegistration.unregister();
 	}
 
 	@Override
@@ -188,11 +206,14 @@ public class ScopedConfigurationManagedServiceFactory
 			});
 	}
 
+	private final BundleContext _bundleContext;
 	private final Class<?> _configurationBeanClass;
 	private final Map<ScopeKey, Map<String, Object>> _configurationBeans =
 		new ConcurrentHashMap<>();
 	private final String _factoryPid;
 	private final LocationVariableResolver _locationVariableResolver;
+	private ServiceRegistration<ManagedServiceFactory>
+		_managedServiceFactoryServiceRegistration;
 	private final Map<String, Set<ScopeKey>> _pidScopeKeys =
 		new ConcurrentHashMap<>();
 

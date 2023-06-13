@@ -16,9 +16,7 @@ package com.liferay.commerce.price.list.service.persistence.impl;
 
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.service.persistence.CommercePriceListPersistence;
-import com.liferay.commerce.price.list.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  * @generated
  */
-public abstract class CommercePriceListFinderBaseImpl
+public class CommercePriceListFinderBaseImpl
 	extends BasePersistenceImpl<CommercePriceList> {
 
 	public CommercePriceListFinderBaseImpl() {
@@ -51,36 +45,30 @@ public abstract class CommercePriceListFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commercePriceListPersistence.getBadColumnNames();
+		return getCommercePriceListPersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce price list persistence.
+	 *
+	 * @return the commerce price list persistence
+	 */
+	public CommercePriceListPersistence getCommercePriceListPersistence() {
+		return commercePriceListPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce price list persistence.
+	 *
+	 * @param commercePriceListPersistence the commerce price list persistence
+	 */
+	public void setCommercePriceListPersistence(
+		CommercePriceListPersistence commercePriceListPersistence) {
+
+		this.commercePriceListPersistence = commercePriceListPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommercePriceListPersistence.class)
 	protected CommercePriceListPersistence commercePriceListPersistence;
 
 	private static final Log _log = LogFactoryUtil.getLog(

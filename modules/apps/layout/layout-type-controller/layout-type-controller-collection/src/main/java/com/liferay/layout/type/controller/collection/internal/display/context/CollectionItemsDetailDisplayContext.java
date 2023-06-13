@@ -17,12 +17,9 @@ package com.liferay.layout.type.controller.collection.internal.display.context;
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
-import com.liferay.asset.util.AssetPublisherAddItemHolder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
@@ -37,10 +34,11 @@ import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.segments.constants.SegmentsEntryConstants;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 import javax.portlet.WindowStateException;
@@ -53,14 +51,14 @@ public class CollectionItemsDetailDisplayContext {
 	public CollectionItemsDetailDisplayContext(
 		AssetListEntryLocalService assetListEntryLocalService,
 		AssetListAssetEntryProvider assetListAssetEntryProvider,
-		InfoItemServiceRegistry infoItemServiceRegistry,
+		InfoItemServiceTracker infoItemServiceTracker,
 		LiferayRenderRequest liferayRenderRequest,
 		LiferayRenderResponse liferayRenderResponse,
 		ThemeDisplay themeDisplay) {
 
 		_assetListEntryLocalService = assetListEntryLocalService;
 		_assetListAssetEntryProvider = assetListAssetEntryProvider;
-		_infoItemServiceRegistry = infoItemServiceRegistry;
+		_infoItemServiceTracker = infoItemServiceTracker;
 		_liferayRenderRequest = liferayRenderRequest;
 		_liferayRenderResponse = liferayRenderResponse;
 		_themeDisplay = themeDisplay;
@@ -93,28 +91,6 @@ public class CollectionItemsDetailDisplayContext {
 		}
 
 		return 0;
-	}
-
-	public List<DropdownItem> getDropdownItems(
-		List<AssetPublisherAddItemHolder> assetPublisherAddItemHolders) {
-
-		return new DropdownItemList() {
-			{
-				for (AssetPublisherAddItemHolder assetPublisherAddItemHolder :
-						assetPublisherAddItemHolders) {
-
-					add(
-						dropdownItem -> {
-							dropdownItem.setHref(
-								String.valueOf(
-									assetPublisherAddItemHolder.
-										getPortletURL()));
-							dropdownItem.setLabel(
-								assetPublisherAddItemHolder.getModelResource());
-						});
-				}
-			}
-		};
 	}
 
 	public String getNamespace() {
@@ -164,34 +140,40 @@ public class CollectionItemsDetailDisplayContext {
 		}
 
 		return _assetListAssetEntryProvider.getAssetEntriesCount(
-			assetListEntry, new long[] {SegmentsEntryConstants.ID_DEFAULT},
-			null, null, StringPool.BLANK, StringPool.BLANK);
+			assetListEntry, 0);
 	}
 
 	private long _getInfoCollectionProviderItemCount(String collectionPK) {
-		for (InfoCollectionProvider<?> infoCollectionProvider :
-				(List<InfoCollectionProvider<?>>)
-					(List<?>)_infoItemServiceRegistry.getAllInfoItemServices(
-						InfoCollectionProvider.class)) {
+		List<InfoCollectionProvider<?>> infoCollectionProviders =
+			(List<InfoCollectionProvider<?>>)
+				(List<?>)_infoItemServiceTracker.getAllInfoItemServices(
+					InfoCollectionProvider.class);
 
-			if (!Objects.equals(
-					infoCollectionProvider.getKey(), collectionPK)) {
+		Stream<InfoCollectionProvider<?>> stream =
+			infoCollectionProviders.stream();
 
-				continue;
-			}
+		Optional<InfoCollectionProvider<?>> infoCollectionProviderOptional =
+			stream.filter(
+				infoCollectionProvider -> Objects.equals(
+					infoCollectionProvider.getKey(), collectionPK)
+			).findFirst();
 
-			InfoPage<?> infoPage = infoCollectionProvider.getCollectionInfoPage(
-				new CollectionQuery());
-
-			return infoPage.getTotalCount();
+		if (!infoCollectionProviderOptional.isPresent()) {
+			return 0;
 		}
 
-		return 0;
+		InfoCollectionProvider<?> infoCollectionProvider =
+			infoCollectionProviderOptional.get();
+
+		InfoPage<?> infoPage = infoCollectionProvider.getCollectionInfoPage(
+			new CollectionQuery());
+
+		return infoPage.getTotalCount();
 	}
 
 	private final AssetListAssetEntryProvider _assetListAssetEntryProvider;
 	private final AssetListEntryLocalService _assetListEntryLocalService;
-	private final InfoItemServiceRegistry _infoItemServiceRegistry;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 	private final LiferayRenderRequest _liferayRenderRequest;
 	private final LiferayRenderResponse _liferayRenderResponse;
 	private final ThemeDisplay _themeDisplay;

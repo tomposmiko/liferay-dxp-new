@@ -33,7 +33,7 @@ const TokenGroup = ({children, className, group, title}) => {
 			)}
 
 			{children && (
-				<ClayLayout.Row className="align-items-start token-items">
+				<ClayLayout.Row className="token-items">
 					{children}
 				</ClayLayout.Row>
 			)}

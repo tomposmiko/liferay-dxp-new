@@ -28,9 +28,7 @@ function resolvePath(
 	return `${basePath}${VERSION}${ORDER_RULE_PATH}/${orderRuleId}${ORDER_RULE_ACCOUNT_GROUPS_PATH}/${orderRuleAccountGroupId}`;
 }
 
-export default function OrderRuleAccountGroup(basePath) {
-	return {
-		addOrderRuleAccountGroup: (orderRuleId, json) =>
-			AJAX.POST(resolvePath(basePath, orderRuleId), json),
-	};
-}
+export default (basePath) => ({
+	addOrderRuleAccountGroup: (orderRuleId, json) =>
+		AJAX.POST(resolvePath(basePath, orderRuleId), json),
+});

@@ -21,19 +21,19 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.knowledge.base.model.KBComment;
 import com.liferay.knowledge.base.web.internal.security.permission.resource.KBCommentPermission;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +61,9 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 		_searchContainer = searchContainer;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
-			liferayPortletRequest, liferayPortletResponse);
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+			_liferayPortletRequest, _liferayPortletResponse);
+
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -70,7 +71,7 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "deleteKBComments");
-				dropdownItem.setIcon("trash");
+				dropdownItem.setIcon("times-circle");
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "delete"));
 				dropdownItem.setQuickAction(true);
@@ -81,21 +82,23 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 	public List<String> getAvailableActions(KBComment kbComment)
 		throws PortalException {
 
+		List<String> availableActions = new ArrayList<>();
+
 		if (KBCommentPermission.contains(
 				_themeDisplay.getPermissionChecker(), kbComment,
 				ActionKeys.DELETE)) {
 
-			return Collections.singletonList("deleteKBComments");
+			availableActions.add("deleteKBComments");
 		}
 
-		return Collections.emptyList();
+		return availableActions;
 	}
 
 	public String getClearResultsURL() {
 		return PortletURLBuilder.createRenderURL(
 			_liferayPortletResponse
 		).setMVCPath(
-			"/admin/view_kb_suggestions.jsp"
+			"/admin/view_suggestions.jsp"
 		).buildString();
 	}
 
@@ -132,7 +135,7 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 						(String)null
 					).buildString());
 
-				labelItem.setDismissible(true);
+				labelItem.setCloseable(true);
 				labelItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, navigation));
 			}
@@ -152,13 +155,7 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 			_getCurrentSortingURL()
 		).setParameter(
 			"orderByType",
-			() -> {
-				if (Objects.equals(getOrderByType(), "asc")) {
-					return "desc";
-				}
-
-				return "asc";
-			}
+			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc"
 		).buildPortletURL();
 	}
 

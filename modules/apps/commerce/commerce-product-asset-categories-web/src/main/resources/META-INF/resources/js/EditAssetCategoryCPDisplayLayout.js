@@ -12,15 +12,14 @@
  * details.
  */
 
-import {getSpritemap} from '@liferay/frontend-icons-web';
 import {openSelectionModal} from 'frontend-js-web';
 
 export default function ({
 	assetCategory,
 	categorySelectorUrl,
 	itemSelectorUrl,
+	locale,
 	portletNamespace,
-	title,
 }) {
 	const displayPageItemRemove = document.getElementById(
 		`${portletNamespace}displayPageItemRemove`
@@ -114,7 +113,10 @@ export default function ({
 			'use'
 		);
 
-		use.setAttribute('href', `${getSpritemap()}#times`);
+		use.setAttribute(
+			'href',
+			`${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg#times`
+		);
 
 		svg.appendChild(use);
 		button.appendChild(svg);
@@ -138,10 +140,13 @@ export default function ({
 
 	const classPK = document.getElementById(`${portletNamespace}classPK`);
 
-	const assetCategoryId = assetCategory?.categoryId;
+	const assetCategoryId = assetCategory?.getCategoryId();
 
 	if (assetCategoryId) {
-		const categoryNode = createLabel(`category-${assetCategoryId}`, title);
+		const categoryNode = createLabel(
+			`category-${assetCategoryId}`,
+			assetCategory.getTitle(locale)
+		);
 
 		categoriesContainer?.appendChild(categoryNode);
 		classPK.value = assetCategoryId;

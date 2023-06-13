@@ -16,6 +16,7 @@ package com.liferay.calendar.model.impl;
 
 import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.model.CalendarModel;
+import com.liferay.calendar.model.CalendarSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -40,15 +41,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -183,6 +187,66 @@ public class CalendarModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static Calendar toModel(CalendarSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		Calendar model = new CalendarImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setUuid(soapModel.getUuid());
+		model.setCalendarId(soapModel.getCalendarId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setCalendarResourceId(soapModel.getCalendarResourceId());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setTimeZoneId(soapModel.getTimeZoneId());
+		model.setColor(soapModel.getColor());
+		model.setDefaultCalendar(soapModel.isDefaultCalendar());
+		model.setEnableComments(soapModel.isEnableComments());
+		model.setEnableRatings(soapModel.isEnableRatings());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<Calendar> toModels(CalendarSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<Calendar> models = new ArrayList<Calendar>(soapModels.length);
+
+		for (CalendarSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public CalendarModelImpl() {
 	}
 
@@ -258,125 +322,132 @@ public class CalendarModelImpl
 	public Map<String, Function<Calendar, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<Calendar, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, Calendar>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<Calendar, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Calendar.class.getClassLoader(), Calendar.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<Calendar, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<Calendar, Object>>();
+		try {
+			Constructor<Calendar> constructor =
+				(Constructor<Calendar>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", Calendar::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", Calendar::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", Calendar::getUuid);
-			attributeGetterFunctions.put("calendarId", Calendar::getCalendarId);
-			attributeGetterFunctions.put("groupId", Calendar::getGroupId);
-			attributeGetterFunctions.put("companyId", Calendar::getCompanyId);
-			attributeGetterFunctions.put("userId", Calendar::getUserId);
-			attributeGetterFunctions.put("userName", Calendar::getUserName);
-			attributeGetterFunctions.put("createDate", Calendar::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", Calendar::getModifiedDate);
-			attributeGetterFunctions.put(
-				"calendarResourceId", Calendar::getCalendarResourceId);
-			attributeGetterFunctions.put("name", Calendar::getName);
-			attributeGetterFunctions.put(
-				"description", Calendar::getDescription);
-			attributeGetterFunctions.put("timeZoneId", Calendar::getTimeZoneId);
-			attributeGetterFunctions.put("color", Calendar::getColor);
-			attributeGetterFunctions.put(
-				"defaultCalendar", Calendar::getDefaultCalendar);
-			attributeGetterFunctions.put(
-				"enableComments", Calendar::getEnableComments);
-			attributeGetterFunctions.put(
-				"enableRatings", Calendar::getEnableRatings);
-			attributeGetterFunctions.put(
-				"lastPublishDate", Calendar::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<Calendar, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<Calendar, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<Calendar, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<Calendar, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Calendar, Object>>();
+		Map<String, BiConsumer<Calendar, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<Calendar, ?>>();
 
-		static {
-			Map<String, BiConsumer<Calendar, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<Calendar, ?>>();
+		attributeGetterFunctions.put("mvccVersion", Calendar::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<Calendar, Long>)Calendar::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", Calendar::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<Calendar, Long>)Calendar::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", Calendar::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<Calendar, String>)Calendar::setUuid);
+		attributeGetterFunctions.put("calendarId", Calendar::getCalendarId);
+		attributeSetterBiConsumers.put(
+			"calendarId", (BiConsumer<Calendar, Long>)Calendar::setCalendarId);
+		attributeGetterFunctions.put("groupId", Calendar::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId", (BiConsumer<Calendar, Long>)Calendar::setGroupId);
+		attributeGetterFunctions.put("companyId", Calendar::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<Calendar, Long>)Calendar::setCompanyId);
+		attributeGetterFunctions.put("userId", Calendar::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<Calendar, Long>)Calendar::setUserId);
+		attributeGetterFunctions.put("userName", Calendar::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<Calendar, String>)Calendar::setUserName);
+		attributeGetterFunctions.put("createDate", Calendar::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate", (BiConsumer<Calendar, Date>)Calendar::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Calendar::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<Calendar, Date>)Calendar::setModifiedDate);
+		attributeGetterFunctions.put(
+			"calendarResourceId", Calendar::getCalendarResourceId);
+		attributeSetterBiConsumers.put(
+			"calendarResourceId",
+			(BiConsumer<Calendar, Long>)Calendar::setCalendarResourceId);
+		attributeGetterFunctions.put("name", Calendar::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<Calendar, String>)Calendar::setName);
+		attributeGetterFunctions.put("description", Calendar::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<Calendar, String>)Calendar::setDescription);
+		attributeGetterFunctions.put("timeZoneId", Calendar::getTimeZoneId);
+		attributeSetterBiConsumers.put(
+			"timeZoneId",
+			(BiConsumer<Calendar, String>)Calendar::setTimeZoneId);
+		attributeGetterFunctions.put("color", Calendar::getColor);
+		attributeSetterBiConsumers.put(
+			"color", (BiConsumer<Calendar, Integer>)Calendar::setColor);
+		attributeGetterFunctions.put(
+			"defaultCalendar", Calendar::getDefaultCalendar);
+		attributeSetterBiConsumers.put(
+			"defaultCalendar",
+			(BiConsumer<Calendar, Boolean>)Calendar::setDefaultCalendar);
+		attributeGetterFunctions.put(
+			"enableComments", Calendar::getEnableComments);
+		attributeSetterBiConsumers.put(
+			"enableComments",
+			(BiConsumer<Calendar, Boolean>)Calendar::setEnableComments);
+		attributeGetterFunctions.put(
+			"enableRatings", Calendar::getEnableRatings);
+		attributeSetterBiConsumers.put(
+			"enableRatings",
+			(BiConsumer<Calendar, Boolean>)Calendar::setEnableRatings);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Calendar::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<Calendar, Date>)Calendar::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<Calendar, Long>)Calendar::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<Calendar, Long>)Calendar::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<Calendar, String>)Calendar::setUuid);
-			attributeSetterBiConsumers.put(
-				"calendarId",
-				(BiConsumer<Calendar, Long>)Calendar::setCalendarId);
-			attributeSetterBiConsumers.put(
-				"groupId", (BiConsumer<Calendar, Long>)Calendar::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<Calendar, Long>)Calendar::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<Calendar, Long>)Calendar::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<Calendar, String>)Calendar::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<Calendar, Date>)Calendar::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<Calendar, Date>)Calendar::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"calendarResourceId",
-				(BiConsumer<Calendar, Long>)Calendar::setCalendarResourceId);
-			attributeSetterBiConsumers.put(
-				"name", (BiConsumer<Calendar, String>)Calendar::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<Calendar, String>)Calendar::setDescription);
-			attributeSetterBiConsumers.put(
-				"timeZoneId",
-				(BiConsumer<Calendar, String>)Calendar::setTimeZoneId);
-			attributeSetterBiConsumers.put(
-				"color", (BiConsumer<Calendar, Integer>)Calendar::setColor);
-			attributeSetterBiConsumers.put(
-				"defaultCalendar",
-				(BiConsumer<Calendar, Boolean>)Calendar::setDefaultCalendar);
-			attributeSetterBiConsumers.put(
-				"enableComments",
-				(BiConsumer<Calendar, Boolean>)Calendar::setEnableComments);
-			attributeSetterBiConsumers.put(
-				"enableRatings",
-				(BiConsumer<Calendar, Boolean>)Calendar::setEnableRatings);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<Calendar, Date>)Calendar::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1384,12 +1455,41 @@ public class CalendarModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<Calendar, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<Calendar, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<Calendar, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((Calendar)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Calendar>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Calendar.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1419,9 +1519,8 @@ public class CalendarModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<Calendar, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<Calendar, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

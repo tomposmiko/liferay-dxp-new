@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.trash.TrashHelper;
 
 import java.util.Locale;
+import java.util.function.IntFunction;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pedro Queiroz
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.DOCUMENT_LIBRARY,
 	service = {
 		DDMFormFieldValueAccessor.class,
@@ -47,8 +49,8 @@ public class DocumentLibraryDDMFormFieldValueAccessor
 	implements DDMFormFieldValueAccessor<JSONObject> {
 
 	@Override
-	public JSONObject[] getArrayGenericType() {
-		return new JSONObject[0];
+	public IntFunction<JSONObject[]> getArrayGeneratorIntFunction() {
+		return JSONObject[]::new;
 	}
 
 	@Override
@@ -117,7 +119,7 @@ public class DocumentLibraryDDMFormFieldValueAccessor
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to get file entry", portalException);
+				_log.debug("Unable to retrieve file entry ", portalException);
 			}
 
 			return null;

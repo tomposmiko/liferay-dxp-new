@@ -17,204 +17,257 @@
 <%@ include file="/init.jsp" %>
 
 <%
+String backURL = ParamUtil.getString(request, "backURL", String.valueOf(renderResponse.createRenderURL()));
+
 long batchPlannerPlanId = ParamUtil.getLong(renderRequest, "batchPlannerPlanId");
 
-boolean editable = ParamUtil.getBoolean(renderRequest, "editable");
+BatchPlannerPlan batchPlannerPlan = BatchPlannerPlanServiceUtil.fetchBatchPlannerPlan(batchPlannerPlanId);
 
-EditBatchPlannerPlanDisplayContext editBatchPlannerPlanDisplayContext = (EditBatchPlannerPlanDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-
-portletDisplay.setShowBackIcon(true);
-portletDisplay.setURLBack(ParamUtil.getString(request, "backURL", String.valueOf(renderResponse.createRenderURL())));
-
-renderResponse.setTitle(editable ? LanguageUtil.get(request, "edit-template") : LanguageUtil.get(request, "import"));
+renderResponse.setTitle((batchPlannerPlan == null) ? LanguageUtil.get(request, "add") : LanguageUtil.get(request, "edit"));
 %>
 
-<clay:container
-	cssClass="container pt-4"
->
-	<form id="<portlet:namespace />fm" name="<portlet:namespace />fm">
-		<input id="<portlet:namespace />batchPlannerPlanId" name="<portlet:namespace />batchPlannerPlanId" type="hidden" value="<%= batchPlannerPlanId %>" />
-		<input id="<portlet:namespace />externalType" name="<portlet:namespace />externalType" type="hidden" value="" />
+<portlet:actionURL name="/batch_planner/edit_import_batch_planner_plan" var="editBatchPlannerPlanURL" />
 
-		<div class="row">
-			<div class="col-lg-6 d-flex flex-column">
-				<div class="card flex-fill">
-					<h4 class="card-header"><liferay-ui:message key="import-settings" /></h4>
+<div class="container pt-4">
+	<liferay-frontend:edit-form
+		action="<%= editBatchPlannerPlanURL %>"
+	>
+		<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (batchPlannerPlanId == 0) ? Constants.ADD : Constants.UPDATE %>" />
+		<aui:input name="redirect" type="hidden" value="<%= backURL %>" />
+		<aui:input name="batchPlannerPlanId" type="hidden" value="<%= batchPlannerPlanId %>" />
 
-					<div class="card-body">
-						<liferay-frontend:edit-form-body>
-							<aui:input name="name" />
+		<div class="card">
+			<h4 class="card-header"><%= LanguageUtil.get(request, "import-settings") %></h4>
 
-							<clay:row>
-								<clay:col
-									md="6"
-								>
-									<div id="<portlet:namespace />templateSelect"></div>
-								</clay:col>
+			<div class="card-body">
+				<liferay-frontend:edit-form-body>
+					<aui:input bean="<%= batchPlannerPlan %>" model="<%= BatchPlannerPlan.class %>" name="name" />
 
-								<clay:col
-									md="6"
-								>
-									<clay:select
-										id='<%= liferayPortletResponse.getNamespace() + "internalClassName" %>'
-										label='<%= LanguageUtil.get(request, "entity-type") %>'
-										name="internalClassName"
-										options="<%= editBatchPlannerPlanDisplayContext.getInternalClassNameSelectOptions() %>"
-									/>
-								</clay:col>
-							</clay:row>
+					<aui:select bean="<%= batchPlannerPlan %>" model="<%= BatchPlannerPlan.class %>" name="externalType">
+						<aui:option label="CSV" value="CSV" />
+						<aui:option label="TXT" value="TXT" />
+						<aui:option label="XLS" value="XLS" />
+						<aui:option label="XML" value="XML" />
+					</aui:select>
 
-							<clay:row>
-								<clay:col>
-									<react:component
-										module="js/components/Scope"
-									/>
-								</clay:col>
-							</clay:row>
+					<aui:input name="importFile" required="<%= true %>" type="file" />
 
-							<clay:alert
-								cssClass="hide"
-								displayType="info"
-								id='<%= liferayPortletResponse.getNamespace() + "downloadTemplateAlert" %>'
-								title="download-a-sample-file-for-this-entity"
+					<%
+					EditBatchPlannerPlanDisplayContext editBatchPlannerPlanDisplayContext = (EditBatchPlannerPlanDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+					%>
+
+					<clay:row>
+						<clay:col
+							md="6"
+						>
+							<clay:select
+								id='<%= liferayPortletResponse.getNamespace() + "headlessEndpoint" %>'
+								label="headless-endpoint"
+								name="headlessEndpoint"
+								options="<%= editBatchPlannerPlanDisplayContext.getSelectOptions() %>"
+							/>
+						</clay:col>
+
+						<clay:col
+							md="6"
+						>
+							<clay:select
+								disabled="<%= true %>"
+								id='<%= liferayPortletResponse.getNamespace() + "internalClassName" %>'
+								label="internal-class-name"
+								name="internalClassName"
+								options="<%= editBatchPlannerPlanDisplayContext.getSelectOptions() %>"
+							/>
+						</clay:col>
+					</clay:row>
+
+					<clay:content-section>
+						<clay:row>
+							<clay:col
+								md="6"
 							>
-								<clay:link
-									cssClass="link-primary single-link"
-									href="#"
-									id='<%= liferayPortletResponse.getNamespace() + "downloadBatchPlannerPlanTemplate" %>'
-									label="download"
-								/>
-
-								<liferay-frontend:component
-									context='<%=
-										HashMapBuilder.<String, Object>put(
-											"HTMLElementId", liferayPortletResponse.getNamespace() + "downloadBatchPlannerPlanTemplate"
-										).put(
-											"type", "batchPlannerTemplate"
-										).build()
-									%>'
-									module="js/DownloadHelper"
-								/>
-							</clay:alert>
-
-							<c:if test='<%= FeatureFlagManagerUtil.isEnabled("LPS-173135") %>'>
-								<div class="mt-2">
-									<clay:checkbox
-										checked="<%= false %>"
-										disabled="<%= true %>"
-										id='<%= liferayPortletResponse.getNamespace() + "detectCategoryNames" %>'
-										label='<%= LanguageUtil.get(request, "detect-category-names-from-CSV-file") %>'
-										name='<%= liferayPortletResponse.getNamespace() + "detectCategoryNames" %>'
-									/>
-								</div>
-							</c:if>
-
-							<div class="mt-2">
 								<clay:checkbox
 									checked="<%= true %>"
-									id='<%= liferayPortletResponse.getNamespace() + "onErrorFail" %>'
-									label='<%= LanguageUtil.get(request, "stop-the-import-on-error") %>'
-									name='<%= liferayPortletResponse.getNamespace() + "onErrorFail" %>'
+									id='<%= liferayPortletResponse.getNamespace() + "containsHeaders" %>'
+									label="contains-headers"
+									name='<%= liferayPortletResponse.getNamespace() + "containsHeaders" %>'
 								/>
-							</div>
-
-							<clay:row>
-								<clay:col>
-									<react:component
-										module="js/components/Strategies"
-									/>
-								</clay:col>
-							</clay:row>
-						</liferay-frontend:edit-form-body>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-lg-6 d-flex flex-column">
-				<div class="card flex-fill">
-					<h4 class="card-header"><liferay-ui:message key="file-settings" /></h4>
-
-					<div class="card-body">
-						<liferay-frontend:edit-form-body>
-							<div id="<portlet:namespace />fileSettings"></div>
-
-							<div class="form-group">
-								<clay:radio
-									checked="<%= true %>"
-									label='<%= LanguageUtil.get(request, "upload-a-file-from-my-computer") %>'
-									name="selectFile"
-									value="computer"
-								/>
-
-								<clay:radio
-									disabled="<%= true %>"
-									label='<%= LanguageUtil.get(request, "use-a-file-already-on-the-server") %>'
-									name="selectFile"
-									value="server"
-								/>
-							</div>
-
-							<div id="<portlet:namespace />fileUpload">
-								<react:component
-									module="js/components/FileUpload"
-								/>
-							</div>
-						</liferay-frontend:edit-form-body>
-					</div>
-				</div>
+							</clay:col>
+						</clay:row>
+					</clay:content-section>
+				</liferay-frontend:edit-form-body>
 			</div>
 		</div>
 
-		<span>
-			<react:component
-				module="js/import/ImportForm"
-				props='<%=
-					HashMapBuilder.<String, Object>put(
-						"formDataQuerySelector", "#" + liferayPortletResponse.getNamespace() + "fm"
-					).put(
-						"formImportURL",
-						ResourceURLBuilder.createResourceURL(
-							renderResponse
-						).setCMD(
-							Constants.IMPORT
-						).setResourceID(
-							"/batch_planner/submit_batch_planner_plan"
-						).buildString()
-					).put(
-						"formSaveAsTemplateURL",
-						ActionURLBuilder.createActionURL(
-							renderResponse
-						).setActionName(
-							"/batch_planner/edit_import_batch_planner_plan_template"
-						).setCMD(
-							Constants.ADD
-						).setParameter(
-							"template", true
-						).buildString()
-					).put(
-						"mappedFields", editBatchPlannerPlanDisplayContext.getSelectedBatchPlannerPlanMappings()
-					).build()
-				%>'
-			/>
-		</span>
-	</form>
-</clay:container>
+		<div class="card hide">
+			<h4 class="card-header"><%= LanguageUtil.get(request, "import-mappings") %></h4>
 
-<liferay-frontend:component
-	context='<%=
-		HashMapBuilder.<String, Object>put(
-			"initialTemplateClassName", editBatchPlannerPlanDisplayContext.getSelectedInternalClassName()
-		).put(
-			"initialTemplateMapping", editBatchPlannerPlanDisplayContext.getSelectedBatchPlannerPlanMappings()
-		).put(
-			"isExport", false
-		).put(
-			"templatesOptions", editBatchPlannerPlanDisplayContext.getTemplateSelectOptions()
-		).build()
-	%>'
-	module="js/edit_batch_planner_plan"
-/>
+			<div class="card-body">
+				<liferay-frontend:edit-form-body>
+					<clay:content-section>
+						<clay:row
+							cssClass="plan-mappings"
+						>
 
-<liferay-frontend:component
-	module="js/show_upload_input"
-/>
+						</clay:row>
+
+						<clay:row
+							cssClass="hide plan-mappings-template"
+						>
+							<clay:col
+								md="6"
+							>
+								<aui:input name="externalFieldName_ID_TEMPLATE" value="" />
+							</clay:col>
+
+							<clay:col
+								md="6"
+							>
+								<aui:input name="internalFieldName_ID_TEMPLATE" value="VALUE_TEMPLATE" />
+							</clay:col>
+						</clay:row>
+					</clay:content-section>
+				</liferay-frontend:edit-form-body>
+			</div>
+		</div>
+
+		<div class="mt-4">
+			<liferay-frontend:edit-form-footer>
+				<aui:button name="save" type="submit" value="import" />
+
+				<aui:button href="<%= backURL %>" type="cancel" />
+			</liferay-frontend:edit-form-footer>
+		</div>
+	</liferay-frontend:edit-form>
+</div>
+
+<aui:script use="aui-io-request,aui-parse-content">
+	A.one('#<portlet:namespace />headlessEndpoint').on('change', function (event) {
+		this.attr('disabled', true);
+
+		var openapiDiscoveryURL = A.one(
+			'#<portlet:namespace />headlessEndpoint'
+		).val();
+
+		Liferay.Util.fetch(openapiDiscoveryURL, {
+			method: 'GET',
+			credentials: 'include',
+			headers: [
+				['content-type', 'application/json'],
+				['x-csrf-token', window.Liferay.authToken],
+			],
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error(`Failed to fetch: '${openapiDiscoveryURL}'`);
+				}
+
+				return response.json();
+			})
+			.then((jsonResponse) => {
+				var internalClassName = A.one(
+					'#<portlet:namespace />internalClassName'
+				);
+
+				internalClassName.empty();
+
+				let schemas = jsonResponse.components.schemas;
+
+				for (key in schemas) {
+					let properties = schemas[key].properties;
+
+					if (!properties || !properties['x-class-name']) {
+						continue;
+					}
+
+					let xClassName = properties['x-class-name'];
+
+					internalClassName.appendChild(
+						'<option value="' +
+							xClassName.default +
+							'">' +
+							key +
+							'</option>'
+					);
+				}
+
+				<portlet:namespace />renderMappings();
+
+				internalClassName.attr('disabled', false);
+			})
+			.catch((response) => {
+				alert('FETCH failed ' + response);
+			})
+			.then(() => {
+				A.one('#<portlet:namespace />headlessEndpoint').attr(
+					'disabled',
+					false
+				);
+			});
+	});
+
+	A.one('#<portlet:namespace />internalClassName').on('change', function (event) {
+		this.attr('disabled', true);
+
+		<portlet:namespace />renderMappings();
+
+		this.attr('disabled', false);
+	});
+
+	function <portlet:namespace />renderMappings() {
+		var openAPIURL = A.one('#<portlet:namespace />headlessEndpoint').val();
+
+		var internalClassName = A.one(
+			'#<portlet:namespace />internalClassName'
+		).val();
+
+		internalClassName = internalClassName.substr(
+			internalClassName.lastIndexOf('.') + 1
+		);
+
+		Liferay.Util.fetch(openAPIURL, {
+			method: 'GET',
+			credentials: 'include',
+			headers: [
+				['content-type', 'application/json'],
+				['x-csrf-token', window.Liferay.authToken],
+			],
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error(`Failed to fetch: '${openAPIURL}'`);
+				}
+
+				return response.json();
+			})
+			.then((jsonResponse) => {
+				let schemas = jsonResponse.components.schemas;
+
+				let schemaEntry = schemas[internalClassName];
+
+				var mappingArea = A.one('.plan-mappings');
+				var mappingRowTemplate = A.one(
+					'.plan-mappings-template'
+				).getContent();
+
+				mappingArea.empty();
+
+				let curId = 1;
+
+				for (key in schemaEntry.properties) {
+					let mappingRow = mappingRowTemplate
+						.replaceAll('ID_TEMPLATE', curId)
+						.replace('VALUE_TEMPLATE', key);
+
+					mappingArea.append(mappingRow);
+
+					curId++;
+				}
+
+				mappingArea.ancestor('.card').removeClass('hide');
+			})
+			.catch((response) => {
+				alert('FETCH failed ' + response);
+			});
+	}
+</aui:script>

@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.frontend.taglib.servlet.taglib;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
@@ -24,6 +24,7 @@ import com.liferay.commerce.frontend.taglib.internal.model.WorkflowStatusModel;
 import com.liferay.commerce.frontend.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.service.CommerceOrderTypeLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -32,7 +33,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -46,71 +46,12 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
 /**
  * @author Fabio Diego Mastrorilli
  */
 public class AccountSelectorTag extends IncludeTag {
-
-	@Override
-	public int doStartTag() throws JspException {
-		try {
-			HttpServletRequest httpServletRequest = getRequest();
-
-			CommerceContext commerceContext =
-				(CommerceContext)httpServletRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT);
-
-			_commerceChannelId = commerceContext.getCommerceChannelId();
-
-			if (_commerceChannelId == 0) {
-				_accountEntryAllowedTypes = new String[0];
-				_addCommerceOrderURL = StringPool.BLANK;
-				_editOrderURL = StringPool.BLANK;
-				_setCurrentAccountURL = StringPool.BLANK;
-
-				return super.doStartTag();
-			}
-
-			_accountEntryAllowedTypes =
-				commerceContext.getAccountEntryAllowedTypes();
-
-			_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-			_addCommerceOrderURL = _getAddCommerceOrderURL(
-				_themeDisplay, httpServletRequest);
-
-			_accountEntry = commerceContext.getAccountEntry();
-			_commerceOrder = commerceContext.getCommerceOrder();
-			_editOrderURL = _getEditOrderURL(_themeDisplay);
-			_setCurrentAccountURL =
-				PortalUtil.getPortalURL(httpServletRequest) +
-					PortalUtil.getPathContext() +
-						"/o/commerce-ui/set-current-account";
-
-			if (Validator.isNull(_spritemap)) {
-				_spritemap = _themeDisplay.getPathThemeSpritemap();
-			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-
-			_accountEntry = null;
-			_accountEntryAllowedTypes = null;
-			_addCommerceOrderURL = null;
-			_commerceChannelId = 0;
-			_commerceOrder = null;
-			_editOrderURL = null;
-			_setCurrentAccountURL = null;
-			_spritemap = null;
-			_themeDisplay = null;
-		}
-
-		return super.doStartTag();
-	}
 
 	public String getSpritemap() {
 		return _spritemap;
@@ -134,16 +75,8 @@ public class AccountSelectorTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
-		_accountEntry = null;
-		_accountEntryAllowedTypes = null;
-		_addCommerceOrderURL = null;
-		_commerceChannelId = 0;
-		_commerceOrder = null;
 		_commerceOrderTypeLocalService = null;
-		_editOrderURL = null;
-		_setCurrentAccountURL = null;
 		_spritemap = null;
-		_themeDisplay = null;
 	}
 
 	@Override
@@ -153,67 +86,102 @@ public class AccountSelectorTag extends IncludeTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
-		httpServletRequest.setAttribute(
-			"liferay-commerce:account-selector:accountEntryAllowedTypes",
-			_accountEntryAllowedTypes);
-		httpServletRequest.setAttribute(
-			"liferay-commerce:account-selector:commerceChannelId",
-			_commerceChannelId);
+		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
-		if (_accountEntry != null) {
-			String thumbnailUrl = null;
-
-			if (_accountEntry.getLogoId() == 0) {
-				thumbnailUrl =
-					_themeDisplay.getPathImage() +
-						"/organization_logo?img_id=0";
-			}
-			else {
-				thumbnailUrl = StringBundler.concat(
-					_themeDisplay.getPathImage(), "/organization_logo?img_id=",
-					_accountEntry.getLogoId(), "&t=",
-					WebServerServletTokenUtil.getToken(
-						_accountEntry.getLogoId()));
+			if (Validator.isNull(_spritemap)) {
+				_spritemap =
+					themeDisplay.getPathThemeImages() + "/clay/icons.svg";
 			}
 
-			CurrentCommerceAccountModel currentCommerceAccountModel =
-				new CurrentCommerceAccountModel(
-					_accountEntry.getAccountEntryId(), thumbnailUrl,
-					_accountEntry.getName());
+			HttpServletRequest parentHttpServletRequest = getRequest();
+
+			CommerceContext commerceContext =
+				(CommerceContext)parentHttpServletRequest.getAttribute(
+					CommerceWebKeys.COMMERCE_CONTEXT);
 
 			httpServletRequest.setAttribute(
-				"liferay-commerce:account-selector:currentCommerceAccount",
-				currentCommerceAccountModel);
-		}
+				"liferay-commerce:account-selector:accountEntryAllowedTypes",
+				commerceContext.getAccountEntryAllowedTypes());
+			httpServletRequest.setAttribute(
+				"liferay-commerce:account-selector:commerceChannelId",
+				commerceContext.getCommerceChannelId());
 
-		if (_commerceOrder != null) {
-			String workflowStatusInfoLabel = WorkflowConstants.getStatusLabel(
-				_commerceOrder.getStatus());
+			CommerceAccount commerceAccount =
+				commerceContext.getCommerceAccount();
 
-			WorkflowStatusModel workflowStatusModel = new WorkflowStatusModel(
-				_commerceOrder.getStatus(), workflowStatusInfoLabel,
-				LanguageUtil.get(
-					_themeDisplay.getLocale(), workflowStatusInfoLabel));
+			if (commerceAccount != null) {
+				String thumbnailUrl = null;
 
-			CurrentCommerceOrderModel currentCommerceOrderModel =
-				new CurrentCommerceOrderModel(
-					_commerceOrder.getCommerceOrderId(), workflowStatusModel);
+				if (commerceAccount.getLogoId() == 0) {
+					thumbnailUrl =
+						themeDisplay.getPathImage() +
+							"/organization_logo?img_id=0";
+				}
+				else {
+					thumbnailUrl = StringBundler.concat(
+						themeDisplay.getPathImage(),
+						"/organization_logo?img_id=",
+						commerceAccount.getLogoId(), "&t=",
+						WebServerServletTokenUtil.getToken(
+							commerceAccount.getLogoId()));
+				}
+
+				CurrentCommerceAccountModel currentCommerceAccountModel =
+					new CurrentCommerceAccountModel(
+						commerceAccount.getCommerceAccountId(), thumbnailUrl,
+						commerceAccount.getName());
+
+				httpServletRequest.setAttribute(
+					"liferay-commerce:account-selector:currentCommerceAccount",
+					currentCommerceAccountModel);
+			}
+
+			CommerceOrder commerceOrder = commerceContext.getCommerceOrder();
+
+			if (commerceOrder != null) {
+				String workflowStatusInfoLabel =
+					WorkflowConstants.getStatusLabel(commerceOrder.getStatus());
+
+				WorkflowStatusModel workflowStatusModel =
+					new WorkflowStatusModel(
+						commerceOrder.getStatus(), workflowStatusInfoLabel,
+						LanguageUtil.get(
+							themeDisplay.getLocale(), workflowStatusInfoLabel));
+
+				CurrentCommerceOrderModel currentCommerceOrderModel =
+					new CurrentCommerceOrderModel(
+						commerceOrder.getCommerceOrderId(),
+						workflowStatusModel);
+
+				httpServletRequest.setAttribute(
+					"liferay-commerce:account-selector:currentCommerceOrder",
+					currentCommerceOrderModel);
+			}
 
 			httpServletRequest.setAttribute(
-				"liferay-commerce:account-selector:currentCommerceOrder",
-				currentCommerceOrderModel);
-		}
+				"liferay-commerce:account-selector:createNewOrderURL",
+				_getAddCommerceOrderURL(themeDisplay, httpServletRequest));
+			httpServletRequest.setAttribute(
+				"liferay-commerce:account-selector:selectOrderURL",
+				_getEditOrderURL(themeDisplay));
 
-		httpServletRequest.setAttribute(
-			"liferay-commerce:account-selector:createNewOrderURL",
-			_addCommerceOrderURL);
-		httpServletRequest.setAttribute(
-			"liferay-commerce:account-selector:selectOrderURL", _editOrderURL);
-		httpServletRequest.setAttribute(
-			"liferay-commerce:account-selector:setCurrentAccountURL",
-			_setCurrentAccountURL);
-		httpServletRequest.setAttribute(
-			"liferay-commerce:account-selector:spritemap", _spritemap);
+			String setCurrentAccountURL =
+				PortalUtil.getPortalURL(parentHttpServletRequest) +
+					"/o/commerce-ui/set-current-account";
+
+			httpServletRequest.setAttribute(
+				"liferay-commerce:account-selector:setCurrentAccountURL",
+				setCurrentAccountURL);
+
+			httpServletRequest.setAttribute(
+				"liferay-commerce:account-selector:spritemap", _spritemap);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+		}
 	}
 
 	private String _getAddCommerceOrderURL(
@@ -221,8 +189,7 @@ public class AccountSelectorTag extends IncludeTag {
 		throws PortalException {
 
 		int commerceOrderTypesCount =
-			_commerceOrderTypeLocalService.getCommerceOrderTypesCount(
-				themeDisplay.getCompanyId(), true);
+			_commerceOrderTypeLocalService.getCommerceOrderTypesCount();
 
 		if (commerceOrderTypesCount > 1) {
 			httpServletRequest.setAttribute(
@@ -310,15 +277,7 @@ public class AccountSelectorTag extends IncludeTag {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AccountSelectorTag.class);
 
-	private AccountEntry _accountEntry;
-	private String[] _accountEntryAllowedTypes;
-	private String _addCommerceOrderURL;
-	private long _commerceChannelId;
-	private CommerceOrder _commerceOrder;
 	private CommerceOrderTypeLocalService _commerceOrderTypeLocalService;
-	private String _editOrderURL;
-	private String _setCurrentAccountURL;
 	private String _spritemap;
-	private ThemeDisplay _themeDisplay;
 
 }

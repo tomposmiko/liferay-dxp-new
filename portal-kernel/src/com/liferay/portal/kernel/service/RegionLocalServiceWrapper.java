@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class RegionLocalServiceWrapper
 	implements RegionLocalService, ServiceWrapper<RegionLocalService> {
 
-	public RegionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public RegionLocalServiceWrapper(RegionLocalService regionLocalService) {
 		_regionLocalService = regionLocalService;
 	}
@@ -439,22 +435,6 @@ public class RegionLocalServiceWrapper
 	@Override
 	public int getRegionsCount(long countryId, boolean active) {
 		return _regionLocalService.getRegionsCount(countryId, active);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.search.BaseModelSearchResult
-		<com.liferay.portal.kernel.model.Region> searchRegions(
-				long companyId, java.lang.Boolean active,
-				java.lang.String keywords,
-				java.util.LinkedHashMap<java.lang.String, java.lang.Object>
-					params,
-				int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.portal.kernel.model.Region> orderByComparator)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _regionLocalService.searchRegions(
-			companyId, active, keywords, params, start, end, orderByComparator);
 	}
 
 	@Override

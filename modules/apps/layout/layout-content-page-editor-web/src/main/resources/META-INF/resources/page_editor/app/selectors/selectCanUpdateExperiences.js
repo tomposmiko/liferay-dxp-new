@@ -12,11 +12,9 @@
  * details.
  */
 
-import selectHasAnyUpdatePermission from './selectHasAnyUpdatePermission';
-
 /**
  * @param {{ permissions: import("../../types/ActionKeys").ActionKeysMap }} state
  */
 export default function selectCanUpdateExperiences({permissions}) {
-	return selectHasAnyUpdatePermission({permissions});
+	return permissions.UPDATE || permissions.UPDATE_LAYOUT_CONTENT;
 }

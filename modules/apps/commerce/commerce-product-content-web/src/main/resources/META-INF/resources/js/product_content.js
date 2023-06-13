@@ -15,15 +15,15 @@
 AUI.add(
 	'liferay-commerce-product-content',
 	(A) => {
-		const CP_CONTENT_WEB_PORTLET_KEY =
+		var CP_CONTENT_WEB_PORTLET_KEY =
 			'com_liferay_commerce_product_content_web_internal_portlet_CPContentPortlet';
 
-		const CP_INSTANCE_CHANGE_EVENT = 'CPInstance:change';
+		var CP_INSTANCE_CHANGE_EVENT = 'CPInstance:change';
 
-		const DDM_FORM_HANDLER_MODULE =
+		var DDM_FORM_HANDLER_MODULE =
 			'commerce-frontend-js/utilities/forms/DDMFormHandler';
 
-		const ProductContent = A.Component.create({
+		var ProductContent = A.Component.create({
 			ATTRS: {
 				checkCPInstanceActionURL: {},
 				cpDefinitionId: {},
@@ -42,17 +42,17 @@ AUI.add(
 
 			prototype: {
 				_bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const eventHandles = [];
+					var eventHandles = [];
 
-					const checkCPInstanceActionURL = instance.get(
+					var checkCPInstanceActionURL = instance.get(
 						'checkCPInstanceActionURL'
 					);
 
-					const cpDefinitionId = instance.get('cpDefinitionId');
+					var cpDefinitionId = instance.get('cpDefinitionId');
 
-					const DDMFormInstance = Liferay.component(
+					var DDMFormInstance = Liferay.component(
 						'ProductOptions' + cpDefinitionId
 					);
 
@@ -60,9 +60,9 @@ AUI.add(
 						Liferay.Loader.require(
 							DDM_FORM_HANDLER_MODULE,
 							(module) => {
-								const DDMFormHandler = module.default;
+								var DDMFormHandler = module.default;
 
-								const FormHandlerConfiguration = {
+								var FormHandlerConfiguration = {
 									DDMFormInstance,
 									actionURL: checkCPInstanceActionURL,
 									addToCartId: 'addToCartId',
@@ -85,13 +85,13 @@ AUI.add(
 					instance._eventHandles = eventHandles;
 				},
 				_ddmFormChange(dispatchedPayload) {
-					const instance = this;
+					var instance = this;
 
-					const cpDefinitionId = instance.get('cpDefinitionId');
+					var cpDefinitionId = instance.get('cpDefinitionId');
 
-					const cpInstance = dispatchedPayload.cpInstance;
+					var cpInstance = dispatchedPayload.cpInstance;
 
-					const ddmFormValues = dispatchedPayload.formFields;
+					var ddmFormValues = dispatchedPayload.formFields;
 
 					instance.set('cpInstanceId', cpInstance.cpInstanceId);
 
@@ -108,80 +108,80 @@ AUI.add(
 					);
 				},
 				_getThumbsContainer() {
-					const instance = this;
+					var instance = this;
 
 					return A.one(instance.get('thumbsContainerSelector'));
 				},
 				_renderCPInstance(cpInstance) {
-					const instance = this;
+					var instance = this;
 
-					const productContent = instance.getProductContent();
+					var productContent = instance.getProductContent();
 
-					const skus = productContent.all(
+					var skus = productContent.all(
 						'[data-text-cp-instance-sku]'
 					);
-					const prices = productContent.all(
+					var prices = productContent.all(
 						'[data-text-cp-instance-price]'
 					);
-					const subscriptionInfo = productContent.all(
+					var subscriptionInfo = productContent.all(
 						'[data-text-cp-instance-subscription-info]'
 					);
-					const deliverySubscriptionInfo = productContent.all(
+					var deliverySubscriptionInfo = productContent.all(
 						'[data-text-cp-instance-delivery-subscription-info]'
 					);
-					const availabilities = productContent.all(
+					var availabilities = productContent.all(
 						'[data-text-cp-instance-availability]'
 					);
-					const availabilityEstimates = productContent.all(
+					var availabilityEstimates = productContent.all(
 						'[data-text-cp-instance-availability-estimate]'
 					);
-					const stockQuantities = productContent.all(
+					var stockQuantities = productContent.all(
 						'[data-text-cp-instance-stock-quantity]'
 					);
-					const gtins = productContent.all(
+					var gtins = productContent.all(
 						'[data-text-cp-instance-gtin]'
 					);
-					const manufacturerPartNumbers = productContent.all(
+					var manufacturerPartNumbers = productContent.all(
 						'[data-text-cp-instance-manufacturer-part-number]'
 					);
-					const sampleFiles = productContent.all(
+					var sampleFiles = productContent.all(
 						'[data-text-cp-instance-sample-file]'
 					);
 
-					const skusShow = productContent
+					var skusShow = productContent
 						.all('[data-text-cp-instance-sku-show]')
 						.hide();
-					const pricesShow = productContent
+					var pricesShow = productContent
 						.all('[data-text-cp-instance-price-show]')
 						.hide();
-					const subscriptionInfoShow = productContent
+					var subscriptionInfoShow = productContent
 						.all('[data-text-cp-instance-subscription-info-show]')
 						.hide();
-					const deliverySubscriptionInfoShow = productContent
+					var deliverySubscriptionInfoShow = productContent
 						.all(
 							'[data-text-cp-instance-delivery-subscription-info-show]'
 						)
 						.hide();
-					const availabilitiesShow = productContent
+					var availabilitiesShow = productContent
 						.all('[data-text-cp-instance-availability-show]')
 						.hide();
-					const availabilityEstimatesShow = productContent
+					var availabilityEstimatesShow = productContent
 						.all(
 							'[data-text-cp-instance-availability-estimate-show]'
 						)
 						.hide();
-					const stockQuantitiesShow = productContent
+					var stockQuantitiesShow = productContent
 						.all('[data-text-cp-instance-stock-quantity-show]')
 						.hide();
-					const gtinsShow = productContent
+					var gtinsShow = productContent
 						.all('[data-text-cp-instance-gtin-show]')
 						.hide();
-					const manufacturerPartNumbersShow = productContent
+					var manufacturerPartNumbersShow = productContent
 						.all(
 							'[data-text-cp-instance-manufacturer-part-number-show]'
 						)
 						.hide();
-					const sampleFilesShow = productContent
+					var sampleFilesShow = productContent
 						.all('[data-text-cp-instance-sample-file-show]')
 						.hide();
 
@@ -196,60 +196,48 @@ AUI.add(
 					}
 
 					if (cpInstance.subscriptionInfo) {
-						subscriptionInfo.setHTML(
-							Liferay.Util.escape(cpInstance.subscriptionInfo)
-						);
+						subscriptionInfo.setHTML(cpInstance.subscriptionInfo);
 						subscriptionInfoShow.show();
 					}
 
 					if (cpInstance.deliverySubscriptionInfo) {
 						deliverySubscriptionInfo.setHTML(
-							Liferay.Util.escape(
-								cpInstance.deliverySubscriptionInfo
-							)
+							cpInstance.deliverySubscriptionInfo
 						);
 						deliverySubscriptionInfoShow.show();
 					}
 
 					if (cpInstance.gtin) {
-						gtins.setHTML(Liferay.Util.escape(cpInstance.gtin));
+						gtins.setHTML(cpInstance.gtin);
 						gtinsShow.show();
 					}
 
 					if (cpInstance.manufacturerPartNumber) {
 						manufacturerPartNumbers.setHTML(
-							Liferay.Util.escape(
-								cpInstance.manufacturerPartNumber
-							)
+							cpInstance.manufacturerPartNumber
 						);
 						manufacturerPartNumbersShow.show();
 					}
 
 					if (cpInstance.availability) {
-						availabilities.setHTML(
-							Liferay.Util.escape(cpInstance.availability)
-						);
+						availabilities.setHTML(cpInstance.availability);
 						availabilitiesShow.show();
 					}
 
 					if (cpInstance.availabilityEstimate) {
 						availabilityEstimates.setHTML(
-							Liferay.Util.escape(cpInstance.availabilityEstimate)
+							cpInstance.availabilityEstimate
 						);
 						availabilityEstimatesShow.show();
 					}
 
 					if (cpInstance.stockQuantity) {
-						stockQuantities.setHTML(
-							Liferay.Util.escape(cpInstance.stockQuantity)
-						);
+						stockQuantities.setHTML(cpInstance.stockQuantity);
 						stockQuantitiesShow.show();
 					}
 
 					if (cpInstance.sampleFile) {
-						sampleFiles.setHTML(
-							Liferay.Util.escape(cpInstance.sampleFile)
-						);
+						sampleFiles.setHTML(cpInstance.sampleFile);
 						sampleFilesShow.show();
 					}
 
@@ -261,23 +249,22 @@ AUI.add(
 					});
 				},
 				_renderImages() {
-					const instance = this;
+					var instance = this;
 
-					const ddmFormValues = instance.get('ddmFormValues');
+					var ddmFormValues = instance.get('ddmFormValues');
 
-					const data = {};
+					var data = {};
 
 					data[
 						instance.get('namespace') + 'ddmFormValues'
 					] = JSON.stringify(ddmFormValues);
 					data.groupId = themeDisplay.getScopeGroupId();
 
-					// eslint-disable-next-line @liferay/aui/no-io
 					A.io.request(instance.get('viewAttachmentURL'), {
 						data,
 						on: {
 							success(event, id, object) {
-								const response = JSON.parse(object.response);
+								var response = JSON.parse(object.response);
 
 								instance._renderThumbsImages(response);
 							},
@@ -285,20 +272,20 @@ AUI.add(
 					});
 				},
 				_renderThumbsImages(images) {
-					const instance = this;
+					var instance = this;
 
-					const thumbsContainer = instance._getThumbsContainer();
+					var thumbsContainer = instance._getThumbsContainer();
 
 					thumbsContainer.setHTML('');
 
 					images.forEach((image) => {
-						const thumbContainer = A.Node.create(
+						var thumbContainer = A.Node.create(
 							'<div class="thumb" />'
 						);
 
 						thumbContainer.setAttribute('data-url', image.url);
 
-						const imageNode = A.Node.create(
+						var imageNode = A.Node.create(
 							'<img class="img-fluid" />'
 						);
 
@@ -309,8 +296,8 @@ AUI.add(
 						thumbContainer.appendTo(thumbsContainer);
 					});
 
-					if (images.length) {
-						const fullImage = A.one(
+					if (images.length > 0) {
+						var fullImage = A.one(
 							instance.get('fullImageSelector')
 						);
 
@@ -318,9 +305,9 @@ AUI.add(
 					}
 				},
 				_renderUI() {
-					const instance = this;
+					var instance = this;
 
-					const productContent = instance.getProductContent();
+					var productContent = instance.getProductContent();
 
 					productContent
 						.all('[data-cp-definition-id]')
@@ -332,7 +319,7 @@ AUI.add(
 						});
 				},
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					new A.EventHandle(instance._eventHandles).detach();
 				},
@@ -343,12 +330,12 @@ AUI.add(
 					return this.get('cpInstanceId');
 				},
 				getFormValues() {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('ddmFormValues');
 				},
 				getProductContent() {
-					const instance = this;
+					var instance = this;
 
 					return A.one(instance.get('productContentSelector'));
 				},
@@ -356,17 +343,17 @@ AUI.add(
 					return this.get('productContentAuthToken');
 				},
 				initializer(_config) {
-					const instance = this;
+					var instance = this;
 
 					instance._bindUI();
 					instance._renderUI();
 				},
 				validateProduct(callback) {
-					const instance = this;
+					var instance = this;
 
-					const cpDefinitionId = instance.get('cpDefinitionId');
+					var cpDefinitionId = instance.get('cpDefinitionId');
 
-					const ddmForm = Liferay.component(
+					var ddmForm = Liferay.component(
 						'ProductOptions' + cpDefinitionId + 'DDMForm'
 					);
 

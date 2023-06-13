@@ -14,36 +14,39 @@
 
 package com.liferay.portal.search.internal.sort;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.contributor.constants.ContributorConstants;
 import com.liferay.portal.search.contributor.sort.SortFieldNameTranslator;
 import com.liferay.portal.search.sort.SortFieldBuilder;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Michael C. Han
  */
-@Component(service = SortFieldBuilder.class)
+@Component(immediate = true, service = SortFieldBuilder.class)
 public class SortFieldBuilderImpl implements SortFieldBuilder {
 
 	@Override
-	public String getSortField(Class<?> entityClass, String orderByCol) {
-		String sortField = _getSortField(entityClass, orderByCol);
+	public String getSortField(String entityClassName, String orderByCol) {
+		String sortField = doGetSortField(entityClassName, orderByCol);
 
 		if (_defaultSortableTextFields.contains(sortField)) {
 			return Field.getSortableFieldName(sortField);
@@ -54,7 +57,7 @@ public class SortFieldBuilderImpl implements SortFieldBuilder {
 
 	@Override
 	public String getSortField(
-		Class<?> entityClass, String orderByCol, int sortType) {
+		String entityClassName, String orderByCol, int sortType) {
 
 		if ((sortType == Sort.DOUBLE_TYPE) || (sortType == Sort.FLOAT_TYPE) ||
 			(sortType == Sort.INT_TYPE) || (sortType == Sort.LONG_TYPE)) {
@@ -62,32 +65,40 @@ public class SortFieldBuilderImpl implements SortFieldBuilder {
 			return Field.getSortableFieldName(orderByCol);
 		}
 
-		return getSortField(entityClass, orderByCol);
+		return getSortField(entityClassName, orderByCol);
 	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate() {
 		_defaultSortableTextFields = SetUtil.fromArray(
-			_props.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, SortFieldNameTranslator.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(sortFieldNameTranslator, emitter) -> emitter.emit(
-					sortFieldNameTranslator.getEntityClass())));
+			props.getArray(PropsKeys.INDEX_SORTABLE_TEXT_FIELDS));
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addSortFieldNameTranslator(
+		SortFieldNameTranslator sortFieldNameTranslator,
+		Map<String, Object> properties) {
+
+		String entryClassName = GetterUtil.getString(
+			properties.get(ContributorConstants.ENTRY_CLASS_NAME_PROPERTY_KEY));
+
+		if (Validator.isNull(entryClassName)) {
+			throw new IllegalArgumentException("No entry.class.name provided");
+		}
+
+		_sortFieldNameTranslators.put(entryClassName, sortFieldNameTranslator);
 	}
 
-	private String _getSortField(Class<?> entityClass, String orderByCol) {
+	protected String doGetSortField(String entityClassName, String orderByCol) {
 		SortFieldNameTranslator sortFieldNameTranslator =
-			_serviceTrackerMap.getService(entityClass);
+			_sortFieldNameTranslators.get(entityClassName);
 
 		if (sortFieldNameTranslator == null) {
-			Indexer<?> indexer = _indexerRegistry.getIndexer(entityClass);
+			Indexer<?> indexer = indexerRegistry.getIndexer(entityClassName);
 
 			return indexer.getSortField(orderByCol);
 		}
@@ -95,15 +106,28 @@ public class SortFieldBuilderImpl implements SortFieldBuilder {
 		return sortFieldNameTranslator.getSortFieldName(orderByCol);
 	}
 
+	protected void removeSortFieldNameTranslator(
+		SortFieldNameTranslator sortFieldNameTranslator,
+		Map<String, Object> properties) {
+
+		String entryClassName = GetterUtil.getString(
+			properties.get(ContributorConstants.ENTRY_CLASS_NAME_PROPERTY_KEY));
+
+		if (Validator.isNull(entryClassName)) {
+			return;
+		}
+
+		_sortFieldNameTranslators.remove(entryClassName);
+	}
+
+	@Reference
+	protected IndexerRegistry indexerRegistry;
+
+	@Reference
+	protected Props props;
+
 	private Set<String> _defaultSortableTextFields;
-
-	@Reference
-	private IndexerRegistry _indexerRegistry;
-
-	@Reference
-	private Props _props;
-
-	private ServiceTrackerMap<Class<?>, SortFieldNameTranslator>
-		_serviceTrackerMap;
+	private final Map<String, SortFieldNameTranslator>
+		_sortFieldNameTranslators = new ConcurrentHashMap<>();
 
 }

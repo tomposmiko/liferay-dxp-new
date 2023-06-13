@@ -23,12 +23,9 @@ import com.liferay.headless.commerce.admin.shipment.resource.v1_0.ShippingAddres
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
@@ -76,25 +73,6 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public Response createShipmentsPageExportBatch(
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("sort") String sortsString,
-			@GraphQLName("callbackURL") String callbackURL,
-			@GraphQLName("contentType") String contentType,
-			@GraphQLName("fieldNames") String fieldNames)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentResource -> shipmentResource.postShipmentsPageExportBatch(
-				search, _filterBiFunction.apply(shipmentResource, filterString),
-				_sortsBiFunction.apply(shipmentResource, sortsString),
-				callbackURL, contentType, fieldNames));
-	}
-
-	@GraphQLField
 	public Shipment createShipment(@GraphQLName("shipment") Shipment shipment)
 		throws Exception {
 
@@ -115,91 +93,6 @@ public class Mutation {
 			this::_populateResourceContext,
 			shipmentResource -> shipmentResource.postShipmentBatch(
 				callbackURL, object));
-	}
-
-	@GraphQLField
-	public boolean deleteShipmentByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_shipmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentResource ->
-				shipmentResource.deleteShipmentByExternalReferenceCode(
-					externalReferenceCode));
-
-		return true;
-	}
-
-	@GraphQLField
-	public Shipment patchShipmentByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("shipment") Shipment shipment)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentResource ->
-				shipmentResource.patchShipmentByExternalReferenceCode(
-					externalReferenceCode, shipment));
-	}
-
-	@GraphQLField
-	public Shipment updateShipmentByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("shipment") Shipment shipment)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentResource ->
-				shipmentResource.putShipmentByExternalReferenceCode(
-					externalReferenceCode, shipment));
-	}
-
-	@GraphQLField
-	public Shipment createShipmentByExternalReferenceCodeStatusDelivered(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentResource ->
-				shipmentResource.
-					postShipmentByExternalReferenceCodeStatusDelivered(
-						externalReferenceCode));
-	}
-
-	@GraphQLField
-	public Shipment createShipmentByExternalReferenceCodeStatusFinishProcessing(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentResource ->
-				shipmentResource.
-					postShipmentByExternalReferenceCodeStatusFinishProcessing(
-						externalReferenceCode));
-	}
-
-	@GraphQLField
-	public Shipment createShipmentByExternalReferenceCodeStatusShipped(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentResource ->
-				shipmentResource.
-					postShipmentByExternalReferenceCodeStatusShipped(
-						externalReferenceCode));
 	}
 
 	@GraphQLField
@@ -278,35 +171,6 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public boolean deleteShipmentItemByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		_applyVoidComponentServiceObjects(
-			_shipmentItemResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentItemResource ->
-				shipmentItemResource.deleteShipmentItemByExternalReferenceCode(
-					externalReferenceCode));
-
-		return true;
-	}
-
-	@GraphQLField
-	public ShipmentItem patchShipmentItemByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("shipmentItem") ShipmentItem shipmentItem)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentItemResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentItemResource ->
-				shipmentItemResource.patchShipmentItemByExternalReferenceCode(
-					externalReferenceCode, shipmentItem));
-	}
-
-	@GraphQLField
 	public boolean deleteShipmentItem(
 			@GraphQLName("shipmentItemId") Long shipmentItemId)
 		throws Exception {
@@ -348,20 +212,6 @@ public class Mutation {
 	}
 
 	@GraphQLField
-	public ShipmentItem updateShipmentByExternalReferenceCodeItem(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("shipmentItem") ShipmentItem shipmentItem)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shipmentItemResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shipmentItemResource ->
-				shipmentItemResource.putShipmentByExternalReferenceCodeItem(
-					externalReferenceCode, shipmentItem));
-	}
-
-	@GraphQLField
 	public ShipmentItem createShipmentItem(
 			@GraphQLName("shipmentId") Long shipmentId,
 			@GraphQLName("shipmentItem") ShipmentItem shipmentItem)
@@ -372,21 +222,6 @@ public class Mutation {
 			this::_populateResourceContext,
 			shipmentItemResource -> shipmentItemResource.postShipmentItem(
 				shipmentId, shipmentItem));
-	}
-
-	@GraphQLField
-	public ShippingAddress patchShipmentByExternalReferenceCodeShippingAddress(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("shippingAddress") ShippingAddress shippingAddress)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_shippingAddressResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			shippingAddressResource ->
-				shippingAddressResource.
-					patchShipmentByExternalReferenceCodeShippingAddress(
-						externalReferenceCode, shippingAddress));
 	}
 
 	@GraphQLField
@@ -452,12 +287,6 @@ public class Mutation {
 		shipmentResource.setContextUser(_user);
 		shipmentResource.setGroupLocalService(_groupLocalService);
 		shipmentResource.setRoleLocalService(_roleLocalService);
-
-		shipmentResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		shipmentResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -473,12 +302,6 @@ public class Mutation {
 		shipmentItemResource.setContextUser(_user);
 		shipmentItemResource.setGroupLocalService(_groupLocalService);
 		shipmentItemResource.setRoleLocalService(_roleLocalService);
-
-		shipmentItemResource.setVulcanBatchEngineExportTaskResource(
-			_vulcanBatchEngineExportTaskResource);
-
-		shipmentItemResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -506,7 +329,6 @@ public class Mutation {
 
 	private AcceptLanguage _acceptLanguage;
 	private com.liferay.portal.kernel.model.Company _company;
-	private BiFunction<Object, String, Filter> _filterBiFunction;
 	private GroupLocalService _groupLocalService;
 	private HttpServletRequest _httpServletRequest;
 	private HttpServletResponse _httpServletResponse;
@@ -514,9 +336,5 @@ public class Mutation {
 	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
-	private VulcanBatchEngineExportTaskResource
-		_vulcanBatchEngineExportTaskResource;
-	private VulcanBatchEngineImportTaskResource
-		_vulcanBatchEngineImportTaskResource;
 
 }

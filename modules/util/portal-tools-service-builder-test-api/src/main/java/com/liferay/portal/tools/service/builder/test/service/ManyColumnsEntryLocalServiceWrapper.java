@@ -27,10 +27,6 @@ public class ManyColumnsEntryLocalServiceWrapper
 	implements ManyColumnsEntryLocalService,
 			   ServiceWrapper<ManyColumnsEntryLocalService> {
 
-	public ManyColumnsEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ManyColumnsEntryLocalServiceWrapper(
 		ManyColumnsEntryLocalService manyColumnsEntryLocalService) {
 

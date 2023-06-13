@@ -35,7 +35,6 @@ export default function Filter({onChange, query}) {
 						value={query}
 					/>
 				</ClayInput.GroupItem>
-
 				<ClayInput.GroupItem append shrink>
 					<ClayInput.GroupText>
 						<ClayIcon symbol="search" />

@@ -12,7 +12,7 @@
 import ClayButton from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import {PropTypes} from 'prop-types';
 import React, {Component} from 'react';
 
@@ -43,7 +43,7 @@ class FilterInput extends Component {
 		const {disableSearch, onSubmit, searchBarTerm} = this.props;
 
 		return (
-			<ManagementToolbar.Search>
+			<ClayManagementToolbar.Search>
 				<ClayInput.Group>
 					<ClayInput.GroupItem>
 						<ClayInput
@@ -59,7 +59,6 @@ class FilterInput extends Component {
 
 						<ClayInput.GroupInsetItem after tag="span">
 							<ClayButton
-								aria-label={Liferay.Language.get('search-icon')}
 								displayType="unstyled"
 								onClick={onSubmit}
 								title={Liferay.Language.get('search-icon')}
@@ -69,7 +68,7 @@ class FilterInput extends Component {
 						</ClayInput.GroupInsetItem>
 					</ClayInput.GroupItem>
 				</ClayInput.Group>
-			</ManagementToolbar.Search>
+			</ClayManagementToolbar.Search>
 		);
 	}
 }

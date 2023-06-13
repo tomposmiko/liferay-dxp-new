@@ -142,27 +142,6 @@ public class UserAccount implements Cloneable, Serializable {
 
 	protected Date birthDate;
 
-	public String getCurrentPassword() {
-		return currentPassword;
-	}
-
-	public void setCurrentPassword(String currentPassword) {
-		this.currentPassword = currentPassword;
-	}
-
-	public void setCurrentPassword(
-		UnsafeSupplier<String, Exception> currentPasswordUnsafeSupplier) {
-
-		try {
-			currentPassword = currentPasswordUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String currentPassword;
-
 	public CustomField[] getCustomFields() {
 		return customFields;
 	}
@@ -517,27 +496,6 @@ public class UserAccount implements Cloneable, Serializable {
 
 	protected OrganizationBrief[] organizationBriefs;
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public void setPassword(
-		UnsafeSupplier<String, Exception> passwordUnsafeSupplier) {
-
-		try {
-			password = passwordUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String password;
-
 	public String getProfileURL() {
 		return profileURL;
 	}
@@ -625,28 +583,6 @@ public class UserAccount implements Cloneable, Serializable {
 	}
 
 	protected UserAccountContactInformation userAccountContactInformation;
-
-	public UserGroupBrief[] getUserGroupBriefs() {
-		return userGroupBriefs;
-	}
-
-	public void setUserGroupBriefs(UserGroupBrief[] userGroupBriefs) {
-		this.userGroupBriefs = userGroupBriefs;
-	}
-
-	public void setUserGroupBriefs(
-		UnsafeSupplier<UserGroupBrief[], Exception>
-			userGroupBriefsUnsafeSupplier) {
-
-		try {
-			userGroupBriefs = userGroupBriefsUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected UserGroupBrief[] userGroupBriefs;
 
 	@Override
 	public UserAccount clone() throws CloneNotSupportedException {

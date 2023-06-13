@@ -12,9 +12,9 @@
  * details.
  */
 
+import {DataConverter} from 'data-engine-taglib';
 import {useDrop as useDndDrop} from 'react-dnd';
 
-import {getDDMFormFieldSettingsContext} from '../../utils/dataConverter';
 import * as DRAG_TYPES from '../../utils/dragTypes';
 import {EVENT_TYPES} from '../actions/eventTypes.es';
 import {elementSetAdded} from '../thunks/elementSetAdded.es';
@@ -123,25 +123,14 @@ const isDroppingFieldIntoFieldset = (sourceField, targetField) =>
 const isSameField = (targetField, sourceField) =>
 	targetField && targetField.fieldName === sourceField.fieldName;
 
-const isElementsSetOverTarget = (target, source) => {
-	if (target) {
-		return (
-			!!Object.keys(target).length &&
-			source?.dragType === 'elementSet:add'
-		);
-	}
-
-	return false;
-};
-
-export function useDrop({
+export const useDrop = ({
 	columnIndex,
 	field,
 	origin,
 	pageIndex,
 	parentField,
 	rowIndex,
-}) {
+}) => {
 	const {editingLanguageId} = useFormState();
 	const {fieldTypes} = useConfig();
 
@@ -158,8 +147,6 @@ export function useDrop({
 	const [{canDrop, overTarget}, drop] = useDndDrop({
 		accept: [...Object.values(DRAG_TYPES), DRAG_ELEMENT_SET_ADD],
 		canDrop: (item) =>
-			!isElementsSetOverTarget(field, item.data) &&
-			!isElementsSetOverTarget(parentField, item.data) &&
 			!isSameField(field, item.data) &&
 			!isDroppingFieldGroupIntoField(field, item.data) &&
 			!isDroppingFieldIntoFieldset(item.data, field) &&
@@ -232,17 +219,16 @@ export function useDrop({
 				case DRAG_DATA_DEFINITION_FIELD_ADD: {
 					const {dataDefinition, name} = data;
 
-					const dataDefinitionField = dataDefinition.dataDefinitionFields.find(
-						(field) => field.name === name
-					);
-
-					const settingsContext = getDDMFormFieldSettingsContext({
-						dataDefinitionField,
+					const {
+						fieldType,
+						label,
+						settingsContext,
+					} = DataConverter.getDataDefinitionFieldByFieldName({
+						dataDefinition,
 						editingLanguageId,
+						fieldName: name,
 						fieldTypes,
 					});
-
-					const {fieldType, label} = dataDefinitionField;
 
 					dispatch({
 						payload: {
@@ -304,4 +290,4 @@ export function useDrop({
 		drop,
 		overTarget,
 	};
-}
+};

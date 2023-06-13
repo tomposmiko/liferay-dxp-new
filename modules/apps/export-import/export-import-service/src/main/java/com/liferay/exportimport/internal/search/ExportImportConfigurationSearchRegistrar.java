@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Akos Thurzo
  * @author Luan Maoski
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ExportImportConfigurationSearchRegistrar {
 
 	@Activate

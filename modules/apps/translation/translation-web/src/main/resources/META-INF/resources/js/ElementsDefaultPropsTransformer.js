@@ -12,20 +12,15 @@
  * details.
  */
 
-import {openConfirmModal} from 'frontend-js-web';
-
 const ACTIONS = {
 	delete(itemData) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, itemData['delete-url']);
-				}
-			},
-		});
+		const message = Liferay.Language.get(
+			'are-you-sure-you-want-to-delete-this'
+		);
+
+		if (confirm(message)) {
+			submitForm(document.hrefFm, itemData['delete-url']);
+		}
 	},
 };
 

@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 
 import java.util.Locale;
 
@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPOptionCategoryIndexer extends BaseIndexer<CPOptionCategory> {
 
 	public static final String CLASS_NAME = CPOptionCategory.class.getName();
@@ -72,10 +72,10 @@ public class CPOptionCategoryIndexer extends BaseIndexer<CPOptionCategory> {
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, Field.DESCRIPTION, false);
 		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
+		addSearchTerm(searchQuery, searchContext, FIELD_KEY, false);
 		addSearchTerm(searchQuery, searchContext, Field.TITLE, false);
 		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, false);
 		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
-		addSearchTerm(searchQuery, searchContext, FIELD_KEY, false);
 	}
 
 	@Override
@@ -98,30 +98,31 @@ public class CPOptionCategoryIndexer extends BaseIndexer<CPOptionCategory> {
 		Document document = getBaseModelDocument(CLASS_NAME, cpOptionCategory);
 
 		String cpOptionCategoryDefaultLanguageId =
-			_localization.getDefaultLanguageId(cpOptionCategory.getTitle());
+			LocalizationUtil.getDefaultLanguageId(cpOptionCategory.getTitle());
 
-		String[] languageIds = _localization.getAvailableLanguageIds(
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
 			cpOptionCategory.getTitle());
 
 		for (String languageId : languageIds) {
 			String description = cpOptionCategory.getDescription(languageId);
-
 			String title = cpOptionCategory.getTitle(languageId);
-
-			document.addText(Field.CONTENT, title);
-
-			document.addText(
-				_localization.getLocalizedName(Field.DESCRIPTION, languageId),
-				description);
-			document.addText(
-				_localization.getLocalizedName(Field.TITLE, languageId), title);
-			document.addText(FIELD_KEY, cpOptionCategory.getKey());
 
 			if (languageId.equals(cpOptionCategoryDefaultLanguageId)) {
 				document.addText(Field.DESCRIPTION, description);
 				document.addText(Field.TITLE, title);
 				document.addText("defaultLanguageId", languageId);
 			}
+
+			document.addText(
+				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
+				title);
+			document.addText(
+				LocalizationUtil.getLocalizedName(
+					Field.DESCRIPTION, languageId),
+				description);
+
+			document.addText(FIELD_KEY, cpOptionCategory.getKey());
+			document.addText(Field.CONTENT, title);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -150,7 +151,8 @@ public class CPOptionCategoryIndexer extends BaseIndexer<CPOptionCategory> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			cpOptionCategory.getCompanyId(), getDocument(cpOptionCategory));
+			getSearchEngineId(), cpOptionCategory.getCompanyId(),
+			getDocument(cpOptionCategory), isCommitImmediately());
 	}
 
 	@Override
@@ -162,10 +164,12 @@ public class CPOptionCategoryIndexer extends BaseIndexer<CPOptionCategory> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPOptionCategorys(companyId);
+		reindexCPOptionCategorys(companyId);
 	}
 
-	private void _reindexCPOptionCategorys(long companyId) throws Exception {
+	protected void reindexCPOptionCategorys(long companyId)
+		throws PortalException {
+
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpOptionCategoryLocalService.getIndexableActionableDynamicQuery();
 
@@ -185,6 +189,7 @@ public class CPOptionCategoryIndexer extends BaseIndexer<CPOptionCategory> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}
@@ -197,8 +202,5 @@ public class CPOptionCategoryIndexer extends BaseIndexer<CPOptionCategory> {
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Localization _localization;
 
 }

@@ -14,10 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.search;
 
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.MatchQuery;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
 import com.liferay.portal.search.elasticsearch7.internal.facet.DefaultFacetTranslator;
@@ -81,491 +78,46 @@ public class CommonSearchSourceBuilderAssemblerImplTest {
 	}
 
 	@Test
-	public void testPartsWhenAdditiveWillAppendToWhatMainQueryFindsFilterOccur()
+	public void testPartsWhenAdditiveWillAppendToWhatMainQueryFinds()
 		throws Exception {
 
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
+		index("alpha 1", "JournalArticle");
+		index("alpha 2", "DLFileEntry");
+		index("bravo 1", "DLFileEntry");
 
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
+		SearchSearchRequest searchSearchRequest = createSearchSearchRequest();
 
 		searchSearchRequest.setQuery(
 			new MatchQuery("entryClassName", "DLFileEntry"));
 
-		_addPart(
-			"filter", _queries.term("title", "bravo"), searchSearchRequest);
+		addPart("filter", _queries.term("title", "bravo"), searchSearchRequest);
 
-		_assertSearch(searchSearchRequest, "bravo 1");
+		assertSearch(searchSearchRequest, "bravo 1");
 
-		_addPartAdditive(
-			"filter", _queries.term("entryClassName", "JournalArticle"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1");
-	}
-
-	@Test
-	public void testPartsWhenAdditiveWillAppendToWhatMainQueryFindsMustNotOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		searchSearchRequest.setQuery(
-			new MatchQuery("entryClassName", "DLFileEntry"));
-
-		_addPart(
-			"filter", _queries.term("title", "bravo"), searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "bravo 1");
-
-		_addPartAdditive(
-			"must_not", _queries.term("entryClassName", "JournalArticle"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "bravo 1");
-	}
-
-	@Test
-	public void testPartsWhenAdditiveWillAppendToWhatMainQueryFindsMustOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		searchSearchRequest.setQuery(
-			new MatchQuery("entryClassName", "DLFileEntry"));
-
-		_addPart(
-			"filter", _queries.term("title", "bravo"), searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "bravo 1");
-
-		_addPartAdditive(
-			"must", _queries.term("entryClassName", "JournalArticle"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1");
-	}
-
-	@Test
-	public void testPartsWhenAdditiveWillAppendToWhatMainQueryFindsShouldOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		searchSearchRequest.setQuery(
-			new MatchQuery("entryClassName", "DLFileEntry"));
-
-		_addPart(
-			"filter", _queries.term("title", "bravo"), searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "bravo 1");
-
-		_addPartAdditive(
+		addPartAdditive(
 			"should", _queries.term("entryClassName", "JournalArticle"),
 			searchSearchRequest);
 
-		_assertSearch(searchSearchRequest, "alpha 1", "bravo 1");
+		assertSearch(searchSearchRequest, "alpha 1", "bravo 1");
 	}
 
 	@Test
-	public void testPartsWillModifyWhatMainQueryFindsFilterOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartRoot(
-			"filter", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 2");
-	}
-
-	@Test
-	public void testPartsWillModifyWhatMainQueryFindsMustNotOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartRoot(
-			"must_not", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1");
-	}
-
-	@Test
-	public void testPartsWillModifyWhatMainQueryFindsMustOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartRoot(
-			"must", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 2");
-	}
-
-	@Test
-	public void testPartsWillModifyWhatMainQueryFindsShouldOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartRoot(
-			"should", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-	}
-
-	@Test
-	public void testPartsWillNarrowDownWhatMainQueryFindsFilterOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPart(
-			"filter", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 2");
-	}
-
-	@Test
-	public void testPartsWillNarrowDownWhatMainQueryFindsMustNotOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPart(
-			"must_not", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1");
-	}
-
-	@Test
-	public void testPartsWillNarrowDownWhatMainQueryFindsMustOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPart(
-			"must", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 2");
-	}
-
-	@Test
-	public void testPartsWillNarrowDownWhatMainQueryFindsShouldOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPart(
-			"should", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-	}
-
-	@Test
-	public void testPrecedenceOfAdditiveFilterOccur() throws Exception {
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartAdditiveAndRoot(
-			"filter", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 2", "bravo 1");
-	}
-
-	@Test
-	public void testPrecedenceOfAdditiveMustNotOccur() throws Exception {
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartAdditiveAndRoot(
-			"must_not", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1");
-	}
-
-	@Test
-	public void testPrecedenceOfAdditiveMustOccur() throws Exception {
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartAdditiveAndRoot(
-			"must", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 2", "bravo 1");
-	}
-
-	@Test
-	public void testPrecedenceOfAdditiveShouldOccur() throws Exception {
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("title", "alpha"), BooleanClauseOccur.MUST);
-
-		searchSearchRequest.setQuery(booleanQueryImpl);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartAdditiveAndRoot(
-			"should", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2", "bravo 1");
-	}
-
-	@Test
-	public void testRootOnlyAppliedWhenMainQueryIsBooleanFilterOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
+	public void testPartsWillNarrowDownWhatMainQueryFinds() throws Exception {
+		index("alpha 1", "JournalArticle");
+		index("alpha 2", "DLFileEntry");
+		index("bravo 1", "DLFileEntry");
+
+		SearchSearchRequest searchSearchRequest = createSearchSearchRequest();
 
 		searchSearchRequest.setQuery(new MatchQuery("title", "alpha"));
 
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
+		assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
 
-		_addPartRoot(
+		addPart(
 			"filter", _queries.term("entryClassName", "DLFileEntry"),
 			searchSearchRequest);
 
-		_assertSearch(searchSearchRequest, "alpha 2");
-	}
-
-	@Test
-	public void testRootOnlyAppliedWhenMainQueryIsBooleanMustNotOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		searchSearchRequest.setQuery(new MatchQuery("title", "alpha"));
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartRoot(
-			"must_not", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1");
-	}
-
-	@Test
-	public void testRootOnlyAppliedWhenMainQueryIsBooleanMustOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		searchSearchRequest.setQuery(new MatchQuery("title", "alpha"));
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartRoot(
-			"must", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 2");
-	}
-
-	@Test
-	public void testRootOnlyAppliedWhenMainQueryIsBooleanShouldOccur()
-		throws Exception {
-
-		_index("alpha 1", "JournalArticle");
-		_index("alpha 2", "DLFileEntry");
-		_index("bravo 1", "DLFileEntry");
-
-		SearchSearchRequest searchSearchRequest = _createSearchSearchRequest();
-
-		searchSearchRequest.setQuery(new MatchQuery("title", "alpha"));
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
-
-		_addPartRoot(
-			"should", _queries.term("entryClassName", "DLFileEntry"),
-			searchSearchRequest);
-
-		_assertSearch(searchSearchRequest, "alpha 1", "alpha 2");
+		assertSearch(searchSearchRequest, "alpha 2");
 	}
 
 	@Rule
@@ -598,29 +150,19 @@ public class CommonSearchSourceBuilderAssemblerImplTest {
 			elasticsearchQueryTranslatorFixture.
 				getElasticsearchQueryTranslator();
 
-		CommonSearchSourceBuilderAssembler commonSearchSourceBuilderAssembler =
-			new CommonSearchSourceBuilderAssemblerImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			commonSearchSourceBuilderAssembler, "_complexQueryBuilderFactory",
-			createComplexQueryBuilderFactory(queries));
-		ReflectionTestUtil.setFieldValue(
-			commonSearchSourceBuilderAssembler, "_facetTranslator",
-			new DefaultFacetTranslator());
-		ReflectionTestUtil.setFieldValue(
-			commonSearchSourceBuilderAssembler,
-			"_filterToQueryBuilderTranslator",
-			elasticsearchFilterTranslatorFixture.
-				getElasticsearchFilterTranslator());
-		ReflectionTestUtil.setFieldValue(
-			commonSearchSourceBuilderAssembler,
-			"_legacyQueryToQueryBuilderTranslator",
-			legacyElasticsearchQueryTranslator);
-		ReflectionTestUtil.setFieldValue(
-			commonSearchSourceBuilderAssembler,
-			"_queryToQueryBuilderTranslator", elasticsearchQueryTranslator);
-
-		return commonSearchSourceBuilderAssembler;
+		return new CommonSearchSourceBuilderAssemblerImpl() {
+			{
+				setComplexQueryBuilderFactory(
+					createComplexQueryBuilderFactory(queries));
+				setFacetTranslator(new DefaultFacetTranslator());
+				setFilterToQueryBuilderTranslator(
+					elasticsearchFilterTranslatorFixture.
+						getElasticsearchFilterTranslator());
+				setLegacyQueryToQueryBuilderTranslator(
+					legacyElasticsearchQueryTranslator);
+				setQueryToQueryBuilderTranslator(elasticsearchQueryTranslator);
+			}
+		};
 	}
 
 	protected static ComplexQueryBuilderFactory
@@ -629,7 +171,7 @@ public class CommonSearchSourceBuilderAssemblerImplTest {
 		return () -> new ComplexQueryBuilderImpl(queries, null);
 	}
 
-	private void _addPart(
+	protected void addPart(
 		String occur, Query query, SearchSearchRequest searchSearchRequest) {
 
 		searchSearchRequest.addComplexQueryParts(
@@ -642,22 +184,7 @@ public class CommonSearchSourceBuilderAssemblerImplTest {
 				).build()));
 	}
 
-	private void _addPartAdditive(
-		String occur, Query query, SearchSearchRequest searchSearchRequest) {
-
-		searchSearchRequest.addComplexQueryParts(
-			Arrays.asList(
-				_complexQueryPartBuilderFactory.builder(
-				).additive(
-					true
-				).occur(
-					occur
-				).query(
-					query
-				).build()));
-	}
-
-	private void _addPartAdditiveAndRoot(
+	protected void addPartAdditive(
 		String occur, Query query, SearchSearchRequest searchSearchRequest) {
 
 		searchSearchRequest.addComplexQueryParts(
@@ -669,27 +196,10 @@ public class CommonSearchSourceBuilderAssemblerImplTest {
 					occur
 				).query(
 					query
-				).rootClause(
-					true
 				).build()));
 	}
 
-	private void _addPartRoot(
-		String occur, Query query, SearchSearchRequest searchSearchRequest) {
-
-		searchSearchRequest.addComplexQueryParts(
-			Arrays.asList(
-				_complexQueryPartBuilderFactory.builder(
-				).occur(
-					occur
-				).query(
-					query
-				).rootClause(
-					true
-				).build()));
-	}
-
-	private void _assertSearch(
+	protected void assertSearch(
 			SearchSearchRequest searchSearchRequest, String... expected)
 		throws Exception {
 
@@ -705,7 +215,7 @@ public class CommonSearchSourceBuilderAssemblerImplTest {
 			searchRequest, "title", expected);
 	}
 
-	private SearchSearchRequest _createSearchSearchRequest() {
+	protected SearchSearchRequest createSearchSearchRequest() {
 		return new SearchSearchRequest() {
 			{
 				setIndexNames(_indexName.getName());
@@ -713,7 +223,7 @@ public class CommonSearchSourceBuilderAssemblerImplTest {
 		};
 	}
 
-	private void _index(String title, String entryClassName) {
+	protected void index(String title, String entryClassName) {
 		_liferayIndexFixture.index(
 			HashMapBuilder.<String, Object>put(
 				"entryClassName", entryClassName

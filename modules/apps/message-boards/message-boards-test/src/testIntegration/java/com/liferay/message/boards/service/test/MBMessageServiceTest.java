@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.test.constants.ServiceTestConstants;
@@ -58,7 +59,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.hibernate.util.JDBCExceptionReporter;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -116,11 +117,12 @@ public class MBMessageServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		serviceContext.setModelPermissions(
-			ModelPermissionsFactory.create(
-				new String[] {ActionKeys.ADD_MESSAGE, ActionKeys.VIEW},
-				new String[] {ActionKeys.ADD_MESSAGE, ActionKeys.VIEW},
-				MBCategory.class.getName()));
+		ModelPermissions modelPermissions = ModelPermissionsFactory.create(
+			new String[] {ActionKeys.ADD_MESSAGE, ActionKeys.VIEW},
+			new String[] {ActionKeys.ADD_MESSAGE, ActionKeys.VIEW},
+			MBCategory.class.getName());
+
+		serviceContext.setModelPermissions(modelPermissions);
 
 		_category = MBCategoryServiceUtil.addCategory(
 			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, name, description,
@@ -150,7 +152,7 @@ public class MBMessageServiceTest {
 			LogCapture logCapture3 = LoggerTestUtil.configureLog4JLogger(
 				DoAsUserThread.class.getName(), LoggerTestUtil.ERROR);
 			LogCapture logCapture4 = LoggerTestUtil.configureLog4JLogger(
-				SqlExceptionHelper.class.getName(), LoggerTestUtil.ERROR);
+				JDBCExceptionReporter.class.getName(), LoggerTestUtil.ERROR);
 			LogCapture logCapture5 = LoggerTestUtil.configureLog4JLogger(
 				"com.liferay.portal.messaging.internal.SynchronousDestination",
 				LoggerTestUtil.ERROR)) {

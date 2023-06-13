@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.order.rule.internal.validator;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
@@ -24,6 +24,7 @@ import com.liferay.commerce.order.rule.entry.type.COREntryType;
 import com.liferay.commerce.order.rule.entry.type.COREntryTypeRegistry;
 import com.liferay.commerce.order.rule.model.COREntry;
 import com.liferay.commerce.order.rule.service.COREntryLocalService;
+import com.liferay.commerce.order.rule.service.COREntryRelLocalService;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
@@ -42,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.order.validator.key=" + CORCommerceOrderValidator.KEY,
 		"commerce.order.validator.priority:Integer=50"
@@ -62,7 +64,7 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 			Locale locale, CommerceOrder commerceOrder)
 		throws PortalException {
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
 		CommerceChannel commerceChannel =
 			_commerceChannelLocalService.getCommerceChannelByOrderGroupId(
@@ -72,7 +74,7 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 			_corEntryLocalService.
 				getAccountEntryAndCommerceChannelAndCommerceOrderTypeCOREntries(
 					commerceOrder.getCompanyId(),
-					accountEntry.getAccountEntryId(),
+					commerceAccount.getCommerceAccountId(),
 					commerceChannel.getCommerceChannelId(),
 					commerceOrder.getCommerceOrderTypeId());
 
@@ -88,7 +90,8 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 
 		corEntries =
 			_corEntryLocalService.getAccountEntryAndCommerceOrderTypeCOREntries(
-				commerceOrder.getCompanyId(), accountEntry.getAccountEntryId(),
+				commerceOrder.getCompanyId(),
+				commerceAccount.getCommerceAccountId(),
 				commerceOrder.getCommerceOrderTypeId());
 
 		if (!corEntries.isEmpty()) {
@@ -103,7 +106,8 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 
 		corEntries =
 			_corEntryLocalService.getAccountEntryAndCommerceChannelCOREntries(
-				commerceOrder.getCompanyId(), accountEntry.getAccountEntryId(),
+				commerceOrder.getCompanyId(),
+				commerceAccount.getCommerceAccountId(),
 				commerceChannel.getCommerceChannelId());
 
 		if (!corEntries.isEmpty()) {
@@ -117,7 +121,8 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 		}
 
 		corEntries = _corEntryLocalService.getAccountEntryCOREntries(
-			commerceOrder.getCompanyId(), accountEntry.getAccountEntryId());
+			commerceOrder.getCompanyId(),
+			commerceAccount.getCommerceAccountId());
 
 		if (!corEntries.isEmpty()) {
 			String errorMessage = _validate(commerceOrder, corEntries, locale);
@@ -131,7 +136,7 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 
 		long[] commerceAccountGroupIds =
 			_commerceAccountHelper.getCommerceAccountGroupIds(
-				accountEntry.getAccountEntryId());
+				commerceAccount.getCommerceAccountId());
 
 		corEntries =
 			_corEntryLocalService.
@@ -239,19 +244,6 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 			return new CommerceOrderValidatorResult(false, errorMessage);
 		}
 
-		corEntries = _corEntryLocalService.getUnqualifiedCOREntries(
-			commerceOrder.getCompanyId());
-
-		if (!corEntries.isEmpty()) {
-			String errorMessage = _validate(commerceOrder, corEntries, locale);
-
-			if (Validator.isBlank(errorMessage)) {
-				return new CommerceOrderValidatorResult(true);
-			}
-
-			return new CommerceOrderValidatorResult(false, errorMessage);
-		}
-
 		return new CommerceOrderValidatorResult(true);
 	}
 
@@ -306,6 +298,9 @@ public class CORCommerceOrderValidator implements CommerceOrderValidator {
 
 	@Reference
 	private COREntryLocalService _corEntryLocalService;
+
+	@Reference
+	private COREntryRelLocalService _corEntryRelLocalService;
 
 	@Reference
 	private COREntryTypeRegistry _corEntryTypeRegistry;

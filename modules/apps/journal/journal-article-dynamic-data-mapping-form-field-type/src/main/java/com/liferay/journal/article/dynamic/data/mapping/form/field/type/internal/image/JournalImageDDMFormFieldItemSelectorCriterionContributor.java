@@ -35,7 +35,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = ImageDDMFormFieldItemSelectorCriterionContributor.class)
+@Component(
+	immediate = true,
+	service = ImageDDMFormFieldItemSelectorCriterionContributor.class
+)
 public class JournalImageDDMFormFieldItemSelectorCriterionContributor
 	implements ImageDDMFormFieldItemSelectorCriterionContributor {
 

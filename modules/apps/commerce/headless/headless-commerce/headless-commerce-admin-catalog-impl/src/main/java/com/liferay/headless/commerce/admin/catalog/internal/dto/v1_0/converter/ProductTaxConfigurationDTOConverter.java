@@ -30,8 +30,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "dto.class.name=ProductTaxConfiguration",
-	service = DTOConverter.class
+	enabled = false, property = "dto.class.name=ProductTaxConfiguration",
+	service = {DTOConverter.class, ProductTaxConfigurationDTOConverter.class}
 )
 public class ProductTaxConfigurationDTOConverter
 	implements DTOConverter<CPDefinition, ProductTaxConfiguration> {

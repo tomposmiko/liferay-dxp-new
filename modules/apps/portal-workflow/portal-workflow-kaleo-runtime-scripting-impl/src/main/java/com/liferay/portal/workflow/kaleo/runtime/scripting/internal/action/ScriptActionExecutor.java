@@ -30,7 +30,17 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = ActionExecutor.class)
+@Component(
+	immediate = true,
+	property = {
+		"com.liferay.portal.workflow.kaleo.runtime.action.executor.language=beanshell",
+		"com.liferay.portal.workflow.kaleo.runtime.action.executor.language=groovy",
+		"com.liferay.portal.workflow.kaleo.runtime.action.executor.language=javascript",
+		"com.liferay.portal.workflow.kaleo.runtime.action.executor.language=python",
+		"com.liferay.portal.workflow.kaleo.runtime.action.executor.language=ruby"
+	},
+	service = ActionExecutor.class
+)
 public class ScriptActionExecutor implements ActionExecutor {
 
 	public ScriptActionExecutor() {
@@ -50,11 +60,6 @@ public class ScriptActionExecutor implements ActionExecutor {
 		}
 	}
 
-	@Override
-	public String[] getActionExecutorKeys() {
-		return _ACTION_EXECUTOR_KEYS;
-	}
-
 	public void setOutputObjects(Set<String> outputObjects) {
 		_outputObjects.addAll(outputObjects);
 	}
@@ -67,10 +72,6 @@ public class ScriptActionExecutor implements ActionExecutor {
 			executionContext, _outputObjects, kaleoAction.getScriptLanguage(),
 			kaleoAction.getScript());
 	}
-
-	private static final String[] _ACTION_EXECUTOR_KEYS = {
-		"beanshell", "groovy", "javascript", "python", "ruby"
-	};
 
 	@Reference
 	private KaleoScriptingEvaluator _kaleoScriptingEvaluator;

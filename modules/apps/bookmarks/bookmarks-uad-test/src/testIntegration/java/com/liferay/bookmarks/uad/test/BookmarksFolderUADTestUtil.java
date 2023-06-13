@@ -17,6 +17,7 @@ package com.liferay.bookmarks.uad.test;
 import com.liferay.bookmarks.constants.BookmarksFolderConstants;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksFolderLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -32,11 +33,14 @@ public class BookmarksFolderUADTestUtil {
 			long userId)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId());
+
 		return bookmarksFolderLocalService.addFolder(
 			userId, BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId()));
+			serviceContext);
 	}
 
 	public static BookmarksFolder addBookmarksFolderWithStatusByUserId(

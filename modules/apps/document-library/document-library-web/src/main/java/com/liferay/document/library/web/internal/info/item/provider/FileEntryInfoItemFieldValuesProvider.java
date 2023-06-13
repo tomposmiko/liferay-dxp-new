@@ -23,12 +23,11 @@ import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
-import com.liferay.document.library.util.DLFileEntryTypeUtil;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.info.item.FileEntryInfoItemFields;
 import com.liferay.dynamic.data.mapping.info.item.provider.DDMFormValuesInfoFieldValuesProvider;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.storage.DDMStorageEngineManager;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.StorageEngineManagerUtil;
 import com.liferay.expando.info.item.provider.ExpandoInfoItemFieldSetProvider;
 import com.liferay.info.exception.NoSuchInfoItemException;
 import com.liferay.info.field.InfoFieldValue;
@@ -63,7 +62,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
-	property = Constants.SERVICE_RANKING + ":Integer=10",
+	immediate = true, property = Constants.SERVICE_RANKING + ":Integer=10",
 	service = InfoItemFieldValuesProvider.class
 )
 public class FileEntryInfoItemFieldValuesProvider
@@ -128,25 +127,21 @@ public class FileEntryInfoItemFieldValuesProvider
 						dlFileEntry.getFileEntryTypeId());
 
 				List<DDMStructure> ddmStructures =
-					DLFileEntryTypeUtil.getDDMStructures(dlFileEntryType);
+					dlFileEntryType.getDDMStructures();
 
 				for (DDMStructure ddmStructure : ddmStructures) {
 					FileVersion fileVersion = fileEntry.getFileVersion();
 
 					DLFileEntryMetadata dlFileEntryMetadata =
-						_dlFileEntryMetadataLocalService.fetchFileEntryMetadata(
+						_dlFileEntryMetadataLocalService.getFileEntryMetadata(
 							ddmStructure.getStructureId(),
 							fileVersion.getFileVersionId());
-
-					if (dlFileEntryMetadata == null) {
-						continue;
-					}
 
 					infoFieldValues.addAll(
 						_ddmFormValuesInfoFieldValuesProvider.
 							getInfoFieldValues(
 								fileEntry,
-								_ddmStorageEngineManager.getDDMFormValues(
+								StorageEngineManagerUtil.getDDMFormValues(
 									dlFileEntryMetadata.getDDMStorageId())));
 				}
 
@@ -197,14 +192,13 @@ public class FileEntryInfoItemFieldValuesProvider
 
 			fileEntryFieldValues.add(
 				new InfoFieldValue<>(
-					FileEntryInfoItemFields.fileNameInfoField,
-					fileEntry.getFileName()));
+					FileEntryInfoItemFields.fileName, fileEntry.getFileName()));
 
 			String mimeType = fileEntry.getMimeType();
 
 			fileEntryFieldValues.add(
 				new InfoFieldValue<>(
-					FileEntryInfoItemFields.mimeTypeInfoField, mimeType));
+					FileEntryInfoItemFields.mimeType, mimeType));
 
 			if (mimeType.startsWith("image")) {
 				WebImage fileURLWebImage = new WebImage(
@@ -216,12 +210,11 @@ public class FileEntryInfoItemFieldValuesProvider
 						new ClassPKInfoItemIdentifier(
 							fileEntry.getFileEntryId())));
 
-				fileURLWebImage.setAlt(fileEntry.getDescription());
+				fileURLWebImage.setAlt(fileEntry.getTitle());
 
 				fileEntryFieldValues.add(
 					new InfoFieldValue<>(
-						FileEntryInfoItemFields.fileURLInfoField,
-						fileURLWebImage));
+						FileEntryInfoItemFields.fileURL, fileURLWebImage));
 			}
 
 			fileEntryFieldValues.add(
@@ -238,8 +231,7 @@ public class FileEntryInfoItemFieldValuesProvider
 					fileEntry.getVersion()));
 			fileEntryFieldValues.add(
 				new InfoFieldValue<>(
-					FileEntryInfoItemFields.sizeInfoField,
-					fileEntry.getSize()));
+					FileEntryInfoItemFields.size, fileEntry.getSize()));
 			fileEntryFieldValues.add(
 				new InfoFieldValue<>(
 					FileEntryInfoItemFields.createDateInfoField,
@@ -281,19 +273,7 @@ public class FileEntryInfoItemFieldValuesProvider
 			if (Validator.isNotNull(downloadURL)) {
 				fileEntryFieldValues.add(
 					new InfoFieldValue<>(
-						FileEntryInfoItemFields.downloadURLInfoField,
-						downloadURL));
-			}
-
-			String previewURL = _dlURLHelper.getPreviewURL(
-				fileEntry, fileEntry.getFileVersion(), themeDisplay,
-				StringPool.BLANK, false, true);
-
-			if (Validator.isNotNull(previewURL)) {
-				fileEntryFieldValues.add(
-					new InfoFieldValue<>(
-						FileEntryInfoItemFields.previewURLInfoField,
-						previewURL));
+						FileEntryInfoItemFields.downloadURL, downloadURL));
 			}
 
 			WebImage imagePreviewURLWebImage = new WebImage(
@@ -302,11 +282,11 @@ public class FileEntryInfoItemFieldValuesProvider
 					FileEntry.class.getName(),
 					new ClassPKInfoItemIdentifier(fileEntry.getFileEntryId())));
 
-			imagePreviewURLWebImage.setAlt(fileEntry.getDescription());
+			imagePreviewURLWebImage.setAlt(fileEntry.getTitle());
 
 			fileEntryFieldValues.add(
 				new InfoFieldValue<>(
-					FileEntryInfoItemFields.previewImageInfoField,
+					FileEntryInfoItemFields.previewImage,
 					imagePreviewURLWebImage));
 
 			if (themeDisplay != null) {
@@ -355,9 +335,6 @@ public class FileEntryInfoItemFieldValuesProvider
 	@Reference
 	private DDMFormValuesInfoFieldValuesProvider
 		_ddmFormValuesInfoFieldValuesProvider;
-
-	@Reference
-	private DDMStorageEngineManager _ddmStorageEngineManager;
 
 	@Reference
 	private DLFileEntryMetadataLocalService _dlFileEntryMetadataLocalService;

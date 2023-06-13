@@ -38,66 +38,37 @@ export default withRouter(
 		const [addUpdateMessage] = useMutation(updateMessageQuery);
 
 		const [data, setData] = useState();
-		const editorRef = useRef('');
+		const editor = useRef('');
 		const [isUpdateButtonDisabled, setIsUpdateButtonDisabled] = useState(
 			false
 		);
 
 		useEffect(() => {
-			editorRef.current.setContent(
+			editor.current.setContent(
 				data && data.messageBoardMessageByFriendlyUrlPath.articleBody
 			);
 		}, [data]);
-
-		const onInstanceReady = () => {
-			client
-				.request({
-					query: getMessageQuery,
-					variables: {
-						friendlyUrlPath: answerId,
-						siteKey: context.siteKey,
-					},
-				})
-				.then(({data}) => setData(data));
-		};
-
-		const handleClickMessage = () => {
-			addUpdateMessage({
-				fetchOptionsOverrides: getContextLink(
-					`${sectionTitle}/${questionId}`
-				),
-				variables: {
-					articleBody: editorRef.current.getContent(),
-					messageBoardMessageId:
-						data.messageBoardMessageByFriendlyUrlPath.id,
-				},
-			}).then(() => {
-				editorRef.current.clearContent();
-				history.goBack();
-			});
-		};
-
-		const isAReplyMessage = answerId.includes('re-re-');
 
 		return (
 			<section className="c-mt-5 questions-section questions-sections-answer">
 				<div className="questions-container row">
 					<div className="c-mx-auto col-xl-10">
-						<h1>
-							{isAReplyMessage
-								? Liferay.Language.get('edit-comment')
-								: Liferay.Language.get('edit-answer')}
-						</h1>
-
+						<h1>{Liferay.Language.get('edit-answer')}</h1>
 						<DefaultQuestionsEditor
-							label={
-								isAReplyMessage
-									? Liferay.Language.get('your-comment')
-									: Liferay.Language.get('your-answer')
-							}
+							label={Liferay.Language.get('your-answer')}
 							onContentLengthValid={setIsUpdateButtonDisabled}
-							onInstanceReady={onInstanceReady}
-							ref={editorRef}
+							onInstanceReady={() => {
+								client
+									.request({
+										query: getMessageQuery,
+										variables: {
+											friendlyUrlPath: answerId,
+											siteKey: context.siteKey,
+										},
+									})
+									.then(({data}) => setData(data));
+							}}
+							ref={editor}
 						/>
 
 						<div className="c-mt-4 d-flex flex-column-reverse flex-sm-row">
@@ -105,18 +76,28 @@ export default withRouter(
 								className="c-mt-4 c-mt-sm-0"
 								disabled={isUpdateButtonDisabled}
 								displayType="primary"
-								onClick={handleClickMessage}
+								onClick={() => {
+									addUpdateMessage({
+										fetchOptionsOverrides: getContextLink(
+											`${sectionTitle}/${questionId}`
+										),
+										variables: {
+											articleBody: editor.current.getContent(),
+											messageBoardMessageId:
+												data
+													.messageBoardMessageByFriendlyUrlPath
+													.id,
+										},
+									}).then(() => {
+										editor.current.clearContent();
+										history.goBack();
+									});
+								}}
 							>
 								{context.trustedUser
-									? isAReplyMessage
-										? Liferay.Language.get(
-												'update-your-comment'
-										  )
-										: Liferay.Language.get(
-												'update-your-answer'
-										  )
+									? Liferay.Language.get('update-your-answer')
 									: Liferay.Language.get(
-											'submit-for-workflow'
+											'submit-for-publication'
 									  )}
 							</ClayButton>
 

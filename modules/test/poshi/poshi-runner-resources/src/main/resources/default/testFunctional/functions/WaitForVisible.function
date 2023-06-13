@@ -1,8 +1,0 @@
-@default = "waitForVisible"
-definition {
-
-	function waitForVisible {
-		selenium.waitForVisible();
-	}
-
-}

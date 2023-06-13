@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.util.stream.Stream;
+
 /**
  * @author Leonardo Barros
  */
@@ -54,13 +56,11 @@ public class AllFunction
 			values = new Object[] {parameter};
 		}
 
-		for (Object value : values) {
-			if (!_accept(expression, value)) {
-				return false;
-			}
-		}
-
-		return true;
+		return Stream.of(
+			values
+		).allMatch(
+			value -> accept(expression, value)
+		);
 	}
 
 	@Override
@@ -68,13 +68,7 @@ public class AllFunction
 		return NAME;
 	}
 
-	protected boolean isArray(Object parameter) {
-		Class<?> clazz = parameter.getClass();
-
-		return clazz.isArray();
-	}
-
-	private boolean _accept(String expression, Object value) {
+	protected boolean accept(String expression, Object value) {
 		expression = StringUtil.replace(
 			expression, "#value#", String.valueOf(value));
 
@@ -91,11 +85,17 @@ public class AllFunction
 		}
 		catch (DDMExpressionException ddmExpressionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ddmExpressionException);
+				_log.debug(ddmExpressionException, ddmExpressionException);
 			}
 		}
 
 		return false;
+	}
+
+	protected boolean isArray(Object parameter) {
+		Class<?> clazz = parameter.getClass();
+
+		return clazz.isArray();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(AllFunction.class);

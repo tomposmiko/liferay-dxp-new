@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.WebDAVProps;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -331,9 +332,14 @@ public class WebDAVPropsUtil {
 	}
 
 	public static WebDAVPropsPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (WebDAVPropsPersistence)PortalBeanLocatorUtil.locate(
+				WebDAVPropsPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile WebDAVPropsPersistence _persistence;
+	private static WebDAVPropsPersistence _persistence;
 
 }

@@ -112,6 +112,17 @@ public interface AssetVocabularyLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addVocabulary(String, long, long, String, String, Map, Map, String, int, ServiceContext)}
+	 */
+	@Deprecated
+	public AssetVocabulary addVocabulary(
+			long userId, long groupId, String name, String title,
+			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			String settings, int visibilityType, ServiceContext serviceContext)
+		throws PortalException;
+
 	public AssetVocabulary addVocabulary(
 			long userId, long groupId, String name, String title,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
@@ -273,9 +284,24 @@ public interface AssetVocabularyLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetVocabulary fetchAssetVocabulary(long vocabularyId);
 
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary, or <code>null</code> if a matching asset vocabulary could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetVocabulary fetchAssetVocabularyByExternalReferenceCode(
-		String externalReferenceCode, long groupId);
+		long groupId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetVocabularyByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetVocabulary fetchAssetVocabularyByReferenceCode(
+		long groupId, String externalReferenceCode);
 
 	/**
 	 * Returns the asset vocabulary matching the UUID and group.
@@ -353,9 +379,17 @@ public interface AssetVocabularyLocalService
 	public AssetVocabulary getAssetVocabulary(long vocabularyId)
 		throws PortalException;
 
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary
+	 * @throws PortalException if a matching asset vocabulary could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetVocabulary getAssetVocabularyByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -453,8 +487,13 @@ public interface AssetVocabularyLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<AssetVocabulary> searchVocabularies(
-			long companyId, long[] groupIds, String title,
-			int[] visibilityTypes, int start, int end, Sort sort)
+			long companyId, long groupId, String title, int start, int end)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BaseModelSearchResult<AssetVocabulary> searchVocabularies(
+			long companyId, long groupId, String title, int start, int end,
+			Sort sort)
 		throws PortalException;
 
 	/**
@@ -483,11 +522,17 @@ public interface AssetVocabularyLocalService
 			int visibilityType)
 		throws PortalException;
 
-	@Indexable(type = IndexableType.REINDEX)
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, String title, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String settings,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	@Indexable(type = IndexableType.REINDEX)
+	public AssetVocabulary updateVocabulary(
+			long vocabularyId, String name, String title,
+			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			String settings, ServiceContext serviceContext)
 		throws PortalException;
 
 	@Override

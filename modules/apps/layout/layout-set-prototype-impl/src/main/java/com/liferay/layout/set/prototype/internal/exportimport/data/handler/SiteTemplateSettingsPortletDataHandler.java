@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Daniela Zapata Riesco
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + LayoutSetPrototypePortletKeys.SITE_TEMPLATE_SETTINGS,
 	service = PortletDataHandler.class
 )

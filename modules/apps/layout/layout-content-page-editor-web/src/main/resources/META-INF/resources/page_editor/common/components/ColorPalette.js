@@ -15,10 +15,10 @@
 import ClayButton from '@clayui/button';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
+import React from 'react';
 
 import {config} from '../../app/config/index';
-import {useId} from '../hooks/useId';
+import {useId} from '../../app/utils/useId';
 
 export default function ColorPalette({
 	label,
@@ -28,43 +28,31 @@ export default function ColorPalette({
 }) {
 	const colorPaletteId = useId();
 
-	const themeColors = useMemo(() => {
-		return config.themeColorsCssClasses.map((color) => {
-			return {
-				color,
-				cssClass: color,
-				rgbValue: getRgbValue(color),
-			};
-		});
-	}, []);
-
 	return (
 		<div className="page-editor__color-palette">
 			{label && <label htmlFor={colorPaletteId}>{label}</label>}
 
 			<div className="palette-container" id={colorPaletteId}>
 				<ul className="list-unstyled palette-items-container">
-					{themeColors.map((color) => (
+					{config.themeColorsCssClasses.map((color) => (
 						<li
 							className={classNames('palette-item', {
 								'palette-item-selected':
-									color.rgbValue === selectedColor ||
-									color.cssClass === selectedColor,
+									color === selectedColor,
 							})}
-							key={color.cssClass}
+							key={color}
 						>
 							<ClayButton
 								block
 								className={classNames(
-									`bg-${color.cssClass}`,
+									`bg-${color}`,
 									'palette-item-inner',
 									'p-1',
 									'rounded-circle'
 								)}
 								displayType="unstyled"
-								onClick={() => onColorSelect(color)}
-								size="sm"
-								title={color.cssClass}
+								onClick={(event) => onColorSelect(color, event)}
+								small
 							/>
 						</li>
 					))}
@@ -76,7 +64,7 @@ export default function ColorPalette({
 					disabled={!selectedColor}
 					displayType="secondary"
 					onClick={onClear}
-					size="sm"
+					small
 				>
 					{Liferay.Language.get('clear')}
 				</ClayButton>
@@ -91,18 +79,3 @@ ColorPalette.propTypes = {
 	onColorSelect: PropTypes.func.isRequired,
 	selectedColor: PropTypes.string,
 };
-
-function getRgbValue(className) {
-	const node = document.createElement('div');
-
-	node.classList.add(`bg-${className}`);
-	node.style.display = 'none';
-
-	document.body.append(node);
-
-	const rgbValue = getComputedStyle(node).backgroundColor;
-
-	document.body.removeChild(node);
-
-	return rgbValue;
-}

@@ -56,9 +56,10 @@ public class MVCContextImpl implements MvcContext {
 		_configuration = configuration;
 		_encoders = encoders;
 		_portletContext = portletContext;
+
 		_portletRequest = portletRequest;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
@@ -74,7 +75,7 @@ public class MVCContextImpl implements MvcContext {
 
 		Map<String, javax.ws.rs.core.Cookie> cookieMap = new HashMap<>();
 
-		Cookie[] cookies = portletRequest.getCookies();
+		Cookie[] cookies = _portletRequest.getCookies();
 
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
@@ -87,17 +88,17 @@ public class MVCContextImpl implements MvcContext {
 
 		Map<String, String> headerMap = new HashMap<>();
 
-		Enumeration<String> enumeration = portletRequest.getPropertyNames();
+		Enumeration<String> enumeration = _portletRequest.getPropertyNames();
 
 		while (enumeration.hasMoreElements()) {
 			String header = enumeration.nextElement();
 
-			headerMap.put(header, portletRequest.getProperty(header));
+			headerMap.put(header, _portletRequest.getProperty(header));
 		}
 
 		LocaleResolverContext localeResolverContext =
 			new LocaleResolverContextImpl(
-				Collections.list(portletRequest.getLocales()), _configuration,
+				Collections.list(_portletRequest.getLocales()), _configuration,
 				cookieMap, headerMap, new UriInfoImpl());
 
 		Locale locale = null;

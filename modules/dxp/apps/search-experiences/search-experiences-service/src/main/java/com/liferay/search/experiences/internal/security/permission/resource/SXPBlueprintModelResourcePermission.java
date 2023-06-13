@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Petteri Karttunen
  */
 @Component(
-	enabled = false,
+	immediate = true,
 	property = "model.class.name=com.liferay.search.experiences.model.SXPBlueprint",
 	service = ModelResourcePermission.class
 )
@@ -69,10 +69,10 @@ public class SXPBlueprintModelResourcePermission
 			String actionId)
 		throws PortalException {
 
-		return contains(
-			permissionChecker,
-			_sxpBlueprintLocalService.getSXPBlueprint(sxpBlueprintId),
-			actionId);
+		SXPBlueprint sxpBlueprint = _sxpBlueprintLocalService.getSXPBlueprint(
+			sxpBlueprintId);
+
+		return contains(permissionChecker, sxpBlueprint, actionId);
 	}
 
 	@Override

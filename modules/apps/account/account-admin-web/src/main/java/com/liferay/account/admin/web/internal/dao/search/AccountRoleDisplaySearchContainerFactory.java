@@ -16,24 +16,22 @@ package com.liferay.account.admin.web.internal.dao.search;
 
 import com.liferay.account.admin.web.internal.display.AccountRoleDisplay;
 import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.constants.AccountPortletKeys;
 import com.liferay.account.constants.AccountRoleConstants;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountRoleLocalServiceUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.util.comparator.RoleNameComparator;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.util.Objects;
+import java.util.List;
 
 /**
  * @author Pei-Jung Lan
@@ -57,10 +55,14 @@ public class AccountRoleDisplaySearchContainerFactory {
 
 		searchContainer.setId("accountRoles");
 		searchContainer.setOrderByCol("name");
-		searchContainer.setOrderByType(
-			SearchOrderByUtil.getOrderByType(
-				liferayPortletRequest, AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
-				"account-role-order-by-type", "asc"));
+
+		String orderByType = ParamUtil.getString(
+			liferayPortletRequest, "orderByType", "asc");
+
+		searchContainer.setOrderByType(orderByType);
+
+		searchContainer.setRowChecker(
+			new AccountRoleRowChecker(liferayPortletResponse));
 
 		String keywords = ParamUtil.getString(
 			liferayPortletRequest, "keywords");
@@ -79,25 +81,23 @@ public class AccountRoleDisplaySearchContainerFactory {
 					}
 				).build(),
 				searchContainer.getStart(), searchContainer.getEnd(),
-				new RoleNameComparator(
-					Objects.equals(searchContainer.getOrderByType(), "asc")));
+				new RoleNameComparator(orderByType.equals("asc")));
 
-		searchContainer.setResultsAndTotal(
-			() -> TransformUtil.transform(
-				baseModelSearchResult.getBaseModels(),
-				accountRole -> {
-					if (!AccountRoleConstants.isImpliedRole(
-							accountRole.getRole())) {
+		List<AccountRoleDisplay> accountRoleDisplays = TransformUtil.transform(
+			baseModelSearchResult.getBaseModels(),
+			accountRole -> {
+				if (!AccountRoleConstants.isImpliedRole(
+						accountRole.getRole())) {
 
-						return AccountRoleDisplay.of(accountRole);
-					}
+					return AccountRoleDisplay.of(accountRole);
+				}
 
-					return null;
-				}),
-			baseModelSearchResult.getLength());
+				return null;
+			});
 
-		searchContainer.setRowChecker(
-			new AccountRoleRowChecker(liferayPortletResponse));
+		searchContainer.setResults(accountRoleDisplays);
+
+		searchContainer.setTotal(baseModelSearchResult.getLength());
 
 		return searchContainer;
 	}

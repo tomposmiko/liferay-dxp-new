@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.ClassNameModel;
+import com.liferay.portal.kernel.model.ClassNameSoap;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -33,15 +34,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -131,6 +135,50 @@ public class ClassNameModelImpl
 	@Deprecated
 	public static final long CLASSNAMEID_COLUMN_BITMASK = 2L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static ClassName toModel(ClassNameSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		ClassName model = new ClassNameImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setValue(soapModel.getValue());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<ClassName> toModels(ClassNameSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<ClassName> models = new ArrayList<ClassName>(soapModels.length);
+
+		for (ClassNameSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.portal.kernel.model.ClassName"));
@@ -210,58 +258,70 @@ public class ClassNameModelImpl
 	public Map<String, Function<ClassName, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ClassName, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ClassName>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ClassName, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ClassName.class.getClassLoader(), ClassName.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ClassName, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<ClassName, Object>>();
+		try {
+			Constructor<ClassName> constructor =
+				(Constructor<ClassName>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", ClassName::getMvccVersion);
-			attributeGetterFunctions.put(
-				"classNameId", ClassName::getClassNameId);
-			attributeGetterFunctions.put("value", ClassName::getValue);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ClassName, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ClassName, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ClassName, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ClassName, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ClassName, Object>>();
+		Map<String, BiConsumer<ClassName, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<ClassName, ?>>();
 
-		static {
-			Map<String, BiConsumer<ClassName, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<ClassName, ?>>();
+		attributeGetterFunctions.put("mvccVersion", ClassName::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<ClassName, Long>)ClassName::setMvccVersion);
+		attributeGetterFunctions.put("classNameId", ClassName::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<ClassName, Long>)ClassName::setClassNameId);
+		attributeGetterFunctions.put("value", ClassName::getValue);
+		attributeSetterBiConsumers.put(
+			"value", (BiConsumer<ClassName, String>)ClassName::setValue);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<ClassName, Long>)ClassName::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<ClassName, Long>)ClassName::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"value", (BiConsumer<ClassName, String>)ClassName::setValue);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -556,12 +616,41 @@ public class ClassNameModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ClassName, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ClassName, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ClassName, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ClassName)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ClassName>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ClassName.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -570,9 +659,8 @@ public class ClassNameModelImpl
 	private String _value;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<ClassName, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<ClassName, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -1,7 +1,8 @@
 {
-	"dependencies": {
-		"@liferay/frontend-icons-web": "*",
-		"frontend-js-web": "*"
+	"jest": {
+		"setupFilesAfterEnv": [
+			"<rootDir>/jest-setup.js"
+		]
 	},
 	"name": "document-library-opener-onedrive-web",
 	"private": true,
@@ -11,5 +12,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "3.0.42"
+	"version": "3.0.15"
 }

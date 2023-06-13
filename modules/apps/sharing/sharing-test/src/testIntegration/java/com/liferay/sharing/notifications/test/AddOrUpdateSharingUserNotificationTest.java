@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -65,15 +66,18 @@ public class AddOrUpdateSharingUserNotificationTest
 
 	@Override
 	protected BaseModel<?> addBaseModel() throws Exception {
+		long classNameId = _classNameLocalService.getClassNameId(
+			Group.class.getName());
 		long classPK = group.getGroupId();
 
-		return _sharingEntryLocalService.addOrUpdateSharingEntry(
-			_fromUser.getUserId(), user.getUserId(),
-			_classNameLocalService.getClassNameId(Group.class.getName()),
-			classPK, group.getGroupId(), true,
-			Arrays.asList(SharingEntryAction.VIEW), null,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), TestPropsValues.getUserId()));
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		return _sharingEntryLocalService.addOrUpdateSharingEntry(
+			_fromUser.getUserId(), user.getUserId(), classNameId, classPK,
+			group.getGroupId(), true, Arrays.asList(SharingEntryAction.VIEW),
+			null, serviceContext);
 	}
 
 	@Override
@@ -82,7 +86,7 @@ public class AddOrUpdateSharingUserNotificationTest
 	}
 
 	@Override
-	protected void subscribeToContainer() throws Exception {
+	protected void subscribeToContainer() {
 		MailServiceTestUtil.clearMessages();
 
 		_userNotificationEventLocalService.deleteUserNotificationEvents(
@@ -95,14 +99,16 @@ public class AddOrUpdateSharingUserNotificationTest
 
 		SharingEntry sharingEntry = (SharingEntry)baseModel;
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
 		return _sharingEntryLocalService.addOrUpdateSharingEntry(
 			sharingEntry.getUserId(), sharingEntry.getToUserId(),
 			sharingEntry.getClassNameId(), sharingEntry.getClassPK(),
 			sharingEntry.getGroupId(), sharingEntry.isShareable(),
 			Arrays.asList(SharingEntryAction.VIEW, SharingEntryAction.UPDATE),
-			sharingEntry.getExpirationDate(),
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), TestPropsValues.getUserId()));
+			sharingEntry.getExpirationDate(), serviceContext);
 	}
 
 	@Inject

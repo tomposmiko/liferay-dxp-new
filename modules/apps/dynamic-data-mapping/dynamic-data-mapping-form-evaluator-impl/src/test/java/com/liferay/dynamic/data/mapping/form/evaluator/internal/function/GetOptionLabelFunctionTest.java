@@ -29,10 +29,12 @@ import org.junit.Test;
 
 import org.mockito.Mockito;
 
+import org.powermock.api.mockito.PowerMockito;
+
 /**
  * @author Marcos Martins
  */
-public class GetOptionLabelFunctionTest {
+public class GetOptionLabelFunctionTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -40,7 +42,7 @@ public class GetOptionLabelFunctionTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		_getOptionLabelFunction = new GetOptionLabelFunction();
 	}
 
@@ -49,7 +51,7 @@ public class GetOptionLabelFunctionTest {
 		DefaultDDMExpressionFieldAccessor ddmExpressionFieldAccessor =
 			new DefaultDDMExpressionFieldAccessor();
 
-		DDMFormFieldOptions ddmFormFieldOptions = Mockito.mock(
+		DDMFormFieldOptions ddmFormFieldOptions = mock(
 			DDMFormFieldOptions.class);
 
 		LocalizedValue localizedValue = new LocalizedValue();
@@ -57,7 +59,7 @@ public class GetOptionLabelFunctionTest {
 		localizedValue.addString(LocaleUtil.US, "Option 1");
 		localizedValue.addString(LocaleUtil.BRAZIL, "Opcao 1");
 
-		Mockito.when(
+		when(
 			ddmFormFieldOptions.getOptionLabels(Mockito.eq("optionName"))
 		).thenReturn(
 			localizedValue
@@ -93,14 +95,14 @@ public class GetOptionLabelFunctionTest {
 		DefaultDDMExpressionFieldAccessor ddmExpressionFieldAccessor =
 			new DefaultDDMExpressionFieldAccessor();
 
-		DDMFormFieldOptions ddmFormFieldOptions = Mockito.mock(
+		DDMFormFieldOptions ddmFormFieldOptions = mock(
 			DDMFormFieldOptions.class);
 
 		LocalizedValue localizedValue = new LocalizedValue();
 
 		localizedValue.addString(LocaleUtil.US, "Option 1");
 
-		Mockito.when(
+		when(
 			ddmFormFieldOptions.getOptionLabels(Mockito.eq("optionName"))
 		).thenReturn(
 			localizedValue

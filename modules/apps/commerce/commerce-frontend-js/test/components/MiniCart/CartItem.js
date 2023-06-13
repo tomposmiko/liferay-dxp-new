@@ -12,8 +12,6 @@
  * details.
  */
 
-import '../../tests_utilities/polyfills';
-
 import '@testing-library/jest-dom/extend-expect';
 import {act, cleanup, fireEvent, render, wait} from '@testing-library/react';
 import React from 'react';
@@ -25,8 +23,8 @@ import {
 	REMOVAL_ERRORS_TIMEOUT,
 	REMOVAL_TIMEOUT,
 } from '../../../src/main/resources/META-INF/resources/components/mini_cart/util/constants';
-import * as MiniCarttests_utilities from '../../../src/main/resources/META-INF/resources/components/mini_cart/util/index';
-import {UPDATE_AFTER} from '../../../src/main/resources/META-INF/resources/components/quantity_selector/tests_utilities';
+import * as MiniCartUtils from '../../../src/main/resources/META-INF/resources/components/mini_cart/util/index';
+import {UPDATE_AFTER} from '../../../src/main/resources/META-INF/resources/components/quantity_selector/utils';
 import {PRODUCT_REMOVED_FROM_CART} from '../../../src/main/resources/META-INF/resources/utilities/eventsDefinitions';
 
 describe('MiniCart Item', () => {
@@ -37,14 +35,13 @@ describe('MiniCart Item', () => {
 		},
 		actionURLs: {
 			orderDetailURL: 'http://order-detail.url',
-			productURLSeparator: 'p',
-			siteDefaultURL: 'http://localhost:8080/group/siteDefaultUrl',
 		},
 		cartState: {
 			id: 101,
 		},
 		displayDiscountLevels: false,
 		setIsUpdating: jest.fn(),
+		spritemap: 'someSpritemap.svg',
 		updateCartModel: jest.fn().mockReturnValue(Promise.resolve()),
 	};
 
@@ -70,9 +67,6 @@ describe('MiniCart Item', () => {
 				priceFormatted: '$ 8.00',
 				promoPrice: 8,
 				promoPriceFormatted: '$ 8.00',
-			},
-			productURLs: {
-				en_US: 'u-joint',
 			},
 			quantity: 1,
 			settings: {
@@ -107,7 +101,7 @@ describe('MiniCart Item', () => {
 			.fn()
 			.mockReturnValue(Promise.resolve());
 
-		jest.spyOn(MiniCarttests_utilities, 'parseOptions');
+		jest.spyOn(MiniCartUtils, 'parseOptions');
 
 		window.Liferay = {
 			Language: {
@@ -179,66 +173,17 @@ describe('MiniCart Item', () => {
 				</MiniCartContext.Provider>
 			);
 
-			expect(MiniCarttests_utilities.parseOptions).toHaveBeenCalledTimes(
-				1
-			);
-			expect(MiniCarttests_utilities.parseOptions).toHaveBeenCalledWith(
+			expect(MiniCartUtils.parseOptions).toHaveBeenCalledTimes(1);
+			expect(MiniCartUtils.parseOptions).toHaveBeenCalledWith(
 				BASE_PROPS.item.options
 			);
-		});
-
-		it('On click redirect to product page', () => {
-			Liferay.Util = {navigate: jest.fn()};
-
-			const {getByRole} = render(
-				<MiniCartContext.Provider value={BASE_CONTEXT_MOCK}>
-					<CartItem {...BASE_PROPS} />
-				</MiniCartContext.Provider>
-			);
-
-			expect(getByRole('link').href).toBe(
-				BASE_CONTEXT_MOCK.actionURLs.siteDefaultURL +
-					'/' +
-					BASE_CONTEXT_MOCK.actionURLs.productURLSeparator +
-					'/' +
-					BASE_PROPS.item.productURLs.en_US
-			);
-		});
-
-		it('On quantitySelector click, no redirect to product page', () => {
-			const {getByRole} = render(
-				<MiniCartContext.Provider value={BASE_CONTEXT_MOCK}>
-					<CartItem {...BASE_PROPS} />
-				</MiniCartContext.Provider>
-			);
-			const mockClick = jest.fn();
-			getByRole('link').addEventListener('click', mockClick);
-
-			fireEvent.click(getByRole('textbox'));
-			fireEvent.change(getByRole('textbox'), {value: '12'});
-
-			expect(mockClick).not.toBeCalled();
-		});
-
-		it('On remove button click, no redirect to product page', () => {
-			const {getAllByRole, getByRole} = render(
-				<MiniCartContext.Provider value={BASE_CONTEXT_MOCK}>
-					<CartItem {...BASE_PROPS} />
-				</MiniCartContext.Provider>
-			);
-			const mockClick = jest.fn();
-			getByRole('link').addEventListener('click', mockClick);
-
-			fireEvent.click(getAllByRole('button')[0]);
-
-			expect(mockClick).not.toBeCalled();
 		});
 	});
 
 	describe('by data flow', () => {
 		describe('if the parsed options string is non-empty', () => {
 			it('adds the "options" class name to the ItemInfoView wrapper div', () => {
-				MiniCarttests_utilities.parseOptions.mockReturnValue('24, L');
+				MiniCartUtils.parseOptions.mockReturnValue('24, L');
 
 				const {container} = render(
 					<MiniCartContext.Provider value={BASE_CONTEXT_MOCK}>

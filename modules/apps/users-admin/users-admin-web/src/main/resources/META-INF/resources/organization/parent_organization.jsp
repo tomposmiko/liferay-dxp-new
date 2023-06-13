@@ -67,7 +67,7 @@ if (parentOrganization != null) {
 %>
 
 <clay:content-row
-	containerElement="div"
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -77,14 +77,16 @@ if (parentOrganization != null) {
 	</clay:content-col>
 
 	<clay:content-col>
-		<clay:button
-			aria-label='<%= LanguageUtil.format(request, (parentOrganizations.size() > 0) ? "change-x" : "select-x", "parent-organization") %>'
-			cssClass="heading-end modify-link"
-			displayType="secondary"
-			id='<%= liferayPortletResponse.getNamespace() + "selectOrganizationLink" %>'
-			label='<%= LanguageUtil.get(request, (parentOrganizations.size() > 0) ? "change" : "select") %>'
-			small="<%= true %>"
-		/>
+		<span class="heading-end">
+			<liferay-ui:icon
+				cssClass="modify-link"
+				id="selectOrganizationLink"
+				label="<%= true %>"
+				linkCssClass="btn btn-secondary btn-sm"
+				message='<%= (parentOrganizations.size() > 0) ? "change" : "select" %>'
+				url="javascript:;"
+			/>
+		</span>
 	</clay:content-col>
 </clay:content-row>
 
@@ -165,7 +167,7 @@ if (parentOrganization != null) {
 		/>
 
 		<liferay-ui:search-container-column-text>
-			<a class="modify-link" data-rowId="<%= curOrganization.getOrganizationId() %>" href="javascript:void(0);"><%= removeOrganizationIcon %></a>
+			<a class="modify-link" data-rowId="<%= curOrganization.getOrganizationId() %>" href="javascript:;"><%= removeOrganizationIcon %></a>
 		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
@@ -240,7 +242,7 @@ if (parentOrganization != null) {
 					rowColumns.push(
 						'<a class="modify-link" data-rowId="' +
 							event.entityid +
-							'" href="javascript:void(0);"><%= UnicodeFormatter.toString(removeOrganizationIcon) %></a>'
+							'" href="javascript:;"><%= UnicodeFormatter.toString(removeOrganizationIcon) %></a>'
 					);
 
 					searchContainer.deleteRow(1, searchContainer.getData());

@@ -15,6 +15,7 @@
 package com.liferay.asset.tags.internal.service;
 
 import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.subscription.service.SubscriptionLocalService;
@@ -25,9 +26,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Javier de Arcos
  */
-@Component(service = ServiceWrapper.class)
+@Component(immediate = true, service = ServiceWrapper.class)
 public class AssetTagLocalServiceWrapper
 	extends com.liferay.asset.kernel.service.AssetTagLocalServiceWrapper {
+
+	public AssetTagLocalServiceWrapper() {
+		super(null);
+	}
+
+	public AssetTagLocalServiceWrapper(
+		AssetTagLocalService assetTagLocalService) {
+
+		super(assetTagLocalService);
+	}
 
 	@Override
 	public void subscribeTag(long userId, long groupId, long tagId)

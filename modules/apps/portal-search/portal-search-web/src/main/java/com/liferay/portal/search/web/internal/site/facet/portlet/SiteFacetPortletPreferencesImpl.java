@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.web.internal.site.facet.portlet;
 
-import com.liferay.portal.search.web.internal.portlet.preferences.BasePortletPreferences;
+import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
 
 import java.util.Optional;
 
@@ -24,43 +24,40 @@ import javax.portlet.PortletPreferences;
  * @author André de Oliveira
  */
 public class SiteFacetPortletPreferencesImpl
-	extends BasePortletPreferences implements SiteFacetPortletPreferences {
+	implements SiteFacetPortletPreferences {
 
 	public SiteFacetPortletPreferencesImpl(
 		Optional<PortletPreferences> portletPreferencesOptional) {
 
-		super(portletPreferencesOptional.orElse(null));
+		_portletPreferencesHelper = new PortletPreferencesHelper(
+			portletPreferencesOptional);
 	}
 
 	@Override
 	public int getFrequencyThreshold() {
-		return getInteger(
+		return _portletPreferencesHelper.getInteger(
 			SiteFacetPortletPreferences.PREFERENCE_KEY_FREQUENCY_THRESHOLD, 1);
 	}
 
 	@Override
 	public int getMaxTerms() {
-		return getInteger(
+		return _portletPreferencesHelper.getInteger(
 			SiteFacetPortletPreferences.PREFERENCE_KEY_MAX_TERMS, 10);
 	}
 
 	@Override
-	public String getOrder() {
-		return getString(
-			SiteFacetPortletPreferences.PREFERENCE_KEY_ORDER, "count:desc");
-	}
-
-	@Override
 	public String getParameterName() {
-		return getString(
+		return _portletPreferencesHelper.getString(
 			SiteFacetPortletPreferences.PREFERENCE_KEY_PARAMETER_NAME, "site");
 	}
 
 	@Override
 	public boolean isFrequenciesVisible() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			SiteFacetPortletPreferences.PREFERENCE_KEY_FREQUENCIES_VISIBLE,
 			true);
 	}
+
+	private final PortletPreferencesHelper _portletPreferencesHelper;
 
 }

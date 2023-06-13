@@ -15,14 +15,17 @@
 package com.liferay.knowledge.base.web.internal.security.permission.resource;
 
 import com.liferay.knowledge.base.model.KBArticle;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class KBArticlePermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class KBArticlePermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<KBArticle> modelResourcePermission =
-			_kbArticleModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _kbArticleModelResourcePermission.contains(
 			permissionChecker, kbArticle, actionId);
 	}
 
@@ -41,17 +41,21 @@ public class KBArticlePermission {
 			PermissionChecker permissionChecker, long classPK, String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<KBArticle> modelResourcePermission =
-			_kbArticleModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _kbArticleModelResourcePermission.contains(
 			permissionChecker, classPK, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<KBArticle>>
-		_kbArticleModelResourcePermissionSnapshot = new Snapshot<>(
-			KBArticlePermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.knowledge.base.model.KBArticle)");
+	@Reference(
+		target = "(model.class.name=com.liferay.knowledge.base.model.KBArticle)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<KBArticle> modelResourcePermission) {
+
+		_kbArticleModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<KBArticle>
+		_kbArticleModelResourcePermission;
 
 }

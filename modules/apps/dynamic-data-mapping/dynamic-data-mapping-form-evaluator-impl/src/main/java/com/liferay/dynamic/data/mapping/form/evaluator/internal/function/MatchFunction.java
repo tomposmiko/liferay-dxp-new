@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.form.evaluator.internal.function;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunction;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,8 +32,7 @@ public class MatchFunction
 	@Override
 	public Boolean apply(String value, String regex) {
 		try {
-			Pattern pattern = Pattern.compile(
-				StringUtil.trim(regex), Pattern.DOTALL);
+			Pattern pattern = Pattern.compile(regex);
 
 			Matcher matcher = pattern.matcher(value);
 
@@ -42,7 +40,7 @@ public class MatchFunction
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

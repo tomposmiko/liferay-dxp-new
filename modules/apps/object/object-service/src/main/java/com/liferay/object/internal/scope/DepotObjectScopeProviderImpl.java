@@ -17,7 +17,7 @@ package com.liferay.object.internal.scope;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.Portal;
@@ -53,7 +53,7 @@ public class DepotObjectScopeProviderImpl implements ObjectScopeProvider {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "depot");
+		return LanguageUtil.get(locale, "depot");
 	}
 
 	@Override
@@ -79,9 +79,6 @@ public class DepotObjectScopeProviderImpl implements ObjectScopeProvider {
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

@@ -12,7 +12,7 @@
 AUI.add(
 	'liferay-kaleo-designer-dialogs',
 	(A) => {
-		const KaleoDesignerDialogs = {
+		var KaleoDesignerDialogs = {
 			_duplicationDialog: null,
 			_forms: {},
 
@@ -23,9 +23,9 @@ AUI.add(
 				randomId,
 				portletNamespace
 			) {
-				const instance = this;
+				var instance = this;
 
-				let form = A.one('#' + portletNamespace + randomId + 'form');
+				var form = A.one('#' + portletNamespace + randomId + 'form');
 
 				if (form && !instance._forms[randomId]) {
 					instance._forms[randomId] = form;
@@ -39,13 +39,13 @@ AUI.add(
 					form.setAttribute('method', 'POST');
 				}
 
-				const duplicationDialog = instance._duplicationDialog;
+				var duplicationDialog = instance._duplicationDialog;
 
 				if (duplicationDialog) {
 					duplicationDialog.destroy();
 				}
 
-				const dialog = Liferay.Util.Window.getWindow({
+				var dialog = Liferay.Util.Window.getWindow({
 					dialog: {
 						bodyContent: form,
 						height: 325,
@@ -86,8 +86,8 @@ AUI.add(
 									discardDefaultButtonCssClasses: true,
 									labelHTML:
 										'<svg class="lexicon-icon" focusable="false"><use href="' +
-										Liferay.Icons.spritemap +
-										'#times" /><title>' +
+										Liferay.ThemeDisplay.getPathThemeImages() +
+										'/clay/icons.svg#times" /><title>' +
 										Liferay.Language.get('close') +
 										'</title></svg>',
 									on: {
@@ -111,8 +111,8 @@ AUI.add(
 			},
 		};
 
-		const openConfirmDeleteDialog = function (title, message, actionUrl) {
-			const dialog = Liferay.Util.Window.getWindow({
+		var openConfirmDeleteDialog = function (title, message, actionUrl) {
+			var dialog = Liferay.Util.Window.getWindow({
 				dialog: {
 					bodyContent: message,
 					destroyOnHide: true,
@@ -147,8 +147,8 @@ AUI.add(
 								discardDefaultButtonCssClasses: true,
 								labelHTML:
 									'<svg class="lexicon-icon" focusable="false"><use href="' +
-									Liferay.Icons.spritemap +
-									'#times" /><title>' +
+									Liferay.ThemeDisplay.getPathThemeImages() +
+									'/clay/icons.svg#times" /><title>' +
 									Liferay.Language.get('close') +
 									'</title></svg>',
 								on: {
@@ -167,26 +167,26 @@ AUI.add(
 			});
 		};
 
-		const showActionUndoneSuccessMessage = function () {
+		var showActionUndoneSuccessMessage = function () {
 			Liferay.Util.openToast({
 				container: document.querySelector('.lfr-alert-container'),
 				message: Liferay.Language.get('action-undone'),
 			});
 		};
 
-		const showDefinitionImportSuccessMessage = function (namespace) {
-			const undo = Liferay.Language.get('undo');
+		var showDefinitionImportSuccessMessage = function (namespace) {
+			var undo = Liferay.Language.get('undo');
 
-			const undoEvent = "'" + namespace + "undoDefinition'";
+			var undoEvent = "'" + namespace + "undoDefinition'";
 
-			const undoLink =
-				'<a href="javascript:void(0);" onclick=Liferay.fire(' +
+			var undoLink =
+				'<a href="javascript:;" onclick=Liferay.fire(' +
 				undoEvent +
 				'); class="alert-link">' +
 				undo +
 				'</a>';
 
-			let message = Liferay.Language.get(
+			var message = Liferay.Language.get(
 				'definition-imported-successfully'
 			);
 

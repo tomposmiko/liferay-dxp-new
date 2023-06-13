@@ -16,7 +16,7 @@ package com.liferay.staging.bar.web.internal.template;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = "type=" + TemplateContextContributor.TYPE_THEME,
 	service = TemplateContextContributor.class
 )
@@ -94,24 +95,30 @@ public class StagingBarTemplateContextContributor
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		contextObjects.put("show_staging", themeDisplay.isShowStagingIcon());
 
 		if (themeDisplay.isShowStagingIcon()) {
 			contextObjects.put(
-				"staging_text", _language.get(httpServletRequest, "staging"));
+				"staging_text",
+				LanguageUtil.get(httpServletRequest, "staging"));
 		}
+	}
+
+	@Reference(unbind = "-")
+	protected void setCustomizationSettingsControlMenuJSPDynamicInclude(
+		StagingBarControlMenuJSPDynamicInclude
+			stagingBarControlMenuJSPDynamicInclude) {
+
+		_stagingBarControlMenuJSPDynamicInclude =
+			stagingBarControlMenuJSPDynamicInclude;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingBarTemplateContextContributor.class);
 
-	@Reference
-	private Language _language;
-
-	@Reference
 	private StagingBarControlMenuJSPDynamicInclude
 		_stagingBarControlMenuJSPDynamicInclude;
 

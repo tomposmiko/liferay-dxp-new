@@ -14,17 +14,17 @@
 
 package com.liferay.user.groups.admin.web.internal.portlet.configuration.icon;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.UserGroupPermission;
+import com.liferay.portal.kernel.service.permission.UserGroupPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserGroupsAdminPortletKeys.USER_GROUPS_ADMIN,
 		"path=/edit_user_group_assignments.jsp"
@@ -53,7 +54,8 @@ public class EditUserGroupPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "edit");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "edit");
 	}
 
 	@Override
@@ -81,7 +83,7 @@ public class EditUserGroupPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -102,10 +104,10 @@ public class EditUserGroupPortletConfigurationIcon
 
 			UserGroup userGroup = ActionUtil.getUserGroup(portletRequest);
 
-			if (_userGroupPermission.contains(
+			if (UserGroupPermissionUtil.contains(
 					themeDisplay.getPermissionChecker(),
 					userGroup.getUserGroupId(), ActionKeys.UPDATE) &&
-				_userGroupPermission.contains(
+				UserGroupPermissionUtil.contains(
 					themeDisplay.getPermissionChecker(),
 					userGroup.getUserGroupId(), ActionKeys.VIEW)) {
 
@@ -116,7 +118,7 @@ public class EditUserGroupPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -127,12 +129,6 @@ public class EditUserGroupPortletConfigurationIcon
 		EditUserGroupPortletConfigurationIcon.class);
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
-
-	@Reference
-	private UserGroupPermission _userGroupPermission;
 
 }

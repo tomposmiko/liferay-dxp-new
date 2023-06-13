@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.workflow.metrics.internal.configuration.WorkflowMetricsConfiguration",
 	service = ConfigurationModelListener.class
 )
@@ -42,21 +43,16 @@ public class WorkflowMetricsConfigurationModelListener
 	public void onBeforeSave(String pid, Dictionary<String, Object> properties)
 		throws ConfigurationModelListenerException {
 
-		WorkflowMetricsConfiguration workflowMetricsConfiguration =
+		WorkflowMetricsConfiguration ddmFormWebConfiguration =
 			ConfigurableUtil.createConfigurable(
 				WorkflowMetricsConfiguration.class, new HashMapDictionary<>());
 
 		try {
-			_validateJobInterval(
-				GetterUtil.getInteger(
-					properties.get("checkSLAJobInterval"),
-					workflowMetricsConfiguration.checkSLAJobInterval()));
+			int checkSLAJobInterval = GetterUtil.getInteger(
+				properties.get("checkSLAJobInterval"),
+				ddmFormWebConfiguration.checkSLAJobInterval());
 
-			_validateJobInterval(
-				GetterUtil.getInteger(
-					properties.get("checkSLADefinitionsJobInterval"),
-					workflowMetricsConfiguration.
-						checkSLADefinitionsJobInterval()));
+			_validateCheckSLAJobInterval(checkSLAJobInterval);
 		}
 		catch (Exception exception) {
 			throw new ConfigurationModelListenerException(
@@ -65,15 +61,18 @@ public class WorkflowMetricsConfigurationModelListener
 		}
 	}
 
-	private void _validateJobInterval(int jobInterval) throws Exception {
-		if (jobInterval <= 0) {
+	private void _validateCheckSLAJobInterval(int checkSLAJobInterval)
+		throws Exception {
+
+		if (checkSLAJobInterval <= 0) {
 			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", LocaleThreadLocal.getThemeDisplayLocale(),
 				getClass());
 
-			throw new Exception(
-				ResourceBundleUtil.getString(
-					resourceBundle, "the-job-interval-must-be-greater-than-0"));
+			String message = ResourceBundleUtil.getString(
+				resourceBundle, "the-job-interval-must-be-greater-than-0");
+
+			throw new Exception(message);
 		}
 	}
 

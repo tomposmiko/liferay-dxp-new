@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -45,10 +46,12 @@ public class FormNavigatorEntryUtil {
 		String formNavigatorId, String categoryKey, User user,
 		T formModelBean) {
 
-		return filterVisibleFormNavigatorEntries(
+		List<FormNavigatorEntry<T>> formNavigatorEntries =
 			_getFormNavigatorEntries(
-				formNavigatorId, categoryKey, formModelBean),
-			user, formModelBean);
+				formNavigatorId, categoryKey, formModelBean);
+
+		return filterVisibleFormNavigatorEntries(
+			formNavigatorEntries, user, formModelBean);
 	}
 
 	public static <T> List<FormNavigatorEntry<T>> getFormNavigatorEntries(
@@ -132,7 +135,7 @@ public class FormNavigatorEntryUtil {
 		return filteredFormNavigatorEntries;
 	}
 
-	private static <T> List<FormNavigatorEntry<T>>
+	private static <T> Optional<List<FormNavigatorEntry<T>>>
 		_getConfigurationFormNavigatorEntries(
 			String formNavigatorId, String categoryKey, T formModelBean) {
 
@@ -141,7 +144,7 @@ public class FormNavigatorEntryUtil {
 				_formNavigatorEntryConfigurationHelper;
 
 		if (formNavigatorEntryConfigurationHelper == null) {
-			return null;
+			return Optional.empty();
 		}
 
 		return formNavigatorEntryConfigurationHelper.getFormNavigatorEntries(
@@ -151,12 +154,12 @@ public class FormNavigatorEntryUtil {
 	private static <T> List<FormNavigatorEntry<T>> _getFormNavigatorEntries(
 		String formNavigatorId, String categoryKey, T formModelBean) {
 
-		List<FormNavigatorEntry<T>> formNavigationEntries =
+		Optional<List<FormNavigatorEntry<T>>> formNavigationEntriesOptional =
 			_getConfigurationFormNavigatorEntries(
 				formNavigatorId, categoryKey, formModelBean);
 
-		if (formNavigationEntries != null) {
-			return formNavigationEntries;
+		if (formNavigationEntriesOptional.isPresent()) {
+			return formNavigationEntriesOptional.get();
 		}
 
 		return (List)_formNavigatorEntries.getService(

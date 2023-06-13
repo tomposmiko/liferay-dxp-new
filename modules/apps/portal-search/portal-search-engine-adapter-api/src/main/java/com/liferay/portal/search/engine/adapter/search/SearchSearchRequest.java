@@ -77,7 +77,6 @@ public class SearchSearchRequest
 		return Collections.unmodifiableList(_groupByRequests);
 	}
 
-	@Override
 	public Highlight getHighlight() {
 		return _highlight;
 	}
@@ -104,18 +103,6 @@ public class SearchSearchRequest
 
 	public Boolean getScoreEnabled() {
 		return _scoreEnabled;
-	}
-
-	public String getScrollId() {
-		return _scrollId;
-	}
-
-	public long getScrollKeepAliveMinutes() {
-		return _scrollKeepAliveMinutes;
-	}
-
-	public Object[] getSearchAfter() {
-		return _searchAfter;
 	}
 
 	public String[] getSelectedFieldNames() {
@@ -219,7 +206,6 @@ public class SearchSearchRequest
 		_groupByRequests = new ArrayList<>(groupByRequests);
 	}
 
-	@Override
 	public void setHighlight(Highlight highlight) {
 		_highlight = highlight;
 	}
@@ -260,18 +246,6 @@ public class SearchSearchRequest
 
 	public void setScoreEnabled(boolean scoreEnabled) {
 		_scoreEnabled = scoreEnabled;
-	}
-
-	public void setScrollId(String scrollId) {
-		_scrollId = scrollId;
-	}
-
-	public void setScrollKeepAliveMinutes(long scrollKeepAliveMinutes) {
-		_scrollKeepAliveMinutes = scrollKeepAliveMinutes;
-	}
-
-	public void setSearchAfter(Object[] searchAfter) {
-		_searchAfter = searchAfter;
 	}
 
 	public void setSelectedFieldNames(String... selectedFieldNames) {
@@ -329,9 +303,6 @@ public class SearchSearchRequest
 	private boolean _luceneSyntax;
 	private String _preference;
 	private Boolean _scoreEnabled;
-	private String _scrollId;
-	private long _scrollKeepAliveMinutes;
-	private Object[] _searchAfter;
 	private String[] _selectedFieldNames;
 	private Integer _size;
 	private List<Sort> _sorts = new ArrayList<>();

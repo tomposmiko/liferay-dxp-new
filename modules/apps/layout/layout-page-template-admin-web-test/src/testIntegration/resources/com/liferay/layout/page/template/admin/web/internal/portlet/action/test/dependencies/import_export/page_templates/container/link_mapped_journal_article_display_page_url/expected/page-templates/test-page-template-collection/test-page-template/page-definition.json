@@ -29,12 +29,12 @@
 						"maxWidth": "none",
 						"minHeight": "auto",
 						"minWidth": "auto",
+						"opacity": "100",
 						"overflow": "visible",
 						"shadow": "shadow-none",
 						"textAlign": "none",
 						"width": "w-auto"
 					},
-					"indexed": true,
 					"layout": {
 						"borderWidth": 0,
 						"marginBottom": 0,

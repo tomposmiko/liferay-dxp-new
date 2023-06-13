@@ -27,10 +27,10 @@ public class DDMFormFieldValueValueMatcher implements DDMFormFieldValueMatcher {
 	@Override
 	public boolean matches(DDMFormFieldValue ddmFormFieldValue) {
 		if (_locale != null) {
-			return _performLocalizedMatch(ddmFormFieldValue.getValue());
+			return performLocalizedMatch(ddmFormFieldValue.getValue());
 		}
 
-		return _performUnlocalizedMatch(ddmFormFieldValue.getValue());
+		return performUnlocalizedMatch(ddmFormFieldValue.getValue());
 	}
 
 	public void setLocale(Locale locale) {
@@ -41,11 +41,11 @@ public class DDMFormFieldValueValueMatcher implements DDMFormFieldValueMatcher {
 		_value = value;
 	}
 
-	private boolean _performLocalizedMatch(Value value) {
+	protected boolean performLocalizedMatch(Value value) {
 		return _value.equals(value.getString(_locale));
 	}
 
-	private boolean _performUnlocalizedMatch(Value value) {
+	protected boolean performUnlocalizedMatch(Value value) {
 		for (Locale locale : value.getAvailableLocales()) {
 			if (_value.equals(value.getString(locale))) {
 				return true;

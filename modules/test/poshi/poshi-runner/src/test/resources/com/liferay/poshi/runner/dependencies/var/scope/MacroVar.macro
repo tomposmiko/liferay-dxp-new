@@ -1,13 +1,16 @@
-definition {
+<definition>
+	<command name="setStaticVar">
+		<var name="macroStaticVar" static="true" value="A static var set in MacroVar#setStaticVar." />
+	</command>
 
-	macro callStaticVar {
-		if ("${macroStaticVar}" != "A static var set in MacroVar#setStaticVar.") {
-			fail("'macroStaticVar' does not match the value set in RootVar#setStaticVar");
-		}
-	}
-
-	macro setStaticVar {
-		static var macroStaticVar = "A static var set in MacroVar#setStaticVar.";
-	}
-
-}
+	<command name="callStaticVar">
+		<if>
+			<not>
+				<equals arg1="${macroStaticVar}" arg2="A static var set in MacroVar#setStaticVar." />
+			</not>
+			<then>
+				<fail message="'macroStaticVar' does not match the value set in RootVar#setStaticVar" />
+			</then>
+		</if>
+	</command>
+</definition>

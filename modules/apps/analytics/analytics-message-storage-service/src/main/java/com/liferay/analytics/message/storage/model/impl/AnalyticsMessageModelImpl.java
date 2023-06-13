@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -209,88 +210,97 @@ public class AnalyticsMessageModelImpl
 	public Map<String, Function<AnalyticsMessage, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AnalyticsMessage, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AnalyticsMessage>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AnalyticsMessage, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AnalyticsMessage.class.getClassLoader(), AnalyticsMessage.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AnalyticsMessage, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<AnalyticsMessage, Object>>();
+		try {
+			Constructor<AnalyticsMessage> constructor =
+				(Constructor<AnalyticsMessage>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AnalyticsMessage::getMvccVersion);
-			attributeGetterFunctions.put(
-				"analyticsMessageId", AnalyticsMessage::getAnalyticsMessageId);
-			attributeGetterFunctions.put(
-				"companyId", AnalyticsMessage::getCompanyId);
-			attributeGetterFunctions.put("userId", AnalyticsMessage::getUserId);
-			attributeGetterFunctions.put(
-				"userName", AnalyticsMessage::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", AnalyticsMessage::getCreateDate);
-			attributeGetterFunctions.put("body", AnalyticsMessage::getBody);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AnalyticsMessage, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AnalyticsMessage, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AnalyticsMessage, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AnalyticsMessage, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<AnalyticsMessage, Object>>();
+		Map<String, BiConsumer<AnalyticsMessage, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<AnalyticsMessage, ?>>();
 
-		static {
-			Map<String, BiConsumer<AnalyticsMessage, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<AnalyticsMessage, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", AnalyticsMessage::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AnalyticsMessage, Long>)
+				AnalyticsMessage::setMvccVersion);
+		attributeGetterFunctions.put(
+			"analyticsMessageId", AnalyticsMessage::getAnalyticsMessageId);
+		attributeSetterBiConsumers.put(
+			"analyticsMessageId",
+			(BiConsumer<AnalyticsMessage, Long>)
+				AnalyticsMessage::setAnalyticsMessageId);
+		attributeGetterFunctions.put(
+			"companyId", AnalyticsMessage::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AnalyticsMessage, Long>)AnalyticsMessage::setCompanyId);
+		attributeGetterFunctions.put("userId", AnalyticsMessage::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<AnalyticsMessage, Long>)AnalyticsMessage::setUserId);
+		attributeGetterFunctions.put("userName", AnalyticsMessage::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<AnalyticsMessage, String>)
+				AnalyticsMessage::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AnalyticsMessage::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<AnalyticsMessage, Date>)
+				AnalyticsMessage::setCreateDate);
+		attributeGetterFunctions.put("body", AnalyticsMessage::getBody);
+		attributeSetterBiConsumers.put(
+			"body",
+			(BiConsumer<AnalyticsMessage, Blob>)AnalyticsMessage::setBody);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AnalyticsMessage, Long>)
-					AnalyticsMessage::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"analyticsMessageId",
-				(BiConsumer<AnalyticsMessage, Long>)
-					AnalyticsMessage::setAnalyticsMessageId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AnalyticsMessage, Long>)
-					AnalyticsMessage::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<AnalyticsMessage, Long>)
-					AnalyticsMessage::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<AnalyticsMessage, String>)
-					AnalyticsMessage::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<AnalyticsMessage, Date>)
-					AnalyticsMessage::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"body",
-				(BiConsumer<AnalyticsMessage, Blob>)AnalyticsMessage::setBody);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -675,12 +685,61 @@ public class AnalyticsMessageModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		StringBundler sb = new StringBundler(25);
+
+		sb.append("<model><model-name>");
+		sb.append(
+			"com.liferay.analytics.message.storage.model.AnalyticsMessage");
+		sb.append("</model-name>");
+
+		sb.append(
+			"<column><column-name>mvccVersion</column-name><column-value><![CDATA[");
+
+		sb.append(getMvccVersion());
+
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>analyticsMessageId</column-name><column-value><![CDATA[");
+
+		sb.append(getAnalyticsMessageId());
+
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>companyId</column-name><column-value><![CDATA[");
+
+		sb.append(getCompanyId());
+
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>userId</column-name><column-value><![CDATA[");
+
+		sb.append(getUserId());
+
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>userName</column-name><column-value><![CDATA[");
+
+		sb.append(getUserName());
+
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>createDate</column-name><column-value><![CDATA[");
+
+		sb.append(getCreateDate());
+
+		sb.append("]]></column-value></column>");
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AnalyticsMessage>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AnalyticsMessage.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -694,8 +753,7 @@ public class AnalyticsMessageModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<AnalyticsMessage, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

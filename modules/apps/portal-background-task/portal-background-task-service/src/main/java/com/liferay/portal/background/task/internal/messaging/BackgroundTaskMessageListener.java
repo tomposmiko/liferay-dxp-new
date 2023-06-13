@@ -16,14 +16,14 @@ package com.liferay.portal.background.task.internal.messaging;
 
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.background.task.internal.BackgroundTaskImpl;
 import com.liferay.portal.background.task.internal.SerialBackgroundTaskExecutor;
 import com.liferay.portal.background.task.internal.ThreadLocalAwareBackgroundTaskExecutor;
-import com.liferay.portal.background.task.model.BackgroundTask;
-import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutorRegistry;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusMessageTranslator;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistry;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocalManager;
@@ -57,13 +57,13 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 
 	public BackgroundTaskMessageListener(
 		BackgroundTaskExecutorRegistry backgroundTaskExecutorRegistry,
-		BackgroundTaskLocalService backgroundTaskLocalService,
+		BackgroundTaskManager backgroundTaskManager,
 		BackgroundTaskStatusRegistry backgroundTaskStatusRegistry,
 		BackgroundTaskThreadLocalManager backgroundTaskThreadLocalManager,
 		LockManager lockManager, MessageBus messageBus) {
 
 		_backgroundTaskExecutorRegistry = backgroundTaskExecutorRegistry;
-		_backgroundTaskLocalService = backgroundTaskLocalService;
+		_backgroundTaskManager = backgroundTaskManager;
 		_backgroundTaskStatusRegistry = backgroundTaskStatusRegistry;
 		_backgroundTaskThreadLocalManager = backgroundTaskThreadLocalManager;
 		_lockManager = lockManager;
@@ -82,7 +82,7 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			ServiceContext serviceContext = new ServiceContext();
 
 			BackgroundTask backgroundTask =
-				_backgroundTaskLocalService.amendBackgroundTask(
+				_backgroundTaskManager.amendBackgroundTask(
 					backgroundTaskId, null,
 					BackgroundTaskConstants.STATUS_IN_PROGRESS, serviceContext);
 
@@ -96,29 +96,44 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			}
 
 			BackgroundTaskExecutor backgroundTaskExecutor = null;
+			BackgroundTaskStatusMessageListener
+				backgroundTaskStatusMessageListener = null;
 
 			int status = backgroundTask.getStatus();
 			String statusMessage = null;
 
 			try {
-				ClassLoader classLoader = _getBackgroundTaskExecutorClassLoader(
+				ClassLoader classLoader = getBackgroundTaskExecutorClassLoader(
 					backgroundTask);
 
-				backgroundTaskExecutor = _wrapBackgroundTaskExecutor(
+				backgroundTaskExecutor = wrapBackgroundTaskExecutor(
 					backgroundTask, classLoader);
 
 				_backgroundTaskStatusRegistry.registerBackgroundTaskStatus(
-					backgroundTaskId,
-					backgroundTaskExecutor.
-						getBackgroundTaskStatusMessageTranslator());
+					backgroundTaskId);
 
-				backgroundTask =
-					_backgroundTaskLocalService.fetchBackgroundTask(
-						backgroundTask.getBackgroundTaskId());
+				BackgroundTaskStatusMessageTranslator
+					backgroundTaskStatusMessageTranslator =
+						backgroundTaskExecutor.
+							getBackgroundTaskStatusMessageTranslator();
+
+				if (backgroundTaskStatusMessageTranslator != null) {
+					backgroundTaskStatusMessageListener =
+						new BackgroundTaskStatusMessageListener(
+							backgroundTaskId,
+							backgroundTaskStatusMessageTranslator,
+							_backgroundTaskStatusRegistry);
+
+					_messageBus.registerMessageListener(
+						DestinationNames.BACKGROUND_TASK_STATUS,
+						backgroundTaskStatusMessageListener);
+				}
+
+				backgroundTask = _backgroundTaskManager.fetchBackgroundTask(
+					backgroundTask.getBackgroundTaskId());
 
 				BackgroundTaskResult backgroundTaskResult =
-					backgroundTaskExecutor.execute(
-						new BackgroundTaskImpl(backgroundTask));
+					backgroundTaskExecutor.execute(backgroundTask);
 
 				status = backgroundTaskResult.getStatus();
 				statusMessage = backgroundTaskResult.getStatusMessage();
@@ -151,7 +166,7 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 
 				if (backgroundTaskExecutor != null) {
 					statusMessage = backgroundTaskExecutor.handleException(
-						new BackgroundTaskImpl(backgroundTask), exception);
+						backgroundTask, exception);
 				}
 
 				if (_log.isInfoEnabled()) {
@@ -174,19 +189,24 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 							" with status: ", status));
 				}
 
-				_backgroundTaskLocalService.amendBackgroundTask(
+				_backgroundTaskManager.amendBackgroundTask(
 					backgroundTaskId, null, status, statusMessage,
 					serviceContext);
 
 				_backgroundTaskStatusRegistry.unregisterBackgroundTaskStatus(
 					backgroundTaskId);
 
+				if (backgroundTaskStatusMessageListener != null) {
+					_messageBus.unregisterMessageListener(
+						DestinationNames.BACKGROUND_TASK_STATUS,
+						backgroundTaskStatusMessageListener);
+				}
+
 				Message responseMessage = new Message();
 
 				responseMessage.put(
 					BackgroundTaskConstants.BACKGROUND_TASK_ID,
 					backgroundTask.getBackgroundTaskId());
-				responseMessage.put("companyId", backgroundTask.getCompanyId());
 				responseMessage.put("name", backgroundTask.getName());
 				responseMessage.put("status", status);
 				responseMessage.put(
@@ -199,35 +219,7 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 		}
 	}
 
-	private ClassLoader _getAggregatePluginsClassLoader(
-		String servletContextNamesString) {
-
-		String[] servletContextNames = StringUtil.split(
-			servletContextNamesString);
-
-		List<ClassLoader> classLoaders = new ArrayList<>(
-			servletContextNames.length);
-
-		for (String servletContextName : servletContextNames) {
-			ClassLoader classLoader =
-				ServletContextClassLoaderPool.getClassLoader(
-					servletContextName);
-
-			if (classLoader == null) {
-				_log.error(
-					"Unable to find class loader for servlet context " +
-						servletContextName);
-			}
-			else {
-				classLoaders.add(classLoader);
-			}
-		}
-
-		return AggregateClassLoader.getAggregateClassLoader(
-			classLoaders.toArray(new ClassLoader[0]));
-	}
-
-	private BackgroundTaskExecutor _getBackgroundTaskExecutor(
+	protected BackgroundTaskExecutor getBackgroundTaskExecutor(
 		BackgroundTask backgroundTask) {
 
 		BackgroundTaskExecutor backgroundTaskExecutor = null;
@@ -271,7 +263,7 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 		return backgroundTaskExecutor;
 	}
 
-	private ClassLoader _getBackgroundTaskExecutorClassLoader(
+	protected ClassLoader getBackgroundTaskExecutorClassLoader(
 		BackgroundTask backgroundTask) {
 
 		if (Validator.isNull(backgroundTask.getServletContextNames())) {
@@ -289,11 +281,11 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 		return classLoader;
 	}
 
-	private BackgroundTaskExecutor _wrapBackgroundTaskExecutor(
+	protected BackgroundTaskExecutor wrapBackgroundTaskExecutor(
 		BackgroundTask backgroundTask, ClassLoader classLoader) {
 
 		BackgroundTaskExecutor backgroundTaskExecutor =
-			_getBackgroundTaskExecutor(backgroundTask);
+			getBackgroundTaskExecutor(backgroundTask);
 
 		if (classLoader != null) {
 			backgroundTaskExecutor = new ClassLoaderAwareBackgroundTaskExecutor(
@@ -309,12 +301,40 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			backgroundTaskExecutor, _backgroundTaskThreadLocalManager);
 	}
 
+	private ClassLoader _getAggregatePluginsClassLoader(
+		String servletContextNamesString) {
+
+		String[] servletContextNames = StringUtil.split(
+			servletContextNamesString);
+
+		List<ClassLoader> classLoaders = new ArrayList<>(
+			servletContextNames.length);
+
+		for (String servletContextName : servletContextNames) {
+			ClassLoader classLoader =
+				ServletContextClassLoaderPool.getClassLoader(
+					servletContextName);
+
+			if (classLoader == null) {
+				_log.error(
+					"Unable to find class loader for servlet context " +
+						servletContextName);
+			}
+			else {
+				classLoaders.add(classLoader);
+			}
+		}
+
+		return AggregateClassLoader.getAggregateClassLoader(
+			classLoaders.toArray(new ClassLoader[0]));
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		BackgroundTaskMessageListener.class);
 
 	private final BackgroundTaskExecutorRegistry
 		_backgroundTaskExecutorRegistry;
-	private final BackgroundTaskLocalService _backgroundTaskLocalService;
+	private final BackgroundTaskManager _backgroundTaskManager;
 	private final BackgroundTaskStatusRegistry _backgroundTaskStatusRegistry;
 	private final BackgroundTaskThreadLocalManager
 		_backgroundTaskThreadLocalManager;

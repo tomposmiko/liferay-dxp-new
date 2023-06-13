@@ -48,7 +48,7 @@ public class LiferayResourceLoader extends ResourceLoader {
 	public InputStream getResourceStream(String source)
 		throws ResourceNotFoundException {
 
-		InputStream inputStream = _getResourceInputStream(source);
+		InputStream inputStream = doGetResourceStream(source);
 
 		if (inputStream == null) {
 			if (_log.isDebugEnabled()) {
@@ -91,7 +91,7 @@ public class LiferayResourceLoader extends ResourceLoader {
 		InputStream inputStream = null;
 
 		try {
-			inputStream = _getResourceInputStream(resourceName);
+			inputStream = doGetResourceStream(resourceName);
 
 			if (inputStream != null) {
 				inputStream.close();
@@ -99,12 +99,13 @@ public class LiferayResourceLoader extends ResourceLoader {
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 		}
 		catch (ResourceNotFoundException resourceNotFoundException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(resourceNotFoundException);
+				_log.debug(
+					resourceNotFoundException, resourceNotFoundException);
 			}
 		}
 
@@ -115,7 +116,7 @@ public class LiferayResourceLoader extends ResourceLoader {
 		return false;
 	}
 
-	private InputStream _getResourceInputStream(String source)
+	protected InputStream doGetResourceStream(String source)
 		throws ResourceNotFoundException {
 
 		if (_log.isDebugEnabled()) {
@@ -130,7 +131,7 @@ public class LiferayResourceLoader extends ResourceLoader {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;

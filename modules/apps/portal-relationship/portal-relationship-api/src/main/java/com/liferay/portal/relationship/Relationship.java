@@ -16,28 +16,40 @@ package com.liferay.portal.relationship;
 
 import com.liferay.portal.kernel.model.ClassedModel;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author Máté Thurzó
  */
 public class Relationship<T extends ClassedModel> {
 
-	public List<? extends ClassedModel> getInboundRelatedModels(long primKey) {
-		return _getRelatedModels(_modelSupplier.supply(primKey), true, false);
+	public Stream<? extends ClassedModel> getInboundRelatedModelStream(
+		long primKey) {
+
+		T model = _modelSupplier.supply(primKey);
+
+		return _getInboundRelatedModelStream(model);
 	}
 
-	public List<? extends ClassedModel> getOutboundRelatedModels(long primKey) {
-		return _getRelatedModels(_modelSupplier.supply(primKey), false, true);
+	public Stream<? extends ClassedModel> getOutboundRelatedModelStream(
+		long primKey) {
+
+		T model = _modelSupplier.supply(primKey);
+
+		return _getOutboundRelatedModelStream(model);
 	}
 
-	public List<? extends ClassedModel> getRelatedModels(long primKey) {
-		return _getRelatedModels(_modelSupplier.supply(primKey), true, true);
+	public Stream<? extends ClassedModel> getRelatedModelStream(long primKey) {
+		T model = _modelSupplier.supply(primKey);
+
+		return Stream.concat(
+			_getInboundRelatedModelStream(model),
+			_getOutboundRelatedModelStream(model));
 	}
 
 	public static class Builder<T extends ClassedModel> {
@@ -118,29 +130,64 @@ public class Relationship<T extends ClassedModel> {
 	private Relationship() {
 	}
 
-	private List<? extends ClassedModel> _getRelatedModels(
-		T model, boolean inbound, boolean outbound) {
+	private Stream<? extends ClassedModel> _getInboundMultiRelatedModelStream(
+		T model) {
 
-		List<ClassedModel> relatedModels = new ArrayList<>();
+		Stream<MultiRelationshipFunction<T, ? extends ClassedModel>> stream =
+			_inboundMultiRelationshipFunctions.stream();
 
-		if (inbound) {
-			_inboundMultiRelationshipFunctions.forEach(
-				multiRelationshipFunction -> relatedModels.addAll(
-					multiRelationshipFunction.apply(model)));
+		return stream.map(
+			multiRelationshipFunction -> multiRelationshipFunction.apply(model)
+		).flatMap(
+			Collection::stream
+		);
+	}
 
-			_inboundSingleRelationshipFunctions.forEach(
-				function -> relatedModels.add(function.apply(model)));
-		}
+	private Stream<? extends ClassedModel> _getInboundRelatedModelStream(
+		T model) {
 
-		if (outbound) {
-			_outboundMultiRelationshipFunctions.forEach(
-				function -> relatedModels.addAll(function.apply(model)));
+		return Stream.concat(
+			_getInboundMultiRelatedModelStream(model),
+			_getSingleInboundRelatedModelStream(model));
+	}
 
-			_outboundSingleRelationshipFunctions.forEach(
-				function -> relatedModels.add(function.apply(model)));
-		}
+	private Stream<? extends ClassedModel> _getOutboundMultiRelatedModelStream(
+		T model) {
 
-		return relatedModels;
+		Stream<MultiRelationshipFunction<T, ? extends ClassedModel>> stream =
+			_outboundMultiRelationshipFunctions.stream();
+
+		return stream.map(
+			multiRelationshipFunction -> multiRelationshipFunction.apply(model)
+		).flatMap(
+			Collection::stream
+		);
+	}
+
+	private Stream<? extends ClassedModel> _getOutboundRelatedModelStream(
+		T model) {
+
+		return Stream.concat(
+			_getOutboundMultiRelatedModelStream(model),
+			_getSingleOutboudRelatedModelStream(model));
+	}
+
+	private Stream<? extends ClassedModel> _getSingleInboundRelatedModelStream(
+		T model) {
+
+		Stream<Function<T, ? extends ClassedModel>> stream =
+			_inboundSingleRelationshipFunctions.stream();
+
+		return stream.map(function -> function.apply(model));
+	}
+
+	private Stream<? extends ClassedModel> _getSingleOutboudRelatedModelStream(
+		T model) {
+
+		Stream<Function<T, ? extends ClassedModel>> stream =
+			_outboundSingleRelationshipFunctions.stream();
+
+		return stream.map(function -> function.apply(model));
 	}
 
 	private final Set<MultiRelationshipFunction<T, ? extends ClassedModel>>

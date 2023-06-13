@@ -17,15 +17,9 @@ import ClayLink from '@clayui/link';
 import ClayNavigationBar from '@clayui/navigation-bar';
 import React from 'react';
 
-export default function NavigationBar({
-	activeItemAriaCurrent,
-	cssClass,
-	inverted,
-	navigationItems,
-}) {
+export default function NavigationBar({cssClass, inverted, navigationItems}) {
 	return (
 		<ClayNavigationBar
-			aria-current={activeItemAriaCurrent}
 			className={cssClass}
 			inverted={inverted}
 			triggerLabel={navigationItems.find(({active}) => active)?.label}
@@ -38,9 +32,20 @@ export default function NavigationBar({
 						key={label}
 					>
 						{href ? (
-							<ClayLink href={href}>{label}</ClayLink>
+							<ClayLink
+								className="nav-link"
+								displayType="unstyled"
+								href={href}
+							>
+								{label}
+							</ClayLink>
 						) : (
-							<ClayButton>{label}</ClayButton>
+							<ClayButton
+								className="nav-link"
+								displayType="unstyled"
+							>
+								{label}
+							</ClayButton>
 						)}
 					</ClayNavigationBar.Item>
 				);

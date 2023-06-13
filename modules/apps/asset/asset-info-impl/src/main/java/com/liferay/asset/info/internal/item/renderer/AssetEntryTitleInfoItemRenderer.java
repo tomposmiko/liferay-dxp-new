@@ -16,7 +16,7 @@ package com.liferay.asset.info.internal.item.renderer;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.info.item.renderer.InfoItemRenderer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Pavel Savinov
@@ -41,7 +40,7 @@ public class AssetEntryTitleInfoItemRenderer
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "title");
+		return LanguageUtil.get(locale, "title");
 	}
 
 	@Override
@@ -64,8 +63,5 @@ public class AssetEntryTitleInfoItemRenderer
 			throw new RuntimeException(exception);
 		}
 	}
-
-	@Reference
-	private Language _language;
 
 }

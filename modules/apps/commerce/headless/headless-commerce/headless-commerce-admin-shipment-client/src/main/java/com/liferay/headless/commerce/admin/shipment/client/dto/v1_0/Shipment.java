@@ -121,27 +121,6 @@ public class Shipment implements Cloneable, Serializable {
 
 	protected Date createDate;
 
-	public CustomField[] getCustomFields() {
-		return customFields;
-	}
-
-	public void setCustomFields(CustomField[] customFields) {
-		this.customFields = customFields;
-	}
-
-	public void setCustomFields(
-		UnsafeSupplier<CustomField[], Exception> customFieldsUnsafeSupplier) {
-
-		try {
-			customFields = customFieldsUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected CustomField[] customFields;
-
 	public Date getExpectedDate() {
 		return expectedDate;
 	}
@@ -162,27 +141,6 @@ public class Shipment implements Cloneable, Serializable {
 	}
 
 	protected Date expectedDate;
-
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String externalReferenceCode;
 
 	public Long getId() {
 		return id;
@@ -413,27 +371,6 @@ public class Shipment implements Cloneable, Serializable {
 	}
 
 	protected String trackingNumber;
-
-	public String getTrackingURL() {
-		return trackingURL;
-	}
-
-	public void setTrackingURL(String trackingURL) {
-		this.trackingURL = trackingURL;
-	}
-
-	public void setTrackingURL(
-		UnsafeSupplier<String, Exception> trackingURLUnsafeSupplier) {
-
-		try {
-			trackingURL = trackingURLUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String trackingURL;
 
 	public String getUserName() {
 		return userName;

@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jorge Ferrer
  */
-@Component(service = StagingPermission.class)
+@Component(immediate = true, service = StagingPermission.class)
 public class StagingPermissionImpl implements StagingPermission {
 
 	@Override
@@ -39,10 +39,12 @@ public class StagingPermissionImpl implements StagingPermission {
 		long classPK, String portletId, String actionId) {
 
 		try {
-			return _hasPermission(group, portletId, actionId);
+			return doHasPermission(
+				permissionChecker, group, className, classPK, portletId,
+				actionId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return null;
@@ -54,18 +56,20 @@ public class StagingPermissionImpl implements StagingPermission {
 		long classPK, String portletId, String actionId) {
 
 		try {
-			return _hasPermission(
-				_groupLocalService.getGroup(groupId), portletId, actionId);
+			return doHasPermission(
+				permissionChecker, _groupLocalService.getGroup(groupId),
+				className, classPK, portletId, actionId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return null;
 	}
 
-	private Boolean _hasPermission(
-			Group group, String portletId, String actionId)
+	protected Boolean doHasPermission(
+			PermissionChecker permissionChecker, Group group, String className,
+			long classPK, String portletId, String actionId)
 		throws Exception {
 
 		if (!PropsValues.STAGING_LIVE_GROUP_LOCKING_ENABLED) {
@@ -81,7 +85,6 @@ public class StagingPermissionImpl implements StagingPermission {
 			!actionId.equals(ActionKeys.CUSTOMIZE) &&
 			!actionId.equals(ActionKeys.DELETE) &&
 			!actionId.equals(ActionKeys.DELETE_DISCUSSION) &&
-			!actionId.equals(ActionKeys.DOWNLOAD) &&
 			!actionId.equals(ActionKeys.UPDATE_DISCUSSION) &&
 			!actionId.equals(ActionKeys.VIEW) &&
 			group.hasLocalOrRemoteStagingGroup() &&
@@ -93,10 +96,14 @@ public class StagingPermissionImpl implements StagingPermission {
 		return null;
 	}
 
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingPermissionImpl.class);
 
-	@Reference
 	private GroupLocalService _groupLocalService;
 
 }

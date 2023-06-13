@@ -17,7 +17,7 @@ package com.liferay.portal.workflow.task.web.internal.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -41,7 +41,7 @@ public abstract class BaseWorkflowTaskMVCActionCommand
 		try {
 			doProcessAction(actionRequest, actionResponse);
 
-			_setRedirectAttribute(actionRequest);
+			setRedirectAttribute(actionRequest);
 
 			return SessionErrors.isEmpty(actionRequest);
 		}
@@ -57,14 +57,14 @@ public abstract class BaseWorkflowTaskMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception;
 
-	private void _setRedirectAttribute(ActionRequest actionRequest) {
+	protected void setRedirectAttribute(ActionRequest actionRequest) {
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		String closeRedirect = ParamUtil.getString(
 			actionRequest, "closeRedirect");
 
 		if (Validator.isNotNull(closeRedirect)) {
-			redirect = HttpComponentsUtil.setParameter(
+			redirect = HttpUtil.setParameter(
 				redirect, "closeRedirect", closeRedirect);
 
 			SessionMessages.add(

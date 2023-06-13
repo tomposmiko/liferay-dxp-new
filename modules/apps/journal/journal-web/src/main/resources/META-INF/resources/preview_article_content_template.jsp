@@ -28,10 +28,10 @@ JournalPreviewArticleContentTemplateDisplayContext journalPreviewArticleContentT
 					<aui:option label="no-template" selected="<%= Objects.equals(journalPreviewArticleContentTemplateDisplayContext.getDDMTemplateId(), -1) %>" value="<%= -1 %>" />
 
 					<%
-					for (DDMTemplate ddmTemplate : journalPreviewArticleContentTemplateDisplayContext.getDDMTemplates()) {
+					for (DDMTemplate ddTemplate : journalPreviewArticleContentTemplateDisplayContext.getDDMTemplates()) {
 					%>
 
-						<aui:option label="<%= HtmlUtil.escape(ddmTemplate.getName(locale)) %>" selected="<%= Objects.equals(journalPreviewArticleContentTemplateDisplayContext.getDDMTemplateId(), ddmTemplate.getTemplateId()) %>" value="<%= ddmTemplate.getTemplateId() %>" />
+						<aui:option label="<%= HtmlUtil.escape(ddTemplate.getName(locale)) %>" selected="<%= Objects.equals(journalPreviewArticleContentTemplateDisplayContext.getDDMTemplateId(), ddTemplate.getTemplateId()) %>" value="<%= ddTemplate.getTemplateId() %>" />
 
 					<%
 					}
@@ -56,11 +56,25 @@ JournalPreviewArticleContentTemplateDisplayContext journalPreviewArticleContentT
 	</nav>
 </aui:form>
 
+<%
+JournalArticleDisplay articleDisplay = journalPreviewArticleContentTemplateDisplayContext.getArticleDisplay();
+%>
+
 <div class="m-4">
-	<liferay-journal:journal-article-display
-		articleDisplay="<%= journalPreviewArticleContentTemplateDisplayContext.getArticleDisplay() %>"
-		paginationURL="<%= journalPreviewArticleContentTemplateDisplayContext.getPageIteratorPortletURL() %>"
-	/>
+	<%= articleDisplay.getContent() %>
+
+	<c:if test="<%= articleDisplay.isPaginate() %>">
+		<liferay-ui:page-iterator
+			cur="<%= articleDisplay.getCurrentPage() %>"
+			curParam="page"
+			delta="<%= 1 %>"
+			id="articleDisplayPages"
+			maxPages="<%= 25 %>"
+			portletURL="<%= journalPreviewArticleContentTemplateDisplayContext.getPageIteratorPortletURL() %>"
+			total="<%= articleDisplay.getNumberOfPages() %>"
+			type="article"
+		/>
+	</c:if>
 </div>
 
 <script>

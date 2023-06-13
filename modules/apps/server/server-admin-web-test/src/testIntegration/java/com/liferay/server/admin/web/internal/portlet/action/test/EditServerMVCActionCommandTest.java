@@ -74,7 +74,7 @@ public class EditServerMVCActionCommandTest {
 		Assert.assertNotNull(portletPreferences);
 
 		ReflectionTestUtil.invoke(
-			_mvcActionCommand, "_cleanUpLayoutRevisionPortletPreferences",
+			_mvcActionCommand, "cleanUpLayoutRevisionPortletPreferences",
 			new Class<?>[0]);
 
 		Assert.assertNull(
@@ -115,7 +115,7 @@ public class EditServerMVCActionCommandTest {
 		Assert.assertTrue(portletIds.isEmpty());
 
 		ReflectionTestUtil.invoke(
-			_mvcActionCommand, "_cleanUpLayoutRevisionPortletPreferences",
+			_mvcActionCommand, "cleanUpLayoutRevisionPortletPreferences",
 			new Class<?>[0]);
 
 		Assert.assertNotNull(
@@ -126,7 +126,7 @@ public class EditServerMVCActionCommandTest {
 	private LayoutRevision _getLayoutRevision() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		Layout layout = LayoutTestUtil.addTypePortletLayout(_group, false);
+		Layout layout = LayoutTestUtil.addLayout(_group, false);
 
 		LayoutSetBranch layoutSetBranch =
 			_layoutSetBranchLocalService.addLayoutSetBranch(

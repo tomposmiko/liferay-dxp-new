@@ -170,21 +170,22 @@ public class LiferayRepositoryDefiner extends BaseRepositoryDefiner {
 
 					DLValidatorUtil.validateFileName(
 						fileContentReference.getSourceFileName());
+				}
 
-					if (fileContentReference.getFileEntryId() == 0) {
-						DLValidatorUtil.validateFileExtension(
-							fileContentReference.getSourceFileName());
+				if ((fileContentReference.getFileEntryId() == 0) ||
+					Validator.isNotNull(
+						fileContentReference.getSourceFileName())) {
 
-						DLValidatorUtil.validateSourceFileExtension(
-							fileContentReference.getExtension(),
-							fileContentReference.getSourceFileName());
-					}
+					DLValidatorUtil.validateFileExtension(
+						fileContentReference.getSourceFileName());
+
+					DLValidatorUtil.validateSourceFileExtension(
+						fileContentReference.getExtension(),
+						fileContentReference.getSourceFileName());
 				}
 
 				DLValidatorUtil.validateFileSize(
-					fileContentReference.getGroupId(),
 					fileContentReference.getSourceFileName(),
-					fileContentReference.getMimeType(),
 					fileContentReference.getSize());
 			};
 

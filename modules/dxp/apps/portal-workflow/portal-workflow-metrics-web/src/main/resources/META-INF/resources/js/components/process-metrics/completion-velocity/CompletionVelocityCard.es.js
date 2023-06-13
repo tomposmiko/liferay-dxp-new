@@ -60,7 +60,7 @@ function CompletionVelocityCard({routeParams}) {
 			...timeRange,
 			unit,
 		},
-		url: `/processes/${processId}/histograms/metrics`,
+		url: `processes/${processId}/histograms/metrics`,
 	});
 
 	const promises = useMemo(() => {
@@ -69,15 +69,7 @@ function CompletionVelocityCard({routeParams}) {
 		}
 
 		return [new Promise((_, reject) => reject(filtersError))];
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		filtersError,
-		timeRange.dateEnd,
-		timeRange.dateStart,
-		routeParams,
-		unit,
-	]);
+	}, [fetchData, filtersError, timeRange.dateEnd, timeRange.dateStart, unit]);
 
 	return (
 		<PromisesResolver promises={promises}>

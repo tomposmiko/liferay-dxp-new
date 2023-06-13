@@ -26,21 +26,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ANY_WITH_ARIA_LABEL</td>
-	<td>//a[@aria-label='${ariaLabel}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ANY_HREF</td>
-	<td>//a[contains(.,'${key_text}')][@href='${key_href}']</td>
-	<td>Page</td>
-</tr>
-<tr>
-	<td>ANY_HREF_2</td>
-	<td>//a[contains(.,'${key_text}')][contains(@href,'${key_href}')]</td>
-	<td>Page</td>
-</tr>
-<tr>
 	<td>BACK</td>
 	<td>//a[contains(.,'Back')]</td>
 	<td></td>
@@ -72,7 +57,7 @@
 </tr>
 <tr>
 	<td>DOWNLOAD</td>
-	<td>//a[contains(.,'Download')]</td>
+	<td>//div[contains(@class,'btn-group-item')]/a[contains(@class,'btn-primary') and contains(.,'Download')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -102,7 +87,7 @@
 </tr>
 <tr>
 	<td>GUEST</td>
-	<td>//div[contains(@class,'navigation')]//span[contains(.,'Guest')]</td>
+	<td>//div[@class='navigation']/ul/li/a/span[contains(.,'Guest')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -122,7 +107,7 @@
 </tr>
 <tr>
 	<td>MOVE_TO_RECYCLING_BIN</td>
-	<td>//a/span[contains(@class,'taglib-text') and contains(.,'Delete')]</td>
+	<td>//a/span[contains(@class,'taglib-text') and contains(.,'Move to Recycle Bin')]</td>
 	<td></td>
 </tr>
 <tr>

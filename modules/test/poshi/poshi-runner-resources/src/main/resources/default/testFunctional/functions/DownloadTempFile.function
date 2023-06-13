@@ -1,8 +1,0 @@
-@default = "downloadTempFile"
-definition {
-
-	function downloadTempFile {
-		selenium.pause(5000);
-	}
-
-}

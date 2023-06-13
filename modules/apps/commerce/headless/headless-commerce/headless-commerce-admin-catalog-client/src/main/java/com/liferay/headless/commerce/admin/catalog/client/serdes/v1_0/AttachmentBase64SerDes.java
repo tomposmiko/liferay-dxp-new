@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class AttachmentBase64SerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (attachmentBase64.getAttachment() != null) {
 			if (sb.length() > 1) {
@@ -72,20 +73,6 @@ public class AttachmentBase64SerDes {
 			sb.append("\"");
 
 			sb.append(_escape(attachmentBase64.getAttachment()));
-
-			sb.append("\"");
-		}
-
-		if (attachmentBase64.getContentType() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"contentType\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(attachmentBase64.getContentType()));
 
 			sb.append("\"");
 		}
@@ -253,7 +240,7 @@ public class AttachmentBase64SerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (attachmentBase64.getAttachment() == null) {
 			map.put("attachment", null);
@@ -261,15 +248,6 @@ public class AttachmentBase64SerDes {
 		else {
 			map.put(
 				"attachment", String.valueOf(attachmentBase64.getAttachment()));
-		}
-
-		if (attachmentBase64.getContentType() == null) {
-			map.put("contentType", null);
-		}
-		else {
-			map.put(
-				"contentType",
-				String.valueOf(attachmentBase64.getContentType()));
 		}
 
 		if (attachmentBase64.getCustomFields() == null) {
@@ -388,26 +366,16 @@ public class AttachmentBase64SerDes {
 						(String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "contentType")) {
-				if (jsonParserFieldValue != null) {
-					attachmentBase64.setContentType(
-						(String)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					attachmentBase64.setCustomFields(customFieldsArray);
+					attachmentBase64.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "displayDate")) {

@@ -14,13 +14,10 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
-import ClayIcon from '@clayui/icon';
-import classNames from 'classnames';
-import {ManagementToolbar} from 'frontend-js-components-web';
-import React, {useContext, useMemo} from 'react';
+import ClayManagementToolbar from '@clayui/management-toolbar';
+import React from 'react';
 
 import normalizeDropdownItems from '../normalize_dropdown_items';
-import FeatureFlagContext from './FeatureFlagContext';
 import LinkOrButton from './LinkOrButton';
 
 function addAction(item, onActionButtonClick) {
@@ -50,18 +47,6 @@ const ActionControls = ({
 	disabled,
 	onActionButtonClick,
 }) => {
-	const {showDesignImprovements} = useContext(FeatureFlagContext);
-
-	const items = useMemo(
-		() =>
-			normalizeDropdownItems(
-				actionDropdownItems?.map((item) =>
-					addAction(item, onActionButtonClick)
-				)
-			) || [],
-		[actionDropdownItems, onActionButtonClick]
-	);
-
 	return (
 		<>
 			{actionDropdownItems && (
@@ -72,15 +57,12 @@ const ActionControls = ({
 						)
 						.filter((item) => item.quickAction && item.icon)
 						.map((item, index) => (
-							<ManagementToolbar.Item
-								className="d-md-flex d-none"
+							<ClayManagementToolbar.Item
+								className="navbar-breakpoint-down-d-none"
 								key={index}
 							>
 								<LinkOrButton
-									className={classNames(
-										{'d-lg-none': showDesignImprovements},
-										'nav-link nav-link-monospaced'
-									)}
+									className="nav-link nav-link-monospaced"
 									disabled={disabled || item.disabled}
 									displayType="unstyled"
 									href={item.href}
@@ -92,44 +74,26 @@ const ActionControls = ({
 									symbol={item.icon}
 									title={item.label}
 								/>
-
-								{showDesignImprovements && (
-									<LinkOrButton
-										className="align-items-center d-lg-inline d-none mr-2 nav-link"
-										disabled={disabled || item.disabled}
-										displayType="unstyled"
-										href={item.href}
-										onClick={(event) => {
-											onActionButtonClick(event, {
-												item,
-											});
-										}}
-										title={item.label}
-									>
-										<span className="inline-item inline-item-before">
-											<ClayIcon symbol={item.icon} />
-										</span>
-
-										<span>{item.label}</span>
-									</LinkOrButton>
-								)}
-							</ManagementToolbar.Item>
+							</ClayManagementToolbar.Item>
 						))}
 
-					<ManagementToolbar.Item>
+					<ClayManagementToolbar.Item>
 						<ClayDropDownWithItems
-							items={items}
+							items={normalizeDropdownItems(
+								actionDropdownItems?.map((item) =>
+									addAction(item, onActionButtonClick)
+								)
+							)}
 							trigger={
 								<ClayButtonWithIcon
 									className="nav-link nav-link-monospaced"
 									disabled={disabled}
 									displayType="unstyled"
 									symbol="ellipsis-v"
-									title={Liferay.Language.get('actions')}
 								/>
 							}
 						/>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 				</>
 			)}
 		</>

@@ -48,9 +48,7 @@ public interface SchedulerResponseManager {
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException;
 
-	public void run(
-			long companyId, String jobName, String groupName,
-			StorageType storageType)
+	public void run(String jobName, String groupName, StorageType storageType)
 		throws SchedulerException;
 
 }

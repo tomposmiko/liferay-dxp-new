@@ -33,26 +33,26 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateResourcePermissions(DDMStructure.class.getName());
+		updateResourcePermissions(DDMStructure.class.getName());
 
-		_updateResourcePermissions(DDMTemplate.class.getName());
+		updateResourcePermissions(DDMTemplate.class.getName());
 	}
 
-	private String _getNewCompositeModelName(String ddmModelClassName) {
+	protected String getNewCompositeModelName(String ddmModelClassName) {
 		return _resourceActions.getCompositeModelName(
 			ddmModelClassName, _CLASS_NAME);
 	}
 
-	private String _getOldCompositeModelName(String ddmModelClassName) {
+	protected String getOldCompositeModelName(String ddmModelClassName) {
 		return _CLASS_NAME + StringPool.DASH + ddmModelClassName;
 	}
 
-	private void _updateResourcePermissions(String ddmModelClassName)
+	protected void updateResourcePermissions(String ddmModelClassName)
 		throws Exception {
 
-		String newCompositeModelName = _getNewCompositeModelName(
+		String newCompositeModelName = getNewCompositeModelName(
 			ddmModelClassName);
-		String oldCompositeModelName = _getOldCompositeModelName(
+		String oldCompositeModelName = getOldCompositeModelName(
 			ddmModelClassName);
 
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(

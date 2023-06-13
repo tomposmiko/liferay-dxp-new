@@ -14,10 +14,11 @@
 
 package com.liferay.trash.web.internal.portlet;
 
+import com.liferay.petra.model.adapter.util.ModelAdapterUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.TrashPermissionException;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -29,11 +30,10 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.model.adapter.ModelAdapterUtil;
 import com.liferay.trash.TrashHelper;
 import com.liferay.trash.constants.TrashEntryConstants;
 import com.liferay.trash.constants.TrashPortletKeys;
-import com.liferay.trash.exception.RestoreEntryException;
+import com.liferay.trash.kernel.exception.RestoreEntryException;
 import com.liferay.trash.model.TrashEntry;
 import com.liferay.trash.service.TrashEntryLocalService;
 import com.liferay.trash.service.TrashEntryService;
@@ -65,6 +65,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-trash",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -79,10 +80,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + TrashPortletKeys.TRASH,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
-	service = Portlet.class
+	service = {Portlet.class, TrashPortlet.class}
 )
 public class TrashPortlet extends MVCPortlet {
 
@@ -173,7 +173,7 @@ public class TrashPortlet extends MVCPortlet {
 		long trashEntryId = ParamUtil.getLong(actionRequest, "trashEntryId");
 
 		if (trashEntryId > 0) {
-			_checkEntry(actionRequest, actionResponse);
+			checkEntry(actionRequest, actionResponse);
 
 			TrashEntry entry = _trashEntryService.restoreEntry(trashEntryId);
 
@@ -194,9 +194,12 @@ public class TrashPortlet extends MVCPortlet {
 						new ObjectValuePair<>(
 							entry.getClassName(), entry.getClassPK()));
 				}
-				catch (RestoreEntryException restoreEntryException) {
+				catch (com.liferay.trash.exception.RestoreEntryException
+							restoreEntryException) {
+
 					if (restoreEntryException.getType() !=
-							RestoreEntryException.NOT_RESTORABLE) {
+							com.liferay.trash.exception.RestoreEntryException.
+								NOT_RESTORABLE) {
 
 						throw restoreEntryException;
 					}
@@ -220,7 +223,7 @@ public class TrashPortlet extends MVCPortlet {
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		if (cmd.equals(Constants.RENAME)) {
-			_checkEntry(actionRequest, actionResponse);
+			checkEntry(actionRequest, actionResponse);
 
 			restoreRename(actionRequest, actionResponse);
 		}
@@ -277,18 +280,7 @@ public class TrashPortlet extends MVCPortlet {
 		sendRedirect(actionRequest, actionResponse);
 	}
 
-	@Override
-	protected boolean isSessionErrorException(Throwable throwable) {
-		if (throwable instanceof RestoreEntryException ||
-			throwable instanceof TrashPermissionException) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private void _checkEntry(
+	protected void checkEntry(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -332,24 +324,48 @@ public class TrashPortlet extends MVCPortlet {
 
 			sendRedirect(actionRequest, actionResponse);
 
-			throw new RestoreEntryException(
+			throw new com.liferay.trash.exception.RestoreEntryException(
 				restoreEntryException.getType(),
 				restoreEntryException.getCause());
 		}
 	}
 
+	@Override
+	protected boolean isSessionErrorException(Throwable throwable) {
+		if (throwable instanceof
+				com.liferay.trash.exception.RestoreEntryException ||
+			throwable instanceof RestoreEntryException ||
+			throwable instanceof TrashPermissionException) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.trash.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setTrashEntryLocalService(
+		TrashEntryLocalService trashEntryLocalService) {
+
+		_trashEntryLocalService = trashEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setTrashEntryService(TrashEntryService trashEntryService) {
+		_trashEntryService = trashEntryService;
+	}
+
 	@Reference
 	private Portal _portal;
 
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.trash.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
-	)
-	private Release _release;
-
-	@Reference
 	private TrashEntryLocalService _trashEntryLocalService;
-
-	@Reference
 	private TrashEntryService _trashEntryService;
 
 	@Reference

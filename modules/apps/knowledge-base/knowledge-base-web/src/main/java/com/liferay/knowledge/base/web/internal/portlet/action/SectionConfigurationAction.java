@@ -24,14 +24,17 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Peter Shin
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_SECTION,
 	service = ConfigurationAction.class
 )
@@ -48,12 +51,21 @@ public class SectionConfigurationAction extends DefaultConfigurationAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		_updateKBArticlesSections(actionRequest);
+		updateKBArticlesSections(actionRequest);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	private void _updateKBArticlesSections(ActionRequest actionRequest) {
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.knowledge.base.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected void updateKBArticlesSections(ActionRequest actionRequest) {
 		String[] kbArticlesSections = actionRequest.getParameterValues(
 			"kbArticlesSections");
 

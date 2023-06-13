@@ -12,7 +12,6 @@
  * details.
  */
 
-import '@testing-library/jest-dom/extend-expect';
 import {fireEvent, render} from '@testing-library/react';
 import React from 'react';
 import {act} from 'react-dom/test-utils';
@@ -100,22 +99,6 @@ describe('Modal', () => {
 		expect(document.getElementById(sampleId)).toBeTruthy();
 	});
 
-	it('renders given body component', () => {
-		const sampleId = 'sampleId';
-
-		const SampleBodyComponent = () => {
-			return <div id={sampleId} />;
-		};
-
-		render(<Modal bodyComponent={SampleBodyComponent} />);
-
-		act(() => {
-			jest.runAllTimers();
-		});
-
-		expect(document.getElementById(sampleId)).toBeTruthy();
-	});
-
 	it('renders given header HTML', () => {
 		const sampleId = 'sampleId';
 
@@ -126,24 +109,5 @@ describe('Modal', () => {
 		});
 
 		expect(document.getElementById(sampleId)).toBeTruthy();
-	});
-
-	// Disabling this test because Modal's behavior now is that the focus goes
-	// to the modal to announce that it is open.
-
-	xit('when providing "autoFocus: true" inside a button configuration, it will make this button focused', () => {
-		render(
-			<Modal
-				buttons={[
-					{autoFocus: true, id: 'modal-button-ok', label: 'ok'},
-				]}
-			/>
-		);
-
-		act(() => {
-			jest.runAllTimers();
-		});
-
-		expect(document.getElementById('modal-button-ok')).toHaveFocus();
 	});
 });

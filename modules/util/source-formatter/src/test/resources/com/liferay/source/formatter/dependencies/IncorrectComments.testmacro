@@ -1,10 +1,13 @@
+// this is a macro,
+// it contains _addPage.
+
 definition {
 
 	macro _addPage {
 		SitePages._selectPageType(
-			collectionName = ${collectionName},
-			pageTemplateName = ${pageTemplateName},
-			sitePageType = ${sitePageType});
+			collectionName = "${collectionName}",
+			pageTemplateName = "${pageTemplateName}",
+			sitePageType = "${sitePageType}");
 
 		//Button.clickAdd();
 		//this is a comment that ends with COMMA,
@@ -12,15 +15,15 @@ definition {
 		//SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		SitePages._addPageToNavigationMenu(
-			assertCheckboxMissing = ${assertCheckboxMissing},
-			navigationMenus = ${navigationMenus});
+			assertCheckboxMissing = "${assertCheckboxMissing}",
+			navigationMenus = "${navigationMenus}");
 
-		PortletEntry.inputName(name = ${pageName});
+		PortletEntry.inputName(name = "${pageName}");
 
 		// if (isSet(categoryName)) {
 		//	AssetCategorization.addCategory(
-		// 		categoryName = ${categoryName},
-		// 		vocabularyName = ${vocabularyName});
+		// 		categoryName = "${categoryName}",
+		// 		vocabularyName = "${vocabularyName}");
 		// }
 
 		//
@@ -32,23 +35,33 @@ definition {
 
 		//quarantine...
 
-		if (${sitePageType} == "Embedded") {
+		if ("${sitePageType}" == "Embedded") {
+			Type(
+				locator1 = "SitePagesEditPage#PAGE_TYPE_EMBEDDED_URL_FIELD",
+				value1 = "${pageTypeURL}");
+		}
+
+		if (isSet(inheritChanges)) {
 			Page.togglePageTemplateInheritChanges(toggleValue = "${inheritChanges}");
 		}
 
 		//workaround...
 
-		if (${sitePageType} == "Embedded") {
-			Page.togglePageTemplateInheritChanges(toggleValue = "${inheritChanges}");
-		}
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
 
 		//This is a commit
 
+		AssertVisible(locator1 = "TextInput#NAME");
+
 		if (isSet(openGraph)) {
 			SitePages._configureOpenGraph(
-				customDescription = ${customDescription},
-				customTitle = ${customTitle});
+				customDescription = "${customDescription}",
+				customTitle = "${customTitle}");
 		}
+
+		Button.click(button = "Save");
+
+		WaitForSPARefresh();
 
 		//TODO find a better fix as we should not be navigating like this for every test. Workaround caused by LPS-104246
 
@@ -57,7 +70,7 @@ definition {
 		//	panel = "Site Administration",
 		// 	portlet = "Pages");
 
-		Button.click(button = "Save");
+		WaitForSPARefresh();
 	}
 
 }

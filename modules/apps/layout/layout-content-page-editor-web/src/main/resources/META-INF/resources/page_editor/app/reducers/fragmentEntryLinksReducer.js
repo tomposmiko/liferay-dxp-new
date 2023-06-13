@@ -23,7 +23,6 @@ import {
 	EDIT_FRAGMENT_ENTRY_LINK_COMMENT,
 	UPDATE_COLLECTION_DISPLAY_COLLECTION,
 	UPDATE_EDITABLE_VALUES,
-	UPDATE_FORM_ITEM_CONFIG,
 	UPDATE_FRAGMENT_ENTRY_LINK_CONFIGURATION,
 	UPDATE_FRAGMENT_ENTRY_LINK_CONTENT,
 	UPDATE_LAYOUT_DATA,
@@ -261,39 +260,6 @@ export default function fragmentEntryLinksReducer(
 				},
 			};
 
-		case UPDATE_FORM_ITEM_CONFIG: {
-			const newFragmentEntryLinks = action.addedFragmentEntryLinks
-				? {...action.addedFragmentEntryLinks}
-				: {};
-
-			if (action.removedFragmentEntryLinkIds) {
-				action.removedFragmentEntryLinkIds.forEach(
-					(fragmentEntryLinkId) => {
-						newFragmentEntryLinks[fragmentEntryLinkId] = {
-							...fragmentEntryLinks[fragmentEntryLinkId],
-							removed: true,
-						};
-					}
-				);
-			}
-
-			if (action.restoredFragmentEntryLinkIds) {
-				action.restoredFragmentEntryLinkIds.forEach(
-					(fragmentEntryLinkId) => {
-						newFragmentEntryLinks[fragmentEntryLinkId] = {
-							...fragmentEntryLinks[fragmentEntryLinkId],
-							removed: false,
-						};
-					}
-				);
-			}
-
-			return {
-				...fragmentEntryLinks,
-				...newFragmentEntryLinks,
-			};
-		}
-
 		case UPDATE_FRAGMENT_ENTRY_LINK_CONFIGURATION:
 			return {
 				...fragmentEntryLinks,
@@ -301,7 +267,6 @@ export default function fragmentEntryLinksReducer(
 					...fragmentEntryLinks[action.fragmentEntryLinkId],
 					configuration: action.fragmentEntryLink.configuration,
 					content: action.fragmentEntryLink.content,
-					editableTypes: action.fragmentEntryLink.editableTypes,
 					editableValues: action.fragmentEntryLink.editableValues,
 				},
 			};
@@ -312,10 +277,7 @@ export default function fragmentEntryLinksReducer(
 
 			let collectionContent = fragmentEntryLink.collectionContent || {};
 
-			if (
-				action.collectionContentId !== null &&
-				action.collectionContentId !== undefined
-			) {
+			if (action.collectionContentId != null) {
 				collectionContent = {...collectionContent};
 
 				collectionContent[action.collectionContentId] = action.content;
@@ -344,7 +306,7 @@ export default function fragmentEntryLinksReducer(
 		}
 
 		case UPDATE_PREVIEW_IMAGE: {
-			const getUpdatedEditableValues = (editableValues = {}) =>
+			const getUpdatedEditableValues = (editableValues) =>
 				Object.entries(editableValues).map(([key, value]) => [
 					key,
 					Object.fromEntries(

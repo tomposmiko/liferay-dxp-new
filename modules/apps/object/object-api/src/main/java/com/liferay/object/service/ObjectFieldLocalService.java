@@ -16,9 +16,6 @@ package com.liferay.object.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectFieldSetting;
-import com.liferay.petra.sql.dsl.Column;
-import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -72,13 +69,10 @@ public interface ObjectFieldLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField addCustomObjectField(
-			String externalReferenceCode, long userId,
-			long listTypeDefinitionId, long objectDefinitionId,
-			String businessType, String dbType, boolean indexed,
-			boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, boolean localized, String name,
-			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings)
+			long userId, long listTypeDefinitionId, long objectDefinitionId,
+			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required,
+			String type)
 		throws PortalException;
 
 	/**
@@ -95,32 +89,11 @@ public interface ObjectFieldLocalService
 	public ObjectField addObjectField(ObjectField objectField);
 
 	@Indexable(type = IndexableType.REINDEX)
-	public ObjectField addOrUpdateCustomObjectField(
-			String externalReferenceCode, long objectFieldId, long userId,
-			long listTypeDefinitionId, long objectDefinitionId,
-			String businessType, String dbType, boolean indexed,
-			boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, boolean localized, String name,
-			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public ObjectField addOrUpdateSystemObjectField(
-			long userId, long objectDefinitionId, String businessType,
-			String dbColumnName, String dbTableName, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, String name, boolean required,
-			boolean state)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField addSystemObjectField(
-			long userId, long objectDefinitionId, String businessType,
-			String dbColumnName, String dbTableName, String dbType,
+			long userId, long objectDefinitionId, String dbColumnName,
 			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
 			Map<Locale, String> labelMap, String name, boolean required,
-			boolean state)
+			String type)
 		throws PortalException;
 
 	/**
@@ -169,18 +142,11 @@ public interface ObjectFieldLocalService
 	public ObjectField deleteObjectField(ObjectField objectField)
 		throws PortalException;
 
-	public void deleteObjectFieldByObjectDefinitionId(Long objectDefinitionId)
-		throws PortalException;
-
 	/**
 	 * @throws PortalException
 	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.DELETE)
-	public ObjectField deleteRelationshipTypeObjectField(long objectFieldId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -261,10 +227,6 @@ public interface ObjectFieldLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ObjectField fetchObjectField(long objectDefinitionId, String name);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ObjectField fetchObjectField(
-		String externalReferenceCode, long objectDefinitionId);
-
 	/**
 	 * Returns the object field with the matching UUID and company.
 	 *
@@ -280,26 +242,11 @@ public interface ObjectFieldLocalService
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectField> getActiveObjectFields(
-			List<ObjectField> objectFields)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Column<?, ?> getColumn(long objectDefinitionId, String name);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectField> getCustomObjectFields(long objectFieldId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectField> getListTypeDefinitionObjectFields(
-		long listTypeDefinitionId, boolean state);
 
 	/**
 	 * Returns the object field with the primary key.
@@ -348,10 +295,6 @@ public interface ObjectFieldLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectField> getObjectFields(
-		long objectDefinitionId, boolean system);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<ObjectField> getObjectFields(
 		long objectDefinitionId, String dbTableName);
 
 	/**
@@ -384,18 +327,12 @@ public interface ObjectFieldLocalService
 	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Table getTable(long objectDefinitionId, String name)
-		throws PortalException;
-
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField updateCustomObjectField(
-			String externalReferenceCode, long objectFieldId,
-			long listTypeDefinitionId, String businessType, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, boolean localized, String name,
-			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings)
+			long objectFieldId, long listTypeDefinitionId, boolean indexed,
+			boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required,
+			String type)
 		throws PortalException;
 
 	/**
@@ -411,18 +348,6 @@ public interface ObjectFieldLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField updateObjectField(ObjectField objectField);
 
-	public ObjectField updateObjectField(
-			String externalReferenceCode, long objectFieldId, long userId,
-			long listTypeDefinitionId, long objectDefinitionId,
-			String businessType, String dbColumnName, String dbTableName,
-			String dbType, boolean indexed, boolean indexedAsKeyword,
-			String indexedLanguageId, Map<Locale, String> labelMap,
-			boolean localized, String name, boolean required, boolean state,
-			boolean system, List<ObjectFieldSetting> objectFieldSettings)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public ObjectField updateRequired(long objectFieldId, boolean required)
-		throws PortalException;
+	public void validateType(String type) throws PortalException;
 
 }

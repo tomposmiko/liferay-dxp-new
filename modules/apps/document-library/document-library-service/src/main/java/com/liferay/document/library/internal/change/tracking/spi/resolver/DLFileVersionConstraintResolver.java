@@ -20,8 +20,7 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
-import com.liferay.document.library.kernel.store.DLStoreRequest;
-import com.liferay.document.library.kernel.store.DLStoreUtil;
+import com.liferay.document.library.kernel.store.Store;
 import com.liferay.document.library.kernel.util.comparator.DLFileVersionVersionComparator;
 import com.liferay.document.library.kernel.util.comparator.VersionNumberComparator;
 import com.liferay.petra.string.CharPool;
@@ -42,10 +41,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Samuel Trong Tran
@@ -161,14 +161,11 @@ public class DLFileVersionConstraintResolver
 
 			newFileVersion = sb.toString();
 
-			String oldStoreFileName = fileVersion.getStoreFileName();
+			versionMap.put(fileVersion.getVersion(), newFileVersion);
 
 			fileVersion.setVersion(newFileVersion);
-			fileVersion.setStoreUUID(String.valueOf(UUID.randomUUID()));
 
 			_dlFileVersionLocalService.updateDLFileVersion(fileVersion);
-
-			versionMap.put(oldStoreFileName, fileVersion.getStoreFileName());
 
 			previousFileVersion = fileVersion;
 		}
@@ -184,29 +181,24 @@ public class DLFileVersionConstraintResolver
 		_dlFileEntryLocalService.updateDLFileEntry(dlFileEntry);
 
 		for (Map.Entry<String, String> entry : versionMap.entrySet()) {
-			String oldStoreFileName = entry.getKey();
-			String newStoreFileName = entry.getValue();
+			String oldVersion = entry.getKey();
+			String newVersion = entry.getValue();
 
-			try (InputStream inputStream = DLStoreUtil.getFileAsStream(
+			try (InputStream inputStream = _store.getFileAsStream(
 					dlFileEntry.getCompanyId(), dlFileEntry.getRepositoryId(),
-					dlFileEntry.getName(), oldStoreFileName)) {
+					dlFileEntry.getName(), oldVersion)) {
 
-				DLStoreUtil.addFile(
-					DLStoreRequest.builder(
-						dlFileEntry.getCompanyId(),
-						dlFileEntry.getRepositoryId(), dlFileEntry.getName()
-					).versionLabel(
-						newStoreFileName
-					).build(),
-					inputStream);
+				_store.addFile(
+					dlFileEntry.getCompanyId(), dlFileEntry.getRepositoryId(),
+					dlFileEntry.getName(), newVersion, inputStream);
 			}
 			catch (IOException ioException) {
 				throw new UncheckedIOException(ioException);
 			}
 
-			DLStoreUtil.deleteFile(
+			_store.deleteFile(
 				dlFileEntry.getCompanyId(), dlFileEntry.getRepositoryId(),
-				dlFileEntry.getName(), oldStoreFileName);
+				dlFileEntry.getName(), oldVersion);
 		}
 	}
 
@@ -215,5 +207,11 @@ public class DLFileVersionConstraintResolver
 
 	@Reference
 	private DLFileVersionLocalService _dlFileVersionLocalService;
+
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile Store _store;
 
 }

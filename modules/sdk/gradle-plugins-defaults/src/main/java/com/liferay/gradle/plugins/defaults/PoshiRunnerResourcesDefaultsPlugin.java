@@ -15,7 +15,6 @@
 package com.liferay.gradle.plugins.defaults;
 
 import com.liferay.gradle.plugins.defaults.internal.util.GitRepo;
-import com.liferay.gradle.plugins.defaults.internal.util.GradlePluginsDefaultsUtil;
 import com.liferay.gradle.plugins.defaults.internal.util.GradleUtil;
 import com.liferay.gradle.plugins.poshi.runner.PoshiRunnerResourcesExtension;
 import com.liferay.gradle.plugins.poshi.runner.PoshiRunnerResourcesPlugin;
@@ -53,8 +52,6 @@ public class PoshiRunnerResourcesDefaultsPlugin implements Plugin<Project> {
 
 	@Override
 	public void apply(Project project) {
-		GradlePluginsDefaultsUtil.configureRepositories(project, null);
-
 		GradleUtil.applyPlugin(project, MavenPlugin.class);
 		GradleUtil.applyPlugin(project, PoshiRunnerResourcesPlugin.class);
 
@@ -79,15 +76,17 @@ public class PoshiRunnerResourcesDefaultsPlugin implements Plugin<Project> {
 		poshiRunnerResourcesExtension.setRootDirName(_ROOT_DIR_NAME);
 
 		if (project.hasProperty(ARTIFACT_APPENDIX_PROPERTY_NAME)) {
-			poshiRunnerResourcesExtension.setArtifactAppendix(
-				GradleUtil.getProperty(
-					project, ARTIFACT_APPENDIX_PROPERTY_NAME, (String)null));
+			String artifactAppendix = GradleUtil.getProperty(
+				project, ARTIFACT_APPENDIX_PROPERTY_NAME, (String)null);
+
+			poshiRunnerResourcesExtension.setArtifactAppendix(artifactAppendix);
 		}
 
 		if (project.hasProperty(ARTIFACT_VERSION_PROPERTY_NAME)) {
-			poshiRunnerResourcesExtension.setArtifactVersion(
-				GradleUtil.getProperty(
-					project, ARTIFACT_VERSION_PROPERTY_NAME, (String)null));
+			String artifactVersion = GradleUtil.getProperty(
+				project, ARTIFACT_VERSION_PROPERTY_NAME, (String)null);
+
+			poshiRunnerResourcesExtension.setArtifactVersion(artifactVersion);
 		}
 	}
 

@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Riccardo Ferrari
+ * @see CommerceMLForecastAlertEntryServiceSoap
  * @generated
  */
 public class CommerceMLForecastAlertEntryServiceHttp {

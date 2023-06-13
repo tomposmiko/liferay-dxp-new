@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
-	property = "key=" + PropsKeys.LOGIN_EVENTS_POST,
+	immediate = true, property = "key=" + PropsKeys.LOGIN_EVENTS_POST,
 	service = LifecycleAction.class
 )
 public class LoginPostAction implements LifecycleAction {
@@ -63,10 +63,19 @@ public class LoginPostAction implements LifecycleAction {
 		}
 	}
 
-	@Reference
-	private MemberRequestLocalService _memberRequestLocalService;
+	@Reference(unbind = "-")
+	protected void setMemberRequestLocalService(
+		MemberRequestLocalService memberRequestLocalService) {
 
-	@Reference
+		_memberRequestLocalService = memberRequestLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
+	}
+
+	private MemberRequestLocalService _memberRequestLocalService;
 	private Portal _portal;
 
 }

@@ -25,11 +25,20 @@
 		}
 	}
 
+	&.active {
+		.mini-compare-delete {
+			transform: scale(1) translate(calc(-110% - 20px), 30%);
+		}
+	}
+
 	&-delete {
 		background: $color-mood-bad;
 		border-radius: 50%;
 		color: white;
-		top: 16px;
+		font-size: 10px;
+		height: 20px;
+		transform: scale(0.6) translate(calc(-160% - 20px), 30%);
+		width: 20px;
 	}
 
 	&-thumbnail-container {

@@ -15,20 +15,29 @@
 package com.liferay.portal.workflow.kaleo.runtime.internal.assignment;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ClassUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignment;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
 import com.liferay.portal.workflow.kaleo.runtime.assignment.KaleoTaskAssignmentSelector;
-import com.liferay.portal.workflow.kaleo.runtime.assignment.KaleoTaskAssignmentSelectorRegistry;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Michael C. Han
  */
-@Component(service = CompositeKaleoTaskAssignmentSelector.class)
+@Component(
+	immediate = true, service = CompositeKaleoTaskAssignmentSelector.class
+)
 public class CompositeKaleoTaskAssignmentSelector
 	implements KaleoTaskAssignmentSelector {
 
@@ -41,8 +50,7 @@ public class CompositeKaleoTaskAssignmentSelector
 		String assigneeClassName = kaleoTaskAssignment.getAssigneeClassName();
 
 		KaleoTaskAssignmentSelector kaleoTaskAssignmentSelector =
-			_kaleoTaskAssignmentSelectorRegistry.getKaleoTaskAssignmentSelector(
-				assigneeClassName);
+			_kaleoTaskAssignmentSelectors.get(assigneeClassName);
 
 		if (kaleoTaskAssignmentSelector == null) {
 			throw new IllegalArgumentException(
@@ -54,8 +62,56 @@ public class CompositeKaleoTaskAssignmentSelector
 			kaleoTaskAssignment, executionContext);
 	}
 
-	@Reference
-	private KaleoTaskAssignmentSelectorRegistry
-		_kaleoTaskAssignmentSelectorRegistry;
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(assignee.class.name=*)"
+	)
+	protected void addKaleoTaskAssignmentSelector(
+		KaleoTaskAssignmentSelector kaleoTaskAssignmentSelector,
+		Map<String, Object> properties) {
+
+		String[] assigneeClassNames = getAssigneeClassNames(
+			kaleoTaskAssignmentSelector, properties);
+
+		for (String assigneeClassName : assigneeClassNames) {
+			_kaleoTaskAssignmentSelectors.put(
+				assigneeClassName, kaleoTaskAssignmentSelector);
+		}
+	}
+
+	protected String[] getAssigneeClassNames(
+		KaleoTaskAssignmentSelector kaleoTaskAssignmentSelector,
+		Map<String, Object> properties) {
+
+		Object value = properties.get("assignee.class.name");
+
+		String[] assigneeClassNames = GetterUtil.getStringValues(
+			value, new String[] {String.valueOf(value)});
+
+		if (ArrayUtil.isEmpty(assigneeClassNames)) {
+			throw new IllegalArgumentException(
+				"The property \"assignee.class.name\" is invalid for " +
+					ClassUtil.getClassName(kaleoTaskAssignmentSelector));
+		}
+
+		return assigneeClassNames;
+	}
+
+	protected void removeKaleoTaskAssignmentSelector(
+		KaleoTaskAssignmentSelector kaleoTaskAssignmentSelector,
+		Map<String, Object> properties) {
+
+		String[] assigneeClassNames = getAssigneeClassNames(
+			kaleoTaskAssignmentSelector, properties);
+
+		for (String assigneeClassName : assigneeClassNames) {
+			_kaleoTaskAssignmentSelectors.remove(assigneeClassName);
+		}
+	}
+
+	private final Map<String, KaleoTaskAssignmentSelector>
+		_kaleoTaskAssignmentSelectors = new HashMap<>();
 
 }

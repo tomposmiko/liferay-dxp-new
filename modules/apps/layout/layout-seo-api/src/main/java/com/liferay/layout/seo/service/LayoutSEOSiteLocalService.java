@@ -15,7 +15,6 @@
 package com.liferay.layout.seo.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.layout.seo.exception.NoSuchSiteException;
 import com.liferay.layout.seo.model.LayoutSEOSite;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
@@ -129,9 +128,6 @@ public interface LayoutSEOSiteLocalService
 	@Indexable(type = IndexableType.DELETE)
 	public LayoutSEOSite deleteLayoutSEOSite(long layoutSEOSiteId)
 		throws PortalException;
-
-	public void deleteLayoutSEOSite(String uuid, long groupId)
-		throws NoSuchSiteException;
 
 	/**
 	 * @throws PortalException

@@ -67,7 +67,7 @@ public class ConfigurationCategoryDisplay {
 		}
 		catch (MissingResourceException missingResourceException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(missingResourceException);
+				_log.warn(missingResourceException, missingResourceException);
 			}
 
 			resourceBundle = ResourceBundleUtil.getBundle(

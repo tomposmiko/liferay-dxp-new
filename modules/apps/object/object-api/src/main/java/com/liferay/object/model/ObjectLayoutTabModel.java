@@ -365,8 +365,4 @@ public interface ObjectLayoutTabModel
 	@Override
 	public ObjectLayoutTab cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

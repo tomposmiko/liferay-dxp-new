@@ -30,10 +30,6 @@ public class DDLRecordVersionLocalServiceWrapper
 	implements DDLRecordVersionLocalService,
 			   ServiceWrapper<DDLRecordVersionLocalService> {
 
-	public DDLRecordVersionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DDLRecordVersionLocalServiceWrapper(
 		DDLRecordVersionLocalService ddlRecordVersionLocalService) {
 

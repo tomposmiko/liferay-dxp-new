@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -48,8 +46,6 @@ public class CommercePricingClassCPDefinitionRelWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put(
 			"CommercePricingClassCPDefinitionRelId",
 			getCommercePricingClassCPDefinitionRelId());
@@ -66,18 +62,6 @@ public class CommercePricingClassCPDefinitionRelWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		Long CommercePricingClassCPDefinitionRelId = (Long)attributes.get(
 			"CommercePricingClassCPDefinitionRelId");
 
@@ -193,16 +177,6 @@ public class CommercePricingClassCPDefinitionRelWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this commerce pricing class cp definition rel.
-	 *
-	 * @return the ct collection ID of this commerce pricing class cp definition rel
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the modified date of this commerce pricing class cp definition rel.
 	 *
 	 * @return the modified date of this commerce pricing class cp definition rel
@@ -210,16 +184,6 @@ public class CommercePricingClassCPDefinitionRelWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this commerce pricing class cp definition rel.
-	 *
-	 * @return the mvcc version of this commerce pricing class cp definition rel
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -321,16 +285,6 @@ public class CommercePricingClassCPDefinitionRelWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this commerce pricing class cp definition rel.
-	 *
-	 * @param ctCollectionId the ct collection ID of this commerce pricing class cp definition rel
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the modified date of this commerce pricing class cp definition rel.
 	 *
 	 * @param modifiedDate the modified date of this commerce pricing class cp definition rel
@@ -338,16 +292,6 @@ public class CommercePricingClassCPDefinitionRelWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
-	}
-
-	/**
-	 * Sets the mvcc version of this commerce pricing class cp definition rel.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce pricing class cp definition rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
 	}
 
 	/**
@@ -388,25 +332,6 @@ public class CommercePricingClassCPDefinitionRelWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CommercePricingClassCPDefinitionRel, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CommercePricingClassCPDefinitionRel, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

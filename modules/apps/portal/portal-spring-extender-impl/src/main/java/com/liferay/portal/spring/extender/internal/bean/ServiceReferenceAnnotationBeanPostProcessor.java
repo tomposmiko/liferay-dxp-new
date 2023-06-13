@@ -64,12 +64,12 @@ public class ServiceReferenceAnnotationBeanPostProcessor
 	public Object postProcessBeforeInitialization(Object bean, String beanName)
 		throws BeansException {
 
-		_autoInject(bean, bean.getClass());
+		autoInject(bean, bean.getClass());
 
 		return bean;
 	}
 
-	private void _autoInject(Object targetBean, Class<?> beanClass) {
+	protected void autoInject(Object targetBean, Class<?> beanClass) {
 		if ((beanClass == null) || beanClass.isInterface()) {
 			return;
 		}
@@ -122,7 +122,7 @@ public class ServiceReferenceAnnotationBeanPostProcessor
 			_serviceReferences.add(osgiServiceReference);
 		}
 
-		_autoInject(targetBean, beanClass.getSuperclass());
+		autoInject(targetBean, beanClass.getSuperclass());
 	}
 
 	private final BundleContext _bundleContext;

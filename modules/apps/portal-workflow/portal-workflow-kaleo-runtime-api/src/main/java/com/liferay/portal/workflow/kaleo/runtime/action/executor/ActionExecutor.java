@@ -26,6 +26,4 @@ public interface ActionExecutor {
 			KaleoAction kaleoAction, ExecutionContext executionContext)
 		throws ActionExecutorException;
 
-	public String[] getActionExecutorKeys();
-
 }

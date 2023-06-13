@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see DDMTemplateServiceSoap
  * @generated
  */
 public class DDMTemplateServiceHttp {
@@ -153,7 +154,7 @@ public class DDMTemplateServiceHttp {
 
 	public static com.liferay.dynamic.data.mapping.model.DDMTemplate
 			copyTemplate(
-				HttpPrincipal httpPrincipal, long sourceTemplateId,
+				HttpPrincipal httpPrincipal, long templateId,
 				java.util.Map<java.util.Locale, String> nameMap,
 				java.util.Map<java.util.Locale, String> descriptionMap,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -165,8 +166,7 @@ public class DDMTemplateServiceHttp {
 				_copyTemplateParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, sourceTemplateId, nameMap, descriptionMap,
-				serviceContext);
+				methodKey, templateId, nameMap, descriptionMap, serviceContext);
 
 			Object returnObj = null;
 
@@ -199,7 +199,7 @@ public class DDMTemplateServiceHttp {
 
 	public static com.liferay.dynamic.data.mapping.model.DDMTemplate
 			copyTemplate(
-				HttpPrincipal httpPrincipal, long sourceTemplateId,
+				HttpPrincipal httpPrincipal, long templateId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -209,7 +209,7 @@ public class DDMTemplateServiceHttp {
 				_copyTemplateParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, sourceTemplateId, serviceContext);
+				methodKey, templateId, serviceContext);
 
 			Object returnObj = null;
 
@@ -242,9 +242,8 @@ public class DDMTemplateServiceHttp {
 
 	public static java.util.List
 		<com.liferay.dynamic.data.mapping.model.DDMTemplate> copyTemplates(
-				HttpPrincipal httpPrincipal, long classNameId,
-				long sourceClassPK, long resourceClassNameId,
-				long targetClassPK, String type,
+				HttpPrincipal httpPrincipal, long classNameId, long oldClassPK,
+				long resourceClassNameId, long newClassPK, String type,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -254,8 +253,8 @@ public class DDMTemplateServiceHttp {
 				_copyTemplatesParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, classNameId, sourceClassPK, resourceClassNameId,
-				targetClassPK, type, serviceContext);
+				methodKey, classNameId, oldClassPK, resourceClassNameId,
+				newClassPK, type, serviceContext);
 
 			Object returnObj = null;
 

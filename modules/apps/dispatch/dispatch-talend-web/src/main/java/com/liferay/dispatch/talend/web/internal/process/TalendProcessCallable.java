@@ -14,11 +14,9 @@
 
 package com.liferay.dispatch.talend.web.internal.process;
 
+import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.process.ProcessCallable;
 import com.liferay.petra.process.ProcessException;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,8 +27,6 @@ import java.lang.reflect.Method;
 
 import java.security.Permission;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -50,23 +46,19 @@ public class TalendProcessCallable
 	public TalendProcessOutput call() throws ProcessException {
 		PrintStream errPrintStream = System.err;
 
-		TalendProcessOutputWriter errTalendProcessOutputWriter =
-			new TalendProcessOutputWriter(20, 20);
+		UnsyncByteArrayOutputStream errUnsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
 
 		System.setErr(
-			new TeePrintStream(
-				new TalendProcessOutputStream(errTalendProcessOutputWriter),
-				errPrintStream));
+			new TeePrintStream(errUnsyncByteArrayOutputStream, errPrintStream));
 
-		TalendProcessOutputWriter outTalendProcessOutputWriter =
-			new TalendProcessOutputWriter(20, 20);
+		UnsyncByteArrayOutputStream outUnsyncByteArrayOutputStream =
+			new UnsyncByteArrayOutputStream();
 
 		PrintStream outPrintStream = System.out;
 
 		System.setOut(
-			new TeePrintStream(
-				new TalendProcessOutputStream(outTalendProcessOutputWriter),
-				outPrintStream));
+			new TeePrintStream(outUnsyncByteArrayOutputStream, outPrintStream));
 
 		AtomicInteger exitStatusAtomicInteger = new AtomicInteger();
 		RuntimeException runtimeException = new RuntimeException();
@@ -105,8 +97,8 @@ public class TalendProcessCallable
 			if (causeThrowable == runtimeException) {
 				return new TalendProcessOutput(
 					exitStatusAtomicInteger.get(),
-					outTalendProcessOutputWriter.getOutput(),
-					errTalendProcessOutputWriter.getOutput());
+					outUnsyncByteArrayOutputStream.toString(),
+					errUnsyncByteArrayOutputStream.toString());
 			}
 
 			throw new ProcessException(causeThrowable);
@@ -126,69 +118,6 @@ public class TalendProcessCallable
 
 	private final String _jobMainClassFQN;
 	private final String[] _mainMethodArgs;
-
-	private class TalendProcessOutputStream extends OutputStream {
-
-		@Override
-		public void write(int integer) {
-			_talendProcessOutputWriter.write(integer);
-		}
-
-		private TalendProcessOutputStream(
-			TalendProcessOutputWriter talendProcessOutputWriter) {
-
-			_talendProcessOutputWriter = talendProcessOutputWriter;
-		}
-
-		private final TalendProcessOutputWriter _talendProcessOutputWriter;
-
-	}
-
-	private class TalendProcessOutputWriter {
-
-		public String getOutput() {
-			if (_lines.size() == _totalLinesCount) {
-				_lines.add(
-					_beginningLinesCount,
-					StringBundler.concat(
-						"-----------------", StringPool.NEW_LINE,
-						"Output was truncated for performance reasons. Check ",
-						"the portal log for details.", StringPool.NEW_LINE,
-						"-----------------"));
-			}
-
-			return StringUtil.merge(_lines, "\n");
-		}
-
-		public void write(int integer) {
-			if (integer == '\n') {
-				if (_lines.size() == _totalLinesCount) {
-					_lines.remove(_beginningLinesCount);
-				}
-
-				_lines.add(_sb.toString());
-
-				_sb = new StringBundler();
-			}
-			else {
-				_sb.append((char)integer);
-			}
-		}
-
-		private TalendProcessOutputWriter(
-			int beginningLinesCount, int endingLinesCount) {
-
-			_beginningLinesCount = beginningLinesCount;
-
-			_totalLinesCount = beginningLinesCount + endingLinesCount;
-		}
-
-		private final int _beginningLinesCount;
-		private final List<String> _lines = new LinkedList<>();
-		private StringBundler _sb = new StringBundler();
-		private final int _totalLinesCount;
-
-	}
 
 	private class TeePrintStream extends PrintStream {
 

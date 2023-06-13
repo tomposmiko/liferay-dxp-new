@@ -45,7 +45,9 @@ public class IconTag extends BaseContainerTag {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		_spritemap = themeDisplay.getPathThemeSpritemap();
+		String pathThemeImages = themeDisplay.getPathThemeImages();
+
+		_spritemap = pathThemeImages.concat("/clay/icons.svg");
 
 		return super.doStartTag();
 	}

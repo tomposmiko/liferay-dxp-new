@@ -52,11 +52,6 @@ public class GroupingFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public boolean isVisible(User user, Object object) {
 		if (!isDynamicAssetSelection()) {
 			return false;
@@ -85,6 +80,15 @@ public class GroupingFormNavigatorEntry
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/configuration/grouping.jsp";
 	}
@@ -94,10 +98,5 @@ public class GroupingFormNavigatorEntry
 
 	@Reference
 	private PortletLocalService _portletLocalService;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)"
-	)
-	private ServletContext _servletContext;
 
 }

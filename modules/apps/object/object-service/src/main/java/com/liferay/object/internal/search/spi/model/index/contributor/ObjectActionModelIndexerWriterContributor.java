@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.object.model.ObjectAction",
 	service = ModelIndexerWriterContributor.class
 )

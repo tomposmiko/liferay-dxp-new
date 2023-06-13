@@ -14,10 +14,12 @@
 
 package com.liferay.commerce.product.internal.upgrade.v1_3_0;
 
+import com.liferay.commerce.product.internal.upgrade.base.BaseCommerceProductServiceUpgradeProcess;
 import com.liferay.commerce.product.model.impl.CPDefinitionLinkModelImpl;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,10 +28,20 @@ import java.sql.Statement;
 /**
  * @author Ethan Bustad
  */
-public class CPDefinitionLinkUpgradeProcess extends UpgradeProcess {
+public class CPDefinitionLinkUpgradeProcess
+	extends BaseCommerceProductServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CPDefinitionLinkModelImpl.class,
+			CPDefinitionLinkModelImpl.TABLE_NAME, "CProductId", "LONG");
+
+		_renameColumn(
+			CPDefinitionLinkModelImpl.class,
+			CPDefinitionLinkModelImpl.TABLE_NAME, "CPDefinitionId1",
+			"CPDefinitionId LONG");
+
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"update CPDefinitionLink set CProductId = ? where " +
 					"CPDefinitionId2 = ?");
@@ -41,29 +53,14 @@ public class CPDefinitionLinkUpgradeProcess extends UpgradeProcess {
 				long cpDefinitionId2 = resultSet.getLong("CPDefinitionId2");
 
 				preparedStatement.setLong(1, _getCProductId(cpDefinitionId2));
+
 				preparedStatement.setLong(2, cpDefinitionId2);
 
 				preparedStatement.execute();
 			}
 		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns(
-				CPDefinitionLinkModelImpl.TABLE_NAME, "CPDefinitionId2")
-		};
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CPDefinitionLink", "CProductId LONG"),
-			UpgradeProcessFactory.alterColumnName(
-				"CPDefinitionLink", "CPDefinitionId1", "CPDefinitionId LONG")
-		};
+		dropColumn(CPDefinitionLinkModelImpl.TABLE_NAME, "CPDefinitionId2");
 	}
 
 	private long _getCProductId(long cpDefinitionId) throws Exception {
@@ -79,5 +76,37 @@ public class CPDefinitionLinkUpgradeProcess extends UpgradeProcess {
 
 		return 0;
 	}
+
+	private void _renameColumn(
+			Class<?> tableClass, String tableName, String oldColumnName,
+			String newColumnName)
+		throws Exception {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				String.format(
+					"Renaming column %s to %s in table %s", oldColumnName,
+					newColumnName, tableName));
+		}
+
+		String newColumnSimpleName = StringUtil.extractFirst(
+			newColumnName, StringPool.SPACE);
+
+		if (!hasColumn(tableName, newColumnSimpleName)) {
+			alter(
+				tableClass, new AlterColumnName(oldColumnName, newColumnName));
+		}
+		else {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					String.format(
+						"Column %s already exists on table %s", newColumnName,
+						tableName));
+			}
+		}
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CPDefinitionLinkUpgradeProcess.class);
 
 }

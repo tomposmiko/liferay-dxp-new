@@ -18,9 +18,8 @@ import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunction;
 
 import java.math.BigDecimal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Leonardo Barros
@@ -32,17 +31,15 @@ public class MinFunction
 
 	@Override
 	public BigDecimal apply(Object[] values) {
-		if (values.length == 0) {
-			return BigDecimal.ZERO;
-		}
-
-		List<BigDecimal> list = new ArrayList<>();
-
-		for (Object value : values) {
-			list.add(new BigDecimal(value.toString()));
-		}
-
-		return Collections.min(list);
+		return Stream.of(
+			values
+		).map(
+			value -> new BigDecimal(value.toString())
+		).collect(
+			Collectors.minBy((num1, num2) -> num1.compareTo(num2))
+		).orElse(
+			BigDecimal.ZERO
+		);
 	}
 
 	@Override

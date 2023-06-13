@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.license.util.LicenseManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.ThrowableCollector;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -90,7 +90,7 @@ import org.osgi.util.tracker.BundleTracker;
 /**
  * @author Shuyang Zhou
  */
-@Component(service = LPKGDeployer.class)
+@Component(immediate = true, service = LPKGDeployer.class)
 public class DefaultLPKGDeployer implements LPKGDeployer {
 
 	@Override
@@ -170,8 +170,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 				BundleStartLevel.class);
 
 			bundleStartLevel.setStartLevel(
-				ModuleFrameworkPropsValues.
-					MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL);
+				PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL);
 
 			bundles.add(lpkgBundle);
 
@@ -288,7 +287,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 		Set<Bundle> removalPendingBundles = new HashSet<>();
 
-		_deploymentDirPath = _getDeploymentDirPath();
+		_deploymentDirPath = _getDeploymentDirPath(bundleContext);
 
 		Path overrideDirPath = _deploymentDirPath.resolve("override");
 
@@ -349,7 +348,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 			File lpkgFile = iterator.next();
 
 			List<File> innerLPKGFiles = ContainerLPKGUtil.deploy(
-				lpkgFile, null);
+				lpkgFile, bundleContext, null);
 
 			if (innerLPKGFiles != null) {
 				iterator.remove();
@@ -403,7 +402,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -413,15 +412,21 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 		}
 	}
 
-	private Path _getDeploymentDirPath() throws Exception {
+	private Path _getDeploymentDirPath(BundleContext bundleContext)
+		throws Exception {
+
 		File deploymentDir = new File(
-			PropsValues.MODULE_FRAMEWORK_MARKETPLACE_DIR);
+			GetterUtil.getString(
+				bundleContext.getProperty("lpkg.deployer.dir"),
+				PropsValues.MODULE_FRAMEWORK_MARKETPLACE_DIR));
 
 		deploymentDir = deploymentDir.getCanonicalFile();
 
-		deploymentDir.mkdirs();
+		Path deploymentDirPath = deploymentDir.toPath();
 
-		return deploymentDir.toPath();
+		Files.createDirectories(deploymentDirPath);
+
+		return deploymentDirPath;
 	}
 
 	private void _installLPKGs(
@@ -466,8 +471,7 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 			BundleStartLevelUtil.setStartLevelAndStart(
 				jarBundle,
-				ModuleFrameworkPropsValues.
-					MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
+				PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
 				bundleContext);
 
 			if (_log.isInfoEnabled()) {

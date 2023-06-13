@@ -18,9 +18,11 @@ import com.liferay.change.tracking.spi.reference.TableReferenceDefinition;
 import com.liferay.change.tracking.spi.reference.builder.ChildTableReferenceInfoBuilder;
 import com.liferay.change.tracking.spi.reference.builder.ParentTableReferenceInfoBuilder;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersionTable;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceTable;
+import com.liferay.portal.workflow.kaleo.model.KaleoInstanceTokenTable;
 import com.liferay.portal.workflow.kaleo.model.KaleoLogTable;
+import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceTokenTable;
+import com.liferay.portal.workflow.kaleo.model.KaleoTimerInstanceTokenTable;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoInstancePersistence;
 
 import org.osgi.service.component.annotations.Component;
@@ -40,7 +42,17 @@ public class KaleoInstanceTableReferenceDefinition
 
 		childTableReferenceInfoBuilder.singleColumnReference(
 			KaleoInstanceTable.INSTANCE.kaleoInstanceId,
-			KaleoLogTable.INSTANCE.kaleoInstanceId);
+			KaleoInstanceTokenTable.INSTANCE.kaleoInstanceId
+		).singleColumnReference(
+			KaleoInstanceTable.INSTANCE.kaleoInstanceId,
+			KaleoLogTable.INSTANCE.kaleoInstanceId
+		).singleColumnReference(
+			KaleoInstanceTable.INSTANCE.kaleoInstanceId,
+			KaleoTaskInstanceTokenTable.INSTANCE.kaleoInstanceId
+		).singleColumnReference(
+			KaleoInstanceTable.INSTANCE.kaleoInstanceId,
+			KaleoTimerInstanceTokenTable.INSTANCE.kaleoInstanceId
+		);
 	}
 
 	@Override
@@ -49,11 +61,7 @@ public class KaleoInstanceTableReferenceDefinition
 			parentTableReferenceInfoBuilder) {
 
 		parentTableReferenceInfoBuilder.groupedModel(
-			KaleoInstanceTable.INSTANCE
-		).singleColumnReference(
-			KaleoInstanceTable.INSTANCE.kaleoDefinitionVersionId,
-			KaleoDefinitionVersionTable.INSTANCE.kaleoDefinitionVersionId
-		);
+			KaleoInstanceTable.INSTANCE);
 	}
 
 	@Override

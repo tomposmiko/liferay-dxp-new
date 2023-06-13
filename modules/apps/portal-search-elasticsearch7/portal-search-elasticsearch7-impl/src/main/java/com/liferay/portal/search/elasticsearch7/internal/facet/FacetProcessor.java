@@ -16,6 +16,8 @@ package com.liferay.portal.search.elasticsearch7.internal.facet;
 
 import com.liferay.portal.kernel.search.facet.Facet;
 
+import java.util.Optional;
+
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 
 /**
@@ -23,6 +25,6 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
  */
 public interface FacetProcessor<T> {
 
-	public AggregationBuilder processFacet(Facet facet);
+	public Optional<AggregationBuilder> processFacet(Facet facet);
 
 }

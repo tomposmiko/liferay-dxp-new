@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.change.tracking.model.impl.CTAutoResolutionInfoImpl",
-		"table.name=CTAutoResolutionInfo"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		CTAutoResolutionInfoModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class CTAutoResolutionInfoModelArgumentsResolver
 	implements ArgumentsResolver {

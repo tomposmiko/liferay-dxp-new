@@ -16,7 +16,6 @@ package com.liferay.portal.search.web.internal.layout.prototype;
 
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
 
 /**
  * @author André de Oliveira
@@ -25,6 +24,6 @@ public interface SearchLayoutFactory {
 
 	public void createSearchLayout(Group group);
 
-	public Layout createSearchLayoutPrototype(Company company);
+	public void createSearchLayoutPrototype(Company company);
 
 }

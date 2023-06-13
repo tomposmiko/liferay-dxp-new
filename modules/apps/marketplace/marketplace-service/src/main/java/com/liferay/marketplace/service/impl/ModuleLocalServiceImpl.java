@@ -18,7 +18,6 @@ import com.liferay.marketplace.exception.ModuleNamespaceException;
 import com.liferay.marketplace.model.App;
 import com.liferay.marketplace.model.Module;
 import com.liferay.marketplace.service.base.ModuleLocalServiceBaseImpl;
-import com.liferay.marketplace.service.persistence.AppPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.Validator;
@@ -26,7 +25,6 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Ryan Park
@@ -51,9 +49,9 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			return module;
 		}
 
-		App app = _appPersistence.findByPrimaryKey(appId);
+		App app = appPersistence.findByPrimaryKey(appId);
 
-		_validate(bundleSymbolicName, contextName);
+		validate(bundleSymbolicName, contextName);
 
 		long moduleId = counterLocalService.increment();
 
@@ -96,7 +94,7 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 		return modulePersistence.findByAppId(appId);
 	}
 
-	private void _validate(String bundleSymbolicName, String contextName)
+	protected void validate(String bundleSymbolicName, String contextName)
 		throws PortalException {
 
 		if (Validator.isNull(bundleSymbolicName) &&
@@ -105,8 +103,5 @@ public class ModuleLocalServiceImpl extends ModuleLocalServiceBaseImpl {
 			throw new ModuleNamespaceException();
 		}
 	}
-
-	@Reference
-	private AppPersistence _appPersistence;
 
 }

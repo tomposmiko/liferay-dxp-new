@@ -27,7 +27,7 @@ KaleoProcessLink kaleoProcessLink = (KaleoProcessLink)request.getAttribute(Kaleo
 %>
 
 <clay:container-fluid
-	cssClass="main-content-body mt-4"
+	cssClass="main-content-body"
 >
 	<aui:fieldset>
 

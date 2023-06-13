@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.workflow.WorkflowTaskAssignee;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
+import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
 import com.liferay.portal.workflow.kaleo.model.KaleoLog;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 
@@ -43,12 +44,17 @@ public interface KaleoWorkflowModelConverter {
 		KaleoDefinition kaleoDefinition);
 
 	public WorkflowDefinition toWorkflowDefinition(
-		KaleoDefinitionVersion kaleoDefinitionVersion);
-
-	public WorkflowInstance toWorkflowInstance(KaleoInstance kaleoInstance);
+			KaleoDefinitionVersion kaleoDefinitionVersion)
+		throws PortalException;
 
 	public WorkflowInstance toWorkflowInstance(
-		KaleoInstance kaleoInstance, Map<String, Serializable> workflowContext);
+			KaleoInstance kaleoInstance, KaleoInstanceToken kaleoInstanceToken)
+		throws PortalException;
+
+	public WorkflowInstance toWorkflowInstance(
+			KaleoInstance kaleoInstance, KaleoInstanceToken kaleoInstanceToken,
+			Map<String, Serializable> workflowContext)
+		throws PortalException;
 
 	public WorkflowLog toWorkflowLog(KaleoLog kaleoLog);
 

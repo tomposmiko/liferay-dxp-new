@@ -21,11 +21,6 @@ import LayoutReports from '../../../src/main/resources/META-INF/resources/js/com
 import {StoreContextProvider} from '../../../src/main/resources/META-INF/resources/js/context/StoreContext';
 import {layoutReportsIssues, pageURLs, selectedIssue} from '../mocks';
 
-jest.mock('frontend-js-web', () => ({
-	...jest.requireActual('frontend-js-web'),
-	sub: jest.fn((langKey, arg) => langKey.replace('x', arg)),
-}));
-
 const getLayoutReportsComponent = ({
 	error = null,
 	layoutReportsIssues = null,
@@ -57,7 +52,6 @@ const getLayoutReportsComponent = ({
 
 const languageSelectorIsInTheDocument = ({fn, useNot = false}) => {
 	['Home', 'en-US', 'http://localhost:8080'].forEach((str) => {
-		// eslint-disable-next-line @liferay/expect-assert
 		const expected = useNot ? expect(fn(str)).not : expect(fn(str));
 
 		expected.toBeInTheDocument();

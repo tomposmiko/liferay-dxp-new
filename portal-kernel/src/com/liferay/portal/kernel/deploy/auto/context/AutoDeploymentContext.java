@@ -23,6 +23,10 @@ import java.io.File;
  */
 public class AutoDeploymentContext {
 
+	public String getAppServerType() {
+		return _appServerType;
+	}
+
 	public String getContext() {
 		return _context;
 	}
@@ -43,6 +47,10 @@ public class AutoDeploymentContext {
 		return _pluginPackage;
 	}
 
+	public void setAppServerType(String appServerType) {
+		_appServerType = appServerType;
+	}
+
 	public void setContext(String context) {
 		_context = context;
 	}
@@ -59,6 +67,7 @@ public class AutoDeploymentContext {
 		_pluginPackage = pluginPackage;
 	}
 
+	private String _appServerType;
 	private String _context;
 	private String _destDir;
 	private File _file;

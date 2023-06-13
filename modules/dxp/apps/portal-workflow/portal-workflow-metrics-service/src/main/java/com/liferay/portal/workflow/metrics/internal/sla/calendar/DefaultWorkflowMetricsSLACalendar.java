@@ -29,7 +29,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(immediate = false, service = WorkflowMetricsSLACalendar.class)
+@Component(
+	immediate = false, property = "sla.calendar.key=default",
+	service = WorkflowMetricsSLACalendar.class
+)
 public class DefaultWorkflowMetricsSLACalendar
 	implements WorkflowMetricsSLACalendar {
 
@@ -38,11 +41,6 @@ public class DefaultWorkflowMetricsSLACalendar
 		LocalDateTime startLocalDateTime, LocalDateTime endLocalDateTime) {
 
 		return Duration.between(startLocalDateTime, endLocalDateTime);
-	}
-
-	@Override
-	public String getKey() {
-		return WorkflowMetricsSLACalendar.DEFAULT_KEY;
 	}
 
 	@Override

@@ -42,18 +42,17 @@ public class BorderStylesFormNavigatorEntry extends BaseFormNavigatorEntry {
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.portlet.configuration.css.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
 	protected String getJspPath() {
 		return "/border_styles.jsp";
 	}
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.portlet.configuration.css.web)"
-	)
-	private ServletContext _servletContext;
 
 }

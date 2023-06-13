@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Raymond Augé
  */
-@Component(service = LayoutStaging.class)
+@Component(immediate = true, service = LayoutStaging.class)
 public class LayoutStagingImpl implements LayoutStaging {
 
 	@Override
@@ -166,7 +166,7 @@ public class LayoutStagingImpl implements LayoutStaging {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -287,13 +287,19 @@ public class LayoutStagingImpl implements LayoutStaging {
 		return true;
 	}
 
+	@Reference(unbind = "-")
+	protected void setLayoutSetBranchLocalService(
+		LayoutSetBranchLocalService layoutSetBranchLocalService) {
+
+		_layoutSetBranchLocalService = layoutSetBranchLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutStagingImpl.class);
 
 	@Reference
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
-	@Reference
 	private LayoutSetBranchLocalService _layoutSetBranchLocalService;
 
 }

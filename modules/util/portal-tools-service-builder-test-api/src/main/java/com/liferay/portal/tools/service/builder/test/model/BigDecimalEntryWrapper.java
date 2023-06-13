@@ -158,11 +158,6 @@ public class BigDecimalEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected BigDecimalEntryWrapper wrap(BigDecimalEntry bigDecimalEntry) {
 		return new BigDecimalEntryWrapper(bigDecimalEntry);
 	}

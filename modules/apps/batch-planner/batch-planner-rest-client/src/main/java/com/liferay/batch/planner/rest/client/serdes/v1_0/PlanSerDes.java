@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -181,60 +182,6 @@ public class PlanSerDes {
 			sb.append("]");
 		}
 
-		if (plan.getSize() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"size\": ");
-
-			sb.append(plan.getSize());
-		}
-
-		if (plan.getStatus() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"status\": ");
-
-			sb.append(plan.getStatus());
-		}
-
-		if (plan.getTaskItemDelegateName() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"taskItemDelegateName\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(plan.getTaskItemDelegateName()));
-
-			sb.append("\"");
-		}
-
-		if (plan.getTemplate() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"template\": ");
-
-			sb.append(plan.getTemplate());
-		}
-
-		if (plan.getTotal() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"total\": ");
-
-			sb.append(plan.getTotal());
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -318,43 +265,6 @@ public class PlanSerDes {
 			map.put("policies", String.valueOf(plan.getPolicies()));
 		}
 
-		if (plan.getSize() == null) {
-			map.put("size", null);
-		}
-		else {
-			map.put("size", String.valueOf(plan.getSize()));
-		}
-
-		if (plan.getStatus() == null) {
-			map.put("status", null);
-		}
-		else {
-			map.put("status", String.valueOf(plan.getStatus()));
-		}
-
-		if (plan.getTaskItemDelegateName() == null) {
-			map.put("taskItemDelegateName", null);
-		}
-		else {
-			map.put(
-				"taskItemDelegateName",
-				String.valueOf(plan.getTaskItemDelegateName()));
-		}
-
-		if (plan.getTemplate() == null) {
-			map.put("template", null);
-		}
-		else {
-			map.put("template", String.valueOf(plan.getTemplate()));
-		}
-
-		if (plan.getTotal() == null) {
-			map.put("total", null);
-		}
-		else {
-			map.put("total", String.valueOf(plan.getTotal()));
-		}
-
 		return map;
 	}
 
@@ -407,18 +317,14 @@ public class PlanSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "mappings")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Mapping[] mappingsArray =
-						new Mapping[jsonParserFieldValues.length];
-
-					for (int i = 0; i < mappingsArray.length; i++) {
-						mappingsArray[i] = MappingSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					plan.setMappings(mappingsArray);
+					plan.setMappings(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> MappingSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Mapping[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
@@ -428,47 +334,14 @@ public class PlanSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "policies")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Policy[] policiesArray =
-						new Policy[jsonParserFieldValues.length];
-
-					for (int i = 0; i < policiesArray.length; i++) {
-						policiesArray[i] = PolicySerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					plan.setPolicies(policiesArray);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "size")) {
-				if (jsonParserFieldValue != null) {
-					plan.setSize(Integer.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "status")) {
-				if (jsonParserFieldValue != null) {
-					plan.setStatus(
-						Integer.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "taskItemDelegateName")) {
-
-				if (jsonParserFieldValue != null) {
-					plan.setTaskItemDelegateName((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "template")) {
-				if (jsonParserFieldValue != null) {
-					plan.setTemplate((Boolean)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "total")) {
-				if (jsonParserFieldValue != null) {
-					plan.setTotal(
-						Integer.valueOf((String)jsonParserFieldValue));
+					plan.setPolicies(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> PolicySerDes.toDTO((String)object)
+						).toArray(
+							size -> new Policy[size]
+						));
 				}
 			}
 		}

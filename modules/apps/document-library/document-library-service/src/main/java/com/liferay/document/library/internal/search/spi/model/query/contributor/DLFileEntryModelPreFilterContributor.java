@@ -15,6 +15,7 @@
 package com.liferay.document.library.internal.search.spi.model.query.contributor;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructureManager;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -52,46 +53,17 @@ public class DLFileEntryModelPreFilterContributor
 		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
 		SearchContext searchContext) {
 
-		_addAttachmentFilter(booleanFilter, searchContext);
-		_addClassTypeIdsFilter(booleanFilter, searchContext);
-		_addDDMFieldFilter(booleanFilter, searchContext);
+		addAttachmentFilter(booleanFilter, searchContext);
+		addClassTypeIdsFilter(
+			booleanFilter, modelSearchSettings, searchContext);
+		addDDMFieldFilter(booleanFilter, searchContext);
 		addWorkflowStatusFilter(
 			booleanFilter, modelSearchSettings, searchContext);
 		addHiddenFilter(booleanFilter, searchContext);
-		_addMimeTypesFilter(booleanFilter, searchContext);
+		addMimeTypesFilter(booleanFilter, searchContext);
 	}
 
-	protected void addHiddenFilter(
-		BooleanFilter booleanFilter, SearchContext searchContext) {
-
-		if ((ArrayUtil.isEmpty(searchContext.getFolderIds()) ||
-			 ArrayUtil.contains(
-				 searchContext.getFolderIds(),
-				 DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) &&
-			!searchContext.isIncludeAttachments()) {
-
-			booleanFilter.addRequiredTerm(Field.HIDDEN, false);
-		}
-	}
-
-	protected void addWorkflowStatusFilter(
-		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
-		SearchContext searchContext) {
-
-		workflowStatusModelPreFilterContributor.contribute(
-			booleanFilter, modelSearchSettings, searchContext);
-	}
-
-	@Reference
-	protected DDMIndexer ddmIndexer;
-
-	protected RelatedEntryIndexer relatedEntryIndexer =
-		new BaseRelatedEntryIndexer();
-
-	@Reference(target = "(model.pre.filter.contributor.id=WorkflowStatus)")
-	protected ModelPreFilterContributor workflowStatusModelPreFilterContributor;
-
-	private void _addAttachmentFilter(
+	protected void addAttachmentFilter(
 		BooleanFilter booleanFilter, SearchContext searchContext) {
 
 		if (!searchContext.isIncludeAttachments()) {
@@ -107,8 +79,9 @@ public class DLFileEntryModelPreFilterContributor
 		}
 	}
 
-	private void _addClassTypeIdsFilter(
-		BooleanFilter booleanFilter, SearchContext searchContext) {
+	protected void addClassTypeIdsFilter(
+		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
+		SearchContext searchContext) {
 
 		long[] classTypeIds = searchContext.getClassTypeIds();
 
@@ -123,7 +96,7 @@ public class DLFileEntryModelPreFilterContributor
 		booleanFilter.add(termsFilter, BooleanClauseOccur.MUST);
 	}
 
-	private void _addDDMFieldFilter(
+	protected void addDDMFieldFilter(
 		BooleanFilter booleanFilter, SearchContext searchContext) {
 
 		try {
@@ -148,7 +121,20 @@ public class DLFileEntryModelPreFilterContributor
 		}
 	}
 
-	private void _addMimeTypesFilter(
+	protected void addHiddenFilter(
+		BooleanFilter booleanFilter, SearchContext searchContext) {
+
+		if ((ArrayUtil.isEmpty(searchContext.getFolderIds()) ||
+			 ArrayUtil.contains(
+				 searchContext.getFolderIds(),
+				 DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) &&
+			!searchContext.isIncludeAttachments()) {
+
+			booleanFilter.addRequiredTerm(Field.HIDDEN, false);
+		}
+	}
+
+	protected void addMimeTypesFilter(
 		BooleanFilter booleanFilter, SearchContext searchContext) {
 
 		String[] mimeTypes = (String[])searchContext.getAttribute("mimeTypes");
@@ -166,5 +152,25 @@ public class DLFileEntryModelPreFilterContributor
 			booleanFilter.add(mimeTypesBooleanFilter, BooleanClauseOccur.MUST);
 		}
 	}
+
+	protected void addWorkflowStatusFilter(
+		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
+		SearchContext searchContext) {
+
+		workflowStatusModelPreFilterContributor.contribute(
+			booleanFilter, modelSearchSettings, searchContext);
+	}
+
+	@Reference
+	protected DDMIndexer ddmIndexer;
+
+	@Reference
+	protected DDMStructureManager ddmStructureManager;
+
+	protected RelatedEntryIndexer relatedEntryIndexer =
+		new BaseRelatedEntryIndexer();
+
+	@Reference(target = "(model.pre.filter.contributor.id=WorkflowStatus)")
+	protected ModelPreFilterContributor workflowStatusModelPreFilterContributor;
 
 }

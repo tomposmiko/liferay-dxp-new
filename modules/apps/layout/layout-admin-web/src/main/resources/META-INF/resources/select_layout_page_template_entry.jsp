@@ -25,7 +25,7 @@ if (Validator.isNull(backURL)) {
 	backURL = portletURL.toString();
 }
 
-SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplayContext = new SelectLayoutPageTemplateEntryDisplayContext(request, liferayPortletResponse);
+SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplayContext = new SelectLayoutPageTemplateEntryDisplayContext(request);
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(backURL);
@@ -45,20 +45,10 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 				<ul class="nav nav-nested">
 					<li class="nav-item">
 						<p class="text-uppercase">
-							<strong><liferay-ui:message key="page-template-sets" /></strong>
+							<strong><liferay-ui:message key="collections" /></strong>
 						</p>
 
 						<ul class="nav nav-stacked">
-							<li class="nav-item">
-								<a class="nav-link text-truncate <%= selectLayoutPageTemplateEntryDisplayContext.isBasicTemplates() ? "active" : StringPool.BLANK %>" href="<%= layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(0, layoutsAdminDisplayContext.getSelPlid(), "basic-templates", layoutsAdminDisplayContext.isPrivateLayout()) %>">
-									<liferay-ui:message key="basic-templates" />
-								</a>
-							</li>
-							<li class="nav-item">
-								<a class="nav-link text-truncate <%= selectLayoutPageTemplateEntryDisplayContext.isGlobalTemplates() ? "active" : StringPool.BLANK %>" href="<%= layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(0, layoutsAdminDisplayContext.getSelPlid(), "global-templates", layoutsAdminDisplayContext.isPrivateLayout()) %>">
-									<liferay-ui:message key="global-templates" />
-								</a>
-							</li>
 
 							<%
 							for (LayoutPageTemplateCollection layoutPageTemplateCollection : LayoutPageTemplateCollectionServiceUtil.getLayoutPageTemplateCollections(scopeGroupId)) {
@@ -77,6 +67,16 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 							}
 							%>
 
+							<li class="nav-item">
+								<a class="nav-link text-truncate <%= selectLayoutPageTemplateEntryDisplayContext.isBasicTemplates() ? "active" : StringPool.BLANK %>" href="<%= layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(0, layoutsAdminDisplayContext.getSelPlid(), "basic-templates", layoutsAdminDisplayContext.isPrivateLayout()) %>">
+									<liferay-ui:message key="basic-templates" />
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-truncate <%= selectLayoutPageTemplateEntryDisplayContext.isGlobalTemplates() ? "active" : StringPool.BLANK %>" href="<%= layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(0, layoutsAdminDisplayContext.getSelPlid(), "global-templates", layoutsAdminDisplayContext.isPrivateLayout()) %>">
+									<liferay-ui:message key="global-templates" />
+								</a>
+							</li>
 						</ul>
 					</li>
 				</ul>
@@ -136,9 +136,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 								modelVar="layoutPageTemplateEntry"
 							>
 								<liferay-ui:search-container-column-text>
-									<react:component
-										module="js/LayoutPageTemplateEntryCard"
-										props="<%= selectLayoutPageTemplateEntryDisplayContext.getLayoutPageTemplateEntryCardProps(layoutPageTemplateEntry) %>"
+									<clay:vertical-card
+										verticalCard="<%= new SelectLayoutPageTemplateEntryVerticalCard(layoutPageTemplateEntry, renderRequest, renderResponse) %>"
 									/>
 								</liferay-ui:search-container-column-text>
 							</liferay-ui:search-container-row>
@@ -161,8 +160,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 	</clay:row>
 </clay:container-fluid>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {delegate} = frontendJsWeb;
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+	var delegate = delegateModule.default;
 
 	var layoutPageTemplateEntries = document.getElementById(
 		'<portlet:namespace />layoutPageTemplateEntries'
@@ -174,9 +173,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 		'.add-layout-action-option',
 		(event) => {
 			Liferay.Util.openModal({
-				disableAutoClose: true,
 				height: '60vh',
-				id: 'addLayoutDialog',
+				id: '<portlet:namespace />addLayoutDialog',
 				size: 'md',
 				title: '<liferay-ui:message key="add-page" />',
 				url: event.delegateTarget.dataset.addLayoutUrl,

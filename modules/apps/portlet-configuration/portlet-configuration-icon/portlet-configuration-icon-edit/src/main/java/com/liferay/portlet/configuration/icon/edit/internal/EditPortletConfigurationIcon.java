@@ -14,7 +14,7 @@
 
 package com.liferay.portlet.configuration.icon.edit.internal;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -25,17 +25,17 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class EditPortletConfigurationIcon extends BasePortletConfigurationIcon {
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "preferences");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "preferences");
 	}
 
 	@Override
@@ -65,7 +65,9 @@ public class EditPortletConfigurationIcon extends BasePortletConfigurationIcon {
 		return portletDisplay.isShowEditIcon();
 	}
 
-	@Reference
-	private Language _language;
+	@Override
+	public boolean isToolTip() {
+		return false;
+	}
 
 }

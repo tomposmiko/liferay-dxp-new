@@ -27,10 +27,6 @@ public class CTCollectionLocalServiceWrapper
 	implements CTCollectionLocalService,
 			   ServiceWrapper<CTCollectionLocalService> {
 
-	public CTCollectionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CTCollectionLocalServiceWrapper(
 		CTCollectionLocalService ctCollectionLocalService) {
 
@@ -72,38 +68,6 @@ public class CTCollectionLocalServiceWrapper
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctCollectionLocalService.checkConflicts(ctCollection);
-	}
-
-	@Override
-	public java.util.Map
-		<Long,
-		 java.util.List<com.liferay.change.tracking.conflict.ConflictInfo>>
-				checkConflicts(
-					long companyId,
-					java.util.List<com.liferay.change.tracking.model.CTEntry>
-						ctEntries,
-					long fromCTCollectionId, String fromCTCollectionName,
-					long toCTCollectionId, String toCTCollectionName)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ctCollectionLocalService.checkConflicts(
-			companyId, ctEntries, fromCTCollectionId, fromCTCollectionName,
-			toCTCollectionId, toCTCollectionName);
-	}
-
-	@Override
-	public java.util.Map
-		<Long,
-		 java.util.List<com.liferay.change.tracking.conflict.ConflictInfo>>
-				checkConflicts(
-					long companyId, long[] ctEntryIds, long fromCTCollectionId,
-					String fromCTCollectionName, long toCTCollectionId,
-					String toCTCollectionName)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ctCollectionLocalService.checkConflicts(
-			companyId, ctEntryIds, fromCTCollectionId, fromCTCollectionName,
-			toCTCollectionId, toCTCollectionName);
 	}
 
 	/**
@@ -190,26 +154,6 @@ public class CTCollectionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctCollectionLocalService.deletePersistedModel(persistedModel);
-	}
-
-	@Override
-	public void discardCTEntries(
-			long ctCollectionId, long modelClassNameId, long modelClassPK,
-			boolean force)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_ctCollectionLocalService.discardCTEntries(
-			ctCollectionId, modelClassNameId, modelClassPK, force);
-	}
-
-	@Override
-	public void discardCTEntry(
-			long ctCollectionId, long modelClassNameId, long modelClassPK,
-			boolean force)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_ctCollectionLocalService.discardCTEntry(
-			ctCollectionId, modelClassNameId, modelClassPK, force);
 	}
 
 	@Override
@@ -384,30 +328,12 @@ public class CTCollectionLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List
-		<com.liferay.change.tracking.mapping.CTMappingTableInfo>
-			getCTMappingTableInfos(long ctCollectionId) {
-
-		return _ctCollectionLocalService.getCTMappingTableInfos(ctCollectionId);
-	}
-
-	@Override
 	public java.util.List<com.liferay.change.tracking.model.CTEntry>
 		getDiscardCTEntries(
 			long ctCollectionId, long modelClassNameId, long modelClassPK) {
 
 		return _ctCollectionLocalService.getDiscardCTEntries(
 			ctCollectionId, modelClassNameId, modelClassPK);
-	}
-
-	@Override
-	public java.util.List<com.liferay.change.tracking.model.CTCollection>
-			getExclusivePublishedCTCollections(
-				long modelClassNameId, long modelClassPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ctCollectionLocalService.getExclusivePublishedCTCollections(
-			modelClassNameId, modelClassPK);
 	}
 
 	@Override
@@ -436,21 +362,6 @@ public class CTCollectionLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctCollectionLocalService.getPersistedModel(primaryKeyObj);
-	}
-
-	@Override
-	public java.util.List<com.liferay.change.tracking.model.CTEntry>
-		getRelatedCTEntries(long ctCollectionId, long[] ctEntryIds) {
-
-		return _ctCollectionLocalService.getRelatedCTEntries(
-			ctCollectionId, ctEntryIds);
-	}
-
-	@Override
-	public boolean hasUnapprovedChanges(long ctCollectionId)
-		throws java.sql.SQLException {
-
-		return _ctCollectionLocalService.hasUnapprovedChanges(ctCollectionId);
 	}
 
 	@Override

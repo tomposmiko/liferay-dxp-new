@@ -30,19 +30,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = OpenIdConnect.class)
+@Component(immediate = true, service = OpenIdConnect.class)
 public class OpenIdConnectImpl implements OpenIdConnect {
 
 	@Override
 	public boolean isEnabled(long companyId) {
 		try {
-			OpenIdConnectConfiguration openIdConnectConfiguration =
+			OpenIdConnectConfiguration openIdConfiguration =
 				_configurationProvider.getConfiguration(
 					OpenIdConnectConfiguration.class,
 					new CompanyServiceSettingsLocator(
 						companyId, OpenIdConnectConstants.SERVICE_NAME));
 
-			return openIdConnectConfiguration.enabled();
+			return openIdConfiguration.enabled();
 		}
 		catch (ConfigurationException configurationException) {
 			_log.error(

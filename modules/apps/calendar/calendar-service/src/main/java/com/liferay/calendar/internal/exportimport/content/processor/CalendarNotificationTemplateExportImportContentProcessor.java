@@ -30,7 +30,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "model.class.name=com.liferay.calendar.model.CalendarNotificationTemplate",
-	service = ExportImportContentProcessor.class
+	service = {
+		CalendarNotificationTemplateExportImportContentProcessor.class,
+		ExportImportContentProcessor.class
+	}
 )
 public class CalendarNotificationTemplateExportImportContentProcessor
 	implements ExportImportContentProcessor<String> {

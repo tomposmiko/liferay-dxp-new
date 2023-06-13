@@ -48,9 +48,7 @@ const items = [
 ];
 
 describe('The performance by step body component should', () => {
-	let cells;
-	let container;
-	let getAllByRole;
+	let cells, container, getAllByRole;
 
 	afterEach(cleanup);
 

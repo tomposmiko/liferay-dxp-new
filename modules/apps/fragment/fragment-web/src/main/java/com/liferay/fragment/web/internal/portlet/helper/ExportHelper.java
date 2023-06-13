@@ -14,12 +14,13 @@
 
 package com.liferay.fragment.web.internal.portlet.helper;
 
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.kernel.zip.ZipWriterFactory;
+import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 
 import java.io.File;
 
@@ -28,19 +29,18 @@ import java.util.List;
 import javax.portlet.PortletException;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = ExportHelper.class)
+@Component(immediate = true, service = ExportHelper.class)
 public class ExportHelper {
 
 	public File exportFragmentCollections(
 			List<FragmentCollection> fragmentCollections)
 		throws PortletException {
 
-		ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
+		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
 		try {
 			for (FragmentCollection fragmentCollection : fragmentCollections) {
@@ -59,7 +59,7 @@ public class ExportHelper {
 			List<FragmentEntry> fragmentEntries)
 		throws PortletException {
 
-		ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
+		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
 		try {
 			for (FragmentComposition fragmentComposition :
@@ -70,7 +70,7 @@ public class ExportHelper {
 			}
 
 			for (FragmentEntry fragmentEntry : fragmentEntries) {
-				if (fragmentEntry.isTypeReact()) {
+				if (fragmentEntry.getType() == FragmentConstants.TYPE_REACT) {
 					continue;
 				}
 
@@ -83,8 +83,5 @@ public class ExportHelper {
 			throw new PortletException(exception);
 		}
 	}
-
-	@Reference
-	private ZipWriterFactory _zipWriterFactory;
 
 }

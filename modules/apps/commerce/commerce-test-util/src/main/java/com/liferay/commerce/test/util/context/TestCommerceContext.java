@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.test.util.context;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.model.CommerceOrder;
@@ -30,26 +30,26 @@ import com.liferay.portal.kernel.model.User;
 public class TestCommerceContext implements CommerceContext {
 
 	public TestCommerceContext(
-		AccountEntry accountEntry, CommerceCurrency commerceCurrency,
-		CommerceChannel commerceChannel, User contextUser, Group contextGroup,
+		CommerceCurrency commerceCurrency, CommerceChannel commerceChannel,
+		User contextUser, Group contextGroup, CommerceAccount commerceAccount,
 		CommerceOrder commerceOrder) {
 
-		_accountEntry = accountEntry;
 		_commerceCurrency = commerceCurrency;
 		_commerceChannel = commerceChannel;
 		_contextUser = contextUser;
 		_contextGroup = contextGroup;
+		_commerceAccount = commerceAccount;
 		_commerceOrder = commerceOrder;
-	}
-
-	@Override
-	public AccountEntry getAccountEntry() {
-		return _accountEntry;
 	}
 
 	@Override
 	public String[] getAccountEntryAllowedTypes() throws PortalException {
 		return new String[0];
+	}
+
+	@Override
+	public CommerceAccount getCommerceAccount() {
+		return _commerceAccount;
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class TestCommerceContext implements CommerceContext {
 		return 0;
 	}
 
-	private final AccountEntry _accountEntry;
+	private final CommerceAccount _commerceAccount;
 	private final CommerceChannel _commerceChannel;
 	private final CommerceCurrency _commerceCurrency;
 	private final CommerceOrder _commerceOrder;

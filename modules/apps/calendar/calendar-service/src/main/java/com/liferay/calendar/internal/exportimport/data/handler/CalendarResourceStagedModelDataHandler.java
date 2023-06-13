@@ -38,7 +38,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
@@ -56,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Daniel Kocsis
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + CalendarPortletKeys.CALENDAR_ADMIN,
 	service = StagedModelDataHandler.class
 )
@@ -182,11 +183,10 @@ public class CalendarResourceStagedModelDataHandler
 		long userId = portletDataContext.getUserId(
 			calendarResource.getUserUuid());
 
-		long classPK = _getClassPK(
-			portletDataContext, calendarResource, userId);
+		long classPK = getClassPK(portletDataContext, calendarResource, userId);
 
 		Map<Locale, String> calendarResourceNameMap =
-			_getCalendarResourceNameMap(portletDataContext, calendarResource);
+			getCalendarResourceNameMap(portletDataContext, calendarResource);
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			calendarResource);
@@ -213,7 +213,7 @@ public class CalendarResourceStagedModelDataHandler
 						userId, portletDataContext.getScopeGroupId(),
 						calendarResource.getClassNameId(), classPK,
 						calendarResource.getClassUuid(),
-						_getUniqueCalendarResourceCode(
+						getUniqueCalendarResourceCode(
 							portletDataContext, calendarResource),
 						calendarResourceNameMap,
 						calendarResource.getDescriptionMap(),
@@ -235,7 +235,7 @@ public class CalendarResourceStagedModelDataHandler
 						userId, portletDataContext.getScopeGroupId(),
 						calendarResource.getClassNameId(), classPK,
 						calendarResource.getClassUuid(),
-						_getUniqueCalendarResourceCode(
+						getUniqueCalendarResourceCode(
 							portletDataContext, calendarResource),
 						calendarResourceNameMap,
 						calendarResource.getDescriptionMap(),
@@ -245,7 +245,9 @@ public class CalendarResourceStagedModelDataHandler
 						duplicateCalendarResourceException) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(duplicateCalendarResourceException);
+					_log.debug(
+						duplicateCalendarResourceException,
+						duplicateCalendarResourceException);
 				}
 
 				// The calendar resource for the site's default calendar is
@@ -257,14 +259,14 @@ public class CalendarResourceStagedModelDataHandler
 			}
 		}
 
-		_updateCalendars(
+		updateCalendars(
 			portletDataContext, calendarResource, importedCalendarResource);
 
 		portletDataContext.importClassedModel(
 			calendarResource, importedCalendarResource);
 	}
 
-	private Map<Locale, String> _getCalendarResourceNameMap(
+	protected Map<Locale, String> getCalendarResourceNameMap(
 			PortletDataContext portletDataContext,
 			CalendarResource calendarResource)
 		throws Exception {
@@ -282,7 +284,7 @@ public class CalendarResourceStagedModelDataHandler
 		Group scopeGroup = _groupLocalService.getGroup(
 			portletDataContext.getScopeGroupId());
 
-		return _localization.populateLocalizationMap(
+		return LocalizationUtil.populateLocalizationMap(
 			HashMapBuilder.put(
 				LocaleUtil.getSiteDefault(), scopeGroup.getDescriptiveName()
 			).build(),
@@ -290,7 +292,7 @@ public class CalendarResourceStagedModelDataHandler
 			scopeGroup.getGroupId());
 	}
 
-	private long _getClassPK(
+	protected long getClassPK(
 		PortletDataContext portletDataContext,
 		CalendarResource calendarResource, long userId) {
 
@@ -310,7 +312,7 @@ public class CalendarResourceStagedModelDataHandler
 		return classPK;
 	}
 
-	private String _getUniqueCalendarResourceCode(
+	protected String getUniqueCalendarResourceCode(
 			PortletDataContext portletDataContext,
 			CalendarResource calendarResource)
 		throws Exception {
@@ -332,7 +334,7 @@ public class CalendarResourceStagedModelDataHandler
 		return code;
 	}
 
-	private void _updateCalendars(
+	protected void updateCalendars(
 		PortletDataContext portletDataContext,
 		CalendarResource calendarResource,
 		CalendarResource importedCalendarResource) {
@@ -372,9 +374,6 @@ public class CalendarResourceStagedModelDataHandler
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

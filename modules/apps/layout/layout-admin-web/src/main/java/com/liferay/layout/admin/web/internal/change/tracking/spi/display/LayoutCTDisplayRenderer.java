@@ -16,19 +16,16 @@ package com.liferay.layout.admin.web.internal.change.tracking.spi.display;
 
 import com.liferay.change.tracking.spi.display.BaseCTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
-import com.liferay.change.tracking.spi.display.context.DisplayContext;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
-import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ColorScheme;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Theme;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -48,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Truong
  */
-@Component(service = CTDisplayRenderer.class)
+@Component(immediate = true, service = CTDisplayRenderer.class)
 public class LayoutCTDisplayRenderer extends BaseCTDisplayRenderer<Layout> {
 
 	@Override
@@ -112,39 +109,6 @@ public class LayoutCTDisplayRenderer extends BaseCTDisplayRenderer<Layout> {
 	@Override
 	public boolean isHideable(Layout layout) {
 		return layout.isSystem();
-	}
-
-	@Override
-	public String renderPreview(DisplayContext<Layout> displayContext)
-		throws Exception {
-
-		Layout layout = displayContext.getModel();
-
-		HttpServletRequest httpServletRequest =
-			displayContext.getHttpServletRequest();
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		String url = null;
-
-		if (!layout.isDenied() && !layout.isPending()) {
-			url = _portal.getLayoutFriendlyURL(layout, themeDisplay);
-		}
-		else {
-			url = _portal.getLayoutFriendlyURL(
-				layout.fetchDraftLayout(), themeDisplay);
-		}
-
-		url = HttpComponentsUtil.addParameter(url, "p_l_mode", "preview");
-		url = HttpComponentsUtil.addParameter(
-			url, "previewCTCollectionId", layout.getCtCollectionId());
-
-		return StringBundler.concat(
-			"<iframe frameborder=\"0\" onload=\"this.style.height = ",
-			"(this.contentWindow.document.body.scrollHeight+20) + 'px';\" ",
-			"src=\"", url, "\" width=\"100%\"></iframe>");
 	}
 
 	@Override

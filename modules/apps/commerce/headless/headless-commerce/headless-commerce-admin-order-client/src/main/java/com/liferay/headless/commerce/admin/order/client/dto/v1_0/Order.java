@@ -300,27 +300,6 @@ public class Order implements Cloneable, Serializable {
 
 	protected Date createDate;
 
-	public String getCreatorEmailAddress() {
-		return creatorEmailAddress;
-	}
-
-	public void setCreatorEmailAddress(String creatorEmailAddress) {
-		this.creatorEmailAddress = creatorEmailAddress;
-	}
-
-	public void setCreatorEmailAddress(
-		UnsafeSupplier<String, Exception> creatorEmailAddressUnsafeSupplier) {
-
-		try {
-			creatorEmailAddress = creatorEmailAddressUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String creatorEmailAddress;
-
 	public String getCurrencyCode() {
 		return currencyCode;
 	}
@@ -362,71 +341,6 @@ public class Order implements Cloneable, Serializable {
 	}
 
 	protected Map<String, ?> customFields;
-
-	public String getDeliveryTermDescription() {
-		return deliveryTermDescription;
-	}
-
-	public void setDeliveryTermDescription(String deliveryTermDescription) {
-		this.deliveryTermDescription = deliveryTermDescription;
-	}
-
-	public void setDeliveryTermDescription(
-		UnsafeSupplier<String, Exception>
-			deliveryTermDescriptionUnsafeSupplier) {
-
-		try {
-			deliveryTermDescription =
-				deliveryTermDescriptionUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String deliveryTermDescription;
-
-	public Long getDeliveryTermId() {
-		return deliveryTermId;
-	}
-
-	public void setDeliveryTermId(Long deliveryTermId) {
-		this.deliveryTermId = deliveryTermId;
-	}
-
-	public void setDeliveryTermId(
-		UnsafeSupplier<Long, Exception> deliveryTermIdUnsafeSupplier) {
-
-		try {
-			deliveryTermId = deliveryTermIdUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long deliveryTermId;
-
-	public String getDeliveryTermName() {
-		return deliveryTermName;
-	}
-
-	public void setDeliveryTermName(String deliveryTermName) {
-		this.deliveryTermName = deliveryTermName;
-	}
-
-	public void setDeliveryTermName(
-		UnsafeSupplier<String, Exception> deliveryTermNameUnsafeSupplier) {
-
-		try {
-			deliveryTermName = deliveryTermNameUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String deliveryTermName;
 
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
@@ -703,70 +617,6 @@ public class Order implements Cloneable, Serializable {
 
 	protected Status paymentStatusInfo;
 
-	public String getPaymentTermDescription() {
-		return paymentTermDescription;
-	}
-
-	public void setPaymentTermDescription(String paymentTermDescription) {
-		this.paymentTermDescription = paymentTermDescription;
-	}
-
-	public void setPaymentTermDescription(
-		UnsafeSupplier<String, Exception>
-			paymentTermDescriptionUnsafeSupplier) {
-
-		try {
-			paymentTermDescription = paymentTermDescriptionUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String paymentTermDescription;
-
-	public Long getPaymentTermId() {
-		return paymentTermId;
-	}
-
-	public void setPaymentTermId(Long paymentTermId) {
-		this.paymentTermId = paymentTermId;
-	}
-
-	public void setPaymentTermId(
-		UnsafeSupplier<Long, Exception> paymentTermIdUnsafeSupplier) {
-
-		try {
-			paymentTermId = paymentTermIdUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long paymentTermId;
-
-	public String getPaymentTermName() {
-		return paymentTermName;
-	}
-
-	public void setPaymentTermName(String paymentTermName) {
-		this.paymentTermName = paymentTermName;
-	}
-
-	public void setPaymentTermName(
-		UnsafeSupplier<String, Exception> paymentTermNameUnsafeSupplier) {
-
-		try {
-			paymentTermName = paymentTermNameUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String paymentTermName;
-
 	public String getPrintedNote() {
 		return printedNote;
 	}
@@ -938,16 +788,16 @@ public class Order implements Cloneable, Serializable {
 
 	protected Double shippingAmountValue;
 
-	public BigDecimal getShippingDiscountAmount() {
+	public Double getShippingDiscountAmount() {
 		return shippingDiscountAmount;
 	}
 
-	public void setShippingDiscountAmount(BigDecimal shippingDiscountAmount) {
+	public void setShippingDiscountAmount(Double shippingDiscountAmount) {
 		this.shippingDiscountAmount = shippingDiscountAmount;
 	}
 
 	public void setShippingDiscountAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountAmountUnsafeSupplier) {
 
 		try {
@@ -958,7 +808,7 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountAmount;
+	protected Double shippingDiscountAmount;
 
 	public String getShippingDiscountAmountFormatted() {
 		return shippingDiscountAmountFormatted;
@@ -985,44 +835,19 @@ public class Order implements Cloneable, Serializable {
 
 	protected String shippingDiscountAmountFormatted;
 
-	public Double getShippingDiscountAmountValue() {
-		return shippingDiscountAmountValue;
-	}
-
-	public void setShippingDiscountAmountValue(
-		Double shippingDiscountAmountValue) {
-
-		this.shippingDiscountAmountValue = shippingDiscountAmountValue;
-	}
-
-	public void setShippingDiscountAmountValue(
-		UnsafeSupplier<Double, Exception>
-			shippingDiscountAmountValueUnsafeSupplier) {
-
-		try {
-			shippingDiscountAmountValue =
-				shippingDiscountAmountValueUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Double shippingDiscountAmountValue;
-
-	public BigDecimal getShippingDiscountPercentageLevel1() {
+	public Double getShippingDiscountPercentageLevel1() {
 		return shippingDiscountPercentageLevel1;
 	}
 
 	public void setShippingDiscountPercentageLevel1(
-		BigDecimal shippingDiscountPercentageLevel1) {
+		Double shippingDiscountPercentageLevel1) {
 
 		this.shippingDiscountPercentageLevel1 =
 			shippingDiscountPercentageLevel1;
 	}
 
 	public void setShippingDiscountPercentageLevel1(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel1UnsafeSupplier) {
 
 		try {
@@ -1034,21 +859,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel1;
+	protected Double shippingDiscountPercentageLevel1;
 
-	public BigDecimal getShippingDiscountPercentageLevel1WithTaxAmount() {
+	public Double getShippingDiscountPercentageLevel1WithTaxAmount() {
 		return shippingDiscountPercentageLevel1WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel1WithTaxAmount(
-		BigDecimal shippingDiscountPercentageLevel1WithTaxAmount) {
+		Double shippingDiscountPercentageLevel1WithTaxAmount) {
 
 		this.shippingDiscountPercentageLevel1WithTaxAmount =
 			shippingDiscountPercentageLevel1WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel1WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel1WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1061,21 +886,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel1WithTaxAmount;
+	protected Double shippingDiscountPercentageLevel1WithTaxAmount;
 
-	public BigDecimal getShippingDiscountPercentageLevel2() {
+	public Double getShippingDiscountPercentageLevel2() {
 		return shippingDiscountPercentageLevel2;
 	}
 
 	public void setShippingDiscountPercentageLevel2(
-		BigDecimal shippingDiscountPercentageLevel2) {
+		Double shippingDiscountPercentageLevel2) {
 
 		this.shippingDiscountPercentageLevel2 =
 			shippingDiscountPercentageLevel2;
 	}
 
 	public void setShippingDiscountPercentageLevel2(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel2UnsafeSupplier) {
 
 		try {
@@ -1087,21 +912,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel2;
+	protected Double shippingDiscountPercentageLevel2;
 
-	public BigDecimal getShippingDiscountPercentageLevel2WithTaxAmount() {
+	public Double getShippingDiscountPercentageLevel2WithTaxAmount() {
 		return shippingDiscountPercentageLevel2WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel2WithTaxAmount(
-		BigDecimal shippingDiscountPercentageLevel2WithTaxAmount) {
+		Double shippingDiscountPercentageLevel2WithTaxAmount) {
 
 		this.shippingDiscountPercentageLevel2WithTaxAmount =
 			shippingDiscountPercentageLevel2WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel2WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel2WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1114,21 +939,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel2WithTaxAmount;
+	protected Double shippingDiscountPercentageLevel2WithTaxAmount;
 
-	public BigDecimal getShippingDiscountPercentageLevel3() {
+	public Double getShippingDiscountPercentageLevel3() {
 		return shippingDiscountPercentageLevel3;
 	}
 
 	public void setShippingDiscountPercentageLevel3(
-		BigDecimal shippingDiscountPercentageLevel3) {
+		Double shippingDiscountPercentageLevel3) {
 
 		this.shippingDiscountPercentageLevel3 =
 			shippingDiscountPercentageLevel3;
 	}
 
 	public void setShippingDiscountPercentageLevel3(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel3UnsafeSupplier) {
 
 		try {
@@ -1140,21 +965,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel3;
+	protected Double shippingDiscountPercentageLevel3;
 
-	public BigDecimal getShippingDiscountPercentageLevel3WithTaxAmount() {
+	public Double getShippingDiscountPercentageLevel3WithTaxAmount() {
 		return shippingDiscountPercentageLevel3WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel3WithTaxAmount(
-		BigDecimal shippingDiscountPercentageLevel3WithTaxAmount) {
+		Double shippingDiscountPercentageLevel3WithTaxAmount) {
 
 		this.shippingDiscountPercentageLevel3WithTaxAmount =
 			shippingDiscountPercentageLevel3WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel3WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel3WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1167,21 +992,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel3WithTaxAmount;
+	protected Double shippingDiscountPercentageLevel3WithTaxAmount;
 
-	public BigDecimal getShippingDiscountPercentageLevel4() {
+	public Double getShippingDiscountPercentageLevel4() {
 		return shippingDiscountPercentageLevel4;
 	}
 
 	public void setShippingDiscountPercentageLevel4(
-		BigDecimal shippingDiscountPercentageLevel4) {
+		Double shippingDiscountPercentageLevel4) {
 
 		this.shippingDiscountPercentageLevel4 =
 			shippingDiscountPercentageLevel4;
 	}
 
 	public void setShippingDiscountPercentageLevel4(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel4UnsafeSupplier) {
 
 		try {
@@ -1193,21 +1018,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel4;
+	protected Double shippingDiscountPercentageLevel4;
 
-	public BigDecimal getShippingDiscountPercentageLevel4WithTaxAmount() {
+	public Double getShippingDiscountPercentageLevel4WithTaxAmount() {
 		return shippingDiscountPercentageLevel4WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel4WithTaxAmount(
-		BigDecimal shippingDiscountPercentageLevel4WithTaxAmount) {
+		Double shippingDiscountPercentageLevel4WithTaxAmount) {
 
 		this.shippingDiscountPercentageLevel4WithTaxAmount =
 			shippingDiscountPercentageLevel4WithTaxAmount;
 	}
 
 	public void setShippingDiscountPercentageLevel4WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountPercentageLevel4WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1220,20 +1045,20 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountPercentageLevel4WithTaxAmount;
+	protected Double shippingDiscountPercentageLevel4WithTaxAmount;
 
-	public BigDecimal getShippingDiscountWithTaxAmount() {
+	public Double getShippingDiscountWithTaxAmount() {
 		return shippingDiscountWithTaxAmount;
 	}
 
 	public void setShippingDiscountWithTaxAmount(
-		BigDecimal shippingDiscountWithTaxAmount) {
+		Double shippingDiscountWithTaxAmount) {
 
 		this.shippingDiscountWithTaxAmount = shippingDiscountWithTaxAmount;
 	}
 
 	public void setShippingDiscountWithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			shippingDiscountWithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1245,7 +1070,7 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal shippingDiscountWithTaxAmount;
+	protected Double shippingDiscountWithTaxAmount;
 
 	public String getShippingDiscountWithTaxAmountFormatted() {
 		return shippingDiscountWithTaxAmountFormatted;
@@ -1429,16 +1254,16 @@ public class Order implements Cloneable, Serializable {
 
 	protected Double subtotalAmount;
 
-	public BigDecimal getSubtotalDiscountAmount() {
+	public Double getSubtotalDiscountAmount() {
 		return subtotalDiscountAmount;
 	}
 
-	public void setSubtotalDiscountAmount(BigDecimal subtotalDiscountAmount) {
+	public void setSubtotalDiscountAmount(Double subtotalDiscountAmount) {
 		this.subtotalDiscountAmount = subtotalDiscountAmount;
 	}
 
 	public void setSubtotalDiscountAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountAmountUnsafeSupplier) {
 
 		try {
@@ -1449,7 +1274,7 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountAmount;
+	protected Double subtotalDiscountAmount;
 
 	public String getSubtotalDiscountAmountFormatted() {
 		return subtotalDiscountAmountFormatted;
@@ -1476,19 +1301,19 @@ public class Order implements Cloneable, Serializable {
 
 	protected String subtotalDiscountAmountFormatted;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel1() {
+	public Double getSubtotalDiscountPercentageLevel1() {
 		return subtotalDiscountPercentageLevel1;
 	}
 
 	public void setSubtotalDiscountPercentageLevel1(
-		BigDecimal subtotalDiscountPercentageLevel1) {
+		Double subtotalDiscountPercentageLevel1) {
 
 		this.subtotalDiscountPercentageLevel1 =
 			subtotalDiscountPercentageLevel1;
 	}
 
 	public void setSubtotalDiscountPercentageLevel1(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel1UnsafeSupplier) {
 
 		try {
@@ -1500,21 +1325,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel1;
+	protected Double subtotalDiscountPercentageLevel1;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel1WithTaxAmount() {
+	public Double getSubtotalDiscountPercentageLevel1WithTaxAmount() {
 		return subtotalDiscountPercentageLevel1WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel1WithTaxAmount(
-		BigDecimal subtotalDiscountPercentageLevel1WithTaxAmount) {
+		Double subtotalDiscountPercentageLevel1WithTaxAmount) {
 
 		this.subtotalDiscountPercentageLevel1WithTaxAmount =
 			subtotalDiscountPercentageLevel1WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel1WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel1WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1527,21 +1352,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel1WithTaxAmount;
+	protected Double subtotalDiscountPercentageLevel1WithTaxAmount;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel2() {
+	public Double getSubtotalDiscountPercentageLevel2() {
 		return subtotalDiscountPercentageLevel2;
 	}
 
 	public void setSubtotalDiscountPercentageLevel2(
-		BigDecimal subtotalDiscountPercentageLevel2) {
+		Double subtotalDiscountPercentageLevel2) {
 
 		this.subtotalDiscountPercentageLevel2 =
 			subtotalDiscountPercentageLevel2;
 	}
 
 	public void setSubtotalDiscountPercentageLevel2(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel2UnsafeSupplier) {
 
 		try {
@@ -1553,21 +1378,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel2;
+	protected Double subtotalDiscountPercentageLevel2;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel2WithTaxAmount() {
+	public Double getSubtotalDiscountPercentageLevel2WithTaxAmount() {
 		return subtotalDiscountPercentageLevel2WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel2WithTaxAmount(
-		BigDecimal subtotalDiscountPercentageLevel2WithTaxAmount) {
+		Double subtotalDiscountPercentageLevel2WithTaxAmount) {
 
 		this.subtotalDiscountPercentageLevel2WithTaxAmount =
 			subtotalDiscountPercentageLevel2WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel2WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel2WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1580,21 +1405,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel2WithTaxAmount;
+	protected Double subtotalDiscountPercentageLevel2WithTaxAmount;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel3() {
+	public Double getSubtotalDiscountPercentageLevel3() {
 		return subtotalDiscountPercentageLevel3;
 	}
 
 	public void setSubtotalDiscountPercentageLevel3(
-		BigDecimal subtotalDiscountPercentageLevel3) {
+		Double subtotalDiscountPercentageLevel3) {
 
 		this.subtotalDiscountPercentageLevel3 =
 			subtotalDiscountPercentageLevel3;
 	}
 
 	public void setSubtotalDiscountPercentageLevel3(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel3UnsafeSupplier) {
 
 		try {
@@ -1606,21 +1431,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel3;
+	protected Double subtotalDiscountPercentageLevel3;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel3WithTaxAmount() {
+	public Double getSubtotalDiscountPercentageLevel3WithTaxAmount() {
 		return subtotalDiscountPercentageLevel3WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel3WithTaxAmount(
-		BigDecimal subtotalDiscountPercentageLevel3WithTaxAmount) {
+		Double subtotalDiscountPercentageLevel3WithTaxAmount) {
 
 		this.subtotalDiscountPercentageLevel3WithTaxAmount =
 			subtotalDiscountPercentageLevel3WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel3WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel3WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1633,21 +1458,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel3WithTaxAmount;
+	protected Double subtotalDiscountPercentageLevel3WithTaxAmount;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel4() {
+	public Double getSubtotalDiscountPercentageLevel4() {
 		return subtotalDiscountPercentageLevel4;
 	}
 
 	public void setSubtotalDiscountPercentageLevel4(
-		BigDecimal subtotalDiscountPercentageLevel4) {
+		Double subtotalDiscountPercentageLevel4) {
 
 		this.subtotalDiscountPercentageLevel4 =
 			subtotalDiscountPercentageLevel4;
 	}
 
 	public void setSubtotalDiscountPercentageLevel4(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel4UnsafeSupplier) {
 
 		try {
@@ -1659,21 +1484,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel4;
+	protected Double subtotalDiscountPercentageLevel4;
 
-	public BigDecimal getSubtotalDiscountPercentageLevel4WithTaxAmount() {
+	public Double getSubtotalDiscountPercentageLevel4WithTaxAmount() {
 		return subtotalDiscountPercentageLevel4WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel4WithTaxAmount(
-		BigDecimal subtotalDiscountPercentageLevel4WithTaxAmount) {
+		Double subtotalDiscountPercentageLevel4WithTaxAmount) {
 
 		this.subtotalDiscountPercentageLevel4WithTaxAmount =
 			subtotalDiscountPercentageLevel4WithTaxAmount;
 	}
 
 	public void setSubtotalDiscountPercentageLevel4WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountPercentageLevel4WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1686,20 +1511,20 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountPercentageLevel4WithTaxAmount;
+	protected Double subtotalDiscountPercentageLevel4WithTaxAmount;
 
-	public BigDecimal getSubtotalDiscountWithTaxAmount() {
+	public Double getSubtotalDiscountWithTaxAmount() {
 		return subtotalDiscountWithTaxAmount;
 	}
 
 	public void setSubtotalDiscountWithTaxAmount(
-		BigDecimal subtotalDiscountWithTaxAmount) {
+		Double subtotalDiscountWithTaxAmount) {
 
 		this.subtotalDiscountWithTaxAmount = subtotalDiscountWithTaxAmount;
 	}
 
 	public void setSubtotalDiscountWithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			subtotalDiscountWithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -1711,7 +1536,7 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal subtotalDiscountWithTaxAmount;
+	protected Double subtotalDiscountWithTaxAmount;
 
 	public String getSubtotalDiscountWithTaxAmountFormatted() {
 		return subtotalDiscountWithTaxAmountFormatted;
@@ -1937,17 +1762,16 @@ public class Order implements Cloneable, Serializable {
 
 	protected Double totalAmount;
 
-	public BigDecimal getTotalDiscountAmount() {
+	public Double getTotalDiscountAmount() {
 		return totalDiscountAmount;
 	}
 
-	public void setTotalDiscountAmount(BigDecimal totalDiscountAmount) {
+	public void setTotalDiscountAmount(Double totalDiscountAmount) {
 		this.totalDiscountAmount = totalDiscountAmount;
 	}
 
 	public void setTotalDiscountAmount(
-		UnsafeSupplier<BigDecimal, Exception>
-			totalDiscountAmountUnsafeSupplier) {
+		UnsafeSupplier<Double, Exception> totalDiscountAmountUnsafeSupplier) {
 
 		try {
 			totalDiscountAmount = totalDiscountAmountUnsafeSupplier.get();
@@ -1957,7 +1781,7 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountAmount;
+	protected Double totalDiscountAmount;
 
 	public String getTotalDiscountAmountFormatted() {
 		return totalDiscountAmountFormatted;
@@ -1984,41 +1808,18 @@ public class Order implements Cloneable, Serializable {
 
 	protected String totalDiscountAmountFormatted;
 
-	public Double getTotalDiscountAmountValue() {
-		return totalDiscountAmountValue;
-	}
-
-	public void setTotalDiscountAmountValue(Double totalDiscountAmountValue) {
-		this.totalDiscountAmountValue = totalDiscountAmountValue;
-	}
-
-	public void setTotalDiscountAmountValue(
-		UnsafeSupplier<Double, Exception>
-			totalDiscountAmountValueUnsafeSupplier) {
-
-		try {
-			totalDiscountAmountValue =
-				totalDiscountAmountValueUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Double totalDiscountAmountValue;
-
-	public BigDecimal getTotalDiscountPercentageLevel1() {
+	public Double getTotalDiscountPercentageLevel1() {
 		return totalDiscountPercentageLevel1;
 	}
 
 	public void setTotalDiscountPercentageLevel1(
-		BigDecimal totalDiscountPercentageLevel1) {
+		Double totalDiscountPercentageLevel1) {
 
 		this.totalDiscountPercentageLevel1 = totalDiscountPercentageLevel1;
 	}
 
 	public void setTotalDiscountPercentageLevel1(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel1UnsafeSupplier) {
 
 		try {
@@ -2030,21 +1831,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel1;
+	protected Double totalDiscountPercentageLevel1;
 
-	public BigDecimal getTotalDiscountPercentageLevel1WithTaxAmount() {
+	public Double getTotalDiscountPercentageLevel1WithTaxAmount() {
 		return totalDiscountPercentageLevel1WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel1WithTaxAmount(
-		BigDecimal totalDiscountPercentageLevel1WithTaxAmount) {
+		Double totalDiscountPercentageLevel1WithTaxAmount) {
 
 		this.totalDiscountPercentageLevel1WithTaxAmount =
 			totalDiscountPercentageLevel1WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel1WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel1WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -2056,20 +1857,20 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel1WithTaxAmount;
+	protected Double totalDiscountPercentageLevel1WithTaxAmount;
 
-	public BigDecimal getTotalDiscountPercentageLevel2() {
+	public Double getTotalDiscountPercentageLevel2() {
 		return totalDiscountPercentageLevel2;
 	}
 
 	public void setTotalDiscountPercentageLevel2(
-		BigDecimal totalDiscountPercentageLevel2) {
+		Double totalDiscountPercentageLevel2) {
 
 		this.totalDiscountPercentageLevel2 = totalDiscountPercentageLevel2;
 	}
 
 	public void setTotalDiscountPercentageLevel2(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel2UnsafeSupplier) {
 
 		try {
@@ -2081,21 +1882,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel2;
+	protected Double totalDiscountPercentageLevel2;
 
-	public BigDecimal getTotalDiscountPercentageLevel2WithTaxAmount() {
+	public Double getTotalDiscountPercentageLevel2WithTaxAmount() {
 		return totalDiscountPercentageLevel2WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel2WithTaxAmount(
-		BigDecimal totalDiscountPercentageLevel2WithTaxAmount) {
+		Double totalDiscountPercentageLevel2WithTaxAmount) {
 
 		this.totalDiscountPercentageLevel2WithTaxAmount =
 			totalDiscountPercentageLevel2WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel2WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel2WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -2107,20 +1908,20 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel2WithTaxAmount;
+	protected Double totalDiscountPercentageLevel2WithTaxAmount;
 
-	public BigDecimal getTotalDiscountPercentageLevel3() {
+	public Double getTotalDiscountPercentageLevel3() {
 		return totalDiscountPercentageLevel3;
 	}
 
 	public void setTotalDiscountPercentageLevel3(
-		BigDecimal totalDiscountPercentageLevel3) {
+		Double totalDiscountPercentageLevel3) {
 
 		this.totalDiscountPercentageLevel3 = totalDiscountPercentageLevel3;
 	}
 
 	public void setTotalDiscountPercentageLevel3(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel3UnsafeSupplier) {
 
 		try {
@@ -2132,21 +1933,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel3;
+	protected Double totalDiscountPercentageLevel3;
 
-	public BigDecimal getTotalDiscountPercentageLevel3WithTaxAmount() {
+	public Double getTotalDiscountPercentageLevel3WithTaxAmount() {
 		return totalDiscountPercentageLevel3WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel3WithTaxAmount(
-		BigDecimal totalDiscountPercentageLevel3WithTaxAmount) {
+		Double totalDiscountPercentageLevel3WithTaxAmount) {
 
 		this.totalDiscountPercentageLevel3WithTaxAmount =
 			totalDiscountPercentageLevel3WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel3WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel3WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -2158,20 +1959,20 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel3WithTaxAmount;
+	protected Double totalDiscountPercentageLevel3WithTaxAmount;
 
-	public BigDecimal getTotalDiscountPercentageLevel4() {
+	public Double getTotalDiscountPercentageLevel4() {
 		return totalDiscountPercentageLevel4;
 	}
 
 	public void setTotalDiscountPercentageLevel4(
-		BigDecimal totalDiscountPercentageLevel4) {
+		Double totalDiscountPercentageLevel4) {
 
 		this.totalDiscountPercentageLevel4 = totalDiscountPercentageLevel4;
 	}
 
 	public void setTotalDiscountPercentageLevel4(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel4UnsafeSupplier) {
 
 		try {
@@ -2183,21 +1984,21 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel4;
+	protected Double totalDiscountPercentageLevel4;
 
-	public BigDecimal getTotalDiscountPercentageLevel4WithTaxAmount() {
+	public Double getTotalDiscountPercentageLevel4WithTaxAmount() {
 		return totalDiscountPercentageLevel4WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel4WithTaxAmount(
-		BigDecimal totalDiscountPercentageLevel4WithTaxAmount) {
+		Double totalDiscountPercentageLevel4WithTaxAmount) {
 
 		this.totalDiscountPercentageLevel4WithTaxAmount =
 			totalDiscountPercentageLevel4WithTaxAmount;
 	}
 
 	public void setTotalDiscountPercentageLevel4WithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountPercentageLevel4WithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -2209,20 +2010,20 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountPercentageLevel4WithTaxAmount;
+	protected Double totalDiscountPercentageLevel4WithTaxAmount;
 
-	public BigDecimal getTotalDiscountWithTaxAmount() {
+	public Double getTotalDiscountWithTaxAmount() {
 		return totalDiscountWithTaxAmount;
 	}
 
 	public void setTotalDiscountWithTaxAmount(
-		BigDecimal totalDiscountWithTaxAmount) {
+		Double totalDiscountWithTaxAmount) {
 
 		this.totalDiscountWithTaxAmount = totalDiscountWithTaxAmount;
 	}
 
 	public void setTotalDiscountWithTaxAmount(
-		UnsafeSupplier<BigDecimal, Exception>
+		UnsafeSupplier<Double, Exception>
 			totalDiscountWithTaxAmountUnsafeSupplier) {
 
 		try {
@@ -2234,7 +2035,7 @@ public class Order implements Cloneable, Serializable {
 		}
 	}
 
-	protected BigDecimal totalDiscountWithTaxAmount;
+	protected Double totalDiscountWithTaxAmount;
 
 	public String getTotalDiscountWithTaxAmountFormatted() {
 		return totalDiscountWithTaxAmountFormatted;
@@ -2261,31 +2062,6 @@ public class Order implements Cloneable, Serializable {
 	}
 
 	protected String totalDiscountWithTaxAmountFormatted;
-
-	public Double getTotalDiscountWithTaxAmountValue() {
-		return totalDiscountWithTaxAmountValue;
-	}
-
-	public void setTotalDiscountWithTaxAmountValue(
-		Double totalDiscountWithTaxAmountValue) {
-
-		this.totalDiscountWithTaxAmountValue = totalDiscountWithTaxAmountValue;
-	}
-
-	public void setTotalDiscountWithTaxAmountValue(
-		UnsafeSupplier<Double, Exception>
-			totalDiscountWithTaxAmountValueUnsafeSupplier) {
-
-		try {
-			totalDiscountWithTaxAmountValue =
-				totalDiscountWithTaxAmountValueUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Double totalDiscountWithTaxAmountValue;
 
 	public String getTotalFormatted() {
 		return totalFormatted;

@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -47,8 +45,6 @@ public class CPDefinitionInventoryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("CPDefinitionInventoryId", getCPDefinitionInventoryId());
 		attributes.put("groupId", getGroupId());
@@ -75,18 +71,6 @@ public class CPDefinitionInventoryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -289,16 +273,6 @@ public class CPDefinitionInventoryWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this cp definition inventory.
-	 *
-	 * @return the ct collection ID of this cp definition inventory
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the display availability of this cp definition inventory.
 	 *
 	 * @return the display availability of this cp definition inventory
@@ -386,16 +360,6 @@ public class CPDefinitionInventoryWrapper
 	@Override
 	public int getMultipleOrderQuantity() {
 		return model.getMultipleOrderQuantity();
-	}
-
-	/**
-	 * Returns the mvcc version of this cp definition inventory.
-	 *
-	 * @return the mvcc version of this cp definition inventory
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -556,16 +520,6 @@ public class CPDefinitionInventoryWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this cp definition inventory.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp definition inventory
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets whether this cp definition inventory is display availability.
 	 *
 	 * @param displayAvailability the display availability of this cp definition inventory
@@ -656,16 +610,6 @@ public class CPDefinitionInventoryWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this cp definition inventory.
-	 *
-	 * @param mvccVersion the mvcc version of this cp definition inventory
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the primary key of this cp definition inventory.
 	 *
 	 * @param primaryKey the primary key of this cp definition inventory
@@ -713,25 +657,6 @@ public class CPDefinitionInventoryWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CPDefinitionInventory, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CPDefinitionInventory, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

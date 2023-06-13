@@ -17,13 +17,13 @@ package com.liferay.site.memberships.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.membership.requests.kernel.util.comparator.MembershipRequestCreateDateComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.MembershipRequest;
 import com.liferay.portal.kernel.model.MembershipRequestConstants;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.MembershipRequestLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.memberships.constants.SiteMembershipsPortletKeys;
 import com.liferay.site.memberships.web.internal.servlet.taglib.util.ViewMembershipRequetsPendingActionDropdownItemsProvider;
-import com.liferay.site.memberships.web.internal.util.comparator.MembershipRequestCreateDateComparator;
 
 import java.util.List;
 import java.util.Objects;
@@ -108,25 +107,22 @@ public class ViewMembershipRequestsDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN, "date");
+		_orderByCol = ParamUtil.getString(_renderRequest, "orderByCol", "date");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			SiteMembershipsPortletKeys.SITE_MEMBERSHIPS_ADMIN, "asc");
+		_orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -211,20 +207,30 @@ public class ViewMembershipRequestsDisplayContext {
 
 		boolean orderByAsc = false;
 
-		if (Objects.equals(getOrderByType(), "asc")) {
+		String orderByType = getOrderByType();
+
+		if (orderByType.equals("asc")) {
 			orderByAsc = true;
 		}
 
 		siteMembershipSearch.setOrderByComparator(
 			new MembershipRequestCreateDateComparator(orderByAsc));
-		siteMembershipSearch.setOrderByType(getOrderByType());
-		siteMembershipSearch.setResultsAndTotal(
-			() -> MembershipRequestLocalServiceUtil.search(
+
+		siteMembershipSearch.setOrderByType(orderByType);
+
+		int membershipRequestCount =
+			MembershipRequestLocalServiceUtil.searchCount(
+				themeDisplay.getSiteGroupIdOrLiveGroupId(), getStatusId());
+
+		siteMembershipSearch.setTotal(membershipRequestCount);
+
+		List<MembershipRequest> results =
+			MembershipRequestLocalServiceUtil.search(
 				themeDisplay.getSiteGroupIdOrLiveGroupId(), getStatusId(),
 				siteMembershipSearch.getStart(), siteMembershipSearch.getEnd(),
-				siteMembershipSearch.getOrderByComparator()),
-			MembershipRequestLocalServiceUtil.searchCount(
-				themeDisplay.getSiteGroupIdOrLiveGroupId(), getStatusId()));
+				siteMembershipSearch.getOrderByComparator());
+
+		siteMembershipSearch.setResults(results);
 
 		_siteMembershipSearch = siteMembershipSearch;
 

@@ -14,14 +14,16 @@
 
 package com.liferay.content.dashboard.web.internal.searcher;
 
-import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryRegistry;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
+import com.liferay.content.dashboard.web.internal.util.ContentDashboardSearchClassNameUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -33,31 +35,14 @@ import org.osgi.service.component.annotations.Reference;
 public class ContentDashboardSearchRequestBuilderFactory {
 
 	public SearchRequestBuilder builder(SearchContext searchContext) {
-		if (ArrayUtil.isEmpty(searchContext.getEntryClassNames())) {
-			searchContext.setEntryClassNames(
-				TransformUtil.transformToArray(
-					_contentDashboardItemFactoryRegistry.getClassNames(),
-					className ->
-						_infoSearchClassMapperRegistry.getSearchClassName(
-							className),
-					String.class));
-		}
-		else {
-			searchContext.setEntryClassNames(
-				TransformUtil.transform(
-					searchContext.getEntryClassNames(),
-					className ->
-						_infoSearchClassMapperRegistry.getSearchClassName(
-							className),
-					String.class));
-		}
+		Collection<String> classNames = _getClassNames();
 
 		return _searchRequestBuilderFactory.builder(
 			searchContext
 		).emptySearchEnabled(
 			true
 		).entryClassNames(
-			searchContext.getEntryClassNames()
+			classNames.toArray(new String[0])
 		).fields(
 			Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK, Field.UID
 		).highlightEnabled(
@@ -65,12 +50,22 @@ public class ContentDashboardSearchRequestBuilderFactory {
 		);
 	}
 
-	@Reference
-	private ContentDashboardItemFactoryRegistry
-		_contentDashboardItemFactoryRegistry;
+	private Collection<String> _getClassNames() {
+		Collection<String> classNames =
+			_contentDashboardItemFactoryTracker.getClassNames();
+
+		Stream<String> stream = classNames.stream();
+
+		return stream.map(
+			ContentDashboardSearchClassNameUtil::getSearchClassName
+		).collect(
+			Collectors.toList()
+		);
+	}
 
 	@Reference
-	private InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
+	private ContentDashboardItemFactoryTracker
+		_contentDashboardItemFactoryTracker;
 
 	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;

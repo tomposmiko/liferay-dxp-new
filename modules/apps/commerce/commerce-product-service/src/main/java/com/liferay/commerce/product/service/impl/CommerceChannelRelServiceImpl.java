@@ -14,34 +14,23 @@
 
 package com.liferay.commerce.product.service.impl;
 
-import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.base.CommerceChannelRelServiceBaseImpl;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceChannelRel"
-	},
-	service = AopService.class
-)
 public class CommerceChannelRelServiceImpl
 	extends CommerceChannelRelServiceBaseImpl {
 
@@ -113,7 +102,8 @@ public class CommerceChannelRelServiceImpl
 			getPermissionChecker(), commerceChannelRel.getCommerceChannelId(),
 			ActionKeys.VIEW);
 
-		return commerceChannelRel;
+		return commerceChannelRelLocalService.getCommerceChannelRel(
+			commerceChannelRelId);
 	}
 
 	@Override
@@ -129,18 +119,37 @@ public class CommerceChannelRelServiceImpl
 			commerceChannelId, start, end, orderByComparator);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
 	@Override
 	public List<CommerceChannelRel> getCommerceChannelRels(
-			String className, long classPK, String name, int start, int end)
-		throws PortalException {
+		String className, long classPK, int start, int end,
+		OrderByComparator<CommerceChannelRel> orderByComparator) {
 
-		if (className.equals(CPDefinition.class.getName())) {
-			_cpDefinitionModelResourcePermission.check(
-				getPermissionChecker(), classPK, ActionKeys.VIEW);
-		}
+		return commerceChannelRelService.getCommerceChannelRels(
+			className, classPK, null, start, end);
+	}
+
+	@Override
+	public List<CommerceChannelRel> getCommerceChannelRels(
+		String className, long classPK, String name, int start, int end) {
 
 		return commerceChannelRelFinder.findByC_C(
 			className, classPK, name, start, end, true);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	@Override
+	public List<CommerceChannelRel> getCommerceChannelRels(
+		String className, long classPK, String classPKField, String name,
+		int start, int end) {
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -155,37 +164,35 @@ public class CommerceChannelRelServiceImpl
 	}
 
 	@Override
-	public int getCommerceChannelRelsCount(String className, long classPK)
-		throws PortalException {
-
+	public int getCommerceChannelRelsCount(String className, long classPK) {
 		return commerceChannelRelService.getCommerceChannelRelsCount(
 			className, classPK, StringPool.BLANK);
 	}
 
 	@Override
 	public int getCommerceChannelRelsCount(
-			String className, long classPK, String name)
-		throws PortalException {
-
-		if (className.equals(CPDefinition.class.getName())) {
-			_cpDefinitionModelResourcePermission.check(
-				getPermissionChecker(), classPK, ActionKeys.VIEW);
-		}
+		String className, long classPK, String name) {
 
 		return commerceChannelRelFinder.countByC_C(
 			className, classPK, name, true);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CommerceChannel)"
-	)
-	private ModelResourcePermission<CommerceChannel>
-		_commerceChannelModelResourcePermission;
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	@Override
+	public int getCommerceChannelRelsCount(
+		String className, long classPK, String classPKField, String name) {
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CPDefinition)"
-	)
-	private ModelResourcePermission<CPDefinition>
-		_cpDefinitionModelResourcePermission;
+		throw new UnsupportedOperationException();
+	}
+
+	private static volatile ModelResourcePermission<CommerceChannel>
+		_commerceChannelModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CommerceChannelServiceImpl.class,
+				"_commerceChannelModelResourcePermission",
+				CommerceChannel.class);
 
 }

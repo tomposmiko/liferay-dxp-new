@@ -66,7 +66,8 @@ public class RulesEngineImplTest {
 
 		do {
 			Collection<ServiceReference<RulesEngine>> serviceReferences =
-				_bundleContext.getServiceReferences(RulesEngine.class, null);
+				_bundleContext.getServiceReferences(
+					RulesEngine.class, "(proxy.bean=false)");
 
 			if (serviceReferences.isEmpty()) {
 				count++;

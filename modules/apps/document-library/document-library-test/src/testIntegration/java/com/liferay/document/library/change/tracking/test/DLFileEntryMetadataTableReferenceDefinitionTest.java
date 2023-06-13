@@ -89,8 +89,7 @@ public class DLFileEntryMetadataTableReferenceDefinitionTest
 			null, TestPropsValues.getUserId(), group.getGroupId(),
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK,
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT, null,
 			null, inputStream, bytes.length, null, null,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));

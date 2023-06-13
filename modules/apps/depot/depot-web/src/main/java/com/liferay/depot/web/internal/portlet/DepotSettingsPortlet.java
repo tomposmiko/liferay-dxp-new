@@ -19,16 +19,13 @@ import com.liferay.depot.service.DepotEntryService;
 import com.liferay.depot.web.internal.application.controller.DepotApplicationController;
 import com.liferay.depot.web.internal.constants.DepotAdminWebKeys;
 import com.liferay.depot.web.internal.constants.DepotPortletKeys;
-import com.liferay.depot.web.internal.display.context.DepotAdminDLDisplayContext;
 import com.liferay.depot.web.internal.display.context.DepotAdminDetailsDisplayContext;
-import com.liferay.document.library.configuration.DLSizeLimitConfigurationProvider;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.DynamicRenderRequest;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -45,10 +42,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-depot-admin",
 		"com.liferay.portlet.display-category=category.hidden",
-		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.instanceable=false",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Depot",
@@ -57,8 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/edit_depot_entry.jsp",
 		"javax.portlet.name=" + DepotPortletKeys.DEPOT_SETTINGS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -81,11 +77,6 @@ public class DepotSettingsPortlet extends MVCPortlet {
 			DepotEntry depotEntry = _depotEntryService.getGroupDepotEntry(
 				themeDisplay.getScopeGroupId());
 
-			renderRequest.setAttribute(
-				DepotAdminDLDisplayContext.class.getName(),
-				new DepotAdminDLDisplayContext(
-					depotEntry, _dlSizeLimitConfigurationProvider,
-					_portal.getHttpServletRequest(renderRequest)));
 			renderRequest.setAttribute(
 				DepotAdminWebKeys.DEPOT_ENTRY, depotEntry);
 
@@ -117,12 +108,6 @@ public class DepotSettingsPortlet extends MVCPortlet {
 	private DepotEntryService _depotEntryService;
 
 	@Reference
-	private DLSizeLimitConfigurationProvider _dlSizeLimitConfigurationProvider;
-
-	@Reference
 	private ItemSelector _itemSelector;
-
-	@Reference
-	private Portal _portal;
 
 }

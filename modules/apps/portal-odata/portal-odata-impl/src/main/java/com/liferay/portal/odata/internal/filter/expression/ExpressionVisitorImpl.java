@@ -21,12 +21,12 @@ import com.liferay.portal.odata.filter.expression.LambdaFunctionExpression;
 import com.liferay.portal.odata.filter.expression.ListExpression;
 import com.liferay.portal.odata.filter.expression.LiteralExpression;
 import com.liferay.portal.odata.filter.expression.MethodExpression;
-import com.liferay.portal.odata.filter.expression.NavigationPropertyExpression;
 import com.liferay.portal.odata.filter.expression.PropertyExpression;
 import com.liferay.portal.odata.filter.expression.UnaryExpression;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.olingo.commons.api.edm.EdmEnumType;
 import org.apache.olingo.commons.api.edm.EdmType;
@@ -45,10 +45,8 @@ import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.uri.UriInfoResource;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
-import org.apache.olingo.server.api.uri.UriResourceCount;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceLambdaAny;
-import org.apache.olingo.server.api.uri.UriResourceNavigation;
 import org.apache.olingo.server.api.uri.UriResourcePartTyped;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
 import org.apache.olingo.server.api.uri.queryoption.expression.BinaryOperatorKind;
@@ -75,40 +73,17 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 		Expression leftBinaryOperationExpression,
 		Expression rightBinaryOperationExpression) {
 
-		BinaryExpression.Operation binaryExpressionOperation = null;
+		Optional<BinaryExpression.Operation> binaryExpressionOperationOptional =
+			_getOperationOptional(binaryOperatorKind);
 
-		if (binaryOperatorKind == BinaryOperatorKind.AND) {
-			binaryExpressionOperation = BinaryExpression.Operation.AND;
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.EQ) {
-			binaryExpressionOperation = BinaryExpression.Operation.EQ;
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.GE) {
-			binaryExpressionOperation = BinaryExpression.Operation.GE;
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.GT) {
-			binaryExpressionOperation = BinaryExpression.Operation.GT;
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.LE) {
-			binaryExpressionOperation = BinaryExpression.Operation.LE;
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.LT) {
-			binaryExpressionOperation = BinaryExpression.Operation.LT;
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.NE) {
-			binaryExpressionOperation = BinaryExpression.Operation.NE;
-		}
-		else if (binaryOperatorKind == BinaryOperatorKind.OR) {
-			binaryExpressionOperation = BinaryExpression.Operation.OR;
-		}
-		else {
-			throw new UnsupportedOperationException(
-				"Binary operator: " + binaryOperatorKind);
-		}
-
-		return new BinaryExpressionImpl(
-			leftBinaryOperationExpression, binaryExpressionOperation,
-			rightBinaryOperationExpression);
+		return binaryExpressionOperationOptional.map(
+			binaryExpressionOperation -> new BinaryExpressionImpl(
+				leftBinaryOperationExpression, binaryExpressionOperation,
+				rightBinaryOperationExpression)
+		).orElseThrow(
+			() -> new UnsupportedOperationException(
+				"Binary operator: " + binaryOperatorKind)
+		);
 	}
 
 	@Override
@@ -194,7 +169,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 				literal.getText(), LiteralExpression.Type.STRING);
 		}
 		else if ((edmType == null) ||
-				 Objects.equals(literal.getText(), "null")) {
+				 Objects.equals("null", literal.getText())) {
 
 			return new NullLiteralExpression();
 		}
@@ -221,11 +196,8 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 			return new MethodExpressionImpl(
 				expressions, MethodExpression.Type.CONTAINS);
 		}
-		else if (methodKind == MethodKind.NOW) {
-			return new MethodExpressionImpl(
-				expressions, MethodExpression.Type.NOW);
-		}
-		else if (methodKind == MethodKind.STARTSWITH) {
+
+		if (methodKind == MethodKind.STARTSWITH) {
 			return new MethodExpressionImpl(
 				expressions, MethodExpression.Type.STARTS_WITH);
 		}
@@ -272,12 +244,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 					uriResources.subList(1, uriResources.size())));
 		}
 		else if ((uriResources.size() > 1) &&
-				 (uriResource instanceof UriResourceNavigation)) {
-
-			return new NavigationPropertyExpressionImpl(
-				uriResource.getSegmentValue(), _getType(uriResources.get(1)));
-		}
-		else if ((uriResources.size() > 1) &&
 				 (uriResource instanceof UriResourcePrimitiveProperty)) {
 
 			UriResource lambdaUriResource = uriResources.get(
@@ -320,14 +286,35 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Expression> {
 				uriResources);
 	}
 
-	private NavigationPropertyExpression.Type _getType(
-		UriResource uriResource) {
+	private Optional<BinaryExpression.Operation> _getOperationOptional(
+		BinaryOperatorKind binaryOperatorKind) {
 
-		if (uriResource instanceof UriResourceCount) {
-			return NavigationPropertyExpression.Type.COUNT;
+		if (binaryOperatorKind == BinaryOperatorKind.AND) {
+			return Optional.of(BinaryExpression.Operation.AND);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.EQ) {
+			return Optional.of(BinaryExpression.Operation.EQ);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.GE) {
+			return Optional.of(BinaryExpression.Operation.GE);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.GT) {
+			return Optional.of(BinaryExpression.Operation.GT);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.LE) {
+			return Optional.of(BinaryExpression.Operation.LE);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.LT) {
+			return Optional.of(BinaryExpression.Operation.LT);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.NE) {
+			return Optional.of(BinaryExpression.Operation.NE);
+		}
+		else if (binaryOperatorKind == BinaryOperatorKind.OR) {
+			return Optional.of(BinaryExpression.Operation.OR);
 		}
 
-		return NavigationPropertyExpression.Type.SIMPLE;
+		return Optional.empty();
 	}
 
 }

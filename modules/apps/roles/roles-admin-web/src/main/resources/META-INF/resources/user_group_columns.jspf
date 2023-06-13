@@ -38,8 +38,13 @@
 		%>
 
 		<liferay-ui:search-container-column-text>
-			<clay:vertical-card
-				verticalCard="<%= new UserGroupVerticalCard(userGroup, renderRequest, userGroupSearchContainer.getRowChecker()) %>"
+			<liferay-frontend:icon-vertical-card
+				actionJspServletContext="<%= application %>"
+				icon="users"
+				resultRow="<%= row %>"
+				rowChecker="<%= userGroupSearchContainer.getRowChecker() %>"
+				subtitle="<%= HtmlUtil.escape(userGroup.getDescription()) %>"
+				title="<%= HtmlUtil.escape(userGroup.getName()) %>"
 			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>

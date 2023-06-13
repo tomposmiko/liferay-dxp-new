@@ -22,8 +22,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  * @author Pei-Jung Lan
  */
 @ExtendedObjectClassDefinition(
-	category = "accounts", scope = ExtendedObjectClassDefinition.Scope.COMPANY,
-	strictScope = true
+	category = "accounts", scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
 	id = "com.liferay.account.configuration.AccountEntryEmailDomainsConfiguration",
@@ -43,11 +42,5 @@ public interface AccountEntryEmailDomainsConfiguration {
 		name = "blocked-email-domains", required = false
 	)
 	public String blockedEmailDomains();
-
-	@Meta.AD(
-		description = "custom-tlds-description", name = "custom-tlds-name",
-		required = false
-	)
-	public String[] customTLDs();
 
 }

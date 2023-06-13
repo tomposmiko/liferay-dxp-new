@@ -15,25 +15,21 @@
 package com.liferay.portal.search.web.internal.facet.display.context;
 
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.configuration.CategoryFacetFieldConfiguration;
 import com.liferay.portal.search.web.internal.category.facet.configuration.CategoryFacetPortletInstanceConfiguration;
 
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Lino Alves
  */
-public class AssetCategoriesSearchFacetDisplayContext
-	implements FacetDisplayContext, Serializable {
+public class AssetCategoriesSearchFacetDisplayContext implements Serializable {
 
 	public AssetCategoriesSearchFacetDisplayContext(
 			HttpServletRequest httpServletRequest)
@@ -50,23 +46,6 @@ public class AssetCategoriesSearchFacetDisplayContext
 		_categoryFacetPortletInstanceConfiguration =
 			portletDisplay.getPortletInstanceConfiguration(
 				CategoryFacetPortletInstanceConfiguration.class);
-
-		CategoryFacetFieldConfiguration categoryFacetFieldConfiguration =
-			ConfigurationProviderUtil.getSystemConfiguration(
-				CategoryFacetFieldConfiguration.class);
-
-		_legacyFieldSelected = _isLegacyFieldSelected(
-			categoryFacetFieldConfiguration.categoryFacetField());
-	}
-
-	public List<BucketDisplayContext> getBucketDisplayContexts() {
-		return _bucketDisplayContexts;
-	}
-
-	public List<BucketDisplayContext> getBucketDisplayContexts(
-		String vocabularyName) {
-
-		return _bucketDisplayContextsMap.get(vocabularyName);
 	}
 
 	public CategoryFacetPortletInstanceConfiguration
@@ -110,16 +89,14 @@ public class AssetCategoriesSearchFacetDisplayContext
 		return _parameterValues;
 	}
 
-	public List<String> getVocabularyNames() {
-		return _vocabularyNames;
+	public List<AssetCategoriesSearchFacetTermDisplayContext>
+		getTermDisplayContexts() {
+
+		return _assetCategoriesSearchFacetTermDisplayContext;
 	}
 
 	public boolean isCloud() {
 		return _cloud;
-	}
-
-	public boolean isLegacyFieldSelected() {
-		return _legacyFieldSelected;
 	}
 
 	public boolean isNothingSelected() {
@@ -128,18 +105,6 @@ public class AssetCategoriesSearchFacetDisplayContext
 
 	public boolean isRenderNothing() {
 		return _renderNothing;
-	}
-
-	public void setBucketDisplayContexts(
-		List<BucketDisplayContext> bucketDisplayContexts) {
-
-		_bucketDisplayContexts = bucketDisplayContexts;
-	}
-
-	public void setBucketDisplayContextsMap(
-		Map<String, List<BucketDisplayContext>> bucketDisplayContextsMap) {
-
-		_bucketDisplayContextsMap = bucketDisplayContextsMap;
 	}
 
 	public void setCloud(boolean cloud) {
@@ -172,32 +137,26 @@ public class AssetCategoriesSearchFacetDisplayContext
 		_renderNothing = renderNothing;
 	}
 
-	public void setVocabularyNames(List<String> vocabularyNames) {
-		_vocabularyNames = vocabularyNames;
+	public void setTermDisplayContexts(
+		List<AssetCategoriesSearchFacetTermDisplayContext>
+			assetCategoriesSearchFacetTermDisplayContext) {
+
+		_assetCategoriesSearchFacetTermDisplayContext =
+			assetCategoriesSearchFacetTermDisplayContext;
 	}
 
-	private boolean _isLegacyFieldSelected(String fieldName) {
-		if (fieldName.equals("assetCategoryIds")) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private List<BucketDisplayContext> _bucketDisplayContexts;
-	private Map<String, List<BucketDisplayContext>> _bucketDisplayContextsMap;
+	private List<AssetCategoriesSearchFacetTermDisplayContext>
+		_assetCategoriesSearchFacetTermDisplayContext;
 	private final CategoryFacetPortletInstanceConfiguration
 		_categoryFacetPortletInstanceConfiguration;
 	private boolean _cloud;
 	private long _displayStyleGroupId;
 	private final HttpServletRequest _httpServletRequest;
-	private final boolean _legacyFieldSelected;
 	private boolean _nothingSelected;
 	private String _paginationStartParameterName;
 	private String _parameterName;
 	private String _parameterValue;
 	private List<String> _parameterValues;
 	private boolean _renderNothing;
-	private List<String> _vocabularyNames;
 
 }

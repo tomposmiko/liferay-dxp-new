@@ -26,6 +26,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -36,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Fabio Pezzutto
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + CalendarPortletKeys.CALENDAR,
 	service = ConfigurationAction.class
 )
@@ -52,13 +54,23 @@ public class CalendarConfigurationAction extends DefaultConfigurationAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		_updateDisplaySettings(actionRequest);
-		_updateUserSettings(actionRequest);
+		updateDisplaySettings(actionRequest, actionResponse);
+		updateUserSettings(actionRequest, actionResponse);
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	private void _updateDisplaySettings(ActionRequest actionRequest)
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.calendar.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected void updateDisplaySettings(
+			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
 		PortletPreferences portletPreferences = actionRequest.getPreferences();
@@ -103,7 +115,8 @@ public class CalendarConfigurationAction extends DefaultConfigurationAction {
 		portletPreferences.store();
 	}
 
-	private void _updateUserSettings(ActionRequest actionRequest)
+	protected void updateUserSettings(
+			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
 		PortletPreferences portletPreferences = actionRequest.getPreferences();

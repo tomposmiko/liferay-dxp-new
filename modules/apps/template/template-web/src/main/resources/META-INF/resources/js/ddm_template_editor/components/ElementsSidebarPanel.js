@@ -13,7 +13,6 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import ClayEmptyState from '@clayui/empty-state';
 import ClayForm, {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
@@ -26,7 +25,7 @@ import {CollapsableButtonList} from './CollapsableButtonList';
 
 const SEARCH_INPUT_ID = 'ddm_template_editor_Sidebar-SearchInputId';
 
-export function ElementsSidebarPanel({className}) {
+export const ElementsSidebarPanel = ({className}) => {
 	const {
 		inputChannel,
 		templateVariableGroups: initialTemplateVariableGroups,
@@ -68,8 +67,7 @@ export function ElementsSidebarPanel({className}) {
 			<h1 className="ddm_template_editor__App-sidebar-title my-3">
 				{Liferay.Language.get('elements')}
 			</h1>
-
-			<ClayForm.Group className="mb-4" small>
+			<ClayForm.Group small>
 				<label className="sr-only" htmlFor={SEARCH_INPUT_ID}>
 					{Liferay.Language.get('search')}
 				</label>
@@ -85,11 +83,9 @@ export function ElementsSidebarPanel({className}) {
 							placeholder={`${Liferay.Language.get('search')}...`}
 							value={searchValue}
 						/>
-
 						<ClayInput.GroupInsetItem after tag="span">
 							{searchValue ? (
 								<ClayButtonWithIcon
-									aria-label={Liferay.Language.get('clear')}
 									borderless
 									displayType="secondary"
 									monospaced={false}
@@ -109,21 +105,10 @@ export function ElementsSidebarPanel({className}) {
 			</ClayForm.Group>
 
 			{filteredItems ? (
-				filteredItems.length !== 0 ? (
-					<ButtonList
-						items={filteredItems}
-						onButtonClick={onButtonClick}
-					/>
-				) : (
-					<ClayEmptyState
-						description={Liferay.Language.get(
-							'try-again-with-a-different-search'
-						)}
-						imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
-						small
-						title={Liferay.Language.get('no-results-found')}
-					/>
-				)
+				<ButtonList
+					items={filteredItems}
+					onButtonClick={onButtonClick}
+				/>
 			) : (
 				templateVariableGroups.map(({items, label}) => (
 					<CollapsableButtonList
@@ -136,7 +121,7 @@ export function ElementsSidebarPanel({className}) {
 			)}
 		</div>
 	);
-}
+};
 
 ElementsSidebarPanel.propTypes = {
 	className: PropTypes.string,

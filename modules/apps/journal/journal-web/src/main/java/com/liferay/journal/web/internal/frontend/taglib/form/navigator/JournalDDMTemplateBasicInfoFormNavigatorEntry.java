@@ -37,16 +37,16 @@ public class JournalDDMTemplateBasicInfoFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.journal.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
 	protected String getJspPath() {
 		return "/ddm_template/edit_basic_info.jsp";
 	}
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.journal.web)")
-	private ServletContext _servletContext;
 
 }

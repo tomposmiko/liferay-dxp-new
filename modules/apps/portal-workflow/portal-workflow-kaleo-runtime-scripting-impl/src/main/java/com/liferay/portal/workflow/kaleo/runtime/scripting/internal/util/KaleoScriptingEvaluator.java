@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = KaleoScriptingEvaluator.class)
+@Component(immediate = true, service = KaleoScriptingEvaluator.class)
 public class KaleoScriptingEvaluator {
 
 	public Map<String, Object> execute(

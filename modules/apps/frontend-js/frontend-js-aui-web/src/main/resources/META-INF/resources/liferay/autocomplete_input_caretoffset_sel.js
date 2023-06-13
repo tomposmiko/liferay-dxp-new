@@ -22,23 +22,23 @@
 AUI.add(
 	'liferay-autocomplete-input-caretoffset-sel',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const DOC = A.config.doc;
+		var DOC = A.config.doc;
 
-		const AutcompleteInputCaretOffset = function () {};
+		var AutcompleteInputCaretOffset = function () {};
 
 		AutcompleteInputCaretOffset.prototype = {
 			_getCaretOffset(node) {
-				const instance = this;
+				var instance = this;
 
 				node = node || instance.get('inputNode');
 
 				node.focus();
 
-				const range = DOC.selection.createRange();
+				var range = DOC.selection.createRange();
 
-				const xy = node.getXY();
+				var xy = node.getXY();
 
 				return {
 					x: range.boundingLeft - xy[0],

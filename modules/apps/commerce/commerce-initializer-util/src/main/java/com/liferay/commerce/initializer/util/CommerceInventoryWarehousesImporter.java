@@ -17,7 +17,6 @@ package com.liferay.commerce.initializer.util;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseLocalService;
 import com.liferay.commerce.product.model.CommerceChannel;
-import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.service.CommerceChannelRelLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -30,14 +29,11 @@ import com.liferay.portal.kernel.service.CountryLocalService;
 import com.liferay.portal.kernel.service.RegionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceInventoryWarehousesImporter.class)
+@Component(enabled = false, service = CommerceInventoryWarehousesImporter.class)
 public class CommerceInventoryWarehousesImporter {
 
 	public List<CommerceInventoryWarehouse> importCommerceInventoryWarehouses(
@@ -114,11 +110,8 @@ public class CommerceInventoryWarehousesImporter {
 			Region region = _regionLocalService.getRegion(
 				country.getCountryId(), regionCode);
 
-			Map<Locale, String> nameMap = Collections.singletonMap(
-				LocaleUtil.getSiteDefault(), jsonObject.getString("name"));
-			Map<Locale, String> descriptionMap = Collections.singletonMap(
-				LocaleUtil.getSiteDefault(),
-				jsonObject.getString("description"));
+			String name = jsonObject.getString("name");
+			String description = jsonObject.getString("description");
 			boolean active = jsonObject.getBoolean("active", true);
 			String street1 = jsonObject.getString("street1");
 			String street2 = jsonObject.getString("street2");
@@ -131,7 +124,7 @@ public class CommerceInventoryWarehousesImporter {
 			commerceInventoryWarehouse =
 				_commerceInventoryWarehouseLocalService.
 					addCommerceInventoryWarehouse(
-						externalReferenceCode, nameMap, descriptionMap, active,
+						externalReferenceCode, name, description, active,
 						street1, street2, street3, city, zip,
 						region.getRegionCode(), country.getA2(), latitude,
 						longitude, serviceContext);
@@ -144,17 +137,6 @@ public class CommerceInventoryWarehousesImporter {
 				serviceContext.getScopeGroupId());
 
 		if (commerceChannel != null) {
-			CommerceChannelRel commerceChannelRel =
-				_commerceChannelRelLocalService.fetchCommerceChannelRel(
-					CommerceInventoryWarehouse.class.getName(),
-					commerceInventoryWarehouse.
-						getCommerceInventoryWarehouseId(),
-					commerceChannel.getCommerceChannelId());
-
-			if (commerceChannelRel != null) {
-				return commerceInventoryWarehouse;
-			}
-
 			_commerceChannelRelLocalService.addCommerceChannelRel(
 				CommerceInventoryWarehouse.class.getName(),
 				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),

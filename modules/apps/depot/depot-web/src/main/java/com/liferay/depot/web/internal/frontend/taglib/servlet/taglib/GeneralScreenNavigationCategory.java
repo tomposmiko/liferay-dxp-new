@@ -16,12 +16,11 @@ package com.liferay.depot.web.internal.frontend.taglib.servlet.taglib;
 
 import com.liferay.depot.web.internal.constants.DepotScreenNavigationEntryConstants;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
@@ -37,15 +36,12 @@ public class GeneralScreenNavigationCategory
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "general");
+		return LanguageUtil.get(locale, "general");
 	}
 
 	@Override
 	public String getScreenNavigationKey() {
 		return DepotScreenNavigationEntryConstants.SCREEN_NAVIGATION_KEY_DEPOT;
 	}
-
-	@Reference
-	private Language _language;
 
 }

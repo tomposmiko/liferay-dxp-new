@@ -22,10 +22,7 @@ import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
-import com.liferay.search.experiences.rest.client.dto.v1_0.SXPBlueprint;
-import com.liferay.search.experiences.rest.client.dto.v1_0.SearchHits;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SearchResponse;
-import com.liferay.search.experiences.rest.client.dto.v1_0.util.SXPBlueprintUtil;
 import com.liferay.search.experiences.rest.client.pagination.Pagination;
 import com.liferay.search.experiences.rest.client.problem.Problem;
 
@@ -51,24 +48,10 @@ public class SearchResponseResourceTest
 		super.testPostSearch();
 
 		_testPostSearch();
-		_testPostSearchZeroResults();
-
-		if (false) {
-
-			// TODO Tests pass with remote Elastic but sidecar does not play
-			// well with ConfigurationTemporarySwapper
-
-			_testPostSearchThrowsElasticsearchStatusException();
-			_testPostSearchThrowsInvalidQueryEntryExceptionAndUnresolvedTemplateVariableException();
-
-			// TODO SXPBlueprint.toDTO with "{ ... }" freezes and never returns
-
-			_testPostSearchThrowsJsonParseException();
-
-			// TODO SXPBlueprint.toDTO with bad JSON returns a half empty DTO
-
-			_testPostSearchThrowsUnrecognizedPropertyException();
-		}
+		_testPostSearchThrowsElasticsearchStatusException();
+		_testPostSearchThrowsInvalidQueryEntryExceptionAndUnresolvedTemplateVariableException();
+		_testPostSearchThrowsJsonParseException();
+		_testPostSearchThrowsUnrecognizedPropertyException();
 	}
 
 	@Override
@@ -77,18 +60,6 @@ public class SearchResponseResourceTest
 		throws Exception {
 
 		return searchResponse;
-	}
-
-	private SearchResponse _postSearch(String sxpBlueprintJSON)
-		throws Exception {
-
-		SXPBlueprint sxpBlueprint = SXPBlueprintUtil.toSXPBlueprint(
-			sxpBlueprintJSON);
-
-		Assert.assertNotNull(sxpBlueprint);
-
-		return searchResponseResource.postSearch(
-			null, _PAGINATION, sxpBlueprint);
 	}
 
 	private String _read() throws Exception {
@@ -106,8 +77,8 @@ public class SearchResponseResourceTest
 	}
 
 	private void _testPostSearch() throws Exception {
-		_postSearch("{}");
-		_postSearch(_read());
+		searchResponseResource.postSearch(null, null, _PAGINATION);
+		searchResponseResource.postSearch(null, _read(), _PAGINATION);
 	}
 
 	private void _testPostSearchThrowsElasticsearchStatusException()
@@ -132,7 +103,8 @@ public class SearchResponseResourceTest
 							_CLASS_NAME_EXCEPTION_MAPPER,
 							LoggerTestUtil.ERROR)) {
 
-					_postSearch(_read());
+					searchResponseResource.postSearch(
+						null, _read(), _PAGINATION);
 				}
 			}
 
@@ -154,9 +126,12 @@ public class SearchResponseResourceTest
 					_CLASS_NAME_ELASTICSEARCH_INDEX_SEARCHER,
 					LoggerTestUtil.ERROR)) {
 
-				SearchResponse searchResponse = _postSearch(_read());
+				SearchResponse searchResponse =
+					searchResponseResource.postSearch(
+						null, _read(), _PAGINATION);
 
 				Assert.assertNull(searchResponse.getResponse());
+
 				Assert.assertThat(
 					searchResponse.getResponseString(),
 					CoreMatchers.containsString(message));
@@ -171,7 +146,7 @@ public class SearchResponseResourceTest
 			try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 					_CLASS_NAME_EXCEPTION_MAPPER, LoggerTestUtil.ERROR)) {
 
-				_postSearch(_read());
+				searchResponseResource.postSearch(null, _read(), _PAGINATION);
 
 				Assert.fail();
 			}
@@ -191,7 +166,7 @@ public class SearchResponseResourceTest
 
 	private void _testPostSearchThrowsJsonParseException() throws Exception {
 		try {
-			_postSearch("{ ... }");
+			searchResponseResource.postSearch(null, "{ ... }", _PAGINATION);
 
 			Assert.fail();
 		}
@@ -206,7 +181,7 @@ public class SearchResponseResourceTest
 		throws Exception {
 
 		try {
-			_postSearch(_read());
+			searchResponseResource.postSearch(null, _read(), _PAGINATION);
 
 			Assert.fail();
 		}
@@ -223,21 +198,6 @@ public class SearchResponseResourceTest
 						"defined in Configuration. The property \"INVALID_1\" ",
 						"is not defined in General.")));
 		}
-	}
-
-	private void _testPostSearchZeroResults() throws Exception {
-		SearchResponse searchResponse = _postSearch(_read());
-
-		SearchHits searchHits = searchResponse.getSearchHits();
-
-		Assert.assertEquals(Long.valueOf(0), searchHits.getTotalHits());
-
-		String response = String.valueOf(searchResponse.getResponse());
-
-		Assert.assertThat(response, CoreMatchers.containsString("hits"));
-		Assert.assertThat(
-			response,
-			CoreMatchers.not(CoreMatchers.containsString("max_score")));
 	}
 
 	private static final String _CLASS_NAME_ELASTICSEARCH_INDEX_SEARCHER =

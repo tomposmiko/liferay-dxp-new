@@ -46,6 +46,7 @@ import com.liferay.style.book.service.StyleBookEntryServiceUtil;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see StyleBookEntryServiceSoap
  * @generated
  */
 public class StyleBookEntryServiceHttp {
@@ -138,7 +139,7 @@ public class StyleBookEntryServiceHttp {
 	public static com.liferay.style.book.model.StyleBookEntry
 			copyStyleBookEntry(
 				HttpPrincipal httpPrincipal, long groupId,
-				long sourceStyleBookEntryId,
+				long styleBookEntryId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -148,7 +149,7 @@ public class StyleBookEntryServiceHttp {
 				_copyStyleBookEntryParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, groupId, sourceStyleBookEntryId, serviceContext);
+				methodKey, groupId, styleBookEntryId, serviceContext);
 
 			Object returnObj = null;
 

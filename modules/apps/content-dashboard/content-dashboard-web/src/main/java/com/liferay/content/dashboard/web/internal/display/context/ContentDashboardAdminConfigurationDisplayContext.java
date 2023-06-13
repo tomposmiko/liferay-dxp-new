@@ -16,29 +16,21 @@ package com.liferay.content.dashboard.web.internal.display.context;
 
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
-import com.liferay.content.dashboard.web.internal.util.ContentDashboardGroupUtil;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.KeyValuePairComparator;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionURL;
 import javax.portlet.RenderResponse;
@@ -52,12 +44,11 @@ public class ContentDashboardAdminConfigurationDisplayContext {
 
 	public ContentDashboardAdminConfigurationDisplayContext(
 		AssetVocabularyLocalService assetVocabularyLocalService,
-		long[] assetVocabularyIds, GroupLocalService groupLocalService,
-		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
+		String[] assetVocabularyNames, HttpServletRequest httpServletRequest,
+		RenderResponse renderResponse) {
 
 		_assetVocabularyLocalService = assetVocabularyLocalService;
-		_assetVocabularyIds = assetVocabularyIds;
-		_groupLocalService = groupLocalService;
+		_assetVocabularyNames = assetVocabularyNames;
 		_renderResponse = renderResponse;
 
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
@@ -74,47 +65,49 @@ public class ContentDashboardAdminConfigurationDisplayContext {
 		).buildActionURL();
 	}
 
-	public JSONArray getAvailableVocabularyJSONArray() {
-		long[] assetVocabularyIds = ArrayUtil.clone(_assetVocabularyIds);
+	public List<KeyValuePair> getAvailableVocabularyNames() {
+		String[] assetVocabularyNames = ArrayUtil.clone(_assetVocabularyNames);
 
-		Arrays.sort(assetVocabularyIds);
+		Arrays.sort(assetVocabularyNames);
 
-		List<AssetVocabulary> filteredAssetVocabularies = ListUtil.filter(
-			_getAvailableAssetVocabularies(),
-			assetVocabulary -> {
-				int pos = Arrays.binarySearch(
-					assetVocabularyIds, assetVocabulary.getVocabularyId());
+		Set<String> availableAssetVocabularyNamesSet = SetUtil.fromArray(
+			_getAvailableAssetVocabularyNames());
 
-				return pos < 0;
-			});
+		Stream<String> stream = availableAssetVocabularyNamesSet.stream();
 
-		filteredAssetVocabularies.sort(
-			Comparator.comparing(
-				this::_getAssetVocabularyLabel, String.CASE_INSENSITIVE_ORDER));
-
-		return JSONUtil.toJSONArray(
-			filteredAssetVocabularies, this::_toJSONObject, _log);
+		return stream.filter(
+			assetVocabularyName ->
+				Arrays.binarySearch(assetVocabularyNames, assetVocabularyName) <
+					0
+		).map(
+			assetVocabularyName ->
+				_assetVocabularyLocalService.fetchGroupVocabulary(
+					_themeDisplay.getCompanyGroupId(), assetVocabularyName)
+		).filter(
+			Objects::nonNull
+		).map(
+			this::_toKeyValuePair
+		).sorted(
+			new KeyValuePairComparator(false, true)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
-	public JSONArray getCurrentVocabularyJSONArray() {
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-		for (long assetVocabularyId : _assetVocabularyIds) {
-			try {
-				AssetVocabulary assetVocabulary =
-					_assetVocabularyLocalService.getAssetVocabulary(
-						assetVocabularyId);
-
-				if (assetVocabulary != null) {
-					jsonArray.put(_toJSONObject(assetVocabulary));
-				}
-			}
-			catch (PortalException portalException) {
-				_log.error(portalException);
-			}
-		}
-
-		return jsonArray;
+	public List<KeyValuePair> getCurrentVocabularyNames() {
+		return Stream.of(
+			_assetVocabularyNames
+		).map(
+			assetVocabularyName ->
+				_assetVocabularyLocalService.fetchGroupVocabulary(
+					_themeDisplay.getCompanyGroupId(), assetVocabularyName)
+		).filter(
+			Objects::nonNull
+		).map(
+			this::_toKeyValuePair
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public String getRedirect() {
@@ -127,67 +120,40 @@ public class ContentDashboardAdminConfigurationDisplayContext {
 		}
 
 		_assetVocabularies = _assetVocabularyLocalService.getGroupVocabularies(
-			ArrayUtil.toLongArray(
-				_groupLocalService.getGroupIds(
-					_themeDisplay.getCompanyId(), true)));
+			new long[] {_themeDisplay.getCompanyGroupId()});
 
 		return _assetVocabularies;
 	}
 
-	private String _getAssetVocabularyLabel(AssetVocabulary assetVocabulary) {
-		String assetVocabularyTitle = assetVocabulary.getTitle(
-			_themeDisplay.getLanguageId());
-
-		Group group = _groupLocalService.fetchGroup(
-			assetVocabulary.getGroupId());
-
-		if (group == null) {
-			return assetVocabularyTitle;
+	private String[] _getAvailableAssetVocabularyNames() {
+		if (_availableAssetVocabularyNames != null) {
+			return _availableAssetVocabularyNames;
 		}
 
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			_themeDisplay.getLocale(), getClass());
+		List<AssetVocabulary> assetVocabularies = _getAssetVocabularies();
 
-		return LanguageUtil.format(
-			resourceBundle, "x-group-x",
-			new String[] {
-				assetVocabularyTitle,
-				ContentDashboardGroupUtil.getGroupName(
-					group, resourceBundle.getLocale())
-			});
-	}
+		_availableAssetVocabularyNames = new String[assetVocabularies.size()];
 
-	private List<AssetVocabulary> _getAvailableAssetVocabularies() {
-		if (_availableAssetVocabularies == null) {
-			_availableAssetVocabularies = _getAssetVocabularies();
+		for (int i = 0; i < assetVocabularies.size(); i++) {
+			AssetVocabulary assetVocabulary = assetVocabularies.get(i);
+
+			_availableAssetVocabularyNames[i] = assetVocabulary.getName();
 		}
 
-		return _availableAssetVocabularies;
+		return _availableAssetVocabularyNames;
 	}
 
-	private JSONObject _toJSONObject(AssetVocabulary assetVocabulary) {
-		Group group = _groupLocalService.fetchGroup(
-			assetVocabulary.getGroupId());
-
-		return JSONUtil.put(
-			"global", group.isCompany()
-		).put(
-			"label", HtmlUtil.escape(_getAssetVocabularyLabel(assetVocabulary))
-		).put(
-			"site", assetVocabulary.getGroupId()
-		).put(
-			"value", assetVocabulary.getVocabularyId()
-		);
+	private KeyValuePair _toKeyValuePair(AssetVocabulary assetVocabulary) {
+		return new KeyValuePair(
+			assetVocabulary.getName(),
+			HtmlUtil.escape(
+				assetVocabulary.getTitle(_themeDisplay.getLanguageId())));
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ContentDashboardAdminConfigurationDisplayContext.class);
 
 	private List<AssetVocabulary> _assetVocabularies;
-	private final long[] _assetVocabularyIds;
 	private final AssetVocabularyLocalService _assetVocabularyLocalService;
-	private List<AssetVocabulary> _availableAssetVocabularies;
-	private final GroupLocalService _groupLocalService;
+	private final String[] _assetVocabularyNames;
+	private String[] _availableAssetVocabularyNames;
 	private final RenderResponse _renderResponse;
 	private final ThemeDisplay _themeDisplay;
 

@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CTMessageLocalServiceWrapper
 	implements CTMessageLocalService, ServiceWrapper<CTMessageLocalService> {
 
-	public CTMessageLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CTMessageLocalServiceWrapper(
 		CTMessageLocalService ctMessageLocalService) {
 

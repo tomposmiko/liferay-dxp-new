@@ -22,7 +22,7 @@ import com.liferay.analytics.settings.web.internal.search.FieldSearch;
 import com.liferay.analytics.settings.web.internal.user.AnalyticsUsersManager;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -67,7 +67,7 @@ public class FieldDisplayContext {
 			(AnalyticsUsersManager)renderRequest.getAttribute(
 				AnalyticsSettingsWebKeys.ANALYTICS_USERS_MANAGER);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		_companyId = themeDisplay.getCompanyId();
@@ -126,15 +126,14 @@ public class FieldDisplayContext {
 						"Default Field", entry.getValue(), entry.getKey()));
 			}
 
-			fieldSearch.setResultsAndTotal(
-				() -> fields,
-				_contactFieldNames.size() -
-					REQUIRED_CONTACT_FIELD_NAMES.length);
 			fieldSearch.setRowChecker(
 				new FieldChecker(
 					_mvcRenderCommandName, _renderResponse,
 					recommendedContactFieldNames, REQUIRED_CONTACT_FIELD_NAMES,
 					syncedContactFieldNames));
+			fieldSearch.setTotal(
+				_contactFieldNames.size() -
+					REQUIRED_CONTACT_FIELD_NAMES.length);
 		}
 		else if (StringUtil.equalsIgnoreCase(
 					_mvcRenderCommandName,
@@ -192,16 +191,17 @@ public class FieldDisplayContext {
 						"Custom Field", entry.getValue(), entry.getKey()));
 			}
 
-			fieldSearch.setResultsAndTotal(
-				() -> fields,
-				_userFieldNames.size() + userCustomFieldNames.size() -
-					REQUIRED_USER_FIELD_NAMES.length);
 			fieldSearch.setRowChecker(
 				new FieldChecker(
 					_mvcRenderCommandName, _renderResponse,
 					recommendedUserFieldNames, REQUIRED_USER_FIELD_NAMES,
 					syncedUserFieldNames));
+			fieldSearch.setTotal(
+				_userFieldNames.size() + userCustomFieldNames.size() -
+					REQUIRED_USER_FIELD_NAMES.length);
 		}
+
+		fieldSearch.setResults(fields);
 
 		return fieldSearch;
 	}
@@ -272,6 +272,8 @@ public class FieldDisplayContext {
 
 	private static final Map<String, String> _contactFieldNames =
 		TreeMapBuilder.put(
+			"accountId", "Long"
+		).put(
 			"birthday", "Date"
 		).put(
 			"classNameId", "Long"
@@ -312,17 +314,15 @@ public class FieldDisplayContext {
 		).put(
 			"parentContactId", "Long"
 		).put(
-			"prefixListTypeId", "Long"
+			"prefixId", "Long"
 		).put(
 			"skypeSn", "String"
 		).put(
 			"smsSn", "String"
 		).put(
-			"suffixListTypeId", "Long"
+			"suffixId", "Long"
 		).put(
 			"twitterSn", "String"
-		).put(
-			"userName", "String"
 		).build();
 	private static final Map<String, String> _userFieldNames =
 		TreeMapBuilder.put(
@@ -335,6 +335,8 @@ public class FieldDisplayContext {
 			"contactId", "Long"
 		).put(
 			"createDate", "Date"
+		).put(
+			"defaultUser", "Boolean"
 		).put(
 			"emailAddress", "String"
 		).put(

@@ -22,10 +22,6 @@ import java.util.Arrays;
 public class StringUtil {
 
 	public static String capitalize(String s) {
-		if ((s == null) || s.isEmpty()) {
-			return "";
-		}
-
 		char firstChar = s.charAt(0);
 
 		if (Character.isLowerCase(firstChar)) {

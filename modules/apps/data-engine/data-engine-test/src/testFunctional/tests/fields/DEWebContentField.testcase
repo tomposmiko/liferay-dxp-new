@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68658. This test verifies that is possible to delete the field."
-	@priority = 5
+	@priority = "5"
 	test CanBeDeleted {
 		NavItem.gotoStructures();
 
@@ -55,7 +55,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68658. This test verifies that is possible to duplicate the field."
-	@priority = 4
+	@priority = "4"
 	test CanBeDuplicated {
 		NavItem.gotoStructures();
 
@@ -81,13 +81,8 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-70033. This test verifies that is possible to clear the Web Content field"
-	@priority = 5
+	@priority = "5"
 	test CanClearInput {
-		JSONWebcontent.addWebContent(
-			content = "WC WebContent Content",
-			groupName = "Test Site Name",
-			title = "Web Content Title 1");
-
 		NavItem.gotoStructures();
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
@@ -124,7 +119,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68658. This test verifies that Label and Help text can be edited."
-	@priority = 5
+	@priority = "5"
 	test CanEditLabelAndHelpText {
 		NavItem.gotoStructures();
 
@@ -161,15 +156,8 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-70033. This test verifies that upon duplicating a repeatable field, inputted data on both fields persists"
-	@priority = 5
+	@priority = "5"
 	test CanInputDataOnDuplicatedField {
-		for (var webContentNumber : list "1,2") {
-			JSONWebcontent.addWebContent(
-				content = "WC WebContent Content",
-				groupName = "Test Site Name",
-				title = "Web Content Title ${webContentNumber}");
-		}
-
 		NavItem.gotoStructures();
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
@@ -193,12 +181,12 @@ definition {
 		DERenderer.inputDataInWebContentField(
 			contentName = "Web Content Title 1",
 			fieldLabel = "Web Content",
-			index = 1);
+			index = "1");
 
 		DERenderer.inputDataInWebContentField(
 			contentName = "Web Content Title 2",
 			fieldLabel = "Web Content",
-			index = 2);
+			index = "2");
 
 		Button.clickPublish();
 
@@ -207,22 +195,17 @@ definition {
 		DERenderer.assertDataInWebContentField(
 			contentName = "Web Content Title 1",
 			fieldLabel = "Web Content",
-			index = 1);
+			index = "1");
 
 		DERenderer.assertDataInWebContentField(
 			contentName = "Web Content Title 2",
 			fieldLabel = "Web Content",
-			index = 2);
+			index = "2");
 	}
 
 	@description = "This is a test for LRQA-70033. This test verifies that is possible to link an Web Content on the Web Content field"
-	@priority = 5
+	@priority = "5"
 	test CanInputLink {
-		JSONWebcontent.addWebContent(
-			content = "WC WebContent Content",
-			groupName = "Test Site Name",
-			title = "Web Content Title 1");
-
 		NavItem.gotoStructures();
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
@@ -253,7 +236,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-70033. This test verifies that is not possible to publish the Web Content with a required field blank"
-	@priority = 4
+	@priority = "4"
 	test CanNotPublishBlankRequiredField {
 		NavItem.gotoStructures();
 
@@ -279,7 +262,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-70033. This test verifies that is possible to remove a duplicated field (repeatable)"
-	@priority = 4
+	@priority = "4"
 	test CanRemoveDuplicatedField {
 		NavItem.gotoStructures();
 
@@ -313,11 +296,11 @@ definition {
 
 		DEBuilder.assertFieldNotPresent(
 			fieldLabel = "Web Content",
-			index = 2);
+			index = "2");
 	}
 
 	@description = "This is a test for LRQA-68658. This test verifies that Default Searchable property is Disable when System Setting is left unchecked."
-	@priority = 3
+	@priority = "3"
 	test CanSetDefaultSearchablePropertyToDisable {
 		property test.name.skip.portal.instance = "DEWebContentField#CanSetDefaultSearchablePropertyToDisable";
 
@@ -351,7 +334,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68658. This test verifies that Default Searchable property is Keyword when System Setting is left checked."
-	@priority = 3
+	@priority = "3"
 	test CanSetDefaultSearchablePropertyToKeyword {
 		property test.name.skip.portal.instance = "DEWebContentField#CanSetDefaultSearchablePropertyToKeyword";
 
@@ -385,7 +368,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68658. This test verifies that Label and Help text can be set."
-	@priority = 3
+	@priority = "3"
 	test CanSetLabelAndHelpText {
 		NavItem.gotoStructures();
 
@@ -410,7 +393,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68658. This test verifies that Label can be shown or hidden."
-	@priority = 3
+	@priority = "3"
 	test CanSetLabelToShownOrHidden {
 		NavItem.gotoStructures();
 
@@ -428,7 +411,7 @@ definition {
 
 		DataEngine.assertFieldNotPresent(fieldFieldLabel = "Web Content");
 
-		DataEngine.toggleShowLabel(hiddenFieldLabel = "Web Content");
+		DataEngine.toggleShowLabel();
 
 		WebContentStructures.saveCP();
 
@@ -437,61 +420,6 @@ definition {
 		DataEngine.viewField(
 			fieldFieldLabel = "Web Content",
 			fieldName = "Web Content");
-	}
-
-	@description = "Check if Web Content Field details can be seen."
-	@priority = 4
-	test ViewWebContentFieldDetails {
-		property portal.acceptance = "true";
-		property portal.upstream = "true";
-
-		NavItem.gotoStructures();
-
-		WebContentStructures.addCP(structureName = "Web Content Structure");
-
-		DEBuilder.addField(
-			fieldLabel = "Web Content",
-			fieldName = "Web Content");
-
-		DEBuilder.openField(
-			fieldLabel = "Web Content",
-			index = 1);
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "FormViewBuilder#SIDEBAR_ADVANCED_FIELD_REFERENCE");
-
-		DataEngine.viewFieldSearchable(
-			fieldFieldLabel = "Web Content",
-			searchableType = "Keyword");
-
-		DataEngine.assertLocalizableField(fieldFieldLabel = "Web Content");
-
-		DataEngine.assertShowLabelField(fieldFieldLabel = "Web Content");
-
-		DataEngine.assertRepeatableField(fieldFieldLabel = "Web Content");
-
-		WebContentStructures.saveCP();
-
-		WebContentNavigator.gotoEditStructure(structureName = "Web Content Structure");
-
-		DEBuilder.openField(
-			fieldLabel = "Web Content",
-			index = 1);
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "FormViewBuilder#SIDEBAR_ADVANCED_FIELD_REFERENCE");
-
-		DataEngine.viewFieldSearchable(
-			fieldFieldLabel = "Web Content",
-			searchableType = "Keyword");
-
-		DataEngine.assertLocalizableField(fieldFieldLabel = "Web Content");
-
-		DataEngine.assertShowLabelField(fieldFieldLabel = "Web Content");
-
-		DataEngine.assertRepeatableField(fieldFieldLabel = "Web Content");
 	}
 
 }

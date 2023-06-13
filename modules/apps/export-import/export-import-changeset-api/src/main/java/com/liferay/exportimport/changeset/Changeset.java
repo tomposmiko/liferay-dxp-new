@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * @author Máté Thurzó
@@ -46,12 +47,12 @@ public class Changeset implements Serializable {
 		return new RawBuilder(new Changeset(uuid));
 	}
 
-	public List<StagedModel> getStagedModels() {
-		return _stagedModels;
-	}
-
 	public String getUuid() {
 		return _uuid;
+	}
+
+	public Stream<StagedModel> stream() {
+		return _stagedModels.stream();
 	}
 
 	public static class Builder {

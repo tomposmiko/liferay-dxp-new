@@ -17,10 +17,10 @@ package com.liferay.portal.spring.extender.internal.configuration;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ServiceComponentLocalService;
 
 import java.util.Dictionary;
@@ -44,7 +44,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 /**
  * @author Preston Crary
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ServiceConfigurationExtender
 	implements BundleTrackerCustomizer
 		<ServiceConfigurationExtender.ServiceConfigurationExtension> {
@@ -64,10 +64,12 @@ public class ServiceConfigurationExtender
 
 		ClassLoader classLoader = bundleWiring.getClassLoader();
 
-		Configuration serviceConfiguration =
-			ConfigurationFactoryUtil.getConfiguration(classLoader, "service");
+		Configuration portletConfiguration = ConfigurationUtil.getConfiguration(
+			classLoader, "portlet");
+		Configuration serviceConfiguration = ConfigurationUtil.getConfiguration(
+			classLoader, "service");
 
-		if (serviceConfiguration == null) {
+		if ((portletConfiguration == null) && (serviceConfiguration == null)) {
 			return null;
 		}
 
@@ -76,8 +78,8 @@ public class ServiceConfigurationExtender
 
 		ServiceConfigurationInitializer serviceConfigurationInitializer =
 			new ServiceConfigurationInitializer(
-				bundle, classLoader, serviceConfiguration,
-				_serviceComponentLocalService);
+				bundle, classLoader, portletConfiguration, serviceConfiguration,
+				_resourceActions, _serviceComponentLocalService);
 
 		ServiceConfigurationExtension serviceConfigurationExtension =
 			new ServiceConfigurationExtension(
@@ -191,7 +193,7 @@ public class ServiceConfigurationExtender
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleTracker = new BundleTracker<>(
-			bundleContext, Bundle.ACTIVE, this);
+			bundleContext, Bundle.ACTIVE | Bundle.STARTING, this);
 
 		_bundleTracker.open();
 	}
@@ -205,6 +207,9 @@ public class ServiceConfigurationExtender
 		ServiceConfigurationExtender.class);
 
 	private BundleTracker<?> _bundleTracker;
+
+	@Reference
+	private ResourceActions _resourceActions;
 
 	@Reference
 	private ServiceComponentLocalService _serviceComponentLocalService;

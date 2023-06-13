@@ -24,6 +24,6 @@ long displayDDMTemplateId = ParamUtil.getLong(request, "displayDDMTemplateId");
 DDLDisplayTemplateTransformer ddlDisplayTemplateTransformer = new DDLDisplayTemplateTransformer(displayDDMTemplateId, recordSet, themeDisplay, renderRequest);
 %>
 
-<div class="main-content-body mt-4">
+<div class="main-content-body">
 	<%= ddlDisplayTemplateTransformer.transform() %>
 </div>

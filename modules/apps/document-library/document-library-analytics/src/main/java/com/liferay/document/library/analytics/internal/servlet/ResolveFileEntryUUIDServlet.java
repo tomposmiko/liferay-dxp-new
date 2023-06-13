@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -91,7 +92,7 @@ public class ResolveFileEntryUUIDServlet extends HttpServlet {
 			httpServletResponse.setStatus(status);
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			_log.error(ioException, ioException);
 
 			httpServletResponse.setStatus(500);
 		}
@@ -116,5 +117,8 @@ public class ResolveFileEntryUUIDServlet extends HttpServlet {
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

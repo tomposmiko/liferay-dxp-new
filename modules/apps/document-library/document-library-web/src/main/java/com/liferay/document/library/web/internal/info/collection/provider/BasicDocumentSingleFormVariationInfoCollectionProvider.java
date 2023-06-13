@@ -29,13 +29,11 @@ import com.liferay.info.filter.CategoriesInfoFilter;
 import com.liferay.info.filter.InfoFilter;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.localized.InfoLocalizedValue;
-import com.liferay.info.localized.SingleValueInfoLocalizedValue;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.info.sort.Sort;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -63,6 +61,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -70,7 +69,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(enabled = false, service = InfoCollectionProvider.class)
+@Component(
+	enabled = false, immediate = true, service = InfoCollectionProvider.class
+)
 public class BasicDocumentSingleFormVariationInfoCollectionProvider
 	implements ConfigurableInfoCollectionProvider<FileEntry>,
 			   FilteredInfoCollectionProvider<FileEntry>,
@@ -98,7 +99,7 @@ public class BasicDocumentSingleFormVariationInfoCollectionProvider
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "basic-document");
+		return LanguageUtil.get(locale, "basic-document");
 	}
 
 	@Override
@@ -121,10 +122,13 @@ public class BasicDocumentSingleFormVariationInfoCollectionProvider
 				"latest", true
 			).build());
 
-		CategoriesInfoFilter categoriesInfoFilter =
-			collectionQuery.getInfoFilter(CategoriesInfoFilter.class);
+		Optional<CategoriesInfoFilter> categoriesInfoFilterOptional =
+			collectionQuery.getInfoFilterOptional(CategoriesInfoFilter.class);
 
-		if (categoriesInfoFilter != null) {
+		if (categoriesInfoFilterOptional.isPresent()) {
+			CategoriesInfoFilter categoriesInfoFilter =
+				categoriesInfoFilterOptional.get();
+
 			long[] categoryIds = ArrayUtil.append(
 				categoriesInfoFilter.getCategoryIds());
 
@@ -133,12 +137,11 @@ public class BasicDocumentSingleFormVariationInfoCollectionProvider
 			searchContext.setAssetCategoryIds(categoryIds);
 		}
 
-		Map<String, String[]> configuration =
-			collectionQuery.getConfiguration();
+		Optional<Map<String, String[]>> configurationOptional =
+			collectionQuery.getConfigurationOptional();
 
-		if (configuration == null) {
-			configuration = Collections.emptyMap();
-		}
+		Map<String, String[]> configuration = configurationOptional.orElse(
+			Collections.emptyMap());
 
 		String[] assetTagNames = configuration.get(Field.ASSET_TAG_NAMES);
 
@@ -165,9 +168,11 @@ public class BasicDocumentSingleFormVariationInfoCollectionProvider
 		searchContext.setGroupIds(
 			new long[] {serviceContext.getScopeGroupId()});
 
-		Sort sort = collectionQuery.getSort();
+		Optional<Sort> sortOptional = collectionQuery.getSortOptional();
 
-		if (sort != null) {
+		if (sortOptional.isPresent()) {
+			Sort sort = sortOptional.get();
+
 			searchContext.setSorts(
 				new com.liferay.portal.kernel.search.Sort(
 					sort.getFieldName(),
@@ -206,15 +211,12 @@ public class BasicDocumentSingleFormVariationInfoCollectionProvider
 		for (AssetTag assetTag : assetTags) {
 			options.add(
 				new SelectInfoFieldType.Option(
-					new SingleValueInfoLocalizedValue<>(assetTag.getName()),
-					assetTag.getName()));
+					assetTag.getName(), assetTag.getName()));
 		}
 
 		InfoField.FinalStep<?> finalStep = InfoField.builder(
 		).infoFieldType(
 			SelectInfoFieldType.INSTANCE
-		).namespace(
-			StringPool.BLANK
 		).name(
 			Field.ASSET_TAG_NAMES
 		).attribute(
@@ -255,7 +257,7 @@ public class BasicDocumentSingleFormVariationInfoCollectionProvider
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 
 			return null;
@@ -270,8 +272,5 @@ public class BasicDocumentSingleFormVariationInfoCollectionProvider
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private Language _language;
 
 }

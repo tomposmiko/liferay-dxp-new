@@ -16,13 +16,11 @@ package com.liferay.layout.admin.web.internal.frontend.taglib.form.navigator;
 
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorCategory;
 import com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstants;
-import com.liferay.layout.admin.web.internal.constants.LayoutAdminFormNavigatorConstants;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
@@ -36,8 +34,7 @@ public class LayoutSetAdvancedFormNavigatorCategory
 
 	@Override
 	public String getFormNavigatorId() {
-		return LayoutAdminFormNavigatorConstants.
-			FORM_NAVIGATOR_ID_LAYOUT_SET_ADVANCED;
+		return FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT_SET;
 	}
 
 	@Override
@@ -47,10 +44,7 @@ public class LayoutSetAdvancedFormNavigatorCategory
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "advanced");
+		return LanguageUtil.get(locale, "advanced");
 	}
-
-	@Reference
-	private Language _language;
 
 }

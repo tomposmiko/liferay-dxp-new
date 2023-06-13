@@ -16,7 +16,6 @@ package com.liferay.document.library.web.internal.info.display.contributor.portl
 
 import com.liferay.asset.display.page.portlet.BaseAssetDisplayPageFriendlyURLResolver;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -29,7 +28,7 @@ public class DLFileEntryAssetDisplayPageFriendlyURLResolver
 
 	@Override
 	public String getURLSeparator() {
-		return FriendlyURLResolverConstants.URL_SEPARATOR_FILE_ENTRY;
+		return "/d/";
 	}
 
 }

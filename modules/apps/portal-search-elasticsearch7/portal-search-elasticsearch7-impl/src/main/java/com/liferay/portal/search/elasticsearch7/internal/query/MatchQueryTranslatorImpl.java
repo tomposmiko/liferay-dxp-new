@@ -60,23 +60,23 @@ public class MatchQueryTranslatorImpl
 			}
 
 			if (type == MatchQuery.Type.PHRASE) {
-				return _translateMatchPhraseQuery(
+				return translateMatchPhraseQuery(
 					field, stringValue, matchQuery);
 			}
 			else if (type == MatchQuery.Type.PHRASE_PREFIX) {
-				return _translateMatchPhrasePrefixQuery(
+				return translateMatchPhrasePrefixQuery(
 					field, stringValue, matchQuery);
 			}
 		}
 
 		if ((type == null) || (type == MatchQuery.Type.BOOLEAN)) {
-			return _translateMatchQuery(field, value, matchQuery);
+			return translateMatchQuery(field, value, matchQuery);
 		}
 
 		throw new IllegalArgumentException("Invalid match query type: " + type);
 	}
 
-	private QueryBuilder _translateMatchPhrasePrefixQuery(
+	protected QueryBuilder translateMatchPhrasePrefixQuery(
 		String field, String value, MatchQuery matchQuery) {
 
 		MatchPhrasePrefixQueryBuilder matchPhrasePrefixQueryBuilder =
@@ -98,7 +98,7 @@ public class MatchQueryTranslatorImpl
 		return matchPhrasePrefixQueryBuilder;
 	}
 
-	private QueryBuilder _translateMatchPhraseQuery(
+	protected QueryBuilder translateMatchPhraseQuery(
 		String field, String value, MatchQuery matchQuery) {
 
 		MatchPhraseQueryBuilder matchPhraseQueryBuilder =
@@ -115,7 +115,7 @@ public class MatchQueryTranslatorImpl
 		return matchPhraseQueryBuilder;
 	}
 
-	private QueryBuilder _translateMatchQuery(
+	protected QueryBuilder translateMatchQuery(
 		String field, Object value, MatchQuery matchQuery) {
 
 		MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(

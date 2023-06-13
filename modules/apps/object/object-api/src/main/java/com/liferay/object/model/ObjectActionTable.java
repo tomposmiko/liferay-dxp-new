@@ -37,10 +37,6 @@ public class ObjectActionTable extends BaseTable<ObjectActionTable> {
 		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
 	public final Column<ObjectActionTable, String> uuid = createColumn(
 		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<ObjectActionTable, String> externalReferenceCode =
-		createColumn(
-			"externalReferenceCode", String.class, Types.VARCHAR,
-			Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, Long> objectActionId = createColumn(
 		"objectActionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<ObjectActionTable, Long> companyId = createColumn(
@@ -59,15 +55,6 @@ public class ObjectActionTable extends BaseTable<ObjectActionTable> {
 			Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, Boolean> active = createColumn(
 		"active_", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
-	public final Column<ObjectActionTable, Clob> conditionExpression =
-		createColumn(
-			"conditionExpression", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
-	public final Column<ObjectActionTable, String> description = createColumn(
-		"description", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<ObjectActionTable, String> errorMessage = createColumn(
-		"errorMessage", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<ObjectActionTable, String> label = createColumn(
-		"label", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, String> name = createColumn(
 		"name", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, String> objectActionExecutorKey =
@@ -80,8 +67,6 @@ public class ObjectActionTable extends BaseTable<ObjectActionTable> {
 			Column.FLAG_DEFAULT);
 	public final Column<ObjectActionTable, Clob> parameters = createColumn(
 		"parameters", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
-	public final Column<ObjectActionTable, Integer> status = createColumn(
-		"status", Integer.class, Types.INTEGER, Column.FLAG_DEFAULT);
 
 	private ObjectActionTable() {
 		super("ObjectAction", ObjectActionTable::new);

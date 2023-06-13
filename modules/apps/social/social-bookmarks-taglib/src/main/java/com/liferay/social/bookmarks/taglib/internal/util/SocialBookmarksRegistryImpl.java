@@ -43,7 +43,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = SocialBookmarksRegistry.class)
+@Component(immediate = true, service = SocialBookmarksRegistry.class)
 public class SocialBookmarksRegistryImpl implements SocialBookmarksRegistry {
 
 	@Override
@@ -151,7 +151,7 @@ public class SocialBookmarksRegistryImpl implements SocialBookmarksRegistry {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SocialBookmarksRegistryImpl.class);
 
-	private ServiceTrackerList<String> _serviceTrackerList;
+	private ServiceTrackerList<SocialBookmark, String> _serviceTrackerList;
 	private ServiceTrackerMap<String, SocialBookmark> _serviceTrackerMap;
 
 	private static class SocialBookmarkTypeServiceTrackerCustomizer

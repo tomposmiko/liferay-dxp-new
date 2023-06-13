@@ -57,7 +57,7 @@ public class DDMTemplateImpl extends DDMTemplateBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -138,10 +138,11 @@ public class DDMTemplateImpl extends DDMTemplateBaseImpl {
 			secure = true;
 		}
 
-		sb.append(
-			PortalUtil.getPortalURL(
-				themeDisplay.getServerName(), themeDisplay.getServerPort(),
-				secure));
+		String portalURL = PortalUtil.getPortalURL(
+			themeDisplay.getServerName(), themeDisplay.getServerPort(), secure);
+
+		sb.append(portalURL);
+
 		sb.append(themeDisplay.getPathContext());
 		sb.append("/webdav");
 

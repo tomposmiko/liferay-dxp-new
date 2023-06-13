@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.model.DDMStructureLayoutTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureLayoutImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureLayoutModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureLayoutPersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureLayoutUtil;
 import com.liferay.dynamic.data.mapping.service.persistence.impl.constants.DDMPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,11 +48,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -84,7 +83,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DDMStructureLayoutPersistence.class)
+@Component(
+	service = {DDMStructureLayoutPersistence.class, BasePersistence.class}
+)
 public class DDMStructureLayoutPersistenceImpl
 	extends BasePersistenceImpl<DDMStructureLayout>
 	implements DDMStructureLayoutPersistence {
@@ -206,7 +207,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureLayout ddmStructureLayout : list) {
@@ -603,7 +604,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -739,7 +740,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof DDMStructureLayout) {
@@ -859,7 +860,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1031,7 +1032,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureLayout ddmStructureLayout : list) {
@@ -1457,7 +1458,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1620,7 +1621,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureLayout ddmStructureLayout : list) {
@@ -1992,7 +1993,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2142,7 +2143,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureLayout ddmStructureLayout : list) {
@@ -2550,7 +2551,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 			finderArgs = new Object[] {structureLayoutKey};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2685,7 +2686,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByStructureVersionId, finderArgs, this);
+				_finderPathFetchByStructureVersionId, finderArgs);
 		}
 
 		if (result instanceof DDMStructureLayout) {
@@ -2804,7 +2805,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 			finderArgs = new Object[] {structureVersionId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2954,7 +2955,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureLayout ddmStructureLayout : list) {
@@ -3355,7 +3356,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 			finderArgs = new Object[] {groupId, classNameId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3496,8 +3497,7 @@ public class DDMStructureLayoutPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_C_S, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_C_S, finderArgs);
 		}
 
 		if (result instanceof DDMStructureLayout) {
@@ -3632,7 +3632,7 @@ public class DDMStructureLayoutPersistenceImpl
 				groupId, classNameId, structureLayoutKey
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3822,7 +3822,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDMStructureLayout ddmStructureLayout : list) {
@@ -4254,7 +4254,7 @@ public class DDMStructureLayoutPersistenceImpl
 				groupId, classNameId, structureVersionId
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4495,7 +4495,7 @@ public class DDMStructureLayoutPersistenceImpl
 		ddmStructureLayout.setNew(true);
 		ddmStructureLayout.setPrimaryKey(structureLayoutId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		ddmStructureLayout.setUuid(uuid);
 
@@ -4622,7 +4622,7 @@ public class DDMStructureLayoutPersistenceImpl
 			(DDMStructureLayoutModelImpl)ddmStructureLayout;
 
 		if (Validator.isNull(ddmStructureLayout.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			ddmStructureLayout.setUuid(uuid);
 		}
@@ -4750,9 +4750,7 @@ public class DDMStructureLayoutPersistenceImpl
 	 */
 	@Override
 	public DDMStructureLayout fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DDMStructureLayout.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DDMStructureLayout.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4974,7 +4972,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDMStructureLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -5050,7 +5048,7 @@ public class DDMStructureLayoutPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -5348,31 +5346,11 @@ public class DDMStructureLayoutPersistenceImpl
 			},
 			new String[] {"groupId", "classNameId", "structureVersionId"},
 			false);
-
-		_setDDMStructureLayoutUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDMStructureLayoutUtilPersistence(null);
-
 		entityCache.removeCache(DDMStructureLayoutImpl.class.getName());
-	}
-
-	private void _setDDMStructureLayoutUtilPersistence(
-		DDMStructureLayoutPersistence ddmStructureLayoutPersistence) {
-
-		try {
-			Field field = DDMStructureLayoutUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddmStructureLayoutPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -5442,6 +5420,7 @@ public class DDMStructureLayoutPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private DDMStructureLayoutModelArgumentsResolver
+		_ddmStructureLayoutModelArgumentsResolver;
 
 }

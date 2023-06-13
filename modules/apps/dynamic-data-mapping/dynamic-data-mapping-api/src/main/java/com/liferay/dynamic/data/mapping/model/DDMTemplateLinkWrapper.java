@@ -292,11 +292,6 @@ public class DDMTemplateLinkWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DDMTemplateLink, Object>>
 		getAttributeGetterFunctions() {
 

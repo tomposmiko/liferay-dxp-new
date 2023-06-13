@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.BooleanEntityField;
-import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.DateTimeEntityField;
 import com.liferay.portal.odata.entity.DoubleEntityField;
 import com.liferay.portal.odata.entity.EntityField;
@@ -58,6 +57,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -75,7 +77,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @author Eduardo García
  * @author Raymond Augé
  */
-@Component(service = RequestContextMapper.class)
+@Component(immediate = true, service = RequestContextMapper.class)
 public class RequestContextMapperImpl implements RequestContextMapper {
 
 	@Override
@@ -124,7 +126,7 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -152,7 +154,7 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 		boolean signedIn = false;
 
 		if (user != null) {
-			signedIn = !user.isGuestUser();
+			signedIn = !user.isDefaultUser();
 		}
 
 		context.put(Context.SIGNED_IN, signedIn);
@@ -176,11 +178,6 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceRegistration = bundleContext.registerService(
-			EntityModel.class, _contextEntityModel,
-			MapUtil.singletonDictionary(
-				"entity.model.name", ContextEntityModel.NAME));
-
 		_requestContextContributorServiceTrackerMap =
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext, RequestContextContributor.class,
@@ -191,27 +188,31 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 
 	@Deactivate
 	protected void deactivate() {
-		_requestContextContributorServiceTrackerMap.close();
+		for (ServiceRegistration<?> serviceRegistration :
+				_serviceRegistrations.values()) {
 
-		_serviceRegistration.unregister();
+			serviceRegistration.unregister();
+		}
+
+		_serviceRegistrations.clear();
+
+		_requestContextContributorServiceTrackerMap.close();
 	}
 
 	private String[] _getCookies(HttpServletRequest httpServletRequest) {
-		Cookie[] httpServletRequestCookies = httpServletRequest.getCookies();
+		Cookie[] cookies = httpServletRequest.getCookies();
 
-		if (httpServletRequestCookies == null) {
+		if (cookies == null) {
 			return new String[0];
 		}
 
-		String[] cookies = new String[httpServletRequestCookies.length];
-
-		for (int i = 0; i < httpServletRequestCookies.length; i++) {
-			cookies[i] =
-				httpServletRequestCookies[i].getName() + "=" +
-					httpServletRequestCookies[i].getValue();
-		}
-
-		return cookies;
+		return Stream.of(
+			cookies
+		).map(
+			c -> c.getName() + "=" + c.getValue()
+		).toArray(
+			String[]::new
+		);
 	}
 
 	private String[] _getRequestParameters(
@@ -224,14 +225,15 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 			return new String[0];
 		}
 
-		List<String> requestParameters = new ArrayList<>();
+		Set<Map.Entry<String, String[]>> entrySet = parameterMap.entrySet();
 
-		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-			requestParameters.add(
-				entry.getKey() + "=" + StringUtil.merge(entry.getValue()));
-		}
+		Stream<Map.Entry<String, String[]>> stream = entrySet.stream();
 
-		return requestParameters.toArray(new String[0]);
+		return stream.map(
+			e -> e.getKey() + "=" + StringUtil.merge(e.getValue())
+		).toArray(
+			String[]::new
+		);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -240,15 +242,15 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 	@Reference
 	private BrowserSniffer _browserSniffer;
 
-	private final ContextEntityModel _contextEntityModel =
-		new ContextEntityModel(Collections.emptyList());
-
 	@Reference
 	private Portal _portal;
 
 	private ServiceTrackerMap<String, RequestContextContributor>
 		_requestContextContributorServiceTrackerMap;
-	private ServiceRegistration<EntityModel> _serviceRegistration;
+	private final Map
+		<ServiceReference<RequestContextContributor>,
+		 ServiceRegistration<EntityModel>> _serviceRegistrations =
+			new ConcurrentHashMap<>();
 
 	private class RequestContextContributorServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer
@@ -268,12 +270,8 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 			List<EntityField> customEntityFields = _addCustomEntityField(
 				requestContextContributorKey, requestContextContributorType);
 
-			Map<String, EntityField> entityFieldsMap =
-				_contextEntityModel.getEntityFieldsMap();
-
-			entityFieldsMap.put(
-				"customContext",
-				new ComplexEntityField("customContext", customEntityFields));
+			_register(
+				_bundleContext, new ContextEntityModel(customEntityFields));
 
 			return _bundleContext.getService(serviceReference);
 		}
@@ -300,12 +298,8 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 			List<EntityField> customEntityFields = _removeCustomEntityField(
 				requestContextContributorKey);
 
-			Map<String, EntityField> entityFieldsMap =
-				_contextEntityModel.getEntityFieldsMap();
-
-			entityFieldsMap.put(
-				"customContext",
-				new ComplexEntityField("customContext", customEntityFields));
+			_register(
+				_bundleContext, new ContextEntityModel(customEntityFields));
 
 			_bundleContext.ungetService(serviceReference);
 		}
@@ -314,6 +308,9 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 			BundleContext bundleContext) {
 
 			_bundleContext = bundleContext;
+
+			_register(
+				bundleContext, new ContextEntityModel(Collections.emptyList()));
 		}
 
 		private List<EntityField> _addCustomEntityField(
@@ -355,6 +352,20 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 			return new ArrayList<>(_customEntityFields.values());
 		}
 
+		private void _register(
+			BundleContext bundleContext,
+			ContextEntityModel contextEntityModel) {
+
+			if (_serviceRegistration != null) {
+				_serviceRegistration.unregister();
+			}
+
+			_serviceRegistration = bundleContext.registerService(
+				EntityModel.class, contextEntityModel,
+				MapUtil.singletonDictionary(
+					"entity.model.name", ContextEntityModel.NAME));
+		}
+
 		private List<EntityField> _removeCustomEntityField(
 			String requestContextContributorKey) {
 
@@ -366,6 +377,7 @@ public class RequestContextMapperImpl implements RequestContextMapper {
 		private final BundleContext _bundleContext;
 		private final Map<String, EntityField> _customEntityFields =
 			new HashMap<>();
+		private ServiceRegistration<EntityModel> _serviceRegistration;
 
 	}
 

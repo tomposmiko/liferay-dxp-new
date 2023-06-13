@@ -137,11 +137,6 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>folderId</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
 			<description>The name of the event to be thrown once an image is selected.</description>
 			<name>itemSelectedEventName</name>
 			<required>true</required>
@@ -156,11 +151,6 @@
 		<attribute>
 			<description>The maximum file size that the backend can handle. It is used in generating error messages.</description>
 			<name>maxFileSize</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>mimeTypeRestriction</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

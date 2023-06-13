@@ -24,14 +24,14 @@ import {EVENT_TYPES} from '../eventTypes.es';
  * NOTE: This is a literal copy of the old LayoutProvider logic. Small changes
  * were made only to adapt to the reducer.
  */
-export default function elementSetReducer(state, {payload, type}) {
+export default (state, {payload, type}) => {
 	switch (type) {
 		case EVENT_TYPES.ELEMENT_SET_ADD: {
 			const {elementSetPages, indexes} = payload;
 			const {activePage, pages} = state;
 			const {pageIndex, rowIndex} = indexes ?? {
 				pageIndex: activePage,
-				rowIndex: indexes.rowIndex,
+				rowIndex: pages[activePage].rows.length,
 			};
 
 			const visitor = new PagesVisitor(elementSetPages);
@@ -80,9 +80,9 @@ export default function elementSetReducer(state, {payload, type}) {
 						return {
 							...page,
 							rows: [
-								...rows.slice(0, rowIndex),
+								...rows.slice(0, rowIndex + 1),
 								...newElementSetPages[0].rows,
-								...rows.slice(rowIndex),
+								...rows.slice(rowIndex + 1),
 							],
 						};
 					}
@@ -94,4 +94,4 @@ export default function elementSetReducer(state, {payload, type}) {
 		default:
 			return state;
 	}
-}
+};

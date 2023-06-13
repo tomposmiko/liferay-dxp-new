@@ -14,10 +14,11 @@
 
 package com.liferay.wiki.web.internal.portlet.toolbar.item;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.BasePortletToolbarContributor;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.PortletToolbarContributor;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
@@ -57,40 +57,19 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,
 		"mvc.render.command.name=/wiki/view_pages"
 	},
-	service = PortletToolbarContributor.class
+	service = {
+		PortletToolbarContributor.class, WikiPortletToolbarContributor.class
+	}
 )
 public class WikiPortletToolbarContributor
 	extends BasePortletToolbarContributor {
 
-	@Override
-	protected List<MenuItem> getPortletTitleMenuItems(
-		PortletRequest portletRequest, PortletResponse portletResponse) {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		List<MenuItem> menuItems = new ArrayList<>();
-
-		try {
-			WikiNode node = _getNode(themeDisplay, portletRequest);
-
-			if (node != null) {
-				_addPortletTitleMenuItem(
-					menuItems, node, themeDisplay, portletRequest);
-			}
-		}
-		catch (PortalException portalException) {
-			_log.error("Unable to add page menu item", portalException);
-		}
-
-		return menuItems;
-	}
-
-	private void _addPortletTitleMenuItem(
+	protected void addPortletTitleMenuItem(
 			List<MenuItem> menuItems, WikiNode node, ThemeDisplay themeDisplay,
 			PortletRequest portletRequest)
 		throws PortalException {
@@ -106,7 +85,7 @@ public class WikiPortletToolbarContributor
 
 		urlMenuItem.setIcon("icon-plus-sign-2");
 		urlMenuItem.setLabel(
-			_language.get(
+			LanguageUtil.get(
 				_portal.getHttpServletRequest(portletRequest), "add-page"));
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
@@ -129,6 +108,35 @@ public class WikiPortletToolbarContributor
 			).buildString());
 
 		menuItems.add(urlMenuItem);
+	}
+
+	@Override
+	protected List<MenuItem> getPortletTitleMenuItems(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		List<MenuItem> menuItems = new ArrayList<>();
+
+		try {
+			WikiNode node = _getNode(themeDisplay, portletRequest);
+
+			if (node != null) {
+				addPortletTitleMenuItem(
+					menuItems, node, themeDisplay, portletRequest);
+			}
+		}
+		catch (PortalException portalException) {
+			_log.error("Unable to add page menu item", portalException);
+		}
+
+		return menuItems;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWikiNodeService(WikiNodeService wikiNodeService) {
+		_wikiNodeService = wikiNodeService;
 	}
 
 	private WikiNode _getNode(
@@ -172,13 +180,13 @@ public class WikiPortletToolbarContributor
 			}
 			catch (NoSuchNodeException noSuchNodeException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchNodeException);
+					_log.debug(noSuchNodeException, noSuchNodeException);
 				}
 
 				node = null;
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -189,15 +197,11 @@ public class WikiPortletToolbarContributor
 		WikiPortletToolbarContributor.class);
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
 
 	@Reference(target = "(model.class.name=com.liferay.wiki.model.WikiNode)")
 	private ModelResourcePermission<WikiNode> _wikiNodeModelResourcePermission;
 
-	@Reference
 	private WikiNodeService _wikiNodeService;
 
 }

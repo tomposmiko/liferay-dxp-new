@@ -15,13 +15,9 @@
 package com.liferay.commerce.product.service;
 
 import com.liferay.commerce.product.model.CPTaxCategory;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -33,8 +29,6 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -59,15 +53,13 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CPTaxCategoryLocalServiceUtil
  * @generated
  */
-@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface CPTaxCategoryLocalService
-	extends BaseLocalService, CTService<CPTaxCategory>,
-			PersistedModelLocalService {
+	extends BaseLocalService, PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -87,6 +79,16 @@ public interface CPTaxCategoryLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public CPTaxCategory addCPTaxCategory(CPTaxCategory cpTaxCategory);
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #addCPTaxCategory(String, Map, Map, ServiceContext)}
+	 */
+	@Deprecated
+	public CPTaxCategory addCPTaxCategory(
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			ServiceContext serviceContext)
+		throws PortalException;
 
 	public CPTaxCategory addCPTaxCategory(
 			String externalReferenceCode, Map<Locale, String> nameMap,
@@ -225,20 +227,24 @@ public interface CPTaxCategoryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPTaxCategory fetchCPTaxCategory(long CPTaxCategoryId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPTaxCategory fetchCPTaxCategoryByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
 	/**
-	 * Returns the cp tax category with the matching UUID and company.
+	 * Returns the cp tax category with the matching external reference code and company.
 	 *
-	 * @param uuid the cp tax category's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
 	 * @return the matching cp tax category, or <code>null</code> if a matching cp tax category could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPTaxCategory fetchCPTaxCategoryByUuidAndCompanyId(
-		String uuid, long companyId);
+	public CPTaxCategory fetchCPTaxCategoryByExternalReferenceCode(
+		long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPTaxCategoryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public CPTaxCategory fetchCPTaxCategoryByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	public List<CPTaxCategory> findCPTaxCategoriesByCompanyId(
 		long companyId, String keyword, int start, int end);
@@ -290,27 +296,18 @@ public interface CPTaxCategoryLocalService
 	public CPTaxCategory getCPTaxCategory(long CPTaxCategoryId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPTaxCategory getCPTaxCategoryByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException;
-
 	/**
-	 * Returns the cp tax category with the matching UUID and company.
+	 * Returns the cp tax category with the matching external reference code and company.
 	 *
-	 * @param uuid the cp tax category's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
 	 * @return the matching cp tax category
 	 * @throws PortalException if a matching cp tax category could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CPTaxCategory getCPTaxCategoryByUuidAndCompanyId(
-			String uuid, long companyId)
+	public CPTaxCategory getCPTaxCategoryByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
@@ -343,24 +340,19 @@ public interface CPTaxCategoryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public CPTaxCategory updateCPTaxCategory(CPTaxCategory cpTaxCategory);
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateCPTaxCategory(String, long, Map, Map)}
+	 */
+	@Deprecated
+	public CPTaxCategory updateCPTaxCategory(
+			long cpTaxCategoryId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap)
+		throws PortalException;
+
 	public CPTaxCategory updateCPTaxCategory(
 			String externalReferenceCode, long cpTaxCategoryId,
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap)
 		throws PortalException;
-
-	@Override
-	@Transactional(enabled = false)
-	public CTPersistence<CPTaxCategory> getCTPersistence();
-
-	@Override
-	@Transactional(enabled = false)
-	public Class<CPTaxCategory> getModelClass();
-
-	@Override
-	@Transactional(rollbackFor = Throwable.class)
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CPTaxCategory>, R, E>
-				updateUnsafeFunction)
-		throws E;
 
 }

@@ -404,15 +404,14 @@ public interface RoleLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end);
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId, int start,
+		int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, List<String> excludedNames, String title,
-		String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId);
+		long companyId, String keywords, List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getGroupRolesCount(long groupId);
@@ -702,9 +701,7 @@ public interface RoleLocalService
 	public long[] getUserPrimaryKeys(long roleId);
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groups are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param userId the primary key of the user
 	 * @param groups the groups (optionally <code>null</code>)
@@ -724,9 +721,7 @@ public interface RoleLocalService
 	public List<Role> getUserRelatedRoles(long userId, long groupId);
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groupIds are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param userId the primary key of the user
 	 * @param groupIds the primary keys of the groups
@@ -798,6 +793,33 @@ public interface RoleLocalService
 	public boolean hasUserRoles(
 			long userId, long companyId, String[] names, boolean inherited)
 		throws PortalException;
+
+	/**
+	 * Returns a role with the name in the company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param name the role's name (optionally <code>null</code>)
+	 * @return the role with the name, or <code>null</code> if a role with the
+	 name could not be found in the company
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #fetchRole(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Role loadFetchRole(long companyId, String name);
+
+	/**
+	 * Returns a role with the name in the company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param name the role's name
+	 * @return the role with the name in the company
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getRole(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Role loadGetRole(long companyId, String name) throws PortalException;
 
 	/**
 	 * Returns an ordered range of all the roles that match the keywords and

@@ -1,68 +1,5 @@
 # Liferay Gradle Plugins Lang Builder Change Log
 
-## 3.0.32 - 2023-03-28
-
-### Dependencies
-- [LPS-178134] Update the com.liferay.lang.builder dependency to version 1.0.49.
-
-## 3.0.31 - 2022-11-24
-
-### Commits
-- [LPS-168821] Simplify (acf28c9f77)
-
-### Dependencies
-- [LPS-168821] Update the com.liferay.lang.builder dependency to version 1.0.48.
-
-## 3.0.30 - 2022-09-27
-
-### Commits
-- [LPS-150857] Update README.markdown (77ff7e244f)
-- [LPS-150857] Update plugins Gradle version (4c389b37ce)
-
-### Dependencies
-- [LPS-158690] Update the com.liferay.lang.builder dependency to version 1.0.47.
-- [LPS-51081] Update the com.liferay.gradle.util dependency to version 1.0.47.
-- [LRCI-2670] Update the com.liferay.gradle.util dependency to version 1.0.46.
-
-## 3.0.29 - 2021-12-08
-
-### Dependencies
-- [LPS-143566] Update the com.liferay.lang.builder dependency to version 1.0.46.
-- [LPS-143280] Update the com.liferay.gradle.util dependency to version 1.0.45.
-
-## 3.0.28 - 2021-09-29
-
-### Commits
-- [LPS-138487] republish (03764ac72b)
-
-### Dependencies
-- [LPS-138487] Update the com.liferay.lang.builder dependency to version 1.0.45.
-
-## 3.0.27 - 2021-09-07
-
-### Dependencies
-- [LPS-138487] Update the com.liferay.lang.builder dependency to version 1.0.44.
-
-## 3.0.26 - 2021-09-03
-
-### Commits
-- [LPS-105380] Remove final from parameters (a4e6ca0985)
-- [LPS-105380] Revert "LPS-105380 Remove final from parameters" (b2f9eed2c2)
-- [LPS-105380] Remove final from parameters (f615ff77ff)
-- [LPS-130505] Revert "LPS-130505 SF, no need to call methods" (d4477c5996)
-- [LPS-130505] SF, no need to call methods (54557cd107)
-
-### Dependencies
-- [LPS-138487] Update the com.liferay.lang.builder dependency to version 1.0.43.
-
-## 3.0.25 - 2021-04-12
-
-### Commits
-- [LPS-105380] Make var final (12e010029a)
-
-### Dependencies
-- [LPS-130464] Update the com.liferay.lang.builder dependency to version 1.0.42.
-
 ## 3.0.24 - 2020-11-04
 
 ### Dependencies
@@ -601,7 +538,6 @@ version 2.4.
 [LPS-96860]: https://issues.liferay.com/browse/LPS-96860
 [LPS-100515]: https://issues.liferay.com/browse/LPS-100515
 [LPS-102700]: https://issues.liferay.com/browse/LPS-102700
-[LPS-105380]: https://issues.liferay.com/browse/LPS-105380
 [LPS-106149]: https://issues.liferay.com/browse/LPS-106149
 [LPS-106614]: https://issues.liferay.com/browse/LPS-106614
 [LPS-108328]: https://issues.liferay.com/browse/LPS-108328
@@ -616,14 +552,4 @@ version 2.4.
 [LPS-117015]: https://issues.liferay.com/browse/LPS-117015
 [LPS-122403]: https://issues.liferay.com/browse/LPS-122403
 [LPS-122599]: https://issues.liferay.com/browse/LPS-122599
-[LPS-130464]: https://issues.liferay.com/browse/LPS-130464
-[LPS-130505]: https://issues.liferay.com/browse/LPS-130505
-[LPS-138487]: https://issues.liferay.com/browse/LPS-138487
-[LPS-143280]: https://issues.liferay.com/browse/LPS-143280
-[LPS-143566]: https://issues.liferay.com/browse/LPS-143566
-[LPS-150857]: https://issues.liferay.com/browse/LPS-150857
-[LPS-158690]: https://issues.liferay.com/browse/LPS-158690
-[LPS-168821]: https://issues.liferay.com/browse/LPS-168821
-[LPS-178134]: https://issues.liferay.com/browse/LPS-178134
-[LRCI-2670]: https://issues.liferay.com/browse/LRCI-2670
 [LRDOCS-4319]: https://issues.liferay.com/browse/LRDOCS-4319

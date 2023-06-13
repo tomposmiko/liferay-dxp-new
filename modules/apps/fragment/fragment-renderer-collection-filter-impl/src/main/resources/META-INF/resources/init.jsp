@@ -28,8 +28,7 @@ page import="com.liferay.fragment.collection.filter.constants.FragmentCollection
 page import="com.liferay.fragment.renderer.FragmentRendererContext" %><%@
 page import="com.liferay.fragment.renderer.collection.filter.internal.display.context.CollectionAppliedFiltersFragmentRendererDisplayContext" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@
-page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
-page import="com.liferay.portal.kernel.util.HtmlUtil" %>
+page import="com.liferay.portal.kernel.util.HashMapBuilder" %>
 
 <%@ page import="java.util.List" %><%@
 page import="java.util.Map" %>

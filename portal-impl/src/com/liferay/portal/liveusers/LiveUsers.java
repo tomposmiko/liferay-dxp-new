@@ -254,7 +254,7 @@ public class LiveUsers {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception.getMessage());
 			}
 		}
 
@@ -267,7 +267,7 @@ public class LiveUsers {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

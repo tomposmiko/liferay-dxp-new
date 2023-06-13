@@ -120,17 +120,12 @@ public class ResourcePermissionLocalServiceImpl
 		else if (serviceContext.isAddGroupPermissions() ||
 				 serviceContext.isAddGuestPermissions()) {
 
-			long groupId = 0;
-
-			if (serviceContext.isAddGroupPermissions()) {
-				groupId = getGroupId(auditedModel);
-			}
-
 			addResourcePermissions(
-				auditedModel.getCompanyId(), groupId, auditedModel.getUserId(),
-				auditedModel.getModelClassName(),
+				auditedModel.getCompanyId(), getGroupId(auditedModel),
+				auditedModel.getUserId(), auditedModel.getModelClassName(),
 				String.valueOf(auditedModel.getPrimaryKeyObj()), false,
-				serviceContext);
+				serviceContext.isAddGroupPermissions(),
+				serviceContext.isAddGuestPermissions());
 		}
 		else {
 			if (serviceContext.isDeriveDefaultPermissions()) {
@@ -337,12 +332,14 @@ public class ResourcePermissionLocalServiceImpl
 	 *        optionally an empty string if no instance exists
 	 * @param portletActions whether to associate portlet actions with the
 	 *        resource
+	 * @param addGroupPermissions whether to add group permissions
+	 * @param addGuestPermissions whether to add guest permissions
 	 */
 	@Override
 	public void addResourcePermissions(
 			long companyId, long groupId, long userId, String name,
-			String primKey, boolean portletActions,
-			ServiceContext serviceContext)
+			String primKey, boolean portletActions, boolean addGroupPermissions,
+			boolean addGuestPermissions)
 		throws PortalException {
 
 		if (!PermissionThreadLocal.isAddResource()) {
@@ -400,9 +397,7 @@ public class ResourcePermissionLocalServiceImpl
 
 			// Group permissions
 
-			if ((groupId > 0) && (serviceContext != null) &&
-				serviceContext.isAddGroupPermissions()) {
-
+			if ((groupId > 0) && addGroupPermissions) {
 				List<String> actions = null;
 
 				if (portletActions) {
@@ -431,8 +426,7 @@ public class ResourcePermissionLocalServiceImpl
 
 			// Guest permissions
 
-			if ((serviceContext != null) &&
-				serviceContext.isAddGuestPermissions()) {
+			if (addGuestPermissions) {
 
 				// Don't add guest permissions when you've already added group
 				// permissions and the given group is the guest group.
@@ -472,11 +466,7 @@ public class ResourcePermissionLocalServiceImpl
 				PermissionCacheUtil.clearResourcePermissionCache(
 					ResourceConstants.SCOPE_INDIVIDUAL, name, primKey);
 
-				if ((serviceContext == null) ||
-					serviceContext.isIndexingEnabled()) {
-
-					IndexWriterHelperUtil.updatePermissionFields(name, primKey);
-				}
+				IndexWriterHelperUtil.updatePermissionFields(name, primKey);
 			}
 		}
 	}
@@ -598,46 +588,42 @@ public class ResourcePermissionLocalServiceImpl
 
 	@Override
 	public void copyModelResourcePermissions(
-			long companyId, String name, long sourcePrimKey, long targetPrimKey)
+			long companyId, String name, long oldPrimKey, long newPrimKey)
 		throws PortalException {
 
-		List<ResourcePermission> sourceResourcePermissions =
+		List<ResourcePermission> oldResourcePermissions =
 			resourcePermissionPersistence.findByC_N_S_P(
 				companyId, name, ResourceConstants.SCOPE_INDIVIDUAL,
-				String.valueOf(sourcePrimKey));
+				String.valueOf(oldPrimKey));
 
-		if (sourceResourcePermissions.isEmpty()) {
+		if (oldResourcePermissions.isEmpty()) {
 			return;
 		}
 
 		long batchCounter = counterLocalService.increment(
-			ResourcePermission.class.getName(),
-			sourceResourcePermissions.size());
+			ResourcePermission.class.getName(), oldResourcePermissions.size());
 
-		batchCounter -= sourceResourcePermissions.size();
+		batchCounter -= oldResourcePermissions.size();
 
-		for (ResourcePermission sourceResourcePermission :
-				sourceResourcePermissions) {
+		for (ResourcePermission oldResourcePermission :
+				oldResourcePermissions) {
 
-			ResourcePermission targetResourcePermission =
+			ResourcePermission resourcePermission =
 				resourcePermissionPersistence.create(++batchCounter);
 
-			targetResourcePermission.setCompanyId(companyId);
-			targetResourcePermission.setName(name);
-			targetResourcePermission.setScope(
-				sourceResourcePermission.getScope());
-			targetResourcePermission.setPrimKey(String.valueOf(targetPrimKey));
-			targetResourcePermission.setPrimKeyId(targetPrimKey);
-			targetResourcePermission.setRoleId(
-				sourceResourcePermission.getRoleId());
-			targetResourcePermission.setOwnerId(
-				sourceResourcePermission.getOwnerId());
-			targetResourcePermission.setActionIds(
-				sourceResourcePermission.getActionIds());
-			targetResourcePermission.setViewActionId(
-				sourceResourcePermission.isViewActionId());
+			resourcePermission.setCompanyId(companyId);
+			resourcePermission.setName(name);
+			resourcePermission.setScope(oldResourcePermission.getScope());
+			resourcePermission.setPrimKey(String.valueOf(newPrimKey));
+			resourcePermission.setPrimKeyId(newPrimKey);
+			resourcePermission.setRoleId(oldResourcePermission.getRoleId());
+			resourcePermission.setOwnerId(oldResourcePermission.getOwnerId());
+			resourcePermission.setActionIds(
+				oldResourcePermission.getActionIds());
+			resourcePermission.setViewActionId(
+				oldResourcePermission.isViewActionId());
 
-			resourcePermissionPersistence.update(targetResourcePermission);
+			resourcePermissionPersistence.update(resourcePermission);
 		}
 	}
 
@@ -809,11 +795,11 @@ public class ResourcePermissionLocalServiceImpl
 			ResourcePermissionTable.INSTANCE.companyId.eq(
 				companyId
 			).and(
-				ResourcePermissionTable.INSTANCE.name.eq(
-					ResourcePermissionTable.INSTANCE.primKey)
-			).and(
 				ResourcePermissionTable.INSTANCE.scope.eq(
 					ResourceConstants.SCOPE_INDIVIDUAL)
+			).and(
+				ResourcePermissionTable.INSTANCE.name.eq(
+					ResourcePermissionTable.INSTANCE.primKey)
 			)
 		);
 
@@ -1756,13 +1742,20 @@ public class ResourcePermissionLocalServiceImpl
 	}
 
 	protected long getGroupId(AuditedModel auditedModel) {
+		long defaultGroupId = 0;
+
 		if (auditedModel instanceof GroupedModel) {
 			GroupedModel groupedModel = (GroupedModel)auditedModel;
 
-			return groupedModel.getGroupId();
+			defaultGroupId = groupedModel.getGroupId();
+		}
+		else {
+			defaultGroupId = BeanPropertiesUtil.getLongSilent(
+				auditedModel, "groupId", defaultGroupId);
 		}
 
-		return BeanPropertiesUtil.getLongSilent(auditedModel, "groupId", 0);
+		return BeanPropertiesUtil.getLongSilent(
+			auditedModel, "resourceGroupId", defaultGroupId);
 	}
 
 	protected Role getRole(long companyId, long groupId, String roleName)

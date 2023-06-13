@@ -15,7 +15,9 @@
 package com.liferay.document.library.internal.model.listener;
 
 import com.liferay.document.library.constants.DLPortletKeys;
-import com.liferay.document.library.internal.helper.DLExportableRepositoryPublisherHelper;
+import com.liferay.document.library.exportimport.data.handler.DLExportableRepositoryPublisher;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
@@ -28,9 +30,13 @@ import com.liferay.portal.repository.temporaryrepository.TemporaryFileEntryRepos
 import com.liferay.staging.model.listener.StagingModelListener;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -70,6 +76,34 @@ public class RepositoryStagingModelListener
 		_stagingModelListener.onAfterUpdate(repository);
 	}
 
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_dlExportableRepositoryPublishers = ServiceTrackerListFactory.open(
+			bundleContext, DLExportableRepositoryPublisher.class);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		if (_dlExportableRepositoryPublishers != null) {
+			_dlExportableRepositoryPublishers.close();
+		}
+	}
+
+	private Collection<Long> _getExportableRepositoryIds(long groupId) {
+		Collection<Long> exportableRepositoryIds = new HashSet<>();
+
+		exportableRepositoryIds.add(groupId);
+
+		for (DLExportableRepositoryPublisher dlExportableRepositoryPublisher :
+				_dlExportableRepositoryPublishers) {
+
+			dlExportableRepositoryPublisher.publish(
+				groupId, exportableRepositoryIds::add);
+		}
+
+		return exportableRepositoryIds;
+	}
+
 	private boolean _isRepositoryExportable(Repository repository) {
 		long liferayRepositoryClassNameId = _portal.getClassNameId(
 			LiferayRepositoryDefiner.CLASS_NAME);
@@ -85,9 +119,8 @@ public class RepositoryStagingModelListener
 			return false;
 		}
 
-		Collection<Long> exportableRepositoryIds =
-			_dlExportableRepositoryPublisherHelper.publish(
-				repository.getGroupId());
+		Collection<Long> exportableRepositoryIds = _getExportableRepositoryIds(
+			repository.getGroupId());
 		String portletId = repository.getPortletId();
 
 		if (!Validator.isBlank(portletId) &&
@@ -101,9 +134,9 @@ public class RepositoryStagingModelListener
 		return true;
 	}
 
-	@Reference
-	private DLExportableRepositoryPublisherHelper
-		_dlExportableRepositoryPublisherHelper;
+	private ServiceTrackerList
+		<DLExportableRepositoryPublisher, DLExportableRepositoryPublisher>
+			_dlExportableRepositoryPublishers;
 
 	@Reference
 	private Portal _portal;

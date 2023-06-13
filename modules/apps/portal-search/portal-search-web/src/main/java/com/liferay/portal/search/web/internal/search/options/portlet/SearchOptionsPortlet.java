@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Wade Cao
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-search-options",
@@ -53,8 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/search/options/view.jsp",
 		"javax.portlet.name=" + SearchOptionsPortletKeys.SEARCH_OPTIONS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -66,7 +66,7 @@ public class SearchOptionsPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		if (!SearchPortletPermissionUtil.containsConfiguration(
-				_portletPermission, renderRequest, _portal)) {
+				portletPermission, renderRequest, portal)) {
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
@@ -76,9 +76,9 @@ public class SearchOptionsPortlet extends MVCPortlet {
 	}
 
 	@Reference
-	private Portal _portal;
+	protected Portal portal;
 
 	@Reference
-	private PortletPermission _portletPermission;
+	protected PortletPermission portletPermission;
 
 }

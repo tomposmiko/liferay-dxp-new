@@ -27,10 +27,6 @@ public class AnnouncementsDeliveryLocalServiceWrapper
 	implements AnnouncementsDeliveryLocalService,
 			   ServiceWrapper<AnnouncementsDeliveryLocalService> {
 
-	public AnnouncementsDeliveryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AnnouncementsDeliveryLocalServiceWrapper(
 		AnnouncementsDeliveryLocalService announcementsDeliveryLocalService) {
 

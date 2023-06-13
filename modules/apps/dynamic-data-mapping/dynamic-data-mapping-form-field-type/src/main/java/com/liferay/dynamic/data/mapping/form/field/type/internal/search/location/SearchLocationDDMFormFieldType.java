@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcela Cunha
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.description=search-location-field-type-description",
 		"ddm.form.field.type.display.order:Integer=11",

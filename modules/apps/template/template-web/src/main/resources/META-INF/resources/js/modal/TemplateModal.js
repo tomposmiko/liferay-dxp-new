@@ -57,7 +57,7 @@ export default function TemplateModal({
 
 		const errors = validateFields(name, itemType, itemSubtype);
 
-		if (Object.keys(errors).length) {
+		if (Object.keys(errors).length > 0) {
 			setErrors(errors);
 
 			return;
@@ -105,7 +105,6 @@ export default function TemplateModal({
 			<ClayModal.Header>
 				{Liferay.Language.get('add-template')}
 			</ClayModal.Header>
-
 			<ClayModal.Body>
 				{errors.other && (
 					<ClayAlert
@@ -116,7 +115,6 @@ export default function TemplateModal({
 						{errors.other}
 					</ClayAlert>
 				)}
-
 				<ClayForm onSubmit={handleSubmit} ref={formRef}>
 					<Field
 						errors={errors}
@@ -191,14 +189,12 @@ export default function TemplateModal({
 					)}
 				</ClayForm>
 			</ClayModal.Body>
-
 			<ClayModal.Footer
 				last={
 					<ClayButton.Group spaced>
 						<ClayButton displayType="secondary" onClick={onClose}>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
-
 						<ClayButton
 							displayType="primary"
 							onClick={handleSubmit}
@@ -211,7 +207,6 @@ export default function TemplateModal({
 									></span>
 								</span>
 							)}
-
 							{Liferay.Language.get('save')}
 						</ClayButton>
 					</ClayButton.Group>

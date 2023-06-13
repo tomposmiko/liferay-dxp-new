@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tamas Molnar
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet",
 	service = {
 		DDLRecordSetStagedModelRepository.class, StagedModelRepository.class
@@ -131,7 +132,7 @@ public class DDLRecordSetStagedModelRepository
 			_ddlRecordSetLocalService.deleteRecordSet(recordSet);
 		}
 
-		_deleteDDMStructures(recordSetDDMStructureIds);
+		deleteDDMStructures(recordSetDDMStructureIds);
 	}
 
 	@Override
@@ -235,7 +236,7 @@ public class DDLRecordSetStagedModelRepository
 			ddlRecordSet.getMinDisplayRows(), serviceContext);
 	}
 
-	private void _deleteDDMStructures(Set<Long> ddmStructureIds)
+	protected void deleteDDMStructures(Set<Long> ddmStructureIds)
 		throws PortalException {
 
 		for (Long ddmStructureId : ddmStructureIds) {

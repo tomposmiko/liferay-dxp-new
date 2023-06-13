@@ -29,8 +29,8 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.segments.service.SegmentsExperienceLocalServiceUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -52,18 +52,17 @@ public class LayoutInfoItemFieldValuesUpdaterHelper {
 	}
 
 	public Layout updateFromInfoItemFieldValues(
-		Layout layout, InfoItemFieldValues infoItemFieldValues,
-		long segmentsExperienceId) {
+		Layout layout, InfoItemFieldValues infoItemFieldValues) {
 
 		_updateFragmentEntryLinks(infoItemFieldValues);
 
 		if (layout.isDraftLayout()) {
 			_updateLayout(
 				_layoutLocalService.fetchLayout(layout.getClassPK()),
-				infoItemFieldValues, segmentsExperienceId);
+				infoItemFieldValues);
 		}
 
-		return _updateLayout(layout, infoItemFieldValues, segmentsExperienceId);
+		return _updateLayout(layout, infoItemFieldValues);
 	}
 
 	private JSONObject _createEditableValuesJSONObject(
@@ -163,7 +162,7 @@ public class LayoutInfoItemFieldValuesUpdaterHelper {
 			if (jsonObject != null) {
 				FragmentEntryLink fragmentEntryLink = entry.getKey();
 
-				fragmentEntryLink.setEditableValues(jsonObject.toString());
+				fragmentEntryLink.setEditableValues(jsonObject.toJSONString());
 
 				_fragmentEntryLinkLocalService.updateFragmentEntryLink(
 					fragmentEntryLink);
@@ -172,26 +171,27 @@ public class LayoutInfoItemFieldValuesUpdaterHelper {
 	}
 
 	private Layout _updateLayout(
-		Layout layout, InfoItemFieldValues infoItemFieldValues,
-		long segmentsExperienceId) {
+		Layout layout, InfoItemFieldValues infoItemFieldValues) {
 
 		if (layout == null) {
 			return null;
 		}
 
-		long defaultSegmentsExperienceId =
-			SegmentsExperienceLocalServiceUtil.fetchDefaultSegmentsExperienceId(
-				layout.getPlid());
-
-		if (segmentsExperienceId == defaultSegmentsExperienceId) {
-			layout.setNameMap(
-				_getFieldMap(
-					LayoutInfoItemFields.nameInfoField.getName(),
-					infoItemFieldValues, layout.getNameMap()));
-		}
+		layout.setNameMap(
+			_getFieldMap(
+				LayoutInfoItemFields.nameInfoField.getName(),
+				infoItemFieldValues, layout.getNameMap()));
 
 		if (layout.isDraftLayout()) {
 			layout.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+			UnicodeProperties unicodeProperties =
+				layout.getTypeSettingsProperties();
+
+			unicodeProperties.setProperty(
+				"published", Boolean.FALSE.toString());
+
+			layout.setTypeSettingsProperties(unicodeProperties);
 		}
 
 		return _layoutLocalService.updateLayout(layout);

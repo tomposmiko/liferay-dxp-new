@@ -16,7 +16,7 @@ package com.liferay.fragment.web.internal.struts;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.constants.FragmentConstants;
-import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
@@ -27,9 +27,9 @@ import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.theme.ThemeUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.taglib.util.ThemeUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -47,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
-	property = "path=/portal/fragment/render_fragment_entry",
+	immediate = true, property = "path=/portal/fragment/render_fragment_entry",
 	service = StrutsAction.class
 )
 public class RenderFragmentEntryStrutsAction implements StrutsAction {
@@ -73,7 +73,7 @@ public class RenderFragmentEntryStrutsAction implements StrutsAction {
 			_fragmentRendererController);
 		httpServletRequest.setAttribute(
 			FragmentWebKeys.FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER,
-			_fragmentCollectionContributorRegistry);
+			_fragmentCollectionContributorTracker);
 
 		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
 			groupId, false);
@@ -110,8 +110,8 @@ public class RenderFragmentEntryStrutsAction implements StrutsAction {
 	}
 
 	@Reference
-	private FragmentCollectionContributorRegistry
-		_fragmentCollectionContributorRegistry;
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
 	private FragmentRendererController _fragmentRendererController;

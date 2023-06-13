@@ -372,11 +372,6 @@ public class UserTrackerWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected UserTrackerWrapper wrap(UserTracker userTracker) {
 		return new UserTrackerWrapper(userTracker);
 	}

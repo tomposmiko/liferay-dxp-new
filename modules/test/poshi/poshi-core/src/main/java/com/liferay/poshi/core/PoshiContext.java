@@ -18,15 +18,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
-import com.liferay.poshi.core.elements.PoshiElementAttribute;
-import com.liferay.poshi.core.elements.PoshiElementException;
-import com.liferay.poshi.core.elements.PropertyPoshiElement;
 import com.liferay.poshi.core.pql.PQLEntity;
 import com.liferay.poshi.core.pql.PQLEntityFactory;
 import com.liferay.poshi.core.prose.PoshiProseMatcher;
 import com.liferay.poshi.core.script.PoshiScriptParserException;
 import com.liferay.poshi.core.selenium.LiferaySelenium;
-import com.liferay.poshi.core.selenium.LiferaySeleniumMethod;
 import com.liferay.poshi.core.util.FileUtil;
 import com.liferay.poshi.core.util.GetterUtil;
 import com.liferay.poshi.core.util.MathUtil;
@@ -37,7 +33,6 @@ import com.liferay.poshi.core.util.StringUtil;
 import com.liferay.poshi.core.util.Validator;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -64,6 +59,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +70,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -101,8 +96,6 @@ public class PoshiContext {
 		_filePaths.clear();
 		_functionFileNames.clear();
 		_functionLocatorCounts.clear();
-		_liferaySeleniumMethods.clear();
-		_macroFileNames.clear();
 		_namespacedClassCommandNamePropertiesMap.clear();
 		_namespaces.clear();
 		_overrideClassNames.clear();
@@ -111,6 +104,7 @@ public class PoshiContext {
 		_poshiPropertyNames.clear();
 		_rootElements.clear();
 		_rootVarElements.clear();
+		_seleniumParameterCounts.clear();
 		_testCaseDescriptions.clear();
 		_testCaseNamespacedClassCommandNames.clear();
 		_testCaseNamespacedClassNames.clear();
@@ -219,20 +213,10 @@ public class PoshiContext {
 		return 0;
 	}
 
-	public static int getFunctionMaxArgumentCount() {
-		return _MAX_ARGUMENT_COUNT;
-	}
-
 	public static Element getFunctionRootElement(
 		String className, String namespace) {
 
 		return _rootElements.get("function#" + namespace + "." + className);
-	}
-
-	public static LiferaySeleniumMethod getLiferaySeleniumMethod(
-		String methodName) {
-
-		return _liferaySeleniumMethods.get(methodName);
 	}
 
 	public static Element getMacroCommandElement(
@@ -247,10 +231,6 @@ public class PoshiContext {
 
 		return _commandSummaries.get(
 			"macro#" + namespace + "." + classCommandName);
-	}
-
-	public static Set<String> getMacroFileNames() {
-		return _macroFileNames;
 	}
 
 	public static Element getMacroRootElement(
@@ -325,59 +305,6 @@ public class PoshiContext {
 		return _rootElements.get("path#" + namespace + "." + className);
 	}
 
-	public static List<File> getPoshiDirs() throws IOException {
-		return getPoshiDirs(null);
-	}
-
-	public static List<File> getPoshiDirs(File currentDir) throws IOException {
-		List<File> dirs = new ArrayList<>();
-
-		Properties properties = new Properties();
-
-		currentDir = getProjectDir(currentDir);
-
-		for (String poshiPropertiesFileName : _POSHI_PROPERTIES_FILE_NAMES) {
-			File propertiesFile = new File(currentDir, poshiPropertiesFileName);
-
-			if (propertiesFile.exists()) {
-				properties.load(
-					new FileReader(propertiesFile.getCanonicalPath()));
-			}
-		}
-
-		for (String poshiDirPropertyName : _POSHI_DIR_PROPERTY_NAMES) {
-			String poshiDirPropertyValue = properties.getProperty(
-				poshiDirPropertyName);
-
-			if (poshiDirPropertyValue == null) {
-				continue;
-			}
-
-			String[] dirNames = StringUtil.split(poshiDirPropertyValue);
-
-			for (String dirName : dirNames) {
-				File dir = null;
-
-				if (dirName.startsWith(FileUtil.getSeparator())) {
-					dir = new File(dirName);
-				}
-				else {
-					dir = new File(currentDir, dirName);
-				}
-
-				if (dir.exists()) {
-					dirs.add(dir.getCanonicalFile());
-				}
-			}
-		}
-
-		if (dirs.isEmpty()) {
-			dirs.add(currentDir);
-		}
-
-		return dirs;
-	}
-
 	public static List<String> getPoshiPropertyNames() {
 		Set<String> poshiPropertyNames = new HashSet<>(_poshiPropertyNames);
 
@@ -410,45 +337,6 @@ public class PoshiContext {
 		return new ArrayList<>(poshiPropertyNames);
 	}
 
-	public static File getProjectDir() throws IOException {
-		return getProjectDir(null);
-	}
-
-	public static File getProjectDir(File currentDir) throws IOException {
-		if (currentDir == null) {
-			currentDir = new File(".");
-		}
-
-		currentDir = currentDir.getCanonicalFile();
-
-		if (_baseDir == null) {
-			_baseDir = currentDir;
-		}
-
-		for (String poshiPropertiesFileName : _POSHI_PROPERTIES_FILE_NAMES) {
-			File poshiPropertiesFile = new File(
-				currentDir, poshiPropertiesFileName);
-
-			if (poshiPropertiesFile.exists()) {
-				return currentDir;
-			}
-		}
-
-		File gitDir = new File(currentDir, ".git");
-
-		if (gitDir.exists()) {
-			return currentDir;
-		}
-
-		File parentDir = currentDir.getParentFile();
-
-		if (parentDir == null) {
-			return _baseDir;
-		}
-
-		return getProjectDir(currentDir.getParentFile());
-	}
-
 	public static List<String> getRequiredPoshiPropertyNames() {
 		List<String> requiredPoshiPropertyNames = new ArrayList<>();
 
@@ -471,8 +359,12 @@ public class PoshiContext {
 			classType + "#" + namespace + "." + className);
 	}
 
+	public static int getSeleniumParameterCount(String commandName) {
+		return _seleniumParameterCounts.get(commandName);
+	}
+
 	public static List<List<String>> getTestBatchGroups(
-			String propertyQuery, long maxGroupSize)
+			String propertyQuery, int maxGroupSize)
 		throws Exception {
 
 		if (maxGroupSize <= 0) {
@@ -502,13 +394,7 @@ public class PoshiContext {
 				}
 			}
 
-			if (!properties.containsKey("test.liferay.virtual.instance") ||
-				Boolean.parseBoolean(
-					(String)properties.get("test.liferay.virtual.instance"))) {
-
-				properties.remove("test.class.method.name");
-			}
-
+			properties.remove("test.class.method.name");
 			properties.remove("test.class.name");
 
 			multimap.put(properties, classCommandName);
@@ -523,14 +409,14 @@ public class PoshiContext {
 
 			Collections.sort(classCommandNameGroup);
 
-			long testCount = classCommandNameGroup.size();
+			int testCount = classCommandNameGroup.size();
 
-			long groupCount = MathUtil.quotient(testCount, maxGroupSize, true);
+			int groupCount = MathUtil.quotient(testCount, maxGroupSize, true);
 
-			long groupSize = MathUtil.quotient(testCount, groupCount, true);
+			int groupSize = MathUtil.quotient(testCount, groupCount, true);
 
 			List<List<String>> testBatchGroups = Lists.partition(
-				classCommandNameGroup, GetterUtil.getInteger(groupSize));
+				classCommandNameGroup, groupSize);
 
 			for (List<String> testBatchGroup : testBatchGroups) {
 				orderedTestBatchGroups.put(
@@ -552,10 +438,19 @@ public class PoshiContext {
 		return _testCaseDescriptions.get(classCommandName);
 	}
 
+	public static String getTestCaseNamespacedClassCommandName() {
+		return _testCaseNamespacedClassCommandName;
+	}
+
 	public static Element getTestCaseRootElement(
 		String className, String namespace) {
 
 		return _rootElements.get("test-case#" + namespace + "." + className);
+	}
+
+	public static boolean ignoreUtilClassesErrors() {
+		return GetterUtil.getBoolean(
+			PropsUtil.get("ignore.errors.util.classes"));
 	}
 
 	public static boolean isCommandElement(
@@ -595,104 +490,80 @@ public class PoshiContext {
 	}
 
 	public static void readFiles() throws Exception {
-		readFiles(true, null);
+		readFiles(null);
 	}
 
-	public static void readFiles(boolean readAll) throws Exception {
-		readFiles(readAll, null);
-	}
-
-	public static void readFiles(
-			boolean readAll, String[] includes, String... baseDirNames)
+	public static void readFiles(String[] includes, String... baseDirNames)
 		throws Exception {
 
 		System.out.println("Start reading Poshi files.");
 
 		long start = System.currentTimeMillis();
 
+		if (includes == null) {
+			includes = POSHI_TEST_FILE_INCLUDES;
+		}
+
 		Set<String> poshiFileIncludes = new HashSet<>();
 
-		if (readAll) {
-			if (includes == null) {
-				includes = POSHI_TEST_FILE_INCLUDES;
-			}
-
-			Collections.addAll(poshiFileIncludes, includes);
-		}
-		else {
-			List<String> testNames = Arrays.asList(
-				PropsValues.TEST_NAME.split("\\s*,\\s*"));
-
-			for (String testName : testNames) {
-				String className =
-					PoshiGetterUtil.getClassNameFromNamespacedClassCommandName(
-						testName);
-
-				Collections.addAll(
-					poshiFileIncludes, "**/" + className + ".{prose,testcase}");
-			}
-		}
-
+		Collections.addAll(poshiFileIncludes, includes);
 		Collections.addAll(poshiFileIncludes, POSHI_SUPPORT_FILE_INCLUDES);
 
 		_readPoshiFilesFromClassPath(
-			poshiFileIncludes.toArray(new String[0]), "default/testFunctional",
-			"testFunctional");
+			poshiFileIncludes.toArray(new String[0]), "testFunctional");
 
 		String testBaseDirName = PropsUtil.get("test.base.dir.name");
 
-		if (((baseDirNames == null) || (baseDirNames.length == 0)) &&
-			(Validator.isNull(testBaseDirName) || testBaseDirName.isEmpty())) {
+		if ((baseDirNames == null) || (baseDirNames.length == 0)) {
+			if ((testBaseDirName == null) || testBaseDirName.isEmpty()) {
+				throw new RuntimeException("Please set 'test.base.dir.name'");
+			}
 
-			throw new RuntimeException("Please set 'test.base.dir.name'");
+			baseDirNames = new String[] {testBaseDirName};
 		}
 
-		Set<URL> poshiURLs = new HashSet<>();
+		String testSubrepoDirs = PropsUtil.get("test.subrepo.dirs");
 
-		Set<String> testDirNames = new HashSet<>();
-
-		if (Validator.isNotNull(baseDirNames)) {
-			Collections.addAll(testDirNames, baseDirNames);
+		if ((testSubrepoDirs != null) && !testSubrepoDirs.isEmpty()) {
+			baseDirNames = ArrayUtils.addAll(
+				baseDirNames, StringUtil.split(testSubrepoDirs));
 		}
 
-		if (Validator.isNotNull(testBaseDirName)) {
-			testDirNames.add(testBaseDirName);
+		String testIncludeDirNames = PropsUtil.get("test.include.dir.names");
+
+		if ((testIncludeDirNames != null) && !testIncludeDirNames.isEmpty()) {
+			Set<String> testIncludeDirPaths = new HashSet<>();
+
+			for (String testIncludeDirName :
+					StringUtil.split(testIncludeDirNames)) {
+
+				File testIncludeDir = new File(testIncludeDirName);
+
+				if (!testIncludeDir.exists()) {
+					testIncludeDir = new File(
+						testBaseDirName, testIncludeDirName);
+				}
+
+				if (!testIncludeDir.exists()) {
+					continue;
+				}
+
+				testIncludeDirPaths.add(testIncludeDir.getCanonicalPath());
+			}
+
+			_readPoshiFiles(
+				POSHI_SUPPORT_FILE_INCLUDES,
+				testIncludeDirPaths.toArray(new String[0]));
 		}
 
-		String[] testDirs = StringUtil.split(PropsUtil.get("test.dirs"));
-
-		if ((testDirs != null) && (testDirs.length > 0)) {
-			Collections.addAll(testDirNames, testDirs);
-		}
-
-		for (String testDirName : testDirNames) {
-			poshiURLs.addAll(
-				_getPoshiURLs(
-					poshiFileIncludes.toArray(new String[0]), testDirName));
-		}
-
-		Set<String> testSupportDirNames = new HashSet<>();
-
-		String[] testSupportDirs = StringUtil.split(
-			PropsUtil.get("test.support.dirs"));
-
-		if ((testSupportDirs != null) && (testSupportDirs.length > 0)) {
-			Collections.addAll(testSupportDirNames, testSupportDirs);
-		}
-
-		for (String testSupportDirName : testSupportDirNames) {
-			poshiURLs.addAll(
-				_getPoshiURLs(POSHI_SUPPORT_FILE_INCLUDES, testSupportDirName));
-		}
-
-		_readPoshiFiles(poshiURLs);
+		_readPoshiFiles(poshiFileIncludes.toArray(new String[0]), baseDirNames);
 		_readSeleniumFiles();
 
 		_initComponentCommandNamesMap();
 
-		PoshiScriptParserException.throwExceptions();
-
 		_throwExceptions();
+
+		PoshiScriptParserException.throwExceptions();
 
 		long duration = System.currentTimeMillis() - start;
 
@@ -700,29 +571,26 @@ public class PoshiContext {
 			"Completed reading Poshi files in " + duration + "ms.");
 	}
 
-	public static void setFunctionFileNames(String... functionFileNames) {
-		Collections.addAll(_functionFileNames, functionFileNames);
+	public static void setTestCaseNamespacedClassCommandName(
+		String testCaseNamespacedClassCommandName) {
+
+		_testCaseNamespacedClassCommandName =
+			testCaseNamespacedClassCommandName;
 	}
 
-	public static void setMacroFileNames(String... macroFileNames) {
-		Collections.addAll(_macroFileNames, macroFileNames);
-	}
-
-	private static void _executePoshiFileRunnables(
-			String poshiFileType, List<PoshiFileRunnable> poshiFileRunnables,
+	private static void _executePoshiFileCallables(
+			String poshiFileType, List<PoshiFileCallable> poshiFileCallables,
 			int threadPoolSize)
 		throws Exception {
 
 		ExecutorService executorService = Executors.newFixedThreadPool(
 			threadPoolSize);
 
-		for (PoshiFileRunnable poshiFileRunnable : poshiFileRunnables) {
-			executorService.execute(poshiFileRunnable);
-		}
+		executorService.invokeAll(poshiFileCallables);
 
 		executorService.shutdown();
 
-		if (!executorService.awaitTermination(2, TimeUnit.MINUTES)) {
+		if (!executorService.awaitTermination(1, TimeUnit.MINUTES)) {
 			throw new TimeoutException(
 				"Timed out while loading " + poshiFileType + " Poshi files");
 		}
@@ -738,15 +606,7 @@ public class PoshiContext {
 
 		for (Element propertyElement : rootPropertyElements) {
 			String propertyName = propertyElement.attributeValue("name");
-
 			String propertyValue = propertyElement.attributeValue("value");
-
-			if (Validator.isNull(propertyValue)) {
-				PropertyPoshiElement propertyPoshiElement =
-					(PropertyPoshiElement)propertyElement;
-
-				propertyValue = propertyPoshiElement.getVarValue();
-			}
 
 			properties.setProperty(propertyName, propertyValue);
 		}
@@ -756,26 +616,9 @@ public class PoshiContext {
 
 		for (Element propertyElement : commandPropertyElements) {
 			String propertyName = propertyElement.attributeValue("name");
-
 			String propertyValue = propertyElement.attributeValue("value");
 
-			if (Validator.isNull(propertyValue)) {
-				PropertyPoshiElement propertyPoshiElement =
-					(PropertyPoshiElement)propertyElement;
-
-				propertyValue = propertyPoshiElement.getVarValue();
-			}
-
 			properties.setProperty(propertyName, propertyValue);
-		}
-
-		if (Validator.isNotNull(
-				commandElement.attributeValue("disable-webdriver"))) {
-
-			String disableWebdriver = commandElement.attributeValue(
-				"disable-webdriver");
-
-			properties.setProperty("disable-webdriver", disableWebdriver);
 		}
 
 		if (Validator.isNotNull(
@@ -849,30 +692,25 @@ public class PoshiContext {
 		return "true";
 	}
 
-	private static Set<URL> _getPoshiURLs(
+	private static List<URL> _getPoshiURLs(
 			FileSystem fileSystem, String[] includes, String baseDirName)
 		throws IOException {
 
-		Set<URL> urls = new HashSet<>();
+		List<URL> urls = null;
 
 		if (fileSystem == null) {
-			File file = new File(baseDirName);
-
-			baseDirName = file.getCanonicalPath();
-
-			urls.addAll(
-				FileUtil.getIncludedResourceURLs(includes, baseDirName));
+			urls = FileUtil.getIncludedResourceURLs(includes, baseDirName);
 		}
 		else {
-			urls.addAll(
-				FileUtil.getIncludedResourceURLs(
-					fileSystem, includes, baseDirName));
+			urls = FileUtil.getIncludedResourceURLs(
+				fileSystem, includes, baseDirName);
 		}
 
 		return urls;
 	}
 
-	private static Set<URL> _getPoshiURLs(String[] includes, String baseDirName)
+	private static List<URL> _getPoshiURLs(
+			String[] includes, String baseDirName)
 		throws Exception {
 
 		return _getPoshiURLs(null, includes, baseDirName);
@@ -1283,8 +1121,14 @@ public class PoshiContext {
 		}
 	}
 
-	private static void _readPoshiFiles(Set<URL> poshiURLs) throws Exception {
-		_storeRootElements(poshiURLs, _DEFAULT_NAMESPACE);
+	private static void _readPoshiFiles(
+			String[] includes, String... baseDirNames)
+		throws Exception {
+
+		for (String baseDirName : baseDirNames) {
+			_storeRootElements(
+				_getPoshiURLs(includes, baseDirName), _DEFAULT_NAMESPACE);
+		}
 
 		if (!_duplicateLocatorMessages.isEmpty()) {
 			throw _getDuplicateLocatorsException();
@@ -1311,43 +1155,35 @@ public class PoshiContext {
 						URI.create(resourceURLString.substring(0, x)),
 						new HashMap<String, String>(), classLoader)) {
 
-					String namespace = null;
-
 					Matcher matcher = _poshiResourceJarNamePattern.matcher(
 						resourceURLString);
 
-					if (matcher.find()) {
-						namespace = StringUtils.capitalize(
-							matcher.group("namespace"));
-					}
-					else if (resourceName.equals("default/testFunctional")) {
-						namespace = "Default";
-					}
-
-					if (namespace == null) {
+					if (!matcher.find()) {
 						throw new RuntimeException(
 							"A namespace must be defined for resource: " +
 								resourceURLString);
 					}
+
+					String namespace = StringUtils.capitalize(
+						matcher.group("namespace"));
 
 					if (namespace.equals(_DEFAULT_NAMESPACE)) {
 						throw new RuntimeException(
 							"Namespace: '" + _DEFAULT_NAMESPACE +
 								"' is reserved");
 					}
-
-					if (_namespaces.contains(namespace)) {
+					else if (_namespaces.contains(namespace)) {
 						throw new RuntimeException(
 							"Duplicate namespace " + namespace);
 					}
 
 					_namespaces.add(namespace);
 
-					_storeRootElements(
-						_getPoshiURLs(
-							fileSystem, includes,
-							resourceURLString.substring(x + 1)),
-						namespace);
+					List<URL> poshiURLs = _getPoshiURLs(
+						fileSystem, includes,
+						resourceURLString.substring(x + 1));
+
+					_storeRootElements(poshiURLs, namespace);
 				}
 			}
 		}
@@ -1357,12 +1193,12 @@ public class PoshiContext {
 		Method[] methods = LiferaySelenium.class.getMethods();
 
 		for (Method method : methods) {
-			LiferaySeleniumMethod liferaySeleniumMethod =
-				new LiferaySeleniumMethod(method);
+			Class<?>[] classes = method.getParameterTypes();
 
-			_liferaySeleniumMethods.put(
-				method.getName(), liferaySeleniumMethod);
+			_seleniumParameterCounts.put(method.getName(), classes.length);
 		}
+
+		_seleniumParameterCounts.put("open", 1);
 	}
 
 	private static void _storePathElement(
@@ -1387,13 +1223,6 @@ public class PoshiContext {
 
 		for (Element trElement : trElements) {
 			List<Element> tdElements = trElement.elements("td");
-
-			if (tdElements.size() != 3) {
-				throw new Exception(
-					"<tr> element must have 3 <td> child elements at:\n" +
-						filePath + ":" +
-							trElement.attributeValue("line-number"));
-			}
 
 			Element locatorKeyElement = tdElements.get(0);
 
@@ -1591,22 +1420,6 @@ public class PoshiContext {
 				Element defaultCommandElement = getFunctionCommandElement(
 					defaultClassCommandName, namespace);
 
-				if (defaultCommandElement == null) {
-					String message =
-						"Unable to find default function \"" +
-							rootElement.attributeValue("default") + "\"";
-
-					Attribute defaultAttribute = rootElement.attribute(
-						"default");
-
-					if (defaultAttribute instanceof PoshiElementAttribute) {
-						throw new PoshiElementException(
-							message, (PoshiElementAttribute)defaultAttribute);
-					}
-
-					throw new Exception(message);
-				}
-
 				_commandElements.put(
 					classType + "#" + namespace + "." + className,
 					defaultCommandElement);
@@ -1639,65 +1452,45 @@ public class PoshiContext {
 		}
 	}
 
-	private static void _storeRootElements(Set<URL> urls, String namespace)
+	private static void _storeRootElements(List<URL> urls, String namespace)
 		throws Exception {
 
-		List<PoshiFileRunnable> dependencyPoshiFileRunnables =
+		List<PoshiFileCallable> dependencyPoshiFileCallables =
 			new ArrayList<>();
-		List<PoshiFileRunnable> macroPoshiFileRunnables = new ArrayList<>();
-		List<PoshiFileRunnable> testPoshiFileRunnables = new ArrayList<>();
+		List<PoshiFileCallable> macroPoshiFileCallables = new ArrayList<>();
+		List<PoshiFileCallable> testPoshiFileCallables = new ArrayList<>();
 
 		for (URL url : urls) {
-			File file = new File(url.getFile());
+			String fileName = url.getFile();
 
-			String fileName = file.getName();
-
-			if (fileName.endsWith(".function")) {
-				_functionFileNames.add(
-					StringUtil.replace(fileName, ".function", ""));
-
-				_functionFileNames.add(
-					namespace + "." +
-						StringUtil.replace(fileName, ".function", ""));
-			}
-
-			if (fileName.endsWith(".macro")) {
-				_validateUniqueCommandName(
-					StringUtil.replace(fileName, ".macro", ""), file.getPath());
-
-				_macroFileNames.add(StringUtil.replace(fileName, ".macro", ""));
-
-				_macroFileNames.add(
-					namespace + "." +
-						StringUtil.replace(fileName, ".macro", ""));
-
-				macroPoshiFileRunnables.add(
-					new PoshiFileRunnable(url, namespace));
+			if (fileName.contains(".macro")) {
+				macroPoshiFileCallables.add(
+					new PoshiFileCallable(url, namespace));
 
 				continue;
 			}
 
-			if (fileName.endsWith(".testcase") || fileName.endsWith(".prose")) {
-				testPoshiFileRunnables.add(
-					new PoshiFileRunnable(url, namespace));
+			if (fileName.contains(".testcase") || fileName.contains(".prose")) {
+				testPoshiFileCallables.add(
+					new PoshiFileCallable(url, namespace));
 
 				continue;
 			}
 
-			dependencyPoshiFileRunnables.add(
-				new PoshiFileRunnable(url, namespace));
+			dependencyPoshiFileCallables.add(
+				new PoshiFileCallable(url, namespace));
 		}
 
-		_executePoshiFileRunnables(
-			"dependency", dependencyPoshiFileRunnables,
+		_executePoshiFileCallables(
+			"dependency", dependencyPoshiFileCallables,
 			PropsValues.POSHI_FILE_READ_THREAD_POOL);
 
-		_executePoshiFileRunnables(
-			"macro", macroPoshiFileRunnables,
+		_executePoshiFileCallables(
+			"macro", macroPoshiFileCallables,
 			PropsValues.POSHI_FILE_READ_THREAD_POOL);
 
-		_executePoshiFileRunnables(
-			"test", testPoshiFileRunnables,
+		_executePoshiFileCallables(
+			"test", testPoshiFileCallables,
 			PropsValues.POSHI_FILE_READ_THREAD_POOL);
 	}
 
@@ -1756,23 +1549,6 @@ public class PoshiContext {
 					"\"")));
 	}
 
-	private static void _validateUniqueCommandName(
-		String macroName, String filePath) {
-
-		for (String functionName : _functionFileNames) {
-			if (functionName.contains("LocalFile")) {
-				functionName = StringUtil.replace(
-					functionName, "LocalFile.", "");
-			}
-
-			if (functionName.equals(macroName)) {
-				throw new RuntimeException(
-					"Duplicate macro and function file name: " + macroName +
-						"\n" + filePath + "\n");
-			}
-		}
-	}
-
 	private static void _writeTestCaseMethodNamesProperties() throws Exception {
 		StringBuilder sb = new StringBuilder();
 
@@ -1785,10 +1561,11 @@ public class PoshiContext {
 				maxSubgroupSize = 1;
 			}
 
+			List<List<String>> testBatchGroups = getTestBatchGroups(
+				PropsValues.TEST_BATCH_PROPERTY_QUERY, maxSubgroupSize);
+
 			List<List<List<String>>> segments = Lists.partition(
-				getTestBatchGroups(
-					PropsValues.TEST_BATCH_PROPERTY_QUERY, maxSubgroupSize),
-				PropsValues.TEST_BATCH_MAX_GROUP_SIZE);
+				testBatchGroups, PropsValues.TEST_BATCH_MAX_GROUP_SIZE);
 
 			for (int i = 0; i < segments.size(); i++) {
 				List<List<String>> segment = segments.get(i);
@@ -1957,18 +1734,6 @@ public class PoshiContext {
 
 	private static final String _DEFAULT_NAMESPACE = "LocalFile";
 
-	private static final int _MAX_ARGUMENT_COUNT = 3;
-
-	private static final String[] _POSHI_DIR_PROPERTY_NAMES = {
-		"test.base.dir.name", "test.dirs", "test.include.dir.names",
-		"test.subrepo.dirs", "test.support.dirs"
-	};
-
-	private static final String[] _POSHI_PROPERTIES_FILE_NAMES = {
-		"test.properties", "poshi.properties", "poshi-ext.properties"
-	};
-
-	private static File _baseDir;
 	private static final Map<String, Element> _commandElements =
 		Collections.synchronizedMap(new HashMap<>());
 	private static final Map<String, String> _commandSummaries =
@@ -1983,10 +1748,6 @@ public class PoshiContext {
 		Collections.synchronizedSet(new HashSet<>());
 	private static final Map<String, Integer> _functionLocatorCounts =
 		Collections.synchronizedMap(new HashMap<>());
-	private static final Map<String, LiferaySeleniumMethod>
-		_liferaySeleniumMethods = Collections.synchronizedMap(new HashMap<>());
-	private static final Set<String> _macroFileNames =
-		Collections.synchronizedSet(new HashSet<>());
 	private static final Pattern _namespaceClassCommandNamePattern =
 		Pattern.compile(
 			"(?<namespace>[^\\.]+)\\.(?<className>[^\\#]+)\\#" +
@@ -2011,16 +1772,19 @@ public class PoshiContext {
 		Collections.synchronizedMap(new HashMap<>());
 	private static final Map<String, List<Element>> _rootVarElements =
 		Collections.synchronizedMap(new HashMap<>());
+	private static final Map<String, Integer> _seleniumParameterCounts =
+		Collections.synchronizedMap(new HashMap<>());
 	private static final Map<String, String> _testCaseDescriptions =
 		Collections.synchronizedMap(new HashMap<>());
+	private static String _testCaseNamespacedClassCommandName;
 	private static final List<String> _testCaseNamespacedClassCommandNames =
 		Collections.synchronizedList(new ArrayList<>());
 	private static final List<String> _testCaseNamespacedClassNames =
 		Collections.synchronizedList(new ArrayList<>());
 
-	private static class PoshiFileRunnable implements Runnable {
+	private static class PoshiFileCallable implements Callable<URL> {
 
-		public void run() {
+		public URL call() {
 			String filePath = _url.getFile();
 
 			try {
@@ -2055,23 +1819,29 @@ public class PoshiContext {
 
 				if (rootElement.attributeValue("override") == null) {
 					_filePaths.put(_namespace + "." + fileName, filePath);
+
+					if (fileName.endsWith(".function")) {
+						_functionFileNames.add(
+							StringUtil.replace(fileName, ".function", ""));
+
+						_functionFileNames.add(
+							_namespace + "." +
+								StringUtil.replace(fileName, ".function", ""));
+					}
 				}
 			}
 			catch (Exception exception) {
 				if (!(exception instanceof PoshiScriptParserException)) {
-					if (exception instanceof PoshiElementException) {
-						_exceptions.add(exception);
-					}
-					else {
-						_exceptions.add(
-							new Exception(
-								"Unable to read: " + filePath, exception));
-					}
+					_exceptions.add(
+						new Exception(
+							"Unable to read: " + filePath, exception));
 				}
 			}
+
+			return _url;
 		}
 
-		private PoshiFileRunnable(URL url, String namespace) {
+		private PoshiFileCallable(URL url, String namespace) {
 			_url = url;
 			_namespace = namespace;
 		}

@@ -32,6 +32,7 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 			actions = {
 				"setVisible('ddmStructureId', FALSE)",
 				"setVisible('ddmStructureLayoutId', FALSE)",
+				"setVisible('fieldReference', FALSE)",
 				"setVisible('name', FALSE)", "setVisible('rows', FALSE)",
 				"setVisible('upgradedStructure', FALSE)"
 			},
@@ -50,23 +51,12 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 						@DDMFormLayoutColumn(
 							size = 12,
 							value = {
-								"label", "collapsible", "labelAtStructureLevel",
+								"label", "name", "fieldReference",
+								"collapsible", "labelAtStructureLevel",
 								"repeatable", "showLabel", "rows", "type",
 								"ddmStructureId", "ddmStructureLayoutId",
 								"upgradedStructure"
 							}
-						)
-					}
-				)
-			}
-		),
-		@DDMFormLayoutPage(
-			title = "%advanced",
-			value = {
-				@DDMFormLayoutRow(
-					{
-						@DDMFormLayoutColumn(
-							size = 12, value = {"name", "fieldReference"}
 						)
 					}
 				)

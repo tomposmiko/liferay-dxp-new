@@ -12,9 +12,36 @@
  * details.
  */
 
-import {getDefaultDataLayout} from '../../../../src/main/resources/META-INF/resources/data_layout_builder/js/utils/dataConverter.es';
+import dataConverter, {
+	getDataDefinitionField,
+	getDefaultDataLayout,
+} from '../../../../src/main/resources/META-INF/resources/data_layout_builder/js/utils/dataConverter.es';
 
 describe('dataConverter', () => {
+	it('is getting component form data property', () => {
+		expect(
+			dataConverter._fromDDMFormToDataDefinitionPropertyName('fieldName')
+		).toBe('name');
+		expect(
+			dataConverter._fromDDMFormToDataDefinitionPropertyName(
+				'nestedFields'
+			)
+		).toBe('nestedDataDefinitionFields');
+		expect(
+			dataConverter._fromDDMFormToDataDefinitionPropertyName(
+				'predefinedValue'
+			)
+		).toBe('defaultValue');
+		expect(
+			dataConverter._fromDDMFormToDataDefinitionPropertyName('type')
+		).toBe('fieldType');
+		expect(
+			dataConverter._fromDDMFormToDataDefinitionPropertyName(
+				'otherProperty'
+			)
+		).toBe('otherProperty');
+	});
+
 	it('is getting defaultDataLayout', () => {
 		const dataDefinition = {
 			dataDefinitionFields: [],
@@ -23,5 +50,28 @@ describe('dataConverter', () => {
 		expect(getDefaultDataLayout(dataDefinition)).toMatchObject({
 			dataLayoutPages: [{dataLayoutRows: []}],
 		});
+	});
+
+	it('is getting data definition field', () => {
+		expect(
+			getDataDefinitionField(
+				{
+					nestedFields: [],
+					settingsContext: {
+						pages: [],
+					},
+				},
+				[],
+				'en_US'
+			)
+		).toMatchObject({
+			customProperties: {},
+			nestedDataDefinitionFields: [],
+		});
+	});
+
+	it('is component custom property', () => {
+		expect(dataConverter._isCustomProperty('defaultValue')).toBe(false);
+		expect(dataConverter._isCustomProperty('otherProperty')).toBe(true);
 	});
 });

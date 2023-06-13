@@ -57,9 +57,9 @@ CPPublisherConfigurationDisplayContext cpPublisherConfigurationDisplayContext = 
 		).put(
 			"namespace", liferayPortletResponse.getNamespace()
 		).put(
-			"rules", cpPublisherConfigurationDisplayContext.getAutoFieldRulesJSONArray()
+			"pathThemeImages", themeDisplay.getPathThemeImages()
 		).put(
-			"spritemap", themeDisplay.getPathThemeSpritemap()
+			"rules", cpPublisherConfigurationDisplayContext.getAutoFieldRulesJSONArray()
 		).put(
 			"tagSelectorURL", cpPublisherConfigurationDisplayContext.getTagSelectorURL()
 		).put(

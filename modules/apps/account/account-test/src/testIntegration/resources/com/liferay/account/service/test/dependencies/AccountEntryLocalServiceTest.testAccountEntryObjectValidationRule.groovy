@@ -1,1 +1,0 @@
-invalidFields = "Invalid Name" == name;

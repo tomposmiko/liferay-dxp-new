@@ -54,14 +54,7 @@ String myWorkflowTasksPortletNamespace = PortalUtil.getPortletNamespace(PortletK
 						%>
 
 						<c:if test="<%= workflowedModel != null %>">
-							<c:choose>
-								<c:when test="<%= bean instanceof GroupedModel %>">
-									<aui:workflow-status bean="<%= bean %>" model="<%= model %>" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= workflowedModel.getStatus() %>" />
-								</c:when>
-								<c:otherwise>
-									<aui:workflow-status model="<%= model %>" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= workflowedModel.getStatus() %>" />
-								</c:otherwise>
-							</c:choose>
+							<aui:workflow-status bean="<%= bean %>" model="<%= model %>" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= workflowedModel.getStatus() %>" />
 						</c:if>
 					</c:if>
 				</div>
@@ -134,7 +127,7 @@ String myWorkflowTasksPortletNamespace = PortalUtil.getPortletNamespace(PortletK
 			<hr class="d-lg-none" />
 
 			<div class="align-items-center c-ml-auto d-flex justify-content-end">
-				<c:if test="<%= !CommercePortletKeys.COMMERCE_OPEN_ORDER_CONTENT.equals(PortalUtil.getPortletId(request)) && Validator.isNotNull(reviewWorkflowTask) %>">
+				<c:if test="<%= Validator.isNotNull(reviewWorkflowTask) %>">
 
 					<%
 					boolean assignedToCurrentUser = false;
@@ -325,7 +318,8 @@ String myWorkflowTasksPortletNamespace = PortalUtil.getPortletNamespace(PortletK
 						<aui:script require="commerce-frontend-js/components/dropdown/entry as dropdown">
 							dropdown.default('dropdown-header', 'dropdown-header-container', {
 								items: <%= jsonSerializer.serializeDeep(dropdownItems) %>,
-								spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+								spritemap:
+									'<%= themeDisplay.getPathThemeImages() + "/lexicon/icons.svg" %>',
 							});
 						</aui:script>
 					</c:if>
@@ -343,9 +337,7 @@ String myWorkflowTasksPortletNamespace = PortalUtil.getPortletNamespace(PortletK
 	</div>
 </div>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {debounce} = frontendJsWeb;
-
+<aui:script require="commerce-frontend-js/utilities/debounce as debounce">
 	var commerceHeader = document.querySelector('.commerce-header');
 	var pageHeader = document.querySelector('.page-header');
 
@@ -355,7 +347,7 @@ String myWorkflowTasksPortletNamespace = PortalUtil.getPortletNamespace(PortletK
 		pageHeader.style.top = distanceFromTop + 'px';
 	}
 
-	var debouncedUpdateMenuDistanceFromTop = debounce(
+	var debouncedUpdateMenuDistanceFromTop = debounce.default(
 		updateMenuDistanceFromTop,
 		200
 	);

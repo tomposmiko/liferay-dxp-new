@@ -15,18 +15,19 @@
 (function () {
 	CKEDITOR.plugins.add('autocomplete', {
 		init(editor) {
-			const instance = this;
+			var instance = this;
 
-			AUI().use('aui-debounce', 'liferay-autocomplete-input', () => {
-				const path = instance.path;
+			AUI().use('aui-debounce', 'liferay-autocomplete-input', (A) => {
+				var path = instance.path;
 
-				const dependencies = [
-					CKEDITOR.getUrl(path + 'autocomplete.js'),
-				];
+				var dependencies = [CKEDITOR.getUrl(path + 'autocomplete.js')];
 
 				CKEDITOR.scriptLoader.load(dependencies, () => {
-					const liferayAutoCompleteCKEditor = new Liferay.AutoCompleteCKEditor(
-						{...editor.config.autocomplete, editor, width: 300}
+					var liferayAutoCompleteCKEditor = new Liferay.AutoCompleteCKEditor(
+						A.merge(editor.config.autocomplete, {
+							editor,
+							width: 300,
+						})
 					);
 
 					liferayAutoCompleteCKEditor.render();

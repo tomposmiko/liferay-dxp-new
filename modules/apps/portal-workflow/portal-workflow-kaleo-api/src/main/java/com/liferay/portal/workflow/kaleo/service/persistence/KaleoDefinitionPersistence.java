@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchDefinitionException;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
 
@@ -34,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoDefinitionPersistence
-	extends BasePersistence<KaleoDefinition>, CTPersistence<KaleoDefinition> {
+	extends BasePersistence<KaleoDefinition> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

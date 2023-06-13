@@ -34,7 +34,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 <liferay-ui:membership-policy-error />
 
 <clay:content-row
-	containerElement="div"
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -45,29 +45,28 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 	<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
 		<clay:content-col>
-			<clay:button
-				aria-label='<%= LanguageUtil.format(request, "select-x", "organizations") %>'
-				cssClass="heading-end modify-link"
-				displayType="secondary"
-				id='<%= liferayPortletResponse.getNamespace() + "selectOrganizationLink" %>'
-				label='<%= LanguageUtil.get(request, "select") %>'
-				small="<%= true %>"
-			/>
+			<span class="heading-end">
+				<liferay-ui:icon
+					cssClass="modify-link"
+					id="selectOrganizationLink"
+					label="<%= true %>"
+					linkCssClass="btn btn-secondary btn-sm"
+					message="select"
+					method="get"
+					url="javascript:;"
+				/>
+			</span>
 		</clay:content-col>
 	</c:if>
 </clay:content-row>
 
 <liferay-util:buffer
-	var="removeButtonOrganizations"
+	var="removeOrganizationIcon"
 >
-	<clay:button
-		aria-label="TOKEN_ARIA_LABEL"
-		cssClass="lfr-portal-tooltip modify-link"
-		data-rowId="TOKEN_DATA_ROW_ID"
-		displayType="unstyled"
+	<liferay-ui:icon
 		icon="times-circle"
-		small="<%= true %>"
-		title="TOKEN_TITLE"
+		markupView="lexicon"
+		message="remove"
 	/>
 </liferay-util:buffer>
 
@@ -84,8 +83,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 	total="<%= organizations.size() %>"
 >
 	<liferay-ui:search-container-results
-		calculateStartAndEnd="<%= true %>"
-		results="<%= organizations %>"
+		results="<%= organizations.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 	/>
 
 	<liferay-ui:search-container-row
@@ -123,15 +121,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 		<c:if test="<%= !portletName.equals(myAccountPortletId) && ((selUser == null) || !OrganizationMembershipPolicyUtil.isMembershipProtected(permissionChecker, selUser.getUserId(), organization.getOrganizationId())) %>">
 			<liferay-ui:search-container-column-text>
-				<clay:button
-					aria-label='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(organization.getName())) %>'
-					cssClass="lfr-portal-tooltip modify-link"
-					data-rowId="<%= organization.getOrganizationId() %>"
-					displayType="unstyled"
-					icon="times-circle"
-					small="<%= true %>"
-					title='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(organization.getName())) %>'
-				/>
+				<a class="modify-link" data-rowId="<%= organization.getOrganizationId() %>" href="javascript:;"><%= removeOrganizationIcon %></a>
 			</liferay-ui:search-container-column-text>
 		</c:if>
 	</liferay-ui:search-container-row>
@@ -211,25 +201,17 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 					onSelect: (selectedItem) => {
 						if (selectedItem) {
 							const entityId = selectedItem.entityid;
-							const entityName = A.Escape.html(selectedItem.entityname);
-							const label = Liferay.Util.sub(
-								'<liferay-ui:message key="remove-x" />',
-								entityName
-							);
+
 							const rowColumns = [];
 
-							let removeButton =
-								'<%= UnicodeFormatter.toString(removeButtonOrganizations) %>';
-
-							removeButton = removeButton
-								.replace('TOKEN_ARIA_LABEL', label)
-								.replace('TOKEN_DATA_ROW_ID', entityId)
-								.replace('TOKEN_TITLE', label);
-
-							rowColumns.push(entityName);
+							rowColumns.push(selectedItem.entityname);
 							rowColumns.push(selectedItem.type);
 							rowColumns.push('');
-							rowColumns.push(removeButton);
+							rowColumns.push(
+								'<a class="modify-link" data-rowId="' +
+									entityId +
+									'" href="javascript:;"><%= UnicodeFormatter.toString(removeOrganizationIcon) %></a>'
+							);
 
 							searchContainer.addRow(rowColumns, entityId);
 
@@ -248,9 +230,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 						}
 					},
 					selectEventName: '<portlet:namespace />selectOrganization',
-					selectedData: <%= Arrays.toString(selUser.getOrganizationIds()) %>.map(
-						String
-					),
+					selectedData: [searchContainer.getData(true)],
 					title:
 						'<liferay-ui:message arguments="organization" key="select-x" />',
 					url:

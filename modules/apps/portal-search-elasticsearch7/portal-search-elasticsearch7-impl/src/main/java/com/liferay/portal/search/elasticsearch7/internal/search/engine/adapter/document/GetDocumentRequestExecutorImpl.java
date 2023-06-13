@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Bryan Engler
  */
-@Component(service = GetDocumentRequestExecutor.class)
+@Component(immediate = true, service = GetDocumentRequestExecutor.class)
 public class GetDocumentRequestExecutorImpl
 	implements GetDocumentRequestExecutor {
 
@@ -45,7 +45,7 @@ public class GetDocumentRequestExecutorImpl
 			_elasticsearchBulkableDocumentRequestTranslator.translate(
 				getDocumentRequest);
 
-		GetResponse getResponse = _getGetResponse(
+		GetResponse getResponse = getGetResponse(
 			getRequest, getDocumentRequest);
 
 		GetDocumentResponse getDocumentResponse = new GetDocumentResponse(
@@ -71,7 +71,7 @@ public class GetDocumentRequestExecutorImpl
 		return getDocumentResponse;
 	}
 
-	private GetResponse _getGetResponse(
+	protected GetResponse getGetResponse(
 		GetRequest getRequest, GetDocumentRequest getDocumentRequest) {
 
 		RestHighLevelClient restHighLevelClient =
@@ -87,17 +87,38 @@ public class GetDocumentRequestExecutorImpl
 		}
 	}
 
-	@Reference
-	private DocumentBuilderFactory _documentBuilderFactory;
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setBulkableDocumentRequestTranslator(
+		ElasticsearchBulkableDocumentRequestTranslator
+			elasticsearchBulkableDocumentRequestTranslator) {
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
+		_elasticsearchBulkableDocumentRequestTranslator =
+			elasticsearchBulkableDocumentRequestTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDocumentBuilderFactory(
+		DocumentBuilderFactory documentBuilderFactory) {
+
+		_documentBuilderFactory = documentBuilderFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGeoBuilders(GeoBuilders geoBuilders) {
+		_geoBuilders = geoBuilders;
+	}
+
+	private DocumentBuilderFactory _documentBuilderFactory;
 	private ElasticsearchBulkableDocumentRequestTranslator
 		_elasticsearchBulkableDocumentRequestTranslator;
-
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
-
-	@Reference
 	private GeoBuilders _geoBuilders;
 
 }

@@ -35,19 +35,19 @@ public class Reindex {
 
 	public Reindex(
 		IndexerRegistry indexerRegistry,
-		BulkReindexersRegistry bulkReindexersRegistry,
+		BulkReindexersHolder bulkReindexersHolder,
 		ExecutorService executorService,
 		ReindexRequestsHolder reindexRequestsHolder) {
 
 		_indexerRegistry = indexerRegistry;
-		_bulkReindexersRegistry = bulkReindexersRegistry;
+		_bulkReindexersHolder = bulkReindexersHolder;
 		_executorService = executorService;
 		_reindexRequestsHolder = reindexRequestsHolder;
 	}
 
 	public void reindex(String className, long... classPKs) {
 		if (_synchronousExecution) {
-			_reindex(className, ListUtil.fromArray(classPKs));
+			doReindex(className, ListUtil.fromArray(classPKs));
 
 			return;
 		}
@@ -63,7 +63,7 @@ public class Reindex {
 						className);
 
 					if (!classPKs.isEmpty()) {
-						_reindex(className, classPKs);
+						doReindex(className, classPKs);
 
 						_executorService.submit(this);
 					}
@@ -88,6 +88,19 @@ public class Reindex {
 		ReindexEndListener reindexEndListener) {
 
 		_reindexEndListeners.add(reindexEndListener);
+	}
+
+	protected void doReindex(String className, Collection<Long> classPKs) {
+		if (_nonbulkIndexing || (classPKs.size() < 2)) {
+			for (long classPK : classPKs) {
+				_reindex(className, classPK);
+			}
+		}
+		else {
+			_reindexBulk(className, classPKs);
+		}
+
+		_reindexEndListeners.forEach(ReindexEndListener::onReindexEnd);
 	}
 
 	protected Indexer<Object> getIndexer(String className) {
@@ -131,7 +144,7 @@ public class Reindex {
 			indexer.reindex(className, classPK);
 		}
 		catch (SearchException searchException) {
-			_log.error(searchException);
+			_log.error(searchException, searchException);
 		}
 	}
 
@@ -144,23 +157,10 @@ public class Reindex {
 			return;
 		}
 
-		BulkReindexer bulkReindexer = _bulkReindexersRegistry.getBulkReindexer(
+		BulkReindexer bulkReindexer = _bulkReindexersHolder.getBulkReindexer(
 			className);
 
 		bulkReindexer.reindex(_companyId, classPKs);
-	}
-
-	private void _reindex(String className, Collection<Long> classPKs) {
-		if (_nonbulkIndexing || (classPKs.size() < 2)) {
-			for (long classPK : classPKs) {
-				_reindex(className, classPK);
-			}
-		}
-		else {
-			_reindexBulk(className, classPKs);
-		}
-
-		_reindexEndListeners.forEach(ReindexEndListener::onReindexEnd);
 	}
 
 	private void _reindex(String className, long classPK) {
@@ -183,7 +183,7 @@ public class Reindex {
 
 	private static final Log _log = LogFactoryUtil.getLog(Reindex.class);
 
-	private final BulkReindexersRegistry _bulkReindexersRegistry;
+	private final BulkReindexersHolder _bulkReindexersHolder;
 	private long _companyId;
 	private CustomReindex _customReindex;
 	private CustomReindexBulk _customReindexBulk;

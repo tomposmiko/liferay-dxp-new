@@ -59,7 +59,7 @@ public class ObjectActionSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (objectAction.getActions() != null) {
 			if (sb.length() > 1) {
@@ -79,20 +79,6 @@ public class ObjectActionSerDes {
 			sb.append("\"active\": ");
 
 			sb.append(objectAction.getActive());
-		}
-
-		if (objectAction.getConditionExpression() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"conditionExpression\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(objectAction.getConditionExpression()));
-
-			sb.append("\"");
 		}
 
 		if (objectAction.getDateCreated() != null) {
@@ -125,44 +111,6 @@ public class ObjectActionSerDes {
 			sb.append("\"");
 		}
 
-		if (objectAction.getDescription() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"description\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(objectAction.getDescription()));
-
-			sb.append("\"");
-		}
-
-		if (objectAction.getErrorMessage() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"errorMessage\": ");
-
-			sb.append(_toJSON(objectAction.getErrorMessage()));
-		}
-
-		if (objectAction.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(objectAction.getExternalReferenceCode()));
-
-			sb.append("\"");
-		}
-
 		if (objectAction.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -171,16 +119,6 @@ public class ObjectActionSerDes {
 			sb.append("\"id\": ");
 
 			sb.append(objectAction.getId());
-		}
-
-		if (objectAction.getLabel() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"label\": ");
-
-			sb.append(_toJSON(objectAction.getLabel()));
 		}
 
 		if (objectAction.getName() != null) {
@@ -235,16 +173,6 @@ public class ObjectActionSerDes {
 			sb.append(_toJSON(objectAction.getParameters()));
 		}
 
-		if (objectAction.getStatus() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"status\": ");
-
-			sb.append(String.valueOf(objectAction.getStatus()));
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -265,7 +193,7 @@ public class ObjectActionSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (objectAction.getActions() == null) {
 			map.put("actions", null);
@@ -279,15 +207,6 @@ public class ObjectActionSerDes {
 		}
 		else {
 			map.put("active", String.valueOf(objectAction.getActive()));
-		}
-
-		if (objectAction.getConditionExpression() == null) {
-			map.put("conditionExpression", null);
-		}
-		else {
-			map.put(
-				"conditionExpression",
-				String.valueOf(objectAction.getConditionExpression()));
 		}
 
 		if (objectAction.getDateCreated() == null) {
@@ -308,43 +227,11 @@ public class ObjectActionSerDes {
 				liferayToJSONDateFormat.format(objectAction.getDateModified()));
 		}
 
-		if (objectAction.getDescription() == null) {
-			map.put("description", null);
-		}
-		else {
-			map.put(
-				"description", String.valueOf(objectAction.getDescription()));
-		}
-
-		if (objectAction.getErrorMessage() == null) {
-			map.put("errorMessage", null);
-		}
-		else {
-			map.put(
-				"errorMessage", String.valueOf(objectAction.getErrorMessage()));
-		}
-
-		if (objectAction.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(objectAction.getExternalReferenceCode()));
-		}
-
 		if (objectAction.getId() == null) {
 			map.put("id", null);
 		}
 		else {
 			map.put("id", String.valueOf(objectAction.getId()));
-		}
-
-		if (objectAction.getLabel() == null) {
-			map.put("label", null);
-		}
-		else {
-			map.put("label", String.valueOf(objectAction.getLabel()));
 		}
 
 		if (objectAction.getName() == null) {
@@ -377,13 +264,6 @@ public class ObjectActionSerDes {
 		}
 		else {
 			map.put("parameters", String.valueOf(objectAction.getParameters()));
-		}
-
-		if (objectAction.getStatus() == null) {
-			map.put("status", null);
-		}
-		else {
-			map.put("status", String.valueOf(objectAction.getStatus()));
 		}
 
 		return map;
@@ -419,14 +299,6 @@ public class ObjectActionSerDes {
 					objectAction.setActive((Boolean)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(
-						jsonParserFieldName, "conditionExpression")) {
-
-				if (jsonParserFieldValue != null) {
-					objectAction.setConditionExpression(
-						(String)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					objectAction.setDateCreated(
@@ -439,37 +311,10 @@ public class ObjectActionSerDes {
 						toDate((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "description")) {
-				if (jsonParserFieldValue != null) {
-					objectAction.setDescription((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "errorMessage")) {
-				if (jsonParserFieldValue != null) {
-					objectAction.setErrorMessage(
-						(Map)ObjectActionSerDes.toMap(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					objectAction.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
 				if (jsonParserFieldValue != null) {
 					objectAction.setId(
 						Long.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "label")) {
-				if (jsonParserFieldValue != null) {
-					objectAction.setLabel(
-						(Map)ObjectActionSerDes.toMap(
-							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
@@ -498,12 +343,6 @@ public class ObjectActionSerDes {
 					objectAction.setParameters(
 						(Map)ObjectActionSerDes.toMap(
 							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "status")) {
-				if (jsonParserFieldValue != null) {
-					objectAction.setStatus(
-						StatusSerDes.toDTO((String)jsonParserFieldValue));
 				}
 			}
 		}

@@ -31,7 +31,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Ivica Cardic
- * @author Igor Beslic
  */
 public class JSONBatchEngineExportTaskItemWriterImplTest
 	extends BaseBatchEngineExportTaskItemWriterImplTestCase {
@@ -61,11 +60,6 @@ public class JSONBatchEngineExportTaskItemWriterImplTest
 	public void testWriteRowsWithDefinedFieldNames4() throws Exception {
 		_testWriteRows(
 			Arrays.asList("id", "name", "description", "createDate"));
-	}
-
-	@Test
-	public void testWriteRowsWithDefinedFieldNames5() throws Exception {
-		_testWriteRows(Arrays.asList("id", "name", "childItem"));
 	}
 
 	@Test
@@ -103,7 +97,8 @@ public class JSONBatchEngineExportTaskItemWriterImplTest
 		try (JSONBatchEngineExportTaskItemWriterImpl
 				jsonBatchEngineExportTaskItemWriterImpl =
 					new JSONBatchEngineExportTaskItemWriterImpl(
-						fieldNames, unsyncByteArrayOutputStream)) {
+						fieldMap.keySet(), fieldNames,
+						unsyncByteArrayOutputStream)) {
 
 			for (Item[] items : getItemGroups()) {
 				jsonBatchEngineExportTaskItemWriterImpl.write(
@@ -111,9 +106,10 @@ public class JSONBatchEngineExportTaskItemWriterImplTest
 			}
 		}
 
+		String content = unsyncByteArrayOutputStream.toString();
+
 		JSONAssert.assertEquals(
-			_getExpectedContent(fieldNames, getItems()),
-			unsyncByteArrayOutputStream.toString(), true);
+			_getExpectedContent(fieldNames, getItems()), content, true);
 	}
 
 }

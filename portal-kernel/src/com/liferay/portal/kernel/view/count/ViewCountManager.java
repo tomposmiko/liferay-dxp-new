@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.view.count;
 
-import com.liferay.petra.sql.dsl.Table;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -29,8 +28,6 @@ public interface ViewCountManager {
 		throws PortalException;
 
 	public long getViewCount(long companyId, long classNameId, long classPK);
-
-	public Table<?> getViewCountEntryTable();
 
 	public void incrementViewCount(
 		long companyId, long classNameId, long classPK, int increment);

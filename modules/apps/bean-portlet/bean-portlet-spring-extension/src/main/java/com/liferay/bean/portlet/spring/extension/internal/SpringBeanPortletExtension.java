@@ -128,7 +128,7 @@ public class SpringBeanPortletExtension {
 			}
 		}
 		catch (ClassNotFoundException classNotFoundException) {
-			_log.error(classNotFoundException);
+			_log.error(classNotFoundException, classNotFoundException);
 		}
 	}
 
@@ -509,8 +509,7 @@ public class SpringBeanPortletExtension {
 
 			if (!className.startsWith("org.springframework")) {
 				_log.error(
-					"Unable to discover methods in class " + clazz.getName(),
-					throwable);
+					"Unable to discover methods in class " + clazz.getName());
 			}
 
 			return false;

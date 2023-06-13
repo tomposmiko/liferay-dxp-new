@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-system-settings",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -49,8 +50,7 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -61,7 +61,7 @@ public class SystemSettingsPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.processAction(actionRequest, actionResponse);
 	}
@@ -71,7 +71,7 @@ public class SystemSettingsPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.render(renderRequest, renderResponse);
 	}
@@ -81,12 +81,12 @@ public class SystemSettingsPortlet extends MVCPortlet {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
 
-		_checkOmniAdmin();
+		checkOmniAdmin();
 
 		super.serveResource(resourceRequest, resourceResponse);
 	}
 
-	private void _checkOmniAdmin() throws PortletException {
+	protected void checkOmniAdmin() throws PortletException {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 

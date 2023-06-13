@@ -18,13 +18,12 @@ import com.liferay.message.boards.constants.MBPortletKeys;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.settings.MBGroupServiceSettings;
 import com.liferay.message.boards.web.internal.portlet.action.ActionUtil;
-import com.liferay.message.boards.web.internal.util.MBRequestUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -44,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS_ADMIN,
 		"path=/message_boards/view_category"
@@ -66,11 +66,12 @@ public class CategorySubscriptionPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
-		return _language.get(getLocale(portletRequest), key);
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), key);
 	}
 
 	@Override
@@ -92,7 +93,7 @@ public class CategorySubscriptionPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -125,8 +126,7 @@ public class CategorySubscriptionPortletConfigurationIcon
 
 		try {
 			MBGroupServiceSettings mbGroupServiceSettings =
-				MBRequestUtil.getMBGroupServiceSettings(
-					_portal.getHttpServletRequest(portletRequest),
+				MBGroupServiceSettings.getInstance(
 					themeDisplay.getScopeGroupId());
 
 			if (!mbGroupServiceSettings.isEmailMessageAddedEnabled() &&
@@ -141,11 +141,18 @@ public class CategorySubscriptionPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return false;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSubscriptionLocalService(
+		SubscriptionLocalService subscriptionLocalService) {
+
+		_subscriptionLocalService = subscriptionLocalService;
 	}
 
 	private boolean _isSubscribed(
@@ -169,12 +176,8 @@ public class CategorySubscriptionPortletConfigurationIcon
 		_categoryModelResourcePermission;
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
 
-	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
 
 }

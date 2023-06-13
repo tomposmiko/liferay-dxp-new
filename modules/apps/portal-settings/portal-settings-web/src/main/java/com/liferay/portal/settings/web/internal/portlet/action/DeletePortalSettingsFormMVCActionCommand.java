@@ -42,6 +42,14 @@ public class DeletePortalSettingsFormMVCActionCommand
 		_portletPreferencesLocalService = portletPreferencesLocalService;
 	}
 
+	protected void deleteSettings(ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		_portletPreferencesLocalService.deletePortletPreferences(
+			themeDisplay.getCompanyId(), PortletKeys.PREFS_OWNER_TYPE_COMPANY,
+			0, getSettingsId());
+	}
+
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -55,7 +63,7 @@ public class DeletePortalSettingsFormMVCActionCommand
 				return;
 			}
 
-			_deleteSettings(themeDisplay);
+			deleteSettings(themeDisplay);
 		}
 		catch (PortalException portalException) {
 			SessionErrors.add(
@@ -73,14 +81,6 @@ public class DeletePortalSettingsFormMVCActionCommand
 	protected void doValidateForm(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
-	}
-
-	private void _deleteSettings(ThemeDisplay themeDisplay)
-		throws PortalException {
-
-		_portletPreferencesLocalService.deletePortletPreferences(
-			themeDisplay.getCompanyId(), PortletKeys.PREFS_OWNER_TYPE_COMPANY,
-			0, getSettingsId());
 	}
 
 	private final PortletPreferencesLocalService

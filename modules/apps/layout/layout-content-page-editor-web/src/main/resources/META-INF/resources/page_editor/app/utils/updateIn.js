@@ -12,12 +12,12 @@
  * details.
  */
 
-export function updateIn(
+export const updateIn = (
 	objectOrArray,
 	keyPathOrKey,
 	updater,
 	defaultValue = undefined
-) {
+) => {
 	const keyPath =
 		typeof keyPathOrKey === 'string' ? [keyPathOrKey] : keyPathOrKey;
 
@@ -55,4 +55,4 @@ export function updateIn(
 	}
 
 	return nextObjectOrArray;
-}
+};

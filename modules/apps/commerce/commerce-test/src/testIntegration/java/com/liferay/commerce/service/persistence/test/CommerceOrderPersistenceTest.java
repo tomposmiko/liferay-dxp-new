@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.exception.DuplicateCommerceOrderExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.service.CommerceOrderLocalServiceUtil;
@@ -127,8 +126,6 @@ public class CommerceOrderPersistenceTest {
 
 		CommerceOrder newCommerceOrder = _persistence.create(pk);
 
-		newCommerceOrder.setMvccVersion(RandomTestUtil.nextLong());
-
 		newCommerceOrder.setUuid(RandomTestUtil.randomString());
 
 		newCommerceOrder.setExternalReferenceCode(
@@ -146,96 +143,30 @@ public class CommerceOrderPersistenceTest {
 
 		newCommerceOrder.setModifiedDate(RandomTestUtil.nextDate());
 
-		newCommerceOrder.setBillingAddressId(RandomTestUtil.nextLong());
-
 		newCommerceOrder.setCommerceAccountId(RandomTestUtil.nextLong());
 
 		newCommerceOrder.setCommerceCurrencyId(RandomTestUtil.nextLong());
 
 		newCommerceOrder.setCommerceOrderTypeId(RandomTestUtil.nextLong());
 
-		newCommerceOrder.setCommerceShippingMethodId(RandomTestUtil.nextLong());
-
-		newCommerceOrder.setDeliveryCommerceTermEntryId(
-			RandomTestUtil.nextLong());
-
-		newCommerceOrder.setPaymentCommerceTermEntryId(
-			RandomTestUtil.nextLong());
+		newCommerceOrder.setBillingAddressId(RandomTestUtil.nextLong());
 
 		newCommerceOrder.setShippingAddressId(RandomTestUtil.nextLong());
-
-		newCommerceOrder.setAdvanceStatus(RandomTestUtil.randomString());
 
 		newCommerceOrder.setCommercePaymentMethodKey(
 			RandomTestUtil.randomString());
 
-		newCommerceOrder.setCouponCode(RandomTestUtil.randomString());
+		newCommerceOrder.setTransactionId(RandomTestUtil.randomString());
 
-		newCommerceOrder.setDeliveryCommerceTermEntryDescription(
-			RandomTestUtil.randomString());
-
-		newCommerceOrder.setDeliveryCommerceTermEntryName(
-			RandomTestUtil.randomString());
-
-		newCommerceOrder.setLastPriceUpdateDate(RandomTestUtil.nextDate());
-
-		newCommerceOrder.setManuallyAdjusted(RandomTestUtil.randomBoolean());
-
-		newCommerceOrder.setOrderDate(RandomTestUtil.nextDate());
-
-		newCommerceOrder.setOrderStatus(RandomTestUtil.nextInt());
-
-		newCommerceOrder.setPaymentCommerceTermEntryDescription(
-			RandomTestUtil.randomString());
-
-		newCommerceOrder.setPaymentCommerceTermEntryName(
-			RandomTestUtil.randomString());
-
-		newCommerceOrder.setPaymentStatus(RandomTestUtil.nextInt());
-
-		newCommerceOrder.setPrintedNote(RandomTestUtil.randomString());
-
-		newCommerceOrder.setPurchaseOrderNumber(RandomTestUtil.randomString());
-
-		newCommerceOrder.setRequestedDeliveryDate(RandomTestUtil.nextDate());
-
-		newCommerceOrder.setShippingAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel1(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel2(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel3(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel4(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel1WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel2WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel3WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountPercentageLevel4WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		newCommerceOrder.setShippingDiscountWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		newCommerceOrder.setCommerceShippingMethodId(RandomTestUtil.nextLong());
 
 		newCommerceOrder.setShippingOptionName(RandomTestUtil.randomString());
 
-		newCommerceOrder.setShippingWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		newCommerceOrder.setPurchaseOrderNumber(RandomTestUtil.randomString());
+
+		newCommerceOrder.setCouponCode(RandomTestUtil.randomString());
+
+		newCommerceOrder.setLastPriceUpdateDate(RandomTestUtil.nextDate());
 
 		newCommerceOrder.setSubtotal(
 			new BigDecimal(RandomTestUtil.nextDouble()));
@@ -255,22 +186,22 @@ public class CommerceOrderPersistenceTest {
 		newCommerceOrder.setSubtotalDiscountPercentageLevel4(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		newCommerceOrder.setSubtotalDiscountPercentageLevel1WithTaxAmount(
+		newCommerceOrder.setShippingAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		newCommerceOrder.setSubtotalDiscountPercentageLevel2WithTaxAmount(
+		newCommerceOrder.setShippingDiscountAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		newCommerceOrder.setSubtotalDiscountPercentageLevel3WithTaxAmount(
+		newCommerceOrder.setShippingDiscountPercentageLevel1(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		newCommerceOrder.setSubtotalDiscountPercentageLevel4WithTaxAmount(
+		newCommerceOrder.setShippingDiscountPercentageLevel2(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		newCommerceOrder.setSubtotalDiscountWithTaxAmount(
+		newCommerceOrder.setShippingDiscountPercentageLevel3(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		newCommerceOrder.setSubtotalWithTaxAmount(
+		newCommerceOrder.setShippingDiscountPercentageLevel4(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		newCommerceOrder.setTaxAmount(
@@ -293,6 +224,48 @@ public class CommerceOrderPersistenceTest {
 		newCommerceOrder.setTotalDiscountPercentageLevel4(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
+		newCommerceOrder.setSubtotalWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setSubtotalDiscountWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setSubtotalDiscountPercentageLevel1WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setSubtotalDiscountPercentageLevel2WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setSubtotalDiscountPercentageLevel3WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setSubtotalDiscountPercentageLevel4WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setShippingWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setShippingDiscountWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setShippingDiscountPercentageLevel1WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setShippingDiscountPercentageLevel2WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setShippingDiscountPercentageLevel3WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setShippingDiscountPercentageLevel4WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setTotalWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		newCommerceOrder.setTotalDiscountWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
 		newCommerceOrder.setTotalDiscountPercentageLevel1WithTaxAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
@@ -305,13 +278,19 @@ public class CommerceOrderPersistenceTest {
 		newCommerceOrder.setTotalDiscountPercentageLevel4WithTaxAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		newCommerceOrder.setTotalDiscountWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		newCommerceOrder.setAdvanceStatus(RandomTestUtil.randomString());
 
-		newCommerceOrder.setTotalWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		newCommerceOrder.setPaymentStatus(RandomTestUtil.nextInt());
 
-		newCommerceOrder.setTransactionId(RandomTestUtil.randomString());
+		newCommerceOrder.setOrderDate(RandomTestUtil.nextDate());
+
+		newCommerceOrder.setOrderStatus(RandomTestUtil.nextInt());
+
+		newCommerceOrder.setPrintedNote(RandomTestUtil.randomString());
+
+		newCommerceOrder.setRequestedDeliveryDate(RandomTestUtil.nextDate());
+
+		newCommerceOrder.setManuallyAdjusted(RandomTestUtil.randomBoolean());
 
 		newCommerceOrder.setStatus(RandomTestUtil.nextInt());
 
@@ -326,9 +305,6 @@ public class CommerceOrderPersistenceTest {
 		CommerceOrder existingCommerceOrder = _persistence.findByPrimaryKey(
 			newCommerceOrder.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceOrder.getMvccVersion(),
-			newCommerceOrder.getMvccVersion());
 		Assert.assertEquals(
 			existingCommerceOrder.getUuid(), newCommerceOrder.getUuid());
 		Assert.assertEquals(
@@ -354,9 +330,6 @@ public class CommerceOrderPersistenceTest {
 			Time.getShortTimestamp(existingCommerceOrder.getModifiedDate()),
 			Time.getShortTimestamp(newCommerceOrder.getModifiedDate()));
 		Assert.assertEquals(
-			existingCommerceOrder.getBillingAddressId(),
-			newCommerceOrder.getBillingAddressId());
-		Assert.assertEquals(
 			existingCommerceOrder.getCommerceAccountId(),
 			newCommerceOrder.getCommerceAccountId());
 		Assert.assertEquals(
@@ -366,112 +339,33 @@ public class CommerceOrderPersistenceTest {
 			existingCommerceOrder.getCommerceOrderTypeId(),
 			newCommerceOrder.getCommerceOrderTypeId());
 		Assert.assertEquals(
-			existingCommerceOrder.getCommerceShippingMethodId(),
-			newCommerceOrder.getCommerceShippingMethodId());
-		Assert.assertEquals(
-			existingCommerceOrder.getDeliveryCommerceTermEntryId(),
-			newCommerceOrder.getDeliveryCommerceTermEntryId());
-		Assert.assertEquals(
-			existingCommerceOrder.getPaymentCommerceTermEntryId(),
-			newCommerceOrder.getPaymentCommerceTermEntryId());
+			existingCommerceOrder.getBillingAddressId(),
+			newCommerceOrder.getBillingAddressId());
 		Assert.assertEquals(
 			existingCommerceOrder.getShippingAddressId(),
 			newCommerceOrder.getShippingAddressId());
 		Assert.assertEquals(
-			existingCommerceOrder.getAdvanceStatus(),
-			newCommerceOrder.getAdvanceStatus());
-		Assert.assertEquals(
 			existingCommerceOrder.getCommercePaymentMethodKey(),
 			newCommerceOrder.getCommercePaymentMethodKey());
 		Assert.assertEquals(
-			existingCommerceOrder.getCouponCode(),
-			newCommerceOrder.getCouponCode());
+			existingCommerceOrder.getTransactionId(),
+			newCommerceOrder.getTransactionId());
 		Assert.assertEquals(
-			existingCommerceOrder.getDeliveryCommerceTermEntryDescription(),
-			newCommerceOrder.getDeliveryCommerceTermEntryDescription());
-		Assert.assertEquals(
-			existingCommerceOrder.getDeliveryCommerceTermEntryName(),
-			newCommerceOrder.getDeliveryCommerceTermEntryName());
-		Assert.assertEquals(
-			Time.getShortTimestamp(
-				existingCommerceOrder.getLastPriceUpdateDate()),
-			Time.getShortTimestamp(newCommerceOrder.getLastPriceUpdateDate()));
-		Assert.assertEquals(
-			existingCommerceOrder.isManuallyAdjusted(),
-			newCommerceOrder.isManuallyAdjusted());
-		Assert.assertEquals(
-			Time.getShortTimestamp(existingCommerceOrder.getOrderDate()),
-			Time.getShortTimestamp(newCommerceOrder.getOrderDate()));
-		Assert.assertEquals(
-			existingCommerceOrder.getOrderStatus(),
-			newCommerceOrder.getOrderStatus());
-		Assert.assertEquals(
-			existingCommerceOrder.getPaymentCommerceTermEntryDescription(),
-			newCommerceOrder.getPaymentCommerceTermEntryDescription());
-		Assert.assertEquals(
-			existingCommerceOrder.getPaymentCommerceTermEntryName(),
-			newCommerceOrder.getPaymentCommerceTermEntryName());
-		Assert.assertEquals(
-			existingCommerceOrder.getPaymentStatus(),
-			newCommerceOrder.getPaymentStatus());
-		Assert.assertEquals(
-			existingCommerceOrder.getPrintedNote(),
-			newCommerceOrder.getPrintedNote());
-		Assert.assertEquals(
-			existingCommerceOrder.getPurchaseOrderNumber(),
-			newCommerceOrder.getPurchaseOrderNumber());
-		Assert.assertEquals(
-			Time.getShortTimestamp(
-				existingCommerceOrder.getRequestedDeliveryDate()),
-			Time.getShortTimestamp(
-				newCommerceOrder.getRequestedDeliveryDate()));
-		Assert.assertEquals(
-			existingCommerceOrder.getShippingAmount(),
-			newCommerceOrder.getShippingAmount());
-		Assert.assertEquals(
-			existingCommerceOrder.getShippingDiscountAmount(),
-			newCommerceOrder.getShippingDiscountAmount());
-		Assert.assertEquals(
-			existingCommerceOrder.getShippingDiscountPercentageLevel1(),
-			newCommerceOrder.getShippingDiscountPercentageLevel1());
-		Assert.assertEquals(
-			existingCommerceOrder.getShippingDiscountPercentageLevel2(),
-			newCommerceOrder.getShippingDiscountPercentageLevel2());
-		Assert.assertEquals(
-			existingCommerceOrder.getShippingDiscountPercentageLevel3(),
-			newCommerceOrder.getShippingDiscountPercentageLevel3());
-		Assert.assertEquals(
-			existingCommerceOrder.getShippingDiscountPercentageLevel4(),
-			newCommerceOrder.getShippingDiscountPercentageLevel4());
-		Assert.assertEquals(
-			existingCommerceOrder.
-				getShippingDiscountPercentageLevel1WithTaxAmount(),
-			newCommerceOrder.
-				getShippingDiscountPercentageLevel1WithTaxAmount());
-		Assert.assertEquals(
-			existingCommerceOrder.
-				getShippingDiscountPercentageLevel2WithTaxAmount(),
-			newCommerceOrder.
-				getShippingDiscountPercentageLevel2WithTaxAmount());
-		Assert.assertEquals(
-			existingCommerceOrder.
-				getShippingDiscountPercentageLevel3WithTaxAmount(),
-			newCommerceOrder.
-				getShippingDiscountPercentageLevel3WithTaxAmount());
-		Assert.assertEquals(
-			existingCommerceOrder.
-				getShippingDiscountPercentageLevel4WithTaxAmount(),
-			newCommerceOrder.
-				getShippingDiscountPercentageLevel4WithTaxAmount());
-		Assert.assertEquals(
-			existingCommerceOrder.getShippingDiscountWithTaxAmount(),
-			newCommerceOrder.getShippingDiscountWithTaxAmount());
+			existingCommerceOrder.getCommerceShippingMethodId(),
+			newCommerceOrder.getCommerceShippingMethodId());
 		Assert.assertEquals(
 			existingCommerceOrder.getShippingOptionName(),
 			newCommerceOrder.getShippingOptionName());
 		Assert.assertEquals(
-			existingCommerceOrder.getShippingWithTaxAmount(),
-			newCommerceOrder.getShippingWithTaxAmount());
+			existingCommerceOrder.getPurchaseOrderNumber(),
+			newCommerceOrder.getPurchaseOrderNumber());
+		Assert.assertEquals(
+			existingCommerceOrder.getCouponCode(),
+			newCommerceOrder.getCouponCode());
+		Assert.assertEquals(
+			Time.getShortTimestamp(
+				existingCommerceOrder.getLastPriceUpdateDate()),
+			Time.getShortTimestamp(newCommerceOrder.getLastPriceUpdateDate()));
 		Assert.assertEquals(
 			existingCommerceOrder.getSubtotal(),
 			newCommerceOrder.getSubtotal());
@@ -491,31 +385,23 @@ public class CommerceOrderPersistenceTest {
 			existingCommerceOrder.getSubtotalDiscountPercentageLevel4(),
 			newCommerceOrder.getSubtotalDiscountPercentageLevel4());
 		Assert.assertEquals(
-			existingCommerceOrder.
-				getSubtotalDiscountPercentageLevel1WithTaxAmount(),
-			newCommerceOrder.
-				getSubtotalDiscountPercentageLevel1WithTaxAmount());
+			existingCommerceOrder.getShippingAmount(),
+			newCommerceOrder.getShippingAmount());
 		Assert.assertEquals(
-			existingCommerceOrder.
-				getSubtotalDiscountPercentageLevel2WithTaxAmount(),
-			newCommerceOrder.
-				getSubtotalDiscountPercentageLevel2WithTaxAmount());
+			existingCommerceOrder.getShippingDiscountAmount(),
+			newCommerceOrder.getShippingDiscountAmount());
 		Assert.assertEquals(
-			existingCommerceOrder.
-				getSubtotalDiscountPercentageLevel3WithTaxAmount(),
-			newCommerceOrder.
-				getSubtotalDiscountPercentageLevel3WithTaxAmount());
+			existingCommerceOrder.getShippingDiscountPercentageLevel1(),
+			newCommerceOrder.getShippingDiscountPercentageLevel1());
 		Assert.assertEquals(
-			existingCommerceOrder.
-				getSubtotalDiscountPercentageLevel4WithTaxAmount(),
-			newCommerceOrder.
-				getSubtotalDiscountPercentageLevel4WithTaxAmount());
+			existingCommerceOrder.getShippingDiscountPercentageLevel2(),
+			newCommerceOrder.getShippingDiscountPercentageLevel2());
 		Assert.assertEquals(
-			existingCommerceOrder.getSubtotalDiscountWithTaxAmount(),
-			newCommerceOrder.getSubtotalDiscountWithTaxAmount());
+			existingCommerceOrder.getShippingDiscountPercentageLevel3(),
+			newCommerceOrder.getShippingDiscountPercentageLevel3());
 		Assert.assertEquals(
-			existingCommerceOrder.getSubtotalWithTaxAmount(),
-			newCommerceOrder.getSubtotalWithTaxAmount());
+			existingCommerceOrder.getShippingDiscountPercentageLevel4(),
+			newCommerceOrder.getShippingDiscountPercentageLevel4());
 		Assert.assertEquals(
 			existingCommerceOrder.getTaxAmount(),
 			newCommerceOrder.getTaxAmount());
@@ -537,6 +423,64 @@ public class CommerceOrderPersistenceTest {
 			existingCommerceOrder.getTotalDiscountPercentageLevel4(),
 			newCommerceOrder.getTotalDiscountPercentageLevel4());
 		Assert.assertEquals(
+			existingCommerceOrder.getSubtotalWithTaxAmount(),
+			newCommerceOrder.getSubtotalWithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.getSubtotalDiscountWithTaxAmount(),
+			newCommerceOrder.getSubtotalDiscountWithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getSubtotalDiscountPercentageLevel1WithTaxAmount(),
+			newCommerceOrder.
+				getSubtotalDiscountPercentageLevel1WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getSubtotalDiscountPercentageLevel2WithTaxAmount(),
+			newCommerceOrder.
+				getSubtotalDiscountPercentageLevel2WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getSubtotalDiscountPercentageLevel3WithTaxAmount(),
+			newCommerceOrder.
+				getSubtotalDiscountPercentageLevel3WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getSubtotalDiscountPercentageLevel4WithTaxAmount(),
+			newCommerceOrder.
+				getSubtotalDiscountPercentageLevel4WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.getShippingWithTaxAmount(),
+			newCommerceOrder.getShippingWithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.getShippingDiscountWithTaxAmount(),
+			newCommerceOrder.getShippingDiscountWithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getShippingDiscountPercentageLevel1WithTaxAmount(),
+			newCommerceOrder.
+				getShippingDiscountPercentageLevel1WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getShippingDiscountPercentageLevel2WithTaxAmount(),
+			newCommerceOrder.
+				getShippingDiscountPercentageLevel2WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getShippingDiscountPercentageLevel3WithTaxAmount(),
+			newCommerceOrder.
+				getShippingDiscountPercentageLevel3WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.
+				getShippingDiscountPercentageLevel4WithTaxAmount(),
+			newCommerceOrder.
+				getShippingDiscountPercentageLevel4WithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.getTotalWithTaxAmount(),
+			newCommerceOrder.getTotalWithTaxAmount());
+		Assert.assertEquals(
+			existingCommerceOrder.getTotalDiscountWithTaxAmount(),
+			newCommerceOrder.getTotalDiscountWithTaxAmount());
+		Assert.assertEquals(
 			existingCommerceOrder.
 				getTotalDiscountPercentageLevel1WithTaxAmount(),
 			newCommerceOrder.getTotalDiscountPercentageLevel1WithTaxAmount());
@@ -553,14 +497,28 @@ public class CommerceOrderPersistenceTest {
 				getTotalDiscountPercentageLevel4WithTaxAmount(),
 			newCommerceOrder.getTotalDiscountPercentageLevel4WithTaxAmount());
 		Assert.assertEquals(
-			existingCommerceOrder.getTotalDiscountWithTaxAmount(),
-			newCommerceOrder.getTotalDiscountWithTaxAmount());
+			existingCommerceOrder.getAdvanceStatus(),
+			newCommerceOrder.getAdvanceStatus());
 		Assert.assertEquals(
-			existingCommerceOrder.getTotalWithTaxAmount(),
-			newCommerceOrder.getTotalWithTaxAmount());
+			existingCommerceOrder.getPaymentStatus(),
+			newCommerceOrder.getPaymentStatus());
 		Assert.assertEquals(
-			existingCommerceOrder.getTransactionId(),
-			newCommerceOrder.getTransactionId());
+			Time.getShortTimestamp(existingCommerceOrder.getOrderDate()),
+			Time.getShortTimestamp(newCommerceOrder.getOrderDate()));
+		Assert.assertEquals(
+			existingCommerceOrder.getOrderStatus(),
+			newCommerceOrder.getOrderStatus());
+		Assert.assertEquals(
+			existingCommerceOrder.getPrintedNote(),
+			newCommerceOrder.getPrintedNote());
+		Assert.assertEquals(
+			Time.getShortTimestamp(
+				existingCommerceOrder.getRequestedDeliveryDate()),
+			Time.getShortTimestamp(
+				newCommerceOrder.getRequestedDeliveryDate()));
+		Assert.assertEquals(
+			existingCommerceOrder.isManuallyAdjusted(),
+			newCommerceOrder.isManuallyAdjusted());
 		Assert.assertEquals(
 			existingCommerceOrder.getStatus(), newCommerceOrder.getStatus());
 		Assert.assertEquals(
@@ -572,26 +530,6 @@ public class CommerceOrderPersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingCommerceOrder.getStatusDate()),
 			Time.getShortTimestamp(newCommerceOrder.getStatusDate()));
-	}
-
-	@Test(expected = DuplicateCommerceOrderExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceOrder commerceOrder = addCommerceOrder();
-
-		CommerceOrder newCommerceOrder = addCommerceOrder();
-
-		newCommerceOrder.setCompanyId(commerceOrder.getCompanyId());
-
-		newCommerceOrder = _persistence.update(newCommerceOrder);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceOrder);
-
-		newCommerceOrder.setExternalReferenceCode(
-			commerceOrder.getExternalReferenceCode());
-
-		_persistence.update(newCommerceOrder);
 	}
 
 	@Test
@@ -636,17 +574,17 @@ public class CommerceOrderPersistenceTest {
 	}
 
 	@Test
-	public void testCountByBillingAddressId() throws Exception {
-		_persistence.countByBillingAddressId(RandomTestUtil.nextLong());
-
-		_persistence.countByBillingAddressId(0L);
-	}
-
-	@Test
 	public void testCountByCommerceAccountId() throws Exception {
 		_persistence.countByCommerceAccountId(RandomTestUtil.nextLong());
 
 		_persistence.countByCommerceAccountId(0L);
+	}
+
+	@Test
+	public void testCountByBillingAddressId() throws Exception {
+		_persistence.countByBillingAddressId(RandomTestUtil.nextLong());
+
+		_persistence.countByBillingAddressId(0L);
 	}
 
 	@Test
@@ -710,12 +648,12 @@ public class CommerceOrderPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -741,59 +679,49 @@ public class CommerceOrderPersistenceTest {
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
 	}
 
-	@Test
-	public void testFilterFindByGroupId() throws Exception {
-		_persistence.filterFindByGroupId(
-			0, QueryUtil.ALL_POS, QueryUtil.ALL_POS, getOrderByComparator());
-	}
-
 	protected OrderByComparator<CommerceOrder> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceOrder", "mvccVersion", true, "uuid", true,
-			"externalReferenceCode", true, "commerceOrderId", true, "groupId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "billingAddressId", true,
-			"commerceAccountId", true, "commerceCurrencyId", true,
-			"commerceOrderTypeId", true, "commerceShippingMethodId", true,
-			"deliveryCommerceTermEntryId", true, "paymentCommerceTermEntryId",
-			true, "shippingAddressId", true, "advanceStatus", true,
-			"commercePaymentMethodKey", true, "couponCode", true,
-			"deliveryCommerceTermEntryName", true, "lastPriceUpdateDate", true,
-			"manuallyAdjusted", true, "orderDate", true, "orderStatus", true,
-			"paymentCommerceTermEntryName", true, "paymentStatus", true,
-			"printedNote", true, "purchaseOrderNumber", true,
-			"requestedDeliveryDate", true, "shippingAmount", true,
-			"shippingDiscountAmount", true, "shippingDiscountPercentageLevel1",
-			true, "shippingDiscountPercentageLevel2", true,
-			"shippingDiscountPercentageLevel3", true,
-			"shippingDiscountPercentageLevel4", true,
-			"shippingDiscountPercentageLevel1WithTaxAmount", true,
-			"shippingDiscountPercentageLevel2WithTaxAmount", true,
-			"shippingDiscountPercentageLevel3WithTaxAmount", true,
-			"shippingDiscountPercentageLevel4WithTaxAmount", true,
-			"shippingDiscountWithTaxAmount", true, "shippingOptionName", true,
-			"shippingWithTaxAmount", true, "subtotal", true,
+			"CommerceOrder", "uuid", true, "externalReferenceCode", true,
+			"commerceOrderId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "commerceAccountId", true,
+			"commerceCurrencyId", true, "commerceOrderTypeId", true,
+			"billingAddressId", true, "shippingAddressId", true,
+			"commercePaymentMethodKey", true, "commerceShippingMethodId", true,
+			"shippingOptionName", true, "purchaseOrderNumber", true,
+			"couponCode", true, "lastPriceUpdateDate", true, "subtotal", true,
 			"subtotalDiscountAmount", true, "subtotalDiscountPercentageLevel1",
 			true, "subtotalDiscountPercentageLevel2", true,
 			"subtotalDiscountPercentageLevel3", true,
-			"subtotalDiscountPercentageLevel4", true,
+			"subtotalDiscountPercentageLevel4", true, "shippingAmount", true,
+			"shippingDiscountAmount", true, "shippingDiscountPercentageLevel1",
+			true, "shippingDiscountPercentageLevel2", true,
+			"shippingDiscountPercentageLevel3", true,
+			"shippingDiscountPercentageLevel4", true, "taxAmount", true,
+			"total", true, "totalDiscountAmount", true,
+			"totalDiscountPercentageLevel1", true,
+			"totalDiscountPercentageLevel2", true,
+			"totalDiscountPercentageLevel3", true,
+			"totalDiscountPercentageLevel4", true, "subtotalWithTaxAmount",
+			true, "subtotalDiscountWithTaxAmount", true,
 			"subtotalDiscountPercentageLevel1WithTaxAmount", true,
 			"subtotalDiscountPercentageLevel2WithTaxAmount", true,
 			"subtotalDiscountPercentageLevel3WithTaxAmount", true,
 			"subtotalDiscountPercentageLevel4WithTaxAmount", true,
-			"subtotalDiscountWithTaxAmount", true, "subtotalWithTaxAmount",
-			true, "taxAmount", true, "total", true, "totalDiscountAmount", true,
-			"totalDiscountPercentageLevel1", true,
-			"totalDiscountPercentageLevel2", true,
-			"totalDiscountPercentageLevel3", true,
-			"totalDiscountPercentageLevel4", true,
+			"shippingWithTaxAmount", true, "shippingDiscountWithTaxAmount",
+			true, "shippingDiscountPercentageLevel1WithTaxAmount", true,
+			"shippingDiscountPercentageLevel2WithTaxAmount", true,
+			"shippingDiscountPercentageLevel3WithTaxAmount", true,
+			"shippingDiscountPercentageLevel4WithTaxAmount", true,
+			"totalWithTaxAmount", true, "totalDiscountWithTaxAmount", true,
 			"totalDiscountPercentageLevel1WithTaxAmount", true,
 			"totalDiscountPercentageLevel2WithTaxAmount", true,
 			"totalDiscountPercentageLevel3WithTaxAmount", true,
-			"totalDiscountPercentageLevel4WithTaxAmount", true,
-			"totalDiscountWithTaxAmount", true, "totalWithTaxAmount", true,
-			"status", true, "statusByUserId", true, "statusByUserName", true,
-			"statusDate", true);
+			"totalDiscountPercentageLevel4WithTaxAmount", true, "advanceStatus",
+			true, "paymentStatus", true, "orderDate", true, "orderStatus", true,
+			"printedNote", true, "requestedDeliveryDate", true,
+			"manuallyAdjusted", true, "status", true, "statusByUserId", true,
+			"statusByUserName", true, "statusDate", true);
 	}
 
 	@Test
@@ -1072,23 +1000,21 @@ public class CommerceOrderPersistenceTest {
 				new Class<?>[] {String.class}, "groupId"));
 
 		Assert.assertEquals(
-			commerceOrder.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				commerceOrder, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(commerceOrder.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				commerceOrder, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			commerceOrder.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				commerceOrder, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CommerceOrder addCommerceOrder() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceOrder commerceOrder = _persistence.create(pk);
-
-		commerceOrder.setMvccVersion(RandomTestUtil.nextLong());
 
 		commerceOrder.setUuid(RandomTestUtil.randomString());
 
@@ -1106,94 +1032,30 @@ public class CommerceOrderPersistenceTest {
 
 		commerceOrder.setModifiedDate(RandomTestUtil.nextDate());
 
-		commerceOrder.setBillingAddressId(RandomTestUtil.nextLong());
-
 		commerceOrder.setCommerceAccountId(RandomTestUtil.nextLong());
 
 		commerceOrder.setCommerceCurrencyId(RandomTestUtil.nextLong());
 
 		commerceOrder.setCommerceOrderTypeId(RandomTestUtil.nextLong());
 
-		commerceOrder.setCommerceShippingMethodId(RandomTestUtil.nextLong());
-
-		commerceOrder.setDeliveryCommerceTermEntryId(RandomTestUtil.nextLong());
-
-		commerceOrder.setPaymentCommerceTermEntryId(RandomTestUtil.nextLong());
+		commerceOrder.setBillingAddressId(RandomTestUtil.nextLong());
 
 		commerceOrder.setShippingAddressId(RandomTestUtil.nextLong());
-
-		commerceOrder.setAdvanceStatus(RandomTestUtil.randomString());
 
 		commerceOrder.setCommercePaymentMethodKey(
 			RandomTestUtil.randomString());
 
-		commerceOrder.setCouponCode(RandomTestUtil.randomString());
+		commerceOrder.setTransactionId(RandomTestUtil.randomString());
 
-		commerceOrder.setDeliveryCommerceTermEntryDescription(
-			RandomTestUtil.randomString());
-
-		commerceOrder.setDeliveryCommerceTermEntryName(
-			RandomTestUtil.randomString());
-
-		commerceOrder.setLastPriceUpdateDate(RandomTestUtil.nextDate());
-
-		commerceOrder.setManuallyAdjusted(RandomTestUtil.randomBoolean());
-
-		commerceOrder.setOrderDate(RandomTestUtil.nextDate());
-
-		commerceOrder.setOrderStatus(RandomTestUtil.nextInt());
-
-		commerceOrder.setPaymentCommerceTermEntryDescription(
-			RandomTestUtil.randomString());
-
-		commerceOrder.setPaymentCommerceTermEntryName(
-			RandomTestUtil.randomString());
-
-		commerceOrder.setPaymentStatus(RandomTestUtil.nextInt());
-
-		commerceOrder.setPrintedNote(RandomTestUtil.randomString());
-
-		commerceOrder.setPurchaseOrderNumber(RandomTestUtil.randomString());
-
-		commerceOrder.setRequestedDeliveryDate(RandomTestUtil.nextDate());
-
-		commerceOrder.setShippingAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel1(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel2(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel3(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel4(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel1WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel2WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel3WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountPercentageLevel4WithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
-
-		commerceOrder.setShippingDiscountWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		commerceOrder.setCommerceShippingMethodId(RandomTestUtil.nextLong());
 
 		commerceOrder.setShippingOptionName(RandomTestUtil.randomString());
 
-		commerceOrder.setShippingWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		commerceOrder.setPurchaseOrderNumber(RandomTestUtil.randomString());
+
+		commerceOrder.setCouponCode(RandomTestUtil.randomString());
+
+		commerceOrder.setLastPriceUpdateDate(RandomTestUtil.nextDate());
 
 		commerceOrder.setSubtotal(new BigDecimal(RandomTestUtil.nextDouble()));
 
@@ -1212,22 +1074,22 @@ public class CommerceOrderPersistenceTest {
 		commerceOrder.setSubtotalDiscountPercentageLevel4(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		commerceOrder.setSubtotalDiscountPercentageLevel1WithTaxAmount(
+		commerceOrder.setShippingAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		commerceOrder.setSubtotalDiscountPercentageLevel2WithTaxAmount(
+		commerceOrder.setShippingDiscountAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		commerceOrder.setSubtotalDiscountPercentageLevel3WithTaxAmount(
+		commerceOrder.setShippingDiscountPercentageLevel1(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		commerceOrder.setSubtotalDiscountPercentageLevel4WithTaxAmount(
+		commerceOrder.setShippingDiscountPercentageLevel2(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		commerceOrder.setSubtotalDiscountWithTaxAmount(
+		commerceOrder.setShippingDiscountPercentageLevel3(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		commerceOrder.setSubtotalWithTaxAmount(
+		commerceOrder.setShippingDiscountPercentageLevel4(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
 		commerceOrder.setTaxAmount(new BigDecimal(RandomTestUtil.nextDouble()));
@@ -1249,6 +1111,48 @@ public class CommerceOrderPersistenceTest {
 		commerceOrder.setTotalDiscountPercentageLevel4(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
+		commerceOrder.setSubtotalWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setSubtotalDiscountWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setSubtotalDiscountPercentageLevel1WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setSubtotalDiscountPercentageLevel2WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setSubtotalDiscountPercentageLevel3WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setSubtotalDiscountPercentageLevel4WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setShippingWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setShippingDiscountWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setShippingDiscountPercentageLevel1WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setShippingDiscountPercentageLevel2WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setShippingDiscountPercentageLevel3WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setShippingDiscountPercentageLevel4WithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setTotalWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
+		commerceOrder.setTotalDiscountWithTaxAmount(
+			new BigDecimal(RandomTestUtil.nextDouble()));
+
 		commerceOrder.setTotalDiscountPercentageLevel1WithTaxAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
@@ -1261,13 +1165,19 @@ public class CommerceOrderPersistenceTest {
 		commerceOrder.setTotalDiscountPercentageLevel4WithTaxAmount(
 			new BigDecimal(RandomTestUtil.nextDouble()));
 
-		commerceOrder.setTotalDiscountWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		commerceOrder.setAdvanceStatus(RandomTestUtil.randomString());
 
-		commerceOrder.setTotalWithTaxAmount(
-			new BigDecimal(RandomTestUtil.nextDouble()));
+		commerceOrder.setPaymentStatus(RandomTestUtil.nextInt());
 
-		commerceOrder.setTransactionId(RandomTestUtil.randomString());
+		commerceOrder.setOrderDate(RandomTestUtil.nextDate());
+
+		commerceOrder.setOrderStatus(RandomTestUtil.nextInt());
+
+		commerceOrder.setPrintedNote(RandomTestUtil.randomString());
+
+		commerceOrder.setRequestedDeliveryDate(RandomTestUtil.nextDate());
+
+		commerceOrder.setManuallyAdjusted(RandomTestUtil.randomBoolean());
 
 		commerceOrder.setStatus(RandomTestUtil.nextInt());
 

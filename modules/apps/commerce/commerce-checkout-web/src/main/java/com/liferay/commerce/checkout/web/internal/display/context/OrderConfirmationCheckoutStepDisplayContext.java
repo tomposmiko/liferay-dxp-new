@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.checkout.web.internal.display.context;
 
-import com.liferay.commerce.checkout.web.internal.display.context.helper.CommerceCheckoutRequestHelper;
+import com.liferay.commerce.checkout.web.internal.display.context.util.CommerceCheckoutRequestHelper;
 import com.liferay.commerce.checkout.web.internal.util.PaymentProcessCommerceCheckoutStep;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
 import com.liferay.commerce.model.CommerceOrder;
@@ -22,9 +22,9 @@ import com.liferay.commerce.model.CommerceOrderPayment;
 import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.service.CommerceOrderPaymentLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 
 import javax.portlet.PortletURL;
 

@@ -14,6 +14,7 @@
 
 package com.liferay.change.tracking.web.internal.display;
 
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.spi.reference.TableReferenceDefinition;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
@@ -34,15 +35,20 @@ import java.io.Serializable;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Preston Crary
@@ -90,21 +96,18 @@ public class BasePersistenceRegistry {
 							basePersistence.getModelClass()));
 				});
 
-		_transactionExecutorServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, TransactionExecutor.class, null,
-				(serviceReference, emitter) -> {
-					Bundle bundle = serviceReference.getBundle();
+		_transactionExecutorServiceTracker = new ServiceTracker<>(
+			bundleContext, TransactionExecutor.class,
+			new TransactionExecutorServiceTrackerCustomizer(bundleContext));
 
-					emitter.emit(bundle.getBundleId());
-				});
+		_transactionExecutorServiceTracker.open(true);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_transactionExecutorServiceTrackerMap.close();
-
 		_tableReferenceDefinitionServiceTrackerMap.close();
+
+		_transactionExecutorServiceTracker.close();
 	}
 
 	private <T extends BaseModel<T>, R> R _applyBasePersistence(
@@ -121,9 +124,8 @@ public class BasePersistenceRegistry {
 		Bundle bundle = FrameworkUtil.getBundle(basePersistence.getClass());
 
 		if (bundle != null) {
-			transactionExecutor =
-				_transactionExecutorServiceTrackerMap.getService(
-					bundle.getBundleId());
+			transactionExecutor = _transactionExecutorMap.get(
+				bundle.getBundleId());
 
 			if (transactionExecutor == null) {
 				throw new IllegalStateException(
@@ -132,7 +134,8 @@ public class BasePersistenceRegistry {
 		}
 
 		try (SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			return transactionExecutor.execute(
 				_transactionAttributeAdapter,
@@ -157,7 +160,53 @@ public class BasePersistenceRegistry {
 
 	private ServiceTrackerMap<Long, TableReferenceDefinition<?>>
 		_tableReferenceDefinitionServiceTrackerMap;
-	private ServiceTrackerMap<Long, TransactionExecutor>
-		_transactionExecutorServiceTrackerMap;
+	private final Map<Object, TransactionExecutor> _transactionExecutorMap =
+		new ConcurrentHashMap<>();
+	private ServiceTracker<TransactionExecutor, ?>
+		_transactionExecutorServiceTracker;
+
+	private class TransactionExecutorServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer<TransactionExecutor, Object> {
+
+		@Override
+		public Object addingService(
+			ServiceReference<TransactionExecutor> serviceReference) {
+
+			Object bundleId = serviceReference.getProperty(
+				Constants.SERVICE_BUNDLEID);
+
+			TransactionExecutor transactionExecutor = _bundleContext.getService(
+				serviceReference);
+
+			_transactionExecutorMap.put(bundleId, transactionExecutor);
+
+			return bundleId;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<TransactionExecutor> serviceReference,
+			Object bundleId) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<TransactionExecutor> serviceReference,
+			Object bundleId) {
+
+			_transactionExecutorMap.remove(bundleId);
+
+			_bundleContext.ungetService(serviceReference);
+		}
+
+		private TransactionExecutorServiceTrackerCustomizer(
+			BundleContext bundleContext) {
+
+			_bundleContext = bundleContext;
+		}
+
+		private final BundleContext _bundleContext;
+
+	}
 
 }

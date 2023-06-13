@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Victor Trajano
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DigitalSignaturePortletKeys.DIGITAL_SIGNATURE,
 		"mvc.command.name=/digital_signature/get_ds_envelopes"

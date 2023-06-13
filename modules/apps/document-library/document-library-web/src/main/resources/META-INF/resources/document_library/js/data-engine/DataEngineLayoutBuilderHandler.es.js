@@ -12,8 +12,6 @@
  * details.
  */
 
-import {openToast, postForm, sub} from 'frontend-js-web';
-
 import {
 	getDataEngineStructure,
 	getInputLocalizedValues,
@@ -35,14 +33,10 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 		if (
 			isElementInnerSelector(
 				target,
-				'.cke_dialog',
-				'.clay-color-dropdown-menu',
-				'.date-picker-dropdown-menu',
 				'.ddm-form-builder-wrapper',
-				'.ddm-select-dropdown',
-				'.input-localized-content',
+				'.multi-panel-sidebar',
 				'.lfr-icon-menu-open',
-				'.multi-panel-sidebar'
+				'.input-localized-content'
 			)
 		) {
 			const dataLayoutBuilder = await getDataLayoutBuilder();
@@ -54,7 +48,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 		}
 	};
 
-	window.addEventListener('mousedown', detectClickOutside, true);
+	window.addEventListener('click', detectClickOutside, true);
 
 	const saveDataEngineStructure = async () => {
 		const dataLayoutBuilder = await getDataLayoutBuilder();
@@ -66,12 +60,12 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 		} = dataLayoutBuilder.current.state.dataDefinition;
 
 		if (!nameInput.value || !name[defaultLanguageId]) {
-			openToast({
-				message: sub(
+			Liferay.Util.openToast({
+				message: Liferay.Util.sub(
 					Liferay.Language.get(
 						'please-enter-a-valid-title-for-the-default-language-x'
 					),
-					defaultLanguageId.replaceAll('_', '-')
+					defaultLanguageId.replace('_', '-')
 				),
 				title: Liferay.Language.get('error'),
 				type: 'danger',
@@ -82,7 +76,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 			return;
 		}
 
-		postForm(form, {
+		Liferay.Util.postForm(form, {
 			data: getDataEngineStructure({dataLayoutBuilder, namespace}),
 		});
 	};
@@ -111,7 +105,7 @@ export default function DataEngineLayoutBuilderHandler({namespace}) {
 	return {
 		dispose() {
 			form.removeEventListener('submit', saveDataEngineStructure);
-			window.removeEventListener('mousedown', detectClickOutside, true);
+			window.removeEventListener('click', detectClickOutside, true);
 		},
 	};
 }

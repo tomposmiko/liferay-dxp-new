@@ -45,26 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditDispatchLogMVCActionCommand extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (Objects.equals(cmd, Constants.DELETE)) {
-				_deleteDispatchLog(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			SessionErrors.add(actionRequest, exception.getClass());
-
-			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
-		}
-	}
-
-	private void _deleteDispatchLog(ActionRequest actionRequest)
+	protected void deleteDispatchLog(ActionRequest actionRequest)
 		throws PortalException {
 
 		long[] deleteDispatchLogIds = null;
@@ -81,6 +62,25 @@ public class EditDispatchLogMVCActionCommand extends BaseMVCActionCommand {
 
 		for (long deleteDispatchLogId : deleteDispatchLogIds) {
 			_dispatchLogService.deleteDispatchLog(deleteDispatchLogId);
+		}
+	}
+
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (Objects.equals(cmd, Constants.DELETE)) {
+				deleteDispatchLog(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			SessionErrors.add(actionRequest, exception.getClass());
+
+			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 		}
 	}
 

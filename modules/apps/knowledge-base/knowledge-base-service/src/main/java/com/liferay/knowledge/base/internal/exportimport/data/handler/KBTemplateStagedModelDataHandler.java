@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class KBTemplateStagedModelDataHandler
 	extends BaseStagedModelDataHandler<KBTemplate> {
 
@@ -137,7 +137,13 @@ public class KBTemplateStagedModelDataHandler
 		portletDataContext.importClassedModel(kbTemplate, importedKBTemplate);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setKBTemplateLocalService(
+		KBTemplateLocalService kbTemplateLocalService) {
+
+		_kbTemplateLocalService = kbTemplateLocalService;
+	}
+
 	private KBTemplateLocalService _kbTemplateLocalService;
 
 }

@@ -14,29 +14,23 @@
 
 package com.liferay.dispatch.web.internal.display.context;
 
-import com.liferay.dispatch.constants.DispatchPortletKeys;
 import com.liferay.dispatch.executor.DispatchTaskExecutorRegistry;
 import com.liferay.dispatch.metadata.DispatchTriggerMetadata;
 import com.liferay.dispatch.metadata.DispatchTriggerMetadataProvider;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchTriggerLocalService;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -60,62 +54,18 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 		_dispatchTriggerMetadataProvider = dispatchTriggerMetadataProvider;
 	}
 
-	public List<DropdownItem> getActionDropdownItems() {
-		return DropdownItemListBuilder.add(
-			dropdownItem -> {
-				dropdownItem.putData("action", "deleteEntries");
-				dropdownItem.setIcon("trash");
-				dropdownItem.setLabel(
-					LanguageUtil.get(
-						dispatchRequestHelper.getLocale(), "delete"));
-				dropdownItem.setQuickAction(true);
-			}
-		).build();
-	}
-
-	public CreationMenu getCreationMenu() {
-		CreationMenu creationMenu = new CreationMenu();
-
-		for (String dispatchTaskExecutorType :
-				_dispatchTaskExecutorRegistry.getDispatchTaskExecutorTypes()) {
-
-			if (_dispatchTaskExecutorRegistry.isHiddenInUI(
-					dispatchTaskExecutorType)) {
-
-				continue;
-			}
-
-			creationMenu.addDropdownItem(
-				dropdownItem -> {
-					dropdownItem.setHref(
-						PortletURLBuilder.createRenderURL(
-							dispatchRequestHelper.getLiferayPortletResponse()
-						).setMVCRenderCommandName(
-							"/dispatch/edit_dispatch_trigger"
-						).setCMD(
-							Constants.ADD
-						).setRedirect(
-							dispatchRequestHelper.getCurrentURL()
-						).setParameter(
-							"dispatchTaskExecutorType", dispatchTaskExecutorType
-						).buildRenderURL());
-					dropdownItem.setLabel(
-						getDispatchTaskExecutorName(
-							dispatchTaskExecutorType,
-							dispatchRequestHelper.getLocale()));
-				});
-		}
-
-		return creationMenu;
-	}
-
 	public String getDispatchTaskExecutorName(
 		String dispatchTaskExecutorType, Locale locale) {
 
-		return LanguageUtil.get(
-			locale,
+		String name =
 			_dispatchTaskExecutorRegistry.fetchDispatchTaskExecutorName(
-				dispatchTaskExecutorType));
+				dispatchTaskExecutorType);
+
+		return LanguageUtil.get(locale, name);
+	}
+
+	public Set<String> getDispatchTaskExecutorTypes() {
+		return _dispatchTaskExecutorRegistry.getDispatchTaskExecutorTypes();
 	}
 
 	public DispatchTrigger getDispatchTrigger() {
@@ -130,30 +80,18 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
-		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			dispatchRequestHelper.getRequest(), DispatchPortletKeys.DISPATCH,
-			"trigger-order-by-col", "modified-date");
-
-		return _orderByCol;
+		return ParamUtil.getString(
+			dispatchRequestHelper.getRequest(),
+			SearchContainer.DEFAULT_ORDER_BY_COL_PARAM, "modified-date");
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
-		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			dispatchRequestHelper.getRequest(), DispatchPortletKeys.DISPATCH,
-			"trigger-order-by-type", "desc");
-
-		return _orderByType;
+		return ParamUtil.getString(
+			dispatchRequestHelper.getRequest(),
+			SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM, "desc");
 	}
 
-	public PortletURL getPortletURL() {
+	public PortletURL getPortletURL() throws PortalException {
 		LiferayPortletResponse liferayPortletResponse =
 			dispatchRequestHelper.getLiferayPortletResponse();
 
@@ -185,7 +123,9 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 		return _rowChecker;
 	}
 
-	public SearchContainer<DispatchTrigger> getSearchContainer() {
+	public SearchContainer<DispatchTrigger> getSearchContainer()
+		throws PortalException {
+
 		if (_searchContainer != null) {
 			return _searchContainer;
 		}
@@ -195,42 +135,31 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 			null, null);
 
 		_searchContainer.setEmptyResultsMessage("no-items-were-found");
+
 		_searchContainer.setOrderByCol(getOrderByCol());
 		_searchContainer.setOrderByComparator(null);
 		_searchContainer.setOrderByType(getOrderByType());
-		_searchContainer.setResultsAndTotal(
-			() -> _dispatchTriggerLocalService.getDispatchTriggers(
-				dispatchRequestHelper.getCompanyId(),
-				_searchContainer.getStart(), _searchContainer.getEnd()),
-			_dispatchTriggerLocalService.getDispatchTriggersCount(
-				dispatchRequestHelper.getCompanyId()));
 		_searchContainer.setRowChecker(getRowChecker());
 
+		int total = _dispatchTriggerLocalService.getDispatchTriggersCount(
+			dispatchRequestHelper.getCompanyId());
+
+		_searchContainer.setTotal(total);
+
+		List<DispatchTrigger> results =
+			_dispatchTriggerLocalService.getDispatchTriggers(
+				dispatchRequestHelper.getCompanyId(),
+				_searchContainer.getStart(), _searchContainer.getEnd());
+
+		_searchContainer.setResults(results);
+
 		return _searchContainer;
-	}
-
-	public ViewTypeItemList getViewTypeItems() {
-		return new ViewTypeItemList(getPortletURL(), "list") {
-			{
-				addTableViewTypeItem();
-			}
-		};
-	}
-
-	public boolean isClusterModeSingle(String type) {
-		if (_dispatchTaskExecutorRegistry.isClusterModeSingle(type)) {
-			return true;
-		}
-
-		return false;
 	}
 
 	private final DispatchTaskExecutorRegistry _dispatchTaskExecutorRegistry;
 	private final DispatchTriggerLocalService _dispatchTriggerLocalService;
 	private final DispatchTriggerMetadataProvider
 		_dispatchTriggerMetadataProvider;
-	private String _orderByCol;
-	private String _orderByType;
 	private RowChecker _rowChecker;
 	private SearchContainer<DispatchTrigger> _searchContainer;
 

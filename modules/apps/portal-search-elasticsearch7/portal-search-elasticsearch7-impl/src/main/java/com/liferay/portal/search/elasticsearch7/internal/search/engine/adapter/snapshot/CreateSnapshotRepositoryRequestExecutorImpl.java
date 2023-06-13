@@ -96,7 +96,13 @@ public class CreateSnapshotRepositoryRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

@@ -14,8 +14,8 @@
 
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayIcon from '@clayui/icon';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import classNames from 'classnames';
-import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {useContext, useState} from 'react';
 
 import DropDown, {CheckboxGroup, ItemsGroup, RadioGroup} from './DropDown';
@@ -37,11 +37,7 @@ const getSortable = (columns, sort = '', defaultSort) => {
 	return {};
 };
 
-export default function ManagementToolbarFilterAndOrder({
-	columns = [],
-	disabled,
-	filters = [],
-}) {
+export default ({columns = [], disabled, filters = []}) => {
 	const [
 		{filters: appliedFilters = {}, defaultSort, sort},
 		dispatch,
@@ -110,7 +106,7 @@ export default function ManagementToolbarFilterAndOrder({
 		}
 	);
 
-	const enableDoneButton = !!filterItems.length;
+	const enableDoneButton = filterItems.length > 0;
 
 	const onSortButtonClick = (asc, newColumn) => {
 		dispatch({
@@ -120,7 +116,7 @@ export default function ManagementToolbarFilterAndOrder({
 	};
 
 	const orderByItems = () => {
-		if (!sortableColumns.length) {
+		if (sortableColumns.length === 0) {
 			return [];
 		}
 
@@ -171,9 +167,9 @@ export default function ManagementToolbarFilterAndOrder({
 
 	return (
 		<>
-			{!!dropDownItems.length && (
-				<ManagementToolbar.ItemList>
-					<ManagementToolbar.Item>
+			{dropDownItems.length > 0 && (
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item>
 						<DropDown
 							active={isDropDownActive}
 							footerContent={
@@ -204,7 +200,6 @@ export default function ManagementToolbarFilterAndOrder({
 											symbol="caret-bottom"
 										/>
 									</span>
-
 									<span className="navbar-breakpoint-d-none">
 										<ClayIcon
 											className="inline-item inline-item-after"
@@ -218,9 +213,9 @@ export default function ManagementToolbarFilterAndOrder({
 								<div key={index}>{item}</div>
 							))}
 						</DropDown>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 
-					<ManagementToolbar.Item>
+					<ClayManagementToolbar.Item>
 						<ClayButtonWithIcon
 							className={classNames(
 								'nav-link',
@@ -238,9 +233,9 @@ export default function ManagementToolbarFilterAndOrder({
 								'reverse-sort-direction'
 							)}
 						/>
-					</ManagementToolbar.Item>
-				</ManagementToolbar.ItemList>
+					</ClayManagementToolbar.Item>
+				</ClayManagementToolbar.ItemList>
 			)}
 		</>
 	);
-}
+};

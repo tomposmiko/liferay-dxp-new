@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -200,71 +201,79 @@ public class DLStorageQuotaModelImpl
 	public Map<String, Function<DLStorageQuota, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<DLStorageQuota, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, DLStorageQuota>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<DLStorageQuota, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DLStorageQuota.class.getClassLoader(), DLStorageQuota.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<DLStorageQuota, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<DLStorageQuota, Object>>();
+		try {
+			Constructor<DLStorageQuota> constructor =
+				(Constructor<DLStorageQuota>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", DLStorageQuota::getMvccVersion);
-			attributeGetterFunctions.put(
-				"dlStorageQuotaId", DLStorageQuota::getDlStorageQuotaId);
-			attributeGetterFunctions.put(
-				"companyId", DLStorageQuota::getCompanyId);
-			attributeGetterFunctions.put(
-				"storageSize", DLStorageQuota::getStorageSize);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<DLStorageQuota, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DLStorageQuota, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<DLStorageQuota, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<DLStorageQuota, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DLStorageQuota, Object>>();
+		Map<String, BiConsumer<DLStorageQuota, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<DLStorageQuota, ?>>();
 
-		static {
-			Map<String, BiConsumer<DLStorageQuota, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<DLStorageQuota, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", DLStorageQuota::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<DLStorageQuota, Long>)DLStorageQuota::setMvccVersion);
+		attributeGetterFunctions.put(
+			"dlStorageQuotaId", DLStorageQuota::getDlStorageQuotaId);
+		attributeSetterBiConsumers.put(
+			"dlStorageQuotaId",
+			(BiConsumer<DLStorageQuota, Long>)
+				DLStorageQuota::setDlStorageQuotaId);
+		attributeGetterFunctions.put("companyId", DLStorageQuota::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DLStorageQuota, Long>)DLStorageQuota::setCompanyId);
+		attributeGetterFunctions.put(
+			"storageSize", DLStorageQuota::getStorageSize);
+		attributeSetterBiConsumers.put(
+			"storageSize",
+			(BiConsumer<DLStorageQuota, Long>)DLStorageQuota::setStorageSize);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<DLStorageQuota, Long>)
-					DLStorageQuota::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"dlStorageQuotaId",
-				(BiConsumer<DLStorageQuota, Long>)
-					DLStorageQuota::setDlStorageQuotaId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<DLStorageQuota, Long>)DLStorageQuota::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"storageSize",
-				(BiConsumer<DLStorageQuota, Long>)
-					DLStorageQuota::setStorageSize);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -547,12 +556,41 @@ public class DLStorageQuotaModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<DLStorageQuota, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<DLStorageQuota, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<DLStorageQuota, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((DLStorageQuota)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DLStorageQuota>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DLStorageQuota.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -563,8 +601,7 @@ public class DLStorageQuotaModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<DLStorageQuota, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

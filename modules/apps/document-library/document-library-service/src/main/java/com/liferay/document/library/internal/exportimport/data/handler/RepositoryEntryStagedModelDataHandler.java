@@ -154,7 +154,13 @@ public class RepositoryEntryStagedModelDataHandler
 			repositoryEntry, importedRepositoryEntry);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setRepositoryEntryLocalService(
+		RepositoryEntryLocalService repositoryEntryLocalService) {
+
+		_repositoryEntryLocalService = repositoryEntryLocalService;
+	}
+
 	private RepositoryEntryLocalService _repositoryEntryLocalService;
 
 }

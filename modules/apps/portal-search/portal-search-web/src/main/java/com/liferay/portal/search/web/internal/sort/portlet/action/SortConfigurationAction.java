@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.sort.constants.SortPortletKeys;
-import com.liferay.portal.search.web.internal.sort.display.context.builder.SortDisplayContextBuilder;
+import com.liferay.portal.search.web.internal.sort.display.context.SortDisplayBuilder;
 import com.liferay.portal.search.web.internal.sort.portlet.SortPortletPreferences;
 import com.liferay.portal.search.web.internal.sort.portlet.SortPortletPreferencesImpl;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchRequest;
@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Wade Cao
  */
 @Component(
-	property = "javax.portlet.name=" + SortPortletKeys.SORT,
+	immediate = true, property = "javax.portlet.name=" + SortPortletKeys.SORT,
 	service = ConfigurationAction.class
 )
 public class SortConfigurationAction extends DefaultConfigurationAction {
@@ -69,14 +69,26 @@ public class SortConfigurationAction extends DefaultConfigurationAction {
 				portletSharedSearchResponse.getPortletPreferences(
 					renderRequest));
 
-		SortDisplayContextBuilder sortDisplayContextBuilder =
-			_createSortDisplayContextBuilder(
-				language, portal, renderRequest, sortPortletPreferences);
+		SortDisplayBuilder sortDisplayBuilder = createSortDisplayBuilder(
+			language, portal, renderRequest, sortPortletPreferences);
 
 		httpServletRequest.setAttribute(
-			WebKeys.PORTLET_DISPLAY_CONTEXT, sortDisplayContextBuilder.build());
+			WebKeys.PORTLET_DISPLAY_CONTEXT, sortDisplayBuilder.build());
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
+	}
+
+	protected SortDisplayBuilder createSortDisplayBuilder(
+		Language language, Portal portal, RenderRequest renderRequest,
+		SortPortletPreferences sortPortletPreferences) {
+
+		try {
+			return new SortDisplayBuilder(
+				language, portal, renderRequest, sortPortletPreferences);
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
+		}
 	}
 
 	@Reference
@@ -84,19 +96,6 @@ public class SortConfigurationAction extends DefaultConfigurationAction {
 
 	@Reference
 	protected Portal portal;
-
-	private SortDisplayContextBuilder _createSortDisplayContextBuilder(
-		Language language, Portal portal, RenderRequest renderRequest,
-		SortPortletPreferences sortPortletPreferences) {
-
-		try {
-			return new SortDisplayContextBuilder(
-				language, portal, renderRequest, sortPortletPreferences);
-		}
-		catch (ConfigurationException configurationException) {
-			throw new RuntimeException(configurationException);
-		}
-	}
 
 	@Reference
 	private PortletSharedSearchRequest _portletSharedSearchRequest;

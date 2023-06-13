@@ -404,11 +404,6 @@ public class DLOpenerFileEntryReferenceWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected DLOpenerFileEntryReferenceWrapper wrap(
 		DLOpenerFileEntryReference dlOpenerFileEntryReference) {
 

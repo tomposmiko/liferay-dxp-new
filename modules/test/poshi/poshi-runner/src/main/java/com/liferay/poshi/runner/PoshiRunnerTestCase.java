@@ -17,13 +17,16 @@ package com.liferay.poshi.runner;
 import com.liferay.poshi.core.PoshiContext;
 import com.liferay.poshi.core.PoshiValidation;
 import com.liferay.poshi.core.util.PropsUtil;
-import com.liferay.poshi.runner.selenium.WebDriverUtil;
+import com.liferay.poshi.core.util.Validator;
+import com.liferay.poshi.runner.selenium.SeleniumUtil;
 
 import java.io.File;
 
-import java.util.Properties;
-
 import junit.framework.TestCase;
+
+import org.apache.commons.lang3.ArrayUtils;
+
+import org.junit.After;
 
 /**
  * @author Kenji Heigel
@@ -36,9 +39,6 @@ public abstract class PoshiRunnerTestCase extends TestCase {
 		poshiRunner.setUp();
 
 		poshiRunner.test();
-
-		WebDriverUtil.stopWebDriver(
-			PoshiContext.getDefaultNamespace() + "." + testName);
 	}
 
 	public void setUpPoshiRunner(String testBaseDirName) throws Exception {
@@ -49,17 +49,26 @@ public abstract class PoshiRunnerTestCase extends TestCase {
 				"Test directory does not exist: " + testBaseDirName);
 		}
 
-		Properties properties = new Properties();
+		if (Validator.isNotNull(System.getenv("JENKINS_HOME"))) {
+			PropsUtil.set(
+				"browser.firefox.bin.file", "/opt/firefox-52.0.2esr/firefox");
+		}
 
-		properties.setProperty("test.base.dir.name", testBaseDirName);
-
-		PropsUtil.setProperties(properties);
+		String[] poshiFileNames = ArrayUtils.addAll(
+			PoshiContext.POSHI_SUPPORT_FILE_INCLUDES,
+			PoshiContext.POSHI_TEST_FILE_INCLUDES);
 
 		PoshiContext.clear();
 
-		PoshiContext.readFiles();
+		PoshiContext.readFiles(poshiFileNames, testBaseDirName);
 
 		PoshiValidation.validate();
+	}
+
+	@After
+	@Override
+	public void tearDown() {
+		SeleniumUtil.stopSelenium();
 	}
 
 }

@@ -19,6 +19,7 @@ import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.model.AccountRoleTable;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.account.service.AccountRoleLocalServiceUtil;
@@ -93,9 +94,12 @@ public class AccountRoleLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_accountEntry1 = AccountEntryTestUtil.addAccountEntry();
-		_accountEntry2 = AccountEntryTestUtil.addAccountEntry();
-		_accountEntry3 = AccountEntryTestUtil.addAccountEntry();
+		_accountEntry1 = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
+		_accountEntry2 = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
+		_accountEntry3 = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
 	}
 
 	@Test
@@ -473,7 +477,7 @@ public class AccountRoleLocalServiceTest {
 			AccountRoleLocalServiceUtil.searchAccountRoles(
 				_accountEntry1.getCompanyId(),
 				new long[] {_accountEntry1.getAccountEntryId()}, keywords, null,
-				0, 2, new RoleNameComparator(true));
+				0, 2, null);
 
 		Assert.assertEquals(
 			expectedAccountRoles.toString(), 5,
@@ -501,18 +505,23 @@ public class AccountRoleLocalServiceTest {
 	public void testSearchAccountRolesWithParams() throws Exception {
 		AccountRole accountRole1 = _accountRoleLocalService.addAccountRole(
 			TestPropsValues.getUserId(), _accountEntry1.getAccountEntryId(),
-			RandomTestUtil.randomString() + " " + RandomTestUtil.randomString(),
-			null, null);
+			RandomTestUtil.randomString(), null, null);
 		AccountRole accountRole2 = _accountRoleLocalService.addAccountRole(
 			TestPropsValues.getUserId(), _accountEntry1.getAccountEntryId(),
-			RandomTestUtil.randomString() + " " + RandomTestUtil.randomString(),
-			null, null);
+			RandomTestUtil.randomString(), null, null);
 
 		_testSearchAccountRolesWithParams(
 			accountRole1.getCompanyId(),
-			new long[] {_accountEntry1.getAccountEntryId()},
+			new long[] {accountRole1.getAccountEntryId()},
 			LinkedHashMapBuilder.<String, Object>put(
 				"excludedRoleNames", new String[] {accountRole1.getRoleName()}
+			).build(),
+			Collections.singletonList(accountRole2));
+		_testSearchAccountRolesWithParams(
+			accountRole1.getCompanyId(),
+			new long[] {accountRole1.getAccountEntryId()},
+			LinkedHashMapBuilder.<String, Object>put(
+				"excludedRoleIds", new Long[] {accountRole1.getRoleId()}
 			).build(),
 			Collections.singletonList(accountRole2));
 	}
@@ -560,7 +569,7 @@ public class AccountRoleLocalServiceTest {
 
 	private void _testDeleteAccountRole(
 			UnsafeFunction<AccountRole, AccountRole, PortalException>
-				deleteAccountRoleUnsafeFunction)
+				deleteAccountRoleFunction)
 		throws Exception {
 
 		AccountRole accountRole = _addAccountRole(
@@ -577,7 +586,7 @@ public class AccountRoleLocalServiceTest {
 		Assert.assertTrue(
 			ArrayUtil.contains(_getRoleIds(user), accountRole.getRoleId()));
 
-		deleteAccountRoleUnsafeFunction.apply(accountRole);
+		deleteAccountRoleFunction.apply(accountRole);
 
 		Assert.assertFalse(
 			ArrayUtil.contains(
@@ -609,6 +618,9 @@ public class AccountRoleLocalServiceTest {
 
 	@DeleteAfterTestRun
 	private AccountEntry _accountEntry3;
+
+	@Inject
+	private AccountEntryLocalService _accountEntryLocalService;
 
 	@Inject
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;

@@ -23,14 +23,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
-import com.liferay.account.constants.AccountConstants;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.google.merchant.internal.xml.model.Feed;
 import com.liferay.commerce.google.merchant.internal.xml.model.Link;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPQuery;
 import com.liferay.commerce.product.constants.CommerceChannelConstants;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
-import com.liferay.commerce.product.exception.CommerceChannelTypeException;
+import com.liferay.commerce.product.exception.InvalidCommerceChannelTypeException;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
@@ -63,7 +63,9 @@ import org.osgi.service.component.annotations.Reference;
  * Implementation for generating XML for Google Merchant Center feed in
  * Atom 1.0 XML format
  */
-@Component(service = ProductFeedXMLGenerator.class)
+@Component(
+	enabled = false, immediate = true, service = ProductFeedXMLGenerator.class
+)
 public class ProductFeedXMLGenerator {
 
 	public String generateProductFeedXML(long commerceChannelId)
@@ -75,7 +77,7 @@ public class ProductFeedXMLGenerator {
 		if (!CommerceChannelConstants.CHANNEL_TYPE_SITE.equals(
 				commerceChannel.getType())) {
 
-			throw new CommerceChannelTypeException(
+			throw new InvalidCommerceChannelTypeException(
 				"Cannot generate products XML for channel with ID " +
 					commerceChannelId +
 						" because channel must be site type channel");
@@ -95,9 +97,10 @@ public class ProductFeedXMLGenerator {
 
 		feed.setLink(link);
 
-		feed.setUpdated(
-			DateUtil.getCurrentDate(
-				DateUtil.ISO_8601_PATTERN, null, TimeZoneUtil.GMT));
+		String updated = DateUtil.getCurrentDate(
+			DateUtil.ISO_8601_PATTERN, null, TimeZoneUtil.GMT);
+
+		feed.setUpdated(updated);
 
 		int total = _countCPCatalogEntriesByChannel(commerceChannel);
 
@@ -112,9 +115,7 @@ public class ProductFeedXMLGenerator {
 				/* TODO: To be implemented in COMMERCE-2690.
 
 				for (CPCatalogEntry cpCatalogEntry : cpCatalogEntries) {
-
-					// TODO COMMERCE-2690 add XML for a product here
-
+					//TODO COMMERCE-2690 add XML for a product here
 				}
 				*/
 
@@ -179,7 +180,7 @@ public class ProductFeedXMLGenerator {
 				Field.STATUS, WorkflowConstants.STATUS_APPROVED
 			).put(
 				"commerceAccountGroupIds",
-				new long[] {AccountConstants.ACCOUNT_ENTRY_ID_GUEST}
+				new long[] {CommerceAccountConstants.ACCOUNT_ID_GUEST}
 			).put(
 				"commerceChannelGroupId", commerceChannel.getGroupId()
 			).build());

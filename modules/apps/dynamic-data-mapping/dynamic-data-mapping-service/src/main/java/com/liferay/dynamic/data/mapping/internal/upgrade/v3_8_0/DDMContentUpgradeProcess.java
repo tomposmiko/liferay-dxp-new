@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.sql.PreparedStatement;
@@ -35,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Marcos Martins
@@ -77,12 +78,19 @@ public class DDMContentUpgradeProcess extends UpgradeProcess {
 						_ddmFormDeserializer,
 						resultSet.getString("definition"));
 
-					List<DDMFormField> fieldSetDDMFormFields = ListUtil.filter(
-						ddmForm.getDDMFormFields(),
+					List<DDMFormField> ddmFormFields =
+						ddmForm.getDDMFormFields();
+
+					Stream<DDMFormField> stream = ddmFormFields.stream();
+
+					List<DDMFormField> fieldSetDDMFormFields = stream.filter(
 						ddmFormField -> ddmFormField.getType(
 						).equals(
 							"fieldset"
-						));
+						)
+					).collect(
+						Collectors.toList()
+					);
 
 					if (fieldSetDDMFormFields.isEmpty()) {
 						continue;
@@ -182,7 +190,7 @@ public class DDMContentUpgradeProcess extends UpgradeProcess {
 
 		dataJSONObject.put("fieldValues", fieldValuesJSONArray);
 
-		return dataJSONObject.toString();
+		return dataJSONObject.toJSONString();
 	}
 
 	private final DDMFormDeserializer _ddmFormDeserializer;

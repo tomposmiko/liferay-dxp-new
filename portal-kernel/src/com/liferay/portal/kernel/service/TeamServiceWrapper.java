@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.model.Team;
 public class TeamServiceWrapper
 	implements ServiceWrapper<TeamService>, TeamService {
 
-	public TeamServiceWrapper() {
-		this(null);
-	}
-
 	public TeamServiceWrapper(TeamService teamService) {
 		_teamService = teamService;
 	}

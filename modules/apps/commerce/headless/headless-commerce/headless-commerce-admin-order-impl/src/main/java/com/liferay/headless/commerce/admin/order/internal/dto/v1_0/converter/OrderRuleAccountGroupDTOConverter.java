@@ -14,8 +14,8 @@
 
 package com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter;
 
-import com.liferay.account.model.AccountGroup;
-import com.liferay.account.service.AccountGroupService;
+import com.liferay.commerce.account.model.CommerceAccountGroup;
+import com.liferay.commerce.account.service.CommerceAccountGroupService;
 import com.liferay.commerce.order.rule.model.COREntry;
 import com.liferay.commerce.order.rule.model.COREntryRel;
 import com.liferay.commerce.order.rule.service.COREntryRelService;
@@ -31,8 +31,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.order.rule.model.COREntryRel-AccountGroup",
-	service = DTOConverter.class
+	service = {DTOConverter.class, OrderRuleAccountGroupDTOConverter.class}
 )
 public class OrderRuleAccountGroupDTOConverter
 	implements DTOConverter<COREntryRel, OrderRuleAccountGroup> {
@@ -49,15 +50,17 @@ public class OrderRuleAccountGroupDTOConverter
 		COREntryRel corEntryRel = _corEntryRelService.getCOREntryRel(
 			(Long)dtoConverterContext.getId());
 
-		AccountGroup orderRuleAccountGroup =
-			_accountGroupService.getAccountGroup(corEntryRel.getClassPK());
+		CommerceAccountGroup commerceAccountGroup =
+			_commerceAccountGroupService.getCommerceAccountGroup(
+				corEntryRel.getClassPK());
 		COREntry corEntry = corEntryRel.getCOREntry();
 
 		return new OrderRuleAccountGroup() {
 			{
 				accountGroupExternalReferenceCode =
-					orderRuleAccountGroup.getExternalReferenceCode();
-				accountGroupId = orderRuleAccountGroup.getAccountGroupId();
+					commerceAccountGroup.getExternalReferenceCode();
+				accountGroupId =
+					commerceAccountGroup.getCommerceAccountGroupId();
 				actions = dtoConverterContext.getActions();
 				orderRuleAccountGroupId = corEntryRel.getCOREntryRelId();
 				orderRuleExternalReferenceCode =
@@ -68,7 +71,7 @@ public class OrderRuleAccountGroupDTOConverter
 	}
 
 	@Reference
-	private AccountGroupService _accountGroupService;
+	private CommerceAccountGroupService _commerceAccountGroupService;
 
 	@Reference
 	private COREntryRelService _corEntryRelService;

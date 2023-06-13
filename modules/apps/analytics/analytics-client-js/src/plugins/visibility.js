@@ -12,18 +12,13 @@
  * details.
  */
 
-import {PAGE} from '../utils/constants';
-
-const applicationId = PAGE;
-const beforeunloadEventListener = 'beforeunload';
-let enableTabEvent = true;
+const applicationId = 'Page';
 
 /**
  * Handle differents browser versions to Visibility API
  */
 function getHiddenKey() {
-	let hidden;
-	let visibilityChange;
+	let hidden, visibilityChange;
 
 	if (typeof document.hidden !== 'undefined') {
 		hidden = 'hidden';
@@ -51,13 +46,11 @@ function getHiddenKey() {
 function handleVisibilityChange(analytics) {
 	const {hidden} = getHiddenKey();
 
-	if (enableTabEvent) {
-		if (document[hidden]) {
-			analytics.send('tabBlurred', applicationId);
-		}
-		else {
-			analytics.send('tabFocused', applicationId);
-		}
+	if (document[hidden]) {
+		analytics.send('tabBlurred', applicationId);
+	}
+	else {
+		analytics.send('tabFocused', applicationId);
 	}
 }
 
@@ -71,24 +64,12 @@ function visibility(analytics) {
 	if (visibilityChange) {
 		const onVisibilityChange = handleVisibilityChange.bind(null, analytics);
 
-		window.addEventListener(
-			beforeunloadEventListener,
-			enableTabEventHandle
-		);
 		document.addEventListener(visibilityChange, onVisibilityChange);
 
 		return () => {
-			window.removeEventListener(
-				beforeunloadEventListener,
-				enableTabEventHandle
-			);
 			document.removeEventListener(visibilityChange, onVisibilityChange);
 		};
 	}
-}
-
-function enableTabEventHandle() {
-	enableTabEvent = false;
 }
 
 export {visibility};

@@ -28,10 +28,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class RoleLocalServiceWrapper
 	implements RoleLocalService, ServiceWrapper<RoleLocalService> {
 
-	public RoleLocalServiceWrapper() {
-		this(null);
-	}
-
 	public RoleLocalServiceWrapper(RoleLocalService roleLocalService) {
 		_roleLocalService = roleLocalService;
 	}
@@ -537,24 +533,23 @@ public class RoleLocalServiceWrapper
 
 	@Override
 	public java.util.List<Role> getGroupRolesAndTeamRoles(
-		long companyId, String name, java.util.List<String> excludedNames,
-		String title, String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId, int start, int end) {
+		long companyId, String keywords, java.util.List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId, int start,
+		int end) {
 
 		return _roleLocalService.getGroupRolesAndTeamRoles(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId, start, end);
+			companyId, keywords, excludedNames, types, excludedTeamRoleId,
+			teamGroupId, start, end);
 	}
 
 	@Override
 	public int getGroupRolesAndTeamRolesCount(
-		long companyId, String name, java.util.List<String> excludedNames,
-		String title, String description, int[] types, long excludedTeamRoleId,
-		long teamGroupId) {
+		long companyId, String keywords, java.util.List<String> excludedNames,
+		int[] types, long excludedTeamRoleId, long teamGroupId) {
 
 		return _roleLocalService.getGroupRolesAndTeamRolesCount(
-			companyId, name, excludedNames, title, description, types,
-			excludedTeamRoleId, teamGroupId);
+			companyId, keywords, excludedNames, types, excludedTeamRoleId,
+			teamGroupId);
 	}
 
 	@Override
@@ -938,9 +933,7 @@ public class RoleLocalServiceWrapper
 	}
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groups are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param userId the primary key of the user
 	 * @param groups the groups (optionally <code>null</code>)
@@ -967,9 +960,7 @@ public class RoleLocalServiceWrapper
 	}
 
 	/**
-	 * Returns the union of all the user's roles within the groups. If no
-	 * groupIds are provided, only the user's directly assigned roles are
-	 * returned.
+	 * Returns the union of all the user's roles within the groups.
 	 *
 	 * @param userId the primary key of the user
 	 * @param groupIds the primary keys of the groups
@@ -1072,6 +1063,39 @@ public class RoleLocalServiceWrapper
 
 		return _roleLocalService.hasUserRoles(
 			userId, companyId, names, inherited);
+	}
+
+	/**
+	 * Returns a role with the name in the company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param name the role's name (optionally <code>null</code>)
+	 * @return the role with the name, or <code>null</code> if a role with the
+	 name could not be found in the company
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #fetchRole(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public Role loadFetchRole(long companyId, String name) {
+		return _roleLocalService.loadFetchRole(companyId, name);
+	}
+
+	/**
+	 * Returns a role with the name in the company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param name the role's name
+	 * @return the role with the name in the company
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getRole(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public Role loadGetRole(long companyId, String name)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _roleLocalService.loadGetRole(companyId, name);
 	}
 
 	/**

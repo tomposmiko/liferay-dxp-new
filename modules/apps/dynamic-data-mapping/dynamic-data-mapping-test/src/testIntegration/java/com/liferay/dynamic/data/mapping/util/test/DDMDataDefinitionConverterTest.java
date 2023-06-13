@@ -69,6 +69,23 @@ public class DDMDataDefinitionConverterTest {
 	}
 
 	@Test
+	public void testConvertDDMFormDataDefinitionCheckboxToCheckboxMultiple()
+		throws Exception {
+
+		String dataDefinition =
+			_ddmDataDefinitionConverter.convertDDMFormDataDefinition(
+				_read("ddm-form-data-definition-json-converter-checkbox.json"),
+				0, 0);
+
+		Assert.assertEquals(
+			_objectMapper.readTree(
+				_read(
+					"ddm-form-data-definition-json-converter-checkbox-" +
+						"expected-result.json")),
+			_objectMapper.readTree(dataDefinition));
+	}
+
+	@Test
 	public void testConvertDDMFormDataDefinitionEmptyValidation()
 		throws Exception {
 
@@ -174,24 +191,20 @@ public class DDMDataDefinitionConverterTest {
 						"page.json"),
 				0, 0);
 
-		String dataDefinition1 = _convertDDMFormLayoutDataDefinition(
-			"ddm-form-layout-data-definition-json-converter-link-to-page.json",
-			structureVersionDataDefinition);
+		String dataDefinition =
+			_ddmDataDefinitionConverter.convertDDMFormLayoutDataDefinition(
+				TestPropsValues.getGroupId(), 0,
+				_read(
+					"ddm-form-layout-data-definition-json-converter-link-to-" +
+						"page.json"),
+				0, structureVersionDataDefinition);
 
 		Assert.assertEquals(
 			_objectMapper.readTree(
 				_read(
 					"ddm-form-layout-data-definition-json-converter-link-to-" +
 						"page-expected-result.json")),
-			_objectMapper.readTree(dataDefinition1));
-
-		String dataDefinition2 = _convertDDMFormLayoutDataDefinition(
-			"ddm-form-layout-data-definition-json-converter-link-to-page.json",
-			structureVersionDataDefinition);
-
-		Assert.assertEquals(
-			_objectMapper.readTree(dataDefinition1),
-			_objectMapper.readTree(dataDefinition2));
+			_objectMapper.readTree(dataDefinition));
 	}
 
 	@Test
@@ -205,9 +218,13 @@ public class DDMDataDefinitionConverterTest {
 						"fields.json"),
 				0, 0);
 
-		String dataDefinition = _convertDDMFormLayoutDataDefinition(
-			"ddm-form-layout-data-definition-json-converter-nested-fields.json",
-			structureVersionDataDefinition);
+		String dataDefinition =
+			_ddmDataDefinitionConverter.convertDDMFormLayoutDataDefinition(
+				TestPropsValues.getGroupId(), 0,
+				_read(
+					"ddm-form-layout-data-definition-json-converter-nested-" +
+						"fields.json"),
+				0, structureVersionDataDefinition);
 
 		Assert.assertEquals(
 			_objectMapper.readTree(
@@ -215,15 +232,6 @@ public class DDMDataDefinitionConverterTest {
 					"ddm-form-layout-data-definition-json-converter-nested-" +
 						"fields-expected-result.json")),
 			_objectMapper.readTree(dataDefinition));
-	}
-
-	private String _convertDDMFormLayoutDataDefinition(
-			String fileName, String structureVersionDataDefinition)
-		throws Exception {
-
-		return _ddmDataDefinitionConverter.convertDDMFormLayoutDataDefinition(
-			TestPropsValues.getGroupId(), 0, _read(fileName), 0,
-			structureVersionDataDefinition);
 	}
 
 	private String _read(String fileName) throws Exception {

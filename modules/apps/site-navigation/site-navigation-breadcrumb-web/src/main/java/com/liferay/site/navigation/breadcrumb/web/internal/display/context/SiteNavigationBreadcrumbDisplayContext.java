@@ -14,24 +14,17 @@
 
 package com.liferay.site.navigation.breadcrumb.web.internal.display.context;
 
-import com.liferay.dynamic.data.mapping.kernel.DDMTemplate;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateManagerUtil;
-import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
+import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.site.navigation.breadcrumb.web.internal.configuration.SiteNavigationBreadcrumbPortletInstanceConfiguration;
-import com.liferay.site.navigation.taglib.servlet.taglib.util.BreadcrumbEntriesUtil;
-
-import java.util.HashMap;
-import java.util.List;
+import com.liferay.site.navigation.breadcrumb.web.internal.constants.SiteNavigationBreadcrumbPortletKeys;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Julio Camarero
@@ -39,12 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 public class SiteNavigationBreadcrumbDisplayContext {
 
 	public SiteNavigationBreadcrumbDisplayContext(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
+			HttpServletRequest httpServletRequest)
 		throws ConfigurationException {
 
 		_httpServletRequest = httpServletRequest;
-		_httpServletResponse = httpServletResponse;
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
@@ -57,16 +48,23 @@ public class SiteNavigationBreadcrumbDisplayContext {
 				SiteNavigationBreadcrumbPortletInstanceConfiguration.class);
 	}
 
-	public List<BreadcrumbEntry> getBreadcrumbEntries() {
-		if (_breadcrumbEntries != null) {
-			return _breadcrumbEntries;
+	public String getDDMTemplateKey() {
+		if (_ddmTemplateKey != null) {
+			return _ddmTemplateKey;
 		}
 
-		_breadcrumbEntries = BreadcrumbEntriesUtil.getBreadcrumbEntries(
-			_httpServletRequest, isShowCurrentGroup(), isShowGuestGroup(),
-			isShowLayout(), isShowParentGroups(), isShowPortletBreadcrumb());
+		String displayStyle = getDisplayStyle();
 
-		return _breadcrumbEntries;
+		if (displayStyle != null) {
+			PortletDisplayTemplate portletDisplayTemplate =
+				(PortletDisplayTemplate)_httpServletRequest.getAttribute(
+					WebKeys.PORTLET_DISPLAY_TEMPLATE);
+
+			_ddmTemplateKey = portletDisplayTemplate.getDDMTemplateKey(
+				displayStyle);
+		}
+
+		return _ddmTemplateKey;
 	}
 
 	public String getDisplayStyle() {
@@ -74,8 +72,9 @@ public class SiteNavigationBreadcrumbDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(
-			_httpServletRequest, "displayStyle",
+		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
+			_httpServletRequest,
+			SiteNavigationBreadcrumbPortletKeys.SITE_NAVIGATION_BREADCRUMB,
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.
 				displayStyle());
 
@@ -178,28 +177,10 @@ public class SiteNavigationBreadcrumbDisplayContext {
 		return _showPortletBreadcrumb;
 	}
 
-	public String renderDDMTemplate() throws Exception {
-		DDMTemplate portletDisplayDDMTemplate =
-			PortletDisplayTemplateManagerUtil.getDDMTemplate(
-				getDisplayStyleGroupId(),
-				PortalUtil.getClassNameId(BreadcrumbEntry.class),
-				getDisplayStyle(), true);
-
-		if (portletDisplayDDMTemplate != null) {
-			return PortletDisplayTemplateManagerUtil.renderDDMTemplate(
-				_httpServletRequest, _httpServletResponse,
-				portletDisplayDDMTemplate.getTemplateId(),
-				getBreadcrumbEntries(), new HashMap<>());
-		}
-
-		return StringPool.BLANK;
-	}
-
-	private List<BreadcrumbEntry> _breadcrumbEntries;
+	private String _ddmTemplateKey;
 	private String _displayStyle;
 	private long _displayStyleGroupId;
 	private final HttpServletRequest _httpServletRequest;
-	private final HttpServletResponse _httpServletResponse;
 	private String _portletResource;
 	private Boolean _showCurrentGroup;
 	private Boolean _showGuestGroup;

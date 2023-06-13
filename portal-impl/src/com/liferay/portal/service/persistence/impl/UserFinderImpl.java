@@ -49,6 +49,9 @@ import com.liferay.util.dao.orm.CustomSQLUtil;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -153,6 +156,144 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 
 	public static final String JOIN_BY_SOCIAL_RELATION_TYPE =
 		UserFinder.class.getName() + ".joinBySocialRelationType";
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public Map<Long, Integer> countByGroups(
+		long companyId, int status, long[] groupIds) {
+
+		if (ArrayUtil.isEmpty(groupIds)) {
+			return Collections.emptyMap();
+		}
+
+		Arrays.sort(groupIds);
+
+		Session session = null;
+
+		try {
+			Map<Long, Integer> counts = new HashMap<>();
+
+			session = openSession();
+
+			StringBundler sb = null;
+
+			DB db = getDB();
+
+			boolean sybase = false;
+
+			if (db.getDBType() == DBType.SYBASE) {
+				sybase = true;
+			}
+
+			if (sybase) {
+				sb = new StringBundler(25);
+			}
+			else {
+				sb = new StringBundler(17);
+			}
+
+			sb.append("SELECT groupId, COUNT(DISTINCT userId) FROM (");
+
+			if (sybase) {
+				sb.append("SELECT userId, groupId FROM ");
+			}
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(CustomSQLUtil.get(FIND_BY_USERS_GROUPS));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+
+			if (sybase) {
+				sb.append(" USERS_GROUPS");
+			}
+
+			sb.append(" UNION ALL ");
+
+			if (sybase) {
+				sb.append("SELECT userId, groupId FROM ");
+			}
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(CustomSQLUtil.get(FIND_BY_USERS_ORGS));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+
+			if (sybase) {
+				sb.append(" USERS_ORGS");
+			}
+
+			sb.append(" UNION ALL ");
+
+			if (sybase) {
+				sb.append("SELECT userId, groupId FROM ");
+			}
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(CustomSQLUtil.get(FIND_BY_USERS_ORGS_GROUP));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+
+			if (sybase) {
+				sb.append(" USERS_ORGS_GROUP");
+			}
+
+			sb.append(" UNION ALL ");
+
+			if (sybase) {
+				sb.append("SELECT userId, groupId FROM ");
+			}
+
+			sb.append(StringPool.OPEN_PARENTHESIS);
+			sb.append(CustomSQLUtil.get(FIND_BY_USERS_USER_GROUPS));
+			sb.append(StringPool.CLOSE_PARENTHESIS);
+
+			if (sybase) {
+				sb.append(" USERS_USER_GROUPS");
+			}
+
+			sb.append(") TEMP_TABLE GROUP BY groupId");
+
+			String sql = StringUtil.replace(
+				sb.toString(), "[$GROUP_ID$]",
+				StringPool.OPEN_PARENTHESIS + StringUtil.merge(groupIds) +
+					StringPool.CLOSE_PARENTHESIS);
+
+			if (status == WorkflowConstants.STATUS_ANY) {
+				sql = StringUtil.removeSubstring(sql, _STATUS_SQL);
+			}
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			for (int i = 0; i < 4; i++) {
+				queryPos.add(companyId);
+				queryPos.add(false);
+
+				if (status != WorkflowConstants.STATUS_ANY) {
+					queryPos.add(status);
+				}
+			}
+
+			List<Object[]> list = (List<Object[]>)QueryUtil.list(
+				sqlQuery, getDialect(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+			for (Object[] objects : list) {
+				Number groupId = (Number)objects[0];
+				Number count = (Number)objects[1];
+
+				counts.put(groupId.longValue(), count.intValue());
+			}
+
+			return counts;
+		}
+		catch (Exception exception) {
+			throw new SystemException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
 
 	@Override
 	public int countByKeywords(
@@ -267,6 +408,7 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 			queryPos.add(userId);
 			queryPos.add(socialRelationType);
 			queryPos.add(companyId);
+			queryPos.add(Boolean.FALSE);
 			queryPos.add(status);
 
 			Iterator<Long> iterator = sqlQuery.iterate();
@@ -445,6 +587,7 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 				setJoin(queryPos, paramsMap);
 
 				queryPos.add(companyId);
+				queryPos.add(false);
 				queryPos.add(firstNames, 2);
 				queryPos.add(middleNames, 2);
 				queryPos.add(lastNames, 2);
@@ -603,6 +746,7 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 			queryPos.add(userId);
 			queryPos.add(socialRelationType);
 			queryPos.add(companyId);
+			queryPos.add(Boolean.FALSE);
 			queryPos.add(status);
 
 			return (List<User>)QueryUtil.list(
@@ -635,6 +779,7 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 
 			queryPos.add(organizationId);
 			queryPos.add(companyId);
+			queryPos.add(Boolean.FALSE);
 			queryPos.add(gtUserId);
 
 			return (List<User>)QueryUtil.list(sqlQuery, getDialect(), 0, size);
@@ -664,6 +809,7 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 
 			queryPos.add(userGroupId);
 			queryPos.add(companyId);
+			queryPos.add(Boolean.FALSE);
 			queryPos.add(gtUserId);
 
 			return (List<User>)QueryUtil.list(sqlQuery, getDialect(), 0, size);
@@ -806,6 +952,7 @@ public class UserFinderImpl extends UserFinderBaseImpl implements UserFinder {
 				setJoin(queryPos, paramsMap);
 
 				queryPos.add(companyId);
+				queryPos.add(false);
 				queryPos.add(firstNames, 2);
 				queryPos.add(middleNames, 2);
 				queryPos.add(lastNames, 2);

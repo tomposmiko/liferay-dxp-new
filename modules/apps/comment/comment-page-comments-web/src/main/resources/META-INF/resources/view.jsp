@@ -21,19 +21,14 @@ String className = ParamUtil.getString(request, "className", Layout.class.getNam
 long classPK = ParamUtil.getLong(request, "classPK", layout.getPlid());
 
 AssetEntry assetEntry = (AssetEntry)request.getAttribute(WebKeys.LAYOUT_ASSET_ENTRY);
-AssetRenderer<?> assetRenderer = null;
 
-if (assetEntry != null) {
-	assetRenderer = assetEntry.getAssetRenderer();
-
-	if (layout.isTypeAssetDisplay()) {
-		className = assetEntry.getClassName();
-		classPK = assetEntry.getClassPK();
-	}
+if ((assetEntry != null) && layout.isTypeAssetDisplay()) {
+	className = assetEntry.getClassName();
+	classPK = assetEntry.getClassPK();
 }
 %>
 
-<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.VIEW) && ((assetRenderer == null) || assetRenderer.isCommentable()) %>">
+<c:if test="<%= LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.VIEW) %>">
 	<liferay-comment:discussion
 		className="<%= className %>"
 		classPK="<%= classPK %>"

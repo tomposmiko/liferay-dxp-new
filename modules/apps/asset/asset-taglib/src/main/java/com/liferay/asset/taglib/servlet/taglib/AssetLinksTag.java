@@ -22,6 +22,7 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
 import com.liferay.asset.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -32,10 +33,9 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -151,7 +151,7 @@ public class AssetLinksTag extends IncludeTag {
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(systemException);
+					_log.debug(systemException, systemException);
 				}
 			}
 		}
@@ -169,7 +169,7 @@ public class AssetLinksTag extends IncludeTag {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -223,8 +223,8 @@ public class AssetLinksTag extends IncludeTag {
 
 			AssetRendererFactory<?> assetRendererFactory =
 				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassName(
-						assetLinkEntry.getClassName());
+					getAssetRendererFactoryByClassNameId(
+						assetLinkEntry.getClassNameId());
 
 			if (assetRendererFactory == null) {
 				if (_log.isWarnEnabled()) {
@@ -330,9 +330,9 @@ public class AssetLinksTag extends IncludeTag {
 			if (Validator.isNotNull(urlViewInContext) &&
 				!Objects.equals(urlViewInContext, noSuchEntryRedirect)) {
 
-				urlViewInContext = HttpComponentsUtil.setParameter(
+				urlViewInContext = HttpUtil.setParameter(
 					urlViewInContext, "inheritRedirect", Boolean.TRUE);
-				urlViewInContext = HttpComponentsUtil.setParameter(
+				urlViewInContext = HttpUtil.setParameter(
 					urlViewInContext, "redirect", themeDisplay.getURLCurrent());
 			}
 

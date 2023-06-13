@@ -18,7 +18,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.list.type.client.dto.v1_0.ListTypeDefinition;
 import com.liferay.headless.admin.list.type.client.dto.v1_0.ListTypeEntry;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.odata.entity.EntityField;
 
 import java.util.Collections;
 
@@ -33,46 +32,10 @@ import org.junit.runner.RunWith;
 public class ListTypeDefinitionResourceTest
 	extends BaseListTypeDefinitionResourceTestCase {
 
-	@Override
-	@Test
-	public void testGetListTypeDefinitionsPageWithSortInteger()
-		throws Exception {
-
-		testGetListTypeDefinitionsPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, listTypeDefinition1, listTypeDefinition2) -> {
-				if (BeanTestUtil.hasProperty(
-						listTypeDefinition1, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						listTypeDefinition1, entityField.getName(), 0);
-				}
-
-				if (BeanTestUtil.hasProperty(
-						listTypeDefinition2, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						listTypeDefinition2, entityField.getName(), 1);
-				}
-			});
-	}
-
 	@Ignore
 	@Override
 	@Test
 	public void testGraphQLGetListTypeDefinition() throws Exception {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetListTypeDefinitionByExternalReferenceCode() {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetListTypeDefinitionByExternalReferenceCodeNotFound() {
 	}
 
 	@Ignore
@@ -125,14 +88,6 @@ public class ListTypeDefinitionResourceTest
 
 	@Override
 	protected ListTypeDefinition
-			testGetListTypeDefinitionByExternalReferenceCode_addListTypeDefinition()
-		throws Exception {
-
-		return _addListTypeDefinition(randomListTypeDefinition());
-	}
-
-	@Override
-	protected ListTypeDefinition
 			testGetListTypeDefinitionsPage_addListTypeDefinition(
 				ListTypeDefinition listTypeDefinition)
 		throws Exception {
@@ -150,14 +105,6 @@ public class ListTypeDefinitionResourceTest
 
 	@Override
 	protected ListTypeDefinition
-			testPatchListTypeDefinition_addListTypeDefinition()
-		throws Exception {
-
-		return _addListTypeDefinition(randomListTypeDefinition());
-	}
-
-	@Override
-	protected ListTypeDefinition
 			testPostListTypeDefinition_addListTypeDefinition(
 				ListTypeDefinition listTypeDefinition)
 		throws Exception {
@@ -168,22 +115,6 @@ public class ListTypeDefinitionResourceTest
 	@Override
 	protected ListTypeDefinition
 			testPutListTypeDefinition_addListTypeDefinition()
-		throws Exception {
-
-		return _addListTypeDefinition(randomListTypeDefinition());
-	}
-
-	@Override
-	protected ListTypeDefinition
-			testPutListTypeDefinitionByExternalReferenceCode_addListTypeDefinition()
-		throws Exception {
-
-		return _addListTypeDefinition(randomListTypeDefinition());
-	}
-
-	@Override
-	protected ListTypeDefinition
-			testPutListTypeDefinitionByExternalReferenceCode_createListTypeDefinition()
 		throws Exception {
 
 		return _addListTypeDefinition(randomListTypeDefinition());

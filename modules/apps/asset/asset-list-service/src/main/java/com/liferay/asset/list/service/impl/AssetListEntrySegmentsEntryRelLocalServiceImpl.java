@@ -19,14 +19,11 @@ import com.liferay.asset.list.service.base.AssetListEntrySegmentsEntryRelLocalSe
 import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Date;
 import java.util.List;
@@ -67,9 +64,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceImpl
 		assetListEntrySegmentsEntryRel.setCreateDate(new Date());
 		assetListEntrySegmentsEntryRel.setModifiedDate(new Date());
 		assetListEntrySegmentsEntryRel.setAssetListEntryId(assetListEntryId);
-		assetListEntrySegmentsEntryRel.setPriority(
-			assetListEntrySegmentsEntryRelPersistence.countByAssetListEntryId(
-				assetListEntryId));
 		assetListEntrySegmentsEntryRel.setSegmentsEntryId(segmentsEntryId);
 		assetListEntrySegmentsEntryRel.setTypeSettings(typeSettings);
 
@@ -149,15 +143,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceImpl
 	}
 
 	@Override
-	public List<AssetListEntrySegmentsEntryRel>
-		fetchAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds) {
-
-		return assetListEntrySegmentsEntryRelPersistence.findByA_S_C(
-			assetListEntryId, segmentsEntryIds);
-	}
-
-	@Override
 	public AssetListEntrySegmentsEntryRel getAssetListEntrySegmentsEntryRel(
 			long assetListEntryId, long segmentsEntryId)
 		throws PortalException {
@@ -173,17 +158,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceImpl
 
 		return assetListEntrySegmentsEntryRelPersistence.findByAssetListEntryId(
 			assetListEntryId, start, end);
-	}
-
-	@Override
-	public List<AssetListEntrySegmentsEntryRel>
-		getAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds, int start, int end,
-			OrderByComparator<AssetListEntrySegmentsEntryRel>
-				orderByComparator) {
-
-		return assetListEntrySegmentsEntryRelPersistence.findByA_S_C(
-			assetListEntryId, segmentsEntryIds, start, end, orderByComparator);
 	}
 
 	@Override
@@ -207,33 +181,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceImpl
 		return assetListEntrySegmentsEntryRelPersistence.update(
 			assetListEntrySegmentsEntryRel);
 	}
-
-	@Override
-	public void updateVariationsPriority(long[] variationsPriority) {
-		for (int priority = 0; priority < variationsPriority.length;
-			 priority++) {
-
-			AssetListEntrySegmentsEntryRel assetListEntrySegmentsEntryRel =
-				null;
-
-			try {
-				assetListEntrySegmentsEntryRel =
-					getAssetListEntrySegmentsEntryRel(
-						variationsPriority[priority]);
-			}
-			catch (PortalException portalException) {
-				_log.error(portalException);
-			}
-
-			assetListEntrySegmentsEntryRel.setPriority(priority);
-
-			updateAssetListEntrySegmentsEntryRel(
-				assetListEntrySegmentsEntryRel);
-		}
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetListEntrySegmentsEntryRelLocalServiceImpl.class);
 
 	@Reference
 	private AssetListEntryAssetEntryRelPersistence

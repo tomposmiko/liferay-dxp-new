@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Adam Brandizzi
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.calendar.model.Calendar",
 	service = BaseSearcher.class
 )

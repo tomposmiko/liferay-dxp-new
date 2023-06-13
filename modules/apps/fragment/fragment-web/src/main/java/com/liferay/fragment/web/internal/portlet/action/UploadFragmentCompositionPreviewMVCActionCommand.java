@@ -15,7 +15,7 @@
 package com.liferay.fragment.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentPortletKeys;
-import com.liferay.fragment.web.internal.upload.FragmentEntryPreviewImageEditorUploadFileEntryHandler;
+import com.liferay.fragment.web.internal.upload.FragmentEntryPreviewUploadFileEntryHandler;
 import com.liferay.item.selector.ItemSelectorUploadResponseHandler;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/upload_fragment_composition_preview"
@@ -46,13 +47,13 @@ public class UploadFragmentCompositionPreviewMVCActionCommand
 		throws Exception {
 
 		_uploadHandler.upload(
-			_fragmentEntryPreviewImageEditorUploadFileEntryHandler,
+			_fragmentEntryPreviewUploadFileEntryHandler,
 			_itemSelectorUploadResponseHandler, actionRequest, actionResponse);
 	}
 
 	@Reference
-	private FragmentEntryPreviewImageEditorUploadFileEntryHandler
-		_fragmentEntryPreviewImageEditorUploadFileEntryHandler;
+	private FragmentEntryPreviewUploadFileEntryHandler
+		_fragmentEntryPreviewUploadFileEntryHandler;
 
 	@Reference
 	private ItemSelectorUploadResponseHandler

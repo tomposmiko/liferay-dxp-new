@@ -15,42 +15,27 @@
 package com.liferay.fragment.entry.processor.internal.util.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionResource;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
-import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
-import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestHelper;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
-import com.liferay.dynamic.data.mapping.util.DDMFormValuesToFieldsConverter;
-import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
-import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
-import com.liferay.fragment.processor.FragmentEntryProcessorContext;
-import com.liferay.info.item.ClassPKInfoItemIdentifier;
-import com.liferay.info.item.InfoItemReference;
 import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.journal.test.util.JournalTestUtil;
-import com.liferay.journal.util.JournalConverter;
-import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
@@ -64,30 +49,25 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.io.InputStream;
 
-import java.text.DateFormat;
-
-import java.time.chrono.IsoChronology;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.FormatStyle;
-
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -115,288 +95,13 @@ public class FragmentEntryProcessorHelperTest {
 	}
 
 	@Test
-	public void testGetFieldValueFromCollectionValue() throws Exception {
-		JournalArticle journalArticle = _addJournalArticle(
-			_addImageFileEntry(), "ImageFieldName",
-			RandomTestUtil.randomString());
-
-		Assert.assertEquals(
-			"one, two, three",
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "AssetTag_tagNames"
-				),
-				LocaleUtil.SPAIN));
-	}
-
-	@Test
-	public void testGetFieldValueFromEmptyCollectionValue() throws Exception {
-		JournalArticle journalArticle = _addJournalArticle(
-			_addImageFileEntry(), "ImageFieldName",
-			RandomTestUtil.randomString());
-
-		Assert.assertEquals(
-			StringPool.BLANK,
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "AssetCategory_categories"
-				),
-				LocaleUtil.SPAIN));
-	}
-
-	@Test
-	public void testGetFieldValueFromLabeledValue() throws Exception {
-		JournalArticle journalArticle = _addJournalArticle(
-			_addImageFileEntry(), "ImageFieldName", "Custom Title");
-
-		Assert.assertEquals(
-			"Custom Title",
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "title"
-				),
-				LocaleUtil.SPAIN));
-	}
-
-	@Test
-	public void testGetFieldValueFromNullValue() throws Exception {
-		JournalArticle journalArticle = _addJournalArticle(
-			_addImageFileEntry(), "ImageFieldName",
-			RandomTestUtil.randomString());
-
-		Assert.assertNull(
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "NoExistingFieldId"
-				),
-				LocaleUtil.SPAIN));
-	}
-
-	@Test
-	public void testGetFieldValueFromStringValue() throws Exception {
-		DDMFormField ddmFormField = _createDDMFormField(
-			DDMFormFieldTypeConstants.TEXT);
-		String fieldValue = StringBundler.concat(
-			"<script>alert(\"", RandomTestUtil.randomString(), "\")</script>");
-
-		JournalArticle journalArticle = JournalTestUtil.addJournalArticle(
-			_dataDefinitionResourceFactory, ddmFormField,
-			_ddmFormValuesToFieldsConverter, fieldValue, _group.getGroupId(),
-			_journalConverter);
-
-		Assert.assertEquals(
-			_html.escape(fieldValue),
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "DDMStructure_" + ddmFormField.getName()
-				),
-				LocaleUtil.SPAIN));
-	}
-
-	@Test
-	public void testGetFieldValueFromStringValueDateDDMFormFieldType()
-		throws Exception {
-
-		DDMFormField ddmFormField = _createDDMFormField(
-			DDMFormFieldTypeConstants.DATE);
-
-		Date date = new Date();
-
-		JournalArticle journalArticle = JournalTestUtil.addJournalArticle(
-			_dataDefinitionResourceFactory, ddmFormField,
-			_ddmFormValuesToFieldsConverter,
-			DateUtil.getDate(date, "yyyy-MM-dd", LocaleUtil.SPAIN),
-			_group.getGroupId(), _journalConverter);
-
-		Assert.assertEquals(
-			_formatDate(date, LocaleUtil.GERMANY),
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "DDMStructure_" + ddmFormField.getName()
-				),
-				LocaleUtil.GERMANY));
-
-		Assert.assertEquals(
-			_formatDate(date, LocaleUtil.SPAIN),
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "DDMStructure_" + ddmFormField.getName()
-				),
-				LocaleUtil.SPAIN));
-
-		Assert.assertEquals(
-			_formatDate(date, LocaleUtil.US),
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "DDMStructure_" + ddmFormField.getName()
-				),
-				LocaleUtil.US));
-	}
-
-	@Test
-	public void testGetFieldValueFromStringValueLinkToLayoutDDMFormFieldType()
-		throws Exception {
-
-		DDMFormField ddmFormField = _createDDMFormField(
-			DDMFormFieldTypeConstants.LINK_TO_LAYOUT);
-
-		Layout layout = LayoutTestUtil.addTypePortletLayout(
-			_group.getGroupId());
-
-		JournalArticle journalArticle = JournalTestUtil.addJournalArticle(
-			_dataDefinitionResourceFactory, ddmFormField,
-			_ddmFormValuesToFieldsConverter,
-			JSONUtil.put(
-				"groupId", layout.getGroupId()
-			).put(
-				"id", layout.getUuid()
-			).put(
-				"layoutId", layout.getLayoutId()
-			).put(
-				"name", layout.getName()
-			).put(
-				"privateLayout", layout.isPrivateLayout()
-			).put(
-				"returnType",
-				"com.liferay.item.selector.criteria.UUIDItemSelectorReturnType"
-			).put(
-				"title", layout.getTitle()
-			).toString(),
-			_group.getGroupId(), _journalConverter);
-
-		Assert.assertEquals(
-			layout.getFriendlyURL(),
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "DDMStructure_" + ddmFormField.getName()
-				),
-				LocaleUtil.SPAIN));
-	}
-
-	@Test
-	public void testGetFieldValueFromStringValueRichTextDDMFormFieldType()
-		throws Exception {
-
-		DDMFormField ddmFormField = _createDDMFormField(
-			DDMFormFieldTypeConstants.RICH_TEXT);
-		String fieldValue = StringBundler.concat(
-			"<p>", RandomTestUtil.randomString(), "</p>");
-
-		JournalArticle journalArticle = JournalTestUtil.addJournalArticle(
-			_dataDefinitionResourceFactory, ddmFormField,
-			_ddmFormValuesToFieldsConverter, fieldValue, _group.getGroupId(),
-			_journalConverter);
-
-		Assert.assertEquals(
-			fieldValue,
-			_getFieldValue(
-				JSONUtil.put(
-					"className", JournalArticle.class.getName()
-				).put(
-					"classNameId",
-					_portal.getClassNameId(JournalArticle.class.getName())
-				).put(
-					"classPK", journalArticle.getResourcePrimKey()
-				).put(
-					"fieldId", "DDMStructure_" + ddmFormField.getName()
-				),
-				LocaleUtil.SPAIN));
-	}
-
-	@Test
-	public void testGetFieldValueFromWebImage() throws Exception {
-		String fieldId = "ImageFieldName";
-
-		JournalArticle journalArticle = _addJournalArticle(
-			_addImageFileEntry(), fieldId, RandomTestUtil.randomString());
-
-		Object actual = _getFieldValue(
-			JSONUtil.put(
-				"className", JournalArticle.class.getName()
-			).put(
-				"classNameId",
-				_portal.getClassNameId(JournalArticle.class.getName())
-			).put(
-				"classPK", journalArticle.getResourcePrimKey()
-			).put(
-				"fieldId", fieldId
-			),
-			LocaleUtil.SPAIN);
-
-		Assert.assertTrue(actual instanceof JSONObject);
-	}
-
-	@Test
 	public void testGetFileEntryIdClassNameClassPKDLImage() throws Exception {
 		FileEntry fileEntry = _addImageFileEntry();
 
-		Assert.assertEquals(
-			fileEntry.getFileEntryId(),
-			_fragmentEntryProcessorHelper.getFileEntryId(
-				FileEntry.class.getName(), fileEntry.getFileEntryId()));
+		long fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+			FileEntry.class.getName(), fileEntry.getFileEntryId());
+
+		Assert.assertEquals(fileEntry.getFileEntryId(), fileEntryId);
 	}
 
 	@Test
@@ -404,26 +109,24 @@ public class FragmentEntryProcessorHelperTest {
 		throws Exception {
 
 		JournalArticle journalArticle = _addJournalArticle(
-			_addImageFileEntry(), "ImageFieldName",
-			RandomTestUtil.randomString());
+			_addImageFileEntry(), "ImageFieldName");
 
-		Assert.assertEquals(
-			0L,
-			_fragmentEntryProcessorHelper.getFileEntryId(
-				JournalArticle.class.getName(),
-				journalArticle.getResourcePrimKey()));
+		long fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+			JournalArticle.class.getName(),
+			journalArticle.getResourcePrimKey());
+
+		Assert.assertEquals(0L, fileEntryId);
 	}
 
 	@Test
 	public void testGetFileEntryIdClassPKDLImage() throws Exception {
 		FileEntry fileEntry = _addImageFileEntry();
 
-		Assert.assertEquals(
-			fileEntry.getFileEntryId(),
-			_fragmentEntryProcessorHelper.getFileEntryId(
-				_portal.getClassNameId(FileEntry.class.getName()),
-				fileEntry.getFileEntryId(), "fileURL",
-				LocaleUtil.getSiteDefault()));
+		long fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+			_portal.getClassNameId(FileEntry.class.getName()),
+			fileEntry.getFileEntryId(), "fileURL", LocaleUtil.getSiteDefault());
+
+		Assert.assertEquals(fileEntry.getFileEntryId(), fileEntryId);
 	}
 
 	@Test
@@ -432,15 +135,14 @@ public class FragmentEntryProcessorHelperTest {
 
 		String fieldId = "ImageFieldName";
 
-		JournalArticle journalArticle = _addJournalArticle(
-			fileEntry, fieldId, RandomTestUtil.randomString());
+		JournalArticle journalArticle = _addJournalArticle(fileEntry, fieldId);
 
-		Assert.assertEquals(
-			fileEntry.getFileEntryId(),
-			_fragmentEntryProcessorHelper.getFileEntryId(
-				_portal.getClassNameId(JournalArticle.class.getName()),
-				journalArticle.getResourcePrimKey(), fieldId,
-				LocaleUtil.getSiteDefault()));
+		long fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+			_portal.getClassNameId(JournalArticle.class.getName()),
+			journalArticle.getResourcePrimKey(), fieldId,
+			LocaleUtil.getSiteDefault());
+
+		Assert.assertEquals(fileEntry.getFileEntryId(), fileEntryId);
 	}
 
 	@Test
@@ -451,17 +153,12 @@ public class FragmentEntryProcessorHelperTest {
 
 		String fieldId = "ImageFieldName";
 
-		JournalArticle journalArticle = _addJournalArticle(
-			fileEntry, fieldId, RandomTestUtil.randomString());
+		JournalArticle journalArticle = _addJournalArticle(fileEntry, fieldId);
 
-		Assert.assertEquals(
-			fileEntry.getFileEntryId(),
-			_fragmentEntryProcessorHelper.getFileEntryId(
-				new InfoItemReference(
-					JournalArticle.class.getName(),
-					new ClassPKInfoItemIdentifier(
-						journalArticle.getResourcePrimKey())),
-				fieldId, LocaleUtil.getSiteDefault()));
+		long fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+			journalArticle, fieldId, LocaleUtil.getSiteDefault());
+
+		Assert.assertEquals(fileEntry.getFileEntryId(), fileEntryId);
 	}
 
 	private DDMStructure _addDDMStructure(Group group, String content)
@@ -496,19 +193,31 @@ public class FragmentEntryProcessorHelperTest {
 			null, TestPropsValues.getUserId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.IMAGE_JPEG,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK, inputStream, bytes.length, null,
-			null, serviceContext);
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
+			inputStream, bytes.length, null, null, serviceContext);
 	}
 
 	private JournalArticle _addJournalArticle(
-			DDMStructure ddmStructure, String fieldId, FileEntry fileEntry,
-			String title)
+			DDMStructure ddmStructure, String fieldId, FileEntry fileEntry)
 		throws Exception {
 
 		User user = TestPropsValues.getUser();
 
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
+
+		String dynamicContent = _readJSONFileToString("dynamic_content.json");
+
+		dynamicContent = StringUtil.replace(
+			dynamicContent,
+			new String[] {
+				"FILE_ENTRY_ID", "GROUP_ID", "RESOURCE_PRIM_KEY", "UUID"
+			},
+			new String[] {
+				String.valueOf(fileEntry.getFileEntryId()),
+				String.valueOf(fileEntry.getGroupId()),
+				String.valueOf(fileEntry.getPrimaryKey()),
+				String.valueOf(fileEntry.getUuid())
+			});
 
 		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
 			_group.getGroupId(), ddmStructure.getStructureId(),
@@ -517,17 +226,12 @@ public class FragmentEntryProcessorHelperTest {
 		Calendar displayCalendar = CalendarFactoryUtil.getCalendar(
 			user.getTimeZone());
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
-
-		serviceContext.setAssetTagNames(new String[] {"one", "two", "three"});
-
 		return _journalArticleLocalService.addArticle(
 			null, user.getUserId(), _group.getGroupId(), 0,
 			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, 0, StringPool.BLANK,
 			true, JournalArticleConstants.VERSION_DEFAULT,
 			HashMapBuilder.put(
-				defaultLocale, title
+				defaultLocale, RandomTestUtil.randomString()
 			).build(),
 			HashMapBuilder.put(
 				defaultLocale, defaultLocale.toString()
@@ -535,21 +239,25 @@ public class FragmentEntryProcessorHelperTest {
 			HashMapBuilder.put(
 				defaultLocale, RandomTestUtil.randomString()
 			).build(),
-			StringUtil.replace(
-				_readFileToString("dynamic_content.xml"),
-				new String[] {"[$FIELD_ID$]", "[$IMAGE_JSON$]"},
-				new String[] {fieldId, _toJSON(fileEntry)}),
-			ddmStructure.getStructureId(), ddmTemplate.getTemplateKey(), null,
+			_getJournalArticleStructuredContent(
+				fieldId,
+				Collections.singletonList(
+					HashMapBuilder.put(
+						defaultLocale, dynamicContent
+					).build()),
+				LocaleUtil.toLanguageId(defaultLocale)),
+			ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(), null,
 			displayCalendar.get(Calendar.MONTH),
 			displayCalendar.get(Calendar.DATE),
 			displayCalendar.get(Calendar.YEAR),
 			displayCalendar.get(Calendar.HOUR_OF_DAY),
 			displayCalendar.get(Calendar.MINUTE), 0, 0, 0, 0, 0, true, 0, 0, 0,
-			0, 0, true, true, false, null, null, null, null, serviceContext);
+			0, 0, true, true, false, null, null, null, null,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 	}
 
 	private JournalArticle _addJournalArticle(
-			FileEntry fileEntry, String fieldId, String title)
+			FileEntry fileEntry, String fieldId)
 		throws Exception {
 
 		String ddmStructureContent = _readJSONFileToString(
@@ -561,24 +269,21 @@ public class FragmentEntryProcessorHelperTest {
 		DDMStructure ddmStructure = _addDDMStructure(
 			_group, ddmStructureContent);
 
-		return _addJournalArticle(ddmStructure, fieldId, fileEntry, title);
+		return _addJournalArticle(ddmStructure, fieldId, fileEntry);
 	}
 
-	private DDMFormField _createDDMFormField(String type) {
-		DDMFormField ddmFormField = new DDMFormField("name", type);
+	private Document _createDocument(
+		String availableLocales, String defaultLocale) {
 
-		ddmFormField.setDataType("text");
-		ddmFormField.setIndexType("text");
-		ddmFormField.setLocalizable(true);
+		Document document = SAXReaderUtil.createDocument();
 
-		LocalizedValue localizedValue = new LocalizedValue(LocaleUtil.US);
+		Element rootElement = document.addElement("root");
 
-		localizedValue.addString(
-			LocaleUtil.US, RandomTestUtil.randomString(10));
+		rootElement.addAttribute("available-locales", availableLocales);
+		rootElement.addAttribute("default-locale", defaultLocale);
+		rootElement.addElement("request");
 
-		ddmFormField.setLabel(localizedValue);
-
-		return ddmFormField;
+		return document;
 	}
 
 	private DDMForm _deserialize(String content) {
@@ -592,26 +297,43 @@ public class FragmentEntryProcessorHelperTest {
 		return ddmFormDeserializerDeserializeResponse.getDDMForm();
 	}
 
-	private String _formatDate(Date date, Locale locale) {
-		DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
-			DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-				FormatStyle.SHORT, null, IsoChronology.INSTANCE, locale),
-			locale);
+	private String _getJournalArticleStructuredContent(
+		String name, List<Map<Locale, String>> contents, String defaultLocale) {
 
-		return dateFormat.format(date);
-	}
+		StringBundler sb = new StringBundler();
 
-	private Object _getFieldValue(
-			JSONObject editableValuesJSONObject, Locale locale)
-		throws Exception {
+		for (Map<Locale, String> map : contents) {
+			for (Locale locale : map.keySet()) {
+				sb.append(LocaleUtil.toLanguageId(locale));
+				sb.append(StringPool.COMMA);
+			}
 
-		FragmentEntryProcessorContext fragmentEntryProcessorContext =
-			new DefaultFragmentEntryProcessorContext(
-				null, null, FragmentEntryLinkConstants.EDIT, locale);
+			sb.setIndex(sb.index() - 1);
+		}
 
-		return _fragmentEntryProcessorHelper.getFieldValue(
-			editableValuesJSONObject, new HashMap<>(),
-			fragmentEntryProcessorContext);
+		Document document = _createDocument(sb.toString(), defaultLocale);
+
+		Element rootElement = document.getRootElement();
+
+		for (Map<Locale, String> map : contents) {
+			Element dynamicElementElement = rootElement.addElement(
+				"dynamic-element");
+
+			dynamicElementElement.addAttribute("index-type", "keyword");
+			dynamicElementElement.addAttribute("name", name);
+			dynamicElementElement.addAttribute("type", "image");
+
+			for (Map.Entry<Locale, String> entry : map.entrySet()) {
+				Element element = dynamicElementElement.addElement(
+					"dynamic-content");
+
+				element.addAttribute(
+					"language-id", LocaleUtil.toLanguageId(entry.getKey()));
+				element.addCDATA(entry.getValue());
+			}
+		}
+
+		return document.asXML();
 	}
 
 	private String _readFileToString(String fileName) throws Exception {
@@ -630,26 +352,6 @@ public class FragmentEntryProcessorHelperTest {
 		return jsonObject.toString();
 	}
 
-	private String _toJSON(FileEntry fileEntry) {
-		return JSONUtil.put(
-			"alt", StringPool.BLANK
-		).put(
-			"description", StringPool.BLANK
-		).put(
-			"fileEntryId", fileEntry.getFileEntryId()
-		).put(
-			"groupId", fileEntry.getGroupId()
-		).put(
-			"name", fileEntry.getFileName()
-		).put(
-			"title", fileEntry.getTitle()
-		).put(
-			"type", "journal"
-		).put(
-			"uuid", fileEntry.getUuid()
-		).toString();
-	}
-
 	@Inject
 	private static JournalArticleLocalService _journalArticleLocalService;
 
@@ -657,22 +359,10 @@ public class FragmentEntryProcessorHelperTest {
 	private static DDMFormDeserializer _jsonDDMFormDeserializer;
 
 	@Inject
-	private DataDefinitionResource.Factory _dataDefinitionResourceFactory;
-
-	@Inject
-	private DDMFormValuesToFieldsConverter _ddmFormValuesToFieldsConverter;
-
-	@Inject
 	private FragmentEntryProcessorHelper _fragmentEntryProcessorHelper;
 
 	@DeleteAfterTestRun
 	private Group _group;
-
-	@Inject
-	private Html _html;
-
-	@Inject
-	private JournalConverter _journalConverter;
 
 	@Inject
 	private Portal _portal;

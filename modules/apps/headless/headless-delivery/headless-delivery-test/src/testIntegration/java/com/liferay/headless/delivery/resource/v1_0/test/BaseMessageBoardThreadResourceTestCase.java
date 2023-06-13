@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardThread;
 import com.liferay.headless.delivery.client.dto.v1_0.Rating;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
@@ -32,7 +31,6 @@ import com.liferay.headless.delivery.client.permission.Permission;
 import com.liferay.headless.delivery.client.resource.v1_0.MessageBoardThreadResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.MessageBoardThreadSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -43,7 +41,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -60,7 +58,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -69,16 +67,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -248,10 +248,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantMessageBoardThread),
 				(List<MessageBoardThread>)page.getItems());
-			assertValid(
-				page,
-				testGetMessageBoardSectionMessageBoardThreadsPage_getExpectedActions(
-					irrelevantMessageBoardSectionId));
+			assertValid(page);
 		}
 
 		MessageBoardThread messageBoardThread1 =
@@ -273,37 +270,13 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(messageBoardThread1, messageBoardThread2),
 			(List<MessageBoardThread>)page.getItems());
-		assertValid(
-			page,
-			testGetMessageBoardSectionMessageBoardThreadsPage_getExpectedActions(
-				messageBoardSectionId));
+		assertValid(page);
 
 		messageBoardThreadResource.deleteMessageBoardThread(
 			messageBoardThread1.getId());
 
 		messageBoardThreadResource.deleteMessageBoardThread(
 			messageBoardThread2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetMessageBoardSectionMessageBoardThreadsPage_getExpectedActions(
-				Long messageBoardSectionId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/message-board-sections/{messageBoardSectionId}/message-board-threads/batch".
-				replace(
-					"{messageBoardSectionId}",
-					String.valueOf(messageBoardSectionId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -333,43 +306,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 						messageBoardSectionId, null, null,
 						getFilterString(
 							entityField, "between", messageBoardThread1),
-						Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(messageBoardThread1),
-				(List<MessageBoardThread>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetMessageBoardSectionMessageBoardThreadsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long messageBoardSectionId =
-			testGetMessageBoardSectionMessageBoardThreadsPage_getMessageBoardSectionId();
-
-		MessageBoardThread messageBoardThread1 =
-			testGetMessageBoardSectionMessageBoardThreadsPage_addMessageBoardThread(
-				messageBoardSectionId, randomMessageBoardThread());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		MessageBoardThread messageBoardThread2 =
-			testGetMessageBoardSectionMessageBoardThreadsPage_addMessageBoardThread(
-				messageBoardSectionId, randomMessageBoardThread());
-
-		for (EntityField entityField : entityFields) {
-			Page<MessageBoardThread> page =
-				messageBoardThreadResource.
-					getMessageBoardSectionMessageBoardThreadsPage(
-						messageBoardSectionId, null, null,
-						getFilterString(entityField, "eq", messageBoardThread1),
 						Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -479,23 +415,9 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		testGetMessageBoardSectionMessageBoardThreadsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetMessageBoardSectionMessageBoardThreadsPageWithSortDouble()
-		throws Exception {
-
-		testGetMessageBoardSectionMessageBoardThreadsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
-					messageBoardThread1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					messageBoardThread2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -506,9 +428,9 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		testGetMessageBoardSectionMessageBoardThreadsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread2, entityField.getName(), 1);
 			});
 	}
@@ -524,27 +446,27 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -552,12 +474,12 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -699,23 +621,13 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 			messageBoardThread1, (List<MessageBoardThread>)page.getItems());
 		assertContains(
 			messageBoardThread2, (List<MessageBoardThread>)page.getItems());
-		assertValid(
-			page, testGetMessageBoardThreadsRankedPage_getExpectedActions());
+		assertValid(page);
 
 		messageBoardThreadResource.deleteMessageBoardThread(
 			messageBoardThread1.getId());
 
 		messageBoardThreadResource.deleteMessageBoardThread(
 			messageBoardThread2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetMessageBoardThreadsRankedPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -782,23 +694,9 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		testGetMessageBoardThreadsRankedPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetMessageBoardThreadsRankedPageWithSortDouble()
-		throws Exception {
-
-		testGetMessageBoardThreadsRankedPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
-					messageBoardThread1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					messageBoardThread2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -809,9 +707,9 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		testGetMessageBoardThreadsRankedPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread2, entityField.getName(), 1);
 			});
 	}
@@ -827,27 +725,27 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -855,12 +753,12 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -960,7 +858,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	@Test
 	public void testGraphQLDeleteMessageBoardThread() throws Exception {
 		MessageBoardThread messageBoardThread =
-			testGraphQLDeleteMessageBoardThread_addMessageBoardThread();
+			testGraphQLMessageBoardThread_addMessageBoardThread();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -975,6 +873,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteMessageBoardThread"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -990,13 +889,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected MessageBoardThread
-			testGraphQLDeleteMessageBoardThread_addMessageBoardThread()
-		throws Exception {
-
-		return testGraphQLMessageBoardThread_addMessageBoardThread();
 	}
 
 	@Test
@@ -1023,7 +915,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	@Test
 	public void testGraphQLGetMessageBoardThread() throws Exception {
 		MessageBoardThread messageBoardThread =
-			testGraphQLGetMessageBoardThread_addMessageBoardThread();
+			testGraphQLMessageBoardThread_addMessageBoardThread();
 
 		Assert.assertTrue(
 			equals(
@@ -1066,13 +958,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				"Object/code"));
 	}
 
-	protected MessageBoardThread
-			testGraphQLGetMessageBoardThread_addMessageBoardThread()
-		throws Exception {
-
-		return testGraphQLMessageBoardThread_addMessageBoardThread();
-	}
-
 	@Test
 	public void testPatchMessageBoardThread() throws Exception {
 		MessageBoardThread postMessageBoardThread =
@@ -1089,8 +974,8 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		MessageBoardThread expectedPatchMessageBoardThread =
 			postMessageBoardThread.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchMessageBoardThread, expectedPatchMessageBoardThread);
+		_beanUtilsBean.copyProperties(
+			expectedPatchMessageBoardThread, randomPatchMessageBoardThread);
 
 		MessageBoardThread getMessageBoardThread =
 			messageBoardThreadResource.getMessageBoardThread(
@@ -1192,19 +1077,18 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	@Test
-	public void testPutMessageBoardThreadPermissionsPage() throws Exception {
+	public void testPutMessageBoardThreadPermission() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		MessageBoardThread messageBoardThread =
-			testPutMessageBoardThreadPermissionsPage_addMessageBoardThread();
+			testPutMessageBoardThreadPermission_addMessageBoardThread();
 
-		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			messageBoardThreadResource.
-				putMessageBoardThreadPermissionsPageHttpResponse(
+				putMessageBoardThreadPermissionHttpResponse(
 					messageBoardThread.getId(),
 					new Permission[] {
 						new Permission() {
@@ -1218,7 +1102,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			messageBoardThreadResource.
-				putMessageBoardThreadPermissionsPageHttpResponse(
+				putMessageBoardThreadPermissionHttpResponse(
 					0L,
 					new Permission[] {
 						new Permission() {
@@ -1231,7 +1115,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	protected MessageBoardThread
-			testPutMessageBoardThreadPermissionsPage_addMessageBoardThread()
+			testPutMessageBoardThreadPermission_addMessageBoardThread()
 		throws Exception {
 
 		return messageBoardThreadResource.postSiteMessageBoardThread(
@@ -1316,10 +1200,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantMessageBoardThread),
 				(List<MessageBoardThread>)page.getItems());
-			assertValid(
-				page,
-				testGetSiteMessageBoardThreadsPage_getExpectedActions(
-					irrelevantSiteId));
+			assertValid(page);
 		}
 
 		MessageBoardThread messageBoardThread1 =
@@ -1338,33 +1219,13 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(messageBoardThread1, messageBoardThread2),
 			(List<MessageBoardThread>)page.getItems());
-		assertValid(
-			page,
-			testGetSiteMessageBoardThreadsPage_getExpectedActions(siteId));
+		assertValid(page);
 
 		messageBoardThreadResource.deleteMessageBoardThread(
 			messageBoardThread1.getId());
 
 		messageBoardThreadResource.deleteMessageBoardThread(
 			messageBoardThread2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetSiteMessageBoardThreadsPage_getExpectedActions(Long siteId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/message-board-threads/batch".
-				replace("{siteId}", String.valueOf(siteId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -1392,41 +1253,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 					siteId, null, null, null,
 					getFilterString(
 						entityField, "between", messageBoardThread1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(messageBoardThread1),
-				(List<MessageBoardThread>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetSiteMessageBoardThreadsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long siteId = testGetSiteMessageBoardThreadsPage_getSiteId();
-
-		MessageBoardThread messageBoardThread1 =
-			testGetSiteMessageBoardThreadsPage_addMessageBoardThread(
-				siteId, randomMessageBoardThread());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		MessageBoardThread messageBoardThread2 =
-			testGetSiteMessageBoardThreadsPage_addMessageBoardThread(
-				siteId, randomMessageBoardThread());
-
-		for (EntityField entityField : entityFields) {
-			Page<MessageBoardThread> page =
-				messageBoardThreadResource.getSiteMessageBoardThreadsPage(
-					siteId, null, null, null,
-					getFilterString(entityField, "eq", messageBoardThread1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -1527,23 +1353,9 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		testGetSiteMessageBoardThreadsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetSiteMessageBoardThreadsPageWithSortDouble()
-		throws Exception {
-
-		testGetSiteMessageBoardThreadsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
-					messageBoardThread1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					messageBoardThread2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -1554,9 +1366,9 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		testGetSiteMessageBoardThreadsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, messageBoardThread1, messageBoardThread2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					messageBoardThread2, entityField.getName(), 1);
 			});
 	}
@@ -1572,27 +1384,27 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1600,12 +1412,12 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						messageBoardThread2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1712,9 +1524,9 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		Assert.assertEquals(0, messageBoardThreadsJSONObject.get("totalCount"));
 
 		MessageBoardThread messageBoardThread1 =
-			testGraphQLGetSiteMessageBoardThreadsPage_addMessageBoardThread();
+			testGraphQLMessageBoardThread_addMessageBoardThread();
 		MessageBoardThread messageBoardThread2 =
-			testGraphQLGetSiteMessageBoardThreadsPage_addMessageBoardThread();
+			testGraphQLMessageBoardThread_addMessageBoardThread();
 
 		messageBoardThreadsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -1728,13 +1540,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 			Arrays.asList(
 				MessageBoardThreadSerDes.toDTOs(
 					messageBoardThreadsJSONObject.getString("items"))));
-	}
-
-	protected MessageBoardThread
-			testGraphQLGetSiteMessageBoardThreadsPage_addMessageBoardThread()
-		throws Exception {
-
-		return testGraphQLMessageBoardThread_addMessageBoardThread();
 	}
 
 	@Test
@@ -1781,19 +1586,11 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		MessageBoardThread getMessageBoardThread =
 			messageBoardThreadResource.
 				getSiteMessageBoardThreadByFriendlyUrlPath(
-					testGetSiteMessageBoardThreadByFriendlyUrlPath_getSiteId(
-						postMessageBoardThread),
+					postMessageBoardThread.getSiteId(),
 					postMessageBoardThread.getFriendlyUrlPath());
 
 		assertEquals(postMessageBoardThread, getMessageBoardThread);
 		assertValid(getMessageBoardThread);
-	}
-
-	protected Long testGetSiteMessageBoardThreadByFriendlyUrlPath_getSiteId(
-			MessageBoardThread messageBoardThread)
-		throws Exception {
-
-		return messageBoardThread.getSiteId();
 	}
 
 	protected MessageBoardThread
@@ -1809,7 +1606,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		throws Exception {
 
 		MessageBoardThread messageBoardThread =
-			testGraphQLGetSiteMessageBoardThreadByFriendlyUrlPath_addMessageBoardThread();
+			testGraphQLMessageBoardThread_addMessageBoardThread();
 
 		Assert.assertTrue(
 			equals(
@@ -1824,9 +1621,8 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 										put(
 											"siteKey",
 											"\"" +
-												testGraphQLGetSiteMessageBoardThreadByFriendlyUrlPath_getSiteId(
-													messageBoardThread) + "\"");
-
+												messageBoardThread.getSiteId() +
+													"\"");
 										put(
 											"friendlyUrlPath",
 											"\"" +
@@ -1838,14 +1634,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/messageBoardThreadByFriendlyUrlPath"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteMessageBoardThreadByFriendlyUrlPath_getSiteId(
-				MessageBoardThread messageBoardThread)
-		throws Exception {
-
-		return messageBoardThread.getSiteId();
 	}
 
 	@Test
@@ -1876,13 +1664,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				"Object/code"));
 	}
 
-	protected MessageBoardThread
-			testGraphQLGetSiteMessageBoardThreadByFriendlyUrlPath_addMessageBoardThread()
-		throws Exception {
-
-		return testGraphQLMessageBoardThread_addMessageBoardThread();
-	}
-
 	@Test
 	public void testGetSiteMessageBoardThreadPermissionsPage()
 		throws Exception {
@@ -1903,21 +1684,18 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	@Test
-	public void testPutSiteMessageBoardThreadPermissionsPage()
-		throws Exception {
-
+	public void testPutSiteMessageBoardThreadPermission() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		MessageBoardThread messageBoardThread =
-			testPutSiteMessageBoardThreadPermissionsPage_addMessageBoardThread();
+			testPutSiteMessageBoardThreadPermission_addMessageBoardThread();
 
-		@SuppressWarnings("PMD.UnusedLocalVariable")
 		com.liferay.portal.kernel.model.Role role = RoleTestUtil.addRole(
 			RoleConstants.TYPE_REGULAR);
 
 		assertHttpResponseStatusCode(
 			200,
 			messageBoardThreadResource.
-				putSiteMessageBoardThreadPermissionsPageHttpResponse(
+				putSiteMessageBoardThreadPermissionHttpResponse(
 					messageBoardThread.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1931,7 +1709,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		assertHttpResponseStatusCode(
 			404,
 			messageBoardThreadResource.
-				putSiteMessageBoardThreadPermissionsPageHttpResponse(
+				putSiteMessageBoardThreadPermissionHttpResponse(
 					messageBoardThread.getSiteId(),
 					new Permission[] {
 						new Permission() {
@@ -1944,7 +1722,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	protected MessageBoardThread
-			testPutSiteMessageBoardThreadPermissionsPage_addMessageBoardThread()
+			testPutSiteMessageBoardThreadPermission_addMessageBoardThread()
 		throws Exception {
 
 		return messageBoardThreadResource.postSiteMessageBoardThread(
@@ -2316,26 +2094,8 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("lastPostDate", additionalAssertFieldName)) {
-				if (messageBoardThread.getLastPostDate() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("locked", additionalAssertFieldName)) {
 				if (messageBoardThread.getLocked() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"messageBoardRootMessageId", additionalAssertFieldName)) {
-
-				if (messageBoardThread.getMessageBoardRootMessageId() == null) {
 					valid = false;
 				}
 
@@ -2471,13 +2231,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	}
 
 	protected void assertValid(Page<MessageBoardThread> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<MessageBoardThread> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<MessageBoardThread> messageBoardThreads =
@@ -2493,20 +2246,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected void assertValid(Rating rating) {
@@ -2813,34 +2552,10 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("lastPostDate", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						messageBoardThread1.getLastPostDate(),
-						messageBoardThread2.getLastPostDate())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("locked", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						messageBoardThread1.getLocked(),
 						messageBoardThread2.getLocked())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"messageBoardRootMessageId", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						messageBoardThread1.getMessageBoardRootMessageId(),
-						messageBoardThread2.getMessageBoardRootMessageId())) {
 
 					return false;
 				}
@@ -3137,16 +2852,14 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -3163,10 +2876,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -3176,18 +2885,18 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -3344,46 +3053,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
-		if (entityFieldName.equals("lastPostDate")) {
-			if (operator.equals("between")) {
-				sb = new StringBundler();
-
-				sb.append("(");
-				sb.append(entityFieldName);
-				sb.append(" gt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(
-							messageBoardThread.getLastPostDate(), -2)));
-				sb.append(" and ");
-				sb.append(entityFieldName);
-				sb.append(" lt ");
-				sb.append(
-					_dateFormat.format(
-						DateUtils.addSeconds(
-							messageBoardThread.getLastPostDate(), 2)));
-				sb.append(")");
-			}
-			else {
-				sb.append(entityFieldName);
-
-				sb.append(" ");
-				sb.append(operator);
-				sb.append(" ");
-
-				sb.append(
-					_dateFormat.format(messageBoardThread.getLastPostDate()));
-			}
-
-			return sb.toString();
-		}
-
 		if (entityFieldName.equals("locked")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("messageBoardRootMessageId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -3394,19 +3064,13 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 		}
 
 		if (entityFieldName.equals("numberOfMessageBoardAttachments")) {
-			sb.append(
-				String.valueOf(
-					messageBoardThread.getNumberOfMessageBoardAttachments()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("numberOfMessageBoardMessages")) {
-			sb.append(
-				String.valueOf(
-					messageBoardThread.getNumberOfMessageBoardMessages()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("relatedContents")) {
@@ -3526,9 +3190,7 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 				headline = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
-				lastPostDate = RandomTestUtil.nextDate();
 				locked = RandomTestUtil.randomBoolean();
-				messageBoardRootMessageId = RandomTestUtil.randomLong();
 				messageBoardSectionId = RandomTestUtil.randomLong();
 				numberOfMessageBoardAttachments = RandomTestUtil.randomInt();
 				numberOfMessageBoardMessages = RandomTestUtil.randomInt();
@@ -3579,115 +3241,6 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -3763,6 +3316,18 @@ public abstract class BaseMessageBoardThreadResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseMessageBoardThreadResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

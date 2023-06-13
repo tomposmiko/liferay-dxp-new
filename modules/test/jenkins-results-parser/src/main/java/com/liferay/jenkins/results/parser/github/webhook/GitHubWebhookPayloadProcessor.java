@@ -786,9 +786,7 @@ public class GitHubWebhookPayloadProcessor {
 		List<String> ciEnabledBranchNames = _getCIEnabledBranchNames(
 			repositoryName);
 
-		if (!_acRepositories.contains(repositoryName) &&
-			!ciEnabledBranchNames.contains(branchName)) {
-
+		if (!ciEnabledBranchNames.contains(branchName)) {
 			StringBuilder sb = new StringBuilder(4);
 
 			sb.append("Closing pull request because pulls for reference ");
@@ -1114,15 +1112,10 @@ public class GitHubWebhookPayloadProcessor {
 
 		JSONObject jsonObject = new JSONObject();
 
-		jsonObject.put(
-			"branch", branchName
-		).put(
-			"command", "pull"
-		).put(
-			"pullRequestNumber", pullRequest.getNumber()
-		).put(
-			"repo", repositoryName
-		);
+		jsonObject.put("branch", branchName);
+		jsonObject.put("command", "pull");
+		jsonObject.put("pullRequestNumber", pullRequest.getNumber());
+		jsonObject.put("repo", repositoryName);
 
 		try {
 			if (!pullRequest.isValidCIMergeFile()) {
@@ -1592,11 +1585,9 @@ public class GitHubWebhookPayloadProcessor {
 			_log.info("Sync subrepo SHA " + sha);
 		}
 
-		jsonObject.put(
-			"pullRequestNumber", "0"
-		).put(
-			"sha", sha
-		);
+		jsonObject.put("sha", sha);
+
+		jsonObject.put("pullRequestNumber", "0");
 
 		String command = "push";
 		String propertyName =
@@ -2413,8 +2404,6 @@ public class GitHubWebhookPayloadProcessor {
 	private static final Log _log = LogFactory.getLog(
 		GitHubWebhookPayloadProcessor.class);
 
-	private static final List<String> _acRepositories = Arrays.asList(
-		"com-liferay-osb-asah-private", "com-liferay-osb-faro-private");
 	private static final Pattern _buildURLPattern = Pattern.compile(
 		"Build[\\w\\s]*started.*Job Link: <a href=\"(?<buildURL>[^\"]+)\"");
 	private static final List<String> _gauntletUsernames = Arrays.asList(

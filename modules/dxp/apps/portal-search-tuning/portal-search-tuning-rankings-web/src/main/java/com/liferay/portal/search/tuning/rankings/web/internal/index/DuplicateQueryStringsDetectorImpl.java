@@ -29,12 +29,14 @@ import com.liferay.portal.search.query.TermsQuery;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.name.RankingIndexName;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.name.RankingIndexNameBuilder;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -67,21 +69,82 @@ public class DuplicateQueryStringsDetectorImpl
 
 					setIndexNames(rankingIndexName.getIndexName());
 
-					setQuery(_getCriteriaQuery(criteria));
+					setQuery(getCriteriaQuery(criteria));
 					setScoreEnabled(false);
 				}
 			});
 
 		SearchHits searchHits = searchSearchResponse.getSearchHits();
 
-		List<String> duplicateQueryStrings = new ArrayList<>();
+		List<SearchHit> searchHitsList = searchHits.getSearchHits();
 
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			duplicateQueryStrings.addAll(
-				_getDuplicateQueryStrings(searchHit, queryStrings));
+		Stream<SearchHit> stream = searchHitsList.stream();
+
+		return stream.map(
+			searchHit -> getDuplicateQueryStrings(searchHit, queryStrings)
+		).flatMap(
+			Collection::stream
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	protected BooleanQuery getCriteriaQuery(Criteria criteria) {
+		BooleanQuery booleanQuery = queries.booleanQuery();
+
+		_addQueryClauses(
+			booleanQuery::addFilterQueryClauses, getQueryStringsQuery(criteria),
+			getIndexQuery(criteria));
+		_addQueryClauses(
+			booleanQuery::addMustNotQueryClauses,
+			queries.term(RankingFields.INACTIVE, true),
+			getUnlessRankingIdQuery(criteria));
+
+		return booleanQuery;
+	}
+
+	protected Collection<String> getDuplicateQueryStrings(
+		SearchHit searchHit, Collection<String> queryStrings) {
+
+		Document document = searchHit.getDocument();
+
+		Collection<String> documentQueryStrings = document.getStrings(
+			RankingFields.QUERY_STRINGS);
+
+		documentQueryStrings.retainAll(queryStrings);
+
+		return documentQueryStrings;
+	}
+
+	protected Query getIndexQuery(Criteria criteria) {
+		if (Validator.isBlank(criteria.getIndex())) {
+			return null;
 		}
 
-		return duplicateQueryStrings;
+		return queries.term(RankingFields.INDEX, criteria.getIndex());
+	}
+
+	protected TermsQuery getQueryStringsQuery(Criteria criteria) {
+		TermsQuery termsQuery = queries.terms(
+			RankingFields.QUERY_STRINGS_KEYWORD);
+
+		Collection<String> queryStrings = criteria.getQueryStrings();
+
+		termsQuery.addValues(queryStrings.toArray());
+
+		return termsQuery;
+	}
+
+	protected IdsQuery getUnlessRankingIdQuery(Criteria criteria) {
+		if (Validator.isBlank(criteria.getUnlessRankingDocumentId())) {
+			return null;
+		}
+
+		IdsQuery idsQuery = queries.ids();
+
+		idsQuery.addIds(criteria.getUnlessRankingDocumentId());
+
+		return idsQuery;
 	}
 
 	@Reference
@@ -181,69 +244,13 @@ public class DuplicateQueryStringsDetectorImpl
 	}
 
 	private void _addQueryClauses(Consumer<Query> consumer, Query... queries) {
-		for (Query query : queries) {
-			if (query != null) {
-				consumer.accept(query);
-			}
-		}
-	}
-
-	private BooleanQuery _getCriteriaQuery(Criteria criteria) {
-		BooleanQuery booleanQuery = queries.booleanQuery();
-
-		_addQueryClauses(
-			booleanQuery::addFilterQueryClauses,
-			_getQueryStringsQuery(criteria), _getIndexQuery(criteria));
-		_addQueryClauses(
-			booleanQuery::addMustNotQueryClauses,
-			queries.term(RankingFields.INACTIVE, true),
-			_getUnlessRankingIdQuery(criteria));
-
-		return booleanQuery;
-	}
-
-	private Collection<String> _getDuplicateQueryStrings(
-		SearchHit searchHit, Collection<String> queryStrings) {
-
-		Document document = searchHit.getDocument();
-
-		Collection<String> documentQueryStrings = document.getStrings(
-			RankingFields.QUERY_STRINGS);
-
-		documentQueryStrings.retainAll(queryStrings);
-
-		return documentQueryStrings;
-	}
-
-	private Query _getIndexQuery(Criteria criteria) {
-		if (Validator.isBlank(criteria.getIndex())) {
-			return null;
-		}
-
-		return queries.term(RankingFields.INDEX, criteria.getIndex());
-	}
-
-	private TermsQuery _getQueryStringsQuery(Criteria criteria) {
-		TermsQuery termsQuery = queries.terms(
-			RankingFields.QUERY_STRINGS_KEYWORD);
-
-		Collection<String> queryStrings = criteria.getQueryStrings();
-
-		termsQuery.addValues(queryStrings.toArray());
-
-		return termsQuery;
-	}
-
-	private IdsQuery _getUnlessRankingIdQuery(Criteria criteria) {
-		if (Validator.isBlank(criteria.getUnlessRankingDocumentId())) {
-			return null;
-		}
-
-		IdsQuery idsQuery = queries.ids();
-
-		idsQuery.addIds(criteria.getUnlessRankingDocumentId());
-
-		return idsQuery;
+		Stream.of(
+			queries
+		).filter(
+			Objects::nonNull
+		).forEach(
+			consumer
+		);
 	}
 
 }

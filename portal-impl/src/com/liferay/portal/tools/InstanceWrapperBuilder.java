@@ -16,8 +16,6 @@ package com.liferay.portal.tools;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
@@ -77,7 +75,7 @@ public class InstanceWrapperBuilder {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 		}
 	}
 
@@ -301,8 +299,5 @@ public class InstanceWrapperBuilder {
 
 		return sb.toString();
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		InstanceWrapperBuilder.class);
 
 }

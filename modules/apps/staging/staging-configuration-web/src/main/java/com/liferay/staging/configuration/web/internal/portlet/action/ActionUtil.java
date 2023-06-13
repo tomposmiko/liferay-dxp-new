@@ -92,11 +92,11 @@ public class ActionUtil {
 		PortletPreferences portletSetup = getLayoutPortletSetup(
 			renderRequest, portlet);
 
+		portletSetup = getPortletSetup(
+			httpServletRequest, renderRequest.getPreferences(), portletSetup);
+
 		String title = PortletConfigurationUtil.getPortletTitle(
-			_getPortletSetup(
-				httpServletRequest, renderRequest.getPreferences(),
-				portletSetup),
-			themeDisplay.getLanguageId());
+			portletSetup, themeDisplay.getLanguageId());
 
 		if (Validator.isNull(title)) {
 			ServletContext servletContext =
@@ -116,7 +116,7 @@ public class ActionUtil {
 		HttpServletRequest httpServletRequest =
 			PortalUtil.getHttpServletRequest(renderRequest);
 
-		portletPreferences = _getPortletPreferences(
+		portletPreferences = getPortletPreferences(
 			httpServletRequest, renderRequest.getPreferences(),
 			portletPreferences);
 
@@ -129,7 +129,7 @@ public class ActionUtil {
 		return renderRequest;
 	}
 
-	private static PortletPreferences _getPortletPreferences(
+	protected static PortletPreferences getPortletPreferences(
 			HttpServletRequest httpServletRequest,
 			PortletPreferences portletConfigPortletPreferences,
 			PortletPreferences portletPreferences)
@@ -150,11 +150,11 @@ public class ActionUtil {
 			httpServletRequest, portletResource);
 	}
 
-	private static PortletPreferences _getPortletSetup(
+	protected static PortletPreferences getPortletSetup(
 			HttpServletRequest httpServletRequest,
 			PortletPreferences portletConfigPortletSetup,
 			PortletPreferences portletSetup)
-		throws Exception {
+		throws PortalException {
 
 		String portletResource = ParamUtil.getString(
 			httpServletRequest, "portletResource");

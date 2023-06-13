@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.model.impl;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalServiceUtil;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalServiceUtil;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.service.CommerceAddressLocalServiceUtil;
@@ -40,16 +40,16 @@ public class CommerceShipmentImpl extends CommerceShipmentBaseImpl {
 	}
 
 	@Override
-	public AccountEntry getAccountEntry() throws PortalException {
-		return AccountEntryLocalServiceUtil.getAccountEntry(
+	public CommerceAccount getCommerceAccount() throws PortalException {
+		return CommerceAccountLocalServiceUtil.getCommerceAccount(
 			getCommerceAccountId());
 	}
 
 	@Override
-	public String getAccountEntryName() throws PortalException {
-		AccountEntry accountEntry = getAccountEntry();
+	public String getCommerceAccountName() throws PortalException {
+		CommerceAccount commerceAccount = getCommerceAccount();
 
-		return accountEntry.getName();
+		return commerceAccount.getName();
 	}
 
 	@Override

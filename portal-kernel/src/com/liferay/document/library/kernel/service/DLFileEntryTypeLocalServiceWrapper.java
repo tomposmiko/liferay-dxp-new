@@ -30,10 +30,6 @@ public class DLFileEntryTypeLocalServiceWrapper
 	implements DLFileEntryTypeLocalService,
 			   ServiceWrapper<DLFileEntryTypeLocalService> {
 
-	public DLFileEntryTypeLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLFileEntryTypeLocalServiceWrapper(
 		DLFileEntryTypeLocalService dlFileEntryTypeLocalService) {
 
@@ -643,6 +639,18 @@ public class DLFileEntryTypeLocalServiceWrapper
 
 		return _dlFileEntryTypeLocalService.getFileEntryType(
 			groupId, fileEntryTypeKey);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
+	@Override
+	public java.util.List<DLFileEntryType> getFileEntryTypes(
+			long ddmStructureId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _dlFileEntryTypeLocalService.getFileEntryTypes(ddmStructureId);
 	}
 
 	@Override

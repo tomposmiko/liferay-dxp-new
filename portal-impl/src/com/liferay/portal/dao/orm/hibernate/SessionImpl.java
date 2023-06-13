@@ -32,22 +32,27 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.LockOptions;
-import org.hibernate.engine.spi.EntityKey;
-import org.hibernate.engine.spi.PersistenceContext;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.event.spi.EventSource;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
-import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.engine.EntityKey;
+import org.hibernate.engine.PersistenceContext;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.event.EventSource;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  */
 public class SessionImpl implements Session {
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #SessionImpl(org.hibernate.Session, ClassLoader)}
+	 */
+	@Deprecated
+	public SessionImpl(org.hibernate.Session session) {
+		this(session, null);
+	}
 
 	public SessionImpl(
 		org.hibernate.Session session, ClassLoader sessionFactoryClassLoader) {
@@ -81,9 +86,7 @@ public class SessionImpl implements Session {
 	@Override
 	public Connection close() throws ORMException {
 		try {
-			_session.close();
-
-			return null;
+			return _session.close();
 		}
 		catch (Exception exception) {
 			throw ExceptionTranslator.translate(exception);
@@ -93,24 +96,6 @@ public class SessionImpl implements Session {
 	@Override
 	public boolean contains(Object object) throws ORMException {
 		try {
-			SessionImplementor sessionImplementor =
-				(SessionImplementor)_session;
-
-			SessionFactoryImplementor sessionFactoryImplementor =
-				sessionImplementor.getSessionFactory();
-
-			MetamodelImplementor metamodelImplementor =
-				sessionFactoryImplementor.getMetamodel();
-
-			Map<String, EntityPersister> entityPersisters =
-				metamodelImplementor.entityPersisters();
-
-			Class<?> clazz = object.getClass();
-
-			if (!entityPersisters.containsKey(clazz.getName())) {
-				return false;
-			}
-
 			return _session.contains(object);
 		}
 		catch (Exception exception) {
@@ -247,14 +232,12 @@ public class SessionImpl implements Session {
 			SessionFactoryImplementor sessionFactoryImplementor =
 				eventSource.getFactory();
 
-			MetamodelImplementor metamodelImplementor =
-				sessionFactoryImplementor.getMetamodel();
-
-			EntityPersister entityPersister =
-				metamodelImplementor.entityPersister(clazz);
-
 			Object object = persistenceContext.getEntity(
-				new EntityKey(id, entityPersister));
+				new EntityKey(
+					id,
+					sessionFactoryImplementor.getEntityPersister(
+						clazz.getName()),
+					eventSource.getEntityMode()));
 
 			if (object == null) {
 				return;

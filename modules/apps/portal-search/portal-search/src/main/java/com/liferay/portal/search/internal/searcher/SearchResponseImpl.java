@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.internal.searcher;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -46,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author André de Oliveira
@@ -79,22 +79,26 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 	}
 
 	@Override
-	public List<Document> getDocuments() {
-		if (_searchHits == null) {
-			return Collections.emptyList();
-		}
-
-		return TransformUtil.transform(
-			_searchHits.getSearchHits(), SearchHit::getDocument);
-	}
-
-	@Override
 	public List<com.liferay.portal.kernel.search.Document> getDocuments71() {
 		if (_hits == null) {
 			return Collections.emptyList();
 		}
 
 		return Arrays.asList(_hits.getDocs());
+	}
+
+	@Override
+	public Stream<Document> getDocumentsStream() {
+		if (_searchHits == null) {
+			return Stream.empty();
+		}
+
+		List<SearchHit> list = _searchHits.getSearchHits();
+
+		return list.stream(
+		).map(
+			SearchHit::getDocument
+		);
 	}
 
 	@Override
@@ -112,8 +116,11 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 	}
 
 	@Override
-	public Collection<SearchResponse> getFederatedSearchResponses() {
-		return _federatedSearchResponsesMap.values();
+	public Stream<SearchResponse> getFederatedSearchResponsesStream() {
+		Collection<SearchResponse> searchResponses =
+			_federatedSearchResponsesMap.values();
+
+		return searchResponses.stream();
 	}
 
 	@Override

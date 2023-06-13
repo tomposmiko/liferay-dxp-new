@@ -14,7 +14,7 @@
 
 package com.liferay.frontend.js.bundle.config.extender.internal.servlet.taglib;
 
-import com.liferay.frontend.js.bundle.config.extender.internal.JSBundleConfigRegistry;
+import com.liferay.frontend.js.bundle.config.extender.internal.JSBundleConfigTracker;
 import com.liferay.frontend.js.loader.modules.extender.npm.ModuleNameUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -49,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Chema Balsas
  */
 @Component(
-	property = "service.ranking:Integer=" + Integer.MIN_VALUE,
+	immediate = true, property = "service.ranking:Integer=" + Integer.MIN_VALUE,
 	service = DynamicInclude.class
 )
 public class JSBundleConfigTopHeadDynamicInclude extends BaseDynamicInclude {
@@ -68,8 +68,8 @@ public class JSBundleConfigTopHeadDynamicInclude extends BaseDynamicInclude {
 
 		StringWriter stringWriter = new StringWriter();
 
-		Collection<JSBundleConfigRegistry.JSConfig> jsConfigs =
-			_jsBundleConfigRegistry.getJSConfigs();
+		Collection<JSBundleConfigTracker.JSConfig> jsConfigs =
+			_jsBundleConfigTracker.getJSConfigs();
 
 		if (!jsConfigs.isEmpty()) {
 			stringWriter.write("<script data-senna-track=\"temporary\" ");
@@ -77,7 +77,7 @@ public class JSBundleConfigTopHeadDynamicInclude extends BaseDynamicInclude {
 			stringWriter.write(ContentTypes.TEXT_JAVASCRIPT);
 			stringWriter.write("\">");
 
-			for (JSBundleConfigRegistry.JSConfig jsConfig : jsConfigs) {
+			for (JSBundleConfigTracker.JSConfig jsConfig : jsConfigs) {
 				URL url = jsConfig.getURL();
 
 				try (InputStream inputStream = url.openStream()) {
@@ -115,7 +115,7 @@ public class JSBundleConfigTopHeadDynamicInclude extends BaseDynamicInclude {
 		String bundleConfig = stringWriter.toString();
 
 		_objectValuePair = new ObjectValuePair<>(
-			_jsBundleConfigRegistry.getLastModified(), bundleConfig);
+			_jsBundleConfigTracker.getLastModified(), bundleConfig);
 
 		_writeResponse(httpServletResponse, bundleConfig);
 	}
@@ -126,16 +126,22 @@ public class JSBundleConfigTopHeadDynamicInclude extends BaseDynamicInclude {
 			"/html/common/themes/top_js.jspf#resources");
 	}
 
-	private String _getModuleMain(JSBundleConfigRegistry.JSConfig jsConfig) {
+	protected JSBundleConfigTracker getJSBundleConfigTracker() {
+		return _jsBundleConfigTracker;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJSBundleConfigTracker(
+		JSBundleConfigTracker jsBundleConfigTracker) {
+
+		_jsBundleConfigTracker = jsBundleConfigTracker;
+	}
+
+	private String _getModuleMain(JSBundleConfigTracker.JSConfig jsConfig) {
 		try {
 			ServletContext servletContext = jsConfig.getServletContext();
 
-			URL url = servletContext.getResource(
-				"META-INF/resources/package.json");
-
-			if (url == null) {
-				url = servletContext.getResource("package.json");
-			}
+			URL url = servletContext.getResource("package.json");
 
 			if (url == null) {
 				return null;
@@ -165,7 +171,7 @@ public class JSBundleConfigTopHeadDynamicInclude extends BaseDynamicInclude {
 	}
 
 	private boolean _isStale() {
-		if (_jsBundleConfigRegistry.getLastModified() >
+		if (_jsBundleConfigTracker.getLastModified() >
 				_objectValuePair.getKey()) {
 
 			return true;
@@ -186,8 +192,7 @@ public class JSBundleConfigTopHeadDynamicInclude extends BaseDynamicInclude {
 	private static final Log _log = LogFactoryUtil.getLog(
 		JSBundleConfigTopHeadDynamicInclude.class);
 
-	@Reference
-	private JSBundleConfigRegistry _jsBundleConfigRegistry;
+	private JSBundleConfigTracker _jsBundleConfigTracker;
 
 	@Reference
 	private JSONFactory _jsonFactory;

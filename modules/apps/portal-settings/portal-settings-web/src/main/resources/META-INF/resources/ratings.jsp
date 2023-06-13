@@ -88,18 +88,15 @@ CompanyPortletRatingsDefinitionDisplayContext companyPortletRatingsDefinitionDis
 	var form = A.one('#<portlet:namespace />fm');
 
 	form.on('submit', (event) => {
-		if (ratingsTypeChanged) {
-			Liferay.Util.openConfirmModal({
-				message:
-					'<%= UnicodeLanguageUtil.get(request, "existing-ratings-data-values-will-be-adapted-to-match-the-new-ratings-type-even-though-it-may-not-be-accurate") %>',
-				onConfirm: (isConfirmed) => {
-					if (!isConfirmed) {
-						event.preventDefault();
+		if (
+			ratingsTypeChanged &&
+			!confirm(
+				'<%= UnicodeLanguageUtil.get(request, "existing-ratings-data-values-will-be-adapted-to-match-the-new-ratings-type-even-though-it-may-not-be-accurate") %>'
+			)
+		) {
+			event.preventDefault();
 
-						event.stopImmediatePropagation();
-					}
-				},
-			});
+			event.stopImmediatePropagation();
 		}
 	});
 </aui:script>

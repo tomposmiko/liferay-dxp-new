@@ -1,10 +1,9 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Translations Management";
+	property testray.main.component.name = "Translation Management";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -15,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -24,9 +23,9 @@ definition {
 	}
 
 	@description = "This ensures that the user can see translation options after move all available languages to current."
-	@priority = 4
-	@refactordone
-	test CanViewOptionsWithAllLanguages {
+	@priority = "4"
+	@refactorneeded
+	test ViewOptionsWithAllLanguages {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		NavItem.gotoStructures();
@@ -86,9 +85,9 @@ definition {
 	}
 
 	@description = "This ensures that the user can see translation options after move one more available language to current."
-	@priority = 5
-	@refactordone
-	test CanViewOptionsWithOneMoreLanguage {
+	@priority = "5"
+	@refactorneeded
+	test ViewOptionsWithOneMoreLanguage {
 		JSONWebcontent.addWebContent(
 			content = "Web Content Content",
 			groupName = "Guest",
@@ -118,9 +117,9 @@ definition {
 	}
 
 	@description = "This test covers LPS-128546. It ensures that the translated field content can be displayed correctly after editing by different translation ways."
-	@priority = 4
-	@refactordone
-	test CanViewTranslatedFieldContentAfterEditing {
+	@priority = "4"
+	@refactorneeded
+	test ViewTranslatedFieldContentAfterEditing {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		NavItem.gotoStructures();
@@ -164,12 +163,12 @@ definition {
 			newTargetLocale = "pt-BR");
 
 		Translations.viewTargetFields(
-			webContentHtml = "Rich Text PT",
+			webContentHTML = "Rich Text PT",
 			webContentText = "Text PT",
 			webContentTitle = "WC WebContent Title PT");
 
 		Translations.translateFields(
-			webContentSourceHtml = "Rich Text PT Edit",
+			webContentSourceHTML = "Rich Text PT Edit",
 			webContentText = "Text PT Edit",
 			webContentTitle = "WC WebContent Title PT Edit");
 
@@ -202,7 +201,7 @@ definition {
 			newTargetLocale = "pt-BR");
 
 		Translations.viewTargetFields(
-			webContentHtml = "Rich Text PT Edit Again",
+			webContentHTML = "Rich Text PT Edit Again",
 			webContentText = "Text PT Again",
 			webContentTitle = "WC WebContent Title PT Again");
 	}

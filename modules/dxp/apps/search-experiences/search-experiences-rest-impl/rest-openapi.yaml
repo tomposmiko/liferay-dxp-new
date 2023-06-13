@@ -1,39 +1,15 @@
 components:
     schemas:
-        Clause:
-            properties:
-                additive:
-                    type: boolean
-                boost:
-                    format: float
-                    type: number
-                context:
-                    type: string
-                disabled:
-                    type: boolean
-                field:
-                    type: string
-                name:
-                    type: string
-                occur:
-                    type: string
-                parent:
-                    type: string
-                query:
-                    type: object
-                type:
-                    type: string
-                value:
-                    type: string
-            type: object
         Condition:
             properties:
                 in:
                     properties:
                         parameterName:
                             type: string
-                        value:
-                            type: object
+                        values:
+                            items:
+                                type: object
+                            type: array
                     type: object
                 allConditions:
                     items:
@@ -49,6 +25,10 @@ components:
                             type: string
                         value:
                             type: object
+                        values:
+                            items:
+                                type: object
+                            type: array
                     type: object
                 equals:
                     properties:
@@ -82,271 +62,12 @@ components:
                             type: string
                     type: object
             type: object
-        Configuration:
-            properties:
-                advancedConfiguration:
-                    properties:
-                        source:
-                            properties:
-                                excludes:
-                                    items:
-                                        type: string
-                                    type: array
-                                fetchSource:
-                                    type: boolean
-                                includes:
-                                    items:
-                                        type: string
-                                    type: array
-                            type: object
-                    type: object
-                aggregationConfiguration:
-                    properties:
-                        aggs:
-                            type: object
-                    type: object
-                generalConfiguration:
-                    properties:
-                        clauseContributorsExcludes:
-                            items:
-                                type: string
-                            type: array
-                        clauseContributorsIncludes:
-                            items:
-                                type: string
-                            type: array
-                        emptySearchEnabled:
-                            type: boolean
-                        explain:
-                            type: boolean
-                        includeResponseString:
-                            type: boolean
-                        languageId:
-                            type: string
-                        queryString:
-                            type: string
-                        searchableAssetTypes:
-                            items:
-                                type: string
-                            type: array
-                        timeZoneId:
-                            type: string
-                    type: object
-                highlightConfiguration:
-                    properties:
-                        fields:
-                            additionalProperties:
-                                $ref: "#/components/schemas/HighlightField"
-                            type: object
-                        fragment_size:
-                            type: integer
-                        number_of_fragments:
-                            type: integer
-                        post_tags:
-                            items:
-                                type: string
-                            type: array
-                        pre_tags:
-                            items:
-                                type: string
-                            type: array
-                        require_field_match:
-                            type: boolean
-                        type:
-                            type: string
-                    type: object
-                indexConfiguration:
-                    properties:
-                        external:
-                            type: boolean
-                        indexName:
-                            type: string
-                    type: object
-                parameterConfiguration:
-                    properties:
-                        parameters:
-                            additionalProperties:
-                                $ref: "#/components/schemas/Parameter"
-                            type: object
-                    type: object
-                queryConfiguration:
-                    properties:
-                        applyIndexerClauses:
-                            type: boolean
-                        queryEntries:
-                            items:
-                                properties:
-                                    clauses:
-                                        items:
-                                            $ref: "#/components/schemas/Clause"
-                                        type: array
-                                    condition:
-                                        $ref: "#/components/schemas/Condition"
-                                    enabled:
-                                        type: boolean
-                                    postFilterClauses:
-                                        items:
-                                            $ref: "#/components/schemas/Clause"
-                                        type: array
-                                    rescores:
-                                        items:
-                                            properties:
-                                                query:
-                                                    type: object
-                                                queryWeight:
-                                                    type: object
-                                                rescoreQueryWeight:
-                                                    type: object
-                                                scoreMode:
-                                                    type: string
-                                                windowSize:
-                                                    type: object
-                                            type: object
-                                        type: array
-                                type: object
-                            type: array
-                    type: object
-                searchContextAttributes:
-                    additionalProperties:
-                        type: object
-                    type: object
-                sortConfiguration:
-                    properties:
-                        sorts:
-                            type: object
-                    type: object
-            type: object
         DocumentField:
             properties:
                 values:
                     items:
                         type: object
                     type: array
-        ElementDefinition:
-            properties:
-                category:
-                    type: string
-                configuration:
-                    $ref: "#/components/schemas/Configuration"
-                icon:
-                    type: string
-                uiConfiguration:
-                    properties:
-                        fieldSets:
-                            items:
-                                properties:
-                                    fields:
-                                        items:
-                                            properties:
-                                                defaultValue:
-                                                    type: object
-                                                fieldMappings:
-                                                    items:
-                                                        properties:
-                                                            boost:
-                                                                format: float
-                                                                type: number
-                                                            field:
-                                                                type: string
-                                                            locale:
-                                                                type: string
-                                                        type: object
-                                                    type: array
-                                                helpText:
-                                                    type: string
-                                                helpTextLocalized:
-                                                    type: string
-                                                label:
-                                                    type: string
-                                                labelLocalized:
-                                                    type: string
-                                                name:
-                                                    type: string
-                                                type:
-                                                    type: string
-                                                typeOptions:
-                                                    properties:
-                                                        boost:
-                                                            type: boolean
-                                                        format:
-                                                            type: string
-                                                        max:
-                                                            type: object
-                                                        min:
-                                                            type: object
-                                                        nullable:
-                                                            type: boolean
-                                                        options:
-                                                            items:
-                                                                properties:
-                                                                    label:
-                                                                        type: string
-                                                                    value:
-                                                                        type: string
-                                                                type: object
-                                                            type: array
-                                                        required:
-                                                            type: boolean
-                                                        step:
-                                                            type: object
-                                                        unit:
-                                                            type: string
-                                                        unitSuffix:
-                                                            type: string
-                                                    type: object
-                                            type: object
-                                        type: array
-                                type: object
-                            type: array
-                    type: object
-            type: object
-        ElementInstance:
-            properties:
-                configurationEntry:
-                    $ref: "#/components/schemas/Configuration"
-                sxpElement:
-                    $ref: "#/components/schemas/SXPElement"
-                sxpElementId:
-                    format: int64
-                    type: integer
-                type:
-                    type: integer
-                uiConfigurationValues:
-                    additionalProperties:
-                        type: object
-                    type: object
-            type: object
-        EmbeddingProviderConfiguration:
-            properties:
-                attributes:
-                    type: object
-                embeddingVectorDimensions:
-                    type: integer
-                languageIds:
-                    items:
-                        type: string
-                    type: array
-                modelClassNames:
-                    items:
-                        type: string
-                    type: array
-                providerName:
-                    type: string
-            type: object
-        EmbeddingProviderValidationResult:
-            properties:
-                errorMessage:
-                    type: string
-                expectedDimensions:
-                    type: integer
-        FieldMappingInfo:
-            properties:
-                languageIdPosition:
-                    type: integer
-                name:
-                    type: string
-                type:
-                    type: string
         HighlightField:
             properties:
                 fragment_offset:
@@ -355,145 +76,183 @@ components:
                     type: integer
                 number_of_fragments:
                     type: integer
-        KeywordQueryContributor:
-            properties:
-                className:
-                    type: string
-        MLModel:
-            properties:
-                modelId:
-                    type: string
-        ModelPrefilterContributor:
-            properties:
-                className:
-                    type: string
         Parameter:
             properties:
-                defaultValue:
-                    type: object
-                format:
+                dateFormat:
                     type: string
-                max:
-                    type: object
-                min:
-                    type: object
-                type:
-                    enum: [Boolean, Date, Double, Float, Integer, IntegerArray, Long, LongArray, String, StringArray, TimeRange]
+                defaultValueDouble:
+                    format: double
+                    type: number
+                defaultValueFloat:
+                    format: float
+                    type: number
+                defaultValueInteger:
+                    type: integer
+                defaultValueLong:
+                    format: int64
+                    type: integer
+                defaultValueString:
                     type: string
-            type: object
-        QueryPrefilterContributor:
-            properties:
-                className:
+                defaultValuesIntegerArray:
+                    items:
+                        type: integer
+                    type: array
+                defaultValuesLongArray:
+                    items:
+                        format: int64
+                        type: integer
+                    type: array
+                defaultValuesStringArray:
+                    items:
+                        type: string
+                    type: array
+                maxValueDouble:
+                    format: double
+                    type: number
+                maxValueFloat:
+                    format: float
+                    type: number
+                maxValueInteger:
+                    type: integer
+                maxValueLong:
+                    format: int64
+                    type: integer
+                minValueDouble:
+                    format: double
+                    type: number
+                minValueFloat:
+                    format: float
+                    type: number
+                minValueInteger:
+                    type: integer
+                minValueLong:
+                    format: int64
+                    type: integer
+                parameterType:
+                    enum: [Date, Double, Float, Integer, IntegerArray, Long, LongArray, String, StringArray, TimeRange]
                     type: string
         SXPBlueprint:
             properties:
-                actions:
-                    additionalProperties:
-                        additionalProperties:
-                            type: string
-                        type: object
-                    readOnly: true
-                    type: object
                 configuration:
-                    $ref: "#/components/schemas/Configuration"
-                createDate:
-                    format: date
-                    type: string
-                description:
-                    type: string
-                description_i18n:
-                    additionalProperties:
-                        type: string
+                    properties:
+                        advanced:
+                            properties:
+                                excludes:
+                                    items:
+                                        type: string
+                                    type: array
+                                includes:
+                                    items:
+                                        type: string
+                                    type: array
+                            type: object
+                        aggregationConfiguration:
+                            properties:
+                                aggs:
+                                    type: object
+                            type: object
+                        facet:
+                            properties:
+                                enabled:
+                                    type: boolean
+                            type: object
+                        general:
+                            properties:
+                                clauseContributorsExcludes:
+                                    items:
+                                        type: string
+                                    type: array
+                                clauseContributorsIncludes:
+                                    items:
+                                        type: string
+                                    type: array
+                                emptySearchEnabled:
+                                    type: boolean
+                                explain:
+                                    type: boolean
+                                includeResponseString:
+                                    type: boolean
+                                searchableAssetTypes:
+                                    items:
+                                        type: string
+                                    type: array
+                            type: object
+                        highlight:
+                            properties:
+                                fields:
+                                    additionalProperties:
+                                        $ref: "#/components/schemas/HighlightField"
+                                    type: object
+                                fragment_size:
+                                    type: integer
+                                number_of_fragments:
+                                    type: integer
+                                post_tags:
+                                    items:
+                                        type: string
+                                    type: array
+                                pre_tags:
+                                    items:
+                                        type: string
+                                    type: array
+                                require_field_match:
+                                    type: boolean
+                                type:
+                                    type: string
+                            type: object
+                        parameters:
+                            additionalProperties:
+                                $ref: "#/components/schemas/Parameter"
+                            type: object
+                        queryConfiguration:
+                            properties:
+                                applyIndexerClauses:
+                                    type: boolean
+                                queryEntries:
+                                    items:
+                                        properties:
+                                            clauses:
+                                                items:
+                                                    properties:
+                                                        context:
+                                                            type: string
+                                                        occur:
+                                                            type: string
+                                                        query:
+                                                            type: object
+                                                    type: object
+                                                type: array
+                                            condition:
+                                                $ref: "#/components/schemas/Condition"
+                                            enabled:
+                                                type: boolean
+                                        type: object
+                                    type: array
+                            type: object
+                        sortConfiguration:
+                            properties:
+                                sorts:
+                                    type: object
+                            type: object
                     type: object
-                elementInstances:
-                    items:
-                        $ref: "#/components/schemas/ElementInstance"
-                    type: array
-                externalReferenceCode:
-                    example: AB-34098-789-N
+                description:
                     type: string
                 id:
                     format: int64
                     type: integer
-                modifiedDate:
-                    format: date
-                    type: string
-                schemaVersion:
-                    type: string
                 title:
-                    type: string
-                title_i18n:
-                    additionalProperties:
-                        type: string
-                    type: object
-                userName:
-                    type: string
-                version:
                     type: string
             type: object
         SXPElement:
             properties:
-                actions:
-                    additionalProperties:
-                        additionalProperties:
-                            type: string
-                        type: object
-                    readOnly: true
-                    type: object
-                createDate:
-                    format: date
-                    type: string
                 description:
                     type: string
-                description_i18n:
-                    additionalProperties:
-                        type: string
-                    type: object
-                elementDefinition:
-                    $ref: "#/components/schemas/ElementDefinition"
-                externalReferenceCode:
-                    example: AB-34098-789-N
-                    type: string
-                hidden:
-                    type: boolean
                 id:
                     format: int64
                     type: integer
-                modifiedDate:
-                    format: date
-                    type: string
-                readOnly:
-                    type: boolean
-                schemaVersion:
-                    type: string
                 title:
                     type: string
-                title_i18n:
-                    additionalProperties:
-                        type: string
-                    type: object
-                type:
-                    type: integer
-                userName:
-                    type: string
-                version:
-                    type: string
             type: object
-        SXPParameterContributorDefinition:
-            properties:
-                className:
-                    type: string
-                description:
-                    type: string
-                templateVariable:
-                    type: string
-            type: object
-        SearchIndex:
-            properties:
-                external:
-                    type: boolean
-                name:
-                    type: string
         SearchRequest:
             properties:
                 queryString:
@@ -501,12 +260,23 @@ components:
             type: object
         SearchResponse:
             properties:
-                errors:
+                documents:
                     items:
-                        additionalProperties:
-                            type: string
+                        properties:
+                            documentFields:
+                                additionalProperties:
+                                    $ref: "#/components/schemas/DocumentField"
+                                type: object
+                            explanation:
+                                type: string
+                            score:
+                                format: double
+                                type: number
                         type: object
                     type: array
+                maxScore:
+                    format: double
+                    type: number
                 page:
                     type: integer
                 pageSize:
@@ -519,53 +289,15 @@ components:
                     type: object
                 responseString:
                     type: string
-                searchHits:
-                    properties:
-                        hits:
-                            items:
-                                properties:
-                                    documentFields:
-                                        additionalProperties:
-                                            $ref: "#/components/schemas/DocumentField"
-                                        type: object
-                                    explanation:
-                                        type: string
-                                    id:
-                                        type: string
-                                    score:
-                                        format: float
-                                        type: number
-                                    version:
-                                        format: int64
-                                        type: integer
-                                type: object
-                            type: array
-                        maxScore:
-                            format: float
-                            type: number
-                        totalHits:
-                            format: int64
-                            type: integer
-                    type: object
                 searchRequest:
                     $ref: "#/components/schemas/SearchRequest"
-            type: object
-        SearchableAssetName:
-            properties:
-                className:
-                    type: string
-            type: object
-        SearchableAssetNameDisplay:
-            properties:
-                className:
-                    type: string
-                displayName:
-                    type: string
+                totalHits:
+                    type: integer
             type: object
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.search.experiences.rest.client', and version '3.0.15'."
+        'com.liferay.search.experiences.rest.client', and version '1.0.0'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -582,6 +314,10 @@ paths:
                   schema:
                       type: string
                 - in: query
+                  name: sxpBlueprint
+                  schema:
+                      type: string
+                - in: query
                   name: page
                   schema:
                       type: integer
@@ -589,14 +325,6 @@ paths:
                   name: pageSize
                   schema:
                       type: integer
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/SXPBlueprint"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/SXPBlueprint"
             responses:
                 200:
                     content:
@@ -607,186 +335,10 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/SearchResponse"
             tags: ["SearchResponse"]
-    /field-mapping-infos:
-        get:
-            operationId: getFieldMappingInfosPage
-            parameters:
-                - in: query
-                  name: external
-                  schema:
-                      type: boolean
-                - in: query
-                  name: indexName
-                  schema:
-                      type: string
-                - in: query
-                  name: query
-                  schema:
-                      type: string
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/FieldMappingInfo"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/FieldMappingInfo"
-                                type: array
-            tags: ["FieldMappingInfo"]
-    /keyword-query-contributors:
-        get:
-            operationId: getKeywordQueryContributorsPage
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/KeywordQueryContributor"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/KeywordQueryContributor"
-                                type: array
-            tags: ["KeywordQueryContributor"]
-    /model-prefilter-contributors:
-        get:
-            operationId: getModelPrefilterContributorsPage
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/ModelPrefilterContributor"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/ModelPrefilterContributor"
-                                type: array
-            tags: ["ModelPrefilterContributor"]
-    /query-prefilter-contributors:
-        get:
-            operationId: getQueryPrefilterContributorsPage
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/QueryPrefilterContributor"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/QueryPrefilterContributor"
-                                type: array
-            tags: ["QueryPrefilterContributor"]
-    /search-indexes:
-        get:
-            operationId: getSearchIndexesPage
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SearchIndex"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SearchIndex"
-                                type: array
-            tags: ["SearchIndex"]
-    /searchable-asset-names:
-        get:
-            operationId: getSearchableAssetNamesPage
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SearchableAssetName"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SearchableAssetName"
-                                type: array
-            tags: ["SearchableAssetName"]
-    /searchable-asset-names/{languageId}:
-        get:
-            operationId: getSearchableAssetNameLanguagePage
-            parameters:
-                - in: path
-                  name: languageId
-                  required: true
-                  schema:
-                      type: string
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SearchableAssetNameDisplay"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SearchableAssetNameDisplay"
-                                type: array
-            tags: ["SearchableAssetNameDisplay"]
-    /sentence-transformer/ml-models:
-        get:
-            operationId: getSentenceTransformerMLModelsPage
-            parameters:
-                - in: query
-                  name: limit
-                  schema:
-                      type: integer
-                - in: query
-                  name: pipelineTag
-                  schema:
-                      type: string
-                - in: query
-                  name: query
-                  schema:
-                      type: string
-                - in: query
-                  name: tag
-                  schema:
-                      type: string
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/MLModel"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/MLModel"
-                                type: array
-            tags: ["MLModel"]
     /sxp-blueprints:
         get:
             operationId: getSXPBlueprintsPage
             parameters:
-                - in: query
-                  name: filter
-                  schema:
-                      type: string
                 - in: query
                   name: page
                   schema:
@@ -797,10 +349,6 @@ paths:
                       type: integer
                 - in: query
                   name: search
-                  schema:
-                      type: string
-                - in: query
-                  name: sort
                   schema:
                       type: string
             responses:
@@ -827,27 +375,6 @@ paths:
                     application/xml:
                         schema:
                             $ref: "#/components/schemas/SXPBlueprint"
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/SXPBlueprint"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/SXPBlueprint"
-            tags: ["SXPBlueprint"]
-    /sxp-blueprints/validate:
-        post:
-            operationId: postSXPBlueprintValidate
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: string
-                    application/xml:
-                        schema:
-                            type: string
             responses:
                 200:
                     content:
@@ -920,60 +447,10 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/SXPBlueprint"
             tags: ["SXPBlueprint"]
-    /sxp-blueprints/{sxpBlueprintId}/copy:
-        post:
-            operationId: postSXPBlueprintCopy
-            parameters:
-                - in: path
-                  name: sxpBlueprintId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/SXPBlueprint"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/SXPBlueprint"
-            tags: ["SXPBlueprint"]
-    /sxp-blueprints/{sxpBlueprintId}/export:
-        get:
-            operationId: getSXPBlueprintExport
-            parameters:
-                - in: path
-                  name: sxpBlueprintId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                format: binary
-                                type: string
-                        application/xml:
-                            schema:
-                                format: binary
-                                type: string
-                    headers:
-                        Content-Disposition:
-                            schema:
-                                type: string
-            tags: ["SXPBlueprint"]
     /sxp-elements:
         get:
             operationId: getSXPElementsPage
             parameters:
-                - in: query
-                  name: filter
-                  schema:
-                      type: string
                 - in: query
                   name: page
                   schema:
@@ -984,10 +461,6 @@ paths:
                       type: integer
                 - in: query
                   name: search
-                  schema:
-                      type: string
-                - in: query
-                  name: sort
                   schema:
                       type: string
             responses:
@@ -1014,27 +487,6 @@ paths:
                     application/xml:
                         schema:
                             $ref: "#/components/schemas/SXPElement"
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/SXPElement"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/SXPElement"
-            tags: ["SXPElement"]
-    /sxp-elements/validate:
-        post:
-            operationId: postSXPElementValidate
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: string
-                    application/xml:
-                        schema:
-                            type: string
             responses:
                 200:
                     content:
@@ -1107,87 +559,3 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/SXPElement"
             tags: ["SXPElement"]
-    /sxp-elements/{sxpElementId}/copy:
-        post:
-            operationId: postSXPElementCopy
-            parameters:
-                - in: path
-                  name: sxpElementId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/SXPElement"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/SXPElement"
-            tags: ["SXPElement"]
-    /sxp-elements/{sxpElementId}/export:
-        get:
-            operationId: getSXPElementExport
-            parameters:
-                - in: path
-                  name: sxpElementId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                format: binary
-                                type: string
-                        application/xml:
-                            schema:
-                                format: binary
-                                type: string
-                    headers:
-                        Content-Disposition:
-                            schema:
-                                type: string
-            tags: ["SXPElement"]
-    /sxp-parameter-contributor-definitions:
-        get:
-            operationId: getSXPParameterContributorDefinitionsPage
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SXPParameterContributorDefinition"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/SXPParameterContributorDefinition"
-                                type: array
-            tags: ["SXPParameterContributorDefinition"]
-    /text-embeddings/validate-provider-configuration:
-        post:
-            operationId: postTextEmbeddingValidateProviderConfiguration
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/EmbeddingProviderConfiguration"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/EmbeddingProviderConfiguration"
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/EmbeddingProviderValidationResult"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/EmbeddingProviderValidationResult"
-            tags: ["EmbeddingProviderValidationResult"]

@@ -33,10 +33,12 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.permission.PermissionUtil;
 
 import java.io.Serializable;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -66,7 +68,7 @@ public class KnowledgeBaseFolderResourceImpl
 
 		KBFolder kbFolder =
 			_kbFolderLocalService.getKBFolderByExternalReferenceCode(
-				externalReferenceCode, siteId);
+				siteId, externalReferenceCode);
 
 		_kbFolderService.deleteKBFolder(kbFolder.getKbFolderId());
 	}
@@ -119,9 +121,20 @@ public class KnowledgeBaseFolderResourceImpl
 				Long siteId, String externalReferenceCode)
 		throws Exception {
 
-		return _toKnowledgeBaseFolder(
-			_kbFolderService.getKBFolderByExternalReferenceCode(
-				siteId, externalReferenceCode));
+		KBFolder kbFolder =
+			_kbFolderLocalService.getKBFolderByExternalReferenceCode(
+				siteId, externalReferenceCode);
+
+		String resourceName = getPermissionCheckerResourceName(
+			kbFolder.getKbFolderId());
+		Long resourceId = getPermissionCheckerResourceId(
+			kbFolder.getKbFolderId());
+
+		PermissionUtil.checkPermission(
+			ActionKeys.VIEW, groupLocalService, resourceName, resourceId,
+			getPermissionCheckerGroupId(kbFolder.getKbFolderId()));
+
+		return _toKnowledgeBaseFolder(kbFolder);
 	}
 
 	@Override
@@ -136,26 +149,10 @@ public class KnowledgeBaseFolderResourceImpl
 					KBActionKeys.ADD_KB_FOLDER, "postSiteKnowledgeBaseFolder",
 					KBConstants.RESOURCE_NAME_ADMIN, siteId)
 			).put(
-				"createBatch",
-				addAction(
-					KBActionKeys.ADD_KB_FOLDER,
-					"postSiteKnowledgeBaseFolderBatch",
-					KBConstants.RESOURCE_NAME_ADMIN, siteId)
-			).put(
-				"deleteBatch",
-				addAction(
-					KBActionKeys.DELETE, "deleteKnowledgeBaseFolderBatch",
-					KBConstants.RESOURCE_NAME_ADMIN, null)
-			).put(
 				"get",
 				addAction(
 					ActionKeys.VIEW, "getSiteKnowledgeBaseFoldersPage",
 					KBConstants.RESOURCE_NAME_ADMIN, siteId)
-			).put(
-				"updateBatch",
-				addAction(
-					KBActionKeys.UPDATE, "putKnowledgeBaseFolderBatch",
-					KBConstants.RESOURCE_NAME_ADMIN, null)
 			).build(),
 			transform(
 				_kbFolderService.getKBFolders(
@@ -195,9 +192,10 @@ public class KnowledgeBaseFolderResourceImpl
 			Long knowledgeBaseFolderId, KnowledgeBaseFolder knowledgeBaseFolder)
 		throws Exception {
 
-		return _updateKnowledgeBaseFolder(
-			_kbFolderLocalService.getKBFolder(knowledgeBaseFolderId),
-			knowledgeBaseFolder);
+		KBFolder kbFolder = _kbFolderLocalService.getKBFolder(
+			knowledgeBaseFolderId);
+
+		return _updateKnowledgeBaseFolder(kbFolder, knowledgeBaseFolder);
 	}
 
 	@Override
@@ -209,7 +207,7 @@ public class KnowledgeBaseFolderResourceImpl
 
 		KBFolder kbFolder =
 			_kbFolderLocalService.fetchKBFolderByExternalReferenceCode(
-				externalReferenceCode, siteId);
+				siteId, externalReferenceCode);
 
 		if (kbFolder != null) {
 			return _updateKnowledgeBaseFolder(kbFolder, knowledgeBaseFolder);
@@ -295,7 +293,7 @@ public class KnowledgeBaseFolderResourceImpl
 						ActionKeys.UPDATE, kbFolder, "putKnowledgeBaseFolder")
 				).build();
 				creator = CreatorUtil.toCreator(
-					_portal, contextUriInfo,
+					_portal, Optional.of(contextUriInfo),
 					_userLocalService.fetchUser(kbFolder.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
 					contextAcceptLanguage.isAcceptAllLanguages(),

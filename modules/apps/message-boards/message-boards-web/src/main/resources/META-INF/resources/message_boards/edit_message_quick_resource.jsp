@@ -90,9 +90,9 @@ String redirect = ParamUtil.getString(request, "redirect");
 			String userDisplayText = LanguageUtil.format(request, "x-replying", new Object[] {HtmlUtil.escape(userName)});
 			%>
 
-			<span class="message-user-display text-default" title="<%= userDisplayText %>">
+			<h5 class="message-user-display text-default" title="<%= userDisplayText %>">
 				<%= userDisplayText %>
-			</span>
+			</h5>
 
 			<h4 title="<%= HtmlUtil.escape(message.getSubject()) %>">
 				<c:choose>
@@ -129,10 +129,10 @@ String redirect = ParamUtil.getString(request, "redirect");
 <div class="divider"></div>
 
 <div class="panel-body">
-	<div class="card-body message-content" id="<portlet:namespace />addQuickReply<%= parentMessageId %>">
+	<div class="card-body message-content" id="<%= liferayPortletResponse.getNamespace() + "addQuickReply" + parentMessageId %>">
 		<portlet:actionURL name="/message_boards/edit_message" var="editMessageURL" />
 
-		<aui:form action="<%= editMessageURL %>" method="post" name='<%= "addQuickReplyFm" + parentMessageId %>' onSubmit="event.preventDefault(); ">
+		<aui:form action="<%= editMessageURL %>" method="post" name='<%= "addQuickReplyFm" + parentMessageId %>' onSubmit='<%= "event.preventDefault(); " %>'>
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
 			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="messageId" type="hidden" value="<%= 0 %>" />
@@ -194,7 +194,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				String publishButtonLabel = "publish";
 
 				if (WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), scopeGroupId, MBMessage.class.getName())) {
-					publishButtonLabel = "submit-for-workflow";
+					publishButtonLabel = "submit-for-publication";
 				}
 				%>
 

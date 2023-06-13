@@ -50,9 +50,8 @@ public class DLFileShortcutUADTestUtil {
 			ServiceContextTestUtil.getServiceContext();
 
 		DLFolder dlFolder = dlFolderLocalService.addFolder(
-			null, userId, groupId, groupId, false, 0L,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), false,
-			serviceContext);
+			userId, groupId, groupId, false, 0L, RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), false, serviceContext);
 
 		byte[] bytes = TestDataConstants.TEST_BYTE_ARRAY;
 
@@ -62,7 +61,7 @@ public class DLFileShortcutUADTestUtil {
 			null, userId, dlFolder.getGroupId(), dlFolder.getRepositoryId(),
 			dlFolder.getFolderId(), RandomTestUtil.randomString(),
 			ContentTypes.TEXT_PLAIN, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
+			StringPool.BLANK, StringPool.BLANK,
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT, null,
 			null, inputStream, bytes.length, null, null, serviceContext);
 

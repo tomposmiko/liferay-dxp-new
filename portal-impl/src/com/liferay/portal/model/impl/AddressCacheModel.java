@@ -76,12 +76,10 @@ public class AddressCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(57);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", externalReferenceCode=");
@@ -104,10 +102,10 @@ public class AddressCacheModel
 		sb.append(classPK);
 		sb.append(", countryId=");
 		sb.append(countryId);
-		sb.append(", listTypeId=");
-		sb.append(listTypeId);
 		sb.append(", regionId=");
 		sb.append(regionId);
+		sb.append(", typeId=");
+		sb.append(typeId);
 		sb.append(", city=");
 		sb.append(city);
 		sb.append(", description=");
@@ -144,7 +142,6 @@ public class AddressCacheModel
 		AddressImpl addressImpl = new AddressImpl();
 
 		addressImpl.setMvccVersion(mvccVersion);
-		addressImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			addressImpl.setUuid("");
@@ -188,8 +185,8 @@ public class AddressCacheModel
 		addressImpl.setClassNameId(classNameId);
 		addressImpl.setClassPK(classPK);
 		addressImpl.setCountryId(countryId);
-		addressImpl.setListTypeId(listTypeId);
 		addressImpl.setRegionId(regionId);
+		addressImpl.setTypeId(typeId);
 
 		if (city == null) {
 			addressImpl.setCity("");
@@ -263,8 +260,6 @@ public class AddressCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
-
-		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
 		externalReferenceCode = objectInput.readUTF();
 
@@ -283,9 +278,9 @@ public class AddressCacheModel
 
 		countryId = objectInput.readLong();
 
-		listTypeId = objectInput.readLong();
-
 		regionId = objectInput.readLong();
+
+		typeId = objectInput.readLong();
 		city = objectInput.readUTF();
 		description = objectInput.readUTF();
 
@@ -309,8 +304,6 @@ public class AddressCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -348,9 +341,9 @@ public class AddressCacheModel
 
 		objectOutput.writeLong(countryId);
 
-		objectOutput.writeLong(listTypeId);
-
 		objectOutput.writeLong(regionId);
+
+		objectOutput.writeLong(typeId);
 
 		if (city == null) {
 			objectOutput.writeUTF("");
@@ -415,7 +408,6 @@ public class AddressCacheModel
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public String uuid;
 	public String externalReferenceCode;
 	public long addressId;
@@ -427,8 +419,8 @@ public class AddressCacheModel
 	public long classNameId;
 	public long classPK;
 	public long countryId;
-	public long listTypeId;
 	public long regionId;
+	public long typeId;
 	public String city;
 	public String description;
 	public double latitude;

@@ -30,58 +30,52 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 <aui:script>
 	window['<portlet:namespace />deleteMBMessages'] = function (dicussion) {
-		var deleteMBMessageIds = Liferay.Util.getCheckedCheckboxes(
+		var deleteMBMessageIds = Liferay.Util.listCheckedExcept(
 			document.<portlet:namespace />fm,
 			'<portlet:namespace />allRowIds'
 		);
 
-		if (deleteMBMessageIds) {
-			Liferay.Util.openConfirmModal({
-				message:
-					'<%= UnicodeLanguageUtil.get(portletConfig.getResourceBundle(locale), "are-you-sure-you-want-to-delete-the-selected-messages") %>',
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						document.<portlet:namespace />fm.<portlet:namespace />deleteMBMessageIds.value = deleteMBMessageIds;
+		if (
+			deleteMBMessageIds &&
+			confirm(
+				'<%= UnicodeLanguageUtil.get(portletConfig.getResourceBundle(locale), "are-you-sure-you-want-to-delete-the-selected-messages") %>'
+			)
+		) {
+			document.<portlet:namespace />fm.<portlet:namespace />deleteMBMessageIds.value = deleteMBMessageIds;
 
-						if (dicussion) {
-							submitForm(
-								document.<portlet:namespace />fm,
-								'<portlet:actionURL name="deleteDiscussionMBMessages"><portlet:param name="redirect" value="<%= portletURL.toString() %>" /></portlet:actionURL>'
-							);
-						}
-						else {
-							submitForm(
-								document.<portlet:namespace />fm,
-								'<portlet:actionURL name="deleteMBMessages"><portlet:param name="redirect" value="<%= portletURL.toString() %>" /></portlet:actionURL>'
-							);
-						}
-					}
-				},
-			});
+			if (dicussion) {
+				submitForm(
+					document.<portlet:namespace />fm,
+					'<portlet:actionURL name="deleteDiscussionMBMessages"><portlet:param name="redirect" value="<%= portletURL.toString() %>" /></portlet:actionURL>'
+				);
+			}
+			else {
+				submitForm(
+					document.<portlet:namespace />fm,
+					'<portlet:actionURL name="deleteMBMessages"><portlet:param name="redirect" value="<%= portletURL.toString() %>" /></portlet:actionURL>'
+				);
+			}
 		}
 	};
 
 	window['<portlet:namespace />notSpamMBMessages'] = function () {
-		var notSpamMBMessageIds = Liferay.Util.getCheckedCheckboxes(
+		var notSpamMBMessageIds = Liferay.Util.listCheckedExcept(
 			document.<portlet:namespace />fm,
 			'<portlet:namespace />allRowIds'
 		);
 
-		if (notSpamMBMessageIds) {
-			Liferay.Util.openConfirmModal({
-				message:
-					'<%= UnicodeLanguageUtil.get(portletConfig.getResourceBundle(locale), "are-you-sure-you-want-to-mark-the-selected-messages-as-not-spam") %>',
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						document.<portlet:namespace />fm.<portlet:namespace />notSpamMBMessageIds.value = notSpamMBMessageIds;
+		if (
+			notSpamMBMessageIds &&
+			confirm(
+				'<%= UnicodeLanguageUtil.get(portletConfig.getResourceBundle(locale), "are-you-sure-you-want-to-mark-the-selected-messages-as-not-spam") %>'
+			)
+		) {
+			document.<portlet:namespace />fm.<portlet:namespace />notSpamMBMessageIds.value = notSpamMBMessageIds;
 
-						submitForm(
-							document.<portlet:namespace />fm,
-							'<portlet:actionURL name="markNotSpamMBMessages"><portlet:param name="redirect" value="<%= portletURL.toString() %>" /></portlet:actionURL>'
-						);
-					}
-				},
-			});
+			submitForm(
+				document.<portlet:namespace />fm,
+				'<portlet:actionURL name="markNotSpamMBMessages"><portlet:param name="redirect" value="<%= portletURL.toString() %>" /></portlet:actionURL>'
+			);
 		}
 	};
 </aui:script>

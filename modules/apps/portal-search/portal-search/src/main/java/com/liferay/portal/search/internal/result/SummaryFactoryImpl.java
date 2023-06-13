@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  * @author André de Oliveira
  */
-@Component(service = SummaryFactory.class)
+@Component(immediate = true, service = SummaryFactory.class)
 public class SummaryFactoryImpl implements SummaryFactory {
 
 	public static final int SUMMARY_MAX_CONTENT_LENGTH = 200;
@@ -89,7 +89,11 @@ public class SummaryFactoryImpl implements SummaryFactory {
 		return summary;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	public void setIndexerRegistry(IndexerRegistry indexerRegistry) {
+		_indexerRegistry = indexerRegistry;
+	}
+
 	private IndexerRegistry _indexerRegistry;
 
 }

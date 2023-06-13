@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
@@ -47,8 +48,7 @@ public class DispatchTriggerServiceImpl extends DispatchTriggerServiceBaseImpl {
 
 	@Override
 	public DispatchTrigger addDispatchTrigger(
-			String externalReferenceCode, long userId,
-			String dispatchTaskExecutorType,
+			long userId, String dispatchTaskExecutorType,
 			UnicodeProperties dispatchTaskSettingsUnicodeProperties,
 			String name)
 		throws PortalException {
@@ -58,7 +58,7 @@ public class DispatchTriggerServiceImpl extends DispatchTriggerServiceBaseImpl {
 			DispatchActionKeys.ADD_DISPATCH_TRIGGER);
 
 		return dispatchTriggerLocalService.addDispatchTrigger(
-			externalReferenceCode, userId, dispatchTaskExecutorType,
+			userId, dispatchTaskExecutorType,
 			dispatchTaskSettingsUnicodeProperties, name, false);
 	}
 
@@ -70,17 +70,6 @@ public class DispatchTriggerServiceImpl extends DispatchTriggerServiceBaseImpl {
 			getPermissionChecker(), dispatchTriggerId, ActionKeys.DELETE);
 
 		dispatchTriggerLocalService.deleteDispatchTrigger(dispatchTriggerId);
-	}
-
-	@Override
-	public DispatchTrigger getDispatchTrigger(long dispatchTriggerId)
-		throws PortalException {
-
-		_dispatchTriggerModelResourcePermission.check(
-			getPermissionChecker(), dispatchTriggerId, ActionKeys.VIEW);
-
-		return dispatchTriggerLocalService.getDispatchTrigger(
-			dispatchTriggerId);
 	}
 
 	@Override
@@ -119,7 +108,7 @@ public class DispatchTriggerServiceImpl extends DispatchTriggerServiceBaseImpl {
 			int endDateDay, int endDateYear, int endDateHour, int endDateMinute,
 			boolean neverEnd, boolean overlapAllowed, int startDateMonth,
 			int startDateDay, int startDateYear, int startDateHour,
-			int startDateMinute, String timeZoneId)
+			int startDateMinute)
 		throws PortalException {
 
 		_dispatchTriggerModelResourcePermission.check(
@@ -129,7 +118,7 @@ public class DispatchTriggerServiceImpl extends DispatchTriggerServiceBaseImpl {
 			dispatchTriggerId, active, cronExpression, dispatchTaskClusterMode,
 			endDateMonth, endDateDay, endDateYear, endDateHour, endDateMinute,
 			neverEnd, overlapAllowed, startDateMonth, startDateDay,
-			startDateYear, startDateHour, startDateMinute, timeZoneId);
+			startDateYear, startDateHour, startDateMinute);
 	}
 
 	@Override
@@ -146,11 +135,12 @@ public class DispatchTriggerServiceImpl extends DispatchTriggerServiceBaseImpl {
 			dispatchTriggerId, dispatchTaskSettingsUnicodeProperties, name);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.dispatch.model.DispatchTrigger)"
-	)
-	private ModelResourcePermission<DispatchTrigger>
-		_dispatchTriggerModelResourcePermission;
+	private static volatile ModelResourcePermission<DispatchTrigger>
+		_dispatchTriggerModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				DispatchTriggerServiceImpl.class,
+				"_dispatchTriggerModelResourcePermission",
+				DispatchTrigger.class);
 
 	@Reference(
 		target = "(resource.name=" + DispatchConstants.RESOURCE_NAME + ")"

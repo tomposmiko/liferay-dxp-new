@@ -20,31 +20,39 @@ import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.service.base.CommerceShipmentServiceBaseImpl;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Collections;
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.stream.Stream;
 
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceShipment"
-	},
-	service = AopService.class
-)
 public class CommerceShipmentServiceImpl
 	extends CommerceShipmentServiceBaseImpl {
+
+	@Override
+	public CommerceShipment addCommerceShipment(
+			long groupId, long commerceAccountId, long commerceAddressId,
+			long commerceShippingMethodId, String commerceShippingOptionName,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
+			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
+
+		return commerceShipmentLocalService.addCommerceShipment(
+			groupId, commerceAccountId, commerceAddressId,
+			commerceShippingMethodId, commerceShippingOptionName,
+			serviceContext);
+	}
 
 	@Override
 	public CommerceShipment addCommerceShipment(
@@ -57,23 +65,6 @@ public class CommerceShipmentServiceImpl
 
 		return commerceShipmentLocalService.addCommerceShipment(
 			commerceOrderId, serviceContext);
-	}
-
-	@Override
-	public CommerceShipment addCommerceShipment(
-			String externalReferenceCode, long groupId, long commerceAccountId,
-			long commerceAddressId, long commerceShippingMethodId,
-			String commerceShippingOptionName, ServiceContext serviceContext)
-		throws PortalException {
-
-		_portletResourcePermission.contains(
-			getPermissionChecker(), null,
-			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
-
-		return commerceShipmentLocalService.addCommerceShipment(
-			externalReferenceCode, groupId, commerceAccountId,
-			commerceAddressId, commerceShippingMethodId,
-			commerceShippingOptionName, serviceContext);
 	}
 
 	/**
@@ -104,20 +95,6 @@ public class CommerceShipmentServiceImpl
 	}
 
 	@Override
-	public CommerceShipment fetchCommerceShipmentByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException {
-
-		_portletResourcePermission.contains(
-			getPermissionChecker(), null,
-			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
-
-		return commerceShipmentLocalService.
-			fetchCommerceShipmentByExternalReferenceCode(
-				externalReferenceCode, companyId);
-	}
-
-	@Override
 	public CommerceShipment getCommerceShipment(long commerceShipmentId)
 		throws PortalException {
 
@@ -142,14 +119,14 @@ public class CommerceShipmentServiceImpl
 		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
 			companyId);
 
-		if (commerceChannels.isEmpty()) {
-			return Collections.emptyList();
-		}
+		Stream<CommerceChannel> stream = commerceChannels.stream();
+
+		long[] commerceChannelGroupIds = stream.mapToLong(
+			CommerceChannel::getGroupId
+		).toArray();
 
 		return commerceShipmentLocalService.getCommerceShipments(
-			TransformUtil.transformToLongArray(
-				commerceChannels, CommerceChannel::getGroupId),
-			status, start, end, orderByComparator);
+			commerceChannelGroupIds, status, start, end, orderByComparator);
 	}
 
 	@Override
@@ -169,10 +146,14 @@ public class CommerceShipmentServiceImpl
 			return Collections.emptyList();
 		}
 
+		Stream<CommerceChannel> stream = commerceChannels.stream();
+
+		long[] commerceChannelGroupIds = stream.mapToLong(
+			CommerceChannel::getGroupId
+		).toArray();
+
 		return commerceShipmentLocalService.getCommerceShipments(
-			TransformUtil.transformToLongArray(
-				commerceChannels, CommerceChannel::getGroupId),
-			start, end, orderByComparator);
+			commerceChannelGroupIds, start, end, orderByComparator);
 	}
 
 	@Override
@@ -188,14 +169,15 @@ public class CommerceShipmentServiceImpl
 		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
 			companyId);
 
-		if (commerceChannels.isEmpty()) {
-			return Collections.emptyList();
-		}
+		Stream<CommerceChannel> stream = commerceChannels.stream();
+
+		long[] commerceChannelGroupIds = stream.mapToLong(
+			CommerceChannel::getGroupId
+		).toArray();
 
 		return commerceShipmentLocalService.getCommerceShipments(
-			TransformUtil.transformToLongArray(
-				commerceChannels, CommerceChannel::getGroupId),
-			commerceAddressId, start, end, orderByComparator);
+			commerceChannelGroupIds, commerceAddressId, start, end,
+			orderByComparator);
 	}
 
 	@Override
@@ -237,9 +219,14 @@ public class CommerceShipmentServiceImpl
 			return 0;
 		}
 
+		Stream<CommerceChannel> stream = commerceChannels.stream();
+
+		long[] commerceChannelGroupIds = stream.mapToLong(
+			CommerceChannel::getGroupId
+		).toArray();
+
 		return commerceShipmentLocalService.getCommerceShipmentsCount(
-			TransformUtil.transformToLongArray(
-				commerceChannels, CommerceChannel::getGroupId));
+			commerceChannelGroupIds);
 	}
 
 	@Override
@@ -253,14 +240,14 @@ public class CommerceShipmentServiceImpl
 		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
 			companyId);
 
-		if (commerceChannels.isEmpty()) {
-			return 0;
-		}
+		Stream<CommerceChannel> stream = commerceChannels.stream();
+
+		long[] commerceChannelGroupIds = stream.mapToLong(
+			CommerceChannel::getGroupId
+		).toArray();
 
 		return commerceShipmentLocalService.getCommerceShipmentsCount(
-			TransformUtil.transformToLongArray(
-				commerceChannels, CommerceChannel::getGroupId),
-			status);
+			commerceChannelGroupIds, status);
 	}
 
 	@Override
@@ -274,14 +261,14 @@ public class CommerceShipmentServiceImpl
 		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
 			companyId);
 
-		if (commerceChannels.isEmpty()) {
-			return 0;
-		}
+		Stream<CommerceChannel> stream = commerceChannels.stream();
+
+		long[] commerceChannelGroupIds = stream.mapToLong(
+			CommerceChannel::getGroupId
+		).toArray();
 
 		return commerceShipmentLocalService.getCommerceShipmentsCount(
-			TransformUtil.transformToLongArray(
-				commerceChannels, CommerceChannel::getGroupId),
-			commerceAddressId);
+			commerceChannelGroupIds, commerceAddressId);
 	}
 
 	@Override
@@ -355,8 +342,7 @@ public class CommerceShipmentServiceImpl
 
 	@Override
 	public CommerceShipment updateCarrierDetails(
-			long commerceShipmentId, long commerceShippingMethodId,
-			String carrier, String trackingNumber, String trackingURL)
+			long commerceShipmentId, String carrier, String trackingNumber)
 		throws PortalException {
 
 		_portletResourcePermission.contains(
@@ -364,13 +350,16 @@ public class CommerceShipmentServiceImpl
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateCarrierDetails(
-			commerceShipmentId, commerceShippingMethodId, carrier,
-			trackingNumber, trackingURL);
+			commerceShipmentId, carrier, trackingNumber);
 	}
 
 	@Override
 	public CommerceShipment updateCommerceShipment(
-			CommerceShipment commerceShipment)
+			long commerceShipmentId, String carrier, String trackingNumber,
+			int status, int shippingDateMonth, int shippingDateDay,
+			int shippingDateYear, int shippingDateHour, int shippingDateMinute,
+			int expectedDateMonth, int expectedDateDay, int expectedDateYear,
+			int expectedDateHour, int expectedDateMinute)
 		throws PortalException {
 
 		_portletResourcePermission.contains(
@@ -378,43 +367,23 @@ public class CommerceShipmentServiceImpl
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateCommerceShipment(
-			commerceShipment);
+			commerceShipmentId, carrier, trackingNumber, status,
+			shippingDateMonth, shippingDateDay, shippingDateYear,
+			shippingDateHour, shippingDateMinute, expectedDateMonth,
+			expectedDateDay, expectedDateYear, expectedDateHour,
+			expectedDateMinute);
 	}
 
 	@Override
 	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, long commerceShippingMethodId,
-			String carrier, int expectedDateMonth, int expectedDateDay,
-			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
-			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
-			int shippingDateHour, int shippingDateMinute, String trackingNumber,
-			String trackingURL, int status, ServiceContext serviceContext)
-		throws PortalException {
-
-		_portletResourcePermission.contains(
-			getPermissionChecker(), null,
-			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
-
-		return commerceShipmentLocalService.updateCommerceShipment(
-			commerceShipmentId, commerceShippingMethodId, carrier,
-			expectedDateMonth, expectedDateDay, expectedDateYear,
-			expectedDateHour, expectedDateMinute, shippingDateMonth,
-			shippingDateDay, shippingDateYear, shippingDateHour,
-			shippingDateMinute, trackingNumber, trackingURL, status,
-			serviceContext);
-	}
-
-	@Override
-	public CommerceShipment updateCommerceShipment(
-			long commerceShipmentId, long commerceShippingMethodId,
-			String carrier, int expectedDateMonth, int expectedDateDay,
-			int expectedDateYear, int expectedDateHour, int expectedDateMinute,
-			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
-			int shippingDateHour, int shippingDateMinute, String trackingNumber,
-			String trackingURL, int status, String name, String description,
+			long commerceShipmentId, String name, String description,
 			String street1, String street2, String street3, String city,
 			String zip, long regionId, long countryId, String phoneNumber,
-			ServiceContext serviceContext)
+			String carrier, String trackingNumber, int status,
+			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
+			int shippingDateHour, int shippingDateMinute, int expectedDateMonth,
+			int expectedDateDay, int expectedDateYear, int expectedDateHour,
+			int expectedDateMinute)
 		throws PortalException {
 
 		_portletResourcePermission.contains(
@@ -422,13 +391,12 @@ public class CommerceShipmentServiceImpl
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateCommerceShipment(
-			commerceShipmentId, commerceShippingMethodId, carrier,
+			commerceShipmentId, name, description, street1, street2, street3,
+			city, zip, regionId, countryId, phoneNumber, carrier,
+			trackingNumber, status, shippingDateMonth, shippingDateDay,
+			shippingDateYear, shippingDateHour, shippingDateMinute,
 			expectedDateMonth, expectedDateDay, expectedDateYear,
-			expectedDateHour, expectedDateMinute, shippingDateMonth,
-			shippingDateDay, shippingDateYear, shippingDateHour,
-			shippingDateMinute, trackingNumber, trackingURL, status, name,
-			description, street1, street2, street3, city, zip, regionId,
-			countryId, phoneNumber, serviceContext);
+			expectedDateHour, expectedDateMinute);
 	}
 
 	@Override
@@ -444,19 +412,6 @@ public class CommerceShipmentServiceImpl
 		return commerceShipmentLocalService.updateExpectedDate(
 			commerceShipmentId, expectedDateMonth, expectedDateDay,
 			expectedDateYear, expectedDateHour, expectedDateMinute);
-	}
-
-	@Override
-	public CommerceShipment updateExternalReferenceCode(
-			long commerceShipmentId, String externalReferenceCode)
-		throws PortalException {
-
-		_portletResourcePermission.contains(
-			getPermissionChecker(), null,
-			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
-
-		return commerceShipmentLocalService.updateExternalReferenceCode(
-			commerceShipmentId, externalReferenceCode);
 	}
 
 	@Override
@@ -486,12 +441,13 @@ public class CommerceShipmentServiceImpl
 			commerceShipmentId, status);
 	}
 
-	@Reference
-	private CommerceChannelService _commerceChannelService;
+	private static volatile PortletResourcePermission
+		_portletResourcePermission =
+			PortletResourcePermissionFactory.getInstance(
+				CommerceShipmentServiceImpl.class, "_portletResourcePermission",
+				CommerceConstants.RESOURCE_NAME_COMMERCE_SHIPMENT);
 
-	@Reference(
-		target = "(resource.name=" + CommerceConstants.RESOURCE_NAME_COMMERCE_SHIPMENT + ")"
-	)
-	private PortletResourcePermission _portletResourcePermission;
+	@ServiceReference(type = CommerceChannelService.class)
+	private CommerceChannelService _commerceChannelService;
 
 }

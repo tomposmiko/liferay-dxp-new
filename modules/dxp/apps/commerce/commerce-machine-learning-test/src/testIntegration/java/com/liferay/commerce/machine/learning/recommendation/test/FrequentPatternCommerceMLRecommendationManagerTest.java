@@ -18,9 +18,11 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.machine.learning.recommendation.FrequentPatternCommerceMLRecommendation;
 import com.liferay.commerce.machine.learning.recommendation.FrequentPatternCommerceMLRecommendationManager;
 import com.liferay.commerce.machine.learning.recommendation.test.util.comparator.FrequentPatternCommerceMLRecommendationComparator;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
@@ -36,6 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -57,8 +62,9 @@ public class FrequentPatternCommerceMLRecommendationManagerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_frequentPatternCommerceMLRecommendations =
-			_addFrequentPatternCommerceMLRecommendations();
+		_company = CompanyTestUtil.addCompany();
+
+		_frequentPatternCommerceMLRecommendations = _populateEntries(5, 5, 6);
 	}
 
 	@Test
@@ -66,14 +72,14 @@ public class FrequentPatternCommerceMLRecommendationManagerTest {
 		throws Exception {
 
 		FrequentPatternCommerceMLRecommendation
-			randomFrequentPatternCommerceMLRecommendation =
+			frequentPatternCommerceMLRecommendation =
 				_frequentPatternCommerceMLRecommendations.get(
 					RandomTestUtil.randomInt(
 						0,
 						_frequentPatternCommerceMLRecommendations.size() - 1));
 
 		List<Long> antecedentIdList = ListUtil.fromArray(
-			randomFrequentPatternCommerceMLRecommendation.getAntecedentIds());
+			frequentPatternCommerceMLRecommendation.getAntecedentIds());
 
 		Collections.shuffle(antecedentIdList);
 
@@ -82,78 +88,38 @@ public class FrequentPatternCommerceMLRecommendationManagerTest {
 
 		long[] antecedentIds = ArrayUtil.toLongArray(antecedentIdList);
 
+		Stream<FrequentPatternCommerceMLRecommendation>
+			frequentPatternCommerceMLRecommendationStream =
+				_frequentPatternCommerceMLRecommendations.stream();
+
 		Map<Long, FrequentPatternCommerceMLRecommendation>
-			expectedFrequentPatternCommerceMLRecommendations =
-				new LinkedHashMap<>();
-
-		for (FrequentPatternCommerceMLRecommendation
-				curFrequentPatternCommerceMLRecommendation :
-					ListUtil.sort(
-						ListUtil.filter(
-							_frequentPatternCommerceMLRecommendations,
-							frequentPatternCommerceMLRecommendation ->
-								_filterFrequentPatternCommerceMLRecommendation(
-									frequentPatternCommerceMLRecommendation,
-									antecedentIds)),
-						new FrequentPatternCommerceMLRecommendationComparator(
-							antecedentIds))) {
-
-			expectedFrequentPatternCommerceMLRecommendations.putIfAbsent(
-				curFrequentPatternCommerceMLRecommendation.
-					getRecommendedEntryClassPK(),
-				curFrequentPatternCommerceMLRecommendation);
-		}
+			expectedFrequentPatternCommerceMLRecommendationsMap =
+				frequentPatternCommerceMLRecommendationStream.filter(
+					recommendation ->
+						_filterFrequentPatternCommerceMLRecommendation(
+							recommendation, antecedentIds)
+				).sorted(
+					new FrequentPatternCommerceMLRecommendationComparator(
+						antecedentIds)
+				).collect(
+					Collectors.toMap(
+						FrequentPatternCommerceMLRecommendation::
+							getRecommendedEntryClassPK,
+						Function.identity(), (item1, item2) -> item1,
+						LinkedHashMap::new)
+				);
 
 		IdempotentRetryAssert.retryAssert(
-			5, TimeUnit.SECONDS, 1, TimeUnit.SECONDS,
+			3, TimeUnit.SECONDS, 5, TimeUnit.SECONDS,
 			() -> {
 				_assetResultEquals(
 					antecedentIds,
-					new ArrayList<>(
-						expectedFrequentPatternCommerceMLRecommendations.
+					new ArrayList(
+						expectedFrequentPatternCommerceMLRecommendationsMap.
 							values()));
 
 				return null;
 			});
-	}
-
-	private List<FrequentPatternCommerceMLRecommendation>
-			_addFrequentPatternCommerceMLRecommendations()
-		throws Exception {
-
-		List<FrequentPatternCommerceMLRecommendation>
-			frequentPatternCommerceMLRecommendations = new ArrayList<>();
-
-		for (int i = 0; i < _PRODUCT_COUNT; i++) {
-			Set<Long> antecedentIds = new HashSet<>();
-
-			for (int j = 0;
-				 j < RandomTestUtil.randomInt(1, _MAX_ANTECEDENT_COUNT); j++) {
-
-				antecedentIds.add(RandomTestUtil.randomLong());
-			}
-
-			for (int j = 0; j < _RECOMMENDATION_COUNT; j++) {
-				float score = 1.0F - (j / 10.0F);
-
-				frequentPatternCommerceMLRecommendations.add(
-					_createFrequentPatternCommerceMLRecommendation(
-						ArrayUtil.toLongArray(antecedentIds), score));
-			}
-		}
-
-		Collections.shuffle(frequentPatternCommerceMLRecommendations);
-
-		for (FrequentPatternCommerceMLRecommendation
-				frequentPatternCommerceMLRecommendation :
-					frequentPatternCommerceMLRecommendations) {
-
-			_frequentPatternCommerceMLRecommendationManager.
-				addFrequentPatternCommerceMLRecommendation(
-					frequentPatternCommerceMLRecommendation);
-		}
-
-		return frequentPatternCommerceMLRecommendations;
 	}
 
 	private void _assetResultEquals(
@@ -166,7 +132,7 @@ public class FrequentPatternCommerceMLRecommendationManagerTest {
 			frequentPatternCommerceMLRecommendations =
 				_frequentPatternCommerceMLRecommendationManager.
 					getFrequentPatternCommerceMLRecommendations(
-						TestPropsValues.getCompanyId(), antecedentIds);
+						_company.getCompanyId(), antecedentIds);
 
 		int expectedRecommendationsSize = Math.min(
 			10, expectedFrequentPatternCommerceMLRecommendations.size());
@@ -197,9 +163,8 @@ public class FrequentPatternCommerceMLRecommendationManagerTest {
 	}
 
 	private FrequentPatternCommerceMLRecommendation
-			_createFrequentPatternCommerceMLRecommendation(
-				long[] antecedentIds, float score)
-		throws Exception {
+		_createFrequentPatternCommerceMLRecommendation(
+			long[] antecedentIds, int productCount) {
 
 		FrequentPatternCommerceMLRecommendation
 			frequentPatternCommerceMLRecommendation =
@@ -209,11 +174,11 @@ public class FrequentPatternCommerceMLRecommendationManagerTest {
 		frequentPatternCommerceMLRecommendation.setAntecedentIdsLength(
 			antecedentIds.length);
 		frequentPatternCommerceMLRecommendation.setCompanyId(
-			TestPropsValues.getCompanyId());
+			_company.getCompanyId());
 		frequentPatternCommerceMLRecommendation.setCreateDate(new Date());
 		frequentPatternCommerceMLRecommendation.setRecommendedEntryClassPK(
-			RandomTestUtil.randomInt(1, _PRODUCT_COUNT));
-		frequentPatternCommerceMLRecommendation.setScore(score);
+			RandomTestUtil.randomInt(1, productCount));
+		frequentPatternCommerceMLRecommendation.setScore(1.0F);
 
 		return frequentPatternCommerceMLRecommendation;
 	}
@@ -248,11 +213,47 @@ public class FrequentPatternCommerceMLRecommendationManagerTest {
 			expectedAntecedentIds);
 	}
 
-	private static final int _MAX_ANTECEDENT_COUNT = 6;
+	private List<FrequentPatternCommerceMLRecommendation> _populateEntries(
+			int productCount, int recommendationCount, int maxAntecedentCount)
+		throws Exception {
 
-	private static final int _PRODUCT_COUNT = 5;
+		List<FrequentPatternCommerceMLRecommendation>
+			frequentPatternCommerceMLRecommendations = new ArrayList<>();
 
-	private static final int _RECOMMENDATION_COUNT = 5;
+		for (int i = 0; i < productCount; i++) {
+			for (int j = 0; j < recommendationCount; j++) {
+				Set<Long> antecedentIds = new HashSet<>();
+
+				int assetCategoryIdsSize = RandomTestUtil.randomInt(
+					1, maxAntecedentCount);
+
+				for (int k = 0; k <= assetCategoryIdsSize; k++) {
+					antecedentIds.add(
+						(long)RandomTestUtil.randomInt(1, maxAntecedentCount));
+				}
+
+				frequentPatternCommerceMLRecommendations.add(
+					_createFrequentPatternCommerceMLRecommendation(
+						ArrayUtil.toLongArray(antecedentIds), productCount));
+			}
+		}
+
+		Collections.shuffle(frequentPatternCommerceMLRecommendations);
+
+		for (FrequentPatternCommerceMLRecommendation
+				frequentPatternCommerceMLRecommendation :
+					frequentPatternCommerceMLRecommendations) {
+
+			_frequentPatternCommerceMLRecommendationManager.
+				addFrequentPatternCommerceMLRecommendation(
+					frequentPatternCommerceMLRecommendation);
+		}
+
+		return frequentPatternCommerceMLRecommendations;
+	}
+
+	@DeleteAfterTestRun
+	private Company _company;
 
 	@Inject
 	private FrequentPatternCommerceMLRecommendationManager

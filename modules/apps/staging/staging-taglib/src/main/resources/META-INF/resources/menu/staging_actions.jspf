@@ -24,7 +24,7 @@
 
 		<aui:script position="inline" sandbox="<%= true %>">
 			var publishGlobalLink = document.getElementById(
-				'<portlet:namespace /><%= groupId %>publishGlobalLink'
+				'<portlet:namespace /><%= groupId + "publishGlobalLink" %>'
 			);
 
 			if (publishGlobalLink) {
@@ -69,7 +69,7 @@
 			</liferay-portlet:renderURL>
 
 			<%
-			UnicodeProperties liveGroupTypeSettingsUnicodeProperties = liveGroup.getTypeSettingsProperties();
+			UnicodeProperties liveGroupTypeSettings = liveGroup.getTypeSettingsProperties();
 			%>
 
 			<liferay-portlet:renderURL portletName="<%= PortletKeys.EXPORT_IMPORT %>" varImpl="simplePublishLayoutsURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
@@ -82,11 +82,11 @@
 				<portlet:param name="localPublishing" value="<%= String.valueOf(localPublishing) %>" />
 				<portlet:param name="privateLayout" value="<%= String.valueOf(privateLayout) %>" />
 				<portlet:param name="quickPublish" value="<%= Boolean.TRUE.toString() %>" />
-				<portlet:param name="remoteAddress" value='<%= liveGroupTypeSettingsUnicodeProperties.getProperty("remoteAddress") %>' />
-				<portlet:param name="remotePathContext" value='<%= liveGroupTypeSettingsUnicodeProperties.getProperty("remotePathContext") %>' />
-				<portlet:param name="remotePort" value='<%= liveGroupTypeSettingsUnicodeProperties.getProperty("remotePort") %>' />
-				<portlet:param name="remoteGroupId" value='<%= liveGroupTypeSettingsUnicodeProperties.getProperty("remoteGroupId") %>' />
-				<portlet:param name="secureConnection" value='<%= liveGroupTypeSettingsUnicodeProperties.getProperty("secureConnection") %>' />
+				<portlet:param name="remoteAddress" value='<%= liveGroupTypeSettings.getProperty("remoteAddress") %>' />
+				<portlet:param name="remotePort" value='<%= liveGroupTypeSettings.getProperty("remotePort") %>' />
+				<portlet:param name="remotePathContext" value='<%= liveGroupTypeSettings.getProperty("remotePathContext") %>' />
+				<portlet:param name="remoteGroupId" value='<%= liveGroupTypeSettings.getProperty("remoteGroupId") %>' />
+				<portlet:param name="secureConnection" value='<%= liveGroupTypeSettings.getProperty("secureConnection") %>' />
 				<portlet:param name="sourceGroupId" value="<%= String.valueOf(stagingGroupId) %>" />
 				<portlet:param name="targetGroupId" value="<%= String.valueOf(liveGroupId) %>" />
 			</liferay-portlet:renderURL>
@@ -167,7 +167,7 @@
 						<ul class="dropdown-menu" role="menu">
 							<c:if test="<%= !layoutRevision.isIncomplete() %>">
 								<li>
-									<a class="dropdown-item" href="javascript:Liferay.fire('<portlet:namespace />viewHistory', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);">
+									<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>viewHistory', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);">
 										<liferay-ui:message key="history" />
 									</a>
 								</li>
@@ -176,7 +176,7 @@
 							<c:if test="<%= !hasWorkflowTask %>">
 								<c:if test="<%= !layoutRevision.isMajor() && (layoutRevision.getParentLayoutRevisionId() != LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID) %>">
 									<li>
-										<a class="dropdown-item" href="javascript:Liferay.fire('<portlet:namespace />undo', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);">
+										<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>undo', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);">
 											<liferay-ui:message key="undo" />
 										</a>
 									</li>
@@ -192,7 +192,7 @@
 
 									<c:if test="<%= firstChildLayoutRevision.isInactive() %>">
 										<li>
-											<a class="dropdown-item" href="javascript:Liferay.fire('<portlet:namespace />redo', {layoutRevisionId: '<%= firstChildLayoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= firstChildLayoutRevision.getLayoutSetBranchId() %>'}); void(0);">
+											<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>redo', {layoutRevisionId: '<%= firstChildLayoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= firstChildLayoutRevision.getLayoutSetBranchId() %>'}); void(0);">
 												<liferay-ui:message key="redo" />
 											</a>
 										</li>

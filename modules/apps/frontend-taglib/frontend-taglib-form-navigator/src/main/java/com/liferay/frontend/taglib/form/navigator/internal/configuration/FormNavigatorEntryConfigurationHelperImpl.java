@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntryConfigurati
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -41,17 +42,18 @@ public class FormNavigatorEntryConfigurationHelperImpl
 	implements FormNavigatorEntryConfigurationHelper {
 
 	@Override
-	public <T> List<FormNavigatorEntry<T>> getFormNavigatorEntries(
+	public <T> Optional<List<FormNavigatorEntry<T>>> getFormNavigatorEntries(
 		String formNavigatorId, String categoryKey, T formModelBean) {
 
 		String context = _getContext(formNavigatorId, formModelBean);
 
-		List<String> formNavigatorEntryKeys =
+		Optional<List<String>> formNavigatorEntryKeysOptional =
 			_formNavigatorEntryConfigurationRetriever.getFormNavigatorEntryKeys(
 				formNavigatorId, categoryKey, context);
 
-		return _getFormNavigatorEntries(
-			formNavigatorId, formNavigatorEntryKeys);
+		return formNavigatorEntryKeysOptional.map(
+			formNavigatorEntryKeys -> _getFormNavigatorEntries(
+				formNavigatorId, formNavigatorEntryKeys));
 	}
 
 	@Activate
@@ -104,10 +106,6 @@ public class FormNavigatorEntryConfigurationHelperImpl
 
 	private <T> List<FormNavigatorEntry<T>> _getFormNavigatorEntries(
 		String formNavigatorId, List<String> formNavigatorEntryKeys) {
-
-		if (formNavigatorEntryKeys == null) {
-			return null;
-		}
 
 		List<FormNavigatorEntry<T>> formNavigatorEntries = new ArrayList<>();
 

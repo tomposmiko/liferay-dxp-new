@@ -66,7 +66,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceCartResource.class)
+@Component(enabled = false, service = CommerceCartResource.class)
 public class CommerceCartResource {
 
 	@Path("/order/{orderId}/coupon-code/{couponCode}")
@@ -100,13 +100,13 @@ public class CommerceCartResource {
 			coupon = new Coupon(couponCode);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			coupon = new Coupon(
 				StringUtil.split(exception.getLocalizedMessage()));
 		}
 
-		return _getResponse(coupon);
+		return getResponse(coupon);
 	}
 
 	@Path("/order/{orderId}/coupon-code")
@@ -138,13 +138,13 @@ public class CommerceCartResource {
 			coupon = new Coupon(StringPool.BLANK);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			coupon = new Coupon(
 				StringUtil.split(exception.getLocalizedMessage()));
 		}
 
-		return _getResponse(coupon);
+		return getResponse(coupon);
 	}
 
 	@Path("/cart-item")
@@ -202,7 +202,7 @@ public class CommerceCartResource {
 			CommerceOrderItem commerceOrderItem =
 				_commerceOrderItemService.addOrUpdateCommerceOrderItem(
 					commerceOrder.getCommerceOrderId(), cpInstanceId, options,
-					quantity, 0, 0, commerceContext, serviceContext);
+					quantity, 0, commerceContext, serviceContext);
 
 			cart = _commerceCartResourceUtil.getCart(
 				commerceOrderItem.getCommerceOrderId(),
@@ -221,7 +221,30 @@ public class CommerceCartResource {
 			}
 		}
 
-		return _getResponse(cart);
+		return getResponse(cart);
+	}
+
+	protected Response getResponse(Object object) {
+		if (object == null) {
+			return Response.status(
+				Response.Status.NOT_FOUND
+			).build();
+		}
+
+		try {
+			String json = _OBJECT_MAPPER.writeValueAsString(object);
+
+			return Response.ok(
+				json, MediaType.APPLICATION_JSON
+			).build();
+		}
+		catch (JsonProcessingException jsonProcessingException) {
+			_log.error(jsonProcessingException, jsonProcessingException);
+		}
+
+		return Response.status(
+			Response.Status.NOT_FOUND
+		).build();
 	}
 
 	private String[] _getCommerceOrderValidatorResultsMessages(
@@ -259,29 +282,6 @@ public class CommerceCartResource {
 		}
 
 		return _portal.getHomeURL(httpServletRequest);
-	}
-
-	private Response _getResponse(Object object) {
-		if (object == null) {
-			return Response.status(
-				Response.Status.NOT_FOUND
-			).build();
-		}
-
-		try {
-			String json = _OBJECT_MAPPER.writeValueAsString(object);
-
-			return Response.ok(
-				json, MediaType.APPLICATION_JSON
-			).build();
-		}
-		catch (JsonProcessingException jsonProcessingException) {
-			_log.error(jsonProcessingException);
-		}
-
-		return Response.status(
-			Response.Status.NOT_FOUND
-		).build();
 	}
 
 	private static final ObjectMapper _OBJECT_MAPPER = new ObjectMapper() {

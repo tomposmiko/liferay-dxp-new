@@ -33,11 +33,6 @@ public class CPDisplayLayoutTable extends BaseTable<CPDisplayLayoutTable> {
 	public static final CPDisplayLayoutTable INSTANCE =
 		new CPDisplayLayoutTable();
 
-	public final Column<CPDisplayLayoutTable, Long> mvccVersion = createColumn(
-		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<CPDisplayLayoutTable, Long> ctCollectionId =
-		createColumn(
-			"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<CPDisplayLayoutTable, String> uuid = createColumn(
 		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<CPDisplayLayoutTable, Long> CPDisplayLayoutId =
@@ -59,10 +54,6 @@ public class CPDisplayLayoutTable extends BaseTable<CPDisplayLayoutTable> {
 		"classNameId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<CPDisplayLayoutTable, Long> classPK = createColumn(
 		"classPK", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
-	public final Column<CPDisplayLayoutTable, String>
-		layoutPageTemplateEntryUuid = createColumn(
-			"layoutPageTemplateEntryUuid", String.class, Types.VARCHAR,
-			Column.FLAG_DEFAULT);
 	public final Column<CPDisplayLayoutTable, String> layoutUuid = createColumn(
 		"layoutUuid", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 

@@ -14,9 +14,10 @@
 
 package com.liferay.change.tracking.web.internal.display.context;
 
-import com.liferay.change.tracking.configuration.CTSettingsConfiguration;
-import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.change.tracking.model.CTPreferences;
+import com.liferay.change.tracking.service.CTPreferencesLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -32,24 +33,29 @@ import javax.servlet.http.HttpServletRequest;
 public class PublicationsConfigurationDisplayContext {
 
 	public PublicationsConfigurationDisplayContext(
-		CTSettingsConfigurationHelper ctSettingsConfigurationHelper,
-		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
+		CTPreferencesLocalService ctPreferencesLocalService,
+		HttpServletRequest httpServletRequest, Language language,
+		RenderResponse renderResponse) {
 
 		_httpServletRequest = httpServletRequest;
-		_renderResponse = renderResponse;
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
+			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		CTSettingsConfiguration ctSettingsConfiguration =
-			ctSettingsConfigurationHelper.getCTSettingsConfiguration(
-				themeDisplay.getCompanyId());
+		CTPreferences ctPreferences =
+			ctPreferencesLocalService.fetchCTPreferences(
+				themeDisplay.getCompanyId(), 0);
 
-		_publicationsEnabled = ctSettingsConfiguration.enabled();
-		_sandboxOnlyEnabled = ctSettingsConfiguration.sandboxEnabled();
-		_unapprovedChangesAllowed =
-			ctSettingsConfiguration.unapprovedChangesAllowed();
+		if (ctPreferences != null) {
+			_publicationsEnabled = true;
+		}
+		else {
+			_publicationsEnabled = false;
+		}
+
+		_language = language;
+		_renderResponse = renderResponse;
 	}
 
 	public String getActionURL() {
@@ -80,19 +86,10 @@ public class PublicationsConfigurationDisplayContext {
 		return _publicationsEnabled;
 	}
 
-	public boolean isSandboxOnlyEnabled() {
-		return _sandboxOnlyEnabled;
-	}
-
-	public boolean isUnapprovedChangesAllowed() {
-		return _unapprovedChangesAllowed;
-	}
-
 	private final HttpServletRequest _httpServletRequest;
+	private final Language _language;
 	private String _navigation;
 	private final boolean _publicationsEnabled;
 	private final RenderResponse _renderResponse;
-	private final boolean _sandboxOnlyEnabled;
-	private final boolean _unapprovedChangesAllowed;
 
 }

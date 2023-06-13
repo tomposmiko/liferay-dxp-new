@@ -18,8 +18,6 @@ module.exports = {
 		configuration: true,
 		fragmentElement: true,
 		fragmentNamespace: true,
-		input: true,
-		layoutMode: true,
 	},
 	overrides: [
 		{

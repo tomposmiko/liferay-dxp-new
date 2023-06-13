@@ -16,7 +16,7 @@ import ClayButton from '@clayui/button';
 import ClayModal, {useModal} from '@clayui/modal';
 import React from 'react';
 
-export default function Modal({
+export default ({
 	body,
 	callback,
 	onClose,
@@ -25,7 +25,7 @@ export default function Modal({
 	textSecondaryButton = 'Cancel',
 	title,
 	visible,
-}) {
+}) => {
 	const {observer, onClose: close} = useModal({
 		onClose,
 	});
@@ -39,9 +39,7 @@ export default function Modal({
 					status={status}
 				>
 					<ClayModal.Header>{title}</ClayModal.Header>
-
 					<ClayModal.Body>{body}</ClayModal.Body>
-
 					<ClayModal.Footer
 						first={
 							<ClayButton displayType="secondary" onClick={close}>
@@ -64,4 +62,4 @@ export default function Modal({
 			)}
 		</>
 	);
-}
+};

@@ -107,64 +107,11 @@ export default function MultiPanelSidebar({
 		}
 	}, [onChange, open]);
 
-	const getMessage = (label) => {
-		return Liferay.Language.get('panel') + label;
-	};
-
-	const handlePanelClick = ({sidebarPanelId}) => {
-		const builder = document.querySelector('.ddm-form-builder');
-		const sidebar = document.querySelector('.multi-panel-sidebar-content');
-		const closeButtonPressed =
-			builder.classList.contains('ddm-form-builder--sidebar-open') !==
-			open;
-
-		if (closeButtonPressed) {
-			builder.classList.toggle('ddm-form-builder--sidebar-open');
-			sidebar.classList.toggle('multi-panel-sidebar-content-open');
-		}
-
-		const newOpen = closeButtonPressed ? open : !open;
-
+	const handlePanelClick = ({sidebarPanelId}) =>
 		onChange({
-			sidebarOpen: sidebarPanelId !== currentPanelId || newOpen,
+			sidebarOpen: sidebarPanelId !== currentPanelId || !open,
 			sidebarPanelId,
 		});
-	};
-
-	const handleKeyDown = (event) => {
-		if (event.keyCode === 38) {
-			let arrayIndex = 0;
-			const panelArr = [...panels[0]];
-
-			panelArr.map((panelId, index) => {
-				if (panelId === event.target.id) {
-					arrayIndex = index - 1;
-
-					if (arrayIndex >= 0) {
-						const button = panels[0][arrayIndex];
-
-						document.querySelector('#' + button).focus();
-					}
-				}
-			});
-		}
-		else if (event.keyCode === 40) {
-			let arrayIndex = 0;
-			const panelArr = [...panels[0]];
-
-			panelArr.map((panelId, index) => {
-				if (panelId === event.target.id) {
-					arrayIndex = index + 1;
-
-					if (arrayIndex <= panels[0].length - 1) {
-						const button = panels[0][arrayIndex];
-
-						document.querySelector('#' + button).focus();
-					}
-				}
-			});
-		}
-	};
 
 	return (
 		<ClayTooltipProvider>
@@ -191,7 +138,7 @@ export default function MultiPanelSidebar({
 				>
 					<ul className="tbar-nav">
 						{panels.reduce((elements, group, groupIndex) => {
-							const buttons = group.map((panelId, index) => {
+							const buttons = group.map((panelId) => {
 								const panel = sidebarPanels[panelId];
 
 								const active =
@@ -232,7 +179,6 @@ export default function MultiPanelSidebar({
 											</a>
 										) : (
 											<ClayButtonWithIcon
-												aria-label={getMessage(label)}
 												aria-pressed={active}
 												className={btnClasses}
 												data-tooltip-align="left"
@@ -242,12 +188,8 @@ export default function MultiPanelSidebar({
 													handlePanelClick(panel)
 												}
 												onFocus={prefetch}
-												onKeyDown={handleKeyDown}
 												onMouseEnter={prefetch}
 												symbol={icon}
-												tabIndex={
-													index === 0 ? '0' : '-1'
-												}
 												title={label}
 											/>
 										)}
@@ -267,9 +209,7 @@ export default function MultiPanelSidebar({
 						}, [])}
 					</ul>
 				</nav>
-
 				<div
-					aria-label={Liferay.Language.get('sidebar')}
 					className={classNames('multi-panel-sidebar-content', {
 						'multi-panel-sidebar-content-open': open,
 					})}
@@ -294,7 +234,7 @@ export default function MultiPanelSidebar({
 								setHasError(true);
 							}}
 						>
-							{!panelComponents.length && (
+							{panelComponents.length === 0 && (
 								<ClayLoadingIndicator />
 							)}
 

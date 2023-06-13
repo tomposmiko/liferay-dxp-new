@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.DuplicateOrganizationExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchOrganizationException;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
@@ -156,7 +155,7 @@ public class OrganizationPersistenceTest {
 
 		newOrganization.setCountryId(RandomTestUtil.nextLong());
 
-		newOrganization.setStatusListTypeId(RandomTestUtil.nextLong());
+		newOrganization.setStatusId(RandomTestUtil.nextLong());
 
 		newOrganization.setComments(RandomTestUtil.randomString());
 
@@ -212,32 +211,11 @@ public class OrganizationPersistenceTest {
 			existingOrganization.getCountryId(),
 			newOrganization.getCountryId());
 		Assert.assertEquals(
-			existingOrganization.getStatusListTypeId(),
-			newOrganization.getStatusListTypeId());
+			existingOrganization.getStatusId(), newOrganization.getStatusId());
 		Assert.assertEquals(
 			existingOrganization.getComments(), newOrganization.getComments());
 		Assert.assertEquals(
 			existingOrganization.getLogoId(), newOrganization.getLogoId());
-	}
-
-	@Test(expected = DuplicateOrganizationExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		Organization organization = addOrganization();
-
-		Organization newOrganization = addOrganization();
-
-		newOrganization.setCompanyId(organization.getCompanyId());
-
-		newOrganization = _persistence.update(newOrganization);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newOrganization);
-
-		newOrganization.setExternalReferenceCode(
-			organization.getExternalReferenceCode());
-
-		_persistence.update(newOrganization);
 	}
 
 	@Test
@@ -327,12 +305,12 @@ public class OrganizationPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -365,8 +343,8 @@ public class OrganizationPersistenceTest {
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "parentOrganizationId", true,
 			"treePath", true, "name", true, "type", true, "recursable", true,
-			"regionId", true, "countryId", true, "statusListTypeId", true,
-			"comments", true, "logoId", true);
+			"regionId", true, "countryId", true, "statusId", true, "comments",
+			true, "logoId", true);
 	}
 
 	@Test
@@ -645,15 +623,15 @@ public class OrganizationPersistenceTest {
 				new Class<?>[] {String.class}, "name"));
 
 		Assert.assertEquals(
-			organization.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				organization, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(organization.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				organization, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			organization.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				organization, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected Organization addOrganization() throws Exception {
@@ -693,7 +671,7 @@ public class OrganizationPersistenceTest {
 
 		organization.setCountryId(RandomTestUtil.nextLong());
 
-		organization.setStatusListTypeId(RandomTestUtil.nextLong());
+		organization.setStatusId(RandomTestUtil.nextLong());
 
 		organization.setComments(RandomTestUtil.randomString());
 

@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = ModelListener.class)
+@Component(enabled = false, immediate = true, service = ModelListener.class)
 public class CommerceCatalogModelListener
 	extends BaseModelListener<CommerceCatalog> {
 
@@ -40,7 +40,7 @@ public class CommerceCatalogModelListener
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 	}
@@ -53,7 +53,7 @@ public class CommerceCatalogModelListener
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 	}

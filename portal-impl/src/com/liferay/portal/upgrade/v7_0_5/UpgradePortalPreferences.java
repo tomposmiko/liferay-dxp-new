@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
-import com.liferay.portal.util.PortalInstances;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,11 +39,15 @@ public class UpgradePortalPreferences extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+		try (LoggingTimer loggingTimer = new LoggingTimer();
+			PreparedStatement preparedStatement = connection.prepareStatement(
+				"select companyId from Company");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
 			upgradePortalPreferences(PortletKeys.PREFS_OWNER_ID_DEFAULT);
 
-			for (long companyId : PortalInstances.getCompanyIdsBySQL()) {
-				upgradePortalPreferences(companyId);
+			while (resultSet.next()) {
+				upgradePortalPreferences(resultSet.getLong("companyId"));
 			}
 		}
 	}
@@ -123,12 +126,15 @@ public class UpgradePortalPreferences extends UpgradeProcess {
 
 	private static final String[] _OBSOLETE_PORTAL_PREFERENCES = {
 		PropsKeys.AUTO_DEPLOY_CUSTOM_PORTLET_XML,
-		PropsKeys.AUTO_DEPLOY_DEPLOY_DIR, "auto.deploy.dest.dir",
+		PropsKeys.AUTO_DEPLOY_DEPLOY_DIR, PropsKeys.AUTO_DEPLOY_DEST_DIR,
 		PropsKeys.AUTO_DEPLOY_ENABLED, PropsKeys.AUTO_DEPLOY_INTERVAL,
-		"auto.deploy.jboss.prefix", PropsKeys.AUTO_DEPLOY_TOMCAT_CONF_DIR,
-		"auto.deploy.tomcat.lib.dir", "auto.deploy.unpack.war",
-		"plugin.notifications.enabled", "plugin.notifications.packages.ignored",
-		"plugin.repositories.trusted", "plugin.repositories.untrusted"
+		PropsKeys.AUTO_DEPLOY_JBOSS_PREFIX,
+		PropsKeys.AUTO_DEPLOY_TOMCAT_CONF_DIR,
+		PropsKeys.AUTO_DEPLOY_TOMCAT_LIB_DIR, PropsKeys.AUTO_DEPLOY_UNPACK_WAR,
+		PropsKeys.PLUGIN_NOTIFICATIONS_ENABLED,
+		PropsKeys.PLUGIN_NOTIFICATIONS_PACKAGES_IGNORED,
+		PropsKeys.PLUGIN_REPOSITORIES_TRUSTED,
+		PropsKeys.PLUGIN_REPOSITORIES_UNTRUSTED
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(

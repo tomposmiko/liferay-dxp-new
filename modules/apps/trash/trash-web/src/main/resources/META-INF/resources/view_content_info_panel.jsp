@@ -49,7 +49,6 @@ TrashHandler trashHandler = trashDisplayContext.getTrashHandler();
 									"portletNamespace", liferayPortletResponse.getNamespace()
 								).build()
 							%>'
-							aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 							dropdownItems="<%= trashContainerActionDropdownItemsProvider.getActionDropdownItems() %>"
 							propsTransformer="js/EntriesPropsTransformer"
 						/>
@@ -59,19 +58,17 @@ TrashHandler trashHandler = trashDisplayContext.getTrashHandler();
 		</clay:content-row>
 	</div>
 
-	<div class="sheet-row">
-		<clay:tabs
-			tabsItems="<%= trashDisplayContext.getTabsItems() %>"
-		>
-			<div class="sidebar-body">
-				<dl class="sidebar-dl sidebar-section">
-					<dt class="sidebar-dt"><liferay-ui:message key="num-of-items" /></dt>
+	<clay:navigation-bar
+		navigationItems="<%= trashDisplayContext.getInfoPanelNavigationItems() %>"
+	/>
 
-					<dd class="sidebar-dd">
-						<%= trashHandler.getTrashModelsCount(classPK) %>
-					</dd>
-				</dl>
-			</div>
-		</clay:tabs>
+	<div class="sidebar-body">
+		<dl class="sidebar-dl sidebar-section">
+			<dt class="sidebar-dt"><liferay-ui:message key="num-of-items" /></dt>
+
+			<dd class="sidebar-dd">
+				<%= trashHandler.getTrashModelsCount(classPK) %>
+			</dd>
+		</dl>
 	</div>
 </c:if>

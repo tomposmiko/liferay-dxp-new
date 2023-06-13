@@ -95,10 +95,11 @@ public class ReferredSegmentsEntryProviderTest {
 			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
 			User.class.getName());
 
-		Assert.assertEquals(
-			0,
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKsCount(
-				segmentsEntry3.getSegmentsEntryId()));
+				segmentsEntry3.getSegmentsEntryId());
+
+		Assert.assertEquals(0, segmentsEntryClassPKsCount);
 	}
 
 	@Test
@@ -127,15 +128,20 @@ public class ReferredSegmentsEntryProviderTest {
 			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
 			User.class.getName());
 
-		Assert.assertEquals(
-			2,
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKsCount(
-				segmentsEntry3.getSegmentsEntryId()));
+				segmentsEntry3.getSegmentsEntryId());
+
+		Assert.assertEquals(2, segmentsEntryClassPKsCount);
+
+		long[] segmentsEntryClassPKs =
+			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
+				segmentsEntry3.getSegmentsEntryId(), 0, 2);
+
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
 				new long[] {_user1.getUserId(), _user2.getUserId()},
-				_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
-					segmentsEntry3.getSegmentsEntryId(), 0, 2)));
+				segmentsEntryClassPKs));
 	}
 
 	@Test
@@ -169,15 +175,19 @@ public class ReferredSegmentsEntryProviderTest {
 			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
 			User.class.getName());
 
-		Assert.assertEquals(
-			1,
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKsCount(
-				segmentsEntry3.getSegmentsEntryId()));
+				segmentsEntry3.getSegmentsEntryId());
+
+		Assert.assertEquals(1, segmentsEntryClassPKsCount);
+
+		long[] segmentsEntryClassPKs =
+			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
+				segmentsEntry3.getSegmentsEntryId(), 0, 1);
+
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
-				new long[] {_user1.getUserId()},
-				_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
-					segmentsEntry3.getSegmentsEntryId(), 0, 1)));
+				new long[] {_user1.getUserId()}, segmentsEntryClassPKs));
 	}
 
 	@Test
@@ -211,15 +221,20 @@ public class ReferredSegmentsEntryProviderTest {
 			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
 			User.class.getName());
 
-		Assert.assertEquals(
-			2,
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKsCount(
-				segmentsEntry3.getSegmentsEntryId()));
+				segmentsEntry3.getSegmentsEntryId());
+
+		Assert.assertEquals(2, segmentsEntryClassPKsCount);
+
+		long[] segmentsEntryClassPKs =
+			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
+				segmentsEntry3.getSegmentsEntryId(), 0, 2);
+
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
 				new long[] {_user1.getUserId(), _user2.getUserId()},
-				_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
-					segmentsEntry3.getSegmentsEntryId(), 0, 2)));
+				segmentsEntryClassPKs));
 	}
 
 	@Test
@@ -250,15 +265,19 @@ public class ReferredSegmentsEntryProviderTest {
 
 		_segmentsEntryLocalService.deleteSegmentsEntry(segmentsEntry1);
 
-		Assert.assertEquals(
-			1,
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKsCount(
-				segmentsEntry3.getSegmentsEntryId()));
+				segmentsEntry3.getSegmentsEntryId());
+
+		Assert.assertEquals(1, segmentsEntryClassPKsCount);
+
+		long[] segmentsEntryClassPKs =
+			_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
+				segmentsEntry3.getSegmentsEntryId(), 0, 1);
+
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
-				new long[] {_user2.getUserId()},
-				_segmentsEntryProviderRegistry.getSegmentsEntryClassPKs(
-					segmentsEntry3.getSegmentsEntryId(), 0, 1)));
+				new long[] {_user2.getUserId()}, segmentsEntryClassPKs));
 	}
 
 	@Test

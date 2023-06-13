@@ -354,7 +354,7 @@ public interface VersionedEntryLocalService
 	 * <strong>Important:</strong> Inspect VersionedEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftVersionedEntry the versioned entry
+	 * @param versionedEntry the versioned entry
 	 * @return the versioned entry that was updated
 	 */
 	@Indexable(type = IndexableType.REINDEX)

@@ -14,25 +14,25 @@
 
 import {PagesVisitor} from './visitors.es';
 
-export function implAddColumn(size, fields = []) {
+export const implAddColumn = (size, fields = []) => {
 	return {
 		fields,
 		size,
 	};
-}
+};
 
-export function implAddRow(size, fields) {
+export const implAddRow = (size, fields) => {
 	return {
 		columns: [implAddColumn(size, fields)],
 	};
-}
+};
 
-export function addRow(
+export const addRow = (
 	pages,
 	indexToAddRow,
 	pageIndex,
 	newRow = implAddRow(12, [])
-) {
+) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.mapPages((page, currentPageIndex) => {
@@ -51,15 +51,15 @@ export function addRow(
 
 		return newPage;
 	});
-}
+};
 
-export function addColumn(
+export const addColumn = (
 	pages,
 	indexToAddColumn,
 	pageIndex,
 	rowIndex,
 	newColumn = implAddColumn(11, [])
-) {
+) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.mapRows((row, currentRowIndex, currentPageIndex) => {
@@ -78,19 +78,21 @@ export function addColumn(
 
 		return newRow;
 	});
-}
+};
 
-export function isEmptyColumn(pages, pageIndex, rowIndex, columnIndex) {
-	return !pages[pageIndex].rows[rowIndex].columns[columnIndex].fields.length;
-}
+export const isEmptyColumn = (pages, pageIndex, rowIndex, columnIndex) => {
+	return (
+		pages[pageIndex].rows[rowIndex].columns[columnIndex].fields.length === 0
+	);
+};
 
-export function addFieldToColumn(
+export const addFieldToColumn = (
 	pages,
 	pageIndex,
 	rowIndex,
 	columnIndex,
 	field
-) {
+) => {
 	const numberOfRows = pages[pageIndex].rows.length;
 
 	if (rowIndex >= numberOfRows) {
@@ -121,9 +123,9 @@ export function addFieldToColumn(
 			return column;
 		}
 	);
-}
+};
 
-export function getFieldIndexes(pages, fieldName) {
+export const getFieldIndexes = (pages, fieldName) => {
 	let indexes = {};
 	const visitor = new PagesVisitor(pages);
 
@@ -142,33 +144,57 @@ export function getFieldIndexes(pages, fieldName) {
 	});
 
 	return indexes;
-}
+};
 
-export function isEmptyRow(pages, pageIndex, rowIndex) {
+export const getParentField = (pages, fieldName) => {
+	let parentField;
+	const visitor = new PagesVisitor(pages);
+
+	visitor.mapFields(
+		(
+			field,
+			fieldIndex,
+			columnIndex,
+			rowIndex,
+			pageIndex,
+			currentParentField
+		) => {
+			if (field.fieldName === fieldName) {
+				parentField = currentParentField;
+			}
+		},
+		true,
+		true
+	);
+
+	return parentField;
+};
+
+export const isEmptyRow = (pages, pageIndex, rowIndex) => {
 	return pages[pageIndex].rows[
 		rowIndex
 	].columns.every((column, columnIndex) =>
 		isEmptyColumn(pages, pageIndex, rowIndex, columnIndex)
 	);
-}
+};
 
-export function isEmptyPage(pages, pageIndex) {
+export const isEmptyPage = (pages, pageIndex) => {
 	return pages[pageIndex].rows.every((row, rowIndex) =>
 		isEmptyRow(pages, pageIndex, rowIndex)
 	);
-}
+};
 
-export function isEmpty(pages) {
+export const isEmpty = (pages) => {
 	return pages.every((page, pageIndex) => isEmptyPage(pages, pageIndex));
-}
+};
 
-export function setColumnFields(
+export const setColumnFields = (
 	pages,
 	pageIndex,
 	rowIndex,
 	columnIndex,
 	fields = []
-) {
+) => {
 	const numberOfRows = pages[Number(pageIndex)].rows.length;
 
 	if (numberOfRows - 1 < rowIndex) {
@@ -188,9 +214,9 @@ export function setColumnFields(
 	}
 
 	return pages;
-}
+};
 
-export function removeColumn(pages, pageIndex, rowIndex, columnIndex) {
+export const removeColumn = (pages, pageIndex, rowIndex, columnIndex) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.mapRows((row, currentRowIndex, currentPageIndex) => {
@@ -207,9 +233,9 @@ export function removeColumn(pages, pageIndex, rowIndex, columnIndex) {
 
 		return newRow;
 	});
-}
+};
 
-export function removeFields(pages, pageIndex, rowIndex, columnIndex) {
+export const removeFields = (pages, pageIndex, rowIndex, columnIndex) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.mapColumns(
@@ -227,9 +253,9 @@ export function removeFields(pages, pageIndex, rowIndex, columnIndex) {
 			return newColumn;
 		}
 	);
-}
+};
 
-export function rowHasFields(pages, pageIndex, rowIndex) {
+export const rowHasFields = (pages, pageIndex, rowIndex) => {
 	let hasFields = false;
 	const page = pages[Number(pageIndex)];
 
@@ -242,9 +268,9 @@ export function rowHasFields(pages, pageIndex, rowIndex) {
 	}
 
 	return hasFields;
-}
+};
 
-export function removeEmptyRows(pages, pageIndex) {
+export const removeEmptyRows = (pages, pageIndex) => {
 	return pages[pageIndex].rows.reduce((result, next, index) => {
 		if (rowHasFields(pages, pageIndex, index)) {
 			result = [...result, next];
@@ -252,15 +278,15 @@ export function removeEmptyRows(pages, pageIndex) {
 
 		return result;
 	}, []);
-}
+};
 
-export function removeRow(pages, pageIndex, rowIndex) {
+export const removeRow = (pages, pageIndex, rowIndex) => {
 	pages[Number(pageIndex)].rows.splice(Number(rowIndex), 1);
 
 	return pages;
-}
+};
 
-export function visitNestedFields({nestedFields}, fn) {
+export const visitNestedFields = ({nestedFields}, fn) => {
 	if (Array.isArray(nestedFields)) {
 		nestedFields.forEach((nestedField) => {
 			fn(nestedField);
@@ -268,35 +294,35 @@ export function visitNestedFields({nestedFields}, fn) {
 			visitNestedFields(nestedField, fn);
 		});
 	}
-}
+};
 
-export function findField(pages, predicate) {
+export const findField = (pages, predicate) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.findField(predicate);
-}
+};
 
-export function findFieldByFieldName(pages, fieldName) {
+export const findFieldByFieldName = (pages, fieldName) => {
 	return findField(pages, (field) => field.fieldName === fieldName);
-}
+};
 
-export function findFieldByName(pages, name) {
+export const findFieldByName = (pages, name) => {
 	return findField(pages, (field) => field.name === name);
-}
+};
 
-export function getRow(pages, pageIndex, rowIndex) {
+export const getRow = (pages, pageIndex, rowIndex) => {
 	const currentPage = pages[Number(pageIndex)];
 
 	return currentPage.rows[Number(rowIndex)];
-}
+};
 
-export function getColumn(pages, pageIndex, rowIndex, columnIndex) {
+export const getColumn = (pages, pageIndex, rowIndex, columnIndex) => {
 	const row = getRow(pages, pageIndex, rowIndex);
 
 	return row.columns[Number(columnIndex)];
-}
+};
 
-export function getColumnPosition(pages, pageIndex, rowIndex, columnIndex) {
+export const getColumnPosition = (pages, pageIndex, rowIndex, columnIndex) => {
 	const currentPage = pages[pageIndex];
 
 	let currentRow = null;
@@ -311,7 +337,7 @@ export function getColumnPosition(pages, pageIndex, rowIndex, columnIndex) {
 		return;
 	}
 
-	return columnIndex !== -1 && currentRow.columns
+	return columnIndex != -1 && currentRow.columns
 		? currentRow.columns.reduce((result, _, index) => {
 				if (index <= columnIndex) {
 					const column = getColumn(pages, pageIndex, rowIndex, index);
@@ -322,9 +348,9 @@ export function getColumnPosition(pages, pageIndex, rowIndex, columnIndex) {
 				return result;
 		  }, 0)
 		: 0;
-}
+};
 
-export function getField(context, pageIndex, rowIndex, columnIndex) {
+export const getField = (context, pageIndex, rowIndex, columnIndex) => {
 	let field = getColumn(context, pageIndex, rowIndex, columnIndex).fields[0];
 
 	if (context[pageIndex].nestedFields) {
@@ -334,9 +360,9 @@ export function getField(context, pageIndex, rowIndex, columnIndex) {
 	}
 
 	return field;
-}
+};
 
-export function getIndexes(node) {
+export const getIndexes = (node) => {
 	const {ddmFieldColumn, ddmFieldPage, ddmFieldRow} = node.dataset;
 
 	return {
@@ -344,9 +370,9 @@ export function getIndexes(node) {
 		pageIndex: Number(ddmFieldPage) || 0,
 		rowIndex: Number(ddmFieldRow) || 0,
 	};
-}
+};
 
-export function getNestedIndexes(node) {
+export const getNestedIndexes = (node) => {
 	let indexes = [];
 
 	if (node.dataset.ddmFieldRow) {
@@ -358,9 +384,9 @@ export function getNestedIndexes(node) {
 	}
 
 	return indexes;
-}
+};
 
-export function updateField(pages, fieldName, properties) {
+export const updateField = (pages, fieldName, properties) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.mapFields(
@@ -377,15 +403,15 @@ export function updateField(pages, fieldName, properties) {
 		true,
 		true
 	);
-}
+};
 
-export function updateColumn(
+export const updateColumn = (
 	pages,
 	pageIndex,
 	rowIndex,
 	columnIndex,
 	properties
-) {
+) => {
 	const visitor = new PagesVisitor(pages);
 
 	return visitor.mapColumns(
@@ -406,4 +432,4 @@ export function updateColumn(
 			return newColumn;
 		}
 	);
-}
+};

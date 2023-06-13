@@ -29,10 +29,12 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.function.IntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Renato Rego
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SELECT,
 	service = {
 		DDMFormFieldValueAccessor.class, SelectDDMFormFieldValueAccessor.class
@@ -52,22 +55,22 @@ public class SelectDDMFormFieldValueAccessor
 	implements DDMFormFieldValueAccessor<JSONArray> {
 
 	@Override
-	public JSONArray[] getArrayGenericType() {
-		return new JSONArray[0];
+	public IntFunction<JSONArray[]> getArrayGeneratorIntFunction() {
+		return JSONArray[]::new;
 	}
 
 	@Override
 	public JSONArray getValue(
 		DDMFormFieldValue ddmFormFieldValue, Locale locale) {
 
-		return _getOptionsValuesJSONArray(ddmFormFieldValue, locale);
+		return getOptionsValuesJSONArray(ddmFormFieldValue, locale);
 	}
 
 	@Override
 	public JSONArray getValueForEvaluation(
 		DDMFormFieldValue ddmFormFieldValue, Locale locale) {
 
-		JSONArray optionsValuesJSONArray = _getOptionsValuesJSONArray(
+		JSONArray optionsValuesJSONArray = getOptionsValuesJSONArray(
 			ddmFormFieldValue, locale);
 
 		if (ddmFormFieldValue.getDDMFormValues() == null) {
@@ -79,11 +82,11 @@ public class SelectDDMFormFieldValueAccessor
 				optionsValuesJSONArray.getString(i));
 
 			if (matcher.matches()) {
-				JSONArray jsonArray = createJSONArray("[]");
-
-				jsonArray.put(getOptionsLabels(ddmFormFieldValue, locale));
-
-				return jsonArray;
+				return createJSONArray(
+					StringBundler.concat(
+						StringPool.OPEN_BRACKET,
+						getOptionsLabels(ddmFormFieldValue, locale),
+						StringPool.CLOSE_BRACKET));
 			}
 		}
 
@@ -153,7 +156,7 @@ public class SelectDDMFormFieldValueAccessor
 	protected String getOptionsLabels(
 		DDMFormFieldValue ddmFormFieldValue, Locale locale) {
 
-		JSONArray optionsValuesJSONArray = _getOptionsValuesJSONArray(
+		JSONArray optionsValuesJSONArray = getOptionsValuesJSONArray(
 			ddmFormFieldValue, locale);
 
 		if (optionsValuesJSONArray.length() == 0) {
@@ -169,12 +172,12 @@ public class SelectDDMFormFieldValueAccessor
 		for (int i = 0; i < optionsValuesJSONArray.length(); i++) {
 			String optionValue = optionsValuesJSONArray.getString(i);
 
-			if (_isManualDataSourceType(ddmFormFieldValue.getDDMFormField())) {
+			if (isManualDataSourceType(ddmFormFieldValue.getDDMFormField())) {
 				LocalizedValue optionLabel =
 					ddmFormFieldOptions.getOptionLabels(optionValue);
 
 				if (optionLabel != null) {
-					sb.append(optionLabel.getString(locale));
+					sb.append(HtmlUtil.escape(optionLabel.getString(locale)));
 				}
 				else {
 					sb.append(optionValue);
@@ -192,10 +195,7 @@ public class SelectDDMFormFieldValueAccessor
 		return sb.toString();
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private JSONArray _getOptionsValuesJSONArray(
+	protected JSONArray getOptionsValuesJSONArray(
 		DDMFormFieldValue ddmFormFieldValue, Locale locale) {
 
 		Value value = ddmFormFieldValue.getValue();
@@ -207,13 +207,16 @@ public class SelectDDMFormFieldValueAccessor
 		return createJSONArray(value.getString(locale));
 	}
 
-	private boolean _isManualDataSourceType(DDMFormField ddmFormField) {
+	protected boolean isManualDataSourceType(DDMFormField ddmFormField) {
 		if (Objects.equals(ddmFormField.getDataSourceType(), "manual")) {
 			return true;
 		}
 
 		return false;
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SelectDDMFormFieldValueAccessor.class);

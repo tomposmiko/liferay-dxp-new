@@ -33,13 +33,17 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.IOException;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -50,36 +54,64 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
-	property = "adaptive.media.handler.pattern=image",
+	immediate = true, property = "adaptive.media.handler.pattern=image",
 	service = AMRequestHandler.class
 )
 public class AMImageRequestHandler
 	implements AMRequestHandler<AMImageProcessor> {
 
 	@Override
-	public AdaptiveMedia<AMImageProcessor> handleRequest(
-		HttpServletRequest httpServletRequest) {
+	public Optional<AdaptiveMedia<AMImageProcessor>> handleRequest(
+			HttpServletRequest httpServletRequest)
+		throws IOException, ServletException {
 
-		Tuple<FileVersion, AMImageAttributeMapping> interpretedPath =
-			_interpretPath(httpServletRequest.getPathInfo());
+		Optional<Tuple<FileVersion, AMImageAttributeMapping>>
+			interpretedPathOptional = _interpretPath(
+				httpServletRequest.getPathInfo());
 
-		if (interpretedPath == null) {
-			return null;
-		}
+		return interpretedPathOptional.flatMap(
+			tuple -> {
+				Optional<AdaptiveMedia<AMImageProcessor>>
+					adaptiveMediaOptional = _findAdaptiveMedia(
+						tuple.first, tuple.second);
 
-		AdaptiveMedia<AMImageProcessor> adaptiveMedia = _getAdaptiveMedia(
-			interpretedPath.first, interpretedPath.second);
+				adaptiveMediaOptional.ifPresent(
+					adaptiveMedia -> _processAMImage(
+						adaptiveMedia, tuple.first, tuple.second));
 
-		if (adaptiveMedia != null) {
-			_processAMImage(
-				adaptiveMedia, interpretedPath.first, interpretedPath.second);
-		}
-
-		return adaptiveMedia;
+				return adaptiveMediaOptional;
+			});
 	}
 
 	private AdaptiveMedia<AMImageProcessor> _createRawAdaptiveMedia(
-		FileVersion fileVersion) {
+			FileVersion fileVersion)
+		throws PortalException {
+
+		Map<String, String> properties = HashMapBuilder.put(
+			() -> {
+				AMAttribute<Object, Long> contentLengthAMAttribute =
+					AMAttribute.getContentLengthAMAttribute();
+
+				return contentLengthAMAttribute.getName();
+			},
+			String.valueOf(fileVersion.getSize())
+		).put(
+			() -> {
+				AMAttribute<Object, String> contentTypeAMAttribute =
+					AMAttribute.getContentTypeAMAttribute();
+
+				return contentTypeAMAttribute.getName();
+			},
+			fileVersion.getMimeType()
+		).put(
+			() -> {
+				AMAttribute<Object, String> fileNameAMAttribute =
+					AMAttribute.getFileNameAMAttribute();
+
+				return fileNameAMAttribute.getName();
+			},
+			fileVersion.getFileName()
+		).build();
 
 		return new AMImage(
 			() -> {
@@ -90,25 +122,56 @@ public class AMImageRequestHandler
 					throw new AMRuntimeException(portalException);
 				}
 			},
-			AMImageAttributeMapping.fromFileVersion(fileVersion), null);
+			AMImageAttributeMapping.fromProperties(properties), null);
 	}
 
-	private AdaptiveMedia<AMImageProcessor> _findAdaptiveMedia(
-			FileVersion fileVersion,
-			AMImageConfigurationEntry amImageConfigurationEntry)
-		throws PortalException {
+	private Optional<AdaptiveMedia<AMImageProcessor>> _findAdaptiveMedia(
+		FileVersion fileVersion,
+		AMImageAttributeMapping amImageAttributeMapping) {
 
-		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-			_amImageFinder.getAdaptiveMedias(
-				amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
-					fileVersion
-				).forConfiguration(
-					amImageConfigurationEntry.getUUID()
-				).done());
+		try {
+			Optional<String> valueOptional =
+				amImageAttributeMapping.getValueOptional(
+					AMAttribute.getConfigurationUuidAMAttribute());
 
-		if (!adaptiveMedias.isEmpty()) {
-			return adaptiveMedias.get(0);
+			Optional<AMImageConfigurationEntry>
+				amImageConfigurationEntryOptional = valueOptional.flatMap(
+					configurationUuid ->
+						_amImageConfigurationHelper.
+							getAMImageConfigurationEntry(
+								fileVersion.getCompanyId(), configurationUuid));
+
+			if (!amImageConfigurationEntryOptional.isPresent()) {
+				return Optional.empty();
+			}
+
+			AMImageConfigurationEntry amImageConfigurationEntry =
+				amImageConfigurationEntryOptional.get();
+
+			Optional<AdaptiveMedia<AMImageProcessor>> adaptiveMediaOptional =
+				_findExactAdaptiveMedia(fileVersion, amImageConfigurationEntry);
+
+			if (adaptiveMediaOptional.isPresent()) {
+				return adaptiveMediaOptional;
+			}
+
+			adaptiveMediaOptional = _findClosestAdaptiveMedia(
+				fileVersion, amImageConfigurationEntry);
+
+			if (adaptiveMediaOptional.isPresent()) {
+				return adaptiveMediaOptional;
+			}
+
+			return Optional.of(_createRawAdaptiveMedia(fileVersion));
 		}
+		catch (PortalException portalException) {
+			throw new AMRuntimeException(portalException);
+		}
+	}
+
+	private Optional<AdaptiveMedia<AMImageProcessor>> _findClosestAdaptiveMedia(
+		FileVersion fileVersion,
+		AMImageConfigurationEntry amImageConfigurationEntry) {
 
 		Map<String, String> properties =
 			amImageConfigurationEntry.getProperties();
@@ -120,62 +183,41 @@ public class AMImageRequestHandler
 			properties.get("max-height"));
 
 		try {
-			adaptiveMedias = _amImageFinder.getAdaptiveMedias(
-				amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
-					fileVersion
-				).with(
-					AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH,
-					configurationWidth
-				).with(
-					AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT,
-					configurationHeight
-				).done());
+			Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
+				_amImageFinder.getAdaptiveMediaStream(
+					amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
+						fileVersion
+					).with(
+						AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH,
+						configurationWidth
+					).with(
+						AMImageAttribute.AM_IMAGE_ATTRIBUTE_HEIGHT,
+						configurationHeight
+					).done());
 
-			if (adaptiveMedias.isEmpty()) {
-				return null;
-			}
-
-			adaptiveMedias.sort(_getComparator(configurationWidth));
-
-			return adaptiveMedias.get(0);
+			return adaptiveMediaStream.sorted(
+				_getComparator(configurationWidth)
+			).findFirst();
 		}
 		catch (PortalException portalException) {
 			throw new AMRuntimeException(portalException);
 		}
 	}
 
-	private AdaptiveMedia<AMImageProcessor> _getAdaptiveMedia(
-		FileVersion fileVersion,
-		AMImageAttributeMapping amImageAttributeMapping) {
+	private Optional<AdaptiveMedia<AMImageProcessor>> _findExactAdaptiveMedia(
+			FileVersion fileVersion,
+			AMImageConfigurationEntry amImageConfigurationEntry)
+		throws PortalException {
 
-		try {
-			String configurationUuid = amImageAttributeMapping.getValue(
-				AMAttribute.getConfigurationUuidAMAttribute());
+		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
+			_amImageFinder.getAdaptiveMediaStream(
+				amImageQueryBuilder -> amImageQueryBuilder.forFileVersion(
+					fileVersion
+				).forConfiguration(
+					amImageConfigurationEntry.getUUID()
+				).done());
 
-			if (configurationUuid == null) {
-				return null;
-			}
-
-			AMImageConfigurationEntry amImageConfigurationEntry =
-				_amImageConfigurationHelper.getAMImageConfigurationEntry(
-					fileVersion.getCompanyId(), configurationUuid);
-
-			if (amImageConfigurationEntry == null) {
-				return null;
-			}
-
-			AdaptiveMedia<AMImageProcessor> adaptiveMedia = _findAdaptiveMedia(
-				fileVersion, amImageConfigurationEntry);
-
-			if (adaptiveMedia != null) {
-				return adaptiveMedia;
-			}
-
-			return _createRawAdaptiveMedia(fileVersion);
-		}
-		catch (PortalException portalException) {
-			throw new AMRuntimeException(portalException);
-		}
+		return adaptiveMediaStream.findFirst();
 	}
 
 	private Comparator<AdaptiveMedia<AMImageProcessor>> _getComparator(
@@ -188,34 +230,37 @@ public class AMImageRequestHandler
 	private Integer _getDistance(
 		int width, AdaptiveMedia<AMImageProcessor> adaptiveMedia) {
 
-		Integer imageWidth = adaptiveMedia.getValue(
+		Optional<Integer> imageWidthOptional = adaptiveMedia.getValueOptional(
 			AMImageAttribute.AM_IMAGE_ATTRIBUTE_WIDTH);
 
-		if (imageWidth == null) {
-			return Integer.MAX_VALUE;
-		}
+		Optional<Integer> distanceOptional = imageWidthOptional.map(
+			imageWidth -> Math.abs(imageWidth - width));
 
-		return Math.abs(imageWidth - width);
+		return distanceOptional.orElse(Integer.MAX_VALUE);
 	}
 
-	private Tuple<FileVersion, AMImageAttributeMapping> _interpretPath(
-		String pathInfo) {
+	private Optional<Tuple<FileVersion, AMImageAttributeMapping>>
+		_interpretPath(String pathInfo) {
 
 		try {
-			Tuple<FileVersion, Map<String, String>> fileVersionPropertiesTuple =
-				_pathInterpreter.interpretPath(pathInfo);
+			Optional<Tuple<FileVersion, Map<String, String>>>
+				fileVersionPropertiesTupleOptional =
+					_pathInterpreter.interpretPath(pathInfo);
 
-			if (fileVersionPropertiesTuple == null) {
-				return null;
+			if (!fileVersionPropertiesTupleOptional.isPresent()) {
+				return Optional.empty();
 			}
 
-			FileVersion fileVersion = fileVersionPropertiesTuple.first;
+			Tuple<FileVersion, Map<String, String>> fileVersionMapTuple =
+				fileVersionPropertiesTupleOptional.get();
+
+			FileVersion fileVersion = fileVersionMapTuple.first;
 
 			if (fileVersion.getStatus() == WorkflowConstants.STATUS_IN_TRASH) {
-				return null;
+				return Optional.empty();
 			}
 
-			Map<String, String> properties = fileVersionPropertiesTuple.second;
+			Map<String, String> properties = fileVersionMapTuple.second;
 
 			AMAttribute<Object, Long> contentLengthAMAttribute =
 				AMAttribute.getContentLengthAMAttribute();
@@ -239,12 +284,12 @@ public class AMImageRequestHandler
 			AMImageAttributeMapping amImageAttributeMapping =
 				AMImageAttributeMapping.fromProperties(properties);
 
-			return Tuple.of(fileVersion, amImageAttributeMapping);
+			return Optional.of(Tuple.of(fileVersion, amImageAttributeMapping));
 		}
 		catch (AMRuntimeException | NumberFormatException exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -252,16 +297,16 @@ public class AMImageRequestHandler
 		AdaptiveMedia<AMImageProcessor> adaptiveMedia, FileVersion fileVersion,
 		AMImageAttributeMapping amImageAttributeMapping) {
 
-		String adaptiveMediaConfigurationUuid = adaptiveMedia.getValue(
-			AMAttribute.getConfigurationUuidAMAttribute());
-
-		String attributeMappingConfigurationUuid =
-			amImageAttributeMapping.getValue(
+		Optional<String> adaptiveMediaConfigurationUuidOptional =
+			adaptiveMedia.getValueOptional(
 				AMAttribute.getConfigurationUuidAMAttribute());
 
-		if (Objects.equals(
-				adaptiveMediaConfigurationUuid,
-				attributeMappingConfigurationUuid)) {
+		Optional<String> attributeMappingConfigurationUuidOptional =
+			amImageAttributeMapping.getValueOptional(
+				AMAttribute.getConfigurationUuidAMAttribute());
+
+		if (adaptiveMediaConfigurationUuidOptional.equals(
+				attributeMappingConfigurationUuidOptional)) {
 
 			return;
 		}

@@ -20,7 +20,6 @@ import com.liferay.layout.seo.model.LayoutSEOSiteTable;
 import com.liferay.layout.seo.model.impl.LayoutSEOSiteImpl;
 import com.liferay.layout.seo.model.impl.LayoutSEOSiteModelImpl;
 import com.liferay.layout.seo.service.persistence.LayoutSEOSitePersistence;
-import com.liferay.layout.seo.service.persistence.LayoutSEOSiteUtil;
 import com.liferay.layout.seo.service.persistence.impl.constants.LayoutSEOPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = LayoutSEOSitePersistence.class)
+@Component(service = {LayoutSEOSitePersistence.class, BasePersistence.class})
 public class LayoutSEOSitePersistenceImpl
 	extends BasePersistenceImpl<LayoutSEOSite>
 	implements LayoutSEOSitePersistence {
@@ -203,7 +202,7 @@ public class LayoutSEOSitePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutSEOSite>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutSEOSite layoutSEOSite : list) {
@@ -594,7 +593,7 @@ public class LayoutSEOSitePersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -730,7 +729,7 @@ public class LayoutSEOSitePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof LayoutSEOSite) {
@@ -850,7 +849,7 @@ public class LayoutSEOSitePersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1022,7 +1021,7 @@ public class LayoutSEOSitePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutSEOSite>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutSEOSite layoutSEOSite : list) {
@@ -1447,7 +1446,7 @@ public class LayoutSEOSitePersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1580,7 +1579,7 @@ public class LayoutSEOSitePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByGroupId, finderArgs, this);
+				_finderPathFetchByGroupId, finderArgs);
 		}
 
 		if (result instanceof LayoutSEOSite) {
@@ -1679,7 +1678,7 @@ public class LayoutSEOSitePersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1866,7 +1865,7 @@ public class LayoutSEOSitePersistenceImpl
 		layoutSEOSite.setNew(true);
 		layoutSEOSite.setPrimaryKey(layoutSEOSiteId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		layoutSEOSite.setUuid(uuid);
 
@@ -1987,7 +1986,7 @@ public class LayoutSEOSitePersistenceImpl
 			(LayoutSEOSiteModelImpl)layoutSEOSite;
 
 		if (Validator.isNull(layoutSEOSite.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			layoutSEOSite.setUuid(uuid);
 		}
@@ -2112,9 +2111,7 @@ public class LayoutSEOSitePersistenceImpl
 	 */
 	@Override
 	public LayoutSEOSite fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				LayoutSEOSite.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(LayoutSEOSite.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2333,7 +2330,7 @@ public class LayoutSEOSitePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutSEOSite>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2409,7 +2406,7 @@ public class LayoutSEOSitePersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2603,31 +2600,11 @@ public class LayoutSEOSitePersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
-
-		_setLayoutSEOSiteUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setLayoutSEOSiteUtilPersistence(null);
-
 		entityCache.removeCache(LayoutSEOSiteImpl.class.getName());
-	}
-
-	private void _setLayoutSEOSiteUtilPersistence(
-		LayoutSEOSitePersistence layoutSEOSitePersistence) {
-
-		try {
-			Field field = LayoutSEOSiteUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutSEOSitePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2697,6 +2674,7 @@ public class LayoutSEOSitePersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private LayoutSEOSiteModelArgumentsResolver
+		_layoutSEOSiteModelArgumentsResolver;
 
 }

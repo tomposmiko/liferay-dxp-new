@@ -15,28 +15,28 @@
 package com.liferay.item.selector.taglib.internal.display.context;
 
 import com.liferay.item.selector.provider.GroupItemSelectorProvider;
+import com.liferay.item.selector.taglib.internal.util.GroupItemSelectorTrackerUtil;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceRequest;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Cristina González
@@ -48,26 +48,17 @@ public class GroupSelectorDisplayContextTest {
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
-	@BeforeClass
-	public static void setUpClass() {
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		Mockito.when(
-			FrameworkUtil.getBundle(Mockito.any())
-		).thenReturn(
-			bundleContext.getBundle()
-		);
-
-		_serviceRegistration = bundleContext.registerService(
-			GroupItemSelectorProvider.class,
-			new MockGroupItemSelectorProvider(), null);
+	@Before
+	public void setUp() {
+		ReflectionTestUtil.setFieldValue(
+			GroupItemSelectorTrackerUtil.class, "_serviceTrackerMap",
+			new MockServiceTrackerMap());
 	}
 
-	@AfterClass
-	public static void tearDownClass() {
-		_serviceRegistration.unregister();
-
-		_frameworkUtilMockedStatic.close();
+	@After
+	public void tearDown() {
+		ReflectionTestUtil.setFieldValue(
+			GroupItemSelectorTrackerUtil.class, "_serviceTrackerMap", null);
 	}
 
 	@Test
@@ -99,11 +90,6 @@ public class GroupSelectorDisplayContextTest {
 			Collections.singleton("test"),
 			groupSelectorDisplayContext.getGroupTypes());
 	}
-
-	private static final MockedStatic<FrameworkUtil>
-		_frameworkUtilMockedStatic = Mockito.mockStatic(FrameworkUtil.class);
-	private static ServiceRegistration<GroupItemSelectorProvider>
-		_serviceRegistration;
 
 	private static class MockGroupItemSelectorProvider
 		implements GroupItemSelectorProvider {
@@ -141,6 +127,43 @@ public class GroupSelectorDisplayContextTest {
 		public String getLabel(Locale locale) {
 			return "label";
 		}
+
+	}
+
+	private static class MockServiceTrackerMap
+		implements ServiceTrackerMap<String, GroupItemSelectorProvider> {
+
+		public MockServiceTrackerMap() {
+			_groupItemSelectorProviderMap = Collections.singletonMap(
+				"test", new MockGroupItemSelectorProvider());
+		}
+
+		@Override
+		public void close() {
+		}
+
+		@Override
+		public boolean containsKey(String key) {
+			return _groupItemSelectorProviderMap.containsKey(key);
+		}
+
+		@Override
+		public GroupItemSelectorProvider getService(String key) {
+			return _groupItemSelectorProviderMap.get(key);
+		}
+
+		@Override
+		public Set<String> keySet() {
+			return _groupItemSelectorProviderMap.keySet();
+		}
+
+		@Override
+		public Collection<GroupItemSelectorProvider> values() {
+			return _groupItemSelectorProviderMap.values();
+		}
+
+		private final Map<String, GroupItemSelectorProvider>
+			_groupItemSelectorProviderMap;
 
 	}
 

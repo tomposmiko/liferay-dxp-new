@@ -17,28 +17,19 @@ package com.liferay.data.engine.rest.dto.v2_0.util;
 import com.liferay.data.engine.field.type.util.LocalizedValueUtil;
 import com.liferay.data.engine.rest.dto.v2_0.DataDefinition;
 import com.liferay.data.engine.rest.dto.v2_0.DataDefinitionField;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeSettings;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
+import com.liferay.dynamic.data.mapping.util.SettingsDDMFormFieldsUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -46,53 +37,34 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Mateus Santana
  */
-public class DataDefinitionDDMFormUtilTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+@PrepareForTest({LocaleUtil.class, SettingsDDMFormFieldsUtil.class})
+@RunWith(PowerMockRunner.class)
+public class DataDefinitionDDMFormUtilTest extends PowerMockito {
 
 	@Before
 	public void setUp() {
-		PortalUtil portalUtil = new PortalUtil();
-
-		portalUtil.setPortal(Mockito.mock(Portal.class));
-
-		ResourceBundleLoader resourceBundleLoader = Mockito.mock(
-			ResourceBundleLoader.class);
-
-		ResourceBundleLoaderUtil.setPortalResourceBundleLoader(
-			resourceBundleLoader);
-
-		Mockito.when(
-			resourceBundleLoader.loadResourceBundle(Mockito.any())
-		).thenReturn(
-			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
-		);
-
-		LanguageUtil languageUtil = new LanguageUtil();
-
-		languageUtil.setLanguage(Mockito.mock(Language.class));
-
 		_setUpJSONFactoryUtil();
-		_setUpLanguageUtil();
+		_setUpLocaleUtil();
 		_setUpSettingsDDMFormFieldsUtil();
 	}
 
 	@Test
 	public void testToDDMFormEquals() {
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			SetUtil.fromArray(LocaleUtil.BRAZIL, LocaleUtil.US), LocaleUtil.US);
+			SetUtil.fromArray(new Locale[] {LocaleUtil.BRAZIL, LocaleUtil.US}),
+			LocaleUtil.US);
 
 		Locale defaultLocale = ddmForm.getDefaultLocale();
 
@@ -156,8 +128,8 @@ public class DataDefinitionDDMFormUtilTest {
 								"pt_BR", "rótulo2"
 							).build(),
 							defaultLocale));
-					setLocalizable(false);
 					setName("name2");
+					setLocalizable(false);
 					setPredefinedValue(
 						LocalizedValueUtil.toLocalizedValue(
 							HashMapBuilder.<String, Object>put(
@@ -193,7 +165,7 @@ public class DataDefinitionDDMFormUtilTest {
 						setDefaultLanguageId("en_US");
 					}
 				},
-				_ddmFormFieldTypeServicesRegistry));
+				null));
 	}
 
 	@Test
@@ -203,8 +175,7 @@ public class DataDefinitionDDMFormUtilTest {
 
 		Assert.assertTrue(SetUtil.isEmpty(ddmForm.getAvailableLocales()));
 		Assert.assertTrue(ListUtil.isEmpty(ddmForm.getDDMFormFields()));
-		Assert.assertEquals(
-			"en_US", LocaleUtil.toLanguageId(ddmForm.getDefaultLocale()));
+		Assert.assertNull(LocaleUtil.toLanguageId(ddmForm.getDefaultLocale()));
 	}
 
 	@Test
@@ -287,8 +258,8 @@ public class DataDefinitionDDMFormUtilTest {
 						).put(
 							"pt_BR", "rótulo2"
 						).build());
-					setLocalizable(false);
 					setName("name2");
+					setLocalizable(false);
 					setReadOnly(false);
 					setRepeatable(false);
 					setRequired(false);
@@ -310,62 +281,53 @@ public class DataDefinitionDDMFormUtilTest {
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
-	private void _setUpLanguageUtil() {
-		LanguageUtil languageUtil = new LanguageUtil();
+	private void _setUpLocaleUtil() {
+		mockStatic(LocaleUtil.class);
 
-		_whenLanguageIsAvailableLocale(LocaleUtil.BRAZIL);
-		_whenLanguageIsAvailableLocale(LocaleUtil.US);
+		when(
+			LocaleUtil.fromLanguageId("en_US")
+		).thenReturn(
+			LocaleUtil.US
+		);
 
-		languageUtil.setLanguage(_language);
+		when(
+			LocaleUtil.fromLanguageId("pt_BR")
+		).thenReturn(
+			LocaleUtil.BRAZIL
+		);
+
+		when(
+			LocaleUtil.toLanguageId(LocaleUtil.US)
+		).thenReturn(
+			"en_US"
+		);
+
+		when(
+			LocaleUtil.toLanguageId(LocaleUtil.BRAZIL)
+		).thenReturn(
+			"pt_BR"
+		);
 	}
 
 	private void _setUpSettingsDDMFormFieldsUtil() {
-		DDMFormFieldType ddmFormFieldType = Mockito.mock(
-			DDMFormFieldType.class);
+		mockStatic(SettingsDDMFormFieldsUtil.class);
 
-		Mockito.doReturn(
-			ddmFormFieldType
-		).when(
-			_ddmFormFieldTypeServicesRegistry
-		).getDDMFormFieldType(
-			"select"
-		);
-
-		Mockito.doReturn(
-			TestTypeSettings.class
-		).when(
-			ddmFormFieldType
-		).getDDMFormFieldTypeSettings();
-	}
-
-	private void _whenLanguageIsAvailableLocale(Locale locale) {
-		Mockito.when(
-			_language.isAvailableLocale(Mockito.eq(locale))
+		when(
+			SettingsDDMFormFieldsUtil.getSettingsDDMFormFields(
+				Matchers.any(DDMFormFieldTypeServicesTracker.class),
+				Matchers.eq("select"))
 		).thenReturn(
-			true
+			HashMapBuilder.put(
+				"options",
+				() -> {
+					DDMFormField ddmFormField = new DDMFormField();
+
+					ddmFormField.setDataType("ddm-options");
+
+					return ddmFormField;
+				}
+			).build()
 		);
-
-		Mockito.when(
-			_language.isAvailableLocale(
-				Mockito.eq(LocaleUtil.toLanguageId(locale)))
-		).thenReturn(
-			true
-		);
-	}
-
-	private final DDMFormFieldTypeServicesRegistry
-		_ddmFormFieldTypeServicesRegistry = Mockito.mock(
-			DDMFormFieldTypeServicesRegistry.class);
-	private final Language _language = Mockito.mock(Language.class);
-
-	@com.liferay.dynamic.data.mapping.annotations.DDMForm
-	private interface TestTypeSettings extends DDMFormFieldTypeSettings {
-
-		@com.liferay.dynamic.data.mapping.annotations.DDMFormField(
-			dataType = "ddm-options"
-		)
-		public String options();
-
 	}
 
 }

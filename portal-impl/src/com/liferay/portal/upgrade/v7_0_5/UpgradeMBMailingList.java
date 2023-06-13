@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_5;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.upgrade.v7_0_5.util.MBMailingListTable;
 
 /**
  * @author Ugurcan Cetin
@@ -23,9 +24,10 @@ public class UpgradeMBMailingList extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("MBMailingList", "emailAddress", "VARCHAR(254) null");
-		alterColumnType(
-			"MBMailingList", "outEmailAddress", "VARCHAR(254) null");
+		alter(
+			MBMailingListTable.class,
+			new AlterColumnType("emailAddress", "VARCHAR(254) null"),
+			new AlterColumnType("outEmailAddress", "VARCHAR(254) null"));
 	}
 
 }

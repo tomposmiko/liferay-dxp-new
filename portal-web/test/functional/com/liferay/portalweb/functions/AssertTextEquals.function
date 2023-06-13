@@ -31,14 +31,6 @@ definition {
 		selenium.assertLiferayErrors();
 	}
 
-	function assertPartialTextCaseSensitive {
-		selenium.waitForVisible();
-
-		selenium.waitForPartialText();
-
-		selenium.assertPartialText();
-	}
-
 	function assertText {
 		WaitForSPARefresh();
 
@@ -70,7 +62,7 @@ definition {
 	function assertTextEquals {
 		WaitForSPARefresh();
 
-		if (contains(${locator1}, "/input")) {
+		if (contains("${locator1}", "/input")) {
 			AssertTextEquals.assertValue();
 		}
 		else {

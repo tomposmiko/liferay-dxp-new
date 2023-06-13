@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class FlagsEntryServiceWrapper
 	implements FlagsEntryService, ServiceWrapper<FlagsEntryService> {
 
-	public FlagsEntryServiceWrapper() {
-		this(null);
-	}
-
 	public FlagsEntryServiceWrapper(FlagsEntryService flagsEntryService) {
 		_flagsEntryService = flagsEntryService;
 	}

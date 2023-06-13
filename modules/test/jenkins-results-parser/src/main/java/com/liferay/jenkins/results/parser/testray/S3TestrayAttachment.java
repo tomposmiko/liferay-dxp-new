@@ -32,6 +32,15 @@ public class S3TestrayAttachment extends BaseTestrayAttachment {
 	}
 
 	@Override
+	public boolean exists() {
+		if (_testrayS3Object == null) {
+			return false;
+		}
+
+		return _testrayS3Object.exists();
+	}
+
+	@Override
 	public URL getURL() {
 		if (_testrayS3Object == null) {
 			return null;

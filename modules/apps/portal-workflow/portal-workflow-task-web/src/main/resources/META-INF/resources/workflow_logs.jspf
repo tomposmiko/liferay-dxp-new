@@ -30,7 +30,7 @@
 		<tbody>
 
 			<%
-			for (WorkflowLog workflowLog : workflowTaskDisplayContext.getWorkflowLogs(workflowTask)) {
+			for (WorkflowLog workflowLog : workflowLogs) {
 			%>
 
 				<tr>

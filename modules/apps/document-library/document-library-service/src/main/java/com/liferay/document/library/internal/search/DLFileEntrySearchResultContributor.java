@@ -78,10 +78,11 @@ public class DLFileEntrySearchResultContributor
 
 			long classPK = GetterUtil.getLong(document.get(Field.CLASS_PK));
 
-			searchResult.setSummary(
-				_summaryFactory.getSummary(
-					document, className.getClassName(), classPK, locale,
-					portletRequest, portletResponse));
+			Summary summary = _summaryFactory.getSummary(
+				document, className.getClassName(), classPK, locale,
+				portletRequest, portletResponse);
+
+			searchResult.setSummary(summary);
 		}
 	}
 
@@ -90,13 +91,25 @@ public class DLFileEntrySearchResultContributor
 		return DLFileEntryConstants.getClassName();
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	public void setClassNameLocalService(
+		ClassNameLocalService classNameLocalService) {
+
+		_classNameLocalService = classNameLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setDLAppLocalService(DLAppLocalService dlAppLocalService) {
+		_dlAppLocalService = dlAppLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setSummaryFactory(SummaryFactory summaryFactory) {
+		_summaryFactory = summaryFactory;
+	}
+
 	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
 	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
 	private SummaryFactory _summaryFactory;
 
 }

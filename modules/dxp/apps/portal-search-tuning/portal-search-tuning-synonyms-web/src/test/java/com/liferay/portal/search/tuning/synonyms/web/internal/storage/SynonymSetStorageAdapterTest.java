@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSet;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexWriter;
-import com.liferay.portal.search.tuning.synonyms.web.internal.storage.helper.SynonymSetJSONStorageHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
@@ -28,7 +27,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Wade Cao
@@ -42,6 +43,8 @@ public class SynonymSetStorageAdapterTest {
 
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+
 		_synonymSetStorageAdapter = new SynonymSetStorageAdapter();
 
 		ReflectionTestUtil.setFieldValue(
@@ -59,7 +62,7 @@ public class SynonymSetStorageAdapterTest {
 		).when(
 			_synonymSetJSONStorageHelper
 		).addJSONStorageEntry(
-			Mockito.nullable(String.class), Mockito.nullable(String.class)
+			Mockito.anyString(), Mockito.anyString()
 		);
 
 		Assert.assertEquals(
@@ -71,7 +74,7 @@ public class SynonymSetStorageAdapterTest {
 		Mockito.verify(
 			_synonymSetIndexWriter, Mockito.times(1)
 		).create(
-			Mockito.any(), Mockito.any()
+			Mockito.anyObject(), Mockito.anyObject()
 		);
 	}
 
@@ -84,7 +87,7 @@ public class SynonymSetStorageAdapterTest {
 		Mockito.verify(
 			_synonymSetIndexWriter, Mockito.times(1)
 		).remove(
-			Mockito.any(), Mockito.anyString()
+			Mockito.anyObject(), Mockito.anyString()
 		);
 	}
 
@@ -111,7 +114,7 @@ public class SynonymSetStorageAdapterTest {
 		Mockito.verify(
 			_synonymSetIndexWriter, Mockito.times(1)
 		).update(
-			Mockito.any(), Mockito.any()
+			Mockito.anyObject(), Mockito.anyObject()
 		);
 	}
 
@@ -129,10 +132,12 @@ public class SynonymSetStorageAdapterTest {
 			Mockito.mock(SynonymSetIndexName.class), synonymSet);
 	}
 
-	private final SynonymSetIndexWriter _synonymSetIndexWriter = Mockito.mock(
-		SynonymSetIndexWriter.class);
-	private final SynonymSetJSONStorageHelper _synonymSetJSONStorageHelper =
-		Mockito.mock(SynonymSetJSONStorageHelper.class);
+	@Mock
+	private SynonymSetIndexWriter _synonymSetIndexWriter;
+
+	@Mock
+	private SynonymSetJSONStorageHelper _synonymSetJSONStorageHelper;
+
 	private SynonymSetStorageAdapter _synonymSetStorageAdapter;
 
 }

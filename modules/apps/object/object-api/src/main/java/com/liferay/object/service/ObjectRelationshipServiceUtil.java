@@ -41,22 +41,11 @@ public class ObjectRelationshipServiceUtil {
 	 */
 	public static ObjectRelationship addObjectRelationship(
 			long objectDefinitionId1, long objectDefinitionId2,
-			long parameterObjectFieldId, String deletionType,
 			Map<java.util.Locale, String> labelMap, String name, String type)
 		throws PortalException {
 
 		return getService().addObjectRelationship(
-			objectDefinitionId1, objectDefinitionId2, parameterObjectFieldId,
-			deletionType, labelMap, name, type);
-	}
-
-	public static void addObjectRelationshipMappingTableValues(
-			long objectRelationshipId, long primaryKey1, long primaryKey2,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		getService().addObjectRelationshipMappingTableValues(
-			objectRelationshipId, primaryKey1, primaryKey2, serviceContext);
+			objectDefinitionId1, objectDefinitionId2, labelMap, name, type);
 	}
 
 	public static ObjectRelationship deleteObjectRelationship(
@@ -71,13 +60,6 @@ public class ObjectRelationshipServiceUtil {
 		throws PortalException {
 
 		return getService().getObjectRelationship(objectRelationshipId);
-	}
-
-	public static ObjectRelationship getObjectRelationship(
-			long objectDefinitionId1, String name)
-		throws PortalException {
-
-		return getService().getObjectRelationship(objectDefinitionId1, name);
 	}
 
 	public static List<ObjectRelationship> getObjectRelationships(
@@ -98,13 +80,12 @@ public class ObjectRelationshipServiceUtil {
 	}
 
 	public static ObjectRelationship updateObjectRelationship(
-			long objectRelationshipId, long parameterObjectFieldId,
-			String deletionType, Map<java.util.Locale, String> labelMap)
+			long objectRelationshipId, String deletionType,
+			Map<java.util.Locale, String> labelMap)
 		throws PortalException {
 
 		return getService().updateObjectRelationship(
-			objectRelationshipId, parameterObjectFieldId, deletionType,
-			labelMap);
+			objectRelationshipId, deletionType, labelMap);
 	}
 
 	public static ObjectRelationshipService getService() {

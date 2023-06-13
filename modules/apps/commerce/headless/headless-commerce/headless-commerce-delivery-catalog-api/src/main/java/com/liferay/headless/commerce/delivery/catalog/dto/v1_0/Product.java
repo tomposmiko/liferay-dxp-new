@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -206,36 +205,8 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, ?> expando;
 
-	@Schema
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	@JsonIgnore
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String externalReferenceCode;
-
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -289,36 +260,6 @@ public class Product implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Attachment[] images;
-
-	@Schema
-	@Valid
-	public LinkedProduct[] getLinkedProducts() {
-		return linkedProducts;
-	}
-
-	public void setLinkedProducts(LinkedProduct[] linkedProducts) {
-		this.linkedProducts = linkedProducts;
-	}
-
-	@JsonIgnore
-	public void setLinkedProducts(
-		UnsafeSupplier<LinkedProduct[], Exception>
-			linkedProductsUnsafeSupplier) {
-
-		try {
-			linkedProducts = linkedProductsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected LinkedProduct[] linkedProducts;
 
 	@Schema
 	public String getMetaDescription() {
@@ -488,38 +429,6 @@ public class Product implements Serializable {
 	protected String name;
 
 	@Schema
-	@Valid
-	public ProductConfiguration getProductConfiguration() {
-		return productConfiguration;
-	}
-
-	public void setProductConfiguration(
-		ProductConfiguration productConfiguration) {
-
-		this.productConfiguration = productConfiguration;
-	}
-
-	@JsonIgnore
-	public void setProductConfiguration(
-		UnsafeSupplier<ProductConfiguration, Exception>
-			productConfigurationUnsafeSupplier) {
-
-		try {
-			productConfiguration = productConfigurationUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected ProductConfiguration productConfiguration;
-
-	@Schema
 	public Long getProductId() {
 		return productId;
 	}
@@ -609,7 +518,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductSpecification[] productSpecifications;
 
-	@Schema(example = "simple")
+	@Schema
 	public String getProductType() {
 		return productType;
 	}
@@ -748,7 +657,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String slug;
 
-	@Schema(example = "[tag1, tag2, tag3]")
+	@Schema
 	public String[] getTags() {
 		return tags;
 	}
@@ -803,37 +712,6 @@ public class Product implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String urlImage;
-
-	@Schema(
-		example = "{en_US=product-url-us, hr_HR=product-url-hr, hu_HU=product-url-hu}"
-	)
-	@Valid
-	public Map<String, String> getUrls() {
-		return urls;
-	}
-
-	public void setUrls(Map<String, String> urls) {
-		this.urls = urls;
-	}
-
-	@JsonIgnore
-	public void setUrls(
-		UnsafeSupplier<Map<String, String>, Exception> urlsUnsafeSupplier) {
-
-		try {
-			urls = urlsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Map<String, String> urls;
 
 	@Override
 	public boolean equals(Object object) {
@@ -943,20 +821,6 @@ public class Product implements Serializable {
 			sb.append(_toJSON(expando));
 		}
 
-		if (externalReferenceCode != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(externalReferenceCode));
-
-			sb.append("\"");
-		}
-
 		if (id != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -980,26 +844,6 @@ public class Product implements Serializable {
 				sb.append(String.valueOf(images[i]));
 
 				if ((i + 1) < images.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (linkedProducts != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"linkedProducts\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < linkedProducts.length; i++) {
-				sb.append(String.valueOf(linkedProducts[i]));
-
-				if ((i + 1) < linkedProducts.length) {
 					sb.append(", ");
 				}
 			}
@@ -1085,16 +929,6 @@ public class Product implements Serializable {
 			sb.append(_escape(name));
 
 			sb.append("\"");
-		}
-
-		if (productConfiguration != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productConfiguration\": ");
-
-			sb.append(String.valueOf(productConfiguration));
 		}
 
 		if (productId != null) {
@@ -1267,16 +1101,6 @@ public class Product implements Serializable {
 			sb.append("\"");
 		}
 
-		if (urls != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"urls\": ");
-
-			sb.append(_toJSON(urls));
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -1290,9 +1114,9 @@ public class Product implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -1318,7 +1142,7 @@ public class Product implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -1350,7 +1174,7 @@ public class Product implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -1366,10 +1190,5 @@ public class Product implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

@@ -106,8 +106,4 @@ public interface CacheMissEntryModel
 	@Override
 	public CacheMissEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

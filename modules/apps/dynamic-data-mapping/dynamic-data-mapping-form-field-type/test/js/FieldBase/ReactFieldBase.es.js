@@ -12,8 +12,14 @@
  * details.
  */
 
-import {act, fireEvent, render} from '@testing-library/react';
-import {FormProvider, PageProvider} from 'data-engine-js-components-web';
+import {
+	act,
+	cleanup,
+	fireEvent,
+	render,
+	waitForElement,
+} from '@testing-library/react';
+import {PageProvider} from 'data-engine-js-components-web';
 import React from 'react';
 
 import '@testing-library/jest-dom/extend-expect';
@@ -23,11 +29,9 @@ import {FieldBase} from '../../../src/main/resources/META-INF/resources/FieldBas
 const spritemap = 'icons.svg';
 
 const FieldBaseWithProvider = (props) => (
-	<FormProvider initialState={{pages: []}}>
-		<PageProvider value={{editingLanguageId: 'en_US'}}>
-			<FieldBase {...props} />
-		</PageProvider>
-	</FormProvider>
+	<PageProvider value={{editingLanguageId: 'en_US'}}>
+		<FieldBase {...props} />
+	</PageProvider>
 );
 
 describe('ReactFieldBase', () => {
@@ -53,6 +57,8 @@ describe('ReactFieldBase', () => {
 		// eslint-disable-next-line no-console
 		console.warn = originalWarn;
 	});
+
+	afterEach(cleanup);
 
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -200,7 +206,7 @@ describe('ReactFieldBase', () => {
 	});
 
 	it('shows the popover for Format field when hovering over the tooltip icon', async () => {
-		const {container, findByTestId, getByRole, getByText} = render(
+		const {container, getByRole, getByTestId, getByText} = render(
 			<FieldBaseWithProvider
 				fieldName="inputMaskFormat"
 				spritemap={spritemap}
@@ -212,7 +218,9 @@ describe('ReactFieldBase', () => {
 
 		fireEvent.mouseOver(tooltipIcon);
 
-		const clayPopover = await findByTestId('clayPopover');
+		const clayPopover = await waitForElement(() =>
+			getByTestId('clayPopover')
+		);
 
 		expect(clayPopover.style).toHaveProperty('maxWidth', '256px');
 
@@ -229,7 +237,7 @@ describe('ReactFieldBase', () => {
 
 	describe('Hide Field', () => {
 		it('renders the FieldBase with hideField markup', () => {
-			const {getAllByText, getByText} = render(
+			const {getByText} = render(
 				<FieldBaseWithProvider
 					hideField
 					label="Text"
@@ -238,18 +246,16 @@ describe('ReactFieldBase', () => {
 			);
 
 			expect(getByText('hidden')).toBeInTheDocument();
-
-			const allByText = getAllByText('Text');
-			expect(allByText).toHaveLength(2);
-			expect(allByText[0]).toBeInTheDocument();
-			expect(allByText[1]).toBeInTheDocument();
+			expect(getByText('Text')).toBeInTheDocument();
 
 			expect(getByText('hidden').parentNode).toHaveAttribute(
 				'class',
 				'label ml-1 label-secondary'
 			);
-			expect(allByText[0]).toHaveAttribute('class', 'text-secondary');
-			expect(allByText[1]).toHaveAttribute('class', 'sr-only');
+			expect(getByText('Text')).toHaveAttribute(
+				'class',
+				'text-secondary'
+			);
 		});
 
 		it('renders the FieldBase with hideField markup when the label is empty', () => {

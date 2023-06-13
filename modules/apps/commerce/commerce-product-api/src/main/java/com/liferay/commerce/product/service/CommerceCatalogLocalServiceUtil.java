@@ -259,11 +259,18 @@ public class CommerceCatalogLocalServiceUtil {
 		return getService().fetchCommerceCatalog(commerceCatalogId);
 	}
 
+	/**
+	 * Returns the commerce catalog with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
+	 * @return the matching commerce catalog, or <code>null</code> if a matching commerce catalog could not be found
+	 */
 	public static CommerceCatalog fetchCommerceCatalogByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchCommerceCatalogByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	public static CommerceCatalog fetchCommerceCatalogByGroupId(long groupId) {
@@ -271,17 +278,14 @@ public class CommerceCatalogLocalServiceUtil {
 	}
 
 	/**
-	 * Returns the commerce catalog with the matching UUID and company.
-	 *
-	 * @param uuid the commerce catalog's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching commerce catalog, or <code>null</code> if a matching commerce catalog could not be found
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceCatalogByExternalReferenceCode(long, String)}
 	 */
-	public static CommerceCatalog fetchCommerceCatalogByUuidAndCompanyId(
-		String uuid, long companyId) {
+	@Deprecated
+	public static CommerceCatalog fetchCommerceCatalogByReferenceCode(
+		long companyId, String externalReferenceCode) {
 
-		return getService().fetchCommerceCatalogByUuidAndCompanyId(
-			uuid, companyId);
+		return getService().fetchCommerceCatalogByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static CommerceCatalog forceDeleteCommerceCatalog(
@@ -310,28 +314,20 @@ public class CommerceCatalogLocalServiceUtil {
 		return getService().getCommerceCatalog(commerceCatalogId);
 	}
 
-	public static CommerceCatalog getCommerceCatalogByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getCommerceCatalogByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the commerce catalog with the matching UUID and company.
+	 * Returns the commerce catalog with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce catalog's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
 	 * @return the matching commerce catalog
 	 * @throws PortalException if a matching commerce catalog could not be found
 	 */
-	public static CommerceCatalog getCommerceCatalogByUuidAndCompanyId(
-			String uuid, long companyId)
+	public static CommerceCatalog getCommerceCatalogByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return getService().getCommerceCatalogByUuidAndCompanyId(
-			uuid, companyId);
+		return getService().getCommerceCatalogByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static com.liferay.portal.kernel.model.Group getCommerceCatalogGroup(
@@ -371,14 +367,6 @@ public class CommerceCatalogLocalServiceUtil {
 	 */
 	public static int getCommerceCatalogsCount() {
 		return getService().getCommerceCatalogsCount();
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	public static

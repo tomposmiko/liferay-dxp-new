@@ -118,8 +118,7 @@ public class UserPermissionImpl
 				if (permissionChecker.hasOwnerPermission(
 						permissionChecker.getCompanyId(), User.class.getName(),
 						userId, contact.getUserId(), actionId) ||
-					((permissionChecker.getUserId() == userId) &&
-					 !actionId.equals(ActionKeys.PERMISSIONS)) ||
+					(permissionChecker.getUserId() == userId) ||
 					permissionChecker.hasPermission(
 						null, User.class.getName(), userId, actionId)) {
 
@@ -191,7 +190,7 @@ public class UserPermissionImpl
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;

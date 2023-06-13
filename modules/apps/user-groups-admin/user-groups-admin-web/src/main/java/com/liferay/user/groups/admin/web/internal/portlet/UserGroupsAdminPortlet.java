@@ -14,10 +14,12 @@
 
 package com.liferay.user.groups.admin.web.internal.portlet;
 
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.portal.kernel.exception.DuplicateUserGroupException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.exception.RequiredUserGroupException;
 import com.liferay.portal.kernel.exception.UserGroupNameException;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -29,7 +31,7 @@ import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.sites.kernel.util.Sites;
+import com.liferay.sites.kernel.util.SitesUtil;
 import com.liferay.user.groups.admin.constants.UserGroupsAdminPortletKeys;
 
 import java.io.IOException;
@@ -49,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-users-admin",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -64,8 +67,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + UserGroupsAdminPortletKeys.USER_GROUPS_ADMIN,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -97,19 +99,23 @@ public class UserGroupsAdminPortlet extends MVCPortlet {
 
 		UserGroup userGroup = null;
 
-		if (userGroupId <= 0) {
+		try (SafeCloseable safeCloseable =
+				ProxyModeThreadLocal.setWithSafeCloseable(true)) {
 
-			// Add user group
+			if (userGroupId <= 0) {
 
-			userGroup = _userGroupService.addUserGroup(
-				name, description, serviceContext);
-		}
-		else {
+				// Add user group
 
-			// Update user group
+				userGroup = _userGroupService.addUserGroup(
+					name, description, serviceContext);
+			}
+			else {
 
-			userGroup = _userGroupService.updateUserGroup(
-				userGroupId, name, description, serviceContext);
+				// Update user group
+
+				userGroup = _userGroupService.updateUserGroup(
+					userGroupId, name, description, serviceContext);
+			}
 		}
 
 		// Layout set prototypes
@@ -127,7 +133,7 @@ public class UserGroupsAdminPortlet extends MVCPortlet {
 			boolean privateLayoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
 				actionRequest, "privateLayoutSetPrototypeLinkEnabled");
 
-			_sites.updateLayoutSetPrototypesLinks(
+			SitesUtil.updateLayoutSetPrototypesLinks(
 				userGroup.getGroup(), publicLayoutSetPrototypeId,
 				privateLayoutSetPrototypeId,
 				publicLayoutSetPrototypeLinkEnabled,
@@ -146,8 +152,12 @@ public class UserGroupsAdminPortlet extends MVCPortlet {
 		long[] removeUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "removeUserIds"), 0L);
 
-		_userService.addUserGroupUsers(userGroupId, addUserIds);
-		_userService.unsetUserGroupUsers(userGroupId, removeUserIds);
+		try (SafeCloseable safeCloseable =
+				ProxyModeThreadLocal.setWithSafeCloseable(true)) {
+
+			_userService.addUserGroupUsers(userGroupId, addUserIds);
+			_userService.unsetUserGroupUsers(userGroupId, removeUserIds);
+		}
 	}
 
 	@Override
@@ -196,13 +206,17 @@ public class UserGroupsAdminPortlet extends MVCPortlet {
 		return false;
 	}
 
-	@Reference
-	private Sites _sites;
+	@Reference(unbind = "-")
+	protected void setUserGroupService(UserGroupService userGroupService) {
+		_userGroupService = userGroupService;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setUserService(UserService userService) {
+		_userService = userService;
+	}
+
 	private UserGroupService _userGroupService;
-
-	@Reference
 	private UserService _userService;
 
 }

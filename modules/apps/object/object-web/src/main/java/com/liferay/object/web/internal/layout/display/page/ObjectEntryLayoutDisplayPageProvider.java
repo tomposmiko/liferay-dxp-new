@@ -22,7 +22,6 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
 
 /**
  * @author Guilherme Camacho
@@ -51,7 +50,7 @@ public class ObjectEntryLayoutDisplayPageProvider
 			InfoItemReference infoItemReference) {
 
 		try {
-			ObjectEntry objectEntry = _objectEntryLocalService.fetchObjectEntry(
+			ObjectEntry objectEntry = _objectEntryLocalService.getObjectEntry(
 				infoItemReference.getClassPK());
 
 			if ((objectEntry == null) || objectEntry.isDraft()) {
@@ -81,7 +80,7 @@ public class ObjectEntryLayoutDisplayPageProvider
 
 	@Override
 	public String getURLSeparator() {
-		return FriendlyURLResolverConstants.URL_SEPARATOR_OBJECT_ENTRY;
+		return "/o/";
 	}
 
 	private final ObjectDefinition _objectDefinition;

@@ -1,26 +1,23 @@
 @component-name = "portal-document-management-ee"
 definition {
 
-	// Stop running on release until ISIT-32385 fixed
-
 	property cmis.repository.type = "sharepoint2013";
 	property custom.properties = "session.store.password=true${line.separator}company.security.auth.type=screenName";
-	property osgi.modules.includes = "sharepoint-soap";
+	property osgi.app.includes = "sharepoint-soap";
 	property portal.release = "false";
-	property portal.upstream = "true";
 	property test.run.environment = "EE";
 	property testray.main.component.name = "Sharepoint";
 
 	setUp {
-		TestCase.setUpPortalInstance(authenticationMethod = "By Screen Name");
+		TestCase.setUpPortalInstance();
 
-		var sharepointVmHostName = PropsUtil.get("cmis.repository.vm.host.name");
+		var sharepointVMHostName = PropsUtil.get("cmis.repository.vm.host.name");
 
 		AntCommand(
 			locator1 = "build-test-sharepoint.xml",
-			value1 = "clean-sharepoint-repository -Dssh.host=${sharepointVmHostName}");
+			value1 = "clean-sharepoint-repository -Dssh.host=${sharepointVMHostName}");
 
-		User.firstLoginByScreenNamePG(
+		User.loginPG(
 			authenticationMethod = "By Screen Name",
 			userScreenName = "test");
 
@@ -40,7 +37,7 @@ definition {
 
 		User.logoutPG();
 
-		User.firstLoginUI(
+		User.loginPG(
 			authenticationMethod = "By Screen Name",
 			password = "password",
 			userScreenName = "administrator");
@@ -48,7 +45,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMNavigator.gotoAddRepositoryCP();
@@ -57,10 +54,9 @@ definition {
 
 		DMRepository.addSharepoint(
 			dmRepositoryLibraryName = "Documents",
-			dmRepositoryLibraryPath = "Shared Documents",
 			dmRepositoryName = "Sharepoint",
-			dmRepositorySiteURL = "http://${sharepointVmHostName}",
-			dmServerVersion = 2013);
+			dmRepositorySiteURL = "http://${sharepointVMHostName}",
+			dmServerVersion = "2013");
 
 		PortletEntry.save();
 	}
@@ -68,7 +64,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -92,23 +88,25 @@ definition {
 
 			User.logoutPG();
 
-			User.firstLoginUI(
+			User.loginPG(
 				authenticationMethod = "By Screen Name",
 				password = "test",
 				userScreenName = "test");
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test CheckinDocument {
-		property test.name.skip.portal.instance = "CPSharepoint2013#CheckinDocument";
+		property test.name.skip.portal.instance = "CPSharepoint#CheckinDocument";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
 		DMDocument.addCP(
 			dmDocumentFile = "Document_3.txt",
 			dmDocumentTitle = "Document_3.txt");
+
+		Pause(locator1 = "5000");
 
 		DMDocument.checkoutCP(
 			dmDocumentTitle = "Document_3.txt",
@@ -117,7 +115,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -126,6 +124,8 @@ definition {
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_3.txt");
 
+		Pause(locator1 = "5000");
+
 		DMDocument.viewCheckedoutCP(dmRepositoryName = "true");
 
 		DMDocument.checkinCP(dmRepositoryName = "true");
@@ -133,10 +133,12 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
+
+		Pause(locator1 = "5000");
 
 		var key_dmDocumentTitle = "Document_3.txt";
 
@@ -149,11 +151,9 @@ definition {
 			dmRepositoryName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test DeleteDocumentInSubfolder {
-		property test.name.skip.portal.instance = "CPSharepoint2013#DeleteDocumentInSubfolder";
-
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
 		DMFolder.addCP(dmFolderName = "DM Folder3 Name");
@@ -167,7 +167,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -181,7 +181,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -195,7 +195,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -207,10 +207,10 @@ definition {
 		DMDocument.viewDefault();
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test DeleteSubfolder {
-		property test.name.skip.portal.instance = "CPSharepoint2013#DeleteSubfolder";
+		property test.name.skip.portal.instance = "CPSharepoint#DeleteSubfolder";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
@@ -223,7 +223,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -233,10 +233,10 @@ definition {
 		DMFolder.viewDefaultCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test EditDocumentFile {
-		property test.name.skip.portal.instance = "CPSharepoint2013#EditDocumentFile";
+		property test.name.skip.portal.instance = "CPSharepoint#EditDocumentFile";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
@@ -253,7 +253,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -265,7 +265,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -285,15 +285,15 @@ definition {
 			metadataLabel = "Content Encoding");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test EditRepository {
-		property test.name.skip.portal.instance = "CPSharepoint2013#EditRepository";
+		property test.name.skip.portal.instance = "CPSharepoint#EditRepository";
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -307,19 +307,15 @@ definition {
 		AssertElementNotPresent(
 			key_menuItem = "Download",
 			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
-
 		AssertElementNotPresent(
 			key_menuItem = "Move",
 			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
-
 		AssertElementPresent(
 			key_menuItem = "Add Folder",
 			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
-
 		AssertElementPresent(
 			key_menuItem = "Delete",
 			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
-
 		AssertElementPresent(
 			key_menuItem = "Edit",
 			locator1 = "DocumentsAndMedia#SIDEBAR_MENU_ITEM");
@@ -329,11 +325,8 @@ definition {
 		Click(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
 
 		MenuItem.viewNotPresent(menuItem = "Download");
-
 		MenuItem.viewNotPresent(menuItem = "Move");
-
 		MenuItem.viewPresent(menuItem = "Delete");
-
 		MenuItem.viewPresent(menuItem = "Edit");
 
 		MenuItem.click(menuItem = "Edit");
@@ -343,7 +336,7 @@ definition {
 		PortletEntry.save();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		AssertTextEquals(
@@ -352,15 +345,15 @@ definition {
 			value1 = "Sharepoint Repository Name Edit");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test MoveCheckedoutDocumentToFolder {
-		property test.name.skip.portal.instance = "CPSharepoint2013#MoveCheckedoutDocumentToFolder";
+		property test.name.skip.portal.instance = "CPSharepoint#MoveCheckedoutDocumentToFolder";
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -372,7 +365,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -388,7 +381,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -402,7 +395,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -423,10 +416,10 @@ definition {
 		DMDocument.viewCheckedoutCP(dmRepositoryName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test MoveDocumentToHome {
-		property test.name.skip.portal.instance = "CPSharepoint2013#MoveDocumentToHome";
+		property test.name.skip.portal.instance = "CPSharepoint#MoveDocumentToHome";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
@@ -441,7 +434,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.odt");
@@ -451,7 +444,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -459,10 +452,10 @@ definition {
 		DMDocument.cannotViewCP(dmDocumentTitle = "Document_1.odt");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test SearchDocumentViaHome {
-		property test.name.skip.portal.instance = "CPSharepoint2013#SearchDocumentViaHome";
+		property test.name.skip.portal.instance = "CPSharepoint#SearchDocumentViaHome";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
@@ -473,7 +466,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		Search.searchCP(searchTerm = "Document_3.odt");
@@ -483,10 +476,10 @@ definition {
 			dmRepositoryName = "Sharepoint Repository Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test ViewEditedCheckedoutDocument {
-		property test.name.skip.portal.instance = "CPSharepoint2013#ViewEditedCheckedoutDocument";
+		property test.name.skip.portal.instance = "CPSharepoint#ViewEditedCheckedoutDocument";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
@@ -501,7 +494,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -521,7 +514,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -533,10 +526,10 @@ definition {
 		DMDocument.viewCheckedoutCP(dmRepositoryName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test ViewOriginalFileExtensionAfterUnsuccessfulExtensionChange {
-		property test.name.skip.portal.instance = "CPSharepoint2013#ViewOriginalFileExtensionAfterUnsuccessfulExtensionChange";
+		property test.name.skip.portal.instance = "CPSharepoint#ViewOriginalFileExtensionAfterUnsuccessfulExtensionChange";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
@@ -561,7 +554,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
@@ -571,10 +564,10 @@ definition {
 		DMDocument.viewCP(dmDocumentTitle = "Document_1.docx");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test ViewOriginalFileExtensionAfterUnsuccessfulExtensionRemoval {
-		property test.name.skip.portal.instance = "CPSharepoint2013#ViewOriginalFileExtensionAfterUnsuccessfulExtensionRemoval";
+		property test.name.skip.portal.instance = "CPSharepoint#ViewOriginalFileExtensionAfterUnsuccessfulExtensionRemoval";
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");
 
@@ -599,7 +592,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			portlet = "Documents and Media");
 
 		DMRepository.gotoCP(dmRepositoryName = "Sharepoint Repository Name");

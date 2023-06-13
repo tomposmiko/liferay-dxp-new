@@ -14,10 +14,8 @@
 
 package com.liferay.account.service.impl;
 
-import com.liferay.account.configuration.AccountEntryEmailConfiguration;
+import com.liferay.account.configuration.AccountEntryEmailDomainsConfiguration;
 import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.constants.AccountPortletKeys;
-import com.liferay.account.constants.AccountTicketConstants;
 import com.liferay.account.exception.AccountEntryTypeException;
 import com.liferay.account.exception.AccountEntryUserRelEmailAddressException;
 import com.liferay.account.exception.DuplicateAccountEntryIdException;
@@ -26,41 +24,24 @@ import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.account.service.base.AccountEntryUserRelLocalServiceBaseImpl;
-import com.liferay.account.validator.AccountEntryEmailAddressValidator;
-import com.liferay.account.validator.AccountEntryEmailAddressValidatorFactory;
-import com.liferay.mail.kernel.model.MailMessage;
-import com.liferay.mail.kernel.service.MailService;
-import com.liferay.mail.kernel.template.MailTemplate;
-import com.liferay.mail.kernel.template.MailTemplateContext;
-import com.liferay.mail.kernel.template.MailTemplateContextBuilder;
-import com.liferay.mail.kernel.template.MailTemplateFactoryUtil;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserEmailAddressException;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.model.Ticket;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
-import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.TicketLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.EscapableObject;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -68,18 +49,10 @@ import com.liferay.portal.kernel.util.Validator;
 import java.time.Month;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import javax.mail.internet.InternetAddress;
-
-import javax.portlet.PortletMode;
-import javax.portlet.PortletRequest;
-import javax.portlet.WindowState;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -119,12 +92,24 @@ public class AccountEntryUserRelLocalServiceImpl
 			_accountEntryLocalService.getAccountEntry(accountEntryId);
 		}
 
+		long creatorUserId = 0;
+
 		User accountUser = _userLocalService.getUser(accountUserId);
 
+		try {
+			creatorUserId = GuestOrUserUtil.getGuestOrUserId();
+		}
+		catch (PrincipalException principalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(principalException, principalException);
+			}
+
+			creatorUserId = _userLocalService.getDefaultUserId(
+				accountUser.getCompanyId());
+		}
+
 		_validateEmailAddress(
-			_accountEntryEmailAddressValidatorFactory.create(
-				accountUser.getCompanyId(), _getAccountDomains(accountEntryId)),
-			accountUser.getEmailAddress());
+			creatorUserId, accountEntryId, accountUser.getEmailAddress());
 
 		accountEntryUserRel = createAccountEntryUserRel(
 			counterLocalService.increment());
@@ -139,9 +124,7 @@ public class AccountEntryUserRelLocalServiceImpl
 	public AccountEntryUserRel addAccountEntryUserRel(
 			long accountEntryId, long creatorUserId, String screenName,
 			String emailAddress, Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, String jobTitle,
-			ServiceContext serviceContext)
+			String middleName, String lastName, long prefixId, long suffixId)
 		throws PortalException {
 
 		long companyId = CompanyThreadLocal.getCompanyId();
@@ -153,10 +136,7 @@ public class AccountEntryUserRelLocalServiceImpl
 			companyId = accountEntry.getCompanyId();
 		}
 
-		_validateEmailAddress(
-			_accountEntryEmailAddressValidatorFactory.create(
-				companyId, _getAccountDomains(accountEntryId)),
-			emailAddress);
+		_validateEmailAddress(creatorUserId, accountEntryId, emailAddress);
 
 		boolean autoPassword = true;
 		String password1 = null;
@@ -166,19 +146,21 @@ public class AccountEntryUserRelLocalServiceImpl
 		int birthdayMonth = Month.JANUARY.getValue();
 		int birthdayDay = 1;
 		int birthdayYear = 1970;
+		String jobTitle = null;
 		long[] groupIds = null;
 		long[] organizationIds = null;
 		long[] roleIds = null;
 		long[] userGroupIds = null;
-		boolean sendEmail = true;
+		boolean sendEmail = false;
+
+		ServiceContext serviceContext = null;
 
 		User user = _userLocalService.addUser(
 			creatorUserId, companyId, autoPassword, password1, password2,
 			autoScreenName, screenName, emailAddress, locale, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle,
-			UserConstants.TYPE_REGULAR, groupIds, organizationIds, roleIds,
-			userGroupIds, sendEmail, serviceContext);
+			middleName, lastName, prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
+			roleIds, userGroupIds, sendEmail, serviceContext);
 
 		return accountEntryUserRelLocalService.addAccountEntryUserRel(
 			accountEntryId, user.getUserId());
@@ -193,8 +175,8 @@ public class AccountEntryUserRelLocalServiceImpl
 		User user = null;
 
 		if (Validator.isNotNull(userExternalReferenceCode)) {
-			user = _userLocalService.fetchUserByExternalReferenceCode(
-				userExternalReferenceCode, serviceContext.getCompanyId());
+			user = _userLocalService.fetchUserByReferenceCode(
+				serviceContext.getCompanyId(), userExternalReferenceCode);
 		}
 
 		if (user == null) {
@@ -222,10 +204,10 @@ public class AccountEntryUserRelLocalServiceImpl
 			user = _userLocalService.addUserWithWorkflow(
 				serviceContext.getUserId(), serviceContext.getCompanyId(), true,
 				StringPool.BLANK, StringPool.BLANK, true, StringPool.BLANK,
-				emailAddress, serviceContext.getLocale(), emailAddress,
-				StringPool.BLANK, emailAddress, 0, 0, true, 1, 1, 1970,
-				StringPool.BLANK, UserConstants.TYPE_REGULAR, groupIds, null,
-				null, null, true, serviceContext);
+				emailAddress, 0, StringPool.BLANK, serviceContext.getLocale(),
+				emailAddress, StringPool.BLANK, emailAddress, 0, 0, true, 1, 1,
+				1970, StringPool.BLANK, groupIds, null, null, null, true,
+				serviceContext);
 
 			user.setExternalReferenceCode(userExternalReferenceCode);
 
@@ -236,7 +218,7 @@ public class AccountEntryUserRelLocalServiceImpl
 			accountEntryUserRelLocalService.addAccountEntryUserRel(
 				accountEntryId, user.getUserId());
 
-		_updateRoles(accountEntryId, user.getUserId(), accountRoleIds);
+		updateRoles(accountEntryId, user.getUserId(), accountRoleIds);
 
 		return accountEntryUserRel;
 	}
@@ -255,9 +237,7 @@ public class AccountEntryUserRelLocalServiceImpl
 	public AccountEntryUserRel addPersonTypeAccountEntryUserRel(
 			long accountEntryId, long creatorUserId, String screenName,
 			String emailAddress, Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, String jobTitle,
-			ServiceContext serviceContext)
+			String middleName, String lastName, long prefixId, long suffixId)
 		throws PortalException {
 
 		AccountEntry accountEntry = _accountEntryLocalService.getAccountEntry(
@@ -272,10 +252,9 @@ public class AccountEntryUserRelLocalServiceImpl
 
 		deleteAccountEntryUserRelsByAccountEntryId(accountEntryId);
 
-		return accountEntryUserRelLocalService.addAccountEntryUserRel(
+		return addAccountEntryUserRel(
 			accountEntryId, creatorUserId, screenName, emailAddress, locale,
-			firstName, middleName, lastName, prefixListTypeId, suffixListTypeId,
-			jobTitle, serviceContext);
+			firstName, middleName, lastName, prefixId, suffixId);
 	}
 
 	@Override
@@ -386,34 +365,6 @@ public class AccountEntryUserRelLocalServiceImpl
 		return false;
 	}
 
-	public void inviteUser(
-			long accountEntryId, long[] accountRoleIds, String emailAddress,
-			User inviter, ServiceContext serviceContext)
-		throws PortalException {
-
-		User user = _userLocalService.fetchUserByEmailAddress(
-			inviter.getCompanyId(), emailAddress);
-
-		if (user != null) {
-			addAccountEntryUserRel(accountEntryId, user.getUserId());
-
-			_updateRoles(accountEntryId, user.getUserId(), accountRoleIds);
-		}
-		else {
-			_sendEmail(
-				accountEntryId, accountRoleIds, emailAddress, inviter,
-				serviceContext);
-		}
-	}
-
-	public boolean isAccountEntryUser(long userId) {
-		if (accountEntryUserRelPersistence.countByAccountUserId(userId) > 0) {
-			return true;
-		}
-
-		return false;
-	}
-
 	@Override
 	public void setPersonTypeAccountEntryUser(long accountEntryId, long userId)
 		throws PortalException {
@@ -469,7 +420,7 @@ public class AccountEntryUserRelLocalServiceImpl
 		Set<Long> set = SetUtil.intersect(
 			addAccountEntryIds, deleteAccountEntryIds);
 
-		if (SetUtil.isNotEmpty(set)) {
+		if (!SetUtil.isEmpty(set)) {
 			throw new DuplicateAccountEntryIdException();
 		}
 
@@ -487,119 +438,7 @@ public class AccountEntryUserRelLocalServiceImpl
 		}
 	}
 
-	private String[] _getAccountDomains(long accountEntryId) {
-		AccountEntry accountEntry = _accountEntryLocalService.fetchAccountEntry(
-			accountEntryId);
-
-		if ((accountEntry == null) || !accountEntry.isRestrictMembership()) {
-			return new String[0];
-		}
-
-		return accountEntry.getDomainsArray();
-	}
-
-	private void _sendEmail(
-			long accountEntryId, long[] accountRoleIds, String emailAddress,
-			User inviter, ServiceContext serviceContext)
-		throws PortalException {
-
-		_validateEmailAddress(
-			_accountEntryEmailAddressValidatorFactory.create(
-				inviter.getCompanyId(), _getAccountDomains(accountEntryId)),
-			emailAddress);
-
-		try {
-			AccountEntryEmailConfiguration accountEntryEmailConfiguration =
-				_configurationProvider.getCompanyConfiguration(
-					AccountEntryEmailConfiguration.class,
-					inviter.getCompanyId());
-
-			int invitationTokenExpirationTime =
-				accountEntryEmailConfiguration.invitationTokenExpirationTime();
-
-			Ticket ticket = _ticketLocalService.addTicket(
-				inviter.getCompanyId(), AccountEntry.class.getName(),
-				accountEntryId, AccountTicketConstants.TYPE_USER_INVITATION,
-				JSONUtil.put(
-					"accountRoleIds", accountRoleIds
-				).put(
-					"emailAddress", emailAddress
-				).toString(),
-				new Date(
-					System.currentTimeMillis() +
-						TimeUnit.HOURS.toMillis(invitationTokenExpirationTime)),
-				serviceContext);
-
-			Group guestGroup = _groupLocalService.getGroup(
-				inviter.getCompanyId(), GroupConstants.GUEST);
-
-			String url = PortletURLBuilder.create(
-				PortletURLFactoryUtil.create(
-					serviceContext.getRequest(),
-					AccountPortletKeys.ACCOUNT_USERS_REGISTRATION,
-					_layoutLocalService.fetchDefaultLayout(
-						guestGroup.getGroupId(), false),
-					PortletRequest.RENDER_PHASE)
-			).setMVCRenderCommandName(
-				"/account_admin/create_account_user"
-			).setParameter(
-				"ticketKey", ticket.getKey()
-			).setPortletMode(
-				PortletMode.VIEW
-			).setWindowState(
-				WindowState.MAXIMIZED
-			).buildString();
-
-			MailTemplateContextBuilder mailTemplateContextBuilder =
-				MailTemplateFactoryUtil.createMailTemplateContextBuilder();
-
-			AccountEntry accountEntry =
-				_accountEntryLocalService.getAccountEntry(accountEntryId);
-
-			mailTemplateContextBuilder.put(
-				"[$ACCOUNT_NAME$]",
-				new EscapableObject<>(accountEntry.getName()));
-
-			mailTemplateContextBuilder.put("[$CREATE_ACCOUNT_URL$]", url);
-			mailTemplateContextBuilder.put(
-				"[$INVITE_SENDER_NAME$]",
-				new EscapableObject<>(inviter.getFullName()));
-
-			MailTemplateContext mailTemplateContext =
-				mailTemplateContextBuilder.build();
-
-			LocalizedValuesMap subjectLocalizedValuesMap =
-				accountEntryEmailConfiguration.invitationEmailSubject();
-
-			MailTemplate subjectMailTemplate =
-				MailTemplateFactoryUtil.createMailTemplate(
-					subjectLocalizedValuesMap.get(inviter.getLocale()), false);
-
-			LocalizedValuesMap bodyLocalizedValuesMap =
-				accountEntryEmailConfiguration.invitationEmailBody();
-
-			MailTemplate bodyMailTemplate =
-				MailTemplateFactoryUtil.createMailTemplate(
-					bodyLocalizedValuesMap.get(inviter.getLocale()), true);
-
-			MailMessage mailMessage = new MailMessage(
-				new InternetAddress(
-					inviter.getEmailAddress(), inviter.getFullName()),
-				new InternetAddress(emailAddress),
-				subjectMailTemplate.renderAsString(
-					inviter.getLocale(), mailTemplateContext),
-				bodyMailTemplate.renderAsString(
-					inviter.getLocale(), mailTemplateContext),
-				true);
-
-			_mailService.sendEmail(mailMessage);
-		}
-		catch (Exception exception) {
-			throw new SystemException(exception);
-		}
-	}
-
-	private void _updateRoles(
+	protected void updateRoles(
 			long accountEntryId, long userId, long[] accountRoleIds)
 		throws PortalException {
 
@@ -612,32 +451,64 @@ public class AccountEntryUserRelLocalServiceImpl
 	}
 
 	private void _validateEmailAddress(
-			AccountEntryEmailAddressValidator accountEntryEmailAddressValidator,
-			String emailAddress)
+			long userId, long accountEntryId, String emailAddress)
 		throws PortalException {
 
-		if (accountEntryEmailAddressValidator.isBlockedDomain(emailAddress)) {
-			throw new UserEmailAddressException.MustNotUseBlockedDomain(
-				emailAddress,
-				StringUtil.merge(
-					accountEntryEmailAddressValidator.getBlockedDomains(),
-					StringPool.COMMA_AND_SPACE));
+		User user = _userLocalService.getUser(userId);
+
+		List<AccountEntryUserRel> accountEntryUserRels =
+			accountEntryUserRelLocalService.
+				getAccountEntryUserRelsByAccountUserId(userId);
+
+		if (ListUtil.isEmpty(accountEntryUserRels)) {
+			return;
 		}
 
-		if (!accountEntryEmailAddressValidator.isValidDomain(emailAddress)) {
-			throw new UserEmailAddressException.MustHaveValidDomain(
+		emailAddress = StringUtil.toLowerCase(emailAddress.trim());
+
+		int index = emailAddress.indexOf(CharPool.AT);
+
+		if (index == -1) {
+			return;
+		}
+
+		String domain = emailAddress.substring(index + 1);
+
+		AccountEntryEmailDomainsConfiguration
+			accountEntryEmailDomainsConfiguration =
+				_configurationProvider.getCompanyConfiguration(
+					AccountEntryEmailDomainsConfiguration.class,
+					user.getCompanyId());
+
+		String[] blockedDomains = StringUtil.split(
+			accountEntryEmailDomainsConfiguration.blockedEmailDomains(),
+			StringPool.RETURN_NEW_LINE);
+
+		if (ArrayUtil.contains(blockedDomains, domain)) {
+			throw new UserEmailAddressException.MustNotUseBlockedDomain(
 				emailAddress,
-				StringUtil.merge(
-					accountEntryEmailAddressValidator.getValidDomains()));
+				StringUtil.merge(blockedDomains, StringPool.COMMA_AND_SPACE));
+		}
+
+		if (!accountEntryEmailDomainsConfiguration.
+				enableEmailDomainValidation()) {
+
+			return;
+		}
+
+		AccountEntry accountEntry = _accountEntryLocalService.getAccountEntry(
+			accountEntryId);
+
+		String[] domains = StringUtil.split(accountEntry.getDomains());
+
+		if (!ArrayUtil.contains(domains, domain)) {
+			throw new UserEmailAddressException.MustHaveValidDomain(
+				emailAddress, accountEntry.getDomains());
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AccountEntryUserRelLocalServiceImpl.class);
-
-	@Reference
-	private AccountEntryEmailAddressValidatorFactory
-		_accountEntryEmailAddressValidatorFactory;
 
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
@@ -647,21 +518,6 @@ public class AccountEntryUserRelLocalServiceImpl
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private MailService _mailService;
-
-	@Reference
-	private Portal _portal;
-
-	@Reference
-	private TicketLocalService _ticketLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

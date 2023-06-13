@@ -17,7 +17,6 @@ package com.liferay.commerce.product.service.persistence;
 import com.liferay.commerce.product.exception.NoSuchCPOptionCategoryException;
 import com.liferay.commerce.product.model.CPOptionCategory;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -34,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CPOptionCategoryPersistence
-	extends BasePersistence<CPOptionCategory>, CTPersistence<CPOptionCategory> {
+	extends BasePersistence<CPOptionCategory> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

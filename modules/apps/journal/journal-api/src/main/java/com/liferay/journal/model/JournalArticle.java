@@ -102,9 +102,6 @@ public interface JournalArticle
 
 	public String getContentByLocale(String languageId);
 
-	public com.liferay.dynamic.data.mapping.storage.DDMFormValues
-		getDDMFormValues();
-
 	public com.liferay.dynamic.data.mapping.model.DDMStructure
 		getDDMStructure();
 
@@ -130,9 +127,6 @@ public interface JournalArticle
 	public String getDescriptionMapAsXML();
 
 	public com.liferay.portal.kernel.xml.Document getDocument();
-
-	public com.liferay.portal.kernel.xml.Document getDocumentByLocale(
-		String languageId);
 
 	public JournalFolder getFolder()
 		throws com.liferay.portal.kernel.exception.PortalException;
@@ -166,8 +160,34 @@ public interface JournalArticle
 
 	public com.liferay.portal.kernel.model.Layout getLayout();
 
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	public String getLegacyDescription();
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	public String getLegacyTitle();
+
 	public String getSmallImageType()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #getDDMStructureKey()}
+	 */
+	@Deprecated
+	public String getStructureId();
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #getDDMTemplateKey()}
+	 */
+	@Deprecated
+	public String getTemplateId();
 
 	@com.liferay.portal.kernel.json.JSON
 	public String getTitle();
@@ -193,6 +213,18 @@ public interface JournalArticle
 
 	public boolean hasApprovedVersion();
 
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
+	 */
+	@Deprecated
+	public boolean isTemplateDriven();
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	public void setDescription(String description);
+
 	public void setDescriptionMap(
 		java.util.Map<java.util.Locale, String> descriptionMap);
 
@@ -201,6 +233,26 @@ public interface JournalArticle
 	public void setImagesFolderId(long imagesFolderId);
 
 	public void setSmallImageType(String smallImageType);
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #setDDMStructureKey(String)}
+	 */
+	@Deprecated
+	public void setStructureId(String ddmStructureKey);
+
+	/**
+	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
+	 #setDDMTemplateKey(String)}
+	 */
+	@Deprecated
+	public void setTemplateId(String ddmTemplateKey);
+
+	/**
+	 * @deprecated As of Judson (7.1.x)
+	 */
+	@Deprecated
+	public void setTitle(String title);
 
 	public void setTitleMap(java.util.Map<java.util.Locale, String> titleMap);
 

@@ -79,11 +79,11 @@ const FilterItem = ({
 					<div onClick={onClick}>{itemLabel}</div>
 				) : (
 					<ClayRadioGroup
-						onChange={(newValue) => {
+						onSelectedValueChange={(newValue) => {
 							onClick();
 							setSelectedValue(newValue);
 						}}
-						value={selectedValue}
+						selectedValue={selectedValue}
 					>
 						<ClayRadio label={itemLabel} value={itemLabel} />
 					</ClayRadioGroup>

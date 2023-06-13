@@ -51,7 +51,7 @@ public class LiferayResourceOwnerLoginHandler
 		Client client, String login, String password) {
 
 		try {
-			User user = _authenticateUser(login, password);
+			User user = authenticateUser(login, password);
 
 			if (user == null) {
 				return null;
@@ -69,13 +69,13 @@ public class LiferayResourceOwnerLoginHandler
 			return userSubject;
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}
 	}
 
-	private User _authenticateUser(String login, String password) {
+	protected User authenticateUser(String login, String password) {
 		int authResult = Authenticator.FAILURE;
 
 		Company company = _companyLocalService.fetchCompany(
@@ -103,7 +103,7 @@ public class LiferayResourceOwnerLoginHandler
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}

@@ -22,6 +22,8 @@ import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.provider.InfoItemFormProvider;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil;
@@ -33,8 +35,9 @@ import com.liferay.portal.templateparser.Transformer;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.portlet.display.template.constants.PortletDisplayTemplateConstants;
 import com.liferay.template.model.TemplateEntry;
-import com.liferay.template.transformer.TemplateNodeFactory;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -43,15 +46,22 @@ import java.util.Map;
 public class TemplateDisplayTemplateTransformer {
 
 	public TemplateDisplayTemplateTransformer(
-		TemplateEntry templateEntry, InfoItemFieldValues infoItemFieldValues,
-		TemplateNodeFactory templateNodeFactory) {
+		TemplateEntry templateEntry, InfoItemFieldValues infoItemFieldValues) {
 
 		_templateEntry = templateEntry;
 		_infoItemFieldValues = infoItemFieldValues;
-		_templateNodeFactory = templateNodeFactory;
 	}
 
-	public String transform(ThemeDisplay themeDisplay) throws Exception {
+	public String transform(Locale locale) throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			return StringPool.BLANK;
+		}
+
+		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
+
 		if (themeDisplay == null) {
 			return StringPool.BLANK;
 		}
@@ -79,11 +89,12 @@ public class TemplateDisplayTemplateTransformer {
 				continue;
 			}
 
-			TemplateNode templateNode = _templateNodeFactory.createTemplateNode(
-				infoFieldValue, themeDisplay);
+			TemplateNode templateNode = new TemplateNode(
+				themeDisplay, infoField.getName(),
+				String.valueOf(infoFieldValue.getValue(locale)),
+				StringPool.BLANK, new HashMap<>());
 
 			contextObjects.put(infoField.getName(), templateNode);
-			contextObjects.put(infoField.getUniqueId(), templateNode);
 		}
 
 		TemplateHandler templateHandler =
@@ -103,7 +114,6 @@ public class TemplateDisplayTemplateTransformer {
 
 	private final InfoItemFieldValues _infoItemFieldValues;
 	private final TemplateEntry _templateEntry;
-	private final TemplateNodeFactory _templateNodeFactory;
 
 	private static class TransformerHolder {
 

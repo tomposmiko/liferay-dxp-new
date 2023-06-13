@@ -66,11 +66,12 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			long classNameId, int start, int end)
 		throws PortalException {
 
-		return filterActivities(
+		List<SocialActivity> activities =
 			socialActivityLocalService.getActivities(
 				classNameId, 0,
-				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT),
-			start, end);
+				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT);
+
+		return filterActivities(activities, start, end);
 	}
 
 	/**
@@ -100,11 +101,12 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			int end)
 		throws PortalException {
 
-		return filterActivities(
+		List<SocialActivity> activities =
 			socialActivityLocalService.getActivities(
 				mirrorActivityId, classNameId, classPK, 0,
-				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT),
-			start, end);
+				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT);
+
+		return filterActivities(activities, start, end);
 	}
 
 	/**
@@ -134,12 +136,13 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			int end)
 		throws PortalException {
 
-		return filterActivities(
+		List<SocialActivity> activities =
 			socialActivityLocalService.getActivities(
 				mirrorActivityId,
 				_classNameLocalService.getClassNameId(className), classPK, 0,
-				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT),
-			start, end);
+				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT);
+
+		return filterActivities(activities, start, end);
 	}
 
 	/**
@@ -165,11 +168,12 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 			String className, int start, int end)
 		throws PortalException {
 
-		return filterActivities(
+		List<SocialActivity> activities =
 			socialActivityLocalService.getActivities(
 				_classNameLocalService.getClassNameId(className), 0,
-				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT),
-			start, end);
+				end + PropsValues.SOCIAL_ACTIVITY_FILTER_SEARCH_LIMIT);
+
+		return filterActivities(activities, start, end);
 	}
 
 	/**
@@ -244,11 +248,11 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		SocialActivity activity = socialActivityLocalService.getActivity(
 			activityId);
 
-		if (!hasPermission(
-				activity,
-				_socialActivityInterpreterLocalService.getActivityInterpreters(
-					StringPool.BLANK))) {
+		List<SocialActivityInterpreter> activityInterpreters =
+			_socialActivityInterpreterLocalService.getActivityInterpreters(
+				StringPool.BLANK);
 
+		if (!hasPermission(activity, activityInterpreters)) {
 			throw new PrincipalException.MustHavePermission(
 				0, SocialActivity.class.getName(), activityId);
 		}
@@ -381,11 +385,11 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 		SocialActivity activity = socialActivityLocalService.getMirrorActivity(
 			mirrorActivityId);
 
-		if (!hasPermission(
-				activity,
-				_socialActivityInterpreterLocalService.getActivityInterpreters(
-					StringPool.BLANK))) {
+		List<SocialActivityInterpreter> activityInterpreters =
+			_socialActivityInterpreterLocalService.getActivityInterpreters(
+				StringPool.BLANK);
 
+		if (!hasPermission(activity, activityInterpreters)) {
 			throw new PrincipalException.MustHavePermission(
 				0, SocialActivity.class.getName(), mirrorActivityId);
 		}
@@ -808,7 +812,7 @@ public class SocialActivityServiceImpl extends SocialActivityServiceBaseImpl {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}

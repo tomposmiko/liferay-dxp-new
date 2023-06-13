@@ -28,8 +28,6 @@ import addPortlet from './addPortlet';
 import {LAYOUT_DATA_ITEM_TYPES} from './constants/layoutDataItemTypes';
 import {POSITIONS} from './constants/positions';
 
-const DROP_ACTIVE_VALID_CLASS = 'yui3-dd-drop-active-valid';
-
 const DROP_CLASS = 'yui3-dd-drop';
 
 const DROP_OVER_CLASS = 'yui3-dd-drop-over';
@@ -50,7 +48,7 @@ const initialDragDrop = {
 const DragAndDropContext = React.createContext(initialDragDrop);
 export const DragAndDropProvider = DragAndDropContext.Provider;
 
-export function useDragItem(sourceItem) {
+export const useDragItem = (sourceItem) => {
 	const getSourceItem = useCallback(() => sourceItem, [sourceItem]);
 	const sourceRef = useRef(null);
 
@@ -79,9 +77,9 @@ export function useDragItem(sourceItem) {
 		isDraggingSource,
 		sourceRef,
 	};
-}
+};
 
-export function useDragSymbol({data, icon, label, portletId, type}) {
+export const useDragSymbol = ({data, icon, label, portletId, type}) => {
 	const sourceItem = useMemo(
 		() => ({
 			data,
@@ -105,9 +103,9 @@ export function useDragSymbol({data, icon, label, portletId, type}) {
 		isDraggingSource,
 		sourceRef: symbolRef,
 	};
-}
+};
 
-export function useDropClear(targetItem) {
+export const useDropClear = (targetItem) => {
 	const {dropTargetColumn, setDropTargetColumn} = useContext(
 		DragAndDropContext
 	);
@@ -121,7 +119,6 @@ export function useDropClear(targetItem) {
 
 			if (dropTargetColumn) {
 				dropTargetColumn.classList.remove(DROP_OVER_CLASS);
-				dropTargetColumn.classList.remove(DROP_ACTIVE_VALID_CLASS);
 			}
 
 			setDropTargetColumn(null);
@@ -129,7 +126,7 @@ export function useDropClear(targetItem) {
 	});
 
 	setDropClearRef(targetItem);
-}
+};
 
 const getHoverPosition = (monitor, targetItem) => {
 	const clientOffset = monitor.getClientOffset();
@@ -171,7 +168,7 @@ const getDropIndicatorPosition = ({
 	};
 };
 
-export function useDropTarget(targetItem) {
+export const useDropTarget = (targetItem) => {
 	const {
 		dropTargetColumn,
 		dropTargetItem,
@@ -201,11 +198,8 @@ export function useDropTarget(targetItem) {
 		item.classList.contains(DROP_ZONE_CLASS) &&
 		!item.classList.contains(DROP_ZONE_DISABLED_CLASS);
 
-	const [{validDrop}, setDropTargetRef] = useDrop({
+	const [, setDropTargetRef] = useDrop({
 		accept: Object.values(LAYOUT_DATA_ITEM_TYPES),
-		collect: (monitor) => ({
-			validDrop: monitor.canDrop(),
-		}),
 		drop(item, monitor) {
 			setDropTargetColumn(null);
 
@@ -219,7 +213,6 @@ export function useDropTarget(targetItem) {
 
 			if (!item.disabled) {
 				dropTargetColumn.classList.remove(DROP_OVER_CLASS);
-				dropTargetColumn.classList.remove(DROP_ACTIVE_VALID_CLASS);
 
 				addPortlet({item, plid, targetItem, targetPosition});
 
@@ -250,15 +243,11 @@ export function useDropTarget(targetItem) {
 			if (dropTargetColumn !== parentTargetItem) {
 				if (dropTargetColumn) {
 					dropTargetColumn.classList.remove(DROP_OVER_CLASS);
-					dropTargetColumn.classList.remove(DROP_ACTIVE_VALID_CLASS);
 				}
 				setDropTargetColumn(parentTargetItem);
 
 				if (targetItemIsDropzone) {
 					parentTargetItem.classList.add(DROP_OVER_CLASS);
-				}
-				else if (validDrop) {
-					parentTargetItem.classList.add(DROP_ACTIVE_VALID_CLASS);
 				}
 			}
 
@@ -286,4 +275,4 @@ export function useDropTarget(targetItem) {
 	});
 
 	setDropTargetRef(targetItem);
-}
+};

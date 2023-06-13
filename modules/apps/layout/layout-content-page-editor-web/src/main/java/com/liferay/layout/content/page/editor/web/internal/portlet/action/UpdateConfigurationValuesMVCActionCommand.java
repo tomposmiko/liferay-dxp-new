@@ -15,20 +15,24 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
-import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
-import com.liferay.fragment.listener.FragmentEntryLinkListener;
-import com.liferay.fragment.listener.FragmentEntryLinkListenerRegistry;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
+import com.liferay.fragment.renderer.FragmentRendererController;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentEntryLinkService;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
-import com.liferay.layout.content.page.editor.web.internal.util.ContentManager;
-import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkManager;
+import com.liferay.layout.content.page.editor.listener.ContentPageEditorListener;
+import com.liferay.layout.content.page.editor.listener.ContentPageEditorListenerTracker;
+import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
 import com.liferay.layout.util.structure.LayoutStructure;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -41,6 +45,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Iterator;
+import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -52,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/update_configuration_values"
@@ -75,7 +81,7 @@ public class UpdateConfigurationValuesMVCActionCommand
 			JSONObject defaultEditableValuesJSONObject, String editableValues)
 		throws Exception {
 
-		JSONObject editableValuesJSONObject = _jsonFactory.createJSONObject(
+		JSONObject editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
 			editableValues);
 
 		for (String fragmentEntryProcessorKey :
@@ -84,10 +90,6 @@ public class UpdateConfigurationValuesMVCActionCommand
 			JSONObject editableFragmentEntryProcessorJSONObject =
 				editableValuesJSONObject.getJSONObject(
 					fragmentEntryProcessorKey);
-
-			if (editableFragmentEntryProcessorJSONObject == null) {
-				continue;
-			}
 
 			JSONObject defaultEditableFragmentEntryProcessorJSONObject =
 				defaultEditableValuesJSONObject.getJSONObject(
@@ -132,7 +134,7 @@ public class UpdateConfigurationValuesMVCActionCommand
 
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkService.updateFragmentEntryLink(
-				fragmentEntryLinkId, editableValues);
+				fragmentEntryLinkId, editableValues, true);
 
 		FragmentEntryProcessorContext fragmentEntryProcessorContext =
 			new DefaultFragmentEntryProcessorContext(
@@ -145,61 +147,59 @@ public class UpdateConfigurationValuesMVCActionCommand
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
 				fragmentEntryLink, fragmentEntryProcessorContext);
 
-		JSONObject newEditableValuesJSONObject = _mergeEditableValuesJSONObject(
+		JSONObject defaultEditableValuesJSONObject =
 			_fragmentEntryProcessorRegistry.getDefaultEditableValuesJSONObject(
-				processedHTML, fragmentEntryLink.getConfiguration()),
-			editableValues);
+				processedHTML, fragmentEntryLink.getConfiguration());
+
+		JSONObject newEditableValuesJSONObject = _mergeEditableValuesJSONObject(
+			defaultEditableValuesJSONObject, editableValues);
 
 		fragmentEntryLink = _fragmentEntryLinkService.updateFragmentEntryLink(
 			fragmentEntryLinkId, newEditableValuesJSONObject.toString());
 
-		for (FragmentEntryLinkListener fragmentEntryLinkListener :
-				_fragmentEntryLinkListenerRegistry.
-					getFragmentEntryLinkListeners()) {
+		List<ContentPageEditorListener> contentPageEditorListeners =
+			_contentPageEditorListenerTracker.getContentPageEditorListeners();
 
-			fragmentEntryLinkListener.
+		for (ContentPageEditorListener contentPageEditorListener :
+				contentPageEditorListeners) {
+
+			contentPageEditorListener.
 				onUpdateFragmentEntryLinkConfigurationValues(fragmentEntryLink);
 		}
 
 		hideDefaultSuccessMessage(actionRequest);
+
+		JSONObject jsonObject = JSONUtil.put(
+			"fragmentEntryLink",
+			FragmentEntryLinkUtil.getFragmentEntryLinkJSONObject(
+				actionRequest, actionResponse,
+				_fragmentEntryConfigurationParser, fragmentEntryLink,
+				_fragmentCollectionContributorTracker,
+				_fragmentRendererController, _fragmentRendererTracker,
+				_itemSelector, StringPool.BLANK));
 
 		LayoutStructure layoutStructure =
 			LayoutStructureUtil.getLayoutStructure(
 				themeDisplay.getScopeGroupId(), themeDisplay.getPlid(),
 				fragmentEntryLink.getSegmentsExperienceId());
 
-		return JSONUtil.put(
-			"fragmentEntryLink",
-			_fragmentEntryLinkManager.getFragmentEntryLinkJSONObject(
-				fragmentEntryLink, _portal.getHttpServletRequest(actionRequest),
-				_portal.getHttpServletResponse(actionResponse), layoutStructure)
-		).put(
-			"layoutData", layoutStructure.toJSONObject()
-		).put(
-			"pageContents",
-			_contentManager.getPageContentsJSONArray(
-				_portal.getHttpServletRequest(actionRequest),
-				_portal.getHttpServletResponse(actionResponse),
-				themeDisplay.getPlid(),
-				ParamUtil.getLong(actionRequest, "segmentsExperienceId"))
-		);
+		return jsonObject.put("layoutData", layoutStructure.toJSONObject());
 	}
 
 	private static final String[] _FRAGMENT_ENTRY_PROCESSOR_KEYS = {
-		FragmentEntryProcessorConstants.
-			KEY_BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
-		FragmentEntryProcessorConstants.KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR
+		"com.liferay.fragment.entry.processor.editable." +
+			"EditableFragmentEntryProcessor"
 	};
 
 	@Reference
-	private ContentManager _contentManager;
+	private ContentPageEditorListenerTracker _contentPageEditorListenerTracker;
 
 	@Reference
-	private FragmentEntryLinkListenerRegistry
-		_fragmentEntryLinkListenerRegistry;
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
-	private FragmentEntryLinkManager _fragmentEntryLinkManager;
+	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 	@Reference
 	private FragmentEntryLinkService _fragmentEntryLinkService;
@@ -208,7 +208,13 @@ public class UpdateConfigurationValuesMVCActionCommand
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private FragmentRendererController _fragmentRendererController;
+
+	@Reference
+	private FragmentRendererTracker _fragmentRendererTracker;
+
+	@Reference
+	private ItemSelector _itemSelector;
 
 	@Reference
 	private Portal _portal;

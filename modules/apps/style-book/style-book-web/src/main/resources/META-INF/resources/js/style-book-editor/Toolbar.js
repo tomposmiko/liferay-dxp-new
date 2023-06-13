@@ -12,90 +12,72 @@
  * details.
  */
 
+import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayPopover from '@clayui/popover';
 import classNames from 'classnames';
 import {ALIGN_POSITIONS, align} from 'frontend-js-web';
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useLayoutEffect, useRef, useState} from 'react';
 
-import PreviewSelector from './PreviewSelector';
-import PublishButton from './PublishButton';
-import Undo from './Undo';
-import UndoHistory from './UndoHistory';
+import LayoutSelector from './LayoutSelector';
+import {StyleBookContext} from './StyleBookContext';
+import {config} from './config';
 import {DRAFT_STATUS} from './constants/draftStatusConstants';
-import {usePreviewLayout} from './contexts/LayoutContext';
-import {useDraftStatus} from './contexts/StyleBookEditorContext';
 
 const STATUS_TO_LABEL = {
-	[DRAFT_STATUS.draftSaved]: Liferay.Language.get('saved'),
+	[DRAFT_STATUS.draftSaved]: Liferay.Language.get('draft-saved'),
 	[DRAFT_STATUS.notSaved]: '',
 	[DRAFT_STATUS.saving]: `${Liferay.Language.get('saving')}...`,
 };
 
-export default React.memo(function Toolbar() {
-	const previewLayout = usePreviewLayout();
-
+export default function Toolbar() {
 	return (
 		<div className="management-bar navbar style-book-editor__toolbar">
 			<ClayLayout.ContainerFluid>
 				<ul className="navbar-nav start">
-					{previewLayout?.url && (
-						<li className="nav-item">
-							<span className="font-weight-bold">
-								{`${Liferay.Language.get('preview')}`}
-							</span>
-
-							<PreviewSelector />
-						</li>
-					)}
+					<li className="nav-item">
+						<span className="style-book-editor__page-preview-text">
+							{`${Liferay.Language.get('preview')}:`}
+						</span>
+						<LayoutSelector />
+					</li>
 				</ul>
 
 				<ul className="end navbar-nav">
-					<li className="mr-2 nav-item">
+					<li className="mr-3 nav-item">
 						<DraftStatus />
 					</li>
-
-					<li className="nav-item">
-						<Undo />
-					</li>
-
-					<li className="nav-item">
-						<UndoHistory />
-					</li>
-
-					<li className="mx-2 nav-item">
+					<li className="mx-3 nav-item">
 						<HelpInformation />
 					</li>
-
-					<li className="ml-2 nav-item">
+					<li className="ml-3 nav-item">
 						<PublishButton />
 					</li>
 				</ul>
 			</ClayLayout.ContainerFluid>
 		</div>
 	);
-});
+}
 
 function DraftStatus() {
-	const draftStatus = useDraftStatus();
+	const {draftStatus} = useContext(StyleBookContext);
 
 	return (
 		<div>
+			{draftStatus === DRAFT_STATUS.draftSaved && (
+				<ClayIcon
+					className="mt-0 style-book-editor__status-icon"
+					symbol="check-circle"
+				/>
+			)}
 			<span
-				className={classNames('mx-1 style-book-editor__status-text', {
+				className={classNames('ml-1 style-book-editor__status-text', {
 					'text-success': draftStatus === DRAFT_STATUS.draftSaved,
 				})}
 			>
 				{STATUS_TO_LABEL[draftStatus]}
 			</span>
-
-			{draftStatus === DRAFT_STATUS.draftSaved && (
-				<ClayIcon
-					className="mx-1 style-book-editor__status-icon"
-					symbol="check-circle"
-				/>
-			)}
 		</div>
 	);
 }
@@ -124,7 +106,6 @@ function HelpInformation() {
 				ref={helpIconRef}
 				symbol="question-circle"
 			/>
-
 			{isShowPopover && (
 				<ClayPopover
 					alignPosition="bottom"
@@ -137,5 +118,44 @@ function HelpInformation() {
 				</ClayPopover>
 			)}
 		</span>
+	);
+}
+
+function PublishButton() {
+	const handleSubmit = (event) => {
+		if (
+			!confirm(
+				Liferay.Language.get(
+					'once-published,-these-changes-will-affect-all-instances-of-the-site-using-these-properties'
+				)
+			)
+		) {
+			event.preventDefault();
+		}
+	};
+
+	return (
+		<form action={config.publishURL} method="POST">
+			<input
+				name={`${config.namespace}redirect`}
+				type="hidden"
+				value={config.redirectURL}
+			/>
+			<input
+				name={`${config.namespace}styleBookEntryId`}
+				type="hidden"
+				value={config.styleBookEntryId}
+			/>
+
+			<ClayButton
+				disabled={config.pending}
+				displayType="primary"
+				onClick={handleSubmit}
+				small
+				type="submit"
+			>
+				{Liferay.Language.get('publish')}
+			</ClayButton>
+		</form>
 	);
 }

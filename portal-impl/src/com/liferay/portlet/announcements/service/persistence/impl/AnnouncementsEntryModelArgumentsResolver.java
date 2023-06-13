@@ -18,7 +18,6 @@ import com.liferay.announcements.kernel.model.AnnouncementsEntryTable;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portlet.announcements.model.impl.AnnouncementsEntryImpl;
 import com.liferay.portlet.announcements.model.impl.AnnouncementsEntryModelImpl;
 
@@ -31,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portlet.announcements.model.impl.AnnouncementsEntryImpl",
-		"table.name=AnnouncementsEntry"
-	},
-	service = ArgumentsResolver.class
-)
 public class AnnouncementsEntryModelArgumentsResolver
 	implements ArgumentsResolver {
 

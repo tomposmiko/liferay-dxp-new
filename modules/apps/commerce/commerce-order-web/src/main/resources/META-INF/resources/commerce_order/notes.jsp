@@ -152,11 +152,11 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 						</div>
 
 						<div class="lfr-discussion-body">
-							<aui:input label="" name="content" placeholder="type-your-note-here" />
+							<aui:input autoFocus="<%= true %>" label="" name="content" placeholder="type-your-note-here" />
 							<aui:input helpMessage="restricted-help" label="private" name="restricted" type="toggle-switch" />
 
 							<aui:button-row>
-								<aui:button cssClass="btn-large" type="submit" />
+								<aui:button cssClass="btn-large btn-primary" type="submit" />
 							</aui:button-row>
 						</div>
 					</div>

@@ -69,21 +69,22 @@ const timeRangeData = {
 };
 
 describe('The PerformanceByAssigneePage component having data should', () => {
-	let getAllByRole;
-	let rows;
+	let getAllByRole, rows;
 
 	beforeAll(async () => {
 		jsonSessionStorage.set('timeRanges', timeRangeData);
 
-		const wrapper = ({children}) => (
-			<MockRouter query={query}>{children}</MockRouter>
-		);
+		const clientMock = {
+			get: jest.fn().mockResolvedValue({data}),
+			post: jest.fn().mockResolvedValue({data}),
+			request: jest.fn().mockResolvedValue({data}),
+		};
 
-		fetch.mockResolvedValue({
-			json: () => Promise.resolve(data),
-			ok: true,
-			text: () => Promise.resolve(),
-		});
+		const wrapper = ({children}) => (
+			<MockRouter client={clientMock} query={query}>
+				{children}
+			</MockRouter>
+		);
 
 		const renderResult = render(
 			<PerformanceByAssigneePage routeParams={{processId}} />,

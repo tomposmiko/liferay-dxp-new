@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.internal.upgrade.v2_5_0;
 
+import com.liferay.fragment.internal.upgrade.v2_5_0.util.FragmentEntryLinkTable;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
@@ -32,11 +33,11 @@ public class FragmentEntryLinkUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeRendererKey();
-		_upgratePlid();
+		upgradeRendererKey();
+		upgratePlid();
 	}
 
-	private void _upgradeRendererKey() throws Exception {
+	protected void upgradeRendererKey() throws Exception {
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select fragmentEntryLinkId, rendererKey from " +
 					"FragmentEntryLink where rendererKey like " +
@@ -44,9 +45,9 @@ public class FragmentEntryLinkUpgradeProcess extends UpgradeProcess {
 			ResultSet resultSet = preparedStatement1.executeQuery();
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update FragmentEntryLink set rendererKey = ? where " +
-						"fragmentEntryLinkId = ?")) {
+					connection.prepareStatement(
+						"update FragmentEntryLink set rendererKey = ? where " +
+							"fragmentEntryLinkId = ?"))) {
 
 			while (resultSet.next()) {
 				long fragmentEntryLinkId = resultSet.getLong(
@@ -68,8 +69,12 @@ public class FragmentEntryLinkUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _upgratePlid() throws Exception {
-		alterTableAddColumn("FragmentEntryLink", "plid", "LONG");
+	protected void upgratePlid() throws Exception {
+		if (!hasColumn("FragmentEntryLink", "plid")) {
+			alter(
+				FragmentEntryLinkTable.class,
+				new AlterTableAddColumn("plid", "LONG"));
+		}
 
 		runSQL(
 			"update FragmentEntryLink set plid = classPK where classNameId = " +

@@ -29,7 +29,6 @@ import com.liferay.headless.admin.user.client.pagination.Pagination;
 import com.liferay.headless.admin.user.client.resource.v1_0.AccountRoleResource;
 import com.liferay.headless.admin.user.client.serdes.v1_0.AccountRoleSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -47,12 +46,11 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -61,16 +59,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -210,25 +210,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			204,
 			accountRoleResource.
 				deleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCodeHttpResponse(
-					testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode_getAccountExternalReferenceCode(),
-					accountRole.getId(),
-					testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode_getExternalReferenceCode()));
-	}
-
-	protected String
-			testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode_getAccountExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByExternalReferenceCode_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+					null, accountRole.getId(), null));
 	}
 
 	protected AccountRole
@@ -276,86 +258,71 @@ public abstract class BaseAccountRoleResourceTestCase {
 			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getAccountExternalReferenceCode();
 		String irrelevantAccountExternalReferenceCode =
 			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getIrrelevantAccountExternalReferenceCode();
-		String externalReferenceCode =
-			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getExternalReferenceCode();
-		String irrelevantExternalReferenceCode =
-			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getIrrelevantExternalReferenceCode();
+		String userAccountExternalReferenceCode =
+			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getUserAccountExternalReferenceCode();
+		String irrelevantUserAccountExternalReferenceCode =
+			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getIrrelevantUserAccountExternalReferenceCode();
 
 		Page<AccountRole> page =
 			accountRoleResource.
 				getAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage(
-					accountExternalReferenceCode, externalReferenceCode);
+					accountExternalReferenceCode,
+					userAccountExternalReferenceCode);
 
 		Assert.assertEquals(0, page.getTotalCount());
 
 		if ((irrelevantAccountExternalReferenceCode != null) &&
-			(irrelevantExternalReferenceCode != null)) {
+			(irrelevantUserAccountExternalReferenceCode != null)) {
 
 			AccountRole irrelevantAccountRole =
 				testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_addAccountRole(
 					irrelevantAccountExternalReferenceCode,
-					irrelevantExternalReferenceCode,
+					irrelevantUserAccountExternalReferenceCode,
 					randomIrrelevantAccountRole());
 
 			page =
 				accountRoleResource.
 					getAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage(
 						irrelevantAccountExternalReferenceCode,
-						irrelevantExternalReferenceCode);
+						irrelevantUserAccountExternalReferenceCode);
 
 			Assert.assertEquals(1, page.getTotalCount());
 
 			assertEquals(
 				Arrays.asList(irrelevantAccountRole),
 				(List<AccountRole>)page.getItems());
-			assertValid(
-				page,
-				testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getExpectedActions(
-					irrelevantAccountExternalReferenceCode,
-					irrelevantExternalReferenceCode));
+			assertValid(page);
 		}
 
 		AccountRole accountRole1 =
 			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_addAccountRole(
-				accountExternalReferenceCode, externalReferenceCode,
+				accountExternalReferenceCode, userAccountExternalReferenceCode,
 				randomAccountRole());
 
 		AccountRole accountRole2 =
 			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_addAccountRole(
-				accountExternalReferenceCode, externalReferenceCode,
+				accountExternalReferenceCode, userAccountExternalReferenceCode,
 				randomAccountRole());
 
 		page =
 			accountRoleResource.
 				getAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage(
-					accountExternalReferenceCode, externalReferenceCode);
+					accountExternalReferenceCode,
+					userAccountExternalReferenceCode);
 
 		Assert.assertEquals(2, page.getTotalCount());
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2),
 			(List<AccountRole>)page.getItems());
-		assertValid(
-			page,
-			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getExpectedActions(
-				accountExternalReferenceCode, externalReferenceCode));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getExpectedActions(
-				String accountExternalReferenceCode,
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	protected AccountRole
 			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_addAccountRole(
 				String accountExternalReferenceCode,
-				String externalReferenceCode, AccountRole accountRole)
+				String userAccountExternalReferenceCode,
+				AccountRole accountRole)
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -378,7 +345,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 	}
 
 	protected String
-			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getExternalReferenceCode()
+			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getUserAccountExternalReferenceCode()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -386,7 +353,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 	}
 
 	protected String
-			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getIrrelevantExternalReferenceCode()
+			testGetAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage_getIrrelevantUserAccountExternalReferenceCode()
 		throws Exception {
 
 		return null;
@@ -404,7 +371,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 		Page<AccountRole> page =
 			accountRoleResource.
 				getAccountAccountRolesByExternalReferenceCodePage(
-					externalReferenceCode, RandomTestUtil.randomString(), null,
+					externalReferenceCode, RandomTestUtil.randomString(),
 					Pagination.of(1, 10), null);
 
 		Assert.assertEquals(0, page.getTotalCount());
@@ -418,7 +385,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			page =
 				accountRoleResource.
 					getAccountAccountRolesByExternalReferenceCodePage(
-						irrelevantExternalReferenceCode, null, null,
+						irrelevantExternalReferenceCode, null,
 						Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
@@ -426,10 +393,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAccountRole),
 				(List<AccountRole>)page.getItems());
-			assertValid(
-				page,
-				testGetAccountAccountRolesByExternalReferenceCodePage_getExpectedActions(
-					irrelevantExternalReferenceCode));
+			assertValid(page);
 		}
 
 		AccountRole accountRole1 =
@@ -443,136 +407,14 @@ public abstract class BaseAccountRoleResourceTestCase {
 		page =
 			accountRoleResource.
 				getAccountAccountRolesByExternalReferenceCodePage(
-					externalReferenceCode, null, null, Pagination.of(1, 10),
-					null);
+					externalReferenceCode, null, Pagination.of(1, 10), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2),
 			(List<AccountRole>)page.getItems());
-		assertValid(
-			page,
-			testGetAccountAccountRolesByExternalReferenceCodePage_getExpectedActions(
-				externalReferenceCode));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetAccountAccountRolesByExternalReferenceCodePage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetAccountAccountRolesByExternalReferenceCodePageWithFilterDateTimeEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DATE_TIME);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		String externalReferenceCode =
-			testGetAccountAccountRolesByExternalReferenceCodePage_getExternalReferenceCode();
-
-		AccountRole accountRole1 = randomAccountRole();
-
-		accountRole1 =
-			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
-				externalReferenceCode, accountRole1);
-
-		for (EntityField entityField : entityFields) {
-			Page<AccountRole> page =
-				accountRoleResource.
-					getAccountAccountRolesByExternalReferenceCodePage(
-						externalReferenceCode, null,
-						getFilterString(entityField, "between", accountRole1),
-						Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(accountRole1),
-				(List<AccountRole>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetAccountAccountRolesByExternalReferenceCodePageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		String externalReferenceCode =
-			testGetAccountAccountRolesByExternalReferenceCodePage_getExternalReferenceCode();
-
-		AccountRole accountRole1 =
-			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
-				externalReferenceCode, randomAccountRole());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		AccountRole accountRole2 =
-			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
-				externalReferenceCode, randomAccountRole());
-
-		for (EntityField entityField : entityFields) {
-			Page<AccountRole> page =
-				accountRoleResource.
-					getAccountAccountRolesByExternalReferenceCodePage(
-						externalReferenceCode, null,
-						getFilterString(entityField, "eq", accountRole1),
-						Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(accountRole1),
-				(List<AccountRole>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetAccountAccountRolesByExternalReferenceCodePageWithFilterStringEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.STRING);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		String externalReferenceCode =
-			testGetAccountAccountRolesByExternalReferenceCodePage_getExternalReferenceCode();
-
-		AccountRole accountRole1 =
-			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
-				externalReferenceCode, randomAccountRole());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		AccountRole accountRole2 =
-			testGetAccountAccountRolesByExternalReferenceCodePage_addAccountRole(
-				externalReferenceCode, randomAccountRole());
-
-		for (EntityField entityField : entityFields) {
-			Page<AccountRole> page =
-				accountRoleResource.
-					getAccountAccountRolesByExternalReferenceCodePage(
-						externalReferenceCode, null,
-						getFilterString(entityField, "eq", accountRole1),
-						Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(accountRole1),
-				(List<AccountRole>)page.getItems());
-		}
+		assertValid(page);
 	}
 
 	@Test
@@ -597,8 +439,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 		Page<AccountRole> page1 =
 			accountRoleResource.
 				getAccountAccountRolesByExternalReferenceCodePage(
-					externalReferenceCode, null, null, Pagination.of(1, 2),
-					null);
+					externalReferenceCode, null, Pagination.of(1, 2), null);
 
 		List<AccountRole> accountRoles1 = (List<AccountRole>)page1.getItems();
 
@@ -607,8 +448,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 		Page<AccountRole> page2 =
 			accountRoleResource.
 				getAccountAccountRolesByExternalReferenceCodePage(
-					externalReferenceCode, null, null, Pagination.of(2, 2),
-					null);
+					externalReferenceCode, null, Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -619,8 +459,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 		Page<AccountRole> page3 =
 			accountRoleResource.
 				getAccountAccountRolesByExternalReferenceCodePage(
-					externalReferenceCode, null, null, Pagination.of(1, 3),
-					null);
+					externalReferenceCode, null, Pagination.of(1, 3), null);
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2, accountRole3),
@@ -634,23 +473,9 @@ public abstract class BaseAccountRoleResourceTestCase {
 		testGetAccountAccountRolesByExternalReferenceCodePageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, accountRole1, accountRole2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					accountRole1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetAccountAccountRolesByExternalReferenceCodePageWithSortDouble()
-		throws Exception {
-
-		testGetAccountAccountRolesByExternalReferenceCodePageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, accountRole1, accountRole2) -> {
-				BeanTestUtil.setProperty(
-					accountRole1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					accountRole2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -661,10 +486,8 @@ public abstract class BaseAccountRoleResourceTestCase {
 		testGetAccountAccountRolesByExternalReferenceCodePageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, accountRole1, accountRole2) -> {
-				BeanTestUtil.setProperty(
-					accountRole1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					accountRole2, entityField.getName(), 1);
+				BeanUtils.setProperty(accountRole1, entityField.getName(), 0);
+				BeanUtils.setProperty(accountRole2, entityField.getName(), 1);
 			});
 	}
 
@@ -679,27 +502,27 @@ public abstract class BaseAccountRoleResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -707,12 +530,12 @@ public abstract class BaseAccountRoleResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -757,7 +580,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			Page<AccountRole> ascPage =
 				accountRoleResource.
 					getAccountAccountRolesByExternalReferenceCodePage(
-						externalReferenceCode, null, null, Pagination.of(1, 2),
+						externalReferenceCode, null, Pagination.of(1, 2),
 						entityField.getName() + ":asc");
 
 			assertEquals(
@@ -767,7 +590,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			Page<AccountRole> descPage =
 				accountRoleResource.
 					getAccountAccountRolesByExternalReferenceCodePage(
-						externalReferenceCode, null, null, Pagination.of(1, 2),
+						externalReferenceCode, null, Pagination.of(1, 2),
 						entityField.getName() + ":desc");
 
 			assertEquals(
@@ -835,25 +658,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			204,
 			accountRoleResource.
 				deleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddressHttpResponse(
-					testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress_getExternalReferenceCode(),
-					accountRole.getId(),
-					testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress_getEmailAddress()));
-	}
-
-	protected String
-			testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testDeleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress_getEmailAddress()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+					null, accountRole.getId(), null));
 	}
 
 	protected AccountRole
@@ -932,10 +737,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAccountRole),
 				(List<AccountRole>)page.getItems());
-			assertValid(
-				page,
-				testGetAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPage_getExpectedActions(
-					irrelevantExternalReferenceCode, irrelevantEmailAddress));
+			assertValid(page);
 		}
 
 		AccountRole accountRole1 =
@@ -956,20 +758,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2),
 			(List<AccountRole>)page.getItems());
-		assertValid(
-			page,
-			testGetAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPage_getExpectedActions(
-				externalReferenceCode, emailAddress));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPage_getExpectedActions(
-				String externalReferenceCode, String emailAddress)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	protected AccountRole
@@ -1019,8 +808,8 @@ public abstract class BaseAccountRoleResourceTestCase {
 			testGetAccountAccountRolesPage_getIrrelevantAccountId();
 
 		Page<AccountRole> page = accountRoleResource.getAccountAccountRolesPage(
-			accountId, RandomTestUtil.randomString(), null,
-			Pagination.of(1, 10), null);
+			accountId, RandomTestUtil.randomString(), Pagination.of(1, 10),
+			null);
 
 		Assert.assertEquals(0, page.getTotalCount());
 
@@ -1030,17 +819,14 @@ public abstract class BaseAccountRoleResourceTestCase {
 					irrelevantAccountId, randomIrrelevantAccountRole());
 
 			page = accountRoleResource.getAccountAccountRolesPage(
-				irrelevantAccountId, null, null, Pagination.of(1, 2), null);
+				irrelevantAccountId, null, Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
 
 			assertEquals(
 				Arrays.asList(irrelevantAccountRole),
 				(List<AccountRole>)page.getItems());
-			assertValid(
-				page,
-				testGetAccountAccountRolesPage_getExpectedActions(
-					irrelevantAccountId));
+			assertValid(page);
 		}
 
 		AccountRole accountRole1 =
@@ -1052,134 +838,14 @@ public abstract class BaseAccountRoleResourceTestCase {
 				accountId, randomAccountRole());
 
 		page = accountRoleResource.getAccountAccountRolesPage(
-			accountId, null, null, Pagination.of(1, 10), null);
+			accountId, null, Pagination.of(1, 10), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2),
 			(List<AccountRole>)page.getItems());
-		assertValid(
-			page, testGetAccountAccountRolesPage_getExpectedActions(accountId));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetAccountAccountRolesPage_getExpectedActions(Long accountId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-admin-user/v1.0/accounts/{accountId}/account-roles/batch".
-				replace("{accountId}", String.valueOf(accountId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetAccountAccountRolesPageWithFilterDateTimeEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DATE_TIME);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long accountId = testGetAccountAccountRolesPage_getAccountId();
-
-		AccountRole accountRole1 = randomAccountRole();
-
-		accountRole1 = testGetAccountAccountRolesPage_addAccountRole(
-			accountId, accountRole1);
-
-		for (EntityField entityField : entityFields) {
-			Page<AccountRole> page =
-				accountRoleResource.getAccountAccountRolesPage(
-					accountId, null,
-					getFilterString(entityField, "between", accountRole1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(accountRole1),
-				(List<AccountRole>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetAccountAccountRolesPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long accountId = testGetAccountAccountRolesPage_getAccountId();
-
-		AccountRole accountRole1 =
-			testGetAccountAccountRolesPage_addAccountRole(
-				accountId, randomAccountRole());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		AccountRole accountRole2 =
-			testGetAccountAccountRolesPage_addAccountRole(
-				accountId, randomAccountRole());
-
-		for (EntityField entityField : entityFields) {
-			Page<AccountRole> page =
-				accountRoleResource.getAccountAccountRolesPage(
-					accountId, null,
-					getFilterString(entityField, "eq", accountRole1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(accountRole1),
-				(List<AccountRole>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetAccountAccountRolesPageWithFilterStringEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.STRING);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long accountId = testGetAccountAccountRolesPage_getAccountId();
-
-		AccountRole accountRole1 =
-			testGetAccountAccountRolesPage_addAccountRole(
-				accountId, randomAccountRole());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		AccountRole accountRole2 =
-			testGetAccountAccountRolesPage_addAccountRole(
-				accountId, randomAccountRole());
-
-		for (EntityField entityField : entityFields) {
-			Page<AccountRole> page =
-				accountRoleResource.getAccountAccountRolesPage(
-					accountId, null,
-					getFilterString(entityField, "eq", accountRole1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(accountRole1),
-				(List<AccountRole>)page.getItems());
-		}
+		assertValid(page);
 	}
 
 	@Test
@@ -1202,7 +868,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 
 		Page<AccountRole> page1 =
 			accountRoleResource.getAccountAccountRolesPage(
-				accountId, null, null, Pagination.of(1, 2), null);
+				accountId, null, Pagination.of(1, 2), null);
 
 		List<AccountRole> accountRoles1 = (List<AccountRole>)page1.getItems();
 
@@ -1210,7 +876,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 
 		Page<AccountRole> page2 =
 			accountRoleResource.getAccountAccountRolesPage(
-				accountId, null, null, Pagination.of(2, 2), null);
+				accountId, null, Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -1220,7 +886,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 
 		Page<AccountRole> page3 =
 			accountRoleResource.getAccountAccountRolesPage(
-				accountId, null, null, Pagination.of(1, 3), null);
+				accountId, null, Pagination.of(1, 3), null);
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2, accountRole3),
@@ -1234,23 +900,9 @@ public abstract class BaseAccountRoleResourceTestCase {
 		testGetAccountAccountRolesPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, accountRole1, accountRole2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					accountRole1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetAccountAccountRolesPageWithSortDouble()
-		throws Exception {
-
-		testGetAccountAccountRolesPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, accountRole1, accountRole2) -> {
-				BeanTestUtil.setProperty(
-					accountRole1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					accountRole2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -1261,10 +913,8 @@ public abstract class BaseAccountRoleResourceTestCase {
 		testGetAccountAccountRolesPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, accountRole1, accountRole2) -> {
-				BeanTestUtil.setProperty(
-					accountRole1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					accountRole2, entityField.getName(), 1);
+				BeanUtils.setProperty(accountRole1, entityField.getName(), 0);
+				BeanUtils.setProperty(accountRole2, entityField.getName(), 1);
 			});
 	}
 
@@ -1279,27 +929,27 @@ public abstract class BaseAccountRoleResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1307,12 +957,12 @@ public abstract class BaseAccountRoleResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						accountRole2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1351,7 +1001,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			Page<AccountRole> ascPage =
 				accountRoleResource.getAccountAccountRolesPage(
-					accountId, null, null, Pagination.of(1, 2),
+					accountId, null, Pagination.of(1, 2),
 					entityField.getName() + ":asc");
 
 			assertEquals(
@@ -1360,7 +1010,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 
 			Page<AccountRole> descPage =
 				accountRoleResource.getAccountAccountRolesPage(
-					accountId, null, null, Pagination.of(1, 2),
+					accountId, null, Pagination.of(1, 2),
 					entityField.getName() + ":desc");
 
 			assertEquals(
@@ -1421,26 +1071,7 @@ public abstract class BaseAccountRoleResourceTestCase {
 			204,
 			accountRoleResource.
 				deleteAccountAccountRoleUserAccountAssociationHttpResponse(
-					testDeleteAccountAccountRoleUserAccountAssociation_getAccountId(
-						accountRole),
-					accountRole.getId(),
-					testDeleteAccountAccountRoleUserAccountAssociation_getUserAccountId()));
-	}
-
-	protected Long
-			testDeleteAccountAccountRoleUserAccountAssociation_getAccountId(
-				AccountRole accountRole)
-		throws Exception {
-
-		return accountRole.getAccountId();
-	}
-
-	protected Long
-			testDeleteAccountAccountRoleUserAccountAssociation_getUserAccountId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+					accountRole.getAccountId(), accountRole.getId(), null));
 	}
 
 	protected AccountRole
@@ -1479,9 +1110,6 @@ public abstract class BaseAccountRoleResourceTestCase {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
-
-	@Rule
-	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected AccountRole testGraphQLAccountRole_addAccountRole()
 		throws Exception {
@@ -1616,13 +1244,6 @@ public abstract class BaseAccountRoleResourceTestCase {
 	}
 
 	protected void assertValid(Page<AccountRole> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<AccountRole> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<AccountRole> accountRoles = page.getItems();
@@ -1637,20 +1258,6 @@ public abstract class BaseAccountRoleResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1821,16 +1428,14 @@ public abstract class BaseAccountRoleResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1847,10 +1452,6 @@ public abstract class BaseAccountRoleResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1860,18 +1461,18 @@ public abstract class BaseAccountRoleResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1997,115 +1598,6 @@ public abstract class BaseAccountRoleResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -2180,6 +1672,18 @@ public abstract class BaseAccountRoleResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseAccountRoleResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

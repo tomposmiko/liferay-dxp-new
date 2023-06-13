@@ -19,53 +19,48 @@
 <%
 Group group = (Group)request.getAttribute("liferay-theme:portlet-messages:group");
 Portlet portlet = (Portlet)request.getAttribute("liferay-theme:portlet-messages:portlet");
-%>
 
-<c:if test="<%= !layout.isTypeControlPanel() %>">
+Group liveGroup = group;
 
-	<%
-	Group liveGroup = group;
+boolean inStaging = false;
 
-	boolean inStaging = false;
+if (group.isControlPanel()) {
+	long doAsGroupId = ParamUtil.getLong(request, "doAsGroupId");
 
-	if (group.isControlPanel()) {
-		long doAsGroupId = ParamUtil.getLong(request, "doAsGroupId");
+	if (doAsGroupId > 0) {
+		try {
+			liveGroup = GroupLocalServiceUtil.getGroup(doAsGroupId);
 
-		if (doAsGroupId > 0) {
-			try {
-				liveGroup = GroupLocalServiceUtil.getGroup(doAsGroupId);
+			if (liveGroup.isStagingGroup()) {
+				liveGroup = liveGroup.getLiveGroup();
 
-				if (liveGroup.isStagingGroup()) {
-					liveGroup = liveGroup.getLiveGroup();
-
-					inStaging = true;
-				}
-			}
-			catch (Exception e) {
+				inStaging = true;
 			}
 		}
+		catch (Exception e) {
+		}
 	}
-	else if (group.isStagingGroup()) {
-		liveGroup = group.getLiveGroup();
+}
+else if (group.isStagingGroup()) {
+	liveGroup = group.getLiveGroup();
 
-		inStaging = true;
-	}
-	%>
+	inStaging = true;
+}
+%>
 
-	<c:if test="<%= liveGroup.isStaged() && !liveGroup.isStagedPortlet(portlet.getRootPortletId()) %>">
-		<c:choose>
-			<c:when test="<%= !liveGroup.isStagedRemotely() && inStaging %>">
-				<div class="alert alert-warning lfr-portlet-message-staging-alert">
-					<liferay-ui:message key="this-portlet-is-not-staged-local-alert" />
-				</div>
-			</c:when>
-			<c:when test="<%= liveGroup.isStagedRemotely() && themeDisplay.isSignedIn() %>">
-				<div class="alert alert-warning lfr-portlet-message-staging-alert">
-					<liferay-ui:message key="this-portlet-is-not-staged-remote-alert" />
-				</div>
-			</c:when>
-		</c:choose>
-	</c:if>
+<c:if test="<%= liveGroup.isStaged() && !liveGroup.isStagedPortlet(portlet.getRootPortletId()) %>">
+	<c:choose>
+		<c:when test="<%= !liveGroup.isStagedRemotely() && inStaging %>">
+			<div class="alert alert-warning lfr-portlet-message-staging-alert">
+				<liferay-ui:message key="this-portlet-is-not-staged-local-alert" />
+			</div>
+		</c:when>
+		<c:when test="<%= liveGroup.isStagedRemotely() && themeDisplay.isSignedIn() %>">
+			<div class="alert alert-warning lfr-portlet-message-staging-alert">
+				<liferay-ui:message key="this-portlet-is-not-staged-remote-alert" />
+			</div>
+		</c:when>
+	</c:choose>
 </c:if>
 
 <c:if test='<%= MultiSessionMessages.contains(renderRequest, "requestProcessed") && !MultiSessionMessages.contains(renderRequest, portlet.getPortletId() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE) %>'>
@@ -89,7 +84,7 @@ Portlet portlet = (Portlet)request.getAttribute("liferay-theme:portlet-messages:
 		<c:if test="<%= themeDisplay.isStatePopUp() && MultiSessionMessages.contains(renderRequest, portlet.getPortletId() + SessionMessages.KEY_SUFFIX_CLOSE_REDIRECT) %>">
 
 			<%
-			String taglibMessage = "class=\"lfr-hide-dialog\" href=\"javascript:void(0);\"";
+			String taglibMessage = "class=\"lfr-hide-dialog\" href=\"javascript:;\"";
 			%>
 
 			<liferay-ui:message arguments="<%= taglibMessage %>" key="the-page-will-be-refreshed-when-you-close-this-dialog.alternatively-you-can-hide-this-dialog-x" translateArguments="<%= false %>" />

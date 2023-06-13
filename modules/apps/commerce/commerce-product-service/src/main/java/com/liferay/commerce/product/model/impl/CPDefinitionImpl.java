@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.model.impl;
 
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.media.CommerceMediaResolverUtil;
 import com.liferay.commerce.product.exception.CPDefinitionMetaDescriptionException;
 import com.liferay.commerce.product.exception.CPDefinitionMetaKeywordsException;
@@ -51,7 +52,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 import java.util.Locale;
@@ -200,8 +200,7 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 	@Override
 	public List<CPInstance> getCPInstances() {
 		return CPInstanceLocalServiceUtil.getCPDefinitionInstances(
-			getCPDefinitionId(), WorkflowConstants.STATUS_ANY,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+			getCPDefinitionId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 	}
 
 	@Override
@@ -220,9 +219,22 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 	}
 
 	@Override
-	public String getDefaultImageThumbnailSrc(long commerceAccountId)
-		throws Exception {
+	public String getDefaultImageFileURL() throws PortalException {
+		CPAttachmentFileEntry cpAttachmentFileEntry =
+			CPDefinitionLocalServiceUtil.getDefaultImageCPAttachmentFileEntry(
+				getCPDefinitionId());
 
+		if (cpAttachmentFileEntry == null) {
+			return CommerceMediaResolverUtil.getDefaultURL(getGroupId());
+		}
+
+		return CommerceMediaResolverUtil.getURL(
+			CommerceAccountConstants.ACCOUNT_ID_GUEST,
+			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
+	}
+
+	@Override
+	public String getDefaultImageThumbnailSrc() throws Exception {
 		CPAttachmentFileEntry cpAttachmentFileEntry =
 			CPDefinitionLocalServiceUtil.getDefaultImageCPAttachmentFileEntry(
 				getCPDefinitionId());
@@ -232,7 +244,7 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 		}
 
 		return CommerceMediaResolverUtil.getThumbnailURL(
-			commerceAccountId,
+			CommerceAccountConstants.ACCOUNT_ID_GUEST,
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 	}
 
@@ -248,9 +260,7 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 	}
 
 	@Override
-	public UnicodeProperties
-		getDeliverySubscriptionTypeSettingsUnicodeProperties() {
-
+	public UnicodeProperties getDeliverySubscriptionTypeSettingsProperties() {
 		if (_deliverySubscriptionTypeSettingsUnicodeProperties == null) {
 			_deliverySubscriptionTypeSettingsUnicodeProperties =
 				UnicodePropertiesBuilder.create(
@@ -348,7 +358,7 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 	}
 
 	@Override
-	public UnicodeProperties getSubscriptionTypeSettingsUnicodeProperties() {
+	public UnicodeProperties getSubscriptionTypeSettingsProperties() {
 		if (_subscriptionTypeSettingsUnicodeProperties == null) {
 			_subscriptionTypeSettingsUnicodeProperties =
 				UnicodePropertiesBuilder.create(
@@ -374,7 +384,7 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;
@@ -410,7 +420,7 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 	}
 
 	@Override
-	public void setDeliverySubscriptionTypeSettingsUnicodeProperties(
+	public void setDeliverySubscriptionTypeSettingsProperties(
 		UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties) {
 
 		_deliverySubscriptionTypeSettingsUnicodeProperties =
@@ -450,7 +460,7 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 	}
 
 	@Override
-	public void setSubscriptionTypeSettingsUnicodeProperties(
+	public void setSubscriptionTypeSettingsProperties(
 		UnicodeProperties subscriptionTypeSettingsUnicodeProperties) {
 
 		_subscriptionTypeSettingsUnicodeProperties =

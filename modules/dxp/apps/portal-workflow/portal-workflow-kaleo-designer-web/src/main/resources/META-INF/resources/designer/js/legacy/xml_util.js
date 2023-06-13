@@ -12,45 +12,45 @@
 AUI.add(
 	'liferay-kaleo-designer-xml-util',
 	(A) => {
-		const Lang = A.Lang;
-		const LString = Lang.String;
+		var Lang = A.Lang;
+		var LString = Lang.String;
 
-		const isNull = Lang.isNull;
-		const isValue = Lang.isValue;
+		var isNull = Lang.isNull;
+		var isValue = Lang.isValue;
 
-		const BUFFER_ATTR = [null, '="', null, '" '];
+		var BUFFER_ATTR = [null, '="', null, '" '];
 
-		const BUFFER_CLOSE_NODE = ['</', null, '>'];
+		var BUFFER_CLOSE_NODE = ['</', null, '>'];
 
-		const BUFFER_OPEN_NODE = ['<', null, null, '>'];
+		var BUFFER_OPEN_NODE = ['<', null, null, '>'];
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const STR_CDATA_CLOSE = ']]>';
+		var STR_CDATA_CLOSE = ']]>';
 
-		const STR_CDATA_OPEN = '<![CDATA[';
+		var STR_CDATA_OPEN = '<![CDATA[';
 
-		const STR_CHAR_CR_LF_CRLF = /\r\n|\r|\n/;
+		var STR_CHAR_CR_LF_CRLF = /\r\n|\r|\n/;
 
-		const STR_CHAR_CRLF = '\r\n';
+		var STR_CHAR_CRLF = '\r\n';
 
-		const STR_CHAR_TAB = '\t';
+		var STR_CHAR_TAB = '\t';
 
-		const STR_DASH = '-';
+		var STR_DASH = '-';
 
-		const STR_METADATA = '<metadata';
+		var STR_METADATA = '<metadata';
 
-		const STR_SPACE = ' ';
+		var STR_SPACE = ' ';
 
-		const XMLUtil = {
+		var XMLUtil = {
 			REGEX_TOKEN_1: /.+<\/\w[^>]*>$/,
 			REGEX_TOKEN_2: /^<\/\w/,
 			REGEX_TOKEN_3: /^<\w[^>]*[^/]>.*$/,
 
 			create(name, content, attrs) {
-				const instance = this;
+				var instance = this;
 
-				const node = instance.createObj(name, attrs);
+				var node = instance.createObj(name, attrs);
 
 				return (
 					node.open +
@@ -60,8 +60,8 @@ AUI.add(
 			},
 
 			createObj(name, attrs) {
-				let attrBuffer = [STR_SPACE];
-				const normalizedName = LString.uncamelize(
+				var attrBuffer = [STR_SPACE];
+				var normalizedName = LString.uncamelize(
 					name,
 					STR_DASH
 				).toLowerCase();
@@ -87,7 +87,7 @@ AUI.add(
 					}
 				});
 
-				const attributes = Lang.trimRight(attrBuffer.join(STR_BLANK));
+				var attributes = Lang.trimRight(attrBuffer.join(STR_BLANK));
 
 				BUFFER_CLOSE_NODE[1] = normalizedName;
 
@@ -108,14 +108,14 @@ AUI.add(
 			},
 
 			format(lines) {
-				const instance = this;
+				var instance = this;
 
-				let formatted = STR_BLANK;
-				let inCDATA = false;
-				let pad = 0;
+				var formatted = STR_BLANK;
+				var inCDATA = false;
+				var pad = 0;
 
 				lines.forEach((item) => {
-					let indent = 0;
+					var indent = 0;
 
 					if (!inCDATA) {
 						if (item.match(instance.REGEX_TOKEN_1)) {
@@ -134,16 +134,16 @@ AUI.add(
 					}
 
 					if (item.indexOf(STR_METADATA) > -1) {
-						const metadata = item.split(STR_CHAR_CR_LF_CRLF);
+						var metadata = item.split(STR_CHAR_CR_LF_CRLF);
 						item = '';
-						for (let i = 0; i < metadata.length; i++) {
-							if (i === 0 || i === 2) {
+						for (var i = 0; i < metadata.length; i++) {
+							if (i == 0 || i == 2) {
 								pad += 1;
 							}
 
 							if (
-								i === metadata.length - 2 ||
-								i === metadata.length - 1
+								i == metadata.length - 2 ||
+								i == metadata.length - 1
 							) {
 								pad -= 1;
 							}
@@ -155,7 +155,7 @@ AUI.add(
 						}
 					}
 					else if (item.indexOf(STR_CDATA_OPEN) > -1) {
-						let cdata = item.split(STR_CDATA_OPEN);
+						var cdata = item.split(STR_CDATA_OPEN);
 
 						item = LString.repeat(STR_CHAR_TAB, pad) + cdata[0];
 
@@ -187,9 +187,9 @@ AUI.add(
 			},
 
 			validateDefinition(definition) {
-				const doc = A.DataType.XML.parse(definition);
+				var doc = A.DataType.XML.parse(definition);
 
-				let valid = true;
+				var valid = true;
 
 				if (
 					isNull(doc) ||

@@ -38,7 +38,7 @@ public class MBAttachmentFileEntryUtil {
 				long groupId, long userId, long messageId, long folderId,
 				List<FileEntry> tempFileEntries,
 				UnsafeFunction<String, String, PortalException>
-					uniqueFileNameUnsafeFunction)
+					uniqueFileNameFunction)
 		throws PortalException {
 
 		List<MBAttachmentFileEntryReference> mbAttachmentFileEntryReferences =
@@ -47,11 +47,10 @@ public class MBAttachmentFileEntryUtil {
 		for (FileEntry tempFileEntry : tempFileEntries) {
 			FileEntry mbFileEntry =
 				PortletFileRepositoryUtil.addPortletFileEntry(
-					null, groupId, userId, MBMessage.class.getName(), messageId,
+					groupId, userId, MBMessage.class.getName(), messageId,
 					MBConstants.SERVICE_NAME, folderId,
 					tempFileEntry.getContentStream(),
-					uniqueFileNameUnsafeFunction.apply(
-						tempFileEntry.getTitle()),
+					uniqueFileNameFunction.apply(tempFileEntry.getTitle()),
 					tempFileEntry.getMimeType(), true);
 
 			mbAttachmentFileEntryReferences.add(

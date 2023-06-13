@@ -14,8 +14,6 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.liferay.jenkins.results.parser.job.property.JobProperty;
-import com.liferay.jenkins.results.parser.job.property.JobPropertyFactory;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.FunctionalBatchTestClassGroup;
@@ -32,18 +30,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -65,24 +58,6 @@ public abstract class BaseJob implements Job {
 	}
 
 	@Override
-	public AxisTestClassGroup getAxisTestClassGroup(String axisName) {
-		List<AxisTestClassGroup> axisTestClassGroups = new ArrayList<>();
-
-		axisTestClassGroups.addAll(getAxisTestClassGroups());
-		axisTestClassGroups.addAll(getDependentAxisTestClassGroups());
-
-		for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
-			if (!Objects.equals(axisName, axisTestClassGroup.getAxisName())) {
-				continue;
-			}
-
-			return axisTestClassGroup;
-		}
-
-		return null;
-	}
-
-	@Override
 	public List<AxisTestClassGroup> getAxisTestClassGroups() {
 		List<AxisTestClassGroup> axisTestClassGroups = new ArrayList<>();
 
@@ -98,51 +73,12 @@ public abstract class BaseJob implements Job {
 
 	@Override
 	public Set<String> getBatchNames() {
-		Set<String> batchNames = new TreeSet<>();
-
-		for (BatchTestClassGroup batchTestClassGroup :
-				getBatchTestClassGroups()) {
-
-			batchNames.add(batchTestClassGroup.getBatchName());
-		}
-
-		return batchNames;
+		return getFilteredBatchNames(getRawBatchNames());
 	}
 
 	@Override
 	public List<BatchTestClassGroup> getBatchTestClassGroups() {
-		synchronized (_jobProperties) {
-			if (_batchTestClassGroups != null) {
-				return _batchTestClassGroups;
-			}
-
-			_batchTestClassGroups = Collections.synchronizedList(
-				new ArrayList<BatchTestClassGroup>());
-
-			if ((jsonObject != null) && jsonObject.has("batches")) {
-				JSONArray batchesJSONArray = jsonObject.getJSONArray("batches");
-
-				for (int i = 0; i < batchesJSONArray.length(); i++) {
-					JSONObject batchJSONObject = batchesJSONArray.getJSONObject(
-						i);
-
-					if (batchJSONObject == null) {
-						continue;
-					}
-
-					_batchTestClassGroups.add(
-						TestClassGroupFactory.newBatchTestClassGroup(
-							this, batchJSONObject));
-				}
-
-				return _batchTestClassGroups;
-			}
-
-			_batchTestClassGroups.addAll(
-				getBatchTestClassGroups(getRawBatchNames()));
-
-			return _batchTestClassGroups;
-		}
+		return getBatchTestClassGroups(getRawBatchNames());
 	}
 
 	@Override
@@ -171,119 +107,6 @@ public abstract class BaseJob implements Job {
 	@Override
 	public BuildProfile getBuildProfile() {
 		return _buildProfile;
-	}
-
-	@Override
-	public String getCompanyDefaultLocale() {
-		if (_companyDefaultLocale != null) {
-			return _companyDefaultLocale;
-		}
-
-		JobProperty jobProperty = getJobProperty(
-			"test.batch.company.default.locale");
-
-		String jobPropertyValue = jobProperty.getValue();
-
-		if (jobPropertyValue != null) {
-			recordJobProperty(jobProperty);
-
-			_companyDefaultLocale = jobPropertyValue;
-
-			return _companyDefaultLocale;
-		}
-
-		return null;
-	}
-
-	@Override
-	public List<AxisTestClassGroup> getDependentAxisTestClassGroups() {
-		List<AxisTestClassGroup> axisTestClassGroups = new ArrayList<>();
-
-		for (BatchTestClassGroup batchTestClassGroup :
-				getDependentBatchTestClassGroups()) {
-
-			axisTestClassGroups.addAll(
-				batchTestClassGroup.getAxisTestClassGroups());
-		}
-
-		return axisTestClassGroups;
-	}
-
-	@Override
-	public Set<String> getDependentBatchNames() {
-		Set<String> batchNames = new TreeSet<>();
-
-		for (BatchTestClassGroup batchTestClassGroup :
-				getDependentBatchTestClassGroups()) {
-
-			batchNames.add(batchTestClassGroup.getBatchName());
-		}
-
-		return batchNames;
-	}
-
-	@Override
-	public List<BatchTestClassGroup> getDependentBatchTestClassGroups() {
-		synchronized (_jobProperties) {
-			if (_dependentBatchTestClassGroups != null) {
-				return _dependentBatchTestClassGroups;
-			}
-
-			_dependentBatchTestClassGroups = Collections.synchronizedList(
-				new ArrayList<BatchTestClassGroup>());
-
-			if ((jsonObject != null) && jsonObject.has("smoke_batches")) {
-				JSONArray smokeBatchesJSONArray = jsonObject.getJSONArray(
-					"smoke_batches");
-
-				for (int i = 0; i < smokeBatchesJSONArray.length(); i++) {
-					JSONObject smokeBatchJSONObject =
-						smokeBatchesJSONArray.getJSONObject(i);
-
-					if (smokeBatchJSONObject == null) {
-						continue;
-					}
-
-					_dependentBatchTestClassGroups.add(
-						TestClassGroupFactory.newBatchTestClassGroup(
-							this, smokeBatchJSONObject));
-				}
-
-				return _dependentBatchTestClassGroups;
-			}
-
-			_dependentBatchTestClassGroups.addAll(
-				getBatchTestClassGroups(getRawDependentBatchNames()));
-
-			return _dependentBatchTestClassGroups;
-		}
-	}
-
-	@Override
-	public Set<String> getDependentSegmentNames() {
-		Set<String> segmentNames = new TreeSet<>();
-
-		for (SegmentTestClassGroup segmentTestClassGroup :
-				getDependentSegmentTestClassGroups()) {
-
-			segmentNames.add(segmentTestClassGroup.getSegmentName());
-		}
-
-		return segmentNames;
-	}
-
-	@Override
-	public List<SegmentTestClassGroup> getDependentSegmentTestClassGroups() {
-		List<SegmentTestClassGroup> segmentTestClassGroups = new ArrayList<>();
-
-		for (BatchTestClassGroup batchTestClassGroup :
-				getDependentBatchTestClassGroups()) {
-
-			segmentTestClassGroups.addAll(
-				batchTestClassGroup.getSegmentTestClassGroups());
-		}
-
-		return segmentTestClassGroups;
 	}
 
 	@Override
@@ -331,13 +154,6 @@ public abstract class BaseJob implements Job {
 	}
 
 	@Override
-	public Set<String> getDistTypes() {
-		JobProperty jobProperty = getJobProperty("test.batch.dist.app.servers");
-
-		return getSetFromString(jobProperty.getValue());
-	}
-
-	@Override
 	public Set<String> getDistTypesExcludingTomcat() {
 		Set<String> distTypesExcludingTomcat = new TreeSet<>(getDistTypes());
 
@@ -347,43 +163,18 @@ public abstract class BaseJob implements Job {
 	}
 
 	@Override
-	public JobHistory getJobHistory() {
-		if (_jobHistory != null) {
-			return _jobHistory;
-		}
-
-		_jobHistory = HistoryUtil.getJobHistory(this);
-
-		return _jobHistory;
-	}
-
-	@Override
 	public String getJobName() {
 		return _jobName;
 	}
 
 	@Override
-	public List<File> getJobPropertiesFiles() {
-		return jobPropertiesFiles;
+	public Properties getJobProperties() {
+		return _jobProperties;
 	}
 
 	@Override
-	public List<String> getJobPropertyOptions() {
-		List<String> jobPropertyOptions = new ArrayList<>();
-
-		jobPropertyOptions.add(String.valueOf(getBuildProfile()));
-
-		String jobName = getJobName();
-
-		jobPropertyOptions.add(jobName);
-
-		if (jobName.contains("(")) {
-			jobPropertyOptions.add(jobName.substring(0, jobName.indexOf("(")));
-		}
-
-		jobPropertyOptions.removeAll(Collections.singleton(null));
-
-		return jobPropertyOptions;
+	public String getJobProperty(String key) {
+		return _jobProperties.getProperty(key);
 	}
 
 	@Override
@@ -393,113 +184,32 @@ public abstract class BaseJob implements Job {
 	}
 
 	@Override
-	public JSONObject getJSONObject() {
-		synchronized (_jobProperties) {
-			if (jsonObject != null) {
-				return jsonObject;
-			}
-
-			jsonObject = new JSONObject();
-
-			List<BatchTestClassGroup> batchTestClassGroups =
-				getBatchTestClassGroups();
-
-			if ((batchTestClassGroups != null) &&
-				!batchTestClassGroups.isEmpty()) {
-
-				JSONArray batchesJSONArray = new JSONArray();
-
-				for (BatchTestClassGroup batchTestClassGroup :
-						batchTestClassGroups) {
-
-					batchesJSONArray.put(batchTestClassGroup.getJSONObject());
-				}
-
-				jsonObject.put("batches", batchesJSONArray);
-			}
-
-			jsonObject.put(
-				"build_profile", String.valueOf(getBuildProfile())
-			).put(
-				"company_default_locale", getCompanyDefaultLocale()
-			).put(
-				"job_name", getJobName()
-			).put(
-				"job_properties", _getJobPropertiesMap()
-			).put(
-				"job_property_options", getJobPropertyOptions()
-			);
-
-			List<BatchTestClassGroup> dependentBatchTestClassGroups =
-				getDependentBatchTestClassGroups();
-
-			if ((dependentBatchTestClassGroups != null) &&
-				!dependentBatchTestClassGroups.isEmpty()) {
-
-				JSONArray smokeBatchesJSONArray = new JSONArray();
-
-				for (BatchTestClassGroup batchTestClassGroup :
-						dependentBatchTestClassGroups) {
-
-					smokeBatchesJSONArray.put(
-						batchTestClassGroup.getJSONObject());
-				}
-
-				jsonObject.put("smoke_batches", smokeBatchesJSONArray);
-			}
-
-			if (this instanceof TestSuiteJob) {
-				TestSuiteJob testSuiteJob = (TestSuiteJob)this;
-
-				jsonObject.put(
-					"test_suite_name", testSuiteJob.getTestSuiteName());
-			}
-
-			return jsonObject;
-		}
-	}
-
-	@Override
 	public Set<String> getSegmentNames() {
-		Set<String> segmentNames = new TreeSet<>();
-
-		for (SegmentTestClassGroup segmentTestClassGroup :
-				getSegmentTestClassGroups()) {
-
-			segmentNames.add(segmentTestClassGroup.getSegmentName());
-		}
-
-		return segmentNames;
+		return getFilteredSegmentNames(getRawBatchNames());
 	}
 
 	@Override
 	public List<SegmentTestClassGroup> getSegmentTestClassGroups() {
-		List<SegmentTestClassGroup> segmentTestClassGroups = new ArrayList<>();
-
-		for (BatchTestClassGroup batchTestClassGroup :
-				getBatchTestClassGroups()) {
-
-			segmentTestClassGroups.addAll(
-				batchTestClassGroup.getSegmentTestClassGroups());
-		}
-
-		return segmentTestClassGroups;
+		return getSegmentTestClassGroups(getRawBatchNames());
 	}
 
 	@Override
 	public String getTestPropertiesContent() {
 		Map<String, Properties> propertiesMap = new HashMap<>();
 
-		List<BatchTestClassGroup> batchTestClassGroups = new ArrayList<>(
-			getBatchTestClassGroups());
+		List<BatchTestClassGroup> batchTestClassGroups =
+			getBatchTestClassGroups();
 
-		batchTestClassGroups.addAll(getDependentBatchTestClassGroups());
+		if (this instanceof BatchDependentJob) {
+			BatchDependentJob batchDependentJob = (BatchDependentJob)this;
+
+			batchTestClassGroups.addAll(
+				batchDependentJob.getDependentBatchTestClassGroups());
+		}
 
 		for (BatchTestClassGroup batchTestClassGroup : batchTestClassGroups) {
 			Properties batchProperties = new Properties();
 
-			batchProperties.setProperty(
-				"test.batch.cohort.name", batchTestClassGroup.getCohortName());
 			batchProperties.setProperty(
 				"test.batch.job.name", batchTestClassGroup.getBatchJobName());
 			batchProperties.setProperty(
@@ -531,12 +241,6 @@ public abstract class BaseJob implements Job {
 					String.valueOf(batchTestClassGroup.getAxisCount()));
 			}
 
-			if (isDownstreamEnabled()) {
-				batchProperties.setProperty(
-					"test.downstream.job.name",
-					batchTestClassGroup.getDownstreamJobName());
-			}
-
 			propertiesMap.put(
 				batchTestClassGroup.getBatchName(), batchProperties);
 
@@ -546,9 +250,6 @@ public abstract class BaseJob implements Job {
 				SegmentTestClassGroup segmentTestClassGroup =
 					batchTestClassGroup.getSegmentTestClassGroup(i);
 
-				segmentProperties.setProperty(
-					"test.batch.cohort.name",
-					segmentTestClassGroup.getCohortName());
 				segmentProperties.setProperty(
 					"test.batch.job.name",
 					segmentTestClassGroup.getBatchJobName());
@@ -578,12 +279,6 @@ public abstract class BaseJob implements Job {
 
 					segmentProperties.setProperty(
 						"test.case.properties", testCasePropertiesContent);
-				}
-
-				if (isDownstreamEnabled()) {
-					segmentProperties.setProperty(
-						"test.downstream.job.name",
-						segmentTestClassGroup.getDownstreamJobName());
 				}
 
 				if (segmentTestClassGroup instanceof
@@ -619,30 +314,18 @@ public abstract class BaseJob implements Job {
 	}
 
 	@Override
-	public int getTimeoutMinutes(JenkinsMaster jenkinsMaster) {
-		return JenkinsResultsParserUtil.getJobTimeoutMinutes(
-			jenkinsMaster, getJobName());
-	}
+	public boolean isSegmentEnabled() {
+		String testSuiteName = "default";
 
-	@Override
-	public boolean isDownstreamEnabled() {
-		JobProperty jobProperty = getJobProperty(
-			"test.batch.downstream.enabled");
+		if (this instanceof TestSuiteJob) {
+			TestSuiteJob testSuiteJob = (TestSuiteJob)this;
 
-		String downstreamEnabled = jobProperty.getValue();
-
-		if ((downstreamEnabled != null) && downstreamEnabled.equals("true")) {
-			return true;
+			testSuiteName = testSuiteJob.getTestSuiteName();
 		}
 
-		return false;
-	}
-
-	@Override
-	public boolean isSegmentEnabled() {
-		JobProperty jobProperty = getJobProperty("test.batch.segment.enabled");
-
-		String segmentEnabled = jobProperty.getValue();
+		String segmentEnabled = JenkinsResultsParserUtil.getProperty(
+			_jobProperties, "test.batch.segment.enabled", getJobName(),
+			testSuiteName);
 
 		if ((segmentEnabled != null) && segmentEnabled.equals("true")) {
 			return true;
@@ -657,56 +340,18 @@ public abstract class BaseJob implements Job {
 	}
 
 	@Override
-	public boolean testJaCoCoCodeCoverage() {
-		JobProperty jobProperty = getJobProperty("test.jacoco.code.coverage");
+	public void readJobProperties() {
+		_jobProperties.clear();
 
-		if (jobProperty != null) {
-			recordJobProperty(jobProperty);
-
-			return Boolean.parseBoolean(jobProperty.getValue());
+		for (File jobPropertiesFile : jobPropertiesFiles) {
+			_jobProperties.putAll(
+				JenkinsResultsParserUtil.getProperties(jobPropertiesFile));
 		}
-
-		return false;
 	}
 
-	@Override
-	public boolean testReleaseBundle() {
-		JobProperty jobProperty = getJobProperty("test.release.bundle");
-
-		if (jobProperty != null) {
-			recordJobProperty(jobProperty);
-
-			return Boolean.parseBoolean(jobProperty.getValue());
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean testRelevantChanges() {
-		JobProperty jobProperty = getJobProperty("test.relevant.changes");
-
-		if (jobProperty != null) {
-			recordJobProperty(jobProperty);
-
-			return Boolean.parseBoolean(jobProperty.getValue());
-		}
-
-		return false;
-	}
-
-	protected BaseJob(BuildProfile buildProfile, String jobName) {
-		_buildProfile = buildProfile;
+	protected BaseJob(String jobName, BuildProfile buildProfile) {
 		_jobName = jobName;
-	}
-
-	protected BaseJob(JSONObject jsonObject) {
-		this.jsonObject = jsonObject;
-
-		_buildProfile = BuildProfile.getByString(
-			jsonObject.getString("build_profile"));
-		_companyDefaultLocale = jsonObject.optString("company_default_locale");
-		_jobName = jsonObject.getString("job_name");
+		_buildProfile = buildProfile;
 	}
 
 	protected List<BatchTestClassGroup> getBatchTestClassGroups(
@@ -726,33 +371,10 @@ public abstract class BaseJob implements Job {
 
 		List<Callable<BatchTestClassGroup>> callables = new ArrayList<>();
 
-		String testSuiteName = null;
-
-		if (this instanceof TestSuiteJob) {
-			TestSuiteJob testSuiteJob = (TestSuiteJob)this;
-
-			testSuiteName = testSuiteJob.getTestSuiteName();
-		}
-
 		final Job job = this;
 
-		Map<File, List<Callable<BatchTestClassGroup>>> testBaseDirCallablesMap =
-			new HashMap<>();
-
 		for (final String batchName : rawBatchNames) {
-			File testBaseDir = null;
-
-			JobProperty jobProperty = getJobProperty(
-				"test.base.dir", testSuiteName, batchName);
-
-			if ((jobProperty != null) &&
-				!JenkinsResultsParserUtil.isNullOrEmpty(
-					jobProperty.getValue())) {
-
-				testBaseDir = new File(jobProperty.getValue());
-			}
-
-			Callable<BatchTestClassGroup> callable =
+			callables.add(
 				new Callable<BatchTestClassGroup>() {
 
 					@Override
@@ -764,8 +386,7 @@ public abstract class BaseJob implements Job {
 							catch (Exception exception) {
 								System.out.println(
 									JenkinsResultsParserUtil.combine(
-										"[", batchName, "] Retry creating a ",
-										"test class group in ",
+										"Retry creating a test class group in ",
 										String.valueOf(
 											_pauseRetryDuration / 1000),
 										" seconds."));
@@ -817,26 +438,7 @@ public abstract class BaseJob implements Job {
 					private final Integer _pauseRetryCount = 2;
 					private final Integer _pauseRetryDuration = 5000;
 
-				};
-
-			if (testBaseDir == null) {
-				callables.add(callable);
-
-				continue;
-			}
-
-			List<Callable<BatchTestClassGroup>> testBaseDirCallables =
-				testBaseDirCallablesMap.get(testBaseDir);
-
-			if (testBaseDirCallables == null) {
-				testBaseDirCallables = new ArrayList<>();
-
-				testBaseDirCallablesMap.put(testBaseDir, testBaseDirCallables);
-			}
-
-			testBaseDirCallables.add(callable);
-
-			testBaseDirCallablesMap.put(testBaseDir, testBaseDirCallables);
+				});
 		}
 
 		ParallelExecutor<BatchTestClassGroup> parallelExecutor =
@@ -844,15 +446,6 @@ public abstract class BaseJob implements Job {
 
 		List<BatchTestClassGroup> batchTestClassGroups =
 			parallelExecutor.execute();
-
-		for (List<Callable<BatchTestClassGroup>> testBaseDirCallables :
-				testBaseDirCallablesMap.values()) {
-
-			parallelExecutor = new ParallelExecutor<>(
-				testBaseDirCallables, _executorService);
-
-			batchTestClassGroups.addAll(parallelExecutor.execute());
-		}
 
 		batchTestClassGroups.removeAll(Collections.singleton(null));
 
@@ -868,15 +461,37 @@ public abstract class BaseJob implements Job {
 		return batchTestClassGroups;
 	}
 
-	protected Document getConfigDocument(JenkinsMaster jenkinsMaster)
-		throws DocumentException, IOException {
+	protected Set<String> getFilteredBatchNames(Set<String> rawBatchNames) {
+		Set<String> batchNames = new TreeSet<>();
 
-		if (_configDocument == null) {
-			_configDocument = JenkinsResultsParserUtil.getJobConfigDocument(
-				jenkinsMaster, getJobName());
+		for (BatchTestClassGroup batchTestClassGroup :
+				getBatchTestClassGroups(rawBatchNames)) {
+
+			batchNames.add(batchTestClassGroup.getBatchName());
 		}
 
-		return _configDocument;
+		return batchNames;
+	}
+
+	protected Set<String> getFilteredSegmentNames(Set<String> rawBatchNames) {
+		Set<String> segmentNames = new TreeSet<>();
+
+		for (BatchTestClassGroup batchTestClassGroup :
+				getBatchTestClassGroups(rawBatchNames)) {
+
+			for (int i = 0; i < batchTestClassGroup.getSegmentCount(); i++) {
+				SegmentTestClassGroup segmentTestClassGroup =
+					batchTestClassGroup.getSegmentTestClassGroup(i);
+
+				if (segmentTestClassGroup.getAxisCount() <= 0) {
+					continue;
+				}
+
+				segmentNames.add(batchTestClassGroup.getBatchName() + "/" + i);
+			}
+		}
+
+		return segmentNames;
 	}
 
 	protected JSONObject getJobJSONObject(
@@ -905,46 +520,35 @@ public abstract class BaseJob implements Job {
 		}
 	}
 
-	protected JobProperty getJobProperty(String basePropertyName) {
-		return JobPropertyFactory.newJobProperty(
-			basePropertyName, null, null, this, null, null, true);
-	}
+	protected abstract Set<String> getRawBatchNames();
 
-	protected JobProperty getJobProperty(
-		String basePropertyName, boolean useBasePropertyName) {
+	protected List<SegmentTestClassGroup> getSegmentTestClassGroups(
+		Set<String> rawBatchNames) {
 
-		return JobPropertyFactory.newJobProperty(
-			basePropertyName, null, null, this, null, null,
-			useBasePropertyName);
-	}
+		List<SegmentTestClassGroup> segmentTestClassGroups = new ArrayList<>();
 
-	protected JobProperty getJobProperty(
-		String basePropertyName, String testSuiteName, String batchName) {
+		for (BatchTestClassGroup batchTestClassGroup :
+				getBatchTestClassGroups(rawBatchNames)) {
 
-		return JobPropertyFactory.newJobProperty(
-			basePropertyName, testSuiteName, batchName, this, null, null, true);
-	}
+			for (int i = 0; i < batchTestClassGroup.getSegmentCount(); i++) {
+				SegmentTestClassGroup segmentTestClassGroup =
+					batchTestClassGroup.getSegmentTestClassGroup(i);
 
-	protected Set<String> getRawBatchNames() {
-		JobProperty jobProperty = getJobProperty("test.batch.names");
+				if (segmentTestClassGroup.getAxisCount() <= 0) {
+					continue;
+				}
 
-		recordJobProperty(jobProperty);
+				segmentTestClassGroups.add(segmentTestClassGroup);
+			}
+		}
 
-		return getSetFromString(jobProperty.getValue());
-	}
-
-	protected Set<String> getRawDependentBatchNames() {
-		JobProperty jobProperty = getJobProperty("test.batch.names.smoke");
-
-		recordJobProperty(jobProperty);
-
-		return getSetFromString(jobProperty.getValue());
+		return segmentTestClassGroups;
 	}
 
 	protected Set<String> getSetFromString(String string) {
 		Set<String> set = new TreeSet<>();
 
-		if (JenkinsResultsParserUtil.isNullOrEmpty(string)) {
+		if (string == null) {
 			return set;
 		}
 
@@ -959,16 +563,13 @@ public abstract class BaseJob implements Job {
 		return set;
 	}
 
-	protected void recordJobProperty(JobProperty jobProperty) {
-		if ((jobProperty == null) || _jobProperties.contains(jobProperty)) {
-			return;
-		}
+	protected void setJobProperties(Properties properties) {
+		_jobProperties.clear();
 
-		_jobProperties.add(jobProperty);
+		_jobProperties.putAll(properties);
 	}
 
 	protected final List<File> jobPropertiesFiles = new ArrayList<>();
-	protected JSONObject jsonObject;
 
 	private int _getDistNodeAxisCount() {
 		try {
@@ -976,7 +577,10 @@ public abstract class BaseJob implements Job {
 				JenkinsResultsParserUtil.getBuildProperty(
 					"dist.node.axis.count");
 
-			if (JenkinsResultsParserUtil.isInteger(distNodeAxisCount)) {
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(distNodeAxisCount) &&
+				distNodeAxisCount.matches("\\d+") &&
+				!distNodeAxisCount.equals("0")) {
+
 				return Integer.parseInt(distNodeAxisCount);
 			}
 		}
@@ -992,7 +596,10 @@ public abstract class BaseJob implements Job {
 				JenkinsResultsParserUtil.getBuildProperty(
 					"dist.node.count.minimum");
 
-			if (JenkinsResultsParserUtil.isInteger(distNodeCountMinimum)) {
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(distNodeCountMinimum) &&
+				distNodeCountMinimum.matches("\\d+") &&
+				!distNodeCountMinimum.equals("0")) {
+
 				return Integer.parseInt(distNodeCountMinimum);
 			}
 		}
@@ -1002,53 +609,17 @@ public abstract class BaseJob implements Job {
 		return 3;
 	}
 
-	private Map<String, Properties> _getJobPropertiesMap() {
-		synchronized (_jobProperties) {
-			if (!_initializeJobProperties) {
-				getBatchTestClassGroups();
-
-				getDependentBatchTestClassGroups();
-
-				_initializeJobProperties = true;
-			}
-		}
-
-		Map<String, Properties> jobPropertiesMap = new TreeMap<>();
-
-		for (JobProperty jobProperty : _jobProperties) {
-			if (jobProperty == null) {
-				continue;
-			}
-
-			String jobPropertyValue = jobProperty.getValue();
-
-			if (jobPropertyValue == null) {
-				continue;
-			}
-
-			String propertiesFilePath = jobProperty.getPropertiesFilePath();
-
-			Properties properties = jobPropertiesMap.get(propertiesFilePath);
-
-			if (properties == null) {
-				properties = new Properties();
-			}
-
-			properties.setProperty(jobProperty.getName(), jobPropertyValue);
-
-			jobPropertiesMap.put(propertiesFilePath, properties);
-		}
-
-		return jobPropertiesMap;
-	}
-
 	private int _getSlaveRAMMinimumDefault() {
 		try {
 			String slaveRAMMinimumDefault =
 				JenkinsResultsParserUtil.getBuildProperty(
 					"slave.ram.minimum.default");
 
-			if (JenkinsResultsParserUtil.isInteger(slaveRAMMinimumDefault)) {
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(
+					slaveRAMMinimumDefault) &&
+				slaveRAMMinimumDefault.matches("\\d+") &&
+				!slaveRAMMinimumDefault.equals("0")) {
+
 				return Integer.parseInt(slaveRAMMinimumDefault);
 			}
 		}
@@ -1064,7 +635,10 @@ public abstract class BaseJob implements Job {
 				JenkinsResultsParserUtil.getBuildProperty(
 					"slaves.per.host.default");
 
-			if (JenkinsResultsParserUtil.isInteger(slavesPerHostDefault)) {
+			if (!JenkinsResultsParserUtil.isNullOrEmpty(slavesPerHostDefault) &&
+				slavesPerHostDefault.matches("\\d+") &&
+				!slavesPerHostDefault.equals("0")) {
+
 				return Integer.parseInt(slavesPerHostDefault);
 			}
 		}
@@ -1079,14 +653,8 @@ public abstract class BaseJob implements Job {
 	private static final ExecutorService _executorService =
 		JenkinsResultsParserUtil.getNewThreadPoolExecutor(_THREAD_COUNT, true);
 
-	private List<BatchTestClassGroup> _batchTestClassGroups;
 	private final BuildProfile _buildProfile;
-	private String _companyDefaultLocale;
-	private Document _configDocument;
-	private List<BatchTestClassGroup> _dependentBatchTestClassGroups;
-	private boolean _initializeJobProperties;
-	private JobHistory _jobHistory;
 	private final String _jobName;
-	private final List<JobProperty> _jobProperties = new ArrayList<>();
+	private final Properties _jobProperties = new Properties();
 
 }

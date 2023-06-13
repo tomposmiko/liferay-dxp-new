@@ -38,6 +38,7 @@ package com.liferay.layout.seo.service.http;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see LayoutSEOSiteServiceSoap
  * @generated
  */
 public class LayoutSEOSiteServiceHttp {

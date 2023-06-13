@@ -19,7 +19,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.layout.set.model.adapter.StagedLayoutSet;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
@@ -27,6 +26,7 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.model.adapter.ModelAdapterUtil;
@@ -37,6 +37,9 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.layout.set.model.adapter.StagedLayoutSet",
 	service = {
 		StagedLayoutSetStagedModelRepository.class, StagedModelRepository.class
@@ -93,38 +97,42 @@ public class StagedLayoutSetStagedModelRepository
 
 		LayoutSet layoutSet = stagedLayoutSet.getLayoutSet();
 
-		return TransformUtil.transform(
-			_layoutLocalService.getLayouts(
-				stagedLayoutSet.getGroupId(), layoutSet.isPrivateLayout()),
-			layout -> {
-				if (_exportImportHelper.isLayoutRevisionInReview(layout)) {
-					return null;
-				}
+		List<Layout> layouts = _layoutLocalService.getLayouts(
+			stagedLayoutSet.getGroupId(), layoutSet.isPrivateLayout());
 
-				return (StagedModel)layout;
-			});
+		Stream<Layout> layoutsStream = layouts.stream();
+
+		return layoutsStream.filter(
+			layout -> !_exportImportHelper.isLayoutRevisionInReview(layout)
+		).map(
+			layout -> (StagedModel)layout
+		).collect(
+			Collectors.toList()
+		);
 	}
 
-	public StagedLayoutSet fetchExistingLayoutSet(
+	public Optional<StagedLayoutSet> fetchExistingLayoutSet(
 		long groupId, boolean privateLayout) {
 
 		StagedLayoutSet stagedLayoutSet = null;
 
 		try {
+			LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
+				groupId, privateLayout);
+
 			stagedLayoutSet = ModelAdapterUtil.adapt(
-				_layoutSetLocalService.getLayoutSet(groupId, privateLayout),
-				LayoutSet.class, StagedLayoutSet.class);
+				layoutSet, LayoutSet.class, StagedLayoutSet.class);
 		}
 		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
-		return stagedLayoutSet;
+		return Optional.ofNullable(stagedLayoutSet);
 	}
 
 	@Override
@@ -134,16 +142,18 @@ public class StagedLayoutSetStagedModelRepository
 		boolean privateLayout = GetterUtil.getBoolean(uuid);
 
 		try {
+			LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
+				groupId, privateLayout);
+
 			return ModelAdapterUtil.adapt(
-				_layoutSetLocalService.getLayoutSet(groupId, privateLayout),
-				LayoutSet.class, StagedLayoutSet.class);
+				layoutSet, LayoutSet.class, StagedLayoutSet.class);
 		}
 		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return null;
@@ -167,10 +177,15 @@ public class StagedLayoutSetStagedModelRepository
 
 		dynamicQuery.add(privateLayoutProperty.eq(privateLayout));
 
-		return TransformUtil.transform(
-			(List<LayoutSet>)dynamicQuery.list(),
+		List<LayoutSet> layoutSets = dynamicQuery.list();
+
+		Stream<LayoutSet> layoutSetsStream = layoutSets.stream();
+
+		Stream<StagedLayoutSet> stagedLayoutSetsStream = layoutSetsStream.map(
 			layoutSet -> ModelAdapterUtil.adapt(
 				layoutSet, LayoutSet.class, StagedLayoutSet.class));
+
+		return stagedLayoutSetsStream.collect(Collectors.toList());
 	}
 
 	@Override
@@ -192,10 +207,11 @@ public class StagedLayoutSetStagedModelRepository
 	public StagedLayoutSet saveStagedModel(StagedLayoutSet stagedLayoutSet)
 		throws PortalException {
 
+		LayoutSet layoutSet = _layoutSetLocalService.updateLayoutSet(
+			stagedLayoutSet.getLayoutSet());
+
 		return ModelAdapterUtil.adapt(
-			_layoutSetLocalService.updateLayoutSet(
-				stagedLayoutSet.getLayoutSet()),
-			LayoutSet.class, StagedLayoutSet.class);
+			layoutSet, LayoutSet.class, StagedLayoutSet.class);
 	}
 
 	public StagedLayoutSet updateStagedModel(
@@ -219,10 +235,13 @@ public class StagedLayoutSetStagedModelRepository
 
 			existingLayoutSet.setLayoutSetPrototypeUuid(
 				layoutSet.getLayoutSetPrototypeUuid());
+
+			boolean layoutSetPrototypeLinkEnabled = MapUtil.getBoolean(
+				portletDataContext.getParameterMap(),
+				PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_LINK_ENABLED);
+
 			existingLayoutSet.setLayoutSetPrototypeLinkEnabled(
-				MapUtil.getBoolean(
-					portletDataContext.getParameterMap(),
-					PortletDataHandlerKeys.LAYOUT_SET_PROTOTYPE_LINK_ENABLED));
+				layoutSetPrototypeLinkEnabled);
 
 			existingLayoutSet = _layoutSetLocalService.updateLayoutSet(
 				existingLayoutSet);

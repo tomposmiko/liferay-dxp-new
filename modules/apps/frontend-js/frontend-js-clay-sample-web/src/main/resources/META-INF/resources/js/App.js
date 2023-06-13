@@ -17,7 +17,7 @@ import React from 'react';
 
 import '../css/main.scss';
 
-export default function App() {
+export default () => {
 	return (
 		<div>
 			<ClayAlert title="Info">
@@ -28,4 +28,4 @@ export default function App() {
 			<div className="clay-test-class">This is where your code goes.</div>
 		</div>
 	);
-}
+};

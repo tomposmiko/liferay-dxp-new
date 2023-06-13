@@ -15,14 +15,14 @@
 AUI.add(
 	'liferay-fullscreen-source-editor',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const CONTENT_TEMPLATE =
+		var CONTENT_TEMPLATE =
 			'<div class="cadmin lfr-fullscreen-source-editor-header row">' +
 			'<div class="col-6">' +
 			'<button class="btn btn-secondary btn-sm float-right lfr-portal-tooltip" data-title="{iconMoonTooltip}" id="switchTheme" type="button">' +
 			'<svg class="lexicon-icon lexicon-icon-moon" focusable="false" role="img">' +
-			'<use href="{spritemap}#moon" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#moon" />' +
 			'</svg>' +
 			'</button>' +
 			'</div>' +
@@ -30,17 +30,17 @@ AUI.add(
 			'<div class="btn-group" role="group">' +
 			'<button class="btn btn-secondary btn-sm" data-layout="vertical">' +
 			'<svg class="lexicon-icon lexicon-icon-columns" focusable="false" role="img">' +
-			'<use href="{spritemap}#columns" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#columns" />' +
 			'</svg>' +
 			'</button>' +
 			'<button class="btn btn-secondary btn-sm" data-layout="horizontal">' +
 			'<svg class="lexicon-icon lexicon-icon-cards" focusable="false" role="img">' +
-			'<use href="{spritemap}#cards" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#cards" />' +
 			'</svg>' +
 			'</button>' +
 			'<button class="btn btn-secondary btn-sm" data-layout="simple">' +
 			'<svg class="lexicon-icon lexicon-icon-expand" focusable="false" role="img">' +
-			'<use href="{spritemap}#expand" />' +
+			'<use href="{pathThemeImages}/clay/icons.svg#expand" />' +
 			'</svg>' +
 			'</button>' +
 			'</div>' +
@@ -54,19 +54,19 @@ AUI.add(
 			'<div class="panel-splitter"></div>' +
 			'</div>';
 
-		const CSS_PREVIEW_PANEL = '.preview-panel';
+		var CSS_PREVIEW_PANEL = '.preview-panel';
 
-		const STR_BOUNDING_BOX = 'boundingBox';
+		var STR_BOUNDING_BOX = 'boundingBox';
 
-		const STR_CLICK = 'click';
+		var STR_CLICK = 'click';
 
-		const STR_DOT = '.';
+		var STR_DOT = '.';
 
-		const STR_LAYOUT = 'layout';
+		var STR_LAYOUT = 'layout';
 
-		const STR_VALUE = 'value';
+		var STR_VALUE = 'value';
 
-		const LiferayFullScreenSourceEditor = A.Component.create({
+		var LiferayFullScreenSourceEditor = A.Component.create({
 			ATTRS: {
 				aceOptions: {
 					validator: Lang.isObject,
@@ -113,9 +113,9 @@ AUI.add(
 
 			prototype: {
 				_getHtml(val) {
-					const instance = this;
+					var instance = this;
 
-					const dataProcessor = instance.get('dataProcessor');
+					var dataProcessor = instance.get('dataProcessor');
 
 					if (dataProcessor && dataProcessor.toHtml) {
 						val = dataProcessor.toHtml(val);
@@ -125,7 +125,7 @@ AUI.add(
 				},
 
 				_getValue(val) {
-					const instance = this;
+					var instance = this;
 
 					return instance._editor
 						? instance._editor.get(STR_VALUE)
@@ -133,7 +133,7 @@ AUI.add(
 				},
 
 				_onEditorChange(event) {
-					const instance = this;
+					var instance = this;
 
 					if (event.newVal || event.newVal === '') {
 						instance._previewPanel.html(
@@ -143,7 +143,7 @@ AUI.add(
 				},
 
 				_onLayoutChange(event) {
-					const instance = this;
+					var instance = this;
 
 					instance
 						.get(STR_BOUNDING_BOX)
@@ -154,7 +154,7 @@ AUI.add(
 				},
 
 				_onLayoutClick(event) {
-					const instance = this;
+					var instance = this;
 
 					instance.set(
 						STR_LAYOUT,
@@ -167,28 +167,28 @@ AUI.add(
 				},
 
 				_onValueChange(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._editor.set(STR_VALUE, event.newVal);
 				},
 
 				_switchTheme() {
-					const instance = this;
+					var instance = this;
 
 					instance._editor.switchTheme();
 				},
 
 				CONTENT_TEMPLATE: Lang.sub(CONTENT_TEMPLATE, {
 					iconMoonTooltip: Liferay.Language.get('dark-theme'),
-					spritemap: Liferay.Icons.spritemap,
+					pathThemeImages: themeDisplay.getPathThemeImages(),
 				}),
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get(STR_BOUNDING_BOX);
+					var boundingBox = instance.get(STR_BOUNDING_BOX);
 
-					const onChangeTask = A.debounce(
+					var onChangeTask = A.debounce(
 						'_onEditorChange',
 						instance.get('previewDelay'),
 						instance
@@ -223,9 +223,9 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
-					const sourceEditor = instance._editor;
+					var sourceEditor = instance._editor;
 
 					if (sourceEditor) {
 						sourceEditor.destroy();
@@ -235,9 +235,9 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get(STR_BOUNDING_BOX);
+					var boundingBox = instance.get(STR_BOUNDING_BOX);
 
 					boundingBox
 						.one(STR_DOT + instance.getClassName('content'))
@@ -254,10 +254,10 @@ AUI.add(
 						mode: 'html',
 						on: {
 							themeSwitched(event) {
-								const editorSwitchTheme =
+								var editorSwitchTheme =
 									instance._editorSwitchTheme;
 
-								const nextTheme =
+								var nextTheme =
 									event.themes[event.nextThemeIndex];
 
 								editorSwitchTheme
@@ -284,7 +284,7 @@ AUI.add(
 				},
 
 				resizeEditor() {
-					const instance = this;
+					var instance = this;
 
 					instance._editor.getEditor().resize();
 				},

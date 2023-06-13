@@ -117,17 +117,6 @@ public class OpenIdConnectSessionLocalServiceUtil {
 		return getService().deleteOpenIdConnectSession(openIdConnectSession);
 	}
 
-	public static void deleteOpenIdConnectSessions(long userId) {
-		getService().deleteOpenIdConnectSessions(userId);
-	}
-
-	public static void deleteOpenIdConnectSessions(
-		long companyId, String authServerWellKnownURI, String clientId) {
-
-		getService().deleteOpenIdConnectSessions(
-			companyId, authServerWellKnownURI, clientId);
-	}
-
 	/**
 	 * @throws PortalException
 	 */
@@ -227,21 +216,6 @@ public class OpenIdConnectSessionLocalServiceUtil {
 		long openIdConnectSessionId) {
 
 		return getService().fetchOpenIdConnectSession(openIdConnectSessionId);
-	}
-
-	public static OpenIdConnectSession fetchOpenIdConnectSession(
-		long userId, String authServerWellKnownURI, String clientId) {
-
-		return getService().fetchOpenIdConnectSession(
-			userId, authServerWellKnownURI, clientId);
-	}
-
-	public static List<OpenIdConnectSession>
-		getAccessTokenExpirationDateOpenIdConnectSessions(
-			java.util.Date ltAccessTokenExpirationDate, int start, int end) {
-
-		return getService().getAccessTokenExpirationDateOpenIdConnectSessions(
-			ltAccessTokenExpirationDate, start, end);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery

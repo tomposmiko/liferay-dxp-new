@@ -64,7 +64,7 @@ public class DDMFormFieldValidationUpgradeProcess extends UpgradeProcess {
 					String definition = resultSet.getString("definition");
 
 					preparedStatement2.setString(
-						1, _makeFieldsLocalizable(definition));
+						1, makeFieldsLocalizable(definition));
 
 					long structureId = resultSet.getLong("structureId");
 
@@ -81,7 +81,7 @@ public class DDMFormFieldValidationUpgradeProcess extends UpgradeProcess {
 							definition = resultSet2.getString("definition");
 
 							preparedStatement4.setString(
-								1, _makeFieldsLocalizable(definition));
+								1, makeFieldsLocalizable(definition));
 
 							long structureVersionId = resultSet2.getLong(
 								"structureVersionId");
@@ -105,18 +105,7 @@ public class DDMFormFieldValidationUpgradeProcess extends UpgradeProcess {
 			"com.liferay.dynamic.data.mapping.model.DDMFormInstance");
 	}
 
-	private boolean _hasValidation(JSONObject fieldJSONObject) {
-		JSONObject validationJSONObject = fieldJSONObject.getJSONObject(
-			"validation");
-
-		if (validationJSONObject == null) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private void _makeFieldsLocalizable(
+	protected void makeFieldsLocalizable(
 		JSONArray availableLanguageIdsJSONArray, JSONArray fieldsJSONArray) {
 
 		for (int i = 0; i < fieldsJSONArray.length(); i++) {
@@ -149,13 +138,13 @@ public class DDMFormFieldValidationUpgradeProcess extends UpgradeProcess {
 				"nestedFields");
 
 			if (nestedFieldsJSONArray != null) {
-				_makeFieldsLocalizable(
+				makeFieldsLocalizable(
 					availableLanguageIdsJSONArray, nestedFieldsJSONArray);
 			}
 		}
 	}
 
-	private String _makeFieldsLocalizable(String definition)
+	protected String makeFieldsLocalizable(String definition)
 		throws PortalException {
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject(definition);
@@ -165,9 +154,20 @@ public class DDMFormFieldValidationUpgradeProcess extends UpgradeProcess {
 
 		JSONArray fieldsJSONArray = jsonObject.getJSONArray("fields");
 
-		_makeFieldsLocalizable(availableLanguageIdsJSONArray, fieldsJSONArray);
+		makeFieldsLocalizable(availableLanguageIdsJSONArray, fieldsJSONArray);
 
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
+	}
+
+	private boolean _hasValidation(JSONObject fieldJSONObject) {
+		JSONObject validationJSONObject = fieldJSONObject.getJSONObject(
+			"validation");
+
+		if (validationJSONObject == null) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private final JSONFactory _jsonFactory;

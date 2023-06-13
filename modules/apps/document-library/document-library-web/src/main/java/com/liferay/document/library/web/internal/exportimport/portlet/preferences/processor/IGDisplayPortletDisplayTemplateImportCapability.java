@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Laszlo Hudak
  */
 @Component(
+	immediate = true,
 	property = {
 		"name=IGDisplayImportCapability",
 		"type=" + PortletDisplayTemplateConstants.DISPLAY_TEMPLATE_IMPORT

@@ -18,24 +18,25 @@ import com.liferay.document.library.display.context.DLDisplayContextProvider;
 import com.liferay.document.library.display.context.DLViewFileVersionDisplayContext;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
-import com.liferay.document.library.web.internal.display.context.helper.DLPortletInstanceSettingsHelper;
-import com.liferay.document.library.web.internal.display.context.helper.DLRequestHelper;
+import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
+import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFileEntryPermission;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFolderPermission;
 import com.liferay.document.library.web.internal.settings.DLPortletInstanceSettings;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.capabilities.CommentCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
+import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.Html;
@@ -47,6 +48,7 @@ import com.liferay.taglib.util.PortalIncludeUtil;
 
 import java.text.Format;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -77,21 +79,14 @@ public class DLViewFileEntryDisplayContext {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
-		_httpServletResponse = portal.getHttpServletResponse(renderResponse);
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_httpServletResponse = _portal.getHttpServletResponse(renderResponse);
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		_dlRequestHelper = new DLRequestHelper(_httpServletRequest);
 
 		_dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(
 			_dlRequestHelper);
-	}
-
-	public List<DropdownItem> getActionDropdownItems() throws PortalException {
-		DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext =
-			_getDLViewFileVersionDisplayContext();
-
-		return dlViewFileVersionDisplayContext.getActionDropdownItems();
 	}
 
 	public String getDiscussionClassName() throws PortalException {
@@ -229,13 +224,19 @@ public class DLViewFileEntryDisplayContext {
 				DLFileEntryConstants.LOCK_EXPIRATION_TIME));
 	}
 
+	public Menu getMenu() throws PortalException {
+		DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext =
+			_getDLViewFileVersionDisplayContext();
+
+		return dlViewFileVersionDisplayContext.getMenu();
+	}
+
 	public String getRedirect() throws PortalException {
 		if (_redirect != null) {
 			return _redirect;
 		}
 
-		_redirect = _portal.escapeRedirect(
-			ParamUtil.getString(_renderRequest, "redirect"));
+		_redirect = ParamUtil.getString(_renderRequest, "redirect");
 
 		if (Validator.isNotNull(_redirect)) {
 			return _redirect;
@@ -258,6 +259,17 @@ public class DLViewFileEntryDisplayContext {
 		).buildString();
 
 		return _redirect;
+	}
+
+	public List<ToolbarItem> getToolbarItems() throws PortalException {
+		if (!_dlPortletInstanceSettingsHelper.isShowActions()) {
+			return Collections.emptyList();
+		}
+
+		DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext =
+			_getDLViewFileVersionDisplayContext();
+
+		return dlViewFileVersionDisplayContext.getToolbarItems();
 	}
 
 	public boolean isDownloadLinkVisible() throws PortalException {

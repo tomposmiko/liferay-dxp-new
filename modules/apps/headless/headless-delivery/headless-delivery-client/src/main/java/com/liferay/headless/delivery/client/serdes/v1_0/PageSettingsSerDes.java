@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -106,18 +107,6 @@ public class PageSettingsSerDes {
 			sb.append(String.valueOf(pageSettings.getSeoSettings()));
 		}
 
-		if (pageSettings.getSitePageNavigationMenuSettings() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"sitePageNavigationMenuSettings\": ");
-
-			sb.append(
-				String.valueOf(
-					pageSettings.getSitePageNavigationMenuSettings()));
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -172,16 +161,6 @@ public class PageSettingsSerDes {
 				"seoSettings", String.valueOf(pageSettings.getSeoSettings()));
 		}
 
-		if (pageSettings.getSitePageNavigationMenuSettings() == null) {
-			map.put("sitePageNavigationMenuSettings", null);
-		}
-		else {
-			map.put(
-				"sitePageNavigationMenuSettings",
-				String.valueOf(
-					pageSettings.getSitePageNavigationMenuSettings()));
-		}
-
 		return map;
 	}
 
@@ -205,18 +184,14 @@ public class PageSettingsSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "customMetaTags")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomMetaTag[] customMetaTagsArray =
-						new CustomMetaTag[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customMetaTagsArray.length; i++) {
-						customMetaTagsArray[i] = CustomMetaTagSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					pageSettings.setCustomMetaTags(customMetaTagsArray);
+					pageSettings.setCustomMetaTags(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomMetaTagSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomMetaTag[size]
+						));
 				}
 			}
 			else if (Objects.equals(
@@ -238,16 +213,6 @@ public class PageSettingsSerDes {
 				if (jsonParserFieldValue != null) {
 					pageSettings.setSeoSettings(
 						SEOSettingsSerDes.toDTO((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName,
-						"sitePageNavigationMenuSettings")) {
-
-				if (jsonParserFieldValue != null) {
-					pageSettings.setSitePageNavigationMenuSettings(
-						SitePageNavigationMenuSettingsSerDes.toDTO(
-							(String)jsonParserFieldValue));
 				}
 			}
 		}

@@ -24,21 +24,12 @@ import com.liferay.portal.kernel.model.BaseModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CommerceDiscountUsageEntry.
  *
  * @author Marco Leo
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.discount.model.impl.CommerceDiscountUsageEntryImpl",
-		"table.name=CommerceDiscountUsageEntry"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommerceDiscountUsageEntryModelArgumentsResolver
 	implements ArgumentsResolver {
 

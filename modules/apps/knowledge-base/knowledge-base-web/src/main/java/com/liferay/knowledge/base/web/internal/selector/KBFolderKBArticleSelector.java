@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.knowledge.base.model.KBFolder",
 	service = KBArticleSelector.class
 )
@@ -64,7 +65,7 @@ public class KBFolderKBArticleSelector implements KBArticleSelector {
 			resourcePrimKey, WorkflowConstants.STATUS_APPROVED);
 
 		if ((kbArticle == null) || !isDescendant(kbArticle, ancestorKBFolder)) {
-			KBArticleSelection kbArticleSelection = _findFirstKBArticle(
+			KBArticleSelection kbArticleSelection = findFirstKBArticle(
 				groupId, ancestorKBFolder, preferredKBFolderUrlTitle);
 
 			if (resourcePrimKey == 0) {
@@ -138,7 +139,7 @@ public class KBFolderKBArticleSelector implements KBArticleSelector {
 			String urlTitle)
 		throws PortalException {
 
-		KBFolder kbFolder = _getCandidateKBFolder(
+		KBFolder kbFolder = getCandidateKBFolder(
 			groupId, preferredKBFolderUrlTitle, ancestorKBFolder,
 			kbFolderUrlTitle);
 
@@ -157,35 +158,7 @@ public class KBFolderKBArticleSelector implements KBArticleSelector {
 		return new KBArticleSelection(kbArticle, keywords);
 	}
 
-	protected boolean isDescendant(KBArticle kbArticle, KBFolder kbFolder)
-		throws PortalException {
-
-		if (kbFolder.getKbFolderId() ==
-				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-
-			return true;
-		}
-
-		if (kbArticle.getKbFolderId() ==
-				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-
-			return false;
-		}
-
-		KBFolder parentKBFolder = _kbFolderService.getKBFolder(
-			kbArticle.getKbFolderId());
-
-		List<Long> ancestorKBFolderIds =
-			parentKBFolder.getAncestorKBFolderIds();
-
-		if (ancestorKBFolderIds.contains(kbFolder.getKbFolderId())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private KBArticleSelection _findFirstKBArticle(
+	protected KBArticleSelection findFirstKBArticle(
 			long groupId, KBFolder ancestorKBFolder,
 			String preferredKBFolderUrlTitle)
 		throws PortalException {
@@ -221,7 +194,7 @@ public class KBFolderKBArticleSelector implements KBArticleSelector {
 		return new KBArticleSelection(kbArticle, true);
 	}
 
-	private KBFolder _getCandidateKBFolder(
+	protected KBFolder getCandidateKBFolder(
 			long groupId, String preferredKBFolderUrlTitle,
 			KBFolder ancestorKBFolder, String kbFolderUrlTitle)
 		throws PortalException {
@@ -256,6 +229,34 @@ public class KBFolderKBArticleSelector implements KBArticleSelector {
 		}
 
 		return kbFolder;
+	}
+
+	protected boolean isDescendant(KBArticle kbArticle, KBFolder kbFolder)
+		throws PortalException {
+
+		if (kbFolder.getKbFolderId() ==
+				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+
+			return true;
+		}
+
+		if (kbArticle.getKbFolderId() ==
+				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+
+			return false;
+		}
+
+		KBFolder parentKBFolder = _kbFolderService.getKBFolder(
+			kbArticle.getKbFolderId());
+
+		List<Long> ancestorKBFolderIds =
+			parentKBFolder.getAncestorKBFolderIds();
+
+		if (ancestorKBFolderIds.contains(kbFolder.getKbFolderId())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Reference

@@ -1,66 +1,59 @@
-@default = "clickAt"
-definition {
+<definition default="clickAt">
+	<command name="clickAt">
+		<execute selenium="waitForVisible" />
 
-	function clickAt {
-		selenium.waitForVisible();
+		<execute selenium="mouseOver" />
 
-		selenium.mouseOver();
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
 
-		if (selenium.isChecked()) {
-			selenium.clickAt();
-		}
+		<execute function="AssertNotChecked#assertNotChecked" />
+	</command>
 
-		AssertNotChecked.assertNotChecked();
-	}
+	<command name="uncheckNoError">
+		<execute selenium="waitForVisible" />
 
-	function uncheckNotVisible {
-		selenium.waitForElementPresent();
+		<execute selenium="mouseOver" />
 
-		selenium.mouseOver();
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
 
-		if (selenium.isChecked()) {
-			selenium.clickAt();
+		<execute function="AssertNotChecked#assertNotChecked" />
+	</command>
 
-			selenium.pause("1000");
-		}
+	<command name="uncheckToggleSwitch">
+		<execute selenium="waitForElementPresent" />
 
-		selenium.assertNotChecked();
-	}
+		<execute selenium="mouseOver" />
 
-	function uncheckToggleSwitch {
-		selenium.waitForElementPresent();
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
 
-		selenium.mouseOver();
+		<execute function="AssertNotChecked#assertNotCheckedToggleSwitch" />
+	</command>
 
-		if (selenium.isChecked()) {
-			selenium.clickAt();
-		}
+	<command name="uncheckToggleSwitchNoErrorNoAssert">
+		<execute selenium="waitForElementPresent" />
 
-		AssertNotChecked.assertNotCheckedNotVisible();
-	}
+		<execute selenium="mouseOver" />
 
-	function uncheckToggleSwitchAndPause {
-		selenium.waitForElementPresent();
-
-		selenium.mouseOver();
-
-		if (selenium.isChecked()) {
-			selenium.clickAt();
-		}
-
-		selenium.pause("1000");
-
-		AssertNotChecked.assertNotCheckedNotVisible();
-	}
-
-	function uncheckToggleSwitchNoErrorNoAssert {
-		selenium.waitForElementPresent();
-
-		selenium.mouseOver();
-
-		if (selenium.isChecked()) {
-			selenium.clickAt();
-		}
-	}
-
-}
+		<if>
+			<condition selenium="isChecked" />
+			<then>
+				<execute selenium="clickAt" />
+			</then>
+		</if>
+	</command>
+</definition>

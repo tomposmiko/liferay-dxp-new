@@ -32,7 +32,6 @@ const RedirectButton = ({
 		<FieldBase {...otherProps}>
 			<div className="redirect-button text-center">
 				{title && <label>{title}</label>}
-
 				{message && (
 					<div
 						className="sheet-text"
@@ -41,14 +40,12 @@ const RedirectButton = ({
 						}}
 					/>
 				)}
-
 				<ClayButton
 					onClick={() => {
 						window.open(redirectURL);
 					}}
 				>
 					{buttonLabel}
-
 					<span className="inline-item inline-item-after">
 						<ClayIcon spritemap={spritemap} symbol="shortcut" />
 					</span>

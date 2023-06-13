@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Bryan Engler
@@ -82,17 +83,29 @@ public class FacetDiscounter {
 			return;
 		}
 
+		Stream<String> termsStream = _findTermsOfField(field);
+
+		termsStream.forEach(this::_exclude);
+	}
+
+	private void _exclude(String term) {
+		int exclusions = _getExclusions(term);
+
+		_excludedTermsMap.put(term, exclusions + 1);
+	}
+
+	private Stream<String> _findTermsOfField(Field field) {
 		FacetCollector facetCollector = _facet.getFacetCollector();
 
-		for (TermCollector termCollector : facetCollector.getTermCollectors()) {
-			String term = termCollector.getTerm();
+		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
 
-			if (FacetBucketUtil.isFieldInBucket(field, term, _facet)) {
-				int exclusions = _getExclusions(term);
+		Stream<TermCollector> termCollectorsStream = termCollectors.stream();
 
-				_excludedTermsMap.put(term, exclusions + 1);
-			}
-		}
+		Stream<String> termsStream = termCollectorsStream.map(
+			TermCollector::getTerm);
+
+		return termsStream.filter(
+			term -> FacetBucketUtil.isFieldInBucket(field, term, _facet));
 	}
 
 	private int _getExclusions(String term) {

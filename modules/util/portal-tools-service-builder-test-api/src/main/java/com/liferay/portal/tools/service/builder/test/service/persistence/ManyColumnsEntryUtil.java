@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the many columns entry service. This utility wraps <code>com.liferay.portal.tools.service.builder.test.service.persistence.impl.ManyColumnsEntryPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -273,9 +277,27 @@ public class ManyColumnsEntryUtil {
 	}
 
 	public static ManyColumnsEntryPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile ManyColumnsEntryPersistence _persistence;
+	private static ServiceTracker
+		<ManyColumnsEntryPersistence, ManyColumnsEntryPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			ManyColumnsEntryPersistence.class);
+
+		ServiceTracker<ManyColumnsEntryPersistence, ManyColumnsEntryPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<ManyColumnsEntryPersistence, ManyColumnsEntryPersistence>(
+						bundle.getBundleContext(),
+						ManyColumnsEntryPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

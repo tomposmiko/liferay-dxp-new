@@ -304,6 +304,11 @@ public class StagedExpandoTableImpl implements StagedExpandoTable {
 		return _expandoTable.toUnescapedModel();
 	}
 
+	@Override
+	public String toXmlString() {
+		return _expandoTable.toXmlString();
+	}
+
 	private String _className;
 	private ExpandoTable _expandoTable;
 

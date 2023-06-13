@@ -16,6 +16,8 @@ package com.liferay.user.associated.data.web.internal.configuration;
 
 import java.io.IOException;
 
+import java.util.Optional;
+
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -25,20 +27,22 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Drew Brokke
  */
-@Component(service = AnonymousUserConfigurationRetriever.class)
+@Component(
+	immediate = true, service = AnonymousUserConfigurationRetriever.class
+)
 public class AnonymousUserConfigurationRetriever {
 
-	public Configuration get(long companyId)
+	public Optional<Configuration> getOptional(long companyId)
 		throws InvalidSyntaxException, IOException {
 
 		String filterString = String.format(
 			"(&(service.factoryPid=%s)(companyId=%s))", _getFactoryPid(),
 			companyId);
 
-		return _get(filterString);
+		return _getOptional(filterString);
 	}
 
-	public Configuration get(long companyId, long userId)
+	public Optional<Configuration> getOptional(long companyId, long userId)
 		throws InvalidSyntaxException, IOException {
 
 		String filterString = String.format(
@@ -46,24 +50,24 @@ public class AnonymousUserConfigurationRetriever {
 			_getFactoryPid(), String.valueOf(companyId),
 			String.valueOf(userId));
 
-		return _get(filterString);
+		return _getOptional(filterString);
 	}
 
-	private Configuration _get(String filterString)
+	private String _getFactoryPid() {
+		return AnonymousUserConfiguration.class.getName() + ".scoped";
+	}
+
+	private Optional<Configuration> _getOptional(String filterString)
 		throws InvalidSyntaxException, IOException {
 
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
 			filterString);
 
 		if (configurations == null) {
-			return null;
+			return Optional.empty();
 		}
 
-		return configurations[0];
-	}
-
-	private String _getFactoryPid() {
-		return AnonymousUserConfiguration.class.getName() + ".scoped";
+		return Optional.of(configurations[0]);
 	}
 
 	@Reference

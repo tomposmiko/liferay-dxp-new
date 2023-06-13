@@ -54,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=knowledge-base-portlet knowledge-base-portlet-article",
@@ -68,14 +69,13 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.always-send-redirect=true",
 		"javax.portlet.init-param.copy-request-parameters=true",
-		"javax.portlet.init-param.template-path=/META-INF/resources/",
-		"javax.portlet.init-param.view-template=/knowledge_base/view",
+		"javax.portlet.init-param.template-path=/article/",
+		"javax.portlet.init-param.view-template=/article/view.jsp",
 		"javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_ARTICLE,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
 		"javax.portlet.supported-public-render-parameter=categoryId",
-		"javax.portlet.supported-public-render-parameter=tag",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supported-public-render-parameter=tag"
 	},
 	service = Portlet.class
 )
@@ -88,7 +88,7 @@ public class ArticlePortlet extends BaseKBPortlet {
 		String actionName = ParamUtil.getString(
 			actionRequest, ActionRequest.ACTION_NAME);
 
-		if (actionName.equals("/knowledge_base/delete_kb_article")) {
+		if (actionName.equals("deleteKBArticle")) {
 			return;
 		}
 
@@ -109,7 +109,7 @@ public class ArticlePortlet extends BaseKBPortlet {
 			SessionErrors.contains(
 				renderRequest, PrincipalException.getNestedClasses())) {
 
-			include("/admin/common/error.jsp", renderRequest, renderResponse);
+			include(templatePath + "error.jsp", renderRequest, renderResponse);
 		}
 		else {
 			super.doDispatch(renderRequest, renderResponse);
@@ -139,21 +139,25 @@ public class ArticlePortlet extends BaseKBPortlet {
 
 			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
 		}
-		catch (NoSuchArticleException | PrincipalException exception) {
-			SessionErrors.add(renderRequest, exception.getClass());
+		catch (Exception exception) {
+			if (exception instanceof NoSuchArticleException ||
+				exception instanceof PrincipalException) {
 
-			SessionMessages.add(
-				renderRequest,
-				portal.getPortletId(renderRequest) +
-					SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
-		}
-		catch (PortalException portalException) {
-			throw new PortletException(portalException);
+				SessionErrors.add(renderRequest, exception.getClass());
+
+				SessionMessages.add(
+					renderRequest,
+					portal.getPortletId(renderRequest) +
+						SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
+			}
+			else {
+				throw new PortletException(exception);
+			}
 		}
 	}
 
 	protected long getResourcePrimKey(RenderRequest renderRequest)
-		throws PortalException {
+		throws Exception {
 
 		PortletPreferences preferences = renderRequest.getPreferences();
 
@@ -173,7 +177,7 @@ public class ArticlePortlet extends BaseKBPortlet {
 			return 0;
 		}
 
-		long resourcePrimKey = _getResourcePrimKeyFromUrlTitle(renderRequest);
+		long resourcePrimKey = getResourcePrimKeyFromUrlTitle(renderRequest);
 
 		if (resourcePrimKey == 0) {
 			resourcePrimKey = ParamUtil.getLong(
@@ -197,7 +201,7 @@ public class ArticlePortlet extends BaseKBPortlet {
 		return defaultValue;
 	}
 
-	private long _getResourcePrimKeyFromUrlTitle(RenderRequest renderRequest)
+	protected long getResourcePrimKeyFromUrlTitle(RenderRequest renderRequest)
 		throws PortalException {
 
 		String urlTitle = ParamUtil.getString(renderRequest, "urlTitle");
@@ -229,7 +233,20 @@ public class ArticlePortlet extends BaseKBPortlet {
 		return 0;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setKBArticleLocalService(
+		KBArticleLocalService kbArticleLocalService) {
+
+		_kbArticleLocalService = kbArticleLocalService;
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.knowledge.base.web)(&(release.schema.version>=1.2.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
 	private KBArticleLocalService _kbArticleLocalService;
 
 	@Reference(
@@ -240,10 +257,5 @@ public class ArticlePortlet extends BaseKBPortlet {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.knowledge.base.web)(&(release.schema.version>=1.2.0)(!(release.schema.version>=2.0.0))))"
-	)
-	private Release _release;
 
 }

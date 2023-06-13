@@ -15,12 +15,12 @@
 package com.liferay.portal.search.internal.spi.model.index.contributor;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.util.ExpandoBridgeIndexer;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
-import com.liferay.portal.search.expando.ExpandoBridgeIndexer;
 import com.liferay.portal.search.spi.model.index.contributor.ExpandoBridgeRetriever;
 
 import org.osgi.framework.BundleContext;
@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = DocumentContributor.class)
+@Component(immediate = true, service = DocumentContributor.class)
 public class ExpandoBridgeDocumentContributor
 	implements DocumentContributor<ExpandoBridge> {
 
@@ -41,7 +41,7 @@ public class ExpandoBridgeDocumentContributor
 		Document document, BaseModel<ExpandoBridge> baseModel) {
 
 		ExpandoBridgeRetriever expandoBridgeRetriever =
-			_serviceTrackerMap.getService(baseModel.getModelClassName());
+			_expandoBridgeIndexers.getService(baseModel.getModelClassName());
 
 		ExpandoBridge expandoBridge = null;
 
@@ -57,19 +57,19 @@ public class ExpandoBridgeDocumentContributor
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+		_expandoBridgeIndexers = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, ExpandoBridgeRetriever.class, "indexer.class.name");
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_expandoBridgeIndexers.close();
 	}
 
 	@Reference
 	protected ExpandoBridgeIndexer expandoBridgeIndexer;
 
 	private ServiceTrackerMap<String, ExpandoBridgeRetriever>
-		_serviceTrackerMap;
+		_expandoBridgeIndexers;
 
 }

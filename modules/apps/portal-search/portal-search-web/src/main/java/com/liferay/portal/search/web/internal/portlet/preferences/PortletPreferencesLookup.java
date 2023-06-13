@@ -17,6 +17,8 @@ package com.liferay.portal.search.web.internal.portlet.preferences;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 
+import java.util.Optional;
+
 import javax.portlet.PortletPreferences;
 
 /**
@@ -24,7 +26,7 @@ import javax.portlet.PortletPreferences;
  */
 public interface PortletPreferencesLookup {
 
-	public PortletPreferences fetchPreferences(
+	public Optional<PortletPreferences> fetchPreferences(
 		Portlet portlet, ThemeDisplay themeDisplay);
 
 }

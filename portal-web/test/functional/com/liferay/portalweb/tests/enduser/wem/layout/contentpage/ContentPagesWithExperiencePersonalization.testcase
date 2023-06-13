@@ -3,582 +3,56 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testcase.url = "http://localhost:8080";
 	property testray.main.component.name = "Content Pages";
 
-	static var randomSiteName = StringUtil.randomString(8);
-
-	var siteURLKey = StringUtil.toLowerCase(${randomSiteName});
-
 	setUp {
-		task ("Sign in") {
+		task ("Set up instance and sign in") {
+			TestCase.setUpPortalInstance();
+
 			User.firstLoginPG();
 		}
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = ${randomSiteName});
+		task ("Add a site via JSON") {
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
-				groupName = ${randomSiteName},
-				layoutName = "Test Page Name",
+				groupName = "Test Site Name",
+				layoutName = "Test Content Page Name",
 				type = "content");
 		}
 	}
 
-	@description = "LPS-157033 Given the View mode of a page When an experience is active in the Control Menu Then the ACTIVE label will appear next to the experience name"
-	@priority = 3
-	test ActiveExperienceLabelInControlMenu {
-		task ("Create an experience and add on content page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-			ContentPages.gotoPageEditor();
-
-			PageEditor.addExperience(
-				experienceName = "NewAnyoneExperience",
-				segmentName = "Anyone");
-
-			PageEditor.prioritizeExperience(experienceName = "NewAnyoneExperience");
-
-			PageEditor.publish();
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
 		}
-
-		task ("Go to the view mode of the page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-		}
-
-		task ("Switch to the new experience") {
-			ContentPages.changeExperience(experienceName = "NewAnyoneExperience");
-		}
-
-		task ("Assert the Active label is present") {
-			PageEditor.viewExperienceActiveInViewModeControlMenu(experienceName = "NewAnyoneExperience");
-		}
-	}
-
-	@description = "LPS-157033 Given the View mode of a page When the Experience dropdown menu is displayed And there experiences active Then the ACTIVE label will appear next to each experience name active"
-	@priority = 3
-	test ActiveExperienceLabelInViewDropdown {
-		task ("Create an experience and add on content page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			ContentPages.gotoPageEditor();
-
-			PageEditor.addExperience(
-				experienceName = "NewAnyoneExperience",
-				segmentName = "Anyone");
-
-			PageEditor.prioritizeExperience(experienceName = "NewAnyoneExperience");
-
-			PageEditor.publish();
-		}
-
-		task ("Go to the view mode of the page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-		}
-
-		task ("Assert the Active label is present") {
-			PageEditor.viewExperienceActiveInViewModeDropdown(experienceName = "NewAnyoneExperience");
-		}
-	}
-
-	@description = "This is a test for LPS-142290. The user cannot modify experiences at view mode."
-	@priority = 4
-	test CannotModifyExperienceAtViewMode {
-		task ("Add a Button fragment to a content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Button");
-		}
-
-		task ("Add a new experience") {
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("Add a Heading fragment below the Button then publish") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading",
-				targetFragmentName = "Button");
-
-			PageEditor.publish();
-		}
-
-		task ("View cannot prioritize, deprioritize, edit, duplicate, delete experiences at view mode") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			ContentPages.openExperienceMenu();
-
-			for (var experienceName : list "Default,New Experience") {
-				MenuItem.viewPresent(menuItem = ${experienceName});
-			}
-
-			for (var action : list "Prioritize,Deprioritize,Edit,Duplicate,Delete") {
-				AssertElementNotPresent(
-					ariaLabel = "${action} Experience",
-					locator1 = "Button#ANY_WITH_ARIA_LABEL");
-			}
-		}
-	}
-
-	@description = "This is a test for LPS-142290. The user cannot modify experiences on preview draft page."
-	@priority = 4
-	test CannotModifyExperiencesOnPreviewDraftPage {
-		task ("Add a Button fragment to a content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Button");
-		}
-
-		task ("Add a new experience") {
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("Add a Heading fragment below the Button") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading",
-				targetFragmentName = "Button");
-		}
-
-		task ("View cannot prioritize, deprioritize, edit, duplicate, delete experiences on preview draft page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Preview Draft",
-				pageName = "Test Page Name");
-
-			SelectWindow.selectPopUp(locator1 = "null");
-
-			ControlMenu.viewHeaderDraftTitle(headerTitle = "Test Page Name");
-
-			ControlMenu.viewHeaderTitleLabel(headerTitleLabel = "Draft");
-
-			ContentPages.openExperienceMenu();
-
-			for (var experienceName : list "Default,New Experience") {
-				MenuItem.viewPresent(menuItem = ${experienceName});
-			}
-
-			for (var action : list "Prioritize,Deprioritize,Edit,Duplicate,Delete") {
-				AssertElementNotPresent(
-					ariaLabel = "${action} Experience",
-					locator1 = "Button#ANY_WITH_ARIA_LABEL");
-			}
-		}
-	}
-
-	@description = "This is a test for LPS-140483. The site admin could create page template from content page based on non-default experience."
-	@priority = 4
-	test CreatePageTemplateFromContentPageBasedOnNonDefaultExperience {
-		task ("Add a page template collection") {
-			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
-				groupName = ${randomSiteName},
-				layoutPageTemplateCollectionName = "Page Template Collection");
-		}
-
-		task ("Add a new experience for Anyone") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("Add a Heading fragment to content page based on new experience") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-		}
-
-		task ("View the info shown in Create Page Template modal then create a content page template under page template collection") {
-			PageEditor.createPageTemplate(
-				collectionName = "Page Template Collection",
-				experienceName = "New Experience");
-		}
-
-		task ("View the content page template shown in Page Templates admin") {
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = ${siteURLKey});
-
-			Navigator.gotoNavNested(navNested = "Page Template Collection");
-
-			PageTemplatesAdmin.viewPageTemplatePresent(pageTemplateName = "Test Page Name - Page Template");
-
-			PageTemplatesAdmin.viewEntryWorkflowStatus(
-				entry = "Test Page Name - Page Template",
-				workflowStatus = "Draft");
-		}
-
-		task ("View the Heading is shown in content page template") {
-			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Test Page Name - Page Template");
-
-			PageEditor.viewFragment(fragmentName = "Heading");
-		}
-	}
-
-	@description = "LPS-157033 Given the View mode of a page When an experience is inactive in the Control Menu Then the INACTIVE label will appear next to the experience name"
-	@priority = 3
-	test InactiveExperienceLabelInControlMenu {
-		task ("Create an experience and add on content page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			ContentPages.gotoPageEditor();
-
-			PageEditor.addExperience(
-				experienceName = "NewAnyoneExperience",
-				segmentName = "Anyone");
-
-			PageEditor.publish();
-		}
-
-		task ("Go to the view mode of the page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-		}
-
-		task ("Switch to the new experience") {
-			ContentPages.changeExperience(experienceName = "NewAnyoneExperience");
-		}
-
-		task ("Assert the Inactive label is present") {
-			PageEditor.viewExperienceNotActiveInViewModeControlMenu(experienceName = "NewAnyoneExperience");
-		}
-	}
-
-	@description = "LPS-157033 Given the View mode of a page When the Experience dropdown menu is displayed And there experiences inactive Then the INACTIVE label will appear next to each experience name inactive"
-	@priority = 3
-	test InactiveExperienceLabelInViewDropdown {
-		task ("Create an experience and add on content page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			ContentPages.gotoPageEditor();
-
-			PageEditor.addExperience(
-				experienceName = "NewAnyoneExperience",
-				segmentName = "Anyone");
-
-			PageEditor.publish();
-		}
-
-		task ("Go to the view mode of the page") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-		}
-
-		task ("Assert the Inactive label is present") {
-			PageEditor.viewExperienceNotActiveInViewModeDropdown(experienceName = "NewAnyoneExperience");
-		}
-	}
-
-	@description = "This is a test for LPS-153367. The page creator could preview current experience in a new tab."
-	@priority = 4
-	test PreviewCurrentExperienceInANewTab {
-		task ("Given a page creator has a Heading fragment on a content page with a new experience") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("When the page creator edits the inline text of Heading in the new experience") {
-			PageEditor.editFragmentText(
-				fragmentName = "Heading",
-				id = "element-text",
-				text = "New editable fragment text");
-		}
-
-		task ("Then the page creator could preview current experience in a new tab") {
-			PageEditor.previewInANewTab();
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "New editable fragment text");
-		}
-	}
-
-	@description = "This is a test for LPS-142290. The user can switch experiences at view mode."
-	@priority = 4
-	test SwitchExperienceAtViewMode {
-		task ("Add a Button fragment to a content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Button");
-		}
-
-		task ("Add a new experience") {
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("Add a Heading fragment below the Button then publish") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading",
-				targetFragmentName = "Button");
-
-			PageEditor.publish();
-		}
-
-		task ("View the current experience is Default at view mode") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			ContentPages.viewCurrentExperience(experienceName = "Default");
-
-			AssertElementNotPresent(
-				fragmentName = "heading",
-				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-		}
-
-		task ("Switch to the new experience") {
-			ContentPages.changeExperience(experienceName = "New Experience");
-		}
-
-		task ("View both Button and Heading fragments are shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
-		}
-
-		task ("View the order of experiences at view mode") {
-			ContentPages.viewExperienceOrder(experienceNameList = "Default,New Experience");
-		}
-
-		task ("Prioritize the new experience in page editor") {
-			ContentPages.gotoPageEditor();
-
-			PageEditor.prioritizeExperience(experienceName = "New Experience");
-
-			PageEditor.clickBack();
-		}
-
-		task ("View the new order of experiences at view mode") {
-			ContentPages.viewExperienceOrder(experienceNameList = "New Experience,Default");
-		}
-
-		task ("View both Button and Heading fragments are shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
-		}
-
-		task ("Switch back to the default experience") {
-			ContentPages.changeExperience(experienceName = "Default");
-		}
-
-		task ("View only Button fragment is shown") {
-			AssertElementNotPresent(
-				fragmentName = "heading",
-				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-		}
-	}
-
-	@description = "This is a test for LPS-142290. The user can switch experiences on preview draft page."
-	@priority = 4
-	test SwitchExperienceOnPreviewDraftPage {
-		task ("Add a Button fragment to a content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Button");
-		}
-
-		task ("Add a new experience") {
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("Add a Heading fragment to below the Button") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading",
-				targetFragmentName = "Button");
-		}
-
-		task ("View the current experience is Default on preview draft page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = ${siteURLKey});
-
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Preview Draft",
-				pageName = "Test Page Name");
-
-			SelectWindow.selectPopUp(locator1 = "null");
-
-			ControlMenu.viewHeaderDraftTitle(headerTitle = "Test Page Name");
-
-			ControlMenu.viewHeaderTitleLabel(headerTitleLabel = "Draft");
-
-			ContentPages.viewCurrentExperience(experienceName = "Default");
-
-			AssertElementNotPresent(
-				fragmentName = "heading",
-				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-		}
-
-		task ("Switch to the new experience") {
-			ContentPages.changeExperience(experienceName = "New Experience");
-		}
-
-		task ("View both Button and Heading fragments are shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
-		}
-
-		task ("View the order of experiences on preview draft page") {
-			ContentPages.viewExperienceOrder(experienceNameList = "Default,New Experience");
-		}
-
-		task ("Prioritize the new experience in page editor") {
-			ContentPages.gotoPageEditor();
-
-			PageEditor.prioritizeExperience(experienceName = "New Experience");
-
-			PageEditor.clickBack();
-		}
-
-		task ("View the new order of experiences on preview draft page") {
-			ContentPages.viewExperienceOrder(experienceNameList = "New Experience,Default");
-		}
-
-		task ("View both Button and Heading fragments are shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
-		}
-
-		task ("Switch back to the default experience") {
-			ContentPages.changeExperience(experienceName = "Default");
-		}
-
-		task ("View only Button fragment is shown") {
-			AssertElementNotPresent(
-				fragmentName = "heading",
-				id = "element-text",
-				index = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
 	@description = "This is a test for LPS-128810. View collection items on content page when select segment."
-	@priority = 4
+	@priority = "4"
 	test ViewCollectionItemsOnContentPageWhenSelectSegment {
-		property ci.retries.disabled = "true";
-
 		task ("Add a segment with a Regular Role field") {
 			var roleId = JSONPermissionSetter.setRoleId(roleTitle = "Owner");
 
 			JSONSegmentsentry.addSegment(
 				fieldName = "Regular Role",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				operator = "equals",
 				segmentName = "New Segment",
-				text = ${roleId});
+				text = "${roleId}");
 		}
 
 		task ("Add a web content without tag") {
 			JSONWebcontent.addWebContent(
 				content = "Web Content Content",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				title = "Web Content Title 1");
 		}
 
@@ -586,20 +60,20 @@ definition {
 			JSONWebcontent.addWebContent(
 				assetTagNames = "tag name",
 				content = "Web Content Content",
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				title = "Web Content Title 2");
 		}
 
 		task ("Add a dynamic collection for Web Content Article and Basic Web Content") {
 			JSONAssetlist.addDynamicAssetListEntryWithItemType(
-				groupName = ${randomSiteName},
+				groupName = "Test Site Name",
 				itemSubtype = "Basic Web Content",
 				itemType = "Web Content Article",
 				title = "Dynamic Collection");
 		}
 
 		task ("Add a new personalized variation with new segment") {
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = ${siteURLKey});
+			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
 
 			AssetListsAdmin.editAssetList(assetListTitle = "Dynamic Collection");
 
@@ -617,15 +91,15 @@ definition {
 		}
 
 		task ("View both web contents shown in collection items when select Anyone personalized variation") {
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = ${siteURLKey});
+			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
 
-			AssetListsAdmin.viewContent(
+			AssetListsAdmin.viewCollectionItems(
 				assetListTitle = "Dynamic Collection",
 				assetTitleList = "Web Content Title 1,Web Content Title 2");
 		}
 
 		task ("View only the web content with tag is shown in collection items when select New Segment personalized variation") {
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = ${siteURLKey});
+			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
 
 			AssetListsAdmin.viewContent(
 				assetListTitle = "Dynamic Collection",
@@ -633,7 +107,7 @@ definition {
 				assetType = "Web Content Article",
 				personalizedVariation = "New Segment");
 
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = ${siteURLKey});
+			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
 
 			AssetListsAdmin.viewNoContent(
 				assetListTitle = "Dynamic Collection",
@@ -644,8 +118,8 @@ definition {
 
 		task ("Add a Collection Display fragment to content page") {
 			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
 			PageEditor.addFragment(
 				collectionName = "Content Display",
@@ -671,22 +145,24 @@ definition {
 				fragmentName = "Heading",
 				id = "element-text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View both web contents shown in simulation modal by default") {
 			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
 			MobileDevice.previewPG();
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title 2,Web Content Title 1") {
-				ContentPages.viewFragmentTextInCollectionDisplay(
-					row = ${n},
-					text = ${title});
+				AssertVisible(
+					key_colPosition = "1",
+					key_entryContent = "${title}",
+					key_rowPosition = "${n}",
+					locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 				var n = ${n} + 1;
 			}
@@ -703,182 +179,27 @@ definition {
 		task ("View only the web content with tag shown in simulation modal when select segment") {
 			SelectFrame.selectFrameNoLoading(locator1 = "ControlMenuPreviewPanel#PREVIEW_DEVICE_GENERAL_IFRAME");
 
-			ContentPages.viewFragmentTextInCollectionDisplay(text = "Web Content Title 2");
+			AssertVisible(
+				key_colPosition = "1",
+				key_entryContent = "Web Content Title 2",
+				key_rowPosition = "1",
+				locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 			AssertElementNotPresent(
-				column = 1,
-				locator1 = "Fragment#FRAGMENT_TEXT_IN_COLLECTION_DISPLAY",
-				row = 2);
-		}
-	}
-
-	@description = "This is a test for LPS-141773. Able to land in the experience selected at view mode in page editor."
-	@priority = 5
-	test ViewExperienceInViewMode {
-		property portal.acceptance = "true";
-
-		task ("Add a Button fragment to a content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Button");
-		}
-
-		task ("Add a new experience") {
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("Add a Heading fragment below the Button then publish") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading",
-				targetFragmentName = "Button");
-
-			PageEditor.publish();
-		}
-
-		task ("View the page and view the new experience shown in experience selector") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			ContentPages.changeExperience(experienceName = "New Experience");
-		}
-
-		task ("Open the preview modal and View the new experience shown in experience selector") {
-			ContentPages.gotoPageEditor();
-
-			PageEditor.previewInANewTab();
-
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
-		}
-
-		task ("Back to view page mode and view the new experience still shown in experience selector") {
-			Close.closeWindow();
-
-			PageEditor.clickBack();
-
-			ContentPages.openExperienceMenu();
-
-			MenuItem.viewPresent(menuItem = "New Experience");
-		}
-	}
-
-	@description = "This is a test for LPS-141773. Able to land in the experience selected at preview draft page in page editor."
-	@priority = 5
-	test ViewExperienceSelectedInPreviewDraftPage {
-		property portal.acceptance = "true";
-
-		task ("Add a Button fragment to a content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Button");
-		}
-
-		task ("Add a new experience") {
-			PageEditor.addExperience(
-				experienceName = "New Experience",
-				segmentName = "Anyone");
-		}
-
-		task ("Add a Heading fragment below the Button then publish") {
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading",
-				targetFragmentName = "Button");
-
-			PageEditor.publish();
-		}
-
-		task ("Edit the inline text of Button in Default experience") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
-
-			PageEditor.editFragmentText(
-				fragmentName = "Button",
-				id = "link",
-				text = "Edited Text");
-		}
-
-		task ("Edit the inline text of Heading in new experience") {
-			PageEditor.changeExperience(newExperience = "New Experience");
-
-			PageEditor.editFragmentText(
-				fragmentName = "Heading",
-				id = "element-text",
-				text = "Edited Heading Example");
-		}
-
-		task ("Navigate to preview draft page via Page Tree") {
-			PagesFinder.goToPagesFinder();
-
-			PagesFinder.gotoPageEllipsisItem(
-				item = "Preview Draft",
-				pageName = "Test Page Name*");
-		}
-
-		task ("Change to new experience and view the new experience shown in experience selector") {
-			SelectWindow.selectPopUp(locator1 = "null");
-
-			ContentPages.changeExperience(experienceName = "New Experience");
-
-			ContentPages.viewCurrentExperience(experienceName = "New Experience");
-		}
-
-		task ("Open the preview modal and View the new experience selected in experience selector") {
-			ContentPages.gotoPageEditor();
-
-			PageEditor.previewInANewTab();
-
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Edited Heading Example");
-		}
-
-		task ("Back to view page mode and view the new experience still selected in experience selector") {
-			Close.closeWindow();
-
-			SelectWindow.selectPopUp(locator1 = "null");
-
-			PageEditor.clickBack();
-
-			ContentPages.viewCurrentExperience(experienceName = "New Experience");
+				key_colPosition = "1",
+				key_entryContent = "Web Content Title 1",
+				key_rowPosition = "2",
+				locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 		}
 	}
 
 	@description = "This is a test for LPS-122148. Only the inline text items from current experience shown in Page Content panel."
-	@priority = 5
+	@priority = "5"
 	test ViewInlineTextItemsFromCurrentExperienceInPageContentPanel {
-		property portal.acceptance = "true";
-
 		task ("Add a new experience") {
 			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = ${randomSiteName});
+				pageName = "Content Page Name",
+				siteName = "Test Site Name");
 
 			PageEditor.addExperience(
 				experienceName = "New Experience",
@@ -915,7 +236,9 @@ definition {
 		}
 
 		task ("Select the Inline Text as content filter in Page Content panel") {
-			PageEditor.gotoTab(tabName = "Page Content");
+			PageEditor.gotoTab(tabName = "Browser");
+
+			Navigator.gotoNavTab(navTab = "Page Content");
 
 			PageEditor.selectContentFilter(filter = "Inline Text");
 		}

@@ -20,7 +20,7 @@ import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
 import com.liferay.commerce.health.status.CommerceHealthHttpStatus;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.health.status.display.order:Integer=90",
 		"commerce.health.status.key=" + CommerceHealthStatusConstants.CURRENCIES_COMMERCE_HEALTH_STATUS_KEY
@@ -57,11 +58,10 @@ public class CurrenciesCommerceHealthHttpStatus
 			httpServletRequest);
 
 		try {
-			_commerceCurrencyLocalService.importDefaultValues(
-				true, serviceContext);
+			_commerceCurrencyLocalService.importDefaultValues(serviceContext);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -70,7 +70,7 @@ public class CurrenciesCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.
 				CURRENCIES_COMMERCE_HEALTH_STATUS_DESCRIPTION);
@@ -87,7 +87,7 @@ public class CurrenciesCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.
 				CURRENCIES_COMMERCE_HEALTH_STATUS_KEY);
@@ -115,8 +115,5 @@ public class CurrenciesCommerceHealthHttpStatus
 
 	@Reference
 	private CommerceCurrencyLocalService _commerceCurrencyLocalService;
-
-	@Reference
-	private Language _language;
 
 }

@@ -33,9 +33,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.configuration.DefaultSearchResultPermissionFilterConfiguration;
 import com.liferay.portal.search.internal.facet.FacetPostProcessorImpl;
 import com.liferay.portal.search.internal.permission.DefaultSearchResultPermissionFilter;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.searcher.SearchRequest;
-import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
@@ -52,6 +49,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import org.mockito.AdditionalMatchers;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 /**
@@ -310,13 +308,9 @@ public abstract class BasePermissionFilteredPaginationTestCase
 			indexerRegistry, permissionChecker, props,
 			defaultSearchResultPermissionFilterConfiguration);
 
-		SearchRequestBuilderFactory searchRequestBuilderFactory =
-			_getSearchRequestBuilderFactory();
-
 		return new DefaultSearchResultPermissionFilter(
 			new FacetPostProcessorImpl(), indexerRegistry, permissionChecker,
 			props, relatedEntryIndexerRegistry, this::doSearch,
-			searchRequestBuilderFactory,
 			defaultSearchResultPermissionFilterConfiguration);
 	}
 
@@ -461,17 +455,17 @@ public abstract class BasePermissionFilteredPaginationTestCase
 
 		Mockito.when(
 			indexer.hasPermission(
-				Mockito.any(PermissionChecker.class), Mockito.anyString(),
-				Mockito.anyLong(), Mockito.anyString())
+				Matchers.any(PermissionChecker.class), Matchers.anyString(),
+				Matchers.anyLong(), Matchers.anyString())
 		).thenReturn(
 			true
 		);
 
 		Mockito.when(
 			indexer.hasPermission(
-				Mockito.any(PermissionChecker.class), Mockito.anyString(),
+				Matchers.any(PermissionChecker.class), Matchers.anyString(),
 				AdditionalMatchers.geq(_FILTERED_ENTRY_IDENTIFIER),
-				Mockito.anyString())
+				Matchers.anyString())
 		).thenReturn(
 			false
 		);
@@ -483,7 +477,7 @@ public abstract class BasePermissionFilteredPaginationTestCase
 		);
 
 		Mockito.when(
-			indexerRegistry.getIndexer(Mockito.anyString())
+			indexerRegistry.getIndexer(Matchers.anyString())
 		).thenReturn(
 			indexer
 		);
@@ -518,42 +512,6 @@ public abstract class BasePermissionFilteredPaginationTestCase
 
 	protected int permissionFilteredSearchResultAccurateCountThreshold;
 	protected int searchQueryResultWindowLimit;
-
-	private SearchRequestBuilderFactory _getSearchRequestBuilderFactory() {
-		SearchRequestBuilderFactory searchRequestBuilderFactory = Mockito.mock(
-			SearchRequestBuilderFactory.class);
-
-		SearchRequestBuilder searchRequestBuilder = Mockito.mock(
-			SearchRequestBuilder.class);
-
-		Mockito.when(
-			searchRequestBuilderFactory.builder(Mockito.any())
-		).thenReturn(
-			searchRequestBuilder
-		);
-
-		SearchRequest searchRequest = Mockito.mock(SearchRequest.class);
-
-		Mockito.when(
-			searchRequestBuilder.build()
-		).thenReturn(
-			searchRequest
-		);
-
-		Mockito.when(
-			searchRequest.getFrom()
-		).thenReturn(
-			0
-		);
-
-		Mockito.when(
-			searchRequest.getSize()
-		).thenReturn(
-			10
-		);
-
-		return searchRequestBuilderFactory;
-	}
 
 	private static final long _FILTERED_ENTRY_IDENTIFIER = 1000000;
 

@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Patrick Yeo
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class CadminTopHeadDynamicInclude extends BaseDynamicInclude {
 
 	@Override
@@ -48,7 +48,7 @@ public class CadminTopHeadDynamicInclude extends BaseDynamicInclude {
 			HttpServletResponse httpServletResponse, String key)
 		throws IOException {
 
-		if (!_isSignedIn()) {
+		if (!isSignedIn()) {
 			return;
 		}
 
@@ -61,7 +61,7 @@ public class CadminTopHeadDynamicInclude extends BaseDynamicInclude {
 				httpServletRequest);
 
 		printWriter.print(
-			absolutePortalURLBuilder.forBundleStylesheet(
+			absolutePortalURLBuilder.forModuleStylesheet(
 				_bundleContext.getBundle(), "clay_admin.css"
 			).build());
 
@@ -84,7 +84,7 @@ public class CadminTopHeadDynamicInclude extends BaseDynamicInclude {
 		_bundleContext = bundleContext;
 	}
 
-	private boolean _isSignedIn() {
+	protected boolean isSignedIn() {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 

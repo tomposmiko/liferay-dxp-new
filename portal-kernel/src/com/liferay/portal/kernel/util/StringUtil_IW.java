@@ -144,15 +144,6 @@ public class StringUtil_IW {
 		return StringUtil.extractLeadingDigits(s);
 	}
 
-	public java.lang.String getTitleCase(java.lang.String s, boolean allowDash,
-		java.lang.String... exceptions) {
-		return StringUtil.getTitleCase(s, allowDash, exceptions);
-	}
-
-	public byte[] hexStringToBytes(java.lang.String hexString) {
-		return StringUtil.hexStringToBytes(hexString);
-	}
-
 	public int indexOfAny(java.lang.String s, char[] chars) {
 		return StringUtil.indexOfAny(s, chars);
 	}

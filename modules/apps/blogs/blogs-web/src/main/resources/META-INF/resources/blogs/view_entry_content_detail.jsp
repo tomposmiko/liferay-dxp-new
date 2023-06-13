@@ -104,7 +104,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 											).buildString()
 										%>"
 									>
-										<span class="hide-accessible sr-only"><liferay-ui:message key="edit-entry" /></span>
+										<span class="hide-accessible"><liferay-ui:message key="edit-entry" /></span>
 
 										<clay:icon
 											symbol="pencil"
@@ -124,7 +124,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 
 						String entryUserURL = StringPool.BLANK;
 
-						if ((entryUser != null) && !entryUser.isGuestUser() && !user.isGuestUser()) {
+						if ((entryUser != null) && !entryUser.isDefaultUser() && !user.isDefaultUser()) {
 							entryUserURL = entryUser.getDisplayURL(themeDisplay);
 						}
 						%>
@@ -150,7 +150,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 									</div>
 
 									<div>
-										<span class="hide-accessible sr-only"><liferay-ui:message key="published-date" /></span><liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - entry.getStatusDate().getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
+										<span class="hide-accessible"><liferay-ui:message key="published-date" /></span><liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - entry.getStatusDate().getTime(), true) %>" key="x-ago" translateArguments="<%= false %>" />
 
 										<c:if test="<%= blogsPortletInstanceConfiguration.enableReadingTime() %>">
 											- <liferay-reading-time:reading-time displayStyle="descriptive" model="<%= entry %>" />
@@ -177,10 +177,14 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 		String coverImageURL = entry.getCoverImageURL(themeDisplay);
 		%>
 
-		<liferay-util:include page="/blogs/entry_cover_image_caption.jsp" servletContext="<%= application %>">
-			<liferay-util:param name="coverImageCaption" value="<%= entry.getCoverImageCaption() %>" />
-			<liferay-util:param name="coverImageURL" value="<%= coverImageURL %>" />
-		</liferay-util:include>
+		<c:if test="<%= Validator.isNotNull(coverImageURL) %>">
+
+			<%
+			String coverImageCaption = HtmlUtil.escapeAttribute(HtmlUtil.stripHtml(entry.getCoverImageCaption()));
+			%>
+
+			<div <c:if test="<%= Validator.isNotNull(coverImageCaption) %>">aria-label="<%= coverImageCaption %>" role="img"</c:if> class="aspect-ratio aspect-ratio-8-to-3 aspect-ratio-bg-cover cover-image" style="background-image: url(<%= coverImageURL %>);"></div>
+		</c:if>
 
 		<!-- text resume -->
 
@@ -248,13 +252,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 							<liferay-asset:asset-tags-summary
 								className="<%= BlogsEntry.class.getName() %>"
 								classPK="<%= entry.getEntryId() %>"
-								portletURL='<%=
-									PortletURLBuilder.createRenderURL(
-										renderResponse
-									).setRedirect(
-										ParamUtil.getString(request, "redirect")
-									).buildPortletURL()
-								%>'
+								portletURL="<%= renderResponse.createRenderURL() %>"
 							/>
 						</div>
 					</clay:col>
@@ -306,7 +304,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 
 		<%
 		if (searchContainer != null) {
-			searchContainer.setResultsAndTotal(searchContainer::getResults, searchContainer.getTotal() - 1);
+			searchContainer.setTotal(searchContainer.getTotal() - 1);
 		}
 		%>
 

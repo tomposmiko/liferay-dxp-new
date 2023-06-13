@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Tomas Polesovsky
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + GogoShellPortletKeys.GOGO_SHELL,
 	service = ControlPanelEntry.class
 )

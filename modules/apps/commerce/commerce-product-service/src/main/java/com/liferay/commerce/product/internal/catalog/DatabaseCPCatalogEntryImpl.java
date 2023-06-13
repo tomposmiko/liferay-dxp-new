@@ -20,6 +20,8 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -68,6 +70,16 @@ public class DatabaseCPCatalogEntryImpl implements CPCatalogEntry {
 		}
 
 		return cpSkus;
+	}
+
+	@Override
+	public String getDefaultImageFileUrl() {
+		try {
+			return _cpDefinition.getDefaultImageFileURL();
+		}
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
+		}
 	}
 
 	@Override

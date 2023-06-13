@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-alloy-editor-source',
 	(A) => {
-		const CSS_SHOW_SOURCE = 'show-source';
+		var CSS_SHOW_SOURCE = 'show-source';
 
-		const MAP_TOGGLE_STATE = {
+		var MAP_TOGGLE_STATE = {
 			false: {
 				iconCssClass: 'code',
 			},
@@ -26,13 +26,13 @@ AUI.add(
 			},
 		};
 
-		const STR_HOST = 'host';
+		var STR_HOST = 'host';
 
-		const STRINGS = 'strings';
+		var STRINGS = 'strings';
 
-		const STR_VALUE = 'value';
+		var STR_VALUE = 'value';
 
-		const LiferayAlloyEditorSource = A.Component.create({
+		var LiferayAlloyEditorSource = A.Component.create({
 			ATTRS: {
 				strings: {
 					value: {
@@ -51,19 +51,19 @@ AUI.add(
 
 			prototype: {
 				_createSourceEditor() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const sourceEditor = new A.LiferaySourceEditor({
+					var sourceEditor = new A.LiferaySourceEditor({
 						boundingBox: instance._editorSource,
 						mode: 'html',
 						on: {
 							themeSwitched(event) {
-								const editorSwitchTheme =
+								var editorSwitchTheme =
 									instance._editorSwitchTheme;
 
-								const nextTheme =
+								var nextTheme =
 									event.themes[event.nextThemeIndex];
 
 								editorSwitchTheme
@@ -85,11 +85,11 @@ AUI.add(
 				},
 
 				_getEditorStateLexiconIcon() {
-					const instance = this;
+					var instance = this;
 
-					let icon;
+					var icon;
 
-					const currentState = MAP_TOGGLE_STATE[instance._isVisible];
+					var currentState = MAP_TOGGLE_STATE[instance._isVisible];
 
 					if (currentState.icon) {
 						icon = currentState.icon.cloneNode(true);
@@ -106,12 +106,12 @@ AUI.add(
 				},
 
 				_getHTML() {
-					const instance = this;
+					var instance = this;
 
-					const sourceEditor = instance._sourceEditor;
+					var sourceEditor = instance._sourceEditor;
 
 					if (sourceEditor && instance._isVisible) {
-						const text = sourceEditor.get('value');
+						var text = sourceEditor.get('value');
 
 						return new A.Do.AlterReturn(
 							'Modified source editor text',
@@ -121,19 +121,19 @@ AUI.add(
 				},
 
 				_onEditorUpdate(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._toggleSourceSwitchFn(event.data.state);
 				},
 
 				_onFullScreenBtnClick() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
-					const strings = instance.get(STRINGS);
+					var host = instance.get(STR_HOST);
+					var strings = instance.get(STRINGS);
 
-					let fullScreenDialog = instance._fullScreenDialog;
-					let fullScreenEditor = instance._fullScreenEditor;
+					var fullScreenDialog = instance._fullScreenDialog;
+					var fullScreenEditor = instance._fullScreenEditor;
 
 					if (fullScreenDialog) {
 						fullScreenEditor.set('value', host.getHTML());
@@ -144,10 +144,10 @@ AUI.add(
 						Liferay.Util.openWindow(
 							{
 								dialog: {
-									'constrain': true,
-									'cssClass':
+									constrain: true,
+									cssClass:
 										'lfr-fulscreen-source-editor-dialog modal-full-screen',
-									'modal': true,
+									modal: true,
 									'toolbars.footer': [
 										{
 											label: strings.cancel,
@@ -211,7 +211,7 @@ AUI.add(
 				},
 
 				_onSwitchBlur() {
-					const instance = this;
+					var instance = this;
 
 					instance._isFocused = false;
 
@@ -221,7 +221,7 @@ AUI.add(
 				},
 
 				_onSwitchFocus() {
-					const instance = this;
+					var instance = this;
 
 					instance._isFocused = true;
 
@@ -231,21 +231,21 @@ AUI.add(
 				},
 
 				_onSwitchMouseDown() {
-					const instance = this;
+					var instance = this;
 
 					instance._isClicked = true;
 				},
 
 				_onSwitchMouseOut() {
-					const instance = this;
+					var instance = this;
 
 					instance._isClicked = false;
 				},
 
 				_setHTML(value) {
-					const instance = this;
+					var instance = this;
 
-					const sourceEditor = instance._sourceEditor;
+					var sourceEditor = instance._sourceEditor;
 
 					if (sourceEditor && instance._isVisible) {
 						sourceEditor.set(STR_VALUE, value);
@@ -253,16 +253,16 @@ AUI.add(
 				},
 
 				_switchMode(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._isClicked = false;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const editor = instance._sourceEditor;
+					var editor = instance._sourceEditor;
 
 					if (instance._isVisible) {
-						const content =
+						var content =
 							event.content ||
 							(editor ? editor.get(STR_VALUE) : '');
 
@@ -271,7 +271,7 @@ AUI.add(
 						instance._toggleEditorModeUI();
 					}
 					else if (editor) {
-						const currentContent = event.content || host.getHTML();
+						var currentContent = event.content || host.getHTML();
 
 						if (currentContent !== editor.get(STR_VALUE)) {
 							editor.set(STR_VALUE, currentContent);
@@ -285,19 +285,19 @@ AUI.add(
 				},
 
 				_switchTheme() {
-					const instance = this;
+					var instance = this;
 
 					instance._sourceEditor.switchTheme();
 				},
 
 				_toggleEditorModeUI() {
-					const instance = this;
+					var instance = this;
 
-					const editorFullscreen = instance._editorFullscreen;
-					const editorSwitch = instance._editorSwitch;
-					const editorSwitchContainer = editorSwitch.ancestor();
-					const editorSwitchTheme = instance._editorSwitchTheme;
-					const editorWrapper = instance._editorWrapper;
+					var editorFullscreen = instance._editorFullscreen;
+					var editorSwitch = instance._editorSwitch;
+					var editorSwitchContainer = editorSwitch.ancestor();
+					var editorSwitchTheme = instance._editorSwitchTheme;
+					var editorWrapper = instance._editorWrapper;
 
 					editorWrapper.toggleClass(CSS_SHOW_SOURCE);
 					editorSwitchContainer.toggleClass(CSS_SHOW_SOURCE);
@@ -324,9 +324,9 @@ AUI.add(
 				},
 
 				_toggleSourceSwitch(editorState) {
-					const instance = this;
+					var instance = this;
 
-					let showSourceSwitch = true;
+					var showSourceSwitch = true;
 
 					if (!instance._isClicked) {
 						showSourceSwitch =
@@ -341,21 +341,21 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
-					const sourceEditor = instance._sourceEditor;
+					var sourceEditor = instance._sourceEditor;
 
 					if (sourceEditor) {
 						sourceEditor.destroy();
 					}
 
-					const fullScreenEditor = instance._fullScreenEditor;
+					var fullScreenEditor = instance._fullScreenEditor;
 
 					if (fullScreenEditor) {
 						fullScreenEditor.destroy();
 					}
 
-					const fullScreenDialog = instance._fullScreenDialog;
+					var fullScreenDialog = instance._fullScreenDialog;
 
 					if (fullScreenDialog) {
 						fullScreenDialog.destroy();
@@ -365,9 +365,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
 					instance._editorFullscreen = host.one('#Fullscreen');
 					instance._editorSource = host.one('#Source');

@@ -46,6 +46,7 @@ import com.liferay.portal.reports.engine.console.service.EntryServiceUtil;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see EntryServiceSoap
  * @generated
  */
 public class EntryServiceHttp {

@@ -67,7 +67,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessorTest {
 
 		_group = GroupTestUtil.addGroup();
 
-		_layout = LayoutTestUtil.addTypePortletLayout(_group.getGroupId());
+		_layout = LayoutTestUtil.addLayout(_group.getGroupId());
 
 		LayoutTestUtil.addPortletToLayout(
 			TestPropsValues.getUserId(), _layout,
@@ -123,7 +123,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessorTest {
 		// Update asset vocabulary to have a different primary key. We will swap
 		// to the new one and verify it.
 
-		AssetVocabularyLocalServiceUtil.deleteVocabulary(
+		AssetVocabularyLocalServiceUtil.deleteAssetVocabulary(
 			assetVocabulary.getVocabularyId());
 
 		assetVocabulary = AssetTestUtil.addVocabulary(_group.getGroupId());
@@ -178,7 +178,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessorTest {
 		// Update asset vocabulary to have a different primary key. We will swap
 		// to the new one and verify it.
 
-		AssetCategoryLocalServiceUtil.deleteCategory(
+		AssetCategoryLocalServiceUtil.deleteAssetCategory(
 			assetCategory.getCategoryId());
 
 		assetCategory = AssetTestUtil.addCategory(

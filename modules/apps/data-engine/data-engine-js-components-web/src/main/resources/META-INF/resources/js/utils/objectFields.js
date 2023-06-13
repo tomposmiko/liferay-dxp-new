@@ -14,10 +14,10 @@
 
 import {fetch} from 'frontend-js-web';
 
-import {EVENT_TYPES} from '../custom/form/eventTypes';
+import {EVENT_TYPES} from '../custom/form/eventTypes.es';
 
 const HEADERS = {
-	'Accept': 'application/json',
+	Accept: 'application/json',
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
 	'Content-Type': 'application/json',
 };
@@ -38,13 +38,8 @@ const getURL = (path, params) => {
 };
 
 const fetchObjectFields = (objectDefinitionId) => {
-	const pathContext = themeDisplay.getPathContext();
-
 	return fetch(
-		getURL(
-			pathContext +
-				`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}`
-		),
+		getURL(`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}`),
 		{
 			headers: HEADERS,
 			method: 'GET',
@@ -52,7 +47,7 @@ const fetchObjectFields = (objectDefinitionId) => {
 	).then((response) => response.json());
 };
 
-export function getFieldsGroupedByTypes(fields) {
+export const getFieldsGroupedByTypes = (fields) => {
 	const types = fields.map(({type}) => type);
 	const uniqueTypes = types.filter(
 		(type, index) => types.indexOf(type) === index
@@ -64,9 +59,9 @@ export function getFieldsGroupedByTypes(fields) {
 			type: uniqueTypes,
 		};
 	});
-}
+};
 
-export async function addObjectFields(dispatch) {
+export const addObjectFields = async (dispatch) => {
 	const settingsDDMForm = await Liferay.componentReady('formSettingsAPI');
 	const objectDefinitionId = settingsDDMForm.reactComponentRef.current.getObjectDefinitionId();
 
@@ -75,12 +70,12 @@ export async function addObjectFields(dispatch) {
 
 		dispatch({
 			payload: {objectFields},
-			type: EVENT_TYPES.OBJECT.FIELDS_CHANGE,
+			type: EVENT_TYPES.OBJECT_FIELDS.ADD,
 		});
 	}
-}
+};
 
-export async function updateObjectFields(dispatch) {
+export const updateObjectFields = async (dispatch) => {
 	const settingsDDMForm = await Liferay.componentReady('formSettingsAPI');
 	const objectDefinitionId = settingsDDMForm.reactComponentRef.current.getObjectDefinitionId();
 
@@ -89,18 +84,18 @@ export async function updateObjectFields(dispatch) {
 
 		dispatch({
 			payload: {objectFields},
-			type: EVENT_TYPES.OBJECT.FIELDS_CHANGE,
+			type: EVENT_TYPES.OBJECT_FIELDS.ADD,
 		});
 	}
 	else {
 		dispatch({
 			payload: {objectFields: []},
-			type: EVENT_TYPES.OBJECT.FIELDS_CHANGE,
+			type: EVENT_TYPES.OBJECT_FIELDS.ADD,
 		});
 	}
-}
+};
 
-export function getSelectedValue(value) {
+export const getSelectedValue = (value) => {
 	if (typeof value === 'string' && value !== '') {
 		const newValue = JSON.parse(value);
 
@@ -108,11 +103,10 @@ export function getSelectedValue(value) {
 	}
 
 	return value[0];
-}
+};
 
-export function getObjectFieldName({settingsContext}) {
-	const getAdvancedColumn = ({title}) =>
-		title === Liferay.Language.get('advanced');
+export const getObjectFieldName = ({settingsContext}) => {
+	const getAdvancedColumn = ({title}) => title.toLowerCase() === 'advanced';
 	const fieldsFromAdvancedColumn = settingsContext.pages.find(
 		getAdvancedColumn
 	)?.rows[0].columns[0].fields;
@@ -126,4 +120,4 @@ export function getObjectFieldName({settingsContext}) {
 	);
 
 	return objectFieldName;
-}
+};

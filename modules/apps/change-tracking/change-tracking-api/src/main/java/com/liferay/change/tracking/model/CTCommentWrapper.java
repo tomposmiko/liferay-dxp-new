@@ -348,11 +348,6 @@ public class CTCommentWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CTCommentWrapper wrap(CTComment ctComment) {
 		return new CTCommentWrapper(ctComment);
 	}

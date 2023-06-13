@@ -23,7 +23,6 @@ import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.account.service.test.util.AccountEntryTestUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -38,10 +37,13 @@ import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -143,14 +145,16 @@ public class RoleModelListenerTest {
 	public void testDeleteCompany() throws Exception {
 		Company company = CompanyTestUtil.addCompany();
 
-		List<Long> requiredRoleIds = TransformUtil.transformToList(
-			AccountRoleConstants.REQUIRED_ROLE_NAMES,
-			requiredRoleName -> {
-				Role role = _roleLocalService.fetchRole(
-					company.getCompanyId(), requiredRoleName);
-
-				return role.getRoleId();
-			});
+		List<Long> requiredRoleIds = Stream.of(
+			AccountRoleConstants.REQUIRED_ROLE_NAMES
+		).map(
+			requiredRoleName -> _roleLocalService.fetchRole(
+				company.getCompanyId(), requiredRoleName)
+		).map(
+			Role::getRoleId
+		).collect(
+			Collectors.toList()
+		);
 
 		_companyLocalService.deleteCompany(company);
 
@@ -187,7 +191,8 @@ public class RoleModelListenerTest {
 
 	@Test(expected = ModelListenerException.class)
 	public void testDeleteRole() throws Exception {
-		AccountEntry accountEntry = AccountEntryTestUtil.addAccountEntry();
+		AccountEntry accountEntry = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService, WorkflowConstants.STATUS_APPROVED);
 
 		AccountRole accountRole = _accountRoleLocalService.addAccountRole(
 			TestPropsValues.getUserId(), accountEntry.getAccountEntryId(),

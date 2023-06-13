@@ -1,5 +1,12 @@
 {
 	"dependencies": {
+		"@clayui/icon": "3.37.0",
+		"@clayui/layout": "3.37.0",
+		"@clayui/sticker": "3.37.0",
+		"frontend-js-web": "*",
+		"prop-types": "15.7.2",
+		"react": "16.12.0",
+		"react-dom": "16.12.0"
 	},
 	"name": "sharing-taglib",
 	"private": true,
@@ -9,5 +16,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "3.0.27"
+	"version": "3.0.12"
 }

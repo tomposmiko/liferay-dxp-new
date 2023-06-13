@@ -17,7 +17,7 @@ import ClayDropDown from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
-import {openToast, sub} from 'frontend-js-web';
+import {openToast} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
@@ -27,7 +27,6 @@ import FragmentService from '../../../app/services/FragmentService';
 import deleteFragmentComment from '../../../app/thunks/deleteFragmentComment';
 import InlineConfirm from '../../../common/components/InlineConfirm';
 import UserIcon from '../../../common/components/UserIcon';
-import {useSessionState} from '../../../common/hooks/useSessionState';
 import EditCommentForm from './EditCommentForm';
 import ReplyCommentForm from './ReplyCommentForm';
 import ResolveButton from './ResolveButton';
@@ -53,9 +52,6 @@ export default function FragmentComment({
 	const [editing, setEditing] = useState(false);
 	const [hidden, setHidden] = useState(false);
 	const [highlighted, setHighlighted] = useState(false);
-	const [highlightedMessageId, setHighlightedMessageId] = useSessionState(
-		HIGHLIGHTED_COMMENT_ID_KEY
-	);
 	const [showDeleteMask, setShowDeleteMask] = useState(false);
 	const [showResolveMask, setShowResolveMask] = useState(false);
 
@@ -127,11 +123,16 @@ export default function FragmentComment({
 	};
 
 	useEffect(() => {
-		if (highlightedMessageId === commentId) {
+		const highlightMessageId = window.sessionStorage.getItem(
+			HIGHLIGHTED_COMMENT_ID_KEY
+		);
+
+		if (highlightMessageId === commentId) {
+			window.sessionStorage.removeItem(HIGHLIGHTED_COMMENT_ID_KEY);
+
 			setHighlighted(true);
-			setHighlightedMessageId(null);
 		}
-	}, [commentId, highlightedMessageId, setHighlightedMessageId]);
+	}, [commentId]);
 
 	return (
 		<article className={commentClassname}>
@@ -154,7 +155,7 @@ export default function FragmentComment({
 						})}
 						data-title={
 							showModifiedDateTooltip &&
-							sub(
+							Liferay.Util.sub(
 								Liferay.Language.get('edited-x'),
 								modifiedDateDescription
 							)
@@ -184,13 +185,12 @@ export default function FragmentComment({
 						onActiveChange={setDropDownActive}
 						trigger={
 							<ClayButton
-								aria-label={Liferay.Language.get('options')}
 								borderless
 								disabled={editing}
 								displayType="secondary"
 								monospaced
 								outline
-								size="sm"
+								small
 							>
 								<ClayIcon symbol="ellipsis-v" />
 							</ClayButton>

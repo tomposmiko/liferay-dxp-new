@@ -39,9 +39,7 @@ import com.liferay.portal.kernel.search.generic.WildcardQueryImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.expando.ExpandoBridgeIndexer;
 
-import java.util.LinkedHashMap;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -54,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 
 	public static final String CLASS_NAME = CommerceOrderItem.class.getName();
@@ -84,13 +82,11 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 			BooleanFilter contextBooleanFilter, SearchContext searchContext)
 		throws Exception {
 
-		Long commerceOrderId = (Long)searchContext.getAttribute(
-			FIELD_COMMERCE_ORDER_ID);
+		long commerceOrderId = GetterUtil.getLong(
+			searchContext.getAttribute(FIELD_COMMERCE_ORDER_ID));
 
-		if (commerceOrderId != null) {
-			contextBooleanFilter.addRequiredTerm(
-				FIELD_COMMERCE_ORDER_ID, commerceOrderId);
-		}
+		contextBooleanFilter.addRequiredTerm(
+			FIELD_COMMERCE_ORDER_ID, commerceOrderId);
 
 		Long parentCommerceOrderItemId = (Long)searchContext.getAttribute(
 			FIELD_PARENT_COMMERCE_ORDER_ITEM_ID);
@@ -107,19 +103,8 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 			SearchContext searchContext)
 		throws Exception {
 
-		addSearchLocalizedTerm(searchQuery, searchContext, Field.NAME, true);
 		addSearchTerm(searchQuery, searchContext, FIELD_SKU, false);
-
-		LinkedHashMap<String, Object> params =
-			(LinkedHashMap<String, Object>)searchContext.getAttribute("params");
-
-		if (params != null) {
-			String expandoAttributes = (String)params.get("expandoAttributes");
-
-			if (Validator.isNotNull(expandoAttributes)) {
-				addSearchExpando(searchQuery, searchContext, expandoAttributes);
-			}
-		}
+		addSearchLocalizedTerm(searchQuery, searchContext, Field.NAME, true);
 
 		String keywords = searchContext.getKeywords();
 
@@ -158,6 +143,7 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 
 		document.addLocalizedKeyword(
 			Field.NAME, commerceOrderItem.getNameMap());
+		document.addKeyword(FIELD_SKU, commerceOrderItem.getSku());
 		document.addNumber(
 			FIELD_COMMERCE_ORDER_ID, commerceOrderItem.getCommerceOrderId());
 		document.addKeyword(
@@ -168,11 +154,7 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 			FIELD_PARENT_COMMERCE_ORDER_ITEM_ID,
 			commerceOrderItem.getParentCommerceOrderItemId());
 		document.addNumber(FIELD_QUANTITY, commerceOrderItem.getQuantity());
-		document.addKeyword(FIELD_SKU, commerceOrderItem.getSku());
 		document.addNumber(FIELD_UNIT_PRICE, commerceOrderItem.getUnitPrice());
-
-		_expandoBridgeIndexer.addAttributes(
-			document, commerceOrderItem.getExpandoBridge());
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -196,7 +178,8 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commerceOrderItem.getCompanyId(), getDocument(commerceOrderItem));
+			getSearchEngineId(), commerceOrderItem.getCompanyId(),
+			getDocument(commerceOrderItem), isCommitImmediately());
 	}
 
 	@Override
@@ -208,16 +191,10 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommerceOrderItems(companyId);
+		reindexCommerceOrderItems(companyId);
 	}
 
-	private WildcardQuery _getTrailingWildcardQuery(
-		String field, String value) {
-
-		return new WildcardQueryImpl(field, value + StringPool.STAR);
-	}
-
-	private void _reindexCommerceOrderItems(long companyId) throws Exception {
+	protected void reindexCommerceOrderItems(long companyId) throws Exception {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_commerceOrderItemLocalService.getIndexableActionableDynamicQuery();
 
@@ -237,8 +214,15 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
+	}
+
+	private WildcardQuery _getTrailingWildcardQuery(
+		String field, String value) {
+
+		return new WildcardQueryImpl(field, value + StringPool.STAR);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -246,9 +230,6 @@ public class CommerceOrderItemIndexer extends BaseIndexer<CommerceOrderItem> {
 
 	@Reference
 	private CommerceOrderItemLocalService _commerceOrderItemLocalService;
-
-	@Reference
-	private ExpandoBridgeIndexer _expandoBridgeIndexer;
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;

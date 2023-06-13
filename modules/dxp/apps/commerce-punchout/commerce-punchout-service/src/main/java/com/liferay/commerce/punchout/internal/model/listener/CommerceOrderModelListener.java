@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Collections;
@@ -32,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jaclyn Ong
  */
-@Component(service = ModelListener.class)
+@Component(enabled = false, immediate = true, service = ModelListener.class)
 public class CommerceOrderModelListener
 	extends BaseModelListener<CommerceOrder> {
 
@@ -51,7 +52,8 @@ public class CommerceOrderModelListener
 
 			_commerceOrderLocalService.updateStatus(
 				commerceOrder.getUserId(), commerceOrder.getCommerceOrderId(),
-				WorkflowConstants.STATUS_APPROVED, Collections.emptyMap());
+				WorkflowConstants.STATUS_APPROVED, new ServiceContext(),
+				Collections.emptyMap());
 		}
 		catch (PortalException portalException) {
 			_log.error(

@@ -15,10 +15,19 @@
 package com.liferay.asset.categories.admin.web.internal.frontend.taglib.servlet.taglib;
 
 import com.liferay.asset.categories.admin.web.internal.constants.AssetCategoriesConstants;
+import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.User;
+
+import java.io.IOException;
 
 import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -27,21 +36,28 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=20",
-	service = ScreenNavigationCategory.class
+	property = {
+		"screen.navigation.category.order:Integer=20",
+		"screen.navigation.entry.order:Integer=20"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class CategoryPropertiesScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory, ScreenNavigationEntry<AssetCategory> {
 
 	@Override
 	public String getCategoryKey() {
-		return AssetCategoriesConstants.CATEGORY_KEY_PROPERTIES;
+		return "properties";
+	}
+
+	@Override
+	public String getEntryKey() {
+		return "properties";
 	}
 
 	@Override
 	public String getLabel(Locale locale) {
-		return language.get(
-			locale, AssetCategoriesConstants.CATEGORY_KEY_PROPERTIES);
+		return LanguageUtil.get(locale, "properties");
 	}
 
 	@Override
@@ -49,7 +65,27 @@ public class CategoryPropertiesScreenNavigationCategory
 		return AssetCategoriesConstants.CATEGORY_KEY_GENERAL;
 	}
 
+	@Override
+	public boolean isVisible(User user, AssetCategory category) {
+		if (category == null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		_jspRenderer.renderJSP(
+			httpServletRequest, httpServletResponse,
+			"/category/properties.jsp");
+	}
+
 	@Reference
-	protected Language language;
+	private JSPRenderer _jspRenderer;
 
 }

@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -56,11 +55,12 @@ public class ListTypeDefinitionServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_adminUser = TestPropsValues.getUser();
+		_defaultUser = _userLocalService.getDefaultUser(
+			TestPropsValues.getCompanyId());
 		_originalName = PrincipalThreadLocal.getName();
 		_originalPermissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
-		_user = UserTestUtil.addUser();
+		_user = TestPropsValues.getUser();
 	}
 
 	@After
@@ -73,7 +73,7 @@ public class ListTypeDefinitionServiceTest {
 	@Test
 	public void testAddListTypeDefinition() throws Exception {
 		try {
-			_testAddListTypeDefinition(_user);
+			_testAddListTypeDefinition(_defaultUser);
 
 			Assert.fail();
 		}
@@ -82,17 +82,17 @@ public class ListTypeDefinitionServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _user.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have ADD_LIST_TYPE_DEFINITION permission for"));
 		}
 
-		_testAddListTypeDefinition(_adminUser);
+		_testAddListTypeDefinition(_user);
 	}
 
 	@Test
 	public void testDeleteListTypeDefinition() throws Exception {
 		try {
-			_testDeleteListTypeDefinition(_adminUser, _user);
+			_testDeleteListTypeDefinition(_user, _defaultUser);
 
 			Assert.fail();
 		}
@@ -101,18 +101,18 @@ public class ListTypeDefinitionServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _user.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have DELETE permission for"));
 		}
 
-		_testDeleteListTypeDefinition(_adminUser, _adminUser);
+		_testDeleteListTypeDefinition(_defaultUser, _defaultUser);
 		_testDeleteListTypeDefinition(_user, _user);
 	}
 
 	@Test
 	public void testGetListTypeDefinition() throws Exception {
 		try {
-			_testGetListTypeDefinition(_adminUser, _user);
+			_testGetListTypeDefinition(_user, _defaultUser);
 
 			Assert.fail();
 		}
@@ -121,18 +121,18 @@ public class ListTypeDefinitionServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _user.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have VIEW permission for"));
 		}
 
-		_testGetListTypeDefinition(_adminUser, _adminUser);
+		_testGetListTypeDefinition(_defaultUser, _defaultUser);
 		_testGetListTypeDefinition(_user, _user);
 	}
 
 	@Test
 	public void testUpdateListTypeDefinition() throws Exception {
 		try {
-			_testUpdateListTypeDefinition(_adminUser, _user);
+			_testUpdateListTypeDefinition(_user, _defaultUser);
 
 			Assert.fail();
 		}
@@ -141,11 +141,11 @@ public class ListTypeDefinitionServiceTest {
 
 			Assert.assertTrue(
 				message.contains(
-					"User " + _user.getUserId() +
+					"User " + _defaultUser.getUserId() +
 						" must have UPDATE permission for"));
 		}
 
-		_testUpdateListTypeDefinition(_adminUser, _adminUser);
+		_testUpdateListTypeDefinition(_defaultUser, _defaultUser);
 		_testUpdateListTypeDefinition(_user, _user);
 	}
 
@@ -153,10 +153,9 @@ public class ListTypeDefinitionServiceTest {
 		throws Exception {
 
 		return _listTypeDefinitionLocalService.addListTypeDefinition(
-			null, user.getUserId(),
+			user.getUserId(),
 			Collections.singletonMap(
-				LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-			Collections.emptyList());
+				LocaleUtil.getDefault(), RandomTestUtil.randomString()));
 	}
 
 	private void _setUser(User user) {
@@ -174,10 +173,9 @@ public class ListTypeDefinitionServiceTest {
 
 			listTypeDefinition =
 				_listTypeDefinitionService.addListTypeDefinition(
-					null,
 					Collections.singletonMap(
-						LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-					Collections.emptyList());
+						LocaleUtil.getDefault(),
+						RandomTestUtil.randomString()));
 		}
 		finally {
 			if (listTypeDefinition != null) {
@@ -243,11 +241,10 @@ public class ListTypeDefinitionServiceTest {
 
 			listTypeDefinition =
 				_listTypeDefinitionService.updateListTypeDefinition(
-					listTypeDefinition.getExternalReferenceCode(),
 					listTypeDefinition.getListTypeDefinitionId(),
 					Collections.singletonMap(
-						LocaleUtil.getDefault(), RandomTestUtil.randomString()),
-					Collections.emptyList());
+						LocaleUtil.getDefault(),
+						RandomTestUtil.randomString()));
 		}
 		finally {
 			if (listTypeDefinition != null) {
@@ -257,7 +254,7 @@ public class ListTypeDefinitionServiceTest {
 		}
 	}
 
-	private User _adminUser;
+	private User _defaultUser;
 
 	@Inject
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;

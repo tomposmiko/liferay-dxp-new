@@ -31,7 +31,9 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Michael C. Han
  */
-@Component(service = NotificationRecipientBuilderRegistry.class)
+@Component(
+	immediate = true, service = NotificationRecipientBuilderRegistry.class
+)
 public class DefaultNotificationRecipientBuilderRegistry
 	implements NotificationRecipientBuilderRegistry {
 
@@ -40,7 +42,7 @@ public class DefaultNotificationRecipientBuilderRegistry
 		RecipientType recipientType) {
 
 		NotificationRecipientBuilder notificationRecipientBuilder =
-			_serviceTrackerMap.getService(recipientType);
+			_notificationRecipientBuilders.getService(recipientType);
 
 		if (notificationRecipientBuilder == null) {
 			throw new IllegalArgumentException(
@@ -52,38 +54,40 @@ public class DefaultNotificationRecipientBuilderRegistry
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, NotificationRecipientBuilder.class, null,
-			new ServiceReferenceMapper
-				<RecipientType, NotificationRecipientBuilder>() {
+		_notificationRecipientBuilders =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, NotificationRecipientBuilder.class, null,
+				new ServiceReferenceMapper
+					<RecipientType, NotificationRecipientBuilder>() {
 
-				@Override
-				public void map(
-					ServiceReference<NotificationRecipientBuilder>
-						serviceReference,
-					ServiceReferenceMapper.Emitter<RecipientType> emitter) {
+					@Override
+					public void map(
+						ServiceReference<NotificationRecipientBuilder>
+							serviceReference,
+						ServiceReferenceMapper.Emitter<RecipientType> emitter) {
 
-					Object value = serviceReference.getProperty(
-						"recipient.type");
+						Object value = serviceReference.getProperty(
+							"recipient.type");
 
-					if (Validator.isNull(value)) {
-						throw new IllegalArgumentException(
-							"The property \"recipient.type\" is invalid for " +
-								serviceReference);
+						if (Validator.isNull(value)) {
+							throw new IllegalArgumentException(
+								"The property \"recipient.type\" is invalid " +
+									"for " + serviceReference);
+						}
+
+						emitter.emit(
+							RecipientType.valueOf(String.valueOf(value)));
 					}
 
-					emitter.emit(RecipientType.valueOf(String.valueOf(value)));
-				}
-
-			});
+				});
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_notificationRecipientBuilders.close();
 	}
 
 	private ServiceTrackerMap<RecipientType, NotificationRecipientBuilder>
-		_serviceTrackerMap;
+		_notificationRecipientBuilders;
 
 }

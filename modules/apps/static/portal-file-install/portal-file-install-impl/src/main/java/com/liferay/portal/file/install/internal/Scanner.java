@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
 /**
@@ -44,11 +46,27 @@ public class Scanner {
 	public static final String SUBDIR_MODE_RECURSE = "recurse";
 
 	public Scanner(
-		List<File> dirs, FilenameFilter filenameFilter, String subdirMode) {
+		List<File> dirs, final String filterString, String subdirMode) {
 
-		_filenameFilter = filenameFilter;
+		_watchedDirs = _canononize(dirs);
 
-		_watchedDirs = dirs;
+		if ((filterString != null) && (filterString.length() > 0)) {
+			_filenameFilter = new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					Matcher matcher = _pattern.matcher(name);
+
+					return matcher.matches();
+				}
+
+				private final Pattern _pattern = Pattern.compile(filterString);
+
+			};
+		}
+		else {
+			_filenameFilter = (dir, name) -> true;
+		}
 
 		_recurseSubdir = SUBDIR_MODE_RECURSE.equals(subdirMode);
 	}
@@ -95,7 +113,6 @@ public class Scanner {
 		crc32.update(name.getBytes());
 
 		if (file.isFile()) {
-			_checksum(file.canWrite() ? 1000L : -1000L, crc32);
 			_checksum(file.lastModified(), crc32);
 			_checksum(file.length(), crc32);
 		}
@@ -116,6 +133,21 @@ public class Scanner {
 
 			l >>= 8;
 		}
+	}
+
+	private List<File> _canononize(List<File> files) {
+		List<File> canonicalFiles = new ArrayList<>(files.size());
+
+		for (File file : files) {
+			try {
+				canonicalFiles.add(file.getCanonicalFile());
+			}
+			catch (IOException ioException) {
+				canonicalFiles.add(file);
+			}
+		}
+
+		return canonicalFiles;
 	}
 
 	private File[] _list() {

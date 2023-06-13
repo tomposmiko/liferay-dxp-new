@@ -15,11 +15,8 @@
 package com.liferay.users.admin.web.internal.portlet.action;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.ContactNameException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.exception.RequiredRoleException;
-import com.liferay.portal.kernel.exception.UserEmailAddressException;
-import com.liferay.portal.kernel.exception.UserScreenNameException;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -32,18 +29,17 @@ import com.liferay.portal.kernel.security.membershippolicy.MembershipPolicyExcep
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
-import com.liferay.portal.kernel.service.permission.OrganizationPermission;
+import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -70,10 +66,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ACCOUNT,
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
-		"javax.portlet.name=" + UsersAdminPortletKeys.SERVICE_ACCOUNTS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/users_admin/update_user_roles"
 	},
@@ -130,14 +126,13 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 				user.getEmailAddress(), user.getLanguageId(),
 				user.getTimeZoneId(), user.getGreeting(), user.getComments(),
 				user.getFirstName(), user.getMiddleName(), user.getLastName(),
-				contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-				user.isMale(), birthdayCal.get(Calendar.MONTH),
-				birthdayCal.get(Calendar.DATE), birthdayCal.get(Calendar.YEAR),
-				contact.getSmsSn(), contact.getFacebookSn(),
-				contact.getJabberSn(), contact.getSkypeSn(),
-				contact.getTwitterSn(), user.getJobTitle(), null,
-				user.getOrganizationIds(), roleIds, userGroupRoles,
-				user.getUserGroupIds(), serviceContext);
+				contact.getPrefixId(), contact.getSuffixId(), user.isMale(),
+				birthdayCal.get(Calendar.MONTH), birthdayCal.get(Calendar.DATE),
+				birthdayCal.get(Calendar.YEAR), contact.getSmsSn(),
+				contact.getFacebookSn(), contact.getJabberSn(),
+				contact.getSkypeSn(), contact.getTwitterSn(),
+				user.getJobTitle(), null, user.getOrganizationIds(), roleIds,
+				userGroupRoles, user.getUserGroupIds(), serviceContext);
 
 			User currentUser = _userService.getCurrentUser();
 
@@ -150,13 +145,10 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 			}
 		}
 		catch (Exception exception) {
-			if (exception instanceof ContactNameException ||
-				exception instanceof NoSuchUserException ||
+			if (exception instanceof NoSuchUserException ||
 				exception instanceof PrincipalException ||
 				exception instanceof
-					RequiredRoleException.MustNotRemoveLastAdministator ||
-				exception instanceof UserEmailAddressException ||
-				exception instanceof UserScreenNameException) {
+					RequiredRoleException.MustNotRemoveLastAdministator) {
 
 				SessionErrors.add(actionRequest, exception.getClass());
 
@@ -205,22 +197,22 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 				httpServletRequest, "redirect");
 
 			if (Validator.isNotNull(redirect)) {
-				Map<String, String[]> parameterMap =
-					HttpComponentsUtil.getParameterMap(redirect);
+				Map<String, String[]> parameterMap = _http.getParameterMap(
+					redirect);
 
 				backURL = parameterMap.get(portletNamespace + "backURL")[0];
 			}
 
 			if (Validator.isNotNull(backURL)) {
-				Map<String, String[]> parameterMap =
-					HttpComponentsUtil.getParameterMap(backURL);
+				Map<String, String[]> parameterMap = _http.getParameterMap(
+					backURL);
 
 				organizationId = GetterUtil.getLong(
 					parameterMap.get(portletNamespace + "organizationId")[0]);
 			}
 
 			if ((organizationId > 0) &&
-				!_organizationPermission.contains(
+				!OrganizationPermissionUtil.contains(
 					permissionChecker, organizationId, ActionKeys.VIEW)) {
 
 				PortletURL portletURL = _portal.getControlPanelPortletURL(
@@ -245,10 +237,10 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 		// this check in UserServiceImpl is useless because UsersAdmin readds
 		// the role.
 
-		Role administratorRole = _roleLocalService.getRole(
+		Role administratorRole = _roleService.getRole(
 			user.getCompanyId(), RoleConstants.ADMINISTRATOR);
 
-		long[] administratorUserIds = _userLocalService.getRoleUserIds(
+		long[] administratorUserIds = _userService.getRoleUserIds(
 			administratorRole.getRoleId());
 
 		if ((administratorUserIds.length == 1) &&
@@ -260,16 +252,13 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	@Reference
-	private OrganizationPermission _organizationPermission;
+	private Http _http;
 
 	@Reference
 	private Portal _portal;
 
 	@Reference
-	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
+	private RoleService _roleService;
 
 	@Reference
 	private UsersAdmin _usersAdmin;

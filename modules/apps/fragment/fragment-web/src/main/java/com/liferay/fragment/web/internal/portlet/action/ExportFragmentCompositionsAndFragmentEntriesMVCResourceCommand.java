@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/export_fragment_compositions_and_fragment_entries"
@@ -86,9 +87,11 @@ public class ExportFragmentCompositionsAndFragmentEntriesMVCResourceCommand
 				for (long exportFragmentCompositionId :
 						exportFragmentCompositionIds) {
 
-					fragmentCompositions.add(
+					FragmentComposition fragmentComposition =
 						_fragmentCompositionService.fetchFragmentComposition(
-							exportFragmentCompositionId));
+							exportFragmentCompositionId);
+
+					fragmentCompositions.add(fragmentComposition);
 				}
 			}
 
@@ -96,9 +99,11 @@ public class ExportFragmentCompositionsAndFragmentEntriesMVCResourceCommand
 
 			if (ArrayUtil.isNotEmpty(exportFragmentEntryIds)) {
 				for (long exportFragmentEntryId : exportFragmentEntryIds) {
-					fragmentEntries.add(
+					FragmentEntry fragmentEntry =
 						_fragmentEntryService.fetchFragmentEntry(
-							exportFragmentEntryId));
+							exportFragmentEntryId);
+
+					fragmentEntries.add(fragmentEntry);
 				}
 			}
 

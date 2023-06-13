@@ -22,6 +22,9 @@ import com.liferay.portal.search.tuning.rankings.web.internal.index.Ranking;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.RankingIndexReader;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.name.RankingIndexName;
 
+import java.util.Optional;
+
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -30,23 +33,25 @@ import org.mockito.Mockito;
 public abstract class BaseRankingResultsBuilderTestCase
 	extends BaseRankingsWebTestCase {
 
-	protected void setUpRankingIndexReader(Ranking ranking) {
+	protected void setUpRankingIndexReader(Optional<Ranking> rankingOptional) {
 		Mockito.doReturn(
-			ranking
+			rankingOptional
 		).when(
 			rankingIndexReader
-		).fetch(
-			Mockito.any(), Mockito.nullable(String.class)
+		).fetchOptional(
+			Mockito.anyObject(), Mockito.anyString()
 		);
 	}
 
 	protected static ObjectMapper mapper = new ObjectMapper();
 
-	protected RankingIndexName rankingIndexName = Mockito.mock(
-		RankingIndexName.class);
-	protected RankingIndexReader rankingIndexReader = Mockito.mock(
-		RankingIndexReader.class);
-	protected ResourceActions resourceActions = Mockito.mock(
-		ResourceActions.class);
+	@Mock
+	protected RankingIndexName rankingIndexName;
+
+	@Mock
+	protected RankingIndexReader rankingIndexReader;
+
+	@Mock
+	protected ResourceActions resourceActions;
 
 }

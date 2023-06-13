@@ -18,8 +18,6 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
@@ -39,7 +37,7 @@ import com.liferay.portal.search.tuning.rankings.web.internal.index.name.Ranking
 import com.liferay.portal.search.tuning.rankings.web.internal.results.builder.RankingGetHiddenResultsBuilder;
 import com.liferay.portal.search.tuning.rankings.web.internal.results.builder.RankingGetSearchResultsBuilder;
 import com.liferay.portal.search.tuning.rankings.web.internal.results.builder.RankingGetVisibleResultsBuilder;
-import com.liferay.portal.search.tuning.rankings.web.internal.searcher.helper.RankingSearchRequestHelper;
+import com.liferay.portal.search.tuning.rankings.web.internal.searcher.RankingSearchRequestHelper;
 
 import java.io.IOException;
 
@@ -53,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ResultRankingsPortletKeys.RESULT_RANKINGS,
 		"mvc.command.name=/result_rankings/get_results"
@@ -73,7 +72,7 @@ public class GetResultsMVCResourceCommand implements MVCResourceCommand {
 			return false;
 		}
 		catch (RuntimeException runtimeException) {
-			_log.error(runtimeException);
+			runtimeException.printStackTrace();
 
 			throw runtimeException;
 		}
@@ -242,9 +241,6 @@ public class GetResultsMVCResourceCommand implements MVCResourceCommand {
 
 	@Reference
 	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		GetResultsMVCResourceCommand.class);
 
 	private class RankingMVCResourceRequest {
 

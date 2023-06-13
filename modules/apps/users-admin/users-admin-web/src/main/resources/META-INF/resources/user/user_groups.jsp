@@ -31,7 +31,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 <liferay-ui:membership-policy-error />
 
 <clay:content-row
-	containerElement="div"
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -42,29 +42,27 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 	<c:if test="<%= !portletName.equals(myAccountPortletId) %>">
 		<clay:content-col>
-			<clay:button
-				aria-label='<%= LanguageUtil.format(request, "select-x", "user-groups") %>'
-				cssClass="heading-end modify-link"
-				displayType="secondary"
-				id='<%= liferayPortletResponse.getNamespace() + "openUserGroupsLink" %>'
-				label='<%= LanguageUtil.get(request, "select") %>'
-				small="<%= true %>"
-			/>
+			<span class="heading-end">
+				<liferay-ui:icon
+					cssClass="modify-link"
+					id="openUserGroupsLink"
+					label="<%= true %>"
+					linkCssClass="btn btn-secondary btn-sm"
+					message="select"
+					url="javascript:;"
+				/>
+			</span>
 		</clay:content-col>
 	</c:if>
 </clay:content-row>
 
 <liferay-util:buffer
-	var="removeButtonUserGroups"
+	var="removeUserGroupIcon"
 >
-	<clay:button
-		aria-label="TOKEN_ARIA_LABEL"
-		cssClass="lfr-portal-tooltip modify-link"
-		data-rowId="TOKEN_DATA_ROW_ID"
-		displayType="unstyled"
+	<liferay-ui:icon
 		icon="times-circle"
-		small="<%= true %>"
-		title="TOKEN_TITLE"
+		markupView="lexicon"
+		message="remove"
 	/>
 </liferay-util:buffer>
 
@@ -81,8 +79,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 	total="<%= userGroups.size() %>"
 >
 	<liferay-ui:search-container-results
-		calculateStartAndEnd="<%= true %>"
-		results="<%= userGroups %>"
+		results="<%= userGroups.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 	/>
 
 	<liferay-ui:search-container-row
@@ -99,15 +96,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 		<c:if test="<%= !portletName.equals(myAccountPortletId) && !UserGroupMembershipPolicyUtil.isMembershipRequired((selUser != null) ? selUser.getUserId() : 0, userGroup.getUserGroupId()) %>">
 			<liferay-ui:search-container-column-text>
-				<clay:button
-					aria-label='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(userGroup.getName())) %>'
-					cssClass="lfr-portal-tooltip modify-link"
-					data-rowId="<%= userGroup.getUserGroupId() %>"
-					displayType="unstyled"
-					icon="times-circle"
-					small="<%= true %>"
-					title='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(userGroup.getName())) %>'
-				/>
+				<a class="modify-link" data-rowId="<%= userGroup.getUserGroupId() %>" href="javascript:;"><%= removeUserGroupIcon %></a>
 			</liferay-ui:search-container-column-text>
 		</c:if>
 	</liferay-ui:search-container-row>
@@ -170,26 +159,18 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 		A.one('#<portlet:namespace />openUserGroupsLink').on('click', (event) => {
 			Liferay.Util.openSelectionModal({
 				onSelect: function (selectedItem) {
-					const A = AUI();
+					var A = AUI();
 
-					const entityId = selectedItem.entityid;
-					const entityName = A.Escape.html(selectedItem.entityname);
-					const label = Liferay.Util.sub(
-						'<liferay-ui:message key="remove-x" />',
-						entityName
+					var entityId = selectedItem.entityid;
+
+					var rowColumns = [];
+
+					rowColumns.push(A.Escape.html(selectedItem.entityname));
+					rowColumns.push(
+						'<a class="modify-link" data-rowId="' +
+							entityId +
+							'" href="javascript:;"><%= UnicodeFormatter.toString(removeUserGroupIcon) %></a>'
 					);
-					const rowColumns = [];
-
-					let removeButton =
-						'<%= UnicodeFormatter.toString(removeButtonUserGroups) %>';
-
-					removeButton = removeButton
-						.replace('TOKEN_ARIA_LABEL', label)
-						.replace('TOKEN_DATA_ROW_ID', entityId)
-						.replace('TOKEN_TITLE', label);
-
-					rowColumns.push(entityName);
-					rowColumns.push(removeButton);
 
 					searchContainer.addRow(rowColumns, entityId);
 

@@ -13,11 +13,7 @@ import {drag as d3drag, event as d3event, select as d3select} from 'd3';
 import {openToast} from 'frontend-js-web';
 
 import DiagramZoomHandler from '../utilities/DiagramZoomHandler';
-import {
-	PINS_CIRCLE_RADIUS,
-	PINS_RADIUS,
-	ZOOM_DISABLED,
-} from '../utilities/constants';
+import {PINS_CIRCLE_RADIUS, PINS_RADIUS} from '../utilities/constants';
 import {savePin} from '../utilities/data';
 import {
 	getAbsolutePositions,
@@ -27,17 +23,15 @@ import {
 
 class D3Handler extends DiagramZoomHandler {
 	constructor(
-		allowPinsUpdate,
-		closeDropdowns,
 		diagramWrapper,
+		zoomWrapper,
 		imageURL,
-		setTooltipData,
 		updateZoomState,
-		zoomWrapper
+		setTooltipData,
+		closeDropdowns
 	) {
 		super();
 
-		this._allowPinsUpdate = allowPinsUpdate;
 		this._closeDropdowns = closeDropdowns;
 		this._currentScale = 1;
 		this._d3diagramWrapper = d3select(diagramWrapper);
@@ -49,6 +43,7 @@ class D3Handler extends DiagramZoomHandler {
 		this._updateZoomState = updateZoomState;
 		this._zoomWrapper = zoomWrapper;
 
+		this._handleClickOutside = this._handleClickOutside.bind(this);
 		this._handleDragEnded = this._handleDragEnded.bind(this);
 		this._handleDragStarted = this._handleDragStarted.bind(this);
 		this._handleDragging = this._handleDragging.bind(this);
@@ -83,17 +78,10 @@ class D3Handler extends DiagramZoomHandler {
 			.attr('y', 0)
 			.on('load', (_d, index, nodes) => {
 				const imageWidth = nodes[index].getBoundingClientRect().width;
-
 				const panX =
 					(wrappperBoundingClientRect.width - imageWidth) / 2;
 
-				if (!ZOOM_DISABLED) {
-					this._d3diagramWrapper.call(
-						this._zoom.translateBy,
-						panX,
-						0
-					);
-				}
+				this._d3diagramWrapper.call(this._zoom.translateBy, panX, 0);
 
 				this.imageRendered = true;
 
@@ -107,7 +95,7 @@ class D3Handler extends DiagramZoomHandler {
 	}
 
 	_handleZoom() {
-		this.resetActivePinsState();
+		this._resetActivePinsState();
 		this._setTooltipData(null);
 
 		super._handleZoom();
@@ -128,10 +116,10 @@ class D3Handler extends DiagramZoomHandler {
 		const x = -pinPositionX * k + width / 2;
 		const y = -pinPositionY * k + height / 2;
 
-		return super._recenterViewport(x, y, duration, k);
+		return super._recenterViewport(x, y, duration);
 	}
 
-	resetActivePinsState() {
+	_resetActivePinsState() {
 		if (this._activePin) {
 			this._activePin.classList.remove('active');
 		}
@@ -143,13 +131,7 @@ class D3Handler extends DiagramZoomHandler {
 	}
 
 	_handleImageClick() {
-		this.resetActivePinsState();
-
-		if (!this._allowPinsUpdate) {
-			this._setTooltipData(null);
-
-			return;
-		}
+		this._resetActivePinsState();
 
 		const [x, y] = getPercentagePositions(
 			d3event.x,
@@ -197,7 +179,7 @@ class D3Handler extends DiagramZoomHandler {
 
 	updatePins(pins) {
 		this._pins = pins;
-		this.resetActivePinsState();
+		this._resetActivePinsState();
 
 		if (this.imageRendered) {
 			this._updatePrintedPins();
@@ -230,7 +212,7 @@ class D3Handler extends DiagramZoomHandler {
 	}
 
 	_selectPinNode(target) {
-		this.resetActivePinsState();
+		this._resetActivePinsState();
 
 		target.classList.add('active');
 
@@ -263,19 +245,15 @@ class D3Handler extends DiagramZoomHandler {
 						this._currentScale
 					)})`
 			)
-			.attr('role', 'pin')
-			.on('click', (_d, index, nodes) => {
-				this._selectPinNode(nodes[index]);
-			});
-
-		if (this._allowPinsUpdate) {
-			pinsWrapper.call(
+			.call(
 				d3drag()
 					.on('start', this._handleDragStarted)
 					.on('drag', this._handleDragging)
 					.on('end', this._handleDragEnded)
-			);
-		}
+			)
+			.on('click', (_d, index, nodes) => {
+				this._selectPinNode(nodes[index]);
+			});
 
 		const radiusHandlers = pinsWrapper
 			.append('g')
@@ -321,7 +299,7 @@ class D3Handler extends DiagramZoomHandler {
 
 		selectedPin.classList.add('drag-started');
 
-		this.resetActivePinsState();
+		this._resetActivePinsState();
 		this._setTooltipData(null);
 	}
 

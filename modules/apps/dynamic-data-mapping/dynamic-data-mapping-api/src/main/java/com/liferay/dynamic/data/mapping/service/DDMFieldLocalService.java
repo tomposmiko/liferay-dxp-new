@@ -15,7 +15,6 @@
 package com.liferay.dynamic.data.mapping.service;
 
 import com.liferay.dynamic.data.mapping.model.DDMField;
-import com.liferay.dynamic.data.mapping.model.DDMFieldAttribute;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.petra.function.UnsafeFunction;
@@ -225,10 +224,6 @@ public interface DDMFieldLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMField getDDMField(long fieldId) throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DDMFieldAttribute> getDDMFieldAttributes(
-		long storageId, String attributeName);
-
 	/**
 	 * Returns a range of all the ddm fields.
 	 *
@@ -253,10 +248,6 @@ public interface DDMFieldLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMFormValues getDDMFormValues(DDMForm ddmForm, long storageId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public DDMFormValues getDDMFormValues(
-		DDMForm ddmForm, long storageId, String languageId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getDDMFormValuesCount(long structureId);

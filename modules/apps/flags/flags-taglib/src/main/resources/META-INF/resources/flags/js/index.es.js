@@ -14,12 +14,13 @@
 
 import React from 'react';
 
+import ThemeContext from './ThemeContext.es';
 import Flags from './components/Flags.es';
-import FlagsModal from './components/FlagsModal.es';
-import useFlags from './hooks/useFlags.es';
 
 export default function ({context, props}) {
-	return <Flags namespace={context.namespace} {...props} />;
+	return (
+		<ThemeContext.Provider value={context}>
+			<Flags {...props} />
+		</ThemeContext.Provider>
+	);
 }
-
-export {FlagsModal, useFlags};

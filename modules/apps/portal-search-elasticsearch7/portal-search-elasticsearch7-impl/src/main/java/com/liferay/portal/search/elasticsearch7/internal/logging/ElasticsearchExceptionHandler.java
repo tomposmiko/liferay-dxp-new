@@ -29,7 +29,7 @@ public class ElasticsearchExceptionHandler {
 	public <T extends Throwable> void handleDeleteDocumentException(T t)
 		throws T {
 
-		if (_isIndexNotFound(t)) {
+		if (isIndexNotFound(t)) {
 			if (_log.isInfoEnabled()) {
 				_log.info(t, t);
 			}
@@ -51,10 +51,7 @@ public class ElasticsearchExceptionHandler {
 		}
 	}
 
-	protected static final String INDEX_NOT_FOUND_EXCEPTION_MESSAGE =
-		"type=index_not_found_exception";
-
-	private boolean _isIndexNotFound(Throwable throwable) {
+	protected boolean isIndexNotFound(Throwable throwable) {
 		String message = throwable.getMessage();
 
 		if (message.contains(INDEX_NOT_FOUND_EXCEPTION_MESSAGE)) {
@@ -63,6 +60,9 @@ public class ElasticsearchExceptionHandler {
 
 		return false;
 	}
+
+	protected static final String INDEX_NOT_FOUND_EXCEPTION_MESSAGE =
+		"type=index_not_found_exception";
 
 	private final Log _log;
 	private final boolean _logExceptionsOnly;

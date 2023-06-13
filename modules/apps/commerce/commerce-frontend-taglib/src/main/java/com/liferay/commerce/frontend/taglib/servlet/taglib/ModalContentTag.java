@@ -42,8 +42,6 @@ public class ModalContentTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			_ATTRIBUTE_NAMESPACE + "modalId", _modalId);
 		httpServletRequest.setAttribute(
-			_ATTRIBUTE_NAMESPACE + "redirect", _redirect);
-		httpServletRequest.setAttribute(
 			_ATTRIBUTE_NAMESPACE + "showCancelButton", _showCancelButton);
 		httpServletRequest.setAttribute(
 			_ATTRIBUTE_NAMESPACE + "showSubmitButton", _showSubmitButton);
@@ -62,10 +60,6 @@ public class ModalContentTag extends IncludeTag {
 
 	public String getModalId() {
 		return _modalId;
-	}
-
-	public String getRedirect() {
-		return _redirect;
 	}
 
 	public boolean getShowCancelButton() {
@@ -99,10 +93,6 @@ public class ModalContentTag extends IncludeTag {
 		setServletContext(ServletContextUtil.getServletContext());
 	}
 
-	public void setRedirect(String redirect) {
-		_redirect = redirect;
-	}
-
 	public void setShowCancelButton(boolean showCancelButton) {
 		_showCancelButton = showCancelButton;
 	}
@@ -125,7 +115,6 @@ public class ModalContentTag extends IncludeTag {
 
 		_contentCssClasses = null;
 		_modalId = null;
-		_redirect = null;
 		_showCancelButton = true;
 		_showSubmitButton = true;
 		_submitButtonLabel = null;
@@ -151,7 +140,6 @@ public class ModalContentTag extends IncludeTag {
 
 	private String _contentCssClasses;
 	private String _modalId;
-	private String _redirect;
 	private boolean _showCancelButton = true;
 	private boolean _showSubmitButton = true;
 	private String _submitButtonLabel;

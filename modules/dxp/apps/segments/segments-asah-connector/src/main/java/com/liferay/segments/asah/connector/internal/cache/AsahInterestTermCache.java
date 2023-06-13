@@ -14,23 +14,27 @@
 
 package com.liferay.segments.asah.connector.internal.cache;
 
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.segments.asah.connector.internal.configuration.provider.SegmentsAsahConfigurationProvider;
+import com.liferay.segments.asah.connector.internal.configuration.SegmentsAsahConfiguration;
+
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Sarai Díaz
  */
-@Component(service = AsahInterestTermCache.class)
+@Component(
+	configurationPid = "com.liferay.segments.asah.connector.internal.configuration.SegmentsAsahConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = AsahInterestTermCache.class
+)
 public class AsahInterestTermCache {
 
 	public String[] getInterestTerms(String userId) {
@@ -38,32 +42,27 @@ public class AsahInterestTermCache {
 	}
 
 	public void putInterestTerms(String userId, String[] terms) {
-		int interestTermsTimeToLiveInSeconds = PortalCache.DEFAULT_TIME_TO_LIVE;
-
-		try {
-			interestTermsTimeToLiveInSeconds =
-				_segmentsAsahConfigurationProvider.
-					getInterestTermsCacheExpirationTime(
-						CompanyThreadLocal.getCompanyId());
-		}
-		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
-		}
-
 		_portalCache.put(
-			_generateCacheKey(userId), terms, interestTermsTimeToLiveInSeconds);
+			_generateCacheKey(userId), terms,
+			_interestTermsTimeToLiveInSeconds);
 	}
 
 	@Activate
-	protected void activate() {
-		_portalCache =
-			(PortalCache<String, String[]>)_multiVMPool.getPortalCache(
-				AsahInterestTermCache.class.getName());
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		SegmentsAsahConfiguration segmentsAsahConfiguration =
+			ConfigurableUtil.createConfigurable(
+				SegmentsAsahConfiguration.class, properties);
+
+		_interestTermsTimeToLiveInSeconds =
+			segmentsAsahConfiguration.interestTermsCacheExpirationTime();
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_multiVMPool.removePortalCache(AsahInterestTermCache.class.getName());
+	@Reference(unbind = "-")
+	protected void setMultiVMPool(MultiVMPool multiVMPool) {
+		_portalCache =
+			(PortalCache<String, String[]>)multiVMPool.getPortalCache(
+				AsahInterestTermCache.class.getName());
 	}
 
 	private String _generateCacheKey(String userId) {
@@ -72,16 +71,8 @@ public class AsahInterestTermCache {
 
 	private static final String _CACHE_PREFIX = "segments-";
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AsahInterestTermCache.class);
-
-	@Reference
-	private MultiVMPool _multiVMPool;
-
+	private volatile int _interestTermsTimeToLiveInSeconds =
+		PortalCache.DEFAULT_TIME_TO_LIVE;
 	private PortalCache<String, String[]> _portalCache;
-
-	@Reference
-	private SegmentsAsahConfigurationProvider
-		_segmentsAsahConfigurationProvider;
 
 }

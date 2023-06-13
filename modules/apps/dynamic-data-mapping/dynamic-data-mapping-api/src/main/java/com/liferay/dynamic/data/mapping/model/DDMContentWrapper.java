@@ -600,11 +600,6 @@ public class DDMContentWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DDMContent, Object>>
 		getAttributeGetterFunctions() {
 

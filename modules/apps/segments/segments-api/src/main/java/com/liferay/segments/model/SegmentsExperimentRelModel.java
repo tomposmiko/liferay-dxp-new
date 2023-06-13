@@ -267,8 +267,4 @@ public interface SegmentsExperimentRelModel
 	@Override
 	public SegmentsExperimentRel cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

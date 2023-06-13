@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -86,7 +87,7 @@ public class ViewAuthorizationRequestMVCRenderCommand
 			_portal.getOriginalServletRequest(
 				_portal.getHttpServletRequest(renderRequest));
 
-		Map<String, String> oAuth2Parameters = _getOAuth2Parameters(
+		Map<String, String> oAuth2Parameters = getOAuth2Parameters(
 			httpServletRequest);
 
 		String error = oAuth2Parameters.get("error");
@@ -139,7 +140,7 @@ public class ViewAuthorizationRequestMVCRenderCommand
 				String[] requestedScopeAliases = StringUtil.split(
 					oAuth2Parameters.get("scope"), StringPool.SPACE);
 
-				_populateAssignableScopes(
+				populateAssignableScopes(
 					assignableScopes, oAuth2ApplicationScopeAliases,
 					requestedScopeAliases);
 			}
@@ -155,7 +156,9 @@ public class ViewAuthorizationRequestMVCRenderCommand
 					noSuchOAuth2ApplicationException) {
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchOAuth2ApplicationException);
+				_log.debug(
+					noSuchOAuth2ApplicationException,
+					noSuchOAuth2ApplicationException);
 			}
 
 			SessionErrors.add(renderRequest, "clientIdInvalid");
@@ -164,7 +167,7 @@ public class ViewAuthorizationRequestMVCRenderCommand
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 
 			SessionErrors.add(renderRequest, principalException.getClass());
@@ -178,7 +181,7 @@ public class ViewAuthorizationRequestMVCRenderCommand
 		return "/authorize/authorize.jsp";
 	}
 
-	private Map<String, String> _getOAuth2Parameters(
+	protected Map<String, String> getOAuth2Parameters(
 		HttpServletRequest httpServletRequest) {
 
 		Map<String, String> oAuth2Parameters = new HashMap<>();
@@ -199,7 +202,7 @@ public class ViewAuthorizationRequestMVCRenderCommand
 		return oAuth2Parameters;
 	}
 
-	private void _populateAssignableScopes(
+	protected void populateAssignableScopes(
 		AssignableScopes assignableScopes,
 		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases,
 		String[] requestedScopeAliases) {
@@ -207,33 +210,32 @@ public class ViewAuthorizationRequestMVCRenderCommand
 		Set<String> requestedScopeAliasesSet = new HashSet<>(
 			Arrays.asList(requestedScopeAliases));
 
+		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
+			_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
+				oAuth2ApplicationScopeAliases.
+					getOAuth2ApplicationScopeAliasesId(),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Stream<OAuth2ScopeGrant> stream = oAuth2ScopeGrants.stream();
+
 		Collection<LiferayOAuth2Scope> liferayOAuth2Scopes =
 			_scopeLocator.getLiferayOAuth2Scopes(
 				oAuth2ApplicationScopeAliases.getCompanyId());
 
-		for (OAuth2ScopeGrant oAuth2ScopeGrant :
-				_oAuth2ScopeGrantLocalService.getOAuth2ScopeGrants(
-					oAuth2ApplicationScopeAliases.
-						getOAuth2ApplicationScopeAliasesId(),
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
-
-			if (Collections.disjoint(
-					oAuth2ScopeGrant.getScopeAliasesList(),
-					requestedScopeAliasesSet)) {
-
-				continue;
-			}
-
-			LiferayOAuth2Scope liferayOAuth2Scope =
-				_scopeLocator.getLiferayOAuth2Scope(
-					oAuth2ScopeGrant.getCompanyId(),
-					oAuth2ScopeGrant.getApplicationName(),
-					oAuth2ScopeGrant.getScope());
-
-			if (liferayOAuth2Scopes.contains(liferayOAuth2Scope)) {
-				assignableScopes.addLiferayOAuth2Scope(liferayOAuth2Scope);
-			}
-		}
+		stream.filter(
+			oAuth2ScopeGrant -> !Collections.disjoint(
+				oAuth2ScopeGrant.getScopeAliasesList(),
+				requestedScopeAliasesSet)
+		).map(
+			oAuth2ScopeGrant -> _scopeLocator.getLiferayOAuth2Scope(
+				oAuth2ScopeGrant.getCompanyId(),
+				oAuth2ScopeGrant.getApplicationName(),
+				oAuth2ScopeGrant.getScope())
+		).filter(
+			liferayOAuth2Scopes::contains
+		).forEach(
+			assignableScopes::addLiferayOAuth2Scope
+		);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

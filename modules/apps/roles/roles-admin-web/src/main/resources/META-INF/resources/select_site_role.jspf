@@ -84,7 +84,7 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 	viewTypeItems="<%= selectRoleManagementToolbarDisplayContext.getViewTypeItems() %>"
 />
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl container-form-lg" method="post" name="selectSiteRoleFm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl container-form-lg" method="post" name="selectSiteRoleFm">
 	<c:choose>
 		<c:when test="<%= step == 1 %>">
 			<aui:input name="groupId" type="hidden" />
@@ -118,9 +118,7 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 						value="<%= LanguageUtil.get(request, group.getTypeLabel()) %>"
 					/>
 
-					<liferay-ui:search-container-column-text
-						align="right"
-					>
+					<liferay-ui:search-container-column-text>
 
 						<%
 						Map<String, Object> data = HashMapBuilder.<String, Object>put(
@@ -137,10 +135,10 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 				/>
 			</liferay-ui:search-container>
 
-			<aui:script require="frontend-js-web/index as frontendJsWeb">
-				var {delegate} = frontendJsWeb;
-
+			<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 				var form = document.<portlet:namespace />selectSiteRoleFm;
+
+				var delegate = delegateModule.default;
 
 				delegate(form, 'click', '.group-selector-button', (event) => {
 					Liferay.Util.postForm(form, {
@@ -159,20 +157,6 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 			</aui:script>
 		</c:when>
 		<c:when test="<%= step == 2 %>">
-
-			<%
-			String groupEventName = ParamUtil.getString(request, "groupEventName");
-			%>
-
-			<c:if test="<%= Validator.isNotNull(groupEventName) %>">
-				<aui:script>
-					const openingLiferay = Liferay.Util.getOpener().Liferay;
-
-					openingLiferay.fire('<%= HtmlUtil.escapeJS(groupEventName) %>', {
-						data: '<%= groupId %>',
-					});
-				</aui:script>
-			</c:if>
 
 			<%
 			Group group = GroupServiceUtil.getGroup(groupId);
@@ -219,6 +203,20 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 						<c:if test="<%= Validator.isNull(p_u_i_d) || SiteMembershipPolicyUtil.isRoleAllowed((selUser != null) ? selUser.getUserId() : 0, group.getGroupId(), role.getRoleId()) %>">
 
 							<%
+							Map<String, Object> data = HashMapBuilder.<String, Object>put(
+								"entityid", role.getRoleId()
+							).put(
+								"entityname", role.getTitle(locale)
+							).put(
+								"groupdescriptivename", group.getDescriptiveName(locale)
+							).put(
+								"groupid", group.getGroupId()
+							).put(
+								"iconcssclass", RolesAdminUtil.getIconCssClass(role)
+							).put(
+								"searchcontainername", "siteRoles"
+							).build();
+
 							boolean disabled = false;
 
 							if (selUser != null) {
@@ -243,26 +241,7 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 							}
 							%>
 
-							<aui:button
-								cssClass="selector-button"
-								data='<%=
-									HashMapBuilder.<String, Object>put(
-										"entityid", role.getRoleId()
-									).put(
-										"entityname", role.getTitle(locale)
-									).put(
-										"groupdescriptivename", group.getDescriptiveName(locale)
-									).put(
-										"groupid", group.getGroupId()
-									).put(
-										"iconcssclass", RolesAdminUtil.getIconCssClass(role)
-									).put(
-										"searchcontainername", "siteRoles"
-									).build()
-								%>'
-								disabled="<%= disabled %>"
-								value="choose"
-							/>
+							<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= disabled %>" value="choose" />
 						</c:if>
 					</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>

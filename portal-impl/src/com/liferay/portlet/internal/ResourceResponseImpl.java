@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.internal;
 
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletApp;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -59,8 +58,7 @@ public class ResourceResponseImpl
 	@Override
 	public void addProperty(Cookie cookie) {
 		if (!(isCalledFlushBuffer() || isCommitted())) {
-			CookiesManagerUtil.addCookie(
-				cookie, getHttpServletRequest(), httpServletResponse);
+			httpServletResponse.addCookie(cookie);
 		}
 	}
 
@@ -127,8 +125,10 @@ public class ResourceResponseImpl
 		httpServletResponse.setHeader(name, value);
 
 		if (name.equals(ResourceResponse.HTTP_STATUS_CODE)) {
-			httpServletResponse.setStatus(
-				GetterUtil.getInteger(value, HttpServletResponse.SC_OK));
+			int status = GetterUtil.getInteger(
+				value, HttpServletResponse.SC_OK);
+
+			httpServletResponse.setStatus(status);
 		}
 	}
 

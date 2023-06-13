@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the batch engine export task service. This utility wraps <code>com.liferay.batch.engine.service.persistence.impl.BatchEngineExportTaskPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -825,76 +829,6 @@ public class BatchEngineExportTaskUtil {
 	}
 
 	/**
-	 * Returns the batch engine export task where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchExportTaskException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching batch engine export task
-	 * @throws NoSuchExportTaskException if a matching batch engine export task could not be found
-	 */
-	public static BatchEngineExportTask findByERC_C(
-			String externalReferenceCode, long companyId)
-		throws com.liferay.batch.engine.exception.NoSuchExportTaskException {
-
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the batch engine export task where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching batch engine export task, or <code>null</code> if a matching batch engine export task could not be found
-	 */
-	public static BatchEngineExportTask fetchByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the batch engine export task where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching batch engine export task, or <code>null</code> if a matching batch engine export task could not be found
-	 */
-	public static BatchEngineExportTask fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
-
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
-	}
-
-	/**
-	 * Removes the batch engine export task where externalReferenceCode = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the batch engine export task that was removed
-	 */
-	public static BatchEngineExportTask removeByERC_C(
-			String externalReferenceCode, long companyId)
-		throws com.liferay.batch.engine.exception.NoSuchExportTaskException {
-
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the number of batch engine export tasks where externalReferenceCode = &#63; and companyId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the number of matching batch engine export tasks
-	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
 	 * Caches the batch engine export task in the entity cache if it is enabled.
 	 *
 	 * @param batchEngineExportTask the batch engine export task
@@ -1053,9 +987,29 @@ public class BatchEngineExportTaskUtil {
 	}
 
 	public static BatchEngineExportTaskPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile BatchEngineExportTaskPersistence _persistence;
+	private static ServiceTracker
+		<BatchEngineExportTaskPersistence, BatchEngineExportTaskPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			BatchEngineExportTaskPersistence.class);
+
+		ServiceTracker
+			<BatchEngineExportTaskPersistence, BatchEngineExportTaskPersistence>
+				serviceTracker =
+					new ServiceTracker
+						<BatchEngineExportTaskPersistence,
+						 BatchEngineExportTaskPersistence>(
+							 bundle.getBundleContext(),
+							 BatchEngineExportTaskPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

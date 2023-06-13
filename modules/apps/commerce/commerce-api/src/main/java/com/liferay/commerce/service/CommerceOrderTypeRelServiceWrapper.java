@@ -27,10 +27,6 @@ public class CommerceOrderTypeRelServiceWrapper
 	implements CommerceOrderTypeRelService,
 			   ServiceWrapper<CommerceOrderTypeRelService> {
 
-	public CommerceOrderTypeRelServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceOrderTypeRelServiceWrapper(
 		CommerceOrderTypeRelService commerceOrderTypeRelService) {
 

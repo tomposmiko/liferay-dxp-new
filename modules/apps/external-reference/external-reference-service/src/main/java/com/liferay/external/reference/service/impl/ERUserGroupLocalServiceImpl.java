@@ -41,8 +41,8 @@ public class ERUserGroupLocalServiceImpl
 		throws PortalException {
 
 		UserGroup userGroup =
-			_userGroupLocalService.fetchUserGroupByExternalReferenceCode(
-				externalReferenceCode, companyId);
+			_userGroupLocalService.fetchUserGroupByReferenceCode(
+				companyId, externalReferenceCode);
 
 		if (userGroup == null) {
 			userGroup = _userGroupLocalService.addUserGroup(

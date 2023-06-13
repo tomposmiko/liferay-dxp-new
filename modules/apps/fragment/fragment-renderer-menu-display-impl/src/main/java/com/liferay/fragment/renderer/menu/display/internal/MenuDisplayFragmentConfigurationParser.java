@@ -18,13 +18,11 @@ import com.liferay.fragment.renderer.menu.display.internal.MenuDisplayFragmentCo
 import com.liferay.fragment.renderer.menu.display.internal.MenuDisplayFragmentConfiguration.DisplayStyle;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,13 +41,11 @@ public class MenuDisplayFragmentConfigurationParser {
 
 		String hoveredItemColor = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
-				configuration, editableValues,
-				LocaleUtil.getMostRelevantLocale(), "hoveredItemColor"));
+				configuration, editableValues, "hoveredItemColor"));
 
 		String selectedItemColor = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
-				configuration, editableValues,
-				LocaleUtil.getMostRelevantLocale(), "selectedItemColor"));
+				configuration, editableValues, "selectedItemColor"));
 
 		MenuDisplayFragmentConfiguration.Source source = _getSource(
 			configuration, editableValues);
@@ -63,14 +59,10 @@ public class MenuDisplayFragmentConfigurationParser {
 
 	private JSONObject _createJSONObject(String value) {
 		try {
-			return _jsonFactory.createJSONObject(value);
+			return JSONFactoryUtil.createJSONObject(value);
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
-			return _jsonFactory.createJSONObject();
+			return JSONFactoryUtil.createJSONObject();
 		}
 	}
 
@@ -79,8 +71,7 @@ public class MenuDisplayFragmentConfigurationParser {
 
 		String displayStyle = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
-				configuration, editableValues,
-				LocaleUtil.getMostRelevantLocale(), "displayStyle"));
+				configuration, editableValues, "displayStyle"));
 
 		return DisplayStyle.parse(displayStyle);
 	}
@@ -90,8 +81,7 @@ public class MenuDisplayFragmentConfigurationParser {
 
 		String source = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
-				configuration, editableValues,
-				LocaleUtil.getMostRelevantLocale(), "source"));
+				configuration, editableValues, "source"));
 
 		if (JSONUtil.isValid(source)) {
 			JSONObject jsonObject = _createJSONObject(source);
@@ -115,17 +105,13 @@ public class MenuDisplayFragmentConfigurationParser {
 	private int _getSublevels(String configuration, String editableValues) {
 		return GetterUtil.getInteger(
 			_fragmentEntryConfigurationParser.getFieldValue(
-				configuration, editableValues,
-				LocaleUtil.getMostRelevantLocale(), "sublevels"));
+				configuration, editableValues, "sublevels"));
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MenuDisplayFragmentConfigurationParser.class);
 
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private LayoutSetLocalService _layoutSetLocalService;
 
 }

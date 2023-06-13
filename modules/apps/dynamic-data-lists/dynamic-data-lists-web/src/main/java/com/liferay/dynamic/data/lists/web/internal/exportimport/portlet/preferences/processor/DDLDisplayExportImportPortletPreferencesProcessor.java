@@ -52,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -66,11 +67,6 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 	@Override
 	public List<Capability> getImportCapabilities() {
 		return ListUtil.fromArray(_capability);
-	}
-
-	@Override
-	public boolean isPublishDisplayedContent() {
-		return false;
 	}
 
 	@Override
@@ -119,7 +115,7 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 				portletDataContext, portletId, recordSet);
 
 			ActionableDynamicQuery recordActionableDynamicQuery =
-				_getRecordActionableDynamicQuery(
+				getRecordActionableDynamicQuery(
 					portletDataContext, recordSet, portletId);
 
 			try {
@@ -205,32 +201,7 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
-	private void _exportReferenceDDMTemplate(
-			PortletDataContext portletDataContext, String portletId,
-			long ddmTemplateId)
-		throws PortletDataException {
-
-		if (ddmTemplateId == 0) {
-			return;
-		}
-
-		DDMTemplate ddmTemplate = _ddmTemplateLocalService.fetchDDMTemplate(
-			ddmTemplateId);
-
-		if (ddmTemplate == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to export referenced template " + ddmTemplateId);
-			}
-
-			return;
-		}
-
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, portletId, ddmTemplate);
-	}
-
-	private ActionableDynamicQuery _getRecordActionableDynamicQuery(
+	protected ActionableDynamicQuery getRecordActionableDynamicQuery(
 		PortletDataContext portletDataContext, DDLRecordSet recordSet,
 		String portletId) {
 
@@ -259,21 +230,63 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 		return recordActionableDynamicQuery;
 	}
 
+	@Reference(unbind = "-")
+	protected void setDDLRecordSetLocalService(
+		DDLRecordSetLocalService ddlRecordSetLocalService) {
+
+		_ddlRecordSetLocalService = ddlRecordSetLocalService;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecord)",
+		unbind = "-"
+	)
+	protected void setDDLRecordStagedModelRepository(
+		StagedModelRepository<DDLRecord> ddlRecordStagedModelRepository) {
+
+		_ddlRecordStagedModelRepository = ddlRecordStagedModelRepository;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
+	}
+
+	private void _exportReferenceDDMTemplate(
+			PortletDataContext portletDataContext, String portletId,
+			long ddmTemplateId)
+		throws PortletDataException {
+
+		if (ddmTemplateId == 0) {
+			return;
+		}
+
+		DDMTemplate ddmTemplate = _ddmTemplateLocalService.fetchDDMTemplate(
+			ddmTemplateId);
+
+		if (ddmTemplate == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to export referenced template " + ddmTemplateId);
+			}
+
+			return;
+		}
+
+		StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			portletDataContext, portletId, ddmTemplate);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDLDisplayExportImportPortletPreferencesProcessor.class);
 
 	@Reference(target = "(name=ReferencedStagedModelImporter)")
 	private Capability _capability;
 
-	@Reference
 	private DDLRecordSetLocalService _ddlRecordSetLocalService;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecord)"
-	)
 	private StagedModelRepository<DDLRecord> _ddlRecordStagedModelRepository;
-
-	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
 
 }

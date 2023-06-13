@@ -14,13 +14,16 @@ definition {
 
 		Navigator.openURL();
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Web Content");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,7 +36,7 @@ definition {
 	}
 
 	@description = "Verify that the user can assign a a different Workflow to a Subfolder"
-	@priority = 4
+	@priority = "4"
 	test CanAssignDifferentWorkflowToSubfolder {
 		WebContentFolder.addCP(
 			folderDescription = "WC Folder Description",
@@ -73,8 +76,13 @@ definition {
 	}
 
 	@description = "Verify that the user can assign a Workflow to the Home folder"
-	@priority = 3
+	@priority = "3"
 	test CanAssignWorkflowToHomeFolder {
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Web Content");
+
 		WorkflowWebContent.selectSingleApprover();
 
 		JSONWebcontent.addWebContent(
@@ -82,38 +90,36 @@ definition {
 			groupName = "Guest",
 			title = "WC WebContent Title");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Web Content");
 
 		AssertTextEquals(
-			key_webContentTitle = "WC WebContent Title",
-			locator1 = "WC#ENTRY_LIST_WORKFLOW_TRANSLATIONE_STATUS",
+			locator1 = "WorkflowWebContent#WEB_CONTENT_STATUS",
 			value1 = "Pending");
 	}
 
 	@description = "LRQA-70845 Verify that cannot bypass workflow by duplicating article."
-	@priority = 5
+	@priority = "5"
 	test CannotBypassWorkflowByduplicatingArticle {
-		property custom.properties = "jsonws.web.service.paths.excludes=";
-
 		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
-		JSONUser.addUser(
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.addCP(
 			userEmailAddress = "user1@liferay.com",
 			userFirstName = "user1",
 			userLastName = "user1",
 			userScreenName = "user1");
 
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			requireReset = "false",
-			userEmailAddress = "user1@liferay.com");
-
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
-
 		User.openUsersAdmin();
 
-		User.editUserSiteCP(
-			siteName = ${siteName},
+		Site.assignUserSitesCP(
+			siteName = "Liferay",
 			userScreenName = "user1");
 
 		ApplicationsMenu.gotoPortlet(
@@ -125,14 +131,26 @@ definition {
 			siteRoleName = "Site Owner",
 			userScreenName = "user1");
 
+		UserNavigator.gotoPassword();
+
+		User.setPasswordByResetLink(
+			newPassword1 = "password",
+			newPassword2 = "password");
+
+		User.logoutPG();
+
+		User.loginPG(
+			password = "password",
+			userEmailAddress = "user1@liferay.com");
+
+		User.setPasswordByResetLink(
+			newPassword1 = "test",
+			newPassword2 = "test");
+
 		Navigator.openURL();
 
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "user1@liferay.com",
-			userLoginFullName = "user1 user1");
-
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -142,7 +160,7 @@ definition {
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "EXAMPLE");
 
-		PortletEntry.submitForWorkflow();
+		PortletEntry.submitForPublication();
 
 		WebContentNavigator.gotoViewStatus(
 			webContentStatus = "PENDING",
@@ -182,7 +200,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -201,7 +219,7 @@ definition {
 			value1 = "APPROVED");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ConfigureFolderWorkflow {
 		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
@@ -230,7 +248,7 @@ definition {
 			workflowRestriction = "Default Workflow");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test EditWebContentInReviewProcess {
 		Navigator.gotoNavItem(navItem = "Structures");
 
@@ -247,7 +265,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -260,14 +278,14 @@ definition {
 			templateName = "WC Template Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
 		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -309,7 +327,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -326,7 +344,7 @@ definition {
 			panel = "Site Administration",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Test Page");
+		SitePages.addPublicPage(pageName = "Test Page");
 
 		Navigator.gotoPage(pageName = "Test Page");
 
@@ -336,13 +354,11 @@ definition {
 
 		Navigator.gotoPage(pageName = "Test Page");
 
-		WebContentDisplayPortlet.viewContent(
-			imageFileName = "Document_2.jpeg",
-			webContentTitle = "WC WebContent Title Edit");
+		WebContentDisplayPortlet.viewImageFieldViaWCD();
 	}
 
 	@description = "Verify that, when a Web Content is moved to a Folder, it's Workflow changes"
-	@priority = 4
+	@priority = "4"
 	test MoveWebContentToFolderChangeItsWorkflow {
 		property test.name.skip.portal.instance = "WorkflowWebContent#MoveWebContentToFolderChangeItsWorkflow";
 
@@ -351,7 +367,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -384,7 +400,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -410,7 +426,7 @@ definition {
 			workflowTask = "Review");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -422,7 +438,7 @@ definition {
 			key_webContentTitle = "Web Content Title",
 			locator1 = "WC#ENTRY_LIST_TITLE");
 
-		PortletEntry.submitForWorkflow();
+		PortletEntry.submitForPublication();
 
 		WorkflowMetrics.goToDashboardAllItemsWithFilter(
 			workflowFilterOption = "PENDING",
@@ -435,7 +451,7 @@ definition {
 	}
 
 	@description = "Verify that the Subfolder can use the Workflow of the Parent Folder"
-	@priority = 4
+	@priority = "4"
 	test SubfolderCanUseWorkflowOfParentFolder {
 		WebContentFolder.addCP(
 			folderDescription = "WC Folder Description",

@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property portal.release = "false";
 	property portal.upstream = "true";
@@ -10,24 +8,16 @@ definition {
 	property testray.main.component.name = "Analytics Cloud";
 
 	setUp {
-		task ("Copy the token from AC") {
-			ACUtils.launchAC();
+		ACUtils.launchAC();
 
-			ACSettings.takeTokenFromAnalyticsCloud();
-		}
+		ACSettings.takeTokenFromAnalyticsCloud();
 
-		task ("Set up instance and sign in DXP") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			ACUtils.launchDXP();
-		}
+		ACUtils.launchDXP();
 
-		task ("Add a new site with a public widget page") {
-			ACUtils.addSiteAndPage();
-		}
-
-		task ("Create Blog to Add to Page") {
-			ACUtils.createBlogsAndAddToPage();
+		task ("Connect DXP to AC") {
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Add a new user") {
@@ -43,8 +33,8 @@ definition {
 				userEmailAddress = "ac@liferay.com");
 		}
 
-		task ("Connect DXP to AC") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
 		}
 
 		task ("View the site page as ac user") {
@@ -52,9 +42,7 @@ definition {
 				userLoginEmailAddress = "ac@liferay.com",
 				userLoginFullName = "ac ac");
 
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -64,7 +52,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to the Views by Technology card") {
@@ -76,9 +64,7 @@ definition {
 
 			ACTimeFilter.setLast24Hours();
 
-			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, " ");
-
-			ACNavigation.openItem(itemName = "Blogs AC Title - Site Name - ${dataSourceName}");
+			ACNavigation.openItem(itemName = "AC Page - Site Name - Liferay DXP");
 
 			ACTimeFilter.clickTimeFilterButton(cardName = "Views by Technology");
 
@@ -89,24 +75,27 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
+
+			JSONUser.tearDownNonAdminUsers();
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8362 | Test Summary: Page profile views by technology shows which browsers are being used"
-	@priority = 5
+	@priority = "5"
 	test ShowsWhichBrowsersBeingUsed {
-		property analytics.cloud.upstream = "false";
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: Data doesn't appear on time
+		// AC Refactor ticket: LRAC-9001
 
 		ACNavigation.switchTabInCard(tabName = "Browsers");
 
@@ -118,9 +107,12 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8363 | Test Summary: Page profile views by technology shows which devices are being used"
-	@priority = 5
+	@priority = "5"
 	test ShowsWhichDevicesBeingUsed {
-		property analytics.cloud.upstream = "false";
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: Data doesn't appear on time
+		// AC Refactor ticket: LRAC-9002
 
 		ACAssets.viewTechnologyDeviceViewsAndPercentage(
 			actionValue = "1 Views",

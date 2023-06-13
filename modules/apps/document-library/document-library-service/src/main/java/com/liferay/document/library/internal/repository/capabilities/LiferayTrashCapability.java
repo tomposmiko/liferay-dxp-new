@@ -40,7 +40,6 @@ import com.liferay.portal.repository.capabilities.util.DLFileEntryServiceAdapter
 import com.liferay.portal.repository.capabilities.util.DLFolderServiceAdapter;
 import com.liferay.portal.repository.capabilities.util.RepositoryServiceAdapter;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.model.TrashEntry;
 import com.liferay.trash.service.TrashEntryLocalService;
 import com.liferay.trash.service.TrashVersionLocalService;
@@ -59,7 +58,7 @@ public class LiferayTrashCapability
 		DLFileEntryServiceAdapter dlFileEntryServiceAdapter,
 		DLFolderServiceAdapter dlFolderServiceAdapter,
 		RepositoryServiceAdapter repositoryServiceAdapter,
-		TrashEntryLocalService trashEntryLocalService, TrashHelper trashHelper,
+		TrashEntryLocalService trashEntryLocalService,
 		TrashVersionLocalService trashVersionLocalService) {
 
 		_dlAppHelperLocalService = dlAppHelperLocalService;
@@ -68,13 +67,12 @@ public class LiferayTrashCapability
 		_dlFolderServiceAdapter = dlFolderServiceAdapter;
 		_repositoryServiceAdapter = repositoryServiceAdapter;
 		_trashEntryLocalService = trashEntryLocalService;
-		_trashHelper = trashHelper;
 		_trashVersionLocalService = trashVersionLocalService;
 	}
 
 	@Override
 	public void deleteFileEntry(FileEntry fileEntry) throws PortalException {
-		_deleteTrashEntry(fileEntry);
+		deleteTrashEntry(fileEntry);
 
 		_dlAppServiceAdapter.deleteFileEntry(fileEntry.getFileEntryId());
 	}
@@ -92,12 +90,12 @@ public class LiferayTrashCapability
 
 			_dlAppHelperLocalService.deleteFileEntry(fileEntry);
 
-			_deleteTrashEntry(fileEntry);
+			deleteTrashEntry(fileEntry);
 		}
 
 		_dlAppHelperLocalService.deleteFolder(folder);
 
-		_deleteTrashEntry(folder);
+		deleteTrashEntry(folder);
 
 		_dlFolderServiceAdapter.deleteFolder(folder.getFolderId(), false);
 	}
@@ -225,7 +223,7 @@ public class LiferayTrashCapability
 		_dlAppHelperLocalService.restoreFolderFromTrash(userId, folder);
 	}
 
-	private void _deleteRepositoryTrashEntries(
+	protected void deleteRepositoryTrashEntries(
 		long repositoryId, String className) {
 
 		List<TrashEntry> trashEntries = _trashEntryLocalService.getEntries(
@@ -236,23 +234,25 @@ public class LiferayTrashCapability
 		}
 	}
 
-	private void _deleteTrashEntries(long repositoryId) throws PortalException {
+	protected void deleteTrashEntries(long repositoryId)
+		throws PortalException {
+
 		Repository repository = _repositoryServiceAdapter.fetchRepository(
 			repositoryId);
 
 		if (repository == null) {
-			_deleteRepositoryTrashEntries(
+			deleteRepositoryTrashEntries(
 				repositoryId, DLFileEntry.class.getName());
-			_deleteRepositoryTrashEntries(
+			deleteRepositoryTrashEntries(
 				repositoryId, DLFolder.class.getName());
 		}
 		else {
-			_deleteTrashEntries(
+			deleteTrashEntries(
 				repository.getGroupId(), repository.getDlFolderId());
 		}
 	}
 
-	private void _deleteTrashEntries(long groupId, long dlFolderId)
+	protected void deleteTrashEntries(long groupId, long dlFolderId)
 		throws PortalException {
 
 		QueryDefinition<Object> queryDefinition = new QueryDefinition<>();
@@ -267,25 +267,25 @@ public class LiferayTrashCapability
 				foldersAndFileEntriesAndFileShortcuts) {
 
 			if (folderFileEntryOrFileShortcut instanceof DLFileEntry) {
-				_deleteTrashEntry((DLFileEntry)folderFileEntryOrFileShortcut);
+				deleteTrashEntry((DLFileEntry)folderFileEntryOrFileShortcut);
 			}
 			else if (folderFileEntryOrFileShortcut instanceof DLFolder) {
 				DLFolder dlFolder = (DLFolder)folderFileEntryOrFileShortcut;
 
-				_deleteTrashEntries(
+				deleteTrashEntries(
 					dlFolder.getGroupId(), dlFolder.getFolderId());
 
-				_deleteTrashEntry(dlFolder);
+				deleteTrashEntry(dlFolder);
 			}
 		}
 	}
 
-	private void _deleteTrashEntry(DLFileEntry dlFileEntry) {
+	protected void deleteTrashEntry(DLFileEntry dlFileEntry) {
 		if (!dlFileEntry.isInTrash()) {
 			return;
 		}
 
-		if (_trashHelper.isInTrashExplicitly(dlFileEntry)) {
+		if (dlFileEntry.isInTrashExplicitly()) {
 			_trashEntryLocalService.deleteEntry(
 				DLFileEntryConstants.getClassName(),
 				dlFileEntry.getFileEntryId());
@@ -302,12 +302,12 @@ public class LiferayTrashCapability
 		}
 	}
 
-	private void _deleteTrashEntry(DLFolder dlFolder) {
+	protected void deleteTrashEntry(DLFolder dlFolder) {
 		if (!dlFolder.isInTrash()) {
 			return;
 		}
 
-		if (_trashHelper.isInTrashExplicitly(dlFolder)) {
+		if (dlFolder.isInTrashExplicitly()) {
 			_trashEntryLocalService.deleteEntry(
 				DLFolderConstants.getClassName(), dlFolder.getFolderId());
 		}
@@ -317,12 +317,12 @@ public class LiferayTrashCapability
 		}
 	}
 
-	private void _deleteTrashEntry(FileEntry fileEntry) {
-		_deleteTrashEntry((DLFileEntry)fileEntry.getModel());
+	protected void deleteTrashEntry(FileEntry fileEntry) {
+		deleteTrashEntry((DLFileEntry)fileEntry.getModel());
 	}
 
-	private void _deleteTrashEntry(Folder folder) {
-		_deleteTrashEntry((DLFolder)folder.getModel());
+	protected void deleteTrashEntry(Folder folder) {
+		deleteTrashEntry((DLFolder)folder.getModel());
 	}
 
 	private final DLAppHelperLocalService _dlAppHelperLocalService;
@@ -331,7 +331,6 @@ public class LiferayTrashCapability
 	private final DLFolderServiceAdapter _dlFolderServiceAdapter;
 	private final RepositoryServiceAdapter _repositoryServiceAdapter;
 	private final TrashEntryLocalService _trashEntryLocalService;
-	private final TrashHelper _trashHelper;
 	private final TrashVersionLocalService _trashVersionLocalService;
 
 	private class DeleteFileEntryRepositoryEventListener
@@ -340,7 +339,7 @@ public class LiferayTrashCapability
 
 		@Override
 		public void execute(FileEntry fileEntry) {
-			LiferayTrashCapability.this._deleteTrashEntry(fileEntry);
+			LiferayTrashCapability.this.deleteTrashEntry(fileEntry);
 		}
 
 	}
@@ -350,7 +349,7 @@ public class LiferayTrashCapability
 
 		@Override
 		public void execute(Folder folder) {
-			LiferayTrashCapability.this._deleteTrashEntry(folder);
+			LiferayTrashCapability.this.deleteTrashEntry(folder);
 		}
 
 	}
@@ -363,7 +362,7 @@ public class LiferayTrashCapability
 		public void execute(LocalRepository localRepository)
 			throws PortalException {
 
-			LiferayTrashCapability.this._deleteTrashEntries(
+			LiferayTrashCapability.this.deleteTrashEntries(
 				localRepository.getRepositoryId());
 		}
 

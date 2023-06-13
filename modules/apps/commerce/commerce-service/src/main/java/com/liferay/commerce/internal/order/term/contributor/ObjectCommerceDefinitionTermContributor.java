@@ -51,7 +51,7 @@ public class ObjectCommerceDefinitionTermContributor
 		_userLocalService = userLocalService;
 
 		List<ObjectField> objectFields =
-			objectFieldLocalService.getObjectFields(objectDefinitionId);
+			_objectFieldLocalService.getObjectFields(_objectDefinitionId);
 
 		for (ObjectField objectField : objectFields) {
 			_objectFieldIds.put(
@@ -118,7 +118,9 @@ public class ObjectCommerceDefinitionTermContributor
 		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
 			objectFieldId);
 
-		return objectField.getLabel(locale);
+		// TODO return objectField.getLable(locale);
+
+		return objectField.getName();
 	}
 
 	@Override

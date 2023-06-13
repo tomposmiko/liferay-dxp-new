@@ -54,7 +54,7 @@ public class CPPriceRangeFacetsDisplayContext {
 		_paginationStartParameterName = paginationStartParameterName;
 		_portletSharedSearchResponse = portletSharedSearchResponse;
 
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
@@ -143,14 +143,6 @@ public class CPPriceRangeFacetsDisplayContext {
 		}
 
 		return false;
-	}
-
-	public boolean isShowClear(String fieldName) {
-		Optional<String[]> parameterValuesOptional =
-			_portletSharedSearchResponse.getParameterValues(
-				fieldName, _renderRequest);
-
-		return parameterValuesOptional.isPresent();
 	}
 
 	public boolean showInputRange() {

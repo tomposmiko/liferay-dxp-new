@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = NameIdTypeValues.class)
+@Component(immediate = true, service = NameIdTypeValues.class)
 public class NameIdTypeValiesImpl implements NameIdTypeValues {
 
 	@Override

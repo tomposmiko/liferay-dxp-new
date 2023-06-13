@@ -78,7 +78,7 @@ public class CMISFileVersion extends BaseCMISModel implements FileVersion {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -186,11 +186,11 @@ public class CMISFileVersion extends BaseCMISModel implements FileVersion {
 		}
 		catch (NoSuchFileEntryException noSuchFileEntryException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileEntryException);
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return 0;
@@ -225,15 +225,11 @@ public class CMISFileVersion extends BaseCMISModel implements FileVersion {
 	public String getMimeType() {
 		String mimeType = _document.getContentStreamMimeType();
 
-		if (Validator.isNull(mimeType)) {
-			mimeType = MimeTypesUtil.getContentType(getTitle());
-		}
-
 		if (Validator.isNotNull(mimeType)) {
 			return mimeType;
 		}
 
-		return StringPool.BLANK;
+		return MimeTypesUtil.getContentType(getTitle());
 	}
 
 	@Override
@@ -321,11 +317,11 @@ public class CMISFileVersion extends BaseCMISModel implements FileVersion {
 	@Override
 	public long getUserId() {
 		try {
-			return UserLocalServiceUtil.getGuestUserId(getCompanyId());
+			return UserLocalServiceUtil.getDefaultUserId(getCompanyId());
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return 0;
@@ -340,13 +336,13 @@ public class CMISFileVersion extends BaseCMISModel implements FileVersion {
 	@Override
 	public String getUserUuid() {
 		try {
-			User user = UserLocalServiceUtil.getGuestUser(getCompanyId());
+			User user = UserLocalServiceUtil.getDefaultUser(getCompanyId());
 
 			return user.getUserUuid();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;

@@ -18,7 +18,6 @@ import com.liferay.expando.kernel.model.ExpandoValueTable;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portlet.expando.model.impl.ExpandoValueImpl;
 import com.liferay.portlet.expando.model.impl.ExpandoValueModelImpl;
 
@@ -31,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portlet.expando.model.impl.ExpandoValueImpl",
-		"table.name=ExpandoValue"
-	},
-	service = ArgumentsResolver.class
-)
 public class ExpandoValueModelArgumentsResolver implements ArgumentsResolver {
 
 	@Override

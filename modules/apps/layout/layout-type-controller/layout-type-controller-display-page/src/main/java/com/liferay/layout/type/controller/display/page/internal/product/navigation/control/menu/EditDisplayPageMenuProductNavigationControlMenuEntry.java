@@ -19,7 +19,7 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.url.provider.InfoEditURLProvider;
-import com.liferay.info.display.url.provider.InfoEditURLProviderRegistry;
+import com.liferay.info.display.url.provider.InfoEditURLProviderTracker;
 import com.liferay.info.item.InfoItemDetails;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.layout.type.controller.display.page.internal.constants.DisplayPageLayoutTypeControllerWebKeys;
@@ -54,9 +54,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
-		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
-		"product.navigation.control.menu.entry.order:Integer=50"
+		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.TOOLS,
+		"product.navigation.control.menu.entry.order:Integer=200"
 	},
 	service = ProductNavigationControlMenuEntry.class
 )
@@ -90,7 +91,7 @@ public class EditDisplayPageMenuProductNavigationControlMenuEntry
 				InfoDisplayWebKeys.INFO_ITEM_DETAILS);
 
 		InfoEditURLProvider<Object> infoEditURLProvider =
-			_infoEditURLProviderRegistry.getInfoEditURLProvider(
+			_infoEditURLProviderTracker.getInfoEditURLProvider(
 				infoItemDetails.getClassName());
 
 		httpServletRequest.setAttribute(
@@ -167,19 +168,18 @@ public class EditDisplayPageMenuProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.display.page)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Reference
-	private InfoEditURLProviderRegistry _infoEditURLProviderRegistry;
+	private InfoEditURLProviderTracker _infoEditURLProviderTracker;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.display.page)"
-	)
-	private ServletContext _servletContext;
 
 }

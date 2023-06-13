@@ -26,7 +26,6 @@ import com.liferay.commerce.price.list.service.CommercePriceListLocalService;
 import com.liferay.commerce.price.list.service.CommercePriceListOrderTypeRelLocalService;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -39,13 +38,13 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.MissingFilter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -57,6 +56,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -68,7 +68,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommercePriceListIndexer extends BaseIndexer<CommercePriceList> {
 
 	public static final String CLASS_NAME = CommercePriceList.class.getName();
@@ -83,13 +83,6 @@ public class CommercePriceListIndexer extends BaseIndexer<CommercePriceList> {
 			Field.SCOPE_GROUP_ID, Field.UID);
 		setFilterSearch(true);
 		setPermissionAware(true);
-	}
-
-	@Override
-	public void delete(long companyId, String uuid) throws SearchException {
-		super.delete(companyId, uuid);
-
-		_commercePriceListLocalService.cleanPriceListCache();
 	}
 
 	@Override
@@ -210,8 +203,6 @@ public class CommercePriceListIndexer extends BaseIndexer<CommercePriceList> {
 		deleteDocument(
 			commercePriceList.getCompanyId(),
 			commercePriceList.getCommercePriceListId());
-
-		_commercePriceListLocalService.cleanPriceListCache();
 	}
 
 	@Override
@@ -224,53 +215,87 @@ public class CommercePriceListIndexer extends BaseIndexer<CommercePriceList> {
 
 		Document document = getBaseModelDocument(CLASS_NAME, commercePriceList);
 
-		document.addNumber(
-			Field.ENTRY_CLASS_PK, commercePriceList.getCommercePriceListId());
-		document.addText(Field.NAME, commercePriceList.getName());
-		document.addNumberSortable(
-			Field.PRIORITY, commercePriceList.getPriority());
-		document.addText(Field.USER_NAME, commercePriceList.getUserName());
 		document.addKeyword(
 			FIELD_EXTERNAL_REFERENCE_CODE,
 			commercePriceList.getExternalReferenceCode());
+		document.addNumber(
+			Field.ENTRY_CLASS_PK, commercePriceList.getCommercePriceListId());
+		document.addText(Field.NAME, commercePriceList.getName());
+		document.addText(Field.USER_NAME, commercePriceList.getUserName());
+		document.addNumberSortable(
+			Field.PRIORITY, commercePriceList.getPriority());
+		document.addNumber("catalogId", _getCatalogId(commercePriceList));
 		document.addKeyword(
 			"catalogBasePriceList", commercePriceList.isCatalogBasePriceList());
-		document.addNumber("catalogId", _getCatalogId(commercePriceList));
+		document.addText("type", commercePriceList.getType());
 
-		long[] commerceAccountGroupIds = TransformUtil.transformToLongArray(
-			_commercePriceListCommerceAccountGroupRelLocalService.
-				getCommercePriceListCommerceAccountGroupRels(
-					commercePriceList.getCommercePriceListId()),
-			CommercePriceListCommerceAccountGroupRel::
-				getCommerceAccountGroupId);
+		List<CommercePriceListAccountRel> commercePriceListAccountRels =
+			_commercePriceListAccountRelLocalService.
+				getCommercePriceListAccountRels(
+					commercePriceList.getCommercePriceListId());
+
+		Stream<CommercePriceListAccountRel> commercePriceListAccountRelsStream =
+			commercePriceListAccountRels.stream();
+
+		long[] commerceAccountIds =
+			commercePriceListAccountRelsStream.mapToLong(
+				CommercePriceListAccountRel::getCommerceAccountId
+			).toArray();
+
+		document.addNumber("commerceAccountId", commerceAccountIds);
+
+		List<CommercePriceListChannelRel> commercePriceListChannelRels =
+			_commercePriceListChannelRelLocalService.
+				getCommercePriceListChannelRels(
+					commercePriceList.getCommercePriceListId());
+
+		Stream<CommercePriceListChannelRel> commercePriceListChannelRelsStream =
+			commercePriceListChannelRels.stream();
+
+		long[] commerceChannelIds =
+			commercePriceListChannelRelsStream.mapToLong(
+				CommercePriceListChannelRel::getCommerceChannelId
+			).toArray();
+
+		document.addNumber("commerceChannelId", commerceChannelIds);
+
+		List<CommercePriceListCommerceAccountGroupRel>
+			commercePriceListCommerceAccountGroupRels =
+				_commercePriceListCommerceAccountGroupRelLocalService.
+					getCommercePriceListCommerceAccountGroupRels(
+						commercePriceList.getCommercePriceListId());
+
+		Stream<CommercePriceListCommerceAccountGroupRel>
+			commercePriceListCommerceAccountGroupRelsStream =
+				commercePriceListCommerceAccountGroupRels.stream();
+
+		long[] commerceAccountGroupIds =
+			commercePriceListCommerceAccountGroupRelsStream.mapToLong(
+				CommercePriceListCommerceAccountGroupRel::
+					getCommerceAccountGroupId
+			).toArray();
 
 		document.addNumber("commerceAccountGroupIds", commerceAccountGroupIds);
+
 		document.addNumber(
 			"commerceAccountGroupIds_required_matches",
 			commerceAccountGroupIds.length);
 
-		document.addNumber(
-			"commerceAccountId",
-			TransformUtil.transformToLongArray(
-				_commercePriceListAccountRelLocalService.
-					getCommercePriceListAccountRels(
-						commercePriceList.getCommercePriceListId()),
-				CommercePriceListAccountRel::getCommerceAccountId));
-		document.addNumber(
-			"commerceChannelId",
-			TransformUtil.transformToLongArray(
-				_commercePriceListChannelRelLocalService.
-					getCommercePriceListChannelRels(
-						commercePriceList.getCommercePriceListId()),
-				CommercePriceListChannelRel::getCommerceChannelId));
-		document.addNumber(
-			"commerceOrderTypeId",
-			TransformUtil.transformToLongArray(
-				_commercePriceListOrderTypeRelLocalService.
-					getCommercePriceListOrderTypeRels(
-						commercePriceList.getCommercePriceListId()),
-				CommercePriceListOrderTypeRel::getCommerceOrderTypeId));
-		document.addText("type", commercePriceList.getType());
+		List<CommercePriceListOrderTypeRel> commercePriceListOrderTypeRels =
+			_commercePriceListOrderTypeRelLocalService.
+				getCommercePriceListOrderTypeRels(
+					commercePriceList.getCommercePriceListId());
+
+		Stream<CommercePriceListOrderTypeRel>
+			commercePriceListOrderTypeRelsStream =
+				commercePriceListOrderTypeRels.stream();
+
+		long[] commerceOrderTypeIds =
+			commercePriceListOrderTypeRelsStream.mapToLong(
+				CommercePriceListOrderTypeRel::getCommerceOrderTypeId
+			).toArray();
+
+		document.addNumber("commerceOrderTypeId", commerceOrderTypeIds);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -298,9 +323,8 @@ public class CommercePriceListIndexer extends BaseIndexer<CommercePriceList> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commercePriceList.getCompanyId(), getDocument(commercePriceList));
-
-		_commercePriceListLocalService.cleanPriceListCache();
+			getSearchEngineId(), commercePriceList.getCompanyId(),
+			getDocument(commercePriceList), isCommitImmediately());
 	}
 
 	@Override
@@ -312,26 +336,12 @@ public class CommercePriceListIndexer extends BaseIndexer<CommercePriceList> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommercePriceLists(companyId);
-
-		_commercePriceListLocalService.cleanPriceListCache();
+		reindexCommercePriceLists(companyId);
 	}
 
-	private long _getCatalogId(CommercePriceList commercePriceList)
-		throws Exception {
+	protected void reindexCommercePriceLists(long companyId)
+		throws PortalException {
 
-		CommerceCatalog commerceCatalog =
-			_commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
-				commercePriceList.getGroupId());
-
-		if (commerceCatalog == null) {
-			return 0L;
-		}
-
-		return commerceCatalog.getCommerceCatalogId();
-	}
-
-	private void _reindexCommercePriceLists(long companyId) throws Exception {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_commercePriceListLocalService.getIndexableActionableDynamicQuery();
 
@@ -351,12 +361,30 @@ public class CommercePriceListIndexer extends BaseIndexer<CommercePriceList> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}
 
+	private long _getCatalogId(CommercePriceList commercePriceList)
+		throws Exception {
+
+		CommerceCatalog commerceCatalog =
+			_commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
+				commercePriceList.getGroupId());
+
+		if (commerceCatalog == null) {
+			return 0L;
+		}
+
+		return commerceCatalog.getCommerceCatalogId();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommercePriceListIndexer.class);
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
 	private CommerceCatalogLocalService _commerceCatalogLocalService;

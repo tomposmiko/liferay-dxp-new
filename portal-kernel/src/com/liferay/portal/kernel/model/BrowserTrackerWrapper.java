@@ -233,11 +233,6 @@ public class BrowserTrackerWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected BrowserTrackerWrapper wrap(BrowserTracker browserTracker) {
 		return new BrowserTrackerWrapper(browserTracker);
 	}

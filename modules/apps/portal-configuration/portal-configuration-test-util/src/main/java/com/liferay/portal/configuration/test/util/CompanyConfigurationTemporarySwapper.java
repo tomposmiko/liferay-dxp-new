@@ -37,7 +37,7 @@ public class CompanyConfigurationTemporarySwapper implements AutoCloseable {
 		_pid = pid;
 		_settingsFactory = settingsFactory;
 
-		Settings settings = settingsFactory.getSettings(
+		Settings settings = _settingsFactory.getSettings(
 			new CompanyServiceSettingsLocator(_companyId, _pid));
 
 		ModifiableSettings modifiableSettings =
@@ -52,14 +52,8 @@ public class CompanyConfigurationTemporarySwapper implements AutoCloseable {
 
 			_initialProperties.put(key, modifiableSettings.getValue(key, null));
 
-			Object value = properties.get(key);
-
-			if (value instanceof String[]) {
-				modifiableSettings.setValues(key, (String[])value);
-			}
-			else {
-				modifiableSettings.setValue(key, String.valueOf(value));
-			}
+			modifiableSettings.setValue(
+				key, String.valueOf(properties.get(key)));
 		}
 
 		modifiableSettings.store();

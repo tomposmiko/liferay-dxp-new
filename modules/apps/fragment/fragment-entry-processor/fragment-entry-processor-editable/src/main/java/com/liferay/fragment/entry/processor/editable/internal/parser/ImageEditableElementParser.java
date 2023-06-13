@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.entry.processor.editable.internal.parser;
 
+import com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor;
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
 import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
 import com.liferay.fragment.exception.FragmentEntryContentException;
@@ -23,10 +24,10 @@ import com.liferay.layout.responsive.ViewportSize;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -41,9 +42,8 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
 
@@ -53,8 +53,16 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(property = "type=image", service = EditableElementParser.class)
+@Component(
+	immediate = true, property = "type=image",
+	service = EditableElementParser.class
+)
 public class ImageEditableElementParser implements EditableElementParser {
+
+	@Override
+	public String getFieldTemplate() {
+		return _TMPL_IMAGE_FIELD_TEMPLATE;
+	}
 
 	@Override
 	public JSONObject getFieldTemplateConfigJSONObject(
@@ -63,7 +71,14 @@ public class ImageEditableElementParser implements EditableElementParser {
 		String alt = StringPool.BLANK;
 		Object fileEntryId = 0;
 
-		if (fieldValue instanceof JSONObject) {
+		if (fieldValue == null) {
+			alt = StringUtil.replace(
+				_TMPL_IMAGE_FIELD_ALT_TEMPLATE, "field_name", fieldName);
+			fileEntryId = StringUtil.replace(
+				_TMPL_IMAGE_FIELD_FILE_ENTRY_ID_TEMPLATE, "field_name",
+				fieldName);
+		}
+		else if (fieldValue instanceof JSONObject) {
 			JSONObject fieldValueJSONObject = (JSONObject)fieldValue;
 
 			alt = fieldValueJSONObject.getString("alt");
@@ -89,10 +104,13 @@ public class ImageEditableElementParser implements EditableElementParser {
 		else if (fieldValue instanceof WebImage) {
 			WebImage webImage = (WebImage)fieldValue;
 
-			InfoLocalizedValue<String> infoLocalizedValue =
-				webImage.getAltInfoLocalizedValue();
+			Optional<InfoLocalizedValue<String>> altInfoLocalizedValueOptional =
+				webImage.getAltInfoLocalizedValueOptional();
 
-			if (infoLocalizedValue != null) {
+			if (altInfoLocalizedValueOptional.isPresent()) {
+				InfoLocalizedValue<String> infoLocalizedValue =
+					altInfoLocalizedValueOptional.get();
+
 				alt = infoLocalizedValue.getValue(locale);
 			}
 
@@ -172,14 +190,13 @@ public class ImageEditableElementParser implements EditableElementParser {
 
 		if (JSONUtil.isValid(value)) {
 			try {
-				JSONObject jsonObject = _jsonFactory.createJSONObject(value);
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 				fileEntryId = jsonObject.getLong("fileEntryId");
 				value = jsonObject.getString("url");
 			}
 			catch (JSONException jsonException) {
-				_log.error(
-					"Unable to parse JSON value " + value, jsonException);
+				_log.error("Unable to parse JSON value " + value);
 
 				value = StringPool.BLANK;
 			}
@@ -203,9 +220,7 @@ public class ImageEditableElementParser implements EditableElementParser {
 			}
 		}
 
-		Matcher matcher = _pattern.matcher(replaceableElement.attr("src"));
-
-		if (Validator.isNotNull(value) && !matcher.matches()) {
+		if (Validator.isNotNull(value)) {
 			replaceableElement.attr("src", _html.unescape(value));
 		}
 
@@ -226,10 +241,6 @@ public class ImageEditableElementParser implements EditableElementParser {
 		if (Validator.isNotNull(alt)) {
 			replaceableElement.attr(
 				"alt", StringUtil.trim(_html.unescape(alt)));
-		}
-
-		if (configJSONObject.getBoolean("lazyLoading")) {
-			replaceableElement.attr("loading", "lazy");
 		}
 
 		String imageLink = configJSONObject.getString("imageLink");
@@ -268,7 +279,7 @@ public class ImageEditableElementParser implements EditableElementParser {
 				"content.Language", getClass());
 
 			throw new FragmentEntryContentException(
-				_language.format(
+				LanguageUtil.format(
 					resourceBundle,
 					"each-editable-image-element-must-contain-an-img-tag",
 					new Object[] {"<em>", "</em>"}, false));
@@ -278,7 +289,7 @@ public class ImageEditableElementParser implements EditableElementParser {
 	private void _setImageConfiguration(
 		Element element, JSONObject imageConfigurationJSONObject) {
 
-		for (ViewportSize viewportSize : _viewportSizes) {
+		for (ViewportSize viewportSize : ViewportSize.values()) {
 			String imageConfiguration = imageConfigurationJSONObject.getString(
 				viewportSize.getViewportSizeId());
 
@@ -294,23 +305,30 @@ public class ImageEditableElementParser implements EditableElementParser {
 		}
 	}
 
+	private static final String _TMPL_IMAGE_FIELD_ALT_TEMPLATE =
+		StringUtil.read(
+			EditableFragmentEntryProcessor.class,
+			"/META-INF/resources/fragment/entry/processor/editable" +
+				"/image_field_alt_template.tmpl");
+
+	private static final String _TMPL_IMAGE_FIELD_FILE_ENTRY_ID_TEMPLATE =
+		StringUtil.read(
+			EditableFragmentEntryProcessor.class,
+			"/META-INF/resources/fragment/entry/processor/editable" +
+				"/image_field_file_entry_id_template.tmpl");
+
+	private static final String _TMPL_IMAGE_FIELD_TEMPLATE = StringUtil.read(
+		EditableFragmentEntryProcessor.class,
+		"/META-INF/resources/fragment/entry/processor/editable" +
+			"/image_field_template.tmpl");
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ImageEditableElementParser.class);
-
-	private static final Pattern _pattern = Pattern.compile(
-		"\\[resources:(.+?)\\]");
-	private static final ViewportSize[] _viewportSizes = ViewportSize.values();
 
 	@Reference
 	private FragmentEntryProcessorHelper _fragmentEntryProcessorHelper;
 
 	@Reference
 	private Html _html;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 }

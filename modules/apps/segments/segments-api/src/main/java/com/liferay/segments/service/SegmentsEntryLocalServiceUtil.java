@@ -449,6 +449,24 @@ public class SegmentsEntryLocalServiceUtil {
 		return getService().getSegmentsEntryByUuidAndGroupId(uuid, groupId);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #searchSegmentsEntries(long, long, String, boolean,
+	 LinkedHashMap, int, int, Sort)}
+	 */
+	@Deprecated
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult
+		<SegmentsEntry> searchSegmentsEntries(
+				long companyId, long groupId, String keywords,
+				boolean includeAncestorSegmentsEntries, int start, int end,
+				com.liferay.portal.kernel.search.Sort sort)
+			throws PortalException {
+
+		return getService().searchSegmentsEntries(
+			companyId, groupId, keywords, includeAncestorSegmentsEntries, start,
+			end, sort);
+	}
+
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult
 		<SegmentsEntry> searchSegmentsEntries(
 				long companyId, long groupId, String keywords,
@@ -460,17 +478,6 @@ public class SegmentsEntryLocalServiceUtil {
 		return getService().searchSegmentsEntries(
 			companyId, groupId, keywords, includeAncestorSegmentsEntries,
 			params, start, end, sort);
-	}
-
-	public static com.liferay.portal.kernel.search.BaseModelSearchResult
-		<SegmentsEntry> searchSegmentsEntries(
-				long companyId, String keywords,
-				java.util.LinkedHashMap<String, Object> params, int start,
-				int end, com.liferay.portal.kernel.search.Sort sort)
-			throws PortalException {
-
-		return getService().searchSegmentsEntries(
-			companyId, keywords, params, start, end, sort);
 	}
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult

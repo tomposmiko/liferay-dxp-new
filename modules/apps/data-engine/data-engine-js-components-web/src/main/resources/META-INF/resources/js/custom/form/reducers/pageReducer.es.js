@@ -14,7 +14,7 @@
 
 import * as FormSupport from '../../../utils/FormSupport.es';
 import {getUid} from '../../../utils/formId.es';
-import {EVENT_TYPES} from '../eventTypes';
+import {EVENT_TYPES} from '../eventTypes.es';
 
 const getLocalizedValue = (languageId, key, value) => {
 	return {
@@ -28,7 +28,7 @@ const getLocalizedValue = (languageId, key, value) => {
  * NOTE: This is a literal copy of the old LayoutProvider logic. Small changes
  * were made only to adapt to the reducer.
  */
-export default function pageReducer(state, action) {
+export default (state, action) => {
 	switch (action.type) {
 		case EVENT_TYPES.SUCCESS_PAGE: {
 			const {defaultLanguageId, pages, paginationMode} = state;
@@ -182,4 +182,4 @@ export default function pageReducer(state, action) {
 		default:
 			return state;
 	}
-}
+};

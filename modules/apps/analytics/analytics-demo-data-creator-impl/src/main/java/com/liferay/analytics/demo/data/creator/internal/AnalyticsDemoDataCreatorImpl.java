@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -45,7 +44,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.TeamLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -76,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.analytics.demo.data.creator.configuration.AnalyticsDemoDataCreatorConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
 	service = AnalyticsDemoDataCreator.class
 )
 public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
@@ -101,7 +100,7 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -157,7 +156,7 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 
 		_companyId = company.getCompanyId();
 
-		_guestUserId = _userLocalService.getGuestUserId(_companyId);
+		_defaultUserId = _userLocalService.getDefaultUserId(_companyId);
 
 		Group group = _groupLocalService.getGroup(
 			company.getCompanyId(), "Guest");
@@ -173,7 +172,7 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 			delete();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 	}
 
@@ -225,13 +224,15 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 
 			try {
 				organization = _organizationLocalService.addOrganization(
-					_guestUserId, 0, name, false);
+					_defaultUserId, 0, name, false);
 			}
 			catch (DuplicateOrganizationException
 						duplicateOrganizationException) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(duplicateOrganizationException);
+					_log.debug(
+						duplicateOrganizationException,
+						duplicateOrganizationException);
 				}
 
 				organization = _organizationLocalService.getOrganization(
@@ -256,12 +257,12 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 
 			try {
 				role = _roleLocalService.addRole(
-					_guestUserId, null, 0, name, null, null,
+					_defaultUserId, null, 0, name, null, null,
 					RoleConstants.TYPE_REGULAR, null, null);
 			}
 			catch (DuplicateRoleException duplicateRoleException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(duplicateRoleException);
+					_log.debug(duplicateRoleException, duplicateRoleException);
 				}
 
 				role = _roleLocalService.getRole(_companyId, name);
@@ -289,16 +290,18 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 
 			try {
 				group = _groupLocalService.addGroup(
-					_guestUserId, GroupConstants.DEFAULT_PARENT_GROUP_ID, null,
-					0, GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap,
+					_defaultUserId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
+					null, 0, GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap,
 					new HashMap<>(), GroupConstants.TYPE_SITE_OPEN, true,
 					GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION,
-					StringPool.SLASH + _friendlyURLNormalizer.normalize(name),
+					StringPool.SLASH +
+						FriendlyURLNormalizerUtil.normalize(name),
 					true, true, null);
 			}
 			catch (DuplicateGroupException duplicateGroupException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(duplicateGroupException);
+					_log.debug(
+						duplicateGroupException, duplicateGroupException);
 				}
 
 				group = _groupLocalService.getGroup(_companyId, name);
@@ -322,12 +325,12 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 
 			try {
 				team = _teamLocalService.addTeam(
-					_guestUserId, _defaultGroupId, name, null,
+					_defaultUserId, _defaultGroupId, name, null,
 					new ServiceContext());
 			}
 			catch (DuplicateTeamException duplicateTeamException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(duplicateTeamException);
+					_log.debug(duplicateTeamException, duplicateTeamException);
 				}
 
 				team = _teamLocalService.getTeam(_defaultGroupId, name);
@@ -347,7 +350,7 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 		boolean male = StringUtil.equalsIgnoreCase(gender, "male");
 
 		User user = _userLocalService.addUser(
-			_guestUserId, _companyId, false, csvRecord.get("password"),
+			_defaultUserId, _companyId, false, csvRecord.get("password"),
 			csvRecord.get("password"), false, csvRecord.get("screenName"),
 			csvRecord.get("emailAddress"), LocaleUtil.getDefault(),
 			csvRecord.get("firstName"), csvRecord.get("middleName"),
@@ -355,7 +358,7 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 			GetterUtil.getInteger(csvRecord.get("birthdayMonth")) - 1,
 			GetterUtil.getInteger(csvRecord.get("birthdayDay")),
 			GetterUtil.getInteger(csvRecord.get("birthdayYear")),
-			csvRecord.get("jobTitle"), UserConstants.TYPE_REGULAR, null,
+			csvRecord.get("jobTitle"), null,
 			_addEntries(csvRecord, "organizations"),
 			_addEntries(csvRecord, "roles"),
 			_addEntries(csvRecord, "userGroups"), false, new ServiceContext());
@@ -385,11 +388,13 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 
 			try {
 				userGroup = _userGroupLocalService.addUserGroup(
-					_guestUserId, _companyId, name, null, null);
+					_defaultUserId, _companyId, name, null, null);
 			}
 			catch (DuplicateUserGroupException duplicateUserGroupException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(duplicateUserGroupException);
+					_log.debug(
+						duplicateUserGroupException,
+						duplicateUserGroupException);
 				}
 
 				userGroup = _userGroupLocalService.getUserGroup(
@@ -416,7 +421,7 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 				csvFile, Charset.defaultCharset(), csvFormat);
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			_log.error(ioException, ioException);
 
 			throw ioException;
 		}
@@ -433,15 +438,12 @@ public class AnalyticsDemoDataCreatorImpl implements AnalyticsDemoDataCreator {
 	private CompanyLocalService _companyLocalService;
 
 	private long _defaultGroupId;
-
-	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
+	private long _defaultUserId;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
 
 	private final HashMap<String, Group> _groups = new HashMap<>();
-	private long _guestUserId;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;

@@ -21,13 +21,12 @@ export default function Hint({message, position = 'top', secondary, title}) {
 	return (
 		<ClayPopover
 			alignPosition={position}
-			className="position-fixed"
 			header={title}
 			onShowChange={setShowPopover}
 			show={showPopover}
 			trigger={
 				<span
-					className={className('p-1', {
+					className={className('p-1 small', {
 						'text-secondary': secondary,
 					})}
 					onMouseEnter={() => setShowPopover(true)}

@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Preston Crary
  * @author André de Oliveira
  */
-@Component(service = DocumentContributor.class)
+@Component(immediate = true, service = DocumentContributor.class)
 public class CTModelDocumentContributor implements DocumentContributor<Object> {
 
 	@Override

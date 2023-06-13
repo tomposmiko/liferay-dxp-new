@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-journal-navigation',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const JournalNavigation = A.Component.create({
+		var JournalNavigation = A.Component.create({
 			ATTRS: {
 				editEntryUrl: {
 					validator: Lang.isString,
@@ -44,7 +44,7 @@ AUI.add(
 
 			prototype: {
 				_bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = [
 						Liferay.on(
@@ -56,11 +56,11 @@ AUI.add(
 				},
 
 				_editEntry(event) {
-					const instance = this;
+					var instance = this;
 
-					const action = event.action;
+					var action = event.action;
 
-					let url = instance.get('editEntryUrl');
+					var url = instance.get('editEntryUrl');
 
 					if (action === 'move' || action === 'moveEntries') {
 						url = instance.get('moveEntryUrl');
@@ -70,15 +70,15 @@ AUI.add(
 				},
 
 				_moveToFolder(object) {
-					const instance = this;
+					var instance = this;
 
-					const namespace = instance.NS;
+					var namespace = instance.NS;
 
-					const dropTarget = object.targetItem;
+					var dropTarget = object.targetItem;
 
-					const selectedItems = object.selectedItems;
+					var selectedItems = object.selectedItems;
 
-					const folderId = dropTarget.attr('data-folder-id');
+					var folderId = dropTarget.attr('data-folder-id');
 
 					if (folderId) {
 						if (
@@ -87,7 +87,7 @@ AUI.add(
 								dropTarget.one('input[type=checkbox]')
 							)
 						) {
-							const form = instance.get('form').node;
+							var form = instance.get('form').node;
 
 							form.get(namespace + 'newFolderId').val(folderId);
 
@@ -100,7 +100,7 @@ AUI.add(
 				},
 
 				_moveToTrash() {
-					const instance = this;
+					var instance = this;
 
 					instance._processAction(
 						'/journal/move_articles_and_folders_to_trash',
@@ -109,11 +109,11 @@ AUI.add(
 				},
 
 				_processAction(action, url, redirectUrl) {
-					const instance = this;
+					var instance = this;
 
-					const namespace = instance.NS;
+					var namespace = instance.NS;
 
-					const form = instance.get('form').node;
+					var form = instance.get('form').node;
 
 					redirectUrl = redirectUrl || location.href;
 
@@ -134,17 +134,17 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					new A.EventHandle(instance._eventHandles).detach();
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const namespace = instance.NS;
+					var namespace = instance.NS;
 
-					const searchContainer = Liferay.SearchContainer.get(
+					var searchContainer = Liferay.SearchContainer.get(
 						namespace + instance.get('searchContainerId')
 					);
 

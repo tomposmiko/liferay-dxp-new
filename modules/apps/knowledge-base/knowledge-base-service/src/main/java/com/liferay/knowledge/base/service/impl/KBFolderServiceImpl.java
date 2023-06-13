@@ -129,21 +129,6 @@ public class KBFolderServiceImpl extends KBFolderServiceBaseImpl {
 	}
 
 	@Override
-	public KBFolder getKBFolderByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws PortalException {
-
-		KBFolder kbFolder =
-			kbFolderLocalService.getKBFolderByExternalReferenceCode(
-				externalReferenceCode, groupId);
-
-		_kbFolderModelResourcePermission.check(
-			getPermissionChecker(), kbFolder, KBActionKeys.VIEW);
-
-		return kbFolder;
-	}
-
-	@Override
 	public KBFolder getKBFolderByUrlTitle(
 			long groupId, long parentKbFolderId, String urlTitle)
 		throws PortalException {

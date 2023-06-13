@@ -76,12 +76,10 @@ public class KaleoNodeCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
 		sb.append(", kaleoNodeId=");
 		sb.append(kaleoNodeId);
 		sb.append(", groupId=");
@@ -102,8 +100,6 @@ public class KaleoNodeCacheModel
 		sb.append(kaleoDefinitionVersionId);
 		sb.append(", name=");
 		sb.append(name);
-		sb.append(", label=");
-		sb.append(label);
 		sb.append(", metadata=");
 		sb.append(metadata);
 		sb.append(", description=");
@@ -124,7 +120,6 @@ public class KaleoNodeCacheModel
 		KaleoNodeImpl kaleoNodeImpl = new KaleoNodeImpl();
 
 		kaleoNodeImpl.setMvccVersion(mvccVersion);
-		kaleoNodeImpl.setCtCollectionId(ctCollectionId);
 		kaleoNodeImpl.setKaleoNodeId(kaleoNodeId);
 		kaleoNodeImpl.setGroupId(groupId);
 		kaleoNodeImpl.setCompanyId(companyId);
@@ -161,13 +156,6 @@ public class KaleoNodeCacheModel
 			kaleoNodeImpl.setName(name);
 		}
 
-		if (label == null) {
-			kaleoNodeImpl.setLabel("");
-		}
-		else {
-			kaleoNodeImpl.setLabel(label);
-		}
-
 		if (metadata == null) {
 			kaleoNodeImpl.setMetadata("");
 		}
@@ -201,8 +189,6 @@ public class KaleoNodeCacheModel
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 
-		ctCollectionId = objectInput.readLong();
-
 		kaleoNodeId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -218,7 +204,6 @@ public class KaleoNodeCacheModel
 
 		kaleoDefinitionVersionId = objectInput.readLong();
 		name = objectInput.readUTF();
-		label = objectInput.readUTF();
 		metadata = objectInput.readUTF();
 		description = objectInput.readUTF();
 		type = objectInput.readUTF();
@@ -231,8 +216,6 @@ public class KaleoNodeCacheModel
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
 
 		objectOutput.writeLong(kaleoNodeId);
 
@@ -263,13 +246,6 @@ public class KaleoNodeCacheModel
 			objectOutput.writeUTF(name);
 		}
 
-		if (label == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(label);
-		}
-
 		if (metadata == null) {
 			objectOutput.writeUTF("");
 		}
@@ -297,7 +273,6 @@ public class KaleoNodeCacheModel
 	}
 
 	public long mvccVersion;
-	public long ctCollectionId;
 	public long kaleoNodeId;
 	public long groupId;
 	public long companyId;
@@ -308,7 +283,6 @@ public class KaleoNodeCacheModel
 	public long kaleoDefinitionId;
 	public long kaleoDefinitionVersionId;
 	public String name;
-	public String label;
 	public String metadata;
 	public String description;
 	public String type;

@@ -48,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  * @author Jorge Ferrer
  */
-@Component(service = ConfigurationProvider.class)
+@Component(immediate = true, service = ConfigurationProvider.class)
 public class ConfigurationProviderImpl implements ConfigurationProvider {
 
 	@Override
@@ -180,16 +180,6 @@ public class ConfigurationProviderImpl implements ConfigurationProvider {
 		_saveFactoryConfiguration(
 			_getConfigurationPid(clazz),
 			ExtendedObjectClassDefinition.Scope.GROUP, groupId, properties);
-	}
-
-	@Override
-	public <T> void saveGroupConfiguration(
-			long groupId, String pid, Dictionary<String, Object> properties)
-		throws ConfigurationException {
-
-		_saveFactoryConfiguration(
-			pid, ExtendedObjectClassDefinition.Scope.GROUP, groupId,
-			properties);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ import com.liferay.commerce.product.asset.categories.web.internal.servlet.taglib
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "form.navigator.entry.order:Integer=100",
+	enabled = false, property = "form.navigator.entry.order:Integer=100",
 	service = FormNavigatorEntry.class
 )
 public class CategoryCPAttachmentScheduleFormNavigatorEntry
@@ -56,25 +56,21 @@ public class CategoryCPAttachmentScheduleFormNavigatorEntry
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "schedule");
+		return LanguageUtil.get(locale, "schedule");
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.asset.categories.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
 	protected String getJspPath() {
 		return "/image/schedule.jsp";
 	}
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.commerce.product.asset.categories.web)"
-	)
-	private ServletContext _servletContext;
 
 }

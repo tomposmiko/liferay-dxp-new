@@ -154,7 +154,7 @@ public class PortletPreferencesServiceImpl
 				}
 				catch (ReadOnlyException readOnlyException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(readOnlyException);
+						_log.debug(readOnlyException, readOnlyException);
 					}
 				}
 			}
@@ -171,7 +171,7 @@ public class PortletPreferencesServiceImpl
 				}
 				catch (ReadOnlyException readOnlyException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(readOnlyException);
+						_log.debug(readOnlyException, readOnlyException);
 					}
 				}
 			}

@@ -15,31 +15,29 @@
 AUI.add(
 	'liferay-session',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const BUFFER_TIME = [];
+		var BUFFER_TIME = [];
 
-		const CONFIG = A.config;
+		var CONFIG = A.config;
 
-		const DOC = CONFIG.doc;
+		var DOC = CONFIG.doc;
 
-		const MAP_SESSION_STATE_EVENTS = {
+		var MAP_SESSION_STATE_EVENTS = {
 			active: 'activated',
 		};
 
-		const SESSION_STATE_CHECK_INTERVAL = 1000;
+		var SRC = {};
 
-		const SRC = {};
-
-		const SRC_EVENT_OBJ = {
+		var SRC_EVENT_OBJ = {
 			src: SRC,
 		};
 
 		const TOAST_ID = 'sessionToast';
 
-		const URL_BASE = themeDisplay.getPathMain() + '/portal/';
+		var URL_BASE = themeDisplay.getPathMain() + '/portal/';
 
-		const SessionBase = A.Component.create({
+		var SessionBase = A.Component.create({
 			ATTRS: {
 				autoExtend: {
 					value: false,
@@ -80,12 +78,12 @@ AUI.add(
 			NAME: 'liferaysession',
 			prototype: {
 				_afterSessionStateChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const details = event.details;
-					const newVal = event.newVal;
+					var details = event.details;
+					var newVal = event.newVal;
 
-					let src = null;
+					var src = null;
 
 					if ('src' in event && details.length) {
 						src = details[0];
@@ -98,25 +96,21 @@ AUI.add(
 				},
 
 				_defActivatedFn(event) {
-					const instance = this;
+					var instance = this;
 
 					instance.set('timestamp');
 
-					if (event.src === SRC) {
-						Liferay.Util.fetch(URL_BASE + 'extend_session').then(
-							(response) => {
-								if (response.status === 500) {
-									instance.expire();
-								}
-							}
-						);
+					if (event.src == SRC) {
+						Liferay.Util.fetch(URL_BASE + 'extend_session');
 					}
 				},
 
 				_defExpiredFn(event) {
-					const instance = this;
+					var instance = this;
 
 					A.clearInterval(instance._intervalId);
+
+					instance.set('timestamp', 'expired');
 
 					if (event.src === SRC) {
 						instance._expireSession();
@@ -124,7 +118,7 @@ AUI.add(
 				},
 
 				_expireSession() {
-					const instance = this;
+					var instance = this;
 
 					Liferay.Util.fetch(URL_BASE + 'expire_session').then(
 						(response) => {
@@ -149,18 +143,18 @@ AUI.add(
 				},
 
 				_getTimestamp() {
-					const instance = this;
+					var instance = this;
 
 					return (
-						Liferay.Util.Cookie.get(
+						A.Cookie.get(
 							instance._cookieKey,
-							Liferay.Util.Cookie.TYPES.NECESSARY
+							instance._cookieOptions
 						) || instance._initTimestamp
 					);
 				},
 
 				_getWarningTime() {
-					const instance = this;
+					var instance = this;
 
 					return (
 						instance.get('sessionLength') -
@@ -169,7 +163,7 @@ AUI.add(
 				},
 
 				_initEvents() {
-					const instance = this;
+					var instance = this;
 
 					instance.publish('activated', {
 						defaultFn: A.bind('_defActivatedFn', instance),
@@ -206,109 +200,159 @@ AUI.add(
 				},
 
 				_onSessionStateChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const newVal = event.newVal;
-					const prevVal = event.prevVal;
+					var newVal = event.newVal;
+					var prevVal = event.prevVal;
 
-					if (prevVal === 'expired' && prevVal !== newVal) {
+					if (prevVal == 'expired' && prevVal != newVal) {
 						event.preventDefault();
 					}
-					else if (prevVal === 'active' && prevVal === newVal) {
+					else if (prevVal == 'active' && prevVal == newVal) {
 						instance._afterSessionStateChange(event);
 					}
 				},
 
 				_setTimestamp(value) {
-					const instance = this;
+					var instance = this;
 
 					value = String(value || Date.now());
 
 					instance._initTimestamp = value;
 
 					if (navigator.cookieEnabled) {
-						Liferay.Util.Cookie.set(
+						A.Cookie.set(
 							instance._cookieKey,
 							value,
-							Liferay.Util.Cookie.TYPES.NECESSARY,
 							instance._cookieOptions
 						);
 					}
 				},
 
 				_setWarningLength(value) {
-					const instance = this;
+					var instance = this;
 
 					return Math.min(instance.get('sessionLength'), value);
 				},
 
 				_startTimer() {
-					const instance = this;
+					var instance = this;
 
-					const sessionLength = instance.get('sessionLength');
-					const sessionTimeoutOffset = instance.get(
+					var sessionLength = instance.get('sessionLength');
+
+					var sessionTimeoutOffset = instance.get(
 						'sessionTimeoutOffset'
 					);
-					const warningTime = instance.get('warningTime');
+
+					var warningTime = instance.get('warningTime');
+
+					var registered = instance._registered;
+
+					var interval = 1000;
 
 					instance._intervalId = A.setInterval(() => {
-						const sessionState = instance.get('sessionState');
-						const timestamp = instance.get('timestamp');
+						var sessionState = instance.get('sessionState');
 
-						// LPS-82336 Maintain session state in multiple tabs
+						var timeOffset;
 
-						if (instance._initTimestamp !== timestamp) {
-							instance.set('timestamp', timestamp);
+						var timestamp = instance.get('timestamp');
 
-							if (sessionState !== 'active') {
-								instance.set(
-									'sessionState',
-									'active',
-									SRC_EVENT_OBJ
-								);
+						var elapsed = sessionLength;
+
+						if (Lang.toInt(timestamp)) {
+							timeOffset =
+								Math.floor((Date.now() - timestamp) / 1000) *
+								1000;
+
+							elapsed = timeOffset;
+
+							if (instance._initTimestamp !== timestamp) {
+								instance.set('timestamp', timestamp);
+
+								if (sessionState != 'active') {
+									instance.set(
+										'sessionState',
+										'active',
+										SRC_EVENT_OBJ
+									);
+								}
+							}
+						}
+						else {
+							timestamp = 'expired';
+						}
+
+						var extend = instance.get('autoExtend');
+
+						var expirationMoment = false;
+						var warningMoment = false;
+
+						var hasExpired = elapsed >= sessionLength;
+						var hasExpiredTimeoutOffset =
+							elapsed >= sessionLength - sessionTimeoutOffset;
+						var hasWarned = elapsed >= warningTime;
+
+						if (hasExpiredTimeoutOffset || hasWarned) {
+							if (timestamp == 'expired') {
+								expirationMoment = true;
+								extend = false;
+								hasExpired = true;
+								hasExpiredTimeoutOffset = true;
+							}
+
+							if (
+								hasExpiredTimeoutOffset &&
+								sessionState != 'expired'
+							) {
+								if (extend && !hasExpired) {
+									expirationMoment = false;
+									hasExpired = false;
+									hasExpiredTimeoutOffset = false;
+									hasWarned = false;
+									warningMoment = false;
+
+									instance.extend();
+								}
+								else {
+									instance.expire();
+
+									expirationMoment = true;
+								}
+							}
+							else if (
+								hasWarned &&
+								!hasExpiredTimeoutOffset &&
+								!extend &&
+								sessionState != 'warned'
+							) {
+								instance.warn();
+
+								warningMoment = true;
 							}
 						}
 
-						const elapsed =
-							Math.floor((Date.now() - timestamp) / 1000) * 1000;
-
-						const autoExtend = instance.get('autoExtend');
-
-						const hasExpired = elapsed >= sessionLength;
-						const hasExpiredTimeoutOffset =
-							elapsed >= sessionLength - sessionTimeoutOffset;
-						const hasWarned = elapsed >= warningTime;
-
-						if (hasExpired && sessionState !== 'expired') {
-							instance.expire();
+						for (var i in registered) {
+							registered[i](
+								elapsed,
+								interval,
+								hasWarned,
+								hasExpired,
+								hasExpiredTimeoutOffset,
+								warningMoment,
+								expirationMoment
+							);
 						}
-						else if (autoExtend && hasExpiredTimeoutOffset) {
-							instance.extend();
-						}
-						else if (
-							!autoExtend &&
-							hasWarned &&
-							sessionState !== 'warned'
-						) {
-							instance.warn();
-						}
-
-						const registered = instance._registered;
-
-						for (const i in registered) {
-							registered[i](elapsed, hasWarned, hasExpired);
-						}
-					}, SESSION_STATE_CHECK_INTERVAL);
+					}, interval);
 				},
 
 				_stopTimer() {
-					const instance = this;
+					var instance = this;
 
 					A.clearInterval(instance._intervalId);
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					new A.EventHandle(instance._eventHandlers).detach();
 
@@ -316,22 +360,22 @@ AUI.add(
 				},
 
 				expire() {
-					const instance = this;
+					var instance = this;
 
 					instance.set('sessionState', 'expired', SRC_EVENT_OBJ);
 				},
 
 				extend() {
-					const instance = this;
+					var instance = this;
 
 					instance.set('sessionState', 'active', SRC_EVENT_OBJ);
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._cookieKey =
-						'LFR_SESSION_STATE_' + themeDisplay.getRealUserId();
+						'LFR_SESSION_STATE_' + themeDisplay.getUserId();
 
 					instance._cookieOptions = {
 						path: '/',
@@ -345,17 +389,13 @@ AUI.add(
 					instance._initEvents();
 
 					instance._startTimer();
-
-					Liferay.fire('sessionInitialized', {
-						session: instance,
-					});
 				},
 
 				registerInterval(fn) {
-					const instance = this;
+					var instance = this;
 
-					let fnId;
-					const registered = instance._registered;
+					var fnId;
+					var registered = instance._registered;
 
 					if (Lang.isFunction(fn)) {
 						fnId = A.stamp(fn);
@@ -367,16 +407,16 @@ AUI.add(
 				},
 
 				resetInterval() {
-					const instance = this;
+					var instance = this;
 
 					instance._stopTimer();
 					instance._startTimer();
 				},
 
 				unregisterInterval(fnId) {
-					const instance = this;
+					var instance = this;
 
-					const registered = instance._registered;
+					var registered = instance._registered;
 
 					if (
 						Object.prototype.hasOwnProperty.call(registered, fnId)
@@ -388,7 +428,7 @@ AUI.add(
 				},
 
 				warn() {
-					const instance = this;
+					var instance = this;
 
 					instance.set('sessionState', 'warned', SRC_EVENT_OBJ);
 				},
@@ -397,7 +437,7 @@ AUI.add(
 
 		SessionBase.SRC = SRC;
 
-		const SessionDisplay = A.Component.create({
+		var SessionDisplay = A.Component.create({
 			ATTRS: {
 				openToast: {
 					validator: Lang.isFunction,
@@ -411,13 +451,13 @@ AUI.add(
 			NS: 'display',
 			prototype: {
 				_afterDefActivatedFn() {
-					const instance = this;
+					var instance = this;
 
 					instance._uiSetActivated();
 				},
 
 				_afterDefExpiredFn() {
-					const instance = this;
+					var instance = this;
 
 					instance._host.unregisterInterval(instance._intervalId);
 
@@ -425,22 +465,22 @@ AUI.add(
 				},
 
 				_beforeHostWarned() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance._host;
+					var host = instance._host;
 
-					const sessionLength = host.get('sessionLength');
-					const timestamp = host.get('timestamp');
-					const warningLength = host.get('warningLength');
+					var sessionLength = host.get('sessionLength');
+					var timestamp = host.get('timestamp');
+					var warningLength = host.get('warningLength');
 
-					let elapsed = sessionLength;
+					var elapsed = sessionLength;
 
 					if (Lang.toInt(timestamp)) {
 						elapsed =
 							Math.floor((Date.now() - timestamp) / 1000) * 1000;
 					}
 
-					let remainingTime = sessionLength - elapsed;
+					var remainingTime = sessionLength - elapsed;
 
 					if (remainingTime > warningLength) {
 						remainingTime = warningLength;
@@ -458,16 +498,37 @@ AUI.add(
 					);
 
 					instance._intervalId = host.registerInterval(
-						(elapsed, hasWarned, hasExpired) => {
+						(
+							elapsed,
+							interval,
+							hasWarned,
+							hasExpired,
+							warningMoment
+						) => {
 							if (!hasWarned) {
 								instance._uiSetActivated();
 							}
 							else if (!hasExpired) {
+								if (warningMoment) {
+									if (remainingTime <= 0) {
+										remainingTime = warningLength;
+									}
+								}
+
+								elapsed =
+									Math.floor(
+										(Date.now() - timestamp) / 1000
+									) * 1000;
+
+								remainingTime = sessionLength - elapsed;
+
 								instance._uiSetRemainingTime(
-									sessionLength - elapsed,
+									remainingTime,
 									counterTextNode
 								);
 							}
+
+							remainingTime -= interval;
 						}
 					);
 				},
@@ -493,7 +554,7 @@ AUI.add(
 				},
 
 				_formatTime(time) {
-					const instance = this;
+					var instance = this;
 
 					time = Number(time);
 
@@ -520,14 +581,14 @@ AUI.add(
 				},
 
 				_getBanner() {
-					const instance = this;
+					var instance = this;
 
-					let banner = instance._banner;
+					var banner = instance._banner;
 
 					if (!banner) {
-						const openToast = instance.get('openToast');
+						var openToast = instance.get('openToast');
 
-						const toastDefaultConfig = {
+						var toastDefaultConfig = {
 							onClick({event}) {
 								if (
 									event.target.classList.contains(
@@ -553,7 +614,7 @@ AUI.add(
 							...toastDefaultConfig,
 						});
 
-						const toastComponent = Liferay.component(TOAST_ID);
+						var toastComponent = Liferay.component(TOAST_ID);
 
 						banner = {
 							open(props) {
@@ -574,15 +635,15 @@ AUI.add(
 				},
 
 				_onHostSessionStateChange(event) {
-					const instance = this;
+					var instance = this;
 
-					if (event.newVal === 'warned') {
+					if (event.newVal == 'warned') {
 						instance._beforeHostWarned(event);
 					}
 				},
 
 				_uiSetActivated() {
-					const instance = this;
+					var instance = this;
 
 					DOC.title = instance.reset('pageTitle').get('pageTitle');
 
@@ -594,9 +655,9 @@ AUI.add(
 				},
 
 				_uiSetExpired() {
-					const instance = this;
+					var instance = this;
 
-					const banner = instance._getBanner();
+					var banner = instance._getBanner();
 
 					banner.open({
 						message: instance._expiredText,
@@ -608,12 +669,12 @@ AUI.add(
 				},
 
 				_uiSetRemainingTime(remainingTime, counterTextNode) {
-					const instance = this;
+					var instance = this;
 
 					remainingTime = instance._formatTime(remainingTime);
 
 					if (!instance._alertClosed) {
-						const alert = counterTextNode.closest(
+						var alert = counterTextNode.closest(
 							'div[role="alert"]'
 						);
 
@@ -637,7 +698,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._banner) {
 						instance._destroyBanner();
@@ -645,11 +706,11 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get('host');
+					var host = instance.get('host');
 
-					if (Liferay.Util.getTop() === CONFIG.win) {
+					if (Liferay.Util.getTop() == CONFIG.win) {
 						instance._host = host;
 
 						instance._toggleText = {
@@ -669,7 +730,7 @@ AUI.add(
 							[
 								'<span class="countdown-timer">{0}</span>',
 								host.get('sessionLength') / 60000,
-								'<a class="alert-link" href="javascript:void(0);">' +
+								'<a class="alert-link" href="javascript:;">' +
 									Liferay.Language.get('extend') +
 									'</a>',
 							]

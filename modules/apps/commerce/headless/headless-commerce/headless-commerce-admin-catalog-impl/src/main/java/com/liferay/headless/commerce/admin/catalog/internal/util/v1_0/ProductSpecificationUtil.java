@@ -37,25 +37,55 @@ public class ProductSpecificationUtil {
 				CPSpecificationOptionService cpSpecificationOptionService,
 				long cpDefinitionId, ProductSpecification productSpecification,
 				ServiceContext serviceContext)
-		throws PortalException {
-
-		CPSpecificationOption cpSpecificationOption =
-			cpSpecificationOptionService.fetchCPSpecificationOption(
-				serviceContext.getCompanyId(),
-				FriendlyURLNormalizerUtil.normalize(
-					productSpecification.getSpecificationKey()));
+		throws Exception {
 
 		return cpDefinitionSpecificationOptionValueService.
 			addCPDefinitionSpecificationOptionValue(
 				cpDefinitionId,
-				_getCPSpecificationOptionId(
-					cpSpecificationOption, cpSpecificationOptionService,
-					productSpecification, serviceContext),
-				_getCPOptionCategoryId(
-					cpSpecificationOption, productSpecification),
+				getCPSpecificationOptionId(
+					cpSpecificationOptionService, productSpecification,
+					serviceContext.getCompanyId(), serviceContext),
+				getCPOptionCategoryId(productSpecification),
 				LanguageUtils.getLocalizedMap(productSpecification.getValue()),
 				GetterUtil.get(productSpecification.getPriority(), 0D),
 				serviceContext);
+	}
+
+	public static long getCPOptionCategoryId(
+		ProductSpecification productSpecification) {
+
+		if (productSpecification.getOptionCategoryId() == null) {
+			return 0;
+		}
+
+		return productSpecification.getOptionCategoryId();
+	}
+
+	public static long getCPSpecificationOptionId(
+			CPSpecificationOptionService cpSpecificationOptionService,
+			ProductSpecification productSpecification, long companyId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		String specificationKey = FriendlyURLNormalizerUtil.normalize(
+			productSpecification.getSpecificationKey());
+
+		CPSpecificationOption cpSpecificationOption =
+			cpSpecificationOptionService.fetchCPSpecificationOption(
+				companyId, specificationKey);
+
+		if (cpSpecificationOption == null) {
+			cpSpecificationOption =
+				cpSpecificationOptionService.addCPSpecificationOption(
+					getCPOptionCategoryId(productSpecification),
+					LanguageUtils.getLocalizedMap(
+						productSpecification.getLabel()),
+					LanguageUtils.getLocalizedMap(
+						productSpecification.getLabel()),
+					false, specificationKey, serviceContext);
+		}
+
+		return cpSpecificationOption.getCPSpecificationOptionId();
 	}
 
 	public static CPDefinitionSpecificationOptionValue
@@ -64,66 +94,20 @@ public class ProductSpecificationUtil {
 					cpDefinitionSpecificationOptionValueService,
 				CPDefinitionSpecificationOptionValue
 					cpDefinitionSpecificationOptionValue,
-				CPSpecificationOptionService cpSpecificationOptionService,
 				ProductSpecification productSpecification,
 				ServiceContext serviceContext)
 		throws PortalException {
-
-		CPSpecificationOption cpSpecificationOption =
-			cpSpecificationOptionService.fetchCPSpecificationOption(
-				serviceContext.getCompanyId(),
-				FriendlyURLNormalizerUtil.normalize(
-					productSpecification.getSpecificationKey()));
 
 		return cpDefinitionSpecificationOptionValueService.
 			updateCPDefinitionSpecificationOptionValue(
 				cpDefinitionSpecificationOptionValue.
 					getCPDefinitionSpecificationOptionValueId(),
-				_getCPOptionCategoryId(
-					cpSpecificationOption, productSpecification),
+				getCPOptionCategoryId(productSpecification),
 				LanguageUtils.getLocalizedMap(productSpecification.getValue()),
 				GetterUtil.get(
 					productSpecification.getPriority(),
 					cpDefinitionSpecificationOptionValue.getPriority()),
 				serviceContext);
-	}
-
-	private static long _getCPOptionCategoryId(
-		CPSpecificationOption cpSpecificationOption,
-		ProductSpecification productSpecification) {
-
-		if (productSpecification.getOptionCategoryId() == null) {
-			if (cpSpecificationOption != null) {
-				return cpSpecificationOption.getCPOptionCategoryId();
-			}
-
-			return 0;
-		}
-
-		return productSpecification.getOptionCategoryId();
-	}
-
-	private static long _getCPSpecificationOptionId(
-			CPSpecificationOption cpSpecificationOption,
-			CPSpecificationOptionService cpSpecificationOptionService,
-			ProductSpecification productSpecification,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		if (cpSpecificationOption == null) {
-			cpSpecificationOption =
-				cpSpecificationOptionService.addCPSpecificationOption(
-					GetterUtil.get(
-						productSpecification.getOptionCategoryId(), 0),
-					LanguageUtils.getLocalizedMap(
-						productSpecification.getLabel()),
-					LanguageUtils.getLocalizedMap(
-						productSpecification.getLabel()),
-					false, productSpecification.getSpecificationKey(),
-					serviceContext);
-		}
-
-		return cpSpecificationOption.getCPSpecificationOptionId();
 	}
 
 }

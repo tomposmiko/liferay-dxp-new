@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.invitation.invite.members.model.impl.MemberRequestImpl",
-		"table.name=IM_MemberRequest"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		MemberRequestModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class MemberRequestModelArgumentsResolver implements ArgumentsResolver {
 

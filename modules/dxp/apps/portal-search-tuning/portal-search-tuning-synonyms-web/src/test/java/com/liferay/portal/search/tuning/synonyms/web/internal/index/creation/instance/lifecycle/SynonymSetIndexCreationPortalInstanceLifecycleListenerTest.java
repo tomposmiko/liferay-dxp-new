@@ -16,7 +16,6 @@ package com.liferay.portal.search.tuning.synonyms.web.internal.index.creation.in
 
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.BaseSynonymsWebTestCase;
@@ -29,6 +28,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -44,6 +45,8 @@ public class SynonymSetIndexCreationPortalInstanceLifecycleListenerTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_synonymSetIndexCreationPortalInstanceLifecycleListener =
 			new SynonymSetIndexCreationPortalInstanceLifecycleListener();
 
@@ -53,9 +56,6 @@ public class SynonymSetIndexCreationPortalInstanceLifecycleListenerTest
 		ReflectionTestUtil.setFieldValue(
 			_synonymSetIndexCreationPortalInstanceLifecycleListener,
 			"_indexNameBuilder", _indexNameBuilder);
-		ReflectionTestUtil.setFieldValue(
-			_synonymSetIndexCreationPortalInstanceLifecycleListener,
-			"_searchEngineInformation", _searchEngineInformation);
 		ReflectionTestUtil.setFieldValue(
 			_synonymSetIndexCreationPortalInstanceLifecycleListener,
 			"_synonymSetIndexCreator", _synonymSetIndexCreator);
@@ -77,12 +77,12 @@ public class SynonymSetIndexCreationPortalInstanceLifecycleListenerTest
 		Mockito.verify(
 			_synonymSetIndexCreator, Mockito.times(1)
 		).create(
-			Mockito.any()
+			Matchers.anyObject()
 		);
 		Mockito.verify(
 			_filterToIndexSynchronizer, Mockito.times(1)
 		).copyToIndex(
-			Mockito.nullable(String.class), Mockito.any()
+			Matchers.anyString(), Matchers.anyObject()
 		);
 	}
 
@@ -96,26 +96,28 @@ public class SynonymSetIndexCreationPortalInstanceLifecycleListenerTest
 		Mockito.verify(
 			_synonymSetIndexCreator, Mockito.never()
 		).create(
-			Mockito.any()
+			Matchers.anyObject()
 		);
 		Mockito.verify(
 			_filterToIndexSynchronizer, Mockito.never()
 		).copyToIndex(
-			Mockito.anyString(), Mockito.any()
+			Matchers.anyString(), Matchers.anyObject()
 		);
 	}
 
-	private final FilterToIndexSynchronizer _filterToIndexSynchronizer =
-		Mockito.mock(FilterToIndexSynchronizer.class);
-	private final IndexNameBuilder _indexNameBuilder = Mockito.mock(
-		IndexNameBuilder.class);
-	private final SearchEngineInformation _searchEngineInformation =
-		Mockito.mock(SearchEngineInformation.class);
+	@Mock
+	private FilterToIndexSynchronizer _filterToIndexSynchronizer;
+
+	@Mock
+	private IndexNameBuilder _indexNameBuilder;
+
 	private SynonymSetIndexCreationPortalInstanceLifecycleListener
 		_synonymSetIndexCreationPortalInstanceLifecycleListener;
-	private final SynonymSetIndexCreator _synonymSetIndexCreator = Mockito.mock(
-		SynonymSetIndexCreator.class);
-	private final SynonymSetIndexNameBuilder _synonymSetIndexNameBuilder =
-		Mockito.mock(SynonymSetIndexNameBuilder.class);
+
+	@Mock
+	private SynonymSetIndexCreator _synonymSetIndexCreator;
+
+	@Mock
+	private SynonymSetIndexNameBuilder _synonymSetIndexNameBuilder;
 
 }

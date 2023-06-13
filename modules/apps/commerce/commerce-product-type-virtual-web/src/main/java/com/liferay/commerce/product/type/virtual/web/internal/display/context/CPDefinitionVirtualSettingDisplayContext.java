@@ -21,28 +21,34 @@ import com.liferay.commerce.product.portlet.action.ActionHelper;
 import com.liferay.commerce.product.type.CPType;
 import com.liferay.commerce.product.type.virtual.constants.VirtualCPTypeConstants;
 import com.liferay.commerce.product.type.virtual.model.CPDefinitionVirtualSetting;
-import com.liferay.commerce.product.type.virtual.web.internal.portlet.action.helper.CPDefinitionVirtualSettingActionHelper;
+import com.liferay.commerce.product.type.virtual.web.internal.portlet.action.CPDefinitionVirtualSettingActionHelper;
 import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.document.library.util.DLURLHelperUtil;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
-import com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
-import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Collections;
+
+import javax.portlet.PortletMode;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -130,7 +136,7 @@ public class CPDefinitionVirtualSettingDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return DLURLHelperUtil.getDownloadURL(
+		return DLUtil.getDownloadURL(
 			fileEntry, fileEntry.getLatestFileVersion(), themeDisplay,
 			StringPool.BLANK, true, true);
 	}
@@ -151,7 +157,7 @@ public class CPDefinitionVirtualSettingDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return DLURLHelperUtil.getDownloadURL(
+		return DLUtil.getDownloadURL(
 			fileEntry, fileEntry.getLatestFileVersion(), themeDisplay,
 			StringPool.BLANK, true, true);
 	}
@@ -183,10 +189,11 @@ public class CPDefinitionVirtualSettingDisplayContext
 			Collections.<ItemSelectorReturnType>singletonList(
 				new FileEntryItemSelectorReturnType()));
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory,
-				"uploadCPDefinitionVirtualSetting", fileItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "uploadCPDefinitionVirtualSetting",
+			fileItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	public JournalArticle getJournalArticle() throws PortalException {
@@ -231,7 +238,7 @@ public class CPDefinitionVirtualSettingDisplayContext
 			cpType = getCPType();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		if (cpType != null) {
@@ -241,22 +248,36 @@ public class CPDefinitionVirtualSettingDisplayContext
 		return super.getScreenNavigationCategoryKey();
 	}
 
-	public String getTermsOfUseJournalArticleBrowserURL() {
-		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
-			RequestBackedPortletURLFactoryUtil.create(
-				cpRequestHelper.getRenderRequest());
+	public String getTermsOfUseJournalArticleBrowserURL() throws Exception {
+		return PortletURLBuilder.create(
+			PortletProviderUtil.getPortletURL(
+				httpServletRequest, JournalArticle.class.getName(),
+				PortletProvider.Action.BROWSE)
+		).setParameter(
+			"eventName", "selectJournalArticle"
+		).setParameter(
+			"groupId", getScopeGroupId()
+		).setParameter(
+			"selectedGroupIds", StringUtil.merge(getSelectedGroupIds())
+		).setParameter(
+			"showNonindexable", Boolean.TRUE
+		).setParameter(
+			"showScheduled", Boolean.TRUE
+		).setParameter(
+			"typeSelection", JournalArticle.class.getName()
+		).setPortletMode(
+			PortletMode.VIEW
+		).setWindowState(
+			LiferayWindowState.POP_UP
+		).buildString();
+	}
 
-		InfoItemItemSelectorCriterion itemSelectorCriterion =
-			new InfoItemItemSelectorCriterion();
+	protected long[] getSelectedGroupIds() {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
-		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new JournalArticleItemSelectorReturnType());
-		itemSelectorCriterion.setItemType(JournalArticle.class.getName());
-
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, "selectedItem",
-				itemSelectorCriterion));
+		return new long[] {getScopeGroupId(), themeDisplay.getCompanyGroupId()};
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

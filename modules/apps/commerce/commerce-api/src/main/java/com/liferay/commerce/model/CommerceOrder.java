@@ -56,10 +56,11 @@ public interface CommerceOrder extends CommerceOrderModel, PersistedModel {
 
 		};
 
-	public com.liferay.account.model.AccountEntry getAccountEntry()
+	public CommerceAddress getBillingAddress()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
-	public CommerceAddress getBillingAddress()
+	public com.liferay.commerce.account.model.CommerceAccount
+			getCommerceAccount()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public String getCommerceAccountName()

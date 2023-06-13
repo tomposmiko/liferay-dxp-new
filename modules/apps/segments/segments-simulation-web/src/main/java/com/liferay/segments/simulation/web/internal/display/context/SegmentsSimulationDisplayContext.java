@@ -14,18 +14,12 @@
 
 package com.liferay.segments.simulation.web.internal.display.context;
 
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.segments.configuration.provider.SegmentsConfigurationProvider;
 import com.liferay.segments.constants.SegmentsPortletKeys;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.service.SegmentsEntryServiceUtil;
@@ -34,6 +28,7 @@ import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.List;
 
+import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,15 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 public class SegmentsSimulationDisplayContext {
 
 	public SegmentsSimulationDisplayContext(
-		HttpServletRequest httpServletRequest,
-		SegmentsConfigurationProvider segmentsConfigurationProvider) {
-
-		_httpServletRequest = httpServletRequest;
-		_segmentsConfigurationProvider = segmentsConfigurationProvider;
-
-		RenderResponse renderResponse =
-			(RenderResponse)httpServletRequest.getAttribute(
-				JavaConstants.JAVAX_PORTLET_RESPONSE);
+		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
 
 		_liferayPortletResponse = PortalUtil.getLiferayPortletResponse(
 			renderResponse);
@@ -61,29 +48,17 @@ public class SegmentsSimulationDisplayContext {
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public String getDeactivateSimulationURL() {
+	public PortletURL getDeactivateSimulationURL() {
 		return PortletURLBuilder.createActionURL(
 			_liferayPortletResponse, SegmentsPortletKeys.SEGMENTS_SIMULATION
 		).setActionName(
 			"/segments_simulation/deactivate_simulation"
-		).buildString();
+		).buildPortletURL();
 	}
 
 	public String getPortletNamespace() {
 		return PortalUtil.getPortletNamespace(
 			SegmentsPortletKeys.SEGMENTS_SIMULATION);
-	}
-
-	public String getSegmentsCompanyConfigurationURL() {
-		try {
-			return _segmentsConfigurationProvider.getCompanyConfigurationURL(
-				_httpServletRequest);
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
-		}
-
-		return StringPool.BLANK;
 	}
 
 	public List<SegmentsEntry> getSegmentsEntries() {
@@ -97,24 +72,12 @@ public class SegmentsSimulationDisplayContext {
 		return _segmentsEntries;
 	}
 
-	public String getSimulateSegmentsEntriesURL() {
+	public PortletURL getSimulateSegmentsEntriesURL() {
 		return PortletURLBuilder.createActionURL(
 			_liferayPortletResponse, SegmentsPortletKeys.SEGMENTS_SIMULATION
 		).setActionName(
 			"/segments_simulation/simulate_segments_entries"
-		).buildString();
-	}
-
-	public boolean isSegmentationEnabled() {
-		try {
-			return _segmentsConfigurationProvider.isSegmentationEnabled(
-				_themeDisplay.getCompanyId());
-		}
-		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
-		}
-
-		return false;
+		).buildPortletURL();
 	}
 
 	public boolean isShowEmptyMessage() {
@@ -134,22 +97,29 @@ public class SegmentsSimulationDisplayContext {
 			return _groupId;
 		}
 
+		long groupId = _themeDisplay.getScopeGroupId();
+
 		StagingGroupHelper stagingGroupHelper =
 			StagingGroupHelperUtil.getStagingGroupHelper();
 
-		_groupId = stagingGroupHelper.getStagedPortletGroupId(
-			_themeDisplay.getScopeGroupId(), SegmentsPortletKeys.SEGMENTS);
+		if (stagingGroupHelper.isStagingGroup(groupId) &&
+			!stagingGroupHelper.isStagedPortlet(
+				groupId, SegmentsPortletKeys.SEGMENTS)) {
 
-		return _groupId;
+			Group group = stagingGroupHelper.fetchLiveGroup(groupId);
+
+			if (group != null) {
+				groupId = group.getGroupId();
+			}
+		}
+
+		_groupId = groupId;
+
+		return groupId;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		SegmentsSimulationDisplayContext.class);
-
 	private Long _groupId;
-	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final SegmentsConfigurationProvider _segmentsConfigurationProvider;
 	private List<SegmentsEntry> _segmentsEntries;
 	private Boolean _showEmptyMessage;
 	private final ThemeDisplay _themeDisplay;

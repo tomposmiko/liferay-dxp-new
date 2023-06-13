@@ -9,7 +9,7 @@
  * distribution rights of the Software.
  */
 
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React from 'react';
 
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
@@ -24,17 +24,17 @@ export default function Header({
 	selectedFilters,
 	totalCount,
 }) {
-	const showFiltersResult = routeParams.search || !!selectedFilters.length;
+	const showFiltersResult = routeParams.search || selectedFilters.length > 0;
 
 	return (
 		<>
-			<ManagementToolbar.Container className="mb-0">
-				<ManagementToolbar.ItemList>
-					<ManagementToolbar.Item>
+			<ClayManagementToolbar className="mb-0">
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item>
 						<strong className="ml-0 mr-0 navbar-text">
 							{Liferay.Language.get('filter-by')}
 						</strong>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 
 					<RoleFilter
 						filterKey={filterConstants.roles.key}
@@ -45,7 +45,7 @@ export default function Header({
 						filterKey={filterConstants.processStep.key}
 						processId={routeParams.processId}
 					/>
-				</ManagementToolbar.ItemList>
+				</ClayManagementToolbar.ItemList>
 
 				<SearchField
 					disabled={false}
@@ -53,7 +53,7 @@ export default function Header({
 						'search-for-assignee-name'
 					)}
 				/>
-			</ManagementToolbar.Container>
+			</ClayManagementToolbar>
 
 			{showFiltersResult && (
 				<ResultsBar>

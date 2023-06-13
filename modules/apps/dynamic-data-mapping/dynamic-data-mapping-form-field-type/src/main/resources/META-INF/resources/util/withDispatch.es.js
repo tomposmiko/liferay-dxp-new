@@ -12,16 +12,12 @@
  * details.
  */
 
-export default function withDispatch(Component) {
-	class WithDispatch extends Component {
+export default (Component) => {
+	return class withDispatch extends Component {
 		dispatch(...args) {
 			const {dispatch} = this.context;
 
 			(dispatch || this.emit).apply(this, args);
 		}
-	}
-
-	WithDispatch.DUMMY_PROPERTY = {};
-
-	return WithDispatch;
-}
+	};
+};

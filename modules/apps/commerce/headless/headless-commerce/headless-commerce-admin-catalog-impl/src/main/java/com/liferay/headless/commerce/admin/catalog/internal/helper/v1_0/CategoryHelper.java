@@ -20,8 +20,8 @@ import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Category;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.CategoryDTOConverter;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = CategoryHelper.class)
+@Component(enabled = false, immediate = true, service = CategoryHelper.class)
 public class CategoryHelper {
 
 	public Page<Category> getCategoriesPage(
@@ -86,10 +86,8 @@ public class CategoryHelper {
 	@Reference
 	private AssetCategoryService _assetCategoryService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.CategoryDTOConverter)"
-	)
-	private DTOConverter<AssetCategory, Category> _categoryDTOConverter;
+	@Reference
+	private CategoryDTOConverter _categoryDTOConverter;
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;

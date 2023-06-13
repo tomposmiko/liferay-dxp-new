@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER,
 		"mvc.command.name=/commerce_order/edit_commerce_order_external_reference_code"
@@ -50,7 +51,7 @@ public class EditCommerceOrderExternalReferenceCodeMVCActionCommand
 		throws Exception {
 
 		try {
-			_updateCommerceOrderExternalReferenceCode(actionRequest);
+			updateCommerceOrderExternalReferenceCode(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchOrderException ||
@@ -69,7 +70,7 @@ public class EditCommerceOrderExternalReferenceCodeMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceOrderExternalReferenceCode(
+	protected void updateCommerceOrderExternalReferenceCode(
 			ActionRequest actionRequest)
 		throws Exception {
 

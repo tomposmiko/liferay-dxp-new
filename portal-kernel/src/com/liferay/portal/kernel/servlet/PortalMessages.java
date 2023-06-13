@@ -315,7 +315,7 @@ public class PortalMessages {
 		}
 		catch (IllegalStateException illegalStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(illegalStateException);
+				_log.debug(illegalStateException, illegalStateException);
 			}
 
 			// Session is already invalidated, just return a null map

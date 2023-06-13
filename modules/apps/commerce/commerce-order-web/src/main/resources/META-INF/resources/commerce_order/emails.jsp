@@ -24,15 +24,18 @@ CommerceOrderEditDisplayContext commerceOrderEditDisplayContext = (CommerceOrder
 	bodyClasses="p-0"
 	title='<%= LanguageUtil.get(request, "emails") %>'
 >
-	<frontend-data-set:classic-display
+	<clay:data-set-display
 		contextParams='<%=
 			HashMapBuilder.<String, String>put(
 				"commerceOrderId", String.valueOf(commerceOrderEditDisplayContext.getCommerceOrderId())
 			).build()
 		%>'
-		dataProviderKey="<%= CommerceOrderFDSNames.NOTIFICATIONS %>"
-		id="<%= CommerceOrderFDSNames.NOTIFICATIONS %>"
+		dataProviderKey="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_NOTIFICATIONS %>"
+		id="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_NOTIFICATIONS %>"
 		itemsPerPage="<%= 10 %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= commerceOrderEditDisplayContext.getCommerceNotificationQueueEntriesPortletURL() %>"
 		showManagementBar="<%= false %>"
 	/>
 </commerce-ui:panel>

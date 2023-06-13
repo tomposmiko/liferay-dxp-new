@@ -81,8 +81,8 @@ public class FrontendTokenCategoryImpl implements FrontendTokenCategory {
 	}
 
 	@Override
-	public JSONObject getJSONObject(Locale locale) {
-		return _jsonLocalizer.getJSONObject(locale);
+	public String getJSON(Locale locale) {
+		return _jsonLocalizer.getJSON(locale);
 	}
 
 	private final FrontendTokenDefinitionImpl _frontendTokenDefinitionImpl;

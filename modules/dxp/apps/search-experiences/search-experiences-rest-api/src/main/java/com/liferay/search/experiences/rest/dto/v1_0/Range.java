@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -271,17 +269,7 @@ public class Range implements Serializable {
 
 			sb.append("\"gt\": ");
 
-			if (gt instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)gt));
-			}
-			else if (gt instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)gt));
-				sb.append("\"");
-			}
-			else {
-				sb.append(gt);
-			}
+			sb.append(String.valueOf(gt));
 		}
 
 		if (gte != null) {
@@ -291,17 +279,7 @@ public class Range implements Serializable {
 
 			sb.append("\"gte\": ");
 
-			if (gte instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)gte));
-			}
-			else if (gte instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)gte));
-				sb.append("\"");
-			}
-			else {
-				sb.append(gte);
-			}
+			sb.append(String.valueOf(gte));
 		}
 
 		if (lt != null) {
@@ -311,17 +289,7 @@ public class Range implements Serializable {
 
 			sb.append("\"lt\": ");
 
-			if (lt instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)lt));
-			}
-			else if (lt instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)lt));
-				sb.append("\"");
-			}
-			else {
-				sb.append(lt);
-			}
+			sb.append(String.valueOf(lt));
 		}
 
 		if (lte != null) {
@@ -331,17 +299,7 @@ public class Range implements Serializable {
 
 			sb.append("\"lte\": ");
 
-			if (lte instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)lte));
-			}
-			else if (lte instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)lte));
-				sb.append("\"");
-			}
-			else {
-				sb.append(lte);
-			}
+			sb.append(String.valueOf(lte));
 		}
 
 		if (parameterName != null) {
@@ -371,9 +329,9 @@ public class Range implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -399,7 +357,7 @@ public class Range implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -431,7 +389,7 @@ public class Range implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -447,10 +405,5 @@ public class Range implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

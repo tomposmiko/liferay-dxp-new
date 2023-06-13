@@ -115,7 +115,7 @@ const Input = (props) => {
 		<ClayForm.Group
 			className={classNames({
 				disabled,
-				filled: !!value.length,
+				filled: value.length > 0,
 				['form-condensed']: condensed,
 				[STATE_CLASS_NAME_MAP[state]]: state,
 			})}
@@ -140,7 +140,6 @@ const Input = (props) => {
 					{message && (
 						<div className="form-feedback-item">
 							<span className="form-feedback-indicator"></span>
-
 							{message}
 						</div>
 					)}
@@ -170,7 +169,7 @@ const Select = (props) => {
 		<ClayForm.Group
 			className={classNames({
 				disabled,
-				filled: !!value.length,
+				filled: value.length > 0,
 				['form-condensed']: condensed,
 				[STATE_CLASS_NAME_MAP[state]]: state,
 			})}
@@ -202,7 +201,6 @@ const Select = (props) => {
 					{message && (
 						<div className="form-feedback-item">
 							<span className="form-feedback-indicator"></span>
-
 							{message}
 						</div>
 					)}

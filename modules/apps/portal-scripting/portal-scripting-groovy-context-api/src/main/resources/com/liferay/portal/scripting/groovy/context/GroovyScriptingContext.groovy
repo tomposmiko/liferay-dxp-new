@@ -39,7 +39,7 @@ class GroovyScriptingContext {
 
 		serviceContext.setCompanyId(defaultCompanyId);
 
-		guestUserId = UserLocalServiceUtil.getGuestUserId(defaultCompanyId);
+		defaultUserId = UserLocalServiceUtil.getDefaultUserId(defaultCompanyId);
 	}
 
 	GroovyScriptingContext(long companyId) {
@@ -47,14 +47,14 @@ class GroovyScriptingContext {
 
 		serviceContext.setCompanyId(companyId);
 
-		guestUserId = UserLocalServiceUtil.getGuestUserId(companyId);
+		defaultUserId = UserLocalServiceUtil.getDefaultUserId(companyId);
 	}
 
 	long getCompanyId() {
 		return serviceContext.getCompanyId();
 	}
 
-	long guestUserId;
+	long defaultUserId;
 	ServiceContext serviceContext;
 
 }

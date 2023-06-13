@@ -24,12 +24,8 @@ const useReindexActions = () => {
 	const schedule = useInterval();
 	const toaster = useToaster();
 
-	const {fetchData} = useFetch({
-		url: '/reindex/statuses',
-	});
-	const {patchData} = usePatch({
-		url: '/indexes/reindex',
-	});
+	const {fetchData} = useFetch({url: '/reindex/statuses'});
+	const {patchData} = usePatch({url: '/indexes/reindex'});
 
 	const getReindexStatus = (key) =>
 		reindexStatuses.find((item) => key === item.key) || {};
@@ -94,7 +90,7 @@ const useReindexActions = () => {
 			}, 1000);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[isReindexing]
+		[fetchData, isReindexing]
 	);
 
 	const handleReindex = (key, label) => {

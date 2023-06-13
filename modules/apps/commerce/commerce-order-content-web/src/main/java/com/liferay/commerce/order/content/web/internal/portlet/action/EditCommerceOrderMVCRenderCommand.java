@@ -19,7 +19,6 @@ import com.liferay.commerce.exception.NoSuchOrderException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.content.web.internal.display.context.CommerceOrderContentDisplayContext;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -37,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_OPEN_ORDER_CONTENT,
 		"mvc.command.name=/commerce_open_order_content/edit_commerce_order"
@@ -61,22 +61,9 @@ public class EditCommerceOrderMVCRenderCommand implements MVCRenderCommand {
 				commerceOrderContentDisplayContext.getCommerceOrder();
 
 			if ((commerceOrder != null) && commerceOrder.isOpen()) {
-				CommerceOrder currentCommerceOrder =
-					_commerceOrderHttpHelper.getCurrentCommerceOrder(
-						_portal.getHttpServletRequest(renderRequest));
-
-				if ((currentCommerceOrder == null) ||
-					(commerceOrder.getCommerceOrderId() !=
-						currentCommerceOrder.getCommerceOrderId())) {
-
-					_commerceOrderHttpHelper.setCurrentCommerceOrder(
-						_portal.getHttpServletRequest(renderRequest),
-						commerceOrder);
-				}
-			}
-
-			if (FeatureFlagManagerUtil.isEnabled("COMMERCE-8949")) {
-				return "/pending_commerce_orders/new_view.jsp";
+				_commerceOrderHttpHelper.setCurrentCommerceOrder(
+					_portal.getHttpServletRequest(renderRequest),
+					commerceOrder);
 			}
 
 			return "/pending_commerce_orders/edit_commerce_order.jsp";

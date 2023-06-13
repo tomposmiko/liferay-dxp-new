@@ -70,10 +70,11 @@ public class RenderStateUtil {
 			themeDisplay.getLayoutTypePortlet();
 
 		if (layoutTypePortlet != null) {
-			return String.valueOf(
-				_getPageStateJSONObject(
-					httpServletRequest, themeDisplay, layoutTypePortlet,
-					renderDataMap));
+			JSONObject pageStateJSONObject = _getPageStateJSONObject(
+				httpServletRequest, themeDisplay, layoutTypePortlet,
+				renderDataMap);
+
+			return pageStateJSONObject.toString();
 		}
 
 		return StringPool.BLANK;
@@ -167,9 +168,12 @@ public class RenderStateUtil {
 				for (PublicRenderParameter publicRenderParameter :
 						publicRenderParameters) {
 
-					String[] currentValue = currentPublicRenderParameters.get(
+					String publicRenderParameterName =
 						PortletQNameUtil.getPublicRenderParameterName(
-							publicRenderParameter.getQName()));
+							publicRenderParameter.getQName());
+
+					String[] currentValue = currentPublicRenderParameters.get(
+						publicRenderParameterName);
 
 					if (currentValue != null) {
 						changedPublicRenderParameters.put(
@@ -371,8 +375,11 @@ public class RenderStateUtil {
 				httpServletRequest, themeDisplay.getPlid(), portlets);
 
 		for (Portlet portlet : portlets) {
+			String portletNamespace = PortalUtil.getPortletNamespace(
+				portlet.getPortletId());
+
 			jsonObject.put(
-				PortalUtil.getPortletNamespace(portlet.getPortletId()),
+				portletNamespace,
 				_getPortletJSONObject(
 					httpServletRequest, themeDisplay, layoutTypePortlet,
 					portlet, renderDataMap.get(portlet.getPortletId()),

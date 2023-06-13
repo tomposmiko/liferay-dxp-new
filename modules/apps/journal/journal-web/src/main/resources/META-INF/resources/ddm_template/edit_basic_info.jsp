@@ -30,17 +30,12 @@ DDMStructure ddmStructure = journalEditDDMTemplateDisplayContext.getDDMStructure
 	<label class="control-label" for="<portlet:namespace />ddmStructure">
 		<liferay-ui:message key="structure" />
 
-		<clay:icon
-			aria-label='<%= LanguageUtil.get(request, "structure-help") %>'
-			cssClass="lfr-portal-tooltip"
-			symbol="question-circle-full"
-			title='<%= LanguageUtil.get(request, "structure-help") %>'
-		/>
+		<liferay-ui:icon-help message="structure-help" />
 	</label>
 
 	<div class="input-group">
 		<div class="input-group-item">
-			<input placeholder="<%= LanguageUtil.format(locale, "select-x", "structure") %>" id="<%= liferayPortletResponse.getNamespace() %>ddmStructure" name="structure" readonly value="<%= (ddmStructure != null) ? ddmStructure.getName(locale) : StringPool.BLANK %>" class="form-control lfr-input-resource" />
+			<input placeholder="<%= LanguageUtil.format(locale, "select-x", "structure") %>" id="<%= liferayPortletResponse.getNamespace() + "ddmStructure" %>" name="structure" readonly value="<%= (ddmStructure != null) ? ddmStructure.getName(locale) : StringPool.BLANK %>" class="form-control lfr-input-resource" />
 		</div>
 
 		<c:if test="<%= (ddmTemplate == null) || (ddmTemplate.getClassPK() == 0) %>">
@@ -100,21 +95,20 @@ DDMStructure ddmStructure = journalEditDDMTemplateDisplayContext.getDDMStructure
 		const onClick = (event) => {
 			Liferay.Util.openSelectionModal({
 				onSelect: function (selectedItem) {
-					const itemValue = JSON.parse(selectedItem.value);
-
 					if (
 						document.<portlet:namespace />fm.<portlet:namespace />classPK
-							.value != itemValue.ddmstructureid
+							.value != selectedItem.ddmstructureid
 					) {
 						document.<portlet:namespace />fm.<portlet:namespace />classPK.value =
-							itemValue.ddmstructureid;
+							selectedItem.ddmstructureid;
 
 						Liferay.fire('<portlet:namespace />refreshEditor');
 					}
 				},
 				selectEventName: '<portlet:namespace />selectDDMStructure',
 				title: '<%= UnicodeLanguageUtil.get(request, "structures") %>',
-				url: '<%= journalDisplayContext.getSelectDDMStructureURL() %>>',
+				url:
+					'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/select_ddm_structure.jsp" /></portlet:renderURL>',
 			});
 		};
 

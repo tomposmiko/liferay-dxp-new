@@ -365,11 +365,6 @@ public class AkismetEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected AkismetEntryWrapper wrap(AkismetEntry akismetEntry) {
 		return new AkismetEntryWrapper(akismetEntry);
 	}

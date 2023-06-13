@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.content.web.internal.display.context;
 
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
@@ -24,17 +25,16 @@ import com.liferay.commerce.product.content.render.list.entry.CPContentListEntry
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
 import com.liferay.commerce.product.content.web.internal.configuration.CPCompareContentPortletInstanceConfiguration;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.product.type.CPType;
-import com.liferay.commerce.product.type.CPTypeRegistry;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPCompareHelper;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
-import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class CPCompareContentDisplayContext {
 				cpContentListEntryRendererRegistry,
 			CPContentListRendererRegistry cpContentListRendererRegistry,
 			CPDefinitionHelper cpDefinitionHelper,
-			CPTypeRegistry cpTypeRegistry,
+			CPTypeServicesTracker cpTypeServicesTracker,
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
@@ -66,7 +66,7 @@ public class CPCompareContentDisplayContext {
 			cpContentListEntryRendererRegistry;
 		_cpContentListRendererRegistry = cpContentListRendererRegistry;
 		_cpDefinitionHelper = cpDefinitionHelper;
-		_cpTypeRegistry = cpTypeRegistry;
+		_cpTypeServicesTracker = cpTypeServicesTracker;
 
 		_cpRequestHelper = new CPRequestHelper(httpServletRequest);
 
@@ -78,18 +78,25 @@ public class CPCompareContentDisplayContext {
 			portletDisplay.getPortletInstanceConfiguration(
 				CPCompareContentPortletInstanceConfiguration.class);
 
-		if (hasCommerceChannel()) {
-			CommerceContext commerceContext =
-				(CommerceContext)httpServletRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT);
+		CommerceContext commerceContext =
+			(CommerceContext)httpServletRequest.getAttribute(
+				CommerceWebKeys.COMMERCE_CONTEXT);
 
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+
+		long commerceAccountId = 0;
+
+		if (commerceAccount != null) {
+			commerceAccountId = commerceAccount.getCommerceAccountId();
+		}
+
+		if (hasCommerceChannel()) {
 			_cpDefinitionIds = cpCompareHelper.getCPDefinitionIds(
-				commerceContext.getCommerceChannelGroupId(),
-				CommerceUtil.getCommerceAccountId(commerceContext),
-				CookiesManagerUtil.getCookieValue(
+				commerceContext.getCommerceChannelGroupId(), commerceAccountId,
+				CookieKeys.getCookie(
+					httpServletRequest,
 					cpCompareHelper.getCPDefinitionIdsCookieKey(
-						commerceContext.getCommerceChannelGroupId()),
-					httpServletRequest));
+						commerceContext.getCommerceChannelGroupId())));
 		}
 		else {
 			_cpDefinitionIds = new ArrayList<>();
@@ -160,10 +167,18 @@ public class CPCompareContentDisplayContext {
 			(CommerceContext)httpServletRequest.getAttribute(
 				CommerceWebKeys.COMMERCE_CONTEXT);
 
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+
+		long commerceAccountId = 0;
+
+		if (commerceAccount != null) {
+			commerceAccountId = commerceAccount.getCommerceAccountId();
+		}
+
 		for (Long cpDefinitionId : _cpDefinitionIds) {
 			cpCatalogEntries.add(
 				_cpDefinitionHelper.getCPCatalogEntry(
-					CommerceUtil.getCommerceAccountId(commerceContext),
+					commerceAccountId,
 					commerceContext.getCommerceChannelGroupId(), cpDefinitionId,
 					_cpRequestHelper.getLocale()));
 		}
@@ -206,7 +221,7 @@ public class CPCompareContentDisplayContext {
 	}
 
 	public List<CPType> getCPTypes() {
-		return _cpTypeRegistry.getCPTypes();
+		return _cpTypeServicesTracker.getCPTypes();
 	}
 
 	public String getDisplayStyle() {
@@ -270,6 +285,6 @@ public class CPCompareContentDisplayContext {
 	private final CPDefinitionHelper _cpDefinitionHelper;
 	private final List<Long> _cpDefinitionIds;
 	private final CPRequestHelper _cpRequestHelper;
-	private final CPTypeRegistry _cpTypeRegistry;
+	private final CPTypeServicesTracker _cpTypeServicesTracker;
 
 }

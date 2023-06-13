@@ -78,32 +78,18 @@ public class GitWorkingDirectoryFactory {
 
 			GitWorkingDirectory gitWorkingDirectory = null;
 
-			if (gitRepositoryName.startsWith("com-liferay-") ||
-				gitRepositoryDirPath.matches(".*/com-liferay-[^/]*")) {
-
+			if (gitRepositoryName.startsWith("com-liferay-")) {
 				gitWorkingDirectory = new SubrepositoryGitWorkingDirectory(
 					upstreamBranchName, gitRepositoryDirPath,
 					gitRepositoryName);
 			}
-			else if (gitRepositoryName.startsWith("liferay-plugins") ||
-					 gitRepositoryDirPath.matches(".*/liferay-plugins[^/]*")) {
-
+			else if (gitRepositoryName.startsWith("liferay-plugins")) {
 				gitWorkingDirectory = new PluginsGitWorkingDirectory(
 					upstreamBranchName, gitRepositoryDirPath,
 					gitRepositoryName);
 			}
-			else if (gitRepositoryName.startsWith("liferay-portal") ||
-					 gitRepositoryDirPath.matches(".*/liferay-portal[^/]*")) {
-
+			else if (gitRepositoryName.startsWith("liferay-portal")) {
 				gitWorkingDirectory = new PortalGitWorkingDirectory(
-					upstreamBranchName, gitRepositoryDirPath,
-					gitRepositoryName);
-			}
-			else if (gitRepositoryName.equals("liferay-qa-websites-ee") ||
-					 gitRepositoryDirPath.matches(
-						 ".*/liferay-qa-websites-ee")) {
-
-				gitWorkingDirectory = new QAWebsitesGitWorkingDirectory(
 					upstreamBranchName, gitRepositoryDirPath,
 					gitRepositoryName);
 			}

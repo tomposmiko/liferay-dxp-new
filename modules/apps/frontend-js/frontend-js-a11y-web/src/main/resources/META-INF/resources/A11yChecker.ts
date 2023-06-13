@@ -14,9 +14,16 @@
 
 import axe, {AxeResults, RunOptions} from 'axe-core';
 
+declare global {
+	interface Window {
+		requestIdleCallback(callback: Function): any;
+		cancelIdleCallback(handle: number): void;
+	}
+}
+
 type Task<T> = {
-	callback: Function;
 	id: number;
+	callback: Function;
 	target: T;
 };
 
@@ -39,7 +46,7 @@ class Queue<T> {
 	}
 
 	peek() {
-		return !this.queue.length ? null : this.queue[0];
+		return this.queue.length === 0 ? null : this.queue[0];
 	}
 
 	has(selector: Selector<T>) {
@@ -510,7 +517,7 @@ export class A11yChecker {
 			} = record;
 
 			let node =
-				type === 'attributes' || !!removedNodes.length
+				type === 'attributes' || removedNodes.length > 0
 					? target
 					: addedNodes[0];
 

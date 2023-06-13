@@ -17,14 +17,14 @@
 AUI.add(
 	'liferay-alloy-editor',
 	(A) => {
-		const Do = A.Do;
-		const Lang = A.Lang;
+		var Do = A.Do;
+		var Lang = A.Lang;
 
-		const KEY_ENTER = 13;
+		var KEY_ENTER = 13;
 
-		const UA = A.UA;
+		var UA = A.UA;
 
-		const LiferayAlloyEditor = A.Component.create({
+		var LiferayAlloyEditor = A.Component.create({
 			ATTRS: {
 				contents: {
 					validator: Lang.isString,
@@ -87,12 +87,12 @@ AUI.add(
 
 			prototype: {
 				_afterGet(attrName) {
-					const instance = this;
+					var instance = this;
 
-					let alterReturn;
+					var alterReturn;
 
 					if (attrName === 'form') {
-						let parentForm = instance._parentForm;
+						var parentForm = instance._parentForm;
 
 						if (!parentForm) {
 							parentForm = instance._srcNode.ancestor('form');
@@ -122,7 +122,7 @@ AUI.add(
 				},
 
 				_afterVal(value) {
-					const instance = this;
+					var instance = this;
 
 					if (value) {
 						instance.setHTML(value);
@@ -135,11 +135,11 @@ AUI.add(
 				},
 
 				_changeLocale(localeChange) {
-					const instance = this;
+					var instance = this;
 
-					const nativeEditor = instance.getNativeEditor();
+					var nativeEditor = instance.getNativeEditor();
 
-					const editable = nativeEditor.editable();
+					var editable = nativeEditor.editable();
 
 					editable.changeAttr('dir', localeChange.dir);
 					editable.changeAttr('lang', localeChange.lang);
@@ -152,15 +152,15 @@ AUI.add(
 				},
 
 				_initializeData() {
-					const instance = this;
+					var instance = this;
 
-					const contents = instance.get('contents');
+					var contents = instance.get('contents');
 
 					if (contents) {
 						instance.getNativeEditor().setData(contents);
 					}
 
-					const onInitFn = instance.get('onInitMethod');
+					var onInitFn = instance.get('onInitMethod');
 
 					if (Lang.isFunction(onInitFn)) {
 						onInitFn();
@@ -174,9 +174,9 @@ AUI.add(
 				},
 
 				_onBlur(event) {
-					const instance = this;
+					var instance = this;
 
-					const blurFn = instance.get('onBlurMethod');
+					var blurFn = instance.get('onBlurMethod');
 
 					if (Lang.isFunction(blurFn)) {
 						blurFn(event.editor);
@@ -184,9 +184,9 @@ AUI.add(
 				},
 
 				_onChange() {
-					const instance = this;
+					var instance = this;
 
-					const changeFn = instance.get('onChangeMethod');
+					var changeFn = instance.get('onChangeMethod');
 
 					if (Lang.isFunction(changeFn)) {
 						changeFn(instance.getText());
@@ -194,7 +194,7 @@ AUI.add(
 				},
 
 				_onCustomDataProcessorLoaded() {
-					const instance = this;
+					var instance = this;
 
 					instance.customDataProcessorLoaded = true;
 
@@ -204,10 +204,10 @@ AUI.add(
 				},
 
 				_onDataReady() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._pendingData) {
-						const pendingData = instance._pendingData;
+						var pendingData = instance._pendingData;
 
 						instance._pendingData = null;
 
@@ -226,9 +226,9 @@ AUI.add(
 				},
 
 				_onFocus(event) {
-					const instance = this;
+					var instance = this;
 
-					const focusFn = instance.get('onFocusMethod');
+					var focusFn = instance.get('onFocusMethod');
 
 					if (Lang.isFunction(focusFn)) {
 						focusFn(event.editor);
@@ -243,9 +243,9 @@ AUI.add(
 				},
 
 				_onInstanceReady() {
-					const instance = this;
+					var instance = this;
 
-					const editorNamespace = instance.get('namespace');
+					var editorNamespace = instance.get('namespace');
 
 					if (instance._pendingLocaleChange) {
 						instance._changeLocale(instance._pendingLocaleChange);
@@ -290,7 +290,7 @@ AUI.add(
 								document.activeElement &&
 								document.activeElement !== document.body
 							) {
-								const nativeEditor = instance.getNativeEditor();
+								var nativeEditor = instance.getNativeEditor();
 
 								nativeEditor.once(
 									'focus',
@@ -309,15 +309,15 @@ AUI.add(
 
 					// LPS-72963
 
-					const editorConfig = instance.getNativeEditor().config;
+					var editorConfig = instance.getNativeEditor().config;
 
-					const removeResizePlugin =
+					var removeResizePlugin =
 						editorConfig.removePlugins &&
 						editorConfig.removePlugins.indexOf('ae_dragresize') >
 							-1;
 
 					if (CKEDITOR.env.gecko && removeResizePlugin) {
-						const doc = instance.getNativeEditor().document.$;
+						var doc = instance.getNativeEditor().document.$;
 
 						doc.designMode = 'on';
 
@@ -354,15 +354,15 @@ AUI.add(
 				},
 
 				_onLocaleChangedHandler(event) {
-					const instance = this;
+					var instance = this;
 
-					const contentsLanguage = event.item.getAttribute(
+					var contentsLanguage = event.item.getAttribute(
 						'data-value'
 					);
-					const contentsLanguageDir =
+					var contentsLanguageDir =
 						Liferay.Language.direction[contentsLanguage];
 
-					const localeChange = {
+					var localeChange = {
 						dir: contentsLanguageDir,
 						lang: contentsLanguage,
 					};
@@ -376,7 +376,7 @@ AUI.add(
 				},
 
 				_onSetData() {
-					const instance = this;
+					var instance = this;
 
 					instance._dataReady = false;
 				},
@@ -386,7 +386,7 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = [
 						Do.after(
@@ -413,7 +413,7 @@ AUI.add(
 						instance
 					);
 
-					const nativeEditor = instance.getNativeEditor();
+					var nativeEditor = instance.getNativeEditor();
 
 					nativeEditor.on(
 						'dataReady',
@@ -448,7 +448,7 @@ AUI.add(
 						);
 					}
 
-					const editorConfig = instance.get('editorConfig');
+					var editorConfig = instance.get('editorConfig');
 
 					if (
 						editorConfig.disallowedContent &&
@@ -459,9 +459,9 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
-					const editor = instance._alloyEditor;
+					var editor = instance._alloyEditor;
 
 					if (editor) {
 						editor.destroy();
@@ -471,7 +471,7 @@ AUI.add(
 
 					// LPS-84186
 
-					const localeChangeHandle =
+					var localeChangeHandle =
 						window[instance.get('namespace')]._localeChangeHandle;
 
 					if (localeChangeHandle) {
@@ -487,7 +487,7 @@ AUI.add(
 				},
 
 				focus() {
-					const instance = this;
+					var instance = this;
 
 					if (instance.instanceReady) {
 						instance.getNativeEditor().focus();
@@ -498,9 +498,9 @@ AUI.add(
 				},
 
 				getCkData() {
-					const instance = this;
+					var instance = this;
 
-					let data = instance.getNativeEditor().getData();
+					var data = instance.getNativeEditor().getData();
 
 					if (
 						CKEDITOR.env.gecko &&
@@ -513,13 +513,13 @@ AUI.add(
 				},
 
 				getEditor() {
-					const instance = this;
+					var instance = this;
 
 					return instance._alloyEditor;
 				},
 
 				getHTML() {
-					const instance = this;
+					var instance = this;
 
 					return instance.get('textMode')
 						? instance.getText()
@@ -527,19 +527,19 @@ AUI.add(
 				},
 
 				getNativeEditor() {
-					const instance = this;
+					var instance = this;
 
 					return instance._alloyEditor.get('nativeEditor');
 				},
 
 				getText() {
-					const instance = this;
+					var instance = this;
 
-					const editorName = instance.getNativeEditor().name;
+					var editorName = instance.getNativeEditor().name;
 
-					const editor = CKEDITOR.instances[editorName];
+					var editor = CKEDITOR.instances[editorName];
 
-					let text = '';
+					var text = '';
 
 					if (editor) {
 						text = editor.editable().getText();
@@ -549,11 +549,11 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const editorConfig = instance.get('editorConfig');
+					var editorConfig = instance.get('editorConfig');
 
-					let srcNode = editorConfig.srcNode;
+					var srcNode = editorConfig.srcNode;
 
 					if (Lang.isString(srcNode)) {
 						srcNode = A.one('#' + srcNode);
@@ -567,7 +567,7 @@ AUI.add(
 				},
 
 				setHTML(value) {
-					const instance = this;
+					var instance = this;
 
 					if (instance.instanceReady) {
 						if (instance._dataReady) {

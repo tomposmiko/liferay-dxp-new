@@ -24,16 +24,17 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.util.LayoutClassedModelUsageActionMenuContributor;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -51,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.journal.model.JournalArticle",
 	service = LayoutClassedModelUsageActionMenuContributor.class
 )
@@ -87,7 +89,7 @@ public class JournalArticleLayoutClassedModelUsageActionMenuContributor
 									InfoItemIdentifier.VERSION_LATEST_APPROVED,
 									httpServletRequest));
 							dropdownItem.setLabel(
-								_language.get(
+								LanguageUtil.get(
 									themeDisplay.getLocale(), "view-in-page"));
 						});
 				}
@@ -109,7 +111,7 @@ public class JournalArticleLayoutClassedModelUsageActionMenuContributor
 								key = "preview-scheduled-in-page";
 							}
 
-							String label = _language.get(
+							String label = LanguageUtil.get(
 								themeDisplay.getLocale(), key);
 
 							add(
@@ -148,20 +150,20 @@ public class JournalArticleLayoutClassedModelUsageActionMenuContributor
 		if (layoutClassedModelUsage.getContainerType() ==
 				_portal.getClassNameId(FragmentEntryLink.class)) {
 
-			layoutURL = _portal.getLayoutFriendlyURL(
-				_layoutLocalService.fetchLayout(
-					layoutClassedModelUsage.getPlid()),
-				themeDisplay);
+			Layout layout = _layoutLocalService.fetchLayout(
+				layoutClassedModelUsage.getPlid());
 
-			layoutURL = HttpComponentsUtil.setParameter(
+			layoutURL = _portal.getLayoutFriendlyURL(layout, themeDisplay);
+
+			layoutURL = _http.setParameter(
 				layoutURL, "previewClassNameId",
 				String.valueOf(layoutClassedModelUsage.getClassNameId()));
-			layoutURL = HttpComponentsUtil.setParameter(
+			layoutURL = _http.setParameter(
 				layoutURL, "previewClassPK",
 				String.valueOf(layoutClassedModelUsage.getClassPK()));
-			layoutURL = HttpComponentsUtil.setParameter(
+			layoutURL = _http.setParameter(
 				layoutURL, "previewType", String.valueOf(previewType));
-			layoutURL = HttpComponentsUtil.setParameter(
+			layoutURL = _http.setParameter(
 				layoutURL, "previewVersion", previewVersion);
 		}
 		else {
@@ -182,7 +184,7 @@ public class JournalArticleLayoutClassedModelUsageActionMenuContributor
 			).buildString();
 		}
 
-		String portletURLString = HttpComponentsUtil.setParameter(
+		String portletURLString = _http.setParameter(
 			layoutURL, "p_l_back_url", themeDisplay.getURLCurrent());
 
 		return portletURLString + "#portlet_" +
@@ -193,10 +195,10 @@ public class JournalArticleLayoutClassedModelUsageActionMenuContributor
 		JournalArticleLayoutClassedModelUsageActionMenuContributor.class);
 
 	@Reference
-	private JournalArticleLocalService _journalArticleLocalService;
+	private Http _http;
 
 	@Reference
-	private Language _language;
+	private JournalArticleLocalService _journalArticleLocalService;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

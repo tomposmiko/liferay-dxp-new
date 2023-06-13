@@ -15,12 +15,16 @@
 import updateColSize from '../actions/updateColSize';
 import LayoutService from '../services/LayoutService';
 
-export default function resizeColumns({layoutData, rowItemId}) {
-	return (dispatch, getState) => {
+export default function resizeColumns({
+	layoutData,
+	rowItemId,
+	segmentsExperienceId,
+}) {
+	return (dispatch) => {
 		return LayoutService.updateLayoutData({
 			layoutData,
 			onNetworkStatus: dispatch,
-			segmentsExperienceId: getState().segmentsExperienceId,
+			segmentsExperienceId,
 		}).then(() => {
 			dispatch(updateColSize({layoutData, rowItemId}));
 		});

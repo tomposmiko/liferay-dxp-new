@@ -22,6 +22,7 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +30,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Wade Cao
@@ -43,6 +46,8 @@ public class SearchRankingResponseTest {
 
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+
 		_searchRankingResponse = new SearchRankingResponse();
 
 		_setUpSearchRankingResponse();
@@ -51,7 +56,9 @@ public class SearchRankingResponseTest {
 	@Test
 	public void testSearchRankingResponseGetter() {
 		Assert.assertEquals(_documents, _searchRankingResponse.getDocuments());
-		Assert.assertEquals(_KEYWORDS, _searchRankingResponse.getKeywords());
+		Assert.assertEquals(
+			Optional.of(_KEYWORDS),
+			_searchRankingResponse.getKeywordsOptional());
 		Assert.assertEquals(
 			_PAGINATION_DELTA, _searchRankingResponse.getPaginationDelta());
 		Assert.assertEquals(
@@ -99,11 +106,16 @@ public class SearchRankingResponseTest {
 	private static final int _TOTAL_HITS = 10;
 
 	private List<Document> _documents;
-	private final SearchContainer<Document> _searchContainer = Mockito.mock(
-		SearchContainer.class);
-	private final SearchHits _searchHits = Mockito.mock(SearchHits.class);
+
+	@Mock
+	private SearchContainer<Document> _searchContainer;
+
+	@Mock
+	private SearchHits _searchHits;
+
 	private SearchRankingResponse _searchRankingResponse;
-	private final SearchResponse _searchResponse = Mockito.mock(
-		SearchResponse.class);
+
+	@Mock
+	private SearchResponse _searchResponse;
 
 }

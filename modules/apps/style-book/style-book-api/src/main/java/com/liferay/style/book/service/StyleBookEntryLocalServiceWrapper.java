@@ -30,10 +30,6 @@ public class StyleBookEntryLocalServiceWrapper
 	implements ServiceWrapper<StyleBookEntryLocalService>,
 			   StyleBookEntryLocalService {
 
-	public StyleBookEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public StyleBookEntryLocalServiceWrapper(
 		StyleBookEntryLocalService styleBookEntryLocalService) {
 
@@ -88,12 +84,12 @@ public class StyleBookEntryLocalServiceWrapper
 
 	@Override
 	public StyleBookEntry copyStyleBookEntry(
-			long userId, long groupId, long sourceStyleBookEntryId,
+			long userId, long groupId, long styleBookEntryId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _styleBookEntryLocalService.copyStyleBookEntry(
-			userId, groupId, sourceStyleBookEntryId, serviceContext);
+			userId, groupId, styleBookEntryId, serviceContext);
 	}
 
 	/**
@@ -600,7 +596,7 @@ public class StyleBookEntryLocalServiceWrapper
 	 * <strong>Important:</strong> Inspect StyleBookEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftStyleBookEntry the style book entry
+	 * @param styleBookEntry the style book entry
 	 * @return the style book entry that was updated
 	 */
 	@Override

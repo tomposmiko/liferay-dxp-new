@@ -30,9 +30,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--RECYCLE_BIN_WARNING-->
-
 <tr>
 	<td>RECYCLE_BIN_WARNING_OVERWRITE_RADIO</td>
 	<td>//input[contains(@id,'override')]</td>
@@ -48,9 +46,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--RECYCLE_BIN_FOLDER-->
-
 <tr>
 	<td>RECYCLE_BIN_FOLDER_DOCUMENT_NAME</td>
 	<td>//div[contains(@id,'trashSearchContainer')]//tr[contains(.,'${key_assetName}')]/td[1]//a</td>

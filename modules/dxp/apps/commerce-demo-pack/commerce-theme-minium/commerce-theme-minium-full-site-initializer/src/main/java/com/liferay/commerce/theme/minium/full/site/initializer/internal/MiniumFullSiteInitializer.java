@@ -52,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "site.initializer.key=" + MiniumFullSiteInitializer.KEY,
 	service = SiteInitializer.class
 )
@@ -92,13 +93,13 @@ public class MiniumFullSiteInitializer implements SiteInitializer {
 
 			_importCommerceMLRecommendations(groupId);
 
-			_fixDLFileEntryPermissions(groupId);
+			fixDLFileEntryPermissions(groupId);
 		}
 		catch (InitializationException initializationException) {
 			throw initializationException;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw new InitializationException(exception);
 		}
@@ -113,7 +114,7 @@ public class MiniumFullSiteInitializer implements SiteInitializer {
 		return _siteInitializer.isActive(companyId);
 	}
 
-	private void _fixDLFileEntryPermissions(long groupId)
+	protected void fixDLFileEntryPermissions(long groupId)
 		throws PortalException {
 
 		List<DLFileEntry> dlFileEntries =

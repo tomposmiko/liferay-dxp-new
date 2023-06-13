@@ -75,29 +75,12 @@ public class EditSessionMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
-		_invalidateSession(actionRequest);
+		invalidateSession(actionRequest);
 
 		sendRedirect(actionRequest, actionResponse);
 	}
 
-	private static void _invalidateSession(String sessionId) {
-		HttpSession userHttpSession = PortalSessionContext.get(sessionId);
-
-		if (userHttpSession != null) {
-			boolean eanbled = ClusterInvokeThreadLocal.isEnabled();
-
-			ClusterInvokeThreadLocal.setEnabled(true);
-
-			try {
-				userHttpSession.invalidate();
-			}
-			finally {
-				ClusterInvokeThreadLocal.setEnabled(eanbled);
-			}
-		}
-	}
-
-	private void _invalidateSession(ActionRequest actionRequest)
+	protected void invalidateSession(ActionRequest actionRequest)
 		throws Exception {
 
 		String sessionId = ParamUtil.getString(actionRequest, "sessionId");
@@ -140,6 +123,23 @@ public class EditSessionMVCActionCommand extends BaseMVCActionCommand {
 		}
 		catch (Exception exception) {
 			_log.error("Unable to invalidate session", exception);
+		}
+	}
+
+	private static void _invalidateSession(String sessionId) {
+		HttpSession userHttpSession = PortalSessionContext.get(sessionId);
+
+		if (userHttpSession != null) {
+			boolean eanbled = ClusterInvokeThreadLocal.isEnabled();
+
+			ClusterInvokeThreadLocal.setEnabled(true);
+
+			try {
+				userHttpSession.invalidate();
+			}
+			finally {
+				ClusterInvokeThreadLocal.setEnabled(eanbled);
+			}
 		}
 	}
 

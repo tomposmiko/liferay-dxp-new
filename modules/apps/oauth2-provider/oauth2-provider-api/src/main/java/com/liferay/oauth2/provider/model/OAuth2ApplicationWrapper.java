@@ -14,7 +14,6 @@
 
 package com.liferay.oauth2.provider.model;
 
-import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
@@ -43,8 +42,6 @@ public class OAuth2ApplicationWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("uuid", getUuid());
-		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("oAuth2ApplicationId", getOAuth2ApplicationId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -55,8 +52,6 @@ public class OAuth2ApplicationWrapper
 			"oAuth2ApplicationScopeAliasesId",
 			getOAuth2ApplicationScopeAliasesId());
 		attributes.put("allowedGrantTypes", getAllowedGrantTypes());
-		attributes.put(
-			"clientAuthenticationMethod", getClientAuthenticationMethod());
 		attributes.put("clientCredentialUserId", getClientCredentialUserId());
 		attributes.put(
 			"clientCredentialUserName", getClientCredentialUserName());
@@ -67,7 +62,6 @@ public class OAuth2ApplicationWrapper
 		attributes.put("features", getFeatures());
 		attributes.put("homePageURL", getHomePageURL());
 		attributes.put("iconFileEntryId", getIconFileEntryId());
-		attributes.put("jwks", getJwks());
 		attributes.put("name", getName());
 		attributes.put("privacyPolicyURL", getPrivacyPolicyURL());
 		attributes.put("redirectURIs", getRedirectURIs());
@@ -79,19 +73,6 @@ public class OAuth2ApplicationWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		String uuid = (String)attributes.get("uuid");
-
-		if (uuid != null) {
-			setUuid(uuid);
-		}
-
-		String externalReferenceCode = (String)attributes.get(
-			"externalReferenceCode");
-
-		if (externalReferenceCode != null) {
-			setExternalReferenceCode(externalReferenceCode);
-		}
-
 		Long oAuth2ApplicationId = (Long)attributes.get("oAuth2ApplicationId");
 
 		if (oAuth2ApplicationId != null) {
@@ -139,13 +120,6 @@ public class OAuth2ApplicationWrapper
 
 		if (allowedGrantTypes != null) {
 			setAllowedGrantTypes(allowedGrantTypes);
-		}
-
-		String clientAuthenticationMethod = (String)attributes.get(
-			"clientAuthenticationMethod");
-
-		if (clientAuthenticationMethod != null) {
-			setClientAuthenticationMethod(clientAuthenticationMethod);
 		}
 
 		Long clientCredentialUserId = (Long)attributes.get(
@@ -204,12 +178,6 @@ public class OAuth2ApplicationWrapper
 			setIconFileEntryId(iconFileEntryId);
 		}
 
-		String jwks = (String)attributes.get("jwks");
-
-		if (jwks != null) {
-			setJwks(jwks);
-		}
-
 		String name = (String)attributes.get("name");
 
 		if (name != null) {
@@ -262,16 +230,6 @@ public class OAuth2ApplicationWrapper
 		getAllowedGrantTypesList() {
 
 		return model.getAllowedGrantTypesList();
-	}
-
-	/**
-	 * Returns the client authentication method of this o auth2 application.
-	 *
-	 * @return the client authentication method of this o auth2 application
-	 */
-	@Override
-	public String getClientAuthenticationMethod() {
-		return model.getClientAuthenticationMethod();
 	}
 
 	/**
@@ -365,16 +323,6 @@ public class OAuth2ApplicationWrapper
 	}
 
 	/**
-	 * Returns the external reference code of this o auth2 application.
-	 *
-	 * @return the external reference code of this o auth2 application
-	 */
-	@Override
-	public String getExternalReferenceCode() {
-		return model.getExternalReferenceCode();
-	}
-
-	/**
 	 * Returns the features of this o auth2 application.
 	 *
 	 * @return the features of this o auth2 application
@@ -407,16 +355,6 @@ public class OAuth2ApplicationWrapper
 	@Override
 	public long getIconFileEntryId() {
 		return model.getIconFileEntryId();
-	}
-
-	/**
-	 * Returns the jwks of this o auth2 application.
-	 *
-	 * @return the jwks of this o auth2 application
-	 */
-	@Override
-	public String getJwks() {
-		return model.getJwks();
 	}
 
 	/**
@@ -545,16 +483,6 @@ public class OAuth2ApplicationWrapper
 	}
 
 	/**
-	 * Returns the uuid of this o auth2 application.
-	 *
-	 * @return the uuid of this o auth2 application
-	 */
-	@Override
-	public String getUuid() {
-		return model.getUuid();
-	}
-
-	/**
 	 * Returns <code>true</code> if this o auth2 application is remember device.
 	 *
 	 * @return <code>true</code> if this o auth2 application is remember device; <code>false</code> otherwise
@@ -595,18 +523,6 @@ public class OAuth2ApplicationWrapper
 			allowedGrantTypesList) {
 
 		model.setAllowedGrantTypesList(allowedGrantTypesList);
-	}
-
-	/**
-	 * Sets the client authentication method of this o auth2 application.
-	 *
-	 * @param clientAuthenticationMethod the client authentication method of this o auth2 application
-	 */
-	@Override
-	public void setClientAuthenticationMethod(
-		String clientAuthenticationMethod) {
-
-		model.setClientAuthenticationMethod(clientAuthenticationMethod);
 	}
 
 	/**
@@ -700,16 +616,6 @@ public class OAuth2ApplicationWrapper
 	}
 
 	/**
-	 * Sets the external reference code of this o auth2 application.
-	 *
-	 * @param externalReferenceCode the external reference code of this o auth2 application
-	 */
-	@Override
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		model.setExternalReferenceCode(externalReferenceCode);
-	}
-
-	/**
 	 * Sets the features of this o auth2 application.
 	 *
 	 * @param features the features of this o auth2 application
@@ -742,16 +648,6 @@ public class OAuth2ApplicationWrapper
 	@Override
 	public void setIconFileEntryId(long iconFileEntryId) {
 		model.setIconFileEntryId(iconFileEntryId);
-	}
-
-	/**
-	 * Sets the jwks of this o auth2 application.
-	 *
-	 * @param jwks the jwks of this o auth2 application
-	 */
-	@Override
-	public void setJwks(String jwks) {
-		model.setJwks(jwks);
 	}
 
 	/**
@@ -880,26 +776,6 @@ public class OAuth2ApplicationWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	/**
-	 * Sets the uuid of this o auth2 application.
-	 *
-	 * @param uuid the uuid of this o auth2 application
-	 */
-	@Override
-	public void setUuid(String uuid) {
-		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return model.getStagedModelType();
 	}
 
 	@Override

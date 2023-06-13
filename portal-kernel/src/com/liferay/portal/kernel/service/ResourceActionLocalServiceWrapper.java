@@ -25,10 +25,6 @@ public class ResourceActionLocalServiceWrapper
 	implements ResourceActionLocalService,
 			   ServiceWrapper<ResourceActionLocalService> {
 
-	public ResourceActionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ResourceActionLocalServiceWrapper(
 		ResourceActionLocalService resourceActionLocalService) {
 

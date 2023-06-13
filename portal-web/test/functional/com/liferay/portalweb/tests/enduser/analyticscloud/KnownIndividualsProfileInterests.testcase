@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -33,30 +31,32 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9132 | Test Summary: Individuals interest details has a tab that shows active pages"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertIndividualsinterestActivePages {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time
 		// AC Refactor ticket: LRAC-9152
 
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		task ("View the site page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -68,7 +68,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to the Individual > KnownIndividual > Interests") {
@@ -85,24 +85,28 @@ definition {
 			ACInterests.clickInterest(interestTopic = "ac page 1");
 
 			var portalURL = PropsUtil.get("portal.url");
-			var siteName = TestCase.getSiteName(siteName = ${siteName});
+			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			ACInterests.viewInterestPage(
 				pageName = "AC Page 1 - Site Name - ${siteName}",
-				pageURL = "${portalURL}/web/site-name/ac-page");
+				pageUrl = "${portalURL}/web/site-name/ac-page");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9131 | Test Summary: Individuals interest details has a tab that shows inactive pages"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertIndividualsInterestInactivePages {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time
 		// AC Refactor ticket: LRAC-9151
 
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		task ("View the site page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -114,7 +118,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to the Individual > KnownIndividual > Interests") {
@@ -137,18 +141,24 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8950 | Test Summary: Interests that are associated with the individual appear in the list"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test InterestsAssociatedWithIndividualAppearInList {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time
 		// AC Refactor ticket: LRAC-9151
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Add specific pages to Site as interest topics") {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.addPage(layoutName = ${layoutName});
+				JSONLayout.addPublicLayout(
+					groupName = "Site Name",
+					layoutName = "${layoutName}");
 			}
 		}
 
@@ -168,8 +178,8 @@ definition {
 				userLoginFullName = "ac ac");
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -181,7 +191,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to the Individual > KnownIndividual > Interests") {
@@ -197,7 +207,7 @@ definition {
 		task ("Assert interests that are associated with the individual appear in the list") {
 			for (var interestTopic : list "movies,music,science,sports,technology") {
 				ACInterests.viewInterest(
-					interestTopic = ${interestTopic},
+					interestTopic = "${interestTopic}",
 					knownIndividuals = "true");
 			}
 		}

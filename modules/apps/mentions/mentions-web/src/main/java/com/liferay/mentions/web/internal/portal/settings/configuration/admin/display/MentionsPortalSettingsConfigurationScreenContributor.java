@@ -72,7 +72,7 @@ public class MentionsPortalSettingsConfigurationScreenContributor
 				WebKeys.THEME_DISPLAY);
 
 		PortletPreferences companyPortletPreferences =
-			PrefsPropsUtil.getPreferences(themeDisplay.getCompanyId());
+			PrefsPropsUtil.getPreferences(themeDisplay.getCompanyId(), true);
 
 		boolean companyMentionsEnabled = PrefsParamUtil.getBoolean(
 			companyPortletPreferences, httpServletRequest, "mentionsEnabled",

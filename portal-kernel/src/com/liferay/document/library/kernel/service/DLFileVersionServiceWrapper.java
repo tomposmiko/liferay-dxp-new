@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class DLFileVersionServiceWrapper
 	implements DLFileVersionService, ServiceWrapper<DLFileVersionService> {
 
-	public DLFileVersionServiceWrapper() {
-		this(null);
-	}
-
 	public DLFileVersionServiceWrapper(
 		DLFileVersionService dlFileVersionService) {
 

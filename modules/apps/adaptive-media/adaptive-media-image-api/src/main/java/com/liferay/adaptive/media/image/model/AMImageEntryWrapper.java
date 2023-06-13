@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -44,8 +42,6 @@ public class AMImageEntryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("amImageEntryId", getAmImageEntryId());
 		attributes.put("groupId", getGroupId());
@@ -63,18 +59,6 @@ public class AMImageEntryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -188,16 +172,6 @@ public class AMImageEntryWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this am image entry.
-	 *
-	 * @return the ct collection ID of this am image entry
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the file version ID of this am image entry.
 	 *
 	 * @return the file version ID of this am image entry
@@ -235,16 +209,6 @@ public class AMImageEntryWrapper
 	@Override
 	public String getMimeType() {
 		return model.getMimeType();
-	}
-
-	/**
-	 * Returns the mvcc version of this am image entry.
-	 *
-	 * @return the mvcc version of this am image entry
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -333,16 +297,6 @@ public class AMImageEntryWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this am image entry.
-	 *
-	 * @param ctCollectionId the ct collection ID of this am image entry
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the file version ID of this am image entry.
 	 *
 	 * @param fileVersionId the file version ID of this am image entry
@@ -383,16 +337,6 @@ public class AMImageEntryWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this am image entry.
-	 *
-	 * @param mvccVersion the mvcc version of this am image entry
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the primary key of this am image entry.
 	 *
 	 * @param primaryKey the primary key of this am image entry
@@ -430,25 +374,6 @@ public class AMImageEntryWrapper
 	@Override
 	public void setWidth(int width) {
 		model.setWidth(width);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<AMImageEntry, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<AMImageEntry, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

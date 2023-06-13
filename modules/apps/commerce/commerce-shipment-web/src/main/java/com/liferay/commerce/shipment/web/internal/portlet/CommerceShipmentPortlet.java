@@ -21,10 +21,8 @@ import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.service.CommerceAddressService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
-import com.liferay.commerce.service.CommerceShipmentItemService;
-import com.liferay.commerce.service.CommerceShippingMethodService;
 import com.liferay.commerce.shipment.web.internal.display.context.CommerceShipmentDisplayContext;
-import com.liferay.commerce.shipment.web.internal.portlet.action.helper.ActionHelper;
+import com.liferay.commerce.shipment.web.internal.portlet.action.ActionHelper;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.CountryService;
@@ -46,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-shipment",
@@ -62,10 +61,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_SHIPMENT,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceShipmentPortlet.class, Portlet.class}
 )
 public class CommerceShipmentPortlet extends MVCPortlet {
 
@@ -79,7 +77,6 @@ public class CommerceShipmentPortlet extends MVCPortlet {
 				_actionHelper, _commerceAddressFormatter,
 				_commerceAddressService, _commerceChannelService,
 				_commerceOrderItemService, _commerceOrderLocalService,
-				_commerceShipmentItemService, _commerceShippingMethodService,
 				_countryService, _portal.getHttpServletRequest(renderRequest),
 				_portletResourcePermission, _regionService);
 
@@ -106,12 +103,6 @@ public class CommerceShipmentPortlet extends MVCPortlet {
 
 	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;
-
-	@Reference
-	private CommerceShipmentItemService _commerceShipmentItemService;
-
-	@Reference
-	private CommerceShippingMethodService _commerceShippingMethodService;
 
 	@Reference
 	private CountryService _countryService;

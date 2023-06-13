@@ -14,16 +14,67 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
+import com.liferay.jenkins.results.parser.test.clazz.group.BatchTestClassGroup;
+import com.liferay.jenkins.results.parser.test.clazz.group.SegmentTestClassGroup;
+
 import java.io.File;
 import java.io.IOException;
 
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author Michael Hashimoto
  */
 public class SubrepositoryGitRepositoryJob
-	extends GitRepositoryJob implements SubrepositoryTestClassJob {
+	extends GitRepositoryJob
+	implements BatchDependentJob, SubrepositoryTestClassJob {
+
+	@Override
+	public List<AxisTestClassGroup> getDependentAxisTestClassGroups() {
+		List<AxisTestClassGroup> axisTestClassGroups = new ArrayList<>();
+
+		for (BatchTestClassGroup batchTestClassGroup :
+				getDependentBatchTestClassGroups()) {
+
+			axisTestClassGroups.addAll(
+				batchTestClassGroup.getAxisTestClassGroups());
+		}
+
+		return axisTestClassGroups;
+	}
+
+	@Override
+	public Set<String> getDependentBatchNames() {
+		return getFilteredBatchNames(getRawDependentBatchNames());
+	}
+
+	@Override
+	public List<BatchTestClassGroup> getDependentBatchTestClassGroups() {
+		return getBatchTestClassGroups(getRawDependentBatchNames());
+	}
+
+	@Override
+	public Set<String> getDependentSegmentNames() {
+		return getFilteredSegmentNames(getRawDependentBatchNames());
+	}
+
+	@Override
+	public List<SegmentTestClassGroup> getDependentSegmentTestClassGroups() {
+		return getSegmentTestClassGroups(getRawDependentBatchNames());
+	}
+
+	@Override
+	public Set<String> getDistTypes() {
+		String testBatchDistAppServers = JenkinsResultsParserUtil.getProperty(
+			getJobProperties(), "test.batch.dist.app.servers");
+
+		return getSetFromString(testBatchDistAppServers);
+	}
 
 	@Override
 	public GitWorkingDirectory getGitWorkingDirectory() {
@@ -34,25 +85,9 @@ public class SubrepositoryGitRepositoryJob
 		checkGitRepositoryDir();
 
 		gitWorkingDirectory = GitWorkingDirectoryFactory.newGitWorkingDirectory(
-			_upstreamBranchName, gitRepositoryDir.getPath());
+			getBranchName(), gitRepositoryDir.getPath());
 
 		return gitWorkingDirectory;
-	}
-
-	@Override
-	public JSONObject getJSONObject() {
-		if (jsonObject != null) {
-			return jsonObject;
-		}
-
-		jsonObject = super.getJSONObject();
-
-		jsonObject.put(
-			"portal_upstream_branch_name", _portalUpstreamBranchName);
-		jsonObject.put("repository_name", _repositoryName);
-		jsonObject.put("upstream_branch_name", _upstreamBranchName);
-
-		return jsonObject;
 	}
 
 	@Override
@@ -60,7 +95,7 @@ public class SubrepositoryGitRepositoryJob
 		if (portalGitWorkingDirectory == null) {
 			portalGitWorkingDirectory =
 				GitWorkingDirectoryFactory.newPortalGitWorkingDirectory(
-					_portalUpstreamBranchName);
+					getBranchName());
 		}
 
 		return portalGitWorkingDirectory;
@@ -101,37 +136,13 @@ public class SubrepositoryGitRepositoryJob
 	}
 
 	protected SubrepositoryGitRepositoryJob(
-		BuildProfile buildProfile, String jobName,
-		String portalUpstreamBranchName, String repositoryName,
-		String upstreamBranchName) {
+		String jobName, BuildProfile buildProfile, String repositoryName) {
 
-		super(buildProfile, jobName, upstreamBranchName);
+		super(jobName, buildProfile);
 
-		_portalUpstreamBranchName = portalUpstreamBranchName;
-		_repositoryName = repositoryName;
-		_upstreamBranchName = upstreamBranchName;
-
-		_initialize();
-	}
-
-	protected SubrepositoryGitRepositoryJob(JSONObject jsonObject) {
-		super(jsonObject);
-
-		_repositoryName = jsonObject.getString("repository_name");
-		_portalUpstreamBranchName = jsonObject.getString(
-			"portal_upstream_branch_name");
-		_upstreamBranchName = jsonObject.getString("upstream_branch_name");
-
-		_initialize();
-	}
-
-	protected PortalGitWorkingDirectory portalGitWorkingDirectory;
-	protected boolean validationRequired;
-
-	private void _initialize() {
 		gitWorkingDirectory =
 			GitWorkingDirectoryFactory.newSubrepositoryGitWorkingDirectory(
-				_upstreamBranchName, _repositoryName);
+				jobName, repositoryName);
 
 		setGitRepositoryDir(gitWorkingDirectory.getWorkingDirectory());
 
@@ -145,28 +156,48 @@ public class SubrepositoryGitRepositoryJob
 				portalGitWorkingDirectory.getWorkingDirectory(),
 				"test.properties"));
 
-		jobPropertiesFiles.add(
-			new File(
-				gitWorkingDirectory.getWorkingDirectory(), "test.properties"));
+		Properties buildProperties = null;
 
 		try {
-			jobPropertiesFiles.add(
-				new File(
-					JenkinsResultsParserUtil.combine(
-						JenkinsResultsParserUtil.getProperty(
-							JenkinsResultsParserUtil.getBuildProperties(),
-							"base.repository.dir"),
-						"/liferay-jenkins-ee/commands/dependencies",
-						"/test-subrepository-batch.properties")));
+			buildProperties = JenkinsResultsParserUtil.getBuildProperties();
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(
 				"Unable to get build properties", ioException);
 		}
+
+		jobPropertiesFiles.add(new File(gitRepositoryDir, "test.properties"));
+
+		jobPropertiesFiles.add(
+			new File(
+				JenkinsResultsParserUtil.combine(
+					buildProperties.getProperty("base.repository.dir"),
+					"/liferay-jenkins-ee/commands/dependencies",
+					"/test-subrepository-batch.properties")));
+
+		readJobProperties();
 	}
 
-	private final String _portalUpstreamBranchName;
-	private final String _repositoryName;
-	private final String _upstreamBranchName;
+	@Override
+	protected Set<String> getRawBatchNames() {
+		String batchNames = JenkinsResultsParserUtil.getProperty(
+			getJobProperties(), "test.batch.names", getBranchName());
+
+		return getSetFromString(batchNames);
+	}
+
+	protected Set<String> getRawDependentBatchNames() {
+		String dependentBatchNames = JenkinsResultsParserUtil.getProperty(
+			getJobProperties(), "test.batch.names.smoke", getBranchName());
+
+		if (JenkinsResultsParserUtil.isNullOrEmpty(dependentBatchNames)) {
+			return new HashSet<>();
+		}
+
+		return getSetFromString(dependentBatchNames);
+	}
+
+	protected PortalGitWorkingDirectory portalGitWorkingDirectory;
+	protected boolean validationRequired;
 
 }

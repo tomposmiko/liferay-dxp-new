@@ -14,8 +14,6 @@
 
 package com.liferay.item.selector;
 
-import com.liferay.item.selector.constants.ItemSelectorCriterionConstants;
-
 import java.util.List;
 
 /**
@@ -61,10 +59,6 @@ public interface ItemSelectorCriterion {
 	 * @return the return types ordered by preference
 	 */
 	public List<ItemSelectorReturnType> getDesiredItemSelectorReturnTypes();
-
-	public default String getMimeTypeRestriction() {
-		return ItemSelectorCriterionConstants.MIME_TYPE_RESTRICTION_DEFAULT;
-	}
 
 	public void setDesiredItemSelectorReturnTypes(
 		ItemSelectorReturnType... desiredItemSelectorReturnType);

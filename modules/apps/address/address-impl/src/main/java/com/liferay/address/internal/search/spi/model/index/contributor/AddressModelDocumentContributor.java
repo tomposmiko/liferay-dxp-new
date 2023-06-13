@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.Address",
 	service = ModelDocumentContributor.class
 )
@@ -39,9 +40,9 @@ public class AddressModelDocumentContributor
 		document.addText("city", address.getCity());
 		document.addText("countryName", _getCountryName(address));
 		document.addText("description", address.getDescription());
-		document.addKeyword("listTypeId", address.getListTypeId());
 		document.addText("regionName", _getRegionName(address));
 		document.addText("street1", address.getStreet1());
+		document.addKeyword("typeId", address.getTypeId());
 		document.addText("zip", address.getZip());
 	}
 

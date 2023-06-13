@@ -16,7 +16,7 @@ package com.liferay.portal.search.web.internal.search.bar.portlet;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.search.web.internal.display.context.SearchScopePreference;
-import com.liferay.portal.search.web.internal.portlet.preferences.BasePortletPreferences;
+import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
 
 import java.util.Optional;
 
@@ -26,48 +26,63 @@ import javax.portlet.PortletPreferences;
  * @author André de Oliveira
  */
 public class SearchBarPortletPreferencesImpl
-	extends BasePortletPreferences implements SearchBarPortletPreferences {
+	implements SearchBarPortletPreferences {
 
 	public SearchBarPortletPreferencesImpl(
 		Optional<PortletPreferences> portletPreferencesOptional) {
 
-		super(portletPreferencesOptional.orElse(null));
+		_portletPreferencesHelper = new PortletPreferencesHelper(
+			portletPreferencesOptional);
 	}
 
 	@Override
-	public String getDestination() {
-		return getString(
-			SearchBarPortletPreferences.PREFERENCE_KEY_DESTINATION,
-			StringPool.BLANK);
+	public Optional<String> getDestination() {
+		return _portletPreferencesHelper.getString(
+			SearchBarPortletPreferences.PREFERENCE_KEY_DESTINATION);
 	}
 
 	@Override
-	public String getFederatedSearchKey() {
-		return getString(
-			SearchBarPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY,
-			StringPool.BLANK);
+	public String getDestinationString() {
+		Optional<String> valueOptional = getDestination();
+
+		return valueOptional.orElse(StringPool.BLANK);
+	}
+
+	@Override
+	public Optional<String> getFederatedSearchKeyOptional() {
+		return _portletPreferencesHelper.getString(
+			SearchBarPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY);
+	}
+
+	@Override
+	public String getFederatedSearchKeyString() {
+		return getFederatedSearchKeyOptional().orElse(StringPool.BLANK);
 	}
 
 	@Override
 	public String getKeywordsParameterName() {
-		return getString(
+		return _portletPreferencesHelper.getString(
 			SearchBarPortletPreferences.PREFERENCE_KEY_KEYWORDS_PARAMETER_NAME,
 			"q");
 	}
 
 	@Override
 	public String getScopeParameterName() {
-		return getString(
+		return _portletPreferencesHelper.getString(
 			SearchBarPortletPreferences.PREFERENCE_KEY_SCOPE_PARAMETER_NAME,
 			"scope");
 	}
 
 	@Override
 	public SearchScopePreference getSearchScopePreference() {
-		return SearchScopePreference.getSearchScopePreference(
-			getString(
-				SearchBarPortletPreferences.PREFERENCE_KEY_SEARCH_SCOPE,
-				StringPool.BLANK));
+		Optional<String> valueOptional = _portletPreferencesHelper.getString(
+			SearchBarPortletPreferences.PREFERENCE_KEY_SEARCH_SCOPE);
+
+		Optional<SearchScopePreference> searchScopePreferenceOptional =
+			valueOptional.map(SearchScopePreference::getSearchScopePreference);
+
+		return searchScopePreferenceOptional.orElse(
+			SearchScopePreference.THIS_SITE);
 	}
 
 	@Override
@@ -80,30 +95,25 @@ public class SearchBarPortletPreferencesImpl
 
 	@Override
 	public boolean isInvisible() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			SearchBarPortletPreferences.PREFERENCE_KEY_INVISIBLE, false);
 	}
 
 	@Override
 	public boolean isShowStagedResults() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			SearchBarPortletPreferences.PREFERENCE_KEY_SHOW_STAGED_RESULTS,
 			false);
 	}
 
 	@Override
-	public boolean isSuggestionsEnabled() {
-		return getBoolean(
-			SearchBarPortletPreferences.PREFERENCE_KEY_SUGGESTIONS_ENABLED,
-			true);
-	}
-
-	@Override
 	public boolean isUseAdvancedSearchSyntax() {
-		return getBoolean(
+		return _portletPreferencesHelper.getBoolean(
 			SearchBarPortletPreferences.
 				PREFERENCE_KEY_USE_ADVANCED_SEARCH_SYNTAX,
 			false);
 	}
+
+	private final PortletPreferencesHelper _portletPreferencesHelper;
 
 }

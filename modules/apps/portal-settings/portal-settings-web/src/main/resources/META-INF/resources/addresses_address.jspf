@@ -19,7 +19,7 @@
 >
 	<aui:input name='<%= "addressId" + addressesIndex %>' type="hidden" value="<%= address.getAddressId() %>" />
 
-	<aui:input fieldParam='<%= "addressStreet1_" + addressesIndex %>' id='<%= "addressStreet1_" + addressesIndex %>' name="street1" required="<%= true %>" />
+	<aui:input fieldParam='<%= "addressStreet1_" + addressesIndex %>' id='<%= "addressStreet1_" + addressesIndex %>' name="street1" />
 
 	<aui:input fieldParam='<%= "addressStreet2_" + addressesIndex %>' id='<%= "addressStreet2_" + addressesIndex %>' name="street2" />
 
@@ -35,9 +35,9 @@
 >
 	<aui:input fieldParam='<%= "addressZip" + addressesIndex %>' id='<%= "addressZip" + addressesIndex %>' label="postal-code" name="zip" />
 
-	<aui:input fieldParam='<%= "addressCity" + addressesIndex %>' id='<%= "addressCity" + addressesIndex %>' name="city" required="<%= true %>" />
+	<aui:input fieldParam='<%= "addressCity" + addressesIndex %>' id='<%= "addressCity" + addressesIndex %>' name="city" />
 
-	<aui:select label="type" listType="<%= className + ListTypeConstants.ADDRESS %>" listTypeFieldName="listTypeId" name='<%= "addressListTypeId" + addressesIndex %>' />
+	<aui:select label="type" listType="<%= className + ListTypeConstants.ADDRESS %>" name='<%= "addressTypeId" + addressesIndex %>' />
 
 	<aui:input checked="<%= address.isPrimary() %>" cssClass="primary-ctrl" id='<%= "addressPrimary" + addressesIndex %>' label="primary" name="addressPrimary" type="radio" value="<%= addressesIndex %>" />
 

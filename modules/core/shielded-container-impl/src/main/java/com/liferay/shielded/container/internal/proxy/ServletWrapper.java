@@ -36,9 +36,10 @@ public class ServletWrapper implements Servlet {
 
 		_proxyFactory = proxyFactory;
 		_servletSupplier = servletSupplier;
+
 		_servletContext = servletContext;
 
-		_classLoader = servletContext.getClassLoader();
+		_classLoader = _servletContext.getClassLoader();
 	}
 
 	@Override

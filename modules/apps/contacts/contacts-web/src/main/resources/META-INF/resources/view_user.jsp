@@ -144,22 +144,16 @@ request.setAttribute("view_user.jsp-user", user2);
 				</clay:col>
 			</clay:row>
 
-			<div class="d-flex lfr-detail-info lfr-field-group" data-title="<%= LanguageUtil.get(request, "details") %>">
+			<div class="field-group lfr-detail-info" data-title="<%= LanguageUtil.get(request, "details") %>">
 
 				<%
 				PortletURL editDetailsURL = PortletURLFactoryUtil.create(request, PortletKeys.MY_ACCOUNT, embeddedPersonalApplicationLayout, PortletRequest.RENDER_PHASE);
 				%>
 
-				<clay:link
-					borderless="<%= true %>"
-					cssClass="edit-button lfr-portal-tooltip"
-					displayType="secondary"
-					href="<%= editDetailsURL.toString() %>"
+				<liferay-ui:icon
 					icon="pencil"
-					monospaced="<%= true %>"
-					small="<%= true %>"
-					title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "information"), false) %>'
-					type="button"
+					markupView="lexicon"
+					url="<%= editDetailsURL.toString() %>"
 				/>
 
 				<c:if test="<%= showIcon %>">
@@ -170,7 +164,7 @@ request.setAttribute("view_user.jsp-user", user2);
 
 				<div class="<%= showIcon ? StringPool.BLANK : "no-icon" %> lfr-contact-info">
 					<div class="lfr-contact-name">
-						<a class="text-decoration-underline" href="<%= user2.getDisplayURL(themeDisplay) %>"><%= user2.getFullName() %></a>
+						<a href="<%= user2.getDisplayURL(themeDisplay) %>"><%= user2.getFullName() %></a>
 					</div>
 
 					<div class="lfr-contact-job-title">
@@ -178,7 +172,7 @@ request.setAttribute("view_user.jsp-user", user2);
 					</div>
 
 					<div class="lfr-contact-extra">
-						<a class="text-decoration-underline" href="mailto:<%= user2.getEmailAddress() %>"><%= user2.getEmailAddress() %></a>
+						<a href="mailto:<%= user2.getEmailAddress() %>"><%= user2.getEmailAddress() %></a>
 					</div>
 				</div>
 
@@ -278,7 +272,7 @@ request.setAttribute("view_user.jsp-user", user2);
 												for (Group curGroup : results) {
 												%>
 
-													<li class="user-information-sites"><a class="text-decoration-underline" href="<%= curGroup.getDisplayURL(themeDisplay, !curGroup.hasPublicLayouts()) %>"><%= HtmlUtil.escape(curGroup.getDescriptiveName(locale)) %></a></li>
+													<li class="user-information-sites"><a href="<%= curGroup.getDisplayURL(themeDisplay, !curGroup.hasPublicLayouts()) %>"><%= HtmlUtil.escape(curGroup.getDescriptiveName(locale)) %></a></li>
 
 												<%
 												}
@@ -305,22 +299,16 @@ request.setAttribute("view_user.jsp-user", user2);
 
 									<c:choose>
 										<c:when test="<%= !assetTags.isEmpty() %>">
-											<div class="lfr-field-group user-tags-wrapper" data-title="<%= LanguageUtil.get(request, "tags") %>">
+											<div class="field-group user-tags-wrapper" data-title="<%= LanguageUtil.get(request, "tags") %>">
 
 												<%
 												PortletURL editCategorizationURL = PortletURLFactoryUtil.create(request, PortletKeys.MY_ACCOUNT, embeddedPersonalApplicationLayout, PortletRequest.RENDER_PHASE);
 												%>
 
-												<clay:link
-													borderless="<%= true %>"
-													cssClass="edit-button lfr-portal-tooltip"
-													displayType="secondary"
-													href="<%= editCategorizationURL.toString() %>"
+												<liferay-ui:icon
 													icon="pencil"
-													monospaced="<%= true %>"
-													small="<%= true %>"
-													title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "information"), false) %>'
-													type="button"
+													markupView="lexicon"
+													url="<%= editCategorizationURL.toString() %>"
 												/>
 
 												<ul class="user-tags">
@@ -343,7 +331,7 @@ request.setAttribute("view_user.jsp-user", user2);
 															WindowState.MAXIMIZED
 														).buildPortletURL();
 
-														sb.append("<li><a class=\"text-decoration-underline\" href=\"");
+														sb.append("<li><a href=\"");
 														sb.append(searchURL);
 														sb.append("\">");
 														sb.append(assetTag.getName());

@@ -23,16 +23,16 @@ import {createSubTopicQuery, createTopicQuery} from '../utils/client.es';
 import lang from '../utils/lang.es';
 import {deleteCache} from '../utils/utils.es';
 
-export default function NewTopicModal({
+export default ({
 	currentSectionId,
 	onClose,
 	onCreateNavigateTo,
 	setError,
 	visible,
-}) {
+}) => {
 	const context = useContext(AppContext);
-	const topicNameRef = useRef(null);
-	const topicDescriptionRef = useRef(null);
+	const topicName = useRef(null);
+	const topicDescription = useRef(null);
 
 	const [createNewSubTopic] = useMutation(createSubTopicQuery);
 
@@ -61,15 +61,14 @@ export default function NewTopicModal({
 	};
 
 	const createTopic = () => {
-		const topicName = topicNameRef.current.value.trim();
-		if (isValidTopic(topicName)) {
+		if (isValidTopic(topicName.current.value)) {
 			deleteCache();
 			if (currentSectionId) {
 				createNewSubTopic({
 					variables: {
-						description: topicDescriptionRef.current.value,
+						description: topicDescription.current.value,
 						parentMessageBoardSectionId: currentSectionId,
-						title: topicName,
+						title: topicName.current.value,
 					},
 				}).then(
 					({
@@ -87,9 +86,9 @@ export default function NewTopicModal({
 			else {
 				createNewTopic({
 					variables: {
-						description: topicDescriptionRef.current.value,
+						description: topicDescription.current.value,
 						siteKey: context.siteKey,
-						title: topicName,
+						title: topicName.current.value,
 					},
 				}).then(({data: {createSiteMessageBoardSection: section}}) =>
 					onCreateNavigateTo(
@@ -111,40 +110,35 @@ export default function NewTopicModal({
 					<ClayModal.Header>
 						{Liferay.Language.get('new-topic')}
 					</ClayModal.Header>
-
 					<ClayModal.Body>
 						<ClayForm>
 							<ClayForm.Group className="form-group-sm">
 								<label htmlFor="basicInput">
 									{Liferay.Language.get('topic-name')}
 								</label>
-
 								<ClayInput
 									placeholder={Liferay.Language.get(
 										'please-enter-a-valid-topic-name'
 									)}
-									ref={topicNameRef}
+									ref={topicName}
 									type="text"
 								/>
 							</ClayForm.Group>
-
 							<ClayForm.Group className="form-group-sm">
 								<label htmlFor="basicInput">
 									{Liferay.Language.get('description')}
 								</label>
-
 								<ClayInput
 									className="form-control"
 									component="textarea"
 									placeholder={Liferay.Language.get(
 										'description'
 									)}
-									ref={topicDescriptionRef}
+									ref={topicDescription}
 								/>
 							</ClayForm.Group>
 						</ClayForm>
 					</ClayModal.Body>
-
 					<ClayModal.Footer
 						last={
 							<ClayButton.Group spaced>
@@ -154,7 +148,6 @@ export default function NewTopicModal({
 								>
 									{Liferay.Language.get('cancel')}
 								</ClayButton>
-
 								<ClayButton
 									displayType="primary"
 									onClick={() => {
@@ -171,4 +164,4 @@ export default function NewTopicModal({
 			)}
 		</>
 	);
-}
+};

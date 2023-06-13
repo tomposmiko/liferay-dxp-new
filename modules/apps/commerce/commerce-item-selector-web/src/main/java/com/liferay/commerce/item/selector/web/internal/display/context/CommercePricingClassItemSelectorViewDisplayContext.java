@@ -18,12 +18,15 @@ import com.liferay.commerce.item.selector.web.internal.search.CommercePricingCla
 import com.liferay.commerce.pricing.model.CommercePricingClass;
 import com.liferay.commerce.pricing.service.CommercePricingClassService;
 import com.liferay.commerce.pricing.util.comparator.CommercePricingClassCreateDateComparator;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -61,37 +64,44 @@ public class CommercePricingClassItemSelectorViewDisplayContext
 				WebKeys.THEME_DISPLAY);
 
 		searchContainer = new SearchContainer<>(
-			cpRequestHelper.getRenderRequest(), getPortletURL(), null,
-			"there-are-no-product-groups");
+			cpRequestHelper.getRenderRequest(), getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage("there-are-no-product-groups");
 
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
-			_getCommercePricingClassOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+
+		OrderByComparator<CommercePricingClass> orderByComparator =
+			getCommercePricingClassOrderByComparator(
+				getOrderByCol(), getOrderByType());
+
+		searchContainer.setOrderByComparator(orderByComparator);
+
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			() -> _commercePricingClassService.getCommercePricingClasses(
+
+		RowChecker rowChecker = new CommercePricingClassItemSelectorChecker(
+			cpRequestHelper.getRenderResponse(),
+			getCheckedCommercePricingClassIds());
+
+		searchContainer.setRowChecker(rowChecker);
+
+		List<CommercePricingClass> commercePricingClasses =
+			_commercePricingClassService.getCommercePricingClasses(
 				themeDisplay.getCompanyId(), searchContainer.getStart(),
-				searchContainer.getEnd(),
-				searchContainer.getOrderByComparator()),
+				searchContainer.getEnd(), orderByComparator);
+
+		searchContainer.setResults(commercePricingClasses);
+
+		int commercePricingClassesCount =
 			_commercePricingClassService.getCommercePricingClassesCount(
-				themeDisplay.getCompanyId()));
-		searchContainer.setRowChecker(
-			new CommercePricingClassItemSelectorChecker(
-				cpRequestHelper.getRenderResponse(),
-				_getCheckedCommercePricingClassIds()));
+				themeDisplay.getCompanyId());
+
+		searchContainer.setTotal(commercePricingClassesCount);
 
 		return searchContainer;
 	}
 
-	private long[] _getCheckedCommercePricingClassIds() {
-		return ParamUtil.getLongValues(
-			cpRequestHelper.getRenderRequest(),
-			"checkedCommercePricingClassIds");
-	}
-
-	private OrderByComparator<CommercePricingClass>
-		_getCommercePricingClassOrderByComparator(
+	protected static OrderByComparator<CommercePricingClass>
+		getCommercePricingClassOrderByComparator(
 			String orderByCol, String orderByType) {
 
 		boolean orderByAsc = false;
@@ -105,6 +115,12 @@ public class CommercePricingClassItemSelectorViewDisplayContext
 		}
 
 		return null;
+	}
+
+	protected long[] getCheckedCommercePricingClassIds() {
+		return ParamUtil.getLongValues(
+			cpRequestHelper.getRenderRequest(),
+			"checkedCommercePricingClassIds");
 	}
 
 	private final CommercePricingClassService _commercePricingClassService;

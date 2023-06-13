@@ -19,12 +19,7 @@ import Body from './IndexesPageBody.es';
 function IndexesPage() {
 	const {data, fetchData} = useFetch({url: '/indexes'});
 
-	const promises = useMemo(
-		() => [fetchData()],
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[]
-	);
+	const promises = useMemo(() => [fetchData()], [fetchData]);
 
 	return (
 		<ClayLayout.ContainerFluid>

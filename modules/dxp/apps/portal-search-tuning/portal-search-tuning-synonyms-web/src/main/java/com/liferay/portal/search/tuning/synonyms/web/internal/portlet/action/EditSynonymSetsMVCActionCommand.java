@@ -28,6 +28,8 @@ import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIn
 import com.liferay.portal.search.tuning.synonyms.web.internal.storage.SynonymSetStorageAdapter;
 import com.liferay.portal.search.tuning.synonyms.web.internal.synchronizer.IndexToFilterSynchronizer;
 
+import java.util.Optional;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
@@ -38,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Filipe Oshiro
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SynonymsPortletKeys.SYNONYMS,
 		"mvc.command.name=/synonyms/edit_synonym_sets"
@@ -56,17 +59,14 @@ public class EditSynonymSetsMVCActionCommand extends BaseMVCActionCommand {
 		sendRedirect(actionRequest, actionResponse);
 	}
 
-	protected SynonymSet getSynonymSet(
+	protected Optional<SynonymSet> getSynonymSetOptional(
 		SynonymSetIndexName synonymSetIndexName, ActionRequest actionRequest) {
 
-		String synonymSetId = ParamUtil.getString(
-			actionRequest, "synonymSetId", null);
-
-		if (synonymSetId == null) {
-			return null;
-		}
-
-		return _synonymSetIndexReader.fetch(synonymSetIndexName, synonymSetId);
+		return Optional.ofNullable(
+			ParamUtil.getString(actionRequest, "synonymSetId", null)
+		).flatMap(
+			id -> _synonymSetIndexReader.fetchOptional(synonymSetIndexName, id)
+		);
 	}
 
 	protected void updateSynonymSet(ActionRequest actionRequest)
@@ -80,7 +80,7 @@ public class EditSynonymSetsMVCActionCommand extends BaseMVCActionCommand {
 		updateSynonymSetIndex(
 			synonymSetIndexName,
 			ParamUtil.getString(actionRequest, "synonymSet"),
-			getSynonymSet(synonymSetIndexName, actionRequest));
+			getSynonymSetOptional(synonymSetIndexName, actionRequest));
 
 		_indexToFilterSynchronizer.copyToFilter(
 			synonymSetIndexName, _indexNameBuilder.getIndexName(companyId),
@@ -89,7 +89,7 @@ public class EditSynonymSetsMVCActionCommand extends BaseMVCActionCommand {
 
 	protected void updateSynonymSetIndex(
 			SynonymSetIndexName synonymSetIndexName, String synonyms,
-			SynonymSet synonymSet)
+			Optional<SynonymSet> synonymSetOptional)
 		throws PortalException {
 
 		SynonymSet.SynonymSetBuilder synonymSetBuilder =
@@ -97,15 +97,16 @@ public class EditSynonymSetsMVCActionCommand extends BaseMVCActionCommand {
 
 		synonymSetBuilder.synonyms(synonyms);
 
-		if (synonymSet == null) {
-			_synonymSetStorageAdapter.create(
+		synonymSetOptional.ifPresent(
+			synonymSet -> synonymSetBuilder.synonymSetDocumentId(
+				synonymSet.getSynonymSetDocumentId()));
+
+		if (synonymSetOptional.isPresent()) {
+			_synonymSetStorageAdapter.update(
 				synonymSetIndexName, synonymSetBuilder.build());
 		}
 		else {
-			synonymSetBuilder.synonymSetDocumentId(
-				synonymSet.getSynonymSetDocumentId());
-
-			_synonymSetStorageAdapter.update(
+			_synonymSetStorageAdapter.create(
 				synonymSetIndexName, synonymSetBuilder.build());
 		}
 	}

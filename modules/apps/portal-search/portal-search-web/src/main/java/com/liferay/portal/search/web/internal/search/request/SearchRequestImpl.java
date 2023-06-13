@@ -55,17 +55,17 @@ public class SearchRequestImpl {
 	}
 
 	public SearchResponseImpl search() {
-		SearchContext searchContext = _buildSearchContext();
+		SearchContext searchContext = buildSearchContext();
 
 		SearchRequestBuilder searchRequestBuilder =
 			_searchRequestBuilderFactory.builder(searchContext);
 
 		searchRequestBuilder.fetchSource(true);
 
-		SearchSettingsImpl searchSettingsImpl = _buildSettings(
+		SearchSettingsImpl searchSettingsImpl = buildSettings(
 			searchRequestBuilder, searchContext);
 
-		SearchContainer<Document> searchContainer = _buildSearchContainer(
+		SearchContainer<Document> searchContainer = buildSearchContainer(
 			searchSettingsImpl);
 
 		searchContext.setEnd(searchContainer.getEnd());
@@ -74,7 +74,7 @@ public class SearchRequestImpl {
 		SearchResponse searchResponse = _searcher.search(
 			searchRequestBuilder.build());
 
-		_populateSearchContainer(searchContainer, searchResponse);
+		populateSearchContainer(searchContainer, searchResponse);
 
 		SearchResponseImpl searchResponseImpl = new SearchResponseImpl();
 
@@ -95,13 +95,26 @@ public class SearchRequestImpl {
 		return searchResponseImpl;
 	}
 
-	private SearchContainer<Document> _buildSearchContainer(
+	protected static void populateSearchContainer(
+		SearchContainer<Document> searchContainer,
+		SearchResponse searchResponse) {
+
+		searchContainer.setSearch(true);
+
+		searchResponse.withHits(
+			hits -> {
+				searchContainer.setResults(hits.toList());
+				searchContainer.setTotal(hits.getLength());
+			});
+	}
+
+	protected SearchContainer<Document> buildSearchContainer(
 		SearchSettingsImpl searchSettingsImpl) {
 
 		return _searchContainerBuilder.getSearchContainer(searchSettingsImpl);
 	}
 
-	private SearchContext _buildSearchContext() {
+	protected SearchContext buildSearchContext() {
 		SearchContext searchContext = _searchContextBuilder.getSearchContext();
 
 		searchContext.setAttribute("filterExpired", Boolean.TRUE);
@@ -110,7 +123,7 @@ public class SearchRequestImpl {
 		return searchContext;
 	}
 
-	private SearchSettingsImpl _buildSettings(
+	protected SearchSettingsImpl buildSettings(
 		SearchRequestBuilder searchRequestBuilder,
 		SearchContext searchContext) {
 
@@ -122,17 +135,6 @@ public class SearchRequestImpl {
 				searchSettingsImpl));
 
 		return searchSettingsImpl;
-	}
-
-	private void _populateSearchContainer(
-		SearchContainer<Document> searchContainer,
-		SearchResponse searchResponse) {
-
-		searchContainer.setSearch(true);
-
-		searchResponse.withHits(
-			hits -> searchContainer.setResultsAndTotal(
-				hits::toList, hits.getLength()));
 	}
 
 	private final SearchContainerBuilder _searchContainerBuilder;

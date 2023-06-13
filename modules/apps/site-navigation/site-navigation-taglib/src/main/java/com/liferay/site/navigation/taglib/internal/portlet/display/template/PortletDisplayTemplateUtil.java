@@ -14,20 +14,34 @@
 
 package com.liferay.site.navigation.taglib.internal.portlet.display.template;
 
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class PortletDisplayTemplateUtil {
 
 	public static PortletDisplayTemplate getPortletDisplayTemplate() {
-		return _portletDisplayTemplateSnapshot.get();
+		return _portletDisplayTemplate;
 	}
 
-	private static final Snapshot<PortletDisplayTemplate>
-		_portletDisplayTemplateSnapshot = new Snapshot<>(
-			PortletDisplayTemplateUtil.class, PortletDisplayTemplate.class);
+	@Deactivate
+	protected void deactivate() {
+		_portletDisplayTemplate = null;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortletDisplayTemplate(
+		PortletDisplayTemplate portletDisplayTemplate) {
+
+		_portletDisplayTemplate = portletDisplayTemplate;
+	}
+
+	private static PortletDisplayTemplate _portletDisplayTemplate;
 
 }

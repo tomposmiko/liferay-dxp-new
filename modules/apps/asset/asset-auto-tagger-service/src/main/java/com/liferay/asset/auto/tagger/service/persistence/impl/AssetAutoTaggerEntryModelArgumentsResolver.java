@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.asset.auto.tagger.model.impl.AssetAutoTaggerEntryImpl",
-		"table.name=AssetAutoTaggerEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		AssetAutoTaggerEntryModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class AssetAutoTaggerEntryModelArgumentsResolver
 	implements ArgumentsResolver {

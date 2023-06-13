@@ -14,21 +14,23 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.list.renderer.InfoListRenderer;
-import com.liferay.info.list.renderer.InfoListRendererRegistry;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
+import com.liferay.info.list.renderer.InfoListRendererTracker;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -40,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/get_available_list_renderers"
@@ -54,12 +57,16 @@ public class GetAvailableListRenderersMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		String className = ParamUtil.getString(resourceRequest, "className");
+
+		if (Objects.equals(className, DLFileEntry.class.getName())) {
+			className = FileEntry.class.getName();
+		}
 
 		List<InfoListRenderer<?>> infoListRenderers =
-			_infoListRendererRegistry.getInfoListRenderers(
-				_infoSearchClassMapperRegistry.getClassName(
-					ParamUtil.getString(resourceRequest, "className")));
+			_infoListRendererTracker.getInfoListRenderers(className);
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -78,12 +85,6 @@ public class GetAvailableListRenderersMVCResourceCommand
 	}
 
 	@Reference
-	private InfoListRendererRegistry _infoListRendererRegistry;
-
-	@Reference
-	private InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
-
-	@Reference
-	private JSONFactory _jsonFactory;
+	private InfoListRendererTracker _infoListRendererTracker;
 
 }

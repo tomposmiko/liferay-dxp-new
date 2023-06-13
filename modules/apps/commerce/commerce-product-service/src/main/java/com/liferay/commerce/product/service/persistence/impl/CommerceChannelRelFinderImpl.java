@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
-import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.model.impl.CommerceChannelRelImpl;
 import com.liferay.commerce.product.service.persistence.CommerceChannelRelFinder;
@@ -27,21 +26,18 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceChannelRelFinder.class)
 public class CommerceChannelRelFinderImpl
 	extends CommerceChannelRelFinderBaseImpl
 	implements CommerceChannelRelFinder {
@@ -74,15 +70,15 @@ public class CommerceChannelRelFinderImpl
 
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
-					sql, CommerceChannel.class.getName(),
-					"CommerceChannel.commerceChannelId");
+					sql, className, "CommerceChannel.commerceChannelId", null,
+					null, new long[] {0}, null);
 			}
 
 			String[] keywords = _customSQL.keywords(name, true);
 
 			if (Validator.isNotNull(name)) {
 				sql = _customSQL.replaceKeywords(
-					sql, "LOWER(CommerceChannel.name)", StringPool.LIKE, true,
+					sql, "(LOWER(CommerceChannel.name)", StringPool.LIKE, true,
 					keywords);
 				sql = _customSQL.replaceAndOperator(sql, false);
 			}
@@ -99,7 +95,7 @@ public class CommerceChannelRelFinderImpl
 
 			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			queryPos.add(_portal.getClassNameId(className));
+			queryPos.add(PortalUtil.getClassNameId(className));
 			queryPos.add(classPK);
 
 			if (Validator.isNotNull(name)) {
@@ -124,6 +120,18 @@ public class CommerceChannelRelFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public int countByC_C(
+		String className, long classPK, String classPKField, String name,
+		boolean inlineSQLHelper) {
+
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -153,13 +161,13 @@ public class CommerceChannelRelFinderImpl
 
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
-					sql, CommerceChannel.class.getName(),
-					"CommerceChannel.commerceChannelId");
+					sql, className, "CommerceChannel.commerceChannelId", null,
+					null, new long[] {0}, null);
 			}
 
 			if (Validator.isNotNull(name)) {
 				sql = _customSQL.replaceKeywords(
-					sql, "LOWER(CommerceChannel.name)", StringPool.LIKE, true,
+					sql, "(LOWER(CommerceChannel.name)", StringPool.LIKE, true,
 					keywords);
 				sql = _customSQL.replaceAndOperator(sql, false);
 			}
@@ -178,7 +186,7 @@ public class CommerceChannelRelFinderImpl
 
 			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
-			queryPos.add(_portal.getClassNameId(className));
+			queryPos.add(PortalUtil.getClassNameId(className));
 			queryPos.add(classPK);
 
 			if (Validator.isNotNull(name)) {
@@ -194,6 +202,18 @@ public class CommerceChannelRelFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public List<CommerceChannelRel> findByC_C(
+		String className, long classPK, String classPKField, String name,
+		int start, int end, boolean inlineSQLHelper) {
+
+		throw new UnsupportedOperationException();
 	}
 
 	private List<Long> _findClassNameIds() {
@@ -220,7 +240,7 @@ public class CommerceChannelRelFinderImpl
 	}
 
 	private boolean _isValidClassName(String className) {
-		long classNameId = _portal.getClassNameId(className);
+		long classNameId = PortalUtil.getClassNameId(className);
 
 		List<Long> validClassNameIds = _findClassNameIds();
 
@@ -230,10 +250,7 @@ public class CommerceChannelRelFinderImpl
 	private static final String _FIND_CLASS_NAME_IDS =
 		CommerceChannelRelFinder.class.getName() + ".findClassNameIds";
 
-	@Reference
+	@ServiceReference(type = CustomSQL.class)
 	private CustomSQL _customSQL;
-
-	@Reference
-	private Portal _portal;
 
 }

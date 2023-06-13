@@ -21,7 +21,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = UADAnonymizer.class)
+@Component(immediate = true, service = UADAnonymizer.class)
 public class DDMFormInstanceUADAnonymizer
 	extends BaseDDMFormInstanceUADAnonymizer {
 }

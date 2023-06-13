@@ -7,78 +7,65 @@ definition {
 	property testray.main.component.name = "Nested Portlets";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
-
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		User.firstLoginPG();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
-		}
-		else {
-			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
-	@description = "User can nest a widget inside Nested Applications widget."
-	@priority = 5
-	test NestWidgetInsideNestedApplications {
+	@priority = "5"
+	test ViewWCDNestedPortlets {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
 
-		task ("Add a widget page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name");
-		}
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Nested Portlets Page");
 
-		task ("Change layout of a widget to 1 Column") {
-			JSONLayout.updateLayoutTemplateOfPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name",
-				layoutTemplate = "1 Column");
-		}
+		JSONLayout.updateLayoutTemplateOfPublicLayout(
+			groupName = "Guest",
+			layoutName = "Nested Portlets Page",
+			layoutTemplate = "1 Column");
 
-		task ("Add a Nested Applications and Web Content Display widget to page") {
-			for (var widgetName : list "Nested Applications,Web Content Display") {
-				JSONLayout.addWidgetToPublicLayout(
-					groupName = "Test Site Name",
-					layoutName = "Test Page Name",
-					widgetName = ${widgetName});
-			}
-		}
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Nested Portlets Page",
+			widgetName = "Nested Applications");
 
-		task ("View default column on Nested Applications") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Nested Portlets Page",
+			widgetName = "Web Content Display");
 
-			NestedPortlets.viewConfigurationDefaultLayoutTemplate(
-				defaultColumnName = "2 Columns (50/50)",
-				portletName = "Nested Applications");
-		}
+		Navigator.gotoPage(pageName = "Nested Portlets Page");
 
-		task ("Drag and drop Web Content Display to first column in Nested Applications") {
-			NestedPortlets.dragAndDropPortletToPortletColumnPG(
-				columnNumberFrom = 1,
-				nestedColumnNumberTo = 1,
-				portletName = "Web Content Display");
-		}
+		NestedPortlets.viewConfigurationDefaultLayoutTemplate(
+			defaultColumnName = "2 Columns (50/50)",
+			portletName = "Nested Applications");
 
-		task ("View Web Content Display is nested to Nested Applications") {
-			NestedPortlets.viewPG(
-				nestedColumnNumber = 1,
-				portletName = "Web Content Display");
-		}
+		Click(locator1 = "Modal#CLOSE_BUTTON");
+
+		WaitForElementNotPresent(locator1 = "IFrame#MODAL_BODY");
+
+		NestedPortlets.dragAndDropPortletToPortletColumnPG(
+			columnNumberFrom = "1",
+			portletColumnNumberTo = "1",
+			portletName = "Web Content Display");
+
+		Navigator.gotoPage(pageName = "Nested Portlets Page");
+
+		NestedPortlets.viewPG(
+			portletColumnNumberTo = "1",
+			portletName = "Web Content Display");
 	}
 
 }

@@ -21,9 +21,9 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.model.TrashedModel;
+import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.trash.BaseTrashHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +125,7 @@ public abstract class BaseJournalTrashHandler extends BaseTrashHandler {
 
 		JournalFolder folder = JournalFolderLocalServiceUtil.getFolder(classPK);
 
-		return JournalArticleLocalServiceUtil.getArticlesCount(
+		return JournalArticleLocalServiceUtil.searchCount(
 			folder.getGroupId(), classPK, WorkflowConstants.STATUS_IN_TRASH);
 	}
 
@@ -181,6 +181,11 @@ public abstract class BaseJournalTrashHandler extends BaseTrashHandler {
 		}
 
 		return trashedModels;
+	}
+
+	@Override
+	public boolean isMovable() {
+		return true;
 	}
 
 	protected abstract long getGroupId(long classPK) throws PortalException;

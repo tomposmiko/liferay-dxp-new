@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the c product service. This utility wraps <code>com.liferay.commerce.product.service.persistence.impl.CProductPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -692,73 +696,73 @@ public class CProductUtil {
 	}
 
 	/**
-	 * Returns the c product where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchCProductException</code> if it could not be found.
+	 * Returns the c product where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchCProductException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching c product
 	 * @throws NoSuchCProductException if a matching c product could not be found
 	 */
-	public static CProduct findByERC_C(
-			String externalReferenceCode, long companyId)
+	public static CProduct findByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.product.exception.NoSuchCProductException {
 
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
+		return getPersistence().findByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the c product where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the c product where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching c product, or <code>null</code> if a matching c product could not be found
 	 */
-	public static CProduct fetchByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static CProduct fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
+		return getPersistence().fetchByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the c product where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the c product where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching c product, or <code>null</code> if a matching c product could not be found
 	 */
-	public static CProduct fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
+	public static CProduct fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
+		return getPersistence().fetchByC_ERC(
+			companyId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the c product where externalReferenceCode = &#63; and companyId = &#63; from the database.
+	 * Removes the c product where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the c product that was removed
 	 */
-	public static CProduct removeByERC_C(
-			String externalReferenceCode, long companyId)
+	public static CProduct removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.commerce.product.exception.NoSuchCProductException {
 
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
+		return getPersistence().removeByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of c products where externalReferenceCode = &#63; and companyId = &#63;.
+	 * Returns the number of c products where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching c products
 	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static int countByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
+		return getPersistence().countByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
@@ -909,9 +913,23 @@ public class CProductUtil {
 	}
 
 	public static CProductPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile CProductPersistence _persistence;
+	private static ServiceTracker<CProductPersistence, CProductPersistence>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(CProductPersistence.class);
+
+		ServiceTracker<CProductPersistence, CProductPersistence>
+			serviceTracker =
+				new ServiceTracker<CProductPersistence, CProductPersistence>(
+					bundle.getBundleContext(), CProductPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

@@ -22,14 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.batch.planner.rest.client.dto.v1_0.Field;
+import com.liferay.batch.planner.rest.client.dto.v1_0.Log;
 import com.liferay.batch.planner.rest.client.dto.v1_0.Plan;
 import com.liferay.batch.planner.rest.client.http.HttpInvoker;
 import com.liferay.batch.planner.rest.client.pagination.Page;
 import com.liferay.batch.planner.rest.client.pagination.Pagination;
 import com.liferay.batch.planner.rest.client.resource.v1_0.PlanResource;
 import com.liferay.batch.planner.rest.client.serdes.v1_0.PlanSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -52,24 +51,24 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -185,7 +184,6 @@ public abstract class BasePlanResourceTestCase {
 		plan.setExternalURL(regex);
 		plan.setInternalClassName(regex);
 		plan.setName(regex);
-		plan.setTaskItemDelegateName(regex);
 
 		String json = PlanSerDes.toJSON(plan);
 
@@ -197,7 +195,6 @@ public abstract class BasePlanResourceTestCase {
 		Assert.assertEquals(regex, plan.getExternalURL());
 		Assert.assertEquals(regex, plan.getInternalClassName());
 		Assert.assertEquals(regex, plan.getName());
-		Assert.assertEquals(regex, plan.getTaskItemDelegateName());
 	}
 
 	@Test
@@ -216,20 +213,11 @@ public abstract class BasePlanResourceTestCase {
 
 		assertContains(plan1, (List<Plan>)page.getItems());
 		assertContains(plan2, (List<Plan>)page.getItems());
-		assertValid(page, testGetPlansPage_getExpectedActions());
+		assertValid(page);
 
 		planResource.deletePlan(plan1.getId());
 
 		planResource.deletePlan(plan2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetPlansPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -289,11 +277,6 @@ public abstract class BasePlanResourceTestCase {
 	}
 
 	@Test
-	public void testGetPlanTemplate() throws Exception {
-		Assert.assertTrue(false);
-	}
-
-	@Test
 	public void testDeletePlan() throws Exception {
 		@SuppressWarnings("PMD.UnusedLocalVariable")
 		Plan plan = testDeletePlan_addPlan();
@@ -339,7 +322,7 @@ public abstract class BasePlanResourceTestCase {
 
 		Plan expectedPatchPlan = postPlan.clone();
 
-		BeanTestUtil.copyProperties(randomPatchPlan, expectedPatchPlan);
+		_beanUtilsBean.copyProperties(expectedPatchPlan, randomPatchPlan);
 
 		Plan getPlan = planResource.getPlan(patchPlan.getId());
 
@@ -491,48 +474,6 @@ public abstract class BasePlanResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("size", additionalAssertFieldName)) {
-				if (plan.getSize() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("status", additionalAssertFieldName)) {
-				if (plan.getStatus() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"taskItemDelegateName", additionalAssertFieldName)) {
-
-				if (plan.getTaskItemDelegateName() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("template", additionalAssertFieldName)) {
-				if (plan.getTemplate() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("total", additionalAssertFieldName)) {
-				if (plan.getTotal() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -542,12 +483,6 @@ public abstract class BasePlanResourceTestCase {
 	}
 
 	protected void assertValid(Page<Plan> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Plan> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Plan> plans = page.getItems();
@@ -562,20 +497,6 @@ public abstract class BasePlanResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -728,53 +649,6 @@ public abstract class BasePlanResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("size", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(plan1.getSize(), plan2.getSize())) {
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("status", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(plan1.getStatus(), plan2.getStatus())) {
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"taskItemDelegateName", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						plan1.getTaskItemDelegateName(),
-						plan2.getTaskItemDelegateName())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("template", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						plan1.getTemplate(), plan2.getTemplate())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("total", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(plan1.getTotal(), plan2.getTotal())) {
-					return false;
-				}
-
-				continue;
-			}
-
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -812,16 +686,14 @@ public abstract class BasePlanResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -838,10 +710,6 @@ public abstract class BasePlanResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -851,18 +719,18 @@ public abstract class BasePlanResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -935,37 +803,6 @@ public abstract class BasePlanResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
-		if (entityFieldName.equals("size")) {
-			sb.append(String.valueOf(plan.getSize()));
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("status")) {
-			sb.append(String.valueOf(plan.getStatus()));
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("taskItemDelegateName")) {
-			sb.append("'");
-			sb.append(String.valueOf(plan.getTaskItemDelegateName()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("template")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("total")) {
-			sb.append(String.valueOf(plan.getTotal()));
-
-			return sb.toString();
-		}
-
 		throw new IllegalArgumentException(
 			"Invalid entity field " + entityFieldName);
 	}
@@ -1020,12 +857,6 @@ public abstract class BasePlanResourceTestCase {
 				internalClassName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				size = RandomTestUtil.randomInt();
-				status = RandomTestUtil.randomInt();
-				taskItemDelegateName = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
-				template = RandomTestUtil.randomBoolean();
-				total = RandomTestUtil.randomInt();
 			}
 		};
 	}
@@ -1044,115 +875,6 @@ public abstract class BasePlanResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1228,6 +950,18 @@ public abstract class BasePlanResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BasePlanResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

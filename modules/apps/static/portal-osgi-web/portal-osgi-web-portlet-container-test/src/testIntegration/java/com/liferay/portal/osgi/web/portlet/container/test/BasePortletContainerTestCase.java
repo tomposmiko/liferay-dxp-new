@@ -48,7 +48,7 @@ public abstract class BasePortletContainerTestCase {
 	public void setUp() throws Exception {
 		group = GroupTestUtil.addGroup();
 
-		layout = LayoutTestUtil.addTypePortletLayout(group);
+		layout = LayoutTestUtil.addLayout(group);
 
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));

@@ -18,10 +18,8 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LocalizedModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedAuditedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 import java.util.Locale;
@@ -42,8 +40,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CPOptionCategoryModel
-	extends BaseModel<CPOptionCategory>, CTModel<CPOptionCategory>,
-			LocalizedModel, MVCCModel, ShardedModel, StagedAuditedModel {
+	extends BaseModel<CPOptionCategory>, LocalizedModel, ShardedModel,
+			StagedAuditedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -56,7 +54,6 @@ public interface CPOptionCategoryModel
 	 *
 	 * @return the primary key of this cp option category
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -64,40 +61,7 @@ public interface CPOptionCategoryModel
 	 *
 	 * @param primaryKey the primary key of this cp option category
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this cp option category.
-	 *
-	 * @return the mvcc version of this cp option category
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this cp option category.
-	 *
-	 * @param mvccVersion the mvcc version of this cp option category
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this cp option category.
-	 *
-	 * @return the ct collection ID of this cp option category
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this cp option category.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp option category
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this cp option category.
@@ -485,9 +449,5 @@ public interface CPOptionCategoryModel
 
 	@Override
 	public CPOptionCategory cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

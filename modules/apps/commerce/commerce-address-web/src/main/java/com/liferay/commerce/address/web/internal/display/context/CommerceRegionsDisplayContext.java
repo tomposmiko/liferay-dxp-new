@@ -14,16 +14,19 @@
 
 package com.liferay.commerce.address.web.internal.display.context;
 
-import com.liferay.commerce.address.web.internal.constants.CommerceCountryScreenNavigationConstants;
-import com.liferay.commerce.address.web.internal.portlet.action.helper.ActionHelper;
+import com.liferay.commerce.address.web.internal.portlet.action.ActionHelper;
+import com.liferay.commerce.address.web.internal.servlet.taglib.ui.constants.CommerceCountryScreenNavigationConstants;
 import com.liferay.commerce.util.CommerceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Region;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.RegionService;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -121,34 +124,37 @@ public class CommerceRegionsDisplayContext
 		searchContainer = new SearchContainer<>(
 			renderRequest, getPortletURL(), null, emptyResultsMessage);
 
-		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
-			CommerceUtil.getRegionOrderByComparator(
-				getOrderByCol(), getOrderByType()));
-		searchContainer.setOrderByType(getOrderByType());
+		String orderByCol = getOrderByCol();
+		String orderByType = getOrderByType();
+
+		OrderByComparator<Region> orderByComparator =
+			CommerceUtil.getRegionOrderByComparator(orderByCol, orderByType);
+
+		searchContainer.setOrderByCol(orderByCol);
+		searchContainer.setOrderByComparator(orderByComparator);
+		searchContainer.setOrderByType(orderByType);
+		searchContainer.setRowChecker(getRowChecker());
+
+		int total;
+		List<Region> results;
 
 		long countryId = getCountryId();
 
 		if (active != null) {
-			boolean navigationActive = active;
-
-			searchContainer.setResultsAndTotal(
-				() -> _regionService.getRegions(
-					countryId, navigationActive, searchContainer.getStart(),
-					searchContainer.getEnd(),
-					searchContainer.getOrderByComparator()),
-				_regionService.getRegionsCount(countryId, navigationActive));
+			total = _regionService.getRegionsCount(countryId, active);
+			results = _regionService.getRegions(
+				countryId, active, searchContainer.getStart(),
+				searchContainer.getEnd(), orderByComparator);
 		}
 		else {
-			searchContainer.setResultsAndTotal(
-				() -> _regionService.getRegions(
-					countryId, searchContainer.getStart(),
-					searchContainer.getEnd(),
-					searchContainer.getOrderByComparator()),
-				_regionService.getRegionsCount(countryId));
+			total = _regionService.getRegionsCount(countryId);
+			results = _regionService.getRegions(
+				countryId, searchContainer.getStart(), searchContainer.getEnd(),
+				orderByComparator);
 		}
 
-		searchContainer.setRowChecker(getRowChecker());
+		searchContainer.setTotal(total);
+		searchContainer.setResults(results);
 
 		return searchContainer;
 	}

@@ -14,10 +14,28 @@
  */
 --%>
 
-<c:if test="<%= !SetUtil.isEmpty(portletTreeSet) %>">
+<c:if test="<%= (portlets != null) && !portlets.isEmpty() %>">
 
 	<%
-	PortletRenderUtil.writeFooterJavaScriptPaths(request, portletTreeSet, out);
+	PortletResourceAccessor[] portletResourceAccessors = {PortletResourceAccessor.FOOTER_PORTAL_JAVASCRIPT, PortletResourceAccessor.FOOTER_PORTLET_JAVASCRIPT};
+
+	final ThemeDisplay finalThemeDisplay = themeDisplay;
+
+	Predicate<String> predicate = resource -> !finalThemeDisplay.isIncludedJs(resource);
+
+	boolean useComboServletStaticURLGenerator = themeDisplay.isThemeJsFastLoad();
+	%>
+
+	<%@ include file="/html/common/themes/portlet_resources.jspf" %>
+
+	<%
+	for (String url : urls) {
+	%>
+
+		<script src="<%= HtmlUtil.escapeAttribute(url) %>" type="text/javascript"></script>
+
+	<%
+	}
 	%>
 
 </c:if>

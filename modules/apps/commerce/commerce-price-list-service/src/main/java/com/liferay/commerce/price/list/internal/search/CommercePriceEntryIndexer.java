@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommercePriceEntryIndexer extends BaseIndexer<CommercePriceEntry> {
 
 	public static final String CLASS_NAME = CommercePriceEntry.class.getName();
@@ -94,11 +94,9 @@ public class CommercePriceEntryIndexer extends BaseIndexer<CommercePriceEntry> {
 		addSearchTerm(
 			searchQuery, searchContext, FIELD_EXTERNAL_REFERENCE_CODE, false);
 
+		addSearchTerm(searchQuery, searchContext, "sku", false);
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, "cpDefinitionName", false);
-		addSearchTerm(searchQuery, searchContext, "sku", false);
-		addSearchTerm(
-			searchQuery, searchContext, "skuExternalReferenceCode", false);
 
 		LinkedHashMap<String, Object> params =
 			(LinkedHashMap<String, Object>)searchContext.getAttribute("params");
@@ -143,8 +141,6 @@ public class CommercePriceEntryIndexer extends BaseIndexer<CommercePriceEntry> {
 
 		document.addKeyword("cpInstanceId", cpInstance.getCPInstanceId());
 		document.addKeyword("sku", cpInstance.getSku());
-		document.addKeyword(
-			"skuExternalReferenceCode", cpInstance.getExternalReferenceCode());
 
 		CPDefinition cpDefinition = cpInstance.getCPDefinition();
 
@@ -178,7 +174,8 @@ public class CommercePriceEntryIndexer extends BaseIndexer<CommercePriceEntry> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commercePriceEntry.getCompanyId(), getDocument(commercePriceEntry));
+			getSearchEngineId(), commercePriceEntry.getCompanyId(),
+			getDocument(commercePriceEntry), isCommitImmediately());
 	}
 
 	@Override
@@ -191,10 +188,12 @@ public class CommercePriceEntryIndexer extends BaseIndexer<CommercePriceEntry> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommercePriceEntries(companyId);
+		reindexCommercePriceEntries(companyId);
 	}
 
-	private void _reindexCommercePriceEntries(long companyId) throws Exception {
+	protected void reindexCommercePriceEntries(long companyId)
+		throws PortalException {
+
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_commercePriceEntryLocalService.
 				getIndexableActionableDynamicQuery();
@@ -215,6 +214,7 @@ public class CommercePriceEntryIndexer extends BaseIndexer<CommercePriceEntry> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

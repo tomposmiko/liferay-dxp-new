@@ -16,22 +16,23 @@ package com.liferay.dispatch.internal.executor;
 
 import com.liferay.dispatch.executor.DispatchTaskExecutor;
 import com.liferay.dispatch.executor.DispatchTaskExecutorRegistry;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Matija Petanjek
- * @author Joe Duffy
- * @author Igor Beslic
  */
 @Component(service = DispatchTaskExecutorRegistry.class)
 public class DispatchTaskExecutorRegistryImpl
@@ -41,84 +42,88 @@ public class DispatchTaskExecutorRegistryImpl
 	public DispatchTaskExecutor fetchDispatchTaskExecutor(
 		String dispatchTaskExecutorType) {
 
-		return _serviceTrackerMap.getService(dispatchTaskExecutorType);
+		return _dispatchTaskExecutors.get(dispatchTaskExecutorType);
 	}
 
 	@Override
 	public String fetchDispatchTaskExecutorName(
 		String dispatchTaskExecutorType) {
 
-		DispatchTaskExecutor dispatchTaskExecutor = fetchDispatchTaskExecutor(
-			dispatchTaskExecutorType);
-
-		if ((dispatchTaskExecutor != null) &&
-			!dispatchTaskExecutor.isHiddenInUI()) {
-
-			return dispatchTaskExecutor.getName();
-		}
-
-		return null;
+		return _dispatchTaskExecutorNames.get(dispatchTaskExecutorType);
 	}
 
 	@Override
 	public Set<String> getDispatchTaskExecutorTypes() {
-		return _serviceTrackerMap.keySet();
+		return _dispatchTaskExecutorNames.keySet();
 	}
 
-	@Override
-	public boolean isClusterModeSingle(String type) {
-		DispatchTaskExecutor dispatchTaskExecutor = fetchDispatchTaskExecutor(
-			type);
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addDispatchTaskExecutor(
+		DispatchTaskExecutor dispatchTaskExecutor,
+		Map<String, Object> properties) {
 
-		if (dispatchTaskExecutor != null) {
-			return dispatchTaskExecutor.isClusterModeSingle();
+		String dispatchTaskExecutorType = (String)properties.get(
+			_KEY_DISPATCH_TASK_EXECUTOR_TYPE);
+
+		_validateDispatchTaskExecutorProperties(
+			dispatchTaskExecutor, dispatchTaskExecutorType);
+
+		_dispatchTaskExecutorNames.put(
+			dispatchTaskExecutorType,
+			(String)properties.get(_KEY_DISPATCH_TASK_EXECUTOR_NAME));
+		_dispatchTaskExecutors.put(
+			dispatchTaskExecutorType, dispatchTaskExecutor);
+	}
+
+	protected void removeDispatchTaskExecutor(
+		DispatchTaskExecutor dispatchTaskExecutor,
+		Map<String, Object> properties) {
+
+		String dispatchTaskExecutorType = (String)properties.get(
+			_KEY_DISPATCH_TASK_EXECUTOR_TYPE);
+
+		_dispatchTaskExecutorNames.remove(dispatchTaskExecutorType);
+		_dispatchTaskExecutors.remove(dispatchTaskExecutorType);
+	}
+
+	private void _validateDispatchTaskExecutorProperties(
+		DispatchTaskExecutor dispatchTaskExecutor,
+		String dispatchTaskExecutorType) {
+
+		if (!_dispatchTaskExecutors.containsKey(dispatchTaskExecutorType)) {
+			return;
 		}
 
-		return false;
+		DispatchTaskExecutor curDispatchTaskExecutor =
+			_dispatchTaskExecutors.get(dispatchTaskExecutorType);
+
+		Class<?> clazz1 = curDispatchTaskExecutor.getClass();
+
+		Class<?> clazz2 = dispatchTaskExecutor.getClass();
+
+		_log.error(
+			StringBundler.concat(
+				_KEY_DISPATCH_TASK_EXECUTOR_TYPE, " property must have unique ",
+				"value. The same value is found in ", clazz1.getName(), " and ",
+				clazz2.getName(), StringPool.PERIOD));
 	}
 
-	@Override
-	public boolean isHiddenInUI(String type) {
-		DispatchTaskExecutor dispatchTaskExecutor = fetchDispatchTaskExecutor(
-			type);
-
-		if (dispatchTaskExecutor != null) {
-			return dispatchTaskExecutor.isHiddenInUI();
-		}
-
-		return false;
-	}
-
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, DispatchTaskExecutor.class, null,
-			(serviceReference, emitter) -> {
-				String dispatchTaskFeatureFlag =
-					(String)serviceReference.getProperty(
-						_KEY_DISPATCH_TASK_FEATURE_FLAG);
-
-				if (Validator.isNull(dispatchTaskFeatureFlag) ||
-					FeatureFlagManagerUtil.isEnabled(dispatchTaskFeatureFlag)) {
-
-					emitter.emit(
-						(String)serviceReference.getProperty(
-							_KEY_DISPATCH_TASK_EXECUTOR_TYPE));
-				}
-			});
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
-	}
+	private static final String _KEY_DISPATCH_TASK_EXECUTOR_NAME =
+		"dispatch.task.executor.name";
 
 	private static final String _KEY_DISPATCH_TASK_EXECUTOR_TYPE =
 		"dispatch.task.executor.type";
 
-	private static final String _KEY_DISPATCH_TASK_FEATURE_FLAG =
-		"dispatch.task.executor.feature.flag";
+	private static final Log _log = LogFactoryUtil.getLog(
+		DispatchTaskExecutorRegistryImpl.class);
 
-	private ServiceTrackerMap<String, DispatchTaskExecutor> _serviceTrackerMap;
+	private final Map<String, String> _dispatchTaskExecutorNames =
+		new HashMap<>();
+	private final Map<String, DispatchTaskExecutor> _dispatchTaskExecutors =
+		new HashMap<>();
 
 }

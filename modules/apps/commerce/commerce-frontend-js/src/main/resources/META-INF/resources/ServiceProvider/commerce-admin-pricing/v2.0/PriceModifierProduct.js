@@ -28,9 +28,7 @@ function resolvePath(
 	return `${basePath}${VERSION}${PRICE_MODIFIERS_PATH}/${priceModifierId}${PRICE_MODIFIER_RULES_PATH}/${priceModifierProductId}`;
 }
 
-export default function PriceModifierProduct(basePath) {
-	return {
-		addPriceModifierProduct: (priceModifierId, json) =>
-			AJAX.POST(resolvePath(basePath, priceModifierId), json),
-	};
-}
+export default (basePath) => ({
+	addPriceModifierProduct: (priceModifierId, json) =>
+		AJAX.POST(resolvePath(basePath, priceModifierId), json),
+});

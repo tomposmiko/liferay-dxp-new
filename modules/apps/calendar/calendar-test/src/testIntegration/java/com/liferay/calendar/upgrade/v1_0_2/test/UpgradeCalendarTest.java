@@ -58,13 +58,15 @@ public class UpgradeCalendarTest {
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
-		_upgradeDatabaseTestHelper =
-			CalendarUpgradeTestUtil.getUpgradeDatabaseTestHelper();
+
+		_user = UserTestUtil.addUser();
+
 		_upgradeProcess = CalendarUpgradeTestUtil.getUpgradeStep(
 			_upgradeStepRegistrator,
 			"com.liferay.calendar.internal.upgrade.v1_0_2." +
 				"CalendarUpgradeProcess");
-		_user = UserTestUtil.addUser();
+		_upgradeDatabaseTestHelper =
+			CalendarUpgradeTestUtil.getUpgradeDatabaseTestHelper();
 	}
 
 	@After
@@ -130,7 +132,7 @@ public class UpgradeCalendarTest {
 	private UpgradeProcess _upgradeProcess;
 
 	@Inject(
-		filter = "component.name=com.liferay.calendar.internal.upgrade.registry.CalendarServiceUpgradeStepRegistrator"
+		filter = "component.name=com.liferay.calendar.internal.upgrade.CalendarServiceUpgrade"
 	)
 	private UpgradeStepRegistrator _upgradeStepRegistrator;
 

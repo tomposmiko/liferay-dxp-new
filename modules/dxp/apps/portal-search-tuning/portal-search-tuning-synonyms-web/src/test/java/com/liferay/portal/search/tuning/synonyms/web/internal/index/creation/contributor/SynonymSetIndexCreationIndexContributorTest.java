@@ -15,7 +15,6 @@
 package com.liferay.portal.search.tuning.synonyms.web.internal.index.creation.contributor;
 
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.tuning.synonyms.web.internal.BaseSynonymsWebTestCase;
 import com.liferay.portal.search.tuning.synonyms.web.internal.synchronizer.IndexToFilterSynchronizer;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -25,6 +24,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -40,15 +40,14 @@ public class SynonymSetIndexCreationIndexContributorTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_synonymSetIndexCreationIndexContributor =
 			new SynonymSetIndexCreationIndexContributor();
 
 		ReflectionTestUtil.setFieldValue(
 			_synonymSetIndexCreationIndexContributor,
 			"_indexToFilterSynchronizer", _indexToFilterSynchronizer);
-		ReflectionTestUtil.setFieldValue(
-			_synonymSetIndexCreationIndexContributor,
-			"_searchEngineInformation", _searchEngineInformation);
 		ReflectionTestUtil.setFieldValue(
 			_synonymSetIndexCreationIndexContributor, "_synonymSetIndexReader",
 			synonymSetIndexReader);
@@ -64,7 +63,7 @@ public class SynonymSetIndexCreationIndexContributorTest
 		Mockito.verify(
 			_indexToFilterSynchronizer, Mockito.times(1)
 		).copyToFilter(
-			Mockito.any(), Mockito.anyString(), Mockito.anyBoolean()
+			Mockito.anyObject(), Mockito.anyString(), Mockito.anyBoolean()
 		);
 	}
 
@@ -76,14 +75,13 @@ public class SynonymSetIndexCreationIndexContributorTest
 		Mockito.verify(
 			_indexToFilterSynchronizer, Mockito.never()
 		).copyToFilter(
-			Mockito.any(), Mockito.anyString(), Mockito.anyBoolean()
+			Mockito.anyObject(), Mockito.anyString(), Mockito.anyBoolean()
 		);
 	}
 
-	private final IndexToFilterSynchronizer _indexToFilterSynchronizer =
-		Mockito.mock(IndexToFilterSynchronizer.class);
-	private final SearchEngineInformation _searchEngineInformation =
-		Mockito.mock(SearchEngineInformation.class);
+	@Mock
+	private IndexToFilterSynchronizer _indexToFilterSynchronizer;
+
 	private SynonymSetIndexCreationIndexContributor
 		_synonymSetIndexCreationIndexContributor;
 

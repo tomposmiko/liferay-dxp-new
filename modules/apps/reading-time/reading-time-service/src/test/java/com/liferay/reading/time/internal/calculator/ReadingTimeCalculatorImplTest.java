@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -49,11 +50,12 @@ public class ReadingTimeCalculatorImplTest {
 			new ReadingTimeCalculatorImpl();
 
 		for (String contentType : _supportedContentTypes) {
-			Duration readingTimeDuration = readingTimeCalculator.calculate(
-				StringUtil.randomString(), contentType,
-				LocaleUtil.getDefault());
+			Optional<Duration> readingTimeOptional =
+				readingTimeCalculator.calculate(
+					StringUtil.randomString(), contentType,
+					LocaleUtil.getDefault());
 
-			Assert.assertNotNull(readingTimeDuration);
+			Assert.assertTrue(readingTimeOptional.isPresent());
 		}
 	}
 
@@ -124,11 +126,12 @@ public class ReadingTimeCalculatorImplTest {
 		ReadingTimeCalculator readingTimeCalculator =
 			new ReadingTimeCalculatorImpl();
 
-		Duration readingTimeDuration = readingTimeCalculator.calculate(
-			StringUtil.randomString(), ContentTypes.APPLICATION_PDF,
-			LocaleUtil.getDefault());
+		Optional<Duration> readingTimeOptional =
+			readingTimeCalculator.calculate(
+				StringUtil.randomString(), ContentTypes.APPLICATION_PDF,
+				LocaleUtil.getDefault());
 
-		Assert.assertNull(readingTimeDuration);
+		Assert.assertFalse(readingTimeOptional.isPresent());
 	}
 
 	private Duration _calculateReadingTime(
@@ -137,7 +140,10 @@ public class ReadingTimeCalculatorImplTest {
 		ReadingTimeCalculator readingTimeCalculator =
 			new ReadingTimeCalculatorImpl();
 
-		return readingTimeCalculator.calculate(content, contentType, locale);
+		Optional<Duration> durationOptional = readingTimeCalculator.calculate(
+			content, contentType, locale);
+
+		return durationOptional.get();
 	}
 
 	private static final List<String> _supportedContentTypes = Arrays.asList(

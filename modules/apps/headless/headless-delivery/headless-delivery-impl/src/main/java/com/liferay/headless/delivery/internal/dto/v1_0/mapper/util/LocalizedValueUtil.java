@@ -14,13 +14,16 @@
 
 package com.liferay.headless.delivery.internal.dto.v1_0.mapper.util;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Eudaldo Alonso
@@ -28,8 +31,15 @@ import java.util.Map;
 public class LocalizedValueUtil {
 
 	public static List<String> getAvailableLanguageIds() {
-		return TransformUtil.transform(
-			LanguageUtil.getAvailableLocales(), LanguageUtil::getLanguageId);
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
+
+		Stream<Locale> stream = availableLocales.stream();
+
+		return stream.map(
+			LanguageUtil::getLanguageId
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public static Map<String, String> toLocalizedValues(JSONObject jsonObject) {

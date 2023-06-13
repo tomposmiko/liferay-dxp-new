@@ -26,7 +26,7 @@ public interface FullNameGenerator {
 
 	public String getLocalizedFullName(
 		String firstName, String middleName, String lastName, Locale locale,
-		long prefixListTypeId, long suffixListTypeId);
+		long prefixId, long suffixId);
 
 	public String[] splitFullName(String fullName);
 

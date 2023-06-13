@@ -12,11 +12,11 @@
  * details.
  */
 
-import {DEBOUNCE, PAGE} from '../utils/constants';
+import {DEBOUNCE} from '../utils/constants';
 import {debounce} from '../utils/debounce';
 import {ScrollTracker} from '../utils/scroll';
 
-const applicationId = PAGE;
+const applicationId = 'Page';
 
 /**
  * Plugin function that registers listener against scroll event

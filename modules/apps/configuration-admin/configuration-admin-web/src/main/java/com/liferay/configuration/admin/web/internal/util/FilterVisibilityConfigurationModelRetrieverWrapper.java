@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
-	property = "filter.visibility=true",
+	immediate = true, property = "filter.visibility=true",
 	service = ConfigurationModelRetriever.class
 )
 public class FilterVisibilityConfigurationModelRetrieverWrapper
@@ -53,12 +53,12 @@ public class FilterVisibilityConfigurationModelRetrieverWrapper
 		String pid, ExtendedObjectClassDefinition.Scope scope,
 		Serializable scopePK) {
 
-		if (ConfigurationVisibilityUtil.isVisible(pid, scope, scopePK)) {
-			return _configurationModelRetriever.getConfiguration(
-				pid, scope, scopePK);
+		if (!ConfigurationVisibilityUtil.isVisible(pid, scope, scopePK)) {
+			return null;
 		}
 
-		return null;
+		return _configurationModelRetriever.getConfiguration(
+			pid, scope, scopePK);
 	}
 
 	@Override
@@ -123,14 +123,14 @@ public class FilterVisibilityConfigurationModelRetrieverWrapper
 			ExtendedObjectClassDefinition.Scope scope, Serializable scopePK)
 		throws IOException {
 
-		if (ConfigurationVisibilityUtil.isVisible(
+		if (!ConfigurationVisibilityUtil.isVisible(
 				factoryConfigurationModel, scope, scopePK)) {
 
-			return _configurationModelRetriever.getFactoryInstances(
-				factoryConfigurationModel, scope, scopePK);
+			return Collections.emptyList();
 		}
 
-		return Collections.emptyList();
+		return _configurationModelRetriever.getFactoryInstances(
+			factoryConfigurationModel, scope, scopePK);
 	}
 
 	private void _filterVisibility(

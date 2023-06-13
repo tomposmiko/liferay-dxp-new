@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Tina Tian
  */
-@Component(service = PortalCacheListenerFactory.class)
+@Component(immediate = true, service = PortalCacheListenerFactory.class)
 public class EhcachePortalCacheListenerFactory
 	implements PortalCacheListenerFactory {
 
@@ -98,7 +98,13 @@ public class EhcachePortalCacheListenerFactory
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPortalCacheReplicatorFactory(
+		PortalCacheReplicatorFactory portalCacheReplicatorFactory) {
+
+		_portalCacheReplicatorFactory = portalCacheReplicatorFactory;
+	}
+
 	private PortalCacheReplicatorFactory _portalCacheReplicatorFactory;
 
 	private class EhcachePortalCacheReplicator

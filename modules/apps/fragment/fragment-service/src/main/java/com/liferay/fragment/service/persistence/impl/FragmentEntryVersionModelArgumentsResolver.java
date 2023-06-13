@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.fragment.model.impl.FragmentEntryVersionImpl",
-		"table.name=FragmentEntryVersion"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		FragmentEntryVersionModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class FragmentEntryVersionModelArgumentsResolver
 	implements ArgumentsResolver {

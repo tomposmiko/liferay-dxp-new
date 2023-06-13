@@ -23,19 +23,18 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.site.display.context.GroupDisplayContextHelper;
+import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 
 import java.io.Serializable;
 
@@ -57,6 +56,7 @@ public class ExportImportToolbarDisplayContext {
 		LiferayPortletResponse liferayPortletResponse) {
 
 		_httpServletRequest = httpServletRequest;
+
 		_liferayPortletResponse = liferayPortletResponse;
 
 		Portlet portlet = liferayPortletResponse.getPortlet();
@@ -196,14 +196,7 @@ public class ExportImportToolbarDisplayContext {
 	}
 
 	public String getSortingOrder() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
-		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, ExportImportPortletKeys.EXPORT_IMPORT, "asc");
-
-		return _orderByType;
+		return ParamUtil.getString(_httpServletRequest, "orderByType", "asc");
 	}
 
 	public String getSortingURL() {
@@ -241,7 +234,7 @@ public class ExportImportToolbarDisplayContext {
 	}
 
 	public List<ViewTypeItem> getViewTypeItems() {
-		return new ViewTypeItemList(getRenderURL(), _getDisplayStyle()) {
+		return new ViewTypeItemList(getRenderURL(), getDisplayStyle()) {
 			{
 				addListViewTypeItem();
 				addTableViewTypeItem();
@@ -249,11 +242,7 @@ public class ExportImportToolbarDisplayContext {
 		};
 	}
 
-	protected PortletURL getRenderURL() {
-		return _liferayPortletResponse.createRenderURL();
-	}
-
-	private String _getDisplayStyle() {
+	protected String getDisplayStyle() {
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(
 				_httpServletRequest);
@@ -276,6 +265,10 @@ public class ExportImportToolbarDisplayContext {
 		}
 
 		return displayStyle;
+	}
+
+	protected PortletURL getRenderURL() {
+		return _liferayPortletResponse.createRenderURL();
 	}
 
 	private List<DropdownItem> _getFilterNavigatioDropdownItems() {
@@ -429,7 +422,6 @@ public class ExportImportToolbarDisplayContext {
 
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private String _orderByType;
 	private final String _portletNamespace;
 
 }

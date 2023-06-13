@@ -30,13 +30,12 @@ function SegmentsExperimentsDetails({segmentsExperiment}) {
 				{Liferay.Language.get('details')}
 			</h4>
 
-			<dl className="pl-0 segments-experiment-details">
+			<dl>
 				{description && (
 					<div className="c-my-2">
 						<dt className="d-inline-block">
-							{Liferay.Language.get('description') + ':' + ' '}
+							{Liferay.Language.get('description') + ':'}{' '}
 						</dt>
-
 						<dd className="d-inline inline-item-after text-secondary">
 							{description}
 						</dd>
@@ -45,9 +44,8 @@ function SegmentsExperimentsDetails({segmentsExperiment}) {
 
 				<div className="c-my-2">
 					<dt className="d-inline-block">
-						{Liferay.Language.get('segment') + ':' + ' '}
+						{Liferay.Language.get('segment') + ':'}{' '}
 					</dt>
-
 					<dd className="d-inline inline-item-after text-secondary">
 						{segmentsEntryName}
 					</dd>
@@ -55,9 +53,8 @@ function SegmentsExperimentsDetails({segmentsExperiment}) {
 
 				<div className="c-my-2">
 					<dt className="d-inline-block">
-						{Liferay.Language.get('goal') + ':' + ' '}
+						{Liferay.Language.get('goal') + ':'}{' '}
 					</dt>
-
 					<dd className="d-inline inline-item-after text-secondary">
 						{goal.label}
 					</dd>
@@ -66,11 +63,8 @@ function SegmentsExperimentsDetails({segmentsExperiment}) {
 				{status.value !== STATUS_DRAFT && (
 					<div className="c-my-2">
 						<dt className="d-inline-block">
-							{Liferay.Language.get('confidence-level') +
-								':' +
-								' '}
+							{Liferay.Language.get('confidence-level') + ':'}{' '}
 						</dt>
-
 						<dd className="d-inline inline-item-after text-secondary">
 							{indexToPercentageString(confidenceLevel)}
 						</dd>

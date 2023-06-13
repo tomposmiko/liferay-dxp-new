@@ -14,12 +14,7 @@
 
 import ClayPopover from '@clayui/popover';
 import {ReactPortal, useEventListener} from '@liferay/frontend-js-react-web';
-import {
-	ALIGN_POSITIONS,
-	align,
-	sub,
-	suggestAlignBestRegion,
-} from 'frontend-js-web';
+import {ALIGN_POSITIONS, align, suggestAlignBestRegion} from 'frontend-js-web';
 import React, {useCallback, useLayoutEffect, useRef, useState} from 'react';
 
 import {useSelectItem} from '../contexts/ControlsContext';
@@ -34,7 +29,6 @@ const DEFAULT_WHITELIST = [
 	'.control-menu',
 	'.lfr-add-panel',
 	'.lfr-product-menu-panel',
-	'.page-editor__layout-breadcrumbs',
 ];
 
 const POPOVER_POSITIONS = {
@@ -148,11 +142,6 @@ const DisabledArea = () => {
 			Array.from(element.parentElement.children).forEach((child) => {
 				if (isDisabled(child)) {
 					child.classList.add(DEFAULT_DISABLED_AREA_CLASS);
-
-					Array.from(child.children).forEach((grandChild) => {
-						grandChild.setAttribute('inert', '');
-						grandChild.setAttribute('aria-hidden', 'true');
-					});
 				}
 			});
 
@@ -164,14 +153,9 @@ const DisabledArea = () => {
 				`.${DEFAULT_DISABLED_AREA_CLASS}`
 			);
 
-			elements.forEach((element) => {
-				element.classList.remove(DEFAULT_DISABLED_AREA_CLASS);
-
-				Array.from(element.children).forEach((child) => {
-					child.removeAttribute('inert');
-					child.removeAttribute('aria-hidden');
-				});
-			});
+			elements.forEach((element) =>
+				element.classList.remove(DEFAULT_DISABLED_AREA_CLASS)
+			);
 		};
 	}, [globalContext, isDisabled]);
 
@@ -181,14 +165,10 @@ const DisabledArea = () => {
 				className="cadmin"
 				container={globalContext.document.body}
 			>
-				<ClayPopover
-					alignPosition={position}
-					defaultShow
-					ref={popoverRef}
-				>
+				<ClayPopover alignPosition={position} ref={popoverRef} show>
 					<div
 						dangerouslySetInnerHTML={{
-							__html: sub(
+							__html: Liferay.Util.sub(
 								Liferay.Language.get(
 									'this-area-is-defined-by-the-theme.-you-can-change-the-theme-settings-by-clicking-x-in-the-x-panel-on-the-sidebar'
 								),

@@ -439,11 +439,6 @@ public class ResourcePermissionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<ResourcePermission, Object>>
 		getAttributeGetterFunctions() {
 

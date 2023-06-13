@@ -9,7 +9,7 @@
  * distribution rights of the Software.
  */
 
-import {act, cleanup, render} from '@testing-library/react';
+import {act, render} from '@testing-library/react';
 import React from 'react';
 
 import CompletionVelocityCard from '../../../../src/main/resources/META-INF/resources/js/components/process-metrics/completion-velocity/CompletionVelocityCard.es';
@@ -83,27 +83,17 @@ const timeRangeData = {
 };
 
 describe('The completion velocity card component should', () => {
-	let getAllByText;
-	let getByText;
-	const {ResizeObserver} = window;
+	let getAllByText, getByText;
 
 	beforeAll(async () => {
-		delete window.ResizeObserver;
-		window.ResizeObserver = jest.fn().mockImplementation(() => ({
-			disconnect: jest.fn(),
-			observe: jest.fn(),
-			unobserve: jest.fn(),
-		}));
-
 		jsonSessionStorage.set('timeRanges', timeRangeData);
 
-		fetch.mockResolvedValueOnce({
-			json: () => Promise.resolve(data),
-			ok: true,
-		});
+		const clientMock = {
+			get: jest.fn().mockResolvedValue({data}),
+		};
 
 		const renderResult = render(
-			<MockRouter query={query}>
+			<MockRouter client={clientMock} query={query}>
 				<CompletionVelocityCard routeParams={{processId}} />
 			</MockRouter>
 		);
@@ -114,12 +104,6 @@ describe('The completion velocity card component should', () => {
 		await act(async () => {
 			jest.runAllTimers();
 		});
-	});
-
-	afterAll(() => {
-		cleanup();
-		window.ResizeObserver = ResizeObserver;
-		jest.restoreAllMocks();
 	});
 
 	it('Be rendered with time range filter', () => {

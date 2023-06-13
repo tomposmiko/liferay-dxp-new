@@ -32,20 +32,26 @@
 			refresh="<%= false %>"
 		>
 			<liferay-ui:section>
-				<%@ include file="/configuration/user_settings.jspf" %>
+				<liferay-frontend:fieldset-group>
+					<%@ include file="/configuration/user_settings.jspf" %>
+				</liferay-frontend:fieldset-group>
 			</liferay-ui:section>
 
 			<liferay-ui:section>
-				<%@ include file="/configuration/display_settings.jspf" %>
+				<liferay-frontend:fieldset-group>
+					<%@ include file="/configuration/display_settings.jspf" %>
+				</liferay-frontend:fieldset-group>
 			</liferay-ui:section>
 
 			<liferay-ui:section>
-				<%@ include file="/configuration/rss.jspf" %>
+				<liferay-frontend:fieldset-group>
+					<%@ include file="/configuration/rss.jspf" %>
+				</liferay-frontend:fieldset-group>
 			</liferay-ui:section>
 		</liferay-ui:tabs>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>

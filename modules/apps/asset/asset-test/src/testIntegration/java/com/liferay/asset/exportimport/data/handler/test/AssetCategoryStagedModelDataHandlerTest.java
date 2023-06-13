@@ -150,9 +150,6 @@ public class AssetCategoryStagedModelDataHandlerTest
 		AssetCategory category = (AssetCategory)stagedModel;
 		AssetCategory importedCategory = (AssetCategory)importedStagedModel;
 
-		Assert.assertEquals(
-			category.getExternalReferenceCode(),
-			importedCategory.getExternalReferenceCode());
 		Assert.assertEquals(category.getName(), importedCategory.getName());
 		Assert.assertEquals(category.getTitle(), importedCategory.getTitle());
 		Assert.assertEquals(

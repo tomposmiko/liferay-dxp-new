@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.MembershipRequest;
 import com.liferay.portal.kernel.model.MembershipRequestModel;
+import com.liferay.portal.kernel.model.MembershipRequestSoap;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
@@ -35,15 +36,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -157,6 +161,61 @@ public class MembershipRequestModelImpl
 	@Deprecated
 	public static final long CREATEDATE_COLUMN_BITMASK = 8L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static MembershipRequest toModel(MembershipRequestSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		MembershipRequest model = new MembershipRequestImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setMembershipRequestId(soapModel.getMembershipRequestId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setComments(soapModel.getComments());
+		model.setReplyComments(soapModel.getReplyComments());
+		model.setReplyDate(soapModel.getReplyDate());
+		model.setReplierUserId(soapModel.getReplierUserId());
+		model.setStatusId(soapModel.getStatusId());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<MembershipRequest> toModels(
+		MembershipRequestSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<MembershipRequest> models = new ArrayList<MembershipRequest>(
+			soapModels.length);
+
+		for (MembershipRequestSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.portal.kernel.model.MembershipRequest"));
@@ -237,116 +296,124 @@ public class MembershipRequestModelImpl
 	public Map<String, Function<MembershipRequest, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<MembershipRequest, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, MembershipRequest>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<MembershipRequest, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MembershipRequest.class.getClassLoader(), MembershipRequest.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<MembershipRequest, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<MembershipRequest, Object>>();
+		try {
+			Constructor<MembershipRequest> constructor =
+				(Constructor<MembershipRequest>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", MembershipRequest::getMvccVersion);
-			attributeGetterFunctions.put(
-				"membershipRequestId",
-				MembershipRequest::getMembershipRequestId);
-			attributeGetterFunctions.put(
-				"groupId", MembershipRequest::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", MembershipRequest::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", MembershipRequest::getUserId);
-			attributeGetterFunctions.put(
-				"createDate", MembershipRequest::getCreateDate);
-			attributeGetterFunctions.put(
-				"comments", MembershipRequest::getComments);
-			attributeGetterFunctions.put(
-				"replyComments", MembershipRequest::getReplyComments);
-			attributeGetterFunctions.put(
-				"replyDate", MembershipRequest::getReplyDate);
-			attributeGetterFunctions.put(
-				"replierUserId", MembershipRequest::getReplierUserId);
-			attributeGetterFunctions.put(
-				"statusId", MembershipRequest::getStatusId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<MembershipRequest, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<MembershipRequest, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<MembershipRequest, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<MembershipRequest, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<MembershipRequest, Object>>();
+		Map<String, BiConsumer<MembershipRequest, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<MembershipRequest, ?>>();
 
-		static {
-			Map<String, BiConsumer<MembershipRequest, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<MembershipRequest, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", MembershipRequest::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<MembershipRequest, Long>)
+				MembershipRequest::setMvccVersion);
+		attributeGetterFunctions.put(
+			"membershipRequestId", MembershipRequest::getMembershipRequestId);
+		attributeSetterBiConsumers.put(
+			"membershipRequestId",
+			(BiConsumer<MembershipRequest, Long>)
+				MembershipRequest::setMembershipRequestId);
+		attributeGetterFunctions.put("groupId", MembershipRequest::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<MembershipRequest, Long>)MembershipRequest::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", MembershipRequest::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<MembershipRequest, Long>)
+				MembershipRequest::setCompanyId);
+		attributeGetterFunctions.put("userId", MembershipRequest::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<MembershipRequest, Long>)MembershipRequest::setUserId);
+		attributeGetterFunctions.put(
+			"createDate", MembershipRequest::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<MembershipRequest, Date>)
+				MembershipRequest::setCreateDate);
+		attributeGetterFunctions.put(
+			"comments", MembershipRequest::getComments);
+		attributeSetterBiConsumers.put(
+			"comments",
+			(BiConsumer<MembershipRequest, String>)
+				MembershipRequest::setComments);
+		attributeGetterFunctions.put(
+			"replyComments", MembershipRequest::getReplyComments);
+		attributeSetterBiConsumers.put(
+			"replyComments",
+			(BiConsumer<MembershipRequest, String>)
+				MembershipRequest::setReplyComments);
+		attributeGetterFunctions.put(
+			"replyDate", MembershipRequest::getReplyDate);
+		attributeSetterBiConsumers.put(
+			"replyDate",
+			(BiConsumer<MembershipRequest, Date>)
+				MembershipRequest::setReplyDate);
+		attributeGetterFunctions.put(
+			"replierUserId", MembershipRequest::getReplierUserId);
+		attributeSetterBiConsumers.put(
+			"replierUserId",
+			(BiConsumer<MembershipRequest, Long>)
+				MembershipRequest::setReplierUserId);
+		attributeGetterFunctions.put(
+			"statusId", MembershipRequest::getStatusId);
+		attributeSetterBiConsumers.put(
+			"statusId",
+			(BiConsumer<MembershipRequest, Long>)
+				MembershipRequest::setStatusId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<MembershipRequest, Long>)
-					MembershipRequest::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"membershipRequestId",
-				(BiConsumer<MembershipRequest, Long>)
-					MembershipRequest::setMembershipRequestId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<MembershipRequest, Long>)
-					MembershipRequest::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<MembershipRequest, Long>)
-					MembershipRequest::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<MembershipRequest, Long>)
-					MembershipRequest::setUserId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<MembershipRequest, Date>)
-					MembershipRequest::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"comments",
-				(BiConsumer<MembershipRequest, String>)
-					MembershipRequest::setComments);
-			attributeSetterBiConsumers.put(
-				"replyComments",
-				(BiConsumer<MembershipRequest, String>)
-					MembershipRequest::setReplyComments);
-			attributeSetterBiConsumers.put(
-				"replyDate",
-				(BiConsumer<MembershipRequest, Date>)
-					MembershipRequest::setReplyDate);
-			attributeSetterBiConsumers.put(
-				"replierUserId",
-				(BiConsumer<MembershipRequest, Long>)
-					MembershipRequest::setReplierUserId);
-			attributeSetterBiConsumers.put(
-				"statusId",
-				(BiConsumer<MembershipRequest, Long>)
-					MembershipRequest::setStatusId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -864,12 +931,41 @@ public class MembershipRequestModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<MembershipRequest, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<MembershipRequest, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<MembershipRequest, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((MembershipRequest)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MembershipRequest>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MembershipRequest.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -887,8 +983,7 @@ public class MembershipRequestModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<MembershipRequest, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

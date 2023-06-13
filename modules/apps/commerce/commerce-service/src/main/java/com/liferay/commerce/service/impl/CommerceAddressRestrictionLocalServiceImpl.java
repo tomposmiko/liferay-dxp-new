@@ -17,26 +17,16 @@ package com.liferay.commerce.service.impl;
 import com.liferay.commerce.model.CommerceAddressRestriction;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.service.base.CommerceAddressRestrictionLocalServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.model.CommerceAddressRestriction",
-	service = AopService.class
-)
 public class CommerceAddressRestrictionLocalServiceImpl
 	extends CommerceAddressRestrictionLocalServiceBaseImpl {
 
@@ -46,7 +36,7 @@ public class CommerceAddressRestrictionLocalServiceImpl
 			long countryId)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		long commerceAddressRestrictionId = counterLocalService.increment();
 
@@ -92,7 +82,7 @@ public class CommerceAddressRestrictionLocalServiceImpl
 		String className, long classPK) {
 
 		commerceAddressRestrictionPersistence.removeByC_C(
-			_classNameLocalService.getClassNameId(className), classPK);
+			classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
@@ -100,7 +90,7 @@ public class CommerceAddressRestrictionLocalServiceImpl
 		String className, long classPK, long countryId) {
 
 		return commerceAddressRestrictionPersistence.fetchByC_C_C(
-			_classNameLocalService.getClassNameId(className), classPK,
+			classNameLocalService.getClassNameId(className), classPK,
 			countryId);
 	}
 
@@ -110,7 +100,7 @@ public class CommerceAddressRestrictionLocalServiceImpl
 		OrderByComparator<CommerceAddressRestriction> orderByComparator) {
 
 		return commerceAddressRestrictionPersistence.findByC_C(
-			_classNameLocalService.getClassNameId(className), classPK, start,
+			classNameLocalService.getClassNameId(className), classPK, start,
 			end, orderByComparator);
 	}
 
@@ -119,7 +109,7 @@ public class CommerceAddressRestrictionLocalServiceImpl
 		String className, long classPK) {
 
 		return commerceAddressRestrictionPersistence.countByC_C(
-			_classNameLocalService.getClassNameId(className), classPK);
+			classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
@@ -145,11 +135,5 @@ public class CommerceAddressRestrictionLocalServiceImpl
 			CommerceShippingMethod.class.getName(), commerceShippingMethodId,
 			countryId);
 	}
-
-	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

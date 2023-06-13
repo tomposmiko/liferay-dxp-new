@@ -21,6 +21,8 @@ import com.liferay.portal.settings.authentication.token.web.internal.constants.P
 import com.liferay.portal.settings.portlet.action.PortalSettingsFormContributor;
 import com.liferay.portal.settings.portlet.action.PortalSettingsParameterUtil;
 
+import java.util.Optional;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
@@ -35,8 +37,8 @@ public class TokenPortalSettingsFormContributor
 	implements PortalSettingsFormContributor {
 
 	@Override
-	public String getDeleteMVCActionCommandName() {
-		return "/portal_settings/token_delete";
+	public Optional<String> getDeleteMVCActionCommandNameOptional() {
+		return Optional.of("/portal_settings/token_delete");
 	}
 
 	@Override
@@ -45,8 +47,8 @@ public class TokenPortalSettingsFormContributor
 	}
 
 	@Override
-	public String getSaveMVCActionCommandName() {
-		return "/portal_settings/token";
+	public Optional<String> getSaveMVCActionCommandNameOptional() {
+		return Optional.of("/portal_settings/token");
 	}
 
 	@Override

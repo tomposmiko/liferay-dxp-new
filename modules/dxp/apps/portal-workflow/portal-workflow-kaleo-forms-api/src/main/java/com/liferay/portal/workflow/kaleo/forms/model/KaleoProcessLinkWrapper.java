@@ -221,11 +221,6 @@ public class KaleoProcessLinkWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected KaleoProcessLinkWrapper wrap(KaleoProcessLink kaleoProcessLink) {
 		return new KaleoProcessLinkWrapper(kaleoProcessLink);
 	}

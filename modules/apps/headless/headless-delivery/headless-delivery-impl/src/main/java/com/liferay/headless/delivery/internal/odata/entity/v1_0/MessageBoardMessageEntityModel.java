@@ -37,14 +37,13 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 
 	public MessageBoardMessageEntityModel(List<EntityField> entityFields) {
 		_entityFieldsMap = EntityFieldsMapFactory.create(
-			new BooleanEntityField("answered", locale -> "answered"),
 			new BooleanEntityField("showAsQuestion", locale -> "question"),
-			new CollectionEntityField(
-				new StringEntityField(
-					"keywords", locale -> "assetTagNames.raw")),
 			new CollectionEntityField(
 				new IntegerEntityField(
 					"taxonomyCategoryIds", locale -> "assetCategoryIds")),
+			new CollectionEntityField(
+				new StringEntityField(
+					"keywords", locale -> "assetTagNames.raw")),
 			new ComplexEntityField(
 				"creator",
 				Collections.singletonList(
@@ -58,16 +57,10 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 				"dateModified",
 				locale -> Field.getSortableFieldName(Field.MODIFIED_DATE),
 				locale -> Field.MODIFIED_DATE),
-			new DateTimeEntityField(
-				"lastPostDate",
-				locale -> Field.getSortableFieldName("lastPostDate"),
-				locale -> "lastPostDate"),
 			new EntityField(
 				"showAsAnswer", EntityField.Type.BOOLEAN,
 				locale -> Field.getSortableFieldName("answer_String"),
 				locale -> "answer", String::valueOf),
-			new IntegerEntityField(
-				"childMessagesCount", locale -> "childMessagesCount"),
 			new IntegerEntityField("creatorId", locale -> Field.USER_ID),
 			new IntegerEntityField(
 				"messageBoardSectionId", locale -> Field.CATEGORY_ID),
@@ -76,10 +69,8 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 			new IntegerEntityField(
 				"parentMessageBoardMessageId", locale -> "parentMessageId"),
 			new IntegerEntityField(
-				"ratingsStatTotalScore",
-				locale -> Field.getSortableFieldName("ratingsStatTotalScore")),
-			new IntegerEntityField(
-				"viewCount", locale -> Field.getSortableFieldName("viewCount")),
+				"ratingValue",
+				locale -> Field.getSortableFieldName("totalScore")),
 			new StringEntityField(
 				"friendlyUrlPath",
 				locale -> Field.getSortableFieldName("urlSubject_String")),

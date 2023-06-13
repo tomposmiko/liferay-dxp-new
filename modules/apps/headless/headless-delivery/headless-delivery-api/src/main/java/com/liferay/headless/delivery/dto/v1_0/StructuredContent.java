@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -695,34 +694,6 @@ public class StructuredContent implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfComments;
 
-	@Schema(description = "The structured content's priority.")
-	public Double getPriority() {
-		return priority;
-	}
-
-	public void setPriority(Double priority) {
-		this.priority = priority;
-	}
-
-	@JsonIgnore
-	public void setPriority(
-		UnsafeSupplier<Double, Exception> priorityUnsafeSupplier) {
-
-		try {
-			priority = priorityUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The structured content's priority.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Double priority;
-
 	@Schema(
 		description = "A list of related contents to this structured content."
 	)
@@ -822,40 +793,6 @@ public class StructuredContent implements Serializable {
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
-
-	@Schema(
-		description = "The ID of the folder where structured content is stored."
-	)
-	public Long getStructuredContentFolderId() {
-		return structuredContentFolderId;
-	}
-
-	public void setStructuredContentFolderId(Long structuredContentFolderId) {
-		this.structuredContentFolderId = structuredContentFolderId;
-	}
-
-	@JsonIgnore
-	public void setStructuredContentFolderId(
-		UnsafeSupplier<Long, Exception>
-			structuredContentFolderIdUnsafeSupplier) {
-
-		try {
-			structuredContentFolderId =
-				structuredContentFolderIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "The ID of the folder where structured content is stored."
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Long structuredContentFolderId;
 
 	@Schema(
 		description = "A flag that indicates whether the user making the requests is subscribed to this structured content."
@@ -1400,16 +1337,6 @@ public class StructuredContent implements Serializable {
 			sb.append(numberOfComments);
 		}
 
-		if (priority != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"priority\": ");
-
-			sb.append(priority);
-		}
-
 		if (relatedContents != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1458,16 +1385,6 @@ public class StructuredContent implements Serializable {
 			sb.append("\"siteId\": ");
 
 			sb.append(siteId);
-		}
-
-		if (structuredContentFolderId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"structuredContentFolderId\": ");
-
-			sb.append(structuredContentFolderId);
 		}
 
 		if (subscribed != null) {
@@ -1623,9 +1540,9 @@ public class StructuredContent implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -1651,7 +1568,7 @@ public class StructuredContent implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -1683,7 +1600,7 @@ public class StructuredContent implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -1699,10 +1616,5 @@ public class StructuredContent implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

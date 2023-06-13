@@ -3,19 +3,18 @@ $a11y-panel-width: 320px;
 .a11y-body {
 	padding-right: $a11y-panel-width;
 
-	.lfr-add-panel.sidenav-right,
 	.multi-panel-sidebar,
 	.page-editor__sidebar {
-		right: $a11y-panel-width !important;
+		right: $a11y-panel-width;
 	}
 
 	.multi-panel-sidebar-content,
 	.page-editor__sidebar__content {
-		right: $a11y-panel-width + 42px !important;
+		right: $a11y-panel-width + 42px;
 	}
 
 	.modal-dialog {
-		right: $a11y-panel-width + 45px !important;
+		right: $a11y-panel-width + 45px;
 	}
 
 	.applications-menu-modal {

@@ -17,7 +17,6 @@ package com.liferay.portal.search.internal.background.task;
 import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.search.index.ConcurrentReindexManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,27 +27,23 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Michael C. Han
  */
-@Component(service = {})
+@Component(immediate = true, service = BackgroundTaskExecutorConfigurator.class)
 public class BackgroundTaskExecutorConfigurator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		BackgroundTaskExecutor reindexPortalBackgroundTaskExecutor =
 			new ReindexPortalBackgroundTaskExecutor(
-				bundleContext, _concurrentReindexManager,
-				_portalExecutorManager);
+				bundleContext, _portalExecutorManager);
 
-		_registerBackgroundTaskExecutor(
+		registerBackgroundTaskExecutor(
 			bundleContext, reindexPortalBackgroundTaskExecutor);
 
-		_registerBackgroundTaskExecutor(
+		registerBackgroundTaskExecutor(
 			bundleContext, _reindexSingleIndexerBackgroundTaskExecutor);
 	}
 
@@ -61,7 +56,7 @@ public class BackgroundTaskExecutorConfigurator {
 		}
 	}
 
-	private void _registerBackgroundTaskExecutor(
+	protected void registerBackgroundTaskExecutor(
 		BundleContext bundleContext,
 		BackgroundTaskExecutor backgroundTaskExecutor) {
 
@@ -76,13 +71,6 @@ public class BackgroundTaskExecutorConfigurator {
 
 		_serviceRegistrations.add(serviceRegistration);
 	}
-
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile ConcurrentReindexManager _concurrentReindexManager;
 
 	@Reference
 	private PortalExecutorManager _portalExecutorManager;

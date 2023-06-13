@@ -20,21 +20,19 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marcela Cunha
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.IMAGE,
 	service = DDMFormFieldValueRenderer.class
 )
@@ -52,23 +50,14 @@ public class ImageDDMFormFieldValueRenderer
 		}
 
 		try {
-			JSONObject jsonObject = _jsonFactory.createJSONObject(valueString);
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				valueString);
 
 			return jsonObject.getString("url", StringPool.BLANK);
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
 			return StringPool.BLANK;
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ImageDDMFormFieldValueRenderer.class);
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

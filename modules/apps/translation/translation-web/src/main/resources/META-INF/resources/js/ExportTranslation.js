@@ -13,23 +13,13 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayForm, {
-	ClayCheckbox,
-	ClayInput,
-	ClayRadio,
-	ClayRadioGroup,
-	ClaySelect,
-} from '@clayui/form';
+import ClayForm, {ClayCheckbox, ClayInput, ClaySelect} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import ClayList from '@clayui/list';
-import {addParams} from 'frontend-js-web';
+import {addParams, createPortletURL} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-
-const EXPORT_DEFAULT = 0;
-
-const EXPORT_ALL = -1;
 
 const Experiences = ({
 	experiences,
@@ -45,7 +35,7 @@ const Experiences = ({
 				<ClayList className="translation-experiences-wrapper">
 					{experiences.map(({label, segment, value}) => {
 						const checked =
-							selectedExperiencesIds.indexOf(value) !== -1;
+							selectedExperiencesIds.indexOf(value) != -1;
 						const inputId = `experience_${value}`;
 
 						return (
@@ -60,7 +50,6 @@ const Experiences = ({
 										value={value}
 									/>
 								</ClayList.ItemField>
-
 								<ClayList.ItemField expand>
 									<ClayLayout.ContentRow
 										className="list-group-label"
@@ -75,7 +64,6 @@ const Experiences = ({
 												{label}
 											</div>
 										</ClayLayout.ContentCol>
-
 										<ClayLayout.ContentCol
 											className="text-right"
 											expand
@@ -103,7 +91,7 @@ const ExportFileFormats = ({
 	portletNamespace,
 	setExportMimeType,
 }) => {
-	if (availableExportFileFormats.length === 1) {
+	if (availableExportFileFormats.length == 1) {
 		return (
 			<ClayInput
 				readOnly
@@ -133,60 +121,13 @@ const ExportFileFormats = ({
 	}
 };
 
-const MultiplePagesExperiences = ({
-	multipleExperiences,
-	onChangeExperience,
-	portletNamespace,
-	selectedExperienceValue,
-}) => {
-	if (multipleExperiences) {
-		return (
-			<div className="mb-5">
-				<label className="mb-2">
-					{Liferay.Language.get('export-experiences')}
-				</label>
-
-				<ClayRadioGroup
-					name={`${portletNamespace}exportExperience`}
-					onChange={onChangeExperience}
-					value={selectedExperienceValue}
-				>
-					<ClayRadio
-						label={Liferay.Language.get('default-experience')}
-						value={EXPORT_DEFAULT}
-					>
-						<div className="form-text">
-							{Liferay.Language.get(
-								'export-default-experience-help-message'
-							)}
-						</div>
-					</ClayRadio>
-
-					<ClayRadio
-						label={Liferay.Language.get('all-experiences')}
-						value={EXPORT_ALL}
-					>
-						<div className="form-text">
-							{Liferay.Language.get(
-								'export-all-experiences-help-message'
-							)}
-						</div>
-					</ClayRadio>
-				</ClayRadioGroup>
-			</div>
-		);
-	}
-
-	return null;
-};
-
 const SourceLocales = ({
 	availableSourceLocales,
 	portletNamespace,
 	setSourceLanguageId,
 	sourceLanguageId,
 }) => {
-	if (availableSourceLocales.length === 1) {
+	if (availableSourceLocales.length == 1) {
 		return (
 			<ClayInput readOnly value={availableSourceLocales[0].displayName} />
 		);
@@ -220,7 +161,7 @@ const TargetLocale = ({
 	sourceLanguageId,
 }) => {
 	const languageId = locale.languageId;
-	const checked = selectedTargetLanguageIds.indexOf(languageId) !== -1;
+	const checked = selectedTargetLanguageIds.indexOf(languageId) != -1;
 
 	return (
 		<ClayLayout.Col className="py-2" md={4}>
@@ -243,8 +184,6 @@ const ExportTranslation = ({
 	defaultSourceLanguageId,
 	experiences,
 	exportTranslationURL: initialExportTranslationURL,
-	multipleExperiences,
-	multiplePagesSelected,
 	portletNamespace,
 	redirectURL,
 }) => {
@@ -264,10 +203,6 @@ const ExportTranslation = ({
 		experiences?.length ? experiences.map(({value}) => value) : []
 	);
 
-	const [selectedExperienceValue, setSelectedExperienceValue] = useState(
-		EXPORT_DEFAULT
-	);
-
 	const exportTranslationURL = addParams(
 		'download=true',
 		initialExportTranslationURL
@@ -278,7 +213,7 @@ const ExportTranslation = ({
 			checked
 				? languageIds.concat(selectedLanguageId)
 				: languageIds.filter(
-						(languageId) => languageId !== selectedLanguageId
+						(languageId) => languageId != selectedLanguageId
 				  )
 		);
 	};
@@ -288,13 +223,9 @@ const ExportTranslation = ({
 			checked
 				? experiencesIds.concat(selectedExperienceId)
 				: experiencesIds.filter(
-						(experienceId) => experienceId !== selectedExperienceId
+						(experienceId) => experienceId != selectedExperienceId
 				  )
 		);
-	};
-
-	const onChangeExperienceValue = (value) => {
-		setSelectedExperienceValue(value);
 	};
 
 	return (
@@ -308,16 +239,13 @@ const ExportTranslation = ({
 					targetLanguageIds: selectedTargetLanguageIds.join(','),
 				};
 
-				if (multiplePagesSelected) {
-					params.segmentsExperienceIds = selectedExperienceValue;
-				}
-				else if (selectedExperiencesIds.length) {
+				if (selectedExperiencesIds.length) {
 					params.segmentsExperienceIds = selectedExperiencesIds.join(
 						','
 					);
 				}
 
-				location.href = addParams(params, exportTranslationURL);
+				location.href = createPortletURL(exportTranslationURL, params);
 			}}
 		>
 			<ClayForm.Group className="w-50">
@@ -330,7 +258,6 @@ const ExportTranslation = ({
 				>
 					{Liferay.Language.get('export-file-format')}
 				</label>
-
 				<ExportFileFormats
 					availableExportFileFormats={availableExportFileFormats}
 					exportMimeType={exportMimeType}
@@ -343,7 +270,6 @@ const ExportTranslation = ({
 				<label htmlFor={`${portletNamespace}sourceLanguageId`}>
 					{Liferay.Language.get('original-language')}
 				</label>
-
 				<SourceLocales
 					availableSourceLocales={availableSourceLocales}
 					portletNamespace={portletNamespace}
@@ -356,7 +282,6 @@ const ExportTranslation = ({
 				<label className="mb-2">
 					{Liferay.Language.get('languages-to-translate-to')}
 				</label>
-
 				<ClayLayout.Row>
 					{availableTargetLocales.map((locale) => (
 						<TargetLocale
@@ -373,27 +298,18 @@ const ExportTranslation = ({
 				</ClayLayout.Row>
 			</ClayForm.Group>
 
-			{multiplePagesSelected ? (
-				<MultiplePagesExperiences
-					multipleExperiences={multipleExperiences}
-					onChangeExperience={onChangeExperienceValue}
-					portletNamespace={portletNamespace}
-					selectedExperienceValue={selectedExperienceValue}
-				/>
-			) : (
-				<Experiences
-					experiences={experiences}
-					onChangeExperience={onChangeExperience}
-					selectedExperiencesIds={selectedExperiencesIds}
-				/>
-			)}
+			<Experiences
+				experiences={experiences}
+				onChangeExperience={onChangeExperience}
+				selectedExperiencesIds={selectedExperiencesIds}
+			/>
 
 			<ClayButton.Group spaced>
 				<ClayButton
 					disabled={
-						!selectedTargetLanguageIds.length ||
+						selectedTargetLanguageIds.length === 0 ||
 						(experiences?.length > 1 &&
-							!selectedExperiencesIds.length)
+							selectedExperiencesIds.length === 0)
 					}
 					displayType="primary"
 					type="submit"
@@ -436,8 +352,7 @@ ExportTranslation.propTypes = {
 			value: PropTypes.string.isRequired,
 		})
 	),
-	multipleExperiences: PropTypes.bool,
-	multiplePagesSelected: PropTypes.bool,
+	keys: PropTypes.array,
 };
 
 export default ExportTranslation;

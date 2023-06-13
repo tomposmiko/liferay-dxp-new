@@ -62,7 +62,7 @@ public class ConnectedAppManagerImpl implements ConnectedAppManager {
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -78,6 +78,7 @@ public class ConnectedAppManagerImpl implements ConnectedAppManager {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ConnectedAppManagerImpl.class);
 
-	private ServiceTrackerList<ConnectedAppProvider> _serviceTrackerList;
+	private ServiceTrackerList<ConnectedAppProvider, ConnectedAppProvider>
+		_serviceTrackerList;
 
 }

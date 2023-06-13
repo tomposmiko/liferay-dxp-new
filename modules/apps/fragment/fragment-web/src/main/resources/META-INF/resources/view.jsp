@@ -24,8 +24,6 @@ List<FragmentCollection> systemFragmentCollections = (List<FragmentCollection>)r
 List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDisplayContext.getFragmentCollectionContributors(locale);
 %>
 
-<liferay-ui:success key="fragmentEntryCopied" message="the-fragment-was-copied-successfully" />
-
 <clay:container-fluid
 	cssClass="container-view"
 >
@@ -51,7 +49,7 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 										expand="<%= true %>"
 									>
 										<strong class="text-uppercase">
-											<liferay-ui:message key="fragment-sets" />
+											<liferay-ui:message key="collections" />
 										</strong>
 									</clay:content-col>
 
@@ -88,7 +86,6 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 															"viewImportURL", fragmentCollectionsViewContext.get("viewImportURL")
 														).build()
 													%>'
-													aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 													dropdownItems="<%= fragmentDisplayContext.getCollectionsDropdownItems() %>"
 													propsTransformer="js/FragmentCollectionViewDefaultPropsTransformer"
 												/>
@@ -113,6 +110,8 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 													href="<%=
 														PortletURLBuilder.createRenderURL(
 															renderResponse
+														).setMVCRenderCommandName(
+															"/fragment/view"
 														).setParameter(
 															"fragmentCollectionKey", fragmentCollectionContributor.getFragmentCollectionKey()
 														).buildString()
@@ -120,11 +119,11 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 												>
 													<span class="text-truncate"><%= HtmlUtil.escape(fragmentCollectionContributor.getName(locale)) %></span>
 
-													<span class="ml-1 text-muted">
-														<clay:icon
-															symbol="lock"
-														/>
-													</span>
+													<liferay-ui:icon
+														icon="lock"
+														iconCssClass="ml-1 text-muted"
+														markupView="lexicon"
+													/>
 												</a>
 											</li>
 
@@ -140,6 +139,8 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 													href="<%=
 														PortletURLBuilder.createRenderURL(
 															renderResponse
+														).setMVCRenderCommandName(
+															"/fragment/view"
 														).setParameter(
 															"fragmentCollectionId", fragmentCollection.getFragmentCollectionId()
 														).buildString()
@@ -148,11 +149,11 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 													<span class="text-truncate"><%= HtmlUtil.escape(fragmentCollection.getName()) %></span>
 
 													<c:if test="<%= fragmentDisplayContext.isLocked(fragmentCollection) %>">
-														<span class="ml-1 text-muted">
-															<clay:icon
-																symbol="lock"
-															/>
-														</span>
+														<liferay-ui:icon
+															icon="lock"
+															iconCssClass="ml-1 text-muted"
+															markupView="lexicon"
+														/>
 													</c:if>
 												</a>
 											</li>
@@ -182,6 +183,8 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 													href="<%=
 														PortletURLBuilder.createRenderURL(
 															renderResponse
+														).setMVCRenderCommandName(
+															"/fragment/view"
 														).setParameter(
 															"fragmentCollectionId", fragmentCollection.getFragmentCollectionId()
 														).buildString()
@@ -189,11 +192,11 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 												>
 													<span class="text-truncate"><%= HtmlUtil.escape(fragmentCollection.getName()) %></span>
 
-													<span class="ml-1 text-muted">
-														<clay:icon
-															symbol="lock"
-														/>
-													</span>
+													<liferay-ui:icon
+														icon="lock"
+														iconCssClass="ml-1 text-muted"
+														markupView="lexicon"
+													/>
 												</a>
 											</li>
 
@@ -218,6 +221,8 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 													href="<%=
 														PortletURLBuilder.createRenderURL(
 															renderResponse
+														).setMVCRenderCommandName(
+															"/fragment/view"
 														).setParameter(
 															"fragmentCollectionId", fragmentCollection.getFragmentCollectionId()
 														).buildString()
@@ -226,11 +231,11 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 													<span class="text-truncate"><%= HtmlUtil.escape(fragmentCollection.getName()) %></span>
 
 													<c:if test="<%= fragmentDisplayContext.isLocked(fragmentCollection) %>">
-														<span class="ml-1 text-muted">
-															<clay:icon
-																symbol="lock"
-															/>
-														</span>
+														<liferay-ui:icon
+															icon="lock"
+															iconCssClass="ml-1 text-muted"
+															markupView="lexicon"
+														/>
 													</c:if>
 												</a>
 											</li>
@@ -244,7 +249,7 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 							</c:when>
 							<c:otherwise>
 								<p class="text-uppercase">
-									<strong><liferay-ui:message key="fragment-sets" /></strong>
+									<strong><liferay-ui:message key="collections" /></strong>
 								</p>
 
 								<liferay-frontend:empty-result-message
@@ -252,8 +257,8 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 									additionalProps="<%= fragmentDisplayContext.getFragmentCollectionsViewContext() %>"
 									animationType="<%= EmptyResultMessageKeys.AnimationType.NONE %>"
 									buttonPropsTransformer="js/FragmentCollectionViewButtonPropsTransformer"
-									description='<%= LanguageUtil.get(request, "fragment-sets-are-needed-to-create-fragments") %>'
-									elementType='<%= LanguageUtil.get(request, "fragment-sets") %>'
+									description='<%= LanguageUtil.get(request, "collections-are-needed-to-create-fragments") %>'
+									elementType='<%= LanguageUtil.get(request, "collections") %>'
 									propsTransformer="js/FragmentCollectionViewDefaultPropsTransformer"
 									propsTransformerServletContext="<%= application %>"
 								/>
@@ -289,7 +294,6 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 									%>
 
 									<clay:dropdown-actions
-										aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 										dropdownItems="<%= fragmentCollectionActionDropdownItemsProvider.getActionDropdownItems() %>"
 										propsTransformer="js/FragmentCollectionDropdownPropsTransformer"
 									/>

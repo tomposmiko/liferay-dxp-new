@@ -17,6 +17,7 @@ package com.liferay.portal.workflow.kaleo.internal.upgrade.v2_0_0;
 import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v2_0_0.util.KaleoNotificationTable;
 
 /**
  * @author Rafael Praxedes
@@ -29,7 +30,7 @@ public class SchemaUpgradeProcess extends UpgradeProcess {
 			new MVCCVersionUpgradeProcess() {
 
 				@Override
-				protected String[] getTableNames() {
+				protected String[] getModuleTableNames() {
 					return new String[] {
 						"KaleoAction", "KaleoCondition", "KaleoDefinition",
 						"KaleoDefinitionVersion", "KaleoInstance",
@@ -46,8 +47,15 @@ public class SchemaUpgradeProcess extends UpgradeProcess {
 			});
 
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			alterColumnType(
-				"KaleoNotification", "notificationTypes", "VARCHAR(255) null");
+			if (!hasColumnType(
+					KaleoNotificationTable.TABLE_NAME, "notificationTypes",
+					"VARCHAR(255) null")) {
+
+				alter(
+					KaleoNotificationTable.class,
+					new AlterColumnType(
+						"notificationTypes", "VARCHAR(255) null"));
+			}
 		}
 	}
 

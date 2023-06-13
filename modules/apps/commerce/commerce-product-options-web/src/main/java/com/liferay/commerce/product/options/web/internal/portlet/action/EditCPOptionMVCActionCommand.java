@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.Locale;
@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_OPTIONS,
 		"mvc.command.name=/cp_options/edit_cp_option"
@@ -62,7 +63,7 @@ public class EditCPOptionMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (cmd.equals(Constants.UPDATE)) {
-				_updateCPOption(cpOptionId, actionRequest);
+				updateCPOption(cpOptionId, actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -72,21 +73,21 @@ public class EditCPOptionMVCActionCommand extends BaseMVCActionCommand {
 				SessionErrors.add(actionRequest, exception.getClass());
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				throw new Exception(exception);
 			}
 		}
 	}
 
-	private CPOption _updateCPOption(
+	protected CPOption updateCPOption(
 			long cpOptionId, ActionRequest actionRequest)
 		throws Exception {
 
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 		String ddmFormFieldTypeName = ParamUtil.getString(
 			actionRequest, "DDMFormFieldTypeName");
 		boolean facetable = ParamUtil.getBoolean(actionRequest, "facetable");
@@ -108,8 +109,5 @@ public class EditCPOptionMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CPOptionService _cpOptionService;
-
-	@Reference
-	private Localization _localization;
 
 }

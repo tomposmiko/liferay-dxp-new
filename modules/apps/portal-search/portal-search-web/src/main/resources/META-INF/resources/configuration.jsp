@@ -24,7 +24,6 @@
 	action="<%= configurationActionURL %>"
 	method="post"
 	name="fm"
-	onSubmit='<%= "if (" + liferayPortletResponse.getNamespace() + "saveConfiguration) {event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveConfiguration();}" %>'
 >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="tabs2" type="hidden" value='<%= ParamUtil.getString(request, "tabs2") %>' />
@@ -38,20 +37,28 @@
 			refresh="<%= false %>"
 		>
 			<liferay-ui:section>
-				<%@ include file="/display_settings.jspf" %>
+				<liferay-frontend:fieldset-group>
+					<%@ include file="/display_settings.jspf" %>
+				</liferay-frontend:fieldset-group>
 			</liferay-ui:section>
 
 			<liferay-ui:section>
-				<%@ include file="/spell_check_settings.jspf" %>
+				<liferay-frontend:fieldset-group>
+					<%@ include file="/spell_check_settings.jspf" %>
+				</liferay-frontend:fieldset-group>
 			</liferay-ui:section>
 
 			<liferay-ui:section>
-				<%@ include file="/other_settings.jspf" %>
+				<liferay-frontend:fieldset-group>
+					<%@ include file="/other_settings.jspf" %>
+				</liferay-frontend:fieldset-group>
 			</liferay-ui:section>
 		</liferay-ui:tabs>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>

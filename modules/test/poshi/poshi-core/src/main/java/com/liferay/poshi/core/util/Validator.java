@@ -150,8 +150,9 @@ public class Validator {
 		else if ((object1 == null) || (object2 == null)) {
 			return false;
 		}
-
-		return object1.equals(object2);
+		else {
+			return object1.equals(object2);
+		}
 	}
 
 	/**
@@ -164,25 +165,6 @@ public class Validator {
 	 */
 	public static boolean equals(short short1, short short2) {
 		if (short1 == short2) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Returns <code>true</code> if the character is in the ASCII character set.
-	 * This includes characters with integer values between 32 and 126
-	 * (inclusive).
-	 *
-	 * @param  c the character to check
-	 * @return <code>true</code> if the character is in the ASCII character set;
-	 *         <code>false</code> otherwise
-	 */
-	public static boolean isAscii(char c) {
-		int i = c;
-
-		if ((i >= 32) && (i <= 126)) {
 			return true;
 		}
 
@@ -298,8 +280,9 @@ public class Validator {
 		else if (object == null) {
 			return true;
 		}
-
-		return false;
+		else {
+			return false;
+		}
 	}
 
 	/**

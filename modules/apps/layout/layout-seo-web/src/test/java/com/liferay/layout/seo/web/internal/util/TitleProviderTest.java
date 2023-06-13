@@ -21,15 +21,12 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListMergeable;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,19 +50,8 @@ public class TitleProviderTest {
 
 	@Before
 	public void setUp() {
-		_setUpPortalUtil();
-
 		_titleProvider = new TitleProvider(
 			new LayoutSEOLinkManager() {
-
-				@Override
-				public LayoutSEOLink getCanonicalLayoutSEOLink(
-						Layout layout, Locale locale, String canonicalURL,
-						ThemeDisplay themeDisplay)
-					throws PortalException {
-
-					return null;
-				}
 
 				@Override
 				public String getFullPageTitle(
@@ -79,11 +65,10 @@ public class TitleProviderTest {
 
 				@Override
 				public List<LayoutSEOLink> getLocalizedLayoutSEOLinks(
-						Layout layout, Locale locale, String canonicalURL,
-						Set<Locale> availableLocales)
-					throws PortalException {
+					Layout layout, Locale locale, String canonicalURL,
+					Map<Locale, String> alternateURLs) {
 
-					return Collections.emptyList();
+					return null;
 				}
 
 			});
@@ -103,20 +88,6 @@ public class TitleProviderTest {
 
 		Assert.assertEquals(
 			"htmlTitle", _titleProvider.getTitle(mockHttpServletRequest));
-	}
-
-	private void _setUpPortalUtil() {
-		PortalUtil portalUtil = new PortalUtil();
-
-		Portal portal = Mockito.mock(Portal.class);
-
-		Mockito.when(
-			portal.getOriginalServletRequest(Mockito.any())
-		).thenReturn(
-			new MockHttpServletRequest()
-		);
-
-		portalUtil.setPortal(portal);
 	}
 
 	private TitleProvider _titleProvider;

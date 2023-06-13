@@ -1877,58 +1877,6 @@ public interface JournalFolderPersistence
 		long folderId, long companyId, long parentFolderId, int status);
 
 	/**
-	 * Returns the journal folder where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchFolderException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching journal folder
-	 * @throws NoSuchFolderException if a matching journal folder could not be found
-	 */
-	public JournalFolder findByERC_G(String externalReferenceCode, long groupId)
-		throws NoSuchFolderException;
-
-	/**
-	 * Returns the journal folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching journal folder, or <code>null</code> if a matching journal folder could not be found
-	 */
-	public JournalFolder fetchByERC_G(
-		String externalReferenceCode, long groupId);
-
-	/**
-	 * Returns the journal folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching journal folder, or <code>null</code> if a matching journal folder could not be found
-	 */
-	public JournalFolder fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache);
-
-	/**
-	 * Removes the journal folder where externalReferenceCode = &#63; and groupId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the journal folder that was removed
-	 */
-	public JournalFolder removeByERC_G(
-			String externalReferenceCode, long groupId)
-		throws NoSuchFolderException;
-
-	/**
-	 * Returns the number of journal folders where externalReferenceCode = &#63; and groupId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the number of matching journal folders
-	 */
-	public int countByERC_G(String externalReferenceCode, long groupId);
-
-	/**
 	 * Caches the journal folder in the entity cache if it is enabled.
 	 *
 	 * @param journalFolder the journal folder

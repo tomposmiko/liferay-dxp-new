@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class ThemeServiceWrapper
 	implements ServiceWrapper<ThemeService>, ThemeService {
 
-	public ThemeServiceWrapper() {
-		this(null);
-	}
-
 	public ThemeServiceWrapper(ThemeService themeService) {
 		_themeService = themeService;
 	}

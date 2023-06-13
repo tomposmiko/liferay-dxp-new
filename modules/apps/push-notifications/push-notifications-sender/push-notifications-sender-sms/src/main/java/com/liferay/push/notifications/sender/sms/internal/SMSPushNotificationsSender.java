@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.push.notifications.sender.sms.internal.configuration.SMSPushNotificationsSenderConfiguration",
+	immediate = true,
 	property = "platform=" + SMSPushNotificationsSender.PLATFORM,
 	service = PushNotificationsSender.class
 )

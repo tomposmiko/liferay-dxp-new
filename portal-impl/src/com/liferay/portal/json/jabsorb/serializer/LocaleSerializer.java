@@ -90,13 +90,9 @@ public class LocaleSerializer extends AbstractSerializer {
 		try {
 			Locale locale = (Locale)object;
 
-			localeJSONObject.put(
-				"country", locale.getCountry()
-			).put(
-				"language", locale.getLanguage()
-			).put(
-				"variant", locale.getVariant()
-			);
+			localeJSONObject.put("country", locale.getCountry());
+			localeJSONObject.put("language", locale.getLanguage());
+			localeJSONObject.put("variant", locale.getVariant());
 		}
 		catch (Exception exception) {
 			throw new MarshallException(
@@ -143,7 +139,7 @@ public class LocaleSerializer extends AbstractSerializer {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -163,7 +159,7 @@ public class LocaleSerializer extends AbstractSerializer {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

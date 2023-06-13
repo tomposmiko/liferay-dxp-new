@@ -24,18 +24,17 @@ import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
 import com.liferay.change.tracking.web.internal.display.BasePersistenceRegistry;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
 import com.liferay.change.tracking.web.internal.display.DisplayContextImpl;
-import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
-import com.liferay.diff.DiffHtml;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
-import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
+import com.liferay.portal.kernel.diff.DiffHtmlUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
@@ -59,7 +58,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -73,6 +71,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/get_entry_render_data"
@@ -105,7 +104,7 @@ public class GetEntryRenderDataMVCResourceCommand
 					resourceRequest, resourceResponse));
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
@@ -155,9 +154,9 @@ public class GetEntryRenderDataMVCResourceCommand
 
 		String[] availableLanguageIds = null;
 		String defaultLanguageId = null;
-		JSONObject editInProductionJSONObject = null;
-		JSONObject editInPublicationJSONObject = null;
-		JSONObject localizedTitlesJSONObject = _jsonFactory.createJSONObject();
+		String editURL = null;
+		JSONObject localizedTitlesJSONObject =
+			JSONFactoryUtil.createJSONObject();
 		String rightPreview = null;
 		JSONObject rightLocalizedPreviewJSONObject = null;
 		JSONObject rightLocalizedRenderJSONObject = null;
@@ -184,22 +183,12 @@ public class GetEntryRenderDataMVCResourceCommand
 				ctEntry.getModelClassPK());
 
 			if (rightModel != null) {
-				String editURL = _ctDisplayRendererRegistry.getEditURL(
-					ctCollectionId, ctSQLMode, httpServletRequest, rightModel,
-					ctEntry.getModelClassNameId());
+				boolean activeCTCollection = ParamUtil.getBoolean(
+					resourceRequest, "activeCTCollection");
 
-				if (Validator.isNotNull(editURL)) {
-					editInPublicationJSONObject = _getEditJSONObject(
-						_language.format(
-							httpServletRequest,
-							"you-are-currently-working-on-production.-work-" +
-								"on-x",
-							new Object[] {ctCollection.getName()}, false),
-						ctCollection.getCtCollectionId(), editURL,
-						_language.format(
-							httpServletRequest, "edit-in-x",
-							new Object[] {ctCollection.getName()}, false),
-						resourceRequest, resourceResponse);
+				if (activeCTCollection) {
+					editURL = ctDisplayRenderer.getEditURL(
+						httpServletRequest, rightModel);
 				}
 
 				if (localize) {
@@ -287,23 +276,6 @@ public class GetEntryRenderDataMVCResourceCommand
 				}
 
 				if (leftModel != null) {
-					String editURL = _ctDisplayRendererRegistry.getEditURL(
-						leftCtCollectionId, leftCTSQLMode, httpServletRequest,
-						leftModel, ctEntry.getModelClassNameId());
-
-					if (Validator.isNotNull(editURL)) {
-						editInProductionJSONObject = _getEditJSONObject(
-							_language.format(
-								httpServletRequest,
-								"you-are-currently-working-on-x.-work-on-" +
-									"production",
-								new Object[] {ctCollection.getName()}, false),
-							CTConstants.CT_COLLECTION_ID_PRODUCTION, editURL,
-							_language.get(
-								httpServletRequest, "edit-in-production"),
-							resourceRequest, resourceResponse);
-					}
-
 					String leftVersionName = ctDisplayRenderer.getVersionName(
 						leftModel);
 
@@ -363,27 +335,6 @@ public class GetEntryRenderDataMVCResourceCommand
 				ctEntry.getModelClassNameId(), ctEntry.getModelClassPK());
 
 			if (leftModel != null) {
-				if (ctEntry.getChangeType() ==
-						CTConstants.CT_CHANGE_TYPE_MODIFICATION) {
-
-					String editURL = _ctDisplayRendererRegistry.getEditURL(
-						leftCtCollectionId, leftCTSQLMode, httpServletRequest,
-						leftModel, ctEntry.getModelClassNameId());
-
-					if (Validator.isNotNull(editURL)) {
-						editInProductionJSONObject = _getEditJSONObject(
-							_language.format(
-								httpServletRequest,
-								"you-are-currently-working-on-x.-work-on-" +
-									"production",
-								new Object[] {ctCollection.getName()}, false),
-							CTConstants.CT_COLLECTION_ID_PRODUCTION, editURL,
-							_language.get(
-								httpServletRequest, "edit-in-production"),
-							resourceRequest, resourceResponse);
-					}
-				}
-
 				if (localize &&
 					(ctEntry.getChangeType() ==
 						CTConstants.CT_CHANGE_TYPE_DELETION)) {
@@ -523,12 +474,8 @@ public class GetEntryRenderDataMVCResourceCommand
 				"defaultLocale", _getLocaleJSONObject(defaultLanguageId));
 		}
 
-		if (editInProductionJSONObject != null) {
-			jsonObject.put("editInProduction", editInProductionJSONObject);
-		}
-
-		if (editInPublicationJSONObject != null) {
-			jsonObject.put("editInPublication", editInPublicationJSONObject);
+		if (editURL != null) {
+			jsonObject.put("editURL", editURL);
 		}
 
 		if (leftLocalizedPreviewJSONObject != null) {
@@ -580,7 +527,7 @@ public class GetEntryRenderDataMVCResourceCommand
 
 			jsonObject.put(
 				"unifiedPreview",
-				_diffHtml.diff(
+				DiffHtmlUtil.diff(
 					new UnsyncStringReader(leftPreview),
 					new UnsyncStringReader(rightPreview)));
 		}
@@ -590,7 +537,7 @@ public class GetEntryRenderDataMVCResourceCommand
 			(rightLocalizedPreviewJSONObject != null)) {
 
 			JSONObject unifiedLocalizedPreviewJSONObject =
-				_jsonFactory.createJSONObject();
+				JSONFactoryUtil.createJSONObject();
 
 			for (String languageId : availableLanguageIds) {
 				String leftLocalizedPreview =
@@ -603,7 +550,7 @@ public class GetEntryRenderDataMVCResourceCommand
 
 					unifiedLocalizedPreviewJSONObject.put(
 						languageId,
-						_diffHtml.diff(
+						DiffHtmlUtil.diff(
 							new UnsyncStringReader(leftLocalizedPreview),
 							new UnsyncStringReader(rightLocalizedPreview)));
 				}
@@ -617,7 +564,7 @@ public class GetEntryRenderDataMVCResourceCommand
 			(rightLocalizedRenderJSONObject != null)) {
 
 			JSONObject unifiedLocalizedRenderJSONObject =
-				_jsonFactory.createJSONObject();
+				JSONFactoryUtil.createJSONObject();
 
 			for (String languageId : availableLanguageIds) {
 				String leftLocalizedRender =
@@ -630,7 +577,7 @@ public class GetEntryRenderDataMVCResourceCommand
 
 					unifiedLocalizedRenderJSONObject.put(
 						languageId,
-						_diffHtml.diff(
+						DiffHtmlUtil.diff(
 							new UnsyncStringReader(leftLocalizedRender),
 							new UnsyncStringReader(rightLocalizedRender)));
 				}
@@ -643,13 +590,13 @@ public class GetEntryRenderDataMVCResourceCommand
 		if ((leftRender != null) && (rightRender != null)) {
 			jsonObject.put(
 				"unifiedRender",
-				_diffHtml.diff(
+				DiffHtmlUtil.diff(
 					new UnsyncStringReader(leftRender),
 					new UnsyncStringReader(rightRender)));
 		}
 
 		if (ArrayUtil.isNotEmpty(availableLanguageIds)) {
-			JSONArray localesJSONArray = _jsonFactory.createJSONArray();
+			JSONArray localesJSONArray = JSONFactoryUtil.createJSONArray();
 
 			for (String languageId : availableLanguageIds) {
 				localesJSONArray.put(_getLocaleJSONObject(languageId));
@@ -663,36 +610,6 @@ public class GetEntryRenderDataMVCResourceCommand
 		}
 
 		return jsonObject;
-	}
-
-	private JSONObject _getEditJSONObject(
-		String confirmationMessage, long ctCollectionId, String editURL,
-		String label, ResourceRequest resourceRequest,
-		ResourceResponse resourceResponse) {
-
-		JSONObject editInProductionJSONObject = JSONUtil.put(
-			"editURL", editURL
-		).put(
-			"label", label
-		);
-
-		long activeCTCollectionId = ParamUtil.getLong(
-			resourceRequest, "activeCTCollectionId");
-
-		if (activeCTCollectionId != ctCollectionId) {
-			editInProductionJSONObject.put(
-				"checkoutURL",
-				PublicationsPortletURLUtil.getHref(
-					resourceResponse.createActionURL(),
-					ActionRequest.ACTION_NAME,
-					"/change_tracking/checkout_ct_collection", "redirect",
-					editURL, "ctCollectionId", String.valueOf(ctCollectionId))
-			).put(
-				"confirmationMessage", confirmationMessage
-			);
-		}
-
-		return editInProductionJSONObject;
 	}
 
 	private JSONObject _getLocaleJSONObject(String languageId) {
@@ -731,7 +648,7 @@ public class GetEntryRenderDataMVCResourceCommand
 
 				if (preview != null) {
 					if (jsonObject == null) {
-						jsonObject = _jsonFactory.createJSONObject();
+						jsonObject = JSONFactoryUtil.createJSONObject();
 					}
 
 					jsonObject.put(languageId, preview);
@@ -741,7 +658,7 @@ public class GetEntryRenderDataMVCResourceCommand
 			return jsonObject;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return null;
 		}
@@ -755,7 +672,7 @@ public class GetEntryRenderDataMVCResourceCommand
 			CTSQLModeThreadLocal.CTSQLMode ctSQLMode, T model, String type)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		for (String languageId : availableLanguageIds) {
 			jsonObject.put(
@@ -789,7 +706,7 @@ public class GetEntryRenderDataMVCResourceCommand
 					ctEntryId, locale, model, type));
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return null;
 		}
@@ -820,21 +737,28 @@ public class GetEntryRenderDataMVCResourceCommand
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return JSONUtil.put(
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(resourceResponse);
+
+		JSONObject jsonObject = JSONUtil.put(
 			"changeType", "production"
 		).put(
+			"leftTitle",
+			_language.get(
+				_portal.getHttpServletRequest(resourceRequest), "production")
+		);
+
+		jsonObject.put(
 			"leftRender",
 			_getRender(
-				httpServletRequest,
-				_portal.getHttpServletResponse(resourceResponse),
+				httpServletRequest, httpServletResponse,
 				CTConstants.CT_COLLECTION_ID_PRODUCTION,
 				_ctDisplayRendererRegistry.getCTDisplayRenderer(
 					modelClassNameId),
 				0, CTSQLModeThreadLocal.CTSQLMode.DEFAULT,
-				themeDisplay.getLocale(), model, CTConstants.TYPE_BEFORE)
-		).put(
-			"leftTitle", _language.get(httpServletRequest, "production")
-		);
+				themeDisplay.getLocale(), model, CTConstants.TYPE_BEFORE));
+
+		return jsonObject;
 	}
 
 	private <T extends BaseModel<T>> String _getRender(
@@ -868,7 +792,7 @@ public class GetEntryRenderDataMVCResourceCommand
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -908,12 +832,6 @@ public class GetEntryRenderDataMVCResourceCommand
 
 	@Reference
 	private CTEntryLocalService _ctEntryLocalService;
-
-	@Reference
-	private DiffHtml _diffHtml;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Language _language;

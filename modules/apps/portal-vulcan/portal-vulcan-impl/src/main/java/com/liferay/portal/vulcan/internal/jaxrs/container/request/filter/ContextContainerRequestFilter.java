@@ -26,9 +26,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.internal.accept.language.AcceptLanguageImpl;
 import com.liferay.portal.vulcan.internal.configuration.util.ConfigurationUtil;
@@ -71,8 +69,6 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 		ResourceActionLocalService resourceActionLocalService,
 		ResourcePermissionLocalService resourcePermissionLocalService,
 		RoleLocalService roleLocalService, Object scopeChecker,
-		SortParserProvider sortParserProvider,
-		VulcanBatchEngineExportTaskResource vulcanBatchEngineExportTaskResource,
 		VulcanBatchEngineImportTaskResource
 			vulcanBatchEngineImportTaskResource) {
 
@@ -86,9 +82,6 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 		_resourcePermissionLocalService = resourcePermissionLocalService;
 		_roleLocalService = roleLocalService;
 		_scopeChecker = scopeChecker;
-		_sortParserProvider = sortParserProvider;
-		_vulcanBatchEngineExportTaskResource =
-			vulcanBatchEngineExportTaskResource;
 		_vulcanBatchEngineImportTaskResource =
 			vulcanBatchEngineImportTaskResource;
 	}
@@ -112,20 +105,16 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 	}
 
 	private void _filterExcludedOperationIds(
-			ContainerRequestContext containerRequestContext,
-			HttpServletRequest httpServletRequest, Message message)
-		throws Exception {
+		ContainerRequestContext containerRequestContext, Message message) {
 
-		Company company = _portal.getCompany(httpServletRequest);
-
-		String path = StringUtil.removeFirst(
+		String path = StringUtil.removeSubstring(
 			(String)message.get(Message.BASE_PATH), "/o");
 
 		path = StringUtil.replaceLast(path, '/', "");
 
 		Set<String> excludedOperationIds =
 			ConfigurationUtil.getExcludedOperationIds(
-				company.getCompanyId(), _configurationAdmin, path);
+				_configurationAdmin, path);
 
 		Method method = (Method)message.get("org.apache.cxf.resource.method");
 
@@ -152,8 +141,7 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 		HttpServletRequest httpServletRequest =
 			ContextProviderUtil.getHttpServletRequest(message);
 
-		_filterExcludedOperationIds(
-			containerRequestContext, httpServletRequest, message);
+		_filterExcludedOperationIds(containerRequestContext, message);
 
 		Class<?> clazz = instance.getClass();
 
@@ -236,11 +224,6 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 
 				field.set(instance, _roleLocalService);
 			}
-			else if (fieldClass.isAssignableFrom(SortParserProvider.class)) {
-				field.setAccessible(true);
-
-				field.set(instance, _sortParserProvider);
-			}
 			else if (fieldClass.isAssignableFrom(UriInfo.class)) {
 				field.setAccessible(true);
 
@@ -250,13 +233,6 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 				field.setAccessible(true);
 
 				field.set(instance, _portal.getUser(httpServletRequest));
-			}
-			else if (fieldClass.isAssignableFrom(
-						VulcanBatchEngineExportTaskResource.class)) {
-
-				field.setAccessible(true);
-
-				field.set(instance, _vulcanBatchEngineExportTaskResource);
 			}
 			else if (fieldClass.isAssignableFrom(
 						VulcanBatchEngineImportTaskResource.class)) {
@@ -279,9 +255,6 @@ public class ContextContainerRequestFilter implements ContainerRequestFilter {
 		_resourcePermissionLocalService;
 	private final RoleLocalService _roleLocalService;
 	private final Object _scopeChecker;
-	private final SortParserProvider _sortParserProvider;
-	private final VulcanBatchEngineExportTaskResource
-		_vulcanBatchEngineExportTaskResource;
 	private final VulcanBatchEngineImportTaskResource
 		_vulcanBatchEngineImportTaskResource;
 

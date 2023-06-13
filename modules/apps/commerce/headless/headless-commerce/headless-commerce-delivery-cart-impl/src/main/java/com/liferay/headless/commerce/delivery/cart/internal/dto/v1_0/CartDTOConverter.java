@@ -15,7 +15,6 @@
 package com.liferay.headless.commerce.delivery.cart.internal.dto.v1_0;
 
 import com.liferay.commerce.constants.CommerceOrderConstants;
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
 import com.liferay.commerce.currency.util.CommercePriceFormatter;
@@ -32,7 +31,7 @@ import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.Cart;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.Status;
 import com.liferay.headless.commerce.delivery.cart.dto.v1_0.Summary;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -53,8 +52,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Sbarra
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.headless.commerce.delivery.cart.dto.v1_0.Cart",
-	service = DTOConverter.class
+	service = {CartDTOConverter.class, DTOConverter.class}
 )
 public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 
@@ -81,7 +81,7 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 			CommerceOrderConstants.getOrderStatusLabel(
 				commerceOrder.getOrderStatus());
 
-		String commerceOrderStatusLabelI18n = _language.get(
+		String commerceOrderStatusLabelI18n = LanguageUtil.get(
 			resourceBundle,
 			CommerceOrderConstants.getOrderStatusLabel(
 				commerceOrder.getOrderStatus()));
@@ -89,17 +89,17 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 		String commerceOrderWorkflowStatusLabel =
 			WorkflowConstants.getStatusLabel(commerceOrder.getStatus());
 
-		String commerceOrderWorkflowStatusLabelI18n = _language.get(
+		String commerceOrderWorkflowStatusLabelI18n = LanguageUtil.get(
 			resourceBundle,
 			WorkflowConstants.getStatusLabel(commerceOrder.getStatus()));
 
 		String commerceOrderPaymentStatusLabel =
-			CommerceOrderPaymentConstants.getOrderPaymentStatusLabel(
+			CommerceOrderConstants.getPaymentStatusLabel(
 				commerceOrder.getPaymentStatus());
 
-		String commerceOrderPaymentStatusLabelI18n = _language.get(
+		String commerceOrderPaymentStatusLabelI18n = LanguageUtil.get(
 			resourceBundle,
-			CommerceOrderPaymentConstants.getOrderPaymentStatusLabel(
+			CommerceOrderConstants.getPaymentStatusLabel(
 				commerceOrder.getPaymentStatus()));
 
 		Cart cart = new Cart() {
@@ -509,8 +509,5 @@ public class CartDTOConverter implements DTOConverter<CommerceOrder, Cart> {
 
 	@Reference
 	private CommercePriceFormatter _commercePriceFormatter;
-
-	@Reference
-	private Language _language;
 
 }

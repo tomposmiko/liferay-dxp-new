@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = AutoLogin.class)
+@Component(immediate = true, service = AutoLogin.class)
 public class OnDemandAdminAutoLogin extends BaseAutoLogin {
 
 	@Override
@@ -45,7 +45,7 @@ public class OnDemandAdminAutoLogin extends BaseAutoLogin {
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		Ticket ticket = _getTicket(httpServletRequest);
+		Ticket ticket = getTicket(httpServletRequest);
 
 		if (ticket == null) {
 			return null;
@@ -71,7 +71,7 @@ public class OnDemandAdminAutoLogin extends BaseAutoLogin {
 		}
 	}
 
-	private Ticket _getTicket(HttpServletRequest httpServletRequest) {
+	protected Ticket getTicket(HttpServletRequest httpServletRequest) {
 		String ticketKey = ParamUtil.getString(httpServletRequest, "ticketKey");
 
 		if (Validator.isNull(ticketKey)) {
@@ -96,7 +96,7 @@ public class OnDemandAdminAutoLogin extends BaseAutoLogin {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

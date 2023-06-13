@@ -37,11 +37,10 @@ boolean last = position == (searchContainer.getTotal() - 1);
 		<portlet:param name="newPosition" value="<%= String.valueOf(position - 1) %>" />
 	</portlet:actionURL>
 
-	<clay:link
-		aria-label='<%= LanguageUtil.get(request, "up") %>'
-		cssClass="lfr-portal-tooltip"
-		href="<%= moveAssetEntrySelectionUpURL %>"
+	<liferay-ui:icon
 		icon="angle-up"
-		title='<%= LanguageUtil.get(request, "up") %>'
+		markupView="lexicon"
+		message="up"
+		url="<%= moveAssetEntrySelectionUpURL %>"
 	/>
 </c:if>

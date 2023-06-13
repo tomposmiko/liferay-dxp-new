@@ -14,7 +14,6 @@
 
 package com.liferay.asset.categories.admin.web.internal.info.item;
 
-import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.localized.InfoLocalizedValue;
@@ -22,21 +21,21 @@ import com.liferay.info.localized.InfoLocalizedValue;
 /**
  * @author Jürgen Kappler
  */
-public class AssetCategoryInfoItemFields {
+public interface AssetCategoryInfoItemFields {
 
 	public static final InfoField<TextInfoFieldType> descriptionInfoField =
-		BuilderHolder._builder.infoFieldType(
+		InfoField.builder(
+		).infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"description"
-		).attribute(
-			TextInfoFieldType.HTML, true
 		).labelInfoLocalizedValue(
 			InfoLocalizedValue.localize(
 				AssetCategoryInfoItemFields.class, "description")
 		).build();
 	public static final InfoField<TextInfoFieldType> displayPageURLInfoField =
-		BuilderHolder._builder.infoFieldType(
+		InfoField.builder(
+		).infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"displayPageURL"
@@ -45,7 +44,8 @@ public class AssetCategoryInfoItemFields {
 				AssetCategoryInfoItemFields.class, "display-page-url")
 		).build();
 	public static final InfoField<TextInfoFieldType> nameInfoField =
-		BuilderHolder._builder.infoFieldType(
+		InfoField.builder(
+		).infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"name"
@@ -54,7 +54,8 @@ public class AssetCategoryInfoItemFields {
 				AssetCategoryInfoItemFields.class, "name")
 		).build();
 	public static final InfoField<TextInfoFieldType> vocabularyInfoField =
-		BuilderHolder._builder.infoFieldType(
+		InfoField.builder(
+		).infoFieldType(
 			TextInfoFieldType.INSTANCE
 		).name(
 			"vocabulary"
@@ -62,12 +63,5 @@ public class AssetCategoryInfoItemFields {
 			InfoLocalizedValue.localize(
 				AssetCategoryInfoItemFields.class, "vocabulary")
 		).build();
-
-	private static class BuilderHolder {
-
-		private static final InfoField.NamespacedBuilder _builder =
-			InfoField.builder(AssetCategory.class.getSimpleName());
-
-	}
 
 }

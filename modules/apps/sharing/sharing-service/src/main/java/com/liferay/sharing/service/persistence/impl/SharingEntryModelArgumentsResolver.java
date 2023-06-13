@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.sharing.model.impl.SharingEntryImpl",
-		"table.name=SharingEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		SharingEntryModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class SharingEntryModelArgumentsResolver implements ArgumentsResolver {
 

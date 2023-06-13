@@ -26,8 +26,8 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
+import com.liferay.portal.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
-import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
@@ -44,7 +44,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.URLCodec;
@@ -226,6 +226,7 @@ public class CTDocumentServlet extends HttpServlet {
 			}
 
 			PrincipalThreadLocal.setName(user.getUserId());
+
 			PrincipalThreadLocal.setPassword(
 				_portal.getUserPassword(httpServletRequest));
 
@@ -235,8 +236,7 @@ public class CTDocumentServlet extends HttpServlet {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 
 			List<String> pathInfos = StringUtil.split(
-				HttpComponentsUtil.fixPath(
-					httpServletRequest.getPathInfo(), true, true),
+				_http.fixPath(httpServletRequest.getPathInfo(), true, true),
 				CharPool.SLASH);
 
 			long ctEntryId = GetterUtil.getLong(pathInfos.get(0));
@@ -250,12 +250,12 @@ public class CTDocumentServlet extends HttpServlet {
 			_modelResourcePermission.check(
 				permissionChecker, ctCollection, ActionKeys.VIEW);
 
-			String key = HttpComponentsUtil.decodeURL(pathInfos.get(2));
+			String key = _http.decodeURL(pathInfos.get(2));
 
 			String fileTitle = ParamUtil.getString(
 				httpServletRequest, "title", key);
 
-			String type = HttpComponentsUtil.decodeURL(pathInfos.get(1));
+			String type = _http.decodeURL(pathInfos.get(1));
 			long fileSize = ParamUtil.getLong(httpServletRequest, "size");
 
 			ServletResponseUtil.sendFile(
@@ -287,6 +287,9 @@ public class CTDocumentServlet extends HttpServlet {
 
 	@Reference
 	private CTEntryLocalService _ctEntryLocalService;
+
+	@Reference
+	private Http _http;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.change.tracking.model.CTCollection)"

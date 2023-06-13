@@ -15,7 +15,7 @@ definition {
 			layoutName = "Documents and Media Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Documents and Media Page",
 			widgetName = "Documents and Media");
@@ -24,88 +24,19 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			DMDocument.tearDownCP();
 
-			PagesAdmin.tearDownCP();
-
-			JSONGroup.deleteGroupByName(groupName = "Site Name");
+			User.logoutPG();
 		}
 	}
 
-	@description = "This ensures that an old image friendlyURL redirects properly after document is reverted."
-	@priority = 5
-	test CanAccessOldFriendlyURLAfterRevert {
-		property custom.properties = "company.default.time.zone=America/Los_Angeles";
-
-		var portalURL = PropsUtil.get("portal.url");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_1",
-			groupName = "Guest",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_1.jpg");
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_1",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1_1");
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_1",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.editCP(
-			dmDocumentFileEdit = "Document_2.jpg",
-			dmDocumentFileNameEdit = "Document_2.jpg",
-			dmDocumentTitle = "Document_1",
-			dmDocumentTitleEdit = "Document_2",
-			skipNavigation = "true");
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_2",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1_2");
-
-		DMNavigator.openToEntryInAdmin(
-			dmDocumentTitle = "Document_2",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.revertPG(dmDocumentVersionNumber = "1.0");
-
-		AssertVisible(
-			key_dmDocumentFileName = "Document_1.jpg",
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
-
-		AssertElementPresent(
-			key_latestVersionURL = "${portalURL}/documents/d/guest/document_1_2",
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_LATEST_VERSION_URL");
-
-		for (var friendlyURL : list "document_1_2,document_1_1") {
-			Navigator.openSpecificURL(url = "${portalURL}/documents/d/guest/${friendlyURL}");
-
-			AssertVisible(
-				key_imageSourceURL = "document_1",
-				locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
-		}
-	}
-
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanAddCommentToDocument {
-		property portal.acceptance = "true";
-		property testray.component.names = "Comment";
-
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		JSONDocument.addFileWithUploadedFile(
@@ -129,11 +60,9 @@ definition {
 	}
 
 	@description = "This test asserts that a major version can be created for a file."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanAddMajorVersionIncrement {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -157,11 +86,9 @@ definition {
 	}
 
 	@description = "This test asserts that a major version can be created for a file."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanAddMinorVersionIncrement {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -182,39 +109,38 @@ definition {
 			dmDocumentVersionNumber = "1.1");
 	}
 
-	@description = "This case covers LPS-140006. It ensures that a valid file can be uploaded after the invalid file is discarded."
-	@priority = 3
-	test CanAddValidFileAfterInvalidFileIsDiscardedViaMultipleUpload {
-		property test.name.skip.portal.instance = "DMFileEntry#CanAddValidFileAfterInvalidFileIsDiscardedViaMultipleUpload";
+	@description = "This test covers LPS-96652. It ensures that the PDF file can be added after enabling text extraction."
+	@priority = "4"
+	@refactordone
+	test CanAddPDFAfterEnablingTextExtraction {
+		property custom.properties = "text.extraction.fork.process.enabled=true${line.separator}text.extraction.fork.process.mime.types=application/x-tika-ooxml,application/pdf";
 
-		DMDocument.updateFileExtensions(fieldValue = ".docx");
+		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+		DMDocument.enableActionsMenuOnPortlet();
 
-		DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "Multiple Files Upload");
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
-		UploadDependencyFile.uploadFile(fileName = "Document_1.jpg");
+		DMDocument.addPG(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.pdf",
+			dmDocumentTitle = "Document_1.pdf");
 
-		Button.clickPublish();
+		AssertConsoleTextNotPresent(value1 = "java.lang.ExceptionInInitializerError");
 
-		Click(
-			key_text = "Clear documents already saved.",
-			locator1 = "Link#ANY");
-
-		UploadDependencyFile.uploadFile(fileName = "Document_1.docx");
-
-		Button.clickPublish();
-
-		LexiconEntry.viewEntryName(rowEntry = "Document_1");
+		DMDocument.viewAllPG(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "Document_1.pdf",
+			dmDocumentType = "Basic Document");
 	}
 
 	@description = "This test covers LPS-124959. It ensures that a user can upload documents with a document type via multiple upload."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanAddWithDocumentTypeViaMultipleUpload {
-		property portal.acceptance = "true";
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
+		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -231,80 +157,16 @@ definition {
 		for (var dmDocumentTitle : list "Document_1,Document_2") {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-			DMNavigator.gotoDocumentCP(dmDocumentTitle = ${dmDocumentTitle});
+			DMNavigator.gotoDocumentCP(dmDocumentTitle = "${dmDocumentTitle}");
 
 			DMDocument.viewDocumentTypePG(dateValue = "01/01/2022");
 		}
 	}
 
 	@description = "This test covers LPS-94657. It ensures that auto complete for edit categories."
-	@priority = 5
-	@refactordone
-	test CanAutocompleteCategory {
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "DMFileEntry#CanAutocompleteCategory";
-
-		JSONCategory.addVocabulary(
-			groupName = "Guest",
-			title = "Topic");
-
-		JSONCategory.addCategory(
-			groupName = "Guest",
-			title = "category",
-			vocabularyName = "Topic");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "text/plain",
-			sourceFileName = "Document_1.txt");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		DMDocument.selectDocuments(dmDocumentTitle = "DM Document Title");
-
-		Click(locator1 = "Icon#EDIT_CATEGORIES");
-
-		SelectFrame(value1 = "relative=top");
-
-		AssertTextEquals(
-			locator1 = "Modal#HEADER",
-			value1 = "Edit Categories");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Modal#BODY",
-			value1 = "You are editing the categories for the selected item.");
-
-		Type.sendKeys(
-			locator1 = "AssetCategorization#TAGS_FIELD",
-			value1 = "cat");
-
-		AssertClick(
-			locator1 = "AssetCategorization#TAG_AUTOCOMPLETE_CONTAINER",
-			value1 = "category");
-
-		Button.clickSave();
-
-		SelectFrame(value1 = "relative=top");
-
-		Alert.viewSuccessMessageText(successMessage = "Changes Saved");
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.viewCategories(categoryNameList = "category");
-	}
-
-	@description = "This test covers LPS-94657. It ensures that auto complete for edit categories."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanAutoCompleteCategory {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "DMFileEntry#CanAutoCompleteCategory";
 
 		JSONCategory.addVocabulary(
@@ -327,7 +189,9 @@ definition {
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
-		DMDocument.selectDocuments(dmDocumentTitle = "DM Document Title");
+		var key_dmDocumentTitle = "DM Document Title";
+
+		Check(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_CHECKBOX");
 
 		Click(locator1 = "Icon#EDIT_CATEGORIES");
 
@@ -364,11 +228,10 @@ definition {
 	}
 
 	@description = "This test ensures that the filename character restriction can be configured through the blacklist."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanBlacklistCharacters {
 		property custom.properties = "dl.char.blacklist=\\\\,//,:,*,?,<,#,|,../,/..";
-		property portal.acceptance = "true";
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
@@ -398,12 +261,9 @@ definition {
 			value1 = ">.jpg");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanCancelCheckout {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -412,6 +272,8 @@ definition {
 			sourceFileName = "Document_1.doc");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -423,12 +285,12 @@ definition {
 	}
 
 	@description = "This test ensures that the document type of a published basic document can be changed."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanChangeDocumentType {
-		property portal.acceptance = "true";
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "guest");
+		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -476,7 +338,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-101908. It makes sure that all elements selected on different pages can be checked out and checked in."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanCheckInAllDocumentsOnDifferentPagesAtOnce {
 		JSONDocument.addFileWithUploadedFile(
@@ -513,7 +375,7 @@ definition {
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		PortletEntry.selectAll();
 
@@ -531,11 +393,11 @@ definition {
 
 		for (var dmDocumentFileList : list "Document_1.doc,Document_2.doc,Document_3.doc,Document_1.txt,Document_2.txt") {
 			AssertElementPresent(
-				key_dmDocumentTitle = ${dmDocumentFileList},
+				key_dmDocumentTitle = "${dmDocumentFileList}",
 				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_ICON_LOCKED");
 		}
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		PortletEntry.selectAll();
 
@@ -547,17 +409,15 @@ definition {
 
 		for (var dmDocumentFileList : list "Document_1.doc,Document_2.doc,Document_3.doc,Document_1.txt,Document_2.txt") {
 			AssertElementNotPresent(
-				key_dmDocumentTitle = ${dmDocumentFileList},
+				key_dmDocumentTitle = "${dmDocumentFileList}",
 				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_ICON_LOCKED");
 		}
 	}
 
 	@description = "This test covers LPS-88313 and LPS-92145. It ensures that a user can check in a document without changing versions."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanCheckInAsCurrentVersion {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Check in as current version",
 			groupName = "Guest",
@@ -595,11 +455,9 @@ definition {
 	}
 
 	@description = "This test ensures that a user can check in a document as a major version."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanCheckInAsMajorVersion {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Check in as major version",
 			groupName = "Guest",
@@ -608,21 +466,17 @@ definition {
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
 		DMDocument.checkoutCP(dmDocumentTitle = "Check in as major version");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.viewStatus(
-			dmDocumentStatus = "Draft",
-			dmDocumentTitle = "Check in as major version");
+		Refresh();
 
 		DMDocument.checkinCP(
 			dmDocumentTitle = "Check in as major version",
 			revision = "Major");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		AssertElementNotPresent(
 			key_dmDocumentTitle = "Check in as major version",
@@ -634,11 +488,9 @@ definition {
 	}
 
 	@description = "This test ensures that a user can check in a document as a minor version."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanCheckInAsMinorVersion {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Check in as minor version",
 			groupName = "Guest",
@@ -669,11 +521,9 @@ definition {
 	}
 
 	@description = "This test covers LPS-82306. It ensures that a user can check in a document through the Management toolbar."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanCheckInViaManagementBar {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Check in as current version",
 			groupName = "Guest",
@@ -704,11 +554,9 @@ definition {
 	}
 
 	@description = "This test covers LPS-90736. It makes sure that all files are deleted when user selects all."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanDeleteAllDocumentsAtOnce {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Document_1.doc",
 			groupName = "Guest",
@@ -738,33 +586,20 @@ definition {
 		DMDocument.viewDefault();
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanDeleteDocumentInSitePage {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
-		HeadlessSite.addSite(siteName = "Site Name");
-
-		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
-			layoutName = "Documents and Media Page");
-
-		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
-			groupName = "Site Name",
-			layoutName = "Documents and Media Page",
-			widgetName = "Documents and Media");
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "/D/M/Document Title",
-			groupName = "Site Name",
+			groupName = "Guest",
 			mimeType = "application/msword",
 			sourceFileName = "Document_1.doc");
 
-		Navigator.openSitePage(
-			pageName = "Documents and Media Page",
-			siteName = "Site Name");
+		Navigator.openURL();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -774,41 +609,28 @@ definition {
 	}
 
 	@description = "This test covers LPS-91597. It ensures that a user can delete multiple documents through the actions icon after selecting them one by one."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanDeleteMultipleDocumentsViaActionsButton {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
+		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		HeadlessSite.addSite(siteName = "Site Name");
-
-		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
-			layoutName = "Documents and Media Page");
-
-		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
-			groupName = "Site Name",
-			layoutName = "Documents and Media Page",
-			widgetName = "Documents and Media");
+		DMDocument.enableActionsMenuOnPortlet();
 
 		for (var entryCount : list "1,2") {
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
 				dmDocumentTitle = "Document_${entryCount}.doc",
-				groupName = "Site Name",
+				groupName = "Guest",
 				mimeType = "application/msword",
 				sourceFileName = "Document_${entryCount}.doc");
 		}
 
-		Navigator.openSitePage(
-			pageName = "Documents and Media Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		for (var entryCount : list "1,2") {
 			var dmDocumentTitle = "Document_${entryCount}.doc";
 
-			LexiconCard.checkCardCheckbox(card = ${dmDocumentTitle});
+			LexiconCard.checkCardCheckbox(card = "${dmDocumentTitle}");
 		}
 
 		Click(locator1 = "Icon#MOVE_TO_RECYCLE_BIN");
@@ -819,11 +641,9 @@ definition {
 	}
 
 	@description = "This case covers LPS-110213. It ensures that a document file can be downloaded after moving it between folders."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadDocumentMovedBetweenFolders {
-		property portal.acceptance = "true";
-
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		JSONFolder.addFolder(
@@ -856,20 +676,16 @@ definition {
 
 		DMNavigator.gotoFolder(dmFolderName = "DM Folder 2 Name");
 
-		DMDocument.downloadCP(
-			dmDocumentSize = "22 KB",
-			dmDocumentTitle = "DM Document Title");
+		DMDocument.downloadCP(dmDocumentTitle = "DM Document Title");
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 	}
 
 	@description = "This ensures that multiple documents can be downloaded simultaneously."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadMultipleFilesSimultaneously {
-		property portal.acceptance = "true";
-
-		HeadlessSite.addSite(siteName = "Site_1");
+		JSONGroup.addGroup(groupName = "Site_1");
 
 		for (var entryCount : list "1,2") {
 			JSONDocument.addFileWithUploadedFile(
@@ -886,19 +702,15 @@ definition {
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 
-		DMDocument.assertFileNameFromTempFolder(fileName = "Site_1.zip");
+		DMDocument.assertFileNameFromTempFolder(downloadedFileName = "Site_1.zip");
 	}
 
 	@description = "This ensures that the document file can be downloaded through the document file name."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadThroughURLWithFileName {
-		property portal.acceptance = "true";
-
 		var portalURL = PropsUtil.get("portal.url");
-		var siteId = JSONGroupAPI._getGroupIdByName(
-			groupName = "Guest",
-			site = "true");
+		var siteID = JSONGroupAPI._getGroupIdByName(groupName = "Guest", site = "true");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -907,25 +719,21 @@ definition {
 			mimeType = "video/mp4",
 			sourceFileName = "Document_1.mp4");
 
-		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteId}/0/Document_1.mp4");
+		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteID}/0/Document_1.mp4");
 
 		DownloadTempFile();
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 
-		DMDocument.assertFileNameFromTempFolder(fileName = "Document_1.mp4");
+		DMDocument.assertFileNameFromTempFolder(downloadedFileName = "Document_1.mp4");
 	}
 
 	@description = "This ensures that the document file can be downloaded through the document title."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadThroughURLWithTitle {
-		property portal.acceptance = "true";
-
 		var portalURL = PropsUtil.get("portal.url");
-		var siteId = JSONGroupAPI._getGroupIdByName(
-			groupName = "Guest",
-			site = "true");
+		var siteID = JSONGroupAPI._getGroupIdByName(groupName = "Guest", site = "true");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -934,25 +742,21 @@ definition {
 			mimeType = "video/mp4",
 			sourceFileName = "Document_1.mp4");
 
-		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteId}/0/Document_1");
+		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteID}/0/Document_1");
 
 		DownloadTempFile();
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 
-		DMDocument.assertFileNameFromTempFolder(fileName = "Document_1.mp4");
+		DMDocument.assertFileNameFromTempFolder(downloadedFileName = "Document_1.mp4");
 	}
 
 	@description = "This ensures that the document file can be downloaded using the updated document file name."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadThroughURLWithUpdatedFileName {
-		property portal.acceptance = "true";
-
 		var portalURL = PropsUtil.get("portal.url");
-		var siteId = JSONGroupAPI._getGroupIdByName(
-			groupName = "Guest",
-			site = "true");
+		var siteID = JSONGroupAPI._getGroupIdByName(groupName = "Guest", site = "true");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Document_3.doc",
@@ -967,25 +771,21 @@ definition {
 			dmDocumentFileNameEdit = "Document_3Edit.doc",
 			dmDocumentTitle = "Document_3");
 
-		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteId}/0/Document_3Edit.doc");
+		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteID}/0/Document_3Edit.doc");
 
 		DownloadTempFile();
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 
-		DMDocument.assertFileNameFromTempFolder(fileName = "Document_3Edit.doc");
+		DMDocument.assertFileNameFromTempFolder(downloadedFileName = "Document_3Edit.doc");
 	}
 
 	@description = "This ensures that the document file can be downloaded through the document title."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadThroughURLWithUpdatedTitle {
-		property portal.acceptance = "true";
-
 		var portalURL = PropsUtil.get("portal.url");
-		var siteId = JSONGroupAPI._getGroupIdByName(
-			groupName = "Guest",
-			site = "true");
+		var siteID = JSONGroupAPI._getGroupIdByName(groupName = "Guest", site = "true");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Document_3.doc",
@@ -999,21 +799,19 @@ definition {
 			dmDocumentTitle = "Document_3",
 			dmDocumentTitleEdit = "Document_3Edit");
 
-		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteId}/0/Document_3Edit");
+		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteID}/0/Document_3Edit");
 
 		DownloadTempFile();
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 
-		DMDocument.assertFileNameFromTempFolder(fileName = "Document_3.doc");
+		DMDocument.assertFileNameFromTempFolder(downloadedFileName = "Document_3.doc");
 	}
 
 	@description = "This ensures that the document file name will be applied to the downloaded file name."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadWithCustomFileName {
-		property portal.acceptance = "true";
-
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.addCP(
@@ -1024,21 +822,16 @@ definition {
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMDocument.downloadCP(
-			dmDocumentSize = "259 B",
-			dmDocumentTitle = "DM Document Title");
+		DMDocument.downloadCP(dmDocumentTitle = "DM Document Title");
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found.");
 
-		DMDocument.assertFileNameFromTempFolder(fileName = "document_1_Edit.jpg");
+		DMDocument.assertFileNameFromTempFolder(downloadedFileName = "document_1_Edit.jpg");
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanDownloadWithSpecialCharactersInTitle {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "/D/M/@!# Title",
 			groupName = "Guest",
@@ -1047,22 +840,23 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMDocument.downloadPG(dmDocumentTitle = "/D/M/@!# Title");
 
-		DMDocument.assertFileNameFromTempFolder(fileName = "Document_1.doc");
+		DMDocument.assertFileNameFromTempFolder(downloadedFileName = "Document_1.doc");
 	}
 
 	@description = "This test edits the title and description of a document. It asserts minor version increment because only its metadata was updated."
-	@e2etest
-	@priority = 5
+	@priority = "5"
 	@refactordone
+	@uitest
 	test CanEditDocument {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,rockylinux,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
@@ -1095,139 +889,8 @@ definition {
 			dmDocumentVersionNumber = "1.1");
 	}
 
-	@description = "This test ensures that users can choose one/multiple of the extensions to filter documents."
-	@priority = 4
-	test CanFilterByExtensions {
-		property custom.properties = "feature.flag.LPS-84424=true";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1.docx",
-			groupName = "Guest",
-			mimeType = "application/docx",
-			sourceFileName = "Document_1.docx");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1.xls",
-			groupName = "Guest",
-			mimeType = "application/excel",
-			sourceFileName = "Document_1.xls");
-
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_2.docx In Folder",
-			folderName = "DM Folder Name",
-			groupName = "Guest",
-			mimeType = "application/docx",
-			sourceFileName = "Document_2.docx");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_2.xls In Folder",
-			folderName = "DM Folder Name",
-			groupName = "Guest",
-			mimeType = "application/excel",
-			sourceFileName = "Document_2.xls");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
-
-		task ("Assert user can choose one of the extensions to filter documents") {
-			ManagementBar.setFilterAndOrder(filterBy = "Extension...");
-
-			DMDocument.viewExtensionDetails(
-				extensionCategory = "Image (1 Item),Spreadsheet (1 Item),Text (1 Item)",
-				extensionSubcategory = "xls,docx");
-
-			DMDocument.selectExtensions(extensionCategory = "Text (1 Item)");
-
-			DMDocument.viewFilterSummaryResults(
-				filterScope = "Extension: docx",
-				searchResults = "2 Results");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_2.docx In Folder");
-
-			AssertTextEquals.assertPartialText(
-				index = 2,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_1.docx");
-		}
-
-		task ("Assert user can choose multiple extensions to filter documents in Home folder") {
-			ManagementBar.setFilterAndOrder(
-				active = "true",
-				filterBy = "Extension...");
-
-			DMDocument.viewExtensionDetails(
-				extensionCategory = "Image (1 Item),Spreadsheet (1 Item),Text (1 Item)",
-				extensionSubcategory = "xls,docx");
-
-			DMDocument.selectExtensions(
-				clearAll = "true",
-				extensionCategory = "Spreadsheet (1 Item),Text (1 Item)");
-
-			DMDocument.viewFilterSummaryResults(
-				filterScope = "Extension: xls,Extension: docx",
-				searchResults = "4 Results");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_2.xls In Folder");
-
-			AssertTextEquals.assertPartialText(
-				index = 2,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_2.docx In Folder");
-
-			AssertTextEquals.assertPartialText(
-				index = 3,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_1.xls");
-
-			AssertTextEquals.assertPartialText(
-				index = 4,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_1.docx");
-		}
-
-		task ("Assert user can choose multiple extensions to filter documents in folder") {
-			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-			DMNavigator.gotoFolder(dmFolderName = "DM Folder Name");
-
-			ManagementBar.setFilterAndOrder(filterBy = "Extension...");
-
-			DMDocument.viewExtensionDetails(
-				extensionCategory = "Image (1 Item),Spreadsheet (1 Item),Text (1 Item)",
-				extensionSubcategory = "xls,docx");
-
-			DMDocument.selectExtensions(extensionCategory = "Spreadsheet (1 Item),Text (1 Item)");
-
-			DMDocument.viewFilterSummaryResults(
-				filterScope = "Extension: docx",
-				searchResults = "2 Results");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_2.xls In Folder");
-
-			AssertTextEquals.assertPartialText(
-				index = 2,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_2.docx In Folder");
-		}
-	}
-
 	@description = "This test covers LPS-128473. This test ensures that users can filter documents by Recent."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanFilterByRecent {
 		JSONDocument.addFileWithUploadedFile(
@@ -1251,268 +914,28 @@ definition {
 			orderBy = "Modified Date");
 
 		AssertTextEquals.assertPartialText(
-			index = 1,
+			index = "1",
 			locator1 = "LexiconTable#TABLE_ROW",
 			value1 = "DM Document Title 3");
 
 		AssertTextEquals.assertPartialText(
-			index = 2,
+			index = "2",
 			locator1 = "LexiconTable#TABLE_ROW",
 			value1 = "DM Document Title 2");
 	}
 
-	@description = "This test covers LPS-136334. This test ensures that users can filter documents by Recent and order by Downloads."
-	@priority = 4
-	test CanFilterByRecentAndOrderByDownloads {
-		property custom.properties = "dl.actions.visible=true";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_2.doc",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_2.doc");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_3.doc",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_3.doc");
-
-		Navigator.gotoPage(pageName = "Documents and Media Page");
-
-		DMDocument.downloadPG(dmDocumentTitle = "Document_3.doc");
-
-		DMDocument.assertFileNameFromTempFolder(fileName = "Document_3.doc");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		ManagementBar.setFilterAndOrder(
-			filterBy = "Recent",
-			orderBy = "Downloads");
-
-		AssertTextNotPresent(value1 = "java.sql.SQLSyntaxErrorException");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
-
-		AssertTextEquals.assertPartialText(
-			index = 1,
-			locator1 = "LexiconTable#TABLE_ROW",
-			value1 = "Document_3.doc");
-
-		AssertTextEquals.assertPartialText(
-			index = 2,
-			locator1 = "LexiconTable#TABLE_ROW",
-			value1 = "Document_2.doc");
-	}
-
-	@description = "This test ensures that users can choose one/multiple subcategories of the extensions to filter documents."
-	@priority = 4
-	test CanFilterBySubcategoriesOfExtensions {
-		property custom.properties = "feature.flag.LPS-84424=true";
-
-		for (var documentName : list "Document_1.pdf,Document_1.xls,Document_1.xlsx,Document_2.docx,Document_2.jpeg,Document_3.docx,Document_3.jpg") {
-			var extension = StringUtil.extractLast(${documentName}, ".");
-
-			if (${extension} == "docx") {
-				var mimeType = "application/docx";
-			}
-			else if (${extension} == "jpg") {
-				var mimeType = "image/jpg";
-			}
-			else if (${extension} == "jpeg") {
-				var mimeType = "image/jpeg";
-			}
-			else if (${extension} == "pdf") {
-				var mimeType = "application/pdf";
-			}
-			else if (${extension} == "xls") {
-				var mimeType = "application/vnd.ms-excel";
-			}
-			else if (${extension} == "xlsx") {
-				var mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-			}
-
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentTitle = ${documentName},
-				groupName = "Guest",
-				mimeType = ${mimeType},
-				sourceFileName = ${documentName});
-		}
-
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1.doc",
-			folderName = "DM Folder Name",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_2.pdf",
-			folderName = "DM Folder Name",
-			groupName = "Guest",
-			mimeType = "application/pdf",
-			sourceFileName = "Document_2.pdf");
-
-		Navigator.gotoPage(pageName = "Documents and Media Page");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
-
-		task ("Assert user can choose one subcategory to filter documents") {
-			ManagementBar.setFilterAndOrder(filterBy = "Extension...");
-
-			DMDocument.viewExtensionDetails(
-				extensionCategory = "Image (3 Items),Spreadsheet (2 Items),Text (2 Items),Vectorial (1 Item)",
-				extensionSubcategory = "png,jpg,jpeg,xls,xlsx,doc,docx");
-
-			DMDocument.selectExtensions(extensionCategory = "xlsx");
-
-			DMDocument.viewFilterSummaryResults(
-				filterScope = "Extension: xlsx",
-				searchResults = "1 Result");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_1.xlsx");
-		}
-
-		task ("Assert user can choose multiple subcategories to filter documents") {
-			ManagementBar.setFilterAndOrder(
-				active = "true",
-				filterBy = "Extension...");
-
-			DMDocument.viewExtensionDetails(
-				extensionCategory = "Image (3 Items),Spreadsheet (2 Items),Text (2 Items),Vectorial (1 Item)",
-				extensionSubcategory = "png,jpg,jpeg,xls,xlsx,doc,docx");
-
-			DMDocument.selectExtensions(
-				clearAll = "true",
-				extensionCategory = "jpg,jpeg");
-
-			DMDocument.viewFilterSummaryResults(
-				filterScope = "Extension: jpg,Extension: jpeg",
-				searchResults = "2 Results");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_3.jpg");
-
-			AssertTextEquals.assertPartialText(
-				index = 2,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_2.jpeg");
-		}
-
-		task ("Assert user can choose multiple subcategories from different extensions to filter documents") {
-			ManagementBar.setFilterAndOrder(
-				active = "true",
-				filterBy = "Extension...");
-
-			DMDocument.viewExtensionDetails(
-				extensionCategory = "Image (3 Items),Spreadsheet (2 Items),Text (2 Items),Vectorial (1 Item)",
-				extensionSubcategory = "png,jpg,jpeg,xls,xlsx,doc,docx");
-
-			DMDocument.selectExtensions(
-				clearAll = "true",
-				extensionCategory = "jpg,xls");
-
-			DMDocument.viewFilterSummaryResults(
-				filterScope = "Extension: jpg,Extension: xls",
-				searchResults = "2 Results");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_3.jpg");
-
-			AssertTextEquals.assertPartialText(
-				index = 2,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_1.xls");
-		}
-
-		task ("Assert user can choose one category and one subcategory of extensions to filter documents") {
-			ManagementBar.setFilterAndOrder(
-				active = "true",
-				filterBy = "Extension...");
-
-			DMDocument.viewExtensionDetails(
-				extensionCategory = "Image (3 Items),Spreadsheet (2 Items),Text (2 Items),Vectorial (1 Item)",
-				extensionSubcategory = "png,jpg,jpeg,xls,xlsx,doc,docx");
-
-			DMDocument.selectExtensions(
-				clearAll = "true",
-				extensionCategory = "doc,pdf");
-
-			DMDocument.viewFilterSummaryResults(
-				filterScope = "Extension: doc,Extension: pdf",
-				searchResults = "3 Results");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_2.pdf");
-
-			AssertTextEquals.assertPartialText(
-				index = 2,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_1.doc");
-
-			AssertTextEquals.assertPartialText(
-				index = 3,
-				locator1 = "LexiconTable#TABLE_ROW",
-				value1 = "Document_1.pdf");
-		}
-	}
-
 	@description = "This is a test for LPS-136825. It checks that a file entry can be imported with tags."
-	@priority = 3
+	@ignore = "true"
+	@priority = "3"
 	test CanImportWithTags {
-		JSONDocument.addFileWithUploadedFile(
-			assetTagNames = "Tag Name",
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_1.jpg");
+		property portal.acceptance = "false";
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+		// TODO LPS-136825 CanImportWithTags pending implementation
 
-		LAR.exportPortlet(larFileName = "DocumentsandMedia_portlet.lar");
-
-		HeadlessSite.addSite(siteName = "Site Name");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
-
-		LAR.importPortlet(larFileName = "DocumentsandMedia_portlet.lar");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
-
-		DMDocument.viewTagInfo(tagName = "tag name");
-	}
-
-	@description = "This test covers LPS-115949. It validates that resource allocation for forked processes can be controlled through portal.properties."
-	@priority = 4
-	test CanLimitForkedProcessResourceAllocation {
-		property custom.properties = "dl.file.entry.preview.fork.process.jvm.options=-Xmx0m";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "large_file.pdf",
-			groupName = "Guest",
-			mimeType = "application/pdf",
-			sourceFileName = "large_file.pdf");
-
-		AssertConsoleTextPresent(value1 = "Unable to process file version");
 	}
 
 	@description = "This test ensures that only the last two versions of a file are kept when the max version limit is set."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanLimitMaximumAmountOfVersions {
 		property test.name.skip.portal.instance = "DMFileEntry#CanLimitMaximumAmountOfVersions";
@@ -1524,7 +947,7 @@ definition {
 			dmDocumentTitle = "Edit this document two times",
 			groupName = "Guest");
 
-		DMDocument.updateMaximumVersions(fieldValue = 2);
+		DMDocument.updateMaximumVersions(fieldValue = "2");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
@@ -1545,7 +968,7 @@ definition {
 
 		for (var versionNumber : list "1.2,1.1") {
 			AssertElementPresent(
-				key_dmDocumentVersionNumber = ${versionNumber},
+				key_dmDocumentVersionNumber = "${versionNumber}",
 				locator1 = "DocumentsAndMedia#DOCUMENT_VERSION_ANY");
 		}
 
@@ -1554,72 +977,29 @@ definition {
 			locator1 = "DocumentsAndMedia#DOCUMENT_VERSION_ANY");
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanMoveDocumentToRecycleBin {
 		property portal.acceptance = "true";
 
-		HeadlessSite.addSite(siteName = "Site Name");
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			groupName = "Site Name",
+			groupName = "Guest",
 			mimeType = "text/plain",
 			sourceFileName = "Document_1.txt");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.moveToRecycleBinCP(
 			assetType = "Document",
 			dmDocumentTitle = "DM Document Title");
 	}
 
-	@description = "This ensures that the entry can be moved to another folder via drag and drop."
-	@priority = 4
-	test CanMoveEntryToFolderViaDragAndDrop {
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder1 Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		DragAndDrop.dragAndDropToObject(
-			key_listEntry = "DM Document Title",
-			key_rowEntry = "DM Folder Name",
-			locator1 = "LexiconList#ANY_LIST",
-			locator2 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
-			value1 = "DM Document Title");
-
-		Alert.viewSuccessMessage();
-
-		DMNavigator.openToFolderInAdmin(
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
-
-		DMDocument.viewCP(dmDocumentTitle = "DM Document Title");
-	}
-
 	@description = "This validates that the location of the document accurately displays after it is moved from one folder to another."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanMoveFromOneFolderToAnother {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONFolder.addFolder(
 			dmFolderDescription = "DM Folder1 Description",
 			dmFolderName = "DM Folder1 Name",
@@ -1640,6 +1020,8 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMNavigator.gotoFolder(dmFolderName = "DM Folder1 Name");
@@ -1659,12 +1041,9 @@ definition {
 			locationFieldName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanMoveWithSlashesInTitle {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "/D/M/Document Title",
 			groupName = "Guest",
@@ -1678,6 +1057,8 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMDocument.moveToFolderPG(
@@ -1689,12 +1070,9 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "/D/M/Document Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CannotAddDocumentWithDuplicateName {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "DM Document Title",
 			groupName = "Guest",
@@ -1702,6 +1080,8 @@ definition {
 			sourceFileName = "Document_1.doc");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -1712,46 +1092,28 @@ definition {
 			dmDocumentTitle = "DM Document Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CannotAddSpecialCharacterToName {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
+		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		HeadlessSite.addSite(siteName = "Site Name");
-
-		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
-			layoutName = "Documents and Media Page");
-
-		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
-			groupName = "Site Name",
-			layoutName = "Documents and Media Page",
-			widgetName = "Documents and Media");
-
-		Navigator.openSitePage(
-			pageName = "Documents and Media Page",
-			siteName = "Site Name");
+		DMDocument.enableActionsMenuOnPortlet();
 
 		DMFolder.addPG(
 			dmFolder = "Invalid",
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name?");
 
-		Navigator.openSitePage(
-			pageName = "Documents and Media Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		DMPortlet.viewDefaultPG();
 	}
 
 	@description = "This test ensures that a checked out document cannot be edited by another user."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CannotEditCheckedOutDocument {
-		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}dl.actions.visible=true";
-		property portal.acceptance = "true";
+		property custom.properties = "jsonws.web.service.paths.excludes=";
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1783,6 +1145,8 @@ definition {
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
 		DMDocument.checkoutPG(dmDocumentTitle = "DM Document Title");
 
 		User.logoutPG();
@@ -1799,33 +1163,9 @@ definition {
 			userName = "Test Test");
 	}
 
-	@description = "This is a test for LPS-82205. It checks that the XSS can not be executed after accessing HTML file."
-	@priority = 4
-	test CannotExecuteXSSWhenAccessingHTMLFile {
-		DMDocument.enableDirectoryIndexing(siteURLKey = "guest");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "The file is a basic HTML file with a simple JavaScript",
-			dmDocumentTitle = "xss_test",
-			groupName = "Guest",
-			mimeType = "code/html",
-			sourceFileName = "xss_test.html");
-
-		DMDocument.downloadWithDirectoryIndexing(
-			dmDocumentTitle = "xss_test",
-			siteURLKey = "guest");
-
-		AssertAlertNotPresent();
-
-		DMDocument.assertFileNameFromTempFolder(fileName = "xss_test");
-	}
-
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CannotMoveToFolderWithDuplicateTitle {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONFolder.addFolder(
 			dmFolderDescription = "DM Folder1 Description",
 			dmFolderName = "DM Folder1 Name",
@@ -1854,6 +1194,8 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMNavigator.gotoFolder(dmFolderName = "DM Folder1 Name");
@@ -1865,10 +1207,9 @@ definition {
 	}
 
 	@description = "This is a test for LPS-91751. It ensures that a user cannot preview a file with size that exceeds the preview limit."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CannotPreviewFileThatExceedsLimit {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "DMFileEntry#CannotPreviewFileThatExceedsLimit";
 
 		DMNavigator.openToConfigInSystemSettings(portlet = "File Entries");
@@ -1876,7 +1217,7 @@ definition {
 		Type(
 			key_fieldLabel = "Previewable Processor Maximum Size",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
-			value1 = 1024);
+			value1 = "1024");
 
 		SystemSettings.saveConfiguration();
 
@@ -1898,7 +1239,7 @@ definition {
 	}
 
 	@description = "This test ensures that a user cannot set a previous expiration date."
-	@priority = 3
+	@priority = "3"
 	test CannotPublishInvalidExpirationDate {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
 
@@ -1912,78 +1253,52 @@ definition {
 
 		DMDocument.setExpirationDate(
 			enableExpirationDate = "true",
-			increaseMinutes = 1,
 			invalidExpirationDate = "true");
 	}
 
-	@description = "This is a use case for LPS-114470. Validate crafted or corrupted files cannot cause out of memory errors."
-	@priority = 5
-	test CannotUploadFileThatCausesOutOfMemoryErrors {
-		property testray.component.names = "Security";
-
-		task ("Add new document") {
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentDescription = "DM Document Description",
-				dmDocumentTitle = "DM Document Title",
-				groupName = "Guest",
-				mimeType = "audio/x-mpeg",
-				sourceFileName = "tika.mp3");
-		}
-
-		task ("Assert out of memory error message") {
-			AssertConsoleTextPresent(value1 = "java.io.IOException: Record size");
-
-			AssertConsoleTextPresent(value1 = "is larger than the allowed record size");
-
-			AssertConsoleTextNotPresent(value1 = "java.lang.OutOfMemoryError");
-		}
-	}
-
 	@description = "This test ensures that the guest cannot see an expired document."
-	@priority = 4
+	@priority = "4"
 	test CannotViewExpiredDocumentAsGuest {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
 		property test.name.skip.portal.instance = "DMFileEntry#CannotViewExpiredDocumentAsGuest";
 
 		var portalURL = PropsUtil.get("portal.url");
 
-		HeadlessSite.addSite(siteName = "Site Name");
-
 		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
+			groupName = "Guest",
 			layoutName = "Documents and Media Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
-			groupName = "Site Name",
+			column = "1",
+			groupName = "Guest",
 			layoutName = "Documents and Media Page",
 			widgetName = "Documents and Media");
 
-		DMDocument.updateCheckInterval(fieldValue = 1);
+		DMDocument.updateCheckInterval(fieldValue = "2");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_3.txt",
-			groupName = "Site Name",
+			groupName = "Guest",
 			mimeType = "text/plain",
 			sourceFileName = "Document_3.txt");
 
 		DMNavigator.openToEditEntryInSite(
 			dmDocumentTitle = "Document_3.txt",
-			groupName = "Site Name",
-			siteURLKey = "site-name");
+			groupName = "Guest",
+			siteURLKey = "guest");
 
 		DMDocument.setExpirationDate(
 			enableExpirationDate = "true",
-			increaseMinutes = 1);
+			increaseMinutes = "2");
+
+		Pause(locator1 = "120000");
 
 		Navigator.openURL();
 
-		Notifications.waitForNotificationFlexibly(flexibleRefreshingTime = 20000);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
-		Notifications.viewBadgeCount(notificationCount = 1);
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.viewStatus(
 			dmDocumentStatus = "Expired",
@@ -1991,17 +1306,15 @@ definition {
 
 		Navigator.openSpecificURL(url = "${portalURL}/c/portal/logout");
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/site-name/documents-and-media-page");
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/documents-and-media-page");
 
 		DMDocument.viewDefault();
 	}
 
 	@description = "This ensures that the empty state displays when the preview file doesn't have anything previewable."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanPreviewEmptyState {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.doc",
@@ -2017,20 +1330,16 @@ definition {
 		for (var emptyStateInfo : list "No preview available,Hmm... looks like this item does not have a preview we can show you.") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_EMPTY_STATE_PREVIEW",
-				value1 = ${emptyStateInfo});
+				value1 = "${emptyStateInfo}");
 		}
 	}
 
 	@description = "This ensures that an image can be previewed through the original URL."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewImageThroughURL {
-		property portal.acceptance = "true";
-
 		var portalURL = PropsUtil.get("portal.url");
-		var siteId = JSONGroupAPI._getGroupIdByName(
-			groupName = "Guest",
-			site = "true");
+		var siteID = JSONGroupAPI._getGroupIdByName(groupName = "Guest", site = "true");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Document_1",
@@ -2040,15 +1349,15 @@ definition {
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteId}/0/Document_1");
+		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteID}/0/Document_1");
 
-		var key_imageSourceURL = "${portalURL}/documents/${siteId}/0/Document_1";
+		var key_imageSourceURL = "${portalURL}/documents/${siteID}/0/Document_1";
 
-		WaitForVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
+		AssertElementPresent.pauseAssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
 	}
 
 	@description = "This test covers LPS-104957. It ensures that the JPG file can be previewed."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewJPG {
 		property portal.acceptance = "true";
@@ -2075,115 +1384,37 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-88785."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewPDF {
 		property portal.acceptance = "true";
 
 		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "large_file_2.pdf",
+			dmDocumentTitle = "large_file.pdf",
 			groupName = "Guest",
 			mimeType = "application/pdf",
-			sourceFileName = "large_file_2.pdf");
+			sourceFileName = "large_file.pdf");
 
 		DMNavigator.openToEntryInAdmin(
-			dmDocumentTitle = "large_file_2.pdf",
+			dmDocumentTitle = "large_file.pdf",
 			groupName = "Guest",
 			siteURLKey = "guest");
 
-		while (IsElementPresent(key_infoMessage = "Generating preview will take a few minutes.", locator1 = "Message#INFO_SPECIFIC")) {
-			WaitForElementPresent.waitForLastScript();
+		while (IsElementPresent(key_infoMessage = "Generating preview will take a few minutes.", locator1 = "Message#INFO")) {
+			Pause(locator1 = "10000");
 
 			Refresh();
 		}
 
 		AssertVisible(
-			key_dmDocumentFileName = "large_file_2.pdf",
+			key_dmDocumentFileName = "large_file.pdf",
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
-
-		AssertConsoleTextNotPresent(value1 = "Unable to render preview for file version: large_file_2.pdf");
-
-		AssertVisible(
-			key_text = "caret-top",
-			locator1 = "Icon#ANY_DISABLED");
-
-		AssertVisible(
-			key_text = "caret-bottom",
-			locator1 = "Icon#ANY_ENABLED");
-	}
-
-	@description = "This test covers LPS-146237. It validates that a PDF can be previewed from the Recycle Bin."
-	@priority = 3
-	test CanPreviewPDFFromRecycleBin {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1.pdf",
-			groupName = "Guest",
-			mimeType = "application/pdf",
-			sourceFileName = "Document_1.pdf");
-
-		JSONDocument.moveToRecycleBin(
-			dmDocumentTitle = "Document_1.pdf",
-			groupName = "Guest");
-
-		RecycleBin.openRecycleBinAdmin(siteURLKey = "guest");
-
-		LexiconEntry.gotoEntry(rowEntry = "Document_1.pdf");
-
-		AssertVisible(
-			key_dmDocumentFileName = "Document_1.pdf",
-			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
-	}
-
-	@description = "This test covers LPS-148758. It ensures that a PDF without an extension can be previewed through the latest version URL."
-	@priority = 3
-	test CanPreviewPDFWithoutExtensionViaLatestVersionURL {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1.pdf",
-			groupName = "Guest",
-			mimeType = "application/pdf",
-			sourceFileName = "Document_1.pdf");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "pdf_no_extension",
-			groupName = "Guest",
-			mimeType = "application/pdf",
-			sourceFileName = "pdf_no_extension");
-
-		DMNavigator.openToEntryInAdmin(
-			dmDocumentTitle = "Document_1.pdf",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		var latestVersionURL = DMDocument.getLatestVersionURL();
-
-		Navigator.openSpecificURL(url = ${latestVersionURL});
-
-		AssertAttributeValue(
-			attribute1 = "baseURI",
-			locator1 = "//embed",
-			value1 = ${latestVersionURL});
-
-		DMNavigator.openToEntryInAdmin(
-			dmDocumentTitle = "pdf_no_extension",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		var latestVersionURL = DMDocument.getLatestVersionURL();
-
-		Navigator.openSpecificURL(url = ${latestVersionURL});
-
-		AssertAttributeValue(
-			attribute1 = "baseURI",
-			locator1 = "//embed",
-			value1 = ${latestVersionURL});
 	}
 
 	@description = "This test covers LPS-104957. It ensures that the PNG file can be previewed."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewPNG {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.png",
@@ -2206,7 +1437,7 @@ definition {
 	}
 
 	@description = "This ensures that the SVG file can be previewed."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewSVG {
 		property portal.acceptance = "true";
@@ -2233,13 +1464,12 @@ definition {
 	}
 
 	@description = "This test ensures that a document with special characters in its title can be published successfully."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPublishTitleWithSpecialCharacters {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -2253,17 +1483,17 @@ definition {
 		DMDocument.viewPG(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = '''/\<>:"?|*''',
-			escapedTitle = '''/\<>:"?|*''',
+			escapedTitle = '''/\&lt;&gt;:&#34;?|*''',
 			specialCharacters = "true");
 	}
 
 	@description = "This test ensures that the user can republish an expired document after disabling expiration date."
-	@priority = 4
+	@priority = "4"
 	test CanRepublishDocumentAfterDisablingExpirationDate {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
 		property test.name.skip.portal.instance = "DMFileEntry#CanRepublishDocumentAfterDisablingExpirationDate";
 
-		DMDocument.updateCheckInterval(fieldValue = 1);
+		DMDocument.updateCheckInterval(fieldValue = "2");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -2279,22 +1509,19 @@ definition {
 
 		DMDocument.setExpirationDate(
 			enableExpirationDate = "true",
-			increaseMinutes = 1);
+			increaseMinutes = "2");
+
+		Pause(locator1 = "120000");
 
 		Navigator.openURL();
 
-		Notifications.waitForNotificationFlexibly(flexibleRefreshingTime = 3000);
+		Notifications.gotoNotifications();
 
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_5.txt",
-			groupName = "Guest",
-			siteURLKey = "guest");
+		Notifications.navigateToContent(contentBody = "Document_5.txt");
 
 		DMDocument.publishExpiredDocument(
 			disableExpirationDate = "true",
 			dmDocumentTitle = "Document_5.txt");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.viewStatus(
 			dmDocumentStatus = "Approved",
@@ -2302,7 +1529,7 @@ definition {
 	}
 
 	@description = "This case covers LPS-97708. It ensures that a document can be restored from the Recycle Bin even if its original folder no longer exists."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanRestoreDocumentWithoutOriginalFolder {
 		JSONFolder.addFolder(
@@ -2318,12 +1545,13 @@ definition {
 			mimeType = "application/msword",
 			sourceFileName = "Document_1.doc");
 
-		JSONDocument.moveToRecycleBin(
+		JSONDocument.deleteFile(
 			dmDocumentTitle = "DM Document Title",
+			folderId = "true",
 			folderName = "DM Folder Name",
 			groupName = "Guest");
 
-		JSONFolder.moveFolderToTrash(
+		JSONFolder.deleteFolder(
 			folderName = "DM Folder Name",
 			groupName = "Guest");
 
@@ -2347,11 +1575,10 @@ definition {
 	}
 
 	@description = "This test checks if file uploads can be restricted to .doc format."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanRestrictFileExtensionToDoc {
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "DMFileEntry#CanRestrictFileExtensionToDoc";
+		property test.name.skip.portal.instance = "DocumentsadministrationUsecase#CanRestrictFileExtensionToDoc";
 
 		DMDocument.updateFileExtensions(fieldValue = ".doc");
 
@@ -2374,18 +1601,15 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 			DMDocument.addCP(
-				dmDocumentFile = ${dmDocumentTitle},
-				dmDocumentTitle = ${dmDocumentTitle},
+				dmDocumentFile = "${dmDocumentTitle}",
+				dmDocumentTitle = "${dmDocumentTitle}",
 				validationError = "Document names must end with one of the following extensions: .doc");
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanRevertToOriginal {
-		property custom.properties = "company.default.time.zone=America/Los_Angeles${line.separator}dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -2394,6 +1618,8 @@ definition {
 			sourceFileName = "Document_1.doc");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -2427,18 +1653,18 @@ definition {
 	}
 
 	@description = "This test ensures that the user can review a document when the date is changed."
-	@priority = 4
+	@priority = "4"
 	test CanReviewDocumentWhenDateIsChanged {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
 		property test.name.skip.portal.instance = "DMFileEntry#CanReviewDocumentWhenDateIsChanged";
 
-		DMDocument.updateCheckInterval(fieldValue = 1);
+		DMDocument.updateCheckInterval(fieldValue = "2");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_5.txt",
 			groupName = "Guest",
-			increaseMinutes = 10,
+			increaseMinutes = "10",
 			mimeType = "text/plain",
 			reviewDate = "true",
 			sourceFileName = "Document_5.txt");
@@ -2448,21 +1674,23 @@ definition {
 			groupName = "Guest",
 			siteURLKey = "guest");
 
-		DMDocument.setReviewDate(increaseMinutes = 1);
+		DMDocument.setReviewDate(increaseMinutes = "2");
 
 		Navigator.openURL();
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
+
+		Pause(locator1 = "120000");
 
 		Navigator.openURL();
 
-		Notifications.waitForNotificationFlexibly(flexibleRefreshingTime = 20000);
-
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		Notifications.gotoNotifications();
 
-		Notifications.viewReviewContent(contentBody = "Document_5.txt");
+		Notifications.viewReviewContent(
+			contentBody = "Document_5.txt",
+			user = "Test Test");
 
 		Notifications.navigateToContent(contentBody = "Document_5.txt");
 
@@ -2480,12 +1708,12 @@ definition {
 	}
 
 	@description = "This test ensures that the user can review a document when the date is disabled."
-	@priority = 4
+	@priority = "4"
 	test CanReviewDocumentWhenDateIsDisabled {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
 		property test.name.skip.portal.instance = "DMFileEntry#CanReviewDocumentWhenDateIsDisabled";
 
-		DMDocument.updateCheckInterval(fieldValue = 1);
+		DMDocument.updateCheckInterval(fieldValue = "2");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -2501,17 +1729,19 @@ definition {
 
 		DMDocument.setReviewDate(
 			enableReviewDate = "true",
-			increaseMinutes = 1);
+			increaseMinutes = "2");
+
+		Pause(locator1 = "120000");
 
 		Navigator.openURL();
 
-		Notifications.waitForNotificationFlexibly(flexibleRefreshingTime = 20000);
-
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		Notifications.gotoNotifications();
 
-		Notifications.viewReviewContent(contentBody = "Document_5.txt");
+		Notifications.viewReviewContent(
+			contentBody = "Document_5.txt",
+			user = "Test Test");
 
 		Notifications.navigateToContent(contentBody = "Document_5.txt");
 
@@ -2531,12 +1761,12 @@ definition {
 	}
 
 	@description = "This test ensures that the user can review a document when the date is set."
-	@priority = 5
+	@priority = "5"
 	test CanReviewDocumentWhenDateIsSet {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
 		property test.name.skip.portal.instance = "DMFileEntry#CanReviewDocumentWhenDateIsSet";
 
-		DMDocument.updateCheckInterval(fieldValue = 1);
+		DMDocument.updateCheckInterval(fieldValue = "1");
 
 		DMNavigator.openToAddEntry(
 			groupName = "Guest",
@@ -2549,17 +1779,19 @@ definition {
 
 		DMDocument.setReviewDate(
 			enableReviewDate = "true",
-			increaseMinutes = 1);
+			increaseMinutes = "2");
+
+		Pause(locator1 = "120000");
 
 		Navigator.openURL();
 
-		Notifications.waitForNotificationFlexibly(flexibleRefreshingTime = 20000);
-
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		Notifications.gotoNotifications();
 
-		Notifications.viewReviewContent(contentBody = "Document_2.txt");
+		Notifications.viewReviewContent(
+			contentBody = "Document_2.txt",
+			user = "Test Test");
 
 		Notifications.navigateToContent(contentBody = "Document_2.txt");
 
@@ -2577,11 +1809,9 @@ definition {
 	}
 
 	@description = "This test covers LPS-130154. It ensures that the user can search for a document based on the content."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanSearchForDocumentBasedOnContent {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_5.txt",
@@ -2599,11 +1829,9 @@ definition {
 	}
 
 	@description = "This ensures that the user can search for document file name using partial text."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanSearchForDocumentWithPartialText {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -2616,43 +1844,15 @@ definition {
 		DMDocument.viewSearchResultsCP(dmDocumentTitle = "DM Document Title");
 	}
 
-	@description = "This is a test for LPS-80857. It checks that the user will stay in the same folder context after filtering."
-	@priority = 3
-	test CanStayInFolderAfterFiltering {
-		JSONFolder.addFolder(
-			dmFolderDescription = "DM Folder Description",
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			folderName = "DM Folder Name",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		DMNavigator.openToFolderInAdmin(
-			dmFolderName = "DM Folder Name",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		ManagementBar.setFilterAndOrder(menuItem = "Recent");
-
-		DMDocument.viewStatus(
-			dmDocumentStatus = "Approved",
-			dmDocumentTitle = "DM Document Title");
-	}
-
 	@description = "This ensures that the user can create a document with edited display page template."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewDocumentWithEditedDisplayPageTemplate {
-		property portal.acceptance = "true";
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
 
-		DMNavigator.openDocumentTypesAdmin(siteURLKey = "test-site-name");
+		DMNavigator.gotoDocumentType();
 
 		DMDocumentType.add(
 			dmDocumentTypeDescription = "DM Document Type Description",
@@ -2706,11 +1906,11 @@ definition {
 			pageName = "Display Page Template Name",
 			siteURLKey = "test-site-name");
 
-		var dmFileEntryId = JSONDocument.getFileEntryId(
+		var dmFileEntryID = JSONDocument.getFileEntryId(
 			dmDocumentTitle = "Document_1.jpg",
 			groupName = "Test Site Name");
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/d/${dmFileEntryId}");
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/d/${dmFileEntryID}");
 
 		AssertVisible(
 			key_imageFileName = "Document_1.jpg",
@@ -2718,12 +1918,9 @@ definition {
 	}
 
 	@description = "This ensures that the user can create a document with the topic from the Global site."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewDocumentWithTopics {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONCategory.addCategory(
 			groupName = "Global",
 			title = "Apple",
@@ -2735,6 +1932,8 @@ definition {
 			vocabularyName = "Topic");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -2767,18 +1966,16 @@ definition {
 	}
 
 	@description = "This test ensures that the user can view an expired document."
-	@priority = 5
+	@priority = "5"
 	test CanViewExpiredDocument {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles";
 		property test.name.skip.portal.instance = "DMFileEntry#CanViewExpiredDocument";
 
-		DMDocument.updateCheckInterval(fieldValue = 1);
+		DMDocument.updateCheckInterval(fieldValue = "2");
 
 		DMNavigator.openToAddEntry(
 			groupName = "Guest",
 			siteURLKey = "guest");
-
-		WaitForPageLoad();
 
 		DMDocument.editDocument(
 			dmDocumentDescription = "DM Document Description",
@@ -2787,17 +1984,19 @@ definition {
 
 		DMDocument.setExpirationDate(
 			enableExpirationDate = "true",
-			increaseMinutes = 1);
+			increaseMinutes = "2");
+
+		Pause(locator1 = "120000");
 
 		Navigator.openURL();
 
-		Notifications.waitForNotificationFlexibly(flexibleRefreshingTime = 20000);
-
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		Notifications.gotoNotifications();
 
-		Notifications.viewExpiredContent(contentBody = "Document_1.txt");
+		Notifications.viewExpiredContent(
+			contentBody = "Document_1.txt",
+			user = "Test Test");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
@@ -2807,7 +2006,7 @@ definition {
 	}
 
 	@description = "This test ensures that a user who has content review permissions can see an expired document."
-	@priority = 4
+	@priority = "4"
 	test CanViewExpiredDocumentAsContentReviewer {
 		property custom.properties = "company.default.time.zone=America/Los_Angeles${line.separator}jsonws.web.service.paths.excludes=";
 		property test.name.skip.portal.instance = "DMFileEntry#CanViewExpiredDocumentAsContentReviewer";
@@ -2827,29 +2026,21 @@ definition {
 			roleTitle = "Portal Content Reviewer",
 			userEmailAddress = "userea@liferay.com");
 
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_5.txt",
-			groupName = "Guest",
-			mimeType = "text/plain",
-			sourceFileName = "Document_5.txt");
+		DMDocument.updateCheckInterval(fieldValue = "1");
 
-		DMDocument.updateCheckInterval(fieldValue = 1);
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_5.txt",
+		DMNavigator.openToAddEntry(
 			groupName = "Guest",
 			siteURLKey = "guest");
 
-		WaitForPageLoad();
+		DMDocument.editDocument(
+			dmDocumentFile = "Document_5.txt",
+			dmDocumentTitle = "Document_5.txt");
 
 		DMDocument.setExpirationDate(
 			enableExpirationDate = "true",
-			increaseMinutes = 1);
+			increaseMinutes = "2");
 
-		// We need to wait for the system time to pass by 2 minutes in order to verify the document is expired. There is currently no easy way to manipulate the system time in CI for automation. 2 minutes is the shortest value we can set while ensuring the stability of the test. See LPS-157957.
-
-		Pause(locator1 = 120000);
+		Pause(locator1 = "120000");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "userea@liferay.com",
@@ -2863,12 +2054,9 @@ definition {
 	}
 
 	@description = "This ensures that a user can view the information about an image when navigating to info panel."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewImageFromInfoPanel {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -2877,6 +2065,8 @@ definition {
 			sourceFileName = "Document_2.jpg");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -2889,11 +2079,9 @@ definition {
 	}
 
 	@description = "This ensures that the document title can be displayed correctly in the different views."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewInDifferentDisplayStyles {
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Document_2",
 			groupName = "Guest",
@@ -2921,12 +2109,9 @@ definition {
 			dmDocumentTitle = "Document_2");
 	}
 
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewOlderVersion {
-		property custom.properties = "dl.actions.visible=true";
-		property portal.acceptance = "true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
@@ -2935,6 +2120,8 @@ definition {
 			sourceFileName = "Document_1.doc");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
@@ -2955,11 +2142,9 @@ definition {
 	}
 
 	@description = "This ensures that the user can view the document through related assets."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanViewRelatedDocument {
-		property custom.properties = "dl.actions.visible=true";
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.doc",
@@ -2987,6 +2172,8 @@ definition {
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		DMNavigator.gotoRelatedAssetPG(
@@ -2998,252 +2185,8 @@ definition {
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
 	}
 
-	@description = "This is a test for LPS-145630. It checks that the DOCs linked in web articles content can be updated."
-	@priority = 4
-	test DocumentLinkedInWCCanBeUpdated {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1.doc",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		WebContentNavigator.openToAddBasicArticle(
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		PortletEntry.inputTitle(title = "Web Content Title");
-
-		CKEditor.addTextWithLink(
-			displayText = "Web Content Content",
-			dmDocumentTitle = "Document_1.doc",
-			fieldLabel = "Content");
-
-		PortletEntry.publish();
-
-		JSONLayout.addPublicLayout(
-			groupName = "Guest",
-			layoutName = "Test Page");
-
-		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Guest",
-			layoutName = "Test Page",
-			widgetName = "Web Content Display");
-
-		Navigator.gotoPage(pageName = "Test Page");
-
-		WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
-
-		IFrame.closeFrame();
-
-		Click(
-			key_portletName = "Web Content Display",
-			locator1 = "Portlet#BODY",
-			value1 = "Web Content Content");
-
-		DMDocument.assertDownloadedFileContent(
-			downloadedContent = "This is a *.doc file.",
-			fileName = "Document_1.doc");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.editCP(
-			dmDocumentFileEdit = "Document_2.doc",
-			dmDocumentFileNameEdit = "Document_2.doc",
-			dmDocumentTitle = "Document_1.doc",
-			dmDocumentTitleEdit = "Document_2.doc");
-
-		Navigator.gotoPage(pageName = "Test Page");
-
-		Click(
-			key_portletName = "Web Content Display",
-			locator1 = "Portlet#BODY",
-			value1 = "Web Content Content");
-
-		DMDocument.assertDownloadedFileContent(
-			downloadedContent = "This is a test document 2.",
-			fileName = "Document_2.doc");
-	}
-
-	@description = "This ensures that the friendly URL of a document created on a site will be updated automatically if it duplicates the existing one on the site."
-	@priority = 4
-	test FriendlyURLDuplicatingSiteDocIsAutomaticallyChanged {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		DMNavigator.openToAddEntry(
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.editDocument(
-			dmDocumentFile = "Document_2.doc",
-			dmDocumentTitle = "Document_2");
-
-		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1");
-
-		Alert.viewWarningSpecific(warningMessage = "Warning:The friendly URL document_1 was changed to document_1-1 to ensure uniqueness.");
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_2",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.viewEntryInEdit(friendlyURL = "document_1-1");
-	}
-
-	@description = "This ensures that the friendly URL of a document created on a site will be updated automatically if it duplicates the one in the recycle bin of the site."
-	@priority = 3
-	test FriendlyURLDuplicatingSiteRecycleBinDocIsAutomaticallyChanged {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.jpg");
-
-		JSONDocument.moveToRecycleBin(
-			dmDocumentTitle = "Document_1",
-			groupName = "Guest");
-
-		DMNavigator.openToAddEntry(
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.editDocument(
-			dmDocumentFile = "Document_2.jpg",
-			dmDocumentTitle = "Document_2");
-
-		DMDocument.editFriendlyURL(friendlyURLEdit = "document_1");
-
-		Alert.viewWarningSpecific(warningMessage = "Warning:The friendly URL document_1 was changed to document_1-1 to ensure uniqueness.");
-
-		DMNavigator.openToEditEntryInSite(
-			dmDocumentTitle = "Document_2",
-			groupName = "Guest",
-			siteURLKey = "guest");
-
-		DMDocument.viewEntryInEdit(friendlyURL = "document_1-1");
-	}
-
-	@description = "This test covers LPS-112571. It ensures that a gif file can be added to editor normally after disabling the gif mime type from the adaptive media of the system settings."
-	@priority = 3
-	@refactordone
-	test GifFileCanBeAddedToEditorAfterDisablingGifMimeTypeInAM {
-		property test.name.skip.portal.instance = "DMFileEntry#GifFileCanBeAddedToEditorAfterDisablingGifMimeTypeInAM";
-
-		SystemSettings.openSystemSettingsAdmin();
-
-		SystemSettings.gotoConfiguration(
-			configurationCategory = "Adaptive Media",
-			configurationName = "Images",
-			configurationScope = "System Scope");
-
-		Click(
-			key_fieldValue = "image/gif",
-			locator1 = "DDMField#REMOVE_SPECIFIC_REPEATED_FIELD");
-
-		SystemSettings.saveConfiguration();
-
-		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
-
-		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
-
-		BlogsEntry.addContentWithInlineImage(
-			entryContent = "Blogs Entry Content",
-			navTab = "Documents and Media",
-			uploadFileName = "static.gif");
-
-		PortletEntry.publish();
-
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
-
-		BlogsEntry.viewInlineImage(uploadFileName = "static-gif");
-	}
-
-	@description = "This test covers LPS-157175. Check that there is no corrupted filename on downloaded folder."
-	@priority = 3
-	test NoCorruptedNameInDownloadedZip {
-		JSONFolder.addFolder(
-			dmFolderName = "日本語フォルダ1",
-			groupName = "Guest");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_1.doc",
-			folderName = "日本語フォルダ1",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		JSONFolder.addFolder(
-			dmFolderName = "日本語フォルダ2",
-			groupName = "Guest",
-			parentFolderName = "日本語フォルダ1");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "Document_2.doc",
-			folderName = "日本語フォルダ2",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			parentFolderName = "日本語フォルダ1",
-			sourceFileName = "Document_2.doc");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "Guest");
-
-		DMFolder.downloadViaEllipsisMenu(dmFolderName = "日本語フォルダ1");
-
-		AntCommand(
-			locator1 = "build-test.xml",
-			value1 = "unzip-temp-file -DfileName=日本語フォルダ1.zip");
-
-		DMFolder.assertExpectedFileNames(key_fileName = "日本語フォルダ1.zip");
-
-		DMFolder.assertExpectedFileNames(key_fileName = "Document_1.doc");
-
-		DMFolder.assertExpectedFileNames(key_fileName = "日本語フォルダ2");
-
-		DMFolder.assertExpectedFileNames(key_fileName = "日本語フォルダ2/Document_2.doc");
-
-		DMFolder.assertExpectedFileNumber(
-			expectedFileNumber = 3,
-			key_folder = "");
-
-		DMFolder.assertExpectedFileNumber(
-			expectedFileNumber = 1,
-			key_folder = "/日本語フォルダ2");
-	}
-
-	@description = "This test covers LPS-144687. It validates that a temp zip is not created if NoSuchFileException occurs during a download."
-	@priority = 4
-	test NoZipFileIsCreatedIfDownloadResultsInError {
-		DMDocument.deleteTempFolder(appServer = "tomcat-9.0.73");
-
-		for (var num : list "1,2,3") {
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentDescription = "DM Document Description",
-				dmDocumentTitle = "DM Document Title${num}",
-				groupName = "Guest",
-				mimeType = "application/msword",
-				sourceFileName = "Document_${num}.doc");
-		}
-
-		DMDocument.deleteDocumentLibraryFolder();
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.downloadMultipleCP(dmDocumentTitleList = "DM Document Title1,DM Document Title2,DM Document Title3");
-
-		AssertConsoleTextPresent(value1 = "com.liferay.document.library.kernel.exception.NoSuchFileException");
-
-		DMDocument.assertNoZipFileFromTempFolder(
-			appServer = "tomcat-9.0.73",
-			fileNamePattern = "*.zip");
-	}
-
 	@description = "This test covers LPS-101667. It makes sure that the file size can be displayed correctly in the different versions after editing the document file."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test SizeIsDisplayedCorrectlyInDifferentVersions {
 		JSONDocument.addFileWithUploadedFile(
@@ -3277,106 +2220,36 @@ definition {
 			dmDocumentVersionNumber = "2.0");
 	}
 
-	@description = "This a ticket for LPS-154955. Verify tree image is available when Liferay is deployed. Skip the instance for performance improvement."
-	@priority = 4
-	test VerifyTreeImageIsAvailable {
-		property test.name.skip.portal.instance = "DMFileEntry#VerifyTreeImageIsAvailable";
-
-		task ("Go to Documents and Media Settings") {
-			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-		}
-
-		task ("Verify tree image is available and selectable") {
-			DMNavigator.gotoFolder(dmFolderName = "Provided by Liferay");
-
-			AssertElementPresent(
-				key_dmDocumentTitle = "tree.png",
-				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX");
-		}
-	}
-
-	@description = "This is a test for LPS-94829. It ensures that the wildcard can be defined with other file extensions."
-	@priority = 4
-	test WildcardCanBeDefinedWithOtherFileExtensions {
-		property test.name.skip.portal.instance = "DMFileEntry#WildcardCanBeDefinedWithOtherFileExtensions";
-
-		DMDocument.updateFileExtensions(
-			fieldValue = ".doc",
-			indexNumber = 2);
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_1.doc",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_2.jpg",
-			groupName = "Guest",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_2.jpg");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		for (var dmDocumentTitleList : list "Document_2.jpg,Document_1.doc") {
-			DMDocument.viewStatus(
-				dmDocumentStatus = "Approved",
-				dmDocumentTitle = ${dmDocumentTitleList});
-		}
-	}
-
-	@description = "This test ensures that a document with forbidden characters in the filename can not be published successfully."
-	@priority = 5
+	@description = "This is a use case for LPS-50760."
+	@priority = "4"
 	@refactordone
-	test WillRejectForbiddenCharactersInFileName {
-		property portal.acceptance = "true";
+	test StagingFileSizeIsNotAffectedByDLRestrictions {
+		property test.name.skip.portal.instance = "DocumentsadministrationUsecase#StagingFileSizeIsNotAffectedByDLRestrictions";
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Guest",
+			mimeType = "audio/x-mpeg",
+			sourceFileName = "Document_1.mp3");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMDocument.addCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentFileName = '''Document_1''',
-			dmDocumentTitle = "DM Document Title",
-			emptyFileNameRestriction = "true");
+		LAR.exportPortlet(larFileName = "DM.portlet.lar");
+
+		DMDocument.updateMaximumFileSize(fieldValue = "300000");
+
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMDocument.addCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentFileName = "",
-			dmDocumentTitle = "DM Document Title",
-			emptyFileNameRestriction = "true");
+		LAR._gotoExportImport();
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+		AssertElementPresent(locator1 = "IFrame#MODAL_BODY");
 
-		DMDocument.addCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.jpg",
-			dmDocumentFileName = '''\\\///.jpg''',
-			dmDocumentTitle = "DM Document Title",
-			validateFileNameRestriction = "true");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.addCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.txt",
-			dmDocumentFileName = '''<>.txt''',
-			dmDocumentTitle = "DM Document Title",
-			validateFileNameRestriction = "true");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.addCP(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.doc",
-			dmDocumentFileName = ''':"?.doc''',
-			dmDocumentTitle = "DM Document Title",
-			validateFileNameRestriction = "true");
+		LAR._export(
+			exportPermissions = "${exportPermissions}",
+			larFileName = "DM.portlet.lar");
 	}
 
 }

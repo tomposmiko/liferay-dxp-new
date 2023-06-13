@@ -15,7 +15,6 @@
 package com.liferay.adaptive.media.image.internal.util;
 
 import com.liferay.adaptive.media.exception.AMRuntimeException;
-import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.ImageResolutionException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -99,15 +98,13 @@ public class RenderedImageUtil {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 			finally {
 				if (imageReader != null) {
 					imageReader.dispose();
 				}
-
-				StreamUtil.cleanUp(imageInputStream, inputStream);
 			}
 		}
 

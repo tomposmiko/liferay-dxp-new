@@ -30,10 +30,6 @@ public class JournalFolderLocalServiceWrapper
 	implements JournalFolderLocalService,
 			   ServiceWrapper<JournalFolderLocalService> {
 
-	public JournalFolderLocalServiceWrapper() {
-		this(null);
-	}
-
 	public JournalFolderLocalServiceWrapper(
 		JournalFolderLocalService journalFolderLocalService) {
 
@@ -42,14 +38,13 @@ public class JournalFolderLocalServiceWrapper
 
 	@Override
 	public JournalFolder addFolder(
-			String externalReferenceCode, long userId, long groupId,
-			long parentFolderId, String name, String description,
+			long userId, long groupId, long parentFolderId, String name,
+			String description,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalFolderLocalService.addFolder(
-			externalReferenceCode, userId, groupId, parentFolderId, name,
-			description, serviceContext);
+			userId, groupId, parentFolderId, name, description, serviceContext);
 	}
 
 	/**
@@ -298,15 +293,6 @@ public class JournalFolderLocalServiceWrapper
 		return _journalFolderLocalService.fetchJournalFolder(folderId);
 	}
 
-	@Override
-	public JournalFolder fetchJournalFolderByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
-
-		return _journalFolderLocalService.
-			fetchJournalFolderByExternalReferenceCode(
-				externalReferenceCode, groupId);
-	}
-
 	/**
 	 * Returns the journal folder matching the UUID and group.
 	 *
@@ -513,16 +499,6 @@ public class JournalFolderLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalFolderLocalService.getJournalFolder(folderId);
-	}
-
-	@Override
-	public JournalFolder getJournalFolderByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _journalFolderLocalService.
-			getJournalFolderByExternalReferenceCode(
-				externalReferenceCode, groupId);
 	}
 
 	/**

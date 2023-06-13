@@ -21,6 +21,7 @@ import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
+import com.liferay.commerce.price.CommerceProductPriceCalculation;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.product.util.CPInstanceHelper;
@@ -42,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Marco Leo
- * @author Alessio Antonio Rendina
  */
 public class CommerceCartContentMiniDisplayContext
 	extends CommerceCartContentDisplayContext {
@@ -53,6 +53,7 @@ public class CommerceCartContentMiniDisplayContext
 			CommerceOrderItemService commerceOrderItemService,
 			CommerceOrderPriceCalculation commerceOrderPriceCalculation,
 			CommerceOrderValidatorRegistry commerceOrderValidatorRegistry,
+			CommerceProductPriceCalculation commerceProductPriceCalculation,
 			CPDefinitionHelper cpDefinitionHelper,
 			CPInstanceHelper cpInstanceHelper,
 			ModelResourcePermission<CommerceOrder>
@@ -66,7 +67,8 @@ public class CommerceCartContentMiniDisplayContext
 			commerceChannelLocalService, commerceOrderItemService,
 			commerceOrderModelResourcePermission, commerceOrderPriceCalculation,
 			commerceOrderValidatorRegistry,
-			commerceProductPortletResourcePermission, cpDefinitionHelper,
+			commerceProductPortletResourcePermission,
+			commerceProductPriceCalculation, cpDefinitionHelper,
 			cpInstanceHelper, httpServletRequest, portal);
 
 		PortletDisplay portletDisplay =

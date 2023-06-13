@@ -287,11 +287,6 @@ public class UserIdMapperWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected UserIdMapperWrapper wrap(UserIdMapper userIdMapper) {
 		return new UserIdMapperWrapper(userIdMapper);
 	}

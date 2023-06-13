@@ -21,7 +21,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -32,14 +32,17 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.ReadOnlyException;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + IFramePortletKeys.IFRAME,
 	service = ConfigurationAction.class
 )
@@ -62,7 +65,7 @@ public class IFrameConfigurationAction extends DefaultConfigurationAction {
 			!StringUtil.startsWith(src, "https://") &&
 			!StringUtil.startsWith(src, "mhtml://")) {
 
-			src = HttpComponentsUtil.getProtocol(actionRequest) + "://" + src;
+			src = _http.getProtocol(actionRequest) + "://" + src;
 
 			setPreference(actionRequest, "src", src);
 		}
@@ -84,6 +87,14 @@ public class IFrameConfigurationAction extends DefaultConfigurationAction {
 		}
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.iframe.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
@@ -109,5 +120,8 @@ public class IFrameConfigurationAction extends DefaultConfigurationAction {
 			}
 		}
 	}
+
+	@Reference
+	private Http _http;
 
 }

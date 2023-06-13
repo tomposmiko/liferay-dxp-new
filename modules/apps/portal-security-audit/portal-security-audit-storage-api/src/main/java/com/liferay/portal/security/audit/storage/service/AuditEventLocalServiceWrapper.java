@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class AuditEventLocalServiceWrapper
 	implements AuditEventLocalService, ServiceWrapper<AuditEventLocalService> {
 
-	public AuditEventLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AuditEventLocalServiceWrapper(
 		AuditEventLocalService auditEventLocalService) {
 

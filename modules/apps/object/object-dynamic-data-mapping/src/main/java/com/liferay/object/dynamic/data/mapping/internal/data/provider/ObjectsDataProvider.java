@@ -21,7 +21,6 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -35,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gabriel Albuquerque
  */
 @Component(
-	property = "ddm.data.provider.instance.id=objects",
+	immediate = true, property = "ddm.data.provider.instance.id=objects",
 	service = DDMDataProvider.class
 )
 public class ObjectsDataProvider implements DDMDataProvider {
@@ -51,21 +50,10 @@ public class ObjectsDataProvider implements DDMDataProvider {
 
 			List<KeyValuePair> keyValuePairs = new ArrayList<>();
 
-			List<ObjectDefinition> objectDefinitions = null;
-
-			if (FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
-				objectDefinitions =
-					_objectDefinitionLocalService.
-						getModifiableObjectDefinitions(
-							ddmDataProviderRequest.getCompanyId(), true,
-							WorkflowConstants.STATUS_APPROVED);
-			}
-			else {
-				objectDefinitions =
-					_objectDefinitionLocalService.getObjectDefinitions(
-						ddmDataProviderRequest.getCompanyId(), true, false,
-						WorkflowConstants.STATUS_APPROVED);
-			}
+			List<ObjectDefinition> objectDefinitions =
+				_objectDefinitionLocalService.getObjectDefinitions(
+					ddmDataProviderRequest.getCompanyId(), true, false,
+					WorkflowConstants.STATUS_APPROVED);
 
 			for (ObjectDefinition objectDefinition : objectDefinitions) {
 				keyValuePairs.add(

@@ -27,12 +27,15 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(property = "model.class.name=*", service = AssetEntryValidator.class)
+@Component(
+	immediate = true, property = "model.class.name=*",
+	service = AssetEntryValidator.class
+)
 public class AtLeastOneTagAssetEntryValidator implements AssetEntryValidator {
 
 	@Override
 	public void validate(
-			long groupId, String className, long classPK, long classTypePK,
+			long groupId, String className, long classTypePK,
 			long[] categoryIds, String[] tagNames)
 		throws PortalException {
 

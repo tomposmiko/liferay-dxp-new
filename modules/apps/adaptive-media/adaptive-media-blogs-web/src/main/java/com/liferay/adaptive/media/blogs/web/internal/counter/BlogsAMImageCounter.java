@@ -33,7 +33,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
-	property = "adaptive.media.key=blogs", service = AMImageCounter.class
+	immediate = true, property = "adaptive.media.key=blogs",
+	service = AMImageCounter.class
 )
 public class BlogsAMImageCounter implements AMImageCounter {
 
@@ -48,10 +49,10 @@ public class BlogsAMImageCounter implements AMImageCounter {
 		Property classNameIdProperty = PropertyFactoryUtil.forName(
 			"classNameId");
 
-		dynamicQuery.add(
-			classNameIdProperty.eq(
-				_classNameLocalService.getClassNameId(
-					BlogsEntry.class.getName())));
+		long classNameId = _classNameLocalService.getClassNameId(
+			BlogsEntry.class.getName());
+
+		dynamicQuery.add(classNameIdProperty.eq(classNameId));
 
 		Property mimeTypeProperty = PropertyFactoryUtil.forName("mimeType");
 

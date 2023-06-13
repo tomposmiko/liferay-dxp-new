@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = ListObjectReferenceFactory.class)
+@Component(immediate = true, service = ListObjectReferenceFactory.class)
 public class AssetEntryListListObjectReferenceFactory
 	implements ListObjectReferenceFactory<InfoListItemSelectorReturnType> {
 

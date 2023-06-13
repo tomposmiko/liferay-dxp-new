@@ -16,9 +16,7 @@ package com.liferay.commerce.tax.engine.fixed.service.persistence.impl;
 
 import com.liferay.commerce.tax.engine.fixed.model.CommerceTaxFixedRateAddressRel;
 import com.liferay.commerce.tax.engine.fixed.service.persistence.CommerceTaxFixedRateAddressRelPersistence;
-import com.liferay.commerce.tax.engine.fixed.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  * @generated
  */
-public abstract class CommerceTaxFixedRateAddressRelFinderBaseImpl
+public class CommerceTaxFixedRateAddressRelFinderBaseImpl
 	extends BasePersistenceImpl<CommerceTaxFixedRateAddressRel> {
 
 	public CommerceTaxFixedRateAddressRelFinderBaseImpl() {
@@ -51,36 +45,35 @@ public abstract class CommerceTaxFixedRateAddressRelFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commerceTaxFixedRateAddressRelPersistence.getBadColumnNames();
+		return getCommerceTaxFixedRateAddressRelPersistence().
+			getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce tax fixed rate address rel persistence.
+	 *
+	 * @return the commerce tax fixed rate address rel persistence
+	 */
+	public CommerceTaxFixedRateAddressRelPersistence
+		getCommerceTaxFixedRateAddressRelPersistence() {
+
+		return commerceTaxFixedRateAddressRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce tax fixed rate address rel persistence.
+	 *
+	 * @param commerceTaxFixedRateAddressRelPersistence the commerce tax fixed rate address rel persistence
+	 */
+	public void setCommerceTaxFixedRateAddressRelPersistence(
+		CommerceTaxFixedRateAddressRelPersistence
+			commerceTaxFixedRateAddressRelPersistence) {
+
+		this.commerceTaxFixedRateAddressRelPersistence =
+			commerceTaxFixedRateAddressRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommerceTaxFixedRateAddressRelPersistence.class)
 	protected CommerceTaxFixedRateAddressRelPersistence
 		commerceTaxFixedRateAddressRelPersistence;
 

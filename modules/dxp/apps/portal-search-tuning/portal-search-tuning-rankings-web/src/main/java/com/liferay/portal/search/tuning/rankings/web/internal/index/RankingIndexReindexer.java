@@ -66,8 +66,8 @@ public class RankingIndexReindexer implements IndexReindexer {
 			}
 			catch (RuntimeException runtimeException) {
 				_log.error(
-					"Unable to delete index " + rankingIndexName.getIndexName(),
-					runtimeException);
+					"Unable to delete index " +
+						rankingIndexName.getIndexName());
 			}
 
 			rankingIndexCreator.create(rankingIndexName);

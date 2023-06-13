@@ -15,7 +15,7 @@
 package com.liferay.layout.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.layout.exception.NoSuchLayoutClassedModelUsageException;
+import com.liferay.layout.exception.NoSuchClassedModelUsageException;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalServiceUtil;
 import com.liferay.layout.service.persistence.LayoutClassedModelUsagePersistence;
@@ -253,29 +253,20 @@ public class LayoutClassedModelUsagePersistenceTest {
 	}
 
 	@Test
-	public void testCountByCN_CPK() throws Exception {
-		_persistence.countByCN_CPK(
+	public void testCountByC_C() throws Exception {
+		_persistence.countByC_C(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
-		_persistence.countByCN_CPK(0L, 0L);
+		_persistence.countByC_C(0L, 0L);
 	}
 
 	@Test
-	public void testCountByC_CN_CT() throws Exception {
-		_persistence.countByC_CN_CT(
-			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
-			RandomTestUtil.nextLong());
-
-		_persistence.countByC_CN_CT(0L, 0L, 0L);
-	}
-
-	@Test
-	public void testCountByCN_CPK_T() throws Exception {
-		_persistence.countByCN_CPK_T(
+	public void testCountByC_C_T() throws Exception {
+		_persistence.countByC_C_T(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
 			RandomTestUtil.nextInt());
 
-		_persistence.countByCN_CPK_T(0L, 0L, 0);
+		_persistence.countByC_C_T(0L, 0L, 0);
 	}
 
 	@Test
@@ -289,14 +280,14 @@ public class LayoutClassedModelUsagePersistenceTest {
 	}
 
 	@Test
-	public void testCountByCN_CPK_CK_CT_P() throws Exception {
-		_persistence.countByCN_CPK_CK_CT_P(
+	public void testCountByC_C_CK_CT_P() throws Exception {
+		_persistence.countByC_C_CK_CT_P(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(), "",
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
-		_persistence.countByCN_CPK_CK_CT_P(0L, 0L, "null", 0L, 0L);
+		_persistence.countByC_C_CK_CT_P(0L, 0L, "null", 0L, 0L);
 
-		_persistence.countByCN_CPK_CK_CT_P(0L, 0L, (String)null, 0L, 0L);
+		_persistence.countByC_C_CK_CT_P(0L, 0L, (String)null, 0L, 0L);
 	}
 
 	@Test
@@ -312,7 +303,7 @@ public class LayoutClassedModelUsagePersistenceTest {
 			existingLayoutClassedModelUsage, newLayoutClassedModelUsage);
 	}
 
-	@Test(expected = NoSuchLayoutClassedModelUsageException.class)
+	@Test(expected = NoSuchClassedModelUsageException.class)
 	public void testFindByPrimaryKeyMissing() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 

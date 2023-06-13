@@ -16,21 +16,20 @@ package com.liferay.blogs.internal.trash;
 
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.trash.BaseTrashHandler;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.constants.TrashActionKeys;
 
 import javax.portlet.PortletRequest;
@@ -68,7 +67,7 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 		BlogsEntry entry = _blogsEntryLocalService.getEntry(classPK);
 
 		return PortletURLBuilder.create(
-			_getRestoreURL(portletRequest, classPK, false)
+			getRestoreURL(portletRequest, classPK, false)
 		).setParameter(
 			"entryId", entry.getEntryId()
 		).setParameter(
@@ -81,7 +80,7 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 			PortletRequest portletRequest, long classPK)
 		throws PortalException {
 
-		PortletURL portletURL = _getRestoreURL(portletRequest, classPK, true);
+		PortletURL portletURL = getRestoreURL(portletRequest, classPK, true);
 
 		return portletURL.toString();
 	}
@@ -114,7 +113,7 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 			return false;
 		}
 
-		return !_trashHelper.isInTrashContainer(entry);
+		return !entry.isInTrashContainer();
 	}
 
 	@Override
@@ -124,16 +123,7 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 		_blogsEntryLocalService.restoreEntryFromTrash(userId, classPK);
 	}
 
-	@Override
-	protected boolean hasPermission(
-			PermissionChecker permissionChecker, long classPK, String actionId)
-		throws PortalException {
-
-		return _blogsEntryModelResourcePermission.contains(
-			permissionChecker, classPK, actionId);
-	}
-
-	private PortletURL _getRestoreURL(
+	protected PortletURL getRestoreURL(
 			PortletRequest portletRequest, long classPK, boolean containerModel)
 		throws PortalException {
 
@@ -165,6 +155,15 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 		return portletURL;
 	}
 
+	@Override
+	protected boolean hasPermission(
+			PermissionChecker permissionChecker, long classPK, String actionId)
+		throws PortalException {
+
+		return _blogsEntryModelResourcePermission.contains(
+			permissionChecker, classPK, actionId);
+	}
+
 	@Reference
 	private BlogsEntryLocalService _blogsEntryLocalService;
 
@@ -174,8 +173,5 @@ public class BlogsEntryTrashHandler extends BaseTrashHandler {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private TrashHelper _trashHelper;
 
 }

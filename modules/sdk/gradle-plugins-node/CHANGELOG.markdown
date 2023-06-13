@@ -1,121 +1,5 @@
 # Liferay Gradle Plugins Node Change Log
 
-## 8.0.0 - 2022-07-15
-
-### Dependencies
-- [LPS-51081] Update the com.liferay.gradle.util dependency to version 1.0.47.
-
-## 7.2.20 - 2022-07-15
-
-### Commits
-- [LPS-51081] Apply (52ec5f96e8)
-- [LPS-51081] Rename package (9d145e2f47)
-
-## 7.2.19 - 2022-05-19
-
-### Commits
-- [LPS-148304] Optional annotation (see
-https://github.com/gradle/gradle/issues/2016) (898ff2e76c)
-
-## 7.2.18 - 2022-05-17
-
-### Commits
-- [LPS-148304] Source formatting (4fb7c59d38)
-- [LPS-148304] Update ExecuteNodeTask.java (788701e0d4)
-- [LPS-148304] Update ExecutePackageManagerTask.java (6129b00477)
-
-## 7.2.17 - 2022-05-14
-
-### Commits
-- [LPS-148304] Use Yarn's internal cache check (b3d7b0c0f9)
-- [LPS-148304] Update annotation (tasks that extends this class will need to add
-inputs as needed, as an example see PackageRunBuildTask) (c379274f8a)
-- [LPS-148304] Add missing import (5d291710a4)
-- [LPS-148304] Edit annotation (d133edc943)
-- [LPS-148304] Add annotation (0ecfc483d0)
-- [LPS-148304] Add annotations to ExecuteNodeTask (536af04b92)
-- [LPS-148304] Add annotations to ExecutePackageManagerTask (e8ce449310)
-- [LPS-148304] Add annotations to ExecuteNodeScriptTask (16fd256457)
-- [LPS-150378] SF, inline (15a4ebdc1f)
-
-## 7.2.16 - 2022-03-22
-
-### Commits
-- [LPS-149634] as used (f59385be2b)
-- [LPS-149634] node osx arm builds are only available for node 16+ so download
-fails for node < 15 (38a2445b3d)
-
-## 7.2.15 - 2022-02-04
-
-### Commits
-- [LPS-146791] sort (e3c717f8ef)
-- [LPS-146791] - Add --ignore-engines flag to yarnInstall task (06db76a25e)
-
-## 7.2.14 - 2022-01-03
-
-### Commits
-- [LPS-144756] yarn/npm now requires access token to publish (5f10d18aa9)
-
-## 7.2.13 - 2022-01-03
-
-### Commits
-- [LPS-144575] Set publish registry url (bac2e5160e)
-
-## 7.2.12 - 2022-01-03
-
-### Commits
-- [LPS-144575] Revert "LPS-144575 Set publish registry url" (1ec9c28a31)
-
-### Dependencies
-- [LRCI-2670] Update the com.liferay.gradle.util dependency to version 1.0.46.
-
-## 7.2.11 - 2021-12-29
-
-### Commits
-- [LPS-144575] Set publish registry url (7b0a1c7c46)
-
-## 7.2.10 - 2021-12-02
-
-### Commits
-- [LPS-143280] use arm arch (81c79fa7db)
-
-### Dependencies
-- [LPS-143280] Update the com.liferay.gradle.util dependency to version 1.0.45.
-
-## 7.2.9 - 2021-11-17
-
-### Commits
-- [LPS-142100] [LPS-141250] revert (eee87baefd)
-
-## 7.2.8 - 2021-11-17
-
-### Commits
-- [LPS-105380] Remove final from parameters (a4e6ca0985)
-- [LPS-105380] Remove final from variables (5a4e0b26b4)
-- [LPS-105380] Revert "LPS-105380 Remove final from variables" (cdda76fc8e)
-- [LPS-105380] Revert "LPS-105380 Remove final from parameters" (b2f9eed2c2)
-- [LPS-105380] Remove final from parameters (f615ff77ff)
-- [LPS-105380] Remove final from variables (ffe6186e71)
-- [LPS-105380] Merge consecutive if-statements (1ec70acda6)
-- [LPS-105380] Increase performance by moving variable declaration after throw
-statement (444d3bb171)
-
-## 7.2.7 - 2021-05-24
-
-### Commits
-- [LPS-106149] Use Gradle incremental cache check (97365d9a4c)
-- [LPS-130505] Revert "LPS-130505 SF, no need to call methods" (a442601c7a)
-- [LPS-130505] Revert "LPS-130505 SF, no need to call methods" (5bbb659cb8)
-- [LPS-130505] SF, no need to call methods (18d35dc2bb)
-- [LPS-130505] SF, no need to call methods (635298fad3)
-
-## 7.2.6 - 2021-03-29
-
-### Commits
-- [LPS-129858] Add excludes for package.json build outputs (f7d4593da4)
-- [LPS-127478] Document yarnUrl extension in NodePlugin (a68a22b757)
-- [LPS-105380] Inline (e47639f436)
-
 ## 7.2.5 - 2020-11-02
 
 ### Commits
@@ -1121,7 +1005,7 @@ following conditions are met:
 ## 1.0.21 - 2016-08-15
 
 ### Commits
-- [LPS-66906] Stop retrying if Node.js completed succesfully (490ff7c860)
+- [LPS-66906] Stop retrying if Node.js completed successfully (490ff7c860)
 
 ## 1.0.20 - 2016-08-11
 
@@ -1393,19 +1277,6 @@ symbolic links in it will be lost (0a1438b324)
 [LPS-115020]: https://issues.liferay.com/browse/LPS-115020
 [LPS-116808]: https://issues.liferay.com/browse/LPS-116808
 [LPS-121567]: https://issues.liferay.com/browse/LPS-121567
-[LPS-127478]: https://issues.liferay.com/browse/LPS-127478
-[LPS-129858]: https://issues.liferay.com/browse/LPS-129858
-[LPS-130505]: https://issues.liferay.com/browse/LPS-130505
-[LPS-141250]: https://issues.liferay.com/browse/LPS-141250
-[LPS-142100]: https://issues.liferay.com/browse/LPS-142100
-[LPS-143280]: https://issues.liferay.com/browse/LPS-143280
-[LPS-144575]: https://issues.liferay.com/browse/LPS-144575
-[LPS-144756]: https://issues.liferay.com/browse/LPS-144756
-[LPS-146791]: https://issues.liferay.com/browse/LPS-146791
-[LPS-148304]: https://issues.liferay.com/browse/LPS-148304
-[LPS-149634]: https://issues.liferay.com/browse/LPS-149634
-[LPS-150378]: https://issues.liferay.com/browse/LPS-150378
-[LRCI-2670]: https://issues.liferay.com/browse/LRCI-2670
 [LRDOCS-3663]: https://issues.liferay.com/browse/LRDOCS-3663
 [LRDOCS-4129]: https://issues.liferay.com/browse/LRDOCS-4129
 [LRQA-52072]: https://issues.liferay.com/browse/LRQA-52072

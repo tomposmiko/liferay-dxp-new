@@ -25,7 +25,7 @@ import com.liferay.document.library.video.external.shortcut.resolver.DLVideoExte
 import com.liferay.document.library.video.internal.constants.DLVideoConstants;
 import com.liferay.document.library.video.internal.helper.DLVideoExternalShortcutMetadataHelper;
 import com.liferay.document.library.video.internal.helper.DLVideoExternalShortcutMetadataHelperFactory;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
-	property = "service.ranking:Integer=-100",
+	immediate = true, property = "service.ranking:Integer=-100",
 	service = DLDisplayContextFactory.class
 )
 public class DLVideoExternalShortcutDLDisplayContextFactory

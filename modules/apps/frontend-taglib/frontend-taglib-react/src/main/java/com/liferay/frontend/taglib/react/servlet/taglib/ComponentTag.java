@@ -15,7 +15,8 @@
 package com.liferay.frontend.taglib.react.servlet.taglib;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolvedPackageNameUtil;
-import com.liferay.frontend.taglib.react.servlet.taglib.util.ServicesProvider;
+import com.liferay.frontend.js.module.launcher.JSModuleResolver;
+import com.liferay.frontend.taglib.react.internal.util.ServicesProvider;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -76,10 +77,6 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 	}
 
 	public String getModule() {
-		if (_module.contains(" from ")) {
-			return _module;
-		}
-
 		return StringBundler.concat(getNamespace(), "/", _module);
 	}
 
@@ -139,7 +136,15 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 			servletContext = getServletContext();
 		}
 
-		return NPMResolvedPackageNameUtil.get(servletContext);
+		try {
+			return NPMResolvedPackageNameUtil.get(servletContext);
+		}
+		catch (UnsupportedOperationException unsupportedOperationException) {
+			JSModuleResolver jsModuleResolver =
+				ServicesProvider.getJSModuleResolver();
+
+			return jsModuleResolver.resolveModule(servletContext, null);
+		}
 	}
 
 	protected Map<String, Object> getProps() {

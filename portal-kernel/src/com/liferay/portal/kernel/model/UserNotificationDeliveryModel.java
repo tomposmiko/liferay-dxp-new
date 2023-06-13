@@ -221,8 +221,4 @@ public interface UserNotificationDeliveryModel
 	@Override
 	public UserNotificationDelivery cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

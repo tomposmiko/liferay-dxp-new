@@ -407,8 +407,4 @@ public interface EntryModel
 	@Override
 	public Entry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

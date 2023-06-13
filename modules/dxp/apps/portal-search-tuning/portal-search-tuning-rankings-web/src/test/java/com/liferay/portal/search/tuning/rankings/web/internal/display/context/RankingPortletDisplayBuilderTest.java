@@ -17,7 +17,6 @@ package com.liferay.portal.search.tuning.rankings.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.tuning.rankings.web.internal.BaseRankingsWebTestCase;
@@ -26,7 +25,6 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -38,6 +36,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -52,26 +51,26 @@ public class RankingPortletDisplayBuilderTest extends BaseRankingsWebTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		setUpPortletPreferencesFactoryUtil();
+		super.setUp();
 
 		_rankingPortletDisplayBuilder = new RankingPortletDisplayBuilder(
 			_documentToRankingTranslator, _httpServletRequest, language, portal,
 			queries, rankingIndexNameBuilder, _sorts, _renderRequest,
-			_renderResponse, searchEngineAdapter, _searchEngineInformation);
+			_renderResponse, searchEngineAdapter);
 	}
 
 	@Test
 	public void testBuild() throws Exception {
-		setUpHttpServletRequestParamValue(
-			_httpServletRequest, "displayStyle", "displayStyle");
-		setUpHttpServletRequestParamValue(
-			_httpServletRequest, "orderByType", "desc");
+		setUpHttpServletRequestAttribute(
+			_httpServletRequest, "orderByType", "asc");
 		setUpHttpServletRequestAttribute(
 			_httpServletRequest, WebKeys.THEME_DISPLAY,
 			Mockito.mock(ThemeDisplay.class));
 
 		setUpLanguageUtil("");
 		setUpPortal();
+		setUpPortletRequestParamValue(
+			_renderRequest, "displayStyle", "displayStyle");
 		setUpPortalUtil();
 		setUpRankingIndexNameBuilder();
 		setUpRenderResponse(_renderResponse);
@@ -86,7 +85,7 @@ public class RankingPortletDisplayBuilderTest extends BaseRankingsWebTestCase {
 		Assert.assertEquals(
 			"displayStyle", rankingPortletDisplayContext.getDisplayStyle());
 		Assert.assertEquals(
-			"desc", rankingPortletDisplayContext.getOrderByType());
+			"asc", rankingPortletDisplayContext.getOrderByType());
 		Assert.assertEquals(
 			"", rankingPortletDisplayContext.getSearchActionURL());
 		Assert.assertNotNull(rankingPortletDisplayContext.getSearchContainer());
@@ -107,30 +106,21 @@ public class RankingPortletDisplayBuilderTest extends BaseRankingsWebTestCase {
 		Assert.assertEquals(dropdownItems.toString(), 2, dropdownItems.size());
 	}
 
-	@Override
-	protected HttpServletRequest setUpPortalGetHttpServletRequest() {
-		Mockito.doReturn(
-			_httpServletRequest
-		).when(
-			portal
-		).getHttpServletRequest(
-			Mockito.any(PortletRequest.class)
-		);
+	@Mock
+	private DocumentToRankingTranslator _documentToRankingTranslator;
 
-		return _httpServletRequest;
-	}
+	@Mock
+	private HttpServletRequest _httpServletRequest;
 
-	private final DocumentToRankingTranslator _documentToRankingTranslator =
-		Mockito.mock(DocumentToRankingTranslator.class);
-	private final HttpServletRequest _httpServletRequest = Mockito.mock(
-		HttpServletRequest.class);
 	private RankingPortletDisplayBuilder _rankingPortletDisplayBuilder;
-	private final RenderRequest _renderRequest = Mockito.mock(
-		RenderRequest.class);
-	private final RenderResponse _renderResponse = Mockito.mock(
-		RenderResponse.class);
-	private final SearchEngineInformation _searchEngineInformation =
-		Mockito.mock(SearchEngineInformation.class);
-	private final Sorts _sorts = Mockito.mock(Sorts.class);
+
+	@Mock
+	private RenderRequest _renderRequest;
+
+	@Mock
+	private RenderResponse _renderResponse;
+
+	@Mock
+	private Sorts _sorts;
 
 }

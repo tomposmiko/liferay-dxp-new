@@ -61,7 +61,7 @@ public class DDMFormValidationException extends PortalException {
 		 */
 		@Deprecated
 		public MustNotDuplicateFieldName(String fieldName) {
-			this(SetUtil.fromArray(fieldName));
+			this(SetUtil.fromArray(new String[] {fieldName}));
 		}
 
 		public Set<String> getDuplicatedFieldNames() {
@@ -84,28 +84,6 @@ public class DDMFormValidationException extends PortalException {
 		}
 
 		private final Set<String> _duplicatedFieldNames;
-
-	}
-
-	public static class MustNotDuplicateFieldReference
-		extends DDMFormValidationException {
-
-		public MustNotDuplicateFieldReference(
-			Set<String> duplicatedFieldReferences) {
-
-			super(
-				String.format(
-					"Field references %s were defined more than once",
-					duplicatedFieldReferences));
-
-			_duplicatedFieldReferences = duplicatedFieldReferences;
-		}
-
-		public Set<String> getDuplicatedFieldReferences() {
-			return _duplicatedFieldReferences;
-		}
-
-		private final Set<String> _duplicatedFieldReferences;
 
 	}
 

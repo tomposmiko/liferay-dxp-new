@@ -23,9 +23,9 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
+import java.util.function.IntFunction;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carolina Barbosa
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.LOCALIZABLE_TEXT,
 	service = {
 		DDMFormFieldValueAccessor.class,
@@ -44,8 +45,8 @@ public class LocalizableTextDDMFormFieldValueAccessor
 	implements DDMFormFieldValueAccessor<JSONObject> {
 
 	@Override
-	public JSONObject[] getArrayGenericType() {
-		return new JSONObject[0];
+	public IntFunction<JSONObject[]> getArrayGeneratorIntFunction() {
+		return JSONObject[]::new;
 	}
 
 	@Override
@@ -85,13 +86,7 @@ public class LocalizableTextDDMFormFieldValueAccessor
 			return true;
 		}
 
-		for (String key : jsonObject.keySet()) {
-			if (Validator.isNotNull(jsonObject.getString(key))) {
-				return false;
-			}
-		}
-
-		return true;
+		return false;
 	}
 
 	@Reference

@@ -71,15 +71,6 @@ public class ProjectTemplatesWorkspaceTest
 			temporaryFolder, "gradle", "foows", getDefaultLiferayVersion(),
 			mavenExecutor);
 
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			getDefaultLiferayVersion());
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceProjectDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
 		testExists(workspaceProjectDir, "configs/dev/portal-ext.properties");
 		testExists(workspaceProjectDir, "gradle.properties");
 		testExists(workspaceProjectDir, "modules");
@@ -117,7 +108,7 @@ public class ProjectTemplatesWorkspaceTest
 
 		File modulesProjectDir = buildTemplateWithGradle(
 			new File(workspaceProjectDir, "modules"), "mvc-portlet",
-			"foo-portlet", "--liferay-product", "dxp");
+			"foo-portlet", "--product", "dxp");
 
 		testContains(modulesProjectDir, "build.gradle", "release.dxp.api");
 
@@ -157,15 +148,6 @@ public class ProjectTemplatesWorkspaceTest
 			temporaryFolder, "gradle", "foows", getDefaultLiferayVersion(),
 			mavenExecutor);
 
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			getDefaultLiferayVersion());
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceProjectDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
 		File gradleProperties = new File(
 			workspaceProjectDir, "gradle.properties");
 
@@ -198,15 +180,6 @@ public class ProjectTemplatesWorkspaceTest
 		File workspaceProjectDir = buildWorkspace(
 			temporaryFolder, "gradle", "foo", getDefaultLiferayVersion(),
 			mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			getDefaultLiferayVersion());
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceProjectDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
 
 		testExists(workspaceProjectDir, "gradle-local.properties");
 
@@ -248,15 +221,6 @@ public class ProjectTemplatesWorkspaceTest
 			temporaryFolder, "gradle", "foows", getDefaultLiferayVersion(),
 			mavenExecutor);
 
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			getDefaultLiferayVersion());
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceProjectDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
-
 		File gradleProperties = new File(
 			workspaceProjectDir, "gradle.properties");
 
@@ -292,15 +256,6 @@ public class ProjectTemplatesWorkspaceTest
 		File gradleWorkspaceProjectDir = buildWorkspace(
 			temporaryFolder, "gradle", "withportlet",
 			getDefaultLiferayVersion(), mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			getDefaultLiferayVersion());
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				gradleWorkspaceProjectDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
 
 		File gradleModulesDir = new File(gradleWorkspaceProjectDir, "modules");
 
@@ -342,15 +297,6 @@ public class ProjectTemplatesWorkspaceTest
 		File workspaceDir = buildWorkspace(
 			temporaryFolder, "gradle", "gradleWS", liferayVersion,
 			mavenExecutor);
-
-		String liferayWorkspaceProduct = getLiferayWorkspaceProduct(
-			getDefaultLiferayVersion());
-
-		if (liferayWorkspaceProduct != null) {
-			writeGradlePropertiesInWorkspace(
-				workspaceDir,
-				"liferay.workspace.product=" + liferayWorkspaceProduct);
-		}
 
 		File modulesDir = new File(workspaceDir, "modules");
 
@@ -416,22 +362,120 @@ public class ProjectTemplatesWorkspaceTest
 	}
 
 	@Test
-	public void testCreateMavenWorksapce() throws Exception {
+	public void testSassCompilerMavenWorkspace() throws Exception {
 		Assume.assumeTrue(isBuildProjects());
 
-		File destinationDir = temporaryFolder.newFolder("mavenWorkspace");
-		String liferayVersion = "7.2.10.4";
+		File nativeSassWorkspaceDir = buildTemplateWithMaven(
+			temporaryFolder, "workspace", "nativeSassMavenWS", "com.test",
+			mavenExecutor, "-DliferayVersion=" + getDefaultLiferayVersion());
 
-		File workspaceDir = buildTemplateWithMaven(
-			destinationDir, destinationDir, "workspace", "mavenWS", "com.test",
-			mavenExecutor, "-DliferayProduct=dxp",
-			"-DliferayVersion=" + liferayVersion, "-Dpackage=com.test");
+		File nativeSassModulesDir = new File(nativeSassWorkspaceDir, "modules");
 
-		Assume.assumeTrue(workspaceDir.exists());
+		File nativeSassProjectDir = buildTemplateWithMaven(
+			nativeSassWorkspaceDir.getParentFile(), nativeSassModulesDir,
+			"mvc-portlet", "foo-portlet", "com.test", mavenExecutor,
+			"-DclassName=Foo", "-Dpackage=foo.portlet",
+			"-DprojectType=workspace");
 
-		testContains(
-			workspaceDir, "pom.xml",
-			"<liferay.bom.version>7.2.10.4</liferay.bom.version>");
+		String nativeSassOutput = executeMaven(
+			nativeSassProjectDir, mavenExecutor, MAVEN_GOAL_PACKAGE);
+
+		Assert.assertTrue(
+			nativeSassOutput,
+			nativeSassOutput.contains("Using native Sass compiler"));
+
+		File rubySassWorkspaceDir = buildTemplateWithMaven(
+			temporaryFolder, "workspace", "rubySassMavenWS", "com.test",
+			mavenExecutor, "-DliferayVersion=" + getDefaultLiferayVersion());
+
+		File rubySassModulesDir = new File(rubySassWorkspaceDir, "modules");
+
+		File rubySassProjectDir = buildTemplateWithMaven(
+			rubySassWorkspaceDir.getParentFile(), rubySassModulesDir,
+			"mvc-portlet", "foo-portlet", "com.test", mavenExecutor,
+			"-DclassName=Foo", "-Dpackage=foo.portlet",
+			"-DprojectType=workspace");
+
+		File pomXmlFile = new File(rubySassProjectDir, "pom.xml");
+
+		if (pomXmlFile.exists()) {
+			editXml(
+				pomXmlFile,
+				document -> addCssBuilderConfigurationElement(
+					document, "sassCompilerClassName", "ruby"));
+		}
+
+		String rubySassOutput = executeMaven(
+			rubySassProjectDir, mavenExecutor, MAVEN_GOAL_PACKAGE);
+
+		Assert.assertTrue(
+			rubySassOutput,
+			rubySassOutput.contains("Using Ruby Sass compiler"));
+
+		File nativeSassOutputFile = testExists(
+			nativeSassProjectDir, "target/foo-portlet-1.0.0.jar");
+		File rubySassOutputFile = testExists(
+			rubySassProjectDir, "target/foo-portlet-1.0.0.jar");
+
+		testBundlesDiff(nativeSassOutputFile, rubySassOutputFile);
+	}
+
+	@Test
+	public void testSassCompilerWorkspace() throws Exception {
+		Assume.assumeTrue(isBuildProjects());
+
+		String liferayVersion = getDefaultLiferayVersion();
+
+		File nativeSassWorkspaceDir = buildWorkspace(
+			temporaryFolder, "gradle", "nativeSassWorkspace", liferayVersion,
+			mavenExecutor);
+
+		writeGradlePropertiesInWorkspace(
+			nativeSassWorkspaceDir, "liferay.workspace.product=portal-7.3-ga7");
+
+		File nativeSassModulesDir = new File(nativeSassWorkspaceDir, "modules");
+
+		File nativeSassProjectDir = buildTemplateWithGradle(
+			nativeSassModulesDir, "mvc-portlet", "foo-portlet");
+
+		String nativeSassOutput = String.valueOf(
+			executeGradle(
+				nativeSassWorkspaceDir, true, _gradleDistribution,
+				":modules:foo-portlet" + GRADLE_TASK_PATH_BUILD));
+
+		Assert.assertTrue(
+			nativeSassOutput,
+			nativeSassOutput.contains("Using native Sass compiler"));
+
+		File rubySassWorkspaceDir = buildTemplateWithGradle(
+			temporaryFolder, WorkspaceUtil.WORKSPACE, "rubySassWorkspace");
+
+		writeGradlePropertiesInWorkspace(
+			rubySassWorkspaceDir, "liferay.workspace.product=portal-7.3-ga7");
+
+		writeGradlePropertiesInWorkspace(
+			rubySassWorkspaceDir, "sass.compiler.class.name=ruby");
+
+		File rubySassModulesDir = new File(rubySassWorkspaceDir, "modules");
+
+		File rubySassProjectDir = buildTemplateWithGradle(
+			rubySassModulesDir, "mvc-portlet", "foo-portlet");
+
+		String rubySassOutput = String.valueOf(
+			executeGradle(
+				rubySassWorkspaceDir, true, _gradleDistribution,
+				":modules:foo-portlet" + GRADLE_TASK_PATH_BUILD));
+
+		Assert.assertTrue(
+			rubySassOutput,
+			rubySassOutput.contains("Using Ruby Sass compiler"));
+
+		File nativeSassOutputFile = testExists(
+			nativeSassProjectDir, "build/libs/foo.portlet-1.0.0.jar");
+		File rubySassOutputFile = testExists(
+			rubySassProjectDir, "build/libs/foo.portlet-1.0.0.jar");
+
+		testBundlesDiff(nativeSassOutputFile, rubySassOutputFile);
 	}
 
 	@Rule

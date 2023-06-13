@@ -28,7 +28,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Tina Tian
  */
-@Component(enabled = false, service = PortalCacheReplicatorFactory.class)
+@Component(
+	enabled = false, immediate = true,
+	service = PortalCacheReplicatorFactory.class
+)
 public class ClusterLinkPortalCacheReplicatorFactory
 	implements PortalCacheReplicatorFactory {
 
@@ -40,7 +43,13 @@ public class ClusterLinkPortalCacheReplicatorFactory
 			properties, _portalCacheClusterLink);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPortalCacheClusterLink(
+		PortalCacheClusterLink portalCacheClusterLink) {
+
+		_portalCacheClusterLink = portalCacheClusterLink;
+	}
+
 	private PortalCacheClusterLink _portalCacheClusterLink;
 
 }

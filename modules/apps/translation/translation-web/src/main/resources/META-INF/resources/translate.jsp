@@ -40,7 +40,7 @@ renderResponse.setTitle(translateDisplayContext.getTitle());
 				<ul class="tbar-nav">
 					<li class="tbar-item tbar-item-expand"></li>
 					<li class="tbar-item">
-						<div class="tbar-section text-right">
+						<div class="metadata-type-button-row tbar-section text-right">
 							<aui:button cssClass="btn-sm mr-3" href="<%= redirect %>" type="cancel" />
 
 							<aui:button cssClass="btn-sm mr-3" disabled="<%= translateDisplayContext.isSaveButtonDisabled() %>" id="saveDraftBtn" primary="<%= false %>" type="submit" value="<%= translateDisplayContext.getSaveButtonLabel() %>" />
@@ -80,7 +80,7 @@ renderResponse.setTitle(translateDisplayContext.getTitle());
 
 								<span class="ml-1"> <%= sourceLanguageIdTitle %> </span>
 
-								<hr class="separator" />
+								<div class="separator"><!-- --></div>
 							</clay:col>
 
 							<clay:col
@@ -97,7 +97,7 @@ renderResponse.setTitle(translateDisplayContext.getTitle());
 
 								<span class="ml-1"> <%= targetLanguageIdTitle %> </span>
 
-								<hr class="separator" />
+								<div class="separator"><!-- --></div>
 							</clay:col>
 						</clay:row>
 
@@ -139,71 +139,38 @@ renderResponse.setTitle(translateDisplayContext.getTitle());
 								boolean html = translateDisplayContext.getBooleanValue(infoField, TextInfoFieldType.HTML);
 								String label = translateDisplayContext.getInfoFieldLabel(infoField);
 								boolean multiline = translateDisplayContext.getBooleanValue(infoField, TextInfoFieldType.MULTILINE);
-
-								String sourceContentDir = LanguageUtil.get(translateDisplayContext.getSourceLocale(), "lang.dir");
-
-								List<String> sourceStringValues = translateDisplayContext.getSourceStringValues(infoField, translateDisplayContext.getSourceLocale());
-
-								Iterator<String> sourceStringValuesIterator = sourceStringValues.iterator();
-
-								List<String> targetStringValues = translateDisplayContext.getTargetStringValues(infoField, translateDisplayContext.getTargetLocale());
-
-								Iterator<String> targetStringValuesIterator = targetStringValues.iterator();
+								String name = infoField.getName();
 							%>
 
 								<c:choose>
 									<c:when test="<%= translateDisplayContext.isAutoTranslateEnabled() %>">
+										<clay:row>
+											<clay:content-col
+												cssClass="col-autotranslate-content"
+												expand="<%= true %>"
+											>
+												<%@ include file="/translate_field.jspf" %>
+											</clay:content-col>
 
-										<%
-										while (sourceStringValuesIterator.hasNext() && targetStringValuesIterator.hasNext()) {
-											String sourceContent = sourceStringValuesIterator.next();
-											String targetContent = targetStringValuesIterator.next();
-										%>
-
-											<clay:row>
-												<clay:content-col
-													cssClass="col-autotranslate-content"
-													expand="<%= true %>"
+											<clay:content-col
+												cssClass="col-autotranslate-button"
+											>
+												<clay:button
+													disabled="<%= true %>"
+													displayType="secondary"
+													monospaced="<%= true %>"
 												>
-													<%@ include file="/translate_field.jspf" %>
-												</clay:content-col>
+													<clay:icon
+														symbol="automatic-translate"
+													/>
 
-												<clay:content-col
-													cssClass="col-autotranslate-button"
-												>
-													<clay:button
-														disabled="<%= true %>"
-														displayType="secondary"
-														monospaced="<%= true %>"
-													>
-														<clay:icon
-															symbol="automatic-translate"
-														/>
-
-														<span class="sr-only"><liferay-ui:message key="location" /></span>
-													</clay:button>
-												</clay:content-col>
-											</clay:row>
-
-										<%
-										}
-										%>
-
+													<span class="sr-only"><liferay-ui:message key="location" /></span>
+												</clay:button>
+											</clay:content-col>
+										</clay:row>
 									</c:when>
 									<c:otherwise>
-
-										<%
-										while (sourceStringValuesIterator.hasNext() && targetStringValuesIterator.hasNext()) {
-											String sourceContent = sourceStringValuesIterator.next();
-											String targetContent = targetStringValuesIterator.next();
-										%>
-
-											<%@ include file="/translate_field.jspf" %>
-
-										<%
-										}
-										%>
-
+										<%@ include file="/translate_field.jspf" %>
 									</c:otherwise>
 								</c:choose>
 

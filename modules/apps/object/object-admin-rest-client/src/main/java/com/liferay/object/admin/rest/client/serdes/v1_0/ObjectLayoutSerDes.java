@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class ObjectLayoutSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (objectLayout.getActions() != null) {
 			if (sb.length() > 1) {
@@ -132,22 +133,6 @@ public class ObjectLayoutSerDes {
 			sb.append(_toJSON(objectLayout.getName()));
 		}
 
-		if (objectLayout.getObjectDefinitionExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"objectDefinitionExternalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(
-				_escape(
-					objectLayout.getObjectDefinitionExternalReferenceCode()));
-
-			sb.append("\"");
-		}
-
 		if (objectLayout.getObjectDefinitionId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -201,7 +186,7 @@ public class ObjectLayoutSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (objectLayout.getActions() == null) {
 			map.put("actions", null);
@@ -249,16 +234,6 @@ public class ObjectLayoutSerDes {
 		}
 		else {
 			map.put("name", String.valueOf(objectLayout.getName()));
-		}
-
-		if (objectLayout.getObjectDefinitionExternalReferenceCode() == null) {
-			map.put("objectDefinitionExternalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"objectDefinitionExternalReferenceCode",
-				String.valueOf(
-					objectLayout.getObjectDefinitionExternalReferenceCode()));
 		}
 
 		if (objectLayout.getObjectDefinitionId() == null) {
@@ -341,15 +316,6 @@ public class ObjectLayoutSerDes {
 				}
 			}
 			else if (Objects.equals(
-						jsonParserFieldName,
-						"objectDefinitionExternalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					objectLayout.setObjectDefinitionExternalReferenceCode(
-						(String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(
 						jsonParserFieldName, "objectDefinitionId")) {
 
 				if (jsonParserFieldValue != null) {
@@ -359,18 +325,15 @@ public class ObjectLayoutSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "objectLayoutTabs")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ObjectLayoutTab[] objectLayoutTabsArray =
-						new ObjectLayoutTab[jsonParserFieldValues.length];
-
-					for (int i = 0; i < objectLayoutTabsArray.length; i++) {
-						objectLayoutTabsArray[i] = ObjectLayoutTabSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					objectLayout.setObjectLayoutTabs(objectLayoutTabsArray);
+					objectLayout.setObjectLayoutTabs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ObjectLayoutTabSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new ObjectLayoutTab[size]
+						));
 				}
 			}
 		}

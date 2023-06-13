@@ -1,9 +1,0 @@
-definition {
-
-	macro addTest {
-		task ("Test  A") {
-			ACUtils.launchAC();
-		}
-	}
-
-}

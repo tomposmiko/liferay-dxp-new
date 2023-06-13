@@ -65,11 +65,8 @@
 						<span class="asset-type">
 							<liferay-ui:message key="<%= workflowTaskDisplayContext.getAssetType(workflowTask) %>" />
 						</span>
-						<span class="author">
-							<liferay-ui:message key="<%= workflowTask.getUserName() %>" />
-						</span>
 						<span class="task-name" id="<%= String.valueOf(workflowTask.getWorkflowTaskId()) %>">
-							<liferay-ui:message key="<%= workflowTask.getLabel(workflowTaskDisplayContext.getTaskContentLocale()) %>" />
+							<liferay-ui:message key="<%= workflowTaskDisplayContext.getTaskName(workflowTask) %>" />
 						</span>
 
 						<c:if test="<%= workflowTaskDisplayContext.getDueDate(workflowTask) != null %>">
@@ -121,16 +118,10 @@
 
 				<liferay-ui:search-container-column-text
 					href="<%= rowURL %>"
-					name="author"
-					value="<%= workflowTask.getUserName() %>"
-				/>
-
-				<liferay-ui:search-container-column-text
-					href="<%= rowURL %>"
 					name="task"
 				>
 					<span class="task-name" id="<%= workflowTask.getWorkflowTaskId() %>">
-						<liferay-ui:message key="<%= workflowTask.getLabel(workflowTaskDisplayContext.getTaskContentLocale()) %>" />
+						<liferay-ui:message key="<%= workflowTaskDisplayContext.getTaskName(workflowTask) %>" />
 					</span>
 				</liferay-ui:search-container-column-text>
 

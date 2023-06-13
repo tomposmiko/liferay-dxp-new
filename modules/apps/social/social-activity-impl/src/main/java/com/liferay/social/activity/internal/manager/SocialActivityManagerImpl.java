@@ -61,7 +61,7 @@ public class SocialActivityManagerImpl<T extends ClassedModel & GroupedModel>
 		}
 
 		SocialActivityManager<T> socialActivityManager =
-			_getSocialActivityManager(model.getModelClassName());
+			getSocialActivityManager(model.getModelClassName());
 
 		socialActivityManager.addActivity(
 			userId, model, type, extraData, receiverUserId);
@@ -78,7 +78,7 @@ public class SocialActivityManagerImpl<T extends ClassedModel & GroupedModel>
 		}
 
 		SocialActivityManager<T> socialActivityManager =
-			_getSocialActivityManager(model.getModelClassName());
+			getSocialActivityManager(model.getModelClassName());
 
 		socialActivityManager.addUniqueActivity(
 			userId, createDate, model, type, extraData, receiverUserId);
@@ -95,7 +95,7 @@ public class SocialActivityManagerImpl<T extends ClassedModel & GroupedModel>
 		}
 
 		SocialActivityManager<T> socialActivityManager =
-			_getSocialActivityManager(model.getModelClassName());
+			getSocialActivityManager(model.getModelClassName());
 
 		socialActivityManager.addUniqueActivity(
 			userId, model, type, extraData, receiverUserId);
@@ -108,7 +108,7 @@ public class SocialActivityManagerImpl<T extends ClassedModel & GroupedModel>
 		}
 
 		SocialActivityManager<T> socialActivityManager =
-			_getSocialActivityManager(model.getModelClassName());
+			getSocialActivityManager(model.getModelClassName());
 
 		socialActivityManager.deleteActivities(model);
 	}
@@ -123,7 +123,7 @@ public class SocialActivityManagerImpl<T extends ClassedModel & GroupedModel>
 		}
 
 		SocialActivityManager<T> socialActivityManager =
-			_getSocialActivityManager(model.getModelClassName());
+			getSocialActivityManager(model.getModelClassName());
 
 		socialActivityManager.updateLastSocialActivity(
 			userId, model, type, createDate);
@@ -160,7 +160,7 @@ public class SocialActivityManagerImpl<T extends ClassedModel & GroupedModel>
 		_serviceTrackerMap.close();
 	}
 
-	private SocialActivityManager<T> _getSocialActivityManager(
+	protected SocialActivityManager<T> getSocialActivityManager(
 		String className) {
 
 		SocialActivityManager<T> socialActivityManager =
@@ -196,7 +196,7 @@ public class SocialActivityManagerImpl<T extends ClassedModel & GroupedModel>
 			return false;
 		}
 		catch (ConfigurationException configurationException) {
-			_log.error(configurationException);
+			_log.error(configurationException, configurationException);
 
 			return false;
 		}

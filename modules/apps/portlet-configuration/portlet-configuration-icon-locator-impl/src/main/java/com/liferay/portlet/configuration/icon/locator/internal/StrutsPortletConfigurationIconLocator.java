@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Sergio González
  */
-@Component(service = PortletConfigurationIconLocator.class)
+@Component(immediate = true, service = PortletConfigurationIconLocator.class)
 public class StrutsPortletConfigurationIconLocator
 	implements PortletConfigurationIconLocator {
 
@@ -60,7 +60,13 @@ public class StrutsPortletConfigurationIconLocator
 		return ParamUtil.getString(portletRequest, "struts_action");
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPortletLocalService(
+		PortletLocalService portletLocalService) {
+
+		_portletLocalService = portletLocalService;
+	}
+
 	private PortletLocalService _portletLocalService;
 
 }

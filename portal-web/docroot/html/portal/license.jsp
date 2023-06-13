@@ -610,7 +610,7 @@ dateFormatDateTime.setTimeZone(timeZone);
 							var checkboxes = A.one(document.license_fm).all('input[type=checkbox]:checked');
 
 							if (!checkboxes || (checkboxes.size() <= 0)) {
-								Liferay.Util.openAlertModal({message: '<liferay-ui:message key="there-are-no-selected-servers-to-register" />'});
+								alert('<liferay-ui:message key="there-are-no-selected-servers-to-register" />');
 
 								return false;
 							}
@@ -622,7 +622,7 @@ dateFormatDateTime.setTimeZone(timeZone);
 
 		<br />
 
-		<h2 class="version-info"><liferay-ui:message key="register-your-application" /></h2>
+		<h3><liferay-ui:message key="register-your-application" /></h3>
 
 		<table class="lfr-table">
 			<tr>

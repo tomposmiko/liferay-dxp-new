@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.internal.security.permission.resource;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceOrderActionKeys;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.model.CommerceOrder;
@@ -59,10 +59,10 @@ public class CommerceOrderModelResourcePermissionLogic
 			CommerceOrder commerceOrder, String actionId)
 		throws PortalException {
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
-		if ((accountEntry.getAccountEntryId() ==
-				AccountConstants.ACCOUNT_ENTRY_ID_GUEST) &&
+		if ((commerceAccount.getCommerceAccountId() ==
+				CommerceAccountConstants.ACCOUNT_ID_GUEST) &&
 			permissionChecker.isSignedIn()) {
 
 			return _hasPermission(
@@ -72,37 +72,26 @@ public class CommerceOrderModelResourcePermissionLogic
 
 		if (permissionChecker.isCompanyAdmin(commerceOrder.getCompanyId()) ||
 			permissionChecker.isGroupAdmin(commerceOrder.getGroupId()) ||
-			((accountEntry.getAccountEntryId() !=
-				AccountConstants.ACCOUNT_ENTRY_ID_GUEST) &&
+			((commerceAccount.getCommerceAccountId() !=
+				CommerceAccountConstants.ACCOUNT_ID_GUEST) &&
 			 _hasAncestorPermission(
-				 permissionChecker, accountEntry.getAccountEntryGroupId(),
+				 permissionChecker, commerceAccount.getCommerceAccountGroupId(),
 				 CommerceOrderActionKeys.MANAGE_COMMERCE_ORDERS))) {
 
 			return true;
 		}
 
-		if ((accountEntry.getAccountEntryId() !=
-				AccountConstants.ACCOUNT_ENTRY_ID_GUEST) &&
+		if ((commerceAccount.getCommerceAccountId() !=
+				CommerceAccountConstants.ACCOUNT_ID_GUEST) &&
 			actionId.equals(CommerceOrderActionKeys.APPROVE_COMMERCE_ORDER)) {
 
 			return _hasAncestorPermission(
-				permissionChecker, accountEntry.getAccountEntryGroupId(),
+				permissionChecker, commerceAccount.getCommerceAccountGroupId(),
 				CommerceOrderActionKeys.APPROVE_OPEN_COMMERCE_ORDERS);
 		}
 
 		if (actionId.equals(CommerceOrderActionKeys.CHECKOUT_COMMERCE_ORDER)) {
 			return _containsCheckoutPermission(
-				permissionChecker, commerceOrder);
-		}
-
-		if (actionId.equals(ActionKeys.DELETE)) {
-			return _containsDeletePermission(permissionChecker, commerceOrder);
-		}
-
-		if (actionId.equals(
-				CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_DELIVERY_TERMS)) {
-
-			return _containsManageDeliveryTerms(
 				permissionChecker, commerceOrder);
 		}
 
@@ -115,32 +104,13 @@ public class CommerceOrderModelResourcePermissionLogic
 
 		if (actionId.equals(
 				CommerceOrderActionKeys.
-					MANAGE_COMMERCE_ORDER_PAYMENT_METHODS)) {
-
-			return _containsManagePaymentMethods(
-				permissionChecker, commerceOrder);
-		}
-
-		if (actionId.equals(
-				CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_TERMS)) {
-
-			return _containsManagePaymentTerms(
-				permissionChecker, commerceOrder);
-		}
-
-		if (actionId.equals(
-				CommerceOrderActionKeys.
 					MANAGE_COMMERCE_ORDER_RESTRICTED_NOTES)) {
 
 			return _containsManageNotes(permissionChecker, commerceOrder, true);
 		}
 
-		if (actionId.equals(
-				CommerceOrderActionKeys.
-					MANAGE_COMMERCE_ORDER_SHIPPING_OPTIONS)) {
-
-			return _containsManageShippingOptions(
-				permissionChecker, commerceOrder);
+		if (actionId.equals(ActionKeys.DELETE)) {
+			return _containsDeletePermission(permissionChecker, commerceOrder);
 		}
 
 		if (actionId.equals(ActionKeys.UPDATE)) {
@@ -149,11 +119,6 @@ public class CommerceOrderModelResourcePermissionLogic
 
 		if (actionId.equals(ActionKeys.VIEW)) {
 			return _containsViewPermission(permissionChecker, commerceOrder);
-		}
-
-		if (actionId.equals(CommerceOrderActionKeys.VIEW_BILLING_ADDRESS)) {
-			return _containsViewBillingAddress(
-				permissionChecker, commerceOrder);
 		}
 
 		return false;
@@ -172,15 +137,15 @@ public class CommerceOrderModelResourcePermissionLogic
 
 		User user = permissionChecker.getUser();
 
-		if (user.isGuestUser() && commerceOrder.isGuestOrder()) {
+		if (user.isDefaultUser() && commerceOrder.isGuestOrder()) {
 			return true;
 		}
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
 		if (commerceOrder.isPending() &&
 			!_hasPermission(
-				permissionChecker, accountEntry.getAccountEntryGroupId(),
+				permissionChecker, commerceAccount.getCommerceAccountGroupId(),
 				CommerceOrderActionKeys.APPROVE_OPEN_COMMERCE_ORDERS)) {
 
 			return false;
@@ -193,7 +158,7 @@ public class CommerceOrderModelResourcePermissionLogic
 		}
 
 		return _portletResourcePermission.contains(
-			permissionChecker, accountEntry.getAccountEntryGroup(),
+			permissionChecker, commerceAccount.getCommerceAccountGroup(),
 			CommerceOrderActionKeys.CHECKOUT_OPEN_COMMERCE_ORDERS);
 	}
 
@@ -211,32 +176,11 @@ public class CommerceOrderModelResourcePermissionLogic
 			}
 		}
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
 		return _portletResourcePermission.contains(
-			permissionChecker, accountEntry.getAccountEntryGroup(),
+			permissionChecker, commerceAccount.getCommerceAccountGroup(),
 			CommerceOrderActionKeys.DELETE_COMMERCE_ORDERS);
-	}
-
-	private boolean _containsManageDeliveryTerms(
-			PermissionChecker permissionChecker, CommerceOrder commerceOrder)
-		throws PortalException {
-
-		if (!commerceOrder.isOpen()) {
-			return false;
-		}
-
-		User user = permissionChecker.getUser();
-
-		if (user.isGuestUser() && commerceOrder.isGuestOrder()) {
-			return true;
-		}
-
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
-
-		return _portletResourcePermission.contains(
-			permissionChecker, accountEntry.getAccountEntryGroup(),
-			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_DELIVERY_TERMS);
 	}
 
 	private boolean _containsManageNotes(
@@ -250,74 +194,11 @@ public class CommerceOrderModelResourcePermissionLogic
 			return true;
 		}
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
 		return _hasAncestorPermission(
-			permissionChecker, accountEntry.getAccountEntryGroupId(),
+			permissionChecker, commerceAccount.getCommerceAccountGroupId(),
 			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDERS);
-	}
-
-	private boolean _containsManagePaymentMethods(
-			PermissionChecker permissionChecker, CommerceOrder commerceOrder)
-		throws PortalException {
-
-		if (!commerceOrder.isOpen()) {
-			return false;
-		}
-
-		User user = permissionChecker.getUser();
-
-		if (user.isGuestUser() && commerceOrder.isGuestOrder()) {
-			return true;
-		}
-
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
-
-		return _portletResourcePermission.contains(
-			permissionChecker, accountEntry.getAccountEntryGroup(),
-			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_METHODS);
-	}
-
-	private boolean _containsManagePaymentTerms(
-			PermissionChecker permissionChecker, CommerceOrder commerceOrder)
-		throws PortalException {
-
-		if (!commerceOrder.isOpen()) {
-			return false;
-		}
-
-		User user = permissionChecker.getUser();
-
-		if (user.isGuestUser() && commerceOrder.isGuestOrder()) {
-			return true;
-		}
-
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
-
-		return _portletResourcePermission.contains(
-			permissionChecker, accountEntry.getAccountEntryGroup(),
-			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_PAYMENT_TERMS);
-	}
-
-	private boolean _containsManageShippingOptions(
-			PermissionChecker permissionChecker, CommerceOrder commerceOrder)
-		throws PortalException {
-
-		if (!commerceOrder.isOpen()) {
-			return false;
-		}
-
-		User user = permissionChecker.getUser();
-
-		if (user.isGuestUser() && commerceOrder.isGuestOrder()) {
-			return true;
-		}
-
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
-
-		return _portletResourcePermission.contains(
-			permissionChecker, accountEntry.getAccountEntryGroup(),
-			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDER_SHIPPING_OPTIONS);
 	}
 
 	private boolean _containsUpdatePermission(
@@ -326,11 +207,11 @@ public class CommerceOrderModelResourcePermissionLogic
 
 		User user = permissionChecker.getUser();
 
-		if (user.isGuestUser() && commerceOrder.isGuestOrder()) {
+		if (user.isDefaultUser() && commerceOrder.isGuestOrder()) {
 			return true;
 		}
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
 		if (commerceOrder.isOpen()) {
 			if (_hasOwnerPermission(permissionChecker, commerceOrder)) {
@@ -342,7 +223,8 @@ public class CommerceOrderModelResourcePermissionLogic
 			}
 
 			if (_hasAncestorPermission(
-					permissionChecker, accountEntry.getAccountEntryGroupId(),
+					permissionChecker,
+					commerceAccount.getCommerceAccountGroupId(),
 					CommerceOrderActionKeys.ADD_COMMERCE_ORDER)) {
 
 				return true;
@@ -354,31 +236,15 @@ public class CommerceOrderModelResourcePermissionLogic
 					CommerceOrderConstants.TYPE_PK_APPROVAL)) {
 
 				return _hasPermission(
-					permissionChecker, accountEntry.getAccountEntryGroupId(),
+					permissionChecker,
+					commerceAccount.getCommerceAccountGroupId(),
 					CommerceOrderActionKeys.APPROVE_OPEN_COMMERCE_ORDERS);
 			}
 		}
 
 		return _hasAncestorPermission(
-			permissionChecker, accountEntry.getAccountEntryGroupId(),
+			permissionChecker, commerceAccount.getCommerceAccountGroupId(),
 			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDERS);
-	}
-
-	private boolean _containsViewBillingAddress(
-			PermissionChecker permissionChecker, CommerceOrder commerceOrder)
-		throws PortalException {
-
-		User user = permissionChecker.getUser();
-
-		if (user.isGuestUser() && commerceOrder.isGuestOrder()) {
-			return true;
-		}
-
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
-
-		return _portletResourcePermission.contains(
-			permissionChecker, accountEntry.getAccountEntryGroup(),
-			CommerceOrderActionKeys.VIEW_BILLING_ADDRESS);
 	}
 
 	private boolean _containsViewPermission(
@@ -391,7 +257,7 @@ public class CommerceOrderModelResourcePermissionLogic
 			return true;
 		}
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
 		if (commerceOrder.isOpen()) {
 			if (commerceOrder.isDraft()) {
@@ -399,13 +265,13 @@ public class CommerceOrderModelResourcePermissionLogic
 			}
 
 			return _hasPermission(
-				permissionChecker, accountEntry.getAccountEntryGroupId(),
+				permissionChecker, commerceAccount.getCommerceAccountGroupId(),
 				CommerceOrderActionKeys.APPROVE_OPEN_COMMERCE_ORDERS,
 				CommerceOrderActionKeys.VIEW_OPEN_COMMERCE_ORDERS);
 		}
 
 		return _hasAncestorPermission(
-			permissionChecker, accountEntry.getAccountEntryGroupId(),
+			permissionChecker, commerceAccount.getCommerceAccountGroupId(),
 			CommerceOrderActionKeys.MANAGE_COMMERCE_ORDERS,
 			CommerceOrderActionKeys.VIEW_COMMERCE_ORDERS);
 	}

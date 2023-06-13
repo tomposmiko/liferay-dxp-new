@@ -32,7 +32,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 <liferay-ui:membership-policy-error />
 
 <clay:content-row
-	containerElement="div"
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -43,29 +43,27 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 	<c:if test="<%= depotAdminMembershipsDisplayContext.isSelectable() %>">
 		<clay:content-col>
-			<clay:button
-				aria-label='<%= LanguageUtil.format(request, "select-x", "asset-libraries") %>'
-				cssClass="heading-end modify-link"
-				displayType="secondary"
-				id='<%= liferayPortletResponse.getNamespace() + "selectDepotGroupLink" %>'
-				label='<%= LanguageUtil.get(request, "select") %>'
-				small="<%= true %>"
-			/>
+			<span class="heading-end">
+				<liferay-ui:icon
+					cssClass="modify-link"
+					id="selectDepotGroupLink"
+					label="<%= true %>"
+					linkCssClass="btn btn-secondary btn-sm"
+					message="select"
+					url="javascript:;"
+				/>
+			</span>
 		</clay:content-col>
 	</c:if>
 </clay:content-row>
 
 <liferay-util:buffer
-	var="removeButtonAssetLibraries"
+	var="removeDepotGroupIcon"
 >
-	<clay:button
-		aria-label="TOKEN_ARIA_LABEL"
-		cssClass="lfr-portal-tooltip modify-link"
-		data-rowId="TOKEN_DATA_ROW_ID"
-		displayType="unstyled"
+	<liferay-ui:icon
 		icon="times-circle"
-		small="<%= true %>"
-		title="TOKEN_TITLE"
+		markupView="lexicon"
+		message="remove"
 	/>
 </liferay-util:buffer>
 
@@ -107,15 +105,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 		<c:if test="<%= depotAdminMembershipsDisplayContext.isDeletable() %>">
 			<liferay-ui:search-container-column-text>
-				<clay:button
-					aria-label='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(group.getDescriptiveName(locale))) %>'
-					cssClass="lfr-portal-tooltip modify-link"
-					data-rowId="<%= group.getGroupId() %>"
-					displayType="unstyled"
-					icon="times-circle"
-					small="<%= true %>"
-					title='<%= LanguageUtil.format(request, "remove-x", HtmlUtil.escape(group.getDescriptiveName(locale))) %>'
-				/>
+				<a class="modify-link" data-rowId="<%= group.getGroupId() %>" href="javascript:;"><%= removeDepotGroupIcon %></a>
 			</liferay-ui:search-container-column-text>
 		</c:if>
 	</liferay-ui:search-container-row>
@@ -146,28 +136,21 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 			Liferay.Util.openSelectionModal({
 				onSelect: function (selectedItem) {
 					if (selectedItem) {
-						const itemValue = JSON.parse(selectedItem.value);
-						const label = Liferay.Util.sub(
-							'<liferay-ui:message key="remove-x" />',
-							itemValue.title
-						);
-						const rowColumns = [];
+						var itemValue = JSON.parse(selectedItem.value);
 
-						let removeButton =
-							'<%= UnicodeFormatter.toString(removeButtonAssetLibraries) %>';
-
-						removeButton = removeButton
-							.replace('TOKEN_ARIA_LABEL', label)
-							.replace('TOKEN_DATA_ROW_ID', itemValue.classPK)
-							.replace('TOKEN_TITLE', label);
+						var rowColumns = [];
 
 						rowColumns.push(itemValue.title);
 						rowColumns.push('');
-						rowColumns.push(removeButton);
+						rowColumns.push(
+							'<a class="modify-link" data-rowId="' +
+								itemValue.classPK +
+								'" href="javascript:;"><%= UnicodeFormatter.toString(removeDepotGroupIcon) %></a>'
+						);
 
-						const searchContainerData = searchContainer.getData();
+						var searchContainerData = searchContainer.getData();
 
-						const itemsValues = searchContainerData.split(',');
+						var itemsValues = searchContainerData.split(',');
 
 						if (!itemsValues.includes(itemValue.classPK)) {
 							searchContainer.addRow(rowColumns, itemValue.classPK);

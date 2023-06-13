@@ -56,7 +56,7 @@ public class LayoutImplTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_layout = LayoutTestUtil.addTypePortletLayout(_group);
+		_layout = LayoutTestUtil.addLayout(_group);
 	}
 
 	@Test

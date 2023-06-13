@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = AMRequestHandlerLocator.class)
+@Component(immediate = true, service = AMRequestHandlerLocator.class)
 public class AMRequestHandlerLocator {
 
 	public AMRequestHandler<?> locateForPattern(String pattern) {

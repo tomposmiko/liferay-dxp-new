@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -41,6 +42,7 @@ import com.liferay.sharing.service.base.SharingEntryLocalServiceBaseImpl;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -176,8 +178,18 @@ public class SharingEntryLocalServiceImpl
 		sharingEntry.setClassNameId(classNameId);
 		sharingEntry.setClassPK(classPK);
 		sharingEntry.setShareable(shareable);
-		sharingEntry.setActionIds(_getActionIds(sharingEntryActions));
 		sharingEntry.setExpirationDate(expirationDate);
+
+		Stream<SharingEntryAction> sharingEntryActionsStream =
+			sharingEntryActions.stream();
+
+		sharingEntryActionsStream.map(
+			SharingEntryAction::getBitwiseValue
+		).reduce(
+			(bitwiseValue1, bitwiseValue2) -> bitwiseValue1 | bitwiseValue2
+		).ifPresent(
+			actionIds -> sharingEntry.setActionIds(actionIds)
+		);
 
 		SharingEntry newSharingEntry = sharingEntryPersistence.update(
 			sharingEntry);
@@ -695,22 +707,20 @@ public class SharingEntryLocalServiceImpl
 
 		sharingEntry.setUserId(userId);
 		sharingEntry.setShareable(shareable);
-		sharingEntry.setActionIds(_getActionIds(sharingEntryActions));
 		sharingEntry.setExpirationDate(expirationDate);
 
+		Stream<SharingEntryAction> sharingEntryActionsStream =
+			sharingEntryActions.stream();
+
+		sharingEntryActionsStream.map(
+			SharingEntryAction::getBitwiseValue
+		).reduce(
+			(bitwiseValue1, bitwiseValue2) -> bitwiseValue1 | bitwiseValue2
+		).ifPresent(
+			actionIds -> sharingEntry.setActionIds(actionIds)
+		);
+
 		return sharingEntryPersistence.update(sharingEntry);
-	}
-
-	private long _getActionIds(
-		Collection<SharingEntryAction> sharingEntryActions) {
-
-		long actionIds = 0;
-
-		for (SharingEntryAction sharingEntryAction : sharingEntryActions) {
-			actionIds |= sharingEntryAction.getBitwiseValue();
-		}
-
-		return actionIds;
 	}
 
 	private void _validateExpirationDate(Date expirationDate)
@@ -757,6 +767,9 @@ public class SharingEntryLocalServiceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SharingEntryLocalServiceImpl.class);
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private IndexerRegistry _indexerRegistry;

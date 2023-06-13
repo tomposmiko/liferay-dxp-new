@@ -13,10 +13,6 @@
  */
 
 export default function getItemPath(itemId, items) {
-	if (itemId === '0') {
-		return ['0'];
-	}
-
 	const item = items.find((item) => item.siteNavigationMenuItemId === itemId);
 
 	return item.parentSiteNavigationMenuItemId !== '0'

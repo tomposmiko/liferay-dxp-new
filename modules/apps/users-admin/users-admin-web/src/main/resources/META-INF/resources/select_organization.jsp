@@ -49,7 +49,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 	sortingURL="<%= selectOrganizationManagementToolbarDisplayContext.getSortingURL() %>"
 />
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="selectOrganizationFm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="selectOrganizationFm">
 	<liferay-ui:search-container
 		searchContainer="<%= searchContainer %>"
 		var="organizationSearchContainer"
@@ -98,6 +98,14 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 				<c:if test="<%= Validator.isNull(p_u_i_d) || OrganizationMembershipPolicyUtil.isMembershipAllowed((selUser != null) ? selUser.getUserId() : 0, organization.getOrganizationId()) %>">
 
 					<%
+					Map<String, Object> data = HashMapBuilder.<String, Object>put(
+						"entityid", organization.getOrganizationId()
+					).put(
+						"entityname", organization.getName()
+					).put(
+						"type", LanguageUtil.get(request, organization.getType())
+					).build();
+
 					boolean disabled = false;
 
 					if (selUser != null) {
@@ -115,16 +123,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 					}
 					%>
 
-					<clay:button
-						aria-label='<%= LanguageUtil.format(request, "choose-x", organization.getName()) %>'
-						cssClass="selector-button"
-						data-entityid="<%= organization.getOrganizationId() %>"
-						data-entityname="<%= organization.getName() %>"
-						data-type="<%= LanguageUtil.get(request, organization.getType()) %>"
-						disabled="<%= disabled %>"
-						displayType="secondary"
-						label='<%= LanguageUtil.get(request, "choose") %>'
-					/>
+					<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= disabled %>" value="choose" />
 				</c:if>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>

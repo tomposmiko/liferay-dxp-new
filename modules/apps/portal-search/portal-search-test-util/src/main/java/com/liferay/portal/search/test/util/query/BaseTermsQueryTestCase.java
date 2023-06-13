@@ -23,6 +23,8 @@ import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,10 +35,13 @@ public abstract class BaseTermsQueryTestCase extends BaseIndexingTestCase {
 
 	@Test
 	public void testTermsQuery() {
-		addDocuments(
-			value -> DocumentCreationHelpers.singleKeyword(
-				Field.USER_NAME, value),
-			"alpha", "bravo", "charlie", "delta");
+		Stream.of(
+			"alpha", "bravo", "charlie", "delta"
+		).forEach(
+			userName -> addDocument(
+				DocumentCreationHelpers.singleKeyword(
+					Field.USER_NAME, userName))
+		);
 
 		TermsQuery termsQuery = queries.terms(Field.USER_NAME);
 
@@ -61,8 +66,8 @@ public abstract class BaseTermsQueryTestCase extends BaseIndexingTestCase {
 					searchResponse -> {
 						DocumentsAssert.assertValues(
 							searchResponse.getRequestString(),
-							searchResponse.getDocuments(), Field.USER_NAME,
-							expected);
+							searchResponse.getDocumentsStream(),
+							Field.USER_NAME, expected);
 
 						SearchHits searchHits = searchResponse.getSearchHits();
 

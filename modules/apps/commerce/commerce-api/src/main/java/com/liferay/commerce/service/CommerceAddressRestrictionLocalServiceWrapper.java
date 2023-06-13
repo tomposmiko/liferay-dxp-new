@@ -27,10 +27,6 @@ public class CommerceAddressRestrictionLocalServiceWrapper
 	implements CommerceAddressRestrictionLocalService,
 			   ServiceWrapper<CommerceAddressRestrictionLocalService> {
 
-	public CommerceAddressRestrictionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAddressRestrictionLocalServiceWrapper(
 		CommerceAddressRestrictionLocalService
 			commerceAddressRestrictionLocalService) {

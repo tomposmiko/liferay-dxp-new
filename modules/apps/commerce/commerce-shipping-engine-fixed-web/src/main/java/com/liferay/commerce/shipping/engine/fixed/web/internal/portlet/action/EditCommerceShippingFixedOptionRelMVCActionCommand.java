@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.math.BigDecimal;
@@ -40,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
 		"mvc.command.name=/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel"
@@ -49,34 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCommerceShippingFixedOptionRelMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommerceShippingFixedOptionRel(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceShippingFixedOptionRels(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchShippingFixedOptionRelException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-			}
-			else {
-				throw exception;
-			}
-		}
-	}
-
-	private void _deleteCommerceShippingFixedOptionRels(
+	protected void deleteCommerceShippingFixedOptionRels(
 			ActionRequest actionRequest)
 		throws PortalException {
 
@@ -106,7 +81,34 @@ public class EditCommerceShippingFixedOptionRelMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceShippingFixedOptionRel(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				updateCommerceShippingFixedOptionRel(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deleteCommerceShippingFixedOptionRels(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchShippingFixedOptionRelException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+			}
+			else {
+				throw exception;
+			}
+		}
+	}
+
+	protected void updateCommerceShippingFixedOptionRel(
 			ActionRequest actionRequest)
 		throws PortalException {
 
@@ -161,5 +163,8 @@ public class EditCommerceShippingFixedOptionRelMVCActionCommand
 
 	@Reference
 	private CommerceShippingMethodService _commerceShippingMethodService;
+
+	@Reference
+	private Portal _portal;
 
 }

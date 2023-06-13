@@ -12,120 +12,109 @@
  * details.
  */
 
-import {openModal, sub} from 'frontend-js-web';
+import {openModal} from 'frontend-js-web';
 
 import {selectPageContents} from './selectPageContents';
 
-export function selectPageContentDropdownItems(classPK, label = '') {
-	return (state) => {
-		const pageContent = selectPageContents(state)?.find(
-			(pageContent) => pageContent.classPK === classPK
-		);
+export const selectPageContentDropdownItems = (classPK, label = '') => (
+	state
+) => {
+	const pageContent = selectPageContents(state)?.find(
+		(pageContent) => pageContent.classPK === classPK
+	);
 
-		if (!pageContent) {
-			return null;
-		}
+	if (!pageContent) {
+		return null;
+	}
 
-		const {
-			addItems,
-			editImage,
-			editURL,
-			permissionsURL,
-			viewItemsURL,
-			viewUsagesURL,
-		} = pageContent.actions || {};
+	const {
+		addItems,
+		editImage,
+		editURL,
+		permissionsURL,
+		viewItemsURL,
+		viewUsagesURL,
+	} = pageContent.actions || {};
 
-		const dropdownItems = [];
+	const dropdownItems = [];
 
-		if (editURL) {
-			dropdownItems.push({
-				href: editURL,
-				label: label
-					? sub(Liferay.Language.get('edit-x'), label)
-					: Liferay.Language.get('edit'),
-				symbolLeft: 'pencil',
-			});
-		}
+	if (editURL) {
+		dropdownItems.push({
+			href: editURL,
+			label: label
+				? Liferay.Util.sub(Liferay.Language.get('edit-x'), label)
+				: Liferay.Language.get('edit'),
+		});
+	}
 
-		if (editImage) {
-			dropdownItems.push({
-				...editImage,
-				label: Liferay.Language.get('edit-image'),
-			});
-		}
+	if (editImage) {
+		dropdownItems.push({
+			...editImage,
+			label: Liferay.Language.get('edit-image'),
+		});
+	}
 
-		if (viewItemsURL) {
-			dropdownItems.push({
-				label: Liferay.Language.get('view-items'),
-				onClick: () =>
-					openModal({
-						title: Liferay.Language.get('view-items'),
-						url: viewItemsURL,
-					}),
-				symbolLeft: 'list-ul',
-			});
-		}
+	if (viewItemsURL) {
+		dropdownItems.push({
+			label: Liferay.Language.get('view-items'),
+			onClick: () =>
+				openModal({
+					title: Liferay.Language.get('view-items'),
+					url: viewItemsURL,
+				}),
+		});
+	}
 
-		if (addItems) {
-			dropdownItems.push({
-				type: 'divider',
-			});
+	if (addItems) {
+		dropdownItems.push({
+			items: addItems,
+			label: Liferay.Language.get('add-items'),
+			type: 'contextual',
+		});
+	}
 
-			dropdownItems.push({
-				items: addItems,
-				label: Liferay.Language.get('add-items'),
-				symbolLeft: 'plus',
-				type: 'contextual',
-			});
-		}
+	if (permissionsURL) {
+		dropdownItems.push({
+			label: label
+				? Liferay.Util.sub(
+						Liferay.Language.get('edit-x-permissions'),
+						label
+				  )
+				: Liferay.Language.get('permissions'),
+			onClick: () =>
+				openModal({
+					title: label
+						? Liferay.Util.sub(
+								Liferay.Language.get('edit-x-permissions'),
+								label
+						  )
+						: Liferay.Language.get('permissions'),
+					url: permissionsURL,
+				}),
+		});
+	}
 
-		if (permissionsURL) {
-			dropdownItems.push({
-				type: 'divider',
-			});
+	if (viewUsagesURL) {
+		dropdownItems.push({
+			label: label
+				? Liferay.Util.sub(Liferay.Language.get('view-x-usages'), label)
+				: Liferay.Language.get('view-usages'),
+			onClick: () =>
+				openModal({
+					title: label
+						? Liferay.Util.sub(
+								Liferay.Language.get('view-x-usages'),
+								label
+						  )
+						: Liferay.Language.get('view-usages'),
+					url: viewUsagesURL,
+				}),
+		});
+	}
 
-			dropdownItems.push({
-				label: label
-					? sub(Liferay.Language.get('edit-x-permissions'), label)
-					: Liferay.Language.get('permissions'),
-				onClick: () =>
-					openModal({
-						title: label
-							? sub(
-									Liferay.Language.get('edit-x-permissions'),
-									label
-							  )
-							: Liferay.Language.get('permissions'),
-						url: permissionsURL,
-					}),
-				symbolLeft: 'password-policies',
-			});
-		}
+	if (dropdownItems.length === 0) {
+		return null;
+	}
 
-		if (viewUsagesURL) {
-			dropdownItems.push({
-				type: 'divider',
-			});
-
-			dropdownItems.push({
-				label: label
-					? sub(Liferay.Language.get('view-x-usages'), label)
-					: Liferay.Language.get('view-usages'),
-				onClick: () =>
-					openModal({
-						title: label
-							? sub(Liferay.Language.get('view-x-usages'), label)
-							: Liferay.Language.get('view-usages'),
-						url: viewUsagesURL,
-					}),
-				symbolLeft: 'list-ul',
-			});
-		}
-
-		if (!dropdownItems.length) {
-			return null;
-		}
-
-		return dropdownItems;
-	};
-}
+	return dropdownItems;
+};

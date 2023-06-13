@@ -1,6 +1,5 @@
 package ${configYAML.apiPackagePath}.internal.resource.${escapedVersion}.factory;
 
-import ${configYAML.apiPackagePath}.internal.security.permission.LiberalPermissionChecker;
 import ${configYAML.apiPackagePath}.resource.${escapedVersion}.${schemaName}Resource;
 
 import com.liferay.portal.kernel.model.Company;
@@ -22,18 +21,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -41,7 +36,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -49,7 +46,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author ${configYAML.author}
  * @generated
  */
-@Component(<#if configYAML.liferayEnterpriseApp>enabled = false,</#if> property="resource.locator.key=${configYAML.application.baseURI}/${openAPIYAML.info.version}/${schemaName}", service = ${schemaName}Resource.Factory.class)
+@Component(<#if configYAML.liferayEnterpriseApp>enabled = false,</#if> immediate = true, service = ${schemaName}Resource.Factory.class)
 @Generated("")
 public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.Factory {
 
@@ -63,7 +60,7 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _${schemaVarName}ResourceProxyProviderFunction.apply((proxy, method,arguments) -> _invoke(method, arguments, _checkPermissions, _httpServletRequest, _httpServletResponse, _preferredLocale, _user));
+				return (${schemaName}Resource)ProxyUtil.newProxyInstance(${schemaName}Resource.class.getClassLoader(), new Class<?>[] {${schemaName}Resource.class}, (proxy, method, arguments) -> _invoke(method, arguments, _checkPermissions, _httpServletRequest, _httpServletResponse, _preferredLocale, _user));
 			}
 
 			@Override
@@ -110,24 +107,14 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 		};
 	}
 
-	private static Function<InvocationHandler, ${schemaName}Resource> _getProxyProviderFunction() {
-		Class<?> proxyClass = ProxyUtil.getProxyClass(${schemaName}Resource.class.getClassLoader(), ${schemaName}Resource.class);
+	@Activate
+	protected void activate() {
+		${schemaName}Resource.FactoryHolder.factory = this;
+	}
 
-		try {
-			Constructor<${schemaName}Resource> constructor = (Constructor<${schemaName}Resource>)proxyClass.getConstructor(InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException reflectiveOperationException) {
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		${schemaName}Resource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(Method method, Object[] arguments, boolean checkPermissions, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Locale preferredLocale, User user) throws Throwable {
@@ -141,7 +128,7 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 			PermissionThreadLocal.setPermissionChecker(_defaultPermissionCheckerFactory.create(user));
 		}
 		else {
-			PermissionThreadLocal.setPermissionChecker(new LiberalPermissionChecker(user));
+			PermissionThreadLocal.setPermissionChecker(_liberalPermissionCheckerFactory.create(user));
 		}
 
 		${schemaName}Resource ${schemaVarName}Resource = _componentServiceObjects.getService();
@@ -161,7 +148,6 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 		${schemaVarName}Resource.setResourceActionLocalService(_resourceActionLocalService);
 		${schemaVarName}Resource.setResourcePermissionLocalService(_resourcePermissionLocalService);
 		${schemaVarName}Resource.setRoleLocalService(_roleLocalService);
-		${schemaVarName}Resource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(${schemaVarName}Resource, arguments);
@@ -178,8 +164,6 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 		}
 	}
 
-	private static final Function<InvocationHandler, ${schemaName}Resource> _${schemaVarName}ResourceProxyProviderFunction = _getProxyProviderFunction();
-
 	@Reference
 	private CompanyLocalService _companyLocalService;
 
@@ -189,9 +173,7 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 	@Reference
 	private PermissionCheckerFactory _defaultPermissionCheckerFactory;
 
-	@Reference(
-		target = "(result.class.name=com.liferay.portal.kernel.search.filter.Filter)"
-	)
+	@Reference
 	private ExpressionConvert<Filter> _expressionConvert;
 
 	@Reference
@@ -199,6 +181,9 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
@@ -208,9 +193,6 @@ public class ${schemaName}ResourceFactoryImpl implements ${schemaName}Resource.F
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

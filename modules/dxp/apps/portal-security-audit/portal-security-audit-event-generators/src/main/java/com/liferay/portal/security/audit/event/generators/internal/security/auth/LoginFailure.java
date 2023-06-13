@@ -35,9 +35,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Farache
  * @author Mika Koivisto
  * @author Brian Wing Shun Chan
- * @author Stian Sigvartsen
  */
-@Component(property = "key=auth.failure", service = AuthFailure.class)
+@Component(
+	immediate = true, property = "key=auth.failure", service = AuthFailure.class
+)
 public class LoginFailure implements AuthFailure {
 
 	@Override
@@ -49,9 +50,8 @@ public class LoginFailure implements AuthFailure {
 			User user = _userLocalService.getUserByEmailAddress(
 				companyId, emailAddress);
 
-			AuditMessage auditMessage = _buildAuditMessage(
-				user, emailAddress, headerMap,
-				"Failed to authenticate by email address");
+			AuditMessage auditMessage = buildAuditMessage(
+				user, headerMap, "Failed to authenticate by email address");
 
 			_auditRouter.route(auditMessage);
 		}
@@ -62,7 +62,7 @@ public class LoginFailure implements AuthFailure {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 	}
@@ -76,9 +76,8 @@ public class LoginFailure implements AuthFailure {
 			User user = _userLocalService.getUserByScreenName(
 				companyId, screenName);
 
-			AuditMessage auditMessage = _buildAuditMessage(
-				user, screenName, headerMap,
-				"Failed to authenticate by screen name");
+			AuditMessage auditMessage = buildAuditMessage(
+				user, headerMap, "Failed to authenticate by screen name");
 
 			_auditRouter.route(auditMessage);
 		}
@@ -89,7 +88,7 @@ public class LoginFailure implements AuthFailure {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 	}
@@ -102,9 +101,8 @@ public class LoginFailure implements AuthFailure {
 		try {
 			User user = _userLocalService.getUserById(companyId, userId);
 
-			AuditMessage auditMessage = _buildAuditMessage(
-				user, String.valueOf(userId), headerMap,
-				"Failed to authenticate by user ID");
+			AuditMessage auditMessage = buildAuditMessage(
+				user, headerMap, "Failed to authenticate by user ID");
 
 			_auditRouter.route(auditMessage);
 		}
@@ -115,14 +113,13 @@ public class LoginFailure implements AuthFailure {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 	}
 
-	private AuditMessage _buildAuditMessage(
-		User user, String userLogin, Map<String, String[]> headerMap,
-		String reason) {
+	protected AuditMessage buildAuditMessage(
+		User user, Map<String, String[]> headerMap, String reason) {
 
 		JSONObject additionalInfoJSONObject = _jsonFactory.createJSONObject();
 
@@ -132,15 +129,11 @@ public class LoginFailure implements AuthFailure {
 			"reason", reason
 		);
 
-		AuditMessage auditMessage = new AuditMessage(
+		return new AuditMessage(
 			EventTypes.LOGIN_FAILURE, user.getCompanyId(), user.getUserId(),
 			user.getFullName(), User.class.getName(),
 			String.valueOf(user.getPrimaryKey()), null,
 			additionalInfoJSONObject);
-
-		auditMessage.setUserLogin(userLogin);
-
-		return auditMessage;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(LoginFailure.class);

@@ -78,10 +78,10 @@ public class CommercePriceEntryLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		User guestUser = _company.getGuestUser();
+		User defaultUser = _company.getDefaultUser();
 
 		_group = GroupTestUtil.addGroup(
-			_company.getCompanyId(), guestUser.getUserId(), 0);
+			_company.getCompanyId(), defaultUser.getUserId(), 0);
 
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
 			_company.getCompanyId());
@@ -530,9 +530,11 @@ public class CommercePriceEntryLocalServiceTest {
 				RandomTestUtil.randomString(), RandomTestUtil.randomDouble(),
 				true, null, null);
 
-		Assert.assertNull(
+		CommercePriceEntry commercePriceEntry =
 			_commercePriceEntryLocalService.fetchCommercePriceEntry(
-				cpInstanceId, commercePriceList.getCommercePriceListId()));
+				cpInstanceId, commercePriceList.getCommercePriceListId());
+
+		Assert.assertNull(commercePriceEntry);
 	}
 
 	@Test

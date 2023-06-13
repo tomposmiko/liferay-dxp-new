@@ -37,17 +37,25 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = InfoItemFieldReader.class)
+@Component(enabled = false, service = InfoItemFieldReader.class)
 public class AssetCategoryFriendlyURLInfoItemFieldReader
 	implements InfoItemFieldReader<AssetCategory> {
+
+	/**
+	 *   @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *          #getInfoField()}
+	 */
+	@Deprecated
+	@Override
+	public InfoField getField() {
+		return null;
+	}
 
 	@Override
 	public InfoField getInfoField() {
 		return InfoField.builder(
 		).infoFieldType(
 			URLInfoFieldType.INSTANCE
-		).namespace(
-			AssetCategory.class.getSimpleName()
 		).name(
 			"friendlyURL"
 		).labelInfoLocalizedValue(
@@ -89,7 +97,7 @@ public class AssetCategoryFriendlyURLInfoItemFieldReader
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 

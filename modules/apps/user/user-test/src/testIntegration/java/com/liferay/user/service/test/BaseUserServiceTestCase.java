@@ -15,6 +15,7 @@
 package com.liferay.user.service.test;
 
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -33,8 +34,10 @@ public abstract class BaseUserServiceTestCase {
 			long groupId, User subjectUser, User objectUser)
 		throws Exception {
 
-		PermissionThreadLocal.setPermissionChecker(
-			_permissionCheckerFactory.create(subjectUser));
+		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
+			subjectUser);
+
+		PermissionThreadLocal.setPermissionChecker(permissionChecker);
 
 		_userService.unsetGroupUsers(
 			groupId, new long[] {objectUser.getUserId()}, new ServiceContext());
@@ -44,8 +47,10 @@ public abstract class BaseUserServiceTestCase {
 			long organizationId, User subjectUser, User objectUser)
 		throws Exception {
 
-		PermissionThreadLocal.setPermissionChecker(
-			_permissionCheckerFactory.create(subjectUser));
+		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
+			subjectUser);
+
+		PermissionThreadLocal.setPermissionChecker(permissionChecker);
 
 		_userService.unsetOrganizationUsers(
 			organizationId, new long[] {objectUser.getUserId()});

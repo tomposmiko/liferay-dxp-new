@@ -60,7 +60,7 @@ renderResponse.setTitle((ddlRecord != null) ? LanguageUtil.format(request, "edit
 	cssClass="sidenav-container sidenav-right"
 >
 	<div class="lfr-form-content">
-		<aui:form action="<%= updateDDLRecordURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" onSubmit="event.preventDefault(); submitForm(event.target);">
+		<aui:form action="<%= updateDDLRecordURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" onSubmit='<%= "event.preventDefault(); submitForm(event.target);" %>'>
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="groupId" type="hidden" value="<%= String.valueOf(groupId) %>" />
 			<aui:input name="ddlRecordId" type="hidden" value="<%= String.valueOf(ddlRecordId) %>" />
@@ -69,37 +69,35 @@ renderResponse.setTitle((ddlRecord != null) ? LanguageUtil.format(request, "edit
 			<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_SAVE_DRAFT %>" />
 			<aui:input name="workflowTaskId" type="hidden" value="<%= String.valueOf(workflowTaskId) %>" />
 
-			<div class="sheet">
-				<div class="panel-group panel-group-flush">
-					<aui:fieldset>
+			<aui:fieldset-group markupView="lexicon">
+				<aui:fieldset>
 
-						<%
-						long classNameId = 0;
-						long classPK = 0;
+					<%
+					long classNameId = 0;
+					long classPK = 0;
 
-						if (ddmTemplateId > 0) {
-							classNameId = PortalUtil.getClassNameId(DDMTemplate.class);
-							classPK = ddmTemplateId;
-						}
-						else {
-							DDLRecordSet ddlRecordSet = kaleoProcess.getDDLRecordSet();
+					if (ddmTemplateId > 0) {
+						classNameId = PortalUtil.getClassNameId(DDMTemplate.class);
+						classPK = ddmTemplateId;
+					}
+					else {
+						DDLRecordSet ddlRecordSet = kaleoProcess.getDDLRecordSet();
 
-							DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
+						DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
 
-							classNameId = PortalUtil.getClassNameId(DDMStructure.class);
-							classPK = ddmStructure.getStructureId();
-						}
-						%>
+						classNameId = PortalUtil.getClassNameId(DDMStructure.class);
+						classPK = ddmStructure.getStructureId();
+					}
+					%>
 
-						<liferay-ddm:html
-							classNameId="<%= classNameId %>"
-							classPK="<%= classPK %>"
-							ddmFormValues="<%= kaleoFormsAdminDisplayContext.getDDMFormValues(ddlRecord.getDDMStorageId()) %>"
-							requestedLocale="<%= locale %>"
-						/>
-					</aui:fieldset>
-				</div>
-			</div>
+					<liferay-ddm:html
+						classNameId="<%= classNameId %>"
+						classPK="<%= classPK %>"
+						ddmFormValues="<%= kaleoFormsAdminDisplayContext.getDDMFormValues(ddlRecord.getDDMStorageId()) %>"
+						requestedLocale="<%= locale %>"
+					/>
+				</aui:fieldset>
+			</aui:fieldset-group>
 
 			<aui:button-row>
 				<aui:button cssClass="btn-lg" name="saveButton" type="submit" value="save" />

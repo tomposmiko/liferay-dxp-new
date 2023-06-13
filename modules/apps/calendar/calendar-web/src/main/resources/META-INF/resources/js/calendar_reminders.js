@@ -15,11 +15,11 @@
 AUI.add(
 	'liferay-calendar-reminders',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const TPL_REMINDER_SECTION =
+		var TPL_REMINDER_SECTION =
 			'<div class="calendar-portlet-reminder-section form-inline">' +
 			'<input <tpl if="!disabled">checked="checked"</tpl> class="calendar-portlet-reminder-check" id="{portletNamespace}reminder{i}" name="{portletNamespace}reminder{i}" type="checkbox" />' +
 			'<label class="reminder-type" for="{portletNamespace}reminder{i}">' +
@@ -35,7 +35,7 @@ AUI.add(
 			'</select>' +
 			'</div>';
 
-		const Reminders = A.Component.create({
+		var Reminders = A.Component.create({
 			ATTRS: {
 				portletNamespace: {
 					value: '',
@@ -74,10 +74,10 @@ AUI.add(
 
 			prototype: {
 				_onChangeCheckbox(event) {
-					const target = event.target;
+					var target = event.target;
 
-					const checked = target.get('checked');
-					const elements = target.siblings('input[type=text],select');
+					var checked = target.get('checked');
+					var elements = target.siblings('input[type=text],select');
 
 					elements.set('disabled', !checked);
 
@@ -87,29 +87,30 @@ AUI.add(
 				},
 
 				_uiSetValues(val) {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get('boundingBox');
-					const portletNamespace = instance.get('portletNamespace');
-					const strings = instance.get('strings');
+					var boundingBox = instance.get('boundingBox');
+					var portletNamespace = instance.get('portletNamespace');
+					var strings = instance.get('strings');
 
-					const buffer = [];
+					var buffer = [];
 
-					const tplReminder = instance.tplReminder;
+					var tplReminder = instance.tplReminder;
 
-					for (let i = 0; i < val.length; i++) {
-						const value = val[i];
+					for (var i = 0; i < val.length; i++) {
+						var value = val[i];
 
 						buffer.push(
-							tplReminder.parse({
-								...strings,
-								disabled: !value.interval,
-								i,
-								portletNamespace,
-								time: Liferay.Time.getDescription(
-									value.interval
-								),
-							})
+							tplReminder.parse(
+								A.merge(strings, {
+									disabled: !value.interval,
+									i,
+									portletNamespace,
+									time: Liferay.Time.getDescription(
+										value.interval
+									),
+								})
+							)
 						);
 					}
 
@@ -117,9 +118,9 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 
 					boundingBox.delegate(
 						'change',
@@ -130,7 +131,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance.tplReminder = new A.Template(TPL_REMINDER_SECTION);
 				},

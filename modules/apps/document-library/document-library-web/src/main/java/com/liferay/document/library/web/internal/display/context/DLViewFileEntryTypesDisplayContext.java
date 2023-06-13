@@ -20,11 +20,11 @@ import com.liferay.document.library.kernel.service.DLFileEntryTypeServiceUtil;
 import com.liferay.document.library.web.internal.security.permission.resource.DLPermission;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -73,8 +73,7 @@ public class DLViewFileEntryTypesDisplayContext {
 						"/document_library/edit_file_entry_type", "redirect",
 						PortalUtil.getCurrentURL(_httpServletRequest));
 					dropdownItem.setLabel(
-						LanguageUtil.format(
-							_httpServletRequest, "new-x", "document-type"));
+						LanguageUtil.get(_httpServletRequest, "new"));
 				}
 			).build();
 		}
@@ -109,21 +108,24 @@ public class DLViewFileEntryTypesDisplayContext {
 		boolean includeBasicFileEntryType = ParamUtil.getBoolean(
 			_renderRequest, "includeBasicFileEntryType");
 
-		searchContainer.setResultsAndTotal(
-			() -> DLFileEntryTypeServiceUtil.search(
+		int total = DLFileEntryTypeServiceUtil.searchCount(
+			themeDisplay.getCompanyId(),
+			PortalUtil.getCurrentAndAncestorSiteGroupIds(
+				themeDisplay.getScopeGroupId()),
+			displayTerms.getKeywords(), includeBasicFileEntryType,
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_SCOPE_DEFAULT);
+
+		searchContainer.setTotal(total);
+
+		searchContainer.setResults(
+			DLFileEntryTypeServiceUtil.search(
 				themeDisplay.getCompanyId(),
 				PortalUtil.getCurrentAndAncestorSiteGroupIds(
 					themeDisplay.getScopeGroupId()),
 				displayTerms.getKeywords(), includeBasicFileEntryType,
 				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_SCOPE_DEFAULT,
 				searchContainer.getStart(), searchContainer.getEnd(),
-				searchContainer.getOrderByComparator()),
-			DLFileEntryTypeServiceUtil.searchCount(
-				themeDisplay.getCompanyId(),
-				PortalUtil.getCurrentAndAncestorSiteGroupIds(
-					themeDisplay.getScopeGroupId()),
-				displayTerms.getKeywords(), includeBasicFileEntryType,
-				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_SCOPE_DEFAULT));
+				searchContainer.getOrderByComparator()));
 
 		_searchContainer = searchContainer;
 

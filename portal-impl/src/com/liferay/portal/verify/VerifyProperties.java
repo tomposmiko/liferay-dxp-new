@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.portlet.documentlibrary.store.StoreFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,32 +29,24 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
  */
-public class VerifyProperties {
+public class VerifyProperties extends VerifyProcess {
 
-	public static void verify() throws Exception {
+	@Override
+	protected void doVerify() throws Exception {
 		verifySystemProperties();
 
-		List<String> keys = verifyPortalProperties();
+		verifyPortalProperties();
 
-		if (!keys.isEmpty()) {
-			_log.error(
-				"Stopping the server due to incorrect use of migrated portal " +
-					"properties " + keys);
-
-			System.exit(1);
-		}
+		verifyDocumentLibrary();
 	}
 
-	protected static InputStream getPropertiesResourceAsStream(
-			String resourceName)
+	protected InputStream getPropertiesResourceAsStream(String resourceName)
 		throws FileNotFoundException {
 
 		File propertyFile = new File(resourceName);
@@ -77,7 +70,7 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static Properties loadPortalProperties() {
+	protected Properties loadPortalProperties() {
 		Properties properties = new Properties();
 
 		List<String> propertiesResourceNames = ListUtil.fromArray(
@@ -109,9 +102,16 @@ public class VerifyProperties {
 		return properties;
 	}
 
-	protected static void verifyMigratedPortalProperty(
-			Properties portalProperties, String oldKey, String newKey,
-			List<String> unmigratedKeys)
+	protected void verifyDocumentLibrary() {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			StoreFactory storeFactory = StoreFactory.getInstance();
+
+			storeFactory.checkProperties();
+		}
+	}
+
+	protected void verifyMigratedPortalProperty(
+			Properties portalProperties, String oldKey, String newKey)
 		throws Exception {
 
 		if (portalProperties.containsKey(oldKey)) {
@@ -119,13 +119,10 @@ public class VerifyProperties {
 				StringBundler.concat(
 					"Portal property \"", oldKey,
 					"\" was migrated to the system property \"", newKey, "\""));
-
-			unmigratedKeys.add(oldKey);
 		}
 	}
 
-	protected static void verifyMigratedSystemProperty(
-			String oldKey, String newKey)
+	protected void verifyMigratedSystemProperty(String oldKey, String newKey)
 		throws Exception {
 
 		String value = SystemProperties.get(oldKey);
@@ -138,7 +135,7 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static void verifyModularizedPortalProperty(
+	protected void verifyModularizedPortalProperty(
 			Properties portalProperties, String oldKey, String newKey,
 			String moduleName)
 		throws Exception {
@@ -151,12 +148,12 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static void verifyModularizedSystemProperty(
-			Set<String> systemPropertyNames, String oldKey, String newKey,
+	protected void verifyModularizedSystemProperty(
+			Properties systemProperties, String oldKey, String newKey,
 			String moduleName)
 		throws Exception {
 
-		if (systemPropertyNames.contains(oldKey)) {
+		if (systemProperties.containsKey(oldKey)) {
 			_log.error(
 				StringBundler.concat(
 					"System property \"", oldKey, "\" was modularized to ",
@@ -164,7 +161,7 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static void verifyObsoletePortalProperty(
+	protected void verifyObsoletePortalProperty(
 			Properties portalProperties, String key)
 		throws Exception {
 
@@ -173,9 +170,7 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static void verifyObsoleteSystemProperty(String key)
-		throws Exception {
-
+	protected void verifyObsoleteSystemProperty(String key) throws Exception {
 		String value = SystemProperties.get(key);
 
 		if (value != null) {
@@ -183,9 +178,7 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static List<String> verifyPortalProperties() throws Exception {
-		List<String> unmigratedKeys = new LinkedList<>();
-
+	protected void verifyPortalProperties() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			Properties portalProperties = loadPortalProperties();
 
@@ -193,8 +186,7 @@ public class VerifyProperties {
 				String oldKey = keys[0];
 				String newKey = keys[1];
 
-				verifyMigratedPortalProperty(
-					portalProperties, oldKey, newKey, unmigratedKeys);
+				verifyMigratedPortalProperty(portalProperties, oldKey, newKey);
 			}
 
 			for (String[] keys : _RENAMED_PORTAL_KEYS) {
@@ -217,11 +209,9 @@ public class VerifyProperties {
 					portalProperties, oldKey, newKey, moduleName);
 			}
 		}
-
-		return unmigratedKeys;
 	}
 
-	protected static void verifyRenamedPortalProperty(
+	protected void verifyRenamedPortalProperty(
 			Properties portalProperties, String oldKey, String newKey)
 		throws Exception {
 
@@ -233,8 +223,7 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static void verifyRenamedSystemProperty(
-			String oldKey, String newKey)
+	protected void verifyRenamedSystemProperty(String oldKey, String newKey)
 		throws Exception {
 
 		String value = SystemProperties.get(oldKey);
@@ -247,7 +236,7 @@ public class VerifyProperties {
 		}
 	}
 
-	protected static void verifySystemProperties() throws Exception {
+	protected void verifySystemProperties() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			for (String[] keys : _MIGRATED_SYSTEM_KEYS) {
 				String oldKey = keys[0];
@@ -267,7 +256,7 @@ public class VerifyProperties {
 				verifyObsoleteSystemProperty(key);
 			}
 
-			Set<String> propertyNames = SystemProperties.getPropertyNames();
+			Properties systemProperties = SystemProperties.getProperties();
 
 			for (String[] keys : _MODULARIZED_SYSTEM_KEYS) {
 				String oldKey = keys[0];
@@ -275,7 +264,7 @@ public class VerifyProperties {
 				String moduleName = keys[2];
 
 				verifyModularizedSystemProperty(
-					propertyNames, oldKey, newKey, moduleName);
+					systemProperties, oldKey, newKey, moduleName);
 			}
 		}
 	}
@@ -297,41 +286,7 @@ public class VerifyProperties {
 		{
 			"http.header.secure.x.frame.options.255",
 			"http.header.secure.x.frame.options.255"
-		},
-		{
-			"module.framework.beginning.start.level",
-			"module.framework.beginning.start.level"
-		},
-		{
-			"module.framework.dynamic.install.start.level",
-			"module.framework.dynamic.install.start.level"
-		},
-		{
-			"module.framework.file.install.config.encoding",
-			"module.framework.file.install.config.encoding"
-		},
-		{
-			"module.framework.concurrent.startup.enabled",
-			"module.framework.concurrent.startup.enabled"
-		},
-		{
-			"module.framework.configuration.bundle.symbolic.names",
-			"module.framework.configuration.bundle.symbolic.names"
-		},
-		{
-			"module.framework.runtime.start.level",
-			"module.framework.runtime.start.level"
-		},
-		{
-			"module.framework.services.ignored.interfaces",
-			"module.framework.services.ignored.interfaces"
-		},
-		{"module.framework.static.jars", "module.framework.static.jars"},
-		{
-			"module.framework.system.packages.extra",
-			"module.framework.system.packages.extra"
-		},
-		{"module.framework.web.start.level", "module.framework.web.start.level"}
+		}
 	};
 
 	private static final String[][] _MIGRATED_SYSTEM_KEYS = {
@@ -374,38 +329,6 @@ public class VerifyProperties {
 		{
 			"com.liferay.util.Http.timeout",
 			"com.liferay.portal.util.HttpImpl.timeout"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.max.connections.per.host",
-			"com.liferay.portal.kernel.util.Http.max.connections.per.host"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.max.total.connections",
-			"com.liferay.portal.kernel.util.Http.max.total.connections"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.proxy.auth.type",
-			"com.liferay.portal.kernel.util.Http.proxy.auth.type"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.proxy.ntlm.domain",
-			"com.liferay.portal.kernel.util.Http.proxy.ntlm.domain"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.proxy.ntlm.host",
-			"com.liferay.portal.kernel.util.Http.proxy.ntlm.host"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.proxy.password",
-			"com.liferay.portal.kernel.util.Http.proxy.password"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.proxy.username",
-			"com.liferay.portal.kernel.util.Http.proxy.username"
-		},
-		{
-			"com.liferay.portal.util.HttpImpl.timeout",
-			"com.liferay.portal.kernel.util.Http.timeout"
 		},
 		{
 			"com.liferay.util.format.PhoneNumberFormat",
@@ -1174,6 +1097,10 @@ public class VerifyProperties {
 			"com.liferay.journal.service"
 		},
 		{
+			"journal.error.template[xsl]", "error.template[xsl]",
+			"com.liferay.journal.service"
+		},
+		{
 			"journal.feed.force.autogenerate.id",
 			"journal.feed.force.autogenerate.id", "com.liferay.journal.web"
 		},
@@ -1210,6 +1137,11 @@ public class VerifyProperties {
 		{
 			"journal.template.language.content[vm]",
 			"journal.article.template.language.content[vm]",
+			"com.liferay.journal.web"
+		},
+		{
+			"journal.template.language.content[xsl]",
+			"journal.article.template.language.content[xsl]",
 			"com.liferay.journal.web"
 		},
 		{
@@ -1525,19 +1457,6 @@ public class VerifyProperties {
 			"com.liferay.asset.tags.compiler.web"
 		},
 
-		// Text Extraction
-
-		{
-			"text.extraction.fork.process.enabled",
-			"text-extraction-fork-process-enabled",
-			"com.liferay.portal.tika"
-		},
-		{
-			"text.extraction.fork.process.mime.types",
-			"text-extraction-fork-process-mime-types",
-			"com.liferay.portal.tika"
-		},
-
 		// Translator
 
 		{
@@ -1617,6 +1536,13 @@ public class VerifyProperties {
 			"xsl.content.xsl.secure.processing.enabled",
 			"xsl.secure.processing.enabled", "com.liferay.xsl.content.web"
 		},
+
+		// XSL Engine
+
+		{
+			"xsl.template.secure.processing.enabled",
+			"secure.processing.enabled", "com.liferay.portal.template.xsl"
+		}
 	};
 
 	private static final String[][] _MODULARIZED_SYSTEM_KEYS = {
@@ -1638,50 +1564,24 @@ public class VerifyProperties {
 		{
 			"ical4j.validation.relaxed", "ical4j.validation.relaxed",
 			"com.liferay.calendar.service"
-		},
-
-		// Tika
-
-		{
-			"tika.config", "tika-config-xml", "com.liferay.portal.tika"
 		}
-
 	};
 
 	private static final String[] _OBSOLETE_PORTAL_KEYS = {
 		"aim.login", "aim.login", "amazon.access.key.id",
 		"amazon.associate.tag", "amazon.secret.access.key",
-		"asset.categories.properties.default",
 		"asset.entry.increment.view.counter.enabled", "asset.entry.validator",
 		"asset.publisher.asset.entry.query.processors",
 		"asset.publisher.filter.unlistable.entries",
 		"asset.publisher.query.form.configuration",
 		"asset.tag.permissions.enabled", "asset.tag.properties.default",
 		"asset.tag.properties.enabled", "asset.tag.suggestions.enabled",
-		"auth.login.prompt.enabled", "auth.max.failures.limit",
-		"auth.user.uuid.store.enabled", "auto.deploy.blacklist.threshold",
-		"auto.deploy.copy.commons.logging", "auto.deploy.copy.log4j",
-		"auto.deploy.dest.dir", "auto.deploy.default.dest.dir",
-		"auto.deploy.jboss.dest.dir", "auto.deploy.jboss.dest.dir[5]",
-		"auto.deploy.jboss.prefix", "auto.deploy.tomcat.dest.dir",
-		"auto.deploy.tomcat.lib.dir", "auto.deploy.unpack.war",
-		"auto.deploy.weblogic.dest.dir", "auto.deploy.websphere.dest.dir",
-		"auto.deploy.websphere.wsadmin.app.manager.install.options",
-		"auto.deploy.websphere.wsadmin.app.manager.list.options",
-		"auto.deploy.websphere.wsadmin.app.manager.query",
-		"auto.deploy.websphere.wsadmin.app.manager.update.options",
-		"auto.deploy.websphere.wsadmin.app.name.suffix",
-		"auto.deploy.websphere.wsadmin.properties.file.name",
-		"auto.deploy.wildfly.dest.dir", "auto.deploy.wildfly.prefix",
-		"axis.servlet.enabled", "axis.servlet.hosts.allowed",
-		"axis.servlet.https.required", "axis.servlet.mapping",
+		"auth.max.failures.limit", "auto.deploy.blacklist.threshold",
 		"blogs.image.small.max.size", "breadcrumb.display.style.options",
-		"browser.compatibility.ie.versions",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size",
-		"cache.clear.on.context.initialization",
-		"cache.clear.on.plugin.undeploy", "calendar.publish.to.live.by.default",
-		"captcha.max.challenges", "captcha.check.portal.create_account",
+		"cache.clear.on.context.initialization", "captcha.max.challenges",
+		"captcha.check.portal.create_account",
 		"captcha.check.portal.send_password",
 		"captcha.check.portlet.message_boards.edit_category",
 		"captcha.check.portlet.message_boards.edit_message",
@@ -1698,39 +1598,20 @@ public class VerifyProperties {
 		"captcha.engine.simplecaptcha.text.producers",
 		"captcha.engine.simplecaptcha.word.renderers", "cas.validate.url",
 		"cluster.executor.heartbeat.interval",
-		"cluster.link.node.bootup.response.timeout",
 		"com.liferay.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.audit.AuditFilter",
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.charbufferpool." +
 			"CharBufferPoolFilter",
-		"com.liferay.portal.servlet.filters.i18n.I18nFilter",
-		"com.liferay.portal.servlet.filters.jsoncontenttype." +
-			"JSONContentTypeFilter",
 		"com.liferay.portal.servlet.filters.monitoring.MonitoringFilter",
 		"com.liferay.portal.servlet.filters.secure.SecureFilter",
-		"com.liferay.portal.servlet.filters.sso.opensso.OpenSSOFilter",
 		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
 		"com.liferay.portal.upload.UploadServletRequestImpl.max.size",
 		"com.liferay.portal.upload.UploadServletRequestImpl.temp.dir",
-		"commons.pool.enabled", "company.security.send.password",
-		"company.settings.form.configuration",
+		"commons.pool.enabled", "company.settings.form.configuration",
 		"company.settings.form.identification",
 		"company.settings.form.miscellaneous", "company.settings.form.social",
-		"control.panel.home.portlet.id",
-		"control.panel.navigation.max.organizations",
-		"control.panel.navigation.max.sites", "convert.processes",
-		"counter.jdbc.prefix", "data.limit.max.dl.storage.size",
-		"data.limit.max.journal.article.count",
-		"data.limit.max.journal.folder.count",
-		"data.limit.max.mail.message.count",
-		"data.limit.max.mail.message.period",
-		"data.limit.max.organization.count", "data.limit.max.role.count",
-		"data.limit.max.site.count", "data.limit.max.team.count",
-		"data.limit.max.user.count", "default.guest.public.layout.column-1",
-		"default.guest.public.layout.column-2",
-		"default.guest.public.layout.column-3",
-		"default.guest.public.layout.column-4",
+		"control.panel.home.portlet.id", "convert.processes",
 		"default.guest.public.layout.wap.color.scheme.id",
 		"default.guest.public.layout.wap.theme.id",
 		"default.user.private.layout.wap.color.scheme.id",
@@ -1740,17 +1621,11 @@ public class VerifyProperties {
 		"default.wap.color.scheme.id", "default.wap.theme.id",
 		"discussion.subscribe.by.default", "discussion.thread.view",
 		"dl.file.entry.image.exif.metadata.rotation.enabled",
-		"dl.file.entry.open.in.ms.office.manual.check.in.required",
-		"dl.file.entry.preview.auto.create.on.upgrade",
-		"dl.file.entry.preview.document.depth",
 		"dl.file.entry.previewable.processor.max.size",
 		"dl.file.entry.read.count.enabled",
-		"dl.file.entry.thumbnail.video.frame.percentage",
 		"dl.file.entry.type.ig.image.auto.create.on.upgrade",
-		"dl.file.entry.version.policy", "dl.file.extensions",
-		"dl.file.indexing.interval", "dl.file.max.size", "dl.file.rank.enabled",
-		"dl.folder.icon.check.count", "dl.folder.menu.visible",
-		"dl.hook.cmis.credentials.password",
+		"dl.file.extensions", "dl.file.max.size", "dl.file.rank.enabled",
+		"dl.folder.menu.visible", "dl.hook.cmis.credentials.password",
 		"dl.hook.cmis.credentials.username", "dl.hook.cmis.repository.url",
 		"dl.hook.cmis.system.root.dir", "dl.hook.file.system.root.dir",
 		"dl.hook.jcr.fetch.delay", "dl.hook.jcr.fetch.max.failures",
@@ -1771,8 +1646,7 @@ public class VerifyProperties {
 		"dynamic.data.mapping.structure.private.field.repeatable[" +
 			"_fieldsDisplay]",
 		"dynamic.data.mapping.template.language.types",
-		"dynamic.resource.servlet.allowed.paths", "editor.ckeditor.version",
-		"editor.inline.editing.enabled",
+		"editor.ckeditor.version", "editor.inline.editing.enabled",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.asset_publisher." +
 			"configuration.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.blogs.configuration." +
@@ -1786,8 +1660,6 @@ public class VerifyProperties {
 			"configuration.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.login.configuration." +
 			"jsp",
-		"editor.wysiwyg.portal-web.docroot.html.portlet.mail.edit.jsp",
-		"editor.wysiwyg.portal-web.docroot.html.portlet.mail.edit_message.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.message_boards." +
 			"configuration.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.message_boards." +
@@ -1811,63 +1683,29 @@ public class VerifyProperties {
 		"ehcache.rmi.peer.listener.factory.properties",
 		"ehcache.rmi.peer.provider.factory.class",
 		"ehcache.rmi.peer.provider.factory.properties",
-		"ehcache.socket.so.timeout", "ehcache.socket.start.port",
-		"ehcache.statistics.enabled", "enterprise.product.commerce.enabled",
-		"finalize.manager.thread.enabled",
+		"ehcache.statistics.enabled",
 		"hot.deploy.hook.custom.jsp.verification.enabled",
-		"hot.undeploy.enabled", "hot.undeploy.interval",
-		"hot.undeploy.on.redeploy", "hibernate.cache.region.factory_class",
+		"hibernate.cache.region.factory_class",
 		"hibernate.cache.use_minimal_puts", "hibernate.cache.use_query_cache",
 		"hibernate.cache.use_second_level_cache",
-		"hibernate.cache.use_structured_entries",
-		"hibernate.connection.release_mode",
-		"hibernate.session.factory.imported.class.name.regexp", "icq.jar",
-		"icq.login", "icq.password", "image.hook.impl",
-		"image.hook.file.system.root.dir", "index.dump.compression.enabled",
-		"index.filter.search.limit", "index.on.upgrade",
-		"index.portal.field.analyzer.enabled", "index.search.engine.id",
-		"index.search.highlight.enabled", "index.search.writer.max.queue.size",
-		"index.read.only", "index.with.thread", "intraband.impl",
-		"intraband.mailbox.reaper.thread.enabled",
-		"intraband.mailbox.storage.life", "intraband.proxy.dump.classes.dir",
-		"intraband.proxy.dump.classes.enabled", "intraband.timeout.default",
-		"intraband.welder.impl", "intraband.welder.socket.buffer.size",
-		"intraband.welder.socket.keep.alive",
-		"intraband.welder.socket.reuse.address",
-		"intraband.welder.socket.server.start.port",
-		"intraband.welder.socket.so.linger",
-		"intraband.welder.socket.so.timeout",
-		"intraband.welder.socket.tcp.no.delay",
-		"invitation.email.max.recipients", "invitation.email.message.body",
-		"invitation.email.message.subject", "invoker.filter.chain.cache.size",
-		"javadoc.manager.enabled", "javax.persistence.validation.mode",
+		"hibernate.cache.use_structured_entries", "icq.jar", "icq.login",
+		"icq.password", "index.filter.search.limit", "index.on.upgrade",
+		"index.portal.field.analyzer.enabled", "index.search.highlight.enabled",
+		"index.read.only", "invitation.email.max.recipients",
+		"invitation.email.message.body", "invitation.email.message.subject",
+		"invoker.filter.chain.cache.size", "javax.persistence.validation.mode",
 		"jbi.workflow.url", "jcr.initialize.on.startup",
 		"jcr.jackrabbit.config.file.path",
 		"jcr.jackrabbit.credentials.password",
 		"jcr.jackrabbit.credentials.username", "jcr.jackrabbit.repository.home",
 		"jcr.jackrabbit.repository.root", "jcr.node.documentlibrary",
 		"jcr.workspace.name", "jcr.wrap.session",
-		"jdbc.default.liferay.pool.provider", "jdbc.default.acquireIncrement",
-		"jdbc.default.acquireRetryAttempts", "jdbc.default.acquireRetryDelay",
-		"jdbc.default.connectionCustomizerClassName",
-		"jdbc.default.defaultTransactionIsolation", "jdbc.default.fairQueue",
-		"jdbc.default.idleConnectionTestPeriod", "jdbc.default.initialPoolSize",
-		"jdbc.default.jdbcInterceptors", "jdbc.default.jmxEnabled",
-		"jdbc.default.logAbandoned", "jdbc.default.maxActive",
-		"jdbc.default.maxIdleTime", "jdbc.default.maxPoolSize",
-		"jdbc.default.minIdle", "jdbc.default.minPoolSize",
-		"jdbc.default.numHelperThreads", "jdbc.default.removeAbandonedTimeout",
-		"jdbc.default.testWhileIdle",
-		"jdbc.default.timeBetweenEvictionRunsMillis",
-		"jdbc.default.transactionIsolation", "jdbc.default.useEquals",
-		"jdbc.default.validationQuery", "json.deserializer.strict.mode",
-		"journal.article.form.add", "journal.article.form.default.values",
-		"journal.article.form.update", "journal.article.form.translate",
-		"journal.article.types", "journal.articles.page.delta.values",
+		"json.deserializer.strict.mode", "journal.article.form.add",
+		"journal.article.form.default.values", "journal.article.form.update",
+		"journal.article.form.translate", "journal.article.types",
+		"journal.articles.page.delta.values",
 		"journal.browse.by.structures.sorted.by.name",
-		"journal.error.template[xsl]", "journal.image.extensions",
-		"journal.image.small.max.size",
-		"journal.template.language.content[xsl]",
+		"journal.image.extensions", "journal.image.small.max.size",
 		"journal.template.language.parser[css]",
 		"journal.template.language.parser[ftl]",
 		"journal.template.language.parser[vm]",
@@ -1877,7 +1715,7 @@ public class VerifyProperties {
 		"jpa.provider", "jpa.provider.property.eclipselink.allow-zero-id",
 		"jpa.provider.property.eclipselink.logging.level",
 		"jpa.provider.property.eclipselink.logging.timestamp",
-		"language.display.style.options", "layout.comments.enabled",
+		"language.display.style.options",
 		"layout.configuration.action.update[embedded]",
 		"layout.configuration.action.update[link_to_layout]",
 		"layout.configuration.action.update[url]",
@@ -1911,8 +1749,7 @@ public class VerifyProperties {
 		"layout.view.page[control_panel]", "layout.view.page[embedded]",
 		"layout.view.page[link_to_layout]", "layout.view.page[panel]",
 		"layout.view.page[url]", "library.download.url.resin.jar",
-		"library.download.url.script-10.jar", "liferay.lib.global.shared.dir",
-		"liferay.web.portal.dir", "look.and.feel.modifiable", "lucene.analyzer",
+		"library.download.url.script-10.jar", "lucene.analyzer",
 		"lucene.cluster.index.loading.sync.timeout", "lucene.file.extractor",
 		"lucene.file.extractor.regexp.strip", "lucene.replicate.write",
 		"lucene.store.jdbc.auto.clean.up",
@@ -1926,11 +1763,7 @@ public class VerifyProperties {
 		"mail.hook.cyrus.delete.user", "mail.hook.cyrus.home",
 		"mail.hook.fusemail.account.type", "mail.hook.fusemail.group.parent",
 		"mail.hook.fusemail.password", "mail.hook.fusemail.url",
-		"mail.hook.fusemail.username", "mail.hook.impl",
-		"mail.hook.sendmail.add.user", "mail.hook.sendmail.change.password",
-		"mail.hook.sendmail.delete.user", "mail.hook.sendmail.home",
-		"mail.hook.sendmail.virtusertable",
-		"mail.hook.sendmail.virtusertable.refresh", "mail.hook.shell.script",
+		"mail.hook.fusemail.username",
 		"memory.cluster.scheduler.lock.cache.enabled",
 		"message.boards.email.message.added.signature",
 		"message.boards.email.message.updated.signature",
@@ -1940,23 +1773,11 @@ public class VerifyProperties {
 		"microsoft.translator.client.id", "microsoft.translator.client.secret",
 		"minifier.inline.content.cache.size",
 		"mobile.device.styling.wap.enabled", "module.framework.initial.bundles",
-		"module.framework.properties.ds.lock.timeout.milliseconds",
-		"module.framework.properties.ds.stop.timeout.milliseconds",
-		"module.framework.properties.felix.fileinstall.disableNio2",
-		"module.framework.properties.felix.fileinstall.log.level",
-		"module.framework.properties.file.install.disableNio2",
-		"module.framework.properties.file.install.log.level",
 		"module.framework.properties.file.install.optionalImportRefreshScope",
-		"module.framework.properties.lpkg.deployer.dir",
 		"module.framework.properties.lpkg.index.validator.enabled",
-		"module.framework.register.liferay.services",
-		"module.framework.resolver.revision.batch.size", "msn.login",
+		"module.framework.register.liferay.services", "msn.login",
 		"msn.password", "multicast.group.address[\"hibernate\"]",
-		"multicast.group.port[\"hibernate\"]", "my.sites.display.style",
-		"multi.value.map.com.liferay.portal.convert." +
-			"ConvertPermissionAlgorithm.convertResourcePermission",
-		"multi.value.map.com.liferay.portal.convert." +
-			"ConvertPermissionAlgorithm.convertRoles",
+		"multicast.group.port[\"hibernate\"]",
 		"net.sf.ehcache.configurationResourceName",
 		"net.sf.ehcache.configurationResourceName.peerProviderProperties",
 		"openoffice.server.enabled", "openoffice.server.host",
@@ -1970,45 +1791,22 @@ public class VerifyProperties {
 		"organizations.form.update.miscellaneous",
 		"organizations.indexer.enabled", "organizations.rootable",
 		"organizations.types", "permissions.object.blocking.cache",
-		"poller.notifications.timeout", "poller.request.timeout",
 		"portal.cache.manager.type.multi.vm",
 		"portal.cache.manager.type.single.vm", "portal.ctx",
-		"portal.fabric.enabled", "portal.fabric.agent.selector.class",
-		"portal.fabric.server.host", "portal.fabric.server.port",
-		"portal.fabric.server.boss.group.thread.count",
-		"portal.fabric.server.worker.group.thread.count",
-		"portal.fabric.server.worker.startup.timeout",
-		"portal.fabric.server.file.server.folder.compression.level",
-		"portal.fabric.server.file.server.group.thread.count",
-		"portal.fabric.server.registeration.group.thread.count",
-		"portal.fabric.server.repository.parent.folder",
-		"portal.fabric.server.repository.get.file.timeout",
-		"portal.fabric.server.rpc.group.thread.count",
-		"portal.fabric.server.rpc.relay.timeout",
-		"portal.fabric.server.warmup.agent.on.register",
-		"portal.fabric.shutdown.quiet.period", "portal.fabric.shutdown.timeout",
-		"portal.jaas.impl", "portal.jaas.strict.password",
 		"portal.resiliency.enabled", "portal.resiliency.portlet.show.footer",
 		"portal.resiliency.spi.agent.client.pool.max.size",
 		"portal.security.manager.enable",
-		"portlet.url.generate.by.path.enabled",
 		"permissions.inline.sql.resource.block.query.threshold",
 		"permissions.list.filter", "permissions.thread.local.cache.max.size",
 		"permissions.user.check.algorithm", "persistence.provider",
-		"plugin.notifications.enabled", "plugin.notifications.packages.ignored",
-		"plugin.repositories.trusted", "plugin.repositories.untrusted",
-		"plugin.types", "pop.server.notifications.interval",
 		"ratings.max.score", "ratings.min.score",
 		"redirect.url.domains.allowed", "redirect.url.ips.allowed",
-		"redirect.url.security.mode", "rss.publish.to.live.by.default",
-		"rtl.css.excluded.paths.regexp", "sandbox.deploy.dir",
+		"redirect.url.security.mode", "sandbox.deploy.dir",
 		"sandbox.deploy.enabled", "sandbox.deploy.interval",
 		"sandbox.deploy.listeners", "sc.image.max.size",
 		"sc.image.thumbnail.max.height", "sc.image.thumbnail.max.width",
 		"sc.product.comments.enabled", "scheduler.classes",
-		"scheduler.event.message.listener.lock.timeout", "schema.run.minimal",
-		"scripting.jruby.compile.mode", "scripting.jruby.compile.threshold",
-		"search.container.page.iterator.page.values",
+		"schema.run.minimal", "search.container.page.iterator.page.values",
 		"service.builder.service.read.only.prefixes", "session.disabled",
 		"setup.database.types", "shard.available.names", "shard.default.name",
 		"shard.selector", "siteminder.auth.enabled",
@@ -2022,8 +1820,7 @@ public class VerifyProperties {
 		"social.bookmark.types", "spring.hibernate.data.source",
 		"spring.hibernate.session.factory", "spring.portlet.configs",
 		"spring.remoting.servlet.hosts.allowed",
-		"spring.remoting.servlet.https.required", "sprite.enabled",
-		"sprite.file.name", "sprite.properties.file.name", "sprite.root.dir",
+		"spring.remoting.servlet.https.required",
 		"staging.delete.temp.lar.on.failure",
 		"staging.delete.temp.lar.on.success",
 		"struts.portlet.ignored.parameters.regexp",
@@ -2038,33 +1835,20 @@ public class VerifyProperties {
 		"users.form.update.identification", "users.form.update.main",
 		"users.form.update.miscellaneous", "users.image.check.token",
 		"users.image.default.use.initials", "users.image.max.height",
-		"users.image.max.size", "users.image.max.width", "users.list.views",
+		"users.image.max.size", "users.image.max.width",
 		"vaadin.resources.path", "vaadin.theme", "vaadin.widgetset",
 		"value.object.entity.blocking.cache",
 		"value.object.finder.blocking.cache", "verify.database.transactions",
-		"verify.frequency", "verify.patch.levels.disabled", "verify.processes",
-		"verify.process.concurrency.threshold", "webdav.storage.class",
+		"verify.frequency", "verify.processes", "webdav.storage.class",
 		"webdav.storage.show.edit.url", "webdav.storage.show.view.url",
 		"webdav.storage.tokens", "wiki.email.page.added.signature",
-		"wiki.email.page.updated.signature",
-		"xsl.template.secure.processing.enabled", "xss.allow",
-		"xuggler.enabled", "xuggler.jar.file", "xuggler.jar.url",
-		"xuggler.jar.options", "xuggler.ffpreset.8x8dct", "xuggler.ffpreset.bf",
-		"xuggler.f.ffpreset.cmp", "xuggler.f.ffpreset.coder",
-		"xuggler.f.ffpreset.flags", "xuggler.f.ffpreset.flags2",
-		"xuggler.f.ffpreset.i_qfactor", "xuggler.f.ffpreset.mbtree",
-		"xuggler.f.ffpreset.me_method", "xuggler.f.ffpreset.me_range",
-		"xuggler.f.ffpreset.qcomp", "xuggler.f.ffpreset.qdiff",
-		"xuggler.f.ffpreset.qmin", "xuggler.f.ffpreset.qmax",
-		"xuggler.f.ffpreset.sc_threshold", "xuggler.f.ffpreset.subq",
-		"xuggler.f.ffpreset.trellis", "xuggler.f.ffpreset.wpredp", "ym.login",
-		"ym.password", "zip.file.name.encoding"
+		"wiki.email.page.updated.signature", "xss.allow", "ym.login",
+		"ym.password"
 	};
 
 	private static final String[] _OBSOLETE_SYSTEM_KEYS = {
 		"com.liferay.petra.memory.FinalizeManager.thread.enabled",
 		"com.liferay.portal.kernel.memory.FinalizeManager.thread.enabled",
-		"com.liferay.util.axis.SimpleHTTPSender.regexp.pattern",
 		"com.liferay.util.Http.proxy.host", "com.liferay.util.Http.proxy.port",
 		"com.liferay.util.XSSUtil.regexp.pattern",
 		"finalize.manager.thread.enabled"
@@ -2081,14 +1865,6 @@ public class VerifyProperties {
 		{
 			"com.liferay.portal.servlet.filters.compression.CompressionFilter",
 			"com.liferay.portal.servlet.filters.gzip.GZipFilter"
-		},
-		{
-			"com.liferay.portal.servlet.filters.urlrewrite.UrlRewriteFilter",
-			"com.liferay.portal.url.rewrite.filter.internal.URLRewriteFilter"
-		},
-		{
-			"com.liferay.portal.upload.LiferayFileItem.threshold.size",
-			"com.liferay.portal.kernel.upload.FileItem.threshold.size"
 		},
 		{
 			"default.guest.friendly.url",
@@ -2161,60 +1937,35 @@ public class VerifyProperties {
 			"velocity.engine.restricted.variables"
 		},
 		{
-			"module.framework.properties.dependency.manager.sync.timeout",
-			"dependency.manager.sync.timeout"
-		},
-		{
-			"module.framework.properties.dependency.manager.thread.pool." +
-				"enabled",
-			"dependency.manager.thread.pool.enabled"
-		},
-		{
 			"module.framework.properties.felix.fileinstall.bundles.new.start",
-			"module.framework.file.install.bundles.start.new"
-		},
-		{
-			"module.framework.properties.file.install.bundles.new.start",
-			"module.framework.file.install.bundles.start.new"
+			"module.framework.properties.file.install.bundles.new.start"
 		},
 		{
 			"module.framework.properties.felix.fileinstall.bundles." +
 				"startActivationPolicy",
-			"module.framework.file.install.bundles.use.start.activation.policy"
-		},
-		{
 			"module.framework.properties.file.install.bundles." +
-				"startActivationPolicy",
-			"module.framework.file.install.bundles.use.start.activation.policy"
+				"startActivationPolicy"
 		},
 		{
 			"module.framework.properties.felix.fileinstall.bundles." +
 				"startTransient",
-			"module.framework.file.install.bundles.start.transient"
+			"module.framework.properties.file.install.bundles.startTransient"
 		},
 		{
-			"module.framework.properties.file.install.bundles.startTransient",
-			"module.framework.file.install.bundles.start.transient"
+			"module.framework.properties.felix.fileinstall.disableNio2",
+			"module.framework.properties.file.install.disableNio2"
+		},
+		{
+			"module.framework.properties.felix.fileinstall.log.level",
+			"module.framework.properties.file.install.log.level"
 		},
 		{
 			"module.framework.properties.felix.fileinstall.noInitialDelay",
-			"module.framework.file.install.no.initial.delay"
-		},
-		{
-			"module.framework.properties.file.install.noInitialDelay",
-			"module.framework.file.install.no.initial.delay"
+			"module.framework.properties.file.install.noInitialDelay"
 		},
 		{
 			"module.framework.properties.felix.fileinstall.subdir.mode",
-			"module.framework.file.install.subdir.mode"
-		},
-		{
-			"module.framework.properties.file.install.subdir.mode",
-			"module.framework.file.install.subdir.mode"
-		},
-		{
-			"module.framework.properties.initial.system.check.enabled",
-			"initial.system.check.enabled"
+			"module.framework.properties.file.install.subdir.mode"
 		},
 		{
 			"passwords.passwordpolicytoolkit.charset.lowercase",

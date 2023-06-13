@@ -12,12 +12,8 @@
  * details.
  */
 
-/* eslint-disable @liferay/no-get-data-attribute */
-
-import {addParams} from 'frontend-js-web';
-
 CKEDITOR.dialog.add('video', (editor) => {
-	const TPL_SCRIPT =
+	var TPL_SCRIPT =
 		'boundingBox: "#" + mediaId,' +
 		'height: {height},' +
 		'ogvUrl: "{ogvUrl}",' +
@@ -26,32 +22,35 @@ CKEDITOR.dialog.add('video', (editor) => {
 		'width: {width}';
 
 	function commitValue(videoNode, extraStyles) {
-		const instance = this;
+		var instance = this;
 
-		const id = instance.id;
-		let value = instance.getValue();
+		var id = instance.id;
+		var value = instance.getValue();
 
-		let scriptTPL = null;
-		let textScript = null;
+		var scriptTPL = null;
+		var textScript = null;
 
-		const videoHeight = videoNode.getAttribute('data-height');
-		let videoOgvUrl = videoNode.getAttribute('data-video-ogv-url');
-		const videoPoster = videoNode.getAttribute('data-poster');
-		let videoUrl = videoNode.getAttribute('data-video-url');
-		const videoWidth = videoNode.getAttribute('data-width');
+		var videoHeight = videoNode.getAttribute('data-height');
+		var videoOgvUrl = videoNode.getAttribute('data-video-ogv-url');
+		var videoPoster = videoNode.getAttribute('data-poster');
+		var videoUrl = videoNode.getAttribute('data-video-url');
+		var videoWidth = videoNode.getAttribute('data-width');
 
 		if (id === 'poster') {
 			videoNode.setAttribute('data-document-url', value);
 
-			videoUrl = addParams('videoPreview=1&type=mp4', value);
+			videoUrl = Liferay.Util.addParams('videoPreview=1&type=mp4', value);
 
 			videoNode.setAttribute('data-video-url', videoUrl);
 
-			videoOgvUrl = addParams('videoPreview=1&type=ogv', value);
+			videoOgvUrl = Liferay.Util.addParams(
+				'videoPreview=1&type=ogv',
+				value
+			);
 
 			videoNode.setAttribute('data-video-ogv-url', videoOgvUrl);
 
-			value = addParams('videoThumbnail=1', value);
+			value = Liferay.Util.addParams('videoThumbnail=1', value);
 
 			videoNode.setAttribute('data-poster', value);
 
@@ -77,8 +76,8 @@ CKEDITOR.dialog.add('video', (editor) => {
 				extraStyles.backgroundImage = 'url(' + value + ')';
 			}
 			else if (id === 'height' || id === 'width') {
-				let height = videoHeight;
-				let width = videoWidth;
+				var height = videoHeight;
+				var width = videoWidth;
 
 				if (id === 'height') {
 					height = value;
@@ -111,12 +110,12 @@ CKEDITOR.dialog.add('video', (editor) => {
 	}
 
 	function loadValue(videoNode) {
-		const instance = this;
+		var instance = this;
 
-		const id = instance.id;
+		var id = instance.id;
 
 		if (videoNode) {
-			let value = null;
+			var value = null;
 
 			if (id === 'poster') {
 				value = videoNode.getAttribute('data-document-url');
@@ -205,13 +204,13 @@ CKEDITOR.dialog.add('video', (editor) => {
 		minWidth: 400,
 
 		onOk() {
-			const instance = this;
+			var instance = this;
 
 			editor.plugins.media.onOkCallback(instance, editor, 'video');
 		},
 
 		onShow() {
-			const instance = this;
+			var instance = this;
 
 			editor.plugins.media.onShowCallback(instance, editor, 'video');
 		},

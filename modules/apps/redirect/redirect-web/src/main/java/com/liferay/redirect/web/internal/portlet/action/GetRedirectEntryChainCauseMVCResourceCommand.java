@@ -29,6 +29,8 @@ import com.liferay.redirect.service.RedirectEntryLocalService;
 import com.liferay.redirect.web.internal.constants.RedirectPortletKeys;
 import com.liferay.redirect.web.internal.util.RedirectUtil;
 
+import java.util.List;
+
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -68,12 +70,13 @@ public class GetRedirectEntryChainCauseMVCResourceCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		if (ListUtil.isNotEmpty(
-				_redirectEntryLocalService.getRedirectEntries(
-					themeDisplay.getScopeGroupId(),
-					RedirectUtil.getGroupBaseURL(themeDisplay) +
-						StringPool.FORWARD_SLASH + sourceURL))) {
+		List<RedirectEntry> redirectEntries =
+			_redirectEntryLocalService.getRedirectEntries(
+				themeDisplay.getScopeGroupId(),
+				RedirectUtil.getGroupBaseURL(themeDisplay) +
+					StringPool.FORWARD_SLASH + sourceURL);
 
+		if (!ListUtil.isEmpty(redirectEntries)) {
 			return "sourceURL";
 		}
 

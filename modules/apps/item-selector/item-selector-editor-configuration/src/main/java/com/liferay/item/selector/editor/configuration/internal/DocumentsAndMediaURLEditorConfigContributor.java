@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Map;
 
+import javax.portlet.PortletURL;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -63,13 +65,16 @@ public class DocumentsAndMediaURLEditorConfigContributor
 			new URLItemSelectorReturnType());
 		layoutItemSelectorCriterion.setShowHiddenPages(true);
 
-		jsonObject.put(
-			"filebrowserBrowseUrl",
-			String.valueOf(
-				_itemSelector.getItemSelectorURL(
-					requestBackedPortletURLFactory,
-					namespace + name + "selectItem", fileItemSelectorCriterion,
-					layoutItemSelectorCriterion)));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, namespace + name + "selectItem",
+			fileItemSelectorCriterion, layoutItemSelectorCriterion);
+
+		jsonObject.put("filebrowserBrowseUrl", itemSelectorURL.toString());
+	}
+
+	@Reference(unbind = "-")
+	public void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
 	}
 
 	@Override
@@ -77,7 +82,6 @@ public class DocumentsAndMediaURLEditorConfigContributor
 		return _itemSelector;
 	}
 
-	@Reference
 	private ItemSelector _itemSelector;
 
 }

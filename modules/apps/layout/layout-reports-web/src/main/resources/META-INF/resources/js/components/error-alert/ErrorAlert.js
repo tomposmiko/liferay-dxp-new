@@ -66,7 +66,6 @@ const ErrorAlert = () => {
 					)} `}
 				</span>
 			)}
-
 			{userHasNotPrivileges && apiKeyError && (
 				<span>
 					{`${Liferay.Language.get(
@@ -74,7 +73,6 @@ const ErrorAlert = () => {
 					)} `}
 				</span>
 			)}
-
 			{(apiKeyError || serverError) && (
 				<ClayButton
 					className="link-primary"
@@ -84,9 +82,7 @@ const ErrorAlert = () => {
 					{actionTitle}
 				</ClayButton>
 			)}
-
 			{showErrorInfo && <ErrorAlertExtendedInfo error={error} />}
-
 			{apiKeyError && data?.configureGooglePageSpeedURL && (
 				<ClayAlert.Footer>
 					<ClayLink

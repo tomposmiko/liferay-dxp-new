@@ -17,9 +17,6 @@ package com.liferay.commerce.product.internal.security.permission.resource;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.permission.CommerceDiscountPermission;
 import com.liferay.commerce.discount.service.CommerceDiscountLocalService;
-import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
-import com.liferay.commerce.inventory.permission.CommerceInventoryWarehousePermission;
-import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseLocalService;
 import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.CommerceChannelRelLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -37,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "model.class.name=com.liferay.commerce.product.model.CommerceChannelRel",
 	service = ModelResourcePermission.class
 )
@@ -64,27 +62,6 @@ public class CommerceChannelRelModelResourcePermission
 				permissionChecker, commerceDiscount.getCommerceDiscountId(),
 				actionId);
 		}
-		else {
-			long commerceInventoryWarehouseClassNameId =
-				classNameLocalService.getClassNameId(
-					CommerceInventoryWarehouse.class.getName());
-
-			if (Objects.equals(
-					commerceChannelRel.getClassNameId(),
-					commerceInventoryWarehouseClassNameId)) {
-
-				CommerceInventoryWarehouse commerceInventoryWarehouse =
-					commerceInventoryWarehouseLocalService.
-						getCommerceInventoryWarehouse(
-							commerceChannelRel.getClassPK());
-
-				commerceDiscountPermission.check(
-					permissionChecker,
-					commerceInventoryWarehouse.
-						getCommerceInventoryWarehouseId(),
-					actionId);
-			}
-		}
 	}
 
 	@Override
@@ -112,27 +89,6 @@ public class CommerceChannelRelModelResourcePermission
 				permissionChecker, commerceDiscount.getCommerceDiscountId(),
 				actionId);
 		}
-		else {
-			long commerceInventoryWarehouseClassNameId =
-				classNameLocalService.getClassNameId(
-					CommerceInventoryWarehouse.class.getName());
-
-			if (Objects.equals(
-					commerceChannelRel.getClassNameId(),
-					commerceInventoryWarehouseClassNameId)) {
-
-				CommerceInventoryWarehouse commerceInventoryWarehouse =
-					commerceInventoryWarehouseLocalService.
-						getCommerceInventoryWarehouse(
-							commerceChannelRel.getClassPK());
-
-				commerceDiscountPermission.check(
-					permissionChecker,
-					commerceInventoryWarehouse.
-						getCommerceInventoryWarehouseId(),
-					actionId);
-			}
-		}
 	}
 
 	@Override
@@ -154,25 +110,6 @@ public class CommerceChannelRelModelResourcePermission
 
 			return commerceDiscountPermission.contains(
 				permissionChecker, commerceDiscount.getCommerceDiscountId(),
-				actionId);
-		}
-
-		long commerceInventoryWarehouseClassNameId =
-			classNameLocalService.getClassNameId(
-				CommerceInventoryWarehouse.class.getName());
-
-		if (Objects.equals(
-				commerceChannelRel.getClassNameId(),
-				commerceInventoryWarehouseClassNameId)) {
-
-			CommerceInventoryWarehouse commerceInventoryWarehouse =
-				commerceInventoryWarehouseLocalService.
-					getCommerceInventoryWarehouse(
-						commerceChannelRel.getClassPK());
-
-			return commerceInventoryWarehousePermission.contains(
-				permissionChecker,
-				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
 				actionId);
 		}
 
@@ -205,25 +142,6 @@ public class CommerceChannelRelModelResourcePermission
 				actionId);
 		}
 
-		long commerceInventoryWarehouseClassNameId =
-			classNameLocalService.getClassNameId(
-				CommerceInventoryWarehouse.class.getName());
-
-		if (Objects.equals(
-				commerceChannelRel.getClassNameId(),
-				commerceInventoryWarehouseClassNameId)) {
-
-			CommerceInventoryWarehouse commerceInventoryWarehouse =
-				commerceInventoryWarehouseLocalService.
-					getCommerceInventoryWarehouse(
-						commerceChannelRel.getClassPK());
-
-			return commerceInventoryWarehousePermission.contains(
-				permissionChecker,
-				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				actionId);
-		}
-
 		return false;
 	}
 
@@ -248,13 +166,5 @@ public class CommerceChannelRelModelResourcePermission
 
 	@Reference
 	protected CommerceDiscountPermission commerceDiscountPermission;
-
-	@Reference
-	protected CommerceInventoryWarehouseLocalService
-		commerceInventoryWarehouseLocalService;
-
-	@Reference
-	protected CommerceInventoryWarehousePermission
-		commerceInventoryWarehousePermission;
 
 }

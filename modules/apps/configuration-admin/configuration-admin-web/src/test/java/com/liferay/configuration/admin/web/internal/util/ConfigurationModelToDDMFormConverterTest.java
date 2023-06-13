@@ -19,14 +19,11 @@ import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
-import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.portal.configuration.metatype.definitions.ExtendedAttributeDefinition;
 import com.liferay.portal.configuration.metatype.definitions.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.language.LanguageImpl;
@@ -43,7 +40,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Marcellus Tavares
@@ -57,70 +56,11 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 
 	@Before
 	public void setUp() {
-		ConfigurationFieldOptionsProviderUtil
-			configurationFieldOptionsProviderUtil =
-				new ConfigurationFieldOptionsProviderUtil();
-
-		configurationFieldOptionsProviderUtil.activate(
-			SystemBundleUtil.getBundleContext());
+		MockitoAnnotations.initMocks(this);
 
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(new LanguageImpl());
-	}
-
-	@Test
-	public void testFieldNameWithSpecialCharacter() {
-		ExtendedObjectClassDefinition extendedObjectClassDefinition = mock(
-			ExtendedObjectClassDefinition.class);
-
-		ExtendedAttributeDefinition extendedAttributeDefinition = mock(
-			ExtendedAttributeDefinition.class);
-
-		whenGetAttributeDefinitions(
-			extendedObjectClassDefinition,
-			new ExtendedAttributeDefinition[] {extendedAttributeDefinition},
-			ExtendedObjectClassDefinition.ALL);
-
-		whenGetAttributeDefinitions(
-			extendedObjectClassDefinition, new ExtendedAttributeDefinition[0],
-			ExtendedObjectClassDefinition.OPTIONAL);
-
-		whenGetAttributeDefinitions(
-			extendedObjectClassDefinition,
-			new ExtendedAttributeDefinition[] {extendedAttributeDefinition},
-			ExtendedObjectClassDefinition.REQUIRED);
-
-		whenGetCardinality(extendedAttributeDefinition, 0);
-
-		String fieldName = "Field.Name";
-
-		whenGetID(extendedAttributeDefinition, fieldName);
-
-		_whenGetType(
-			extendedAttributeDefinition, ExtendedAttributeDefinition.STRING);
-
-		ConfigurationModel configurationModel = new ConfigurationModel(
-			null, null, null, extendedObjectClassDefinition, false);
-
-		ConfigurationModelToDDMFormConverter
-			configurationModelToDDMFormConverter = spy(
-				new ConfigurationModelToDDMFormConverter(
-					configurationModel, _enLocale, new EmptyResourceBundle()));
-
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
-
-		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
-
-		Map<String, DDMFormField> ddmFormFieldsMap =
-			ddmForm.getDDMFormFieldsMap(false);
-
-		DDMFormField ddmFormField = ddmFormFieldsMap.get(
-			DDMFormFieldNameUtil.normalizeFieldName(fieldName));
-
-		Assert.assertNotNull(ddmFormField);
-		Assert.assertEquals(fieldName, ddmFormField.getFieldReference());
 	}
 
 	@Test
@@ -139,13 +79,14 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 		whenGetAttributeDefinitions(
 			extendedObjectClassDefinition, new ExtendedAttributeDefinition[0],
 			ExtendedObjectClassDefinition.OPTIONAL);
+
 		whenGetAttributeDefinitions(
 			extendedObjectClassDefinition,
 			new ExtendedAttributeDefinition[] {extendedAttributeDefinition},
 			ExtendedObjectClassDefinition.REQUIRED);
 		whenGetCardinality(extendedAttributeDefinition, 0);
 		whenGetID(extendedAttributeDefinition, "Boolean");
-		_whenGetType(
+		whenGetType(
 			extendedAttributeDefinition, ExtendedAttributeDefinition.BOOLEAN);
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
@@ -156,8 +97,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 				new ConfigurationModelToDDMFormConverter(
 					configurationModel, _enLocale, new EmptyResourceBundle()));
 
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
+		whenGetConfigurationDDMForm(configurationModelToDDMFormConverter, null);
 
 		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
 
@@ -199,7 +139,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 			ExtendedObjectClassDefinition.REQUIRED);
 		whenGetCardinality(extendedAttributeDefinition, 0);
 		whenGetID(extendedAttributeDefinition, "Integer");
-		_whenGetType(
+		whenGetType(
 			extendedAttributeDefinition, ExtendedAttributeDefinition.INTEGER);
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
@@ -210,8 +150,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 				new ConfigurationModelToDDMFormConverter(
 					configurationModel, _enLocale, new EmptyResourceBundle()));
 
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
+		whenGetConfigurationDDMForm(configurationModelToDDMFormConverter, null);
 
 		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
 
@@ -221,7 +160,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 		DDMFormField ddmFormField = ddmFormFieldsMap.get("Integer");
 
 		Assert.assertNotNull(ddmFormField);
-		Assert.assertEquals(DDMFormFieldType.NUMERIC, ddmFormField.getType());
+		Assert.assertEquals(DDMFormFieldType.TEXT, ddmFormField.getType());
 		Assert.assertEquals("integer", ddmFormField.getDataType());
 		Assert.assertFalse(ddmFormField.isRepeatable());
 		Assert.assertTrue(ddmFormField.isRequired());
@@ -230,8 +169,6 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 
 		Assert.assertEquals(_enLocale, predefinedValue.getDefaultLocale());
 		Assert.assertEquals("0", predefinedValue.getString(_enLocale));
-
-		_assertDDMFormFieldValidation(ddmFormField);
 	}
 
 	@Test
@@ -256,8 +193,8 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 			ExtendedObjectClassDefinition.REQUIRED);
 		whenGetCardinality(extendedAttributeDefinition, 0);
 		whenGetID(extendedAttributeDefinition, "LocalizableText");
-		_whenGetRequiredInput(extendedAttributeDefinition, true);
-		_whenGetType(
+		whenGetRequiredInput(extendedAttributeDefinition, true);
+		whenGetType(
 			extendedAttributeDefinition,
 			ExtendedAttributeDefinition.LOCALIZED_VALUES_MAP);
 
@@ -269,8 +206,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 				new ConfigurationModelToDDMFormConverter(
 					configurationModel, _enLocale, new EmptyResourceBundle()));
 
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
+		whenGetConfigurationDDMForm(configurationModelToDDMFormConverter, null);
 
 		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
 
@@ -285,63 +221,6 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 		Assert.assertEquals("string", ddmFormField.getDataType());
 		Assert.assertFalse(ddmFormField.isRepeatable());
 		Assert.assertTrue(ddmFormField.isRequired());
-	}
-
-	@Test
-	public void testGetWithLongField() {
-		ExtendedObjectClassDefinition extendedObjectClassDefinition = mock(
-			ExtendedObjectClassDefinition.class);
-
-		ExtendedAttributeDefinition extendedAttributeDefinition = mock(
-			ExtendedAttributeDefinition.class);
-
-		whenGetAttributeDefinitions(
-			extendedObjectClassDefinition,
-			new ExtendedAttributeDefinition[] {extendedAttributeDefinition},
-			ExtendedObjectClassDefinition.ALL);
-
-		whenGetAttributeDefinitions(
-			extendedObjectClassDefinition, new ExtendedAttributeDefinition[0],
-			ExtendedObjectClassDefinition.OPTIONAL);
-		whenGetAttributeDefinitions(
-			extendedObjectClassDefinition,
-			new ExtendedAttributeDefinition[] {extendedAttributeDefinition},
-			ExtendedObjectClassDefinition.REQUIRED);
-		whenGetCardinality(extendedAttributeDefinition, 0);
-		whenGetID(extendedAttributeDefinition, "Long");
-		_whenGetType(
-			extendedAttributeDefinition, ExtendedAttributeDefinition.LONG);
-
-		ConfigurationModel configurationModel = new ConfigurationModel(
-			null, null, null, extendedObjectClassDefinition, false);
-
-		ConfigurationModelToDDMFormConverter
-			configurationModelToDDMFormConverter = spy(
-				new ConfigurationModelToDDMFormConverter(
-					configurationModel, _enLocale, new EmptyResourceBundle()));
-
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
-
-		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
-
-		Map<String, DDMFormField> ddmFormFieldsMap =
-			ddmForm.getDDMFormFieldsMap(false);
-
-		DDMFormField ddmFormField = ddmFormFieldsMap.get("Long");
-
-		Assert.assertNotNull(ddmFormField);
-		Assert.assertEquals(DDMFormFieldType.NUMERIC, ddmFormField.getType());
-		Assert.assertEquals("long", ddmFormField.getDataType());
-		Assert.assertFalse(ddmFormField.isRepeatable());
-		Assert.assertTrue(ddmFormField.isRequired());
-
-		LocalizedValue predefinedValue = ddmFormField.getPredefinedValue();
-
-		Assert.assertEquals(_enLocale, predefinedValue.getDefaultLocale());
-		Assert.assertEquals("0", predefinedValue.getString(_enLocale));
-
-		_assertDDMFormFieldValidation(ddmFormField);
 	}
 
 	@Test
@@ -366,7 +245,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 			ExtendedObjectClassDefinition.REQUIRED);
 		whenGetCardinality(extendedAttributeDefinition, 0);
 		whenGetID(extendedAttributeDefinition, "Password");
-		_whenGetType(
+		whenGetType(
 			extendedAttributeDefinition, ExtendedAttributeDefinition.PASSWORD);
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
@@ -377,8 +256,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 				new ConfigurationModelToDDMFormConverter(
 					configurationModel, _enLocale, new EmptyResourceBundle()));
 
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
+		whenGetConfigurationDDMForm(configurationModelToDDMFormConverter, null);
 
 		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
 
@@ -416,7 +294,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 			ExtendedObjectClassDefinition.REQUIRED);
 		whenGetCardinality(extendedAttributeDefinition, 0);
 		whenGetID(extendedAttributeDefinition, "Select");
-		_whenGetType(
+		whenGetType(
 			extendedAttributeDefinition, ExtendedAttributeDefinition.STRING);
 		whenGetOptionLabels(
 			extendedAttributeDefinition, new String[] {"Label 1", "Label 2"});
@@ -431,8 +309,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 				new ConfigurationModelToDDMFormConverter(
 					configurationModel, _enLocale, new EmptyResourceBundle()));
 
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
+		whenGetConfigurationDDMForm(configurationModelToDDMFormConverter, null);
 
 		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
 
@@ -494,7 +371,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 			ExtendedObjectClassDefinition.REQUIRED);
 		whenGetCardinality(extendedAttributeDefinition, 0);
 		whenGetID(extendedAttributeDefinition, "Text");
-		_whenGetType(
+		whenGetType(
 			extendedAttributeDefinition, ExtendedAttributeDefinition.STRING);
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
@@ -505,8 +382,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 				new ConfigurationModelToDDMFormConverter(
 					configurationModel, _enLocale, new EmptyResourceBundle()));
 
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
+		whenGetConfigurationDDMForm(configurationModelToDDMFormConverter, null);
 
 		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
 
@@ -544,8 +420,8 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 			ExtendedObjectClassDefinition.REQUIRED);
 		whenGetCardinality(extendedAttributeDefinition, 0);
 		whenGetID(extendedAttributeDefinition, "Text");
-		_whenGetRequiredInput(extendedAttributeDefinition, true);
-		_whenGetType(
+		whenGetRequiredInput(extendedAttributeDefinition, true);
+		whenGetType(
 			extendedAttributeDefinition, ExtendedAttributeDefinition.STRING);
 
 		ConfigurationModel configurationModel = new ConfigurationModel(
@@ -556,8 +432,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 				new ConfigurationModelToDDMFormConverter(
 					configurationModel, _enLocale, new EmptyResourceBundle()));
 
-		_whenGetConfigurationDDMForm(
-			configurationModelToDDMFormConverter, null);
+		whenGetConfigurationDDMForm(configurationModelToDDMFormConverter, null);
 
 		DDMForm ddmForm = configurationModelToDDMFormConverter.getDDMForm();
 
@@ -580,7 +455,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 
 		when(
 			extendedObjectClassDefinition.getAttributeDefinitions(
-				Mockito.eq(filter))
+				Matchers.eq(filter))
 		).thenReturn(
 			extendedAttributeDefinitions
 		);
@@ -595,6 +470,18 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 		).thenReturn(
 			cardinality
 		);
+	}
+
+	protected void whenGetConfigurationDDMForm(
+		ConfigurationModelToDDMFormConverter
+			configurationModelToDDMFormConverter,
+		DDMForm ddmForm) {
+
+		Mockito.doReturn(
+			ddmForm
+		).when(
+			configurationModelToDDMFormConverter
+		).getConfigurationDDMForm();
 	}
 
 	protected void whenGetID(
@@ -629,35 +516,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 		);
 	}
 
-	private void _assertDDMFormFieldValidation(DDMFormField ddmFormField) {
-		DDMFormFieldValidation ddmFormFieldValidation =
-			ddmFormField.getDDMFormFieldValidation();
-
-		Assert.assertNotNull(ddmFormFieldValidation);
-
-		DDMFormFieldValidationExpression ddmFormFieldValidationExpression =
-			ddmFormFieldValidation.getDDMFormFieldValidationExpression();
-
-		Assert.assertNotNull(ddmFormFieldValidationExpression);
-		Assert.assertEquals(
-			ConfigurationModelToDDMFormConverter.
-				NUMBER_TYPE_VALUE_VALIDATION_EXPRESSION_NAME,
-			ddmFormFieldValidationExpression.getName());
-	}
-
-	private void _whenGetConfigurationDDMForm(
-		ConfigurationModelToDDMFormConverter
-			configurationModelToDDMFormConverter,
-		DDMForm ddmForm) {
-
-		Mockito.doReturn(
-			ddmForm
-		).when(
-			configurationModelToDDMFormConverter
-		).getConfigurationDDMForm();
-	}
-
-	private void _whenGetRequiredInput(
+	protected void whenGetRequiredInput(
 		ExtendedAttributeDefinition extendedAttributeDefinition,
 		boolean requiredInput) {
 
@@ -670,7 +529,7 @@ public class ConfigurationModelToDDMFormConverterTest extends Mockito {
 		);
 	}
 
-	private void _whenGetType(
+	protected void whenGetType(
 		ExtendedAttributeDefinition extendedAttributeDefinition, int type) {
 
 		when(

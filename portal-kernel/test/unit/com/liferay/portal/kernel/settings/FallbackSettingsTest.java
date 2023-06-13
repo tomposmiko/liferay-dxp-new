@@ -20,21 +20,21 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import org.powermock.api.mockito.PowerMockito;
+
 /**
  * @author Iván Zaera
  */
-public class FallbackSettingsTest {
+public class FallbackSettingsTest extends PowerMockito {
 
 	public FallbackSettingsTest() {
-		_settings = Mockito.mock(Settings.class);
+		_settings = mock(Settings.class);
 
-		FallbackKeys fallbackKeys = new FallbackKeys();
+		_fallbackKeys.add("key1", "key2", "key3");
+		_fallbackKeys.add("key2", "key7");
+		_fallbackKeys.add("key3", "key5");
 
-		fallbackKeys.add("key1", "key2", "key3");
-		fallbackKeys.add("key2", "key7");
-		fallbackKeys.add("key3", "key5");
-
-		_fallbackSettings = new FallbackSettings(_settings, fallbackKeys);
+		_fallbackSettings = new FallbackSettings(_settings, _fallbackKeys);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class FallbackSettingsTest {
 
 		String[] mockValues = {"value"};
 
-		Mockito.when(
+		when(
 			_settings.getValues("key2", null)
 		).thenReturn(
 			mockValues
@@ -67,7 +67,7 @@ public class FallbackSettingsTest {
 
 	@Test
 	public void testGetValueWhenConfigured() {
-		Mockito.when(
+		when(
 			_settings.getValue("key2", null)
 		).thenReturn(
 			"value"
@@ -91,11 +91,9 @@ public class FallbackSettingsTest {
 		InOrder inOrder = Mockito.inOrder(_settings);
 
 		for (String key : keys) {
-			inOrder.verify(
-				_settings
-			).getValue(
-				key, null
-			);
+			inOrder.verify(_settings);
+
+			_settings.getValue(key, null);
 		}
 	}
 
@@ -103,14 +101,13 @@ public class FallbackSettingsTest {
 		InOrder inOrder = Mockito.inOrder(_settings);
 
 		for (String key : keys) {
-			inOrder.verify(
-				_settings
-			).getValues(
-				key, null
-			);
+			inOrder.verify(_settings);
+
+			_settings.getValues(key, null);
 		}
 	}
 
+	private final FallbackKeys _fallbackKeys = new FallbackKeys();
 	private final FallbackSettings _fallbackSettings;
 	private final Settings _settings;
 

@@ -56,36 +56,35 @@ public class ElasticsearchQueryTranslatorTest {
 
 	@Test
 	public void testTranslateBoostCommonTermsQuery() {
-		_assertBoost(new CommonTermsQueryImpl("test", "test"));
+		assertBoost(new CommonTermsQueryImpl("test", "test"));
 	}
 
 	@Test
 	public void testTranslateBoostFuzzyQuery() {
-		_assertBoost(new FuzzyQueryImpl("test", "test"));
+		assertBoost(new FuzzyQueryImpl("test", "test"));
 	}
 
 	@Test
 	public void testTranslateBoostMatchAllQuery() {
-		_assertBoost(new MatchAllQueryImpl());
+		assertBoost(new MatchAllQueryImpl());
 	}
 
 	@Test
 	public void testTranslateBoostMoreLikeThisQueryStringQuery() {
-		_assertBoost(
-			new MoreLikeThisQueryImpl(Collections.emptyList(), "test"));
+		assertBoost(new MoreLikeThisQueryImpl(Collections.emptyList(), "test"));
 	}
 
 	@Test
 	public void testTranslateBoostTermQuery() {
-		_assertBoost(new TermQueryImpl("test", "test"));
+		assertBoost(new TermQueryImpl("test", "test"));
 	}
 
 	@Test
 	public void testTranslateBoostWildcardQuery() {
-		_assertBoost(new WildcardQueryImpl("test", "test"));
+		assertBoost(new WildcardQueryImpl("test", "test"));
 	}
 
-	private void _assertBoost(Query query) {
+	protected void assertBoost(Query query) {
 		query.setBoost(_BOOST);
 
 		QueryBuilder queryBuilder = _elasticsearchQueryTranslator.translate(

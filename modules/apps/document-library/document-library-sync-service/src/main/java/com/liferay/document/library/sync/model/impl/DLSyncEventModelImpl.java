@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -202,72 +203,82 @@ public class DLSyncEventModelImpl
 	public Map<String, Function<DLSyncEvent, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<DLSyncEvent, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, DLSyncEvent>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<DLSyncEvent, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DLSyncEvent.class.getClassLoader(), DLSyncEvent.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<DLSyncEvent, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<DLSyncEvent, Object>>();
+		try {
+			Constructor<DLSyncEvent> constructor =
+				(Constructor<DLSyncEvent>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"syncEventId", DLSyncEvent::getSyncEventId);
-			attributeGetterFunctions.put(
-				"companyId", DLSyncEvent::getCompanyId);
-			attributeGetterFunctions.put(
-				"modifiedTime", DLSyncEvent::getModifiedTime);
-			attributeGetterFunctions.put("event", DLSyncEvent::getEvent);
-			attributeGetterFunctions.put("type", DLSyncEvent::getType);
-			attributeGetterFunctions.put("typePK", DLSyncEvent::getTypePK);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<DLSyncEvent, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DLSyncEvent, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<DLSyncEvent, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DLSyncEvent, Object>>();
+		Map<String, BiConsumer<DLSyncEvent, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<DLSyncEvent, ?>>();
 
-		static {
-			Map<String, BiConsumer<DLSyncEvent, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<DLSyncEvent, ?>>();
+		attributeGetterFunctions.put(
+			"syncEventId", DLSyncEvent::getSyncEventId);
+		attributeSetterBiConsumers.put(
+			"syncEventId",
+			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setSyncEventId);
+		attributeGetterFunctions.put("companyId", DLSyncEvent::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setCompanyId);
+		attributeGetterFunctions.put(
+			"modifiedTime", DLSyncEvent::getModifiedTime);
+		attributeSetterBiConsumers.put(
+			"modifiedTime",
+			(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setModifiedTime);
+		attributeGetterFunctions.put("event", DLSyncEvent::getEvent);
+		attributeSetterBiConsumers.put(
+			"event", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setEvent);
+		attributeGetterFunctions.put("type", DLSyncEvent::getType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setType);
+		attributeGetterFunctions.put("typePK", DLSyncEvent::getTypePK);
+		attributeSetterBiConsumers.put(
+			"typePK", (BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setTypePK);
 
-			attributeSetterBiConsumers.put(
-				"syncEventId",
-				(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setSyncEventId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"modifiedTime",
-				(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setModifiedTime);
-			attributeSetterBiConsumers.put(
-				"event",
-				(BiConsumer<DLSyncEvent, String>)DLSyncEvent::setEvent);
-			attributeSetterBiConsumers.put(
-				"type", (BiConsumer<DLSyncEvent, String>)DLSyncEvent::setType);
-			attributeSetterBiConsumers.put(
-				"typePK",
-				(BiConsumer<DLSyncEvent, Long>)DLSyncEvent::setTypePK);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -622,12 +633,41 @@ public class DLSyncEventModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<DLSyncEvent, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<DLSyncEvent, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<DLSyncEvent, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((DLSyncEvent)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DLSyncEvent>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DLSyncEvent.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -641,9 +681,8 @@ public class DLSyncEventModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<DLSyncEvent, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<DLSyncEvent, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

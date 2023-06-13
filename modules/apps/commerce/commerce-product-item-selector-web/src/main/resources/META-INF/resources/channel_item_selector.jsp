@@ -20,11 +20,42 @@
 CommerceChannelItemSelectorViewDisplayContext commerceChannelItemSelectorViewDisplayContext = (CommerceChannelItemSelectorViewDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 SearchContainer<CommerceChannel> commerceChannelSearchContainer = commerceChannelItemSelectorViewDisplayContext.getSearchContainer();
+PortletURL portletURL = commerceChannelItemSelectorViewDisplayContext.getPortletURL();
 %>
 
-<clay:management-toolbar
-	managementToolbarDisplayContext="<%= new CommerceChannelsItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, commerceChannelSearchContainer) %>"
-/>
+<liferay-frontend:management-bar
+	includeCheckBox="<%= true %>"
+	searchContainerId="commerceChannels"
+>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= portletURL %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= commerceChannelItemSelectorViewDisplayContext.getOrderByCol() %>"
+			orderByType="<%= commerceChannelItemSelectorViewDisplayContext.getOrderByType() %>"
+			orderColumns="<%= new String[0] %>"
+			portletURL="<%= portletURL %>"
+		/>
+
+		<li>
+			<liferay-commerce:search-input
+				actionURL="<%= portletURL %>"
+				formName="searchFm"
+			/>
+		</li>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />commerceChannelSelectorWrapper">
 	<liferay-ui:search-container

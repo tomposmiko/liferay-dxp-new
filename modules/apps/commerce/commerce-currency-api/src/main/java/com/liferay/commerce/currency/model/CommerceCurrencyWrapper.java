@@ -45,7 +45,6 @@ public class CommerceCurrencyWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("commerceCurrencyId", getCommerceCurrencyId());
 		attributes.put("companyId", getCompanyId());
@@ -71,12 +70,6 @@ public class CommerceCurrencyWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -375,16 +368,6 @@ public class CommerceCurrencyWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this commerce currency.
-	 *
-	 * @return the mvcc version of this commerce currency
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -773,16 +756,6 @@ public class CommerceCurrencyWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce currency.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce currency
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the name of this commerce currency.
 	 *
 	 * @param name the name of this commerce currency
@@ -943,11 +916,6 @@ public class CommerceCurrencyWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

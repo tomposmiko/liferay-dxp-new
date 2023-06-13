@@ -23,7 +23,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = AMImageConfigurationEntrySerializer.class)
+@Component(
+	immediate = true, service = AMImageConfigurationEntrySerializer.class
+)
 public class AMImageConfigurationEntrySerializerImpl
 	implements AMImageConfigurationEntrySerializer {
 

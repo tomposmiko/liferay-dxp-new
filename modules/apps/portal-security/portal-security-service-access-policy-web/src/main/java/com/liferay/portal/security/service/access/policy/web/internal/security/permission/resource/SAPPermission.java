@@ -14,29 +14,36 @@
 
 package com.liferay.portal.security.service.access.policy.web.internal.security.permission.resource;
 
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.security.service.access.policy.constants.SAPConstants;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class SAPPermission {
 
 	public static boolean contains(
 		PermissionChecker permissionChecker, String actionId) {
 
-		PortletResourcePermission portletResourcePermission =
-			_portletResourcePermissionSnapshot.get();
-
-		return portletResourcePermission.contains(
+		return _portletResourcePermission.contains(
 			permissionChecker, null, actionId);
 	}
 
-	private static final Snapshot<PortletResourcePermission>
-		_portletResourcePermissionSnapshot = new Snapshot<>(
-			SAPPermission.class, PortletResourcePermission.class,
-			"(resource.name=" + SAPConstants.RESOURCE_NAME + ")");
+	@Reference(
+		target = "(resource.name=" + SAPConstants.RESOURCE_NAME + ")",
+		unbind = "-"
+	)
+	protected void setPortletResourcePermission(
+		PortletResourcePermission portletResourcePermission) {
+
+		_portletResourcePermission = portletResourcePermission;
+	}
+
+	private static PortletResourcePermission _portletResourcePermission;
 
 }

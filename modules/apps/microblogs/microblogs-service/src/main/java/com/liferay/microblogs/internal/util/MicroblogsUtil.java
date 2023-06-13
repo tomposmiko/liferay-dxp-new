@@ -140,9 +140,9 @@ public class MicroblogsUtil {
 			String content, ServiceContext serviceContext)
 		throws PortalException {
 
-		content = _replaceHashtags(content, serviceContext);
+		content = replaceHashtags(content, serviceContext);
 
-		content = _replaceUserTags(content, serviceContext);
+		content = replaceUserTags(content, serviceContext);
 
 		return content;
 	}
@@ -159,7 +159,7 @@ public class MicroblogsUtil {
 			new UserFirstNameComparator(true));
 
 		for (User user : users) {
-			if (user.isGuestUser() || (userId == user.getUserId())) {
+			if (user.isDefaultUser() || (userId == user.getUserId())) {
 				continue;
 			}
 
@@ -322,7 +322,7 @@ public class MicroblogsUtil {
 		return false;
 	}
 
-	private static String _replaceHashtags(
+	protected static String replaceHashtags(
 			String content, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -359,7 +359,7 @@ public class MicroblogsUtil {
 				}
 				catch (WindowStateException windowStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(windowStateException);
+						_log.debug(windowStateException, windowStateException);
 					}
 				}
 			}
@@ -375,7 +375,7 @@ public class MicroblogsUtil {
 				}
 				catch (WindowStateException windowStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(windowStateException);
+						_log.debug(windowStateException, windowStateException);
 					}
 				}
 			}
@@ -402,7 +402,7 @@ public class MicroblogsUtil {
 		return escapedContent;
 	}
 
-	private static String _replaceUserTags(
+	protected static String replaceUserTags(
 			String content, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -444,7 +444,7 @@ public class MicroblogsUtil {
 			}
 			catch (NoSuchUserException noSuchUserException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchUserException);
+					_log.debug(noSuchUserException, noSuchUserException);
 				}
 			}
 		}

@@ -27,10 +27,6 @@ public class WorkflowMetricsSLADefinitionVersionLocalServiceWrapper
 	implements ServiceWrapper<WorkflowMetricsSLADefinitionVersionLocalService>,
 			   WorkflowMetricsSLADefinitionVersionLocalService {
 
-	public WorkflowMetricsSLADefinitionVersionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public WorkflowMetricsSLADefinitionVersionLocalServiceWrapper(
 		WorkflowMetricsSLADefinitionVersionLocalService
 			workflowMetricsSLADefinitionVersionLocalService) {

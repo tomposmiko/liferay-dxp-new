@@ -36,9 +36,9 @@ const baseProps = {
 					id: 'infoField--title--',
 					label: 'Title',
 					multiline: false,
-					sourceContent: ['mock title'],
+					sourceContent: 'mock title',
 					sourceContentDir: 'ltr',
-					targetContent: ['mock title'],
+					targetContent: 'mock title',
 					targetContentDir: 'ltr',
 					targetLanguageId: 'es_ES',
 				},
@@ -48,9 +48,9 @@ const baseProps = {
 					id: 'infoField--description--',
 					label: 'Description',
 					multiline: false,
-					sourceContent: ['<p>mock summary</p>'],
+					sourceContent: '<p>mock summary</p>',
 					sourceContentDir: 'ltr',
-					targetContent: ['<p>mock summary</p>'],
+					targetContent: '<p>mock summary</p>',
 					targetContentDir: 'ltr',
 					targetLanguageId: 'es_ES',
 				},
@@ -65,34 +65,14 @@ const baseProps = {
 					id: 'infoField--content--',
 					label: 'Content',
 					multiline: true,
-					sourceContent: ['<p>mock content</p>'],
+					sourceContent: '<p>mock content</p>',
 					sourceContentDir: 'ltr',
-					targetContent: ['<p>mock content</p'],
-					targetContentDir: 'ltr',
-					targetLanguageId: 'es_ES',
-				},
-				{
-					editorConfiguration: {},
-					html: true,
-					id: 'infoField--repeteableContent--',
-					label: 'Content',
-					multiline: true,
-					sourceContent: [
-						'<p>mock source repeteable field 1</p>',
-						'<p>mock source repeteable field 2</p>',
-						'<p>mock source repeteable field 3</p>',
-					],
-					sourceContentDir: 'ltr',
-					targetContent: [
-						'<p>mock target repeteable field 1</p>',
-						'<p>mock target repeteable field 2</p>',
-						'<p>mock target repeteable field 3</p>',
-					],
+					targetContent: '<p>mock content</p',
 					targetContentDir: 'ltr',
 					targetLanguageId: 'es_ES',
 				},
 			],
-			legend: 'Content with repeateable fields',
+			legend: 'Content (Basic Web Content)',
 		},
 	],
 	portletId: 'mock_TranslationPortlet',
@@ -135,12 +115,20 @@ const baseProps = {
 
 const renderComponent = (props) => render(<Translate {...props} />);
 
-jest.mock('frontend-js-web', () => ({
-	...jest.requireActual('frontend-js-web'),
-	sub: jest.fn((langKey, arg) => langKey.replace('x', arg)),
-}));
-
 describe('Translate', () => {
+	Liferay.Util.sub.mockImplementation((langKey, ...args) =>
+		[langKey, ...args].join('-')
+	);
+
+	Liferay.Util.unescapeHTML =
+		Liferay.Util.unescapeHTML ||
+		jest.fn((string) =>
+			string.replace(/&([^;]+);/g, (match) => {
+				return new DOMParser().parseFromString(match, 'text/html')
+					.documentElement.textContent;
+			})
+		);
+
 	afterEach(cleanup);
 
 	it('renders with auto-translate enabled', () => {
@@ -180,7 +168,7 @@ describe('Translate', () => {
 					fields: [
 						{
 							...baseProps.infoFieldSetEntries[1].fields[0],
-							sourceContent: [''],
+							sourceContent: '',
 						},
 					],
 				},
@@ -189,7 +177,8 @@ describe('Translate', () => {
 
 		expect(
 			getByText(
-				`auto-translate-${baseProps.infoFieldSetEntries[1].fields[0].label}-field`
+				'auto-translate-x-field-' +
+					baseProps.infoFieldSetEntries[1].fields[0].label
 			).closest('button')
 		).toBeDisabled();
 	});
@@ -199,16 +188,9 @@ describe('Translate', () => {
 			fetch.mockResponseOnce(
 				JSON.stringify({
 					fields: {
-						'infoField--content--0':
-							'<p>simulacro de contenido</p>',
-						'infoField--description--0': '<p>resumen simulado</p>',
-						'infoField--repeteableContent--0':
-							'<p>campo repetible de fuente simulada 1</p>',
-						'infoField--repeteableContent--1':
-							'<p>campo repetible de fuente simulada 2</p>',
-						'infoField--repeteableContent--2':
-							'<p>campo repetible de fuente simulada 3</p>',
-						'infoField--title--0': 'título simulado&#39;',
+						'infoField--content--': '<p>simulacro de contenido</p>',
+						'infoField--description--': '<p>resumen simulado</p>',
+						'infoField--title--': 'título simulado&#39;',
 					},
 					sourceLanguageId: 'en_US',
 					targetLanguageId: 'es_ES',
@@ -229,9 +211,8 @@ describe('Translate', () => {
 				result = renderComponent(baseProps);
 
 				const {getByText} = result;
-
 				const autoTranslateFieldButton = getByText(
-					`auto-translate-${infoFieldContent.label}-field`
+					'auto-translate-x-field-' + infoFieldContent.label
 				).closest('button');
 
 				await act(async () => {
@@ -244,11 +225,9 @@ describe('Translate', () => {
 				const request = JSON.parse(body);
 
 				expect(url).toBe(baseProps.getAutoTranslateURL);
-
-				expect(request.fields[`${infoFieldContent.id}0`]).toBe(
-					infoFieldContent.sourceContent[0]
+				expect(request.fields[infoFieldContent.id]).toBe(
+					infoFieldContent.sourceContent
 				);
-
 				expect(request.sourceLanguageId).toBe(
 					baseProps.sourceLanguageId
 				);
@@ -326,7 +305,8 @@ describe('Translate', () => {
 				const {getByText} = renderComponent(baseProps);
 
 				const autoTranslateFieldButton = getByText(
-					`auto-translate-${baseProps.infoFieldSetEntries[0].fields[0].label}-field`
+					'auto-translate-x-field-' +
+						baseProps.infoFieldSetEntries[0].fields[0].label
 				).closest('button');
 
 				await act(async () => {

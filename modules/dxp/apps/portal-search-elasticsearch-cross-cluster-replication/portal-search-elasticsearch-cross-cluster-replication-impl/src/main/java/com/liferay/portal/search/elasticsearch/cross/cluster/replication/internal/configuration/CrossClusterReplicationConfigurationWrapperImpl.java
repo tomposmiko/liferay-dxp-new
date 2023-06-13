@@ -27,7 +27,8 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.elasticsearch.cross.cluster.replication.internal.configuration.CrossClusterReplicationConfiguration",
-	enabled = false, service = CrossClusterReplicationConfigurationWrapper.class
+	enabled = false, immediate = true,
+	service = CrossClusterReplicationConfigurationWrapper.class
 )
 public class CrossClusterReplicationConfigurationWrapperImpl
 	implements CrossClusterReplicationConfigurationWrapper {

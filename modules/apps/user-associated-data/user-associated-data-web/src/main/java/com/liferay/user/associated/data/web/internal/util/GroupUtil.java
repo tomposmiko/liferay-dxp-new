@@ -64,7 +64,7 @@ public class GroupUtil {
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return null;

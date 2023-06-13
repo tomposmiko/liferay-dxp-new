@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Miguel Angelo Caldas Gallindo
  */
-@Component(service = TermRangeQueryTranslator.class)
+@Component(immediate = true, service = TermRangeQueryTranslator.class)
 public class TermRangeQueryTranslatorImpl implements TermRangeQueryTranslator {
 
 	@Override

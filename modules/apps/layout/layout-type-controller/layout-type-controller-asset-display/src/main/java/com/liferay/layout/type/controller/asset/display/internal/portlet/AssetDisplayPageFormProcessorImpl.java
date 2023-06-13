@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletRequest;
@@ -57,12 +56,7 @@ public class AssetDisplayPageFormProcessorImpl
 			portletRequest, "displayPageType",
 			AssetDisplayPageConstants.TYPE_DEFAULT);
 
-		String layoutUuid = ParamUtil.getString(portletRequest, "layoutUuid");
-
-		if ((displayPageType == AssetDisplayPageConstants.TYPE_DEFAULT) ||
-			((displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) &&
-			 Validator.isNotNull(layoutUuid))) {
-
+		if (displayPageType == AssetDisplayPageConstants.TYPE_DEFAULT) {
 			if (assetDisplayPageEntry != null) {
 				_assetDisplayPageEntryLocalService.deleteAssetDisplayPageEntry(
 					themeDisplay.getScopeGroupId(), classNameId, classPK);

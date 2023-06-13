@@ -36,15 +36,12 @@ public abstract class BaseLocalGitCommit
 		_gitWorkingDirectory = gitWorkingDirectory;
 	}
 
-	@Override
 	protected void initCommitTime() {
 	}
 
-	@Override
 	protected void initEmailAddress() {
 	}
 
-	@Override
 	protected void initMessage() {
 	}
 

@@ -34,7 +34,7 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -53,6 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Akos Thurzo
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.expando.kernel.model.adapter.StagedExpandoColumn",
 	service = StagedModelRepository.class
 )
@@ -65,16 +66,10 @@ public class StagedExpandoColumnStagedModelRepository
 			StagedExpandoColumn stagedExpandoColumn)
 		throws PortalException {
 
-		long columnId = stagedExpandoColumn.getColumnId();
-
-		stagedExpandoColumn.setColumnId(0);
-
 		ExpandoColumn expandoColumn = _expandoColumnLocalService.addColumn(
 			stagedExpandoColumn.getTableId(), stagedExpandoColumn.getName(),
 			stagedExpandoColumn.getType(),
 			stagedExpandoColumn.getDefaultValue());
-
-		stagedExpandoColumn.setColumnId(columnId);
 
 		expandoColumn = _expandoColumnLocalService.updateTypeSettings(
 			expandoColumn.getColumnId(), stagedExpandoColumn.getTypeSettings());
@@ -95,7 +90,7 @@ public class StagedExpandoColumnStagedModelRepository
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
 
-		JSONObject extraDataJSONObject = _jsonFactory.createJSONObject(
+		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject(
 			extraData);
 
 		List<StagedExpandoColumn> stagedExpandoColumns =
@@ -302,6 +297,18 @@ public class StagedExpandoColumnStagedModelRepository
 			expandoColumn, ExpandoColumn.class, StagedExpandoColumn.class);
 	}
 
+	@Reference(
+		target = "(model.class.name=com.liferay.expando.kernel.model.adapter.StagedExpandoTable)",
+		unbind = "-"
+	)
+	protected void setStagedExpandoTableStagedModelRepository(
+		StagedModelRepository<StagedExpandoTable>
+			stagedExpandoTableStagedModelRepository) {
+
+		_stagedExpandoTableStagedModelRepository =
+			stagedExpandoTableStagedModelRepository;
+	}
+
 	private String _parseExpandoColumnName(String uuid) {
 		return uuid.substring(uuid.lastIndexOf(StringPool.POUND) + 1);
 	}
@@ -325,12 +332,6 @@ public class StagedExpandoColumnStagedModelRepository
 	@Reference
 	private ExportImportHelper _exportImportHelper;
 
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.expando.kernel.model.adapter.StagedExpandoTable)"
-	)
 	private StagedModelRepository<StagedExpandoTable>
 		_stagedExpandoTableStagedModelRepository;
 

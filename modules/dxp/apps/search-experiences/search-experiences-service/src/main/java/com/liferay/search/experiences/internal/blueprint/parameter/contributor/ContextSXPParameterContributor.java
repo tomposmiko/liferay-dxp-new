@@ -15,23 +15,18 @@
 package com.liferay.search.experiences.internal.blueprint.parameter.contributor;
 
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.search.experiences.blueprint.parameter.BooleanSXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.LongSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition;
-import com.liferay.search.experiences.internal.blueprint.parameter.BooleanSXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.LongArraySXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.LongSXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
-
-import java.beans.ExceptionListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,42 +39,25 @@ import java.util.Set;
 public class ContextSXPParameterContributor implements SXPParameterContributor {
 
 	public ContextSXPParameterContributor(
-		GroupLocalService groupLocalService, Language language) {
+		GroupLocalService groupLocalService, Language language,
+		LayoutLocalService layoutLocalService) {
 
 		_groupLocalService = groupLocalService;
 		_language = language;
+		_layoutLocalService = layoutLocalService;
 	}
 
 	@Override
 	public void contribute(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint, Set<SXPParameter> sxpParameters) {
-
-		long[] commerceAccountGroupIds = (long[])searchContext.getAttribute(
-			"commerceAccountGroupIds");
-
-		if (commerceAccountGroupIds != null) {
-			sxpParameters.add(
-				new LongArraySXPParameter(
-					"commerceAccountGroupIds", true,
-					ArrayUtil.toArray(commerceAccountGroupIds)));
-		}
-
-		Long commerceChannelGroupId = (Long)searchContext.getAttribute(
-			"commerceChannelGroupId");
-
-		if (commerceChannelGroupId != null) {
-			sxpParameters.add(
-				new LongSXPParameter(
-					"commerceChannelGroupId", true, commerceChannelGroupId));
-		}
+		SearchContext searchContext, SXPBlueprint sxpBlueprint,
+		Set<SXPParameter> sxpParameters) {
 
 		sxpParameters.add(
 			new LongSXPParameter(
 				"context.company_id", true, searchContext.getCompanyId()));
 		sxpParameters.add(
 			new LongSXPParameter(
-				"context.publication_id", true,
+				"context.ct_collection_id", true,
 				CTCollectionThreadLocal.getCTCollectionId()));
 
 		Locale locale = searchContext.getLocale();
@@ -89,37 +67,35 @@ public class ContextSXPParameterContributor implements SXPParameterContributor {
 				"context.language", true, locale.getLanguage()));
 		sxpParameters.add(
 			new StringSXPParameter(
-				"context.language_id", true, _language.getLanguageId(locale)));
+				"context.language_id", true,
+				"_" + _language.getLanguageId(locale)));
 
 		Layout layout = searchContext.getLayout();
 
 		if (layout != null) {
 			sxpParameters.add(
 				new StringSXPParameter(
-					"context.layout-name-localized", true,
+					"context.layout_locale_name", true,
 					layout.getName(locale, true)));
 			sxpParameters.add(
 				new LongSXPParameter("plid", true, layout.getPlid()));
 		}
 
-		long scopeGroupId = GetterUtil.getLong(
-			searchContext.getAttribute("search.experiences.scope.group.id"));
+		Long scopeGroupId = (Long)searchContext.getAttribute(
+			"search.experiences.scope_group_id");
 
-		if (scopeGroupId != 0) {
+		if (scopeGroupId != null) {
 			sxpParameters.add(
 				new LongSXPParameter(
 					"context.scope_group_id", true, scopeGroupId));
 
-			try {
-				Group group = _groupLocalService.getGroup(scopeGroupId);
+			Group group = _groupLocalService.fetchGroup(scopeGroupId);
 
+			if (group != null) {
 				sxpParameters.add(
 					new BooleanSXPParameter(
 						"context.is_staging_group", true,
 						group.isStagingGroup()));
-			}
-			catch (PortalException portalException) {
-				exceptionListener.exceptionThrown(portalException);
 			}
 		}
 	}
@@ -131,26 +107,26 @@ public class ContextSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public List<SXPParameterContributorDefinition>
-		getSXPParameterContributorDefinitions(long companyId, Locale locale) {
+		getSXPParameterContributorDefinitions(long companyId) {
 
 		return Arrays.asList(
 			new SXPParameterContributorDefinition(
 				LongSXPParameter.class, "company-id", "context.company_id"),
 			new SXPParameterContributorDefinition(
-				BooleanSXPParameter.class, "is-staging-group",
+				LongSXPParameter.class, "ct-collection-id",
+				"context.ct_collection_id"),
+			new SXPParameterContributorDefinition(
+				BooleanSXPParameter.class, "staging-group",
 				"context.is_staging_group"),
 			new SXPParameterContributorDefinition(
 				StringSXPParameter.class, "language", "context.language"),
 			new SXPParameterContributorDefinition(
 				StringSXPParameter.class, "language-id", "context.language_id"),
 			new SXPParameterContributorDefinition(
-				StringSXPParameter.class, "layout-name-localized",
-				"context.layout-name-localized"),
+				StringSXPParameter.class, "layout-locale-name",
+				"context.layout_locale_name"),
 			new SXPParameterContributorDefinition(
-				LongSXPParameter.class, "page-layout-id", "context.plid"),
-			new SXPParameterContributorDefinition(
-				LongSXPParameter.class, "publication-id",
-				"context.publication_id"),
+				LongSXPParameter.class, "plid", "context.plid"),
 			new SXPParameterContributorDefinition(
 				LongSXPParameter.class, "scope-group-id",
 				"context.scope_group_id"));
@@ -158,5 +134,6 @@ public class ContextSXPParameterContributor implements SXPParameterContributor {
 
 	private final GroupLocalService _groupLocalService;
 	private final Language _language;
+	private final LayoutLocalService _layoutLocalService;
 
 }

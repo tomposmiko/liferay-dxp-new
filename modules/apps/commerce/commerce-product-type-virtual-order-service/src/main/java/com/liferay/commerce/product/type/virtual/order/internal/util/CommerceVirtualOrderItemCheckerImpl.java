@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.product.type.virtual.order.internal.util;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceSubscriptionEntry;
@@ -38,7 +38,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceVirtualOrderItemChecker.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceVirtualOrderItemChecker.class
+)
 public class CommerceVirtualOrderItemCheckerImpl
 	implements CommerceVirtualOrderItemChecker {
 
@@ -146,9 +149,9 @@ public class CommerceVirtualOrderItemCheckerImpl
 
 		serviceContext.setScopeGroupId(commerceOrder.getGroupId());
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
-		serviceContext.setUserId(accountEntry.getUserId());
+		serviceContext.setUserId(commerceAccount.getUserId());
 
 		UUID uuid = new UUID(
 			SecureRandomUtil.nextLong(), SecureRandomUtil.nextLong());

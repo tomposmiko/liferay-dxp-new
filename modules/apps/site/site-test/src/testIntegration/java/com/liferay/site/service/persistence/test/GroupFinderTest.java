@@ -261,19 +261,19 @@ public class GroupFinderTest {
 
 		_groups.addFirst(parentGroup);
 
-		LayoutTestUtil.addTypePortletLayout(parentGroup, false);
+		LayoutTestUtil.addLayout(parentGroup, false);
 
 		Group childGroup1 = GroupTestUtil.addGroup(parentGroup.getGroupId());
 
 		_groups.addFirst(childGroup1);
 
-		LayoutTestUtil.addTypePortletLayout(childGroup1, false);
+		LayoutTestUtil.addLayout(childGroup1, false);
 
 		Group childGroup2 = GroupTestUtil.addGroup(parentGroup.getGroupId());
 
 		_groups.addFirst(childGroup2);
 
-		LayoutTestUtil.addTypePortletLayout(childGroup2, true);
+		LayoutTestUtil.addLayout(childGroup2, true);
 
 		groups = _findByLayouts(GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
@@ -299,19 +299,19 @@ public class GroupFinderTest {
 
 		_groups.addFirst(parentGroup);
 
-		LayoutTestUtil.addTypePortletLayout(parentGroup, false);
+		LayoutTestUtil.addLayout(parentGroup, false);
 
 		Group childGroup1 = GroupTestUtil.addGroup(parentGroup.getGroupId());
 
 		_groups.addFirst(childGroup1);
 
-		LayoutTestUtil.addTypePortletLayout(childGroup1, false);
+		LayoutTestUtil.addLayout(childGroup1, false);
 
 		Group childGroup2 = GroupTestUtil.addGroup(parentGroup.getGroupId());
 
 		_groups.addFirst(childGroup2);
 
-		LayoutTestUtil.addTypePortletLayout(childGroup2, true);
+		LayoutTestUtil.addLayout(childGroup2, true);
 
 		_groupLocalService.updateGroup(
 			parentGroup.getGroupId(), parentGroup.getParentGroupId(),

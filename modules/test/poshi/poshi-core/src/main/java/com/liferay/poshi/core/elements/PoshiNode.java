@@ -42,21 +42,12 @@ public interface PoshiNode<A extends Node, B extends PoshiNode<A, B>>
 		return parentPoshiNode.getFileExtension();
 	}
 
-	public default URL getFilePathURL() {
-		PoshiNode<?, ?> parentPoshiNode = (PoshiNode<?, ?>)getParent();
-
-		return parentPoshiNode.getFilePathURL();
-	}
-
 	public String getPoshiScript();
 
 	public default int getPoshiScriptLineNumber() {
 		PoshiElement parentPoshiElement = (PoshiElement)getParent();
 
-		if ((parentPoshiElement == null) ||
-			((this instanceof PoshiElementAttribute) &&
-			 (parentPoshiElement instanceof DefinitionPoshiElement))) {
-
+		if (parentPoshiElement == null) {
 			return 1;
 		}
 
@@ -106,25 +97,15 @@ public interface PoshiNode<A extends Node, B extends PoshiNode<A, B>>
 				poshiScriptLineNumber +
 					StringUtil.countStartingNewLines(poshiScript);
 
-			if (previousPoshiNode instanceof PoshiElement) {
-				PoshiElement previousPoshiElement =
-					(PoshiElement)previousPoshiNode;
+			Matcher poshiScriptBlockMatcher =
+				PoshiElement.poshiScriptBlockPattern.matcher(
+					previousPoshiScript);
 
-				if (previousPoshiElement.getBlockName() != null) {
-					Matcher poshiScriptBlockMatcher =
-						PoshiElement.poshiScriptBlockPattern.matcher(
-							previousPoshiScript);
+			if (poshiScriptBlockMatcher.find()) {
+				int newLineCount = StringUtil.count(
+					parentPoshiElement.getBlockName(previousPoshiScript), "\n");
 
-					if (poshiScriptBlockMatcher.find()) {
-						int newLineCount = StringUtil.count(
-							parentPoshiElement.getBlockName(
-								previousPoshiScript),
-							"\n");
-
-						poshiScriptLineNumber =
-							poshiScriptLineNumber - newLineCount;
-					}
-				}
+				poshiScriptLineNumber = poshiScriptLineNumber - newLineCount;
 			}
 
 			return poshiScriptLineNumber;
@@ -137,6 +118,12 @@ public interface PoshiNode<A extends Node, B extends PoshiNode<A, B>>
 
 		return previousPoshiNode.getPoshiScriptLineNumber() +
 			StringUtil.count(previousPoshiNode.getPoshiScript(), "\n");
+	}
+
+	public default URL getURL() {
+		PoshiNode<?, ?> parentPoshiNode = (PoshiNode<?, ?>)getParent();
+
+		return parentPoshiNode.getURL();
 	}
 
 	public default boolean isValidPoshiXML() throws PoshiScriptParserException {

@@ -22,11 +22,7 @@ import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.order.CommerceOrderValidatorResult;
 import com.liferay.commerce.order.content.web.internal.display.context.CommerceOrderContentDisplayContext;
-import com.liferay.commerce.order.engine.CommerceOrderEngine;
-import com.liferay.commerce.order.importer.type.CommerceOrderImporterTypeRegistry;
-import com.liferay.commerce.order.status.CommerceOrderStatusRegistry;
-import com.liferay.commerce.payment.method.CommercePaymentMethodRegistry;
-import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelLocalService;
+import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelService;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
@@ -35,13 +31,11 @@ import com.liferay.commerce.service.CommerceOrderNoteService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.commerce.service.CommerceShipmentItemService;
-import com.liferay.commerce.term.service.CommerceTermEntryService;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocalCloseable;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
@@ -55,6 +49,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
@@ -68,6 +64,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-open-order-content",
@@ -75,6 +72,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.instanceable=false",
 		"com.liferay.portlet.layout-cacheable=true",
 		"com.liferay.portlet.preferences-owned-by-group=true",
+		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
@@ -84,12 +82,25 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/pending_commerce_orders/view.jsp",
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_OPEN_ORDER_CONTENT,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceOpenOrderContentPortlet.class, Portlet.class}
 )
 public class CommerceOpenOrderContentPortlet extends MVCPortlet {
+
+	@Override
+	public void processAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException, PortletException {
+
+		try (ProxyModeThreadLocalCloseable proxyModeThreadLocalCloseable =
+				new ProxyModeThreadLocalCloseable()) {
+
+			ProxyModeThreadLocal.setForceSync(true);
+
+			super.processAction(actionRequest, actionResponse);
+		}
+	}
 
 	@Override
 	public void render(
@@ -101,20 +112,16 @@ public class CommerceOpenOrderContentPortlet extends MVCPortlet {
 				commerceOrderContentDisplayContext =
 					new CommerceOrderContentDisplayContext(
 						_commerceAddressService, _commerceChannelLocalService,
-						_commerceOrderEngine, _commerceOrderHttpHelper,
-						_commerceOrderImporterTypeRegistry,
 						_commerceOrderNoteService,
 						_commerceOrderPriceCalculation, _commerceOrderService,
-						_commerceOrderStatusRegistry, _commerceOrderTypeService,
-						_commercePaymentMethodGroupRelLocalService,
-						_commercePaymentMethodRegistry,
-						_commerceShipmentItemService, _commerceTermEntryService,
-						_configurationProvider, _dlAppLocalService,
+						_commerceOrderTypeService,
+						_commercePaymentMethodGroupRelService,
+						_commerceShipmentItemService,
 						_portal.getHttpServletRequest(renderRequest),
-						_itemSelector, _modelResourcePermission,
-						_percentageFormatter, _portletResourcePermission);
+						_modelResourcePermission, _percentageFormatter,
+						_portletResourcePermission);
 
-			CommerceOrder commerceOrder = _getCommerceOrder(renderRequest);
+			CommerceOrder commerceOrder = getCommerceOrder(renderRequest);
 
 			if (commerceOrder != null) {
 				List<String> errorMessages = new ArrayList<>();
@@ -141,37 +148,30 @@ public class CommerceOpenOrderContentPortlet extends MVCPortlet {
 				commerceOrderContentDisplayContext);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		super.render(renderRequest, renderResponse);
 	}
 
-	private CommerceOrder _getCommerceOrder(PortletRequest portletRequest) {
+	protected CommerceOrder getCommerceOrder(PortletRequest portletRequest)
+		throws PortalException {
+
 		String commerceOrderUuid = ParamUtil.getString(
 			portletRequest, "commerceOrderUuid");
 
-		try {
-			if (Validator.isNotNull(commerceOrderUuid)) {
-				long groupId =
-					_commerceChannelLocalService.
-						getCommerceChannelGroupIdBySiteGroupId(
-							_portal.getScopeGroupId(portletRequest));
+		if (Validator.isNotNull(commerceOrderUuid)) {
+			long groupId =
+				_commerceChannelLocalService.
+					getCommerceChannelGroupIdBySiteGroupId(
+						_portal.getScopeGroupId(portletRequest));
 
-				return _commerceOrderService.getCommerceOrderByUuidAndGroupId(
-					commerceOrderUuid, groupId);
-			}
-
-			return _commerceOrderHttpHelper.getCurrentCommerceOrder(
-				_portal.getHttpServletRequest(portletRequest));
+			return _commerceOrderService.getCommerceOrderByUuidAndGroupId(
+				commerceOrderUuid, groupId);
 		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
 
-			return null;
-		}
+		return _commerceOrderHttpHelper.getCurrentCommerceOrder(
+			_portal.getHttpServletRequest(portletRequest));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -184,14 +184,7 @@ public class CommerceOpenOrderContentPortlet extends MVCPortlet {
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	@Reference
-	private CommerceOrderEngine _commerceOrderEngine;
-
-	@Reference
 	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
-
-	@Reference
-	private CommerceOrderImporterTypeRegistry
-		_commerceOrderImporterTypeRegistry;
 
 	@Reference
 	private CommerceOrderNoteService _commerceOrderNoteService;
@@ -203,35 +196,17 @@ public class CommerceOpenOrderContentPortlet extends MVCPortlet {
 	private CommerceOrderService _commerceOrderService;
 
 	@Reference
-	private CommerceOrderStatusRegistry _commerceOrderStatusRegistry;
-
-	@Reference
 	private CommerceOrderTypeService _commerceOrderTypeService;
 
 	@Reference
 	private CommerceOrderValidatorRegistry _commerceOrderValidatorRegistry;
 
 	@Reference
-	private CommercePaymentMethodGroupRelLocalService
-		_commercePaymentMethodGroupRelLocalService;
-
-	@Reference
-	private CommercePaymentMethodRegistry _commercePaymentMethodRegistry;
+	private CommercePaymentMethodGroupRelService
+		_commercePaymentMethodGroupRelService;
 
 	@Reference
 	private CommerceShipmentItemService _commerceShipmentItemService;
-
-	@Reference
-	private CommerceTermEntryService _commerceTermEntryService;
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private ItemSelector _itemSelector;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"

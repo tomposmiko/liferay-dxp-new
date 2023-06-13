@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.product.content.web.internal.display.context;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
@@ -25,17 +25,16 @@ import com.liferay.commerce.product.content.render.list.entry.CPContentListEntry
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
 import com.liferay.commerce.product.content.web.internal.configuration.CPCompareContentMiniPortletInstanceConfiguration;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.product.type.CPType;
-import com.liferay.commerce.product.type.CPTypeRegistry;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPCompareHelper;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
-import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -60,7 +59,7 @@ public class CPCompareContentMiniDisplayContext {
 				cpContentListEntryRendererRegistry,
 			CPContentListRendererRegistry cpContentListRendererRegistry,
 			CPDefinitionHelper cpDefinitionHelper,
-			CPTypeRegistry cpTypeRegistry,
+			CPTypeServicesTracker cpTypeServicesTracker,
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
@@ -69,7 +68,7 @@ public class CPCompareContentMiniDisplayContext {
 			cpContentListEntryRendererRegistry;
 		_cpContentListRendererRegistry = cpContentListRendererRegistry;
 		_cpDefinitionHelper = cpDefinitionHelper;
-		_cpTypeRegistry = cpTypeRegistry;
+		_cpTypeServicesTracker = cpTypeServicesTracker;
 
 		_cpRequestHelper = new CPRequestHelper(httpServletRequest);
 
@@ -85,20 +84,20 @@ public class CPCompareContentMiniDisplayContext {
 			(CommerceContext)httpServletRequest.getAttribute(
 				CommerceWebKeys.COMMERCE_CONTEXT);
 
-		AccountEntry accountEntry = commerceContext.getAccountEntry();
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
 
-		if (accountEntry != null) {
+		if (commerceAccount != null) {
 			HttpServletRequest originalHttpServletRequest =
 				PortalUtil.getOriginalServletRequest(httpServletRequest);
 
 			_cpDefinitionIds = new ArrayList<>(
-				cpCompareHelper.getCPDefinitionIds(
+				_cpCompareHelper.getCPDefinitionIds(
 					commerceContext.getCommerceChannelGroupId(),
-					accountEntry.getAccountEntryId(),
-					CookiesManagerUtil.getCookieValue(
-						cpCompareHelper.getCPDefinitionIdsCookieKey(
-							commerceContext.getCommerceChannelGroupId()),
-						originalHttpServletRequest)));
+					commerceAccount.getCommerceAccountId(),
+					CookieKeys.getCookie(
+						originalHttpServletRequest,
+						_cpCompareHelper.getCPDefinitionIdsCookieKey(
+							commerceContext.getCommerceChannelGroupId()))));
 		}
 		else {
 			_cpDefinitionIds = new ArrayList<>();
@@ -169,10 +168,18 @@ public class CPCompareContentMiniDisplayContext {
 			(CommerceContext)httpServletRequest.getAttribute(
 				CommerceWebKeys.COMMERCE_CONTEXT);
 
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+
+		long commerceAccountId = 0;
+
+		if (commerceAccount != null) {
+			commerceAccountId = commerceAccount.getCommerceAccountId();
+		}
+
 		for (Long cpDefinitionId : _cpDefinitionIds) {
 			cpCatalogEntries.add(
 				_cpDefinitionHelper.getCPCatalogEntry(
-					CommerceUtil.getCommerceAccountId(commerceContext),
+					commerceAccountId,
 					commerceContext.getCommerceChannelGroupId(), cpDefinitionId,
 					_cpRequestHelper.getLocale()));
 		}
@@ -215,7 +222,7 @@ public class CPCompareContentMiniDisplayContext {
 	}
 
 	public List<CPType> getCPTypes() {
-		return _cpTypeRegistry.getCPTypes();
+		return _cpTypeServicesTracker.getCPTypes();
 	}
 
 	public String getDisplayStyle() {
@@ -282,6 +289,6 @@ public class CPCompareContentMiniDisplayContext {
 	private final CPDefinitionHelper _cpDefinitionHelper;
 	private final List<Long> _cpDefinitionIds;
 	private final CPRequestHelper _cpRequestHelper;
-	private final CPTypeRegistry _cpTypeRegistry;
+	private final CPTypeServicesTracker _cpTypeServicesTracker;
 
 }

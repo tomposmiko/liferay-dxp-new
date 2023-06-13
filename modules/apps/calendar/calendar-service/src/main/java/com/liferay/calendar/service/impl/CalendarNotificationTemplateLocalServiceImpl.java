@@ -19,20 +19,17 @@ import com.liferay.calendar.model.CalendarNotificationTemplate;
 import com.liferay.calendar.notification.NotificationTemplateType;
 import com.liferay.calendar.notification.NotificationType;
 import com.liferay.calendar.service.base.CalendarNotificationTemplateLocalServiceBaseImpl;
-import com.liferay.calendar.service.persistence.CalendarPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 
 import java.util.Date;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Adam Brandizzi
@@ -53,8 +50,8 @@ public class CalendarNotificationTemplateLocalServiceImpl
 			String body, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
-		Calendar calendar = _calendarPersistence.findByPrimaryKey(calendarId);
+		User user = userLocalService.getUser(userId);
+		Calendar calendar = calendarPersistence.findByPrimaryKey(calendarId);
 		Date date = new Date();
 
 		long calendarNotificationTemplateId = counterLocalService.increment();
@@ -141,11 +138,5 @@ public class CalendarNotificationTemplateLocalServiceImpl
 		return calendarNotificationTemplatePersistence.update(
 			calendarNotificationTemplate);
 	}
-
-	@Reference
-	private CalendarPersistence _calendarPersistence;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

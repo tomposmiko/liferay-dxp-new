@@ -17,7 +17,6 @@ package com.liferay.wiki.trash.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassedModel;
-import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -92,11 +91,6 @@ public class WikiNodeTrashHandlerTest
 		WikiNode node = (WikiNode)baseModel;
 
 		return _trashHelper.getOriginalTitle(node.getName());
-	}
-
-	@Override
-	protected boolean isInTrashContainer(TrashedModel trashedModel) {
-		return _trashHelper.isInTrashContainer(trashedModel);
 	}
 
 	@Override

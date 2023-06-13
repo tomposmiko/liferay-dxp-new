@@ -16,6 +16,8 @@ package com.liferay.dynamic.data.mapping.form.web.internal.portlet.action;
 
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -31,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Basto
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
 		"mvc.command.name=/dynamic_data_mapping_form/delete_form_instance"
@@ -39,6 +42,12 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class DeleteFormInstanceMVCActionCommand
 	extends BaseTransactionalMVCActionCommand {
+
+	protected void doDeleteFormInstance(long formInstanceId)
+		throws PortalException {
+
+		_ddmFormInstanceService.deleteFormInstance(formInstanceId);
+	}
 
 	@Override
 	protected void doTransactionalCommand(
@@ -60,15 +69,25 @@ public class DeleteFormInstanceMVCActionCommand
 		}
 
 		for (long deleteFormInstanceId : deleteFormInstanceIds) {
-			_deleteFormInstance(deleteFormInstanceId);
+			doDeleteFormInstance(deleteFormInstanceId);
 		}
 	}
 
-	private void _deleteFormInstance(long formInstanceId) throws Exception {
-		_ddmFormInstanceService.deleteFormInstance(formInstanceId);
+	@Reference(unbind = "-")
+	protected void setDDMFormInstanceService(
+		DDMFormInstanceService ddmFormInstanceService) {
+
+		_ddmFormInstanceService = ddmFormInstanceService;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDMStructureService(
+		DDMStructureService ddmStructureService) {
+
+		_ddmStructureService = ddmStructureService;
+	}
+
 	private DDMFormInstanceService _ddmFormInstanceService;
+	private DDMStructureService _ddmStructureService;
 
 }

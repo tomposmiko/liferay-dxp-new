@@ -23,7 +23,6 @@ import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.OpenAPIYAML;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Parameter;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.PathItem;
 import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.Schema;
-import com.liferay.portal.tools.rest.builder.internal.yaml.openapi.XML;
 
 import java.util.List;
 import java.util.Map;
@@ -71,18 +70,13 @@ public class YAMLUtil {
 	private static final Yaml _YAML_OPEN_API;
 
 	static {
-		Representer representer = new Representer(new DumperOptions());
+		Representer representer = new Representer();
 
 		PropertyUtils propertyUtils = representer.getPropertyUtils();
 
 		propertyUtils.setSkipMissingProperties(true);
 
-		LoaderOptions loaderOptions = new LoaderOptions();
-
-		loaderOptions.setAllowDuplicateKeys(false);
-
-		Constructor configYAMLConstructor = new Constructor(
-			ConfigYAML.class, loaderOptions);
+		Constructor configYAMLConstructor = new Constructor(ConfigYAML.class);
 
 		TypeDescription securityTypeDescription = new TypeDescription(
 			Security.class);
@@ -92,12 +86,15 @@ public class YAMLUtil {
 
 		configYAMLConstructor.addTypeDescription(securityTypeDescription);
 
+		LoaderOptions loaderOptions = new LoaderOptions();
+
+		loaderOptions.setAllowDuplicateKeys(false);
+
 		_YAML_CONFIG = new Yaml(
 			configYAMLConstructor, representer, new DumperOptions(),
 			loaderOptions);
 
-		Constructor openAPIYAMLConstructor = new Constructor(
-			OpenAPIYAML.class, loaderOptions);
+		Constructor openAPIYAMLConstructor = new Constructor(OpenAPIYAML.class);
 
 		TypeDescription itemsTypeDescription = new TypeDescription(Items.class);
 
@@ -181,12 +178,6 @@ public class YAMLUtil {
 
 		schemaTypeDescription.substituteProperty(
 			"x-json-map", boolean.class, "getJsonMap", "setJsonMap");
-
-		schemaTypeDescription.substituteProperty(
-			"xml", XML.class, "getXML", "setXML");
-
-		schemaTypeDescription.addPropertyParameters(
-			"xml", String.class, XML.class);
 
 		openAPIYAMLConstructor.addTypeDescription(schemaTypeDescription);
 

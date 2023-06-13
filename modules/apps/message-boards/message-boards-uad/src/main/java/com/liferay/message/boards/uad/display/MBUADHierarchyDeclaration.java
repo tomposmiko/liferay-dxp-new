@@ -14,7 +14,7 @@
 
 package com.liferay.message.boards.uad.display;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.user.associated.data.display.UADDisplay;
 import com.liferay.user.associated.data.display.UADHierarchyDeclaration;
 
@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Samuel Trong Tran
  */
-@Component(service = UADHierarchyDeclaration.class)
+@Component(immediate = true, service = UADHierarchyDeclaration.class)
 public class MBUADHierarchyDeclaration implements UADHierarchyDeclaration {
 
 	@Override
@@ -36,7 +36,7 @@ public class MBUADHierarchyDeclaration implements UADHierarchyDeclaration {
 
 	@Override
 	public String getEntitiesTypeLabel(Locale locale) {
-		return _language.get(locale, "categories-and-threads");
+		return LanguageUtil.get(locale, "categories-and-threads");
 	}
 
 	@Override
@@ -50,21 +50,12 @@ public class MBUADHierarchyDeclaration implements UADHierarchyDeclaration {
 	}
 
 	@Reference
-	private Language _language;
+	private MBCategoryUADDisplay _mbCategoryUADDisplay;
 
-	@Reference(
-		target = "(component.name=com.liferay.message.boards.uad.display.MBCategoryUADDisplay)"
-	)
-	private UADDisplay<?> _mbCategoryUADDisplay;
+	@Reference
+	private MBMessageUADDisplay _mbMessageUADDisplay;
 
-	@Reference(
-		target = "(component.name=com.liferay.message.boards.uad.display.MBMessageUADDisplay)"
-	)
-	private UADDisplay<?> _mbMessageUADDisplay;
-
-	@Reference(
-		target = "(component.name=com.liferay.message.boards.uad.display.MBThreadUADDisplay)"
-	)
-	private UADDisplay<?> _mbThreadUADDisplay;
+	@Reference
+	private MBThreadUADDisplay _mbThreadUADDisplay;
 
 }

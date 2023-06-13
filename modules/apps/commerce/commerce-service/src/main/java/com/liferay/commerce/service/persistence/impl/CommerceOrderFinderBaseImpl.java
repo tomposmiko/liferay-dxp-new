@@ -16,9 +16,7 @@ package com.liferay.commerce.service.persistence.impl;
 
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.service.persistence.CommerceOrderPersistence;
-import com.liferay.commerce.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  * @generated
  */
-public abstract class CommerceOrderFinderBaseImpl
+public class CommerceOrderFinderBaseImpl
 	extends BasePersistenceImpl<CommerceOrder> {
 
 	public CommerceOrderFinderBaseImpl() {
@@ -44,36 +38,6 @@ public abstract class CommerceOrderFinderBaseImpl
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
-		dbColumnNames.put(
-			"deliveryCommerceTermEntryDescription",
-			"deliveryCTermEntryDescription");
-		dbColumnNames.put(
-			"paymentCommerceTermEntryDescription",
-			"paymentCTermEntryDescription");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel1",
-			"shippingDiscountPercentLevel1");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel2",
-			"shippingDiscountPercentLevel2");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel3",
-			"shippingDiscountPercentLevel3");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel4",
-			"shippingDiscountPercentLevel4");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel1WithTaxAmount",
-			"shippingDiscountPctLev1WithTax");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel2WithTaxAmount",
-			"shippingDiscountPctLev2WithTax");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel3WithTaxAmount",
-			"shippingDiscountPctLev3WithTax");
-		dbColumnNames.put(
-			"shippingDiscountPercentageLevel4WithTaxAmount",
-			"shippingDiscountPctLev4WithTax");
 		dbColumnNames.put(
 			"subtotalDiscountPercentageLevel1",
 			"subtotalDiscountPercentLevel1");
@@ -87,6 +51,18 @@ public abstract class CommerceOrderFinderBaseImpl
 			"subtotalDiscountPercentageLevel4",
 			"subtotalDiscountPercentLevel4");
 		dbColumnNames.put(
+			"shippingDiscountPercentageLevel1",
+			"shippingDiscountPercentLevel1");
+		dbColumnNames.put(
+			"shippingDiscountPercentageLevel2",
+			"shippingDiscountPercentLevel2");
+		dbColumnNames.put(
+			"shippingDiscountPercentageLevel3",
+			"shippingDiscountPercentLevel3");
+		dbColumnNames.put(
+			"shippingDiscountPercentageLevel4",
+			"shippingDiscountPercentLevel4");
+		dbColumnNames.put(
 			"subtotalDiscountPercentageLevel1WithTaxAmount",
 			"subtotalDiscountPctLev1WithTax");
 		dbColumnNames.put(
@@ -98,6 +74,18 @@ public abstract class CommerceOrderFinderBaseImpl
 		dbColumnNames.put(
 			"subtotalDiscountPercentageLevel4WithTaxAmount",
 			"subtotalDiscountPctLev4WithTax");
+		dbColumnNames.put(
+			"shippingDiscountPercentageLevel1WithTaxAmount",
+			"shippingDiscountPctLev1WithTax");
+		dbColumnNames.put(
+			"shippingDiscountPercentageLevel2WithTaxAmount",
+			"shippingDiscountPctLev2WithTax");
+		dbColumnNames.put(
+			"shippingDiscountPercentageLevel3WithTaxAmount",
+			"shippingDiscountPctLev3WithTax");
+		dbColumnNames.put(
+			"shippingDiscountPercentageLevel4WithTaxAmount",
+			"shippingDiscountPctLev4WithTax");
 		dbColumnNames.put(
 			"totalDiscountPercentageLevel1WithTaxAmount",
 			"totalDiscountPctLev1WithTax");
@@ -116,36 +104,30 @@ public abstract class CommerceOrderFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commerceOrderPersistence.getBadColumnNames();
+		return getCommerceOrderPersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce order persistence.
+	 *
+	 * @return the commerce order persistence
+	 */
+	public CommerceOrderPersistence getCommerceOrderPersistence() {
+		return commerceOrderPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce order persistence.
+	 *
+	 * @param commerceOrderPersistence the commerce order persistence
+	 */
+	public void setCommerceOrderPersistence(
+		CommerceOrderPersistence commerceOrderPersistence) {
+
+		this.commerceOrderPersistence = commerceOrderPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommerceOrderPersistence.class)
 	protected CommerceOrderPersistence commerceOrderPersistence;
 
 	private static final Log _log = LogFactoryUtil.getLog(

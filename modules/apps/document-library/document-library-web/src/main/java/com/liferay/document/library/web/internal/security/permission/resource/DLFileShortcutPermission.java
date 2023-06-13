@@ -15,15 +15,18 @@
 package com.liferay.document.library.web.internal.security.permission.resource;
 
 import com.liferay.document.library.kernel.model.DLFileShortcut;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(service = {})
 public class DLFileShortcutPermission {
 
 	public static void check(
@@ -31,10 +34,7 @@ public class DLFileShortcutPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<FileShortcut> modelResourcePermission =
-			_fileShortcutModelResourcePermissionSnapshot.get();
-
-		modelResourcePermission.check(
+		_fileShortcutModelResourcePermission.check(
 			permissionChecker, fileShortcut, actionId);
 	}
 
@@ -43,10 +43,7 @@ public class DLFileShortcutPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<FileShortcut> modelResourcePermission =
-			_fileShortcutModelResourcePermissionSnapshot.get();
-
-		modelResourcePermission.check(
+		_fileShortcutModelResourcePermission.check(
 			permissionChecker, fileShortcutId, actionId);
 	}
 
@@ -55,10 +52,7 @@ public class DLFileShortcutPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DLFileShortcut> modelResourcePermission =
-			_dlFileShortcutModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _dlFileShortcutModelResourcePermission.contains(
 			permissionChecker, dlFileShortcut, actionId);
 	}
 
@@ -67,10 +61,7 @@ public class DLFileShortcutPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<FileShortcut> modelResourcePermission =
-			_fileShortcutModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _fileShortcutModelResourcePermission.contains(
 			permissionChecker, fileShortcut, actionId);
 	}
 
@@ -79,24 +70,33 @@ public class DLFileShortcutPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<FileShortcut> modelResourcePermission =
-			_fileShortcutModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _fileShortcutModelResourcePermission.contains(
 			permissionChecker, fileShortcutId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<DLFileShortcut>>
-		_dlFileShortcutModelResourcePermissionSnapshot = new Snapshot<>(
-			DLFileShortcutPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.document.library.kernel.model." +
-				"DLFileShortcut)");
-	private static final Snapshot<ModelResourcePermission<FileShortcut>>
-		_fileShortcutModelResourcePermissionSnapshot = new Snapshot<>(
-			DLFileShortcutPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.portal.kernel.repository.model." +
-				"FileShortcut)");
+	@Reference(
+		target = "(model.class.name=com.liferay.document.library.kernel.model.DLFileShortcut)",
+		unbind = "-"
+	)
+	protected void setDLFileShortcutModelResourcePermission(
+		ModelResourcePermission<DLFileShortcut> modelResourcePermission) {
+
+		_dlFileShortcutModelResourcePermission = modelResourcePermission;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.portal.kernel.repository.model.FileShortcut)",
+		unbind = "-"
+	)
+	protected void setFileShortcutModelResourcePermission(
+		ModelResourcePermission<FileShortcut> modelResourcePermission) {
+
+		_fileShortcutModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<DLFileShortcut>
+		_dlFileShortcutModelResourcePermission;
+	private static ModelResourcePermission<FileShortcut>
+		_fileShortcutModelResourcePermission;
 
 }

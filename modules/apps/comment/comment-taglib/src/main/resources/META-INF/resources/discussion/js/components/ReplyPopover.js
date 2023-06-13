@@ -21,8 +21,6 @@ import React, {useState} from 'react';
 import useOnClickOutside from '../hooks/useOnClickOutside';
 import UserIcon from './UserIcon';
 
-import '../../css/main.scss';
-
 function ReplyPopover({
 	ariaLabel,
 	contentHTML,
@@ -52,10 +50,8 @@ function ReplyPopover({
 							userId={userId}
 						/>
 					</ClayLayout.ContentCol>
-
 					<ClayLayout.ContentCol expand>
 						<div className="username">{username}</div>
-
 						<div className="font-weight-normal text-secondary">
 							{time}
 						</div>
@@ -79,7 +75,6 @@ function ReplyPopover({
 						small="true"
 						symbol="redo"
 					/>
-
 					{username}
 				</a>
 			}

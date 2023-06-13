@@ -20,7 +20,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Iván Zaera
@@ -29,19 +32,20 @@ public class PortletPreferencesSettingsTest {
 
 	@Before
 	public void setUp() {
-		_portletPreferences = Mockito.mock(PortletPreferences.class);
+		_portletPreferences = PowerMockito.mock(PortletPreferences.class);
 
 		Mockito.when(
 			_portletPreferences.getValue(
-				Mockito.eq(_PORTLET_PREFERENCES_SINGLE_KEY),
-				Mockito.nullable(String.class))
+				Matchers.eq(_PORTLET_PREFERENCES_SINGLE_KEY),
+				Matchers.anyString())
 		).thenReturn(
 			_PORTLET_PREFERENCES_SINGLE_VALUE
 		);
 
 		Mockito.when(
 			_portletPreferences.getValues(
-				Mockito.eq(_PORTLET_PREFERENCES_MULTIPLE_KEY), Mockito.any())
+				Matchers.eq(_PORTLET_PREFERENCES_MULTIPLE_KEY),
+				(String[])Matchers.any())
 		).thenReturn(
 			_PORTLET_PREFERENCES_MULTIPLE_VALUES
 		);
@@ -111,11 +115,9 @@ public class PortletPreferencesSettingsTest {
 
 		_portletPreferencesSettings.setValue("key", "value");
 
-		Mockito.verify(
-			_portletPreferences
-		).setValue(
-			"key", "value"
-		);
+		Mockito.verify(_portletPreferences);
+
+		_portletPreferences.setValue("key", "value");
 	}
 
 	@Test
@@ -126,20 +128,18 @@ public class PortletPreferencesSettingsTest {
 
 		_portletPreferencesSettings.setValues("key", values);
 
-		Mockito.verify(
-			_portletPreferences
-		).setValues(
-			"key", values
-		);
+		Mockito.verify(_portletPreferences);
+
+		_portletPreferences.setValues("key", values);
 	}
 
 	@Test
 	public void testStoreIsPerformedOnPortletPreferences() throws Exception {
 		_portletPreferencesSettings.store();
 
-		Mockito.verify(
-			_portletPreferences
-		).store();
+		Mockito.verify(_portletPreferences);
+
+		_portletPreferences.store();
 	}
 
 	private static final String _DEFAULT_SETTINGS_MULTIPLE_KEY = "defaultKeys";

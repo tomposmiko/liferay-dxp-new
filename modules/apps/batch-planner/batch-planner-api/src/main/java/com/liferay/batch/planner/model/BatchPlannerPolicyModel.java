@@ -234,8 +234,4 @@ public interface BatchPlannerPolicyModel
 	@Override
 	public BatchPlannerPolicy cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

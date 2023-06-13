@@ -25,10 +25,6 @@ public class UserNotificationDeliveryLocalServiceWrapper
 	implements ServiceWrapper<UserNotificationDeliveryLocalService>,
 			   UserNotificationDeliveryLocalService {
 
-	public UserNotificationDeliveryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public UserNotificationDeliveryLocalServiceWrapper(
 		UserNotificationDeliveryLocalService
 			userNotificationDeliveryLocalService) {

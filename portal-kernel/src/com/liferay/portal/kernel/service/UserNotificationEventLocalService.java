@@ -68,16 +68,34 @@ public interface UserNotificationEventLocalService
 			NotificationEvent notificationEvent)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	public UserNotificationEvent addUserNotificationEvent(
+			long userId, boolean actionRequired,
+			NotificationEvent notificationEvent)
+		throws PortalException;
+
 	public UserNotificationEvent addUserNotificationEvent(
 			long userId, NotificationEvent notificationEvent)
 		throws PortalException;
 
-	@Indexable(type = IndexableType.REINDEX)
 	public UserNotificationEvent addUserNotificationEvent(
 			long userId, String type, long timestamp, int deliveryType,
 			long deliverBy, boolean delivered, String payload,
 			boolean actionRequired, boolean archived,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	public UserNotificationEvent addUserNotificationEvent(
+			long userId, String type, long timestamp, int deliveryType,
+			long deliverBy, String payload, boolean actionRequired,
+			boolean archived, ServiceContext serviceContext)
 		throws PortalException;
 
 	public UserNotificationEvent addUserNotificationEvent(
@@ -147,8 +165,7 @@ public interface UserNotificationEventLocalService
 			long userNotificationEventId)
 		throws PortalException;
 
-	public void deleteUserNotificationEvent(String uuid, long companyId)
-		throws PortalException;
+	public void deleteUserNotificationEvent(String uuid, long companyId);
 
 	/**
 	 * Deletes the user notification event from the database. Also notifies the appropriate model listeners.
@@ -165,11 +182,9 @@ public interface UserNotificationEventLocalService
 		UserNotificationEvent userNotificationEvent);
 
 	public void deleteUserNotificationEvents(
-			Collection<String> uuids, long companyId)
-		throws PortalException;
+		Collection<String> uuids, long companyId);
 
-	public void deleteUserNotificationEvents(long userId)
-		throws PortalException;
+	public void deleteUserNotificationEvents(long userId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> T dslQuery(DSLQuery dslQuery);
@@ -519,7 +534,6 @@ public interface UserNotificationEventLocalService
 			JSONObject notificationEventJSONObject)
 		throws PortalException;
 
-	@Indexable(type = IndexableType.REINDEX)
 	public UserNotificationEvent updateUserNotificationEvent(
 		String uuid, long companyId, boolean archive);
 

@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.knowledge.base.model.KBArticle",
 	service = KBArticleSelector.class
 )
@@ -54,7 +55,7 @@ public class KBArticleKBArticleSelector implements KBArticleSelector {
 		KBArticle kbArticle = _kbArticleService.fetchLatestKBArticle(
 			resourcePrimKey, WorkflowConstants.STATUS_APPROVED);
 
-		return _getClosestMatchingDescendantKBArticle(
+		return getClosestMatchingDescendantKBArticle(
 			groupId, ancestorKBArticle, kbArticle);
 	}
 
@@ -76,7 +77,7 @@ public class KBArticleKBArticleSelector implements KBArticleSelector {
 			groupId, ancestorKBArticle.getKbFolderId(), urlTitle,
 			WorkflowConstants.STATUS_APPROVED);
 
-		return _getClosestMatchingDescendantKBArticle(
+		return getClosestMatchingDescendantKBArticle(
 			groupId, ancestorKBArticle, kbArticle);
 	}
 
@@ -102,6 +103,22 @@ public class KBArticleKBArticleSelector implements KBArticleSelector {
 		return new KBArticleSelection(ancestorKBArticle, false);
 	}
 
+	protected KBArticleSelection getClosestMatchingDescendantKBArticle(
+			long groupId, KBArticle ancestorKBArticle, KBArticle kbArticle)
+		throws PortalException {
+
+		if (kbArticle == null) {
+			return new KBArticleSelection(ancestorKBArticle, false);
+		}
+
+		if (isDescendant(kbArticle, ancestorKBArticle)) {
+			return new KBArticleSelection(kbArticle, true);
+		}
+
+		return findClosestMatchingKBArticle(
+			groupId, ancestorKBArticle, kbArticle);
+	}
+
 	protected boolean isDescendant(
 			KBArticle kbArticle, KBArticle ancestorKBArticle)
 		throws PortalException {
@@ -123,22 +140,6 @@ public class KBArticleKBArticleSelector implements KBArticleSelector {
 		}
 
 		return false;
-	}
-
-	private KBArticleSelection _getClosestMatchingDescendantKBArticle(
-			long groupId, KBArticle ancestorKBArticle, KBArticle kbArticle)
-		throws PortalException {
-
-		if (kbArticle == null) {
-			return new KBArticleSelection(ancestorKBArticle, false);
-		}
-
-		if (isDescendant(kbArticle, ancestorKBArticle)) {
-			return new KBArticleSelection(kbArticle, true);
-		}
-
-		return findClosestMatchingKBArticle(
-			groupId, ancestorKBArticle, kbArticle);
 	}
 
 	@Reference

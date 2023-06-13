@@ -21,6 +21,8 @@ import Options from '../../../src/main/resources/META-INF/resources/Options/Opti
 
 const DEFAULT_OPTION_NAME_REGEX = /^Option[0-9]{8}$/;
 
+let liferayLanguageSpy;
+
 const globalLanguageDirection = Liferay.Language.direction;
 
 const spritemap = 'icons.svg';
@@ -46,6 +48,22 @@ const optionsValue = {
 			value: 'Option2',
 		},
 	],
+};
+
+const mockLiferayLanguage = () => {
+	liferayLanguageSpy = jest.spyOn(Liferay.Language, 'get');
+
+	liferayLanguageSpy.mockImplementation((key) => {
+		if (key === 'option') {
+			return 'Option';
+		}
+
+		return key;
+	});
+};
+
+const unmockLiferayLanguage = () => {
+	liferayLanguageSpy.mockRestore();
 };
 
 describe('Options', () => {
@@ -81,6 +99,8 @@ describe('Options', () => {
 	});
 
 	it('shows the options', () => {
+		mockLiferayLanguage();
+
 		const {container} = render(
 			<OptionsWithProvider
 				name="options"
@@ -113,9 +133,13 @@ describe('Options', () => {
 		valueInputs[2].setAttribute('value', 'Any<String>');
 
 		expect(container).toMatchSnapshot();
+
+		unmockLiferayLanguage();
 	});
 
 	it('shows the options with not editable value', () => {
+		mockLiferayLanguage();
+
 		const {container} = render(
 			<OptionsWithProvider
 				keywordReadOnly={true}
@@ -142,9 +166,13 @@ describe('Options', () => {
 
 		expect(valueInputs[0].readOnly).toBeTruthy();
 		expect(valueInputs[0].value).toEqual('Option1');
+
+		unmockLiferayLanguage();
 	});
 
 	it('shows the options with editable value', () => {
+		mockLiferayLanguage();
+
 		const {container, getByDisplayValue} = render(
 			<OptionsWithProvider
 				keywordReadOnly={false}
@@ -175,9 +203,13 @@ describe('Options', () => {
 
 		expect(valueInputs[0].readOnly).toBeFalsy();
 		expect(valueInputs[0].value).toEqual('Option2');
+
+		unmockLiferayLanguage();
 	});
 
 	it('shows an empty option when value is an array of size 1', () => {
+		mockLiferayLanguage();
+
 		const {container} = render(
 			<OptionsWithProvider
 				name="options"
@@ -213,6 +245,8 @@ describe('Options', () => {
 		expect(valueInputs[1].value).toEqual(
 			expect.stringMatching(DEFAULT_OPTION_NAME_REGEX)
 		);
+
+		unmockLiferayLanguage();
 	});
 
 	it('does show an empty option when translating', () => {
@@ -252,6 +286,8 @@ describe('Options', () => {
 	});
 
 	it('does not changes the option value when the option label changes', () => {
+		mockLiferayLanguage();
+
 		const {container, getByDisplayValue} = render(
 			<OptionsWithProvider
 				name="options"
@@ -281,6 +317,8 @@ describe('Options', () => {
 
 		const valueInputs = container.querySelectorAll('.key-value-input');
 		expect(valueInputs[0].value).toEqual('Option1');
+
+		unmockLiferayLanguage();
 	});
 
 	it('edits the value of an option based on the label', () => {
@@ -409,6 +447,8 @@ describe('Options', () => {
 	});
 
 	it('deduplication of value when adding a new option', () => {
+		mockLiferayLanguage();
+
 		const {container} = render(
 			<OptionsWithProvider
 				name="options"
@@ -444,6 +484,8 @@ describe('Options', () => {
 		expect(valueInputs[1].value).toEqual(
 			expect.stringMatching(DEFAULT_OPTION_NAME_REGEX)
 		);
+
+		unmockLiferayLanguage();
 	});
 
 	it('deduplication of the value when editing the value', () => {
@@ -567,6 +609,8 @@ describe('Options', () => {
 	});
 
 	it('checks if the initial value of the option reference matches the option value', () => {
+		mockLiferayLanguage();
+
 		const {container} = render(
 			<OptionsWithProvider
 				name="options"
@@ -587,10 +631,14 @@ describe('Options', () => {
 		const valueInputs = container.querySelectorAll('.key-value-input');
 
 		expect(referenceInputs[2].value).toBe(valueInputs[2].value);
+
+		unmockLiferayLanguage();
 	});
 
 	describe('Normalize option reference during the onBlur event', () => {
 		it('changes to the option value when the reference is duplicated', () => {
+			mockLiferayLanguage();
+
 			const {container} = render(
 				<OptionsWithProvider
 					name="options"
@@ -634,9 +682,13 @@ describe('Options', () => {
 
 			expect(referenceInputs[0].value).toBe('Option1');
 			expect(referenceInputs[1].value).toBe('Reference2');
+
+			unmockLiferayLanguage();
 		});
 
 		it('changes to the option value when the reference is empty', () => {
+			mockLiferayLanguage();
+
 			const {container} = render(
 				<OptionsWithProvider
 					name="options"
@@ -670,6 +722,8 @@ describe('Options', () => {
 			});
 
 			expect(referenceInput.value).toEqual('Value');
+
+			unmockLiferayLanguage();
 		});
 	});
 });

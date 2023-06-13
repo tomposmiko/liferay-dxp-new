@@ -14,7 +14,6 @@
 
 package com.liferay.wiki.engine.creole.internal;
 
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -45,17 +44,13 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Miguel Pastor
  */
-@Component(
-	configurationPid = "com.liferay.wiki.configuration.WikiGroupServiceConfiguration",
-	service = WikiEngine.class
-)
+@Component(service = WikiEngine.class)
 public class CreoleWikiEngine extends BaseWikiEngine {
 
 	@Override
@@ -67,7 +62,7 @@ public class CreoleWikiEngine extends BaseWikiEngine {
 
 		return xhtmlTranslator.translate(
 			page, viewPageURL, editPageURL, attachmentURLPrefix,
-			_parse(page.getContent()));
+			parse(page.getContent()));
 	}
 
 	@Override
@@ -95,7 +90,7 @@ public class CreoleWikiEngine extends BaseWikiEngine {
 			new LinkNodeCollectorVisitor();
 
 		List<ASTNode> astNodes = linkNodeCollectorVisitor.collect(
-			_parse(page.getContent()));
+			parse(page.getContent()));
 
 		try {
 			for (ASTNode astNode : astNodes) {
@@ -126,10 +121,15 @@ public class CreoleWikiEngine extends BaseWikiEngine {
 		return outgoingLinks;
 	}
 
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_wikiGroupServiceConfiguration = ConfigurableUtil.createConfigurable(
-			WikiGroupServiceConfiguration.class, properties);
+	protected Creole10Parser build(String creoleCode) {
+		ANTLRStringStream antlrStringStream = new ANTLRStringStream(creoleCode);
+
+		Creole10Lexer creole10Lexer = new Creole10Lexer(antlrStringStream);
+
+		CommonTokenStream commonTokenStream = new CommonTokenStream(
+			creole10Lexer);
+
+		return new Creole10Parser(commonTokenStream);
 	}
 
 	@Override
@@ -142,19 +142,8 @@ public class CreoleWikiEngine extends BaseWikiEngine {
 		return _servletContext;
 	}
 
-	private Creole10Parser _build(String creoleCode) {
-		ANTLRStringStream antlrStringStream = new ANTLRStringStream(creoleCode);
-
-		Creole10Lexer creole10Lexer = new Creole10Lexer(antlrStringStream);
-
-		CommonTokenStream commonTokenStream = new CommonTokenStream(
-			creole10Lexer);
-
-		return new Creole10Parser(commonTokenStream);
-	}
-
-	private WikiPageNode _parse(String creoleCode) {
-		Creole10Parser creole10Parser = _build(creoleCode);
+	protected WikiPageNode parse(String creoleCode) {
+		Creole10Parser creole10Parser = build(creoleCode);
 
 		try {
 			creole10Parser.wikipage();
@@ -186,6 +175,7 @@ public class CreoleWikiEngine extends BaseWikiEngine {
 	)
 	private ServletContext _wikiEngineInputEditorServletContext;
 
+	@Reference
 	private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
 
 	@Reference

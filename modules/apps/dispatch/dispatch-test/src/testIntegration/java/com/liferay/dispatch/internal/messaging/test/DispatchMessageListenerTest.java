@@ -18,7 +18,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dispatch.constants.DispatchConstants;
 import com.liferay.dispatch.executor.DispatchTaskClusterMode;
 import com.liferay.dispatch.executor.DispatchTaskStatus;
-import com.liferay.dispatch.internal.messaging.TestDispatchTaskExecutor;
 import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchLogLocalService;
@@ -29,13 +28,14 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.DataGuard;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -44,6 +44,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -75,8 +77,7 @@ public class DispatchMessageListenerTest {
 		int executeCount = RandomTestUtil.randomInt(1, 3);
 
 		DispatchTrigger dispatchTrigger = _executeDispatchTrigger(
-			executeCount, 1000, true,
-			TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST);
+			executeCount, 1000, RandomTestUtil.randomBoolean(), "missingType");
 
 		List<DispatchLog> dispatchLogs =
 			_dispatchLogLocalService.getDispatchLogs(
@@ -90,7 +91,7 @@ public class DispatchMessageListenerTest {
 
 		for (DispatchLog dispatchLog : dispatchLogs) {
 			Assert.assertEquals(
-				DispatchTaskStatus.SUCCESSFUL.getStatus(),
+				DispatchTaskStatus.CANCELED.getStatus(),
 				dispatchLog.getStatus());
 		}
 	}
@@ -118,19 +119,21 @@ public class DispatchMessageListenerTest {
 			executeCount, 750, false,
 			TestDispatchTaskExecutor.DISPATCH_TASK_EXECUTOR_TYPE_TEST);
 
-		_assertExecutionSequence(
+		List<DispatchLog> dispatchLogs =
 			_dispatchLogLocalService.getDispatchLogs(
 				dispatchTrigger.getDispatchTriggerId(), QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS),
-			executeCount, false);
+				QueryUtil.ALL_POS);
+
+		_assertExecutionSequence(dispatchLogs, executeCount, false);
 	}
 
 	private void _assertExecutionSequence(
 		List<DispatchLog> dispatchLogs, int executeCount,
 		boolean overlapAllowed) {
 
-		dispatchLogs = ListUtil.filter(
-			dispatchLogs,
+		Stream<DispatchLog> stream = dispatchLogs.stream();
+
+		List<DispatchLog> sortedDispatchLogs = stream.filter(
 			dispatchLog -> {
 				if (DispatchTaskStatus.valueOf(dispatchLog.getStatus()) ==
 						DispatchTaskStatus.SUCCESSFUL) {
@@ -139,16 +142,16 @@ public class DispatchMessageListenerTest {
 				}
 
 				return false;
-			});
-
-		List<DispatchLog> sortedDispatchLogs = ListUtil.sort(
-			dispatchLogs,
+			}
+		).sorted(
 			(dispatchLog1, dispatchLog2) -> DateUtil.compareTo(
-				dispatchLog1.getCreateDate(), dispatchLog2.getCreateDate()));
+				dispatchLog1.getCreateDate(), dispatchLog2.getCreateDate())
+		).collect(
+			Collectors.toList()
+		);
 
-		if (sortedDispatchLogs.isEmpty()) {
-			return;
-		}
+		Assert.assertFalse(
+			"Expected at least one dispatch log", sortedDispatchLogs.isEmpty());
 
 		Assert.assertTrue(
 			String.format(
@@ -168,16 +171,12 @@ public class DispatchMessageListenerTest {
 
 			if (overlapAllowed) {
 				Assert.assertTrue(
-					String.format(
-						"Dispatch log end at %s before next start at %s",
-						currentDispatchLog.getEndDate(),
-						nextDispatchLog.getStartDate()),
-					difference > 0);
+					"Dispatch log execution order", difference > 0);
 			}
 			else {
 				Assert.assertTrue(
 					String.format(
-						"Dispatch log end at %s after next start at %s in %s",
+						"Dispatch log end at %s before next start at %s in %s",
 						currentDispatchLog.getEndDate(),
 						nextDispatchLog.getStartDate(),
 						sortedDispatchLogs.toString()),
@@ -223,12 +222,14 @@ public class DispatchMessageListenerTest {
 			boolean overlapAllowed, String type)
 		throws Exception {
 
-		User user = UserTestUtil.addUser();
+		Company company = CompanyTestUtil.addCompany();
+
+		User user = UserTestUtil.addUser(company);
 
 		DispatchTrigger dispatchTrigger =
 			_dispatchTriggerLocalService.addDispatchTrigger(
-				null, user.getUserId(), type, null,
-				RandomTestUtil.randomString(), RandomTestUtil.randomBoolean());
+				user.getUserId(), type, null, RandomTestUtil.randomString(),
+				RandomTestUtil.randomBoolean());
 
 		Date date = new Date();
 
@@ -239,7 +240,7 @@ public class DispatchMessageListenerTest {
 			DispatchTaskClusterMode.NOT_APPLICABLE, 0, 0, 0, 0, 0, true,
 			overlapAllowed, calendar.get(Calendar.MONTH),
 			calendar.get(Calendar.DATE), calendar.get(Calendar.YEAR),
-			calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), "UTC");
+			calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE));
 
 		_execute(
 			dispatchTrigger.getDispatchTriggerId(), executeCount,
@@ -252,9 +253,8 @@ public class DispatchMessageListenerTest {
 		Message message = new Message();
 
 		message.setPayload(
-			JSONUtil.put(
-				"dispatchTriggerId", dispatchTriggerId
-			).toString());
+			String.valueOf(
+				JSONUtil.put("dispatchTriggerId", dispatchTriggerId)));
 
 		return message;
 	}

@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class JournalFeedServiceWrapper
 	implements JournalFeedService, ServiceWrapper<JournalFeedService> {
 
-	public JournalFeedServiceWrapper() {
-		this(null);
-	}
-
 	public JournalFeedServiceWrapper(JournalFeedService journalFeedService) {
 		_journalFeedService = journalFeedService;
 	}
@@ -38,7 +34,7 @@ public class JournalFeedServiceWrapper
 	@Override
 	public JournalFeed addFeed(
 			long groupId, String feedId, boolean autoFeedId, String name,
-			String description, long ddmStructureId, String ddmTemplateKey,
+			String description, String ddmStructureKey, String ddmTemplateKey,
 			String ddmRendererTemplateKey, int delta, String orderByCol,
 			String orderByType, String targetLayoutFriendlyUrl,
 			String targetPortletId, String contentField, String feedType,
@@ -47,7 +43,7 @@ public class JournalFeedServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalFeedService.addFeed(
-			groupId, feedId, autoFeedId, name, description, ddmStructureId,
+			groupId, feedId, autoFeedId, name, description, ddmStructureKey,
 			ddmTemplateKey, ddmRendererTemplateKey, delta, orderByCol,
 			orderByType, targetLayoutFriendlyUrl, targetPortletId, contentField,
 			feedType, feedVersion, serviceContext);
@@ -94,7 +90,7 @@ public class JournalFeedServiceWrapper
 	@Override
 	public JournalFeed updateFeed(
 			long groupId, String feedId, String name, String description,
-			long ddmStructureId, String ddmTemplateKey,
+			String ddmStructureKey, String ddmTemplateKey,
 			String ddmRendererTemplateKey, int delta, String orderByCol,
 			String orderByType, String targetLayoutFriendlyUrl,
 			String targetPortletId, String contentField, String feedType,
@@ -103,7 +99,7 @@ public class JournalFeedServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalFeedService.updateFeed(
-			groupId, feedId, name, description, ddmStructureId, ddmTemplateKey,
+			groupId, feedId, name, description, ddmStructureKey, ddmTemplateKey,
 			ddmRendererTemplateKey, delta, orderByCol, orderByType,
 			targetLayoutFriendlyUrl, targetPortletId, contentField, feedType,
 			feedVersion, serviceContext);

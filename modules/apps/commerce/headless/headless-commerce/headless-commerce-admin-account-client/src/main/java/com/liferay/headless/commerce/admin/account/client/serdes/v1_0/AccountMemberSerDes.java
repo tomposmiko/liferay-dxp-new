@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -255,18 +256,14 @@ public class AccountMemberSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "accountRoles")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AccountRole[] accountRolesArray =
-						new AccountRole[jsonParserFieldValues.length];
-
-					for (int i = 0; i < accountRolesArray.length; i++) {
-						accountRolesArray[i] = AccountRoleSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					accountMember.setAccountRoles(accountRolesArray);
+					accountMember.setAccountRoles(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AccountRoleSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AccountRole[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "email")) {

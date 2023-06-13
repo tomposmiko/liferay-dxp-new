@@ -69,7 +69,7 @@ public class JournalCacheExportImportLifecycleListener
 			PortletDataContext portletDataContext)
 		throws Exception {
 
-		_clearCache();
+		clearCache();
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class JournalCacheExportImportLifecycleListener
 			return;
 		}
 
-		_clearCache();
+		clearCache();
 	}
 
 	@Override
@@ -223,15 +223,19 @@ public class JournalCacheExportImportLifecycleListener
 		throws Exception {
 	}
 
-	private void _clearCache() {
+	protected void clearCache() {
 		_journalContent.clearCache();
+	}
+
+	@Reference(unbind = "-")
+	protected void setJournalContent(JournalContent journalContent) {
+		_journalContent = journalContent;
 	}
 
 	@Reference
 	private JournalArticleExportImportProcessorCache
 		_journalArticleExportImportCache;
 
-	@Reference
 	private JournalContent _journalContent;
 
 }

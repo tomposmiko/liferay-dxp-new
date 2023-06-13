@@ -30,18 +30,18 @@ if (!dlFileEntries.isEmpty()) {
 	List<DLFileVersion> dlFileVersions = dlFileEntry.getFileVersions(WorkflowConstants.STATUS_ANY);
 
 	for (DLFileVersion dlFileVersion : dlFileVersions) {
-		UnicodeProperties extraSettingsUnicodeProperties = dlFileVersion.getExtraSettingsProperties();
+		UnicodeProperties extraSettingsProperties = dlFileVersion.getExtraSettingsProperties();
 
-		if (extraSettingsUnicodeProperties.isEmpty()) {
+		if (extraSettingsProperties.isEmpty()) {
 			continue;
 		}
 
-		keys = new ArrayList<String>(extraSettingsUnicodeProperties.size());
-		expandoBridgeAttributeNames = new ArrayList<String>(extraSettingsUnicodeProperties.size());
+		keys = new ArrayList<String>(extraSettingsProperties.size());
+		expandoBridgeAttributeNames = new ArrayList<String>(extraSettingsProperties.size());
 
 		ExpandoBridge expandoBridge = dlFileEntry.getExpandoBridge();
 
-		for (String key : extraSettingsUnicodeProperties.keySet()) {
+		for (String key : extraSettingsProperties.keySet()) {
 			if (expandoBridge.hasAttribute(key)) {
 				expandoBridgeAttributeNames.add(key);
 			}

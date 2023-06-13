@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
-	property = "search.engine.impl=Elasticsearch",
+	immediate = true, property = "search.engine.impl=Elasticsearch",
 	service = CCRRequestExecutor.class
 )
 public class ElasticsearchCCRRequestExecutor implements CCRRequestExecutor {
@@ -64,16 +64,37 @@ public class ElasticsearchCCRRequestExecutor implements CCRRequestExecutor {
 		return _unfollowCCRRequestExecutor.execute(unfollowCCRRequest);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setFollowInfoCCRRequestExecutor(
+		FollowInfoCCRRequestExecutor followInfoCCRRequestExecutor) {
+
+		_followInfoCCRRequestExecutor = followInfoCCRRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPauseFollowCCRRequestExecutor(
+		PauseFollowCCRRequestExecutor pauseFollowCCRRequestExecutor) {
+
+		_pauseFollowCCRRequestExecutor = pauseFollowCCRRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPutFollowCCRRequestExecutor(
+		PutFollowCCRRequestExecutor putFollowCCRRequestExecutor) {
+
+		_putFollowCCRRequestExecutor = putFollowCCRRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUnfollowCCRRequestExecutor(
+		UnfollowCCRRequestExecutor unfollowCCRRequestExecutor) {
+
+		_unfollowCCRRequestExecutor = unfollowCCRRequestExecutor;
+	}
+
 	private FollowInfoCCRRequestExecutor _followInfoCCRRequestExecutor;
-
-	@Reference
 	private PauseFollowCCRRequestExecutor _pauseFollowCCRRequestExecutor;
-
-	@Reference
 	private PutFollowCCRRequestExecutor _putFollowCCRRequestExecutor;
-
-	@Reference
 	private UnfollowCCRRequestExecutor _unfollowCCRRequestExecutor;
 
 }

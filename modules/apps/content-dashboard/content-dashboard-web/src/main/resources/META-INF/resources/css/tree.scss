@@ -1,4 +1,4 @@
-@import 'cadmin-variables';
+@import 'atlas-variables';
 
 .tree-filter {
 	&-clear {
@@ -7,19 +7,20 @@
 
 	&-count-feedback {
 		align-items: center;
-		background: $cadmin-primary-l2;
+		background: $primary-l2;
 		display: flex;
 		min-height: 40px;
+		padding: 0 24px;
+
+		p {
+			font-size: 12px;
+		}
 	}
 
 	&-search {
 		.container-fluid {
 			height: 40px;
 		}
-	}
-
-	&-clear-selected {
-		color: $cadmin-gray-900;
 	}
 
 	&-loader {

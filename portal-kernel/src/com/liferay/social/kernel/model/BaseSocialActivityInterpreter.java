@@ -38,16 +38,15 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
-import com.liferay.portal.kernel.trash.helper.TrashHelper;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.social.kernel.service.SocialActivityLocalServiceUtil;
 import com.liferay.social.kernel.service.SocialActivitySetLocalServiceUtil;
 import com.liferay.social.kernel.service.persistence.SocialActivityUtil;
+import com.liferay.trash.kernel.util.TrashUtil;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -141,14 +140,11 @@ public abstract class BaseSocialActivityInterpreter
 			return url;
 		}
 
-		return HttpComponentsUtil.setParameter(
-			url, "noSuchEntryRedirect", viewEntryURL);
+		return HttpUtil.setParameter(url, "noSuchEntryRedirect", viewEntryURL);
 	}
 
 	protected String buildLink(String link, String text) {
-		return StringBundler.concat(
-			"<a class=\"text-decoration-underline\" href=\"", link, "\">", text,
-			"</a>");
+		return StringBundler.concat("<a href=\"", link, "\">", text, "</a>");
 	}
 
 	protected SocialActivityFeedEntry doInterpret(
@@ -240,12 +236,12 @@ public abstract class BaseSocialActivityInterpreter
 			}
 
 			return StringBundler.concat(
-				"<a class=\"group text-decoration-underline\" href=\"",
-				groupDisplayURL, "\">", HtmlUtil.escape(groupName), "</a>");
+				"<a class=\"group\" href=\"", groupDisplayURL, "\">",
+				HtmlUtil.escape(groupName), "</a>");
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;
@@ -326,7 +322,7 @@ public abstract class BaseSocialActivityInterpreter
 			return sb.toString();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}
@@ -337,6 +333,20 @@ public abstract class BaseSocialActivityInterpreter
 		throws Exception {
 
 		return StringPool.BLANK;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #acquireResourceBundleLoader}
+	 */
+	@Deprecated
+	protected com.liferay.portal.kernel.util.ResourceBundleLoader
+		getResourceBundleLoader() {
+
+		ResourceBundleLoader resourceBundleLoader =
+			acquireResourceBundleLoader();
+
+		return locale -> resourceBundleLoader.loadResourceBundle(locale);
 	}
 
 	protected String getTitle(
@@ -419,7 +429,7 @@ public abstract class BaseSocialActivityInterpreter
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;
@@ -434,7 +444,7 @@ public abstract class BaseSocialActivityInterpreter
 			className);
 
 		if ((trashHandler != null) && trashHandler.isInTrash(classPK)) {
-			PortletURL portletURL = _trashHelper.getViewContentURL(
+			PortletURL portletURL = TrashUtil.getViewContentURL(
 				serviceContext.getRequest(), className, classPK);
 
 			if (portletURL == null) {
@@ -518,10 +528,5 @@ public abstract class BaseSocialActivityInterpreter
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseSocialActivityInterpreter.class);
-
-	private static volatile TrashHelper _trashHelper =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			TrashHelper.class, BaseSocialActivityInterpreter.class,
-			"_trashHelper", false);
 
 }

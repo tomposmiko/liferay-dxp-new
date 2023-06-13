@@ -14,7 +14,7 @@
 
 package com.liferay.journal.internal.upgrade.v1_1_0;
 
-import com.liferay.journal.internal.upgrade.helper.JournalArticleImageUpgradeHelper;
+import com.liferay.journal.internal.upgrade.util.JournalArticleImageUpgradeHelper;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
@@ -40,12 +40,7 @@ public class DocumentLibraryTypeContentUpgradeProcess extends UpgradeProcess {
 		_journalArticleImageUpgradeHelper = journalArticleImageUpgradeHelper;
 	}
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_updateContent();
-	}
-
-	private String _convertContent(String content) throws Exception {
+	protected String convertContent(String content) throws Exception {
 		Document contentDocument = SAXReaderUtil.read(content);
 
 		contentDocument = contentDocument.clone();
@@ -75,26 +70,37 @@ public class DocumentLibraryTypeContentUpgradeProcess extends UpgradeProcess {
 		return contentDocument.formattedString();
 	}
 
-	private void _updateContent() throws Exception {
+	@Override
+	protected void doUpgrade() throws Exception {
+		updateContent();
+	}
+
+	protected void updateContent() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select content, id_ from JournalArticle where content like " +
-					"'%type=\"document_library\"%'");
-			ResultSet resultSet = preparedStatement1.executeQuery();
-			PreparedStatement preparedStatement2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection,
-					"update JournalArticle set content = ? where id_ = ?")) {
+					"?")) {
 
-			while (resultSet.next()) {
-				preparedStatement2.setString(
-					1, _convertContent(resultSet.getString(1)));
-				preparedStatement2.setLong(2, resultSet.getLong(2));
+			preparedStatement1.setString(1, "%type=\"document_library\"%");
 
-				preparedStatement2.addBatch();
+			ResultSet resultSet1 = preparedStatement1.executeQuery();
+
+			while (resultSet1.next()) {
+				String content = resultSet1.getString(1);
+				long id = resultSet1.getLong(2);
+
+				try (PreparedStatement preparedStatement2 =
+						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+							connection,
+							"update JournalArticle set content = ? where id_ " +
+								"= ?")) {
+
+					preparedStatement2.setString(1, convertContent(content));
+					preparedStatement2.setLong(2, id);
+
+					preparedStatement2.executeUpdate();
+				}
 			}
-
-			preparedStatement2.executeBatch();
 		}
 	}
 

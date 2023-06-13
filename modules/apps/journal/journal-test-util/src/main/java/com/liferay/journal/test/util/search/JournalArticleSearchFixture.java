@@ -14,15 +14,12 @@
 
 package com.liferay.journal.test.util.search;
 
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
-import com.liferay.portal.kernel.util.Portal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,29 +32,23 @@ import java.util.Map;
 public class JournalArticleSearchFixture {
 
 	public JournalArticleSearchFixture(
-		DDMStructureLocalService ddmStructureLocalService,
-		JournalArticleLocalService journalArticleLocalService, Portal portal) {
+		JournalArticleLocalService journalArticleLocalService) {
 
-		_ddmStructureLocalService = ddmStructureLocalService;
 		_journalArticleLocalService = journalArticleLocalService;
-		_portal = portal;
 	}
 
 	public JournalArticle addArticle(
 		JournalArticleBlueprint journalArticleBlueprint) {
 
-		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
-			_portal.getSiteGroupId(journalArticleBlueprint.getGroupId()),
-			_portal.getClassNameId(JournalArticle.class.getName()),
-			"BASIC-WEB-CONTENT", true);
+		String ddmStructureKey = "BASIC-WEB-CONTENT";
+		String ddmTemplateKey = "BASIC-WEB-CONTENT";
 
 		return addArticle(
-			journalArticleBlueprint, ddmStructure.getStructureId(),
-			"BASIC-WEB-CONTENT");
+			journalArticleBlueprint, ddmStructureKey, ddmTemplateKey);
 	}
 
 	public JournalArticle addArticle(
-		JournalArticleBlueprint journalArticleBlueprint, long ddmStructureId,
+		JournalArticleBlueprint journalArticleBlueprint, String ddmStructureKey,
 		String ddmTemplateKey) {
 
 		long userId = journalArticleBlueprint.getUserId();
@@ -83,7 +74,7 @@ public class JournalArticleSearchFixture {
 
 		JournalArticle journalArticle = addArticle(
 			userId, groupId, folderId, titleMap, descriptionMap, contentString,
-			ddmStructureId, ddmTemplateKey, serviceContext);
+			ddmStructureKey, ddmTemplateKey, serviceContext);
 
 		_journalArticles.add(journalArticle);
 
@@ -120,13 +111,13 @@ public class JournalArticleSearchFixture {
 	protected JournalArticle addArticle(
 		long userId, long groupId, long folderId, Map<Locale, String> titleMap,
 		Map<Locale, String> descriptionMap, String contentString,
-		long ddmStructureId, String ddmTemplateKey,
+		String ddmStructureKey, String ddmTemplateKey,
 		ServiceContext serviceContext) {
 
 		try {
 			return _journalArticleLocalService.addArticle(
 				null, userId, groupId, folderId, titleMap, descriptionMap,
-				contentString, ddmStructureId, ddmTemplateKey, serviceContext);
+				contentString, ddmStructureKey, ddmTemplateKey, serviceContext);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -163,9 +154,7 @@ public class JournalArticleSearchFixture {
 		}
 	}
 
-	private final DDMStructureLocalService _ddmStructureLocalService;
 	private final JournalArticleLocalService _journalArticleLocalService;
 	private final List<JournalArticle> _journalArticles = new ArrayList<>();
-	private final Portal _portal;
 
 }

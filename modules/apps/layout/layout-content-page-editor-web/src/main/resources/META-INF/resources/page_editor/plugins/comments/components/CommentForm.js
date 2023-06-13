@@ -36,12 +36,15 @@ export default function CommentForm({
 		<form onFocus={onFormFocus}>
 			<InvisibleFieldset disabled={loading}>
 				<div className="form-group form-group-sm">
+					<label className="sr-only" htmlFor={id}>
+						{Liferay.Language.get('add-comment')}
+					</label>
+
 					<Editor
 						autoFocus={autoFocus}
 						configurationName="comment"
 						id={id}
 						initialValue={textareaContent}
-						label={Liferay.Language.get('add-comment')}
 						onChange={onTextareaChange}
 						placeholder={Liferay.Language.get(
 							'type-your-comment-here'
@@ -56,7 +59,7 @@ export default function CommentForm({
 							displayType="primary"
 							loading={loading}
 							onClick={onSubmitButtonClick}
-							size="sm"
+							small
 						>
 							{submitButtonLabel}
 						</Button>
@@ -64,7 +67,7 @@ export default function CommentForm({
 						<Button
 							displayType="secondary"
 							onClick={onCancelButtonClick}
-							size="sm"
+							small
 							type="button"
 						>
 							{Liferay.Language.get('cancel')}

@@ -40,12 +40,6 @@ public interface AssetAutoTaggerCompanyConfiguration {
 	)
 	public boolean enabled();
 
-	@Meta.AD(
-		deflt = "false", description = "update-auto-tags-description",
-		name = "update-auto-tags", required = false
-	)
-	public boolean updateAutoTags();
-
 	/**
 	 * Specifies the maximum number of tags that can be added for a given asset.
 	 */

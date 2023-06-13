@@ -14,8 +14,7 @@
 
 package com.liferay.portal.security.auto.login.remember.me;
 
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -24,11 +23,13 @@ import com.liferay.portal.kernel.security.auto.login.AutoLogin;
 import com.liferay.portal.kernel.security.auto.login.AutoLoginException;
 import com.liferay.portal.kernel.security.auto.login.BaseAutoLogin;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = AutoLogin.class)
+@Component(immediate = true, service = AutoLogin.class)
 public class RememberMeAutoLogin extends BaseAutoLogin {
 
 	@Override
@@ -48,7 +49,7 @@ public class RememberMeAutoLogin extends BaseAutoLogin {
 		throws AutoLoginException {
 
 		if (_log.isDebugEnabled()) {
-			_log.debug(exception);
+			_log.debug(exception, exception);
 		}
 
 		removeCookies(httpServletRequest, httpServletResponse);
@@ -62,12 +63,12 @@ public class RememberMeAutoLogin extends BaseAutoLogin {
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		String autoUserId = CookiesManagerUtil.getCookieValue(
-			CookiesConstants.NAME_ID, httpServletRequest, false);
-		String autoPassword = CookiesManagerUtil.getCookieValue(
-			CookiesConstants.NAME_PASSWORD, httpServletRequest, false);
-		String rememberMe = CookiesManagerUtil.getCookieValue(
-			CookiesConstants.NAME_REMEMBER_ME, httpServletRequest, false);
+		String autoUserId = CookieKeys.getCookie(
+			httpServletRequest, CookieKeys.ID, false);
+		String autoPassword = CookieKeys.getCookie(
+			httpServletRequest, CookieKeys.PASSWORD, false);
+		String rememberMe = CookieKeys.getCookie(
+			httpServletRequest, CookieKeys.REMEMBER_ME, false);
 
 		// LEP-5188
 
@@ -110,12 +111,12 @@ public class RememberMeAutoLogin extends BaseAutoLogin {
 		if (credentials != null) {
 			Company company = _portal.getCompany(httpServletRequest);
 
-			User guestUser = _userLocalService.getGuestUser(
+			User defaultUser = _userLocalService.getDefaultUser(
 				company.getCompanyId());
 
 			long userId = GetterUtil.getLong(credentials[0]);
 
-			if (guestUser.getUserId() == userId) {
+			if (defaultUser.getUserId() == userId) {
 				removeCookies(httpServletRequest, httpServletResponse);
 
 				return null;
@@ -129,14 +130,24 @@ public class RememberMeAutoLogin extends BaseAutoLogin {
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
-		String domain = CookiesManagerUtil.getDomain(httpServletRequest);
+		Cookie cookie = new Cookie(CookieKeys.ID, StringPool.BLANK);
 
-		CookiesManagerUtil.deleteCookies(
-			domain, httpServletRequest, httpServletResponse,
-			CookiesConstants.NAME_ID);
-		CookiesManagerUtil.deleteCookies(
-			domain, httpServletRequest, httpServletResponse,
-			CookiesConstants.NAME_PASSWORD);
+		cookie.setMaxAge(0);
+		cookie.setPath(StringPool.SLASH);
+
+		CookieKeys.addCookie(httpServletRequest, httpServletResponse, cookie);
+
+		cookie = new Cookie(CookieKeys.PASSWORD, StringPool.BLANK);
+
+		cookie.setMaxAge(0);
+		cookie.setPath(StringPool.SLASH);
+
+		CookieKeys.addCookie(httpServletRequest, httpServletResponse, cookie);
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -145,7 +156,6 @@ public class RememberMeAutoLogin extends BaseAutoLogin {
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

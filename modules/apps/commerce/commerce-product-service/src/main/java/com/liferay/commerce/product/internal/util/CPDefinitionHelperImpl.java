@@ -14,18 +14,14 @@
 
 package com.liferay.commerce.product.internal.util;
 
-import com.liferay.commerce.media.CommerceMediaResolverUtil;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPQuery;
-import com.liferay.commerce.product.configuration.CPDisplayLayoutConfiguration;
-import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.constants.CPField;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
 import com.liferay.commerce.product.internal.catalog.DatabaseCPCatalogEntryImpl;
 import com.liferay.commerce.product.internal.catalog.IndexCPCatalogEntryImpl;
 import com.liferay.commerce.product.internal.search.CPDefinitionSearcher;
-import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CommerceChannel;
@@ -44,7 +40,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
@@ -55,9 +50,7 @@ import com.liferay.portal.kernel.search.SortFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -71,9 +64,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  * @author Andrea Di Giorgi
- * @author Alessio Antonio Rendina
  */
-@Component(service = CPDefinitionHelper.class)
+@Component(
+	enabled = false, immediate = true, service = CPDefinitionHelper.class
+)
 public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 
 	@Override
@@ -102,28 +96,6 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 
 		return new DatabaseCPCatalogEntryImpl(
 			cpDefinition, _cpInstanceLocalService, locale);
-	}
-
-	@Override
-	public String getDefaultImageFileURL(
-			long commerceAccountId, long cpDefinitionId)
-		throws PortalException {
-
-		CPAttachmentFileEntry cpAttachmentFileEntry =
-			_cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
-				cpDefinitionId);
-
-		if (cpAttachmentFileEntry == null) {
-			CPDefinition cpDefinition =
-				_cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
-
-			return CommerceMediaResolverUtil.getDefaultURL(
-				cpDefinition.getGroupId());
-		}
-
-		return CommerceMediaResolverUtil.getURL(
-			commerceAccountId,
-			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 	}
 
 	@Override
@@ -170,34 +142,6 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 		return cpDefinitionSearcher.searchCount(searchContext);
 	}
 
-	@Override
-	public List<CPDefinition> searchCPDefinitions(
-			long groupId, SearchContext searchContext, CPQuery cpQuery,
-			int start, int end)
-		throws PortalException {
-
-		List<CPDefinition> cpDefinitions = new ArrayList<>();
-
-		CPDefinitionSearcher cpDefinitionSearcher = _getCPDefinitionSearcher(
-			groupId, searchContext, cpQuery, start, end);
-
-		Hits hits = cpDefinitionSearcher.search(searchContext);
-
-		Document[] documents = hits.getDocs();
-
-		for (Document document : documents) {
-			CPDefinition cpDefinition =
-				_cpDefinitionLocalService.fetchCPDefinition(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)));
-
-			if (cpDefinition != null) {
-				cpDefinitions.add(cpDefinition);
-			}
-		}
-
-		return cpDefinitions;
-	}
-
 	private long _checkChannelGroupId(long groupId) {
 		Group group = _groupLocalService.fetchGroup(groupId);
 
@@ -229,6 +173,7 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 		searchContext.setAttribute(
 			"commerceChannelGroupId", _checkChannelGroupId(groupId));
 		searchContext.setAttribute("secure", Boolean.TRUE);
+
 		searchContext.setEnd(end);
 		searchContext.setSorts(_getSorts(cpQuery));
 		searchContext.setStart(start);
@@ -252,41 +197,48 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 		}
 		catch (Exception exception) {
 			if (_log.isInfoEnabled()) {
-				_log.info(
-					"No friendly URL entry found for " + cProductId, exception);
+				_log.info("No friendly URL found for " + cProductId, exception);
 			}
 
 			return StringPool.BLANK;
 		}
 
-		long groupId = themeDisplay.getScopeGroupId();
+		Layout layout = null;
+
+		Group group = themeDisplay.getScopeGroup();
 
 		CProduct cProduct = _cProductLocalService.getCProduct(cProductId);
 
 		String layoutUuid = _cpDefinitionLocalService.getLayoutUuid(
-			groupId, cProduct.getPublishedCPDefinitionId());
+			group.getGroupId(), cProduct.getPublishedCPDefinitionId());
 
-		Layout layout = _getLayout(groupId, layoutUuid);
+		if (Validator.isNotNull(layoutUuid)) {
+			try {
+				layout = _layoutLocalService.getLayoutByUuidAndGroupId(
+					layoutUuid, group.getGroupId(), true);
+			}
+			catch (PortalException portalException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(portalException, portalException);
+				}
+			}
 
-		if (layout == null) {
-			CommerceChannel commerceChannel =
-				_commerceChannelLocalService.fetchCommerceChannelBySiteGroupId(
-					groupId);
-
-			CPDisplayLayoutConfiguration cpDisplayLayoutConfiguration =
-				_configurationProvider.getConfiguration(
-					CPDisplayLayoutConfiguration.class,
-					new GroupServiceSettingsLocator(
-						commerceChannel.getGroupId(),
-						CPConstants.RESOURCE_NAME_CP_DISPLAY_LAYOUT));
-
-			layout = _getLayout(
-				groupId, cpDisplayLayoutConfiguration.productLayoutUuid());
+			if (layout == null) {
+				try {
+					layout = _layoutLocalService.getLayoutByUuidAndGroupId(
+						layoutUuid, group.getGroupId(), false);
+				}
+				catch (PortalException portalException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(portalException, portalException);
+					}
+				}
+			}
 		}
 
 		if (layout == null) {
 			long plid = _portal.getPlidFromPortletId(
-				groupId, CPPortletKeys.CP_CONTENT_WEB);
+				group.getGroupId(), CPPortletKeys.CP_CONTENT_WEB);
 
 			if (plid > 0) {
 				layout = _layoutLocalService.getLayout(plid);
@@ -308,36 +260,6 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 				friendlyURLEntry.getUrlTitle(themeDisplay.getLanguageId());
 
 		return _portal.addPreservedParameters(themeDisplay, productFriendlyURL);
-	}
-
-	private Layout _getLayout(long groupId, String layoutUuid) {
-		Layout layout = null;
-
-		if (Validator.isNotNull(layoutUuid)) {
-			try {
-				layout = _layoutLocalService.getLayoutByUuidAndGroupId(
-					layoutUuid, groupId, true);
-			}
-			catch (PortalException portalException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
-				}
-			}
-
-			if (layout == null) {
-				try {
-					layout = _layoutLocalService.getLayoutByUuidAndGroupId(
-						layoutUuid, groupId, false);
-				}
-				catch (PortalException portalException) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(portalException);
-					}
-				}
-			}
-		}
-
-		return layout;
 	}
 
 	private String _getOrderByCol(String sortField) {
@@ -390,9 +312,6 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 
 	@Reference
 	private CommerceProductViewPermission _commerceProductViewPermission;
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private CPDefinitionLocalService _cpDefinitionLocalService;

@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Truong
  */
-@Component(service = CTDisplayRenderer.class)
+@Component(immediate = true, service = CTDisplayRenderer.class)
 public class FriendlyURLEntryLocalizationCTDisplayRenderer
 	extends BaseCTDisplayRenderer<FriendlyURLEntryLocalization> {
 

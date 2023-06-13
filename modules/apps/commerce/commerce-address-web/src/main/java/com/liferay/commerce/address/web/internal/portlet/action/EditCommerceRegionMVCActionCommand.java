@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -39,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_COUNTRY,
 		"mvc.command.name=/commerce_country/edit_commerce_region"
@@ -46,6 +48,24 @@ import org.osgi.service.component.annotations.Reference;
 	service = MVCActionCommand.class
 )
 public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
+
+	protected void deleteRegions(ActionRequest actionRequest) throws Exception {
+		long[] deleteRegionIds = null;
+
+		long regionId = ParamUtil.getLong(actionRequest, "regionId");
+
+		if (regionId > 0) {
+			deleteRegionIds = new long[] {regionId};
+		}
+		else {
+			deleteRegionIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "deleteRegionIds"), 0L);
+		}
+
+		for (long deleteRegionId : deleteRegionIds) {
+			_regionService.deleteRegion(deleteRegionId);
+		}
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -56,10 +76,10 @@ public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommerceRegion(actionRequest);
+				updateCommerceRegion(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteRegions(actionRequest);
+				deleteRegions(actionRequest);
 			}
 			else if (cmd.equals("setActive")) {
 				setActive(actionRequest);
@@ -99,24 +119,7 @@ public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 		_regionService.updateActive(regionId, active);
 	}
 
-	private void _deleteRegions(ActionRequest actionRequest) throws Exception {
-		long[] deleteRegionIds = null;
-
-		long regionId = ParamUtil.getLong(actionRequest, "regionId");
-
-		if (regionId > 0) {
-			deleteRegionIds = new long[] {regionId};
-		}
-		else {
-			deleteRegionIds = ParamUtil.getLongValues(actionRequest, "rowIds");
-		}
-
-		for (long deleteRegionId : deleteRegionIds) {
-			_regionService.deleteRegion(deleteRegionId);
-		}
-	}
-
-	private Region _updateCommerceRegion(ActionRequest actionRequest)
+	protected Region updateCommerceRegion(ActionRequest actionRequest)
 		throws Exception {
 
 		long regionId = ParamUtil.getLong(actionRequest, "regionId");

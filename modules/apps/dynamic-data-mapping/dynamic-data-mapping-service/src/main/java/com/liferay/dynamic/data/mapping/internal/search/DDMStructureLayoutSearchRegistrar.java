@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcelo Mello
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class DDMStructureLayoutSearchRegistrar {
 
 	@Activate

@@ -12,74 +12,120 @@
  * details.
  */
 
-import {fetch} from 'frontend-js-web';
+AUI.add(
+	'liferay-portlet-segments-simulation',
+	(A) => {
+		var Lang = A.Lang;
 
-export default function ({
-	deactivateSimulationURL,
-	namespace: portletNamespace,
-	simulateSegmentsEntriesURL,
-}) {
-	const form = document.getElementById(
-		`${portletNamespace}segmentsSimulationFm`
-	);
+		var SegmentsSimulation = A.Component.create({
+			ATTRS: {
+				deactivateSimulationUrl: {
+					validator: Lang.isString,
+				},
 
-	const fetchDeactivateSimulation = () => {
-		fetch(deactivateSimulationURL, {
-			body: new FormData(form),
-			method: 'POST',
-		}).then(() => {
-			const simulationElements = document.querySelectorAll(
-				`#${form.id} input`
-			);
+				form: {
+					validator: Lang.isObject,
+				},
 
-			for (let i = 0; i < simulationElements.length; i++) {
-				simulationElements[i].setAttribute('checked', false);
-			}
+				simulateSegmentsEntriesUrl: {
+					validator: Lang.isString,
+				},
+			},
+
+			AUGMENTS: [Liferay.PortletBase],
+
+			EXTENDS: A.Base,
+
+			NAME: 'segmentsSimulation',
+
+			prototype: {
+				_bindUI() {
+					var instance = this;
+
+					instance._eventHandles = [];
+
+					instance._eventHandles.push(
+						Liferay.on(
+							'SimulationMenu:closeSimulationPanel',
+							A.bind('_deactivateSimulation', instance)
+						),
+						Liferay.on(
+							'SimulationMenu:openSimulationPanel',
+							A.bind('_simulateSegmentsEntries', instance)
+						),
+						A.on('beforeunload', () => {
+							instance._deactivateSimulation();
+						})
+					);
+
+					var form = instance.get('form');
+
+					A.one('#' + form.id).delegate(
+						'click',
+						instance._simulateSegmentsEntries,
+						'input',
+						instance
+					);
+				},
+
+				_deactivateSimulation() {
+					var instance = this;
+
+					var form = instance.get('form');
+
+					Liferay.Util.fetch(
+						instance.get('deactivateSimulationUrl'),
+						{
+							body: new FormData(form),
+							method: 'POST',
+						}
+					).then(() => {
+						A.all('#' + form.id + ' input').set('checked', false);
+					});
+				},
+
+				_simulateSegmentsEntries() {
+					var instance = this;
+
+					Liferay.Util.fetch(
+						instance.get('simulateSegmentsEntriesUrl'),
+						{
+							body: new FormData(instance.get('form')),
+							method: 'POST',
+						}
+					).then(() => {
+						const iframe = A.one('#simulationDeviceIframe');
+
+						if (iframe) {
+							const iframeWindow = A.Node.getDOMNode(
+								iframe.get('contentWindow')
+							);
+
+							if (iframeWindow) {
+								iframeWindow.location.reload();
+							}
+						}
+					});
+				},
+
+				destructor() {
+					var instance = this;
+
+					new A.EventHandle(instance._eventHandles).detach();
+				},
+
+				initializer() {
+					var instance = this;
+
+					instance._bindUI();
+				},
+			},
 		});
-	};
 
-	const simulateSegmentsEntries = () => {
-		fetch(simulateSegmentsEntriesURL, {
-			body: new FormData(form),
-			method: 'POST',
-		}).then(() => {
-			const iframe = document.querySelector('iframe');
-
-			if (iframe?.contentWindow) {
-				iframe.contentWindow.location.reload();
-			}
-		});
-	};
-
-	document.addEventListener('beforeunload', fetchDeactivateSimulation);
-
-	form.addEventListener('change', simulateSegmentsEntries);
-
-	Liferay.on(
-		'SimulationMenu:closeSimulationPanel',
-		fetchDeactivateSimulation
-	);
-
-	Liferay.on('SimulationMenu:openSimulationPanel', simulateSegmentsEntries);
-
-	return {
-		dispose() {
-			document.removeEventListener(
-				'beforeunload',
-				fetchDeactivateSimulation
-			);
-
-			form.removeEventListener('change', simulateSegmentsEntries);
-
-			Liferay.detach(
-				'SimulationMenu:closeSimulationPanel',
-				fetchDeactivateSimulation
-			);
-
-			Liferay.detach(
-				'SimulationMenu:openSimulationPanel',
-				simulateSegmentsEntries
-			);
-		},
-	};
-}
+		Liferay.Portlet.SegmentsSimulation = SegmentsSimulation;
+	},
+	'',
+	{
+		requires: ['aui-base', 'liferay-portlet-base'],
+	}
+);

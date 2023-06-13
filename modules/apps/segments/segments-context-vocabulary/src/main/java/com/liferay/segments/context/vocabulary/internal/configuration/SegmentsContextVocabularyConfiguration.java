@@ -22,7 +22,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
  * @author Raymond Augé
  */
 @ExtendedObjectClassDefinition(
-	category = "segments", factoryInstanceLabelAttribute = "entityFieldName"
+	category = "segments", factoryInstanceLabelAttribute = "entityField"
 )
 @Meta.OCD(
 	description = "segments-context-vocabulary-configuration-description",
@@ -34,13 +34,15 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface SegmentsContextVocabularyConfiguration {
 
 	@Meta.AD(
+		description = "segments-context-vocabulary-configuration-entity-field-description",
 		name = "segments-context-vocabulary-configuration-entity-field-name"
 	)
-	public String entityFieldName();
+	public String entityField();
 
 	@Meta.AD(
+		description = "segments-context-vocabulary-configuration-asset-vocabulary-description",
 		name = "segments-context-vocabulary-configuration-asset-vocabulary-name"
 	)
-	public String assetVocabularyName();
+	public String assetVocabulary();
 
 }

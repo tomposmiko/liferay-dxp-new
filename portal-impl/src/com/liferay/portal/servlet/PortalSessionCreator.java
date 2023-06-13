@@ -47,7 +47,7 @@ public class PortalSessionCreator extends BasePortalLifecycle {
 		}
 		catch (IllegalStateException illegalStateException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(illegalStateException);
+				_log.warn(illegalStateException, illegalStateException);
 			}
 		}
 
@@ -59,7 +59,7 @@ public class PortalSessionCreator extends BasePortalLifecycle {
 				PropsValues.SERVLET_SESSION_CREATE_EVENTS, _httpSession);
 		}
 		catch (ActionException actionException) {
-			_log.error(actionException);
+			_log.error(actionException, actionException);
 		}
 	}
 

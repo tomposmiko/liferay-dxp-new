@@ -64,7 +64,7 @@ public class ViewEntryMVCRenderCommand implements MVCRenderCommand {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return "/announcements/error.jsp";

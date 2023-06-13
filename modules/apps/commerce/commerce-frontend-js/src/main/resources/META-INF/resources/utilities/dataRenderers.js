@@ -12,7 +12,7 @@
  * details.
  */
 
-import {DataRenderers} from '@liferay/frontend-data-set-web';
+import DataRenderers from 'frontend-taglib-clay/data_set_display/data_renderers/index';
 
 const DEFAULT_TYPE = 'default';
 

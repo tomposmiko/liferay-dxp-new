@@ -27,10 +27,6 @@ public class CommerceNotificationTemplateServiceWrapper
 	implements CommerceNotificationTemplateService,
 			   ServiceWrapper<CommerceNotificationTemplateService> {
 
-	public CommerceNotificationTemplateServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceNotificationTemplateServiceWrapper(
 		CommerceNotificationTemplateService
 			commerceNotificationTemplateService) {

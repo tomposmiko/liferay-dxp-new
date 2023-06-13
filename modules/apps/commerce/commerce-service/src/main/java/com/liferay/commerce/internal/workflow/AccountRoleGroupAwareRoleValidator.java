@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.internal.workflow;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
@@ -28,7 +28,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = GroupAwareRoleValidator.class)
+@Component(
+	enabled = false, immediate = true, service = GroupAwareRoleValidator.class
+)
 public class AccountRoleGroupAwareRoleValidator
 	implements GroupAwareRoleValidator {
 
@@ -44,7 +46,8 @@ public class AccountRoleGroupAwareRoleValidator
 	}
 
 	private boolean _isAccount(Group group) {
-		long classNameId = _portal.getClassNameId(AccountEntry.class.getName());
+		long classNameId = _portal.getClassNameId(
+			CommerceAccount.class.getName());
 
 		if (group.getClassNameId() == classNameId) {
 			return true;

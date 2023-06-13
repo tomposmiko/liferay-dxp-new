@@ -14,10 +14,8 @@
 
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
-import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.PluginsGitWorkingDirectory;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
-import com.liferay.jenkins.results.parser.test.clazz.TestClassFactory;
 
 import java.io.File;
 
@@ -25,26 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 /**
  * @author Michael Hashimoto
  */
 public class PluginsGulpBatchTestClassGroup extends BatchTestClassGroup {
-
-	@Override
-	public JSONObject getJSONObject() {
-		if (jsonObject != null) {
-			return jsonObject;
-		}
-
-		jsonObject = super.getJSONObject();
-
-		jsonObject.put("modified_files_list", _modifiedFilesList);
-
-		return jsonObject;
-	}
 
 	public List<File> getTestBaseDirNames() {
 		List<File> testBaseDirNames = new ArrayList<>();
@@ -66,31 +48,14 @@ public class PluginsGulpBatchTestClassGroup extends BatchTestClassGroup {
 		return testBaseDirNames;
 	}
 
-	protected PluginsGulpBatchTestClassGroup(
-		JSONObject jsonObject, PortalTestClassJob portalTestClassJob) {
+	public static class PluginsGulpBatchTestClass extends BaseTestClass {
 
-		super(jsonObject, portalTestClassJob);
+		protected PluginsGulpBatchTestClass(File testBaseDirName) {
+			super(testBaseDirName);
 
-		_modifiedFilesList = new ArrayList<>();
-
-		JSONArray modifiedFilesJSONArray = jsonObject.optJSONArray(
-			"modified_files_list");
-
-		if ((modifiedFilesJSONArray == null) ||
-			modifiedFilesJSONArray.isEmpty()) {
-
-			return;
+			addTestClassMethod("gulpfile.js");
 		}
 
-		for (int i = 0; i < modifiedFilesJSONArray.length(); i++) {
-			String modifiedFilePath = modifiedFilesJSONArray.getString(i);
-
-			if (JenkinsResultsParserUtil.isNullOrEmpty(modifiedFilePath)) {
-				continue;
-			}
-
-			_modifiedFilesList.add(new File(modifiedFilePath));
-		}
 	}
 
 	protected PluginsGulpBatchTestClassGroup(
@@ -125,8 +90,7 @@ public class PluginsGulpBatchTestClassGroup extends BatchTestClassGroup {
 
 	private void _setTestClasses() {
 		for (File testBaseDirName : getTestBaseDirNames()) {
-			testClasses.add(
-				TestClassFactory.newTestClass(this, testBaseDirName));
+			testClasses.add(new PluginsGulpBatchTestClass(testBaseDirName));
 		}
 
 		Collections.sort(testClasses);

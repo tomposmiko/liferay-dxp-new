@@ -16,8 +16,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>TASK_NAME</td>
-	<td>//div/span[contains(.,'Task Name')]/..//div[@class='panel-body']</td>
+	<td>STATE</td>
+	<td>//div/span[contains(.,'State')]/..//div[@class='panel-body']</td>
 	<td></td>
 </tr>
 <tr>
@@ -25,9 +25,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--MENU-->
-
 <tr>
 	<td>MENU_REJECT</td>
 	<td>//a[contains(@id,'rejecttaskChangeStatusLink')]</td>
@@ -38,9 +36,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--PREVIEW-->
-
 <tr>
 	<td>PREVIEW_TITLE</td>
 	<td>//h3[@class='task-content-title']</td>
@@ -56,9 +52,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ACTIVITIES-->
-
 <tr>
 	<td>ACTIVITIES</td>
 	<td>//span[contains(@class,'panel-title') and contains(.,'Activities')]</td>
@@ -79,9 +73,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--COMMENTS-->
-
 <tr>
 	<td>COMMENTS</td>
 	<td>//div[contains(@class,'panel-title') and contains(.,'Comments')]/a</td>

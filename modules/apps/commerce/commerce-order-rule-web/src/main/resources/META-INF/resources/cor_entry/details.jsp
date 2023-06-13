@@ -52,7 +52,7 @@ String type = BeanParamUtil.getString(corEntry, renderRequest, "type", COREntryC
 			>
 				<div class="row">
 					<div class="col">
-						<aui:input label="name" name="name" required="<%= true %>" />
+						<aui:input autoFocus="<%= true %>" label="name" name="name" required="<%= true %>" />
 					</div>
 
 					<div class="col-auto">
@@ -79,12 +79,6 @@ String type = BeanParamUtil.getString(corEntry, renderRequest, "type", COREntryC
 				<div class="row">
 					<div class="col">
 						<aui:input name="description" type="textarea" value="<%= corEntry.getDescription() %>" />
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col">
-						<aui:input name="priority" />
 					</div>
 				</div>
 			</commerce-ui:panel>

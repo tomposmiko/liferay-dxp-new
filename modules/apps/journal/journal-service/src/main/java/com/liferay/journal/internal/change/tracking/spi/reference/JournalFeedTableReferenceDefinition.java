@@ -77,8 +77,8 @@ public class JournalFeedTableReferenceDefinition
 				DDMStructureTable.INSTANCE
 			).innerJoinON(
 				JournalFeedTable.INSTANCE,
-				JournalFeedTable.INSTANCE.DDMStructureId.eq(
-					DDMStructureTable.INSTANCE.structureId
+				JournalFeedTable.INSTANCE.DDMStructureKey.eq(
+					DDMStructureTable.INSTANCE.structureKey
 				).and(
 					JournalFeedTable.INSTANCE.companyId.eq(
 						DDMStructureTable.INSTANCE.companyId)

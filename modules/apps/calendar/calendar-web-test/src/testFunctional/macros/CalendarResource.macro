@@ -11,25 +11,11 @@ definition {
 	macro add {
 		CalendarNavigator.gotoAddResource();
 
-		CalendarResource.editResourceName(calendarResourceName = ${calendarResourceName});
+		CalendarResource.editResourceName(calendarResourceName = "${calendarResourceName}");
 
 		CalendarResource.save();
 
-		CalendarResource.view(calendarResourceName = ${calendarResourceName});
-	}
-
-	macro addCalendarByResource {
-		Click(locator1 = "CalendarManageCalendars#ADD_CALENDAR");
-
-		Calendar._editName(calendarName = ${calendarName});
-
-		Button.clickSave();
-
-		Navigator.gotoBack();
-	}
-
-	macro clearSearchResults {
-		Click(locator1 = "WorkflowConfiguration#CLEAR_BUTTON");
+		CalendarResource.view(calendarResourceName = "${calendarResourceName}");
 	}
 
 	macro deactivate {
@@ -41,13 +27,13 @@ definition {
 	macro delete {
 		CalendarNavigator.gotoResources();
 
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		AssertTextEquals(
 			locator1 = "CalendarResources#RESOURCE_TABLE_NAME",
-			value1 = ${calendarResourceName});
+			value1 = "${calendarResourceName}");
 
-		LexiconEntry.openEntryMenu(rowEntry = ${calendarResourceName});
+		LexiconEntry.openEntryMenu(rowEntry = "${calendarResourceName}");
 
 		MenuItem.clickNoError(menuItem = "Delete");
 
@@ -57,69 +43,43 @@ definition {
 
 		AssertElementNotPresent(locator1 = "CalendarResources#RESOURCE_TABLE_NAME");
 
-		AssertTextNotPresent(value1 = ${calendarResourceName});
+		AssertTextNotPresent(value1 = "${calendarResourceName}");
 	}
 
 	macro edit {
 		CalendarNavigator.gotoResources();
 
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		AssertTextEquals(
 			locator1 = "CalendarResources#RESOURCE_TABLE_NAME",
-			value1 = ${calendarResourceName});
+			value1 = "${calendarResourceName}");
 
-		LexiconEntry.openEntryMenu(rowEntry = ${calendarResourceName});
+		LexiconEntry.openEntryMenu(rowEntry = "${calendarResourceName}");
 
 		MenuItem.click(menuItem = "Edit");
 
 		AssertTextEquals(
 			locator1 = "Portlet#H3_HEADER",
-			value1 = ${calendarResourceName});
+			value1 = "${calendarResourceName}");
 
-		PortletEntry.inputName(name = ${calendarResourceNameEdit});
+		PortletEntry.inputName(name = "${calendarResourceNameEdit}");
 
 		CalendarResource.save();
 
-		CalendarResource.view(calendarResourceName = ${calendarResourceNameEdit});
-	}
-
-	macro editResourceDescription {
-		CalendarResource._expandDetailsPanel();
-
-		PortletEntry.inputDescription(description = ${calendarResourceDescription});
+		CalendarResource.view(calendarResourceName = "${calendarResourceNameEdit}");
 	}
 
 	macro editResourceName {
-		PortletEntry.inputName(name = ${calendarResourceName});
-	}
-
-	macro gotoPermissions {
-		Click(locator1 = "CalendarResources#VERTICAL_ELLIPSIS_BY_RESOURCE_NAME");
-
-		MenuItem.clickNoError(menuItem = "Permissions");
-	}
-
-	macro notDisplayResultBar {
-		AssertElementNotPresent(locator1 = "CalendarResources#VIEW_RESOURCE_RESULT_BAR");
-	}
-
-	macro resourceSetFilterAndOrder {
-		ManagementBar.setFilterAndOrder(filterBy = ${filterBy});
+		PortletEntry.inputName(name = "${calendarResourceName}");
 	}
 
 	macro save {
 		Click(locator1 = "Button#SAVE");
 
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		Alert.viewSuccessMessage();
-	}
-
-	macro search {
-		Search.searchPG(
-			portletName = "Calendar",
-			searchTerm = ${searchTerm});
 	}
 
 	macro tearDown {
@@ -143,11 +103,11 @@ definition {
 	macro view {
 		CalendarNavigator.gotoResources();
 
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		AssertTextEquals(
 			locator1 = "CalendarResources#RESOURCE_TABLE_NAME",
-			value1 = ${calendarResourceName});
+			value1 = "${calendarResourceName}");
 
 		AssertTextEquals(
 			locator1 = "CalendarResources#RESOURCE_TABLE_DESCRIPTION",
@@ -160,14 +120,10 @@ definition {
 		AssertElementPresent(locator1 = "CalendarResources#RESOURCE_TABLE_ACTIONS");
 	}
 
-	macro viewCalendarNameByResourceOntable {
-		AssertElementPresent(locator1 = "CalendarManageCalendars#CALENDAR_TABLE_NAME");
-	}
-
 	macro viewDefault {
 		CalendarNavigator.gotoResources();
 
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO",
@@ -176,16 +132,12 @@ definition {
 		AssertElementNotPresent(locator1 = "CalendarResources#RESOURCE_TABLE_NAME");
 	}
 
-	macro viewMenuPermissionsModal {
-		AssertElementPresent(locator1 = "CalendarResources#RESOURCE_PERMISSIONS_MODAL");
-	}
-
 	macro viewResourceCalendars {
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		AssertTextEquals(
 			locator1 = "CalendarResources#RESOURCE_TABLE_NAME",
-			value1 = ${calendarResourceName});
+			value1 = "${calendarResourceName}");
 
 		AssertTextEquals(
 			locator1 = "Portlet#H3_HEADER",
@@ -193,31 +145,19 @@ definition {
 	}
 
 	macro viewResourceName {
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		AssertTextEquals(
 			locator1 = "CalendarResources#RESOURCE_TABLE_NAME",
-			value1 = ${calendarResourceName});
+			value1 = "${calendarResourceName}");
 	}
 
 	macro viewResourceNameNotPresent {
-		var key_calendarResourceName = ${calendarResourceName};
+		var key_calendarResourceName = "${calendarResourceName}";
 
 		AssertElementNotPresent(locator1 = "CalendarResources#RESOURCE_TABLE_NAME");
 
-		AssertTextNotPresent(value1 = ${calendarResourceName});
-	}
-
-	macro viewSearchSummaryResults {
-		AssertTextEquals(
-			locator1 = "ManagementBar#SEARCH_RESULT_SUMMARY",
-			value1 = ${searchResults});
-	}
-
-	macro viewTableEmpty {
-		AssertTextEquals(
-			locator1 = "Message#EMPTY_INFO",
-			value1 = "No resources were found.");
+		AssertTextNotPresent(value1 = "${calendarResourceName}");
 	}
 
 }

@@ -14,7 +14,9 @@
 
 package com.liferay.portal.scheduler.quartz.internal;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.cluster.ClusterExecutor;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
@@ -42,7 +44,6 @@ import com.liferay.portal.scheduler.quartz.internal.job.MessageSenderJob;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -60,10 +61,8 @@ import org.quartz.Calendar;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.JobPersistenceException;
-import org.quartz.ListenerManager;
 import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerContext;
@@ -73,7 +72,6 @@ import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.jdbcjobstore.UpdateLockRowSemaphore;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.quartz.listeners.TriggerListenerSupport;
 import org.quartz.spi.OperableTrigger;
 
 /**
@@ -85,8 +83,8 @@ import org.quartz.spi.OperableTrigger;
  * @author Edward C. Han
  */
 @Component(
-	enabled = false, property = "scheduler.engine.proxy=false",
-	service = SchedulerEngine.class
+	enabled = false, immediate = true,
+	service = {QuartzSchedulerEngine.class, SchedulerEngine.class}
 )
 public class QuartzSchedulerEngine implements SchedulerEngine {
 
@@ -95,9 +93,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		throws SchedulerException {
 
 		try {
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
-			groupName = _fixMaxLength(
+			groupName = fixMaxLength(
 				groupName, _groupNameMaxLength, storageType);
 
 			Set<JobKey> jobKeys = scheduler.getJobKeys(
@@ -119,10 +117,10 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		throws SchedulerException {
 
 		try {
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
-			jobName = _fixMaxLength(jobName, _jobNameMaxLength, storageType);
-			groupName = _fixMaxLength(
+			jobName = fixMaxLength(jobName, _jobNameMaxLength, storageType);
+			groupName = fixMaxLength(
 				groupName, _groupNameMaxLength, storageType);
 
 			JobKey jobKey = new JobKey(jobName, groupName);
@@ -156,10 +154,10 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		throws SchedulerException {
 
 		try {
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
-			jobName = _fixMaxLength(jobName, _jobNameMaxLength, storageType);
-			groupName = _fixMaxLength(
+			jobName = fixMaxLength(jobName, _jobNameMaxLength, storageType);
+			groupName = fixMaxLength(
 				groupName, _groupNameMaxLength, storageType);
 
 			JobKey jobKey = new JobKey(jobName, groupName);
@@ -208,7 +206,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		throws SchedulerException {
 
 		try {
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
 			List<String> groupNames = scheduler.getJobGroupNames();
 
@@ -234,7 +232,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 		try {
 			return getScheduledJobs(
-				_getScheduler(storageType), groupName, storageType);
+				getScheduler(storageType), groupName, storageType);
 		}
 		catch (Exception exception) {
 			throw new SchedulerException(
@@ -243,21 +241,46 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 	}
 
 	@Override
+	public void pause(String groupName, StorageType storageType)
+		throws SchedulerException {
+
+		try {
+			Scheduler scheduler = getScheduler(storageType);
+
+			groupName = fixMaxLength(
+				groupName, _groupNameMaxLength, storageType);
+
+			Set<JobKey> jobKeys = scheduler.getJobKeys(
+				GroupMatcher.jobGroupEquals(groupName));
+
+			scheduler.pauseJobs(GroupMatcher.jobGroupEquals(groupName));
+
+			for (JobKey jobKey : jobKeys) {
+				updateJobState(scheduler, jobKey, TriggerState.PAUSED, false);
+			}
+		}
+		catch (Exception exception) {
+			throw new SchedulerException(
+				"Unable to pause jobs in group " + groupName, exception);
+		}
+	}
+
+	@Override
 	public void pause(String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		try {
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
-			jobName = _fixMaxLength(jobName, _jobNameMaxLength, storageType);
-			groupName = _fixMaxLength(
+			jobName = fixMaxLength(jobName, _jobNameMaxLength, storageType);
+			groupName = fixMaxLength(
 				groupName, _groupNameMaxLength, storageType);
 
 			JobKey jobKey = new JobKey(jobName, groupName);
 
 			scheduler.pauseJob(jobKey);
 
-			_updateJobState(scheduler, jobKey, TriggerState.PAUSED);
+			updateJobState(scheduler, jobKey, TriggerState.PAUSED, false);
 		}
 		catch (Exception exception) {
 			throw new SchedulerException(
@@ -269,22 +292,47 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 	}
 
 	@Override
+	public void resume(String groupName, StorageType storageType)
+		throws SchedulerException {
+
+		try {
+			Scheduler scheduler = getScheduler(storageType);
+
+			groupName = fixMaxLength(
+				groupName, _groupNameMaxLength, storageType);
+
+			Set<JobKey> jobKeys = scheduler.getJobKeys(
+				GroupMatcher.jobGroupEquals(groupName));
+
+			scheduler.resumeJobs(GroupMatcher.jobGroupEquals(groupName));
+
+			for (JobKey jobKey : jobKeys) {
+				updateJobState(scheduler, jobKey, TriggerState.NORMAL, false);
+			}
+		}
+		catch (Exception exception) {
+			throw new SchedulerException(
+				"Unable to resume jobs in group " + groupName, exception);
+		}
+	}
+
+	@Override
 	public void resume(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		try {
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
-			jobName = _fixMaxLength(jobName, _jobNameMaxLength, storageType);
-			groupName = _fixMaxLength(
+			jobName = fixMaxLength(jobName, _jobNameMaxLength, storageType);
+			groupName = fixMaxLength(
 				groupName, _groupNameMaxLength, storageType);
 
 			JobKey jobKey = new JobKey(jobName, groupName);
 
 			scheduler.resumeJob(jobKey);
 
-			_updateJobState(scheduler, jobKey, TriggerState.NORMAL);
+			updateJobState(scheduler, jobKey, TriggerState.NORMAL, false);
 		}
 		catch (Exception exception) {
 			throw new SchedulerException(
@@ -293,27 +341,6 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 					groupName, "}"),
 				exception);
 		}
-	}
-
-	public void run(
-			long companyId, String jobName, String groupName,
-			StorageType storageType)
-		throws SchedulerException {
-
-		SchedulerResponse schedulerResponse = getScheduledJob(
-			jobName, groupName, storageType);
-
-		Message message = schedulerResponse.getMessage();
-
-		message.put(
-			SchedulerEngine.DESTINATION_NAME,
-			schedulerResponse.getDestinationName());
-		message.put(SchedulerEngine.GROUP_NAME, groupName);
-		message.put(SchedulerEngine.JOB_NAME, jobName);
-		message.put("companyId", companyId);
-
-		_messageBus.sendMessage(
-			schedulerResponse.getDestinationName(), message);
 	}
 
 	@Override
@@ -330,9 +357,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 				return;
 			}
 
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
-			description = _fixMaxLength(
+			description = fixMaxLength(
 				description, _descriptionMaxLength, storageType);
 
 			message = message.clone();
@@ -354,7 +381,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 					if (className.contains(ServerDetector.class.getName())) {
 						if (_log.isInfoEnabled()) {
-							_log.info(runtimeException);
+							_log.info(runtimeException, runtimeException);
 						}
 
 						return;
@@ -407,15 +434,63 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 	}
 
 	@Override
+	public void suppressError(
+			String jobName, String groupName, StorageType storageType)
+		throws SchedulerException {
+
+		try {
+			Scheduler scheduler = getScheduler(storageType);
+
+			jobName = fixMaxLength(jobName, _jobNameMaxLength, storageType);
+			groupName = fixMaxLength(
+				groupName, _groupNameMaxLength, storageType);
+
+			JobKey jobKey = new JobKey(jobName, groupName);
+
+			updateJobState(scheduler, jobKey, null, true);
+		}
+		catch (Exception exception) {
+			throw new SchedulerException(
+				StringBundler.concat(
+					"Unable to suppress error for job {jobName=", jobName,
+					", groupName=", groupName, "}"),
+				exception);
+		}
+	}
+
+	@Override
+	public void unschedule(String groupName, StorageType storageType)
+		throws SchedulerException {
+
+		try {
+			Scheduler scheduler = getScheduler(storageType);
+
+			groupName = fixMaxLength(
+				groupName, _groupNameMaxLength, storageType);
+
+			Set<JobKey> jobKeys = scheduler.getJobKeys(
+				GroupMatcher.jobGroupEquals(groupName));
+
+			for (JobKey jobKey : jobKeys) {
+				unschedule(scheduler, jobKey);
+			}
+		}
+		catch (Exception exception) {
+			throw new SchedulerException(
+				"Unable to unschedule jobs in group " + groupName, exception);
+		}
+	}
+
+	@Override
 	public void unschedule(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
 		try {
-			Scheduler scheduler = _getScheduler(storageType);
+			Scheduler scheduler = getScheduler(storageType);
 
-			jobName = _fixMaxLength(jobName, _jobNameMaxLength, storageType);
-			groupName = _fixMaxLength(
+			jobName = fixMaxLength(jobName, _jobNameMaxLength, storageType);
+			groupName = fixMaxLength(
 				groupName, _groupNameMaxLength, storageType);
 
 			JobKey jobKey = new JobKey(jobName, groupName);
@@ -432,6 +507,20 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 	}
 
 	@Override
+	public void update(
+			com.liferay.portal.kernel.scheduler.Trigger trigger,
+			StorageType storageType)
+		throws SchedulerException {
+
+		try {
+			update(getScheduler(storageType), trigger, storageType);
+		}
+		catch (Exception exception) {
+			throw new SchedulerException("Unable to update trigger", exception);
+		}
+	}
+
+	@Override
 	public void validateTrigger(
 			com.liferay.portal.kernel.scheduler.Trigger trigger,
 			StorageType storageType)
@@ -443,7 +532,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 			return;
 		}
 
-		Scheduler scheduler = _getScheduler(storageType);
+		Scheduler scheduler = getScheduler(storageType);
 
 		Calendar calendar = null;
 
@@ -470,13 +559,6 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 	@Activate
 	protected void activate() {
-		_descriptionMaxLength = GetterUtil.getInteger(
-			_props.get(PropsKeys.SCHEDULER_DESCRIPTION_MAX_LENGTH), 120);
-		_groupNameMaxLength = GetterUtil.getInteger(
-			_props.get(PropsKeys.SCHEDULER_GROUP_NAME_MAX_LENGTH), 80);
-		_jobNameMaxLength = GetterUtil.getInteger(
-			_props.get(PropsKeys.SCHEDULER_JOB_NAME_MAX_LENGTH), 80);
-
 		_schedulerEngineEnabled = GetterUtil.getBoolean(
 			_props.get(PropsKeys.SCHEDULER_ENABLED));
 
@@ -485,10 +567,10 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 
 		try {
-			_persistedScheduler = _initializeScheduler(
+			_persistedScheduler = initializeScheduler(
 				"persisted.scheduler.", true);
 
-			_memoryScheduler = _initializeScheduler("memory.scheduler.", false);
+			_memoryScheduler = initializeScheduler("memory.scheduler.", false);
 		}
 		catch (Exception exception) {
 			_log.error("Unable to initialize engine", exception);
@@ -517,6 +599,27 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 	}
 
+	protected String fixMaxLength(
+		String argument, int maxLength, StorageType storageType) {
+
+		if ((argument == null) || (storageType != StorageType.PERSISTED)) {
+			return argument;
+		}
+
+		if (argument.length() > maxLength) {
+			argument = argument.substring(0, maxLength);
+		}
+
+		return argument;
+	}
+
+	protected JobState getJobState(JobDataMap jobDataMap) {
+		Map<String, Object> jobStateMap = (Map<String, Object>)jobDataMap.get(
+			SchedulerEngine.JOB_STATE);
+
+		return JobStateSerializeUtil.deserialize(jobStateMap);
+	}
+
 	protected Message getMessage(JobDataMap jobDataMap) {
 		String messageJSON = (String)jobDataMap.get(SchedulerEngine.MESSAGE);
 
@@ -539,18 +642,22 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 		schedulerResponse.setDescription(
 			jobDataMap.getString(SchedulerEngine.DESCRIPTION));
-		schedulerResponse.setDestinationName(
-			jobDataMap.getString(SchedulerEngine.DESTINATION_NAME));
+
+		String destinationName = jobDataMap.getString(
+			SchedulerEngine.DESTINATION_NAME);
+
+		schedulerResponse.setDestinationName(destinationName);
 
 		Message message = getMessage(jobDataMap);
 
-		message.put(SchedulerEngine.JOB_STATE, _getJobState(jobDataMap));
+		message.put(SchedulerEngine.JOB_STATE, getJobState(jobDataMap));
 
 		schedulerResponse.setMessage(message);
 
-		schedulerResponse.setStorageType(
-			StorageType.valueOf(
-				jobDataMap.getString(SchedulerEngine.STORAGE_TYPE)));
+		StorageType storageType = StorageType.valueOf(
+			jobDataMap.getString(SchedulerEngine.STORAGE_TYPE));
+
+		schedulerResponse.setStorageType(storageType);
 
 		String jobName = jobKey.getName();
 		String groupName = jobKey.getGroup();
@@ -583,7 +690,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 			Scheduler scheduler, String groupName, StorageType storageType)
 		throws Exception {
 
-		groupName = _fixMaxLength(groupName, _groupNameMaxLength, storageType);
+		groupName = fixMaxLength(groupName, _groupNameMaxLength, storageType);
 
 		List<SchedulerResponse> schedulerResponses = new ArrayList<>();
 
@@ -603,6 +710,74 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 
 		return schedulerResponses;
+	}
+
+	protected Scheduler getScheduler(StorageType storageType) {
+		if (storageType == StorageType.PERSISTED) {
+			return _persistedScheduler;
+		}
+
+		return _memoryScheduler;
+	}
+
+	protected StorageType getStorageType(String groupName) {
+		int pos = groupName.indexOf(CharPool.POUND);
+
+		String storageTypeString = groupName.substring(0, pos);
+
+		return StorageType.valueOf(storageTypeString);
+	}
+
+	protected Scheduler initializeScheduler(
+			String propertiesPrefix, boolean useQuartzCluster)
+		throws Exception {
+
+		StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
+
+		Properties properties = _props.getProperties(propertiesPrefix, true);
+
+		if (useQuartzCluster) {
+			DB db = DBManagerUtil.getDB();
+
+			DBType dbType = db.getDBType();
+
+			if (dbType == DBType.SQLSERVER) {
+				String lockHandlerClassName = properties.getProperty(
+					"org.quartz.jobStore.lockHandler.class");
+
+				if (Validator.isNull(lockHandlerClassName)) {
+					properties.setProperty(
+						"org.quartz.jobStore.lockHandler.class",
+						UpdateLockRowSemaphore.class.getName());
+				}
+			}
+
+			if (GetterUtil.getBoolean(
+					_props.get(PropsKeys.CLUSTER_LINK_ENABLED))) {
+
+				if (dbType == DBType.HYPERSONIC) {
+					_log.error("Unable to cluster scheduler on Hypersonic");
+				}
+				else {
+					properties.put(
+						"org.quartz.jobStore.isClustered",
+						Boolean.TRUE.toString());
+				}
+			}
+		}
+
+		schedulerFactory.initialize(properties);
+
+		Scheduler scheduler = schedulerFactory.getScheduler();
+
+		SchedulerContext schedulerContext = scheduler.getContext();
+
+		schedulerContext.put("clusterExecutor", _clusterExecutor);
+		schedulerContext.put("jSONFactory", _jsonFactory);
+		schedulerContext.put("messageBus", _messageBus);
+		schedulerContext.put("props", _props);
+
+		return scheduler;
 	}
 
 	protected void initJobState() throws Exception {
@@ -657,7 +832,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 			jobDataMap.put(
 				SchedulerEngine.STORAGE_TYPE, storageType.toString());
 
-			JobState jobState = new JobState(TriggerState.NORMAL);
+			JobState jobState = new JobState(
+				TriggerState.NORMAL,
+				message.getInteger(SchedulerEngine.EXCEPTIONS_MAX_SIZE));
 
 			jobDataMap.put(
 				SchedulerEngine.JOB_STATE,
@@ -684,6 +861,27 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+
+		_descriptionMaxLength = GetterUtil.getInteger(
+			_props.get(PropsKeys.SCHEDULER_DESCRIPTION_MAX_LENGTH), 120);
+
+		_groupNameMaxLength = GetterUtil.getInteger(
+			_props.get(PropsKeys.SCHEDULER_GROUP_NAME_MAX_LENGTH), 80);
+
+		_jobNameMaxLength = GetterUtil.getInteger(
+			_props.get(PropsKeys.SCHEDULER_JOB_NAME_MAX_LENGTH), 80);
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.portal.scheduler.quartz)(release.schema.version=1.0.0))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
 	protected void unschedule(Scheduler scheduler, JobKey jobKey)
 		throws Exception {
 
@@ -704,7 +902,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 		JobDataMap jobDataMap = jobDetail.getJobDataMap();
 
-		JobState jobState = _getJobState(jobDataMap);
+		JobState jobState = getJobState(jobDataMap);
 
 		jobState.setTriggerDate(SchedulerEngine.END_TIME, new Date());
 		jobState.setTriggerDate(
@@ -716,6 +914,8 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 			SchedulerEngine.START_TIME, trigger.getStartTime());
 
 		jobState.setTriggerState(TriggerState.UNSCHEDULED);
+
+		jobState.clearExceptions();
 
 		jobDataMap.put(
 			SchedulerEngine.JOB_STATE,
@@ -757,95 +957,13 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 				scheduler.scheduleJob(jobDetail, quartzTrigger);
 			}
 
-			_updateJobState(scheduler, jobKey, TriggerState.NORMAL);
+			updateJobState(scheduler, jobKey, TriggerState.NORMAL, true);
 		}
 	}
 
-	private String _fixMaxLength(
-		String argument, int maxLength, StorageType storageType) {
-
-		if ((argument == null) || (storageType != StorageType.PERSISTED)) {
-			return argument;
-		}
-
-		if (argument.length() > maxLength) {
-			argument = argument.substring(0, maxLength);
-		}
-
-		return argument;
-	}
-
-	private JobState _getJobState(JobDataMap jobDataMap) {
-		Map<String, Object> jobStateMap = (Map<String, Object>)jobDataMap.get(
-			SchedulerEngine.JOB_STATE);
-
-		return JobStateSerializeUtil.deserialize(jobStateMap);
-	}
-
-	private Scheduler _getScheduler(StorageType storageType) {
-		if (storageType == StorageType.PERSISTED) {
-			return _persistedScheduler;
-		}
-
-		return _memoryScheduler;
-	}
-
-	private Scheduler _initializeScheduler(
-			String propertiesPrefix, boolean useQuartzCluster)
-		throws Exception {
-
-		StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
-
-		Properties properties = _props.getProperties(propertiesPrefix, true);
-
-		if (useQuartzCluster) {
-			DB db = DBManagerUtil.getDB();
-
-			DBType dbType = db.getDBType();
-
-			if (dbType == DBType.SQLSERVER) {
-				String lockHandlerClassName = properties.getProperty(
-					"org.quartz.jobStore.lockHandler.class");
-
-				if (Validator.isNull(lockHandlerClassName)) {
-					properties.setProperty(
-						"org.quartz.jobStore.lockHandler.class",
-						UpdateLockRowSemaphore.class.getName());
-				}
-			}
-
-			if (GetterUtil.getBoolean(
-					_props.get(PropsKeys.CLUSTER_LINK_ENABLED))) {
-
-				if (dbType == DBType.HYPERSONIC) {
-					_log.error("Unable to cluster scheduler on Hypersonic");
-				}
-				else {
-					properties.put(
-						"org.quartz.jobStore.isClustered",
-						Boolean.TRUE.toString());
-				}
-			}
-		}
-
-		schedulerFactory.initialize(properties);
-
-		Scheduler scheduler = schedulerFactory.getScheduler();
-
-		SchedulerContext schedulerContext = scheduler.getContext();
-
-		schedulerContext.put("jSONFactory", _jsonFactory);
-		schedulerContext.put("messageBus", _messageBus);
-
-		ListenerManager listenerManager = scheduler.getListenerManager();
-
-		listenerManager.addTriggerListener(new TriggerListenerSupportImpl());
-
-		return scheduler;
-	}
-
-	private void _updateJobState(
-			Scheduler scheduler, JobKey jobKey, TriggerState triggerState)
+	protected void updateJobState(
+			Scheduler scheduler, JobKey jobKey, TriggerState triggerState,
+			boolean suppressError)
 		throws Exception {
 
 		JobDetail jobDetail = scheduler.getJobDetail(jobKey);
@@ -856,10 +974,14 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 		JobDataMap jobDataMap = jobDetail.getJobDataMap();
 
-		JobState jobState = _getJobState(jobDataMap);
+		JobState jobState = getJobState(jobDataMap);
 
 		if (triggerState != null) {
 			jobState.setTriggerState(triggerState);
+		}
+
+		if (suppressError) {
+			jobState.clearExceptions();
 		}
 
 		jobDataMap.put(
@@ -871,6 +993,9 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		QuartzSchedulerEngine.class);
+
+	@Reference
+	private ClusterExecutor _clusterExecutor;
 
 	private int _descriptionMaxLength;
 	private int _groupNameMaxLength;
@@ -885,15 +1010,7 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 	private MessageBus _messageBus;
 
 	private Scheduler _persistedScheduler;
-
-	@Reference
 	private Props _props;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.portal.scheduler.quartz)(release.schema.version=1.0.0))"
-	)
-	private Release _release;
-
 	private volatile boolean _schedulerEngineEnabled;
 
 	@Reference(
@@ -902,66 +1019,5 @@ public class QuartzSchedulerEngine implements SchedulerEngine {
 		policyOption = ReferencePolicyOption.GREEDY
 	)
 	private volatile SchedulerEngineHelper _schedulerEngineHelper;
-
-	private class TriggerListenerSupportImpl extends TriggerListenerSupport {
-
-		@Override
-		public String getName() {
-			return TriggerListenerSupportImpl.class.getName();
-		}
-
-		@Override
-		public void triggerComplete(
-			Trigger trigger, JobExecutionContext jobExecutionContext,
-			Trigger.CompletedExecutionInstruction
-				completedExecutionInstruction) {
-
-			if (jobExecutionContext.getNextFireTime() != null) {
-				return;
-			}
-
-			TriggerKey triggerKey = trigger.getKey();
-
-			JobDetail jobDetail = jobExecutionContext.getJobDetail();
-
-			JobDataMap jobDataMap = jobDetail.getJobDataMap();
-
-			try {
-				_schedulerEngineHelper.delete(
-					triggerKey.getName(), triggerKey.getGroup(),
-					StorageType.valueOf(
-						jobDataMap.getString(SchedulerEngine.STORAGE_TYPE)));
-			}
-			catch (SchedulerException schedulerException) {
-				_log.error(
-					"Unable to delete job " + triggerKey, schedulerException);
-			}
-		}
-
-		@Override
-		public void triggerFired(
-			Trigger trigger, JobExecutionContext jobExecutionContext) {
-
-			JobDetail jobDetail = jobExecutionContext.getJobDetail();
-
-			JobDataMap jobDataMap = jobDetail.getJobDataMap();
-
-			Message message = new Message();
-
-			message.setValues(new HashMap<>(jobDataMap.getWrappedMap()));
-
-			try {
-				_schedulerEngineHelper.auditSchedulerJobs(
-					message, TriggerState.NORMAL);
-			}
-			catch (SchedulerException schedulerException) {
-				_log.error(
-					"Unable to send audit message for scheduler job " +
-						trigger.getKey(),
-					schedulerException);
-			}
-		}
-
-	}
 
 }

@@ -604,11 +604,6 @@ public class OAuth2AuthorizationWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected OAuth2AuthorizationWrapper wrap(
 		OAuth2Authorization oAuth2Authorization) {
 

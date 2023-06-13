@@ -112,7 +112,7 @@ public class InvokerFilterContainerImplTest {
 
 		Assert.assertTrue(
 			"Target not found in " + eventFilters,
-			_hasFilter(eventFilters, eventFilter));
+			eventFilters.removeIf(filter -> eventFilter == filter));
 	}
 
 	@Test
@@ -124,7 +124,7 @@ public class InvokerFilterContainerImplTest {
 
 		Assert.assertTrue(
 			"Target not found in " + renderFilters,
-			_hasFilter(renderFilters, renderFilter));
+			renderFilters.removeIf(filter -> renderFilter == filter));
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class InvokerFilterContainerImplTest {
 
 		Assert.assertTrue(
 			"Target not found in " + resourceFilters,
-			_hasFilter(resourceFilters, resourceFilter));
+			resourceFilters.removeIf(filter -> resourceFilter == filter));
 	}
 
 	@Test
@@ -172,20 +172,7 @@ public class InvokerFilterContainerImplTest {
 
 		Assert.assertTrue(
 			"Target not found in " + actionFilters,
-			_hasFilter(actionFilters, actionFilter));
-	}
-
-	private boolean _hasFilter(
-		List<? extends PortletFilter> portletFilters,
-		PortletFilter portletFilter) {
-
-		for (PortletFilter currentPortletFilter : portletFilters) {
-			if (currentPortletFilter == portletFilter) {
-				return true;
-			}
-		}
-
-		return false;
+			actionFilters.removeIf(filter -> filter == actionFilter));
 	}
 
 	private <T> T _registerPortletFilter(Class<T> clazz) {

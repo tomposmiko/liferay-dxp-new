@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.servlet;
 
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.util.CookieUtil;
 
 import java.io.Externalizable;
@@ -78,8 +77,7 @@ public class Header implements Externalizable {
 		String key, HttpServletResponse httpServletResponse) {
 
 		if (_type == Type.COOKIE) {
-			CookiesManagerUtil.addCookie(
-				_cookieValue, null, httpServletResponse);
+			httpServletResponse.addCookie(_cookieValue);
 		}
 		else if (_type == Type.DATE) {
 			httpServletResponse.addDateHeader(key, _dateValue);
@@ -131,8 +129,9 @@ public class Header implements Externalizable {
 		else if (_type == Type.STRING) {
 			return _stringValue.equals(header._stringValue);
 		}
-
-		throw new IllegalStateException("Invalid type " + _type);
+		else {
+			throw new IllegalStateException("Invalid type " + _type);
+		}
 	}
 
 	@Override
@@ -149,8 +148,9 @@ public class Header implements Externalizable {
 		else if (_type == Type.STRING) {
 			return _stringValue.hashCode();
 		}
-
-		throw new IllegalStateException("Invalid type " + _type);
+		else {
+			throw new IllegalStateException("Invalid type " + _type);
+		}
 	}
 
 	@Override
@@ -181,8 +181,7 @@ public class Header implements Externalizable {
 		String key, HttpServletResponse httpServletResponse) {
 
 		if (_type == Type.COOKIE) {
-			CookiesManagerUtil.addCookie(
-				_cookieValue, null, httpServletResponse);
+			httpServletResponse.addCookie(_cookieValue);
 		}
 		else if (_type == Type.DATE) {
 			httpServletResponse.setDateHeader(key, _dateValue);
@@ -212,8 +211,9 @@ public class Header implements Externalizable {
 		else if (_type == Type.STRING) {
 			return _stringValue;
 		}
-
-		throw new IllegalStateException("Invalid type " + _type);
+		else {
+			throw new IllegalStateException("Invalid type " + _type);
+		}
 	}
 
 	@Override

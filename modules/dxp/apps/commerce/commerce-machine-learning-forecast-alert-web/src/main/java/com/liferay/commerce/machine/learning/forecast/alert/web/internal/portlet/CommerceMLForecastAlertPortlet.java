@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.machine.learning.forecast.alert.web.internal.portlet;
 
-import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.machine.learning.forecast.alert.constants.CommerceMLForecastAlertConstants;
 import com.liferay.commerce.machine.learning.forecast.alert.constants.CommerceMLForecastAlertPortletKeys;
 import com.liferay.commerce.machine.learning.forecast.alert.service.CommerceMLForecastAlertEntryService;
@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Ferrari
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-machine-learning-forecast-alert",
@@ -56,10 +57,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + CommerceMLForecastAlertPortletKeys.COMMERCE_ML_FORECAST_ALERT,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceMLForecastAlertPortlet.class, Portlet.class}
 )
 public class CommerceMLForecastAlertPortlet extends MVCPortlet {
 
@@ -72,7 +72,7 @@ public class CommerceMLForecastAlertPortlet extends MVCPortlet {
 			CommerceMLForecastAlertEntryListDisplayContext
 				commerceMLForecastAlertEntryListDisplayContext =
 					new CommerceMLForecastAlertEntryListDisplayContext(
-						_accountEntryLocalService,
+						_commerceAccountLocalService,
 						_commerceMLForecastAlertEntryService,
 						_portletResourcePermission, renderRequest);
 
@@ -92,7 +92,7 @@ public class CommerceMLForecastAlertPortlet extends MVCPortlet {
 	}
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Reference
 	private CommerceMLForecastAlertEntryService

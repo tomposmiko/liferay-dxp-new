@@ -27,8 +27,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=ProductSubscriptionConfiguration",
-	service = DTOConverter.class
+	service = {
+		DTOConverter.class, ProductSubscriptionConfigurationDTOConverter.class
+	}
 )
 public class ProductSubscriptionConfigurationDTOConverter
 	implements DTOConverter<CPDefinition, ProductSubscriptionConfiguration> {
@@ -55,7 +58,7 @@ public class ProductSubscriptionConfigurationDTOConverter
 					ProductSubscriptionConfiguration.SubscriptionType.create(
 						cpDefinition.getSubscriptionType());
 				subscriptionTypeSettings =
-					cpDefinition.getSubscriptionTypeSettingsUnicodeProperties();
+					cpDefinition.getSubscriptionTypeSettingsProperties();
 			}
 		};
 	}

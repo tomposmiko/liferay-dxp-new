@@ -20,7 +20,6 @@ import com.liferay.data.engine.model.DEDataListViewTable;
 import com.liferay.data.engine.model.impl.DEDataListViewImpl;
 import com.liferay.data.engine.model.impl.DEDataListViewModelImpl;
 import com.liferay.data.engine.service.persistence.DEDataListViewPersistence;
-import com.liferay.data.engine.service.persistence.DEDataListViewUtil;
 import com.liferay.data.engine.service.persistence.impl.constants.DEPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DEDataListViewPersistence.class)
+@Component(service = {DEDataListViewPersistence.class, BasePersistence.class})
 public class DEDataListViewPersistenceImpl
 	extends BasePersistenceImpl<DEDataListView>
 	implements DEDataListViewPersistence {
@@ -203,7 +202,7 @@ public class DEDataListViewPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataListView>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataListView deDataListView : list) {
@@ -595,7 +594,7 @@ public class DEDataListViewPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -731,7 +730,7 @@ public class DEDataListViewPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof DEDataListView) {
@@ -851,7 +850,7 @@ public class DEDataListViewPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1023,7 +1022,7 @@ public class DEDataListViewPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataListView>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataListView deDataListView : list) {
@@ -1448,7 +1447,7 @@ public class DEDataListViewPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1614,7 +1613,7 @@ public class DEDataListViewPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataListView>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataListView deDataListView : list) {
@@ -1989,7 +1988,7 @@ public class DEDataListViewPersistenceImpl
 
 			finderArgs = new Object[] {ddmStructureId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2148,7 +2147,7 @@ public class DEDataListViewPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataListView>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataListView deDataListView : list) {
@@ -2576,7 +2575,7 @@ public class DEDataListViewPersistenceImpl
 
 			finderArgs = new Object[] {groupId, companyId, ddmStructureId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2769,7 +2768,7 @@ public class DEDataListViewPersistenceImpl
 		deDataListView.setNew(true);
 		deDataListView.setPrimaryKey(deDataListViewId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		deDataListView.setUuid(uuid);
 
@@ -2891,7 +2890,7 @@ public class DEDataListViewPersistenceImpl
 			(DEDataListViewModelImpl)deDataListView;
 
 		if (Validator.isNull(deDataListView.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			deDataListView.setUuid(uuid);
 		}
@@ -3017,9 +3016,7 @@ public class DEDataListViewPersistenceImpl
 	 */
 	@Override
 	public DEDataListView fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				DEDataListView.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(DEDataListView.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3238,7 +3235,7 @@ public class DEDataListViewPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataListView>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3314,7 +3311,7 @@ public class DEDataListViewPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3539,31 +3536,11 @@ public class DEDataListViewPersistenceImpl
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"groupId", "companyId", "ddmStructureId"}, false);
-
-		_setDEDataListViewUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDEDataListViewUtilPersistence(null);
-
 		entityCache.removeCache(DEDataListViewImpl.class.getName());
-	}
-
-	private void _setDEDataListViewUtilPersistence(
-		DEDataListViewPersistence deDataListViewPersistence) {
-
-		try {
-			Field field = DEDataListViewUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, deDataListViewPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3633,6 +3610,7 @@ public class DEDataListViewPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private DEDataListViewModelArgumentsResolver
+		_deDataListViewModelArgumentsResolver;
 
 }

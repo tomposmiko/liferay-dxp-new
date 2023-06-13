@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ACCOUNT,
 		"mvc.command.name=/users_admin/update_password"
@@ -60,44 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 public class UpdatePasswordMyAccountMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		PasswordModificationThreadLocal.setPasswordModified(true);
-
-		try {
-			_authenticateUser(actionRequest, actionResponse);
-
-			_mvcActionCommand.processAction(actionRequest, actionResponse);
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchUserException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-
-				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
-			}
-			else if (exception instanceof UserPasswordException) {
-				SessionErrors.add(
-					actionRequest, exception.getClass(), exception);
-
-				String redirect = _portal.escapeRedirect(
-					ParamUtil.getString(actionRequest, "redirect"));
-
-				if (Validator.isNotNull(redirect)) {
-					sendRedirect(actionRequest, actionResponse, redirect);
-				}
-			}
-			else {
-				throw exception;
-			}
-		}
-	}
-
-	private void _authenticateUser(
+	protected void authenticateUser(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -173,6 +137,43 @@ public class UpdatePasswordMyAccountMVCActionCommand
 		}
 		else if (Validator.isNotNull(newPassword)) {
 			throw new UserPasswordException.MustNotBeNull(user.getUserId());
+		}
+	}
+
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		PasswordModificationThreadLocal.setPasswordModified(true);
+
+		try {
+			authenticateUser(actionRequest, actionResponse);
+
+			_mvcActionCommand.processAction(actionRequest, actionResponse);
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchUserException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+
+				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+			}
+			else if (exception instanceof UserPasswordException) {
+				SessionErrors.add(
+					actionRequest, exception.getClass(), exception);
+
+				String redirect = _portal.escapeRedirect(
+					ParamUtil.getString(actionRequest, "redirect"));
+
+				if (Validator.isNotNull(redirect)) {
+					sendRedirect(actionRequest, actionResponse, redirect);
+				}
+			}
+			else {
+				throw exception;
+			}
 		}
 	}
 

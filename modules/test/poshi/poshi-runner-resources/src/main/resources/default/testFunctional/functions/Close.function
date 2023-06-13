@@ -1,30 +1,21 @@
-@default = "close"
-definition {
+<definition default="close">
+	<command name="close">
+		<execute argument1="null" selenium="selectWindow" />
 
-	function close {
-		selenium.selectWindow("null");
+		<execute argument1="relative=top" selenium="selectFrame" />
+	</command>
 
-		selenium.selectFrame("relative=top");
-	}
+	<command name="closeAndSelectWindow">
+		<execute selenium="close" />
 
-	function closeAndSelectWindow {
-		selenium.pause("1000");
+		<execute selenium="selectWindow" />
+	</command>
 
-		selenium.close();
+	<command name="closeWindow">
+		<execute selenium="close" />
 
-		selenium.pause("5000");
+		<execute argument1="null" selenium="selectWindow" />
 
-		selenium.selectWindow();
-	}
-
-	function closeWindow {
-		selenium.pause("1000");
-
-		selenium.close();
-
-		selenium.selectWindow("null");
-
-		selenium.selectFrame("relative=top");
-	}
-
-}
+		<execute argument1="relative=top" selenium="selectFrame" />
+	</command>
+</definition>

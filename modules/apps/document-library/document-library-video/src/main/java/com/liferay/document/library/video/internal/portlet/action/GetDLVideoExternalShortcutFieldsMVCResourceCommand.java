@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DLVideoPortletKeys.DL_VIDEO,
 		"mvc.command.name=/document_library_video/get_dl_video_external_shortcut_fields"

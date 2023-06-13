@@ -188,7 +188,7 @@ SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("l
 	showCreationMenu="<%= false %>"
 />
 
-<aui:form action="<%= portletURL %>" method="post" name="fm">
+<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 	<aui:input name="tabs1" type="hidden" value="<%= tabs1 %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="groupId" type="hidden" value="<%= String.valueOf(group.getGroupId()) %>" />
@@ -225,11 +225,11 @@ SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("l
 		Util.postForm(form, {
 			data: {
 				redirect: redirect,
-				addUserGroupIds: Util.getCheckedCheckboxes(
+				addUserGroupIds: Util.listCheckedExcept(
 					form,
 					'<portlet:namespace />allRowIds'
 				),
-				removeUserGroupIds: Util.getUncheckedCheckboxes(
+				removeUserGroupIds: Util.listUncheckedExcept(
 					form,
 					'<portlet:namespace />allRowIds'
 				),
@@ -246,11 +246,11 @@ SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("l
 		Util.postForm(form, {
 			data: {
 				redirect: redirect,
-				addUserIds: Util.getCheckedCheckboxes(
+				addUserIds: Util.listCheckedExcept(
 					form,
 					'<portlet:namespace />allRowIds'
 				),
-				removeUserIds: Util.getUncheckedCheckboxes(
+				removeUserIds: Util.listUncheckedExcept(
 					form,
 					'<portlet:namespace />allRowIds'
 				),

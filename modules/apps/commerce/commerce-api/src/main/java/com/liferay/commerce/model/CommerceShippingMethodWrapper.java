@@ -44,7 +44,6 @@ public class CommerceShippingMethodWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put(
 			"commerceShippingMethodId", getCommerceShippingMethodId());
 		attributes.put("groupId", getGroupId());
@@ -55,23 +54,16 @@ public class CommerceShippingMethodWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("name", getName());
 		attributes.put("description", getDescription());
-		attributes.put("active", isActive());
-		attributes.put("engineKey", getEngineKey());
 		attributes.put("imageId", getImageId());
+		attributes.put("engineKey", getEngineKey());
 		attributes.put("priority", getPriority());
-		attributes.put("trackingURL", getTrackingURL());
+		attributes.put("active", isActive());
 
 		return attributes;
 	}
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		Long commerceShippingMethodId = (Long)attributes.get(
 			"commerceShippingMethodId");
 
@@ -127,10 +119,10 @@ public class CommerceShippingMethodWrapper
 			setDescription(description);
 		}
 
-		Boolean active = (Boolean)attributes.get("active");
+		Long imageId = (Long)attributes.get("imageId");
 
-		if (active != null) {
-			setActive(active);
+		if (imageId != null) {
+			setImageId(imageId);
 		}
 
 		String engineKey = (String)attributes.get("engineKey");
@@ -139,22 +131,16 @@ public class CommerceShippingMethodWrapper
 			setEngineKey(engineKey);
 		}
 
-		Long imageId = (Long)attributes.get("imageId");
-
-		if (imageId != null) {
-			setImageId(imageId);
-		}
-
 		Double priority = (Double)attributes.get("priority");
 
 		if (priority != null) {
 			setPriority(priority);
 		}
 
-		String trackingURL = (String)attributes.get("trackingURL");
+		Boolean active = (Boolean)attributes.get("active");
 
-		if (trackingURL != null) {
-			setTrackingURL(trackingURL);
+		if (active != null) {
+			setActive(active);
 		}
 	}
 
@@ -337,16 +323,6 @@ public class CommerceShippingMethodWrapper
 	}
 
 	/**
-	 * Returns the mvcc version of this commerce shipping method.
-	 *
-	 * @return the mvcc version of this commerce shipping method
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
 	 * Returns the name of this commerce shipping method.
 	 *
 	 * @return the name of this commerce shipping method
@@ -440,16 +416,6 @@ public class CommerceShippingMethodWrapper
 	@Override
 	public double getPriority() {
 		return model.getPriority();
-	}
-
-	/**
-	 * Returns the tracking url of this commerce shipping method.
-	 *
-	 * @return the tracking url of this commerce shipping method
-	 */
-	@Override
-	public String getTrackingURL() {
-		return model.getTrackingURL();
 	}
 
 	/**
@@ -660,16 +626,6 @@ public class CommerceShippingMethodWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce shipping method.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce shipping method
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the name of this commerce shipping method.
 	 *
 	 * @param name the name of this commerce shipping method
@@ -753,16 +709,6 @@ public class CommerceShippingMethodWrapper
 	}
 
 	/**
-	 * Sets the tracking url of this commerce shipping method.
-	 *
-	 * @param trackingURL the tracking url of this commerce shipping method
-	 */
-	@Override
-	public void setTrackingURL(String trackingURL) {
-		model.setTrackingURL(trackingURL);
-	}
-
-	/**
 	 * Sets the user ID of this commerce shipping method.
 	 *
 	 * @param userId the user ID of this commerce shipping method
@@ -790,11 +736,6 @@ public class CommerceShippingMethodWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

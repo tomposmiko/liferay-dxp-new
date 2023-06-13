@@ -43,23 +43,21 @@ public class ImageJournalUploadResponseHandler
 			PortletRequest portletRequest, PortalException portalException)
 		throws PortalException {
 
-		return _itemSelectorUploadResponseHandler.onFailure(
-			portletRequest, portalException
-		).put(
-			"error",
-			() -> {
-				if (portalException instanceof ImageTypeException) {
-					return JSONUtil.put(
-						"errorType",
-						ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION
-					).put(
-						"message", StringPool.BLANK
-					);
-				}
+		JSONObject jsonObject = _itemSelectorUploadResponseHandler.onFailure(
+			portletRequest, portalException);
 
-				return null;
-			}
-		);
+		if (portalException instanceof ImageTypeException) {
+			jsonObject.put(
+				"error",
+				JSONUtil.put(
+					"errorType",
+					ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION
+				).put(
+					"message", StringPool.BLANK
+				));
+		}
+
+		return jsonObject;
 	}
 
 	@Override

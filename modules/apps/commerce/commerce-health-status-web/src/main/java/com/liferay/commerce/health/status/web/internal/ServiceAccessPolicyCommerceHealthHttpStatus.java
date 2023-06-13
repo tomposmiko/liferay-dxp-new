@@ -20,7 +20,7 @@ import com.liferay.commerce.health.status.CommerceHealthHttpStatus;
 import com.liferay.commerce.helper.CommerceSAPHelper;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Portal;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.health.status.display.order:Integer=50",
 		"commerce.health.status.key=" + CommerceHealthStatusConstants.SAP_COMMERCE_HEALTH_STATUS_KEY
@@ -59,7 +60,7 @@ public class ServiceAccessPolicyCommerceHealthHttpStatus
 
 		_commerceSAPHelper.removeCommerceDefaultSAPEntries(companyId);
 
-		User user = _userLocalService.getGuestUser(companyId);
+		User user = _userLocalService.getDefaultUser(companyId);
 
 		_commerceSAPHelper.addCommerceDefaultSAPEntries(
 			companyId, user.getUserId());
@@ -70,7 +71,7 @@ public class ServiceAccessPolicyCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.
 				SAP_COMMERCE_HEALTH_STATUS_DESCRIPTION);
@@ -86,7 +87,7 @@ public class ServiceAccessPolicyCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.SAP_COMMERCE_HEALTH_STATUS_KEY);
 	}
@@ -139,9 +140,6 @@ public class ServiceAccessPolicyCommerceHealthHttpStatus
 
 	@Reference
 	private CommerceSAPHelper _commerceSAPHelper;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

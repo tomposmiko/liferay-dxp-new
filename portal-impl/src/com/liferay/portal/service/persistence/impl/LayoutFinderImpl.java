@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.GroupTable;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutReference;
+import com.liferay.portal.kernel.model.LayoutSoap;
 import com.liferay.portal.kernel.model.LayoutTable;
 import com.liferay.portal.kernel.model.PortletPreferenceValueTable;
 import com.liferay.portal.kernel.model.PortletPreferencesTable;
@@ -169,7 +170,8 @@ public class LayoutFinderImpl
 					layoutPlid.longValue());
 
 				layoutReferences.add(
-					new LayoutReference(layout, preferencesPortletId));
+					new LayoutReference(
+						LayoutSoap.toSoapModel(layout), preferencesPortletId));
 			}
 
 			return layoutReferences;

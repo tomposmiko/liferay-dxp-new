@@ -23,24 +23,25 @@ import com.liferay.commerce.service.CommerceOrderTypeLocalService;
 import com.liferay.commerce.service.CommerceOrderTypeRelLocalService;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.headless.commerce.admin.order.client.dto.v1_0.OrderTypeChannel;
+import com.liferay.headless.commerce.core.util.DateConfig;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.test.rule.Inject;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Alessio Antonio Rendina
- * @author Stefano Motta
  */
-@DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class OrderTypeChannelResourceTest
 	extends BaseOrderTypeChannelResourceTestCase {
@@ -56,27 +57,37 @@ public class OrderTypeChannelResourceTest
 			testCompany.getCompanyId(), testGroup.getGroupId(),
 			_user.getUserId());
 
+		DateConfig displayDateConfig = DateConfig.toDisplayDateConfig(
+			RandomTestUtil.nextDate(), _user.getTimeZone());
+		DateConfig expirationDateConfig = DateConfig.toExpirationDateConfig(
+			RandomTestUtil.nextDate(), _user.getTimeZone());
+
 		_commerceOrderType =
 			_commerceOrderTypeLocalService.addCommerceOrderType(
 				RandomTestUtil.randomString(), _user.getUserId(),
 				RandomTestUtil.randomLocaleStringMap(),
 				RandomTestUtil.randomLocaleStringMap(),
-				RandomTestUtil.randomBoolean(), 1, 1, 2022, 12, 0, 0, 0, 0, 0,
-				0, 0, true, _serviceContext);
+				RandomTestUtil.randomBoolean(), displayDateConfig.getMonth(),
+				displayDateConfig.getDay(), displayDateConfig.getYear(),
+				displayDateConfig.getHour(), displayDateConfig.getMinute(), 0,
+				expirationDateConfig.getMonth(), expirationDateConfig.getDay(),
+				expirationDateConfig.getYear(), expirationDateConfig.getHour(),
+				expirationDateConfig.getMinute(), true, _serviceContext);
 	}
 
-	@Ignore
 	@Override
 	@Test
 	public void testDeleteOrderTypeChannel() throws Exception {
-		super.testDeleteOrderTypeChannel();
 	}
 
-	@Ignore
 	@Override
 	@Test
 	public void testGraphQLDeleteOrderTypeChannel() throws Exception {
-		super.testGraphQLDeleteOrderTypeChannel();
+	}
+
+	@Override
+	protected Collection<EntityField> getEntityFields() throws Exception {
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -103,7 +114,7 @@ public class OrderTypeChannelResourceTest
 				String externalReferenceCode, OrderTypeChannel orderTypeChannel)
 		throws Exception {
 
-		return _addCommerceOrderTypeRel(orderTypeChannel);
+		return _addOrderTypeChannel(orderTypeChannel);
 	}
 
 	@Override
@@ -120,7 +131,7 @@ public class OrderTypeChannelResourceTest
 				Long id, OrderTypeChannel orderTypeChannel)
 		throws Exception {
 
-		return _addCommerceOrderTypeRel(orderTypeChannel);
+		return _addOrderTypeChannel(orderTypeChannel);
 	}
 
 	@Override
@@ -136,7 +147,7 @@ public class OrderTypeChannelResourceTest
 				OrderTypeChannel orderTypeChannel)
 		throws Exception {
 
-		return _addCommerceOrderTypeRel(orderTypeChannel);
+		return _addOrderTypeChannel(orderTypeChannel);
 	}
 
 	@Override
@@ -145,21 +156,30 @@ public class OrderTypeChannelResourceTest
 				OrderTypeChannel orderTypeChannel)
 		throws Exception {
 
-		return _addCommerceOrderTypeRel(orderTypeChannel);
+		return _addOrderTypeChannel(orderTypeChannel);
 	}
 
-	private OrderTypeChannel _addCommerceOrderTypeRel(
+	private OrderTypeChannel _addOrderTypeChannel(
 			OrderTypeChannel orderTypeChannel)
+		throws Exception {
+
+		return _toOrderTypeChannel(
+			_commerceOrderTypeRelLocalService.addCommerceOrderTypeRel(
+				_user.getUserId(), CommerceChannel.class.getName(),
+				orderTypeChannel.getChannelId(),
+				orderTypeChannel.getOrderTypeId(), _serviceContext));
+	}
+
+	private OrderTypeChannel _toOrderTypeChannel(
+			CommerceOrderTypeRel commerceOrderTypeRel)
 		throws Exception {
 
 		CommerceChannel commerceChannel =
 			_commerceChannelLocalService.getCommerceChannel(
-				orderTypeChannel.getChannelId());
-		CommerceOrderTypeRel commerceOrderTypeRel =
-			_commerceOrderTypeRelLocalService.addCommerceOrderTypeRel(
-				_user.getUserId(), CommerceChannel.class.getName(),
-				orderTypeChannel.getChannelId(),
-				orderTypeChannel.getOrderTypeId(), _serviceContext);
+				commerceOrderTypeRel.getClassPK());
+		CommerceOrderType commerceOrderType =
+			_commerceOrderTypeLocalService.fetchCommerceOrderType(
+				commerceOrderTypeRel.getCommerceOrderTypeId());
 
 		return new OrderTypeChannel() {
 			{
@@ -169,8 +189,8 @@ public class OrderTypeChannelResourceTest
 				orderTypeChannelId =
 					commerceOrderTypeRel.getCommerceOrderTypeRelId();
 				orderTypeExternalReferenceCode =
-					_commerceOrderType.getExternalReferenceCode();
-				orderTypeId = _commerceOrderType.getCommerceOrderTypeId();
+					commerceOrderType.getExternalReferenceCode();
+				orderTypeId = commerceOrderType.getCommerceOrderTypeId();
 			}
 		};
 	}

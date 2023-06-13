@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
 		"mvc.command.name=/commerce_shipping_methods/edit_commerce_shipping_fixed_option"
@@ -66,9 +67,9 @@ public class EditCommerceShippingFixedOptionMVCRenderCommand
 					new CommerceShippingFixedOptionsDisplayContext(
 						_commerceChannelLocalService,
 						_commerceCurrencyLocalService,
-						_commerceShippingFixedOptionService,
-						_commerceShippingMethodService, _portal, renderRequest,
-						renderResponse);
+						_commerceShippingMethodService,
+						_commerceShippingFixedOptionService, _portal,
+						renderRequest, renderResponse);
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
@@ -87,7 +88,8 @@ public class EditCommerceShippingFixedOptionMVCRenderCommand
 				return "/error.jsp";
 			}
 
-			throw new PortletException(exception);
+			throw new PortletException(
+				"Unable to include edit_shipping_option.jsp", exception);
 		}
 
 		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;

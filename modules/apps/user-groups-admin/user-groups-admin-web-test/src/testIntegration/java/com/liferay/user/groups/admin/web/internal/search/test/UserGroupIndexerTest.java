@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
@@ -46,6 +47,8 @@ import com.liferay.users.admin.test.util.search.GroupSearchFixture;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -84,28 +87,27 @@ public class UserGroupIndexerTest {
 
 	@Test
 	public void testSearchUserGroups() throws Exception {
-		Role role = _addRole();
+		Role role = addRole();
 
 		long companyId = role.getCompanyId();
 
-		groupLocalService.addRoleGroup(role.getRoleId(), _group.getGroupId());
-
-		int originalUserGroupCount = userGroupLocalService.searchCount(
+		int count = userGroupLocalService.searchCount(
 			companyId, null, new LinkedHashMap<String, Object>());
 
 		String baseName = RandomTestUtil.randomString();
+		int i = 2;
 
-		int newUserGroupCount = 2;
+		List<UserGroup> userGroups = Stream.generate(
+			() -> addUserGroup(baseName)
+		).limit(
+			i
+		).collect(
+			Collectors.toList()
+		);
 
-		List<String> userGroupNames = new ArrayList<>();
+		groupLocalService.addRoleGroup(role.getRoleId(), _group.getGroupId());
 
-		for (int i = 0; i < newUserGroupCount; i++) {
-			UserGroup userGroup = addUserGroup(baseName);
-
-			userGroupNames.add(userGroup.getName());
-		}
-
-		SearchRequestBuilder searchRequestBuilder1 = _getSearchRequestBuilder(
+		SearchRequestBuilder searchRequestBuilder1 = getSearchRequestBuilder(
 			companyId);
 
 		SearchResponse searchResponse1 = searcher.search(
@@ -113,31 +115,62 @@ public class UserGroupIndexerTest {
 				baseName
 			).build());
 
-		DocumentsAssert.assertValuesIgnoreRelevance(
-			searchResponse1.getRequestString(), searchResponse1.getDocuments(),
-			Field.NAME, userGroupNames);
+		Stream<UserGroup> stream = userGroups.stream();
 
-		SearchRequestBuilder searchRequestBuilder2 = _getSearchRequestBuilder(
+		DocumentsAssert.assertValuesIgnoreRelevance(
+			searchResponse1.getRequestString(),
+			searchResponse1.getDocumentsStream(), Field.NAME,
+			stream.map(UserGroup::getName));
+
+		SearchRequestBuilder searchRequestBuilder2 = getSearchRequestBuilder(
 			companyId);
 
 		SearchResponse searchResponse2 = searcher.search(
-			searchRequestBuilder2.emptySearchEnabled(
-				true
-			).size(
+			searchRequestBuilder2.size(
 				0
 			).build());
 
-		Assert.assertEquals(
-			originalUserGroupCount + newUserGroupCount,
-			searchResponse2.getCount());
+		Assert.assertEquals(count + i, searchResponse2.getCount());
 	}
 
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
+	protected Role addRole() throws Exception {
+		Role role = roleLocalService.addRole(
+			TestPropsValues.getUserId(), null, 0,
+			RandomTestUtil.randomString(
+				NumericStringRandomizerBumper.INSTANCE,
+				UniqueStringRandomizerBumper.INSTANCE),
+			null, null, RoleConstants.TYPE_REGULAR, null, null);
+
+		_roles.add(role);
+
+		return role;
+	}
+
 	protected UserGroup addUserGroup(String baseName) {
 		return _userGroupFixture.createUserGroup(
 			baseName + StringPool.SPACE + RandomTestUtil.randomString());
+	}
+
+	protected SearchContext getSearchContext(long companyId) {
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setCompanyId(companyId);
+
+		return searchContext;
+	}
+
+	protected SearchRequestBuilder getSearchRequestBuilder(long companyId) {
+		return searchRequestBuilderFactory.builder(
+		).companyId(
+			companyId
+		).fields(
+			StringPool.STAR
+		).modelIndexerClasses(
+			UserGroup.class
+		);
 	}
 
 	@Inject
@@ -162,30 +195,6 @@ public class UserGroupIndexerTest {
 
 	@Inject
 	protected UsersAdmin usersAdmin;
-
-	private Role _addRole() throws Exception {
-		Role role = roleLocalService.addRole(
-			TestPropsValues.getUserId(), null, 0,
-			RandomTestUtil.randomString(
-				NumericStringRandomizerBumper.INSTANCE,
-				UniqueStringRandomizerBumper.INSTANCE),
-			null, null, RoleConstants.TYPE_REGULAR, null, null);
-
-		_roles.add(role);
-
-		return role;
-	}
-
-	private SearchRequestBuilder _getSearchRequestBuilder(long companyId) {
-		return searchRequestBuilderFactory.builder(
-		).companyId(
-			companyId
-		).fields(
-			StringPool.STAR
-		).modelIndexerClasses(
-			UserGroup.class
-		);
-	}
 
 	private Group _group;
 

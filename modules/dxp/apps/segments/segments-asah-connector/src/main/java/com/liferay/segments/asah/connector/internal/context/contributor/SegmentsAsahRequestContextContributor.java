@@ -21,6 +21,7 @@ import com.liferay.segments.context.Context;
 import com.liferay.segments.context.contributor.RequestContextContributor;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"request.context.contributor.key=" + SegmentsAsahRequestContextContributor.KEY_SEGMENTS_ANONYMOUS_USER_ID,
 		"request.context.contributor.type=id"
@@ -66,15 +68,17 @@ public class SegmentsAsahRequestContextContributor
 			return StringPool.BLANK;
 		}
 
-		for (Cookie cookie : cookies) {
-			if (Objects.equals(
-					cookie.getName(), _AC_CLIENT_USER_ID_COOKIE_NAME)) {
-
-				return cookie.getValue();
-			}
-		}
-
-		return StringPool.BLANK;
+		return Stream.of(
+			cookies
+		).filter(
+			cookie -> Objects.equals(
+				cookie.getName(), _AC_CLIENT_USER_ID_COOKIE_NAME)
+		).map(
+			Cookie::getValue
+		).findFirst(
+		).orElse(
+			StringPool.BLANK
+		);
 	}
 
 	private static final String _AC_CLIENT_USER_ID_COOKIE_NAME =

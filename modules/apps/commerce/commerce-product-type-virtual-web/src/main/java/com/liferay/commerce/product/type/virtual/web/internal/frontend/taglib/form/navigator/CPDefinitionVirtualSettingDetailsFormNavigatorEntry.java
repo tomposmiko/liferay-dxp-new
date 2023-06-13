@@ -18,7 +18,7 @@ import com.liferay.commerce.product.type.virtual.model.CPDefinitionVirtualSettin
 import com.liferay.commerce.product.type.virtual.web.internal.servlet.taglib.ui.constants.CPDefinitionVirtualSettingFormNavigatorConstants;
 import com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "form.navigator.entry.order:Integer=100",
+	enabled = false, property = "form.navigator.entry.order:Integer=100",
 	service = FormNavigatorEntry.class
 )
 public class CPDefinitionVirtualSettingDetailsFormNavigatorEntry
@@ -62,12 +62,7 @@ public class CPDefinitionVirtualSettingDetailsFormNavigatorEntry
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "details");
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return _cpDefinitionVirtualSettingServletContext;
+		return LanguageUtil.get(locale, "details");
 	}
 
 	@Override
@@ -84,7 +79,8 @@ public class CPDefinitionVirtualSettingDetailsFormNavigatorEntry
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}
 		catch (ServletException servletException) {
-			throw new IOException(servletException);
+			throw new IOException(
+				"Unable to include " + getJspPath(), servletException);
 		}
 	}
 
@@ -97,8 +93,5 @@ public class CPDefinitionVirtualSettingDetailsFormNavigatorEntry
 		target = "(osgi.web.symbolicname=com.liferay.commerce.product.type.virtual.web)"
 	)
 	private ServletContext _cpDefinitionVirtualSettingServletContext;
-
-	@Reference
-	private Language _language;
 
 }

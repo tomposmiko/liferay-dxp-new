@@ -30,10 +30,6 @@ public class AssetDisplayPageEntryLocalServiceWrapper
 	implements AssetDisplayPageEntryLocalService,
 			   ServiceWrapper<AssetDisplayPageEntryLocalService> {
 
-	public AssetDisplayPageEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AssetDisplayPageEntryLocalServiceWrapper(
 		AssetDisplayPageEntryLocalService assetDisplayPageEntryLocalService) {
 

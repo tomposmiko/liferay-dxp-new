@@ -14,13 +14,14 @@
 
 package com.liferay.commerce.avalara.tax.engine.fixed.web.internal.portlet.action;
 
-import com.liferay.commerce.avalara.connector.configuration.CommerceAvalaraConnectorChannelConfiguration;
-import com.liferay.commerce.avalara.connector.dispatch.CommerceAvalaraDispatchTrigger;
+import com.liferay.commerce.avalara.connector.CommerceAvalaraConnector;
+import com.liferay.commerce.avalara.connector.configuration.CommerceAvalaraConnectorConfiguration;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.tax.model.CommerceTaxMethod;
 import com.liferay.commerce.tax.service.CommerceTaxMethodService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Calvin Keum
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_TAX_METHODS,
 		"mvc.command.name=/commerce_tax_methods/edit_commerce_tax_avalara"
@@ -54,56 +56,82 @@ public class EditCommerceTaxAvalaraMVCActionCommand
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
-		if (cmd.equals("runNow")) {
-			_commerceAvalaraDispatchTriggerHelper.runJob(
-				_getCommerceTaxMethod(actionRequest));
+		try {
+			if (cmd.equals(Constants.UPDATE)) {
+				_updateCommerceTaxAvalara(actionRequest);
+			}
+			else if (cmd.equals("verifyConnection")) {
+				_updateCommerceTaxAvalara(actionRequest);
+				_verifyConnection(actionRequest);
+			}
 		}
-		else {
-			_updateCommerceTaxAvalara(actionRequest);
+		catch (Throwable throwable) {
+			SessionErrors.add(actionRequest, throwable.getClass(), throwable);
+
+			String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+			sendRedirect(actionRequest, actionResponse, redirect);
 		}
-	}
-
-	private CommerceTaxMethod _getCommerceTaxMethod(ActionRequest actionRequest)
-		throws Exception {
-
-		long commerceTaxMethodId = ParamUtil.getLong(
-			actionRequest, "commerceTaxMethodId");
-
-		return _commerceTaxMethodService.getCommerceTaxMethod(
-			commerceTaxMethodId);
 	}
 
 	private void _updateCommerceTaxAvalara(ActionRequest actionRequest)
 		throws Exception {
 
-		CommerceTaxMethod commerceTaxMethod = _getCommerceTaxMethod(
-			actionRequest);
+		long commerceTaxMethodId = ParamUtil.getLong(
+			actionRequest, "commerceTaxMethodId");
+
+		CommerceTaxMethod commerceTaxMethod =
+			_commerceTaxMethodService.getCommerceTaxMethod(commerceTaxMethodId);
 
 		Settings settings = _settingsFactory.getSettings(
 			new GroupServiceSettingsLocator(
 				commerceTaxMethod.getGroupId(),
-				CommerceAvalaraConnectorChannelConfiguration.class.getName()));
+				CommerceAvalaraConnectorConfiguration.class.getName()));
 
 		ModifiableSettings modifiableSettings =
 			settings.getModifiableSettings();
+
+		String accountNumber = ParamUtil.getString(
+			actionRequest, "accountNumber");
+
+		modifiableSettings.setValue("accountNumber", accountNumber);
 
 		String companyCode = ParamUtil.getString(actionRequest, "companyCode");
 
 		modifiableSettings.setValue("companyCode", companyCode);
 
-		Boolean disableDocumentRecording = ParamUtil.getBoolean(
-			actionRequest, "disableDocumentRecording");
+		Boolean disabledDocumentRecording = ParamUtil.getBoolean(
+			actionRequest, "disabledDocumentRecording");
 
 		modifiableSettings.setValue(
-			"disableDocumentRecording",
-			String.valueOf(disableDocumentRecording));
+			"disabledDocumentRecording",
+			String.valueOf(disabledDocumentRecording));
+
+		String licenseKey = ParamUtil.getString(actionRequest, "licenseKey");
+
+		modifiableSettings.setValue("licenseKey", licenseKey);
+
+		String serviceURL = ParamUtil.getString(actionRequest, "serviceURL");
+
+		modifiableSettings.setValue("serviceURL", serviceURL);
 
 		modifiableSettings.store();
 	}
 
+	private void _verifyConnection(ActionRequest actionRequest)
+		throws Exception {
+
+		String accountNumber = ParamUtil.getString(
+			actionRequest, "accountNumber");
+		String licenseKey = ParamUtil.getString(actionRequest, "licenseKey");
+		String serviceURL = ParamUtil.getString(actionRequest, "serviceURL");
+
+		_commerceAvalaraConnector.verifyConnection(
+			accountNumber, licenseKey, serviceURL);
+	}
+
 	@Reference
-	private CommerceAvalaraDispatchTrigger
-		_commerceAvalaraDispatchTriggerHelper;
+	private CommerceAvalaraConnector _commerceAvalaraConnector;
 
 	@Reference
 	private CommerceTaxMethodService _commerceTaxMethodService;

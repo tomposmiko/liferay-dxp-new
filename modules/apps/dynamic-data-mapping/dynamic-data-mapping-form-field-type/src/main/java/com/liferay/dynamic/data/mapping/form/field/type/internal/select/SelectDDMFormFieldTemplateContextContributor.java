@@ -20,22 +20,12 @@ import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTy
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
-import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
-import com.liferay.list.type.model.ListTypeEntry;
-import com.liferay.list.type.service.ListTypeEntryLocalService;
-import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectField;
-import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
@@ -46,7 +36,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.text.Collator;
 
@@ -54,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
@@ -64,8 +52,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SELECT,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		SelectDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class SelectDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -80,9 +72,6 @@ public class SelectDDMFormFieldTemplateContextContributor
 			GetterUtil.getBoolean(ddmFormField.getProperty("alphabeticalOrder"))
 		).put(
 			"dataSourceType", ddmFormField.getDataSourceType()
-		).put(
-			"defaultSearch",
-			GetterUtil.getBoolean(ddmFormField.getProperty("defaultSearch"))
 		).put(
 			"multiple", getMultiple(ddmFormField, ddmFormFieldRenderingContext)
 		).put(
@@ -108,7 +97,7 @@ public class SelectDDMFormFieldTemplateContextContributor
 			GetterUtil.getBoolean(
 				ddmFormField.getProperty("showEmptyOption"), true)
 		).put(
-			"strings", _getStrings(ddmFormFieldRenderingContext)
+			"strings", getStrings(ddmFormFieldRenderingContext)
 		).put(
 			"tooltip",
 			DDMFormFieldTypeUtil.getPropertyValue(
@@ -145,40 +134,6 @@ public class SelectDDMFormFieldTemplateContextContributor
 		DDMFormField ddmFormField, DDMFormFieldOptions ddmFormFieldOptions,
 		Locale locale,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
-
-		DDMFormInstance ddmFormInstance =
-			_ddmFormInstanceLocalService.fetchDDMFormInstance(
-				ddmFormFieldRenderingContext.getDDMFormInstanceId());
-
-		ObjectDefinition objectDefinition = null;
-
-		try {
-			if (ddmFormInstance != null) {
-				objectDefinition =
-					_objectDefinitionLocalService.fetchObjectDefinition(
-						ddmFormInstance.getObjectDefinitionId());
-			}
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		String objectFieldName = GetterUtil.getString(
-			ddmFormField.getProperty("objectFieldName"));
-
-		if ((objectDefinition != null) &&
-			Validator.isNotNull(objectFieldName)) {
-
-			List<Map<String, String>> options = _getOptionsFromObjectField(
-				ddmFormFieldOptions, objectDefinition.getObjectDefinitionId(),
-				objectFieldName);
-
-			if (ListUtil.isNotEmpty(options)) {
-				return options;
-			}
-		}
 
 		List<Map<String, String>> options = new ArrayList<>();
 
@@ -234,6 +189,32 @@ public class SelectDDMFormFieldTemplateContextContributor
 			resourceBundle, portalResourceBundle);
 	}
 
+	protected Map<String, String> getStrings(
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
+
+		Locale displayLocale = LocaleThreadLocal.getThemeDisplayLocale();
+
+		if (displayLocale == null) {
+			displayLocale = ddmFormFieldRenderingContext.getLocale();
+		}
+
+		ResourceBundle resourceBundle = getResourceBundle(displayLocale);
+
+		return HashMapBuilder.put(
+			"chooseAnOption",
+			LanguageUtil.get(resourceBundle, "choose-an-option")
+		).put(
+			"chooseOptions", LanguageUtil.get(resourceBundle, "choose-options")
+		).put(
+			"dynamicallyLoadedData",
+			LanguageUtil.get(resourceBundle, "dynamically-loaded-data")
+		).put(
+			"emptyList", LanguageUtil.get(resourceBundle, "empty-list")
+		).put(
+			"search", LanguageUtil.get(resourceBundle, "search")
+		).build();
+	}
+
 	protected List<String> getValue(String valueString) {
 		JSONArray jsonArray = null;
 
@@ -242,7 +223,7 @@ public class SelectDDMFormFieldTemplateContextContributor
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
+				_log.debug(jsonException, jsonException);
 			}
 
 			return ListUtil.fromString(valueString);
@@ -266,92 +247,7 @@ public class SelectDDMFormFieldTemplateContextContributor
 	@Reference
 	protected Portal portal;
 
-	private List<Map<String, String>> _getOptionsFromObjectField(
-		DDMFormFieldOptions ddmFormFieldOptions, long objectDefinitionId,
-		String objectFieldName) {
-
-		ObjectField objectField = _objectFieldLocalService.fetchObjectField(
-			objectDefinitionId,
-			objectFieldName.replaceAll("\\[|\\]|\"", StringPool.BLANK));
-
-		List<ListTypeEntry> listTypeEntries =
-			_listTypeEntryLocalService.getListTypeEntries(
-				objectField.getListTypeDefinitionId());
-
-		if (ListUtil.isEmpty(listTypeEntries)) {
-			return null;
-		}
-
-		List<Map<String, String>> options = new ArrayList<>();
-
-		for (ListTypeEntry listTypeEntry : listTypeEntries) {
-			Map<Locale, String> nameMap = listTypeEntry.getNameMap();
-
-			for (Map.Entry<Locale, String> entry : nameMap.entrySet()) {
-				if (!Objects.equals(
-						entry.getKey(),
-						LocaleThreadLocal.getThemeDisplayLocale())) {
-
-					continue;
-				}
-
-				options.add(
-					HashMapBuilder.put(
-						"label", entry.getValue()
-					).put(
-						"reference", listTypeEntry.getKey()
-					).put(
-						"value",
-						ddmFormFieldOptions.getOptionValue(
-							listTypeEntry.getKey())
-					).build());
-			}
-		}
-
-		return options;
-	}
-
-	private Map<String, String> _getStrings(
-		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
-
-		Locale displayLocale = LocaleThreadLocal.getThemeDisplayLocale();
-
-		if (displayLocale == null) {
-			displayLocale = ddmFormFieldRenderingContext.getLocale();
-		}
-
-		ResourceBundle resourceBundle = getResourceBundle(displayLocale);
-
-		return HashMapBuilder.put(
-			"chooseAnOption", _language.get(resourceBundle, "choose-an-option")
-		).put(
-			"chooseOptions", _language.get(resourceBundle, "choose-options")
-		).put(
-			"dynamicallyLoadedData",
-			_language.get(resourceBundle, "dynamically-loaded-data")
-		).put(
-			"emptyList", _language.get(resourceBundle, "empty-list")
-		).put(
-			"search", _language.get(resourceBundle, "search")
-		).build();
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		SelectDDMFormFieldTemplateContextContributor.class);
-
-	@Reference
-	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private ListTypeEntryLocalService _listTypeEntryLocalService;
-
-	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@Reference
-	private ObjectFieldLocalService _objectFieldLocalService;
 
 }

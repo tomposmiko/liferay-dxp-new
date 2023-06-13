@@ -21,19 +21,16 @@ import React, {useRef, useState} from 'react';
 
 let nextInputId = 0;
 
-export default function SearchForm({className, label, onChange}) {
+export default function SearchForm({className, onChange}) {
 	const id = `pageEditorSearchFormInput${nextInputId++}`;
-	const onChangeDebounceRef = useRef(
-		debounce((value) => onChange(value), 100)
-	);
+	const onChangeDebounce = useRef(debounce((value) => onChange(value), 100));
 	const [searchValue, setSearchValue] = useState('');
 
 	return (
 		<ClayForm.Group className={className} role="search">
 			<label className="sr-only" htmlFor={id}>
-				{label || Liferay.Language.get('search-form')}
+				{Liferay.Language.get('search-form')}
 			</label>
-
 			<ClayInput.Group>
 				<ClayInput.GroupItem>
 					<ClayInput
@@ -41,30 +38,25 @@ export default function SearchForm({className, label, onChange}) {
 						insetAfter
 						onChange={(event) => {
 							setSearchValue(event.target.value);
-							onChangeDebounceRef.current(event.target.value);
+							onChangeDebounce.current(event.target.value);
 						}}
 						placeholder={`${Liferay.Language.get('search')}...`}
 						sizing="sm"
-						spellCheck="false"
 						value={searchValue}
 					/>
-
 					<ClayInput.GroupInsetItem after tag="span">
 						{searchValue ? (
 							<ClayButtonWithIcon
-								aria-label={Liferay.Language.get(
-									'clear-search'
-								)}
 								borderless
 								displayType="secondary"
 								monospaced={false}
 								onClick={() => {
 									setSearchValue('');
-									onChangeDebounceRef.current('');
+									onChangeDebounce.current('');
 								}}
-								size="sm"
+								small
 								symbol={searchValue ? 'times' : 'search'}
-								title={Liferay.Language.get('clear-search')}
+								title={Liferay.Language.get('clear')}
 							/>
 						) : (
 							<ClayIcon

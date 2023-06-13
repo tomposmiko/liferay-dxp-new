@@ -32,7 +32,9 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -41,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.Address",
 	service = ModelPreFilterContributor.class
 )
@@ -53,7 +56,7 @@ public class AddressModelPreFilterContributor
 		SearchContext searchContext) {
 
 		_filterByClass(booleanFilter, searchContext);
-		_filterByListTypeId(booleanFilter, searchContext);
+		_filterByTypeId(booleanFilter, searchContext);
 	}
 
 	private void _filterByClass(
@@ -78,7 +81,7 @@ public class AddressModelPreFilterContributor
 		}
 	}
 
-	private void _filterByListTypeId(
+	private void _filterByTypeId(
 		BooleanFilter booleanFilter, SearchContext searchContext) {
 
 		LinkedHashMap<String, Object> params =
@@ -88,20 +91,19 @@ public class AddressModelPreFilterContributor
 			return;
 		}
 
-		long[] listTypeIds = (long[])params.getOrDefault(
-			"listTypeIds", new long[0]);
+		long[] typeIds = (long[])params.getOrDefault("typeIds", new long[0]);
 		String[] typeNames = (String[])params.get("typeNames");
 
 		if (ArrayUtil.isNotEmpty(typeNames)) {
-			listTypeIds = ArrayUtil.unique(
+			typeIds = ArrayUtil.unique(
 				ArrayUtil.append(
-					listTypeIds, _getTypeIds(searchContext, typeNames)));
+					typeIds, _getTypeIds(searchContext, typeNames)));
 		}
 
-		if (ArrayUtil.isNotEmpty(listTypeIds)) {
-			TermsFilter termsFilter = new TermsFilter("listTypeId");
+		if (ArrayUtil.isNotEmpty(typeIds)) {
+			TermsFilter termsFilter = new TermsFilter("typeId");
 
-			termsFilter.addValues(ArrayUtil.toStringArray(listTypeIds));
+			termsFilter.addValues(ArrayUtil.toStringArray(typeIds));
 
 			booleanFilter.add(termsFilter, BooleanClauseOccur.MUST);
 		}
@@ -124,32 +126,30 @@ public class AddressModelPreFilterContributor
 			return new long[0];
 		}
 
-		long[] typeIds = new long[typeNames.length];
+		Stream<String> typeNamesStream = Arrays.stream(typeNames);
 
-		for (int i = 0; i < typeNames.length; i++) {
-			String listTypeType =
-				className.getClassName() + ListTypeConstants.ADDRESS;
+		return typeNamesStream.mapToLong(
+			typeName -> {
+				String listTypeType =
+					className.getClassName() + ListTypeConstants.ADDRESS;
 
-			ListType listType = _listTypeLocalService.getListType(
-				typeNames[i], listTypeType);
+				ListType listType = _listTypeLocalService.getListType(
+					typeName, listTypeType);
 
-			if (listType == null) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						StringBundler.concat(
-							"No list type found for ", listTypeType,
-							" with the name ", typeNames[i]));
+				if (listType == null) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							StringBundler.concat(
+								"No list type found for ", listTypeType,
+								" with the name: ", typeName));
+					}
+
+					return -1;
 				}
 
-				typeIds[i] = -1;
-
-				continue;
+				return listType.getListTypeId();
 			}
-
-			typeIds[i] = listType.getListTypeId();
-		}
-
-		return typeIds;
+		).toArray();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

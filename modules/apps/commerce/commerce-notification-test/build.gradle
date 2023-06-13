@@ -1,5 +1,5 @@
 dependencies {
-	testIntegrationCompile project(":apps:account:account-api")
+	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
 	testIntegrationCompile project(":apps:commerce:commerce-account-api")
 	testIntegrationCompile project(":apps:commerce:commerce-account-test-util")
 	testIntegrationCompile project(":apps:commerce:commerce-api")

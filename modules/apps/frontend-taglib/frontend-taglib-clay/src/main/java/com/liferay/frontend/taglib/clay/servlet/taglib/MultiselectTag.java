@@ -186,7 +186,7 @@ public class MultiselectTag extends BaseContainerTag {
 
 	@Override
 	protected String getHydratedModuleName() {
-		return "{Multiselect} from frontend-taglib-clay";
+		return "frontend-taglib-clay/Multiselect";
 	}
 
 	@Override
@@ -247,7 +247,7 @@ public class MultiselectTag extends BaseContainerTag {
 		List<MultiselectItem> selectedMultiselectItems =
 			getSelectedMultiselectItems();
 
-		if (ListUtil.isNotEmpty(selectedMultiselectItems)) {
+		if (!ListUtil.isEmpty(selectedMultiselectItems)) {
 			MultiselectLocator multiselectLocator = getMultiselectLocator();
 
 			for (MultiselectItem selectedItem : selectedMultiselectItems) {

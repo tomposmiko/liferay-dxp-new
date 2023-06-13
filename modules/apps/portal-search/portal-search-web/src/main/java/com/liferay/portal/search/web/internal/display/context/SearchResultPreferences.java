@@ -14,12 +14,14 @@
 
 package com.liferay.portal.search.web.internal.display.context;
 
+import java.util.Optional;
+
 /**
  * @author André de Oliveira
  */
 public interface SearchResultPreferences {
 
-	public String getFieldsToDisplay();
+	public Optional<String> getFieldsToDisplayOptional();
 
 	public boolean isDisplayResultsInDocumentForm();
 

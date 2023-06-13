@@ -137,6 +137,7 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 			new UnsyncPrintWriter(
 				new File(
 					_HYPERSONIC_TEMP_DIR_NAME, _DATABASE_NAME + ".std.log")));
+
 		testServer.setDatabaseName(0, _DATABASE_NAME);
 		testServer.setDatabasePath(
 			0, _HYPERSONIC_TEMP_DIR_NAME + _DATABASE_NAME);
@@ -146,19 +147,6 @@ public class HypersonicServerClassTestRule extends ClassTestRule<Server> {
 		if (!startCountDownLatch.await(1, TimeUnit.MINUTES)) {
 			throw new IllegalStateException(
 				"Unable to start up Hypersonic " + _DATABASE_NAME);
-		}
-
-		try (Connection testServerConnection = JDBCDriver.getConnection(
-				_DATABASE_URL_BASE + _DATABASE_NAME,
-				new Properties() {
-					{
-						put("password", "");
-						put("user", "sa");
-					}
-				});
-			Statement statement = testServerConnection.createStatement()) {
-
-			statement.execute("SET WRITE_DELAY FALSE");
 		}
 
 		return testServer;

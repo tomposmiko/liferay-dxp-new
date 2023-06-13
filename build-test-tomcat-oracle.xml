@@ -4,20 +4,10 @@
 	<import file="build-test-tomcat.xml" />
 
 	<target name="run-selenium-tomcat-oracle">
-		<antcall target="record-test-generated-properties" />
-
-		<antcall inheritAll="false" target="start-docker-database-oracle">
-			<param name="skip.copy.optional.jars" value="true" />
-			<param name="skip.prepare.portal.ext.properties" value="true" />
-			<param name="skip.property.cleanup" value="true" />
-			<param name="skip.rebuild.database" value="true" />
-		</antcall>
+		<echo file="test.${user.name}.properties">database.type=oracle</echo>
 
 		<antcall inheritAll="false" target="run-selenium-tomcat">
-			<param name="test.jdbc.drivers.url" value="http://mirrors.lax.liferay.com/files.liferay.com/private/jdbc" />
 			<param name="test.class" value="${test.class}" />
 		</antcall>
-
-		<antcall inheritAll="false" target="clean-up-database-properties" />
 	</target>
 </project>

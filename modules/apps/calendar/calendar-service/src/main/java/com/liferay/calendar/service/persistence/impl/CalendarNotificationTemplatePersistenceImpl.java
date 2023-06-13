@@ -20,7 +20,6 @@ import com.liferay.calendar.model.CalendarNotificationTemplateTable;
 import com.liferay.calendar.model.impl.CalendarNotificationTemplateImpl;
 import com.liferay.calendar.model.impl.CalendarNotificationTemplateModelImpl;
 import com.liferay.calendar.service.persistence.CalendarNotificationTemplatePersistence;
-import com.liferay.calendar.service.persistence.CalendarNotificationTemplateUtil;
 import com.liferay.calendar.service.persistence.impl.constants.CalendarPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,11 +48,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -84,7 +83,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo Lundgren
  * @generated
  */
-@Component(service = CalendarNotificationTemplatePersistence.class)
+@Component(
+	service = {
+		CalendarNotificationTemplatePersistence.class, BasePersistence.class
+	}
+)
 public class CalendarNotificationTemplatePersistenceImpl
 	extends BasePersistenceImpl<CalendarNotificationTemplate>
 	implements CalendarNotificationTemplatePersistence {
@@ -206,7 +209,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<CalendarNotificationTemplate>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CalendarNotificationTemplate calendarNotificationTemplate :
@@ -611,7 +614,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -750,7 +753,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof CalendarNotificationTemplate) {
@@ -874,7 +877,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1048,7 +1051,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<CalendarNotificationTemplate>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CalendarNotificationTemplate calendarNotificationTemplate :
@@ -1480,7 +1483,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1648,7 +1651,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<CalendarNotificationTemplate>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CalendarNotificationTemplate calendarNotificationTemplate :
@@ -2031,7 +2034,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 			finderArgs = new Object[] {calendarId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2172,7 +2175,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_NT_NTT, finderArgs, this);
+				_finderPathFetchByC_NT_NTT, finderArgs);
 		}
 
 		if (result instanceof CalendarNotificationTemplate) {
@@ -2346,7 +2349,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 				calendarId, notificationType, notificationTemplateType
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2616,7 +2619,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 		calendarNotificationTemplate.setPrimaryKey(
 			calendarNotificationTemplateId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		calendarNotificationTemplate.setUuid(uuid);
 
@@ -2752,7 +2755,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 					calendarNotificationTemplate;
 
 		if (Validator.isNull(calendarNotificationTemplate.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			calendarNotificationTemplate.setUuid(uuid);
 		}
@@ -2887,7 +2890,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				CalendarNotificationTemplate.class, primaryKey)) {
+				CalendarNotificationTemplate.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3116,7 +3119,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<CalendarNotificationTemplate>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3195,7 +3198,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3422,34 +3425,12 @@ public class CalendarNotificationTemplatePersistenceImpl
 				"calendarId", "notificationType", "notificationTemplateType"
 			},
 			false);
-
-		_setCalendarNotificationTemplateUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCalendarNotificationTemplateUtilPersistence(null);
-
 		entityCache.removeCache(
 			CalendarNotificationTemplateImpl.class.getName());
-	}
-
-	private void _setCalendarNotificationTemplateUtilPersistence(
-		CalendarNotificationTemplatePersistence
-			calendarNotificationTemplatePersistence) {
-
-		try {
-			Field field =
-				CalendarNotificationTemplateUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, calendarNotificationTemplatePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3520,6 +3501,7 @@ public class CalendarNotificationTemplatePersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private CalendarNotificationTemplateModelArgumentsResolver
+		_calendarNotificationTemplateModelArgumentsResolver;
 
 }

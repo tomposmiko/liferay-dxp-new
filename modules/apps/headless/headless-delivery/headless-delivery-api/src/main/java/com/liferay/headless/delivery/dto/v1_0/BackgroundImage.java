@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -181,18 +179,7 @@ public class BackgroundImage implements Serializable {
 
 			sb.append("\"description\": ");
 
-			if (description instanceof Map) {
-				sb.append(
-					JSONFactoryUtil.createJSONObject((Map<?, ?>)description));
-			}
-			else if (description instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)description));
-				sb.append("\"");
-			}
-			else {
-				sb.append(description);
-			}
+			sb.append(String.valueOf(description));
 		}
 
 		if (title != null) {
@@ -202,17 +189,7 @@ public class BackgroundImage implements Serializable {
 
 			sb.append("\"title\": ");
 
-			if (title instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)title));
-			}
-			else if (title instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)title));
-				sb.append("\"");
-			}
-			else {
-				sb.append(title);
-			}
+			sb.append(String.valueOf(title));
 		}
 
 		if (url != null) {
@@ -222,17 +199,7 @@ public class BackgroundImage implements Serializable {
 
 			sb.append("\"url\": ");
 
-			if (url instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)url));
-			}
-			else if (url instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)url));
-				sb.append("\"");
-			}
-			else {
-				sb.append(url);
-			}
+			sb.append(String.valueOf(url));
 		}
 
 		sb.append("}");
@@ -248,9 +215,9 @@ public class BackgroundImage implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -276,7 +243,7 @@ public class BackgroundImage implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -308,7 +275,7 @@ public class BackgroundImage implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -324,10 +291,5 @@ public class BackgroundImage implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

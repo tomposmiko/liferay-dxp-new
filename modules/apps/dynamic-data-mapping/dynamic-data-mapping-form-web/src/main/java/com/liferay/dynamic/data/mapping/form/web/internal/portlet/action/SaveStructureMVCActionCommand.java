@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
 import com.liferay.dynamic.data.mapping.exception.StructureLayoutException;
 import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormContextDeserializer;
 import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormContextDeserializerRequest;
-import com.liferay.dynamic.data.mapping.form.web.internal.portlet.action.helper.SaveFormInstanceMVCCommandHelper;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
@@ -58,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
 		"mvc.command.name=/dynamic_data_mapping_form/save_structure"
@@ -88,7 +88,7 @@ public class SaveStructureMVCActionCommand extends BaseMVCActionCommand {
 		Map<Locale, String> nameMap =
 			saveFormInstanceMVCCommandHelper.getNameMap(
 				ddmForm, name, "untitled-element-set");
-		Map<Locale, String> descriptionMap = _getLocalizedMap(
+		Map<Locale, String> descriptionMap = getLocalizedMap(
 			description, ddmForm.getAvailableLocales(),
 			ddmForm.getDefaultLocale());
 
@@ -122,6 +122,7 @@ public class SaveStructureMVCActionCommand extends BaseMVCActionCommand {
 
 		portletURL.setParameter(
 			"structureId", String.valueOf(ddmStructure.getStructureId()));
+
 		portletURL.setParameter("redirect", redirect);
 
 		actionRequest.setAttribute(WebKeys.REDIRECT, portletURL.toString());
@@ -157,27 +158,9 @@ public class SaveStructureMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	@Reference(
-		target = "(dynamic.data.mapping.form.builder.context.deserializer.type=form)"
-	)
-	protected DDMFormContextDeserializer<DDMForm>
-		ddlFormBuilderContextToDDMForm;
-
-	@Reference(
-		target = "(dynamic.data.mapping.form.builder.context.deserializer.type=formLayout)"
-	)
-	protected DDMFormContextDeserializer<DDMFormLayout>
-		ddlFormBuilderContextToDDMFormLayout;
-
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	@Reference
-	protected SaveFormInstanceMVCCommandHelper saveFormInstanceMVCCommandHelper;
-
-	private Map<Locale, String> _getLocalizedMap(
+	protected Map<Locale, String> getLocalizedMap(
 			String value, Set<Locale> availableLocales, Locale defaultLocale)
-		throws Exception {
+		throws PortalException {
 
 		Map<Locale, String> localizedMap = new HashMap<>();
 
@@ -195,6 +178,24 @@ public class SaveStructureMVCActionCommand extends BaseMVCActionCommand {
 
 		return localizedMap;
 	}
+
+	@Reference(
+		target = "(dynamic.data.mapping.form.builder.context.deserializer.type=form)"
+	)
+	protected DDMFormContextDeserializer<DDMForm>
+		ddlFormBuilderContextToDDMForm;
+
+	@Reference(
+		target = "(dynamic.data.mapping.form.builder.context.deserializer.type=formLayout)"
+	)
+	protected DDMFormContextDeserializer<DDMFormLayout>
+		ddlFormBuilderContextToDDMFormLayout;
+
+	@Reference
+	protected JSONFactory jsonFactory;
+
+	@Reference
+	protected SaveFormInstanceMVCCommandHelper saveFormInstanceMVCCommandHelper;
 
 	@Reference
 	private DDMStructureService _ddmStructureService;

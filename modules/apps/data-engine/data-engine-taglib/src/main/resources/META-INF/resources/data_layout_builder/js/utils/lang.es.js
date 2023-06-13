@@ -12,7 +12,7 @@
  * details.
  */
 
-export function getLocalizedValue(defaultLanguageId, localizedValues) {
+export const getLocalizedValue = (defaultLanguageId, localizedValues) => {
 	const languageId = themeDisplay.getLanguageId();
 
 	if (localizedValues[languageId]) {
@@ -20,7 +20,7 @@ export function getLocalizedValue(defaultLanguageId, localizedValues) {
 	}
 
 	return localizedValues[defaultLanguageId];
-}
+};
 
 const replaceString = (langKey, args) => {
 	const SPLIT_REGEX = /({\d+})/g;
@@ -46,22 +46,18 @@ const replaceString = (langKey, args) => {
 	return keyArray;
 };
 
-export function sub(langKey, args) {
-	return replaceString(langKey, args).join('');
-}
+export const sub = (langKey, args) => replaceString(langKey, args).join('');
 
-export function subComp(langKey, args) {
-	return replaceString(langKey, args);
-}
+export const subComp = (langKey, args) => replaceString(langKey, args);
 
-export function getPluralMessage(
+export const getPluralMessage = (
 	singular,
 	plural,
 	count = 0,
 	toString,
 	subArray
-) {
+) => {
 	const message = count > 1 ? plural : singular;
 
 	return sub(message, subArray || [count.toLocaleString()], toString);
-}
+};

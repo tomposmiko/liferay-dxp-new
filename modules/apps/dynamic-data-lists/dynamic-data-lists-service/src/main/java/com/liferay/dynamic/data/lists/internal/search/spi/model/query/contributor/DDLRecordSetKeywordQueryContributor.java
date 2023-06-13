@@ -17,7 +17,7 @@ package com.liferay.dynamic.data.lists.internal.search.spi.model.query.contribut
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.query.QueryHelper;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcela Cunha
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet",
 	service = KeywordQueryContributor.class
 )
@@ -41,16 +42,13 @@ public class DDLRecordSetKeywordQueryContributor
 		String keywords, BooleanQuery booleanQuery,
 		KeywordQueryContributorHelper keywordQueryContributorHelper) {
 
-		_addSearchLocalizedTerm(
+		addSearchLocalizedTerm(
 			booleanQuery, keywordQueryContributorHelper, Field.DESCRIPTION);
-		_addSearchLocalizedTerm(
+		addSearchLocalizedTerm(
 			booleanQuery, keywordQueryContributorHelper, Field.NAME);
 	}
 
-	@Reference
-	protected QueryHelper queryHelper;
-
-	private void _addSearchLocalizedTerm(
+	protected void addSearchLocalizedTerm(
 		BooleanQuery booleanQuery,
 		KeywordQueryContributorHelper keywordQueryContributorHelper,
 		String fieldName) {
@@ -63,7 +61,7 @@ public class DDLRecordSetKeywordQueryContributor
 		}
 
 		searchContext.setAttribute(
-			_localization.getLocalizedName(
+			LocalizationUtil.getLocalizedName(
 				fieldName, searchContext.getLanguageId()),
 			searchContext.getAttribute(fieldName));
 
@@ -73,6 +71,6 @@ public class DDLRecordSetKeywordQueryContributor
 	}
 
 	@Reference
-	private Localization _localization;
+	protected QueryHelper queryHelper;
 
 }

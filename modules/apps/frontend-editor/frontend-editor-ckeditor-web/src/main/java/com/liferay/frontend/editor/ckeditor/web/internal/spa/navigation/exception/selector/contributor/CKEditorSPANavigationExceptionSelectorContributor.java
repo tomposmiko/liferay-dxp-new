@@ -20,6 +20,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Chema Balsas
  */
 @Component(
+	immediate = true,
 	property = "javascript.single.page.application.navigation.exception.selector=:not([data-cke-saved-href])",
 	service = Object.class
 )

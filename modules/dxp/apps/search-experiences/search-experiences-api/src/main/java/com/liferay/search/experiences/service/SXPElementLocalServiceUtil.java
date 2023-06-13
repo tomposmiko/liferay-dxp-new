@@ -46,18 +46,15 @@ public class SXPElementLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.search.experiences.service.impl.SXPElementLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static SXPElement addSXPElement(
-			String externalReferenceCode, long userId,
-			Map<java.util.Locale, String> descriptionMap,
+			long userId, Map<java.util.Locale, String> descriptionMap,
 			String elementDefinitionJSON, boolean readOnly,
-			String schemaVersion, Map<java.util.Locale, String> titleMap,
-			int type,
+			Map<java.util.Locale, String> titleMap, int type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addSXPElement(
-			externalReferenceCode, userId, descriptionMap,
-			elementDefinitionJSON, readOnly, schemaVersion, titleMap, type,
-			serviceContext);
+			userId, descriptionMap, elementDefinitionJSON, readOnly, titleMap,
+			type, serviceContext);
 	}
 
 	/**
@@ -92,12 +89,6 @@ public class SXPElementLocalServiceUtil {
 	 */
 	public static SXPElement createSXPElement(long sxpElementId) {
 		return getService().createSXPElement(sxpElementId);
-	}
-
-	public static void deleteCompanySXPElements(long companyId)
-		throws PortalException {
-
-		getService().deleteCompanySXPElements(companyId);
 	}
 
 	/**
@@ -233,13 +224,6 @@ public class SXPElementLocalServiceUtil {
 		return getService().fetchSXPElement(sxpElementId);
 	}
 
-	public static SXPElement fetchSXPElementByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
-
-		return getService().fetchSXPElementByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -305,14 +289,6 @@ public class SXPElementLocalServiceUtil {
 		return getService().getSXPElement(sxpElementId);
 	}
 
-	public static SXPElement getSXPElementByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getSXPElementByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -343,12 +319,6 @@ public class SXPElementLocalServiceUtil {
 		return getService().getSXPElements(start, end);
 	}
 
-	public static List<SXPElement> getSXPElements(
-		long companyId, boolean readOnly) {
-
-		return getService().getSXPElements(companyId, readOnly);
-	}
-
 	/**
 	 * Returns the number of sxp elements.
 	 *
@@ -368,14 +338,14 @@ public class SXPElementLocalServiceUtil {
 	public static SXPElement updateSXPElement(
 			long userId, long sxpElementId,
 			Map<java.util.Locale, String> descriptionMap,
-			String elementDefinitionJSON, boolean hidden, String schemaVersion,
+			String elementDefinitionJSON, boolean hidden,
 			Map<java.util.Locale, String> titleMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateSXPElement(
 			userId, sxpElementId, descriptionMap, elementDefinitionJSON, hidden,
-			schemaVersion, titleMap, serviceContext);
+			titleMap, serviceContext);
 	}
 
 	/**

@@ -14,10 +14,11 @@
 
 package com.liferay.frontend.taglib.servlet.taglib;
 
-import com.liferay.diff.DiffVersion;
-import com.liferay.diff.DiffVersionsInfo;
 import com.liferay.frontend.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.diff.DiffVersion;
+import com.liferay.portal.kernel.diff.DiffVersionsInfo;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -28,7 +29,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -59,7 +59,13 @@ public class DiffVersionComparatorTag extends IncludeTag {
 			DiffVersion diffVersion, PortletURL sourceURL, PortletURL targetURL)
 		throws PortalException {
 
+		Date modifiedDate = diffVersion.getModifiedDate();
+
 		HttpServletRequest httpServletRequest = getRequest();
+
+		String timeDescription = LanguageUtil.getTimeDescription(
+			httpServletRequest,
+			System.currentTimeMillis() - modifiedDate.getTime(), true);
 
 		String diffVersionString = String.valueOf(diffVersion.getVersion());
 
@@ -75,17 +81,8 @@ public class DiffVersionComparatorTag extends IncludeTag {
 
 		return JSONUtil.put(
 			"displayDate",
-			() -> {
-				Date modifiedDate = diffVersion.getModifiedDate();
-
-				return LanguageUtil.format(
-					httpServletRequest, "x-ago",
-					LanguageUtil.getTimeDescription(
-						httpServletRequest,
-						System.currentTimeMillis() - modifiedDate.getTime(),
-						true),
-					false);
-			}
+			LanguageUtil.format(
+				httpServletRequest, "x-ago", timeDescription, false)
 		).put(
 			"inRange",
 			(diffVersion.getVersion() > _sourceVersion) &&
@@ -284,7 +281,7 @@ public class DiffVersionComparatorTag extends IncludeTag {
 		}
 		catch (PortalException | PortletException exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

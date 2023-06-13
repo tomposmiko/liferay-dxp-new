@@ -33,15 +33,17 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.test.util.SearchStreamUtil;
 
 import java.io.Serializable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Igor Fabiano Nazar
@@ -113,16 +115,18 @@ public class OrganizationFixture {
 	}
 
 	public List<String> getCountryNames(Organization organization) {
-		Set<String> countryNames = new HashSet<>();
-
 		Country country = _countryService.fetchCountry(
 			organization.getCountryId());
 
-		for (Locale locale : _language.getAvailableLocales()) {
-			countryNames.add(StringUtil.toLowerCase(country.getName(locale)));
-		}
+		Stream<Locale> stream = SearchStreamUtil.stream(
+			_language.getAvailableLocales());
 
-		return new ArrayList<>(countryNames);
+		return stream.map(
+			locale -> StringUtil.toLowerCase(country.getName(locale))
+		).distinct(
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public List<Organization> getOrganizations() {
@@ -151,15 +155,16 @@ public class OrganizationFixture {
 	}
 
 	private Region _getRegion(String regionName, Country country) {
-		for (Region region :
-				_regionService.getRegions(country.getCountryId())) {
+		List<Region> regions = _regionService.getRegions(
+			country.getCountryId());
 
-			if (StringUtil.equalsIgnoreCase(regionName, region.getName())) {
-				return region;
-			}
-		}
+		Stream<Region> stream = regions.stream();
 
-		return null;
+		Optional<Region> regionOptional = stream.filter(
+			line -> StringUtil.equalsIgnoreCase(regionName, line.getName())
+		).findFirst();
+
+		return regionOptional.get();
 	}
 
 	private final CountryService _countryService;

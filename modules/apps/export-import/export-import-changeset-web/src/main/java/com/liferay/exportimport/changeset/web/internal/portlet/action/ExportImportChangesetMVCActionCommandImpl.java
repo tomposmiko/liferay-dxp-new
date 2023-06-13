@@ -31,12 +31,12 @@ import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalSer
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.StagingURLHelper;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.service.http.LayoutServiceHttp;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.Map;
@@ -69,6 +70,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Akos Thurzo
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ChangesetPortletKeys.CHANGESET,
 		"mvc.command.name=/export_import_changeset/export_import_changeset"
@@ -126,6 +128,29 @@ public class ExportImportChangesetMVCActionCommandImpl
 				new ExportImportEntityException(
 					ExportImportEntityException.TYPE_INVALID_COMMAND));
 		}
+	}
+
+	protected void sendRedirect(
+			ActionRequest actionRequest, ActionResponse actionResponse,
+			long backgroundTaskId)
+		throws IOException {
+
+		actionRequest.setAttribute(
+			WebKeys.REDIRECT,
+			PortletURLBuilder.createRenderURL(
+				_portal.getLiferayPortletResponse(actionResponse),
+				ExportImportPortletKeys.EXPORT_IMPORT
+			).setMVCPath(
+				"/view_export_import.jsp"
+			).setBackURL(
+				actionRequest.getParameter("backURL")
+			).setParameter(
+				"backgroundTaskId", backgroundTaskId
+			).buildString());
+
+		hideDefaultSuccessMessage(actionRequest);
+
+		sendRedirect(actionRequest, actionResponse);
 	}
 
 	private void _processExportAndPublishAction(
@@ -287,30 +312,7 @@ public class ExportImportChangesetMVCActionCommandImpl
 				themeDisplay.getUserId(), exportImportConfiguration);
 		}
 
-		_sendRedirect(actionRequest, actionResponse, backgroundTaskId);
-	}
-
-	private void _sendRedirect(
-			ActionRequest actionRequest, ActionResponse actionResponse,
-			long backgroundTaskId)
-		throws Exception {
-
-		actionRequest.setAttribute(
-			WebKeys.REDIRECT,
-			PortletURLBuilder.createRenderURL(
-				_portal.getLiferayPortletResponse(actionResponse),
-				ExportImportPortletKeys.EXPORT_IMPORT
-			).setMVCPath(
-				"/view_export_import.jsp"
-			).setBackURL(
-				actionRequest.getParameter("backURL")
-			).setParameter(
-				"backgroundTaskId", backgroundTaskId
-			).buildString());
-
-		hideDefaultSuccessMessage(actionRequest);
-
-		sendRedirect(actionRequest, actionResponse);
+		sendRedirect(actionRequest, actionResponse, backgroundTaskId);
 	}
 
 	@Reference

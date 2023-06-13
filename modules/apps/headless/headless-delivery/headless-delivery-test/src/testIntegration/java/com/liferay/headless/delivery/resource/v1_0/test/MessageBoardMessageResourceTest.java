@@ -16,8 +16,6 @@ package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardMessage;
-import com.liferay.headless.delivery.client.pagination.Page;
-import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBMessageLocalServiceUtil;
@@ -30,10 +28,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,86 +47,6 @@ public class MessageBoardMessageResourceTest
 		ServiceContext serviceContext = new ServiceContext();
 
 		serviceContext.setScopeGroupId(testGroup.getGroupId());
-	}
-
-	@Override
-	@Test
-	public void testDeleteMessageBoardMessageMyRating() throws Exception {
-		super.testDeleteMessageBoardMessageMyRating();
-
-		MessageBoardMessage messageBoardMessage =
-			testDeleteMessageBoardMessageMyRating_addMessageBoardMessage();
-
-		assertHttpResponseStatusCode(
-			204,
-			messageBoardMessageResource.
-				deleteMessageBoardMessageMyRatingHttpResponse(
-					messageBoardMessage.getId()));
-		assertHttpResponseStatusCode(
-			404,
-			messageBoardMessageResource.
-				deleteMessageBoardMessageMyRatingHttpResponse(
-					messageBoardMessage.getId()));
-
-		MessageBoardMessage irrelevantMessageBoardMessage =
-			randomIrrelevantMessageBoardMessage();
-
-		assertHttpResponseStatusCode(
-			404,
-			messageBoardMessageResource.
-				deleteMessageBoardMessageMyRatingHttpResponse(
-					irrelevantMessageBoardMessage.getId()));
-	}
-
-	@Override
-	@Test
-	public void testGetMessageBoardMessageMessageBoardMessagesPage()
-		throws Exception {
-
-		super.testGetMessageBoardMessageMessageBoardMessagesPage();
-
-		// Message board messages in a tree hierarchy
-
-		Long parentMessageBoardMessageId =
-			testGetMessageBoardMessageMessageBoardMessagesPage_getParentMessageBoardMessageId();
-
-		MessageBoardMessage messageBoardMessage1 =
-			testGetMessageBoardMessageMessageBoardMessagesPage_addMessageBoardMessage(
-				parentMessageBoardMessageId, randomMessageBoardMessage());
-
-		MessageBoardMessage messageBoardMessage2 =
-			testGetMessageBoardMessageMessageBoardMessagesPage_addMessageBoardMessage(
-				messageBoardMessage1.getId(), randomMessageBoardMessage());
-
-		Boolean flatten = false;
-
-		Page<MessageBoardMessage> page =
-			messageBoardMessageResource.
-				getMessageBoardMessageMessageBoardMessagesPage(
-					parentMessageBoardMessageId, flatten, null, null, null,
-					Pagination.of(1, 10), null);
-
-		Assert.assertEquals(1, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(messageBoardMessage1),
-			(List<MessageBoardMessage>)page.getItems());
-		assertValid(page);
-
-		flatten = true;
-
-		page =
-			messageBoardMessageResource.
-				getMessageBoardMessageMessageBoardMessagesPage(
-					parentMessageBoardMessageId, flatten, null, null, null,
-					Pagination.of(1, 10), null);
-
-		Assert.assertEquals(2, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(messageBoardMessage1, messageBoardMessage2),
-			(List<MessageBoardMessage>)page.getItems());
-		assertValid(page);
 	}
 
 	@Test
@@ -167,10 +81,8 @@ public class MessageBoardMessageResourceTest
 	@Override
 	protected String[] getIgnoredEntityFieldNames() {
 		return new String[] {
-			"childMessagesCount", "creatorId", "dateCreated", "dateModified",
-			"lastPostDate", "messageBoardSectionId", "messageBoardThreadId",
-			"modified", "parentMessageBoardMessageId", "ratingsStatTotalScore",
-			"ratingValue", "viewCount"
+			"creatorId", "messageBoardSectionId", "messageBoardThreadId",
+			"parentMessageBoardMessageId", "ratingValue"
 		};
 	}
 
@@ -197,12 +109,7 @@ public class MessageBoardMessageResourceTest
 			testDeleteMessageBoardMessageMyRating_addMessageBoardMessage()
 		throws Exception {
 
-		MessageBoardMessage messageBoardMessage = _addMessageBoardMessage();
-
-		messageBoardMessageResource.putMessageBoardMessageMyRating(
-			messageBoardMessage.getId(), randomRating());
-
-		return messageBoardMessage;
+		return _addMessageBoardMessage();
 	}
 
 	@Override
@@ -311,7 +218,7 @@ public class MessageBoardMessageResourceTest
 
 	@Override
 	protected MessageBoardMessage
-			testPutMessageBoardMessagePermissionsPage_addMessageBoardMessage()
+			testPutMessageBoardMessagePermission_addMessageBoardMessage()
 		throws Exception {
 
 		return _addMessageBoardMessage();
@@ -358,7 +265,7 @@ public class MessageBoardMessageResourceTest
 
 	@Override
 	protected MessageBoardMessage
-			testPutSiteMessageBoardMessagePermissionsPage_addMessageBoardMessage()
+			testPutSiteMessageBoardMessagePermission_addMessageBoardMessage()
 		throws Exception {
 
 		return _addMessageBoardMessage();
@@ -369,7 +276,7 @@ public class MessageBoardMessageResourceTest
 
 		MBMessage mbMessage = MBTestUtil.addMessage(
 			siteId,
-			UserLocalServiceUtil.getGuestUserId(testGroup.getCompanyId()),
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
 			subject, body);
 
 		_mbThread = mbMessage.getThread();

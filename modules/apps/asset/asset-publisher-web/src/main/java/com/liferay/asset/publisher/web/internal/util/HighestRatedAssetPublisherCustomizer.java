@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	configurationPid = "com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration",
-	service = AssetPublisherCustomizer.class
+	immediate = true, service = AssetPublisherCustomizer.class
 )
 public class HighestRatedAssetPublisherCustomizer
 	extends DefaultAssetPublisherCustomizer {

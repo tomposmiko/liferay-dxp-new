@@ -21,11 +21,11 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Igor Beslic
@@ -69,17 +69,6 @@ public class BatchPlannerMappingServiceImpl
 	}
 
 	@Override
-	public void deleteBatchPlannerMappings(long batchPlannerPlanId)
-		throws PortalException {
-
-		_batchPlannerPlanModelResourcePermission.check(
-			getPermissionChecker(), batchPlannerPlanId, ActionKeys.UPDATE);
-
-		batchPlannerMappingLocalService.deleteBatchPlannerMappings(
-			batchPlannerPlanId);
-	}
-
-	@Override
 	public List<BatchPlannerMapping> getBatchPlannerMappings(
 			long batchPlannerPlanId)
 		throws PortalException {
@@ -110,10 +99,11 @@ public class BatchPlannerMappingServiceImpl
 			script);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.batch.planner.model.BatchPlannerPlan)"
-	)
-	private ModelResourcePermission<BatchPlannerPlan>
-		_batchPlannerPlanModelResourcePermission;
+	private static volatile ModelResourcePermission<BatchPlannerPlan>
+		_batchPlannerPlanModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				BatchPlannerPlanServiceImpl.class,
+				"_batchPlannerPlanModelResourcePermission",
+				BatchPlannerPlan.class);
 
 }

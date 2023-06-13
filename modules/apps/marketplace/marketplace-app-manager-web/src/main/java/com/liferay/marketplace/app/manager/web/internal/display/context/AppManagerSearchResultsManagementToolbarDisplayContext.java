@@ -17,13 +17,15 @@ package com.liferay.marketplace.app.manager.web.internal.display.context;
 import com.liferay.marketplace.app.manager.web.internal.util.BundleManagerUtil;
 import com.liferay.marketplace.app.manager.web.internal.util.MarketplaceAppManagerSearchUtil;
 import com.liferay.marketplace.app.manager.web.internal.util.comparator.MarketplaceAppManagerComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -54,10 +56,6 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 			liferayPortletResponse
 		).setMVCPath(
 			"/view_search_results.jsp"
-		).setRedirect(
-			ParamUtil.getString(
-				httpServletRequest, "redirect",
-				String.valueOf(liferayPortletResponse.createRenderURL()))
 		).setKeywords(
 			() -> {
 				if (Validator.isNotNull(getKeywords())) {
@@ -73,6 +71,12 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 		).setParameter(
 			"state", getState()
 		).buildPortletURL();
+
+		String redirect = ParamUtil.getString(
+			httpServletRequest, "redirect",
+			String.valueOf(liferayPortletResponse.createRenderURL()));
+
+		portletURL.setParameter("redirect", redirect);
 
 		if (_searchContainer != null) {
 			portletURL.setParameter(
@@ -98,12 +102,24 @@ public class AppManagerSearchResultsManagementToolbarDisplayContext
 
 		searchContainer.setOrderByCol(getOrderByCol());
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			ListUtil.sort(
-				MarketplaceAppManagerSearchUtil.getResults(
-					BundleManagerUtil.getBundles(), getKeywords(),
-					httpServletRequest.getLocale()),
-				new MarketplaceAppManagerComparator(getOrderByType())));
+
+		List<Object> results = MarketplaceAppManagerSearchUtil.getResults(
+			BundleManagerUtil.getBundles(), getKeywords(),
+			httpServletRequest.getLocale());
+
+		results = ListUtil.sort(
+			results, new MarketplaceAppManagerComparator(getOrderByType()));
+
+		int end = searchContainer.getEnd();
+
+		if (end > results.size()) {
+			end = results.size();
+		}
+
+		searchContainer.setResults(
+			results.subList(searchContainer.getStart(), end));
+
+		searchContainer.setTotal(results.size());
 
 		_searchContainer = searchContainer;
 

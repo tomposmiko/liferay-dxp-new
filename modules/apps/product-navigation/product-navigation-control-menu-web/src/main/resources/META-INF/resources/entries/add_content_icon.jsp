@@ -21,20 +21,20 @@ String portletNamespace = PortalUtil.getPortletNamespace(ProductNavigationContro
 %>
 
 <li class="control-menu-nav-item">
-	<clay:button
-		aria-label='<%= LanguageUtil.get(request, "add") %>'
-		cssClass="lfr-portal-tooltip product-menu-toggle sidenav-toggler"
+	<a
+		aria-label="<%= LanguageUtil.get(request, "add") %>"
+		class="control-menu-icon lfr-portal-tooltip product-menu-toggle sidenav-toggler"
 		data-content="body"
 		data-open-class="open-admin-panel"
 		data-qa-id="add"
-		data-target='<%= "#" + portletNamespace + "addPanelId" %>'
-		data-title='<%= LanguageUtil.get(request, "add") %>'
+		data-target="#<%= portletNamespace %>addPanelId"
+		data-title="<%= LanguageUtil.get(request, "add") %>"
 		data-toggle="liferay-sidenav"
 		data-type="fixed-push"
 		data-type-mobile="fixed"
-		data-url='<%=
+		data-url="<%=
 			PortletURLBuilder.create(
-				PortletURLFactoryUtil.create(request, ProductNavigationControlMenuPortletKeys.PRODUCT_NAVIGATION_CONTROL_MENU, PortletRequest.RESOURCE_PHASE)
+				PortletURLFactoryUtil.create(request, ProductNavigationControlMenuPortletKeys.PRODUCT_NAVIGATION_CONTROL_MENU, PortletRequest.RENDER_PHASE)
 			).setMVCPath(
 				"/add_panel.jsp"
 			).setParameter(
@@ -42,12 +42,12 @@ String portletNamespace = PortalUtil.getPortletNamespace(ProductNavigationContro
 			).setWindowState(
 				LiferayWindowState.EXCLUSIVE
 			).buildString()
-		%>'
-		displayType="unstyled"
-		icon="plus"
-		id='<%= portletNamespace + "addToggleId" %>'
-		small="<%= true %>"
-	/>
+		%>"
+		href="javascript:;"
+		id="<%= portletNamespace %>addToggleId"
+	>
+		<aui:icon cssClass="icon-monospaced" image="plus" markupView="lexicon" />
+	</a>
 </li>
 
 <%

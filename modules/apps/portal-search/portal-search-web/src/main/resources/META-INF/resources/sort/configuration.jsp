@@ -18,15 +18,13 @@
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/learn" prefix="liferay-learn" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
-taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
-taglib uri="http://liferay.com/tld/template" prefix="liferay-template" %><%@
-taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
+taglib uri="http://liferay.com/tld/template" prefix="liferay-template" %>
 
 <%@ page import="com.liferay.portal.kernel.json.JSONArray" %><%@
+page import="com.liferay.portal.kernel.json.JSONObject" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
-page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
+page import="com.liferay.portal.kernel.util.StringUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.sort.configuration.SortPortletInstanceConfiguration" %><%@
 page import="com.liferay.portal.search.web.internal.sort.display.context.SortDisplayContext" %><%@
@@ -59,54 +57,71 @@ JSONArray fieldsJSONArray = sortPortletPreferences.getFieldsJSONArray();
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 	<liferay-frontend:edit-form-body>
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			label="display-settings"
-		>
-			<div class="display-template">
-				<liferay-template:template-selector
-					className="<%= SortDisplayContext.class.getName() %>"
-					displayStyle="<%= sortPortletInstanceConfiguration.displayStyle() %>"
-					displayStyleGroupId="<%= sortDisplayContext.getDisplayStyleGroupId() %>"
-					refreshURL="<%= configurationRenderURL %>"
-					showEmptyOption="<%= true %>"
-				/>
-			</div>
-		</liferay-frontend:fieldset>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				label="display-settings"
+			>
+				<div class="display-template">
+					<liferay-template:template-selector
+						className="<%= SortDisplayContext.class.getName() %>"
+						displayStyle="<%= sortPortletInstanceConfiguration.displayStyle() %>"
+						displayStyleGroupId="<%= sortDisplayContext.getDisplayStyleGroupId() %>"
+						refreshURL="<%= configurationRenderURL %>"
+						showEmptyOption="<%= true %>"
+					/>
+				</div>
+			</liferay-frontend:fieldset>
 
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			label="advanced-configuration"
-		>
-			<p class="sheet-text">
-				<liferay-ui:message key="sort-advanced-configuration-description" />
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				id='<%= liferayPortletResponse.getNamespace() + "fieldsId" %>'
+				label="advanced-configuration"
+			>
 
-				<liferay-learn:message
-					key="sorting-search-results"
-					resource="portal-search-web"
-				/>
-			</p>
+				<%
+				int[] fieldsIndexes = new int[fieldsJSONArray.length()];
 
-			<div>
-				<span aria-hidden="true" class="loading-animation loading-animation-sm mt-4"></span>
+				for (int i = 0; i < fieldsJSONArray.length(); i++) {
+					fieldsIndexes[i] = i;
 
-				<react:component
-					module="js/components/SortConfigurationOptions"
-					props='<%=
-						HashMapBuilder.<String, Object>put(
-							"fieldsInputName", PortletPreferencesJspUtil.getInputName(SortPortletPreferences.PREFERENCE_KEY_FIELDS)
-						).put(
-							"fieldsJSONArray", fieldsJSONArray
-						).put(
-							"namespace", liferayPortletResponse.getNamespace()
-						).build()
-					%>'
-				/>
-			</div>
-		</liferay-frontend:fieldset>
+					JSONObject jsonObject = fieldsJSONArray.getJSONObject(i);
+				%>
+
+					<div class="field-form-row lfr-form-row lfr-form-row-inline">
+						<div class="row-fields">
+							<aui:input cssClass="label-input" label="label" name='<%= "label_" + i %>' value='<%= jsonObject.getString("label") %>' />
+
+							<aui:input cssClass="sort-field-input" label="field" name='<%= "field_" + i %>' value='<%= jsonObject.getString("field") %>' />
+						</div>
+					</div>
+
+				<%
+				}
+				%>
+
+				<aui:input cssClass="fields-input" name="<%= PortletPreferencesJspUtil.getInputName(SortPortletPreferences.PREFERENCE_KEY_FIELDS) %>" type="hidden" value="<%= sortPortletPreferences.getFieldsString() %>" />
+
+				<aui:input name="fieldsIndexes" type="hidden" value="<%= StringUtil.merge(fieldsIndexes) %>" />
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button cssClass="btn-lg" type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
+
+<aui:script use="liferay-auto-fields">
+	var autoFields = new Liferay.AutoFields({
+		contentBox: 'fieldset#<portlet:namespace />fieldsId',
+		fieldIndexes: '<portlet:namespace />fieldsIndexes',
+		namespace: '<portlet:namespace />',
+	}).render();
+</aui:script>
+
+<aui:script use="liferay-search-sort-configuration">
+	new Liferay.Search.SortConfiguration(A.one(document.<portlet:namespace />fm));
+</aui:script>

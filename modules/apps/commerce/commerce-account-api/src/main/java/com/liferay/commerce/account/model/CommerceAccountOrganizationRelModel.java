@@ -188,8 +188,4 @@ public interface CommerceAccountOrganizationRelModel
 	@Override
 	public CommerceAccountOrganizationRel cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

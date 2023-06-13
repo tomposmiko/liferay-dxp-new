@@ -15,14 +15,13 @@
  */
 package org.outerj.daisy.diff.helper;
 
-import org.apache.xerces.util.XML11Char;
+import org.apache.xalan.xsltc.runtime.Constants;
+import org.apache.xml.utils.XML11Char;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-
-import javax.xml.XMLConstants;
 
 class CleanBrokenAttributeQNamesHandler implements ContentHandler {
     private ContentHandler consumer;
@@ -85,7 +84,7 @@ class CleanBrokenAttributeQNamesHandler implements ContentHandler {
         AttributesImpl filtered = new AttributesImpl();
         for (int i = 0, l = atts.getLength(); i < l; i++) {
             String localName = atts.getLocalName(i);
-            if (XML11Char.isXML11ValidNCName(localName) && !localName.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
+            if (XML11Char.isXML11ValidNCName(localName) && !localName.equals(Constants.XMLNS_PREFIX)) {
                 filtered.addAttribute(atts.getURI(i), localName, atts.getQName(i), atts.getType(i), atts.getValue(i));
             }
         }

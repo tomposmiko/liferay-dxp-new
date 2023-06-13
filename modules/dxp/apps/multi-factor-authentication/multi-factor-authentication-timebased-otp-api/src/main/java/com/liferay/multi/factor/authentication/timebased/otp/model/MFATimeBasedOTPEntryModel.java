@@ -277,8 +277,4 @@ public interface MFATimeBasedOTPEntryModel
 	@Override
 	public MFATimeBasedOTPEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

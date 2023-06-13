@@ -47,20 +47,18 @@ public class JSONLBatchEngineTaskProgressImplTest
 		StringBundler sb = new StringBundler();
 
 		for (int i = 0; i < expectedTotalItemsCount; i++) {
-			sb.append(productJSONObject.toString());
+			sb.append(productJSON);
 
 			if (i < (PRODUCTS_COUNT - 1)) {
 				sb.append(StringPool.NEW_LINE);
 			}
 		}
 
-		String content = sb.toString();
-
 		Assert.assertEquals(
 			expectedTotalItemsCount,
 			_batchEngineTaskProgress.getTotalItemsCount(
 				compress(
-					content.getBytes(),
+					sb.toString(),
 					BatchEngineTaskContentType.JSONL.toString())));
 	}
 

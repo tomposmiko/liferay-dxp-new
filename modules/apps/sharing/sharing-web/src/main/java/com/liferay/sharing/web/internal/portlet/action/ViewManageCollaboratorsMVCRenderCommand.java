@@ -14,15 +14,15 @@
 
 package com.liferay.sharing.web.internal.portlet.action;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
@@ -54,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SharingPortletKeys.MANAGE_COLLABORATORS,
 		"mvc.command.name=/"
@@ -111,13 +112,14 @@ public class ViewManageCollaboratorsMVCRenderCommand
 					classNameId, classPK);
 
 			if (sharingEntriesCount == 0) {
-				return _jsonFactory.createJSONArray();
+				return JSONFactoryUtil.createJSONArray();
 			}
 
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-			JSONArray collaboratorsJSONArray = _jsonFactory.createJSONArray();
+			JSONArray collaboratorsJSONArray =
+				JSONFactoryUtil.createJSONArray();
 
 			List<SharingEntry> sharingEntries =
 				_sharingEntryLocalService.getSharingEntries(
@@ -150,7 +152,7 @@ public class ViewManageCollaboratorsMVCRenderCommand
 					Format expirationDateTooltipDateFormat =
 						DateFormatFactoryUtil.getDate(themeDisplay.getLocale());
 
-					expirationDateTooltip = _language.format(
+					expirationDateTooltip = LanguageUtil.format(
 						themeDisplay.getLocale(), "until-x",
 						expirationDateTooltipDateFormat.format(expirationDate));
 				}
@@ -209,7 +211,7 @@ public class ViewManageCollaboratorsMVCRenderCommand
 				themeDisplay.getScopeGroupId(), themeDisplay.getLocale());
 
 		JSONArray sharingEntryPermissionDisplaySelectOptionsJSONArray =
-			_jsonFactory.createJSONArray();
+			JSONFactoryUtil.createJSONArray();
 
 		for (SharingEntryPermissionDisplay sharingEntryPermissionDisplay :
 				sharingEntryPermissionDisplays) {
@@ -226,12 +228,6 @@ public class ViewManageCollaboratorsMVCRenderCommand
 
 		return sharingEntryPermissionDisplaySelectOptionsJSONArray;
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private SharingEntryLocalService _sharingEntryLocalService;

@@ -12,16 +12,9 @@
  * details.
  */
 
-import {
-	addParams,
-	navigate,
-	openConfirmModal,
-	openSelectionModal,
-	setFormValues,
-} from 'frontend-js-web';
+import {addParams, openSelectionModal} from 'frontend-js-web';
 
 export default function ({
-	availableLocales,
 	currentURL,
 	ddmTemplateId,
 	editDDMTemplateURL,
@@ -34,48 +27,41 @@ export default function ({
 	const namespaceId = (id) => `${namespace}${id}`;
 
 	const changeDDMTemplate = (newDDMTemplate) => {
-		if (
-			newDDMTemplate &&
-			newDDMTemplate.ddmtemplateid === Number(ddmTemplateId)
-		) {
+		if (newDDMTemplate && newDDMTemplate.ddmtemplateid === ddmTemplateId) {
 			return;
 		}
 
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'editing-the-current-template-deletes-all-unsaved-content'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const newDDMTemplateId =
-						(newDDMTemplate && newDDMTemplate.ddmtemplateid) || -1;
+		if (
+			confirm(
+				Liferay.Language.get(
+					'editing-the-current-template-deletes-all-unsaved-content'
+				)
+			)
+		) {
+			const newDDMTemplateId =
+				(newDDMTemplate && newDDMTemplate.ddmtemplateid) || -1;
 
-					const url = addParams(
-						`${namespaceId('ddmTemplateId')}=${newDDMTemplateId}`,
-						currentURL
-					);
+			const url = addParams(
+				`${namespaceId('ddmTemplateId')}=${newDDMTemplateId}`,
+				currentURL
+			);
 
-					const form = document.getElementById(namespaceId('fm1'));
+			const form = document.getElementById(namespaceId('fm1'));
 
-					if (form) {
-						setFormValues(form, {
-							availableLocales,
-							ddmTemplateId: newDDMTemplateId,
-							ddmTemplateKey:
-								(newDDMTemplate &&
-									newDDMTemplate.ddmtemplatekey) ||
-								'',
-							ddmTemplateName:
-								(newDDMTemplate && newDDMTemplate.name) || '',
-						});
+			if (form) {
+				Liferay.Util.setFormValues(form, {
+					ddmTemplateId: newDDMTemplateId,
+					ddmTemplateKey:
+						(newDDMTemplate && newDDMTemplate.ddmtemplatekey) || '',
+					ddmTemplateName:
+						(newDDMTemplate && newDDMTemplate.name) || '',
+				});
 
-						form.action = url;
+				form.action = url;
 
-						form.submit();
-					}
-				}
-			},
-		});
+				form.submit();
+			}
+		}
 	};
 
 	const previewWithTemplateButton = document.getElementById(
@@ -150,13 +136,15 @@ export default function ({
 
 	if (editDDMTemplateButton) {
 		const editDDMTemplateButtonClick = () => {
-			openConfirmModal({
-				message: Liferay.Language.get(
-					'editing-the-current-template-deletes-all-unsaved-content'
-				),
-				onConfirm: (isConfirmed) =>
-					isConfirmed && navigate(editDDMTemplateURL),
-			});
+			if (
+				confirm(
+					Liferay.Language.get(
+						'editing-the-current-template-deletes-all-unsaved-content'
+					)
+				)
+			) {
+				Liferay.Util.navigate(editDDMTemplateURL);
+			}
 		};
 
 		editDDMTemplateButton.addEventListener(
@@ -181,9 +169,8 @@ export default function ({
 	if (selectDDMTemplateButton) {
 		const selectDDMTemplateButtonClick = () => {
 			openSelectionModal({
-				onSelect: (selectedItem) =>
-					changeDDMTemplate(JSON.parse(selectedItem.value)),
-				selectEventName: 'selectDDMTemplate',
+				onSelect: (selectedItem) => changeDDMTemplate(selectedItem),
+				selectEventName: namespaceId('selectDDMTemplate'),
 				title: Liferay.Language.get('templates'),
 				url: selectDDMTemplateURL,
 			});
@@ -212,7 +199,7 @@ export default function ({
 }
 
 function getCurrentLanguage(namespace) {
-	const inputComponent = Liferay.component(`${namespace}titleMapAsXML`);
+	var inputComponent = Liferay.component(`${namespace}titleMapAsXML`);
 
 	if (inputComponent) {
 		return inputComponent.getSelectedLanguageId();

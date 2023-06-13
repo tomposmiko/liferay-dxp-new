@@ -98,21 +98,6 @@ public interface ObjectDefinitionModel
 	public void setUuid(String uuid);
 
 	/**
-	 * Returns the external reference code of this object definition.
-	 *
-	 * @return the external reference code of this object definition
-	 */
-	@AutoEscape
-	public String getExternalReferenceCode();
-
-	/**
-	 * Sets the external reference code of this object definition.
-	 *
-	 * @param externalReferenceCode the external reference code of this object definition
-	 */
-	public void setExternalReferenceCode(String externalReferenceCode);
-
-	/**
 	 * Returns the object definition ID of this object definition.
 	 *
 	 * @return the object definition ID of this object definition
@@ -224,21 +209,6 @@ public interface ObjectDefinitionModel
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
-	 * Returns the account entry restricted object field ID of this object definition.
-	 *
-	 * @return the account entry restricted object field ID of this object definition
-	 */
-	public long getAccountEntryRestrictedObjectFieldId();
-
-	/**
-	 * Sets the account entry restricted object field ID of this object definition.
-	 *
-	 * @param accountEntryRestrictedObjectFieldId the account entry restricted object field ID of this object definition
-	 */
-	public void setAccountEntryRestrictedObjectFieldId(
-		long accountEntryRestrictedObjectFieldId);
-
-	/**
 	 * Returns the description object field ID of this object definition.
 	 *
 	 * @return the description object field ID of this object definition
@@ -265,27 +235,6 @@ public interface ObjectDefinitionModel
 	 * @param titleObjectFieldId the title object field ID of this object definition
 	 */
 	public void setTitleObjectFieldId(long titleObjectFieldId);
-
-	/**
-	 * Returns the account entry restricted of this object definition.
-	 *
-	 * @return the account entry restricted of this object definition
-	 */
-	public boolean getAccountEntryRestricted();
-
-	/**
-	 * Returns <code>true</code> if this object definition is account entry restricted.
-	 *
-	 * @return <code>true</code> if this object definition is account entry restricted; <code>false</code> otherwise
-	 */
-	public boolean isAccountEntryRestricted();
-
-	/**
-	 * Sets whether this object definition is account entry restricted.
-	 *
-	 * @param accountEntryRestricted the account entry restricted of this object definition
-	 */
-	public void setAccountEntryRestricted(boolean accountEntryRestricted);
 
 	/**
 	 * Returns the active of this object definition.
@@ -436,111 +385,6 @@ public interface ObjectDefinitionModel
 	 * @param className the class name of this object definition
 	 */
 	public void setClassName(String className);
-
-	/**
-	 * Returns the enable categorization of this object definition.
-	 *
-	 * @return the enable categorization of this object definition
-	 */
-	public boolean getEnableCategorization();
-
-	/**
-	 * Returns <code>true</code> if this object definition is enable categorization.
-	 *
-	 * @return <code>true</code> if this object definition is enable categorization; <code>false</code> otherwise
-	 */
-	public boolean isEnableCategorization();
-
-	/**
-	 * Sets whether this object definition is enable categorization.
-	 *
-	 * @param enableCategorization the enable categorization of this object definition
-	 */
-	public void setEnableCategorization(boolean enableCategorization);
-
-	/**
-	 * Returns the enable comments of this object definition.
-	 *
-	 * @return the enable comments of this object definition
-	 */
-	public boolean getEnableComments();
-
-	/**
-	 * Returns <code>true</code> if this object definition is enable comments.
-	 *
-	 * @return <code>true</code> if this object definition is enable comments; <code>false</code> otherwise
-	 */
-	public boolean isEnableComments();
-
-	/**
-	 * Sets whether this object definition is enable comments.
-	 *
-	 * @param enableComments the enable comments of this object definition
-	 */
-	public void setEnableComments(boolean enableComments);
-
-	/**
-	 * Returns the enable localization of this object definition.
-	 *
-	 * @return the enable localization of this object definition
-	 */
-	public boolean getEnableLocalization();
-
-	/**
-	 * Returns <code>true</code> if this object definition is enable localization.
-	 *
-	 * @return <code>true</code> if this object definition is enable localization; <code>false</code> otherwise
-	 */
-	public boolean isEnableLocalization();
-
-	/**
-	 * Sets whether this object definition is enable localization.
-	 *
-	 * @param enableLocalization the enable localization of this object definition
-	 */
-	public void setEnableLocalization(boolean enableLocalization);
-
-	/**
-	 * Returns the enable object entry history of this object definition.
-	 *
-	 * @return the enable object entry history of this object definition
-	 */
-	public boolean getEnableObjectEntryHistory();
-
-	/**
-	 * Returns <code>true</code> if this object definition is enable object entry history.
-	 *
-	 * @return <code>true</code> if this object definition is enable object entry history; <code>false</code> otherwise
-	 */
-	public boolean isEnableObjectEntryHistory();
-
-	/**
-	 * Sets whether this object definition is enable object entry history.
-	 *
-	 * @param enableObjectEntryHistory the enable object entry history of this object definition
-	 */
-	public void setEnableObjectEntryHistory(boolean enableObjectEntryHistory);
-
-	/**
-	 * Returns the modifiable of this object definition.
-	 *
-	 * @return the modifiable of this object definition
-	 */
-	public boolean getModifiable();
-
-	/**
-	 * Returns <code>true</code> if this object definition is modifiable.
-	 *
-	 * @return <code>true</code> if this object definition is modifiable; <code>false</code> otherwise
-	 */
-	public boolean isModifiable();
-
-	/**
-	 * Sets whether this object definition is modifiable.
-	 *
-	 * @param modifiable the modifiable of this object definition
-	 */
-	public void setModifiable(boolean modifiable);
 
 	/**
 	 * Returns the name of this object definition.
@@ -719,27 +563,6 @@ public interface ObjectDefinitionModel
 		Map<Locale, String> pluralLabelMap, Locale defaultLocale);
 
 	/**
-	 * Returns the portlet of this object definition.
-	 *
-	 * @return the portlet of this object definition
-	 */
-	public boolean getPortlet();
-
-	/**
-	 * Returns <code>true</code> if this object definition is portlet.
-	 *
-	 * @return <code>true</code> if this object definition is portlet; <code>false</code> otherwise
-	 */
-	public boolean isPortlet();
-
-	/**
-	 * Sets whether this object definition is portlet.
-	 *
-	 * @param portlet the portlet of this object definition
-	 */
-	public void setPortlet(boolean portlet);
-
-	/**
 	 * Returns the scope of this object definition.
 	 *
 	 * @return the scope of this object definition
@@ -753,21 +576,6 @@ public interface ObjectDefinitionModel
 	 * @param scope the scope of this object definition
 	 */
 	public void setScope(String scope);
-
-	/**
-	 * Returns the storage type of this object definition.
-	 *
-	 * @return the storage type of this object definition
-	 */
-	@AutoEscape
-	public String getStorageType();
-
-	/**
-	 * Sets the storage type of this object definition.
-	 *
-	 * @param storageType the storage type of this object definition
-	 */
-	public void setStorageType(String storageType);
 
 	/**
 	 * Returns the system of this object definition.
@@ -833,9 +641,5 @@ public interface ObjectDefinitionModel
 
 	@Override
 	public ObjectDefinition cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

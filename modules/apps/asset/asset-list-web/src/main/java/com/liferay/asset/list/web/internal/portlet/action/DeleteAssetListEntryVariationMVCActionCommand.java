@@ -16,9 +16,9 @@ package com.liferay.asset.list.web.internal.portlet.action;
 
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.service.AssetListEntryService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 
@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AssetListPortletKeys.ASSET_LIST,
 		"mvc.command.name=/asset_list/delete_asset_list_entry_variation"
@@ -57,19 +58,16 @@ public class DeleteAssetListEntryVariationMVCActionCommand
 
 		sendRedirect(
 			actionRequest, actionResponse,
-			getRedirectURL(actionRequest, actionResponse, assetListEntryId));
+			getRedirectURL(actionResponse, assetListEntryId));
 	}
 
 	protected String getRedirectURL(
-		ActionRequest actionRequest, ActionResponse actionResponse,
-		long assetListEntryId) {
+		ActionResponse actionResponse, long assetListEntryId) {
 
 		return PortletURLBuilder.createRenderURL(
 			_portal.getLiferayPortletResponse(actionResponse)
 		).setMVCPath(
 			"/edit_asset_list_entry.jsp"
-		).setBackURL(
-			ParamUtil.getString(actionRequest, "backURL")
 		).setParameter(
 			"assetListEntryId", assetListEntryId
 		).buildString();

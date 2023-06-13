@@ -17,11 +17,9 @@ package com.liferay.commerce.service;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.exception.NoSuchOrderItemException;
 import com.liferay.commerce.model.CommerceOrderItem;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -88,21 +86,21 @@ public interface CommerceOrderItemLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceOrderItem addCommerceOrderItem(
-			long userId, long commerceOrderId, long cpInstanceId, String json,
-			int quantity, long replacedCPInstanceId, int shippedQuantity,
-			CommerceContext commerceContext, ServiceContext serviceContext)
+			long commerceOrderId, long cpInstanceId, String json, int quantity,
+			int shippedQuantity, CommerceContext commerceContext,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public CommerceOrderItem addOrUpdateCommerceOrderItem(
-			long userId, long commerceOrderId, long cpInstanceId, int quantity,
-			long replacedCPInstanceId, int shippedQuantity,
-			CommerceContext commerceContext, ServiceContext serviceContext)
+			long commerceOrderId, long cpInstanceId, int quantity,
+			int shippedQuantity, CommerceContext commerceContext,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public CommerceOrderItem addOrUpdateCommerceOrderItem(
-			long userId, long commerceOrderId, long cpInstanceId, String json,
-			int quantity, long replacedCPInstanceId, int shippedQuantity,
-			CommerceContext commerceContext, ServiceContext serviceContext)
+			long commerceOrderId, long cpInstanceId, String json, int quantity,
+			int shippedQuantity, CommerceContext commerceContext,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public int countSubscriptionCommerceOrderItems(long commerceOrderId);
@@ -131,10 +129,18 @@ public interface CommerceOrderItemLocalService
 	 *
 	 * @param commerceOrderItem the commerce order item
 	 * @return the commerce order item that was removed
+	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	public CommerceOrderItem deleteCommerceOrderItem(
-		CommerceOrderItem commerceOrderItem);
+			CommerceOrderItem commerceOrderItem)
+		throws PortalException;
+
+	@Indexable(type = IndexableType.DELETE)
+	public CommerceOrderItem deleteCommerceOrderItem(
+			CommerceOrderItem commerceOrderItem,
+			CommerceContext commerceContext)
+		throws PortalException;
 
 	/**
 	 * Deletes the commerce order item with the primary key from the database. Also notifies the appropriate model listeners.
@@ -151,31 +157,10 @@ public interface CommerceOrderItemLocalService
 	public CommerceOrderItem deleteCommerceOrderItem(long commerceOrderItemId)
 		throws PortalException;
 
-	@Indexable(type = IndexableType.DELETE)
-	public CommerceOrderItem deleteCommerceOrderItem(
-			long userId, CommerceOrderItem commerceOrderItem)
+	public void deleteCommerceOrderItems(long commerceOrderId)
 		throws PortalException;
 
-	@Indexable(type = IndexableType.DELETE)
-	public CommerceOrderItem deleteCommerceOrderItem(
-			long userId, CommerceOrderItem commerceOrderItem,
-			CommerceContext commerceContext)
-		throws PortalException;
-
-	public CommerceOrderItem deleteCommerceOrderItem(
-			long userId, long commerceOrderItemId)
-		throws PortalException;
-
-	public void deleteCommerceOrderItems(long userId, long commerceOrderId)
-		throws PortalException;
-
-	public void deleteCommerceOrderItemsByCPInstanceId(
-			long userId, long cpInstanceId)
-		throws PortalException;
-
-	public void deleteMissingCommerceOrderItems(
-			long userId, long commerceOrderId, Long[] commerceOrderItemIds,
-			String[] externalReferenceCodes)
+	public void deleteCommerceOrderItemsByCPInstanceId(long cpInstanceId)
 		throws PortalException;
 
 	/**
@@ -268,20 +253,24 @@ public interface CommerceOrderItemLocalService
 	public CommerceOrderItem fetchCommerceOrderItemByBookedQuantityId(
 		long bookedQuantityId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderItem fetchCommerceOrderItemByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
 	/**
-	 * Returns the commerce order item matching the UUID and group.
+	 * Returns the commerce order item with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order item's UUID
-	 * @param groupId the primary key of the group
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order item's external reference code
 	 * @return the matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderItem fetchCommerceOrderItemByUuidAndGroupId(
-		String uuid, long groupId);
+	public CommerceOrderItem fetchCommerceOrderItemByExternalReferenceCode(
+		long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderItemByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public CommerceOrderItem fetchCommerceOrderItemByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -310,22 +299,17 @@ public interface CommerceOrderItemLocalService
 	public CommerceOrderItem getCommerceOrderItem(long commerceOrderItemId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderItem getCommerceOrderItemByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException;
-
 	/**
-	 * Returns the commerce order item matching the UUID and group.
+	 * Returns the commerce order item with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order item's UUID
-	 * @param groupId the primary key of the group
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order item's external reference code
 	 * @return the matching commerce order item
 	 * @throws PortalException if a matching commerce order item could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceOrderItem getCommerceOrderItemByUuidAndGroupId(
-			String uuid, long groupId)
+	public CommerceOrderItem getCommerceOrderItemByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -366,32 +350,6 @@ public interface CommerceOrderItemLocalService
 		int end);
 
 	/**
-	 * Returns all the commerce order items matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the commerce order items
-	 * @param companyId the primary key of the company
-	 * @return the matching commerce order items, or an empty list if no matches were found
-	 */
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceOrderItem> getCommerceOrderItemsByUuidAndCompanyId(
-		String uuid, long companyId);
-
-	/**
-	 * Returns a range of commerce order items matching the UUID and company.
-	 *
-	 * @param uuid the UUID of the commerce order items
-	 * @param companyId the primary key of the company
-	 * @param start the lower bound of the range of commerce order items
-	 * @param end the upper bound of the range of commerce order items (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the range of matching commerce order items, or an empty list if no matches were found
-	 */
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceOrderItem> getCommerceOrderItemsByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		OrderByComparator<CommerceOrderItem> orderByComparator);
-
-	/**
 	 * Returns the number of commerce order items.
 	 *
 	 * @return the number of commerce order items
@@ -414,10 +372,6 @@ public interface CommerceOrderItemLocalService
 	public int getCommerceOrderItemsQuantity(long commerceOrderId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
@@ -438,14 +392,6 @@ public interface CommerceOrderItemLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceOrderItem> getSubscriptionCommerceOrderItems(
 		long commerceOrderId);
-
-	@Indexable(type = IndexableType.REINDEX)
-	public CommerceOrderItem importCommerceOrderItem(
-			long userId, String externalReferenceCode, long commerceOrderItemId,
-			long commerceOrderId, long cpInstanceId,
-			String cpMeasurementUnitKey, BigDecimal decimalQuantity,
-			int quantity, int shippedQuantity, ServiceContext serviceContext)
-		throws PortalException;
 
 	public CommerceOrderItem incrementShippedQuantity(
 			long commerceOrderItemId, int shippedQuantity)
@@ -484,35 +430,18 @@ public interface CommerceOrderItemLocalService
 		CommerceOrderItem commerceOrderItem);
 
 	public CommerceOrderItem updateCommerceOrderItem(
+			long commerceOrderItemId, int quantity,
+			CommerceContext commerceContext, ServiceContext serviceContext)
+		throws PortalException;
+
+	public CommerceOrderItem updateCommerceOrderItem(
 			long commerceOrderItemId, long bookedQuantityId)
 		throws NoSuchOrderItemException;
 
-	public CommerceOrderItem updateCommerceOrderItem(
-			long userId, long commerceOrderItemId, int quantity,
-			CommerceContext commerceContext, ServiceContext serviceContext)
-		throws PortalException;
-
-	public CommerceOrderItem updateCommerceOrderItem(
-			long userId, long commerceOrderItemId, long cpMeasurementUnitId,
-			int quantity, CommerceContext commerceContext,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	public CommerceOrderItem updateCommerceOrderItem(
-			long userId, long commerceOrderItemId, long cpMeasurementUnitId,
-			int quantity, ServiceContext serviceContext)
-		throws PortalException;
-
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceOrderItem updateCommerceOrderItem(
-			long userId, long commerceOrderItemId, String json, int quantity,
+			long commerceOrderItemId, String json, int quantity,
 			CommerceContext commerceContext, ServiceContext serviceContext)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	public CommerceOrderItem updateCommerceOrderItem(
-			long userId, long commerceOrderItemId, String json, int quantity,
-			ServiceContext serviceContext)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -587,11 +516,6 @@ public interface CommerceOrderItemLocalService
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItemUnitPrice(
-			long userId, long commerceOrderItemId, BigDecimal decimalQuantity,
-			BigDecimal unitPrice)
-		throws PortalException;
-
-	public CommerceOrderItem updateCommerceOrderItemUnitPrice(
 			long userId, long commerceOrderItemId, int quantity,
 			BigDecimal unitPrice)
 		throws PortalException;
@@ -599,10 +523,6 @@ public interface CommerceOrderItemLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceOrderItem updateCustomFields(
 			long commerceOrderItemId, ServiceContext serviceContext)
-		throws PortalException;
-
-	public CommerceOrderItem updateExternalReferenceCode(
-			long commerceOrderItemId, String externalReferenceCode)
 		throws PortalException;
 
 }

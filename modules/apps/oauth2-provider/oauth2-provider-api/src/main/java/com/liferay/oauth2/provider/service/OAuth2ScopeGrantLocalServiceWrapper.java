@@ -27,10 +27,6 @@ public class OAuth2ScopeGrantLocalServiceWrapper
 	implements OAuth2ScopeGrantLocalService,
 			   ServiceWrapper<OAuth2ScopeGrantLocalService> {
 
-	public OAuth2ScopeGrantLocalServiceWrapper() {
-		this(null);
-	}
-
 	public OAuth2ScopeGrantLocalServiceWrapper(
 		OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService) {
 

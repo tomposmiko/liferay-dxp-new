@@ -43,28 +43,11 @@ public class AddressImpl extends AddressBaseImpl {
 			country = new CountryImpl();
 
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
 		return country;
-	}
-
-	public ListType getListType() {
-		ListType listType = null;
-
-		try {
-			listType = ListTypeServiceUtil.getListType(getListTypeId());
-		}
-		catch (Exception exception) {
-			listType = new ListTypeImpl();
-
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
-			}
-		}
-
-		return listType;
 	}
 
 	@Override
@@ -92,11 +75,29 @@ public class AddressImpl extends AddressBaseImpl {
 			region = new RegionImpl();
 
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
 		return region;
+	}
+
+	@Override
+	public ListType getType() {
+		ListType type = null;
+
+		try {
+			type = ListTypeServiceUtil.getListType(getTypeId());
+		}
+		catch (Exception exception) {
+			type = new ListTypeImpl();
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception, exception);
+			}
+		}
+
+		return type;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(AddressImpl.class);

@@ -14,10 +14,9 @@
 
 package com.liferay.saml.opensaml.integration.internal.servlet.profile;
 
-import com.liferay.petra.concurrent.DCLSingleton;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -31,13 +30,13 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.saml.constants.SamlWebKeys;
 import com.liferay.saml.opensaml.integration.internal.binding.SamlBinding;
-import com.liferay.saml.opensaml.integration.internal.bootstrap.ParserPoolUtil;
 import com.liferay.saml.opensaml.integration.internal.metadata.MetadataManager;
 import com.liferay.saml.opensaml.integration.internal.resolver.AttributePublisherImpl;
 import com.liferay.saml.opensaml.integration.internal.resolver.AttributeResolverRegistry;
@@ -47,7 +46,6 @@ import com.liferay.saml.opensaml.integration.internal.resolver.NameIdResolverReg
 import com.liferay.saml.opensaml.integration.internal.resolver.NameIdResolverSAMLContextImpl;
 import com.liferay.saml.opensaml.integration.internal.resolver.SubjectAssertionContext;
 import com.liferay.saml.opensaml.integration.internal.resolver.UserResolverSAMLContextImpl;
-import com.liferay.saml.opensaml.integration.internal.util.ConfigurationServiceBootstrapUtil;
 import com.liferay.saml.opensaml.integration.internal.util.OpenSamlUtil;
 import com.liferay.saml.opensaml.integration.internal.util.SamlUtil;
 import com.liferay.saml.opensaml.integration.resolver.AttributeResolver;
@@ -66,9 +64,11 @@ import com.liferay.saml.persistence.service.SamlIdpSsoSessionLocalService;
 import com.liferay.saml.persistence.service.SamlSpAuthRequestLocalService;
 import com.liferay.saml.persistence.service.SamlSpIdpConnectionLocalService;
 import com.liferay.saml.persistence.service.SamlSpMessageLocalService;
+import com.liferay.saml.persistence.service.SamlSpSessionLocalService;
 import com.liferay.saml.runtime.SamlException;
 import com.liferay.saml.runtime.configuration.SamlConfiguration;
 import com.liferay.saml.runtime.configuration.SamlProviderConfiguration;
+import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
 import com.liferay.saml.runtime.exception.AssertionException;
 import com.liferay.saml.runtime.exception.AudienceException;
 import com.liferay.saml.runtime.exception.AuthnAgeException;
@@ -86,22 +86,21 @@ import com.liferay.saml.runtime.servlet.profile.WebSsoProfile;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
-import net.shibboleth.utilities.java.support.xml.ParserPool;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
+import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.messaging.context.InOutOperationContext;
 import org.opensaml.messaging.context.MessageContext;
@@ -151,26 +150,22 @@ import org.opensaml.security.credential.Credential;
 import org.opensaml.security.credential.UsageType;
 import org.opensaml.security.criteria.UsageCriterion;
 import org.opensaml.security.trust.TrustEngine;
-import org.opensaml.xmlsec.DecryptionParameters;
-import org.opensaml.xmlsec.DecryptionParametersResolver;
 import org.opensaml.xmlsec.EncryptionConfiguration;
 import org.opensaml.xmlsec.EncryptionParameters;
-import org.opensaml.xmlsec.SecurityConfigurationSupport;
 import org.opensaml.xmlsec.context.SecurityParametersContext;
-import org.opensaml.xmlsec.criterion.DecryptionConfigurationCriterion;
 import org.opensaml.xmlsec.criterion.EncryptionConfigurationCriterion;
 import org.opensaml.xmlsec.criterion.EncryptionOptionalCriterion;
 import org.opensaml.xmlsec.encryption.support.DataEncryptionParameters;
 import org.opensaml.xmlsec.encryption.support.DecryptionException;
 import org.opensaml.xmlsec.encryption.support.KeyEncryptionParameters;
-import org.opensaml.xmlsec.impl.BasicDecryptionParametersResolver;
-import org.opensaml.xmlsec.keyinfo.KeyInfoCredentialResolver;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -178,6 +173,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.saml.runtime.configuration.SamlConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	service = WebSsoProfile.class
 )
 public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
@@ -189,7 +185,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		throws PortalException {
 
 		try {
-			_processAuthnRequest(httpServletRequest, httpServletResponse);
+			doProcessAuthnRequest(httpServletRequest, httpServletResponse);
 		}
 		catch (Exception exception) {
 			ExceptionHandlerUtil.handleException(exception);
@@ -205,64 +201,48 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		MessageContext<?> messageContext = null;
 
 		try {
-			messageContext = _decodeAuthnResponse(
+			messageContext = decodeAuthnResponse(
 				httpServletRequest, httpServletResponse,
-				samlBindingProvider.getSamlBinding(
-					SAMLConstants.SAML2_POST_BINDING_URI));
+				getSamlBinding(SAMLConstants.SAML2_POST_BINDING_URI));
 
-			_processResponse(
+			doProcessResponse(
 				messageContext, httpServletRequest, httpServletResponse);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 			else {
 				if (!(exception instanceof AuthnAgeException ||
 					  exception instanceof SubjectException)) {
 
-					_log.error(exception);
+					_log.error(exception.getMessage());
 				}
 			}
 
-			if (messageContext == null) {
-				ExceptionHandlerUtil.handleException(exception);
+			if (messageContext != null) {
+				SAMLPeerEntityContext samlPeerEntityContext =
+					messageContext.getSubcontext(SAMLPeerEntityContext.class);
 
-				return;
+				if (samlPeerEntityContext != null) {
+					String nameIdValue = Optional.ofNullable(
+						messageContext.getSubcontext(
+							SAMLSubjectNameIdentifierContext.class)
+					).map(
+						SAMLSubjectNameIdentifierContext::getSAML2SubjectNameID
+					).map(
+						NameID::getValue
+					).orElse(
+						null
+					);
+
+					throw new EntityInteractionException(
+						samlPeerEntityContext.getEntityId(), nameIdValue,
+						exception);
+				}
 			}
 
-			SAMLPeerEntityContext samlPeerEntityContext =
-				messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-			if (samlPeerEntityContext == null) {
-				ExceptionHandlerUtil.handleException(exception);
-
-				return;
-			}
-
-			SAMLSubjectNameIdentifierContext samlSubjectNameIdentifierContext =
-				messageContext.getSubcontext(
-					SAMLSubjectNameIdentifierContext.class);
-
-			if (samlSubjectNameIdentifierContext == null) {
-				ExceptionHandlerUtil.handleException(exception);
-
-				return;
-			}
-
-			NameID saml2SubjectNameID =
-				samlSubjectNameIdentifierContext.getSAML2SubjectNameID();
-
-			if (saml2SubjectNameID == null) {
-				ExceptionHandlerUtil.handleException(exception);
-
-				return;
-			}
-
-			String nameIdValue = saml2SubjectNameID.getValue();
-
-			throw new EntityInteractionException(
-				samlPeerEntityContext.getEntityId(), nameIdValue, exception);
+			ExceptionHandlerUtil.handleException(exception);
 		}
 	}
 
@@ -301,7 +281,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -311,6 +291,118 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 	protected void activate(Map<String, Object> properties) {
 		_samlConfiguration = ConfigurableUtil.createConfigurable(
 			SamlConfiguration.class, properties);
+
+		_samlMetadataEncryptionParametersResolver =
+			new SAMLMetadataEncryptionParametersResolver(
+				metadataManager.getMetadataCredentialResolver());
+
+		_samlMetadataEncryptionParametersResolver.
+			setAutoGenerateDataEncryptionCredential(true);
+	}
+
+	protected void addSamlSsoSession(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse,
+			SamlSsoRequestContext samlSsoRequestContext, NameID nameID)
+		throws Exception {
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			httpServletRequest);
+
+		SamlIdpSsoSession samlIdpSsoSession =
+			_samlIdpSsoSessionLocalService.addSamlIdpSsoSession(
+				samlSsoRequestContext.getSamlSsoSessionId(), serviceContext);
+
+		MessageContext<?> messageContext =
+			samlSsoRequestContext.getSAMLMessageContext();
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		_samlIdpSpSessionLocalService.addSamlIdpSpSession(
+			samlIdpSsoSession.getSamlIdpSsoSessionId(),
+			samlPeerEntityContext.getEntityId(), nameID.getFormat(),
+			nameID.getValue(), serviceContext);
+
+		addCookie(
+			httpServletRequest, httpServletResponse,
+			SamlWebKeys.SAML_SSO_SESSION_ID,
+			samlSsoRequestContext.getSamlSsoSessionId(), -1);
+	}
+
+	protected SamlSsoRequestContext decodeAuthnConversationAfterLogin(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws Exception {
+
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		SamlSsoRequestContext samlSsoRequestContext =
+			(SamlSsoRequestContext)httpSession.getAttribute(
+				SamlWebKeys.SAML_SSO_REQUEST_CONTEXT);
+
+		if (samlSsoRequestContext != null) {
+			httpSession.removeAttribute(SamlWebKeys.SAML_SSO_REQUEST_CONTEXT);
+
+			MessageContext<?> messageContext = getMessageContext(
+				httpServletRequest, httpServletResponse,
+				samlSsoRequestContext.getPeerEntityId());
+
+			samlSsoRequestContext.setSAMLMessageContext(messageContext);
+
+			String authnRequestXml = samlSsoRequestContext.getAuthnRequestXml();
+
+			if (Validator.isNotNull(authnRequestXml)) {
+				AuthnRequest authnRequest =
+					(AuthnRequest)OpenSamlUtil.unmarshall(authnRequestXml);
+
+				InOutOperationContext<AuthnRequest, ?> inOutOperationContext =
+					new InOutOperationContext(
+						new MessageContext(), new MessageContext());
+
+				messageContext.addSubcontext(inOutOperationContext);
+
+				MessageContext<AuthnRequest> inboundMessageContext =
+					inOutOperationContext.getInboundMessageContext();
+
+				inboundMessageContext.setMessage(authnRequest);
+
+				SAMLMessageInfoContext samlInboundMessageInfoContext =
+					inboundMessageContext.getSubcontext(
+						SAMLMessageInfoContext.class, true);
+
+				samlInboundMessageInfoContext.setMessageId(
+					authnRequest.getID());
+			}
+
+			String relayState = samlSsoRequestContext.getRelayState();
+
+			SAMLBindingContext samlBindingContext =
+				messageContext.getSubcontext(SAMLBindingContext.class, true);
+
+			samlBindingContext.setRelayState(relayState);
+
+			String samlSsoSessionId = getSamlSsoSessionId(httpServletRequest);
+
+			if (Validator.isNotNull(samlSsoSessionId)) {
+				samlSsoRequestContext.setSamlSsoSessionId(samlSsoSessionId);
+			}
+			else {
+				samlSsoRequestContext.setNewSession(true);
+				samlSsoRequestContext.setSamlSsoSessionId(
+					generateIdentifier(30));
+			}
+
+			samlSsoRequestContext.setStage(
+				SamlSsoRequestContext.STAGE_AUTHENTICATED);
+
+			samlSsoRequestContext.setUserId(
+				portal.getUserId(httpServletRequest));
+
+			return samlSsoRequestContext;
+		}
+
+		return null;
 	}
 
 	protected SamlSsoRequestContext decodeAuthnRequest(
@@ -323,7 +415,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 		if (!Validator.isBlank(samlMessageId)) {
 			SamlSsoRequestContext samlSsoRequestContext =
-				_decodeAuthnConversationAfterLogin(
+				decodeAuthnConversationAfterLogin(
 					httpServletRequest, httpServletResponse);
 
 			if (samlSsoRequestContext != null) {
@@ -361,7 +453,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 		if (idpInitiatedSSO) {
 			SamlSsoRequestContext samlSsoRequestContext =
-				_decodeAuthnConversationAfterLogin(
+				decodeAuthnConversationAfterLogin(
 					httpServletRequest, httpServletResponse);
 
 			if (samlSsoRequestContext != null) {
@@ -386,12 +478,11 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		if (StringUtil.equalsIgnoreCase(
 				httpServletRequest.getMethod(), "GET")) {
 
-			samlBinding = samlBindingProvider.getSamlBinding(
+			samlBinding = getSamlBinding(
 				SAMLConstants.SAML2_REDIRECT_BINDING_URI);
 		}
 		else {
-			samlBinding = samlBindingProvider.getSamlBinding(
-				SAMLConstants.SAML2_POST_BINDING_URI);
+			samlBinding = getSamlBinding(SAMLConstants.SAML2_POST_BINDING_URI);
 		}
 
 		SamlSsoRequestContext samlSsoRequestContext = null;
@@ -471,6 +562,329 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		return samlSsoRequestContext;
 	}
 
+	protected MessageContext<?> decodeAuthnResponse(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, SamlBinding samlBinding)
+		throws Exception {
+
+		MessageContext<?> messageContext = decodeSamlMessage(
+			httpServletRequest, httpServletResponse, samlBinding, true);
+
+		InOutOperationContext<Response, ?> inOutOperationContext =
+			messageContext.getSubcontext(InOutOperationContext.class);
+
+		MessageContext<Response> inboundMessageContext =
+			inOutOperationContext.getInboundMessageContext();
+
+		Response samlResponse = inboundMessageContext.getMessage();
+
+		List<EncryptedAssertion> encryptedAssertions =
+			samlResponse.getEncryptedAssertions();
+
+		List<Assertion> assertions = new ArrayList<>(
+			samlResponse.getAssertions());
+
+		if (_decrypter != null) {
+			for (EncryptedAssertion encryptedAssertion : encryptedAssertions) {
+				try {
+					assertions.add(_decrypter.decrypt(encryptedAssertion));
+				}
+				catch (DecryptionException decryptionException) {
+					_log.error(
+						"Unable to assertion decryption", decryptionException);
+				}
+			}
+
+			inboundMessageContext.addSubcontext(
+				new DecrypterContext(_decrypter));
+		}
+		else {
+			if (!encryptedAssertions.isEmpty()) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Message returned encrypted assertions but there is " +
+							"no decrypter available");
+				}
+			}
+		}
+
+		SignatureTrustEngine signatureTrustEngine =
+			metadataManager.getSignatureTrustEngine();
+
+		Assertion assertion = null;
+
+		for (Assertion curAssertion : assertions) {
+			try {
+				verifyAssertion(
+					curAssertion, messageContext, signatureTrustEngine);
+			}
+			catch (SamlException samlException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Rejecting assertion " + curAssertion.getID(),
+						samlException);
+				}
+
+				continue;
+			}
+
+			List<AuthnStatement> authnStatements =
+				curAssertion.getAuthnStatements();
+
+			if (!authnStatements.isEmpty()) {
+				Subject subject = curAssertion.getSubject();
+
+				if ((subject != null) &&
+					(subject.getSubjectConfirmations() != null)) {
+
+					for (SubjectConfirmation subjectConfirmation :
+							subject.getSubjectConfirmations()) {
+
+						if (SubjectConfirmation.METHOD_BEARER.equals(
+								subjectConfirmation.getMethod())) {
+
+							assertion = curAssertion;
+
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if (assertion == null) {
+			throw new AssertionException(
+				"Response does not contain any acceptable assertions");
+		}
+
+		inboundMessageContext.addSubcontext(
+			new SubjectAssertionContext(assertion));
+
+		return messageContext;
+	}
+
+	protected void doProcessAuthnRequest(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws Exception {
+
+		SamlSsoRequestContext samlSsoRequestContext = decodeAuthnRequest(
+			httpServletRequest, httpServletResponse);
+
+		MessageContext<?> messageContext =
+			samlSsoRequestContext.getSAMLMessageContext();
+
+		InOutOperationContext<AuthnRequest, ?> inOutOperationContext =
+			messageContext.getSubcontext(InOutOperationContext.class, false);
+
+		AuthnRequest authnRequest = null;
+		User user = samlSsoRequestContext.getUser();
+
+		if (inOutOperationContext != null) {
+			MessageContext<AuthnRequest> inboundMessageContext =
+				inOutOperationContext.getInboundMessageContext();
+
+			authnRequest = inboundMessageContext.getMessage();
+
+			if ((authnRequest != null) && authnRequest.isPassive() &&
+				(user == null)) {
+
+				sendFailureResponse(
+					samlSsoRequestContext, StatusCode.NO_PASSIVE,
+					httpServletResponse);
+
+				return;
+			}
+		}
+
+		boolean sessionExpired = false;
+
+		if (!samlSsoRequestContext.isNewSession()) {
+			String samlSsoSessionId =
+				samlSsoRequestContext.getSamlSsoSessionId();
+
+			SamlIdpSsoSession samlIdpSsoSession =
+				_samlIdpSsoSessionLocalService.fetchSamlIdpSso(
+					samlSsoSessionId);
+
+			if (samlIdpSsoSession != null) {
+				sessionExpired = samlIdpSsoSession.isExpired();
+			}
+			else {
+				samlSsoSessionId = null;
+
+				samlSsoRequestContext.setSamlSsoSessionId(null);
+			}
+
+			if (sessionExpired || Validator.isNull(samlSsoSessionId)) {
+				addCookie(
+					httpServletRequest, httpServletResponse,
+					SamlWebKeys.SAML_SSO_SESSION_ID, StringPool.BLANK, 0);
+
+				samlSsoRequestContext.setNewSession(true);
+				samlSsoRequestContext.setSamlSsoSessionId(
+					generateIdentifier(30));
+			}
+		}
+
+		if (sessionExpired || (user == null) ||
+			((authnRequest != null) && authnRequest.isForceAuthn() &&
+			 (user != null) &&
+			 (samlSsoRequestContext.getStage() ==
+				 SamlSsoRequestContext.STAGE_INITIAL))) {
+
+			boolean forceAuthn = false;
+
+			if ((authnRequest != null) && authnRequest.isForceAuthn()) {
+				forceAuthn = true;
+			}
+
+			redirectToLogin(
+				httpServletRequest, httpServletResponse, samlSsoRequestContext,
+				forceAuthn);
+		}
+		else {
+			sendSuccessResponse(
+				httpServletRequest, httpServletResponse, samlSsoRequestContext);
+
+			HttpSession httpSession = httpServletRequest.getSession(false);
+
+			if (httpSession != null) {
+				httpSession.removeAttribute(SamlWebKeys.FORCE_REAUTHENTICATION);
+			}
+		}
+	}
+
+	protected void doProcessResponse(
+			MessageContext<?> messageContext,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws Exception {
+
+		InOutOperationContext<Response, ?> inOutOperationContext =
+			messageContext.getSubcontext(InOutOperationContext.class);
+
+		MessageContext<Response> inboundMessageContext =
+			inOutOperationContext.getInboundMessageContext();
+
+		Response samlResponse = inboundMessageContext.getMessage();
+
+		Status status = samlResponse.getStatus();
+
+		StatusCode statusCode = status.getStatusCode();
+
+		String statusCodeURI = statusCode.getValue();
+
+		if (!statusCodeURI.equals(StatusCode.SUCCESS)) {
+			StatusCode childStatusCode = statusCode.getStatusCode();
+
+			if ((childStatusCode != null) &&
+				Validator.isNotNull(childStatusCode.getValue())) {
+
+				throw new StatusException(childStatusCode.getValue());
+			}
+
+			throw new StatusException(statusCodeURI);
+		}
+
+		verifyInResponseTo(samlResponse);
+		verifyDestination(messageContext, samlResponse.getDestination());
+
+		Issuer issuer = samlResponse.getIssuer();
+
+		verifyIssuer(messageContext, issuer);
+
+		SAMLSubjectNameIdentifierContext samlSubjectNameIdentifierContext =
+			messageContext.getSubcontext(
+				SAMLSubjectNameIdentifierContext.class);
+
+		NameID nameID =
+			samlSubjectNameIdentifierContext.getSAML2SubjectNameID();
+
+		if (nameID == null) {
+			throw new SamlException("Name ID not present in subject");
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("SAML authenticated user " + nameID.getValue());
+		}
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		SamlSpIdpConnection samlSpIdpConnection =
+			_samlSpIdpConnectionLocalService.getSamlSpIdpConnection(
+				CompanyThreadLocal.getCompanyId(),
+				samlPeerEntityContext.getEntityId());
+
+		if (Validator.isNull(samlResponse.getInResponseTo()) &&
+			samlSpIdpConnection.isForceAuthn()) {
+
+			throw new AuthnAgeException();
+		}
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			httpServletRequest);
+
+		User user = _userResolver.resolveUser(
+			new UserResolverSAMLContextImpl(
+				(MessageContext<Response>)messageContext),
+			serviceContext);
+
+		if (user == null) {
+			throw new SubjectException(
+				"No user could not be matched or provisioned");
+		}
+
+		serviceContext.setUserId(user.getUserId());
+
+		SamlSpSession samlSpSession = getSamlSpSession(httpServletRequest);
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		SubjectAssertionContext subjectAssertionContext =
+			inboundMessageContext.getSubcontext(SubjectAssertionContext.class);
+
+		Assertion assertion = subjectAssertionContext.getAssertion();
+
+		List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
+
+		AuthnStatement authnStatement = authnStatements.get(0);
+
+		String sessionIndex = authnStatement.getSessionIndex();
+
+		if (samlSpSession != null) {
+			samlSpSessionLocalService.updateSamlSpSession(
+				samlSpSession.getSamlSpSessionId(),
+				OpenSamlUtil.marshall(assertion), httpSession.getId(),
+				nameID.getFormat(), nameID.getNameQualifier(),
+				nameID.getSPNameQualifier(), nameID.getValue(),
+				issuer.getValue(), samlSpSession.getSamlSpSessionKey(),
+				sessionIndex, serviceContext);
+		}
+		else {
+			String samlSpSessionKey = generateIdentifier(30);
+
+			samlSpSession = samlSpSessionLocalService.addSamlSpSession(
+				OpenSamlUtil.marshall(assertion), httpSession.getId(),
+				nameID.getFormat(), nameID.getNameQualifier(),
+				nameID.getSPNameQualifier(), nameID.getValue(),
+				issuer.getValue(), samlSpSessionKey, sessionIndex,
+				serviceContext);
+		}
+
+		httpSession.setAttribute(
+			SamlWebKeys.SAML_SP_SESSION_KEY,
+			samlSpSession.getSamlSpSessionKey());
+
+		addCookie(
+			httpServletRequest, httpServletResponse,
+			SamlWebKeys.SAML_SP_SESSION_KEY,
+			samlSpSession.getSamlSpSessionKey(), -1);
+
+		httpServletResponse.sendRedirect(
+			getAuthRedirectURL(messageContext, httpServletRequest));
+	}
+
 	protected void doSendAuthnRequest(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String relayState)
@@ -513,6 +927,10 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		SPSSODescriptor spSSODescriptor =
 			(SPSSODescriptor)samlSelfMetadataContext.getRoleDescriptor();
 
+		AssertionConsumerService assertionConsumerService =
+			SamlUtil.getAssertionConsumerServiceForBinding(
+				spSSODescriptor, SAMLConstants.SAML2_POST_BINDING_URI);
+
 		SAMLPeerEntityContext samlPeerEntityContext =
 			messageContext.getSubcontext(SAMLPeerEntityContext.class);
 
@@ -534,9 +952,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		nameIDPolicy.setFormat(metadataManager.getNameIdFormat(entityId));
 
 		AuthnRequest authnRequest = OpenSamlUtil.buildAuthnRequest(
-			samlSelfEntityContext.getEntityId(),
-			SamlUtil.getAssertionConsumerServiceForBinding(
-				spSSODescriptor, SAMLConstants.SAML2_POST_BINDING_URI),
+			samlSelfEntityContext.getEntityId(), assertionConsumerService,
 			singleSignOnService, nameIDPolicy);
 
 		if (samlSpIdpConnection.isForceAuthn() ||
@@ -587,6 +1003,128 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		sendSamlMessage(messageContext, httpServletResponse);
 	}
 
+	protected String getAuthRedirectURL(
+			MessageContext<?> messageContext,
+			HttpServletRequest httpServletRequest)
+		throws PortalException {
+
+		StringBundler sb = new StringBundler(3);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		sb.append(themeDisplay.getPathMain());
+
+		sb.append("/portal/saml/auth_redirect?redirect=");
+
+		SAMLBindingContext samlBindingContext = messageContext.getSubcontext(
+			SAMLBindingContext.class);
+
+		String relayState = portal.escapeRedirect(
+			samlBindingContext.getRelayState());
+
+		if (Validator.isNull(relayState)) {
+			relayState = portal.getHomeURL(httpServletRequest);
+		}
+
+		sb.append(URLCodec.encodeURL(relayState));
+
+		return sb.toString();
+	}
+
+	protected Assertion getSuccessAssertion(
+		SamlSsoRequestContext samlSsoRequestContext,
+		AssertionConsumerService assertionConsumerService, NameID nameID) {
+
+		MessageContext<AuthnRequest> messageContext =
+			(MessageContext<AuthnRequest>)
+				samlSsoRequestContext.getSAMLMessageContext();
+
+		Assertion assertion = OpenSamlUtil.buildAssertion();
+
+		DateTime issueInstantDateTime = new DateTime(DateTimeZone.UTC);
+
+		SubjectConfirmationData subjectConfirmationData =
+			getSuccessSubjectConfirmationData(
+				samlSsoRequestContext, assertionConsumerService,
+				issueInstantDateTime);
+
+		Conditions conditions = getSuccessConditions(
+			samlSsoRequestContext, issueInstantDateTime,
+			subjectConfirmationData.getNotOnOrAfter());
+
+		assertion.setConditions(conditions);
+
+		assertion.setID(generateIdentifier(20));
+		assertion.setIssueInstant(issueInstantDateTime);
+
+		SAMLSelfEntityContext samlSelfEntityContext =
+			messageContext.getSubcontext(SAMLSelfEntityContext.class);
+
+		Issuer issuer = OpenSamlUtil.buildIssuer(
+			samlSelfEntityContext.getEntityId());
+
+		assertion.setIssuer(issuer);
+
+		Subject subject = getSuccessSubject(
+			samlSsoRequestContext, assertionConsumerService, nameID,
+			subjectConfirmationData);
+
+		assertion.setSubject(subject);
+
+		assertion.setVersion(SAMLVersion.VERSION_20);
+
+		List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
+
+		authnStatements.add(
+			getSuccessAuthnStatement(samlSsoRequestContext, assertion));
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		boolean attributesEnabled = metadataManager.isAttributesEnabled(
+			samlPeerEntityContext.getEntityId());
+
+		if (!attributesEnabled) {
+			return assertion;
+		}
+
+		User user = samlSsoRequestContext.getUser();
+
+		AttributeResolver attributeResolver =
+			_attributeResolverRegistry.getAttributeResolver(
+				samlPeerEntityContext.getEntityId());
+
+		AttributePublisherImpl attributePublisherImpl =
+			new AttributePublisherImpl();
+
+		attributeResolver.resolve(
+			user, new AttributeResolverSAMLContextImpl(messageContext),
+			attributePublisherImpl);
+
+		List<Attribute> attributes = attributePublisherImpl.getAttributes();
+
+		if (attributes.isEmpty()) {
+			return assertion;
+		}
+
+		List<AttributeStatement> attributeStatements =
+			assertion.getAttributeStatements();
+
+		AttributeStatement attributeStatement =
+			OpenSamlUtil.buildAttributeStatement();
+
+		attributeStatements.add(attributeStatement);
+
+		List<Attribute> attributeStatementAttributes =
+			attributeStatement.getAttributes();
+
+		attributeStatementAttributes.addAll(attributes);
+
+		return assertion;
+	}
+
 	protected AudienceRestriction getSuccessAudienceRestriction(
 		String entityId) {
 
@@ -602,6 +1140,34 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		audiences.add(audience);
 
 		return audienceRestriction;
+	}
+
+	protected AuthnContext getSuccessAuthnContext() {
+		AuthnContext authnContext = OpenSamlUtil.buildAuthnContext();
+
+		AuthnContextClassRef authnContextClassRef =
+			OpenSamlUtil.buildAuthnContextClassRef();
+
+		authnContextClassRef.setAuthnContextClassRef(
+			AuthnContext.UNSPECIFIED_AUTHN_CTX);
+
+		authnContext.setAuthnContextClassRef(authnContextClassRef);
+
+		return authnContext;
+	}
+
+	protected AuthnStatement getSuccessAuthnStatement(
+		SamlSsoRequestContext samlSsoRequestContext, Assertion assertion) {
+
+		AuthnStatement authnStatement = OpenSamlUtil.buildAuthnStatement();
+
+		authnStatement.setAuthnContext(getSuccessAuthnContext());
+
+		authnStatement.setAuthnInstant(assertion.getIssueInstant());
+		authnStatement.setSessionIndex(
+			samlSsoRequestContext.getSamlSsoSessionId());
+
+		return authnStatement;
 	}
 
 	protected Conditions getSuccessConditions(
@@ -630,8 +1196,105 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		return conditions;
 	}
 
+	protected NameID getSuccessNameId(
+			SamlSsoRequestContext samlSsoRequestContext)
+		throws Exception {
+
+		String nameIdFormat = null;
+		String spNameQualifier = null;
+
+		MessageContext<AuthnRequest> messageContext =
+			(MessageContext<AuthnRequest>)
+				samlSsoRequestContext.getSAMLMessageContext();
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		NameIdResolver nameIdResolver =
+			_nameIdResolverRegistry.getNameIdResolver(
+				samlPeerEntityContext.getEntityId());
+
+		boolean allowCreate = false;
+
+		AuthnRequest authnRequest = SamlUtil.getAuthnRequest(messageContext);
+
+		if (authnRequest != null) {
+			NameIDPolicy nameIDPolicy = authnRequest.getNameIDPolicy();
+
+			if (nameIDPolicy != null) {
+				nameIdFormat = nameIDPolicy.getFormat();
+				spNameQualifier = nameIDPolicy.getSPNameQualifier();
+				allowCreate = nameIDPolicy.getAllowCreate();
+			}
+		}
+
+		if (nameIdFormat == null) {
+			nameIdFormat = metadataManager.getNameIdFormat(
+				samlPeerEntityContext.getEntityId());
+		}
+
+		return OpenSamlUtil.buildNameId(
+			nameIdFormat, null, spNameQualifier,
+			nameIdResolver.resolve(
+				samlSsoRequestContext.getUser(),
+				samlPeerEntityContext.getEntityId(), nameIdFormat,
+				spNameQualifier, allowCreate,
+				new NameIdResolverSAMLContextImpl(messageContext)));
+	}
+
+	protected Response getSuccessResponse(
+		SamlSsoRequestContext samlSsoRequestContext,
+		AssertionConsumerService assertionConsumerService,
+		DateTime issueInstant) {
+
+		Response response = OpenSamlUtil.buildResponse();
+
+		response.setDestination(assertionConsumerService.getLocation());
+		response.setID(generateIdentifier(20));
+
+		MessageContext<?> messageContext =
+			samlSsoRequestContext.getSAMLMessageContext();
+
+		InOutOperationContext<?, ?> inOutOperationContext =
+			messageContext.getSubcontext(InOutOperationContext.class, false);
+
+		if (inOutOperationContext != null) {
+			MessageContext<?> inboundMessageContext =
+				inOutOperationContext.getInboundMessageContext();
+
+			SAMLMessageInfoContext samlMessageInfoContext =
+				inboundMessageContext.getSubcontext(
+					SAMLMessageInfoContext.class);
+
+			if (Validator.isNotNull(samlMessageInfoContext.getMessageId())) {
+				response.setInResponseTo(samlMessageInfoContext.getMessageId());
+			}
+		}
+
+		response.setIssueInstant(issueInstant);
+
+		SAMLSelfEntityContext samlSelfEntityContext =
+			messageContext.getSubcontext(SAMLSelfEntityContext.class);
+
+		Issuer issuer = OpenSamlUtil.buildIssuer(
+			samlSelfEntityContext.getEntityId());
+
+		response.setIssuer(issuer);
+
+		StatusCode statusCode = OpenSamlUtil.buildStatusCode(
+			StatusCode.SUCCESS);
+
+		response.setStatus(OpenSamlUtil.buildStatus(statusCode));
+
+		response.setVersion(SAMLVersion.VERSION_20);
+
+		return response;
+	}
+
 	protected Subject getSuccessSubject(
-		NameID nameID, SubjectConfirmationData subjectConfirmationData) {
+		SamlSsoRequestContext samlSsoRequestContext,
+		AssertionConsumerService assertionConsumerService, NameID nameID,
+		SubjectConfirmationData subjectConfirmationData) {
 
 		SubjectConfirmation subjectConfirmation =
 			OpenSamlUtil.buildSubjectConfirmation();
@@ -681,13 +1344,453 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		SAMLPeerEntityContext samlPeerEntityContext =
 			messageContext.getSubcontext(SAMLPeerEntityContext.class);
 
+		int assertionLifetime = metadataManager.getAssertionLifetime(
+			samlPeerEntityContext.getEntityId());
+
 		DateTime notOnOrAfterDateTime = issueInstantDateTime.plusSeconds(
-			metadataManager.getAssertionLifetime(
-				samlPeerEntityContext.getEntityId()));
+			assertionLifetime);
 
 		subjectConfirmationData.setNotOnOrAfter(notOnOrAfterDateTime);
 
 		return subjectConfirmationData;
+	}
+
+	protected void redirectToLogin(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SamlSsoRequestContext samlSsoRequestContext, boolean forceAuthn) {
+
+		HttpSession httpSession = httpServletRequest.getSession();
+
+		if (forceAuthn) {
+			logout(httpServletRequest, httpServletResponse);
+
+			httpSession = httpServletRequest.getSession(true);
+
+			httpSession.setAttribute(
+				SamlWebKeys.FORCE_REAUTHENTICATION, Boolean.TRUE);
+		}
+
+		MessageContext<?> samlMessageContext =
+			samlSsoRequestContext.getSAMLMessageContext();
+
+		samlSsoRequestContext.setSAMLMessageContext(null);
+
+		httpSession.setAttribute(
+			SamlWebKeys.SAML_SSO_REQUEST_CONTEXT, samlSsoRequestContext);
+
+		httpServletResponse.addHeader(
+			HttpHeaders.CACHE_CONTROL,
+			HttpHeaders.CACHE_CONTROL_NO_CACHE_VALUE);
+		httpServletResponse.addHeader(
+			HttpHeaders.PRAGMA, HttpHeaders.PRAGMA_NO_CACHE_VALUE);
+
+		StringBundler sb = new StringBundler(3);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		sb.append(themeDisplay.getPathMain());
+
+		sb.append("/portal/login?redirect=");
+
+		StringBundler redirectSB = new StringBundler(4);
+
+		redirectSB.append(themeDisplay.getPathMain());
+		redirectSB.append("/portal/saml/sso");
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			samlMessageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		InOutOperationContext<?, ?> inOutOperationContext =
+			samlMessageContext.getSubcontext(
+				InOutOperationContext.class, false);
+
+		if (inOutOperationContext != null) {
+			MessageContext<?> inboundMessageContext =
+				inOutOperationContext.getInboundMessageContext();
+
+			SAMLMessageInfoContext samlMessageInfoContext =
+				inboundMessageContext.getSubcontext(
+					SAMLMessageInfoContext.class);
+
+			if ((samlMessageInfoContext != null) &&
+				(samlMessageInfoContext.getMessageId() != null)) {
+
+				redirectSB.append("?saml_message_id=");
+				redirectSB.append(
+					URLCodec.encodeURL(samlMessageInfoContext.getMessageId()));
+			}
+		}
+		else if (samlPeerEntityContext.getEntityId() != null) {
+			redirectSB.append("?entityId=");
+			redirectSB.append(
+				URLCodec.encodeURL(samlPeerEntityContext.getEntityId()));
+		}
+
+		sb.append(URLCodec.encodeURL(redirectSB.toString()));
+
+		String redirect = sb.toString();
+
+		try {
+			httpServletResponse.sendRedirect(redirect);
+		}
+		catch (IOException ioException) {
+			throw new SystemException(ioException);
+		}
+	}
+
+	protected void sendFailureResponse(
+			SamlSsoRequestContext samlSsoRequestContext, String statusURI,
+			HttpServletResponse httpServletResponse)
+		throws PortalException {
+
+		MessageContext<?> messageContext =
+			samlSsoRequestContext.getSAMLMessageContext();
+
+		SamlBinding samlBinding = getSamlBinding(
+			SAMLConstants.SAML2_POST_BINDING_URI);
+
+		AssertionConsumerService assertionConsumerService =
+			SamlUtil.resolverAssertionConsumerService(
+				messageContext, samlBinding.getCommunicationProfileId());
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		SAMLEndpointContext samlPeerEndpointContext =
+			samlPeerEntityContext.getSubcontext(SAMLEndpointContext.class);
+
+		samlPeerEndpointContext.setEndpoint(assertionConsumerService);
+
+		Credential credential = metadataManager.getSigningCredential();
+
+		InOutOperationContext<?, Response> inOutOperationContext =
+			messageContext.getSubcontext(InOutOperationContext.class);
+
+		MessageContext<Response> outboundMessageContext =
+			inOutOperationContext.getOutboundMessageContext();
+
+		SecurityParametersContext securityParametersContext =
+			outboundMessageContext.getSubcontext(
+				SecurityParametersContext.class, true);
+
+		SAMLMetadataContext samlPeerMetadataContext =
+			samlPeerEntityContext.getSubcontext(SAMLMetadataContext.class);
+
+		OpenSamlUtil.prepareSecurityParametersContext(
+			credential, securityParametersContext,
+			samlPeerMetadataContext.getRoleDescriptor());
+
+		Response response = OpenSamlUtil.buildResponse();
+
+		response.setDestination(assertionConsumerService.getLocation());
+
+		MessageContext<?> inboundMessageContext =
+			inOutOperationContext.getInboundMessageContext();
+
+		SAMLMessageInfoContext samlMessageInfoContext =
+			inboundMessageContext.getSubcontext(SAMLMessageInfoContext.class);
+
+		response.setInResponseTo(samlMessageInfoContext.getMessageId());
+
+		DateTime issueInstantDateTime = new DateTime(DateTimeZone.UTC);
+
+		response.setIssueInstant(issueInstantDateTime);
+
+		SAMLSelfEntityContext samlSelfEntityContext =
+			messageContext.getSubcontext(SAMLSelfEntityContext.class);
+
+		Issuer issuer = OpenSamlUtil.buildIssuer(
+			samlSelfEntityContext.getEntityId());
+
+		response.setIssuer(issuer);
+
+		StatusCode statusCode = OpenSamlUtil.buildStatusCode(statusURI);
+
+		response.setStatus(OpenSamlUtil.buildStatus(statusCode));
+
+		outboundMessageContext.setMessage(response);
+
+		sendSamlMessage(messageContext, httpServletResponse);
+	}
+
+	protected void sendSuccessResponse(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse,
+			SamlSsoRequestContext samlSsoRequestContext)
+		throws Exception {
+
+		MessageContext<?> messageContext =
+			samlSsoRequestContext.getSAMLMessageContext();
+
+		SamlBinding samlBinding = getSamlBinding(
+			SAMLConstants.SAML2_POST_BINDING_URI);
+
+		AssertionConsumerService assertionConsumerService =
+			SamlUtil.resolverAssertionConsumerService(
+				messageContext, samlBinding.getCommunicationProfileId());
+
+		NameID nameID = getSuccessNameId(samlSsoRequestContext);
+
+		Assertion assertion = getSuccessAssertion(
+			samlSsoRequestContext, assertionConsumerService, nameID);
+
+		Credential credential = metadataManager.getSigningCredential();
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		SAMLMetadataContext samlPeerMetadataContext =
+			samlPeerEntityContext.getSubcontext(SAMLMetadataContext.class);
+
+		SPSSODescriptor spSSODescriptor =
+			(SPSSODescriptor)samlPeerMetadataContext.getRoleDescriptor();
+
+		if (spSSODescriptor.getWantAssertionsSigned()) {
+			OpenSamlUtil.signObject(assertion, credential, spSSODescriptor);
+		}
+
+		Response samlResponse = getSuccessResponse(
+			samlSsoRequestContext, assertionConsumerService,
+			assertion.getIssueInstant());
+
+		SamlIdpSpConnection samlIdpSpConnection =
+			_samlIdpSpConnectionLocalService.getSamlIdpSpConnection(
+				CompanyThreadLocal.getCompanyId(),
+				samlPeerEntityContext.getEntityId());
+
+		CriteriaSet criteriaSet = new CriteriaSet(
+			new EncryptionConfigurationCriterion(
+				ConfigurationService.get(EncryptionConfiguration.class)),
+			new RoleDescriptorCriterion(spSSODescriptor));
+
+		if (!samlIdpSpConnection.isEncryptionForced()) {
+			criteriaSet.add(new EncryptionOptionalCriterion(true));
+		}
+
+		EncryptionParameters encryptionParameters =
+			_samlMetadataEncryptionParametersResolver.resolveSingle(
+				criteriaSet);
+
+		if (encryptionParameters != null) {
+			Encrypter encrypter = new Encrypter(
+				new DataEncryptionParameters(encryptionParameters),
+				new KeyEncryptionParameters(
+					encryptionParameters, samlPeerEntityContext.getEntityId()));
+
+			EncryptedAssertion encryptedAssertion = encrypter.encrypt(
+				assertion);
+
+			List<EncryptedAssertion> encryptedAssertions =
+				samlResponse.getEncryptedAssertions();
+
+			encryptedAssertions.add(encryptedAssertion);
+		}
+		else if (samlIdpSpConnection.isEncryptionForced()) {
+			throw new SamlException(
+				StringBundler.concat(
+					"Encryption is forced for ",
+					samlPeerEntityContext.getEntityId(),
+					", but no encryption parameters have been successfully ",
+					"negotiated"));
+		}
+		else {
+			List<Assertion> assertions = samlResponse.getAssertions();
+
+			assertions.add(assertion);
+		}
+
+		InOutOperationContext<?, Response> inOutOperationContext =
+			messageContext.getSubcontext(InOutOperationContext.class, false);
+
+		if (inOutOperationContext == null) {
+			inOutOperationContext =
+				(InOutOperationContext)messageContext.addSubcontext(
+					new InOutOperationContext<>(
+						new MessageContext<>(), new MessageContext<>()));
+		}
+
+		MessageContext<Response> outboundMessageContext =
+			inOutOperationContext.getOutboundMessageContext();
+
+		outboundMessageContext.addSubcontext(
+			messageContext.getSubcontext(SAMLBindingContext.class, true));
+		outboundMessageContext.setMessage(samlResponse);
+
+		SecurityParametersContext securityParametersContext =
+			outboundMessageContext.getSubcontext(
+				SecurityParametersContext.class, true);
+
+		OpenSamlUtil.prepareSecurityParametersContext(
+			credential, securityParametersContext, spSSODescriptor);
+
+		SAMLProtocolContext samlProtocolContext =
+			outboundMessageContext.getSubcontext(
+				SAMLProtocolContext.class, true);
+
+		samlProtocolContext.setProtocol(SAMLConstants.SAML20P_NS);
+
+		SAMLPeerEntityContext samlOutboundPeerEntityContext =
+			outboundMessageContext.getSubcontext(
+				SAMLPeerEntityContext.class, true);
+
+		SAMLEndpointContext samlPeerEndpointContext =
+			samlOutboundPeerEntityContext.getSubcontext(
+				SAMLEndpointContext.class, true);
+
+		samlPeerEndpointContext.setEndpoint(assertionConsumerService);
+
+		if (samlSsoRequestContext.isNewSession()) {
+			addSamlSsoSession(
+				httpServletRequest, httpServletResponse, samlSsoRequestContext,
+				nameID);
+		}
+		else {
+			updateSamlSsoSession(
+				httpServletRequest, samlSsoRequestContext, nameID);
+		}
+
+		sendSamlMessage(messageContext, httpServletResponse);
+	}
+
+	@Reference(unbind = "-")
+	protected void setAttributeResolverRegistry(
+		AttributeResolverRegistry attributeResolverRegistry) {
+
+		_attributeResolverRegistry = attributeResolverRegistry;
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	protected void setIdentifierGenerationStrategyFactory(
+		IdentifierGenerationStrategyFactory identifierGenerationStrategy) {
+
+		super.setIdentifierGenerationStrategyFactory(
+			identifierGenerationStrategy);
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	protected void setMetadataManager(MetadataManager metadataManager) {
+		super.setMetadataManager(metadataManager);
+	}
+
+	@Reference(unbind = "-")
+	protected void setNameIdResolverRegistry(
+		NameIdResolverRegistry nameIdResolverRegistry) {
+
+		_nameIdResolverRegistry = nameIdResolverRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		super.portal = portal;
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.AT_LEAST_ONE,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void setSamlBinding(SamlBinding samlBinding) {
+		addSamlBinding(samlBinding);
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	protected void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		super.setSamlProviderConfigurationHelper(
+			samlProviderConfigurationHelper);
+	}
+
+	@Reference(unbind = "-")
+	protected void setSamlSpAuthRequestLocalService(
+		SamlSpAuthRequestLocalService samlSpAuthRequestLocalService) {
+
+		_samlSpAuthRequestLocalService = samlSpAuthRequestLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSamlSpIdpConnectionLocalService(
+		SamlSpIdpConnectionLocalService samlSpIdpConnectionLocalService) {
+
+		_samlSpIdpConnectionLocalService = samlSpIdpConnectionLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSamlSpMessageLocalService(
+		SamlSpMessageLocalService samlSpMessageLocalService) {
+
+		_samlSpMessageLocalService = samlSpMessageLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSamlSpSessionLocalService(
+		SamlSpSessionLocalService samlSpSessionLocalService) {
+
+		super.samlSpSessionLocalService = samlSpSessionLocalService;
+	}
+
+	@Reference(policyOption = ReferencePolicyOption.GREEDY, unbind = "-")
+	protected void setUserResolver(UserResolver userResolver) {
+		_userResolver = userResolver;
+	}
+
+	@Override
+	protected void unsetSamlBinding(SamlBinding samlBinding) {
+		removeSamlBinding(samlBinding);
+	}
+
+	protected void updateSamlSsoSession(
+			HttpServletRequest httpServletRequest,
+			SamlSsoRequestContext samlSsoRequestContext, NameID nameID)
+		throws Exception {
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			httpServletRequest);
+
+		SamlIdpSsoSession samlIdpSsoSession =
+			_samlIdpSsoSessionLocalService.updateModifiedDate(
+				samlSsoRequestContext.getSamlSsoSessionId());
+
+		MessageContext<?> messageContext =
+			samlSsoRequestContext.getSAMLMessageContext();
+
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+		try {
+			_samlIdpSpSessionLocalService.updateModifiedDate(
+				samlIdpSsoSession.getSamlIdpSsoSessionId(),
+				samlPeerEntityContext.getEntityId());
+		}
+		catch (NoSuchIdpSpSessionException noSuchIdpSpSessionException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					noSuchIdpSpSessionException, noSuchIdpSpSessionException);
+			}
+
+			_samlIdpSpSessionLocalService.addSamlIdpSpSession(
+				samlIdpSsoSession.getSamlIdpSsoSessionId(),
+				samlPeerEntityContext.getEntityId(), nameID.getFormat(),
+				nameID.getValue(), serviceContext);
+		}
+	}
+
+	protected void verifyAssertion(
+			Assertion assertion, MessageContext<?> messageContext,
+			TrustEngine<Signature> trustEngine)
+		throws PortalException {
+
+		verifyReplay(messageContext, assertion);
+		verifyIssuer(messageContext, assertion.getIssuer());
+		verifyAssertionSignature(
+			assertion.getSignature(), messageContext, trustEngine);
+		verifyConditions(messageContext, assertion.getConditions());
+		verifySubject(messageContext, assertion.getSubject());
 	}
 
 	protected void verifyAssertionSignature(
@@ -705,7 +1808,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 			(SPSSODescriptor)samlSelfMetadataContext.getRoleDescriptor();
 
 		if (signature != null) {
-			_verifySignature(messageContext, signature, trustEngine);
+			verifySignature(messageContext, signature, trustEngine);
 		}
 		else if (spSSODescriptor.getWantAssertionsSigned()) {
 			throw new SignatureException("SAML assertion is not signed");
@@ -931,6 +2034,40 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		}
 	}
 
+	protected void verifySignature(
+			MessageContext<?> messageContext, Signature signature,
+			TrustEngine<Signature> trustEngine)
+		throws PortalException {
+
+		try {
+			_samlSignatureProfileValidator.validate(signature);
+
+			SAMLPeerEntityContext samlPeerEntityContext =
+				messageContext.getSubcontext(SAMLPeerEntityContext.class);
+
+			CriteriaSet criteriaSet = new CriteriaSet();
+
+			criteriaSet.add(
+				new EntityIdCriterion(samlPeerEntityContext.getEntityId()));
+			criteriaSet.add(
+				new EntityRoleCriterion(IDPSSODescriptor.DEFAULT_ELEMENT_NAME));
+			criteriaSet.add(new ProtocolCriterion(SAMLConstants.SAML20P_NS));
+			criteriaSet.add(new UsageCriterion(UsageType.SIGNING));
+
+			if (!trustEngine.validate(signature, criteriaSet)) {
+				throw new SignatureException("Unable validate signature trust");
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof PortalException) {
+				throw (PortalException)exception;
+			}
+
+			throw new SignatureException(
+				"Unable to verify signature", exception);
+		}
+	}
+
 	protected void verifySubject(
 			MessageContext<?> messageContext, Subject subject)
 		throws PortalException {
@@ -979,10 +2116,6 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 			NameID nameID = subject.getNameID();
 
-			if (Validator.isNull(nameID.getValue())) {
-				continue;
-			}
-
 			SAMLSubjectNameIdentifierContext samlSubjectNameIdentifierContext =
 				messageContext.getSubcontext(
 					SAMLSubjectNameIdentifierContext.class);
@@ -995,1139 +2128,21 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		throw new SubjectException("Unable to verify subject");
 	}
 
-	private void _addSamlSsoSession(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
-			SamlSsoRequestContext samlSsoRequestContext, NameID nameID)
-		throws Exception {
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			httpServletRequest);
-
-		SamlIdpSsoSession samlIdpSsoSession =
-			_samlIdpSsoSessionLocalService.addSamlIdpSsoSession(
-				samlSsoRequestContext.getSamlSsoSessionId(), serviceContext);
-
-		MessageContext<?> messageContext =
-			samlSsoRequestContext.getSAMLMessageContext();
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		_samlIdpSpSessionLocalService.addSamlIdpSpSession(
-			samlIdpSsoSession.getSamlIdpSsoSessionId(),
-			samlPeerEntityContext.getEntityId(), nameID.getFormat(),
-			nameID.getValue(), serviceContext);
-
-		addNonpersistentCookie(
-			httpServletRequest, httpServletResponse,
-			SamlWebKeys.SAML_SSO_SESSION_ID,
-			samlSsoRequestContext.getSamlSsoSessionId());
-	}
-
-	private Decrypter _createDecrypter() {
-		DecryptionParametersResolver decryptionParametersResolver =
-			new BasicDecryptionParametersResolver();
-
-		try {
-			DecryptionParameters decryptionParameters =
-				decryptionParametersResolver.resolveSingle(
-					new CriteriaSet(
-						new DecryptionConfigurationCriterion(
-							SecurityConfigurationSupport.
-								getGlobalDecryptionConfiguration())));
-
-			if (decryptionParameters == null) {
-				throw new RuntimeException(
-					"Unable to resolve decryption parameters from the " +
-						"configuration");
-			}
-
-			decryptionParameters.setKEKKeyInfoCredentialResolver(
-				new DefaultKeyInfoCredentialResolver());
-
-			Decrypter decrypter = new CustomParserPoolDecrypter(
-				decryptionParameters);
-
-			decrypter.setRootInNewDocument(true);
-
-			return decrypter;
-		}
-		catch (ResolverException resolverException) {
-			_log.error(resolverException);
-		}
-
-		return null;
-	}
-
-	private SAMLMetadataEncryptionParametersResolver
-		_createSAMLMetadataEncryptionParametersResolver() {
-
-		SAMLMetadataEncryptionParametersResolver
-			samlMetadataEncryptionParametersResolver =
-				new SAMLMetadataEncryptionParametersResolver(
-					metadataManager.getMetadataCredentialResolver());
-
-		samlMetadataEncryptionParametersResolver.
-			setAutoGenerateDataEncryptionCredential(true);
-
-		return samlMetadataEncryptionParametersResolver;
-	}
-
-	private SamlSsoRequestContext _decodeAuthnConversationAfterLogin(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws Exception {
-
-		HttpSession httpSession = httpServletRequest.getSession();
-
-		SamlSsoRequestContext samlSsoRequestContext =
-			(SamlSsoRequestContext)httpSession.getAttribute(
-				SamlWebKeys.SAML_SSO_REQUEST_CONTEXT);
-
-		if (samlSsoRequestContext != null) {
-			httpSession.removeAttribute(SamlWebKeys.SAML_SSO_REQUEST_CONTEXT);
-
-			MessageContext<?> messageContext = getMessageContext(
-				httpServletRequest, httpServletResponse,
-				samlSsoRequestContext.getPeerEntityId());
-
-			samlSsoRequestContext.setSAMLMessageContext(messageContext);
-
-			String authnRequestXml = samlSsoRequestContext.getAuthnRequestXml();
-
-			if (Validator.isNotNull(authnRequestXml)) {
-				AuthnRequest authnRequest =
-					(AuthnRequest)OpenSamlUtil.unmarshall(authnRequestXml);
-
-				InOutOperationContext<AuthnRequest, ?> inOutOperationContext =
-					new InOutOperationContext(
-						new MessageContext(), new MessageContext());
-
-				messageContext.addSubcontext(inOutOperationContext);
-
-				MessageContext<AuthnRequest> inboundMessageContext =
-					inOutOperationContext.getInboundMessageContext();
-
-				inboundMessageContext.setMessage(authnRequest);
-
-				SAMLMessageInfoContext samlInboundMessageInfoContext =
-					inboundMessageContext.getSubcontext(
-						SAMLMessageInfoContext.class, true);
-
-				samlInboundMessageInfoContext.setMessageId(
-					authnRequest.getID());
-			}
-
-			String relayState = samlSsoRequestContext.getRelayState();
-
-			SAMLBindingContext samlBindingContext =
-				messageContext.getSubcontext(SAMLBindingContext.class, true);
-
-			samlBindingContext.setRelayState(relayState);
-
-			String samlSsoSessionId = getSamlSsoSessionId(httpServletRequest);
-
-			if (Validator.isNotNull(samlSsoSessionId)) {
-				samlSsoRequestContext.setSamlSsoSessionId(samlSsoSessionId);
-			}
-			else {
-				samlSsoRequestContext.setNewSession(true);
-				samlSsoRequestContext.setSamlSsoSessionId(
-					generateIdentifier(30));
-			}
-
-			samlSsoRequestContext.setStage(
-				SamlSsoRequestContext.STAGE_AUTHENTICATED);
-
-			samlSsoRequestContext.setUserId(
-				portal.getUserId(httpServletRequest));
-
-			return samlSsoRequestContext;
-		}
-
-		return null;
-	}
-
-	private MessageContext<?> _decodeAuthnResponse(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, SamlBinding samlBinding)
-		throws Exception {
-
-		MessageContext<?> messageContext = decodeSamlMessage(
-			httpServletRequest, httpServletResponse, samlBinding, true);
-
-		InOutOperationContext<Response, ?> inOutOperationContext =
-			messageContext.getSubcontext(InOutOperationContext.class);
-
-		MessageContext<Response> inboundMessageContext =
-			inOutOperationContext.getInboundMessageContext();
-
-		Response samlResponse = inboundMessageContext.getMessage();
-
-		List<EncryptedAssertion> encryptedAssertions =
-			samlResponse.getEncryptedAssertions();
-
-		List<Assertion> assertions = new ArrayList<>(
-			samlResponse.getAssertions());
-
-		Decrypter decrypter = _decrypterDCLSingleton.getSingleton(
-			this::_createDecrypter);
-
-		if (decrypter == null) {
-			if (!encryptedAssertions.isEmpty()) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Message returned encrypted assertions but there is " +
-							"no decrypter available");
-				}
-			}
-		}
-		else {
-			for (EncryptedAssertion encryptedAssertion : encryptedAssertions) {
-				try {
-					assertions.add(decrypter.decrypt(encryptedAssertion));
-				}
-				catch (DecryptionException decryptionException) {
-					_log.error(
-						"Unable to assertion decryption", decryptionException);
-				}
-			}
-
-			inboundMessageContext.addSubcontext(
-				new DecrypterContext(decrypter));
-		}
-
-		SignatureTrustEngine signatureTrustEngine =
-			metadataManager.getSignatureTrustEngine();
-
-		Assertion assertion = null;
-
-		for (Assertion curAssertion : assertions) {
-			try {
-				_verifyAssertion(
-					curAssertion, messageContext, signatureTrustEngine);
-			}
-			catch (SamlException samlException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Rejecting assertion " + curAssertion.getID(),
-						samlException);
-				}
-
-				continue;
-			}
-
-			List<AuthnStatement> authnStatements =
-				curAssertion.getAuthnStatements();
-
-			if (!authnStatements.isEmpty()) {
-				Subject subject = curAssertion.getSubject();
-
-				if ((subject != null) &&
-					(subject.getSubjectConfirmations() != null)) {
-
-					for (SubjectConfirmation subjectConfirmation :
-							subject.getSubjectConfirmations()) {
-
-						if (SubjectConfirmation.METHOD_BEARER.equals(
-								subjectConfirmation.getMethod())) {
-
-							assertion = curAssertion;
-
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		if (assertion == null) {
-			throw new AssertionException(
-				"Response does not contain any acceptable assertions");
-		}
-
-		inboundMessageContext.addSubcontext(
-			new SubjectAssertionContext(assertion));
-
-		return messageContext;
-	}
-
-	private String _getAuthRedirectURL(
-			MessageContext<?> messageContext,
-			HttpServletRequest httpServletRequest)
-		throws Exception {
-
-		StringBundler sb = new StringBundler(3);
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		sb.append(themeDisplay.getPathMain());
-
-		sb.append("/portal/saml/auth_redirect?redirect=");
-
-		SAMLBindingContext samlBindingContext = messageContext.getSubcontext(
-			SAMLBindingContext.class);
-
-		String relayState = portal.escapeRedirect(
-			samlBindingContext.getRelayState());
-
-		if (Validator.isNull(relayState)) {
-			relayState = portal.getHomeURL(httpServletRequest);
-		}
-
-		sb.append(URLCodec.encodeURL(relayState));
-
-		return sb.toString();
-	}
-
-	private Assertion _getSuccessAssertion(
-		SamlSsoRequestContext samlSsoRequestContext,
-		AssertionConsumerService assertionConsumerService, NameID nameID) {
-
-		MessageContext<AuthnRequest> messageContext =
-			(MessageContext<AuthnRequest>)
-				samlSsoRequestContext.getSAMLMessageContext();
-
-		Assertion assertion = OpenSamlUtil.buildAssertion();
-
-		DateTime issueInstantDateTime = new DateTime(DateTimeZone.UTC);
-
-		SubjectConfirmationData subjectConfirmationData =
-			getSuccessSubjectConfirmationData(
-				samlSsoRequestContext, assertionConsumerService,
-				issueInstantDateTime);
-
-		assertion.setConditions(
-			getSuccessConditions(
-				samlSsoRequestContext, issueInstantDateTime,
-				subjectConfirmationData.getNotOnOrAfter()));
-
-		assertion.setID(generateIdentifier(20));
-		assertion.setIssueInstant(issueInstantDateTime);
-
-		SAMLSelfEntityContext samlSelfEntityContext =
-			messageContext.getSubcontext(SAMLSelfEntityContext.class);
-
-		assertion.setIssuer(
-			OpenSamlUtil.buildIssuer(samlSelfEntityContext.getEntityId()));
-
-		assertion.setSubject(
-			getSuccessSubject(nameID, subjectConfirmationData));
-		assertion.setVersion(SAMLVersion.VERSION_20);
-
-		List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
-
-		authnStatements.add(
-			_getSuccessAuthnStatement(samlSsoRequestContext, assertion));
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		boolean attributesEnabled = metadataManager.isAttributesEnabled(
-			samlPeerEntityContext.getEntityId());
-
-		if (!attributesEnabled) {
-			return assertion;
-		}
-
-		User user = samlSsoRequestContext.getUser();
-
-		AttributeResolver attributeResolver =
-			_attributeResolverRegistry.getAttributeResolver(
-				samlPeerEntityContext.getEntityId());
-
-		AttributePublisherImpl attributePublisherImpl =
-			new AttributePublisherImpl();
-
-		attributeResolver.resolve(
-			user, new AttributeResolverSAMLContextImpl(messageContext),
-			attributePublisherImpl);
-
-		List<Attribute> attributes = attributePublisherImpl.getAttributes();
-
-		if (attributes.isEmpty()) {
-			return assertion;
-		}
-
-		List<AttributeStatement> attributeStatements =
-			assertion.getAttributeStatements();
-
-		AttributeStatement attributeStatement =
-			OpenSamlUtil.buildAttributeStatement();
-
-		attributeStatements.add(attributeStatement);
-
-		List<Attribute> attributeStatementAttributes =
-			attributeStatement.getAttributes();
-
-		attributeStatementAttributes.addAll(attributes);
-
-		return assertion;
-	}
-
-	private AuthnContext _getSuccessAuthnContext() {
-		AuthnContext authnContext = OpenSamlUtil.buildAuthnContext();
-
-		AuthnContextClassRef authnContextClassRef =
-			OpenSamlUtil.buildAuthnContextClassRef();
-
-		authnContextClassRef.setAuthnContextClassRef(
-			AuthnContext.UNSPECIFIED_AUTHN_CTX);
-
-		authnContext.setAuthnContextClassRef(authnContextClassRef);
-
-		return authnContext;
-	}
-
-	private AuthnStatement _getSuccessAuthnStatement(
-		SamlSsoRequestContext samlSsoRequestContext, Assertion assertion) {
-
-		AuthnStatement authnStatement = OpenSamlUtil.buildAuthnStatement();
-
-		authnStatement.setAuthnContext(_getSuccessAuthnContext());
-
-		authnStatement.setAuthnInstant(assertion.getIssueInstant());
-		authnStatement.setSessionIndex(
-			samlSsoRequestContext.getSamlSsoSessionId());
-
-		return authnStatement;
-	}
-
-	private NameID _getSuccessNameId(
-			SamlSsoRequestContext samlSsoRequestContext)
-		throws Exception {
-
-		String nameIdFormat = null;
-		String spNameQualifier = null;
-
-		MessageContext<AuthnRequest> messageContext =
-			(MessageContext<AuthnRequest>)
-				samlSsoRequestContext.getSAMLMessageContext();
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		NameIdResolver nameIdResolver =
-			_nameIdResolverRegistry.getNameIdResolver(
-				samlPeerEntityContext.getEntityId());
-
-		boolean allowCreate = false;
-
-		AuthnRequest authnRequest = SamlUtil.getAuthnRequest(messageContext);
-
-		if (authnRequest != null) {
-			NameIDPolicy nameIDPolicy = authnRequest.getNameIDPolicy();
-
-			if (nameIDPolicy != null) {
-				nameIdFormat = nameIDPolicy.getFormat();
-				spNameQualifier = nameIDPolicy.getSPNameQualifier();
-				allowCreate = nameIDPolicy.getAllowCreate();
-			}
-		}
-
-		if (nameIdFormat == null) {
-			nameIdFormat = metadataManager.getNameIdFormat(
-				samlPeerEntityContext.getEntityId());
-		}
-
-		return OpenSamlUtil.buildNameId(
-			nameIdFormat, null, spNameQualifier,
-			nameIdResolver.resolve(
-				samlSsoRequestContext.getUser(),
-				samlPeerEntityContext.getEntityId(), nameIdFormat,
-				spNameQualifier, allowCreate,
-				new NameIdResolverSAMLContextImpl(messageContext)));
-	}
-
-	private Response _getSuccessResponse(
-		SamlSsoRequestContext samlSsoRequestContext,
-		AssertionConsumerService assertionConsumerService,
-		DateTime issueInstant) {
-
-		Response response = OpenSamlUtil.buildResponse();
-
-		response.setDestination(assertionConsumerService.getLocation());
-		response.setID(generateIdentifier(20));
-
-		MessageContext<?> messageContext =
-			samlSsoRequestContext.getSAMLMessageContext();
-
-		InOutOperationContext<?, ?> inOutOperationContext =
-			messageContext.getSubcontext(InOutOperationContext.class, false);
-
-		if (inOutOperationContext != null) {
-			MessageContext<?> inboundMessageContext =
-				inOutOperationContext.getInboundMessageContext();
-
-			SAMLMessageInfoContext samlMessageInfoContext =
-				inboundMessageContext.getSubcontext(
-					SAMLMessageInfoContext.class);
-
-			if (Validator.isNotNull(samlMessageInfoContext.getMessageId())) {
-				response.setInResponseTo(samlMessageInfoContext.getMessageId());
-			}
-		}
-
-		response.setIssueInstant(issueInstant);
-
-		SAMLSelfEntityContext samlSelfEntityContext =
-			messageContext.getSubcontext(SAMLSelfEntityContext.class);
-
-		response.setIssuer(
-			OpenSamlUtil.buildIssuer(samlSelfEntityContext.getEntityId()));
-
-		StatusCode statusCode = OpenSamlUtil.buildStatusCode(
-			StatusCode.SUCCESS);
-
-		response.setStatus(OpenSamlUtil.buildStatus(statusCode));
-
-		response.setVersion(SAMLVersion.VERSION_20);
-
-		return response;
-	}
-
-	private void _processAuthnRequest(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws Exception {
-
-		SamlSsoRequestContext samlSsoRequestContext = decodeAuthnRequest(
-			httpServletRequest, httpServletResponse);
-
-		MessageContext<?> messageContext =
-			samlSsoRequestContext.getSAMLMessageContext();
-
-		InOutOperationContext<AuthnRequest, ?> inOutOperationContext =
-			messageContext.getSubcontext(InOutOperationContext.class, false);
-
-		AuthnRequest authnRequest = null;
-		User user = samlSsoRequestContext.getUser();
-
-		if (inOutOperationContext != null) {
-			MessageContext<AuthnRequest> inboundMessageContext =
-				inOutOperationContext.getInboundMessageContext();
-
-			authnRequest = inboundMessageContext.getMessage();
-
-			if ((authnRequest != null) && authnRequest.isPassive() &&
-				(user == null)) {
-
-				SamlProviderConfiguration samlProviderConfiguration =
-					samlProviderConfigurationHelper.
-						getSamlProviderConfiguration();
-
-				_sendFailureResponse(
-					samlProviderConfiguration.
-						authnRequestSigningAllowsDynamicACSURL(),
-					httpServletResponse, samlSsoRequestContext,
-					StatusCode.NO_PASSIVE);
-
-				return;
-			}
-		}
-
-		boolean sessionExpired = false;
-
-		if (!samlSsoRequestContext.isNewSession()) {
-			String samlSsoSessionId =
-				samlSsoRequestContext.getSamlSsoSessionId();
-
-			SamlIdpSsoSession samlIdpSsoSession =
-				_samlIdpSsoSessionLocalService.fetchSamlIdpSso(
-					samlSsoSessionId);
-
-			if (samlIdpSsoSession != null) {
-				sessionExpired = samlIdpSsoSession.isExpired();
-			}
-			else {
-				samlSsoSessionId = null;
-
-				samlSsoRequestContext.setSamlSsoSessionId(null);
-			}
-
-			if (sessionExpired || Validator.isNull(samlSsoSessionId)) {
-				CookiesManagerUtil.deleteCookies(
-					CookiesManagerUtil.getDomain(httpServletRequest),
-					httpServletRequest, httpServletResponse,
-					SamlWebKeys.SAML_SSO_SESSION_ID);
-
-				samlSsoRequestContext.setNewSession(true);
-				samlSsoRequestContext.setSamlSsoSessionId(
-					generateIdentifier(30));
-			}
-		}
-
-		if (sessionExpired || (user == null) ||
-			((authnRequest != null) && authnRequest.isForceAuthn() &&
-			 (user != null) &&
-			 (samlSsoRequestContext.getStage() ==
-				 SamlSsoRequestContext.STAGE_INITIAL))) {
-
-			boolean forceAuthn = false;
-
-			if ((authnRequest != null) && authnRequest.isForceAuthn()) {
-				forceAuthn = true;
-			}
-
-			_redirectToLogin(
-				httpServletRequest, httpServletResponse, samlSsoRequestContext,
-				forceAuthn);
-		}
-		else {
-			SamlProviderConfiguration samlProviderConfiguration =
-				samlProviderConfigurationHelper.getSamlProviderConfiguration();
-
-			_sendSuccessResponse(
-				samlProviderConfiguration.
-					authnRequestSigningAllowsDynamicACSURL(),
-				httpServletRequest, httpServletResponse, samlSsoRequestContext);
-
-			HttpSession httpSession = httpServletRequest.getSession(false);
-
-			if (httpSession != null) {
-				httpSession.removeAttribute(SamlWebKeys.FORCE_REAUTHENTICATION);
-			}
-		}
-	}
-
-	private void _processResponse(
-			MessageContext<?> messageContext,
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws Exception {
-
-		InOutOperationContext<Response, ?> inOutOperationContext =
-			messageContext.getSubcontext(InOutOperationContext.class);
-
-		MessageContext<Response> inboundMessageContext =
-			inOutOperationContext.getInboundMessageContext();
-
-		Response samlResponse = inboundMessageContext.getMessage();
-
-		Status status = samlResponse.getStatus();
-
-		StatusCode statusCode = status.getStatusCode();
-
-		String statusCodeURI = statusCode.getValue();
-
-		if (!statusCodeURI.equals(StatusCode.SUCCESS)) {
-			StatusCode childStatusCode = statusCode.getStatusCode();
-
-			if ((childStatusCode != null) &&
-				Validator.isNotNull(childStatusCode.getValue())) {
-
-				throw new StatusException(childStatusCode.getValue());
-			}
-
-			throw new StatusException(statusCodeURI);
-		}
-
-		verifyInResponseTo(samlResponse);
-		verifyDestination(messageContext, samlResponse.getDestination());
-
-		Issuer issuer = samlResponse.getIssuer();
-
-		verifyIssuer(messageContext, issuer);
-
-		SAMLSubjectNameIdentifierContext samlSubjectNameIdentifierContext =
-			messageContext.getSubcontext(
-				SAMLSubjectNameIdentifierContext.class);
-
-		NameID nameID =
-			samlSubjectNameIdentifierContext.getSAML2SubjectNameID();
-
-		if (nameID == null) {
-			throw new SamlException("Name ID not present in subject");
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("SAML authenticated user " + nameID.getValue());
-		}
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		SamlSpIdpConnection samlSpIdpConnection =
-			_samlSpIdpConnectionLocalService.getSamlSpIdpConnection(
-				CompanyThreadLocal.getCompanyId(),
-				samlPeerEntityContext.getEntityId());
-
-		if (Validator.isNull(samlResponse.getInResponseTo()) &&
-			samlSpIdpConnection.isForceAuthn()) {
-
-			throw new AuthnAgeException();
-		}
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			httpServletRequest);
-
-		User user = _userResolver.resolveUser(
-			new UserResolverSAMLContextImpl(
-				(MessageContext<Response>)messageContext),
-			serviceContext);
-
-		if (user == null) {
-			throw new SubjectException(
-				"No user could not be matched or provisioned");
-		}
-
-		serviceContext.setUserId(user.getUserId());
-
-		SamlSpSession samlSpSession = getSamlSpSession(httpServletRequest);
-		HttpSession httpSession = httpServletRequest.getSession();
-
-		SubjectAssertionContext subjectAssertionContext =
-			inboundMessageContext.getSubcontext(SubjectAssertionContext.class);
-
-		Assertion assertion = subjectAssertionContext.getAssertion();
-
-		List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
-
-		AuthnStatement authnStatement = authnStatements.get(0);
-
-		String sessionIndex = authnStatement.getSessionIndex();
-
-		if (samlSpSession != null) {
-			samlSpSessionLocalService.updateSamlSpSession(
-				samlSpSession.getSamlSpSessionId(),
-				OpenSamlUtil.marshall(assertion), httpSession.getId(),
-				nameID.getFormat(), nameID.getNameQualifier(),
-				nameID.getSPNameQualifier(), nameID.getValue(),
-				issuer.getValue(), samlSpSession.getSamlSpSessionKey(),
-				sessionIndex, serviceContext);
-		}
-		else {
-			String samlSpSessionKey = generateIdentifier(30);
-
-			samlSpSession = samlSpSessionLocalService.addSamlSpSession(
-				OpenSamlUtil.marshall(assertion), httpSession.getId(),
-				nameID.getFormat(), nameID.getNameQualifier(),
-				nameID.getSPNameQualifier(), nameID.getValue(),
-				issuer.getValue(), samlSpSessionKey, sessionIndex,
-				serviceContext);
-		}
-
-		httpSession.setAttribute(
-			SamlWebKeys.SAML_SP_SESSION_KEY,
-			samlSpSession.getSamlSpSessionKey());
-
-		addNonpersistentCookie(
-			httpServletRequest, httpServletResponse,
-			SamlWebKeys.SAML_SP_SESSION_KEY,
-			samlSpSession.getSamlSpSessionKey());
-
-		httpServletResponse.sendRedirect(
-			_getAuthRedirectURL(messageContext, httpServletRequest));
-	}
-
-	private void _redirectToLogin(
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		SamlSsoRequestContext samlSsoRequestContext, boolean forceAuthn) {
-
-		HttpSession httpSession = httpServletRequest.getSession();
-
-		if (forceAuthn) {
-			logout(httpServletRequest, httpServletResponse);
-
-			httpSession = httpServletRequest.getSession(true);
-
-			httpSession.setAttribute(
-				SamlWebKeys.FORCE_REAUTHENTICATION, Boolean.TRUE);
-		}
-
-		MessageContext<?> samlMessageContext =
-			samlSsoRequestContext.getSAMLMessageContext();
-
-		samlSsoRequestContext.setSAMLMessageContext(null);
-
-		httpSession.setAttribute(
-			SamlWebKeys.SAML_SSO_REQUEST_CONTEXT, samlSsoRequestContext);
-
-		httpServletResponse.addHeader(
-			HttpHeaders.CACHE_CONTROL,
-			HttpHeaders.CACHE_CONTROL_NO_CACHE_VALUE);
-		httpServletResponse.addHeader(
-			HttpHeaders.PRAGMA, HttpHeaders.PRAGMA_NO_CACHE_VALUE);
-
-		StringBundler sb = new StringBundler(3);
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		sb.append(themeDisplay.getPathMain());
-
-		sb.append("/portal/login?redirect=");
-
-		StringBundler redirectSB = new StringBundler(4);
-
-		redirectSB.append(themeDisplay.getPathMain());
-		redirectSB.append("/portal/saml/sso");
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			samlMessageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		InOutOperationContext<?, ?> inOutOperationContext =
-			samlMessageContext.getSubcontext(
-				InOutOperationContext.class, false);
-
-		if (inOutOperationContext != null) {
-			MessageContext<?> inboundMessageContext =
-				inOutOperationContext.getInboundMessageContext();
-
-			SAMLMessageInfoContext samlMessageInfoContext =
-				inboundMessageContext.getSubcontext(
-					SAMLMessageInfoContext.class);
-
-			if ((samlMessageInfoContext != null) &&
-				(samlMessageInfoContext.getMessageId() != null)) {
-
-				redirectSB.append("?saml_message_id=");
-				redirectSB.append(
-					URLCodec.encodeURL(samlMessageInfoContext.getMessageId()));
-			}
-		}
-		else if (samlPeerEntityContext.getEntityId() != null) {
-			redirectSB.append("?entityId=");
-			redirectSB.append(
-				URLCodec.encodeURL(samlPeerEntityContext.getEntityId()));
-		}
-
-		sb.append(URLCodec.encodeURL(redirectSB.toString()));
-
-		String redirect = sb.toString();
-
-		try {
-			httpServletResponse.sendRedirect(redirect);
-		}
-		catch (IOException ioException) {
-			throw new SystemException(ioException);
-		}
-	}
-
-	private void _sendFailureResponse(
-			boolean dynamicACSURL, HttpServletResponse httpServletResponse,
-			SamlSsoRequestContext samlSsoRequestContext, String statusURI)
-		throws Exception {
-
-		MessageContext<?> messageContext =
-			samlSsoRequestContext.getSAMLMessageContext();
-
-		SamlBinding samlBinding = samlBindingProvider.getSamlBinding(
-			SAMLConstants.SAML2_POST_BINDING_URI);
-
-		AssertionConsumerService assertionConsumerService =
-			SamlUtil.resolverAssertionConsumerService(
-				messageContext, samlBinding.getCommunicationProfileId(),
-				dynamicACSURL);
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		SAMLEndpointContext samlPeerEndpointContext =
-			samlPeerEntityContext.getSubcontext(SAMLEndpointContext.class);
-
-		samlPeerEndpointContext.setEndpoint(assertionConsumerService);
-
-		Credential credential = metadataManager.getSigningCredential();
-
-		InOutOperationContext<?, Response> inOutOperationContext =
-			messageContext.getSubcontext(InOutOperationContext.class);
-
-		MessageContext<Response> outboundMessageContext =
-			inOutOperationContext.getOutboundMessageContext();
-
-		SecurityParametersContext securityParametersContext =
-			outboundMessageContext.getSubcontext(
-				SecurityParametersContext.class, true);
-
-		SAMLMetadataContext samlPeerMetadataContext =
-			samlPeerEntityContext.getSubcontext(SAMLMetadataContext.class);
-
-		OpenSamlUtil.prepareSecurityParametersContext(
-			credential, securityParametersContext,
-			samlPeerMetadataContext.getRoleDescriptor());
-
-		Response response = OpenSamlUtil.buildResponse();
-
-		response.setDestination(assertionConsumerService.getLocation());
-
-		MessageContext<?> inboundMessageContext =
-			inOutOperationContext.getInboundMessageContext();
-
-		SAMLMessageInfoContext samlMessageInfoContext =
-			inboundMessageContext.getSubcontext(SAMLMessageInfoContext.class);
-
-		response.setInResponseTo(samlMessageInfoContext.getMessageId());
-
-		DateTime issueInstantDateTime = new DateTime(DateTimeZone.UTC);
-
-		response.setIssueInstant(issueInstantDateTime);
-
-		SAMLSelfEntityContext samlSelfEntityContext =
-			messageContext.getSubcontext(SAMLSelfEntityContext.class);
-
-		response.setIssuer(
-			OpenSamlUtil.buildIssuer(samlSelfEntityContext.getEntityId()));
-
-		StatusCode statusCode = OpenSamlUtil.buildStatusCode(statusURI);
-
-		response.setStatus(OpenSamlUtil.buildStatus(statusCode));
-
-		outboundMessageContext.setMessage(response);
-
-		sendSamlMessage(messageContext, httpServletResponse);
-	}
-
-	private void _sendSuccessResponse(
-			boolean dynamicACSURL, HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
-			SamlSsoRequestContext samlSsoRequestContext)
-		throws Exception {
-
-		MessageContext<?> messageContext =
-			samlSsoRequestContext.getSAMLMessageContext();
-
-		SamlBinding samlBinding = samlBindingProvider.getSamlBinding(
-			SAMLConstants.SAML2_POST_BINDING_URI);
-
-		AssertionConsumerService assertionConsumerService =
-			SamlUtil.resolverAssertionConsumerService(
-				messageContext, samlBinding.getCommunicationProfileId(),
-				dynamicACSURL);
-
-		NameID nameID = _getSuccessNameId(samlSsoRequestContext);
-
-		Assertion assertion = _getSuccessAssertion(
-			samlSsoRequestContext, assertionConsumerService, nameID);
-
-		Credential credential = metadataManager.getSigningCredential();
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		SAMLMetadataContext samlPeerMetadataContext =
-			samlPeerEntityContext.getSubcontext(SAMLMetadataContext.class);
-
-		SPSSODescriptor spSSODescriptor =
-			(SPSSODescriptor)samlPeerMetadataContext.getRoleDescriptor();
-
-		if (spSSODescriptor.getWantAssertionsSigned()) {
-			OpenSamlUtil.signObject(assertion, credential, spSSODescriptor);
-		}
-
-		Response samlResponse = _getSuccessResponse(
-			samlSsoRequestContext, assertionConsumerService,
-			assertion.getIssueInstant());
-
-		SamlIdpSpConnection samlIdpSpConnection =
-			_samlIdpSpConnectionLocalService.getSamlIdpSpConnection(
-				CompanyThreadLocal.getCompanyId(),
-				samlPeerEntityContext.getEntityId());
-
-		CriteriaSet criteriaSet = new CriteriaSet(
-			new EncryptionConfigurationCriterion(
-				ConfigurationServiceBootstrapUtil.get(
-					EncryptionConfiguration.class)),
-			new RoleDescriptorCriterion(spSSODescriptor));
-
-		if (!samlIdpSpConnection.isEncryptionForced()) {
-			criteriaSet.add(new EncryptionOptionalCriterion(true));
-		}
-
-		SAMLMetadataEncryptionParametersResolver
-			samlMetadataEncryptionParametersResolver =
-				_samlMetadataEncryptionParametersResolverDCLSingleton.
-					getSingleton(
-						this::_createSAMLMetadataEncryptionParametersResolver);
-
-		EncryptionParameters encryptionParameters =
-			samlMetadataEncryptionParametersResolver.resolveSingle(criteriaSet);
-
-		if (encryptionParameters != null) {
-			Encrypter encrypter = new Encrypter(
-				new DataEncryptionParameters(encryptionParameters),
-				new KeyEncryptionParameters(
-					encryptionParameters, samlPeerEntityContext.getEntityId()));
-
-			EncryptedAssertion encryptedAssertion = encrypter.encrypt(
-				assertion);
-
-			List<EncryptedAssertion> encryptedAssertions =
-				samlResponse.getEncryptedAssertions();
-
-			encryptedAssertions.add(encryptedAssertion);
-		}
-		else if (samlIdpSpConnection.isEncryptionForced()) {
-			throw new SamlException(
-				StringBundler.concat(
-					"Encryption is forced for ",
-					samlPeerEntityContext.getEntityId(),
-					", but no encryption parameters have been successfully ",
-					"negotiated"));
-		}
-		else {
-			List<Assertion> assertions = samlResponse.getAssertions();
-
-			assertions.add(assertion);
-		}
-
-		InOutOperationContext<?, Response> inOutOperationContext =
-			messageContext.getSubcontext(InOutOperationContext.class, false);
-
-		if (inOutOperationContext == null) {
-			inOutOperationContext =
-				(InOutOperationContext)messageContext.addSubcontext(
-					new InOutOperationContext<>(
-						new MessageContext<>(), new MessageContext<>()));
-		}
-
-		MessageContext<Response> outboundMessageContext =
-			inOutOperationContext.getOutboundMessageContext();
-
-		outboundMessageContext.addSubcontext(
-			messageContext.getSubcontext(SAMLBindingContext.class, true));
-		outboundMessageContext.setMessage(samlResponse);
-
-		SecurityParametersContext securityParametersContext =
-			outboundMessageContext.getSubcontext(
-				SecurityParametersContext.class, true);
-
-		OpenSamlUtil.prepareSecurityParametersContext(
-			credential, securityParametersContext, spSSODescriptor);
-
-		SAMLProtocolContext samlProtocolContext =
-			outboundMessageContext.getSubcontext(
-				SAMLProtocolContext.class, true);
-
-		samlProtocolContext.setProtocol(SAMLConstants.SAML20P_NS);
-
-		SAMLPeerEntityContext samlOutboundPeerEntityContext =
-			outboundMessageContext.getSubcontext(
-				SAMLPeerEntityContext.class, true);
-
-		SAMLEndpointContext samlPeerEndpointContext =
-			samlOutboundPeerEntityContext.getSubcontext(
-				SAMLEndpointContext.class, true);
-
-		samlPeerEndpointContext.setEndpoint(assertionConsumerService);
-
-		if (samlSsoRequestContext.isNewSession()) {
-			_addSamlSsoSession(
-				httpServletRequest, httpServletResponse, samlSsoRequestContext,
-				nameID);
-		}
-		else {
-			_updateSamlSsoSession(
-				httpServletRequest, samlSsoRequestContext, nameID);
-		}
-
-		sendSamlMessage(messageContext, httpServletResponse);
-	}
-
-	private void _updateSamlSsoSession(
-			HttpServletRequest httpServletRequest,
-			SamlSsoRequestContext samlSsoRequestContext, NameID nameID)
-		throws Exception {
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			httpServletRequest);
-
-		SamlIdpSsoSession samlIdpSsoSession =
-			_samlIdpSsoSessionLocalService.updateModifiedDate(
-				samlSsoRequestContext.getSamlSsoSessionId());
-
-		MessageContext<?> messageContext =
-			samlSsoRequestContext.getSAMLMessageContext();
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-		try {
-			_samlIdpSpSessionLocalService.updateModifiedDate(
-				samlIdpSsoSession.getSamlIdpSsoSessionId(),
-				samlPeerEntityContext.getEntityId());
-		}
-		catch (NoSuchIdpSpSessionException noSuchIdpSpSessionException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchIdpSpSessionException);
-			}
-
-			_samlIdpSpSessionLocalService.addSamlIdpSpSession(
-				samlIdpSsoSession.getSamlIdpSsoSessionId(),
-				samlPeerEntityContext.getEntityId(), nameID.getFormat(),
-				nameID.getValue(), serviceContext);
-		}
-	}
-
-	private void _verifyAssertion(
-			Assertion assertion, MessageContext<?> messageContext,
-			TrustEngine<Signature> trustEngine)
-		throws PortalException {
-
-		verifyReplay(messageContext, assertion);
-		verifyIssuer(messageContext, assertion.getIssuer());
-		verifyAssertionSignature(
-			assertion.getSignature(), messageContext, trustEngine);
-		verifyConditions(messageContext, assertion.getConditions());
-		verifySubject(messageContext, assertion.getSubject());
-	}
-
-	private void _verifySignature(
-			MessageContext<?> messageContext, Signature signature,
-			TrustEngine<Signature> trustEngine)
-		throws PortalException {
-
-		try {
-			_samlSignatureProfileValidator.validate(signature);
-
-			SAMLPeerEntityContext samlPeerEntityContext =
-				messageContext.getSubcontext(SAMLPeerEntityContext.class);
-
-			CriteriaSet criteriaSet = new CriteriaSet();
-
-			criteriaSet.add(
-				new EntityIdCriterion(samlPeerEntityContext.getEntityId()));
-			criteriaSet.add(
-				new EntityRoleCriterion(IDPSSODescriptor.DEFAULT_ELEMENT_NAME));
-			criteriaSet.add(new ProtocolCriterion(SAMLConstants.SAML20P_NS));
-			criteriaSet.add(new UsageCriterion(UsageType.SIGNING));
-
-			if (!trustEngine.validate(signature, criteriaSet)) {
-				throw new SignatureException("Unable validate signature trust");
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof PortalException) {
-				throw (PortalException)exception;
-			}
-
-			throw new SignatureException(
-				"Unable to verify signature", exception);
-		}
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		WebSsoProfileImpl.class);
 
 	private static final SAMLSignatureProfileValidator
 		_samlSignatureProfileValidator = new SAMLSignatureProfileValidator();
 
-	@Reference
 	private AttributeResolverRegistry _attributeResolverRegistry;
 
-	private final DCLSingleton<Decrypter> _decrypterDCLSingleton =
-		new DCLSingleton<>();
+	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
+	private Decrypter _decrypter;
 
-	@Reference
-	private MetadataManager _metadataManager;
-
-	@Reference
 	private NameIdResolverRegistry _nameIdResolverRegistry;
+
+	@Reference
+	private Portal _portal;
 
 	private SamlConfiguration _samlConfiguration;
 
@@ -2140,62 +2155,15 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 	@Reference
 	private SamlIdpSsoSessionLocalService _samlIdpSsoSessionLocalService;
 
-	private final DCLSingleton<SAMLMetadataEncryptionParametersResolver>
-		_samlMetadataEncryptionParametersResolverDCLSingleton =
-			new DCLSingleton<>();
-
-	@Reference
+	private SAMLMetadataEncryptionParametersResolver
+		_samlMetadataEncryptionParametersResolver;
 	private SamlSpAuthRequestLocalService _samlSpAuthRequestLocalService;
-
-	@Reference
 	private SamlSpIdpConnectionLocalService _samlSpIdpConnectionLocalService;
-
-	@Reference
 	private SamlSpMessageLocalService _samlSpMessageLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
 
-	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private UserResolver _userResolver;
-
-	private class CustomParserPoolDecrypter extends Decrypter {
-
-		public CustomParserPoolDecrypter(
-			DecryptionParameters decryptionParameters) {
-
-			super(decryptionParameters);
-		}
-
-		@Override
-		protected ParserPool buildParserPool() {
-			return ParserPoolUtil.getParserPool();
-		}
-
-	}
-
-	private class DefaultKeyInfoCredentialResolver
-		implements KeyInfoCredentialResolver {
-
-		@Override
-		public Iterable<Credential> resolve(CriteriaSet criteria)
-			throws ResolverException {
-
-			return Collections.singletonList(resolveSingle(criteria));
-		}
-
-		@Override
-		public Credential resolveSingle(CriteriaSet criteria)
-			throws ResolverException {
-
-			try {
-				return _metadataManager.getEncryptionCredential();
-			}
-			catch (SamlException samlException) {
-				throw new ResolverException(samlException);
-			}
-		}
-
-	}
 
 }

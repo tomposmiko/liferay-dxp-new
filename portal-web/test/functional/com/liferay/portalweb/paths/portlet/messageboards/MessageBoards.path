@@ -16,18 +16,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CONTAINER_VERTICAL_ELLIPSIS</td>
-	<td>//div[contains(@class,'btn-group')]//a[contains(@class,'dropdown-toggle')]//*[name()='svg'][contains(@class,'icon-ellipsis')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>PAGER_TITLE</td>
 	<td>//div[contains(@class,'list-group-header-title') and contains(.,'${key_titleName}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>VERTICAL_ELLIPSIS</td>
-	<td>//dd[contains(.,'${key_threadSubject}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]] | //div[contains(@class,'heading')]//div[contains(@class,'dropdown')]//a</td>
+	<td>//li[contains(.,'${key_threadSubject}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]] | //div[contains(@class,'heading')]//div[contains(@class,'dropdown')]//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -40,9 +35,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CATEGORIES-->
-
 <tr>
 	<td>CATEGORIES_NAME_HEADER</td>
 	<td>//div[contains(@class,'content-body')]//h3</td>
@@ -53,9 +46,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--NAVIGATION-->
-
 <tr>
 	<td>NAVIGATION_RECENT_POSTS</td>
 	<td>//div[contains(@class,'navbar')]//ul/li/a[contains(.,'Recent Posts')]</td>
@@ -86,9 +77,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CATEGORY_TABLE-->
-
 <tr>
 	<td>CATEGORY_TABLE_PANEL</td>
 	<td>//div[@id=&quot;messageBoardsCategoriesPanel&quot;]</td>
@@ -124,12 +113,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CATEGORY_LIST-->
-
 <tr>
 	<td>CATEGORY_LIST_ACTIONS</td>
-	<td>//dd[contains(.,'${key_categoryName}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td>//li[contains(.,'${key_categoryName}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -149,7 +136,7 @@
 </tr>
 <tr>
 	<td>CATEGORY_LIST_CHECKBOX</td>
-	<td>//dd[contains(.,'${key_categoryName}')]//div[contains(@class,'checkbox')]/label/input[contains(@type,'checkbox')]</td>
+	<td>//li[contains(.,'${key_categoryName}')]//div[contains(@class,'checkbox')]/label/input[contains(@type,'checkbox')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -162,9 +149,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--QUESTION_CATEGORY_THREAD_TABLE-->
-
 <tr>
 	<td>QUESTION_CATEGORY_THREAD_TABLE_QUESTION</td>
 	<td>//div[contains(@id,'mbThreadsSearchContainer')]//tr[contains(.,'${key_threadSubject}')]/td[2]//a</td>
@@ -175,12 +160,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--THREAD_LIST-->
-
 <tr>
 	<td>THREAD_LIST_ACTIONS</td>
-	<td>//dd[contains(.,'${key_threadSubject}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td>//li[contains(.,'${key_threadSubject}')]//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -190,7 +173,7 @@
 </tr>
 <tr>
 	<td>THREAD_LIST_CHECKBOX</td>
-	<td>//dd[contains(.,'${key_threadSubject}')]/div/label/input[contains(@type,'checkbox')]</td>
+	<td>//li[contains(.,'${key_threadSubject}')]/div/label/input[contains(@type,'checkbox')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -200,7 +183,7 @@
 </tr>
 <tr>
 	<td>THREAD_LIST_LAST_POST</td>
-	<td>//div[contains(.,'${key_threadSubject}')]//div[contains(@data-qa-id,'rowItemContent') and contains(.,'${key_userName}')] | //dd[contains(.,'${key_threadSubject}')]//div[contains(@data-qa-id,'rowItemContent') and contains(.,'${key_userName}')]</td>
+	<td>//div[contains(.,'${key_threadSubject}')]//div[contains(@data-qa-id,'rowItemContent') and contains(.,'${key_userName}')] | //li[contains(.,'${key_threadSubject}')]//div[contains(@data-qa-id,'rowItemContent') and contains(.,'${key_userName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -225,7 +208,7 @@
 </tr>
 <tr>
 	<td>THREAD_LIST_VIEWS</td>
-	<td>//div[@data-qa-id='rowItemContent'][contains(.,'${key_threadSubject}')]//div[3]</td>
+	<td>//div[@data-qa-id='rowItemContent'][contains(.,'${key_threadSubject}')]//div[contains(.,'View')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -238,9 +221,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--THREAD_REPLY-->
-
 <tr>
 	<td>THREAD_REPLY_ACTIONS</td>
 	<td>//div[contains(@class,'message-content') and contains(.,'${key_threadReplyBody}')]/../..//a[span/*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
@@ -256,9 +237,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--THREAD_TABLE-->
-
 <tr>
 	<td>THREAD_TABLE_ALL_CHECKBOX</td>
 	<td>//div[contains(@id,'mbThreadsSearchContainer')]//input[contains(@name,'allRowIds')]</td>

@@ -36,38 +36,45 @@ public class JournalArticleUpgradeProcess extends UpgradeProcess {
 	protected void doUpgrade() throws Exception {
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select id_, content from JournalArticle where content like " +
-					"'%type=\"radio\"%'");
-			ResultSet resultSet = preparedStatement1.executeQuery();
-			PreparedStatement preparedStatement2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection,
-					"update JournalArticle set content = ? where id_ = ?")) {
+					"?")) {
 
-			while (resultSet.next()) {
-				preparedStatement2.setString(
-					1,
-					_convertRadioDynamicElements(
-						resultSet.getString("content")));
-				preparedStatement2.setLong(2, resultSet.getLong("id_"));
+			preparedStatement1.setString(1, "%type=\"radio\"%");
 
-				preparedStatement2.addBatch();
+			ResultSet resultSet1 = preparedStatement1.executeQuery();
+
+			while (resultSet1.next()) {
+				long id = resultSet1.getLong("id_");
+
+				String content = resultSet1.getString("content");
+
+				content = _convertRadioDynamicElements(content);
+
+				try (PreparedStatement preparedStatement2 =
+						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+							connection,
+							"update JournalArticle set content = ? where id_ " +
+								"= ?")) {
+
+					preparedStatement2.setString(1, content);
+					preparedStatement2.setLong(2, id);
+
+					preparedStatement2.executeUpdate();
+				}
 			}
-
-			preparedStatement2.executeBatch();
 		}
 	}
 
 	private String _convertRadioDynamicElements(String content)
 		throws Exception {
 
-		Document document = SAXReaderUtil.read(content);
+		Document contentDocument = SAXReaderUtil.read(content);
 
-		document = document.clone();
+		contentDocument = contentDocument.clone();
 
 		XPath xPath = SAXReaderUtil.createXPath(
 			"//dynamic-element[@type='radio']");
 
-		List<Node> nodes = xPath.selectNodes(document);
+		List<Node> nodes = xPath.selectNodes(contentDocument);
 
 		for (Node node : nodes) {
 			Element element = (Element)node;
@@ -86,7 +93,7 @@ public class JournalArticleUpgradeProcess extends UpgradeProcess {
 			}
 		}
 
-		return document.formattedString();
+		return contentDocument.formattedString();
 	}
 
 	private String _removeUnusedChars(String data) {

@@ -14,20 +14,19 @@
 
 package com.liferay.commerce.order.web.internal.frontend.taglib.form.navigator;
 
-import com.liferay.commerce.order.web.internal.constants.CommerceOrderFormNavigatorConstants;
+import com.liferay.commerce.order.web.internal.servlet.taglib.ui.constants.CommerceOrderFormNavigatorConstants;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Andrea Di Giorgi
  */
 @Component(
-	property = "form.navigator.category.order:Integer=10",
+	enabled = false, property = "form.navigator.category.order:Integer=10",
 	service = FormNavigatorCategory.class
 )
 public class CommerceOrderDetailsFormNavigatorCategory
@@ -47,10 +46,7 @@ public class CommerceOrderDetailsFormNavigatorCategory
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, getKey());
+		return LanguageUtil.get(locale, getKey());
 	}
-
-	@Reference
-	private Language _language;
 
 }

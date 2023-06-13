@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,14 +31,18 @@ definition {
 	}
 
 	@description = "This ensures that the depot language can be set in a depot."
-	@priority = 4
-	@refactordone
+	@priority = "4"
+	@refactorneeded
 	test CanSetCustomLanguage {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
+		DepotNavigator.openDepotLanguages(depotName = "Test Depot Name");
+
+		Click.clickNoMouseOverNoWaitForVisible(
+			key_languagesOption = "Define a custom default language and additional active languages for this asset library.",
+			locator1 = "Radio#DEPOT_LANGUAGES_OPTION");
 
 		Depot.viewDefaultLanguage(defaultDepotLanguage = "English (United States)");
 
@@ -54,7 +58,7 @@ definition {
 
 		AssertElementNotPresent(locator1 = "Button#BACK");
 
-		Depot.viewGeneralLanguageOptions(currentLanguageList = "es-ES");
+		Depot.viewGeneralLanguageOptions(currentLanguageList = "es_ES");
 
 		AssertElementPresent(
 			key_unnamedTitle = "Repositorio sin nombre",
@@ -68,12 +72,14 @@ definition {
 	}
 
 	@description = "This ensures that the custom type language can be set in a depot."
-	@priority = 4
-	@refactordone
-	test CanViewCustomLanguagesOrderForCustomType {
+	@priority = "4"
+	@refactorneeded
+	test ViewCustomLanguagesOrderForCustomType {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
+
+		DepotNavigator.openDepotAdmin();
 
 		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
@@ -84,36 +90,34 @@ definition {
 			defaultDepotLanguage = "English (United States)");
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = 2,
-			toRowNumber = 3);
+			fromRowNumber = "2",
+			toRowNumber = "3");
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = 4,
-			toRowNumber = 1);
+			fromRowNumber = "4",
+			toRowNumber = "1");
 
 		Button.click(button = "Save");
 
-		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
+		DepotNavigator.openDepotAdmin();
 
-		Click(
-			key_fieldName = "Name",
-			locator1 = "Button#LOCALIZATION");
+		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
 
-		Depot.viewLanguageSelectionOrder(
-			localizationName1 = "en-US",
-			localizationName2 = "es-ES",
-			localizationName3 = "ja-JP",
-			localizationName4 = "fr-FR");
+		DepotNavigator.gotoGeneral(depotName = "Test Depot Name");
 
-		Click(
-			key_fieldName = "Description",
-			locator1 = "Button#LOCALIZATION");
+		Pause(locator1 = "3000");
 
-		Depot.viewLanguageSelectionOrder(
-			localizationName1 = "en-US",
-			localizationName2 = "es-ES",
-			localizationName3 = "ja-JP",
-			localizationName4 = "fr-FR");
+		for (var fieldName : list "Name,Description") {
+			Click(
+				key_fieldName = "${fieldName}",
+				locator1 = "Button#LOCALIZATION");
+
+			Depot.view4LanguagesOrder(
+				localizationName1 = "en-US",
+				localizationName2 = "es-ES",
+				localizationName3 = "ja-JP",
+				localizationName4 = "fr-FR");
+		}
 
 		DepotNavigator.openDepotDocumentTypeAdmin(depotName = "Test Depot Name");
 
@@ -121,7 +125,7 @@ definition {
 
 		Click(locator1 = "Button#LOCALIZATION_GENERIC");
 
-		Depot.viewLanguageSelectionOrder(
+		Depot.view4LanguagesOrder(
 			localizationName1 = "en-US",
 			localizationName2 = "es-ES",
 			localizationName3 = "ja-JP",
@@ -131,7 +135,7 @@ definition {
 
 		Click(locator1 = "Button#LOCALIZATION_GENERIC_2");
 
-		Depot.viewLanguageSelectionOrder(
+		Depot.view4LanguagesOrder(
 			localizationName1 = "en-US",
 			localizationName2 = "es-ES",
 			localizationName3 = "ja-JP",
@@ -145,7 +149,7 @@ definition {
 
 		Click(locator1 = "Button#LOCALIZATION_GENERIC");
 
-		Depot.viewLanguageSelectionOrder(
+		Depot.view4LanguagesOrder(
 			localizationName1 = "en-US",
 			localizationName2 = "es-ES",
 			localizationName3 = "ja-JP",
@@ -155,7 +159,7 @@ definition {
 
 		Click(locator1 = "Button#LOCALIZATION_GENERIC_2");
 
-		Depot.viewLanguageSelectionOrder(
+		Depot.view4LanguagesOrder(
 			localizationName1 = "en-US",
 			localizationName2 = "es-ES",
 			localizationName3 = "ja-JP",
@@ -163,12 +167,14 @@ definition {
 	}
 
 	@description = "This ensures that the web content language can be set in a depot."
-	@priority = 5
-	@refactordone
-	test CanViewCustomLanguagesOrderForWebContent {
+	@priority = "5"
+	@refactorneeded
+	test ViewCustomLanguagesOrderForWebContent {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
+
+		DepotNavigator.openDepotAdmin();
 
 		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
@@ -182,25 +188,35 @@ definition {
 			depotLanguage = "English (United States)",
 			firstLanguageItem = "true");
 
+		DepotNavigator.openDepotAdmin();
+
 		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
 		Depot.moveLanguage(
 			depotLanguage = "English (United States)",
 			moveDown = "true");
 
+		DepotNavigator.openDepotAdmin();
+
 		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
 		Depot.viewLanguageItems(depotLanguage = "English (United States)");
 
+		DepotNavigator.openDepotAdmin();
+
 		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
 		Depot.moveLanguage(depotLanguage = "English (United States)");
+
+		DepotNavigator.openDepotAdmin();
 
 		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
 		Depot.viewLanguageItems(
 			depotLanguage = "English (United States)",
 			firstLanguageItem = "true");
+
+		DepotNavigator.openDepotAdmin();
 
 		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
@@ -211,36 +227,34 @@ definition {
 			defaultDepotLanguage = "English (United States)");
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = 2,
-			toRowNumber = 3);
+			fromRowNumber = "2",
+			toRowNumber = "3");
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = 4,
-			toRowNumber = 1);
+			fromRowNumber = "4",
+			toRowNumber = "1");
 
 		Button.click(button = "Save");
 
-		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
+		DepotNavigator.openDepotAdmin();
 
-		Click(
-			key_fieldName = "Name",
-			locator1 = "Button#LOCALIZATION");
+		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
 
-		Depot.viewLanguageSelectionOrder(
-			localizationName1 = "en-US",
-			localizationName2 = "es-ES",
-			localizationName3 = "ja-JP",
-			localizationName4 = "fr-FR");
+		DepotNavigator.gotoGeneral(depotName = "Test Depot Name");
 
-		Click(
-			key_fieldName = "Description",
-			locator1 = "Button#LOCALIZATION");
+		Pause(locator1 = "3000");
 
-		Depot.viewLanguageSelectionOrder(
-			localizationName1 = "en-US",
-			localizationName2 = "es-ES",
-			localizationName3 = "ja-JP",
-			localizationName4 = "fr-FR");
+		for (var fieldName : list "Name,Description") {
+			Click(
+				key_fieldName = "${fieldName}",
+				locator1 = "Button#LOCALIZATION");
+
+			Depot.view4LanguagesOrder(
+				localizationName1 = "en-US",
+				localizationName2 = "es-ES",
+				localizationName3 = "ja-JP",
+				localizationName4 = "fr-FR");
+		}
 
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",

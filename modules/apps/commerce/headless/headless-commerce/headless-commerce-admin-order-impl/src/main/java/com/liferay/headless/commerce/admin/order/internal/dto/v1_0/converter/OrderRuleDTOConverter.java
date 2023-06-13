@@ -18,7 +18,7 @@ import com.liferay.commerce.order.rule.model.COREntry;
 import com.liferay.commerce.order.rule.service.COREntryService;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderRule;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Status;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
@@ -31,8 +31,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.order.rule.model.COREntry",
-	service = DTOConverter.class
+	service = {DTOConverter.class, OrderRuleDTOConverter.class}
 )
 public class OrderRuleDTOConverter
 	implements DTOConverter<COREntry, OrderRule> {
@@ -63,7 +64,7 @@ public class OrderRuleDTOConverter
 				typeSettings = corEntry.getTypeSettings();
 				workflowStatusInfo = _toStatus(
 					WorkflowConstants.getStatusLabel(corEntry.getStatus()),
-					_language.get(
+					LanguageUtil.get(
 						LanguageResources.getResourceBundle(
 							dtoConverterContext.getLocale()),
 						WorkflowConstants.getStatusLabel(corEntry.getStatus())),
@@ -87,8 +88,5 @@ public class OrderRuleDTOConverter
 
 	@Reference
 	private COREntryService _corEntryService;
-
-	@Reference
-	private Language _language;
 
 }

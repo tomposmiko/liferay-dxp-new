@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Ambrín Chaudhary
@@ -78,7 +77,7 @@ public class CKEditorCreoleConfigContributor
 				"sourcearea,wikilink"
 		).put(
 			"filebrowserWindowFeatures",
-			"title=" + _language.get(themeDisplay.getLocale(), "browse")
+			"title=" + LanguageUtil.get(themeDisplay.getLocale(), "browse")
 		).put(
 			"format_tags", "p;h1;h2;h3;h4;h5;h6;pre"
 		).put(
@@ -90,76 +89,66 @@ public class CKEditorCreoleConfigContributor
 				"stylescombo,templates,video")
 		).put(
 			"toolbar_creole",
-			_getToolbarsCreoleJSONArray(inputEditorTaglibAttributes)
+			getToolbarsCreoleJSONArray(inputEditorTaglibAttributes)
 		).put(
 			"toolbar_phone",
-			_getToolbarsPhoneJSONArray(inputEditorTaglibAttributes)
+			getToolbarsPhoneJSONArray(inputEditorTaglibAttributes)
 		).put(
 			"toolbar_tablet",
-			_getToolbarsTabletJSONArray(inputEditorTaglibAttributes)
+			getToolbarsTabletJSONArray(inputEditorTaglibAttributes)
 		);
 	}
 
-	private JSONArray _getToolbarsCreoleJSONArray(
+	protected JSONArray getToolbarsCreoleJSONArray(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
-		return JSONUtil.putAll(
+		JSONArray jsonArray = JSONUtil.putAll(
 			toJSONArray("['Bold', 'Italic', 'Underline', '-' ,'RemoveFormat']"),
 			toJSONArray("['NumberedList', 'BulletedList', '-']"),
 			toJSONArray("['Format']"), toJSONArray("['Link', 'Unlink']"),
-			toJSONArray("['Table', '-','ImageSelector', '-', 'HorizontalRule']")
-		).put(
-			() -> {
-				if (isShowSource(inputEditorTaglibAttributes)) {
-					return toJSONArray("['Source']");
-				}
+			toJSONArray(
+				"['Table', '-','ImageSelector', '-', 'HorizontalRule']"));
 
-				return null;
-			}
-		).put(
-			toJSONArray("['A11YBtn']")
-		);
+		if (isShowSource(inputEditorTaglibAttributes)) {
+			jsonArray.put(toJSONArray("['Source']"));
+		}
+
+		jsonArray.put(toJSONArray("['A11YBtn']"));
+
+		return jsonArray;
 	}
 
-	private JSONArray _getToolbarsPhoneJSONArray(
+	protected JSONArray getToolbarsPhoneJSONArray(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
-		return JSONUtil.putAll(
+		JSONArray jsonArray = JSONUtil.putAll(
 			toJSONArray("['Bold', 'Italic']"),
 			toJSONArray("['NumberedList', 'BulletedList']"),
-			toJSONArray("['Link', 'Unlink']"), toJSONArray("['ImageSelector']")
-		).put(
-			() -> {
-				if (isShowSource(inputEditorTaglibAttributes)) {
-					return toJSONArray("['Source']");
-				}
+			toJSONArray("['Link', 'Unlink']"),
+			toJSONArray("['ImageSelector']"));
 
-				return null;
-			}
-		);
+		if (isShowSource(inputEditorTaglibAttributes)) {
+			jsonArray.put(toJSONArray("['Source']"));
+		}
+
+		return jsonArray;
 	}
 
-	private JSONArray _getToolbarsTabletJSONArray(
+	protected JSONArray getToolbarsTabletJSONArray(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
-		return JSONUtil.putAll(
+		JSONArray jsonArray = JSONUtil.putAll(
 			toJSONArray("['Bold', 'Italic']"),
 			toJSONArray(
 				"['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']"),
 			toJSONArray("['Format']"), toJSONArray("['Link', 'Unlink']"),
-			toJSONArray("['ImageSelector']")
-		).put(
-			() -> {
-				if (isShowSource(inputEditorTaglibAttributes)) {
-					return toJSONArray("['Source']");
-				}
+			toJSONArray("['ImageSelector']"));
 
-				return null;
-			}
-		);
+		if (isShowSource(inputEditorTaglibAttributes)) {
+			jsonArray.put(toJSONArray("['Source']"));
+		}
+
+		return jsonArray;
 	}
-
-	@Reference
-	private Language _language;
 
 }

@@ -16,10 +16,6 @@
 
 <%@ include file="/html/taglib/ui/input_localized/init.jsp" %>
 
-<%
-Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMap<String, Map<String, String>>();
-%>
-
 <c:if test="<%= Validator.isNotNull(inputAddon) %>">
 	<div class="form-text">
 		<span class="lfr-portal-tooltip" title="<%= HtmlUtil.escape(inputAddon) %>">
@@ -78,7 +74,7 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 		</c:choose>
 	</div>
 
-	<div class="hide-accessible sr-only" id="<%= namespace + HtmlUtil.escapeAttribute(id + fieldSuffix) %>_desc"><%= defaultLocale.getDisplayName(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(request))) %> <liferay-ui:message key="translation" /></div>
+	<div class="hide-accessible" id="<%= namespace + HtmlUtil.escapeAttribute(id + fieldSuffix) %>_desc"><%= defaultLocale.getDisplayName(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(request))) %> <liferay-ui:message key="translation" /></div>
 
 	<c:if test="<%= !availableLocales.isEmpty() && Validator.isNull(languageId) %>">
 
@@ -119,34 +115,31 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 			if (!ignoreRequestValue) {
 				languageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + curLanguageId, languageValue);
 			}
+
+			if (curLanguageId.equals(defaultLanguageId) && Validator.isNull(languageValue)) {
+				languageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
+			}
 		%>
 
 			<aui:input dir="<%= curLanguageDir %>" disabled="<%= disabled %>" id="<%= HtmlUtil.escapeAttribute(id + StringPool.UNDERLINE + curLanguageId) %>" name="<%= HtmlUtil.escapeAttribute(fieldNamePrefix + name + StringPool.UNDERLINE + curLanguageId + fieldNameSuffix) %>" type="hidden" value="<%= languageValue %>" />
 
 		<%
 		}
-
-		String selectedLanguageName = LanguageUtil.get(request, "language." + selectedLanguageId);
-
-		if (selectedLanguageName.contains("language.")) {
-			selectedLanguageName = LanguageUtil.get(request, "language." + selectedLanguageId.substring(0, 2));
-		}
 		%>
 
-		<div class="input-group-item input-group-item-shrink input-localized-content">
+		<div class="input-group-item input-group-item-shrink input-localized-content" role="menu">
 
 			<%
 			String normalizedSelectedLanguageId = StringUtil.replace(selectedLanguageId, '_', '-');
 			%>
 
 			<liferay-ui:icon-menu
-				direction="<%= languagesDropdownDirection %>"
+				direction="left-side"
 				icon="<%= StringUtil.toLowerCase(normalizedSelectedLanguageId) %>"
 				id='<%= namespace + id + "Menu" %>'
 				markupView="lexicon"
 				message="<%= StringPool.BLANK %>"
 				showWhenSingleIcon="<%= true %>"
-				triggerAriaLabel='<%= LanguageUtil.format(request, "current-translation-is-x-press-enter-to-select-another-language", new String[] {selectedLanguageName}, false) %>'
 				triggerCssClass="input-localized-trigger"
 				triggerLabel="<%= normalizedSelectedLanguageId %>"
 				triggerType="button"
@@ -168,7 +161,7 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 						int index = 0;
 
 						for (String curLanguageId : uniqueLanguageIds) {
-							String linkCssClass = "dropdown-item palette-item keep-aria-attributes";
+							String linkCssClass = "dropdown-item palette-item";
 
 							Locale curLocale = LocaleUtil.fromLanguageId(curLanguageId);
 
@@ -186,39 +179,15 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 								"value", curLanguageId
 							).build();
 
-							String languageName = LanguageUtil.get(request, "language." + curLanguageId);
-
-							if (languageName.contains("language.")) {
-								languageName = LanguageUtil.get(request, "language." + curLanguageId.substring(0, 2));
-							}
-
-							String translationInstructionAnnouncement = LanguageUtil.format(request, "press-enter-to-edit-x-translation", new String[] {languageName}, false);
-
-							Map<String, String> languageTranslationAriaLabelsMap = HashMapBuilder.put(
-								"currentlySelected", LanguageUtil.format(request, "current-translation-is-x-press-enter-to-select-another-language", new String[] {languageName}, false)
-							).put(
-								"defaultStatus", LanguageUtil.format(request, "default-translation-is-x", new String[] {languageName}, false) + StringPool.SPACE + translationInstructionAnnouncement
-							).put(
-								"notTranslatedStatus", LanguageUtil.format(request, "not-translated-into-x", new String[] {languageName}, false) + StringPool.SPACE + translationInstructionAnnouncement
-							).put(
-								"translatedStatus", LanguageUtil.format(request, "translated-into-x", new String[] {languageName}, false) + StringPool.SPACE + translationInstructionAnnouncement
-							).build();
-
-							languagesTranslationsAriaLabelsMap.put(curLanguageId, languageTranslationAriaLabelsMap);
-
-							String translationAriaLabel = languageTranslationAriaLabelsMap.get("notTranslatedStatus");
-
-							String translationStatus = LanguageUtil.get(request, "not-translated");
+							String translationStatus = LanguageUtil.get(request, "untranslated");
 							String translationStatusCssClass = "warning";
 
 							if (languageIds.contains(curLanguageId)) {
-								translationAriaLabel = languageTranslationAriaLabelsMap.get("translatedStatus");
 								translationStatus = LanguageUtil.get(request, "translated");
 								translationStatusCssClass = "success";
 							}
 
 							if (defaultLanguageId.equals(curLanguageId)) {
-								translationAriaLabel = languageTranslationAriaLabelsMap.get("defaultStatus");
 								translationStatus = LanguageUtil.get(request, "default");
 								translationStatusCssClass = "info";
 							}
@@ -227,13 +196,9 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 							<liferay-util:buffer
 								var="linkContent"
 							>
-								<span aria-label="<%= translationAriaLabel %>" role="button" tabindex="0">
-									<%= StringUtil.replace(curLanguageId, '_', '-') %>
+								<%= StringUtil.replace(curLanguageId, '_', '-') %>
 
-									<span class="dropdown-item-indicator-end w-auto">
-										<span class="label label-<%= translationStatusCssClass %>"><%= translationStatus %></span>
-									</span>
-								</span>
+								<span class="label label-<%= translationStatusCssClass %>"><%= translationStatus %></span>
 							</liferay-util:buffer>
 
 							<liferay-ui:icon
@@ -244,7 +209,7 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 								linkCssClass="<%= linkCssClass %>"
 								markupView="lexicon"
 								message="<%= linkContent %>"
-								url="javascript:void(0);"
+								url="javascript:;"
 							>
 							</liferay-ui:icon>
 
@@ -256,11 +221,10 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 							<li aria-hidden="true" class="dropdown-divider" role="presentation"></li>
 							<li>
 								<button class="dropdown-item" id="manage-translations">
-									<span class="inline-item inline-item-before">
-										<svg class="lexicon-icon lexicon-icon-automatic-translate" role="presentation">
-											<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#automatic-translate" />
-										</svg>
-									</span>
+									<svg class="lexicon-icon lexicon-icon-automatic-translate" role="presentation">
+										<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#automatic-translate" />
+									</svg>
+
 									<span><liferay-ui:message key="manage-translations" /></span>
 								</button>
 							</li>
@@ -356,13 +320,12 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 				inputBox: '#<%= namespace + id %>BoundingBox',
 				items: availableLanguageIds,
 				itemsError: errorLanguageIds,
-				languagesTranslationsAriaLabels: <%= JSONFactoryUtil.looseSerializeDeep(languagesTranslationsAriaLabelsMap) %>,
 				lazy: <%= !type.equals("editor") %>,
 				name: '<%= HtmlUtil.escapeJS(name) %>',
 				namespace: '<%= namespace %>',
 				selectedLanguageId: '<%= selectedLanguageId %>',
 				toggleSelection: false,
-				translatedLanguages: '<%= StringUtil.merge(languageIds) %>',
+				translatedLanguages: '<%= StringUtil.merge(languageIds) %>'
 			};
 
 			<c:choose>
@@ -388,22 +351,10 @@ Map<String, Map<String, String>> languagesTranslationsAriaLabelsMap = new HashMa
 					});
 				</c:when>
 				<c:otherwise>
-					Liferay.Loader.require(
-					[
-						A.config.groups.components.mainModule,
-						A.config.groups.state.mainModule,
-					],
-					(frontendJsComponentsWebModule, frontendJsStateWebModule) => {
-
-						Liferay.InputLocalized.register(
-							'<%= namespace + id + HtmlUtil.getAUICompatibleId(fieldSuffix) %>',
-							{
-								frontendJsComponentsWebModule,
-								frontendJsStateWebModule,
-								...inputLocalizedProps
-							}
-						);
-					});
+					Liferay.InputLocalized.register(
+						'<%= namespace + id + HtmlUtil.getAUICompatibleId(fieldSuffix) %>',
+						inputLocalizedProps
+					);
 				</c:otherwise>
 			</c:choose>
 

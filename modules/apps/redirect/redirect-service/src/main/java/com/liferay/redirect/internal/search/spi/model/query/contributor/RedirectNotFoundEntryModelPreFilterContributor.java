@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.redirect.model.RedirectNotFoundEntry",
 	service = ModelPreFilterContributor.class
 )

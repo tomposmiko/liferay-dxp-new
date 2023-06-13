@@ -14,7 +14,6 @@
 
 package com.liferay.portal.security.membershippolicy;
 
-import com.liferay.petra.concurrent.DCLSingleton;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -36,31 +35,12 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class UserGroupMembershipPolicyFactoryImpl
 	implements UserGroupMembershipPolicyFactory {
 
-	public void destroy() {
-		_serviceTrackerDCLSingleton.destroy(ServiceTracker::close);
-	}
-
 	@Override
 	public UserGroupMembershipPolicy getUserGroupMembershipPolicy() {
-		ServiceTracker<UserGroupMembershipPolicy, UserGroupMembershipPolicy>
-			serviceTracker = _serviceTrackerDCLSingleton.getSingleton(
-				UserGroupMembershipPolicyFactoryImpl::_createServiceTracker);
-
-		return serviceTracker.getService();
+		return _serviceTracker.getService();
 	}
 
-	private static ServiceTracker
-		<UserGroupMembershipPolicy, UserGroupMembershipPolicy>
-			_createServiceTracker() {
-
-		ServiceTracker<UserGroupMembershipPolicy, UserGroupMembershipPolicy>
-			serviceTracker = new ServiceTracker<>(
-				_bundleContext, UserGroupMembershipPolicy.class,
-				new UserGroupMembershipPolicyTrackerCustomizer());
-
-		serviceTracker.open();
-
-		return serviceTracker;
+	private UserGroupMembershipPolicyFactoryImpl() {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -68,9 +48,8 @@ public class UserGroupMembershipPolicyFactoryImpl
 
 	private static final BundleContext _bundleContext =
 		SystemBundleUtil.getBundleContext();
-	private static final DCLSingleton
-		<ServiceTracker<UserGroupMembershipPolicy, UserGroupMembershipPolicy>>
-			_serviceTrackerDCLSingleton = new DCLSingleton<>();
+	private static final ServiceTracker<?, UserGroupMembershipPolicy>
+		_serviceTracker;
 
 	private static class UserGroupMembershipPolicyTrackerCustomizer
 		implements ServiceTrackerCustomizer
@@ -88,7 +67,7 @@ public class UserGroupMembershipPolicyFactoryImpl
 					userGroupMembershipPolicy.verifyPolicy();
 				}
 				catch (PortalException portalException) {
-					_log.error(portalException);
+					_log.error(portalException, portalException);
 				}
 			}
 
@@ -109,6 +88,14 @@ public class UserGroupMembershipPolicyFactoryImpl
 			_bundleContext.ungetService(serviceReference);
 		}
 
+	}
+
+	static {
+		_serviceTracker = new ServiceTracker<>(
+			_bundleContext, UserGroupMembershipPolicy.class,
+			new UserGroupMembershipPolicyTrackerCustomizer());
+
+		_serviceTracker.open();
 	}
 
 }

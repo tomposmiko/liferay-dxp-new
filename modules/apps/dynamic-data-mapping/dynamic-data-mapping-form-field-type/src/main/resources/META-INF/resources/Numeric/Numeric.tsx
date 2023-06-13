@@ -13,28 +13,29 @@
  */
 
 import {ClayInput} from '@clayui/form';
-import {ClayTooltipProvider} from '@clayui/tooltip';
 import classNames from 'classnames';
 
 // @ts-ignore
 
-import {SettingsContext, useFormState} from 'data-engine-js-components-web';
+import {useFormState} from 'data-engine-js-components-web';
 import React, {ChangeEventHandler, FocusEventHandler, useMemo} from 'react';
-import {createNumberMask} from 'text-mask-addons';
-import {conformToMask} from 'text-mask-core';
+import createNumberMask from 'text-mask-addons/dist/createNumberMask';
+
+// @ts-ignore
+
+import {conformToMask} from 'vanilla-text-mask';
+
+// @ts-ignore
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import {ISymbols} from '../NumericInputMask/NumericInputMask';
-import {trimLeftZero} from '../util/numericalOperations';
 
 // @ts-ignore
 
 import withConfirmationField from '../util/withConfirmationField.es';
 
 import './Numeric.scss';
-import {getTooltipTitle} from '../util/tooltip';
 
-import type {FieldChangeEventHandler, Locale, LocalizedValue} from '../types';
 const NON_NUMERIC_REGEX = /[\D]/g;
 
 const adaptiveMask = (rawValue: string, inputMaskFormat: string) => {
@@ -59,16 +60,12 @@ const adaptiveMask = (rawValue: string, inputMaskFormat: string) => {
 
 const getMaskedValue = ({
 	dataType,
-	decimalPlaces,
-	focused,
 	includeThousandsSeparator = false,
 	inputMaskFormat,
 	symbols,
 	value,
 }: {
 	dataType: NumericDataType;
-	decimalPlaces: number;
-	focused: boolean;
 	includeThousandsSeparator?: boolean;
 	inputMaskFormat: string;
 	symbols: ISymbols;
@@ -80,7 +77,6 @@ const getMaskedValue = ({
 			allowDecimal: true,
 			allowLeadingZeroes: true,
 			allowNegative: true,
-			decimalLimit: decimalPlaces,
 			decimalSymbol: symbols.decimalSymbol,
 			includeThousandsSeparator,
 			prefix: '',
@@ -100,23 +96,15 @@ const getMaskedValue = ({
 	});
 
 	const regex = new RegExp(
-		dataType === 'double' ? `[^-${symbols.decimalSymbol}\\d]` : '[^\\d]',
+		dataType === 'double' ? `[^${symbols.decimalSymbol}|\\d]` : '[^\\d]',
 		'g'
 	);
 
-	const splitNumbers = masked.split(symbols.decimalSymbol);
-
-	const decimalDigitsLength =
-		splitNumbers.length > 1 ? splitNumbers.pop().length : 0;
-
 	return {
-		masked:
-			!focused && dataType === 'double' && decimalDigitsLength
-				? masked + '0'.repeat(decimalPlaces - decimalDigitsLength)
-				: masked,
+		masked,
 		placeholder:
 			dataType === 'double'
-				? `0${symbols.decimalSymbol}${'0'.repeat(decimalPlaces)}`
+				? `0${symbols.decimalSymbol}00`
 				: inputMaskFormat.replace(/\d/g, '_'),
 		raw: masked.replace(regex, ''),
 	};
@@ -169,13 +157,10 @@ const Numeric: React.FC<IProps> = ({
 	append,
 	appendType,
 	dataType = 'integer',
-	decimalPlaces,
 	defaultLanguageId,
-	focused,
 	id,
 	inputMask,
 	inputMaskFormat,
-	localizedSymbols: initialLocalizedSymbols,
 	localizedValue,
 	name,
 	onBlur,
@@ -184,97 +169,62 @@ const Numeric: React.FC<IProps> = ({
 	placeholder,
 	predefinedValue,
 	readOnly,
-	settingsContext,
 	symbols: symbolsProp = {decimalSymbol: '.'},
 	value,
 	...otherProps
 }) => {
 	const {editingLanguageId}: {editingLanguageId: Locale} = useFormState();
 
-	const localizedSymbols = settingsContext
-		? SettingsContext.getSettingsContextProperty(
-				settingsContext,
-				'predefinedValue',
-				'localizedSymbols'
-		  )
-		: initialLocalizedSymbols;
-
 	const symbols = useMemo<ISymbols>(() => {
-		if (inputMask) {
-			return {
-				decimalSymbol: symbolsProp.decimalSymbol,
-				thousandsSeparator:
-					symbolsProp.thousandsSeparator === 'none'
-						? null
-						: symbolsProp.thousandsSeparator,
-			};
-		}
-
-		return localizedSymbols?.[editingLanguageId] || symbolsProp;
-	}, [editingLanguageId, inputMask, localizedSymbols, symbolsProp]);
+		return inputMask
+			? {
+					decimalSymbol: symbolsProp.decimalSymbol,
+					thousandsSeparator:
+						symbolsProp.thousandsSeparator == 'none'
+							? null
+							: symbolsProp.thousandsSeparator,
+			  }
+			: symbolsProp;
+	}, [inputMask, symbolsProp]);
 
 	const inputValue = useMemo<IMaskedNumber>(() => {
-		let newValue =
-			value ??
-			localizedValue?.[editingLanguageId] ??
-			localizedValue?.[defaultLanguageId] ??
+		const newValue =
+			((localizedValue?.[editingLanguageId] ??
+				localizedValue?.[defaultLanguageId]) ||
+				value) ??
 			predefinedValue ??
 			'';
-
-		if (dataType === 'double') {
-			const symbolsValue = newValue.match(/[^-\d]/g);
-
-			newValue = symbolsValue
-				? newValue.replace(symbolsValue[0], symbols.decimalSymbol)
-				: newValue;
-		}
 
 		return inputMask
 			? getMaskedValue({
 					dataType,
-					decimalPlaces,
-					focused,
 					includeThousandsSeparator: Boolean(
 						symbols.thousandsSeparator
 					),
-					inputMaskFormat: String(inputMaskFormat),
+					inputMaskFormat: inputMaskFormat as string,
 					symbols,
 					value: newValue,
 			  })
 			: {
-					...getFormattedValue({
-						dataType,
-						symbols,
-						value: newValue,
-					}),
+					...getFormattedValue({dataType, symbols, value: newValue}),
 					placeholder,
 			  };
 	}, [
 		dataType,
-		decimalPlaces,
+		symbols,
 		defaultLanguageId,
 		editingLanguageId,
-		focused,
 		inputMask,
 		inputMaskFormat,
 		localizedValue,
 		placeholder,
 		predefinedValue,
-		symbols,
 		value,
 	]);
 
 	const handleChange: ChangeEventHandler<HTMLInputElement> = ({
 		target: {value},
 	}) => {
-		value =
-			inputMask && dataType === 'integer'
-				? value
-				: trimLeftZero({
-						decimalSymbol: symbols.decimalSymbol,
-						thousandsSeparator: symbols.thousandsSeparator,
-						value,
-				  });
 
 		// allows user to delete characters from the mask
 
@@ -291,9 +241,7 @@ const Numeric: React.FC<IProps> = ({
 		const {masked, raw} = inputMask
 			? getMaskedValue({
 					dataType,
-					decimalPlaces,
-					focused,
-					inputMaskFormat: String(inputMaskFormat),
+					inputMaskFormat: inputMaskFormat as string,
 					symbols,
 					value,
 			  })
@@ -304,45 +252,22 @@ const Numeric: React.FC<IProps> = ({
 		}
 	};
 
-	const accessibleProps = {
-		...(otherProps.tip && {
-			'aria-describedby': `${id ?? name}_fieldHelp`,
-		}),
-		...(otherProps.errorMessage && {
-			'aria-errormessage': `${id ?? name}_fieldError`,
-		}),
-		'aria-invalid': !otherProps.valid,
-		'aria-required': otherProps.required,
-	};
-
 	const input = (
-		<ClayTooltipProvider>
-			<div
-				data-tooltip-align="top"
-				{...getTooltipTitle({
-					placeholder: inputValue.placeholder!,
-					value: inputValue.masked,
-				})}
-			>
-				<ClayInput
-					{...accessibleProps}
-					className={classNames({
-						'ddm-form-field-type__numeric--rtl':
-							Liferay.Language.direction[editingLanguageId] ===
-							'rtl',
-					})}
-					disabled={readOnly}
-					id={id ?? name}
-					name={`${name}${inputMask ? '_masked' : ''}`}
-					onBlur={onBlur}
-					onChange={handleChange}
-					onFocus={onFocus}
-					placeholder={inputValue.placeholder}
-					type="text"
-					value={inputValue.masked}
-				/>
-			</div>
-		</ClayTooltipProvider>
+		<ClayInput
+			className={classNames({
+				'ddm-form-field-type__numeric--rtl':
+					Liferay.Language.direction[editingLanguageId] === 'rtl',
+			})}
+			disabled={readOnly}
+			id={id}
+			name={`${name}${inputMask ? '_masked' : ''}`}
+			onBlur={onBlur}
+			onChange={handleChange}
+			onFocus={onFocus}
+			placeholder={inputValue.placeholder}
+			type="text"
+			value={inputValue.masked}
+		/>
 	);
 
 	return (
@@ -360,9 +285,7 @@ const Numeric: React.FC<IProps> = ({
 							<ClayInput.GroupText>{append}</ClayInput.GroupText>
 						</ClayInput.GroupItem>
 					)}
-
 					<ClayInput.GroupItem prepend>{input}</ClayInput.GroupItem>
-
 					{appendType === 'suffix' && (
 						<ClayInput.GroupItem append shrink>
 							<ClayInput.GroupText>{append}</ClayInput.GroupText>
@@ -372,7 +295,6 @@ const Numeric: React.FC<IProps> = ({
 			) : (
 				input
 			)}
-
 			{inputMask && (
 				<input name={name} type="hidden" value={inputValue.raw} />
 			)}
@@ -405,27 +327,19 @@ interface IProps {
 	append: string;
 	appendType: 'prefix' | 'suffix';
 	dataType: NumericDataType;
-	decimalPlaces: number;
 	defaultLanguageId: Locale;
-	errorMessage?: string;
-	focused: boolean;
 	id: string;
 	inputMask?: boolean;
 	inputMaskFormat?: string;
-	localizedSymbols?: LocalizedValue<ISymbols>;
 	localizedValue?: LocalizedValue<string>;
 	name: string;
 	onBlur: FocusEventHandler<HTMLInputElement>;
-	onChange: FieldChangeEventHandler<string>;
+	onChange: FieldChangeEventHandler<String>;
 	onFocus: FocusEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	predefinedValue?: string;
 	readOnly: boolean;
-	required?: boolean;
-	settingsContext?: any;
 	symbols: ISymbols;
-	tip?: string;
-	valid?: boolean;
 	value?: string;
 }
 

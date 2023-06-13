@@ -195,11 +195,7 @@ public class StickerTag extends BaseContainerTag {
 		}
 		else if (Validator.isNotNull(_imageSrc)) {
 			jspWriter.write("<img alt=\"");
-
-			if (Validator.isNotNull(_imageAlt)) {
-				jspWriter.write(_imageAlt);
-			}
-
+			jspWriter.write(_imageAlt);
 			jspWriter.write("\" class=\"sticker-img\" src=\"");
 			jspWriter.write(_imageSrc);
 			jspWriter.write("\" />");

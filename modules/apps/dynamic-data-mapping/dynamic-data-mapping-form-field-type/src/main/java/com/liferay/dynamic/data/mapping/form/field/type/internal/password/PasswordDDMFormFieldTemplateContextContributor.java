@@ -32,8 +32,12 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.PASSWORD,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		PasswordDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class PasswordDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -45,35 +49,35 @@ public class PasswordDDMFormFieldTemplateContextContributor
 
 		return HashMapBuilder.<String, Object>put(
 			"placeholder",
-			_getPlaceholder(ddmFormField, ddmFormFieldRenderingContext)
+			getPlaceholder(ddmFormField, ddmFormFieldRenderingContext)
 		).put(
-			"tooltip", _getTooltip(ddmFormField, ddmFormFieldRenderingContext)
+			"tooltip", getTooltip(ddmFormField, ddmFormFieldRenderingContext)
 		).build();
 	}
 
-	private String _getPlaceholder(
+	protected String getPlaceholder(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		LocalizedValue placeholder = (LocalizedValue)ddmFormField.getProperty(
 			"placeholder");
 
-		return _getValueString(
+		return getValueString(
 			placeholder, ddmFormFieldRenderingContext.getLocale());
 	}
 
-	private String _getTooltip(
+	protected String getTooltip(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		LocalizedValue tooltip = (LocalizedValue)ddmFormField.getProperty(
 			"tooltip");
 
-		return _getValueString(
+		return getValueString(
 			tooltip, ddmFormFieldRenderingContext.getLocale());
 	}
 
-	private String _getValueString(Value value, Locale locale) {
+	protected String getValueString(Value value, Locale locale) {
 		if (value != null) {
 			return value.getString(locale);
 		}

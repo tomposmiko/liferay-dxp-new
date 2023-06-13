@@ -14,8 +14,8 @@
 
 import React from 'react';
 declare type Props = {
-	children: React.ReactElement;
 	fallback: React.ReactElement;
+	children: React.ReactElement;
 };
 declare type State = {
 	hasError: boolean;

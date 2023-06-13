@@ -52,7 +52,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  * @author Carlos Sierra Andrés
  * @author Miguel Pastor
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ConfiguratorExtender implements BundleTrackerCustomizer<Bundle> {
 
 	@Override
@@ -102,7 +102,7 @@ public class ConfiguratorExtender implements BundleTrackerCustomizer<Bundle> {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		_bundleTracker = new BundleTracker<>(
-			bundleContext, Bundle.ACTIVE, this);
+			bundleContext, Bundle.ACTIVE | Bundle.STARTING, this);
 
 		_bundleTracker.open();
 	}
@@ -125,7 +125,7 @@ public class ConfiguratorExtender implements BundleTrackerCustomizer<Bundle> {
 					namedConfigurationContent);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
@@ -194,7 +194,7 @@ public class ConfiguratorExtender implements BundleTrackerCustomizer<Bundle> {
 		Bundle bundle, String configurationPath,
 		List<NamedConfigurationContent> namedConfigurationContents,
 		UnsafeFunction<InputStream, Dictionary<?, ?>, IOException>
-			propertyUnsafeFunction,
+			propertyFunction,
 		String filePattern) {
 
 		Enumeration<URL> enumeration = bundle.findEntries(
@@ -236,7 +236,7 @@ public class ConfiguratorExtender implements BundleTrackerCustomizer<Bundle> {
 					factoryPid, pid,
 					() -> {
 						try (InputStream inputStream = url.openStream()) {
-							return propertyUnsafeFunction.apply(inputStream);
+							return propertyFunction.apply(inputStream);
 						}
 					}));
 		}

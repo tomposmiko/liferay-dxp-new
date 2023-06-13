@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -45,8 +44,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.HitsAssert;
 import com.liferay.portal.search.test.util.IndexedFieldsFixture;
 import com.liferay.portal.search.test.util.SearchTestRule;
@@ -128,8 +125,7 @@ public abstract class BaseCalendarIndexerTestCase {
 	}
 
 	protected IndexedFieldsFixture createIndexedFieldsFixture() {
-		return new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper);
+		return new IndexedFieldsFixture(resourcePermissionLocalService);
 	}
 
 	protected SearchContext getSearchContext(String keywords, Locale locale) {
@@ -173,27 +169,6 @@ public abstract class BaseCalendarIndexerTestCase {
 			search(getSearchContext(keywords, locale)));
 	}
 
-	protected SearchResponse searchOnlyOneSearchResponse(
-		String keywords, Locale locale) {
-
-		SearchContext searchContext = getSearchContext(keywords, locale);
-
-		searchRequestBuilderFactory.builder(
-			searchContext
-		).fetchSourceIncludes(
-			new String[] {"*_sortable"}
-		).build();
-
-		search(searchContext);
-
-		SearchResponse searchResponse =
-			(SearchResponse)searchContext.getAttribute("search.response");
-
-		HitsAssert.assertOnlyOne(searchResponse.getSearchHits());
-
-		return searchResponse;
-	}
-
 	protected void setIndexerClass(Class<?> clazz) {
 		_indexer = indexerRegistry.getIndexer(clazz);
 	}
@@ -212,12 +187,6 @@ public abstract class BaseCalendarIndexerTestCase {
 
 	@Inject
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
-
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
-	@Inject
-	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
 
 	protected User user;
 

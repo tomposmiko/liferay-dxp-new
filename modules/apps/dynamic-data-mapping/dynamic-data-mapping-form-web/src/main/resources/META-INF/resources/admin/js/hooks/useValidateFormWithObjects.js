@@ -12,13 +12,12 @@
  * details.
  */
 
+import {useConfig, useFormState} from 'data-engine-js-components-web';
+import {getFields} from 'data-engine-js-components-web/js/utils/fields.es';
 import {
-	PagesVisitor,
-	getFields,
 	getObjectFieldName,
 	getSelectedValue,
-	useFormState,
-} from 'data-engine-js-components-web';
+} from 'data-engine-js-components-web/js/utils/objectFields';
 import {useCallback} from 'react';
 
 const getUnmappedFormFields = (formFields) => {
@@ -49,36 +48,30 @@ const getUnmappedRequiredObjectFields = (formFields, objectFields) => {
  * This hook is used to validate the Forms when the
  * storage type object is selected in the Forms settings
  */
-export function useValidateFormWithObjects() {
-	const {formSettingsContext, objectFields, pages} = useFormState();
+export const useValidateFormWithObjects = () => {
+	const {portletNamespace} = useConfig();
+	const {objectFields, pages} = useFormState();
 
 	return useCallback(
-		(callbackFn) => {
-			if (!formSettingsContext) {
+		async (callbackFn) => {
+
+			// Checks if managementToolbar exists because in some screens such as (elementSet)
+			// it does not exist and therefore saving is allowed
+
+			const managementToolbar = document.querySelector(
+				`#${portletNamespace}managementToolbar`
+			);
+
+			if (!managementToolbar) {
 				return true;
 			}
 
-			let hasObjectDefinitionId = false;
-			let isStorageTypeObject = false;
+			const settingsDDMForm = await Liferay.componentReady(
+				'formSettingsAPI'
+			);
+			const objectDefinitionId = settingsDDMForm.reactComponentRef.current.getObjectDefinitionId();
 
-			const visitor = new PagesVisitor(formSettingsContext.pages);
-
-			visitor.visitFields(({fieldName, value}) => {
-				if (fieldName === 'objectDefinitionId') {
-					hasObjectDefinitionId = !!value[0];
-				}
-				else if (
-					fieldName === 'storageType' &&
-					value[0] === 'object'
-				) {
-					isStorageTypeObject = true;
-				}
-			});
-
-			if (
-				(hasObjectDefinitionId && isStorageTypeObject) ||
-				objectFields.length
-			) {
+			if (objectDefinitionId) {
 				const formFields = getFields(pages);
 				const unmappedFormFields = getUnmappedFormFields(formFields);
 				const unmappedRequiredObjectFields = getUnmappedRequiredObjectFields(
@@ -107,6 +100,6 @@ export function useValidateFormWithObjects() {
 				return true;
 			}
 		},
-		[formSettingsContext, objectFields, pages]
+		[objectFields, pages, portletNamespace]
 	);
-}
+};

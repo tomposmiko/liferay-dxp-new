@@ -15,8 +15,6 @@
 package com.liferay.dynamic.data.mapping.form.evaluator.internal.function;
 
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFunction;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.math.BigDecimal;
 
@@ -36,10 +34,6 @@ public class IsDecimalFunction
 			return true;
 		}
 		catch (NumberFormatException numberFormatException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(numberFormatException);
-			}
-
 			return false;
 		}
 	}
@@ -48,8 +42,5 @@ public class IsDecimalFunction
 	public String getName() {
 		return NAME;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		IsDecimalFunction.class);
 
 }

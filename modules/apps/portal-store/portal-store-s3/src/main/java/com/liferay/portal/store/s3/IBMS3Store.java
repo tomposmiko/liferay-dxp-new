@@ -74,6 +74,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -87,7 +88,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.store.s3.configuration.S3StoreConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
 	property = "store.type=com.liferay.portal.store.s3.IBMS3Store",
 	service = Store.class
 )
@@ -292,7 +293,7 @@ public class IBMS3Store implements Store {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileException);
+				_log.debug(noSuchFileException, noSuchFileException);
 			}
 
 			return false;
@@ -639,6 +640,13 @@ public class IBMS3Store implements Store {
 		return false;
 	}
 
+	@Modified
+	protected void modified(Map<String, Object> properties) {
+		deactivate();
+
+		activate(properties);
+	}
+
 	protected void putObject(
 		long companyId, long repositoryId, String fileName, String versionLabel,
 		File file) {
@@ -663,7 +671,7 @@ public class IBMS3Store implements Store {
 		}
 		catch (InterruptedException interruptedException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(interruptedException);
+				_log.debug(interruptedException, interruptedException);
 			}
 
 			upload.abort();

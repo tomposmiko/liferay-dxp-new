@@ -16,8 +16,6 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.cache.CacheRegistryItem;
 import com.liferay.portal.kernel.change.tracking.CTAware;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -116,10 +114,6 @@ public class ClassNameLocalServiceImpl
 					return classNameLocalService.addClassName(value);
 				}
 				catch (Throwable throwable) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(throwable);
-					}
-
 					return null;
 				}
 			});
@@ -154,9 +148,6 @@ public class ClassNameLocalServiceImpl
 	public void invalidate() {
 		_classNames.clear();
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ClassNameLocalServiceImpl.class);
 
 	private static final Map<String, ClassName> _classNames =
 		new ConcurrentHashMap<>();

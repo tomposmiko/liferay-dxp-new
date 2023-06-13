@@ -117,12 +117,15 @@ public class FolderStagedModelDataHandlerTest
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFileEntryType.class, dlFileEntryType);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, stagingGroup.getGroupId(),
+			stagingGroup.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			ServiceContextTestUtil.getServiceContext(
-				stagingGroup.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFolder.class, folder);
@@ -151,12 +154,14 @@ public class FolderStagedModelDataHandlerTest
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFileEntryType.class, dlFileEntryType);
 
-		Folder folder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), TestPropsValues.getUserId()));
+				group.getGroupId(), TestPropsValues.getUserId());
+
+		Folder folder = DLAppServiceUtil.addFolder(
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
 
 		addDependentStagedModel(
 			dependentStagedModelsMap, DLFolder.class, folder);
@@ -206,7 +211,7 @@ public class FolderStagedModelDataHandlerTest
 				group.getGroupId(), TestPropsValues.getUserId());
 
 		folder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(), folder.getFolderId(),
+			group.getGroupId(), folder.getFolderId(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 
@@ -368,10 +373,6 @@ public class FolderStagedModelDataHandlerTest
 
 		Folder folder = (Folder)stagedModel;
 		Folder importedFolder = (Folder)importedStagedModel;
-
-		Assert.assertEquals(
-			folder.getExternalReferenceCode(),
-			importedFolder.getExternalReferenceCode());
 
 		Assert.assertEquals(folder.getName(), importedFolder.getName());
 		Assert.assertEquals(

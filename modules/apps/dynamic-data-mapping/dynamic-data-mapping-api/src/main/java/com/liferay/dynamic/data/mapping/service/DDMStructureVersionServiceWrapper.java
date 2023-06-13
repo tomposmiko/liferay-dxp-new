@@ -28,10 +28,6 @@ public class DDMStructureVersionServiceWrapper
 	implements DDMStructureVersionService,
 			   ServiceWrapper<DDMStructureVersionService> {
 
-	public DDMStructureVersionServiceWrapper() {
-		this(null);
-	}
-
 	public DDMStructureVersionServiceWrapper(
 		DDMStructureVersionService ddmStructureVersionService) {
 

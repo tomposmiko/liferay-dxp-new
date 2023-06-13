@@ -12,13 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	openSelectionModal,
-	postForm,
-	sub,
-} from 'frontend-js-web';
+import {openSelectionModal, postForm} from 'frontend-js-web';
 
 export default function propsTransformer({
 	additionalProps: {
@@ -36,39 +30,34 @@ export default function propsTransformer({
 			const action = item?.data?.action;
 
 			if (action === 'removeAccountGroupAccountEntries') {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-remove-the-selected-accounts'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							const form = document.getElementById(
-								`${portletNamespace}fm`
-							);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-remove-the-selected-accounts'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}fm`
+					);
 
-							if (form) {
-								postForm(form, {
-									data: {
-										accountEntryIds: getCheckedCheckboxes(
-											form,
-											`${portletNamespace}allRowIds`
-										),
-									},
-									url: removeAccountGroupAccountEntriesURL,
-								});
-							}
-						}
-					},
-				});
+					if (form) {
+						postForm(form, {
+							data: {
+								accountEntryIds: Liferay.Util.listCheckedExcept(
+									form,
+									`${portletNamespace}allRowIds`
+								),
+							},
+							url: removeAccountGroupAccountEntriesURL,
+						});
+					}
+				}
 			}
 		},
 		onCreateButtonClick: () => {
 			openSelectionModal({
 				buttonAddLabel: Liferay.Language.get('assign'),
-				containerProps: {
-					className: '',
-				},
-				iframeBodyCssClass: '',
 				multiple: true,
 				onSelect: (selectedItems) => {
 					if (!selectedItems?.length) {
@@ -90,7 +79,7 @@ export default function propsTransformer({
 						});
 					}
 				},
-				title: sub(
+				title: Liferay.Util.sub(
 					Liferay.Language.get('assign-accounts-to-x'),
 					accountGroupName
 				),

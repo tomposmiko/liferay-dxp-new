@@ -15,7 +15,7 @@
 package com.liferay.portal.workflow.web.internal.portlet.action;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW,
 		"javax.portlet.name=" + WorkflowPortletKeys.SITE_ADMINISTRATION_WORKFLOW,
@@ -62,12 +63,12 @@ public class UpdateWorkflowDefinitionLinkMVCActionCommand
 		String successMessage = StringPool.BLANK;
 
 		if (Validator.isNull(workflowDefinition)) {
-			successMessage = _language.format(
+			successMessage = LanguageUtil.format(
 				getResourceBundle(actionRequest), "workflow-unassigned-from-x",
 				resource);
 		}
 		else {
-			successMessage = _language.format(
+			successMessage = LanguageUtil.format(
 				getResourceBundle(actionRequest), "workflow-assigned-to-x",
 				resource);
 		}
@@ -81,7 +82,7 @@ public class UpdateWorkflowDefinitionLinkMVCActionCommand
 		throws Exception {
 
 		String[] classNameAndWorkflowDefinition =
-			_getClassNameAndWorkflowDefinition(actionRequest);
+			getClassNameAndWorkflowDefinition(actionRequest);
 
 		String className = classNameAndWorkflowDefinition[0];
 		String workflowDefinition = classNameAndWorkflowDefinition[1];
@@ -113,7 +114,7 @@ public class UpdateWorkflowDefinitionLinkMVCActionCommand
 		sendRedirect(actionRequest, actionResponse);
 	}
 
-	private String[] _getClassNameAndWorkflowDefinition(
+	protected String[] getClassNameAndWorkflowDefinition(
 		ActionRequest actionRequest) {
 
 		String className = StringPool.BLANK;
@@ -137,12 +138,16 @@ public class UpdateWorkflowDefinitionLinkMVCActionCommand
 		return new String[] {className, workflowDefinition};
 	}
 
+	@Reference(unbind = "-")
+	protected void setWorkflowDefinitionLinkLocalService(
+		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService) {
+
+		_workflowDefinitionLinkLocalService =
+			workflowDefinitionLinkLocalService;
+	}
+
 	private static final String _PREFIX = "workflowDefinitionName@";
 
-	@Reference
-	private Language _language;
-
-	@Reference
 	private WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;
 

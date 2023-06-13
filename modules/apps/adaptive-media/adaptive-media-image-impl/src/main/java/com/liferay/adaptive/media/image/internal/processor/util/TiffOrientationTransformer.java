@@ -30,6 +30,7 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -42,11 +43,12 @@ public class TiffOrientationTransformer {
 		throws PortalException {
 
 		try {
-			int tiffOrientationValue = _getTiffOrientationValue(
-				inputStreamSupplier);
+			Optional<Integer> tiffOrientationValueOptional =
+				_getTiffOrientationValue(inputStreamSupplier);
 
-			if (tiffOrientationValue != _ORIENTATION_VALUE_NOT_FOUND) {
-				return _transform(inputStreamSupplier, tiffOrientationValue);
+			if (tiffOrientationValueOptional.isPresent()) {
+				return _transform(
+					inputStreamSupplier, tiffOrientationValueOptional.get());
 			}
 
 			return RenderedImageUtil.readImage(inputStreamSupplier.get());
@@ -56,7 +58,7 @@ public class TiffOrientationTransformer {
 		}
 	}
 
-	private static int _getTiffOrientationValue(
+	private static Optional<Integer> _getTiffOrientationValue(
 		Supplier<InputStream> inputStreamSupplier) {
 
 		try (InputStream inputStream = inputStreamSupplier.get()) {
@@ -69,18 +71,19 @@ public class TiffOrientationTransformer {
 				!exifIFD0Directory.containsTag(
 					ExifIFD0Directory.TAG_ORIENTATION)) {
 
-				return _ORIENTATION_VALUE_NOT_FOUND;
+				return Optional.empty();
 			}
 
-			return exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+			return Optional.of(
+				exifIFD0Directory.getInt(ExifIFD0Directory.TAG_ORIENTATION));
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
-		return _ORIENTATION_VALUE_NOT_FOUND;
+		return Optional.empty();
 	}
 
 	private static RenderedImage _transform(
@@ -135,8 +138,6 @@ public class TiffOrientationTransformer {
 		_ORIENTATION_VALUE_MIRROR_HORIZONTAL_ROTATE_270_CW = 5;
 
 	private static final int _ORIENTATION_VALUE_MIRROR_VERTICAL = 4;
-
-	private static final int _ORIENTATION_VALUE_NOT_FOUND = -1;
 
 	private static final int _ORIENTATION_VALUE_ROTATE_90_CW = 6;
 

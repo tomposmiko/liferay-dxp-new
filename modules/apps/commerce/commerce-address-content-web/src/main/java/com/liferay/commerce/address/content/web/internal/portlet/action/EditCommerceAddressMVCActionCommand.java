@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.address.content.web.internal.portlet.action;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.exception.CommerceAddressCityException;
 import com.liferay.commerce.exception.CommerceAddressCountryException;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_ADDRESS_CONTENT,
 		"mvc.command.name=/commerce_address_content/edit_commerce_address"
@@ -49,6 +50,17 @@ import org.osgi.service.component.annotations.Reference;
 	service = MVCActionCommand.class
 )
 public class EditCommerceAddressMVCActionCommand extends BaseMVCActionCommand {
+
+	protected void deleteCommerceAddress(ActionRequest actionRequest)
+		throws Exception {
+
+		long commerceAddressId = ParamUtil.getLong(
+			actionRequest, "commerceAddressId");
+
+		if (commerceAddressId > 0) {
+			_commerceAddressService.deleteCommerceAddress(commerceAddressId);
+		}
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -59,12 +71,12 @@ public class EditCommerceAddressMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceAddress(actionRequest);
+				deleteCommerceAddress(actionRequest);
 			}
 			else if (cmd.equals(Constants.ADD) ||
 					 cmd.equals(Constants.UPDATE)) {
 
-				_updateCommerceAddress(actionRequest);
+				updateCommerceAddress(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -95,18 +107,7 @@ public class EditCommerceAddressMVCActionCommand extends BaseMVCActionCommand {
 		hideDefaultSuccessMessage(actionRequest);
 	}
 
-	private void _deleteCommerceAddress(ActionRequest actionRequest)
-		throws Exception {
-
-		long commerceAddressId = ParamUtil.getLong(
-			actionRequest, "commerceAddressId");
-
-		if (commerceAddressId > 0) {
-			_commerceAddressService.deleteCommerceAddress(commerceAddressId);
-		}
-	}
-
-	private void _updateCommerceAddress(ActionRequest actionRequest)
+	protected void updateCommerceAddress(ActionRequest actionRequest)
 		throws Exception {
 
 		long commerceAddressId = ParamUtil.getLong(
@@ -135,7 +136,7 @@ public class EditCommerceAddressMVCActionCommand extends BaseMVCActionCommand {
 				actionRequest, "commerceAccountId");
 
 			_commerceAddressService.addCommerceAddress(
-				AccountEntry.class.getName(), commerceAccountId, name,
+				CommerceAccount.class.getName(), commerceAccountId, name,
 				description, street1, street2, street3, city, zip, regionId,
 				countryId, phoneNumber, defaultBilling, defaultShipping,
 				serviceContext);

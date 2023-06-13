@@ -16,7 +16,6 @@ package com.liferay.commerce.product.type.virtual.order.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.constants.CommerceOrderConstants;
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
 import com.liferay.commerce.model.CommerceOrder;
@@ -40,10 +39,12 @@ import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.subscription.CommerceSubscriptionEntryHelper;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -62,6 +63,7 @@ import org.frutilla.FrutillaRule;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,19 +82,25 @@ public class CommerceVirtualOrderItemLocalServiceTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
-			_group.getCompanyId());
+			_company.getCompanyId());
 
 		_commerceChannel = CommerceTestUtil.addCommerceChannel(
 			_group.getGroupId(), _commerceCurrency.getCode());
 		_commerceCatalog = CommerceTestUtil.addCommerceCatalog(
-			_group.getCompanyId(), _group.getGroupId(), _user.getUserId(),
+			_company.getCompanyId(), _company.getGroupId(), _user.getUserId(),
 			_commerceCurrency.getCode());
 	}
 
@@ -149,9 +157,7 @@ public class CommerceVirtualOrderItemLocalServiceTest {
 		}
 
 		commerceOrder = _setCommerceOrderStatuses(
-			_commerceOrderLocalService.getCommerceOrder(
-				commerceOrder.getCommerceOrderId()),
-			CommerceOrderPaymentConstants.STATUS_COMPLETED,
+			commerceOrder, CommerceOrderConstants.PAYMENT_STATUS_PAID,
 			CommerceOrderConstants.ORDER_STATUS_PENDING);
 
 		_commerceVirtualOrderItemChecker.checkCommerceVirtualOrderItems(
@@ -242,9 +248,7 @@ public class CommerceVirtualOrderItemLocalServiceTest {
 		}
 
 		commerceOrder = _setCommerceOrderStatuses(
-			_commerceOrderLocalService.getCommerceOrder(
-				commerceOrder.getCommerceOrderId()),
-			CommerceOrderPaymentConstants.STATUS_COMPLETED,
+			commerceOrder, CommerceOrderConstants.PAYMENT_STATUS_PAID,
 			CommerceOrderConstants.ORDER_STATUS_PENDING);
 
 		_commerceSubscriptionEntryHelper.checkCommerceSubscriptions(
@@ -288,8 +292,8 @@ public class CommerceVirtualOrderItemLocalServiceTest {
 	private CommerceOrder _setCommerceOrderStatuses(
 		CommerceOrder commerceOrder, int paymentStatus, int orderStatus) {
 
-		commerceOrder.setOrderStatus(orderStatus);
 		commerceOrder.setPaymentStatus(paymentStatus);
+		commerceOrder.setOrderStatus(orderStatus);
 
 		return _commerceOrderLocalService.updateCommerceOrder(commerceOrder);
 	}
@@ -307,6 +311,7 @@ public class CommerceVirtualOrderItemLocalServiceTest {
 		return _cpInstanceLocalService.updateCPInstance(cpInstance);
 	}
 
+	private static Company _company;
 	private static User _user;
 
 	private CommerceCatalog _commerceCatalog;

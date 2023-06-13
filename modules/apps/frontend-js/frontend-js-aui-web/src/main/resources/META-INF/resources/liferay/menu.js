@@ -15,93 +15,86 @@
 AUI.add(
 	'liferay-menu',
 	(A) => {
-		const Util = Liferay.Util;
+		var Util = Liferay.Util;
 
-		const ARIA_ATTR_ROLE = 'role';
+		var ARIA_ATTR_ROLE = 'role';
 
-		const ATTR_CLASS_NAME = 'className';
+		var ATTR_CLASS_NAME = 'className';
 
-		const AUTO = 'auto';
+		var AUTO = 'auto';
 
-		const CSS_BTN_PRIMARY = 'btn-primary';
+		var CSS_BTN_PRIMARY = 'btn-primary';
 
-		const CSS_EXTENDED = 'lfr-extended';
+		var CSS_EXTENDED = 'lfr-extended';
 
-		const CSS_OPEN = 'open';
+		var CSS_OPEN = 'open';
 
-		const CSS_PORTLET = '.portlet';
+		var CSS_PORTLET = '.portlet';
 
-		const DEFAULT_ALIGN_POINTS = ['tl', 'bl'];
+		var DEFAULT_ALIGN_POINTS = ['tl', 'bl'];
 
-		const EVENT_CLICK = 'click';
+		var EVENT_CLICK = 'click';
 
-		const EVENT_KEYDOWN = 'keydown';
+		var PARENT_NODE = 'parentNode';
 
-		const PARENT_NODE = 'parentNode';
+		var STR_BOTTOM = 'b';
 
-		const STR_BOTTOM = 'b';
+		var STR_LEFT = 'l';
 
-		const STR_LEFT = 'l';
+		var STR_LTR = 'ltr';
 
-		const STR_LTR = 'ltr';
+		var STR_RIGHT = 'r';
 
-		const STR_RIGHT = 'r';
+		var STR_RTL = 'rtl';
 
-		const STR_RTL = 'rtl';
+		var STR_TOP = 't';
 
-		const STR_TOP = 't';
-
-		const MAP_ALIGN_DOWN = {
-			downleft: ['tr', 'br'],
-			downright: DEFAULT_ALIGN_POINTS,
-		};
-
-		const MAP_ALIGN_HORIZONTAL_OVERLAY = {
+		var MAP_ALIGN_HORIZONTAL_OVERLAY = {
 			left: STR_RIGHT,
 			right: STR_LEFT,
 		};
 
-		const MAP_ALIGN_HORIZONTAL_OVERLAY_RTL = {
+		var MAP_ALIGN_HORIZONTAL_OVERLAY_RTL = {
 			left: STR_LEFT,
 			right: STR_RIGHT,
 		};
 
-		const MAP_ALIGN_HORIZONTAL_TRIGGER = {
+		var MAP_ALIGN_HORIZONTAL_TRIGGER = {
 			left: STR_LEFT,
 			right: STR_RIGHT,
 		};
 
-		const MAP_ALIGN_HORIZONTAL_TRIGGER_RTL = {
+		var MAP_ALIGN_HORIZONTAL_TRIGGER_RTL = {
 			left: STR_RIGHT,
 			right: STR_LEFT,
 		};
 
-		const MAP_ALIGN_VERTICAL_OVERLAY = {
+		var MAP_ALIGN_VERTICAL_OVERLAY = {
 			down: STR_TOP,
 			up: STR_BOTTOM,
 		};
 
-		const MAP_ALIGN_VERTICAL_TRIGGER = {
+		var MAP_ALIGN_VERTICAL_TRIGGER = {
 			down: STR_BOTTOM,
 			up: STR_TOP,
 		};
 
-		const MAP_LIVE_SEARCH = {};
+		var MAP_LIVE_SEARCH = {};
 
-		const REGEX_DIRECTION = /\bdirection-(downleft|downright|down|left|right|up)\b/;
+		var REGEX_DIRECTION = /\bdirection-(down|left|right|up)\b/;
 
-		const REGEX_MAX_DISPLAY_ITEMS = /max-display-items-(\d+)/;
+		var REGEX_MAX_DISPLAY_ITEMS = /max-display-items-(\d+)/;
 
-		const SELECTOR_ANCHOR = 'a';
+		var SELECTOR_ANCHOR = 'a';
 
-		const SELECTOR_LIST_ITEM = 'li';
+		var SELECTOR_LIST_ITEM = 'li';
 
-		const SELECTOR_SEARCH_CONTAINER = '.lfr-menu-list-search-container';
+		var SELECTOR_SEARCH_CONTAINER = '.lfr-menu-list-search-container';
 
-		const TPL_MENU = '<div class="open" />';
+		var TPL_MENU = '<div class="open" />';
 
-		const Menu = function () {
-			const instance = this;
+		var Menu = function () {
+			var instance = this;
 
 			instance._handles = [];
 
@@ -112,31 +105,27 @@ AUI.add(
 
 		Menu.prototype = {
 			_closeActiveMenu() {
-				const instance = this;
+				var instance = this;
 
-				const menu = instance._activeMenu;
+				var menu = instance._activeMenu;
 
 				if (menu) {
-					const handles = instance._handles;
+					var handles = instance._handles;
 
 					A.Array.invoke(handles, 'detach');
 
 					handles.length = 0;
 
-					const overlay = instance._overlay;
+					var overlay = instance._overlay;
 
 					if (overlay) {
 						overlay.hide();
 					}
 
-					const trigger = instance._activeTrigger;
+					var trigger = instance._activeTrigger;
 
 					instance._activeMenu = null;
 					instance._activeTrigger = null;
-
-					trigger.attr({
-						'aria-expanded': false,
-					});
 
 					if (trigger.hasClass(CSS_EXTENDED)) {
 						trigger.removeClass(CSS_BTN_PRIMARY);
@@ -144,7 +133,7 @@ AUI.add(
 					else {
 						trigger.get(PARENT_NODE).removeClass(CSS_OPEN);
 
-						const portlet = trigger.ancestor(CSS_PORTLET);
+						var portlet = trigger.ancestor(CSS_PORTLET);
 
 						if (portlet) {
 							portlet.removeClass(CSS_OPEN);
@@ -154,17 +143,17 @@ AUI.add(
 			},
 
 			_getAlignPoints: A.cached((cssClass) => {
-				let alignPoints = DEFAULT_ALIGN_POINTS;
+				var alignPoints = DEFAULT_ALIGN_POINTS;
 
-				let defaultOverlayHorizontalAlign = STR_RIGHT;
+				var defaultOverlayHorizontalAlign = STR_RIGHT;
 
-				let defaultTriggerHorizontalAlign = STR_LEFT;
+				var defaultTriggerHorizontalAlign = STR_LEFT;
 
-				let mapAlignHorizontalOverlay = MAP_ALIGN_HORIZONTAL_OVERLAY;
+				var mapAlignHorizontalOverlay = MAP_ALIGN_HORIZONTAL_OVERLAY;
 
-				let mapAlignHorizontalTrigger = MAP_ALIGN_HORIZONTAL_TRIGGER;
+				var mapAlignHorizontalTrigger = MAP_ALIGN_HORIZONTAL_TRIGGER;
 
-				const langDir =
+				var langDir =
 					Liferay.Language.direction[themeDisplay.getLanguageId()] ||
 					STR_LTR;
 
@@ -177,27 +166,22 @@ AUI.add(
 				}
 
 				if (cssClass.indexOf(AUTO) === -1) {
-					const directionMatch = cssClass.match(REGEX_DIRECTION);
+					var directionMatch = cssClass.match(REGEX_DIRECTION);
 
-					const direction =
+					var direction =
 						(directionMatch && directionMatch[1]) || AUTO;
 
-					if (direction.startsWith('down')) {
-						alignPoints =
-							MAP_ALIGN_DOWN[direction] ||
-							MAP_ALIGN_DOWN.downright;
-					}
-					else {
-						const overlayHorizontal =
+					if (direction != 'down') {
+						var overlayHorizontal =
 							mapAlignHorizontalOverlay[direction] ||
 							defaultOverlayHorizontalAlign;
-						const overlayVertical =
+						var overlayVertical =
 							MAP_ALIGN_VERTICAL_OVERLAY[direction] || STR_TOP;
 
-						const triggerHorizontal =
+						var triggerHorizontal =
 							mapAlignHorizontalTrigger[direction] ||
 							defaultTriggerHorizontalAlign;
-						const triggerVertical =
+						var triggerVertical =
 							MAP_ALIGN_VERTICAL_TRIGGER[direction] || STR_TOP;
 
 						alignPoints = [
@@ -211,12 +195,12 @@ AUI.add(
 			}),
 
 			_getMenu(trigger) {
-				const instance = this;
+				var instance = this;
 
-				let overlay = instance._overlay;
+				var overlay = instance._overlay;
 
 				if (!overlay) {
-					const MenuOverlay = A.Component.create({
+					var MenuOverlay = A.Component.create({
 						AUGMENTS: [
 							A.WidgetCssClass,
 							A.WidgetPosition,
@@ -241,7 +225,6 @@ AUI.add(
 						},
 						constrain: true,
 						hideClass: false,
-						modal: Util.isPhone() || Util.isTablet(),
 						preventOverlap: true,
 						zIndex: Liferay.zIndex.MENU,
 					}).render();
@@ -258,17 +241,17 @@ AUI.add(
 					overlay.set('align.node', trigger);
 				}
 
-				let listContainer = trigger.getData('menuListContainer');
-				let menu = trigger.getData('menu');
-				let menuHeight = trigger.getData('menuHeight');
+				var listContainer = trigger.getData('menuListContainer');
+				var menu = trigger.getData('menu');
+				var menuHeight = trigger.getData('menuHeight');
 
-				const liveSearch = menu && MAP_LIVE_SEARCH[menu.guid()];
+				var liveSearch = menu && MAP_LIVE_SEARCH[menu.guid()];
 
 				if (liveSearch) {
 					liveSearch.reset();
 				}
 
-				let listItems;
+				var listItems;
 
 				if (!menu || !listContainer) {
 					listContainer = trigger.next('ul');
@@ -292,16 +275,16 @@ AUI.add(
 						listContainer.delegate(
 							'click',
 							(event) => {
-								const selectedListItem = event.currentTarget;
+								var selectedListItem = event.currentTarget;
 
-								const selectedListItemIcon = selectedListItem.one(
+								var selectedListItemIcon = selectedListItem.one(
 									'i'
 								);
 
-								const triggerIcon = trigger.one('i');
+								var triggerIcon = trigger.one('i');
 
 								if (selectedListItemIcon && triggerIcon) {
-									const selectedListItemIconClass = selectedListItemIcon.attr(
+									var selectedListItemIconClass = selectedListItemIcon.attr(
 										'class'
 									);
 
@@ -311,11 +294,11 @@ AUI.add(
 									);
 								}
 
-								const selectedListItemMessage = selectedListItem.one(
+								var selectedListItemMessage = selectedListItem.one(
 									'.lfr-icon-menu-text'
 								);
 
-								const triggerMessage = trigger.one(
+								var triggerMessage = trigger.one(
 									'.lfr-icon-menu-text'
 								);
 
@@ -352,16 +335,16 @@ AUI.add(
 			},
 
 			_getMenuHeight(trigger, menu, listItems) {
-				const instance = this;
+				var instance = this;
 
-				const cssClass = trigger.attr(ATTR_CLASS_NAME);
+				var cssClass = trigger.attr(ATTR_CLASS_NAME);
 
-				let height = AUTO;
+				var height = AUTO;
 
 				if (cssClass.indexOf('lfr-menu-expanded') === -1) {
-					const params = REGEX_MAX_DISPLAY_ITEMS.exec(cssClass);
+					var params = REGEX_MAX_DISPLAY_ITEMS.exec(cssClass);
 
-					const maxDisplayItems = params && parseInt(params[1], 10);
+					var maxDisplayItems = params && parseInt(params[1], 10);
 
 					if (maxDisplayItems && listItems.size() > maxDisplayItems) {
 						instance._getLiveSearch(
@@ -371,11 +354,11 @@ AUI.add(
 
 						height = 0;
 
-						const heights = listItems
+						var heights = listItems
 							.slice(0, maxDisplayItems)
 							.get('offsetHeight');
 
-						for (let i = heights.length - 1; i >= 0; i--) {
+						for (var i = heights.length - 1; i >= 0; i--) {
 							height += heights[i];
 						}
 					}
@@ -385,44 +368,52 @@ AUI.add(
 			},
 
 			_positionActiveMenu() {
-				const instance = this;
+				var instance = this;
 
-				const menu = instance._activeMenu;
-				const trigger = instance._activeTrigger;
+				var menu = instance._activeMenu;
+				var trigger = instance._activeTrigger;
 
 				if (menu) {
-					const cssClass = trigger.attr(ATTR_CLASS_NAME);
+					var cssClass = trigger.attr(ATTR_CLASS_NAME);
 
-					const overlay = instance._overlay;
+					var overlay = instance._overlay;
 
-					const align = overlay.get('align');
+					var align = overlay.get('align');
 
-					const listNode = menu.one('ul');
+					var listNode = menu.one('ul');
 
-					overlay.show();
+					var listNodeHeight = listNode.get('offsetHeight');
+					var listNodeWidth = listNode.get('offsetWidth');
 
-					const listNodeHeight = listNode.get('offsetHeight');
-					const listNodeWidth = listNode.get('offsetWidth');
+					var modalMask = false;
 
 					align.points = instance._getAlignPoints(cssClass);
 
 					menu.addClass('lfr-icon-menu-open');
 
+					if (Util.isPhone() || Util.isTablet()) {
+						overlay.hide();
+
+						modalMask = true;
+					}
+
 					overlay.setAttrs({
 						align,
 						centered: false,
 						height: listNodeHeight,
-						modal: Util.isPhone() || Util.isTablet(),
+						modal: modalMask,
 						width: listNodeWidth,
 					});
 
 					if (!Util.isPhone() && !Util.isTablet()) {
-						const focusManager = overlay.bodyNode.focusManager;
+						var focusManager = overlay.bodyNode.focusManager;
 
 						if (focusManager) {
 							focusManager.focus(0);
 						}
 					}
+
+					overlay.show();
 
 					if (cssClass.indexOf(CSS_EXTENDED) > -1) {
 						trigger.addClass(CSS_BTN_PRIMARY);
@@ -430,7 +421,7 @@ AUI.add(
 					else {
 						trigger.get(PARENT_NODE).addClass(CSS_OPEN);
 
-						const portlet = trigger.ancestor(CSS_PORTLET);
+						var portlet = trigger.ancestor(CSS_PORTLET);
 
 						if (portlet) {
 							portlet.addClass(CSS_OPEN);
@@ -440,39 +431,34 @@ AUI.add(
 			},
 
 			_setARIARoles(trigger, menu) {
-				const links = menu
-					.all(SELECTOR_ANCHOR)
-					.filter(':not([aria-haspopup="dialog"]');
+				var links = menu.all(SELECTOR_ANCHOR);
 
-				const searchContainer = menu.one(SELECTOR_SEARCH_CONTAINER);
+				var searchContainer = menu.one(SELECTOR_SEARCH_CONTAINER);
 
-				const listNode = menu.one('ul');
+				var listNode = menu.one('ul');
 
-				let ariaLinksAttr = 'menuitem';
-				let ariaListNodeAttr = 'menu';
+				var ariaLinksAttr = 'menuitem';
+				var ariaListNodeAttr = 'menu';
 
 				if (searchContainer) {
-					ariaLinksAttr = 'option';
 					ariaListNodeAttr = 'listbox';
+					ariaListNodeAttr = 'option';
 				}
 
-				if (links.size() > 0) {
-					listNode.setAttribute(ARIA_ATTR_ROLE, ariaListNodeAttr);
-					links.set(ARIA_ATTR_ROLE, ariaLinksAttr);
-				}
+				listNode.setAttribute(ARIA_ATTR_ROLE, ariaListNodeAttr);
+				links.set(ARIA_ATTR_ROLE, ariaLinksAttr);
 
 				trigger.attr({
 					'aria-haspopup': true,
+					role: 'button',
 				});
 
-				if (!trigger.hasClass('input-localized-trigger')) {
-					listNode.setAttribute('aria-labelledby', trigger.guid());
-				}
+				listNode.setAttribute('aria-labelledby', trigger.guid());
 			},
 		};
 
 		Menu.handleFocus = function (id) {
-			const node = A.one(id);
+			var node = A.one(id);
 
 			if (node) {
 				node.delegate(
@@ -488,10 +474,10 @@ AUI.add(
 			}
 		};
 
-		const buffer = [];
+		var buffer = [];
 
 		Menu.register = function (id) {
-			const menuNode = document.getElementById(id);
+			var menuNode = document.getElementById(id);
 
 			if (menuNode) {
 				if (!Menu._INSTANCE) {
@@ -506,19 +492,16 @@ AUI.add(
 
 		Menu._registerTask = A.debounce(() => {
 			if (buffer.length) {
-				const nodes = A.all(buffer);
+				var nodes = A.all(buffer);
 
-				nodes.on(
-					[EVENT_CLICK, EVENT_KEYDOWN],
-					A.bind('_registerMenu', Menu)
-				);
+				nodes.on(EVENT_CLICK, A.bind('_registerMenu', Menu));
 
 				buffer.length = 0;
 			}
 		}, 100);
 
 		Menu._targetLink = function (event, action) {
-			const anchor = event.currentTarget.one(SELECTOR_ANCHOR);
+			var anchor = event.currentTarget.one(SELECTOR_ANCHOR);
 
 			if (anchor) {
 				anchor[action]();
@@ -529,12 +512,12 @@ AUI.add(
 			Menu,
 			'_getFocusManager',
 			() => {
-				const menuInstance = Menu._INSTANCE;
+				var menuInstance = Menu._INSTANCE;
 
-				let focusManager = menuInstance._focusManager;
+				var focusManager = menuInstance._focusManager;
 
 				if (!focusManager) {
-					const bodyNode = menuInstance._overlay.bodyNode;
+					var bodyNode = menuInstance._overlay.bodyNode;
 
 					bodyNode.plug(A.Plugin.NodeFocusManager, {
 						circular: true,
@@ -549,7 +532,7 @@ AUI.add(
 					bodyNode.on(
 						'key',
 						() => {
-							const activeTrigger = menuInstance._activeTrigger;
+							var activeTrigger = menuInstance._activeTrigger;
 
 							if (activeTrigger) {
 								menuInstance._closeActiveMenu();
@@ -575,12 +558,12 @@ AUI.add(
 					);
 
 					focusManager.after('activeDescendantChange', (event) => {
-						const descendants = focusManager.get('descendants');
+						var descendants = focusManager.get('descendants');
 
-						const selectedItem = descendants.item(event.newVal);
+						var selectedItem = descendants.item(event.newVal);
 
 						if (selectedItem) {
-							const overlayList = bodyNode.one('ul');
+							var overlayList = bodyNode.one('ul');
 
 							if (overlayList) {
 								overlayList.setAttribute(
@@ -592,10 +575,6 @@ AUI.add(
 					});
 
 					menuInstance._focusManager = focusManager;
-
-					Liferay.once('beforeScreenFlip', () => {
-						menuInstance._focusManager = null;
-					});
 				}
 
 				focusManager.refresh();
@@ -608,14 +587,14 @@ AUI.add(
 			Menu,
 			'_getLiveSearch',
 			(_trigger, menu) => {
-				const id = menu.guid();
+				var id = menu.guid();
 
-				let liveSearch = MAP_LIVE_SEARCH[id];
+				var liveSearch = MAP_LIVE_SEARCH[id];
 
 				if (!liveSearch) {
-					const listNode = menu.one('ul');
+					var listNode = menu.one('ul');
 
-					const results = [];
+					var results = [];
 
 					listNode.all('li').each((node) => {
 						results.push({
@@ -626,7 +605,6 @@ AUI.add(
 
 					liveSearch = new Liferay.MenuFilter({
 						content: listNode,
-						menu: Menu._INSTANCE,
 						minQueryLength: 0,
 						queryDelay: 0,
 						resultFilters: 'phraseMatch',
@@ -647,30 +625,21 @@ AUI.add(
 			Menu,
 			'_registerMenu',
 			(event) => {
-				const key = event.key || event.keyCode;
+				var menuInstance = Menu._INSTANCE;
 
-				if (
-					event.type === EVENT_KEYDOWN &&
-					key !== A.Event.KeyMap.SPACE
-				) {
-					return;
-				}
+				var handles = menuInstance._handles;
 
-				const menuInstance = Menu._INSTANCE;
+				var trigger = event.currentTarget;
 
-				const handles = menuInstance._handles;
-
-				const trigger = event.currentTarget;
-
-				const activeTrigger = menuInstance._activeTrigger;
+				var activeTrigger = menuInstance._activeTrigger;
 
 				if (activeTrigger) {
-					if (activeTrigger !== trigger) {
+					if (activeTrigger != trigger) {
 						activeTrigger.removeClass(CSS_BTN_PRIMARY);
 
 						activeTrigger.get(PARENT_NODE).removeClass(CSS_OPEN);
 
-						const portlet = activeTrigger.ancestor(CSS_PORTLET);
+						var portlet = activeTrigger.ancestor(CSS_PORTLET);
 
 						if (portlet) {
 							portlet.removeClass(CSS_OPEN);
@@ -684,17 +653,13 @@ AUI.add(
 				}
 
 				if (!trigger.hasClass('disabled')) {
-					const menu = menuInstance._getMenu(trigger);
+					var menu = menuInstance._getMenu(trigger);
 
 					menuInstance._activeMenu = menu;
 					menuInstance._activeTrigger = trigger;
 
-					trigger.attr({
-						'aria-expanded': true,
-					});
-
 					if (!handles.length) {
-						const listContainer = trigger.getData(
+						var listContainer = trigger.getData(
 							'menuListContainer'
 						);
 
@@ -730,7 +695,7 @@ AUI.add(
 							})
 						);
 
-						const DDM = A.DD && A.DD.DDM;
+						var DDM = A.DD && A.DD.DDM;
 
 						if (DDM) {
 							handles.push(

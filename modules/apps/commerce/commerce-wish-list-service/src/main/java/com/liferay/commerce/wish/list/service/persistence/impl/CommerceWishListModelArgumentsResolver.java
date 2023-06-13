@@ -24,21 +24,12 @@ import com.liferay.portal.kernel.model.BaseModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CommerceWishList.
  *
  * @author Andrea Di Giorgi
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.wish.list.model.impl.CommerceWishListImpl",
-		"table.name=CommerceWishList"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommerceWishListModelArgumentsResolver
 	implements ArgumentsResolver {
 

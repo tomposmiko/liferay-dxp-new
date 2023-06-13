@@ -12,12 +12,8 @@
  * details.
  */
 
-import {
-	fireEvent,
-	render,
-	waitFor,
-	waitForElementToBeRemoved,
-} from '@testing-library/react';
+import {waitForElement} from '@testing-library/dom';
+import {cleanup, fireEvent, render} from '@testing-library/react';
 import React from 'react';
 
 import {EVENT_TYPES} from '../../../src/main/resources/META-INF/resources/js/core/actions/eventTypes.es';
@@ -69,12 +65,14 @@ describe('FieldCompabilityLayer -> Metal+Soy', () => {
 		window.Liferay.Loader = originalLiferayLoader;
 	});
 
+	afterEach(cleanup);
+
 	it('renders the Metal field', async () => {
 		const {container} = render(<FieldWithProvider field={fieldProps} />);
 
-		await waitForElementToBeRemoved(
-			container.querySelector('.loading-animation')
-		);
+		await waitForElement(() => container.querySelector('input'), {
+			container,
+		});
 
 		expect(container).toMatchSnapshot();
 	});
@@ -86,7 +84,7 @@ describe('FieldCompabilityLayer -> Metal+Soy', () => {
 			<FieldWithProvider field={fieldProps} onChange={onChange} />
 		);
 
-		await waitFor(() => container.querySelector('input'), {
+		await waitForElement(() => container.querySelector('input'), {
 			container,
 		});
 
@@ -112,7 +110,7 @@ describe('FieldCompabilityLayer -> Metal+Soy', () => {
 			<FieldWithProvider field={fieldProps} onBlur={onBlur} />
 		);
 
-		await waitFor(() => container.querySelector('input'), {
+		await waitForElement(() => container.querySelector('input'), {
 			container,
 		});
 
@@ -137,7 +135,7 @@ describe('FieldCompabilityLayer -> Metal+Soy', () => {
 			<FieldWithProvider field={fieldProps} onFocus={onFocus} />
 		);
 
-		await waitFor(() => container.querySelector('input'), {
+		await waitForElement(() => container.querySelector('input'), {
 			container,
 		});
 
@@ -155,11 +153,11 @@ describe('FieldCompabilityLayer -> Metal+Soy', () => {
 	it('dispatch the EVENT_TYPES.FIELD_REMOVED event when removing the field repeated', async () => {
 		const onAction = jest.fn();
 
-		const {findByText, getByText} = render(
+		const {container, getByText} = render(
 			<FieldWithProvider field={fieldProps} onAction={onAction} />
 		);
 
-		await findByText('Remove');
+		await waitForElement(() => getByText('Remove'), {container});
 
 		const button = getByText('Remove');
 
@@ -174,11 +172,11 @@ describe('FieldCompabilityLayer -> Metal+Soy', () => {
 	it('dispatch the EVENT_TYPES.FIELD_REPEATED event when repeating the same field', async () => {
 		const onAction = jest.fn();
 
-		const {findByText, getByText} = render(
+		const {container, getByText} = render(
 			<FieldWithProvider field={fieldProps} onAction={onAction} />
 		);
 
-		await findByText('Duplicate');
+		await waitForElement(() => getByText('Duplicate'), {container});
 
 		const button = getByText('Duplicate');
 

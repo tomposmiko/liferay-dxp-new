@@ -17,6 +17,8 @@
 <%@ include file="/render_fragment_layout/init.jsp" %>
 
 <%
+Map<String, Object> fieldValues = (Map<String, Object>)request.getAttribute("liferay-layout:render-fragment-layout:fieldValues");
+LayoutStructure layoutStructure = (LayoutStructure)request.getAttribute("liferay-layout:render-fragment-layout:layoutStructure");
 String mainItemId = (String)request.getAttribute("liferay-layout:render-fragment-layout:mainItemId");
 String mode = (String)request.getAttribute("liferay-layout:render-fragment-layout:mode");
 boolean showPreview = GetterUtil.getBoolean(request.getAttribute("liferay-layout:render-fragment-layout:showPreview"));
@@ -33,6 +35,8 @@ try {
 		var="content"
 	>
 		<liferay-layout:render-layout-structure
+			fieldValues="<%= fieldValues %>"
+			layoutStructure="<%= layoutStructure %>"
 			mainItemId="<%= mainItemId %>"
 			mode="<%= mode %>"
 			showPreview="<%= showPreview %>"

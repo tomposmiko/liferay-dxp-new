@@ -22,20 +22,11 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface SearchRequestExecutor {
 
-	public ClearScrollResponse executeSearchRequest(
-		ClearScrollRequest clearScrollRequest);
-
-	public ClosePointInTimeResponse executeSearchRequest(
-		ClosePointInTimeRequest closePointInTimeRequest);
-
 	public CountSearchResponse executeSearchRequest(
 		CountSearchRequest countSearchRequest);
 
 	public MultisearchSearchResponse executeSearchRequest(
 		MultisearchSearchRequest multisearchSearchRequest);
-
-	public OpenPointInTimeResponse executeSearchRequest(
-		OpenPointInTimeRequest openPointInTimeRequest);
 
 	public SearchSearchResponse executeSearchRequest(
 		SearchSearchRequest searchSearchRequest);

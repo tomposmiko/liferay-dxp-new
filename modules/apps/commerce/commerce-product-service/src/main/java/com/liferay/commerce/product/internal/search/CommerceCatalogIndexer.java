@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alec Sloan
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommerceCatalogIndexer extends BaseIndexer<CommerceCatalog> {
 
 	public static final String CLASS_NAME = CommerceCatalog.class.getName();
@@ -114,11 +114,11 @@ public class CommerceCatalogIndexer extends BaseIndexer<CommerceCatalog> {
 
 		Document document = getBaseModelDocument(CLASS_NAME, commerceCatalog);
 
+		document.addKeyword(Field.GROUP_ID, commerceCatalog.getGroupId());
+		document.addKeyword(Field.NAME, commerceCatalog.getName());
 		document.addKeyword(
 			CPField.CATALOG_DEFAULT_LANGUAGE_ID,
 			commerceCatalog.getCatalogDefaultLanguageId());
-		document.addKeyword(Field.GROUP_ID, commerceCatalog.getGroupId());
-		document.addKeyword(Field.NAME, commerceCatalog.getName());
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + commerceCatalog + " indexed successfully");
@@ -143,7 +143,8 @@ public class CommerceCatalogIndexer extends BaseIndexer<CommerceCatalog> {
 	@Override
 	protected void doReindex(CommerceCatalog commerceCatalog) throws Exception {
 		_indexWriterHelper.updateDocument(
-			commerceCatalog.getCompanyId(), getDocument(commerceCatalog));
+			getSearchEngineId(), commerceCatalog.getCompanyId(),
+			getDocument(commerceCatalog), isCommitImmediately());
 	}
 
 	@Override
@@ -155,10 +156,12 @@ public class CommerceCatalogIndexer extends BaseIndexer<CommerceCatalog> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommerceCatalogs(companyId);
+		reindexCommerceCatalogs(companyId);
 	}
 
-	private void _reindexCommerceCatalogs(long companyId) throws Exception {
+	protected void reindexCommerceCatalogs(long companyId)
+		throws PortalException {
+
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_commerceCatalogLocalService.getIndexableActionableDynamicQuery();
 
@@ -178,6 +181,7 @@ public class CommerceCatalogIndexer extends BaseIndexer<CommerceCatalog> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

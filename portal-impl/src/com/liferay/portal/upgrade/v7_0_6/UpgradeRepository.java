@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_6;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.upgrade.v7_0_6.util.RepositoryTable;
 
 /**
  * @author Alec Shay
@@ -23,7 +24,9 @@ public class UpgradeRepository extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("Repository", "name", "VARCHAR(200) null");
+		alter(
+			RepositoryTable.class,
+			new AlterColumnType("name", "VARCHAR(200) null"));
 	}
 
 }

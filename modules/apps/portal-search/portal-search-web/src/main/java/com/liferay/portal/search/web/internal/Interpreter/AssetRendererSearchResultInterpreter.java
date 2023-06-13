@@ -45,7 +45,9 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Wade Cao
  */
-@Component(service = AssetRendererSearchResultInterpreter.class)
+@Component(
+	immediate = true, service = AssetRendererSearchResultInterpreter.class
+)
 public class AssetRendererSearchResultInterpreter
 	implements SearchResultInterpreter {
 
@@ -138,7 +140,7 @@ public class AssetRendererSearchResultInterpreter
 
 	@Override
 	public AssetRenderer<?> getAssetRenderer(Document document) {
-		AssetRendererFactory<?> assetRendererFactory = _getAssetRendererFactory(
+		AssetRendererFactory<?> assetRendererFactory = getAssetRendererFactory(
 			document);
 
 		if (assetRendererFactory == null) {
@@ -151,7 +153,7 @@ public class AssetRendererSearchResultInterpreter
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -580,7 +582,7 @@ public class AssetRendererSearchResultInterpreter
 		return assetRendererFactory.isSupportsClassTypes();
 	}
 
-	private AssetRendererFactory<?> _getAssetRendererFactory(
+	protected AssetRendererFactory<?> getAssetRendererFactory(
 		Document document) {
 
 		return AssetRendererFactoryRegistryUtil.

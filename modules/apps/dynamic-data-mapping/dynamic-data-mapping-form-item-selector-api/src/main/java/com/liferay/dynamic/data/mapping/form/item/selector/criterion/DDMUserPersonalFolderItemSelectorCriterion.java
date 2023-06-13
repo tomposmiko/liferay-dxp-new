@@ -40,10 +40,6 @@ public class DDMUserPersonalFolderItemSelectorCriterion
 		return _groupId;
 	}
 
-	public long getObjectFieldId() {
-		return _objectFieldId;
-	}
-
 	public long getRepositoryId() {
 		return _repositoryId;
 	}
@@ -56,17 +52,12 @@ public class DDMUserPersonalFolderItemSelectorCriterion
 		_groupId = groupId;
 	}
 
-	public void setObjectFieldId(long objectFieldId) {
-		_objectFieldId = objectFieldId;
-	}
-
 	public void setRepositoryId(long repositoryId) {
 		_repositoryId = repositoryId;
 	}
 
 	private long _folderId;
 	private long _groupId;
-	private long _objectFieldId;
 	private long _repositoryId;
 
 }

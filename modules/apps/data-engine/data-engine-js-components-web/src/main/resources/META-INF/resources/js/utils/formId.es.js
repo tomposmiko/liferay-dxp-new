@@ -12,14 +12,8 @@
  * details.
  */
 
-export function getFormId(form) {
-	return form?.dataset.ddmforminstanceid;
-}
+export const getFormNode = (element) => element.closest('form');
 
-export function getFormNode(element) {
-	return element.closest('form');
-}
+export const getFormId = (form) => form?.dataset.ddmforminstanceid;
 
-export function getUid() {
-	return Math.random().toString(36).substr(2, 9);
-}
+export const getUid = () => Math.random().toString(36).substr(2, 9);

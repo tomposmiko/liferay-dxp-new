@@ -15,7 +15,6 @@
 package com.liferay.headless.commerce.admin.inventory.resource.v1_0;
 
 import com.liferay.headless.commerce.admin.inventory.dto.v1_0.WarehouseItem;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -23,10 +22,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -58,6 +54,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface WarehouseItemResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Response deleteWarehouseItemByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception;
@@ -74,13 +74,10 @@ public interface WarehouseItemResource {
 			String externalReferenceCode, WarehouseItem warehouseItem)
 		throws Exception;
 
-	public Page<WarehouseItem> getWarehouseItemsUpdatedPage(
-			Date end, Date start, Pagination pagination)
-		throws Exception;
-
 	public Response deleteWarehouseItem(Long id) throws Exception;
 
-	public Response deleteWarehouseItemBatch(String callbackURL, Object object)
+	public Response deleteWarehouseItemBatch(
+			Long id, String callbackURL, Object object)
 		throws Exception;
 
 	public WarehouseItem getWarehouseItem(Long id) throws Exception;
@@ -89,24 +86,24 @@ public interface WarehouseItemResource {
 		throws Exception;
 
 	public Page<WarehouseItem>
-			getWarehouseByExternalReferenceCodeWarehouseItemsPage(
+			getWarehousByExternalReferenceCodeWarehouseItemsPage(
 				String externalReferenceCode, Pagination pagination)
 		throws Exception;
 
-	public WarehouseItem postWarehouseByExternalReferenceCodeWarehouseItem(
+	public WarehouseItem postWarehousByExternalReferenceCodeWarehouseItem(
 			String externalReferenceCode, WarehouseItem warehouseItem)
 		throws Exception;
 
-	public Page<WarehouseItem> getWarehouseIdWarehouseItemsPage(
+	public Page<WarehouseItem> getWarehousIdWarehouseItemsPage(
 			Long id, Pagination pagination)
 		throws Exception;
 
-	public WarehouseItem postWarehouseIdWarehouseItem(
+	public WarehouseItem postWarehousIdWarehouseItem(
 			Long id, WarehouseItem warehouseItem)
 		throws Exception;
 
-	public Response postWarehouseIdWarehouseItemBatch(
-			String callbackURL, Object object)
+	public Page<WarehouseItem> getWarehouseItemsUpdatedPage(
+			Date end, Date start, Pagination pagination)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
@@ -146,16 +143,6 @@ public interface WarehouseItemResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineExportTaskResource(
-		VulcanBatchEngineExportTaskResource
-			vulcanBatchEngineExportTaskResource);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -167,8 +154,10 @@ public interface WarehouseItemResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

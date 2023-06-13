@@ -10,8 +10,8 @@
  */
 
 import ClayLayout from '@clayui/layout';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import {usePrevious} from '@liferay/frontend-js-react-web';
-import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {useCallback, useContext, useEffect, useMemo} from 'react';
 
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
@@ -42,6 +42,7 @@ export default function Header({
 	totalCount,
 }) {
 	const {dateModified, fetchData} = useDateModified({
+		fetchDateModified: !!items?.length,
 		processId,
 	});
 
@@ -58,14 +59,13 @@ export default function Header({
 	const previousFetchData = usePrevious(fetchData);
 
 	const promises = useMemo(() => {
-		if (previousFetchData !== fetchData && items?.length) {
+		if (previousFetchData !== fetchData) {
 			return [fetchData()];
 		}
 
 		return [];
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [items?.length, routeParams]);
+	}, [fetchData]);
 
 	const handleClick = useCallback(
 		(bulkModal, singleModal) => {
@@ -105,12 +105,12 @@ export default function Header({
 	);
 
 	const allPageSelected =
-		!!items.length && items.length === selectedOnPage.length;
+		items.length > 0 && items.length === selectedOnPage.length;
 
 	const checkbox = {
 		checked: allPageSelected || selectAll,
 		indeterminate:
-			!!selectedOnPage.length && !allPageSelected && !selectAll,
+			selectedOnPage.length > 0 && !allPageSelected && !selectAll,
 	};
 
 	const isRemainingItem = (clear) => ({assignees = [], id, status}) => {
@@ -125,12 +125,12 @@ export default function Header({
 	};
 
 	const remainingItems = items.filter(isRemainingItem(true));
-	const toolbarActive = !!selectedItems.length;
+	const toolbarActive = selectedItems.length > 0;
 
 	useEffect(() => {
 		if (
 			selectAll &&
-			!!remainingItems.length &&
+			remainingItems.length > 0 &&
 			previousCount === totalCount
 		) {
 			setSelectedItems([
@@ -139,13 +139,11 @@ export default function Header({
 			]);
 			setSelectAll(items.length === remainingItems.length);
 		}
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [items]);
 
 	useEffect(() => {
 		setSelectAll(totalCount > 0 && totalCount === selectedItems.length);
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [totalCount]);
 
@@ -163,7 +161,6 @@ export default function Header({
 			setSelectAll(totalCount > 0 && totalCount === updatedItems.length);
 			setSelectedItems(updatedItems);
 		},
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[items, remainingItems, selectedItems]
 	);
@@ -198,18 +195,18 @@ export default function Header({
 				totalCount={totalCount}
 			>
 				{toolbarActive ? (
-					<ManagementToolbar.Item className="navbar-nav-last">
+					<ClayManagementToolbar.Item className="navbar-nav-last">
 						<ClayLayout.ContentCol>
 							<QuickActionKebab items={kebabItems} />
 						</ClayLayout.ContentCol>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 				) : (
 					<>
-						<ManagementToolbar.Item>
+						<ClayManagementToolbar.Item>
 							<strong className="ml-0 mr-0 navbar-text">
 								{Liferay.Language.get('filter-by')}
 							</strong>
-						</ManagementToolbar.Item>
+						</ClayManagementToolbar.Item>
 
 						<SLAStatusFilter
 							options={{
@@ -233,7 +230,7 @@ export default function Header({
 				)}
 			</ToolbarWithSelection>
 
-			{!!selectedFilterItems.length && (
+			{selectedFilterItems.length > 0 && (
 				<ResultsBar>
 					<ResultsBar.TotalCount
 						search={routeParams.search}

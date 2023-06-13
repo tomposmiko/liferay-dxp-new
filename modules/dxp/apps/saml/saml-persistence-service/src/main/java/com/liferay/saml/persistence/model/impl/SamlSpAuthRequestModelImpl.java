@@ -29,6 +29,7 @@ import com.liferay.saml.persistence.model.SamlSpAuthRequestModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -213,81 +214,92 @@ public class SamlSpAuthRequestModelImpl
 	public Map<String, Function<SamlSpAuthRequest, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<SamlSpAuthRequest, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, SamlSpAuthRequest>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<SamlSpAuthRequest, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SamlSpAuthRequest.class.getClassLoader(), SamlSpAuthRequest.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<SamlSpAuthRequest, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<SamlSpAuthRequest, Object>>();
+		try {
+			Constructor<SamlSpAuthRequest> constructor =
+				(Constructor<SamlSpAuthRequest>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"samlSpAuthnRequestId",
-				SamlSpAuthRequest::getSamlSpAuthnRequestId);
-			attributeGetterFunctions.put(
-				"companyId", SamlSpAuthRequest::getCompanyId);
-			attributeGetterFunctions.put(
-				"createDate", SamlSpAuthRequest::getCreateDate);
-			attributeGetterFunctions.put(
-				"samlIdpEntityId", SamlSpAuthRequest::getSamlIdpEntityId);
-			attributeGetterFunctions.put(
-				"samlSpAuthRequestKey",
-				SamlSpAuthRequest::getSamlSpAuthRequestKey);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<SamlSpAuthRequest, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<SamlSpAuthRequest, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<SamlSpAuthRequest, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<SamlSpAuthRequest, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<SamlSpAuthRequest, Object>>();
+		Map<String, BiConsumer<SamlSpAuthRequest, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<SamlSpAuthRequest, ?>>();
 
-		static {
-			Map<String, BiConsumer<SamlSpAuthRequest, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<SamlSpAuthRequest, ?>>();
+		attributeGetterFunctions.put(
+			"samlSpAuthnRequestId", SamlSpAuthRequest::getSamlSpAuthnRequestId);
+		attributeSetterBiConsumers.put(
+			"samlSpAuthnRequestId",
+			(BiConsumer<SamlSpAuthRequest, Long>)
+				SamlSpAuthRequest::setSamlSpAuthnRequestId);
+		attributeGetterFunctions.put(
+			"companyId", SamlSpAuthRequest::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<SamlSpAuthRequest, Long>)
+				SamlSpAuthRequest::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", SamlSpAuthRequest::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<SamlSpAuthRequest, Date>)
+				SamlSpAuthRequest::setCreateDate);
+		attributeGetterFunctions.put(
+			"samlIdpEntityId", SamlSpAuthRequest::getSamlIdpEntityId);
+		attributeSetterBiConsumers.put(
+			"samlIdpEntityId",
+			(BiConsumer<SamlSpAuthRequest, String>)
+				SamlSpAuthRequest::setSamlIdpEntityId);
+		attributeGetterFunctions.put(
+			"samlSpAuthRequestKey", SamlSpAuthRequest::getSamlSpAuthRequestKey);
+		attributeSetterBiConsumers.put(
+			"samlSpAuthRequestKey",
+			(BiConsumer<SamlSpAuthRequest, String>)
+				SamlSpAuthRequest::setSamlSpAuthRequestKey);
 
-			attributeSetterBiConsumers.put(
-				"samlSpAuthnRequestId",
-				(BiConsumer<SamlSpAuthRequest, Long>)
-					SamlSpAuthRequest::setSamlSpAuthnRequestId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<SamlSpAuthRequest, Long>)
-					SamlSpAuthRequest::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<SamlSpAuthRequest, Date>)
-					SamlSpAuthRequest::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"samlIdpEntityId",
-				(BiConsumer<SamlSpAuthRequest, String>)
-					SamlSpAuthRequest::setSamlIdpEntityId);
-			attributeSetterBiConsumers.put(
-				"samlSpAuthRequestKey",
-				(BiConsumer<SamlSpAuthRequest, String>)
-					SamlSpAuthRequest::setSamlSpAuthRequestKey);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -645,12 +657,41 @@ public class SamlSpAuthRequestModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<SamlSpAuthRequest, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<SamlSpAuthRequest, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<SamlSpAuthRequest, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((SamlSpAuthRequest)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SamlSpAuthRequest>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SamlSpAuthRequest.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -662,8 +703,7 @@ public class SamlSpAuthRequestModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<SamlSpAuthRequest, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

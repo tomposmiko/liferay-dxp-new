@@ -131,11 +131,12 @@ public class RawMetadataProcessorImpl
 			}
 
 			rawMetadataMap = RawMetadataProcessorUtil.getRawMetadataMap(
-				fileVersion.getMimeType(), inputStream);
+				fileVersion.getExtension(), fileVersion.getMimeType(),
+				inputStream);
 		}
 		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioException);
+				_log.warn(ioException, ioException);
 			}
 		}
 

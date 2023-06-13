@@ -15,7 +15,7 @@
 package com.liferay.fragment.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentPortletKeys;
-import com.liferay.fragment.web.internal.upload.FragmentCollectionResourceImageEditorUploadFileEntryHandler;
+import com.liferay.fragment.web.internal.upload.FragmentCollectionResourceUploadFileEntryHandler;
 import com.liferay.item.selector.ItemSelectorUploadResponseHandler;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/upload_fragment_collection_resource"
@@ -46,13 +47,13 @@ public class UploadFragmentCollectionResourceMVCActionCommand
 		throws Exception {
 
 		_uploadHandler.upload(
-			_fragmentCollectionResourceImageEditorUploadFileEntryHandler,
+			_fragmentCollectionResourceUploadFileEntryHandler,
 			_itemSelectorUploadResponseHandler, actionRequest, actionResponse);
 	}
 
 	@Reference
-	private FragmentCollectionResourceImageEditorUploadFileEntryHandler
-		_fragmentCollectionResourceImageEditorUploadFileEntryHandler;
+	private FragmentCollectionResourceUploadFileEntryHandler
+		_fragmentCollectionResourceUploadFileEntryHandler;
 
 	@Reference
 	private ItemSelectorUploadResponseHandler

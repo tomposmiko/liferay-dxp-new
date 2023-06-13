@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_DISPLAY,
 	service = CustomAttributesDisplay.class
 )

@@ -16,7 +16,6 @@ package com.liferay.portal.search.tuning.rankings.web.internal.util;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -24,7 +23,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -40,18 +40,19 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.WindowState;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Wade Cao
  */
+@Component(immediate = true, service = {})
 public class RankingResultUtil {
 
 	public static AssetRenderer<?> getAssetRenderer(
 		String entryClassName, long entryClassPK) {
 
-		DocumentBuilderFactory documentBuilderFactory =
-			_documentBuilderFactorySnapshot.get();
-
-		Document document = documentBuilderFactory.builder(
+		Document document = _documentBuilderFactory.builder(
 		).setString(
 			Field.ENTRY_CLASS_NAME, entryClassName
 		).setLong(
@@ -86,7 +87,7 @@ public class RankingResultUtil {
 			_getSearchResultInterpreter();
 
 		PortletURL viewContentURL = resourceResponse.createRenderURL();
-		String currentURL = PortalUtil.getCurrentURL(resourceRequest);
+		String currentURL = _portal.getCurrentURL(resourceRequest);
 
 		try {
 			viewContentURL.setParameter("mvcPath", "/view_content.jsp");
@@ -125,7 +126,7 @@ public class RankingResultUtil {
 				(ThemeDisplay)resourceRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
 
-			viewURL = HttpComponentsUtil.setParameter(
+			viewURL = HttpUtil.setParameter(
 				viewURL, "inheritRedirect", viewInContext);
 
 			Layout layout = themeDisplay.getLayout();
@@ -135,7 +136,7 @@ public class RankingResultUtil {
 			if (Validator.isNotNull(assetEntryLayoutUuid) &&
 				!assetEntryLayoutUuid.equals(layout.getUuid())) {
 
-				viewURL = HttpComponentsUtil.setParameter(
+				viewURL = HttpUtil.setParameter(
 					viewURL, "redirect", currentURL);
 			}
 
@@ -178,22 +179,36 @@ public class RankingResultUtil {
 		}
 	}
 
-	private static SearchResultInterpreter _getSearchResultInterpreter() {
-		SearchResultInterpreterProvider searchResultInterpreterProvider =
-			_searchResultInterpreterProviderSnapshot.get();
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
+	}
 
-		return searchResultInterpreterProvider.getSearchResultInterpreter(
+	@Reference(unbind = "-")
+	protected void setSearchDocumentBuilderFactory(
+		DocumentBuilderFactory documentBuilderFactory) {
+
+		_documentBuilderFactory = documentBuilderFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchResultInterpreterProvider(
+		SearchResultInterpreterProvider searchResultInterpreterProvider) {
+
+		_searchResultInterpreterProvider = searchResultInterpreterProvider;
+	}
+
+	private static SearchResultInterpreter _getSearchResultInterpreter() {
+		return _searchResultInterpreterProvider.getSearchResultInterpreter(
 			ResultRankingsPortletKeys.RESULT_RANKINGS);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		RankingResultUtil.class);
 
-	private static final Snapshot<DocumentBuilderFactory>
-		_documentBuilderFactorySnapshot = new Snapshot<>(
-			RankingResultUtil.class, DocumentBuilderFactory.class);
-	private static final Snapshot<SearchResultInterpreterProvider>
-		_searchResultInterpreterProviderSnapshot = new Snapshot<>(
-			RankingResultUtil.class, SearchResultInterpreterProvider.class);
+	private static DocumentBuilderFactory _documentBuilderFactory;
+	private static Portal _portal;
+	private static SearchResultInterpreterProvider
+		_searchResultInterpreterProvider;
 
 }

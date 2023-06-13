@@ -20,11 +20,14 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.settings.SettingsBuilder;
 import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
+import com.liferay.portal.search.elasticsearch7.settings.ClientSettingsHelper;
+import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 
 import java.net.InetAddress;
 
 import java.nio.file.Path;
 
+import java.util.Collection;
 import java.util.function.Supplier;
 
 import org.elasticsearch.common.settings.Settings;
@@ -126,39 +129,19 @@ public class ElasticsearchInstanceSettingsBuilder {
 		return this;
 	}
 
+	public ElasticsearchInstanceSettingsBuilder settingsContributors(
+		Collection<SettingsContributor> settingsContributors) {
+
+		_settingsContributors = settingsContributors;
+
+		return this;
+	}
+
 	public interface LocalBindInetAddressSupplier
 		extends Supplier<InetAddress> {
 	}
 
-	protected Path getHomePath() {
-		Path homePath = _elasticsearchInstancePaths.getHomePath();
-
-		if (homePath != null) {
-			return homePath;
-		}
-
-		Path workPath = _elasticsearchInstancePaths.getWorkPath();
-
-		return workPath.resolve("data/elasticsearch7");
-	}
-
-	protected void load() {
-		_loadDefaultConfigurations();
-
-		_loadSidecarConfigurations();
-
-		_loadAdditionalConfigurations();
-	}
-
-	protected void put(String key, boolean value) {
-		_settingsBuilder.put(key, value);
-	}
-
-	protected void put(String key, String value) {
-		_settingsBuilder.put(key, value);
-	}
-
-	private void _configureClustering() {
+	protected void configureClustering() {
 		put("cluster.name", _clusterName);
 		put("cluster.routing.allocation.disk.threshold_enabled", false);
 
@@ -175,7 +158,7 @@ public class ElasticsearchInstanceSettingsBuilder {
 		}
 	}
 
-	private void _configureHttp() {
+	protected void configureHttp() {
 		put("http.port", _httpPortRange.toSettingsString());
 
 		put(
@@ -194,7 +177,7 @@ public class ElasticsearchInstanceSettingsBuilder {
 			_elasticsearchConfigurationWrapper.httpCORSConfigurations());
 	}
 
-	private void _configureNetworking() {
+	protected void configureNetworking() {
 		String networkBindHost =
 			_elasticsearchConfigurationWrapper.networkBindHost();
 		String networkHost = _elasticsearchConfigurationWrapper.networkHost();
@@ -237,7 +220,7 @@ public class ElasticsearchInstanceSettingsBuilder {
 		}
 	}
 
-	private void _configurePaths() {
+	protected void configurePaths() {
 		Path workPath = _elasticsearchInstancePaths.getWorkPath();
 
 		Path dataParentPath = workPath.resolve("data/elasticsearch7");
@@ -253,7 +236,7 @@ public class ElasticsearchInstanceSettingsBuilder {
 		put("path.repo", String.valueOf(dataParentPath.resolve("repo")));
 	}
 
-	private void _configureTestMode() {
+	protected void configureTestMode() {
 		if (!PortalRunMode.isTestMode()) {
 			return;
 		}
@@ -261,24 +244,34 @@ public class ElasticsearchInstanceSettingsBuilder {
 		put("monitor.jvm.gc.enabled", StringPool.FALSE);
 	}
 
-	private void _disableGeoipDownloader() {
-		put("ingest.geoip.downloader.enabled", false);
+	protected Path getHomePath() {
+		Path homePath = _elasticsearchInstancePaths.getHomePath();
+
+		if (homePath != null) {
+			return homePath;
+		}
+
+		Path workPath = _elasticsearchInstancePaths.getWorkPath();
+
+		return workPath.resolve("data/elasticsearch7");
 	}
 
-	private void _disableXpack() {
-		put("xpack.ml.enabled", false);
-		put("xpack.monitoring.enabled", false);
-		put("xpack.security.enabled", false);
-		put("xpack.sql.enabled", false);
-		put("xpack.watcher.enabled", false);
+	protected void load() {
+		loadDefaultConfigurations();
+
+		loadSidecarConfigurations();
+
+		loadAdditionalConfigurations();
+
+		loadSettingsContributors();
 	}
 
-	private void _loadAdditionalConfigurations() {
+	protected void loadAdditionalConfigurations() {
 		_settingsBuilder.loadFromSource(
 			_elasticsearchConfigurationWrapper.additionalConfigurations());
 	}
 
-	private void _loadDefaultConfigurations() {
+	protected void loadDefaultConfigurations() {
 		String defaultConfigurations = ResourceUtil.getResourceAsString(
 			getClass(), "/META-INF/elasticsearch-optional-defaults.yml");
 
@@ -289,29 +282,55 @@ public class ElasticsearchInstanceSettingsBuilder {
 			"bootstrap.memory_lock",
 			_elasticsearchConfigurationWrapper.bootstrapMlockAll());
 
-		_configureClustering();
+		configureClustering();
 
-		_configureHttp();
+		configureHttp();
 
-		_configureNetworking();
+		configureNetworking();
 
 		put("node.data", true);
 		put("node.ingest", true);
 		put("node.master", true);
 		put("node.name", _nodeName);
 
-		_configurePaths();
+		configurePaths();
 
-		_configureTestMode();
+		configureTestMode();
 
-		_disableGeoipDownloader();
-
-		_disableXpack();
+		put("transport.type", "netty4");
 	}
 
-	private void _loadSidecarConfigurations() {
+	protected void loadSettingsContributors() {
+		ClientSettingsHelper clientSettingsHelper = new ClientSettingsHelper() {
+
+			@Override
+			public void put(String setting, String value) {
+				_settingsBuilder.put(setting, value);
+			}
+
+			@Override
+			public void putArray(String setting, String... values) {
+				_settingsBuilder.putList(setting, values);
+			}
+
+		};
+
+		for (SettingsContributor settingsContributor : _settingsContributors) {
+			settingsContributor.populate(clientSettingsHelper);
+		}
+	}
+
+	protected void loadSidecarConfigurations() {
 		put("bootstrap.system_call_filter", false);
 		put("node.store.allow_mmap", false);
+	}
+
+	protected void put(String key, boolean value) {
+		_settingsBuilder.put(key, value);
+	}
+
+	protected void put(String key, String value) {
+		_settingsBuilder.put(key, value);
 	}
 
 	private String _clusterInitialMasterNodes;
@@ -327,5 +346,6 @@ public class ElasticsearchInstanceSettingsBuilder {
 	private String _nodeName;
 	private final SettingsBuilder _settingsBuilder = new SettingsBuilder(
 		Settings.builder());
+	private Collection<SettingsContributor> _settingsContributors;
 
 }

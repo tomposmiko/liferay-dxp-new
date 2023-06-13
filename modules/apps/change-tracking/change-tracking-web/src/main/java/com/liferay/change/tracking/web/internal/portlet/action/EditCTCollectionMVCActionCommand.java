@@ -14,15 +14,13 @@
 
 package com.liferay.change.tracking.web.internal.portlet.action;
 
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTPreferences;
 import com.liferay.change.tracking.service.CTCollectionService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
-import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -44,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/edit_ct_collection"
@@ -85,22 +84,10 @@ public class EditCTCollectionMVCActionCommand extends BaseMVCActionCommand {
 				ctPreferences.setCtCollectionId(
 					ctCollection.getCtCollectionId());
 				ctPreferences.setPreviousCtCollectionId(
-					CTCollectionThreadLocal.getCTCollectionId());
+					CTConstants.CT_COLLECTION_ID_PRODUCTION);
 
 				_ctPreferencesLocalService.updateCTPreferences(ctPreferences);
-
-				ctCollectionId = ctCollection.getCtCollectionId();
 			}
-
-			JSONPortletResponseUtil.writeJSON(
-				actionRequest, actionResponse,
-				JSONUtil.put(
-					"ctCollectionId", String.valueOf(ctCollectionId)
-				).put(
-					"redirect", true
-				));
-
-			hideDefaultSuccessMessage(actionRequest);
 		}
 		catch (PortalException portalException) {
 			SessionErrors.add(actionRequest, portalException.getClass());

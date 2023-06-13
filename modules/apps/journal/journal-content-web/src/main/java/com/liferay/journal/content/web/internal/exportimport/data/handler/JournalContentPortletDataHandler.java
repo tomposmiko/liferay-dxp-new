@@ -60,6 +60,7 @@ import org.osgi.service.component.annotations.Reference;
  * @see    PortletDataHandler
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + JournalContentPortletKeys.JOURNAL_CONTENT,
 	service = PortletDataHandler.class
 )
@@ -107,12 +108,14 @@ public class JournalContentPortletDataHandler extends BasePortletDataHandler {
 		return portletPreferences;
 	}
 
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
 	@Reference(
 		target = "(javax.portlet.name=" + JournalPortletKeys.JOURNAL + ")"
 	)
 	private PortletDataHandler _journalPortletDataHandler;
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 }

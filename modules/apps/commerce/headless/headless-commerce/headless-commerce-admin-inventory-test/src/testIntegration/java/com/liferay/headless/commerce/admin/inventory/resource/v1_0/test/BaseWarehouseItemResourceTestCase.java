@@ -28,7 +28,6 @@ import com.liferay.headless.commerce.admin.inventory.client.pagination.Page;
 import com.liferay.headless.commerce.admin.inventory.client.pagination.Pagination;
 import com.liferay.headless.commerce.admin.inventory.client.resource.v1_0.WarehouseItemResource;
 import com.liferay.headless.commerce.admin.inventory.client.serdes.v1_0.WarehouseItemSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -52,25 +51,24 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -260,7 +258,7 @@ public abstract class BaseWarehouseItemResourceTestCase {
 		throws Exception {
 
 		WarehouseItem warehouseItem =
-			testGraphQLGetWarehouseItemByExternalReferenceCode_addWarehouseItem();
+			testGraphQLWarehouseItem_addWarehouseItem();
 
 		Assert.assertTrue(
 			equals(
@@ -310,13 +308,6 @@ public abstract class BaseWarehouseItemResourceTestCase {
 				"Object/code"));
 	}
 
-	protected WarehouseItem
-			testGraphQLGetWarehouseItemByExternalReferenceCode_addWarehouseItem()
-		throws Exception {
-
-		return testGraphQLWarehouseItem_addWarehouseItem();
-	}
-
 	@Test
 	public void testPatchWarehouseItemByExternalReferenceCode()
 		throws Exception {
@@ -348,6 +339,435 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	}
 
 	@Test
+	public void testDeleteWarehouseItem() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		WarehouseItem warehouseItem =
+			testDeleteWarehouseItem_addWarehouseItem();
+
+		assertHttpResponseStatusCode(
+			204,
+			warehouseItemResource.deleteWarehouseItemHttpResponse(
+				warehouseItem.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			warehouseItemResource.getWarehouseItemHttpResponse(
+				warehouseItem.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			warehouseItemResource.getWarehouseItemHttpResponse(
+				warehouseItem.getId()));
+	}
+
+	protected WarehouseItem testDeleteWarehouseItem_addWarehouseItem()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLDeleteWarehouseItem() throws Exception {
+		WarehouseItem warehouseItem =
+			testGraphQLWarehouseItem_addWarehouseItem();
+
+		Assert.assertTrue(
+			JSONUtil.getValueAsBoolean(
+				invokeGraphQLMutation(
+					new GraphQLField(
+						"deleteWarehouseItem",
+						new HashMap<String, Object>() {
+							{
+								put("id", warehouseItem.getId());
+							}
+						})),
+				"JSONObject/data", "Object/deleteWarehouseItem"));
+
+		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"warehouseItem",
+					new HashMap<String, Object>() {
+						{
+							put("id", warehouseItem.getId());
+						}
+					},
+					new GraphQLField("id"))),
+			"JSONArray/errors");
+
+		Assert.assertTrue(errorsJSONArray.length() > 0);
+	}
+
+	@Test
+	public void testGetWarehouseItem() throws Exception {
+		WarehouseItem postWarehouseItem =
+			testGetWarehouseItem_addWarehouseItem();
+
+		WarehouseItem getWarehouseItem = warehouseItemResource.getWarehouseItem(
+			postWarehouseItem.getId());
+
+		assertEquals(postWarehouseItem, getWarehouseItem);
+		assertValid(getWarehouseItem);
+	}
+
+	protected WarehouseItem testGetWarehouseItem_addWarehouseItem()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetWarehouseItem() throws Exception {
+		WarehouseItem warehouseItem =
+			testGraphQLWarehouseItem_addWarehouseItem();
+
+		Assert.assertTrue(
+			equals(
+				warehouseItem,
+				WarehouseItemSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"warehouseItem",
+								new HashMap<String, Object>() {
+									{
+										put("id", warehouseItem.getId());
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/warehouseItem"))));
+	}
+
+	@Test
+	public void testGraphQLGetWarehouseItemNotFound() throws Exception {
+		Long irrelevantId = RandomTestUtil.randomLong();
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"warehouseItem",
+						new HashMap<String, Object>() {
+							{
+								put("id", irrelevantId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	@Test
+	public void testPatchWarehouseItem() throws Exception {
+		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testGetWarehousByExternalReferenceCodeWarehouseItemsPage()
+		throws Exception {
+
+		String externalReferenceCode =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_getExternalReferenceCode();
+		String irrelevantExternalReferenceCode =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_getIrrelevantExternalReferenceCode();
+
+		Page<WarehouseItem> page =
+			warehouseItemResource.
+				getWarehousByExternalReferenceCodeWarehouseItemsPage(
+					externalReferenceCode, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantExternalReferenceCode != null) {
+			WarehouseItem irrelevantWarehouseItem =
+				testGetWarehousByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
+					irrelevantExternalReferenceCode,
+					randomIrrelevantWarehouseItem());
+
+			page =
+				warehouseItemResource.
+					getWarehousByExternalReferenceCodeWarehouseItemsPage(
+						irrelevantExternalReferenceCode, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantWarehouseItem),
+				(List<WarehouseItem>)page.getItems());
+			assertValid(page);
+		}
+
+		WarehouseItem warehouseItem1 =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
+				externalReferenceCode, randomWarehouseItem());
+
+		WarehouseItem warehouseItem2 =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
+				externalReferenceCode, randomWarehouseItem());
+
+		page =
+			warehouseItemResource.
+				getWarehousByExternalReferenceCodeWarehouseItemsPage(
+					externalReferenceCode, Pagination.of(1, 10));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(warehouseItem1, warehouseItem2),
+			(List<WarehouseItem>)page.getItems());
+		assertValid(page);
+
+		warehouseItemResource.deleteWarehouseItem(warehouseItem1.getId());
+
+		warehouseItemResource.deleteWarehouseItem(warehouseItem2.getId());
+	}
+
+	@Test
+	public void testGetWarehousByExternalReferenceCodeWarehouseItemsPageWithPagination()
+		throws Exception {
+
+		String externalReferenceCode =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_getExternalReferenceCode();
+
+		WarehouseItem warehouseItem1 =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
+				externalReferenceCode, randomWarehouseItem());
+
+		WarehouseItem warehouseItem2 =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
+				externalReferenceCode, randomWarehouseItem());
+
+		WarehouseItem warehouseItem3 =
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
+				externalReferenceCode, randomWarehouseItem());
+
+		Page<WarehouseItem> page1 =
+			warehouseItemResource.
+				getWarehousByExternalReferenceCodeWarehouseItemsPage(
+					externalReferenceCode, Pagination.of(1, 2));
+
+		List<WarehouseItem> warehouseItems1 =
+			(List<WarehouseItem>)page1.getItems();
+
+		Assert.assertEquals(
+			warehouseItems1.toString(), 2, warehouseItems1.size());
+
+		Page<WarehouseItem> page2 =
+			warehouseItemResource.
+				getWarehousByExternalReferenceCodeWarehouseItemsPage(
+					externalReferenceCode, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<WarehouseItem> warehouseItems2 =
+			(List<WarehouseItem>)page2.getItems();
+
+		Assert.assertEquals(
+			warehouseItems2.toString(), 1, warehouseItems2.size());
+
+		Page<WarehouseItem> page3 =
+			warehouseItemResource.
+				getWarehousByExternalReferenceCodeWarehouseItemsPage(
+					externalReferenceCode, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(warehouseItem1, warehouseItem2, warehouseItem3),
+			(List<WarehouseItem>)page3.getItems());
+	}
+
+	protected WarehouseItem
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
+				String externalReferenceCode, WarehouseItem warehouseItem)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_getExternalReferenceCode()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetWarehousByExternalReferenceCodeWarehouseItemsPage_getIrrelevantExternalReferenceCode()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
+	public void testPostWarehousByExternalReferenceCodeWarehouseItem()
+		throws Exception {
+
+		WarehouseItem randomWarehouseItem = randomWarehouseItem();
+
+		WarehouseItem postWarehouseItem =
+			testPostWarehousByExternalReferenceCodeWarehouseItem_addWarehouseItem(
+				randomWarehouseItem);
+
+		assertEquals(randomWarehouseItem, postWarehouseItem);
+		assertValid(postWarehouseItem);
+	}
+
+	protected WarehouseItem
+			testPostWarehousByExternalReferenceCodeWarehouseItem_addWarehouseItem(
+				WarehouseItem warehouseItem)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGetWarehousIdWarehouseItemsPage() throws Exception {
+		Long id = testGetWarehousIdWarehouseItemsPage_getId();
+		Long irrelevantId =
+			testGetWarehousIdWarehouseItemsPage_getIrrelevantId();
+
+		Page<WarehouseItem> page =
+			warehouseItemResource.getWarehousIdWarehouseItemsPage(
+				id, Pagination.of(1, 10));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantId != null) {
+			WarehouseItem irrelevantWarehouseItem =
+				testGetWarehousIdWarehouseItemsPage_addWarehouseItem(
+					irrelevantId, randomIrrelevantWarehouseItem());
+
+			page = warehouseItemResource.getWarehousIdWarehouseItemsPage(
+				irrelevantId, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantWarehouseItem),
+				(List<WarehouseItem>)page.getItems());
+			assertValid(page);
+		}
+
+		WarehouseItem warehouseItem1 =
+			testGetWarehousIdWarehouseItemsPage_addWarehouseItem(
+				id, randomWarehouseItem());
+
+		WarehouseItem warehouseItem2 =
+			testGetWarehousIdWarehouseItemsPage_addWarehouseItem(
+				id, randomWarehouseItem());
+
+		page = warehouseItemResource.getWarehousIdWarehouseItemsPage(
+			id, Pagination.of(1, 10));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(warehouseItem1, warehouseItem2),
+			(List<WarehouseItem>)page.getItems());
+		assertValid(page);
+
+		warehouseItemResource.deleteWarehouseItem(warehouseItem1.getId());
+
+		warehouseItemResource.deleteWarehouseItem(warehouseItem2.getId());
+	}
+
+	@Test
+	public void testGetWarehousIdWarehouseItemsPageWithPagination()
+		throws Exception {
+
+		Long id = testGetWarehousIdWarehouseItemsPage_getId();
+
+		WarehouseItem warehouseItem1 =
+			testGetWarehousIdWarehouseItemsPage_addWarehouseItem(
+				id, randomWarehouseItem());
+
+		WarehouseItem warehouseItem2 =
+			testGetWarehousIdWarehouseItemsPage_addWarehouseItem(
+				id, randomWarehouseItem());
+
+		WarehouseItem warehouseItem3 =
+			testGetWarehousIdWarehouseItemsPage_addWarehouseItem(
+				id, randomWarehouseItem());
+
+		Page<WarehouseItem> page1 =
+			warehouseItemResource.getWarehousIdWarehouseItemsPage(
+				id, Pagination.of(1, 2));
+
+		List<WarehouseItem> warehouseItems1 =
+			(List<WarehouseItem>)page1.getItems();
+
+		Assert.assertEquals(
+			warehouseItems1.toString(), 2, warehouseItems1.size());
+
+		Page<WarehouseItem> page2 =
+			warehouseItemResource.getWarehousIdWarehouseItemsPage(
+				id, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<WarehouseItem> warehouseItems2 =
+			(List<WarehouseItem>)page2.getItems();
+
+		Assert.assertEquals(
+			warehouseItems2.toString(), 1, warehouseItems2.size());
+
+		Page<WarehouseItem> page3 =
+			warehouseItemResource.getWarehousIdWarehouseItemsPage(
+				id, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(warehouseItem1, warehouseItem2, warehouseItem3),
+			(List<WarehouseItem>)page3.getItems());
+	}
+
+	protected WarehouseItem
+			testGetWarehousIdWarehouseItemsPage_addWarehouseItem(
+				Long id, WarehouseItem warehouseItem)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetWarehousIdWarehouseItemsPage_getId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetWarehousIdWarehouseItemsPage_getIrrelevantId()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
+	public void testPostWarehousIdWarehouseItem() throws Exception {
+		WarehouseItem randomWarehouseItem = randomWarehouseItem();
+
+		WarehouseItem postWarehouseItem =
+			testPostWarehousIdWarehouseItem_addWarehouseItem(
+				randomWarehouseItem);
+
+		assertEquals(randomWarehouseItem, postWarehouseItem);
+		assertValid(postWarehouseItem);
+	}
+
+	protected WarehouseItem testPostWarehousIdWarehouseItem_addWarehouseItem(
+			WarehouseItem warehouseItem)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
 	public void testGetWarehouseItemsUpdatedPage() throws Exception {
 		Page<WarehouseItem> page =
 			warehouseItemResource.getWarehouseItemsUpdatedPage(
@@ -371,21 +791,11 @@ public abstract class BaseWarehouseItemResourceTestCase {
 
 		assertContains(warehouseItem1, (List<WarehouseItem>)page.getItems());
 		assertContains(warehouseItem2, (List<WarehouseItem>)page.getItems());
-		assertValid(
-			page, testGetWarehouseItemsUpdatedPage_getExpectedActions());
+		assertValid(page);
 
 		warehouseItemResource.deleteWarehouseItem(warehouseItem1.getId());
 
 		warehouseItemResource.deleteWarehouseItem(warehouseItem2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetWarehouseItemsUpdatedPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -442,475 +852,6 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	}
 
 	protected WarehouseItem testGetWarehouseItemsUpdatedPage_addWarehouseItem(
-			WarehouseItem warehouseItem)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testDeleteWarehouseItem() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		WarehouseItem warehouseItem =
-			testDeleteWarehouseItem_addWarehouseItem();
-
-		assertHttpResponseStatusCode(
-			204,
-			warehouseItemResource.deleteWarehouseItemHttpResponse(
-				warehouseItem.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			warehouseItemResource.getWarehouseItemHttpResponse(
-				warehouseItem.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			warehouseItemResource.getWarehouseItemHttpResponse(
-				warehouseItem.getId()));
-	}
-
-	protected WarehouseItem testDeleteWarehouseItem_addWarehouseItem()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLDeleteWarehouseItem() throws Exception {
-		WarehouseItem warehouseItem =
-			testGraphQLDeleteWarehouseItem_addWarehouseItem();
-
-		Assert.assertTrue(
-			JSONUtil.getValueAsBoolean(
-				invokeGraphQLMutation(
-					new GraphQLField(
-						"deleteWarehouseItem",
-						new HashMap<String, Object>() {
-							{
-								put("id", warehouseItem.getId());
-							}
-						})),
-				"JSONObject/data", "Object/deleteWarehouseItem"));
-		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
-			invokeGraphQLQuery(
-				new GraphQLField(
-					"warehouseItem",
-					new HashMap<String, Object>() {
-						{
-							put("id", warehouseItem.getId());
-						}
-					},
-					new GraphQLField("id"))),
-			"JSONArray/errors");
-
-		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected WarehouseItem testGraphQLDeleteWarehouseItem_addWarehouseItem()
-		throws Exception {
-
-		return testGraphQLWarehouseItem_addWarehouseItem();
-	}
-
-	@Test
-	public void testGetWarehouseItem() throws Exception {
-		WarehouseItem postWarehouseItem =
-			testGetWarehouseItem_addWarehouseItem();
-
-		WarehouseItem getWarehouseItem = warehouseItemResource.getWarehouseItem(
-			postWarehouseItem.getId());
-
-		assertEquals(postWarehouseItem, getWarehouseItem);
-		assertValid(getWarehouseItem);
-	}
-
-	protected WarehouseItem testGetWarehouseItem_addWarehouseItem()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetWarehouseItem() throws Exception {
-		WarehouseItem warehouseItem =
-			testGraphQLGetWarehouseItem_addWarehouseItem();
-
-		Assert.assertTrue(
-			equals(
-				warehouseItem,
-				WarehouseItemSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"warehouseItem",
-								new HashMap<String, Object>() {
-									{
-										put("id", warehouseItem.getId());
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data", "Object/warehouseItem"))));
-	}
-
-	@Test
-	public void testGraphQLGetWarehouseItemNotFound() throws Exception {
-		Long irrelevantId = RandomTestUtil.randomLong();
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"warehouseItem",
-						new HashMap<String, Object>() {
-							{
-								put("id", irrelevantId);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected WarehouseItem testGraphQLGetWarehouseItem_addWarehouseItem()
-		throws Exception {
-
-		return testGraphQLWarehouseItem_addWarehouseItem();
-	}
-
-	@Test
-	public void testPatchWarehouseItem() throws Exception {
-		Assert.assertTrue(false);
-	}
-
-	@Test
-	public void testGetWarehouseByExternalReferenceCodeWarehouseItemsPage()
-		throws Exception {
-
-		String externalReferenceCode =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getExternalReferenceCode();
-		String irrelevantExternalReferenceCode =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getIrrelevantExternalReferenceCode();
-
-		Page<WarehouseItem> page =
-			warehouseItemResource.
-				getWarehouseByExternalReferenceCodeWarehouseItemsPage(
-					externalReferenceCode, Pagination.of(1, 10));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
-		if (irrelevantExternalReferenceCode != null) {
-			WarehouseItem irrelevantWarehouseItem =
-				testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
-					irrelevantExternalReferenceCode,
-					randomIrrelevantWarehouseItem());
-
-			page =
-				warehouseItemResource.
-					getWarehouseByExternalReferenceCodeWarehouseItemsPage(
-						irrelevantExternalReferenceCode, Pagination.of(1, 2));
-
-			Assert.assertEquals(1, page.getTotalCount());
-
-			assertEquals(
-				Arrays.asList(irrelevantWarehouseItem),
-				(List<WarehouseItem>)page.getItems());
-			assertValid(
-				page,
-				testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
-		}
-
-		WarehouseItem warehouseItem1 =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
-				externalReferenceCode, randomWarehouseItem());
-
-		WarehouseItem warehouseItem2 =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
-				externalReferenceCode, randomWarehouseItem());
-
-		page =
-			warehouseItemResource.
-				getWarehouseByExternalReferenceCodeWarehouseItemsPage(
-					externalReferenceCode, Pagination.of(1, 10));
-
-		Assert.assertEquals(2, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(warehouseItem1, warehouseItem2),
-			(List<WarehouseItem>)page.getItems());
-		assertValid(
-			page,
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getExpectedActions(
-				externalReferenceCode));
-
-		warehouseItemResource.deleteWarehouseItem(warehouseItem1.getId());
-
-		warehouseItemResource.deleteWarehouseItem(warehouseItem2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetWarehouseByExternalReferenceCodeWarehouseItemsPageWithPagination()
-		throws Exception {
-
-		String externalReferenceCode =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getExternalReferenceCode();
-
-		WarehouseItem warehouseItem1 =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
-				externalReferenceCode, randomWarehouseItem());
-
-		WarehouseItem warehouseItem2 =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
-				externalReferenceCode, randomWarehouseItem());
-
-		WarehouseItem warehouseItem3 =
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
-				externalReferenceCode, randomWarehouseItem());
-
-		Page<WarehouseItem> page1 =
-			warehouseItemResource.
-				getWarehouseByExternalReferenceCodeWarehouseItemsPage(
-					externalReferenceCode, Pagination.of(1, 2));
-
-		List<WarehouseItem> warehouseItems1 =
-			(List<WarehouseItem>)page1.getItems();
-
-		Assert.assertEquals(
-			warehouseItems1.toString(), 2, warehouseItems1.size());
-
-		Page<WarehouseItem> page2 =
-			warehouseItemResource.
-				getWarehouseByExternalReferenceCodeWarehouseItemsPage(
-					externalReferenceCode, Pagination.of(2, 2));
-
-		Assert.assertEquals(3, page2.getTotalCount());
-
-		List<WarehouseItem> warehouseItems2 =
-			(List<WarehouseItem>)page2.getItems();
-
-		Assert.assertEquals(
-			warehouseItems2.toString(), 1, warehouseItems2.size());
-
-		Page<WarehouseItem> page3 =
-			warehouseItemResource.
-				getWarehouseByExternalReferenceCodeWarehouseItemsPage(
-					externalReferenceCode, Pagination.of(1, 3));
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(warehouseItem1, warehouseItem2, warehouseItem3),
-			(List<WarehouseItem>)page3.getItems());
-	}
-
-	protected WarehouseItem
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_addWarehouseItem(
-				String externalReferenceCode, WarehouseItem warehouseItem)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetWarehouseByExternalReferenceCodeWarehouseItemsPage_getIrrelevantExternalReferenceCode()
-		throws Exception {
-
-		return null;
-	}
-
-	@Test
-	public void testPostWarehouseByExternalReferenceCodeWarehouseItem()
-		throws Exception {
-
-		WarehouseItem randomWarehouseItem = randomWarehouseItem();
-
-		WarehouseItem postWarehouseItem =
-			testPostWarehouseByExternalReferenceCodeWarehouseItem_addWarehouseItem(
-				randomWarehouseItem);
-
-		assertEquals(randomWarehouseItem, postWarehouseItem);
-		assertValid(postWarehouseItem);
-	}
-
-	protected WarehouseItem
-			testPostWarehouseByExternalReferenceCodeWarehouseItem_addWarehouseItem(
-				WarehouseItem warehouseItem)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetWarehouseIdWarehouseItemsPage() throws Exception {
-		Long id = testGetWarehouseIdWarehouseItemsPage_getId();
-		Long irrelevantId =
-			testGetWarehouseIdWarehouseItemsPage_getIrrelevantId();
-
-		Page<WarehouseItem> page =
-			warehouseItemResource.getWarehouseIdWarehouseItemsPage(
-				id, Pagination.of(1, 10));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
-		if (irrelevantId != null) {
-			WarehouseItem irrelevantWarehouseItem =
-				testGetWarehouseIdWarehouseItemsPage_addWarehouseItem(
-					irrelevantId, randomIrrelevantWarehouseItem());
-
-			page = warehouseItemResource.getWarehouseIdWarehouseItemsPage(
-				irrelevantId, Pagination.of(1, 2));
-
-			Assert.assertEquals(1, page.getTotalCount());
-
-			assertEquals(
-				Arrays.asList(irrelevantWarehouseItem),
-				(List<WarehouseItem>)page.getItems());
-			assertValid(
-				page,
-				testGetWarehouseIdWarehouseItemsPage_getExpectedActions(
-					irrelevantId));
-		}
-
-		WarehouseItem warehouseItem1 =
-			testGetWarehouseIdWarehouseItemsPage_addWarehouseItem(
-				id, randomWarehouseItem());
-
-		WarehouseItem warehouseItem2 =
-			testGetWarehouseIdWarehouseItemsPage_addWarehouseItem(
-				id, randomWarehouseItem());
-
-		page = warehouseItemResource.getWarehouseIdWarehouseItemsPage(
-			id, Pagination.of(1, 10));
-
-		Assert.assertEquals(2, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(warehouseItem1, warehouseItem2),
-			(List<WarehouseItem>)page.getItems());
-		assertValid(
-			page, testGetWarehouseIdWarehouseItemsPage_getExpectedActions(id));
-
-		warehouseItemResource.deleteWarehouseItem(warehouseItem1.getId());
-
-		warehouseItemResource.deleteWarehouseItem(warehouseItem2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetWarehouseIdWarehouseItemsPage_getExpectedActions(Long id)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetWarehouseIdWarehouseItemsPageWithPagination()
-		throws Exception {
-
-		Long id = testGetWarehouseIdWarehouseItemsPage_getId();
-
-		WarehouseItem warehouseItem1 =
-			testGetWarehouseIdWarehouseItemsPage_addWarehouseItem(
-				id, randomWarehouseItem());
-
-		WarehouseItem warehouseItem2 =
-			testGetWarehouseIdWarehouseItemsPage_addWarehouseItem(
-				id, randomWarehouseItem());
-
-		WarehouseItem warehouseItem3 =
-			testGetWarehouseIdWarehouseItemsPage_addWarehouseItem(
-				id, randomWarehouseItem());
-
-		Page<WarehouseItem> page1 =
-			warehouseItemResource.getWarehouseIdWarehouseItemsPage(
-				id, Pagination.of(1, 2));
-
-		List<WarehouseItem> warehouseItems1 =
-			(List<WarehouseItem>)page1.getItems();
-
-		Assert.assertEquals(
-			warehouseItems1.toString(), 2, warehouseItems1.size());
-
-		Page<WarehouseItem> page2 =
-			warehouseItemResource.getWarehouseIdWarehouseItemsPage(
-				id, Pagination.of(2, 2));
-
-		Assert.assertEquals(3, page2.getTotalCount());
-
-		List<WarehouseItem> warehouseItems2 =
-			(List<WarehouseItem>)page2.getItems();
-
-		Assert.assertEquals(
-			warehouseItems2.toString(), 1, warehouseItems2.size());
-
-		Page<WarehouseItem> page3 =
-			warehouseItemResource.getWarehouseIdWarehouseItemsPage(
-				id, Pagination.of(1, 3));
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(warehouseItem1, warehouseItem2, warehouseItem3),
-			(List<WarehouseItem>)page3.getItems());
-	}
-
-	protected WarehouseItem
-			testGetWarehouseIdWarehouseItemsPage_addWarehouseItem(
-				Long id, WarehouseItem warehouseItem)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected Long testGetWarehouseIdWarehouseItemsPage_getId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected Long testGetWarehouseIdWarehouseItemsPage_getIrrelevantId()
-		throws Exception {
-
-		return null;
-	}
-
-	@Test
-	public void testPostWarehouseIdWarehouseItem() throws Exception {
-		WarehouseItem randomWarehouseItem = randomWarehouseItem();
-
-		WarehouseItem postWarehouseItem =
-			testPostWarehouseIdWarehouseItem_addWarehouseItem(
-				randomWarehouseItem);
-
-		assertEquals(randomWarehouseItem, postWarehouseItem);
-		assertValid(postWarehouseItem);
-	}
-
-	protected WarehouseItem testPostWarehouseIdWarehouseItem_addWarehouseItem(
 			WarehouseItem warehouseItem)
 		throws Exception {
 
@@ -1075,13 +1016,6 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	}
 
 	protected void assertValid(Page<WarehouseItem> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<WarehouseItem> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<WarehouseItem> warehouseItems = page.getItems();
@@ -1096,20 +1030,6 @@ public abstract class BaseWarehouseItemResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1308,16 +1228,14 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1334,10 +1252,6 @@ public abstract class BaseWarehouseItemResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1347,18 +1261,18 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1421,15 +1335,13 @@ public abstract class BaseWarehouseItemResourceTestCase {
 		}
 
 		if (entityFieldName.equals("quantity")) {
-			sb.append(String.valueOf(warehouseItem.getQuantity()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("reservedQuantity")) {
-			sb.append(String.valueOf(warehouseItem.getReservedQuantity()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("sku")) {
@@ -1528,115 +1440,6 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1711,6 +1514,18 @@ public abstract class BaseWarehouseItemResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseWarehouseItemResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

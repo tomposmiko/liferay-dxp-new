@@ -16,10 +16,7 @@ package com.liferay.portal.theme;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.PortletDecorator;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.theme.PortletDecoratorFactory;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.model.impl.PortletDecoratorImpl;
 import com.liferay.portal.util.PropsValues;
 
@@ -42,9 +39,7 @@ public class PortletDecoratorFactoryImpl implements PortletDecoratorFactory {
 
 	@Override
 	public String getDefaultPortletDecoratorId() {
-		return PrefsPropsUtil.getString(
-			CompanyThreadLocal.getCompanyId(),
-			PropsKeys.DEFAULT_PORTLET_DECORATOR_ID);
+		return PropsValues.DEFAULT_PORTLET_DECORATOR_ID;
 	}
 
 	@Override

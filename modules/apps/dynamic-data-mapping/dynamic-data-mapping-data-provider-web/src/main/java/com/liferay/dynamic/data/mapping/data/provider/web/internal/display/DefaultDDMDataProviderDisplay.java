@@ -17,7 +17,7 @@ package com.liferay.dynamic.data.mapping.data.provider.web.internal.display;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.data.provider.display.DDMDataProviderDisplay;
 import com.liferay.dynamic.data.mapping.util.DDMDisplayTabItem;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Lino Alves
@@ -57,7 +56,7 @@ public class DefaultDDMDataProviderDisplay implements DDMDataProviderDisplay {
 					liferayPortletRequest, "scopeTitle");
 
 				if (Validator.isNull(scopeTitle)) {
-					return _language.get(
+					return LanguageUtil.get(
 						liferayPortletRequest.getHttpServletRequest(),
 						"data-providers");
 				}
@@ -75,10 +74,7 @@ public class DefaultDDMDataProviderDisplay implements DDMDataProviderDisplay {
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "data-providers");
+		return LanguageUtil.get(locale, "data-providers");
 	}
-
-	@Reference
-	private Language _language;
 
 }

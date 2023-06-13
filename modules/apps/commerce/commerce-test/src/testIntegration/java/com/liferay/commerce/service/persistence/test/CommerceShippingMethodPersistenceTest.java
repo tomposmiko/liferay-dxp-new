@@ -129,8 +129,6 @@ public class CommerceShippingMethodPersistenceTest {
 		CommerceShippingMethod newCommerceShippingMethod = _persistence.create(
 			pk);
 
-		newCommerceShippingMethod.setMvccVersion(RandomTestUtil.nextLong());
-
 		newCommerceShippingMethod.setGroupId(RandomTestUtil.nextLong());
 
 		newCommerceShippingMethod.setCompanyId(RandomTestUtil.nextLong());
@@ -147,15 +145,13 @@ public class CommerceShippingMethodPersistenceTest {
 
 		newCommerceShippingMethod.setDescription(RandomTestUtil.randomString());
 
-		newCommerceShippingMethod.setActive(RandomTestUtil.randomBoolean());
+		newCommerceShippingMethod.setImageId(RandomTestUtil.nextLong());
 
 		newCommerceShippingMethod.setEngineKey(RandomTestUtil.randomString());
 
-		newCommerceShippingMethod.setImageId(RandomTestUtil.nextLong());
-
 		newCommerceShippingMethod.setPriority(RandomTestUtil.nextDouble());
 
-		newCommerceShippingMethod.setTrackingURL(RandomTestUtil.randomString());
+		newCommerceShippingMethod.setActive(RandomTestUtil.randomBoolean());
 
 		_commerceShippingMethods.add(
 			_persistence.update(newCommerceShippingMethod));
@@ -164,9 +160,6 @@ public class CommerceShippingMethodPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommerceShippingMethod.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceShippingMethod.getMvccVersion(),
-			newCommerceShippingMethod.getMvccVersion());
 		Assert.assertEquals(
 			existingCommerceShippingMethod.getCommerceShippingMethodId(),
 			newCommerceShippingMethod.getCommerceShippingMethodId());
@@ -198,20 +191,17 @@ public class CommerceShippingMethodPersistenceTest {
 			existingCommerceShippingMethod.getDescription(),
 			newCommerceShippingMethod.getDescription());
 		Assert.assertEquals(
-			existingCommerceShippingMethod.isActive(),
-			newCommerceShippingMethod.isActive());
+			existingCommerceShippingMethod.getImageId(),
+			newCommerceShippingMethod.getImageId());
 		Assert.assertEquals(
 			existingCommerceShippingMethod.getEngineKey(),
 			newCommerceShippingMethod.getEngineKey());
-		Assert.assertEquals(
-			existingCommerceShippingMethod.getImageId(),
-			newCommerceShippingMethod.getImageId());
 		AssertUtils.assertEquals(
 			existingCommerceShippingMethod.getPriority(),
 			newCommerceShippingMethod.getPriority());
 		Assert.assertEquals(
-			existingCommerceShippingMethod.getTrackingURL(),
-			newCommerceShippingMethod.getTrackingURL());
+			existingCommerceShippingMethod.isActive(),
+			newCommerceShippingMethod.isActive());
 	}
 
 	@Test
@@ -222,20 +212,20 @@ public class CommerceShippingMethodPersistenceTest {
 	}
 
 	@Test
-	public void testCountByG_A() throws Exception {
-		_persistence.countByG_A(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
-
-		_persistence.countByG_A(0L, RandomTestUtil.randomBoolean());
-	}
-
-	@Test
 	public void testCountByG_E() throws Exception {
 		_persistence.countByG_E(RandomTestUtil.nextLong(), "");
 
 		_persistence.countByG_E(0L, "null");
 
 		_persistence.countByG_E(0L, (String)null);
+	}
+
+	@Test
+	public void testCountByG_A() throws Exception {
+		_persistence.countByG_A(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
+
+		_persistence.countByG_A(0L, RandomTestUtil.randomBoolean());
 	}
 
 	@Test
@@ -266,12 +256,11 @@ public class CommerceShippingMethodPersistenceTest {
 
 	protected OrderByComparator<CommerceShippingMethod> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceShippingMethod", "mvccVersion", true,
-			"commerceShippingMethodId", true, "groupId", true, "companyId",
-			true, "userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "name", true, "description", true, "active",
-			true, "engineKey", true, "imageId", true, "priority", true,
-			"trackingURL", true);
+			"CommerceShippingMethod", "commerceShippingMethodId", true,
+			"groupId", true, "companyId", true, "userId", true, "userName",
+			true, "createDate", true, "modifiedDate", true, "name", true,
+			"description", true, "imageId", true, "engineKey", true, "priority",
+			true, "active", true);
 	}
 
 	@Test
@@ -586,8 +575,6 @@ public class CommerceShippingMethodPersistenceTest {
 
 		CommerceShippingMethod commerceShippingMethod = _persistence.create(pk);
 
-		commerceShippingMethod.setMvccVersion(RandomTestUtil.nextLong());
-
 		commerceShippingMethod.setGroupId(RandomTestUtil.nextLong());
 
 		commerceShippingMethod.setCompanyId(RandomTestUtil.nextLong());
@@ -604,15 +591,13 @@ public class CommerceShippingMethodPersistenceTest {
 
 		commerceShippingMethod.setDescription(RandomTestUtil.randomString());
 
-		commerceShippingMethod.setActive(RandomTestUtil.randomBoolean());
+		commerceShippingMethod.setImageId(RandomTestUtil.nextLong());
 
 		commerceShippingMethod.setEngineKey(RandomTestUtil.randomString());
 
-		commerceShippingMethod.setImageId(RandomTestUtil.nextLong());
-
 		commerceShippingMethod.setPriority(RandomTestUtil.nextDouble());
 
-		commerceShippingMethod.setTrackingURL(RandomTestUtil.randomString());
+		commerceShippingMethod.setActive(RandomTestUtil.randomBoolean());
 
 		_commerceShippingMethods.add(
 			_persistence.update(commerceShippingMethod));

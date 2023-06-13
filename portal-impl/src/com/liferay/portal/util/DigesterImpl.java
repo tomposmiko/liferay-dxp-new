@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.StreamUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +30,8 @@ import java.nio.ByteBuffer;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.apache.commons.codec.binary.Hex;
 
 /**
  * @author Brian Wing Shun Chan
@@ -136,21 +137,21 @@ public class DigesterImpl implements Digester {
 	public String digestHex(String algorithm, ByteBuffer byteBuffer) {
 		byte[] bytes = digestRaw(algorithm, byteBuffer);
 
-		return StringUtil.bytesToHexString(bytes);
+		return Hex.encodeHexString(bytes);
 	}
 
 	@Override
 	public String digestHex(String algorithm, InputStream inputStream) {
 		byte[] bytes = digestRaw(algorithm, inputStream);
 
-		return StringUtil.bytesToHexString(bytes);
+		return Hex.encodeHexString(bytes);
 	}
 
 	@Override
 	public String digestHex(String algorithm, String... text) {
 		byte[] bytes = digestRaw(algorithm, text);
 
-		return StringUtil.bytesToHexString(bytes);
+		return Hex.encodeHexString(bytes);
 	}
 
 	@Override
@@ -173,7 +174,7 @@ public class DigesterImpl implements Digester {
 			messageDigest.update(byteBuffer);
 		}
 		catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-			_log.error(noSuchAlgorithmException);
+			_log.error(noSuchAlgorithmException, noSuchAlgorithmException);
 		}
 
 		return messageDigest.digest();
@@ -197,10 +198,10 @@ public class DigesterImpl implements Digester {
 			}
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			_log.error(ioException, ioException);
 		}
 		catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-			_log.error(noSuchAlgorithmException);
+			_log.error(noSuchAlgorithmException, noSuchAlgorithmException);
 		}
 
 		return messageDigest.digest();
@@ -228,10 +229,11 @@ public class DigesterImpl implements Digester {
 			messageDigest.update(s.getBytes(Digester.ENCODING));
 		}
 		catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-			_log.error(noSuchAlgorithmException);
+			_log.error(noSuchAlgorithmException, noSuchAlgorithmException);
 		}
 		catch (UnsupportedEncodingException unsupportedEncodingException) {
-			_log.error(unsupportedEncodingException);
+			_log.error(
+				unsupportedEncodingException, unsupportedEncodingException);
 		}
 
 		return messageDigest.digest();

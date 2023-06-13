@@ -19,11 +19,11 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -44,7 +44,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -104,7 +104,7 @@ public class JournalArticleAssetRendererTest {
 			assetRendererFactory.getAssetRenderer(article, 0);
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			_layoutDisplayPageProviderRegistry.
+			_layoutDisplayPageProviderTracker.
 				getLayoutDisplayPageProviderByClassName(
 					JournalArticle.class.getName());
 
@@ -126,15 +126,13 @@ public class JournalArticleAssetRendererTest {
 			index + urlSeparator.length());
 
 		Assert.assertEquals(
-			article.getUrlTitle(), HttpComponentsUtil.getPath(friendlyURL));
+			article.getUrlTitle(), HttpUtil.getPath(friendlyURL));
 
-		String version = HttpComponentsUtil.getParameter(
-			urlViewInContext, "version");
+		String version = HttpUtil.getParameter(urlViewInContext, "version");
 
 		Assert.assertNotNull(version);
-		Assert.assertEquals(
-			article.getVersion(), GetterUtil.getDouble(version),
-			GetterUtil.DEFAULT_DOUBLE);
+
+		Assert.assertEquals(article.getId(), GetterUtil.getLong(version));
 
 		article = JournalTestUtil.updateArticleWithWorkflow(article, true);
 
@@ -152,11 +150,11 @@ public class JournalArticleAssetRendererTest {
 		friendlyURL = urlViewInContext.substring(index + urlSeparator.length());
 
 		Assert.assertEquals(
-			article.getUrlTitle(), HttpComponentsUtil.getPath(friendlyURL));
+			article.getUrlTitle(), HttpUtil.getPath(friendlyURL));
 
 		Assert.assertEquals(
 			StringPool.BLANK,
-			HttpComponentsUtil.getParameter(urlViewInContext, "version"));
+			HttpUtil.getParameter(urlViewInContext, "version"));
 	}
 
 	private LiferayPortletRequest _getLiferayPortletRequest(
@@ -195,11 +193,10 @@ public class JournalArticleAssetRendererTest {
 	private Group _group;
 
 	@Inject
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Inject
-	private LayoutDisplayPageProviderRegistry
-		_layoutDisplayPageProviderRegistry;
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;

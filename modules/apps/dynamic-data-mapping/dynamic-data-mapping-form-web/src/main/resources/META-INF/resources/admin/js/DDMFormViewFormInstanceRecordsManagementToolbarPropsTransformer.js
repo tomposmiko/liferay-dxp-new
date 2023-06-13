@@ -12,11 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	postForm,
-} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
 
 export default function propsTransformer({
 	additionalProps: {deleteFormInstanceRecordURL},
@@ -27,34 +23,33 @@ export default function propsTransformer({
 		...otherProps,
 		onActionButtonClick(event, {item}) {
 			if (item?.data?.action === 'deleteRecords') {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-delete-this'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							const form = document.getElementById(
-								`${portletNamespace}searchContainerForm`
-							);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-delete-this'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}searchContainerForm`
+					);
 
-							const searchContainer = document.getElementById(
-								`${portletNamespace}ddmFormInstanceRecord`
-							);
+					const searchContainer = document.getElementById(
+						`${portletNamespace}ddmFormInstanceRecord`
+					);
 
-							if (form && searchContainer) {
-								postForm(form, {
-									data: {
-										deleteFormInstanceRecordIds: getCheckedCheckboxes(
-											searchContainer,
-											`${portletNamespace}allRowIds`
-										),
-									},
-									url: deleteFormInstanceRecordURL,
-								});
-							}
-						}
-					},
-				});
+					if (form && searchContainer) {
+						postForm(form, {
+							data: {
+								deleteFormInstanceRecordIds: Liferay.Util.listCheckedExcept(
+									searchContainer,
+									`${portletNamespace}allRowIds`
+								),
+							},
+							url: deleteFormInstanceRecordURL,
+						});
+					}
+				}
 			}
 		},
 	};

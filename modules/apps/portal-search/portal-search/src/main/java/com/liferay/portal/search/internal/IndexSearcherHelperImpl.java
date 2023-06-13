@@ -36,12 +36,13 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = IndexSearcherHelper.class)
+@Component(immediate = true, service = IndexSearcherHelper.class)
 public class IndexSearcherHelperImpl implements IndexSearcherHelper {
 
 	@Override
 	public String getQueryString(SearchContext searchContext, Query query) {
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchContext.getSearchEngineId());
 
 		IndexSearcher indexSearcher = searchEngine.getIndexSearcher();
 
@@ -61,7 +62,8 @@ public class IndexSearcherHelperImpl implements IndexSearcherHelper {
 	public Hits search(SearchContext searchContext, Query query)
 		throws SearchException {
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchContext.getSearchEngineId());
 
 		IndexSearcher indexSearcher = searchEngine.getIndexSearcher();
 
@@ -72,7 +74,8 @@ public class IndexSearcherHelperImpl implements IndexSearcherHelper {
 	public long searchCount(SearchContext searchContext, Query query)
 		throws SearchException {
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchContext.getSearchEngineId());
 
 		IndexSearcher indexSearcher = searchEngine.getIndexSearcher();
 
@@ -87,7 +90,8 @@ public class IndexSearcherHelperImpl implements IndexSearcherHelper {
 			_log.debug("Spell checking " + searchContext.getKeywords());
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchContext.getSearchEngineId());
 
 		IndexSearcher indexSearcher = searchEngine.getIndexSearcher();
 
@@ -103,7 +107,8 @@ public class IndexSearcherHelperImpl implements IndexSearcherHelper {
 			_log.debug("Spell checking " + searchContext.getKeywords());
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchContext.getSearchEngineId());
 
 		IndexSearcher indexSearcher = searchEngine.getIndexSearcher();
 
@@ -119,7 +124,8 @@ public class IndexSearcherHelperImpl implements IndexSearcherHelper {
 				"Suggesting keyword queries" + searchContext.getKeywords());
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchContext.getSearchEngineId());
 
 		IndexSearcher indexSearcher = searchEngine.getIndexSearcher();
 

@@ -15,22 +15,16 @@
 import * as FormSupport from '../../utils/FormSupport.es';
 import {updateField} from '../../utils/settingsContext';
 
-export function getColumn(pages, nestedIndexes = []) {
+export const getColumn = (pages, nestedIndexes = []) => {
 	let column;
 	let context = pages;
 
 	nestedIndexes.forEach((indexes) => {
 		const {columnIndex, pageIndex, rowIndex} = indexes;
 
-		let index = pageIndex;
-
-		if (pages.length - 1 < pageIndex) {
-			index = 0;
-		}
-
 		column = FormSupport.getColumn(
 			context,
-			column ? 0 : index,
+			column ? 0 : pageIndex,
 			rowIndex,
 			columnIndex
 		);
@@ -46,7 +40,7 @@ export function getColumn(pages, nestedIndexes = []) {
 	});
 
 	return column;
-}
+};
 
 const getContext = (context, nestedIndexes = []) => {
 	if (nestedIndexes.length) {
@@ -84,7 +78,7 @@ const getColumnPosition = (context, indexes) => {
 	);
 };
 
-export function handleResizeRight(props, state, indexes, columnTarget) {
+export const handleResizeRight = (props, state, indexes, columnTarget) => {
 	const {pages} = state;
 
 	const {columnIndex, pageIndex, rowIndex} = indexes[indexes.length - 1];
@@ -154,7 +148,7 @@ export function handleResizeRight(props, state, indexes, columnTarget) {
 			};
 		}
 		else if (columnTarget > currentColumnPosition) {
-			if (nextColumn.size === 1 && !nextColumn.fields.length) {
+			if (nextColumn.size === 1 && nextColumn.fields.length === 0) {
 				newCurrentColumn = {
 					...currentColumn,
 					size: currentColumn.size + newSize,
@@ -213,9 +207,9 @@ export function handleResizeRight(props, state, indexes, columnTarget) {
 		newContext[indexes.length > 1 ? 0 : pageIndex].rows;
 
 	return pages;
-}
+};
 
-export function handleResizeLeft(props, state, indexes, columnTarget) {
+export const handleResizeLeft = (props, state, indexes, columnTarget) => {
 	const {pages} = state;
 
 	const {columnIndex, pageIndex, rowIndex} = indexes[indexes.length - 1];
@@ -268,7 +262,7 @@ export function handleResizeLeft(props, state, indexes, columnTarget) {
 	else if (
 		previousColumn &&
 		previousColumn.size === 1 &&
-		!previousColumn.fields.length &&
+		previousColumn.fields.length === 0 &&
 		columnTarget <= previousColumnPosition
 	) {
 		newContext = FormSupport.removeColumn(
@@ -336,15 +330,9 @@ export function handleResizeLeft(props, state, indexes, columnTarget) {
 		newContext[indexes.length > 1 ? 0 : pageIndex].rows;
 
 	return pages;
-}
+};
 
-export default function columnResizedHandler({
-	column,
-	direction,
-	loc,
-	props,
-	state,
-}) {
+export default ({column, direction, loc, props, state}) => {
 	const {pages} = state;
 
 	let newPages = [...pages];
@@ -363,4 +351,4 @@ export default function columnResizedHandler({
 	return {
 		pages: newPages,
 	};
-}
+};

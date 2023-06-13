@@ -45,7 +45,6 @@ public class CommerceDiscountUsageEntryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put(
 			"commerceDiscountUsageEntryId", getCommerceDiscountUsageEntryId());
 		attributes.put("companyId", getCompanyId());
@@ -62,12 +61,6 @@ public class CommerceDiscountUsageEntryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		Long commerceDiscountUsageEntryId = (Long)attributes.get(
 			"commerceDiscountUsageEntryId");
 
@@ -200,16 +193,6 @@ public class CommerceDiscountUsageEntryWrapper
 	}
 
 	/**
-	 * Returns the mvcc version of this commerce discount usage entry.
-	 *
-	 * @return the mvcc version of this commerce discount usage entry
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
 	 * Returns the primary key of this commerce discount usage entry.
 	 *
 	 * @return the primary key of this commerce discount usage entry
@@ -327,16 +310,6 @@ public class CommerceDiscountUsageEntryWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce discount usage entry.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce discount usage entry
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the primary key of this commerce discount usage entry.
 	 *
 	 * @param primaryKey the primary key of this commerce discount usage entry
@@ -374,11 +347,6 @@ public class CommerceDiscountUsageEntryWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

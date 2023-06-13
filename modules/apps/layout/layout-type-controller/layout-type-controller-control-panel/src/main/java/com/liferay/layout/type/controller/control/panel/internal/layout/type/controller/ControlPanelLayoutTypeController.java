@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = "layout.type=" + LayoutConstants.TYPE_CONTROL_PANEL,
 	service = LayoutTypeController.class
 )
@@ -94,6 +95,22 @@ public class ControlPanelLayoutTypeController
 			_panelCategoryRegistry);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
+	}
+
 	@Override
 	protected ServletResponse createServletResponse(
 		HttpServletResponse httpServletResponse,
@@ -109,11 +126,6 @@ public class ControlPanelLayoutTypeController
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	protected String getViewPage() {
 		return _VIEW_PAGE;
 	}
@@ -126,6 +138,26 @@ public class ControlPanelLayoutTypeController
 			ApplicationListWebKeys.PANEL_CATEGORY_REGISTRY);
 	}
 
+	@Reference(unbind = "-")
+	protected void setPanelAppRegistry(PanelAppRegistry panelAppRegistry) {
+		_panelAppRegistry = panelAppRegistry;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPanelCategoryRegistry(
+		PanelCategoryRegistry panelCategoryRegistry) {
+
+		_panelCategoryRegistry = panelCategoryRegistry;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.control.panel)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
+
 	private static final String _EDIT_PAGE = "/layout/edit/control_panel.jsp";
 
 	private static final String _URL =
@@ -134,15 +166,7 @@ public class ControlPanelLayoutTypeController
 
 	private static final String _VIEW_PAGE = "/layout/view/control_panel.jsp";
 
-	@Reference
 	private PanelAppRegistry _panelAppRegistry;
-
-	@Reference
 	private PanelCategoryRegistry _panelCategoryRegistry;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.control.panel)"
-	)
-	private ServletContext _servletContext;
 
 }

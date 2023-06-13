@@ -27,10 +27,6 @@ public class AnnouncementsEntryLocalServiceWrapper
 	implements AnnouncementsEntryLocalService,
 			   ServiceWrapper<AnnouncementsEntryLocalService> {
 
-	public AnnouncementsEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AnnouncementsEntryLocalServiceWrapper(
 		AnnouncementsEntryLocalService announcementsEntryLocalService) {
 

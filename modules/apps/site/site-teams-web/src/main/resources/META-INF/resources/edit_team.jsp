@@ -53,20 +53,22 @@ renderResponse.setTitle((team == null) ? LanguageUtil.get(request, "new-team") :
 
 		<aui:model-context bean="<%= team %>" model="<%= Team.class %>" />
 
-		<liferay-frontend:fieldset>
-			<c:if test="<%= team != null %>">
-				<aui:input name="teamId" type="resource" value="<%= String.valueOf(team.getTeamId()) %>" />
-			</c:if>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset>
+				<c:if test="<%= team != null %>">
+					<aui:input name="teamId" type="resource" value="<%= String.valueOf(team.getTeamId()) %>" />
+				</c:if>
 
-			<aui:input name="name" placeholder="name" />
+				<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" name="name" placeholder="name" />
 
-			<aui:input name="description" placeholder="description" />
-		</liferay-frontend:fieldset>
+				<aui:input name="description" placeholder="description" />
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons
-			redirect="<%= redirect %>"
-		/>
+		<aui:button type="submit" />
+
+		<aui:button href="<%= redirect %>" type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>

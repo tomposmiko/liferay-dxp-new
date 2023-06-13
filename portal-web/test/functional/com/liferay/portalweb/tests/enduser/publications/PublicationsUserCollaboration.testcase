@@ -2,8 +2,6 @@
 definition {
 
 	property custom.properties = "jsonws.web.service.paths.excludes=";
-	property osgi.module.configuration.file.names = "com.liferay.change.tracking.configuration.CTSettingsConfiguration.config";
-	property osgi.module.configurations = "enabled=B\"true\"";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Publications";
@@ -17,17 +15,22 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			User.firstLoginPG();
 
+			ApplicationsMenu.gotoPortlet(
+				category = "Publications",
+				panel = "Applications",
+				portlet = "Publications");
+
 			Publications.disablePublications();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test CanBeInvitedToCollaborateOnMultiplePublications {
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -53,12 +56,16 @@ definition {
 			roleTitle = "Publications User",
 			userEmailAddress = "userea@liferay.com");
 
+		JSONPublications.enablePublications();
+
 		JSONPublications.addPublication(publicationName = "Publication Name 1");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
 		Publications.inviteUsers(
-			gotoReviewChanges = "true",
 			publicationName = "Publication Name 1",
 			userInvite = "userea@liferay.com");
 
@@ -77,10 +84,7 @@ definition {
 
 		JSONPublications.addPublication(publicationName = "Publication Name 2");
 
-		PublicationsNavigator.openPublicationsAdmin();
-
 		Publications.inviteUsers(
-			gotoReviewChanges = "true",
 			publicationName = "Publication Name 2",
 			publicationRole = "Editor",
 			userInvite = "userea@liferay.com");
@@ -114,108 +118,108 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name 2 as a Editor.");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
-		PublicationsPermissions.assertViewerPermissions(publicationName = "Publication Name 1");
+		AssertElementPresent(
+			key_publicationName = "Publication Name 1",
+			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		Publications.assertViewerPermissions(publicationName = "Publication Name 1");
 
-		PublicationsPermissions.assertEditorPermissions(publicationName = "Publication Name 2");
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
+
+		AssertElementPresent(
+			key_publicationName = "Publication Name 2",
+			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
+
+		Publications.assertEditorPermissions(publicationName = "Publication Name 2");
 	}
 
-	@description = "This is a use case for LPS-168508. Switching Publications invitee between roles shouldn't remove it from the invitee list."
-	@priority = 3
-	test CanSwitchInviteeRoles {
-		task ("Create User and add Publication") {
-			JSONUser.addUser(
-				userEmailAddress = "userea@liferay.com",
-				userFirstName = "userfn",
-				userLastName = "userln",
-				userScreenName = "usersn");
+	@priority = "5"
+	test InviteUserAsEditor {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
 
-			JSONPublications.addPublication(publicationName = "Test Publication");
-		}
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		JSONUser.addUserToSite(
+			groupName = "Guest",
+			userEmailAddress = "userea@liferay.com");
 
-		PublicationsNavigator.gotoPublicationEllipsisItem(
-			menuItem = "Invite Users",
-			publicationName = "Test Publication");
+		JSONRole.assignSiteRoleToUser(
+			groupName = "Guest",
+			roleTitle = "Site Administrator",
+			userEmailAddress = "userea@liferay.com");
 
-		Click(
-			key_title = "Viewers can view. Viewers cannot edit, publish, or invite other users.",
-			locator1 = "Button#ANY_TITLE");
+		JSONRole.assignRoleToUser(
+			roleTitle = "Publications User",
+			userEmailAddress = "userea@liferay.com");
 
-		Click(
-			key_publicationRole = "Viewer",
-			locator1 = "Publications#PUBLICATION_ROLE_BUTTON");
+		JSONPublications.enablePublications();
 
-		Type(
-			locator1 = "Publications#KEYWORD_TEXTFIELD",
-			value1 = "userea@liferay.com");
-
-		KeyPress(
-			locator1 = "Publications#KEYWORD_TEXTFIELD",
-			value1 = "\ENTER");
-
-		Click(
-			key_title = "Viewers can view. Viewers cannot edit, publish, or invite other users.",
-			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY_TITLE");
-
-		Click(
-			key_publicationRole = "Editor",
-			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY");
-
-		Click(
-			key_title = "Editors can view and edit. Editors cannot publish or invite other users.",
-			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY_TITLE");
-
-		Click(
-			key_publicationRole = "Viewer",
-			locator1 = "Publications#PUBLICATION_ROLE_BUTTON_BODY");
-
-		Button.clickNoError(button = "Send");
-
-		AssertConfirm(value1 = "You are inviting user userea@liferay.com who does not have access to Publications. This user will be assigned the Publications User role to gain access to Publications.");
-
-		Alert.viewSuccessMessage();
-	}
-
-	@priority = 3
-	test ExplainEachRoleInInviteUsers {
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		PublicationsNavigator.gotoReviewChanges(
-			gotoPublicationsAdmin = "true",
-			publicationName = "Publication Name");
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
-		Click(locator1 = "Icon#PLUS");
-
-		Click(
-			key_text = "Viewer",
-			locator1 = "Button#ANY_SECONDARY");
-
-		PublicationsPermissions.viewPublicationRoleHelpText(
-			publicationRole = "Viewer",
-			publicationRoleHelpText = "Viewers can view.");
-
-		PublicationsPermissions.viewPublicationRoleHelpText(
+		Publications.inviteUsers(
+			publicationName = "Publication Name",
 			publicationRole = "Editor",
-			publicationRoleHelpText = "Editors can view and edit.");
+			userInvite = "userea@liferay.com");
 
-		PublicationsPermissions.viewPublicationRoleHelpText(
-			publicationRole = "Publisher",
-			publicationRoleHelpText = "Publishers can view, edit, and publish.");
+		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		PublicationsPermissions.viewPublicationRoleHelpText(
-			publicationRole = "Admin",
-			publicationRoleHelpText = "Admins can view, edit, publish, and invite other users.");
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Guest",
+			title = "WC WebContent Title");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Guest",
+			mimeType = "text/plain",
+			sourceFileName = "Document_1.txt");
+
+		SignOut.signOut();
+
+		User.firstLoginUI(
+			password = "test",
+			userEmailAddress = "userea@liferay.com");
+
+		Notifications.gotoNotifications();
+
+		AssertElementPresent(
+			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
+			value1 = "Test Test has invited you to work on Publication Name as a Editor.");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
+
+		AssertElementPresent(
+			key_publicationName = "Publication Name",
+			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
+
+		Publications.assertEditorPermissions(publicationName = "Publication Name");
 	}
 
-	@priority = 5
-	test InviteUserAsAdmin {
-		property portal.acceptance = "true";
-
+	@priority = "5"
+	test InviteUserAsInviter {
 		for (var userNumber : list "1,2") {
 			JSONUser.addUser(
 				userEmailAddress = "userea${userNumber}@liferay.com",
@@ -247,14 +251,18 @@ definition {
 			resourceName = "com.liferay.change.tracking.model.CTCollection",
 			roleTitle = "Publications User");
 
+		JSONPublications.enablePublications();
+
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
 		Publications.inviteUsers(
-			gotoReviewChanges = "true",
 			publicationName = "Publication Name",
-			publicationRole = "Admin",
+			publicationRole = "Inviter",
 			userInvite = "userea1@liferay.com");
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
@@ -280,80 +288,21 @@ definition {
 
 		AssertElementPresent(
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
-			value1 = "Test Test has invited you to work on Publication Name as a Admin.");
+			value1 = "Test Test has invited you to work on Publication Name as a Inviter.");
 
-		PublicationsNavigator.openPublicationsAdmin();
-
-		PublicationsPermissions.assertAdminPermissions(publicationName = "Publication Name");
-	}
-
-	@priority = 5
-	test InviteUserAsEditor {
-		JSONUser.addUser(
-			userEmailAddress = "userea@liferay.com",
-			userFirstName = "userfn",
-			userLastName = "userln",
-			userScreenName = "usersn");
-
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			requireReset = "false",
-			userEmailAddress = "userea@liferay.com");
-
-		JSONUser.addUserToSite(
-			groupName = "Guest",
-			userEmailAddress = "userea@liferay.com");
-
-		JSONRole.assignSiteRoleToUser(
-			groupName = "Guest",
-			roleTitle = "Site Administrator",
-			userEmailAddress = "userea@liferay.com");
-
-		JSONRole.assignRoleToUser(
-			roleTitle = "Publications User",
-			userEmailAddress = "userea@liferay.com");
-
-		JSONPublications.addPublication(publicationName = "Publication Name");
-
-		PublicationsNavigator.openPublicationsAdmin();
-
-		Publications.inviteUsers(
-			gotoReviewChanges = "true",
-			publicationName = "Publication Name",
-			publicationRole = "Editor",
-			userInvite = "userea@liferay.com");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name");
-
-		JSONWebcontent.addWebContent(
-			content = "WC WebContent Content",
-			groupName = "Guest",
-			title = "WC WebContent Title");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "text/plain",
-			sourceFileName = "Document_1.txt");
-
-		SignOut.signOut();
-
-		User.firstLoginUI(
-			password = "test",
-			userEmailAddress = "userea@liferay.com");
-
-		Notifications.gotoNotifications();
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
 		AssertElementPresent(
-			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
-			value1 = "Test Test has invited you to work on Publication Name as a Editor.");
+			key_publicationName = "Publication Name",
+			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
 
-		PublicationsNavigator.openPublicationsAdmin();
-
-		PublicationsPermissions.assertEditorPermissions(publicationName = "Publication Name");
+		Publications.assertInviterPermissions(publicationName = "Publication Name");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test InviteUserAsPublisher {
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -384,12 +333,16 @@ definition {
 			resourceName = "com.liferay.change.tracking.model.CTCollection",
 			roleTitle = "Publications User");
 
+		JSONPublications.enablePublications();
+
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
 		Publications.inviteUsers(
-			gotoReviewChanges = "true",
 			publicationName = "Publication Name",
 			publicationRole = "Publisher",
 			userInvite = "userea@liferay.com");
@@ -419,12 +372,19 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name as a Publisher.");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
-		PublicationsPermissions.assertPublisherPermissions(publicationName = "Publication Name");
+		AssertElementPresent(
+			key_publicationName = "Publication Name",
+			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
+
+		Publications.assertPublisherPermissions(publicationName = "Publication Name");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test InviteUserAsViewer {
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -446,12 +406,16 @@ definition {
 			roleTitle = "Site Administrator",
 			userEmailAddress = "userea@liferay.com");
 
+		JSONPublications.enablePublications();
+
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
-		PublicationsNavigator.openPublicationsAdmin();
+		ApplicationsMenu.gotoPortlet(
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
 		Publications.inviteUsers(
-			gotoReviewChanges = "true",
 			publicationName = "Publication Name",
 			userInvite = "userea@liferay.com",
 			userMissingPublicationsRole = "true");
@@ -481,41 +445,16 @@ definition {
 			locator1 = "Notifications#NOTIFICATIONS_WORKFLOW_TITLE",
 			value1 = "Test Test has invited you to work on Publication Name as a Viewer.");
 
-		PublicationsNavigator.openPublicationsAdmin();
-
-		PublicationsPermissions.assertViewerPermissions(publicationName = "Publication Name");
-	}
-
-	@description = "This is a use case for LPS-150313."
-	@priority = 4
-	test VerifyPublicationsUserPermissions {
 		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
+			category = "Publications",
+			panel = "Applications",
+			portlet = "Publications");
 
-		AssertClick(
-			key_itemName = "Publications User",
-			locator1 = "ListGroupItem#ITEM_NAME_LINK",
-			value1 = "Publications User");
+		AssertElementPresent(
+			key_publicationName = "Publication Name",
+			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
 
-		Navigator.gotoNavItem(navItem = "Define Permissions");
-
-		Role.viewPermissionCP(
-			permissionDefinitionValue = "Access in Control Panel",
-			permissionNavigationValue = "Publications");
-
-		Role.viewPermissionCP(
-			permissionDefinitionValue = "View",
-			permissionNavigationValue = "Publications");
-
-		Role.viewPermissionCP(
-			permissionDefinitionValue = "Add Publication",
-			permissionNavigationValue = "Publications > Publications");
-
-		Role.viewPermissionCP(
-			permissionDefinitionValue = "View Control Panel Menu",
-			permissionNavigationValue = "Portal");
+		Publications.assertViewerPermissions(publicationName = "Publication Name");
 	}
 
 }

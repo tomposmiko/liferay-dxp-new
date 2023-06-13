@@ -77,7 +77,6 @@ PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplay
 
 								<liferay-ui:search-container-column-text>
 									<clay:dropdown-actions
-										aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 										dropdownItems="<%= portletConfigurationTemplatesDisplayContext.getActionDropdownItems(archivedSettings) %>"
 										propsTransformer="js/ArchivedSetuptsDropdownDefaultPropsTransformer"
 									/>
@@ -112,7 +111,6 @@ PortletConfigurationTemplatesDisplayContext portletConfigurationTemplatesDisplay
 
 								<liferay-ui:search-container-column-text>
 									<clay:dropdown-actions
-										aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 										dropdownItems="<%= portletConfigurationTemplatesDisplayContext.getActionDropdownItems(archivedSettings) %>"
 										propsTransformer="js/ArchivedSetuptsDropdownDefaultPropsTransformer"
 									/>

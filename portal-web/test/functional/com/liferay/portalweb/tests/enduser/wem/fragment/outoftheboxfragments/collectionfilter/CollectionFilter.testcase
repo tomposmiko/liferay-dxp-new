@@ -13,14 +13,14 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-137722. View alert info shown in dropdown menu when select multiple target collections without filters in common."
-	@priority = 4
+	@priority = "4"
 	test CannotSelectMultipleCollectionsWithoutFiltersInCommon {
 		property test.name.skip.portal.instance = "CollectionFilter#CannotSelectMultipleCollectionsWithoutFiltersInCommon";
 
@@ -56,6 +56,7 @@ definition {
 				groupName = "Test Site Name",
 				title = "SUV",
 				vocabularyName = "Type");
+
 			var carId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Car",
@@ -74,7 +75,7 @@ definition {
 		task ("Add three documents with SUV category") {
 			for (var style : list "X1,X3,X5") {
 				JSONDocument.addFile(
-					assetCategoryIds = ${suvId},
+					assetCategoryIds = "${suvId}",
 					dmDocumentTitle = "BMW ${style}",
 					groupName = "Test Site Name");
 			}
@@ -99,7 +100,7 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 		}
 
@@ -107,7 +108,7 @@ definition {
 			for (var columnNumber : list "1,2") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${columnNumber},
+					columnNumber = "${columnNumber}",
 					fragmentName = "Collection Display",
 					navTab = "Fragments");
 			}
@@ -117,17 +118,17 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				infoListProviderName = "Basic Web Content",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List");
 		}
 
 		task ("View the title of three web contents shown in the first Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "3,Y,X") {
 				AssertVisible(
 					key_entryContent = "[normalize-space()='Tesla Model ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST");
 
 				var n = ${n} + 1;
@@ -137,19 +138,19 @@ definition {
 		task ("Select the Basic Document collection provider and Bulleted List in the second Collection Display") {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
-				index = 2,
+				index = "2",
 				infoListProviderName = "Basic Document",
-				styleDisplay = "Bulleted List");
+				listStyle = "Bulleted List");
 		}
 
 		task ("View the title of documents shown in the second Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "X5,X3,X1") {
 				AssertVisible(
 					key_entryContent = "[normalize-space()='BMW ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST");
 
 				var n = ${n} + 1;
@@ -201,7 +202,7 @@ definition {
 		task ("View the Search is shown in Collection Filter") {
 			AssertAttributeValue(
 				attribute1 = "placeholder",
-				index = 1,
+				index = "1",
 				locator1 = "PageEditor#COLLECTION_FILTER_SEARCH_FIELD",
 				value1 = "Search");
 		}
@@ -261,7 +262,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-111807. The user could enable search field in dropdown list of Collection Filter."
-	@priority = 5
+	@priority = "5"
 	test EnableSearchFieldInDropdownList {
 		property portal.acceptance = "true";
 
@@ -269,7 +270,7 @@ definition {
 			for (var vocabularyName : list "Size,Warehouse") {
 				JSONCategory.addVocabulary(
 					groupName = "Test Site Name",
-					title = ${vocabularyName});
+					title = "${vocabularyName}");
 			}
 		}
 
@@ -277,19 +278,21 @@ definition {
 			for (var categoryName : list "6.5 inch,7 inch,7.5 inch,8 inch,8.5 inch") {
 				JSONCategory.addCategory(
 					groupName = "Test Site Name",
-					title = ${categoryName},
+					title = "${categoryName}",
 					vocabularyName = "Size");
 			}
 
-			var inch90Id = JSONCategory.addCategory(
+			var 90inchId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "9 inch",
 				vocabularyName = "Size");
-			var inch95Id = JSONCategory.addCategory(
+
+			var 95inchId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "9.5 inch",
 				vocabularyName = "Size");
-			var inch100Id = JSONCategory.addCategory(
+
+			var 100inchId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "10 inch",
 				vocabularyName = "Size");
@@ -299,7 +302,7 @@ definition {
 			for (var categoryName : list "Canada,England,Japan,France,Brazil") {
 				JSONCategory.addCategory(
 					groupName = "Test Site Name",
-					title = ${categoryName},
+					title = "${categoryName}",
 					vocabularyName = "Warehouse");
 			}
 
@@ -307,10 +310,12 @@ definition {
 				groupName = "Test Site Name",
 				title = "United States",
 				vocabularyName = "Warehouse");
+
 			var cnId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "China",
 				vocabularyName = "Warehouse");
+
 			var esId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Spain",
@@ -319,7 +324,7 @@ definition {
 
 		task ("Add the first web content with 10 inch and United States") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = "${inch100Id},${usId}",
+				assetCategoryIds = "${100inchId},${usId}",
 				content = "Air Force 1",
 				groupName = "Test Site Name",
 				title = "Air Force 1");
@@ -327,7 +332,7 @@ definition {
 
 		task ("Add the second web content with 9.5 inch and China") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = "${inch95Id},${cnId}",
+				assetCategoryIds = "${95inchId},${cnId}",
 				content = "Air Jordan 1",
 				groupName = "Test Site Name",
 				title = "Air Jordan 1");
@@ -335,7 +340,7 @@ definition {
 
 		task ("Add the third web content with 9 inch and United States") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = "${inch90Id},${usId}",
+				assetCategoryIds = "${90inchId},${usId}",
 				content = "Air Max 1",
 				groupName = "Test Site Name",
 				title = "Air Max 1");
@@ -343,7 +348,7 @@ definition {
 
 		task ("Add the fourth web content with 10 inch and Spain") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = "${inch100Id},${esId}",
+				assetCategoryIds = "${100inchId},${esId}",
 				content = "LeBron VIII",
 				groupName = "Test Site Name",
 				title = "LeBron VIII");
@@ -363,15 +368,15 @@ definition {
 
 			for (var assetName : list "Air Max 1,Air Jordan 1,Air Force 1,LeBron VIII") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Web Content");
 			}
 		}
 
 		task ("Add a collection page based on manual collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Manual Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -381,8 +386,8 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				selectedName = "Manual Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				selectedName = "Manual Collection");
 		}
 
 		task ("Add a Grid above the Container") {
@@ -395,7 +400,7 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 		}
 
@@ -403,7 +408,7 @@ definition {
 			for (var columnNumber : list "1,2") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${columnNumber},
+					columnNumber = "${columnNumber}",
 					fragmentName = "Collection Filter",
 					navTab = "Fragments");
 			}
@@ -412,7 +417,7 @@ definition {
 		task ("Select the Size vocabulary and Include Search Field in first Collection Filter") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "6.5 inch,7 inch,7.5 inch,8 inch,8.5 inch,9 inch,9.5 inch,10 inch",
-				columnNumber = 1,
+				columnNumber = "1",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				includeSearchField = "true",
@@ -423,7 +428,7 @@ definition {
 		task ("Select the Warehouse vocabulary, Single Selection and Include Search Field in second Collection Filter") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Brazil,Canada,China,England,France,Japan,Spain,United States",
-				columnNumber = 2,
+				columnNumber = "2",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				includeSearchField = "true",
@@ -433,17 +438,19 @@ definition {
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("View all web contents shown in Collection Display") {
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var title : list "Air Max 1,Air Jordan 1,Air Force 1,LeBron VIII") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -453,7 +460,7 @@ definition {
 		task ("Search 10 inch and select it in the first Collection Filter") {
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "10 inch",
-				columnNumber = 1,
+				columnNumber = "1",
 				multipleSelection = "true",
 				searchTerm = "10 inch",
 				selectedName = "10 inch",
@@ -461,13 +468,13 @@ definition {
 		}
 
 		task ("View only the Air Force 1 and LeBron VIII shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Air Force 1,LeBron VIII") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -476,7 +483,7 @@ definition {
 
 		task ("Search Spain and select it in the second Collection Filter") {
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				filterName = "Spain",
 				searchTerm = "Spain",
 				selectedName = "Spain",
@@ -487,12 +494,12 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='LeBron VIII']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -502,13 +509,13 @@ definition {
 		}
 
 		task ("View all web contents shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Air Max 1,Air Jordan 1,Air Force 1,LeBron VIII") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -517,7 +524,7 @@ definition {
 
 		task ("Search United States and select it in the second Collection Filter") {
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				filterName = "United States",
 				searchTerm = "United States",
 				selectedName = "United States",
@@ -525,13 +532,13 @@ definition {
 		}
 
 		task ("View only the Air Max 1,Air Force 1 shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Air Max 1,Air Force 1") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -540,14 +547,14 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "[normalize-space(text())='LeBron VIII']",
 				key_fragmentName = "Collection Display",
-				key_position = 3,
+				key_position = "3",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 
 		task ("Search 9 inch and select it in the first Collection Filter") {
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "9 inch",
-				columnNumber = 1,
+				columnNumber = "1",
 				multipleSelection = "true",
 				searchTerm = "9 inch",
 				selectedName = "9 inch",
@@ -558,21 +565,21 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Air Max 1']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "[normalize-space(text())='Air Force 1']",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-131947. Collection Filters with category works in display page template."
-	@priority = 4
+	@priority = "4"
 	test FilterResultsOfCollectionDisplayByCategoryInDisplayPageTemplate {
-		property testray.component.names = "Display Page Templates,Fragments";
+		property testray.main.component.name = "Display Pages";
 
 		task ("Add a vocabulary") {
 			JSONCategory.addVocabulary(
@@ -603,7 +610,7 @@ definition {
 
 		task ("Add the second web content with Sellout") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${selloutId},
+				assetCategoryIds = "${selloutId}",
 				content = "Web Content Content 2",
 				groupName = "Test Site Name",
 				title = "Web Content Title 2");
@@ -611,7 +618,7 @@ definition {
 
 		task ("Add the third web content with Instock") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${instockId},
+				assetCategoryIds = "${instockId}",
 				content = "Web Content Content 3",
 				groupName = "Test Site Name",
 				title = "Web Content Title 3");
@@ -658,7 +665,7 @@ definition {
 			PageEditor.editCollectionDisplay(
 				assetListName = "Hot Sale",
 				fragmentName = "Collection Display",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List");
 		}
 
 		task ("Add a Collection Filter above the Collection Display") {
@@ -694,7 +701,7 @@ definition {
 		}
 
 		task ("Publish the display page template") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Select the display page template as Specific in the first web content") {
@@ -714,18 +721,18 @@ definition {
 				entry = "Web Content Title 1",
 				menuItem = "View Content");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Web Content Title 1");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Web Content Title 1");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title 2,Web Content Title 3") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -737,335 +744,27 @@ definition {
 				selectedName = "Instock",
 				title = "Availability");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Web Content Title 1");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Web Content Title 1");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Web Content Title 3']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
-	@description = "This is a test for LPS-167949. The page designer could filter collection by contains all tags."
-	@priority = 5
-	test FilterResultsOfCollectionDisplayByContainsAllTags {
-		property test.name.skip.portal.instance = "CollectionFilter#FilterResultsOfCollectionDisplayByContainsAllTags";
-
-		task ("Given a page designer has a Collection Display and two Collection Filter on page") {
-			GogoShell.openGogoShellAdmin();
-
-			GogoShell.executeCommand(commandName = "scr:enable com.liferay.fragment.collection.filter.tags.FragmentCollectionFilterTags");
-
-			GogoShell.viewOutput(outputContent = "true");
-
-			HeadlessWebcontent.addBasicWebContent(
-				assetTagNames = "huawei",
-				content = "Wenjie M5",
-				groupName = "Test Site Name",
-				title = "Wenjie M5");
-
-			HeadlessBlog.addBlogEntry(
-				assetTagNames = "electric",
-				content = "GA8 Intelligent System",
-				groupName = "Test Site Name",
-				title = "GA8 Intelligent System");
-
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentTitle = "GA8 Interior",
-				groupName = "Test Site Name",
-				mimeType = "image/jpeg",
-				sourceFileName = "Document_1.jpg");
-
-			JSONAssetlist.addManualAssetListEntryWithItemType(
-				groupName = "Test Site Name",
-				itemType = "All Types",
-				title = "Manual Collection");
-
-			AssetListsAdmin.openAssetListsAdmin(siteURLKey = "test-site-name");
-
-			AssetListsAdmin.editAssetList(assetListTitle = "Manual Collection");
-
-			AssetListsAdmin.selectAsset(
-				assetName = "Wenjie M5",
-				assetType = "Basic Web Content");
-
-			AssetListsAdmin.selectAsset(
-				assetName = "GA8 Intelligent System",
-				assetType = "Blogs Entry");
-
-			AssetListsAdmin.selectAsset(
-				assetName = "GA8 Interior",
-				assetType = "Basic Document");
-
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name",
-				type = "content");
-
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				fragmentName = "Collection Display");
-
-			PageEditor.editCollectionDisplay(
-				assetListName = "Manual Collection",
-				fragmentName = "Collection Display");
-
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				dropTarget = "Header",
-				fragmentName = "Collection Filter",
-				targetFragmentName = "Collection Display");
-
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				dropTarget = "Header",
-				fragmentName = "Collection Filter",
-				targetFragmentName = "Collection Filter");
-
-			PageEditor.addFragmentToCollectionDisplay(
-				collectionName = "Basic Components",
-				entryTitle = "Wenjie M5",
-				fragmentName = "Heading");
-
-			PageEditorMapping.mapEditableTextToField(
-				field = "Title",
-				fragmentName = "Heading",
-				id = "element-text");
-		}
-
-		task ("When the page designer selects the Tags as filter in both Collection Filter") {
-			PageEditor.editCollectionFilter(
-				filter = "Tags",
-				fragmentName = "Collection Filter",
-				targetCollection = "Manual Collection");
-
-			PageEditor.editCollectionFilter(
-				filter = "Tags",
-				fragmentName = "Collection Filter",
-				index = 2,
-				targetCollection = "Manual Collection");
-
-			PageEditor.publish();
-		}
-
-		task ("Then the page designer filters the Collection Display by tags at view mode") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			Page.selectTagInCollectionFilter(tagName = "huawei");
-
-			AssertTextEquals(
-				key_colPosition = 1,
-				key_fragmentName = "heading",
-				key_rowPosition = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-				value1 = "Wenjie M5");
-
-			AssertElementNotPresent(
-				key_colPosition = 1,
-				key_fragmentName = "heading",
-				key_rowPosition = 2,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
-
-			Page.selectTagInCollectionFilter(
-				index = 2,
-				tagName = "electric");
-
-			AssertTextEquals.assertPartialText(
-				index = 1,
-				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
-				value1 = "No Results Found");
-
-			GogoShell.openGogoShellAdmin();
-
-			GogoShell.executeCommand(commandName = "scr:disable com.liferay.fragment.collection.filter.tags.FragmentCollectionFilterTags");
-
-			GogoShell.viewOutput(outputContent = "true");
-		}
-	}
-
-	@description = "This is a test for LPS-167949. The page designer could filter collection by contains any tags."
-	@priority = 5
-	test FilterResultsOfCollectionDisplayByContainsAnyTags {
-		property test.name.skip.portal.instance = "CollectionFilter#FilterResultsOfCollectionDisplayByContainsAnyTags";
-
-		task ("Given a page designer has a Collection Display and Collection Filter on page") {
-			GogoShell.openGogoShellAdmin();
-
-			GogoShell.executeCommand(commandName = "scr:enable com.liferay.fragment.collection.filter.tags.FragmentCollectionFilterTags");
-
-			GogoShell.viewOutput(outputContent = "true");
-
-			HeadlessWebcontent.addBasicWebContent(
-				assetTagNames = "huawei",
-				content = "Wenjie M5",
-				groupName = "Test Site Name",
-				title = "Wenjie M5");
-
-			HeadlessBlog.addBlogEntry(
-				assetTagNames = "electric",
-				content = "GA8 Intelligent System",
-				groupName = "Test Site Name",
-				title = "GA8 Intelligent System");
-
-			JSONDocument.addFileWithUploadedFile(
-				dmDocumentTitle = "GA8 Interior",
-				groupName = "Test Site Name",
-				mimeType = "image/jpeg",
-				sourceFileName = "Document_1.jpg");
-
-			JSONAssetlist.addDynamicAssetListEntryWithItemType(
-				groupName = "Test Site Name",
-				itemType = "All Types",
-				title = "Dynamic Collection");
-
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name",
-				type = "content");
-
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				fragmentName = "Collection Display");
-
-			PageEditor.editCollectionDisplay(
-				assetListName = "Dynamic Collection",
-				fragmentName = "Collection Display");
-
-			PageEditor.addFragment(
-				collectionName = "Content Display",
-				dropTarget = "Header",
-				fragmentName = "Collection Filter",
-				targetFragmentName = "Collection Display");
-
-			PageEditor.addFragmentToCollectionDisplay(
-				collectionName = "Basic Components",
-				entryTitle = "Wenjie M5",
-				fragmentName = "Heading");
-
-			PageEditorMapping.mapEditableTextToField(
-				field = "Title",
-				fragmentName = "Heading",
-				id = "element-text");
-		}
-
-		task ("When the page designer selects the Tags as filter in Collection Filter") {
-			PageEditor.editCollectionFilter(
-				filter = "Tags",
-				fragmentName = "Collection Filter",
-				targetCollection = "Dynamic Collection");
-		}
-
-		task ("Then the page designer sees the styles of Collection Filter") {
-			PageEditor.editCollectionFilter(
-				fragmentName = "Collection Filter",
-				showHelpText = "true");
-
-			AssertVisible(
-				helpText = "Type a comma or press enter to input a tag.",
-				index = 1,
-				locator1 = "PageEditor#COLLECTION_FILTER_HELP_TEXT");
-
-			PageEditor.editCollectionFilter(
-				fragmentName = "Collection Filter",
-				label = "Tags Filter",
-				showLabel = "true");
-
-			AssertVisible(
-				index = 1,
-				label = "Tags Filter",
-				locator1 = "PageEditor#COLLECTION_FILTER_LABEL");
-
-			Type.sendKeys(
-				index = 1,
-				locator1 = "PageEditor#COLLECTION_FILTER_TAGS_SELECTOR",
-				value1 = "huawei");
-
-			AssertTextEquals(
-				index = 1,
-				locator1 = "PageEditor#COLLECTION_FILTER_TAGS_SELECTOR",
-				value1 = "");
-
-			PageEditor.publish();
-		}
-
-		task ("When the page designer filters the Collection Display by huawei tag at view mode") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			Page.selectTagInCollectionFilter(tagName = "huawei");
-		}
-
-		task ("Then the page designer sees only the Wenjie M5 shown in Collection Display") {
-			AssertTextEquals(
-				key_colPosition = 1,
-				key_fragmentName = "heading",
-				key_rowPosition = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-				value1 = "Wenjie M5");
-
-			AssertElementNotPresent(
-				key_colPosition = 1,
-				key_fragmentName = "heading",
-				key_rowPosition = 2,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
-		}
-
-		task ("When the page designer filters the Collection Display by huawei and electric tags at view mode") {
-			Page.selectTagInCollectionFilter(tagName = "electric");
-		}
-
-		task ("Then the page designer sees only the Wenjie M5 and GA8 Intelligent System shown in Collection Display") {
-			AssertTextEquals(
-				key_colPosition = 1,
-				key_fragmentName = "heading",
-				key_rowPosition = 1,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-				value1 = "GA8 Intelligent System");
-
-			AssertTextEquals(
-				key_colPosition = 1,
-				key_fragmentName = "heading",
-				key_rowPosition = 2,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-				value1 = "Wenjie M5");
-
-			AssertElementNotPresent(
-				key_colPosition = 1,
-				key_fragmentName = "heading",
-				key_rowPosition = 3,
-				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
-
-			GogoShell.openGogoShellAdmin();
-
-			GogoShell.executeCommand(commandName = "scr:disable com.liferay.fragment.collection.filter.tags.FragmentCollectionFilterTags");
-
-			GogoShell.viewOutput(outputContent = "true");
-		}
-	}
-
 	@description = "This is a test for LPS-113926. The user can filter collection items in Collection Display by keywords."
-	@priority = 5
+	@priority = "5"
 	test FilterResultsOfCollectionDisplayByKeywords {
 		property portal.acceptance = "true";
 
@@ -1148,7 +847,7 @@ definition {
 		}
 
 		task ("Publish the page") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the Collection Filter doesn't appear at view mode") {
@@ -1157,7 +856,7 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertElementNotPresent(
-				index = 1,
+				index = "1",
 				locator1 = "PageEditor#COLLECTION_FILTER_SEARCH_FIELD");
 		}
 
@@ -1172,25 +871,33 @@ definition {
 		}
 
 		task ("Filter results of Collection Display by keywords at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var content : list "AirPods,LeBron VIII,Levis 501") {
-				ContentPages.viewFragmentTextInCollectionDisplay(
-					row = ${n},
-					text = ${content});
+				AssertVisible(
+					key_colPosition = "1",
+					key_entryContent = "${content}",
+					key_rowPosition = "${n}",
+					locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 				var n = ${n} + 1;
 			}
 
 			Page.searchInCollectionFilter(searchTerm = "Levis");
 
-			ContentPages.viewFragmentTextInCollectionDisplay(text = "Levis 501");
+			AssertVisible(
+				key_colPosition = "1",
+				key_entryContent = "Levis 501",
+				key_rowPosition = "1",
+				locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Filter results of Collection Display by keywords at View mode") {
@@ -1198,24 +905,30 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var content : list "AirPods,LeBron VIII,Levis 501") {
-				ContentPages.viewFragmentTextInCollectionDisplay(
-					row = ${n},
-					text = ${content});
+				AssertVisible(
+					key_colPosition = "1",
+					key_entryContent = "${content}",
+					key_rowPosition = "${n}",
+					locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 				var n = ${n} + 1;
 			}
 
 			Page.searchInCollectionFilter(searchTerm = "LeBron");
 
-			ContentPages.viewFragmentTextInCollectionDisplay(text = "LeBron VIII");
+			AssertVisible(
+				key_colPosition = "1",
+				key_entryContent = "LeBron VIII",
+				key_rowPosition = "1",
+				locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 		}
 	}
 
 	@description = "This is a test for LPS-113926. The user can filter collection items in Collection Display by multiple keywords."
-	@priority = 4
+	@priority = "4"
 	test FilterResultsOfCollectionDisplayByMultipleKeywords {
 		task ("Add a web content") {
 			JSONWebcontent.addWebContent(
@@ -1284,7 +997,7 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 		}
 
@@ -1292,7 +1005,7 @@ definition {
 			for (var columnNumber : list "1,2") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${columnNumber},
+					columnNumber = "${columnNumber}",
 					fragmentName = "Collection Filter",
 					navTab = "Fragments");
 			}
@@ -1301,7 +1014,7 @@ definition {
 		task ("Select the Keywords type in both Collection Filters") {
 			for (var columnNumber : list "1,2") {
 				PageEditor.editCollectionFilter(
-					columnNumber = ${columnNumber},
+					columnNumber = "${columnNumber}",
 					filter = "Keywords",
 					fragmentName = "Collection Filter",
 					targetCollection = "Dynamic Collection");
@@ -1309,44 +1022,54 @@ definition {
 		}
 
 		task ("Filter results of Collection Display by multiple keywords at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var content : list "AirPods,LeBron VIII,Levis 501") {
-				ContentPages.viewFragmentTextInCollectionDisplay(
-					row = ${n},
-					text = ${content});
+				AssertVisible(
+					key_colPosition = "1",
+					key_entryContent = "${content}",
+					key_rowPosition = "${n}",
+					locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 				var n = ${n} + 1;
 			}
 
 			Page.searchInCollectionFilter(searchTerm = "Levis");
 
-			ContentPages.viewFragmentTextInCollectionDisplay(text = "Levis 501");
+			AssertVisible(
+				key_colPosition = "1",
+				key_entryContent = "Levis 501",
+				key_rowPosition = "1",
+				locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 			Page.searchInCollectionFilter(
-				index = 2,
+				index = "2",
 				searchTerm = "AirPods");
 
-			var n = 1;
+			var n = "1";
 
 			for (var content : list "AirPods,Levis 501") {
-				ContentPages.viewFragmentTextInCollectionDisplay(
-					row = ${n},
-					text = ${content});
+				AssertVisible(
+					key_colPosition = "1",
+					key_entryContent = "${content}",
+					key_rowPosition = "${n}",
+					locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 				var n = ${n} + 1;
 			}
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
-				key_rowPosition = 3,
+				key_colPosition = "1",
+				key_rowPosition = "3",
 				locator1 = "PageEditor#COLLECTION_ITEM");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Filter results of Collection Display by multiple keywords at View mode") {
@@ -1354,43 +1077,51 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var content : list "AirPods,LeBron VIII,Levis 501") {
-				ContentPages.viewFragmentTextInCollectionDisplay(
-					row = ${n},
-					text = ${content});
+				AssertVisible(
+					key_colPosition = "1",
+					key_entryContent = "${content}",
+					key_rowPosition = "${n}",
+					locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 				var n = ${n} + 1;
 			}
 
 			Page.searchInCollectionFilter(searchTerm = "VIII");
 
-			ContentPages.viewFragmentTextInCollectionDisplay(text = "LeBron VIII");
+			AssertVisible(
+				key_colPosition = "1",
+				key_entryContent = "LeBron VIII",
+				key_rowPosition = "1",
+				locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 			Page.searchInCollectionFilter(
-				index = 2,
+				index = "2",
 				searchTerm = "Levis");
 
-			var n = 1;
+			var n = "1";
 
 			for (var content : list "LeBron VIII,Levis 501") {
-				ContentPages.viewFragmentTextInCollectionDisplay(
-					row = ${n},
-					text = ${content});
+				AssertVisible(
+					key_colPosition = "1",
+					key_entryContent = "${content}",
+					key_rowPosition = "${n}",
+					locator1 = "Fragment#CONTENT_DISPLAY_FRAGMENT_CONTENT");
 
 				var n = ${n} + 1;
 			}
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
-				key_rowPosition = 3,
+				key_colPosition = "1",
+				key_rowPosition = "3",
 				locator1 = "PageEditor#COLLECTION_ITEM");
 		}
 	}
 
 	@description = "This is a test for LPS-124226. Can filter the results of a collection page based on dynamic collection via selecting multiple categories in multiple filters."
-	@priority = 5
+	@priority = "5"
 	test FilterResultsOfCollectionPageBasedOnDynamicCollectionByContainsAllCategories {
 		property portal.acceptance = "true";
 
@@ -1398,7 +1129,7 @@ definition {
 			for (var title : list "Vocabulary A,Vocabulary B") {
 				JSONCategory.addVocabulary(
 					groupName = "Test Site Name",
-					title = ${title});
+					title = "${title}");
 			}
 		}
 
@@ -1418,7 +1149,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with Category A") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryAId},
+				assetCategoryIds = "${categoryAId}",
 				content = "Web Content Content With Category A",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Category A");
@@ -1434,7 +1165,7 @@ definition {
 
 		task ("Add a blogs entry with Category A") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${categoryAId},
+				assetCategoryIds = "${categoryAId}",
 				content = "Blogs Entry Content With Category A",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Category A");
@@ -1450,7 +1181,7 @@ definition {
 
 		task ("Add a document with Category A") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${categoryAId},
+				assetCategoryIds = "${categoryAId}",
 				dmDocumentTitle = "Document Title With Category A",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -1474,9 +1205,9 @@ definition {
 		}
 
 		task ("Add a collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -1486,9 +1217,9 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				maxNumberOfItemsToDisplay = 6,
-				selectedName = "Dynamic Collection",
-				styleDisplay = "Inline List");
+				listStyle = "Inline List",
+				maxNumberOfItems = "6",
+				selectedName = "Dynamic Collection");
 		}
 
 		task ("Add a Grid above the Container") {
@@ -1501,7 +1232,7 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 		}
 
@@ -1509,7 +1240,7 @@ definition {
 			for (var columnNumber : list "1,2") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${columnNumber},
+					columnNumber = "${columnNumber}",
 					fragmentName = "Collection Filter",
 					navTab = "Fragments");
 			}
@@ -1518,7 +1249,7 @@ definition {
 		task ("Select the Vocabulary A in Collection Filter inside first module") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Category A",
-				columnNumber = 1,
+				columnNumber = "1",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				singleSelection = "true",
@@ -1526,9 +1257,9 @@ definition {
 				vocabularyName = "Vocabulary A");
 
 			AssertTextEquals.assertPartialText(
-				key_columnNumber = 1,
-				key_elementHeader = "//div[@aria-label='Collection Filter']//div[contains(@class,'page-editor__topper__content')]",
-				key_position = 1,
+				key_columnNumber = "1",
+				key_elementHeader = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Collection Filter')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT",
 				value1 = "Vocabulary A");
 		}
@@ -1536,56 +1267,58 @@ definition {
 		task ("Select the Vocabulary B in Collection Filter inside second module and choose Multiple Selection") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Category B",
-				columnNumber = 2,
+				columnNumber = "2",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				targetCollection = "Dynamic Collection",
 				vocabularyName = "Vocabulary B");
 
 			AssertTextEquals.assertPartialText(
-				key_columnNumber = 2,
-				key_elementHeader = "//div[@aria-label='Collection Filter']//div[contains(@class,'page-editor__topper__content')]",
-				key_position = 1,
+				key_columnNumber = "2",
+				key_elementHeader = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Collection Filter')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT",
 				value1 = "Vocabulary B");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("View the order of elements inside of Container") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container-fluid-max-xl')]/div)[1]//*[contains(@data-lfr-editable-id,'element-text')][normalize-space(text())='Dynamic Collection']");
 
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container-fluid-max-xl')]/div)[2]//ul[contains(@class,'list-inline')]");
 		}
 
 		task ("View Contains All Categories works in preview modal") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Both Categories,Document Title With Category A,Blogs Entry Title With Both Categories,Blogs Entry Title With Category A,Web Content Title With Both Categories,Web Content Title With Category A") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 1,
+				columnNumber = "1",
 				filterName = "Category A",
 				selectedName = "Category A",
 				title = "Vocabulary A");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Both Categories,Document Title With Category A,Blogs Entry Title With Both Categories,Blogs Entry Title With Category A,Web Content Title With Both Categories,Web Content Title With Category A") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -1593,18 +1326,18 @@ definition {
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Category B",
-				columnNumber = 2,
+				columnNumber = "2",
 				multipleSelection = "true",
 				selectedName = "Category B",
 				title = "Vocabulary B");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Both Categories,Blogs Entry Title With Both Categories,Web Content Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -1613,12 +1346,12 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -1634,31 +1367,31 @@ definition {
 		}
 
 		task ("Assert Contains All Categories works in view mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Both Categories,Document Title With Category A,Blogs Entry Title With Both Categories,Blogs Entry Title With Category A,Web Content Title With Both Categories,Web Content Title With Category A") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 1,
+				columnNumber = "1",
 				filterName = "Category A",
 				selectedName = "Category A",
 				title = "Vocabulary A");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Both Categories,Document Title With Category A,Blogs Entry Title With Both Categories,Blogs Entry Title With Category A,Web Content Title With Both Categories,Web Content Title With Category A") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -1666,18 +1399,18 @@ definition {
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Category B",
-				columnNumber = 2,
+				columnNumber = "2",
 				multipleSelection = "true",
 				selectedName = "Category B",
 				title = "Vocabulary B");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Both Categories,Blogs Entry Title With Both Categories,Web Content Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -1686,13 +1419,13 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-124226. Can filter the results of a collection page based on dynamic collection via selecting multiple subcategories in one filter."
-	@priority = 5
+	@priority = "5"
 	test FilterResultsOfCollectionPageBasedOnDynamicCollectionByContainsAnySubcategories {
 		property portal.acceptance = "true";
 
@@ -1715,11 +1448,13 @@ definition {
 				parentCategoryName = "Category Name",
 				title = "Subcategory A",
 				vocabularyName = "Vocabulary Name");
+
 			var subcategoryBId = JSONCategory.addSubcategory(
 				groupName = "Test Site Name",
 				parentCategoryName = "Category Name",
 				title = "Subcategory B",
 				vocabularyName = "Vocabulary Name");
+
 			var subcategoryCId = JSONCategory.addSubcategory(
 				groupName = "Test Site Name",
 				parentCategoryName = "Category Name",
@@ -1736,7 +1471,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with Subcategory A") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${subcategoryAId},
+				assetCategoryIds = "${subcategoryAId}",
 				content = "Web Content Content With Subcategory",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Subcategory");
@@ -1751,7 +1486,7 @@ definition {
 
 		task ("Add a blogs entry with Subcategory B") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${subcategoryBId},
+				assetCategoryIds = "${subcategoryBId}",
 				content = "Blogs Entry Content With Subcategory",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Subcategory");
@@ -1767,7 +1502,7 @@ definition {
 
 		task ("Add a document with Subcategory C") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${subcategoryCId},
+				assetCategoryIds = "${subcategoryCId}",
 				dmDocumentTitle = "Document Title With Subcategory",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -1782,9 +1517,9 @@ definition {
 		}
 
 		task ("Add a collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -1793,7 +1528,7 @@ definition {
 		task ("Change Max Number of Items to 6") {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
-				maxNumberOfItemsToDisplay = 6,
+				maxNumberOfItems = "6",
 				selectedName = "Dynamic Collection");
 		}
 
@@ -1832,32 +1567,33 @@ definition {
 
 		task ("View the category name is shown in Collection Filter") {
 			AssertTextEquals.assertPartialText(
-				index = 1,
 				key_fragmentName = "Collection Filter",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Category Name");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("View the order of elements inside of Container") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[1]//*[contains(@data-lfr-editable-id,'element-text')][normalize-space(text())='Dynamic Collection']");
 
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[2]//div[contains(@class,'row')]");
 		}
 
 		task ("View Contains Any Subcategories works in preview modal") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Subcategory,Document Title,Blogs Entry Title With Subcategory,Blogs Entry Title,Web Content Title With Subcategory,Web Content Title") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
@@ -1869,16 +1605,16 @@ definition {
 				title = "Category Name");
 
 			AssertTextEquals(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
 				value1 = "Web Content Title With Subcategory");
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 2,
+				key_rowPosition = "2",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
 
 			Page.selectFilterInCollectionFilter(
@@ -1887,23 +1623,23 @@ definition {
 				selectedName = "2 Selected",
 				title = "Category Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Blogs Entry Title With Subcategory,Web Content Title With Subcategory") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 3,
+				key_rowPosition = "3",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
 
 			Page.selectFilterInCollectionFilter(
@@ -1912,28 +1648,28 @@ definition {
 				selectedName = "3 Selected",
 				title = "Category Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Subcategory,Blogs Entry Title With Subcategory,Web Content Title With Subcategory") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 4,
+				key_rowPosition = "4",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page at view mode") {
@@ -1949,15 +1685,15 @@ definition {
 		}
 
 		task ("View Contains Any Subcategories works at view mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Subcategory,Document Title,Blogs Entry Title With Subcategory,Blogs Entry Title,Web Content Title With Subcategory,Web Content Title") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
@@ -1969,16 +1705,16 @@ definition {
 				title = "Category Name");
 
 			AssertTextEquals(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 1,
+				key_rowPosition = "1",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
 				value1 = "Web Content Title With Subcategory");
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 2,
+				key_rowPosition = "2",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
 
 			Page.selectFilterInCollectionFilter(
@@ -1987,23 +1723,23 @@ definition {
 				selectedName = "2 Selected",
 				title = "Category Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Blogs Entry Title With Subcategory,Web Content Title With Subcategory") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 3,
+				key_rowPosition = "3",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
 
 			Page.selectFilterInCollectionFilter(
@@ -2012,29 +1748,29 @@ definition {
 				selectedName = "3 Selected",
 				title = "Category Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Subcategory,Blogs Entry Title With Subcategory,Web Content Title With Subcategory") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
 
 			AssertElementNotPresent(
-				key_colPosition = 1,
+				key_colPosition = "1",
 				key_fragmentName = "heading",
-				key_rowPosition = 4,
+				key_rowPosition = "4",
 				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY");
 		}
 	}
 
 	@description = "This is a test for LPS-124226. Can filter the results of a collection page based on dynamic collection via selecting single category."
-	@priority = 5
+	@priority = "5"
 	test FilterResultsOfCollectionPageBasedOnDynamicCollectionBySingleCategory {
 		property portal.acceptance = "true";
 
@@ -2060,7 +1796,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with category") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Web Content Content With Category",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Category");
@@ -2075,7 +1811,7 @@ definition {
 
 		task ("Add a blogs entry with category") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Blogs Entry Content With Category",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Category");
@@ -2091,7 +1827,7 @@ definition {
 
 		task ("Add a document with category") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				dmDocumentTitle = "Document Title With Category",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -2106,9 +1842,9 @@ definition {
 		}
 
 		task ("Add a collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -2118,9 +1854,9 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				maxNumberOfItemsToDisplay = 6,
-				selectedName = "Dynamic Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				maxNumberOfItems = "6",
+				selectedName = "Dynamic Collection");
 		}
 
 		task ("Add a Collection Filter above the Container") {
@@ -2143,30 +1879,31 @@ definition {
 
 		task ("View the vocabulary name shown in Collection Filter") {
 			AssertTextEquals.assertPartialText(
-				index = 1,
 				key_fragmentName = "Collection Filter",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Vocabulary Name");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("View the order of elements inside of Container") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[1]//*[contains(@data-lfr-editable-id,'element-text')][normalize-space(text())='Dynamic Collection']");
 
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[2]//ul[contains(@class,'list-group')]");
 		}
 
 		task ("View the filter works in preview modal") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Category,Document Title,Blogs Entry Title With Category,Blogs Entry Title,Web Content Title With Category,Web Content Title") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2177,13 +1914,13 @@ definition {
 				selectedName = "Category Name",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Category,Blogs Entry Title With Category,Web Content Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2192,12 +1929,12 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page at view mode") {
@@ -2213,13 +1950,13 @@ definition {
 		}
 
 		task ("View the filter works at view mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Category,Document Title,Blogs Entry Title With Category,Blogs Entry Title,Web Content Title With Category,Web Content Title") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2230,13 +1967,13 @@ definition {
 				selectedName = "Category Name",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title With Category,Blogs Entry Title With Category,Web Content Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2245,19 +1982,19 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-111807. Can filter the results of a collection page based on manual collection via selecting multiple categories in multiple filters."
-	@priority = 4
+	@priority = "4"
 	test FilterResultsOfCollectionPageBasedOnManualCollectionByContainsAllCategories {
 		task ("Add two vocabularies") {
 			for (var title : list "Vocabulary A,Vocabulary B") {
 				JSONCategory.addVocabulary(
 					groupName = "Test Site Name",
-					title = ${title});
+					title = "${title}");
 			}
 		}
 
@@ -2277,7 +2014,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with Category A") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryAId},
+				assetCategoryIds = "${categoryAId}",
 				content = "Web Content Content With Category A",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Category A");
@@ -2293,7 +2030,7 @@ definition {
 
 		task ("Add a blogs entry with Category A") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${categoryAId},
+				assetCategoryIds = "${categoryAId}",
 				content = "Blogs Entry Content With Category A",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Category A");
@@ -2309,7 +2046,7 @@ definition {
 
 		task ("Add a document with Category A") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${categoryAId},
+				assetCategoryIds = "${categoryAId}",
 				dmDocumentTitle = "Document Title With Category A",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -2339,27 +2076,27 @@ definition {
 
 			for (var assetName : list "Web Content Title With Category A,Web Content Title With Both Categories") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Web Content");
 			}
 
 			for (var assetName : list "Blogs Entry Title With Category A,Blogs Entry Title With Both Categories") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Blogs Entry");
 			}
 
 			for (var assetName : list "Document Title With Category A,Document Title With Both Categories") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Document");
 			}
 		}
 
 		task ("Add a collection page based on manual collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Manual Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -2369,9 +2106,9 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				maxNumberOfItemsToDisplay = 6,
-				selectedName = "Manual Collection",
-				styleDisplay = "Inline List");
+				listStyle = "Inline List",
+				maxNumberOfItems = "6",
+				selectedName = "Manual Collection");
 		}
 
 		task ("Add a Grid above the Container") {
@@ -2384,7 +2121,7 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 		}
 
@@ -2392,7 +2129,7 @@ definition {
 			for (var columnNumber : list "1,2") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${columnNumber},
+					columnNumber = "${columnNumber}",
 					fragmentName = "Collection Filter",
 					navTab = "Fragments");
 			}
@@ -2401,7 +2138,7 @@ definition {
 		task ("Select the Vocabulary A in Collection Filter inside first module") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Category A",
-				columnNumber = 1,
+				columnNumber = "1",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				singleSelection = "true",
@@ -2409,9 +2146,9 @@ definition {
 				vocabularyName = "Vocabulary A");
 
 			AssertTextEquals.assertPartialText(
-				key_columnNumber = 1,
-				key_elementHeader = "//div[@aria-label='Collection Filter']//div[contains(@class,'page-editor__topper__content')]",
-				key_position = 1,
+				key_columnNumber = "1",
+				key_elementHeader = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Collection Filter')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT",
 				value1 = "Vocabulary A");
 		}
@@ -2419,56 +2156,58 @@ definition {
 		task ("Select the Vocabulary B in Collection Filter inside second module and choose Multiple Selection") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Category B",
-				columnNumber = 2,
+				columnNumber = "2",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				targetCollection = "Manual Collection",
 				vocabularyName = "Vocabulary B");
 
 			AssertTextEquals.assertPartialText(
-				key_columnNumber = 2,
-				key_elementHeader = "//div[@aria-label='Collection Filter']//div[contains(@class,'page-editor__topper__content')]",
-				key_position = 1,
+				key_columnNumber = "2",
+				key_elementHeader = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Collection Filter')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT",
 				value1 = "Vocabulary B");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("Assert the order of elements inside of Container") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container-fluid-max-xl')]/div)[1]//*[contains(@data-lfr-editable-id,'element-text')][normalize-space(text())='Manual Collection']");
 
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container-fluid-max-xl')]/div)[2]//ul[contains(@class,'list-inline')]");
 		}
 
 		task ("Assert Contains All Categories works in preview mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category A,Web Content Title With Both Categories,Blogs Entry Title With Category A,Blogs Entry Title With Both Categories,Document Title With Category A,Document Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 1,
+				columnNumber = "1",
 				filterName = "Category A",
 				selectedName = "Category A",
 				title = "Vocabulary A");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category A,Web Content Title With Both Categories,Blogs Entry Title With Category A,Blogs Entry Title With Both Categories,Document Title With Category A,Document Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2476,18 +2215,18 @@ definition {
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Category B",
-				columnNumber = 2,
+				columnNumber = "2",
 				multipleSelection = "true",
 				selectedName = "Category B",
 				title = "Vocabulary B");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Both Categories,Blogs Entry Title With Both Categories,Document Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2496,12 +2235,12 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -2517,31 +2256,31 @@ definition {
 		}
 
 		task ("Assert Contains All Categories works in view mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category A,Web Content Title With Both Categories,Blogs Entry Title With Category A,Blogs Entry Title With Both Categories,Document Title With Category A,Document Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 1,
+				columnNumber = "1",
 				filterName = "Category A",
 				selectedName = "Category A",
 				title = "Vocabulary A");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category A,Web Content Title With Both Categories,Blogs Entry Title With Category A,Blogs Entry Title With Both Categories,Document Title With Category A,Document Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2549,18 +2288,18 @@ definition {
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Category B",
-				columnNumber = 2,
+				columnNumber = "2",
 				multipleSelection = "true",
 				selectedName = "Category B",
 				title = "Vocabulary B");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Both Categories,Blogs Entry Title With Both Categories,Document Title With Both Categories") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2569,13 +2308,13 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_INLINE_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-111807. Can filter the results of a collection page based on manual collection via selecting multiple categories in one filter."
-	@priority = 5
+	@priority = "5"
 	test FilterResultsOfCollectionPageBasedOnManualCollectionByContainsAnyCategories {
 		property portal.acceptance = "true";
 
@@ -2590,10 +2329,12 @@ definition {
 				groupName = "Test Site Name",
 				title = "Category A",
 				vocabularyName = "Vocabulary Name");
+
 			var categoryBId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Category B",
 				vocabularyName = "Vocabulary Name");
+
 			var categoryCId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Category C",
@@ -2609,7 +2350,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with Category A") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryAId},
+				assetCategoryIds = "${categoryAId}",
 				content = "Web Content Content With Category",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Category");
@@ -2624,7 +2365,7 @@ definition {
 
 		task ("Add a blogs entry with Category B") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${categoryBId},
+				assetCategoryIds = "${categoryBId}",
 				content = "Blogs Entry Content With Category",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Category");
@@ -2640,7 +2381,7 @@ definition {
 
 		task ("Add a document with Category C") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${categoryCId},
+				assetCategoryIds = "${categoryCId}",
 				dmDocumentTitle = "Document Title With Category",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -2661,27 +2402,27 @@ definition {
 
 			for (var assetName : list "Web Content Title,Web Content Title With Category") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Web Content");
 			}
 
 			for (var assetName : list "Blogs Entry Title,Blogs Entry Title With Category") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Blogs Entry");
 			}
 
 			for (var assetName : list "Document Title,Document Title With Category") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Document");
 			}
 		}
 
 		task ("Add a collection page based on manual collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Manual Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -2691,9 +2432,9 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				maxNumberOfItemsToDisplay = 6,
-				selectedName = "Manual Collection",
-				styleDisplay = "Bulleted List");
+				listStyle = "Bulleted List",
+				maxNumberOfItems = "6",
+				selectedName = "Manual Collection");
 		}
 
 		task ("Add a Collection Filter above the Container") {
@@ -2715,30 +2456,31 @@ definition {
 
 		task ("Assert Vocabulary Name is shown in Collection Filter") {
 			AssertTextEquals.assertPartialText(
-				index = 1,
 				key_fragmentName = "Collection Filter",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Vocabulary Name");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("Assert the order of elements inside of Container") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[1]//*[contains(@data-lfr-editable-id,'element-text')][normalize-space(text())='Manual Collection']");
 
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[2]//ul[not(contains(@class,'list-group'))]");
 		}
 
 		task ("Assert Contains Any Categories works in preview mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title,Web Content Title With Category,Blogs Entry Title,Blogs Entry Title With Category,Document Title,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2753,13 +2495,13 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Web Content Title With Category']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 			Page.selectFilterInCollectionFilter(
@@ -2768,13 +2510,13 @@ definition {
 				selectedName = "2 Selected",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Blogs Entry Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2783,7 +2525,7 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 3,
+				key_position = "3",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 			Page.selectFilterInCollectionFilter(
@@ -2792,13 +2534,13 @@ definition {
 				selectedName = "3 Selected",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Blogs Entry Title With Category,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2807,12 +2549,12 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -2828,13 +2570,13 @@ definition {
 		}
 
 		task ("Assert Contains Any Categories works in view mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title,Web Content Title With Category,Blogs Entry Title,Blogs Entry Title With Category,Document Title,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2849,13 +2591,13 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Web Content Title With Category']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 			Page.selectFilterInCollectionFilter(
@@ -2864,13 +2606,13 @@ definition {
 				selectedName = "2 Selected",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Blogs Entry Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2879,7 +2621,7 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 3,
+				key_position = "3",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 			Page.selectFilterInCollectionFilter(
@@ -2888,13 +2630,13 @@ definition {
 				selectedName = "3 Selected",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Blogs Entry Title With Category,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -2903,13 +2645,13 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BULLETED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-111807. Can filter the results of a collection page based on manual collection via selecting single category."
-	@priority = 5
+	@priority = "5"
 	test FilterResultsOfCollectionPageBasedOnManualCollectionBySingleCategory {
 		property portal.acceptance = "true";
 
@@ -2935,7 +2677,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with category") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Web Content Content With Category",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Category");
@@ -2950,7 +2692,7 @@ definition {
 
 		task ("Add a blogs entry with category") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Blogs Entry Content With Category",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Category");
@@ -2966,7 +2708,7 @@ definition {
 
 		task ("Add a document with category") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				dmDocumentTitle = "Document Title With Category",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -2987,27 +2729,27 @@ definition {
 
 			for (var assetName : list "Web Content Title,Web Content Title With Category") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Web Content");
 			}
 
 			for (var assetName : list "Blogs Entry Title,Blogs Entry Title With Category") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Blogs Entry");
 			}
 
 			for (var assetName : list "Document Title,Document Title With Category") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Document");
 			}
 		}
 
 		task ("Add a collection page based on manual collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Manual Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -3017,9 +2759,9 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				maxNumberOfItemsToDisplay = 6,
-				selectedName = "Manual Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				maxNumberOfItems = "6",
+				selectedName = "Manual Collection");
 		}
 
 		task ("Add a Collection Filter above the Container") {
@@ -3042,30 +2784,31 @@ definition {
 
 		task ("Assert Vocabulary Name is shown in Collection Filter") {
 			AssertTextEquals.assertPartialText(
-				index = 1,
 				key_fragmentName = "Collection Filter",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Vocabulary Name");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("Assert the order of elements inside of Container") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[1]//*[contains(@data-lfr-editable-id,'element-text')][normalize-space(text())='Manual Collection']");
 
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[2]//ul[contains(@class,'list-group')]");
 		}
 
 		task ("Assert filter works in preview mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title,Web Content Title With Category,Blogs Entry Title,Blogs Entry Title With Category,Document Title,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3076,13 +2819,13 @@ definition {
 				selectedName = "Category Name",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Blogs Entry Title With Category,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3091,12 +2834,12 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -3112,13 +2855,13 @@ definition {
 		}
 
 		task ("Assert filter works in view mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title,Web Content Title With Category,Blogs Entry Title,Blogs Entry Title With Category,Document Title,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3129,13 +2872,13 @@ definition {
 				selectedName = "Category Name",
 				title = "Vocabulary Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Blogs Entry Title With Category,Document Title With Category") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3144,13 +2887,13 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-111807. Can filter the results of a collection page based on manual collection with via selecting subcategories from Global site."
-	@priority = 4
+	@priority = "4"
 	test FilterResultsOfCollectionPageBasedOnManualCollectionBySubcategoryFromGlobalSite {
 		task ("Add a category in Topic from Global site") {
 			var categoryId = JSONCategory.addCategory(
@@ -3169,7 +2912,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with category") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Web Content Content With Category",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Category");
@@ -3177,7 +2920,7 @@ definition {
 
 		task ("Add a web content based on Basic Web Content with subcategory") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${subcategoryId},
+				assetCategoryIds = "${subcategoryId}",
 				content = "Web Content Content With Subcategory",
 				groupName = "Test Site Name",
 				title = "Web Content Title With Subcategory");
@@ -3185,7 +2928,7 @@ definition {
 
 		task ("Add a blogs entry with category") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				content = "Blogs Entry Content With Category",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Category");
@@ -3193,7 +2936,7 @@ definition {
 
 		task ("Add a blogs entry with subcategory") {
 			HeadlessBlog.addBlogEntry(
-				assetCategoryIds = ${subcategoryId},
+				assetCategoryIds = "${subcategoryId}",
 				content = "Blogs Entry Content With Subcategory",
 				groupName = "Test Site Name",
 				title = "Blogs Entry Title With Subcategory");
@@ -3201,7 +2944,7 @@ definition {
 
 		task ("Add a document with category") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${categoryId},
+				assetCategoryIds = "${categoryId}",
 				dmDocumentTitle = "Document Title With Category",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -3210,7 +2953,7 @@ definition {
 
 		task ("Add a document with subcategory") {
 			JSONDocument.addFileWithUploadedFile(
-				assetCategoryIds = ${subcategoryId},
+				assetCategoryIds = "${subcategoryId}",
 				dmDocumentTitle = "Document Title With Subcategory",
 				groupName = "Test Site Name",
 				mimeType = "image/jpeg",
@@ -3231,27 +2974,27 @@ definition {
 
 			for (var assetName : list "Web Content Title With Category,Web Content Title With Subcategory") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Web Content");
 			}
 
 			for (var assetName : list "Blogs Entry Title With Category,Blogs Entry Title With Subcategory") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Blogs Entry");
 			}
 
 			for (var assetName : list "Document Title With Category,Document Title With Subcategory") {
 				AssetListsAdmin.selectAsset(
-					assetName = ${assetName},
+					assetName = "${assetName}",
 					assetType = "Basic Document");
 			}
 		}
 
 		task ("Add a collection page based on manual collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Manual Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -3261,9 +3004,9 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				maxNumberOfItemsToDisplay = 6,
-				selectedName = "Manual Collection",
-				styleDisplay = "Numbered List");
+				listStyle = "Numbered List",
+				maxNumberOfItems = "6",
+				selectedName = "Manual Collection");
 		}
 
 		task ("Add a Collection Filter above the Container") {
@@ -3288,30 +3031,31 @@ definition {
 
 		task ("Assert Category Name is shown in Collection Filter") {
 			AssertTextEquals.assertPartialText(
-				index = 1,
 				key_fragmentName = "Collection Filter",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Category Name");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("Assert the order of elements inside of Container") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[1]//*[contains(@data-lfr-editable-id,'element-text')][normalize-space(text())='Manual Collection']");
 
 			AssertVisible(locator1 = "xpath=(//div[contains(@class,'layout-content')]//div[contains(@class,'container')]/div)[2]//ol");
 		}
 
 		task ("Assert filter works in preview mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Web Content Title With Subcategory,Blogs Entry Title With Category,Blogs Entry Title With Subcategory,Document Title With Category,Document Title With Subcategory") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_NUMBERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3322,13 +3066,13 @@ definition {
 				selectedName = "Subcategory Name",
 				title = "Category Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Subcategory,Blogs Entry Title With Subcategory,Document Title With Subcategory") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_NUMBERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3337,12 +3081,12 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_NUMBERED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -3358,13 +3102,13 @@ definition {
 		}
 
 		task ("Assert filter works in view mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Category,Web Content Title With Subcategory,Blogs Entry Title With Category,Blogs Entry Title With Subcategory,Document Title With Category,Document Title With Subcategory") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_NUMBERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3375,13 +3119,13 @@ definition {
 				selectedName = "Subcategory Name",
 				title = "Category Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Web Content Title With Subcategory,Blogs Entry Title With Subcategory,Document Title With Subcategory") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_NUMBERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3390,20 +3134,20 @@ definition {
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 4,
+				key_position = "4",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_NUMBERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-131947. The user could view a warning info in Collection Filter fragment when no collection in page. Can filter different Collection Displays by different Collection Filters."
-	@priority = 4
+	@priority = "4"
 	test FilterResultsOfMultipleCollectionDisplaysByMultipleCollectionFilters {
 		task ("Add three web contents") {
 			for (var style : list "501,510,512") {
 				JSONWebcontent.addWebContent(
-					content = ${style},
+					content = "${style}",
 					groupName = "Test Site Name",
-					title = ${style});
+					title = "${style}");
 			}
 		}
 
@@ -3450,7 +3194,7 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 		}
 
@@ -3458,7 +3202,7 @@ definition {
 			for (var n : list "1,2") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${n},
+					columnNumber = "${n}",
 					fragmentName = "Collection Filter",
 					navTab = "Fragments");
 			}
@@ -3466,12 +3210,12 @@ definition {
 
 		task ("View the alert info shown in General panel of Collection Filter") {
 			PageEditor.editCollectionFilter(
-				columnNumber = 1,
+				columnNumber = "1",
 				fragmentName = "Collection Filter");
 
 			AssertTextEquals(
 				locator1 = "PageEditor#ITEM_CONFIGURATION_ALERT_INFO",
-				value1 = "Display a collection on the page that supports at least one filter type.");
+				value1 = "Display a collection on the page that support at least one filter type.");
 		}
 
 		task ("Add the second Grid below the first one") {
@@ -3483,19 +3227,19 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General",
-				position = 2);
+				position = "2");
 		}
 
 		task ("Add one Collection Display to each module of the second Grid") {
 			for (var n : list "1,2") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${n},
+					columnNumber = "${n}",
 					fragmentName = "Collection Display",
 					navTab = "Fragments",
-					position = 2);
+					position = "2");
 			}
 		}
 
@@ -3503,20 +3247,20 @@ definition {
 			PageEditor.editCollectionDisplay(
 				assetListName = "Levis",
 				fragmentName = "Collection Display",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List");
 		}
 
 		task ("Select the Tesla in the second Collection Display and Select the Bordered List as List Style") {
 			PageEditor.editCollectionDisplay(
 				assetListName = "Tesla",
 				fragmentName = "Collection Display",
-				index = 2,
-				styleDisplay = "Bordered List");
+				index = "2",
+				listStyle = "Bordered List");
 		}
 
 		task ("Select the Levis as Target Collection and Select the Keywords as Filter in the first Collection Filter") {
 			PageEditor.editCollectionFilter(
-				columnNumber = 1,
+				columnNumber = "1",
 				filter = "Keywords",
 				fragmentName = "Collection Filter",
 				targetCollection = "Levis");
@@ -3524,66 +3268,68 @@ definition {
 
 		task ("Select the Tesla as Target Collection and Select the Keywords as Filter in the second Collection Filter") {
 			PageEditor.editCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				filter = "Keywords",
 				fragmentName = "Collection Filter",
 				targetCollection = "Tesla");
 		}
 
 		task ("Filter results of multiple Collection Displays by multiple Collection Filters at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var style : list "512,510,501") {
 				AssertVisible(
 					key_entryContent = "[normalize-space()='${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			var n = 4;
+			var n = "4";
 
 			for (var style : list "S,Y,X") {
 				AssertVisible(
 					key_entryContent = "[normalize-space()='Model ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			Page.searchInCollectionFilter(searchTerm = 501);
+			Page.searchInCollectionFilter(searchTerm = "501");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space()='501']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			Page.searchInCollectionFilter(
-				index = 2,
+				index = "2",
 				searchTerm = "X");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space()='Model X']",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space()='501']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Filter results of multiple Collection Displays by multiple Collection Filters at View mode") {
@@ -3591,58 +3337,58 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "512,510,501") {
 				AssertVisible(
 					key_entryContent = "[normalize-space()='${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			var n = 4;
+			var n = "4";
 
 			for (var style : list "S,Y,X") {
 				AssertVisible(
 					key_entryContent = "[normalize-space()='Model ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			Page.searchInCollectionFilter(searchTerm = 501);
+			Page.searchInCollectionFilter(searchTerm = "501");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space()='501']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			Page.searchInCollectionFilter(
-				index = 2,
+				index = "2",
 				searchTerm = "X");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space()='Model X']",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space()='501']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-111807. The user could show the label of selected vocabulary or category in Collection Filter."
-	@priority = 5
+	@priority = "5"
 	test ShowLabelOfSelectedSource {
 		property portal.acceptance = "true";
 
@@ -3650,7 +3396,7 @@ definition {
 			for (var vocabularyName : list "Size,Color") {
 				JSONCategory.addVocabulary(
 					groupName = "Test Site Name",
-					title = ${vocabularyName});
+					title = "${vocabularyName}");
 			}
 		}
 
@@ -3659,10 +3405,12 @@ definition {
 				groupName = "Test Site Name",
 				title = "Large",
 				vocabularyName = "Size");
+
 			var mediumId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Medium",
 				vocabularyName = "Size");
+
 			var smallId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Small",
@@ -3682,11 +3430,13 @@ definition {
 				parentCategoryName = "Pure Color",
 				title = "Blue",
 				vocabularyName = "Color");
+
 			var redId = JSONCategory.addSubcategory(
 				groupName = "Test Site Name",
 				parentCategoryName = "Pure Color",
 				title = "Red",
 				vocabularyName = "Color");
+
 			var greenId = JSONCategory.addSubcategory(
 				groupName = "Test Site Name",
 				parentCategoryName = "Pure Color",
@@ -3734,9 +3484,9 @@ definition {
 		}
 
 		task ("Add a collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -3746,8 +3496,8 @@ definition {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
 				listItemStyle = "Title",
-				selectedName = "Dynamic Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				selectedName = "Dynamic Collection");
 		}
 
 		task ("Add a Grid above the Container") {
@@ -3760,14 +3510,14 @@ definition {
 
 		task ("Change Number of Modules to 2") {
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 		}
 
 		task ("Add the first Collection Filter to first module of Grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Content Display",
-				columnNumber = 1,
+				columnNumber = "1",
 				fragmentName = "Collection Filter",
 				navTab = "Fragments");
 		}
@@ -3794,14 +3544,14 @@ definition {
 		task ("Select the Size vocabulary in Collection Filter") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Large,Medium,Small",
-				columnNumber = 1,
+				columnNumber = "1",
 				fragmentName = "Collection Filter",
 				vocabularyName = "Size");
 
 			AssertTextEquals.assertPartialText(
-				key_columnNumber = 1,
-				key_elementHeader = "//div[@aria-label='Collection Filter']//div[contains(@class,'page-editor__topper__content')]",
-				key_position = 1,
+				key_columnNumber = "1",
+				key_elementHeader = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Collection Filter')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT",
 				value1 = "Size");
 		}
@@ -3815,7 +3565,7 @@ definition {
 		task ("Add the second Collection Filter to second module of Grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Content Display",
-				columnNumber = 2,
+				columnNumber = "2",
 				fragmentName = "Collection Filter",
 				navTab = "Fragments");
 		}
@@ -3824,7 +3574,7 @@ definition {
 			PageEditor.editCollectionFilter(
 				categoryName = "Pure Color",
 				categoryNameList = "Pure Color",
-				columnNumber = 2,
+				columnNumber = "2",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				singleSelection = "true",
@@ -3833,24 +3583,24 @@ definition {
 				vocabularyName = "Color");
 
 			AssertTextEquals.assertPartialText(
-				key_columnNumber = 2,
-				key_elementHeader = "//div[@aria-label='Collection Filter']//div[contains(@class,'page-editor__topper__content')]",
-				key_position = 1,
+				key_columnNumber = "2",
+				key_elementHeader = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Collection Filter')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT",
 				value1 = "Pure Color");
 		}
 
 		task ("View the source label of second Collection Filter is not shown") {
 			AssertElementPresent(
-				key_columnNumber = 2,
-				key_elementHeader = "//div[.//button[contains(@class,'dropdown-toggle')]]//label[normalize-space(text())='Pure Color'][contains(@class,'sr-only')]",
-				key_position = 1,
+				key_columnNumber = "2",
+				key_elementHeader = "//div[.//button[contains(@class,'dropdown-toggle')]]//p[contains(@class,'font-weight-semi-bold')][normalize-space(text())='Pure Color'][contains(@class,'sr-only')]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 		}
 
 		task ("Check the Show Label in the second Collection Filter") {
 			PageEditor.editCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				fragmentName = "Collection Filter",
 				selectedName = "Pure Color",
 				showLabel = "true");
@@ -3858,15 +3608,15 @@ definition {
 
 		task ("View the source label of the second Collection Filter is Pure Color") {
 			AssertElementPresent(
-				key_columnNumber = 2,
-				key_elementHeader = "//div[.//button[contains(@class,'dropdown-toggle')]]//label[normalize-space(text())='Pure Color'][not(contains(@class,'sr-only'))]",
-				key_position = 1,
+				key_columnNumber = "2",
+				key_elementHeader = "//div[.//button[contains(@class,'dropdown-toggle')]]//p[contains(@class,'font-weight-semi-bold')][normalize-space(text())='Pure Color'][not(contains(@class,'sr-only'))]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 		}
 
 		task ("Edit the source label of the second Collection Filter") {
 			PageEditor.editCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				fragmentName = "Collection Filter",
 				label = "T-shirt Color",
 				selectedName = "Pure Color");
@@ -3874,17 +3624,19 @@ definition {
 
 		task ("View the source label of the second Collection Filter is T-shirt Color") {
 			AssertElementPresent(
-				key_columnNumber = 2,
-				key_elementHeader = "//div[.//button[contains(@class,'dropdown-toggle')]]//label[normalize-space(text())='T-shirt Color'][not(contains(@class,'sr-only'))]",
-				key_position = 1,
+				key_columnNumber = "2",
+				key_elementHeader = "//div[.//button[contains(@class,'dropdown-toggle')]]//p[contains(@class,'font-weight-semi-bold')][normalize-space(text())='T-shirt Color'][not(contains(@class,'sr-only'))]",
+				key_position = "1",
 				locator1 = "PageEditor#GRID_COLUMN_NESTED_ELEMENT");
 		}
 
 		task ("Open the Preview modal") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 		}
 
 		task ("View the source label of the first Collection Filter is Size") {
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
 			AssertElementPresent(
 				locator1 = "PageEditor#COLLECTION_FILTER_SOURCE_LABEL_VISIBLE",
 				sourceLabel = "Size");
@@ -3899,13 +3651,13 @@ definition {
 		}
 
 		task ("View only the T-shirt 1, T-shirt 2 and T-shirt 4 shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "T-shirt 4,T-shirt 2,T-shirt 1") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3920,28 +3672,28 @@ definition {
 
 		task ("Select the Green in the second Collection Filter") {
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				filterName = "Green",
 				selectedName = "Green",
 				title = "T-shirt Color");
 		}
 
 		task ("View only the T-shirt 1 and T-shirt 2 shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "T-shirt 2,T-shirt 1") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -3958,20 +3710,20 @@ definition {
 
 		task ("Select the Green in the second Collection Filter") {
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				filterName = "Green",
 				selectedName = "Green",
 				title = "T-shirt Color");
 		}
 
 		task ("View only the T-shirt 1 and T-shirt 2 shown in Collection Display") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "T-shirt 2,T-shirt 1") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -3996,13 +3748,13 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='T-shirt 1']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-113926 and LPS-137722. View no results found when no matched collection items in Collection Display."
-	@priority = 4
+	@priority = "4"
 	test ViewNoResultsFoundInCollectionDisplayWhenNoMatchedCollectionItems {
 		task ("Add a vocabulary") {
 			JSONCategory.addVocabulary(
@@ -4015,6 +3767,7 @@ definition {
 				groupName = "Test Site Name",
 				title = "SUV",
 				vocabularyName = "Type");
+
 			var carId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Car",
@@ -4023,14 +3776,14 @@ definition {
 			for (var title : list "Trunk,Hatchback") {
 				JSONCategory.addCategory(
 					groupName = "Test Site Name",
-					title = ${title},
+					title = "${title}",
 					vocabularyName = "Type");
 			}
 		}
 
 		task ("Add the first web content with Car") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${carId},
+				assetCategoryIds = "${carId}",
 				content = "Tesla Model X",
 				groupName = "Test Site Name",
 				title = "Tesla Model X");
@@ -4038,7 +3791,7 @@ definition {
 
 		task ("Add the second web content with SUV") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${suvId},
+				assetCategoryIds = "${suvId}",
 				content = "Tesla Model Y",
 				groupName = "Test Site Name",
 				title = "Tesla Model Y");
@@ -4046,7 +3799,7 @@ definition {
 
 		task ("Add the third web content with Car") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${carId},
+				assetCategoryIds = "${carId}",
 				content = "Tesla Model 3",
 				groupName = "Test Site Name",
 				title = "Tesla Model 3");
@@ -4112,17 +3865,19 @@ definition {
 		}
 
 		task ("View No Results Found in Collection Dipslay when search Toyota at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var title : list "Tesla Model 3,Tesla Model Y,Tesla Model X") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
@@ -4130,13 +3885,18 @@ definition {
 			Page.searchInCollectionFilter(searchTerm = "Toyota");
 
 			AssertTextEquals.assertPartialText(
-				index = 1,
+				index = "2",
 				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
 				value1 = "No Results Found");
 
-			Close.closeWindow();
+			AssertTextEquals.assertPartialText(
+				index = "2",
+				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
+				value1 = "Sorry, no results were found.");
 
-			PageEditor.publish();
+			IFrame.closeFrame();
+
+			PageEditor.clickPublish();
 		}
 
 		task ("View No Results Found in Collection Dipslay when search BMW at View mode") {
@@ -4144,15 +3904,15 @@ definition {
 				pageName = "Test Page Name 1",
 				siteName = "Test Site Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Tesla Model 3,Tesla Model Y,Tesla Model X") {
 				AssertTextEquals(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_fragmentName = "heading",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "Fragment#CONTRIBUTED_FRAGMENT_INLINE_CONTENT_IN_COLLECTION_DISPLAY",
-					value1 = ${title});
+					value1 = "${title}");
 
 				var n = ${n} + 1;
 			}
@@ -4160,9 +3920,14 @@ definition {
 			Page.searchInCollectionFilter(searchTerm = "BMW");
 
 			AssertTextEquals.assertPartialText(
-				index = 1,
+				index = "2",
 				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
 				value1 = "No Results Found");
+
+			AssertTextEquals.assertPartialText(
+				index = "2",
+				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
+				value1 = "Sorry, no results were found.");
 		}
 
 		task ("Add the second content page") {
@@ -4186,7 +3951,7 @@ definition {
 			PageEditor.editCollectionDisplay(
 				assetListName = "Dynamic Collection",
 				fragmentName = "Collection Display",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List");
 		}
 
 		task ("Add a Collection Filter above the Collection Display") {
@@ -4207,15 +3972,17 @@ definition {
 		}
 
 		task ("View No Results Found in Collection Dipslay when select Trunk at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var title : list "Tesla Model 3,Tesla Model Y,Tesla Model X") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -4228,13 +3995,18 @@ definition {
 				title = "Type");
 
 			AssertTextEquals.assertPartialText(
-				index = 1,
+				index = "2",
 				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
 				value1 = "No Results Found");
 
-			Close.closeWindow();
+			AssertTextEquals.assertPartialText(
+				index = "2",
+				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
+				value1 = "Sorry, no results were found.");
 
-			PageEditor.publish();
+			IFrame.closeFrame();
+
+			PageEditor.clickPublish();
 		}
 
 		task ("View No Results Found in Collection Dipslay when select Hatchback at View mode") {
@@ -4242,13 +4014,13 @@ definition {
 				pageName = "Test Page Name 2",
 				siteName = "Test Site Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Tesla Model 3,Tesla Model Y,Tesla Model X") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -4261,9 +4033,14 @@ definition {
 				title = "Type");
 
 			AssertTextEquals.assertPartialText(
-				index = 1,
+				index = "2",
 				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
 				value1 = "No Results Found");
+
+			AssertTextEquals.assertPartialText(
+				index = "2",
+				locator1 = "PageEditor#COLLECTION_DISPLAY_EMPTY_STATE",
+				value1 = "Sorry, no results were found.");
 		}
 	}
 

@@ -14,7 +14,6 @@
 
 package com.liferay.layout.seo.service.impl;
 
-import com.liferay.layout.seo.exception.NoSuchSiteException;
 import com.liferay.layout.seo.model.LayoutSEOSite;
 import com.liferay.layout.seo.service.base.LayoutSEOSiteLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
@@ -25,7 +24,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -44,22 +42,8 @@ public class LayoutSEOSiteLocalServiceImpl
 	extends LayoutSEOSiteLocalServiceBaseImpl {
 
 	@Override
-	public void deleteLayoutSEOSite(String uuid, long groupId)
-		throws NoSuchSiteException {
-
-		layoutSEOSitePersistence.removeByUUID_G(uuid, groupId);
-	}
-
-	@Override
 	public LayoutSEOSite fetchLayoutSEOSiteByGroupId(long groupId) {
 		return layoutSEOSitePersistence.fetchByGroupId(groupId);
-	}
-
-	@Override
-	public List<LayoutSEOSite> getLayoutSEOSitesByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		return layoutSEOSitePersistence.findByUuid_C(uuid, companyId);
 	}
 
 	@Override

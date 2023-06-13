@@ -19,10 +19,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.PortletPreferences;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
-import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
-import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import org.osgi.service.component.annotations.Component;
@@ -31,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class SubscriptionPortletPreferencesModelListener
 	extends BaseModelListener<PortletPreferences> {
 
@@ -46,58 +42,26 @@ public class SubscriptionPortletPreferencesModelListener
 		}
 
 		try {
-			if (!CopyLayoutThreadLocal.isCopyLayout()) {
-				_subscriptionLocalService.deleteSubscriptions(
-					portletPreferences.getCompanyId(),
-					portletPreferences.getModelClassName(),
-					portletPreferences.getPortletPreferencesId());
-
-				return;
-			}
-
-			TransactionCommitCallbackUtil.registerCallback(
-				() -> {
-					PortletPreferences remainingPortletPreferences =
-						_portletPreferencesLocalService.fetchPortletPreferences(
-							portletPreferences.getOwnerId(),
-							portletPreferences.getOwnerType(),
-							portletPreferences.getPlid(),
-							portletPreferences.getPortletId());
-
-					if (remainingPortletPreferences == null) {
-						_subscriptionLocalService.deleteSubscriptions(
-							portletPreferences.getCompanyId(),
-							portletPreferences.getModelClassName(),
-							portletPreferences.getPortletPreferencesId());
-
-						return null;
-					}
-
-					_subscriptionLocalService.updateSubscriptions(
-						remainingPortletPreferences.getCompanyId(),
-						_classNameLocalService.getClassNameId(
-							remainingPortletPreferences.getModelClassName()),
-						portletPreferences.getPortletPreferencesId(),
-						remainingPortletPreferences.getPortletPreferencesId());
-
-					return null;
-				});
+			_subscriptionLocalService.deleteSubscriptions(
+				portletPreferences.getCompanyId(),
+				portletPreferences.getModelClassName(),
+				portletPreferences.getPortletPreferencesId());
 		}
 		catch (Exception exception) {
 			_log.error("Unable to delete subscriptions", exception);
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setSubscriptionLocalService(
+		SubscriptionLocalService subscriptionLocalService) {
+
+		_subscriptionLocalService = subscriptionLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		SubscriptionPortletPreferencesModelListener.class);
 
-	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private PortletPreferencesLocalService _portletPreferencesLocalService;
-
-	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
 
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.asset.util;
 
-import com.liferay.asset.kernel.configuration.provider.AssetCategoryConfigurationProviderUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyConstants;
@@ -34,12 +33,13 @@ import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.StringQuery;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,6 +87,27 @@ public class AssetSearcher extends BaseSearcher {
 		throws Exception {
 
 		queryBooleanFilter.addTerm(field, "-1", BooleanClauseOccur.MUST);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchAllCategories(BooleanFilter queryBooleanFilter)
+		throws Exception {
+
+		addSearchAllCategories(queryBooleanFilter, Field.ASSET_CATEGORY_IDS);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchAllCategories(
+			BooleanFilter queryBooleanFilter, String fieldNamesArray)
+		throws Exception {
+
+		_addSearchAllCategories(queryBooleanFilter, fieldNamesArray);
 	}
 
 	protected void addSearchAllKeywords(BooleanFilter queryBooleanFilter)
@@ -141,6 +162,27 @@ public class AssetSearcher extends BaseSearcher {
 
 		queryBooleanFilter.add(
 			tagIdsArrayBooleanFilter, BooleanClauseOccur.MUST);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchAnyCategories(BooleanFilter queryBooleanFilter)
+		throws Exception {
+
+		addSearchAllCategories(queryBooleanFilter, Field.ASSET_CATEGORY_IDS);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchAnyCategories(
+			BooleanFilter queryBooleanFilter, String fieldNamesArray)
+		throws Exception {
+
+		_addSearchAnyCategories(queryBooleanFilter, fieldNamesArray);
 	}
 
 	protected void addSearchAnyKeywords(BooleanFilter queryBooleanFilter)
@@ -251,6 +293,27 @@ public class AssetSearcher extends BaseSearcher {
 		}
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchNotAllCategories(BooleanFilter queryBooleanFilter)
+		throws Exception {
+
+		addSearchNotAllCategories(queryBooleanFilter, Field.ASSET_CATEGORY_IDS);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchNotAllCategories(
+			BooleanFilter queryBooleanFilter, String fieldNamesArray)
+		throws Exception {
+
+		_addSearchNotAllCategories(queryBooleanFilter, fieldNamesArray);
+	}
+
 	protected void addSearchNotAllKeywords(BooleanFilter queryBooleanFilter)
 		throws Exception {
 
@@ -303,6 +366,27 @@ public class AssetSearcher extends BaseSearcher {
 
 		queryBooleanFilter.add(
 			tagIdsArrayBooleanFilter, BooleanClauseOccur.MUST_NOT);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchNotAnyCategories(BooleanFilter queryBooleanFilter)
+		throws Exception {
+
+		addSearchNotAnyCategories(queryBooleanFilter, Field.ASSET_CATEGORY_IDS);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void addSearchNotAnyCategories(
+			BooleanFilter queryBooleanFilter, String fieldNamesArray)
+		throws Exception {
+
+		_addSearchNotAnyCategories(queryBooleanFilter, fieldNamesArray);
 	}
 
 	protected void addSearchNotAnyKeywords(BooleanFilter queryBooleanFilter)
@@ -396,8 +480,17 @@ public class AssetSearcher extends BaseSearcher {
 				continue;
 			}
 
+			long[] filteredAllCategoryIds = AssetUtil.filterCategoryIds(
+				PermissionThreadLocal.getPermissionChecker(), allCategoryIds);
+
+			if (allCategoryIds.length != filteredAllCategoryIds.length) {
+				addImpossibleTerm(queryBooleanFilter, fieldName);
+
+				continue;
+			}
+
 			queryBooleanFilter.add(
-				_getCategoryIdsBooleanFilter(fieldName, allCategoryIds),
+				_getCategoryIdsBooleanFilter(fieldName, filteredAllCategoryIds),
 				BooleanClauseOccur.MUST);
 		}
 	}
@@ -416,8 +509,20 @@ public class AssetSearcher extends BaseSearcher {
 				continue;
 			}
 
+			long[] filteredAnyCategoryIds = AssetUtil.filterCategoryIds(
+				PermissionThreadLocal.getPermissionChecker(), anyCategoryIds);
+
+			filteredAnyCategoryIds = _filterCategoryIdsByVisibilityType(
+				filteredAnyCategoryIds, fieldName);
+
+			if (filteredAnyCategoryIds.length == 0) {
+				addImpossibleTerm(queryBooleanFilter, fieldName);
+
+				continue;
+			}
+
 			categoryIdsQueryBooleanFilter.add(
-				_getCategoryIdsTermsFilter(fieldName, anyCategoryIds),
+				_getCategoryIdsTermsFilter(fieldName, filteredAnyCategoryIds),
 				BooleanClauseOccur.SHOULD);
 		}
 
@@ -519,9 +624,7 @@ public class AssetSearcher extends BaseSearcher {
 		for (long categoryId : filteredCategoryIds) {
 			List<Long> categoryIds = new ArrayList<>();
 
-			if (AssetCategoryConfigurationProviderUtil.isSearchHierarchical(
-					CompanyThreadLocal.getCompanyId())) {
-
+			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
 				categoryIds.addAll(
 					AssetCategoryLocalServiceUtil.getSubcategoryIds(
 						categoryId));
@@ -551,9 +654,7 @@ public class AssetSearcher extends BaseSearcher {
 		for (long categoryId : filteredCategoryIds) {
 			List<Long> categoryIds = new ArrayList<>();
 
-			if (AssetCategoryConfigurationProviderUtil.isSearchHierarchical(
-					CompanyThreadLocal.getCompanyId())) {
-
+			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
 				categoryIds.addAll(
 					AssetCategoryLocalServiceUtil.getSubcategoryIds(
 						categoryId));

@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Matthew Kong
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + MicroblogsPortletKeys.MICROBLOGS,
 	service = AssetRendererFactory.class
 )
@@ -83,7 +84,21 @@ public class MicroblogsEntryAssetRendererFactory
 			permissionChecker, classPK, actionId);
 	}
 
-	@Reference
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.microblogs.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMicroblogsEntryLocalService(
+		MicroblogsEntryLocalService microblogsEntryLocalService) {
+
+		_microblogsEntryLocalService = microblogsEntryLocalService;
+	}
+
 	private MicroblogsEntryLocalService _microblogsEntryLocalService;
 
 	@Reference(
@@ -92,7 +107,6 @@ public class MicroblogsEntryAssetRendererFactory
 	private ModelResourcePermission<MicroblogsEntry>
 		_microblogsEntryModelResourcePermission;
 
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.microblogs.web)")
 	private ServletContext _servletContext;
 
 }

@@ -15,10 +15,11 @@
 package com.liferay.portal.file.install.deploy.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
@@ -56,11 +57,13 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.framework.wiring.BundleRequirement;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ManagedService;
 
 /**
  * @author Matthew Tambara
@@ -87,24 +90,24 @@ public class FileInstallDeployTest {
 			_CONFIGURATION_PID.concat(".config"));
 
 		try {
-			Configuration configuration =
-				ConfigurationTestUtil.updateConfiguration(
-					_CONFIGURATION_PID,
-					() -> {
-						String content1 = StringBundler.concat(
-							_TEST_KEY, StringPool.EQUAL, StringPool.QUOTE,
-							_TEST_VALUE_1, StringPool.QUOTE);
+			_updateConfiguration(
+				() -> {
+					String content = StringBundler.concat(
+						_TEST_KEY, StringPool.EQUAL, StringPool.QUOTE,
+						_TEST_VALUE_1, StringPool.QUOTE);
 
-						Files.write(path, content1.getBytes());
-					});
+					Files.write(path, content.getBytes());
+				});
+
+			Configuration configuration = _configurationAdmin.getConfiguration(
+				_CONFIGURATION_PID, StringPool.QUESTION);
 
 			Dictionary<String, Object> properties =
 				configuration.getProperties();
 
 			Assert.assertEquals(_TEST_VALUE_1, properties.get(_TEST_KEY));
 
-			configuration = ConfigurationTestUtil.updateConfiguration(
-				_CONFIGURATION_PID,
+			_updateConfiguration(
 				() -> {
 					String content = StringBundler.concat(
 						_TEST_KEY, StringPool.EQUAL, StringPool.QUOTE,
@@ -117,14 +120,19 @@ public class FileInstallDeployTest {
 					file.setLastModified(file.lastModified() + 1000);
 				});
 
+			configuration = _configurationAdmin.getConfiguration(
+				_CONFIGURATION_PID, StringPool.QUESTION);
+
 			properties = configuration.getProperties();
 
 			Assert.assertEquals(_TEST_VALUE_2, properties.get(_TEST_KEY));
 
-			configuration = ConfigurationTestUtil.updateConfiguration(
-				_CONFIGURATION_PID, () -> Files.delete(path));
+			_updateConfiguration(() -> Files.delete(path));
 
-			Assert.assertNull(configuration);
+			configuration = _configurationAdmin.getConfiguration(
+				_CONFIGURATION_PID, StringPool.QUESTION);
+
+			Assert.assertNull(configuration.getProperties());
 		}
 		finally {
 			Files.deleteIfExists(path);
@@ -143,15 +151,16 @@ public class FileInstallDeployTest {
 		System.setProperty(systemTestPropertyKey, _TEST_VALUE_1);
 
 		try {
-			Configuration configuration =
-				ConfigurationTestUtil.updateConfiguration(
-					_CONFIGURATION_PID,
-					() -> {
-						String content = StringBundler.concat(
-							_TEST_KEY, "=\"${", systemTestPropertyKey, "}\"");
+			_updateConfiguration(
+				() -> {
+					String content = StringBundler.concat(
+						_TEST_KEY, "=\"${", systemTestPropertyKey, "}\"");
 
-						Files.write(path, content.getBytes());
-					});
+					Files.write(path, content.getBytes());
+				});
+
+			Configuration configuration = _configurationAdmin.getConfiguration(
+				_CONFIGURATION_PID, StringPool.QUESTION);
 
 			Dictionary<String, Object> properties =
 				configuration.getProperties();
@@ -324,8 +333,6 @@ public class FileInstallDeployTest {
 
 			jarBuilder.setFragmentHost(
 				_TEST_JAR_SYMBOLIC_NAME
-			).setImport(
-				"javax.servlet"
 			).build();
 
 			fragmentInstallCountDownLatch.await();
@@ -516,6 +523,28 @@ public class FileInstallDeployTest {
 		}
 		finally {
 			_bundleContext.removeBundleListener(bundleListener);
+		}
+	}
+
+	private void _updateConfiguration(UnsafeRunnable<Exception> runnable)
+		throws Exception {
+
+		CountDownLatch countDownLatch = new CountDownLatch(2);
+
+		ServiceRegistration<ManagedService> serviceRegistration =
+			_bundleContext.registerService(
+				ManagedService.class, props -> countDownLatch.countDown(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					Constants.SERVICE_PID, _CONFIGURATION_PID
+				).build());
+
+		try {
+			runnable.run();
+
+			countDownLatch.await();
+		}
+		finally {
+			serviceRegistration.unregister();
 		}
 	}
 

@@ -26,6 +26,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * The cache model class for representing ObjectEntry in entity cache.
@@ -83,8 +84,6 @@ public class ObjectEntryCacheModel
 		sb.append(mvccVersion);
 		sb.append(", uuid=");
 		sb.append(uuid);
-		sb.append(", externalReferenceCode=");
-		sb.append(externalReferenceCode);
 		sb.append(", objectEntryId=");
 		sb.append(objectEntryId);
 		sb.append(", groupId=");
@@ -99,6 +98,8 @@ public class ObjectEntryCacheModel
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
+		sb.append(", externalReferenceCode=");
+		sb.append(externalReferenceCode);
 		sb.append(", objectDefinitionId=");
 		sb.append(objectDefinitionId);
 		sb.append(", lastPublishDate=");
@@ -129,13 +130,6 @@ public class ObjectEntryCacheModel
 			objectEntryImpl.setUuid(uuid);
 		}
 
-		if (externalReferenceCode == null) {
-			objectEntryImpl.setExternalReferenceCode("");
-		}
-		else {
-			objectEntryImpl.setExternalReferenceCode(externalReferenceCode);
-		}
-
 		objectEntryImpl.setObjectEntryId(objectEntryId);
 		objectEntryImpl.setGroupId(groupId);
 		objectEntryImpl.setCompanyId(companyId);
@@ -160,6 +154,13 @@ public class ObjectEntryCacheModel
 		}
 		else {
 			objectEntryImpl.setModifiedDate(new Date(modifiedDate));
+		}
+
+		if (externalReferenceCode == null) {
+			objectEntryImpl.setExternalReferenceCode("");
+		}
+		else {
+			objectEntryImpl.setExternalReferenceCode(externalReferenceCode);
 		}
 
 		objectEntryImpl.setObjectDefinitionId(objectDefinitionId);
@@ -190,14 +191,17 @@ public class ObjectEntryCacheModel
 
 		objectEntryImpl.resetOriginalValues();
 
+		objectEntryImpl.setValues(_values);
+
 		return objectEntryImpl;
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
-		externalReferenceCode = objectInput.readUTF();
 
 		objectEntryId = objectInput.readLong();
 
@@ -209,6 +213,7 @@ public class ObjectEntryCacheModel
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
+		externalReferenceCode = objectInput.readUTF();
 
 		objectDefinitionId = objectInput.readLong();
 		lastPublishDate = objectInput.readLong();
@@ -218,6 +223,8 @@ public class ObjectEntryCacheModel
 		statusByUserId = objectInput.readLong();
 		statusByUserName = objectInput.readUTF();
 		statusDate = objectInput.readLong();
+
+		_values = (Map)objectInput.readObject();
 	}
 
 	@Override
@@ -229,13 +236,6 @@ public class ObjectEntryCacheModel
 		}
 		else {
 			objectOutput.writeUTF(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(externalReferenceCode);
 		}
 
 		objectOutput.writeLong(objectEntryId);
@@ -256,6 +256,13 @@ public class ObjectEntryCacheModel
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
+		if (externalReferenceCode == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(externalReferenceCode);
+		}
+
 		objectOutput.writeLong(objectDefinitionId);
 		objectOutput.writeLong(lastPublishDate);
 
@@ -271,11 +278,12 @@ public class ObjectEntryCacheModel
 		}
 
 		objectOutput.writeLong(statusDate);
+
+		objectOutput.writeObject(_values);
 	}
 
 	public long mvccVersion;
 	public String uuid;
-	public String externalReferenceCode;
 	public long objectEntryId;
 	public long groupId;
 	public long companyId;
@@ -283,11 +291,13 @@ public class ObjectEntryCacheModel
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
+	public String externalReferenceCode;
 	public long objectDefinitionId;
 	public long lastPublishDate;
 	public int status;
 	public long statusByUserId;
 	public String statusByUserName;
 	public long statusDate;
+	public Map _values;
 
 }

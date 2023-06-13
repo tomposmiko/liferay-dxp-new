@@ -55,7 +55,7 @@ public class CMISRepositoryUtil {
 			Validator.isNull(
 				typeSettingsUnicodeProperties.getProperty(typeSettingsKey))) {
 
-			Repository cmisRepository = _getCMISRepository(parameters);
+			Repository cmisRepository = getCMISRepository(parameters);
 
 			typeSettingsUnicodeProperties.setProperty(
 				typeSettingsKey, cmisRepository.getId());
@@ -127,7 +127,7 @@ public class CMISRepositoryUtil {
 		return value;
 	}
 
-	private static Repository _getCMISRepository(
+	protected static Repository getCMISRepository(
 		Map<String, String> parameters) {
 
 		Thread currentThread = Thread.currentThread();

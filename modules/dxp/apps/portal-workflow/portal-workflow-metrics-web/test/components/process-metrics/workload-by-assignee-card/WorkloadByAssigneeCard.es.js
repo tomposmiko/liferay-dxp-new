@@ -37,16 +37,20 @@ describe('The workload by assignee card should', () => {
 		},
 	];
 
+	const jestMock = jest
+		.fn()
+		.mockResolvedValue({data: {items, totalCount: 2}});
+
+	const clientMock = {
+		post: jestMock,
+		request: jestMock,
+	};
+
 	afterEach(cleanup);
 
 	beforeEach(async () => {
-		fetch.mockResolvedValue({
-			json: () => Promise.resolve({items, totalCount: 2}),
-			ok: true,
-		});
-
 		const renderResult = render(
-			<MockRouter>
+			<MockRouter client={clientMock}>
 				<WorkloadByAssigneeCard routeParams={{processId: 12345}} />
 			</MockRouter>
 		);

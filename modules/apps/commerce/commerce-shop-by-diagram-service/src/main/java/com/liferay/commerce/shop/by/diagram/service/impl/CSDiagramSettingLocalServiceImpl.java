@@ -22,16 +22,15 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "model.class.name=com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting",
 	service = AopService.class
 )
@@ -44,7 +43,7 @@ public class CSDiagramSettingLocalServiceImpl
 			String color, double radius, String type)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		long csDiagramSettingId = counterLocalService.increment();
 
@@ -131,8 +130,5 @@ public class CSDiagramSettingLocalServiceImpl
 
 		return csDiagramSettingPersistence.update(csDiagramSetting);
 	}
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

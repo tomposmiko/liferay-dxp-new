@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommerceWishListPortletKeys.COMMERCE_WISH_LIST_CONTENT,
 		"mvc.command.name=/commerce_wish_list_content/edit_commerce_wish_list_item"
@@ -45,31 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCommerceWishListItemMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceWishListItems(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchWishListItemException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-			}
-			else {
-				throw exception;
-			}
-		}
-	}
-
-	private void _deleteCommerceWishListItems(ActionRequest actionRequest)
+	protected void deleteCommerceWishListItems(ActionRequest actionRequest)
 		throws PortalException {
 
 		long[] deleteCommerceWishListItemIds = null;
@@ -92,6 +69,30 @@ public class EditCommerceWishListItemMVCActionCommand
 
 			_commerceWishListItemService.deleteCommerceWishListItem(
 				deleteCommerceWishListItemId);
+		}
+	}
+
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.DELETE)) {
+				deleteCommerceWishListItems(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchWishListItemException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+			}
+			else {
+				throw exception;
+			}
 		}
 	}
 

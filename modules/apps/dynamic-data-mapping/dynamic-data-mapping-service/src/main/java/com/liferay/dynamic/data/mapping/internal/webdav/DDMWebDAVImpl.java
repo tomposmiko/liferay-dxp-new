@@ -54,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Juan Fernández
  */
-@Component(service = DDMWebDAV.class)
+@Component(immediate = true, service = DDMWebDAV.class)
 public class DDMWebDAVImpl implements DDMWebDAV {
 
 	@Override
@@ -76,7 +76,7 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 			String definition = StringUtil.read(
 				httpServletRequest.getInputStream());
 
-			DDMForm ddmForm = _getDDMForm(definition);
+			DDMForm ddmForm = getDDMForm(definition);
 
 			DDMFormLayout ddmFormLayout = _ddm.getDefaultDDMFormLayout(ddmForm);
 
@@ -143,7 +143,7 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return HttpServletResponse.SC_FORBIDDEN;
@@ -243,7 +243,7 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 				String definition = StringUtil.read(
 					httpServletRequest.getInputStream());
 
-				DDMForm ddmForm = _getDDMForm(definition);
+				DDMForm ddmForm = getDDMForm(definition);
 
 				DDMFormLayout ddmFormLayout = _ddm.getDefaultDDMFormLayout(
 					ddmForm);
@@ -280,7 +280,7 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return HttpServletResponse.SC_FORBIDDEN;
@@ -342,7 +342,7 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 		return resource;
 	}
 
-	private DDMForm _getDDMForm(String definition) throws PortalException {
+	protected DDMForm getDDMForm(String definition) throws PortalException {
 		_ddmXML.validateXML(definition);
 
 		DDMFormDeserializerDeserializeRequest.Builder builder =
@@ -356,24 +356,51 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 		return ddmFormDeserializerDeserializeResponse.getDDMForm();
 	}
 
+	@Reference(unbind = "-")
+	protected void setDDM(DDM ddm) {
+		_ddm = ddm;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureLocalService(
+		DDMStructureLocalService ddmStructureLocalService) {
+
+		_ddmStructureLocalService = ddmStructureLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMStructureService(
+		DDMStructureService ddmStructureService) {
+
+		_ddmStructureService = ddmStructureService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateService(
+		DDMTemplateService ddmTemplateService) {
+
+		_ddmTemplateService = ddmTemplateService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMXML(DDMXML ddmXML) {
+		_ddmXML = ddmXML;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(DDMWebDAVImpl.class);
 
-	@Reference
 	private DDM _ddm;
-
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
 	private DDMStructureService _ddmStructureService;
-
-	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
-
-	@Reference
 	private DDMTemplateService _ddmTemplateService;
-
-	@Reference
 	private DDMXML _ddmXML;
 
 	@Reference(target = "(ddm.form.deserializer.type=xsd)")

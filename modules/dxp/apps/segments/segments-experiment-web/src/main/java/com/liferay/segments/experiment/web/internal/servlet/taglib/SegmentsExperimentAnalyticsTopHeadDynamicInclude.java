@@ -14,16 +14,17 @@
 
 package com.liferay.segments.experiment.web.internal.servlet.taglib;
 
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
+import com.liferay.segments.constants.SegmentsWebKeys;
 import com.liferay.segments.experiment.web.internal.constants.SegmentsExperimentWebKeys;
-import com.liferay.segments.manager.SegmentsExperienceManager;
+import com.liferay.segments.experiment.web.internal.util.SegmentsExperimentUtil;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
@@ -42,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class SegmentsExperimentAnalyticsTopHeadDynamicInclude
 	implements DynamicInclude {
 
@@ -56,32 +57,24 @@ public class SegmentsExperimentAnalyticsTopHeadDynamicInclude
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		try {
-			if (!_analyticsSettingsManager.isSiteIdSynced(
-					themeDisplay.getCompanyId(),
-					themeDisplay.getScopeGroupId())) {
+		if (!SegmentsExperimentUtil.isAnalyticsSynced(
+				themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId())) {
 
-				return;
-			}
-		}
-		catch (Exception exception) {
-			throw new IOException(exception);
+			return;
 		}
 
 		SegmentsExperiment segmentsExperiment =
 			(SegmentsExperiment)httpServletRequest.getAttribute(
 				SegmentsExperimentWebKeys.SEGMENTS_EXPERIMENT);
-
-		SegmentsExperienceManager segmentsExperienceManager =
-			new SegmentsExperienceManager(_segmentsExperienceLocalService);
+		long[] segmentsExperienceIds = GetterUtil.getLongValues(
+			httpServletRequest.getAttribute(
+				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS));
 
 		StringBundler sb = StringUtil.replaceToStringBundler(
 			_TMPL_CONTENT, "${", "}",
 			_getValues(
 				segmentsExperiment,
-				_getSegmentsExperienceKey(
-					segmentsExperienceManager.getSegmentsExperienceId(
-						httpServletRequest))));
+				_getSegmentsExperienceKey(segmentsExperienceIds)));
 
 		sb.writeTo(httpServletResponse.getWriter());
 	}
@@ -92,13 +85,15 @@ public class SegmentsExperimentAnalyticsTopHeadDynamicInclude
 			"/dynamic_include/top_head.jsp#analytics");
 	}
 
-	private String _getSegmentsExperienceKey(long segmentsExperienceId) {
-		SegmentsExperience segmentsExperience =
-			_segmentsExperienceLocalService.fetchSegmentsExperience(
-				segmentsExperienceId);
+	private String _getSegmentsExperienceKey(long[] segmentsExperienceIds) {
+		if (segmentsExperienceIds.length > 0) {
+			SegmentsExperience segmentsExperience =
+				_segmentsExperienceLocalService.fetchSegmentsExperience(
+					segmentsExperienceIds[0]);
 
-		if (segmentsExperience != null) {
-			return segmentsExperience.getSegmentsExperienceKey();
+			if (segmentsExperience != null) {
+				return segmentsExperience.getSegmentsExperienceKey();
+			}
 		}
 
 		return SegmentsExperienceConstants.KEY_DEFAULT;
@@ -132,9 +127,6 @@ public class SegmentsExperimentAnalyticsTopHeadDynamicInclude
 	private static final String _TMPL_CONTENT = StringUtil.read(
 		SegmentsExperimentAnalyticsTopHeadJSPDynamicInclude.class,
 		"analytics.tmpl");
-
-	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
 
 	@Reference
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;

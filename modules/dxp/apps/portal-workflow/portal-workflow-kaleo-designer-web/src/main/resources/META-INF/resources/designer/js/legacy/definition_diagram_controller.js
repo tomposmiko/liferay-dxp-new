@@ -12,19 +12,18 @@
 AUI.add(
 	'liferay-kaleo-designer-definition-diagram-controller',
 	() => {
-		const XMLDefinition = Liferay.KaleoDesignerXMLDefinition;
+		var XMLDefinition = Liferay.KaleoDesignerXMLDefinition;
 
-		const jsonParse = Liferay.KaleoDesignerUtils.jsonParse;
-		const serializeDefinition =
-			Liferay.KaleoDesignerXMLDefinitionSerializer;
-		const uniformRandomInt = Liferay.KaleoDesignerUtils.uniformRandomInt;
+		var jsonParse = Liferay.KaleoDesignerUtils.jsonParse;
+		var serializeDefinition = Liferay.KaleoDesignerXMLDefinitionSerializer;
+		var uniformRandomInt = Liferay.KaleoDesignerUtils.uniformRandomInt;
 
-		const FieldNormalizer = Liferay.KaleoDesignerFieldNormalizer;
+		var FieldNormalizer = Liferay.KaleoDesignerFieldNormalizer;
 
-		const DEFAULT_LANGUAGE = 'groovy';
+		var DEFAULT_LANGUAGE = 'groovy';
 
-		const DefinitionDiagramController = function (content, canvas) {
-			const instance = this;
+		var DefinitionDiagramController = function (content, canvas) {
+			var instance = this;
 
 			instance.definition = new XMLDefinition({
 				value: content,
@@ -35,9 +34,9 @@ AUI.add(
 
 		DefinitionDiagramController.prototype = {
 			_getRandomXY() {
-				const instance = this;
+				var instance = this;
 
-				const region = instance.canvas.get('region');
+				var region = instance.canvas.get('region');
 
 				return [
 					uniformRandomInt(0, region.width - 100),
@@ -46,9 +45,9 @@ AUI.add(
 			},
 
 			getConnectors() {
-				const instance = this;
+				var instance = this;
 
-				const connectors = [];
+				var connectors = [];
 
 				instance.definition.forEachField((tagName, fieldData) => {
 					fieldData.results.forEach((item1) => {
@@ -69,19 +68,19 @@ AUI.add(
 			},
 
 			getFields() {
-				const instance = this;
+				var instance = this;
 
-				const fields = [];
+				var fields = [];
 
 				instance.definition.forEachField((tagName, fieldData) => {
 					fieldData.results.forEach((item) => {
-						let type = tagName;
+						var type = tagName;
 
 						if (item.initial) {
 							type = 'start';
 						}
 
-						let metadata = jsonParse(item.metadata);
+						var metadata = jsonParse(item.metadata);
 
 						if (metadata) {
 							if (metadata.terminal) {
@@ -124,20 +123,16 @@ AUI.add(
 				return fields;
 			},
 
-			serializeDefinition(draftVersion, json) {
-				const instance = this;
-
-				const metadata = instance.definition.getAttrs([
-					'description',
-					'name',
-				]);
-
-				metadata.version =
-					draftVersion || instance.definition.get('version');
+			serializeDefinition(json) {
+				var instance = this;
 
 				return serializeDefinition(
 					instance.definition.get('xmlNamespace'),
-					metadata,
+					instance.definition.getAttrs([
+						'description',
+						'name',
+						'version',
+					]),
 					json
 				);
 			},

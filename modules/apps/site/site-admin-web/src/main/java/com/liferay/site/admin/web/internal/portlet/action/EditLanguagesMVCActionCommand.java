@@ -16,7 +16,7 @@ package com.liferay.site.admin.web.internal.portlet.action;
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.LocaleException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
 		"mvc.command.name=/site_admin/edit_languages"
@@ -82,12 +83,13 @@ public class EditLanguagesMVCActionCommand
 			formTypeSettingsUnicodeProperties.setProperty(
 				PropsKeys.LOCALES,
 				StringUtil.merge(
-					LocaleUtil.toLanguageIds(_language.getAvailableLocales())));
+					LocaleUtil.toLanguageIds(
+						LanguageUtil.getAvailableLocales())));
 
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-			User user = themeDisplay.getGuestUser();
+			User user = themeDisplay.getDefaultUser();
 
 			formTypeSettingsUnicodeProperties.setProperty(
 				"languageId", user.getLanguageId());
@@ -128,8 +130,5 @@ public class EditLanguagesMVCActionCommand
 
 	@Reference
 	private GroupService _groupService;
-
-	@Reference
-	private Language _language;
 
 }

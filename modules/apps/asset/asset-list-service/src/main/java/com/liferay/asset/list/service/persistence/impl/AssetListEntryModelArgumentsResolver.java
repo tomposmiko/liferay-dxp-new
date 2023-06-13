@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.asset.list.model.impl.AssetListEntryImpl",
-		"table.name=AssetListEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		AssetListEntryModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class AssetListEntryModelArgumentsResolver implements ArgumentsResolver {
 

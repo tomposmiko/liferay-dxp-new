@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.web.internal.facet.display.context.builder.UserSearchFacetDisplayContextBuilder;
+import com.liferay.portal.search.web.internal.facet.display.builder.UserSearchFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.user.facet.constants.UserFacetPortletKeys;
 
 import javax.portlet.PortletConfig;
@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + UserFacetPortletKeys.USER_FACET,
 	service = ConfigurationAction.class
 )
@@ -55,23 +56,21 @@ public class UserFacetPortletConfigurationAction
 			(RenderRequest)httpServletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_REQUEST);
 
-		UserSearchFacetDisplayContextBuilder
-			userSearchFacetDisplayContextBuilder =
-				_createUserSearchFacetDisplayContextBuilder(renderRequest);
+		UserSearchFacetDisplayBuilder userSearchFacetDisplayBuilder =
+			createUserSearchFacetDisplayBuilder(renderRequest);
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			userSearchFacetDisplayContextBuilder.build());
+			userSearchFacetDisplayBuilder.build());
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
 
-	private UserSearchFacetDisplayContextBuilder
-		_createUserSearchFacetDisplayContextBuilder(
-			RenderRequest renderRequest) {
+	protected UserSearchFacetDisplayBuilder createUserSearchFacetDisplayBuilder(
+		RenderRequest renderRequest) {
 
 		try {
-			return new UserSearchFacetDisplayContextBuilder(renderRequest);
+			return new UserSearchFacetDisplayBuilder(renderRequest);
 		}
 		catch (ConfigurationException configurationException) {
 			throw new RuntimeException(configurationException);

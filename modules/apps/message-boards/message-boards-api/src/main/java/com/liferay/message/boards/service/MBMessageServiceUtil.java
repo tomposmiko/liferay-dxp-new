@@ -286,14 +286,6 @@ public class MBMessageServiceUtil {
 			entryURL, themeDisplay);
 	}
 
-	public static MBMessage getMBMessageByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		return getService().getMBMessageByExternalReferenceCode(
-			externalReferenceCode, groupId);
-	}
-
 	public static MBMessage getMessage(long messageId) throws PortalException {
 		return getService().getMessage(messageId);
 	}
@@ -378,11 +370,11 @@ public class MBMessageServiceUtil {
 		getService().unsubscribeMessage(messageId);
 	}
 
-	public static MBMessage updateAnswer(
+	public static void updateAnswer(
 			long messageId, boolean answer, boolean cascade)
 		throws PortalException {
 
-		return getService().updateAnswer(messageId, answer, cascade);
+		getService().updateAnswer(messageId, answer, cascade);
 	}
 
 	public static MBMessage updateDiscussionMessage(

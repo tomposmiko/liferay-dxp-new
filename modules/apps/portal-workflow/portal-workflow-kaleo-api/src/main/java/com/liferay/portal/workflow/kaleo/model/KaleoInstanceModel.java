@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -38,8 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoInstanceModel
-	extends BaseModel<KaleoInstance>, CTModel<KaleoInstance>, GroupedModel,
-			MVCCModel, ShardedModel {
+	extends BaseModel<KaleoInstance>, GroupedModel, MVCCModel, ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -52,7 +50,6 @@ public interface KaleoInstanceModel
 	 *
 	 * @return the primary key of this kaleo instance
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -60,7 +57,6 @@ public interface KaleoInstanceModel
 	 *
 	 * @param primaryKey the primary key of this kaleo instance
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -78,22 +74,6 @@ public interface KaleoInstanceModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this kaleo instance.
-	 *
-	 * @return the ct collection ID of this kaleo instance
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this kaleo instance.
-	 *
-	 * @param ctCollectionId the ct collection ID of this kaleo instance
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the kaleo instance ID of this kaleo instance.
@@ -294,27 +274,6 @@ public interface KaleoInstanceModel
 	public void setRootKaleoInstanceTokenId(long rootKaleoInstanceTokenId);
 
 	/**
-	 * Returns the active of this kaleo instance.
-	 *
-	 * @return the active of this kaleo instance
-	 */
-	public boolean getActive();
-
-	/**
-	 * Returns <code>true</code> if this kaleo instance is active.
-	 *
-	 * @return <code>true</code> if this kaleo instance is active; <code>false</code> otherwise
-	 */
-	public boolean isActive();
-
-	/**
-	 * Sets whether this kaleo instance is active.
-	 *
-	 * @param active the active of this kaleo instance
-	 */
-	public void setActive(boolean active);
-
-	/**
 	 * Returns the class name of this kaleo instance.
 	 *
 	 * @return the class name of this kaleo instance
@@ -395,9 +354,5 @@ public interface KaleoInstanceModel
 
 	@Override
 	public KaleoInstance cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

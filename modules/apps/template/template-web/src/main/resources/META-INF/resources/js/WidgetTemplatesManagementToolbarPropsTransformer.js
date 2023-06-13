@@ -12,23 +12,19 @@
  * details.
  */
 
-import openDeleteTemplateModal from './modal/openDeleteTemplateModal';
-
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const deleteSelectedDDMTemplates = () => {
-		openDeleteTemplateModal({
-			message: Liferay.Language.get(
-				'some-of-these-templates-are-being-used-in-pages.-are-you-sure-you-want-to-delete-this'
-			),
-			multiple: true,
-			onDelete: () => {
-				const form = document.getElementById(`${portletNamespace}fm`);
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			const form = document.getElementById(`${portletNamespace}fm`);
 
-				if (form) {
-					submitForm(form);
-				}
-			},
-		});
+			if (form) {
+				submitForm(form);
+			}
+		}
 	};
 
 	return {

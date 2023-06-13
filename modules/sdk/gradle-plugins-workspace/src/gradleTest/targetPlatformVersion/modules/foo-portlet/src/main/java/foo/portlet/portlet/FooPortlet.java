@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Liferay
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.display-category=category.sample",
 		"com.liferay.portlet.instanceable=true",

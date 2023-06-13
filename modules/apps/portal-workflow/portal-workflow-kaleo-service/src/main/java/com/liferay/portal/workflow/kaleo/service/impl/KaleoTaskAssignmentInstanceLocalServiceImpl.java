@@ -18,7 +18,6 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
@@ -26,7 +25,6 @@ import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignment;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken;
 import com.liferay.portal.workflow.kaleo.service.base.KaleoTaskAssignmentInstanceLocalServiceBaseImpl;
-import com.liferay.portal.workflow.kaleo.service.persistence.KaleoInstancePersistence;
 
 import java.io.Serializable;
 
@@ -37,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -57,8 +54,7 @@ public class KaleoTaskAssignmentInstanceLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(
-			serviceContext.getGuestOrUserId());
+		User user = userLocalService.getUser(serviceContext.getGuestOrUserId());
 		Date date = new Date();
 
 		long kaleoTaskAssignmentInstanceId = counterLocalService.increment();
@@ -93,7 +89,7 @@ public class KaleoTaskAssignmentInstanceLocalServiceImpl
 			assigneeClassName.equals(User.class.getName())) {
 
 			KaleoInstance kaleoInstance =
-				_kaleoInstancePersistence.findByPrimaryKey(
+				kaleoInstancePersistence.findByPrimaryKey(
 					kaleoTaskInstanceToken.getKaleoInstanceId());
 
 			kaleoTaskAssignmentInstance.setAssigneeClassPK(
@@ -265,11 +261,5 @@ public class KaleoTaskAssignmentInstanceLocalServiceImpl
 		return kaleoTaskAssignmentInstancePersistence.
 			countByKaleoTaskInstanceTokenId(kaleoTaskInstanceTokenId);
 	}
-
-	@Reference
-	private KaleoInstancePersistence _kaleoInstancePersistence;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

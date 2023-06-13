@@ -16,7 +16,6 @@ package com.liferay.template.web.internal.webdav;
 
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.webdav.DDMWebDAV;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.webdav.BaseWebDAVStorageImpl;
@@ -24,6 +23,7 @@ import com.liferay.portal.kernel.webdav.Resource;
 import com.liferay.portal.kernel.webdav.WebDAVException;
 import com.liferay.portal.kernel.webdav.WebDAVRequest;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
+import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.template.constants.TemplatePortletKeys;
 import com.liferay.template.model.TemplateEntry;
@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lourdes Fernández Besada
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + TemplatePortletKeys.TEMPLATE,
 		"webdav.storage.token=template"
@@ -70,10 +71,10 @@ public class TemplateWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			String[] pathArray = webDAVRequest.getPathArray();
 
 			if (pathArray.length == 2) {
-				return _getFolders(webDAVRequest);
+				return getFolders(webDAVRequest);
 			}
 			else if (pathArray.length == 3) {
-				return _getTemplates(webDAVRequest);
+				return getTemplates(webDAVRequest);
 			}
 
 			return new ArrayList<>();
@@ -89,13 +90,13 @@ public class TemplateWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			webDAVRequest, getRootPath(), getToken(), 0);
 	}
 
-	private List<Resource> _getFolders(WebDAVRequest webDAVRequest) {
+	protected List<Resource> getFolders(WebDAVRequest webDAVRequest) {
 		return ListUtil.fromArray(
 			_ddmWebDAV.toResource(
 				webDAVRequest, DDMWebDAV.TYPE_TEMPLATES, getRootPath(), true));
 	}
 
-	private List<Resource> _getTemplates(WebDAVRequest webDAVRequest) {
+	protected List<Resource> getTemplates(WebDAVRequest webDAVRequest) {
 		return TransformUtil.transform(
 			ListUtil.concat(
 				_ddmTemplateLocalService.getTemplates(

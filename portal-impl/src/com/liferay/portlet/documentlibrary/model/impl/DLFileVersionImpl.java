@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,11 +61,6 @@ public class DLFileVersionImpl extends DLFileVersionBaseImpl {
 			getFileEntryId(), getVersion(), incrementCounter);
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 *             DLFileEntryTypeUtil#getDDMStructures(DLFileEntryType)}
-	 */
-	@Deprecated
 	@Override
 	public List<DDMStructure> getDDMStructures() throws PortalException {
 		DLFileEntryType dlFileEntryType =
@@ -110,7 +104,7 @@ public class DLFileVersionImpl extends DLFileVersionBaseImpl {
 				_extraSettingsUnicodeProperties.load(super.getExtraSettings());
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 
@@ -134,15 +128,6 @@ public class DLFileVersionImpl extends DLFileVersionBaseImpl {
 	@Override
 	public String getIcon() {
 		return DLUtil.getFileIcon(getExtension());
-	}
-
-	@Override
-	public String getStoreFileName() {
-		if (Validator.isNull(getStoreUUID())) {
-			return getVersion();
-		}
-
-		return getVersion() + StringPool.TILDE + getStoreUUID();
 	}
 
 	@Override

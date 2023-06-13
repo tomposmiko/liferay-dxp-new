@@ -14,11 +14,9 @@
 
 package com.liferay.object.related.models;
 
-import com.liferay.object.model.ObjectDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,8 +37,6 @@ public interface ObjectRelatedModelsProvider<T extends BaseModel<T>> {
 
 	public String getClassName();
 
-	public long getCompanyId();
-
 	public String getObjectRelationshipType();
 
 	public List<T> getRelatedModels(
@@ -51,13 +47,5 @@ public interface ObjectRelatedModelsProvider<T extends BaseModel<T>> {
 	public int getRelatedModelsCount(
 			long groupId, long objectRelationshipId, long primaryKey)
 		throws PortalException;
-
-	public default List<T> getUnrelatedModels(
-			long companyId, long groupId, ObjectDefinition objectDefinition,
-			long objectEntryId, long objectRelationshipId)
-		throws PortalException {
-
-		return new ArrayList<>();
-	}
 
 }

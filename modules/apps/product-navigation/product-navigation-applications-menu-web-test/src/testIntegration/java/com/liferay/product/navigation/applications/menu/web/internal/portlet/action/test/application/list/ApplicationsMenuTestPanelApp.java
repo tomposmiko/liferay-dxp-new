@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=100",
 		"panel.category.key=" + ApplicationsMenuTestPanelCategoryKeys.APPLICATIONS_MENU_TEST_PANEL_CATEGORY
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class ApplicationsMenuTestPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return ApplicationsMenuTestPortletKeys.APPLICATIONS_MENU_TEST_PORTLET;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + ApplicationsMenuTestPortletKeys.APPLICATIONS_MENU_TEST_PORTLET + ")"
+		target = "(javax.portlet.name=" + ApplicationsMenuTestPortletKeys.APPLICATIONS_MENU_TEST_PORTLET + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

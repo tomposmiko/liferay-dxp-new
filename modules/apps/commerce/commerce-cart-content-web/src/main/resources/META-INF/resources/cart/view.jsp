@@ -35,7 +35,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 List<CommerceOrderValidatorResult> commerceOrderValidatorResults = new ArrayList<>();
 
-Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap = commerceCartContentDisplayContext.getCommerceOrderValidatorResults();
+Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = commerceCartContentDisplayContext.getCommerceOrderValidatorResults();
 %>
 
 <liferay-ui:error exception="<%= CommerceOrderValidatorException.class %>">
@@ -85,8 +85,6 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 
 					StringJoiner stringJoiner = new StringJoiner(StringPool.COMMA);
 
-					String cpInstanceCDNURL = commerceCartContentDisplayContext.getCPInstanceCDNURL(commerceOrderItem);
-
 					if (cpInstance != null) {
 						CPDefinition cpDefinition = commerceOrderItem.getCPDefinition();
 
@@ -103,17 +101,10 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 					>
 						<span class="sticker sticker-xl">
 							<span class="sticker-overlay">
-								<c:choose>
-									<c:when test="<%= Validator.isNotNull(cpInstanceCDNURL) %>">
-										<img class="sticker-img" src="<%= cpInstanceCDNURL %>" />
-									</c:when>
-									<c:otherwise>
-										<liferay-adaptive-media:img
-											class="sticker-img"
-											fileVersion="<%= commerceCartContentDisplayContext.getCPInstanceImageFileVersion(commerceOrderItem) %>"
-										/>
-									</c:otherwise>
-								</c:choose>
+								<liferay-adaptive-media:img
+									class="sticker-img"
+									fileVersion="<%= commerceCartContentDisplayContext.getCPInstanceImageFileVersion(commerceOrderItem) %>"
+								/>
 							</span>
 						</span>
 					</liferay-ui:search-container-column-text>
@@ -129,10 +120,10 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 							<%= HtmlUtil.escape(stringJoiner.toString()) %>
 						</h6>
 
-						<c:if test="<%= !commerceOrderValidatorResultsMap.isEmpty() %>">
+						<c:if test="<%= !commerceOrderValidatorResultMap.isEmpty() %>">
 
 							<%
-							commerceOrderValidatorResults = commerceOrderValidatorResultsMap.get(commerceOrderItem.getCommerceOrderItemId());
+							commerceOrderValidatorResults = commerceOrderValidatorResultMap.get(commerceOrderItem.getCommerceOrderItemId());
 
 							for (CommerceOrderValidatorResult commerceOrderValidatorResult : commerceOrderValidatorResults) {
 							%>
@@ -229,7 +220,9 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 		</div>
 	</div>
 
-	<liferay-frontend:component
-		module="js/cart_total/view"
-	/>
+	<aui:script>
+		Liferay.after('current-order-updated', (event) => {
+			Liferay.Portlet.refresh('#p_p_id<portlet:namespace />');
+		});
+	</aui:script>
 </liferay-ddm:template-renderer>

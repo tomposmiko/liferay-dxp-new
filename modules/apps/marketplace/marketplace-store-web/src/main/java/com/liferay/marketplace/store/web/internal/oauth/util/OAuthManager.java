@@ -14,12 +14,27 @@
 
 package com.liferay.marketplace.store.web.internal.oauth.util;
 
+import com.liferay.expando.kernel.exception.DuplicateColumnNameException;
+import com.liferay.expando.kernel.exception.DuplicateTableNameException;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoValue;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.expando.kernel.service.ExpandoValueLocalService;
 import com.liferay.marketplace.store.web.internal.configuration.MarketplaceStoreWebConfigurationValues;
 import com.liferay.marketplace.store.web.internal.oauth.api.MarketplaceApi;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import org.scribe.builder.api.Api;
 import org.scribe.model.OAuthConfig;
@@ -30,11 +45,8 @@ import org.scribe.oauth.OAuthService;
 /**
  * @author Ryan Park
  */
+@Component(immediate = true, service = OAuthManager.class)
 public class OAuthManager {
-
-	public OAuthManager(ExpandoValueLocalService expandoValueLocalService) {
-		_expandoValueLocalService = expandoValueLocalService;
-	}
 
 	public void deleteAccessToken(User user) throws PortalException {
 		_expandoValueLocalService.deleteValue(
@@ -120,6 +132,107 @@ public class OAuthManager {
 			user.getUserId(), token.getToken());
 	}
 
-	private final ExpandoValueLocalService _expandoValueLocalService;
+	@Activate
+	protected void activate() {
+		_companyLocalService.forEachCompanyId(
+			companyId -> {
+				try {
+					setupExpando(companyId);
+				}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							StringBundler.concat(
+								"Unable to setup Marketplace for company ",
+								companyId, ": ", exception.getMessage()));
+					}
+				}
+			});
+	}
+
+	@Reference(unbind = "-")
+	protected void setCompanyLocalService(
+		CompanyLocalService companyLocalService) {
+
+		_companyLocalService = companyLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setExpandoColumnLocalService(
+		ExpandoColumnLocalService expandoColumnLocalService) {
+
+		_expandoColumnLocalService = expandoColumnLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setExpandoTableLocalService(
+		ExpandoTableLocalService expandoTableLocalService) {
+
+		_expandoTableLocalService = expandoTableLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setExpandoValueLocalService(
+		ExpandoValueLocalService expandoValueLocalService) {
+
+		_expandoValueLocalService = expandoValueLocalService;
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	protected void setupExpando(long companyId) throws Exception {
+		ExpandoTable table = null;
+
+		try {
+			table = _expandoTableLocalService.addTable(
+				companyId, User.class.getName(), "MP");
+		}
+		catch (DuplicateTableNameException duplicateTableNameException) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					duplicateTableNameException, duplicateTableNameException);
+			}
+
+			table = _expandoTableLocalService.getTable(
+				companyId, User.class.getName(), "MP");
+		}
+
+		try {
+			_expandoColumnLocalService.addColumn(
+				table.getTableId(), "accessSecret",
+				ExpandoColumnConstants.STRING);
+			_expandoColumnLocalService.addColumn(
+				table.getTableId(), "accessToken",
+				ExpandoColumnConstants.STRING);
+			_expandoColumnLocalService.addColumn(
+				table.getTableId(), "requestSecret",
+				ExpandoColumnConstants.STRING);
+			_expandoColumnLocalService.addColumn(
+				table.getTableId(), "requestToken",
+				ExpandoColumnConstants.STRING);
+		}
+		catch (DuplicateColumnNameException duplicateColumnNameException) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					duplicateColumnNameException, duplicateColumnNameException);
+			}
+		}
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(OAuthManager.class);
+
+	private CompanyLocalService _companyLocalService;
+	private ExpandoColumnLocalService _expandoColumnLocalService;
+	private ExpandoTableLocalService _expandoTableLocalService;
+	private ExpandoValueLocalService _expandoValueLocalService;
 
 }

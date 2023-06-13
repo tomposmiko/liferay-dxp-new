@@ -30,9 +30,6 @@ if (selUser != null) {
 portletURL.setParameter("mvcRenderCommandName", "/users_admin/edit_user");
 
 if (Validator.isNotNull(backURL)) {
-	portletDisplay.setShowBackIcon(true);
-	portletDisplay.setURLBack(backURL);
-
 	portletURL.setParameter("backURL", backURL);
 }
 %>

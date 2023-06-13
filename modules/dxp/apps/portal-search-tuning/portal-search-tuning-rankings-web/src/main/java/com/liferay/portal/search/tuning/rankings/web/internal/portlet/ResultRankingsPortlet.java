@@ -17,7 +17,6 @@ package com.liferay.portal.search.tuning.rankings.web.internal.portlet;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
@@ -43,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Filipe Oshiro
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-result-rankings",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -58,8 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ResultRankingsPortletKeys.RESULT_RANKINGS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -75,7 +74,7 @@ public class ResultRankingsPortlet extends MVCPortlet {
 				documentToRankingTranslator,
 				portal.getHttpServletRequest(renderRequest), language, portal,
 				queries, rankingIndexNameBuilder, sorts, renderRequest,
-				renderResponse, searchEngineAdapter, searchEngineInformation
+				renderResponse, searchEngineAdapter
 			).build();
 
 		renderRequest.setAttribute(
@@ -105,9 +104,6 @@ public class ResultRankingsPortlet extends MVCPortlet {
 
 	@Reference
 	protected SearchEngineAdapter searchEngineAdapter;
-
-	@Reference
-	protected SearchEngineInformation searchEngineInformation;
 
 	@Reference
 	protected SearchRequestBuilderFactory searchRequestBuilderFactory;

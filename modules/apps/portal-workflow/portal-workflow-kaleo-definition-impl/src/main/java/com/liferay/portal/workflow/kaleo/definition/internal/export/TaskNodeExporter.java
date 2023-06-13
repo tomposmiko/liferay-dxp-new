@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.workflow.kaleo.definition.Node;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.definition.Task;
 import com.liferay.portal.workflow.kaleo.definition.TaskForm;
 import com.liferay.portal.workflow.kaleo.definition.TaskFormReference;
@@ -31,13 +30,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = NodeExporter.class)
+@Component(
+	immediate = true, property = "node.type=TASK", service = NodeExporter.class
+)
 public class TaskNodeExporter extends BaseNodeExporter implements NodeExporter {
-
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.TASK;
-	}
 
 	@Override
 	protected Element createNodeElement(Element element, String namespace) {
@@ -53,12 +49,12 @@ public class TaskNodeExporter extends BaseNodeExporter implements NodeExporter {
 		exportAssignmentsElement(
 			task.getAssignments(), nodeElement, "assignments");
 
-		_exportTaskForms(task.getTaskForms(), nodeElement, "task-forms");
+		exportTaskForms(task.getTaskForms(), nodeElement, "task-forms");
 
 		exportTimersElement(task, nodeElement, "task-timers", "task-timer");
 	}
 
-	private void _exportTaskForms(
+	protected void exportTaskForms(
 		Set<TaskForm> taskForms, Element parentElement,
 		String taskFormsElementName) {
 

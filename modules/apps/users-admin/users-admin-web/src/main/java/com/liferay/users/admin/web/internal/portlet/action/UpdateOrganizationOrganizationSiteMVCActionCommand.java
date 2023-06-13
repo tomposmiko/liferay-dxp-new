@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.service.OrgLaborService;
 import com.liferay.portal.kernel.service.OrganizationService;
 import com.liferay.portal.kernel.service.PhoneService;
 import com.liferay.portal.kernel.service.WebsiteService;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
@@ -66,7 +67,7 @@ public class UpdateOrganizationOrganizationSiteMVCActionCommand
 		throws Exception {
 
 		try {
-			_updateOrganizationSite(actionRequest);
+			updateOrganizationSite(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchOrganizationException ||
@@ -82,7 +83,7 @@ public class UpdateOrganizationOrganizationSiteMVCActionCommand
 		}
 	}
 
-	private void _updateOrganizationSite(ActionRequest actionRequest)
+	protected void updateOrganizationSite(ActionRequest actionRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -110,13 +111,13 @@ public class UpdateOrganizationOrganizationSiteMVCActionCommand
 			organizationId, organization.getParentOrganizationId(),
 			organization.getName(), organization.getType(),
 			organization.getRegionId(), organization.getCountryId(),
-			organization.getStatusListTypeId(), organization.getComments(),
-			true, null, site, organization.getAddresses(), emailAddresses,
-			orgLabors, phones, websites, null);
+			organization.getStatusId(), organization.getComments(), true, null,
+			site, organization.getAddresses(), emailAddresses, orgLabors,
+			phones, websites, null);
 
 		Group organizationGroup = organization.getGroup();
 
-		if (_groupPermission.contains(
+		if (GroupPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(), organizationGroup,
 				ActionKeys.UPDATE)) {
 
@@ -141,9 +142,6 @@ public class UpdateOrganizationOrganizationSiteMVCActionCommand
 
 	@Reference
 	private EmailAddressService _emailAddressService;
-
-	@Reference
-	private GroupPermission _groupPermission;
 
 	@Reference
 	private OrganizationService _organizationService;

@@ -28,7 +28,7 @@ AUI.add(
 		 * newer layouts (ADT) sometimes only use `id`.
 		 */
 		function _getTermId(term) {
-			return term.dataset.termId || term.id;
+			return term.getAttribute('data-term-id') || term.id;
 		}
 
 		/**
@@ -91,13 +91,13 @@ AUI.add(
 			},
 
 			clearSelections(event) {
-				const form = A.one(event.target).ancestor('form');
+				var form = A.one(event.target).ancestor('form');
 
 				if (!form) {
 					return;
 				}
 
-				const selections = [];
+				var selections = [];
 
 				FacetUtil.selectTerms(form._node, selections);
 			},
@@ -109,19 +109,19 @@ AUI.add(
 			},
 
 			removeStartParameter(startParameterName, queryString) {
-				let search = queryString;
+				var search = queryString;
 
-				const hasQuestionMark = search[0] === '?';
+				var hasQuestionMark = search[0] === '?';
 
 				if (hasQuestionMark) {
 					search = search.substr(1);
 				}
 
-				const parameterArray = search.split('&').filter((item) => {
+				var parameterArray = search.split('&').filter((item) => {
 					return item.trim() !== '';
 				});
 
-				const newParameters = FacetUtil.removeURLParameters(
+				var newParameters = FacetUtil.removeURLParameters(
 					startParameterName,
 					parameterArray
 				);
@@ -139,22 +139,22 @@ AUI.add(
 				key = encodeURIComponent(key);
 
 				return parameterArray.filter((item) => {
-					const itemSplit = item.split('=');
+					var itemSplit = item.split('=');
 
 					return !(itemSplit && itemSplit[0] === key);
 				});
 			},
 
 			selectTerms(form, selections) {
-				const formParameterNameElement = document.querySelector(
+				var formParameterNameElement = document.querySelector(
 					'#' + form.id + ' input.facet-parameter-name'
 				);
 
-				const startParameterNameElement = document.querySelector(
+				var startParameterNameElement = document.querySelector(
 					'#' + form.id + ' input.start-parameter-name'
 				);
 
-				let search = document.location.search;
+				var search = document.location.search;
 
 				if (startParameterNameElement) {
 					search = FacetUtil.removeStartParameter(
@@ -173,11 +173,11 @@ AUI.add(
 			},
 
 			setURLParameter(url, name, value) {
-				const parts = url.split('?');
+				var parts = url.split('?');
 
-				const address = parts[0];
+				var address = parts[0];
 
-				let queryString = parts[1];
+				var queryString = parts[1];
 
 				if (!queryString) {
 					queryString = '';
@@ -193,7 +193,7 @@ AUI.add(
 			},
 
 			setURLParameters(key, selections, parameterArray) {
-				let newParameters = FacetUtil.removeURLParameters(
+				var newParameters = FacetUtil.removeURLParameters(
 					key,
 					parameterArray
 				);
@@ -220,19 +220,19 @@ AUI.add(
 			},
 
 			updateQueryString(key, selections, queryString) {
-				let search = queryString;
+				var search = queryString;
 
-				const hasQuestionMark = search[0] === '?';
+				var hasQuestionMark = search[0] === '?';
 
 				if (hasQuestionMark) {
 					search = search.substr(1);
 				}
 
-				const parameterArray = search.split('&').filter((item) => {
+				var parameterArray = search.split('&').filter((item) => {
 					return item.trim() !== '';
 				});
 
-				const newParameters = FacetUtil.setURLParameters(
+				var newParameters = FacetUtil.setURLParameters(
 					key,
 					selections,
 					parameterArray

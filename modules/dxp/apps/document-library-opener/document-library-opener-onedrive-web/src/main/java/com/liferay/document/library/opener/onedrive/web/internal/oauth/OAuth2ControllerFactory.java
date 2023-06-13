@@ -16,8 +16,9 @@ package com.liferay.document.library.opener.onedrive.web.internal.oauth;
 
 import com.liferay.document.library.opener.oauth.OAuth2State;
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PwdGenerator;
@@ -36,6 +36,7 @@ import java.io.IOException;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.portlet.PortletRequest;
@@ -123,9 +124,6 @@ public class OAuth2ControllerFactory {
 		OAuth2ControllerFactory.class);
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
 	private Language _language;
 
 	@Reference
@@ -137,53 +135,7 @@ public class OAuth2ControllerFactory {
 	@Reference
 	private PortletURLFactory _portletURLFactory;
 
-	private class JSONOAuth2Controller implements OAuth2Controller {
-
-		public JSONOAuth2Controller(Function<PortletRequest, String> function) {
-			_function = function;
-		}
-
-		@Override
-		public void execute(
-				PortletRequest portletRequest, PortletResponse portletResponse,
-				UnsafeFunction<PortletRequest, JSONObject, PortalException>
-					unsafeFunction)
-			throws PortalException {
-
-			try {
-				OAuth2Result oAuth2Result = _getOAuth2Result(
-					portletRequest, unsafeFunction, _function);
-
-				PortalException portalException =
-					oAuth2Result.getPortalException();
-
-				if (Objects.nonNull(portalException)) {
-					_log.error(portalException);
-
-					JSONPortletResponseUtil.writeJSON(
-						portletRequest, portletResponse,
-						JSONUtil.put(
-							"error",
-							_translate(
-								_portal.getLocale(portletRequest),
-								"your-request-failed-to-complete")));
-				}
-				else {
-					JSONPortletResponseUtil.writeJSON(
-						portletRequest, portletResponse,
-						oAuth2Result.getResponseJSONObject());
-				}
-			}
-			catch (IOException ioException) {
-				throw new PortalException(ioException);
-			}
-		}
-
-		private final Function<PortletRequest, String> _function;
-
-	}
-
-	private class OAuth2Result {
+	private static class OAuth2Result {
 
 		public OAuth2Result(JSONObject responseJSONObject) {
 			_responseJSONObject = responseJSONObject;
@@ -219,16 +171,62 @@ public class OAuth2ControllerFactory {
 				return JSONUtil.put("redirectURL", _redirectURL);
 			}
 
-			if (_responseJSONObject == null) {
-				return _jsonFactory.createJSONObject();
-			}
-
-			return _responseJSONObject;
+			return Optional.ofNullable(
+				_responseJSONObject
+			).orElseGet(
+				JSONFactoryUtil::createJSONObject
+			);
 		}
 
 		private final PortalException _portalException;
 		private final String _redirectURL;
 		private final JSONObject _responseJSONObject;
+
+	}
+
+	private class JSONOAuth2Controller implements OAuth2Controller {
+
+		public JSONOAuth2Controller(Function<PortletRequest, String> function) {
+			_function = function;
+		}
+
+		@Override
+		public void execute(
+				PortletRequest portletRequest, PortletResponse portletResponse,
+				UnsafeFunction<PortletRequest, JSONObject, PortalException>
+					unsafeFunction)
+			throws PortalException {
+
+			try {
+				OAuth2Result oAuth2Result = _getOAuth2Result(
+					portletRequest, unsafeFunction, _function);
+
+				PortalException portalException =
+					oAuth2Result.getPortalException();
+
+				if (Objects.nonNull(portalException)) {
+					_log.error(portalException, portalException);
+
+					JSONPortletResponseUtil.writeJSON(
+						portletRequest, portletResponse,
+						JSONUtil.put(
+							"error",
+							_translate(
+								_portal.getLocale(portletRequest),
+								"your-request-failed-to-complete")));
+				}
+				else {
+					JSONPortletResponseUtil.writeJSON(
+						portletRequest, portletResponse,
+						oAuth2Result.getResponseJSONObject());
+				}
+			}
+			catch (IOException ioException) {
+				throw new PortalException(ioException);
+			}
+		}
+
+		private final Function<PortletRequest, String> _function;
 
 	}
 
@@ -252,7 +250,7 @@ public class OAuth2ControllerFactory {
 			PortalException portalException = oAuth2Result.getPortalException();
 
 			if (Objects.nonNull(portalException)) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 
 				throw portalException;
 			}
@@ -264,13 +262,13 @@ public class OAuth2ControllerFactory {
 					fieldName, jsonObject.getString(fieldName));
 			}
 
-			String url = oAuth2Result.getRedirectURL();
-
-			if (url == null) {
-				url = _getRenderURL(portletRequest);
-			}
-
-			portletRequest.setAttribute(WebKeys.REDIRECT, url);
+			portletRequest.setAttribute(
+				WebKeys.REDIRECT,
+				Optional.ofNullable(
+					oAuth2Result.getRedirectURL()
+				).orElseGet(
+					() -> _getRenderURL(portletRequest)
+				));
 		}
 
 		private final Function<PortletRequest, String> _function;

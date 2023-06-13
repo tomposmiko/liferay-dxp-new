@@ -15,11 +15,11 @@
 package com.liferay.change.tracking.web.internal.display.context;
 
 import com.liferay.change.tracking.constants.CTPortletKeys;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -76,26 +76,66 @@ public abstract class BasePublicationsDisplayContext {
 	protected abstract String getDefaultOrderByCol();
 
 	protected String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, CTPortletKeys.PUBLICATIONS,
-			getPortalPreferencesPrefix() + "-order-by-col",
-			getDefaultOrderByCol());
+		String orderByCol = ParamUtil.getString(
+			_httpServletRequest, SearchContainer.DEFAULT_ORDER_BY_COL_PARAM);
+
+		if (Validator.isNull(orderByCol)) {
+			orderByCol = _portalPreferences.getValue(
+				CTPortletKeys.PUBLICATIONS,
+				getPortalPreferencesPrefix() + "-order-by-col",
+				getDefaultOrderByCol());
+		}
+
+		try {
+			_portalPreferences.setValue(
+				CTPortletKeys.PUBLICATIONS,
+				getPortalPreferencesPrefix() + "-order-by-col", orderByCol);
+		}
+		catch (ConcurrentModificationException
+					concurrentModificationException) {
+
+			log.error(
+				concurrentModificationException,
+				concurrentModificationException);
+		}
+
+		_orderByCol = orderByCol;
 
 		return _orderByCol;
 	}
 
 	protected String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, CTPortletKeys.PUBLICATIONS,
-			getPortalPreferencesPrefix() + "-order-by-type", "desc");
+		String orderByType = ParamUtil.getString(
+			_httpServletRequest, SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM);
+
+		if (Validator.isNull(orderByType)) {
+			orderByType = _portalPreferences.getValue(
+				CTPortletKeys.PUBLICATIONS,
+				getPortalPreferencesPrefix() + "-order-by-type", "desc");
+		}
+
+		try {
+			_portalPreferences.setValue(
+				CTPortletKeys.PUBLICATIONS,
+				getPortalPreferencesPrefix() + "-order-by-type", orderByType);
+		}
+		catch (ConcurrentModificationException
+					concurrentModificationException) {
+
+			log.error(
+				concurrentModificationException,
+				concurrentModificationException);
+		}
+
+		_orderByType = orderByType;
 
 		return _orderByType;
 	}

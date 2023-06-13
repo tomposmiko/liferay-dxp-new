@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -38,6 +37,7 @@ import javax.annotation.Generated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -61,7 +61,7 @@ public class Warehouse implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Warehouse.class, json);
 	}
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getActive() {
 		return active;
 	}
@@ -89,7 +89,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean active;
 
-	@Schema(example = "Diamond Bar")
+	@Schema
 	public String getCity() {
 		return city;
 	}
@@ -116,7 +116,7 @@ public class Warehouse implements Serializable {
 	protected String city;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getCommerceCountryId() {
 		return commerceCountryId;
 	}
@@ -146,7 +146,7 @@ public class Warehouse implements Serializable {
 	protected Long commerceCountryId;
 
 	@DecimalMin("0")
-	@Schema(example = "30234")
+	@Schema
 	public Long getCommerceRegionId() {
 		return commerceRegionId;
 	}
@@ -174,22 +174,18 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long commerceRegionId;
 
-	@Schema(
-		example = "{en_US=Warehouse Description US, hr_HR=Warehouse Description HR, hu_HU=Warehouse Description HU}"
-	)
-	@Valid
-	public Map<String, String> getDescription() {
+	@Schema
+	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(Map<String, String> description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
 	@JsonIgnore
 	public void setDescription(
-		UnsafeSupplier<Map<String, String>, Exception>
-			descriptionUnsafeSupplier) {
+		UnsafeSupplier<String, Exception> descriptionUnsafeSupplier) {
 
 		try {
 			description = descriptionUnsafeSupplier.get();
@@ -204,10 +200,10 @@ public class Warehouse implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Map<String, String> description;
+	protected String description;
 
 	@DecimalMin("0")
-	@Schema(example = "23130")
+	@Schema
 	public Long getGroupId() {
 		return groupId;
 	}
@@ -236,7 +232,7 @@ public class Warehouse implements Serializable {
 	protected Long groupId;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -262,7 +258,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "33.9976884")
+	@Schema
 	public Double getLatitude() {
 		return latitude;
 	}
@@ -290,7 +286,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double latitude;
 
-	@Schema(example = "-117.8144595")
+	@Schema
 	public Double getLongitude() {
 		return longitude;
 	}
@@ -318,7 +314,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double longitude;
 
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public Number getMvccVersion() {
 		return mvccVersion;
@@ -347,22 +343,17 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Number mvccVersion;
 
-	@Schema(
-		example = "{en_US=Warehouse Name US, hr_HR=Warehouse Name HR, hu_HU=Warehouse Name HU}"
-	)
-	@Valid
-	public Map<String, String> getName() {
+	@Schema
+	public String getName() {
 		return name;
 	}
 
-	public void setName(Map<String, String> name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
 	@JsonIgnore
-	public void setName(
-		UnsafeSupplier<Map<String, String>, Exception> nameUnsafeSupplier) {
-
+	public void setName(UnsafeSupplier<String, Exception> nameUnsafeSupplier) {
 		try {
 			name = nameUnsafeSupplier.get();
 		}
@@ -376,10 +367,10 @@ public class Warehouse implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	@NotNull
-	protected Map<String, String> name;
+	@NotEmpty
+	protected String name;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getPrimary() {
 		return primary;
 	}
@@ -407,7 +398,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean primary;
 
-	@Schema(example = "1400 Montefino Ave")
+	@Schema
 	public String getStreet1() {
 		return street1;
 	}
@@ -435,7 +426,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street1;
 
-	@Schema(example = "1st floor")
+	@Schema
 	public String getStreet2() {
 		return street2;
 	}
@@ -463,7 +454,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street2;
 
-	@Schema(example = "suite 200")
+	@Schema
 	public String getStreet3() {
 		return street3;
 	}
@@ -491,7 +482,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street3;
 
-	@Schema(example = "91765")
+	@Schema
 	public String getZip() {
 		return zip;
 	}
@@ -595,7 +586,11 @@ public class Warehouse implements Serializable {
 
 			sb.append("\"description\": ");
 
-			sb.append(_toJSON(description));
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
 		}
 
 		if (groupId != null) {
@@ -655,7 +650,11 @@ public class Warehouse implements Serializable {
 
 			sb.append("\"name\": ");
 
-			sb.append(_toJSON(name));
+			sb.append("\"");
+
+			sb.append(_escape(name));
+
+			sb.append("\"");
 		}
 
 		if (primary != null) {
@@ -737,9 +736,9 @@ public class Warehouse implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -765,7 +764,7 @@ public class Warehouse implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -797,7 +796,7 @@ public class Warehouse implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -813,10 +812,5 @@ public class Warehouse implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

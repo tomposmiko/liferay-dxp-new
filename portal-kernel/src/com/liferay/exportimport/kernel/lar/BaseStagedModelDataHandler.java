@@ -226,14 +226,14 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 				}
 				catch (PortalException portalException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(portalException);
+						_log.debug(portalException, portalException);
 					}
 				}
 			}
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 			else if (_log.isWarnEnabled()) {
 				_log.warn(
@@ -477,7 +477,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;

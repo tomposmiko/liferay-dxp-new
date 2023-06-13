@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.discount.internal;
 
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
@@ -21,7 +22,6 @@ import com.liferay.commerce.currency.model.CommerceMoneyFactory;
 import com.liferay.commerce.discount.CommerceDiscountCalculation;
 import com.liferay.commerce.discount.CommerceDiscountValue;
 import com.liferay.commerce.discount.application.strategy.CommerceDiscountApplicationStrategy;
-import com.liferay.commerce.discount.application.strategy.CommerceDiscountApplicationStrategyRegistry;
 import com.liferay.commerce.discount.constants.CommerceDiscountConstants;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.service.CommerceDiscountUsageEntryLocalService;
@@ -33,14 +33,13 @@ import com.liferay.commerce.pricing.configuration.CommercePricingConfiguration;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.util.CommerceBigDecimalUtil;
-import com.liferay.commerce.util.CommerceUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.math.BigDecimal;
@@ -48,16 +47,22 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Riccardo Alberti
  */
 @Component(
-	property = "commerce.discount.calculation.key=v2.0",
+	enabled = false, property = "commerce.discount.calculation.key=v2.0",
 	service = CommerceDiscountCalculation.class
 )
 public class CommerceDiscountCalculationV2Impl
@@ -134,12 +139,16 @@ public class CommerceDiscountCalculationV2Impl
 		if ((commercePriceListDiscountRels != null) &&
 			!commercePriceListDiscountRels.isEmpty()) {
 
+			Stream<CommercePriceListDiscountRel> stream =
+				commercePriceListDiscountRels.stream();
+
+			long[] commerceDiscountIds = stream.mapToLong(
+				CommercePriceListDiscountRel::getCommerceDiscountId
+			).toArray();
+
 			List<CommerceDiscount> commerceDiscounts =
 				commerceDiscountLocalService.getPriceListCommerceDiscounts(
-					TransformUtil.transformToLongArray(
-						commercePriceListDiscountRels,
-						CommercePriceListDiscountRel::getCommerceDiscountId),
-					cpInstance.getCPDefinitionId());
+					commerceDiscountIds, cpInstance.getCPDefinitionId());
 
 			if (commerceDiscounts.isEmpty()) {
 				return null;
@@ -159,7 +168,8 @@ public class CommerceDiscountCalculationV2Impl
 
 		List<CommerceDiscount> commerceDiscounts =
 			getProductCommerceDiscountByHierarchy(
-				cpInstance.getCompanyId(), commerceContext, commerceOrderTypeId,
+				cpInstance.getCompanyId(), commerceContext.getCommerceAccount(),
+				commerceContext.getCommerceChannelId(), commerceOrderTypeId,
 				cpInstance.getCPDefinitionId(), cpInstanceId);
 
 		if (commerceDiscounts.isEmpty()) {
@@ -170,6 +180,34 @@ public class CommerceDiscountCalculationV2Impl
 			productUnitPrice, quantity, commerceContext, commerceDiscounts);
 	}
 
+	public void unsetCommerceDiscountApplicationStrategy(
+		CommerceDiscountApplicationStrategy commerceDiscountApplicationStrategy,
+		Map<String, Object> properties) {
+
+		String commerceDiscountApplicationStrategyKey = GetterUtil.getString(
+			properties.get("commerce.discount.application.strategy.key"));
+
+		_commerceDiscountApplicationStrategyMap.remove(
+			commerceDiscountApplicationStrategyKey);
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void setCommerceDiscountApplicationStrategy(
+		CommerceDiscountApplicationStrategy commerceDiscountApplicationStrategy,
+		Map<String, Object> properties) {
+
+		String commerceDiscountApplicationStrategyKey = GetterUtil.getString(
+			properties.get("commerce.discount.application.strategy.key"));
+
+		_commerceDiscountApplicationStrategyMap.put(
+			commerceDiscountApplicationStrategyKey,
+			commerceDiscountApplicationStrategy);
+	}
+
 	private CommerceDiscountApplicationStrategy
 			_getCommerceDiscountApplicationStrategy()
 		throws ConfigurationException {
@@ -178,23 +216,23 @@ public class CommerceDiscountCalculationV2Impl
 			_configurationProvider.getSystemConfiguration(
 				CommercePricingConfiguration.class);
 
-		String commerceDiscountApplicationStrategyKey =
+		String commerceDiscountApplicationStrategy =
 			commercePricingConfiguration.commerceDiscountApplicationStrategy();
 
-		CommerceDiscountApplicationStrategy
-			commerceDiscountApplicationStrategy =
-				_commerceDiscountApplicationStrategyRegistry.get(
-					commerceDiscountApplicationStrategyKey);
+		if (!_commerceDiscountApplicationStrategyMap.containsKey(
+				commerceDiscountApplicationStrategy)) {
 
-		if (commerceDiscountApplicationStrategy == null) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"No commerce discount application strategy specified for " +
-						commerceDiscountApplicationStrategyKey);
+						commerceDiscountApplicationStrategy);
 			}
+
+			return null;
 		}
 
-		return commerceDiscountApplicationStrategy;
+		return _commerceDiscountApplicationStrategyMap.get(
+			commerceDiscountApplicationStrategy);
 	}
 
 	private BigDecimal _getCommerceDiscountLevel(
@@ -355,7 +393,9 @@ public class CommerceDiscountCalculationV2Impl
 
 		List<CommerceDiscount> commerceDiscounts =
 			getOrderCommerceDiscountByHierarchy(
-				commerceOrder.getCompanyId(), commerceContext,
+				commerceOrder.getCompanyId(),
+				commerceContext.getCommerceAccount(),
+				commerceContext.getCommerceChannelId(),
 				commerceOrder.getCommerceOrderTypeId(), target);
 
 		if (commerceDiscounts.isEmpty()) {
@@ -465,12 +505,19 @@ public class CommerceDiscountCalculationV2Impl
 			String discountCouponCode, CommerceContext commerceContext)
 		throws PortalException {
 
+		long commerceAccountId = 0;
+
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+
+		if (commerceAccount != null) {
+			commerceAccountId = commerceAccount.getCommerceAccountId();
+		}
+
 		if ((Validator.isBlank(discountCouponCode) ||
 			 Objects.equals(couponCode, discountCouponCode)) &&
 			_commerceDiscountUsageEntryLocalService.
 				validateDiscountLimitationUsage(
-					CommerceUtil.getCommerceAccountId(commerceContext),
-					commerceDiscountId)) {
+					commerceAccountId, commerceDiscountId)) {
 
 			return true;
 		}
@@ -494,9 +541,8 @@ public class CommerceDiscountCalculationV2Impl
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceDiscountCalculationV2Impl.class);
 
-	@Reference
-	private CommerceDiscountApplicationStrategyRegistry
-		_commerceDiscountApplicationStrategyRegistry;
+	private final Map<String, CommerceDiscountApplicationStrategy>
+		_commerceDiscountApplicationStrategyMap = new ConcurrentHashMap<>();
 
 	@Reference
 	private CommerceDiscountUsageEntryLocalService

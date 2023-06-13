@@ -34,11 +34,26 @@ import java.util.Set;
  */
 public class UpgradePortletId extends BasePortletIdUpgradeProcess {
 
+	protected void deletePortletReferences(String portletId) throws Exception {
+		runSQL("delete from Portlet where portletId = '" + portletId + "'");
+
+		runSQL(
+			"delete from PortletPreferences where portletId = '" + portletId +
+				"'");
+
+		runSQL("delete from ResourceAction where name = '" + portletId + "'");
+
+		runSQL(
+			"delete from ResourcePermission where name = '" + portletId + "'");
+
+		removePortletIdFromLayouts(portletId);
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
 		super.doUpgrade();
 
-		_deletePortletReferences("1_WAR_kaleoformsportlet");
+		deletePortletReferences("1_WAR_kaleoformsportlet");
 	}
 
 	protected String getNewTypeSettings(
@@ -94,22 +109,7 @@ public class UpgradePortletId extends BasePortletIdUpgradeProcess {
 		};
 	}
 
-	private void _deletePortletReferences(String portletId) throws Exception {
-		runSQL("delete from Portlet where portletId = '" + portletId + "'");
-
-		runSQL(
-			"delete from PortletPreferences where portletId = '" + portletId +
-				"'");
-
-		runSQL("delete from ResourceAction where name = '" + portletId + "'");
-
-		runSQL(
-			"delete from ResourcePermission where name = '" + portletId + "'");
-
-		_removePortletIdFromLayouts(portletId);
-	}
-
-	private void _removePortletIdFromLayouts(String oldRootPortletId)
+	protected void removePortletIdFromLayouts(String oldRootPortletId)
 		throws Exception {
 
 		String sql =
@@ -121,10 +121,14 @@ public class UpgradePortletId extends BasePortletIdUpgradeProcess {
 			ResultSet resultSet = preparedStatement.executeQuery()) {
 
 			while (resultSet.next()) {
-				updateLayout(
-					resultSet.getLong("plid"),
-					getNewTypeSettings(
-						resultSet.getString("typeSettings"), oldRootPortletId));
+				long plid = resultSet.getLong("plid");
+
+				String typeSettings = resultSet.getString("typeSettings");
+
+				String newTypeSettings = getNewTypeSettings(
+					typeSettings, oldRootPortletId);
+
+				updateLayout(plid, newTypeSettings);
 			}
 		}
 	}

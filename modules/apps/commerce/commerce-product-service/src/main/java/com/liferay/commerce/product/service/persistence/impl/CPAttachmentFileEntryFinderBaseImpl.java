@@ -16,9 +16,7 @@ package com.liferay.commerce.product.service.persistence.impl;
 
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.service.persistence.CPAttachmentFileEntryPersistence;
-import com.liferay.commerce.product.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @generated
  */
-public abstract class CPAttachmentFileEntryFinderBaseImpl
+public class CPAttachmentFileEntryFinderBaseImpl
 	extends BasePersistenceImpl<CPAttachmentFileEntry> {
 
 	public CPAttachmentFileEntryFinderBaseImpl() {
@@ -51,36 +45,33 @@ public abstract class CPAttachmentFileEntryFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return cpAttachmentFileEntryPersistence.getBadColumnNames();
+		return getCPAttachmentFileEntryPersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the cp attachment file entry persistence.
+	 *
+	 * @return the cp attachment file entry persistence
+	 */
+	public CPAttachmentFileEntryPersistence
+		getCPAttachmentFileEntryPersistence() {
+
+		return cpAttachmentFileEntryPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the cp attachment file entry persistence.
+	 *
+	 * @param cpAttachmentFileEntryPersistence the cp attachment file entry persistence
+	 */
+	public void setCPAttachmentFileEntryPersistence(
+		CPAttachmentFileEntryPersistence cpAttachmentFileEntryPersistence) {
+
+		this.cpAttachmentFileEntryPersistence =
+			cpAttachmentFileEntryPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CPAttachmentFileEntryPersistence.class)
 	protected CPAttachmentFileEntryPersistence cpAttachmentFileEntryPersistence;
 
 	private static final Log _log = LogFactoryUtil.getLog(

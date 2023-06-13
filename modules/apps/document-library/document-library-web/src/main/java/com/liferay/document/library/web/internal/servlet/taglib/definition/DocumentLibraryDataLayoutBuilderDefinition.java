@@ -22,7 +22,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Eudaldo Alonso
  */
 @Component(
-	property = "content.type=document-library",
+	immediate = true, property = "content.type=document-library",
 	service = DataLayoutBuilderDefinition.class
 )
 public class DocumentLibraryDataLayoutBuilderDefinition
@@ -35,7 +35,7 @@ public class DocumentLibraryDataLayoutBuilderDefinition
 
 	@Override
 	public String[] getDisabledProperties() {
-		return new String[] {"objectFieldName", "requiredErrorMessage"};
+		return new String[] {"requiredErrorMessage"};
 	}
 
 	@Override

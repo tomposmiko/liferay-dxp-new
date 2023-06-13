@@ -18,7 +18,6 @@ import com.liferay.commerce.order.rule.model.COREntryRel;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -34,7 +33,7 @@ import java.util.Date;
  * @generated
  */
 public class COREntryRelCacheModel
-	implements CacheModel<COREntryRel>, Externalizable, MVCCModel {
+	implements CacheModel<COREntryRel>, Externalizable {
 
 	@Override
 	public boolean equals(Object object) {
@@ -49,9 +48,7 @@ public class COREntryRelCacheModel
 		COREntryRelCacheModel corEntryRelCacheModel =
 			(COREntryRelCacheModel)object;
 
-		if ((COREntryRelId == corEntryRelCacheModel.COREntryRelId) &&
-			(mvccVersion == corEntryRelCacheModel.mvccVersion)) {
-
+		if (COREntryRelId == corEntryRelCacheModel.COREntryRelId) {
 			return true;
 		}
 
@@ -60,28 +57,14 @@ public class COREntryRelCacheModel
 
 	@Override
 	public int hashCode() {
-		int hashCode = HashUtil.hash(0, COREntryRelId);
-
-		return HashUtil.hash(hashCode, mvccVersion);
-	}
-
-	@Override
-	public long getMvccVersion() {
-		return mvccVersion;
-	}
-
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		this.mvccVersion = mvccVersion;
+		return HashUtil.hash(0, COREntryRelId);
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(19);
 
-		sb.append("{mvccVersion=");
-		sb.append(mvccVersion);
-		sb.append(", COREntryRelId=");
+		sb.append("{COREntryRelId=");
 		sb.append(COREntryRelId);
 		sb.append(", companyId=");
 		sb.append(companyId);
@@ -108,7 +91,6 @@ public class COREntryRelCacheModel
 	public COREntryRel toEntityModel() {
 		COREntryRelImpl corEntryRelImpl = new COREntryRelImpl();
 
-		corEntryRelImpl.setMvccVersion(mvccVersion);
 		corEntryRelImpl.setCOREntryRelId(COREntryRelId);
 		corEntryRelImpl.setCompanyId(companyId);
 		corEntryRelImpl.setUserId(userId);
@@ -145,8 +127,6 @@ public class COREntryRelCacheModel
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		mvccVersion = objectInput.readLong();
-
 		COREntryRelId = objectInput.readLong();
 
 		companyId = objectInput.readLong();
@@ -165,8 +145,6 @@ public class COREntryRelCacheModel
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		objectOutput.writeLong(mvccVersion);
-
 		objectOutput.writeLong(COREntryRelId);
 
 		objectOutput.writeLong(companyId);
@@ -190,7 +168,6 @@ public class COREntryRelCacheModel
 		objectOutput.writeLong(COREntryId);
 	}
 
-	public long mvccVersion;
 	public long COREntryRelId;
 	public long companyId;
 	public long userId;

@@ -43,14 +43,6 @@ public interface CPInstanceHelper {
 			long cpDefinitionId, String serializedDDMFormValues)
 		throws PortalException;
 
-	public CPInstance fetchFirstAvailableReplacementCPInstance(
-			long commerceChannelGroupId, long cpInstanceId)
-		throws PortalException;
-
-	public CPInstance fetchReplacementCPInstance(
-			long cProductId, String cpInstanceUuid)
-		throws PortalException;
-
 	public List<CPDefinitionOptionValueRel> filterCPDefinitionOptionValueRels(
 			long cpDefinitionOptionRelId,
 			List<Long> skuCombinationCPDefinitionOptionValueRelIds)
@@ -68,18 +60,15 @@ public interface CPInstanceHelper {
 		throws Exception;
 
 	public Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
-		getCPDefinitionOptionValueRelsMap(
+		getCPDefinitionOptionRelsMap(
 			long cpDefinitionId, boolean skuContributor, boolean publicStore);
 
 	public Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
-			getCPDefinitionOptionValueRelsMap(long cpDefinitionId, String json)
+			getCPDefinitionOptionRelsMap(long cpDefinitionId, String json)
 		throws PortalException;
 
 	public String getCPInstanceAdaptiveMediaImageHTMLTag(
-			long commerceAccountId, long companyId, long cpInstanceId)
-		throws Exception;
-
-	public String getCPInstanceCDNURL(long commerceAccountId, long cpInstanceId)
+			long companyId, long cpInstanceId)
 		throws Exception;
 
 	public Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
@@ -95,12 +84,10 @@ public interface CPInstanceHelper {
 		getCPInstanceCPInstanceOptionValueRels(long cpInstanceId);
 
 	public FileVersion getCPInstanceImageFileVersion(
-			long commerceAccountId, long companyId, long cpInstanceId)
+			long companyId, long cpInstanceId)
 		throws Exception;
 
-	public String getCPInstanceThumbnailSrc(
-			long commerceAccountId, long cpInstanceId)
-		throws Exception;
+	public String getCPInstanceThumbnailSrc(long cpInstanceId) throws Exception;
 
 	public CPInstance getDefaultCPInstance(long cpDefinitionId)
 		throws PortalException;
@@ -111,7 +98,5 @@ public interface CPInstanceHelper {
 	public List<KeyValuePair> getKeyValuePairs(
 			long cpDefinitionId, String json, Locale locale)
 		throws PortalException;
-
-	public CPSku toCPSku(CPInstance cpInstance);
 
 }

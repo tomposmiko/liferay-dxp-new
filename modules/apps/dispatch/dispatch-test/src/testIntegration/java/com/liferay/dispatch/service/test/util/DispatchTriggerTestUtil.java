@@ -43,13 +43,14 @@ public class DispatchTriggerTestUtil {
 	}
 
 	public static DispatchTrigger randomDispatchTrigger(
-		User user, String dispatchTaskExecutorType, int nameSalt) {
+		User user, int nameSalt) {
 
 		Objects.requireNonNull(user);
 
 		return _randomDispatchTrigger(
 			RandomTestUtil.randomBoolean(), user.getCompanyId(),
-			CronExpressionUtil.getCronExpression(), 0, dispatchTaskExecutorType,
+			CronExpressionUtil.getCronExpression(), 0,
+			RandomTestUtil.randomString(20),
 			RandomTestUtil.randomUnicodeProperties(
 				RandomTestUtil.randomInt(10, 30), 32, 64),
 			_randomName(nameSalt), RandomTestUtil.randomBoolean(),

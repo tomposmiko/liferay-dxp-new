@@ -14,10 +14,7 @@
 
 package com.liferay.account.admin.web.internal.display.context;
 
-import com.liferay.account.admin.web.internal.display.AccountEntryDisplay;
 import com.liferay.account.admin.web.internal.display.AddressDisplay;
-import com.liferay.account.admin.web.internal.security.permission.resource.AccountEntryPermission;
-import com.liferay.account.constants.AccountActionKeys;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
@@ -26,21 +23,17 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -78,9 +71,6 @@ public class ViewAccountEntryAddressesManagementToolbarDisplayContext
 					"/account_admin/delete_account_entry_addresses"
 				).setRedirect(
 					currentURLObj
-				).setParameter(
-					"accountEntryId",
-					ParamUtil.getLong(liferayPortletRequest, "accountEntryId")
 				).buildString()
 			).setIcon(
 				"times-circle"
@@ -89,26 +79,6 @@ public class ViewAccountEntryAddressesManagementToolbarDisplayContext
 			).setQuickAction(
 				true
 			).build());
-	}
-
-	public List<String> getAvailableActions(
-			AccountEntryDisplay accountEntryDisplay)
-		throws PortalException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		if (AccountEntryPermission.contains(
-				themeDisplay.getPermissionChecker(),
-				accountEntryDisplay.getAccountEntryId(),
-				AccountActionKeys.MANAGE_ADDRESSES)) {
-
-			return Collections.<String>singletonList(
-				"deleteAccountEntryAddresses");
-		}
-
-		return Collections.<String>emptyList();
 	}
 
 	@Override
@@ -171,7 +141,7 @@ public class ViewAccountEntryAddressesManagementToolbarDisplayContext
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return liferayPortletResponse.createRenderURL();
@@ -179,15 +149,15 @@ public class ViewAccountEntryAddressesManagementToolbarDisplayContext
 	}
 
 	@Override
-	public Boolean isShowCreationMenu() {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
 
-		return AccountEntryPermission.contains(
-			themeDisplay.getPermissionChecker(),
-			ParamUtil.getLong(liferayPortletRequest, "accountEntryId"),
-			AccountActionKeys.MANAGE_ADDRESSES);
+		return searchActionURL.toString();
+	}
+
+	@Override
+	public Boolean isDisabled() {
+		return false;
 	}
 
 	@Override

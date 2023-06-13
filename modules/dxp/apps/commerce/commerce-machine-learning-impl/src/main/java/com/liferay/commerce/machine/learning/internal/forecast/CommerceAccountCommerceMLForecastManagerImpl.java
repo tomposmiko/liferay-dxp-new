@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.search.engine.adapter.search.CountSearchRequest;
 
 import java.util.Date;
 import java.util.List;
@@ -39,7 +40,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = CommerceAccountCommerceMLForecastManager.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceAccountCommerceMLForecastManager.class
+)
 public class CommerceAccountCommerceMLForecastManagerImpl
 	extends BaseCommerceMLForecastServiceImpl<CommerceAccountCommerceMLForecast>
 	implements CommerceAccountCommerceMLForecastManager {
@@ -111,12 +115,12 @@ public class CommerceAccountCommerceMLForecastManagerImpl
 			int historyLength, int forecastLength)
 		throws PortalException {
 
-		return getCountResult(
-			getCountSearchRequest(
-				commerceMLIndexer.getIndexName(companyId),
-				_getMonthlyRevenueQuery(
-					commerceAccountIds, actualDate, historyLength,
-					forecastLength)));
+		CountSearchRequest countSearchRequest = getCountSearchRequest(
+			commerceMLIndexer.getIndexName(companyId),
+			_getMonthlyRevenueQuery(
+				commerceAccountIds, actualDate, historyLength, forecastLength));
+
+		return getCountResult(countSearchRequest);
 	}
 
 	@Override

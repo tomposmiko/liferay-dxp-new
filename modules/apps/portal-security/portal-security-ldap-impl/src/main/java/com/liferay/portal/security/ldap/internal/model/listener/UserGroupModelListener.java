@@ -28,6 +28,8 @@ import com.liferay.portal.security.exportimport.UserExporter;
 import com.liferay.portal.security.exportimport.UserOperation;
 import com.liferay.portal.security.ldap.internal.UserImportTransactionThreadLocal;
 
+import java.util.concurrent.Callable;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -36,7 +38,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class UserGroupModelListener extends BaseModelListener<UserGroup> {
 
 	@Override
@@ -86,35 +88,36 @@ public class UserGroupModelListener extends BaseModelListener<UserGroup> {
 			return;
 		}
 
-		TransactionCommitCallbackUtil.registerCallback(
-			CallableUtil.getCallable(
-				expandoBridgeAttributes -> {
-					if ((_userLocalService.fetchUser(userId) == null) ||
-						(_userGroupLocalService.fetchUserGroup(userGroupId) ==
-							null)) {
+		Callable<Void> callable = CallableUtil.getCallable(
+			expandoBridgeAttributes -> {
+				if ((_userLocalService.fetchUser(userId) == null) ||
+					(_userGroupLocalService.fetchUserGroup(userGroupId) ==
+						null)) {
 
-						return;
-					}
+					return;
+				}
 
-					try {
-						_userExporter.exportUser(
-							userId, userGroupId, userOperation);
+				try {
+					_userExporter.exportUser(
+						userId, userGroupId, userOperation);
+				}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(exception, exception);
 					}
-					catch (Exception exception) {
-						if (_log.isWarnEnabled()) {
-							_log.warn(exception);
-						}
-					}
+				}
 
+				if (_log.isDebugEnabled()) {
 					if (_log.isDebugEnabled()) {
-						if (_log.isDebugEnabled()) {
-							StringBundler.concat(
-								"Exporting user ", userId, " to user group ",
-								userGroupId, " with user operation ",
-								userOperation.name());
-						}
+						StringBundler.concat(
+							"Exporting user ", userId, " to user group ",
+							userGroupId, " with user operation ",
+							userOperation.name());
 					}
-				}));
+				}
+			});
+
+		TransactionCommitCallbackUtil.registerCallback(callable);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

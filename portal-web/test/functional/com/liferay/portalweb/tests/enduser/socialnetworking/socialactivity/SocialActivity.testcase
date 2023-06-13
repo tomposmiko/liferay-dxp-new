@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -22,12 +22,12 @@ definition {
 
 			BlogsEntry.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownPG();
 		}
 	}
 
 	@description = "It ensures that the user statistics are counted when social tracking is enabled."
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test CountUserStatisticsAfterEnablingSocialTracking {
 		property test.name.skip.portal.instance = "SocialActivity#CountUserStatisticsAfterEnablingSocialTracking";
@@ -44,21 +44,15 @@ definition {
 
 		FormFields.viewCheckboxChecked(fieldName = "enableUserSocialActivityTracking");
 
-		HeadlessSite.addSite(siteName = "Site Name");
-
 		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
+			groupName = "Guest",
 			layoutName = "Activities Page");
 
-		Navigator.openSitePage(
-			pageName = "Activities Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Activities Page");
 
 		Portlet.addPG(portletName = "Activities");
 
-		Navigator.openSitePage(
-			pageName = "Activities Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Activities Page");
 
 		AssertTextEquals.assertPartialText(
 			key_portletName = "Activities",
@@ -68,13 +62,11 @@ definition {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			groupName = "Site Name",
+			groupName = "Guest",
 			mimeType = "application/msword",
 			sourceFileName = "Document_1.doc");
 
-		Navigator.openSitePage(
-			pageName = "Activities Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Activities Page");
 
 		AssertTextEquals(
 			key_assetName = "DM Document Title",
@@ -83,7 +75,7 @@ definition {
 	}
 
 	@description = "It ensures that the user statistics are not counted when social tracking is disabled."
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test DisableSocialTracking {
 		property test.name.skip.portal.instance = "SocialActivity#DisableSocialTracking";
@@ -104,21 +96,15 @@ definition {
 
 		FormFields.viewCheckboxNotChecked(fieldName = "enable");
 
-		HeadlessSite.addSite(siteName = "Site Name");
-
 		JSONLayout.addPublicLayout(
-			groupName = "Site Name",
+			groupName = "Guest",
 			layoutName = "Activities Page");
 
-		Navigator.openSitePage(
-			pageName = "Activities Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Activities Page");
 
 		Portlet.addPG(portletName = "Activities");
 
-		Navigator.openSitePage(
-			pageName = "Activities Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Activities Page");
 
 		AssertTextEquals.assertPartialText(
 			key_portletName = "Activities",
@@ -128,13 +114,11 @@ definition {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			groupName = "Site Name",
+			groupName = "Guest",
 			mimeType = "application/msword",
 			sourceFileName = "Document_1.doc");
 
-		Navigator.openSitePage(
-			pageName = "Activities Page",
-			siteName = "Site Name");
+		Navigator.gotoPage(pageName = "Activities Page");
 
 		AssertTextEquals.assertPartialText(
 			key_portletName = "Activities",
@@ -147,7 +131,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-50602"
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test ViewDraftWikiPageViaActivities {
 		JSONLayout.addPublicLayout(

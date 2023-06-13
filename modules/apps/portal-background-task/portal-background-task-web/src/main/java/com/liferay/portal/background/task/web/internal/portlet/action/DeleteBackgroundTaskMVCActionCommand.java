@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=*",
 		"mvc.command.name=/portal_background_task/delete_background_task"
@@ -42,13 +43,22 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class DeleteBackgroundTaskMVCActionCommand extends BaseMVCActionCommand {
 
+	protected void deleteBackgroundTask(ActionRequest actionRequest)
+		throws PortalException {
+
+		long backgroundTaskId = ParamUtil.getLong(
+			actionRequest, "backgroundTaskId");
+
+		_backgroundTaskManager.deleteBackgroundTask(backgroundTaskId);
+	}
+
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
 		try {
-			_deleteBackgroundTask(actionRequest);
+			deleteBackgroundTask(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchBackgroundTaskException ||
@@ -62,15 +72,6 @@ public class DeleteBackgroundTaskMVCActionCommand extends BaseMVCActionCommand {
 				throw exception;
 			}
 		}
-	}
-
-	private void _deleteBackgroundTask(ActionRequest actionRequest)
-		throws PortalException {
-
-		long backgroundTaskId = ParamUtil.getLong(
-			actionRequest, "backgroundTaskId");
-
-		_backgroundTaskManager.deleteBackgroundTask(backgroundTaskId);
 	}
 
 	@Reference

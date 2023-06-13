@@ -35,7 +35,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = PortletDataHandlerStatusMessageSender.class)
+@Component(
+	immediate = true, service = PortletDataHandlerStatusMessageSender.class
+)
 public class PortletDataHandlerStatusMessageSenderImpl
 	implements PortletDataHandlerStatusMessageSender {
 
@@ -45,7 +47,7 @@ public class PortletDataHandlerStatusMessageSenderImpl
 
 		Message message = new Message();
 
-		_init(message, messageType, manifestSummary);
+		init(message, messageType, manifestSummary);
 
 		message.put("portletId", portletId);
 
@@ -81,7 +83,7 @@ public class PortletDataHandlerStatusMessageSenderImpl
 
 		Message message = new Message();
 
-		_init(message, messageType, manifestSummary);
+		init(message, messageType, manifestSummary);
 
 		message.put("portletIds", portletIds);
 
@@ -95,7 +97,7 @@ public class PortletDataHandlerStatusMessageSenderImpl
 
 		Message message = new Message();
 
-		_init(message, messageType, manifestSummary);
+		init(message, messageType, manifestSummary);
 
 		StagedModelDataHandler<T> stagedModelDataHandler =
 			(StagedModelDataHandler<T>)
@@ -115,7 +117,7 @@ public class PortletDataHandlerStatusMessageSenderImpl
 			message);
 	}
 
-	private void _init(
+	protected void init(
 		Message message, String messageType, ManifestSummary manifestSummary) {
 
 		message.put(

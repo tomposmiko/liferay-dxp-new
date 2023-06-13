@@ -116,7 +116,7 @@ public class CORSServletFilter extends BaseFilter {
 
 		User user = permissionChecker.getUser();
 
-		return user.isGuestUser();
+		return user.isDefaultUser();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

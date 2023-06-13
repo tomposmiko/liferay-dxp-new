@@ -9,48 +9,28 @@
  * distribution rights of the Software.
  */
 
-import {fetch} from 'frontend-js-web';
-import {useCallback, useState} from 'react';
+import {useCallback, useContext, useState} from 'react';
 
-import {adminBaseURL, headers, metricsBaseURL} from '../rest/fetch.es';
+import {AppContext} from '../../components/AppContext.es';
 
-const usePost = ({
-	admin = false,
-	body = {},
-	callback = (data) => data,
-	params = {},
-	url,
-}) => {
+const usePost = ({admin = false, body = {}, params = {}, url}) => {
+	const {getClient} = useContext(AppContext);
 	const [data, setData] = useState({});
 
-	let fetchURL = admin ? `${adminBaseURL}${url}` : `${metricsBaseURL}${url}`;
+	const client = getClient(admin);
+	const queryBodyStr = JSON.stringify(body);
+	const queryParamsStr = JSON.stringify(params);
 
-	fetchURL = new URL(fetchURL, Liferay.ThemeDisplay.getPortalURL());
+	const postData = useCallback(
+		() =>
+			client.post(url, body, {params}).then(({data}) => {
+				setData(data);
 
-	Object.entries(params).map(([key, value]) => {
-		if (value) {
-			fetchURL.searchParams.append(key, value);
-		}
-	});
-
-	const postData = useCallback(async () => {
-		const response = await fetch(fetchURL, {
-			body: JSON.stringify(body),
-			headers: {...headers, 'Content-Type': 'application/json'},
-			method: 'POST',
-			params,
-		});
-
-		const data = await response.json();
-
-		if (response.ok) {
-			setData(data);
-
-			return callback(data);
-		}
-
-		throw data;
-	}, [body, callback, fetchURL, params]);
+				return data;
+			}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[admin, queryBodyStr, queryParamsStr, url]
+	);
 
 	return {
 		data,

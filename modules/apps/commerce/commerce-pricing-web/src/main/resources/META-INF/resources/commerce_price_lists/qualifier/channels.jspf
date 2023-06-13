@@ -43,11 +43,11 @@
 						.then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 								id:
-									'<%= CommercePricingFDSNames.PRICE_LIST_QUALIFIER_CHANNELS %>',
+									'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_CHANNELS %>',
 							});
 						})
 						.catch((error) => {
-							return Promise.reject(error.title);
+							return Promise.reject(error);
 						});
 				}
 
@@ -61,7 +61,7 @@
 					inputPlaceholder: '<%= LanguageUtil.get(request, "find-a-channel") %>',
 					itemSelectedMessage: '<%= LanguageUtil.get(request, "channel-selected") %>',
 					linkedDatasetsId: [
-						'<%= CommercePricingFDSNames.PRICE_LIST_QUALIFIER_CHANNELS %>',
+						'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_CHANNELS %>',
 					],
 					itemCreation: false,
 					itemsKey: 'id',
@@ -74,7 +74,7 @@
 							fieldName: 'name',
 						},
 					],
-					spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 					titleLabel: '<%= LanguageUtil.get(request, "add-existing-channel") %>',
 				});
 			</aui:script>
@@ -85,12 +85,15 @@
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "channels") %>'
 			>
-				<frontend-data-set:headless-display
+				<clay:headless-data-set-display
 					apiURL="<%= commercePriceListQualifiersDisplayContext.getPriceListChannelsApiURL() %>"
-					fdsActionDropdownItems="<%= commercePriceListQualifiersDisplayContext.getPriceListChannelFDSActionDropdownItems() %>"
-					formName="fm"
-					id="<%= CommercePricingFDSNames.PRICE_LIST_QUALIFIER_CHANNELS %>"
+					clayDataSetActionDropdownItems="<%= commercePriceListQualifiersDisplayContext.getPriceListChannelClayDataSetActionDropdownItems() %>"
+					formId="fm"
+					id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_CHANNELS %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= currentURLObj %>"
 				/>
 			</commerce-ui:panel>
 		</div>

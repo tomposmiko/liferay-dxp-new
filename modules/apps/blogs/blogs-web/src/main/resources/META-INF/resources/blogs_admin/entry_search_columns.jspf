@@ -73,7 +73,7 @@
 	<c:when test='<%= displayStyle.equals("icon") %>'>
 		<liferay-ui:search-container-column-text>
 			<clay:vertical-card
-				verticalCard="<%= blogsViewEntriesDisplayContext.getBlogsEntryVerticalCard(entry, searchContainer.getRowChecker(), rowURL.toString(), resourceBundle) %>"
+				verticalCard="<%= new BlogsEntryVerticalCard(entry, renderRequest, renderResponse, searchContainer.getRowChecker(), trashHelper, rowURL.toString(), permissionChecker, resourceBundle) %>"
 			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>

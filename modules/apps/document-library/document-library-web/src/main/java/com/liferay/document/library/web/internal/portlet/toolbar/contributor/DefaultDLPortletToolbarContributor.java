@@ -179,14 +179,14 @@ public class DefaultDLPortletToolbarContributor
 		return false;
 	}
 
-	private ServiceTrackerList<DLPortletToolbarContributorContext>
-		_dlPortletToolbarContributorContexts;
+	private ServiceTrackerList
+		<DLPortletToolbarContributorContext, DLPortletToolbarContributorContext>
+			_dlPortletToolbarContributorContexts;
 
 	@Reference
 	private DLPortletToolbarContributorHelper
 		_dlPortletToolbarContributorHelper;
 
-	@Reference
-	private MenuItemProvider _menuItemProvider;
+	private final MenuItemProvider _menuItemProvider = new MenuItemProvider();
 
 }

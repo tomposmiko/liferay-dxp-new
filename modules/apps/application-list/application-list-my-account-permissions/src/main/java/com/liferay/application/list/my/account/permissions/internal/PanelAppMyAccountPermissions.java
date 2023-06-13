@@ -55,7 +55,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Drew Brokke
  */
-@Component(service = PanelAppMyAccountPermissions.class)
+@Component(immediate = true, service = PanelAppMyAccountPermissions.class)
 public class PanelAppMyAccountPermissions {
 
 	public void initPermissions(long companyId, List<Portlet> portlets) {
@@ -98,7 +98,8 @@ public class PanelAppMyAccountPermissions {
 
 		String filter = StringBundler.concat(
 			"(&(objectClass=", PanelApp.class.getName(), ")",
-			"(panel.category.key=", PanelCategoryKeys.USER_MY_ACCOUNT, "*))");
+			"(panel.category.key=", PanelCategoryKeys.USER_MY_ACCOUNT,
+			"*)(!(depot.panel.app.wrapper=*)))");
 
 		_serviceTracker = ServiceTrackerFactory.open(
 			bundleContext, filter, new PanelAppServiceTrackerCustomizer());

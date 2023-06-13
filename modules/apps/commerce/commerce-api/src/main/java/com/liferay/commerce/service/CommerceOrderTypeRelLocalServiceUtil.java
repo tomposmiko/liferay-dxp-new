@@ -242,27 +242,30 @@ public class CommerceOrderTypeRelLocalServiceUtil {
 		return getService().fetchCommerceOrderTypeRel(commerceOrderTypeRelId);
 	}
 
-	public static CommerceOrderTypeRel
-		fetchCommerceOrderTypeRelByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return getService().fetchCommerceOrderTypeRelByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the commerce order type rel with the matching UUID and company.
+	 * Returns the commerce order type rel with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order type rel's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order type rel's external reference code
 	 * @return the matching commerce order type rel, or <code>null</code> if a matching commerce order type rel could not be found
 	 */
 	public static CommerceOrderTypeRel
-		fetchCommerceOrderTypeRelByUuidAndCompanyId(
-			String uuid, long companyId) {
+		fetchCommerceOrderTypeRelByExternalReferenceCode(
+			long companyId, String externalReferenceCode) {
 
-		return getService().fetchCommerceOrderTypeRelByUuidAndCompanyId(
-			uuid, companyId);
+		return getService().fetchCommerceOrderTypeRelByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderTypeRelByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static CommerceOrderTypeRel fetchCommerceOrderTypeRelByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchCommerceOrderTypeRelByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
@@ -302,30 +305,21 @@ public class CommerceOrderTypeRelLocalServiceUtil {
 		return getService().getCommerceOrderTypeRel(commerceOrderTypeRelId);
 	}
 
-	public static CommerceOrderTypeRel
-			getCommerceOrderTypeRelByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getCommerceOrderTypeRelByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the commerce order type rel with the matching UUID and company.
+	 * Returns the commerce order type rel with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce order type rel's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order type rel's external reference code
 	 * @return the matching commerce order type rel
 	 * @throws PortalException if a matching commerce order type rel could not be found
 	 */
 	public static CommerceOrderTypeRel
-			getCommerceOrderTypeRelByUuidAndCompanyId(
-				String uuid, long companyId)
+			getCommerceOrderTypeRelByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return getService().getCommerceOrderTypeRelByUuidAndCompanyId(
-			uuid, companyId);
+		return getService().getCommerceOrderTypeRelByExternalReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -366,14 +360,6 @@ public class CommerceOrderTypeRelLocalServiceUtil {
 		String className, long classPK) {
 
 		return getService().getCommerceOrderTypeRelsCount(className, classPK);
-	}
-
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return getService().getExportActionableDynamicQuery(portletDataContext);
 	}
 
 	public static

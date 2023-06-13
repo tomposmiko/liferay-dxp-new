@@ -27,7 +27,7 @@ public class CommerceWishListImpl extends CommerceWishListBaseImpl {
 	public boolean isGuestWishList() throws PortalException {
 		User user = UserLocalServiceUtil.getUser(getUserId());
 
-		return user.isGuestUser();
+		return user.isDefaultUser();
 	}
 
 }

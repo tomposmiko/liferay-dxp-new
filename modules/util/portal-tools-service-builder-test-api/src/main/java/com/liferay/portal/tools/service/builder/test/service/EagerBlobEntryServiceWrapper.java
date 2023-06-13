@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class EagerBlobEntryServiceWrapper
 	implements EagerBlobEntryService, ServiceWrapper<EagerBlobEntryService> {
 
-	public EagerBlobEntryServiceWrapper() {
-		this(null);
-	}
-
 	public EagerBlobEntryServiceWrapper(
 		EagerBlobEntryService eagerBlobEntryService) {
 

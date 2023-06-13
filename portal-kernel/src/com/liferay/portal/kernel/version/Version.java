@@ -49,23 +49,13 @@ public class Version implements Comparable<Version> {
 		return new Version(
 			GetterUtil.getInteger(matcher.group(1)),
 			GetterUtil.getInteger(matcher.group(3)),
-			GetterUtil.getInteger(matcher.group(5)),
-			GetterUtil.getString(matcher.group(7)));
+			GetterUtil.getInteger(matcher.group(5)));
 	}
 
 	public Version(int major, int minor, int micro) {
 		_major = major;
 		_minor = minor;
 		_micro = micro;
-
-		_qualifier = StringPool.BLANK;
-	}
-
-	public Version(int major, int minor, int micro, String qualifier) {
-		_major = major;
-		_minor = minor;
-		_micro = micro;
-		_qualifier = qualifier;
 	}
 
 	@Override
@@ -82,23 +72,7 @@ public class Version implements Comparable<Version> {
 			return result;
 		}
 
-		result = Integer.compare(_micro, version._micro);
-
-		if (result != 0) {
-			return result;
-		}
-
-		String qualifier = version._qualifier;
-
-		result = _qualifier.compareTo(qualifier);
-
-		if (_qualifier.equals(StringPool.BLANK) ||
-			qualifier.equals(StringPool.BLANK)) {
-
-			return result * -1;
-		}
-
-		return result;
+		return Integer.compare(_micro, version._micro);
 	}
 
 	@Override
@@ -114,8 +88,7 @@ public class Version implements Comparable<Version> {
 		Version version = (Version)object;
 
 		if ((_major == version._major) && (_minor == version._minor) &&
-			(_micro == version._micro) &&
-			_qualifier.equals(version._qualifier)) {
+			(_micro == version._micro)) {
 
 			return true;
 		}
@@ -135,39 +108,26 @@ public class Version implements Comparable<Version> {
 		return _minor;
 	}
 
-	public String getQualifier() {
-		return _qualifier;
-	}
-
 	@Override
 	public int hashCode() {
 		int hash = HashUtil.hash(0, _major);
 
 		hash = HashUtil.hash(hash, _minor);
-		hash = HashUtil.hash(hash, _micro);
 
-		return HashUtil.hash(hash, _qualifier);
+		return HashUtil.hash(hash, _micro);
 	}
 
 	@Override
 	public String toString() {
-		if (getQualifier().equals(StringPool.BLANK)) {
-			return StringBundler.concat(
-				_major, StringPool.PERIOD, _minor, StringPool.PERIOD, _micro);
-		}
-
 		return StringBundler.concat(
-			_major, StringPool.PERIOD, _minor, StringPool.PERIOD, _micro,
-			StringPool.PERIOD, _qualifier);
+			_major, StringPool.PERIOD, _minor, StringPool.PERIOD, _micro);
 	}
 
 	private static final Pattern _versionPattern = Pattern.compile(
-		"(\\d{1,10})(\\.(\\d{1,10})(\\.(\\d{1,10})" +
-			"(\\.([-_\\da-zA-Z]+))?)?)?");
+		"(\\d{1,10})(\\.(\\d{1,10})(\\.(\\d{1,10})(\\.([-_\\da-zA-Z]+))?)?)?");
 
 	private final int _major;
 	private final int _micro;
 	private final int _minor;
-	private final String _qualifier;
 
 }

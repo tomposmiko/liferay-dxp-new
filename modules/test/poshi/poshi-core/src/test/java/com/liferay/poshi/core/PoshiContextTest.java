@@ -14,9 +14,7 @@
 
 package com.liferay.poshi.core;
 
-import com.liferay.poshi.core.selenium.LiferaySeleniumMethod;
 import com.liferay.poshi.core.util.FileUtil;
-import com.liferay.poshi.core.util.PropsUtil;
 
 import java.io.File;
 
@@ -47,11 +45,7 @@ public class PoshiContextTest extends TestCase {
 		String poshiFileDir =
 			"src/test/resources/com/liferay/poshi/core/dependencies/test";
 
-		PropsUtil.clear();
-
-		PropsUtil.set("test.base.dir.name", poshiFileDir);
-
-		PoshiContext.readFiles(true, poshiFileNames, poshiFileDir);
+		PoshiContext.readFiles(poshiFileNames, poshiFileDir);
 	}
 
 	@After
@@ -63,12 +57,12 @@ public class PoshiContextTest extends TestCase {
 	@Test
 	public void testGetFilePath() throws Exception {
 		String actualFilePath = PoshiContext.getFilePathFromFileName(
-			"Macro.macro", PoshiContext.getDefaultNamespace());
+			"Action2.action", PoshiContext.getDefaultNamespace());
 
 		String baseDirName = FileUtil.getCanonicalPath(
 			"src/test/resources/com/liferay/poshi/core/");
 
-		File file = new File(baseDirName, "/dependencies/test/Macro.macro");
+		File file = new File(baseDirName, "/dependencies/test/Action2.action");
 
 		String expectedFilePath = file.getCanonicalPath();
 
@@ -132,16 +126,11 @@ public class PoshiContextTest extends TestCase {
 
 	@Test
 	public void testGetSeleniumParameterCount() {
-		LiferaySeleniumMethod seleniumMethod =
-			PoshiContext.getLiferaySeleniumMethod("clickAt");
-
-		int count = seleniumMethod.getParameterCount();
+		int count = PoshiContext.getSeleniumParameterCount("clickAt");
 
 		Assert.assertEquals("getSeleniumParameterCount is failing", 2, count);
 
-		seleniumMethod = PoshiContext.getLiferaySeleniumMethod("click");
-
-		count = seleniumMethod.getParameterCount();
+		count = PoshiContext.getSeleniumParameterCount("click");
 
 		Assert.assertEquals("getSeleniumParameterCount is failing", 1, count);
 	}

@@ -17,7 +17,6 @@ package com.liferay.commerce.shop.by.diagram.service.persistence;
 import com.liferay.commerce.shop.by.diagram.exception.NoSuchCSDiagramSettingException;
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -34,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CSDiagramSettingPersistence
-	extends BasePersistence<CSDiagramSetting>, CTPersistence<CSDiagramSetting> {
+	extends BasePersistence<CSDiagramSetting> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

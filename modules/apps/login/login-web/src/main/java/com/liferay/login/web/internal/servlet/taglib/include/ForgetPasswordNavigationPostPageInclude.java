@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Shuyang Zhou
  */
 @Component(
+	immediate = true,
 	property = {
 		"login.web.navigation.position=post", "service.ranking:Integer=100"
 	},
@@ -80,7 +81,6 @@ public class ForgetPasswordNavigationPostPageInclude implements PageInclude {
 
 		IconTag iconTag = new IconTag();
 
-		iconTag.setCssClass("text-4");
 		iconTag.setMessage("forgot-password");
 		iconTag.setUrl(forgetPasswordURL);
 

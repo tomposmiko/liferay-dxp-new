@@ -55,7 +55,7 @@ public class JournalMoveEntriesDisplayContext {
 		_liferayPortletResponse = liferayPortletResponse;
 
 		_httpServletRequest = PortalUtil.getHttpServletRequest(
-			liferayPortletRequest);
+			_liferayPortletRequest);
 
 		processFolders(getMoveFolders());
 		processArticles(getMoveArticles());

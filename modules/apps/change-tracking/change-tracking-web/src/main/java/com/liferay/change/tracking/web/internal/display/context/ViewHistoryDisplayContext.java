@@ -14,7 +14,6 @@
 
 package com.liferay.change.tracking.web.internal.display.context;
 
-import com.liferay.change.tracking.constants.CTActionKeys;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTCollectionTable;
 import com.liferay.change.tracking.model.CTProcess;
@@ -23,7 +22,6 @@ import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTProcessService;
 import com.liferay.change.tracking.service.CTSchemaVersionLocalService;
 import com.liferay.change.tracking.web.internal.constants.CTWebConstants;
-import com.liferay.change.tracking.web.internal.security.permission.resource.CTPermission;
 import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
@@ -96,7 +94,7 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 		_renderResponse = renderResponse;
 		_userLocalService = userLocalService;
 
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -169,9 +167,14 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 
 			Date publishedDate = ctProcess.getCreateDate();
 
+			String timeDescription = _language.getTimeDescription(
+				_themeDisplay.getLocale(),
+				System.currentTimeMillis() - publishedDate.getTime(), true);
+
 			ResourceURL statusURL = _renderResponse.createResourceURL();
 
 			statusURL.setResourceID("/change_tracking/get_publication_status");
+
 			statusURL.setParameter(
 				"ctProcessId", String.valueOf(ctProcess.getCtProcessId()));
 
@@ -184,11 +187,6 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 					"expired",
 					!_ctSchemaVersionLocalService.isLatestCTSchemaVersion(
 						ctCollection.getSchemaVersionId())
-				).put(
-					"hasRevertPermission",
-					CTPermission.contains(
-						_themeDisplay.getPermissionChecker(),
-						CTActionKeys.ADD_PUBLICATION)
 				).put(
 					"hasViewPermission",
 					_ctCollectionModelResourcePermission.contains(
@@ -217,17 +215,9 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 					"statusURL", statusURL.toString()
 				).put(
 					"timeDescription",
-					() -> {
-						String timeDescription = _language.getTimeDescription(
-							_themeDisplay.getLocale(),
-							System.currentTimeMillis() -
-								publishedDate.getTime(),
-							true);
-
-						return _language.format(
-							_themeDisplay.getLocale(), "x-ago",
-							new String[] {timeDescription}, false);
-					}
+					_language.format(
+						_themeDisplay.getLocale(), "x-ago",
+						new String[] {timeDescription}, false)
 				).put(
 					"userId", ctProcess.getUserId()
 				).put(
@@ -245,7 +235,7 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 		).put(
 			"entries", entriesJSONArray
 		).put(
-			"spritemap", _themeDisplay.getPathThemeSpritemap()
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"userInfo",
 			() -> {
@@ -283,15 +273,19 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 
 		DisplayTerms displayTerms = searchContainer.getDisplayTerms();
 
-		searchContainer.setResultsAndTotal(
-			() -> _ctProcessService.getCTProcesses(
-				_themeDisplay.getCompanyId(), CTWebConstants.USER_FILTER_ALL,
-				displayTerms.getKeywords(), _getStatus(getFilterByStatus()),
-				searchContainer.getStart(), searchContainer.getEnd(),
-				_getOrderByComparator(getOrderByCol(), getOrderByType())),
-			_ctProcessService.getCTProcessesCount(
-				_themeDisplay.getCompanyId(), CTWebConstants.USER_FILTER_ALL,
-				displayTerms.getKeywords(), _getStatus(getFilterByStatus())));
+		List<CTProcess> results = _ctProcessService.getCTProcesses(
+			_themeDisplay.getCompanyId(), CTWebConstants.USER_FILTER_ALL,
+			displayTerms.getKeywords(), _getStatus(getFilterByStatus()),
+			searchContainer.getStart(), searchContainer.getEnd(),
+			_getOrderByComparator(getOrderByCol(), getOrderByType()));
+
+		searchContainer.setResults(results);
+
+		int count = _ctProcessService.getCTProcessesCount(
+			_themeDisplay.getCompanyId(), CTWebConstants.USER_FILTER_ALL,
+			displayTerms.getKeywords(), _getStatus(getFilterByStatus()));
+
+		searchContainer.setTotal(count);
 
 		_searchContainer = searchContainer;
 

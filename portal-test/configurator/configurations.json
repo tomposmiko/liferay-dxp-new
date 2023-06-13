@@ -1,7 +1,0 @@
-{
-	"org.apache.aries.jmx.framework.StateConfig": {
-		"attributeChangeNotificationEnabled": false,
-		"bundleChangeNotificationEnabled": false,
-		"serviceChangeNotificationEnabled": false
-	}
-}

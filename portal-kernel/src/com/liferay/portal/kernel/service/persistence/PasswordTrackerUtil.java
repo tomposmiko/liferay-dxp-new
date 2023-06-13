@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.PasswordTracker;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -439,9 +440,15 @@ public class PasswordTrackerUtil {
 	}
 
 	public static PasswordTrackerPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(PasswordTrackerPersistence)PortalBeanLocatorUtil.locate(
+					PasswordTrackerPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile PasswordTrackerPersistence _persistence;
+	private static PasswordTrackerPersistence _persistence;
 
 }

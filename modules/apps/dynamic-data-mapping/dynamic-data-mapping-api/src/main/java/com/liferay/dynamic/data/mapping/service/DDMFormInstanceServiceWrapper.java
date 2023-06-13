@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class DDMFormInstanceServiceWrapper
 	implements DDMFormInstanceService, ServiceWrapper<DDMFormInstanceService> {
 
-	public DDMFormInstanceServiceWrapper() {
-		this(null);
-	}
-
 	public DDMFormInstanceServiceWrapper(
 		DDMFormInstanceService ddmFormInstanceService) {
 
@@ -71,14 +67,14 @@ public class DDMFormInstanceServiceWrapper
 	@Override
 	public DDMFormInstance copyFormInstance(
 			long groupId, java.util.Map<java.util.Locale, String> nameMap,
-			DDMFormInstance sourceDDMFormInstance,
+			DDMFormInstance ddmFormInstance,
 			com.liferay.dynamic.data.mapping.storage.DDMFormValues
 				settingsDDMFormValues,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddmFormInstanceService.copyFormInstance(
-			groupId, nameMap, sourceDDMFormInstance, settingsDDMFormValues,
+			groupId, nameMap, ddmFormInstance, settingsDDMFormValues,
 			serviceContext);
 	}
 

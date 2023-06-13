@@ -34,23 +34,17 @@ const NAV_ITEMS_REVERSE = {
  * change the React Router route, currently the component is rendered via JSP
  * and it is necessary to control the interaction via JavaScript.
  */
-export function NavigationBar({history, location}) {
+export const NavigationBar = ({history, location}) => {
 	useBack();
 
 	const onClick = useCallback(
 		(event) => {
-			if (
-				event.target.type === 'button' ||
-				event.target.tagName === 'SPAN'
-			) {
+			if (event.target.type === 'button') {
 				event.preventDefault();
 
-				const target =
-					event.target.type === 'button'
-						? event.target
-						: event.target.parentElement;
-
-				const index = Number(target.parentElement.dataset.navItemIndex);
+				const index = Number(
+					event.target.parentElement.dataset.navItemIndex
+				);
 
 				const path = NAV_ITEMS[index];
 
@@ -61,7 +55,7 @@ export function NavigationBar({history, location}) {
 					.querySelector('.forms-navigation-bar li > .active')
 					.classList.remove('active');
 
-				target.classList.add('active');
+				event.target.classList.add('active');
 
 				const method =
 					path === location.pathname ? history.replace : history.push;
@@ -95,4 +89,4 @@ export function NavigationBar({history, location}) {
 	}, []);
 
 	return null;
-}
+};

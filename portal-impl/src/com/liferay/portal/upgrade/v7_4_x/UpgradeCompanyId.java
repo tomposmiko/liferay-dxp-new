@@ -17,7 +17,6 @@ package com.liferay.portal.upgrade.v7_4_x;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.BaseCompanyIdUpgradeProcess;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.util.PortalInstances;
 
 import java.io.IOException;
 
@@ -65,69 +64,71 @@ public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 		public void update(Connection connection)
 			throws IOException, SQLException {
 
-			long[] companyIds = PortalInstances.getCompanyIdsBySQL();
+			List<Long> companyIds = getCompanyIds(connection);
 
-			if (companyIds.length == 1) {
-				runSQL(connection, getUpdateSQL(String.valueOf(companyIds[0])));
+			if (companyIds.size() == 1) {
+				String selectSQL = String.valueOf(companyIds.get(0));
+
+				runSQL(connection, getUpdateSQL(selectSQL));
 
 				return;
 			}
 
 			// Company
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Company", "companyId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_COMPANY));
+			String updateSQL = _getUpdateSQL(
+				"Company", "companyId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_COMPANY);
+
+			runSQL(connection, updateSQL);
 
 			// Group
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Group_", "groupId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_GROUP));
+			updateSQL = _getUpdateSQL(
+				"Group_", "groupId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_GROUP);
+
+			runSQL(connection, updateSQL);
 
 			// Layout
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Layout", "plid", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT));
+			updateSQL = _getUpdateSQL(
+				"Layout", "plid", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT);
+
+			runSQL(connection, updateSQL);
 
 			// LayoutRevision
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"LayoutRevision", "layoutRevisionId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT));
+			updateSQL = _getUpdateSQL(
+				"LayoutRevision", "layoutRevisionId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT);
+
+			runSQL(connection, updateSQL);
 
 			// Organization
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"Organization_", "organizationId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_ORGANIZATION));
+			updateSQL = _getUpdateSQL(
+				"Organization_", "organizationId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_ORGANIZATION);
+
+			runSQL(connection, updateSQL);
 
 			// PortletItem
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"PortletItem", "portletItemId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_ARCHIVED));
+			updateSQL = _getUpdateSQL(
+				"PortletItem", "portletItemId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_ARCHIVED);
+
+			runSQL(connection, updateSQL);
 
 			// User_
 
-			runSQL(
-				connection,
-				_getUpdateSQL(
-					"User_", "userId", "ownerId",
-					PortletKeys.PREFS_OWNER_TYPE_USER));
+			updateSQL = _getUpdateSQL(
+				"User_", "userId", "ownerId",
+				PortletKeys.PREFS_OWNER_TYPE_USER);
+
+			runSQL(connection, updateSQL);
 
 			// PortalPreferences companyId 0
 
@@ -170,11 +171,11 @@ public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 				String columnName, int ownerType)
 			throws IOException, SQLException {
 
+			String selectSQL = _getSelectSQL(
+				foreignTableName, foreignColumnName, columnName);
+
 			return StringBundler.concat(
-				getUpdateSQL(
-					_getSelectSQL(
-						foreignTableName, foreignColumnName, columnName)),
-				" where ownerType = ", ownerType,
+				getUpdateSQL(selectSQL), " where ownerType = ", ownerType,
 				" and (companyId is null or companyId = 0)");
 		}
 

@@ -14,10 +14,10 @@
 
 package com.liferay.commerce.theme.minium.full.site.initializer.internal.importer;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.machine.learning.recommendation.ProductContentCommerceMLRecommendation;
 import com.liferay.commerce.machine.learning.recommendation.ProductContentCommerceMLRecommendationManager;
 import com.liferay.commerce.machine.learning.recommendation.ProductInteractionCommerceMLRecommendation;
@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = CommerceMLRecommendationImporter.class)
+@Component(enabled = false, service = CommerceMLRecommendationImporter.class)
 public class CommerceMLRecommendationImporter {
 
 	public void importCommerceMLRecommendations(
@@ -245,11 +245,11 @@ public class CommerceMLRecommendationImporter {
 		String accountExternalReferenceCode = jsonObject.getString(
 			"accountExternalReferenceCode");
 
-		AccountEntry accountEntry =
-			_accountEntryLocalService.fetchAccountEntryByExternalReferenceCode(
-				accountExternalReferenceCode, serviceContext.getCompanyId());
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.fetchByExternalReferenceCode(
+				serviceContext.getCompanyId(), accountExternalReferenceCode);
 
-		if (accountEntry == null) {
+		if (commerceAccount == null) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					String.format(
@@ -297,7 +297,7 @@ public class CommerceMLRecommendationImporter {
 			serviceContext.getCompanyId());
 		userCommerceMLRecommendation.setCreateDate(new Date());
 		userCommerceMLRecommendation.setEntryClassPK(
-			accountEntry.getAccountEntryId());
+			commerceAccount.getCommerceAccountId());
 		userCommerceMLRecommendation.setJobId(
 			"commerce-ml-recommendation-importer");
 		userCommerceMLRecommendation.setRecommendedEntryClassPK(
@@ -313,10 +313,10 @@ public class CommerceMLRecommendationImporter {
 		CommerceMLRecommendationImporter.class);
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
-	private AssetEntryLocalService _assetEntryLocalService;
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Reference
 	private CPDefinitionLocalService _cpDefinitionLocalService;

@@ -14,7 +14,7 @@
 
 package com.liferay.gradle.plugins.tlddoc.builder;
 
-import com.liferay.gradle.plugins.tlddoc.builder.task.TLDDocTask;
+import com.liferay.gradle.plugins.tlddoc.builder.tasks.TLDDocTask;
 import com.liferay.gradle.util.GradleUtil;
 
 import groovy.lang.Closure;
@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.invocation.Gradle;
@@ -160,9 +161,10 @@ public class AppTLDDocBuilderPlugin implements Plugin<Project> {
 	private void _configureTaskAppTLDDoc(
 		TLDDocTask appTLDDocTask, Project subproject) {
 
-		appTLDDocTask.dependsOn(
-			GradleUtil.getTask(
-				subproject, TLDDocBuilderPlugin.VALIDATE_TLD_TASK_NAME));
+		Task task = GradleUtil.getTask(
+			subproject, TLDDocBuilderPlugin.VALIDATE_TLD_TASK_NAME);
+
+		appTLDDocTask.dependsOn(task);
 
 		TLDDocTask tldDocTask = (TLDDocTask)GradleUtil.getTask(
 			subproject, TLDDocBuilderPlugin.TLDDOC_TASK_NAME);

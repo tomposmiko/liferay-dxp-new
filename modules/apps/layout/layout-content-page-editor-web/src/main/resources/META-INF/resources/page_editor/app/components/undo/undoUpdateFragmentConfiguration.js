@@ -19,21 +19,17 @@ function undoAction({action}) {
 	const {editableValues, fragmentEntryLinkId} = action;
 
 	return (dispatch, getState) => {
-		const {languageId, segmentsExperienceId} = getState();
-
 		return FragmentService.updateConfigurationValues({
 			editableValues,
 			fragmentEntryLinkId,
-			languageId,
+			languageId: getState().languageId,
 			onNetworkStatus: dispatch,
-			segmentsExperienceId,
-		}).then(({fragmentEntryLink, layoutData, pageContents}) => {
+		}).then(({fragmentEntryLink, layoutData}) => {
 			dispatch(
 				updateFragmentEntryLinkConfiguration({
 					fragmentEntryLink,
 					fragmentEntryLinkId,
 					layoutData,
-					pageContents,
 				})
 			);
 		});

@@ -70,7 +70,7 @@ public class BeanFilterInvokerPortletFilter
 			_invokeMethod(_destroyMethod);
 		}
 		catch (PortletException portletException) {
-			_log.error(portletException);
+			_log.error(portletException, portletException);
 		}
 	}
 

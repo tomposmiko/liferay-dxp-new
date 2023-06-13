@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = {
 		"scripting.language=beanshell", "scripting.language=groovy",
 		"scripting.language=javascript", "scripting.language=python",
@@ -65,7 +66,7 @@ public class ScriptingLanguagesKaleoTaskAssignmentSelector
 
 	private static final Set<String> _outputNames = new HashSet<>(
 		Arrays.asList(
-			ROLES_ASSIGNMENT, USER_ASSIGNMENT, USERS_ASSIGNMENT,
+			ROLES_ASSIGNMENT, USER_ASSIGNMENT,
 			WorkflowContextUtil.WORKFLOW_CONTEXT_NAME));
 
 	@Reference

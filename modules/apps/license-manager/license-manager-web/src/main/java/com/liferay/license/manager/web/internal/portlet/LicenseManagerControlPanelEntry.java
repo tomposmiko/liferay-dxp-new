@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Daniel Sanz
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + LicenseManagerPortletKeys.LICENSE_MANAGER,
 	service = ControlPanelEntry.class
 )

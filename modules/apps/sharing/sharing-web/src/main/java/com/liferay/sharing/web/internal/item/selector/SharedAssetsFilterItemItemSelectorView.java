@@ -21,8 +21,9 @@ import com.liferay.item.selector.ItemSelectorViewDescriptorRenderer;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.sharing.filter.SharedAssetsFilterItem;
-import com.liferay.sharing.web.internal.filter.SharedAssetsFilterItemRegistry;
+import com.liferay.sharing.web.internal.filter.SharedAssetsFilterItemTracker;
 
 import java.io.IOException;
 
@@ -135,13 +136,9 @@ public class SharedAssetsFilterItemItemSelectorView
 								JavaConstants.JAVAX_PORTLET_REQUEST),
 							portletURL, null, null);
 
-					List<SharedAssetsFilterItem> sharedAssetsFilterItems =
-						_sharedAssetsFilterItemRegistry.
-							getSharedAssetsFilterItems();
-
-					entriesSearchContainer.setResultsAndTotal(
-						() -> sharedAssetsFilterItems,
-						sharedAssetsFilterItems.size());
+					entriesSearchContainer.setResults(
+						_sharedAssetsFilterItemTracker.
+							getSharedAssetsFilterItems());
 
 					return entriesSearchContainer;
 				}
@@ -172,6 +169,9 @@ public class SharedAssetsFilterItemItemSelectorView
 	private Language _language;
 
 	@Reference
-	private SharedAssetsFilterItemRegistry _sharedAssetsFilterItemRegistry;
+	private Portal _portal;
+
+	@Reference
+	private SharedAssetsFilterItemTracker _sharedAssetsFilterItemTracker;
 
 }

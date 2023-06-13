@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Marco Leo
+ * @see ObjectLayoutServiceSoap
  * @generated
  */
 public class ObjectLayoutServiceHttp {

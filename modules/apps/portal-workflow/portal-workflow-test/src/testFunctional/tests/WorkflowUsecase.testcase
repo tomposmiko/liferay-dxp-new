@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -30,7 +30,7 @@ definition {
 
 			WikiPage.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownPG();
 
 			Workflow.tearDownPortalWorkflow();
 
@@ -44,7 +44,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddBlogsEntriesWithPortalScopeWorkflowAndAssertWorkflowScope {
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -67,7 +67,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -79,7 +79,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -97,7 +97,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -115,7 +115,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -130,7 +130,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -142,7 +142,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -160,7 +160,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -178,7 +178,7 @@ definition {
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -203,7 +203,7 @@ definition {
 			workflowTask = "Review");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddBlogsEntriesWithSiteScopeWorkflowAndAssertWorkflowScope {
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -226,14 +226,14 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -252,7 +252,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -266,21 +266,21 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Blogs");
 
@@ -294,8 +294,7 @@ definition {
 		Workflow.viewCompletedTasksTaskNotPresentCP(workflowAssetTitle = "Blogs Entry Title - Site Name");
 	}
 
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test AddDDLRecordWithDoubleApproverDefinition {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WorkflowUsecase#AddDDLRecordWithDoubleApproverDefinition";
@@ -306,24 +305,23 @@ definition {
 			panel = "Applications",
 			portlet = "Process Builder");
 
-		Workflow.addNewDefinition(workflowDefinitionTitle = "Double Approver Definition");
+		Workflow.uploadDefinition(
+			workflowDefinitionFile = "legal-marketing-workflow-definition.xml",
+			workflowDefinitionTitle = "Double Approver Definition");
 
-		ProcessBuilderKaleoDesignerReact.uploadDefinition(workflowDefinitionFile = "legal-marketing-workflow-definition.xml");
-
-		ProcessBuilderKaleoDesignerReact.diagramSourceSwitchView();
-
-		PortletEntry.publish();
-
-		Navigator.gotoBack();
+		ApplicationsMenu.gotoPortlet(
+			category = "Workflow",
+			panel = "Applications",
+			portlet = "Process Builder");
 
 		Workflow.viewDefinition(
 			workflowDefinitionTitle = "Double Approver Definition",
-			workflowDefinitionVersionNumber = 1);
+			workflowDefinitionVersionNumber = "1");
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists");
 
@@ -339,7 +337,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists");
 
@@ -352,7 +350,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists");
 
@@ -363,7 +361,7 @@ definition {
 			fieldFieldLabel = "Boolean",
 			fieldName = "Boolean");
 
-		DDLRecord.submitForWorkflow();
+		DDLRecord.submitForPublication();
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -376,7 +374,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists");
 
@@ -401,7 +399,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists");
 
@@ -425,7 +423,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists");
 
@@ -450,11 +448,11 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Dynamic Data Lists");
 
-		DDLNavigator.gotoListRecords(ddlListName = ${ddlListName});
+		DDLNavigator.gotoListRecords(ddlListName = "${ddlListName}");
 
 		DDLRecord.viewFirstFieldCP(
 			ddlRecordFieldData = "True",
@@ -463,9 +461,8 @@ definition {
 			fieldName = "Boolean");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddWebContentWithCategorySpecificDefinition {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "WorkflowUsecase#AddWebContentWithCategorySpecificDefinition";
 
 		ApplicationsMenu.gotoPortlet(
@@ -473,19 +470,13 @@ definition {
 			panel = "Applications",
 			portlet = "Process Builder");
 
-		Workflow.addNewDefinition(workflowDefinitionTitle = "Category Specific");
-
-		ProcessBuilderKaleoDesignerReact.uploadDefinition(workflowDefinitionFile = "category-specific-workflow-definition.xml");
-
-		ProcessBuilderKaleoDesignerReact.diagramSourceSwitchView();
-
-		PortletEntry.publish();
-
-		Navigator.gotoBack();
+		Workflow.uploadDefinition(
+			workflowDefinitionFile = "category-specific-workflow-definition.xml",
+			workflowDefinitionTitle = "Category Specific");
 
 		Workflow.viewDefinition(
 			workflowDefinitionTitle = "Category Specific",
-			workflowDefinitionVersionNumber = 1);
+			workflowDefinitionVersionNumber = "1");
 
 		Navigator.openURL();
 
@@ -514,7 +505,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -527,10 +518,10 @@ definition {
 			webContentTitle = "WC With Legal Category");
 
 		WebContent.selectCategory(
-			categoryNameList = "legal",
+			categoryName = "legal",
 			vocabularyName = "Vocabulary Name");
 
-		Button.clickSubmitForWorkflow();
+		Button.clickSubmitForPublication();
 
 		Alert.viewSuccessMessage();
 
@@ -542,7 +533,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -553,10 +544,14 @@ definition {
 			webContentTitle = "WC With Multiple Categories");
 
 		WebContent.selectCategory(
-			categoryNameList = "legal,other",
+			categoryName = "legal",
 			vocabularyName = "Vocabulary Name");
 
-		Button.clickSubmitForWorkflow();
+		WebContent.selectCategory(
+			categoryName = "other",
+			vocabularyName = "Vocabulary Name");
+
+		Button.clickSubmitForPublication();
 
 		Alert.viewSuccessMessage();
 
@@ -568,7 +563,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -579,10 +574,10 @@ definition {
 			webContentTitle = "WC With Other Category");
 
 		WebContent.selectCategory(
-			categoryNameList = "other",
+			categoryName = "other",
 			vocabularyName = "Vocabulary Name");
 
-		Button.clickSubmitForWorkflow();
+		Button.clickSubmitForPublication();
 
 		Alert.viewSuccessMessage();
 
@@ -594,7 +589,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -632,9 +627,9 @@ definition {
 			workflowTask = "content-review");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test AddWikiPageAsSiteUser {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Navigator.openURL();
 
@@ -652,7 +647,7 @@ definition {
 			panel = "Site Administration",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Wiki Page");
+		SitePages.addPublicPage(pageName = "Wiki Page");
 
 		Navigator.gotoPage(pageName = "Wiki Page");
 
@@ -684,7 +679,7 @@ definition {
 			portlet = "Users and Organizations");
 
 		User.editUserSiteCP(
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			userScreenName = "usersn");
 
 		User.logoutPG();
@@ -716,19 +711,19 @@ definition {
 		var key_workflowAssetTitle = "Wiki Page Title";
 
 		AssertTextEquals(
-			locator1 = "WorkflowSubmissions#MY_SUBMISSIONS_TABLE_DEFINITION",
+			locator1 = "MyWorkflowTasks#ASSIGNED_TO_ME_TABLE_LAST_ACTIVITY_DATE",
 			value1 = "Single Approver");
 
 		AssertTextEquals(
-			locator1 = "WorkflowSubmissions#MY_SUBMISSIONS_TABLE_TITLE",
+			locator1 = "MyWorkflowTasks#TABLE_GENERIC_ASSET_TITLE",
 			value1 = "Wiki Page Title");
 
 		AssertTextEquals(
-			locator1 = "WorkflowSubmissions#MY_SUBMISSIONS_TABLE_TYPE",
+			locator1 = "MyWorkflowTasks#ASSIGNED_TO_ME_TABLE_ASSET_TYPE",
 			value1 = "Wiki Page");
 
 		AssertTextEquals(
-			locator1 = "WorkflowSubmissions#MY_SUBMISSIONS_TABLE_TASK",
+			locator1 = "MyWorkflowTasks#ASSIGNED_TO_ME_TABLE_TASK",
 			value1 = "Review");
 
 		AssertElementPresent(locator1 = "MyWorkflowTasks#ASSIGNED_TO_ME_TABLE_DUE_DATE");
@@ -796,9 +791,9 @@ definition {
 			wikiPageTitle = "Wiki Page Title");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test UnpublishAndDeleteUploadedDefinition {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WorkflowUsecase#UnpublishAndDeleteUploadedDefinition";
 
 		ApplicationsMenu.gotoPortlet(
@@ -806,17 +801,9 @@ definition {
 			panel = "Applications",
 			portlet = "Process Builder");
 
-		Workflow.addNewDefinition(workflowDefinitionTitle = "New Uploaded Definition");
-
-		ProcessBuilderKaleoDesignerReact.uploadDefinition(workflowDefinitionFile = "1-workflow-definition.xml");
-
-		ProcessBuilderKaleoDesignerReact.diagramSourceSwitchView();
-
-		Button.clickSave();
-
-		Button.clickPublish();
-
-		Navigator.gotoBack();
+		Workflow.uploadDefinition(
+			workflowDefinitionFile = "1-workflow-definition.xml",
+			workflowDefinitionTitle = "New Uploaded Definition");
 
 		Workflow.viewDefinitionPublished(workflowDefinitionTitle = "New Uploaded Definition");
 
@@ -852,7 +839,7 @@ definition {
 		Workflow.deleteWorkflowDefinition(workflowDefinitionTitle = "New Uploaded Definition");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewBlogsEntryWorkflowViaNotifications {
 		Navigator.openURL();
 
@@ -870,7 +857,7 @@ definition {
 			panel = "Site Administration",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Blogs Page");
+		SitePages.addPublicPage(pageName = "Blogs Page");
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
@@ -883,7 +870,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
-		Notifications.viewBadgeCount(notificationCount = 1);
+		Notifications.viewBadgeCount(notificationCount = "1");
 
 		WorkflowAsset.gotoViaNotification(
 			assetType = "Blogs Entry",
@@ -895,7 +882,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -921,11 +908,10 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
 
-		Notifications.viewBadgeCount(notificationCount = 0);
+		Notifications.viewBadgeCount(notificationCount = "0");
 	}
 
-	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test ViewInvalidDefinitionAlert {
 		property test.name.skip.portal.instance = "WorkflowUsecase#ViewInvalidDefinitionAlert";
 
@@ -934,27 +920,54 @@ definition {
 			panel = "Applications",
 			portlet = "Process Builder");
 
-		Workflow.addNewDefinition(workflowDefinitionTitle = "Invalid Definition");
+		Click(locator1 = "Button#PLUS");
 
-		ProcessBuilderKaleoDesignerReact.uploadDefinition(
-			errorMessage = "Please enter valid content.",
-			workflowDefinitionFile = "Document_1.txt");
+		PortletEntry.inputTitle(title = "Invalid Definition");
+
+		if (IsElementPresent(locator1 = "KaleoDesignerEditWorkflow#SOURCE_KALEO_XML_TAB")) {
+			KaleoDesigner.viewSourceXMLTab();
+		}
+
+		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
+			locator1 = "WorkflowUpload#FILE_UPLOAD",
+			value1 = "Document_1.txt");
+
+		Button.clickPublish();
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_1",
+			value1 = "Please enter valid content.");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewTaskCount {
-		Workflow.openWorkflowProcessBuilderConfiguration();
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Site Administration",
+			portlet = "Workflow");
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Blogs Entry");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Web Content");
 
 		Workflow.configureWCWorkflowViaFolderInfo(workflowDefinition = "Single Approver");
 
 		for (var number : list "1,2,3") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+			Navigator.openURL();
+
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				panel = "Site Administration",
+				portlet = "Web Content");
 
 			Workflow.webContentGoToAddCP();
 
@@ -962,13 +975,25 @@ definition {
 				webContentContent = "WC WebContent Content ${number}",
 				webContentTitle = "WC WebContent Title ${number}");
 
-			BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+			Navigator.openURL();
+
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				panel = "Site Administration",
+				portlet = "Blogs");
+
+			Pause(locator1 = "3000");
 
 			Blogs.addWithWorkflow(
 				entryContent = "Blogs Entry Content ${number}",
 				entrySubtitle = "Subtitle ${number}",
 				entryTitle = "Blogs Entry Title ${number}");
 		}
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Workflow",
+			panel = "Applications",
+			portlet = "Process Builder");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -988,19 +1013,19 @@ definition {
 
 		AssertElementPresent(locator1 = "xpath=(//div[contains(@id,'workflowTasksSearchContainer')]//tr[@data-qa-id])[6]");
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		Pagination.viewResults(results = "Showing 1 to 4 of 6 entries.");
 
 		AssertElementNotPresent(locator1 = "xpath=(//div[contains(@id,'workflowTasksSearchContainer')]//tr[@data-qa-id])[6]");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewWebContentConfigurationCP {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -1009,7 +1034,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -1018,7 +1043,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -1026,7 +1051,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-59108."
-	@priority = 4
+	@priority = "4"
 	test ViewWorkflowConfigurationScope {
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -1100,52 +1125,99 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-13519."
-	@priority = 5
+	@priority = "5"
 	test ViewWorkflowSubmissionsFromDifferentUsers {
-		Workflow.openWorkflowProcessBuilderConfiguration();
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Workflow",
+			panel = "Applications",
+			portlet = "Process Builder");
+
+		Navigator.gotoNavItem(navItem = "Configuration");
 
 		Workflow.configureWorkflow(
 			workflowDefinition = "Single Approver",
 			workflowResourceValue = "Blogs Entry");
 
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS_IN_CONTROL_PANEL",
-			resourceName = "com_liferay_blogs_web_portlet_BlogsAdminPortlet",
-			roleTitle = "Site Member",
-			roleType = "site");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Roles");
 
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ADD_ENTRY",
-			resourceName = "com.liferay.blogs",
+		Role.definePermissionCP(
+			permissionDefinitionKey = "SITE_ADMIN_CONTENT_BLOGS_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX",
+			permissionDefinitionValue = "Access in Site and Asset Library Administration",
 			roleTitle = "Site Member",
-			roleType = "site");
+			roleType = "Site");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Roles");
+
+		Role.definePermissionCP(
+			permissionDefinitionKey = "SITE_ADMIN_CONTENT_BLOGS_RESOURCE_PERMISSIONS_BLOGS_ENTRIES_ADD_ENTRY_CHECKBOX",
+			permissionDefinitionValue = "Add Entry",
+			roleTitle = "Site Member",
+			roleType = "Site");
 
 		for (var n : list "1,2") {
-			JSONUser.addUser(
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
+
+			User.addCP(
 				userEmailAddress = "usersn${n}@liferay.com",
 				userFirstName = "userfn${n}",
 				userLastName = "userln${n}",
 				userScreenName = "usersn${n}");
 
-			JSONUser.addUserToSite(
-				groupName = "Guest",
-				userEmailAddress = "usersn${n}@liferay.com");
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
 
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "usersn${n}@liferay.com");
+			User.editUserSiteCP(
+				siteName = "${siteName}",
+				userScreenName = "usersn${n}");
+
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
+
+			User.editPasswordCP(
+				userEmailAddress = "usersn${n}@liferay.com",
+				userScreenName = "usersn${n}");
 
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "usersn${n}@liferay.com",
 				userScreenName = "usersn${n}");
 
-			BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+			Navigator.openURL();
+
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				panel = "Site Administration",
+				portlet = "Blogs");
+
+			Pause(locator1 = "3000");
 
 			Blogs.addWithWorkflow(
 				entryContent = "User ${n} Blog Content Approved",
 				entrySubtitle = "User ${n} Blog Subtitle Approved",
 				entryTitle = "User ${n} Blog Title Approved");
+
+			Navigator.openURL();
+
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				panel = "Site Administration",
+				portlet = "Blogs");
+
+			Pause(locator1 = "3000");
 
 			Blogs.addWithWorkflow(
 				entryContent = "User ${n} Blog Content Pending",
@@ -1155,6 +1227,8 @@ definition {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "test@liferay.com",
 				userScreenName = "Test Test");
+
+			Navigator.openURL();
 
 			UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -1172,6 +1246,8 @@ definition {
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "usersn1@liferay.com",
 			userScreenName = "usersn1");
+
+		Navigator.openURL();
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Submissions");
 
@@ -1195,6 +1271,8 @@ definition {
 			userLoginEmailAddress = "usersn2@liferay.com",
 			userScreenName = "usersn2");
 
+		Navigator.openURL();
+
 		UserBar.gotoDropdownItem(dropdownItem = "My Submissions");
 
 		Workflow.viewMySubmissions(
@@ -1214,14 +1292,14 @@ definition {
 		Workflow.viewSubmissionNotPresent(workflowAssetTitle = "User 1 Blog Title Approved");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test XSSScriptWebContent {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -1230,7 +1308,7 @@ definition {
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -1259,11 +1337,12 @@ definition {
 		AssertAlertNotPresent();
 
 		var actualScript = '''<script>alert(123);</script>''';
+
 		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
 
-		AssertHTMLSourceTextNotPresent(value1 = ${actualScript});
+		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
 
-		AssertHTMLSourceTextPresent(value1 = ${escapedScript});
+		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -1276,16 +1355,17 @@ definition {
 		AssertAlertNotPresent();
 
 		var actualScript = '''<script>alert(123);</script>''';
+
 		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
 
-		AssertHTMLSourceTextNotPresent(value1 = ${actualScript});
+		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
 
-		AssertHTMLSourceTextPresent(value1 = ${escapedScript});
+		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
 
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
-			category = "Content & Data",
+			category = "Content &amp; Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -1301,19 +1381,19 @@ definition {
 			category = "Sites",
 			panel = "Control Panel",
 			portlet = "Sites",
-			site = ${siteName});
+			site = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages",
-			site = ${siteName});
+			site = "${siteName}");
 
-		PagesAdmin.addPage(pageName = "Asset Publisher Test Page");
+		SitePages.addPublicPage(pageName = "Asset Publisher Test Page");
 
 		Navigator.gotoPage(
 			pageName = "Asset Publisher Test Page",
-			siteName = ${siteName});
+			siteName = "${siteName}");
 
 		Navigator.gotoPage(pageName = "Asset Publisher Test Page");
 

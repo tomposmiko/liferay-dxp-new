@@ -28,8 +28,6 @@ import com.liferay.commerce.model.CommerceShippingOption;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
-import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionLocalService;
-import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionQualifierLocalService;
 import com.liferay.commerce.util.BaseCommerceCheckoutStep;
 import com.liferay.commerce.util.CommerceCheckoutStep;
 import com.liferay.commerce.util.CommerceShippingEngineRegistry;
@@ -38,16 +36,12 @@ import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.transaction.Propagation;
-import com.liferay.portal.kernel.transaction.TransactionConfig;
-import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -73,6 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.checkout.step.name=" + ShippingMethodCommerceCheckoutStep.NAME,
 		"commerce.checkout.step.order:Integer=20"
@@ -119,7 +114,7 @@ public class ShippingMethodCommerceCheckoutStep
 		throws Exception {
 
 		try {
-			_updateCommerceOrderShippingMethod(actionRequest);
+			updateCommerceOrderShippingMethod(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof CommerceOrderShippingMethodException) {
@@ -142,9 +137,7 @@ public class ShippingMethodCommerceCheckoutStep
 			shippingMethodCheckoutStepDisplayContext =
 				new ShippingMethodCheckoutStepDisplayContext(
 					_commercePriceFormatter, _commerceShippingEngineRegistry,
-					_commerceShippingMethodLocalService,
-					_commerceShippingFixedOptionLocalService,
-					_configurationProvider, httpServletRequest);
+					_commerceShippingMethodLocalService, httpServletRequest);
 
 		CommerceOrder commerceOrder =
 			shippingMethodCheckoutStepDisplayContext.getCommerceOrder();
@@ -213,7 +206,7 @@ public class ShippingMethodCommerceCheckoutStep
 		for (CommerceShippingOption commerceShippingOption :
 				commerceShippingOptions) {
 
-			if (shippingOptionName.equals(commerceShippingOption.getKey())) {
+			if (shippingOptionName.equals(commerceShippingOption.getName())) {
 				return commerceShippingOption.getAmount();
 			}
 		}
@@ -224,7 +217,18 @@ public class ShippingMethodCommerceCheckoutStep
 				"\" for shipping method ", commerceShippingMethodId));
 	}
 
-	private void _updateCommerceOrderShippingMethod(ActionRequest actionRequest)
+	@Reference(
+		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<CommerceOrder> modelResourcePermission) {
+
+		_commerceOrderModelResourcePermission = modelResourcePermission;
+	}
+
+	protected void updateCommerceOrderShippingMethod(
+			ActionRequest actionRequest)
 		throws Exception {
 
 		String commerceShippingOptionKey = ParamUtil.getString(
@@ -269,33 +273,10 @@ public class ShippingMethodCommerceCheckoutStep
 			commerceContext, commerceOrder, commerceShippingMethodId,
 			commerceShippingOptionName, themeDisplay.getLocale());
 
-		try {
-			CommerceOrder updateCommerceOrder = TransactionInvokerUtil.invoke(
-				_transactionConfig,
-				() -> {
-					_commerceOrderLocalService.updateCommerceShippingMethod(
-						commerceOrder.getCommerceOrderId(),
-						commerceShippingMethodId, commerceShippingOptionName,
-						shippingAmount, commerceContext);
-
-					return _commerceOrderLocalService.recalculatePrice(
-						commerceOrder.getCommerceOrderId(), commerceContext);
-				});
-
-			_commerceOrderLocalService.resetTermsAndConditions(
-				commerceOrder.getCommerceOrderId(), true, false);
-
-			actionRequest.setAttribute(
-				CommerceCheckoutWebKeys.COMMERCE_ORDER, updateCommerceOrder);
-		}
-		catch (Throwable throwable) {
-			throw new PortalException(throwable);
-		}
+		_commerceOrderLocalService.updateCommerceShippingMethod(
+			commerceOrder.getCommerceOrderId(), commerceShippingMethodId,
+			commerceShippingOptionName, shippingAmount, commerceContext);
 	}
-
-	private static final TransactionConfig _transactionConfig =
-		TransactionConfig.Factory.create(
-			Propagation.REQUIRED, new Class<?>[] {Exception.class});
 
 	@Reference
 	private CommerceCheckoutStepHttpHelper _commerceCheckoutStepHttpHelper;
@@ -303,9 +284,6 @@ public class ShippingMethodCommerceCheckoutStep
 	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"
-	)
 	private ModelResourcePermission<CommerceOrder>
 		_commerceOrderModelResourcePermission;
 
@@ -319,22 +297,11 @@ public class ShippingMethodCommerceCheckoutStep
 	private CommerceShippingEngineRegistry _commerceShippingEngineRegistry;
 
 	@Reference
-	private CommerceShippingFixedOptionLocalService
-		_commerceShippingFixedOptionLocalService;
-
-	@Reference
-	private CommerceShippingFixedOptionQualifierLocalService
-		_commerceShippingFixedOptionQualifierLocalService;
-
-	@Reference
 	private CommerceShippingHelper _commerceShippingHelper;
 
 	@Reference
 	private CommerceShippingMethodLocalService
 		_commerceShippingMethodLocalService;
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private JSPRenderer _jspRenderer;

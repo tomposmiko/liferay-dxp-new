@@ -50,10 +50,11 @@ public class SocialActivitySettingLocalServiceTest
 		SocialActivityDefinition defaultActivityDefinition =
 			SocialConfigurationUtil.getActivityDefinition(TEST_MODEL, 1);
 
-		Assert.assertEquals(
-			defaultActivityDefinition,
+		SocialActivityDefinition activityDefinition =
 			SocialActivitySettingLocalServiceUtil.getActivityDefinition(
-				group.getGroupId(), TEST_MODEL, 1));
+				group.getGroupId(), TEST_MODEL, 1);
+
+		Assert.assertEquals(defaultActivityDefinition, activityDefinition);
 
 		List<SocialActivityDefinition> defaultActivityDefinitions =
 			SocialConfigurationUtil.getActivityDefinitions(TEST_MODEL);

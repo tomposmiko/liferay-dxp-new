@@ -14,26 +14,28 @@
 
 package com.liferay.layout.admin.web.internal.template;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = "type=" + TemplateContextContributor.TYPE_THEME,
 	service = TemplateContextContributor.class
 )
@@ -77,15 +79,15 @@ public class ToggleControlsTemplateContextContributor
 		contextObjects.put("show_toggle_controls", themeDisplay.isSignedIn());
 
 		if (themeDisplay.isSignedIn()) {
+			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+				"content.Language", themeDisplay.getLocale(), getClass());
+
 			contextObjects.put(
 				"toggle_controls_text",
-				_language.get(themeDisplay.getLocale(), "toggle-controls"));
+				LanguageUtil.get(resourceBundle, "toggle-controls"));
 
-			contextObjects.put("toggle_controls_url", "javascript:void(0);");
+			contextObjects.put("toggle_controls_url", "javascript:;");
 		}
 	}
-
-	@Reference
-	private Language _language;
 
 }

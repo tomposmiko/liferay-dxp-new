@@ -39,38 +39,24 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(assetRenderer.getTitle(locale));
 %>
 
-<clay:container-fluid
-	cssClass="container-view"
->
-	<clay:col
-		cssClass="lfr-asset-column lfr-asset-column-details"
-		md="12"
-	>
-		<div class="card">
-			<div class="panel-body">
-				<div class="instance-content-container">
-					<c:if test="<%= assetEntry != null %>">
-						<liferay-asset:asset-display
-							assetEntry="<%= assetEntry %>"
-							assetRenderer="<%= assetRenderer %>"
-							assetRendererFactory="<%= assetRendererFactory %>"
-							showExtraInfo="<%= workflowInstanceViewDisplayContext.isShowExtraInfo() %>"
-						/>
+<clay:container-fluid>
+	<div class="instance-content-container">
+		<c:if test="<%= assetEntry != null %>">
+			<liferay-asset:asset-display
+				assetEntry="<%= assetEntry %>"
+				assetRenderer="<%= assetRenderer %>"
+				assetRendererFactory="<%= assetRendererFactory %>"
+			/>
 
-						<%
-						WorkflowHandler<?> workflowHandler = WorkflowHandlerRegistryUtil.getWorkflowHandler(assetRenderer.getClassName());
+			<%
+			String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletRequest, liferayPortletResponse, null);
+			%>
 
-						String viewInContextURL = workflowHandler.getURLViewInContext(assetRenderer.getClassPK(), liferayPortletRequest, liferayPortletResponse, null);
-						%>
-
-						<c:if test="<%= viewInContextURL != null %>">
-							<div class="asset-more">
-								<aui:a href="<%= viewInContextURL %>"><liferay-ui:message key="view-in-context" /> &raquo;</aui:a>
-							</div>
-						</c:if>
-					</c:if>
+			<c:if test="<%= viewInContextURL != null %>">
+				<div class="asset-more">
+					<aui:a href="<%= viewInContextURL %>"><liferay-ui:message key="view-in-context" /> &raquo;</aui:a>
 				</div>
-			</div>
-		</div>
-	</clay:col>
+			</c:if>
+		</c:if>
+	</div>
 </clay:container-fluid>

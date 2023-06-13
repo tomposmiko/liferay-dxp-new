@@ -17,7 +17,7 @@ package com.liferay.list.type.internal.search.spi.model.query.contributor;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.query.QueryHelper;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carolina Barbosa
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.list.type.model.ListTypeDefinition",
 	service = KeywordQueryContributor.class
 )
@@ -49,7 +50,7 @@ public class ListTypeDefinitionKeywordQueryContributor
 		}
 
 		searchContext.setAttribute(
-			_localization.getLocalizedName(
+			LocalizationUtil.getLocalizedName(
 				Field.NAME, searchContext.getLanguageId()),
 			searchContext.getAttribute(Field.NAME));
 
@@ -57,9 +58,6 @@ public class ListTypeDefinitionKeywordQueryContributor
 			booleanQuery, keywordQueryContributorHelper.getSearchContext(),
 			Field.NAME, false);
 	}
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private QueryHelper _queryHelper;

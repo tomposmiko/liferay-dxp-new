@@ -21,7 +21,7 @@ import com.liferay.commerce.order.CommerceOrderValidatorResult;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CPSubscriptionInfo;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.List;
@@ -29,12 +29,12 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.order.validator.key=" + SubscriptionCommerceOrderValidatorImpl.KEY,
 		"commerce.order.validator.priority:Integer=30"
@@ -69,12 +69,6 @@ public class SubscriptionCommerceOrderValidatorImpl
 		}
 
 		CommerceOrderItem commerceOrderItem = commerceOrderItems.get(0);
-
-		if (commerceOrderItem.getCPInstanceId() ==
-				cpInstance.getCPInstanceId()) {
-
-			return new CommerceOrderValidatorResult(true);
-		}
 
 		CPSubscriptionInfo cpSubscriptionInfo =
 			cpInstance.getCPSubscriptionInfo();
@@ -154,10 +148,7 @@ public class SubscriptionCommerceOrderValidatorImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, key);
+		return LanguageUtil.get(resourceBundle, key);
 	}
-
-	@Reference
-	private Language _language;
 
 }

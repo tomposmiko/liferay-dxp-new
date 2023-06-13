@@ -34,15 +34,7 @@ export default function BulkTransitionModal() {
 		setSelectTasks,
 		visibleModal,
 	} = useContext(ModalContext);
-	const {clearFilters, fetchTasks} = useFetchTasks({
-		callback: ({items}) => {
-			setFetching(false);
-			setSelectTasks({selectAll, tasks: items});
-
-			setCurrentStep('selectTransitions');
-		},
-		withoutUnassigned: true,
-	});
+	const {clearFilters, fetchTasks} = useFetchTasks({withoutUnassigned: true});
 	const [currentStep, setCurrentStep] = useState('selectTasks');
 	const [errorToast, setErrorToast] = useState(null);
 	const [fetching, setFetching] = useState(false);
@@ -63,7 +55,6 @@ export default function BulkTransitionModal() {
 		setSelectTasks({selectAll: false, tasks: []});
 		setCurrentStep('selectTasks');
 		setErrorToast(false);
-		window.location.reload();
 	};
 
 	const {observer, onClose} = useModal({
@@ -73,22 +64,6 @@ export default function BulkTransitionModal() {
 	const {patchData} = usePatch({
 		admin: true,
 		body: transitionTasks,
-		callback: () => {
-			toaster.success(
-				transitionTasks.length > 1
-					? Liferay.Language.get(
-							'the-selected-steps-have-transitioned-successfully'
-					  )
-					: Liferay.Language.get(
-							'the-selected-step-has-transitioned-successfully'
-					  )
-			);
-
-			onCloseModal(true);
-			setSelectedItems([]);
-			setSelectAll(false);
-			setTransitioning(false);
-		},
 		url: '/workflow-tasks/change-transition',
 	});
 
@@ -101,14 +76,31 @@ export default function BulkTransitionModal() {
 		if (!Object.values(errors).some((error) => error)) {
 			setTransitioning(true);
 
-			patchData().catch(() => {
-				setErrorToast(
-					`${Liferay.Language.get(
-						'your-request-has-failed'
-					)} ${Liferay.Language.get('select-done-to-retry')}`
-				);
-				setTransitioning(false);
-			});
+			patchData()
+				.then(() => {
+					toaster.success(
+						transitionTasks.length > 1
+							? Liferay.Language.get(
+									'the-selected-steps-have-transitioned-successfully'
+							  )
+							: Liferay.Language.get(
+									'the-selected-step-has-transitioned-successfully'
+							  )
+					);
+
+					onCloseModal(true);
+					setSelectedItems([]);
+					setSelectAll(false);
+					setTransitioning(false);
+				})
+				.catch(() => {
+					setErrorToast(
+						`${Liferay.Language.get(
+							'your-request-has-failed'
+						)} ${Liferay.Language.get('select-done-to-retry')}`
+					);
+					setTransitioning(false);
+				});
 		}
 		else {
 			setErrorToast(
@@ -117,7 +109,6 @@ export default function BulkTransitionModal() {
 				)
 			);
 		}
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [errors, transitionTasks]);
 
@@ -125,19 +116,24 @@ export default function BulkTransitionModal() {
 		if (selectAll) {
 			setFetching(true);
 
-			fetchTasks().catch(() => {
-				setErrorToast(
-					`${Liferay.Language.get('your-request-has-failed')}`
-				);
-				setFetching(false);
-			});
+			fetchTasks()
+				.then(({items}) => {
+					setFetching(false);
+					setSelectTasks({selectAll, tasks: items});
+
+					setCurrentStep('selectTransitions');
+				})
+				.catch(() => {
+					setErrorToast(
+						`${Liferay.Language.get('your-request-has-failed')}`
+					);
+					setFetching(false);
+				});
 		}
 		else {
 			setCurrentStep('selectTransitions');
 		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectAll]);
+	}, [fetchTasks, selectAll, setSelectTasks]);
 
 	const handlePrevious = useCallback(() => {
 		clearContext();
@@ -153,7 +149,7 @@ export default function BulkTransitionModal() {
 			},
 			component: SelectTasksStep,
 			nextBtn: {
-				disabled: !tasks.length || fetching,
+				disabled: tasks.length === 0 || fetching,
 				handle: handleNext,
 				text: Liferay.Language.get('next'),
 			},

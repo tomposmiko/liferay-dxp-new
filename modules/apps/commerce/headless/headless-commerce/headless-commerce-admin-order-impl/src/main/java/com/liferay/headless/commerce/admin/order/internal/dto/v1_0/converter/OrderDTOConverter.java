@@ -14,9 +14,8 @@
 
 package com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceOrderConstants;
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
 import com.liferay.commerce.currency.util.CommercePriceFormatter;
@@ -32,9 +31,7 @@ import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Order;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Status;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
@@ -53,12 +50,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = {
-		"application.name=Liferay.Headless.Commerce.Admin.Order",
-		"dto.class.name=com.liferay.commerce.model.CommerceOrder",
-		"version=v1.0"
-	},
-	service = DTOConverter.class
+	enabled = false,
+	property = "dto.class.name=com.liferay.commerce.model.CommerceOrder",
+	service = {DTOConverter.class, OrderDTOConverter.class}
 )
 public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 
@@ -74,18 +68,47 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		CommerceOrder commerceOrder = _commerceOrderService.getCommerceOrder(
 			(Long)dtoConverterContext.getId());
 
-		CommerceChannel commerceChannel =
-			_commerceChannelLocalService.getCommerceChannelByOrderGroupId(
-				commerceOrder.getGroupId());
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 		CommerceCurrency commerceCurrency = commerceOrder.getCommerceCurrency();
+		CommerceShippingMethod commerceShippingMethod =
+			commerceOrder.getCommerceShippingMethod();
+		ExpandoBridge expandoBridge = commerceOrder.getExpandoBridge();
 
 		Locale locale = dtoConverterContext.getLocale();
 
 		ResourceBundle resourceBundle = LanguageResources.getResourceBundle(
 			locale);
 
+		String commerceOrderStatusLabel = _getCommerceOrderStatusLabel(
+			commerceOrder.getOrderStatus(), locale);
+
+		String commerceOrderStatusLabelI18n = _getCommerceOrderStatusLabelI18n(
+			commerceOrder.getOrderStatus(), locale);
+
+		String commerceOrderWorkflowStatusLabel =
+			WorkflowConstants.getStatusLabel(commerceOrder.getStatus());
+
+		String commerceOrderWorkflowStatusLabelI18n = LanguageUtil.get(
+			resourceBundle,
+			WorkflowConstants.getStatusLabel(commerceOrder.getStatus()));
+
+		String commerceOrderPaymentStatusLabel =
+			CommerceOrderConstants.getPaymentStatusLabel(
+				commerceOrder.getPaymentStatus());
+
+		String commerceOrderPaymentStatusLabelI18n = LanguageUtil.get(
+			resourceBundle,
+			CommerceOrderConstants.getPaymentStatusLabel(
+				commerceOrder.getPaymentStatus()));
+
+		CommerceChannel commerceChannel =
+			_commerceChannelLocalService.getCommerceChannelByOrderGroupId(
+				commerceOrder.getGroupId());
+
 		Order order = new Order() {
 			{
+				accountExternalReferenceCode =
+					commerceAccount.getExternalReferenceCode();
 				accountId = commerceOrder.getCommerceAccountId();
 				actions = dtoConverterContext.getActions();
 				advanceStatus = commerceOrder.getAdvanceStatus();
@@ -95,12 +118,9 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 				channelId = commerceChannel.getCommerceChannelId();
 				couponCode = commerceOrder.getCouponCode();
 				createDate = commerceOrder.getCreateDate();
-				currencyCode = commerceCurrency.getCode();
-				deliveryTermDescription =
-					commerceOrder.getDeliveryCommerceTermEntryDescription();
-				deliveryTermId = commerceOrder.getDeliveryCommerceTermEntryId();
-				deliveryTermName =
-					commerceOrder.getDeliveryCommerceTermEntryName();
+				currencyCode = commerceCurrency.getName(
+					dtoConverterContext.getLocale());
+				customFields = expandoBridge.getAttributes();
 				externalReferenceCode =
 					commerceOrder.getExternalReferenceCode();
 				id = commerceOrder.getCommerceOrderId();
@@ -109,11 +129,8 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 				orderDate = commerceOrder.getOrderDate();
 				orderStatus = commerceOrder.getOrderStatus();
 				orderStatusInfo = _getOrderStatusInfo(
-					commerceOrder.getOrderStatus(),
-					_getCommerceOrderStatusLabel(
-						commerceOrder.getOrderStatus(), locale),
-					_getCommerceOrderStatusLabelI18n(
-						commerceOrder.getOrderStatus(), locale));
+					commerceOrder.getOrderStatus(), commerceOrderStatusLabel,
+					commerceOrderStatusLabelI18n);
 				orderTypeExternalReferenceCode =
 					_getOrderTypeExternalReferenceCode(
 						commerceOrder.getCommerceOrderTypeId());
@@ -122,56 +139,20 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 				paymentStatus = commerceOrder.getPaymentStatus();
 				paymentStatusInfo = _getPaymentStatusInfo(
 					commerceOrder.getPaymentStatus(),
-					CommerceOrderPaymentConstants.getOrderPaymentStatusLabel(
-						commerceOrder.getPaymentStatus()),
-					_language.get(
-						resourceBundle,
-						CommerceOrderPaymentConstants.
-							getOrderPaymentStatusLabel(
-								commerceOrder.getPaymentStatus())));
-				paymentTermDescription =
-					commerceOrder.getPaymentCommerceTermEntryDescription();
-				paymentTermId = commerceOrder.getPaymentCommerceTermEntryId();
-				paymentTermName =
-					commerceOrder.getPaymentCommerceTermEntryName();
+					commerceOrderPaymentStatusLabel,
+					commerceOrderPaymentStatusLabelI18n);
 				printedNote = commerceOrder.getPrintedNote();
 				purchaseOrderNumber = commerceOrder.getPurchaseOrderNumber();
 				requestedDeliveryDate =
 					commerceOrder.getRequestedDeliveryDate();
 				shippingAddressId = commerceOrder.getShippingAddressId();
 				shippingMethod = _getShippingMethodEngineKey(
-					commerceOrder.getCommerceShippingMethod());
+					commerceShippingMethod);
 				shippingOption = commerceOrder.getShippingOptionName();
 				transactionId = commerceOrder.getTransactionId();
 				workflowStatusInfo = _toStatus(
-					commerceOrder.getStatus(),
-					WorkflowConstants.getStatusLabel(commerceOrder.getStatus()),
-					_language.get(
-						resourceBundle,
-						WorkflowConstants.getStatusLabel(
-							commerceOrder.getStatus())));
-
-				setAccountExternalReferenceCode(
-					() -> {
-						AccountEntry accountEntry =
-							commerceOrder.getAccountEntry();
-
-						return accountEntry.getExternalReferenceCode();
-					});
-				setCreatorEmailAddress(
-					() -> {
-						User user = _userLocalService.getUser(
-							commerceOrder.getUserId());
-
-						return user.getEmailAddress();
-					});
-				setCustomFields(
-					() -> {
-						ExpandoBridge expandoBridge =
-							commerceOrder.getExpandoBridge();
-
-						return expandoBridge.getAttributes();
-					});
+					commerceOrder.getStatus(), commerceOrderWorkflowStatusLabel,
+					commerceOrderWorkflowStatusLabelI18n);
 			}
 		};
 
@@ -227,7 +208,7 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 	private String _getCommerceOrderStatusLabelI18n(
 		int orderStatus, Locale locale) {
 
-		String commerceOrderStatusLabelI18n = _language.get(
+		String commerceOrderStatusLabelI18n = LanguageUtil.get(
 			locale, CommerceOrderConstants.getOrderStatusLabel(orderStatus));
 
 		if (!Validator.isBlank(commerceOrderStatusLabelI18n)) {
@@ -235,6 +216,14 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		}
 
 		return _getCommerceOrderStatusLabel(orderStatus, locale);
+	}
+
+	private double _getDoubleValue(BigDecimal amount) {
+		if (amount == null) {
+			return 0;
+		}
+
+		return amount.doubleValue();
 	}
 
 	private Status _getOrderStatusInfo(
@@ -326,17 +315,22 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 			commerceOrder.getShippingDiscountAmount();
 
 		if (shippingDiscountAmount != null) {
-			order.setShippingDiscountAmount(shippingDiscountAmount);
+			order.setShippingDiscountAmount(
+				shippingDiscountAmount.doubleValue());
 			order.setShippingDiscountAmountFormatted(
 				_formatPrice(shippingDiscountAmount, commerceCurrency, locale));
 			order.setShippingDiscountPercentageLevel1(
-				commerceOrder.getShippingDiscountPercentageLevel1());
+				_getDoubleValue(
+					commerceOrder.getShippingDiscountPercentageLevel1()));
 			order.setShippingDiscountPercentageLevel2(
-				commerceOrder.getShippingDiscountPercentageLevel2());
+				_getDoubleValue(
+					commerceOrder.getShippingDiscountPercentageLevel2()));
 			order.setShippingDiscountPercentageLevel3(
-				commerceOrder.getShippingDiscountPercentageLevel3());
+				_getDoubleValue(
+					commerceOrder.getShippingDiscountPercentageLevel3()));
 			order.setShippingDiscountPercentageLevel4(
-				commerceOrder.getShippingDiscountPercentageLevel4());
+				_getDoubleValue(
+					commerceOrder.getShippingDiscountPercentageLevel4()));
 		}
 
 		BigDecimal shippingDiscountWithTaxAmount =
@@ -344,22 +338,26 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 
 		if (shippingDiscountWithTaxAmount != null) {
 			order.setShippingDiscountWithTaxAmount(
-				shippingDiscountWithTaxAmount);
+				shippingDiscountWithTaxAmount.doubleValue());
 			order.setShippingDiscountWithTaxAmountFormatted(
 				_formatPrice(
 					shippingDiscountWithTaxAmount, commerceCurrency, locale));
 			order.setShippingDiscountPercentageLevel1WithTaxAmount(
-				commerceOrder.
-					getShippingDiscountPercentageLevel1WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getShippingDiscountPercentageLevel1WithTaxAmount()));
 			order.setShippingDiscountPercentageLevel2WithTaxAmount(
-				commerceOrder.
-					getShippingDiscountPercentageLevel2WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getShippingDiscountPercentageLevel2WithTaxAmount()));
 			order.setShippingDiscountPercentageLevel3WithTaxAmount(
-				commerceOrder.
-					getShippingDiscountPercentageLevel3WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getShippingDiscountPercentageLevel3WithTaxAmount()));
 			order.setShippingDiscountPercentageLevel4WithTaxAmount(
-				commerceOrder.
-					getShippingDiscountPercentageLevel4WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getShippingDiscountPercentageLevel4WithTaxAmount()));
 		}
 	}
 
@@ -404,17 +402,22 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 			commerceOrder.getSubtotalDiscountAmount();
 
 		if (subtotalDiscountAmount != null) {
-			order.setSubtotalDiscountAmount(subtotalDiscountAmount);
+			order.setSubtotalDiscountAmount(
+				subtotalDiscountAmount.doubleValue());
 			order.setSubtotalDiscountAmountFormatted(
 				_formatPrice(subtotalDiscountAmount, commerceCurrency, locale));
 			order.setSubtotalDiscountPercentageLevel1(
-				commerceOrder.getSubtotalDiscountPercentageLevel1());
+				_getDoubleValue(
+					commerceOrder.getSubtotalDiscountPercentageLevel1()));
 			order.setSubtotalDiscountPercentageLevel2(
-				commerceOrder.getSubtotalDiscountPercentageLevel2());
+				_getDoubleValue(
+					commerceOrder.getSubtotalDiscountPercentageLevel2()));
 			order.setSubtotalDiscountPercentageLevel3(
-				commerceOrder.getSubtotalDiscountPercentageLevel3());
+				_getDoubleValue(
+					commerceOrder.getSubtotalDiscountPercentageLevel3()));
 			order.setSubtotalDiscountPercentageLevel4(
-				commerceOrder.getSubtotalDiscountPercentageLevel4());
+				_getDoubleValue(
+					commerceOrder.getSubtotalDiscountPercentageLevel4()));
 		}
 
 		BigDecimal subtotalDiscountWithTaxAmount =
@@ -422,22 +425,26 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 
 		if (subtotalDiscountWithTaxAmount != null) {
 			order.setSubtotalDiscountWithTaxAmount(
-				subtotalDiscountWithTaxAmount);
+				subtotalDiscountWithTaxAmount.doubleValue());
 			order.setSubtotalDiscountWithTaxAmountFormatted(
 				_formatPrice(
 					subtotalDiscountWithTaxAmount, commerceCurrency, locale));
 			order.setSubtotalDiscountPercentageLevel1WithTaxAmount(
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel1WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getSubtotalDiscountPercentageLevel1WithTaxAmount()));
 			order.setSubtotalDiscountPercentageLevel2WithTaxAmount(
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel2WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getSubtotalDiscountPercentageLevel2WithTaxAmount()));
 			order.setSubtotalDiscountPercentageLevel3WithTaxAmount(
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel3WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getSubtotalDiscountPercentageLevel3WithTaxAmount()));
 			order.setSubtotalDiscountPercentageLevel4WithTaxAmount(
-				commerceOrder.
-					getSubtotalDiscountPercentageLevel4WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getSubtotalDiscountPercentageLevel4WithTaxAmount()));
 		}
 	}
 
@@ -480,35 +487,48 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		BigDecimal totalDiscountAmount = commerceOrder.getTotalDiscountAmount();
 
 		if (totalDiscountAmount != null) {
-			order.setTotalDiscountAmount(totalDiscountAmount);
+			order.setTotalDiscountAmount(totalDiscountAmount.doubleValue());
 			order.setTotalDiscountAmountFormatted(
 				_formatPrice(totalDiscountAmount, commerceCurrency, locale));
 			order.setTotalDiscountPercentageLevel1(
-				commerceOrder.getTotalDiscountPercentageLevel1());
+				_getDoubleValue(
+					commerceOrder.getTotalDiscountPercentageLevel1()));
 			order.setTotalDiscountPercentageLevel2(
-				commerceOrder.getTotalDiscountPercentageLevel2());
+				_getDoubleValue(
+					commerceOrder.getTotalDiscountPercentageLevel2()));
 			order.setTotalDiscountPercentageLevel3(
-				commerceOrder.getTotalDiscountPercentageLevel3());
+				_getDoubleValue(
+					commerceOrder.getTotalDiscountPercentageLevel3()));
 			order.setTotalDiscountPercentageLevel4(
-				commerceOrder.getTotalDiscountPercentageLevel4());
+				_getDoubleValue(
+					commerceOrder.getTotalDiscountPercentageLevel4()));
 		}
 
 		BigDecimal totalDiscountWithTaxAmount =
 			commerceOrder.getTotalDiscountWithTaxAmount();
 
 		if (totalDiscountWithTaxAmount != null) {
-			order.setTotalDiscountWithTaxAmount(totalDiscountWithTaxAmount);
+			order.setTotalDiscountWithTaxAmount(
+				totalDiscountWithTaxAmount.doubleValue());
 			order.setTotalDiscountWithTaxAmountFormatted(
 				_formatPrice(
 					totalDiscountWithTaxAmount, commerceCurrency, locale));
 			order.setSubtotalDiscountPercentageLevel1WithTaxAmount(
-				commerceOrder.getTotalDiscountPercentageLevel1WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getTotalDiscountPercentageLevel1WithTaxAmount()));
 			order.setSubtotalDiscountPercentageLevel2WithTaxAmount(
-				commerceOrder.getTotalDiscountPercentageLevel2WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getTotalDiscountPercentageLevel2WithTaxAmount()));
 			order.setSubtotalDiscountPercentageLevel3WithTaxAmount(
-				commerceOrder.getTotalDiscountPercentageLevel3WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getTotalDiscountPercentageLevel3WithTaxAmount()));
 			order.setSubtotalDiscountPercentageLevel4WithTaxAmount(
-				commerceOrder.getTotalDiscountPercentageLevel4WithTaxAmount());
+				_getDoubleValue(
+					commerceOrder.
+						getTotalDiscountPercentageLevel4WithTaxAmount()));
 		}
 	}
 
@@ -539,11 +559,5 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 
 	@Reference
 	private CommercePriceFormatter _commercePriceFormatter;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

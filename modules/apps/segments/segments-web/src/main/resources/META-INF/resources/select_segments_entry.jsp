@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SelectSegmentsEntryDisplayContext selectSegmentsEntryDisplayContext = (SelectSegmentsEntryDisplayContext)request.getAttribute(SelectSegmentsEntryDisplayContext.class.getName());
+SelectSegmentsEntryDisplayContext selectSegmentsEntryDisplayContext = (SelectSegmentsEntryDisplayContext)request.getAttribute(SegmentsWebKeys.SELECT_SEGMENTS_ENTRY_DISPLAY_CONTEXT);
 %>
 
 <clay:management-toolbar
@@ -33,7 +33,7 @@ SelectSegmentsEntryDisplayContext selectSegmentsEntryDisplayContext = (SelectSeg
 	sortingURL="<%= selectSegmentsEntryDisplayContext.getSortingURL() %>"
 />
 
-<aui:form cssClass="c-p-0 container-fluid container-fluid-max-xl h-100" name="selectSegmentsEntryFm">
+<aui:form cssClass="container-fluid container-fluid-max-xl" name="selectSegmentsEntryFm">
 	<liferay-ui:search-container
 		id="<%= selectSegmentsEntryDisplayContext.getSearchContainerId() %>"
 		searchContainer="<%= selectSegmentsEntryDisplayContext.getSearchContainer() %>"
@@ -59,7 +59,7 @@ SelectSegmentsEntryDisplayContext selectSegmentsEntryDisplayContext = (SelectSeg
 									"entityname", segmentsEntry.getName(locale)
 								).build()
 							%>'
-							href="javascript:void(0);"
+							href="javascript:;"
 						>
 							<%= HtmlUtil.escape(segmentsEntry.getName(locale)) %>
 						</aui:a>

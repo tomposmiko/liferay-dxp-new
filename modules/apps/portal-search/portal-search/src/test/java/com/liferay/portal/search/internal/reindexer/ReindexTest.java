@@ -52,7 +52,7 @@ public class ReindexTest {
 		_reindex.setNonbulkIndexing(false);
 		_reindex.setSynchronousExecution(false);
 
-		_testMustRepeatModelChangedOutsideAfterIndexedInside();
+		doTestMustRepeatModelChangedOutsideAfterIndexedInside();
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class ReindexTest {
 		_reindex.setNonbulkIndexing(true);
 		_reindex.setSynchronousExecution(false);
 
-		_testMustRepeatModelChangedOutsideAfterIndexedInside();
+		doTestMustRepeatModelChangedOutsideAfterIndexedInside();
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class ReindexTest {
 		_reindex.setNonbulkIndexing(false);
 		_reindex.setSynchronousExecution(true);
 
-		_testSynchronousIndexingForIntegrationTests();
+		doTestSynchronousIndexingForIntegrationTests();
 	}
 
 	@Test
@@ -76,13 +76,29 @@ public class ReindexTest {
 		_reindex.setNonbulkIndexing(true);
 		_reindex.setSynchronousExecution(true);
 
-		_testSynchronousIndexingForIntegrationTests();
+		doTestSynchronousIndexingForIntegrationTests();
+	}
+
+	protected void acquire(Semaphore semaphore, int permits) {
+		try {
+			if (!semaphore.tryAcquire(permits, 2L, TimeUnit.SECONDS)) {
+				Assert.assertEquals(
+					"Permits", permits, semaphore.availablePermits());
+			}
+		}
+		catch (InterruptedException interruptedException) {
+			throw new RuntimeException(interruptedException);
+		}
 	}
 
 	protected void addReindexEndListener(
 		Reindex.ReindexEndListener reindexEndListener) {
 
 		_reindex.addReindexEndListener(reindexEndListener);
+	}
+
+	protected void assertIndexedValues(List<Integer> list) {
+		Assert.assertEquals(list, _indexedValues);
 	}
 
 	protected Reindex createReindex() {
@@ -96,37 +112,7 @@ public class ReindexTest {
 		return reindex;
 	}
 
-	private void _acquire(Semaphore semaphore, int permits) {
-		try {
-			if (!semaphore.tryAcquire(permits, 2L, TimeUnit.SECONDS)) {
-				Assert.assertEquals(
-					"Permits", permits, semaphore.availablePermits());
-			}
-		}
-		catch (InterruptedException interruptedException) {
-			throw new RuntimeException(interruptedException);
-		}
-	}
-
-	private void _assertIndexedValues(List<Integer> list) {
-		Assert.assertEquals(list, _indexedValues);
-	}
-
-	private void _reindex(long classPK) {
-		_transferAccumulatedToIndexed();
-	}
-
-	private void _reindexAddingValue(int group) {
-		_addedValues.add(group);
-
-		_reindex.reindex(_CLASS_NAME, _CLASS_PK);
-	}
-
-	private void _reindexBulk(Collection<Long> classPKs) {
-		_transferAccumulatedToIndexed();
-	}
-
-	private void _testMustRepeatModelChangedOutsideAfterIndexedInside() {
+	protected void doTestMustRepeatModelChangedOutsideAfterIndexedInside() {
 		Semaphore semaphore1 = new Semaphore(0);
 
 		Semaphore semaphore2 = new Semaphore(0);
@@ -138,43 +124,57 @@ public class ReindexTest {
 				semaphore1.release(1);
 
 				if (!atomicBoolean.getAndSet(true)) {
-					_acquire(semaphore2, 1);
+					acquire(semaphore2, 1);
 				}
 			});
 
-		_reindexAddingValue(101);
+		reindexAddingValue(101);
 
-		_acquire(semaphore1, 1);
+		acquire(semaphore1, 1);
 
-		_assertIndexedValues(Arrays.asList(101));
+		assertIndexedValues(Arrays.asList(101));
 
-		_reindexAddingValue(202);
-		_reindexAddingValue(303);
-		_reindexAddingValue(404);
-		_reindexAddingValue(505);
+		reindexAddingValue(202);
+		reindexAddingValue(303);
+		reindexAddingValue(404);
+		reindexAddingValue(505);
 
-		_assertIndexedValues(Arrays.asList(101));
+		assertIndexedValues(Arrays.asList(101));
 
 		semaphore2.release(1);
 
 		int multipleRequestsForSameClassPKCollapseIntoOne = 1;
 
-		_acquire(semaphore1, multipleRequestsForSameClassPKCollapseIntoOne);
+		acquire(semaphore1, multipleRequestsForSameClassPKCollapseIntoOne);
 
-		_assertIndexedValues(Arrays.asList(101, 202, 303, 404, 505));
+		assertIndexedValues(Arrays.asList(101, 202, 303, 404, 505));
 	}
 
-	private void _testSynchronousIndexingForIntegrationTests() {
-		_reindexAddingValue(101);
+	protected void doTestSynchronousIndexingForIntegrationTests() {
+		reindexAddingValue(101);
 
-		_assertIndexedValues(Arrays.asList(101));
+		assertIndexedValues(Arrays.asList(101));
 
-		_reindexAddingValue(202);
-		_reindexAddingValue(303);
-		_reindexAddingValue(404);
-		_reindexAddingValue(505);
+		reindexAddingValue(202);
+		reindexAddingValue(303);
+		reindexAddingValue(404);
+		reindexAddingValue(505);
 
-		_assertIndexedValues(Arrays.asList(101, 202, 303, 404, 505));
+		assertIndexedValues(Arrays.asList(101, 202, 303, 404, 505));
+	}
+
+	protected void reindexAddingValue(int group) {
+		_addedValues.add(group);
+
+		_reindex.reindex(_CLASS_NAME, _CLASS_PK);
+	}
+
+	private void _reindex(long classPK) {
+		_transferAccumulatedToIndexed();
+	}
+
+	private void _reindexBulk(Collection<Long> classPKs) {
+		_transferAccumulatedToIndexed();
 	}
 
 	private void _transferAccumulatedToIndexed() {

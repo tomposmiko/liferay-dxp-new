@@ -24,13 +24,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.file.install.FileInstaller;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.InputStream;
 
 import java.net.URI;
@@ -38,6 +36,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -77,6 +76,35 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  */
 public class DirectoryWatcher extends Thread implements BundleListener {
 
+	public static final String ACTIVE_LEVEL = "file.install.active.level";
+
+	public static final String CONFIG_ENCODING = "file.install.configEncoding";
+
+	public static final String DIR = "file.install.dir";
+
+	public static final String FILENAME = "felix.fileinstall.filename";
+
+	public static final String FILTER = "file.install.filter";
+
+	public static final String NO_INITIAL_DELAY = "file.install.noInitialDelay";
+
+	public static final String POLL = "file.install.poll";
+
+	public static final String START_LEVEL = "file.install.start.level";
+
+	public static final String START_NEW_BUNDLES =
+		"file.install.bundles.new.start";
+
+	public static final String SUBDIR_MODE = "file.install.subdir.mode";
+
+	public static final String USE_START_ACTIVATION_POLICY =
+		"file.install.bundles.startActivationPolicy";
+
+	public static final String USE_START_TRANSIENT =
+		"file.install.bundles.startTransient";
+
+	public static final String WEB_START_LEVEL = "file.install.web.start.level";
+
 	public DirectoryWatcher(BundleContext bundleContext) {
 		super("fileinstall-directory-watcher");
 
@@ -84,15 +112,36 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 		_bundleContext = bundleContext;
 
+		_activeLevel = GetterUtil.getInteger(
+			bundleContext.getProperty(ACTIVE_LEVEL));
+		_filter = bundleContext.getProperty(FILTER);
+		_noInitialDelay = GetterUtil.getBoolean(
+			bundleContext.getProperty(NO_INITIAL_DELAY));
+		_poll = GetterUtil.getLong(bundleContext.getProperty(POLL), 2000);
+		_startBundles = GetterUtil.getBoolean(
+			bundleContext.getProperty(START_NEW_BUNDLES), true);
+		_startLevel = GetterUtil.getInteger(
+			bundleContext.getProperty(START_LEVEL));
 		_systemBundle = bundleContext.getBundle(
 			Constants.SYSTEM_BUNDLE_LOCATION);
+		_useStartActivationPolicy = GetterUtil.getBoolean(
+			bundleContext.getProperty(USE_START_ACTIVATION_POLICY), true);
+		_useStartTransient = GetterUtil.getBoolean(
+			bundleContext.getProperty(USE_START_TRANSIENT));
 
-		for (String dir : PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_DIRS) {
-			String filePath = Util.getFilePath(dir);
+		Set<String> dirs = new LinkedHashSet<>(
+			Arrays.asList(
+				StringUtil.split(
+					bundleContext.getProperty(DirectoryWatcher.DIR))));
 
-			_watchedDirPaths.add(filePath);
-			_watchedDirs.add(new File(filePath));
+		_watchedDirs = new ArrayList<>(dirs.size());
+
+		for (String dir : dirs) {
+			_watchedDirs.add(new File(dir));
 		}
+
+		_webStartLevel = GetterUtil.getInteger(
+			bundleContext.getProperty(WEB_START_LEVEL), _startLevel);
 
 		_fileInstallers = ServiceTrackerListFactory.open(
 			_bundleContext, FileInstaller.class, null,
@@ -133,30 +182,8 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 			});
 
-		if (!Validator.isBlank(
-				PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_FILTER)) {
-
-			_filenameFilter = new FilenameFilter() {
-
-				@Override
-				public boolean accept(File dir, String name) {
-					Matcher matcher = _pattern.matcher(name);
-
-					return matcher.matches();
-				}
-
-				private final Pattern _pattern = Pattern.compile(
-					PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_FILTER);
-
-			};
-		}
-		else {
-			_filenameFilter = (dir, name) -> true;
-		}
-
 		_scanner = new Scanner(
-			_watchedDirs, _filenameFilter,
-			PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_SUBDIR_MODE);
+			_watchedDirs, _filter, bundleContext.getProperty(SUBDIR_MODE));
 
 		_bundleContext.addBundleListener(this);
 	}
@@ -203,7 +230,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 		}
 		catch (InterruptedException interruptedException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(interruptedException);
+				_log.debug(interruptedException, interruptedException);
 			}
 		}
 
@@ -216,13 +243,13 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 	@Override
 	public void run() {
-		if (!PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_NO_INITIAL_DELAY) {
+		if (!_noInitialDelay) {
 			try {
-				Thread.sleep(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_INTERVAL);
+				Thread.sleep(_poll);
 			}
 			catch (InterruptedException interruptedException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(interruptedException);
+					_log.debug(interruptedException, interruptedException);
 				}
 
 				return;
@@ -236,9 +263,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				FrameworkStartLevel frameworkStartLevel = _systemBundle.adapt(
 					FrameworkStartLevel.class);
 
-				if ((frameworkStartLevel.getStartLevel() >=
-						PropsValues.
-							MODULE_FRAMEWORK_FILE_INSTALL_ACTIVE_LEVEL) &&
+				if ((frameworkStartLevel.getStartLevel() >= _activeLevel) &&
 					(_systemBundle.getState() == Bundle.ACTIVE)) {
 
 					Set<File> files = _scanner.scan(false);
@@ -249,12 +274,12 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				}
 
 				synchronized (this) {
-					wait(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_INTERVAL);
+					wait(_poll);
 				}
 			}
 			catch (InterruptedException interruptedException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(interruptedException);
+					_log.debug(interruptedException, interruptedException);
 				}
 
 				interrupt();
@@ -267,7 +292,8 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				}
 				catch (IllegalStateException illegalStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(illegalStateException);
+						_log.debug(
+							illegalStateException, illegalStateException);
 					}
 
 					return;
@@ -280,7 +306,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 	@Override
 	public void start() {
-		if (PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_NO_INITIAL_DELAY) {
+		if (_noInitialDelay) {
 			_initializeCurrentManagedBundles();
 
 			Set<File> files = _scanner.scan(true);
@@ -306,35 +332,6 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 		}
 
 		return false;
-	}
-
-	private void _findBundlesWithFragmentsToRefresh(Set<Bundle> bundles) {
-		Set<String> hostBundleSymbolicNames = new HashSet<>();
-
-		for (Bundle bundle : bundles) {
-			if ((bundle.getState() != Bundle.UNINSTALLED) &&
-				_isFragment(bundle)) {
-
-				hostBundleSymbolicNames.add(_getFragmentHost(bundle));
-			}
-		}
-
-		if (hostBundleSymbolicNames.isEmpty()) {
-			return;
-		}
-
-		for (Bundle bundle : _bundleContext.getBundles()) {
-			if (hostBundleSymbolicNames.remove(bundle.getSymbolicName())) {
-				int hostBundleState = bundle.getState();
-
-				if ((hostBundleState == Bundle.ACTIVE) ||
-					(hostBundleState == Bundle.RESOLVED) ||
-					(hostBundleState == Bundle.STARTING)) {
-
-					bundles.add(bundle);
-				}
-			}
-		}
 	}
 
 	private void _findBundlesWithOptionalPackagesToRefresh(
@@ -518,32 +515,32 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 		}
 	}
 
-	/**
-	 * @see com.liferay.portal.fragment.bundle.watcher.internal.PortalFragmentBundleWatcher#_getFragmentHost
-	 */
-	private String _getFragmentHost(Bundle bundle) {
-		Dictionary<String, String> dictionary = bundle.getHeaders(
-			StringPool.BLANK);
+	private List<String> _getWatchedDirPaths() {
+		List<String> watchedDirPaths = new ArrayList<>();
 
-		String fragmentHost = dictionary.get(Constants.FRAGMENT_HOST);
+		for (File watchedDir : _watchedDirs) {
+			URI uri = watchedDir.toURI();
 
-		if (fragmentHost == null) {
-			return null;
+			uri = uri.normalize();
+
+			watchedDirPaths.add(uri.getPath());
 		}
 
-		int index = fragmentHost.indexOf(CharPool.SEMICOLON);
-
-		if (index != -1) {
-			fragmentHost = fragmentHost.substring(0, index);
-		}
-
-		return fragmentHost;
+		return watchedDirPaths;
 	}
 
 	private void _initializeCurrentManagedBundles() {
 		Bundle[] bundles = _bundleContext.getBundles();
 
 		Map<File, Long> checksums = new HashMap<>();
+
+		Pattern filePattern = null;
+
+		if ((_filter != null) && !_filter.isEmpty()) {
+			filePattern = Pattern.compile(_filter);
+		}
+
+		List<String> watchedDirPaths = _getWatchedDirPaths();
 
 		for (Bundle bundle : bundles) {
 			String location = bundle.getLocation();
@@ -556,7 +553,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 			}
 			catch (URISyntaxException uriSyntaxException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(uriSyntaxException);
+					_log.debug(uriSyntaxException, uriSyntaxException);
 				}
 
 				File file = new File(location);
@@ -575,7 +572,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 			String path = null;
 
 			if ((location != null) &&
-				_contains(locationPath, _watchedDirPaths)) {
+				_contains(locationPath, watchedDirPaths)) {
 
 				String schemeSpecificPart = uri.getSchemeSpecificPart();
 
@@ -613,12 +610,15 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 			int index = path.lastIndexOf(CharPool.SLASH);
 
-			if ((index != -1) && _startWith(path, _watchedDirPaths)) {
-				if (!_filenameFilter.accept(
-						new File(path.substring(0, index)),
-						path.substring(index + 1))) {
+			if ((index != -1) && _startWith(path, watchedDirPaths)) {
+				String fileName = path.substring(index + 1);
 
-					continue;
+				if (filePattern != null) {
+					Matcher matcher = filePattern.matcher(fileName);
+
+					if (!matcher.matches()) {
+						continue;
+					}
 				}
 
 				Artifact artifact = new Artifact();
@@ -831,16 +831,10 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				BundleStartLevel.class);
 
 			if (header != null) {
-				bundleStartLevel.setStartLevel(
-					ModuleFrameworkPropsValues.
-						MODULE_FRAMEWORK_WEB_START_LEVEL);
+				bundleStartLevel.setStartLevel(_webStartLevel);
 			}
-			else if (ModuleFrameworkPropsValues.
-						MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL != 0) {
-
-				bundleStartLevel.setStartLevel(
-					ModuleFrameworkPropsValues.
-						MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL);
+			else if (_startLevel != 0) {
+				bundleStartLevel.setStartLevel(_startLevel);
 			}
 
 			return bundle;
@@ -1018,8 +1012,6 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 			bundles.addAll(installedBundles);
 
-			_findBundlesWithFragmentsToRefresh(bundles);
-
 			_findBundlesWithOptionalPackagesToRefresh(bundles);
 
 			if (!bundles.isEmpty()) {
@@ -1029,7 +1021,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 			}
 		}
 
-		if (PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_BUNDLES_START_NEW) {
+		if (_startBundles) {
 			FrameworkStartLevel frameworkStartLevel = _systemBundle.adapt(
 				FrameworkStartLevel.class);
 
@@ -1115,8 +1107,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 					if ((state != Bundle.STARTING) &&
 						(state != Bundle.ACTIVE) &&
-						(PropsValues.
-							MODULE_FRAMEWORK_FILE_INSTALL_BUNDLES_START_TRANSIENT ||
+						(_useStartTransient ||
 						 bundleStartLevel.isPersistentlyStarted()) &&
 						(frameworkStartLevel.getStartLevel() >=
 							bundleStartLevel.getStartLevel())) {
@@ -1134,22 +1125,18 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 		BundleStartLevel bundleStartLevel = bundle.adapt(
 			BundleStartLevel.class);
 
-		if (PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_BUNDLES_START_NEW &&
-			(bundle.getState() != Bundle.UNINSTALLED) && !_isFragment(bundle) &&
+		if (_startBundles && (bundle.getState() != Bundle.UNINSTALLED) &&
+			!_isFragment(bundle) &&
 			(_frameworkStartLevel >= bundleStartLevel.getStartLevel())) {
 
 			try {
 				int options = 0;
 
-				if (PropsValues.
-						MODULE_FRAMEWORK_FILE_INSTALL_BUNDLES_START_TRANSIENT) {
-
+				if (_useStartTransient) {
 					options = Bundle.START_TRANSIENT;
 				}
 
-				if (PropsValues.
-						MODULE_FRAMEWORK_FILE_INSTALL_BUNDLES_START_ACTIVATION_POLICY) {
-
+				if (_useStartActivationPolicy) {
 					options |= Bundle.START_ACTIVATION_POLICY;
 				}
 
@@ -1203,9 +1190,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 	}
 
 	private void _stopTransient(Bundle bundle) throws BundleException {
-		if (PropsValues.MODULE_FRAMEWORK_FILE_INSTALL_BUNDLES_START_NEW &&
-			!_isFragment(bundle)) {
-
+		if (_startBundles && !_isFragment(bundle)) {
 			bundle.stop(Bundle.STOP_TRANSIENT);
 		}
 	}
@@ -1358,20 +1343,28 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DirectoryWatcher.class);
 
+	private final int _activeLevel;
 	private final BundleContext _bundleContext;
 	private final Set<Bundle> _consistentlyFailingBundles = new HashSet<>();
 	private final Map<File, Artifact> _currentManagedArtifacts =
 		new HashMap<>();
 	private final Set<Bundle> _delayedStart = new HashSet<>();
-	private final ServiceTrackerList<FileInstaller> _fileInstallers;
-	private final FilenameFilter _filenameFilter;
+	private final ServiceTrackerList<FileInstaller, FileInstaller>
+		_fileInstallers;
+	private final String _filter;
 	private int _frameworkStartLevel;
 	private final Map<File, Artifact> _installationFailures = new HashMap<>();
+	private final boolean _noInitialDelay;
+	private final long _poll;
 	private final Set<File> _processingFailures = new HashSet<>();
 	private final Scanner _scanner;
+	private final boolean _startBundles;
+	private final int _startLevel;
 	private final AtomicBoolean _stateChanged = new AtomicBoolean();
 	private final Bundle _systemBundle;
-	private final List<String> _watchedDirPaths = new ArrayList<>();
-	private final List<File> _watchedDirs = new ArrayList<>();
+	private final boolean _useStartActivationPolicy;
+	private final boolean _useStartTransient;
+	private final List<File> _watchedDirs;
+	private final int _webStartLevel;
 
 }

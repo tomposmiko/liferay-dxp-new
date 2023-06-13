@@ -14,14 +14,12 @@
 
 package com.liferay.data.engine.rest.resource.exception;
 
-import com.liferay.portal.kernel.exception.PortalException;
-
 import java.util.Set;
 
 /**
  * @author Leonardo Barros
  */
-public class DataLayoutValidationException extends PortalException {
+public class DataLayoutValidationException extends RuntimeException {
 
 	public DataLayoutValidationException() {
 	}

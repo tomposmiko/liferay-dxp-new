@@ -14,19 +14,18 @@
 
 package com.liferay.portal.tools.service.builder;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.io.unsync.UnsyncBufferedReader;
 import com.liferay.petra.io.unsync.UnsyncStringReader;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.Dom4jUtil;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.dao.db.IndexMetadata;
 import com.liferay.portal.kernel.dao.db.IndexMetadataFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.cache.CacheField;
 import com.liferay.portal.kernel.plugin.Version;
@@ -119,6 +118,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -127,9 +127,7 @@ import org.dom4j.DocumentType;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.XPath;
-import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 
 /**
  * @author Brian Wing Shun Chan
@@ -841,12 +839,7 @@ public class ServiceBuilder {
 							_createModelCache(entity);
 							_createModelWrapper(entity);
 
-							if (isVersionGTE_7_4_0()) {
-								_removeModelSoap(entity, _serviceOutputPath);
-							}
-							else {
-								_createModelSoap(entity);
-							}
+							_createModelSoap(entity);
 
 							_createModelTable(entity);
 
@@ -900,12 +893,7 @@ public class ServiceBuilder {
 								_removeServiceJsonSerializer(entity);
 							}
 
-							if (isVersionGTE_7_4_0()) {
-								_removeServiceSoap(entity);
-							}
-							else {
-								_createServiceSoap(entity);
-							}
+							_createServiceSoap(entity);
 						}
 						else {
 							_removeServiceImpl(entity, _SESSION_TYPE_REMOTE);
@@ -1154,13 +1142,6 @@ public class ServiceBuilder {
 		return getDimensions(GetterUtil.getInteger(dims));
 	}
 
-	public String getDuplicateEntityExternalReferenceCodeException(
-		Entity entity) {
-
-		return "Duplicate" + _getEntityExceptionName(entity, false) +
-			"ExternalReferenceCode";
-	}
-
 	public Entity getEntity(String name) throws Exception {
 		Entity entity = _entityPool.get(name);
 
@@ -1407,8 +1388,21 @@ public class ServiceBuilder {
 	}
 
 	public String getNoSuchEntityException(Entity entity) {
-		return "NoSuch" +
-			_getEntityExceptionName(entity, _shortNoSuchExceptionEnabled);
+		String noSuchEntityException = entity.getName();
+
+		if (_shortNoSuchExceptionEnabled) {
+			String portletShortName = entity.getPortletShortName();
+
+			if (Validator.isNull(portletShortName) ||
+				(noSuchEntityException.startsWith(portletShortName) &&
+				 !noSuchEntityException.equals(portletShortName))) {
+
+				noSuchEntityException = noSuchEntityException.substring(
+					portletShortName.length());
+			}
+		}
+
+		return "NoSuch" + noSuchEntityException;
 	}
 
 	public String getParameterType(JavaParameter parameter) {
@@ -2312,15 +2306,16 @@ public class ServiceBuilder {
 	private void _createBaseUADAnonymizer(Entity entity) throws Exception {
 		Map<String, Object> context = _getContext();
 
-		context.put(
-			"deleteUADEntityMethodName",
-			_getDeleteUADEntityMethodName(
-				_getJavaClass(
-					StringBundler.concat(
-						_outputPath, "/service/impl/", entity.getName(),
-						_getSessionTypeName(_SESSION_TYPE_LOCAL),
-						"ServiceImpl.java")),
-				entity.getName()));
+		JavaClass javaClass = _getJavaClass(
+			StringBundler.concat(
+				_outputPath, "/service/impl/", entity.getName(),
+				_getSessionTypeName(_SESSION_TYPE_LOCAL), "ServiceImpl.java"));
+
+		String deleteUADEntityMethodName = _getDeleteUADEntityMethodName(
+			javaClass, entity.getName());
+
+		context.put("deleteUADEntityMethodName", deleteUADEntityMethodName);
+
 		context.put("entity", entity);
 
 		String content = _processTemplate(_TPL_BASE_UAD_ANONYMIZER, context);
@@ -2485,7 +2480,7 @@ public class ServiceBuilder {
 											entityColumn.getType());
 									}
 
-									if (Objects.equals(sqlType, "CLOB")) {
+									if (Objects.equals("CLOB", sqlType)) {
 										return "Clob";
 									}
 
@@ -2603,14 +2598,6 @@ public class ServiceBuilder {
 			}
 
 			if (entity.hasEntityColumns()) {
-				if (entity.hasExternalReferenceCode() ||
-					entity.hasEntityColumn("externalReferenceCode")) {
-
-					exceptions.add(
-						getDuplicateEntityExternalReferenceCodeException(
-							entity));
-				}
-
 				exceptions.add(getNoSuchEntityException(entity));
 			}
 		}
@@ -2676,16 +2663,7 @@ public class ServiceBuilder {
 
 				String content = _processTemplate(_tplException, context);
 
-				if (exception.startsWith("Duplicate") &&
-					exception.endsWith("ExternalReferenceCode")) {
-
-					content = StringUtil.replace(
-						content, "PortalException",
-						isVersionGTE_7_4_0() ?
-							"DuplicateExternalReferenceCodeException" :
-								"SystemException");
-				}
-				else if (exception.startsWith("NoSuch")) {
+				if (exception.startsWith("NoSuch")) {
 					content = StringUtil.replace(
 						content, "PortalException", "NoSuchModelException");
 				}
@@ -2696,37 +2674,7 @@ public class ServiceBuilder {
 					exceptionFile, content, _modifiedFileNames);
 			}
 
-			if (exception.startsWith("Duplicate") &&
-				exception.endsWith("ExternalReferenceCode")) {
-
-				String content = _read(exceptionFile);
-
-				if (isVersionGTE_7_4_0()) {
-					if (!content.contains(
-							"DuplicateExternalReferenceCodeException")) {
-
-						content = StringUtil.replace(
-							content, "PortalException",
-							"DuplicateExternalReferenceCodeException");
-						content = StringUtil.replace(
-							content, "SystemException",
-							"DuplicateExternalReferenceCodeException");
-
-						ToolsUtil.writeFileRaw(
-							exceptionFile, content, _modifiedFileNames);
-					}
-				}
-				else {
-					if (!content.contains("SystemException")) {
-						content = StringUtil.replace(
-							content, "PortalException", "SystemException");
-
-						ToolsUtil.writeFileRaw(
-							exceptionFile, content, _modifiedFileNames);
-					}
-				}
-			}
-			else if (exception.startsWith("NoSuch")) {
+			if (exception.startsWith("NoSuch")) {
 				String content = _read(exceptionFile);
 
 				if (!content.contains("NoSuchModelException")) {
@@ -3029,16 +2977,11 @@ public class ServiceBuilder {
 		content = content.substring(lastImportEnd + 1);
 
 		if (!xmlFile.exists()) {
-			String hbmNamespace = _HIBERNATE_3_HBM_NAMESPACE;
-
-			if (isVersionGTE_7_4_0()) {
-				hbmNamespace = _HIBERNATE_5_HBM_NAMESPACE;
-			}
-
 			String xml = StringBundler.concat(
 				"<?xml version=\"1.0\"?>\n",
 				"<!DOCTYPE hibernate-mapping PUBLIC \"-//Hibernate/Hibernate ",
-				"Mapping DTD 3.0//EN\" ", hbmNamespace, ">\n\n",
+				"Mapping DTD 3.0//EN\" \"http://hibernate.sourceforge.net",
+				"/hibernate-mapping-3.0.dtd\">\n\n",
 				"<hibernate-mapping auto-import=\"false\" default-lazy=",
 				"\"false\">\n", "</hibernate-mapping>");
 
@@ -3133,18 +3076,7 @@ public class ServiceBuilder {
 	}
 
 	private void _createModelArgumentsResolver(Entity entity) throws Exception {
-		File file = new File(
-			StringBundler.concat(
-				_outputPath, "/service/persistence/impl/", entity.getName(),
-				"ModelArgumentsResolver.java"));
-
 		if (!entity.hasPersistence() || isVersionLTE_7_3_0()) {
-			if (file.exists()) {
-				System.out.println("Removing " + file);
-
-				file.delete();
-			}
-
 			return;
 		}
 
@@ -3160,7 +3092,12 @@ public class ServiceBuilder {
 
 		String content = _processTemplate(_tplModelArgumentsResolver, context);
 
-		_write(file, content, _modifiedFileNames);
+		File argumentsResolverFile = new File(
+			StringBundler.concat(
+				_outputPath, "/service/persistence/impl/", entity.getName(),
+				"ModelArgumentsResolver.java"));
+
+		_write(argumentsResolverFile, content, _modifiedFileNames);
 	}
 
 	private void _createModelCache(Entity entity) throws Exception {
@@ -3387,34 +3324,19 @@ public class ServiceBuilder {
 	}
 
 	private void _createPersistenceConstants() throws Exception {
+		if (!_dependencyInjectorDS) {
+			return;
+		}
+
 		File file = new File(
 			StringBundler.concat(
 				_outputPath, "/service/persistence/impl/constants/",
 				_portletShortName, "PersistenceConstants.java"));
 
-		if (_dependencyInjectorDS) {
-			String content = _processTemplate(
-				_TPL_PERSISTENCE_CONSTANTS, _getContext());
+		String content = _processTemplate(
+			_TPL_PERSISTENCE_CONSTANTS, _getContext());
 
-			_write(file, content, _modifiedFileNames);
-		}
-		else if (file.exists()) {
-			System.out.println("Removing " + file);
-
-			file.delete();
-		}
-
-		File dir = file.getParentFile();
-
-		if (!dir.exists() || !dir.isDirectory()) {
-			return;
-		}
-
-		for (File oldFile : dir.listFiles()) {
-			if (!Objects.equals(file.getName(), oldFile.getName())) {
-				oldFile.delete();
-			}
-		}
+		_write(file, content, _modifiedFileNames);
 	}
 
 	private void _createPersistenceImpl(Entity entity) throws Exception {
@@ -4685,15 +4607,7 @@ public class ServiceBuilder {
 			String line = null;
 
 			while ((line = unsyncBufferedReader.readLine()) != null) {
-				if (isVersionGTE_7_4_0() &&
-					line.startsWith("<!DOCTYPE hibernate-mapping") &&
-					line.contains(_HIBERNATE_3_HBM_NAMESPACE)) {
-
-					line = StringUtil.replace(
-						line, _HIBERNATE_3_HBM_NAMESPACE,
-						_HIBERNATE_5_HBM_NAMESPACE);
-				}
-				else if (line.startsWith("\t<class name=\"")) {
+				if (line.startsWith("\t<class name=\"")) {
 					line = StringUtil.replace(
 						line,
 						new String[] {
@@ -4780,20 +4694,6 @@ public class ServiceBuilder {
 	}
 
 	private String _formatXml(String xml) throws Exception {
-		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
-			new UnsyncByteArrayOutputStream();
-
-		OutputFormat outputFormat = new OutputFormat(StringPool.TAB, true);
-
-		outputFormat.setOmitEncoding(true);
-		outputFormat.setPadText(true);
-		outputFormat.setTrimText(true);
-
-		XMLWriter xmlWriter = new XMLWriter(
-			unsyncByteArrayOutputStream, outputFormat);
-
-		SAXReader saxReader = _getSAXReader();
-
 		String doctype = null;
 
 		int x = xml.indexOf("<!DOCTYPE");
@@ -4807,16 +4707,7 @@ public class ServiceBuilder {
 		}
 
 		xml = StringUtil.replace(xml, '\r', "");
-
-		xmlWriter.write(saxReader.read(new XMLSafeReader(xml)));
-
-		xml = StringUtil.trimTrailing(
-			unsyncByteArrayOutputStream.toString(StringPool.UTF8));
-
-		while (xml.contains(" \n")) {
-			xml = StringUtil.replace(xml, " \n", "\n");
-		}
-
+		xml = Dom4jUtil.toString(xml);
 		xml = StringUtil.replace(xml, "\"/>", "\" />");
 
 		if (Validator.isNotNull(doctype)) {
@@ -5456,25 +5347,6 @@ public class ServiceBuilder {
 				columnDBName, " for entity ", entity.getName()));
 	}
 
-	private String _getEntityExceptionName(
-		Entity entity, boolean shortExceptionName) {
-
-		String name = entity.getName();
-
-		if (shortExceptionName) {
-			String portletShortName = entity.getPortletShortName();
-
-			if (Validator.isNull(portletShortName) ||
-				(name.startsWith(portletShortName) &&
-				 !name.equals(portletShortName))) {
-
-				name = name.substring(portletShortName.length());
-			}
-		}
-
-		return name;
-	}
-
 	private List<String> _getEntityMappingPKEntityColumnDBNames(
 			EntityMapping entityMapping)
 		throws Exception {
@@ -5879,40 +5751,32 @@ public class ServiceBuilder {
 			return false;
 		}
 
-		boolean hasCompanyId = false;
-
-		for (Element columnElement : columnElements) {
-			String columnName = columnElement.attributeValue("name");
-
-			if (columnName.equals("companyId")) {
-				hasCompanyId = true;
-
-				break;
-			}
-		}
+		boolean hasCompanyId = Stream.of(
+			columnElements.toArray(new Element[0])
+		).map(
+			columnElement -> columnElement.attributeValue("name")
+		).anyMatch(
+			columnName -> columnName.equals("companyId")
+		);
 
 		if (!hasCompanyId) {
 			return false;
 		}
 
-		List<String> finderColumnNames = TransformUtil.transform(
-			finderColumnElements,
-			finderColumnElement -> {
-				String finderColumnName = finderColumnElement.attributeValue(
-					"name");
+		String[] finderColumnNames = Stream.of(
+			finderColumnElements.toArray(new Element[0])
+		).map(
+			finderColumnElement -> finderColumnElement.attributeValue("name")
+		).filter(
+			finderColumnName ->
+				finderColumnName.endsWith("Id") ||
+				finderColumnName.endsWith("PK")
+		).toArray(
+			String[]::new
+		);
 
-				if ((finderColumnName == null) ||
-					(!finderColumnName.endsWith("Id") &&
-					 !finderColumnName.endsWith("PK"))) {
-
-					return null;
-				}
-
-				return finderColumnName;
-			});
-
-		if ((finderColumnNames.size() == 1) &&
-			Objects.equals(finderColumnNames.get(0), "classNameId")) {
+		if ((finderColumnNames.length == 1) &&
+			finderColumnNames[0].equals("classNameId")) {
 
 			return true;
 		}
@@ -6659,42 +6523,20 @@ public class ServiceBuilder {
 			String externalReferenceCodeUpperCase = StringUtil.toUpperCase(
 				externalReferenceCode);
 
-			if (isVersionGTE_7_4_0()) {
-				finderElement.addAttribute(
-					"name", "ERC_" + externalReferenceCodeUpperCase.charAt(0));
-			}
-			else {
-				finderElement.addAttribute(
-					"name", externalReferenceCodeUpperCase.charAt(0) + "_ERC");
-			}
+			finderElement.addAttribute(
+				"name", externalReferenceCodeUpperCase.charAt(0) + "_ERC");
 
 			finderElement.addAttribute("return-type", entityName);
-
-			if (isVersionGTE_7_4_0()) {
-				finderElement.addAttribute("unique", "true");
-			}
 
 			Element finderColumnElement = finderElement.addElement(
 				"finder-column");
 
-			if (isVersionGTE_7_4_0()) {
-				finderColumnElement.addAttribute(
-					"name", "externalReferenceCode");
+			finderColumnElement.addAttribute(
+				"name", externalReferenceCode + "Id");
 
-				finderColumnElement = finderElement.addElement("finder-column");
+			finderColumnElement = finderElement.addElement("finder-column");
 
-				finderColumnElement.addAttribute(
-					"name", externalReferenceCode + "Id");
-			}
-			else {
-				finderColumnElement.addAttribute(
-					"name", externalReferenceCode + "Id");
-
-				finderColumnElement = finderElement.addElement("finder-column");
-
-				finderColumnElement.addAttribute(
-					"name", "externalReferenceCode");
-			}
+			finderColumnElement.addAttribute("name", "externalReferenceCode");
 
 			finderElements.add(finderElement);
 		}
@@ -6953,7 +6795,7 @@ public class ServiceBuilder {
 
 			EntityColumn pkEntityColumn = pkEntityColumns.get(0);
 
-			if (!Objects.equals(pkEntityColumn.getType(), "long")) {
+			if (!Objects.equals("long", pkEntityColumn.getType())) {
 				throw new ServiceBuilderException(
 					"Primary key must be of type long to enable change " +
 						"tracking for " + entityName);
@@ -7409,7 +7251,7 @@ public class ServiceBuilder {
 
 		EntityColumn pkEntityColumn = pkEntityColumns.get(0);
 
-		if (!Objects.equals(pkEntityColumn.getType(), "long")) {
+		if (!Objects.equals("long", pkEntityColumn.getType())) {
 			throw new IllegalArgumentException(
 				"Must have long primary key to create versioned entity");
 		}
@@ -8019,12 +7861,6 @@ public class ServiceBuilder {
 	}
 
 	private static final int _DEFAULT_COLUMN_MAX_LENGTH = 75;
-
-	private static final String _HIBERNATE_3_HBM_NAMESPACE =
-		"\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\"";
-
-	private static final String _HIBERNATE_5_HBM_NAMESPACE =
-		"\"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd\"";
 
 	private static final int _MAX_LINE_LENGTH = 80;
 

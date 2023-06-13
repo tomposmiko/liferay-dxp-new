@@ -468,10 +468,6 @@ public interface Localization {
 	public String getXml(
 		Map<String, String> map, String defaultLanguageId, String key);
 
-	public String getXml(
-		Map<String, String> map, String defaultLanguageId, String key,
-		boolean cdata);
-
 	public Map<Locale, String> populateLocalizationMap(
 		Map<Locale, String> localizationMap, String defaultLanguageId,
 		long groupId);

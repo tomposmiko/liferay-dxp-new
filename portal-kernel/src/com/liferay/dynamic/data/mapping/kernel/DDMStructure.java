@@ -178,4 +178,6 @@ public interface DDMStructure extends StagedGroupedModel {
 
 	public void setDefinition(String definition);
 
+	public String toXmlString();
+
 }

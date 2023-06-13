@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -59,7 +60,18 @@ public abstract class BaseAccessTokenGrantHandler
 				"User does not have permission to create token");
 		}
 
-		return doCreateAccessToken(client, params);
+		AccessTokenGrantHandler accessTokenGrantHandler =
+			getAccessTokenGrantHandler();
+
+		return accessTokenGrantHandler.createAccessToken(client, params);
+	}
+
+	@Override
+	public List<String> getSupportedGrantTypes() {
+		AccessTokenGrantHandler accessTokenGrantHandler =
+			getAccessTokenGrantHandler();
+
+		return accessTokenGrantHandler.getSupportedGrantTypes();
 	}
 
 	protected boolean clientsMatch(Client client1, Client client2) {
@@ -81,8 +93,7 @@ public abstract class BaseAccessTokenGrantHandler
 		return false;
 	}
 
-	protected abstract ServerAccessToken doCreateAccessToken(
-		Client client, MultivaluedMap<String, String> params);
+	protected abstract AccessTokenGrantHandler getAccessTokenGrantHandler();
 
 	protected boolean hasCreateTokenPermission(
 		long userId, OAuth2Application oAuth2Application) {

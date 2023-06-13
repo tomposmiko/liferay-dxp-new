@@ -68,14 +68,13 @@ public abstract class BaseDLAppTestCase {
 		}
 		catch (NoSuchFolderException noSuchFolderException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFolderException);
+				_log.debug(noSuchFolderException, noSuchFolderException);
 			}
 		}
 
 		parentFolder = _dlAppService.addFolder(
-			null, group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test Folder",
-			RandomTestUtil.randomString(),
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Test Folder", RandomTestUtil.randomString(),
 			ServiceContextTestUtil.getServiceContext(
 				group.getGroupId(), TestPropsValues.getUserId()));
 

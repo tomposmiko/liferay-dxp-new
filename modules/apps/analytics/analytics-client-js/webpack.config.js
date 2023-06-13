@@ -21,19 +21,19 @@ module.exports = {
 		'core-js/fn/object/assign',
 		'core-js/fn/promise',
 		'core-js/fn/string/includes',
+		'unfetch/polyfill',
 		'./src/analytics.js',
 	],
 	mode: 'production',
 	module: {
 		rules: [
 			{
-				exclude: /node_modules/,
+				exclude: /node_modules\/(?!unfetch\/)/,
 				test: /\.m?js$/,
 				use: {
 					loader: 'babel-loader',
 					options: {
 						compact: false,
-						plugins: [],
 					},
 				},
 			},

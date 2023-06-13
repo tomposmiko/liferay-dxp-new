@@ -21,7 +21,7 @@ import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.exception.CPDisplayLayoutEntryException;
-import com.liferay.commerce.product.exception.CPDisplayLayoutEntryUuidException;
+import com.liferay.commerce.product.exception.CPDisplayLayoutLayoutUuidException;
 import com.liferay.commerce.product.exception.NoSuchCPDisplayLayoutException;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPDisplayLayoutService;
@@ -55,6 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"mvc.command.name=/commerce_channels/edit_asset_category_cp_display_layout"
@@ -64,46 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditAssetCategoryCPDisplayLayoutMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCPDisplayLayout(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCPDisplayLayouts(actionRequest);
-			}
-			else if (cmd.equals("setDefaultLayout")) {
-				_setDefaultLayout(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchCategoryException ||
-				exception instanceof NoSuchCPDisplayLayoutException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-
-				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
-			}
-			else if (exception instanceof CPDisplayLayoutEntryException ||
-					 exception instanceof CPDisplayLayoutEntryUuidException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-
-				actionResponse.setRenderParameter(
-					"mvcRenderCommandName",
-					"/commerce_channels/edit_asset_category_cp_display_layout");
-			}
-		}
-	}
-
-	private void _deleteCPDisplayLayouts(ActionRequest actionRequest)
+	protected void deleteCPDisplayLayouts(ActionRequest actionRequest)
 		throws Exception {
 
 		long[] deleteCPDisplayLayoutIds = null;
@@ -126,7 +88,46 @@ public class EditAssetCategoryCPDisplayLayoutMVCActionCommand
 		}
 	}
 
-	private void _setDefaultLayout(ActionRequest actionRequest)
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				updateCPDisplayLayout(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deleteCPDisplayLayouts(actionRequest);
+			}
+			else if (cmd.equals("setDefaultLayout")) {
+				setDefaultLayout(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchCategoryException ||
+				exception instanceof NoSuchCPDisplayLayoutException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+
+				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+			}
+			else if (exception instanceof CPDisplayLayoutEntryException ||
+					 exception instanceof CPDisplayLayoutLayoutUuidException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+
+				actionResponse.setRenderParameter(
+					"mvcRenderCommandName",
+					"/commerce_channels/edit_asset_category_cp_display_layout");
+			}
+		}
+	}
+
+	protected void setDefaultLayout(ActionRequest actionRequest)
 		throws Exception {
 
 		long commerceChannelId = ParamUtil.getLong(
@@ -150,7 +151,7 @@ public class EditAssetCategoryCPDisplayLayoutMVCActionCommand
 		modifiableSettings.store();
 	}
 
-	private void _updateCPDisplayLayout(ActionRequest actionRequest)
+	protected void updateCPDisplayLayout(ActionRequest actionRequest)
 		throws PortalException {
 
 		long cpDisplayLayoutId = ParamUtil.getLong(
@@ -182,14 +183,11 @@ public class EditAssetCategoryCPDisplayLayoutMVCActionCommand
 			}
 		}
 
-		String layoutPageTemplateEntryUuid = ParamUtil.getString(
-			actionRequest, "layoutPageTemplateEntryUuid");
 		String layoutUuid = ParamUtil.getString(actionRequest, "layoutUuid");
 
 		if (cpDisplayLayoutId > 0) {
 			_cpDisplayLayoutService.updateCPDisplayLayout(
-				cpDisplayLayoutId, classPK, layoutPageTemplateEntryUuid,
-				layoutUuid);
+				cpDisplayLayoutId, classPK, layoutUuid);
 		}
 		else {
 			if (classPKs.isEmpty()) {
@@ -205,7 +203,7 @@ public class EditAssetCategoryCPDisplayLayoutMVCActionCommand
 			for (long curClassPK : classPKs) {
 				_cpDisplayLayoutService.addCPDisplayLayout(
 					commerceChannel.getSiteGroupId(), AssetCategory.class,
-					curClassPK, layoutPageTemplateEntryUuid, layoutUuid);
+					curClassPK, layoutUuid);
 			}
 		}
 	}

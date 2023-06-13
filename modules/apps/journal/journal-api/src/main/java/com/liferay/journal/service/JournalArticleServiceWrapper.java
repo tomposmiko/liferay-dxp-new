@@ -27,14 +27,149 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class JournalArticleServiceWrapper
 	implements JournalArticleService, ServiceWrapper<JournalArticleService> {
 
-	public JournalArticleServiceWrapper() {
-		this(null);
-	}
-
 	public JournalArticleServiceWrapper(
 		JournalArticleService journalArticleService) {
 
 		_journalArticleService = journalArticleService;
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addArticle(String, long, long, long, long, String, boolean,
+	 Map, Map, Map, String, String, String, String, int, int, int,
+	 int, int, int, int, int, int, int, boolean, int, int, int,
+	 int, int, boolean, boolean, boolean, String, File, Map,
+	 String, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public JournalArticle addArticle(
+			long groupId, long folderId, long classNameId, long classPK,
+			String articleId, boolean autoArticleId,
+			java.util.Map<java.util.Locale, String> titleMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			java.util.Map<java.util.Locale, String> friendlyURLMap,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+			int reviewDateDay, int reviewDateYear, int reviewDateHour,
+			int reviewDateMinute, boolean neverReview, boolean indexable,
+			boolean smallImage, String smallImageURL, java.io.File smallFile,
+			java.util.Map<String, byte[]> images, String articleURL,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleService.addArticle(
+			groupId, folderId, classNameId, classPK, articleId, autoArticleId,
+			titleMap, descriptionMap, friendlyURLMap, content, ddmStructureKey,
+			ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
+			displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, neverExpire,
+			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
+			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
+			smallFile, images, articleURL, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addArticle(String, long, long, long, long, String, boolean,
+	 Map, Map, Map, String, String, String, String, int, int, int,
+	 int, int, int, int, int, int, int, boolean, int, int, int,
+	 int, int, boolean, boolean, boolean, String, File, Map,
+	 String, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public JournalArticle addArticle(
+			long groupId, long folderId, long classNameId, long classPK,
+			String articleId, boolean autoArticleId,
+			java.util.Map<java.util.Locale, String> titleMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+			int reviewDateDay, int reviewDateYear, int reviewDateHour,
+			int reviewDateMinute, boolean neverReview, boolean indexable,
+			boolean smallImage, String smallImageURL, java.io.File smallFile,
+			java.util.Map<String, byte[]> images, String articleURL,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleService.addArticle(
+			groupId, folderId, classNameId, classPK, articleId, autoArticleId,
+			titleMap, descriptionMap, content, ddmStructureKey, ddmTemplateKey,
+			layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
+			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
+			indexable, smallImage, smallImageURL, smallFile, images, articleURL,
+			serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addArticle(String, long, long, long, long, String, boolean,
+	 Map, Map, Map, String, String, String, String, int, int, int,
+	 int, int, int, int, int, int, int, boolean, int, int, int,
+	 int, int, boolean, boolean, boolean, String, File, Map,
+	 String, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public JournalArticle addArticle(
+			long groupId, long folderId, long classNameId, long classPK,
+			String articleId, boolean autoArticleId,
+			java.util.Map<java.util.Locale, String> titleMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+			int reviewDateDay, int reviewDateYear, int reviewDateHour,
+			int reviewDateMinute, boolean neverReview, boolean indexable,
+			String articleURL,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleService.addArticle(
+			groupId, folderId, classNameId, classPK, articleId, autoArticleId,
+			titleMap, descriptionMap, content, ddmStructureKey, ddmTemplateKey,
+			layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
+			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
+			indexable, articleURL, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addArticle(String, long, long, Map, Map, String, String,
+	 String, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public JournalArticle addArticle(
+			long groupId, long folderId,
+			java.util.Map<java.util.Locale, String> titleMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleService.addArticle(
+			groupId, folderId, titleMap, descriptionMap, content,
+			ddmStructureKey, ddmTemplateKey, serviceContext);
 	}
 
 	/**
@@ -66,9 +201,9 @@ public class JournalArticleServiceWrapper
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureId the primary key of the web content article's DDM
+	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>0</code> otherwise
+	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -127,7 +262,7 @@ public class JournalArticleServiceWrapper
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			java.util.Map<java.util.Locale, String> friendlyURLMap,
-			String content, long ddmStructureId, String ddmTemplateKey,
+			String content, String ddmStructureKey, String ddmTemplateKey,
 			String layoutUuid, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
 			int expirationDateMonth, int expirationDateDay,
@@ -143,7 +278,7 @@ public class JournalArticleServiceWrapper
 		return _journalArticleService.addArticle(
 			externalReferenceCode, groupId, folderId, classNameId, classPK,
 			articleId, autoArticleId, titleMap, descriptionMap, friendlyURLMap,
-			content, ddmStructureId, ddmTemplateKey, layoutUuid,
+			content, ddmStructureKey, ddmTemplateKey, layoutUuid,
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, expirationDateMonth, expirationDateDay,
 			expirationDateYear, expirationDateHour, expirationDateMinute,
@@ -166,9 +301,9 @@ public class JournalArticleServiceWrapper
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
-	 * @param ddmStructureId the primary key of the web content article's DDM
+	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure, if the article is related to a DDM structure, or
-	 <code>0</code> otherwise
+	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param serviceContext the service context to be applied. Can set the
@@ -185,13 +320,13 @@ public class JournalArticleServiceWrapper
 			String externalReferenceCode, long groupId, long folderId,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, long ddmStructureId, String ddmTemplateKey,
+			String content, String ddmStructureKey, String ddmTemplateKey,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleService.addArticle(
 			externalReferenceCode, groupId, folderId, titleMap, descriptionMap,
-			content, ddmStructureId, ddmTemplateKey, serviceContext);
+			content, ddmStructureKey, ddmTemplateKey, serviceContext);
 	}
 
 	@Override
@@ -199,28 +334,16 @@ public class JournalArticleServiceWrapper
 			long groupId, long classNameId, long classPK,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, long ddmStructureId, String ddmTemplateKey,
-			String layoutUuid, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
-			int reviewDateDay, int reviewDateYear, int reviewDateHour,
-			int reviewDateMinute, boolean neverReview, boolean indexable,
-			boolean smallImage, String smallImageURL,
-			java.io.File smallImageFile,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, boolean indexable, boolean smallImage,
+			String smallImageURL, java.io.File smallImageFile,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleService.addArticleDefaultValues(
 			groupId, classNameId, classPK, titleMap, descriptionMap, content,
-			ddmStructureId, ddmTemplateKey, layoutUuid, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, neverExpire,
-			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
-			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
-			smallImageFile, serviceContext);
+			ddmStructureKey, ddmTemplateKey, layoutUuid, indexable, smallImage,
+			smallImageURL, smallImageFile, serviceContext);
 	}
 
 	/**
@@ -229,8 +352,8 @@ public class JournalArticleServiceWrapper
 	 * from the old one and updating its article ID.
 	 *
 	 * @param groupId the primary key of the web content article's group
-	 * @param sourceArticleId the primary key of the old web content article
-	 * @param targetArticleId the primary key of the new web content article
+	 * @param oldArticleId the primary key of the old web content article
+	 * @param newArticleId the primary key of the new web content article
 	 * @param autoArticleId whether to auto-generate the web content article ID
 	 * @param version the web content article's version
 	 * @return the new web content article
@@ -238,12 +361,12 @@ public class JournalArticleServiceWrapper
 	 */
 	@Override
 	public JournalArticle copyArticle(
-			long groupId, String sourceArticleId, String targetArticleId,
+			long groupId, String oldArticleId, String newArticleId,
 			boolean autoArticleId, double version)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleService.copyArticle(
-			groupId, sourceArticleId, targetArticleId, autoArticleId, version);
+			groupId, oldArticleId, newArticleId, autoArticleId, version);
 	}
 
 	/**
@@ -295,11 +418,11 @@ public class JournalArticleServiceWrapper
 
 	@Override
 	public void deleteArticleDefaultValues(
-			long groupId, String articleId, long ddmStructureId)
+			long groupId, String articleId, String ddmStructureKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_journalArticleService.deleteArticleDefaultValues(
-			groupId, articleId, ddmStructureId);
+			groupId, articleId, ddmStructureKey);
 	}
 
 	/**
@@ -545,16 +668,6 @@ public class JournalArticleServiceWrapper
 			groupId, folderId, locale, start, end, orderByComparator);
 	}
 
-	@Override
-	public java.util.List<JournalArticle> getArticlesByArticleId(
-		long groupId, String articleId, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
-			orderByComparator) {
-
-		return _journalArticleService.getArticlesByArticleId(
-			groupId, articleId, status, start, end, orderByComparator);
-	}
-
 	/**
 	 * Returns an ordered range of all the web content articles matching the
 	 * group and article ID.
@@ -654,7 +767,7 @@ public class JournalArticleServiceWrapper
 
 	/**
 	 * Returns an ordered range of all the web content articles matching the
-	 * group, default class name ID, and DDM structure key.
+	 * group, class name ID, DDM structure key, and workflow status.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end -
@@ -667,7 +780,12 @@ public class JournalArticleServiceWrapper
 	 * </p>
 	 *
 	 * @param groupId the primary key of the web content article's group
-	 * @param ddmStructureId the primary key of the web content article's DDM
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure
 	 * @param status the web content article's workflow status. For more
 	 information see {@link WorkflowConstants} for constants starting
@@ -683,12 +801,60 @@ public class JournalArticleServiceWrapper
 	 */
 	@Override
 	public java.util.List<JournalArticle> getArticlesByStructureId(
-		long groupId, long ddmStructureId, int status, int start, int end,
+		long groupId, long classNameId, String ddmStructureKey, int status,
+		int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
 			orderByComparator) {
 
 		return _journalArticleService.getArticlesByStructureId(
-			groupId, ddmStructureId, status, start, end, orderByComparator);
+			groupId, classNameId, ddmStructureKey, status, start, end,
+			orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the web content articles matching the
+	 * group, class name ID, DDM structure key, and workflow status.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param groupId the primary key of the web content article's group
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param start the lower bound of the range of web content articles to
+	 return
+	 * @param end the upper bound of the range of web content articles to
+	 return (not inclusive)
+	 * @param orderByComparator the comparator to order the web content
+	 articles
+	 * @return the range of matching web content articles ordered by the
+	 comparator
+	 */
+	@Override
+	public java.util.List<JournalArticle> getArticlesByStructureId(
+		long groupId, long classNameId, String ddmStructureKey,
+		java.util.Locale locale, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
+
+		return _journalArticleService.getArticlesByStructureId(
+			groupId, classNameId, ddmStructureKey, locale, status, start, end,
+			orderByComparator);
 	}
 
 	/**
@@ -706,7 +872,46 @@ public class JournalArticleServiceWrapper
 	 * </p>
 	 *
 	 * @param groupId the primary key of the web content article's group
-	 * @param ddmStructureId the primary key of the web content article's DDM
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param start the lower bound of the range of web content articles to
+	 return
+	 * @param end the upper bound of the range of web content articles to
+	 return (not inclusive)
+	 * @param orderByComparator the comparator to order the web content
+	 articles
+	 * @return the range of matching web content articles ordered by the
+	 comparator
+	 */
+	@Override
+	public java.util.List<JournalArticle> getArticlesByStructureId(
+		long groupId, String ddmStructureKey, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
+
+		return _journalArticleService.getArticlesByStructureId(
+			groupId, ddmStructureKey, status, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the web content articles matching the
+	 * group, default class name ID, and DDM structure key.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param groupId the primary key of the web content article's group
+	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure
 	 * @param start the lower bound of the range of web content articles to
 	 return
@@ -719,12 +924,12 @@ public class JournalArticleServiceWrapper
 	 */
 	@Override
 	public java.util.List<JournalArticle> getArticlesByStructureId(
-		long groupId, long ddmStructureId, int start, int end,
+		long groupId, String ddmStructureKey, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
 			orderByComparator) {
 
 		return _journalArticleService.getArticlesByStructureId(
-			groupId, ddmStructureId, start, end, orderByComparator);
+			groupId, ddmStructureKey, start, end, orderByComparator);
 	}
 
 	/**
@@ -742,7 +947,7 @@ public class JournalArticleServiceWrapper
 	 * </p>
 	 *
 	 * @param groupId the primary key of the web content article's group
-	 * @param ddmStructureId the primary key of the web content article's DDM
+	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure
 	 * @param locale web content articles locale
 	 * @param status the web content article's workflow status. For more
@@ -759,117 +964,13 @@ public class JournalArticleServiceWrapper
 	 */
 	@Override
 	public java.util.List<JournalArticle> getArticlesByStructureId(
-		long groupId, long ddmStructureId, java.util.Locale locale, int status,
-		int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
-			orderByComparator) {
-
-		return _journalArticleService.getArticlesByStructureId(
-			groupId, ddmStructureId, locale, status, start, end,
-			orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the web content articles matching the
-	 * group, class name ID, DDM structure key, and workflow status.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end -
-	 * start</code> instances. <code>start</code> and <code>end</code> are not
-	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
-	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	 * result set.
-	 * </p>
-	 *
-	 * @param groupId the primary key of the web content article's group
-	 * @param classNameId the primary key of the DDMStructure class if the web
-	 content article is related to a DDM structure, the primary key of
-	 the class name associated with the article, or
-	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
-	 module otherwise
-	 * @param ddmStructureId the primary key of the web content article's DDM
-	 structure
-	 * @param status the web content article's workflow status. For more
-	 information see {@link WorkflowConstants} for constants starting
-	 with the "STATUS_" prefix.
-	 * @param start the lower bound of the range of web content articles to
-	 return
-	 * @param end the upper bound of the range of web content articles to
-	 return (not inclusive)
-	 * @param orderByComparator the comparator to order the web content
-	 articles
-	 * @return the range of matching web content articles ordered by the
-	 comparator
-	 */
-	@Override
-	public java.util.List<JournalArticle> getArticlesByStructureId(
-		long groupId, long classNameId, long ddmStructureId, int status,
-		int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
-			orderByComparator) {
-
-		return _journalArticleService.getArticlesByStructureId(
-			groupId, classNameId, ddmStructureId, status, start, end,
-			orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the web content articles matching the
-	 * group, class name ID, DDM structure key, and workflow status.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end -
-	 * start</code> instances. <code>start</code> and <code>end</code> are not
-	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
-	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	 * result set.
-	 * </p>
-	 *
-	 * @param groupId the primary key of the web content article's group
-	 * @param classNameId the primary key of the DDMStructure class if the web
-	 content article is related to a DDM structure, the primary key of
-	 the class name associated with the article, or
-	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
-	 module otherwise
-	 * @param ddmStructureId the primary key of the web content article's DDM
-	 structure
-	 * @param status the web content article's workflow status. For more
-	 information see {@link WorkflowConstants} for constants starting
-	 with the "STATUS_" prefix.
-	 * @param start the lower bound of the range of web content articles to
-	 return
-	 * @param end the upper bound of the range of web content articles to
-	 return (not inclusive)
-	 * @param orderByComparator the comparator to order the web content
-	 articles
-	 * @return the range of matching web content articles ordered by the
-	 comparator
-	 */
-	@Override
-	public java.util.List<JournalArticle> getArticlesByStructureId(
-		long groupId, long classNameId, long ddmStructureId,
-		java.util.Locale locale, int status, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
-			orderByComparator) {
-
-		return _journalArticleService.getArticlesByStructureId(
-			groupId, classNameId, ddmStructureId, locale, status, start, end,
-			orderByComparator);
-	}
-
-	@Override
-	public java.util.List<JournalArticle> getArticlesByStructureId(
-		long groupId, long folderId, long classNameId, long ddmStructureId,
+		long groupId, String ddmStructureKey, java.util.Locale locale,
 		int status, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
 			orderByComparator) {
 
 		return _journalArticleService.getArticlesByStructureId(
-			groupId, folderId, classNameId, ddmStructureId, status, start, end,
+			groupId, ddmStructureKey, locale, status, start, end,
 			orderByComparator);
 	}
 
@@ -916,51 +1017,6 @@ public class JournalArticleServiceWrapper
 			groupId, articleId);
 	}
 
-	@Override
-	public int getArticlesCountByArticleId(
-		long groupId, String articleId, int status) {
-
-		return _journalArticleService.getArticlesCountByArticleId(
-			groupId, articleId, status);
-	}
-
-	/**
-	 * Returns the number of web content articles matching the group, default
-	 * class name ID, and DDM structure key.
-	 *
-	 * @param groupId the primary key of the web content article's group
-	 * @param ddmStructureId the primary key of the web content article's DDM
-	 structure
-	 * @return the number of matching web content articles
-	 */
-	@Override
-	public int getArticlesCountByStructureId(
-		long groupId, long ddmStructureId) {
-
-		return _journalArticleService.getArticlesCountByStructureId(
-			groupId, ddmStructureId);
-	}
-
-	/**
-	 * Returns the number of web content articles matching the group, default
-	 * class name ID, and DDM structure key.
-	 *
-	 * @param groupId the primary key of the web content article's group
-	 * @param ddmStructureId the primary key of the web content article's DDM
-	 structure
-	 * @param status the web content article's workflow status. For more
-	 information see {@link WorkflowConstants} for constants starting
-	 with the "STATUS_" prefix.
-	 * @return the number of matching web content articles
-	 */
-	@Override
-	public int getArticlesCountByStructureId(
-		long groupId, long ddmStructureId, int status) {
-
-		return _journalArticleService.getArticlesCountByStructureId(
-			groupId, ddmStructureId, status);
-	}
-
 	/**
 	 * Returns the number of web content articles matching the group, class name
 	 * ID, DDM structure key, and workflow status.
@@ -971,7 +1027,7 @@ public class JournalArticleServiceWrapper
 	 the class name associated with the article, or
 	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
 	 module otherwise
-	 * @param ddmStructureId the primary key of the web content article's DDM
+	 * @param ddmStructureKey the primary key of the web content article's DDM
 	 structure
 	 * @param status the web content article's workflow status. For more
 	 information see {@link WorkflowConstants} for constants starting
@@ -980,19 +1036,47 @@ public class JournalArticleServiceWrapper
 	 */
 	@Override
 	public int getArticlesCountByStructureId(
-		long groupId, long classNameId, long ddmStructureId, int status) {
+		long groupId, long classNameId, String ddmStructureKey, int status) {
 
 		return _journalArticleService.getArticlesCountByStructureId(
-			groupId, classNameId, ddmStructureId, status);
+			groupId, classNameId, ddmStructureKey, status);
 	}
 
+	/**
+	 * Returns the number of web content articles matching the group, default
+	 * class name ID, and DDM structure key.
+	 *
+	 * @param groupId the primary key of the web content article's group
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure
+	 * @return the number of matching web content articles
+	 */
 	@Override
 	public int getArticlesCountByStructureId(
-		long groupId, long folderId, long classNameId, long ddmStructureId,
-		int status) {
+		long groupId, String ddmStructureKey) {
 
 		return _journalArticleService.getArticlesCountByStructureId(
-			groupId, folderId, classNameId, ddmStructureId, status);
+			groupId, ddmStructureKey);
+	}
+
+	/**
+	 * Returns the number of web content articles matching the group, default
+	 * class name ID, and DDM structure key.
+	 *
+	 * @param groupId the primary key of the web content article's group
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @return the number of matching web content articles
+	 */
+	@Override
+	public int getArticlesCountByStructureId(
+		long groupId, String ddmStructureKey, int status) {
+
+		return _journalArticleService.getArticlesCountByStructureId(
+			groupId, ddmStructureKey, status);
 	}
 
 	/**
@@ -1021,7 +1105,7 @@ public class JournalArticleServiceWrapper
 	 *
 	 * @param groupId the primary key of the web content article's group
 	 * @param folderIds the primary keys of the web content article folders
-	 (optionally {@link Collections#EMPTY_LIST})
+	 (optionally {@link java.util.Collections#EMPTY_LIST})
 	 * @return the number of matching folders containing web content articles
 	 */
 	@Override
@@ -1579,6 +1663,459 @@ public class JournalArticleServiceWrapper
 		_journalArticleService.restoreArticleFromTrash(groupId, articleId);
 	}
 
+	/**
+	 * Returns a range of all the web content articles matching the group,
+	 * creator, creator, and workflow status using the indexer. It is preferable
+	 * to use this method instead of the non-indexed version whenever possible
+	 * for performance reasons.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param groupId the primary key of the web content article's group
+	 * @param creatorUserId the primary key of the web content article's
+	 creator
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param start the lower bound of the range of web content articles to
+	 return
+	 * @param end the upper bound of the range of web content articles to
+	 return (not inclusive)
+	 * @return the matching web content articles
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Override
+	public com.liferay.portal.kernel.search.Hits search(
+			long groupId, long creatorUserId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _journalArticleService.search(
+			groupId, creatorUserId, status, start, end);
+	}
+
+	/**
+	 * Returns an ordered range of all the web content articles matching the
+	 * parameters, including a keywords parameter for matching with the
+	 * article's ID, title, description, and content, a DDM structure key
+	 * parameter, and a DDM template key parameter.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param companyId the primary key of the web content article's company
+	 * @param groupId the primary key of the group (optionally <code>0</code>)
+	 * @param folderIds the primary keys of the web content article folders
+	 (optionally {@link java.util.Collections#EMPTY_LIST})
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param keywords the keywords (space separated), which may occur in the
+	 web content article ID, title, description, or content
+	 (optionally <code>null</code>). If the keywords value is not
+	 <code>null</code>, the search uses the OR operator in connecting
+	 query criteria; otherwise it uses the AND operator.
+	 * @param version the web content article's version (optionally
+	 <code>null</code>)
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
+	 * @param ddmTemplateKey the primary key of the web content article's DDM
+	 template
+	 * @param displayDateGT the date after which a matching web content
+	 article's display date must be after (optionally
+	 <code>null</code>)
+	 * @param displayDateLT the date before which a matching web content
+	 article's display date must be before (optionally
+	 <code>null</code>)
+	 * @param reviewDate the web content article's scheduled review date
+	 (optionally <code>null</code>)
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param start the lower bound of the range of web content articles to
+	 return
+	 * @param end the upper bound of the range of web content articles to
+	 return (not inclusive)
+	 * @param orderByComparator the comparator to order the web content
+	 articles
+	 * @return the range of matching web content articles ordered by the
+	 comparator
+	 */
+	@Override
+	public java.util.List<JournalArticle> search(
+		long companyId, long groupId, java.util.List<Long> folderIds,
+		long classNameId, String keywords, Double version,
+		String ddmStructureKey, String ddmTemplateKey,
+		java.util.Date displayDateGT, java.util.Date displayDateLT,
+		java.util.Date reviewDate, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
+
+		return _journalArticleService.search(
+			companyId, groupId, folderIds, classNameId, keywords, version,
+			ddmStructureKey, ddmTemplateKey, displayDateGT, displayDateLT,
+			reviewDate, status, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the web content articles matching the
+	 * parameters, including keyword parameters for article ID, title,
+	 * description, and content, a DDM structure key parameter, a DDM template
+	 * key parameter, and an AND operator switch.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param companyId the primary key of the web content article's company
+	 * @param groupId the primary key of the group (optionally <code>0</code>)
+	 * @param folderIds the primary keys of the web content article folders
+	 (optionally {@link java.util.Collections#EMPTY_LIST})
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param articleId the article ID keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param version the web content article's version (optionally
+	 <code>null</code>)
+	 * @param title the title keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param description the description keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param content the content keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
+	 * @param ddmTemplateKey the primary key of the web content article's DDM
+	 template
+	 * @param displayDateGT the date after which a matching web content
+	 article's display date must be after (optionally
+	 <code>null</code>)
+	 * @param displayDateLT the date before which a matching web content
+	 article's display date must be before (optionally
+	 <code>null</code>)
+	 * @param reviewDate the web content article's scheduled review date
+	 (optionally <code>null</code>)
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param andOperator whether every field must match its value or keywords,
+	 or just one field must match. Company, group, folder IDs, class
+	 name ID, and status must all match their values.
+	 * @param start the lower bound of the range of web content articles to
+	 return
+	 * @param end the upper bound of the range of web content articles to
+	 return (not inclusive)
+	 * @param orderByComparator the comparator to order the web content
+	 articles
+	 * @return the range of matching web content articles ordered by the
+	 comparator
+	 */
+	@Override
+	public java.util.List<JournalArticle> search(
+		long companyId, long groupId, java.util.List<Long> folderIds,
+		long classNameId, String articleId, Double version, String title,
+		String description, String content, String ddmStructureKey,
+		String ddmTemplateKey, java.util.Date displayDateGT,
+		java.util.Date displayDateLT, java.util.Date reviewDate, int status,
+		boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
+
+		return _journalArticleService.search(
+			companyId, groupId, folderIds, classNameId, articleId, version,
+			title, description, content, ddmStructureKey, ddmTemplateKey,
+			displayDateGT, displayDateLT, reviewDate, status, andOperator,
+			start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the web content articles matching the
+	 * parameters, including keyword parameters for article ID, title,
+	 * description, and content, a DDM structure keys (plural) parameter, a DDM
+	 * template keys (plural) parameter, and an AND operator switch.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param companyId the primary key of the web content article's company
+	 * @param groupId the primary key of the group (optionally <code>0</code>)
+	 * @param folderIds the primary keys of the web content article folders
+	 (optionally {@link java.util.Collections#EMPTY_LIST})
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param articleId the article ID keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param version the web content article's version (optionally
+	 <code>null</code>)
+	 * @param title the title keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param description the description keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param content the content keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param ddmStructureKeys the primary keys of the web content article's
+	 DDM structures, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
+	 * @param ddmTemplateKeys the primary keys of the web content article's DDM
+	 templates (originally <code>null</code>). If the articles are
+	 related to a DDM structure, the template's structure must match
+	 it.
+	 * @param displayDateGT the date after which a matching web content
+	 article's display date must be after (optionally
+	 <code>null</code>)
+	 * @param displayDateLT the date before which a matching web content
+	 article's display date must be before (optionally
+	 <code>null</code>)
+	 * @param reviewDate the web content article's scheduled review date
+	 (optionally <code>null</code>)
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param andOperator whether every field must match its value or keywords,
+	 or just one field must match.  Company, group, folder IDs, class
+	 name ID, and status must all match their values.
+	 * @param start the lower bound of the range of web content articles to
+	 return
+	 * @param end the upper bound of the range of web content articles to
+	 return (not inclusive)
+	 * @param orderByComparator the comparator to order the web content
+	 articles
+	 * @return the range of matching web content articles ordered by the
+	 comparator
+	 */
+	@Override
+	public java.util.List<JournalArticle> search(
+		long companyId, long groupId, java.util.List<Long> folderIds,
+		long classNameId, String articleId, Double version, String title,
+		String description, String content, String[] ddmStructureKeys,
+		String[] ddmTemplateKeys, java.util.Date displayDateGT,
+		java.util.Date displayDateLT, java.util.Date reviewDate, int status,
+		boolean andOperator, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<JournalArticle>
+			orderByComparator) {
+
+		return _journalArticleService.search(
+			companyId, groupId, folderIds, classNameId, articleId, version,
+			title, description, content, ddmStructureKeys, ddmTemplateKeys,
+			displayDateGT, displayDateLT, reviewDate, status, andOperator,
+			start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns the number of web content articles matching the parameters,
+	 * including a keywords parameter for matching with the article's ID, title,
+	 * description, and content, a DDM structure key parameter, and a DDM
+	 * template key parameter.
+	 *
+	 * @param companyId the primary key of the web content article's company
+	 * @param groupId the primary key of the group (optionally <code>0</code>)
+	 * @param folderIds the primary keys of the web content article folders
+	 (optionally {@link java.util.Collections#EMPTY_LIST})
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param keywords the keywords (space separated), which may occur in the
+	 web content article ID, title, description, or content
+	 (optionally <code>null</code>). If the keywords value is not
+	 <code>null</code>, the search uses the OR operator in connecting
+	 query criteria; otherwise it uses the AND operator.
+	 * @param version the web content article's version (optionally
+	 <code>null</code>)
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
+	 * @param ddmTemplateKey the primary key of the web content article's DDM
+	 template
+	 * @param displayDateGT the date after which a matching web content
+	 article's display date must be after (optionally
+	 <code>null</code>)
+	 * @param displayDateLT the date before which a matching web content
+	 article's display date must be before (optionally
+	 <code>null</code>)
+	 * @param reviewDate the web content article's scheduled review date
+	 (optionally <code>null</code>)
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @return the number of matching web content articles
+	 */
+	@Override
+	public int searchCount(
+		long companyId, long groupId, java.util.List<Long> folderIds,
+		long classNameId, String keywords, Double version,
+		String ddmStructureKey, String ddmTemplateKey,
+		java.util.Date displayDateGT, java.util.Date displayDateLT,
+		java.util.Date reviewDate, int status) {
+
+		return _journalArticleService.searchCount(
+			companyId, groupId, folderIds, classNameId, keywords, version,
+			ddmStructureKey, ddmTemplateKey, displayDateGT, displayDateLT,
+			reviewDate, status);
+	}
+
+	/**
+	 * Returns the number of web content articles matching the parameters,
+	 * including keyword parameters for article ID, title, description, and
+	 * content, a DDM structure key parameter, a DDM template key parameter, and
+	 * an AND operator switch.
+	 *
+	 * @param companyId the primary key of the web content article's company
+	 * @param groupId the primary key of the group (optionally <code>0</code>)
+	 * @param folderIds the primary keys of the web content article folders
+	 (optionally {@link java.util.Collections#EMPTY_LIST})
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param articleId the article ID keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param version the web content article's version (optionally
+	 <code>null</code>)
+	 * @param title the title keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param description the description keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param content the content keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
+	 * @param ddmTemplateKey the primary key of the web content article's DDM
+	 template
+	 * @param displayDateGT the date after which a matching web content
+	 article's display date must be after (optionally
+	 <code>null</code>)
+	 * @param displayDateLT the date before which a matching web content
+	 article's display date must be before (optionally
+	 <code>null</code>)
+	 * @param reviewDate the web content article's scheduled review date
+	 (optionally <code>null</code>)
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param andOperator whether every field must match its value or keywords,
+	 or just one field must match. Group, folder IDs, class name ID,
+	 and status must all match their values.
+	 * @return the number of matching web content articles
+	 */
+	@Override
+	public int searchCount(
+		long companyId, long groupId, java.util.List<Long> folderIds,
+		long classNameId, String articleId, Double version, String title,
+		String description, String content, String ddmStructureKey,
+		String ddmTemplateKey, java.util.Date displayDateGT,
+		java.util.Date displayDateLT, java.util.Date reviewDate, int status,
+		boolean andOperator) {
+
+		return _journalArticleService.searchCount(
+			companyId, groupId, folderIds, classNameId, articleId, version,
+			title, description, content, ddmStructureKey, ddmTemplateKey,
+			displayDateGT, displayDateLT, reviewDate, status, andOperator);
+	}
+
+	/**
+	 * Returns the number of web content articles matching the parameters,
+	 * including keyword parameters for article ID, title, description, and
+	 * content, a DDM structure keys (plural) parameter, a DDM template keys
+	 * (plural) parameter, and an AND operator switch.
+	 *
+	 * @param companyId the primary key of the web content article's company
+	 * @param groupId the primary key of the group (optionally <code>0</code>)
+	 * @param folderIds the primary keys of the web content article folders
+	 (optionally {@link java.util.Collections#EMPTY_LIST})
+	 * @param classNameId the primary key of the DDMStructure class if the web
+	 content article is related to a DDM structure, the primary key of
+	 the class name associated with the article, or
+	 JournalArticleConstants.CLASS_NAME_ID_DEFAULT in the journal-api
+	 module otherwise
+	 * @param articleId the article ID keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param version the web content article's version (optionally
+	 <code>null</code>)
+	 * @param title the title keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param description the description keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param content the content keywords (space separated, optionally
+	 <code>null</code>)
+	 * @param ddmStructureKeys the primary keys of the web content article's
+	 DDM structures, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
+	 * @param ddmTemplateKeys the primary keys of the web content article's DDM
+	 templates (originally <code>null</code>). If the articles are
+	 related to a DDM structure, the template's structure must match
+	 it.
+	 * @param displayDateGT the date after which a matching web content
+	 article's display date must be after (optionally
+	 <code>null</code>)
+	 * @param displayDateLT the date before which a matching web content
+	 article's display date must be before (optionally
+	 <code>null</code>)
+	 * @param reviewDate the web content article's scheduled review date
+	 (optionally <code>null</code>)
+	 * @param status the web content article's workflow status. For more
+	 information see {@link WorkflowConstants} for constants starting
+	 with the "STATUS_" prefix.
+	 * @param andOperator whether every field must match its value or keywords,
+	 or just one field must match.  Group, folder IDs, class name ID,
+	 and status must all match their values.
+	 * @return the number of matching web content articles
+	 */
+	@Override
+	public int searchCount(
+		long companyId, long groupId, java.util.List<Long> folderIds,
+		long classNameId, String articleId, Double version, String title,
+		String description, String content, String[] ddmStructureKeys,
+		String[] ddmTemplateKeys, java.util.Date displayDateGT,
+		java.util.Date displayDateLT, java.util.Date reviewDate, int status,
+		boolean andOperator) {
+
+		return _journalArticleService.searchCount(
+			companyId, groupId, folderIds, classNameId, articleId, version,
+			title, description, content, ddmStructureKeys, ddmTemplateKeys,
+			displayDateGT, displayDateLT, reviewDate, status, andOperator);
+	}
+
 	@Override
 	public void subscribe(long groupId, long articleId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1690,6 +2227,9 @@ public class JournalArticleServiceWrapper
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -1756,28 +2296,28 @@ public class JournalArticleServiceWrapper
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			java.util.Map<java.util.Locale, String> friendlyURLMap,
-			String content, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
-			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
-			boolean neverReview, boolean indexable, boolean smallImage,
-			String smallImageURL, java.io.File smallFile,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+			int reviewDateDay, int reviewDateYear, int reviewDateHour,
+			int reviewDateMinute, boolean neverReview, boolean indexable,
+			boolean smallImage, String smallImageURL, java.io.File smallFile,
 			java.util.Map<String, byte[]> images, String articleURL,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleService.updateArticle(
 			groupId, folderId, articleId, version, titleMap, descriptionMap,
-			friendlyURLMap, content, ddmTemplateKey, layoutUuid,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
-			reviewDateHour, reviewDateMinute, neverReview, indexable,
-			smallImage, smallImageURL, smallFile, images, articleURL,
+			friendlyURLMap, content, ddmStructureKey, ddmTemplateKey,
+			layoutUuid, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
+			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
+			indexable, smallImage, smallImageURL, smallFile, images, articleURL,
 			serviceContext);
 	}
 
@@ -1796,6 +2336,9 @@ public class JournalArticleServiceWrapper
 	 * @param content the HTML content wrapped in XML. For more information,
 	 see the content example in the {@link #updateArticle(long, long,
 	 String, double, String, ServiceContext)} description.
+	 * @param ddmStructureKey the primary key of the web content article's DDM
+	 structure, if the article is related to a DDM structure, or
+	 <code>null</code> otherwise
 	 * @param ddmTemplateKey the primary key of the web content article's DDM
 	 template
 	 * @param layoutUuid the unique string identifying the web content
@@ -1861,28 +2404,29 @@ public class JournalArticleServiceWrapper
 			long groupId, long folderId, String articleId, double version,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
-			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
-			boolean neverReview, boolean indexable, boolean smallImage,
-			String smallImageURL, java.io.File smallFile,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire, int reviewDateMonth,
+			int reviewDateDay, int reviewDateYear, int reviewDateHour,
+			int reviewDateMinute, boolean neverReview, boolean indexable,
+			boolean smallImage, String smallImageURL, java.io.File smallFile,
 			java.util.Map<String, byte[]> images, String articleURL,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleService.updateArticle(
 			groupId, folderId, articleId, version, titleMap, descriptionMap,
-			content, ddmTemplateKey, layoutUuid, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, neverExpire,
-			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
-			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
-			smallFile, images, articleURL, serviceContext);
+			content, ddmStructureKey, ddmTemplateKey, layoutUuid,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
+			reviewDateHour, reviewDateMinute, neverReview, indexable,
+			smallImage, smallImageURL, smallFile, images, articleURL,
+			serviceContext);
 	}
 
 	/**
@@ -1940,27 +2484,16 @@ public class JournalArticleServiceWrapper
 			long groupId, String articleId,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String content, String ddmTemplateKey, String layoutUuid,
-			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, int reviewDateMonth, int reviewDateDay,
-			int reviewDateYear, int reviewDateHour, int reviewDateMinute,
-			boolean neverReview, boolean indexable, boolean smallImage,
+			String content, String ddmStructureKey, String ddmTemplateKey,
+			String layoutUuid, boolean indexable, boolean smallImage,
 			String smallImageURL, java.io.File smallImageFile,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _journalArticleService.updateArticleDefaultValues(
 			groupId, articleId, titleMap, descriptionMap, content,
-			ddmTemplateKey, layoutUuid, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, neverExpire,
-			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
-			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
-			smallImageFile, serviceContext);
+			ddmStructureKey, ddmTemplateKey, layoutUuid, indexable, smallImage,
+			smallImageURL, smallImageFile, serviceContext);
 	}
 
 	/**

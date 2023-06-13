@@ -16,7 +16,6 @@ package com.liferay.commerce.product.asset.categories.web.internal.portlet.actio
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
-import com.liferay.commerce.product.asset.categories.web.internal.constants.CommerceProductAssetCategoriesPortletKeys;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryService;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
@@ -28,7 +27,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 
@@ -46,8 +45,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
-		"javax.portlet.name=" + CommerceProductAssetCategoriesPortletKeys.ASSET_CATEGORIES_ADMIN,
+		"javax.portlet.name=com_liferay_asset_categories_admin_web_portlet_AssetCategoriesAdminPortlet",
 		"mvc.command.name=/commerce_product_asset_categories/edit_asset_category_cp_attachment_file_entry"
 	},
 	service = MVCActionCommand.class
@@ -55,37 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditAssetCategoryCPAttachmentFileEntryMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCPAttachmentFileEntry(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCPAttachmentFileEntry(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchFileEntryException) {
-				hideDefaultErrorMessage(actionRequest);
-				hideDefaultSuccessMessage(actionRequest);
-
-				SessionErrors.add(actionRequest, exception.getClass());
-			}
-			else {
-				_log.error(exception);
-
-				throw exception;
-			}
-		}
-	}
-
-	private void _deleteCPAttachmentFileEntry(ActionRequest actionRequest)
+	protected void deleteCPAttachmentFileEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		long cpAttachmentFileEntryId = ParamUtil.getLong(
@@ -97,7 +67,37 @@ public class EditAssetCategoryCPAttachmentFileEntryMVCActionCommand
 		}
 	}
 
-	private void _updateCPAttachmentFileEntry(ActionRequest actionRequest)
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				updateCPAttachmentFileEntry(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deleteCPAttachmentFileEntry(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchFileEntryException) {
+				hideDefaultErrorMessage(actionRequest);
+				hideDefaultSuccessMessage(actionRequest);
+
+				SessionErrors.add(actionRequest, exception.getClass());
+			}
+			else {
+				_log.error(exception, exception);
+
+				throw exception;
+			}
+		}
+	}
+
+	protected void updateCPAttachmentFileEntry(ActionRequest actionRequest)
 		throws Exception {
 
 		long cpAttachmentFileEntryId = ParamUtil.getLong(
@@ -143,7 +143,7 @@ public class EditAssetCategoryCPAttachmentFileEntryMVCActionCommand
 
 		boolean neverExpire = ParamUtil.getBoolean(
 			actionRequest, "neverExpire");
-		Map<Locale, String> titleMap = _localization.getLocalizationMap(
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "title");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 		int type = ParamUtil.getInteger(actionRequest, "type");
@@ -186,9 +186,6 @@ public class EditAssetCategoryCPAttachmentFileEntryMVCActionCommand
 
 	@Reference
 	private CPAttachmentFileEntryService _cpAttachmentFileEntryService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

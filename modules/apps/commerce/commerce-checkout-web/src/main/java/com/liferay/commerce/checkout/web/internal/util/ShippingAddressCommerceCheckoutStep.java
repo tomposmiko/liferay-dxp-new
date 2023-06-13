@@ -14,15 +14,11 @@
 
 package com.liferay.commerce.checkout.web.internal.util;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.account.service.AccountRoleLocalService;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.checkout.helper.CommerceCheckoutStepHttpHelper;
-import com.liferay.commerce.checkout.web.internal.display.context.AddressCommerceCheckoutStepDisplayContext;
 import com.liferay.commerce.checkout.web.internal.display.context.ShippingAddressCheckoutStepDisplayContext;
 import com.liferay.commerce.constants.CommerceAddressConstants;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
-import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.exception.CommerceAddressCityException;
 import com.liferay.commerce.exception.CommerceAddressCountryException;
 import com.liferay.commerce.exception.CommerceAddressNameException;
@@ -31,8 +27,6 @@ import com.liferay.commerce.exception.CommerceAddressZipException;
 import com.liferay.commerce.exception.CommerceOrderBillingAddressException;
 import com.liferay.commerce.exception.CommerceOrderShippingAddressException;
 import com.liferay.commerce.model.CommerceOrder;
-import com.liferay.commerce.product.service.CommerceChannelAccountEntryRelLocalService;
-import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceAddressService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.util.BaseCommerceCheckoutStep;
@@ -40,8 +34,6 @@ import com.liferay.commerce.util.CommerceCheckoutStep;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-import com.liferay.portal.kernel.service.CountryLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 
 import javax.portlet.ActionRequest;
@@ -52,15 +44,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Andrea Di Giorgi
  * @author Luca Pellizzon
- * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.checkout.step.name=" + ShippingAddressCommerceCheckoutStep.NAME,
 		"commerce.checkout.step.order:Integer=10"
@@ -96,20 +86,17 @@ public class ShippingAddressCommerceCheckoutStep
 		throws Exception {
 
 		try {
-			AddressCommerceCheckoutStepDisplayContext
-				addressCommerceCheckoutStepDisplayContext =
-					new AddressCommerceCheckoutStepDisplayContext(
-						_accountEntryLocalService,
-						CommerceAddressConstants.ADDRESS_TYPE_SHIPPING,
-						_commerceOrderService, _commerceAddressService,
-						_countryLocalService,
-						_commerceOrderModelResourcePermission);
+			AddressCommerceCheckoutStepUtil addressCommerceCheckoutStepUtil =
+				new AddressCommerceCheckoutStepUtil(
+					_commerceAccountLocalService,
+					CommerceAddressConstants.ADDRESS_TYPE_SHIPPING,
+					_commerceOrderService, _commerceAddressService,
+					_commerceOrderModelResourcePermission);
 
 			CommerceOrder commerceOrder =
-				addressCommerceCheckoutStepDisplayContext.
-					updateCommerceOrderAddress(
-						actionRequest,
-						CommerceCheckoutWebKeys.SHIPPING_ADDRESS_PARAM_NAME);
+				addressCommerceCheckoutStepUtil.updateCommerceOrderAddress(
+					actionRequest,
+					CommerceCheckoutWebKeys.SHIPPING_ADDRESS_PARAM_NAME);
 
 			actionRequest.setAttribute(
 				CommerceCheckoutWebKeys.COMMERCE_ORDER, commerceOrder);
@@ -141,12 +128,7 @@ public class ShippingAddressCommerceCheckoutStep
 		ShippingAddressCheckoutStepDisplayContext
 			shippingAddressCheckoutStepDisplayContext =
 				new ShippingAddressCheckoutStepDisplayContext(
-					_accountEntryLocalService,
-					_accountEntryModelResourcePermission,
-					_accountRoleLocalService, _commerceAddressService,
-					_commerceChannelAccountEntryRelLocalService,
-					_commerceChannelLocalService, httpServletRequest,
-					_portletResourcePermission);
+					_commerceAddressService, httpServletRequest);
 
 		CommerceOrder commerceOrder =
 			shippingAddressCheckoutStepDisplayContext.getCommerceOrder();
@@ -188,28 +170,10 @@ public class ShippingAddressCommerceCheckoutStep
 	}
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(model.class.name=com.liferay.account.model.AccountEntry)"
-	)
-	private volatile ModelResourcePermission<AccountEntry>
-		_accountEntryModelResourcePermission;
-
-	@Reference
-	private AccountRoleLocalService _accountRoleLocalService;
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Reference
 	private CommerceAddressService _commerceAddressService;
-
-	@Reference
-	private CommerceChannelAccountEntryRelLocalService
-		_commerceChannelAccountEntryRelLocalService;
-
-	@Reference
-	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	@Reference
 	private CommerceCheckoutStepHttpHelper _commerceCheckoutStepHttpHelper;
@@ -227,14 +191,6 @@ public class ShippingAddressCommerceCheckoutStep
 	private CommerceShippingHelper _commerceShippingHelper;
 
 	@Reference
-	private CountryLocalService _countryLocalService;
-
-	@Reference
 	private JSPRenderer _jspRenderer;
-
-	@Reference(
-		target = "(resource.name=" + CommerceOrderConstants.RESOURCE_NAME + ")"
-	)
-	private PortletResourcePermission _portletResourcePermission;
 
 }

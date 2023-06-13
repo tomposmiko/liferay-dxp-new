@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.InternalServerErrorException;
@@ -132,7 +133,7 @@ public class MultipartBodyTest {
 	}
 
 	@Test
-	public void testGetValueAsNullableInstance() throws IOException {
+	public void testGetValueAsInstanceOptional() throws IOException {
 
 		// Present optional
 
@@ -148,10 +149,12 @@ public class MultipartBodyTest {
 					"string", "Hello"
 				).toString()));
 
-		TestClass testClass = multipartBody.getValueAsNullableInstance(
-			"key", TestClass.class);
+		Optional<TestClass> testClassOptional =
+			multipartBody.getValueAsInstanceOptional("key", TestClass.class);
 
-		MatcherAssert.assertThat(testClass != null, Is.is(true));
+		MatcherAssert.assertThat(testClassOptional.isPresent(), Is.is(true));
+
+		TestClass testClass = testClassOptional.get();
 
 		MatcherAssert.assertThat(testClass.list, Matchers.contains(1, 2, 3));
 		MatcherAssert.assertThat(testClass.number, Is.is(42L));
@@ -161,10 +164,10 @@ public class MultipartBodyTest {
 
 		// Null optional
 
-		testClass = multipartBody.getValueAsNullableInstance(
+		testClassOptional = multipartBody.getValueAsInstanceOptional(
 			"null", TestClass.class);
 
-		MatcherAssert.assertThat(testClass != null, Is.is(false));
+		MatcherAssert.assertThat(testClassOptional.isPresent(), Is.is(false));
 
 		// Incorrect JSON
 

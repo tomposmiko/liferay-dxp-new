@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,21 +61,7 @@ public class AttachmentUrlSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
-
-		if (attachmentUrl.getContentType() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"contentType\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(attachmentUrl.getContentType()));
-
-			sb.append("\"");
-		}
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (attachmentUrl.getCustomFields() != null) {
 			if (sb.length() > 1) {
@@ -235,15 +222,7 @@ public class AttachmentUrlSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
-
-		if (attachmentUrl.getContentType() == null) {
-			map.put("contentType", null);
-		}
-		else {
-			map.put(
-				"contentType", String.valueOf(attachmentUrl.getContentType()));
-		}
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (attachmentUrl.getCustomFields() == null) {
 			map.put("customFields", null);
@@ -353,25 +332,16 @@ public class AttachmentUrlSerDes {
 			AttachmentUrl attachmentUrl, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "contentType")) {
+			if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					attachmentUrl.setContentType((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "customFields")) {
-				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					attachmentUrl.setCustomFields(customFieldsArray);
+					attachmentUrl.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "displayDate")) {

@@ -18,7 +18,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
@@ -36,6 +35,8 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -204,13 +205,16 @@ public class IndexerPostProcessorRegistryTest {
 
 			List<String> expectedClassNames = Arrays.asList(
 				TestSampleModelIndexerPostProcessor.class.getName());
-			List<String> actualClassNames = TransformUtil.transformToList(
-				indexer.getIndexerPostProcessors(),
-				indexerPostProcessor -> {
-					Class<?> clazz = indexerPostProcessor.getClass();
 
-					return clazz.getName();
-				});
+			List<String> actualClassNames = Stream.of(
+				indexer.getIndexerPostProcessors()
+			).map(
+				IndexerPostProcessor::getClass
+			).map(
+				Class::getName
+			).collect(
+				Collectors.toList()
+			);
 
 			Assert.assertEquals(
 				expectedClassNames.toString(), actualClassNames.toString());
@@ -227,8 +231,9 @@ public class IndexerPostProcessorRegistryTest {
 		Indexer<BlogsEntry> blogsEntryIndexer = IndexerRegistryUtil.getIndexer(
 			BlogsEntry.class.getName());
 
-		testQueuedIndexerPostProcessor(
-			blogsEntryIndexer, blogsEntryIndexer.getClassName());
+		Class<?> clazz = blogsEntryIndexer.getClass();
+
+		testQueuedIndexerPostProcessor(blogsEntryIndexer, clazz.getName());
 	}
 
 	@Test
@@ -292,6 +297,8 @@ public class IndexerPostProcessorRegistryTest {
 			Arrays.toString(indexerPostProcessors), 0,
 			indexerPostProcessors.length);
 
+		IndexerRegistryUtil.unregister(indexer);
+
 		Bundle bundle = FrameworkUtil.getBundle(getClass());
 
 		BundleContext bundleContext = bundle.getBundleContext();
@@ -307,6 +314,8 @@ public class IndexerPostProcessorRegistryTest {
 				).build());
 
 		try {
+			IndexerRegistryUtil.register(indexer);
+
 			indexerPostProcessors = indexer.getIndexerPostProcessors();
 
 			Assert.assertEquals(

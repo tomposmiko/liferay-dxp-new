@@ -13,14 +13,11 @@
  */
 
 import ClayDropDown from '@clayui/drop-down';
-import {ClayCheckbox} from '@clayui/form';
-import {ClayTooltipProvider} from '@clayui/tooltip';
+import {ClayCheckbox, ClayInput} from '@clayui/form';
 import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import {useSyncValue} from '../hooks/useSyncValue.es';
-import {normalizeOptions, normalizeValue} from '../util/options';
-import {getTooltipTitle} from '../util/tooltip';
 import HiddenSelectInput from './HiddenSelectInput.es';
 import VisibleSelectInput from './VisibleSelectInput.es';
 
@@ -92,6 +89,92 @@ function toArray(value = '') {
 	}
 
 	return newValue;
+}
+
+function normalizeValue({
+	localizedValueEdited,
+	multiple,
+	normalizedOptions,
+	predefinedValueArray,
+	valueArray,
+}) {
+	const assertValue =
+		valueArray.length || (valueArray.length === 0 && localizedValueEdited)
+			? valueArray
+			: predefinedValueArray;
+
+	const valueWithoutMultiple = assertValue.filter((_, index) => {
+		return multiple ? true : index === 0;
+	});
+
+	return valueWithoutMultiple.filter((value) =>
+		normalizedOptions.some((option) => value === option.value)
+	);
+}
+
+/**
+ * Some parameters on each option
+ * needs to be prepared in case of
+ * multiple selected values(when the value state is an array).
+ */
+function assertOptionParameters({
+	editingLanguageId,
+	multiple,
+	option,
+	valueArray,
+}) {
+	const included = valueArray.includes(option.value);
+
+	return {
+		...option,
+		active: !multiple && included,
+		checked: multiple && included,
+		label: option.label[editingLanguageId] ?? option.label,
+		type: multiple ? 'checkbox' : 'item',
+	};
+}
+
+function normalizeOptions({
+	editingLanguageId,
+	fixedOptions,
+	multiple,
+	options,
+	showEmptyOption,
+	valueArray,
+}) {
+	const newOptions = [
+		...options.map((option, index) => ({
+			...assertOptionParameters({
+				editingLanguageId,
+				multiple,
+				option,
+				valueArray,
+			}),
+			separator:
+				Array.isArray(fixedOptions) &&
+				fixedOptions.length > 0 &&
+				index === options.length - 1,
+		})),
+		...fixedOptions.map((option) =>
+			assertOptionParameters({
+				editingLanguageId,
+				multiple,
+				option,
+				valueArray,
+			})
+		),
+	].filter(({value}) => value !== '');
+
+	if (!multiple && showEmptyOption) {
+		const emptyOption = {
+			label: Liferay.Language.get('choose-an-option'),
+			value: null,
+		};
+
+		return [emptyOption, ...newOptions];
+	}
+
+	return newOptions;
 }
 
 function handleDropdownItemClick({currentValue, multiple, option}) {
@@ -179,25 +262,22 @@ const DropdownList = ({
 	currentValue,
 	expand,
 	handleSelect,
-	label,
 	multiple,
 	options,
 }) => (
 	<ClayDropDown.ItemList>
-		<ClayDropDown.Group header={label}>
-			{options.map((option, index) => (
-				<DropdownItem
-					currentValue={currentValue}
-					expand={expand}
-					index={index}
-					key={`${option.value}-${index}`}
-					multiple={multiple}
-					onSelect={handleSelect}
-					option={option}
-					options={options}
-				/>
-			))}
-		</ClayDropDown.Group>
+		{options.map((option, index) => (
+			<DropdownItem
+				currentValue={currentValue}
+				expand={expand}
+				index={index}
+				key={`${option.value}-${index}`}
+				multiple={multiple}
+				onSelect={handleSelect}
+				option={option}
+				options={options}
+			/>
+		))}
 	</ClayDropDown.ItemList>
 );
 
@@ -234,8 +314,11 @@ const DropdownListWithSearch = ({
 
 	return (
 		<>
-			<ClayDropDown.Search onChange={setQuery} value={query} />
-			{filteredOptions.length ? (
+			<ClayDropDown.Search
+				onChange={(event) => setQuery(event.target.value)}
+				value={query}
+			/>
+			{filteredOptions.length > 1 ? (
 				<DropdownList
 					currentValue={currentValue}
 					expand={expand}
@@ -284,8 +367,6 @@ const Trigger = forwardRef(
 );
 
 const Select = ({
-	defaultSearch,
-	label,
 	multiple,
 	onCloseButtonClicked,
 	onDropdownItemClicked,
@@ -299,9 +380,10 @@ const Select = ({
 }) => {
 	const menuElementRef = useRef(null);
 	const triggerElementRef = useRef(null);
+
 	const [currentValue, setCurrentValue] = useSyncValue(value, false);
 	const [expand, setExpand] = useState(false);
-	const [selectedLabel, setSelectedLabel] = useState('');
+
 	const handleFocus = (event, direction) => {
 		const target = event.target;
 		const focusabledElements = event.currentTarget.querySelectorAll(
@@ -352,167 +434,118 @@ const Select = ({
 		}
 	};
 
-	const inputTrigger =
-		document.querySelector(
-			'[data-field-name|="selectedObjectField"] > .lfr__ddm-select-input-trigger'
-		) ??
-		document.querySelector(
-			`[data-field-reference|='${otherProps.fieldReference}'] .lfr__ddm-select-input-trigger`
-		);
-
-	let leftRect;
-
-	if (inputTrigger) {
-		const rect = inputTrigger.getBoundingClientRect();
-		leftRect = rect.left;
-	}
-
-	useEffect(() => {
-		const [selectedValue] = currentValue;
-		const selectedOption = options.find(
-			(option) => option.value === selectedValue
-		);
-
-		if (selectedOption) {
-			return setSelectedLabel(selectedOption.label);
-		}
-
-		setSelectedLabel('');
-	}, [currentValue, options, value]);
-
 	return (
-		<ClayTooltipProvider>
-			<div
-				data-tooltip-align="top"
-				{...getTooltipTitle({
-					placeholder: Liferay.Language.get('choose-an-option'),
-					value: selectedLabel,
-				})}
-			>
-				<Trigger
-					multiple={multiple}
-					onCloseButtonClicked={({event, value}) => {
-						const newValue = removeValue({
-							value: currentValue,
-							valueToBeRemoved: value,
-						});
+		<>
+			<Trigger
+				multiple={multiple}
+				onCloseButtonClicked={({event, value}) => {
+					const newValue = removeValue({
+						value: currentValue,
+						valueToBeRemoved: value,
+					});
 
-						setCurrentValue(newValue);
+					setCurrentValue(newValue);
 
-						onCloseButtonClicked({event, value: newValue});
-					}}
-					onTriggerClicked={(event) => {
-						if (readOnly) {
-							return;
-						}
+					onCloseButtonClicked({event, value: newValue});
+				}}
+				onTriggerClicked={(event) => {
+					if (readOnly) {
+						return;
+					}
+
+					setExpand(!expand);
+					onExpand({event, expand: !expand});
+
+					if (expand) {
+						triggerElementRef.current.firstChild.focus();
+					}
+				}}
+				onTriggerKeyDown={(event) => {
+					if (
+						(event.keyCode === KEYCODES.TAB ||
+							event.keyCode === KEYCODES.ARROW_DOWN) &&
+						!event.shiftKey &&
+						expand
+					) {
+						event.preventDefault();
+						event.stopPropagation();
+
+						const firstElement = menuElementRef.current.querySelector(
+							'button'
+						);
+
+						firstElement.focus();
+					}
+
+					if (
+						event.keyCode === KEYCODES.ENTER ||
+						(event.keyCode === KEYCODES.SPACE && !event.shiftKey)
+					) {
+						event.preventDefault();
+						event.stopPropagation();
 
 						setExpand(!expand);
+
 						onExpand({event, expand: !expand});
 
 						if (expand) {
 							triggerElementRef.current.firstChild.focus();
 						}
-					}}
-					onTriggerKeyDown={(event) => {
-						if (
-							(event.keyCode === KEYCODES.TAB ||
-								event.keyCode === KEYCODES.ARROW_DOWN) &&
-							!event.shiftKey &&
-							expand
-						) {
-							event.preventDefault();
-							event.stopPropagation();
-
-							const firstElement = menuElementRef.current.querySelector(
-								'button'
-							);
-
-							firstElement.focus();
-						}
-
-						if (
-							event.keyCode === KEYCODES.ENTER ||
-							(event.keyCode === KEYCODES.SPACE &&
-								!event.shiftKey)
-						) {
-							event.preventDefault();
-							event.stopPropagation();
-
-							setExpand(!expand);
-
-							onExpand({event, expand: !expand});
-
-							if (expand) {
-								triggerElementRef.current.firstChild.focus();
-							}
-						}
-					}}
-					options={options}
-					predefinedValue={predefinedValue}
-					readOnly={readOnly}
-					ref={triggerElementRef}
-					value={currentValue}
-					{...otherProps}
-				/>
-
-				<ClayDropDown.Menu
-					active={expand}
-					alignElementRef={triggerElementRef}
-					alignmentPosition={5}
-					className="ddm-btn-full ddm-select-dropdown"
-					onKeyDown={(event) => {
-						switch (event.keyCode) {
-							case KEYCODES.ARROW_DOWN:
-								handleFocus(event, false);
-								break;
-							case KEYCODES.ARROW_UP:
-								handleFocus(event, true);
-								break;
-							case KEYCODES.TAB:
-								handleFocus(event, event.shiftKey);
-								break;
-							default:
-								break;
-						}
-					}}
-					onSetActive={setExpand}
-					ref={menuElementRef}
-					style={{
-						left: leftRect,
-						maxWidth: inputTrigger
-							? inputTrigger.offsetWidth
-							: '500px',
-						width: '100%',
-					}}
-				>
-					{options.length > MAX_ITEMS || defaultSearch ? (
-						<DropdownListWithSearch
-							currentValue={currentValue}
-							expand={expand}
-							handleSelect={handleSelect}
-							label={label}
-							multiple={multiple}
-							options={options}
-							showEmptyOption={showEmptyOption}
-						/>
-					) : (
-						<DropdownList
-							currentValue={currentValue}
-							expand={expand}
-							handleSelect={handleSelect}
-							label={label}
-							multiple={multiple}
-							options={options}
-						/>
-					)}
-				</ClayDropDown.Menu>
-			</div>
-		</ClayTooltipProvider>
+					}
+				}}
+				options={options}
+				predefinedValue={predefinedValue}
+				readOnly={readOnly}
+				ref={triggerElementRef}
+				value={currentValue}
+				{...otherProps}
+			/>
+			<ClayDropDown.Menu
+				active={expand}
+				alignElementRef={triggerElementRef}
+				className="ddm-btn-full ddm-select-dropdown"
+				onKeyDown={(event) => {
+					switch (event.keyCode) {
+						case KEYCODES.ARROW_DOWN:
+							handleFocus(event, false);
+							break;
+						case KEYCODES.ARROW_UP:
+							handleFocus(event, true);
+							break;
+						case KEYCODES.TAB:
+							handleFocus(event, event.shiftKey);
+							break;
+						default:
+							break;
+					}
+				}}
+				onSetActive={setExpand}
+				ref={menuElementRef}
+			>
+				{options.length > MAX_ITEMS ? (
+					<DropdownListWithSearch
+						currentValue={currentValue}
+						expand={expand}
+						handleSelect={handleSelect}
+						multiple={multiple}
+						options={options}
+						showEmptyOption={showEmptyOption}
+					/>
+				) : (
+					<DropdownList
+						currentValue={currentValue}
+						expand={expand}
+						handleSelect={handleSelect}
+						multiple={multiple}
+						options={options}
+					/>
+				)}
+			</ClayDropDown.Menu>
+		</>
 	);
 };
 
 const Main = ({
-	defaultSearch = false,
 	editingLanguageId,
 	fixedOptions = [],
 	label,
@@ -574,8 +607,6 @@ const Main = ({
 			{...otherProps}
 		>
 			<Select
-				defaultSearch={defaultSearch}
-				label={label}
 				multiple={multiple}
 				name={`${name}_field`}
 				onCloseButtonClicked={({event, value}) =>
@@ -599,8 +630,7 @@ const Main = ({
 				value={value}
 				{...otherProps}
 			/>
-
-			<input name={name} type="hidden" value={value} />
+			<ClayInput name={name} type="hidden" value={value} />
 		</FieldBase>
 	);
 };

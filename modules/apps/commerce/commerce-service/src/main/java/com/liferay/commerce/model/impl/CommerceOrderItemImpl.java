@@ -20,10 +20,8 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
-import com.liferay.commerce.product.model.CPMeasurementUnit;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.service.CPInstanceLocalServiceUtil;
-import com.liferay.commerce.product.service.CPMeasurementUnitLocalServiceUtil;
 import com.liferay.commerce.product.service.CProductLocalServiceUtil;
 import com.liferay.commerce.service.CommerceOrderItemLocalServiceUtil;
 import com.liferay.commerce.service.CommerceOrderLocalServiceUtil;
@@ -41,12 +39,6 @@ public class CommerceOrderItemImpl extends CommerceOrderItemBaseImpl {
 	@Override
 	public CPInstance fetchCPInstance() {
 		return CPInstanceLocalServiceUtil.fetchCPInstance(getCPInstanceId());
-	}
-
-	@Override
-	public CPMeasurementUnit fetchCPMeasurementUnit() {
-		return CPMeasurementUnitLocalServiceUtil.fetchCPMeasurementUnit(
-			getCPMeasurementUnitId());
 	}
 
 	@Override

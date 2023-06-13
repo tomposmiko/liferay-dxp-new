@@ -14,8 +14,9 @@
 
 package com.liferay.commerce.payment.method.mercanet.internal;
 
+import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
-import com.liferay.commerce.constants.CommercePaymentMethodConstants;
+import com.liferay.commerce.constants.CommercePaymentConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.payment.method.CommercePaymentMethod;
@@ -29,15 +30,15 @@ import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import com.worldline.sips.model.CaptureMode;
 import com.worldline.sips.model.Currency;
@@ -65,6 +66,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.payment.engine.method.key=" + MercanetCommercePaymentMethod.KEY,
 	service = CommercePaymentMethod.class
 )
@@ -104,7 +106,7 @@ public class MercanetCommercePaymentMethod implements CommercePaymentMethod {
 
 	@Override
 	public String getDescription(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			_getResourceBundle(locale), "mercanet-description");
 	}
 
@@ -115,12 +117,13 @@ public class MercanetCommercePaymentMethod implements CommercePaymentMethod {
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(_getResourceBundle(locale), KEY);
+		return LanguageUtil.get(_getResourceBundle(locale), KEY);
 	}
 
 	@Override
 	public int getPaymentType() {
-		return CommercePaymentMethodConstants.TYPE_ONLINE_REDIRECT;
+		return CommercePaymentConstants.
+			COMMERCE_PAYMENT_METHOD_TYPE_ONLINE_REDIRECT;
 	}
 
 	@Override
@@ -174,7 +177,7 @@ public class MercanetCommercePaymentMethod implements CommercePaymentMethod {
 
 		URL returnURL = new URL(mercanetCommercePaymentRequest.getReturnUrl());
 
-		Map<String, String[]> parameters = HttpComponentsUtil.getParameterMap(
+		Map<String, String[]> parameters = _http.getParameterMap(
 			returnURL.getQuery());
 
 		URL baseURL = new URL(
@@ -211,7 +214,7 @@ public class MercanetCommercePaymentMethod implements CommercePaymentMethod {
 		paymentRequest.setOrderId(
 			String.valueOf(commerceOrder.getCommerceOrderId()));
 
-		String transactionUuid = _portalUUID.generate();
+		String transactionUuid = PortalUUIDUtil.generate();
 
 		String transactionId = StringUtil.replace(
 			transactionUuid, CharPool.DASH, StringPool.BLANK);
@@ -219,7 +222,7 @@ public class MercanetCommercePaymentMethod implements CommercePaymentMethod {
 		paymentRequest.setTransactionReference(transactionId);
 
 		MercanetGroupServiceConfiguration mercanetGroupServiceConfiguration =
-			_getMercanetGroupServiceConfiguration(commerceOrder.getGroupId());
+			_getConfiguration(commerceOrder.getGroupId());
 
 		String environment = StringUtil.toUpperCase(
 			mercanetGroupServiceConfiguration.environment());
@@ -261,12 +264,11 @@ public class MercanetCommercePaymentMethod implements CommercePaymentMethod {
 
 		return new CommercePaymentResult(
 			transactionId, commerceOrder.getCommerceOrderId(),
-			CommerceOrderPaymentConstants.STATUS_AUTHORIZED, true, url, null,
+			CommerceOrderConstants.PAYMENT_STATUS_AUTHORIZED, true, url, null,
 			resultMessage, true);
 	}
 
-	private MercanetGroupServiceConfiguration
-			_getMercanetGroupServiceConfiguration(long groupId)
+	private MercanetGroupServiceConfiguration _getConfiguration(long groupId)
 		throws Exception {
 
 		return _configurationProvider.getConfiguration(
@@ -297,12 +299,9 @@ public class MercanetCommercePaymentMethod implements CommercePaymentMethod {
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
-	private Language _language;
+	private Http _http;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortalUUID _portalUUID;
 
 }

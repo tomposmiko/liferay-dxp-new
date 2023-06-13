@@ -14,6 +14,12 @@
 
 package com.liferay.portal.search.internal.indexer;
 
+import com.liferay.portal.kernel.configuration.Filter;
+import com.liferay.portal.kernel.search.SearchEngineHelper;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
 /**
@@ -45,6 +51,26 @@ public class ModelSearchSettingsImpl implements ModelSearchSettings {
 	@Override
 	public String[] getSearchClassNames() {
 		return _searchClassNames;
+	}
+
+	@Override
+	public String getSearchEngineId() {
+		if (_searchEngineId != null) {
+			return _searchEngineId;
+		}
+
+		String searchEngineId = GetterUtil.getString(
+			PropsUtil.get(
+				PropsKeys.INDEX_SEARCH_ENGINE_ID, new Filter(_className)));
+
+		if (!Validator.isBlank(searchEngineId)) {
+			_searchEngineId = searchEngineId;
+		}
+		else {
+			_searchEngineId = SearchEngineHelper.SYSTEM_ENGINE_ID;
+		}
+
+		return _searchEngineId;
 	}
 
 	@Override
@@ -88,6 +114,10 @@ public class ModelSearchSettingsImpl implements ModelSearchSettings {
 		_searchClassNames = searchClassNames;
 	}
 
+	public void setSearchEngineId(String searchEngineId) {
+		_searchEngineId = searchEngineId;
+	}
+
 	public void setSearchResultPermissionFilterSuppressed(
 		boolean searchResultPermissionFilterSuppressed) {
 
@@ -108,6 +138,7 @@ public class ModelSearchSettingsImpl implements ModelSearchSettings {
 	private String[] _defaultSelectedFieldNames;
 	private String[] _defaultSelectedLocalizedFieldNames;
 	private String[] _searchClassNames;
+	private String _searchEngineId;
 	private boolean _searchResultPermissionFilterSuppressed;
 	private boolean _selectAllLocales;
 	private boolean _stagingAware = true;

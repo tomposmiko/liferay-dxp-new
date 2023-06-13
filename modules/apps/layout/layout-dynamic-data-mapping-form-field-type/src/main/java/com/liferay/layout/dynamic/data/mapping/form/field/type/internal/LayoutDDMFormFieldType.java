@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.data.domain=link_to_layout",
 		"ddm.form.field.type.description=link-to-layout-field-description",

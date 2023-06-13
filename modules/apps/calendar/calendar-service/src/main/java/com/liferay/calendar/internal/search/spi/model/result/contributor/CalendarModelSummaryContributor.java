@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.calendar.model.Calendar",
 	service = ModelSummaryContributor.class
 )

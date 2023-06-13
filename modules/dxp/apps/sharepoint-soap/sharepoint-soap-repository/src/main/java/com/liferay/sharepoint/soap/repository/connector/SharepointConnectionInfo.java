@@ -47,8 +47,8 @@ public class SharepointConnectionInfo {
 
 		_serviceURL = URLUtil.toURL(
 			StringBundler.concat(
-				serverProtocol, "://", serverAddress, StringPool.COLON,
-				serverPort, sitePath, StringPool.SLASH));
+				_serverProtocol, "://", _serverAddress, StringPool.COLON,
+				_serverPort, _sitePath, StringPool.SLASH));
 	}
 
 	public String getLibraryName() {

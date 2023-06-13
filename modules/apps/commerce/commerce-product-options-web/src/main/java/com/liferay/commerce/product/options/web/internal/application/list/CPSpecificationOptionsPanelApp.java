@@ -18,7 +18,7 @@ import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
 import com.liferay.commerce.application.list.constants.CommercePanelCategoryKeys;
 import com.liferay.commerce.product.constants.CPPortletKeys;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Portlet;
 
 import java.util.Locale;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"panel.app.order:Integer=400",
 		"panel.category.key=" + CommercePanelCategoryKeys.COMMERCE_PRODUCT_MANAGEMENT
@@ -40,12 +41,7 @@ public class CPSpecificationOptionsPanelApp extends BasePanelApp {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "specifications");
-	}
-
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
+		return LanguageUtil.get(locale, "specifications");
 	}
 
 	@Override
@@ -53,12 +49,13 @@ public class CPSpecificationOptionsPanelApp extends BasePanelApp {
 		return CPPortletKeys.CP_SPECIFICATION_OPTIONS;
 	}
 
-	@Reference
-	private Language _language;
-
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + CPPortletKeys.CP_SPECIFICATION_OPTIONS + ")"
+		target = "(javax.portlet.name=" + CPPortletKeys.CP_SPECIFICATION_OPTIONS + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

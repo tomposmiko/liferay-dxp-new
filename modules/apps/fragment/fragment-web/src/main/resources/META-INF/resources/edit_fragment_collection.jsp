@@ -24,7 +24,7 @@ FragmentCollection fragmentCollection = FragmentCollectionLocalServiceUtil.fetch
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(fragmentDisplayContext.getRedirect());
 
-renderResponse.setTitle((fragmentCollection != null) ? fragmentCollection.getName() : LanguageUtil.get(request, "add-fragment-set"));
+renderResponse.setTitle((fragmentCollection != null) ? fragmentCollection.getName() : LanguageUtil.get(request, "add-collection"));
 %>
 
 <portlet:actionURL name="/fragment/edit_fragment_collection" var="editFragmentCollectionURL">
@@ -44,16 +44,18 @@ renderResponse.setTitle((fragmentCollection != null) ? fragmentCollection.getNam
 
 		<aui:model-context bean="<%= fragmentCollection %>" model="<%= FragmentCollection.class %>" />
 
-		<liferay-frontend:fieldset>
-			<aui:input label="name" name="name" placeholder="name" />
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset>
+				<aui:input autoFocus="<%= true %>" label="name" name="name" placeholder="name" />
 
-			<aui:input name="description" placeholder="description" />
-		</liferay-frontend:fieldset>
+				<aui:input name="description" placeholder="description" />
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons
-			redirect="<%= fragmentDisplayContext.getRedirect() %>"
-		/>
+		<aui:button type="submit" />
+
+		<aui:button href="<%= fragmentDisplayContext.getRedirect() %>" type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>

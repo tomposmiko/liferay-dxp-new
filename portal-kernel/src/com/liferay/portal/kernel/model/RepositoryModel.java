@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -34,8 +33,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface RepositoryModel
-	extends BaseModel<Repository>, CTModel<Repository>, MVCCModel, ShardedModel,
-			StagedGroupedModel, TypedModel {
+	extends BaseModel<Repository>, MVCCModel, ShardedModel, StagedGroupedModel,
+			TypedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -48,7 +47,6 @@ public interface RepositoryModel
 	 *
 	 * @return the primary key of this repository
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -56,7 +54,6 @@ public interface RepositoryModel
 	 *
 	 * @param primaryKey the primary key of this repository
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -74,22 +71,6 @@ public interface RepositoryModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this repository.
-	 *
-	 * @return the ct collection ID of this repository
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this repository.
-	 *
-	 * @param ctCollectionId the ct collection ID of this repository
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this repository.
@@ -353,9 +334,5 @@ public interface RepositoryModel
 
 	@Override
 	public Repository cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

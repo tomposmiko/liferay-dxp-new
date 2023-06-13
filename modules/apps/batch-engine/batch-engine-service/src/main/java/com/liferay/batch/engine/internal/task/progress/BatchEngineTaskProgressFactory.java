@@ -29,22 +29,12 @@ public class BatchEngineTaskProgressFactory {
 	public BatchEngineTaskProgress create(
 		BatchEngineTaskContentType batchEngineTaskContentType) {
 
-		if (batchEngineTaskContentType == BatchEngineTaskContentType.CSV) {
-			return new CSVBatchEngineTaskProgressImpl();
-		}
-
 		if (batchEngineTaskContentType == BatchEngineTaskContentType.JSON) {
 			return new JSONBatchEngineTaskProgressImpl();
 		}
 
 		if (batchEngineTaskContentType == BatchEngineTaskContentType.JSONL) {
 			return new JSONLBatchEngineTaskProgressImpl();
-		}
-
-		if ((batchEngineTaskContentType == BatchEngineTaskContentType.XLS) ||
-			(batchEngineTaskContentType == BatchEngineTaskContentType.XLSX)) {
-
-			return new XLSBatchEngineTaskProgressImpl();
 		}
 
 		return new DefaultBatchEngineTaskProgressImpl();

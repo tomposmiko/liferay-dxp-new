@@ -15,15 +15,15 @@
 package com.liferay.commerce.product.options.web.internal.display.context;
 
 import com.liferay.commerce.product.model.CPOptionCategory;
-import com.liferay.commerce.product.options.web.internal.portlet.action.helper.ActionHelper;
+import com.liferay.commerce.product.options.web.internal.portlet.action.ActionHelper;
 import com.liferay.commerce.product.options.web.internal.util.CPOptionsPortletUtil;
 import com.liferay.commerce.product.service.CPOptionCategoryService;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
-
-import javax.portlet.PortletURL;
+import com.liferay.portal.kernel.util.OrderByComparator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,18 +43,9 @@ public class CPOptionCategoryDisplayContext
 			actionHelper, httpServletRequest,
 			CPOptionCategory.class.getSimpleName(), portletResourcePermission);
 
-		_cpOptionCategoryService = cpOptionCategoryService;
-
 		setDefaultOrderByCol("priority");
-	}
 
-	@Override
-	public PortletURL getPortletURL() throws PortalException {
-		return PortletURLBuilder.create(
-			super.getPortletURL()
-		).setMVCRenderCommandName(
-			"/cp_specification_options/view_cp_option_categories"
-		).buildPortletURL();
+		_cpOptionCategoryService = cpOptionCategoryService;
 	}
 
 	@Override
@@ -66,21 +57,33 @@ public class CPOptionCategoryDisplayContext
 		}
 
 		searchContainer = new SearchContainer<>(
-			liferayPortletRequest, getPortletURL(), null,
+			liferayPortletRequest, getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage(
 			"no-specification-groups-were-found");
 
-		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
+		OrderByComparator<CPOptionCategory> orderByComparator =
 			CPOptionsPortletUtil.getCPOptionCategoryOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+				getOrderByCol(), getOrderByType());
+
+		Sort sort = CPOptionsPortletUtil.getCPOptionCategorySort(
+			getOrderByCol(), getOrderByType());
+
+		searchContainer.setOrderByCol(getOrderByCol());
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			_cpOptionCategoryService.searchCPOptionCategories(
-				cpRequestHelper.getCompanyId(), getKeywords(),
-				searchContainer.getStart(), searchContainer.getEnd(),
-				CPOptionsPortletUtil.getCPOptionCategorySort(
-					getOrderByCol(), getOrderByType())));
 		searchContainer.setRowChecker(getRowChecker());
+
+		BaseModelSearchResult<CPOptionCategory>
+			cpOptionCategoryBaseModelSearchResult =
+				_cpOptionCategoryService.searchCPOptionCategories(
+					cpRequestHelper.getCompanyId(), getKeywords(),
+					searchContainer.getStart(), searchContainer.getEnd(), sort);
+
+		searchContainer.setResults(
+			cpOptionCategoryBaseModelSearchResult.getBaseModels());
+		searchContainer.setTotal(
+			cpOptionCategoryBaseModelSearchResult.getLength());
 
 		return searchContainer;
 	}

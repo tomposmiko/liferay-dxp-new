@@ -9,7 +9,7 @@
  * distribution rights of the Software.
  */
 
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React from 'react';
 
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
@@ -19,10 +19,10 @@ import ProcessVersionFilter from '../filter/ProcessVersionFilter.es';
 import TimeRangeFilter from '../filter/TimeRangeFilter.es';
 
 const hasFilterToShow = (selectedFilters = [], hideFilters = []) =>
-	!!selectedFilters.filter(
+	selectedFilters.filter(
 		(selectedItem) =>
 			!hideFilters.find((hideItem) => selectedItem.key === hideItem)
-	).length;
+	).length > 0;
 
 export default function Header({
 	filterKeys,
@@ -36,13 +36,13 @@ export default function Header({
 
 	return (
 		<>
-			<ManagementToolbar.Container className="mb-0">
-				<ManagementToolbar.ItemList>
-					<ManagementToolbar.Item>
+			<ClayManagementToolbar className="mb-0">
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item>
 						<strong className="ml-0 mr-0 navbar-text">
 							{Liferay.Language.get('filter-by')}
 						</strong>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 
 					<ProcessVersionFilter
 						filterKey={filterConstants.processVersion.key}
@@ -53,17 +53,17 @@ export default function Header({
 						}}
 						processId={routeParams.processId}
 					/>
-				</ManagementToolbar.ItemList>
+				</ClayManagementToolbar.ItemList>
 
 				<SearchField
 					disabled={false}
 					placeholder={Liferay.Language.get('search-for-step-name')}
 				/>
 
-				<ManagementToolbar.ItemList>
+				<ClayManagementToolbar.ItemList>
 					<TimeRangeFilter />
-				</ManagementToolbar.ItemList>
-			</ManagementToolbar.Container>
+				</ClayManagementToolbar.ItemList>
+			</ClayManagementToolbar>
 
 			{showFiltersResult && (
 				<ResultsBar>

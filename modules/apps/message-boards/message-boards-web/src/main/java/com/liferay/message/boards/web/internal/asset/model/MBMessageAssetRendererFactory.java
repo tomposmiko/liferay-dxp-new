@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.util.HtmlParser;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -45,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS,
 	service = AssetRendererFactory.class
 )
@@ -65,7 +65,7 @@ public class MBMessageAssetRendererFactory
 
 		MBMessageAssetRenderer mbMessageAssetRenderer =
 			new MBMessageAssetRenderer(
-				_htmlParser, _mbMessageLocalService.getMessage(classPK),
+				_mbMessageLocalService.getMessage(classPK),
 				_messageModelResourcePermission);
 
 		mbMessageAssetRenderer.setAssetDisplayPageFriendlyURLProvider(
@@ -104,7 +104,7 @@ public class MBMessageAssetRendererFactory
 		}
 		catch (WindowStateException windowStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(windowStateException);
+				_log.debug(windowStateException, windowStateException);
 			}
 		}
 
@@ -120,6 +120,13 @@ public class MBMessageAssetRendererFactory
 			permissionChecker, classPK, actionId);
 	}
 
+	@Reference(unbind = "-")
+	protected void setMBMessageLocalService(
+		MBMessageLocalService mbMessageLocalService) {
+
+		_mbMessageLocalService = mbMessageLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		MBMessageAssetRendererFactory.class);
 
@@ -127,10 +134,6 @@ public class MBMessageAssetRendererFactory
 	private AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
 
-	@Reference
-	private HtmlParser _htmlParser;
-
-	@Reference
 	private MBMessageLocalService _mbMessageLocalService;
 
 	@Reference(

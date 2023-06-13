@@ -50,30 +50,5 @@ if (Validator.isNull(width)) {
 </div>
 
 <aui:script>
-	var randomElement = document.getElementById('<%= randomNamespace %>');
-
-	if (randomElement) {
-		var children = randomElement.getElementsByTagName('*');
-
-		var emptyFnFalse = function () {
-			return false;
-		};
-
-		for (var i = children.length - 1; i >= 0; i--) {
-			var item = children[i];
-
-			item.style.cursor = 'default';
-
-			item.onclick = emptyFnFalse;
-			item.onmouseover = emptyFnFalse;
-			item.onmouseout = emptyFnFalse;
-			item.onmouseenter = emptyFnFalse;
-			item.onmouseleave = emptyFnFalse;
-
-			item.action = '';
-			item.disabled = true;
-			item.href = 'javascript:void(0);';
-			item.onsubmit = emptyFnFalse;
-		}
-	}
+	Liferay.Util.disableElements('#<%= randomNamespace %>');
 </aui:script>

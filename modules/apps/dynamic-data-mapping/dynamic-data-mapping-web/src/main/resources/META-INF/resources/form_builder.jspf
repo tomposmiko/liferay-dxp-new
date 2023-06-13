@@ -15,21 +15,13 @@
 --%>
 
 <%
-Locale[] availableLocales = {LocaleUtil.getSiteDefault()};
 String defaultLanguageId = LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault());
-boolean hasDDMDocumentLibraryDataType = false;
+
+Locale[] availableLocales = {LocaleUtil.getSiteDefault()};
 
 if (Validator.isNotNull(script)) {
 	try {
 		DDMForm ddmForm = DDMUtil.getDDMForm(script);
-
-		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
-			if (StringUtil.equals(ddmFormField.getType(), "ddm-documentlibrary")) {
-				hasDDMDocumentLibraryDataType = true;
-
-				break;
-			}
-		}
 
 		String ddmFormDefaultLanguageId = LocaleUtil.toLanguageId(ddmForm.getDefaultLocale());
 
@@ -48,7 +40,7 @@ if (Validator.isNotNull(script)) {
 }
 %>
 
-<hr class="separator" />
+<div class="separator"><!-- --></div>
 
 <div class="alert alert-danger hide lfr-message-response" id="<portlet:namespace />messageContainer"></div>
 
@@ -56,10 +48,6 @@ if (Validator.isNotNull(script)) {
 	names='<%= LanguageUtil.get(request, "view[action]") + "," + LanguageUtil.get(request, "source") %>'
 	refresh="<%= false %>"
 >
-	<div class="alert alert-info ddm-documents-and-media-field lfr-message-response <%= hasDDMDocumentLibraryDataType ? StringPool.BLANK : "hide" %>">
-		<liferay-ui:message key="document-permissions-are-not-inherited-from-the-dynamic-data-list-record" />
-	</div>
-
 	<liferay-ui:section>
 		<div id="<portlet:namespace />formBuilderTab">
 			<aui:translation-manager availableLocales="<%= availableLocales %>" changeableDefaultLanguage="<%= changeableDefaultLanguage %>" defaultLanguageId="<%= defaultLanguageId %>" id="translationManager" initialize="<%= false %>" readOnly="<%= false %>" />
@@ -68,14 +56,14 @@ if (Validator.isNotNull(script)) {
 				<div class="diagram-builder-content" id="<portlet:namespace />formBuilderContent">
 					<div class="tabbable">
 						<div class="tabbable-content">
-							<ul class="lfr-nav nav nav-tabs">
+							<ul class="lfr-nav nav nav-underline">
 								<li class="nav-item">
-									<a class="nav-link" href="javascript:void(0);">
+									<a class="active nav-link" href="javascript:;">
 										<liferay-ui:message key="fields" />
 									</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link" href="javascript:void(0);">
+									<a class="disabled nav-link" href="javascript:;">
 										<liferay-ui:message key="settings" />
 									</a>
 								</li>

@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.Optional;
+
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -34,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AMPortletKeys.ADAPTIVE_MEDIA,
 		"mvc.command.name=/adaptive_media/edit_image_configuration_entry"
@@ -52,13 +55,16 @@ public class EditImageConfigurationEntryMVCRenderCommand
 
 		String entryUuid = ParamUtil.getString(renderRequest, "entryUuid");
 
-		AMImageConfigurationEntry amImageConfigurationEntry =
+		Optional<AMImageConfigurationEntry> amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				themeDisplay.getCompanyId(), entryUuid);
 
 		boolean configurationEntryEditable = true;
 
-		if (amImageConfigurationEntry != null) {
+		if (amImageConfigurationEntryOptional.isPresent()) {
+			AMImageConfigurationEntry amImageConfigurationEntry =
+				amImageConfigurationEntryOptional.get();
+
 			int entriesCount = _amImageEntryLocalService.getAMImageEntriesCount(
 				themeDisplay.getCompanyId(),
 				amImageConfigurationEntry.getUUID());
@@ -69,7 +75,8 @@ public class EditImageConfigurationEntryMVCRenderCommand
 		}
 
 		renderRequest.setAttribute(
-			AMWebKeys.CONFIGURATION_ENTRY, amImageConfigurationEntry);
+			AMWebKeys.CONFIGURATION_ENTRY,
+			amImageConfigurationEntryOptional.orElse(null));
 
 		renderRequest.setAttribute(
 			AMWebKeys.CONFIGURATION_ENTRY_EDITABLE, configurationEntryEditable);

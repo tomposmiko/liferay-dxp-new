@@ -149,6 +149,7 @@ public class ExtRepositoryFileEntryAdapter
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public List<FileVersion> getFileVersions(int status) {
 		if ((status == WorkflowConstants.STATUS_ANY) ||
 			(status == WorkflowConstants.STATUS_APPROVED)) {
@@ -166,11 +167,6 @@ public class ExtRepositoryFileEntryAdapter
 	}
 
 	@Override
-	public List<FileVersion> getFileVersions(int status, int start, int end) {
-		return getFileVersions(status);
-	}
-
-	@Override
 	public int getFileVersionsCount(int status) {
 		List<FileVersion> fileVersions = getFileVersions(status);
 
@@ -185,7 +181,7 @@ public class ExtRepositoryFileEntryAdapter
 			parentFolder = getParentFolder();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return parentFolder;
@@ -341,7 +337,7 @@ public class ExtRepositoryFileEntryAdapter
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;

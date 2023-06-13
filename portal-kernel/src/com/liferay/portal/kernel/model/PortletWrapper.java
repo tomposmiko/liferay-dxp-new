@@ -310,6 +310,31 @@ public class PortletWrapper
 	}
 
 	/**
+	 * Returns the names of the classes that represent atom collection adapters
+	 * associated with the portlet.
+	 *
+	 * @return the names of the classes that represent atom collection adapters
+	 associated with the portlet
+	 */
+	@Override
+	public java.util.List<String> getAtomCollectionAdapterClasses() {
+		return model.getAtomCollectionAdapterClasses();
+	}
+
+	/**
+	 * Returns the atom collection adapter instances of the portlet.
+	 *
+	 * @return the atom collection adapter instances of the portlet
+	 */
+	@Override
+	public java.util.List
+		<com.liferay.portal.kernel.atom.AtomCollectionAdapter<?>>
+			getAtomCollectionAdapterInstances() {
+
+		return model.getAtomCollectionAdapterInstances();
+	}
+
+	/**
 	 * Returns the names of the parameters that will be automatically propagated
 	 * through the portlet.
 	 *
@@ -589,11 +614,6 @@ public class PortletWrapper
 	@Override
 	public String getFriendlyURLMapping() {
 		return model.getFriendlyURLMapping();
-	}
-
-	@Override
-	public String getFriendlyURLMapping(boolean lookUpFriendlyURLMapper) {
-		return model.getFriendlyURLMapping(lookUpFriendlyURLMapper);
 	}
 
 	/**
@@ -939,6 +959,28 @@ public class PortletWrapper
 	}
 
 	/**
+	 * Returns the name of the poller processor class of the portlet.
+	 *
+	 * @return the name of the poller processor class of the portlet
+	 */
+	@Override
+	public String getPollerProcessorClass() {
+		return model.getPollerProcessorClass();
+	}
+
+	/**
+	 * Returns the poller processor instance of the portlet.
+	 *
+	 * @return the poller processor instance of the portlet
+	 */
+	@Override
+	public com.liferay.portal.kernel.poller.PollerProcessor
+		getPollerProcessorInstance() {
+
+		return model.getPollerProcessorInstance();
+	}
+
+	/**
 	 * Returns the name of the POP message listener class of the portlet.
 	 *
 	 * @return the name of the POP message listener class of the portlet
@@ -990,18 +1032,6 @@ public class PortletWrapper
 	@Override
 	public String getPortletClass() {
 		return model.getPortletClass();
-	}
-
-	@Override
-	public String getPortletConfigurationListenerClass() {
-		return model.getPortletConfigurationListenerClass();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.portlet.PortletConfigurationListener
-		getPortletConfigurationListenerInstance() {
-
-		return model.getPortletConfigurationListenerInstance();
 	}
 
 	/**
@@ -2457,6 +2487,20 @@ public class PortletWrapper
 	}
 
 	/**
+	 * Sets the names of the classes that represent atom collection adapters
+	 * associated with the portlet.
+	 *
+	 * @param atomCollectionAdapterClasses the names of the classes that
+	 represent atom collection adapters associated with the portlet
+	 */
+	@Override
+	public void setAtomCollectionAdapterClasses(
+		java.util.List<String> atomCollectionAdapterClasses) {
+
+		model.setAtomCollectionAdapterClasses(atomCollectionAdapterClasses);
+	}
+
+	/**
 	 * Sets the names of the parameters that will be automatically propagated
 	 * through the portlet.
 	 *
@@ -2977,6 +3021,17 @@ public class PortletWrapper
 	}
 
 	/**
+	 * Sets the name of the poller processor class of the portlet.
+	 *
+	 * @param pollerProcessorClass the name of the poller processor class of the
+	 portlet
+	 */
+	@Override
+	public void setPollerProcessorClass(String pollerProcessorClass) {
+		model.setPollerProcessorClass(pollerProcessorClass);
+	}
+
+	/**
 	 * Sets the name of the POP message listener class of the portlet.
 	 *
 	 * @param popMessageListenerClass the name of the POP message listener class
@@ -3017,14 +3072,6 @@ public class PortletWrapper
 	@Override
 	public void setPortletClass(String portletClass) {
 		model.setPortletClass(portletClass);
-	}
-
-	@Override
-	public void setPortletConfigurationListenerClass(
-		String portletConfigurationListenerClass) {
-
-		model.setPortletConfigurationListenerClass(
-			portletConfigurationListenerClass);
 	}
 
 	/**
@@ -3698,11 +3745,6 @@ public class PortletWrapper
 	@Override
 	public void setXmlRpcMethodClass(String xmlRpcMethodClass) {
 		model.setXmlRpcMethodClass(xmlRpcMethodClass);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

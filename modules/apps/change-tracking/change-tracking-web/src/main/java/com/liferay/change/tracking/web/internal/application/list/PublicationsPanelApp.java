@@ -18,7 +18,8 @@ import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.change.tracking.constants.CTPortletKeys;
-import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
+import com.liferay.change.tracking.model.CTPreferences;
+import com.liferay.change.tracking.service.CTPreferencesLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
@@ -39,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=200",
 		"panel.category.key=" + PanelCategoryKeys.APPLICATIONS_MENU_APPLICATIONS_PUBLICATIONS
@@ -46,11 +48,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = PanelApp.class
 )
 public class PublicationsPanelApp extends BasePanelApp {
-
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
 
 	@Override
 	public String getPortletId() {
@@ -67,9 +64,11 @@ public class PublicationsPanelApp extends BasePanelApp {
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		if (!_ctSettingsConfigurationHelper.isEnabled(
-				themeDisplay.getCompanyId())) {
+		CTPreferences ctPreferences =
+			_ctPreferencesLocalService.fetchCTPreferences(
+				themeDisplay.getCompanyId(), 0);
 
+		if (ctPreferences == null) {
 			portletURL.setParameter(
 				"mvcRenderCommandName", "/change_tracking/view_settings");
 		}
@@ -83,11 +82,19 @@ public class PublicationsPanelApp extends BasePanelApp {
 
 		if (_portletPermission.contains(
 				permissionChecker, CTPortletKeys.PUBLICATIONS,
-				ActionKeys.CONFIGURATION) ||
-			(_ctSettingsConfigurationHelper.isEnabled(group.getCompanyId()) &&
-			 _portletPermission.contains(
-				 permissionChecker, CTPortletKeys.PUBLICATIONS,
-				 ActionKeys.VIEW))) {
+				ActionKeys.CONFIGURATION)) {
+
+			return true;
+		}
+
+		CTPreferences ctPreferences =
+			_ctPreferencesLocalService.fetchCTPreferences(
+				group.getCompanyId(), 0);
+
+		if ((ctPreferences != null) &&
+			_portletPermission.contains(
+				permissionChecker, CTPortletKeys.PUBLICATIONS,
+				ActionKeys.VIEW)) {
 
 			return true;
 		}
@@ -95,13 +102,17 @@ public class PublicationsPanelApp extends BasePanelApp {
 		return false;
 	}
 
-	@Reference
-	private CTSettingsConfigurationHelper _ctSettingsConfigurationHelper;
-
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + CTPortletKeys.PUBLICATIONS + ")"
+		target = "(javax.portlet.name=" + CTPortletKeys.PUBLICATIONS + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
+
+	@Reference
+	private CTPreferencesLocalService _ctPreferencesLocalService;
 
 	@Reference
 	private PortletPermission _portletPermission;

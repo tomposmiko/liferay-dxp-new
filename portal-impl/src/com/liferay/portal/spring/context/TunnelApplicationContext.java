@@ -72,7 +72,7 @@ public class TunnelApplicationContext extends XmlWebApplicationContext {
 					}
 				}
 				else {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			}
 		}

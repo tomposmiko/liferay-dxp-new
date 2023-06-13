@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * @author Jeyvison Nascimento
@@ -38,9 +39,11 @@ public class MapToDDMFormValuesConverterUtil {
 		DDMFormValues ddmFormValues = new DDMFormValues(ddmForm);
 
 		if (locale == null) {
-			for (Locale availableLocale : ddmForm.getAvailableLocales()) {
-				ddmFormValues.addAvailableLocale(availableLocale);
-			}
+			Set<Locale> availableLocales = ddmForm.getAvailableLocales();
+
+			Stream<Locale> stream = availableLocales.stream();
+
+			stream.forEach(ddmFormValues::addAvailableLocale);
 
 			ddmFormValues.setDefaultLocale(ddmForm.getDefaultLocale());
 		}

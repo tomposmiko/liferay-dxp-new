@@ -18,19 +18,18 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.expando.kernel.model.CustomAttributesDisplay;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
-import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.notifications.UserNotificationDeliveryType;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
+import com.liferay.portal.kernel.poller.PollerProcessor;
 import com.liferay.portal.kernel.pop.MessageListener;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.ControlPanelEntry;
@@ -38,13 +37,12 @@ import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapperTracker;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
-import com.liferay.portal.kernel.portlet.PortletConfigurationListener;
 import com.liferay.portal.kernel.portlet.PortletInstanceFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
-import com.liferay.portal.kernel.scheduler.SchedulerJobConfiguration;
-import com.liferay.portal.kernel.scheduler.TriggerConfiguration;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener;
+import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.security.permission.propagator.PermissionPropagator;
@@ -54,7 +52,7 @@ import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -136,7 +134,7 @@ public class PortletBagFactory {
 		_registerOpenSearches(
 			bundleContext, portlet, properties, serviceRegistrations);
 
-		_registerSchedulerJobConfigurations(
+		_registerSchedulerEventMessageListeners(
 			bundleContext, portlet, properties, serviceRegistrations);
 
 		FriendlyURLMapperTracker friendlyURLMapperTracker =
@@ -154,10 +152,10 @@ public class PortletBagFactory {
 		_registerTemplateHandlers(
 			bundleContext, portlet, properties, serviceRegistrations);
 
-		_registerPortletConfigurationListeners(
+		_registerPortletLayoutListeners(
 			bundleContext, portlet, properties, serviceRegistrations);
 
-		_registerPortletLayoutListeners(
+		_registerPollerProcessors(
 			bundleContext, portlet, properties, serviceRegistrations);
 
 		_registerPOPMessageListeners(
@@ -184,6 +182,9 @@ public class PortletBagFactory {
 			bundleContext, portlet, properties, serviceRegistrations);
 
 		_registerAssetRendererFactoryInstances(
+			bundleContext, portlet, properties, serviceRegistrations);
+
+		_registerAtomCollectionAdapterInstances(
 			bundleContext, portlet, properties, serviceRegistrations);
 
 		_registerCustomAttributesDisplayInstances(
@@ -213,7 +214,7 @@ public class PortletBagFactory {
 				portlet, _servletContext, destroyPrevious);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return portletBag;
@@ -235,7 +236,7 @@ public class PortletBagFactory {
 	 * @see FriendlyURLMapperTrackerImpl#getContent(ClassLoader, String)
 	 */
 	private String _getContent(String fileName) throws Exception {
-		String queryString = HttpComponentsUtil.getQueryString(fileName);
+		String queryString = HttpUtil.getQueryString(fileName);
 
 		if (Validator.isNull(queryString)) {
 			return StringUtil.read(_classLoader, fileName);
@@ -245,7 +246,7 @@ public class PortletBagFactory {
 
 		String xml = StringUtil.read(_classLoader, fileName.substring(0, pos));
 
-		Map<String, String[]> parameterMap = HttpComponentsUtil.getParameterMap(
+		Map<String, String[]> parameterMap = HttpUtil.getParameterMap(
 			queryString);
 
 		if (parameterMap == null) {
@@ -352,6 +353,28 @@ public class PortletBagFactory {
 
 				serviceRegistrations.add(serviceRegistration);
 			}
+		}
+	}
+
+	private void _registerAtomCollectionAdapterInstances(
+			BundleContext bundleContext, Portlet portlet,
+			Dictionary<String, Object> properties,
+			List<ServiceRegistration<?>> serviceRegistrations)
+		throws Exception {
+
+		for (String atomCollectionAdapterClass :
+				portlet.getAtomCollectionAdapterClasses()) {
+
+			AtomCollectionAdapter<?> atomCollectionAdapterInstance =
+				_newInstance(
+					AtomCollectionAdapter.class, atomCollectionAdapterClass);
+
+			ServiceRegistration<?> serviceRegistration =
+				bundleContext.registerService(
+					AtomCollectionAdapter.class, atomCollectionAdapterInstance,
+					properties);
+
+			serviceRegistrations.add(serviceRegistration);
 		}
 	}
 
@@ -495,6 +518,24 @@ public class PortletBagFactory {
 		}
 	}
 
+	private void _registerPollerProcessors(
+			BundleContext bundleContext, Portlet portlet,
+			Dictionary<String, Object> properties,
+			List<ServiceRegistration<?>> serviceRegistrations)
+		throws Exception {
+
+		if (Validator.isNotNull(portlet.getPollerProcessorClass())) {
+			PollerProcessor pollerProcessorInstance = _newInstance(
+				PollerProcessor.class, portlet.getPollerProcessorClass());
+
+			ServiceRegistration<?> serviceRegistration =
+				bundleContext.registerService(
+					PollerProcessor.class, pollerProcessorInstance, properties);
+
+			serviceRegistrations.add(serviceRegistration);
+		}
+	}
+
 	private void _registerPOPMessageListeners(
 			BundleContext bundleContext, Portlet portlet,
 			Dictionary<String, Object> properties,
@@ -509,29 +550,6 @@ public class PortletBagFactory {
 				bundleContext.registerService(
 					MessageListener.class, popMessageListenerInstance,
 					properties);
-
-			serviceRegistrations.add(serviceRegistration);
-		}
-	}
-
-	private void _registerPortletConfigurationListeners(
-			BundleContext bundleContext, Portlet portlet,
-			Dictionary<String, Object> properties,
-			List<ServiceRegistration<?>> serviceRegistrations)
-		throws Exception {
-
-		if (Validator.isNotNull(
-				portlet.getPortletConfigurationListenerClass())) {
-
-			PortletConfigurationListener portletConfigurationListener =
-				_newInstance(
-					PortletConfigurationListener.class,
-					portlet.getPortletConfigurationListenerClass());
-
-			ServiceRegistration<?> serviceRegistration =
-				bundleContext.registerService(
-					PortletConfigurationListener.class,
-					portletConfigurationListener, properties);
 
 			serviceRegistrations.add(serviceRegistration);
 		}
@@ -615,19 +633,34 @@ public class PortletBagFactory {
 		serviceRegistrations.add(serviceRegistration);
 	}
 
-	private void _registerSchedulerJobConfigurations(
+	private void _registerSchedulerEventMessageListeners(
 			BundleContext bundleContext, Portlet portlet,
 			Dictionary<String, Object> properties,
 			List<ServiceRegistration<?>> serviceRegistrations)
 		throws Exception {
 
 		for (SchedulerEntry schedulerEntry : portlet.getSchedulerEntries()) {
+			SchedulerEventMessageListenerWrapper
+				schedulerEventMessageListenerWrapper =
+					new SchedulerEventMessageListenerWrapper();
+
+			com.liferay.portal.kernel.messaging.MessageListener
+				messageListener =
+					(com.liferay.portal.kernel.messaging.MessageListener)
+						InstanceFactory.newInstance(
+							_classLoader,
+							schedulerEntry.getEventListenerClass());
+
+			schedulerEventMessageListenerWrapper.setMessageListener(
+				messageListener);
+
+			schedulerEventMessageListenerWrapper.setSchedulerEntry(
+				schedulerEntry);
+
 			ServiceRegistration<?> serviceRegistration =
 				bundleContext.registerService(
-					SchedulerJobConfiguration.class,
-					new SchedulerEntrySchedulerJobConfiguration(
-						schedulerEntry, _classLoader),
-					properties);
+					SchedulerEventMessageListener.class,
+					schedulerEventMessageListenerWrapper, properties);
 
 			serviceRegistrations.add(serviceRegistration);
 		}
@@ -925,47 +958,5 @@ public class PortletBagFactory {
 	private Configuration _configuration;
 	private ServletContext _servletContext;
 	private Boolean _warFile;
-
-	private static class SchedulerEntrySchedulerJobConfiguration
-		implements SchedulerJobConfiguration {
-
-		@Override
-		public UnsafeConsumer<Message, Exception>
-			getJobExecutorUnsafeConsumer() {
-
-			return _messageListener::receive;
-		}
-
-		@Override
-		public UnsafeRunnable<Exception> getJobExecutorUnsafeRunnable() {
-			throw new UnsupportedOperationException();
-		}
-
-		public String getName() {
-			return _schedulerEntry.getEventListenerClass();
-		}
-
-		@Override
-		public TriggerConfiguration getTriggerConfiguration() {
-			return _schedulerEntry.getTriggerConfiguration();
-		}
-
-		private SchedulerEntrySchedulerJobConfiguration(
-				SchedulerEntry schedulerEntry, ClassLoader classLoader)
-			throws Exception {
-
-			_schedulerEntry = schedulerEntry;
-
-			_messageListener =
-				(com.liferay.portal.kernel.messaging.MessageListener)
-					InstanceFactory.newInstance(
-						classLoader, schedulerEntry.getEventListenerClass());
-		}
-
-		private final com.liferay.portal.kernel.messaging.MessageListener
-			_messageListener;
-		private final SchedulerEntry _schedulerEntry;
-
-	}
 
 }

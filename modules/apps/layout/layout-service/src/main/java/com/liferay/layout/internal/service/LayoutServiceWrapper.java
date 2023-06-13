@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.ServiceWrapper;
@@ -32,9 +33,17 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Yang Cao
  */
-@Component(service = ServiceWrapper.class)
+@Component(immediate = true, service = ServiceWrapper.class)
 public class LayoutServiceWrapper
 	extends com.liferay.portal.kernel.service.LayoutServiceWrapper {
+
+	public LayoutServiceWrapper() {
+		super(null);
+	}
+
+	public LayoutServiceWrapper(LayoutService layoutService) {
+		super(layoutService);
+	}
 
 	@Override
 	public Layout publishLayout(long plid) throws Exception {
@@ -55,7 +64,7 @@ public class LayoutServiceWrapper
 			GuestOrUserUtil.getPermissionChecker(), draftLayout,
 			ActionKeys.UPDATE);
 
-		layout = _layoutCopyHelper.copyLayoutContent(draftLayout, layout);
+		layout = _layoutCopyHelper.copyLayout(draftLayout, layout);
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();

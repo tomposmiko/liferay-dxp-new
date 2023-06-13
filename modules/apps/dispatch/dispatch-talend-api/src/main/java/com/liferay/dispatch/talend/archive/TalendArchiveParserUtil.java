@@ -205,8 +205,7 @@ public class TalendArchiveParserUtil {
 			StringUtil.replace(jobVersion, CharPool.PERIOD, CharPool.UNDERLINE),
 			".jar");
 
-		Path jobJarPath = jobDirectoryPath.resolve(
-			StringUtil.toLowerCase(jarName));
+		Path jobJarPath = jobDirectoryPath.resolve(jarName);
 
 		if (jobJarPath != null) {
 			return jobJarPath;

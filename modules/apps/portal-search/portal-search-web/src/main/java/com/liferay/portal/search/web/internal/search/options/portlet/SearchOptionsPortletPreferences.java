@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.web.internal.search.options.portlet;
 
+import java.util.Optional;
+
 /**
  * @author Wade Cao
  */
@@ -28,7 +30,9 @@ public interface SearchOptionsPortletPreferences {
 	public static final String PREFERENCE_KEY_FEDERATED_SEARCH_KEY =
 		"federatedSearchKey";
 
-	public String getFederatedSearchKey();
+	public Optional<String> getFederatedSearchKeyOptional();
+
+	public String getFederatedSearchKeyString();
 
 	public boolean isAllowEmptySearches();
 

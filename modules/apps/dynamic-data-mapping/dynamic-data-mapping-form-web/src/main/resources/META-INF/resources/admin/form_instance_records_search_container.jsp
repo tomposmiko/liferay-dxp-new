@@ -46,23 +46,10 @@ PortletURL portletURL = ddmFormViewFormInstanceRecordsDisplayContext.getPortletU
 	sortingURL="<%= ddmFormViewFormInstanceRecordsDisplayContext.getSortingURL() %>"
 />
 
-<c:if test="<%= DDMFormInstanceExpirationStatusUtil.isFormExpired(ddmFormViewFormInstanceRecordsDisplayContext.getDDMFormInstance(), timeZone) %>">
-	<clay:stripe
-		dismissible="<%= true %>"
-		displayType="warning"
-		message="the-form-is-expired-and-is-no-longer-available-for-editing-or-submitting-new-answers"
-	/>
-</c:if>
-
-<clay:stripe
-	displayType="info"
-	message="view-current-fields-warning-message"
-/>
-
 <clay:container-fluid
 	id='<%= liferayPortletResponse.getNamespace() + "viewEntriesContainer" %>'
 >
-	<aui:form action="<%= portletURL %>" method="post" name="searchContainerForm">
+	<aui:form action="<%= portletURL.toString() %>" method="post" name="searchContainerForm">
 		<aui:input name="deleteFormInstanceRecordIds" type="hidden" />
 
 		<liferay-ui:search-container
@@ -86,7 +73,7 @@ PortletURL portletURL = ddmFormViewFormInstanceRecordsDisplayContext.getPortletU
 
 						<div class="search-container-column-language">
 							<svg class="h4 lexicon-icon lexicon-icon-<%= w3cLanguageId %> reference-mark">
-								<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#<%= w3cLanguageId %>" />
+								<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#<%= w3cLanguageId %>" />
 							</svg>
 						</div>
 					</liferay-ui:search-container-column-text>

@@ -15,6 +15,7 @@
 package com.liferay.wiki.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.model.MVCCModel;
@@ -22,7 +23,6 @@ import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
 import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -41,8 +41,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface WikiNodeModel
-	extends BaseModel<WikiNode>, ContainerModel, CTModel<WikiNode>, MVCCModel,
-			ShardedModel, StagedGroupedModel, TrashedModel, WorkflowedModel {
+	extends BaseModel<WikiNode>, ContainerModel, MVCCModel, ShardedModel,
+			StagedGroupedModel, TrashedModel, WorkflowedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -55,7 +55,6 @@ public interface WikiNodeModel
 	 *
 	 * @return the primary key of this wiki node
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -63,7 +62,6 @@ public interface WikiNodeModel
 	 *
 	 * @param primaryKey the primary key of this wiki node
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -81,22 +79,6 @@ public interface WikiNodeModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this wiki node.
-	 *
-	 * @return the ct collection ID of this wiki node
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this wiki node.
-	 *
-	 * @param ctCollectionId the ct collection ID of this wiki node
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this wiki node.
@@ -399,6 +381,15 @@ public interface WikiNodeModel
 	public void setStatusDate(Date statusDate);
 
 	/**
+	 * Returns the trash entry created when this wiki node was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this wiki node.
+	 *
+	 * @return the trash entry created when this wiki node was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws PortalException;
+
+	/**
 	 * Returns the class primary key of the trash entry for this wiki node.
 	 *
 	 * @return the class primary key of the trash entry for this wiki node
@@ -407,12 +398,36 @@ public interface WikiNodeModel
 	public long getTrashEntryClassPK();
 
 	/**
+	 * Returns the trash handler for this wiki node.
+	 *
+	 * @return the trash handler for this wiki node
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler();
+
+	/**
 	 * Returns <code>true</code> if this wiki node is in the Recycle Bin.
 	 *
 	 * @return <code>true</code> if this wiki node is in the Recycle Bin; <code>false</code> otherwise
 	 */
 	@Override
 	public boolean isInTrash();
+
+	/**
+	 * Returns <code>true</code> if the parent of this wiki node is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this wiki node is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer();
+
+	@Override
+	public boolean isInTrashExplicitly();
+
+	@Override
+	public boolean isInTrashImplicitly();
 
 	/**
 	 * Returns <code>true</code> if this wiki node is approved.
@@ -520,9 +535,5 @@ public interface WikiNodeModel
 
 	@Override
 	public WikiNode cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

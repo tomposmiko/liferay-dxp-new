@@ -346,8 +346,4 @@ public interface SiteNavigationMenuItemModel
 	@Override
 	public SiteNavigationMenuItem cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -15,28 +15,20 @@
 package com.liferay.on.demand.admin.internal.ticket.generator;
 
 import com.liferay.on.demand.admin.constants.OnDemandAdminConstants;
-import com.liferay.on.demand.admin.internal.configuration.OnDemandAdminConfiguration;
-import com.liferay.on.demand.admin.internal.helper.OnDemandAdminHelper;
 import com.liferay.on.demand.admin.ticket.generator.OnDemandAdminTicketGenerator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.audit.AuditMessage;
-import com.liferay.portal.kernel.audit.AuditRouter;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Ticket;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.TicketLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.PwdGenerator;
-import com.liferay.portal.security.audit.event.generators.util.AuditMessageBuilder;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -47,50 +39,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = OnDemandAdminTicketGenerator.class)
+@Component(immediate = true, service = OnDemandAdminTicketGenerator.class)
 public class OnDemandAdminTicketGeneratorImpl
 	implements OnDemandAdminTicketGenerator {
 
-	@Override
-	public Ticket generate(
-			Company company, String justification, long requestorUserId)
+	public Ticket generate(Company company, long requestorUserId)
 		throws PortalException {
-
-		_onDemandAdminHelper.checkRequestAdministratorAccessPermission(
-			company.getCompanyId(), requestorUserId);
 
 		User user = _addOnDemandAdminUser(company, requestorUserId);
 
-		AuditMessage auditMessage = AuditMessageBuilder.buildAuditMessage(
-			OnDemandAdminConstants.
-				AUDIT_EVENT_TYPE_ON_DEMAND_ADMIN_TICKET_GENERATED,
-			User.class.getName(), requestorUserId, null);
-
-		auditMessage.setAdditionalInfo(
-			JSONUtil.put(
-				"justification", justification
-			).put(
-				"requestedCompanyId", company.getCompanyId()
-			).put(
-				"requestedCompanyWebId", company.getWebId()
-			));
-
-		_auditRouter.route(auditMessage);
-
-		OnDemandAdminConfiguration onDemandAdminConfiguration =
-			_configurationProvider.getSystemConfiguration(
-				OnDemandAdminConfiguration.class);
-
-		int expirationTime =
-			onDemandAdminConfiguration.authenticationTokenExpirationTime();
-
 		return _ticketLocalService.addDistinctTicket(
 			user.getCompanyId(), User.class.getName(), user.getUserId(),
-			OnDemandAdminConstants.TICKET_TYPE_ON_DEMAND_ADMIN_LOGIN,
-			justification,
-			new Date(
-				System.currentTimeMillis() +
-					TimeUnit.MINUTES.toMillis(expirationTime)),
+			OnDemandAdminConstants.TICKET_TYPE_ON_DEMAND_ADMIN_LOGIN, null,
+			new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)),
 			null);
 	}
 
@@ -98,18 +59,20 @@ public class OnDemandAdminTicketGeneratorImpl
 		throws PortalException {
 
 		User requestorUser = _userLocalService.getUser(userId);
-		String password = PwdGenerator.getPassword(20);
-		Date date = new Date();
+
+		Date date = requestorUser.getBirthday();
+
 		Role role = _roleLocalService.getRole(
 			company.getCompanyId(), RoleConstants.ADMINISTRATOR);
 
 		User user = _userLocalService.addUser(
-			requestorUser.getUserId(), company.getCompanyId(), false, password,
-			password, true, null, requestorUser.getEmailAddress(),
-			requestorUser.getLocale(), requestorUser.getFirstName(),
-			requestorUser.getMiddleName(), requestorUser.getLastName(), 0, 0,
-			requestorUser.getMale(), date.getMonth(), date.getDay(),
-			date.getYear(), null, UserConstants.TYPE_REGULAR, null, null,
+			requestorUser.getUserId(), company.getCompanyId(), false,
+			PropsValues.DEFAULT_ADMIN_PASSWORD,
+			PropsValues.DEFAULT_ADMIN_PASSWORD, true, null,
+			requestorUser.getEmailAddress(), requestorUser.getLocale(),
+			requestorUser.getFirstName(), requestorUser.getMiddleName(),
+			requestorUser.getLastName(), 0, 0, requestorUser.getMale(),
+			date.getMonth(), date.getDay(), date.getYear(), null, null, null,
 			new long[] {role.getRoleId()}, null, false, new ServiceContext());
 
 		String screenName = _getScreenName(
@@ -131,15 +94,6 @@ public class OnDemandAdminTicketGeneratorImpl
 			StringPool.UNDERLINE, requestorUserId, StringPool.UNDERLINE,
 			userId);
 	}
-
-	@Reference
-	private AuditRouter _auditRouter;
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private OnDemandAdminHelper _onDemandAdminHelper;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

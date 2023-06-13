@@ -67,7 +67,7 @@ public class ConfigurationModelToDDMFormValuesConverter {
 		ddmFormValues.addAvailableLocale(_locale);
 		ddmFormValues.setDefaultLocale(_locale);
 
-		_addDDMFormFieldValues(
+		addDDMFormFieldValues(
 			_configurationModel.getAttributeDefinitions(ConfigurationModel.ALL),
 			ddmFormValues);
 
@@ -79,29 +79,12 @@ public class ConfigurationModelToDDMFormValuesConverter {
 
 		DDMFormFieldValue ddmFormFieldValue = createDDMFormFieldValue(name);
 
-		_setDDMFormFieldValueLocalizedValue(value, ddmFormFieldValue);
+		setDDMFormFieldValueLocalizedValue(value, ddmFormFieldValue);
 
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 	}
 
-	protected DDMFormFieldValue createDDMFormFieldValue(String name) {
-		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
-
-		ddmFormFieldValue.setFieldReference(name);
-		ddmFormFieldValue.setInstanceId(StringUtil.randomString());
-		ddmFormFieldValue.setName(
-			DDMFormFieldNameUtil.normalizeFieldName(name));
-
-		return ddmFormFieldValue;
-	}
-
-	protected String getDDMFormFieldType(String ddmFormFieldName) {
-		DDMFormField ddmFormField = _ddmFormFieldsMap.get(ddmFormFieldName);
-
-		return ddmFormField.getType();
-	}
-
-	private void _addDDMFormFieldValues(
+	protected void addDDMFormFieldValues(
 		AttributeDefinition attributeDefinition, DDMFormValues ddmFormValues) {
 
 		String[] values = null;
@@ -113,9 +96,7 @@ public class ConfigurationModelToDDMFormValuesConverter {
 			Configuration configuration =
 				_configurationModel.getConfiguration();
 
-			if (_hasConfigurationAttribute(
-					configuration, attributeDefinition)) {
-
+			if (hasConfigurationAttribute(configuration, attributeDefinition)) {
 				values = AttributeDefinitionUtil.getPropertyStringArray(
 					attributeDefinition, configuration);
 			}
@@ -125,11 +106,11 @@ public class ConfigurationModelToDDMFormValuesConverter {
 			}
 		}
 
-		_addDDMFormFieldValues(
+		addDDMFormFieldValues(
 			attributeDefinition.getID(), values, ddmFormValues);
 	}
 
-	private void _addDDMFormFieldValues(
+	protected void addDDMFormFieldValues(
 		AttributeDefinition[] attributeDefinitions,
 		DDMFormValues ddmFormValues) {
 
@@ -138,11 +119,11 @@ public class ConfigurationModelToDDMFormValuesConverter {
 		}
 
 		for (AttributeDefinition attributeDefinition : attributeDefinitions) {
-			_addDDMFormFieldValues(attributeDefinition, ddmFormValues);
+			addDDMFormFieldValues(attributeDefinition, ddmFormValues);
 		}
 	}
 
-	private void _addDDMFormFieldValues(
+	protected void addDDMFormFieldValues(
 		String name, String[] values, DDMFormValues ddmFormValues) {
 
 		for (String value : values) {
@@ -150,7 +131,22 @@ public class ConfigurationModelToDDMFormValuesConverter {
 		}
 	}
 
-	private boolean _hasConfigurationAttribute(
+	protected DDMFormFieldValue createDDMFormFieldValue(String name) {
+		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue();
+
+		ddmFormFieldValue.setName(name);
+		ddmFormFieldValue.setInstanceId(StringUtil.randomString());
+
+		return ddmFormFieldValue;
+	}
+
+	protected String getDDMFormFieldType(String ddmFormFieldName) {
+		DDMFormField ddmFormField = _ddmFormFieldsMap.get(ddmFormFieldName);
+
+		return ddmFormField.getType();
+	}
+
+	protected boolean hasConfigurationAttribute(
 		Configuration configuration, AttributeDefinition attributeDefinition) {
 
 		if (configuration == null) {
@@ -172,15 +168,13 @@ public class ConfigurationModelToDDMFormValuesConverter {
 		return false;
 	}
 
-	private void _setDDMFormFieldValueLocalizedValue(
+	protected void setDDMFormFieldValueLocalizedValue(
 		String value, DDMFormFieldValue ddmFormFieldValue) {
 
 		try {
 			if ((_locationVariableResolver != null) &&
-				(_locationVariableResolver.isLocationVariable(
-					value, LocationVariableProtocol.LANGUAGE) ||
-				 _locationVariableResolver.isLocationVariable(
-					 value, LocationVariableProtocol.RESOURCE))) {
+				_locationVariableResolver.isLocationVariable(
+					value, LocationVariableProtocol.RESOURCE)) {
 
 				value = _locationVariableResolver.resolve(value);
 			}

@@ -322,11 +322,6 @@ public class CTAutoResolutionInfoWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CTAutoResolutionInfoWrapper wrap(
 		CTAutoResolutionInfo ctAutoResolutionInfo) {
 

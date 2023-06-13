@@ -16,7 +16,6 @@ package com.liferay.portal.workflow.kaleo.definition.export;
 
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.workflow.kaleo.definition.Node;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
 
 /**
  * @author Michael C. Han
@@ -24,7 +23,5 @@ import com.liferay.portal.workflow.kaleo.definition.NodeType;
 public interface NodeExporter {
 
 	public void exportNode(Node node, Element element, String namespace);
-
-	public NodeType getNodeType();
 
 }

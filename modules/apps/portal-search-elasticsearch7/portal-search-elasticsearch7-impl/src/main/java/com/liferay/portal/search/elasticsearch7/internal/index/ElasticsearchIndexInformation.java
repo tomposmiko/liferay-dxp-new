@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adam Brandizzi
  */
-@Component(service = IndexInformation.class)
+@Component(immediate = true, service = IndexInformation.class)
 public class ElasticsearchIndexInformation implements IndexInformation {
 
 	@Override
@@ -68,7 +68,7 @@ public class ElasticsearchIndexInformation implements IndexInformation {
 	protected GetIndexResponse getIndexResponse(
 		GetIndexRequest getIndexRequest) {
 
-		IndicesClient indicesClient = _getIndicesClient();
+		IndicesClient indicesClient = getIndicesClient();
 
 		try {
 			return indicesClient.get(getIndexRequest, RequestOptions.DEFAULT);
@@ -78,10 +78,17 @@ public class ElasticsearchIndexInformation implements IndexInformation {
 		}
 	}
 
+	protected IndicesClient getIndicesClient() {
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchClientResolver.getRestHighLevelClient(null, true);
+
+		return restHighLevelClient.indices();
+	}
+
 	protected GetMappingsResponse getMappingsResponse(
 		GetMappingsRequest getMappingsRequest) {
 
-		IndicesClient indicesClient = _getIndicesClient();
+		IndicesClient indicesClient = getIndicesClient();
 
 		try {
 			return indicesClient.getMapping(
@@ -92,17 +99,19 @@ public class ElasticsearchIndexInformation implements IndexInformation {
 		}
 	}
 
-	private IndicesClient _getIndicesClient() {
-		RestHighLevelClient restHighLevelClient =
-			_elasticsearchClientResolver.getRestHighLevelClient(null, true);
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-		return restHighLevelClient.indices();
+		_elasticsearchClientResolver = elasticsearchClientResolver;
 	}
 
-	@Reference
-	private ElasticsearchClientResolver _elasticsearchClientResolver;
+	@Reference(unbind = "-")
+	protected void setIndexNameBuilder(IndexNameBuilder indexNameBuilder) {
+		_indexNameBuilder = indexNameBuilder;
+	}
 
-	@Reference
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
 	private IndexNameBuilder _indexNameBuilder;
 
 }

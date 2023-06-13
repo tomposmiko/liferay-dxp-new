@@ -410,8 +410,8 @@ public class CSSRTLConverterTest {
 			}
 
 			Assert.assertEquals(
-				_formatCss(_read(_getRtlCustomFileName(filePath))),
-				_formatCss(cssRTLConverter.process(_read(filePath))));
+				formatCss(read(getRtlCustomFileName(filePath))),
+				formatCss(cssRTLConverter.process(read(filePath))));
 		}
 	}
 
@@ -446,7 +446,7 @@ public class CSSRTLConverterTest {
 			cssRTLConverter.process("p{text-align:left}"));
 	}
 
-	private String _formatCss(String css) {
+	protected String formatCss(String css) {
 		CascadingStyleSheet cascadingStyleSheet = CSSReader.readFromString(
 			css, CCharset.CHARSET_UTF_8_OBJ, ECSSVersion.CSS30,
 			new DoNothingCSSParseErrorHandler());
@@ -462,13 +462,13 @@ public class CSSRTLConverterTest {
 		return cssWriter.getCSSAsString(cascadingStyleSheet);
 	}
 
-	private String _getRtlCustomFileName(String fileName) {
+	protected String getRtlCustomFileName(String fileName) {
 		int pos = fileName.lastIndexOf(".");
 
 		return fileName.substring(0, pos) + "_rtl" + fileName.substring(pos);
 	}
 
-	private String _read(String fileName) throws Exception {
+	protected String read(String fileName) throws Exception {
 		Path filePath = Paths.get(fileName);
 
 		return new String(Files.readAllBytes(filePath));

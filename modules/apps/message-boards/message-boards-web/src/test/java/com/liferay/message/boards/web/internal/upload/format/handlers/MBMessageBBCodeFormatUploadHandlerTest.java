@@ -19,7 +19,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -31,12 +30,16 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Alejandro Tardín
  */
+@RunWith(MockitoJUnitRunner.class)
 public class MBMessageBBCodeFormatUploadHandlerTest {
 
 	@ClassRule
@@ -46,8 +49,7 @@ public class MBMessageBBCodeFormatUploadHandlerTest {
 
 	@Before
 	public void setUp() {
-		ReflectionTestUtil.setFieldValue(
-			_mbMessageBBCodeFormatUploadHandler, "_portletFileRepository",
+		_mbMessageBBCodeFormatUploadHandler.setPortletFileRepository(
 			_portletFileRepository);
 	}
 
@@ -68,7 +70,7 @@ public class MBMessageBBCodeFormatUploadHandlerTest {
 		).when(
 			_portletFileRepository
 		).getPortletFileEntryURL(
-			Mockito.nullable(ThemeDisplay.class), Mockito.eq(fileEntry),
+			Mockito.isNull(ThemeDisplay.class), Mockito.eq(fileEntry),
 			Mockito.eq(StringPool.BLANK)
 		);
 
@@ -102,7 +104,7 @@ public class MBMessageBBCodeFormatUploadHandlerTest {
 		).when(
 			_portletFileRepository
 		).getPortletFileEntryURL(
-			Mockito.nullable(ThemeDisplay.class), Mockito.eq(fileEntry),
+			Mockito.isNull(ThemeDisplay.class), Mockito.eq(fileEntry),
 			Mockito.eq(StringPool.BLANK)
 		);
 
@@ -138,7 +140,7 @@ public class MBMessageBBCodeFormatUploadHandlerTest {
 			).when(
 				_portletFileRepository
 			).getPortletFileEntryURL(
-				Mockito.nullable(ThemeDisplay.class), Mockito.eq(fileEntry),
+				Mockito.isNull(ThemeDisplay.class), Mockito.eq(fileEntry),
 				Mockito.eq(StringPool.BLANK)
 			);
 
@@ -162,7 +164,8 @@ public class MBMessageBBCodeFormatUploadHandlerTest {
 	private final MBMessageBBCodeFormatUploadHandler
 		_mbMessageBBCodeFormatUploadHandler =
 			new MBMessageBBCodeFormatUploadHandler();
-	private final PortletFileRepository _portletFileRepository = Mockito.mock(
-		PortletFileRepository.class);
+
+	@Mock
+	private PortletFileRepository _portletFileRepository;
 
 }

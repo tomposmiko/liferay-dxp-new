@@ -51,6 +51,7 @@ public class CompanyWrapper
 		attributes.put("mx", getMx());
 		attributes.put("homeURL", getHomeURL());
 		attributes.put("logoId", getLogoId());
+		attributes.put("system", isSystem());
 		attributes.put("maxUsers", getMaxUsers());
 		attributes.put("active", isActive());
 		attributes.put("name", getName());
@@ -62,8 +63,6 @@ public class CompanyWrapper
 		attributes.put("industry", getIndustry());
 		attributes.put("type", getType());
 		attributes.put("size", getSize());
-		attributes.put("indexNameCurrent", getIndexNameCurrent());
-		attributes.put("indexNameNext", getIndexNameNext());
 
 		return attributes;
 	}
@@ -128,6 +127,12 @@ public class CompanyWrapper
 
 		if (logoId != null) {
 			setLogoId(logoId);
+		}
+
+		Boolean system = (Boolean)attributes.get("system");
+
+		if (system != null) {
+			setSystem(system);
 		}
 
 		Integer maxUsers = (Integer)attributes.get("maxUsers");
@@ -195,18 +200,6 @@ public class CompanyWrapper
 		if (size != null) {
 			setSize(size);
 		}
-
-		String indexNameCurrent = (String)attributes.get("indexNameCurrent");
-
-		if (indexNameCurrent != null) {
-			setIndexNameCurrent(indexNameCurrent);
-		}
-
-		String indexNameNext = (String)attributes.get("indexNameNext");
-
-		if (indexNameNext != null) {
-			setIndexNameNext(indexNameNext);
-		}
 	}
 
 	@Override
@@ -264,10 +257,6 @@ public class CompanyWrapper
 		return model.getCreateDate();
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #getGuestUser}
-	 */
-	@Deprecated
 	@Override
 	public User getDefaultUser()
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -299,13 +288,6 @@ public class CompanyWrapper
 		return model.getGroupId();
 	}
 
-	@Override
-	public User getGuestUser()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getGuestUser();
-	}
-
 	/**
 	 * Returns the home url of this company.
 	 *
@@ -314,26 +296,6 @@ public class CompanyWrapper
 	@Override
 	public String getHomeURL() {
 		return model.getHomeURL();
-	}
-
-	/**
-	 * Returns the index name current of this company.
-	 *
-	 * @return the index name current of this company
-	 */
-	@Override
-	public String getIndexNameCurrent() {
-		return model.getIndexNameCurrent();
-	}
-
-	/**
-	 * Returns the index name next of this company.
-	 *
-	 * @return the index name next of this company
-	 */
-	@Override
-	public String getIndexNameNext() {
-		return model.getIndexNameNext();
 	}
 
 	/**
@@ -505,6 +467,16 @@ public class CompanyWrapper
 	}
 
 	/**
+	 * Returns the system of this company.
+	 *
+	 * @return the system of this company
+	 */
+	@Override
+	public boolean getSystem() {
+		return model.getSystem();
+	}
+
+	/**
 	 * Returns the ticker symbol of this company.
 	 *
 	 * @return the ticker symbol of this company
@@ -596,6 +568,15 @@ public class CompanyWrapper
 		return model.isAutoLogin();
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public boolean isSendPassword() {
+		return model.isSendPassword();
+	}
+
 	@Override
 	public boolean isSendPasswordResetLink() {
 		return model.isSendPasswordResetLink();
@@ -619,6 +600,16 @@ public class CompanyWrapper
 	@Override
 	public boolean isStrangersWithMx() {
 		return model.isStrangersWithMx();
+	}
+
+	/**
+	 * Returns <code>true</code> if this company is system.
+	 *
+	 * @return <code>true</code> if this company is system; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isSystem() {
+		return model.isSystem();
 	}
 
 	@Override
@@ -669,26 +660,6 @@ public class CompanyWrapper
 	@Override
 	public void setHomeURL(String homeURL) {
 		model.setHomeURL(homeURL);
-	}
-
-	/**
-	 * Sets the index name current of this company.
-	 *
-	 * @param indexNameCurrent the index name current of this company
-	 */
-	@Override
-	public void setIndexNameCurrent(String indexNameCurrent) {
-		model.setIndexNameCurrent(indexNameCurrent);
-	}
-
-	/**
-	 * Sets the index name next of this company.
-	 *
-	 * @param indexNameNext the index name next of this company
-	 */
-	@Override
-	public void setIndexNameNext(String indexNameNext) {
-		model.setIndexNameNext(indexNameNext);
 	}
 
 	/**
@@ -832,6 +803,16 @@ public class CompanyWrapper
 	}
 
 	/**
+	 * Sets whether this company is system.
+	 *
+	 * @param system the system of this company
+	 */
+	@Override
+	public void setSystem(boolean system) {
+		model.setSystem(system);
+	}
+
+	/**
 	 * Sets the ticker symbol of this company.
 	 *
 	 * @param tickerSymbol the ticker symbol of this company
@@ -894,11 +875,6 @@ public class CompanyWrapper
 	@Override
 	public void setWebId(String webId) {
 		model.setWebId(webId);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

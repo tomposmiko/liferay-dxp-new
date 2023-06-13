@@ -43,12 +43,11 @@ public abstract class BaseUpgradeClassNames extends UpgradeProcess {
 		updateClassName("KaleoTaskAssignmentInstance", "assigneeClassName");
 		updateClassName("KaleoTaskInstanceToken", "className");
 
-		_updateWorkflowContextEntryClassName(
-			"KaleoInstance", "kaleoInstanceId");
-		_updateWorkflowContextEntryClassName("KaleoLog", "kaleoLogId");
-		_updateWorkflowContextEntryClassName(
+		updateWorkflowContextEntryClassName("KaleoInstance", "kaleoInstanceId");
+		updateWorkflowContextEntryClassName("KaleoLog", "kaleoLogId");
+		updateWorkflowContextEntryClassName(
 			"KaleoTaskInstanceToken", "kaleoTaskInstanceTokenId");
-		_updateWorkflowContextEntryClassName(
+		updateWorkflowContextEntryClassName(
 			"KaleoTimerInstanceToken", "kaleoTimerInstanceTokenId");
 	}
 
@@ -75,7 +74,7 @@ public abstract class BaseUpgradeClassNames extends UpgradeProcess {
 		}
 	}
 
-	private void _updateWorkflowContextEntryClassName(
+	protected void updateWorkflowContextEntryClassName(
 			String tableName, String primaryKeyName)
 		throws Exception {
 

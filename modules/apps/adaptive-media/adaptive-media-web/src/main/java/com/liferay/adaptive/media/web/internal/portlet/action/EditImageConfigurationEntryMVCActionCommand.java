@@ -20,13 +20,13 @@ import com.liferay.adaptive.media.image.configuration.AMImageConfigurationHelper
 import com.liferay.adaptive.media.image.service.AMImageEntryLocalService;
 import com.liferay.adaptive.media.web.internal.constants.AMPortletKeys;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.io.IOException;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.portlet.ActionRequest;
@@ -49,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AMPortletKeys.ADAPTIVE_MEDIA,
 		"mvc.command.name=/adaptive_media/edit_image_configuration_entry"
@@ -78,7 +80,7 @@ public class EditImageConfigurationEntryMVCActionCommand
 			"max-width", ParamUtil.getString(actionRequest, "maxWidth")
 		).build();
 
-		AMImageConfigurationEntry amImageConfigurationEntry =
+		Optional<AMImageConfigurationEntry> amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				themeDisplay.getCompanyId(), uuid);
 
@@ -91,7 +93,7 @@ public class EditImageConfigurationEntryMVCActionCommand
 
 		if (automaticUuid) {
 			String normalizedName =
-				_friendlyURLNormalizer.normalizeWithPeriodsAndSlashes(name);
+				FriendlyURLNormalizerUtil.normalizeWithPeriodsAndSlashes(name);
 
 			newUuid = _getAutomaticUuid(
 				themeDisplay.getCompanyId(), normalizedName, uuid);
@@ -104,17 +106,20 @@ public class EditImageConfigurationEntryMVCActionCommand
 			newUuid = ParamUtil.getString(actionRequest, "newUuid");
 		}
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", themeDisplay.getLocale(), getClass());
 
 		try {
 			String message = "";
 
-			if (amImageConfigurationEntry != null) {
+			if (amImageConfigurationEntryOptional.isPresent()) {
+				AMImageConfigurationEntry amImageConfigurationEntry =
+					amImageConfigurationEntryOptional.get();
+
 				if (!_isConfigurationEntryEditable(
 						themeDisplay.getCompanyId(),
-						amImageConfigurationEntry)) {
+						amImageConfigurationEntryOptional.get())) {
 
 					newUuid = amImageConfigurationEntry.getUUID();
 
@@ -129,7 +134,7 @@ public class EditImageConfigurationEntryMVCActionCommand
 						newUuid, properties);
 
 				if (autoModifiedUuid) {
-					message = _language.format(
+					message = LanguageUtil.format(
 						resourceBundle,
 						"x-was-saved-successfully.-the-id-was-duplicated-and-" +
 							"renamed-to-x",
@@ -140,13 +145,13 @@ public class EditImageConfigurationEntryMVCActionCommand
 						});
 				}
 				else {
-					message = _language.format(
+					message = LanguageUtil.format(
 						resourceBundle, "x-was-saved-successfully",
 						amImageConfigurationEntry.getName());
 				}
 			}
 			else {
-				amImageConfigurationEntry =
+				AMImageConfigurationEntry amImageConfigurationEntry =
 					_amImageConfigurationHelper.addAMImageConfigurationEntry(
 						themeDisplay.getCompanyId(), name, description, newUuid,
 						properties);
@@ -161,7 +166,7 @@ public class EditImageConfigurationEntryMVCActionCommand
 								themeDisplay.getCompanyId(),
 								amImageConfigurationEntry);
 
-					message = _language.format(
+					message = LanguageUtil.format(
 						resourceBundle, "x-and-x-were-saved-successfully",
 						new String[] {
 							HtmlUtil.escape(
@@ -173,7 +178,7 @@ public class EditImageConfigurationEntryMVCActionCommand
 				}
 				else {
 					if (autoModifiedUuid) {
-						message = _language.format(
+						message = LanguageUtil.format(
 							resourceBundle,
 							"x-was-saved-successfully.-the-id-was-duplicated-" +
 								"and-renamed-to-x",
@@ -184,7 +189,7 @@ public class EditImageConfigurationEntryMVCActionCommand
 							});
 					}
 					else {
-						message = _language.format(
+						message = LanguageUtil.format(
 							resourceBundle, "x-was-saved-successfully",
 							amImageConfigurationEntry.getName());
 					}
@@ -200,7 +205,7 @@ public class EditImageConfigurationEntryMVCActionCommand
 		catch (AMImageConfigurationException amImageConfigurationException) {
 			jsonObject.put(
 				"message",
-				_language.get(
+				LanguageUtil.get(
 					resourceBundle,
 					_errorMessagesMap.get(
 						amImageConfigurationException.getClass()))
@@ -249,17 +254,19 @@ public class EditImageConfigurationEntryMVCActionCommand
 				break;
 			}
 
-			AMImageConfigurationEntry amImageConfigurationEntry =
-				_amImageConfigurationHelper.getAMImageConfigurationEntry(
-					companyId, curUuid);
+			Optional<AMImageConfigurationEntry>
+				amImageConfigurationEntryOptional =
+					_amImageConfigurationHelper.getAMImageConfigurationEntry(
+						companyId, curUuid);
 
-			if (amImageConfigurationEntry == null) {
+			if (!amImageConfigurationEntryOptional.isPresent()) {
 				break;
 			}
 
 			String suffix = StringPool.DASH + i;
 
-			curUuid = _friendlyURLNormalizer.normalize(normalizedName + suffix);
+			curUuid = FriendlyURLNormalizerUtil.normalize(
+				normalizedName + suffix);
 		}
 
 		return curUuid;
@@ -311,14 +318,5 @@ public class EditImageConfigurationEntryMVCActionCommand
 
 	@Reference
 	private AMImageEntryLocalService _amImageEntryLocalService;
-
-	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 }

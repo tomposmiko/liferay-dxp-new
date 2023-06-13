@@ -50,8 +50,8 @@ const ImagePreviewer = ({alt, imageURL}) => {
 	const [zoomOutDisabled, setZoomOutDisabled] = useState(false);
 	const [zoomRatio, setZoomRatio] = useState(false);
 
-	const imageRef = useRef();
-	const imageContainerRef = useRef();
+	const image = useRef();
+	const imageContainer = useRef();
 
 	const isMounted = useIsMounted();
 
@@ -62,7 +62,7 @@ const ImagePreviewer = ({alt, imageURL}) => {
 	};
 
 	const applyZoom = (zoom) => {
-		const imageElement = imageRef.current;
+		const imageElement = image.current;
 
 		setImageHeight(imageElement.naturalHeight * zoom);
 		setImageWidth(imageElement.naturalWidth * zoom);
@@ -72,7 +72,7 @@ const ImagePreviewer = ({alt, imageURL}) => {
 	};
 
 	const getFittingZoom = () => {
-		const imageElement = imageRef.current;
+		const imageElement = image.current;
 
 		return imageElement.width / imageElement.naturalWidth;
 	};
@@ -109,7 +109,7 @@ const ImagePreviewer = ({alt, imageURL}) => {
 	};
 
 	const handleWindowResize = debounce(() => {
-		if (isMounted() && !imageRef.current.style.width) {
+		if (isMounted() && !image.current.style.width) {
 			updateToolbar(getFittingZoom());
 		}
 	}, 250);
@@ -117,7 +117,7 @@ const ImagePreviewer = ({alt, imageURL}) => {
 	useEventListener('resize', handleWindowResize, false, window);
 
 	useLayoutEffect(() => {
-		const imageContainerElement = imageContainerRef.current;
+		const imageContainerElement = imageContainer.current;
 
 		setImageMargin(
 			`${imageHeight > imageContainerElement.clientHeight ? 0 : 'auto'} ${
@@ -127,10 +127,9 @@ const ImagePreviewer = ({alt, imageURL}) => {
 
 		if (
 			zoomRatio &&
-			(imageContainerElement.clientWidth <
-				imageRef.current.naturalWidth ||
+			(imageContainerElement.clientWidth < image.current.naturalWidth ||
 				imageContainerElement.clientHeight <
-					imageRef.current.naturalHeight)
+					image.current.naturalHeight)
 		) {
 			let scrollLeft;
 			let scrollTop;
@@ -156,7 +155,7 @@ const ImagePreviewer = ({alt, imageURL}) => {
 			setZoomRatio(null);
 		}
 
-		if (!imageRef.current.style.width) {
+		if (!image.current.style.width) {
 			updateToolbar(getFittingZoom());
 		}
 	}, [imageHeight, imageWidth, zoomRatio, imageMargin]);
@@ -165,20 +164,19 @@ const ImagePreviewer = ({alt, imageURL}) => {
 		<div className="preview-file">
 			<div
 				className="d-flex preview-file-container preview-file-max-height"
-				ref={imageContainerRef}
+				ref={imageContainer}
 			>
 				<div className="image-container">
 					<img
 						alt={alt}
 						className="preview-file-image"
 						onLoad={handleImageLoad}
-						ref={imageRef}
+						ref={image}
 						src={imageURL}
 						style={getImageStyles()}
 					/>
 				</div>
 			</div>
-
 			<div className="preview-toolbar-container">
 				<ClayButton.Group className="floating-bar">
 					<ClayButton
@@ -197,7 +195,6 @@ const ImagePreviewer = ({alt, imageURL}) => {
 					>
 						<ClayIcon symbol="hr" />
 					</ClayButton>
-
 					<ClayButton
 						className="btn-floating-bar btn-floating-bar-text"
 						displayType={null}
@@ -212,7 +209,6 @@ const ImagePreviewer = ({alt, imageURL}) => {
 							{Math.round((currentZoom || 0) * 100)}%
 						</span>
 					</ClayButton>
-
 					<ClayButton
 						className="btn-floating-bar"
 						disabled={zoomInDisabled}

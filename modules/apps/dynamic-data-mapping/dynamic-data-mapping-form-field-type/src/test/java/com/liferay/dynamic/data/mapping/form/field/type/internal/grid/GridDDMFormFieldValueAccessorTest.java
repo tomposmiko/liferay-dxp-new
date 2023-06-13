@@ -23,29 +23,26 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Pedro Queiroz
  */
-public class GridDDMFormFieldValueAccessorTest {
+@RunWith(PowerMockRunner.class)
+public class GridDDMFormFieldValueAccessorTest extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		_setUpGridDDMFormFieldValueAccessor();
+	@Before
+	public void setUp() throws Exception {
+		setUpGridDDMFormFieldValueAccessor();
 	}
 
 	@Test
@@ -123,14 +120,17 @@ public class GridDDMFormFieldValueAccessorTest {
 				ddmFormFieldValue, LocaleUtil.US));
 	}
 
-	private static void _setUpGridDDMFormFieldValueAccessor() {
+	protected void setUpGridDDMFormFieldValueAccessor() throws Exception {
 		_gridDDMFormFieldValueAccessor = new GridDDMFormFieldValueAccessor();
 
-		ReflectionTestUtil.setFieldValue(
-			_gridDDMFormFieldValueAccessor, "jsonFactory",
-			new JSONFactoryImpl());
+		field(
+			GridDDMFormFieldValueAccessor.class, "jsonFactory"
+		).set(
+			_gridDDMFormFieldValueAccessor, _jsonFactory
+		);
 	}
 
-	private static GridDDMFormFieldValueAccessor _gridDDMFormFieldValueAccessor;
+	private GridDDMFormFieldValueAccessor _gridDDMFormFieldValueAccessor;
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 }

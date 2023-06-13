@@ -21,6 +21,8 @@ import com.liferay.segments.criteria.CriteriaSerializer;
 import com.liferay.segments.model.SegmentsEntryRole;
 import com.liferay.segments.service.SegmentsEntryRoleLocalServiceUtil;
 
+import java.util.List;
+
 /**
  * @author Eduardo García
  */
@@ -37,10 +39,12 @@ public class SegmentsEntryImpl extends SegmentsEntryBaseImpl {
 
 	@Override
 	public long[] getRoleIds() {
-		return ListUtil.toLongArray(
+		List<SegmentsEntryRole> segmentsEntryRoles =
 			SegmentsEntryRoleLocalServiceUtil.getSegmentsEntryRoles(
-				getSegmentsEntryId()),
-			SegmentsEntryRole::getRoleId);
+				getSegmentsEntryId());
+
+		return ListUtil.toLongArray(
+			segmentsEntryRoles, SegmentsEntryRole::getRoleId);
 	}
 
 	private Criteria _criteria;

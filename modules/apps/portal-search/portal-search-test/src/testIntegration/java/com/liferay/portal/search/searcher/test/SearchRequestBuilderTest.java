@@ -15,7 +15,6 @@
 package com.liferay.portal.search.searcher.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.search.JournalArticleBlueprint;
@@ -35,7 +34,6 @@ import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.rescore.Rescore;
@@ -87,7 +85,7 @@ public class SearchRequestBuilderTest {
 	@Before
 	public void setUp() throws Exception {
 		_journalArticleSearchFixture = new JournalArticleSearchFixture(
-			_ddmStructureLocalService, _journalArticleLocalService, _portal);
+			_journalArticleLocalService);
 
 		_journalArticleSearchFixture.setUp();
 
@@ -387,8 +385,8 @@ public class SearchRequestBuilderTest {
 			searchRequestBuilder.build());
 
 		DocumentsAssert.assertValuesIgnoreRelevance(
-			searchResponse.getRequestString(), searchResponse.getDocuments(),
-			fieldName, expected);
+			searchResponse.getRequestString(),
+			searchResponse.getDocumentsStream(), fieldName, expected);
 	}
 
 	private void _assertSearch(
@@ -419,8 +417,8 @@ public class SearchRequestBuilderTest {
 			searchRequestBuilder.build());
 
 		DocumentsAssert.assertValues(
-			searchResponse.getRequestString(), searchResponse.getDocuments(),
-			fieldName, expected);
+			searchResponse.getRequestString(),
+			searchResponse.getDocumentsStream(), fieldName, expected);
 	}
 
 	private void _assertSearch(
@@ -439,8 +437,8 @@ public class SearchRequestBuilderTest {
 			).build());
 
 		DocumentsAssert.assertValues(
-			searchResponse.getRequestString(), searchResponse.getDocuments(),
-			fieldName, expected);
+			searchResponse.getRequestString(),
+			searchResponse.getDocumentsStream(), fieldName, expected);
 	}
 
 	private Rescore _buildRescore(String fieldName, String value) {
@@ -454,12 +452,6 @@ public class SearchRequestBuilderTest {
 	private boolean _isElasticsearch() {
 		return Objects.equals(_searchEngine.getVendor(), "Elasticsearch");
 	}
-
-	@Inject
-	private static DDMStructureLocalService _ddmStructureLocalService;
-
-	@Inject
-	private static Portal _portal;
 
 	@Inject
 	private ComplexQueryPartBuilderFactory _complexQueryPartBuilderFactory;
@@ -483,7 +475,7 @@ public class SearchRequestBuilderTest {
 	@Inject
 	private RescoreBuilderFactory _rescoreBuilderFactory;
 
-	@Inject
+	@Inject(filter = "search.engine.id=SYSTEM_ENGINE")
 	private SearchEngine _searchEngine;
 
 	@Inject

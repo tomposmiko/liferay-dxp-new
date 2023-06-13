@@ -16,11 +16,11 @@ package com.liferay.layout.page.template.admin.web.internal.portlet.action.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.info.item.InfoItemFormVariation;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
-import com.liferay.layout.importer.LayoutsImporter;
-import com.liferay.layout.importer.LayoutsImporterResultEntry;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporter;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporterResultEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -54,13 +54,13 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.io.File;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -100,20 +100,21 @@ public class ExportImportDisplayPagesTest {
 		long classNameId = _portal.getClassNameId(className);
 
 		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormVariationsProvider.class, className);
 
-		List<InfoItemFormVariation> infoItemFormVariations = new ArrayList<>(
+		Collection<InfoItemFormVariation> infoItemFormVariations =
 			infoItemFormVariationsProvider.getInfoItemFormVariations(
-				_serviceContext1.getScopeGroupId()));
+				_serviceContext1.getScopeGroupId());
 
-		Assert.assertFalse(infoItemFormVariations.isEmpty());
+		Assert.assertTrue(!infoItemFormVariations.isEmpty());
 
-		infoItemFormVariations.sort(
-			Comparator.comparing(InfoItemFormVariation::getKey));
+		Stream<InfoItemFormVariation> stream = infoItemFormVariations.stream();
 
-		InfoItemFormVariation infoItemFormVariation =
-			infoItemFormVariations.get(0);
+		InfoItemFormVariation infoItemFormVariation = stream.sorted(
+			Comparator.comparing(InfoItemFormVariation::getKey)
+		).findFirst(
+		).get();
 
 		long classTypeId = GetterUtil.getLong(infoItemFormVariation.getKey());
 
@@ -128,13 +129,11 @@ public class ExportImportDisplayPagesTest {
 		Layout layout1 = _layoutLocalService.fetchLayout(
 			layoutPageTemplateEntry1.getPlid());
 
-		_layoutPageTemplateStructureLocalService.
-			updateLayoutPageTemplateStructureData(
-				_group1.getGroupId(), layoutPageTemplateEntry1.getPlid(),
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(
-						layoutPageTemplateEntry1.getPlid()),
-				_read("export_import_display_page_layout_data.json"));
+		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
+			TestPropsValues.getUserId(), _group1.getGroupId(),
+			layoutPageTemplateEntry1.getPlid(),
+			_read("export_import_display_page_layout_data.json"),
+			_serviceContext1);
 
 		Repository repository = PortletFileRepositoryUtil.addPortletRepository(
 			_group1.getGroupId(), RandomTestUtil.randomString(),
@@ -143,7 +142,7 @@ public class ExportImportDisplayPagesTest {
 		Class<?> clazz = getClass();
 
 		FileEntry fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			null, _group1.getGroupId(), TestPropsValues.getUserId(),
+			_group1.getGroupId(), TestPropsValues.getUserId(),
 			LayoutPageTemplateEntry.class.getName(),
 			layoutPageTemplateEntry1.getLayoutPageTemplateEntryId(),
 			RandomTestUtil.randomString(), repository.getDlFolderId(),
@@ -160,30 +159,32 @@ public class ExportImportDisplayPagesTest {
 				layoutPageTemplateEntry1.getLayoutPageTemplateEntryId()
 			});
 
-		List<LayoutsImporterResultEntry> layoutsImporterResultEntries = null;
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries = null;
 
 		ServiceContextThreadLocal.pushServiceContext(_serviceContext2);
 
 		try {
-			layoutsImporterResultEntries = _layoutsImporter.importFile(
-				TestPropsValues.getUserId(), _group2.getGroupId(), 0, file,
-				false);
+			layoutPageTemplatesImporterResultEntries =
+				_layoutPageTemplatesImporter.importFile(
+					TestPropsValues.getUserId(), _group2.getGroupId(), 0, file,
+					false);
 		}
 		finally {
 			ServiceContextThreadLocal.popServiceContext();
 		}
 
-		Assert.assertNotNull(layoutsImporterResultEntries);
+		Assert.assertNotNull(layoutPageTemplatesImporterResultEntries);
 
 		Assert.assertEquals(
-			layoutsImporterResultEntries.toString(), 1,
-			layoutsImporterResultEntries.size());
+			layoutPageTemplatesImporterResultEntries.toString(), 1,
+			layoutPageTemplatesImporterResultEntries.size());
 
-		LayoutsImporterResultEntry layoutPageTemplateImportEntry =
-			layoutsImporterResultEntries.get(0);
+		LayoutPageTemplatesImporterResultEntry layoutPageTemplateImportEntry =
+			layoutPageTemplatesImporterResultEntries.get(0);
 
 		Assert.assertEquals(
-			LayoutsImporterResultEntry.Status.IMPORTED,
+			LayoutPageTemplatesImporterResultEntry.Status.IMPORTED,
 			layoutPageTemplateImportEntry.getStatus());
 
 		String layoutPageTemplateEntryKey = StringUtil.toLowerCase(
@@ -225,9 +226,9 @@ public class ExportImportDisplayPagesTest {
 					layoutPageTemplateEntry2.getPlid());
 
 		LayoutStructure layoutStructure1 = LayoutStructure.of(
-			layoutPageTemplateStructure1.getDefaultSegmentsExperienceData());
+			layoutPageTemplateStructure1.getData(0));
 		LayoutStructure layoutStructure2 = LayoutStructure.of(
-			layoutPageTemplateStructure2.getDefaultSegmentsExperienceData());
+			layoutPageTemplateStructure2.getData(0));
 
 		_validateRootLayoutStructureItem(
 			(RootLayoutStructureItem)
@@ -255,8 +256,8 @@ public class ExportImportDisplayPagesTest {
 			actualRootLayoutStructureItem.getItemConfigJSONObject();
 
 		Assert.assertEquals(
-			expectedItemConfigJSONObject.toString(),
-			actualItemConfigJSONObject.toString());
+			expectedItemConfigJSONObject.toJSONString(),
+			actualItemConfigJSONObject.toJSONString());
 
 		Assert.assertEquals(
 			expectedRootLayoutStructureItem.getItemType(),
@@ -273,7 +274,7 @@ public class ExportImportDisplayPagesTest {
 	private Group _group2;
 
 	@Inject
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;
@@ -283,11 +284,11 @@ public class ExportImportDisplayPagesTest {
 		_layoutPageTemplateEntryLocalService;
 
 	@Inject
-	private LayoutPageTemplateStructureLocalService
-		_layoutPageTemplateStructureLocalService;
+	private LayoutPageTemplatesImporter _layoutPageTemplatesImporter;
 
 	@Inject
-	private LayoutsImporter _layoutsImporter;
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
 
 	@Inject(
 		filter = "mvc.command.name=/layout_page_template_admin/export_display_pages"
@@ -296,9 +297,6 @@ public class ExportImportDisplayPagesTest {
 
 	@Inject
 	private Portal _portal;
-
-	@Inject
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	private ServiceContext _serviceContext1;
 	private ServiceContext _serviceContext2;

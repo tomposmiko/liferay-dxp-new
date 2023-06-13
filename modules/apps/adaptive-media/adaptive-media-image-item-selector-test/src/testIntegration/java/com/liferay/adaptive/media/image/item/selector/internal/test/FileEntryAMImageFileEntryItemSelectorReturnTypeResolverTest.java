@@ -64,12 +64,16 @@ public class FileEntryAMImageFileEntryItemSelectorReturnTypeResolverTest {
 
 	@Test
 	public void testAddingFileEntryWithImageCreatesMedia() throws Exception {
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_itemSelectorReturnTypeResolver.getValue(fileEntry, null));
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		String value = _itemSelectorReturnTypeResolver.getValue(
+			fileEntry, null);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
 		String url = jsonObject.getString("url");
 		long fileEntryId = jsonObject.getLong("fileEntryId");
@@ -96,7 +100,7 @@ public class FileEntryAMImageFileEntryItemSelectorReturnTypeResolverTest {
 	private byte[] _getImageBytes() throws Exception {
 		return FileUtil.getBytes(
 			FileEntryAMImageFileEntryItemSelectorReturnTypeResolverTest.class,
-			"dependencies/image.jpg");
+			"image.jpg");
 	}
 
 	@Inject

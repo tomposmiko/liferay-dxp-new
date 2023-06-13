@@ -16,7 +16,7 @@ package com.liferay.portal.search.tuning.rankings.web.internal.index;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.search.tuning.rankings.web.internal.util.RankingUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +26,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Bryan Engler
@@ -83,7 +85,15 @@ public class Ranking {
 	}
 
 	public Collection<String> getQueryStrings() {
-		return RankingUtil.getQueryStrings(_queryString, _aliases);
+		return Stream.concat(
+			Stream.of(_queryString), _aliases.stream()
+		).filter(
+			string -> !Validator.isBlank(string)
+		).distinct(
+		).sorted(
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public String getRankingDocumentId() {
@@ -167,11 +177,14 @@ public class Ranking {
 
 		public RankingBuilder pins(List<Pin> pins) {
 			if (pins != null) {
-				Set<String> documentIds = new LinkedHashSet<>();
+				Stream<Pin> stream = pins.stream();
 
-				pins.forEach(pin -> documentIds.add(pin.getDocumentId()));
-
-				_ranking._pinnedDocumentIds = documentIds;
+				_ranking._pinnedDocumentIds = new LinkedHashSet<>(
+					stream.map(
+						Pin::getDocumentId
+					).collect(
+						Collectors.toSet()
+					));
 
 				_ranking._pins = pins;
 			}

@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SiteFacetPortletKeys.SITE_FACET,
 	service = PortletSharedSearchContributor.class
 )

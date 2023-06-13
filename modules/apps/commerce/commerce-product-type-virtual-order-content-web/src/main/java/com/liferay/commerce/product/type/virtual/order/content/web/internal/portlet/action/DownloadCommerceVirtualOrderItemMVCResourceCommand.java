@@ -15,6 +15,7 @@
 package com.liferay.commerce.product.type.virtual.order.content.web.internal.portlet.action;
 
 import com.liferay.commerce.product.type.virtual.order.constants.CommerceVirtualOrderPortletKeys;
+import com.liferay.commerce.product.type.virtual.order.service.CommerceVirtualOrderItemLocalService;
 import com.liferay.commerce.product.type.virtual.order.service.CommerceVirtualOrderItemService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -24,6 +25,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommerceVirtualOrderPortletKeys.COMMERCE_VIRTUAL_ORDER_ITEM_CONTENT,
 		"mvc.command.name=/commerce_virtual_order_item_content/download_commerce_virtual_order_item"
@@ -67,7 +70,7 @@ public class DownloadCommerceVirtualOrderItemMVCResourceCommand
 				HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -75,6 +78,13 @@ public class DownloadCommerceVirtualOrderItemMVCResourceCommand
 		DownloadCommerceVirtualOrderItemMVCResourceCommand.class);
 
 	@Reference
+	private CommerceVirtualOrderItemLocalService
+		_commerceVirtualOrderItemLocalService;
+
+	@Reference
 	private CommerceVirtualOrderItemService _commerceVirtualOrderItemService;
+
+	@Reference
+	private Portal _portal;
 
 }

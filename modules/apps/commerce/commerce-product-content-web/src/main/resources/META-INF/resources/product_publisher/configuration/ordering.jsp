@@ -20,12 +20,8 @@
 CPPublisherConfigurationDisplayContext cpPublisherConfigurationDisplayContext = (CPPublisherConfigurationDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
-<clay:row
-	id='<%= liferayPortletResponse.getNamespace() + "ordering" %>'
->
-	<clay:col
-		size="6"
-	>
+<aui:row id="ordering">
+	<aui:col width="<%= 50 %>">
 		<aui:select label="order-by" name="preferences--orderByColumn1--" value="<%= cpPublisherConfigurationDisplayContext.getOrderByColumn1() %>" wrapperCssClass="field-inline w90">
 			<aui:option label="title" />
 			<aui:option label="create-date" value="createDate" />
@@ -44,7 +40,7 @@ CPPublisherConfigurationDisplayContext cpPublisherConfigurationDisplayContext = 
 				icon="angle-up"
 				markupView="lexicon"
 				message="ascending"
-				url="javascript:void(0);"
+				url="javascript:;"
 			/>
 
 			<liferay-ui:icon
@@ -52,16 +48,14 @@ CPPublisherConfigurationDisplayContext cpPublisherConfigurationDisplayContext = 
 				icon="angle-down"
 				markupView="lexicon"
 				message="descending"
-				url="javascript:void(0);"
+				url="javascript:;"
 			/>
 
 			<aui:input cssClass="order-by-type-field" name="preferences--orderByType1--" type="hidden" value="<%= orderByType1 %>" />
 		</aui:field-wrapper>
-	</clay:col>
+	</aui:col>
 
-	<clay:col
-		size="6"
-	>
+	<aui:col width="<%= 50 %>">
 
 		<%
 		String orderByColumn2 = cpPublisherConfigurationDisplayContext.getOrderByColumn2();
@@ -85,7 +79,7 @@ CPPublisherConfigurationDisplayContext cpPublisherConfigurationDisplayContext = 
 				icon="angle-up"
 				markupView="lexicon"
 				message="ascending"
-				url="javascript:void(0);"
+				url="javascript:;"
 			/>
 
 			<liferay-ui:icon
@@ -93,13 +87,13 @@ CPPublisherConfigurationDisplayContext cpPublisherConfigurationDisplayContext = 
 				icon="angle-down"
 				markupView="lexicon"
 				message="descending"
-				url="javascript:void(0);"
+				url="javascript:;"
 			/>
 
 			<aui:input cssClass="order-by-type-field" name="preferences--orderByType2--" type="hidden" value="<%= orderByType2 %>" />
 		</aui:field-wrapper>
-	</clay:col>
-</clay:row>
+	</aui:col>
+</aui:row>
 
 <aui:script use="aui-base">
 	A.one('#<portlet:namespace />ordering').delegate(

@@ -15,7 +15,7 @@
 package com.liferay.dynamic.data.mapping.form.builder.internal.servlet;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
@@ -56,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"dynamic.data.mapping.form.builder.servlet=true",
 		"osgi.http.whiteboard.context.path=/dynamic-data-mapping-form-builder-field-settings-form-context",
@@ -67,6 +68,60 @@ import org.osgi.service.component.annotations.Reference;
 public class DDMFieldSettingsDDMFormContextServlet
 	extends BaseDDMFormBuilderServlet {
 
+	protected Map<String, Object> createFieldSettingsFormContext(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
+
+		try {
+			String languageId = ParamUtil.getString(
+				httpServletRequest, "languageId");
+			String portletNamespace = ParamUtil.getString(
+				httpServletRequest, "portletNamespace");
+			String type = ParamUtil.getString(httpServletRequest, "type");
+
+			Locale locale = LocaleUtil.fromLanguageId(languageId);
+
+			LocaleThreadLocal.setThemeDisplayLocale(locale);
+
+			Class<?> ddmFormFieldTypeSettings = getDDMFormFieldTypeSettings(
+				type);
+
+			DDMForm ddmFormFieldTypeSettingsDDMForm = DDMFormFactory.create(
+				ddmFormFieldTypeSettings);
+
+			DDMFormLayout ddmFormFieldTypeSettingsDDMFormLayout =
+				DDMFormLayoutFactory.create(ddmFormFieldTypeSettings);
+
+			DDMFormRenderingContext ddmFormRenderingContext =
+				new DDMFormRenderingContext();
+
+			DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
+				httpServletRequest, ddmFormFieldTypeSettingsDDMForm);
+
+			setTypeDDMFormFieldValue(ddmFormValues, type);
+
+			ddmFormRenderingContext.setDDMFormValues(ddmFormValues);
+
+			ddmFormRenderingContext.setHttpServletRequest(httpServletRequest);
+			ddmFormRenderingContext.setHttpServletResponse(httpServletResponse);
+			ddmFormRenderingContext.setContainerId("settings");
+			ddmFormRenderingContext.setLocale(locale);
+			ddmFormRenderingContext.setPortletNamespace(portletNamespace);
+			ddmFormRenderingContext.setReturnFullContext(true);
+
+			return _ddmFormTemplateContextFactory.create(
+				ddmFormFieldTypeSettingsDDMForm,
+				ddmFormFieldTypeSettingsDDMFormLayout, ddmFormRenderingContext);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
+
+		return null;
+	}
+
 	@Override
 	protected void doGet(
 			HttpServletRequest httpServletRequest,
@@ -74,7 +129,7 @@ public class DDMFieldSettingsDDMFormContextServlet
 		throws IOException, ServletException {
 
 		Map<String, Object> fieldSettingsFormContext =
-			_createFieldSettingsFormContext(
+			createFieldSettingsFormContext(
 				httpServletRequest, httpServletResponse);
 
 		if (fieldSettingsFormContext == null) {
@@ -93,68 +148,14 @@ public class DDMFieldSettingsDDMFormContextServlet
 			jsonSerializer.serializeDeep(fieldSettingsFormContext));
 	}
 
-	private Map<String, Object> _createFieldSettingsFormContext(
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse) {
-
-		try {
-			String languageId = ParamUtil.getString(
-				httpServletRequest, "languageId");
-			String portletNamespace = ParamUtil.getString(
-				httpServletRequest, "portletNamespace");
-			String type = ParamUtil.getString(httpServletRequest, "type");
-
-			Locale locale = LocaleUtil.fromLanguageId(languageId);
-
-			LocaleThreadLocal.setThemeDisplayLocale(locale);
-
-			Class<?> ddmFormFieldTypeSettings = _getDDMFormFieldTypeSettings(
-				type);
-
-			DDMForm ddmFormFieldTypeSettingsDDMForm = DDMFormFactory.create(
-				ddmFormFieldTypeSettings);
-
-			DDMFormLayout ddmFormFieldTypeSettingsDDMFormLayout =
-				DDMFormLayoutFactory.create(ddmFormFieldTypeSettings);
-
-			DDMFormRenderingContext ddmFormRenderingContext =
-				new DDMFormRenderingContext();
-
-			DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
-				httpServletRequest, ddmFormFieldTypeSettingsDDMForm);
-
-			_setTypeDDMFormFieldValue(ddmFormValues, type);
-
-			ddmFormRenderingContext.setDDMFormValues(ddmFormValues);
-
-			ddmFormRenderingContext.setHttpServletRequest(httpServletRequest);
-			ddmFormRenderingContext.setHttpServletResponse(httpServletResponse);
-			ddmFormRenderingContext.setContainerId("settings");
-			ddmFormRenderingContext.setLocale(locale);
-			ddmFormRenderingContext.setPortletNamespace(portletNamespace);
-			ddmFormRenderingContext.setReturnFullContext(true);
-
-			return _ddmFormTemplateContextFactory.create(
-				ddmFormFieldTypeSettingsDDMForm,
-				ddmFormFieldTypeSettingsDDMFormLayout, ddmFormRenderingContext);
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		return null;
-	}
-
-	private Class<?> _getDDMFormFieldTypeSettings(String type) {
+	protected Class<?> getDDMFormFieldTypeSettings(String type) {
 		DDMFormFieldType ddmFormFieldType =
-			_ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(type);
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(type);
 
 		return ddmFormFieldType.getDDMFormFieldTypeSettings();
 	}
 
-	private void _setTypeDDMFormFieldValue(
+	protected void setTypeDDMFormFieldValue(
 		DDMFormValues ddmFormValues, String type) {
 
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
@@ -174,7 +175,7 @@ public class DDMFieldSettingsDDMFormContextServlet
 	private static final long serialVersionUID = 1L;
 
 	@Reference
-	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	private DDMFormTemplateContextFactory _ddmFormTemplateContextFactory;

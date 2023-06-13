@@ -14,16 +14,13 @@
 
 package com.liferay.commerce.product.type.grouped.web.internal.util;
 
-import com.liferay.commerce.product.permission.CommerceProductViewPermission;
 import com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry;
-import com.liferay.commerce.product.type.grouped.service.CPDefinitionGroupedEntryLocalService;
+import com.liferay.commerce.product.type.grouped.service.CPDefinitionGroupedEntryService;
 import com.liferay.commerce.product.type.grouped.util.GroupedCPTypeHelper;
 import com.liferay.commerce.product.type.grouped.util.comparator.CPDefinitionGroupedEntryPriorityComparator;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -32,33 +29,22 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = GroupedCPTypeHelper.class)
+@Component(
+	enabled = false, immediate = true, service = GroupedCPTypeHelper.class
+)
 public class GroupedCPTypeHelperImpl implements GroupedCPTypeHelper {
 
 	@Override
 	public List<CPDefinitionGroupedEntry> getCPDefinitionGroupedEntry(
-			long commerceAccountId, long commerceChannelGroupId,
 			long cpDefinitionId)
 		throws PortalException {
 
-		if (_commerceProductViewPermission.contains(
-				PermissionThreadLocal.getPermissionChecker(), commerceAccountId,
-				commerceChannelGroupId, cpDefinitionId)) {
-
-			return _cpDefinitionGroupedEntryLocalService.
-				getCPDefinitionGroupedEntries(
-					cpDefinitionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					new CPDefinitionGroupedEntryPriorityComparator());
-		}
-
-		return Collections.emptyList();
+		return _cpDefinitionGroupedEntryService.getCPDefinitionGroupedEntries(
+			cpDefinitionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			new CPDefinitionGroupedEntryPriorityComparator());
 	}
 
 	@Reference
-	private CommerceProductViewPermission _commerceProductViewPermission;
-
-	@Reference
-	private CPDefinitionGroupedEntryLocalService
-		_cpDefinitionGroupedEntryLocalService;
+	private CPDefinitionGroupedEntryService _cpDefinitionGroupedEntryService;
 
 }

@@ -26,9 +26,6 @@ import com.liferay.wiki.engine.creole.internal.util.WikiEngineCreoleComponentPro
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -47,8 +44,7 @@ public class CreoleTestUtil {
 			new WikiEngineCreoleComponentProvider();
 
 		ReflectionTestUtil.invoke(
-			wikiEngineCreoleComponentProvider, "activate",
-			new Class<?>[] {Map.class}, Collections.emptyMap());
+			wikiEngineCreoleComponentProvider, "activate", new Class<?>[0]);
 
 		WikiGroupServiceConfiguration wikiGroupServiceConfiguration =
 			Mockito.mock(WikiGroupServiceConfiguration.class);
@@ -77,14 +73,14 @@ public class CreoleTestUtil {
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 
 			throw new RuntimeException("File " + fileName + " does not exist");
 		}
 		catch (RecognitionException recognitionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(recognitionException);
+				_log.debug(recognitionException, recognitionException);
 			}
 
 			throw new RuntimeException("Unable to parse " + fileName);

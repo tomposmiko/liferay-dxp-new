@@ -14,10 +14,11 @@
 
 package com.liferay.document.library.display.context;
 
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
+import com.liferay.portal.kernel.servlet.taglib.ui.ToolbarItem;
 
 import java.io.IOException;
 
@@ -32,8 +33,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author Iván Zaera
  */
 public interface DLViewFileVersionDisplayContext extends DLDisplayContext {
-
-	public List<DropdownItem> getActionDropdownItems() throws PortalException;
 
 	public String getCssClassFileMimeType();
 
@@ -56,6 +55,10 @@ public interface DLViewFileVersionDisplayContext extends DLDisplayContext {
 	public default String getIconFileMimeType() {
 		return "document-default";
 	}
+
+	public Menu getMenu() throws PortalException;
+
+	public List<ToolbarItem> getToolbarItems() throws PortalException;
 
 	public default boolean hasCustomThumbnail() {
 		return false;

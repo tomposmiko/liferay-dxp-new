@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.TOOLS,
 		"product.navigation.control.menu.entry.order:Integer=400"
@@ -85,11 +86,15 @@ public class CustomizationSettingsProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
-	private boolean _isCustomizableLayout(ThemeDisplay themeDisplay)
+	protected boolean isCustomizableLayout(ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		Layout layout = themeDisplay.getLayout();
@@ -136,7 +141,7 @@ public class CustomizationSettingsProductNavigationControlMenuEntry
 		Layout layout = themeDisplay.getLayout();
 
 		if (layout.isTypeControlPanel() || layout.isTypeContent() ||
-			!_isCustomizableLayout(themeDisplay)) {
+			!isCustomizableLayout(themeDisplay)) {
 
 			return false;
 		}
@@ -146,8 +151,5 @@ public class CustomizationSettingsProductNavigationControlMenuEntry
 
 	private static final String _SHOW =
 		CustomizationSettingsProductNavigationControlMenuEntry.class + "#_SHOW";
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")
-	private ServletContext _servletContext;
 
 }

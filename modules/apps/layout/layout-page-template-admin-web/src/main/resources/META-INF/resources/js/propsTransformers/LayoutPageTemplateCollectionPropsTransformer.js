@@ -14,21 +14,17 @@
 
 import {openModal} from 'frontend-js-web';
 
-import openDeletePageTemplateModal from '../modal/openDeletePageTemplateModal';
-
 const ACTIONS = {
 	deleteLayoutPageTemplateCollection({
 		deleteLayoutPageTemplateCollectionURL,
 	}) {
-		openDeletePageTemplateModal({
-			onDelete: () => {
-				submitForm(
-					document.hrefFm,
-					deleteLayoutPageTemplateCollectionURL
-				);
-			},
-			title: Liferay.Language.get('page-template-set'),
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, deleteLayoutPageTemplateCollectionURL);
+		}
 	},
 
 	permissionsLayoutPageTemplateCollection({

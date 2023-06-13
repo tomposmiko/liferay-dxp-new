@@ -25,6 +25,6 @@ public interface SchedulerEntry extends Serializable {
 
 	public String getEventListenerClass();
 
-	public TriggerConfiguration getTriggerConfiguration();
+	public Trigger getTrigger();
 
 }

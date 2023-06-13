@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class DDMFormBuilderTopHeadDynamicInclude extends BaseDynamicInclude {
 
 	@Override
@@ -50,11 +50,12 @@ public class DDMFormBuilderTopHeadDynamicInclude extends BaseDynamicInclude {
 
 		PrintWriter printWriter = httpServletResponse.getWriter();
 
-		String content = "<link href=\"".concat(
-			_portal.getStaticResourceURL(
-				httpServletRequest,
-				StringBundler.concat(
-					themeDisplay.getCDNBaseURL(), _postfix, "/css/main.css")));
+		String staticResourceURL = _portal.getStaticResourceURL(
+			httpServletRequest,
+			StringBundler.concat(
+				themeDisplay.getCDNBaseURL(), _postfix, "/css/main.css"));
+
+		String content = "<link href=\"".concat(staticResourceURL);
 
 		printWriter.println(
 			content.concat("\" rel=\"stylesheet\" type = \"text/css\" />"));

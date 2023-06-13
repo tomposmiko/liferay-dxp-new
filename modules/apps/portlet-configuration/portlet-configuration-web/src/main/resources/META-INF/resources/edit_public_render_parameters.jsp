@@ -61,76 +61,74 @@ Set<PublicRenderParameter> publicRenderParameters = (Set<PublicRenderParameter>)
 		<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 
 		<liferay-frontend:edit-form-body>
-			<liferay-frontend:fieldset>
-				<liferay-ui:error key="duplicateMapping" message="several-shared-parameters-are-mapped-to-the-same-parameter" />
+			<liferay-frontend:fieldset-group>
+				<liferay-frontend:fieldset>
+					<liferay-ui:error key="duplicateMapping" message="several-shared-parameters-are-mapped-to-the-same-parameter" />
 
-				<div class="alert alert-info">
-					<liferay-ui:message key="set-up-the-communication-among-the-portlets-that-use-public-render-parameters" />
+					<div class="alert alert-info">
+						<liferay-ui:message arguments='<%= "https://dev.liferay.com/en/discover/portal/-/knowledge_base/7-0/communication-between-apps" %>' key="set-up-the-communication-among-the-portlets-that-use-public-render-parameters" translateArguments="<%= false %>" />
+					</div>
 
-					<liferay-learn:message
-						key="general"
-						resource="portlet-configuration-web"
-					/>
-				</div>
-
-				<liferay-ui:search-container
-					total="<%= publicRenderParameterConfigurations.size() %>"
-				>
-					<liferay-ui:search-container-results
-						calculateStartAndEnd="<%= true %>"
-						results="<%= publicRenderParameterConfigurations %>"
-					/>
-
-					<liferay-ui:search-container-row
-						className="PublicRenderParameterConfiguration"
-						modelVar="publicRenderParameterConfiguration"
+					<liferay-ui:search-container
+						total="<%= publicRenderParameterConfigurations.size() %>"
 					>
-						<liferay-ui:search-container-column-text
-							name="shared-parameter"
-							value="<%= HtmlUtil.escape(publicRenderParameterConfiguration.getPublicRenderParameter().getIdentifier()) %>"
+						<liferay-ui:search-container-results
+							results="<%= ListUtil.subList(publicRenderParameterConfigurations, searchContainer.getStart(), searchContainer.getEnd()) %>"
 						/>
 
-						<liferay-ui:search-container-column-text
-							name="ignore"
+						<liferay-ui:search-container-row
+							className="PublicRenderParameterConfiguration"
+							modelVar="publicRenderParameterConfiguration"
 						>
-							<aui:input label="" name="<%= publicRenderParameterConfiguration.getIgnoreKey() %>" type="checkbox" value="<%= publicRenderParameterConfiguration.getIgnoreValue() %>" />
-						</liferay-ui:search-container-column-text>
+							<liferay-ui:search-container-column-text
+								name="shared-parameter"
+								value="<%= HtmlUtil.escape(publicRenderParameterConfiguration.getPublicRenderParameter().getIdentifier()) %>"
+							/>
 
-						<liferay-ui:search-container-column-text
-							name="read-value-from-parameter"
-						>
-							<aui:select label="" name="<%= publicRenderParameterConfiguration.getMappingKey() %>">
-								<aui:option label="<%= HtmlUtil.escape(publicRenderParameterConfiguration.getPublicRenderParameter().getIdentifier()) %>" value="" />
+							<liferay-ui:search-container-column-text
+								name="ignore"
+							>
+								<aui:input label="" name="<%= publicRenderParameterConfiguration.getIgnoreKey() %>" type="checkbox" value="<%= publicRenderParameterConfiguration.getIgnoreValue() %>" />
+							</liferay-ui:search-container-column-text>
 
-								<%
-								for (PublicRenderParameter publicRenderParameter : publicRenderParameters) {
-									String publicRenderParameterName = PortletQNameUtil.getPublicRenderParameterName(publicRenderParameter.getQName());
+							<liferay-ui:search-container-column-text
+								name="read-value-from-parameter"
+							>
+								<aui:select label="" name="<%= publicRenderParameterConfiguration.getMappingKey() %>">
+									<aui:option label="<%= HtmlUtil.escape(publicRenderParameterConfiguration.getPublicRenderParameter().getIdentifier()) %>" value="" />
 
-									if (publicRenderParameterName.equals(publicRenderParameterConfiguration.getPublicRenderParameterName())) {
-										continue;
+									<%
+									for (PublicRenderParameter publicRenderParameter : publicRenderParameters) {
+										String publicRenderParameterName = PortletQNameUtil.getPublicRenderParameterName(publicRenderParameter.getQName());
+
+										if (publicRenderParameterName.equals(publicRenderParameterConfiguration.getPublicRenderParameterName())) {
+											continue;
+										}
+									%>
+
+										<aui:option label="<%= HtmlUtil.escape(publicRenderParameter.getIdentifier()) %>" selected="<%= publicRenderParameterName.equals(publicRenderParameterConfiguration.getMappingValue()) %>" value="<%= publicRenderParameterName %>" />
+
+									<%
 									}
-								%>
+									%>
 
-									<aui:option label="<%= HtmlUtil.escape(publicRenderParameter.getIdentifier()) %>" selected="<%= publicRenderParameterName.equals(publicRenderParameterConfiguration.getMappingValue()) %>" value="<%= publicRenderParameterName %>" />
+								</aui:select>
+							</liferay-ui:search-container-column-text>
+						</liferay-ui:search-container-row>
 
-								<%
-								}
-								%>
-
-							</aui:select>
-						</liferay-ui:search-container-column-text>
-					</liferay-ui:search-container-row>
-
-					<liferay-ui:search-iterator
-						markupView="lexicon"
-						paginate="<%= false %>"
-					/>
-				</liferay-ui:search-container>
-			</liferay-frontend:fieldset>
+						<liferay-ui:search-iterator
+							markupView="lexicon"
+							paginate="<%= false %>"
+						/>
+					</liferay-ui:search-container>
+				</liferay-frontend:fieldset>
+			</liferay-frontend:fieldset-group>
 		</liferay-frontend:edit-form-body>
 
 		<liferay-frontend:edit-form-footer>
-			<liferay-frontend:edit-form-buttons />
+			<aui:button type="submit" />
+
+			<aui:button type="cancel" />
 		</liferay-frontend:edit-form-footer>
 	</liferay-frontend:edit-form>
 </div>
@@ -141,20 +139,11 @@ Set<PublicRenderParameter> publicRenderParameters = (Set<PublicRenderParameter>)
 	for (PublicRenderParameterConfiguration publicRenderParameterConfiguration : publicRenderParameterConfigurations) {
 	%>
 
-		var ignoreInput = document.getElementById(
-			'<portlet:namespace /><%= PublicRenderParameterConfiguration.IGNORE_PREFIX + HtmlUtil.escapeJS(publicRenderParameterConfiguration.getPublicRenderParameterName()) %>'
+		Liferay.Util.disableToggleBoxes(
+			'<portlet:namespace /><%= PublicRenderParameterConfiguration.IGNORE_PREFIX + HtmlUtil.escapeJS(publicRenderParameterConfiguration.getPublicRenderParameterName()) %>',
+			'<portlet:namespace /><%= PublicRenderParameterConfiguration.MAPPING_PREFIX + HtmlUtil.escapeJS(publicRenderParameterConfiguration.getPublicRenderParameterName()) %>',
+			true
 		);
-		var mappingInput = document.getElementById(
-			'<portlet:namespace /><%= PublicRenderParameterConfiguration.MAPPING_PREFIX + HtmlUtil.escapeJS(publicRenderParameterConfiguration.getPublicRenderParameterName()) %>'
-		);
-
-		if (ignoreInput && mappingInput) {
-			mappingInput.disabled = ignoreInput.checked;
-
-			ignoreInput.addEventListener('click', () => {
-				Liferay.Util.toggleDisabled(mappingInput, !mappingInput.disabled);
-			});
-		}
 
 	<%
 	}

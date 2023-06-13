@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.select;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRenderer;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
-import com.liferay.portal.kernel.util.Html;
 
 import java.util.Locale;
 
@@ -28,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Renato Rego
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SELECT,
 	service = DDMFormFieldValueRenderer.class
 )
@@ -36,15 +36,11 @@ public class SelectDDMFormFieldValueRenderer
 
 	@Override
 	public String render(DDMFormFieldValue ddmFormFieldValue, Locale locale) {
-		return _html.escape(
-			selectDDMFormFieldValueAccessor.getOptionsLabels(
-				ddmFormFieldValue, locale));
+		return selectDDMFormFieldValueAccessor.getOptionsLabels(
+			ddmFormFieldValue, locale);
 	}
 
 	@Reference
 	protected SelectDDMFormFieldValueAccessor selectDDMFormFieldValueAccessor;
-
-	@Reference
-	private Html _html;
 
 }

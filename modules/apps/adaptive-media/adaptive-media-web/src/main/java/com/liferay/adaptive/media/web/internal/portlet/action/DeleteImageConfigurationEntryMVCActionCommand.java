@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -36,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AMPortletKeys.ADAPTIVE_MEDIA,
 		"mvc.command.name=/adaptive_media/delete_image_configuration_entry"
@@ -63,19 +65,18 @@ public class DeleteImageConfigurationEntryMVCActionCommand
 		for (String deleteAMImageConfigurationEntryUuid :
 				deleteAMImageConfigurationEntryUuids) {
 
-			AMImageConfigurationEntry amImageConfigurationEntry =
-				_amImageConfigurationHelper.getAMImageConfigurationEntry(
-					themeDisplay.getCompanyId(),
-					deleteAMImageConfigurationEntryUuid);
+			Optional<AMImageConfigurationEntry>
+				amImageConfigurationEntryOptional =
+					_amImageConfigurationHelper.getAMImageConfigurationEntry(
+						themeDisplay.getCompanyId(),
+						deleteAMImageConfigurationEntryUuid);
 
 			_amImageConfigurationHelper.deleteAMImageConfigurationEntry(
 				themeDisplay.getCompanyId(),
 				deleteAMImageConfigurationEntryUuid);
 
-			if (amImageConfigurationEntry != null) {
-				deletedAMImageConfigurationEntries.add(
-					amImageConfigurationEntry);
-			}
+			amImageConfigurationEntryOptional.ifPresent(
+				deletedAMImageConfigurationEntries::add);
 		}
 
 		SessionMessages.add(

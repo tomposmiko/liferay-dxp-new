@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Sergio González
  */
-@Component(service = PortletToolbarContributorLocator.class)
+@Component(immediate = true, service = PortletToolbarContributorLocator.class)
 public class MVCPortletToolbarContributorLocator
 	extends BasePortletToolbarContributorLocator {
 
@@ -52,7 +52,9 @@ public class MVCPortletToolbarContributorLocator
 		return "mvc.path";
 	}
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
 
 }

@@ -54,7 +54,7 @@ public class DDMFormFieldUtil {
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 			}
 		}
@@ -72,12 +72,13 @@ public class DDMFormFieldUtil {
 			else if (name.equals(ddmFormField.getFieldReference())) {
 				return ddmFormField;
 			}
+			else {
+				DDMFormField nestedDDMFormField = _getDDMFormField(
+					ddmFormField.getNestedDDMFormFields(), name);
 
-			DDMFormField nestedDDMFormField = _getDDMFormField(
-				ddmFormField.getNestedDDMFormFields(), name);
-
-			if (nestedDDMFormField != null) {
-				return nestedDDMFormField;
+				if (nestedDDMFormField != null) {
+					return nestedDDMFormField;
+				}
 			}
 		}
 

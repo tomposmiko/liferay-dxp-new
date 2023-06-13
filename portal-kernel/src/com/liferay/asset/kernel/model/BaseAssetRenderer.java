@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.trash.kernel.util.TrashUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +48,8 @@ import java.util.Locale;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,7 +101,7 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 
 	@Override
 	public String getNewName(String oldName, String token) {
-		return StringBundler.concat(oldName, StringPool.SPACE, token);
+		return TrashUtil.getNewName(oldName, token);
 	}
 
 	@Override
@@ -267,16 +270,8 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 	}
 
 	@Override
-	public String getURLViewInContext(
-			ThemeDisplay themeDisplay, String noSuchEntryRedirect)
-		throws Exception {
-
-		throw null;
-	}
-
-	@Override
 	public String getViewInContextMessage() {
-		return "view-on-new-page";
+		return "view-in-context";
 	}
 
 	@Override
@@ -332,6 +327,13 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 		return true;
 	}
 
+	public String renderActions(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws Exception {
+
+		return null;
+	}
+
 	public void setAssetRendererType(int assetRendererType) {
 		_assetRendererType = assetRendererType;
 	}
@@ -365,15 +367,6 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
-
-		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect, path, primaryKeyParameterName,
-			primaryKeyParameterValue);
-	}
-
-	protected String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect, String path,
-		String primaryKeyParameterName, long primaryKeyParameterValue) {
 
 		return PortalUtil.addPreservedParameters(
 			themeDisplay,

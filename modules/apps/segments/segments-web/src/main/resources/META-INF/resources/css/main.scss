@@ -4,6 +4,7 @@
 @import 'globals';
 
 .segments-root {
+	@import 'clay_button';
 	@import 'conjunction';
 	@import 'contributor_builder';
 	@import 'criteria_builder';

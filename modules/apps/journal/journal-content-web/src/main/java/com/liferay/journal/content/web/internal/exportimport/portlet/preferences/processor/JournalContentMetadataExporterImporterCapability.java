@@ -28,7 +28,12 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Pavel Savinov
  */
-@Component(service = Capability.class)
+@Component(
+	immediate = true,
+	service = {
+		Capability.class, JournalContentMetadataExporterImporterCapability.class
+	}
+)
 public class JournalContentMetadataExporterImporterCapability
 	implements Capability {
 

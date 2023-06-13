@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.mapping.expression;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Leonardo Barros
@@ -35,8 +36,12 @@ public final class UpdateFieldPropertyRequest {
 		return Collections.unmodifiableMap(_properties);
 	}
 
-	public <T> T getProperty(String name) {
-		return (T)_properties.get(name);
+	public <T> Optional<T> getPropertyOptional(String name) {
+		if (!_properties.containsKey(name)) {
+			return Optional.empty();
+		}
+
+		return Optional.of((T)_properties.get(name));
 	}
 
 	public static class Builder {

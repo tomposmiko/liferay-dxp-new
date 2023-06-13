@@ -22,6 +22,7 @@ import com.liferay.commerce.product.model.CPDefinitionOptionRel;
 import com.liferay.commerce.product.model.CPDefinitionOptionValueRel;
 import com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValue;
 import com.liferay.commerce.product.model.CPInstance;
+import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.portlet.action.ActionHelper;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryService;
 import com.liferay.commerce.product.service.CPDefinitionLinkService;
@@ -30,13 +31,15 @@ import com.liferay.commerce.product.service.CPDefinitionOptionValueRelService;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.service.CPDefinitionSpecificationOptionValueService;
 import com.liferay.commerce.product.service.CPInstanceService;
+import com.liferay.commerce.product.service.CProductLocalService;
 import com.liferay.commerce.product.type.CPType;
-import com.liferay.commerce.product.type.CPTypeRegistry;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.IOException;
 
@@ -55,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(service = ActionHelper.class)
+@Component(enabled = false, service = ActionHelper.class)
 public class ActionHelperImpl implements ActionHelper {
 
 	@Override
@@ -125,7 +128,7 @@ public class ActionHelperImpl implements ActionHelper {
 		long cpDefinitionId = ParamUtil.getLong(
 			portletRequest, "cpDefinitionId");
 
-		cpDefinition = _cpDefinitionService.fetchCPDefinition(cpDefinitionId);
+		cpDefinition = _validateCPDefinition(cpDefinitionId);
 
 		if (cpDefinition != null) {
 			portletRequest.setAttribute(CPWebKeys.CP_DEFINITION, cpDefinition);
@@ -426,12 +429,12 @@ public class ActionHelperImpl implements ActionHelper {
 
 	@Override
 	public CPType getCPType(String name) {
-		return _cpTypeRegistry.getCPType(name);
+		return _cpTypeServicesTracker.getCPType(name);
 	}
 
 	@Override
 	public List<CPType> getCPTypes() {
-		return _cpTypeRegistry.getCPTypes();
+		return _cpTypeServicesTracker.getCPTypes();
 	}
 
 	@Override
@@ -459,6 +462,28 @@ public class ActionHelperImpl implements ActionHelper {
 		httpServletResponse.flushBuffer();
 	}
 
+	private CPDefinition _validateCPDefinition(Long cpDefinitionId)
+		throws PortalException {
+
+		CPDefinition cpDefinition = _cpDefinitionService.fetchCPDefinition(
+			cpDefinitionId);
+
+		if (cpDefinition != null) {
+			CProduct cProduct = _cProductLocalService.getCProduct(
+				cpDefinition.getCProductId());
+
+			if ((cpDefinition.getStatus() ==
+					WorkflowConstants.STATUS_APPROVED) &&
+				(cpDefinitionId != cProduct.getPublishedCPDefinitionId())) {
+
+				cpDefinition = _cpDefinitionService.fetchCPDefinition(
+					cProduct.getPublishedCPDefinitionId());
+			}
+		}
+
+		return cpDefinition;
+	}
+
 	@Reference
 	private CPAttachmentFileEntryService _cpAttachmentFileEntryService;
 
@@ -483,7 +508,10 @@ public class ActionHelperImpl implements ActionHelper {
 	private CPInstanceService _cpInstanceService;
 
 	@Reference
-	private CPTypeRegistry _cpTypeRegistry;
+	private CProductLocalService _cProductLocalService;
+
+	@Reference
+	private CPTypeServicesTracker _cpTypeServicesTracker;
 
 	@Reference
 	private Portal _portal;

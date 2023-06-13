@@ -14,10 +14,7 @@
 
 package com.liferay.adaptive.media.image.internal.validator;
 
-import com.liferay.adaptive.media.AMAttribute;
-import com.liferay.adaptive.media.AdaptiveMedia;
 import com.liferay.adaptive.media.image.mime.type.AMImageMimeTypeProvider;
-import com.liferay.adaptive.media.image.service.AMImageEntryLocalService;
 import com.liferay.adaptive.media.image.size.AMImageSizeProvider;
 import com.liferay.adaptive.media.image.validator.AMImageValidator;
 import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
@@ -57,30 +54,6 @@ import org.osgi.service.component.annotations.Reference;
 public class AMImageValidatorImpl implements AMImageValidator {
 
 	@Override
-	public <T> boolean isProcessingRequired(
-		AdaptiveMedia<T> adaptiveMedia, FileVersion fileVersion) {
-
-		if (!isProcessingSupported(fileVersion)) {
-			return false;
-		}
-
-		String configurationUuid = adaptiveMedia.getValue(
-			AMAttribute.getConfigurationUuidAMAttribute());
-
-		if (configurationUuid == null) {
-			return true;
-		}
-
-		if (_amImageEntryLocalService.hasAMImageEntryContent(
-				configurationUuid, fileVersion)) {
-
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
 	public boolean isProcessingSupported(FileVersion fileVersion) {
 		if (!isValid(fileVersion) ||
 			Objects.equals(
@@ -109,12 +82,6 @@ public class AMImageValidatorImpl implements AMImageValidator {
 			((imageMaxSize == 0) || (fileVersion.getSize() == 0) ||
 			 (fileVersion.getSize() >= imageMaxSize))) {
 
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"File " + fileVersion.getFileName() +
-						" has an invalid size");
-			}
-
 			return false;
 		}
 
@@ -122,22 +89,10 @@ public class AMImageValidatorImpl implements AMImageValidator {
 				fileVersion.getMimeType()) ||
 			!_isFileVersionStoredMetadataSupported(fileVersion)) {
 
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"File " + fileVersion.getFileName() +
-						"has an invalid mime type or metada");
-			}
-
 			return false;
 		}
 
 		return true;
-	}
-
-	protected void setAMImageEntryLocalService(
-		AMImageEntryLocalService amImageEntryLocalService) {
-
-		_amImageEntryLocalService = amImageEntryLocalService;
 	}
 
 	private boolean _isFileVersionStoredMetadataSupported(
@@ -174,11 +129,6 @@ public class AMImageValidatorImpl implements AMImageValidator {
 							entry.getValue(),
 							PropsValues.IMAGE_TOOL_IMAGE_MAX_HEIGHT)) {
 
-						if (_log.isDebugEnabled()) {
-							_log.debug(
-								entry.getValue() + " has an invalid height");
-						}
-
 						return false;
 					}
 					else if (Objects.equals(
@@ -186,11 +136,6 @@ public class AMImageValidatorImpl implements AMImageValidator {
 							 !_isValidDimension(
 								 entry.getValue(),
 								 PropsValues.IMAGE_TOOL_IMAGE_MAX_WIDTH)) {
-
-						if (_log.isDebugEnabled()) {
-							_log.debug(
-								entry.getValue() + " has an invalid width");
-						}
 
 						return false;
 					}
@@ -207,7 +152,9 @@ public class AMImageValidatorImpl implements AMImageValidator {
 				}
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(ddmFormFieldValueValidationException);
+					_log.debug(
+						ddmFormFieldValueValidationException,
+						ddmFormFieldValueValidationException);
 				}
 			}
 			catch (PortalException portalException) {
@@ -220,7 +167,7 @@ public class AMImageValidatorImpl implements AMImageValidator {
 				}
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}
@@ -266,9 +213,6 @@ public class AMImageValidatorImpl implements AMImageValidator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AMImageValidatorImpl.class);
-
-	@Reference
-	private AMImageEntryLocalService _amImageEntryLocalService;
 
 	@Reference
 	private AMImageMimeTypeProvider _amImageMimeTypeProvider;

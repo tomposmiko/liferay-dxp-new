@@ -29,6 +29,4 @@ const STATUS_TO_TYPE = {
 	[STATUS_TERMINATED]: 'danger',
 };
 
-export function statusToLabelDisplayType(status) {
-	return STATUS_TO_TYPE[status];
-}
+export const statusToLabelDisplayType = (status) => STATUS_TO_TYPE[status];

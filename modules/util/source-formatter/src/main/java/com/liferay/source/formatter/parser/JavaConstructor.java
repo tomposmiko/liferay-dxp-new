@@ -32,8 +32,7 @@ public class JavaConstructor extends BaseJavaTerm {
 	public JavaSignature getSignature() {
 		if (_signature == null) {
 			_signature = JavaSignatureParser.parseJavaSignature(
-				getContent(), getAccessModifier(), getPackageName(),
-				getImportNames(), false);
+				getContent(), getAccessModifier(), false);
 		}
 
 		return _signature;

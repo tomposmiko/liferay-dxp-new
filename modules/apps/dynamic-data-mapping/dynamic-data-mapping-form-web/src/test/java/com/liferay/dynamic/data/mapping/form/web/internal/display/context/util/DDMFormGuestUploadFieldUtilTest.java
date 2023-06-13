@@ -14,8 +14,6 @@
 
 package com.liferay.dynamic.data.mapping.form.web.internal.display.context.util;
 
-import com.liferay.dynamic.data.mapping.internal.io.DDMFormJSONDeserializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
@@ -24,163 +22,121 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureImpl;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
-import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.MockedStatic;
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
+import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Carolina Barbosa
  */
+@RunWith(PowerMockRunner.class)
 public class DDMFormGuestUploadFieldUtilTest {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		Mockito.when(
-			FrameworkUtil.getBundle(Mockito.any())
-		).thenReturn(
-			bundleContext.getBundle()
-		);
-
-		_ddmForm = DDMFormTestUtil.createDDMForm();
-
-		Dictionary<String, Object> properties = new Hashtable<>();
-
-		properties.put("ddm.form.deserializer.type", "json");
-
-		_ddmFormDeserializerServiceRegistration = bundleContext.registerService(
-			DDMFormDeserializer.class, _ddmFormDeserializer, properties);
-
-		_ddmFormInstanceRecordLocalServiceServiceRegistration =
-			bundleContext.registerService(
-				DDMFormInstanceRecordLocalService.class,
-				_ddmFormInstanceRecordLocalService, null);
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		_ddmFormDeserializerServiceRegistration.unregister();
-
-		_ddmFormInstanceRecordLocalServiceServiceRegistration.unregister();
-
-		_frameworkUtilMockedStatic.close();
+	@Before
+	public void setUp() throws Exception {
+		setUpDDMForm();
+		setUpDDMFormInstanceRecordLocalService();
 	}
 
 	@Test
 	public void testGuestUserAnsweringForFifthTime() throws Exception {
-		_addUploadField(true);
+		addUploadField(true);
 
 		List<DDMFormInstanceRecord> ddmFormInstanceRecords = new ArrayList<>();
 
 		for (int i = 0; i < (_MAXIMUM_SUBMISSIONS - 1); i++) {
-			ddmFormInstanceRecords.add(_mockDDMFormInstanceRecord());
+			ddmFormInstanceRecords.add(mockDDMFormInstanceRecord());
 		}
 
-		_mockDDMFormInstanceLocalService(ddmFormInstanceRecords);
+		mockDDMFormInstanceLocalService(ddmFormInstanceRecords);
 
 		Assert.assertFalse(
-			DDMFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
-				_mockDDMFormInstance(), _mockHttpServletRequest(false),
+			_ddmFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
+				mockDDMFormInstance(), mockHttpServletRequest(false),
 				_MAXIMUM_SUBMISSIONS));
 	}
 
 	@Test
 	public void testGuestUserAnsweringForSixthTime() throws Exception {
-		_addUploadField(true);
+		addUploadField(true);
 
 		List<DDMFormInstanceRecord> ddmFormInstanceRecords = new ArrayList<>();
 
 		for (int i = 0; i < _MAXIMUM_SUBMISSIONS; i++) {
-			ddmFormInstanceRecords.add(_mockDDMFormInstanceRecord());
+			ddmFormInstanceRecords.add(mockDDMFormInstanceRecord());
 		}
 
-		_mockDDMFormInstanceLocalService(ddmFormInstanceRecords);
+		mockDDMFormInstanceLocalService(ddmFormInstanceRecords);
 
 		Assert.assertTrue(
-			DDMFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
-				_mockDDMFormInstance(), _mockHttpServletRequest(false),
+			_ddmFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
+				mockDDMFormInstance(), mockHttpServletRequest(false),
 				_MAXIMUM_SUBMISSIONS));
 	}
 
 	@Test
 	public void testHasGuestUploadFieldAllowedForGuests() throws Exception {
-		_addUploadField(true);
+		addUploadField(true);
 
 		Assert.assertTrue(
-			DDMFormGuestUploadFieldUtil.hasGuestUploadField(
-				_mockDDMFormInstance()));
+			_ddmFormGuestUploadFieldUtil.hasGuestUploadField(
+				mockDDMFormInstance()));
 	}
 
 	@Test
 	public void testHasGuestUploadFieldNotAllowedForGuests() throws Exception {
-		_addUploadField(false);
+		addUploadField(false);
 
 		Assert.assertFalse(
-			DDMFormGuestUploadFieldUtil.hasGuestUploadField(
-				_mockDDMFormInstance()));
+			_ddmFormGuestUploadFieldUtil.hasGuestUploadField(
+				mockDDMFormInstance()));
 	}
 
 	@Test
 	public void testHasGuestUploadFieldWithNoUploadField() throws Exception {
 		Assert.assertFalse(
-			DDMFormGuestUploadFieldUtil.hasGuestUploadField(
-				_mockDDMFormInstance()));
+			_ddmFormGuestUploadFieldUtil.hasGuestUploadField(
+				mockDDMFormInstance()));
 	}
 
 	@Test
 	public void testMaxLimitWithGuestUserNotAllowed() throws Exception {
-		_addUploadField(false);
+		addUploadField(false);
 
 		Assert.assertFalse(
-			DDMFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
-				_mockDDMFormInstance(), _mockHttpServletRequest(false),
+			_ddmFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
+				mockDDMFormInstance(), mockHttpServletRequest(false),
 				_MAXIMUM_SUBMISSIONS));
 	}
 
 	@Test
 	public void testMaxLimitWithSignedInUser() throws Exception {
 		Assert.assertFalse(
-			DDMFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
-				_mockDDMFormInstance(), _mockHttpServletRequest(true),
+			_ddmFormGuestUploadFieldUtil.isMaximumSubmissionLimitReached(
+				mockDDMFormInstance(), mockHttpServletRequest(true),
 				_MAXIMUM_SUBMISSIONS));
 	}
 
-	protected static final JSONFactory jsonFactory = new JSONFactoryImpl();
-
-	private void _addUploadField(boolean allowGuestUsers) {
+	protected void addUploadField(boolean allowGuestUsers) {
 		DDMFormField ddmFormField = new DDMFormField(
 			"fieldName", "document_library");
 
@@ -189,7 +145,7 @@ public class DDMFormGuestUploadFieldUtilTest {
 		_ddmForm.addDDMFormField(ddmFormField);
 	}
 
-	private DDMStructure _createDDMStructure() {
+	protected DDMStructure createDDMStructure() {
 		DDMStructure ddmStructure = new DDMStructureImpl();
 
 		ddmStructure.setDDMForm(_ddmForm);
@@ -197,7 +153,7 @@ public class DDMFormGuestUploadFieldUtilTest {
 		return ddmStructure;
 	}
 
-	private DDMFormInstance _mockDDMFormInstance() throws Exception {
+	protected DDMFormInstance mockDDMFormInstance() throws Exception {
 		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
 
 		Mockito.when(
@@ -206,32 +162,32 @@ public class DDMFormGuestUploadFieldUtilTest {
 			_DDM_FORM_INSTANCE_ID
 		);
 
-		DDMStructure ddmStructure = _createDDMStructure();
-
 		Mockito.when(
 			ddmFormInstance.getStructure()
 		).thenReturn(
-			ddmStructure
+			createDDMStructure()
 		);
 
 		return ddmFormInstance;
 	}
 
-	private void _mockDDMFormInstanceLocalService(
+	protected void mockDDMFormInstanceLocalService(
 		List<DDMFormInstanceRecord> ddmFormInstanceRecords) {
 
 		Mockito.when(
 			_ddmFormInstanceRecordLocalService.getFormInstanceRecords(
-				Mockito.eq(_DDM_FORM_INSTANCE_ID),
-				Mockito.eq(WorkflowConstants.STATUS_ANY),
-				Mockito.eq(QueryUtil.ALL_POS), Mockito.eq(QueryUtil.ALL_POS),
-				Mockito.eq(null))
+				Matchers.eq(_DDM_FORM_INSTANCE_ID),
+				Matchers.eq(WorkflowConstants.STATUS_ANY),
+				Matchers.eq(QueryUtil.ALL_POS), Matchers.eq(QueryUtil.ALL_POS),
+				Matchers.eq(null))
 		).thenReturn(
 			ddmFormInstanceRecords
 		);
 	}
 
-	private DDMFormInstanceRecord _mockDDMFormInstanceRecord() {
+	protected DDMFormInstanceRecord mockDDMFormInstanceRecord()
+		throws Exception {
+
 		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
 			DDMFormInstanceRecord.class);
 
@@ -244,11 +200,11 @@ public class DDMFormGuestUploadFieldUtilTest {
 		return ddmFormInstanceRecord;
 	}
 
-	private HttpServletRequest _mockHttpServletRequest(boolean signedIn) {
+	protected HttpServletRequest mockHttpServletRequest(boolean signedIn) {
 		HttpServletRequest httpServletRequest = Mockito.mock(
 			HttpServletRequest.class);
 
-		ThemeDisplay themeDisplay = _mockThemeDisplay(signedIn);
+		ThemeDisplay themeDisplay = mockThemeDisplay(signedIn);
 
 		Mockito.when(
 			(ThemeDisplay)httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY)
@@ -265,7 +221,7 @@ public class DDMFormGuestUploadFieldUtilTest {
 		return httpServletRequest;
 	}
 
-	private ThemeDisplay _mockThemeDisplay(boolean signedIn) {
+	protected ThemeDisplay mockThemeDisplay(boolean signedIn) {
 		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
 
 		Mockito.when(
@@ -277,6 +233,19 @@ public class DDMFormGuestUploadFieldUtilTest {
 		return themeDisplay;
 	}
 
+	protected void setUpDDMForm() {
+		_ddmForm = DDMFormTestUtil.createDDMForm();
+	}
+
+	protected void setUpDDMFormInstanceRecordLocalService() throws Exception {
+		MemberMatcher.field(
+			DDMFormGuestUploadFieldUtil.class,
+			"_ddmFormInstanceRecordLocalService"
+		).set(
+			_ddmFormGuestUploadFieldUtil, _ddmFormInstanceRecordLocalService
+		);
+	}
+
 	private static final long _DDM_FORM_INSTANCE_ID =
 		RandomTestUtil.randomLong();
 
@@ -284,17 +253,12 @@ public class DDMFormGuestUploadFieldUtilTest {
 
 	private static final int _MAXIMUM_SUBMISSIONS = 5;
 
-	private static DDMForm _ddmForm;
-	private static final DDMFormDeserializer _ddmFormDeserializer =
-		new DDMFormJSONDeserializer();
-	private static ServiceRegistration<DDMFormDeserializer>
-		_ddmFormDeserializerServiceRegistration;
-	private static final DDMFormInstanceRecordLocalService
-		_ddmFormInstanceRecordLocalService = Mockito.mock(
-			DDMFormInstanceRecordLocalService.class);
-	private static ServiceRegistration<DDMFormInstanceRecordLocalService>
-		_ddmFormInstanceRecordLocalServiceServiceRegistration;
-	private static final MockedStatic<FrameworkUtil>
-		_frameworkUtilMockedStatic = Mockito.mockStatic(FrameworkUtil.class);
+	private DDMForm _ddmForm;
+	private final DDMFormGuestUploadFieldUtil _ddmFormGuestUploadFieldUtil =
+		new DDMFormGuestUploadFieldUtil();
+
+	@Mock
+	private DDMFormInstanceRecordLocalService
+		_ddmFormInstanceRecordLocalService;
 
 }

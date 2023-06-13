@@ -13,6 +13,7 @@
  */
 
 import {PortletBase, delegate, openSelectionModal} from 'frontend-js-web';
+import {Config} from 'metal-state';
 
 class PersonAccountEntryEventHandler extends PortletBase {
 
@@ -36,17 +37,7 @@ class PersonAccountEntryEventHandler extends PortletBase {
 	/**
 	 * @inheritDoc
 	 */
-	created(props) {
-		this.container = this._setElement(props.container);
-		this.removeUserIconMarkup = props.removeUserIconMarkup;
-		this.removeUserLinkSelector = props.removeUserLinkSelector;
-		this.searchContainerId = props.searchContainer;
-		this.selectUserButton = this._setElement(props.selectUserButton);
-		this.selectUserEventName = props.selectUserEventName;
-		this.selectUserURL = props.selectUserURL;
-		this.userIdInput = this._setElement(props.userIdInput);
-
-		this._handleOnSelect = this._handleOnSelect.bind(this);
+	created() {
 		this._handleSelectUserButtonClicked = this._handleSelectUserButtonClicked.bind(
 			this
 		);
@@ -71,9 +62,7 @@ class PersonAccountEntryEventHandler extends PortletBase {
 	}
 
 	_handleRemoveUserButtonClicked() {
-		const searchContainer = this._getSearchContainer();
-
-		searchContainer.deleteRow(1, searchContainer.getData());
+		this.searchContainer.deleteRow(1, this.searchContainer.getData());
 
 		this.userIdInput.value = null;
 	}
@@ -82,18 +71,10 @@ class PersonAccountEntryEventHandler extends PortletBase {
 		this._selectAccountUser();
 	}
 
-	_getSearchContainer() {
-		return Liferay.SearchContainer.get(this.ns(this.searchContainerId));
-	}
-
 	_selectAccountUser() {
 		openSelectionModal({
-			containerProps: {
-				className: '',
-			},
 			id: this.ns(this.selectUserEventName),
-			iframeBodyCssClass: '',
-			onSelect: this._handleOnSelect,
+			onSelect: this._handleOnSelect.bind(this),
 			selectEventName: this.ns(this.selectUserEventName),
 			selectedData: [this.userIdInput.value],
 			title: Liferay.Language.get('assign-user'),
@@ -109,19 +90,32 @@ class PersonAccountEntryEventHandler extends PortletBase {
 	}) {
 		this.userIdInput.value = userId;
 
-		const searchContainer = this._getSearchContainer();
-
-		searchContainer.deleteRow(1, searchContainer.getData());
-		searchContainer.addRow(
+		this.searchContainer.deleteRow(1, this.searchContainer.getData());
+		this.searchContainer.addRow(
 			[userName, emailAddress, jobTitle, this.removeUserIconMarkup],
 			userId
 		);
-		searchContainer.updateDataStore([userId]);
+		this.searchContainer.updateDataStore([userId]);
+	}
+
+	_setSearchContainer(searchContainerId) {
+		return Liferay.SearchContainer.get(this.ns(searchContainerId));
 	}
 
 	_setElement(selector) {
 		return this.one(selector);
 	}
 }
+
+PersonAccountEntryEventHandler.STATE = {
+	container: Config.string().setter('_setElement'),
+	removeUserIconMarkup: Config.string(),
+	removeUserLinkSelector: Config.string(),
+	searchContainer: Config.string().setter('_setSearchContainer'),
+	selectUserButton: Config.string().setter('_setElement'),
+	selectUserEventName: Config.string(),
+	selectUserURL: Config.string(),
+	userIdInput: Config.string().setter('_setElement'),
+};
 
 export default PersonAccountEntryEventHandler;

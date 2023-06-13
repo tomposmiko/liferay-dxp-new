@@ -26,7 +26,10 @@ import com.liferay.knowledge.base.service.KBArticleLocalService;
 import com.liferay.knowledge.base.service.KBArticleLocalServiceUtil;
 import com.liferay.knowledge.base.service.persistence.KBArticleFinder;
 import com.liferay.knowledge.base.service.persistence.KBArticlePersistence;
-import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.knowledge.base.service.persistence.KBCommentPersistence;
+import com.liferay.knowledge.base.service.persistence.KBFolderFinder;
+import com.liferay.knowledge.base.service.persistence.KBFolderPersistence;
+import com.liferay.knowledge.base.service.persistence.KBTemplatePersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -49,17 +52,13 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -483,11 +482,6 @@ public abstract class KBArticleLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement KBArticleLocalServiceImpl#deleteKBArticle(KBArticle) to avoid orphaned data");
-		}
-
 		return kbArticleLocalService.deleteKBArticle((KBArticle)persistedModel);
 	}
 
@@ -613,7 +607,7 @@ public abstract class KBArticleLocalServiceBaseImpl
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			KBArticleLocalService.class, IdentifiableOSGiService.class,
-			CTService.class, PersistedModelLocalService.class
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -634,22 +628,8 @@ public abstract class KBArticleLocalServiceBaseImpl
 		return KBArticleLocalService.class.getName();
 	}
 
-	@Override
-	public CTPersistence<KBArticle> getCTPersistence() {
-		return kbArticlePersistence;
-	}
-
-	@Override
-	public Class<KBArticle> getModelClass() {
+	protected Class<?> getModelClass() {
 		return KBArticle.class;
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<KBArticle>, R, E> updateUnsafeFunction)
-		throws E {
-
-		return updateUnsafeFunction.apply(kbArticlePersistence);
 	}
 
 	protected String getModelClassName() {
@@ -705,10 +685,31 @@ public abstract class KBArticleLocalServiceBaseImpl
 	protected KBArticleFinder kbArticleFinder;
 
 	@Reference
+	protected KBCommentPersistence kbCommentPersistence;
+
+	@Reference
+	protected KBFolderPersistence kbFolderPersistence;
+
+	@Reference
+	protected KBFolderFinder kbFolderFinder;
+
+	@Reference
+	protected KBTemplatePersistence kbTemplatePersistence;
+
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		KBArticleLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Brian Wing Shun Chan
+ * @see DDLRecordSetServiceSoap
  * @generated
  */
 public class DDLRecordSetServiceHttp {

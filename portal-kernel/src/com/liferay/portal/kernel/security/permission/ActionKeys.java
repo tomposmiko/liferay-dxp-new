@@ -155,8 +155,6 @@ public class ActionKeys {
 
 	public static final String DELETE_USER = "DELETE_USER";
 
-	public static final String DOWNLOAD = "DOWNLOAD";
-
 	public static final String EXPIRE = "EXPIRE";
 
 	public static final String EXPORT_ALL_EVENTS = "EXPORT_ALL_EVENTS";
@@ -241,14 +239,7 @@ public class ActionKeys {
 
 	public static final String UPDATE_DISCUSSION = "UPDATE_DISCUSSION";
 
-	public static final String UPDATE_LAYOUT_ADVANCED_OPTIONS =
-		"UPDATE_LAYOUT_ADVANCED_OPTIONS";
-
-	public static final String UPDATE_LAYOUT_BASIC = "UPDATE_LAYOUT_BASIC";
-
 	public static final String UPDATE_LAYOUT_CONTENT = "UPDATE_LAYOUT_CONTENT";
-
-	public static final String UPDATE_LAYOUT_LIMITED = "UPDATE_LAYOUT_LIMITED";
 
 	public static final String UPDATE_THREAD_PRIORITY =
 		"UPDATE_THREAD_PRIORITY";

@@ -20,6 +20,7 @@ import com.liferay.commerce.discount.service.CommerceDiscountService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Discount;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountSku;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountSkuDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v2_0.DiscountSkuUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountSkuResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
@@ -27,7 +28,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -37,6 +37,8 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -45,6 +47,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Zoltán Takács
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/discount-sku.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {DiscountSkuResource.class, NestedFieldSupport.class}
@@ -78,7 +81,7 @@ public class DiscountSkuResourceImpl
 
 	@Override
 	public DiscountSku postDiscountIdDiscountSku(
-			Long id, DiscountSku discountSku)
+			@NotNull Long id, DiscountSku discountSku)
 		throws Exception {
 
 		CommerceDiscountRel commerceDiscountRel =
@@ -132,11 +135,8 @@ public class DiscountSkuResourceImpl
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountSkuDTOConverter)"
-	)
-	private DTOConverter<CommerceDiscountRel, DiscountSku>
-		_discountSkuDTOConverter;
+	@Reference
+	private DiscountSkuDTOConverter _discountSkuDTOConverter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

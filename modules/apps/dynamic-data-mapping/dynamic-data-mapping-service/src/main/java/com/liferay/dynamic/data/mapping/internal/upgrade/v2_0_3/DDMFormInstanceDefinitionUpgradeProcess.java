@@ -54,7 +54,7 @@ public class DDMFormInstanceDefinitionUpgradeProcess extends UpgradeProcess {
 					String definition = resultSet.getString("definition");
 
 					preparedStatement2.setString(
-						1, _updateFieldsToLocalizable(definition));
+						1, updateFieldsToLocalizable(definition));
 
 					long structureId = resultSet.getLong("structureId");
 
@@ -68,7 +68,7 @@ public class DDMFormInstanceDefinitionUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateFieldsToLocalizable(JSONArray fieldsJSONArray) {
+	protected void updateFieldsToLocalizable(JSONArray fieldsJSONArray) {
 		for (int i = 0; i < fieldsJSONArray.length(); i++) {
 			JSONObject fieldJSONObject = fieldsJSONArray.getJSONObject(i);
 
@@ -78,12 +78,12 @@ public class DDMFormInstanceDefinitionUpgradeProcess extends UpgradeProcess {
 				"nestedFields");
 
 			if (nestedFieldsJSONArray != null) {
-				_updateFieldsToLocalizable(nestedFieldsJSONArray);
+				updateFieldsToLocalizable(nestedFieldsJSONArray);
 			}
 		}
 	}
 
-	private String _updateFieldsToLocalizable(String definition)
+	protected String updateFieldsToLocalizable(String definition)
 		throws PortalException {
 
 		JSONObject ddmFormJSONObject = _jsonFactory.createJSONObject(
@@ -91,9 +91,9 @@ public class DDMFormInstanceDefinitionUpgradeProcess extends UpgradeProcess {
 
 		JSONArray fieldsJSONArray = ddmFormJSONObject.getJSONArray("fields");
 
-		_updateFieldsToLocalizable(fieldsJSONArray);
+		updateFieldsToLocalizable(fieldsJSONArray);
 
-		return ddmFormJSONObject.toString();
+		return ddmFormJSONObject.toJSONString();
 	}
 
 	private final JSONFactory _jsonFactory;

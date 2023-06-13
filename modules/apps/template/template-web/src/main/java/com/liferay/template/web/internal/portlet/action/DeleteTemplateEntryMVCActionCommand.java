@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + TemplatePortletKeys.TEMPLATE,
 		"mvc.command.name=/template/delete_template_entry"
@@ -63,7 +64,7 @@ public class DeleteTemplateEntryMVCActionCommand
 				_templateEntryLocalService.deleteTemplateEntry(
 					deleteTemplateEntryId);
 
-			_ddmTemplateLocalService.deleteTemplate(
+			_ddmTemplateLocalService.deleteDDMTemplate(
 				templateEntry.getDDMTemplateId());
 		}
 	}

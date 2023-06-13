@@ -40,6 +40,8 @@ public class RankingIndexCreatorImplTest extends BaseRankingsIndexTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_rankingIndexCreatorImpl = new RankingIndexCreatorImpl();
 
 		ReflectionTestUtil.setFieldValue(
@@ -56,7 +58,7 @@ public class RankingIndexCreatorImplTest extends BaseRankingsIndexTestCase {
 		Mockito.verify(
 			searchEngineAdapter, Mockito.times(1)
 		).execute(
-			(CreateIndexRequest)Mockito.any()
+			(CreateIndexRequest)Mockito.anyObject()
 		);
 	}
 
@@ -69,7 +71,7 @@ public class RankingIndexCreatorImplTest extends BaseRankingsIndexTestCase {
 		Mockito.verify(
 			searchEngineAdapter, Mockito.times(1)
 		).execute(
-			(DeleteIndexRequest)Mockito.any()
+			(DeleteIndexRequest)Mockito.anyObject()
 		);
 	}
 

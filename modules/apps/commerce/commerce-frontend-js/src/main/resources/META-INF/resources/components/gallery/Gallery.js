@@ -64,15 +64,13 @@ export default class Gallery extends React.Component {
 
 		updateGallery(formFields, namespace, viewCPAttachmentURL).then(
 			(selectedImage) => {
-				const selectedImageIndex =
-					this.state.images.length > 1
+				const selected =
+					this.state.images > 1
 						? this.state.images.findIndex(
-								({URL}) => URL === selectedImage[0].url
+								({downloadUrl}) =>
+									downloadUrl === selectedImage[0].URL
 						  )
 						: 0;
-
-				const selected =
-					selectedImageIndex >= 0 ? selectedImageIndex : 0;
 
 				this.setState({selected});
 			}
@@ -145,7 +143,7 @@ export default class Gallery extends React.Component {
 
 		return (
 			<div className="product-gallery">
-				{images && !!images.length && (
+				{images && images.length > 0 && (
 					<MainImage
 						adaptiveMediaImageHTMLTag={
 							images[selected].adaptiveMediaImageHTMLTag
@@ -191,9 +189,9 @@ Gallery.propTypes = {
 	background: PropTypes.string,
 	images: PropTypes.arrayOf(
 		PropTypes.shape({
-			URL: PropTypes.string.isRequired,
-			thumbnailURL: PropTypes.string.isRequired,
+			thumbnailUrl: PropTypes.string.isRequired,
 			title: PropTypes.string.isRequired,
+			url: PropTypes.string.isRequired,
 		})
 	),
 	namespace: PropTypes.string,

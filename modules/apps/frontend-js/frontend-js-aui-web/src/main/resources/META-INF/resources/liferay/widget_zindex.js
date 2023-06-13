@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-widget-zindex',
 	(A) => {
-		const STR_HOST = 'host';
+		var STR_HOST = 'host';
 
-		const WidgetZIndex = A.Component.create({
+		var WidgetZIndex = A.Component.create({
 			EXTENDS: A.Plugin.Base,
 
 			NAME: 'widgetzindex',
@@ -26,7 +26,7 @@ AUI.add(
 
 			prototype: {
 				_setHostZIndex() {
-					const instance = this;
+					var instance = this;
 
 					instance
 						.get(STR_HOST)
@@ -34,9 +34,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
 					if (!host.get('rendered') && host.get('visible')) {
 						instance._setHostZIndex();

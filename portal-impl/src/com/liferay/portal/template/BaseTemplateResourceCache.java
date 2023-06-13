@@ -14,11 +14,11 @@
 
 package com.liferay.portal.template;
 
+import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheException;
-import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.PortalCacheListener;
-import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
+import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.template.StringTemplateResource;
@@ -125,33 +125,65 @@ public abstract class BaseTemplateResourceCache
 		_singleVMPortalCache.remove(templateId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public void setSecondLevelPortalCache(
+		PortalCache<TemplateResource, ?> portalCache) {
+
+		if (!isEnabled()) {
+			return;
+		}
+
+		_setSecondLevelPortalCache(portalCache);
+	}
+
 	protected void destroy() {
-		PortalCacheHelperUtil.removePortalCache(
-			PortalCacheManagerNames.MULTI_VM,
+		_multiVMPool.removePortalCache(
 			_multiVMPortalCache.getPortalCacheName());
 
-		PortalCacheHelperUtil.removePortalCache(
-			PortalCacheManagerNames.SINGLE_VM,
+		_singleVMPool.removePortalCache(
 			_singleVMPortalCache.getPortalCacheName());
 
-		PortalCacheHelperUtil.removePortalCache(
-			PortalCacheManagerNames.SINGLE_VM,
+		_singleVMPool.removePortalCache(
 			_secondLevelPortalCache.getPortalCacheName());
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *          #init(long, MultiVMPool, SingleVMPool, String, String)}
+	 */
+	@Deprecated
 	protected void init(
-		long modificationCheckInterval, String portalCacheName,
+		long modificationCheckInterval, MultiVMPool multiVMPool,
+		SingleVMPool singleVMPool, String portalCacheName) {
+
+		init(
+			modificationCheckInterval, multiVMPool, singleVMPool,
+			portalCacheName, null);
+	}
+
+	protected void init(
+		long modificationCheckInterval, MultiVMPool multiVMPool,
+		SingleVMPool singleVMPool, String portalCacheName,
 		String secondLevelPortalCacheName) {
 
 		_modificationCheckInterval = modificationCheckInterval;
+		_multiVMPool = multiVMPool;
+		_singleVMPool = singleVMPool;
 
-		_multiVMPortalCache = PortalCacheHelperUtil.getPortalCache(
-			PortalCacheManagerNames.MULTI_VM, portalCacheName);
-		_singleVMPortalCache = PortalCacheHelperUtil.getPortalCache(
-			PortalCacheManagerNames.SINGLE_VM, portalCacheName);
+		_multiVMPortalCache =
+			(PortalCache<String, TemplateResource>)multiVMPool.getPortalCache(
+				portalCacheName);
+		_singleVMPortalCache =
+			(PortalCache<String, TemplateResource>)singleVMPool.getPortalCache(
+				portalCacheName);
 
-		_secondLevelPortalCache = PortalCacheHelperUtil.getPortalCache(
-			PortalCacheManagerNames.SINGLE_VM, secondLevelPortalCacheName);
+		_secondLevelPortalCache =
+			(PortalCache<TemplateResource, ?>)_singleVMPool.getPortalCache(
+				secondLevelPortalCacheName);
 
 		_setSecondLevelPortalCache(_secondLevelPortalCache);
 	}
@@ -182,8 +214,10 @@ public abstract class BaseTemplateResourceCache
 		BaseTemplateResourceCache.class);
 
 	private volatile long _modificationCheckInterval;
+	private MultiVMPool _multiVMPool;
 	private PortalCache<String, TemplateResource> _multiVMPortalCache;
 	private PortalCache<TemplateResource, ?> _secondLevelPortalCache;
+	private SingleVMPool _singleVMPool;
 	private PortalCache<String, TemplateResource> _singleVMPortalCache;
 
 	private class TemplateResourcePortalCacheListener

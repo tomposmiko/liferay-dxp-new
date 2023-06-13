@@ -76,7 +76,7 @@ public class DB2DBTest extends BaseDBTestCase {
 	@Test
 	public void testRewordRenameTable() throws Exception {
 		Assert.assertEquals(
-			"rename table a to b;\n", buildSQL(RENAME_TABLE_QUERY));
+			"alter table a to b;\n", buildSQL(RENAME_TABLE_QUERY));
 	}
 
 	@Override

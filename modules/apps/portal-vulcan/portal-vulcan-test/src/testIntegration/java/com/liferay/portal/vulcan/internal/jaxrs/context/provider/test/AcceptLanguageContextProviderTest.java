@@ -116,8 +116,8 @@ public class AcceptLanguageContextProviderTest {
 	}
 
 	@Test
-	public void testCreateContextWithGuestUser() throws Exception {
-		User user = _company.getGuestUser();
+	public void testCreateContextWithDefaultUser() throws Exception {
+		User user = _company.getDefaultUser();
 
 		_testCreateContext(LocaleUtil.TAIWAN, user);
 	}
@@ -213,7 +213,7 @@ public class AcceptLanguageContextProviderTest {
 
 			addHeader("Host", _company.getVirtualHostname());
 
-			if (!user.isGuestUser()) {
+			if (!user.isDefaultUser()) {
 				setAttribute(WebKeys.USER_ID, user.getUserId());
 			}
 

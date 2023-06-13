@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -181,39 +180,6 @@ public class PageSettings implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected SEOSettings seoSettings;
 
-	@Schema(description = "The page's site navigation menu settings.")
-	@Valid
-	public SitePageNavigationMenuSettings getSitePageNavigationMenuSettings() {
-		return sitePageNavigationMenuSettings;
-	}
-
-	public void setSitePageNavigationMenuSettings(
-		SitePageNavigationMenuSettings sitePageNavigationMenuSettings) {
-
-		this.sitePageNavigationMenuSettings = sitePageNavigationMenuSettings;
-	}
-
-	@JsonIgnore
-	public void setSitePageNavigationMenuSettings(
-		UnsafeSupplier<SitePageNavigationMenuSettings, Exception>
-			sitePageNavigationMenuSettingsUnsafeSupplier) {
-
-		try {
-			sitePageNavigationMenuSettings =
-				sitePageNavigationMenuSettingsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The page's site navigation menu settings.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected SitePageNavigationMenuSettings sitePageNavigationMenuSettings;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -291,16 +257,6 @@ public class PageSettings implements Serializable {
 			sb.append(String.valueOf(seoSettings));
 		}
 
-		if (sitePageNavigationMenuSettings != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"sitePageNavigationMenuSettings\": ");
-
-			sb.append(String.valueOf(sitePageNavigationMenuSettings));
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -314,9 +270,9 @@ public class PageSettings implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -342,7 +298,7 @@ public class PageSettings implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -374,7 +330,7 @@ public class PageSettings implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -390,10 +346,5 @@ public class PageSettings implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

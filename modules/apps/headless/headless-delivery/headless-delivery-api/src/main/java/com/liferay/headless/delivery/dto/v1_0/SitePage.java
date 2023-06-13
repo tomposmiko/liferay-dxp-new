@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -409,32 +408,6 @@ public class SitePage implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> friendlyUrlPath_i18n;
 
-	@Schema(description = "The page ID.")
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	@JsonIgnore
-	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
-		try {
-			id = idUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The page ID.")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Long id;
-
 	@Schema(description = "A list of keywords describing the page.")
 	public String[] getKeywords() {
 		return keywords;
@@ -497,36 +470,6 @@ public class SitePage implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected PageDefinition pageDefinition;
 
-	@Schema(description = "The page's permissions.")
-	@Valid
-	public PagePermission[] getPagePermissions() {
-		return pagePermissions;
-	}
-
-	public void setPagePermissions(PagePermission[] pagePermissions) {
-		this.pagePermissions = pagePermissions;
-	}
-
-	@JsonIgnore
-	public void setPagePermissions(
-		UnsafeSupplier<PagePermission[], Exception>
-			pagePermissionsUnsafeSupplier) {
-
-		try {
-			pagePermissions = pagePermissionsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(description = "The page's permissions.")
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected PagePermission[] pagePermissions;
-
 	@Schema(description = "Settings of the page, such as SEO or OpenGraph.")
 	@Valid
 	public PageSettings getPageSettings() {
@@ -585,38 +528,6 @@ public class SitePage implements Serializable {
 	@GraphQLField(description = "The type of the page.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String pageType;
-
-	@Schema(description = "The parent page or null if it is a top level page.")
-	@Valid
-	public ParentSitePage getParentSitePage() {
-		return parentSitePage;
-	}
-
-	public void setParentSitePage(ParentSitePage parentSitePage) {
-		this.parentSitePage = parentSitePage;
-	}
-
-	@JsonIgnore
-	public void setParentSitePage(
-		UnsafeSupplier<ParentSitePage, Exception>
-			parentSitePageUnsafeSupplier) {
-
-		try {
-			parentSitePage = parentSitePageUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "The parent page or null if it is a top level page."
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ParentSitePage parentSitePage;
 
 	@Schema(
 		description = "Metadata of the page such as it's master page and template."
@@ -1050,16 +961,6 @@ public class SitePage implements Serializable {
 			sb.append(_toJSON(friendlyUrlPath_i18n));
 		}
 
-		if (id != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"id\": ");
-
-			sb.append(id);
-		}
-
 		if (keywords != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1094,26 +995,6 @@ public class SitePage implements Serializable {
 			sb.append(String.valueOf(pageDefinition));
 		}
 
-		if (pagePermissions != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"pagePermissions\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < pagePermissions.length; i++) {
-				sb.append(String.valueOf(pagePermissions[i]));
-
-				if ((i + 1) < pagePermissions.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		if (pageSettings != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1136,16 +1017,6 @@ public class SitePage implements Serializable {
 			sb.append(_escape(pageType));
 
 			sb.append("\"");
-		}
-
-		if (parentSitePage != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"parentSitePage\": ");
-
-			sb.append(String.valueOf(parentSitePage));
 		}
 
 		if (renderedPage != null) {
@@ -1311,9 +1182,9 @@ public class SitePage implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -1339,7 +1210,7 @@ public class SitePage implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -1371,7 +1242,7 @@ public class SitePage implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -1387,10 +1258,5 @@ public class SitePage implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

@@ -25,7 +25,8 @@ import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.service.ExpandoColumnService;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.Field;
@@ -33,7 +34,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
@@ -63,6 +64,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-expando",
@@ -80,8 +82,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ExpandoPortletKeys.EXPANDO,
-		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.version=3.0"
+		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
 )
@@ -120,10 +121,12 @@ public class ExpandoPortlet extends MVCPortlet {
 		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
 			themeDisplay.getCompanyId(), modelResource, resourcePrimKey);
 
-		expandoBridge.addAttribute(
-			name, type, _getDefaultValue(actionRequest, type));
+		expandoBridge.addAttribute(name, type);
 
-		_updateProperties(actionRequest, expandoBridge, name);
+		expandoBridge.setAttributeDefault(
+			name, getDefaultValue(actionRequest, type));
+
+		updateProperties(actionRequest, expandoBridge, name);
 	}
 
 	public void deleteExpando(
@@ -161,15 +164,16 @@ public class ExpandoPortlet extends MVCPortlet {
 
 		String name = ParamUtil.getString(actionRequest, "name");
 
+		int type = ParamUtil.getInteger(actionRequest, "type");
+
+		Serializable defaultValue = getDefaultValue(actionRequest, type);
+
 		ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
 			themeDisplay.getCompanyId(), modelResource, resourcePrimKey);
 
-		expandoBridge.setAttributeDefault(
-			name,
-			_getDefaultValue(
-				actionRequest, ParamUtil.getInteger(actionRequest, "type")));
+		expandoBridge.setAttributeDefault(name, defaultValue);
 
-		_updateProperties(actionRequest, expandoBridge, name);
+		updateProperties(actionRequest, expandoBridge, name);
 	}
 
 	@Override
@@ -184,14 +188,7 @@ public class ExpandoPortlet extends MVCPortlet {
 			SessionErrors.contains(
 				renderRequest, DuplicateColumnNameException.class.getName()) ||
 			SessionErrors.contains(
-				renderRequest,
-				ValueDataException.MismatchColumnType.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest,
-				ValueDataException.MustInformDefaultLocale.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest,
-				ValueDataException.UnsupportedColumnType.class.getName())) {
+				renderRequest, ValueDataException.class.getName())) {
 
 			include("/edit/expando.jsp", renderRequest, renderResponse);
 		}
@@ -207,96 +204,26 @@ public class ExpandoPortlet extends MVCPortlet {
 		}
 	}
 
-	@Override
-	protected boolean isSessionErrorException(Throwable throwable) {
-		if (throwable instanceof ColumnNameException ||
-			throwable instanceof ColumnTypeException ||
-			throwable instanceof DuplicateColumnNameException ||
-			throwable instanceof NoSuchColumnException ||
-			throwable instanceof PrincipalException ||
-			throwable instanceof ValueDataException) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private Serializable _getDefaultValue(ActionRequest actionRequest, int type)
+	protected Serializable getDefaultValue(
+			ActionRequest actionRequest, int type)
 		throws Exception {
 
 		if (type == ExpandoColumnConstants.GEOLOCATION) {
-			return _jsonFactory.createJSONObject(
+			return JSONFactoryUtil.createJSONObject(
 				ParamUtil.getString(actionRequest, "defaultValue"));
 		}
 
 		if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
-			return (Serializable)_localization.getLocalizationMap(
+			return (Serializable)LocalizationUtil.getLocalizationMap(
 				actionRequest, "defaultValueLocalized");
 		}
 
-		return _getValue(actionRequest, "defaultValue", type);
+		return getValue(actionRequest, "defaultValue", type);
 	}
 
-	private int _getNumberType(
-		String dataType, String precisionType, int type) {
-
-		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_DECIMAL) &&
-			precisionType.equals(ExpandoColumnConstants.PRECISION_64_BIT)) {
-
-			if (type == ExpandoColumnConstants.STRING_ARRAY) {
-				return ExpandoColumnConstants.DOUBLE_ARRAY;
-			}
-
-			return ExpandoColumnConstants.DOUBLE;
-		}
-
-		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_DECIMAL) &&
-			precisionType.equals(ExpandoColumnConstants.PRECISION_32_BIT)) {
-
-			if (type == ExpandoColumnConstants.STRING_ARRAY) {
-				return ExpandoColumnConstants.FLOAT_ARRAY;
-			}
-
-			return ExpandoColumnConstants.FLOAT;
-		}
-
-		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_INTEGER) &&
-			precisionType.equals(ExpandoColumnConstants.PRECISION_64_BIT)) {
-
-			if (type == ExpandoColumnConstants.STRING_ARRAY) {
-				return ExpandoColumnConstants.LONG_ARRAY;
-			}
-
-			return ExpandoColumnConstants.LONG;
-		}
-
-		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_INTEGER) &&
-			precisionType.equals(ExpandoColumnConstants.PRECISION_32_BIT)) {
-
-			if (type == ExpandoColumnConstants.STRING_ARRAY) {
-				return ExpandoColumnConstants.INTEGER_ARRAY;
-			}
-
-			return ExpandoColumnConstants.INTEGER;
-		}
-
-		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_INTEGER) &&
-			precisionType.equals(ExpandoColumnConstants.PRECISION_16_BIT)) {
-
-			if (type == ExpandoColumnConstants.STRING_ARRAY) {
-				return ExpandoColumnConstants.SHORT_ARRAY;
-			}
-
-			return ExpandoColumnConstants.SHORT;
-		}
-
-		return 0;
-	}
-
-	private Serializable _getValue(
+	protected Serializable getValue(
 			PortletRequest portletRequest, String name, int type)
-		throws Exception {
+		throws PortalException {
 
 		String delimiter = StringPool.COMMA;
 
@@ -433,7 +360,29 @@ public class ExpandoPortlet extends MVCPortlet {
 		return value;
 	}
 
-	private void _updateProperties(
+	@Override
+	protected boolean isSessionErrorException(Throwable throwable) {
+		if (throwable instanceof ColumnNameException ||
+			throwable instanceof ColumnTypeException ||
+			throwable instanceof DuplicateColumnNameException ||
+			throwable instanceof NoSuchColumnException ||
+			throwable instanceof PrincipalException ||
+			throwable instanceof ValueDataException) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Reference(unbind = "-")
+	protected void setExpandoColumnService(
+		ExpandoColumnService expandoColumnService) {
+
+		_expandoColumnService = expandoColumnService;
+	}
+
+	protected void updateProperties(
 			ActionRequest actionRequest, ExpandoBridge expandoBridge,
 			String name)
 		throws Exception {
@@ -452,14 +401,63 @@ public class ExpandoPortlet extends MVCPortlet {
 		expandoBridge.setAttributeProperties(name, unicodeProperties);
 	}
 
-	@Reference
+	private int _getNumberType(
+		String dataType, String precisionType, int type) {
+
+		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_DECIMAL) &&
+			precisionType.equals(ExpandoColumnConstants.PRECISION_64_BIT)) {
+
+			if (type == ExpandoColumnConstants.STRING_ARRAY) {
+				return ExpandoColumnConstants.DOUBLE_ARRAY;
+			}
+
+			return ExpandoColumnConstants.DOUBLE;
+		}
+
+		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_DECIMAL) &&
+			precisionType.equals(ExpandoColumnConstants.PRECISION_32_BIT)) {
+
+			if (type == ExpandoColumnConstants.STRING_ARRAY) {
+				return ExpandoColumnConstants.FLOAT_ARRAY;
+			}
+
+			return ExpandoColumnConstants.FLOAT;
+		}
+
+		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_INTEGER) &&
+			precisionType.equals(ExpandoColumnConstants.PRECISION_64_BIT)) {
+
+			if (type == ExpandoColumnConstants.STRING_ARRAY) {
+				return ExpandoColumnConstants.LONG_ARRAY;
+			}
+
+			return ExpandoColumnConstants.LONG;
+		}
+
+		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_INTEGER) &&
+			precisionType.equals(ExpandoColumnConstants.PRECISION_32_BIT)) {
+
+			if (type == ExpandoColumnConstants.STRING_ARRAY) {
+				return ExpandoColumnConstants.INTEGER_ARRAY;
+			}
+
+			return ExpandoColumnConstants.INTEGER;
+		}
+
+		if (dataType.equals(ExpandoColumnConstants.DATA_TYPE_INTEGER) &&
+			precisionType.equals(ExpandoColumnConstants.PRECISION_16_BIT)) {
+
+			if (type == ExpandoColumnConstants.STRING_ARRAY) {
+				return ExpandoColumnConstants.SHORT_ARRAY;
+			}
+
+			return ExpandoColumnConstants.SHORT;
+		}
+
+		return 0;
+	}
+
 	private ExpandoColumnService _expandoColumnService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

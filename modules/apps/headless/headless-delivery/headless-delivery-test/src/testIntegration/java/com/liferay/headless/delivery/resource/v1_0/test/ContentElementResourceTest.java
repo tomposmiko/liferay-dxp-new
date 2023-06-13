@@ -18,16 +18,14 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.ContentElement;
+import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
-import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.odata.entity.EntityField;
 
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,20 +39,70 @@ public class ContentElementResourceTest
 
 	@Override
 	@Test
-	public void testGetAssetLibraryContentElementsPageWithSortDouble()
+	public void testGetAssetLibraryContentElementsPageWithSortString()
 		throws Exception {
 
-		testGetAssetLibraryContentElementsPageWithSort(
-			EntityField.Type.DOUBLE, _getUnsafeTriConsumer());
+		ContentElement contentElement1 = _toContentElement(
+			JournalTestUtil.addArticle(
+				testDepotEntry.getGroupId(),
+				"a" + RandomTestUtil.randomString(),
+				RandomTestUtil.randomString()));
+		ContentElement contentElement2 = _toContentElement(
+			JournalTestUtil.addArticle(
+				testDepotEntry.getGroupId(),
+				"b" + RandomTestUtil.randomString(),
+				RandomTestUtil.randomString()));
+
+		Page<ContentElement> ascPage =
+			contentElementResource.getAssetLibraryContentElementsPage(
+				testGetAssetLibraryContentElementsPage_getAssetLibraryId(),
+				null, null, null, Pagination.of(1, 2), "title:asc");
+
+		assertEquals(
+			Arrays.asList(contentElement1, contentElement2),
+			(List<ContentElement>)ascPage.getItems());
+
+		Page<ContentElement> descPage =
+			contentElementResource.getAssetLibraryContentElementsPage(
+				testGetAssetLibraryContentElementsPage_getAssetLibraryId(),
+				null, null, null, Pagination.of(1, 2), "title:desc");
+
+		assertEquals(
+			Arrays.asList(contentElement2, contentElement1),
+			(List<ContentElement>)descPage.getItems());
 	}
 
 	@Override
 	@Test
-	public void testGetSiteContentElementsPageWithSortDouble()
+	public void testGetSiteContentElementsPageWithSortString()
 		throws Exception {
 
-		testGetSiteContentElementsPageWithSort(
-			EntityField.Type.DOUBLE, _getUnsafeTriConsumer());
+		ContentElement contentElement1 = _toContentElement(
+			JournalTestUtil.addArticle(
+				testGroup.getGroupId(), "a" + RandomTestUtil.randomString(),
+				RandomTestUtil.randomString()));
+		ContentElement contentElement2 = _toContentElement(
+			JournalTestUtil.addArticle(
+				testGroup.getGroupId(), "b" + RandomTestUtil.randomString(),
+				RandomTestUtil.randomString()));
+
+		Page<ContentElement> ascPage =
+			contentElementResource.getSiteContentElementsPage(
+				testGroup.getGroupId(), null, null, null, Pagination.of(1, 2),
+				"title:asc");
+
+		assertEquals(
+			Arrays.asList(contentElement1, contentElement2),
+			(List<ContentElement>)ascPage.getItems());
+
+		Page<ContentElement> descPage =
+			contentElementResource.getSiteContentElementsPage(
+				testGroup.getGroupId(), null, null, null, Pagination.of(1, 2),
+				"title:desc");
+
+		assertEquals(
+			Arrays.asList(contentElement2, contentElement1),
+			(List<ContentElement>)descPage.getItems());
 	}
 
 	@Override
@@ -63,41 +111,10 @@ public class ContentElementResourceTest
 	}
 
 	@Override
-	protected String getFilterString(
-		EntityField entityField, String operator,
-		ContentElement contentElement) {
-
-		String entityFieldName = entityField.getName();
-
-		if (entityFieldName.equals("priority")) {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append(entityFieldName);
-			sb.append(" ");
-			sb.append(operator);
-			sb.append(" ");
-			sb.append(String.valueOf(_get(contentElement, entityFieldName)));
-
-			return sb.toString();
-		}
-
-		return super.getFilterString(entityField, operator, contentElement);
-	}
-
-	@Override
 	protected String[] getIgnoredEntityFieldNames() {
 		return new String[] {
 			"contentType", "creatorId", "dateCreated", "dateModified"
 		};
-	}
-
-	@Override
-	protected ContentElement randomContentElement() throws Exception {
-		ContentElement contentElement = super.randomContentElement();
-
-		_put(contentElement, "priority", RandomTestUtil.randomDouble());
-
-		return contentElement;
 	}
 
 	@Override
@@ -109,9 +126,7 @@ public class ContentElementResourceTest
 		DepotEntry depotEntry = DepotEntryLocalServiceUtil.getDepotEntry(
 			assetLibraryId);
 
-		return _addContentElement(
-			contentElement, (Double)_get(contentElement, "priority"),
-			depotEntry.getGroupId());
+		return _getContentElement(depotEntry.getGroupId());
 	}
 
 	@Override
@@ -119,61 +134,18 @@ public class ContentElementResourceTest
 			Long siteId, ContentElement contentElement)
 		throws Exception {
 
-		return _addContentElement(
-			contentElement, (Double)_get(contentElement, "priority"), siteId);
+		return _getContentElement(siteId);
 	}
 
 	@Override
 	protected ContentElement testGraphQLContentElement_addContentElement()
 		throws Exception {
 
-		return _addContentElement(
-			randomContentElement(), null, testGroup.getGroupId());
+		return _getContentElement(testGroup.getGroupId());
 	}
 
-	private ContentElement _addContentElement(
-			ContentElement contentElement, Double priority, Long siteId)
-		throws Exception {
-
-		contentElement = _toContentElement(
-			JournalTestUtil.addArticle(
-				siteId, 0L, String.valueOf(contentElement.getId()),
-				contentElement.getTitle(), contentElement.getTitle(),
-				contentElement.getTitle(), priority));
-
-		_put(contentElement, "priority", priority);
-
-		return contentElement;
-	}
-
-	private Object _get(ContentElement contentElement, String fieldName) {
-		Map<String, Object> fieldValueMap = _fieldValueMaps.get(contentElement);
-
-		if (fieldValueMap == null) {
-			return null;
-		}
-
-		return fieldValueMap.getOrDefault(fieldName, null);
-	}
-
-	private UnsafeTriConsumer
-		<EntityField, ContentElement, ContentElement, Exception>
-			_getUnsafeTriConsumer() {
-
-		return (entityField, contentElement1, contentElement2) -> {
-			_put(contentElement1, entityField.getName(), 0.1);
-			_put(contentElement2, entityField.getName(), 0.5);
-		};
-	}
-
-	private void _put(
-		ContentElement contentElement, String fieldName, Object fieldValue) {
-
-		_fieldValueMaps.computeIfAbsent(
-			contentElement, key -> new HashMap<>()
-		).put(
-			fieldName, fieldValue
-		);
+	private ContentElement _getContentElement(long groupId) throws Exception {
+		return _toContentElement(JournalTestUtil.addArticle(groupId, 0));
 	}
 
 	private ContentElement _toContentElement(JournalArticle journalArticle) {
@@ -184,8 +156,5 @@ public class ContentElementResourceTest
 			}
 		};
 	}
-
-	private final Map<ContentElement, Map<String, Object>> _fieldValueMaps =
-		new IdentityHashMap<>();
 
 }

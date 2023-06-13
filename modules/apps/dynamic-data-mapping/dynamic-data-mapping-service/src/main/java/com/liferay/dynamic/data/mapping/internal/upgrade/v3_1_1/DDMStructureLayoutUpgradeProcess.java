@@ -30,12 +30,12 @@ public class DDMStructureLayoutUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeSchema();
+		upgradeSchema();
 
-		_populateFields();
+		populateFields();
 	}
 
-	private void _populateFields() throws Exception {
+	protected void populateFields() throws Exception {
 		long classNameId = PortalUtil.getClassNameId(DDMStructure.class);
 
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
@@ -64,10 +64,15 @@ public class DDMStructureLayoutUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _upgradeSchema() throws Exception {
-		alterTableAddColumn("DDMStructureLayout", "classNameId", "LONG");
-		alterTableAddColumn(
-			"DDMStructureLayout", "structureLayoutKey", "VARCHAR(75) null");
+	protected void upgradeSchema() throws Exception {
+		if (!hasColumn("DDMStructureLayout", "classNameId") &&
+			!hasColumn("DDMStructureLayout", "structureLayoutKey")) {
+
+			runSQL("alter table DDMStructureLayout add classNameId LONG");
+			runSQL(
+				"alter table DDMStructureLayout add structureLayoutKey " +
+					"VARCHAR(75) null");
+		}
 	}
 
 }

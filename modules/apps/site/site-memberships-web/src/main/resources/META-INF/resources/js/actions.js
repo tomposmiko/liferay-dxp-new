@@ -12,15 +12,14 @@
  * details.
  */
 
-import {openConfirmModal, openSelectionModal} from 'frontend-js-web';
+import {openSelectionModal} from 'frontend-js-web';
 
 export const ACTIONS = {
 	assignRoles(itemData, portletNamespace) {
 		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('done'),
-			getSelectedItemsOnly: false,
 			multiple: true,
-			onSelect: (items) => {
+			onSelect: (selectedItems) => {
 				const editUserGroupRoleFm = document.getElementById(
 					`${portletNamespace}editUserGroupRoleFm`
 				);
@@ -29,21 +28,12 @@ export const ACTIONS = {
 					return;
 				}
 
-				const allInput = document.createElement('input');
+				const input = document.createElement('input');
 
-				allInput.name = `${portletNamespace}availableRowIds`;
-				allInput.value = items.map((item) => item.value);
+				input.name = `${portletNamespace}rowIds`;
+				input.value = selectedItems.map((item) => item.value);
 
-				editUserGroupRoleFm.appendChild(allInput);
-
-				const checkedInput = document.createElement('input');
-
-				checkedInput.name = `${portletNamespace}rowIds`;
-				checkedInput.value = items
-					.filter((item) => item.checked)
-					.map((item) => item.value);
-
-				editUserGroupRoleFm.appendChild(checkedInput);
+				editUserGroupRoleFm.appendChild(input);
 
 				submitForm(editUserGroupRoleFm, itemData.editUserGroupRoleURL);
 			},
@@ -53,15 +43,12 @@ export const ACTIONS = {
 	},
 
 	deleteGroupUsers(itemData) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, itemData.deleteGroupUsersURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, itemData.deleteGroupUsersURL);
+		}
 	},
 };

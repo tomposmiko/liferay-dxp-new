@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tamas Molnar
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance",
 	service = {
 		DDMFormInstanceStagedModelRepository.class, StagedModelRepository.class
@@ -109,7 +110,7 @@ public class DDMFormInstanceStagedModelRepository
 			_ddmFormInstanceLocalService.deleteFormInstance(formInstance);
 		}
 
-		_deleteDDMStructures(formInstanceDDMStructureIds);
+		deleteDDMStructures(formInstanceDDMStructureIds);
 	}
 
 	@Override
@@ -190,7 +191,7 @@ public class DDMFormInstanceStagedModelRepository
 			ddmFormInstance.getSettingsDDMFormValues(), serviceContext);
 	}
 
-	private void _deleteDDMStructures(Set<Long> ddmStructureIds)
+	protected void deleteDDMStructures(Set<Long> ddmStructureIds)
 		throws PortalException {
 
 		for (Long ddmStructureId : ddmStructureIds) {

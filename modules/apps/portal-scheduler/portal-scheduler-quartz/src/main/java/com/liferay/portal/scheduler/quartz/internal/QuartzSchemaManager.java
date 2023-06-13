@@ -36,7 +36,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(enabled = false, service = {})
+@Component(
+	enabled = false, immediate = true, service = QuartzSchemaManager.class
+)
 public class QuartzSchemaManager {
 
 	@Activate
@@ -52,7 +54,7 @@ public class QuartzSchemaManager {
 		}
 		catch (Exception exception) {
 			if (_log.isInfoEnabled()) {
-				_log.info(exception);
+				_log.info(exception, exception);
 			}
 		}
 

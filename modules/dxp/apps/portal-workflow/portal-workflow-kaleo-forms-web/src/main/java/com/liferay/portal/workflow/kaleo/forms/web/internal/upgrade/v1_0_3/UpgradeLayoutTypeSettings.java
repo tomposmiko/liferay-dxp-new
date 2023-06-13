@@ -35,12 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
  */
 public class UpgradeLayoutTypeSettings extends BasePortletIdUpgradeProcess {
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_deleteLayoutTypeSettingsColumnKeyWithoutValue();
-	}
-
-	private void _deleteLayoutTypeSettingsColumnKeyWithoutValue()
+	protected void deleteLayoutTypeSettingsColumnKeyWithoutValue()
 		throws Exception {
 
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
@@ -71,7 +66,7 @@ public class UpgradeLayoutTypeSettings extends BasePortletIdUpgradeProcess {
 					UnicodeProperties oldtypeSettingsUnicodeProperties =
 						layout.getTypeSettingsProperties();
 					UnicodeProperties newTypeSettingsUnicodeProperties =
-						_getNewTypeSettingsUnicodeProperties(
+						getNewTypeSettingsUnicodeProperties(
 							layout.getTypeSettingsProperties());
 
 					if (!oldtypeSettingsUnicodeProperties.equals(
@@ -94,7 +89,12 @@ public class UpgradeLayoutTypeSettings extends BasePortletIdUpgradeProcess {
 		indexableActionableDynamicQuery.performActions();
 	}
 
-	private UnicodeProperties _getNewTypeSettingsUnicodeProperties(
+	@Override
+	protected void doUpgrade() throws Exception {
+		deleteLayoutTypeSettingsColumnKeyWithoutValue();
+	}
+
+	protected UnicodeProperties getNewTypeSettingsUnicodeProperties(
 		UnicodeProperties oldtypeSettingsUnicodeProperties) {
 
 		UnicodeProperties newtypeSettingsUnicodeProperties =

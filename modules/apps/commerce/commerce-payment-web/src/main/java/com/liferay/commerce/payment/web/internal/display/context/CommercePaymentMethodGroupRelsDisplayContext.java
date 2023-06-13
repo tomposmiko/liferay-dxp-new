@@ -18,7 +18,7 @@ import com.liferay.commerce.payment.method.CommercePaymentMethod;
 import com.liferay.commerce.payment.method.CommercePaymentMethodRegistry;
 import com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelService;
-import com.liferay.commerce.payment.web.internal.display.context.helper.CommercePaymentMethodRequestHelper;
+import com.liferay.commerce.payment.web.internal.display.context.util.CommercePaymentMethodRequestHelper;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -47,7 +47,7 @@ public class CommercePaymentMethodGroupRelsDisplayContext {
 		_commercePaymentMethodRegistry = commercePaymentMethodRegistry;
 		_countryService = countryService;
 
-		commercePaymentMethodRequestHelper =
+		_commercePaymentMethodRequestHelper =
 			new CommercePaymentMethodRequestHelper(httpServletRequest);
 	}
 
@@ -61,7 +61,7 @@ public class CommercePaymentMethodGroupRelsDisplayContext {
 		}
 
 		return ParamUtil.getLong(
-			commercePaymentMethodRequestHelper.getRequest(),
+			_commercePaymentMethodRequestHelper.getRequest(),
 			"commerceChannelId");
 	}
 
@@ -79,7 +79,7 @@ public class CommercePaymentMethodGroupRelsDisplayContext {
 		}
 
 		return ParamUtil.getString(
-			commercePaymentMethodRequestHelper.getRequest(),
+			_commercePaymentMethodRequestHelper.getRequest(),
 			"commercePaymentMethodEngineKey");
 	}
 
@@ -122,17 +122,16 @@ public class CommercePaymentMethodGroupRelsDisplayContext {
 
 	public int getCountriesCount() throws PortalException {
 		return _countryService.getCompanyCountriesCount(
-			commercePaymentMethodRequestHelper.getCompanyId());
+			_commercePaymentMethodRequestHelper.getCompanyId());
 	}
-
-	protected final CommercePaymentMethodRequestHelper
-		commercePaymentMethodRequestHelper;
 
 	private final CommerceChannelLocalService _commerceChannelLocalService;
 	private CommercePaymentMethodGroupRel _commercePaymentMethodGroupRel;
 	private final CommercePaymentMethodGroupRelService
 		_commercePaymentMethodGroupRelService;
 	private final CommercePaymentMethodRegistry _commercePaymentMethodRegistry;
+	private final CommercePaymentMethodRequestHelper
+		_commercePaymentMethodRequestHelper;
 	private final CountryService _countryService;
 
 }

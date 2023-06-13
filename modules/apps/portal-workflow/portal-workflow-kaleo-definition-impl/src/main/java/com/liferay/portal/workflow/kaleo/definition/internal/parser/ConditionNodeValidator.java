@@ -16,7 +16,6 @@ package com.liferay.portal.workflow.kaleo.definition.internal.parser;
 
 import com.liferay.portal.workflow.kaleo.definition.Condition;
 import com.liferay.portal.workflow.kaleo.definition.Definition;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.definition.exception.KaleoDefinitionValidationException;
 import com.liferay.portal.workflow.kaleo.definition.parser.NodeValidator;
 
@@ -26,13 +25,11 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  * @author Marcellus Tavares
  */
-@Component(service = NodeValidator.class)
+@Component(
+	immediate = true, property = "node.type=CONDITION",
+	service = NodeValidator.class
+)
 public class ConditionNodeValidator extends BaseNodeValidator<Condition> {
-
-	@Override
-	public NodeType getNodeType() {
-		return NodeType.CONDITION;
-	}
 
 	@Override
 	protected void doValidate(Definition definition, Condition condition)
@@ -40,12 +37,12 @@ public class ConditionNodeValidator extends BaseNodeValidator<Condition> {
 
 		if (condition.getIncomingTransitionsCount() == 0) {
 			throw new KaleoDefinitionValidationException.
-				MustSetIncomingTransition(condition.getDefaultLabel());
+				MustSetIncomingTransition(condition.getName());
 		}
 
 		if (condition.getOutgoingTransitionsCount() < 2) {
 			throw new KaleoDefinitionValidationException.
-				MustSetMultipleOutgoingTransition(condition.getDefaultLabel());
+				MustSetMultipleOutgoingTransition(condition.getName());
 		}
 	}
 

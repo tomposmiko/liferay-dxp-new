@@ -15,15 +15,15 @@
 package com.liferay.dynamic.data.mapping.internal.io.exporter;
 
 import com.liferay.dynamic.data.mapping.exception.FormInstanceRecordExporterException;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRenderer;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordExporter;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordExporterRequest;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordExporterResponse;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriter;
-import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterRegistry;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterRequest;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterResponse;
+import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
@@ -36,25 +36,28 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalServi
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.comparator.FormInstanceVersionVersionComparator;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.text.Format;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -62,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Leonardo Barros
  */
-@Component(service = DDMFormInstanceRecordExporter.class)
+@Component(immediate = true, service = DDMFormInstanceRecordExporter.class)
 public class DDMFormInstanceRecordExporterImpl
 	implements DDMFormInstanceRecordExporter {
 
@@ -112,20 +115,27 @@ public class DDMFormInstanceRecordExporterImpl
 
 		Map<String, String> ddmFormFieldsLabel = new LinkedHashMap<>();
 
-		for (DDMFormField ddmFormField : ddmFormFieldMap.values()) {
-			LocalizedValue localizedValue = ddmFormField.getLabel();
+		Collection<DDMFormField> ddmFormFields = ddmFormFieldMap.values();
 
-			ddmFormFieldsLabel.put(
-				ddmFormField.getFieldReference(),
-				localizedValue.getString(locale));
-		}
+		Stream<DDMFormField> stream = ddmFormFields.stream();
 
-		ddmFormFieldsLabel.put(_KEY_AUTHOR, _language.get(locale, _KEY_AUTHOR));
+		stream.forEach(
+			field -> {
+				LocalizedValue localizedValue = field.getLabel();
+
+				ddmFormFieldsLabel.put(
+					field.getFieldReference(),
+					localizedValue.getString(locale));
+			});
+
 		ddmFormFieldsLabel.put(
-			_KEY_LANGUAGE_ID, _language.get(locale, "default-language"));
+			_KEY_AUTHOR, LanguageUtil.get(locale, _KEY_AUTHOR));
 		ddmFormFieldsLabel.put(
-			_KEY_MODIFIED_DATE, _language.get(locale, "modified-date"));
-		ddmFormFieldsLabel.put(_KEY_STATUS, _language.get(locale, _KEY_STATUS));
+			_KEY_LANGUAGE_ID, LanguageUtil.get(locale, "default-language"));
+		ddmFormFieldsLabel.put(
+			_KEY_MODIFIED_DATE, LanguageUtil.get(locale, "modified-date"));
+		ddmFormFieldsLabel.put(
+			_KEY_STATUS, LanguageUtil.get(locale, _KEY_STATUS));
 
 		return ddmFormFieldsLabel;
 	}
@@ -139,24 +149,22 @@ public class DDMFormInstanceRecordExporterImpl
 			ddmFormField.getFieldReference());
 
 		DDMFormFieldValueRenderer ddmFormFieldValueRenderer =
-			ddmFormFieldTypeServicesRegistry.getDDMFormFieldValueRenderer(
+			ddmFormFieldTypeServicesTracker.getDDMFormFieldValueRenderer(
 				ddmFormField.getType());
 
-		StringBundler sb = new StringBundler(2 * ddmFormFieldValues.size());
+		Stream<DDMFormFieldValue> stream = ddmFormFieldValues.stream();
 
-		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-			String value = ddmFormFieldValueRenderer.render(
-				ddmFormFieldValue, locale);
-
-			if (Validator.isNotNull(value)) {
-				sb.append(value);
-				sb.append(StringPool.COMMA_AND_SPACE);
-			}
-		}
-
-		sb.setIndex(sb.index() - 1);
-
-		return _html.unescape(sb.toString());
+		return HtmlUtil.extractText(
+			StringUtil.merge(
+				stream.map(
+					ddmForFieldValue -> ddmFormFieldValueRenderer.render(
+						ddmForFieldValue, locale)
+				).filter(
+					Validator::isNotNull
+				).collect(
+					Collectors.toList()
+				),
+				StringPool.COMMA_AND_SPACE));
 	}
 
 	protected List<Map<String, String>> getDDMFormFieldValues(
@@ -222,18 +230,20 @@ public class DDMFormInstanceRecordExporterImpl
 			long ddmFormInstanceId)
 		throws Exception {
 
+		List<DDMStructureVersion> ddmStructureVersions = getStructureVersions(
+			ddmFormInstanceId);
+
 		Map<String, DDMFormField> ddmFormFields = new LinkedHashMap<>();
 
-		for (DDMStructureVersion ddmStructureVersion :
-				getStructureVersions(ddmFormInstanceId)) {
+		Stream<DDMStructureVersion> stream = ddmStructureVersions.stream();
 
-			Map<String, DDMFormField> map =
-				getNontransientDDMFormFieldsReferencesMap(ddmStructureVersion);
-
-			for (Map.Entry<String, DDMFormField> entry : map.entrySet()) {
-				ddmFormFields.putIfAbsent(entry.getKey(), entry.getValue());
-			}
-		}
+		stream.map(
+			this::getNontransientDDMFormFieldsReferencesMap
+		).forEach(
+			map -> map.forEach(
+				(key, ddmFormField) -> ddmFormFields.putIfAbsent(
+					key, ddmFormField))
+		);
 
 		return ddmFormFields;
 	}
@@ -248,7 +258,8 @@ public class DDMFormInstanceRecordExporterImpl
 	}
 
 	protected String getStatusMessage(int status, Locale locale) {
-		return _language.get(locale, WorkflowConstants.getStatusLabel(status));
+		return LanguageUtil.get(
+			locale, WorkflowConstants.getStatusLabel(status));
 	}
 
 	protected List<DDMStructureVersion> getStructureVersions(
@@ -281,7 +292,7 @@ public class DDMFormInstanceRecordExporterImpl
 		throws Exception {
 
 		DDMFormInstanceRecordWriter ddmFormInstanceRecordWriter =
-			ddmFormInstanceRecordWriterRegistry.getDDMFormInstanceRecordWriter(
+			ddmFormInstanceRecordWriterTracker.getDDMFormInstanceRecordWriter(
 				type);
 
 		DDMFormInstanceRecordWriterRequest.Builder builder =
@@ -300,15 +311,15 @@ public class DDMFormInstanceRecordExporterImpl
 	}
 
 	@Reference
-	protected DDMFormFieldTypeServicesRegistry ddmFormFieldTypeServicesRegistry;
+	protected DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	protected DDMFormInstanceRecordLocalService
 		ddmFormInstanceRecordLocalService;
 
 	@Reference
-	protected DDMFormInstanceRecordWriterRegistry
-		ddmFormInstanceRecordWriterRegistry;
+	protected DDMFormInstanceRecordWriterTracker
+		ddmFormInstanceRecordWriterTracker;
 
 	@Reference
 	protected DDMFormInstanceVersionLocalService
@@ -321,11 +332,5 @@ public class DDMFormInstanceRecordExporterImpl
 	private static final String _KEY_MODIFIED_DATE = "modifiedDate";
 
 	private static final String _KEY_STATUS = "status";
-
-	@Reference
-	private Html _html;
-
-	@Reference
-	private Language _language;
 
 }

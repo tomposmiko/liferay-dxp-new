@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -249,107 +250,119 @@ public class UserNotificationDeliveryModelImpl
 	public Map<String, Function<UserNotificationDelivery, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<UserNotificationDelivery, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, UserNotificationDelivery>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<UserNotificationDelivery, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			UserNotificationDelivery.class.getClassLoader(),
+			UserNotificationDelivery.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<UserNotificationDelivery, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<UserNotificationDelivery, Object>>();
+		try {
+			Constructor<UserNotificationDelivery> constructor =
+				(Constructor<UserNotificationDelivery>)
+					proxyClass.getConstructor(InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", UserNotificationDelivery::getMvccVersion);
-			attributeGetterFunctions.put(
-				"userNotificationDeliveryId",
-				UserNotificationDelivery::getUserNotificationDeliveryId);
-			attributeGetterFunctions.put(
-				"companyId", UserNotificationDelivery::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", UserNotificationDelivery::getUserId);
-			attributeGetterFunctions.put(
-				"portletId", UserNotificationDelivery::getPortletId);
-			attributeGetterFunctions.put(
-				"classNameId", UserNotificationDelivery::getClassNameId);
-			attributeGetterFunctions.put(
-				"notificationType",
-				UserNotificationDelivery::getNotificationType);
-			attributeGetterFunctions.put(
-				"deliveryType", UserNotificationDelivery::getDeliveryType);
-			attributeGetterFunctions.put(
-				"deliver", UserNotificationDelivery::getDeliver);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<UserNotificationDelivery, Object>>
+		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<UserNotificationDelivery, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<UserNotificationDelivery, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<UserNotificationDelivery, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<UserNotificationDelivery, Object>>();
+		Map<String, BiConsumer<UserNotificationDelivery, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<UserNotificationDelivery, ?>>();
 
-		static {
-			Map<String, BiConsumer<UserNotificationDelivery, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<UserNotificationDelivery, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", UserNotificationDelivery::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<UserNotificationDelivery, Long>)
+				UserNotificationDelivery::setMvccVersion);
+		attributeGetterFunctions.put(
+			"userNotificationDeliveryId",
+			UserNotificationDelivery::getUserNotificationDeliveryId);
+		attributeSetterBiConsumers.put(
+			"userNotificationDeliveryId",
+			(BiConsumer<UserNotificationDelivery, Long>)
+				UserNotificationDelivery::setUserNotificationDeliveryId);
+		attributeGetterFunctions.put(
+			"companyId", UserNotificationDelivery::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<UserNotificationDelivery, Long>)
+				UserNotificationDelivery::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", UserNotificationDelivery::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<UserNotificationDelivery, Long>)
+				UserNotificationDelivery::setUserId);
+		attributeGetterFunctions.put(
+			"portletId", UserNotificationDelivery::getPortletId);
+		attributeSetterBiConsumers.put(
+			"portletId",
+			(BiConsumer<UserNotificationDelivery, String>)
+				UserNotificationDelivery::setPortletId);
+		attributeGetterFunctions.put(
+			"classNameId", UserNotificationDelivery::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<UserNotificationDelivery, Long>)
+				UserNotificationDelivery::setClassNameId);
+		attributeGetterFunctions.put(
+			"notificationType", UserNotificationDelivery::getNotificationType);
+		attributeSetterBiConsumers.put(
+			"notificationType",
+			(BiConsumer<UserNotificationDelivery, Integer>)
+				UserNotificationDelivery::setNotificationType);
+		attributeGetterFunctions.put(
+			"deliveryType", UserNotificationDelivery::getDeliveryType);
+		attributeSetterBiConsumers.put(
+			"deliveryType",
+			(BiConsumer<UserNotificationDelivery, Integer>)
+				UserNotificationDelivery::setDeliveryType);
+		attributeGetterFunctions.put(
+			"deliver", UserNotificationDelivery::getDeliver);
+		attributeSetterBiConsumers.put(
+			"deliver",
+			(BiConsumer<UserNotificationDelivery, Boolean>)
+				UserNotificationDelivery::setDeliver);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<UserNotificationDelivery, Long>)
-					UserNotificationDelivery::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"userNotificationDeliveryId",
-				(BiConsumer<UserNotificationDelivery, Long>)
-					UserNotificationDelivery::setUserNotificationDeliveryId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<UserNotificationDelivery, Long>)
-					UserNotificationDelivery::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<UserNotificationDelivery, Long>)
-					UserNotificationDelivery::setUserId);
-			attributeSetterBiConsumers.put(
-				"portletId",
-				(BiConsumer<UserNotificationDelivery, String>)
-					UserNotificationDelivery::setPortletId);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<UserNotificationDelivery, Long>)
-					UserNotificationDelivery::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"notificationType",
-				(BiConsumer<UserNotificationDelivery, Integer>)
-					UserNotificationDelivery::setNotificationType);
-			attributeSetterBiConsumers.put(
-				"deliveryType",
-				(BiConsumer<UserNotificationDelivery, Integer>)
-					UserNotificationDelivery::setDeliveryType);
-			attributeSetterBiConsumers.put(
-				"deliver",
-				(BiConsumer<UserNotificationDelivery, Boolean>)
-					UserNotificationDelivery::setDeliver);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -825,13 +838,44 @@ public class UserNotificationDeliveryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<UserNotificationDelivery, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<UserNotificationDelivery, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<UserNotificationDelivery, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((UserNotificationDelivery)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, UserNotificationDelivery>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						UserNotificationDelivery.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -847,8 +891,7 @@ public class UserNotificationDeliveryModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<UserNotificationDelivery, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

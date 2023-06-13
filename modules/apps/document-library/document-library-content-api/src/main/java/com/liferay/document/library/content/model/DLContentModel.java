@@ -212,8 +212,4 @@ public interface DLContentModel
 	@Override
 	public DLContent cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

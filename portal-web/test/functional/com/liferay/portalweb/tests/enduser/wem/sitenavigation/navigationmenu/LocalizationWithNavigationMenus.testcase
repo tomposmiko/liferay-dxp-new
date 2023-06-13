@@ -13,14 +13,14 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-85566. A user can enter translations for navigation menu items."
-	@priority = 5
+	@priority = "5"
 	test TranslateItemName {
 		property portal.acceptance = "true";
 
@@ -79,21 +79,21 @@ definition {
 
 			NavigationMenusAdmin.addTranslation(
 				itemName = "Test Page Name",
-				locale = "es-ES",
+				locale = "es_ES",
 				translation = "Nombre de la página de prueba");
 		}
 
 		task ("Add a Spanish translation for the submenu item") {
 			NavigationMenusAdmin.addTranslation(
 				itemName = "Submenu Name",
-				locale = "es-ES",
+				locale = "es_ES",
 				translation = "Submenú Nombre");
 		}
 
 		task ("Add a Spanish translation for the URL item") {
 			NavigationMenusAdmin.addTranslation(
 				itemName = "Liferay",
-				locale = "es-ES",
+				locale = "es_ES",
 				translation = "Liferay (Spanish)");
 		}
 
@@ -112,7 +112,7 @@ definition {
 
 			PortletEntry.changeLocale(
 				fieldName = "Nombre",
-				locale = "es-ES");
+				locale = "es_ES");
 
 			AssertTextEquals(
 				locator1 = "TextInput#NAME",
@@ -128,7 +128,7 @@ definition {
 
 			PortletEntry.changeLocale(
 				fieldName = "Nombre",
-				locale = "es-ES");
+				locale = "es_ES");
 
 			AssertTextEquals(
 				locator1 = "TextInput#NAME",
@@ -144,7 +144,7 @@ definition {
 
 			PortletEntry.changeLocale(
 				fieldName = "Nombre",
-				locale = "es-ES");
+				locale = "es_ES");
 
 			AssertTextEquals(
 				locator1 = "TextInput#NAME",
@@ -153,7 +153,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-85566. A navigation menu page item will be prepopulated with existing translations for a page."
-	@priority = 5
+	@priority = "5"
 	test ViewPageItemPrepopulatedWithTranslation {
 		property portal.acceptance = "true";
 
@@ -164,15 +164,16 @@ definition {
 		}
 
 		task ("Add a Spanish translation for the page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			PagesAdmin.gotoPageEllipsisMenuItem(
+			SitePages.gotoPageMenuItem(
 				menuItem = "Configure",
 				pageName = "Test Page Name");
 
-			PagesAdmin.addLocalizedName(
-				localeList = "es-ES",
-				localizedNameList = "Nombre de la página de prueba");
+			Page.addPageTranslations(
+				page = "Test Page Name",
+				pageTranslation = "es_ES",
+				pageTranslationName = "Nombre de la página de prueba");
 		}
 
 		task ("Add a navigation menu") {
@@ -188,7 +189,7 @@ definition {
 
 			NavigationMenusAdmin.addItem(
 				item = "Page",
-				pageNameList = "Test Page Name");
+				pageNames = "Test Page Name");
 		}
 
 		task ("Click on the page item to open the item sidebar") {
@@ -198,7 +199,7 @@ definition {
 		task ("Change the name locale to Spanish") {
 			PortletEntry.changeLocale(
 				fieldName = "Name",
-				locale = "es-ES");
+				locale = "es_ES");
 		}
 
 		task ("View localized name shown in sidebar") {

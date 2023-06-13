@@ -165,7 +165,7 @@ public class BaseIndexerGetSiteGroupIdTest {
 
 		ReflectionTestUtil.setFieldValue(
 			GroupLocalServiceUtil.class, "_service",
-			new GroupLocalServiceWrapper() {
+			new GroupLocalServiceWrapper(null) {
 
 				@Override
 				public Group getGroup(long groupId) throws PortalException {

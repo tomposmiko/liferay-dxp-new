@@ -48,17 +48,17 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Tomas Polesovsky
  */
-@Component(service = UserPersonalSitePermissions.class)
+@Component(immediate = true, service = UserPersonalSitePermissions.class)
 public class UserPersonalSitePermissions {
 
 	public void initPermissions(long companyId, List<Portlet> portlets) {
-		Role powerUserRole = _getPowerUserRole(companyId);
+		Role powerUserRole = getPowerUserRole(companyId);
 
 		if (powerUserRole == null) {
 			return;
 		}
 
-		Group userPersonalSiteGroup = _getUserPersonalSiteGroup(companyId);
+		Group userPersonalSiteGroup = getUserPersonalSiteGroup(companyId);
 
 		if (userPersonalSiteGroup == null) {
 			return;
@@ -66,12 +66,10 @@ public class UserPersonalSitePermissions {
 
 		for (Portlet portlet : portlets) {
 			try {
-				if (companyId == portlet.getCompanyId()) {
-					initPermissions(
-						companyId, powerUserRole.getRoleId(),
-						portlet.getRootPortletId(),
-						userPersonalSiteGroup.getGroupId());
-				}
+				initPermissions(
+					companyId, powerUserRole.getRoleId(),
+					portlet.getRootPortletId(),
+					userPersonalSiteGroup.getGroupId());
 			}
 			catch (PortalException portalException) {
 				_log.error(
@@ -94,12 +92,44 @@ public class UserPersonalSitePermissions {
 		_bundleContext = bundleContext;
 
 		String filter = StringBundler.concat(
-			"(&(objectClass=", PanelApp.class.getName(),
-			")(panel.category.key=", PanelCategoryKeys.SITE_ADMINISTRATION,
-			"*))");
+			"(&(!(depot.panel.app.wrapper=*))(objectClass=",
+			PanelApp.class.getName(), ")(panel.category.key=",
+			PanelCategoryKeys.SITE_ADMINISTRATION, "*))");
 
 		_serviceTracker = ServiceTrackerFactory.open(
 			bundleContext, filter, new PanelAppServiceTrackerCustomizer());
+	}
+
+	protected void deactivated() {
+		_serviceTracker.close();
+	}
+
+	protected Role getPowerUserRole(long companyId) {
+		try {
+			return _roleLocalService.getRole(
+				companyId, RoleConstants.POWER_USER);
+		}
+		catch (PortalException portalException) {
+			_log.error(
+				"Unable to get power user role in company " + companyId,
+				portalException);
+		}
+
+		return null;
+	}
+
+	protected Group getUserPersonalSiteGroup(long companyId) {
+		try {
+			return _groupLocalService.getUserPersonalSiteGroup(companyId);
+		}
+		catch (PortalException portalException) {
+			_log.error(
+				"Unable to get user personal site group in company " +
+					companyId,
+				portalException);
+		}
+
+		return null;
 	}
 
 	protected void initPermissions(
@@ -144,56 +174,25 @@ public class UserPersonalSitePermissions {
 		}
 	}
 
-	private Role _getPowerUserRole(long companyId) {
-		try {
-			return _roleLocalService.getRole(
-				companyId, RoleConstants.POWER_USER);
-		}
-		catch (PortalException portalException) {
-			_log.error(
-				"Unable to get power user role in company " + companyId,
-				portalException);
-		}
-
-		return null;
-	}
-
-	private Group _getUserPersonalSiteGroup(long companyId) {
-		try {
-			return _groupLocalService.getUserPersonalSiteGroup(companyId);
-		}
-		catch (PortalException portalException) {
-			_log.error(
-				"Unable to get user personal site group in company " +
-					companyId,
-				portalException);
-		}
-
-		return null;
-	}
-
 	private void _initPermissions(Company company, Portlet portlet) {
 		long companyId = company.getCompanyId();
 
-		Role powerUserRole = _getPowerUserRole(companyId);
+		Role powerUserRole = getPowerUserRole(companyId);
 
 		if (powerUserRole == null) {
 			return;
 		}
 
-		Group userPersonalSiteGroup = _getUserPersonalSiteGroup(companyId);
+		Group userPersonalSiteGroup = getUserPersonalSiteGroup(companyId);
 
 		if (userPersonalSiteGroup == null) {
 			return;
 		}
 
 		try {
-			if (companyId == portlet.getCompanyId()) {
-				initPermissions(
-					companyId, powerUserRole.getRoleId(),
-					portlet.getRootPortletId(),
-					userPersonalSiteGroup.getGroupId());
-			}
+			initPermissions(
+				companyId, powerUserRole.getRoleId(),
+				portlet.getRootPortletId(), userPersonalSiteGroup.getGroupId());
 		}
 		catch (PortalException portalException) {
 			_log.error(

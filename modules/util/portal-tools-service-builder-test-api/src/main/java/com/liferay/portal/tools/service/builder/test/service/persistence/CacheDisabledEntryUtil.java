@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the cache disabled entry service. This utility wraps <code>com.liferay.portal.tools.service.builder.test.service.persistence.impl.CacheDisabledEntryPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -339,9 +343,29 @@ public class CacheDisabledEntryUtil {
 	}
 
 	public static CacheDisabledEntryPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile CacheDisabledEntryPersistence _persistence;
+	private static ServiceTracker
+		<CacheDisabledEntryPersistence, CacheDisabledEntryPersistence>
+			_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			CacheDisabledEntryPersistence.class);
+
+		ServiceTracker
+			<CacheDisabledEntryPersistence, CacheDisabledEntryPersistence>
+				serviceTracker =
+					new ServiceTracker
+						<CacheDisabledEntryPersistence,
+						 CacheDisabledEntryPersistence>(
+							 bundle.getBundleContext(),
+							 CacheDisabledEntryPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

@@ -30,10 +30,10 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateLayouts();
+		updateLayouts();
 	}
 
-	private void _updateLayout(long plid, String typeSettings)
+	protected void updateLayout(long plid, String typeSettings)
 		throws Exception {
 
 		if (Validator.isNull(typeSettings)) {
@@ -48,12 +48,15 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 			).build();
 
 		typeSettingsUnicodeProperties.setProperty(
-			"embeddedLayoutURL", typeSettingsUnicodeProperties.remove("url"));
+			"embeddedLayoutURL",
+			typeSettingsUnicodeProperties.getProperty("url"));
 
-		_updateTypeSettings(plid, typeSettingsUnicodeProperties.toString());
+		typeSettingsUnicodeProperties.remove("url");
+
+		updateTypeSettings(plid, typeSettingsUnicodeProperties.toString());
 	}
 
-	private void _updateLayouts() throws Exception {
+	protected void updateLayouts() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement = connection.prepareStatement(
 				"select plid, typeSettings from Layout where type_ = ?")) {
@@ -65,13 +68,13 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 					long plid = resultSet.getLong("plid");
 					String typeSettings = resultSet.getString("typeSettings");
 
-					_updateLayout(plid, typeSettings);
+					updateLayout(plid, typeSettings);
 				}
 			}
 		}
 	}
 
-	private void _updateTypeSettings(long plid, String typeSettings)
+	protected void updateTypeSettings(long plid, String typeSettings)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(

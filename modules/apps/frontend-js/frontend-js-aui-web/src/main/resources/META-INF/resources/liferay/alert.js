@@ -19,9 +19,9 @@
 AUI.add(
 	'liferay-alert',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const Alert = A.Component.create({
+		var Alert = A.Component.create({
 			ATTRS: {
 				animated: {
 					validator: Lang.isBoolean,
@@ -68,13 +68,13 @@ AUI.add(
 
 			prototype: {
 				_afterTypeChange() {
-					const instance = this;
+					var instance = this;
 
 					instance._updateCssClass();
 				},
 
 				_cancelHide() {
-					const instance = this;
+					var instance = this;
 
 					instance._clearHideTimer();
 
@@ -82,15 +82,14 @@ AUI.add(
 				},
 
 				_getAlertsContainer(targetNode) {
-					const instance = this;
+					var instance = this;
 
-					let alertsContainer = instance._alertsContainer;
+					var alertsContainer = instance._alertsContainer;
 
 					if (!alertsContainer) {
-						const rootNode =
+						var rootNode =
 							targetNode ||
 							instance.get('rootNode') ||
-							// eslint-disable-next-line @liferay/aui/no-get-body
 							A.getBody();
 
 						alertsContainer =
@@ -107,7 +106,7 @@ AUI.add(
 								targetNode.prepend(alertsContainer);
 							}
 							else {
-								const navbar = rootNode.one(
+								var navbar = rootNode.one(
 									'.portlet-body > .navbar'
 								);
 
@@ -115,7 +114,7 @@ AUI.add(
 									navbar.placeAfter(alertsContainer);
 								}
 								else {
-									const prependTarget =
+									var prependTarget =
 										rootNode.one('.portlet-body') ||
 										rootNode;
 
@@ -131,14 +130,14 @@ AUI.add(
 				},
 
 				_getParentNode(targetNode) {
-					const instance = this;
+					var instance = this;
 
-					let parentNode = instance._parentNode;
+					var parentNode = instance._parentNode;
 
 					if (!parentNode) {
 						parentNode = A.Node.create(instance.TPL_ALERT_NODE);
 
-						const alertsContainer = instance._getAlertsContainer(
+						var alertsContainer = instance._getAlertsContainer(
 							targetNode
 						);
 
@@ -151,7 +150,7 @@ AUI.add(
 				},
 
 				_maybeHide() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._ignoreHideDelay) {
 						instance._prepareTransition(false);
@@ -173,9 +172,9 @@ AUI.add(
 				},
 
 				_onMouseLeave() {
-					const instance = this;
+					var instance = this;
 
-					const delay = instance.get('delay');
+					var delay = instance.get('delay');
 
 					if (delay.hide > 0) {
 						instance.hide();
@@ -183,9 +182,9 @@ AUI.add(
 				},
 
 				_prepareTransition(visible) {
-					const instance = this;
+					var instance = this;
 
-					const parentNode = instance._getParentNode();
+					var parentNode = instance._getParentNode();
 
 					instance._clearHideTimer();
 
@@ -197,9 +196,9 @@ AUI.add(
 				},
 
 				_transition(visible) {
-					const instance = this;
+					var instance = this;
 
-					const parentNode = instance._getParentNode();
+					var parentNode = instance._getParentNode();
 
 					if (!visible || !parentNode.test('.in')) {
 						try {
@@ -218,7 +217,7 @@ AUI.add(
 
 									instance._uiSetVisibleHost(visible);
 
-									const delay = instance.get('delay');
+									var delay = instance.get('delay');
 
 									if (visible && delay.hide) {
 										instance.hide();
@@ -234,12 +233,12 @@ AUI.add(
 				},
 
 				_updateBodyContent() {
-					const instance = this;
+					var instance = this;
 
-					const bodyContent = Lang.sub(instance.TPL_CONTENT, {
+					var bodyContent = Lang.sub(instance.TPL_CONTENT, {
 						icon: instance.get('icon'),
 						message: instance.get('message'),
-						spritemap: Liferay.Icons.spritemap,
+						pathThemeImages: themeDisplay.getPathThemeImages(),
 						title: instance.get('title') || '',
 					});
 
@@ -247,7 +246,7 @@ AUI.add(
 				},
 
 				_updateCssClass() {
-					const instance = this;
+					var instance = this;
 
 					instance.set('cssClass', 'alert-' + instance.get('type'));
 				},
@@ -258,12 +257,12 @@ AUI.add(
 				TPL_ALERTS_CONTAINER: '<div class="lfr-alert-container"></div>',
 
 				TPL_CONTENT:
-					'<strong class="lead"><svg class="lexicon-icon" focusable="false"><use href="{spritemap}#{icon}" /><title>{title}</title></svg> {title}</strong>{message}',
+					'<strong class="lead"><svg class="lexicon-icon" focusable="false"><use href="{pathThemeImages}/clay/icons.svg#{icon}" /><title>{title}</title></svg> {title}</strong>{message}',
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 
 					instance._eventHandles = [
 						instance.after(
@@ -294,7 +293,7 @@ AUI.add(
 				},
 
 				render(parentNode) {
-					const instance = this;
+					var instance = this;
 
 					instance._updateBodyContent();
 					instance._updateCssClass();

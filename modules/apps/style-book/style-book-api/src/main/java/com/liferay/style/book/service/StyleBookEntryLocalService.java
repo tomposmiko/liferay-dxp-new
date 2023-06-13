@@ -104,7 +104,7 @@ public interface StyleBookEntryLocalService
 		throws PortalException;
 
 	public StyleBookEntry copyStyleBookEntry(
-			long userId, long groupId, long sourceStyleBookEntryId,
+			long userId, long groupId, long styleBookEntryId,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -434,7 +434,7 @@ public interface StyleBookEntryLocalService
 	 * <strong>Important:</strong> Inspect StyleBookEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftStyleBookEntry the style book entry
+	 * @param styleBookEntry the style book entry
 	 * @return the style book entry that was updated
 	 */
 	@Indexable(type = IndexableType.REINDEX)

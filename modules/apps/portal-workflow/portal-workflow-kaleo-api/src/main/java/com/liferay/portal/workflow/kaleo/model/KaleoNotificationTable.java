@@ -37,9 +37,6 @@ public class KaleoNotificationTable extends BaseTable<KaleoNotificationTable> {
 	public final Column<KaleoNotificationTable, Long> mvccVersion =
 		createColumn(
 			"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<KaleoNotificationTable, Long> ctCollectionId =
-		createColumn(
-			"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<KaleoNotificationTable, Long> kaleoNotificationId =
 		createColumn(
 			"kaleoNotificationId", Long.class, Types.BIGINT,

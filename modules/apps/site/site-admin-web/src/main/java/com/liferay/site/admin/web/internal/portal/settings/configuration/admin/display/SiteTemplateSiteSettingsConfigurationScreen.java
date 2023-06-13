@@ -17,7 +17,7 @@ package com.liferay.site.admin.web.internal.portal.settings.configuration.admin.
 import com.liferay.configuration.admin.display.ConfigurationScreen;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -61,7 +61,7 @@ public class SiteTemplateSiteSettingsConfigurationScreen
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(locale, "site-template");
+		return LanguageUtil.get(locale, "site-template");
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class SiteTemplateSiteSettingsConfigurationScreen
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -156,9 +156,6 @@ public class SiteTemplateSiteSettingsConfigurationScreen
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SiteTemplateSiteSettingsConfigurationScreen.class);
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private LayoutSetLocalService _layoutSetLocalService;

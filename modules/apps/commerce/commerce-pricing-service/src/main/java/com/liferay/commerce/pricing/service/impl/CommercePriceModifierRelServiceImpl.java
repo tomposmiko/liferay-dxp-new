@@ -17,31 +17,19 @@ package com.liferay.commerce.pricing.service.impl;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.pricing.model.CommercePriceModifier;
 import com.liferay.commerce.pricing.model.CommercePriceModifierRel;
-import com.liferay.commerce.pricing.service.CommercePriceModifierLocalService;
 import com.liferay.commerce.pricing.service.base.CommercePriceModifierRelServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Riccardo Alberti
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommercePriceModifierRel"
-	},
-	service = AopService.class
-)
 public class CommercePriceModifierRelServiceImpl
 	extends CommercePriceModifierRelServiceBaseImpl {
 
@@ -52,7 +40,7 @@ public class CommercePriceModifierRelServiceImpl
 		throws PortalException {
 
 		CommercePriceModifier commercePriceModifier =
-			_commercePriceModifierLocalService.getCommercePriceModifier(
+			commercePriceModifierLocalService.getCommercePriceModifier(
 				commercePriceModifierId);
 
 		_commercePriceListModelResourcePermission.check(
@@ -228,7 +216,7 @@ public class CommercePriceModifierRelServiceImpl
 		String className, long classPK) {
 
 		return commercePriceModifierRelPersistence.findByCN_CPK(
-			_classNameLocalService.getClassNameId(className), classPK);
+			classNameLocalService.getClassNameId(className), classPK);
 	}
 
 	@Override
@@ -270,17 +258,11 @@ public class CommercePriceModifierRelServiceImpl
 				commercePriceModifierId, languageId, name, true);
 	}
 
-	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.price.list.model.CommercePriceList)"
-	)
-	private ModelResourcePermission<CommercePriceList>
-		_commercePriceListModelResourcePermission;
-
-	@Reference
-	private CommercePriceModifierLocalService
-		_commercePriceModifierLocalService;
+	private static volatile ModelResourcePermission<CommercePriceList>
+		_commercePriceListModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CommercePriceModifierServiceImpl.class,
+				"_commercePriceListModelResourcePermission",
+				CommercePriceList.class);
 
 }

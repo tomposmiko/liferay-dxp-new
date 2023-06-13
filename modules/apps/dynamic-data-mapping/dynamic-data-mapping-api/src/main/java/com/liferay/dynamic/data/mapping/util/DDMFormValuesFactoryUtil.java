@@ -25,11 +25,14 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Marcos Martins
@@ -46,12 +49,12 @@ public class DDMFormValuesFactoryUtil {
 		List<DDMFormFieldValue> ddmFormFieldValues = new ArrayList<>();
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
-			for (String entryKey :
-					_sort(
-						_getEntryKeys(
-							ddmFormFieldValuesMap, ddmFormField.getName(),
-							StringPool.BLANK))) {
+			Collection<String> entryKeys = _sort(
+				_getEntryKeys(
+					ddmFormFieldValuesMap, ddmFormField.getName(),
+					StringPool.BLANK));
 
+			for (String entryKey : entryKeys) {
 				DDMFormFieldValue ddmFormFieldValue = ddmFormFieldValuesMap.get(
 					entryKey);
 
@@ -129,12 +132,12 @@ public class DDMFormValuesFactoryUtil {
 		int index = 0;
 
 		for (DDMFormField nestedDDMFormField : nestedDDMFormFields) {
-			for (String entryKey :
-					_sort(
-						_getEntryKeys(
-							ddmFormFieldValuesMap, nestedDDMFormField.getName(),
-							parentEntryKey))) {
+			Collection<String> entryKeys = _sort(
+				_getEntryKeys(
+					ddmFormFieldValuesMap, nestedDDMFormField.getName(),
+					parentEntryKey));
 
+			for (String entryKey : entryKeys) {
 				DDMFormFieldValue ddmFormFieldValue = ddmFormFieldValuesMap.get(
 					entryKey);
 
@@ -151,17 +154,28 @@ public class DDMFormValuesFactoryUtil {
 	}
 
 	private static Collection<String> _sort(Set<String> entryKeys) {
-		Map<Integer, String> entryKeysMap = new TreeMap<>();
+		Stream<String> entryKeysStream = entryKeys.stream();
 
-		for (String key : entryKeys) {
-			entryKeysMap.put(
-				GetterUtil.getInteger(
+		Map<Integer, String> entryKeysMap = entryKeysStream.collect(
+			Collectors.toMap(
+				key -> GetterUtil.getInteger(
 					DDMFormFieldParameterNameUtil.
 						getLastDDMFormFieldParameterNameParts(key)
 						[DDMFormFieldParameterNameUtil.
 							DDM_FORM_FIELD_INDEX_INDEX]),
-				key);
-		}
+				Function.identity()));
+
+		Set<Map.Entry<Integer, String>> set = entryKeysMap.entrySet();
+
+		Stream<Map.Entry<Integer, String>> stream = set.stream();
+
+		entryKeysMap = stream.sorted(
+			Map.Entry.comparingByKey()
+		).collect(
+			Collectors.toMap(
+				Map.Entry::getKey, Map.Entry::getValue,
+				(oldValue, newValue) -> oldValue, LinkedHashMap::new)
+		);
 
 		return entryKeysMap.values();
 	}

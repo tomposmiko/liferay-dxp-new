@@ -22,13 +22,11 @@ import classNames from 'classnames';
 import {cancelDebounce, debounce, fetch} from 'frontend-js-web';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
-import createFile from './createFile';
-
 /**
  * Defined ratios for preview sizing.
  */
 const SIZE_RATIOS = {
-	'desktop': {
+	desktop: {
 		height: 9,
 		width: 16,
 	},
@@ -36,11 +34,11 @@ const SIZE_RATIOS = {
 		height: '',
 		width: '',
 	},
-	'portrait-phone': {
+	'mobile-portrait': {
 		height: 16,
 		width: 10,
 	},
-	'tablet': {
+	'tablet-portrait': {
 		height: 3,
 		width: 4,
 	},
@@ -49,14 +47,12 @@ const SIZE_RATIOS = {
 /**
  * Available preview sizes in order.
  */
-const PREVIEW_SIZES = ['desktop', 'tablet', 'portrait-phone', 'full-size'];
-
-const PREVIEW_SIZES_LABELS = {
-	'desktop': Liferay.Language.get('desktop'),
-	'full-size': Liferay.Language.get('full-size'),
-	'portrait-phone': Liferay.Language.get('portrait-phone'),
-	'tablet': Liferay.Language.get('tablet'),
-};
+const PREVIEW_SIZES = [
+	'desktop',
+	'tablet-portrait',
+	'mobile-portrait',
+	'full-size',
+];
 
 const stopEventPropagation = (event) => {
 	event.preventDefault();
@@ -89,9 +85,9 @@ const FragmentPreview = ({
 				const formData = new FormData();
 
 				formData.append(`${namespace}configuration`, configuration);
-				formData.append(`${namespace}css`, createFile('css', css));
-				formData.append(`${namespace}html`, createFile('html', html));
-				formData.append(`${namespace}js`, createFile('js', js));
+				formData.append(`${namespace}css`, css);
+				formData.append(`${namespace}html`, html);
+				formData.append(`${namespace}js`, js);
 
 				fetch(urls.render, {
 					body: formData,
@@ -169,7 +165,6 @@ const FragmentPreview = ({
 			<div className="btn-group fragment-preview__toolbar">
 				{PREVIEW_SIZES.map((previewSize) => (
 					<ClayButtonWithIcon
-						aria-label={PREVIEW_SIZES_LABELS[previewSize]}
 						borderless={true}
 						className={classNames({
 							active: currentPreviewSize === previewSize,
@@ -177,9 +172,8 @@ const FragmentPreview = ({
 						displayType="secondary"
 						key={previewSize}
 						onClick={() => setCurrentPreviewSize(previewSize)}
-						size="sm"
+						small={true}
 						symbol={previewSize}
-						title={PREVIEW_SIZES_LABELS[previewSize]}
 					/>
 				))}
 			</div>

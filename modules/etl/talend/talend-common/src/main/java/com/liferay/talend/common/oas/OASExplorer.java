@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -35,25 +36,27 @@ import javax.json.JsonValue;
  */
 public class OASExplorer {
 
-	public String getEntityClassName(String name, JsonObject oasJsonObject) {
+	public Optional<String> getEntityClassNameOptional(
+		String name, JsonObject oasJsonObject) {
+
 		String jsonFinderPath = StringUtil.replace(
 			OASConstants.LOCATOR_COMPONENTS_SCHEMAS_CLASS_NAME_PATTERN,
 			"SCHEMA_TPL", name);
 
 		if (!_jsonFinder.hasJsonObject(jsonFinderPath, oasJsonObject)) {
-			return null;
+			return Optional.empty();
 		}
 
 		JsonValue classNameJsonValue = _jsonFinder.getDescendantJsonValue(
 			jsonFinderPath, oasJsonObject);
 
 		if (classNameJsonValue.getValueType() != JsonValue.ValueType.STRING) {
-			return null;
+			return Optional.empty();
 		}
 
 		JsonString classNameJsonString = (JsonString)classNameJsonValue;
 
-		return classNameJsonString.getString();
+		return Optional.ofNullable(classNameJsonString.getString());
 	}
 
 	public Set<String> getEntitySchemaNames(JsonObject oasJsonObject) {

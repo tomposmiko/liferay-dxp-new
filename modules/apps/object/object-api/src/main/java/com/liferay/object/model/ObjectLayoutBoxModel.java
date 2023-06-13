@@ -356,21 +356,6 @@ public interface ObjectLayoutBoxModel
 	 */
 	public void setPriority(int priority);
 
-	/**
-	 * Returns the type of this object layout box.
-	 *
-	 * @return the type of this object layout box
-	 */
-	@AutoEscape
-	public String getType();
-
-	/**
-	 * Sets the type of this object layout box.
-	 *
-	 * @param type the type of this object layout box
-	 */
-	public void setType(String type);
-
 	@Override
 	public String[] getAvailableLanguageIds();
 
@@ -386,9 +371,5 @@ public interface ObjectLayoutBoxModel
 
 	@Override
 	public ObjectLayoutBox cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

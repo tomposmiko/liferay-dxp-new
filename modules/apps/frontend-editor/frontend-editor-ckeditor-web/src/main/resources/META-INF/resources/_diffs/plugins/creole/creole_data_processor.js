@@ -13,81 +13,81 @@
  */
 
 (function () {
-	const CKTools = CKEDITOR.tools;
+	var CKTools = CKEDITOR.tools;
 
-	const NEW_LINE = '\n';
+	var NEW_LINE = '\n';
 
-	const REGEX_CREOLE_RESERVED_CHARACTERS = /(\/{1,2}|={1,6}|\[{1,2}|\]{1,2}|\\{1,2}|\*{1,}|----|{{2,3}|}{2,3}|#{1,})/g;
+	var REGEX_CREOLE_RESERVED_CHARACTERS = /(\/{1,2}|={1,6}|\[{1,2}|\]{1,2}|\\{1,2}|\*{1,}|----|{{2,3}|}{2,3}|#{1,})/g;
 
-	const REGEX_HEADER = /^h([1-6])$/i;
+	var REGEX_HEADER = /^h([1-6])$/i;
 
-	const REGEX_LASTCHAR_NEWLINE = /(\r?\n\s*)$/;
+	var REGEX_LASTCHAR_NEWLINE = /(\r?\n\s*)$/;
 
-	const REGEX_NEWLINE = /\r?\n/g;
+	var REGEX_NEWLINE = /\r?\n/g;
 
-	const REGEX_NON_BREAKING_SPACE = /\u00a0/g;
+	var REGEX_NON_BREAKING_SPACE = /\u00a0/g;
 
-	const REGEX_NOT_WHITESPACE = /[^\t\n\r ]/;
+	var REGEX_NOT_WHITESPACE = /[^\t\n\r ]/;
 
-	const REGEX_URL_PREFIX = /^(?:\/|https?|ftp):\/\//i;
+	var REGEX_URL_PREFIX = /^(?:\/|https?|ftp):\/\//i;
 
-	const REGEX_ZERO_WIDTH_SPACE = /\u200B/g;
+	var REGEX_ZERO_WIDTH_SPACE = /\u200B/g;
 
-	const STR_BLANK = '';
+	var STR_BLANK = '';
 
-	const STR_EQUALS = '=';
+	var STR_EQUALS = '=';
 
-	const STR_LIST_ITEM_ESCAPE_CHARACTERS = '\\\\';
+	var STR_LIST_ITEM_ESCAPE_CHARACTERS = '\\\\';
 
-	const STR_PIPE = '|';
+	var STR_PIPE = '|';
 
-	const STR_SPACE = ' ';
+	var STR_SPACE = ' ';
 
-	const TAG_BOLD = '**';
+	var TAG_BOLD = '**';
 
-	const TAG_EMPHASIZE = '//';
+	var TAG_EMPHASIZE = '//';
 
-	const TAG_LIST_ITEM = 'li';
+	var TAG_LIST_ITEM = 'li';
 
-	const TAG_ORDERED_LIST = 'ol';
+	var TAG_ORDERED_LIST = 'ol';
 
-	const TAG_ORDERED_LIST_ITEM = '#';
+	var TAG_ORDERED_LIST_ITEM = '#';
 
-	const TAG_PARAGRAPH = 'p';
+	var TAG_PARAGRAPH = 'p';
 
-	const TAG_PRE = 'pre';
+	var TAG_PRE = 'pre';
 
-	const TAG_TELETYPETEXT = 'tt';
+	var TAG_TELETYPETEXT = 'tt';
 
-	const TAG_UNORDERED_LIST = 'ul';
+	var TAG_UNORDERED_LIST = 'ul';
 
-	const TAG_UNORDERED_LIST_ITEM = '*';
+	var TAG_UNORDERED_LIST_ITEM = '*';
 
-	let attachmentURLPrefix;
+	var attachmentURLPrefix;
 
-	const brFiller = CKEDITOR.env.needsBrFiller ? '<br>' : '';
+	var brFiller = CKEDITOR.env.needsBrFiller ? '<br>' : '';
 
-	const enterModeEmptyValue = {
+	var enterModeEmptyValue = {
 		1: ['<p>' + brFiller + '</p>'],
 		2: [brFiller],
 		3: ['<div>' + brFiller + '</div>'],
 	};
 
-	const CreoleDataProcessor = function (editor) {
-		const instance = this;
+	var CreoleDataProcessor = function (editor) {
+		var instance = this;
 
 		instance._editor = editor;
 	};
 
 	CreoleDataProcessor.prototype = {
 		_appendNewLines(total) {
-			const instance = this;
+			var instance = this;
 
-			let count = 0;
+			var count = 0;
 
-			const endResult = instance._endResult;
+			var endResult = instance._endResult;
 
-			const newLinesAtEnd = REGEX_LASTCHAR_NEWLINE.exec(
+			var newLinesAtEnd = REGEX_LASTCHAR_NEWLINE.exec(
 				endResult.slice(-2).join(STR_BLANK)
 			);
 
@@ -101,15 +101,15 @@
 		},
 
 		_convert(data) {
-			const instance = this;
+			var instance = this;
 
-			const node = document.createElement('div');
+			var node = document.createElement('div');
 
 			node.innerHTML = data;
 
 			instance._handle(node);
 
-			const endResult = instance._endResult.join(STR_BLANK);
+			var endResult = instance._endResult.join(STR_BLANK);
 
 			instance._endResult = null;
 
@@ -121,23 +121,23 @@
 		_endResult: null,
 
 		_handle(node) {
-			const instance = this;
+			var instance = this;
 
 			if (!instance._endResult) {
 				instance._endResult = [];
 			}
 
-			const children = node.childNodes;
+			var children = node.childNodes;
 
-			const pushTagList = instance._pushTagList;
+			var pushTagList = instance._pushTagList;
 
-			for (let i = 0; i < children.length; i++) {
-				const listTagsIn = [];
-				const listTagsOut = [];
-				const stylesTagsIn = [];
-				const stylesTagsOut = [];
+			for (var i = 0; i < children.length; i++) {
+				var listTagsIn = [];
+				var listTagsOut = [];
+				var stylesTagsIn = [];
+				var stylesTagsOut = [];
 
-				const child = children[i];
+				var child = children[i];
 
 				if (instance._skipParse) {
 					instance._handleData(child.data || child.outerHTML, node);
@@ -166,11 +166,11 @@
 		},
 
 		_handleBreak(element, listTagsIn, _listTagsOut) {
-			const instance = this;
+			var instance = this;
 
-			let newLineCharacter = STR_LIST_ITEM_ESCAPE_CHARACTERS;
+			var newLineCharacter = STR_LIST_ITEM_ESCAPE_CHARACTERS;
 
-			const nextSibling = element.nextSibling;
+			var nextSibling = element.nextSibling;
 
 			if (instance._skipParse) {
 				newLineCharacter = NEW_LINE;
@@ -187,7 +187,7 @@
 		},
 
 		_handleData(data, _element) {
-			const instance = this;
+			var instance = this;
 
 			if (data) {
 				if (!instance._skipParse) {
@@ -199,18 +199,18 @@
 						data = data.replace(
 							REGEX_CREOLE_RESERVED_CHARACTERS,
 							(_match, p1, _offset, _string) => {
-								let res = '';
+								var res = '';
 
 								if (!instance._endResult.length) {
 									res += '~' + p1;
 								}
 								else {
-									const lastResultString =
+									var lastResultString =
 										instance._endResult[
 											instance._endResult.length - 1
 										];
 
-									const lastResultCharacter =
+									var lastResultCharacter =
 										lastResultString[
 											lastResultString.length - 1
 										];
@@ -236,15 +236,15 @@
 		},
 
 		_handleElementEnd(element, _listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
-			let tagName = element.tagName;
+			var tagName = element.tagName;
 
 			if (tagName) {
 				tagName = tagName.toLowerCase();
 			}
 
-			if (tagName === TAG_PARAGRAPH) {
+			if (tagName == TAG_PARAGRAPH) {
 				if (!instance._isLastItemNewLine()) {
 					if (instance._hasParentNode(element, 'table', Infinity)) {
 						instance._endResult.push(
@@ -257,12 +257,12 @@
 				}
 			}
 			else if (
-				tagName === TAG_UNORDERED_LIST ||
-				tagName === TAG_ORDERED_LIST
+				tagName == TAG_UNORDERED_LIST ||
+				tagName == TAG_ORDERED_LIST
 			) {
 				instance._listsStack.pop();
 
-				let newLinesCount = 1;
+				var newLinesCount = 1;
 
 				if (!instance._hasParentNode(element, TAG_LIST_ITEM)) {
 					newLinesCount = 2;
@@ -270,12 +270,12 @@
 
 				instance._appendNewLines(newLinesCount);
 			}
-			else if (tagName === TAG_PRE) {
+			else if (tagName == TAG_PRE) {
 				if (!instance._isLastItemNewLine()) {
 					instance._endResult.push(NEW_LINE);
 				}
 			}
-			else if (tagName === 'table') {
+			else if (tagName == 'table') {
 				listTagsOut.push(NEW_LINE);
 			}
 
@@ -284,66 +284,66 @@
 		},
 
 		_handleElementStart(element, listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
-			let tagName = element.tagName;
+			var tagName = element.tagName;
 
 			if (tagName) {
 				tagName = tagName.toLowerCase();
 
-				const regexHeader = REGEX_HEADER.exec(tagName);
-				const elementContent = element.textContent
+				var regexHeader = REGEX_HEADER.exec(tagName);
+				var elementContent = element.textContent
 					.toString()
 					.replace(REGEX_ZERO_WIDTH_SPACE, STR_BLANK);
 
-				if (tagName === TAG_PARAGRAPH) {
+				if (tagName == TAG_PARAGRAPH) {
 					instance._handleParagraph(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === 'br') {
+				else if (tagName == 'br') {
 					instance._handleBreak(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === 'a') {
+				else if (tagName == 'a') {
 					instance._handleLink(element, listTagsIn, listTagsOut);
 				}
 				else if (
-					(tagName === 'strong' || tagName === 'b') &&
-					!!elementContent.length
+					(tagName == 'strong' || tagName == 'b') &&
+					elementContent.length > 0
 				) {
 					instance._handleStrong(element, listTagsIn, listTagsOut);
 				}
 				else if (
-					(tagName === 'em' || tagName === 'i') &&
-					!!elementContent.length
+					(tagName == 'em' || tagName == 'i') &&
+					elementContent.length > 0
 				) {
 					instance._handleEm(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === 'img') {
+				else if (tagName == 'img') {
 					instance._handleImage(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === TAG_UNORDERED_LIST) {
+				else if (tagName == TAG_UNORDERED_LIST) {
 					instance._handleUnorderedList(
 						element,
 						listTagsIn,
 						listTagsOut
 					);
 				}
-				else if (tagName === TAG_LIST_ITEM) {
+				else if (tagName == TAG_LIST_ITEM) {
 					instance._handleListItem(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === TAG_ORDERED_LIST) {
+				else if (tagName == TAG_ORDERED_LIST) {
 					instance._handleOrderedList(
 						element,
 						listTagsIn,
 						listTagsOut
 					);
 				}
-				else if (tagName === 'hr') {
+				else if (tagName == 'hr') {
 					instance._handleHr(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === TAG_PRE) {
+				else if (tagName == TAG_PRE) {
 					instance._handlePre(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === TAG_TELETYPETEXT) {
+				else if (tagName == TAG_TELETYPETEXT) {
 					instance._handleTT(element, listTagsIn, listTagsOut);
 				}
 				else if (regexHeader) {
@@ -354,17 +354,17 @@
 						regexHeader
 					);
 				}
-				else if (tagName === 'th') {
+				else if (tagName == 'th') {
 					instance._handleTableHeader(
 						element,
 						listTagsIn,
 						listTagsOut
 					);
 				}
-				else if (tagName === 'tr') {
+				else if (tagName == 'tr') {
 					instance._handleTableRow(element, listTagsIn, listTagsOut);
 				}
-				else if (tagName === 'td') {
+				else if (tagName == 'td') {
 					instance._handleTableCell(element, listTagsIn, listTagsOut);
 				}
 			}
@@ -376,9 +376,9 @@
 		},
 
 		_handleHeader(_element, listTagsIn, listTagsOut, params) {
-			const instance = this;
+			var instance = this;
 
-			let res = new Array(parseInt(params[1], 10) + 1);
+			var res = new Array(parseInt(params[1], 10) + 1);
 
 			res = res.join(STR_EQUALS);
 
@@ -393,7 +393,7 @@
 		},
 
 		_handleHr(element, listTagsIn, _listTagsOut) {
-			const instance = this;
+			var instance = this;
 
 			if (instance._isDataAvailable() && !instance._isLastItemNewLine()) {
 				listTagsIn.push(NEW_LINE);
@@ -403,8 +403,8 @@
 		},
 
 		_handleImage(element, listTagsIn, listTagsOut) {
-			const attrAlt = element.getAttribute('alt');
-			let attrSrc = element.getAttribute('src');
+			var attrAlt = element.getAttribute('alt');
+			var attrSrc = element.getAttribute('src');
 
 			attrSrc = attrSrc.replace(attachmentURLPrefix, STR_BLANK);
 
@@ -418,16 +418,16 @@
 		},
 
 		_handleLink(element, listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
-			let hrefAttribute = element.getAttribute('href');
+			var hrefAttribute = element.getAttribute('href');
 
 			if (hrefAttribute) {
 				if (!REGEX_URL_PREFIX.test(hrefAttribute)) {
 					hrefAttribute = decodeURIComponent(hrefAttribute);
 				}
 
-				const linkText = element.textContent || element.innerText;
+				var linkText = element.textContent || element.innerText;
 
 				listTagsIn.push('[[');
 
@@ -443,15 +443,15 @@
 		},
 
 		_handleListItem(element, listTagsIn, _listTagsOut) {
-			const instance = this;
+			var instance = this;
 
 			if (instance._isDataAvailable() && !instance._isLastItemNewLine()) {
 				listTagsIn.push(NEW_LINE);
 			}
 
-			const listsStack = instance._listsStack;
+			var listsStack = instance._listsStack;
 
-			const listsStackLength = listsStack.length;
+			var listsStackLength = listsStack.length;
 
 			listTagsIn.push(
 				new Array(listsStackLength + 1).join(
@@ -461,13 +461,13 @@
 		},
 
 		_handleOrderedList(_element, _listTagsIn) {
-			const instance = this;
+			var instance = this;
 
 			instance._listsStack.push(TAG_ORDERED_LIST_ITEM);
 		},
 
 		_handleParagraph(element, _listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
 			if (!instance._hasParentNode(element, 'table', Infinity)) {
 				if (instance._isDataAvailable()) {
@@ -479,7 +479,7 @@
 		},
 
 		_handlePre(_element, listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
 			instance._skipParse = true;
 
@@ -492,9 +492,9 @@
 		},
 
 		_handleStrong(element, listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
-			const previousSibling = element.previousSibling;
+			var previousSibling = element.previousSibling;
 
 			if (
 				instance._isParentNode(element, TAG_LIST_ITEM) &&
@@ -508,15 +508,15 @@
 		},
 
 		_handleStyles(element, stylesTagsIn, stylesTagsOut) {
-			const style = element.style;
+			var style = element.style;
 
 			if (style) {
-				if (style.fontWeight.toLowerCase() === 'bold') {
+				if (style.fontWeight.toLowerCase() == 'bold') {
 					stylesTagsIn.push(TAG_BOLD);
 					stylesTagsOut.push(TAG_BOLD);
 				}
 
-				if (style.fontStyle.toLowerCase() === 'italic') {
+				if (style.fontStyle.toLowerCase() == 'italic') {
 					stylesTagsIn.push(TAG_EMPHASIZE);
 					stylesTagsOut.push(TAG_EMPHASIZE);
 				}
@@ -524,7 +524,7 @@
 		},
 
 		_handleTT(_element, listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
 			instance._skipParse = true;
 
@@ -541,7 +541,7 @@
 		},
 
 		_handleTableRow(element, listTagsIn, listTagsOut) {
-			const instance = this;
+			var instance = this;
 
 			if (instance._isDataAvailable()) {
 				listTagsIn.push(NEW_LINE);
@@ -551,7 +551,7 @@
 		},
 
 		_handleUnorderedList(_element, _listTagsIn, _listTagsOut) {
-			const instance = this;
+			var instance = this;
 
 			instance._listsStack.push(TAG_UNORDERED_LIST_ITEM);
 		},
@@ -565,25 +565,25 @@
 		},
 
 		_hasParentNode(element, tags, level) {
-			const instance = this;
+			var instance = this;
 
 			if (!CKTools.isArray(tags)) {
 				tags = [tags];
 			}
 
-			let result = false;
+			var result = false;
 
-			const parentNode = element.parentNode;
+			var parentNode = element.parentNode;
 
-			const tagName =
+			var tagName =
 				parentNode &&
 				parentNode.tagName &&
 				parentNode.tagName.toLowerCase();
 
 			if (tagName) {
-				const length = tags.length;
+				var length = tags.length;
 
-				for (let i = 0; i < length; i++) {
+				for (var i = 0; i < length; i++) {
 					result = instance._tagNameMatch(tagName, tags[i]);
 
 					if (result) {
@@ -600,29 +600,29 @@
 		},
 
 		_isDataAvailable() {
-			const instance = this;
+			var instance = this;
 
-			const endResult = instance._endResult;
+			var endResult = instance._endResult;
 
 			return endResult && endResult.length;
 		},
 
 		_isIgnorable(node) {
-			const instance = this;
+			var instance = this;
 
-			const nodeType = node.nodeType;
+			var nodeType = node.nodeType;
 
 			return (
 				node.isElementContentWhitespace ||
-				nodeType === 8 ||
-				(nodeType === 3 && instance._isWhitespace(node))
+				nodeType == 8 ||
+				(nodeType == 3 && instance._isWhitespace(node))
 			);
 		},
 
 		_isLastItemNewLine() {
-			const instance = this;
+			var instance = this;
 
-			const endResult = instance._endResult;
+			var endResult = instance._endResult;
 
 			return (
 				endResult && REGEX_LASTCHAR_NEWLINE.test(endResult.slice(-1))
@@ -630,7 +630,7 @@
 		},
 
 		_isParentNode(element, tagName) {
-			const instance = this;
+			var instance = this;
 
 			return instance._hasParentNode(element, tagName, 1);
 		},
@@ -645,14 +645,17 @@
 		_listsStack: [],
 
 		_pushTagList(tagsList) {
-			const instance = this;
+			var instance = this;
 
-			let tag;
+			var endResult;
+			var i;
+			var length;
+			var tag;
 
-			const endResult = instance._endResult;
-			const length = tagsList.length;
+			endResult = instance._endResult;
+			length = tagsList.length;
 
-			for (let i = 0; i < length; i++) {
+			for (i = 0; i < length; i++) {
 				tag = tagsList[i];
 
 				endResult.push(tag);
@@ -673,20 +676,20 @@
 		constructor: CreoleDataProcessor,
 
 		toDataFormat(html) {
-			const instance = this;
+			var instance = this;
 
-			const data = instance._convert(html);
+			var data = instance._convert(html);
 
 			return data;
 		},
 
 		toHtml(data, config) {
-			const instance = this;
+			var instance = this;
 
 			if (config) {
-				const fragment = CKEDITOR.htmlParser.fragment.fromHtml(data);
+				var fragment = CKEDITOR.htmlParser.fragment.fromHtml(data);
 
-				const writer = new CKEDITOR.htmlParser.basicWriter();
+				var writer = new CKEDITOR.htmlParser.basicWriter();
 
 				config.filter.applyTo(fragment);
 
@@ -695,7 +698,7 @@
 				data = writer.getHtml();
 			}
 			else {
-				const div = document.createElement('div');
+				var div = document.createElement('div');
 
 				if (!instance._creoleParser) {
 					instance._creoleParser = new CKEDITOR.CreoleParser({

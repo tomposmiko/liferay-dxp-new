@@ -85,8 +85,4 @@ public interface CounterModel extends BaseModel<Counter> {
 	@Override
 	public Counter cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

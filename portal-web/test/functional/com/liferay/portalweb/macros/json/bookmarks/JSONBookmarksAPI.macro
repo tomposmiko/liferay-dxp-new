@@ -7,26 +7,25 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (isSet(description)) {
-			var description = ${description};
+			var description = "${description}";
 		}
 		else {
 			var description = "";
 		}
 
-		var userLoginInfo = JSONUtil2.formatJSONUser();
-
 		var curl = '''
 			${portalURL}/api/jsonws/bookmarks.bookmarksentry/add-entry \
-				-u ${userLoginInfo} \
+				-u test@liferay.com:test \
 				-d groupId=${groupId} \
 				-d folderId=${folderId} \
 				-d name=${name} \
 				-d url=${url}
 				-d description=${description}
 				-d serviceContext=${serviceContext}
+
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@summary = "Helper function to add a Bookmarks Folder via JSON"
@@ -36,24 +35,22 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (isSet(folderDescription)) {
-			var description = ${folderDescription};
+			var description = "${folderDescription}";
 		}
 		else {
 			var description = "";
 		}
 
-		var userLoginInfo = JSONUtil2.formatJSONUser();
-
 		var curl = '''
 			${portalURL}/api/jsonws/bookmarks.bookmarksfolder/add-folder \
-				-u ${userLoginInfo} \
+				-u test@liferay.com:test \
 				-d parentFolderId=${parentFolderId} \
 				-d name=${folderName} \
 				-d description=${description} \
 				-d serviceContext=${serviceContext}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@summary = "Helper function to get the 'folderId' for the folder '${folderName}'"
@@ -61,21 +58,20 @@ definition {
 		Variables.assertDefined(parameterList = "${groupId},${folderName}");
 
 		var portalURL = JSONCompany.getPortalURL();
-		var userLoginInfo = JSONUtil2.formatJSONUser();
 
 		var curl = '''
 			${portalURL}/api/jsonws/bookmarks.bookmarksfolder/get-folders \
-				-u ${userLoginInfo} \
+				-u test@liferay.com:test \
 				-d groupId=${groupId}
 		''';
 
-		var folderId = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${folderName}')]['folderId']");
+		var folderId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${folderName}')]['folderId']");
 
-		if (${folderId} == "") {
+		if ("${folderId}" == "") {
 			fail("FAIL. Cannot find folder.");
 		}
 		else {
-			return ${folderId};
+			return "${folderId}";
 		}
 	}
 

@@ -14,24 +14,24 @@
 
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
+import com.liferay.jenkins.results.parser.GitWorkingDirectory;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
-import com.liferay.jenkins.results.parser.test.clazz.NPMTestClass;
-import com.liferay.jenkins.results.parser.test.clazz.TestClass;
-import com.liferay.jenkins.results.parser.test.clazz.TestClassFactory;
-import com.liferay.jenkins.results.parser.test.clazz.TestClassMethod;
 
 import java.io.File;
 import java.io.IOException;
 
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
-
-import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
@@ -62,21 +62,32 @@ public class NPMTestBatchTestClassGroup extends BatchTestClassGroup {
 		return TestClassGroupFactory.newAxisTestClassGroup(this);
 	}
 
+	public Map<File, NPMTestBatchTestClass> getNPMTestBatchTestClasses() {
+		return NPMTestBatchTestClass.getNPMTestBatchTestClasses();
+	}
+
 	public void writeTestCSVReportFile() throws Exception {
 		CSVReport csvReport = new CSVReport(
 			new CSVReport.Row(
 				"Module Name", "Class Name", "Method Name", "Ignored",
 				"File Path"));
 
-		for (NPMTestClass npmTestClass : TestClassFactory.getNPMTestClasses()) {
-			File moduleTestClassFile = npmTestClass.getTestClassFile();
+		Map<File, NPMTestBatchTestClass> npmTestBatchTestClasses =
+			getNPMTestBatchTestClasses();
+
+		for (NPMTestBatchTestClassGroup.NPMTestBatchTestClass
+				npmTestBatchTestClass : npmTestBatchTestClasses.values()) {
+
+			File moduleTestClassFile = npmTestBatchTestClass.getTestClassFile();
 
 			String moduleName = moduleTestClassFile.getName();
 
-			List<TestClassMethod> jsTestClassMethods =
-				npmTestClass.getJSTestClassMethods();
+			List<TestClassGroup.TestClass.TestClassMethod> jsTestClassMethods =
+				npmTestBatchTestClass.getJSTestClassMethods();
 
-			for (TestClassMethod jsTestClassMethod : jsTestClassMethods) {
+			for (TestClassGroup.TestClass.TestClassMethod jsTestClassMethod :
+					jsTestClassMethods) {
+
 				String classMethodName = jsTestClassMethod.getName();
 
 				int colonIndex = classMethodName.indexOf(
@@ -123,10 +134,109 @@ public class NPMTestBatchTestClassGroup extends BatchTestClassGroup {
 		}
 	}
 
-	protected NPMTestBatchTestClassGroup(
-		JSONObject jsonObject, PortalTestClassJob portalTestClassJob) {
+	public static class NPMTestBatchTestClass extends BaseTestClass {
 
-		super(jsonObject, portalTestClassJob);
+		public List<TestClassGroup.TestClass.TestClassMethod>
+			getJSTestClassMethods() {
+
+			return _jsTestClassMethods;
+		}
+
+		protected static NPMTestBatchTestClass getInstance(
+			String batchName, GitWorkingDirectory gitWorkingDirectory,
+			File moduleDir) {
+
+			if (_npmTestBatchTestClasses.containsKey(moduleDir)) {
+				return _npmTestBatchTestClasses.get(moduleDir);
+			}
+
+			_npmTestBatchTestClasses.put(
+				moduleDir,
+				new NPMTestBatchTestClass(
+					batchName, gitWorkingDirectory,
+					new File(
+						JenkinsResultsParserUtil.getCanonicalPath(moduleDir))));
+
+			return _npmTestBatchTestClasses.get(moduleDir);
+		}
+
+		protected static Map<File, NPMTestBatchTestClass>
+			getNPMTestBatchTestClasses() {
+
+			return _npmTestBatchTestClasses;
+		}
+
+		protected NPMTestBatchTestClass(
+			String batchName, GitWorkingDirectory gitWorkingDirectory,
+			File testClassFile) {
+
+			super(testClassFile);
+
+			addTestClassMethod(batchName);
+
+			_gitWorkingDirectory = gitWorkingDirectory;
+
+			_moduleFile = testClassFile;
+
+			initJSTestClassMethods();
+		}
+
+		protected void initJSTestClassMethods() {
+			List<File> jsFiles = JenkinsResultsParserUtil.findFiles(
+				_moduleFile, ".*\\.(js|ts|tsx)");
+
+			String workingDirectoryPath =
+				JenkinsResultsParserUtil.getCanonicalPath(
+					_gitWorkingDirectory.getWorkingDirectory());
+
+			for (File jsFile : jsFiles) {
+				try {
+					String jsFileRelativePath =
+						JenkinsResultsParserUtil.getCanonicalPath(jsFile);
+
+					jsFileRelativePath = jsFileRelativePath.replace(
+						workingDirectoryPath, "");
+
+					String jsFileContent = JenkinsResultsParserUtil.read(
+						jsFile);
+
+					Matcher matcher = _itPattern.matcher(jsFileContent);
+
+					while (matcher.find()) {
+						String methodName = matcher.group("description");
+
+						String xit = matcher.group("xit");
+
+						boolean methodIgnored = false;
+
+						if (xit != null) {
+							methodIgnored = true;
+						}
+
+						_jsTestClassMethods.add(
+							new TestClassMethod(
+								methodIgnored,
+								jsFileRelativePath +
+									_TOKEN_CLASS_METHOD_SEPARATOR + methodName,
+								this));
+					}
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
+			}
+		}
+
+		private static final Pattern _itPattern = Pattern.compile(
+			"\\s+(?<xit>x)?it\\s*\\(\\s*\\'(?<description>[\\s\\S]*?)\\'");
+		private static final Map<File, NPMTestBatchTestClass>
+			_npmTestBatchTestClasses = new HashMap<>();
+
+		private final GitWorkingDirectory _gitWorkingDirectory;
+		private final List<TestClassMethod> _jsTestClassMethods =
+			new ArrayList<>();
+		private final File _moduleFile;
+
 	}
 
 	protected NPMTestBatchTestClassGroup(
@@ -161,16 +271,15 @@ public class NPMTestBatchTestClassGroup extends BatchTestClassGroup {
 			TestClassGroupFactory.newAxisTestClassGroup(this);
 
 		for (File moduleDir : moduleDirs) {
-			TestClass testClass = TestClassFactory.newTestClass(
-				this, moduleDir);
+			NPMTestBatchTestClass npmTestBatchTestClass =
+				NPMTestBatchTestClass.getInstance(
+					batchName, portalGitWorkingDirectory,
+					new File(
+						JenkinsResultsParserUtil.getCanonicalPath(moduleDir)));
 
-			if (!testClass.hasTestClassMethods()) {
-				continue;
-			}
+			testClasses.add(npmTestBatchTestClass);
 
-			testClasses.add(testClass);
-
-			axisTestClassGroup.addTestClass(testClass);
+			axisTestClassGroup.addTestClass(npmTestBatchTestClass);
 		}
 
 		axisTestClassGroups.add(0, axisTestClassGroup);

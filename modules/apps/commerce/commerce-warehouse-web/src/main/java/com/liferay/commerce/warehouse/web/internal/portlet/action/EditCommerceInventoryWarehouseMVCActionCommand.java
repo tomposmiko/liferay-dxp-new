@@ -40,13 +40,10 @@ import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 
-import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.portlet.ActionRequest;
@@ -60,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_INVENTORY_WAREHOUSE,
 		"mvc.command.name=/commerce_inventory_warehouse/edit_commerce_inventory_warehouse"
@@ -69,62 +67,8 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCommerceInventoryWarehouseMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceInventoryWarehouses(actionRequest);
-			}
-			else if (cmd.equals(Constants.ADD) ||
-					 cmd.equals(Constants.UPDATE)) {
-
-				Callable<Object> commerceInventoryWarehouseCallable =
-					new CommerceInventoryWarehouseCallable(actionRequest);
-
-				TransactionInvokerUtil.invoke(
-					_transactionConfig, commerceInventoryWarehouseCallable);
-			}
-			else if (cmd.equals("geolocate")) {
-				_geolocateCommerceInventoryWarehouse(actionRequest);
-			}
-			else if (cmd.equals("setActive")) {
-				_setActive(actionRequest);
-			}
-		}
-		catch (Throwable throwable) {
-			if (throwable instanceof NoSuchWarehouseException ||
-				throwable instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, throwable.getClass());
-
-				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
-			}
-			else if (throwable instanceof CommerceGeocoderException ||
-					 throwable instanceof
-						 CommerceInventoryWarehouseActiveException ||
-					 throwable instanceof
-						 CommerceInventoryWarehouseNameException ||
-					 throwable instanceof MVCCException) {
-
-				hideDefaultErrorMessage(actionRequest);
-				hideDefaultSuccessMessage(actionRequest);
-
-				SessionErrors.add(actionRequest, throwable.getClass());
-
-				actionResponse.setRenderParameter(
-					"mvcRenderCommandName",
-					"/commerce_inventory_warehouse" +
-						"/edit_commerce_inventory_warehouse");
-			}
-		}
-	}
-
-	private void _deleteCommerceInventoryWarehouses(ActionRequest actionRequest)
+	protected void deleteCommerceInventoryWarehouses(
+			ActionRequest actionRequest)
 		throws PortalException {
 
 		long[] deleteCommerceInventoryWarehouseIds;
@@ -152,7 +96,68 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 		}
 	}
 
-	private void _geolocateCommerceInventoryWarehouse(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.DELETE)) {
+				deleteCommerceInventoryWarehouses(actionRequest);
+			}
+			else if (cmd.equals(Constants.ADD) ||
+					 cmd.equals(Constants.UPDATE)) {
+
+				Callable<Object> commerceInventoryWarehouseCallable =
+					new CommerceInventoryWarehouseCallable(actionRequest);
+
+				TransactionInvokerUtil.invoke(
+					_transactionConfig, commerceInventoryWarehouseCallable);
+			}
+			else if (cmd.equals("geolocate")) {
+				geolocateCommerceInventoryWarehouse(actionRequest);
+			}
+			else if (cmd.equals("setActive")) {
+				setActive(actionRequest);
+			}
+		}
+		catch (Throwable throwable) {
+			if (throwable instanceof CommerceGeocoderException) {
+				hideDefaultErrorMessage(actionRequest);
+
+				SessionErrors.add(
+					actionRequest, throwable.getClass(),
+					throwable.getMessage());
+			}
+			else if (throwable instanceof NoSuchWarehouseException ||
+					 throwable instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, throwable.getClass());
+
+				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+			}
+			else if (throwable instanceof
+						CommerceInventoryWarehouseActiveException ||
+					 throwable instanceof
+						 CommerceInventoryWarehouseNameException ||
+					 throwable instanceof MVCCException) {
+
+				hideDefaultErrorMessage(actionRequest);
+				hideDefaultSuccessMessage(actionRequest);
+
+				SessionErrors.add(actionRequest, throwable.getClass());
+
+				actionResponse.setRenderParameter(
+					"mvcRenderCommandName",
+					"/commerce_inventory_warehouse" +
+						"/edit_commerce_inventory_warehouse");
+			}
+		}
+	}
+
+	protected void geolocateCommerceInventoryWarehouse(
 			ActionRequest actionRequest)
 		throws PortalException {
 
@@ -167,32 +172,20 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 			_portal.getCompanyId(actionRequest),
 			commerceInventoryWarehouse.getCountryTwoLettersISOCode());
 
+		Region region = _getRegion(
+			country.getCountryId(),
+			commerceInventoryWarehouse.getCommerceRegionCode());
+
 		double[] coordinates = _commerceGeocoder.getCoordinates(
 			commerceInventoryWarehouse.getStreet1(),
 			commerceInventoryWarehouse.getCity(),
-			commerceInventoryWarehouse.getZip(),
-			_getRegion(
-				country.getCountryId(),
-				commerceInventoryWarehouse.getCommerceRegionCode()),
-			country);
+			commerceInventoryWarehouse.getZip(), region, country);
 
 		_commerceInventoryWarehouseService.geolocateCommerceInventoryWarehouse(
 			commerceInventoryWarehouseId, coordinates[0], coordinates[1]);
 	}
 
-	private Country _getCountry(long companyId, String countryCode)
-		throws PortalException {
-
-		return _countryLocalService.getCountryByA2(companyId, countryCode);
-	}
-
-	private Region _getRegion(long countryId, String regionCode)
-		throws PortalException {
-
-		return _regionLocalService.getRegion(countryId, regionCode);
-	}
-
-	private void _setActive(ActionRequest actionRequest) throws Exception {
+	protected void setActive(ActionRequest actionRequest) throws Exception {
 		long commerceInventoryWarehouseId = ParamUtil.getLong(
 			actionRequest, "commerceInventoryWarehouseId");
 
@@ -202,7 +195,9 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 			commerceInventoryWarehouseId, active);
 	}
 
-	private void _updateChannels(ActionRequest actionRequest) throws Exception {
+	protected void updateChannels(ActionRequest actionRequest)
+		throws PortalException {
+
 		long commerceInventoryWarehouseId = ParamUtil.getLong(
 			actionRequest, "commerceInventoryWarehouseId");
 
@@ -231,17 +226,15 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 		}
 	}
 
-	private CommerceInventoryWarehouse _updateCommerceInventoryWarehouse(
+	protected CommerceInventoryWarehouse updateCommerceInventoryWarehouse(
 			ActionRequest actionRequest)
-		throws Exception {
+		throws PortalException {
 
 		long commerceInventoryWarehouseId = ParamUtil.getLong(
 			actionRequest, "commerceInventoryWarehouseId");
 
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
-			actionRequest, "name");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
+		String name = ParamUtil.getString(actionRequest, "name");
+		String description = ParamUtil.getString(actionRequest, "description");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 		String street1 = ParamUtil.getString(actionRequest, "street1");
 		String street2 = ParamUtil.getString(actionRequest, "street2");
@@ -265,7 +258,7 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 			commerceInventoryWarehouse =
 				_commerceInventoryWarehouseService.
 					addCommerceInventoryWarehouse(
-						null, nameMap, descriptionMap, active, street1, street2,
+						null, name, description, active, street1, street2,
 						street3, city, zip, commerceRegionCode,
 						commerceCountryCode, latitude, longitude,
 						serviceContext);
@@ -278,13 +271,25 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 			commerceInventoryWarehouse =
 				_commerceInventoryWarehouseService.
 					updateCommerceInventoryWarehouse(
-						commerceInventoryWarehouseId, nameMap, descriptionMap,
-						active, street1, street2, street3, city, zip,
+						commerceInventoryWarehouseId, name, description, active,
+						street1, street2, street3, city, zip,
 						commerceRegionCode, commerceCountryCode, latitude,
 						longitude, mvccVersion, serviceContext);
 		}
 
 		return commerceInventoryWarehouse;
+	}
+
+	private Country _getCountry(long companyId, String countryCode)
+		throws PortalException {
+
+		return _countryLocalService.getCountryByA2(companyId, countryCode);
+	}
+
+	private Region _getRegion(long countryId, String regionCode)
+		throws PortalException {
+
+		return _regionLocalService.getRegion(countryId, regionCode);
 	}
 
 	private static final TransactionConfig _transactionConfig =
@@ -305,9 +310,6 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 	private CountryLocalService _countryLocalService;
 
 	@Reference
-	private Localization _localization;
-
-	@Reference
 	private Portal _portal;
 
 	@Reference
@@ -318,8 +320,8 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 
 		@Override
 		public Object call() throws Exception {
-			_updateCommerceInventoryWarehouse(_actionRequest);
-			_updateChannels(_actionRequest);
+			updateCommerceInventoryWarehouse(_actionRequest);
+			updateChannels(_actionRequest);
 
 			return null;
 		}

@@ -33,11 +33,6 @@ public class CSDiagramEntryTable extends BaseTable<CSDiagramEntryTable> {
 	public static final CSDiagramEntryTable INSTANCE =
 		new CSDiagramEntryTable();
 
-	public final Column<CSDiagramEntryTable, Long> mvccVersion = createColumn(
-		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<CSDiagramEntryTable, Long> ctCollectionId =
-		createColumn(
-			"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<CSDiagramEntryTable, Long> CSDiagramEntryId =
 		createColumn(
 			"CSDiagramEntryId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);

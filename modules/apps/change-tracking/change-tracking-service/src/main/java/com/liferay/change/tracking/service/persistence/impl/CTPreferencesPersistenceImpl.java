@@ -20,7 +20,6 @@ import com.liferay.change.tracking.model.CTPreferencesTable;
 import com.liferay.change.tracking.model.impl.CTPreferencesImpl;
 import com.liferay.change.tracking.model.impl.CTPreferencesModelImpl;
 import com.liferay.change.tracking.service.persistence.CTPreferencesPersistence;
-import com.liferay.change.tracking.service.persistence.CTPreferencesUtil;
 import com.liferay.change.tracking.service.persistence.impl.constants.CTPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -35,6 +34,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -44,7 +44,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
@@ -68,7 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = CTPreferencesPersistence.class)
+@Component(service = {CTPreferencesPersistence.class, BasePersistence.class})
 public class CTPreferencesPersistenceImpl
 	extends BasePersistenceImpl<CTPreferences>
 	implements CTPreferencesPersistence {
@@ -189,7 +188,7 @@ public class CTPreferencesPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTPreferences>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTPreferences ctPreferences : list) {
@@ -555,7 +554,7 @@ public class CTPreferencesPersistenceImpl
 
 		Object[] finderArgs = new Object[] {ctCollectionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -698,7 +697,7 @@ public class CTPreferencesPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTPreferences>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTPreferences ctPreferences : list) {
@@ -1069,7 +1068,7 @@ public class CTPreferencesPersistenceImpl
 
 		Object[] finderArgs = new Object[] {previousCtCollectionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1184,8 +1183,7 @@ public class CTPreferencesPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_U, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_U, finderArgs);
 		}
 
 		if (result instanceof CTPreferences) {
@@ -1283,7 +1281,7 @@ public class CTPreferencesPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, userId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1733,7 +1731,7 @@ public class CTPreferencesPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTPreferences>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1803,7 +1801,7 @@ public class CTPreferencesPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1918,31 +1916,11 @@ public class CTPreferencesPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "userId"}, false);
-
-		_setCTPreferencesUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCTPreferencesUtilPersistence(null);
-
 		entityCache.removeCache(CTPreferencesImpl.class.getName());
-	}
-
-	private void _setCTPreferencesUtilPersistence(
-		CTPreferencesPersistence ctPreferencesPersistence) {
-
-		try {
-			Field field = CTPreferencesUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ctPreferencesPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2004,5 +1982,9 @@ public class CTPreferencesPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private CTPreferencesModelArgumentsResolver
+		_ctPreferencesModelArgumentsResolver;
 
 }

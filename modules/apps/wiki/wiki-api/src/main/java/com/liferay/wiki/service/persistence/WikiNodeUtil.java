@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the wiki node service. This utility wraps <code>com.liferay.wiki.service.persistence.impl.WikiNodePersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1448,71 +1452,71 @@ public class WikiNodeUtil {
 	}
 
 	/**
-	 * Returns the wiki node where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchNodeException</code> if it could not be found.
+	 * Returns the wiki node where groupId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchNodeException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching wiki node
 	 * @throws NoSuchNodeException if a matching wiki node could not be found
 	 */
-	public static WikiNode findByERC_G(
-			String externalReferenceCode, long groupId)
+	public static WikiNode findByG_ERC(
+			long groupId, String externalReferenceCode)
 		throws com.liferay.wiki.exception.NoSuchNodeException {
 
-		return getPersistence().findByERC_G(externalReferenceCode, groupId);
+		return getPersistence().findByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the wiki node where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the wiki node where groupId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching wiki node, or <code>null</code> if a matching wiki node could not be found
 	 */
-	public static WikiNode fetchByERC_G(
-		String externalReferenceCode, long groupId) {
+	public static WikiNode fetchByG_ERC(
+		long groupId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_G(externalReferenceCode, groupId);
+		return getPersistence().fetchByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the wiki node where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the wiki node where groupId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching wiki node, or <code>null</code> if a matching wiki node could not be found
 	 */
-	public static WikiNode fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache) {
+	public static WikiNode fetchByG_ERC(
+		long groupId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_G(
-			externalReferenceCode, groupId, useFinderCache);
+		return getPersistence().fetchByG_ERC(
+			groupId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the wiki node where externalReferenceCode = &#63; and groupId = &#63; from the database.
+	 * Removes the wiki node where groupId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the wiki node that was removed
 	 */
-	public static WikiNode removeByERC_G(
-			String externalReferenceCode, long groupId)
+	public static WikiNode removeByG_ERC(
+			long groupId, String externalReferenceCode)
 		throws com.liferay.wiki.exception.NoSuchNodeException {
 
-		return getPersistence().removeByERC_G(externalReferenceCode, groupId);
+		return getPersistence().removeByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of wiki nodes where externalReferenceCode = &#63; and groupId = &#63;.
+	 * Returns the number of wiki nodes where groupId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching wiki nodes
 	 */
-	public static int countByERC_G(String externalReferenceCode, long groupId) {
-		return getPersistence().countByERC_G(externalReferenceCode, groupId);
+	public static int countByG_ERC(long groupId, String externalReferenceCode) {
+		return getPersistence().countByG_ERC(groupId, externalReferenceCode);
 	}
 
 	/**
@@ -1663,9 +1667,23 @@ public class WikiNodeUtil {
 	}
 
 	public static WikiNodePersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile WikiNodePersistence _persistence;
+	private static ServiceTracker<WikiNodePersistence, WikiNodePersistence>
+		_serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(WikiNodePersistence.class);
+
+		ServiceTracker<WikiNodePersistence, WikiNodePersistence>
+			serviceTracker =
+				new ServiceTracker<WikiNodePersistence, WikiNodePersistence>(
+					bundle.getBundleContext(), WikiNodePersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

@@ -97,6 +97,9 @@ public class MBStatsUserLocalServiceImpl
 	public long getMessageCountByGroupId(long groupId) throws PortalException {
 		Group group = _groupLocalService.getGroup(groupId);
 
+		long defaultUserId = _userLocalService.getDefaultUserId(
+			group.getCompanyId());
+
 		return _mbMessagePersistence.dslQuery(
 			DSLQueryFactoryUtil.count(
 			).from(
@@ -105,8 +108,7 @@ public class MBStatsUserLocalServiceImpl
 				MBMessageTable.INSTANCE.groupId.eq(
 					groupId
 				).and(
-					MBMessageTable.INSTANCE.userId.neq(
-						_userLocalService.getGuestUserId(group.getCompanyId()))
+					MBMessageTable.INSTANCE.userId.neq(defaultUserId)
 				).and(
 					MBMessageTable.INSTANCE.categoryId.neq(
 						MBCategoryConstants.DISCUSSION_CATEGORY_ID)
@@ -143,7 +145,7 @@ public class MBStatsUserLocalServiceImpl
 
 		Group group = _groupLocalService.getGroup(groupId);
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			group.getCompanyId());
 
 		Expression<Long> countExpression = DSLFunctionFactoryUtil.count(
@@ -166,7 +168,7 @@ public class MBStatsUserLocalServiceImpl
 				MBMessageTable.INSTANCE.groupId.eq(
 					groupId
 				).and(
-					MBMessageTable.INSTANCE.userId.neq(guestUserId)
+					MBMessageTable.INSTANCE.userId.neq(defaultUserId)
 				).and(
 					MBMessageTable.INSTANCE.categoryId.neq(
 						MBCategoryConstants.DISCUSSION_CATEGORY_ID)
@@ -203,6 +205,9 @@ public class MBStatsUserLocalServiceImpl
 
 		Group group = _groupLocalService.getGroup(groupId);
 
+		long defaultUserId = _userLocalService.getDefaultUserId(
+			group.getCompanyId());
+
 		return _mbMessagePersistence.dslQueryCount(
 			DSLQueryFactoryUtil.countDistinct(
 				MBMessageTable.INSTANCE.userId
@@ -212,8 +217,7 @@ public class MBStatsUserLocalServiceImpl
 				MBMessageTable.INSTANCE.groupId.eq(
 					groupId
 				).and(
-					MBMessageTable.INSTANCE.userId.neq(
-						_userLocalService.getGuestUserId(group.getCompanyId()))
+					MBMessageTable.INSTANCE.userId.neq(defaultUserId)
 				).and(
 					MBMessageTable.INSTANCE.categoryId.neq(
 						MBCategoryConstants.DISCUSSION_CATEGORY_ID)
@@ -274,7 +278,7 @@ public class MBStatsUserLocalServiceImpl
 				}
 				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(exception);
+						_log.warn(exception, exception);
 					}
 				}
 			}

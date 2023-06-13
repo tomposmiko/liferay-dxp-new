@@ -14,9 +14,7 @@
 
 package com.liferay.document.library.web.internal.portlet.action;
 
-import com.liferay.change.tracking.spi.constants.CTTimelineKeys;
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
-import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.web.internal.constants.DLWebKeys;
 import com.liferay.document.library.web.internal.helper.DLTrashHelper;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -51,16 +49,12 @@ public abstract class BaseFolderMVCRenderCommand implements MVCRenderCommand {
 						WebKeys.THEME_DISPLAY);
 
 				checkPermissions(themeDisplay.getPermissionChecker(), folder);
-
-				renderRequest.setAttribute(
-					CTTimelineKeys.CLASS_NAME, DLFolder.class.getName());
-				renderRequest.setAttribute(
-					CTTimelineKeys.CLASS_PK, folder.getFolderId());
 			}
+
+			renderRequest.setAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER, folder);
 
 			renderRequest.setAttribute(
 				DLWebKeys.DOCUMENT_LIBRARY_TRASH_HELPER, getDLTrashHelper());
-			renderRequest.setAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDER, folder);
 
 			return getPath();
 		}

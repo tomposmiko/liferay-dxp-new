@@ -22,8 +22,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author Peter Yoo
@@ -39,7 +37,7 @@ public class ParallelExecutor<T> {
 
 		_executorService = executorService;
 
-		if (executorService == null) {
+		if (_executorService == null) {
 			_disposeExecutor = true;
 			_executorService = Executors.newSingleThreadExecutor();
 		}
@@ -55,17 +53,9 @@ public class ParallelExecutor<T> {
 	}
 
 	public List<T> execute() {
-		return execute(null);
-	}
-
-	public List<T> execute(Long timeoutSeconds) {
 		start();
 
-		return waitFor(timeoutSeconds);
-	}
-
-	public void shutdownNow() {
-		_executorService.shutdownNow();
+		return waitFor();
 	}
 
 	public synchronized void start() {
@@ -81,16 +71,8 @@ public class ParallelExecutor<T> {
 	}
 
 	public List<T> waitFor() {
-		return waitFor(null);
-	}
-
-	public List<T> waitFor(Long timeoutSeconds) {
 		if (_futures == null) {
 			start();
-		}
-
-		if (timeoutSeconds == null) {
-			timeoutSeconds = 60L * 60L * 2L;
 		}
 
 		try {
@@ -98,23 +80,7 @@ public class ParallelExecutor<T> {
 
 			for (Future<T> future : _futures) {
 				try {
-					T result = null;
-
-					try {
-						result = future.get(timeoutSeconds, TimeUnit.SECONDS);
-					}
-					catch (TimeoutException timeoutException) {
-						System.out.println(
-							JenkinsResultsParserUtil.combine(
-								"Parallel executor thread timed out after ",
-								JenkinsResultsParserUtil.toDurationString(
-									timeoutSeconds * 1000),
-								"\n", timeoutException.getMessage()));
-
-						future.cancel(true);
-
-						result = null;
-					}
+					T result = future.get();
 
 					if ((result == null) && _excludeNulls) {
 						continue;
@@ -131,7 +97,7 @@ public class ParallelExecutor<T> {
 		}
 		finally {
 			if (_disposeExecutor) {
-				_executorService.shutdownNow();
+				_executorService.shutdown();
 
 				while (!_executorService.isShutdown()) {
 					JenkinsResultsParserUtil.sleep(100);

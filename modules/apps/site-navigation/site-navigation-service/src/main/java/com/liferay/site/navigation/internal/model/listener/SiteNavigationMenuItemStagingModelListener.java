@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Máté Thurzó
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class SiteNavigationMenuItemStagingModelListener
 	extends BaseModelListener<SiteNavigationMenuItem> {
 

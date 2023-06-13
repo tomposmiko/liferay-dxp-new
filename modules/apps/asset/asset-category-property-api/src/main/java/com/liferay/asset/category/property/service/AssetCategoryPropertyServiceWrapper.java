@@ -28,10 +28,6 @@ public class AssetCategoryPropertyServiceWrapper
 	implements AssetCategoryPropertyService,
 			   ServiceWrapper<AssetCategoryPropertyService> {
 
-	public AssetCategoryPropertyServiceWrapper() {
-		this(null);
-	}
-
 	public AssetCategoryPropertyServiceWrapper(
 		AssetCategoryPropertyService assetCategoryPropertyService) {
 

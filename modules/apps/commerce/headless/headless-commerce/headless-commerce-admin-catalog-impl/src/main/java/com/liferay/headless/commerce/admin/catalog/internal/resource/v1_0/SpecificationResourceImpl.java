@@ -19,24 +19,25 @@ import com.liferay.commerce.product.model.CPSpecificationOption;
 import com.liferay.commerce.product.service.CPSpecificationOptionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.OptionCategory;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Specification;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.SpecificationDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.odata.entity.v1_0.SpecificationEntityModel;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.SpecificationResource;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.Collections;
@@ -53,11 +54,12 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/specification.properties",
 	scope = ServiceScope.PROTOTYPE, service = SpecificationResource.class
 )
-@CTAware
-public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
+public class SpecificationResourceImpl
+	extends BaseSpecificationResourceImpl implements EntityModelResource {
 
 	@Override
 	public Response deleteSpecification(Long id) throws Exception {
@@ -91,8 +93,15 @@ public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
 			CPSpecificationOption.class.getName(), search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
-			searchContext -> searchContext.setCompanyId(
-				contextCompany.getCompanyId()),
+			new UnsafeConsumer() {
+
+				public void accept(Object object) throws Exception {
+					SearchContext searchContext = (SearchContext)object;
+
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+				}
+
+			},
 			sorts,
 			document -> _toSpecification(
 				GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
@@ -141,34 +150,12 @@ public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
 			}
 		}
 
-		String specificationKey = specification.getKey();
-
-		if (specificationKey != null) {
-			try {
-				CPSpecificationOption cpSpecificationOption =
-					_updateSpecification(specificationKey, specification);
-
-				return _toSpecification(
-					cpSpecificationOption.getCPSpecificationOptionId());
-			}
-			catch (NoSuchCPSpecificationOptionException
-						noSuchCPSpecificationOptionException) {
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Unable to find specification with key: " +
-							specificationKey,
-						noSuchCPSpecificationOptionException);
-				}
-			}
-		}
-
 		CPSpecificationOption cpSpecificationOption =
 			_cpSpecificationOptionService.addCPSpecificationOption(
 				_getCPOptionCategoryId(specification),
 				LanguageUtils.getLocalizedMap(specification.getTitle()),
 				LanguageUtils.getLocalizedMap(specification.getDescription()),
-				_isFacetable(specification), specificationKey,
+				_isFacetable(specification), specification.getKey(),
 				_serviceContextHelper.getServiceContext());
 
 		return _toSpecification(
@@ -213,36 +200,11 @@ public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
 
 		return _cpSpecificationOptionService.updateCPSpecificationOption(
 			cpSpecificationOption.getCPSpecificationOptionId(),
-			GetterUtil.getLong(
-				cpSpecificationOption.getCPOptionCategoryId(),
-				_getCPOptionCategoryId(specification)),
-			LanguageUtils.getLocalizedMap(specification.getTitle()),
-			LanguageUtils.getLocalizedMap(specification.getDescription()),
-			GetterUtil.getBoolean(
-				cpSpecificationOption.isFacetable(),
-				_isFacetable(specification)),
-			GetterUtil.getString(
-				specification.getKey(), cpSpecificationOption.getKey()),
-			_serviceContextHelper.getServiceContext());
-	}
-
-	private CPSpecificationOption _updateSpecification(
-			String key, Specification specification)
-		throws PortalException {
-
-		ServiceContext serviceContext =
-			_serviceContextHelper.getServiceContext();
-
-		CPSpecificationOption cpSpecificationOption =
-			_cpSpecificationOptionService.getCPSpecificationOption(
-				serviceContext.getCompanyId(), key);
-
-		return _cpSpecificationOptionService.updateCPSpecificationOption(
-			cpSpecificationOption.getCPSpecificationOptionId(),
 			_getCPOptionCategoryId(specification),
 			LanguageUtils.getLocalizedMap(specification.getTitle()),
 			LanguageUtils.getLocalizedMap(specification.getDescription()),
-			_isFacetable(specification), key, serviceContext);
+			_isFacetable(specification), specification.getKey(),
+			_serviceContextHelper.getServiceContext());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -257,10 +219,7 @@ public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.SpecificationDTOConverter)"
-	)
-	private DTOConverter<CPSpecificationOption, Specification>
-		_specificationDTOConverter;
+	@Reference
+	private SpecificationDTOConverter _specificationDTOConverter;
 
 }

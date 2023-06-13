@@ -79,27 +79,6 @@ public class ObjectAction implements Cloneable, Serializable {
 
 	protected Boolean active;
 
-	public String getConditionExpression() {
-		return conditionExpression;
-	}
-
-	public void setConditionExpression(String conditionExpression) {
-		this.conditionExpression = conditionExpression;
-	}
-
-	public void setConditionExpression(
-		UnsafeSupplier<String, Exception> conditionExpressionUnsafeSupplier) {
-
-		try {
-			conditionExpression = conditionExpressionUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String conditionExpression;
-
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -142,70 +121,6 @@ public class ObjectAction implements Cloneable, Serializable {
 
 	protected Date dateModified;
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void setDescription(
-		UnsafeSupplier<String, Exception> descriptionUnsafeSupplier) {
-
-		try {
-			description = descriptionUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String description;
-
-	public Map<String, String> getErrorMessage() {
-		return errorMessage;
-	}
-
-	public void setErrorMessage(Map<String, String> errorMessage) {
-		this.errorMessage = errorMessage;
-	}
-
-	public void setErrorMessage(
-		UnsafeSupplier<Map<String, String>, Exception>
-			errorMessageUnsafeSupplier) {
-
-		try {
-			errorMessage = errorMessageUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Map<String, String> errorMessage;
-
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String externalReferenceCode;
-
 	public Long getId() {
 		return id;
 	}
@@ -224,27 +139,6 @@ public class ObjectAction implements Cloneable, Serializable {
 	}
 
 	protected Long id;
-
-	public Map<String, String> getLabel() {
-		return label;
-	}
-
-	public void setLabel(Map<String, String> label) {
-		this.label = label;
-	}
-
-	public void setLabel(
-		UnsafeSupplier<Map<String, String>, Exception> labelUnsafeSupplier) {
-
-		try {
-			label = labelUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Map<String, String> label;
 
 	public String getName() {
 		return name;
@@ -330,27 +224,6 @@ public class ObjectAction implements Cloneable, Serializable {
 	}
 
 	protected Map<String, ?> parameters;
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
-		this.status = status;
-	}
-
-	public void setStatus(
-		UnsafeSupplier<Status, Exception> statusUnsafeSupplier) {
-
-		try {
-			status = statusUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Status status;
 
 	@Override
 	public ObjectAction clone() throws CloneNotSupportedException {

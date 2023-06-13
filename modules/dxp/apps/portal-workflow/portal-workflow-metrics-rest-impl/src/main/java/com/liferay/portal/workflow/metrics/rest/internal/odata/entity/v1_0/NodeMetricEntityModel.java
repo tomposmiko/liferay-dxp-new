@@ -21,6 +21,9 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.IntegerEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Inácio Nery
@@ -28,7 +31,7 @@ import java.util.Map;
 public class NodeMetricEntityModel implements EntityModel {
 
 	public NodeMetricEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = Stream.of(
 			new IntegerEntityField(
 				"breachedInstancePercentage",
 				locale -> "breachedInstancePercentage"),
@@ -37,7 +40,10 @@ public class NodeMetricEntityModel implements EntityModel {
 			new IntegerEntityField(
 				"onTimeInstanceCount", locale -> "onTimeInstanceCount"),
 			new IntegerEntityField(
-				"overdueInstanceCount", locale -> "overdueInstanceCount"));
+				"overdueInstanceCount", locale -> "overdueInstanceCount")
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

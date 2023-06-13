@@ -57,7 +57,7 @@ public class RoleSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (role.getActions() != null) {
 			if (sb.length() > 1) {
@@ -155,20 +155,6 @@ public class RoleSerDes {
 			sb.append(_toJSON(role.getDescription_i18n()));
 		}
 
-		if (role.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(role.getExternalReferenceCode()));
-
-			sb.append("\"");
-		}
-
 		if (role.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -236,7 +222,7 @@ public class RoleSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (role.getActions() == null) {
 			map.put("actions", null);
@@ -292,15 +278,6 @@ public class RoleSerDes {
 		else {
 			map.put(
 				"description_i18n", String.valueOf(role.getDescription_i18n()));
-		}
-
-		if (role.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(role.getExternalReferenceCode()));
 		}
 
 		if (role.getId() == null) {
@@ -390,13 +367,6 @@ public class RoleSerDes {
 				if (jsonParserFieldValue != null) {
 					role.setDescription_i18n(
 						(Map)RoleSerDes.toMap((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					role.setExternalReferenceCode((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {

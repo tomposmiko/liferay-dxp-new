@@ -18,7 +18,7 @@ import com.liferay.commerce.inventory.constants.CommerceInventoryConstants;
 import com.liferay.commerce.inventory.type.CommerceInventoryAuditType;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 
@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.inventory.audit.type.key=" + CommerceInventoryConstants.AUDIT_TYPE_UPDATE_WAREHOUSE_ITEM,
 	service = CommerceInventoryAuditType.class
 )
@@ -44,13 +45,13 @@ public class UpdateWarehouseItemCommerceInventoryAuditTypeImpl
 
 		User user = _userLocalService.getUserById(userId);
 
-		return _language.format(
+		return LanguageUtil.format(
 			locale, "x-updated-the-quantity-on-hand", user.getFullName());
 	}
 
 	@Override
 	public String formatQuantity(int quantity, Locale locale) {
-		return _language.format(locale, "set-to-x", quantity);
+		return LanguageUtil.format(locale, "set-to-x", quantity);
 	}
 
 	@Override
@@ -71,9 +72,6 @@ public class UpdateWarehouseItemCommerceInventoryAuditTypeImpl
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private UserLocalService _userLocalService;

@@ -478,8 +478,4 @@ public interface TranslationEntryModel
 	@Override
 	public TranslationEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

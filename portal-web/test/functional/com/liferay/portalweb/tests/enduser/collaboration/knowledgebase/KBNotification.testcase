@@ -15,7 +15,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,143 +27,17 @@ definition {
 
 			JSONUser.tearDownNonAdminUsers();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@description = "This test checks that a user can subscribe and unsubscribe from an article."
-	@priority = 4
-	test CanSubscribeToArticleViaToolbar {
-		property custom.properties = "jsonws.web.service.paths.excludes=";
-
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
-			kbArticleContent = "Knowledge Base Article Content",
-			kbArticleTitle = "Knowledge Base Article Title");
-
-		JSONUser.addUser(
-			userEmailAddress = "userea@liferay.com",
-			userFirstName = "userfn",
-			userLastName = "userln",
-			userScreenName = "usersn");
-
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			requireReset = "false",
-			userEmailAddress = "userea@liferay.com");
-
-		JSONRole.assignRoleToUser(
-			roleTitle = "Administrator",
-			userEmailAddress = "userea@liferay.com");
-
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "userea@liferay.com",
-			userLoginFullName = "userfn userln");
-
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
-
-		KBArticle.subscribeCP(
-			kbArticleTitle = "Knowledge Base Article Title",
-			subscribeActionToolbar = "true");
-
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "test@liferay.com",
-			userLoginFullName = "test test");
-
-		KBArticle.openToEditKBArticleInSite(
-			groupName = "Guest",
-			kbArticleTitle = "Knowledge Base Article Title",
-			siteURLKey = "guest");
-
-		KBArticle.editCP(
-			kbArticleTitleEdit = "Knowledge Base Article Title Edit",
-			skipNavigation = "true");
-
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "userea@liferay.com",
-			userLoginFullName = "userfn userln");
-
-		Notifications.viewBadgeCount(notificationCount = 1);
-
-		Notifications.gotoNotifications();
-
-		Notifications.navigateToContent(contentBody = "Knowledge Base Article Title Edit");
-	}
-
-	@description = "This test ensures that users can subscribe to the KB home folder from the navigation pane."
-	@priority = 5
-	test CanSubscribeToHomeFolderViaNavigationPane {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
-
-		JSONUser.addUser(
-			userEmailAddress = "userea@liferay.com",
-			userFirstName = "Test",
-			userLastName = 2,
-			userScreenName = "usersn");
-
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			requireReset = "false",
-			userEmailAddress = "userea@liferay.com");
-
-		User.openUsersAdmin();
-
-		User.editUserSiteCP(
-			siteName = ${siteName},
-			userScreenName = "usersn");
-
-		User.openUsersAdmin();
-
-		User.assignSiteRoleCP(
-			siteRoleName = "Site Administrator",
-			userScreenName = "usersn");
-
-		User.logoutPG();
-
-		User.loginUserPG(
-			password = "test",
-			userEmailAddress = "userea@liferay.com");
-
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
-
-		KBArticle.openPageTreePanel(section = "Folders and Articles");
-
-		KBFolder.gotoMenuItemViaNavigationPane(
-			kbFolderName = "Home",
-			menuItem = "Subscribe");
-
-		User.logoutPG();
-
-		User.loginUserPG(
-			password = "test",
-			userEmailAddress = "test@liferay.com");
-
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
-
-		KBArticle.addCP(
-			kbArticleContent = "Knowledge Base Article Content",
-			kbArticleTitle = "Knowledge Base Article Title");
-
-		User.logoutPG();
-
-		User.loginUserPG(
-			password = "test",
-			userEmailAddress = "userea@liferay.com");
-
-		Notifications.viewBadgeCount(notificationCount = 1);
-
-		Notifications.gotoNotifications();
-
-		Notifications.navigateToContent(contentBody = "Knowledge Base Article Title");
-	}
-
-	@priority = 3
+	@priority = "3"
 	@refactorneeded
 	test ViewKBArticleSuggestionsWorkflowNotificationEmail {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property test.smtp.server.enabled = "true";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -177,7 +51,7 @@ definition {
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "Test",
-			userLastName = 2,
+			userLastName = "2",
 			userScreenName = "usersn");
 
 		JSONUser.setFirstPassword(
@@ -191,7 +65,7 @@ definition {
 			portlet = "Users and Organizations");
 
 		User.editUserSiteCP(
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			userScreenName = "usersn");
 
 		ApplicationsMenu.gotoPortlet(
@@ -229,8 +103,9 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.addCP(
 			kbArticleContent = "KB Article Content",
 			kbArticleTitle = "KB Article Title");
 

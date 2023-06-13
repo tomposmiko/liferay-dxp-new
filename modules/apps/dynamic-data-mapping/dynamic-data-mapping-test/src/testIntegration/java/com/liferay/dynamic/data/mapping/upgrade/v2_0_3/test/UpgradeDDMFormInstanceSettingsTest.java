@@ -71,19 +71,21 @@ public class UpgradeDDMFormInstanceSettingsTest {
 
 		DDMFormInstance formInstance = createFormInstance(settings);
 
+		JSONArray fieldValuesJSONArray = getFieldValuesJSONArray(
+			formInstance.getSettings());
+
 		Assert.assertFalse(
-			containsField(
-				getFieldValuesJSONArray(formInstance.getSettings()),
-				"requireAuthentication"));
+			containsField(fieldValuesJSONArray, "requireAuthentication"));
 
 		_ddmFormInstanceSettingsUpgradeProcess.upgrade();
 
 		formInstance = getRecordSet(formInstance);
 
+		fieldValuesJSONArray = getFieldValuesJSONArray(
+			formInstance.getSettings());
+
 		Assert.assertTrue(
-			containsField(
-				getFieldValuesJSONArray(formInstance.getSettings()),
-				"requireAuthentication"));
+			containsField(fieldValuesJSONArray, "requireAuthentication"));
 	}
 
 	@Test
@@ -92,19 +94,21 @@ public class UpgradeDDMFormInstanceSettingsTest {
 
 		DDMFormInstance formInstance = createFormInstance(settings);
 
+		JSONArray fieldValuesJSONArray = getFieldValuesJSONArray(
+			formInstance.getSettings());
+
 		Assert.assertFalse(
-			containsField(
-				getFieldValuesJSONArray(formInstance.getSettings()),
-				"autosaveEnabled"));
+			containsField(fieldValuesJSONArray, "autosaveEnabled"));
 
 		_ddmFormInstanceSettingsUpgradeProcess.upgrade();
 
 		formInstance = getRecordSet(formInstance);
 
+		fieldValuesJSONArray = getFieldValuesJSONArray(
+			formInstance.getSettings());
+
 		Assert.assertTrue(
-			containsField(
-				getFieldValuesJSONArray(formInstance.getSettings()),
-				"autosaveEnabled"));
+			containsField(fieldValuesJSONArray, "autosaveEnabled"));
 	}
 
 	protected boolean containsField(
@@ -179,8 +183,11 @@ public class UpgradeDDMFormInstanceSettingsTest {
 	protected String createSettings(boolean hasSetting) {
 		JSONObject jsonObject = _jsonFactory.createJSONObject();
 
+		JSONArray availableLanguagesJSONArray = getAvailableLanguagesJSONArray(
+			"en_US");
+
 		jsonObject.put(
-			"availableLanguageIdss", getAvailableLanguagesJSONArray("en_US")
+			"availableLanguageIdss", availableLanguagesJSONArray
 		).put(
 			"defaultLanguageId", "en_US"
 		);
@@ -189,7 +196,7 @@ public class UpgradeDDMFormInstanceSettingsTest {
 
 		jsonObject.put("fieldValues", fieldValuesJSONArray);
 
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
 	}
 
 	protected JSONArray getAvailableLanguagesJSONArray(String languageId) {
@@ -260,7 +267,7 @@ public class UpgradeDDMFormInstanceSettingsTest {
 			"DDMFormInstanceSettingsUpgradeProcess";
 
 	@Inject(
-		filter = "(&(component.name=com.liferay.dynamic.data.mapping.internal.upgrade.registry.DDMServiceUpgradeStepRegistrator))"
+		filter = "(&(objectClass=com.liferay.dynamic.data.mapping.internal.upgrade.DDMServiceUpgrade))"
 	)
 	private static UpgradeStepRegistrator _upgradeStepRegistrator;
 

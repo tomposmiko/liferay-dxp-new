@@ -372,11 +372,6 @@ public class SegmentsEntryRoleWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<SegmentsEntryRole, Object>>
 		getAttributeGetterFunctions() {
 

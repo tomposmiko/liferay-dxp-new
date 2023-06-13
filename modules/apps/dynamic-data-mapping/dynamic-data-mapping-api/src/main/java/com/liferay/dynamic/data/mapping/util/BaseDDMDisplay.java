@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.constants.DDMConstants;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -308,12 +308,12 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			return ParamUtil.getString(liferayPortletRequest, "redirect");
 		}
 
+		String portletId = PortletProviderUtil.getPortletId(
+			DDMStructure.class.getName(), PortletProvider.Action.VIEW);
+
 		return PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
-				liferayPortletRequest,
-				PortletProviderUtil.getPortletId(
-					DDMStructure.class.getName(), PortletProvider.Action.VIEW),
-				PortletRequest.RENDER_PHASE)
+				liferayPortletRequest, portletId, PortletRequest.RENDER_PHASE)
 		).setMVCPath(
 			"/view.jsp"
 		).buildString();
@@ -437,12 +437,12 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			long classPK, long resourceClassNameId)
 		throws Exception {
 
+		String portletId = PortletProviderUtil.getPortletId(
+			DDMStructure.class.getName(), PortletProvider.Action.VIEW);
+
 		return PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
-				liferayPortletRequest,
-				PortletProviderUtil.getPortletId(
-					DDMStructure.class.getName(), PortletProvider.Action.VIEW),
-				PortletRequest.RENDER_PHASE)
+				liferayPortletRequest, portletId, PortletRequest.RENDER_PHASE)
 		).setMVCPath(
 			"/view_template.jsp"
 		).setParameter(
@@ -455,8 +455,10 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 	}
 
 	private static final Set<String> _templateLanguageTypes = SetUtil.fromArray(
-		TemplateConstants.LANG_TYPE_FTL, TemplateConstants.LANG_TYPE_VM);
+		new String[] {
+			TemplateConstants.LANG_TYPE_FTL, TemplateConstants.LANG_TYPE_VM
+		});
 	private static final Set<String> _viewTemplateExcludedColumnNames =
-		SetUtil.fromArray("structure");
+		SetUtil.fromArray(new String[] {"structure"});
 
 }

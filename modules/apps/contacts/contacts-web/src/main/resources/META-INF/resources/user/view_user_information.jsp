@@ -31,25 +31,19 @@ if (assetTags.isEmpty() || Validator.isNull(user2.getComments())) {
 %>
 
 <c:if test="<%= showComments && Validator.isNotNull(user2.getComments()) %>">
-	<div class="lfr-field-group lfr-user-comments section" data-title="<%= LanguageUtil.get(request, "introduction") %>">
+	<div class="field-group lfr-user-comments section" data-title="<%= LanguageUtil.get(request, "introduction") %>">
 
 		<%
 		PortletURL editCommentsURL = PortletURLFactoryUtil.create(request, PortletKeys.MY_ACCOUNT, embeddedPersonalApplicationLayout, PortletRequest.RENDER_PHASE);
 		%>
 
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href="<%= editCommentsURL.toString() %>"
+		<liferay-ui:icon
 			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "information"), false) %>'
-			type="button"
+			markupView="lexicon"
+			url="<%= editCommentsURL.toString() %>"
 		/>
 
-		<span class="h3"><liferay-ui:message key="introduction" />:</span>
+		<h3><liferay-ui:message key="introduction" />:</h3>
 
 		<ul class="property-list">
 			<li>
@@ -68,7 +62,7 @@ if (phones.isEmpty()) {
 %>
 
 <c:if test="<%= showPhones && !phones.isEmpty() %>">
-	<div class="lfr-field-group lfr-user-phones section" data-title="<%= LanguageUtil.get(request, "phone-numbers") %>">
+	<div class="field-group lfr-user-phones section" data-title="<%= LanguageUtil.get(request, "phone-numbers") %>">
 
 		<%
 		PortletURL editPhonesURL = PortletURLBuilder.create(
@@ -80,29 +74,22 @@ if (phones.isEmpty()) {
 		).buildPortletURL();
 		%>
 
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href="<%= editPhonesURL.toString() %>"
+		<liferay-ui:icon
 			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "contact-information"), false) %>'
-			type="button"
+			markupView="lexicon"
+			url="<%= editPhonesURL.toString() %>"
 		/>
 
-		<span class="h3"><liferay-ui:message key="phones" />:</span>
+		<h3><liferay-ui:message key="phones" />:</h3>
 
 		<ul class="property-list">
 
 			<%
 			for (Phone phone : phones) {
-				ListType listType = phone.getListType();
 			%>
 
 				<li class="<%= phone.isPrimary() ? "primary" : "" %>">
-					<span class="property-type"><liferay-ui:message key="<%= listType.getName() %>" /></span>
+					<span class="property-type"><%= LanguageUtil.get(request, phone.getType().getName()) %></span>
 					<span class="property"><%= HtmlUtil.escape(phone.getNumber()) %> <%= phone.getExtension() %></span>
 				</li>
 
@@ -123,7 +110,7 @@ if (emailAddresses.isEmpty()) {
 %>
 
 <c:if test="<%= showAdditionalEmailAddresses && !emailAddresses.isEmpty() %>">
-	<div class="lfr-field-group lfr-user-email-addresses section" data-title="<%= LanguageUtil.get(request, "additional-email-addresses") %>">
+	<div class="field-group lfr-user-email-addresses section" data-title="<%= LanguageUtil.get(request, "additional-email-addresses") %>">
 
 		<%
 		PortletURL editAdditionalEmailAddressesURL = PortletURLBuilder.create(
@@ -135,32 +122,24 @@ if (emailAddresses.isEmpty()) {
 		).buildPortletURL();
 		%>
 
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href="<%= editAdditionalEmailAddressesURL.toString() %>"
+		<liferay-ui:icon
 			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "contact-information"), false) %>'
-			type="button"
+			markupView="lexicon"
+			url="<%= editAdditionalEmailAddressesURL.toString() %>"
 		/>
 
-		<span class="h3"><liferay-ui:message key="additional-email-addresses" />:</span>
+		<h3><liferay-ui:message key="additional-email-addresses" />:</h3>
 
 		<ul class="property-list">
 
 			<%
 			for (int i = 0; i < emailAddresses.size(); i++) {
 				EmailAddress emailAddress = emailAddresses.get(i);
-
-				ListType listType = emailAddress.getListType();
 			%>
 
 				<li class="<%= emailAddress.isPrimary() ? "primary" : "" %>">
-					<span class="property-type"><liferay-ui:message key="<%= listType.getName() %>" /></span>
-					<span class="property"><a class="text-decoration-underline" href="mailto:<%= emailAddress.getAddress() %>"><%= emailAddress.getAddress() %></a></span>
+					<span class="property-type"><%= LanguageUtil.get(request, emailAddress.getType().getName()) %></span>
+					<span class="property"><a href="mailto:<%= emailAddress.getAddress() %>"><%= emailAddress.getAddress() %></a></span>
 				</li>
 
 			<%
@@ -181,12 +160,11 @@ if (Validator.isNull(jabberSn) && Validator.isNull(skypeSn)) {
 %>
 
 <c:if test="<%= showInstantMessenger && (Validator.isNotNull(jabberSn) || Validator.isNotNull(skypeSn)) %>">
-	<div class="lfr-field-group section" data-title="<%= LanguageUtil.get(request, "instant-messenger") %>">
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href='<%=
+	<div class="field-group section" data-title="<%= LanguageUtil.get(request, "instant-messenger") %>">
+		<liferay-ui:icon
+			icon="pencil"
+			markupView="lexicon"
+			url='<%=
 				PortletURLBuilder.create(
 					PortletURLFactoryUtil.create(request, PortletKeys.MY_ACCOUNT, embeddedPersonalApplicationLayout, PortletRequest.RENDER_PHASE)
 				).setParameter(
@@ -195,14 +173,9 @@ if (Validator.isNull(jabberSn) && Validator.isNull(skypeSn)) {
 					"screenNavigationEntryKey", "contact-information"
 				).buildString()
 			%>'
-			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "contact-information"), false) %>'
-			type="button"
 		/>
 
-		<span class="h3"><liferay-ui:message key="instant-messenger" />:</span>
+		<h3><liferay-ui:message key="instant-messenger" />:</h3>
 
 		<ul class="property-list">
 			<c:if test="<%= Validator.isNotNull(jabberSn) %>">
@@ -233,7 +206,7 @@ if (addresses.isEmpty()) {
 %>
 
 <c:if test="<%= showAddresses && !addresses.isEmpty() %>">
-	<div class="lfr-field-group lfr-user-addresses section" data-title="<%= LanguageUtil.get(request, "addresses") %>">
+	<div class="field-group lfr-user-addresses section" data-title="<%= LanguageUtil.get(request, "addresses") %>">
 
 		<%
 		PortletURL editAddressesURL = PortletURLBuilder.create(
@@ -243,29 +216,23 @@ if (addresses.isEmpty()) {
 		).buildPortletURL();
 		%>
 
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href="<%= editAddressesURL.toString() %>"
+		<liferay-ui:icon
 			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "addresses"), false) %>'
-			type="button"
+			markupView="lexicon"
+			url="<%= editAddressesURL.toString() %>"
 		/>
 
-		<span class="h3"><liferay-ui:message key="addresses" />:</span>
+		<h3><liferay-ui:message key="addresses" />:</h3>
 
 		<ul class="property-list">
 
 			<%
 			for (Address address : addresses) {
-				ListType listType = address.getListType();
+				ListType listType = address.getType();
 			%>
 
 				<li class="<%= address.isPrimary() ? "primary" : "" %>">
-					<span class="property-type"><liferay-ui:message key="<%= listType.getName() %>" /></span><br />
+					<span class="property-type"><%= LanguageUtil.get(request, listType.getName()) %></span><br />
 
 					<liferay-text-localizer:address-display
 						address="<%= address %>"
@@ -291,7 +258,7 @@ if (websites.isEmpty()) {
 %>
 
 <c:if test="<%= showWebsites && !websites.isEmpty() %>">
-	<div class="lfr-field-group lfr-user-websites section" data-title="<%= LanguageUtil.get(request, "websites") %>">
+	<div class="field-group lfr-user-websites section" data-title="<%= LanguageUtil.get(request, "websites") %>">
 
 		<%
 		PortletURL editWebsitesURL = PortletURLBuilder.create(
@@ -303,19 +270,13 @@ if (websites.isEmpty()) {
 		).buildPortletURL();
 		%>
 
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href="<%= editWebsitesURL.toString() %>"
+		<liferay-ui:icon
 			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "contact-information"), false) %>'
-			type="button"
+			markupView="lexicon"
+			url="<%= editWebsitesURL.toString() %>"
 		/>
 
-		<span class="h3"><liferay-ui:message key="websites" />:</span>
+		<h3><liferay-ui:message key="websites" />:</h3>
 
 		<ul class="property-list">
 
@@ -325,9 +286,9 @@ if (websites.isEmpty()) {
 			%>
 
 				<li class="<%= website.isPrimary() ? "primary" : "" %>">
-					<span class="property-type"><liferay-ui:message key="<%= website.getListType().getName() %>" /></span>
+					<span class="property-type"><%= LanguageUtil.get(request, website.getType().getName()) %></span>
 
-					<span class="property"><a class="text-decoration-underline" href="<%= website.getUrl() %>"><%= website.getUrl() %></a></span>
+					<span class="property"><a href="<%= website.getUrl() %>"><%= website.getUrl() %></a></span>
 				</li>
 
 			<%
@@ -348,7 +309,7 @@ if (Validator.isNull(facebook) && Validator.isNull(twitter)) {
 %>
 
 <c:if test="<%= showSocialNetwork && (Validator.isNotNull(facebook) || Validator.isNotNull(twitter)) %>">
-	<div class="lfr-field-group lfr-user-social-network section" data-title="<%= LanguageUtil.get(request, "social-network") %>">
+	<div class="field-group lfr-user-social-network section" data-title="<%= LanguageUtil.get(request, "social-network") %>">
 
 		<%
 		PortletURL editSocialNetworkURL = PortletURLBuilder.create(
@@ -360,19 +321,13 @@ if (Validator.isNull(facebook) && Validator.isNull(twitter)) {
 		).buildPortletURL();
 		%>
 
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href="<%= editSocialNetworkURL.toString() %>"
+		<liferay-ui:icon
 			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "contact-information"), false) %>'
-			type="button"
+			markupView="lexicon"
+			url="<%= editSocialNetworkURL.toString() %>"
 		/>
 
-		<span class="h3"><liferay-ui:message key="social-network" />:</span>
+		<h3><liferay-ui:message key="social-network" />:</h3>
 
 		<ul class="property-list">
 			<c:if test="<%= Validator.isNotNull(facebook) %>">
@@ -401,7 +356,7 @@ if (Validator.isNull(contact2.getSmsSn())) {
 %>
 
 <c:if test="<%= showSMS && Validator.isNotNull(contact2.getSmsSn()) %>">
-	<div class="lfr-field-group lfr-user-sms section" data-title="<%= LanguageUtil.get(request, "sms") %>">
+	<div class="field-group lfr-user-sms section" data-title="<%= LanguageUtil.get(request, "sms") %>">
 
 		<%
 		PortletURL editSmsURL = PortletURLBuilder.create(
@@ -413,19 +368,13 @@ if (Validator.isNull(contact2.getSmsSn())) {
 		).buildPortletURL();
 		%>
 
-		<clay:link
-			borderless="<%= true %>"
-			cssClass="edit-button lfr-portal-tooltip"
-			displayType="secondary"
-			href="<%= editSmsURL.toString() %>"
+		<liferay-ui:icon
 			icon="pencil"
-			monospaced="<%= true %>"
-			small="<%= true %>"
-			title='<%= LanguageUtil.format(request, "edit-x", LanguageUtil.get(request, "contact-information"), false) %>'
-			type="button"
+			markupView="lexicon"
+			url="<%= editSmsURL.toString() %>"
 		/>
 
-		<span class="h3"><liferay-ui:message key="sms" />:</span>
+		<h3><liferay-ui:message key="sms" />:</h3>
 
 		<ul class="property-list">
 			<li class="property">

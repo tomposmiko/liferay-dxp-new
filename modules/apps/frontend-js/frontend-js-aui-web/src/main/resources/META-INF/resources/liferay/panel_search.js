@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-panel-search',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const PanelSearch = A.Component.create({
+		var PanelSearch = A.Component.create({
 			ATTRS: {
 				categorySelector: {
 					validator: Lang.isString,
@@ -46,7 +46,7 @@ AUI.add(
 
 			prototype: {
 				_bindUISearch() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = instance._eventHandles || [];
 
@@ -73,12 +73,12 @@ AUI.add(
 				},
 
 				_setItemsVisibility(visible) {
-					const instance = this;
+					var instance = this;
 
 					instance._nodes.each((item) => {
-						let contentItem = item;
+						var contentItem = item;
 
-						const nodeContainerSelector = instance.get(
+						var nodeContainerSelector = instance.get(
 							'nodeContainerSelector'
 						);
 
@@ -93,17 +93,17 @@ AUI.add(
 				},
 
 				_updateList(event) {
-					const instance = this;
+					var instance = this;
 
-					const categories = instance._categories;
+					var categories = instance._categories;
 
-					const query = event.query;
+					var query = event.query;
 
 					if (!instance._collapsedCategories) {
 						instance._collapsedCategories = [];
 
 						categories.each((item) => {
-							const header = item.one('.list-group-heading');
+							var header = item.one('.list-group-heading');
 
 							if (header && header.hasClass('collapsed')) {
 								instance._collapsedCategories.push(item);
@@ -138,9 +138,9 @@ AUI.add(
 						instance._setItemsVisibility(false);
 
 						event.results.forEach((item) => {
-							let node = item.raw.node;
+							var node = item.raw.node;
 
-							const nodeContainerSelector = instance.get(
+							var nodeContainerSelector = instance.get(
 								'nodeContainerSelector'
 							);
 
@@ -152,7 +152,7 @@ AUI.add(
 								node.show();
 							}
 
-							const contentParent = node.ancestorsByClassName(
+							var contentParent = node.ancestorsByClassName(
 								instance.get('categorySelector')
 							);
 
@@ -171,15 +171,15 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const nodeList = instance.get('nodeList');
+					var nodeList = instance.get('nodeList');
 
 					instance._categories = nodeList.all(
 						instance.get('categorySelector')
 					);
 
-					const applicationSearch = new Liferay.SearchFilter({
+					var applicationSearch = new Liferay.SearchFilter({
 						inputNode: instance.get('inputNode'),
 						nodeList,
 						nodeSelector: instance.get('nodeSelector'),

@@ -24,7 +24,7 @@ import NavigationBar from './pages/NavigationBar.es';
 import {client} from './utils/client.es';
 import {getFullPath} from './utils/utils.es';
 
-export default function App(props) {
+export default (props) => {
 	redirectForNotifications(props);
 
 	const Component = useLazy();
@@ -32,18 +32,6 @@ export default function App(props) {
 	const Router = props.historyRouterBasePath ? BrowserRouter : HashRouter;
 
 	const packageName = props.npmResolvedPackageName;
-
-	const questionComponent = Liferay.FeatureFlags['LPS-167151']
-		? `${packageName}/js/pages/questions/Question.new.es`
-		: `${packageName}/js/pages/questions/Question.es`;
-
-	const questionsComponent = Liferay.FeatureFlags['LPS-165491']
-		? `${packageName}/js/pages/questions/Questions.new.es`
-		: `${packageName}/js/pages/questions/Questions.es`;
-
-	const userActivityPage = Liferay.FeatureFlags['LPS-167151']
-		? `${packageName}/js/pages/home/UserActivity.new.es`
-		: `${packageName}/js/pages/home/UserActivity.es`;
 
 	let path = props.historyRouterBasePath;
 
@@ -59,25 +47,23 @@ export default function App(props) {
 	}
 
 	return (
-		<ClientContext.Provider value={client}>
-			<AppContextProvider {...props}>
+		<AppContextProvider {...props}>
+			<ClientContext.Provider value={client}>
 				<Router basename={path}>
 					<ErrorBoundary>
 						<div>
 							<NavigationBar />
-
 							<Switch>
 								<Route
 									component={(props) => (
 										<Component
 											module={`${packageName}/js/pages/home/Home`}
-											props={{...props, isHomePath: true}}
+											props={props}
 										/>
 									)}
 									exact
 									path="/"
 								/>
-
 								<Route
 									component={(props) => (
 										<Component
@@ -88,7 +74,6 @@ export default function App(props) {
 									exact
 									path="/questions"
 								/>
-
 								<Route
 									component={(props) => (
 										<Component
@@ -99,18 +84,16 @@ export default function App(props) {
 									exact
 									path="/questions/question/:questionId"
 								/>
-
 								<Route
 									component={(props) => (
 										<Component
-											module={userActivityPage}
+											module={`${packageName}/js/pages/home/UserActivity.es`}
 											props={props}
 										/>
 									)}
 									exact
 									path="/questions/activity/:creatorId"
 								/>
-
 								<Route
 									component={(props) => (
 										<Component
@@ -121,18 +104,16 @@ export default function App(props) {
 									exact
 									path="/questions/subscriptions/:creatorId"
 								/>
-
 								<Route
 									component={(props) => (
 										<Component
-											module={questionsComponent}
+											module={`${packageName}/js/pages/questions/Questions.es`}
 											props={props}
 										/>
 									)}
 									exact
 									path="/questions/tag/:tag"
 								/>
-
 								<Route
 									component={(props) => (
 										<Component
@@ -159,33 +140,26 @@ export default function App(props) {
 													exact
 													path={`${path}/:questionId/answers/:answerId/edit`}
 												/>
-
 												<Route
 													component={(props) => (
 														<Component
-															module={
-																questionsComponent
-															}
+															module={`${packageName}/js/pages/questions/Questions.es`}
 															props={props}
 														/>
 													)}
 													exact
 													path={`${path}/creator/:creatorId`}
 												/>
-
 												<Route
 													component={(props) => (
 														<Component
-															module={
-																questionsComponent
-															}
+															module={`${packageName}/js/pages/questions/Questions.es`}
 															props={props}
 														/>
 													)}
 													exact
 													path={`${path}/tag/:tag`}
 												/>
-
 												<ProtectedRoute
 													component={(props) => (
 														<Component
@@ -196,20 +170,16 @@ export default function App(props) {
 													exact
 													path={`${path}/new`}
 												/>
-
 												<Route
 													component={(props) => (
 														<Component
-															module={
-																questionComponent
-															}
+															module={`${packageName}/js/pages/questions/Question.es`}
 															props={props}
 														/>
 													)}
 													exact
 													path={`${path}/:questionId`}
 												/>
-
 												<ProtectedRoute
 													component={(props) => (
 														<Component
@@ -220,13 +190,10 @@ export default function App(props) {
 													exact
 													path={`${path}/:questionId/edit`}
 												/>
-
 												<Route
 													component={(props) => (
 														<Component
-															module={
-																questionsComponent
-															}
+															module={`${packageName}/js/pages/questions/Questions.es`}
 															props={props}
 														/>
 													)}
@@ -241,8 +208,8 @@ export default function App(props) {
 						</div>
 					</ErrorBoundary>
 				</Router>
-			</AppContextProvider>
-		</ClientContext.Provider>
+			</ClientContext.Provider>
+		</AppContextProvider>
 	);
 
 	function redirectForNotifications(props) {
@@ -259,4 +226,4 @@ export default function App(props) {
 			}
 		}
 	}
-}
+};

@@ -65,7 +65,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Wade Cao
  */
-@Component(service = Queries.class)
+@Component(immediate = true, service = Queries.class)
 public class QueriesImpl implements Queries {
 
 	@Override

@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"mvc.command.name=/commerce_channels/edit_commerce_tax_method"
@@ -67,7 +68,8 @@ public class EditCommerceTaxMethodMVCRenderCommand implements MVCRenderCommand {
 				return "/error.jsp";
 			}
 
-			throw new PortletException(exception);
+			throw new PortletException(
+				"Unable to include edit_tax_method.jsp", exception);
 		}
 
 		return MVCRenderConstants.MVC_PATH_VALUE_SKIP_DISPATCH;

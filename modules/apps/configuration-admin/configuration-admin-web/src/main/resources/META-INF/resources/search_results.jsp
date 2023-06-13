@@ -42,15 +42,13 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(LanguageUtil.get(request, "search-results"));
 %>
 
-<div class="sticky-top" style="top: 56px; z-index: 999;">
-	<clay:management-toolbar
-		clearResultsURL="<%= redirect %>"
-		itemsTotal="<%= configurationEntryIterator.getTotal() %>"
-		searchActionURL="<%= searchURL.toString() %>"
-		selectable="<%= false %>"
-		showSearch="<%= true %>"
-	/>
-</div>
+<clay:management-toolbar
+	clearResultsURL="<%= redirect %>"
+	itemsTotal="<%= configurationEntryIterator.getTotal() %>"
+	searchActionURL="<%= searchURL.toString() %>"
+	selectable="<%= false %>"
+	showSearch="<%= true %>"
+/>
 
 <clay:container-fluid
 	cssClass="container-view"

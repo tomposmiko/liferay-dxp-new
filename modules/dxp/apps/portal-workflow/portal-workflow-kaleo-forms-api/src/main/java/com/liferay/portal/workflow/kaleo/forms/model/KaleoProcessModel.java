@@ -264,8 +264,4 @@ public interface KaleoProcessModel
 	@Override
 	public KaleoProcess cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

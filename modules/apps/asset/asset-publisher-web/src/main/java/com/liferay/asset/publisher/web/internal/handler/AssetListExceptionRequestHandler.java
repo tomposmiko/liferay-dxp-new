@@ -19,7 +19,7 @@ import com.liferay.asset.list.exception.DuplicateAssetListEntryTitleException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -30,12 +30,11 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Pavel Savinov
  */
-@Component(service = AssetListExceptionRequestHandler.class)
+@Component(immediate = true, service = AssetListExceptionRequestHandler.class)
 public class AssetListExceptionRequestHandler {
 
 	public void handlePortalException(
@@ -44,7 +43,7 @@ public class AssetListExceptionRequestHandler {
 		throws Exception {
 
 		if (_log.isDebugEnabled()) {
-			_log.debug(portalException);
+			_log.debug(portalException, portalException);
 		}
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -61,11 +60,11 @@ public class AssetListExceptionRequestHandler {
 			errorMessage = "a-collection-with-that-title-already-exists";
 		}
 		else {
-			_log.error(portalException);
+			_log.error(portalException.getMessage());
 		}
 
 		JSONObject jsonObject = JSONUtil.put(
-			"error", _language.get(themeDisplay.getRequest(), errorMessage));
+			"error", LanguageUtil.get(themeDisplay.getRequest(), errorMessage));
 
 		JSONPortletResponseUtil.writeJSON(
 			actionRequest, actionResponse, jsonObject);
@@ -73,8 +72,5 @@ public class AssetListExceptionRequestHandler {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetListExceptionRequestHandler.class);
-
-	@Reference
-	private Language _language;
 
 }

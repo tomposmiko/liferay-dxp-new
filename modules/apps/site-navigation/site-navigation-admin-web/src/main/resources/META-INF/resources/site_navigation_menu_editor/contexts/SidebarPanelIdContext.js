@@ -15,30 +15,17 @@
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
-import {SIDEBAR_PANEL_IDS} from '../constants/sidebarPanelIds';
-import {useSelectedMenuItemId} from './SelectedMenuItemIdContext';
-
 const SidebarPanelIdContext = React.createContext(null);
 const SetSidebarPanelIdContext = React.createContext(() => {});
 
-export function useSetSidebarPanelId() {
-	return useContext(SetSidebarPanelIdContext);
-}
-export function useSidebarPanelId() {
-	return useContext(SidebarPanelIdContext);
-}
+export const useSetSidebarPanelId = () => useContext(SetSidebarPanelIdContext);
+export const useSidebarPanelId = () => useContext(SidebarPanelIdContext);
 
-export function SidebarPanelIdProvider({
+export const SidebarPanelIdProvider = ({
 	children,
 	initialSidebarPanelId = null,
-}) {
-	const selectedMenuItemId = useSelectedMenuItemId();
-
-	const [sidebarPanelId, setSidebarPanelId] = useState(
-		selectedMenuItemId
-			? SIDEBAR_PANEL_IDS.menuItemSettings
-			: initialSidebarPanelId
-	);
+}) => {
+	const [sidebarPanelId, setSidebarPanelId] = useState(initialSidebarPanelId);
 
 	return (
 		<SetSidebarPanelIdContext.Provider value={setSidebarPanelId}>
@@ -47,7 +34,7 @@ export function SidebarPanelIdProvider({
 			</SidebarPanelIdContext.Provider>
 		</SetSidebarPanelIdContext.Provider>
 	);
-}
+};
 
 SidebarPanelIdContext.propTypes = {
 	setSidebarPanelId: PropTypes.func,

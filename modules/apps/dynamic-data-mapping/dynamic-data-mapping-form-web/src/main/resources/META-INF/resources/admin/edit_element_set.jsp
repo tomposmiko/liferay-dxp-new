@@ -116,13 +116,11 @@ renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-ele
 					).put(
 						"localizedName", ddmFormAdminDisplayContext.getFormLocalizedNameJSONObject(structure)
 					).put(
-						"mainRequire", ddmFormAdminDisplayContext.getMainRequire()
-					).put(
 						"portletNamespace", liferayPortletResponse.getNamespace()
 					).put(
 						"redirectURL", HtmlUtil.escape(redirect)
 					).put(
-						"spritemap", themeDisplay.getPathThemeSpritemap()
+						"spritemap", themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 					).put(
 						"view", "fieldSets"
 					).build()
@@ -134,7 +132,7 @@ renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-ele
 
 <div class="hide">
 	<react:component
-		module="admin/js/FormView"
+		module="admin/js/FormView.link.es"
 		props="<%= ddmFormAdminDisplayContext.getDDMFormSettingsContext(pageContext) %>"
 	/>
 </div>
@@ -143,7 +141,7 @@ renderResponse.setTitle((structure == null) ? LanguageUtil.get(request, "new-ele
 	Liferay.namespace('DDM').FormSettings = {
 		portletNamespace: '<portlet:namespace />',
 		showPagination: false,
-		spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+		spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 	};
 
 	var clearPortletHandlers = function (event) {

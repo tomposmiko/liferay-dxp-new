@@ -37,7 +37,7 @@ public class PoshiRunnerResourcesExtension {
 	public PoshiRunnerResourcesExtension(Project project) {
 		_project = project;
 
-		Gradle gradle = project.getGradle();
+		Gradle gradle = _project.getGradle();
 
 		gradle.addBuildListener(_gitRepositoryBuildAdapter);
 
@@ -45,7 +45,7 @@ public class PoshiRunnerResourcesExtension {
 
 			@Override
 			public String call() throws Exception {
-				return _gitRepositoryBuildAdapter.getBranchName(project);
+				return _gitRepositoryBuildAdapter.getBranchName(_project);
 			}
 
 		};
@@ -59,7 +59,7 @@ public class PoshiRunnerResourcesExtension {
 				DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
 				return dateFormat.format(date) + "-" +
-					_gitRepositoryBuildAdapter.getHeadHash(project);
+					_gitRepositoryBuildAdapter.getHeadHash(_project);
 			}
 
 		};
@@ -91,10 +91,6 @@ public class PoshiRunnerResourcesExtension {
 		return GradleUtil.toString(_rootDirName);
 	}
 
-	public String getVersion() {
-		return GradleUtil.toString(_version);
-	}
-
 	public void setArtifactAppendix(Object artifactAppendix) {
 		_artifactAppendix = artifactAppendix;
 	}
@@ -117,19 +113,14 @@ public class PoshiRunnerResourcesExtension {
 		_rootDirName = rootDirName;
 	}
 
-	public void setVersion(Object version) {
-		_version = version;
-	}
-
 	private static final GitRepositoryBuildAdapter _gitRepositoryBuildAdapter =
 		new GitRepositoryBuildAdapter();
 
 	private Object _artifactAppendix;
 	private Object _artifactVersion;
-	private Object _baseName = "default";
+	private Object _baseName;
 	private final Set<Object> _dirs = new HashSet<>();
 	private final Project _project;
 	private Object _rootDirName;
-	private Object _version = "1.0.14";
 
 }

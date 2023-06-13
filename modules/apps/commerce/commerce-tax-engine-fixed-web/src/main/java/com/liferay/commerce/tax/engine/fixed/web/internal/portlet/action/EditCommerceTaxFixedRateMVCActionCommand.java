@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_TAX_METHODS,
 		"mvc.command.name=/commerce_tax_methods/edit_commerce_tax_fixed_rate"
@@ -53,36 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCommerceTaxFixedRateMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommerceTaxFixedRate(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceTaxFixedRates(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof DuplicateCommerceTaxFixedRateException ||
-				exception instanceof NoSuchCPTaxCategoryException ||
-				exception instanceof NoSuchTaxFixedRateException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-			}
-			else {
-				throw exception;
-			}
-		}
-	}
-
-	private void _deleteCommerceTaxFixedRates(ActionRequest actionRequest)
+	protected void deleteCommerceTaxFixedRates(ActionRequest actionRequest)
 		throws PortalException {
 
 		long[] deleteCommerceTaxFixedRateIds = null;
@@ -108,7 +80,36 @@ public class EditCommerceTaxFixedRateMVCActionCommand
 		}
 	}
 
-	private void _updateCommerceTaxFixedRate(ActionRequest actionRequest)
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				updateCommerceTaxFixedRate(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deleteCommerceTaxFixedRates(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof DuplicateCommerceTaxFixedRateException ||
+				exception instanceof NoSuchCPTaxCategoryException ||
+				exception instanceof NoSuchTaxFixedRateException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+			}
+			else {
+				throw exception;
+			}
+		}
+	}
+
+	protected void updateCommerceTaxFixedRate(ActionRequest actionRequest)
 		throws Exception {
 
 		long commerceTaxFixedRateId = ParamUtil.getLong(

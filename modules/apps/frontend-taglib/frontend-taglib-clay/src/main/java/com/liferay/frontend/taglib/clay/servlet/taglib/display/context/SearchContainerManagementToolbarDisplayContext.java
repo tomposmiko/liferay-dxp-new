@@ -17,8 +17,8 @@ package com.liferay.frontend.taglib.clay.servlet.taglib.display.context;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-
-import javax.portlet.PortletURL;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -64,24 +64,20 @@ public class SearchContainerManagementToolbarDisplayContext
 	}
 
 	@Override
-	public String getSearchActionURL() {
-		PortletURL searchActionURL = getPortletURL();
-
-		return searchActionURL.toString();
-	}
-
-	@Override
 	public String getSearchContainerId() {
 		return searchContainer.getId(httpServletRequest, getNamespace());
 	}
 
 	@Override
-	public Boolean isSelectable() {
-		if (getItemsTotal() == 0) {
-			return false;
+	public Boolean isDisabled() {
+		if ((getItemsTotal() == 0) &&
+			Validator.isNull(
+				ParamUtil.getString(httpServletRequest, "keywords"))) {
+
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	@Override

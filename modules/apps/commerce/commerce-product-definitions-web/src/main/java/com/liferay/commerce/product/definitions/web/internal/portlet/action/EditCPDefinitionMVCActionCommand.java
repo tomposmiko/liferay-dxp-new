@@ -14,13 +14,12 @@
 
 package com.liferay.commerce.product.definitions.web.internal.portlet.action;
 
-import com.liferay.account.model.AccountGroupRel;
-import com.liferay.account.service.AccountGroupRelLocalService;
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
+import com.liferay.commerce.account.model.CommerceAccountGroupRel;
+import com.liferay.commerce.account.service.CommerceAccountGroupRelService;
 import com.liferay.commerce.exception.NoSuchCPDefinitionInventoryException;
 import com.liferay.commerce.model.CPDefinitionInventory;
-import com.liferay.commerce.product.configuration.CProductVersionConfiguration;
 import com.liferay.commerce.product.constants.CPInstanceConstants;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.exception.CPDefinitionExpirationDateException;
@@ -39,45 +38,35 @@ import com.liferay.commerce.product.servlet.taglib.ui.constants.CPDefinitionScre
 import com.liferay.commerce.service.CPDAvailabilityEstimateService;
 import com.liferay.commerce.service.CPDefinitionInventoryService;
 import com.liferay.friendly.url.exception.FriendlyURLLengthException;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.settings.SystemSettingsLocator;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-
-import java.net.URL;
 
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -92,6 +81,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_definition"
@@ -99,6 +89,57 @@ import org.osgi.service.component.annotations.Reference;
 	service = MVCActionCommand.class
 )
 public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
+
+	protected void deleteAccountGroup(ActionRequest actionRequest)
+		throws PortalException {
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
+
+		long commerceAccountGroupRelId = ParamUtil.getLong(
+			actionRequest, "commerceAccountGroupRelId");
+
+		_commerceAccountGroupRelService.deleteCommerceAccountGroupRel(
+			commerceAccountGroupRelId);
+
+		reindexCPDefinition(cpDefinitionId);
+	}
+
+	protected void deleteChannel(ActionRequest actionRequest)
+		throws PortalException {
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
+
+		long commerceChannelRelId = ParamUtil.getLong(
+			actionRequest, "commerceChannelRelId");
+
+		_commerceChannelRelService.deleteCommerceChannelRel(
+			commerceChannelRelId);
+
+		reindexCPDefinition(cpDefinitionId);
+	}
+
+	protected void deleteCPDefinitions(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] deleteCPDefinitionIds = null;
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
+
+		if (cpDefinitionId > 0) {
+			deleteCPDefinitionIds = new long[] {cpDefinitionId};
+		}
+		else {
+			deleteCPDefinitionIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "id"), 0L);
+		}
+
+		for (long deleteCPDefinitionId : deleteCPDefinitionIds) {
+			_cpDefinitionService.deleteCPDefinition(deleteCPDefinitionId);
+		}
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -108,97 +149,45 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
 		try {
-			CPDefinition cpDefinition = _getCPDefinition(actionRequest);
-
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				Callable<CPDefinition> cpDefinitionCallable =
-					new CPDefinitionCallable(actionRequest, cpDefinition);
-
-				cpDefinition = TransactionInvokerUtil.invoke(
-					_transactionConfig, cpDefinitionCallable);
+				CPDefinition cpDefinition = updateCPDefinition(actionRequest);
 
 				String redirect = getSaveAndContinueRedirect(
-					actionRequest, cpDefinition.getCPDefinitionId(),
+					actionRequest, cpDefinition,
 					CPDefinitionScreenNavigationConstants.CATEGORY_KEY_DETAILS);
 
 				sendRedirect(actionRequest, actionResponse, redirect);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCPDefinitions(actionRequest);
+				deleteCPDefinitions(actionRequest);
 			}
 			else if (cmd.equals("deleteAccountGroup")) {
-				_deleteAccountGroup(
-					actionRequest, cpDefinition.getCPDefinitionId());
-
-				String redirect = getSaveAndContinueRedirect(
-					actionRequest, cpDefinition.getCPDefinitionId(),
-					CPDefinitionScreenNavigationConstants.
-						CATEGORY_KEY_VISIBILITY);
-
-				sendRedirect(actionRequest, actionResponse, redirect);
+				deleteAccountGroup(actionRequest);
 			}
 			else if (cmd.equals("deleteChannel")) {
-				_deleteChannel(actionRequest, cpDefinition.getCPDefinitionId());
-
-				String redirect = getSaveAndContinueRedirect(
-					actionRequest, cpDefinition.getCPDefinitionId(),
-					CPDefinitionScreenNavigationConstants.
-						CATEGORY_KEY_VISIBILITY);
-
-				sendRedirect(actionRequest, actionResponse, redirect);
+				deleteChannel(actionRequest);
 			}
 			else if (cmd.equals("updateConfiguration")) {
 				Callable<Object> cpDefinitionConfigurationCallable =
-					new CPDefinitionConfigurationCallable(
-						actionRequest, cpDefinition);
+					new CPDefinitionConfigurationCallable(actionRequest);
 
 				TransactionInvokerUtil.invoke(
 					_transactionConfig, cpDefinitionConfigurationCallable);
 
-				String redirect = getSaveAndContinueRedirect(
-					actionRequest, cpDefinition.getCPDefinitionId(),
-					CPDefinitionScreenNavigationConstants.
-						CATEGORY_KEY_CONFIGURATION);
+				String redirect = ParamUtil.getString(
+					actionRequest, "redirect");
 
 				sendRedirect(actionRequest, actionResponse, redirect);
 			}
 			else if (cmd.equals("updateSubscriptionInfo")) {
-				updateSubscriptionInfo(actionRequest, cpDefinition);
-
-				String redirect = getSaveAndContinueRedirect(
-					actionRequest, cpDefinition.getCPDefinitionId(),
-					CPDefinitionScreenNavigationConstants.
-						CATEGORY_KEY_SUBSCRIPTION);
-
-				sendRedirect(actionRequest, actionResponse, redirect);
+				updateSubscriptionInfo(actionRequest);
 			}
 			else if (cmd.equals("updateVisibility")) {
 				Callable<Object> cpDefinitionVisibilityCallable =
-					new CPDefinitionVisibilityCallable(
-						actionRequest, cpDefinition);
+					new CPDefinitionVisibilityCallable(actionRequest);
 
 				TransactionInvokerUtil.invoke(
 					_transactionConfig, cpDefinitionVisibilityCallable);
-
-				String redirect = getSaveAndContinueRedirect(
-					actionRequest, cpDefinition.getCPDefinitionId(),
-					CPDefinitionScreenNavigationConstants.
-						CATEGORY_KEY_VISIBILITY);
-
-				sendRedirect(actionRequest, actionResponse, redirect);
-			}
-			else {
-				URL redirectURL = new URL(
-					ParamUtil.getString(actionRequest, "redirect"));
-
-				Map<String, String> queryMap = _getQueryMap(
-					cpDefinition.getCPDefinitionId(), redirectURL.getQuery());
-
-				String redirect = getSaveAndContinueRedirect(
-					actionRequest, Long.valueOf(queryMap.get("cpDefinitionId")),
-					queryMap.get("screenNavigationCategoryKey"));
-
-				sendRedirect(actionRequest, actionResponse, redirect);
 			}
 		}
 		catch (Throwable throwable) {
@@ -241,7 +230,7 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected String getSaveAndContinueRedirect(
-			ActionRequest actionRequest, long cpDefinitionId,
+			ActionRequest actionRequest, CPDefinition cpDefinition,
 			String screenNavigationCategoryKey)
 		throws Exception {
 
@@ -255,203 +244,13 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		).setMVCRenderCommandName(
 			"/cp_definitions/edit_cp_definition"
 		).setParameter(
-			"cpDefinitionId", cpDefinitionId
+			"cpDefinitionId", cpDefinition.getCPDefinitionId()
 		).setParameter(
 			"screenNavigationCategoryKey", screenNavigationCategoryKey
 		).buildString();
 	}
 
-	protected void updateShippingInfo(
-			ActionRequest actionRequest, long cpDefinitionId)
-		throws PortalException {
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CPDefinition.class.getName(), actionRequest);
-
-		boolean shippable = ParamUtil.getBoolean(actionRequest, "shippable");
-		boolean freeShipping = ParamUtil.getBoolean(
-			actionRequest, "freeShipping");
-		boolean shipSeparately = ParamUtil.getBoolean(
-			actionRequest, "shipSeparately");
-		double shippingExtraPrice = ParamUtil.getDouble(
-			actionRequest, "shippingExtraPrice");
-		double width = ParamUtil.getDouble(actionRequest, "width");
-		double height = ParamUtil.getDouble(actionRequest, "height");
-		double depth = ParamUtil.getDouble(actionRequest, "depth");
-		double weight = ParamUtil.getDouble(actionRequest, "weight");
-
-		_cpDefinitionService.updateShippingInfo(
-			cpDefinitionId, shippable, freeShipping, shipSeparately,
-			shippingExtraPrice, width, height, depth, weight, serviceContext);
-	}
-
-	protected void updateSubscriptionInfo(
-			ActionRequest actionRequest, CPDefinition cpDefinition)
-		throws PortalException {
-
-		if (cpDefinition == null) {
-			return;
-		}
-
-		boolean subscriptionEnabled = ParamUtil.getBoolean(
-			actionRequest, "subscriptionEnabled");
-		int subscriptionLength = ParamUtil.getInteger(
-			actionRequest, "subscriptionLength");
-		String subscriptionType = ParamUtil.getString(
-			actionRequest, "subscriptionType");
-		UnicodeProperties subscriptionTypeSettingsUnicodeProperties =
-			PropertiesParamUtil.getProperties(
-				actionRequest, "subscriptionTypeSettings--");
-		long maxSubscriptionCycles = ParamUtil.getLong(
-			actionRequest, "maxSubscriptionCycles");
-		boolean deliverySubscriptionEnabled = ParamUtil.getBoolean(
-			actionRequest, "deliverySubscriptionEnabled");
-		int deliverySubscriptionLength = ParamUtil.getInteger(
-			actionRequest, "deliverySubscriptionLength");
-		String deliverySubscriptionType = ParamUtil.getString(
-			actionRequest, "deliverySubscriptionType");
-		UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties =
-			PropertiesParamUtil.getProperties(
-				actionRequest, "deliverySubscriptionTypeSettings--");
-		long deliveryMaxSubscriptionCycles = ParamUtil.getLong(
-			actionRequest, "deliveryMaxSubscriptionCycles");
-
-		_cpDefinitionService.updateSubscriptionInfo(
-			cpDefinition.getCPDefinitionId(), subscriptionEnabled,
-			subscriptionLength, subscriptionType,
-			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
-			deliverySubscriptionEnabled, deliverySubscriptionLength,
-			deliverySubscriptionType,
-			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles);
-	}
-
-	private void _deleteAccountGroup(
-			ActionRequest actionRequest, long cpDefinitionId)
-		throws PortalException {
-
-		long accountGroupRelId = ParamUtil.getLong(
-			actionRequest, "commerceAccountGroupRelId");
-
-		_accountGroupRelLocalService.deleteAccountGroupRel(accountGroupRelId);
-
-		_reindexCPDefinition(cpDefinitionId);
-	}
-
-	private void _deleteChannel(
-			ActionRequest actionRequest, long cpDefinitionId)
-		throws PortalException {
-
-		long commerceChannelRelId = ParamUtil.getLong(
-			actionRequest, "commerceChannelRelId");
-
-		_commerceChannelRelService.deleteCommerceChannelRel(
-			commerceChannelRelId);
-
-		_reindexCPDefinition(cpDefinitionId);
-	}
-
-	private void _deleteCPDefinitions(ActionRequest actionRequest)
-		throws Exception {
-
-		long[] deleteCPDefinitionIds = null;
-
-		long cpDefinitionId = ParamUtil.getLong(
-			actionRequest, "cpDefinitionId");
-
-		if (cpDefinitionId > 0) {
-			deleteCPDefinitionIds = new long[] {cpDefinitionId};
-		}
-		else {
-			deleteCPDefinitionIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "id"), 0L);
-		}
-
-		for (long deleteCPDefinitionId : deleteCPDefinitionIds) {
-			_cpDefinitionService.deleteCPDefinition(deleteCPDefinitionId);
-		}
-	}
-
-	private CPDefinition _getCPDefinition(ActionRequest actionRequest)
-		throws Exception {
-
-		long cpDefinitionId = ParamUtil.getLong(
-			actionRequest, "cpDefinitionId");
-
-		if (cpDefinitionId <= 0) {
-			return null;
-		}
-
-		CPDefinition cpDefinition = _cpDefinitionService.getCPDefinition(
-			cpDefinitionId);
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CPDefinition.class.getName(), actionRequest);
-
-		if (!cpDefinition.isDraft() &&
-			(serviceContext.getWorkflowAction() ==
-				WorkflowConstants.ACTION_SAVE_DRAFT)) {
-
-			CProductVersionConfiguration cProductVersionConfiguration =
-				_configurationProvider.getConfiguration(
-					CProductVersionConfiguration.class,
-					new SystemSettingsLocator(
-						CProductVersionConfiguration.class.getName()));
-
-			if (cProductVersionConfiguration.enabled()) {
-				List<CPDefinition> cProductCPDefinitions =
-					_cpDefinitionService.getCProductCPDefinitions(
-						cpDefinition.getCProductId(),
-						WorkflowConstants.STATUS_DRAFT, QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS);
-
-				for (CPDefinition cProductCPDefinition :
-						cProductCPDefinitions) {
-
-					_cpDefinitionService.updateStatus(
-						cProductCPDefinition.getCPDefinitionId(),
-						WorkflowConstants.STATUS_INCOMPLETE, serviceContext,
-						Collections.emptyMap());
-				}
-
-				boolean saveAsDraft = ParamUtil.getBoolean(
-					actionRequest, "saveAsDraft");
-
-				if (saveAsDraft) {
-					cpDefinition = _cpDefinitionService.copyCPDefinition(
-						cpDefinitionId, cpDefinition.getGroupId(),
-						WorkflowConstants.STATUS_DRAFT);
-				}
-			}
-		}
-
-		return cpDefinition;
-	}
-
-	private Map<String, String> _getQueryMap(
-		long cpDefinitionId, String query) {
-
-		String[] params = query.split(StringPool.AMPERSAND);
-
-		Map<String, String> map = new HashMap<>();
-
-		for (String param : params) {
-			String name = param.split(StringPool.EQUAL)[0];
-
-			name = name.substring(name.lastIndexOf(StringPool.UNDERLINE) + 1);
-
-			if (name.equals("cpDefinitionId")) {
-				map.put(name, String.valueOf(cpDefinitionId));
-			}
-			else {
-				map.put(name, param.split(StringPool.EQUAL)[1]);
-			}
-		}
-
-		return map;
-	}
-
-	private void _reindexCPDefinition(long cpDefinitionId)
+	protected void reindexCPDefinition(long cpDefinitionId)
 		throws PortalException {
 
 		CPDefinition cpDefinition = _cpDefinitionService.getCPDefinition(
@@ -463,26 +262,30 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		indexer.reindex(cpDefinition);
 	}
 
-	private CPDefinition _updateCPDefinition(
-			ActionRequest actionRequest, CPDefinition cpDefinition)
+	protected CPDefinition updateCPDefinition(ActionRequest actionRequest)
 		throws Exception {
 
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
+
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "nameMapAsXML");
 		Map<Locale, String> shortDescriptionMap =
-			_localization.getLocalizationMap(
+			LocalizationUtil.getLocalizationMap(
 				actionRequest, "shortDescriptionMapAsXML");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "descriptionMapAsXML");
-		Map<Locale, String> urlTitleMap = _localization.getLocalizationMap(
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(
+				actionRequest, "descriptionMapAsXML");
+		Map<Locale, String> urlTitleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "urlTitleMapAsXML");
-		Map<Locale, String> metaTitleMap = _localization.getLocalizationMap(
+		Map<Locale, String> metaTitleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "metaTitleMapAsXML");
 		Map<Locale, String> metaDescriptionMap =
-			_localization.getLocalizationMap(
+			LocalizationUtil.getLocalizationMap(
 				actionRequest, "metaDescriptionMapAsXML");
-		Map<Locale, String> metaKeywordsMap = _localization.getLocalizationMap(
-			actionRequest, "metaKeywordsMapAsXML");
+		Map<Locale, String> metaKeywordsMap =
+			LocalizationUtil.getLocalizationMap(
+				actionRequest, "metaKeywordsMapAsXML");
 		boolean published = ParamUtil.getBoolean(actionRequest, "published");
 
 		int displayDateMonth = ParamUtil.getInteger(
@@ -525,7 +328,9 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			CPDefinition.class.getName(), actionRequest);
 
-		if (cpDefinition == null) {
+		CPDefinition cpDefinition = null;
+
+		if (cpDefinitionId <= 0) {
 			long commerceCatalogGroupId = ParamUtil.getLong(
 				actionRequest, "commerceCatalogGroupId");
 
@@ -547,6 +352,8 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			String productTypeName = ParamUtil.getString(
 				actionRequest, "productTypeName");
 
+			// Add commerce product definition
+
 			cpDefinition = _cpDefinitionService.addCPDefinition(
 				null, commerceCatalogGroupId, nameMap, shortDescriptionMap,
 				descriptionMap, urlTitleMap, metaTitleMap, metaDescriptionMap,
@@ -557,14 +364,20 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 				expirationDateDay, expirationDateYear, expirationDateHour,
 				expirationDateMinute, neverExpire,
 				CPInstanceConstants.DEFAULT_SKU, false, 1, null, null, 0L,
-				WorkflowConstants.STATUS_DRAFT, serviceContext);
+				serviceContext);
 		}
 		else {
+
+			// Update commerce product definition
+
+			CPDefinition oldCPDefinition = _cpDefinitionService.getCPDefinition(
+				cpDefinitionId);
+
 			cpDefinition = _cpDefinitionService.updateCPDefinition(
-				cpDefinition.getCPDefinitionId(), nameMap, shortDescriptionMap,
-				descriptionMap, urlTitleMap, metaTitleMap, metaDescriptionMap,
-				metaKeywordsMap, cpDefinition.isIgnoreSKUCombinations(), null,
-				published, displayDateMonth, displayDateDay, displayDateYear,
+				cpDefinitionId, nameMap, shortDescriptionMap, descriptionMap,
+				urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
+				oldCPDefinition.isIgnoreSKUCombinations(), null, published,
+				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, expirationDateMonth,
 				expirationDateDay, expirationDateYear, expirationDateHour,
 				expirationDateMinute, neverExpire, serviceContext);
@@ -573,12 +386,17 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		return cpDefinition;
 	}
 
-	private void _updateCPDefinitionInventory(
-			ActionRequest actionRequest, long cpDefinitionId)
+	protected void updateCPDefinitionInventory(ActionRequest actionRequest)
 		throws Exception {
+
+		long cpDefinitionInventoryId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionInventoryId");
 
 		long cpdAvailabilityEstimateEntryId = ParamUtil.getLong(
 			actionRequest, "cpdAvailabilityEstimateEntryId");
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
 
 		String cpDefinitionInventoryEngine = ParamUtil.getString(
 			actionRequest, "CPDefinitionInventoryEngine");
@@ -605,11 +423,7 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			CPDefinitionInventory.class.getName(), actionRequest);
 
-		CPDefinitionInventory cpDefinitionInventory =
-			_cpDefinitionInventoryService.
-				fetchCPDefinitionInventoryByCPDefinitionId(cpDefinitionId);
-
-		if (cpDefinitionInventory == null) {
+		if (cpDefinitionInventoryId <= 0) {
 			_cpDefinitionInventoryService.addCPDefinitionInventory(
 				cpDefinitionId, cpDefinitionInventoryEngine, lowStockActivity,
 				displayAvailability, displayStockQuantity, minStockQuantity,
@@ -618,11 +432,11 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		}
 		else {
 			_cpDefinitionInventoryService.updateCPDefinitionInventory(
-				cpDefinitionInventory.getCPDefinitionInventoryId(),
-				cpDefinitionInventoryEngine, lowStockActivity,
-				displayAvailability, displayStockQuantity, minStockQuantity,
-				backOrders, minOrderQuantity, maxOrderQuantity,
-				allowedOrderQuantities, multipleOrderQuantity);
+				cpDefinitionInventoryId, cpDefinitionInventoryEngine,
+				lowStockActivity, displayAvailability, displayStockQuantity,
+				minStockQuantity, backOrders, minOrderQuantity,
+				maxOrderQuantity, allowedOrderQuantities,
+				multipleOrderQuantity);
 		}
 
 		_cpdAvailabilityEstimateService.updateCPDAvailabilityEstimate(
@@ -630,9 +444,75 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			commerceAvailabilityEstimateId, serviceContext);
 	}
 
-	private void _updateTaxCategoryInfo(
-			ActionRequest actionRequest, long cpDefinitionId)
-		throws Exception {
+	protected void updateShippingInfo(ActionRequest actionRequest)
+		throws PortalException {
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			CPDefinition.class.getName(), actionRequest);
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
+
+		boolean shippable = ParamUtil.getBoolean(actionRequest, "shippable");
+		boolean freeShipping = ParamUtil.getBoolean(
+			actionRequest, "freeShipping");
+		boolean shipSeparately = ParamUtil.getBoolean(
+			actionRequest, "shipSeparately");
+		double shippingExtraPrice = ParamUtil.getDouble(
+			actionRequest, "shippingExtraPrice");
+		double width = ParamUtil.getDouble(actionRequest, "width");
+		double height = ParamUtil.getDouble(actionRequest, "height");
+		double depth = ParamUtil.getDouble(actionRequest, "depth");
+		double weight = ParamUtil.getDouble(actionRequest, "weight");
+
+		_cpDefinitionService.updateShippingInfo(
+			cpDefinitionId, shippable, freeShipping, shipSeparately,
+			shippingExtraPrice, width, height, depth, weight, serviceContext);
+	}
+
+	protected void updateSubscriptionInfo(ActionRequest actionRequest)
+		throws PortalException {
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
+
+		boolean subscriptionEnabled = ParamUtil.getBoolean(
+			actionRequest, "subscriptionEnabled");
+		int subscriptionLength = ParamUtil.getInteger(
+			actionRequest, "subscriptionLength");
+		String subscriptionType = ParamUtil.getString(
+			actionRequest, "subscriptionType");
+		UnicodeProperties subscriptionTypeSettingsUnicodeProperties =
+			PropertiesParamUtil.getProperties(
+				actionRequest, "subscriptionTypeSettings--");
+		long maxSubscriptionCycles = ParamUtil.getLong(
+			actionRequest, "maxSubscriptionCycles");
+		boolean deliverySubscriptionEnabled = ParamUtil.getBoolean(
+			actionRequest, "deliverySubscriptionEnabled");
+		int deliverySubscriptionLength = ParamUtil.getInteger(
+			actionRequest, "deliverySubscriptionLength");
+		String deliverySubscriptionType = ParamUtil.getString(
+			actionRequest, "deliverySubscriptionType");
+		UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties =
+			PropertiesParamUtil.getProperties(
+				actionRequest, "deliverySubscriptionTypeSettings--");
+		long deliveryMaxSubscriptionCycles = ParamUtil.getLong(
+			actionRequest, "deliveryMaxSubscriptionCycles");
+
+		_cpDefinitionService.updateSubscriptionInfo(
+			cpDefinitionId, subscriptionEnabled, subscriptionLength,
+			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
+			maxSubscriptionCycles, deliverySubscriptionEnabled,
+			deliverySubscriptionLength, deliverySubscriptionType,
+			deliverySubscriptionTypeSettingsUnicodeProperties,
+			deliveryMaxSubscriptionCycles);
+	}
+
+	protected void updateTaxCategoryInfo(ActionRequest actionRequest)
+		throws PortalException {
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
 
 		long cpTaxCategoryId = ParamUtil.getLong(
 			actionRequest, "cpTaxCategoryId");
@@ -644,25 +524,28 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			cpDefinitionId, cpTaxCategoryId, taxExempt, telcoOrElectronics);
 	}
 
-	private void _updateVisibility(
-			ActionRequest actionRequest, long cpDefinitionId)
-		throws Exception {
+	protected void updateVisibility(ActionRequest actionRequest)
+		throws PortalException {
+
+		long cpDefinitionId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionId");
 
 		// Commerce account group rels
 
-		long[] accountGroupIds = StringUtil.split(
+		long[] commerceAccountGroupIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "commerceAccountGroupIds"), 0L);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			AccountGroupRel.class.getName(), actionRequest);
+			CommerceAccountGroupRel.class.getName(), actionRequest);
 
-		for (long accountGroupId : accountGroupIds) {
-			if (accountGroupId == 0) {
+		for (long commerceAccountGroupId : commerceAccountGroupIds) {
+			if (commerceAccountGroupId == 0) {
 				continue;
 			}
 
-			_accountGroupRelLocalService.addAccountGroupRel(
-				accountGroupId, CPDefinition.class.getName(), cpDefinitionId);
+			_commerceAccountGroupRelService.addCommerceAccountGroupRel(
+				CPDefinition.class.getName(), cpDefinitionId,
+				commerceAccountGroupId, serviceContext);
 		}
 
 		// Commerce channel rels
@@ -701,16 +584,13 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
 
 	@Reference
-	private AccountGroupRelLocalService _accountGroupRelLocalService;
+	private CommerceAccountGroupRelService _commerceAccountGroupRelService;
 
 	@Reference
 	private CommerceCatalogService _commerceCatalogService;
 
 	@Reference
 	private CommerceChannelRelService _commerceChannelRelService;
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private CPDAvailabilityEstimateService _cpdAvailabilityEstimateService;
@@ -721,55 +601,23 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private CPDefinitionService _cpDefinitionService;
 
-	@Reference
-	private Localization _localization;
-
-	private class CPDefinitionCallable implements Callable<CPDefinition> {
-
-		@Override
-		public CPDefinition call() throws Exception {
-			return _updateCPDefinition(_actionRequest, _cpDefinition);
-		}
-
-		private CPDefinitionCallable(
-			ActionRequest actionRequest, CPDefinition cpDefinition) {
-
-			_actionRequest = actionRequest;
-			_cpDefinition = cpDefinition;
-		}
-
-		private final ActionRequest _actionRequest;
-		private final CPDefinition _cpDefinition;
-
-	}
-
 	private class CPDefinitionConfigurationCallable
 		implements Callable<Object> {
 
 		@Override
 		public Object call() throws Exception {
-			if (_cpDefinition == null) {
-				return null;
-			}
-
-			long cpDefinitionId = _cpDefinition.getCPDefinitionId();
-
-			_updateCPDefinitionInventory(_actionRequest, cpDefinitionId);
-			updateShippingInfo(_actionRequest, cpDefinitionId);
-			_updateTaxCategoryInfo(_actionRequest, cpDefinitionId);
+			updateCPDefinitionInventory(_actionRequest);
+			updateShippingInfo(_actionRequest);
+			updateTaxCategoryInfo(_actionRequest);
 
 			return null;
 		}
 
-		private CPDefinitionConfigurationCallable(
-			ActionRequest actionRequest, CPDefinition cpDefinition) {
-
+		private CPDefinitionConfigurationCallable(ActionRequest actionRequest) {
 			_actionRequest = actionRequest;
-			_cpDefinition = cpDefinition;
 		}
 
 		private final ActionRequest _actionRequest;
-		private final CPDefinition _cpDefinition;
 
 	}
 
@@ -777,25 +625,16 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 
 		@Override
 		public Object call() throws Exception {
-			if (_cpDefinition == null) {
-				return null;
-			}
-
-			_updateVisibility(
-				_actionRequest, _cpDefinition.getCPDefinitionId());
+			updateVisibility(_actionRequest);
 
 			return null;
 		}
 
-		private CPDefinitionVisibilityCallable(
-			ActionRequest actionRequest, CPDefinition cpDefinition) {
-
+		private CPDefinitionVisibilityCallable(ActionRequest actionRequest) {
 			_actionRequest = actionRequest;
-			_cpDefinition = cpDefinition;
 		}
 
 		private final ActionRequest _actionRequest;
-		private final CPDefinition _cpDefinition;
 
 	}
 

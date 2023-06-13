@@ -16,4 +16,4 @@
 
 <%@ include file="/layout/view/init.jsp" %>
 
-<liferay-layout:layout-common />
+<liferay-ui:layout-common />

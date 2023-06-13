@@ -21,11 +21,12 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
@@ -39,6 +40,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,8 +50,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Basto
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.LOCALIZABLE_TEXT,
-	service = DDMFormFieldTemplateContextContributor.class
+	service = {
+		DDMFormFieldTemplateContextContributor.class,
+		LocalizableTextDDMFormFieldTemplateContextContributor.class
+	}
 )
 public class LocalizableTextDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -61,35 +68,29 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 		Map<String, Object> parameters = new HashMap<>();
 
 		if (ddmFormFieldRenderingContext.isReturnFullContext()) {
-			parameters.put(
-				"availableLocales",
-				JSONUtil.toJSONArray(
-					_language.getAvailableLocales(), this::_getLocaleJSONObject,
-					_log));
+			parameters.put("availableLocales", getAvailableLocalesJSONArray());
 
 			DDMForm ddmForm = ddmFormField.getDDMForm();
 
-			JSONObject localeJSONObject = _getLocaleJSONObject(
+			JSONObject localeJSONObject = getLocaleJSONObject(
 				ddmForm.getDefaultLocale());
 
 			parameters.put("defaultLocale", localeJSONObject);
 
-			parameters.put("displayStyle", _getDisplayStyle(ddmFormField));
+			parameters.put("displayStyle", getDisplayStyle(ddmFormField));
 			parameters.put("editingLocale", localeJSONObject);
 			parameters.put(
 				"placeholder",
-				_getPlaceholder(ddmFormField, ddmFormFieldRenderingContext));
+				getPlaceholder(ddmFormField, ddmFormFieldRenderingContext));
 			parameters.put(
 				"placeholdersSubmitLabel",
-				JSONUtil.toJSONArray(
-					_language.getAvailableLocales(),
-					this::_getPlaceholdersSubmitLabelJSONObject, _log));
+				getPlaceholdersSubmitLabelJSONArray());
 			parameters.put(
 				"tooltip",
-				_getTooltip(ddmFormField, ddmFormFieldRenderingContext));
+				getTooltip(ddmFormField, ddmFormFieldRenderingContext));
 		}
 
-		String predefinedValue = _getPredefinedValue(
+		String predefinedValue = getPredefinedValue(
 			ddmFormField, ddmFormFieldRenderingContext);
 
 		if (predefinedValue != null) {
@@ -97,30 +98,33 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 		}
 
 		parameters.put(
-			"value", _getValueJSONObject(ddmFormFieldRenderingContext));
+			"value", getValueJSONObject(ddmFormFieldRenderingContext));
 
 		return parameters;
 	}
 
-	protected ResourceBundle getResourceBundle(Locale locale) {
-		return new AggregateResourceBundle(
-			ResourceBundleUtil.getBundle(
-				"content.Language", locale, getClass()),
-			portal.getResourceBundle(locale));
+	protected JSONArray getAvailableLocalesJSONArray() {
+		JSONArray jsonArray = jsonFactory.createJSONArray();
+
+		Set<Locale> locales = language.getAvailableLocales();
+
+		Stream<Locale> stream = locales.stream();
+
+		stream.map(
+			this::getLocaleJSONObject
+		).forEach(
+			jsonArray::put
+		);
+
+		return jsonArray;
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	@Reference
-	protected Portal portal;
-
-	private String _getDisplayStyle(DDMFormField ddmFormField) {
+	protected String getDisplayStyle(DDMFormField ddmFormField) {
 		return GetterUtil.getString(
 			ddmFormField.getProperty("displayStyle"), "singleline");
 	}
 
-	private JSONObject _getLocaleJSONObject(Locale locale) {
+	protected JSONObject getLocaleJSONObject(Locale locale) {
 		JSONObject jsonObject = jsonFactory.createJSONObject();
 
 		String languageId = LocaleUtil.toLanguageId(locale);
@@ -137,7 +141,7 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 		return jsonObject;
 	}
 
-	private String _getPlaceholder(
+	protected String getPlaceholder(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -152,7 +156,24 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 			ddmFormFieldRenderingContext.getLocale());
 	}
 
-	private JSONObject _getPlaceholdersSubmitLabelJSONObject(Locale locale) {
+	protected JSONArray getPlaceholdersSubmitLabelJSONArray() {
+		JSONArray placeholdersSubmitLabelJSONArray =
+			jsonFactory.createJSONArray();
+
+		Set<Locale> availableLocales = language.getAvailableLocales();
+
+		Stream<Locale> stream = availableLocales.stream();
+
+		stream.map(
+			this::getPlaceholdersSubmitLabelJSONObject
+		).forEach(
+			placeholdersSubmitLabelJSONArray::put
+		);
+
+		return placeholdersSubmitLabelJSONArray;
+	}
+
+	protected JSONObject getPlaceholdersSubmitLabelJSONObject(Locale locale) {
 		JSONObject placeholdersSubmitLabelJSONObject =
 			jsonFactory.createJSONObject();
 
@@ -160,11 +181,11 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 			"localeId", LocaleUtil.toLanguageId(locale)
 		).put(
 			"placeholderSubmitLabel",
-			_language.get(getResourceBundle(locale), "submit-form")
+			LanguageUtil.get(getResourceBundle(locale), "submit-form")
 		);
 	}
 
-	private String _getPredefinedValue(
+	protected String getPredefinedValue(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -178,7 +199,14 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 			ddmFormFieldRenderingContext.getLocale());
 	}
 
-	private String _getTooltip(
+	protected ResourceBundle getResourceBundle(Locale locale) {
+		return new AggregateResourceBundle(
+			ResourceBundleUtil.getBundle(
+				"content.Language", locale, getClass()),
+			portal.getResourceBundle(locale));
+	}
+
+	protected String getTooltip(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -193,7 +221,7 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 			ddmFormFieldRenderingContext.getLocale());
 	}
 
-	private JSONObject _getValueJSONObject(
+	protected JSONObject getValueJSONObject(
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		try {
@@ -202,17 +230,23 @@ public class LocalizableTextDDMFormFieldTemplateContextContributor
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
+				_log.debug(jsonException, jsonException);
 			}
 		}
 
 		return jsonFactory.createJSONObject();
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		LocalizableTextDDMFormFieldTemplateContextContributor.class);
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	@Reference
-	private Language _language;
+	protected Language language;
+
+	@Reference
+	protected Portal portal;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LocalizableTextDDMFormFieldTemplateContextContributor.class);
 
 }

@@ -15,10 +15,12 @@
 package com.liferay.journal.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -57,13 +59,25 @@ public class JournalViewMoreMenuItemsManagementToolbarDisplayContext
 	}
 
 	@Override
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
+
+		return searchActionURL.toString();
+	}
+
+	@Override
 	public Boolean isSelectable() {
 		return false;
 	}
 
 	@Override
+	protected String[] getNavigationKeys() {
+		return new String[] {"all"};
+	}
+
+	@Override
 	protected String[] getOrderByKeys() {
-		return new String[] {"name", "modified-date"};
+		return new String[] {"modified-date"};
 	}
 
 }

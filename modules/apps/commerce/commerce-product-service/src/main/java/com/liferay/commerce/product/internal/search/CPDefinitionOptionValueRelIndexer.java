@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.LinkedHashMap;
@@ -48,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPDefinitionOptionValueRelIndexer
 	extends BaseIndexer<CPDefinitionOptionValueRel> {
 
@@ -87,8 +87,8 @@ public class CPDefinitionOptionValueRelIndexer
 			SearchContext searchContext)
 		throws Exception {
 
-		addSearchTerm(searchQuery, searchContext, CPField.KEY, false);
 		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
+		addSearchTerm(searchQuery, searchContext, CPField.KEY, false);
 		addSearchLocalizedTerm(searchQuery, searchContext, Field.NAME, false);
 		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
 		addSearchTerm(searchQuery, searchContext, "sku", false);
@@ -128,14 +128,8 @@ public class CPDefinitionOptionValueRelIndexer
 		Document document = getBaseModelDocument(
 			CLASS_NAME, cpDefinitionOptionValueRel);
 
-		document.addKeyword(
-			CPField.CP_DEFINITION_OPTION_REL_ID,
-			cpDefinitionOptionValueRel.getCPDefinitionOptionRelId());
-		document.addNumber(
-			Field.PRIORITY, cpDefinitionOptionValueRel.getPriority());
-
 		String cpDefinitionOptionValueRelDefaultLanguageId =
-			_localization.getDefaultLanguageId(
+			LocalizationUtil.getDefaultLanguageId(
 				cpDefinitionOptionValueRel.getName());
 
 		Locale locale = LocaleUtil.fromLanguageId(
@@ -150,6 +144,12 @@ public class CPDefinitionOptionValueRelIndexer
 		if (cpInstance != null) {
 			document.addKeyword("sku", cpInstance.getSku());
 		}
+
+		document.addNumber(
+			Field.PRIORITY, cpDefinitionOptionValueRel.getPriority());
+		document.addKeyword(
+			CPField.CP_DEFINITION_OPTION_REL_ID,
+			cpDefinitionOptionValueRel.getCPDefinitionOptionRelId());
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -178,8 +178,8 @@ public class CPDefinitionOptionValueRelIndexer
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			cpDefinitionOptionValueRel.getCompanyId(),
-			getDocument(cpDefinitionOptionValueRel));
+			getSearchEngineId(), cpDefinitionOptionValueRel.getCompanyId(),
+			getDocument(cpDefinitionOptionValueRel), isCommitImmediately());
 	}
 
 	@Override
@@ -193,11 +193,11 @@ public class CPDefinitionOptionValueRelIndexer
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPDefinitionOptionValueRels(companyId);
+		reindexCPDefinitionOptionValueRels(companyId);
 	}
 
-	private void _reindexCPDefinitionOptionValueRels(long companyId)
-		throws Exception {
+	protected void reindexCPDefinitionOptionValueRels(long companyId)
+		throws PortalException {
 
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpDefinitionOptionValueRelLocalService.
@@ -223,6 +223,7 @@ public class CPDefinitionOptionValueRelIndexer
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}
@@ -236,8 +237,5 @@ public class CPDefinitionOptionValueRelIndexer
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Localization _localization;
 
 }

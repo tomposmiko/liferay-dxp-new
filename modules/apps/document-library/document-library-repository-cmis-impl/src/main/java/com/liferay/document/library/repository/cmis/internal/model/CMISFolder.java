@@ -77,7 +77,7 @@ public class CMISFolder extends BaseCMISModel implements Folder {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -96,7 +96,7 @@ public class CMISFolder extends BaseCMISModel implements Folder {
 		ObjectType objectType = _cmisFolder.getType();
 
 		if (cmisRepositoryDetector.isNuxeo() &&
-			!Objects.equals(objectType.getId(), "Workspace") &&
+			!Objects.equals("Workspace", objectType.getId()) &&
 			Objects.equals(ActionKeys.ADD_DOCUMENT, actionId)) {
 
 			return false;
@@ -235,7 +235,7 @@ public class CMISFolder extends BaseCMISModel implements Folder {
 				return folder.getName();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -255,7 +255,7 @@ public class CMISFolder extends BaseCMISModel implements Folder {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -298,7 +298,7 @@ public class CMISFolder extends BaseCMISModel implements Folder {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
@@ -364,7 +364,7 @@ public class CMISFolder extends BaseCMISModel implements Folder {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

@@ -15,7 +15,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,16 +27,15 @@ definition {
 
 			JSONUser.tearDownNonAdminUsers();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@description = "This is a use case for LPS-68599. Skip the instance for performance improvement."
-	@priority = 5
+	@description = "This is a use case for LPS-68599."
+	@priority = "5"
 	@refactordone
 	test CanAddCommentToWorkflowSubmission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
-		property test.name.skip.portal.instance = "KBWorkflow#CanAddCommentToWorkflowSubmission";
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -72,7 +71,7 @@ definition {
 		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title",
-			kbWorkflowAction = "Submit for Workflow");
+			kbWorkflowAction = "Submit for Publication");
 
 		User.logoutAndLoginPG(
 			userLoginEmailAddress = "test@liferay.com",
@@ -85,36 +84,7 @@ definition {
 		WorkflowComment.add(workflowComment = "Workflow Comment");
 	}
 
-	@e2etest
-	@priority = 4
-	@refactordone
-	test CanViewPendingContent {
-		property portal.acceptance = "true";
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Configuration",
-			portlet = "Workflow");
-
-		Workflow.configureWorkflow(
-			workflowDefinition = "Single Approver",
-			workflowResourceValue = "Knowledge Base Article");
-
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
-
-		KBArticle.addCP(
-			kbArticleContent = "Knowledge Base Article Content",
-			kbArticleTitle = "Knowledge Base Article Title",
-			kbWorkflowAction = "Submit for Workflow");
-
-		KBArticle.viewCP(
-			kbArticleContent = "Knowledge Base Article Content",
-			kbArticleTitle = "Knowledge Base Article Title",
-			kbStatus = "Pending");
-	}
-
-	@priority = 4
+	@priority = "4"
 	@refactorneeded
 	test ViewKBArticleSuggestionsWorkflow {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
@@ -124,7 +94,7 @@ definition {
 			layoutName = "Knowledge Base Display Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Guest",
 			layoutName = "Knowledge Base Display Page",
 			widgetName = "Knowledge Base Display");
@@ -156,8 +126,9 @@ definition {
 			roleTitle = "Administrator",
 			userScreenName = "usersn");
 
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
+		KBAdmin.openKBAdmin(siteURLKey = "guest");
+
+		KBArticle.addCP(
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title");
 
@@ -185,17 +156,15 @@ definition {
 
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
-		KBArticle.openPageTreePanel(section = "Suggestions");
+		KBArticle.gotoSuggestionsNavigationCP();
 
-		KBArticleSuggestion.gotoSuggestionStatusNew(suggestionCount = 1);
+		KBArticleSuggestion.gotoSuggestionStatusNew(suggestionCount = "1");
 
 		KBArticleSuggestion.moveToInProgressStatus(
 			kbArticleTitle = "Knowledge Base Article Title",
 			kbSuggestionBody = "Knowledge Base Article Suggestion");
 
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
-
-		KBArticle.openPageTreePanel(section = "Suggestions");
+		KBArticle.gotoSuggestionsNavigationCP();
 
 		KBArticleSuggestion.viewPG(
 			kbSuggestionBody = "Knowledge Base Article Suggestion",
@@ -206,9 +175,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title",
 			kbSuggestionBody = "Knowledge Base Article Suggestion");
 
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
-
-		KBArticle.openPageTreePanel(section = "Suggestions");
+		KBArticle.gotoSuggestionsNavigationCP();
 
 		KBArticleSuggestion.viewPG(
 			kbSuggestionBody = "Knowledge Base Article Suggestion",
@@ -219,7 +186,7 @@ definition {
 
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
-		KBArticle.openPageTreePanel(section = "Suggestions");
+		KBArticle.gotoSuggestionsNavigationCP();
 
 		KBArticleSuggestion.viewNoSuggestions();
 	}

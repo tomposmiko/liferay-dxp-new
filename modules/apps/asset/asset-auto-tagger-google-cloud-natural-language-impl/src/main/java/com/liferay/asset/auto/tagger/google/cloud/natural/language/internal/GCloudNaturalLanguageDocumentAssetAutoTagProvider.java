@@ -17,7 +17,7 @@ package com.liferay.asset.auto.tagger.google.cloud.natural.language.internal;
 import com.liferay.asset.auto.tagger.AssetAutoTagProvider;
 import com.liferay.asset.auto.tagger.google.cloud.natural.language.internal.configuration.GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration;
 import com.liferay.asset.auto.tagger.text.extractor.TextExtractor;
-import com.liferay.asset.auto.tagger.text.extractor.TextExtractorRegistry;
+import com.liferay.asset.auto.tagger.text.extractor.TextExtractorTracker;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.portal.kernel.log.Log;
@@ -50,7 +50,7 @@ public class GCloudNaturalLanguageDocumentAssetAutoTagProvider
 			if (_isEnabled(assetEntry)) {
 				TextExtractor<Object> textExtractor =
 					(TextExtractor<Object>)
-						_textExtractorRegistry.getTextExtractor(
+						_textExtractorTracker.getTextExtractor(
 							assetEntry.getClassName());
 
 				if (textExtractor != null) {
@@ -68,7 +68,7 @@ public class GCloudNaturalLanguageDocumentAssetAutoTagProvider
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -85,14 +85,14 @@ public class GCloudNaturalLanguageDocumentAssetAutoTagProvider
 		throws ConfigurationException {
 
 		GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration
-			gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration =
+			openNLPDocumentAssetAutoTagProviderCompanyConfiguration =
 				_configurationProvider.getCompanyConfiguration(
 					GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration.
 						class,
 					assetEntry.getCompanyId());
 
 		return ArrayUtil.contains(
-			gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration.
+			openNLPDocumentAssetAutoTagProviderCompanyConfiguration.
 				enabledClassNames(),
 			assetEntry.getClassName());
 	}
@@ -108,6 +108,6 @@ public class GCloudNaturalLanguageDocumentAssetAutoTagProvider
 		_gCloudNaturalLanguageDocumentAssetAutoTaggerImpl;
 
 	@Reference
-	private TextExtractorRegistry _textExtractorRegistry;
+	private TextExtractorTracker _textExtractorTracker;
 
 }

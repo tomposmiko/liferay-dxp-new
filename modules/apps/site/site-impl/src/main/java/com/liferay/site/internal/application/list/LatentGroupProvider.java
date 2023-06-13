@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Julio Camarero
  */
-@Component(service = GroupProvider.class)
+@Component(immediate = true, service = GroupProvider.class)
 public class LatentGroupProvider implements GroupProvider {
 
 	@Override
@@ -71,10 +71,14 @@ public class LatentGroupProvider implements GroupProvider {
 			String.valueOf(group.getGroupId()));
 	}
 
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
 	private static final String _KEY_LATENT_GROUP =
 		"com.liferay.site.application.list_latentGroup";
 
-	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference

@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jeyvison Nascimento
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class DEDataListViewSearchRegistrar {
 
 	@Activate
@@ -38,8 +38,7 @@ public class DEDataListViewSearchRegistrar {
 			DEDataListView.class, bundleContext,
 			modelSearchDefinition -> {
 				modelSearchDefinition.setDefaultSelectedFieldNames(
-					Field.COMPANY_ID, Field.ENTRY_CLASS_NAME,
-					Field.ENTRY_CLASS_PK, Field.GROUP_ID, Field.UID);
+					Field.COMPANY_ID, Field.GROUP_ID, Field.UID);
 				modelSearchDefinition.setDefaultSelectedLocalizedFieldNames(
 					Field.NAME);
 				modelSearchDefinition.setModelIndexWriteContributor(

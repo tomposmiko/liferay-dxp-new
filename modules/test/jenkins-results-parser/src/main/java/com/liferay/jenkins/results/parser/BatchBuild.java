@@ -28,16 +28,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dom4j.Element;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -48,6 +49,11 @@ public class BatchBuild extends BaseBuild {
 	@Override
 	public void addTimelineData(BaseBuild.TimelineData timelineData) {
 		addDownstreamBuildsTimelineData(timelineData);
+	}
+
+	@Override
+	public String getAppServer() {
+		return getSpiraPropertyValue("app.server");
 	}
 
 	@Override
@@ -70,6 +76,16 @@ public class BatchBuild extends BaseBuild {
 
 	public String getBatchName() {
 		return batchName;
+	}
+
+	@Override
+	public String getBrowser() {
+		return getSpiraPropertyValue("browser");
+	}
+
+	@Override
+	public String getDatabase() {
+		return getSpiraPropertyValue("database");
 	}
 
 	public List<AxisBuild> getDownstreamAxisBuilds() {
@@ -240,12 +256,30 @@ public class BatchBuild extends BaseBuild {
 	}
 
 	@Override
+	public String getJDK() {
+		return getSpiraPropertyValue("java.jdk");
+	}
+
+	@Override
 	public Map<String, String> getMetricLabels() {
 		Map<String, String> metricLabels = super.getMetricLabels();
 
 		metricLabels.put("job_type", batchName);
 
 		return metricLabels;
+	}
+
+	@Override
+	public String getOperatingSystem() {
+		return getSpiraPropertyValue("operating.system");
+	}
+
+	public String getSpiraPropertyValue(String propertyType) {
+		String propertyName = _getSpiraPropertyNameFromBatchName(propertyType);
+
+		return JenkinsResultsParserUtil.getProperty(
+			getJobProperties(), "test.batch.spira.property.value", propertyType,
+			propertyName);
 	}
 
 	@Override
@@ -363,37 +397,6 @@ public class BatchBuild extends BaseBuild {
 		else {
 			batchName = null;
 		}
-	}
-
-	@Override
-	protected void findDownstreamBuilds() {
-		List<String> downstreamBuildURLs = new ArrayList<>();
-
-		JSONObject buildJSONObject = getBuildJSONObject("runs[number,url]");
-
-		if ((buildJSONObject != null) && buildJSONObject.has("runs")) {
-			JSONArray runsJSONArray = buildJSONObject.getJSONArray("runs");
-
-			if (runsJSONArray != null) {
-				for (int i = 0; i < runsJSONArray.length(); i++) {
-					JSONObject runJSONObject = runsJSONArray.getJSONObject(i);
-
-					if (runJSONObject.getInt("number") != getBuildNumber()) {
-						continue;
-					}
-
-					String url = runJSONObject.getString("url");
-
-					if (hasBuildURL(url) || downstreamBuildURLs.contains(url)) {
-						continue;
-					}
-
-					downstreamBuildURLs.add(url);
-				}
-			}
-		}
-
-		addDownstreamBuilds(downstreamBuildURLs.toArray(new String[0]));
 	}
 
 	protected AxisBuild getAxisBuild(String axisVariable) {
@@ -522,6 +525,61 @@ public class BatchBuild extends BaseBuild {
 	}
 
 	protected final String batchName;
+	protected final Pattern majorVersionPattern = Pattern.compile(
+		"((\\d+)\\.?(\\d+?)).*");
+
+	private String _getSpiraPropertyNameFromBatchName(String propertyType) {
+		String batchName = getBatchName();
+
+		if ((batchName == null) || batchName.isEmpty()) {
+			return null;
+		}
+
+		Properties jobProperties = getJobProperties();
+
+		String propertyNamePrefix = JenkinsResultsParserUtil.combine(
+			"test.batch.spira.property.name[", propertyType, "]");
+
+		Set<String> propertyNames = new HashSet<>();
+
+		for (Object jobPropertyNameObject : jobProperties.keySet()) {
+			if (!(jobPropertyNameObject instanceof String)) {
+				continue;
+			}
+
+			String jobPropertyNameRegex = JenkinsResultsParserUtil.combine(
+				Pattern.quote(propertyNamePrefix), "\\[([^\\]+)\\]");
+
+			String jobPropertyName = jobPropertyNameObject.toString();
+
+			if (!jobPropertyName.matches(jobPropertyNameRegex)) {
+				continue;
+			}
+
+			String propertyName = jobPropertyName.replaceAll(
+				jobPropertyNameRegex, "$1");
+
+			if (!batchName.contains(propertyName)) {
+				continue;
+			}
+
+			propertyNames.add(propertyName);
+		}
+
+		if (propertyNames.isEmpty()) {
+			return null;
+		}
+
+		String targetPropertyName = "";
+
+		for (String propertyName : propertyNames) {
+			if (propertyName.length() > targetPropertyName.length()) {
+				targetPropertyName = propertyName;
+			}
+		}
+
+		return targetPropertyName;
+	}
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
 		{new ClosedChannelExceptionFailureMessageGenerator()};

@@ -385,11 +385,6 @@ public class CommerceAccountGroupWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CommerceAccountGroupWrapper wrap(
 		CommerceAccountGroup commerceAccountGroup) {
 

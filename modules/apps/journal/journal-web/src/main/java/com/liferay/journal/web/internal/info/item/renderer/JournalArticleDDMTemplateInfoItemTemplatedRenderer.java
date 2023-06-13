@@ -22,7 +22,7 @@ import com.liferay.info.item.renderer.InfoItemTemplatedRenderer;
 import com.liferay.info.item.renderer.template.InfoItemRendererTemplate;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -92,19 +94,20 @@ public class JournalArticleDDMTemplateInfoItemTemplatedRenderer
 					GetterUtil.getLong(classTypeKey)));
 		}
 
-		List<InfoItemRendererTemplate> infoItemRendererTemplates =
-			new ArrayList<>();
+		Stream<DDMStructure> stream = ddmStructures.stream();
 
-		for (DDMStructure ddmStructure : ddmStructures) {
-			for (DDMTemplate ddmTemplate : ddmStructure.getTemplates()) {
-				infoItemRendererTemplates.add(
-					new InfoItemRendererTemplate(
-						ddmTemplate.getName(locale),
-						ddmTemplate.getTemplateKey()));
+		return stream.flatMap(
+			ddmStructure -> {
+				List<DDMTemplate> ddmTemplates = ddmStructure.getTemplates();
+
+				return ddmTemplates.stream();
 			}
-		}
-
-		return infoItemRendererTemplates;
+		).map(
+			ddmTemplate -> new InfoItemRendererTemplate(
+				ddmTemplate.getName(locale), ddmTemplate.getTemplateKey())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	@Override
@@ -142,7 +145,7 @@ public class JournalArticleDDMTemplateInfoItemTemplatedRenderer
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "ddm-template");
+		return LanguageUtil.get(locale, "ddm-template");
 	}
 
 	@Override
@@ -150,12 +153,6 @@ public class JournalArticleDDMTemplateInfoItemTemplatedRenderer
 		JournalArticle article, String templateKey,
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
-
-		if (!JournalArticleRendererUtil.isShowArticle(
-				httpServletRequest, article)) {
-
-			return;
-		}
 
 		if (Validator.isNull(templateKey)) {
 			render(article, httpServletRequest, httpServletResponse);
@@ -179,16 +176,19 @@ public class JournalArticleDDMTemplateInfoItemTemplatedRenderer
 		}
 	}
 
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.journal.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private Portal _portal;
 
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.journal.web)")
 	private ServletContext _servletContext;
 
 	@Reference

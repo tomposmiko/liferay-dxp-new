@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -43,8 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_BROWSER,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator,guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -65,13 +65,19 @@ public class DDMFormBrowserPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
+	@Reference
+	protected void setDDMFormInstanceService(
+		DDMFormInstanceService ddmFormInstanceService) {
+
+		_ddmFormInstanceService = ddmFormInstanceService;
+	}
+
 	protected void unsetDDMFormInstanceService(
 		DDMFormInstanceService ddmFormInstanceService) {
 
 		_ddmFormInstanceService = null;
 	}
 
-	@Reference
 	private DDMFormInstanceService _ddmFormInstanceService;
 
 }

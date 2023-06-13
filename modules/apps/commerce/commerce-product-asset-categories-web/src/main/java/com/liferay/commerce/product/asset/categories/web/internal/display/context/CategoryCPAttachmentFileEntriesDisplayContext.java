@@ -28,6 +28,8 @@ import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 
 import java.util.Collections;
 
+import javax.portlet.PortletURL;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -81,11 +83,11 @@ public class CategoryCPAttachmentFileEntriesDisplayContext
 			Collections.<ItemSelectorReturnType>singletonList(
 				new FileEntryItemSelectorReturnType()));
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory,
-				"addCategoryCPAttachmentFileEntry",
-				imageItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "addCategoryCPAttachmentFileEntry",
+			imageItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	private final AttachmentsConfiguration _attachmentsConfiguration;

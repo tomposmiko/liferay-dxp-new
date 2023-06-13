@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.portal.kernel.dao.jdbc.aop.DynamicDataSourceTargetSource;
 import com.liferay.portal.kernel.jndi.JNDIUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -39,6 +40,12 @@ public class InfrastructureUtil {
 		return _dataSource;
 	}
 
+	public static DynamicDataSourceTargetSource
+		getDynamicDataSourceTargetSource() {
+
+		return _dynamicDataSourceTargetSource;
+	}
+
 	public static Session getMailSession() {
 		if (_mailSession == null) {
 			_mailSession = _createMailSession();
@@ -53,6 +60,19 @@ public class InfrastructureUtil {
 
 	public void setDataSource(DataSource dataSource) {
 		_dataSource = dataSource;
+	}
+
+	public void setDynamicDataSourceTargetSource(
+		DynamicDataSourceTargetSource dynamicDataSourceTargetSource) {
+
+		_dynamicDataSourceTargetSource = dynamicDataSourceTargetSource;
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	public void setMailSession(Session mailSession) {
 	}
 
 	public void setTransactionManager(Object transactionManager) {
@@ -85,6 +105,7 @@ public class InfrastructureUtil {
 		InfrastructureUtil.class);
 
 	private static DataSource _dataSource;
+	private static DynamicDataSourceTargetSource _dynamicDataSourceTargetSource;
 	private static Session _mailSession;
 	private static Object _transactionManager;
 

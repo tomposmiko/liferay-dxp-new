@@ -16,7 +16,6 @@ import ClayButton from '@clayui/button';
 import {ClayIconSpriteContext} from '@clayui/icon';
 import ClayModal, {useModal} from '@clayui/modal';
 import {render} from '@liferay/frontend-js-react-web';
-import {sub} from 'frontend-js-web';
 import React, {useRef} from 'react';
 import {unmountComponentAtNode} from 'react-dom';
 
@@ -32,9 +31,12 @@ export function Modal({
 	url,
 }) {
 	const {observer} = useModal({onClose});
-	const emailContentRef = useRef({
+	const emailContent = useRef({
 		addresses: [],
-		message: sub(Liferay.Language.get('please-fill-out-this-form-x'), url),
+		message: Liferay.Util.sub(
+			Liferay.Language.get('please-fill-out-this-form-x'),
+			url
+		),
 		subject: localizedName[themeDisplay.getLanguageId()],
 	});
 
@@ -46,16 +48,14 @@ export function Modal({
 				<ClayModal.Header>
 					{Liferay.Language.get('share')}
 				</ClayModal.Header>
-
 				<ClayModal.Body>
 					<ShareFormModalBody
 						autocompleteUserURL={autocompleteUserURL}
-						emailContent={emailContentRef}
+						emailContent={emailContent}
 						localizedName={localizedName}
 						url={url}
 					/>
 				</ClayModal.Body>
-
 				<ClayModal.Footer
 					last={
 						<ClayButton.Group spaced>
@@ -65,19 +65,16 @@ export function Modal({
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
-
 							<ClayButton
 								displayType="primary"
 								onClick={() => {
 									submitEmailContent({
 										addresses:
-											emailContentRef.current.addresses,
-										message:
-											emailContentRef.current.message,
+											emailContent.current.addresses,
+										message: emailContent.current.message,
 										portletNamespace,
 										shareFormInstanceURL,
-										subject:
-											emailContentRef.current.subject,
+										subject: emailContent.current.subject,
 									});
 
 									onClose();

@@ -1,16 +1,19 @@
-@default = "assertChecked"
-definition {
+<definition default="assertChecked">
+	<command name="assertChecked">
+		<execute selenium="waitForVisible" />
 
-	function assertChecked {
-		selenium.waitForVisible();
+		<execute selenium="assertChecked" />
+	</command>
 
-		selenium.assertChecked();
-	}
+	<command name="assertCheckedToggleSwitch">
+		<execute selenium="waitForElementPresent" />
 
-	function assertCheckedNotVisible {
-		selenium.waitForElementPresent();
+		<execute selenium="assertChecked" />
+	</command>
 
-		selenium.assertChecked();
-	}
+	<command name="waitForElementPresentAssertChecked">
+		<execute selenium="waitForElementPresent" />
 
-}
+		<execute selenium="assertChecked" />
+	</command>
+</definition>

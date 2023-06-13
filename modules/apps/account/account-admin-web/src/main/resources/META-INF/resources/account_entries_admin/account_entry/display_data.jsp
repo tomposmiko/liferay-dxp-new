@@ -24,51 +24,72 @@ String[] types = GetterUtil.getStringValues(request.getAttribute(AccountWebKeys.
 
 <clay:sheet-section>
 	<h3 class="sheet-subtitle">
-		<liferay-ui:message key="account-display-data" />
+		<%= LanguageUtil.get(request, "account-display-data") %>
 	</h3>
 
-	<liferay-frontend:logo-selector
-		currentLogoURL="<%= accountEntryDisplay.getLogoURL() %>"
-		defaultLogoURL="<%= accountEntryDisplay.getDefaultLogoURL() %>"
-		label='<%= LanguageUtil.get(request, "image") %>'
-	/>
+	<clay:row>
+		<clay:col
+			md="6"
+		>
+			<aui:input label="account-name" name="name" required="<%= true %>" type="text" value="<%= accountEntryDisplay.getName() %>">
+				<aui:validator name="maxLength"><%= ModelHintsUtil.getMaxLength(AccountEntry.class.getName(), "name") %></aui:validator>
+			</aui:input>
 
-	<aui:input bean="<%= accountEntryDisplay %>" label="account-name" model="<%= AccountEntry.class %>" name="name" />
+			<c:choose>
+				<c:when test="<%= accountEntryDisplay.getAccountEntryId() > 0 %>">
+					<aui:input disabled="<%= true %>" label="type" name="type" value="<%= LanguageUtil.get(request, accountEntryDisplay.getType()) %>" />
+				</c:when>
+				<c:otherwise>
+					<aui:select label="type" name="type">
 
-	<c:choose>
-		<c:when test="<%= accountEntryDisplay.getAccountEntryId() > 0 %>">
-			<aui:input disabled="<%= true %>" label="type" name="type" value="<%= LanguageUtil.get(request, accountEntryDisplay.getType()) %>" />
-		</c:when>
-		<c:otherwise>
-			<aui:select label="type" name="type">
+						<%
+						for (String type : types) {
+						%>
 
-				<%
-				for (String type : types) {
-				%>
+							<aui:option label="<%= LanguageUtil.get(request, type) %>" value="<%= type %>" />
 
-					<aui:option label="<%= LanguageUtil.get(request, type) %>" value="<%= type %>" />
+						<%
+						}
+						%>
 
-				<%
-				}
-				%>
+					</aui:select>
+				</c:otherwise>
+			</c:choose>
 
-			</aui:select>
-		</c:otherwise>
-	</c:choose>
+			<aui:input helpMessage="tax-id-help" label="tax-id" name="taxIdNumber" type="text" value="<%= accountEntryDisplay.getTaxIdNumber() %>">
+				<aui:validator name="maxLength"><%= ModelHintsUtil.getMaxLength(AccountEntry.class.getName(), "taxIdNumber") %></aui:validator>
+			</aui:input>
 
-	<aui:input helpMessage="tax-id-help" label="tax-id" name="taxIdNumber" type="text" value="<%= accountEntryDisplay.getTaxIdNumber() %>">
-		<aui:validator name="maxLength"><%= ModelHintsUtil.getMaxLength(AccountEntry.class.getName(), "taxIdNumber") %></aui:validator>
-	</aui:input>
+			<liferay-ui:error embed="<%= false %>" key="<%= DuplicateAccountEntryExternalReferenceCodeException.class.getName() %>" message="the-given-external-reference-code-belongs-to-another-account" />
 
-	<liferay-ui:error embed="<%= false %>" key="<%= DuplicateAccountEntryExternalReferenceCodeException.class.getName() %>" message="the-given-external-reference-code-belongs-to-another-account" />
+			<aui:input label="external-reference-code" name="externalReferenceCode" type="text" value="<%= accountEntryDisplay.getExternalReferenceCode() %>" />
 
-	<aui:input bean="<%= accountEntryDisplay %>" label="external-reference-code" model="<%= AccountEntry.class %>" name="externalReferenceCode" />
+			<c:if test="<%= accountEntryDisplay.getAccountEntryId() > 0 %>">
+				<aui:input cssClass="disabled" label="account-id" name="accountEntryId" readonly="true" type="text" value="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>" />
+			</c:if>
+		</clay:col>
 
-	<c:if test="<%= accountEntryDisplay.getAccountEntryId() > 0 %>">
-		<aui:input cssClass="disabled" label="account-id" name="accountEntryId" readonly="true" type="text" value="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>" />
-	</c:if>
+		<clay:col
+			md="5"
+		>
+			<div align="middle">
+				<label class="control-label"></label>
+
+				<liferay-ui:logo-selector
+					currentLogoURL="<%= (accountEntryDisplay.getLogoId() == 0) ? accountEntryDisplay.getDefaultLogoURL(liferayPortletRequest) : accountEntryDisplay.getLogoURL(themeDisplay) %>"
+					defaultLogo="<%= accountEntryDisplay.getLogoId() == 0 %>"
+					defaultLogoURL="<%= accountEntryDisplay.getDefaultLogoURL(liferayPortletRequest) %>"
+					tempImageFileName="<%= String.valueOf(accountEntryDisplay.getAccountEntryId()) %>"
+				/>
+			</div>
+		</clay:col>
+	</clay:row>
 
 	<aui:field-wrapper cssClass="form-group lfr-input-text-container">
 		<aui:input name="description" type="textarea" value="<%= accountEntryDisplay.getDescription() %>" />
+	</aui:field-wrapper>
+
+	<aui:field-wrapper cssClass="form-group lfr-input-text-container">
+		<aui:input label="" labelOff="inactive" labelOn="active" name="active" type="toggle-switch" value="<%= accountEntryDisplay.isActive() %>" />
 	</aui:field-wrapper>
 </clay:sheet-section>

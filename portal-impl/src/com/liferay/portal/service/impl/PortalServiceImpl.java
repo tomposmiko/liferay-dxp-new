@@ -24,15 +24,18 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceMode;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.sender.SynchronousMessageSender;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.PortalService;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.transaction.Propagation;
-import com.liferay.portal.kernel.transaction.TransactionConfig;
-import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ReleaseInfo;
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
+import com.liferay.portal.model.impl.ClassNameImpl;
 import com.liferay.portal.service.base.PortalServiceBaseImpl;
 import com.liferay.portal.util.PropsValues;
 
@@ -72,6 +75,35 @@ public class PortalServiceImpl extends PortalServiceBaseImpl {
 	}
 
 	@Override
+	public void testAddClassNameAndTestTransactionPortletBar_PortalRollback(
+		String transactionPortletBarText) {
+
+		addClassName(PortalService.class.getName());
+
+		addTransactionPortletBar(transactionPortletBarText, false);
+
+		throw new SystemException();
+	}
+
+	@Override
+	public void testAddClassNameAndTestTransactionPortletBar_PortletRollback(
+		String transactionPortletBarText) {
+
+		addClassName(PortalService.class.getName());
+
+		addTransactionPortletBar(transactionPortletBarText, true);
+	}
+
+	@Override
+	public void testAddClassNameAndTestTransactionPortletBar_Success(
+		String transactionPortletBarText) {
+
+		addClassName(PortalService.class.getName());
+
+		addTransactionPortletBar(transactionPortletBarText, false);
+	}
+
+	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void testAutoSyncHibernateSessionStateOnTxCreation() {
 
@@ -100,29 +132,17 @@ public class PortalServiceImpl extends PortalServiceBaseImpl {
 						"cache");
 			}
 
+			ClassName newClassName = new ClassNameImpl();
+
+			newClassName.setPrimaryKey(className.getClassNameId());
+
 			String newValue = "testAutoSyncHibernateSessionStateOnTxCreation2";
+
+			newClassName.setValue(newValue);
 
 			// Update in new transaction
 
-			long classNameId = className.getClassNameId();
-
-			try {
-				TransactionInvokerUtil.invoke(
-					_transactionConfig,
-					() -> {
-						ClassName localClassName =
-							_classNamePersistence.findByPrimaryKey(classNameId);
-
-						localClassName.setValue(newValue);
-
-						_classNameLocalService.updateClassName(localClassName);
-
-						return null;
-					});
-			}
-			catch (Throwable throwable) {
-				throw new RuntimeException(throwable);
-			}
+			_classNameLocalService.updateClassName(newClassName);
 
 			if (currentSession.contains(className)) {
 				throw new IllegalStateException(
@@ -173,7 +193,7 @@ public class PortalServiceImpl extends PortalServiceBaseImpl {
 			userId = getUserId();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		if (_log.isInfoEnabled()) {
@@ -203,12 +223,31 @@ public class PortalServiceImpl extends PortalServiceBaseImpl {
 		_classNamePersistence.update(className);
 	}
 
+	protected void addTransactionPortletBar(
+		String transactionPortletBarText, boolean rollback) {
+
+		try {
+			Message message = new Message();
+
+			message.put("rollback", rollback);
+			message.put("text", transactionPortletBarText);
+
+			_directSynchronousMessageSender.send(
+				DestinationNames.TEST_TRANSACTION, message);
+		}
+		catch (Exception exception) {
+			throw new SystemException(exception);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortalServiceImpl.class);
 
-	private static final TransactionConfig _transactionConfig =
-		TransactionConfig.Factory.create(
-			Propagation.REQUIRES_NEW, new Class<?>[0]);
+	private static volatile SynchronousMessageSender
+		_directSynchronousMessageSender =
+			ServiceProxyFactory.newServiceTrackedInstance(
+				SynchronousMessageSender.class, PortalServiceImpl.class,
+				"_directSynchronousMessageSender", "(mode=DIRECT)", true);
 
 	@BeanReference(type = ClassNameLocalService.class)
 	private ClassNameLocalService _classNameLocalService;

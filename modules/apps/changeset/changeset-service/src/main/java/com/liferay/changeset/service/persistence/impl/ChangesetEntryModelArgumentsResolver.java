@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.changeset.model.impl.ChangesetEntryImpl",
-		"table.name=ChangesetEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		ChangesetEntryModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class ChangesetEntryModelArgumentsResolver implements ArgumentsResolver {
 

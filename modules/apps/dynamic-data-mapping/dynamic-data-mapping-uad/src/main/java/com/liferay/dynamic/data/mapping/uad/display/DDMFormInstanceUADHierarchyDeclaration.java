@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.uad.display;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.user.associated.data.display.UADDisplay;
 import com.liferay.user.associated.data.display.UADHierarchyDeclaration;
 
@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcos Martins
  */
-@Component(service = UADHierarchyDeclaration.class)
+@Component(immediate = true, service = UADHierarchyDeclaration.class)
 public class DDMFormInstanceUADHierarchyDeclaration
 	implements UADHierarchyDeclaration {
 
@@ -37,7 +37,7 @@ public class DDMFormInstanceUADHierarchyDeclaration
 
 	@Override
 	public String getEntitiesTypeLabel(Locale locale) {
-		return _language.get(locale, "ddm-form-instance");
+		return LanguageUtil.get(locale, "ddm-form-instance");
 	}
 
 	@Override
@@ -50,17 +50,10 @@ public class DDMFormInstanceUADHierarchyDeclaration
 		return new UADDisplay<?>[] {_ddmFormInstanceRecordUADDisplay};
 	}
 
-	@Reference(
-		target = "(component.name=com.liferay.dynamic.data.mapping.uad.display.DDMFormInstanceRecordUADDisplay)"
-	)
-	private UADDisplay<?> _ddmFormInstanceRecordUADDisplay;
-
-	@Reference(
-		target = "(component.name=com.liferay.dynamic.data.mapping.uad.display.DDMFormInstanceUADDisplay)"
-	)
-	private UADDisplay<?> _ddmFormInstanceUADDisplay;
+	@Reference
+	private DDMFormInstanceRecordUADDisplay _ddmFormInstanceRecordUADDisplay;
 
 	@Reference
-	private Language _language;
+	private DDMFormInstanceUADDisplay _ddmFormInstanceUADDisplay;
 
 }

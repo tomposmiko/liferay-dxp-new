@@ -221,11 +221,29 @@ public class CProductLocalServiceUtil {
 		return getService().fetchCProduct(CProductId);
 	}
 
+	/**
+	 * Returns the c product with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the c product's external reference code
+	 * @return the matching c product, or <code>null</code> if a matching c product could not be found
+	 */
 	public static CProduct fetchCProductByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchCProductByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCProductByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static CProduct fetchCProductByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchCProductByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -264,12 +282,20 @@ public class CProductLocalServiceUtil {
 		return getService().getCProductByCPInstanceUuid(cpInstanceUuid);
 	}
 
+	/**
+	 * Returns the c product with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the c product's external reference code
+	 * @return the matching c product
+	 * @throws PortalException if a matching c product could not be found
+	 */
 	public static CProduct getCProductByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getCProductByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	/**

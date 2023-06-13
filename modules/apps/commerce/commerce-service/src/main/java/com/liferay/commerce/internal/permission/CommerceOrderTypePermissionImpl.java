@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.internal.permission;
 
-import com.liferay.commerce.context.CommerceGroupThreadLocal;
 import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.permission.CommerceOrderTypePermission;
 import com.liferay.commerce.service.CommerceOrderTypeLocalService;
@@ -29,7 +28,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Alberti
  */
-@Component(service = CommerceOrderTypePermission.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceOrderTypePermission.class
+)
 public class CommerceOrderTypePermissionImpl
 	implements CommerceOrderTypePermission {
 
@@ -134,7 +136,7 @@ public class CommerceOrderTypePermissionImpl
 		}
 
 		return permissionChecker.hasPermission(
-			CommerceGroupThreadLocal.get(), CommerceOrderType.class.getName(),
+			null, CommerceOrderType.class.getName(),
 			commerceOrderType.getCommerceOrderTypeId(), actionId);
 	}
 

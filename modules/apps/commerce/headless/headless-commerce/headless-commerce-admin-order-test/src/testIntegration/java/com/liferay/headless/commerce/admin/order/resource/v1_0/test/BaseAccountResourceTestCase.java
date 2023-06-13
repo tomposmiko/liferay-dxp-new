@@ -27,7 +27,6 @@ import com.liferay.headless.commerce.admin.order.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.order.client.pagination.Page;
 import com.liferay.headless.commerce.admin.order.client.resource.v1_0.AccountResource;
 import com.liferay.headless.commerce.admin.order.client.serdes.v1_0.AccountSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -49,24 +48,24 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -199,18 +198,10 @@ public abstract class BaseAccountResourceTestCase {
 	public void testGetOrderRuleAccountAccount() throws Exception {
 		Account postAccount = testGetOrderRuleAccountAccount_addAccount();
 
-		Account getAccount = accountResource.getOrderRuleAccountAccount(
-			testGetOrderRuleAccountAccount_getOrderRuleAccountId());
+		Account getAccount = accountResource.getOrderRuleAccountAccount(null);
 
 		assertEquals(postAccount, getAccount);
 		assertValid(getAccount);
-	}
-
-	protected Long testGetOrderRuleAccountAccount_getOrderRuleAccountId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected Account testGetOrderRuleAccountAccount_addAccount()
@@ -222,7 +213,7 @@ public abstract class BaseAccountResourceTestCase {
 
 	@Test
 	public void testGraphQLGetOrderRuleAccountAccount() throws Exception {
-		Account account = testGraphQLGetOrderRuleAccountAccount_addAccount();
+		Account account = testGraphQLAccount_addAccount();
 
 		Assert.assertTrue(
 			equals(
@@ -234,20 +225,11 @@ public abstract class BaseAccountResourceTestCase {
 								"orderRuleAccountAccount",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"orderRuleAccountId",
-											testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId());
+										put("orderRuleAccountId", null);
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data", "Object/orderRuleAccountAccount"))));
-	}
-
-	protected Long testGraphQLGetOrderRuleAccountAccount_getOrderRuleAccountId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -274,12 +256,6 @@ public abstract class BaseAccountResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Account testGraphQLGetOrderRuleAccountAccount_addAccount()
-		throws Exception {
-
-		return testGraphQLAccount_addAccount();
-	}
-
 	@Test
 	public void testGetOrderByExternalReferenceCodeAccount() throws Exception {
 		Account postAccount =
@@ -287,19 +263,10 @@ public abstract class BaseAccountResourceTestCase {
 
 		Account getAccount =
 			accountResource.getOrderByExternalReferenceCodeAccount(
-				testGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-					postAccount));
+				postAccount.getExternalReferenceCode());
 
 		assertEquals(postAccount, getAccount);
 		assertValid(getAccount);
-	}
-
-	protected String
-			testGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-				Account account)
-		throws Exception {
-
-		return account.getExternalReferenceCode();
 	}
 
 	protected Account testGetOrderByExternalReferenceCodeAccount_addAccount()
@@ -313,8 +280,7 @@ public abstract class BaseAccountResourceTestCase {
 	public void testGraphQLGetOrderByExternalReferenceCodeAccount()
 		throws Exception {
 
-		Account account =
-			testGraphQLGetOrderByExternalReferenceCodeAccount_addAccount();
+		Account account = testGraphQLAccount_addAccount();
 
 		Assert.assertTrue(
 			equals(
@@ -329,21 +295,14 @@ public abstract class BaseAccountResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-													account) + "\"");
+												account.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/orderByExternalReferenceCodeAccount"))));
-	}
-
-	protected String
-			testGraphQLGetOrderByExternalReferenceCodeAccount_getExternalReferenceCode(
-				Account account)
-		throws Exception {
-
-		return account.getExternalReferenceCode();
 	}
 
 	@Test
@@ -371,28 +330,15 @@ public abstract class BaseAccountResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Account
-			testGraphQLGetOrderByExternalReferenceCodeAccount_addAccount()
-		throws Exception {
-
-		return testGraphQLAccount_addAccount();
-	}
-
 	@Test
 	public void testGetOrderIdAccount() throws Exception {
 		Account postAccount = testGetOrderIdAccount_addAccount();
 
 		Account getAccount = accountResource.getOrderIdAccount(
-			testGetOrderIdAccount_getId(postAccount));
+			postAccount.getId());
 
 		assertEquals(postAccount, getAccount);
 		assertValid(getAccount);
-	}
-
-	protected Long testGetOrderIdAccount_getId(Account account)
-		throws Exception {
-
-		return account.getId();
 	}
 
 	protected Account testGetOrderIdAccount_addAccount() throws Exception {
@@ -402,7 +348,7 @@ public abstract class BaseAccountResourceTestCase {
 
 	@Test
 	public void testGraphQLGetOrderIdAccount() throws Exception {
-		Account account = testGraphQLGetOrderIdAccount_addAccount();
+		Account account = testGraphQLAccount_addAccount();
 
 		Assert.assertTrue(
 			equals(
@@ -414,20 +360,11 @@ public abstract class BaseAccountResourceTestCase {
 								"orderIdAccount",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetOrderIdAccount_getId(
-												account));
+										put("id", account.getId());
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data", "Object/orderIdAccount"))));
-	}
-
-	protected Long testGraphQLGetOrderIdAccount_getId(Account account)
-		throws Exception {
-
-		return account.getId();
 	}
 
 	@Test
@@ -448,12 +385,6 @@ public abstract class BaseAccountResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected Account testGraphQLGetOrderIdAccount_addAccount()
-		throws Exception {
-
-		return testGraphQLAccount_addAccount();
 	}
 
 	protected Account testGraphQLAccount_addAccount() throws Exception {
@@ -608,12 +539,6 @@ public abstract class BaseAccountResourceTestCase {
 	}
 
 	protected void assertValid(Page<Account> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Account> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Account> accounts = page.getItems();
@@ -628,20 +553,6 @@ public abstract class BaseAccountResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -840,16 +751,14 @@ public abstract class BaseAccountResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -866,10 +775,6 @@ public abstract class BaseAccountResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -879,18 +784,18 @@ public abstract class BaseAccountResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -959,9 +864,8 @@ public abstract class BaseAccountResourceTestCase {
 		}
 
 		if (entityFieldName.equals("type")) {
-			sb.append(String.valueOf(account.getType()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		throw new IllegalArgumentException(
@@ -1038,115 +942,6 @@ public abstract class BaseAccountResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1221,6 +1016,18 @@ public abstract class BaseAccountResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseAccountResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

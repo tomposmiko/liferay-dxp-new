@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.servlet.taglib.aui;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.util.Mergeable;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -28,15 +27,13 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.regex.Pattern;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Brian Wing Shun Chan
@@ -44,59 +41,43 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  */
 public class ScriptData implements Mergeable<ScriptData>, Serializable {
 
-	public void append(String portletId, JSFragment jsFragment) {
-		if (Validator.isNull(portletId)) {
-			portletId = StringPool.BLANK;
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #append(String, StringBundler, String, ModulesType)}
+	 */
+	@Deprecated
+	public void append(
+		String portletId,
+		com.liferay.portal.kernel.util.StringBundler contentSB, String modules,
+		ModulesType modulesType) {
+
+		PortletData portletData = _getPortletData(portletId);
+
+		StringBundler sb = new StringBundler();
+
+		for (int i = 0; i < contentSB.index(); i++) {
+			sb.append(contentSB.stringAt(0));
 		}
 
-		PortletData portletData = _portletDataMap.get(portletId);
-
-		if (portletData == null) {
-			portletData = new PortletData();
-
-			PortletData oldPortletData = _portletDataMap.putIfAbsent(
-				portletId, portletData);
-
-			if (oldPortletData != null) {
-				portletData = oldPortletData;
-			}
-		}
-
-		portletData.add(jsFragment);
+		portletData.append(sb, modules, modulesType);
 	}
 
 	public void append(
 		String portletId, String content, String modules,
 		ModulesType modulesType) {
 
-		if (Validator.isNull(modules)) {
-			append(portletId, new JSFragment(content));
-		}
-		else {
-			if (modulesType == ModulesType.AUI) {
-				List<String> auiModules = new ArrayList<>();
+		PortletData portletData = _getPortletData(portletId);
 
-				for (String module : StringUtil.split(modules)) {
-					auiModules.add(StringUtil.trim(module));
-				}
-
-				append(
-					portletId, new JSFragment(null, auiModules, content, null));
-			}
-			else {
-				append(
-					portletId,
-					new JSFragment(
-						_parseAMDRequires(modules), null, content, null));
-			}
-		}
+		portletData.append(content, modules, modulesType);
 	}
 
 	public void append(
 		String portletId, StringBundler contentSB, String modules,
 		ModulesType modulesType) {
 
-		append(portletId, contentSB.toString(), modules, modulesType);
+		PortletData portletData = _getPortletData(portletId);
+
+		portletData.append(contentSB, modules, modulesType);
 	}
 
 	public void mark() {
@@ -126,7 +107,20 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 	}
 
 	public void writeTo(Writer writer) throws IOException {
-		_portletDataRenderer.write(_portletDataMap.values(), writer);
+		writer.write("<script type=\"text/javascript\">\n// <![CDATA[\n");
+
+		for (PortletData portletData : _portletDataMap.values()) {
+			portletData._rawSB.writeTo(writer);
+		}
+
+		Collection<PortletData> portletDataCollection =
+			_portletDataMap.values();
+
+		_writeEs6ModulesTo(writer, portletDataCollection);
+
+		_writeAuiModulesTo(writer, portletDataCollection);
+
+		writer.write("\n// ]]>\n</script>");
 	}
 
 	public void writeTo(Writer writer, String portletId) throws IOException {
@@ -136,7 +130,22 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 			return;
 		}
 
-		_portletDataRenderer.write(Collections.singleton(portletData), writer);
+		writer.write("<script type=\"text/javascript\">\n// <![CDATA[\n");
+
+		portletData._rawSB.writeTo(writer);
+
+		Collection<PortletData> portletDataCollection = Collections.singleton(
+			portletData);
+
+		if (!portletData._es6TagInvocationDatas.isEmpty()) {
+			_writeEs6ModulesTo(writer, portletDataCollection);
+		}
+
+		if (!portletData._auiModulesSet.isEmpty()) {
+			_writeAuiModulesTo(writer, portletDataCollection);
+		}
+
+		writer.write("\n// ]]>\n</script>");
 	}
 
 	public static enum ModulesType {
@@ -145,93 +154,222 @@ public class ScriptData implements Mergeable<ScriptData>, Serializable {
 
 	}
 
-	protected ConcurrentMap<String, PortletData> getPortletDataMap() {
-		return _portletDataMap;
-	}
-
-	private String[] _getNameAndAlias(String requirePart) {
-		requirePart = requirePart.trim();
-
-		String[] parts = _whitespacePattern.split(requirePart, 4);
-
-		if ((parts.length == 3) &&
-			StringUtil.equalsIgnoreCase(parts[1], "as")) {
-
-			return new String[] {parts[0], parts[2]};
+	private PortletData _getPortletData(String portletId) {
+		if (Validator.isNull(portletId)) {
+			portletId = StringPool.BLANK;
 		}
 
-		return new String[] {requirePart, null};
-	}
+		PortletData portletData = _portletDataMap.get(portletId);
 
-	private Collection<AMDRequire> _parseAMDRequires(String require) {
-		List<AMDRequire> amdRequires = new ArrayList<>();
+		if (portletData == null) {
+			portletData = new PortletData();
 
-		String[] requireParts = require.split(StringPool.COMMA);
+			PortletData oldPortletData = _portletDataMap.putIfAbsent(
+				portletId, portletData);
 
-		for (String requirePart : requireParts) {
-			String[] nameAndAlias = _getNameAndAlias(requirePart);
-
-			AMDRequire amdRequire = null;
-
-			if (nameAndAlias[1] == null) {
-				amdRequire = new AMDRequire(nameAndAlias[0]);
+			if (oldPortletData != null) {
+				portletData = oldPortletData;
 			}
-			else {
-				amdRequire = new AMDRequire(nameAndAlias[1], nameAndAlias[0]);
-			}
-
-			amdRequires.add(amdRequire);
 		}
 
-		return amdRequires;
+		return portletData;
 	}
 
-	private static volatile PortletDataRenderer _portletDataRenderer;
-	private static final ServiceTracker
-		<PortletDataRenderer, PortletDataRenderer> _serviceTracker;
-	private static final Pattern _whitespacePattern = Pattern.compile("\\s+");
+	private void _writeAuiModulesTo(
+			Writer writer, Collection<PortletData> portletDataCollection)
+		throws IOException {
+
+		StringBundler auiModulesSB = new StringBundler(
+			portletDataCollection.size());
+		Set<String> auiModulesSet = new HashSet<>();
+
+		for (PortletData portletData : portletDataCollection) {
+			if (!portletData._auiModulesSet.isEmpty()) {
+				auiModulesSB.append(portletData._auiCallbackSB);
+				auiModulesSet.addAll(portletData._auiModulesSet);
+			}
+		}
+
+		if (!auiModulesSet.isEmpty()) {
+			writer.write("AUI().use(");
+
+			for (String use : auiModulesSet) {
+				writer.write(StringPool.APOSTROPHE);
+				writer.write(use);
+				writer.write(StringPool.APOSTROPHE);
+				writer.write(StringPool.COMMA_AND_SPACE);
+			}
+
+			writer.write("function(A) {");
+
+			auiModulesSB.writeTo(writer);
+
+			writer.write("});");
+		}
+	}
+
+	private void _writeEs6ModulesTo(
+			Writer writer, Collection<PortletData> portletDataCollection)
+		throws IOException {
+
+		StringBundler es6CallbacksSB = new StringBundler(
+			portletDataCollection.size());
+		List<String> es6Modules = new ArrayList<>();
+		List<String> es6Variables = new ArrayList<>();
+		Set<String> usedVariables = new HashSet<>();
+
+		for (PortletData portletData : portletDataCollection) {
+			if (portletData._es6TagInvocationDatas.isEmpty()) {
+				continue;
+			}
+
+			for (TagInvocationData tagInvocationData :
+					portletData._es6TagInvocationDatas) {
+
+				List<String> modules = tagInvocationData.getModules();
+
+				Stream<String> stream = modules.stream();
+
+				List<String> variables = stream.map(
+					module -> VariableUtil.generateVariable(
+						module, usedVariables)
+				).collect(
+					Collectors.toList()
+				);
+
+				es6Modules.addAll(modules);
+				es6Variables.addAll(variables);
+
+				es6CallbacksSB.append(tagInvocationData.getContent(variables));
+				es6CallbacksSB.append(StringPool.NEW_LINE);
+			}
+		}
+
+		if (es6Modules.isEmpty()) {
+			return;
+		}
+
+		writer.write("Liferay.Loader.require(");
+
+		for (String es6Module : es6Modules) {
+			writer.write(StringPool.APOSTROPHE);
+			writer.write(es6Module);
+			writer.write(StringPool.APOSTROPHE);
+			writer.write(StringPool.COMMA_AND_SPACE);
+		}
+
+		writer.write("function(");
+
+		String delimiter = StringPool.BLANK;
+
+		for (String es6Variable : es6Variables) {
+			writer.write(delimiter);
+			writer.write(es6Variable);
+
+			delimiter = StringPool.COMMA_AND_SPACE;
+		}
+
+		writer.write(") {\n");
+		writer.write("try {\n");
+
+		es6CallbacksSB.writeTo(writer);
+
+		writer.write("} catch (err) {\n");
+		writer.write("\tconsole.error(err);\n");
+		writer.write("}\n");
+
+		writer.write("});");
+	}
+
 	private static final long serialVersionUID = 1L;
-
-	static {
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		_serviceTracker =
-			new ServiceTracker<PortletDataRenderer, PortletDataRenderer>(
-				bundleContext, PortletDataRenderer.class,
-				new ServiceTrackerCustomizer
-					<PortletDataRenderer, PortletDataRenderer>() {
-
-					@Override
-					public PortletDataRenderer addingService(
-						ServiceReference<PortletDataRenderer>
-							serviceReference) {
-
-						_portletDataRenderer = bundleContext.getService(
-							serviceReference);
-
-						return _portletDataRenderer;
-					}
-
-					@Override
-					public void modifiedService(
-						ServiceReference<PortletDataRenderer> serviceReference,
-						PortletDataRenderer portletDataRenderer) {
-					}
-
-					@Override
-					public void removedService(
-						ServiceReference<PortletDataRenderer> serviceReference,
-						PortletDataRenderer portletDataRenderer) {
-
-						bundleContext.ungetService(serviceReference);
-					}
-
-				});
-
-		_serviceTracker.open();
-	}
 
 	private final ConcurrentMap<String, PortletData> _portletDataMap =
 		new ConcurrentHashMap<>();
+
+	private static class PortletData implements Serializable {
+
+		public void append(
+			String content, String modules, ModulesType modulesType) {
+
+			if (Validator.isNull(modules)) {
+				_rawSB.append(content);
+			}
+			else {
+				String[] modulesArray = StringUtil.split(modules);
+
+				if (modulesType == ModulesType.AUI) {
+					_auiCallbackSB.append("(function() {");
+					_auiCallbackSB.append(content);
+					_auiCallbackSB.append("})();");
+
+					for (String module : modulesArray) {
+						_auiModulesSet.add(StringUtil.trim(module));
+					}
+				}
+				else {
+					_es6TagInvocationDatas.add(
+						new TagInvocationData(content, modules));
+				}
+			}
+		}
+
+		public void append(
+			StringBundler contentSB, String modules, ModulesType modulesType) {
+
+			if (Validator.isNull(modules)) {
+				_rawSB.append(contentSB);
+			}
+			else {
+				String[] modulesArray = StringUtil.split(modules);
+
+				if (modulesType == ModulesType.AUI) {
+					_auiCallbackSB.append("(function() {");
+					_auiCallbackSB.append(contentSB);
+					_auiCallbackSB.append("})();");
+
+					for (String module : modulesArray) {
+						_auiModulesSet.add(StringUtil.trim(module));
+					}
+				}
+				else {
+					_es6TagInvocationDatas.add(
+						new TagInvocationData(contentSB, modules));
+				}
+			}
+		}
+
+		public void mark() {
+			_auiCallbackSBIndex = _auiCallbackSB.index();
+			_es6TagInvocationDatasIndex = _es6TagInvocationDatas.size();
+			_rawSBIndex = _rawSB.index();
+		}
+
+		public void reset() {
+			if (_auiCallbackSBIndex >= 0) {
+				_auiCallbackSB.setIndex(_auiCallbackSBIndex);
+			}
+
+			if (_es6TagInvocationDatasIndex >= 0) {
+				_es6TagInvocationDatas = _es6TagInvocationDatas.subList(
+					0, _es6TagInvocationDatasIndex);
+			}
+
+			if (_rawSBIndex >= 0) {
+				_rawSB.setIndex(_rawSBIndex);
+			}
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		private final StringBundler _auiCallbackSB = new StringBundler();
+		private int _auiCallbackSBIndex = -1;
+		private final Set<String> _auiModulesSet = new HashSet<>();
+		private List<TagInvocationData> _es6TagInvocationDatas =
+			new ArrayList<>();
+		private int _es6TagInvocationDatasIndex = -1;
+		private final StringBundler _rawSB = new StringBundler();
+		private int _rawSBIndex = -1;
+
+	}
 
 }

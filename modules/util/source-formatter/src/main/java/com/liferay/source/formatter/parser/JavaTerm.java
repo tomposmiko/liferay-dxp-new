@@ -14,8 +14,6 @@
 
 package com.liferay.source.formatter.parser;
 
-import java.util.List;
-
 /**
  * @author Hugo Huijser
  */
@@ -38,15 +36,11 @@ public interface JavaTerm {
 
 	public String getContent();
 
-	public List<String> getImportNames();
-
 	public int getLineNumber();
 
 	public int getLineNumber(int pos);
 
 	public String getName();
-
-	public String getPackageName();
 
 	public JavaClass getParentJavaClass();
 

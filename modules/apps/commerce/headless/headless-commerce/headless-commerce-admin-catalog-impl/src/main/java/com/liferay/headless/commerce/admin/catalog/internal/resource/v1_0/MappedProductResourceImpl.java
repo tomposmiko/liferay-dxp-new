@@ -23,18 +23,16 @@ import com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramEntryService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.MappedProduct;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.MappedProductDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.MappedProductUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.MappedProductResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -53,20 +51,17 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/mapped-product.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {MappedProductResource.class, NestedFieldSupport.class}
 )
-@CTAware
 public class MappedProductResourceImpl
 	extends BaseMappedProductResourceImpl implements NestedFieldSupport {
 
 	@Override
 	public void deleteMappedProduct(Long mappedProductId) throws Exception {
-		CSDiagramEntry csDiagramEntry =
-			_csDiagramEntryService.getCSDiagramEntry(mappedProductId);
-
-		_csDiagramEntryService.deleteCSDiagramEntry(csDiagramEntry);
+		_csDiagramEntryService.deleteCSDiagramEntry(mappedProductId);
 	}
 
 	@Override
@@ -296,9 +291,8 @@ public class MappedProductResourceImpl
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference(target = DTOConverterConstants.MAPPED_PRODUCT_DTO_CONVERTER)
-	private DTOConverter<CSDiagramEntry, MappedProduct>
-		_mappedProductDTOConverter;
+	@Reference
+	private MappedProductDTOConverter _mappedProductDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

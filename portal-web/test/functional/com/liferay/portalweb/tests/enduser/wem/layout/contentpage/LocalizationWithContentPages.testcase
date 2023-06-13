@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Add a content page") {
@@ -27,7 +27,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,8 +35,8 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-106776. Add a translation to inline content."
-	@priority = 5
+	@description = "This is a test for LPS-106776. Add a translation to inline content."
+	@priority = "5"
 	test AddTranslationToInlineContent {
 		property portal.acceptance = "true";
 
@@ -67,7 +67,7 @@ definition {
 				id = "element-text",
 				text = "New editable fragment ca-ES text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the content page in Edit mode") {
@@ -95,164 +95,8 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-140483. The site admin could create page template from content page with translation."
-	@priority = 4
-	test CreatePageTemplateFromContentPageWithTranslation {
-		task ("Add a page template collection") {
-			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
-				groupName = "Test Site Name",
-				layoutPageTemplateCollectionName = "Page Template Collection");
-		}
-
-		task ("Add a Heading fragment to content page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Content Page Name",
-				siteName = "Test Site Name");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-		}
-
-		task ("Add translation to inline text of Heading in es-ES") {
-			PageEditor.changeLocale(
-				currentLocale = "en-US",
-				locale = "es-ES");
-
-			PageEditor.editFragmentText(
-				fragmentName = "Heading",
-				id = "element-text",
-				text = "Ejemplo de encabezado");
-		}
-
-		task ("Create a content page template from the content page under page template collection") {
-			PageEditor.createPageTemplate(collectionName = "Page Template Collection");
-		}
-
-		task ("View the content page template shown in Page Templates admin") {
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
-
-			Navigator.gotoNavNested(navNested = "Page Template Collection");
-
-			PageTemplatesAdmin.viewPageTemplatePresent(pageTemplateName = "Content Page Name - Page Template");
-
-			PageTemplatesAdmin.viewEntryWorkflowStatus(
-				entry = "Content Page Name - Page Template",
-				workflowStatus = "Draft");
-		}
-
-		task ("View the default inline text shown in content page template in en-US") {
-			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Content Page Name - Page Template");
-
-			PageEditor.viewFragmentEditableText(
-				editableText = "Heading Example",
-				fragmentName = "Heading",
-				id = "element-text");
-		}
-
-		task ("View the translated inline text shown in content page template in es-US") {
-			PageEditor.changeLocale(
-				currentLocale = "en-US",
-				locale = "es-ES");
-
-			PageEditor.viewFragmentEditableText(
-				editableText = "Ejemplo de encabezado",
-				fragmentName = "Heading",
-				id = "element-text");
-		}
-	}
-
-	@description = "This is a test for LPS-153367. The page creator could preview current localization in a new tab."
-	@priority = 4
-	test PreviewCurrentLocalizationInANewTab {
-		task ("Given a page creator has a Heading fragment on a content page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Test Page Name",
-				type = "content");
-
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = "Test Site Name");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-		}
-
-		task ("When the page creator adds translation to the inline text of Heading") {
-			PageEditor.changeLocale(
-				currentLocale = "en-US",
-				locale = "es-ES");
-
-			PageEditor.editFragmentText(
-				fragmentName = "Heading",
-				id = "element-text",
-				text = "Ejemplo de encabezado");
-		}
-
-		task ("Then the page creator could preview current localization in a new tab") {
-			PageEditor.previewInANewTab();
-
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Ejemplo de encabezado");
-		}
-	}
-
-	@description = "This is a test for LPS-139064. Users can preview localized draft for a content page."
-	@priority = 3
-	test PreviewLocalizedDraftContentPage {
-		task ("Add a Button fragment to page") {
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Content Page Name",
-				siteName = "Test Site Name");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Button");
-		}
-
-		task ("Change the locale to ca-ES") {
-			PageEditor.changeLocale(
-				currentLocale = "en-US",
-				locale = "ca-ES");
-		}
-
-		task ("Add the localized inline text") {
-			PageEditor.editFragmentText(
-				fragmentName = "Button",
-				id = "link",
-				text = "Aneu a algun lloc");
-		}
-
-		task ("Navigate to the Pages admin") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-		}
-
-		task ("Change the user language to ca-ES") {
-			Navigator.ensureLocaleURL(locale = "ca");
-		}
-
-		task ("Preview the localized draft content page in a new tab") {
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Previsualitza l'esborrany",
-				pageName = "Content Page Name");
-
-			SelectWindow.selectPopUp(locator1 = "null");
-
-			ControlMenu.viewHeaderDraftTitle(headerTitle = "Content Page Name");
-
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Aneu a algun lloc");
-		}
-	}
-
 	@description = "This is a test for LPS-122148. Search localized inline text items in Page Content panel."
-	@priority = 4
+	@priority = "4"
 	test SearchLocalizedInlineTextItemsInPageContentPanel {
 		task ("Add a Heading fragment to page") {
 			ContentPagesNavigator.openEditContentPage(
@@ -283,7 +127,7 @@ definition {
 			PageEditor.editFragmentText(
 				fragmentName = "Heading",
 				id = "element-text",
-				index = 2,
+				index = "2",
 				text = "Edited Title");
 		}
 
@@ -311,7 +155,7 @@ definition {
 			PageEditor.editFragmentText(
 				fragmentName = "Heading",
 				id = "element-text",
-				index = 2,
+				index = "2",
 				text = "Título editado");
 		}
 
@@ -322,11 +166,13 @@ definition {
 		}
 
 		task ("View the inline texts in Page Content tab") {
-			PageEditor.gotoTab(tabName = "Page Content");
+			PageEditor.gotoTab(tabName = "Browser");
+
+			Navigator.gotoNavTab(navTab = "Page Content");
 
 			for (var itemName : list "Edited Text,Edited Title,Edited Subtitle") {
 				AssertVisible(
-					key_itemName = ${itemName},
+					key_itemName = "${itemName}",
 					locator1 = "PageEditor#PAGE_CONTENTS_ITEM");
 			}
 		}
@@ -340,7 +186,7 @@ definition {
 		task ("View the inline texts in Page Content tab") {
 			for (var itemName : list "Texto editado,Título editado,Edited Subtitle") {
 				AssertVisible(
-					key_itemName = ${itemName},
+					key_itemName = "${itemName}",
 					locator1 = "PageEditor#PAGE_CONTENTS_ITEM");
 			}
 		}
@@ -354,7 +200,7 @@ definition {
 
 			for (var itemName : list "Título editado,Edited Subtitle") {
 				AssertElementNotPresent(
-					key_itemName = ${itemName},
+					key_itemName = "${itemName}",
 					locator1 = "PageEditor#PAGE_CONTENTS_ITEM");
 			}
 
@@ -366,7 +212,7 @@ definition {
 
 			for (var itemName : list "Texto editado,Edited Subtitle") {
 				AssertElementNotPresent(
-					key_itemName = ${itemName},
+					key_itemName = "${itemName}",
 					locator1 = "PageEditor#PAGE_CONTENTS_ITEM");
 			}
 		}

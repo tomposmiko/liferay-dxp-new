@@ -1,5 +1,5 @@
 {
-	"@generated": "cea0a8faa9f3cbf360aa81c9c5f0986b3563d5bd",
+	"@generated": "c950209e6d87c9a20f17d56d67f7efa046552fe6",
 	"@overrides": {
 	},
 	"@readonly": "** AUTO-GENERATED: DO NOT EDIT OUTSIDE @overrides **",
@@ -15,18 +15,6 @@
 		"paths": {
 			"@liferay/frontend-js-react-web": [
 				"../../frontend-js/frontend-js-react-web/src/main/resources/META-INF/resources/js/index.ts"
-			],
-			"@liferay/frontend-js-state-web": [
-				"../../frontend-js/frontend-js-state-web/src/main/resources/META-INF/resources/index.ts"
-			],
-			"data-engine-js-components-web": [
-				"../data-engine-js-components-web/src/main/resources/META-INF/resources/js/index.d.ts"
-			],
-			"frontend-js-components-web": [
-				"../../frontend-js/frontend-js-components-web/src/main/resources/META-INF/resources/index.d.ts"
-			],
-			"frontend-js-web": [
-				"../../frontend-js/frontend-js-web/src/main/resources/META-INF/resources/index.d.ts"
 			]
 		},
 		"sourceMap": false,
@@ -38,29 +26,13 @@
 			"./node_modules/@types"
 		]
 	},
-	"exclude": [
-		"test/**/*",
-		"**/__tests__/**"
-	],
 	"include": [
 		"src/**/*",
-		"../../../global.d.ts"
+		"test/**/*"
 	],
 	"references": [
 		{
 			"path": "../../frontend-js/frontend-js-react-web"
-		},
-		{
-			"path": "../../frontend-js/frontend-js-state-web"
-		},
-		{
-			"path": "../data-engine-js-components-web"
-		},
-		{
-			"path": "../../frontend-js/frontend-js-components-web"
-		},
-		{
-			"path": "../../frontend-js/frontend-js-web"
 		}
 	]
 }

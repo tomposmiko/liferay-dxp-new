@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -1507,6 +1508,70 @@ public class UserUtil {
 	}
 
 	/**
+	 * Returns the user where companyId = &#63; and defaultUser = &#63; or throws a <code>NoSuchUserException</code> if it could not be found.
+	 *
+	 * @param companyId the company ID
+	 * @param defaultUser the default user
+	 * @return the matching user
+	 * @throws NoSuchUserException if a matching user could not be found
+	 */
+	public static User findByC_DU(long companyId, boolean defaultUser)
+		throws com.liferay.portal.kernel.exception.NoSuchUserException {
+
+		return getPersistence().findByC_DU(companyId, defaultUser);
+	}
+
+	/**
+	 * Returns the user where companyId = &#63; and defaultUser = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param defaultUser the default user
+	 * @return the matching user, or <code>null</code> if a matching user could not be found
+	 */
+	public static User fetchByC_DU(long companyId, boolean defaultUser) {
+		return getPersistence().fetchByC_DU(companyId, defaultUser);
+	}
+
+	/**
+	 * Returns the user where companyId = &#63; and defaultUser = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param defaultUser the default user
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching user, or <code>null</code> if a matching user could not be found
+	 */
+	public static User fetchByC_DU(
+		long companyId, boolean defaultUser, boolean useFinderCache) {
+
+		return getPersistence().fetchByC_DU(
+			companyId, defaultUser, useFinderCache);
+	}
+
+	/**
+	 * Removes the user where companyId = &#63; and defaultUser = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param defaultUser the default user
+	 * @return the user that was removed
+	 */
+	public static User removeByC_DU(long companyId, boolean defaultUser)
+		throws com.liferay.portal.kernel.exception.NoSuchUserException {
+
+		return getPersistence().removeByC_DU(companyId, defaultUser);
+	}
+
+	/**
+	 * Returns the number of users where companyId = &#63; and defaultUser = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param defaultUser the default user
+	 * @return the number of matching users
+	 */
+	public static int countByC_DU(long companyId, boolean defaultUser) {
+		return getPersistence().countByC_DU(companyId, defaultUser);
+	}
+
+	/**
 	 * Returns the user where companyId = &#63; and screenName = &#63; or throws a <code>NoSuchUserException</code> if it could not be found.
 	 *
 	 * @param companyId the company ID
@@ -1823,185 +1888,6 @@ public class UserUtil {
 	 */
 	public static int countByC_O(long companyId, String openId) {
 		return getPersistence().countByC_O(companyId, openId);
-	}
-
-	/**
-	 * Returns all the users where companyId = &#63; and type = &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @return the matching users
-	 */
-	public static List<User> findByC_T(long companyId, int type) {
-		return getPersistence().findByC_T(companyId, type);
-	}
-
-	/**
-	 * Returns a range of all the users where companyId = &#63; and type = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
-	 * </p>
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param start the lower bound of the range of users
-	 * @param end the upper bound of the range of users (not inclusive)
-	 * @return the range of matching users
-	 */
-	public static List<User> findByC_T(
-		long companyId, int type, int start, int end) {
-
-		return getPersistence().findByC_T(companyId, type, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the users where companyId = &#63; and type = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
-	 * </p>
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param start the lower bound of the range of users
-	 * @param end the upper bound of the range of users (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching users
-	 */
-	public static List<User> findByC_T(
-		long companyId, int type, int start, int end,
-		OrderByComparator<User> orderByComparator) {
-
-		return getPersistence().findByC_T(
-			companyId, type, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the users where companyId = &#63; and type = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
-	 * </p>
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param start the lower bound of the range of users
-	 * @param end the upper bound of the range of users (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching users
-	 */
-	public static List<User> findByC_T(
-		long companyId, int type, int start, int end,
-		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
-
-		return getPersistence().findByC_T(
-			companyId, type, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first user in the ordered set where companyId = &#63; and type = &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching user
-	 * @throws NoSuchUserException if a matching user could not be found
-	 */
-	public static User findByC_T_First(
-			long companyId, int type, OrderByComparator<User> orderByComparator)
-		throws com.liferay.portal.kernel.exception.NoSuchUserException {
-
-		return getPersistence().findByC_T_First(
-			companyId, type, orderByComparator);
-	}
-
-	/**
-	 * Returns the first user in the ordered set where companyId = &#63; and type = &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching user, or <code>null</code> if a matching user could not be found
-	 */
-	public static User fetchByC_T_First(
-		long companyId, int type, OrderByComparator<User> orderByComparator) {
-
-		return getPersistence().fetchByC_T_First(
-			companyId, type, orderByComparator);
-	}
-
-	/**
-	 * Returns the last user in the ordered set where companyId = &#63; and type = &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching user
-	 * @throws NoSuchUserException if a matching user could not be found
-	 */
-	public static User findByC_T_Last(
-			long companyId, int type, OrderByComparator<User> orderByComparator)
-		throws com.liferay.portal.kernel.exception.NoSuchUserException {
-
-		return getPersistence().findByC_T_Last(
-			companyId, type, orderByComparator);
-	}
-
-	/**
-	 * Returns the last user in the ordered set where companyId = &#63; and type = &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching user, or <code>null</code> if a matching user could not be found
-	 */
-	public static User fetchByC_T_Last(
-		long companyId, int type, OrderByComparator<User> orderByComparator) {
-
-		return getPersistence().fetchByC_T_Last(
-			companyId, type, orderByComparator);
-	}
-
-	/**
-	 * Returns the users before and after the current user in the ordered set where companyId = &#63; and type = &#63;.
-	 *
-	 * @param userId the primary key of the current user
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next user
-	 * @throws NoSuchUserException if a user with the primary key could not be found
-	 */
-	public static User[] findByC_T_PrevAndNext(
-			long userId, long companyId, int type,
-			OrderByComparator<User> orderByComparator)
-		throws com.liferay.portal.kernel.exception.NoSuchUserException {
-
-		return getPersistence().findByC_T_PrevAndNext(
-			userId, companyId, type, orderByComparator);
-	}
-
-	/**
-	 * Removes all the users where companyId = &#63; and type = &#63; from the database.
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 */
-	public static void removeByC_T(long companyId, int type) {
-		getPersistence().removeByC_T(companyId, type);
-	}
-
-	/**
-	 * Returns the number of users where companyId = &#63; and type = &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param type the type
-	 * @return the number of matching users
-	 */
-	public static int countByC_T(long companyId, int type) {
-		return getPersistence().countByC_T(companyId, type);
 	}
 
 	/**
@@ -2391,70 +2277,72 @@ public class UserUtil {
 	}
 
 	/**
-	 * Returns all the users where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns all the users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @return the matching users
 	 */
-	public static List<User> findByC_T_S(long companyId, int type, int status) {
-		return getPersistence().findByC_T_S(companyId, type, status);
+	public static List<User> findByC_DU_S(
+		long companyId, boolean defaultUser, int status) {
+
+		return getPersistence().findByC_DU_S(companyId, defaultUser, status);
 	}
 
 	/**
-	 * Returns a range of all the users where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns a range of all the users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @return the range of matching users
 	 */
-	public static List<User> findByC_T_S(
-		long companyId, int type, int status, int start, int end) {
+	public static List<User> findByC_DU_S(
+		long companyId, boolean defaultUser, int status, int start, int end) {
 
-		return getPersistence().findByC_T_S(
-			companyId, type, status, start, end);
+		return getPersistence().findByC_DU_S(
+			companyId, defaultUser, status, start, end);
 	}
 
 	/**
-	 * Returns an ordered range of all the users where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns an ordered range of all the users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching users
 	 */
-	public static List<User> findByC_T_S(
-		long companyId, int type, int status, int start, int end,
+	public static List<User> findByC_DU_S(
+		long companyId, boolean defaultUser, int status, int start, int end,
 		OrderByComparator<User> orderByComparator) {
 
-		return getPersistence().findByC_T_S(
-			companyId, type, status, start, end, orderByComparator);
+		return getPersistence().findByC_DU_S(
+			companyId, defaultUser, status, start, end, orderByComparator);
 	}
 
 	/**
-	 * Returns an ordered range of all the users where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns an ordered range of all the users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>UserModelImpl</code>.
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
@@ -2462,197 +2350,201 @@ public class UserUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching users
 	 */
-	public static List<User> findByC_T_S(
-		long companyId, int type, int status, int start, int end,
+	public static List<User> findByC_DU_S(
+		long companyId, boolean defaultUser, int status, int start, int end,
 		OrderByComparator<User> orderByComparator, boolean useFinderCache) {
 
-		return getPersistence().findByC_T_S(
-			companyId, type, status, start, end, orderByComparator,
+		return getPersistence().findByC_DU_S(
+			companyId, defaultUser, status, start, end, orderByComparator,
 			useFinderCache);
 	}
 
 	/**
-	 * Returns the first user in the ordered set where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns the first user in the ordered set where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching user
 	 * @throws NoSuchUserException if a matching user could not be found
 	 */
-	public static User findByC_T_S_First(
-			long companyId, int type, int status,
+	public static User findByC_DU_S_First(
+			long companyId, boolean defaultUser, int status,
 			OrderByComparator<User> orderByComparator)
 		throws com.liferay.portal.kernel.exception.NoSuchUserException {
 
-		return getPersistence().findByC_T_S_First(
-			companyId, type, status, orderByComparator);
+		return getPersistence().findByC_DU_S_First(
+			companyId, defaultUser, status, orderByComparator);
 	}
 
 	/**
-	 * Returns the first user in the ordered set where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns the first user in the ordered set where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching user, or <code>null</code> if a matching user could not be found
 	 */
-	public static User fetchByC_T_S_First(
-		long companyId, int type, int status,
+	public static User fetchByC_DU_S_First(
+		long companyId, boolean defaultUser, int status,
 		OrderByComparator<User> orderByComparator) {
 
-		return getPersistence().fetchByC_T_S_First(
-			companyId, type, status, orderByComparator);
+		return getPersistence().fetchByC_DU_S_First(
+			companyId, defaultUser, status, orderByComparator);
 	}
 
 	/**
-	 * Returns the last user in the ordered set where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns the last user in the ordered set where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching user
 	 * @throws NoSuchUserException if a matching user could not be found
 	 */
-	public static User findByC_T_S_Last(
-			long companyId, int type, int status,
+	public static User findByC_DU_S_Last(
+			long companyId, boolean defaultUser, int status,
 			OrderByComparator<User> orderByComparator)
 		throws com.liferay.portal.kernel.exception.NoSuchUserException {
 
-		return getPersistence().findByC_T_S_Last(
-			companyId, type, status, orderByComparator);
+		return getPersistence().findByC_DU_S_Last(
+			companyId, defaultUser, status, orderByComparator);
 	}
 
 	/**
-	 * Returns the last user in the ordered set where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns the last user in the ordered set where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching user, or <code>null</code> if a matching user could not be found
 	 */
-	public static User fetchByC_T_S_Last(
-		long companyId, int type, int status,
+	public static User fetchByC_DU_S_Last(
+		long companyId, boolean defaultUser, int status,
 		OrderByComparator<User> orderByComparator) {
 
-		return getPersistence().fetchByC_T_S_Last(
-			companyId, type, status, orderByComparator);
+		return getPersistence().fetchByC_DU_S_Last(
+			companyId, defaultUser, status, orderByComparator);
 	}
 
 	/**
-	 * Returns the users before and after the current user in the ordered set where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns the users before and after the current user in the ordered set where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * @param userId the primary key of the current user
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next user
 	 * @throws NoSuchUserException if a user with the primary key could not be found
 	 */
-	public static User[] findByC_T_S_PrevAndNext(
-			long userId, long companyId, int type, int status,
+	public static User[] findByC_DU_S_PrevAndNext(
+			long userId, long companyId, boolean defaultUser, int status,
 			OrderByComparator<User> orderByComparator)
 		throws com.liferay.portal.kernel.exception.NoSuchUserException {
 
-		return getPersistence().findByC_T_S_PrevAndNext(
-			userId, companyId, type, status, orderByComparator);
+		return getPersistence().findByC_DU_S_PrevAndNext(
+			userId, companyId, defaultUser, status, orderByComparator);
 	}
 
 	/**
-	 * Removes all the users where companyId = &#63; and type = &#63; and status = &#63; from the database.
+	 * Removes all the users where companyId = &#63; and defaultUser = &#63; and status = &#63; from the database.
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 */
-	public static void removeByC_T_S(long companyId, int type, int status) {
-		getPersistence().removeByC_T_S(companyId, type, status);
+	public static void removeByC_DU_S(
+		long companyId, boolean defaultUser, int status) {
+
+		getPersistence().removeByC_DU_S(companyId, defaultUser, status);
 	}
 
 	/**
-	 * Returns the number of users where companyId = &#63; and type = &#63; and status = &#63;.
+	 * Returns the number of users where companyId = &#63; and defaultUser = &#63; and status = &#63;.
 	 *
 	 * @param companyId the company ID
-	 * @param type the type
+	 * @param defaultUser the default user
 	 * @param status the status
 	 * @return the number of matching users
 	 */
-	public static int countByC_T_S(long companyId, int type, int status) {
-		return getPersistence().countByC_T_S(companyId, type, status);
+	public static int countByC_DU_S(
+		long companyId, boolean defaultUser, int status) {
+
+		return getPersistence().countByC_DU_S(companyId, defaultUser, status);
 	}
 
 	/**
-	 * Returns the user where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchUserException</code> if it could not be found.
+	 * Returns the user where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchUserException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching user
 	 * @throws NoSuchUserException if a matching user could not be found
 	 */
-	public static User findByERC_C(String externalReferenceCode, long companyId)
+	public static User findByC_ERC(long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.NoSuchUserException {
 
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
+		return getPersistence().findByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the user where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the user where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
-	public static User fetchByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static User fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
+		return getPersistence().fetchByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the user where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the user where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching user, or <code>null</code> if a matching user could not be found
 	 */
-	public static User fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
+	public static User fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
+		return getPersistence().fetchByC_ERC(
+			companyId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the user where externalReferenceCode = &#63; and companyId = &#63; from the database.
+	 * Removes the user where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the user that was removed
 	 */
-	public static User removeByERC_C(
-			String externalReferenceCode, long companyId)
+	public static User removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.NoSuchUserException {
 
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
+		return getPersistence().removeByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of users where externalReferenceCode = &#63; and companyId = &#63;.
+	 * Returns the number of users where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching users
 	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static int countByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
+		return getPersistence().countByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
@@ -3860,9 +3752,14 @@ public class UserUtil {
 	}
 
 	public static UserPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (UserPersistence)PortalBeanLocatorUtil.locate(
+				UserPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile UserPersistence _persistence;
+	private static UserPersistence _persistence;
 
 }

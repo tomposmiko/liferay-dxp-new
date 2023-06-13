@@ -181,8 +181,4 @@ public interface DDMStructureLinkModel
 	@Override
 	public DDMStructureLink cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

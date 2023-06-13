@@ -14,7 +14,7 @@
 
 package com.liferay.poshi.runner.selenium;
 
-import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -56,16 +56,14 @@ public class SafariWebDriverImpl extends BaseWebDriverImpl {
 
 				javaScriptClick(locator);
 			}
-			catch (ElementNotInteractableException
-						elementNotInteractableException) {
-
+			catch (ElementNotVisibleException elementNotVisibleException) {
 				if (isVisible(locator)) {
 					javaScriptClick(locator);
 
 					return;
 				}
 
-				throw elementNotInteractableException;
+				throw elementNotVisibleException;
 			}
 		}
 	}

@@ -74,14 +74,11 @@ public class RangeSerDes {
 
 			sb.append("\"gt\": ");
 
-			if (range.getGt() instanceof String) {
-				sb.append("\"");
-				sb.append((String)range.getGt());
-				sb.append("\"");
-			}
-			else {
-				sb.append(range.getGt());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(range.getGt()));
+
+			sb.append("\"");
 		}
 
 		if (range.getGte() != null) {
@@ -91,14 +88,11 @@ public class RangeSerDes {
 
 			sb.append("\"gte\": ");
 
-			if (range.getGte() instanceof String) {
-				sb.append("\"");
-				sb.append((String)range.getGte());
-				sb.append("\"");
-			}
-			else {
-				sb.append(range.getGte());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(range.getGte()));
+
+			sb.append("\"");
 		}
 
 		if (range.getLt() != null) {
@@ -108,14 +102,11 @@ public class RangeSerDes {
 
 			sb.append("\"lt\": ");
 
-			if (range.getLt() instanceof String) {
-				sb.append("\"");
-				sb.append((String)range.getLt());
-				sb.append("\"");
-			}
-			else {
-				sb.append(range.getLt());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(range.getLt()));
+
+			sb.append("\"");
 		}
 
 		if (range.getLte() != null) {
@@ -125,14 +116,11 @@ public class RangeSerDes {
 
 			sb.append("\"lte\": ");
 
-			if (range.getLte() instanceof String) {
-				sb.append("\"");
-				sb.append((String)range.getLte());
-				sb.append("\"");
-			}
-			else {
-				sb.append(range.getLte());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(range.getLte()));
+
+			sb.append("\"");
 		}
 
 		if (range.getParameterName() != null) {

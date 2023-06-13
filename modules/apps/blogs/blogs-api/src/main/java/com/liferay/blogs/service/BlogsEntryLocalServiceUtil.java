@@ -413,11 +413,29 @@ public class BlogsEntryLocalServiceUtil {
 		return getService().fetchBlogsEntry(entryId);
 	}
 
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
+	 */
 	public static BlogsEntry fetchBlogsEntryByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
 		return getService().fetchBlogsEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchBlogsEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static BlogsEntry fetchBlogsEntryByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return getService().fetchBlogsEntryByReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -511,12 +529,20 @@ public class BlogsEntryLocalServiceUtil {
 		return getService().getBlogsEntry(entryId);
 	}
 
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry
+	 * @throws PortalException if a matching blogs entry could not be found
+	 */
 	public static BlogsEntry getBlogsEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getBlogsEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
 	}
 
 	/**

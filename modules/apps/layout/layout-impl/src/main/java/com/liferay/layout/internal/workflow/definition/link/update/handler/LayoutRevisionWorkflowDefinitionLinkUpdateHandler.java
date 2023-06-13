@@ -24,6 +24,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.workflow.definition.link.update.handler.WorkflowDefinitionLinkUpdateHandler;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -31,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.LayoutRevision",
 	service = WorkflowDefinitionLinkUpdateHandler.class
 )
@@ -45,29 +49,37 @@ public class LayoutRevisionWorkflowDefinitionLinkUpdateHandler
 
 		// Workflow definition link was deleted
 
-		for (LayoutRevision layoutRevision :
-				_layoutRevisionLocalService.getLayoutRevisionsByStatus(
-					WorkflowConstants.STATUS_PENDING)) {
+		List<LayoutRevision> pendingLayoutRevisions =
+			_layoutRevisionLocalService.getLayoutRevisionsByStatus(
+				WorkflowConstants.STATUS_PENDING);
 
-			layoutRevision.setStatus(WorkflowConstants.STATUS_DRAFT);
+		Stream<LayoutRevision> stream = pendingLayoutRevisions.stream();
 
-			_layoutRevisionLocalService.updateLayoutRevision(layoutRevision);
+		stream.forEach(
+			layoutRevision -> {
+				layoutRevision.setStatus(WorkflowConstants.STATUS_DRAFT);
 
-			try {
-				_workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
-					layoutRevision.getCompanyId(), layoutRevision.getGroupId(),
-					layoutRevision.getModelClassName(),
-					layoutRevision.getLayoutRevisionId());
-			}
-			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to delete workflow instance links for layout " +
-							"revision " + layoutRevision.getLayoutRevisionId(),
-						portalException);
+				_layoutRevisionLocalService.updateLayoutRevision(
+					layoutRevision);
+
+				try {
+					_workflowInstanceLinkLocalService.
+						deleteWorkflowInstanceLinks(
+							layoutRevision.getCompanyId(),
+							layoutRevision.getGroupId(),
+							layoutRevision.getModelClassName(),
+							layoutRevision.getLayoutRevisionId());
 				}
-			}
-		}
+				catch (PortalException portalException) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Unable to delete workflow instance links for " +
+								"layout revision " +
+									layoutRevision.getLayoutRevisionId(),
+							portalException);
+					}
+				}
+			});
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

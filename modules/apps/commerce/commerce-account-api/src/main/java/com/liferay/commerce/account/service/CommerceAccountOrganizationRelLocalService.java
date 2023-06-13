@@ -68,8 +68,7 @@ public interface CommerceAccountOrganizationRelLocalService
 		CommerceAccountOrganizationRelPK commerceAccountOrganizationRelPK);
 
 	public CommerceAccountOrganizationRel deleteCommerceAccountOrganizationRel(
-			CommerceAccountOrganizationRel commerceAccountOrganizationRel)
-		throws PortalException;
+		CommerceAccountOrganizationRel commerceAccountOrganizationRel);
 
 	public CommerceAccountOrganizationRel deleteCommerceAccountOrganizationRel(
 			CommerceAccountOrganizationRelPK commerceAccountOrganizationRelPK)

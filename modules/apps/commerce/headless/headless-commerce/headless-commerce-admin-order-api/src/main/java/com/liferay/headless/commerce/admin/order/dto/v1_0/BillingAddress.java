@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -60,7 +59,7 @@ public class BillingAddress implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(BillingAddress.class, json);
 	}
 
-	@Schema(example = "Diamond Bar")
+	@Schema
 	public String getCity() {
 		return city;
 	}
@@ -87,7 +86,7 @@ public class BillingAddress implements Serializable {
 	@NotEmpty
 	protected String city;
 
-	@Schema(example = "US")
+	@Schema
 	public String getCountryISOCode() {
 		return countryISOCode;
 	}
@@ -116,7 +115,7 @@ public class BillingAddress implements Serializable {
 	@NotEmpty
 	protected String countryISOCode;
 
-	@Schema(example = "right stairs, first room on the left")
+	@Schema
 	public String getDescription() {
 		return description;
 	}
@@ -144,7 +143,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -173,7 +172,7 @@ public class BillingAddress implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -199,7 +198,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "33.9976884")
+	@Schema
 	public Double getLatitude() {
 		return latitude;
 	}
@@ -227,7 +226,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double latitude;
 
-	@Schema(example = "-117.8144595")
+	@Schema
 	public Double getLongitude() {
 		return longitude;
 	}
@@ -255,7 +254,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double longitude;
 
-	@Schema(example = "Alessio Antonio Rendina")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -282,7 +281,7 @@ public class BillingAddress implements Serializable {
 	@NotEmpty
 	protected String name;
 
-	@Schema(example = "(123) 456 7890")
+	@Schema
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -310,7 +309,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String phoneNumber;
 
-	@Schema(example = "CA")
+	@Schema
 	public String getRegionISOCode() {
 		return regionISOCode;
 	}
@@ -338,7 +337,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String regionISOCode;
 
-	@Schema(example = "1400 Montefino Ave")
+	@Schema
 	public String getStreet1() {
 		return street1;
 	}
@@ -367,7 +366,7 @@ public class BillingAddress implements Serializable {
 	@NotEmpty
 	protected String street1;
 
-	@Schema(example = "1st floor")
+	@Schema
 	public String getStreet2() {
 		return street2;
 	}
@@ -395,7 +394,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street2;
 
-	@Schema(example = "suite 200")
+	@Schema
 	public String getStreet3() {
 		return street3;
 	}
@@ -423,7 +422,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street3;
 
-	@Schema(example = "353246836565")
+	@Schema
 	public String getVatNumber() {
 		return vatNumber;
 	}
@@ -451,7 +450,7 @@ public class BillingAddress implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String vatNumber;
 
-	@Schema(example = "91765")
+	@Schema
 	public String getZip() {
 		return zip;
 	}
@@ -715,9 +714,9 @@ public class BillingAddress implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -743,7 +742,7 @@ public class BillingAddress implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -775,7 +774,7 @@ public class BillingAddress implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -791,10 +790,5 @@ public class BillingAddress implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

@@ -17,7 +17,7 @@ import ClayIcon from '@clayui/icon';
 import {useMutation} from 'graphql-hooks';
 import React, {useEffect, useState} from 'react';
 
-export default function SubscriptionButton({
+export default ({
 	isSubscribed,
 	onSubscription,
 	parentSection = false,
@@ -25,7 +25,7 @@ export default function SubscriptionButton({
 	showTitle = false,
 	subscribeQuery,
 	unsubscribeQuery,
-}) {
+}) => {
 	const [subscription, setSubscription] = useState(false);
 
 	useEffect(() => {
@@ -36,7 +36,7 @@ export default function SubscriptionButton({
 
 	const onCompleted = () => {
 		setSubscription(!subscription);
-		onSubscription?.(!subscription);
+		onSubscription?.();
 	};
 
 	const [subscribe] = useMutation(subscribeQuery);
@@ -47,24 +47,25 @@ export default function SubscriptionButton({
 		fn({variables: queryVariables}).then(onCompleted);
 	};
 
-	const btnTitle = subscription
-		? Liferay.Language.get('subscribed')
-		: Liferay.Language.get('subscribe');
+	const btnTitle = showTitle
+		? subscription
+			? Liferay.Language.get('subscribed')
+			: Liferay.Language.get('subscribe')
+		: '';
 
 	return (
 		<ClayButton
-			data-tooltip-align="top"
 			displayType={subscription ? 'primary' : 'secondary'}
 			onClick={changeSubscription}
 			title={btnTitle}
 		>
 			<ClayIcon symbol="bell-on" />
 
-			{showTitle && (
+			{btnTitle && (
 				<span className="c-ml-2 d-none d-sm-inline-block">
 					{btnTitle}
 				</span>
 			)}
 		</ClayButton>
 	);
-}
+};

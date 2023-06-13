@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -28,7 +29,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.sharing.model.SharingEntry;
+import com.liferay.sharing.model.SharingEntryModel;
 import com.liferay.sharing.service.SharingEntryLocalServiceUtil;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * @author Alejandro Tardín
@@ -61,7 +68,7 @@ public class CollaboratorsUtil {
 			return assetRendererFactory.getAssetRenderer(classPK);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return null;
@@ -69,14 +76,14 @@ public class CollaboratorsUtil {
 
 	private static String _getDisplayURL(ThemeDisplay themeDisplay, User user) {
 		try {
-			if ((user == null) || user.isGuestUser()) {
+			if ((user == null) || user.isDefaultUser()) {
 				return StringPool.BLANK;
 			}
 
 			return user.getDisplayURL(themeDisplay);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}
@@ -93,7 +100,7 @@ public class CollaboratorsUtil {
 			return user.getPortraitURL(themeDisplay);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}
@@ -102,20 +109,27 @@ public class CollaboratorsUtil {
 	private static JSONArray _getSharingEntryToUsersJSONArray(
 		long classPK, long classNameId, ThemeDisplay themeDisplay) {
 
-		return JSONUtil.toJSONArray(
+		List<SharingEntry> sharingEntries =
 			SharingEntryLocalServiceUtil.getSharingEntries(
-				classNameId, classPK, 0, 4),
-			sharingEntry -> {
-				User user = UserLocalServiceUtil.fetchUserById(
-					sharingEntry.getToUserId());
+				classNameId, classPK, 0, 4);
 
-				if (user == null) {
-					return null;
-				}
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-				return _getUserJSONObject(user, themeDisplay);
-			},
-			_log);
+		Stream<SharingEntry> stream = sharingEntries.stream();
+
+		stream.map(
+			SharingEntryModel::getToUserId
+		).map(
+			UserLocalServiceUtil::fetchUserById
+		).filter(
+			Objects::nonNull
+		).map(
+			user -> _getUserJSONObject(user, themeDisplay)
+		).forEach(
+			jsonArray::put
+		);
+
+		return jsonArray;
 	}
 
 	private static JSONObject _getUserJSONObject(

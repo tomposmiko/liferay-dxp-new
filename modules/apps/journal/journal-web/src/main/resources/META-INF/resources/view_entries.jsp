@@ -92,9 +92,16 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 
 				<c:choose>
 					<c:when test='<%= Objects.equals(journalDisplayContext.getDisplayStyle(), "descriptive") %>'>
+
+						<%
+						List<JournalArticle> articles = JournalArticleLocalServiceUtil.getArticles(curArticle.getGroupId(), curArticle.getArticleId(), 0, 1, new ArticleVersionComparator(true));
+
+						JournalArticle article = articles.get(0);
+						%>
+
 						<liferay-ui:search-container-column-text>
 							<liferay-ui:user-portrait
-								userId="<%= curArticle.getStatusByUserId() %>"
+								userId="<%= article.getUserId() %>"
 							/>
 						</liferay-ui:search-container-column-text>
 
@@ -108,31 +115,19 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 							String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - createDate.getTime(), true);
 							%>
 
-							<div class="d-flex">
-								<c:choose>
-									<c:when test="<%= editURL != StringPool.BLANK %>">
-										<clay:link
-											cssClass="d-block lfr-portal-tooltip text-dark text-truncate"
-											href="<%= editURL %>"
-											label="<%= title %>"
-											title="<%= HtmlUtil.escape(title) %>"
-										/>
-									</c:when>
-									<c:otherwise>
-										<span class="d-block lfr-portal-tooltip text-dark text-truncate" title="<%= HtmlUtil.escape(title) %>">
-											<%= HtmlUtil.escape(title) %>
-										</span>
-									</c:otherwise>
-								</c:choose>
-							</div>
-
-							<span class="text-secondary">
-								<liferay-ui:message arguments="<%= new String[] {modifiedDateDescription, HtmlUtil.escape(curArticle.getStatusByUserName())} %>" key="modified-x-ago-by-x" />
+							<span class="text-default">
+								<liferay-ui:message arguments="<%= new String[] {modifiedDateDescription, HtmlUtil.escape(curArticle.getUserName())} %>" key="modified-x-ago-by-x" />
 							</span>
+
+							<p class="font-weight-bold h5">
+								<aui:a href="<%= editURL %>">
+									<%= HtmlUtil.escape(title) %>
+								</aui:a>
+							</p>
 
 							<c:if test="<%= journalDisplayContext.isSearch() && ((curArticle.getFolderId() <= 0) || JournalFolderPermission.contains(permissionChecker, curArticle.getFolder(), ActionKeys.VIEW)) %>">
 								<h5>
-									<%= journalDisplayContext.getAbsolutePath(curArticle.getFolderId()) %>
+									<%= JournalHelperUtil.getAbsolutePath(liferayPortletRequest, curArticle.getFolderId()) %>
 								</h5>
 							</c:if>
 
@@ -158,7 +153,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 										"trashEnabled", componentContext.get("trashEnabled")
 									).build()
 								%>'
-								aria-label='<%= LanguageUtil.format(request, "actions-for-x", HtmlUtil.escape(title), false) %>'
 								dropdownItems="<%= journalDisplayContext.getArticleActionDropdownItems(curArticle) %>"
 								propsTransformer="js/ElementsDefaultPropsTransformer"
 							/>
@@ -202,14 +196,18 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 							<liferay-ui:search-container-column-text
 								cssClass="table-cell-expand-smallest table-cell-minw-200"
 								name="path"
-								value="<%= journalDisplayContext.getAbsolutePath(curArticle.getFolderId()) %>"
+								value="<%= JournalHelperUtil.getAbsolutePath(liferayPortletRequest, curArticle.getFolderId()) %>"
 							/>
 						</c:if>
+
+						<%
+						List<JournalArticle> articles = JournalArticleLocalServiceUtil.getArticles(curArticle.getGroupId(), curArticle.getArticleId(), 0, 1, new ArticleVersionComparator(true));
+						%>
 
 						<liferay-ui:search-container-column-text
 							cssClass="table-cell-expand-smallest table-cell-minw-100"
 							name="author"
-							value="<%= HtmlUtil.escape(curArticle.getUserName()) %>"
+							value="<%= HtmlUtil.escape(PortalUtil.getUserName(articles.get(0))) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
@@ -240,7 +238,7 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 							String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - createDate.getTime(), true);
 							%>
 
-							<liferay-ui:message arguments="<%= new String[] {modifiedDateDescription, HtmlUtil.escape(curArticle.getStatusByUserName())} %>" key="modified-x-ago-by-x" />
+							<liferay-ui:message arguments="<%= new String[] {modifiedDateDescription, HtmlUtil.escape(curArticle.getUserName())} %>" key="modified-x-ago-by-x" />
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-date
@@ -266,7 +264,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 										"trashEnabled", componentContext.get("trashEnabled")
 									).build()
 								%>'
-								aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 								dropdownItems="<%= journalDisplayContext.getArticleActionDropdownItems(curArticle) %>"
 								propsTransformer="js/ElementsDefaultPropsTransformer"
 							/>
@@ -319,33 +316,25 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 							String createDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - createDate.getTime(), true);
 							%>
 
-							<div class="d-flex">
-								<c:choose>
-									<c:when test="<%= rowURL.toString() != StringPool.BLANK %>">
-										<clay:link
-											cssClass="d-block lfr-portal-tooltip text-dark text-truncate"
-											href="<%= rowURL.toString() %>"
-											label="<%= HtmlUtil.escape(curFolder.getName()) %>"
-											title="<%= HtmlUtil.escape(curFolder.getName()) %>"
-										/>
-									</c:when>
-									<c:otherwise>
-										<span class="d-block lfr-portal-tooltip text-dark text-truncate" title="<%= HtmlUtil.escape(curFolder.getName()) %>">
-											<%= HtmlUtil.escape(curFolder.getName()) %>
-										</span>
-									</c:otherwise>
-								</c:choose>
-							</div>
-
-							<span class="text-secondary">
-								<liferay-ui:message arguments="<%= new String[] {createDateDescription, HtmlUtil.escape(curFolder.getUserName())} %>" key="modified-x-ago-by-x" />
+							<span class="text-default">
+								<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(curFolder.getUserName()), createDateDescription} %>" key="x-modified-x-ago" />
 							</span>
+
+							<p class="font-weight-bold h5">
+								<aui:a href="<%= rowURL.toString() %>">
+									<%= HtmlUtil.escape(curFolder.getName()) %>
+								</aui:a>
+							</p>
 
 							<c:if test="<%= journalDisplayContext.isSearch() && ((curFolder.getParentFolderId() <= 0) || JournalFolderPermission.contains(permissionChecker, curFolder.getParentFolder(), ActionKeys.VIEW)) %>">
 								<h5>
-									<%= journalDisplayContext.getAbsolutePath(curFolder.getParentFolderId()) %>
+									<%= JournalHelperUtil.getAbsolutePath(liferayPortletRequest, curFolder.getParentFolderId()) %>
 								</h5>
 							</c:if>
+
+							<span class="text-default">
+								<aui:workflow-status markupView="lexicon" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= curFolder.getStatus() %>" />
+							</span>
 						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text>
@@ -355,7 +344,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 										"trashEnabled", componentContext.get("trashEnabled")
 									).build()
 								%>'
-								aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 								dropdownItems="<%= journalDisplayContext.getFolderActionDropdownItems(curFolder) %>"
 								propsTransformer="js/ElementsDefaultPropsTransformer"
 							/>
@@ -400,7 +388,7 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 							<liferay-ui:search-container-column-text
 								cssClass="table-cell-expand-smallest table-cell-minw-200"
 								name="path"
-								value="<%= journalDisplayContext.getAbsolutePath(curFolder.getParentFolderId()) %>"
+								value="<%= JournalHelperUtil.getAbsolutePath(liferayPortletRequest, curFolder.getParentFolderId()) %>"
 							/>
 						</c:if>
 
@@ -440,7 +428,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 										"trashEnabled", componentContext.get("trashEnabled")
 									).build()
 								%>'
-								aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 								dropdownItems="<%= journalDisplayContext.getFolderActionDropdownItems(curFolder) %>"
 								propsTransformer="js/ElementsDefaultPropsTransformer"
 							/>

@@ -127,6 +127,15 @@ public class ServiceComponentLocalServiceUtil {
 		return getService().deleteServiceComponent(serviceComponent);
 	}
 
+	public static void destroyServiceComponent(
+		com.liferay.portal.kernel.service.configuration.
+			ServiceComponentConfiguration serviceComponentConfiguration,
+		ClassLoader classLoader) {
+
+		getService().destroyServiceComponent(
+			serviceComponentConfiguration, classLoader);
+	}
+
 	public static <T> T dslQuery(DSLQuery dslQuery) {
 		return getService().dslQuery(dslQuery);
 	}
@@ -329,6 +338,10 @@ public class ServiceComponentLocalServiceUtil {
 		getService().upgradeDB(
 			classLoader, buildNamespace, buildNumber, previousServiceComponent,
 			tablesSQL, sequencesSQL, indexesSQL);
+	}
+
+	public static void verifyDB() {
+		getService().verifyDB();
 	}
 
 	public static ServiceComponentLocalService getService() {

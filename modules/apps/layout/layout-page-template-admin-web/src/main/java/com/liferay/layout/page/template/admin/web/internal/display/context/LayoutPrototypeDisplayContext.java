@@ -14,18 +14,19 @@
 
 package com.liferay.layout.page.template.admin.web.internal.display.context;
 
-import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminPortletKeys;
 import com.liferay.layout.page.template.admin.web.internal.util.LayoutPageTemplatePortletUtil;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -48,7 +49,7 @@ public class LayoutPrototypeDisplayContext {
 	}
 
 	public Boolean getActive() {
-		String navigation = _getNavigation();
+		String navigation = getNavigation();
 
 		Boolean active = null;
 
@@ -67,10 +68,8 @@ public class LayoutPrototypeDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest,
-			LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
-			"layout-prototype-order-by-col", "create-date");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}
@@ -80,10 +79,8 @@ public class LayoutPrototypeDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest,
-			LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
-			"layout-prototype-order-by-type", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -91,7 +88,7 @@ public class LayoutPrototypeDisplayContext {
 	public PortletURL getPortletURL() {
 		PortletURL portletURL = _renderResponse.createRenderURL();
 
-		String navigation = _getNavigation();
+		String navigation = getNavigation();
 
 		if (Validator.isNotNull(navigation)) {
 			portletURL.setParameter("navigation", navigation);
@@ -123,31 +120,42 @@ public class LayoutPrototypeDisplayContext {
 				"there-are-no-page-templates");
 
 		searchContainer.setId("layoutPrototype");
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
+
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
+
+		OrderByComparator<LayoutPageTemplateEntry> orderByComparator =
 			LayoutPageTemplatePortletUtil.
 				getLayoutPageTemplateEntryOrderByComparator(
-					getOrderByCol(), getOrderByType()));
+					getOrderByCol(), getOrderByType());
+
+		searchContainer.setOrderByComparator(orderByComparator);
+
 		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			() ->
-				LayoutPageTemplateEntryServiceUtil.
-					getLayoutPageTemplateEntriesByType(
-						themeDisplay.getScopeGroupId(), 0,
-						LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE,
-						searchContainer.getStart(), searchContainer.getEnd(),
-						searchContainer.getOrderByComparator()),
+
+		int count =
 			LayoutPageTemplateEntryServiceUtil.
 				getLayoutPageTemplateEntriesCountByType(
 					themeDisplay.getScopeGroupId(), 0,
-					LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE));
-		searchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(_renderResponse));
+					LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE);
+
+		searchContainer.setTotal(count);
+
+		List<LayoutPageTemplateEntry> results =
+			LayoutPageTemplateEntryServiceUtil.
+				getLayoutPageTemplateEntriesByType(
+					themeDisplay.getScopeGroupId(), 0,
+					LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE,
+					searchContainer.getStart(), searchContainer.getEnd(),
+					orderByComparator);
+
+		searchContainer.setResults(results);
 
 		return searchContainer;
 	}
 
-	private String _getNavigation() {
+	protected String getNavigation() {
 		if (Validator.isNotNull(_navigation)) {
 			return _navigation;
 		}

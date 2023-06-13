@@ -9,35 +9,19 @@
  * distribution rights of the Software.
  */
 
-import {fetch} from 'frontend-js-web';
-import {useCallback} from 'react';
+import {useCallback, useContext} from 'react';
 
-import {adminBaseURL, headers, metricsBaseURL} from '../rest/fetch.es';
+import {AppContext} from '../../components/AppContext.es';
 
-const usePatch = ({admin = false, body = {}, callback = () => {}, url}) => {
-	const fetchURL = admin
-		? `${adminBaseURL}${url}`
-		: `${metricsBaseURL}${url}`;
+const usePatch = ({body = {}, admin = false, url}) => {
+	const {getClient} = useContext(AppContext);
 
+	const client = getClient(admin);
+	const queryBodyStr = JSON.stringify(body);
 	const patchData = useCallback(
-		async (patchBody) => {
-			const response = await fetch(fetchURL, {
-				body: JSON.stringify(patchBody) || JSON.stringify(body),
-				headers: {...headers, 'Content-Type': 'application/json'},
-				method: 'PATCH',
-			});
-
-			if (response.ok) {
-				return callback();
-			}
-
-			const requestFailedMessage = Liferay.Language.get(
-				'your-request-has-failed'
-			);
-
-			throw new Error(requestFailedMessage);
-		},
-		[fetchURL, body, callback]
+		(patchBody) => client.patch(url, patchBody || body),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[queryBodyStr, url, admin]
 	);
 
 	return {patchData};

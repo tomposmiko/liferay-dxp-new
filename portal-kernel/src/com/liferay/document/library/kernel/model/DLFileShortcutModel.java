@@ -15,6 +15,7 @@
 package com.liferay.document.library.kernel.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
@@ -417,6 +418,15 @@ public interface DLFileShortcutModel
 	public void setStatusDate(Date statusDate);
 
 	/**
+	 * Returns the trash entry created when this document library file shortcut was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this document library file shortcut.
+	 *
+	 * @return the trash entry created when this document library file shortcut was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws PortalException;
+
+	/**
 	 * Returns the class primary key of the trash entry for this document library file shortcut.
 	 *
 	 * @return the class primary key of the trash entry for this document library file shortcut
@@ -425,12 +435,36 @@ public interface DLFileShortcutModel
 	public long getTrashEntryClassPK();
 
 	/**
+	 * Returns the trash handler for this document library file shortcut.
+	 *
+	 * @return the trash handler for this document library file shortcut
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler();
+
+	/**
 	 * Returns <code>true</code> if this document library file shortcut is in the Recycle Bin.
 	 *
 	 * @return <code>true</code> if this document library file shortcut is in the Recycle Bin; <code>false</code> otherwise
 	 */
 	@Override
 	public boolean isInTrash();
+
+	/**
+	 * Returns <code>true</code> if the parent of this document library file shortcut is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this document library file shortcut is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer();
+
+	@Override
+	public boolean isInTrashExplicitly();
+
+	@Override
+	public boolean isInTrashImplicitly();
 
 	/**
 	 * Returns <code>true</code> if this document library file shortcut is approved.
@@ -498,9 +532,5 @@ public interface DLFileShortcutModel
 
 	@Override
 	public DLFileShortcut cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Angelo Jefferson
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,

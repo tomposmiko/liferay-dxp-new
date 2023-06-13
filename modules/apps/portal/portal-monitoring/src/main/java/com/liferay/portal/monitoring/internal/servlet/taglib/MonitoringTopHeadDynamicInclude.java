@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.monitoring.internal.configuration.MonitoringConfiguration",
-	enabled = false, service = DynamicInclude.class
+	enabled = false, immediate = true, service = DynamicInclude.class
 )
 public class MonitoringTopHeadDynamicInclude extends BaseDynamicInclude {
 
@@ -91,9 +91,12 @@ public class MonitoringTopHeadDynamicInclude extends BaseDynamicInclude {
 			MonitoringConfiguration.class, properties);
 	}
 
-	@Reference
-	private DataSampleFactory _dataSampleFactory;
+	@Reference(unbind = "-")
+	protected void setDataSampleFactory(DataSampleFactory dataSampleFactory) {
+		_dataSampleFactory = dataSampleFactory;
+	}
 
+	private DataSampleFactory _dataSampleFactory;
 	private volatile MonitoringConfiguration _monitoringConfiguration;
 
 }

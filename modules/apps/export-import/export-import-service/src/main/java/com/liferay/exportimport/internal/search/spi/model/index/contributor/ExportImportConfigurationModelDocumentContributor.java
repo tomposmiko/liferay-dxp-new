@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.exportimport.kernel.model.ExportImportConfiguration",
 	service = ModelDocumentContributor.class
 )
@@ -65,19 +66,19 @@ public class ExportImportConfigurationModelDocumentContributor
 		Map<String, Serializable> settingsMap =
 			exportImportConfiguration.getSettingsMap();
 
-		_populateDates(document, settingsMap);
-		_populateLayoutIds(document, settingsMap);
-		_populateLocale(document, settingsMap);
-		_populateParameterMap(document, settingsMap);
-		_populateSiteInformation(document, settingsMap);
-		_populateTimeZone(document, settingsMap);
+		populateDates(document, settingsMap);
+		populateLayoutIds(document, settingsMap);
+		populateLocale(document, settingsMap);
+		populateParameterMap(document, settingsMap);
+		populateSiteInformation(document, settingsMap);
+		populateTimeZone(document, settingsMap);
 
 		document.addKeyword(
 			_PREFIX_SETTING + Field.USER_ID,
 			MapUtil.getLong(settingsMap, "userId"));
 	}
 
-	private void _populateDates(
+	protected void populateDates(
 		Document document, Map<String, Serializable> settingsMap) {
 
 		if (settingsMap.containsKey("endDate")) {
@@ -93,7 +94,7 @@ public class ExportImportConfigurationModelDocumentContributor
 		}
 	}
 
-	private void _populateLayoutIds(
+	protected void populateLayoutIds(
 		Document document, Map<String, Serializable> settingsMap) {
 
 		if (!settingsMap.containsKey("layoutIdMap") &&
@@ -117,7 +118,7 @@ public class ExportImportConfigurationModelDocumentContributor
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}
@@ -125,7 +126,7 @@ public class ExportImportConfigurationModelDocumentContributor
 		document.addKeyword("layoutIds", layoutIds);
 	}
 
-	private void _populateLocale(
+	protected void populateLocale(
 		Document document, Map<String, Serializable> settingsMap) {
 
 		Locale locale = (Locale)settingsMap.get("locale");
@@ -133,7 +134,7 @@ public class ExportImportConfigurationModelDocumentContributor
 		document.addText(_PREFIX_SETTING + "locale", locale.toString());
 	}
 
-	private void _populateParameterMap(
+	protected void populateParameterMap(
 		Document document, Map<String, Serializable> settingsMap) {
 
 		if (!settingsMap.containsKey("parameterMap")) {
@@ -173,7 +174,7 @@ public class ExportImportConfigurationModelDocumentContributor
 		}
 	}
 
-	private void _populateSiteInformation(
+	protected void populateSiteInformation(
 		Document document, Map<String, Serializable> settingsMap) {
 
 		document.addKeyword(
@@ -187,7 +188,7 @@ public class ExportImportConfigurationModelDocumentContributor
 			MapUtil.getLong(settingsMap, "targetGroupId"));
 	}
 
-	private void _populateTimeZone(
+	protected void populateTimeZone(
 		Document document, Map<String, Serializable> settingsMap) {
 
 		TimeZone timeZone = (TimeZone)settingsMap.get("timeZone");

@@ -14,12 +14,12 @@
 
 package com.liferay.commerce.payment.method.money.order.internal;
 
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
-import com.liferay.commerce.constants.CommercePaymentMethodConstants;
+import com.liferay.commerce.constants.CommerceOrderConstants;
+import com.liferay.commerce.constants.CommercePaymentConstants;
 import com.liferay.commerce.payment.method.CommercePaymentMethod;
 import com.liferay.commerce.payment.request.CommercePaymentRequest;
 import com.liferay.commerce.payment.result.CommercePaymentResult;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Collections;
@@ -27,12 +27,12 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.payment.engine.method.key=" + MoneyOrderCommercePaymentMethod.KEY,
 	service = CommercePaymentMethod.class
 )
@@ -48,14 +48,13 @@ public class MoneyOrderCommercePaymentMethod implements CommercePaymentMethod {
 		return new CommercePaymentResult(
 			commercePaymentRequest.getTransactionId(),
 			commercePaymentRequest.getCommerceOrderId(),
-			CommerceOrderPaymentConstants.STATUS_PENDING, false, null, null,
+			CommerceOrderConstants.PAYMENT_STATUS_PENDING, false, null, null,
 			Collections.emptyList(), true);
 	}
 
 	@Override
 	public String getDescription(Locale locale) {
-		return _language.get(
-			_getResourceBundle(locale), "money-order-description");
+		return null;
 	}
 
 	@Override
@@ -65,12 +64,12 @@ public class MoneyOrderCommercePaymentMethod implements CommercePaymentMethod {
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(_getResourceBundle(locale), KEY);
+		return LanguageUtil.get(_getResourceBundle(locale), KEY);
 	}
 
 	@Override
 	public int getPaymentType() {
-		return CommercePaymentMethodConstants.TYPE_OFFLINE;
+		return CommercePaymentConstants.COMMERCE_PAYMENT_METHOD_TYPE_OFFLINE;
 	}
 
 	@Override
@@ -96,7 +95,7 @@ public class MoneyOrderCommercePaymentMethod implements CommercePaymentMethod {
 		return new CommercePaymentResult(
 			commercePaymentRequest.getTransactionId(),
 			commercePaymentRequest.getCommerceOrderId(),
-			CommerceOrderPaymentConstants.STATUS_AUTHORIZED, false, null, null,
+			CommerceOrderConstants.PAYMENT_STATUS_AUTHORIZED, false, null, null,
 			Collections.emptyList(), true);
 	}
 
@@ -104,8 +103,5 @@ public class MoneyOrderCommercePaymentMethod implements CommercePaymentMethod {
 		return ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 	}
-
-	@Reference
-	private Language _language;
 
 }

@@ -20,7 +20,6 @@ import com.liferay.data.engine.model.DEDataDefinitionFieldLinkTable;
 import com.liferay.data.engine.model.impl.DEDataDefinitionFieldLinkImpl;
 import com.liferay.data.engine.model.impl.DEDataDefinitionFieldLinkModelImpl;
 import com.liferay.data.engine.service.persistence.DEDataDefinitionFieldLinkPersistence;
-import com.liferay.data.engine.service.persistence.DEDataDefinitionFieldLinkUtil;
 import com.liferay.data.engine.service.persistence.impl.constants.DEPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -49,11 +49,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -85,7 +84,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DEDataDefinitionFieldLinkPersistence.class)
+@Component(
+	service = {
+		DEDataDefinitionFieldLinkPersistence.class, BasePersistence.class
+	}
+)
 public class DEDataDefinitionFieldLinkPersistenceImpl
 	extends BasePersistenceImpl<DEDataDefinitionFieldLink>
 	implements DEDataDefinitionFieldLinkPersistence {
@@ -207,7 +210,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -612,7 +615,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -749,7 +752,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof DEDataDefinitionFieldLink) {
@@ -872,7 +875,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1046,7 +1049,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -1477,7 +1480,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1645,7 +1648,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -2028,7 +2031,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {ddmStructureId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2179,7 +2182,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -2584,7 +2587,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2743,7 +2746,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -3151,7 +3154,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, ddmStructureId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3313,7 +3316,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -3776,7 +3779,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 	 * </p>
 	 *
 	 * @param ddmStructureId the ddm structure ID
-	 * @param fieldNames the field names
+	 * @param fieldName the field name
 	 * @param start the lower bound of the range of de data definition field links
 	 * @param end the upper bound of the range of de data definition field links (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3830,7 +3833,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				_finderPathWithPaginationFindByDDMSI_F, finderArgs, this);
+				_finderPathWithPaginationFindByDDMSI_F, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -3971,7 +3974,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {ddmStructureId, fieldName};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4059,7 +4062,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByDDMSI_F, finderArgs, this);
+				_finderPathWithPaginationCountByDDMSI_F, finderArgs);
 		}
 
 		if (count == null) {
@@ -4263,7 +4266,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -4758,7 +4761,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 	 *
 	 * @param classNameId the class name ID
 	 * @param ddmStructureId the ddm structure ID
-	 * @param fieldNames the field names
+	 * @param fieldName the field name
 	 * @param start the lower bound of the range of de data definition field links
 	 * @param end the upper bound of the range of de data definition field links (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -4813,7 +4816,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				_finderPathWithPaginationFindByC_DDMSI_F, finderArgs, this);
+				_finderPathWithPaginationFindByC_DDMSI_F, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
@@ -4966,7 +4969,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, ddmStructureId, fieldName};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5061,7 +5064,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByC_DDMSI_F, finderArgs, this);
+				_finderPathWithPaginationCountByC_DDMSI_F, finderArgs);
 		}
 
 		if (count == null) {
@@ -5250,7 +5253,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_C_DDMSI_F, finderArgs, this);
+				_finderPathFetchByC_C_DDMSI_F, finderArgs);
 		}
 
 		if (result instanceof DEDataDefinitionFieldLink) {
@@ -5395,7 +5398,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 				classNameId, classPK, ddmStructureId, fieldName
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5497,7 +5500,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByC_C_DDMSI_F, finderArgs, this);
+				_finderPathWithPaginationCountByC_C_DDMSI_F, finderArgs);
 		}
 
 		if (count == null) {
@@ -5770,7 +5773,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 		deDataDefinitionFieldLink.setNew(true);
 		deDataDefinitionFieldLink.setPrimaryKey(deDataDefinitionFieldLinkId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		deDataDefinitionFieldLink.setUuid(uuid);
 
@@ -5901,7 +5904,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 			(DEDataDefinitionFieldLinkModelImpl)deDataDefinitionFieldLink;
 
 		if (Validator.isNull(deDataDefinitionFieldLink.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			deDataDefinitionFieldLink.setUuid(uuid);
 		}
@@ -6035,7 +6038,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				DEDataDefinitionFieldLink.class, primaryKey)) {
+				DEDataDefinitionFieldLink.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -6263,7 +6266,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DEDataDefinitionFieldLink>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -6340,7 +6343,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -6674,32 +6677,11 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 				"classNameId", "classPK", "ddmStructureId", "fieldName"
 			},
 			false);
-
-		_setDEDataDefinitionFieldLinkUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDEDataDefinitionFieldLinkUtilPersistence(null);
-
 		entityCache.removeCache(DEDataDefinitionFieldLinkImpl.class.getName());
-	}
-
-	private void _setDEDataDefinitionFieldLinkUtilPersistence(
-		DEDataDefinitionFieldLinkPersistence
-			deDataDefinitionFieldLinkPersistence) {
-
-		try {
-			Field field = DEDataDefinitionFieldLinkUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, deDataDefinitionFieldLinkPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -6770,6 +6752,7 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private DEDataDefinitionFieldLinkModelArgumentsResolver
+		_deDataDefinitionFieldLinkModelArgumentsResolver;
 
 }

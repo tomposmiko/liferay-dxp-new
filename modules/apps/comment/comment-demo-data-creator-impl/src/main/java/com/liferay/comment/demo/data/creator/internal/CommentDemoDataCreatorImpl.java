@@ -66,7 +66,7 @@ public class CommentDemoDataCreatorImpl implements CommentDemoDataCreator {
 			new IdentityServiceContextFunction(new ServiceContext());
 
 		long commentId = _commentManager.addComment(
-			null, user.getUserId(), group.getGroupId(), className, classPK,
+			user.getUserId(), group.getGroupId(), className, classPK,
 			user.getFullName(), StringPool.BLANK, _getRandomBody(),
 			identityServiceContextFunction);
 
@@ -84,9 +84,9 @@ public class CommentDemoDataCreatorImpl implements CommentDemoDataCreator {
 			new IdentityServiceContextFunction(new ServiceContext());
 
 		long commentId = _commentManager.addComment(
-			null, userId, parentComment.getClassName(),
-			parentComment.getClassPK(), user.getFullName(), parentCommentId,
-			StringPool.BLANK, _getRandomBody(), identityServiceContextFunction);
+			userId, parentComment.getClassName(), parentComment.getClassPK(),
+			user.getFullName(), parentCommentId, StringPool.BLANK,
+			_getRandomBody(), identityServiceContextFunction);
 
 		return _getComment(commentId);
 	}
@@ -99,7 +99,7 @@ public class CommentDemoDataCreatorImpl implements CommentDemoDataCreator {
 			}
 			catch (NoSuchMessageException noSuchMessageException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchMessageException);
+					_log.warn(noSuchMessageException, noSuchMessageException);
 				}
 			}
 

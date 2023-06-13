@@ -16,7 +16,6 @@ package com.liferay.commerce.product.internal.search;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
-import com.liferay.commerce.product.constants.CPDisplayLayoutConstants;
 import com.liferay.commerce.product.constants.CPField;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDisplayLayout;
@@ -38,9 +37,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -58,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 
 	public static final String CLASS_NAME = CPDisplayLayout.class.getName();
@@ -92,12 +89,6 @@ public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 			contextBooleanFilter.addTerm(
 				FIELD_ENTRY_MODEL_CLASS_NAME, entryModelClassName,
 				BooleanClauseOccur.MUST);
-		}
-
-		Integer type = (Integer)attributes.get(Field.TYPE);
-
-		if (type != null) {
-			contextBooleanFilter.addRequiredTerm(Field.TYPE, type);
 		}
 	}
 
@@ -159,25 +150,12 @@ public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 				_assetCategoryLocalService.getAssetCategory(
 					cpDisplayLayout.getClassPK());
 
-			String[] availableLanguageIds =
-				_localization.getAvailableLanguageIds(
-					assetCategory.getDescription());
-
-			for (String availableLanguageId : availableLanguageIds) {
-				document.addText(
-					_localization.getLocalizedName(
-						Field.DESCRIPTION, availableLanguageId),
-					_html.stripHtml(
-						assetCategory.getDescription(availableLanguageId)));
-			}
-
 			Locale siteDefaultLocale = _portal.getSiteDefaultLocale(
 				assetCategory.getGroupId());
 
-			document.addText(
-				Field.DESCRIPTION,
-				_html.stripHtml(
-					assetCategory.getDescription(siteDefaultLocale)));
+			addLocalizedField(
+				document, Field.DESCRIPTION, siteDefaultLocale,
+				assetCategory.getDescriptionMap());
 
 			document.addText(Field.NAME, assetCategory.getName());
 
@@ -187,18 +165,6 @@ public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 		}
 
 		document.addKeyword(Field.GROUP_ID, cpDisplayLayout.getGroupId());
-
-		if (Validator.isNotNull(
-				cpDisplayLayout.getLayoutPageTemplateEntryUuid())) {
-
-			document.addKeyword(
-				Field.TYPE,
-				CPDisplayLayoutConstants.TYPE_LAYOUT_PAGE_TEMPLATE_ENTRY);
-		}
-		else if (Validator.isNotNull(cpDisplayLayout.getLayoutUuid())) {
-			document.addKeyword(
-				Field.TYPE, CPDisplayLayoutConstants.TYPE_LAYOUT);
-		}
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + cpDisplayLayout + " indexed successfully");
@@ -223,7 +189,8 @@ public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 	@Override
 	protected void doReindex(CPDisplayLayout cpDisplayLayout) throws Exception {
 		_indexWriterHelper.updateDocument(
-			cpDisplayLayout.getCompanyId(), getDocument(cpDisplayLayout));
+			getSearchEngineId(), cpDisplayLayout.getCompanyId(),
+			getDocument(cpDisplayLayout), isCommitImmediately());
 	}
 
 	@Override
@@ -235,10 +202,12 @@ public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPDisplayLayouts(companyId);
+		reindexCPDisplayLayouts(companyId);
 	}
 
-	private void _reindexCPDisplayLayouts(long companyId) throws Exception {
+	protected void reindexCPDisplayLayouts(long companyId)
+		throws PortalException {
+
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpDisplayLayoutLocalService.getIndexableActionableDynamicQuery();
 
@@ -258,6 +227,7 @@ public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}
@@ -275,13 +245,7 @@ public class CPDisplayLayoutIndexer extends BaseIndexer<CPDisplayLayout> {
 	private CPDisplayLayoutLocalService _cpDisplayLayoutLocalService;
 
 	@Reference
-	private Html _html;
-
-	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private Portal _portal;

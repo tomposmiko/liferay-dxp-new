@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPDefinitionOptionRelIndexer
 	extends BaseIndexer<CPDefinitionOptionRel> {
 
@@ -88,14 +88,14 @@ public class CPDefinitionOptionRelIndexer
 			SearchContext searchContext)
 		throws Exception {
 
+		addSearchLocalizedTerm(
+			searchQuery, searchContext, Field.CONTENT, false);
 		addSearchTerm(
 			searchQuery, searchContext,
 			CPField.DEFINITION_OPTION_VALUE_REL_NAME, false);
 		addSearchLocalizedTerm(
 			searchQuery, searchContext,
 			CPField.DEFINITION_OPTION_VALUE_REL_NAME, false);
-		addSearchLocalizedTerm(
-			searchQuery, searchContext, Field.CONTENT, false);
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, Field.DESCRIPTION, false);
 		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
@@ -140,9 +140,10 @@ public class CPDefinitionOptionRelIndexer
 			cpDefinitionOptionRel.getCPDefinitionOptionValueRels();
 
 		String cpDefinitionOptionRelDefaultLanguageId =
-			_localization.getDefaultLanguageId(cpDefinitionOptionRel.getName());
+			LocalizationUtil.getDefaultLanguageId(
+				cpDefinitionOptionRel.getName());
 
-		String[] languageIds = _localization.getAvailableLanguageIds(
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
 			cpDefinitionOptionRel.getName());
 
 		for (String languageId : languageIds) {
@@ -160,24 +161,8 @@ public class CPDefinitionOptionRelIndexer
 					cpDefinitionOptionValueRel.getName(languageId));
 			}
 
-			document.addKeyword(
-				CPField.CP_DEFINITION_ID,
-				cpDefinitionOptionRel.getCPDefinitionId());
-
 			String[] cpDefinitionOptionValueRelNames =
 				cpDefinitionOptionValueRelNamesList.toArray(new String[0]);
-
-			document.addText(
-				_localization.getLocalizedName(
-					CPField.DEFINITION_OPTION_VALUE_REL_NAME, languageId),
-				cpDefinitionOptionValueRelNames);
-
-			document.addText(Field.CONTENT, name);
-			document.addText(
-				_localization.getLocalizedName(Field.DESCRIPTION, languageId),
-				description);
-			document.addText(
-				_localization.getLocalizedName(Field.NAME, languageId), name);
 
 			if (languageId.equals(cpDefinitionOptionRelDefaultLanguageId)) {
 				document.addText(
@@ -187,6 +172,25 @@ public class CPDefinitionOptionRelIndexer
 				document.addText(Field.NAME, name);
 				document.addText("defaultLanguageId", languageId);
 			}
+
+			document.addText(
+				LocalizationUtil.getLocalizedName(Field.NAME, languageId),
+				name);
+			document.addText(
+				LocalizationUtil.getLocalizedName(
+					Field.DESCRIPTION, languageId),
+				description);
+
+			document.addText(Field.CONTENT, name);
+
+			document.addKeyword(
+				CPField.CP_DEFINITION_ID,
+				cpDefinitionOptionRel.getCPDefinitionId());
+
+			document.addText(
+				LocalizationUtil.getLocalizedName(
+					CPField.DEFINITION_OPTION_VALUE_REL_NAME, languageId),
+				cpDefinitionOptionValueRelNames);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -215,8 +219,8 @@ public class CPDefinitionOptionRelIndexer
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			cpDefinitionOptionRel.getCompanyId(),
-			getDocument(cpDefinitionOptionRel));
+			getSearchEngineId(), cpDefinitionOptionRel.getCompanyId(),
+			getDocument(cpDefinitionOptionRel), isCommitImmediately());
 	}
 
 	@Override
@@ -230,11 +234,11 @@ public class CPDefinitionOptionRelIndexer
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPDefinitionOptionRels(companyId);
+		reindexCPDefinitionOptionRels(companyId);
 	}
 
-	private void _reindexCPDefinitionOptionRels(long companyId)
-		throws Exception {
+	protected void reindexCPDefinitionOptionRels(long companyId)
+		throws PortalException {
 
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpDefinitionOptionRelLocalService.
@@ -259,6 +263,7 @@ public class CPDefinitionOptionRelIndexer
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}
@@ -272,8 +277,5 @@ public class CPDefinitionOptionRelIndexer
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Localization _localization;
 
 }

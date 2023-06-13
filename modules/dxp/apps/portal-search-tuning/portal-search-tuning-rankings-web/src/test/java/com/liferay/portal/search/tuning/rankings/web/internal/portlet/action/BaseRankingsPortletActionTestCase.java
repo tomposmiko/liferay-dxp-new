@@ -26,10 +26,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -48,7 +51,7 @@ public abstract class BaseRankingsPortletActionTestCase
 		).when(
 			builder
 		).index(
-			Mockito.anyString()
+			Matchers.anyString()
 		);
 
 		Mockito.doReturn(
@@ -56,7 +59,7 @@ public abstract class BaseRankingsPortletActionTestCase
 		).when(
 			builder
 		).queryStrings(
-			Mockito.anyCollection()
+			Matchers.anyCollection()
 		);
 
 		Mockito.doReturn(
@@ -64,7 +67,7 @@ public abstract class BaseRankingsPortletActionTestCase
 		).when(
 			builder
 		).rankingIndexName(
-			Mockito.any()
+			Matchers.anyObject()
 		);
 
 		Mockito.doReturn(
@@ -72,7 +75,7 @@ public abstract class BaseRankingsPortletActionTestCase
 		).when(
 			builder
 		).unlessRankingDocumentId(
-			Mockito.anyString()
+			Matchers.anyString()
 		);
 
 		Mockito.doReturn(
@@ -92,7 +95,7 @@ public abstract class BaseRankingsPortletActionTestCase
 		).when(
 			duplicateQueryStringsDetector
 		).detect(
-			Mockito.any()
+			Matchers.anyObject()
 		);
 	}
 
@@ -102,11 +105,10 @@ public abstract class BaseRankingsPortletActionTestCase
 		).when(
 			indexNameBuilder
 		).getIndexName(
-			Mockito.anyLong()
+			Matchers.anyLong()
 		);
 	}
 
-	@Override
 	protected void setUpPortletRequestParamValue(
 		PortletRequest portletRequest, String returnValue, String paramName) {
 
@@ -115,7 +117,7 @@ public abstract class BaseRankingsPortletActionTestCase
 		).when(
 			portletRequest
 		).getParameter(
-			Mockito.eq(paramName)
+			Matchers.eq(paramName)
 		);
 	}
 
@@ -145,11 +147,11 @@ public abstract class BaseRankingsPortletActionTestCase
 		).getAliases();
 
 		Mockito.doReturn(
-			ranking
+			Optional.of(ranking)
 		).when(
 			rankingIndexReader
-		).fetch(
-			Mockito.any(), Mockito.anyString()
+		).fetchOptional(
+			Matchers.anyObject(), Matchers.anyString()
 		);
 	}
 
@@ -167,13 +169,16 @@ public abstract class BaseRankingsPortletActionTestCase
 		).createRenderURL();
 	}
 
-	protected DuplicateQueryStringsDetector duplicateQueryStringsDetector =
-		Mockito.mock(DuplicateQueryStringsDetector.class);
-	protected IndexNameBuilder indexNameBuilder = Mockito.mock(
-		IndexNameBuilder.class);
-	protected RankingIndexReader rankingIndexReader = Mockito.mock(
-		RankingIndexReader.class);
-	protected RankingStorageAdapter rankingStorageAdapter = Mockito.mock(
-		RankingStorageAdapter.class);
+	@Mock
+	protected DuplicateQueryStringsDetector duplicateQueryStringsDetector;
+
+	@Mock
+	protected IndexNameBuilder indexNameBuilder;
+
+	@Mock
+	protected RankingIndexReader rankingIndexReader;
+
+	@Mock
+	protected RankingStorageAdapter rankingStorageAdapter;
 
 }

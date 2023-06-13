@@ -27,11 +27,12 @@ import com.liferay.info.pagination.InfoPage;
 import com.liferay.layout.list.retriever.DefaultLayoutListRetrieverContext;
 import com.liferay.layout.list.retriever.KeyListObjectReference;
 import com.liferay.layout.list.retriever.LayoutListRetriever;
-import com.liferay.layout.list.retriever.LayoutListRetrieverRegistry;
+import com.liferay.layout.list.retriever.LayoutListRetrieverTracker;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -47,6 +48,7 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -103,7 +105,7 @@ public class LayoutListRetrieverTest {
 
 		LayoutListRetriever<?, KeyListObjectReference> layoutListRetriever =
 			(LayoutListRetriever<?, KeyListObjectReference>)
-				_layoutListRetrieverRegistry.getLayoutListRetriever(
+				_layoutListRetrieverTracker.getLayoutListRetriever(
 					InfoListProviderItemSelectorReturnType.class.getName());
 
 		KeyListObjectReference keyListObjectReference =
@@ -113,14 +115,16 @@ public class LayoutListRetrieverTest {
 					AssetEntryRelatedInfoItemCollectionProvider.class.
 						getName()));
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId(),
+				new String[] {"tag1", "tag2"});
+
 		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString(), ContentTypes.APPLICATION_OCTET_STREAM,
-			new byte[0], null, null,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId(),
-				new String[] {"tag1", "tag2"}));
+			new byte[0], null, null, serviceContext);
 
 		DefaultLayoutListRetrieverContext layoutListRetrieverContext =
 			new DefaultLayoutListRetrieverContext();
@@ -157,7 +161,7 @@ public class LayoutListRetrieverTest {
 
 		LayoutListRetriever<?, KeyListObjectReference> layoutListRetriever =
 			(LayoutListRetriever<?, KeyListObjectReference>)
-				_layoutListRetrieverRegistry.getLayoutListRetriever(
+				_layoutListRetrieverTracker.getLayoutListRetriever(
 					InfoListProviderItemSelectorReturnType.class.getName());
 
 		KeyListObjectReference keyListObjectReference =
@@ -179,7 +183,7 @@ public class LayoutListRetrieverTest {
 	private Group _group;
 
 	@Inject
-	private LayoutListRetrieverRegistry _layoutListRetrieverRegistry;
+	private LayoutListRetrieverTracker _layoutListRetrieverTracker;
 
 	private static class AssetEntryRelatedInfoItemCollectionProvider
 		implements RelatedInfoItemCollectionProvider<AssetEntry, AssetTag> {
@@ -188,7 +192,10 @@ public class LayoutListRetrieverTest {
 		public InfoPage<AssetTag> getCollectionInfoPage(
 			CollectionQuery collectionQuery) {
 
-			Object relatedItem = collectionQuery.getRelatedItem();
+			Optional<Object> relatedItemOptional =
+				collectionQuery.getRelatedItemObjectOptional();
+
+			Object relatedItem = relatedItemOptional.orElse(null);
 
 			if (!(relatedItem instanceof AssetEntry)) {
 				return InfoPage.of(

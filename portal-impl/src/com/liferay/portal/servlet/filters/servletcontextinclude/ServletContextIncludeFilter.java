@@ -88,7 +88,7 @@ public class ServletContextIncludeFilter extends BasePortalFilter {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;

@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.document.UpdateByQueryDocumentRequest;
 import com.liferay.portal.search.query.BooleanQuery;
@@ -37,20 +36,19 @@ import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Feliphe Marinho
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class UserModelListener extends BaseModelListener<User> {
 
 	@Override
 	public void onBeforeUpdate(User originalUser, User user)
 		throws ModelListenerException {
-
-		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
-			return;
-		}
 
 		User currentUser = _userLocalService.fetchUserById(user.getUserId());
 
@@ -106,8 +104,13 @@ public class UserModelListener extends BaseModelListener<User> {
 			});
 	}
 
-	@Reference
-	protected SearchEngineAdapter searchEngineAdapter;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(search.engine.impl=Elasticsearch)"
+	)
+	protected volatile SearchEngineAdapter searchEngineAdapter;
 
 	@Reference(target = "(workflow.metrics.index.entity.name=instance)")
 	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
@@ -117,9 +120,6 @@ public class UserModelListener extends BaseModelListener<User> {
 
 	@Reference
 	private Scripts _scripts;
-
-	@Reference
-	private SearchCapabilities _searchCapabilities;
 
 	@Reference
 	private UserLocalService _userLocalService;

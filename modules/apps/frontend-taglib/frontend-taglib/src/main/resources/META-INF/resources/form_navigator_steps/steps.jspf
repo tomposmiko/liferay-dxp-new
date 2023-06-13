@@ -14,10 +14,6 @@
  */
 --%>
 
-<liferay-util:html-top>
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/form_navigator.css") %>" rel="stylesheet" type="text/css" />
-</liferay-util:html-top>
-
 <div class="taglib-form-navigator" id="<portlet:namespace />tabsBoundingBox">
 	<aui:input name="modifiedSections" type="hidden" />
 
@@ -97,8 +93,8 @@
 						error = true;
 					}
 
-					boolean foundActiveStep = false;
 					int step = 1;
+					boolean isFoundActiveStep = false;
 
 					for (int j = 0; j < sectionKeys.length; j++) {
 						String sectionIcon = "live";
@@ -123,11 +119,11 @@
 
 						if (curSection.equals(sectionKey) || curSection.equals(sectionId)) {
 							cssClass += " active";
-							foundActiveStep = true;
+							isFoundActiveStep = true;
 							sectionIcon = "circle";
 						}
 
-						if (!foundActiveStep) {
+						if (!isFoundActiveStep) {
 							cssClass += " complete";
 							sectionIcon = "check";
 						}
@@ -142,7 +138,7 @@
 
 							<div class="divider">
 								<svg aria-hidden="true" class="lexicon-icon lexicon-icon-<%= sectionIcon %>">
-									<use xlink:href="<%= themeDisplay.getPathThemeSpritemap() %>#<%= sectionIcon %>"></use>
+									<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg#<%= sectionIcon %>"></use>
 								</svg>
 							</div>
 

@@ -33,17 +33,27 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tomas Polesovsky
  */
 @Component(
-	property = "path=/portal/saml/auth_redirect", service = StrutsAction.class
+	immediate = true, property = "path=/portal/saml/auth_redirect",
+	service = StrutsAction.class
 )
 public class AuthRedirectAction extends BaseSamlStrutsAction {
 
 	@Override
 	public boolean isEnabled() {
-		if (_samlProviderConfigurationHelper.isRoleSp()) {
-			return _samlProviderConfigurationHelper.isEnabled();
+		if (samlProviderConfigurationHelper.isRoleSp()) {
+			return super.isEnabled();
 		}
 
 		return false;
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		super.setSamlProviderConfigurationHelper(
+			samlProviderConfigurationHelper);
 	}
 
 	@Override
@@ -72,8 +82,5 @@ public class AuthRedirectAction extends BaseSamlStrutsAction {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
 
 }

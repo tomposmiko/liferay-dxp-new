@@ -56,7 +56,7 @@ public class DeleteOrganizationPasswordPolicyChecker
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return false;

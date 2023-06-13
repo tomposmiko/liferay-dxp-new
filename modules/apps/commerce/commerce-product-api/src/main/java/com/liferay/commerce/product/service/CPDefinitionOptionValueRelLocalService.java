@@ -18,9 +18,7 @@ import com.liferay.commerce.product.model.CPDefinitionOptionValueRel;
 import com.liferay.commerce.product.model.CPInstanceOptionValueRel;
 import com.liferay.commerce.product.model.CPOptionValue;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -39,8 +37,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -67,15 +63,13 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see CPDefinitionOptionValueRelLocalServiceUtil
  * @generated
  */
-@CTAware
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface CPDefinitionOptionValueRelLocalService
-	extends BaseLocalService, CTService<CPDefinitionOptionValueRel>,
-			PersistedModelLocalService {
+	extends BaseLocalService, PersistedModelLocalService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -422,6 +416,28 @@ public interface CPDefinitionOptionValueRelLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Hits search(SearchContext searchContext);
 
+	/**
+	 * @param companyId
+	 * @param groupId
+	 * @param cpDefinitionOptionRelId
+	 * @param keywords
+	 * @param start
+	 * @param end
+	 * @param sort
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchCPDefinitionOptionValueRels(long, long, long, String,
+	 int, int, Sort[])}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BaseModelSearchResult<CPDefinitionOptionValueRel>
+			searchCPDefinitionOptionValueRels(
+				long companyId, long groupId, long cpDefinitionOptionRelId,
+				String keywords, int start, int end, Sort sort)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<CPDefinitionOptionValueRel>
 			searchCPDefinitionOptionValueRels(
@@ -449,6 +465,28 @@ public interface CPDefinitionOptionValueRelLocalService
 	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
 		CPDefinitionOptionValueRel cpDefinitionOptionValueRel);
 
+	/**
+	 * @param cpDefinitionOptionValueRelId
+	 * @param nameMap
+	 * @param priority
+	 * @param key
+	 * @param cpInstanceId
+	 * @param quantity
+	 * @param price
+	 * @param serviceContext
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Athanasius (7.3.x), use {@link
+	 #updateCPDefinitionOptionValueRel(long, Map, double, String,
+	 long, int, boolean, BigDecimal, ServiceContext)}
+	 */
+	@Deprecated
+	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
+			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
+			double priority, String key, long cpInstanceId, int quantity,
+			BigDecimal price, ServiceContext serviceContext)
+		throws PortalException;
+
 	@Indexable(type = IndexableType.REINDEX)
 	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
 			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
@@ -457,23 +495,26 @@ public interface CPDefinitionOptionValueRelLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @param cpDefinitionOptionValueRelId
+	 * @param nameMap
+	 * @param priority
+	 * @param key
+	 * @param serviceContext
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Athanasius (7.3.x), use {@link
+	 #updateCPDefinitionOptionValueRel(long, Map, double, String,
+	 long, int, boolean, BigDecimal, ServiceContext)}
+	 */
+	@Deprecated
+	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
+			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
+			double priority, String key, ServiceContext serviceContext)
+		throws PortalException;
+
 	public CPDefinitionOptionValueRel
 		updateCPDefinitionOptionValueRelPreselected(
 			long cpDefinitionOptionValueRelId, boolean preselected);
-
-	@Override
-	@Transactional(enabled = false)
-	public CTPersistence<CPDefinitionOptionValueRel> getCTPersistence();
-
-	@Override
-	@Transactional(enabled = false)
-	public Class<CPDefinitionOptionValueRel> getModelClass();
-
-	@Override
-	@Transactional(rollbackFor = Throwable.class)
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<CPDefinitionOptionValueRel>, R, E>
-				updateUnsafeFunction)
-		throws E;
 
 }

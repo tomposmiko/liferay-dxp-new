@@ -17,12 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ContentDashboardAdminConfigurationDisplayContext contentDashboardAdminConfigurationDisplayContext = (ContentDashboardAdminConfigurationDisplayContext)request.getAttribute(ContentDashboardAdminConfigurationDisplayContext.class.getName());
+ContentDashboardAdminConfigurationDisplayContext contentDashboardAdminConfigurationDisplayContext = (ContentDashboardAdminConfigurationDisplayContext)request.getAttribute(ContentDashboardWebKeys.CONTENT_DASHBOARD_ADMIN_CONFIGURATION_DISPLAY_CONTEXT);
 %>
-
-<liferay-util:html-top>
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/vocabularies_selection.css") %>" rel="stylesheet" type="text/css" />
-</liferay-util:html-top>
 
 <liferay-frontend:edit-form
 	action="<%= contentDashboardAdminConfigurationDisplayContext.getActionURL() %>"
@@ -31,11 +27,10 @@ ContentDashboardAdminConfigurationDisplayContext contentDashboardAdminConfigurat
 	onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveConfiguration();" %>'
 >
 	<aui:input name="redirect" type="hidden" value="<%= contentDashboardAdminConfigurationDisplayContext.getRedirect() %>" />
-
-	<aui:input name="assetVocabularyIds" type="hidden" />
+	<aui:input name="assetVocabularyNames" type="hidden" />
 
 	<liferay-frontend:edit-form-body>
-		<c:if test='<%= GetterUtil.getBoolean(SessionMessages.get(renderRequest, "emptyAssetVocabularyIds")) %>'>
+		<c:if test='<%= GetterUtil.getBoolean(SessionMessages.get(renderRequest, "emptyAssetVocabularyNames")) %>'>
 			<clay:alert
 				dismissible="<%= true %>"
 				displayType="warning"
@@ -43,51 +38,43 @@ ContentDashboardAdminConfigurationDisplayContext contentDashboardAdminConfigurat
 			/>
 		</c:if>
 
-		<liferay-frontend:fieldset>
-			<aui:field-wrapper>
-				<p class="sheet-text">
-					<liferay-ui:message key="select-vocabularies-description" />
-				</p>
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset>
+				<aui:field-wrapper>
+					<p class="sheet-text">
+						<liferay-ui:message key="select-vocabularies-description" />
+					</p>
 
-				<div class="vocabularies-selection-wrapper">
-					<span
-						aria-hidden="true"
-						class="loading-animation
-						vocabularies-selection-loader"
-					>
-					</span>
-
-					<react:component
-						module="js/components/VocabulariesSelectionBox"
-						props='<%=
-							HashMapBuilder.<String, Object>put(
-								"leftBoxName", "availableAssetVocabularyIds"
-							).put(
-								"leftList", contentDashboardAdminConfigurationDisplayContext.getAvailableVocabularyJSONArray()
-							).put(
-								"rightBoxName", "currentAssetVocabularyIds"
-							).put(
-								"rightList", contentDashboardAdminConfigurationDisplayContext.getCurrentVocabularyJSONArray()
-							).build()
-						%>'
+					<liferay-ui:input-move-boxes
+						leftBoxName="availableAssetVocabularyNames"
+						leftList="<%= contentDashboardAdminConfigurationDisplayContext.getAvailableVocabularyNames() %>"
+						leftTitle="available"
+						rightBoxMaxItems="<%= 2 %>"
+						rightBoxName="currentAssetVocabularyNames"
+						rightList="<%= contentDashboardAdminConfigurationDisplayContext.getCurrentVocabularyNames() %>"
+						rightReorder="<%= Boolean.TRUE.toString() %>"
+						rightTitle="in-use"
 					/>
-				</div>
-			</aui:field-wrapper>
-		</liferay-frontend:fieldset>
+				</aui:field-wrapper>
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
 <aui:script>
 	function <portlet:namespace />saveConfiguration() {
 		var form = document.<portlet:namespace />fm;
+
 		Liferay.Util.postForm(form, {
 			data: {
-				assetVocabularyIds: Liferay.Util.getSelectedOptionValues(
-					Liferay.Util.getFormElement(form, 'currentAssetVocabularyIds')
+				assetVocabularyNames: Liferay.Util.listSelect(
+					Liferay.Util.getFormElement(form, 'currentAssetVocabularyNames')
 				),
 			},
 		});

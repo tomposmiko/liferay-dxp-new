@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Bryan Engler
  */
-@Component(service = GroupByRequestFactory.class)
+@Component(immediate = true, service = GroupByRequestFactory.class)
 public class GroupByRequestFactoryImpl implements GroupByRequestFactory {
 
 	@Override

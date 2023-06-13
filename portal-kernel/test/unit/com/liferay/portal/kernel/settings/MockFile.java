@@ -52,7 +52,15 @@ public class MockFile implements com.liferay.portal.kernel.util.File {
 	}
 
 	@Override
+	public void copyFile(File source, File destination, boolean lazy) {
+	}
+
+	@Override
 	public void copyFile(String source, String destination) {
+	}
+
+	@Override
+	public void copyFile(String source, String destination, boolean lazy) {
 	}
 
 	@Override
@@ -139,13 +147,20 @@ public class MockFile implements com.liferay.portal.kernel.util.File {
 	}
 
 	@Override
-	public String extractText(InputStream inputStream) {
+	public String extractText(InputStream inputStream, String fileName) {
 		return null;
 	}
 
 	@Override
-	public String extractText(InputStream inputStream, int maxStringLength) {
+	public String extractText(
+		InputStream inputStream, String fileName, int maxStringLength) {
+
 		return null;
+	}
+
+	@Override
+	public String[] find(String directory, String includes, String excludes) {
+		return new String[0];
 	}
 
 	@Override
@@ -198,6 +213,11 @@ public class MockFile implements com.liferay.portal.kernel.util.File {
 	@Override
 	public String getShortFileName(String fullFileName) {
 		return null;
+	}
+
+	@Override
+	public boolean isAscii(File file) {
+		return false;
 	}
 
 	@Override

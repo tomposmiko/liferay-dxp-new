@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = ScreenNavigationRegistry.class)
+@Component(immediate = true, service = ScreenNavigationRegistry.class)
 public class ScreenNavigationRegistry {
 
 	public <T> List<ScreenNavigationCategory> getScreenNavigationCategories(
@@ -48,21 +48,26 @@ public class ScreenNavigationRegistry {
 
 		return ListUtil.filter(
 			screenNavigationCategories,
-			screenNavigationCategory -> ListUtil.isNotEmpty(
-				getScreenNavigationEntries(
-					screenNavigationCategory, user, context)));
+			screenNavigationCategory -> {
+				List<ScreenNavigationEntry<T>> screenNavigationEntries =
+					getScreenNavigationEntries(
+						screenNavigationCategory, user, context);
+
+				return ListUtil.isNotEmpty(screenNavigationEntries);
+			});
 	}
 
 	public <T> List<ScreenNavigationEntry<T>> getScreenNavigationEntries(
 		ScreenNavigationCategory screenNavigationCategory, User user,
 		T context) {
 
+		String key = _getKey(
+			screenNavigationCategory.getScreenNavigationKey(),
+			screenNavigationCategory.getCategoryKey());
+
 		List<ScreenNavigationEntry<T>> screenNavigationEntries =
 			(List<ScreenNavigationEntry<T>>)
-				(List<?>)_screenNavigationEntriesMap.getService(
-					_getKey(
-						screenNavigationCategory.getScreenNavigationKey(),
-						screenNavigationCategory.getCategoryKey()));
+				(List<?>)_screenNavigationEntriesMap.getService(key);
 
 		if (ListUtil.isEmpty(screenNavigationEntries)) {
 			return Collections.emptyList();

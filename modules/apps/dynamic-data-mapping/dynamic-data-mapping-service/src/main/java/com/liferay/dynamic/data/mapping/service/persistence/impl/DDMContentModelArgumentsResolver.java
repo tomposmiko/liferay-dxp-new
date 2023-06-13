@@ -34,11 +34,8 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.dynamic.data.mapping.model.impl.DDMContentImpl",
-		"table.name=DDMContent"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {DDMContentModelArgumentsResolver.class, ArgumentsResolver.class}
 )
 public class DDMContentModelArgumentsResolver implements ArgumentsResolver {
 

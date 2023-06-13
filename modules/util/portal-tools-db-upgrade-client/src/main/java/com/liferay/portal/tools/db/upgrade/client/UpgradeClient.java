@@ -40,8 +40,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jline.console.ConsoleReader;
 
@@ -233,8 +231,10 @@ public class UpgradeClient {
 			ioException.printStackTrace();
 		}
 
-		try (GogoShellClient gogoShellClient = _initGogoShellClient()) {
-			if (!_isModuleUpgradesFinished(gogoShellClient) || _shell) {
+		try (GogoShellClient gogoShellClient = new GogoShellClient()) {
+			boolean finished = _isFinished(gogoShellClient);
+
+			if (!finished || _shell) {
 				System.out.println("Connecting to Gogo shell...");
 
 				_printHelp();
@@ -267,17 +267,6 @@ public class UpgradeClient {
 	}
 
 	public void verifyProperties() {
-		File file = new File(
-			System.getProperty("user.home") + "/portal-ext.properties");
-
-		if (file.exists()) {
-			System.err.println(
-				"Remove " + file + " prior to running an upgrade to prevent " +
-					"possible conflicts.");
-
-			System.exit(0);
-		}
-
 		try {
 			_verifyAppServerProperties();
 			_verifyPortalUpgradeDatabaseProperties();
@@ -362,6 +351,8 @@ public class UpgradeClient {
 
 		_appendClassPath(sb, _jarDir);
 
+		_appendClassPath(sb, _appServer.getGlobalLibDir());
+
 		sb.append(_appServer.getPortalClassesDir());
 		sb.append(File.pathSeparator);
 
@@ -369,45 +360,17 @@ public class UpgradeClient {
 
 		_appendClassPath(sb, _appServer.getPortalShieldedContainerLibDir());
 
-		_appendClassPath(sb, _appServer.getGlobalLibDir());
-
 		_appendClassPath(sb, _appServer.getExtraLibDirs());
 
 		return sb.toString();
 	}
 
-	private GogoShellClient _initGogoShellClient() throws IOException {
-		String value = _portalUpgradeExtProperties.getProperty(
-			"module.framework.properties.osgi.console");
-
-		if (value == null) {
-			return new GogoShellClient();
-		}
-
-		Matcher matcher = _gogoShellAddressPattern.matcher(value);
-
-		if (!matcher.find()) {
-			return new GogoShellClient();
-		}
-
-		String host = matcher.group(1);
-		int port = Integer.parseInt(matcher.group(2));
-
-		return new GogoShellClient(host, port);
-	}
-
-	private boolean _isModuleUpgradesFinished(GogoShellClient gogoShellClient)
+	private boolean _isFinished(GogoShellClient gogoShellClient)
 		throws IOException {
 
+		System.out.print("Checking to see if all upgrades have completed...");
+
 		String upgradeCheck = gogoShellClient.send("upgrade:check");
-
-		if (upgradeCheck.contains("CommandNotFoundException")) {
-			System.out.print("Portal upgrade failed. Fix the issue and retry.");
-
-			return true;
-		}
-
-		System.out.println("Checking to see if all upgrades have completed...");
 
 		String upgradeSteps = gogoShellClient.send(
 			"upgrade:list | grep Registered | grep step");
@@ -416,13 +379,13 @@ public class UpgradeClient {
 			upgradeSteps.contains("true")) {
 
 			System.out.println(
-				"Module upgrades have failed, have not started, or are still " +
+				" your upgrades have failed, have not started, or are still " +
 					"running.");
 
 			return false;
 		}
 
-		System.out.println("Looks good.");
+		System.out.println(" done.");
 
 		return true;
 	}
@@ -773,8 +736,6 @@ public class UpgradeClient {
 				put("sybase", Database.getSybaseDatabase());
 			}
 		};
-	private static final Pattern _gogoShellAddressPattern = Pattern.compile(
-		"^([^\\:]+):([0-9]{1,5})$");
 	private static File _jarDir;
 
 	static {

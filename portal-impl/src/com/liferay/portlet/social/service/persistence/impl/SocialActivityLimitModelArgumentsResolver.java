@@ -17,7 +17,6 @@ package com.liferay.portlet.social.service.persistence.impl;
 import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portlet.social.model.impl.SocialActivityLimitImpl;
 import com.liferay.portlet.social.model.impl.SocialActivityLimitModelImpl;
 import com.liferay.social.kernel.model.SocialActivityLimitTable;
@@ -31,13 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"class.name=com.liferay.portlet.social.model.impl.SocialActivityLimitImpl",
-		"table.name=SocialActivityLimit"
-	},
-	service = ArgumentsResolver.class
-)
 public class SocialActivityLimitModelArgumentsResolver
 	implements ArgumentsResolver {
 

@@ -27,10 +27,6 @@ public class DLAppHelperLocalServiceWrapper
 	implements DLAppHelperLocalService,
 			   ServiceWrapper<DLAppHelperLocalService> {
 
-	public DLAppHelperLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLAppHelperLocalServiceWrapper(
 		DLAppHelperLocalService dlAppHelperLocalService) {
 
@@ -329,11 +325,13 @@ public class DLAppHelperLocalServiceWrapper
 			long userId,
 			com.liferay.portal.kernel.repository.model.FileEntry fileEntry,
 			com.liferay.portal.kernel.repository.model.FileVersion fileVersion,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			long[] assetCategoryIds, String[] assetTagNames,
+			long[] assetLinkEntryIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _dlAppHelperLocalService.updateAsset(
-			userId, fileEntry, fileVersion, serviceContext);
+			userId, fileEntry, fileVersion, assetCategoryIds, assetTagNames,
+			assetLinkEntryIds);
 	}
 
 	@Override

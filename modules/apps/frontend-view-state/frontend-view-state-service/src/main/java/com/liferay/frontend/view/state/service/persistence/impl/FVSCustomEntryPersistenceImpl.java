@@ -20,7 +20,6 @@ import com.liferay.frontend.view.state.model.FVSCustomEntryTable;
 import com.liferay.frontend.view.state.model.impl.FVSCustomEntryImpl;
 import com.liferay.frontend.view.state.model.impl.FVSCustomEntryModelImpl;
 import com.liferay.frontend.view.state.service.persistence.FVSCustomEntryPersistence;
-import com.liferay.frontend.view.state.service.persistence.FVSCustomEntryUtil;
 import com.liferay.frontend.view.state.service.persistence.impl.constants.FVSPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -45,11 +45,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -76,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = FVSCustomEntryPersistence.class)
+@Component(service = {FVSCustomEntryPersistence.class, BasePersistence.class})
 public class FVSCustomEntryPersistenceImpl
 	extends BasePersistenceImpl<FVSCustomEntry>
 	implements FVSCustomEntryPersistence {
@@ -193,7 +192,7 @@ public class FVSCustomEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<FVSCustomEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FVSCustomEntry fvsCustomEntry : list) {
@@ -576,7 +575,7 @@ public class FVSCustomEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -735,7 +734,7 @@ public class FVSCustomEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<FVSCustomEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (FVSCustomEntry fvsCustomEntry : list) {
@@ -1151,7 +1150,7 @@ public class FVSCustomEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1321,7 +1320,7 @@ public class FVSCustomEntryPersistenceImpl
 		fvsCustomEntry.setNew(true);
 		fvsCustomEntry.setPrimaryKey(fvsCustomEntryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		fvsCustomEntry.setUuid(uuid);
 
@@ -1441,7 +1440,7 @@ public class FVSCustomEntryPersistenceImpl
 			(FVSCustomEntryModelImpl)fvsCustomEntry;
 
 		if (Validator.isNull(fvsCustomEntry.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			fvsCustomEntry.setUuid(uuid);
 		}
@@ -1636,7 +1635,7 @@ public class FVSCustomEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<FVSCustomEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1706,7 +1705,7 @@ public class FVSCustomEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1813,31 +1812,11 @@ public class FVSCustomEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
-
-		_setFVSCustomEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setFVSCustomEntryUtilPersistence(null);
-
 		entityCache.removeCache(FVSCustomEntryImpl.class.getName());
-	}
-
-	private void _setFVSCustomEntryUtilPersistence(
-		FVSCustomEntryPersistence fvsCustomEntryPersistence) {
-
-		try {
-			Field field = FVSCustomEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, fvsCustomEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -1904,6 +1883,7 @@ public class FVSCustomEntryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private FVSCustomEntryModelArgumentsResolver
+		_fvsCustomEntryModelArgumentsResolver;
 
 }

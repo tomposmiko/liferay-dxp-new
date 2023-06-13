@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.object.model.ObjectAction",
 	service = KeywordQueryContributor.class
 )
@@ -46,8 +47,6 @@ public class ObjectActionKeywordQueryContributor
 			booleanQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		_queryHelper.addSearchTerm(
 			booleanQuery, searchContext, Field.NAME, false);
-		_queryHelper.addSearchLocalizedTerm(
-			booleanQuery, searchContext, "label", false);
 	}
 
 	@Reference

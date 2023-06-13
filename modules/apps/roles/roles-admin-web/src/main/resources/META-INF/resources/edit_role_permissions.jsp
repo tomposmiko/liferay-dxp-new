@@ -376,11 +376,11 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 		Liferay.Util.postForm(form, {
 			data: {
 				redirect: '<%= HtmlUtil.escapeJS(redirect) %>',
-				selectedTargets: Liferay.Util.getCheckedCheckboxes(
+				selectedTargets: Liferay.Util.listCheckedExcept(
 					form,
 					'<portlet:namespace />allRowIds'
 				),
-				unselectedTargets: Liferay.Util.getUncheckedCheckboxes(
+				unselectedTargets: Liferay.Util.listUncheckedExcept(
 					form,
 					'<portlet:namespace />allRowIds'
 				),

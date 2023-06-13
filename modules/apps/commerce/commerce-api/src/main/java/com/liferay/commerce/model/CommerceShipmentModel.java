@@ -17,9 +17,7 @@ package com.liferay.commerce.model;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.StagedAuditedModel;
 
 import java.util.Date;
 
@@ -38,8 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommerceShipmentModel
-	extends BaseModel<CommerceShipment>, GroupedModel, MVCCModel, ShardedModel,
-			StagedAuditedModel {
+	extends BaseModel<CommerceShipment>, GroupedModel, ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -60,54 +57,6 @@ public interface CommerceShipmentModel
 	 * @param primaryKey the primary key of this commerce shipment
 	 */
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this commerce shipment.
-	 *
-	 * @return the mvcc version of this commerce shipment
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this commerce shipment.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce shipment
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the uuid of this commerce shipment.
-	 *
-	 * @return the uuid of this commerce shipment
-	 */
-	@AutoEscape
-	@Override
-	public String getUuid();
-
-	/**
-	 * Sets the uuid of this commerce shipment.
-	 *
-	 * @param uuid the uuid of this commerce shipment
-	 */
-	@Override
-	public void setUuid(String uuid);
-
-	/**
-	 * Returns the external reference code of this commerce shipment.
-	 *
-	 * @return the external reference code of this commerce shipment
-	 */
-	@AutoEscape
-	public String getExternalReferenceCode();
-
-	/**
-	 * Sets the external reference code of this commerce shipment.
-	 *
-	 * @param externalReferenceCode the external reference code of this commerce shipment
-	 */
-	public void setExternalReferenceCode(String externalReferenceCode);
 
 	/**
 	 * Returns the commerce shipment ID of this commerce shipment.
@@ -279,49 +228,6 @@ public interface CommerceShipmentModel
 	public void setCommerceShippingMethodId(long commerceShippingMethodId);
 
 	/**
-	 * Returns the carrier of this commerce shipment.
-	 *
-	 * @return the carrier of this commerce shipment
-	 */
-	@AutoEscape
-	public String getCarrier();
-
-	/**
-	 * Sets the carrier of this commerce shipment.
-	 *
-	 * @param carrier the carrier of this commerce shipment
-	 */
-	public void setCarrier(String carrier);
-
-	/**
-	 * Returns the expected date of this commerce shipment.
-	 *
-	 * @return the expected date of this commerce shipment
-	 */
-	public Date getExpectedDate();
-
-	/**
-	 * Sets the expected date of this commerce shipment.
-	 *
-	 * @param expectedDate the expected date of this commerce shipment
-	 */
-	public void setExpectedDate(Date expectedDate);
-
-	/**
-	 * Returns the shipping date of this commerce shipment.
-	 *
-	 * @return the shipping date of this commerce shipment
-	 */
-	public Date getShippingDate();
-
-	/**
-	 * Sets the shipping date of this commerce shipment.
-	 *
-	 * @param shippingDate the shipping date of this commerce shipment
-	 */
-	public void setShippingDate(Date shippingDate);
-
-	/**
 	 * Returns the shipping option name of this commerce shipment.
 	 *
 	 * @return the shipping option name of this commerce shipment
@@ -335,6 +241,21 @@ public interface CommerceShipmentModel
 	 * @param shippingOptionName the shipping option name of this commerce shipment
 	 */
 	public void setShippingOptionName(String shippingOptionName);
+
+	/**
+	 * Returns the carrier of this commerce shipment.
+	 *
+	 * @return the carrier of this commerce shipment
+	 */
+	@AutoEscape
+	public String getCarrier();
+
+	/**
+	 * Sets the carrier of this commerce shipment.
+	 *
+	 * @param carrier the carrier of this commerce shipment
+	 */
+	public void setCarrier(String carrier);
 
 	/**
 	 * Returns the tracking number of this commerce shipment.
@@ -352,19 +273,32 @@ public interface CommerceShipmentModel
 	public void setTrackingNumber(String trackingNumber);
 
 	/**
-	 * Returns the tracking url of this commerce shipment.
+	 * Returns the shipping date of this commerce shipment.
 	 *
-	 * @return the tracking url of this commerce shipment
+	 * @return the shipping date of this commerce shipment
 	 */
-	@AutoEscape
-	public String getTrackingURL();
+	public Date getShippingDate();
 
 	/**
-	 * Sets the tracking url of this commerce shipment.
+	 * Sets the shipping date of this commerce shipment.
 	 *
-	 * @param trackingURL the tracking url of this commerce shipment
+	 * @param shippingDate the shipping date of this commerce shipment
 	 */
-	public void setTrackingURL(String trackingURL);
+	public void setShippingDate(Date shippingDate);
+
+	/**
+	 * Returns the expected date of this commerce shipment.
+	 *
+	 * @return the expected date of this commerce shipment
+	 */
+	public Date getExpectedDate();
+
+	/**
+	 * Sets the expected date of this commerce shipment.
+	 *
+	 * @param expectedDate the expected date of this commerce shipment
+	 */
+	public void setExpectedDate(Date expectedDate);
 
 	/**
 	 * Returns the status of this commerce shipment.
@@ -382,9 +316,5 @@ public interface CommerceShipmentModel
 
 	@Override
 	public CommerceShipment cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

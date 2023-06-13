@@ -18,20 +18,20 @@ import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.retriever.AccountUserRetriever;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
-import com.liferay.account.service.test.util.AccountEntryArgs;
 import com.liferay.account.service.test.util.AccountEntryTestUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -41,10 +41,7 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
-import java.io.Serializable;
-
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
@@ -73,18 +70,18 @@ public class AccountUserRetrieverWhenSearchingByEmailAddressDomainsTest {
 		_users.add(_addAccountUser("test.com"));
 
 		_accountEntry = AccountEntryTestUtil.addAccountEntry(
-			AccountEntryArgs.withDomains("test.com"));
+			_accountEntryLocalService, new String[] {"test.com"});
 
 		BaseModelSearchResult<User> expectedBaseModelSearchResult =
 			_accountUserRetriever.searchAccountUsers(
-				new long[] {AccountConstants.ACCOUNT_ENTRY_ID_ANY}, null,
-				new LinkedHashMap<>(), WorkflowConstants.STATUS_APPROVED,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, "screen-name", false);
+				AccountConstants.ACCOUNT_ENTRY_ID_ANY, null,
+				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, "screen-name", false);
 		BaseModelSearchResult<User> actualBaseModelSearchResult =
 			_accountUserRetriever.searchAccountUsers(
-				new long[] {AccountConstants.ACCOUNT_ENTRY_ID_ANY}, null,
-				new LinkedHashMap<>(), WorkflowConstants.STATUS_APPROVED,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS, "screen-name", false);
+				AccountConstants.ACCOUNT_ENTRY_ID_ANY, null, null,
+				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, "screen-name", false);
 
 		Assert.assertEquals(
 			expectedBaseModelSearchResult.getLength(),
@@ -114,15 +111,12 @@ public class AccountUserRetrieverWhenSearchingByEmailAddressDomainsTest {
 		_users.addAll(users);
 
 		_accountEntry = AccountEntryTestUtil.addAccountEntry(
-			AccountEntryArgs.withDomains(emailAddressDomains));
+			_accountEntryLocalService, emailAddressDomains);
 
 		BaseModelSearchResult<User> baseModelSearchResult =
 			_accountUserRetriever.searchAccountUsers(
-				new long[] {AccountConstants.ACCOUNT_ENTRY_ID_ANY}, null,
-				LinkedHashMapBuilder.<String, Serializable>put(
-					"emailAddressDomains", emailAddressDomains
-				).build(),
-				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+				AccountConstants.ACCOUNT_ENTRY_ID_ANY, emailAddressDomains,
+				null, WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, "email-address", false);
 
 		Assert.assertEquals(users.size(), baseModelSearchResult.getLength());
@@ -138,18 +132,16 @@ public class AccountUserRetrieverWhenSearchingByEmailAddressDomainsTest {
 		_users.add(UserTestUtil.addUser());
 		_users.add(_addAccountUser("test.com"));
 
-		_accountEntry = AccountEntryTestUtil.addAccountEntry();
+		_accountEntry = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
 
 		String[] emailAddressDomains = StringUtil.split(
 			_accountEntry.getDomains());
 
 		BaseModelSearchResult<User> baseModelSearchResult =
 			_accountUserRetriever.searchAccountUsers(
-				new long[] {AccountConstants.ACCOUNT_ENTRY_ID_ANY}, null,
-				LinkedHashMapBuilder.<String, Serializable>put(
-					"emailAddressDomains", emailAddressDomains
-				).build(),
-				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+				AccountConstants.ACCOUNT_ENTRY_ID_ANY, emailAddressDomains,
+				null, WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
 				QueryUtil.ALL_POS, "email-address", false);
 
 		Assert.assertEquals(0, baseModelSearchResult.getLength());
@@ -184,6 +176,9 @@ public class AccountUserRetrieverWhenSearchingByEmailAddressDomainsTest {
 	private AccountEntry _accountEntry;
 
 	@Inject
+	private AccountEntryLocalService _accountEntryLocalService;
+
+	@Inject
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
 
 	@DeleteAfterTestRun
@@ -192,6 +187,9 @@ public class AccountUserRetrieverWhenSearchingByEmailAddressDomainsTest {
 
 	@Inject
 	private AccountUserRetriever _accountUserRetriever;
+
+	@Inject
+	private UserLocalService _userLocalService;
 
 	@DeleteAfterTestRun
 	private final List<User> _users = new ArrayList<>();

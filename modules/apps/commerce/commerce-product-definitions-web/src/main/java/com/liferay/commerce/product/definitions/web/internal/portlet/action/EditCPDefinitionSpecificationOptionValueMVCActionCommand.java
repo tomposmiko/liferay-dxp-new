@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_definition_specification_option_value"
@@ -53,42 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCPDefinitionSpecificationOptionValueMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.ADD) ||
-				cmd.equals(Constants.ADD_MULTIPLE)) {
-
-				_addCPDefinitionSpecificationOptionValues(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCPDefinitionSpecificationOptionValues(actionRequest);
-			}
-			else if (cmd.equals(Constants.UPDATE)) {
-				_updateCPDefinitionSpecificationOptionValue(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof
-					NoSuchCPDefinitionSpecificationOptionValueException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-
-				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
-			}
-			else {
-				throw exception;
-			}
-		}
-	}
-
-	private void _addCPDefinitionSpecificationOptionValues(
+	protected void addCPDefinitionSpecificationOptionValues(
 			ActionRequest actionRequest)
 		throws Exception {
 
@@ -128,7 +94,7 @@ public class EditCPDefinitionSpecificationOptionValueMVCActionCommand
 		}
 	}
 
-	private void _deleteCPDefinitionSpecificationOptionValues(
+	protected void deleteCPDefinitionSpecificationOptionValues(
 			ActionRequest actionRequest)
 		throws Exception {
 
@@ -159,8 +125,43 @@ public class EditCPDefinitionSpecificationOptionValueMVCActionCommand
 		}
 	}
 
-	private CPDefinitionSpecificationOptionValue
-			_updateCPDefinitionSpecificationOptionValue(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.ADD) ||
+				cmd.equals(Constants.ADD_MULTIPLE)) {
+
+				addCPDefinitionSpecificationOptionValues(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deleteCPDefinitionSpecificationOptionValues(actionRequest);
+			}
+			else if (cmd.equals(Constants.UPDATE)) {
+				updateCPDefinitionSpecificationOptionValue(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof
+					NoSuchCPDefinitionSpecificationOptionValueException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+
+				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+			}
+			else {
+				throw exception;
+			}
+		}
+	}
+
+	protected CPDefinitionSpecificationOptionValue
+			updateCPDefinitionSpecificationOptionValue(
 				ActionRequest actionRequest)
 		throws Exception {
 
@@ -169,7 +170,7 @@ public class EditCPDefinitionSpecificationOptionValueMVCActionCommand
 
 		long cpOptionCategoryId = ParamUtil.getLong(
 			actionRequest, "CPOptionCategoryId");
-		Map<Locale, String> valueMap = _localization.getLocalizationMap(
+		Map<Locale, String> valueMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "value");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 
@@ -189,8 +190,5 @@ public class EditCPDefinitionSpecificationOptionValueMVCActionCommand
 
 	@Reference
 	private CPSpecificationOptionService _cpSpecificationOptionService;
-
-	@Reference
-	private Localization _localization;
 
 }

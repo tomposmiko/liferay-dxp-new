@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -29,24 +27,23 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8359 | Test Summary: Page profile views by location shows where views are coming from"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test PageLocationCardShowsViewsByExpectedLocation {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time
 		// AC Refactor ticket: LRAC-9268
@@ -56,7 +53,7 @@ definition {
 		}
 
 		task ("View the page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -72,7 +69,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to Pages tab in Sites dashboard") {
@@ -104,7 +101,7 @@ definition {
 
 			ACCards.viewGeomapTableText(
 				cardTitle = "Views by Location",
-				leftText = ${country},
+				leftText = "${country}",
 				rightText = "1 100%");
 		}
 	}

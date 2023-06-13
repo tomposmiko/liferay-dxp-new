@@ -16,7 +16,6 @@ package com.liferay.asset.list.staging.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.list.model.AssetListEntry;
-import com.liferay.asset.list.model.AssetListEntrySegmentsEntryRel;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalService;
 import com.liferay.asset.list.util.AssetListStagingTestUtil;
@@ -30,13 +29,9 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.segments.model.SegmentsEntry;
-import com.liferay.segments.service.SegmentsEntryLocalService;
 import com.liferay.segments.service.SegmentsEntryLocalServiceUtil;
 import com.liferay.segments.test.util.SegmentsTestUtil;
 
@@ -126,54 +121,29 @@ public class AssetListEntryStagingTest {
 		SegmentsEntry segmentsEntry = SegmentsTestUtil.addSegmentsEntry(
 			_stagingGroup.getGroupId());
 
-		AssetListEntrySegmentsEntryRel assetListEntrySegmentsEntryRel =
-			AssetListTestUtil.addAssetListEntrySegmentsEntryRel(
-				_stagingGroup.getGroupId(), assetListEntry,
-				segmentsEntry.getSegmentsEntryId());
+		AssetListTestUtil.addAssetListEntrySegmentsEntryRel(
+			_stagingGroup.getGroupId(), assetListEntry,
+			segmentsEntry.getSegmentsEntryId());
 
-		UnicodeProperties unicodeProperties = UnicodePropertiesBuilder.create(
-			true
-		).put(
-			"groupIds", String.valueOf(_liveGroup.getGroupId())
-		).build();
-
-		assetListEntrySegmentsEntryRel.setTypeSettings(
-			unicodeProperties.toString());
-
-		_assetListEntrySegmentsEntryRelLocalService.
-			updateAssetListEntrySegmentsEntryRel(
-				assetListEntrySegmentsEntryRel);
+		int assetListEntrySegmentsEntryRelsCount =
+			_assetListEntrySegmentsEntryRelLocalService.
+				getAssetListEntrySegmentsEntryRelsCount(
+					assetListEntry.getAssetListEntryId());
 
 		AssetListStagingTestUtil.publishLayouts(_stagingGroup, _liveGroup);
 
 		AssetListEntry liveAssetListEntry =
-			_assetListEntryLocalService.getAssetListEntryByUuidAndGroupId(
+			_assetListEntryLocalService.fetchAssetListEntryByUuidAndGroupId(
 				assetListEntry.getUuid(), _liveGroup.getGroupId());
 
-		SegmentsEntry liveSegmentsEntry =
-			_segmentsEntryLocalService.getSegmentsEntryByUuidAndGroupId(
-				segmentsEntry.getUuid(), _liveGroup.getGroupId());
-
-		AssetListEntrySegmentsEntryRel liveAssetListEntrySegmentsEntryRel =
+		int liveAssetListEntrySegmentsEntryRelsCount =
 			_assetListEntrySegmentsEntryRelLocalService.
-				fetchAssetListEntrySegmentsEntryRel(
-					liveAssetListEntry.getAssetListEntryId(),
-					liveSegmentsEntry.getSegmentsEntryId());
+				getAssetListEntrySegmentsEntryRelsCount(
+					liveAssetListEntry.getAssetListEntryId());
 
-		Assert.assertNotNull(liveAssetListEntrySegmentsEntryRel);
-
-		UnicodeProperties liveUnicodeProperties =
-			UnicodePropertiesBuilder.create(
-				true
-			).fastLoad(
-				liveAssetListEntry.getTypeSettings(
-					liveSegmentsEntry.getSegmentsEntryId())
-			).build();
-
-		long groupId = GetterUtil.getLong(
-			liveUnicodeProperties.get("groupIds"));
-
-		Assert.assertEquals(_liveGroup.getGroupId(), groupId);
+		Assert.assertEquals(
+			assetListEntrySegmentsEntryRelsCount,
+			liveAssetListEntrySegmentsEntryRelsCount);
 	}
 
 	@Test
@@ -298,10 +268,6 @@ public class AssetListEntryStagingTest {
 	private Group _liveGroup;
 
 	private PermissionChecker _originalPermissionChecker;
-
-	@Inject
-	private SegmentsEntryLocalService _segmentsEntryLocalService;
-
 	private Group _stagingGroup;
 
 }

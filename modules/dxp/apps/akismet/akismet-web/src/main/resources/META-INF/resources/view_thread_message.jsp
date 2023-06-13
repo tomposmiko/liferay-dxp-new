@@ -91,7 +91,7 @@ if (messageId > 0) {
 					User messageUser = UserLocalServiceUtil.fetchUser(message.getUserId());
 					%>
 
-					<c:if test="<%= (messageUser != null) && !messageUser.isGuestUser() %>">
+					<c:if test="<%= (messageUser != null) && !messageUser.isDefaultUser() %>">
 
 						<%
 						String[] ranks = MBStatsUserLocalServiceUtil.getUserRank(themeDisplay.getSiteGroupId(), themeDisplay.getLanguageId(), message.getUserId());

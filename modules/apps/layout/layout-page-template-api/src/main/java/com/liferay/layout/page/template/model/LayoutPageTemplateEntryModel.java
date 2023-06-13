@@ -569,8 +569,4 @@ public interface LayoutPageTemplateEntryModel
 	@Override
 	public LayoutPageTemplateEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

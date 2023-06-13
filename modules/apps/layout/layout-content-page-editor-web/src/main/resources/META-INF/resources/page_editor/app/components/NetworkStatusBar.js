@@ -16,42 +16,43 @@ import ClayIcon from '@clayui/icon';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {useEventListener} from '@liferay/frontend-js-react-web';
 import {openToast} from 'frontend-js-web';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {SERVICE_NETWORK_STATUS_TYPES} from '../config/constants/serviceNetworkStatusTypes';
+
+const LoadingText = ({children}) => (
+	<>
+		<span className="d-none d-sm-block m-0 navbar-text page-editor__status-bar text-info">
+			{children}
+		</span>
+		<ClayLoadingIndicator className="my-0" small />
+	</>
+);
+
+const SuccessText = ({children}) => (
+	<>
+		<span className="d-none d-sm-block m-0 navbar-text page-editor__status-bar text-success">
+			{children}
+		</span>
+		<ClayIcon className="text-success" symbol="check-circle" />
+	</>
+);
 
 const getContent = (isOnline, status) => {
 	if (!isOnline) {
 		return (
-			<ClayLoadingIndicator
-				aria-label={Liferay.Language.get('trying-to-reconnect')}
-				className="my-0"
-				size="sm"
-				title={Liferay.Language.get('trying-to-reconnect')}
-			/>
+			<LoadingText>
+				{Liferay.Language.get('trying-to-reconnect')}
+			</LoadingText>
 		);
 	}
 
 	if (status === SERVICE_NETWORK_STATUS_TYPES.draftSaved) {
-		return (
-			<ClayIcon
-				aria-label={Liferay.Language.get('saved')}
-				className="text-success"
-				data-title={Liferay.Language.get('saved')}
-				symbol="check-circle"
-			/>
-		);
+		return <SuccessText>{Liferay.Language.get('saved')}</SuccessText>;
 	}
 
 	if (status === SERVICE_NETWORK_STATUS_TYPES.savingDraft) {
-		return (
-			<ClayLoadingIndicator
-				aria-label={Liferay.Language.get('saving')}
-				className="my-0"
-				size="sm"
-				title={Liferay.Language.get('saving')}
-			/>
-		);
+		return <LoadingText>{Liferay.Language.get('saving')}</LoadingText>;
 	}
 
 	return null;
@@ -59,7 +60,6 @@ const getContent = (isOnline, status) => {
 
 const NetworkStatusBar = ({error, status}) => {
 	const [isOnline, setIsOnline] = useState(true);
-	const autoSaveMessageRef = useRef(null);
 
 	useEffect(() => {
 		if (status === SERVICE_NETWORK_STATUS_TYPES.error) {
@@ -70,17 +70,6 @@ const NetworkStatusBar = ({error, status}) => {
 		}
 	}, [error, status]);
 
-	useEffect(() => {
-		if (
-			status === SERVICE_NETWORK_STATUS_TYPES.draftSaved &&
-			!autoSaveMessageRef.current
-		) {
-			autoSaveMessageRef.current = Liferay.Language.get(
-				'changes-have-been-saved.-page-editor-will-autosave-new-changes'
-			);
-		}
-	}, [status]);
-
 	useEventListener('online', () => setIsOnline(true), true, window);
 
 	useEventListener('offline', () => setIsOnline(false), true, window);
@@ -88,13 +77,9 @@ const NetworkStatusBar = ({error, status}) => {
 	const content = getContent(isOnline, status);
 
 	return (
-		<div className="page-editor__status-bar">
-			<span aria-live="polite" className="sr-only">
-				{autoSaveMessageRef.current}
-			</span>
-
+		<span className="align-items-center d-flex h-100 text-truncate">
 			{content}
-		</div>
+		</span>
 	);
 };
 

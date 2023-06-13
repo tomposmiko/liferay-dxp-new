@@ -15,9 +15,9 @@
 package com.liferay.layout.type.controller.node.internal.layout.type.controller;
 
 import com.liferay.layout.type.controller.BaseLayoutTypeControllerImpl;
+import com.liferay.layout.type.controller.node.internal.constants.NodeLayoutTypeControllerConstants;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 
@@ -32,7 +32,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Juergen Kappler
  */
 @Component(
-	property = "layout.type=" + LayoutConstants.TYPE_NODE,
+	immediate = true,
+	property = "layout.type=" + NodeLayoutTypeControllerConstants.LAYOUT_TYPE_NODE,
 	service = LayoutTypeController.class
 )
 public class NodeLayoutTypeController extends BaseLayoutTypeControllerImpl {
@@ -64,12 +65,28 @@ public class NodeLayoutTypeController extends BaseLayoutTypeControllerImpl {
 
 	@Override
 	public boolean isURLFriendliable() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean isWorkflowEnabled() {
 		return false;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
 	}
 
 	@Override
@@ -87,13 +104,16 @@ public class NodeLayoutTypeController extends BaseLayoutTypeControllerImpl {
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	protected String getViewPage() {
 		return _VIEW_PAGE;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.node)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 
 	private static final String _EDIT_PAGE = "/layout/edit/node.jsp";
@@ -104,10 +124,5 @@ public class NodeLayoutTypeController extends BaseLayoutTypeControllerImpl {
 		"layoutId=${liferay:layoutId}");
 
 	private static final String _VIEW_PAGE = "/layout/view/node.jsp";
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.node)"
-	)
-	private ServletContext _servletContext;
 
 }

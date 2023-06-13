@@ -37,7 +37,7 @@
 		</div>
 	</div>
 
-	<br />
+	 <br />
 
 	<@getRatings
 		cssClass="page-ratings"
@@ -189,7 +189,7 @@
 		${editPageURL.setParameter("title", entry.getTitle())}
 
 		<@liferay_ui["icon"]
-			icon="pencil"
+			iconCssClass="icon-edit"
 			message=entry.getTitle()
 			url=editPageURL?string
 		/>
@@ -221,7 +221,7 @@
 	/>
 
 	<@liferay_ui["icon"]
-		icon="print"
+		iconCssClass="icon-print"
 		message="print"
 		url=taglibPrintURL
 	/>

@@ -22,14 +22,14 @@
 AUI.add(
 	'liferay-store',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const isObject = Lang.isObject;
+		var isObject = Lang.isObject;
 
-		const TOKEN_SERIALIZE = 'serialize://';
+		var TOKEN_SERIALIZE = 'serialize://';
 
-		const Store = function (key, value) {
-			let method;
+		var Store = function (key, value) {
+			var method;
 
 			if (Lang.isFunction(value)) {
 				method = 'get';
@@ -44,7 +44,7 @@ AUI.add(
 				if (isObject(key)) {
 					method = 'setAll';
 				}
-				else if (arguments.length === 1) {
+				else if (arguments.length == 1) {
 					method = null;
 				}
 			}
@@ -56,9 +56,9 @@ AUI.add(
 
 		A.mix(Store, {
 			_getValues(cmd, key, callback) {
-				const instance = this;
+				var instance = this;
 
-				const config = {
+				var config = {
 					callback,
 					data: {
 						cmd,
@@ -66,7 +66,7 @@ AUI.add(
 					},
 				};
 
-				if (cmd === 'getAll') {
+				if (cmd == 'getAll') {
 					config.dataType = 'json';
 				}
 
@@ -75,6 +75,12 @@ AUI.add(
 
 			_ioRequest(config) {
 				config.data.p_auth = Liferay.authToken;
+
+				var doAsUserIdEncoded = themeDisplay.getDoAsUserIdEncoded();
+
+				if (doAsUserIdEncoded) {
+					config.data.doAsUserId = doAsUserIdEncoded;
+				}
 
 				const body = new URLSearchParams();
 
@@ -126,7 +132,7 @@ AUI.add(
 			},
 
 			_setValues(data) {
-				const instance = this;
+				var instance = this;
 
 				instance._ioRequest({
 					data,
@@ -134,21 +140,21 @@ AUI.add(
 			},
 
 			get(key, callback) {
-				const instance = this;
+				var instance = this;
 
 				instance._getValues('get', key, callback);
 			},
 
 			getAll(keys, callback) {
-				const instance = this;
+				var instance = this;
 
 				instance._getValues('getAll', keys, callback);
 			},
 
 			set(key, value) {
-				const instance = this;
+				var instance = this;
 
-				const object = {};
+				var object = {};
 
 				if (isObject(value)) {
 					value = TOKEN_SERIALIZE + JSON.stringify(value);
@@ -160,7 +166,7 @@ AUI.add(
 			},
 
 			setAll(object) {
-				const instance = this;
+				var instance = this;
 
 				instance._setValues(object);
 			},

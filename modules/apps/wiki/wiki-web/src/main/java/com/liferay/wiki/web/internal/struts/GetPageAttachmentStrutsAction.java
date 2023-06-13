@@ -26,10 +26,10 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.trash.TrashHelper;
-import com.liferay.wiki.constants.WikiPageConstants;
 import com.liferay.wiki.exception.NoSuchPageException;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiPageService;
+import com.liferay.wiki.web.internal.importer.MediaWikiImporter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,21 +59,21 @@ public class GetPageAttachmentStrutsAction implements StrutsAction {
 				httpServletRequest, "fileName");
 
 			if (fileName.startsWith(
-					WikiPageConstants.SHARED_IMAGES_TITLE + StringPool.SLASH)) {
+					MediaWikiImporter.SHARED_IMAGES_TITLE + StringPool.SLASH)) {
 
 				String[] fileNameParts = fileName.split(
-					WikiPageConstants.SHARED_IMAGES_TITLE + StringPool.SLASH);
+					MediaWikiImporter.SHARED_IMAGES_TITLE + StringPool.SLASH);
 
 				fileName = fileNameParts[1];
 
-				title = WikiPageConstants.SHARED_IMAGES_TITLE;
+				title = MediaWikiImporter.SHARED_IMAGES_TITLE;
 			}
 
 			int status = ParamUtil.getInteger(
 				httpServletRequest, "status",
 				WorkflowConstants.STATUS_APPROVED);
 
-			_getFile(
+			getFile(
 				nodeId, title, fileName, status, httpServletRequest,
 				httpServletResponse);
 
@@ -84,7 +84,7 @@ public class GetPageAttachmentStrutsAction implements StrutsAction {
 				exception instanceof NoSuchPageException) {
 
 				if (_log.isWarnEnabled()) {
-					_log.warn(exception);
+					_log.warn(exception, exception);
 				}
 			}
 			else {
@@ -96,7 +96,7 @@ public class GetPageAttachmentStrutsAction implements StrutsAction {
 		}
 	}
 
-	private void _getFile(
+	protected void getFile(
 			long nodeId, String title, String fileName, int status,
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
@@ -123,6 +123,11 @@ public class GetPageAttachmentStrutsAction implements StrutsAction {
 			fileEntry.getMimeType());
 	}
 
+	@Reference(unbind = "-")
+	protected void setWikiPageService(WikiPageService wikiPageService) {
+		_wikiPageService = wikiPageService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		GetPageAttachmentStrutsAction.class);
 
@@ -132,7 +137,6 @@ public class GetPageAttachmentStrutsAction implements StrutsAction {
 	@Reference
 	private TrashHelper _trashHelper;
 
-	@Reference
 	private WikiPageService _wikiPageService;
 
 }

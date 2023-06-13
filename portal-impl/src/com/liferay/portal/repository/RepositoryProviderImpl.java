@@ -389,7 +389,8 @@ public class RepositoryProviderImpl implements RepositoryProvider {
 					// LPS-52675
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(noSuchFolderException);
+						_log.debug(
+							noSuchFolderException, noSuchFolderException);
 					}
 				}
 			}

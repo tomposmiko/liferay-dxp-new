@@ -29,8 +29,6 @@ public class LayoutDataItemTypeConstants {
 
 	public static final String TYPE_DROP_ZONE = "drop-zone";
 
-	public static final String TYPE_FORM = "form";
-
 	public static final String TYPE_FRAGMENT = "fragment";
 
 	public static final String TYPE_FRAGMENT_DROP_ZONE = "fragment-drop-zone";

@@ -398,8 +398,4 @@ public interface SourceModel
 	@Override
 	public Source cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -73,12 +73,11 @@ public class DLFileShortcutLocalServiceTreeTest {
 				_group.getGroupId(), TestPropsValues.getUserId());
 
 		Folder folderA = DLAppServiceUtil.addFolder(
-			null, _group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Folder A",
-			RandomTestUtil.randomString(), serviceContext);
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Folder A", RandomTestUtil.randomString(), serviceContext);
 
 		Folder folderAA = DLAppServiceUtil.addFolder(
-			null, _group.getGroupId(), folderA.getFolderId(), "Folder AA",
+			_group.getGroupId(), folderA.getFolderId(), "Folder AA",
 			RandomTestUtil.randomString(), serviceContext);
 
 		FileEntry fileEntry = addFileEntry(folderA.getFolderId(), "Entry.txt");
@@ -128,12 +127,14 @@ public class DLFileShortcutLocalServiceTreeTest {
 	protected FileEntry addFileEntry(long folderId, String sourceFileName)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		return DLAppLocalServiceUtil.addFileEntry(
 			null, TestPropsValues.getUserId(), _group.getGroupId(), folderId,
 			sourceFileName, ContentTypes.TEXT_PLAIN,
-			TestDataConstants.TEST_BYTE_ARRAY, null, null,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			TestDataConstants.TEST_BYTE_ARRAY, null, null, serviceContext);
 	}
 
 	protected FileShortcut addFileShortcut(
@@ -159,12 +160,13 @@ public class DLFileShortcutLocalServiceTreeTest {
 
 		_fileShortcuts.add(fileShortcutA);
 
-		_folder = DLAppServiceUtil.addFolder(
-			null, _group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Folder A",
-			RandomTestUtil.randomString(),
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		_folder = DLAppServiceUtil.addFolder(
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			"Folder A", RandomTestUtil.randomString(), serviceContext);
 
 		FileShortcut fileShortcutAA = addFileShortcut(
 			_fileEntry, TestPropsValues.getGroupId(), _folder.getFolderId());

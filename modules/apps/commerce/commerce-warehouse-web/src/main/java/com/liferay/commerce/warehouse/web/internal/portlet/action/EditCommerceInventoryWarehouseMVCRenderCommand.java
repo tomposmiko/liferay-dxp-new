@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_INVENTORY_WAREHOUSE,
 		"mvc.command.name=/commerce_inventory_warehouse/edit_commerce_inventory_warehouse"
@@ -42,8 +43,7 @@ public class EditCommerceInventoryWarehouseMVCRenderCommand
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws PortletException {
 
-		return "/commerce_inventory_warehouse" +
-			"/edit_commerce_inventory_warehouse.jsp";
+		return "/edit_commerce_inventory_warehouse.jsp";
 	}
 
 }

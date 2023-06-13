@@ -114,6 +114,12 @@
 		};
 
 		Liferay.Data.notices = [
+			<c:if test="<%= permissionChecker.isOmniadmin() && PortalUtil.isUpdateAvailable() %>">
+				{
+					message: '<a class="update-available" href="<%= themeDisplay.getURLUpdateManager() %>"><liferay-ui:message key="updates-are-available-for-liferay" /></a>'
+				},
+			</c:if>
+
 			<c:if test="<%= ShutdownUtil.isInProcess() %>">
 				{
 					title: '<liferay-ui:message key="maintenance-alert" /> <span class="mx-2"><%= FastDateFormatFactoryUtil.getTime(locale).format(Time.getDate(CalendarFactoryUtil.getCalendar(timeZone))) %> <%= timeZone.getDisplayName(false, TimeZone.SHORT, locale) %></span>',
@@ -152,14 +158,6 @@
 			};
 		})();
 
-		var featureFlags = <%= FeatureFlagManagerUtil.getJSON(themeDisplay.getCompanyId()) %>;
-
-		Liferay.FeatureFlags = Object.keys(featureFlags).reduce(
-			(acc, key) => ({
-				...acc, [key]: featureFlags[key] === 'true' || featureFlags[key] === true
-			}), {}
-		);
-
 		Liferay.PortletKeys = {
 			DOCUMENT_LIBRARY: '<%= PortletKeys.DOCUMENT_LIBRARY %>',
 			DYNAMIC_DATA_MAPPING: 'com_liferay_dynamic_data_mapping_web_portlet_DDMPortlet',
@@ -168,7 +166,7 @@
 
 		Liferay.PropsValues = {
 			JAVASCRIPT_SINGLE_PAGE_APPLICATION_TIMEOUT: <%= PrefsPropsUtil.getInteger(themeDisplay.getCompanyId(), PropsKeys.JAVASCRIPT_SINGLE_PAGE_APPLICATION_TIMEOUT, PropsValues.JAVASCRIPT_SINGLE_PAGE_APPLICATION_TIMEOUT) %>,
-			UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE: <%= UploadServletRequestConfigurationProviderUtil.getMaxSize() %>
+			UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE: <%= UploadServletRequestConfigurationHelperUtil.getMaxSize() %>
 		};
 
 		Liferay.ThemeDisplay = {
@@ -222,7 +220,9 @@
 
 				String completeURL = PortalUtil.getCurrentCompleteURL(request);
 
-				LayoutSEOLink layoutSEOLink = layoutSEOLinkManager.getCanonicalLayoutSEOLink(layout, themeDisplay.getLocale(), PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, false, false), themeDisplay);
+				String canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, false, false);
+
+				LayoutSEOLink layoutSEOLink = layoutSEOLinkManager.getCanonicalLayoutSEOLink(layout, themeDisplay.getLocale(), canonicalURL, PortalUtil.getAlternateURLs(canonicalURL, themeDisplay, layout));
 				%>
 
 				return '<%= HtmlUtil.escapeJS(layoutSEOLink.getHref()) %>';
@@ -278,15 +278,6 @@
 			getPortalURL: function() {
 				return '<%= themeDisplay.getPortalURL() %>';
 			},
-			getRealUserId: function() {
-				return '<%= themeDisplay.getRealUserId() %>';
-			},
-			getRemoteAddr: function() {
-				return '<%= themeDisplay.getRemoteAddr() %>';
-			},
-			getRemoteHost: function() {
-				return '<%= themeDisplay.getRemoteHost() %>';
-			},
 			getScopeGroupId: function() {
 				return '<%= scopeGroup.getGroupId() %>';
 			},
@@ -326,18 +317,6 @@
 			isSignedIn: function() {
 				return <%= themeDisplay.isSignedIn() %>;
 			},
-
-			isStagedPortlet: function() {
-				<c:choose>
-					<c:when test="<%= Validator.isNotNull(themeDisplay.getPpid()) %>">
-						return <%= liveGroup.isStagedPortlet(themeDisplay.getPpid()) %>;
-					</c:when>
-					<c:otherwise>
-						return false;
-					</c:otherwise>
-				</c:choose>
-			},
-
 			isStateExclusive: function() {
 				return <%= themeDisplay.isStateExclusive() %>;
 			},
@@ -458,7 +437,7 @@
 <%-- Analytics --%>
 
 <%
-UnicodeProperties groupTypeSettingsUnicodeProperties = group.getTypeSettingsProperties();
+UnicodeProperties groupTypeSettings = group.getTypeSettingsProperties();
 
 String[] analyticsTypes = PrefsPropsUtil.getStringArray(company.getCompanyId(), PropsKeys.ADMIN_ANALYTICS_TYPES, StringPool.NEW_LINE);
 
@@ -469,7 +448,7 @@ for (String analyticsType : analyticsTypes) {
 		<c:when test='<%= StringUtil.equalsIgnoreCase(analyticsType, "google") %>'>
 
 			<%
-			String googleAnalyticsId = groupTypeSettingsUnicodeProperties.getProperty("googleAnalyticsId");
+			String googleAnalyticsId = groupTypeSettings.getProperty("googleAnalyticsId");
 			%>
 
 			<c:if test="<%= Validator.isNotNull(googleAnalyticsId) %>">
@@ -495,7 +474,7 @@ for (String analyticsType : analyticsTypes) {
 					})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
 					<%
-					String googleAnalyticsCreateCustomConfiguration = groupTypeSettingsUnicodeProperties.getProperty("googleAnalyticsCreateCustomConfiguration");
+					String googleAnalyticsCreateCustomConfiguration = groupTypeSettings.getProperty("googleAnalyticsCreateCustomConfiguration");
 					%>
 
 					<c:choose>
@@ -508,7 +487,7 @@ for (String analyticsType : analyticsTypes) {
 					</c:choose>
 
 					<%
-					String googleAnalyticsCustomConfiguration = groupTypeSettingsUnicodeProperties.getProperty("googleAnalyticsCustomConfiguration");
+					String googleAnalyticsCustomConfiguration = groupTypeSettings.getProperty("googleAnalyticsCustomConfiguration");
 					%>
 
 					<c:if test="<%= Validator.isNotNull(googleAnalyticsCustomConfiguration) %>">
@@ -523,7 +502,7 @@ for (String analyticsType : analyticsTypes) {
 						Liferay.on(
 							'endNavigate',
 							function(event) {
-								ga('set', 'page', Liferay.ThemeDisplay.getLayoutRelativeURL());
+								ga('set', 'page', event.path);
 								ga('send', 'pageview');
 							}
 						);
@@ -531,35 +510,10 @@ for (String analyticsType : analyticsTypes) {
 				</script>
 			</c:if>
 		</c:when>
-		<c:when test='<%= StringUtil.equalsIgnoreCase(analyticsType, "googleAnalytics4") %>'>
-
-			<%
-			String googleAnalytics4Id = groupTypeSettingsUnicodeProperties.getProperty("googleAnalytics4Id");
-			%>
-
-			<c:if test="<%= Validator.isNotNull(googleAnalytics4Id) %>">
-				<script async src="https://www.googletagmanager.com/gtag/js?id=<%= HtmlUtil.escapeJS(googleAnalytics4Id) %>"></script>
-
-				<script>
-					window.dataLayer = window.dataLayer || [];
-					function gtag(){dataLayer.push(arguments);}
-					gtag('js', new Date());
-					gtag('config', '<%= HtmlUtil.escapeJS(googleAnalytics4Id) %>');
-
-					<%
-					String googleAnalytics4CustomConfiguration = groupTypeSettingsUnicodeProperties.getProperty("googleAnalytics4CustomConfiguration");
-					%>
-
-					<c:if test="<%= Validator.isNotNull(googleAnalytics4CustomConfiguration) %>">
-						<%= googleAnalytics4CustomConfiguration %>
-					</c:if>
-				</script>
-			</c:if>
-		</c:when>
 		<c:otherwise>
 
 			<%
-			String analyticsScript = groupTypeSettingsUnicodeProperties.getProperty(Sites.ANALYTICS_PREFIX + analyticsType);
+			String analyticsScript = groupTypeSettings.getProperty(Sites.ANALYTICS_PREFIX + analyticsType);
 			%>
 
 			<c:if test="<%= Validator.isNotNull(analyticsScript) %>">

@@ -22,7 +22,6 @@ import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormRule;
 import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeSettings;
-import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 
 /**
@@ -91,11 +90,6 @@ public interface CheckboxDDMFormFieldTypeSettings
 	@DDMFormField(predefinedValue = "boolean")
 	@Override
 	public String dataType();
-
-	@DDMFormField(
-		dataType = "ddm-options", label = "%options", type = "options"
-	)
-	public DDMFormFieldOptions options();
 
 	@DDMFormField(
 		label = "%predefined-value", optionLabels = {"%false", "%true"},

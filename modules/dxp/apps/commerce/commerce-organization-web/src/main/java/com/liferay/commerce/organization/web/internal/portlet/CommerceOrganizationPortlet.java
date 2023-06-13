@@ -39,7 +39,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	configurationPid = "com.liferay.users.admin.configuration.UserFileUploadsConfiguration",
+	configurationPid = "com.liferay.user.admin.configuration.UserFileUploadsConfiguration",
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-organization",
@@ -56,10 +57,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + CommerceOrganizationPortletKeys.COMMERCE_ORGANIZATION,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceOrganizationPortlet.class, Portlet.class}
 )
 public class CommerceOrganizationPortlet extends MVCPortlet {
 
@@ -80,7 +80,7 @@ public class CommerceOrganizationPortlet extends MVCPortlet {
 				commerceOrganizationDisplayContext);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		super.render(renderRequest, renderResponse);

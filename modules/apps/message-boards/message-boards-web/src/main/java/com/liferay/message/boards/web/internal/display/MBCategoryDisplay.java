@@ -36,10 +36,10 @@ public class MBCategoryDisplay {
 
 	public MBCategoryDisplay(long scopeGroupId, long categoryId) {
 		try {
-			_init(scopeGroupId, categoryId);
+			init(scopeGroupId, categoryId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class MBCategoryDisplay {
 		return count;
 	}
 
-	private void _init(long scopeGroupId, long categoryId) throws Exception {
+	protected void init(long scopeGroupId, long categoryId) throws Exception {
 		_allCategories = MBCategoryServiceUtil.getCategories(
 			scopeGroupId, WorkflowConstants.STATUS_APPROVED);
 
@@ -123,10 +123,10 @@ public class MBCategoryDisplay {
 			curCategories.add(category);
 		}
 
-		_populateCategoryNodesMap(_categoryTree.getRootNode(), categoriesMap);
+		populateCategoryNodesMap(_categoryTree.getRootNode(), categoriesMap);
 	}
 
-	private void _populateCategoryNodesMap(
+	protected void populateCategoryNodesMap(
 		TreeNode<MBCategory> node, Map<Long, List<MBCategory>> categoriesMap) {
 
 		MBCategory category = node.getValue();
@@ -152,7 +152,7 @@ public class MBCategoryDisplay {
 
 			_categoryNodesMap.put(curCategory.getCategoryId(), curNode);
 
-			_populateCategoryNodesMap(curNode, categoriesMap);
+			populateCategoryNodesMap(curNode, categoriesMap);
 		}
 	}
 

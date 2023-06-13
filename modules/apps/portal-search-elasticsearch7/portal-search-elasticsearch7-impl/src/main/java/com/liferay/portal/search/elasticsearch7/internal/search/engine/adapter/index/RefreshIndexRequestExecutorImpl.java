@@ -46,7 +46,7 @@ public class RefreshIndexRequestExecutorImpl
 		RefreshRequest refreshRequest = createRefreshRequest(
 			refreshIndexRequest);
 
-		RefreshResponse refreshResponse = _getRefreshResponse(
+		RefreshResponse refreshResponse = getRefreshResponse(
 			refreshRequest, refreshIndexRequest);
 
 		RefreshIndexResponse refreshIndexResponse = new RefreshIndexResponse();
@@ -81,7 +81,7 @@ public class RefreshIndexRequestExecutorImpl
 		return new RefreshRequest(refreshIndexRequest.getIndexNames());
 	}
 
-	private RefreshResponse _getRefreshResponse(
+	protected RefreshResponse getRefreshResponse(
 		RefreshRequest refreshRequest,
 		RefreshIndexRequest refreshIndexRequest) {
 
@@ -101,10 +101,22 @@ public class RefreshIndexRequestExecutorImpl
 		}
 	}
 
-	@Reference
-	private ElasticsearchClientResolver _elasticsearchClientResolver;
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-	@Reference
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	@Reference(unbind = "-")
+	protected void setIndexRequestShardFailureTranslator(
+		IndexRequestShardFailureTranslator indexRequestShardFailureTranslator) {
+
+		_indexRequestShardFailureTranslator =
+			indexRequestShardFailureTranslator;
+	}
+
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
 	private IndexRequestShardFailureTranslator
 		_indexRequestShardFailureTranslator;
 

@@ -47,11 +47,6 @@ public class AssetListScopeFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public void include(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
@@ -79,14 +74,20 @@ public class AssetListScopeFormNavigatorEntry
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.asset.list.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/asset_list/scope.jsp";
 	}
 
 	@Reference
 	private ItemSelector _itemSelector;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.asset.list.web)")
-	private ServletContext _servletContext;
 
 }

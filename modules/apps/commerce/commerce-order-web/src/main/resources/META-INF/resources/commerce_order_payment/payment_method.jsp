@@ -36,16 +36,19 @@ long commerceOrderId = commerceOrder.getCommerceOrderId();
 
 		<liferay-ui:error exception="<%= CommerceOrderPaymentMethodException.class %>" message="please-select-a-valid-payment-method" />
 
-		<frontend-data-set:classic-display
+		<clay:data-set-display
 			contextParams='<%=
 				HashMapBuilder.<String, String>put(
 					"commerceOrderId", String.valueOf(commerceOrderId)
 				).build()
 			%>'
-			dataProviderKey="<%= CommerceOrderFDSNames.PAYMENT_METHODS %>"
-			formName="fm"
-			id="<%= CommerceOrderFDSNames.PAYMENT_METHODS %>"
+			dataProviderKey="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PAYMENT_METHODS %>"
+			formId="fm"
+			id="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PAYMENT_METHODS %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= currentURLObj %>"
 			selectedItems="<%= Collections.singletonList(String.valueOf(commerceOrder.getCommercePaymentMethodKey())) %>"
 			selectedItemsKey="paymentMethodKey"
 			selectionType="single"

@@ -14,7 +14,6 @@
 
 package com.liferay.wiki.service;
 
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -48,7 +47,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @AccessControlled
-@CTAware
 @JSONWebService
 @ProviderType
 @Transactional(
@@ -68,21 +66,14 @@ public interface WikiPageService extends BaseService {
 		throws PortalException;
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addPage(String,
-	 long, String, String, String, boolean, String, String,
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addPage(String, long, String, String, String, boolean, String, String,
 	 String, ServiceContext)}
 	 */
 	@Deprecated
 	public WikiPage addPage(
 			long nodeId, String title, String content, String summary,
 			boolean minorEdit, String format, String parentTitle,
-			String redirectTitle, ServiceContext serviceContext)
-		throws PortalException;
-
-	public WikiPage addPage(
-			String externalReferenceCode, long nodeId, String title,
-			double version, String content, String summary, boolean minorEdit,
-			String format, boolean head, String parentTitle,
 			String redirectTitle, ServiceContext serviceContext)
 		throws PortalException;
 
@@ -220,9 +211,6 @@ public interface WikiPageService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public WikiPage getPage(long nodeId, String title, double version)
 		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public WikiPage getPageByPageId(long pageId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<WikiPage> getPages(

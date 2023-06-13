@@ -17,7 +17,6 @@ package com.liferay.commerce.inventory.web.internal.portlet.action;
 import com.liferay.commerce.inventory.exception.DuplicateCommerceInventoryWarehouseItemException;
 import com.liferay.commerce.inventory.exception.MVCCException;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem;
-import com.liferay.commerce.inventory.service.CommerceInventoryReplenishmentItemService;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseItemService;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -40,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_INVENTORY,
 		"mvc.command.name=/commerce_inventory/edit_commerce_inventory_warehouse"
@@ -48,6 +48,31 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditCommerceInventoryWarehouseMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected void addCommerceInventoryWarehouse(ActionRequest actionRequest)
+		throws PortalException {
+
+		long commerceInventoryWarehouseId = ParamUtil.getLong(
+			actionRequest, "commerceInventoryWarehouseId");
+
+		String sku = ParamUtil.getString(actionRequest, "sku");
+
+		int quantity = ParamUtil.getInteger(actionRequest, "quantity");
+
+		_commerceInventoryWarehouseItemService.
+			addCommerceInventoryWarehouseItem(
+				commerceInventoryWarehouseId, sku, quantity);
+	}
+
+	protected void deleteCommerceInventoryWarehouse(ActionRequest actionRequest)
+		throws PortalException {
+
+		String sku = ParamUtil.getString(actionRequest, "sku");
+
+		_commerceInventoryWarehouseItemService.
+			deleteCommerceInventoryWarehouseItems(
+				_portal.getCompanyId(actionRequest), sku);
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -58,13 +83,13 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.ADD)) {
-				_addCommerceInventoryWarehouse(actionRequest);
+				addCommerceInventoryWarehouse(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceInventoryWarehouse(actionRequest);
+				deleteCommerceInventoryWarehouse(actionRequest);
 			}
 			else if (cmd.equals(Constants.UPDATE)) {
-				_updateCommerceInventoryWarehouse(actionRequest);
+				updateCommerceInventoryWarehouse(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -80,41 +105,12 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 				sendRedirect(actionRequest, actionResponse);
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 	}
 
-	private void _addCommerceInventoryWarehouse(ActionRequest actionRequest)
-		throws PortalException {
-
-		long commerceInventoryWarehouseId = ParamUtil.getLong(
-			actionRequest, "commerceInventoryWarehouseId");
-
-		String sku = ParamUtil.getString(actionRequest, "sku");
-
-		int quantity = ParamUtil.getInteger(actionRequest, "quantity");
-
-		_commerceInventoryWarehouseItemService.
-			addCommerceInventoryWarehouseItem(
-				commerceInventoryWarehouseId, sku, quantity);
-	}
-
-	private void _deleteCommerceInventoryWarehouse(ActionRequest actionRequest)
-		throws PortalException {
-
-		long companyId = _portal.getCompanyId(actionRequest);
-
-		String sku = ParamUtil.getString(actionRequest, "sku");
-
-		_commerceInventoryWarehouseItemService.
-			deleteCommerceInventoryWarehouseItems(companyId, sku);
-
-		_commerceInventoryReplenishmentItemService.
-			deleteCommerceInventoryReplenishmentItems(companyId, sku);
-	}
-
-	private void _updateCommerceInventoryWarehouse(ActionRequest actionRequest)
+	protected void updateCommerceInventoryWarehouse(ActionRequest actionRequest)
 		throws PortalException {
 
 		long commerceInventoryWarehouseId = ParamUtil.getLong(
@@ -145,10 +141,6 @@ public class EditCommerceInventoryWarehouseMVCActionCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditCommerceInventoryWarehouseMVCActionCommand.class);
-
-	@Reference
-	private CommerceInventoryReplenishmentItemService
-		_commerceInventoryReplenishmentItemService;
 
 	@Reference
 	private CommerceInventoryWarehouseItemService

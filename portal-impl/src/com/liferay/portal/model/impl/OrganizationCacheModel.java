@@ -113,8 +113,8 @@ public class OrganizationCacheModel
 		sb.append(regionId);
 		sb.append(", countryId=");
 		sb.append(countryId);
-		sb.append(", statusListTypeId=");
-		sb.append(statusListTypeId);
+		sb.append(", statusId=");
+		sb.append(statusId);
 		sb.append(", comments=");
 		sb.append(comments);
 		sb.append(", logoId=");
@@ -196,7 +196,7 @@ public class OrganizationCacheModel
 		organizationImpl.setRecursable(recursable);
 		organizationImpl.setRegionId(regionId);
 		organizationImpl.setCountryId(countryId);
-		organizationImpl.setStatusListTypeId(statusListTypeId);
+		organizationImpl.setStatusId(statusId);
 
 		if (comments == null) {
 			organizationImpl.setComments("");
@@ -240,7 +240,7 @@ public class OrganizationCacheModel
 
 		countryId = objectInput.readLong();
 
-		statusListTypeId = objectInput.readLong();
+		statusId = objectInput.readLong();
 		comments = objectInput.readUTF();
 
 		logoId = objectInput.readLong();
@@ -311,7 +311,7 @@ public class OrganizationCacheModel
 
 		objectOutput.writeLong(countryId);
 
-		objectOutput.writeLong(statusListTypeId);
+		objectOutput.writeLong(statusId);
 
 		if (comments == null) {
 			objectOutput.writeUTF("");
@@ -340,7 +340,7 @@ public class OrganizationCacheModel
 	public boolean recursable;
 	public long regionId;
 	public long countryId;
-	public long statusListTypeId;
+	public long statusId;
 	public String comments;
 	public long logoId;
 

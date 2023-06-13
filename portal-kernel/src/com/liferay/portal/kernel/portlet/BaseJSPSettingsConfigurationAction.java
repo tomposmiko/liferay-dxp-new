@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
@@ -70,11 +71,7 @@ public class BaseJSPSettingsConfigurationAction
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		PortletBag portletBag = PortletBagPool.get(
-			PortletIdCodec.decodePortletName(
-				ParamUtil.getString(httpServletRequest, "portletResource")));
-
-		ServletContext servletContext = portletBag.getServletContext();
+		ServletContext servletContext = getServletContext(httpServletRequest);
 
 		RequestDispatcher requestDispatcher =
 			servletContext.getRequestDispatcher(getJspPath(httpServletRequest));
@@ -91,6 +88,32 @@ public class BaseJSPSettingsConfigurationAction
 				"Unable to include " + getJspPath(httpServletRequest),
 				servletException);
 		}
+	}
+
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
+	protected ServletContext getServletContext(
+		HttpServletRequest httpServletRequest) {
+
+		if (_servletContext != null) {
+			return _servletContext;
+		}
+
+		String portletResource = ParamUtil.getString(
+			httpServletRequest, "portletResource");
+
+		if (Validator.isNotNull(portletResource)) {
+			String rootPortletId = PortletIdCodec.decodePortletName(
+				portletResource);
+
+			PortletBag portletBag = PortletBagPool.get(rootPortletId);
+
+			return portletBag.getServletContext();
+		}
+
+		return (ServletContext)httpServletRequest.getAttribute(WebKeys.CTX);
 	}
 
 	protected void removeDefaultValue(
@@ -116,5 +139,7 @@ public class BaseJSPSettingsConfigurationAction
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseJSPSettingsConfigurationAction.class);
+
+	private ServletContext _servletContext;
 
 }

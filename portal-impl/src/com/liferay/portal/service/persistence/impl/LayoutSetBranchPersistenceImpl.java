@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.LayoutSetBranchPersistence;
-import com.liferay.portal.kernel.service.persistence.LayoutSetBranchUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -48,7 +47,6 @@ import com.liferay.portal.model.impl.LayoutSetBranchModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -185,7 +183,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LayoutSetBranch>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutSetBranch layoutSetBranch : list) {
@@ -877,8 +875,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1071,7 +1068,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LayoutSetBranch>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutSetBranch layoutSetBranch : list) {
@@ -1812,8 +1809,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, privateLayout};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2000,7 +1996,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByG_P_N, finderArgs, this);
+				_finderPathFetchByG_P_N, finderArgs);
 		}
 
 		if (result instanceof LayoutSetBranch) {
@@ -2120,8 +2116,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, privateLayout, name};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -2301,7 +2296,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LayoutSetBranch>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutSetBranch layoutSetBranch : list) {
@@ -3087,8 +3082,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, privateLayout, master};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3645,7 +3639,7 @@ public class LayoutSetBranchPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LayoutSetBranch>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3715,7 +3709,7 @@ public class LayoutSetBranchPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3862,30 +3856,10 @@ public class LayoutSetBranchPersistenceImpl
 				Boolean.class.getName()
 			},
 			new String[] {"groupId", "privateLayout", "master"}, false);
-
-		_setLayoutSetBranchUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setLayoutSetBranchUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(LayoutSetBranchImpl.class.getName());
-	}
-
-	private void _setLayoutSetBranchUtilPersistence(
-		LayoutSetBranchPersistence layoutSetBranchPersistence) {
-
-		try {
-			Field field = LayoutSetBranchUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutSetBranchPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_LAYOUTSETBRANCH =

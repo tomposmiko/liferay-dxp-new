@@ -56,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gergely Mathe
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
 	service = PortletDataHandler.class
 )
@@ -254,8 +255,24 @@ public class WikiAdminPortletDataHandler extends BasePortletDataHandler {
 		pageExportActionableDynamicQuery.performCount();
 	}
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setWikiNodeLocalService(
+		WikiNodeLocalService wikiNodeLocalService) {
+
+		_wikiNodeLocalService = wikiNodeLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWikiPageLocalService(
+		WikiPageLocalService wikiPageLocalService) {
+
+		_wikiPageLocalService = wikiPageLocalService;
+	}
 
 	@Reference
 	private MultiVMPool _multiVMPool;
@@ -265,10 +282,7 @@ public class WikiAdminPortletDataHandler extends BasePortletDataHandler {
 	@Reference
 	private Staging _staging;
 
-	@Reference
 	private WikiNodeLocalService _wikiNodeLocalService;
-
-	@Reference
 	private WikiPageLocalService _wikiPageLocalService;
 
 }

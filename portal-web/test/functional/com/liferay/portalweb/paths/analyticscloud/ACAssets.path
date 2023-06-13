@@ -10,27 +10,15 @@
 </thead>
 
 <tbody>
-
 <!-- ASSETS PAGE -->
-
 <tr>
 	<td>ASSETS_INFO</td>
 	<td>xpath=(//td[contains(@class,'name-cell')][.//*[text()='${key_assetName}']]//following-sibling::td[not(contains(@class,'actions'))])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>CUSTOM_ASSETS_FORM_OPTION</td>
-	<td>//input[@name='portal'and @value='${key_formOptionName}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CUSTOM_ASSETS_DOWNLOAD</td>
-	<td>//a[@data-analytics-asset-action='download']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>METRIC_VALUE</td>
-	<td>//span[@class='title'and text()='${key_metricTitle}']/..//div[text()='${key_metricValue}']</td>
+	<td>//span[@class='title'and text()='${key_metricTitle}']/..//div[@class='metric-value']</td>
 	<td></td>
 </tr>
 <tr>
@@ -38,9 +26,7 @@
 	<td>//*//div[contains(@class,'no-results-content')]//h4[text()='${key_noResultMessage}']</td>
 	<td></td>
 </tr>
-
 <!-- ASSET APPEARS ON -->
-
 <tr>
 	<td>APPEARS_ON_CANONICAL_URL</td>
 	<td>//h5[contains(.,'${key_cardTitle}')]/parent::div/following-sibling::div//a[contains(@class,'text-secondary')]//span</td>
@@ -51,9 +37,7 @@
 	<td>//h5[contains(.,'${key_cardTitle}')]/parent::div/following-sibling::div//a[contains(@class,'text-dark')]//span</td>
 	<td></td>
 </tr>
-
 <!-- VIEWS BY TECHNOLOGY -->
-
 <tr>
 	<td>BROWSERS_METRIC_VALUE</td>
 	<td>//div[contains(.,'${key_cardTitle}')]//span[@class='recharts-legend-item-text']//span[@class='text-truncate']</td>

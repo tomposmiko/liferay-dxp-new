@@ -16,41 +16,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PARTIAL_NAME_LIST</td>
-	<td>//div[contains(@class,'table-title')][contains(normalize-space(),'${key_nameList}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>GENERIC_TEXT</td>
-	<td>//*[text()='${key_textValue}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>GENERIC_TEXT_ORDER</td>
-	<td>xpath=(//*[normalize-space(text())='${key_textValue}'])[${index}]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TOGGLE_ICON</td>
-	<td>//*[contains(@class, 'toggle-switch-check')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TOGGLE_ICON_ON_OFF</td>
-	<td>//*[contains(@data-testid, '${key_toggleType}__${key_boolean}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>EDIT_NAME_BUTTON</td>
-	<td>//div[contains(@class,'editor')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NAME_FIELD</td>
-	<td>//input[@name='name']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>LABEL</td>
 	<td>//label[normalize-space()='${label}']</td>
 	<td></td>
@@ -60,27 +25,13 @@
 	<td>//span[contains(@class,'loading-animation')]</td>
 	<td></td>
 </tr>
-<tr>
-	<td>TABLE_CELL_INFORMATION</td>
-	<td>//a[contains(text(),'${key_nameList}')]//ancestor::tr//td[contains(@class,'table-column-text-end') and text()='${key_numberValue}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DELETE_BUTTON</td>
-	<td>//*[text()='${key_nameList}']/ancestor::tr//div[@class='quick-action-menu']//button[contains(@alt,'Delete')]</td>
-	<td></td>
-</tr>
-
 <!-- CLOSE MODAL -->
-
 <tr>
 	<td>MODAL_CLOSE_BUTTON</td>
 	<td>//button[contains(@class, 'close')]</td>
 	<td></td>
 </tr>
-
 <!-- FILTER ORDER -->
-
 <tr>
 	<td>ORDER_ARROW_BUTTON_ASC</td>
 	<td>//a[contains(@class, 'nav-link-monospaced btn-outline-borderless')][*[name()='svg'][contains(@class,'lexicon-icon-order-arrow-ascending')]]</td>
@@ -101,14 +52,7 @@
 	<td>//a[contains(@class, 'text-truncate-inline')]/span[contains(@class, 'inline-item-after')][*[name()='svg'][contains(@class,'lexicon-icon-order-arrow-down')]]</td>
 	<td></td>
 </tr>
-<tr>
-	<td>GENERIC_ORDER_BUTTON</td>
-	<td>//a[contains(@href,'sortOrder')]//span[text()='${key_columnName}']</td>
-	<td></td>
-</tr>
-
 <!-- PAGE_PAGINATION-->
-
 <tr>
 	<td>ACTIVE_PAGE</td>
 	<td>//li[@class='page-item active']</td>
@@ -139,9 +83,7 @@
 	<td>//div[@class='pagination-results']</td>
 	<td></td>
 </tr>
-
 <!-- SEARCH_BAR -->
-
 <tr>
 	<td>CLEAR_SEARCH_BAR_BUTTON</td>
 	<td>//div[contains(@class, 'input-group-item')]//button[contains(@class, 'button-root')]</td>
@@ -149,7 +91,7 @@
 </tr>
 <tr>
 	<td>GENERIC_BUTTON</td>
-	<td>//*[contains(@class,'button-root')and text()='${key_buttonName}']</td>
+	<td>//button[contains(@class,'button-root')and text()='${key_buttonName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -157,9 +99,7 @@
 	<td>//span[@class='text-truncate'and text()='${key_pageTitle}']</td>
 	<td></td>
 </tr>
-
 <!-- SVG_TIMED_GRAPH -->
-
 <tr>
 	<td>SVG_TIMED_GRAPH</td>
 	<td>//*[text()='${key_parentName}']/parent::div/following-sibling::div[contains(@class, 'card-body')]//*[contains(@class, 'recharts-surface')]</td>
@@ -170,9 +110,7 @@
 	<td>xpath=(//*[contains(@class,'recharts-pie-labels')])[${key_index}]//*[contains(text(),'${key_percentage}')]</td>
 	<td></td>
 </tr>
-
 <!-- CLICKABLE -->
-
 <tr>
 	<td>DROPDOWN_ITEM</td>
 	<td>//div[contains(@class, 'dropdown-menu show')]//*[text()='${key_dropdownItem}']</td>

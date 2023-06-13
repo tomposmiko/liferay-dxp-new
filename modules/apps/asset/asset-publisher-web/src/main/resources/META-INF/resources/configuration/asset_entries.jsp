@@ -18,6 +18,7 @@
 
 <%
 PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configuration.jsp-configurationRenderURL");
+String eventName = "_" + HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) + "_selectAsset";
 
 List<AssetEntry> assetEntries = assetPublisherHelper.getAssetEntries(renderRequest, portletPreferences, permissionChecker, assetPublisherDisplayContext.getGroupIds(), true, assetPublisherDisplayContext.isEnablePermissions(), true, AssetRendererFactory.TYPE_LATEST);
 %>
@@ -29,8 +30,7 @@ List<AssetEntry> assetEntries = assetPublisherHelper.getAssetEntries(renderReque
 	total="<%= assetEntries.size() %>"
 >
 	<liferay-ui:search-container-results
-		calculateStartAndEnd="<%= true %>"
-		results="<%= assetEntries %>"
+		results="<%= assetEntries.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 	/>
 
 	<liferay-ui:search-container-row
@@ -50,19 +50,17 @@ List<AssetEntry> assetEntries = assetPublisherHelper.getAssetEntries(renderReque
 			name="title"
 			truncate="<%= true %>"
 		>
-			<div class="d-flex">
-				<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
+			<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
 
-				<c:if test="<%= !assetEntry.isVisible() %>">
-					(<div class="ml-1">
-						<liferay-portal-workflow:status
-							showStatusLabel="<%= false %>"
-							status="<%= assetRenderer.getStatus() %>"
-							statusMessage='<%= (assetRenderer.getStatus() == 0) ? "not-visible" : WorkflowConstants.getStatusLabel(assetRenderer.getStatus()) %>'
-						/>
-					</div>)
-				</c:if>
-			</div>
+			<c:if test="<%= !assetEntry.isVisible() %>">
+				(<aui:workflow-status
+					markupView="lexicon"
+					showIcon="<%= false %>"
+					showLabel="<%= false %>"
+					status="<%= assetRenderer.getStatus() %>"
+					statusMessage='<%= (assetRenderer.getStatus() == 0) ? "not-visible" : WorkflowConstants.getStatusLabel(assetRenderer.getStatus()) %>'
+				/>)
+			</c:if>
 		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-text
@@ -99,39 +97,120 @@ List<AssetEntry> assetEntries = assetPublisherHelper.getAssetEntries(renderReque
 
 <%
 long[] groupIds = assetPublisherDisplayContext.getGroupIds();
+
+for (long groupId : groupIds) {
+	Group group = GroupLocalServiceUtil.getGroup(groupId);
 %>
 
-<c:if test="<%= ArrayUtil.isNotEmpty(groupIds) %>">
-	<div class="d-flex">
+	<liferay-ui:icon-menu
+		cssClass="select-existing-selector"
+		direction="right"
+		message='<%= LanguageUtil.format(request, (groupIds.length == 1) ? "select" : "select-in-x", HtmlUtil.escape(group.getDescriptiveName(locale)), false) %>'
+		showArrow="<%= false %>"
+		showWhenSingleIcon="<%= true %>"
+	>
 
 		<%
-		for (long groupId : groupIds) {
-			Group group = GroupLocalServiceUtil.getGroup(groupId);
+		List<AssetRendererFactory<?>> assetRendererFactories = ListUtil.sort(AssetRendererFactoryRegistryUtil.getAssetRendererFactories(company.getCompanyId()), new AssetRendererFactoryTypeNameComparator(locale));
 
-			String title = LanguageUtil.format(request, (groupIds.length == 1) ? "select" : "select-in-x", HtmlUtil.escape(group.getDescriptiveName(locale)), false);
+		for (AssetRendererFactory<?> curRendererFactory : assetRendererFactories) {
+			long curGroupId = groupId;
+
+			if (!curRendererFactory.isSelectable()) {
+				continue;
+			}
+
+			PortletURL assetBrowserURL = PortletProviderUtil.getPortletURL(request, curRendererFactory.getClassName(), PortletProvider.Action.BROWSE);
+
+			if (assetBrowserURL == null) {
+				continue;
+			}
+
+			if (group.isStagingGroup() && !group.isStagedPortlet(curRendererFactory.getPortletId())) {
+				curGroupId = group.getLiveGroupId();
+			}
+
+			assetBrowserURL.setParameter("groupId", String.valueOf(curGroupId));
+			assetBrowserURL.setParameter("multipleSelection", String.valueOf(Boolean.TRUE));
+			assetBrowserURL.setParameter("selectedGroupIds", String.valueOf(curGroupId));
+			assetBrowserURL.setParameter("typeSelection", curRendererFactory.getClassName());
+			assetBrowserURL.setParameter("showNonindexable", String.valueOf(Boolean.TRUE));
+			assetBrowserURL.setParameter("showScheduled", String.valueOf(Boolean.TRUE));
+			assetBrowserURL.setParameter("eventName", eventName);
+			assetBrowserURL.setPortletMode(PortletMode.VIEW);
+			assetBrowserURL.setWindowState(LiferayWindowState.POP_UP);
+
+			Map<String, Object> data = HashMapBuilder.<String, Object>put(
+				"groupid", String.valueOf(curGroupId)
+			).build();
 		%>
 
-				<clay:dropdown-menu
-					additionalProps='<%=
-						HashMapBuilder.<String, Object>put(
-							"currentURL", configurationRenderURL.toString()
-						).build()
-					%>'
-					aria-label="<%= title %>"
-					cssClass="mr-2"
-					displayType="secondary"
-					dropdownItems="<%= assetPublisherDisplayContext.getDropdownItems(group) %>"
-					label="<%= title %>"
-					propsTransformer="js/AssetEntrySelectionDropdownPropsTransformer"
-					title="<%= title %>"
-				/>
+			<c:choose>
+				<c:when test="<%= !curRendererFactory.isSupportsClassTypes() %>">
+
+					<%
+					data.put("href", assetBrowserURL.toString());
+
+					String type = curRendererFactory.getTypeName(locale);
+
+					data.put("destroyOnHide", true);
+					data.put("title", LanguageUtil.format(request, "select-x", type, false));
+					data.put("type", type);
+					%>
+
+					<liferay-ui:icon
+						cssClass="asset-selector"
+						data="<%= data %>"
+						id="<%= curGroupId + FriendlyURLNormalizerUtil.normalize(type) %>"
+						message="<%= HtmlUtil.escape(type) %>"
+						url="javascript:;"
+					/>
+				</c:when>
+				<c:otherwise>
+
+					<%
+					ClassTypeReader classTypeReader = curRendererFactory.getClassTypeReader();
+
+					List<ClassType> assetAvailableClassTypes = classTypeReader.getAvailableClassTypes(PortalUtil.getCurrentAndAncestorSiteGroupIds(curGroupId), locale);
+
+					for (ClassType assetAvailableClassType : assetAvailableClassTypes) {
+						assetBrowserURL.setParameter("subtypeSelectionId", String.valueOf(assetAvailableClassType.getClassTypeId()));
+						assetBrowserURL.setParameter("showNonindexable", String.valueOf(Boolean.TRUE));
+						assetBrowserURL.setParameter("showScheduled", String.valueOf(Boolean.TRUE));
+
+						data.put("href", assetBrowserURL.toString());
+
+						String type = assetAvailableClassType.getName();
+
+						data.put("destroyOnHide", true);
+						data.put("title", LanguageUtil.format(request, "select-x", type, false));
+						data.put("type", type);
+					%>
+
+						<liferay-ui:icon
+							cssClass="asset-selector"
+							data="<%= data %>"
+							id="<%= curGroupId + FriendlyURLNormalizerUtil.normalize(type) %>"
+							message="<%= HtmlUtil.escape(type) %>"
+							url="javascript:;"
+						/>
+
+					<%
+					}
+					%>
+
+				</c:otherwise>
+			</c:choose>
 
 		<%
 		}
 		%>
 
-	</div>
-</c:if>
+	</liferay-ui:icon-menu>
+
+<%
+}
+%>
 
 <script>
 	function <portlet:namespace />moveSelectionDown(assetEntryOrder) {
@@ -154,3 +233,58 @@ long[] groupIds = assetPublisherDisplayContext.getGroupIds();
 		});
 	}
 </script>
+
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+	function selectAssets(assetEntryList) {
+		var assetClassName = '';
+		var assetEntryIds = [];
+
+		Array.prototype.forEach.call(assetEntryList, (assetEntry) => {
+			assetEntryIds.push(assetEntry.entityid);
+
+			assetClassName = assetEntry.assetclassname;
+		});
+
+		Liferay.Util.postForm(document.<portlet:namespace />fm, {
+			data: {
+				assetEntryIds: assetEntryIds.join(','),
+				assetEntryType: assetClassName,
+				cmd: 'add-selection',
+				redirect: '<%= HtmlUtil.escapeJS(currentURL) %>',
+			},
+		});
+	}
+
+	var delegate = delegateModule.default;
+
+	var delegateHandler = delegate(
+		document.body,
+		'click',
+		'.asset-selector a',
+		(event) => {
+			event.preventDefault();
+
+			var delegateTarget = event.delegateTarget;
+
+			Liferay.Util.openSelectionModal({
+				multiple: true,
+				onSelect: function (selectedItems) {
+					if (selectedItems) {
+						selectAssets(selectedItems);
+					}
+				},
+				selectEventName: '<%= eventName %>',
+				title: delegateTarget.dataset.title,
+				url: delegateTarget.dataset.href,
+			});
+		}
+	);
+
+	function handleDestroyPortlet() {
+		delegateHandler.dispose();
+
+		Liferay.detach('destroyPortlet', handleDestroyPortlet);
+	}
+
+	Liferay.on('destroyPortlet', handleDestroyPortlet);
+</aui:script>

@@ -10,7 +10,7 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -25,7 +25,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -34,7 +34,7 @@ definition {
 	}
 
 	@description = "View the widget template applied to Asset Publisher widget."
-	@priority = 3
+	@priority = "3"
 	test ViewWidgetTemplateAppliedToAssetPublisher {
 		property portal.acceptance = "true";
 		property testray.component.names = "Asset Publisher,Content and Application Templates";
@@ -54,25 +54,11 @@ definition {
 		}
 
 		task ("Add a widget template for Asset Publisher") {
-			var newLine = '''
-''';
-			var script = TestCase.getFileContent(fileName = "adt_asset_publisher_rich_summary.ftl");
+			ApplicationDisplayTemplates.openWidgetTemplatesAdmin(siteURLKey = "test-site-name");
 
-			var script = StringUtil.regexReplaceAll(${script}, ${newLine}, "%0A");
-
-			var script = StringUtil.regexReplaceAll(${script}, " ", "%20");
-
-			var script = StringUtil.regexReplaceAll(${script}, "	", "%09");
-
-			var script = StringUtil.regexReplaceAll(${script}, "&", "%26");
-
-			var script = StringUtil.regexReplaceAll(${script}, "\+", "%2B");
-
-			JSONDDMtemplate.addWidgetTemplate(
-				groupName = "Test Site Name",
-				itemType = "Asset Publisher Template",
-				name = "Asset Publisher Test ADT",
-				script = ${script});
+			ApplicationDisplayTemplates.addCP(
+				adtFile = "adt_asset_publisher_rich_summary.ftl",
+				adtType = "Asset Publisher");
 		}
 
 		task ("Configure the display setttings of Asset Publisher") {
@@ -103,13 +89,13 @@ definition {
 				siteName = "Test Site Name");
 
 			AssetPublisherPortlet.viewCustomADTRichSummaryPG(
-				assetContent = "Web Content Content",
+				assetDescription = "Web Content Content",
 				assetTitle = "Web Content Title");
 		}
 	}
 
 	@description = "View the widget template applied to Breadcrumb widget."
-	@priority = 5
+	@priority = "5"
 	test ViewWidgetTemplateAppliedToBreadcrumb {
 		property portal.acceptance = "true";
 		property testray.component.names = "Breadcrumb,Content and Application Templates";
@@ -132,7 +118,7 @@ definition {
 				portletName = "Breadcrumb",
 				portletOption = "Configuration");
 
-			Breadcrumb.configureBreadcrumb(selectAdtType = "Arrows");
+			Breadcrumb.configureBreadcrumb(selectADTType = "Arrows");
 		}
 
 		task ("View the widget template applied to Breadcrumb") {
@@ -140,12 +126,12 @@ definition {
 				pageName = "ADT Test Page",
 				siteName = "Test Site Name");
 
-			Breadcrumb.viewADTApplied(breadcrumbAdtType = "arrows");
+			Breadcrumb.viewADTApplied(breadcrumbADTType = "arrows");
 		}
 	}
 
 	@description = "View the widget template applied to Categories Navigation widget."
-	@priority = 5
+	@priority = "5"
 	test ViewWidgetTemplateAppliedToCategoriesNavigation {
 		property portal.acceptance = "true";
 		property testray.component.names = "Categories,Content and Application Templates";
@@ -171,7 +157,7 @@ definition {
 			JSONLayout.addWidgetToPublicLayout(
 				groupName = "Test Site Name",
 				layoutName = "ADT Test Page",
-				widgetName = "Category Filter");
+				widgetName = "Categories Navigation");
 		}
 
 		task ("View the displayed content in Categories Navigation") {
@@ -193,7 +179,7 @@ definition {
 
 			ApplicationDisplayTemplates.addCP(
 				adtFile = "adt_categories_navigation_multi_column.ftl",
-				adtType = "Category Filter");
+				adtType = "Categories Navigation");
 		}
 
 		task ("Select the widget template in Categories Navigation") {
@@ -201,7 +187,7 @@ definition {
 				pageName = "ADT Test Page",
 				siteName = "Test Site Name");
 
-			ApplicationDisplayTemplates.selectPortletADT(templateName = "Category Filter Test ADT");
+			ApplicationDisplayTemplates.selectPortletADT(templateName = "Categories Navigation Test ADT");
 		}
 
 		task ("View the widget template applied to Categories Navigation") {
@@ -217,7 +203,7 @@ definition {
 	}
 
 	@description = "View the widget template applied to RSS Publisher widget."
-	@priority = 5
+	@priority = "5"
 	test ViewWidgetTemplateAppliedToRSSPublisher {
 		property portal.acceptance = "true";
 		property testray.component.names = "Content and Application Templates,RSS";
@@ -235,10 +221,10 @@ definition {
 				siteName = "Test Site Name");
 
 			RSSPortlet.addFeed(
-				feedRowIndexNumber = 0,
-				feedTitle = "Latimes > Technology News",
+				feedRowIndexNumber = "0",
+				feedTitle = "Latimes &gt; Technology News",
 				feedType = "file",
-				feedURLLink = "rss2.0.xml");
+				feedUrlLink = "rss2.0.xml");
 		}
 
 		task ("Add a widget template for RSS Publisher") {
@@ -271,7 +257,7 @@ definition {
 	}
 
 	@description = "View the widget template applied to Site Map widget."
-	@priority = 3
+	@priority = "3"
 	test ViewWidgetTemplateAppliedToSiteMap {
 		property testray.component.names = "Content and Application Templates,Sitemap";
 
@@ -302,7 +288,9 @@ definition {
 				pageName = "ADT Test Page",
 				siteName = "Test Site Name");
 
-			SiteMapPortlet.viewPageItem(pageNameList = "ADT Test Page,ADT Test Page 2,ADT Test Page 3,ADT Child Page Name");
+			SiteMapPortlet.viewDefaultPG(
+				listChildPageName = "ADT Child Page Name",
+				listPageName = "ADT Test Page,ADT Test Page 2,ADT Test Page 3");
 		}
 
 		task ("Add a widget template for Site Map") {
@@ -326,12 +314,14 @@ definition {
 				pageName = "ADT Test Page",
 				siteName = "Test Site Name");
 
-			SiteMapPortlet.viewPageItem(pageNameList = "ADT Test Page,ADT Test Page 2,ADT Test Page 3,ADT Child Page Name");
+			SiteMapPortlet.viewCustomADTMultiColumnPG(
+				listChildPageName = "ADT Child Page Name",
+				listPageName = "ADT Test Page,ADT Test Page 2,ADT Test Page 3");
 		}
 	}
 
 	@description = "View the widget template applied to Tags Navigation widget."
-	@priority = 5
+	@priority = "5"
 	test ViewWidgetTemplateAppliedToTagsNavigation {
 		property portal.acceptance = "true";
 		property testray.component.names = "Content and Application Templates,Tags";
@@ -340,7 +330,7 @@ definition {
 			JSONLayout.addWidgetToPublicLayout(
 				groupName = "Test Site Name",
 				layoutName = "ADT Test Page",
-				widgetName = "Tag Filter");
+				widgetName = "Tags Navigation");
 		}
 
 		task ("Add a widget page") {
@@ -420,7 +410,7 @@ definition {
 	}
 
 	@description = "View the widget template applied to Wiki widget."
-	@priority = 3
+	@priority = "3"
 	test ViewWidgetTemplateAppliedToWiki {
 		property app.server.types = "tomcat,websphere";
 		property testray.component.names = "Content and Application Templates,Wiki";
@@ -472,7 +462,7 @@ definition {
 	}
 
 	@description = "View the widget template based on script file applied to RSS Publisher widget."
-	@priority = 3
+	@priority = "3"
 	test ViewWidgetTemplateBasedOnScriptFileAppliedToRSSPublisher {
 		property testray.component.names = "Content and Application Templates,RSS";
 
@@ -489,10 +479,10 @@ definition {
 				siteName = "Test Site Name");
 
 			RSSPortlet.addFeed(
-				feedRowIndexNumber = 0,
+				feedRowIndexNumber = "0",
 				feedTitle = "Technology",
 				feedType = "file",
-				feedURLLink = "Technology.xml");
+				feedUrlLink = "Technology.xml");
 		}
 
 		task ("Add a widget template based on script file for RSS Publisher") {
@@ -518,19 +508,23 @@ definition {
 
 			RSSPortlet.viewNavigationDisplayFeedTitle(
 				feedTitle = "Technology",
-				navigationNullAdt = "true");
+				navigationNullADT = "true");
 		}
 	}
 
 	@description = "This is a use case for LPS-71944."
-	@priority = 5
+	@priority = "5"
 	test ViewWidgetTemplateEmbeddedWidgetAppliedToAssetPublisher {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "ApplicationDisplayTemplatesUseCase#ADTChangeTemplatePortletPreferencesMethodContracts";
 		property testray.component.names = "Asset Publisher,Content and Application Templates";
 
 		task ("Execute reindex all search indexes") {
-			SearchAdministration.executeReindex();
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "Search");
+
+			SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
 		}
 
 		task ("Edit Rich Summary widget template") {
@@ -550,7 +544,7 @@ definition {
 		portletProviderClassName="com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry"/>
 					''';
 
-			ApplicationDisplayTemplates.editADTScript(adtScript = ${script});
+			ApplicationDisplayTemplates.editADTScript(adtScript = "${script}");
 		}
 
 		task ("Add an Asset Publisher to page") {
@@ -586,7 +580,7 @@ definition {
 	}
 
 	@description = "View the widget template with corrupt script applied to RSS Publisher widget."
-	@priority = 3
+	@priority = "3"
 	test ViewWidgetTemplateWithCorruptScriptAppliedToRSSPublisher {
 		property testray.component.names = "Content and Application Templates,RSS";
 
@@ -603,10 +597,10 @@ definition {
 				siteName = "Test Site Name");
 
 			RSSPortlet.addFeed(
-				feedRowIndexNumber = 0,
-				feedTitle = "Latimes > Technology News",
+				feedRowIndexNumber = "0",
+				feedTitle = "Latimes &gt; Technology News",
 				feedType = "file",
-				feedURLLink = "rss2.0.xml");
+				feedUrlLink = "rss2.0.xml");
 		}
 
 		task ("Add a widget template for RSS Publisher") {

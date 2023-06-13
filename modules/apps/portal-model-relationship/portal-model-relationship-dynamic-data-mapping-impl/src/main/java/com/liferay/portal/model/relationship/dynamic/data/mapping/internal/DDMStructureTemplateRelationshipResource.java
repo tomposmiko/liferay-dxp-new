@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.dynamic.data.mapping.model.DDMStructure",
 	service = RelationshipResource.class
 )
@@ -49,9 +50,11 @@ public class DDMStructureTemplateRelationshipResource
 	}
 
 	private List<DDMTemplate> _getStructureTemplates(DDMStructure structure) {
+		long classNameId = _classNameLocalService.getClassNameId(
+			DDMStructure.class);
+
 		return _ddmTemplateLocalService.getTemplates(
-			structure.getGroupId(),
-			_classNameLocalService.getClassNameId(DDMStructure.class));
+			structure.getGroupId(), classNameId);
 	}
 
 	@Reference

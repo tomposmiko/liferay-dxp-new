@@ -15,44 +15,44 @@
 AUI.add(
 	'liferay-contacts-center',
 	(A) => {
-		const AArray = A.Array;
+		var AArray = A.Array;
 
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const Node = A.Node;
+		var Node = A.Node;
 
-		const ParseContent = A.Plugin.ParseContent;
+		var ParseContent = A.Plugin.ParseContent;
 
-		const CSS_NOT_SELECTED_CHECKBOX =
+		var CSS_NOT_SELECTED_CHECKBOX =
 			'input[type="checkbox"]:not(:disabled):not(:checked)';
 
-		const CSS_SELECTED_CHECKBOX =
+		var CSS_SELECTED_CHECKBOX =
 			'input[type="checkbox"]:not(:disabled):checked';
 
-		const STR_UNDEFINED = 'undefined';
+		var STR_UNDEFINED = 'undefined';
 
-		const TPL_BLOCK_IMG =
+		var TPL_BLOCK_IMG =
 			'<span>' +
 			'<span class="taglib-text">' +
 			Liferay.Language.get('blocked') +
 			'</span>' +
 			'</span>';
 
-		const TPL_CONNECTED_IMG =
+		var TPL_CONNECTED_IMG =
 			'<span>' +
 			'<span class="taglib-text">' +
 			Liferay.Language.get('connected') +
 			'</span>' +
 			'</span>';
 
-		const TPL_CONNECTION_REQUESTED_IMG =
+		var TPL_CONNECTION_REQUESTED_IMG =
 			'<span>' +
 			'<span class="taglib-text">' +
 			Liferay.Language.get('connection-requested') +
 			'</span>' +
 			'</span>';
 
-		const TPL_ENTRY_DATA =
+		var TPL_ENTRY_DATA =
 			'{lastNameAnchor}' +
 			'<div class="lfr-contact">' +
 			'<div class="lfr-contact-checkbox">' +
@@ -74,7 +74,7 @@ AUI.add(
 			'</div>' +
 			'</div>';
 
-		const TPL_ENTRY_DETAIL_DATA =
+		var TPL_ENTRY_DETAIL_DATA =
 			'<div class="contacts-profile external-contact">' +
 			'<div class="lfr-detail-info">' +
 			'{icon}' +
@@ -94,7 +94,7 @@ AUI.add(
 			'</div>' +
 			'</div>';
 
-		const TPL_FOLLOWING_IMG =
+		var TPL_FOLLOWING_IMG =
 			'<span>' +
 			'<i class="icon-user"></i>' +
 			'<span class="taglib-text">' +
@@ -102,17 +102,17 @@ AUI.add(
 			'</span>' +
 			'</span>';
 
-		const TPL_ICON =
+		var TPL_ICON =
 			'<div class="lfr-contact-thumb">' +
 			'<img alt="{fullName}" src="{portraitURL}" />' +
 			'</div>';
 
-		const TPL_NO_RESULTS =
+		var TPL_NO_RESULTS =
 			'<div class="empty">' +
 			Liferay.Language.get('there-are-no-results') +
 			'</div>';
 
-		const TPL_USER_DATA =
+		var TPL_USER_DATA =
 			'{lastNameAnchor}' +
 			'<div class="lfr-contact">' +
 			'<div class="lfr-contact-checkbox">' +
@@ -134,7 +134,7 @@ AUI.add(
 			'</div>' +
 			'</div>';
 
-		const TPL_USER_DETAIL_DATA =
+		var TPL_USER_DETAIL_DATA =
 			'<div class="lfr-contact-grid-item lfr-selected-user {cssClass}" data-viewSummaryURL="{viewSummaryURL}" id="user-{userId}">' +
 			'<input type="hidden" value="{userId}" name="selected-user-{userId}" />' +
 			'<div class="lfr-contact-thumb">' +
@@ -157,7 +157,7 @@ AUI.add(
 			'<div class="clear"></div>' +
 			'</div>';
 
-		const ContactsResult = A.Base.create(
+		var ContactsResult = A.Base.create(
 			'contactsResult',
 			A.Base,
 			[A.AutoCompleteBase],
@@ -171,7 +171,7 @@ AUI.add(
 			}
 		);
 
-		const ContactsCenter = A.Component.create({
+		var ContactsCenter = A.Component.create({
 			AUGMENTS: [Liferay.PortletBase],
 
 			EXTENDS: A.Base,
@@ -180,7 +180,7 @@ AUI.add(
 
 			prototype: {
 				_clearContactResult() {
-					const instance = this;
+					var instance = this;
 
 					instance._detailUserView.empty();
 
@@ -215,31 +215,31 @@ AUI.add(
 				},
 
 				_createContactList(config) {
-					const instance = this;
+					var instance = this;
 
-					const contactsResult = config.contactsResult;
-					const contactsResultURL = config.contactsResultURL;
-					const contactsSearchInput = config.contactsSearchInput;
+					var contactsResult = config.contactsResult;
+					var contactsResultURL = config.contactsResultURL;
+					var contactsSearchInput = config.contactsSearchInput;
 
-					const contactList = new ContactsResult({
+					var contactList = new ContactsResult({
 						inputNode: contactsSearchInput,
 						listNode: contactsResult,
 						minQueryLength: 0,
 						requestTemplate(query) {
-							const data = {};
+							var data = {};
 
 							data[instance._namespace + 'keywords'] = query;
 
 							return data;
 						},
 						resultTextLocator(response) {
-							let result = '';
+							var result = '';
 
-							if (typeof response.toString !== STR_UNDEFINED) {
+							if (typeof response.toString != STR_UNDEFINED) {
 								result = response.toString();
 							}
 							else if (
-								typeof response.responseText !== STR_UNDEFINED
+								typeof response.responseText != STR_UNDEFINED
 							) {
 								result = response.responseText;
 							}
@@ -258,7 +258,7 @@ AUI.add(
 				},
 
 				_createDataSource(url) {
-					const instance = this;
+					var instance = this;
 
 					return new A.DataSource.IO({
 						ioConfig: {
@@ -266,19 +266,19 @@ AUI.add(
 						},
 						on: {
 							request(event) {
-								const contactFilter = A.one(
+								var contactFilter = A.one(
 									'#' + instance._namespace + 'filterBy'
 								);
 
-								let filterBy = '0';
+								var filterBy = '0';
 
 								if (contactFilter) {
 									filterBy = contactFilter.get('value');
 								}
 
-								const eventData = {};
+								var eventData = {};
 
-								const data = event.request;
+								var data = event.request;
 
 								eventData[instance._namespace + 'end'] =
 									data[instance._namespace + 'end'] ||
@@ -300,51 +300,46 @@ AUI.add(
 				},
 
 				_deleteEntry(contact) {
-					const instance = this;
+					var instance = this;
 
-					const config = instance._config;
+					var config = instance._config;
 
-					const confirmMessageText = Lang.sub(
+					var confirmMessageText = Lang.sub(
 						Liferay.Language.get(
 							'are-you-sure-you-want-to-delete-x-from-your-contacts'
 						),
 						[contact.fullName]
 					);
 
-					Liferay.Util.openConfirmModal({
-						message: confirmMessageText,
-						onConfirm: (isConfirmed) => {
-							if (isConfirmed) {
-								const url = Liferay.Util.PortletURL.createActionURL(
-									config.baseActionURL,
-									{
-										'entryId': contact.entryId,
-										'javax.portlet.action': 'deleteEntry',
-										'p_p_state': 'NORMAL',
-									}
-								);
-
-								Liferay.Util.fetch(url)
-									.then((response) => {
-										return response.text();
-									})
-									.then(() => {
-										location.href = contact.redirect;
-									})
-									.catch(() => {
-										instance.showMessage(false);
-									});
+					if (confirm(confirmMessageText)) {
+						var url = Liferay.Util.PortletURL.createActionURL(
+							config.baseActionURL,
+							{
+								entryId: contact.entryId,
+								'javax.portlet.action': 'deleteEntry',
+								p_p_state: 'NORMAL',
 							}
-						},
-					});
+						);
+
+						Liferay.Util.fetch(url)
+							.then((response) => {
+								return response.text();
+							})
+							.then(() => {
+								location.href = contact.redirect;
+							})
+							.catch(() => {
+								instance.showMessage(false);
+							});
+					}
 				},
 
 				_editEntry(contact) {
-					const instance = this;
+					var instance = this;
 
-					const config = instance._config;
+					var config = instance._config;
 
-					const url = Liferay.Util.PortletURL.createRenderURL(
+					var url = Liferay.Util.PortletURL.createRenderURL(
 						config.baseRenderURL,
 						{
 							entryId: contact.entryId,
@@ -361,10 +356,10 @@ AUI.add(
 				},
 
 				_getPopup() {
-					const instance = this;
+					var instance = this;
 
 					if (!instance._popup) {
-						const contactsPortlet = A.one('.contacts-portlet');
+						var contactsPortlet = A.one('.contacts-portlet');
 
 						instance._popup = Liferay.Util.Window.getWindow({
 							dialog: {
@@ -387,10 +382,10 @@ AUI.add(
 				},
 
 				_getRequestTemplate(filterBy) {
-					const instance = this;
+					var instance = this;
 
 					return function (query) {
-						const data = {};
+						var data = {};
 
 						data[instance._namespace + 'end'] =
 							instance._maxResultCount;
@@ -403,13 +398,13 @@ AUI.add(
 				},
 
 				_onCheckAll(event) {
-					const instance = this;
+					var instance = this;
 
-					const config = instance._config;
+					var config = instance._config;
 
-					const checkBox = event.target;
+					var checkBox = event.target;
 
-					let contacts;
+					var contacts;
 
 					if (checkBox.get('checked')) {
 						contacts = instance._contactsCheckBox.all(
@@ -419,9 +414,9 @@ AUI.add(
 						if (contacts.size() > 0) {
 							contacts.set('checked', true);
 
-							let uri = config.getSelectedContactsURL;
+							var uri = config.getSelectedContactsURL;
 
-							const userIds = contacts.val();
+							var userIds = contacts.val();
 
 							uri =
 								Liferay.Util.addParams(
@@ -457,9 +452,9 @@ AUI.add(
 				},
 
 				_renderContact(data) {
-					const instance = this;
+					var instance = this;
 
-					const user = data.user;
+					var user = data.user;
 
 					return Lang.sub(TPL_USER_DETAIL_DATA, {
 						block: user.block ? TPL_BLOCK_IMG : '',
@@ -468,9 +463,7 @@ AUI.add(
 							? TPL_CONNECTION_REQUESTED_IMG
 							: '',
 						cssClass:
-							instance._numSelectedContacts % 2 === 0
-								? ''
-								: 'alt',
+							instance._numSelectedContacts % 2 == 0 ? '' : 'alt',
 						emailAddress: user.emailAddress,
 						firstName: user.firstName,
 						following: user.following ? TPL_FOLLOWING_IMG : '',
@@ -483,9 +476,9 @@ AUI.add(
 				},
 
 				_renderEntryDetailView(contact) {
-					const instance = this;
+					var instance = this;
 
-					let icon = '';
+					var icon = '';
 
 					if (instance._showIcon) {
 						icon = Lang.sub(TPL_ICON, {
@@ -494,7 +487,7 @@ AUI.add(
 						});
 					}
 
-					const contactSummary = Lang.sub(TPL_ENTRY_DETAIL_DATA, {
+					var contactSummary = Lang.sub(TPL_ENTRY_DETAIL_DATA, {
 						comments: contact.comments,
 						cssClass: instance._showIcon ? '' : 'no-icon',
 						emailAddress: contact.emailAddress,
@@ -506,7 +499,7 @@ AUI.add(
 				},
 
 				_renderEntryToolbar(contact) {
-					const instance = this;
+					var instance = this;
 
 					instance._userToolbar.empty();
 
@@ -537,22 +530,22 @@ AUI.add(
 				},
 
 				_renderResult(data, displayMessage, lastNameAnchor) {
-					const count = data.count;
-					const results = data.users;
+					var count = data.count;
+					var results = data.users;
 
-					const options = data.options;
+					var options = data.options;
 
-					const buffer = [];
+					var buffer = [];
 
-					if (!results.length && displayMessage) {
+					if (results.length == 0 && displayMessage) {
 						buffer.push(TPL_NO_RESULTS);
 					}
 					else {
-						const selectedUsersNodes = A.all(
+						var selectedUsersNodes = A.all(
 							'.lfr-contact-grid-item input'
 						);
 
-						let selectedUsersIds = [];
+						var selectedUsersIds = [];
 
 						if (selectedUsersNodes.size() > 0) {
 							selectedUsersIds = selectedUsersNodes.val();
@@ -561,11 +554,11 @@ AUI.add(
 						buffer.push(
 							results
 								.map((result) => {
-									let displayLastNameAnchor = false;
+									var displayLastNameAnchor = false;
 
-									let nameAnchor;
+									var nameAnchor;
 
-									let name;
+									var name;
 
 									if (result.portalUser) {
 										name = result.lastName;
@@ -585,24 +578,24 @@ AUI.add(
 										);
 									}
 
-									if (nameAnchor !== lastNameAnchor) {
+									if (nameAnchor != lastNameAnchor) {
 										displayLastNameAnchor = true;
 
 										lastNameAnchor = nameAnchor;
 									}
 
-									let str;
+									var str;
 
 									if (result.portalUser) {
 										str = Lang.sub(TPL_USER_DATA, {
 											checked:
 												selectedUsersIds.indexOf(
 													result.userId
-												) !== -1
+												) != -1
 													? 'checked="true"'
 													: '',
 											disabled:
-												themeDisplay.getUserId() ===
+												themeDisplay.getUserId() ==
 												result.userId
 													? 'disabled="true"'
 													: '',
@@ -664,7 +657,7 @@ AUI.add(
 					if (count > options.end) {
 						buffer.push(
 							'<div class="more-results">' +
-								'<a href="javascript:void(0);" data-end="' +
+								'<a href="javascript:;" data-end="' +
 								options.end +
 								'" data-lastNameAnchor="' +
 								lastNameAnchor +
@@ -682,7 +675,7 @@ AUI.add(
 				},
 
 				_setVisibleDetailUserView() {
-					const instance = this;
+					var instance = this;
 
 					instance._contactCenterToolbar.hide();
 
@@ -692,7 +685,7 @@ AUI.add(
 				},
 
 				_setVisibleSelectedUsersView() {
-					const instance = this;
+					var instance = this;
 
 					instance._userToolbar.empty();
 
@@ -710,11 +703,11 @@ AUI.add(
 				},
 
 				_updateContactsResult(event) {
-					const instance = this;
+					var instance = this;
 
-					const data = JSON.parse(event.data.responseText);
+					var data = JSON.parse(event.data.responseText);
 
-					const buffer = instance._renderResult(data, true, ' ');
+					var buffer = instance._renderResult(data, true, ' ');
 
 					event.currentTarget._listNode.html(buffer.join(''));
 
@@ -729,9 +722,9 @@ AUI.add(
 				},
 
 				_updateToolbarButtonsAdd(data) {
-					const instance = this;
+					var instance = this;
 
-					const user = data.user;
+					var user = data.user;
 
 					if (user.block) {
 						if (instance._unblockButton) {
@@ -794,9 +787,9 @@ AUI.add(
 				},
 
 				_updateToolbarButtonsRemove(userId) {
-					const instance = this;
+					var instance = this;
 
-					const blockUserIdIndex = instance._buttonBlockUserIds.indexOf(
+					var blockUserIdIndex = instance._buttonBlockUserIds.indexOf(
 						userId
 					);
 
@@ -814,7 +807,7 @@ AUI.add(
 						}
 					}
 
-					const unblockUserIdIndex = instance._buttonUnBlockUserIds.indexOf(
+					var unblockUserIdIndex = instance._buttonUnBlockUserIds.indexOf(
 						userId
 					);
 
@@ -832,7 +825,7 @@ AUI.add(
 						}
 					}
 
-					const addConnectionUserIdIndex = instance._buttonAddConnectionUserIds.indexOf(
+					var addConnectionUserIdIndex = instance._buttonAddConnectionUserIds.indexOf(
 						userId
 					);
 
@@ -850,7 +843,7 @@ AUI.add(
 						}
 					}
 
-					const removeConnectionUserIdIndex = instance._buttonRemoveConnectionUserIds.indexOf(
+					var removeConnectionUserIdIndex = instance._buttonRemoveConnectionUserIds.indexOf(
 						userId
 					);
 
@@ -868,7 +861,7 @@ AUI.add(
 						}
 					}
 
-					const followUserIdIndex = instance._buttonFollowUserIds.indexOf(
+					var followUserIdIndex = instance._buttonFollowUserIds.indexOf(
 						userId
 					);
 
@@ -886,7 +879,7 @@ AUI.add(
 						}
 					}
 
-					const unFollowUserIdIndex = instance._buttonUnFollowUserIds.indexOf(
+					var unFollowUserIdIndex = instance._buttonUnFollowUserIds.indexOf(
 						userId
 					);
 
@@ -904,7 +897,7 @@ AUI.add(
 						}
 					}
 
-					const exportUserIdIndex = instance._buttonExportUserIds.indexOf(
+					var exportUserIdIndex = instance._buttonExportUserIds.indexOf(
 						userId
 					);
 
@@ -924,14 +917,14 @@ AUI.add(
 				},
 
 				_updateUserIcons(user) {
-					const contactsAction = A.one('.contacts-action');
+					var contactsAction = A.one('.contacts-action');
 
 					contactsAction.hide();
 
-					const blockIcon = contactsAction.one('.block');
-					const connectedIcon = contactsAction.one('.connected');
-					const disabledIcon = contactsAction.one('.disabled');
-					const followingIcon = contactsAction.one('.following');
+					var blockIcon = contactsAction.one('.block');
+					var connectedIcon = contactsAction.one('.connected');
+					var disabledIcon = contactsAction.one('.disabled');
+					var followingIcon = contactsAction.one('.following');
 
 					if (user.block) {
 						blockIcon.show();
@@ -967,20 +960,20 @@ AUI.add(
 				},
 
 				_updateUserToolBar(user) {
-					const instance = this;
+					var instance = this;
 
 					instance._userToolbar.hide();
 
-					const addConnectionButton = instance.byId(
+					var addConnectionButton = instance.byId(
 						'addConnectionButton'
 					);
-					const blockButton = instance.byId('blockButton');
-					const followButton = instance.byId('followButton');
-					const removeConnectionButton = instance.byId(
+					var blockButton = instance.byId('blockButton');
+					var followButton = instance.byId('followButton');
+					var removeConnectionButton = instance.byId(
 						'removeConnectionButton'
 					);
-					const unblockButton = instance.byId('unblockButton');
-					const unfollowButton = instance.byId('unfollowButton');
+					var unblockButton = instance.byId('unblockButton');
+					var unfollowButton = instance.byId('unfollowButton');
 
 					if (user.block) {
 						addConnectionButton.hide();
@@ -1021,11 +1014,11 @@ AUI.add(
 				},
 
 				addContactResult(data) {
-					const instance = this;
+					var instance = this;
 
 					instance._setVisibleSelectedUsersView();
 
-					const contact = instance._renderContact(data);
+					var contact = instance._renderContact(data);
 
 					if (instance._numSelectedContacts <= 0) {
 						instance._selectedUsersView.html(contact);
@@ -1053,9 +1046,9 @@ AUI.add(
 				},
 
 				addContactResults(data) {
-					const instance = this;
+					var instance = this;
 
-					const contacts = data.contacts;
+					var contacts = data.contacts;
 
 					contacts.map((contact) => {
 						instance.addContactResult(contact);
@@ -1063,7 +1056,7 @@ AUI.add(
 				},
 
 				closePopup() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._popup) {
 						instance._popup.hide();
@@ -1071,11 +1064,11 @@ AUI.add(
 				},
 
 				deleteContactResult(userId) {
-					const instance = this;
+					var instance = this;
 
 					instance._setVisibleSelectedUsersView();
 
-					const user = A.one('#user-' + userId);
+					var user = A.one('#user-' + userId);
 
 					if (user) {
 						user.remove(true);
@@ -1095,7 +1088,7 @@ AUI.add(
 				},
 
 				deleteContactResults(userIds) {
-					const instance = this;
+					var instance = this;
 
 					userIds.map((userId) => {
 						instance.deleteContactResult(userId);
@@ -1103,7 +1096,7 @@ AUI.add(
 				},
 
 				initializer(config) {
-					const instance = this;
+					var instance = this;
 
 					instance._config = config;
 
@@ -1170,7 +1163,7 @@ AUI.add(
 				},
 
 				renderContent(data, clear) {
-					const instance = this;
+					var instance = this;
 
 					if (clear) {
 						instance._clearContactResult();
@@ -1178,9 +1171,9 @@ AUI.add(
 
 					instance._setVisibleDetailUserView();
 
-					const content = Node.create(data);
+					var content = Node.create(data);
 
-					const contactSummary = instance.one(
+					var contactSummary = instance.one(
 						'#contactSummary',
 						content
 					);
@@ -1193,10 +1186,7 @@ AUI.add(
 						instance._detailUserView.setContent(contactSummary);
 					}
 
-					const userToolbar = instance.one(
-						'#contactsToolbar',
-						content
-					);
+					var userToolbar = instance.one('#contactsToolbar', content);
 
 					if (userToolbar) {
 						instance._userToolbar.empty();
@@ -1208,22 +1198,22 @@ AUI.add(
 				},
 
 				renderEntry(data, lastNameAnchor) {
-					const instance = this;
+					var instance = this;
 
-					const contact = data.contact;
+					var contact = data.contact;
 
 					instance._renderEntryDetailView(contact);
 					instance._renderEntryToolbar(contact);
 
-					const contactList = data.contactList;
+					var contactList = data.contactList;
 
-					const contactUserHTML = instance._renderResult(
+					var contactUserHTML = instance._renderResult(
 						contactList,
 						true,
 						lastNameAnchor
 					);
 
-					const contactResultContent = A.one(
+					var contactResultContent = A.one(
 						'.contacts-portlet .contacts-result'
 					);
 
@@ -1233,16 +1223,16 @@ AUI.add(
 				},
 
 				renderSelectedContacts(data, lastNameAnchor) {
-					const instance = this;
+					var instance = this;
 
-					const contacts = data.contacts;
+					var contacts = data.contacts;
 
-					if (contacts && !!contacts.length) {
+					if (contacts && contacts.length > 0) {
 						if (
 							!instance._detailUserView.hasClass('hide') &&
-							contacts.length === 1
+							contacts.length == 1
 						) {
-							const user = contacts[0].user;
+							var user = contacts[0].user;
 
 							instance._updateUserToolBar(user);
 							instance._updateUserIcons(user);
@@ -1256,15 +1246,15 @@ AUI.add(
 						}
 					}
 
-					const contactList = data.contactList;
+					var contactList = data.contactList;
 
-					const contactUserHTML = instance._renderResult(
+					var contactUserHTML = instance._renderResult(
 						contactList,
 						true,
 						lastNameAnchor
 					);
 
-					const contactResultContent = A.one(
+					var contactResultContent = A.one(
 						'.contacts-portlet .contacts-result'
 					);
 
@@ -1274,11 +1264,11 @@ AUI.add(
 				},
 
 				showMessage(success, message) {
-					const instance = this;
+					var instance = this;
 
 					if (instance._messageContainer) {
 						if (success) {
-							if (!message || message === '') {
+							if (!message || message == '') {
 								message = instance._defaultMessageSuccess;
 							}
 
@@ -1289,7 +1279,7 @@ AUI.add(
 							);
 						}
 						else {
-							if (!message || message === '') {
+							if (!message || message == '') {
 								message = instance._defaultMessageError;
 							}
 
@@ -1303,20 +1293,18 @@ AUI.add(
 				},
 
 				showMoreResult(responseData, lastNameAnchor) {
-					const instance = this;
+					var instance = this;
 
-					const contactUserHTML = instance._renderResult(
+					var contactUserHTML = instance._renderResult(
 						responseData,
 						false,
 						lastNameAnchor
 					);
 
-					const contactResultContent = A.one(
+					var contactResultContent = A.one(
 						'.contacts-portlet .contacts-result'
 					);
-					const moreResults = A.one(
-						'.contacts-portlet .more-results'
-					);
+					var moreResults = A.one('.contacts-portlet .more-results');
 
 					moreResults.remove();
 
@@ -1324,7 +1312,7 @@ AUI.add(
 				},
 
 				showPopup(title, uri) {
-					const instance = this;
+					var instance = this;
 
 					instance._getPopup();
 
@@ -1338,7 +1326,7 @@ AUI.add(
 				},
 
 				updateContacts(keywords, filterBy) {
-					const instance = this;
+					var instance = this;
 
 					if (instance._contactList) {
 						instance._contactList.sendRequest(

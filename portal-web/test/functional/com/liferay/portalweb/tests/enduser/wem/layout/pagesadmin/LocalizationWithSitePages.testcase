@@ -3,24 +3,20 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Page Administration";
+	property testray.main.component.name = "Site Pages Administration";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
+		User.firstLoginPG();
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		JSONGroup.addGroup(groupName = "Test Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -28,79 +24,122 @@ definition {
 		}
 	}
 
-	@description = "Can add a translation to parent and child page."
-	@priority = 3
-	test AddTranslationToPageName {
-		property testray.component.names = "Localization,Sites Administration,Site Localization";
+	@priority = "3"
+	test AddPageAndChildPageTranslations {
+		property test.name.skip.portal.instance = "LocalizationWithSitePages#AddPageAndChildPageTranslations";
+		property testray.component.names = "Localization,Site Administration,Site Localization,Site Pages Administration";
 
-		task ("Get portal URL") {
-			var portalURL = PropsUtil.get("portal.url");
-		}
+		var portalURL = PropsUtil.get("portal.url");
 
-		task ("Add widget page") {
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Home");
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+		SitePages.gotoPageMenuItem(
+			menuItem = "Configure",
+			pageName = "Home");
+
+		Page.addPageTranslations(
+			page = "Home",
+			pageTranslation = "es_ES",
+			pageTranslationName = "Casa");
+
+		Navigator.openSiteURL(siteName = "Test Site Name");
+
+		Page.viewTranslationsPG(
+			defaultLanguageLocalizationMessage = "Display the page in English (United States).",
+			pageName = "Casa",
+			preferredLanguageLocalizationMessage = "Establecer español (España) como su idioma preferido.",
+			sitePageURL = "${portalURL}/es/web/test-site-name/home",
+			translationLanguageLocalizationMessage = "This page is displayed in Spanish (Spain).");
+
+		Navigator.openSiteURL(siteName = "Test Site Name");
+
+		Page.localizedPG(pageLocale = "Display the page in English (United States)");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Blog Page",
+			parentLayoutName = "Home");
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+		SitePages.gotoPageMenuItem(
+			menuItem = "Configure",
+			pageName = "Blog Page",
+			parentPagesHierarchy = "Home");
+
+		Page.addPageTranslations(
+			page = "Blog Page",
+			pageTranslation = "es_ES",
+			pageTranslationName = "Blog Página");
+
+		Navigator.openSiteURL(siteName = "Test Site Name");
+
+		Page.viewTranslationsPG(
+			childPageName = "Blog Página",
+			defaultLanguageLocalizationMessage = "Display the page in English (United States).",
+			preferredLanguageLocalizationMessage = "Establecer español (España) como su idioma preferido.",
+			sitePageURL = "${portalURL}/es/web/test-site-name/blog-page",
+			translationLanguageLocalizationMessage = "This page is displayed in Spanish (Spain).");
+	}
+
+	@description = "Users can preview localized draft for a content page."
+	@priority = "3"
+	test PreviewLocalizedDraftContentPage {
+		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
 				groupName = "Test Site Name",
-				layoutName = "Home");
+				layoutName = "Test Page Name",
+				type = "content");
 		}
 
-		task ("Add a translation of page to es-ES") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		task ("Add a Button fragment to page") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Page Name",
+				siteName = "Test Site Name");
 
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Configure",
-				pageName = "Home");
-
-			PagesAdmin.addLocalizedName(
-				localeList = "es-ES",
-				localizedNameList = "Casa");
+			PageEditor.addFragment(
+				collectionName = "Basic Components",
+				fragmentName = "Button");
 		}
 
-		task ("View page name is translated when change locale to es-ES") {
-			Navigator.openSiteURL(siteName = "Test Site Name");
-
-			Page.viewTranslationsPG(
-				defaultLanguageLocalizationMessage = "Display the page in English (United States).",
-				pageName = "Casa",
-				preferredLanguageLocalizationMessage = "Establecer español (España) como su idioma preferido.",
-				sitePageURL = "${portalURL}/es/web/test-site-name/home",
-				translationLanguageLocalizationMessage = "This page is displayed in Spanish (Spain).");
+		task ("Change the locale to ca-ES") {
+			PageEditor.changeLocale(
+				currentLocale = "en-US",
+				locale = "ca-ES");
 		}
 
-		task ("Locale the page to English") {
-			Navigator.openSiteURL(siteName = "Test Site Name");
-
-			Page.localizedPG(pageLocale = "Display the page in English (United States)");
+		task ("Add the localized inline text") {
+			PageEditor.editFragmentText(
+				fragmentName = "Button",
+				id = "link",
+				text = "Aneu a algun lloc");
 		}
 
-		task ("Add child widget page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Blog Page",
-				parentLayoutName = "Home");
+		task ("Navigate to the Pages admin") {
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 		}
 
-		task ("Add a translation of child page to es-ES") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-			PagesAdmin.gotoPageEllipsisMenuItem(
-				menuItem = "Configure",
-				pageName = "Blog Page",
-				parentPagesHierarchy = "Home");
-
-			PagesAdmin.addLocalizedName(
-				localeList = "es-ES",
-				localizedNameList = "Blog Página");
+		task ("Change the user language to ca-ES") {
+			Navigator.ensureLocaleURL(locale = "ca");
 		}
 
-		task ("View child page name is transled when changing site language to es-ES") {
-			Navigator.openSiteURL(siteName = "Test Site Name");
+		task ("Preview the localized draft content page in a new tab") {
+			SitePages.gotoPageMenuItem(
+				menuItem = "Previsualitza l'esborrany",
+				pageName = "Test Page Name");
 
-			Page.viewTranslationsPG(
-				childPageName = "Blog Página",
-				defaultLanguageLocalizationMessage = "Display the page in English (United States).",
-				preferredLanguageLocalizationMessage = "Establecer español (España) como su idioma preferido.",
-				sitePageURL = "${portalURL}/es/web/test-site-name/blog-page",
-				translationLanguageLocalizationMessage = "This page is displayed in Spanish (Spain).");
+			SelectWindow.selectPopUp(locator1 = "null");
+
+			ControlMenu.viewHeaderTitle(headerTitle = "Test Page Name");
+
+			AssertTextEquals(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Aneu a algun lloc");
 		}
 	}
 

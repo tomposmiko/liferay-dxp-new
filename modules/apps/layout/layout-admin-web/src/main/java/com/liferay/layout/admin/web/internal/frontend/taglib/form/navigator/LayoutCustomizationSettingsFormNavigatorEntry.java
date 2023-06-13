@@ -16,10 +16,11 @@ package com.liferay.layout.admin.web.internal.frontend.taglib.form.navigator;
 
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstants;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.GroupLocalService;
 
 import javax.servlet.ServletContext;
 
@@ -38,12 +39,7 @@ public class LayoutCustomizationSettingsFormNavigatorEntry
 
 	@Override
 	public String getCategoryKey() {
-		return FormNavigatorConstants.CATEGORY_KEY_LAYOUT_GENERAL;
-	}
-
-	@Override
-	public String getFormNavigatorId() {
-		return FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT;
+		return FormNavigatorConstants.CATEGORY_KEY_LAYOUT_ADVANCED;
 	}
 
 	@Override
@@ -52,19 +48,18 @@ public class LayoutCustomizationSettingsFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public boolean isVisible(User user, Layout layout) {
+		Group group = layout.getGroup();
+
+		if (group == null) {
+			_log.error("Unable to display form for customization settings");
+		}
+
 		if (layout.isTypeAssetDisplay() || layout.isTypeContent()) {
 			return false;
 		}
 
-		Group group = _groupLocalService.fetchGroup(layout.getGroupId());
-
-		if ((group != null) && !group.isUser() && layout.isTypePortlet()) {
+		if (!group.isUser() && layout.isTypePortlet()) {
 			return true;
 		}
 
@@ -72,14 +67,20 @@ public class LayoutCustomizationSettingsFormNavigatorEntry
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/layout/customization_settings.jsp";
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")
-	private ServletContext _servletContext;
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutCustomizationSettingsFormNavigatorEntry.class);
 
 }

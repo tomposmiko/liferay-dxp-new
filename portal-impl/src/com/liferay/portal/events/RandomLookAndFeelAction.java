@@ -101,7 +101,7 @@ public class RandomLookAndFeelAction extends Action {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw new ActionException(exception);
 		}

@@ -36,7 +36,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  */
-@Component(service = {})
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceMessagingConfigurator.class
+)
 public class CommerceMessagingConfigurator {
 
 	@Activate

@@ -25,24 +25,21 @@ function SliderWithLabel({
 		<label className="form-group-autofit">
 			<span className="form-group-item">
 				{label}
-
 				{subTitle && (
 					<span className="font-weight-normal form-text">
 						{subTitle}
 					</span>
 				)}
 			</span>
-
 			<div className="flex-row form-group-item">
 				<ClaySlider
 					className="w-100"
 					max={max}
 					min={min}
-					onChange={onValueChange}
+					onValueChange={onValueChange}
 					showTooltip={false}
 					value={value}
 				/>
-
 				<small className="font-weight-normal form-text ml-3">
 					{value + '%'}
 				</small>

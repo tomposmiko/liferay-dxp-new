@@ -37,13 +37,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Sergio González
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class MBPortletHeaderJSPDynamicInclude extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -87,12 +82,16 @@ public class MBPortletHeaderJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.message.boards.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		MBPortletHeaderJSPDynamicInclude.class);
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.message.boards.web)"
-	)
-	private ServletContext _servletContext;
 
 }

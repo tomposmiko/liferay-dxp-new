@@ -22,13 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.dto.v1_0.KnowledgeBaseAttachment;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.resource.v1_0.KnowledgeBaseAttachmentResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.KnowledgeBaseAttachmentSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -53,24 +51,24 @@ import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.io.File;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -192,7 +190,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 		knowledgeBaseAttachment.setContentUrl(regex);
 		knowledgeBaseAttachment.setContentValue(regex);
 		knowledgeBaseAttachment.setEncodingFormat(regex);
-		knowledgeBaseAttachment.setExternalReferenceCode(regex);
 		knowledgeBaseAttachment.setFileExtension(regex);
 		knowledgeBaseAttachment.setTitle(regex);
 
@@ -206,8 +203,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 		Assert.assertEquals(regex, knowledgeBaseAttachment.getContentUrl());
 		Assert.assertEquals(regex, knowledgeBaseAttachment.getContentValue());
 		Assert.assertEquals(regex, knowledgeBaseAttachment.getEncodingFormat());
-		Assert.assertEquals(
-			regex, knowledgeBaseAttachment.getExternalReferenceCode());
 		Assert.assertEquals(regex, knowledgeBaseAttachment.getFileExtension());
 		Assert.assertEquals(regex, knowledgeBaseAttachment.getTitle());
 	}
@@ -244,10 +239,7 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantKnowledgeBaseAttachment),
 				(List<KnowledgeBaseAttachment>)page.getItems());
-			assertValid(
-				page,
-				testGetKnowledgeBaseArticleKnowledgeBaseAttachmentsPage_getExpectedActions(
-					irrelevantKnowledgeBaseArticleId));
+			assertValid(page);
 		}
 
 		KnowledgeBaseAttachment knowledgeBaseAttachment1 =
@@ -268,37 +260,13 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(knowledgeBaseAttachment1, knowledgeBaseAttachment2),
 			(List<KnowledgeBaseAttachment>)page.getItems());
-		assertValid(
-			page,
-			testGetKnowledgeBaseArticleKnowledgeBaseAttachmentsPage_getExpectedActions(
-				knowledgeBaseArticleId));
+		assertValid(page);
 
 		knowledgeBaseAttachmentResource.deleteKnowledgeBaseAttachment(
 			knowledgeBaseAttachment1.getId());
 
 		knowledgeBaseAttachmentResource.deleteKnowledgeBaseAttachment(
 			knowledgeBaseAttachment2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetKnowledgeBaseArticleKnowledgeBaseAttachmentsPage_getExpectedActions(
-				Long knowledgeBaseArticleId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/knowledge-base-attachments/batch".
-				replace(
-					"{knowledgeBaseArticleId}",
-					String.valueOf(knowledgeBaseArticleId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	protected KnowledgeBaseAttachment
@@ -395,7 +363,7 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 	@Test
 	public void testGraphQLDeleteKnowledgeBaseAttachment() throws Exception {
 		KnowledgeBaseAttachment knowledgeBaseAttachment =
-			testGraphQLDeleteKnowledgeBaseAttachment_addKnowledgeBaseAttachment();
+			testGraphQLKnowledgeBaseAttachment_addKnowledgeBaseAttachment();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -410,6 +378,7 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteKnowledgeBaseAttachment"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -425,13 +394,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected KnowledgeBaseAttachment
-			testGraphQLDeleteKnowledgeBaseAttachment_addKnowledgeBaseAttachment()
-		throws Exception {
-
-		return testGraphQLKnowledgeBaseAttachment_addKnowledgeBaseAttachment();
 	}
 
 	@Test
@@ -458,7 +420,7 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 	@Test
 	public void testGraphQLGetKnowledgeBaseAttachment() throws Exception {
 		KnowledgeBaseAttachment knowledgeBaseAttachment =
-			testGraphQLGetKnowledgeBaseAttachment_addKnowledgeBaseAttachment();
+			testGraphQLKnowledgeBaseAttachment_addKnowledgeBaseAttachment();
 
 		Assert.assertTrue(
 			equals(
@@ -501,277 +463,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected KnowledgeBaseAttachment
-			testGraphQLGetKnowledgeBaseAttachment_addKnowledgeBaseAttachment()
-		throws Exception {
-
-		return testGraphQLKnowledgeBaseAttachment_addKnowledgeBaseAttachment();
-	}
-
-	@Test
-	public void testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode()
-		throws Exception {
-
-		KnowledgeBaseAttachment postKnowledgeBaseAttachment =
-			testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment();
-
-		KnowledgeBaseAttachment getKnowledgeBaseAttachment =
-			knowledgeBaseAttachmentResource.
-				getSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode(
-					testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId(),
-					testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode(),
-					postKnowledgeBaseAttachment.getExternalReferenceCode());
-
-		assertEquals(postKnowledgeBaseAttachment, getKnowledgeBaseAttachment);
-		assertValid(getKnowledgeBaseAttachment);
-	}
-
-	protected Long
-			testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected KnowledgeBaseAttachment
-			testGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode()
-		throws Exception {
-
-		KnowledgeBaseAttachment knowledgeBaseAttachment =
-			testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment();
-
-		Assert.assertTrue(
-			equals(
-				knowledgeBaseAttachment,
-				KnowledgeBaseAttachmentSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"knowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"siteKey",
-											"\"" +
-												testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId() +
-													"\"");
-
-										put(
-											"knowledgeBaseArticleExternalReferenceCode",
-											"\"" +
-												testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode() +
-													"\"");
-
-										put(
-											"externalReferenceCode",
-											"\"" +
-												knowledgeBaseAttachment.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/knowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCodeNotFound()
-		throws Exception {
-
-		String irrelevantKnowledgeBaseArticleExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"knowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"siteKey",
-									"\"" + irrelevantGroup.getGroupId() + "\"");
-								put(
-									"knowledgeBaseArticleExternalReferenceCode",
-									irrelevantKnowledgeBaseArticleExternalReferenceCode);
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected KnowledgeBaseAttachment
-			testGraphQLGetSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment()
-		throws Exception {
-
-		return testGraphQLKnowledgeBaseAttachment_addKnowledgeBaseAttachment();
-	}
-
-	@Test
-	public void testPostSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode()
-		throws Exception {
-
-		KnowledgeBaseAttachment randomKnowledgeBaseAttachment =
-			randomKnowledgeBaseAttachment();
-
-		Map<String, File> multipartFiles = getMultipartFiles();
-
-		KnowledgeBaseAttachment postKnowledgeBaseAttachment =
-			testPostSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment(
-				randomKnowledgeBaseAttachment, multipartFiles);
-
-		assertEquals(
-			randomKnowledgeBaseAttachment, postKnowledgeBaseAttachment);
-		assertValid(postKnowledgeBaseAttachment);
-
-		assertValid(postKnowledgeBaseAttachment, multipartFiles);
-	}
-
-	protected KnowledgeBaseAttachment
-			testPostSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment(
-				KnowledgeBaseAttachment knowledgeBaseAttachment,
-				Map<String, File> multipartFiles)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode()
-		throws Exception {
-
-		KnowledgeBaseAttachment postKnowledgeBaseAttachment =
-			testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment();
-
-		KnowledgeBaseAttachment randomKnowledgeBaseAttachment =
-			randomKnowledgeBaseAttachment();
-
-		Map<String, File> multipartFiles = getMultipartFiles();
-
-		KnowledgeBaseAttachment putKnowledgeBaseAttachment =
-			knowledgeBaseAttachmentResource.
-				putSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode(
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId(),
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode(),
-					postKnowledgeBaseAttachment.getExternalReferenceCode(),
-					randomKnowledgeBaseAttachment, multipartFiles);
-
-		assertEquals(randomKnowledgeBaseAttachment, putKnowledgeBaseAttachment);
-		assertValid(putKnowledgeBaseAttachment);
-
-		KnowledgeBaseAttachment getKnowledgeBaseAttachment =
-			knowledgeBaseAttachmentResource.
-				getSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode(
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId(),
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode(),
-					putKnowledgeBaseAttachment.getExternalReferenceCode());
-
-		assertEquals(randomKnowledgeBaseAttachment, getKnowledgeBaseAttachment);
-		assertValid(getKnowledgeBaseAttachment);
-
-		assertValid(getKnowledgeBaseAttachment, multipartFiles);
-
-		KnowledgeBaseAttachment newKnowledgeBaseAttachment =
-			testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_createKnowledgeBaseAttachment();
-
-		putKnowledgeBaseAttachment =
-			knowledgeBaseAttachmentResource.
-				putSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode(
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId(),
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode(),
-					newKnowledgeBaseAttachment.getExternalReferenceCode(),
-					newKnowledgeBaseAttachment, getMultipartFiles());
-
-		assertEquals(newKnowledgeBaseAttachment, putKnowledgeBaseAttachment);
-		assertValid(putKnowledgeBaseAttachment);
-
-		getKnowledgeBaseAttachment =
-			knowledgeBaseAttachmentResource.
-				getSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode(
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId(),
-					testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode(),
-					putKnowledgeBaseAttachment.getExternalReferenceCode());
-
-		assertEquals(newKnowledgeBaseAttachment, getKnowledgeBaseAttachment);
-
-		Assert.assertEquals(
-			newKnowledgeBaseAttachment.getExternalReferenceCode(),
-			putKnowledgeBaseAttachment.getExternalReferenceCode());
-	}
-
-	protected Long
-			testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getSiteId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_getKnowledgeBaseArticleExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected KnowledgeBaseAttachment
-			testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_createKnowledgeBaseAttachment()
-		throws Exception {
-
-		return randomKnowledgeBaseAttachment();
-	}
-
-	protected KnowledgeBaseAttachment
-			testPutSiteKnowledgeBaseArticleByExternalReferenceCodeKnowledgeBaseArticleExternalReferenceCodeKnowledgeBaseAttachmentByExternalReferenceCode_addKnowledgeBaseAttachment()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected KnowledgeBaseAttachment
@@ -904,18 +595,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (knowledgeBaseAttachment.getExternalReferenceCode() ==
-						null) {
-
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("fileExtension", additionalAssertFieldName)) {
 				if (knowledgeBaseAttachment.getFileExtension() == null) {
 					valid = false;
@@ -958,13 +637,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 	}
 
 	protected void assertValid(Page<KnowledgeBaseAttachment> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<KnowledgeBaseAttachment> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<KnowledgeBaseAttachment> knowledgeBaseAttachments =
@@ -980,20 +652,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1098,19 +756,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						knowledgeBaseAttachment1.getExternalReferenceCode(),
-						knowledgeBaseAttachment2.getExternalReferenceCode())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("fileExtension", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						knowledgeBaseAttachment1.getFileExtension(),
@@ -1192,16 +837,14 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1220,10 +863,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1233,18 +872,18 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1282,16 +921,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 			sb.append("'");
 			sb.append(
 				String.valueOf(knowledgeBaseAttachment.getEncodingFormat()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("externalReferenceCode")) {
-			sb.append("'");
-			sb.append(
-				String.valueOf(
-					knowledgeBaseAttachment.getExternalReferenceCode()));
 			sb.append("'");
 
 			return sb.toString();
@@ -1381,8 +1010,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 					RandomTestUtil.randomString());
 				encodingFormat = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				externalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				fileExtension = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
@@ -1411,115 +1038,6 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1596,6 +1114,18 @@ public abstract class BaseKnowledgeBaseAttachmentResourceTestCase {
 		LogFactoryUtil.getLog(
 			BaseKnowledgeBaseAttachmentResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

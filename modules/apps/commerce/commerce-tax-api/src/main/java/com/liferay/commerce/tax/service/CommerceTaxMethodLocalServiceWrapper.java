@@ -27,10 +27,6 @@ public class CommerceTaxMethodLocalServiceWrapper
 	implements CommerceTaxMethodLocalService,
 			   ServiceWrapper<CommerceTaxMethodLocalService> {
 
-	public CommerceTaxMethodLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceTaxMethodLocalServiceWrapper(
 		CommerceTaxMethodLocalService commerceTaxMethodLocalService) {
 

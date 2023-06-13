@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jonathan Lee
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + MBPortletKeys.MESSAGE_BOARDS,
 	service = AssetRendererFactory.class
 )
@@ -102,7 +103,7 @@ public class MBCategoryAssetRendererFactory
 		}
 		catch (WindowStateException windowStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(windowStateException);
+				_log.debug(windowStateException, windowStateException);
 			}
 		}
 
@@ -120,6 +121,13 @@ public class MBCategoryAssetRendererFactory
 			permissionChecker, category, actionId);
 	}
 
+	@Reference(unbind = "-")
+	protected void setMBCategoryLocalService(
+		MBCategoryLocalService mbCategoryLocalService) {
+
+		_mbCategoryLocalService = mbCategoryLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		MBCategoryAssetRendererFactory.class);
 
@@ -129,7 +137,6 @@ public class MBCategoryAssetRendererFactory
 	private ModelResourcePermission<MBCategory>
 		_categoryModelResourcePermission;
 
-	@Reference
 	private MBCategoryLocalService _mbCategoryLocalService;
 
 }

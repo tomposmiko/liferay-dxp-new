@@ -217,8 +217,4 @@ public interface SocialActivityAchievementModel
 	@Override
 	public SocialActivityAchievement cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

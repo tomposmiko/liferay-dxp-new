@@ -12,7 +12,7 @@
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import {ClaySelect} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React, {useMemo} from 'react';
 
 import {ZOOM_STEP, ZOOM_VALUES} from '../utilities/constants';
@@ -26,7 +26,6 @@ function DiagramFooter({
 }) {
 	function _handleZoomUpdate(value) {
 		chartInstance.current?.updateZoom(value);
-
 		updateCurrentZoom(value);
 	}
 
@@ -37,10 +36,10 @@ function DiagramFooter({
 	}, [currentZoom]);
 
 	return (
-		<ManagementToolbar.Container className="py-2">
+		<ClayManagementToolbar className="py-2">
 			<div className="d-flex flex-grow-1 justify-content-end">
-				<ManagementToolbar.ItemList>
-					<ManagementToolbar.Item>
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item>
 						<ClayButton
 							className="ml-1"
 							displayType="secondary"
@@ -52,13 +51,11 @@ function DiagramFooter({
 								/>
 							</span>
 
-							{expanded
-								? Liferay.Language.get('compress')
-								: Liferay.Language.get('expand')}
+							{Liferay.Language.get('expand')}
 						</ClayButton>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 
-					<ManagementToolbar.Item>
+					<ClayManagementToolbar.Item>
 						<ClayButtonWithIcon
 							className="ml-1"
 							disabled={currentZoom <= ZOOM_VALUES[0]}
@@ -78,9 +75,9 @@ function DiagramFooter({
 							}}
 							symbol="hr"
 						/>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 
-					<ManagementToolbar.Item>
+					<ClayManagementToolbar.Item>
 						<ClaySelect
 							className="ml-1"
 							onChange={(event) => {
@@ -96,9 +93,9 @@ function DiagramFooter({
 								/>
 							))}
 						</ClaySelect>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 
-					<ManagementToolbar.Item>
+					<ClayManagementToolbar.Item>
 						<ClayButtonWithIcon
 							className="ml-1"
 							disabled={
@@ -121,10 +118,10 @@ function DiagramFooter({
 							}}
 							symbol="plus"
 						/>
-					</ManagementToolbar.Item>
-				</ManagementToolbar.ItemList>
+					</ClayManagementToolbar.Item>
+				</ClayManagementToolbar.ItemList>
 			</div>
-		</ManagementToolbar.Container>
+		</ClayManagementToolbar>
 	);
 }
 

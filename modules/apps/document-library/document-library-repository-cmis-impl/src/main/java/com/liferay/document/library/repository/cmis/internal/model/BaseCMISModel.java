@@ -124,17 +124,17 @@ public abstract class BaseCMISModel {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		if (user == null) {
 			try {
-				user = UserLocalServiceUtil.getGuestUser(getCompanyId());
+				user = UserLocalServiceUtil.getDefaultUser(getCompanyId());
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -159,8 +159,6 @@ public abstract class BaseCMISModel {
 			ActionKeys.DELETE, Action.CAN_DELETE_OBJECT
 		).put(
 			ActionKeys.DELETE_DISCUSSION, Action.CAN_DELETE_OBJECT
-		).put(
-			ActionKeys.DOWNLOAD, Action.CAN_GET_CONTENT_STREAM
 		).put(
 			ActionKeys.UPDATE, Action.CAN_UPDATE_PROPERTIES
 		).put(

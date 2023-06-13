@@ -15,17 +15,14 @@
 package com.liferay.adaptive.media.journal.internal.exportimport.data.handler.test;
 
 import com.liferay.adaptive.media.image.configuration.AMImageConfigurationHelper;
-import com.liferay.adaptive.media.image.html.AMImageHTMLTagFactory;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
-import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.test.util.lar.BaseWorkflowedStagedModelDataHandlerTestCase;
 import com.liferay.journal.constants.JournalArticleConstants;
@@ -35,7 +32,6 @@ import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.journal.util.JournalContent;
-import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -57,11 +53,11 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -125,21 +121,12 @@ public class AMJournalArticleStagedModelDataHandlerTest
 		JournalArticle journalArticle = _addJournalArticle(
 			content, _getServiceContext());
 
-		ExportImportThreadLocal.setPortletImportInProcess(true);
-
-		try {
-			exportImportStagedModel(journalArticle);
-		}
-		finally {
-			ExportImportThreadLocal.setPortletImportInProcess(false);
-		}
+		exportImportStagedModel(journalArticle);
 
 		JournalArticle importedJournalArticle = (JournalArticle)getStagedModel(
 			journalArticle.getUuid(), liveGroup);
 
-		_assertXMLEquals(
-			_getExpectedDynamicContent(fileEntry1, fileEntry2),
-			importedJournalArticle.getContent());
+		_assertContentEquals(journalArticle, importedJournalArticle);
 	}
 
 	@Test
@@ -156,21 +143,12 @@ public class AMJournalArticleStagedModelDataHandlerTest
 		JournalArticle journalArticle = _addJournalArticle(
 			content, serviceContext);
 
-		ExportImportThreadLocal.setPortletImportInProcess(true);
-
-		try {
-			exportImportStagedModel(journalArticle);
-		}
-		finally {
-			ExportImportThreadLocal.setPortletImportInProcess(false);
-		}
+		exportImportStagedModel(journalArticle);
 
 		JournalArticle importedJournalArticle = (JournalArticle)getStagedModel(
 			journalArticle.getUuid(), liveGroup);
 
-		_assertXMLEquals(
-			_getExpectedStaticContent(fileEntry1, fileEntry2),
-			importedJournalArticle.getContent());
+		_assertContentEquals(journalArticle, importedJournalArticle);
 	}
 
 	@Test
@@ -178,14 +156,7 @@ public class AMJournalArticleStagedModelDataHandlerTest
 		JournalArticle journalArticle = _addJournalArticle(
 			_getContent(StringPool.BLANK), _getServiceContext());
 
-		ExportImportThreadLocal.setPortletImportInProcess(true);
-
-		try {
-			exportImportStagedModel(journalArticle);
-		}
-		finally {
-			ExportImportThreadLocal.setPortletImportInProcess(false);
-		}
+		exportImportStagedModel(journalArticle);
 
 		JournalArticle importedJournalArticle = (JournalArticle)getStagedModel(
 			journalArticle.getUuid(), liveGroup);
@@ -197,10 +168,8 @@ public class AMJournalArticleStagedModelDataHandlerTest
 	public void testExportSucceedsWithInvalidReferences() throws Exception {
 		int invalidFileEntryId = 9999999;
 
-		JournalArticle journalArticle = _withPortletImportEnabled(
-			() -> _addJournalArticle(
-				_getContent(_getImgTag(invalidFileEntryId)),
-				_getServiceContext()));
+		JournalArticle journalArticle = _addJournalArticle(
+			_getContent(_getImgTag(invalidFileEntryId)), _getServiceContext());
 
 		initExport();
 
@@ -267,7 +236,7 @@ public class AMJournalArticleStagedModelDataHandlerTest
 			null, TestPropsValues.getUserId(), stagingGroup.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString(), ContentTypes.IMAGE_JPEG,
-			FileUtil.getBytes(getClass(), "dependencies/image.jpg"), null, null,
+			FileUtil.getBytes(getClass(), "image.jpg"), null, null,
 			serviceContext);
 	}
 
@@ -276,7 +245,7 @@ public class AMJournalArticleStagedModelDataHandlerTest
 		throws Exception {
 
 		JournalFolder journalFolder = _journalFolderLocalService.addFolder(
-			null, serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), "This is a test folder.",
 			serviceContext);
@@ -286,8 +255,7 @@ public class AMJournalArticleStagedModelDataHandlerTest
 		).build();
 
 		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm(
-			"content", "string", "text", true,
-			DDMFormFieldTypeConstants.RICH_TEXT,
+			"content", "string", "text", true, "textarea",
 			new Locale[] {LocaleUtil.getSiteDefault()},
 			LocaleUtil.getSiteDefault());
 
@@ -307,7 +275,7 @@ public class AMJournalArticleStagedModelDataHandlerTest
 			journalFolder.getFolderId(),
 			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, 0, StringPool.BLANK,
 			true, 0, titleMap, null, titleMap, content,
-			ddmStructure.getStructureId(), ddmTemplate.getTemplateKey(), null,
+			ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(), null,
 			1, 1, 1965, 0, 0, 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true, true,
 			false, null, null, null, null, serviceContext);
 	}
@@ -328,23 +296,34 @@ public class AMJournalArticleStagedModelDataHandlerTest
 		AssertUtils.assertEqualsIgnoreCase(expectedContent, actualContent);
 	}
 
-	private void _assertXMLEquals(String expectedXML, String actualXML)
-		throws Exception {
-
-		Document actualDocument = SAXReaderUtil.read(actualXML);
-		Document expectedDocument = SAXReaderUtil.read(expectedXML);
-
-		AssertUtils.assertEqualsIgnoreCase(
-			expectedDocument.formattedString(),
-			actualDocument.formattedString());
-	}
-
 	private String _getContent(String html) throws Exception {
-		return StringUtil.replace(
-			new String(
-				FileUtil.getBytes(
-					getClass(), "dependencies/dynamic_content.xml")),
-			"[$CONTENT$]", html);
+		Document document = SAXReaderUtil.createDocument();
+
+		Element rootElement = document.addElement("root");
+
+		rootElement.addAttribute(
+			"available-locales",
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
+		rootElement.addAttribute(
+			"default-locale",
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
+		rootElement.addElement("request");
+
+		Element dynamicElementElement = rootElement.addElement(
+			"dynamic-element");
+
+		dynamicElementElement.addAttribute("index-type", "text");
+		dynamicElementElement.addAttribute("name", "content");
+		dynamicElementElement.addAttribute("type", "rich_text");
+
+		Element element = dynamicElementElement.addElement("dynamic-content");
+
+		element.addAttribute(
+			"language-id",
+			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
+		element.addCDATA(html);
+
+		return document.asXML();
 	}
 
 	private String _getDynamicContent(FileEntry... fileEntries)
@@ -356,45 +335,6 @@ public class AMJournalArticleStagedModelDataHandlerTest
 			sb.append(_getImgTag(fileEntry));
 			sb.append(StringPool.NEW_LINE);
 		}
-
-		sb.setIndex(sb.index() - 1);
-
-		return _getContent(sb.toString());
-	}
-
-	private String _getExpectedDynamicContent(FileEntry... fileEntries)
-		throws Exception {
-
-		List<FileEntry> importedFileEntries = new ArrayList<>();
-
-		for (FileEntry fileEntry : fileEntries) {
-			importedFileEntries.add(
-				_dlAppLocalService.getFileEntryByUuidAndGroupId(
-					fileEntry.getUuid(), liveGroup.getGroupId()));
-		}
-
-		return _getDynamicContent(
-			importedFileEntries.toArray(new FileEntry[0]));
-	}
-
-	private String _getExpectedStaticContent(FileEntry... fileEntries)
-		throws Exception {
-
-		StringBundler sb = new StringBundler(fileEntries.length * 2);
-
-		for (FileEntry fileEntry : fileEntries) {
-			FileEntry importedFileEntry =
-				_dlAppLocalService.getFileEntryByUuidAndGroupId(
-					fileEntry.getUuid(), liveGroup.getGroupId());
-
-			sb.append(
-				_amImageHTMLTagFactory.create(
-					_getImgTag(importedFileEntry), importedFileEntry));
-
-			sb.append(StringPool.NEW_LINE);
-		}
-
-		sb.setIndex(sb.index() - 1);
 
 		return _getContent(sb.toString());
 	}
@@ -438,36 +378,13 @@ public class AMJournalArticleStagedModelDataHandlerTest
 			sb.append(StringPool.NEW_LINE);
 		}
 
-		sb.setIndex(sb.index() - 1);
-
 		return _getContent(sb.toString());
-	}
-
-	private JournalArticle _withPortletImportEnabled(
-			UnsafeSupplier<JournalArticle, Exception> unsafeSupplier)
-		throws Exception {
-
-		boolean portletImportInProcess =
-			ExportImportThreadLocal.isPortletImportInProcess();
-
-		try {
-			ExportImportThreadLocal.setPortletImportInProcess(true);
-
-			return unsafeSupplier.get();
-		}
-		finally {
-			ExportImportThreadLocal.setPortletImportInProcess(
-				portletImportInProcess);
-		}
 	}
 
 	private static final String _AM_JOURNAL_CONFIG_UUID = "journal-config";
 
 	@Inject
 	private AMImageConfigurationHelper _amImageConfigurationHelper;
-
-	@Inject
-	private AMImageHTMLTagFactory _amImageHTMLTagFactory;
 
 	@Inject
 	private DLAppLocalService _dlAppLocalService;

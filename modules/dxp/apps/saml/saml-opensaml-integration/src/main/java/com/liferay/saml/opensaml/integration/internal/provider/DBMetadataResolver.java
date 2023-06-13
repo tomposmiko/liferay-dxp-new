@@ -42,27 +42,20 @@ import net.shibboleth.utilities.java.support.xml.ParserPool;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.util.XMLObjectSupport;
+import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.filter.MetadataFilter;
 import org.opensaml.saml.metadata.resolver.impl.AbstractMetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+
 /**
  * @author Mika Koivisto
  */
+@Component(scope = ServiceScope.PROTOTYPE, service = MetadataResolver.class)
 public class DBMetadataResolver extends AbstractMetadataResolver {
-
-	public DBMetadataResolver(
-		ParserPool parserPool,
-		SamlIdpSpConnectionLocalService samlIdpSpConnectionLocalService,
-		SamlProviderConfigurationHelper samlProviderConfigurationHelper,
-		SamlSpIdpConnectionLocalService samlSpIdpConnectionLocalService) {
-
-		setParserPool(parserPool);
-
-		_samlIdpSpConnectionLocalService = samlIdpSpConnectionLocalService;
-		_samlProviderConfigurationHelper = samlProviderConfigurationHelper;
-		_samlSpIdpConnectionLocalService = samlSpIdpConnectionLocalService;
-	}
 
 	@Nonnull
 	@Override
@@ -81,7 +74,7 @@ public class DBMetadataResolver extends AbstractMetadataResolver {
 		}
 
 		try {
-			EntityDescriptor entityDescriptor = _getEntityDescriptor(
+			EntityDescriptor entityDescriptor = getEntityDescriptor(
 				entityIdCriterion.getEntityId());
 
 			if (isValid(entityDescriptor)) {
@@ -95,41 +88,29 @@ public class DBMetadataResolver extends AbstractMetadataResolver {
 		}
 	}
 
-	@Nonnull
 	@Override
-	protected List<EntityDescriptor> lookupEntityID(@Nonnull String entityID)
-		throws ResolverException {
+	public void setParserPool(ParserPool parserPool) {
+		super.setParserPool(parserPool);
 
-		try {
-			EntityDescriptor entityDescriptor = _getEntityDescriptor(entityID);
-
-			if (entityDescriptor == null) {
-				return Collections.emptyList();
-			}
-
-			return Collections.singletonList(entityDescriptor);
-		}
-		catch (Exception exception) {
-			throw new ResolverException(exception);
-		}
+		_parserPool = parserPool;
 	}
 
-	private EntityDescriptor _getEntityDescriptor(String entityID)
+	protected EntityDescriptor getEntityDescriptor(String entityID)
 		throws Exception {
 
 		return SamlUtil.getEntityDescriptorById(
-			entityID, _getMetadata(entityID));
+			entityID, getMetadata(entityID));
 	}
 
-	private XMLObject _getMetadata(String entityID) throws Exception {
-		String metadataXml = _getMetadataXml(entityID);
+	protected XMLObject getMetadata(String entityID) throws Exception {
+		String metadataXml = getMetadataXml(entityID);
 
 		if (Validator.isNull(metadataXml)) {
 			return null;
 		}
 
 		XMLObject metadataXMLObject = XMLObjectSupport.unmarshallFromReader(
-			getParserPool(), new StringReader(metadataXml));
+			_parserPool, new StringReader(metadataXml));
 
 		MetadataFilter metadataFilter = getMetadataFilter();
 
@@ -140,7 +121,7 @@ public class DBMetadataResolver extends AbstractMetadataResolver {
 		return metadataXMLObject;
 	}
 
-	private String _getMetadataXml(String entityId) throws Exception {
+	protected String getMetadataXml(String entityId) throws Exception {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		if (_samlProviderConfigurationHelper.isRoleIdp()) {
@@ -159,7 +140,9 @@ public class DBMetadataResolver extends AbstractMetadataResolver {
 						noSuchIdpSpConnectionException) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchIdpSpConnectionException);
+					_log.debug(
+						noSuchIdpSpConnectionException,
+						noSuchIdpSpConnectionException);
 				}
 
 				return null;
@@ -181,7 +164,9 @@ public class DBMetadataResolver extends AbstractMetadataResolver {
 						noSuchSpIdpConnectionException) {
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchSpIdpConnectionException);
+					_log.debug(
+						noSuchSpIdpConnectionException,
+						noSuchSpIdpConnectionException);
 				}
 
 				return null;
@@ -191,14 +176,38 @@ public class DBMetadataResolver extends AbstractMetadataResolver {
 		return null;
 	}
 
+	@Nonnull
+	@Override
+	protected List<EntityDescriptor> lookupEntityID(@Nonnull String entityID)
+		throws ResolverException {
+
+		try {
+			EntityDescriptor entityDescriptor = getEntityDescriptor(entityID);
+
+			if (entityDescriptor == null) {
+				return Collections.emptyList();
+			}
+
+			return Collections.singletonList(entityDescriptor);
+		}
+		catch (Exception exception) {
+			throw new ResolverException(exception);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DBMetadataResolver.class);
 
-	private final SamlIdpSpConnectionLocalService
-		_samlIdpSpConnectionLocalService;
-	private final SamlProviderConfigurationHelper
-		_samlProviderConfigurationHelper;
-	private final SamlSpIdpConnectionLocalService
-		_samlSpIdpConnectionLocalService;
+	@Reference
+	private ParserPool _parserPool;
+
+	@Reference
+	private SamlIdpSpConnectionLocalService _samlIdpSpConnectionLocalService;
+
+	@Reference
+	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
+
+	@Reference
+	private SamlSpIdpConnectionLocalService _samlSpIdpConnectionLocalService;
 
 }

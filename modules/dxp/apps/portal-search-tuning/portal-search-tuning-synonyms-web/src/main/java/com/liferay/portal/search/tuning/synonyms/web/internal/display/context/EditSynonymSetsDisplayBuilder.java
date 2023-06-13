@@ -18,9 +18,12 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
 import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSet;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexReader;
+
+import java.util.Optional;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -50,7 +53,7 @@ public class EditSynonymSetsDisplayBuilder {
 		EditSynonymSetsDisplayContext editSynonymSetsDisplayContext =
 			new EditSynonymSetsDisplayContext();
 
-		_synonymSet = _getSynonymSet(_getCompanyId());
+		_synonymSetOptional = _getSynonymSetOptional(_getCompanyId());
 
 		_setBackURL(editSynonymSetsDisplayContext);
 		_setData(editSynonymSetsDisplayContext);
@@ -83,31 +86,23 @@ public class EditSynonymSetsDisplayBuilder {
 		return ParamUtil.getString(_httpServletRequest, "redirect");
 	}
 
-	private SynonymSet _getSynonymSet(long companyId) {
-		String synonymSetId = ParamUtil.getString(
-			_renderRequest, "synonymSetId", null);
+	private Optional<SynonymSet> _getSynonymSetOptional(long companyId) {
+		SynonymSetIndexName synonymSetIndexName =
+			_synonymSetIndexNameBuilder.getSynonymSetIndexName(companyId);
 
-		if (synonymSetId == null) {
-			return null;
-		}
-
-		return _synonymSetIndexReader.fetch(
-			_synonymSetIndexNameBuilder.getSynonymSetIndexName(companyId),
-			synonymSetId);
+		return Optional.ofNullable(
+			ParamUtil.getString(_renderRequest, "synonymSetId", null)
+		).flatMap(
+			id -> _synonymSetIndexReader.fetchOptional(synonymSetIndexName, id)
+		);
 	}
 
 	private String _getSynonymSets() {
-		if (_synonymSet == null) {
-			return StringPool.BLANK;
-		}
-
-		String synonyms = _synonymSet.getSynonyms();
-
-		if (synonyms == null) {
-			return StringPool.BLANK;
-		}
-
-		return synonyms;
+		return _synonymSetOptional.map(
+			SynonymSet::getSynonyms
+		).orElse(
+			StringPool.BLANK
+		);
 	}
 
 	private void _setBackURL(
@@ -150,18 +145,17 @@ public class EditSynonymSetsDisplayBuilder {
 	private void _setSynonymSetId(
 		EditSynonymSetsDisplayContext editSynonymSetsDisplayContext) {
 
-		if (_synonymSet != null) {
-			editSynonymSetsDisplayContext.setSynonymSetId(
-				_synonymSet.getSynonymSetDocumentId());
-		}
+		_synonymSetOptional.ifPresent(
+			synonymSet -> editSynonymSetsDisplayContext.setSynonymSetId(
+				synonymSet.getSynonymSetDocumentId()));
 	}
 
 	private final HttpServletRequest _httpServletRequest;
 	private final Portal _portal;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private SynonymSet _synonymSet;
 	private final SynonymSetIndexNameBuilder _synonymSetIndexNameBuilder;
 	private final SynonymSetIndexReader _synonymSetIndexReader;
+	private Optional<SynonymSet> _synonymSetOptional;
 
 }

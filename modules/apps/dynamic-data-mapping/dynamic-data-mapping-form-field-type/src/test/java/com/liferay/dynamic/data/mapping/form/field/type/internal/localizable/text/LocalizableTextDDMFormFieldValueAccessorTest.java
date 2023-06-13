@@ -14,36 +14,30 @@
 
 package com.liferay.dynamic.data.mapping.form.field.type.internal.localizable.text;
 
-import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.UnlocalizedValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Gabriel Ibson
  */
-public class LocalizableTextDDMFormFieldValueAccessorTest {
+@RunWith(PowerMockRunner.class)
+public class LocalizableTextDDMFormFieldValueAccessorTest extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
+	@Before
+	public void setUp() throws Exception {
 		_setUpLocalizableTextDDMFormFieldValueAccessor();
 	}
 
@@ -53,22 +47,6 @@ public class LocalizableTextDDMFormFieldValueAccessorTest {
 			_localizableTextDDMFormFieldValueAccessor.isEmpty(
 				DDMFormValuesTestUtil.createDDMFormFieldValue(
 					"localizableText", new UnlocalizedValue("{}")),
-				LocaleUtil.US));
-
-		LocalizedValue localizedValue = new LocalizedValue();
-
-		localizedValue.addString(
-			LocaleUtil.US,
-			JSONUtil.put(
-				"en_US", StringPool.BLANK
-			).put(
-				"pt_BR", StringPool.BLANK
-			).toString());
-
-		Assert.assertTrue(
-			_localizableTextDDMFormFieldValueAccessor.isEmpty(
-				DDMFormValuesTestUtil.createDDMFormFieldValue(
-					"localizableText", localizedValue),
 				LocaleUtil.US));
 	}
 
@@ -99,16 +77,21 @@ public class LocalizableTextDDMFormFieldValueAccessorTest {
 				ddmFormFieldValue, LocaleUtil.US));
 	}
 
-	private static void _setUpLocalizableTextDDMFormFieldValueAccessor() {
+	private void _setUpLocalizableTextDDMFormFieldValueAccessor()
+		throws Exception {
+
 		_localizableTextDDMFormFieldValueAccessor =
 			new LocalizableTextDDMFormFieldValueAccessor();
 
-		ReflectionTestUtil.setFieldValue(
-			_localizableTextDDMFormFieldValueAccessor, "jsonFactory",
-			new JSONFactoryImpl());
+		field(
+			LocalizableTextDDMFormFieldValueAccessor.class, "jsonFactory"
+		).set(
+			_localizableTextDDMFormFieldValueAccessor, _jsonFactory
+		);
 	}
 
-	private static LocalizableTextDDMFormFieldValueAccessor
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
+	private LocalizableTextDDMFormFieldValueAccessor
 		_localizableTextDDMFormFieldValueAccessor;
 
 }

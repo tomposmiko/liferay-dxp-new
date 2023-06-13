@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionRegistryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 
@@ -35,8 +34,7 @@ public class BaseModelPermissionCheckerUtil {
 		long classPK, String actionId) {
 
 		ModelResourcePermission<?> modelResourcePermission =
-			ModelResourcePermissionRegistryUtil.getModelResourcePermission(
-				className);
+			_modelPermissions.getService(className);
 
 		if (modelResourcePermission != null) {
 			try {
@@ -54,7 +52,7 @@ public class BaseModelPermissionCheckerUtil {
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 
 				return false;
@@ -74,7 +72,7 @@ public class BaseModelPermissionCheckerUtil {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -91,5 +89,11 @@ public class BaseModelPermissionCheckerUtil {
 			ServiceTrackerMapFactory.openSingleValueMap(
 				SystemBundleUtil.getBundleContext(),
 				BaseModelPermissionChecker.class, "model.class.name");
+	private static final ServiceTrackerMap<String, ModelResourcePermission<?>>
+		_modelPermissions = ServiceTrackerMapFactory.openSingleValueMap(
+			SystemBundleUtil.getBundleContext(),
+			(Class<ModelResourcePermission<?>>)
+				(Class<?>)ModelResourcePermission.class,
+			"model.class.name");
 
 }

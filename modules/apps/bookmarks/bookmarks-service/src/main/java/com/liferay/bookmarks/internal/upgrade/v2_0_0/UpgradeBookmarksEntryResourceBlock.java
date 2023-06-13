@@ -14,6 +14,7 @@
 
 package com.liferay.bookmarks.internal.upgrade.v2_0_0;
 
+import com.liferay.bookmarks.internal.upgrade.v2_0_0.util.BookmarksEntryTable;
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.portal.upgrade.util.BaseUpgradeResourceBlock;
 
@@ -34,8 +35,8 @@ public class UpgradeBookmarksEntryResourceBlock
 	}
 
 	@Override
-	protected String getTableName() {
-		return "BookmarksEntry";
+	protected Class<?> getTableClass() {
+		return BookmarksEntryTable.class;
 	}
 
 	@Override

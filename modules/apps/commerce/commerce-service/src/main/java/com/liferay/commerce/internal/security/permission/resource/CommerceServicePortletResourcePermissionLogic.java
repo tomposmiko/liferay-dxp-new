@@ -23,7 +23,10 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Riccardo Alberti
  */
-@Component(service = CommerceServicePortletResourcePermissionLogic.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceServicePortletResourcePermissionLogic.class
+)
 public class CommerceServicePortletResourcePermissionLogic
 	implements PortletResourcePermissionLogic {
 

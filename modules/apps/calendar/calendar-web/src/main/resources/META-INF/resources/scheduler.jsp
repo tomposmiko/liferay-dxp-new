@@ -90,7 +90,7 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 
 	<c:if test="<%= !hideAgendaView %>">
 		window.<portlet:namespace />agendaView = new Liferay.SchedulerAgendaView({
-			daysCount: <%= maxDaysDisplayed + 1 %>,
+			daysCount: 31,
 			height: 700,
 			isoTime: <%= useIsoTimeFormat %>,
 			readOnly: <%= readOnly %>,
@@ -153,7 +153,6 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 			window['<portlet:namespace /><%= HtmlUtil.escapeJS(activeView) %>View'],
 		ariaLabels: {
 			agenda: '<liferay-ui:message key="agenda-view" />',
-			calendar: '<liferay-ui:message key="calendar-views" />',
 			day: '<liferay-ui:message key="day-view" />',
 			month: '<liferay-ui:message key="month-view" />',
 			next: '<liferay-ui:message key="next" />',

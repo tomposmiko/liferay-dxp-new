@@ -34,20 +34,23 @@ import com.liferay.headless.form.dto.v1_0.FormStructure;
 import com.liferay.headless.form.dto.v1_0.FormSuccessPage;
 import com.liferay.headless.form.dto.v1_0.Grid;
 import com.liferay.headless.form.dto.v1_0.Validation;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Victor Oliveira
@@ -123,24 +126,26 @@ public class StructureUtil {
 	private static List<String> _getNestedDDMFormFieldNames(
 		List<String> ddmFormFieldNames, DDMStructure ddmStructure) {
 
-		List<String> nestedDDMFormFieldNames = new ArrayList<>();
+		List<DDMFormField> ddmFormFields = ddmStructure.getDDMFormFields(true);
 
-		for (DDMFormField ddmFormField : ddmStructure.getDDMFormFields(true)) {
-			if (!ddmFormFieldNames.contains(ddmFormField.getName())) {
-				continue;
-			}
+		Stream<DDMFormField> stream = ddmFormFields.stream();
 
-			nestedDDMFormFieldNames.addAll(
-				_getNestedDDMFormFieldNames(
-					TransformUtil.transform(
-						ddmFormField.getNestedDDMFormFields(),
-						DDMFormField::getName),
-					ddmStructure));
-		}
-
-		nestedDDMFormFieldNames.addAll(ddmFormFieldNames);
-
-		return nestedDDMFormFieldNames;
+		return stream.filter(
+			ddmFormField -> ddmFormFieldNames.contains(ddmFormField.getName())
+		).map(
+			ddmFormField -> TransformUtil.transform(
+				ddmFormField.getNestedDDMFormFields(), DDMFormField::getName)
+		).map(
+			nestedDDMFormFieldNames -> _getNestedDDMFormFieldNames(
+				nestedDDMFormFieldNames, ddmStructure)
+		).peek(
+			nestedDDMFormFieldNames -> nestedDDMFormFieldNames.addAll(
+				ddmFormFieldNames)
+		).flatMap(
+			Collection::stream
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private static FormField _toFormField(
@@ -155,6 +160,23 @@ public class StructureUtil {
 			{
 				displayStyle = GetterUtil.getString(
 					ddmFormField.getProperty("displayStyle"));
+
+				formFieldOptions = Optional.ofNullable(
+					ddmFormField.getDDMFormFieldOptions()
+				).map(
+					DDMFormFieldOptions::getOptions
+				).map(
+					Map::entrySet
+				).map(
+					Set::stream
+				).orElseGet(
+					Stream::empty
+				).map(
+					entry -> _toFormFieldOption(
+						acceptAllLanguages, entry, locale)
+				).toArray(
+					FormFieldOption[]::new
+				);
 
 				immutable = ddmFormField.isTransient();
 				inputControl = type;
@@ -178,41 +200,23 @@ public class StructureUtil {
 
 				setDataType(
 					() -> {
-						if (Objects.equals(type, "date")) {
+						if (Objects.equals("date", type)) {
 							return type;
 						}
 
-						if (Objects.equals(type, "document_library")) {
+						if (Objects.equals("document_library", type)) {
 							return "document";
 						}
 
-						if (Objects.equals(type, "paragraph")) {
+						if (Objects.equals("paragraph", type)) {
 							return "string";
 						}
 
 						return ddmFormField.getDataType();
 					});
-				setFormFieldOptions(
-					() -> {
-						DDMFormFieldOptions ddmFormFieldOptions =
-							ddmFormField.getDDMFormFieldOptions();
-
-						if (ddmFormFieldOptions == null) {
-							return new FormFieldOption[0];
-						}
-
-						Map<String, LocalizedValue> ddmFormFieldOptionsMap =
-							ddmFormFieldOptions.getOptions();
-
-						return TransformUtil.transformToArray(
-							ddmFormFieldOptionsMap.entrySet(),
-							entry -> _toFormFieldOption(
-								acceptAllLanguages, entry, locale),
-							FormFieldOption.class);
-					});
 				setGrid(
 					() -> {
-						if (!Objects.equals(type, "grid")) {
+						if (!Objects.equals("grid", type)) {
 							return null;
 						}
 
@@ -235,17 +239,17 @@ public class StructureUtil {
 					() -> {
 						DDMForm ddmForm = ddmFormField.getDDMForm();
 
-						for (DDMFormRule ddmFormRule :
-								ddmForm.getDDMFormRules()) {
+						List<DDMFormRule> ddmFormRules =
+							ddmForm.getDDMFormRules();
 
-							String condition = ddmFormRule.getCondition();
+						Stream<DDMFormRule> stream = ddmFormRules.stream();
 
-							if (condition.contains(ddmFormField.getName())) {
-								return true;
-							}
-						}
-
-						return false;
+						return stream.map(
+							DDMFormRule::getCondition
+						).anyMatch(
+							condition -> condition.contains(
+								ddmFormField.getName())
+						);
 					});
 				setShowAsSwitcher(
 					() -> {
@@ -333,20 +337,35 @@ public class StructureUtil {
 		boolean acceptAllLanguages, DDMFormLayoutPage ddmFormLayoutPage,
 		DDMStructure ddmStructure, Locale locale) {
 
-		List<String> ddmFormFieldNames = new ArrayList<>();
+		List<String> ddmFormFieldNames = Stream.of(
+			ddmFormLayoutPage.getDDMFormLayoutRows()
+		).flatMap(
+			Collection::stream
+		).map(
+			DDMFormLayoutRow::getDDMFormLayoutColumns
+		).flatMap(
+			Collection::stream
+		).map(
+			DDMFormLayoutColumn::getDDMFormFieldNames
+		).map(
+			nestedDDMFormFieldNames -> _getNestedDDMFormFieldNames(
+				nestedDDMFormFieldNames, ddmStructure)
+		).flatMap(
+			Collection::stream
+		).collect(
+			Collectors.toList()
+		);
 
-		for (DDMFormLayoutRow ddmFormLayoutRow :
-				ddmFormLayoutPage.getDDMFormLayoutRows()) {
+		List<DDMFormField> ddmFormFieldsList = ddmStructure.getDDMFormFields(
+			true);
 
-			for (DDMFormLayoutColumn ddmFormLayoutColumn :
-					ddmFormLayoutRow.getDDMFormLayoutColumns()) {
+		Stream<DDMFormField> ddmFormFieldsStream = ddmFormFieldsList.stream();
 
-				ddmFormFieldNames.addAll(
-					_getNestedDDMFormFieldNames(
-						ddmFormLayoutColumn.getDDMFormFieldNames(),
-						ddmStructure));
-			}
-		}
+		DDMFormField[] ddmFormFields = ddmFormFieldsStream.filter(
+			ddmFormField -> ddmFormFieldNames.contains(ddmFormField.getName())
+		).toArray(
+			DDMFormField[]::new
+		);
 
 		LocalizedValue titleLocalizedValue = ddmFormLayoutPage.getTitle();
 
@@ -356,18 +375,7 @@ public class StructureUtil {
 		return new FormPage() {
 			{
 				formFields = TransformUtil.transform(
-					TransformUtil.transformToArray(
-						ddmStructure.getDDMFormFields(true),
-						ddmFormField -> {
-							if (!ddmFormFieldNames.contains(
-									ddmFormField.getName())) {
-
-								return null;
-							}
-
-							return ddmFormField;
-						},
-						DDMFormField.class),
+					ddmFormFields,
 					ddmFormField -> _toFormField(
 						acceptAllLanguages, ddmFormField, locale),
 					FormField.class);

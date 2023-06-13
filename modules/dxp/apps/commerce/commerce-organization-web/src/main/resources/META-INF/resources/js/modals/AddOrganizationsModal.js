@@ -15,7 +15,7 @@ import ClayIcon from '@clayui/icon';
 import ClayModal from '@clayui/modal';
 import ClayMultiSelect from '@clayui/multi-select';
 import classNames from 'classnames';
-import {openToast, sub} from 'frontend-js-web';
+import {openToast} from 'frontend-js-web';
 import React, {useContext, useState} from 'react';
 
 import ChartContext from '../ChartContext';
@@ -67,13 +67,13 @@ export default function AddOrganizationModal({
 				if (newOrganizationsDetails.length) {
 					const message =
 						newOrganizationsDetails.length === 1
-							? sub(
+							? Liferay.Util.sub(
 									Liferay.Language.get(
 										'1-organization-was-added-to-x'
 									),
 									parentData.name
 							  )
-							: sub(
+							: Liferay.Util.sub(
 									Liferay.Language.get(
 										'x-organizations-were-added-to-x'
 									),
@@ -119,7 +119,6 @@ export default function AddOrganizationModal({
 				>
 					<label htmlFor="addNewOrganization">
 						{Liferay.Language.get('name') + ' '}
-
 						<ClayIcon
 							className="ml-1 reference-mark"
 							symbol="asterisk"
@@ -130,13 +129,13 @@ export default function AddOrganizationModal({
 						<ClayInput.GroupItem>
 							<ClayMultiSelect
 								id="addNewOrganization"
+								inputValue={query}
 								items={items}
 								onChange={setQuery}
 								onItemsChange={setItems}
 								placeholder={Liferay.Language.get(
 									'organization-name'
 								)}
-								value={query}
 							/>
 
 							{!!errors.length && (
@@ -144,7 +143,6 @@ export default function AddOrganizationModal({
 									{errors.map((error, i) => (
 										<ClayForm.FeedbackItem key={i}>
 											<ClayForm.FeedbackIndicator symbol="info-circle" />
-
 											{error}
 										</ClayForm.FeedbackItem>
 									))}

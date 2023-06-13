@@ -15,6 +15,7 @@
 package com.liferay.questions.web.internal.configuration.persistence.listener;
 
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.layout.seo.canonical.url.LayoutSEOCanonicalURLProvider;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBCategoryLocalService;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
@@ -33,28 +35,37 @@ import com.liferay.portal.security.service.access.policy.service.SAPEntryService
 import com.liferay.questions.web.internal.asset.model.MBCategoryAssetRendererFactory;
 import com.liferay.questions.web.internal.asset.model.MBMessageAssetRendererFactory;
 import com.liferay.questions.web.internal.constants.QuestionsPortletKeys;
+import com.liferay.questions.web.internal.layout.seo.QuestionsLayoutSEOLinkManagerImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
 /**
  * @author Javier Gamarra
  */
 @Component(
+	configurationPid = "com.liferay.questions.web.internal.configuration.QuestionsConfiguration",
+	immediate = true,
 	property = "model.class.name=com.liferay.questions.web.internal.configuration.QuestionsConfiguration",
 	service = ConfigurationModelListener.class
 )
@@ -64,20 +75,54 @@ public class QuestionsConfigurationModelListener
 	@Override
 	public void onAfterSave(String pid, Dictionary<String, Object> properties) {
 		try {
-			Map<String, Object> propertiesMap = new HashMap<>();
+			List<String> keys = Collections.list(properties.keys());
 
-			Enumeration<String> enumeration = properties.keys();
+			Stream<String> stream = keys.stream();
 
-			while (enumeration.hasMoreElements()) {
-				String key = enumeration.nextElement();
-
-				propertiesMap.put(key, properties.get(key));
-			}
+			Map<String, Object> propertiesMap = stream.collect(
+				Collectors.toMap(Function.identity(), properties::get));
 
 			_enableAssetRenderer(propertiesMap);
 
 			_enableServiceAccessPolicy(
 				GetterUtil.getBoolean(properties.get("enableAnonymousRead")));
+
+			ComponentDescriptionDTO componentDescriptionDTO =
+				_serviceComponentRuntime.getComponentDescriptionDTO(
+					_bundleContext.getBundle(),
+					QuestionsLayoutSEOLinkManagerImpl.class.getName());
+
+			Configuration configuration = _getConfiguration();
+
+			Dictionary<String, Object> configurationProperties =
+				configuration.getProperties();
+
+			if (!Objects.equals(
+					GetterUtil.getString(
+						properties.get("historyRouterBasePath")),
+					"")) {
+
+				if (configurationProperties == null) {
+					configurationProperties = new HashMapDictionary<>();
+				}
+
+				configurationProperties.put(
+					"_layoutSEOLinkManager.target",
+					"(component.name=" +
+						QuestionsLayoutSEOLinkManagerImpl.class.getName() +
+							")");
+
+				_serviceComponentRuntime.enableComponent(
+					componentDescriptionDTO);
+			}
+			else if (configurationProperties != null) {
+				configurationProperties.remove("_layoutSEOLinkManager.target");
+
+				_serviceComponentRuntime.disableComponent(
+					componentDescriptionDTO);
+			}
+
+			configuration.update(configurationProperties);
 		}
 		catch (Exception exception) {
 			throw new RuntimeException(exception);
@@ -92,6 +137,21 @@ public class QuestionsConfigurationModelListener
 		_bundleContext = bundleContext;
 
 		_enableAssetRenderer(properties);
+
+		ComponentDescriptionDTO componentDescriptionDTO =
+			_serviceComponentRuntime.getComponentDescriptionDTO(
+				_bundleContext.getBundle(),
+				QuestionsLayoutSEOLinkManagerImpl.class.getName());
+
+		if (!Objects.equals(
+				GetterUtil.getString(properties.get("historyRouterBasePath")),
+				"")) {
+
+			_serviceComponentRuntime.enableComponent(componentDescriptionDTO);
+		}
+		else {
+			_serviceComponentRuntime.disableComponent(componentDescriptionDTO);
+		}
 	}
 
 	@Deactivate
@@ -145,49 +205,32 @@ public class QuestionsConfigurationModelListener
 			_sapEntryService.deleteSAPEntry(sapEntry);
 		}
 		else if (enableAnonymousRead && (sapEntry == null)) {
-			String headlessDeliveryPackage =
-				"com.liferay.headless.delivery.internal.resource.v1_0.";
+			String mbPackage = "com.liferay.message.boards.service.";
 
 			_sapEntryService.addSAPEntry(
 				StringBundler.concat(
-					"com.liferay.headless.admin.taxonomy.internal.resource.",
-					"v1_0.KeywordResourceImpl#getKeywordsRankedPage\n",
-					"com.liferay.headless.admin.user.internal.resource.v1_0.",
-					"SubscriptionResourceImpl#",
-					"getMyUserAccountSubscriptionsPage\n",
-					headlessDeliveryPackage,
-					"MessageBoardMessageResourceImpl#getMessageBoardMessage\n",
-					headlessDeliveryPackage, "MessageBoardMessageResourceImpl#",
-					"getMessageBoardMessageMessageBoardMessagesPage\n",
-					headlessDeliveryPackage, "MessageBoardMessageResourceImpl#",
-					"getMessageBoardMessageMyRating\n", headlessDeliveryPackage,
-					"MessageBoardMessageResourceImpl#",
-					"getMessageBoardThreadMessageBoardMessagesPage\n",
-					headlessDeliveryPackage, "MessageBoardMessageResourceImpl#",
-					"getSiteMessageBoardMessageByFriendlyUrlPath\n",
-					headlessDeliveryPackage, "MessageBoardMessageResourceImpl#",
-					"getSiteMessageBoardMessagesPage\n",
-					headlessDeliveryPackage, "MessageBoardSectionResourceImpl#",
-					"getMessageBoardSection\n", headlessDeliveryPackage,
-					"MessageBoardSectionResourceImpl#",
-					"getSiteMessageBoardSectionsPage\n",
-					headlessDeliveryPackage, "MessageBoardSectionResourceImpl#",
-					"getMessageBoardSectionMessageBoardSectionsPage\n",
-					headlessDeliveryPackage, "MessageBoardThreadResourceImpl#",
-					"getMessageBoardSectionMessageBoardThreadsPage\n",
-					headlessDeliveryPackage, "MessageBoardThreadResourceImpl#",
-					"getMessageBoardThreadsRankedPage\n",
-					headlessDeliveryPackage, "MessageBoardThreadResourceImpl#",
-					"getMessageBoardThreadMyRating\n", headlessDeliveryPackage,
-					"MessageBoardThreadResourceImpl#",
-					"getSiteMessageBoardThreadByFriendlyUrlPath\n",
-					headlessDeliveryPackage, "MessageBoardThreadResourceImpl#",
-					"getSiteMessageBoardThreadsPage\n"),
+					"com.liferay.expando.kernel.service.",
+					"ExpandoValueService#getData\n", mbPackage,
+					"MBCategoryService#getCategory\n", mbPackage,
+					"MBCategoryService#getCategoriesCount\n", mbPackage,
+					"MBMessageService#fetchMBMessageByUrlSubject\n", mbPackage,
+					"MBMessageService#getChildMessages\n", mbPackage,
+					"MBMessageService#getChildMessagesCount\n", mbPackage,
+					"MBMessageService#getMessage\n", mbPackage,
+					"MBThreadService#getThreads\n", mbPackage,
+					"MBThreadService#getThreadsCount\n"),
 				true, true, name,
 				Collections.singletonMap(
 					LocaleThreadLocal.getDefaultLocale(), name),
 				new ServiceContext());
 		}
+	}
+
+	private Configuration _getConfiguration() throws Exception {
+		return _configurationAdmin.getConfiguration(
+			"com.liferay.layout.seo.web.internal.servlet.taglib." +
+				"OpenGraphTopHeadDynamicInclude",
+			"?");
 	}
 
 	private void _unregister() {
@@ -204,6 +247,14 @@ public class QuestionsConfigurationModelListener
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference(
+		target = "(component.name=com.liferay.layout.seo.internal.canonical.url.LayoutSEOCanonicalURLProviderImpl)"
+	)
+	private LayoutSEOCanonicalURLProvider _layoutSEOCanonicalURLProvider;
 
 	@Reference
 	private MBCategoryLocalService _mbCategoryLocalService;
@@ -225,6 +276,9 @@ public class QuestionsConfigurationModelListener
 
 	@Reference
 	private SAPEntryService _sapEntryService;
+
+	@Reference
+	private ServiceComponentRuntime _serviceComponentRuntime;
 
 	private List<ServiceRegistration<?>> _serviceRegistrations =
 		new ArrayList<>();

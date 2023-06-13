@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adam Brandizzi
  */
-@Component(service = SynonymSetFilterWriter.class)
+@Component(immediate = true, service = SynonymSetFilterWriter.class)
 public class SynonymSetFilterWriterImpl implements SynonymSetFilterWriter {
 
 	@Override
@@ -40,29 +40,23 @@ public class SynonymSetFilterWriterImpl implements SynonymSetFilterWriter {
 			return;
 		}
 
-		_closeIndex(companyIndexName);
+		closeIndex(companyIndexName);
 
 		try {
 			UpdateIndexSettingsIndexRequest updateIndexSettingsIndexRequest =
 				new UpdateIndexSettingsIndexRequest(companyIndexName);
 
 			updateIndexSettingsIndexRequest.setSettings(
-				_buildSettings(filterName, synonymSets));
+				buildSettings(filterName, synonymSets));
 
 			searchEngineAdapter.execute(updateIndexSettingsIndexRequest);
 		}
 		finally {
-			_openIndex(companyIndexName);
+			openIndex(companyIndexName);
 		}
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	@Reference
-	protected SearchEngineAdapter searchEngineAdapter;
-
-	private String _buildSettings(String filterName, String[] synonymSets) {
+	protected String buildSettings(String filterName, String[] synonymSets) {
 		return JSONUtil.put(
 			"analysis",
 			JSONUtil.put(
@@ -79,18 +73,24 @@ public class SynonymSetFilterWriterImpl implements SynonymSetFilterWriter {
 		).toString();
 	}
 
-	private void _closeIndex(String indexName) {
+	protected void closeIndex(String indexName) {
 		CloseIndexRequest closeIndexRequest = new CloseIndexRequest(indexName);
 
 		searchEngineAdapter.execute(closeIndexRequest);
 	}
 
-	private void _openIndex(String indexName) {
+	protected void openIndex(String indexName) {
 		OpenIndexRequest openIndexRequest = new OpenIndexRequest(indexName);
 
 		openIndexRequest.setWaitForActiveShards(1);
 
 		searchEngineAdapter.execute(openIndexRequest);
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
+
+	@Reference
+	protected SearchEngineAdapter searchEngineAdapter;
 
 }

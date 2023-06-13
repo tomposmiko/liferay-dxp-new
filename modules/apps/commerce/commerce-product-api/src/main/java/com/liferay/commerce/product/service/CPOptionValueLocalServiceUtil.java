@@ -258,11 +258,29 @@ public class CPOptionValueLocalServiceUtil {
 		return getService().fetchCPOptionValue(CPOptionValueId);
 	}
 
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value, or <code>null</code> if a matching cp option value could not be found
+	 */
 	public static CPOptionValue fetchCPOptionValueByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
 		return getService().fetchCPOptionValueByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionValueByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static CPOptionValue fetchCPOptionValueByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return getService().fetchCPOptionValueByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -304,12 +322,20 @@ public class CPOptionValueLocalServiceUtil {
 		return getService().getCPOptionValue(cpOptionId, key);
 	}
 
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value
+	 * @throws PortalException if a matching cp option value could not be found
+	 */
 	public static CPOptionValue getCPOptionValueByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getCPOptionValueByExternalReferenceCode(
-			externalReferenceCode, companyId);
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -406,6 +432,30 @@ public class CPOptionValueLocalServiceUtil {
 		com.liferay.portal.kernel.search.SearchContext searchContext) {
 
 		return getService().search(searchContext);
+	}
+
+	/**
+	 * @param companyId
+	 * @param groupId
+	 * @param cpOptionId
+	 * @param keywords
+	 * @param start
+	 * @param end
+	 * @param sort
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchCPOptionValues(long, long, String, int, int, Sort[])}
+	 */
+	@Deprecated
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult
+		<CPOptionValue> searchCPOptionValues(
+				long companyId, long groupId, long cpOptionId, String keywords,
+				int start, int end, com.liferay.portal.kernel.search.Sort sort)
+			throws PortalException {
+
+		return getService().searchCPOptionValues(
+			companyId, groupId, cpOptionId, keywords, start, end, sort);
 	}
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult

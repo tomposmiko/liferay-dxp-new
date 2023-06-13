@@ -77,14 +77,12 @@ public class ObjectFieldCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(51);
+		StringBundler sb = new StringBundler(41);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
 		sb.append(", uuid=");
 		sb.append(uuid);
-		sb.append(", externalReferenceCode=");
-		sb.append(externalReferenceCode);
 		sb.append(", objectFieldId=");
 		sb.append(objectFieldId);
 		sb.append(", companyId=");
@@ -101,14 +99,10 @@ public class ObjectFieldCacheModel
 		sb.append(listTypeDefinitionId);
 		sb.append(", objectDefinitionId=");
 		sb.append(objectDefinitionId);
-		sb.append(", businessType=");
-		sb.append(businessType);
 		sb.append(", dbColumnName=");
 		sb.append(dbColumnName);
 		sb.append(", dbTableName=");
 		sb.append(dbTableName);
-		sb.append(", dbType=");
-		sb.append(dbType);
 		sb.append(", indexed=");
 		sb.append(indexed);
 		sb.append(", indexedAsKeyword=");
@@ -117,18 +111,14 @@ public class ObjectFieldCacheModel
 		sb.append(indexedLanguageId);
 		sb.append(", label=");
 		sb.append(label);
-		sb.append(", localized=");
-		sb.append(localized);
 		sb.append(", name=");
 		sb.append(name);
 		sb.append(", relationshipType=");
 		sb.append(relationshipType);
 		sb.append(", required=");
 		sb.append(required);
-		sb.append(", state=");
-		sb.append(state);
-		sb.append(", system=");
-		sb.append(system);
+		sb.append(", type=");
+		sb.append(type);
 		sb.append("}");
 
 		return sb.toString();
@@ -145,13 +135,6 @@ public class ObjectFieldCacheModel
 		}
 		else {
 			objectFieldImpl.setUuid(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			objectFieldImpl.setExternalReferenceCode("");
-		}
-		else {
-			objectFieldImpl.setExternalReferenceCode(externalReferenceCode);
 		}
 
 		objectFieldImpl.setObjectFieldId(objectFieldId);
@@ -182,13 +165,6 @@ public class ObjectFieldCacheModel
 		objectFieldImpl.setListTypeDefinitionId(listTypeDefinitionId);
 		objectFieldImpl.setObjectDefinitionId(objectDefinitionId);
 
-		if (businessType == null) {
-			objectFieldImpl.setBusinessType("");
-		}
-		else {
-			objectFieldImpl.setBusinessType(businessType);
-		}
-
 		if (dbColumnName == null) {
 			objectFieldImpl.setDBColumnName("");
 		}
@@ -201,13 +177,6 @@ public class ObjectFieldCacheModel
 		}
 		else {
 			objectFieldImpl.setDBTableName(dbTableName);
-		}
-
-		if (dbType == null) {
-			objectFieldImpl.setDBType("");
-		}
-		else {
-			objectFieldImpl.setDBType(dbType);
 		}
 
 		objectFieldImpl.setIndexed(indexed);
@@ -227,8 +196,6 @@ public class ObjectFieldCacheModel
 			objectFieldImpl.setLabel(label);
 		}
 
-		objectFieldImpl.setLocalized(localized);
-
 		if (name == null) {
 			objectFieldImpl.setName("");
 		}
@@ -244,8 +211,13 @@ public class ObjectFieldCacheModel
 		}
 
 		objectFieldImpl.setRequired(required);
-		objectFieldImpl.setState(state);
-		objectFieldImpl.setSystem(system);
+
+		if (type == null) {
+			objectFieldImpl.setType("");
+		}
+		else {
+			objectFieldImpl.setType(type);
+		}
 
 		objectFieldImpl.resetOriginalValues();
 
@@ -256,7 +228,6 @@ public class ObjectFieldCacheModel
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
-		externalReferenceCode = objectInput.readUTF();
 
 		objectFieldId = objectInput.readLong();
 
@@ -270,26 +241,19 @@ public class ObjectFieldCacheModel
 		listTypeDefinitionId = objectInput.readLong();
 
 		objectDefinitionId = objectInput.readLong();
-		businessType = objectInput.readUTF();
 		dbColumnName = objectInput.readUTF();
 		dbTableName = objectInput.readUTF();
-		dbType = objectInput.readUTF();
 
 		indexed = objectInput.readBoolean();
 
 		indexedAsKeyword = objectInput.readBoolean();
 		indexedLanguageId = objectInput.readUTF();
 		label = objectInput.readUTF();
-
-		localized = objectInput.readBoolean();
 		name = objectInput.readUTF();
 		relationshipType = objectInput.readUTF();
 
 		required = objectInput.readBoolean();
-
-		state = objectInput.readBoolean();
-
-		system = objectInput.readBoolean();
+		type = objectInput.readUTF();
 	}
 
 	@Override
@@ -301,13 +265,6 @@ public class ObjectFieldCacheModel
 		}
 		else {
 			objectOutput.writeUTF(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(externalReferenceCode);
 		}
 
 		objectOutput.writeLong(objectFieldId);
@@ -330,13 +287,6 @@ public class ObjectFieldCacheModel
 
 		objectOutput.writeLong(objectDefinitionId);
 
-		if (businessType == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(businessType);
-		}
-
 		if (dbColumnName == null) {
 			objectOutput.writeUTF("");
 		}
@@ -349,13 +299,6 @@ public class ObjectFieldCacheModel
 		}
 		else {
 			objectOutput.writeUTF(dbTableName);
-		}
-
-		if (dbType == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(dbType);
 		}
 
 		objectOutput.writeBoolean(indexed);
@@ -376,8 +319,6 @@ public class ObjectFieldCacheModel
 			objectOutput.writeUTF(label);
 		}
 
-		objectOutput.writeBoolean(localized);
-
 		if (name == null) {
 			objectOutput.writeUTF("");
 		}
@@ -394,14 +335,16 @@ public class ObjectFieldCacheModel
 
 		objectOutput.writeBoolean(required);
 
-		objectOutput.writeBoolean(state);
-
-		objectOutput.writeBoolean(system);
+		if (type == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(type);
+		}
 	}
 
 	public long mvccVersion;
 	public String uuid;
-	public String externalReferenceCode;
 	public long objectFieldId;
 	public long companyId;
 	public long userId;
@@ -410,19 +353,15 @@ public class ObjectFieldCacheModel
 	public long modifiedDate;
 	public long listTypeDefinitionId;
 	public long objectDefinitionId;
-	public String businessType;
 	public String dbColumnName;
 	public String dbTableName;
-	public String dbType;
 	public boolean indexed;
 	public boolean indexedAsKeyword;
 	public String indexedLanguageId;
 	public String label;
-	public boolean localized;
 	public String name;
 	public String relationshipType;
 	public boolean required;
-	public boolean state;
-	public boolean system;
+	public String type;
 
 }

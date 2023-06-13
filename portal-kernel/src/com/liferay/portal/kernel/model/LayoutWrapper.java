@@ -75,7 +75,6 @@ public class LayoutWrapper
 		attributes.put("styleBookEntryId", getStyleBookEntryId());
 		attributes.put("css", getCss());
 		attributes.put("priority", getPriority());
-		attributes.put("faviconFileEntryId", getFaviconFileEntryId());
 		attributes.put("masterLayoutPlid", getMasterLayoutPlid());
 		attributes.put("layoutPrototypeUuid", getLayoutPrototypeUuid());
 		attributes.put(
@@ -286,12 +285,6 @@ public class LayoutWrapper
 			setPriority(priority);
 		}
 
-		Long faviconFileEntryId = (Long)attributes.get("faviconFileEntryId");
-
-		if (faviconFileEntryId != null) {
-			setFaviconFileEntryId(faviconFileEntryId);
-		}
-
 		Long masterLayoutPlid = (Long)attributes.get("masterLayoutPlid");
 
 		if (masterLayoutPlid != null) {
@@ -421,13 +414,6 @@ public class LayoutWrapper
 	@Override
 	public String[] getAvailableLanguageIds() {
 		return model.getAvailableLanguageIds();
-	}
-
-	@Override
-	public String getBreadcrumb(java.util.Locale locale)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getBreadcrumb(locale);
 	}
 
 	/**
@@ -672,21 +658,6 @@ public class LayoutWrapper
 	}
 
 	/**
-	 * Returns the favicon file entry ID of this layout.
-	 *
-	 * @return the favicon file entry ID of this layout
-	 */
-	@Override
-	public long getFaviconFileEntryId() {
-		return model.getFaviconFileEntryId();
-	}
-
-	@Override
-	public String getFaviconURL() {
-		return model.getFaviconURL();
-	}
-
-	/**
 	 * Returns the friendly url of this layout.
 	 *
 	 * @return the friendly url of this layout
@@ -783,11 +754,6 @@ public class LayoutWrapper
 	@Override
 	public String getHTMLTitle(String localeLanguageId) {
 		return model.getHTMLTitle(localeLanguageId);
-	}
-
-	@Override
-	public String getIcon() {
-		return model.getIcon();
 	}
 
 	/**
@@ -1629,11 +1595,6 @@ public class LayoutWrapper
 		return model.isDraftLayout();
 	}
 
-	@Override
-	public boolean isEmbeddedPersonalApplication() {
-		return model.isEmbeddedPersonalApplication();
-	}
-
 	/**
 	 * Returns <code>true</code> if this layout is expired.
 	 *
@@ -1781,11 +1742,6 @@ public class LayoutWrapper
 		return model.isPublicLayout();
 	}
 
-	@Override
-	public boolean isPublished() {
-		return model.isPublished();
-	}
-
 	/**
 	 * Returns <code>true</code> if the current layout is the root layout.
 	 *
@@ -1839,11 +1795,6 @@ public class LayoutWrapper
 	@Override
 	public boolean isTypeAssetDisplay() {
 		return model.isTypeAssetDisplay();
-	}
-
-	@Override
-	public boolean isTypeCollection() {
-		return model.isTypeCollection();
 	}
 
 	@Override
@@ -2049,16 +2000,6 @@ public class LayoutWrapper
 		java.util.Locale defaultLocale) {
 
 		model.setDescriptionMap(descriptionMap, defaultLocale);
-	}
-
-	/**
-	 * Sets the favicon file entry ID of this layout.
-	 *
-	 * @param faviconFileEntryId the favicon file entry ID of this layout
-	 */
-	@Override
-	public void setFaviconFileEntryId(long faviconFileEntryId) {
-		model.setFaviconFileEntryId(faviconFileEntryId);
 	}
 
 	/**
@@ -2661,11 +2602,6 @@ public class LayoutWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

@@ -15,36 +15,36 @@
 AUI.add(
 	'liferay-calendar-remote-services',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const isString = Lang.isString;
-		const toInt = Lang.toInt;
+		var isString = Lang.isString;
+		var toInt = Lang.toInt;
 
-		const CalendarUtil = Liferay.CalendarUtil;
-		const MessageUtil = Liferay.CalendarMessageUtil;
+		var CalendarUtil = Liferay.CalendarUtil;
+		var MessageUtil = Liferay.CalendarMessageUtil;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const CalendarRemoteServices = A.Base.create(
+		var CalendarRemoteServices = A.Base.create(
 			'calendar-remote-services',
 			A.Base,
 			[Liferay.PortletBase],
 			{
 				_invokeActionURL(config) {
-					const instance = this;
+					var instance = this;
 
-					const actionParameters = {
+					var actionParameters = {
 						'javax.portlet.action': config.actionName,
 					};
 
 					A.mix(actionParameters, config.queryParameters);
 
-					const url = Liferay.Util.PortletURL.createActionURL(
+					var url = Liferay.Util.PortletURL.createActionURL(
 						instance.get('baseActionURL'),
 						actionParameters
 					);
 
-					let payload;
+					var payload;
 
 					if (config.payload) {
 						payload = Liferay.Util.ns(
@@ -72,20 +72,21 @@ AUI.add(
 				},
 
 				_invokeResourceURL(config) {
-					const instance = this;
+					var instance = this;
 
-					const resourceParameters = {
+					var resourceParameters = {
+						doAsUserId: Liferay.ThemeDisplay.getDoAsUserIdEncoded(),
 						p_p_resource_id: config.resourceId,
 					};
 
 					A.mix(resourceParameters, config.queryParameters);
 
-					const url = Liferay.Util.PortletURL.createResourceURL(
+					var url = Liferay.Util.PortletURL.createResourceURL(
 						instance.get('baseResourceURL'),
 						resourceParameters
 					);
 
-					let payload;
+					var payload;
 
 					if (config.payload) {
 						payload = Liferay.Util.ns(
@@ -117,7 +118,7 @@ AUI.add(
 				},
 
 				_invokeService(payload, callback) {
-					const instance = this;
+					var instance = this;
 
 					callback = callback || {};
 
@@ -145,7 +146,7 @@ AUI.add(
 				},
 
 				deleteCalendar(calendarId, callback) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeService(
 						{
@@ -162,7 +163,7 @@ AUI.add(
 				},
 
 				deleteEvent(schedulerEvent, success) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeService(
 						{
@@ -186,7 +187,7 @@ AUI.add(
 				},
 
 				deleteEventInstance(schedulerEvent, allFollowing, success) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeService(
 						{
@@ -215,7 +216,7 @@ AUI.add(
 				},
 
 				getCalendar(calendarId, callback) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeResourceURL({
 						callback,
@@ -227,7 +228,7 @@ AUI.add(
 				},
 
 				getCalendarBookingInvitees(calendarBookingId, callback) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeResourceURL({
 						callback,
@@ -245,7 +246,7 @@ AUI.add(
 					ruleName,
 					callback
 				) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeResourceURL({
 						callback,
@@ -260,21 +261,20 @@ AUI.add(
 				},
 
 				getCurrentTime(callback) {
-					const instance = this;
+					var instance = this;
 
-					const lastCurrentTime = instance.lastCurrentTime;
+					var lastCurrentTime = instance.lastCurrentTime;
 
 					if (lastCurrentTime) {
-						const lastBrowserTime = instance.lastBrowserTime;
+						var lastBrowserTime = instance.lastBrowserTime;
 
-						const browserTime = new Date();
+						var browserTime = new Date();
 
-						const timeDiff = Math.abs(
+						var timeDiff = Math.abs(
 							browserTime.getTime() - lastBrowserTime.getTime()
 						);
 
-						const currentTime =
-							lastCurrentTime.getTime() + timeDiff;
+						var currentTime = lastCurrentTime.getTime() + timeDiff;
 
 						lastCurrentTime.setTime(currentTime);
 
@@ -302,7 +302,7 @@ AUI.add(
 				},
 
 				getEvent(calendarBookingId, success, failure) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeService(
 						{
@@ -325,7 +325,7 @@ AUI.add(
 					status,
 					callback
 				) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeResourceURL({
 						callback,
@@ -349,7 +349,7 @@ AUI.add(
 				},
 
 				getResourceCalendars(calendarResourceId, callback) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeResourceURL({
 						callback,
@@ -366,7 +366,7 @@ AUI.add(
 					endDate,
 					callback
 				) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeResourceURL({
 						callback(result) {
@@ -396,9 +396,9 @@ AUI.add(
 					updateInstance,
 					allFollowing
 				) {
-					const instance = this;
+					var instance = this;
 
-					const scheduler = schedulerEvent.get('scheduler');
+					var scheduler = schedulerEvent.get('scheduler');
 
 					instance._invokeService(
 						{
@@ -426,7 +426,7 @@ AUI.add(
 								});
 
 								if (data && !data.exception && scheduler) {
-									const eventRecorder = scheduler.get(
+									var eventRecorder = scheduler.get(
 										'eventRecorder'
 									);
 
@@ -440,7 +440,7 @@ AUI.add(
 				},
 
 				updateCalendarColor(calendarId, color) {
-					const instance = this;
+					var instance = this;
 
 					instance._invokeService({
 						'/calendar.calendar/update-color': {
@@ -456,10 +456,10 @@ AUI.add(
 					allFollowing,
 					success
 				) {
-					const instance = this;
+					var instance = this;
 
-					const endDate = schedulerEvent.get('endDate');
-					const startDate = schedulerEvent.get('startDate');
+					var endDate = schedulerEvent.get('endDate');
+					var startDate = schedulerEvent.get('startDate');
 
 					instance._invokeActionURL({
 						actionName: 'updateSchedulerCalendarBooking',

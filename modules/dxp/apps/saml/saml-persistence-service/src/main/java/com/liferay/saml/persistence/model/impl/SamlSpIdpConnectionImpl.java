@@ -29,7 +29,6 @@ import java.util.Properties;
  */
 public class SamlSpIdpConnectionImpl extends SamlSpIdpConnectionBaseImpl {
 
-	@Override
 	public Properties getNormalizedUserAttributeMappings() throws IOException {
 		Properties userAttributeMappingsProperties = new OrderedProperties();
 
@@ -48,9 +47,7 @@ public class SamlSpIdpConnectionImpl extends SamlSpIdpConnectionBaseImpl {
 	}
 
 	private String _removeDefaultPrefix(String userFieldExpression) {
-		if (Validator.isNotNull(userFieldExpression) &&
-			(userFieldExpression.charAt(0) == CharPool.COLON)) {
-
+		if (userFieldExpression.charAt(0) == CharPool.COLON) {
 			return userFieldExpression.substring(1);
 		}
 

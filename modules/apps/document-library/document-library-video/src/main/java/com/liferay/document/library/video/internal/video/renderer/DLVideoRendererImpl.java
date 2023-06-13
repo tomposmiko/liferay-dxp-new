@@ -62,7 +62,7 @@ public class DLVideoRendererImpl implements DLVideoRenderer {
 				"\" width=\"560\"></iframe>");
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return null;
 		}

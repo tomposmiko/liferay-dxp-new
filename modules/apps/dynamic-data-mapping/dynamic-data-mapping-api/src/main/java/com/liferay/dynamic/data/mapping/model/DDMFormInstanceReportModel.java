@@ -198,8 +198,4 @@ public interface DDMFormInstanceReportModel
 	@Override
 	public DDMFormInstanceReport cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

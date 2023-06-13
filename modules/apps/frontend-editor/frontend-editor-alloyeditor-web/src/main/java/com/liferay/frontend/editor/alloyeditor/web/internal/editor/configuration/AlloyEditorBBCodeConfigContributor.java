@@ -18,20 +18,20 @@ import com.liferay.message.boards.constants.MBThreadConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Ambrín Chaudhary
@@ -68,7 +68,7 @@ public class AlloyEditorBBCodeConfigContributor
 		).put(
 			"format_tags", "p;pre"
 		).put(
-			"lang", _getLangJSONObject(inputEditorTaglibAttributes)
+			"lang", getLangJSONObject(inputEditorTaglibAttributes)
 		).put(
 			"newThreadURL", MBThreadConstants.NEW_THREAD_URL
 		);
@@ -88,13 +88,22 @@ public class AlloyEditorBBCodeConfigContributor
 			toJSONArray(BBCodeTranslatorUtil.getEmoticonFiles())
 		).put(
 			"smiley_path",
-			_html.escape(themeDisplay.getPathThemeImages()) + "/emoticons/"
+			HtmlUtil.escape(themeDisplay.getPathThemeImages()) + "/emoticons/"
 		).put(
 			"smiley_symbols",
 			toJSONArray(BBCodeTranslatorUtil.getEmoticonSymbols())
 		).put(
 			"toolbars", getToolbarsJSONObject(themeDisplay.getLocale())
 		);
+	}
+
+	protected JSONObject getLangJSONObject(
+		Map<String, Object> inputEditorTaglibAttributes) {
+
+		return JSONUtil.put(
+			"code",
+			LanguageUtil.get(
+				getContentsLocale(inputEditorTaglibAttributes), "code"));
 	}
 
 	protected JSONObject getStyleFormatJSONObject(
@@ -110,19 +119,22 @@ public class AlloyEditorBBCodeConfigContributor
 	protected JSONArray getStyleFormatsJSONArray(Locale locale) {
 		return JSONUtil.putAll(
 			getStyleFormatJSONObject(
-				_language.get(locale, "normal"), "p", null,
+				LanguageUtil.get(locale, "normal"), "p", null,
 				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				_language.get(locale, "cited-work"), "cite", null,
+				LanguageUtil.get(locale, "cited-work"), "cite", null,
 				_CKEDITOR_STYLE_INLINE),
 			getStyleFormatJSONObject(
-				_language.get(locale, "computer-code"), "code", null,
+				LanguageUtil.get(locale, "computer-code"), "code", null,
 				_CKEDITOR_STYLE_INLINE));
 	}
 
 	protected JSONObject getStyleFormatsJSONObject(Locale locale) {
+		JSONObject stylesJSONObject = JSONUtil.put(
+			"styles", getStyleFormatsJSONArray(locale));
+
 		return JSONUtil.put(
-			"cfg", JSONUtil.put("styles", getStyleFormatsJSONArray(locale))
+			"cfg", stylesJSONObject
 		).put(
 			"name", "styles"
 		);
@@ -131,20 +143,21 @@ public class AlloyEditorBBCodeConfigContributor
 	protected JSONObject getStyleJSONObject(
 		String element, String cssClass, int type) {
 
-		return JSONUtil.put(
-			"attributes",
-			() -> {
-				if (Validator.isNotNull(cssClass)) {
-					return JSONUtil.put("class", cssClass);
-				}
+		JSONObject styleJSONObject = JSONFactoryUtil.createJSONObject();
 
-				return null;
-			}
-		).put(
+		if (Validator.isNotNull(cssClass)) {
+			JSONObject attributesJSONObject = JSONUtil.put("class", cssClass);
+
+			styleJSONObject.put("attributes", attributesJSONObject);
+		}
+
+		styleJSONObject.put(
 			"element", element
 		).put(
 			"type", type
 		);
+
+		return styleJSONObject;
 	}
 
 	protected JSONObject getToolbarsAddJSONObject() {
@@ -202,23 +215,8 @@ public class AlloyEditorBBCodeConfigContributor
 		);
 	}
 
-	private JSONObject _getLangJSONObject(
-		Map<String, Object> inputEditorTaglibAttributes) {
-
-		return JSONUtil.put(
-			"code",
-			_language.get(
-				getContentsLocale(inputEditorTaglibAttributes), "code"));
-	}
-
 	private static final int _CKEDITOR_STYLE_BLOCK = 1;
 
 	private static final int _CKEDITOR_STYLE_INLINE = 2;
-
-	@Reference
-	private Html _html;
-
-	@Reference
-	private Language _language;
 
 }

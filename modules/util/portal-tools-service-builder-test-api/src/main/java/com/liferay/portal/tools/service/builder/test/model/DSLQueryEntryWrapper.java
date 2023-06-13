@@ -133,11 +133,6 @@ public class DSLQueryEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected DSLQueryEntryWrapper wrap(DSLQueryEntry dslQueryEntry) {
 		return new DSLQueryEntryWrapper(dslQueryEntry);
 	}

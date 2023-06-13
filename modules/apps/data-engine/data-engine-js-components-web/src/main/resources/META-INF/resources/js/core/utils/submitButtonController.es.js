@@ -12,12 +12,8 @@
  * details.
  */
 
-export function disableSubmitButton(submitButtonId) {
-	return document
-		.getElementById(submitButtonId)
-		?.setAttribute('disabled', 'true');
-}
+export const disableSubmitButton = (submitButtonId) =>
+	document.getElementById(submitButtonId)?.setAttribute('disabled', 'true');
 
-export function enableSubmitButton(submitButtonId) {
-	return document.getElementById(submitButtonId)?.removeAttribute('disabled');
-}
+export const enableSubmitButton = (submitButtonId) =>
+	document.getElementById(submitButtonId)?.removeAttribute('disabled');

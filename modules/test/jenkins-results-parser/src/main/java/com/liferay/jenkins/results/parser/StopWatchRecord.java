@@ -33,23 +33,16 @@ public class StopWatchRecord implements Comparable<StopWatchRecord> {
 	public StopWatchRecord(String name, long startTimestamp) {
 		_jsonObject = new JSONObject();
 
-		_jsonObject.put(
-			"name", name
-		).put(
-			"startTimestamp", startTimestamp
-		);
+		_jsonObject.put("name", name);
+		_jsonObject.put("startTimestamp", startTimestamp);
 	}
 
 	public StopWatchRecord(String name, long startTimestamp, long duration) {
 		_jsonObject = new JSONObject();
 
-		_jsonObject.put(
-			"duration", duration
-		).put(
-			"name", name
-		).put(
-			"startTimestamp", startTimestamp
-		);
+		_jsonObject.put("duration", duration);
+		_jsonObject.put("name", name);
+		_jsonObject.put("startTimestamp", startTimestamp);
 	}
 
 	public void addChildStopWatchRecord(
@@ -147,13 +140,9 @@ public class StopWatchRecord implements Comparable<StopWatchRecord> {
 				"childStopWatchRecords", childStopWatchRecordJSONArray);
 		}
 
-		jsonObject.put(
-			"duration", getDuration()
-		).put(
-			"name", getName()
-		).put(
-			"startTimestamp", getStartTimestamp()
-		);
+		jsonObject.put("duration", getDuration());
+		jsonObject.put("name", getName());
+		jsonObject.put("startTimestamp", getStartTimestamp());
 
 		return jsonObject;
 	}

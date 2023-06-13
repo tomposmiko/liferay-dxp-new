@@ -16,10 +16,8 @@ package com.liferay.portal.workflow.kaleo.metrics.integration.internal.model.lis
 
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
-import com.liferay.portal.workflow.kaleo.metrics.integration.internal.helper.IndexerHelper;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
-import com.liferay.portal.workflow.metrics.model.DeleteNodeRequest;
 import com.liferay.portal.workflow.metrics.search.index.NodeWorkflowMetricsIndexer;
 
 import java.util.Objects;
@@ -30,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class KaleoNodeModelListener extends BaseKaleoModelListener<KaleoNode> {
 
 	@Override
@@ -47,8 +45,12 @@ public class KaleoNodeModelListener extends BaseKaleoModelListener<KaleoNode> {
 		}
 
 		_nodeWorkflowMetricsIndexer.addNode(
-			_indexerHelper.createAddNodeRequest(
-				kaleoDefinitionVersion, kaleoNode));
+			kaleoNode.getCompanyId(), kaleoNode.getCreateDate(),
+			kaleoNode.isInitial(), kaleoNode.getModifiedDate(),
+			kaleoNode.getName(), kaleoNode.getKaleoNodeId(),
+			kaleoNode.getKaleoDefinitionId(),
+			kaleoDefinitionVersion.getVersion(), kaleoNode.isTerminal(),
+			kaleoNode.getType());
 	}
 
 	@Override
@@ -57,18 +59,9 @@ public class KaleoNodeModelListener extends BaseKaleoModelListener<KaleoNode> {
 			return;
 		}
 
-		DeleteNodeRequest.Builder builder = new DeleteNodeRequest.Builder();
-
 		_nodeWorkflowMetricsIndexer.deleteNode(
-			builder.companyId(
-				kaleoNode.getCompanyId()
-			).nodeId(
-				kaleoNode.getKaleoNodeId()
-			).build());
+			kaleoNode.getCompanyId(), kaleoNode.getKaleoNodeId());
 	}
-
-	@Reference
-	private IndexerHelper _indexerHelper;
 
 	@Reference
 	private NodeWorkflowMetricsIndexer _nodeWorkflowMetricsIndexer;

@@ -19,14 +19,14 @@
 <liferay-util:html-top
 	outputKey="document_library_video_embed_css"
 >
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/embed.css") %>" rel="stylesheet" type="text/css" />
+	<link href="<%= PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/css/embed.css") %>" rel="stylesheet" type="text/css" />
 </liferay-util:html-top>
 
 <div class="video-embed-placeholder">
 	<span aria-hidden="true" class="loading-animation"></span>
 
 	<div class="video-embed-placeholder-text">
-		<liferay-ui:message key="generating-preview-will-take-a-few-minutes" />
+		<liferay-ui:message key="generating-video-preview-will-take-a-few-minutes" />
 	</div>
 </div>
 

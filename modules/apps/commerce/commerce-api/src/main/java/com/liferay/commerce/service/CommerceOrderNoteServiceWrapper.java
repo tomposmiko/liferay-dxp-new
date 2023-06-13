@@ -27,10 +27,6 @@ public class CommerceOrderNoteServiceWrapper
 	implements CommerceOrderNoteService,
 			   ServiceWrapper<CommerceOrderNoteService> {
 
-	public CommerceOrderNoteServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceOrderNoteServiceWrapper(
 		CommerceOrderNoteService commerceOrderNoteService) {
 
@@ -102,16 +98,6 @@ public class CommerceOrderNoteServiceWrapper
 
 		return _commerceOrderNoteService.getCommerceOrderNotes(
 			commerceOrderId, restricted);
-	}
-
-	@Override
-	public java.util.List<com.liferay.commerce.model.CommerceOrderNote>
-			getCommerceOrderNotes(
-				long commerceOrderId, boolean restricted, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceOrderNoteService.getCommerceOrderNotes(
-			commerceOrderId, restricted, start, end);
 	}
 
 	@Override

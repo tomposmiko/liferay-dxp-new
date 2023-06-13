@@ -58,6 +58,4 @@ public interface ObjectRelationship
 
 			};
 
-	public boolean isSelf();
-
 }

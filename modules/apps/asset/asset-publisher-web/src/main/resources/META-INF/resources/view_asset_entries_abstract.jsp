@@ -30,7 +30,7 @@ AssetEntryResult assetEntryResult = (AssetEntryResult)request.getAttribute("view
 
 <%
 for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
-	AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
+	AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(assetEntry.getClassNameId());
 
 	if (assetRendererFactory == null) {
 		continue;
@@ -48,7 +48,7 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 	}
 	catch (Exception e) {
 		if (_log.isWarnEnabled()) {
-			_log.warn(e);
+			_log.warn(e, e);
 		}
 	}
 
@@ -61,7 +61,9 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 
 	try {
 		String title = assetRenderer.getTitle(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(request)));
+
 		String viewURL = assetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry, assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet());
+
 		Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
 			"fragments-editor-item-id", PortalUtil.getClassNameId(assetRenderer.getClassName()) + "-" + assetRenderer.getClassPK()
 		).put(
@@ -228,7 +230,7 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 			</c:if>
 
 			<c:if test="<%= (assetPublisherDisplayContext.isEnableRatings() && assetRenderer.isRatable()) || assetPublisherDisplayContext.isEnableFlags() || assetPublisherDisplayContext.isEnablePrint() || Validator.isNotNull(assetPublisherDisplayContext.getSocialBookmarksTypes()) %>">
-				<hr class="separator" />
+				<div class="separator"><!-- --></div>
 
 				<clay:content-row
 					cssClass="asset-details"
@@ -275,40 +277,37 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 						>
 
 							<%
+							PortletURL printAssetURL = PortletURLBuilder.createRenderURL(
+								renderResponse
+							).setMVCPath(
+								"/view_content.jsp"
+							).setParameter(
+								"assetEntryId", assetEntry.getEntryId()
+							).setParameter(
+								"languageId", LanguageUtil.getLanguageId(request)
+							).setParameter(
+								"type", assetRendererFactory.getType()
+							).setParameter(
+								"viewMode", Constants.PRINT
+							).setWindowState(
+								LiferayWindowState.POP_UP
+							).buildPortletURL();
+
 							String id = assetEntry.getEntryId() + StringUtil.randomId();
-							String label = LanguageUtil.format(request, "print-x", HtmlUtil.escape(title));
 							%>
 
-							<clay:button
-								aria-label="<%= label %>"
-								borderless="<%= true %>"
-								displayType="secondary"
+							<liferay-ui:icon
 								icon="print"
-								onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "printPage_" + id + "();" %>'
-								small="<%= true %>"
-								title="<%= label %>"
-								type="button"
+								linkCssClass="btn btn-monospaced btn-outline-borderless btn-outline-secondary btn-sm"
+								markupView="lexicon"
+								message='<%= LanguageUtil.format(request, "print-x-x", new Object[] {"hide-accessible", HtmlUtil.escape(title)}, false) %>'
+								url='<%= "javascript:" + liferayPortletResponse.getNamespace() + "printPage_" + id + "();" %>'
 							/>
 
 							<aui:script>
 								function <portlet:namespace />printPage_<%= id %>() {
 									window.open(
-										'<%=
-										PortletURLBuilder.createRenderURL(
-											renderResponse
-										).setMVCPath(
-											"/view_content.jsp"
-										).setParameter(
-											"assetEntryId", assetEntry.getEntryId()
-										).setParameter(
-											"languageId", LanguageUtil.getLanguageId(request)
-										).setParameter(
-											"type", assetRendererFactory.getType()
-										).setParameter(
-											"viewMode", Constants.PRINT
-										).setWindowState(
-											LiferayWindowState.POP_UP
-										).buildPortletURL() %>',
+										'<%= printAssetURL %>',
 										'',
 										'directories=0,height=480,left=80,location=1,menubar=1,resizable=1,scrollbars=yes,status=0,toolbar=0,top=180,width=640'
 									);
@@ -325,14 +324,14 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 							target="_blank"
 							title="<%= title %>"
 							types="<%= assetPublisherDisplayContext.getSocialBookmarksTypes() %>"
-							url="<%= assetPublisherHelper.getAssetSocialURL(liferayPortletRequest, liferayPortletResponse, assetEntry) %>"
+							urlImpl="<%= assetPublisherHelper.getBaseAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry) %>"
 						/>
 					</clay:content-col>
 				</clay:content-row>
 			</c:if>
 
 			<c:if test="<%= (assetPublisherDisplayContext.isShowAvailableLocales() && assetRenderer.isLocalizable()) || (assetPublisherDisplayContext.isEnableConversions() && assetRenderer.isConvertible()) %>">
-				<hr class="separator" />
+				<div class="separator"><!-- --></div>
 
 				<clay:content-row
 					cssClass="asset-details"

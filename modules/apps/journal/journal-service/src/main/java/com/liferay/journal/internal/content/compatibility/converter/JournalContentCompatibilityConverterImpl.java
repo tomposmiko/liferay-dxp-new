@@ -20,11 +20,10 @@ import com.liferay.journal.content.compatibility.converter.JournalContentCompati
 import com.liferay.layout.dynamic.data.mapping.form.field.type.constants.LayoutDDMFormFieldTypeConstants;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.petra.xml.XMLUtil;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -47,22 +46,20 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = JournalContentCompatibilityConverter.class)
+@Component(
+	immediate = true, service = JournalContentCompatibilityConverter.class
+)
 public class JournalContentCompatibilityConverterImpl
 	implements JournalContentCompatibilityConverter {
 
 	@Override
 	public String convert(String content) {
 		try {
-			Document document = _convert(SAXReaderUtil.read(content));
+			Document document = SAXReaderUtil.read(content);
 
-			return document.formattedString(StringPool.DOUBLE_SPACE);
+			return XMLUtil.formatXML(_convert(document));
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
 			return content;
 		}
 	}
@@ -121,7 +118,7 @@ public class JournalContentCompatibilityConverterImpl
 
 	private String _convertDDMFieldType(String ddmFieldType) {
 		if (Objects.equals(ddmFieldType, "boolean")) {
-			return DDMFormFieldTypeConstants.CHECKBOX;
+			return DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE;
 		}
 
 		if (Objects.equals(ddmFieldType, "ddm-color")) {
@@ -194,10 +191,6 @@ public class JournalContentCompatibilityConverterImpl
 			"dynamic-content");
 
 		for (Element dynamicContentElement : dynamicContentElements) {
-			if (Objects.equals(ddmFieldType, "list")) {
-				continue;
-			}
-
 			String text = dynamicContentElement.getText();
 
 			dynamicContentElement.clearContent();
@@ -233,7 +226,7 @@ public class JournalContentCompatibilityConverterImpl
 			return StringPool.BLANK;
 		}
 
-		JSONObject jsonObject = _jsonFactorys.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		long layoutId = GetterUtil.getLong(values[0]);
 		boolean privateLayout = !Objects.equals(values[1], "public");
@@ -263,7 +256,7 @@ public class JournalContentCompatibilityConverterImpl
 			"privateLayout", privateLayout
 		);
 
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
 	}
 
 	private void _convertNestedFields(Element newElement, Element oldElement) {
@@ -344,12 +337,6 @@ public class JournalContentCompatibilityConverterImpl
 	}
 
 	private static final String _LATEST_CONTENT_VERSION = "1.0";
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		JournalContentCompatibilityConverterImpl.class);
-
-	@Reference
-	private JSONFactory _jsonFactorys;
 
 	@Reference(unbind = "-")
 	private LayoutLocalService _layoutLocalService;

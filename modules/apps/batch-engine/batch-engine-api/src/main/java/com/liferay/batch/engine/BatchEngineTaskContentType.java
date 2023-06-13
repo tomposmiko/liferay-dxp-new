@@ -19,17 +19,6 @@ package com.liferay.batch.engine;
  */
 public enum BatchEngineTaskContentType {
 
-	CSV("csv"), JSON("json"), JSONL("jsonl"), JSONT("batch-engine-data.json"),
-	XLS("xls"), XLSX("xlsx");
-
-	public String getFileExtension() {
-		return _fileExtension;
-	}
-
-	private BatchEngineTaskContentType(String fileExtension) {
-		_fileExtension = fileExtension;
-	}
-
-	private final String _fileExtension;
+	CSV, JSON, JSONL, XLS, XLSX
 
 }

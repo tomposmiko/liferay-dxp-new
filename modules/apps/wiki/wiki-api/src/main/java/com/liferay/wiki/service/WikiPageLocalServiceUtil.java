@@ -48,9 +48,9 @@ public class WikiPageLocalServiceUtil {
 	 */
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addPage(String,
-	 long, long, String, double, String, String, boolean, String,
-	 boolean, String, String, ServiceContext)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addPage(String, long, long, String, double, String, String, boolean,
+	 String, boolean, String, String, ServiceContext)}
 	 */
 	@Deprecated
 	public static WikiPage addPage(
@@ -731,12 +731,6 @@ public class WikiPageLocalServiceUtil {
 		long userId, long nodeId, int status, int start, int end) {
 
 		return getService().getPages(userId, nodeId, status, start, end);
-	}
-
-	public static List<WikiPage> getPages(
-		long groupId, long nodeId, int status, long statusByUserId) {
-
-		return getService().getPages(groupId, nodeId, status, statusByUserId);
 	}
 
 	public static List<WikiPage> getPages(

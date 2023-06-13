@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Stian Sigvartsen
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + PortletKeys.FAST_LOGIN,
 		"javax.portlet.name=" + PortletKeys.LOGIN,
@@ -64,9 +65,9 @@ public class AssociateFacebookUserMVCRenderCommand implements MVCRenderCommand {
 			renderRequest, "userId");
 
 		if (facebookIncompleteUserId != 0) {
-			return _renderUpdateAccount(
-				renderRequest,
-				_userLocalService.fetchUser(facebookIncompleteUserId));
+			User user = _userLocalService.fetchUser(facebookIncompleteUserId);
+
+			return renderUpdateAccount(renderRequest, user);
 		}
 
 		// This return statement may be used if the user presses the browser's
@@ -75,7 +76,7 @@ public class AssociateFacebookUserMVCRenderCommand implements MVCRenderCommand {
 		return "/login.jsp";
 	}
 
-	private String _renderUpdateAccount(
+	protected String renderUpdateAccount(
 			PortletRequest portletRequest, User user)
 		throws PortletException {
 
@@ -84,10 +85,17 @@ public class AssociateFacebookUserMVCRenderCommand implements MVCRenderCommand {
 		return "/update_account.jsp";
 	}
 
-	@Reference
-	private FacebookConnect _facebookConnect;
+	@Reference(unbind = "-")
+	protected void setFacebookConnect(FacebookConnect facebookConnect) {
+		_facebookConnect = facebookConnect;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	private FacebookConnect _facebookConnect;
 	private UserLocalService _userLocalService;
 
 }

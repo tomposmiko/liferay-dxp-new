@@ -12,7 +12,6 @@
  * details.
  */
 
-import {escapeHTML} from './util/html_util';
 import toggleDisabled from './util/toggle_disabled';
 
 function sortByValue(a, b) {
@@ -77,8 +76,8 @@ function updateSelect(array, index, list) {
 	}
 
 	list.forEach((item) => {
-		const key = escapeHTML(item[options.selectId]);
-		const value = escapeHTML(item[options.selectDesc]);
+		const key = Liferay.Util.escapeHTML(item[options.selectId]);
+		const value = Liferay.Util.escapeHTML(item[options.selectDesc]);
 
 		let selected = '';
 

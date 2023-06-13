@@ -27,10 +27,6 @@ public class DepotAppCustomizationLocalServiceWrapper
 	implements DepotAppCustomizationLocalService,
 			   ServiceWrapper<DepotAppCustomizationLocalService> {
 
-	public DepotAppCustomizationLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DepotAppCustomizationLocalServiceWrapper(
 		DepotAppCustomizationLocalService depotAppCustomizationLocalService) {
 
@@ -295,14 +291,6 @@ public class DepotAppCustomizationLocalServiceWrapper
 
 		return _depotAppCustomizationLocalService.getDepotAppCustomizations(
 			start, end);
-	}
-
-	@Override
-	public java.util.List<com.liferay.depot.model.DepotAppCustomization>
-		getDepotAppCustomizations(long depotEntryId) {
-
-		return _depotAppCustomizationLocalService.getDepotAppCustomizations(
-			depotEntryId);
 	}
 
 	/**

@@ -15,6 +15,7 @@
 package com.liferay.headless.admin.content.internal.resource.v1_0;
 
 import com.liferay.headless.admin.content.dto.v1_0.DisplayPageTemplate;
+import com.liferay.headless.admin.content.internal.dto.v1_0.converter.DisplayPageTemplateDTOConverter;
 import com.liferay.headless.admin.content.resource.v1_0.DisplayPageTemplateResource;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.exception.NoSuchPageTemplateEntryException;
@@ -30,11 +31,11 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -103,7 +104,7 @@ public class DisplayPageTemplateResourceImpl
 					ActionKeys.VIEW, "getSiteDisplayPageTemplatesPage",
 					Group.class.getName(), siteId)
 			).build(),
-			transform(
+			TransformUtil.transform(
 				_layoutPageTemplateEntryLocalService.dynamicQuery(
 					dynamicQuery, pagination.getStartPosition(),
 					pagination.getEndPosition()),
@@ -154,11 +155,8 @@ public class DisplayPageTemplateResourceImpl
 		"title", "name"
 	).build();
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.admin.content.internal.dto.v1_0.converter.DisplayPageTemplateDTOConverter)"
-	)
-	private DTOConverter<LayoutPageTemplateEntry, DisplayPageTemplate>
-		_displayPageTemplateDTOConverter;
+	@Reference
+	private DisplayPageTemplateDTOConverter _displayPageTemplateDTOConverter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

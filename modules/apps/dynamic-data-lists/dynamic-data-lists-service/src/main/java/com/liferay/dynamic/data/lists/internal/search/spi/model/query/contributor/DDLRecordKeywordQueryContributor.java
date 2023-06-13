@@ -21,6 +21,8 @@ import com.liferay.portal.search.query.QueryHelper;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
 import com.liferay.portal.search.spi.model.query.contributor.helper.KeywordQueryContributorHelper;
 
+import java.util.stream.Stream;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -28,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcela Cunha
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.lists.model.DDLRecord",
 	service = KeywordQueryContributor.class
 )
@@ -43,15 +46,15 @@ public class DDLRecordKeywordQueryContributor
 			booleanQuery, keywordQueryContributorHelper.getSearchContext(),
 			Field.USER_NAME, false);
 
-		for (String localizedFieldName :
-				_searchLocalizationHelper.getLocalizedFieldNames(
-					new String[] {"ddmContent"},
-					keywordQueryContributorHelper.getSearchContext())) {
-
-			queryHelper.addSearchTerm(
+		Stream.of(
+			_searchLocalizationHelper.getLocalizedFieldNames(
+				new String[] {"ddmContent"},
+				keywordQueryContributorHelper.getSearchContext())
+		).forEach(
+			localizedFieldName -> queryHelper.addSearchTerm(
 				booleanQuery, keywordQueryContributorHelper.getSearchContext(),
-				localizedFieldName, false);
-		}
+				localizedFieldName, false)
+		);
 	}
 
 	@Reference

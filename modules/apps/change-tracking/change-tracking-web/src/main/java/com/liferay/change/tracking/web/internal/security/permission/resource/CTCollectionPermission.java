@@ -15,14 +15,17 @@
 package com.liferay.change.tracking.web.internal.security.permission.resource;
 
 import com.liferay.change.tracking.model.CTCollection;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class CTCollectionPermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class CTCollectionPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<CTCollection> modelResourcePermission =
-			_ctCollectionModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ctCollectionModelResourcePermission.contains(
 			permissionChecker, ctCollection, actionId);
 	}
 
@@ -42,18 +42,21 @@ public class CTCollectionPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<CTCollection> modelResourcePermission =
-			_ctCollectionModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ctCollectionModelResourcePermission.contains(
 			permissionChecker, ctCollectionId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<CTCollection>>
-		_ctCollectionModelResourcePermissionSnapshot = new Snapshot<>(
-			CTCollectionPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.change.tracking.model." +
-				"CTCollection)");
+	@Reference(
+		target = "(model.class.name=com.liferay.change.tracking.model.CTCollection)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<CTCollection> modelResourcePermission) {
+
+		_ctCollectionModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<CTCollection>
+		_ctCollectionModelResourcePermission;
 
 }

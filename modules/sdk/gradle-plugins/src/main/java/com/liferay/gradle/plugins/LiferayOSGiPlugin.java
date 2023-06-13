@@ -47,11 +47,11 @@ import com.liferay.gradle.plugins.jasper.jspc.JspCPlugin;
 import com.liferay.gradle.plugins.javadoc.formatter.JavadocFormatterPlugin;
 import com.liferay.gradle.plugins.lang.builder.LangBuilderPlugin;
 import com.liferay.gradle.plugins.node.NodePlugin;
-import com.liferay.gradle.plugins.node.task.DownloadNodeModuleTask;
-import com.liferay.gradle.plugins.node.task.NpmInstallTask;
+import com.liferay.gradle.plugins.node.tasks.DownloadNodeModuleTask;
+import com.liferay.gradle.plugins.node.tasks.NpmInstallTask;
 import com.liferay.gradle.plugins.python.PythonPlugin;
 import com.liferay.gradle.plugins.source.formatter.SourceFormatterPlugin;
-import com.liferay.gradle.plugins.task.DirectDeployTask;
+import com.liferay.gradle.plugins.tasks.DirectDeployTask;
 import com.liferay.gradle.plugins.test.integration.TestIntegrationPlugin;
 import com.liferay.gradle.plugins.tld.formatter.TLDFormatterPlugin;
 import com.liferay.gradle.plugins.tlddoc.builder.TLDDocBuilderPlugin;
@@ -847,14 +847,9 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 										"project.buildpath",
 										buildDirs.getAsPath());
 
-									if (logger.isDebugEnabled() ||
-										Boolean.getBoolean(
-											"build.bnd.print.builder." +
-												"classpath")) {
-
-										logger.lifecycle(
-											"BND Builder Classpath {}: {}",
-											project.getName(),
+									if (logger.isDebugEnabled()) {
+										logger.debug(
+											"Builder Classpath: {}",
 											buildDirs.getAsPath());
 									}
 
@@ -884,8 +879,7 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 
 									if (logger.isDebugEnabled()) {
 										logger.debug(
-											"BND Builder Sourcepath {}: {}",
-											project.getName(),
+											"Builder Sourcepath: {}",
 											builder.getSourcePath());
 									}
 
@@ -926,8 +920,8 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 
 									if (logger.isDebugEnabled()) {
 										logger.debug(
-											"BND Builder Properties {}: {}",
-											project.getName(), properties);
+											"Builder Properties: {}",
+											properties);
 									}
 
 									aQute.bnd.osgi.Jar bndJar = builder.build();
@@ -1483,21 +1477,6 @@ public class LiferayOSGiPlugin implements Plugin<Project> {
 							@Override
 							public void execute(Task task) {
 								bundleTaskConvention.buildBundle();
-
-								Logger logger = task.getLogger();
-
-								if (logger.isDebugEnabled() ||
-									Boolean.getBoolean(
-										"build.bnd.print.builder.classpath")) {
-
-									FileCollection builderClasspath =
-										bundleTaskConvention.getClasspath();
-
-									logger.lifecycle(
-										"BND Builder Classpath {}: {}",
-										project.getName(),
-										builderClasspath.getAsPath());
-								}
 							}
 
 						});

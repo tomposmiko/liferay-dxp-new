@@ -258,8 +258,4 @@ public interface SamlPeerBindingModel
 	@Override
 	public SamlPeerBinding cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

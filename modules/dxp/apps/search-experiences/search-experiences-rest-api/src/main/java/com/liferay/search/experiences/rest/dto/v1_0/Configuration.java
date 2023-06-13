@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -60,23 +59,20 @@ public class Configuration implements Serializable {
 
 	@Schema
 	@Valid
-	public AdvancedConfiguration getAdvancedConfiguration() {
-		return advancedConfiguration;
+	public Advanced getAdvanced() {
+		return advanced;
 	}
 
-	public void setAdvancedConfiguration(
-		AdvancedConfiguration advancedConfiguration) {
-
-		this.advancedConfiguration = advancedConfiguration;
+	public void setAdvanced(Advanced advanced) {
+		this.advanced = advanced;
 	}
 
 	@JsonIgnore
-	public void setAdvancedConfiguration(
-		UnsafeSupplier<AdvancedConfiguration, Exception>
-			advancedConfigurationUnsafeSupplier) {
+	public void setAdvanced(
+		UnsafeSupplier<Advanced, Exception> advancedUnsafeSupplier) {
 
 		try {
-			advancedConfiguration = advancedConfigurationUnsafeSupplier.get();
+			advanced = advancedUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -88,7 +84,7 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected AdvancedConfiguration advancedConfiguration;
+	protected Advanced advanced;
 
 	@Schema
 	@Valid
@@ -125,23 +121,18 @@ public class Configuration implements Serializable {
 
 	@Schema
 	@Valid
-	public GeneralConfiguration getGeneralConfiguration() {
-		return generalConfiguration;
+	public Facet getFacet() {
+		return facet;
 	}
 
-	public void setGeneralConfiguration(
-		GeneralConfiguration generalConfiguration) {
-
-		this.generalConfiguration = generalConfiguration;
+	public void setFacet(Facet facet) {
+		this.facet = facet;
 	}
 
 	@JsonIgnore
-	public void setGeneralConfiguration(
-		UnsafeSupplier<GeneralConfiguration, Exception>
-			generalConfigurationUnsafeSupplier) {
-
+	public void setFacet(UnsafeSupplier<Facet, Exception> facetUnsafeSupplier) {
 		try {
-			generalConfiguration = generalConfigurationUnsafeSupplier.get();
+			facet = facetUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -153,27 +144,24 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected GeneralConfiguration generalConfiguration;
+	protected Facet facet;
 
 	@Schema
 	@Valid
-	public HighlightConfiguration getHighlightConfiguration() {
-		return highlightConfiguration;
+	public General getGeneral() {
+		return general;
 	}
 
-	public void setHighlightConfiguration(
-		HighlightConfiguration highlightConfiguration) {
-
-		this.highlightConfiguration = highlightConfiguration;
+	public void setGeneral(General general) {
+		this.general = general;
 	}
 
 	@JsonIgnore
-	public void setHighlightConfiguration(
-		UnsafeSupplier<HighlightConfiguration, Exception>
-			highlightConfigurationUnsafeSupplier) {
+	public void setGeneral(
+		UnsafeSupplier<General, Exception> generalUnsafeSupplier) {
 
 		try {
-			highlightConfiguration = highlightConfigurationUnsafeSupplier.get();
+			general = generalUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -185,25 +173,24 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected HighlightConfiguration highlightConfiguration;
+	protected General general;
 
 	@Schema
 	@Valid
-	public IndexConfiguration getIndexConfiguration() {
-		return indexConfiguration;
+	public Highlight getHighlight() {
+		return highlight;
 	}
 
-	public void setIndexConfiguration(IndexConfiguration indexConfiguration) {
-		this.indexConfiguration = indexConfiguration;
+	public void setHighlight(Highlight highlight) {
+		this.highlight = highlight;
 	}
 
 	@JsonIgnore
-	public void setIndexConfiguration(
-		UnsafeSupplier<IndexConfiguration, Exception>
-			indexConfigurationUnsafeSupplier) {
+	public void setHighlight(
+		UnsafeSupplier<Highlight, Exception> highlightUnsafeSupplier) {
 
 		try {
-			indexConfiguration = indexConfigurationUnsafeSupplier.get();
+			highlight = highlightUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -215,27 +202,25 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected IndexConfiguration indexConfiguration;
+	protected Highlight highlight;
 
 	@Schema
 	@Valid
-	public ParameterConfiguration getParameterConfiguration() {
-		return parameterConfiguration;
+	public Map<String, Parameter> getParameters() {
+		return parameters;
 	}
 
-	public void setParameterConfiguration(
-		ParameterConfiguration parameterConfiguration) {
-
-		this.parameterConfiguration = parameterConfiguration;
+	public void setParameters(Map<String, Parameter> parameters) {
+		this.parameters = parameters;
 	}
 
 	@JsonIgnore
-	public void setParameterConfiguration(
-		UnsafeSupplier<ParameterConfiguration, Exception>
-			parameterConfigurationUnsafeSupplier) {
+	public void setParameters(
+		UnsafeSupplier<Map<String, Parameter>, Exception>
+			parametersUnsafeSupplier) {
 
 		try {
-			parameterConfiguration = parameterConfigurationUnsafeSupplier.get();
+			parameters = parametersUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -247,7 +232,7 @@ public class Configuration implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ParameterConfiguration parameterConfiguration;
+	protected Map<String, Parameter> parameters;
 
 	@Schema
 	@Valid
@@ -278,39 +263,6 @@ public class Configuration implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected QueryConfiguration queryConfiguration;
-
-	@Schema
-	@Valid
-	public Map<String, Object> getSearchContextAttributes() {
-		return searchContextAttributes;
-	}
-
-	public void setSearchContextAttributes(
-		Map<String, Object> searchContextAttributes) {
-
-		this.searchContextAttributes = searchContextAttributes;
-	}
-
-	@JsonIgnore
-	public void setSearchContextAttributes(
-		UnsafeSupplier<Map<String, Object>, Exception>
-			searchContextAttributesUnsafeSupplier) {
-
-		try {
-			searchContextAttributes =
-				searchContextAttributesUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Map<String, Object> searchContextAttributes;
 
 	@Schema
 	@Valid
@@ -369,14 +321,14 @@ public class Configuration implements Serializable {
 
 		sb.append("{");
 
-		if (advancedConfiguration != null) {
+		if (advanced != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"advancedConfiguration\": ");
+			sb.append("\"advanced\": ");
 
-			sb.append(String.valueOf(advancedConfiguration));
+			sb.append(String.valueOf(advanced));
 		}
 
 		if (aggregationConfiguration != null) {
@@ -389,44 +341,44 @@ public class Configuration implements Serializable {
 			sb.append(String.valueOf(aggregationConfiguration));
 		}
 
-		if (generalConfiguration != null) {
+		if (facet != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"generalConfiguration\": ");
+			sb.append("\"facet\": ");
 
-			sb.append(String.valueOf(generalConfiguration));
+			sb.append(String.valueOf(facet));
 		}
 
-		if (highlightConfiguration != null) {
+		if (general != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"highlightConfiguration\": ");
+			sb.append("\"general\": ");
 
-			sb.append(String.valueOf(highlightConfiguration));
+			sb.append(String.valueOf(general));
 		}
 
-		if (indexConfiguration != null) {
+		if (highlight != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"indexConfiguration\": ");
+			sb.append("\"highlight\": ");
 
-			sb.append(String.valueOf(indexConfiguration));
+			sb.append(String.valueOf(highlight));
 		}
 
-		if (parameterConfiguration != null) {
+		if (parameters != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"parameterConfiguration\": ");
+			sb.append("\"parameters\": ");
 
-			sb.append(String.valueOf(parameterConfiguration));
+			sb.append(_toJSON(parameters));
 		}
 
 		if (queryConfiguration != null) {
@@ -437,16 +389,6 @@ public class Configuration implements Serializable {
 			sb.append("\"queryConfiguration\": ");
 
 			sb.append(String.valueOf(queryConfiguration));
-		}
-
-		if (searchContextAttributes != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"searchContextAttributes\": ");
-
-			sb.append(_toJSON(searchContextAttributes));
 		}
 
 		if (sortConfiguration != null) {
@@ -472,9 +414,9 @@ public class Configuration implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -500,7 +442,7 @@ public class Configuration implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -532,7 +474,7 @@ public class Configuration implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -548,10 +490,5 @@ public class Configuration implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

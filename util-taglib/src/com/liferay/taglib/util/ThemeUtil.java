@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -179,11 +180,12 @@ public class ThemeUtil {
 			return null;
 		}
 
-		Template template = TemplateManagerUtil.getTemplate(
-			TemplateConstants.LANG_TYPE_FTL,
+		TemplateResource templateResource =
 			TemplateResourceLoaderUtil.getTemplateResource(
-				TemplateConstants.LANG_TYPE_FTL, resourcePath),
-			restricted);
+				TemplateConstants.LANG_TYPE_FTL, resourcePath);
+
+		Template template = TemplateManagerUtil.getTemplate(
+			TemplateConstants.LANG_TYPE_FTL, templateResource, restricted);
 
 		// FreeMarker variables
 
@@ -233,10 +235,11 @@ public class ThemeUtil {
 
 	private static final Log _log = LogFactoryUtil.getLog(ThemeUtil.class);
 
-	private static final ServiceTrackerList<TemplateContextContributor>
-		_templateContextContributors = ServiceTrackerListFactory.open(
-			SystemBundleUtil.getBundleContext(),
-			TemplateContextContributor.class,
-			"(type=" + TemplateContextContributor.TYPE_THEME + ")");
+	private static final ServiceTrackerList
+		<TemplateContextContributor, TemplateContextContributor>
+			_templateContextContributors = ServiceTrackerListFactory.open(
+				SystemBundleUtil.getBundleContext(),
+				TemplateContextContributor.class,
+				"(type=" + TemplateContextContributor.TYPE_THEME + ")");
 
 }

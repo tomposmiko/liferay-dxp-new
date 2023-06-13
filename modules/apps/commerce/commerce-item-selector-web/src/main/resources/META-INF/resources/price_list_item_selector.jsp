@@ -20,11 +20,43 @@
 CommercePriceListItemSelectorViewDisplayContext commercePriceListItemSelectorViewDisplayContext = (CommercePriceListItemSelectorViewDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 String itemSelectedEventName = commercePriceListItemSelectorViewDisplayContext.getItemSelectedEventName();
+
+PortletURL portletURL = commercePriceListItemSelectorViewDisplayContext.getPortletURL();
 %>
 
-<clay:management-toolbar
-	managementToolbarDisplayContext="<%= new CommercePriceListItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, commercePriceListItemSelectorViewDisplayContext.getSearchContainer()) %>"
-/>
+<liferay-frontend:management-bar
+	includeCheckBox="<%= true %>"
+	searchContainerId="commercePriceLists"
+>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= portletURL %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= commercePriceListItemSelectorViewDisplayContext.getOrderByCol() %>"
+			orderByType="<%= commercePriceListItemSelectorViewDisplayContext.getOrderByType() %>"
+			orderColumns='<%= new String[] {"create-date", "display-date"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<li>
+			<liferay-commerce:search-input
+				actionURL="<%= commercePriceListItemSelectorViewDisplayContext.getPortletURL() %>"
+				formName="searchFm"
+			/>
+		</li>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />commercePriceListSelectorWrapper">
 	<liferay-ui:search-container
@@ -72,6 +104,10 @@ String itemSelectedEventName = commercePriceListItemSelectorViewDisplayContext.g
 			markupView="lexicon"
 			searchContainer="<%= commercePriceListItemSelectorViewDisplayContext.getSearchContainer() %>"
 		/>
+
+		<liferay-ui:search-paginator
+			searchContainer="<%= commercePriceListItemSelectorViewDisplayContext.getSearchContainer() %>"
+		/>
 	</liferay-ui:search-container>
 </div>
 
@@ -88,7 +124,7 @@ String itemSelectedEventName = commercePriceListItemSelectorViewDisplayContext.g
 		Liferay.Util.getOpener().Liferay.fire(
 			'<%= HtmlUtil.escapeJS(itemSelectedEventName) %>',
 			{
-				data: Liferay.Util.getCheckedCheckboxes(
+				data: Liferay.Util.listCheckedExcept(
 					commercePriceListSelectorWrapper,
 					'<portlet:namespace />allRowIds'
 				),

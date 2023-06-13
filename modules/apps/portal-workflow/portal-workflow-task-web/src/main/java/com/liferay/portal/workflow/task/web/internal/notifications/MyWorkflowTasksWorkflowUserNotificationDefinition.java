@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Sarai Díaz
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + PortletKeys.MY_WORKFLOW_TASK,
 	service = UserNotificationDefinition.class
 )
@@ -41,6 +42,10 @@ public class MyWorkflowTasksWorkflowUserNotificationDefinition
 		addUserNotificationDeliveryType(
 			new UserNotificationDeliveryType(
 				"email", UserNotificationDeliveryConstants.TYPE_EMAIL, true,
+				true));
+		addUserNotificationDeliveryType(
+			new UserNotificationDeliveryType(
+				"mobile", UserNotificationDeliveryConstants.TYPE_PUSH, true,
 				true));
 		addUserNotificationDeliveryType(
 			new UserNotificationDeliveryType(

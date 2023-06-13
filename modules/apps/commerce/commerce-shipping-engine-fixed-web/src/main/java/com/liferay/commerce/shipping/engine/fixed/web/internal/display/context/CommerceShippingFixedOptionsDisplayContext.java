@@ -23,22 +23,17 @@ import com.liferay.commerce.shipping.engine.fixed.constants.CommerceShippingEngi
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionService;
 import com.liferay.commerce.shipping.engine.fixed.web.internal.FixedCommerceShippingEngine;
-import com.liferay.commerce.shipping.engine.fixed.web.internal.constants.CommerceShippingFixedOptionScreenNavigationConstants;
-import com.liferay.frontend.data.set.model.FDSSortItemBuilder;
-import com.liferay.frontend.data.set.model.FDSSortItemList;
-import com.liferay.frontend.data.set.model.FDSSortItemListBuilder;
+import com.liferay.commerce.shipping.engine.fixed.web.internal.frontend.taglib.servlet.taglib.CommerceShippingMethodFixedOptionsScreenNavigationCategory;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
-
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
@@ -53,8 +48,8 @@ public class CommerceShippingFixedOptionsDisplayContext
 	public CommerceShippingFixedOptionsDisplayContext(
 		CommerceChannelLocalService commerceChannelLocalService,
 		CommerceCurrencyLocalService commerceCurrencyLocalService,
-		CommerceShippingFixedOptionService commerceShippingFixedOptionService,
 		CommerceShippingMethodService commerceShippingMethodService,
+		CommerceShippingFixedOptionService commerceShippingFixedOptionService,
 		Portal portal, RenderRequest renderRequest,
 		RenderResponse renderResponse) {
 
@@ -107,20 +102,6 @@ public class CommerceShippingFixedOptionsDisplayContext
 		return commerceShippingFixedOption;
 	}
 
-	public String getCommerceShippingFixedOptionName(
-			ResourceBundle resourceBundle)
-		throws PortalException {
-
-		CommerceShippingFixedOption commerceShippingFixedOption =
-			getCommerceShippingFixedOption();
-
-		if (commerceShippingFixedOption == null) {
-			return LanguageUtil.get(resourceBundle, "shipping-option");
-		}
-
-		return commerceShippingFixedOption.getName(resourceBundle.getLocale());
-	}
-
 	public CreationMenu getCreationMenu() throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -136,20 +117,10 @@ public class CommerceShippingFixedOptionsDisplayContext
 		).build();
 	}
 
-	public FDSSortItemList getFDSSortItemList() {
-		return FDSSortItemListBuilder.add(
-			FDSSortItemBuilder.setDirection(
-				"desc"
-			).setKey(
-				"priority"
-			).build()
-		).build();
-	}
-
 	@Override
 	public String getScreenNavigationCategoryKey() {
-		return CommerceShippingFixedOptionScreenNavigationConstants.
-			CATEGORY_KEY_SHIPPING_OPTIONS;
+		return CommerceShippingMethodFixedOptionsScreenNavigationCategory.
+			CATEGORY_KEY;
 	}
 
 	public boolean isFixed() throws PortalException {

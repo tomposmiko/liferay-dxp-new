@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -92,7 +91,7 @@ public class PriceEntry implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, ?> customFields;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -120,7 +119,7 @@ public class PriceEntry implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getHasTierPrice() {
 		return hasTierPrice;
 	}
@@ -149,7 +148,7 @@ public class PriceEntry implements Serializable {
 	protected Boolean hasTierPrice;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -176,7 +175,7 @@ public class PriceEntry implements Serializable {
 	protected Long id;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	@Valid
 	public BigDecimal getPrice() {
 		return price;
@@ -206,7 +205,7 @@ public class PriceEntry implements Serializable {
 	@NotNull
 	protected BigDecimal price;
 
-	@Schema(example = "PLAB-34098-789-N")
+	@Schema
 	public String getPriceListExternalReferenceCode() {
 		return priceListExternalReferenceCode;
 	}
@@ -239,7 +238,7 @@ public class PriceEntry implements Serializable {
 	protected String priceListExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "20078")
+	@Schema
 	public Long getPriceListId() {
 		return priceListId;
 	}
@@ -268,7 +267,7 @@ public class PriceEntry implements Serializable {
 	protected Long priceListId;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	@Valid
 	public BigDecimal getPromoPrice() {
 		return promoPrice;
@@ -297,7 +296,7 @@ public class PriceEntry implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal promoPrice;
 
-	@Schema(example = "BL500IC")
+	@Schema
 	public String getSku() {
 		return sku;
 	}
@@ -323,7 +322,7 @@ public class PriceEntry implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String sku;
 
-	@Schema(example = "CAB-34098-789-N")
+	@Schema
 	public String getSkuExternalReferenceCode() {
 		return skuExternalReferenceCode;
 	}
@@ -354,7 +353,7 @@ public class PriceEntry implements Serializable {
 	protected String skuExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getSkuId() {
 		return skuId;
 	}
@@ -595,9 +594,9 @@ public class PriceEntry implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -623,7 +622,7 @@ public class PriceEntry implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -655,7 +654,7 @@ public class PriceEntry implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -671,10 +670,5 @@ public class PriceEntry implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

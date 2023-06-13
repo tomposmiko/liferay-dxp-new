@@ -28,18 +28,22 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.service.builder.test.model.EagerBlobEntry;
 import com.liferay.portal.tools.service.builder.test.model.EagerBlobEntryModel;
+import com.liferay.portal.tools.service.builder.test.model.EagerBlobEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -109,6 +113,54 @@ public class EagerBlobEntryModelImpl
 	 */
 	@Deprecated
 	public static final boolean FINDER_CACHE_ENABLED = false;
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static EagerBlobEntry toModel(EagerBlobEntrySoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		EagerBlobEntry model = new EagerBlobEntryImpl();
+
+		model.setUuid(soapModel.getUuid());
+		model.setEagerBlobEntryId(soapModel.getEagerBlobEntryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setBlob(soapModel.getBlob());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<EagerBlobEntry> toModels(
+		EagerBlobEntrySoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<EagerBlobEntry> models = new ArrayList<EagerBlobEntry>(
+			soapModels.length);
+
+		for (EagerBlobEntrySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.tools.service.builder.test.service.util.ServiceProps.
@@ -191,66 +243,76 @@ public class EagerBlobEntryModelImpl
 	public Map<String, Function<EagerBlobEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<EagerBlobEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, EagerBlobEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<EagerBlobEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			EagerBlobEntry.class.getClassLoader(), EagerBlobEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<EagerBlobEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<EagerBlobEntry, Object>>();
+		try {
+			Constructor<EagerBlobEntry> constructor =
+				(Constructor<EagerBlobEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put("uuid", EagerBlobEntry::getUuid);
-			attributeGetterFunctions.put(
-				"eagerBlobEntryId", EagerBlobEntry::getEagerBlobEntryId);
-			attributeGetterFunctions.put("groupId", EagerBlobEntry::getGroupId);
-			attributeGetterFunctions.put("blob", EagerBlobEntry::getBlob);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<EagerBlobEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<EagerBlobEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<EagerBlobEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<EagerBlobEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<EagerBlobEntry, Object>>();
+		Map<String, BiConsumer<EagerBlobEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<EagerBlobEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<EagerBlobEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<EagerBlobEntry, ?>>();
+		attributeGetterFunctions.put("uuid", EagerBlobEntry::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<EagerBlobEntry, String>)EagerBlobEntry::setUuid);
+		attributeGetterFunctions.put(
+			"eagerBlobEntryId", EagerBlobEntry::getEagerBlobEntryId);
+		attributeSetterBiConsumers.put(
+			"eagerBlobEntryId",
+			(BiConsumer<EagerBlobEntry, Long>)
+				EagerBlobEntry::setEagerBlobEntryId);
+		attributeGetterFunctions.put("groupId", EagerBlobEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<EagerBlobEntry, Long>)EagerBlobEntry::setGroupId);
+		attributeGetterFunctions.put("blob", EagerBlobEntry::getBlob);
+		attributeSetterBiConsumers.put(
+			"blob", (BiConsumer<EagerBlobEntry, Blob>)EagerBlobEntry::setBlob);
 
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<EagerBlobEntry, String>)EagerBlobEntry::setUuid);
-			attributeSetterBiConsumers.put(
-				"eagerBlobEntryId",
-				(BiConsumer<EagerBlobEntry, Long>)
-					EagerBlobEntry::setEagerBlobEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<EagerBlobEntry, Long>)EagerBlobEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"blob",
-				(BiConsumer<EagerBlobEntry, Blob>)EagerBlobEntry::setBlob);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -525,12 +587,41 @@ public class EagerBlobEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<EagerBlobEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<EagerBlobEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<EagerBlobEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((EagerBlobEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, EagerBlobEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					EagerBlobEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -543,8 +634,7 @@ public class EagerBlobEntryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<EagerBlobEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

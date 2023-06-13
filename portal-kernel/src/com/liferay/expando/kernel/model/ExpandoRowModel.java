@@ -168,8 +168,4 @@ public interface ExpandoRowModel
 	@Override
 	public ExpandoRow cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

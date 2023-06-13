@@ -1,21 +1,13 @@
-task jarManifest
 task jarPatched(type: Zip)
 
 dependencies {
-	compileOnly group: "javax.xml.soap", name: "javax.xml.soap-api", transitive: false, version: "1.4.0"
+	compileOnly group: "javax.xml.soap", name: "javax.xml.soap-api", version: "1.4.0"
 }
 
 jar {
 	setActions([])
 
 	dependsOn jarPatched
-	finalizedBy jarManifest
-}
-
-jarManifest {
-	doLast {
-		ant.jar(destfile: jar.archivePath, update: true)
-	}
 }
 
 jarPatched {

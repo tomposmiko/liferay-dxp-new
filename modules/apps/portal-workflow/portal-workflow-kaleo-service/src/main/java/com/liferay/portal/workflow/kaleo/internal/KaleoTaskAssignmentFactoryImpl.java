@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = KaleoTaskAssignmentFactory.class)
+@Component(immediate = true, service = KaleoTaskAssignmentFactory.class)
 public class KaleoTaskAssignmentFactoryImpl
 	implements KaleoTaskAssignmentFactory {
 

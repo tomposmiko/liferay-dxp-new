@@ -20,7 +20,6 @@ import com.liferay.change.tracking.model.CTCollectionTable;
 import com.liferay.change.tracking.model.impl.CTCollectionImpl;
 import com.liferay.change.tracking.model.impl.CTCollectionModelImpl;
 import com.liferay.change.tracking.service.persistence.CTCollectionPersistence;
-import com.liferay.change.tracking.service.persistence.CTCollectionUtil;
 import com.liferay.change.tracking.service.persistence.impl.constants.CTPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -39,6 +38,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -50,7 +50,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -75,7 +74,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = CTCollectionPersistence.class)
+@Component(service = {CTCollectionPersistence.class, BasePersistence.class})
 public class CTCollectionPersistenceImpl
 	extends BasePersistenceImpl<CTCollection>
 	implements CTCollectionPersistence {
@@ -195,7 +194,7 @@ public class CTCollectionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTCollection ctCollection : list) {
@@ -883,7 +882,7 @@ public class CTCollectionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1070,7 +1069,7 @@ public class CTCollectionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTCollection ctCollection : list) {
@@ -1770,7 +1769,7 @@ public class CTCollectionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {schemaVersionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1963,7 +1962,7 @@ public class CTCollectionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTCollection ctCollection : list) {
@@ -2883,7 +2882,7 @@ public class CTCollectionPersistenceImpl
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of ct collections
 	 * @param end the upper bound of the range of ct collections (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2930,7 +2929,7 @@ public class CTCollectionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTCollection>)finderCache.getResult(
-				_finderPathWithPaginationFindByC_S, finderArgs, this);
+				_finderPathWithPaginationFindByC_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTCollection ctCollection : list) {
@@ -3040,7 +3039,7 @@ public class CTCollectionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3102,7 +3101,7 @@ public class CTCollectionPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByC_S, finderArgs, this);
+			_finderPathWithPaginationCountByC_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -3691,7 +3690,7 @@ public class CTCollectionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTCollection>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3761,7 +3760,7 @@ public class CTCollectionPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3886,31 +3885,11 @@ public class CTCollectionPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"companyId", "status"}, false);
-
-		_setCTCollectionUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCTCollectionUtilPersistence(null);
-
 		entityCache.removeCache(CTCollectionImpl.class.getName());
-	}
-
-	private void _setCTCollectionUtilPersistence(
-		CTCollectionPersistence ctCollectionPersistence) {
-
-		try {
-			Field field = CTCollectionUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ctCollectionPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3995,5 +3974,9 @@ public class CTCollectionPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private CTCollectionModelArgumentsResolver
+		_ctCollectionModelArgumentsResolver;
 
 }

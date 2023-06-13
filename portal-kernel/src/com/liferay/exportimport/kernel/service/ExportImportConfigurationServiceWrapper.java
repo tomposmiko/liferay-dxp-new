@@ -27,10 +27,6 @@ public class ExportImportConfigurationServiceWrapper
 	implements ExportImportConfigurationService,
 			   ServiceWrapper<ExportImportConfigurationService> {
 
-	public ExportImportConfigurationServiceWrapper() {
-		this(null);
-	}
-
 	public ExportImportConfigurationServiceWrapper(
 		ExportImportConfigurationService exportImportConfigurationService) {
 

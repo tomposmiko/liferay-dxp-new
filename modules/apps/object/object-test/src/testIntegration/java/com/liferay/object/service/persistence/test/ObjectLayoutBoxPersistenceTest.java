@@ -141,8 +141,6 @@ public class ObjectLayoutBoxPersistenceTest {
 
 		newObjectLayoutBox.setPriority(RandomTestUtil.nextInt());
 
-		newObjectLayoutBox.setType(RandomTestUtil.randomString());
-
 		_objectLayoutBoxes.add(_persistence.update(newObjectLayoutBox));
 
 		ObjectLayoutBox existingObjectLayoutBox = _persistence.findByPrimaryKey(
@@ -182,8 +180,6 @@ public class ObjectLayoutBoxPersistenceTest {
 		Assert.assertEquals(
 			existingObjectLayoutBox.getPriority(),
 			newObjectLayoutBox.getPriority());
-		Assert.assertEquals(
-			existingObjectLayoutBox.getType(), newObjectLayoutBox.getType());
 	}
 
 	@Test
@@ -240,7 +236,7 @@ public class ObjectLayoutBoxPersistenceTest {
 			"objectLayoutBoxId", true, "companyId", true, "userId", true,
 			"userName", true, "createDate", true, "modifiedDate", true,
 			"objectLayoutTabId", true, "collapsable", true, "name", true,
-			"priority", true, "type", true);
+			"priority", true);
 	}
 
 	@Test
@@ -460,8 +456,6 @@ public class ObjectLayoutBoxPersistenceTest {
 		objectLayoutBox.setName(RandomTestUtil.randomString());
 
 		objectLayoutBox.setPriority(RandomTestUtil.nextInt());
-
-		objectLayoutBox.setType(RandomTestUtil.randomString());
 
 		_objectLayoutBoxes.add(_persistence.update(objectLayoutBox));
 

@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Stian Sigvartsen
  */
-@Component(service = CertificateUploadFileEntryHandler.class)
+@Component(immediate = true, service = CertificateUploadFileEntryHandler.class)
 public class CertificateUploadFileEntryHandler
 	implements UploadFileEntryHandler {
 
@@ -73,7 +73,7 @@ public class CertificateUploadFileEntryHandler
 		}
 
 		try {
-			_validateFile(fileEntry);
+			validateFile(fileEntry);
 
 			return fileEntry;
 		}
@@ -88,7 +88,7 @@ public class CertificateUploadFileEntryHandler
 		}
 	}
 
-	private void _validateFile(FileEntry fileEntry)
+	protected void validateFile(FileEntry fileEntry)
 		throws CertificateException, KeyStoreException {
 
 		try (InputStream inputStream = fileEntry.getContentStream()) {

@@ -22,8 +22,7 @@ public class MailReaderUpgradeProcess extends BaseUpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 		removePortletData(
-			new String[] {"com.liferay.mail.reader.web"},
-			new String[] {"1_WAR_mailportlet"},
+			new String[] {"com.liferay.mail.reader.web"}, null,
 			new String[] {"com_liferay_mail_reader_web_portlet_MailPortlet"});
 
 		removeServiceData(

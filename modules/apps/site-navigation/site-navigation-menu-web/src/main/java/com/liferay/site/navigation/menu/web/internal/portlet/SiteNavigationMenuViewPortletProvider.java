@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Juergen Kappler
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.theme.NavItem",
 	service = ViewPortletProvider.class
 )

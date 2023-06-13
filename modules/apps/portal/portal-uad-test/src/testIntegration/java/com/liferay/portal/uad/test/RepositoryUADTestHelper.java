@@ -32,13 +32,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = RepositoryUADTestHelper.class)
+@Component(immediate = true, service = RepositoryUADTestHelper.class)
 public class RepositoryUADTestHelper {
 
 	public Repository addRepository(long userId) throws Exception {
+		long classNameId = _portal.getClassNameId(
+			LiferayRepository.class.getName());
+
 		return _repositoryLocalService.addRepository(
-			userId, TestPropsValues.getGroupId(),
-			_portal.getClassNameId(LiferayRepository.class.getName()),
+			userId, TestPropsValues.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), new UnicodeProperties(), true,

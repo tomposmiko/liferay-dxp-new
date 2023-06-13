@@ -14,9 +14,9 @@
 
 package com.liferay.commerce.notification.test;
 
-import com.liferay.account.constants.AccountRoleConstants;
-import com.liferay.account.model.AccountEntry;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
@@ -28,12 +28,12 @@ import com.liferay.commerce.notification.service.CommerceNotificationQueueEntryL
 import com.liferay.commerce.notification.test.util.CommerceNotificationTestUtil;
 import com.liferay.commerce.notification.util.CommerceNotificationHelper;
 import com.liferay.commerce.product.constants.CommerceChannelConstants;
-import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -60,6 +61,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,19 +80,25 @@ public class CommerceNotificationTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
-			_group.getCompanyId());
+			_company.getCompanyId());
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
-			_group.getCompanyId(), _group.getGroupId(), _user.getUserId());
+			_company.getCompanyId(), _group.getGroupId(), _user.getUserId());
 
-		_commerceChannel = _commerceChannelLocalService.addCommerceChannel(
+		_commerceChannelLocalService.addCommerceChannel(
 			StringPool.BLANK, _group.getGroupId(),
 			_group.getName(_serviceContext.getLanguageId()) + " Portal",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null, StringPool.BLANK,
@@ -123,7 +131,7 @@ public class CommerceNotificationTest {
 
 		_commerceOrder = CommerceTestUtil.addB2BCommerceOrder(
 			_group.getGroupId(), _user.getUserId(),
-			_accountEntry.getAccountEntryId(),
+			_commerceAccount.getCommerceAccountId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		_commerceNotificationHelper.sendNotifications(
@@ -161,17 +169,18 @@ public class CommerceNotificationTest {
 				_serviceContext);
 
 		_commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
-			_user.getUserId(), _commerceChannel.getGroupId(),
+			_user.getUserId(), _group.getGroupId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		_commerceNotificationHelper.sendNotifications(
 			_group.getGroupId(), _user.getUserId(),
 			CommerceOrderConstants.ORDER_NOTIFICATION_PLACED, _commerceOrder);
 
-		Assert.assertEquals(
-			1,
+		int commerceNotificationQueueEntriesCount =
 			_commerceNotificationQueueEntryLocalService.
-				getCommerceNotificationQueueEntriesCount(_group.getGroupId()));
+				getCommerceNotificationQueueEntriesCount(_group.getGroupId());
+
+		Assert.assertEquals(1, commerceNotificationQueueEntriesCount);
 	}
 
 	@Test
@@ -183,7 +192,7 @@ public class CommerceNotificationTest {
 				_serviceContext);
 
 		_commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
-			_user.getUserId(), _commerceChannel.getGroupId(),
+			_user.getUserId(), _group.getGroupId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		_commerceNotificationHelper.sendNotifications(
@@ -223,7 +232,7 @@ public class CommerceNotificationTest {
 
 		_commerceOrder = CommerceTestUtil.addB2BCommerceOrder(
 			_group.getGroupId(), _user.getUserId(),
-			_accountEntry.getAccountEntryId(),
+			_commerceAccount.getCommerceAccountId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		_commerceNotificationHelper.sendNotifications(
@@ -257,17 +266,18 @@ public class CommerceNotificationTest {
 				_serviceContext);
 
 		_commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
-			_user.getUserId(), _commerceChannel.getGroupId(),
+			_user.getUserId(), _group.getGroupId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		_commerceNotificationHelper.sendNotifications(
 			_group.getGroupId(), _user.getUserId(),
 			CommerceOrderConstants.ORDER_NOTIFICATION_PLACED, _commerceOrder);
 
-		Assert.assertEquals(
-			1,
+		int commerceNotificationQueueEntriesCount =
 			_commerceNotificationQueueEntryLocalService.
-				getCommerceNotificationQueueEntriesCount(_group.getGroupId()));
+				getCommerceNotificationQueueEntriesCount(_group.getGroupId());
+
+		Assert.assertEquals(1, commerceNotificationQueueEntriesCount);
 	}
 
 	@Test
@@ -285,17 +295,18 @@ public class CommerceNotificationTest {
 				_serviceContext);
 
 		_commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
-			_user.getUserId(), _commerceChannel.getGroupId(),
+			_user.getUserId(), _group.getGroupId(),
 			_commerceCurrency.getCommerceCurrencyId());
 
 		_commerceNotificationHelper.sendNotifications(
 			_group.getGroupId(), _user.getUserId(),
 			CommerceOrderConstants.ORDER_NOTIFICATION_PLACED, _commerceOrder);
 
-		Assert.assertEquals(
-			1,
+		int commerceNotificationQueueEntriesCount =
 			_commerceNotificationQueueEntryLocalService.
-				getCommerceNotificationQueueEntriesCount(_group.getGroupId()));
+				getCommerceNotificationQueueEntriesCount(_group.getGroupId());
+
+		Assert.assertEquals(1, commerceNotificationQueueEntriesCount);
 	}
 
 	private void _setUpAccountAdministrator() throws Exception {
@@ -305,24 +316,23 @@ public class CommerceNotificationTest {
 			RandomTestUtil.randomString(),
 			new long[] {_serviceContext.getScopeGroupId()}, _serviceContext);
 
-		_accountEntry = CommerceAccountTestUtil.addBusinessAccountEntry(
+		_commerceAccount = CommerceAccountTestUtil.addBusinessCommerceAccount(
 			_accountAdmin.getUserId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString() + "@liferay.com",
 			RandomTestUtil.randomString(), new long[] {_user.getUserId()}, null,
 			_serviceContext);
 
 		_accountAdminRole = _roleLocalService.fetchRole(
-			_group.getCompanyId(),
-			AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_ADMINISTRATOR);
+			_company.getCompanyId(),
+			CommerceAccountConstants.ROLE_NAME_ACCOUNT_ADMINISTRATOR);
 
 		if (_accountAdminRole == null) {
 			_accountAdminRole = _roleLocalService.addRole(
 				_serviceContext.getUserId(), null, 0,
-				AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_ADMINISTRATOR,
+				CommerceAccountConstants.ROLE_NAME_ACCOUNT_ADMINISTRATOR,
 				Collections.singletonMap(
 					_serviceContext.getLocale(),
-					AccountRoleConstants.
-						REQUIRED_ROLE_NAME_ACCOUNT_ADMINISTRATOR),
+					CommerceAccountConstants.ROLE_NAME_ACCOUNT_ADMINISTRATOR),
 				Collections.emptyMap(), RoleConstants.TYPE_SITE,
 				StringPool.BLANK, _serviceContext);
 
@@ -331,10 +341,11 @@ public class CommerceNotificationTest {
 
 		_userGroupRoleLocalService.deleteUserGroupRoles(
 			_accountAdmin.getUserId(),
-			new long[] {_accountEntry.getAccountEntryGroupId()});
+			new long[] {_commerceAccount.getCommerceAccountGroupId()});
 
 		_userGroupRoleLocalService.addUserGroupRoles(
-			_accountAdmin.getUserId(), _accountEntry.getAccountEntryGroupId(),
+			_accountAdmin.getUserId(),
+			_commerceAccount.getCommerceAccountGroupId(),
 			new long[] {_accountAdminRole.getRoleId()});
 	}
 
@@ -346,7 +357,7 @@ public class CommerceNotificationTest {
 			new long[] {_serviceContext.getScopeGroupId()}, _serviceContext);
 
 		_orderManagerRole = _roleLocalService.fetchRole(
-			_group.getCompanyId(), "Order Manager");
+			_company.getCompanyId(), "Order Manager");
 
 		if (_orderManagerRole == null) {
 			_orderManagerRole = _roleLocalService.addRole(
@@ -361,16 +372,17 @@ public class CommerceNotificationTest {
 
 		_userGroupRoleLocalService.deleteUserGroupRoles(
 			_orderManager.getUserId(),
-			new long[] {_accountEntry.getAccountEntryGroupId()});
+			new long[] {_commerceAccount.getCommerceAccountGroupId()});
 
 		_userGroupRoleLocalService.addUserGroupRoles(
-			_orderManager.getUserId(), _accountEntry.getAccountEntryGroupId(),
+			_orderManager.getUserId(),
+			_commerceAccount.getCommerceAccountGroupId(),
 			new long[] {_orderManagerRole.getRoleId()});
 	}
 
 	private String _setUpUserGroup() throws Exception {
 		UserGroup userGroup = _userGroupLocalService.addUserGroup(
-			_user.getUserId(), _group.getCompanyId(), "Test User Group",
+			_user.getUserId(), _company.getCompanyId(), "Test User Group",
 			RandomTestUtil.randomString(), _serviceContext);
 
 		long[] userIds = new long[1];
@@ -383,16 +395,14 @@ public class CommerceNotificationTest {
 		return userGroup.getName();
 	}
 
+	private static Company _company;
 	private static User _user;
 
 	@DeleteAfterTestRun
 	private User _accountAdmin;
 
 	private Role _accountAdminRole;
-	private AccountEntry _accountEntry;
-
-	@DeleteAfterTestRun
-	private CommerceChannel _commerceChannel;
+	private CommerceAccount _commerceAccount;
 
 	@Inject
 	private CommerceChannelLocalService _commerceChannelLocalService;

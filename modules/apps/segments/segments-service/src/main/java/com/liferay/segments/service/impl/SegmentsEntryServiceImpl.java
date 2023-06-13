@@ -30,7 +30,6 @@ import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.service.base.SegmentsEntryServiceBaseImpl;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -146,20 +145,6 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 	}
 
 	@Override
-	public List<SegmentsEntry> getSegmentsEntries(
-		long companyId, int start, int end,
-		OrderByComparator<SegmentsEntry> orderByComparator) {
-
-		return segmentsEntryPersistence.findByCompanyId(
-			companyId, start, end, orderByComparator);
-	}
-
-	@Override
-	public int getSegmentsEntriesCount(long companyId) {
-		return segmentsEntryPersistence.countByCompanyId(companyId);
-	}
-
-	@Override
 	public int getSegmentsEntriesCount(
 		long groupId, boolean includeAncestorSegmentsEntries) {
 
@@ -196,17 +181,8 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 			getPermissionChecker(), groupId, ActionKeys.VIEW);
 
 		return segmentsEntryLocalService.searchSegmentsEntries(
-			companyId, groupId, keywords, includeAncestorSegmentsEntries,
-			new LinkedHashMap<>(), start, end, sort);
-	}
-
-	@Override
-	public BaseModelSearchResult<SegmentsEntry> searchSegmentsEntries(
-			long companyId, String keywords, int start, int end, Sort sort)
-		throws PortalException {
-
-		return segmentsEntryLocalService.searchSegmentsEntries(
-			companyId, keywords, new LinkedHashMap<>(), start, end, sort);
+			companyId, groupId, keywords, includeAncestorSegmentsEntries, start,
+			end, sort);
 	}
 
 	@Override

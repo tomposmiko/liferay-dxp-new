@@ -15,88 +15,66 @@
 package com.liferay.account.internal.manager;
 
 import com.liferay.account.constants.AccountConstants;
+import com.liferay.account.constants.AccountWebKeys;
 import com.liferay.account.exception.AccountEntryTypeException;
 import com.liferay.account.manager.CurrentAccountEntryManager;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.settings.AccountEntryGroupSettings;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
+import com.liferay.portal.kernel.portlet.PortalPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.service.PortalPreferencesLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+
+import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Pei-Jung Lan
  * @author Drew Brokke
  */
-@Component(service = CurrentAccountEntryManager.class)
+@Component(immediate = true, service = CurrentAccountEntryManager.class)
 public class CurrentAccountEntryManagerImpl
 	implements CurrentAccountEntryManager {
 
-	@Override
 	public AccountEntry getCurrentAccountEntry(long groupId, long userId)
 		throws PortalException {
 
-		AccountEntry guestAccountEntry =
-			_accountEntryLocalService.getGuestAccountEntry(
-				CompanyThreadLocal.getCompanyId());
-
-		if (userId <= UserConstants.USER_ID_DEFAULT) {
-			return guestAccountEntry;
-		}
-
-		User user = _userLocalService.fetchUser(userId);
-
-		if (user == null) {
-			return guestAccountEntry;
-		}
-
-		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
-			user);
-
-		AccountEntry accountEntry =
-			_currentAccountEntryManagerStore.getAccountEntryFromHttpSession(
-				groupId);
+		AccountEntry accountEntry = _getAccountEntryFromHttpSession(groupId);
 
 		String[] allowedTypes = _getAllowedTypes(groupId);
 
-		if (_isValid(accountEntry, allowedTypes, permissionChecker)) {
+		if (_isValid(accountEntry, allowedTypes)) {
 			return accountEntry;
 		}
 
-		accountEntry =
-			_currentAccountEntryManagerStore.
-				getAccountEntryFromPortalPreferences(groupId, userId);
+		accountEntry = _getAccountEntryFromPortalPreferences(groupId, userId);
 
-		if (_isValid(accountEntry, allowedTypes, permissionChecker)) {
-			_currentAccountEntryManagerStore.saveInHttpSession(
-				accountEntry.getAccountEntryId(), groupId);
+		if (_isValid(accountEntry, allowedTypes)) {
+			_saveInHttpSession(accountEntry.getAccountEntryId(), groupId);
 
 			return accountEntry;
 		}
 
-		accountEntry = _getDefaultAccountEntry(
-			allowedTypes, permissionChecker, userId);
+		accountEntry = _getDefaultAccountEntry(allowedTypes, userId);
 
-		if (accountEntry != null) {
+		if (_isValid(accountEntry, allowedTypes)) {
 			setCurrentAccountEntry(
 				accountEntry.getAccountEntryId(), groupId, userId);
 
@@ -109,7 +87,6 @@ public class CurrentAccountEntryManagerImpl
 		return null;
 	}
 
-	@Override
 	public void setCurrentAccountEntry(
 		long accountEntryId, long groupId, long userId) {
 
@@ -126,8 +103,9 @@ public class CurrentAccountEntryManagerImpl
 						"type: " + accountEntry.getType());
 			}
 
-			_currentAccountEntryManagerStore.setCurrentAccountEntry(
-				accountEntryId, groupId, userId);
+			_saveInHttpSession(accountEntryId, groupId);
+
+			_saveInPortalPreferences(accountEntryId, groupId, userId);
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
@@ -136,58 +114,117 @@ public class CurrentAccountEntryManagerImpl
 		}
 	}
 
-	private String[] _getAllowedTypes(long groupId) {
-		return _accountEntryGroupSettings.getAllowedTypes(groupId);
+	private AccountEntry _getAccountEntryFromHttpSession(long groupId) {
+		HttpSession httpSession = PortalSessionThreadLocal.getHttpSession();
+
+		if (httpSession == null) {
+			return null;
+		}
+
+		long currentAccountEntryId = GetterUtil.getLong(
+			httpSession.getAttribute(_getKey(groupId)));
+
+		return _accountEntryLocalService.fetchAccountEntry(
+			currentAccountEntryId);
 	}
 
-	private AccountEntry _getDefaultAccountEntry(
-			String[] allowedTypes, PermissionChecker permissionChecker,
-			long userId)
-		throws PortalException {
+	private AccountEntry _getAccountEntryFromPortalPreferences(
+		long groupId, long userId) {
 
-		List<AccountEntry> accountEntries =
-			_accountEntryLocalService.getUserAccountEntries(
-				userId, AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
-				allowedTypes, WorkflowConstants.STATUS_APPROVED,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		PortalPreferences portalPreferences = _getPortalPreferences(userId);
 
-		accountEntries.sort(Comparator.comparing(AccountEntry::getName));
+		long accountEntryId = GetterUtil.getLong(
+			portalPreferences.getValue(
+				AccountEntry.class.getName(), _getKey(groupId)));
 
-		for (AccountEntry accountEntry : accountEntries) {
-			if (_accountEntryModelResourcePermission.contains(
-					permissionChecker, accountEntry.getAccountEntryId(),
-					ActionKeys.VIEW)) {
-
-				return accountEntry;
-			}
+		if (accountEntryId > 0) {
+			return _accountEntryLocalService.fetchAccountEntry(accountEntryId);
 		}
 
 		return null;
 	}
 
-	private boolean _isValid(
-		AccountEntry accountEntry, String[] allowedTypes,
-		PermissionChecker permissionChecker) {
+	private String[] _getAllowedTypes(long groupId) {
+		return _accountEntryGroupSettings.getAllowedTypes(groupId);
+	}
 
-		try {
-			if ((accountEntry != null) && accountEntry.isApproved() &&
-				((accountEntry.getAccountEntryId() ==
-					AccountConstants.ACCOUNT_ENTRY_ID_GUEST) ||
-				 ArrayUtil.contains(allowedTypes, accountEntry.getType())) &&
-				_accountEntryModelResourcePermission.contains(
-					permissionChecker, accountEntry.getAccountEntryId(),
-					ActionKeys.VIEW)) {
+	private AccountEntry _getDefaultAccountEntry(
+			String[] allowedTypes, long userId)
+		throws PortalException {
 
-				return true;
-			}
+		User user = _userLocalService.fetchUser(userId);
+
+		if ((user == null) || user.isDefaultUser()) {
+			return _accountEntryLocalService.getGuestAccountEntry(
+				CompanyThreadLocal.getCompanyId());
 		}
-		catch (PortalException portalException) {
-			if (_log.isInfoEnabled()) {
-				_log.info(portalException);
-			}
+
+		List<AccountEntry> accountEntries =
+			_accountEntryLocalService.getUserAccountEntries(
+				user.getUserId(),
+				AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
+				allowedTypes, 0, 1);
+
+		if (accountEntries.size() == 1) {
+			return accountEntries.get(0);
+		}
+
+		return null;
+	}
+
+	private String _getKey(long groupId) {
+		return AccountWebKeys.CURRENT_ACCOUNT_ENTRY_ID + groupId;
+	}
+
+	private PortalPreferences _getPortalPreferences(long userId) {
+		return _portletPreferencesFactory.getPortalPreferences(userId, true);
+	}
+
+	private boolean _isValid(AccountEntry accountEntry, String[] allowedTypes) {
+		if ((accountEntry != null) &&
+			Objects.equals(
+				WorkflowConstants.STATUS_APPROVED, accountEntry.getStatus()) &&
+			((accountEntry.getAccountEntryId() ==
+				AccountConstants.ACCOUNT_ENTRY_ID_GUEST) ||
+			 ArrayUtil.contains(allowedTypes, accountEntry.getType()))) {
+
+			return true;
 		}
 
 		return false;
+	}
+
+	private void _saveInHttpSession(long accountEntryId, long groupId) {
+		HttpSession httpSession = PortalSessionThreadLocal.getHttpSession();
+
+		if (httpSession == null) {
+			return;
+		}
+
+		httpSession.setAttribute(_getKey(groupId), accountEntryId);
+	}
+
+	private void _saveInPortalPreferences(
+		long accountEntryId, long groupId, long userId) {
+
+		PortalPreferences portalPreferences = _getPortalPreferences(userId);
+
+		String key = _getKey(groupId);
+
+		long currentAccountEntryId = GetterUtil.getLong(
+			portalPreferences.getValue(
+				AccountEntry.class.getName(), key,
+				String.valueOf(AccountConstants.ACCOUNT_ENTRY_ID_GUEST)));
+
+		if (currentAccountEntryId == accountEntryId) {
+			return;
+		}
+
+		portalPreferences.setValue(
+			AccountEntry.class.getName(), key, String.valueOf(accountEntryId));
+
+		_portalPreferencesLocalService.updatePreferences(
+			userId, PortletKeys.PREFS_OWNER_TYPE_USER, portalPreferences);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -199,19 +236,14 @@ public class CurrentAccountEntryManagerImpl
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
 
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(model.class.name=com.liferay.account.model.AccountEntry)"
-	)
-	private volatile ModelResourcePermission<AccountEntry>
-		_accountEntryModelResourcePermission;
+	@Reference
+	private Portal _portal;
 
 	@Reference
-	private CurrentAccountEntryManagerStore _currentAccountEntryManagerStore;
+	private PortalPreferencesLocalService _portalPreferencesLocalService;
 
 	@Reference
-	private PermissionCheckerFactory _permissionCheckerFactory;
+	private PortletPreferencesFactory _portletPreferencesFactory;
 
 	@Reference
 	private UserLocalService _userLocalService;

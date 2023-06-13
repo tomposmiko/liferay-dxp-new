@@ -23,7 +23,6 @@ export default function ({
 	enableDisablePropagationURL,
 	portletNamespace,
 	readyForPropagation,
-	triggerPropagation,
 }) {
 	const [show, setShow] = useState(false);
 	const ref = useRef();
@@ -54,7 +53,6 @@ export default function ({
 			}}
 			onShowChange={setShow}
 			show={show}
-			size="lg"
 			trigger={
 				<ClayButtonWithIcon
 					data-qa-id="info"
@@ -92,10 +90,6 @@ export default function ({
 							message: readyForPropagation
 								? Liferay.Language.get(
 										'propagation-is-disabled-connected-sites-might-not-have-been-updated-yet-propagation-is-only-triggered-when-a-site-created-from-the-template-is-visited'
-								  )
-								: triggerPropagation
-								? Liferay.Language.get(
-										'propagation-is-enabled-connected-sites-are-being-updated'
 								  )
 								: Liferay.Language.get(
 										'propagation-is-enabled-connected-sites-will-be-updated-once-a-site-page-is-visited'

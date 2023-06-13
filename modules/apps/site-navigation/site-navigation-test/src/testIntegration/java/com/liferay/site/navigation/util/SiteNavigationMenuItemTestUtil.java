@@ -16,6 +16,7 @@ package com.liferay.site.navigation.util;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.site.navigation.menu.item.layout.constants.SiteNavigationMenuItemTypeConstants;
@@ -39,13 +40,15 @@ public class SiteNavigationMenuItemTestUtil {
 			SiteNavigationMenu siteNavigationMenu, int position)
 		throws PortalException {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				siteNavigationMenu.getGroupId());
+
 		return SiteNavigationMenuItemLocalServiceUtil.addSiteNavigationMenuItem(
 			TestPropsValues.getUserId(), siteNavigationMenu.getGroupId(),
 			siteNavigationMenu.getSiteNavigationMenuId(), 0,
 			SiteNavigationMenuItemTypeConstants.NODE, position,
-			StringPool.BLANK,
-			ServiceContextTestUtil.getServiceContext(
-				siteNavigationMenu.getGroupId()));
+			StringPool.BLANK, serviceContext);
 	}
 
 	public static SiteNavigationMenuItem addSiteNavigationMenuItem(
@@ -53,13 +56,16 @@ public class SiteNavigationMenuItemTestUtil {
 			long parentSiteNavigationMenuItemId)
 		throws PortalException {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				siteNavigationMenu.getGroupId());
+
 		return SiteNavigationMenuItemLocalServiceUtil.addSiteNavigationMenuItem(
 			TestPropsValues.getUserId(), siteNavigationMenu.getGroupId(),
 			siteNavigationMenu.getSiteNavigationMenuId(),
 			parentSiteNavigationMenuItemId,
 			SiteNavigationMenuItemTypeConstants.LAYOUT, StringPool.BLANK,
-			ServiceContextTestUtil.getServiceContext(
-				siteNavigationMenu.getGroupId()));
+			serviceContext);
 	}
 
 }

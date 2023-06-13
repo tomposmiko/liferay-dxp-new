@@ -15,7 +15,6 @@
 package com.liferay.commerce.inventory.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.inventory.exception.DuplicateCommerceInventoryReplenishmentItemExternalReferenceCodeException;
 import com.liferay.commerce.inventory.exception.NoSuchInventoryReplenishmentItemException;
 import com.liferay.commerce.inventory.model.CommerceInventoryReplenishmentItem;
 import com.liferay.commerce.inventory.service.CommerceInventoryReplenishmentItemLocalServiceUtil;
@@ -27,8 +26,6 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -137,12 +134,6 @@ public class CommerceInventoryReplenishmentItemPersistenceTest {
 		newCommerceInventoryReplenishmentItem.setMvccVersion(
 			RandomTestUtil.nextLong());
 
-		newCommerceInventoryReplenishmentItem.setUuid(
-			RandomTestUtil.randomString());
-
-		newCommerceInventoryReplenishmentItem.setExternalReferenceCode(
-			RandomTestUtil.randomString());
-
 		newCommerceInventoryReplenishmentItem.setCompanyId(
 			RandomTestUtil.nextLong());
 
@@ -181,13 +172,6 @@ public class CommerceInventoryReplenishmentItemPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceInventoryReplenishmentItem.getMvccVersion(),
 			newCommerceInventoryReplenishmentItem.getMvccVersion());
-		Assert.assertEquals(
-			existingCommerceInventoryReplenishmentItem.getUuid(),
-			newCommerceInventoryReplenishmentItem.getUuid());
-		Assert.assertEquals(
-			existingCommerceInventoryReplenishmentItem.
-				getExternalReferenceCode(),
-			newCommerceInventoryReplenishmentItem.getExternalReferenceCode());
 		Assert.assertEquals(
 			existingCommerceInventoryReplenishmentItem.
 				getCommerceInventoryReplenishmentItemId(),
@@ -229,51 +213,6 @@ public class CommerceInventoryReplenishmentItemPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceInventoryReplenishmentItem.getQuantity(),
 			newCommerceInventoryReplenishmentItem.getQuantity());
-	}
-
-	@Test(
-		expected = DuplicateCommerceInventoryReplenishmentItemExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceInventoryReplenishmentItem commerceInventoryReplenishmentItem =
-			addCommerceInventoryReplenishmentItem();
-
-		CommerceInventoryReplenishmentItem
-			newCommerceInventoryReplenishmentItem =
-				addCommerceInventoryReplenishmentItem();
-
-		newCommerceInventoryReplenishmentItem.setCompanyId(
-			commerceInventoryReplenishmentItem.getCompanyId());
-
-		newCommerceInventoryReplenishmentItem = _persistence.update(
-			newCommerceInventoryReplenishmentItem);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceInventoryReplenishmentItem);
-
-		newCommerceInventoryReplenishmentItem.setExternalReferenceCode(
-			commerceInventoryReplenishmentItem.getExternalReferenceCode());
-
-		_persistence.update(newCommerceInventoryReplenishmentItem);
-	}
-
-	@Test
-	public void testCountByUuid() throws Exception {
-		_persistence.countByUuid("");
-
-		_persistence.countByUuid("null");
-
-		_persistence.countByUuid((String)null);
-	}
-
-	@Test
-	public void testCountByUuid_C() throws Exception {
-		_persistence.countByUuid_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByUuid_C("null", 0L);
-
-		_persistence.countByUuid_C((String)null, 0L);
 	}
 
 	@Test
@@ -319,15 +258,6 @@ public class CommerceInventoryReplenishmentItemPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByERC_C("null", 0L);
-
-		_persistence.countByERC_C((String)null, 0L);
-	}
-
-	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		CommerceInventoryReplenishmentItem
 			newCommerceInventoryReplenishmentItem =
@@ -360,8 +290,7 @@ public class CommerceInventoryReplenishmentItemPersistenceTest {
 		getOrderByComparator() {
 
 		return OrderByComparatorFactoryUtil.create(
-			"CIReplenishmentItem", "mvccVersion", true, "uuid", true,
-			"externalReferenceCode", true,
+			"CIReplenishmentItem", "mvccVersion", true,
 			"commerceInventoryReplenishmentItemId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "commerceInventoryWarehouseId", true, "sku",
@@ -629,78 +558,6 @@ public class CommerceInventoryReplenishmentItemPersistenceTest {
 		Assert.assertEquals(0, result.size());
 	}
 
-	@Test
-	public void testResetOriginalValues() throws Exception {
-		CommerceInventoryReplenishmentItem
-			newCommerceInventoryReplenishmentItem =
-				addCommerceInventoryReplenishmentItem();
-
-		_persistence.clearCache();
-
-		_assertOriginalValues(
-			_persistence.findByPrimaryKey(
-				newCommerceInventoryReplenishmentItem.getPrimaryKey()));
-	}
-
-	@Test
-	public void testResetOriginalValuesWithDynamicQueryLoadFromDatabase()
-		throws Exception {
-
-		_testResetOriginalValuesWithDynamicQuery(true);
-	}
-
-	@Test
-	public void testResetOriginalValuesWithDynamicQueryLoadFromSession()
-		throws Exception {
-
-		_testResetOriginalValuesWithDynamicQuery(false);
-	}
-
-	private void _testResetOriginalValuesWithDynamicQuery(boolean clearSession)
-		throws Exception {
-
-		CommerceInventoryReplenishmentItem
-			newCommerceInventoryReplenishmentItem =
-				addCommerceInventoryReplenishmentItem();
-
-		if (clearSession) {
-			Session session = _persistence.openSession();
-
-			session.flush();
-
-			session.clear();
-		}
-
-		DynamicQuery dynamicQuery = DynamicQueryFactoryUtil.forClass(
-			CommerceInventoryReplenishmentItem.class, _dynamicQueryClassLoader);
-
-		dynamicQuery.add(
-			RestrictionsFactoryUtil.eq(
-				"commerceInventoryReplenishmentItemId",
-				newCommerceInventoryReplenishmentItem.
-					getCommerceInventoryReplenishmentItemId()));
-
-		List<CommerceInventoryReplenishmentItem> result =
-			_persistence.findWithDynamicQuery(dynamicQuery);
-
-		_assertOriginalValues(result.get(0));
-	}
-
-	private void _assertOriginalValues(
-		CommerceInventoryReplenishmentItem commerceInventoryReplenishmentItem) {
-
-		Assert.assertEquals(
-			commerceInventoryReplenishmentItem.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				commerceInventoryReplenishmentItem, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
-			Long.valueOf(commerceInventoryReplenishmentItem.getCompanyId()),
-			ReflectionTestUtil.<Long>invoke(
-				commerceInventoryReplenishmentItem, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "companyId"));
-	}
-
 	protected CommerceInventoryReplenishmentItem
 			addCommerceInventoryReplenishmentItem()
 		throws Exception {
@@ -712,12 +569,6 @@ public class CommerceInventoryReplenishmentItemPersistenceTest {
 
 		commerceInventoryReplenishmentItem.setMvccVersion(
 			RandomTestUtil.nextLong());
-
-		commerceInventoryReplenishmentItem.setUuid(
-			RandomTestUtil.randomString());
-
-		commerceInventoryReplenishmentItem.setExternalReferenceCode(
-			RandomTestUtil.randomString());
 
 		commerceInventoryReplenishmentItem.setCompanyId(
 			RandomTestUtil.nextLong());

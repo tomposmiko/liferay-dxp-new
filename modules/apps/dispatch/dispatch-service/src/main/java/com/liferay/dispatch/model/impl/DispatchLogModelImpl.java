@@ -16,6 +16,7 @@ package com.liferay.dispatch.model.impl;
 
 import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.model.DispatchLogModel;
+import com.liferay.dispatch.model.DispatchLogSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -35,15 +36,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -150,6 +154,61 @@ public class DispatchLogModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static DispatchLog toModel(DispatchLogSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		DispatchLog model = new DispatchLogImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setDispatchLogId(soapModel.getDispatchLogId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setDispatchTriggerId(soapModel.getDispatchTriggerId());
+		model.setEndDate(soapModel.getEndDate());
+		model.setError(soapModel.getError());
+		model.setOutput(soapModel.getOutput());
+		model.setStartDate(soapModel.getStartDate());
+		model.setStatus(soapModel.getStatus());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<DispatchLog> toModels(DispatchLogSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<DispatchLog> models = new ArrayList<DispatchLog>(
+			soapModels.length);
+
+		for (DispatchLogSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public DispatchLogModelImpl() {
 	}
 
@@ -226,106 +285,110 @@ public class DispatchLogModelImpl
 	public Map<String, Function<DispatchLog, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<DispatchLog, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, DispatchLog>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<DispatchLog, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DispatchLog.class.getClassLoader(), DispatchLog.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<DispatchLog, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<DispatchLog, Object>>();
+		try {
+			Constructor<DispatchLog> constructor =
+				(Constructor<DispatchLog>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", DispatchLog::getMvccVersion);
-			attributeGetterFunctions.put(
-				"dispatchLogId", DispatchLog::getDispatchLogId);
-			attributeGetterFunctions.put(
-				"companyId", DispatchLog::getCompanyId);
-			attributeGetterFunctions.put("userId", DispatchLog::getUserId);
-			attributeGetterFunctions.put("userName", DispatchLog::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", DispatchLog::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", DispatchLog::getModifiedDate);
-			attributeGetterFunctions.put(
-				"dispatchTriggerId", DispatchLog::getDispatchTriggerId);
-			attributeGetterFunctions.put("endDate", DispatchLog::getEndDate);
-			attributeGetterFunctions.put("error", DispatchLog::getError);
-			attributeGetterFunctions.put("output", DispatchLog::getOutput);
-			attributeGetterFunctions.put(
-				"startDate", DispatchLog::getStartDate);
-			attributeGetterFunctions.put("status", DispatchLog::getStatus);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<DispatchLog, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DispatchLog, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<DispatchLog, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<DispatchLog, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DispatchLog, Object>>();
+		Map<String, BiConsumer<DispatchLog, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<DispatchLog, ?>>();
 
-		static {
-			Map<String, BiConsumer<DispatchLog, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<DispatchLog, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", DispatchLog::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<DispatchLog, Long>)DispatchLog::setMvccVersion);
+		attributeGetterFunctions.put(
+			"dispatchLogId", DispatchLog::getDispatchLogId);
+		attributeSetterBiConsumers.put(
+			"dispatchLogId",
+			(BiConsumer<DispatchLog, Long>)DispatchLog::setDispatchLogId);
+		attributeGetterFunctions.put("companyId", DispatchLog::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DispatchLog, Long>)DispatchLog::setCompanyId);
+		attributeGetterFunctions.put("userId", DispatchLog::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<DispatchLog, Long>)DispatchLog::setUserId);
+		attributeGetterFunctions.put("userName", DispatchLog::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<DispatchLog, String>)DispatchLog::setUserName);
+		attributeGetterFunctions.put("createDate", DispatchLog::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<DispatchLog, Date>)DispatchLog::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DispatchLog::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<DispatchLog, Date>)DispatchLog::setModifiedDate);
+		attributeGetterFunctions.put(
+			"dispatchTriggerId", DispatchLog::getDispatchTriggerId);
+		attributeSetterBiConsumers.put(
+			"dispatchTriggerId",
+			(BiConsumer<DispatchLog, Long>)DispatchLog::setDispatchTriggerId);
+		attributeGetterFunctions.put("endDate", DispatchLog::getEndDate);
+		attributeSetterBiConsumers.put(
+			"endDate", (BiConsumer<DispatchLog, Date>)DispatchLog::setEndDate);
+		attributeGetterFunctions.put("error", DispatchLog::getError);
+		attributeSetterBiConsumers.put(
+			"error", (BiConsumer<DispatchLog, String>)DispatchLog::setError);
+		attributeGetterFunctions.put("output", DispatchLog::getOutput);
+		attributeSetterBiConsumers.put(
+			"output", (BiConsumer<DispatchLog, String>)DispatchLog::setOutput);
+		attributeGetterFunctions.put("startDate", DispatchLog::getStartDate);
+		attributeSetterBiConsumers.put(
+			"startDate",
+			(BiConsumer<DispatchLog, Date>)DispatchLog::setStartDate);
+		attributeGetterFunctions.put("status", DispatchLog::getStatus);
+		attributeSetterBiConsumers.put(
+			"status", (BiConsumer<DispatchLog, Integer>)DispatchLog::setStatus);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<DispatchLog, Long>)DispatchLog::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"dispatchLogId",
-				(BiConsumer<DispatchLog, Long>)DispatchLog::setDispatchLogId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<DispatchLog, Long>)DispatchLog::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<DispatchLog, Long>)DispatchLog::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<DispatchLog, String>)DispatchLog::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<DispatchLog, Date>)DispatchLog::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<DispatchLog, Date>)DispatchLog::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"dispatchTriggerId",
-				(BiConsumer<DispatchLog, Long>)
-					DispatchLog::setDispatchTriggerId);
-			attributeSetterBiConsumers.put(
-				"endDate",
-				(BiConsumer<DispatchLog, Date>)DispatchLog::setEndDate);
-			attributeSetterBiConsumers.put(
-				"error",
-				(BiConsumer<DispatchLog, String>)DispatchLog::setError);
-			attributeSetterBiConsumers.put(
-				"output",
-				(BiConsumer<DispatchLog, String>)DispatchLog::setOutput);
-			attributeSetterBiConsumers.put(
-				"startDate",
-				(BiConsumer<DispatchLog, Date>)DispatchLog::setStartDate);
-			attributeSetterBiConsumers.put(
-				"status",
-				(BiConsumer<DispatchLog, Integer>)DispatchLog::setStatus);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -876,12 +939,41 @@ public class DispatchLogModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<DispatchLog, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<DispatchLog, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<DispatchLog, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((DispatchLog)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DispatchLog>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DispatchLog.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -903,9 +995,8 @@ public class DispatchLogModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<DispatchLog, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<DispatchLog, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

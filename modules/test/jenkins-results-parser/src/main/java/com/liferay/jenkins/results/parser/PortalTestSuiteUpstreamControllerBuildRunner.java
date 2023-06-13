@@ -86,23 +86,31 @@ public class PortalTestSuiteUpstreamControllerBuildRunner
 	}
 
 	protected String getTestPortalBuildProfile(String testSuite) {
-		return _getTestSuiteBuildProperty(
-			"portal.testsuite.upstream.test.portal.build.profile", testSuite);
-	}
+		try {
+			Properties buildProperties =
+				JenkinsResultsParserUtil.getBuildProperties();
 
-	protected String getTestraySlackChannels(String testSuite) {
-		return _getTestSuiteBuildProperty(
-			"portal.testsuite.upstream.testray.slack.channels", testSuite);
-	}
+			S buildData = getBuildData();
 
-	protected String getTestraySlackIconEmoji(String testSuite) {
-		return _getTestSuiteBuildProperty(
-			"portal.testsuite.upstream.testray.slack.icon.emoji", testSuite);
-	}
+			String buildProfile = buildProperties.getProperty(
+				JenkinsResultsParserUtil.combine(
+					"portal.testsuite.upstream.test.portal.build.profile[",
+					buildData.getPortalUpstreamBranchName(), "][", testSuite,
+					"]"));
 
-	protected String getTestraySlackUsername(String testSuite) {
-		return _getTestSuiteBuildProperty(
-			"portal.testsuite.upstream.testray.slack.username", testSuite);
+			if (buildProfile == null) {
+				buildProfile = buildProperties.getProperty(
+					"portal.testsuite.upstream.test.portal.build.profile");
+			}
+
+			return buildProfile;
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(
+				"Unable to get portal build profile for test suite " +
+					testSuite,
+				ioException);
+		}
 	}
 
 	protected void invokeTestSuiteBuilds() {
@@ -152,9 +160,14 @@ public class PortalTestSuiteUpstreamControllerBuildRunner
 				"PORTAL_GIT_COMMIT", buildData.getPortalBranchSHA());
 			invocationParameters.put(
 				"PORTAL_GITHUB_URL", buildData.getPortalGitHubURL());
-			invocationParameters.put(
-				"TEST_PORTAL_BUILD_PROFILE",
-				getTestPortalBuildProfile(testSuiteName));
+
+			String testPortalBuildProfile = getTestPortalBuildProfile(
+				testSuiteName);
+
+			if (testPortalBuildProfile != null) {
+				invocationParameters.put(
+					"TEST_PORTAL_BUILD_PROFILE", testPortalBuildProfile);
+			}
 
 			String testrayProjectName = _getTestrayProjectName(testSuiteName);
 
@@ -163,7 +176,7 @@ public class PortalTestSuiteUpstreamControllerBuildRunner
 					"[", buildData.getPortalUpstreamBranchName(), "] ci:test:",
 					testSuiteName);
 
-				String testrayBuildName = JenkinsResultsParserUtil.combine(
+				String testraybuildName = JenkinsResultsParserUtil.combine(
 					testrayRoutineName, " - ",
 					String.valueOf(buildData.getBuildNumber()), " - ",
 					JenkinsResultsParserUtil.toDateString(
@@ -175,41 +188,26 @@ public class PortalTestSuiteUpstreamControllerBuildRunner
 				}
 
 				invocationParameters.put(
-					"TESTRAY_BUILD_NAME", testrayBuildName);
+					"TESTRAY_BUILD_NAME", testraybuildName);
 				invocationParameters.put(
 					"TESTRAY_PROJECT_NAME", testrayProjectName);
 				invocationParameters.put(
 					"TESTRAY_ROUTINE_NAME", testrayRoutineName);
 			}
 
-			invocationParameters.put(
-				"TESTRAY_SLACK_CHANNELS",
-				getTestraySlackChannels(testSuiteName));
-			invocationParameters.put(
-				"TESTRAY_SLACK_ICON_EMOJI",
-				getTestraySlackIconEmoji(testSuiteName));
-			invocationParameters.put(
-				"TESTRAY_SLACK_USERNAME",
-				getTestraySlackUsername(testSuiteName));
-
 			invocationParameters.putAll(buildData.getBuildParameters());
 
 			for (Map.Entry<String, String> invocationParameter :
 					invocationParameters.entrySet()) {
 
-				String invocationParameterValue =
-					invocationParameter.getValue();
-
-				if (JenkinsResultsParserUtil.isNullOrEmpty(
-						invocationParameterValue)) {
-
+				if (invocationParameter.getValue() == null) {
 					continue;
 				}
 
 				sb.append("&");
 				sb.append(invocationParameter.getKey());
 				sb.append("=");
-				sb.append(invocationParameterValue);
+				sb.append(invocationParameter.getValue());
 			}
 
 			try {
@@ -359,34 +357,50 @@ public class PortalTestSuiteUpstreamControllerBuildRunner
 	}
 
 	private String _getTestrayProjectName(String testSuite) {
-		return _getTestSuiteBuildProperty(
-			"portal.testsuite.upstream.testray.project.name", testSuite);
+		try {
+			Properties buildProperties =
+				JenkinsResultsParserUtil.getBuildProperties();
+
+			S buildData = getBuildData();
+
+			return buildProperties.getProperty(
+				JenkinsResultsParserUtil.combine(
+					"portal.testsuite.upstream.testray.project.name[",
+					buildData.getPortalUpstreamBranchName(), "][", testSuite,
+					"]"));
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	private String _getTestrayRoutineName(String testSuite) {
-		String testrayRoutineName = _getTestSuiteBuildProperty(
-			"portal.testsuite.upstream.testray.routine.name", testSuite);
-
-		if (JenkinsResultsParserUtil.isNullOrEmpty(testrayRoutineName)) {
-			testrayRoutineName = _getTestSuiteBuildProperty(
-				"portal.testsuite.upstream.testray.build.type", testSuite);
-		}
-
-		return testrayRoutineName;
-	}
-
-	private String _getTestSuiteBuildProperty(
-		String propertyName, String testSuite) {
-
-		S buildData = getBuildData();
-
 		try {
-			return JenkinsResultsParserUtil.getProperty(
-				JenkinsResultsParserUtil.getBuildProperties(), propertyName,
-				buildData.getPortalUpstreamBranchName(), testSuite);
+			Properties buildProperties =
+				JenkinsResultsParserUtil.getBuildProperties();
+
+			S buildData = getBuildData();
+
+			String testrayRoutineName = JenkinsResultsParserUtil.getProperty(
+				buildProperties,
+				JenkinsResultsParserUtil.combine(
+					"portal.testsuite.upstream.testray.routine.name[",
+					buildData.getPortalUpstreamBranchName(), "][", testSuite,
+					"]"));
+
+			if (JenkinsResultsParserUtil.isNullOrEmpty(testrayRoutineName)) {
+				testrayRoutineName = JenkinsResultsParserUtil.getProperty(
+					buildProperties,
+					JenkinsResultsParserUtil.combine(
+						"portal.testsuite.upstream.testray.build.type[",
+						buildData.getPortalUpstreamBranchName(), "][",
+						testSuite, "]"));
+			}
+
+			return testrayRoutineName;
 		}
 		catch (IOException ioException) {
-			return null;
+			throw new RuntimeException(ioException);
 		}
 	}
 

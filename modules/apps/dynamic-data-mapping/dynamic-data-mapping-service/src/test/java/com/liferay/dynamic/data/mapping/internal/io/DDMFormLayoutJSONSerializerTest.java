@@ -48,7 +48,7 @@ public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_setUpDDMFormLayoutJSONSerializer();
+		setUpDDMFormLayoutJSONSerializer();
 	}
 
 	@Test
@@ -56,7 +56,7 @@ public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
 		String expectedJSON = read(
 			"ddm-form-layout-json-serializer-test-data.json");
 
-		DDMFormLayout ddmFormLayout = _createDDMFormLayout();
+		DDMFormLayout ddmFormLayout = createDDMFormLayout();
 
 		String actualJSON = serialize(ddmFormLayout);
 
@@ -71,7 +71,7 @@ public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
 			"ddm-form-layout-json-serializer-with-definition-schema-" +
 				"version.json");
 
-		DDMFormLayout ddmFormLayout = _createDDMFormLayout();
+		DDMFormLayout ddmFormLayout = createDDMFormLayout();
 
 		ddmFormLayout.setDefinitionSchemaVersion("2.0");
 
@@ -80,24 +80,12 @@ public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
 		JSONAssert.assertEquals(expectedJSON, actualJSON, false);
 	}
 
-	protected String serialize(DDMFormLayout ddmFormLayout) {
-		DDMFormLayoutSerializerSerializeRequest.Builder builder =
-			DDMFormLayoutSerializerSerializeRequest.Builder.newBuilder(
-				ddmFormLayout);
-
-		DDMFormLayoutSerializerSerializeResponse
-			ddmFormLayoutSerializerSerializeResponse =
-				_ddmFormLayoutJSONSerializer.serialize(builder.build());
-
-		return ddmFormLayoutSerializerSerializeResponse.getContent();
-	}
-
-	private DDMFormLayout _createDDMFormLayout() {
+	protected DDMFormLayout createDDMFormLayout() {
 		DDMFormLayout ddmFormLayout = new DDMFormLayout();
 
 		ddmFormLayout.setDefaultLocale(LocaleUtil.US);
 
-		DDMFormLayoutPage ddmFormLayoutPage = _createDDMFormLayoutPage(
+		DDMFormLayoutPage ddmFormLayoutPage = createDDMFormLayoutPage(
 			"Page 1", "Pagina 1");
 
 		ddmFormLayoutPage.addDDMFormLayoutRow(
@@ -115,7 +103,7 @@ public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
 		return ddmFormLayout;
 	}
 
-	private DDMFormLayoutPage _createDDMFormLayoutPage(
+	protected DDMFormLayoutPage createDDMFormLayoutPage(
 		String enTitle, String ptTitle) {
 
 		DDMFormLayoutPage ddmFormLayoutPage = new DDMFormLayoutPage();
@@ -128,7 +116,19 @@ public class DDMFormLayoutJSONSerializerTest extends BaseDDMTestCase {
 		return ddmFormLayoutPage;
 	}
 
-	private void _setUpDDMFormLayoutJSONSerializer() throws Exception {
+	protected String serialize(DDMFormLayout ddmFormLayout) {
+		DDMFormLayoutSerializerSerializeRequest.Builder builder =
+			DDMFormLayoutSerializerSerializeRequest.Builder.newBuilder(
+				ddmFormLayout);
+
+		DDMFormLayoutSerializerSerializeResponse
+			ddmFormLayoutSerializerSerializeResponse =
+				_ddmFormLayoutJSONSerializer.serialize(builder.build());
+
+		return ddmFormLayoutSerializerSerializeResponse.getContent();
+	}
+
+	protected void setUpDDMFormLayoutJSONSerializer() throws Exception {
 		Field field = ReflectionUtil.getDeclaredField(
 			DDMFormLayoutJSONSerializer.class, "_jsonFactory");
 

@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleWrapper;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceWrapper;
@@ -30,7 +29,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,21 +38,26 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Jorge Ferrer
  */
-public class ModelPermissionsFactoryTest {
+@PrepareForTest(ResourceActionsUtil.class)
+@RunWith(PowerMockRunner.class)
+public class ModelPermissionsFactoryTest extends PowerMockito {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		ReflectionTestUtil.setFieldValue(
 			RoleLocalServiceUtil.class, "_service",
-			new RoleLocalServiceWrapper() {
+			new RoleLocalServiceWrapper(null) {
 
 				@Override
 				public Role getDefaultGroupRole(long groupId) {
@@ -186,22 +189,18 @@ public class ModelPermissionsFactoryTest {
 
 		String className = RandomTestUtil.randomString();
 
-		ResourceActionsUtil resourceActionsUtil = new ResourceActionsUtil();
+		mockStatic(ResourceActionsUtil.class);
 
-		ResourceActions resourceActions = Mockito.mock(ResourceActions.class);
-
-		resourceActionsUtil.setResourceActions(resourceActions);
-
-		Mockito.when(
-			resourceActions.getModelResourceGroupDefaultActions(className)
+		when(
+			ResourceActionsUtil.getModelResourceGroupDefaultActions(className)
 		).thenReturn(
-			Collections.singletonList(ActionKeys.VIEW)
+			Arrays.asList(ActionKeys.VIEW)
 		);
 
-		Mockito.when(
-			resourceActions.getModelResourceGuestDefaultActions(className)
+		when(
+			ResourceActionsUtil.getModelResourceGuestDefaultActions(className)
 		).thenReturn(
-			Collections.singletonList(ActionKeys.VIEW)
+			Arrays.asList(ActionKeys.VIEW)
 		);
 
 		ModelPermissions modelPermissions = ModelPermissionsFactory.create(

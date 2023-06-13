@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -61,20 +59,20 @@ public class SearchResponse implements Serializable {
 
 	@Schema
 	@Valid
-	public Map[] getErrors() {
-		return errors;
+	public Document[] getDocuments() {
+		return documents;
 	}
 
-	public void setErrors(Map[] errors) {
-		this.errors = errors;
+	public void setDocuments(Document[] documents) {
+		this.documents = documents;
 	}
 
 	@JsonIgnore
-	public void setErrors(
-		UnsafeSupplier<Map[], Exception> errorsUnsafeSupplier) {
+	public void setDocuments(
+		UnsafeSupplier<Document[], Exception> documentsUnsafeSupplier) {
 
 		try {
-			errors = errorsUnsafeSupplier.get();
+			documents = documentsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -86,7 +84,35 @@ public class SearchResponse implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Map[] errors;
+	protected Document[] documents;
+
+	@Schema
+	public Double getMaxScore() {
+		return maxScore;
+	}
+
+	public void setMaxScore(Double maxScore) {
+		this.maxScore = maxScore;
+	}
+
+	@JsonIgnore
+	public void setMaxScore(
+		UnsafeSupplier<Double, Exception> maxScoreUnsafeSupplier) {
+
+		try {
+			maxScore = maxScoreUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Double maxScore;
 
 	@Schema
 	public Integer getPage() {
@@ -258,35 +284,6 @@ public class SearchResponse implements Serializable {
 
 	@Schema
 	@Valid
-	public SearchHits getSearchHits() {
-		return searchHits;
-	}
-
-	public void setSearchHits(SearchHits searchHits) {
-		this.searchHits = searchHits;
-	}
-
-	@JsonIgnore
-	public void setSearchHits(
-		UnsafeSupplier<SearchHits, Exception> searchHitsUnsafeSupplier) {
-
-		try {
-			searchHits = searchHitsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected SearchHits searchHits;
-
-	@Schema
-	@Valid
 	public SearchRequest getSearchRequest() {
 		return searchRequest;
 	}
@@ -313,6 +310,34 @@ public class SearchResponse implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected SearchRequest searchRequest;
+
+	@Schema
+	public Integer getTotalHits() {
+		return totalHits;
+	}
+
+	public void setTotalHits(Integer totalHits) {
+		this.totalHits = totalHits;
+	}
+
+	@JsonIgnore
+	public void setTotalHits(
+		UnsafeSupplier<Integer, Exception> totalHitsUnsafeSupplier) {
+
+		try {
+			totalHits = totalHitsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Integer totalHits;
 
 	@Override
 	public boolean equals(Object object) {
@@ -341,24 +366,34 @@ public class SearchResponse implements Serializable {
 
 		sb.append("{");
 
-		if (errors != null) {
+		if (documents != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"errors\": ");
+			sb.append("\"documents\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < errors.length; i++) {
-				sb.append(errors[i]);
+			for (int i = 0; i < documents.length; i++) {
+				sb.append(String.valueOf(documents[i]));
 
-				if ((i + 1) < errors.length) {
+				if ((i + 1) < documents.length) {
 					sb.append(", ");
 				}
 			}
 
 			sb.append("]");
+		}
+
+		if (maxScore != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"maxScore\": ");
+
+			sb.append(maxScore);
 		}
 
 		if (page != null) {
@@ -388,17 +423,7 @@ public class SearchResponse implements Serializable {
 
 			sb.append("\"request\": ");
 
-			if (request instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)request));
-			}
-			else if (request instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)request));
-				sb.append("\"");
-			}
-			else {
-				sb.append(request);
-			}
+			sb.append(String.valueOf(request));
 		}
 
 		if (requestString != null) {
@@ -422,18 +447,7 @@ public class SearchResponse implements Serializable {
 
 			sb.append("\"response\": ");
 
-			if (response instanceof Map) {
-				sb.append(
-					JSONFactoryUtil.createJSONObject((Map<?, ?>)response));
-			}
-			else if (response instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)response));
-				sb.append("\"");
-			}
-			else {
-				sb.append(response);
-			}
+			sb.append(String.valueOf(response));
 		}
 
 		if (responseString != null) {
@@ -450,16 +464,6 @@ public class SearchResponse implements Serializable {
 			sb.append("\"");
 		}
 
-		if (searchHits != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"searchHits\": ");
-
-			sb.append(String.valueOf(searchHits));
-		}
-
 		if (searchRequest != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -468,6 +472,16 @@ public class SearchResponse implements Serializable {
 			sb.append("\"searchRequest\": ");
 
 			sb.append(String.valueOf(searchRequest));
+		}
+
+		if (totalHits != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"totalHits\": ");
+
+			sb.append(totalHits);
 		}
 
 		sb.append("}");
@@ -483,9 +497,9 @@ public class SearchResponse implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -511,7 +525,7 @@ public class SearchResponse implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -543,7 +557,7 @@ public class SearchResponse implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -559,10 +573,5 @@ public class SearchResponse implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

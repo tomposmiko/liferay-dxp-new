@@ -45,7 +45,6 @@ public class CommerceAddressRestrictionWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put(
 			"commerceAddressRestrictionId", getCommerceAddressRestrictionId());
 		attributes.put("groupId", getGroupId());
@@ -63,12 +62,6 @@ public class CommerceAddressRestrictionWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		Long commerceAddressRestrictionId = (Long)attributes.get(
 			"commerceAddressRestrictionId");
 
@@ -234,16 +227,6 @@ public class CommerceAddressRestrictionWrapper
 	}
 
 	/**
-	 * Returns the mvcc version of this commerce address restriction.
-	 *
-	 * @return the mvcc version of this commerce address restriction
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
 	 * Returns the primary key of this commerce address restriction.
 	 *
 	 * @return the primary key of this commerce address restriction
@@ -376,16 +359,6 @@ public class CommerceAddressRestrictionWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce address restriction.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce address restriction
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the primary key of this commerce address restriction.
 	 *
 	 * @param primaryKey the primary key of this commerce address restriction
@@ -423,11 +396,6 @@ public class CommerceAddressRestrictionWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

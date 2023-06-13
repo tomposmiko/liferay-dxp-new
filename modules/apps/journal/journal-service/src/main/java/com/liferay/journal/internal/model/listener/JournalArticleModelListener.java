@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jon Steer
  * @author Raymond Augé
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class JournalArticleModelListener
 	extends BaseModelListener<JournalArticle> {
 
@@ -66,7 +66,11 @@ public class JournalArticleModelListener
 		CacheUtil.clearCache(journalArticle.getCompanyId());
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setJournalContent(JournalContent journalContent) {
+		_journalContent = journalContent;
+	}
+
 	private JournalContent _journalContent;
 
 	@Reference

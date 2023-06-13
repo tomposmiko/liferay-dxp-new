@@ -28,14 +28,15 @@ import com.liferay.document.library.kernel.exception.InvalidFileVersionException
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.exception.SourceFileNameException;
+import com.liferay.document.library.kernel.util.DLValidator;
 import com.liferay.dynamic.data.mapping.kernel.StorageFieldRequiredException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -67,13 +68,16 @@ import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.exception.NoSuchNodeException;
 import com.liferay.wiki.exception.NoSuchPageException;
 import com.liferay.wiki.service.WikiPageService;
-import com.liferay.wiki.web.internal.helper.WikiAttachmentsHelper;
+import com.liferay.wiki.web.internal.WikiAttachmentsHelper;
 import com.liferay.wiki.web.internal.upload.TempAttachmentWikiUploadFileEntryHandler;
 
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletConfig;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -88,6 +92,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.document.library.configuration.DLConfiguration",
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
@@ -98,11 +103,83 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 
+	@Reference(unbind = "-")
+	public void setWikiAttachmentsHelper(
+		WikiAttachmentsHelper wikiAttachmentsHelper) {
+
+		_wikiAttachmentsHelper = wikiAttachmentsHelper;
+	}
+
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
 		_dlConfiguration = ConfigurableUtil.createConfigurable(
 			DLConfiguration.class, properties);
+	}
+
+	protected void addTempAttachment(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		_uploadHandler.upload(
+			_tempAttachmentWikiUploadFileEntryHandler, _uploadResponseHandler,
+			actionRequest, actionResponse);
+	}
+
+	protected void deleteAttachment(
+			ActionRequest actionRequest, boolean moveToTrash)
+		throws Exception {
+
+		TrashedModel trashedModel = _wikiAttachmentsHelper.deleteAttachment(
+			actionRequest, moveToTrash);
+
+		if (moveToTrash && (trashedModel != null)) {
+			addDeleteSuccessData(
+				actionRequest,
+				HashMapBuilder.<String, Object>put(
+					Constants.CMD, Constants.REMOVE
+				).put(
+					"trashedModels", ListUtil.fromArray(trashedModel)
+				).build());
+		}
+	}
+
+	protected void deleteTempAttachment(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		UploadPortletRequest uploadPortletRequest =
+			_portal.getUploadPortletRequest(actionRequest);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long nodeId = ParamUtil.getLong(uploadPortletRequest, "nodeId");
+		String fileName = ParamUtil.getString(actionRequest, "fileName");
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		try {
+			_wikiPageService.deleteTempFileEntry(
+				nodeId, WikiConstants.TEMP_FOLDER_NAME, fileName);
+
+			jsonObject.put("deleted", Boolean.TRUE);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			jsonObject.put("deleted", Boolean.FALSE);
+
+			String errorMessage = themeDisplay.translate(
+				"an-unexpected-error-occurred-while-deleting-the-file");
+
+			jsonObject.put("errorMessage", errorMessage);
+		}
+
+		JSONPortletResponseUtil.writeJSON(
+			actionRequest, actionResponse, jsonObject);
 	}
 
 	@Override
@@ -111,6 +188,8 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		PortletConfig portletConfig = getPortletConfig(actionRequest);
 
 		try {
 			UploadException uploadException =
@@ -135,19 +214,19 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 				throw new PortalException(throwable);
 			}
 			else if (cmd.equals(Constants.ADD_TEMP)) {
-				_addTempAttachment(actionRequest, actionResponse);
+				addTempAttachment(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteAttachment(actionRequest, false);
+				deleteAttachment(actionRequest, false);
 			}
 			else if (cmd.equals(Constants.DELETE_TEMP)) {
-				_deleteTempAttachment(actionRequest, actionResponse);
+				deleteTempAttachment(actionRequest, actionResponse);
 			}
 			else if (cmd.equals(Constants.EMPTY_TRASH)) {
 				_wikiAttachmentsHelper.emptyTrash(actionRequest);
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
-				_deleteAttachment(actionRequest, true);
+				deleteAttachment(actionRequest, true);
 			}
 			else if (cmd.equals(Constants.RESTORE)) {
 				_wikiAttachmentsHelper.restoreEntries(actionRequest);
@@ -168,81 +247,20 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 			actionResponse.setRenderParameter("mvcPath", "/wiki/error.jsp");
 		}
 		catch (Exception exception) {
-			_handleUploadException(
-				actionRequest, actionResponse, cmd, exception);
+			handleUploadException(
+				portletConfig, actionRequest, actionResponse, cmd, exception);
 		}
-	}
-
-	private void _addTempAttachment(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		_uploadHandler.upload(
-			_tempAttachmentWikiUploadFileEntryHandler, _uploadResponseHandler,
-			actionRequest, actionResponse);
-	}
-
-	private void _deleteAttachment(
-			ActionRequest actionRequest, boolean moveToTrash)
-		throws Exception {
-
-		TrashedModel trashedModel = _wikiAttachmentsHelper.deleteAttachment(
-			actionRequest, moveToTrash);
-
-		if (moveToTrash && (trashedModel != null)) {
-			addDeleteSuccessData(
-				actionRequest,
-				HashMapBuilder.<String, Object>put(
-					Constants.CMD, Constants.REMOVE
-				).put(
-					"trashedModels", ListUtil.fromArray(trashedModel)
-				).build());
-		}
-	}
-
-	private void _deleteTempAttachment(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		UploadPortletRequest uploadPortletRequest =
-			_portal.getUploadPortletRequest(actionRequest);
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long nodeId = ParamUtil.getLong(uploadPortletRequest, "nodeId");
-		String fileName = ParamUtil.getString(actionRequest, "fileName");
-
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
-
-		try {
-			_wikiPageService.deleteTempFileEntry(
-				nodeId, WikiConstants.TEMP_FOLDER_NAME, fileName);
-
-			jsonObject.put("deleted", Boolean.TRUE);
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			jsonObject.put("deleted", Boolean.FALSE);
-
-			String errorMessage = themeDisplay.translate(
-				"an-unexpected-error-occurred-while-deleting-the-file");
-
-			jsonObject.put("errorMessage", errorMessage);
-		}
-
-		JSONPortletResponseUtil.writeJSON(
-			actionRequest, actionResponse, jsonObject);
 	}
 
 	/**
 	 * TODO: Remove. This should extend from EditFileEntryAction once it is
 	 * modularized.
 	 */
-	private String[] _getAllowedFileExtensions() throws Exception {
+	protected String[] getAllowedFileExtensions(
+			PortletConfig portletConfig, PortletRequest portletRequest,
+			PortletResponse portletResponse)
+		throws PortalException {
+
 		return _dlConfiguration.fileExtensions();
 	}
 
@@ -250,9 +268,9 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 	 * TODO: Remove. This should extend from EditFileEntryAction once it is
 	 * modularized.
 	 */
-	private void _handleUploadException(
-			ActionRequest actionRequest, ActionResponse actionResponse,
-			String cmd, Exception exception)
+	protected void handleUploadException(
+			PortletConfig portletConfig, ActionRequest actionRequest,
+			ActionResponse actionResponse, String cmd, Exception exception)
 		throws Exception {
 
 		if (exception instanceof AssetCategoryException ||
@@ -331,7 +349,9 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 				else if (exception instanceof FileExtensionException) {
 					errorMessage = themeDisplay.translate(
 						"please-enter-a-file-with-a-valid-extension-x",
-						StringUtil.merge(_getAllowedFileExtensions()));
+						StringUtil.merge(
+							getAllowedFileExtensions(
+								portletConfig, actionRequest, actionResponse)));
 					errorType =
 						ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION;
 				}
@@ -341,16 +361,12 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 					errorType = ServletResponseConstants.SC_FILE_NAME_EXCEPTION;
 				}
 				else if (exception instanceof FileSizeException) {
-					FileSizeException fileSizeException =
-						(FileSizeException)exception;
-
 					errorMessage = themeDisplay.translate(
 						"please-enter-a-file-with-a-valid-file-size-no-" +
 							"larger-than-x",
-						_language.formatStorageSize(
-							fileSizeException.getMaxSize(),
+						LanguageUtil.formatStorageSize(
+							_dlValidator.getMaxAllowableSize(),
 							themeDisplay.getLocale()));
-
 					errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
 				}
 
@@ -410,10 +426,7 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 	private volatile DLConfiguration _dlConfiguration;
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
+	private DLValidator _dlValidator;
 
 	@Reference
 	private Portal _portal;
@@ -428,7 +441,6 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 	@Reference(target = "(upload.response.handler=multiple)")
 	private UploadResponseHandler _uploadResponseHandler;
 
-	@Reference
 	private WikiAttachmentsHelper _wikiAttachmentsHelper;
 
 	@Reference

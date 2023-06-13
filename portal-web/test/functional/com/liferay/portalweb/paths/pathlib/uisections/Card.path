@@ -16,8 +16,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CARD_LINK</td>
+	<td>//div[contains(@data-analytics-asset-title,'${key_card}')]//a[contains(@class,'card-link')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CARD_PAGE_ITEM</td>
-	<td>xpath=(//dd[contains(@class,'card-page-item')])[${key_index}]//*[contains(@class,'card-title')][contains(.,'${key_card}')]</td>
+	<td>xpath=(//li[contains(@class,'card-page-item')])[${key_index}]//*[contains(@class,'card-title')][contains(.,'${key_card}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -37,7 +42,7 @@
 </tr>
 <tr>
 	<td>CARD_LABEL</td>
-	<td>xpath=(//div[contains(@class,'card')][contains(.,'${key_card}')]//span[contains(@class,'label-item')])[${index}]</td>
+	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//span[contains(@class,'label-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -52,12 +57,17 @@
 </tr>
 <tr>
 	<td>CARD_SELECTED</td>
-	<td>//li[contains(@class,'active')]//div[contains(@class,'card')][contains(.,'${key_card}')] | //div[contains(@class,'card')][contains(@class,'active')][.//*[starts-with(.,'${key_card}')]]</td>
+	<td>//li[contains(@class,'active')]//div[contains(@class,'card')][contains(.,'${key_card}')] | //div[contains(@class,'card')][contains(@class,'active')][contains(.,'${key_card}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CARD_STICKER</td>
-	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//span[contains(@class,'sticker-overlay')]//*[name()='svg'][contains(@class,'lexicon-icon-${key_icon}')] | //div[contains(@class,'card')][contains(.,'${key_card}')]//span[contains(@class,'text')]//*[name()='svg'][contains(@class,'lexicon-icon-${key_icon}')]</td>
+	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//span[contains(@class,'sticker-overlay')]//*[name()='svg'][contains(@class,'lexicon-icon-${key_icon}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CARD_STYLE</td>
+	<td>//div[contains(@data-analytics-asset-title,'${key_card}')]/parent::div[contains(@class,'${key_cardStyle}') or contains(@style,'${key_cardStyle}')]</td>
 	<td></td>
 </tr>
 <tr>

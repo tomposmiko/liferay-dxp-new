@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Display Page Templates";
+	property testray.main.component.name = "Display Pages";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Add a display page template for Web Content Article and Basic Web Content") {
@@ -28,7 +28,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -39,7 +39,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-86550. Users should be able to map author name and author profile image to editable fields in a display page template."
-	@priority = 5
+	@priority = "5"
 	test MapAuthorInfoToEditableField {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -68,7 +68,7 @@ definition {
 				fieldName = "Author Profile Image",
 				panel = "Styles");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a new user with Administrator role") {
@@ -101,9 +101,8 @@ definition {
 
 			PortletEntry.save();
 
-			var userPortrait = selenium.getAttribute("//img[contains(@class,'logo-selector') and contains(@src,'image')]@src");
-
-			var userPortrait = StringUtil.extractLast(${userPortrait}, "image/");
+			var userPortrait = selenium.getAttribute("//img[contains(@id,'avatar') and contains(@src,'image')]@src");
+			var userPortrait = StringUtil.extractLast("${userPortrait}", "image/");
 		}
 
 		task ("Add a web content and select the display page template") {
@@ -127,17 +126,20 @@ definition {
 		}
 
 		task ("View mapped content in display page template") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
+			AssertVisible(
 				id = "element-text",
-				text = "userfn1 userln1");
+				key_position = "1",
+				key_text = "userfn1 userln1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 
-			ContentPages.viewFragmentBackgroundImage(image = ${userPortrait});
+			AssertVisible(
+				key_imageName = "${userPortrait}",
+				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
 		}
 	}
 
 	@description = "This is a test for LPS-128645. Map custom field to text fragment."
-	@priority = 4
+	@priority = "4"
 	test MapCustomFieldToTextFragment {
 		task ("Add a custom field for Document") {
 			ApplicationsMenu.gotoPortlet(
@@ -178,11 +180,11 @@ definition {
 
 		task ("Map custom field to editable field of Heading") {
 			PageEditorMapping.mapEditableTextToField(
-				field = "Short Description",
+				field = "short description",
 				fragmentName = "Heading",
 				id = "element-text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Mark the display page template as default") {
@@ -190,23 +192,25 @@ definition {
 		}
 
 		task ("Assert the mapped custom field is shown in display page template") {
-			var fileEntryId = JSONDocument.getFileEntryId(
+			var fileEntryID = JSONDocument.getFileEntryId(
 				dmDocumentTitle = "DM Title",
 				groupName = "Test Site Name");
 
-			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/d/${fileEntryId}");
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/d/${fileEntryID}");
 
-			ControlMenu.viewHeaderTitle(headerTitle = "DM Title");
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "DPT Name");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "This is a short description");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "This is a short description");
 		}
 	}
 
 	@description = "This is a test for LPS-86550. Users should be able to map last editor name and author profile image to editable fields in a display page template."
-	@priority = 5
+	@priority = "5"
 	test MapLastEditorInfoToEditableField {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -235,7 +239,7 @@ definition {
 				fieldName = "Last Editor Profile Image",
 				panel = "Styles");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Mark the display page as default") {
@@ -256,9 +260,8 @@ definition {
 				key_imageName = "image",
 				locator1 = "UsersAndOrganizationsEditUser#DETAILS_PROFILE_IMAGE");
 
-			var userPortrait = selenium.getAttribute("//img[contains(@class,'logo-selector') and contains(@src,'image')]@src");
-
-			var userPortrait = StringUtil.extractLast(${userPortrait}, "image/");
+			var userPortrait = selenium.getAttribute("//img[contains(@id,'avatar') and contains(@src,'image')]@src");
+			var userPortrait = StringUtil.extractLast("${userPortrait}", "image/");
 		}
 
 		task ("Navigate to the display page template at view mode") {
@@ -266,12 +269,15 @@ definition {
 		}
 
 		task ("View mapped content in display page template") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
+			AssertVisible(
 				id = "element-text",
-				text = "Test Test");
+				key_position = "1",
+				key_text = "Test Test",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 
-			ContentPages.viewFragmentBackgroundImage(image = ${userPortrait});
+			AssertVisible(
+				key_imageName = "${userPortrait}",
+				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
 		}
 
 		task ("Add a new user with Administrator role") {
@@ -304,9 +310,8 @@ definition {
 
 			PortletEntry.save();
 
-			var userPortrait = selenium.getAttribute("//img[contains(@class,'logo-selector') and contains(@src,'image')]@src");
-
-			var userPortrait = StringUtil.extractLast(${userPortrait}, "image/");
+			var userPortrait = selenium.getAttribute("//img[contains(@id,'avatar') and contains(@src,'image')]@src");
+			var userPortrait = StringUtil.extractLast("${userPortrait}", "image/");
 		}
 
 		task ("Edit the web content") {
@@ -324,20 +329,21 @@ definition {
 		}
 
 		task ("View mapped content in display page template") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
+			AssertVisible(
 				id = "element-text",
-				text = "userfn1 userln1");
+				key_position = "1",
+				key_text = "userfn1 userln1",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 
-			ContentPages.viewFragmentBackgroundImage(image = ${userPortrait});
+			AssertVisible(
+				key_imageName = "${userPortrait}",
+				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
 		}
 	}
 
 	@description = "This is a test for LPS-98031. Map manual URL to image fragment."
-	@priority = 4
+	@priority = "4"
 	test MapManualURLToImageFragment {
-		property ci.retries.disabled = "true";
-
 		task ("Add an Image fragment to the Display Page Name") {
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
@@ -361,11 +367,11 @@ definition {
 			PageEditorEditableLink.updateURL(url = "https://liferay.com");
 
 			AssertVisible(
-				key_append = "//img[contains(@src,'document_1-jpg')]",
-				key_url = "https://liferay.com",
+				key_append = "//img[contains(@src,'Document_1.jpg')]",
+				key_URL = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content based on Basic Web Content") {
@@ -394,18 +400,20 @@ definition {
 				entry = "Web Content Title",
 				menuItem = "View Content");
 
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content Title");
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "Display Page Name");
 		}
 
 		task ("Assert mapped URL work in display page template") {
 			AssertVisible(
-				key_append = "//img[contains(@src,'document_1-jpg')]",
-				key_url = "https://liferay.com",
+				key_append = "//img[contains(@src,'Document_1.jpg')]",
+				key_URL = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			Click(
-				key_append = "//img[contains(@src,'document_1-jpg')]",
-				key_url = "https://liferay.com",
+				key_append = "//img[contains(@src,'Document_1.jpg')]",
+				key_URL = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			AssertLocation.assertPartialLocation(value1 = "https://www.liferay.com");
@@ -413,7 +421,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98031. Map manual URL to link fragment."
-	@priority = 5
+	@priority = "5"
 	test MapManualURLToLinkFragment {
 		property portal.acceptance = "true";
 
@@ -435,7 +443,7 @@ definition {
 
 			PageEditorEditableLink.updateURL(url = "https://liferay.com");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the mapped URL in link editable field") {
@@ -450,10 +458,8 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98031. Map manual URL to text fragment."
-	@priority = 4
+	@priority = "4"
 	test MapManualURLToTextFragment {
-		property ci.retries.disabled = "true";
-
 		task ("Add a Heading fragment to the Display Page Name") {
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
@@ -473,10 +479,10 @@ definition {
 
 			AssertVisible(
 				key_append = "[normalize-space(text())='Heading Example']",
-				key_url = "https://liferay.com",
+				key_URL = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content based on Basic Web Content") {
@@ -505,18 +511,20 @@ definition {
 				entry = "Web Content Title",
 				menuItem = "View Content");
 
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content Title");
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "Display Page Name");
 		}
 
 		task ("Assert mapped URL work in view mode") {
 			AssertVisible(
 				key_append = "[normalize-space(text())='Heading Example']",
-				key_url = "https://liferay.com",
+				key_URL = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			Click(
 				key_append = "[normalize-space(text())='Heading Example']",
-				key_url = "https://liferay.com",
+				key_URL = "https://liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			AssertLocation.assertPartialLocation(value1 = "https://www.liferay.com");
@@ -524,7 +532,7 @@ definition {
 	}
 
 	@description = "Map multiple custom ddm fields to text editable fields."
-	@priority = 4
+	@priority = "4"
 	test MapMultipleCustomDDMFieldsToTextFragment {
 		task ("Add a web content structure") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -567,7 +575,7 @@ definition {
 				fragmentName = "Paragraph",
 				id = "element-text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content based on new structure") {
@@ -592,20 +600,22 @@ definition {
 		}
 
 		task ("View mapped content in display page template") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
+			AssertVisible(
 				id = "element-text",
-				text = "Webcontent Text");
+				key_position = "1",
+				key_text = "Webcontent Text",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "paragraph",
+			AssertVisible(
 				id = "element-text",
-				text = "Webcontent Rich Text");
+				key_position = "2",
+				key_text = "Webcontent Rich Text",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "Map multiple fields to text editable fields."
-	@priority = 4
+	@priority = "4"
 	test MapMultipleFieldsToTextFragment {
 		task ("Import fragment collection") {
 			FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
@@ -624,19 +634,31 @@ definition {
 		}
 
 		task ("Map multiple fields to editable fields") {
-			var n = 1;
+			PageEditorMapping.mapEditableTextToField(
+				contributed = "false",
+				field = "Title",
+				fragmentName = "Multiple Editables",
+				id = "test1");
 
-			for (var fieldName : list "Title,Content,Author Name,Display Page URL,Tags") {
-				PageEditorMapping.mapEditableTextToField(
-					contributed = "false",
-					field = ${fieldName},
-					fragmentName = "Multiple Editables",
-					index = ${n});
+			PageEditorMapping.mapEditableTextToField(
+				contributed = "false",
+				field = "Content",
+				fragmentName = "Multiple Editables",
+				id = "test2");
 
-				var n = ${n} + 1;
-			}
+			PageEditorMapping.mapEditableTextToField(
+				contributed = "false",
+				field = "Tags",
+				fragmentName = "Multiple Editables",
+				id = "test3");
 
-			PageEditor.publish();
+			PageEditorMapping.mapEditableTextToField(
+				contributed = "false",
+				field = "Publish Date",
+				fragmentName = "Multiple Editables",
+				id = "test4");
+
+			PageEditor.clickPublish();
 		}
 
 		task ("Mark the display page as default") {
@@ -656,29 +678,16 @@ definition {
 		}
 
 		task ("View mapped content in display page template") {
-			var portalURL = PropsUtil.get("portal.url");
-			var n = 1;
-
-			for (var content : list "Webcontent Title,Webcontent Content,Test Test,${portalURL}/web/test-site-name/w/webcontent-title") {
-				ContentPages.viewFragmentText(
-					contributed = "false",
-					fragmentName = "multiple-editables",
-					position = ${n},
-					text = ${content});
-
-				var n = ${n} + 1;
+			for (var content : list "Webcontent Title,Webcontent Content,tag1,tag2,tag3") {
+				AssertVisible(
+					key_text = "${content}",
+					locator1 = "Fragment#EDITABLE_FIELD_CONTENT");
 			}
-
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "multiple-editables",
-				position = 5,
-				text = "tag1, tag2, tag3");
 		}
 	}
 
 	@description = "This is a test for LPS-98031. Map web content field with URL to image editable field."
-	@priority = 2
+	@priority = "2"
 	test MapWebContentFieldWithURLToImageFragment {
 		task ("Add a web content structure with a Text field") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -716,7 +725,7 @@ definition {
 
 			PageEditorEditableLink.mapURLToAsset(field = "Text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content based on new structure") {
@@ -744,18 +753,20 @@ definition {
 				entry = "Web Content Title",
 				menuItem = "View Content");
 
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content Title");
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "Test Display Page Name");
 		}
 
 		task ("Assert mapped URL work in view mode") {
 			AssertVisible(
 				key_append = "//img[contains(@src,'data:image/png')]",
-				key_url = "https://www.liferay.com",
+				key_URL = "https://www.liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			Click(
 				key_append = "//img[contains(@src,'data:image/png')]",
-				key_url = "https://www.liferay.com",
+				key_URL = "https://www.liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			AssertLocation.assertPartialLocation(value1 = "https://www.liferay.com");
@@ -763,7 +774,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98031. Map web content field with URL to link editable field."
-	@priority = 2
+	@priority = "2"
 	test MapWebContentFieldWithURLToLinkFragment {
 		task ("Add a web content structure with a Text field") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -801,7 +812,7 @@ definition {
 
 			PageEditorEditableLink.mapURLToAsset(field = "Text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content based on new structure") {
@@ -829,18 +840,20 @@ definition {
 				entry = "Web Content Title",
 				menuItem = "View Content");
 
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content Title");
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "Test Display Page Name");
 		}
 
 		task ("Assert mapped URL work in view mode") {
 			AssertVisible(
 				key_append = "[normalize-space(text())='Go Somewhere']",
-				key_url = "https://www.liferay.com",
+				key_URL = "https://www.liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			Click(
 				key_append = "[normalize-space(text())='Go Somewhere']",
-				key_url = "https://www.liferay.com",
+				key_URL = "https://www.liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			AssertLocation.assertPartialLocation(value1 = "https://www.liferay.com");
@@ -848,7 +861,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98031. Map web content field with URL to text editable field."
-	@priority = 2
+	@priority = "2"
 	test MapWebContentFieldWithURLToTextFragment {
 		task ("Add a web content structure with a Text field") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -886,7 +899,7 @@ definition {
 
 			PageEditorEditableLink.mapURLToAsset(field = "Text");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content based on new structure") {
@@ -914,18 +927,20 @@ definition {
 				entry = "Web Content Title",
 				menuItem = "View Content");
 
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content Title");
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "Test Display Page Name");
 		}
 
 		task ("Assert mapped URL work in view mode") {
 			AssertVisible(
 				key_append = "[normalize-space(text())='Heading Example']",
-				key_url = "https://www.liferay.com",
+				key_URL = "https://www.liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			Click(
 				key_append = "[normalize-space(text())='Heading Example']",
-				key_url = "https://www.liferay.com",
+				key_URL = "https://www.liferay.com",
 				locator1 = "Fragment#FRAGMENT_LINK");
 
 			AssertLocation.assertPartialLocation(value1 = "https://www.liferay.com");
@@ -933,7 +948,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-98030. Can map the editable background images of a fragment to an existing image content in a display page template."
-	@priority = 2
+	@priority = "2"
 	test MapWebContentImageToBackgoundImageOfBannerCenter {
 		task ("Add a web content structure with an Image field") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -971,7 +986,7 @@ definition {
 				fieldName = "Image",
 				panel = "Styles");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a web content based on new structure") {
@@ -1001,19 +1016,25 @@ definition {
 				entry = "Web Content Title",
 				menuItem = "View Content");
 
-			ControlMenu.viewHeaderTitle(headerTitle = "Web Content Title");
+			AssertTextEquals(
+				locator1 = "ControlMenu#HEADING",
+				value1 = "Test Display Page Name");
 		}
 
 		task ("Assert mapped image is shown in display page template") {
-			ContentPages.viewFragmentBackgroundImage(image = "Document_2.jpeg");
+			AssertVisible(
+				key_imageName = "Document_2.jpeg",
+				locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
 		}
 	}
 
 	@description = "This is a test for LPS-118979. The mappable fields are grouped by fieldset in display page template."
-	@priority = 4
+	@priority = "4"
 	test ViewMappableFieldsAreGroupedByFieldset {
 		task ("Add a custom Document type") {
-			DMNavigator.openDocumentTypesAdmin(siteURLKey = "test-site-name");
+			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+
+			DMNavigator.gotoDocumentType();
 
 			DMDocumentType.add(
 				dmDocumentTypeDescription = "DM Document Type Description",
@@ -1046,7 +1067,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1072,7 +1093,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1080,7 +1101,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Schedule",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -1117,7 +1138,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1125,7 +1146,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Content",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1133,7 +1154,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Configuration",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1141,7 +1162,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
@@ -1176,7 +1197,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Basic Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1184,7 +1205,7 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "File Information",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 
@@ -1198,14 +1219,14 @@ definition {
 				AssertElementPresent(
 					key_fieldLabel = "Field",
 					key_groupLabel = "Categorization",
-					key_value = ${field},
+					key_value = "${field}",
 					locator1 = "Select#GROUPED_SELECT_VALUE");
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-120504. View mapped image after sort documents in display page template."
-	@priority = 4
+	@priority = "4"
 	test ViewMappedImageAfterSortDocumentsInDisplayPageTemplate {
 		task ("Add a display page template based on Document and Basic Document") {
 			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
@@ -1242,7 +1263,7 @@ definition {
 		}
 
 		task ("Mark the display page template as default") {
-			PageEditor.publish();
+			PageEditor.clickPublish();
 
 			DisplayPageTemplatesAdmin.markDisplayPageAsDefault(displayPageName = "Document Display Page");
 		}
@@ -1281,9 +1302,9 @@ definition {
 
 			for (var title : list "Document Title 1,Document Title 2") {
 				AssertTextEquals(
-					key_assetTitle = ${title},
+					key_assetTitle = "${title}",
 					locator1 = "AP#ASSET_ABSTRACT_TITLE",
-					value1 = ${title});
+					value1 = "${title}");
 			}
 
 			AssetPublisherPortlet.clickAssetTitle(assetTitle = "Document Title 1");
@@ -1298,12 +1319,12 @@ definition {
 		}
 
 		task ("Assert the order of documents in Documents and Media") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title 2,Document Title 1") {
 				LexiconCard.viewCardOrder(
-					card = ${title},
-					index = ${n});
+					card = "${title}",
+					index = "${n}");
 
 				var n = ${n} + 1;
 			}
@@ -1314,12 +1335,12 @@ definition {
 		}
 
 		task ("Assert the order of documents in Documents and Media") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Document Title 1,Document Title 2") {
 				LexiconCard.viewCardOrder(
-					card = ${title},
-					index = ${n});
+					card = "${title}",
+					index = "${n}");
 
 				var n = ${n} + 1;
 			}
@@ -1335,8 +1356,9 @@ definition {
 	}
 
 	@description = "This is a test for LPS-118060. The contributed content types and their subtypes are available when creating a display page template."
-	@priority = 5
+	@priority = "5"
 	test ViewTypesDuringCreation {
+		property osgi.app.includes = "document-library-google-docs";
 		property portal.acceptance = "true";
 
 		task ("Add a custom Web Content structure") {
@@ -1356,7 +1378,9 @@ definition {
 		}
 
 		task ("Add a custom Document type") {
-			DMNavigator.openDocumentTypesAdmin(siteURLKey = "test-site-name");
+			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+
+			DMNavigator.gotoDocumentType();
 
 			DMDocumentType.add(
 				dmDocumentTypeDescription = "DM Document Type Description",
@@ -1376,7 +1400,7 @@ definition {
 			for (var contentType : list "Web Content Article,Document,Blogs Entry") {
 				AssertElementPresent(
 					key_fieldLabel = "Content Type",
-					key_value = ${contentType},
+					key_value = "${contentType}",
 					locator1 = "Select#GENERIC_SELECT_VALUE");
 			}
 
@@ -1390,14 +1414,12 @@ definition {
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Web Content Article");
 
-			WaitForEditable(
-				key_fieldLabel = "Subtype",
-				locator1 = "Select#GENERIC_SELECT_FIELD");
+			Pause(locator1 = "3000");
 
 			for (var subtype : list "Basic Web Content,WC Structure Name") {
 				AssertElementPresent(
 					key_fieldLabel = "Subtype",
-					key_value = ${subtype},
+					key_value = "${subtype}",
 					locator1 = "Select#GENERIC_SELECT_VALUE");
 			}
 
@@ -1406,14 +1428,12 @@ definition {
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "Document");
 
-			WaitForEditable(
-				key_fieldLabel = "Subtype",
-				locator1 = "Select#GENERIC_SELECT_FIELD");
+			Pause(locator1 = "3000");
 
 			for (var subtype : list "Basic Document,Google Drive Shortcut,DM Document Type Name") {
 				AssertElementPresent(
 					key_fieldLabel = "Subtype",
-					key_value = ${subtype},
+					key_value = "${subtype}",
 					locator1 = "Select#GENERIC_SELECT_VALUE");
 			}
 		}

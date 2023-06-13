@@ -44,11 +44,11 @@ public class AutoFillDDMFormRuleActionFactory {
 
 		return new AutoFillDDMFormRuleAction(
 			ddmDataProviderInstanceUUID,
-			_createAutoFillInputParameters(paramsExpression),
-			_createAutoFillOutputParameters(resultMapExpression));
+			createAutoFillInputParameters(paramsExpression),
+			createAutoFillOutputParameters(resultMapExpression));
 	}
 
-	private static Map<String, String> _createAutoFillInputParameters(
+	protected static Map<String, String> createAutoFillInputParameters(
 		String paramsExpression) {
 
 		Map<String, String> map = new LinkedHashMap<>();
@@ -63,7 +63,7 @@ public class AutoFillDDMFormRuleActionFactory {
 		for (String innerExpression : innerExpressions) {
 			String[] tokens = StringUtil.split(innerExpression, CharPool.EQUAL);
 
-			if (!_isValidExpression(tokens)) {
+			if (!isValidExpression(tokens)) {
 				continue;
 			}
 
@@ -73,7 +73,7 @@ public class AutoFillDDMFormRuleActionFactory {
 		return map;
 	}
 
-	private static Map<String, String> _createAutoFillOutputParameters(
+	protected static Map<String, String> createAutoFillOutputParameters(
 		String resultMapExpression) {
 
 		Map<String, String> map = new LinkedHashMap<>();
@@ -88,7 +88,7 @@ public class AutoFillDDMFormRuleActionFactory {
 		for (String innerExpression : innerExpressions) {
 			String[] tokens = StringUtil.split(innerExpression, CharPool.EQUAL);
 
-			if (!_isValidExpression(tokens)) {
+			if (!isValidExpression(tokens)) {
 				continue;
 			}
 
@@ -98,7 +98,7 @@ public class AutoFillDDMFormRuleActionFactory {
 		return map;
 	}
 
-	private static boolean _isValidExpression(String[] tokens) {
+	protected static boolean isValidExpression(String[] tokens) {
 		if ((tokens.length < 2) || Validator.isNull(tokens[0]) ||
 			Validator.isNull(tokens[1])) {
 

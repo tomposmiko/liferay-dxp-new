@@ -106,10 +106,10 @@ public class ContactCacheModel
 		sb.append(middleName);
 		sb.append(", lastName=");
 		sb.append(lastName);
-		sb.append(", prefixListTypeId=");
-		sb.append(prefixListTypeId);
-		sb.append(", suffixListTypeId=");
-		sb.append(suffixListTypeId);
+		sb.append(", prefixId=");
+		sb.append(prefixId);
+		sb.append(", suffixId=");
+		sb.append(suffixId);
 		sb.append(", male=");
 		sb.append(male);
 		sb.append(", birthday=");
@@ -201,8 +201,8 @@ public class ContactCacheModel
 			contactImpl.setLastName(lastName);
 		}
 
-		contactImpl.setPrefixListTypeId(prefixListTypeId);
-		contactImpl.setSuffixListTypeId(suffixListTypeId);
+		contactImpl.setPrefixId(prefixId);
+		contactImpl.setSuffixId(suffixId);
 		contactImpl.setMale(male);
 
 		if (birthday == Long.MIN_VALUE) {
@@ -310,9 +310,9 @@ public class ContactCacheModel
 		middleName = objectInput.readUTF();
 		lastName = objectInput.readUTF();
 
-		prefixListTypeId = objectInput.readLong();
+		prefixId = objectInput.readLong();
 
-		suffixListTypeId = objectInput.readLong();
+		suffixId = objectInput.readLong();
 
 		male = objectInput.readBoolean();
 		birthday = objectInput.readLong();
@@ -382,9 +382,9 @@ public class ContactCacheModel
 			objectOutput.writeUTF(lastName);
 		}
 
-		objectOutput.writeLong(prefixListTypeId);
+		objectOutput.writeLong(prefixId);
 
-		objectOutput.writeLong(suffixListTypeId);
+		objectOutput.writeLong(suffixId);
 
 		objectOutput.writeBoolean(male);
 		objectOutput.writeLong(birthday);
@@ -474,8 +474,8 @@ public class ContactCacheModel
 	public String firstName;
 	public String middleName;
 	public String lastName;
-	public long prefixListTypeId;
-	public long suffixListTypeId;
+	public long prefixId;
+	public long suffixId;
 	public boolean male;
 	public long birthday;
 	public String smsSn;

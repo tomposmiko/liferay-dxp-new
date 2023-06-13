@@ -19,6 +19,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
+import com.liferay.commerce.price.CommerceProductPriceCalculation;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.product.util.CPInstanceHelper;
@@ -47,6 +48,7 @@ public class CommerceCartContentTotalDisplayContext
 			CommerceOrderItemService commerceOrderItemService,
 			CommerceOrderPriceCalculation commerceOrderPriceCalculation,
 			CommerceOrderValidatorRegistry commerceOrderValidatorRegistry,
+			CommerceProductPriceCalculation commerceProductPriceCalculation,
 			CPDefinitionHelper cpDefinitionHelper,
 			CPInstanceHelper cpInstanceHelper,
 			ModelResourcePermission<CommerceOrder>
@@ -59,7 +61,8 @@ public class CommerceCartContentTotalDisplayContext
 			commerceChannelLocalService, commerceOrderItemService,
 			commerceOrderModelResourcePermission, commerceOrderPriceCalculation,
 			commerceOrderValidatorRegistry,
-			commerceProductPortletResourcePermission, cpDefinitionHelper,
+			commerceProductPortletResourcePermission,
+			commerceProductPriceCalculation, cpDefinitionHelper,
 			cpInstanceHelper, httpServletRequest, portal);
 
 		_commerceOrderHttpHelper = commerceOrderHttpHelper;

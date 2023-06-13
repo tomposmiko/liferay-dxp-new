@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author André de Oliveira
  */
-@Component(service = SearchRequestBuilderFactory.class)
+@Component(immediate = true, service = SearchRequestBuilderFactory.class)
 public class SearchRequestBuilderFactoryImpl
 	implements SearchRequestBuilderFactory {
 

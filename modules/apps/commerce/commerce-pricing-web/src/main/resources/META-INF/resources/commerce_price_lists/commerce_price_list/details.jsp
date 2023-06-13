@@ -96,7 +96,7 @@ if ((commercePriceList != null) && (commercePriceList.getExpirationDate() != nul
 					<aui:validator name="number" />
 				</aui:input>
 
-				<label class="control-label" for="parentCommercePriceListId"><liferay-ui:message key="parent-price-list" /></label>
+				<label class="control-label" for="parentCommercePriceListId"><%= LanguageUtil.get(request, "parent-price-list") %></label>
 
 				<div class="mb-4" id="autocomplete-root"></div>
 
@@ -131,15 +131,15 @@ if ((commercePriceList != null) && (commercePriceList.getExpirationDate() != nul
 				<aui:select label="price-type" name="netPrice">
 
 					<%
-					boolean netPrice = true;
+					boolean isNetPrice = true;
 
 					if (commercePriceList != null) {
-						netPrice = commercePriceList.isNetPrice();
+						isNetPrice = commercePriceList.isNetPrice();
 					}
 					%>
 
-					<aui:option label="net-price" selected="<%= netPrice %>" value="true" />
-					<aui:option label="gross-price" selected="<%= !netPrice %>" value="false" />
+					<aui:option label="net-price" selected="<%= isNetPrice %>" value="true" />
+					<aui:option label="gross-price" selected="<%= !isNetPrice %>" value="false" />
 				</aui:select>
 			</commerce-ui:panel>
 		</div>

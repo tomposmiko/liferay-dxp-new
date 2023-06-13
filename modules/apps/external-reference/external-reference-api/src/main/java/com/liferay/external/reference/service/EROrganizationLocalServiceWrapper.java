@@ -27,10 +27,6 @@ public class EROrganizationLocalServiceWrapper
 	implements EROrganizationLocalService,
 			   ServiceWrapper<EROrganizationLocalService> {
 
-	public EROrganizationLocalServiceWrapper() {
-		this(null);
-	}
-
 	public EROrganizationLocalServiceWrapper(
 		EROrganizationLocalService erOrganizationLocalService) {
 

@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.cluster;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.engine.adapter.cluster.ClusterRequestExecutor;
 import com.liferay.portal.search.engine.adapter.cluster.HealthClusterRequest;
@@ -27,7 +26,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Dylan Rebelak
@@ -41,17 +42,15 @@ public class ElasticsearchClusterRequestExecutorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_clusterRequestExecutor = new ElasticsearchClusterRequestExecutor();
+		MockitoAnnotations.initMocks(this);
 
-		ReflectionTestUtil.setFieldValue(
-			_clusterRequestExecutor, "_healthClusterRequestExecutor",
-			_healthClusterRequestExecutor);
-		ReflectionTestUtil.setFieldValue(
-			_clusterRequestExecutor, "_stateClusterRequestExecutor",
-			_stateClusterRequestExecutor);
-		ReflectionTestUtil.setFieldValue(
-			_clusterRequestExecutor, "_statsClusterRequestExecutor",
-			_statsClusterRequestExecutor);
+		_clusterRequestExecutor = new ElasticsearchClusterRequestExecutor() {
+			{
+				setHealthClusterRequestExecutor(_healthClusterRequestExecutor);
+				setStateClusterRequestExecutor(_stateClusterRequestExecutor);
+				setStatsClusterRequestExecutor(_statsClusterRequestExecutor);
+			}
+		};
 	}
 
 	@Test
@@ -97,11 +96,14 @@ public class ElasticsearchClusterRequestExecutorTest {
 	}
 
 	private ClusterRequestExecutor _clusterRequestExecutor;
-	private final HealthClusterRequestExecutor _healthClusterRequestExecutor =
-		Mockito.mock(HealthClusterRequestExecutor.class);
-	private final StateClusterRequestExecutor _stateClusterRequestExecutor =
-		Mockito.mock(StateClusterRequestExecutor.class);
-	private final StatsClusterRequestExecutor _statsClusterRequestExecutor =
-		Mockito.mock(StatsClusterRequestExecutor.class);
+
+	@Mock
+	private HealthClusterRequestExecutor _healthClusterRequestExecutor;
+
+	@Mock
+	private StateClusterRequestExecutor _stateClusterRequestExecutor;
+
+	@Mock
+	private StatsClusterRequestExecutor _statsClusterRequestExecutor;
 
 }

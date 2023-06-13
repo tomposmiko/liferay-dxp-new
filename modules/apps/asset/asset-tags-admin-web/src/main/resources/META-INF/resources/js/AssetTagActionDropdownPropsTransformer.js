@@ -12,15 +12,15 @@
  * details.
  */
 
-import openDeleteTagModal from './openDeleteTagModal';
-
 const ACTIONS = {
 	deleteTag({deleteTagURL}) {
-		openDeleteTagModal({
-			onDelete: () => {
-				submitForm(document.hrefFm, deleteTagURL);
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, deleteTagURL);
+		}
 	},
 };
 

@@ -283,8 +283,4 @@ public interface RatingsEntryModel
 	@Override
 	public RatingsEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -270,21 +268,48 @@ public abstract class UserGroupLocalServiceBaseImpl
 		return userGroupPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup fetchUserGroupByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
-		return userGroupPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
+		return userGroupPersistence.fetchByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserGroupByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public UserGroup fetchUserGroupByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return fetchUserGroupByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group
+	 * @throws PortalException if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup getUserGroupByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return userGroupPersistence.findByERC_C(
-			externalReferenceCode, companyId);
+		return userGroupPersistence.findByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
 	/**
@@ -423,11 +448,6 @@ public abstract class UserGroupLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement UserGroupLocalServiceImpl#deleteUserGroup(UserGroup) to avoid orphaned data");
-		}
 
 		return userGroupLocalService.deleteUserGroup((UserGroup)persistedModel);
 	}
@@ -763,42 +783,30 @@ public abstract class UserGroupLocalServiceBaseImpl
 	}
 
 	/**
-	 * @throws PortalException
 	 */
 	@Override
-	public void addUserUserGroup(long userId, long userGroupId)
-		throws PortalException {
-
+	public void addUserUserGroup(long userId, long userGroupId) {
 		userPersistence.addUserGroup(userId, userGroupId);
 	}
 
 	/**
-	 * @throws PortalException
 	 */
 	@Override
-	public void addUserUserGroup(long userId, UserGroup userGroup)
-		throws PortalException {
-
+	public void addUserUserGroup(long userId, UserGroup userGroup) {
 		userPersistence.addUserGroup(userId, userGroup);
 	}
 
 	/**
-	 * @throws PortalException
 	 */
 	@Override
-	public void addUserUserGroups(long userId, long[] userGroupIds)
-		throws PortalException {
-
+	public void addUserUserGroups(long userId, long[] userGroupIds) {
 		userPersistence.addUserGroups(userId, userGroupIds);
 	}
 
 	/**
-	 * @throws PortalException
 	 */
 	@Override
-	public void addUserUserGroups(long userId, List<UserGroup> userGroups)
-		throws PortalException {
-
+	public void addUserUserGroups(long userId, List<UserGroup> userGroups) {
 		userPersistence.addUserGroups(userId, userGroups);
 	}
 
@@ -1094,9 +1102,6 @@ public abstract class UserGroupLocalServiceBaseImpl
 
 	@BeanReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		UserGroupLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

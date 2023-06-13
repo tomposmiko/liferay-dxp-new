@@ -14,35 +14,29 @@
 
 package com.liferay.layout.admin.web.internal.servlet.taglib.util;
 
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownContextItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.layout.admin.web.internal.display.context.LayoutsAdminDisplayContext;
-import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.segments.service.SegmentsExperienceLocalServiceUtil;
 import com.liferay.translation.constants.TranslationActionKeys;
 import com.liferay.translation.security.permission.TranslationPermission;
 import com.liferay.translation.url.provider.TranslationURLProvider;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -67,10 +61,9 @@ public class LayoutActionDropdownItemsProvider {
 	}
 
 	public List<DropdownItem> getActionDropdownItems(
-			Layout layout, boolean includeAddChildPageAction)
-		throws Exception {
+		Layout layout, boolean includeAddChildPageAction) {
 
-		Layout draftLayout = _layoutsAdminDisplayContext.getDraftLayout(layout);
+		Layout draftLayout = layout.fetchDraftLayout();
 
 		return DropdownItemListBuilder.addGroup(
 			dropdownGroupItem -> {
@@ -82,20 +75,93 @@ public class LayoutActionDropdownItemsProvider {
 							 layout.isTypeContent()) &&
 							_layoutsAdminDisplayContext.isShowConfigureAction(
 								layout),
-						_getEditLayoutActionUnsafeConsumer(layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.getEditLayoutURL(
+									layout));
+
+							String label = LanguageUtil.get(
+								_httpServletRequest, "edit");
+
+							if (_layoutsAdminDisplayContext.isConversionDraft(
+									layout)) {
+
+								label = LanguageUtil.get(
+									_httpServletRequest,
+									"edit-conversion-draft");
+							}
+
+							dropdownItem.setLabel(label);
+						}
 					).add(
 						() -> _isShowTranslateAction(layout),
-						_getAutomaticTranslateLayoutActionUnsafeConsumer(
-							draftLayout, layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								PortletURLBuilder.create(
+									_translationURLProvider.getTranslateURL(
+										_themeDisplay.getScopeGroupId(),
+										PortalUtil.getClassNameId(
+											Layout.class.getName()),
+										BeanPropertiesUtil.getLong(
+											draftLayout, "plid",
+											layout.getPlid()),
+										RequestBackedPortletURLFactoryUtil.
+											create(_httpServletRequest))
+								).setRedirect(
+									PortalUtil.getCurrentURL(
+										_httpServletRequest)
+								).setPortletResource(
+									() -> {
+										PortletDisplay portletDisplay =
+											_themeDisplay.getPortletDisplay();
+
+										return portletDisplay.getId();
+									}
+								).buildString());
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "translate"));
+						}
 					).add(
-						_getPreviewLayoutActionUnsafeConsumer(
-							draftLayout, layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.getViewLayoutURL(
+									layout));
+
+							String label = LanguageUtil.get(
+								_httpServletRequest, "view");
+
+							if (layout.isDenied() || layout.isPending()) {
+								label = LanguageUtil.get(
+									_httpServletRequest, "preview");
+							}
+
+							dropdownItem.setLabel(label);
+
+							if (layout.isTypeContent() &&
+								!GetterUtil.getBoolean(
+									draftLayout.getTypeSettingsProperty(
+										"published"))) {
+
+								dropdownItem.setDisabled(true);
+							}
+						}
 					).add(
 						() ->
 							_layoutsAdminDisplayContext.
 								isShowViewCollectionItemsAction(layout),
-						_getViewCollectionItemsLayoutActionUnsafeConsumer(
-							layout)
+						dropdownItem -> {
+							dropdownItem.putData(
+								"action", "viewCollectionItems");
+							dropdownItem.putData(
+								"viewCollectionItemsURL",
+								_layoutsAdminDisplayContext.
+									getViewCollectionItemsURL(layout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest,
+									"view-collection-items"));
+						}
 					).build());
 				dropdownGroupItem.setSeparator(true);
 			}
@@ -107,55 +173,169 @@ public class LayoutActionDropdownItemsProvider {
 							includeAddChildPageAction &&
 							_layoutsAdminDisplayContext.
 								isShowAddChildPageAction(layout),
-						_getAddLayoutActionUnsafeConsumer(layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.
+									getSelectLayoutPageTemplateEntryURL(
+										_layoutsAdminDisplayContext.
+											getFirstLayoutPageTemplateCollectionId(),
+										layout.getPlid(),
+										layout.isPrivateLayout()));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "add-page"));
+						}
 					).add(
 						() ->
 							_layoutsAdminDisplayContext.
 								isShowConvertLayoutAction(layout) &&
 							(draftLayout == null),
-						_getConvertToContentPageLayoutActionUnsafeConsumer(
-							layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.
+									getLayoutConversionPreviewURL(layout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest,
+									"convert-to-content-page..."));
+						}
 					).add(
 						() ->
 							_layoutsAdminDisplayContext.
 								isShowConvertLayoutAction(layout) &&
 							(draftLayout != null),
-						_getDiscardConversionDraftLayoutActionUnsafeConsumer(
-							draftLayout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.getDeleteLayoutURL(
+									draftLayout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest,
+									"discard-conversion-draft"));
+						}
 					).add(
-						() ->
-							_layoutsAdminDisplayContext.
-								isShowPreviewDraftActions(layout),
-						_getPreviewDraftLayoutActionUnsafeConsumer(layout)
+						() -> _layoutsAdminDisplayContext.isShowDraftActions(
+							layout),
+						dropdownItem -> {
+							dropdownItem.put("symbolRight", "shortcut");
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.getPreviewDraftURL(
+									layout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "preview-draft"));
+							dropdownItem.setTarget("_blank");
+						}
 					).add(
-						() ->
-							_layoutsAdminDisplayContext.
-								isShowDiscardDraftActions(layout),
-						_getDiscardDraftLayoutActionUnsafeConsumer(layout)
+						() -> _layoutsAdminDisplayContext.isShowDraftActions(
+							layout),
+						dropdownItem -> {
+							dropdownItem.putData("action", "discardDraft");
+							dropdownItem.putData(
+								"discardDraftURL",
+								_layoutsAdminDisplayContext.getDiscardDraftURL(
+									layout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "discard-draft"));
+						}
 					).add(
 						() ->
 							_layoutsAdminDisplayContext.
 								isShowOrphanPortletsAction(layout),
-						_getOrphanWidgetsLayoutActionUnsafeConsumer(layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.
+									getOrphanPortletsURL(layout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "orphan-widgets"));
+						}
 					).build());
 				dropdownGroupItem.setSeparator(true);
 			}
 		).addGroup(
 			dropdownGroupItem -> {
 				dropdownGroupItem.setDropdownItems(
-					DropdownItemListBuilder.addContext(
-						_getCopyLayoutWithPermissionsActionUnsafeConsumer(
-							layout)
+					DropdownItemListBuilder.add(
+						dropdownItem -> {
+							dropdownItem.putData("action", "copyLayout");
+							dropdownItem.putData(
+								"copyLayoutURL",
+								_layoutsAdminDisplayContext.
+									getCopyLayoutRenderURL(layout));
+
+							if (!_layoutsAdminDisplayContext.
+									isShowCopyLayoutAction(layout)) {
+
+								dropdownItem.setDisabled(true);
+							}
+
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "copy-page"));
+						}
 					).add(
-						() ->
-							_layoutsAdminDisplayContext.
-								isShowExportTranslationAction(layout),
-						_getExportForTranslationLayoutActionUnsafeConsumer(
-							draftLayout, layout)
+						() -> _isShowExportTranslationAction(layout),
+						dropdownItem -> {
+							dropdownItem.setHref(
+								PortletURLBuilder.create(
+									_translationURLProvider.
+										getExportTranslationURL(
+											layout.getGroupId(),
+											PortalUtil.getClassNameId(
+												Layout.class.getName()),
+											BeanPropertiesUtil.getLong(
+												draftLayout, "plid",
+												layout.getPlid()),
+											RequestBackedPortletURLFactoryUtil.
+												create(_httpServletRequest))
+								).setRedirect(
+									PortalUtil.getCurrentURL(
+										_httpServletRequest)
+								).setPortletResource(
+									() -> {
+										PortletDisplay portletDisplay =
+											_themeDisplay.getPortletDisplay();
+
+										return portletDisplay.getId();
+									}
+								).buildString());
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest,
+									"export-for-translation"));
+						}
 					).add(
 						() -> _isShowImportTranslationAction(layout),
-						_getImportTranslationLayoutActionUnsafeConsumer(
-							draftLayout, layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								PortletURLBuilder.create(
+									_translationURLProvider.
+										getImportTranslationURL(
+											layout.getGroupId(),
+											PortalUtil.getClassNameId(
+												Layout.class.getName()),
+											BeanPropertiesUtil.getLong(
+												draftLayout, "plid",
+												layout.getPlid()),
+											RequestBackedPortletURLFactoryUtil.
+												create(_httpServletRequest))
+								).setRedirect(
+									PortalUtil.getCurrentURL(
+										_httpServletRequest)
+								).setPortletResource(
+									() -> {
+										PortletDisplay portletDisplay =
+											_themeDisplay.getPortletDisplay();
+
+										return portletDisplay.getId();
+									}
+								).buildString());
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "import-translation"));
+						}
 					).build());
 				dropdownGroupItem.setSeparator(true);
 			}
@@ -165,12 +345,28 @@ public class LayoutActionDropdownItemsProvider {
 					DropdownItemListBuilder.add(
 						() -> _layoutsAdminDisplayContext.isShowConfigureAction(
 							layout),
-						_getConfigureLayoutActionUnsafeConsumer(layout)
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_layoutsAdminDisplayContext.
+									getConfigureLayoutURL(layout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "configure"));
+						}
 					).add(
 						() ->
 							_layoutsAdminDisplayContext.isShowPermissionsAction(
 								layout),
-						_getPermissionLayoutActionUnsafeConsumer(layout)
+						dropdownItem -> {
+							dropdownItem.putData("action", "permissionLayout");
+							dropdownItem.putData(
+								"permissionLayoutURL",
+								_layoutsAdminDisplayContext.getPermissionsURL(
+									layout));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "permissions"));
+						}
 					).build());
 				dropdownGroupItem.setSeparator(true);
 			}
@@ -180,352 +376,46 @@ public class LayoutActionDropdownItemsProvider {
 					DropdownItemListBuilder.add(
 						() -> _layoutsAdminDisplayContext.isShowDeleteAction(
 							layout),
-						_getDeleteLayoutActionUnsafeConsumer(layout)
+						dropdownItem -> {
+							dropdownItem.putData("action", "deleteLayout");
+							dropdownItem.putData(
+								"deleteLayoutURL",
+								_layoutsAdminDisplayContext.getDeleteLayoutURL(
+									layout));
+
+							String messageKey =
+								"are-you-sure-you-want-to-delete-this-page";
+
+							if (layout.hasChildren() &&
+								_hasScopeGroup(layout)) {
+
+								messageKey =
+									"this-page-is-being-used-as-a-scope-for-" +
+										"content-and-also-has-child-pages";
+							}
+							else if (layout.hasChildren()) {
+								messageKey =
+									"this-page-has-child-pages-that-will-" +
+										"also-be-removed";
+							}
+							else if (_hasScopeGroup(layout)) {
+								messageKey =
+									"this-page-is-being-used-as-a-scope-for-" +
+										"content";
+							}
+
+							dropdownItem.putData(
+								"message",
+								LanguageUtil.get(
+									_httpServletRequest, messageKey));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "delete"));
+						}
 					).build());
 				dropdownGroupItem.setSeparator(true);
 			}
 		).build();
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getAddLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(
-					0, layout.getPlid(), layout.isPrivateLayout()));
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "add-page"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getAutomaticTranslateLayoutActionUnsafeConsumer(
-			Layout draftLayout, Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				PortletURLBuilder.create(
-					_translationURLProvider.getTranslateURL(
-						_themeDisplay.getScopeGroupId(),
-						PortalUtil.getClassNameId(Layout.class.getName()),
-						BeanPropertiesUtil.getLong(
-							draftLayout, "plid", layout.getPlid()),
-						RequestBackedPortletURLFactoryUtil.create(
-							_httpServletRequest))
-				).setRedirect(
-					PortalUtil.getCurrentURL(_httpServletRequest)
-				).setPortletResource(
-					() -> {
-						PortletDisplay portletDisplay =
-							_themeDisplay.getPortletDisplay();
-
-						return portletDisplay.getId();
-					}
-				).setParameter(
-					"segmentsExperienceId",
-					SegmentsExperienceLocalServiceUtil.
-						fetchDefaultSegmentsExperienceId(layout.getPlid())
-				).buildString());
-			dropdownItem.setIcon("automatic-translate");
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "translate"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getConfigureLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getConfigureLayoutURL(layout));
-			dropdownItem.setIcon("cog");
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "configure"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getConvertToContentPageLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getLayoutConversionPreviewURL(
-					layout));
-			dropdownItem.setIcon("page");
-			dropdownItem.setLabel(
-				LanguageUtil.get(
-					_httpServletRequest, "convert-to-content-page..."));
-		};
-	}
-
-	private UnsafeConsumer<DropdownContextItem, Exception>
-		_getCopyLayoutWithPermissionsActionUnsafeConsumer(Layout layout) {
-
-		return dropdownContextItem -> {
-			if (_layoutsAdminDisplayContext.isShowCopyLayoutAction(layout)) {
-				dropdownContextItem.setDropdownItems(
-					DropdownItemListBuilder.add(
-						dropdownItem -> {
-							dropdownItem.putData("action", "copyLayout");
-							dropdownItem.putData(
-								"copyLayoutURL",
-								_layoutsAdminDisplayContext.
-									getCopyLayoutRenderURL(false, layout));
-							dropdownItem.setLabel(
-								LanguageUtil.get(_httpServletRequest, "page"));
-						}
-					).add(
-						dropdownItem -> {
-							dropdownItem.putData(
-								"action", "copyLayoutWithPermissions");
-							dropdownItem.putData(
-								"copyLayoutURL",
-								_layoutsAdminDisplayContext.
-									getCopyLayoutRenderURL(true, layout));
-							dropdownItem.setLabel(
-								LanguageUtil.get(
-									_httpServletRequest,
-									"page-with-permissions"));
-						}
-					).build());
-			}
-			else {
-				dropdownContextItem.setDisabled(true);
-			}
-
-			dropdownContextItem.setIcon("copy");
-			dropdownContextItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "copy"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getDeleteLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.putData("action", "deleteLayout");
-			dropdownItem.putData(
-				"deleteLayoutURL",
-				_layoutsAdminDisplayContext.getDeleteLayoutURL(layout));
-
-			String messageKey =
-				"are-you-sure-you-want-to-delete-the-page-x.-it-will-be-" +
-					"removed-immediately";
-
-			if (layout.hasChildren() && _hasScopeGroup(layout)) {
-				messageKey = StringBundler.concat(
-					"are-you-sure-you-want-to-delete-the-page-x.-this-page-",
-					"serves-as-a-scope-for-content-and-also-contains-child-",
-					"pages");
-			}
-			else if (layout.hasChildren()) {
-				messageKey =
-					"are-you-sure-you-want-to-delete-the-page-x.-this-page-" +
-						"contains-child-pages-that-will-also-be-removed";
-			}
-			else if (_hasScopeGroup(layout)) {
-				messageKey =
-					"are-you-sure-you-want-to-delete-the-page-x.-this-page-" +
-						"serves-as-a-scope-for-content";
-			}
-
-			dropdownItem.putData(
-				"message",
-				LanguageUtil.format(
-					_httpServletRequest, messageKey,
-					HtmlUtil.escape(
-						layout.getName(_themeDisplay.getLocale()))));
-
-			dropdownItem.setIcon("trash");
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "delete"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getDiscardConversionDraftLayoutActionUnsafeConsumer(
-			Layout draftLayout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getDeleteLayoutURL(draftLayout));
-			dropdownItem.setLabel(
-				LanguageUtil.get(
-					_httpServletRequest, "discard-conversion-draft"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getDiscardDraftLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.putData("action", "discardDraft");
-			dropdownItem.putData(
-				"discardDraftURL",
-				_layoutsAdminDisplayContext.getDiscardDraftURL(layout));
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "discard-draft"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getEditLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getEditLayoutURL(layout));
-			dropdownItem.setIcon("pencil");
-
-			String label = LanguageUtil.get(_httpServletRequest, "edit");
-
-			if (_layoutsAdminDisplayContext.isConversionDraft(layout)) {
-				label = LanguageUtil.get(
-					_httpServletRequest, "edit-conversion-draft");
-			}
-
-			dropdownItem.setLabel(label);
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getExportForTranslationLayoutActionUnsafeConsumer(
-			Layout draftLayout, Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				PortletURLBuilder.create(
-					_translationURLProvider.getExportTranslationURL(
-						layout.getGroupId(),
-						PortalUtil.getClassNameId(Layout.class.getName()),
-						BeanPropertiesUtil.getLong(
-							draftLayout, "plid", layout.getPlid()),
-						RequestBackedPortletURLFactoryUtil.create(
-							_httpServletRequest))
-				).setRedirect(
-					PortalUtil.getCurrentURL(_httpServletRequest)
-				).setPortletResource(
-					() -> {
-						PortletDisplay portletDisplay =
-							_themeDisplay.getPortletDisplay();
-
-						return portletDisplay.getId();
-					}
-				).buildString());
-			dropdownItem.setIcon("upload");
-			dropdownItem.setLabel(
-				LanguageUtil.get(
-					_httpServletRequest, "export-for-translation"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getImportTranslationLayoutActionUnsafeConsumer(
-			Layout draftLayout, Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				PortletURLBuilder.create(
-					_translationURLProvider.getImportTranslationURL(
-						layout.getGroupId(),
-						PortalUtil.getClassNameId(Layout.class.getName()),
-						BeanPropertiesUtil.getLong(
-							draftLayout, "plid", layout.getPlid()),
-						RequestBackedPortletURLFactoryUtil.create(
-							_httpServletRequest))
-				).setRedirect(
-					PortalUtil.getCurrentURL(_httpServletRequest)
-				).setPortletResource(
-					() -> {
-						PortletDisplay portletDisplay =
-							_themeDisplay.getPortletDisplay();
-
-						return portletDisplay.getId();
-					}
-				).buildString());
-			dropdownItem.setIcon("download");
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "import-translation"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getOrphanWidgetsLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getOrphanPortletsURL(layout));
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "orphan-widgets"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getPermissionLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.putData("action", "permissionLayout");
-			dropdownItem.putData(
-				"permissionLayoutURL",
-				_layoutsAdminDisplayContext.getPermissionsURL(layout));
-			dropdownItem.setIcon("password-policies");
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "permissions"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getPreviewDraftLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.put("symbolRight", "shortcut");
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getPreviewDraftURL(layout));
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "preview-draft"));
-			dropdownItem.setTarget("_blank");
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getPreviewLayoutActionUnsafeConsumer(
-			Layout draftLayout, Layout layout) {
-
-		return dropdownItem -> {
-			if (layout.isTypeContent() &&
-				!GetterUtil.getBoolean(
-					draftLayout.getTypeSettingsProperty("published"))) {
-
-				dropdownItem.setDisabled(true);
-			}
-
-			dropdownItem.setHref(
-				_layoutsAdminDisplayContext.getViewLayoutURL(layout));
-			dropdownItem.setIcon("view");
-
-			String label = LanguageUtil.get(_httpServletRequest, "view");
-
-			if (layout.isDenied() || layout.isPending()) {
-				label = LanguageUtil.get(_httpServletRequest, "preview");
-			}
-
-			dropdownItem.setLabel(label);
-			dropdownItem.setTarget(
-				HtmlUtil.escape(layout.getTypeSettingsProperty("target")));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getViewCollectionItemsLayoutActionUnsafeConsumer(Layout layout) {
-
-		return dropdownItem -> {
-			dropdownItem.putData("action", "viewCollectionItems");
-			dropdownItem.putData(
-				"viewCollectionItemsURL",
-				_layoutsAdminDisplayContext.getViewCollectionItemsURL(layout));
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "view-collection-items"));
-		};
 	}
 
 	private boolean _hasScopeGroup(Layout layout) throws Exception {
@@ -560,10 +450,17 @@ public class LayoutActionDropdownItemsProvider {
 		return false;
 	}
 
+	private boolean _isShowExportTranslationAction(Layout layout) {
+		if (layout.isTypeContent() && !_isSingleLanguageSite()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private boolean _isShowImportTranslationAction(Layout layout) {
 		try {
-			if (layout.isTypeContent() &&
-				!_layoutsAdminDisplayContext.isSingleLanguageSite() &&
+			if (layout.isTypeContent() && !_isSingleLanguageSite() &&
 				LayoutPermissionUtil.contains(
 					_themeDisplay.getPermissionChecker(), layout,
 					ActionKeys.UPDATE)) {
@@ -574,17 +471,13 @@ public class LayoutActionDropdownItemsProvider {
 			return false;
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
 			return false;
 		}
 	}
 
 	private boolean _isShowTranslateAction(Layout layout) {
 		if (layout.isTypeContent() && _hasTranslatePermission() &&
-			!_layoutsAdminDisplayContext.isSingleLanguageSite()) {
+			!_isSingleLanguageSite()) {
 
 			return true;
 		}
@@ -592,8 +485,16 @@ public class LayoutActionDropdownItemsProvider {
 		return false;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutActionDropdownItemsProvider.class);
+	private boolean _isSingleLanguageSite() {
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(
+			_themeDisplay.getSiteGroupId());
+
+		if (availableLocales.size() == 1) {
+			return true;
+		}
+
+		return false;
+	}
 
 	private final HttpServletRequest _httpServletRequest;
 	private final LayoutsAdminDisplayContext _layoutsAdminDisplayContext;

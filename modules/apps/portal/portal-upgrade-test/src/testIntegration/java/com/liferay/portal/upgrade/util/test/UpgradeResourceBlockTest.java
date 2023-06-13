@@ -24,14 +24,12 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.DBAssertionUtil;
 import com.liferay.portal.kernel.test.util.RoleTestUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.upgrade.util.BaseUpgradeResourceBlock;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -58,7 +56,7 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 
 		_siteRole = RoleTestUtil.addRole(RoleConstants.TYPE_SITE);
 
-		_connection = DataAccess.getConnection();
+		connection = DataAccess.getConnection();
 
 		runSQL(
 			StringBundler.concat(
@@ -144,19 +142,19 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 
 	@After
 	public void tearDown() throws Exception {
-		dropTable("ResourceBlock");
+		runSQL("drop table ResourceBlock");
 
-		dropTable("ResourceBlockPermission");
+		runSQL("drop table ResourceBlockPermission");
 
-		dropTable("ResourceTypePermission");
+		runSQL("drop table ResourceTypePermission");
 
 		runSQL(
 			"delete from ResourcePermission where name = '" +
 				UpgradeResourceBlockTest.class.getName() + "'");
 
-		dropTable(getTableName());
+		runSQL(TableClass.TABLE_SQL_DROP);
 
-		_connection.close();
+		connection.close();
 	}
 
 	@Test
@@ -167,6 +165,25 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 	@Test
 	public void testUpgradeWithUserId() throws Exception {
 		_testUpgrade(true);
+	}
+
+	public static class TableClass {
+
+		public static final Object[][] TABLE_COLUMNS = {
+			{"id_", Types.BIGINT}, {"userId", Types.BIGINT}
+		};
+
+		public static final String TABLE_NAME = "UpgradeResourceBlockTest";
+
+		public static final String[] TABLE_SQL_ADD_INDEXES = {};
+
+		public static final String TABLE_SQL_CREATE =
+			"create table UpgradeResourceBlockTest(id_ LONG not null primary " +
+				"key, userId LONG, resourceBlockId LONG)";
+
+		public static final String TABLE_SQL_DROP =
+			"drop table UpgradeResourceBlockTest";
+
 	}
 
 	@Override
@@ -180,8 +197,8 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 	}
 
 	@Override
-	protected String getTableName() {
-		return "UpgradeResourceBlockTest";
+	protected Class<?> getTableClass() {
+		return TableClass.class;
 	}
 
 	@Override
@@ -213,7 +230,7 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 	private void _assertRowsRemoved(String tableName, String primaryKeyName)
 		throws Exception {
 
-		try (PreparedStatement preparedStatement = _connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				StringBundler.concat(
 					"select * from ", tableName, " where ", primaryKeyName,
 					" < 0"));
@@ -242,15 +259,11 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 		_hasUserId = hasUserId;
 
 		DBAssertionUtil.assertColumns(
-			getTableName(), "id_", "userId", "resourceBlockId");
+			TableClass.TABLE_NAME, "id_", "userId", "resourceBlockId");
 
-		for (UpgradeStep upgradeStep : getUpgradeSteps()) {
-			UpgradeProcess upgradeProcess = (UpgradeProcess)upgradeStep;
+		doUpgrade();
 
-			upgradeProcess.upgrade();
-		}
-
-		try (PreparedStatement preparedStatement = _connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select * from ResourcePermission where name = '" +
 					UpgradeResourceBlockTest.class.getName() +
 						"' order by scope");
@@ -283,7 +296,7 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 			Assert.assertFalse(resultSet.next());
 		}
 
-		DBAssertionUtil.assertColumns(getTableName(), "id_", "userId");
+		DBAssertionUtil.assertColumns(TableClass.TABLE_NAME, "id_", "userId");
 
 		_assertRowsRemoved("ResourceBlock", "resourceBlockId");
 		_assertRowsRemoved(
@@ -307,8 +320,6 @@ public class UpgradeResourceBlockTest extends BaseUpgradeResourceBlock {
 	private static final long _RESOURCE_PRIMARY_KEY = -8;
 
 	private static final long _USER_ID = -9;
-
-	private static Connection _connection;
 
 	private boolean _hasUserId;
 

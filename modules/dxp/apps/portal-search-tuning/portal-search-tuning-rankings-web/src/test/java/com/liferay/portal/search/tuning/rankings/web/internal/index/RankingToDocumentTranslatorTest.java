@@ -14,8 +14,6 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.index;
 
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
 import com.liferay.portal.search.internal.document.DocumentBuilderFactoryImpl;
@@ -25,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,8 +44,8 @@ public class RankingToDocumentTranslatorTest {
 
 	@Before
 	public void setUp() {
-		_documentToRankingTranslator = _createDocumentToRankingTranslator();
-		_rankingToDocumentTranslator = _createRankingToDocumentTranslator();
+		_documentToRankingTranslator = createDocumentToRankingTranslator();
+		_rankingToDocumentTranslator = createRankingToDocumentTranslator();
 	}
 
 	@Test
@@ -133,31 +133,35 @@ public class RankingToDocumentTranslatorTest {
 			String.valueOf(ranking2.getQueryStrings()));
 	}
 
+	protected static DocumentToRankingTranslator
+		createDocumentToRankingTranslator() {
+
+		return new DocumentToRankingTranslatorImpl();
+	}
+
+	protected static RankingToDocumentTranslatorImpl
+		createRankingToDocumentTranslator() {
+
+		return new RankingToDocumentTranslatorImpl() {
+			{
+				setDocumentBuilderFactory(new DocumentBuilderFactoryImpl());
+			}
+		};
+	}
+
 	protected Document translate(Ranking ranking) {
 		return _rankingToDocumentTranslator.translate(ranking);
 	}
 
-	private DocumentToRankingTranslator _createDocumentToRankingTranslator() {
-		return new DocumentToRankingTranslatorImpl();
-	}
-
-	private RankingToDocumentTranslatorImpl
-		_createRankingToDocumentTranslator() {
-
-		RankingToDocumentTranslatorImpl rankingToDocumentTranslatorImpl =
-			new RankingToDocumentTranslatorImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			rankingToDocumentTranslatorImpl, "_documentBuilderFactory",
-			new DocumentBuilderFactoryImpl());
-
-		return rankingToDocumentTranslatorImpl;
-	}
-
 	private String _toString(List<Ranking.Pin> pins) {
+		Stream<Ranking.Pin> stream = pins.stream();
+
 		return String.valueOf(
-			TransformUtil.transform(
-				pins, pin -> pin.getPosition() + "=" + pin.getDocumentId()));
+			stream.map(
+				pin -> pin.getPosition() + "=" + pin.getDocumentId()
+			).collect(
+				Collectors.toList()
+			));
 	}
 
 	private DocumentToRankingTranslator _documentToRankingTranslator;

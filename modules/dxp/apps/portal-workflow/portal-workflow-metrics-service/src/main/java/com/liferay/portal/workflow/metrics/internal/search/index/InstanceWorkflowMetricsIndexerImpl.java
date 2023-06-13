@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = InstanceWorkflowMetricsIndexer.class)
+@Component(immediate = true, service = InstanceWorkflowMetricsIndexer.class)
 public class InstanceWorkflowMetricsIndexerImpl
 	extends BaseWorkflowMetricsIndexer
 	implements InstanceWorkflowMetricsIndexer {
@@ -49,9 +49,7 @@ public class InstanceWorkflowMetricsIndexerImpl
 
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
-		documentBuilder.setValue(
-			"active", true
-		).setString(
+		documentBuilder.setString(
 			"className", className
 		).setLong(
 			"classPK", classPK
@@ -144,14 +142,43 @@ public class InstanceWorkflowMetricsIndexerImpl
 			() -> {
 				updateDocument(document);
 
-				_updateDocuments(
+				BooleanQuery booleanQuery = queries.booleanQuery();
+
+				booleanQuery.addMustQueryClauses(
+					queries.term("companyId", companyId),
+					queries.term("instanceId", instanceId));
+
+				_slaInstanceResultWorkflowMetricsIndexer.updateDocuments(
 					companyId,
 					HashMapBuilder.<String, Object>put(
 						"completionDate", document.getDate("completionDate")
 					).put(
 						"instanceCompleted", Boolean.TRUE
 					).build(),
-					instanceId);
+					booleanQuery);
+
+				_slaTaskResultWorkflowMetricsIndexer.updateDocuments(
+					companyId,
+					HashMapBuilder.<String, Object>put(
+						"instanceCompleted", Boolean.TRUE
+					).put(
+						"instanceCompletionDate",
+						document.getDate("completionDate")
+					).build(),
+					booleanQuery);
+
+				BaseWorkflowMetricsIndexer baseWorkflowMetricsIndexer =
+					(BaseWorkflowMetricsIndexer)_taskWorkflowMetricsIndexer;
+
+				baseWorkflowMetricsIndexer.updateDocuments(
+					companyId,
+					HashMapBuilder.<String, Object>put(
+						"instanceCompleted", Boolean.TRUE
+					).put(
+						"instanceCompletionDate",
+						document.getDate("completionDate")
+					).build(),
+					booleanQuery);
 			});
 
 		return document;
@@ -193,15 +220,12 @@ public class InstanceWorkflowMetricsIndexerImpl
 
 	@Override
 	public Document updateInstance(
-		boolean active, Map<Locale, String> assetTitleMap,
-		Map<Locale, String> assetTypeMap, long companyId, long instanceId,
-		Date modifiedDate) {
+		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
+		long companyId, long instanceId, Date modifiedDate) {
 
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
-		documentBuilder.setValue(
-			"active", active
-		).setLong(
+		documentBuilder.setLong(
 			"companyId", companyId
 		).setDate(
 			"modifiedDate", getDate(modifiedDate)
@@ -214,17 +238,7 @@ public class InstanceWorkflowMetricsIndexerImpl
 
 		Document document = documentBuilder.build();
 
-		workflowMetricsPortalExecutor.execute(
-			() -> {
-				updateDocument(document);
-
-				_updateDocuments(
-					companyId,
-					HashMapBuilder.<String, Object>put(
-						"active", active
-					).build(),
-					instanceId);
-			});
+		workflowMetricsPortalExecutor.execute(() -> updateDocument(document));
 
 		return document;
 	}
@@ -234,28 +248,6 @@ public class InstanceWorkflowMetricsIndexerImpl
 			createDate.toInstant(), completionDate.toInstant());
 
 		return duration.toMillis();
-	}
-
-	private void _updateDocuments(
-		long companyId, Map<String, Object> fieldsMap, long instanceId) {
-
-		BooleanQuery booleanQuery = queries.booleanQuery();
-
-		booleanQuery.addMustQueryClauses(
-			queries.term("companyId", companyId),
-			queries.term("instanceId", instanceId));
-
-		_slaInstanceResultWorkflowMetricsIndexer.updateDocuments(
-			companyId, fieldsMap, booleanQuery);
-
-		_slaTaskResultWorkflowMetricsIndexer.updateDocuments(
-			companyId, fieldsMap, booleanQuery);
-
-		BaseWorkflowMetricsIndexer baseWorkflowMetricsIndexer =
-			(BaseWorkflowMetricsIndexer)_taskWorkflowMetricsIndexer;
-
-		baseWorkflowMetricsIndexer.updateDocuments(
-			companyId, fieldsMap, booleanQuery);
 	}
 
 	@Reference(target = "(workflow.metrics.index.entity.name=instance)")

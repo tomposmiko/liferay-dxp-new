@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.taglib.servlet.taglib;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -55,10 +56,13 @@ public class TierPriceTag extends IncludeTag {
 				(CommerceContext)httpServletRequest.getAttribute(
 					CommerceWebKeys.COMMERCE_CONTEXT);
 
-			CommercePriceList commercePriceList = _getPriceList(
-				_cpInstanceId, commerceContext);
+			Optional<CommercePriceList> commercePriceListOptional =
+				_getPriceList(_cpInstanceId, commerceContext);
 
-			if (commercePriceList != null) {
+			if (commercePriceListOptional.isPresent()) {
+				CommercePriceList commercePriceList =
+					commercePriceListOptional.get();
+
 				CommercePriceEntry commercePriceEntry =
 					CommercePriceEntryLocalServiceUtil.fetchCommercePriceEntry(
 						_cpInstanceId,
@@ -89,7 +93,7 @@ public class TierPriceTag extends IncludeTag {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return SKIP_BODY;
@@ -171,21 +175,22 @@ public class TierPriceTag extends IncludeTag {
 
 	protected CommercePriceFormatter commercePriceFormatter;
 
-	private CommercePriceList _getPriceList(
+	private Optional<CommercePriceList> _getPriceList(
 			long cpInstanceId, CommerceContext commerceContext)
 		throws PortalException {
 
-		AccountEntry accountEntry = commerceContext.getAccountEntry();
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
 
-		if (accountEntry == null) {
-			return null;
+		if (commerceAccount == null) {
+			return Optional.empty();
 		}
 
 		CPInstance cpInstance = CPInstanceLocalServiceUtil.getCPInstance(
 			cpInstanceId);
 
 		return _commercePriceListLocalService.getCommercePriceList(
-			cpInstance.getGroupId(), accountEntry.getAccountEntryId(),
+			commerceAccount.getCompanyId(), cpInstance.getGroupId(),
+			commerceAccount.getCommerceAccountId(),
 			commerceContext.getCommerceAccountGroupIds());
 	}
 

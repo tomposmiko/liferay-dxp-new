@@ -14,14 +14,9 @@
 
 package com.liferay.portal.search.similar.results.web.internal.portlet.shared.search;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -42,13 +37,9 @@ import com.liferay.portal.search.similar.results.web.spi.contributor.helper.Crit
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -58,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Wade Cao
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SimilarResultsPortletKeys.SIMILAR_RESULTS,
 	service = PortletSharedSearchContributor.class
 )
@@ -68,56 +60,39 @@ public class SimilarResultsPortletSharedSearchContributor
 	public void contribute(
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
-		SimilarResultsRoute similarResultsRoute =
+		Optional<SimilarResultsRoute> optional =
 			similarResultsContributorsRegistry.detectRoute(
-				_getURLString(portletSharedSearchSettings));
+				getURLString(portletSharedSearchSettings));
 
-		if (similarResultsRoute == null) {
-			return;
-		}
-
-		SimilarResultsContributor similarResultsContributor =
-			similarResultsRoute.getContributor();
-
-		CriteriaBuilderImpl criteriaBuilderImpl = new CriteriaBuilderImpl();
-
-		CriteriaHelper criteriaHelper = new CriteriaHelperImpl(
-			getGroupId(portletSharedSearchSettings), similarResultsRoute);
-
-		similarResultsContributor.resolveCriteria(
-			criteriaBuilderImpl, criteriaHelper);
-
-		Criteria criteria = criteriaBuilderImpl.build();
-
-		if (criteria != null) {
-			contribute(criteria, portletSharedSearchSettings);
-		}
+		optional.flatMap(
+			similarResultsRoute -> getSimilarResultsInputOptional(
+				getGroupId(portletSharedSearchSettings), similarResultsRoute)
+		).ifPresent(
+			similarResultsInput -> contribute(
+				similarResultsInput, portletSharedSearchSettings)
+		);
 	}
 
 	protected void contribute(
 		Criteria criteria,
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
-		Optional<PortletPreferences> portletPreferencesOptional =
-			portletSharedSearchSettings.getPortletPreferencesOptional();
-
 		SimilarResultsPortletPreferences similarResultsPortletPreferences =
 			new SimilarResultsPortletPreferencesImpl(
-				portletPreferencesOptional.orElse(null));
+				portletSharedSearchSettings.getPortletPreferencesOptional());
 
 		SearchRequestBuilder searchRequestBuilder =
 			portletSharedSearchSettings.getFederatedSearchRequestBuilder(
-				similarResultsPortletPreferences.getFederatedSearchKey());
+				Optional.of(
+					similarResultsPortletPreferences.getFederatedSearchKey()));
 
-		_filterByEntryClassName(
+		filterByEntryClassName(
 			criteria, portletSharedSearchSettings, searchRequestBuilder);
 
-		_filterByGroupId(
-			searchRequestBuilder, similarResultsPortletPreferences,
-			portletSharedSearchSettings);
+		filterByGroupId(portletSharedSearchSettings, searchRequestBuilder);
 
 		searchRequestBuilder.query(
-			_getMoreLikeThisQuery(
+			getMoreLikeThisQuery(
 				criteria.getUID(), similarResultsPortletPreferences)
 		).emptySearchEnabled(
 			true
@@ -125,53 +100,10 @@ public class SimilarResultsPortletSharedSearchContributor
 			similarResultsPortletPreferences.getMaxItemDisplay()
 		);
 
-		_setUIDRenderRequestAttribute(criteria, portletSharedSearchSettings);
+		setUIDRenderRequestAttribute(criteria, portletSharedSearchSettings);
 	}
 
-	protected long getGroupId(
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		ThemeDisplay themeDisplay =
-			portletSharedSearchSettings.getThemeDisplay();
-
-		return themeDisplay.getScopeGroupId();
-	}
-
-	protected long[] getGroupIds(
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		ThemeDisplay themeDisplay =
-			portletSharedSearchSettings.getThemeDisplay();
-
-		try {
-			List<Long> groupIds = new ArrayList<>();
-
-			groupIds.add(themeDisplay.getScopeGroupId());
-
-			List<Group> groups = _groupLocalService.getGroups(
-				themeDisplay.getCompanyId(), Layout.class.getName(),
-				themeDisplay.getScopeGroupId());
-
-			for (Group group : groups) {
-				groupIds.add(group.getGroupId());
-			}
-
-			return ArrayUtil.toLongArray(groupIds);
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			return new long[] {themeDisplay.getScopeGroupId()};
-		}
-	}
-
-	@Reference
-	protected SimilarResultsContributorsRegistry
-		similarResultsContributorsRegistry;
-
-	private void _filterByEntryClassName(
+	protected void filterByEntryClassName(
 		Criteria criteria,
 		PortletSharedSearchSettings portletSharedSearchSettings,
 		SearchRequestBuilder searchRequestBuilder) {
@@ -184,41 +116,47 @@ public class SimilarResultsPortletSharedSearchContributor
 			return;
 		}
 
-		String className = criteria.getType();
+		Optional<String> classNameOptional = criteria.getTypeOptional();
 
-		if (!Validator.isBlank(className)) {
-			searchRequestBuilder.addComplexQueryPart(
-				_getComplexQueryPart(_getEntryClassNameQuery(className)));
-		}
+		classNameOptional.ifPresent(
+			className -> {
+				if (!Validator.isBlank(className)) {
+					searchRequestBuilder.addComplexQueryPart(
+						getComplexQueryPart(getEntryClassNameQuery(className)));
+				}
+			});
 	}
 
-	private void _filterByGroupId(
-		SearchRequestBuilder searchRequestBuilder,
-		SimilarResultsPortletPreferences similarResultsPortletPreferences,
-		PortletSharedSearchSettings portletSharedSearchSettings) {
+	protected void filterByGroupId(
+		PortletSharedSearchSettings portletSharedSearchSettings,
+		SearchRequestBuilder searchRequestBuilder) {
 
-		if (Objects.equals(
-				similarResultsPortletPreferences.getSearchScope(),
-				"this-site")) {
-
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setGroupIds(
-					getGroupIds(portletSharedSearchSettings)));
-		}
+		searchRequestBuilder.withSearchContext(
+			searchContext -> searchContext.setGroupIds(
+				new long[] {getGroupId(portletSharedSearchSettings)}));
 	}
 
-	private ComplexQueryPart _getComplexQueryPart(Query query) {
+	protected ComplexQueryPart getComplexQueryPart(Query query) {
 		return _complexQueryPartBuilderFactory.builder(
 		).query(
 			query
 		).build();
 	}
 
-	private Query _getEntryClassNameQuery(String entryClassName) {
+	protected Query getEntryClassNameQuery(String entryClassName) {
 		return _queries.term(Field.ENTRY_CLASS_NAME, entryClassName);
 	}
 
-	private MoreLikeThisQuery _getMoreLikeThisQuery(
+	protected long getGroupId(
+		PortletSharedSearchSettings portletSharedSearchSettings) {
+
+		ThemeDisplay themeDisplay =
+			portletSharedSearchSettings.getThemeDisplay();
+
+		return themeDisplay.getScopeGroupId();
+	}
+
+	protected MoreLikeThisQuery getMoreLikeThisQuery(
 		String uid,
 		SimilarResultsPortletPreferences similarResultsPortletPreferences) {
 
@@ -233,12 +171,43 @@ public class SimilarResultsPortletSharedSearchContributor
 		return moreLikeThisQuery;
 	}
 
-	private String _getURLString(
+	protected Optional<Criteria> getSimilarResultsInputOptional(
+		long groupId, SimilarResultsRoute similarResultsRoute) {
+
+		SimilarResultsContributor similarResultsContributor =
+			similarResultsRoute.getContributor();
+
+		CriteriaBuilderImpl criteriaBuilderImpl = new CriteriaBuilderImpl();
+
+		CriteriaHelper criteriaHelper = new CriteriaHelperImpl(
+			groupId, similarResultsRoute);
+
+		similarResultsContributor.resolveCriteria(
+			criteriaBuilderImpl, criteriaHelper);
+
+		return criteriaBuilderImpl.build();
+	}
+
+	protected String getURLString(
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
 		return _portal.getCurrentURL(
 			portletSharedSearchSettings.getRenderRequest());
 	}
+
+	protected void setUIDRenderRequestAttribute(
+		Criteria criteria,
+		PortletSharedSearchSettings portletSharedSearchSettings) {
+
+		RenderRequest renderRequest =
+			portletSharedSearchSettings.getRenderRequest();
+
+		renderRequest.setAttribute(Field.UID, criteria.getUID());
+	}
+
+	@Reference
+	protected SimilarResultsContributorsRegistry
+		similarResultsContributorsRegistry;
 
 	private void _populate(
 		MoreLikeThisQuery moreLikeThisQuery,
@@ -280,24 +249,11 @@ public class SimilarResultsPortletSharedSearchContributor
 			similarResultsPortletPreferences.getTermBoost());
 	}
 
-	private void _setUIDRenderRequestAttribute(
-		Criteria criteria,
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		RenderRequest renderRequest =
-			portletSharedSearchSettings.getRenderRequest();
-
-		renderRequest.setAttribute(Field.UID, criteria.getUID());
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SimilarResultsPortletSharedSearchContributor.class);
-
 	@Reference
 	private ComplexQueryPartBuilderFactory _complexQueryPartBuilderFactory;
 
 	@Reference
-	private GroupLocalService _groupLocalService;
+	private Language _language;
 
 	@Reference
 	private Portal _portal;

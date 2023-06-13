@@ -27,13 +27,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alicia García García
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class OneDriveViewErrorsJSPDynamicInclude extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
@@ -52,12 +47,16 @@ public class OneDriveViewErrorsJSPDynamicInclude extends BaseJSPDynamicInclude {
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.document.library.opener.onedrive.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		OneDriveViewErrorsJSPDynamicInclude.class);
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.document.library.opener.onedrive.web)"
-	)
-	private ServletContext _servletContext;
 
 }

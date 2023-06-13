@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.document.library.kernel.exception.DuplicateDLFileEntryExternalReferenceCodeException;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
@@ -284,26 +283,6 @@ public class DLFileEntryPersistenceTest {
 			Time.getShortTimestamp(newDLFileEntry.getLastPublishDate()));
 	}
 
-	@Test(expected = DuplicateDLFileEntryExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		DLFileEntry dlFileEntry = addDLFileEntry();
-
-		DLFileEntry newDLFileEntry = addDLFileEntry();
-
-		newDLFileEntry.setGroupId(dlFileEntry.getGroupId());
-
-		newDLFileEntry = _persistence.update(newDLFileEntry);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newDLFileEntry);
-
-		newDLFileEntry.setExternalReferenceCode(
-			dlFileEntry.getExternalReferenceCode());
-
-		_persistence.update(newDLFileEntry);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -509,12 +488,12 @@ public class DLFileEntryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_G() throws Exception {
-		_persistence.countByERC_G("", RandomTestUtil.nextLong());
+	public void testCountByG_ERC() throws Exception {
+		_persistence.countByG_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_G("null", 0L);
+		_persistence.countByG_ERC(0L, "null");
 
-		_persistence.countByERC_G((String)null, 0L);
+		_persistence.countByG_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -883,15 +862,15 @@ public class DLFileEntryPersistenceTest {
 				new Class<?>[] {String.class}, "title"));
 
 		Assert.assertEquals(
-			dlFileEntry.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				dlFileEntry, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(dlFileEntry.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
 				dlFileEntry, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "groupId"));
+		Assert.assertEquals(
+			dlFileEntry.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				dlFileEntry, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected DLFileEntry addDLFileEntry() throws Exception {

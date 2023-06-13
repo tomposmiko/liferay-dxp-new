@@ -27,8 +27,6 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(MBMessage.clas
 
 request.setAttribute(WebKeys.LAYOUT_ASSET_ENTRY, layoutAssetEntry);
 
-LinkedAssetEntryIdsUtil.addLinkedAssetEntryId(request, layoutAssetEntry.getEntryId());
-
 AssetEntryServiceUtil.incrementViewCounter(layoutAssetEntry);
 
 boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
@@ -50,10 +48,13 @@ MBBreadcrumbUtil.addPortletBreadcrumbEntries(message, request, renderResponse);
 		<%@ include file="/message_boards/nav.jspf" %>
 	</c:if>
 
-	<div <%= !portletTitleBasedNavigation ? "class=\"main-content-body mt-4\"" : StringPool.BLANK %>>
+	<div <%= !portletTitleBasedNavigation ? "class=\"main-content-body\"" : StringPool.BLANK %>>
 		<c:if test="<%= !portletTitleBasedNavigation %>">
-			<liferay-site-navigation:breadcrumb
-				breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, false, true) %>"
+			<liferay-ui:breadcrumb
+				showCurrentGroup="<%= false %>"
+				showGuestGroup="<%= false %>"
+				showLayout="<%= false %>"
+				showParentGroups="<%= false %>"
 			/>
 		</c:if>
 
@@ -61,9 +62,7 @@ MBBreadcrumbUtil.addPortletBreadcrumbEntries(message, request, renderResponse);
 	</div>
 </div>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {runScriptsInElement} = frontendJsWeb;
-
+<aui:script require="frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 	window['<portlet:namespace />addReplyToMessage'] = function (messageId, quote) {
 		var addQuickReplyContainer = document.querySelector(
 			'#<portlet:namespace />addReplyToMessage' + messageId + ' .panel'
@@ -102,7 +101,7 @@ MBBreadcrumbUtil.addPortletBreadcrumbEntries(message, request, renderResponse);
 				.then((response) => {
 					addQuickReplyContainer.innerHTML = response;
 
-					runScriptsInElement(addQuickReplyContainer);
+					runScriptsInElement.default(addQuickReplyContainer);
 
 					addQuickReplyContainer.classList.remove('hide');
 					addQuickReplyLoadingMask.classList.add('hide');

@@ -14,9 +14,7 @@
 
 import {
 	isValidEvent,
-	validateAttributeType,
 	validateEmptyString,
-	validateIsString,
 	validateMaxLength,
 	validatePropsLength,
 } from '../../src/utils/validators';
@@ -133,44 +131,6 @@ describe('isValidEvent()', () => {
 	});
 });
 
-describe('validateAttributeType()', () => {
-	it('returns nothing when attribute is a string', () => {
-		const errorMsg = validateAttributeType('testLabel');
-
-		expect(errorMsg).toBeFalsy();
-	});
-
-	it('returns nothing when attribute is a number', () => {
-		const errorMsg = validateAttributeType(123);
-
-		expect(errorMsg).toBeFalsy();
-	});
-
-	it('returns nothing when attribute is a boolean', () => {
-		const errorMsg = validateAttributeType(false);
-
-		expect(errorMsg).toBeFalsy();
-	});
-
-	it('returns an error msg when attribute is an object', () => {
-		const errorMsg = validateAttributeType({test: 'test'});
-
-		expect(errorMsg).toBeTruthy();
-	});
-
-	it('returns an error msg when attribute is an array', () => {
-		const errorMsg = validateAttributeType([1, 2, 3]);
-
-		expect(errorMsg).toBeTruthy();
-	});
-
-	it('returns an error msg when attribute is a function', () => {
-		const errorMsg = validateAttributeType(() => {});
-
-		expect(errorMsg).toBeTruthy();
-	});
-});
-
 describe('validateEmptyString()', () => {
 	it('returns an empty string when string is not empty', () => {
 		const errorMsg = validateEmptyString('testLabel')('Value');
@@ -180,20 +140,6 @@ describe('validateEmptyString()', () => {
 
 	it('returns an error msg when string is empty', () => {
 		const errorMsg = validateEmptyString('testLabel')('');
-
-		expect(errorMsg).toBeTruthy();
-	});
-});
-
-describe('validateIsString()', () => {
-	it('returns an empty string when value is a string', () => {
-		const errorMsg = validateIsString('testLabel')('Value');
-
-		expect(errorMsg).toBeFalsy();
-	});
-
-	it('returns an error msg when value is not a string', () => {
-		const errorMsg = validateIsString('testLabel')({test: 'test'});
 
 		expect(errorMsg).toBeTruthy();
 	});

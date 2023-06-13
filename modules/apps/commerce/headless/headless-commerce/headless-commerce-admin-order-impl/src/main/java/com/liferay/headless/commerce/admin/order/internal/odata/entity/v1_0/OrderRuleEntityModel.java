@@ -20,6 +20,9 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.IntegerEntityField;
 
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Alessio Antonio Rendina
@@ -27,9 +30,12 @@ import java.util.Map;
 public class OrderRuleEntityModel implements EntityModel {
 
 	public OrderRuleEntityModel() {
-		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+		_entityFieldsMap = Stream.of(
 			new CollectionEntityField(
-				new IntegerEntityField("name", locale -> "name")));
+				new IntegerEntityField("name", locale -> "name"))
+		).collect(
+			Collectors.toMap(EntityField::getName, Function.identity())
+		);
 	}
 
 	@Override

@@ -383,16 +383,23 @@ public interface SegmentsEntryLocalService
 			String uuid, long groupId)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #searchSegmentsEntries(long, long, String, boolean,
+	 LinkedHashMap, int, int, Sort)}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<SegmentsEntry> searchSegmentsEntries(
 			long companyId, long groupId, String keywords,
-			boolean includeAncestorSegmentsEntries,
-			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
+			boolean includeAncestorSegmentsEntries, int start, int end,
+			Sort sort)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<SegmentsEntry> searchSegmentsEntries(
-			long companyId, String keywords,
+			long companyId, long groupId, String keywords,
+			boolean includeAncestorSegmentsEntries,
 			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
 		throws PortalException;
 

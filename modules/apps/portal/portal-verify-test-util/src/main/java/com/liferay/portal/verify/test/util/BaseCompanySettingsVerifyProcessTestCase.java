@@ -14,16 +14,21 @@
 
 package com.liferay.portal.verify.test.util;
 
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsException;
 import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PrefsProps;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.verify.VerifyException;
+import com.liferay.portal.verify.VerifyProcess;
 
 import javax.portlet.PortletPreferences;
 
@@ -35,6 +40,7 @@ import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Michael C. Han
@@ -89,7 +95,7 @@ public abstract class BaseCompanySettingsVerifyProcessTestCase
 		companyLocalService.forEachCompanyId(
 			companyId -> {
 				PortletPreferences portletPreferences =
-					prefsProps.getPreferences(companyId);
+					prefsProps.getPreferences(companyId, true);
 
 				Settings settings = getSettings(companyId);
 
@@ -114,6 +120,35 @@ public abstract class BaseCompanySettingsVerifyProcessTestCase
 
 	protected abstract String getSettingsId();
 
+	@Override
+	protected VerifyProcess getVerifyProcess() {
+		try {
+			ServiceReference<?>[] serviceReferences =
+				_bundleContext.getServiceReferences(
+					VerifyProcess.class.getName(),
+					StringBundler.concat(
+						"(&(objectClass=", VerifyProcess.class.getName(),
+						")(verify.process.name=", getVerifyProcessName(),
+						"))"));
+
+			if (ArrayUtil.isEmpty(serviceReferences)) {
+				throw new IllegalStateException("Unable to get verify process");
+			}
+
+			return (VerifyProcess)_bundleContext.getService(
+				serviceReferences[0]);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			throw new IllegalStateException("Unable to get verify process");
+		}
+	}
+
+	protected abstract String getVerifyProcessName();
+
 	protected abstract void populateLegacyProperties(
 		UnicodeProperties unicodeProperties);
 
@@ -125,6 +160,9 @@ public abstract class BaseCompanySettingsVerifyProcessTestCase
 
 	@Inject
 	protected SettingsFactory settingsFactory;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseCompanySettingsVerifyProcessTestCase.class);
 
 	private static BundleContext _bundleContext;
 

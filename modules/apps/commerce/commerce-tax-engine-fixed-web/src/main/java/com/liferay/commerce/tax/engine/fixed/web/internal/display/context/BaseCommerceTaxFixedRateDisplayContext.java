@@ -23,13 +23,13 @@ import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPTaxCategoryService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.comparator.CPTaxCategoryCreateDateComparator;
-import com.liferay.commerce.tax.engine.fixed.web.internal.display.context.helper.CommerceTaxFixedRateRequestHelper;
+import com.liferay.commerce.tax.engine.fixed.web.internal.display.context.util.CommerceTaxFixedRateRequestHelper;
 import com.liferay.commerce.tax.model.CommerceTaxMethod;
 import com.liferay.commerce.tax.service.CommerceTaxMethodService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -138,12 +138,13 @@ public class BaseCommerceTaxFixedRateDisplayContext {
 				commerceChannel.getCompanyId(),
 				commerceChannel.getCommerceCurrencyCode());
 
+		String localizedPercentage = percentageFormatter.getLocalizedPercentage(
+			locale, commerceCurrency.getMaxFractionDigits(),
+			commerceCurrency.getMinFractionDigits(),
+			new BigDecimal(percentage));
+
 		return StringUtil.removeSubstring(
-			percentageFormatter.getLocalizedPercentage(
-				locale, commerceCurrency.getMaxFractionDigits(),
-				commerceCurrency.getMinFractionDigits(),
-				new BigDecimal(percentage)),
-			StringPool.PERCENT);
+			localizedPercentage, StringPool.PERCENT);
 	}
 
 	public String getLocalizedRate(
@@ -219,7 +220,7 @@ public class BaseCommerceTaxFixedRateDisplayContext {
 			}
 		).setParameter(
 			"screenNavigationCategoryKey",
-			_getSelectedScreenNavigationCategoryKey()
+			getSelectedScreenNavigationCategoryKey()
 		).buildPortletURL();
 	}
 
@@ -229,11 +230,19 @@ public class BaseCommerceTaxFixedRateDisplayContext {
 	}
 
 	public boolean hasUpdateCommerceChannelPermission() throws PortalException {
+		CommerceChannel commerceChannel =
+			commerceChannelLocalService.getCommerceChannel(
+				getCommerceChannelId());
+
 		return modelResourcePermission.contains(
 			commerceTaxFixedRateRequestHelper.getPermissionChecker(),
-			commerceChannelLocalService.getCommerceChannel(
-				getCommerceChannelId()),
-			ActionKeys.UPDATE);
+			commerceChannel, ActionKeys.UPDATE);
+	}
+
+	protected String getSelectedScreenNavigationCategoryKey() {
+		return ParamUtil.getString(
+			commerceTaxFixedRateRequestHelper.getRequest(),
+			"screenNavigationCategoryKey", getScreenNavigationCategoryKey());
 	}
 
 	protected final CommerceChannelLocalService commerceChannelLocalService;
@@ -245,12 +254,6 @@ public class BaseCommerceTaxFixedRateDisplayContext {
 	protected final ModelResourcePermission<CommerceChannel>
 		modelResourcePermission;
 	protected final PercentageFormatter percentageFormatter;
-
-	private String _getSelectedScreenNavigationCategoryKey() {
-		return ParamUtil.getString(
-			commerceTaxFixedRateRequestHelper.getRequest(),
-			"screenNavigationCategoryKey", getScreenNavigationCategoryKey());
-	}
 
 	private CommerceTaxMethod _commerceTaxMethod;
 

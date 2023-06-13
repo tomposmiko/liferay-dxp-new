@@ -18,8 +18,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -29,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -94,10 +93,16 @@ public class JSONUtilTest {
 	public void testCreateCollector() {
 		List<String> strings = Arrays.asList("foo", "bar", "baz");
 
+		Stream<String> stringsStream = strings.stream();
+
 		Assert.assertTrue(
 			JSONUtil.equals(
 				JSONUtil.concat(JSONUtil.putAll("FOO", "BAR", "BAZ")),
-				JSONUtil.toJSONArray(strings, String::toUpperCase, _log)));
+				stringsStream.map(
+					String::toUpperCase
+				).collect(
+					JSONUtil.createCollector()
+				)));
 	}
 
 	@Test
@@ -774,29 +779,6 @@ public class JSONUtilTest {
 	}
 
 	@Test
-	public void testToStringMap() {
-		Map<String, String> expectedMapValues = HashMapBuilder.put(
-			"alpha", "1"
-		).put(
-			"beta", "2"
-		).put(
-			"gamma", "3"
-		).build();
-
-		Map<String, String> actualMapValues = JSONUtil.toStringMap(
-			JSONUtil.put(
-				"alpha", "1"
-			).put(
-				"beta", "2"
-			).put(
-				"gamma", "3"
-			));
-
-		Assert.assertEquals(
-			expectedMapValues.toString(), actualMapValues.toString());
-	}
-
-	@Test
 	public void testToStringSet() {
 		Assert.assertEquals(Collections.emptySet(), JSONUtil.toStringSet(null));
 		Assert.assertEquals(
@@ -836,7 +818,5 @@ public class JSONUtilTest {
 	private JSONObject _createJSONObject() {
 		return JSONFactoryUtil.createJSONObject();
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(JSONUtilTest.class);
 
 }

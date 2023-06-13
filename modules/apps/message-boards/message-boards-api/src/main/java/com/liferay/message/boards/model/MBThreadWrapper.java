@@ -524,6 +524,18 @@ public class MBThreadWrapper
 	}
 
 	/**
+	 * Returns the trash entry created when this message boards thread was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this message boards thread.
+	 *
+	 * @return the trash entry created when this message boards thread was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getTrashEntry();
+	}
+
+	/**
 	 * Returns the class primary key of the trash entry for this message boards thread.
 	 *
 	 * @return the class primary key of the trash entry for this message boards thread
@@ -531,6 +543,18 @@ public class MBThreadWrapper
 	@Override
 	public long getTrashEntryClassPK() {
 		return model.getTrashEntryClassPK();
+	}
+
+	/**
+	 * Returns the trash handler for this message boards thread.
+	 *
+	 * @return the trash handler for this message boards thread
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
+		return model.getTrashHandler();
 	}
 
 	/**
@@ -651,6 +675,26 @@ public class MBThreadWrapper
 	@Override
 	public boolean isInTrash() {
 		return model.isInTrash();
+	}
+
+	/**
+	 * Returns <code>true</code> if the parent of this message boards thread is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this message boards thread is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer() {
+		return model.isInTrashContainer();
+	}
+
+	@Override
+	public boolean isInTrashExplicitly() {
+		return model.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return model.isInTrashImplicitly();
 	}
 
 	@Override
@@ -991,11 +1035,6 @@ public class MBThreadWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

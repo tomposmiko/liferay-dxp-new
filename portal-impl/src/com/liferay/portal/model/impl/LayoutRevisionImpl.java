@@ -15,7 +15,6 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -34,6 +33,7 @@ import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -129,7 +129,7 @@ public class LayoutRevisionImpl extends LayoutRevisionBaseImpl {
 		String url = PortalUtil.getLayoutURL(
 			LayoutLocalServiceUtil.getLayout(getPlid()), themeDisplay);
 
-		if (!CookiesManagerUtil.hasSessionId(httpServletRequest) &&
+		if (!CookieKeys.hasSessionId(httpServletRequest) &&
 			(url.startsWith(PortalUtil.getPortalURL(httpServletRequest)) ||
 			 url.startsWith(StringPool.SLASH))) {
 
@@ -181,7 +181,7 @@ public class LayoutRevisionImpl extends LayoutRevisionBaseImpl {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -193,7 +193,7 @@ public class LayoutRevisionImpl extends LayoutRevisionBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

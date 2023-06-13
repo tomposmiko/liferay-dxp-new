@@ -14,20 +14,18 @@
 
 package com.liferay.portal.search.test.util.mappings;
 
-import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
-import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
-import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.MatchQuery;
 import com.liferay.portal.search.test.util.document.BaseDocumentTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -35,21 +33,11 @@ import org.junit.Test;
  */
 public abstract class BaseDocumentMappingTestCase extends BaseDocumentTestCase {
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-
-		addDocuments(
-			screenName -> document -> populate(document, screenName),
-			SCREEN_NAMES);
-	}
-
 	@Test
 	public void testFirstNamesSearchResults() throws Exception {
-		for (String screenName : SCREEN_NAMES) {
-			assertMappings(
-				StringUtil.replaceFirst(screenName, "user", StringPool.BLANK));
-		}
+		Stream<String> stream = getScreenNamesStream();
+
+		stream.forEach(this::assertMappings);
 	}
 
 	@Test
@@ -91,29 +79,16 @@ public abstract class BaseDocumentMappingTestCase extends BaseDocumentTestCase {
 	protected void assertMappings(String keywords) {
 		assertSearch(
 			indexingTestHelper -> {
-				SearchEngineAdapter searchEngineAdapter =
-					getSearchEngineAdapter();
+				indexingTestHelper.setQuery(getQuery(keywords));
 
-				SearchSearchResponse searchSearchResponse =
-					searchEngineAdapter.execute(
-						new SearchSearchRequest() {
-							{
-								setIndexNames(getIndexName());
-								setQuery(
-									BaseDocumentTestCase.getQuery(keywords));
-								setSelectedFieldNames(StringPool.STAR);
-							}
-						});
+				indexingTestHelper.search();
 
-				Hits hits = searchSearchResponse.getHits();
-
-				Document[] documents = hits.getDocs();
-
-				Assert.assertNotEquals(0, documents.length);
-
-				for (Document document : documents) {
-					assertMappings(document);
-				}
+				indexingTestHelper.verify(
+					hits -> {
+						for (Document document : hits.getDocs()) {
+							assertMappings(document);
+						}
+					});
 			});
 	}
 
@@ -137,8 +112,6 @@ public abstract class BaseDocumentMappingTestCase extends BaseDocumentTestCase {
 		return list.toArray(new Float[0]);
 	}
 
-	protected abstract String getIndexName();
-
 	protected Integer[] getIntegerArray(Document document) {
 		List<Integer> list = new ArrayList<>();
 
@@ -157,6 +130,17 @@ public abstract class BaseDocumentMappingTestCase extends BaseDocumentTestCase {
 		}
 
 		return list.toArray(new Long[0]);
+	}
+
+	protected Query getQuery(String keywords) {
+		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
+
+		booleanQueryImpl.add(
+			new MatchQuery("firstName", keywords), BooleanClauseOccur.SHOULD);
+		booleanQueryImpl.add(
+			new MatchQuery("lastName", keywords), BooleanClauseOccur.SHOULD);
+
+		return booleanQueryImpl;
 	}
 
 }

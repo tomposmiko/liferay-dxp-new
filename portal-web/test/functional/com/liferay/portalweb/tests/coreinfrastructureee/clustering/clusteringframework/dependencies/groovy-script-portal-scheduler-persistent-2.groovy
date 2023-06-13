@@ -13,7 +13,8 @@ String script = "System.out.println(\"Persistent job 2 is triggered at \" + Syst
 
 try {
 	SchedulerEngineHelperUtil.addScriptingJob(
-		trigger, StorageType.PERSISTED, "persistent job", "groovy", script);
+		trigger, StorageType.PERSISTED, "persistent job", "groovy", script,
+		0);
 
 	out.println("Persistent job 2 is added");
 }

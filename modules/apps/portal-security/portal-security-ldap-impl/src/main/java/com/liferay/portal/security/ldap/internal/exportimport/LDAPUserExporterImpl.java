@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.naming.Binding;
@@ -70,7 +71,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Wesley Gong
  * @author Vilmos Papp
  */
-@Component(service = UserExporter.class)
+@Component(immediate = true, service = UserExporter.class)
 public class LDAPUserExporterImpl implements UserExporter {
 
 	@Override
@@ -95,7 +96,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 		User user = _userLocalService.getUserByContactId(
 			contact.getContactId());
 
-		if (user.isGuestUser() ||
+		if (user.isDefaultUser() ||
 			((user.getStatus() != WorkflowConstants.STATUS_APPROVED) &&
 			 (user.getStatus() != WorkflowConstants.STATUS_INACTIVE)) ||
 			_isAnonymousUser(user)) {
@@ -207,7 +208,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 
 		if (userGroupBinding == null) {
 			if (userOperation == UserOperation.ADD) {
-				_addGroup(
+				addGroup(
 					ldapServerId, safeLdapContext, userGroup, user,
 					groupMappings, userMappings);
 			}
@@ -274,7 +275,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 			User user, Map<String, Serializable> userExpandoAttributes)
 		throws Exception {
 
-		if (user.isGuestUser() ||
+		if (user.isDefaultUser() ||
 			((user.getStatus() != WorkflowConstants.STATUS_APPROVED) &&
 			 (user.getStatus() != WorkflowConstants.STATUS_INACTIVE)) ||
 			_isAnonymousUser(user)) {
@@ -385,13 +386,32 @@ public class LDAPUserExporterImpl implements UserExporter {
 				throw nameNotFoundException;
 			}
 
-			_log.error(nameNotFoundException);
+			_log.error(nameNotFoundException, nameNotFoundException);
 		}
 		finally {
 			if (safeLdapContext != null) {
 				safeLdapContext.close();
 			}
 		}
+	}
+
+	protected Binding addGroup(
+			long ldapServerId, LdapContext ldapContext, UserGroup userGroup,
+			User user, Properties groupMappings, Properties userMappings)
+		throws Exception {
+
+		SafeLdapName userGroupSafeLdapName =
+			_portalToLDAPConverter.getGroupSafeLdapName(
+				ldapServerId, userGroup, groupMappings);
+
+		Attributes attributes = _portalToLDAPConverter.getLDAPGroupAttributes(
+			ldapServerId, userGroup, user, groupMappings, userMappings);
+
+		ldapContext.bind(
+			userGroupSafeLdapName, new PortalLDAPContext(attributes));
+
+		return _safePortalLDAP.getGroup(
+			ldapServerId, userGroup.getCompanyId(), userGroup.getName());
 	}
 
 	protected Binding addUser(
@@ -413,23 +433,32 @@ public class LDAPUserExporterImpl implements UserExporter {
 			user.getEmailAddress());
 	}
 
-	private Binding _addGroup(
-			long ldapServerId, LdapContext ldapContext, UserGroup userGroup,
-			User user, Properties groupMappings, Properties userMappings)
-		throws Exception {
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration)",
+		unbind = "-"
+	)
+	protected void setConfigurationProvider(
+		ConfigurationProvider<LDAPAuthConfiguration>
+			ldapAuthConfigurationProvider) {
 
-		SafeLdapName userGroupSafeLdapName =
-			_portalToLDAPConverter.getGroupSafeLdapName(
-				ldapServerId, userGroup, groupMappings);
+		_ldapAuthConfigurationProvider = ldapAuthConfigurationProvider;
+	}
 
-		Attributes attributes = _portalToLDAPConverter.getLDAPGroupAttributes(
-			ldapServerId, userGroup, user, groupMappings, userMappings);
+	@Reference(unbind = "-")
+	protected void setLdapSettings(LDAPSettings ldapSettings) {
+		_ldapSettings = ldapSettings;
+	}
 
-		ldapContext.bind(
-			userGroupSafeLdapName, new PortalLDAPContext(attributes));
+	@Reference(unbind = "-")
+	protected void setUserGroupLocalService(
+		UserGroupLocalService userGroupLocalService) {
 
-		return _safePortalLDAP.getGroup(
-			ldapServerId, userGroup.getCompanyId(), userGroup.getName());
+		_userGroupLocalService = userGroupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
 	}
 
 	private User _getAnonymousUser(long companyId) throws Exception {
@@ -443,11 +472,14 @@ public class LDAPUserExporterImpl implements UserExporter {
 			return null;
 		}
 
-		Configuration configuration = configurations[0];
+		Optional<Configuration> configurationOptional = Optional.of(
+			configurations[0]);
 
-		if (configuration == null) {
+		if (!configurationOptional.isPresent()) {
 			return null;
 		}
+
+		Configuration configuration = configurationOptional.get();
 
 		Dictionary<String, Object> properties = configuration.getProperties();
 
@@ -470,7 +502,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -483,13 +515,8 @@ public class LDAPUserExporterImpl implements UserExporter {
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
 
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration)"
-	)
 	private ConfigurationProvider<LDAPAuthConfiguration>
 		_ldapAuthConfigurationProvider;
-
-	@Reference
 	private LDAPSettings _ldapSettings;
 
 	@Reference(
@@ -504,10 +531,7 @@ public class LDAPUserExporterImpl implements UserExporter {
 	)
 	private volatile SafePortalLDAP _safePortalLDAP;
 
-	@Reference
 	private UserGroupLocalService _userGroupLocalService;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

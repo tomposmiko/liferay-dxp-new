@@ -27,10 +27,6 @@ public class FinderWhereClauseEntryLocalServiceWrapper
 	implements FinderWhereClauseEntryLocalService,
 			   ServiceWrapper<FinderWhereClauseEntryLocalService> {
 
-	public FinderWhereClauseEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public FinderWhereClauseEntryLocalServiceWrapper(
 		FinderWhereClauseEntryLocalService finderWhereClauseEntryLocalService) {
 

@@ -43,11 +43,8 @@ public class GitHubRemoteGitRepository extends BaseRemoteGitRepository {
 
 		JSONObject jsonObject = new JSONObject();
 
-		jsonObject.put(
-			"color", color
-		).put(
-			"name", name
-		);
+		jsonObject.put("color", color);
+		jsonObject.put("name", name);
 
 		if ((description != null) && !description.isEmpty()) {
 			jsonObject.put("description", description);
@@ -210,11 +207,8 @@ public class GitHubRemoteGitRepository extends BaseRemoteGitRepository {
 		if (name != null) {
 			jsonObject = new JSONObject();
 
-			jsonObject.put(
-				"color", color
-			).put(
-				"name", name
-			);
+			jsonObject.put("color", color);
+			jsonObject.put("name", name);
 
 			if ((description != null) && !description.isEmpty()) {
 				jsonObject.put("description", description);

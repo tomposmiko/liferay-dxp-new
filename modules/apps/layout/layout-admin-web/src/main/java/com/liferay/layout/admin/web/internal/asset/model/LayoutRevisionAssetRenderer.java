@@ -20,6 +20,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutBranch;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
@@ -28,7 +29,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -51,9 +52,10 @@ public class LayoutRevisionAssetRenderer
 
 		try {
 			_layoutBranch = layoutRevision.getLayoutBranch();
+
 			_layoutSetBranch =
 				LayoutSetBranchLocalServiceUtil.getLayoutSetBranch(
-					layoutRevision.getLayoutSetBranchId());
+					_layoutRevision.getLayoutSetBranchId());
 		}
 		catch (Exception exception) {
 			throw new IllegalStateException(exception);
@@ -124,26 +126,20 @@ public class LayoutRevisionAssetRenderer
 		LiferayPortletResponse liferayPortletResponse,
 		String noSuchEntryRedirect) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return getURLViewInContext(themeDisplay, noSuchEntryRedirect);
-	}
-
-	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
-
 		try {
-			String layoutURL = PortalUtil.getLayoutURL(
-				LayoutLocalServiceUtil.getLayout(_layoutRevision.getPlid()),
-				themeDisplay);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)liferayPortletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
-			layoutURL = HttpComponentsUtil.addParameter(
+			Layout layout = LayoutLocalServiceUtil.getLayout(
+				_layoutRevision.getPlid());
+
+			String layoutURL = PortalUtil.getLayoutURL(layout, themeDisplay);
+
+			layoutURL = HttpUtil.addParameter(
 				layoutURL, "layoutSetBranchId",
 				_layoutRevision.getLayoutSetBranchId());
-			layoutURL = HttpComponentsUtil.addParameter(
+			layoutURL = HttpUtil.addParameter(
 				layoutURL, "layoutRevisionId",
 				_layoutRevision.getLayoutRevisionId());
 
@@ -151,7 +147,7 @@ public class LayoutRevisionAssetRenderer
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;

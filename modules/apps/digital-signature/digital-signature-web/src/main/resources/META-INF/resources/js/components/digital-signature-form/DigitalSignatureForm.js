@@ -20,7 +20,6 @@ import {useFormik} from 'formik';
 import {
 	createResourceURL,
 	fetch,
-	navigate,
 	objectToFormData,
 	openToast,
 } from 'frontend-js-web';
@@ -55,7 +54,7 @@ const DigitalSignatureForm = ({fileEntries = [], history}) => {
 			return history.goBack();
 		}
 
-		return navigate(backURL);
+		return Liferay.Util.navigate(backURL);
 	};
 
 	const onSubmit = async (values) => {
@@ -185,9 +184,7 @@ const DigitalSignatureForm = ({fileEntries = [], history}) => {
 						{Liferay.Language.get('new-digital-signature-envelope')}
 					</h1>
 				</div>
-
 				<hr />
-
 				<ClayCard.Body className="m-2">
 					<ClayForm onSubmit={handleSubmit}>
 						<DigitalSignatureFormBase
@@ -202,14 +199,12 @@ const DigitalSignatureForm = ({fileEntries = [], history}) => {
 							disabled={
 								!isValid ||
 								isSubmitting ||
-								!values.fileEntries.length ||
-								values.fileEntries.length > 10
+								!values.fileEntries.length
 							}
 							type="submit"
 						>
 							{Liferay.Language.get('send')}
 						</ClayButton>
-
 						<ClayButton
 							className="ml-2"
 							displayType="secondary"

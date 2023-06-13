@@ -22,7 +22,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
@@ -119,31 +119,30 @@ public class StyleBookEntryLocalServiceImpl
 
 	@Override
 	public StyleBookEntry copyStyleBookEntry(
-			long userId, long groupId, long sourceStyleBookEntryId,
+			long userId, long groupId, long styleBookEntryId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		StyleBookEntry sourceStyleBookEntry = getStyleBookEntry(
-			sourceStyleBookEntryId);
+		StyleBookEntry styleBookEntry = getStyleBookEntry(styleBookEntryId);
 
 		String name = StringBundler.concat(
-			sourceStyleBookEntry.getName(), StringPool.SPACE,
+			styleBookEntry.getName(), StringPool.SPACE,
 			StringPool.OPEN_PARENTHESIS,
-			_language.get(LocaleUtil.getMostRelevantLocale(), "copy"),
+			LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "copy"),
 			StringPool.CLOSE_PARENTHESIS);
 
-		StyleBookEntry targetStyleBookEntry = addStyleBookEntry(
-			userId, groupId, sourceStyleBookEntry.getFrontendTokensValues(),
-			name, StringPool.BLANK, serviceContext);
+		StyleBookEntry copyStyleBookEntry = addStyleBookEntry(
+			userId, groupId, styleBookEntry.getFrontendTokensValues(), name,
+			StringPool.BLANK, serviceContext);
 
 		long previewFileEntryId = _copyStyleBookEntryPreviewFileEntry(
-			userId, groupId, sourceStyleBookEntry, targetStyleBookEntry);
+			userId, groupId, styleBookEntry, copyStyleBookEntry);
 
-		StyleBookEntry draftStyleBookEntry = fetchDraft(sourceStyleBookEntry);
+		StyleBookEntry draftStyleBookEntry = fetchDraft(styleBookEntry);
 
 		if (draftStyleBookEntry != null) {
 			StyleBookEntry copyDraftStyleBookEntry = getDraft(
-				targetStyleBookEntry);
+				copyStyleBookEntry);
 
 			copyDraftStyleBookEntry.setFrontendTokensValues(
 				draftStyleBookEntry.getFrontendTokensValues());
@@ -152,7 +151,7 @@ public class StyleBookEntryLocalServiceImpl
 		}
 
 		return updatePreviewFileEntryId(
-			targetStyleBookEntry.getStyleBookEntryId(), previewFileEntryId);
+			copyStyleBookEntry.getStyleBookEntryId(), previewFileEntryId);
 	}
 
 	@Override
@@ -448,16 +447,16 @@ public class StyleBookEntryLocalServiceImpl
 	}
 
 	private long _copyStyleBookEntryPreviewFileEntry(
-			long userId, long groupId, StyleBookEntry sourceStyleBookEntry,
+			long userId, long groupId, StyleBookEntry styleBookEntry,
 			StyleBookEntry copyStyleBookEntry)
 		throws PortalException {
 
-		if (sourceStyleBookEntry.getPreviewFileEntryId() == 0) {
+		if (styleBookEntry.getPreviewFileEntryId() == 0) {
 			return 0;
 		}
 
 		FileEntry fileEntry = _dlAppLocalService.getFileEntry(
-			sourceStyleBookEntry.getPreviewFileEntryId());
+			styleBookEntry.getPreviewFileEntryId());
 
 		Repository repository =
 			PortletFileRepositoryUtil.fetchPortletRepository(
@@ -480,7 +479,7 @@ public class StyleBookEntryLocalServiceImpl
 				fileEntry.getExtension();
 
 		fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			null, groupId, userId, StyleBookEntry.class.getName(),
+			groupId, userId, StyleBookEntry.class.getName(),
 			copyStyleBookEntry.getStyleBookEntryId(),
 			StyleBookPortletKeys.STYLE_BOOK, repository.getDlFolderId(),
 			fileEntry.getContentStream(), fileName, fileEntry.getMimeType(),
@@ -539,9 +538,6 @@ public class StyleBookEntryLocalServiceImpl
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private UserLocalService _userLocalService;

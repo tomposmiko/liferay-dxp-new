@@ -111,11 +111,6 @@ public class LocalizedValue implements Value {
 	}
 
 	@Override
-	public void removeLocale(Locale locale) {
-		_values.remove(locale);
-	}
-
-	@Override
 	public void setDefaultLocale(Locale defaultLocale) {
 		_defaultLocale = defaultLocale;
 	}

@@ -41,7 +41,7 @@ exports[`EnvelopeForm renders 1`] = `
                 </svg>
               </span>
               <span
-                class="hide-accessible sr-only"
+                class="hide-accessible"
               >
                 required
               </span>
@@ -98,7 +98,7 @@ exports[`EnvelopeForm renders 1`] = `
                       </svg>
                     </span>
                     <span
-                      class="hide-accessible sr-only"
+                      class="hide-accessible"
                     >
                       required
                     </span>
@@ -137,7 +137,7 @@ exports[`EnvelopeForm renders 1`] = `
                       </svg>
                     </span>
                     <span
-                      class="hide-accessible sr-only"
+                      class="hide-accessible"
                     >
                       required
                     </span>
@@ -213,7 +213,7 @@ exports[`EnvelopeForm renders 1`] = `
                 </svg>
               </span>
               <span
-                class="hide-accessible sr-only"
+                class="hide-accessible"
               >
                 required
               </span>
@@ -244,19 +244,6 @@ exports[`EnvelopeForm renders 1`] = `
               placeholder="email-message"
               type="textarea"
             />
-            <div
-              class="form-feedback-group"
-            >
-              <div
-                class="form-feedback-item"
-              >
-                <div
-                  class="form-text"
-                >
-                  x-characters-remaining
-                </div>
-              </div>
-            </div>
           </div>
           <button
             class="btn btn-primary"

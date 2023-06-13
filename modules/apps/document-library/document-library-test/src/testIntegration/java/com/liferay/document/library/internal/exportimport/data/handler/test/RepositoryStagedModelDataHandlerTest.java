@@ -73,8 +73,7 @@ public class RepositoryStagedModelDataHandlerTest
 				group.getGroupId(), TestPropsValues.getUserId());
 
 		Folder mountFolder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 

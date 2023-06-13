@@ -27,10 +27,6 @@ public class CommerceOrderPaymentLocalServiceWrapper
 	implements CommerceOrderPaymentLocalService,
 			   ServiceWrapper<CommerceOrderPaymentLocalService> {
 
-	public CommerceOrderPaymentLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceOrderPaymentLocalServiceWrapper(
 		CommerceOrderPaymentLocalService commerceOrderPaymentLocalService) {
 

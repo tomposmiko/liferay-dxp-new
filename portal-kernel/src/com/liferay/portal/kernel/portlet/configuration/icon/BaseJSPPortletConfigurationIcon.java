@@ -34,6 +34,10 @@ public abstract class BaseJSPPortletConfigurationIcon
 
 	public abstract String getJspPath();
 
+	public ServletContext getServletContext() {
+		return _servletContext;
+	}
+
 	@Override
 	public boolean include(
 			HttpServletRequest httpServletRequest,
@@ -46,10 +50,8 @@ public abstract class BaseJSPPortletConfigurationIcon
 			return false;
 		}
 
-		ServletContext servletContext = getServletContext();
-
 		RequestDispatcher requestDispatcher =
-			servletContext.getRequestDispatcher(jspPath);
+			_servletContext.getRequestDispatcher(jspPath);
 
 		try {
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
@@ -63,9 +65,13 @@ public abstract class BaseJSPPortletConfigurationIcon
 		return true;
 	}
 
-	protected abstract ServletContext getServletContext();
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseJSPPortletConfigurationIcon.class);
+
+	private ServletContext _servletContext;
 
 }

@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.test.util;
 
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +24,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * @author Brian Wing Shun Chan
@@ -90,9 +88,7 @@ public class TestPropsUtil {
 		}
 
 		for (String key : keys) {
-			if (!_doNotPrintKeys.contains(key)) {
-				System.out.println(key + "=" + _props.getProperty(key));
-			}
+			System.out.println(key + "=" + _props.getProperty(key));
 		}
 
 		System.out.println("");
@@ -102,16 +98,6 @@ public class TestPropsUtil {
 		_props.setProperty(key, value);
 	}
 
-	private static final Set<String> _doNotPrintKeys = SetUtil.fromArray(
-		"digital.signature.account.base.uri", "digital.signature.api.accountId",
-		"digital.signature.api.username", "digital.signature.integration.key",
-		"digital.signature.rsa.private.key",
-		"digital.signature.site.settings.strategy",
-		"object.storage.salesforce.consumer.key",
-		"object.storage.salesforce.consumer.secret",
-		"object.storage.salesforce.login.url",
-		"object.storage.salesforce.password",
-		"object.storage.salesforce.username");
 	private static final TestPropsUtil _testPropsUtil = new TestPropsUtil();
 
 	private final Properties _props = new Properties();

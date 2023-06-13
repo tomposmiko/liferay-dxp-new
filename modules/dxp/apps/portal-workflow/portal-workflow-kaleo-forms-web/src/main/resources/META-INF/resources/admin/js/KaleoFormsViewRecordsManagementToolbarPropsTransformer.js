@@ -9,11 +9,7 @@
  * distribution rights of the Software.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	postForm,
-} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
 
 export default function propsTransformer({
 	additionalProps: {deleteDDLRecordURL},
@@ -24,34 +20,33 @@ export default function propsTransformer({
 		...otherProps,
 		onActionButtonClick(event, {item}) {
 			if (item?.data?.action === 'deleteRecords') {
-				openConfirmModal({
-					message: Liferay.Language.get(
-						'are-you-sure-you-want-to-delete-this'
-					),
-					onConfirm: (isConfirmed) => {
-						if (isConfirmed) {
-							const form = document.getElementById(
-								`${portletNamespace}searchContainerForm`
-							);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-delete-this'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}searchContainerForm`
+					);
 
-							const searchContainer = document.getElementById(
-								otherProps.searchContainerId
-							);
+					const searchContainer = document.getElementById(
+						otherProps.searchContainerId
+					);
 
-							if (form && searchContainer) {
-								postForm(form, {
-									data: {
-										ddlRecordIds: getCheckedCheckboxes(
-											searchContainer,
-											`${portletNamespace}allRowIds`
-										),
-									},
-									url: deleteDDLRecordURL,
-								});
-							}
-						}
-					},
-				});
+					if (form && searchContainer) {
+						postForm(form, {
+							data: {
+								ddlRecordIds: Liferay.Util.listCheckedExcept(
+									searchContainer,
+									`${portletNamespace}allRowIds`
+								),
+							},
+							url: deleteDDLRecordURL,
+						});
+					}
+				}
 			}
 		},
 	};

@@ -1,9 +1,0 @@
-apply plugin: "com.liferay.poshi.runner"
-
-dependencies {
-	poshiRunnerResources group: "com.liferay", name: "com.liferay.poshi.runner.resources", version: "latest.release"
-}
-
-poshiRunner {
-	poshiPropertiesFile = file("poshi.properties")
-}

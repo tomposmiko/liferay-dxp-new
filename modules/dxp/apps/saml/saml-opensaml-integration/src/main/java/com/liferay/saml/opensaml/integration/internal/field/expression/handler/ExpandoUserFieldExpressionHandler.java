@@ -14,9 +14,7 @@
 
 package com.liferay.saml.opensaml.integration.internal.field.expression.handler;
 
-import com.liferay.expando.kernel.exception.ValueDataException;
 import com.liferay.expando.kernel.model.ExpandoColumn;
-import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoTableConstants;
 import com.liferay.expando.kernel.model.ExpandoValue;
@@ -35,7 +33,6 @@ import com.liferay.portal.kernel.security.ldap.LDAPSettings;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -58,13 +55,11 @@ import com.liferay.saml.opensaml.integration.processor.context.UserProcessorCont
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.naming.Binding;
 import javax.naming.NamingEnumeration;
@@ -108,30 +103,7 @@ public class ExpandoUserFieldExpressionHandler
 					user -> _getExpandoValue(user, validFieldExpression),
 					_processingIndex, validFieldExpression, this::_update);
 
-			userBind.handleUnsafeStringArray(
-				validFieldExpression,
-				(expandoValue, values) -> {
-					ExpandoColumn expandoColumn = expandoValue.getColumn();
-
-					try {
-						_setExpandoValueData(
-							expandoValue,
-							_valueConsumers.get(expandoColumn.getType()),
-							values);
-					}
-					catch (Exception exception) {
-						if (exception instanceof PortalException) {
-							throw exception;
-						}
-
-						throw new PortalException(
-							StringBundler.concat(
-								"Unable to set value for expando column ",
-								validFieldExpression, ": ",
-								exception.getMessage()),
-							exception);
-					}
-				});
+			userBind.mapString(validFieldExpression, ExpandoValue::setData);
 		}
 	}
 
@@ -140,9 +112,6 @@ public class ExpandoUserFieldExpressionHandler
 			long companyId, String userIdentifier,
 			String userIdentifierExpression)
 		throws Exception {
-
-		userIdentifier = _getNormalizedData(
-			companyId, userIdentifierExpression, userIdentifier);
 
 		Collection<LDAPServerConfiguration> ldapServerConfigurations =
 			_ldapServerConfigurationProvider.getConfigurations(companyId);
@@ -203,12 +172,12 @@ public class ExpandoUserFieldExpressionHandler
 			_expandoValueLocalService.getColumnValues(
 				companyId, User.class.getName(),
 				ExpandoTableConstants.DEFAULT_TABLE_NAME,
-				userIdentifierExpression,
-				_getNormalizedData(
-					companyId, userIdentifierExpression, userIdentifier),
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				userIdentifierExpression, userIdentifier, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
 
 		if (expandoValues.size() > 1) {
+			expandoValues.forEach(StringBundler::concat);
+
 			List<Long> userIds = new ArrayList<>();
 
 			expandoValues.forEach(
@@ -221,31 +190,28 @@ public class ExpandoUserFieldExpressionHandler
 					"\" must match only 1 user, but it matched ", userIds));
 		}
 
-		for (ExpandoValue expandoValue : expandoValues) {
-			User user = _userLocalService.fetchUserById(
-				expandoValue.getClassPK());
+		Stream<ExpandoValue> stream = expandoValues.stream();
 
-			if (user != null) {
-				return user;
-			}
-		}
-
-		return null;
+		return stream.map(
+			ExpandoValue::getClassPK
+		).map(
+			_userLocalService::fetchUserById
+		).findFirst(
+		).orElse(
+			null
+		);
 	}
 
 	@Override
 	public List<String> getValidFieldExpressions() {
 		List<String> validExpressions = new ArrayList<>();
-
-		Set<Integer> types = _valueConsumers.keySet();
+		long companyId = CompanyThreadLocal.getCompanyId();
 
 		for (ExpandoColumn column :
 				_expandoColumnLocalService.getDefaultTableColumns(
-					CompanyThreadLocal.getCompanyId(), User.class.getName())) {
+					companyId, User.class.getName())) {
 
-			if (types.contains(column.getType())) {
-				validExpressions.add(column.getName());
-			}
+			validExpressions.add(column.getName());
 		}
 
 		return Collections.unmodifiableList(validExpressions);
@@ -256,46 +222,30 @@ public class ExpandoUserFieldExpressionHandler
 		return true;
 	}
 
-	@FunctionalInterface
-	public interface ValueConsumer<T> {
-
-		public void accept(ExpandoValue expandoValue, T value)
-			throws PortalException;
-
-	}
-
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		_processingIndex = GetterUtil.getInteger(
 			properties.get("processing.index"));
 	}
 
-	private static <V> ValueConsumer<String[]> _getValueConsumer(
-		Function<String[], V> function, ValueConsumer<V> valueConsumer) {
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPServerConfigurationProvider(
+		ConfigurationProvider<LDAPServerConfiguration>
+			ldapServerConfigurationProvider) {
 
-		return (expandoValue, value) -> valueConsumer.accept(
-			expandoValue, function.apply(value));
-	}
-
-	private static <V> V _head(V[] values) {
-		if ((values == null) || (values.length == 0)) {
-			return null;
-		}
-
-		return values[0];
+		_ldapServerConfigurationProvider = ldapServerConfigurationProvider;
 	}
 
 	private ExpandoValue _getExpandoValue(
 		User user, String validUserFieldExpression) {
 
-		ExpandoValue expandoValue = null;
-
-		if (!user.isNew()) {
-			expandoValue = _expandoValueLocalService.getValue(
-				user.getCompanyId(), User.class.getName(),
-				ExpandoTableConstants.DEFAULT_TABLE_NAME,
-				validUserFieldExpression, user.getUserId());
-		}
+		ExpandoValue expandoValue = _expandoValueLocalService.getValue(
+			user.getCompanyId(), User.class.getName(),
+			ExpandoTableConstants.DEFAULT_TABLE_NAME, validUserFieldExpression,
+			user.getUserId());
 
 		if (expandoValue == null) {
 			ExpandoTable table = null;
@@ -432,7 +382,7 @@ public class ExpandoUserFieldExpressionHandler
 			}
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			throw new SystemException(
@@ -447,41 +397,6 @@ public class ExpandoUserFieldExpressionHandler
 				safeLdapContext.close();
 			}
 		}
-	}
-
-	private String _getNormalizedData(
-			long companyId, String columnName, String... values)
-		throws PortalException {
-
-		ExpandoValue expandoValue =
-			_expandoValueLocalService.createExpandoValue(0);
-
-		ExpandoColumn expandoColumn = _expandoColumnLocalService.getColumn(
-			companyId, User.class.getName(),
-			ExpandoTableConstants.DEFAULT_TABLE_NAME, columnName);
-
-		expandoValue.setColumnId(expandoColumn.getColumnId());
-
-		_setExpandoValueData(
-			expandoValue, _valueConsumers.get(expandoColumn.getType()), values);
-
-		return expandoValue.getData();
-	}
-
-	private void _setExpandoValueData(
-			ExpandoValue expandoValue, ValueConsumer<String[]> valueConsumer,
-			String[] values)
-		throws PortalException {
-
-		if (valueConsumer == null) {
-			ExpandoColumn expandoColumn = expandoValue.getColumn();
-
-			throw new ValueDataException.UnsupportedColumnType(
-				expandoColumn.getColumnId(),
-				ExpandoColumnConstants.getTypeLabel(expandoColumn.getType()));
-		}
-
-		valueConsumer.accept(expandoValue, values);
 	}
 
 	private ExpandoValue _update(
@@ -500,126 +415,11 @@ public class ExpandoUserFieldExpressionHandler
 		return _expandoValueLocalService.addValue(
 			newExpandoValue.getCompanyId(), User.class.getName(),
 			ExpandoTableConstants.DEFAULT_TABLE_NAME, column.getName(),
-			newExpandoValue.getClassPK(), (Object)newExpandoValue.getData());
+			newExpandoValue.getClassPK(), newExpandoValue.getData());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExpandoUserFieldExpressionHandler.class);
-
-	private static final HashMap<Integer, ValueConsumer<String[]>>
-		_valueConsumers = HashMapBuilder.<Integer, ValueConsumer<String[]>>put(
-			ExpandoColumnConstants.BOOLEAN,
-			_getValueConsumer(
-				values -> GetterUtil.getBoolean(_head(values)),
-				ExpandoValue::setBoolean)
-		).put(
-			ExpandoColumnConstants.BOOLEAN_ARRAY,
-			_getValueConsumer(
-				GetterUtil::getBooleanValues, ExpandoValue::setBooleanArray)
-		).put(
-			ExpandoColumnConstants.DOUBLE,
-			_getValueConsumer(
-				values -> GetterUtil.getDouble(_head(values)),
-				ExpandoValue::setDouble)
-		).put(
-			ExpandoColumnConstants.DOUBLE_ARRAY,
-			_getValueConsumer(
-				GetterUtil::getDoubleValues, ExpandoValue::setDoubleArray)
-		).put(
-			ExpandoColumnConstants.FLOAT,
-			_getValueConsumer(
-				values -> GetterUtil.getFloat(_head(values)),
-				ExpandoValue::setFloat)
-		).put(
-			ExpandoColumnConstants.FLOAT_ARRAY,
-			_getValueConsumer(
-				GetterUtil::getLongValues, ExpandoValue::setLongArray)
-		).put(
-			ExpandoColumnConstants.INTEGER,
-			_getValueConsumer(
-				values -> GetterUtil.getIntegerStrict(_head(values)),
-				ExpandoValue::setInteger)
-		).put(
-			ExpandoColumnConstants.INTEGER_ARRAY,
-			_getValueConsumer(
-				values -> {
-					if (values == null) {
-						return null;
-					}
-
-					int[] valuesIntArray = new int[values.length];
-
-					for (int i = 0; i < valuesIntArray.length; i++) {
-						valuesIntArray[i] = GetterUtil.getIntegerStrict(
-							values[i]);
-					}
-
-					return valuesIntArray;
-				},
-				ExpandoValue::setIntegerArray)
-		).put(
-			ExpandoColumnConstants.LONG,
-			_getValueConsumer(
-				values -> GetterUtil.getLongStrict(_head(values)),
-				ExpandoValue::setLong)
-		).put(
-			ExpandoColumnConstants.LONG_ARRAY,
-			_getValueConsumer(
-				values -> {
-					if (values == null) {
-						return null;
-					}
-
-					long[] valuesLongArray = new long[values.length];
-
-					for (int i = 0; i < valuesLongArray.length; i++) {
-						valuesLongArray[i] = GetterUtil.getLongStrict(
-							values[i]);
-					}
-
-					return valuesLongArray;
-				},
-				ExpandoValue::setLongArray)
-		).put(
-			ExpandoColumnConstants.NUMBER,
-			_getValueConsumer(
-				values -> GetterUtil.getNumber(_head(values)),
-				ExpandoValue::setNumber)
-		).put(
-			ExpandoColumnConstants.NUMBER_ARRAY,
-			_getValueConsumer(
-				GetterUtil::getNumberValues, ExpandoValue::setNumberArray)
-		).put(
-			ExpandoColumnConstants.SHORT,
-			_getValueConsumer(
-				values -> GetterUtil.getShortStrict(_head(values)),
-				ExpandoValue::setShort)
-		).put(
-			ExpandoColumnConstants.SHORT_ARRAY,
-			_getValueConsumer(
-				values -> {
-					if (values == null) {
-						return null;
-					}
-
-					short[] shortValues = new short[values.length];
-
-					for (int i = 0; i < values.length; i++) {
-						shortValues[i] = GetterUtil.getShortStrict(values[i]);
-					}
-
-					return shortValues;
-				},
-				ExpandoValue::setShortArray)
-		).put(
-			ExpandoColumnConstants.STRING,
-			_getValueConsumer(
-				ExpandoUserFieldExpressionHandler::_head,
-				ExpandoValue::setString)
-		).put(
-			ExpandoColumnConstants.STRING_ARRAY,
-			_getValueConsumer(Function.identity(), ExpandoValue::setStringArray)
-		).build();
 
 	@Reference
 	private ExpandoColumnLocalService _expandoColumnLocalService;
@@ -633,9 +433,6 @@ public class ExpandoUserFieldExpressionHandler
 	@Reference
 	private LDAPFilterValidator _ldapFilterValidator;
 
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)"
-	)
 	private ConfigurationProvider<LDAPServerConfiguration>
 		_ldapServerConfigurationProvider;
 

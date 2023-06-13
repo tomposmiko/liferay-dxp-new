@@ -42,7 +42,7 @@ public class DateHistogramAggregationTranslatorImpl
 			AggregationBuilders.dateHistogram(
 				dateHistogramAggregation.getName());
 
-		if (ListUtil.isNotEmpty(dateHistogramAggregation.getOrders())) {
+		if (!ListUtil.isEmpty(dateHistogramAggregation.getOrders())) {
 			List<BucketOrder> bucketOrders = _orderTranslator.translate(
 				dateHistogramAggregation.getOrders());
 

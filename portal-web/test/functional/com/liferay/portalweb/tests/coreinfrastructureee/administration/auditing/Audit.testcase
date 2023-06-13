@@ -1,218 +1,51 @@
 @component-name = "portal-security"
 definition {
 
-	property ci.retries.disabled = "true";
-	property log.context.enabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property test.run.environment = "EE";
-	property testray.main.component.name = "Audit";
+	property testray.main.component.name = "Security";
 	property testray.testcase.product.edition = "EE";
 
 	setUp {
-		TestCase.setUpPortalInstance();
-
-		User.firstLoginPG();
+		User.firstLoginUI();
 	}
 
-	@description = "LPS-133646 and LPS-133653 TC-1: Verify that information is present in the logs after enabling log context & Incoming X-Request-ID."
-	@priority = 5
+	@description = "LPS-133646 and LPS-133653 TC-1: Asserting that information is present in the logs after enabling log context & Incoming X-Request-ID."
+	@priority = "5"
 	test AssertAuditConsoleInformationIsPresentAfterEnabledLog {
 		property test.name.skip.portal.instance = "Audit#AssertAuditConsoleInformationIsPresentAfterEnabledLog";
 
 		var companyId = JSONCompany.getCompanyId();
 		var userId = JSONUserAPI._getUserIdByEmailAddress(userEmailAddress = "test@liferay.com");
 
-		task ("Enable log context and Incoming X-Request-ID") {
-			Audit.gotoSystemSettings(portlet = "Audit Log Context");
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings");
 
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_ENABLED_BUTTON");
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Audit",
+			configurationName = "Audit Log Context",
+			configurationScope = "System Scope");
 
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_USE_X-REQUEST-ID");
+		Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_ENABLED_BUTTON");
 
-			PortletEntry.save();
-		}
+		Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_USE_X-REQUEST-ID");
 
-		task ("Assert that audit information is present in the logs") {
-			Navigator.openURL(baseURL = "http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address");
+		PortletEntry.save();
 
-			var curl = '''http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address''';
+		Navigator.openURL(baseURL = "http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address");
 
-			var runGet = JSONCurlUtil.get(${curl});
-
-			for (var logString : list "xRequestId,companyId=${companyId},virtualHostName,clientIP,userEmailAddress,serverName,userId=${userId}") {
-				AuditLog.viewLogFileContent(logString = ${logString});
-			}
-		}
-	}
-
-	@description = "This is a use case for LPS-155728. TC-1: Assert the email address is present in the audit log context in a human-readable format."
-	@priority = 2
-	test AssertEmailAddressIsPresentInReadable {
-		property test.name.skip.portal.instance = "Audit#AssertEmailAddressIsPresentInReadable";
-
-		task ("Given: Enable log context and Incoming X-Request-ID") {
-			Audit.gotoSystemSettings(portlet = "Audit Log Context");
-
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_ENABLED_BUTTON");
-
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_USE_X-REQUEST-ID");
-
-			PortletEntry.save();
-		}
-
-		task ("When: Trigger audit log") {
-			Navigator.openURL(baseURL = "http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address");
-		}
-
-		task ("Then: Assert the email address is present in the audit log context in a human-readable format") {
-			AuditLog.viewLogFileContent(logString = "userEmailAddress=test@liferay.com");
-		}
-	}
-
-	@description = "LPS-133646 and LPS-133653 TC-2: Verify that Console outputs a different X-Request-ID if an invalid X-Request-ID was inputted."
-	@priority = 5
-	test AssertInvalidXRequestId {
-		property osgi.module.configuration.file.names = "com.liferay.portal.security.audit.wiring.internal.configuration.AuditLogContextConfiguration.config";
-		property osgi.module.configurations = "enabled=\"true\"${line.separator}useIncomingXRequestId=\"true\"";
-		property test.name.skip.portal.instance = "Audit#AssertInvalidXRequestId";
-
-		var companyId = JSONCompany.getCompanyId();
-		var userId = JSONUserAPI._getUserIdByEmailAddress(userEmailAddress = "test@liferay.com");
-
-		task ("Assert that console outputs a different X-Request-ID than invalid inputted X-Request-ID") {
-			Navigator.openURL(baseURL = "http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address");
-
-			var invalidXRequestId = "invalidXRID";
-
-			var curl = '''http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address -H 'X-Request-Id:${invalidXRequestId}' ''';
-
-			var userId = JSONCurlUtil.get(${curl});
-
-			AssertConsoleTextNotPresent(value1 = ${invalidXRequestId});
-
-			AuditLog.viewLogFileContent(logString = "xRequestId");
-		}
-	}
-
-	@description = "This is a use case for LPS-140258. TC-1: Assert that sessionId is not present in the audit log context."
-	@priority = 2
-	test AssertSessionIdIsNotPresentInAuditLogContext {
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "Audit#AssertSessionIdIsNotPresentInAuditLogContext";
-
-		task ("Given: Enable log context and Incoming X-Request-ID") {
-			Audit.gotoSystemSettings(portlet = "Audit Log Context");
-
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_ENABLED_BUTTON");
-
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_USE_X-REQUEST-ID");
-
-			PortletEntry.save();
-		}
-
-		task ("When: Trigger audit log") {
-			User.logoutPG();
-
-			Navigator.openURL(baseURL = "http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address");
-		}
-
-		task ("Then: Assert that sessionId is not present in the audit log context") {
-			AssertConsoleTextNotPresent(value1 = "AuditLogContext.sessionId");
-		}
-	}
-
-	@description = "This is a use case for LPS-140258. TC-2: Assert that sessionId is not present in the Audit Log portlet's UI."
-	@priority = 2
-	test AssertSessionIdIsNotPresentInAuditLogPortlet {
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "Audit#AssertSessionIdIsNotPresentInAuditLogPortlet";
-
-		task ("Given: Enable log context and Incoming X-Request-ID") {
-			Audit.gotoSystemSettings(portlet = "Audit Log Context");
-
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_ENABLED_BUTTON");
-
-			Click(locator1 = "Audit#AUDIT_LOG_CONTEXT_USE_X-REQUEST-ID");
-
-			PortletEntry.save();
-		}
-
-		task ("And: Trigger audit log and assert sessionId is not present in audit log context") {
-			User.logoutPG();
-
-			Navigator.openURL(baseURL = "http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address");
-
-			AssertConsoleTextNotPresent(value1 = "AuditLogContext.sessionId");
-		}
-
-		task ("When: Go to control panel > Audit") {
-			User.loginPG();
-
-			ApplicationsMenu.gotoPortlet(
-				category = "Security",
-				panel = "Control Panel",
-				portlet = "Audit");
-		}
-
-		task ("Then: Assert that sessionId is not present in the Audit Log portlet's UI") {
-			AssertElementNotPresent(locator1 = "//tr/th[contains(@class,'session-id')]");
-		}
-	}
-
-	@description = "LPS-133646 and LPS-133653 TC-3: Verify that Console outputs the same X-Request-ID as inputted X-Request-ID."
-	@priority = 5
-	test AssertValidXRequestId {
-		property osgi.module.configuration.file.names = "com.liferay.portal.security.audit.wiring.internal.configuration.AuditLogContextConfiguration.config";
-		property osgi.module.configurations = "enabled=\"true\"${line.separator}useIncomingXRequestId=\"true\"";
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "Audit#AssertValidXRequestId";
-
-		var companyId = JSONCompany.getCompanyId();
-		var userId = JSONUserAPI._getUserIdByEmailAddress(userEmailAddress = "test@liferay.com");
-
-		task ("Assert that console outputs the same X-Request-ID as inputted X-Request-ID") {
-			Navigator.openURL(baseURL = "http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address");
-
-			var validXRequestId = StringUtil.randomString(40);
-
-			var curl = '''http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address -H 'X-Request-Id:${validXRequestId}' ''';
-
-			var userId = JSONCurlUtil.get(${curl});
-
-			AuditLog.viewLogFileContent(logString = ${validXRequestId});
-		}
-	}
-
-	@description = "This is a use case for LPS-150300. Verify that Console outputs the correct clientIP when reading of the X-Forwarded-For http header."
-	@priority = 5
-	test VerifyCorrectClientIP {
-		property osgi.module.configuration.file.names = "com.liferay.portal.security.audit.wiring.internal.configuration.AuditLogContextConfiguration.config";
-		property osgi.module.configurations = "enabled=\"true\"${line.separator}useIncomingXRequestId=\"true\"";
-		property test.name.skip.portal.instance = "Audit#VerifyCorrectClientIP";
-
-		task ("Add the OSGI configuration file") {
-			OSGiConfig.copyOSGiConfigFile(
-				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/administration/auditing/dependencies",
-				osgiConfigFileName = "com.liferay.portal.security.audit.router.configuration.LoggingAuditMessageProcessorConfiguration.config");
-
-			Audit.verifyConfigurationElementIsConfigured(
-				element = "Audit#AUDIT_LOG_MESSAGE_FORMAT",
-				portlet = "Logging Message Audit",
-				text = "JSON");
-		}
-
-		task ("Verify that console outputs the correct clientIP when reading of the X-Forwarded-For http header") {
-			var ipAddress = PropsUtil.get("ip.address");
-
-			var curl = '''http://localhost:8080/api/jsonws/user/get-user-by-email-address/company-id/email-address -H 'X-Forwarded-For: ${ipAddress}' ''';
-
-			echo("## * Read of the X-Forwarded-For http header:");
-
-			var runGet = JSONCurlUtil.get(${curl});
-
-			AuditLog.viewLogFileContent(logString = "clientIP=127.0.0.1");
-		}
+		AssertConsoleTextPresent(
+			value1 = "xRequestId",
+			value2 = "sessionId",
+			value3 = "companyId:${companyId}",
+			value4 = "virtualHostName",
+			value5 = "clientIP",
+			value6 = "emailAddress",
+			value7 = "serverName",
+			value8 = "userId:${userId}");
 	}
 
 }

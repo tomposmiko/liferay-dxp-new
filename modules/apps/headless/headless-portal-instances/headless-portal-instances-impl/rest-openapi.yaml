@@ -1,41 +1,11 @@
 components:
     schemas:
-        Admin:
-            # @review
-            description:
-                Administrator information.
-            properties:
-                emailAddress:
-                    # @review
-                    description:
-                        Administrator's email address.
-                    format: email
-                    type: string
-                familyName:
-                    # @review
-                    description:
-                        The admin's surname (last name).
-                    type: string
-                givenName:
-                    # @review
-                    description:
-                        The admin's first name.
-                    type: string
-            type: object
         PortalInstance:
             # @review
             properties:
                 active:
                     readOnly: true
                     type: boolean
-                admin:
-                    allOf:
-                        - $ref: "#/components/schemas/Admin"
-                    # @review
-                    description:
-                        The portal instance's administrator. This field is optional and is only used in the portal
-                        instance creation.
-                    writeOnly: true
                 companyId:
                     description:
                         internal unique key.
@@ -58,7 +28,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.portal.instances.client', and version '1.0.13'."
+        'com.liferay.headless.portal.instances.client', and version '1.0.2'."
     license:
         name: Apache 2.0
         url: http://www.apache.org/licenses/LICENSE-2.0.html

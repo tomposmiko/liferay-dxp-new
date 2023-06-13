@@ -12,19 +12,17 @@
  * details.
  */
 
+import './Calculator.scss';
+
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayForm from '@clayui/form';
 import ClayLayout from '@clayui/layout';
-import {
-	FieldStateless,
-	RulesSupport,
-	Token,
-	Tokenizer,
-} from 'data-engine-js-components-web';
+import {FieldStateless, RulesSupport} from 'data-engine-js-components-web';
+import Token from 'dynamic-data-mapping-form-builder/js/expressions/Token.es';
+import Tokenizer from 'dynamic-data-mapping-form-builder/js/expressions/Tokenizer.es';
 import React, {forwardRef, useMemo, useState} from 'react';
 
-import './Calculator.scss';
 import CalculatorButtonArea from './CalculatorButtonArea.es';
 
 function getRepeatableFields(fields) {
@@ -33,32 +31,44 @@ function getRepeatableFields(fields) {
 
 function getStateBasedOnExpression(expression) {
 	let disableDot = false;
+	let disableFunctions = false;
+	let disableNumbers = false;
 	let disableOperators = false;
+	let showOnlyRepeatableFields = false;
 	const tokens = Tokenizer.tokenize(expression);
 
 	if (
-		!tokens.length ||
-		(!!tokens.length &&
-			(tokens[tokens.length - 1].type !== Token.LITERAL ||
-				tokens[tokens.length - 1].value.includes('.')))
+		tokens.length > 1 &&
+		tokens[tokens.length - 1].type === Token.LEFT_PARENTHESIS &&
+		tokens[tokens.length - 2].type === Token.FUNCTION &&
+		tokens[tokens.length - 2].value === 'sum'
+	) {
+		disableFunctions = true;
+		disableNumbers = true;
+		disableOperators = true;
+		showOnlyRepeatableFields = true;
+	}
+
+	if (
+		tokens.length === 0 ||
+		(tokens.length > 0 && tokens[tokens.length - 1].type !== Token.LITERAL)
 	) {
 		disableDot = true;
 	}
 
 	if (
-		!!tokens.length &&
-		(tokens[tokens.length - 1].type === Token.OPERATOR ||
-			tokens[tokens.length - 1].value.slice(-1) === '.')
+		tokens.length > 0 &&
+		tokens[tokens.length - 1].type === Token.OPERATOR
 	) {
 		disableOperators = true;
 	}
 
 	return {
 		disableDot,
-		disableFunctions: false,
-		disableNumbers: false,
+		disableFunctions,
+		disableNumbers,
 		disableOperators,
-		showOnlyRepeatableFields: false,
+		showOnlyRepeatableFields,
 	};
 }
 
@@ -103,22 +113,11 @@ function isImplicitMultiplication(lastToken, newToken) {
 	);
 }
 
-function isSumAction(token) {
-	return (
-		token.length > 1 &&
-		token[token.length - 1].type === Token.LEFT_PARENTHESIS &&
-		token[token.length - 2].type === Token.FUNCTION &&
-		token[token.length - 2].value === 'sum'
-	);
-}
-
 function shouldAddImplicitMultiplication(tokens, newToken) {
 	const lastToken = tokens[tokens.length - 1];
 
 	return (
-		lastToken !== undefined &&
-		isImplicitMultiplication(lastToken, newToken) &&
-		isSumAction(tokens) !== true
+		lastToken !== undefined && isImplicitMultiplication(lastToken, newToken)
 	);
 }
 
@@ -174,7 +173,6 @@ function FieldsDropdown({items, onFieldSelected = () => {}, ...otherProps}) {
 								}}
 							>
 								{item.label}
-
 								{item.fieldReference && (
 									<span className="calculate-field-reference">
 										{` ${Liferay.Language.get(
@@ -296,7 +294,6 @@ const Calculator = forwardRef(
 										</ClayButton>
 									}
 								/>
-
 								<CalculatorButtonArea
 									disableDot={disableDot}
 									disableFunctions={disableFunctions}
@@ -308,7 +305,6 @@ const Calculator = forwardRef(
 								/>
 							</div>
 						</ClayLayout.Col>
-
 						<ClayLayout.Col
 							className="calculate-container-fields"
 							md="9"

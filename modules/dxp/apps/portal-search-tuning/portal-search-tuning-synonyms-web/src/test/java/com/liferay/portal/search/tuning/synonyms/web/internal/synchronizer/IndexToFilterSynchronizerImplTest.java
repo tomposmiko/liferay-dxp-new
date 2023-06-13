@@ -25,6 +25,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -39,6 +40,8 @@ public class IndexToFilterSynchronizerImplTest extends BaseSynonymsWebTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_indexToFilterSynchronizerImpl = new IndexToFilterSynchronizerImpl();
 
 		ReflectionTestUtil.setFieldValue(
@@ -47,6 +50,9 @@ public class IndexToFilterSynchronizerImplTest extends BaseSynonymsWebTestCase {
 		ReflectionTestUtil.setFieldValue(
 			_indexToFilterSynchronizerImpl, "_synonymSetFilterWriter",
 			_synonymSetFilterWriter);
+		ReflectionTestUtil.setFieldValue(
+			_indexToFilterSynchronizerImpl, "_synonymSetIndexNameBuilder",
+			synonymSetIndexNameBuilder);
 		ReflectionTestUtil.setFieldValue(
 			_indexToFilterSynchronizerImpl, "_synonymSetIndexReader",
 			synonymSetIndexReader);
@@ -62,13 +68,14 @@ public class IndexToFilterSynchronizerImplTest extends BaseSynonymsWebTestCase {
 		Mockito.verify(
 			_synonymSetFilterWriter, Mockito.times(1)
 		).updateSynonymSets(
-			Mockito.anyString(), Mockito.anyString(), Mockito.any(),
+			Mockito.anyString(), Mockito.anyString(), Mockito.anyObject(),
 			Mockito.anyBoolean()
 		);
 	}
 
 	private IndexToFilterSynchronizerImpl _indexToFilterSynchronizerImpl;
-	private final SynonymSetFilterWriter _synonymSetFilterWriter = Mockito.mock(
-		SynonymSetFilterWriter.class);
+
+	@Mock
+	private SynonymSetFilterWriter _synonymSetFilterWriter;
 
 }

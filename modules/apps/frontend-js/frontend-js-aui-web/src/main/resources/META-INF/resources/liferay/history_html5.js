@@ -22,31 +22,30 @@
 AUI.add(
 	'liferay-history-html5',
 	(A) => {
-		// eslint-disable-next-line @liferay/aui/no-object
-		const AObject = A.Object;
-		const History = Liferay.History;
-		const Lang = A.Lang;
-		const QueryString = A.QueryString;
+		var AObject = A.Object;
+		var History = Liferay.History;
+		var Lang = A.Lang;
+		var QueryString = A.QueryString;
 
-		const isEmpty = AObject.isEmpty;
-		const isValue = Lang.isValue;
+		var isEmpty = AObject.isEmpty;
+		var isValue = Lang.isValue;
 
-		const WIN = A.config.win;
+		var WIN = A.config.win;
 
-		const HISTORY = WIN.history;
+		var HISTORY = WIN.history;
 
-		const LOCATION = WIN.location;
+		var LOCATION = WIN.location;
 
 		A.mix(
 			History.prototype,
 			{
 				_init(config) {
-					const instance = this;
+					var instance = this;
 
-					const hash = LOCATION.hash;
+					var hash = LOCATION.hash;
 
-					const locationHashValid =
-						hash.indexOf(History.VALUE_SEPARATOR) !== -1;
+					var locationHashValid =
+						hash.indexOf(History.VALUE_SEPARATOR) != -1;
 
 					if (locationHashValid) {
 						HISTORY.replaceState(null, null, instance._updateURI());
@@ -71,27 +70,27 @@ AUI.add(
 				},
 
 				_updateURI(state) {
-					const instance = this;
+					var instance = this;
 
-					const uriData = [
+					var uriData = [
 						LOCATION.search.substr(1),
 						LOCATION.hash.substr(1),
 					];
 
-					const hash = uriData[1];
-					const query = uriData[0];
+					var hash = uriData[1];
+					var query = uriData[0];
 
-					let queryMap = {};
+					var queryMap = {};
 
 					if (query) {
 						queryMap = instance._parse(query);
 					}
 
 					if (!state && hash) {
-						const hashMap = instance._parse(hash);
+						var hashMap = instance._parse(hash);
 
 						if (!isEmpty(hashMap)) {
-							const protectedHashMap = {};
+							var protectedHashMap = {};
 
 							state = hashMap;
 
@@ -142,7 +141,7 @@ AUI.add(
 				PROTECTED_HASH_KEYS: [/^liferay$/, /^tab$/, /^_\d+_tab$/],
 
 				add(state, options) {
-					const instance = this;
+					var instance = this;
 
 					options = options || {};
 

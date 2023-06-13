@@ -20,7 +20,6 @@ import com.liferay.json.storage.model.JSONStorageEntryTable;
 import com.liferay.json.storage.model.impl.JSONStorageEntryImpl;
 import com.liferay.json.storage.model.impl.JSONStorageEntryModelImpl;
 import com.liferay.json.storage.service.persistence.JSONStorageEntryPersistence;
-import com.liferay.json.storage.service.persistence.JSONStorageEntryUtil;
 import com.liferay.json.storage.service.persistence.impl.constants.JSONStorePersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -36,6 +35,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Preston Crary
  * @generated
  */
-@Component(service = JSONStorageEntryPersistence.class)
+@Component(service = {JSONStorageEntryPersistence.class, BasePersistence.class})
 public class JSONStorageEntryPersistenceImpl
 	extends BasePersistenceImpl<JSONStorageEntry>
 	implements JSONStorageEntryPersistence {
@@ -206,7 +205,7 @@ public class JSONStorageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<JSONStorageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JSONStorageEntry jsonStorageEntry : list) {
@@ -606,7 +605,7 @@ public class JSONStorageEntryPersistenceImpl
 
 			finderArgs = new Object[] {classNameId, classPK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -785,7 +784,7 @@ public class JSONStorageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<JSONStorageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JSONStorageEntry jsonStorageEntry : list) {
@@ -1264,7 +1263,7 @@ public class JSONStorageEntryPersistenceImpl
 				companyId, classNameId, index, type, valueLong
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1467,7 +1466,7 @@ public class JSONStorageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<JSONStorageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JSONStorageEntry jsonStorageEntry : list) {
@@ -1974,7 +1973,7 @@ public class JSONStorageEntryPersistenceImpl
 				companyId, classNameId, key, type, valueLong
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2166,7 +2165,7 @@ public class JSONStorageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByCN_CPK_P_I_K, finderArgs, this);
+				_finderPathFetchByCN_CPK_P_I_K, finderArgs);
 		}
 
 		if (result instanceof JSONStorageEntry) {
@@ -2316,7 +2315,7 @@ public class JSONStorageEntryPersistenceImpl
 				classNameId, classPK, parentJSONStorageEntryId, index, key
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2763,9 +2762,7 @@ public class JSONStorageEntryPersistenceImpl
 	 */
 	@Override
 	public JSONStorageEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				JSONStorageEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(JSONStorageEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2985,7 +2982,7 @@ public class JSONStorageEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<JSONStorageEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3061,7 +3058,7 @@ public class JSONStorageEntryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3315,31 +3312,11 @@ public class JSONStorageEntryPersistenceImpl
 				"key_"
 			},
 			false);
-
-		_setJSONStorageEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setJSONStorageEntryUtilPersistence(null);
-
 		entityCache.removeCache(JSONStorageEntryImpl.class.getName());
-	}
-
-	private void _setJSONStorageEntryUtilPersistence(
-		JSONStorageEntryPersistence jsonStorageEntryPersistence) {
-
-		try {
-			Field field = JSONStorageEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, jsonStorageEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3407,5 +3384,9 @@ public class JSONStorageEntryPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private JSONStorageEntryModelArgumentsResolver
+		_jsonStorageEntryModelArgumentsResolver;
 
 }

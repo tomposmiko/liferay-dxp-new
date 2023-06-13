@@ -9,8 +9,6 @@
  * distribution rights of the Software.
  */
 
-/* eslint-disable @liferay/empty-line-between-elements */
-
 import ClayTable from '@clayui/table';
 import React from 'react';
 

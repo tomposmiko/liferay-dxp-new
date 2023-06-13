@@ -34,7 +34,7 @@ const getLabel = (confirmationLabel, label) => {
 	return label;
 };
 
-export default function withConfirmationField(Component) {
+export default (Component) => {
 	const Wrapper = ({requireConfirmation, ...otherProps}) => {
 		if (!requireConfirmation) {
 			return <Component {...otherProps} />;
@@ -64,7 +64,6 @@ export default function withConfirmationField(Component) {
 						label={getLabel(confirmationLabel, label)}
 					/>
 				</div>
-
 				<div className={className}>
 					<Component
 						{...otherProps}
@@ -96,4 +95,4 @@ export default function withConfirmationField(Component) {
 	};
 
 	return Wrapper;
-}
+};

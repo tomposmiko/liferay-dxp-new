@@ -11,8 +11,7 @@
 
 import {useContext, useEffect} from 'react';
 
-import {useFetch} from '../../../hooks/useFetch.es';
-import {usePost} from '../../../hooks/usePost.es';
+import {AppContext} from '../../../../components/AppContext.es';
 import {FilterContext} from '../FilterContext.es';
 import {
 	buildFilterItems,
@@ -26,7 +25,7 @@ const useFilterFetch = ({
 	formatItem,
 	labelPropertyName = 'label',
 	prefixKey,
-	requestBody: body = {},
+	requestBody: data = {},
 	propertyKey,
 	requestMethod: method = 'get',
 	requestParams: params = {},
@@ -35,18 +34,19 @@ const useFilterFetch = ({
 	staticItems,
 	withoutRouteParams,
 }) => {
+	const {client} = useContext(AppContext);
 	const {dispatchFilterError} = useContext(FilterContext);
 	const {items, selectedItems, selectedKeys, setItems} = useFilterState(
 		getCapitalizedFilterKey(prefixKey, filterKey),
 		withoutRouteParams
 	);
 
-	const parseResponse = (data = {}) => {
-		data?.items.sort((current, next) =>
+	const parseResponse = ({data = {}}) => {
+		data.items.sort((current, next) =>
 			current[labelPropertyName]?.localeCompare(next[labelPropertyName])
 		);
 
-		const mergedItems = mergeItemsArray(staticItems, data?.items);
+		const mergedItems = mergeItemsArray(staticItems, data.items);
 
 		const mappedItems = buildFilterItems({
 			formatItem,
@@ -58,29 +58,20 @@ const useFilterFetch = ({
 		setItems(mappedItems);
 	};
 
-	const {fetchData: fetch} = useFetch({callback: parseResponse, params, url});
-
-	const {postData: fetchPost} = usePost({
-		body,
-		callback: parseResponse,
-		params,
-		url,
-	});
-
-	const request = method === 'post' ? fetchPost : fetch;
-
 	useEffect(
 		() => {
 			dispatchFilterError(filterKey, true);
 
 			if (staticData) {
-				parseResponse({items: staticData});
+				parseResponse({data: {items: staticData}});
 			}
 			else {
-				request().catch(() => dispatchFilterError(filterKey));
+				client
+					.request({data, method, params, url})
+					.then(parseResponse)
+					.catch(() => dispatchFilterError(filterKey));
 			}
 		},
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[]
 	);

@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -125,26 +126,20 @@ public class ObjectLayoutColumnModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTFIELDID_COLUMN_BITMASK = 2L;
+	public static final long OBJECTLAYOUTROWID_COLUMN_BITMASK = 2L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTLAYOUTROWID_COLUMN_BITMASK = 4L;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
-	 */
-	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 8L;
+	public static final long UUID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTLAYOUTCOLUMNID_COLUMN_BITMASK = 16L;
+	public static final long OBJECTLAYOUTCOLUMNID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -236,120 +231,132 @@ public class ObjectLayoutColumnModelImpl
 	public Map<String, Function<ObjectLayoutColumn, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ObjectLayoutColumn, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ObjectLayoutColumn>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ObjectLayoutColumn, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ObjectLayoutColumn.class.getClassLoader(), ObjectLayoutColumn.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ObjectLayoutColumn, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<ObjectLayoutColumn, Object>>();
+		try {
+			Constructor<ObjectLayoutColumn> constructor =
+				(Constructor<ObjectLayoutColumn>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", ObjectLayoutColumn::getMvccVersion);
-			attributeGetterFunctions.put("uuid", ObjectLayoutColumn::getUuid);
-			attributeGetterFunctions.put(
-				"objectLayoutColumnId",
-				ObjectLayoutColumn::getObjectLayoutColumnId);
-			attributeGetterFunctions.put(
-				"companyId", ObjectLayoutColumn::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", ObjectLayoutColumn::getUserId);
-			attributeGetterFunctions.put(
-				"userName", ObjectLayoutColumn::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", ObjectLayoutColumn::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", ObjectLayoutColumn::getModifiedDate);
-			attributeGetterFunctions.put(
-				"objectFieldId", ObjectLayoutColumn::getObjectFieldId);
-			attributeGetterFunctions.put(
-				"objectLayoutRowId", ObjectLayoutColumn::getObjectLayoutRowId);
-			attributeGetterFunctions.put(
-				"priority", ObjectLayoutColumn::getPriority);
-			attributeGetterFunctions.put("size", ObjectLayoutColumn::getSize);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ObjectLayoutColumn, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ObjectLayoutColumn, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ObjectLayoutColumn, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ObjectLayoutColumn, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<ObjectLayoutColumn, Object>>();
+		Map<String, BiConsumer<ObjectLayoutColumn, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<ObjectLayoutColumn, ?>>();
 
-		static {
-			Map<String, BiConsumer<ObjectLayoutColumn, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<ObjectLayoutColumn, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", ObjectLayoutColumn::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<ObjectLayoutColumn, Long>)
+				ObjectLayoutColumn::setMvccVersion);
+		attributeGetterFunctions.put("uuid", ObjectLayoutColumn::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<ObjectLayoutColumn, String>)
+				ObjectLayoutColumn::setUuid);
+		attributeGetterFunctions.put(
+			"objectLayoutColumnId",
+			ObjectLayoutColumn::getObjectLayoutColumnId);
+		attributeSetterBiConsumers.put(
+			"objectLayoutColumnId",
+			(BiConsumer<ObjectLayoutColumn, Long>)
+				ObjectLayoutColumn::setObjectLayoutColumnId);
+		attributeGetterFunctions.put(
+			"companyId", ObjectLayoutColumn::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<ObjectLayoutColumn, Long>)
+				ObjectLayoutColumn::setCompanyId);
+		attributeGetterFunctions.put("userId", ObjectLayoutColumn::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<ObjectLayoutColumn, Long>)
+				ObjectLayoutColumn::setUserId);
+		attributeGetterFunctions.put(
+			"userName", ObjectLayoutColumn::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<ObjectLayoutColumn, String>)
+				ObjectLayoutColumn::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", ObjectLayoutColumn::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<ObjectLayoutColumn, Date>)
+				ObjectLayoutColumn::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", ObjectLayoutColumn::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<ObjectLayoutColumn, Date>)
+				ObjectLayoutColumn::setModifiedDate);
+		attributeGetterFunctions.put(
+			"objectFieldId", ObjectLayoutColumn::getObjectFieldId);
+		attributeSetterBiConsumers.put(
+			"objectFieldId",
+			(BiConsumer<ObjectLayoutColumn, Long>)
+				ObjectLayoutColumn::setObjectFieldId);
+		attributeGetterFunctions.put(
+			"objectLayoutRowId", ObjectLayoutColumn::getObjectLayoutRowId);
+		attributeSetterBiConsumers.put(
+			"objectLayoutRowId",
+			(BiConsumer<ObjectLayoutColumn, Long>)
+				ObjectLayoutColumn::setObjectLayoutRowId);
+		attributeGetterFunctions.put(
+			"priority", ObjectLayoutColumn::getPriority);
+		attributeSetterBiConsumers.put(
+			"priority",
+			(BiConsumer<ObjectLayoutColumn, Integer>)
+				ObjectLayoutColumn::setPriority);
+		attributeGetterFunctions.put("size", ObjectLayoutColumn::getSize);
+		attributeSetterBiConsumers.put(
+			"size",
+			(BiConsumer<ObjectLayoutColumn, Integer>)
+				ObjectLayoutColumn::setSize);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<ObjectLayoutColumn, Long>)
-					ObjectLayoutColumn::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<ObjectLayoutColumn, String>)
-					ObjectLayoutColumn::setUuid);
-			attributeSetterBiConsumers.put(
-				"objectLayoutColumnId",
-				(BiConsumer<ObjectLayoutColumn, Long>)
-					ObjectLayoutColumn::setObjectLayoutColumnId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<ObjectLayoutColumn, Long>)
-					ObjectLayoutColumn::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<ObjectLayoutColumn, Long>)
-					ObjectLayoutColumn::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<ObjectLayoutColumn, String>)
-					ObjectLayoutColumn::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<ObjectLayoutColumn, Date>)
-					ObjectLayoutColumn::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<ObjectLayoutColumn, Date>)
-					ObjectLayoutColumn::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"objectFieldId",
-				(BiConsumer<ObjectLayoutColumn, Long>)
-					ObjectLayoutColumn::setObjectFieldId);
-			attributeSetterBiConsumers.put(
-				"objectLayoutRowId",
-				(BiConsumer<ObjectLayoutColumn, Long>)
-					ObjectLayoutColumn::setObjectLayoutRowId);
-			attributeSetterBiConsumers.put(
-				"priority",
-				(BiConsumer<ObjectLayoutColumn, Integer>)
-					ObjectLayoutColumn::setPriority);
-			attributeSetterBiConsumers.put(
-				"size",
-				(BiConsumer<ObjectLayoutColumn, Integer>)
-					ObjectLayoutColumn::setSize);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -527,16 +534,6 @@ public class ObjectLayoutColumnModelImpl
 		}
 
 		_objectFieldId = objectFieldId;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public long getOriginalObjectFieldId() {
-		return GetterUtil.getLong(
-			this.<Long>getColumnOriginalValue("objectFieldId"));
 	}
 
 	@Override
@@ -885,12 +882,41 @@ public class ObjectLayoutColumnModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ObjectLayoutColumn, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ObjectLayoutColumn, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ObjectLayoutColumn, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ObjectLayoutColumn)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ObjectLayoutColumn>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ObjectLayoutColumn.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -912,8 +938,7 @@ public class ObjectLayoutColumnModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<ObjectLayoutColumn, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

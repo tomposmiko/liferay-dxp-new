@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-sidebar-panel',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const SidebarPanel = A.Component.create({
+		var SidebarPanel = A.Component.create({
 			ATTRS: {
 				resourceUrl: {
 					validator: Lang.isString,
@@ -40,7 +40,7 @@ AUI.add(
 
 			prototype: {
 				_bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = [
 						instance._searchContainer.on(
@@ -61,9 +61,9 @@ AUI.add(
 				},
 
 				_detachSearchContainerRegisterHandle() {
-					const instance = this;
+					var instance = this;
 
-					const searchContainerRegisterHandle =
+					var searchContainerRegisterHandle =
 						instance._searchContainerRegisterHandle;
 
 					if (searchContainerRegisterHandle) {
@@ -74,7 +74,7 @@ AUI.add(
 				},
 
 				_getSidebarContent() {
-					const instance = this;
+					var instance = this;
 
 					Liferay.Util.fetch(instance.get('resourceUrl'), {
 						body: new FormData(
@@ -89,9 +89,9 @@ AUI.add(
 				},
 
 				_onSearchContainerRegistered(event) {
-					const instance = this;
+					var instance = this;
 
-					const searchContainer = event.searchContainer;
+					var searchContainer = event.searchContainer;
 
 					if (
 						searchContainer.get('id') ===
@@ -108,7 +108,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					instance._detachSearchContainerRegisterHandle();
 
@@ -116,7 +116,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._searchContainerRegisterHandle = Liferay.on(
 						'search-container:registered',

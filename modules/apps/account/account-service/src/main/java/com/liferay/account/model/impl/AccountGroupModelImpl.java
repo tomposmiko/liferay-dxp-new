@@ -16,9 +16,9 @@ package com.liferay.account.model.impl;
 
 import com.liferay.account.model.AccountGroup;
 import com.liferay.account.model.AccountGroupModel;
+import com.liferay.account.model.AccountGroupSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
-import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -30,21 +30,23 @@ import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -73,8 +75,7 @@ public class AccountGroupModelImpl
 	public static final String TABLE_NAME = "AccountGroup";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
-		{"externalReferenceCode", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"externalReferenceCode", Types.VARCHAR},
 		{"accountGroupId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -87,7 +88,6 @@ public class AccountGroupModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("accountGroupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -102,7 +102,7 @@ public class AccountGroupModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table AccountGroup (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,accountGroupId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,defaultAccountGroup BOOLEAN,description VARCHAR(75) null,name VARCHAR(75) null,type_ VARCHAR(75) null)";
+		"create table AccountGroup (mvccVersion LONG default 0 not null,externalReferenceCode VARCHAR(75) null,accountGroupId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,defaultAccountGroup BOOLEAN,description VARCHAR(75) null,name VARCHAR(75) null,type_ VARCHAR(75) null)";
 
 	public static final String TABLE_SQL_DROP = "drop table AccountGroup";
 
@@ -146,19 +146,7 @@ public class AccountGroupModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long NAME_COLUMN_BITMASK = 16L;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
-	 */
-	@Deprecated
-	public static final long TYPE_COLUMN_BITMASK = 32L;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
-	 */
-	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 64L;
+	public static final long TYPE_COLUMN_BITMASK = 16L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -172,6 +160,60 @@ public class AccountGroupModelImpl
 	 */
 	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AccountGroup toModel(AccountGroupSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		AccountGroup model = new AccountGroupImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
+		model.setAccountGroupId(soapModel.getAccountGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setDefaultAccountGroup(soapModel.isDefaultAccountGroup());
+		model.setDescription(soapModel.getDescription());
+		model.setName(soapModel.getName());
+		model.setType(soapModel.getType());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AccountGroup> toModels(AccountGroupSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AccountGroup> models = new ArrayList<AccountGroup>(
+			soapModels.length);
+
+		for (AccountGroupSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public AccountGroupModelImpl() {
@@ -250,111 +292,112 @@ public class AccountGroupModelImpl
 	public Map<String, Function<AccountGroup, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AccountGroup, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AccountGroup>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AccountGroup, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AccountGroup.class.getClassLoader(), AccountGroup.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AccountGroup, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<AccountGroup, Object>>();
+		try {
+			Constructor<AccountGroup> constructor =
+				(Constructor<AccountGroup>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AccountGroup::getMvccVersion);
-			attributeGetterFunctions.put("uuid", AccountGroup::getUuid);
-			attributeGetterFunctions.put(
-				"externalReferenceCode",
-				AccountGroup::getExternalReferenceCode);
-			attributeGetterFunctions.put(
-				"accountGroupId", AccountGroup::getAccountGroupId);
-			attributeGetterFunctions.put(
-				"companyId", AccountGroup::getCompanyId);
-			attributeGetterFunctions.put("userId", AccountGroup::getUserId);
-			attributeGetterFunctions.put("userName", AccountGroup::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", AccountGroup::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", AccountGroup::getModifiedDate);
-			attributeGetterFunctions.put(
-				"defaultAccountGroup", AccountGroup::getDefaultAccountGroup);
-			attributeGetterFunctions.put(
-				"description", AccountGroup::getDescription);
-			attributeGetterFunctions.put("name", AccountGroup::getName);
-			attributeGetterFunctions.put("type", AccountGroup::getType);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AccountGroup, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AccountGroup, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AccountGroup, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AccountGroup, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AccountGroup, Object>>();
+		Map<String, BiConsumer<AccountGroup, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AccountGroup, ?>>();
 
-		static {
-			Map<String, BiConsumer<AccountGroup, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<AccountGroup, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountGroup::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AccountGroup, Long>)AccountGroup::setMvccVersion);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", AccountGroup::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<AccountGroup, String>)
+				AccountGroup::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"accountGroupId", AccountGroup::getAccountGroupId);
+		attributeSetterBiConsumers.put(
+			"accountGroupId",
+			(BiConsumer<AccountGroup, Long>)AccountGroup::setAccountGroupId);
+		attributeGetterFunctions.put("companyId", AccountGroup::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AccountGroup, Long>)AccountGroup::setCompanyId);
+		attributeGetterFunctions.put("userId", AccountGroup::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<AccountGroup, Long>)AccountGroup::setUserId);
+		attributeGetterFunctions.put("userName", AccountGroup::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<AccountGroup, String>)AccountGroup::setUserName);
+		attributeGetterFunctions.put("createDate", AccountGroup::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<AccountGroup, Date>)AccountGroup::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AccountGroup::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<AccountGroup, Date>)AccountGroup::setModifiedDate);
+		attributeGetterFunctions.put(
+			"defaultAccountGroup", AccountGroup::getDefaultAccountGroup);
+		attributeSetterBiConsumers.put(
+			"defaultAccountGroup",
+			(BiConsumer<AccountGroup, Boolean>)
+				AccountGroup::setDefaultAccountGroup);
+		attributeGetterFunctions.put(
+			"description", AccountGroup::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<AccountGroup, String>)AccountGroup::setDescription);
+		attributeGetterFunctions.put("name", AccountGroup::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<AccountGroup, String>)AccountGroup::setName);
+		attributeGetterFunctions.put("type", AccountGroup::getType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<AccountGroup, String>)AccountGroup::setType);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AccountGroup, Long>)AccountGroup::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<AccountGroup, String>)AccountGroup::setUuid);
-			attributeSetterBiConsumers.put(
-				"externalReferenceCode",
-				(BiConsumer<AccountGroup, String>)
-					AccountGroup::setExternalReferenceCode);
-			attributeSetterBiConsumers.put(
-				"accountGroupId",
-				(BiConsumer<AccountGroup, Long>)
-					AccountGroup::setAccountGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AccountGroup, Long>)AccountGroup::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<AccountGroup, Long>)AccountGroup::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<AccountGroup, String>)AccountGroup::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<AccountGroup, Date>)AccountGroup::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<AccountGroup, Date>)AccountGroup::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"defaultAccountGroup",
-				(BiConsumer<AccountGroup, Boolean>)
-					AccountGroup::setDefaultAccountGroup);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<AccountGroup, String>)AccountGroup::setDescription);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<AccountGroup, String>)AccountGroup::setName);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<AccountGroup, String>)AccountGroup::setType);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -370,35 +413,6 @@ public class AccountGroupModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
-	}
-
-	@JSON
-	@Override
-	public String getUuid() {
-		if (_uuid == null) {
-			return "";
-		}
-		else {
-			return _uuid;
-		}
-	}
-
-	@Override
-	public void setUuid(String uuid) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_uuid = uuid;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public String getOriginalUuid() {
-		return getColumnOriginalValue("uuid_");
 	}
 
 	@JSON
@@ -638,15 +652,6 @@ public class AccountGroupModelImpl
 		_name = name;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public String getOriginalName() {
-		return getColumnOriginalValue("name");
-	}
-
 	@JSON
 	@Override
 	public String getType() {
@@ -674,12 +679,6 @@ public class AccountGroupModelImpl
 	@Deprecated
 	public String getOriginalType() {
 		return getColumnOriginalValue("type_");
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return new StagedModelType(
-			PortalUtil.getClassNameId(AccountGroup.class.getName()));
 	}
 
 	public long getColumnBitmask() {
@@ -739,7 +738,6 @@ public class AccountGroupModelImpl
 		AccountGroupImpl accountGroupImpl = new AccountGroupImpl();
 
 		accountGroupImpl.setMvccVersion(getMvccVersion());
-		accountGroupImpl.setUuid(getUuid());
 		accountGroupImpl.setExternalReferenceCode(getExternalReferenceCode());
 		accountGroupImpl.setAccountGroupId(getAccountGroupId());
 		accountGroupImpl.setCompanyId(getCompanyId());
@@ -763,7 +761,6 @@ public class AccountGroupModelImpl
 
 		accountGroupImpl.setMvccVersion(
 			this.<Long>getColumnOriginalValue("mvccVersion"));
-		accountGroupImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
 		accountGroupImpl.setExternalReferenceCode(
 			this.<String>getColumnOriginalValue("externalReferenceCode"));
 		accountGroupImpl.setAccountGroupId(
@@ -862,14 +859,6 @@ public class AccountGroupModelImpl
 			new AccountGroupCacheModel();
 
 		accountGroupCacheModel.mvccVersion = getMvccVersion();
-
-		accountGroupCacheModel.uuid = getUuid();
-
-		String uuid = accountGroupCacheModel.uuid;
-
-		if ((uuid != null) && (uuid.length() == 0)) {
-			accountGroupCacheModel.uuid = null;
-		}
 
 		accountGroupCacheModel.externalReferenceCode =
 			getExternalReferenceCode();
@@ -993,17 +982,45 @@ public class AccountGroupModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AccountGroup, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AccountGroup, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AccountGroup, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((AccountGroup)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AccountGroup>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AccountGroup.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
-	private String _uuid;
 	private String _externalReferenceCode;
 	private long _accountGroupId;
 	private long _companyId;
@@ -1020,9 +1037,8 @@ public class AccountGroupModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<AccountGroup, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<AccountGroup, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -1048,7 +1064,6 @@ public class AccountGroupModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
-		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("accountGroupId", _accountGroupId);
@@ -1068,7 +1083,6 @@ public class AccountGroupModelImpl
 	static {
 		Map<String, String> attributeNames = new HashMap<>();
 
-		attributeNames.put("uuid_", "uuid");
 		attributeNames.put("type_", "type");
 
 		_attributeNames = Collections.unmodifiableMap(attributeNames);
@@ -1087,29 +1101,27 @@ public class AccountGroupModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("uuid_", 2L);
+		columnBitmasks.put("externalReferenceCode", 2L);
 
-		columnBitmasks.put("externalReferenceCode", 4L);
+		columnBitmasks.put("accountGroupId", 4L);
 
-		columnBitmasks.put("accountGroupId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("defaultAccountGroup", 256L);
 
-		columnBitmasks.put("defaultAccountGroup", 512L);
+		columnBitmasks.put("description", 512L);
 
-		columnBitmasks.put("description", 1024L);
+		columnBitmasks.put("name", 1024L);
 
-		columnBitmasks.put("name", 2048L);
-
-		columnBitmasks.put("type_", 4096L);
+		columnBitmasks.put("type_", 2048L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

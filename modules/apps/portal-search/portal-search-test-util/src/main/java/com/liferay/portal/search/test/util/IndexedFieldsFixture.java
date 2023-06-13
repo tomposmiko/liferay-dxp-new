@@ -25,12 +25,9 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.change.tracking.CTModel;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
@@ -52,11 +49,9 @@ import java.util.Map;
 public class IndexedFieldsFixture {
 
 	public IndexedFieldsFixture(
-		ResourcePermissionLocalService resourcePermissionLocalService,
-		SearchEngineHelper searchEngineHelper) {
+		ResourcePermissionLocalService resourcePermissionLocalService) {
 
 		_resourcePermissionLocalService = resourcePermissionLocalService;
-		_searchEngineHelper = searchEngineHelper;
 
 		_uidFactory = null;
 		_documentBuilderFactory = null;
@@ -64,11 +59,9 @@ public class IndexedFieldsFixture {
 
 	public IndexedFieldsFixture(
 		ResourcePermissionLocalService resourcePermissionLocalService,
-		SearchEngineHelper searchEngineHelper,
 		DocumentBuilderFactory documentBuilderFactory) {
 
 		_resourcePermissionLocalService = resourcePermissionLocalService;
-		_searchEngineHelper = searchEngineHelper;
 		_documentBuilderFactory = documentBuilderFactory;
 
 		_uidFactory = null;
@@ -76,11 +69,9 @@ public class IndexedFieldsFixture {
 
 	public IndexedFieldsFixture(
 		ResourcePermissionLocalService resourcePermissionLocalService,
-		SearchEngineHelper searchEngineHelper, UIDFactory uidFactory,
-		DocumentBuilderFactory documentBuilderFactory) {
+		UIDFactory uidFactory, DocumentBuilderFactory documentBuilderFactory) {
 
 		_resourcePermissionLocalService = resourcePermissionLocalService;
-		_searchEngineHelper = searchEngineHelper;
 		_uidFactory = uidFactory;
 		_documentBuilderFactory = documentBuilderFactory;
 	}
@@ -96,13 +87,11 @@ public class IndexedFieldsFixture {
 	public void populateExpirationDateWithForever(Map<String, String> map) {
 		populateDate(Field.EXPIRATION_DATE, new Date(Long.MAX_VALUE), map);
 
-		if (_isSearchEngineElasticsearch()) {
-			map.put(Field.EXPIRATION_DATE, "99950812133000");
-		}
+		map.put(Field.EXPIRATION_DATE, "99950812133000");
 	}
 
 	public void populatePriority(String priority, Map<String, String> map) {
-		populatePriority(priority, map, true);
+		populatePriority(priority, map, false);
 	}
 
 	public void populatePriority(
@@ -111,7 +100,7 @@ public class IndexedFieldsFixture {
 
 		map.put(Field.PRIORITY, priority);
 
-		if (sourceFilteringEnabled || _isSearchEngineSolr()) {
+		if (sourceFilteringEnabled) {
 			map.put(Field.PRIORITY.concat("_sortable"), priority);
 		}
 	}
@@ -205,33 +194,9 @@ public class IndexedFieldsFixture {
 
 	public void postProcessDocument(
 		com.liferay.portal.kernel.search.Document document) {
-
-		if (_isSearchEngineSolr()) {
-			if (Validator.isNotNull(document.get("roleNames"))) {
-				document.add(
-					new Field(
-						"roleNames",
-						StringUtil.toLowerCase(document.get("roleNames"))));
-			}
-
-			document.remove("score");
-		}
 	}
 
 	public Document postProcessDocument(Document document) {
-		if (_isSearchEngineSolr()) {
-			DocumentBuilder documentBuilder = _documentBuilderFactory.builder(
-				document);
-
-			documentBuilder.setString(
-				"userGroupRoleNames",
-				StringUtil.toLowerCase(
-					document.getString("userGroupRoleNames")));
-			documentBuilder.unsetValue("score");
-
-			return documentBuilder.build();
-		}
-
 		return document;
 	}
 
@@ -248,20 +213,6 @@ public class IndexedFieldsFixture {
 		}
 	}
 
-	private boolean _isSearchEngine(String vendor) {
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
-
-		return vendor.equals(searchEngine.getVendor());
-	}
-
-	private boolean _isSearchEngineElasticsearch() {
-		return _isSearchEngine("Elasticsearch");
-	}
-
-	private boolean _isSearchEngineSolr() {
-		return _isSearchEngine("Solr");
-	}
-
 	private static final boolean _ENFORCE_STANDARD_UID = false;
 
 	private final Format _dateFormat =
@@ -269,7 +220,6 @@ public class IndexedFieldsFixture {
 	private final DocumentBuilderFactory _documentBuilderFactory;
 	private final ResourcePermissionLocalService
 		_resourcePermissionLocalService;
-	private final SearchEngineHelper _searchEngineHelper;
 	private final UIDFactory _uidFactory;
 
 }

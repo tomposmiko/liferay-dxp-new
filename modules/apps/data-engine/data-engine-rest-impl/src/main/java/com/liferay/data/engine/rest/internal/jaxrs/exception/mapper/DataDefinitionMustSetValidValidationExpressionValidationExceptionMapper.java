@@ -52,11 +52,10 @@ public class
 				mustSetValidValidationExpression.getValidationExpression()
 			).put(
 				"fieldName", mustSetValidValidationExpression.getFieldName()
-			).toString(),
+			).toJSONString(),
 			Response.Status.BAD_REQUEST,
 			mustSetValidValidationExpression.getMessage(),
-			DataDefinitionValidationException.MustSetValidValidationExpression.
-				class.getName());
+			"MustSetValidValidationExpression");
 	}
 
 }

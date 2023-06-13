@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 public class GroupUtil {
 
 	public static String getAssetLibraryKey(Group group) {
-		if (group.isDepot()) {
+		if (_isDepot(group)) {
 			return group.getGroupKey();
 		}
 
@@ -56,7 +56,7 @@ public class GroupUtil {
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 
 				return null;
@@ -87,7 +87,7 @@ public class GroupUtil {
 	}
 
 	public static Long getSiteId(Group group) {
-		if (group.isDepot()) {
+		if (_isDepot(group)) {
 			return null;
 		}
 
@@ -98,6 +98,14 @@ public class GroupUtil {
 		if (_isDepotOrSite(group) ||
 			((group != null) && _isDepotOrSite(group.getLiveGroup()))) {
 
+			return true;
+		}
+
+		return false;
+	}
+
+	private static boolean _isDepot(Group group) {
+		if (group.isDepot()) {
 			return true;
 		}
 

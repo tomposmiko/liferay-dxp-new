@@ -1,7 +1,6 @@
 @component-name = "portal-server-administration"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Server Administration";
@@ -15,12 +14,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ExecuteScriptWithEmbeddedHTML {
 		property test.name.skip.portal.instance = "GroovyScript#ExecuteScriptWithEmbeddedHTML";
 
@@ -37,25 +36,23 @@ definition {
 
 		ServerAdministration.executeScript(
 			language = "Groovy",
-			script = ${script});
-
-		var outputContent = '''<div class="embedded-html-test"> Test Embedded HTML </div>''';
+			script = "${script}");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
-			value1 = ${outputContent});
+			value1 = '''<div class="embedded-html-test"> Test Embedded HTML </div>''');
 
 		ServerAdministration.executeScript(
 			htmlOutput = "true",
 			language = "Groovy",
-			script = ${script});
+			script = "${script}");
 
 		AssertTextEquals(
 			locator1 = "//div[@class='embedded-html-test']",
 			value1 = "Test Embedded HTML");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ExecuteScriptWithLiferayClasses {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "GroovyScript#ExecuteScriptWithLiferayClasses";
@@ -63,8 +60,8 @@ definition {
 		ServerAdministration.openServerAdmin();
 
 		var script = '''
-			import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 			import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
+			import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 
 			fragmentCollectionId = CounterLocalServiceUtil.increment();
 
@@ -77,46 +74,14 @@ definition {
 
 		ServerAdministration.executeScript(
 			language = "Groovy",
-			script = ${script});
+			script = "${script}");
 
 		AssertTextEquals(
 			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
 			value1 = "Test Fragment Collection Name");
 	}
 
-	@description = "This is a use case for LPS-102832. Check returns property value without leading spaces."
-	@priority = 4
-	test ExecuteScriptWithPredefinedProperty {
-		property custom.properties = "partnerstamm-api-user = his_user";
-		property test.name.skip.portal.instance = "GroovyScript#ExecuteScriptWithPredefinedProperty";
-
-		ServerAdministration.openServerAdmin();
-
-		var script = '''
-			import com.liferay.portal.kernel.configuration.Configuration;
-			import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
-			import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
-			import com.liferay.portal.kernel.util.PropsUtil;
-			import com.liferay.portal.util.PropsUtil;
-
-			println("com.liferay.portal.util.PropsUtil:" + com.liferay.portal.util.PropsUtil.get("partnerstamm-api-user"))
-
-			println("com.liferay.portal.kernel.util.PropsUtil:" + com.liferay.portal.kernel.util.PropsUtil.get("partnerstamm-api-user"))
-
-			Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portal");
-			println("ConfigurationFactoryUtil:" + configuration.get("partnerstamm-api-user"));
-		''';
-
-		ServerAdministration.executeScript(
-			language = "Groovy",
-			script = ${script});
-
-		AssertTextEquals(
-			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
-			value1 = "com.liferay.portal.util.PropsUtil:his_user com.liferay.portal.kernel.util.PropsUtil:his_user ConfigurationFactoryUtil:his_user");
-	}
-
-	@priority = 4
+	@priority = "4"
 	test ExecuteScriptWithPredefinedVariables {
 		property test.name.skip.portal.instance = "GroovyScript#ExecuteScriptWithPredefinedVariables";
 
@@ -132,7 +97,7 @@ definition {
 
 		ServerAdministration.executeScript(
 			language = "Groovy",
-			script = ${script});
+			script = "${script}");
 
 		var siteName = TestCase.getSiteName();
 
@@ -141,7 +106,7 @@ definition {
 			value1 = "Current company: ${siteName}");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ExecuteSimpleScript {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "GroovyScript#ExecuteSimpleScript";
@@ -154,7 +119,7 @@ definition {
 
 		ServerAdministration.executeScript(
 			language = "Groovy",
-			script = ${script});
+			script = "${script}");
 
 		AssertTextEquals(
 			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",

@@ -761,9 +761,11 @@ public class SharepointWSRepository
 
 			sharepointConnection.moveSharepointObject(path, newPath);
 
+			sharepointObject = sharepointConnection.getSharepointObject(
+				newPath);
+
 			return _toExtRepositoryObject(
-				extRepositoryObjectType,
-				sharepointConnection.getSharepointObject(newPath));
+				extRepositoryObjectType, sharepointObject);
 		}
 		catch (SharepointException | SharepointRuntimeException exception) {
 			throw new SystemException(exception);
@@ -908,7 +910,7 @@ public class SharepointWSRepository
 		}
 		catch (SharepointException sharepointException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(sharepointException);
+				_log.debug(sharepointException, sharepointException);
 			}
 
 			// The Sharepoint object does not exist

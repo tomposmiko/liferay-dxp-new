@@ -14,19 +14,23 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.PortletRegistry;
+import com.liferay.fragment.renderer.FragmentRendererController;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.web.internal.segments.SegmentsExperienceUtil;
-import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkManager;
-import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
+import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
-import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Layout;
@@ -34,15 +38,17 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.segments.constants.SegmentsEntryConstants;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.model.SegmentsExperimentRel;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.segments.service.SegmentsExperienceService;
 import com.liferay.segments.service.SegmentsExperimentRelService;
 import com.liferay.segments.service.SegmentsExperimentService;
@@ -61,6 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author David Arques
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/add_segments_experience"
@@ -74,36 +81,40 @@ public class AddSegmentsExperienceMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws PortalException {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		SegmentsExperiment segmentsExperiment = _getSegmentsExperiment(
 			actionRequest);
-
-		long groupId = ParamUtil.getLong(actionRequest, "groupId");
-		long plid = ParamUtil.getLong(actionRequest, "plid");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
 		SegmentsExperience segmentsExperience = _addSegmentsExperience(
-			actionRequest, plid, segmentsExperiment, serviceContext);
+			actionRequest, _portal.getClassNameId(Layout.class),
+			themeDisplay.getPlid(), segmentsExperiment, serviceContext);
 
 		long baseSegmentsExperienceId = _getBaseSegmentsExperienceId(
-			plid, segmentsExperiment);
+			segmentsExperiment);
 
 		SegmentsExperienceUtil.copySegmentsExperienceData(
-			plid, _commentManager, groupId, _portletRegistry,
+			themeDisplay.getPlid(), _commentManager,
+			themeDisplay.getScopeGroupId(), _portletRegistry,
 			baseSegmentsExperienceId,
 			segmentsExperience.getSegmentsExperienceId(),
-			className -> serviceContext, _portal.getUserId(actionRequest));
+			className -> serviceContext, themeDisplay.getUserId());
 
 		JSONObject jsonObject = JSONUtil.put(
 			"fragmentEntryLinks",
 			_getFragmentEntryLinksJSONObject(
-				actionRequest, actionResponse, plid, groupId,
+				actionRequest, actionResponse, themeDisplay.getPlid(),
+				themeDisplay.getScopeGroupId(),
 				segmentsExperience.getSegmentsExperienceId())
 		).put(
 			"layoutData",
 			_getLayoutDataJSONObject(
-				plid, groupId, segmentsExperience.getSegmentsExperienceId())
+				themeDisplay.getPlid(), themeDisplay.getScopeGroupId(),
+				segmentsExperience.getSegmentsExperienceId())
 		).put(
 			"segmentsExperience",
 			SegmentsExperienceUtil.getSegmentsExperienceJSONObject(
@@ -120,11 +131,11 @@ public class AddSegmentsExperienceMVCActionCommand
 		jsonObject.put(
 			"segmentsExperimentRel",
 			_getSegmentsSegmentsExperimentRelJSONObject(
-				segmentsExperimentRel, _portal.getLocale(actionRequest)));
+				segmentsExperimentRel, themeDisplay.getLocale()));
 
 		_initializeDraftLayout(
-			groupId, plid, segmentsExperience, baseSegmentsExperienceId,
-			serviceContext);
+			themeDisplay.getScopeGroupId(), themeDisplay.getPlid(),
+			segmentsExperience, baseSegmentsExperienceId, serviceContext);
 
 		return jsonObject;
 	}
@@ -138,19 +149,26 @@ public class AddSegmentsExperienceMVCActionCommand
 	}
 
 	private SegmentsExperience _addSegmentsExperience(
-			ActionRequest actionRequest, long classPK,
+			ActionRequest actionRequest, long classNameId, long classPK,
 			SegmentsExperiment segmentsExperiment,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		if (segmentsExperiment != null) {
-			SegmentsExperience segmentsExperience =
-				_segmentsExperienceService.getSegmentsExperience(
-					segmentsExperiment.getSegmentsExperienceId());
+			long segmentsEntryId = SegmentsEntryConstants.ID_DEFAULT;
+
+			if (segmentsExperiment.getSegmentsExperienceId() !=
+					SegmentsExperienceConstants.ID_DEFAULT) {
+
+				SegmentsExperience segmentsExperience =
+					_segmentsExperienceService.getSegmentsExperience(
+						segmentsExperiment.getSegmentsExperienceId());
+
+				segmentsEntryId = segmentsExperience.getSegmentsEntryId();
+			}
 
 			return _segmentsExperienceService.appendSegmentsExperience(
-				serviceContext.getScopeGroupId(),
-				segmentsExperience.getSegmentsEntryId(), classPK,
+				segmentsEntryId, classNameId, classPK,
 				Collections.singletonMap(
 					LocaleUtil.getSiteDefault(),
 					ParamUtil.getString(actionRequest, "name")),
@@ -158,13 +176,13 @@ public class AddSegmentsExperienceMVCActionCommand
 		}
 
 		return _segmentsExperienceService.addSegmentsExperience(
-			serviceContext.getScopeGroupId(),
-			ParamUtil.getLong(actionRequest, "segmentsEntryId"), classPK,
+			ParamUtil.getLong(actionRequest, "segmentsEntryId"), classNameId,
+			classPK,
 			Collections.singletonMap(
 				LocaleUtil.getSiteDefault(),
 				ParamUtil.getString(actionRequest, "name")),
 			ParamUtil.getBoolean(actionRequest, "active", true),
-			new UnicodeProperties(true), serviceContext);
+			serviceContext);
 	}
 
 	private SegmentsExperimentRel _addSegmentsExperimentRel(
@@ -179,11 +197,10 @@ public class AddSegmentsExperienceMVCActionCommand
 	}
 
 	private long _getBaseSegmentsExperienceId(
-		long plid, SegmentsExperiment segmentsExperiment) {
+		SegmentsExperiment segmentsExperiment) {
 
 		if (segmentsExperiment == null) {
-			return _segmentsExperienceLocalService.
-				fetchDefaultSegmentsExperienceId(plid);
+			return SegmentsExperienceConstants.ID_DEFAULT;
 		}
 
 		return segmentsExperiment.getSegmentsExperienceId();
@@ -191,29 +208,26 @@ public class AddSegmentsExperienceMVCActionCommand
 
 	private JSONObject _getFragmentEntryLinksJSONObject(
 			ActionRequest actionRequest, ActionResponse actionResponse,
-			long plid, long groupId, long segmentsExperienceId)
+			long plid, long groupId, long segmentExperienceId)
 		throws PortalException {
 
 		JSONObject fragmentEntryLinksJSONObject =
-			_jsonFactory.createJSONObject();
+			JSONFactoryUtil.createJSONObject();
 
 		List<FragmentEntryLink> fragmentEntryLinks =
 			_fragmentEntryLinkLocalService.
 				getFragmentEntryLinksBySegmentsExperienceId(
-					groupId, segmentsExperienceId, plid);
-
-		LayoutStructure layoutStructure =
-			LayoutStructureUtil.getLayoutStructure(
-				groupId, plid, segmentsExperienceId);
+					groupId, segmentExperienceId, plid);
 
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 			fragmentEntryLinksJSONObject.put(
 				String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()),
-				_fragmentEntryLinkManager.getFragmentEntryLinkJSONObject(
-					fragmentEntryLink,
-					_portal.getHttpServletRequest(actionRequest),
-					_portal.getHttpServletResponse(actionResponse),
-					layoutStructure));
+				FragmentEntryLinkUtil.getFragmentEntryLinkJSONObject(
+					actionRequest, actionResponse,
+					_fragmentEntryConfigurationParser, fragmentEntryLink,
+					_fragmentCollectionContributorTracker,
+					_fragmentRendererController, _fragmentRendererTracker,
+					_itemSelector, StringPool.BLANK));
 		}
 
 		return fragmentEntryLinksJSONObject;
@@ -227,7 +241,7 @@ public class AddSegmentsExperienceMVCActionCommand
 			_layoutPageTemplateStructureLocalService.
 				fetchLayoutPageTemplateStructure(groupId, classPK, true);
 
-		return _jsonFactory.createJSONObject(
+		return JSONFactoryUtil.createJSONObject(
 			layoutPageTemplateStructure.getData(segmentsExperienceId));
 	}
 
@@ -289,13 +303,23 @@ public class AddSegmentsExperienceMVCActionCommand
 	private CommentManager _commentManager;
 
 	@Reference
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
+
+	@Reference
+	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
+
+	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@Reference
-	private FragmentEntryLinkManager _fragmentEntryLinkManager;
+	private FragmentRendererController _fragmentRendererController;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private FragmentRendererTracker _fragmentRendererTracker;
+
+	@Reference
+	private ItemSelector _itemSelector;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
@@ -309,9 +333,6 @@ public class AddSegmentsExperienceMVCActionCommand
 
 	@Reference
 	private PortletRegistry _portletRegistry;
-
-	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@Reference
 	private SegmentsExperienceService _segmentsExperienceService;

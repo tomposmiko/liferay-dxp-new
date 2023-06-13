@@ -14,11 +14,11 @@
 
 package com.liferay.commerce.subscription.test;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
+import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceSubscriptionEntryConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
@@ -32,6 +32,7 @@ import com.liferay.commerce.service.CommerceOrderLocalServiceUtil;
 import com.liferay.commerce.service.CommerceSubscriptionEntryLocalService;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUti
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -52,6 +54,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,16 +72,22 @@ public class CommercePaymentSubscriptionsTest {
 		new LiferayIntegrationTestRule(),
 		PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
-
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(_user));
 
 		PrincipalThreadLocal.setName(_user.getUserId());
+
+		_group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -90,15 +99,15 @@ public class CommercePaymentSubscriptionsTest {
 		_commerceChannel = CommerceTestUtil.addCommerceChannel(
 			_group.getGroupId(), _commerceCurrency.getCode());
 
-		_accountEntry = CommerceAccountTestUtil.addBusinessAccountEntry(
+		_commerceAccount = CommerceAccountTestUtil.addBusinessCommerceAccount(
 			_user.getUserId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString() + "@liferay.com",
 			RandomTestUtil.randomString(), serviceContext);
 
-		CommerceAccountTestUtil.addAccountGroupAndAccountRel(
+		CommerceAccountTestUtil.addCommerceAccountGroupAndAccountRel(
 			_user.getCompanyId(), RandomTestUtil.randomString(),
-			AccountConstants.ACCOUNT_GROUP_TYPE_STATIC,
-			_accountEntry.getAccountEntryId(), serviceContext);
+			CommerceAccountConstants.ACCOUNT_GROUP_TYPE_STATIC,
+			_commerceAccount.getCommerceAccountId(), serviceContext);
 
 		_commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
 			_user.getUserId(), _commerceChannel.getGroupId(),
@@ -118,7 +127,7 @@ public class CommercePaymentSubscriptionsTest {
 			_commerceOrder, _user.getUserId(), true, false);
 
 		_commerceOrder.setPaymentStatus(
-			CommerceOrderPaymentConstants.STATUS_COMPLETED);
+			CommerceOrderConstants.PAYMENT_STATUS_PAID);
 
 		CommerceOrderLocalServiceUtil.updateCommerceOrder(_commerceOrder);
 
@@ -177,9 +186,10 @@ public class CommercePaymentSubscriptionsTest {
 			commerceSubscriptionEntry.getSubscriptionStatus());
 	}
 
+	private static Company _company;
 	private static User _user;
 
-	private AccountEntry _accountEntry;
+	private CommerceAccount _commerceAccount;
 	private CommerceChannel _commerceChannel;
 	private CommerceCurrency _commerceCurrency;
 

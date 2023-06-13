@@ -16,18 +16,15 @@ package com.liferay.analytics.reports.web.internal.item.action.provider;
 
 import com.liferay.analytics.reports.info.action.provider.AnalyticsReportsContentDashboardItemActionProvider;
 import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItem;
-import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItemRegistry;
+import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItemTracker;
 import com.liferay.analytics.reports.info.item.provider.AnalyticsReportsInfoItemObjectProvider;
-import com.liferay.analytics.reports.web.internal.info.item.provider.AnalyticsReportsInfoItemObjectProviderRegistry;
+import com.liferay.analytics.reports.web.internal.info.item.provider.AnalyticsReportsInfoItemObjectProviderTracker;
 import com.liferay.analytics.reports.web.internal.item.action.AnalyticsReportsContentDashboardItemAction;
 import com.liferay.analytics.reports.web.internal.util.AnalyticsReportsUtil;
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
 import com.liferay.content.dashboard.item.action.exception.ContentDashboardItemActionException;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
@@ -94,7 +91,7 @@ public class AnalyticsReportsContentDashboardItemActionProviderImpl
 		AnalyticsReportsInfoItemObjectProvider<Object>
 			analyticsReportsInfoItemObjectProvider =
 				(AnalyticsReportsInfoItemObjectProvider<Object>)
-					_analyticsReportsInfoItemObjectProviderRegistry.
+					_analyticsReportsInfoItemObjectProviderTracker.
 						getAnalyticsReportsInfoItemObjectProvider(
 							infoItemReference.getClassName());
 
@@ -112,7 +109,7 @@ public class AnalyticsReportsContentDashboardItemActionProviderImpl
 
 		AnalyticsReportsInfoItem<Object> analyticsReportsInfoItem =
 			(AnalyticsReportsInfoItem<Object>)
-				_analyticsReportsInfoItemRegistry.getAnalyticsReportsInfoItem(
+				_analyticsReportsInfoItemTracker.getAnalyticsReportsInfoItem(
 					infoItemReference.getClassName());
 
 		if ((analyticsReportsInfoItem == null) ||
@@ -125,21 +122,10 @@ public class AnalyticsReportsContentDashboardItemActionProviderImpl
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		try {
-			if (AnalyticsReportsUtil.isShowAnalyticsReportsPanel(
-					_analyticsSettingsManager, themeDisplay.getCompanyId(),
-					httpServletRequest)) {
+		if (AnalyticsReportsUtil.isShowAnalyticsReportsPanel(
+				themeDisplay.getCompanyId(), httpServletRequest)) {
 
-				return true;
-			}
-		}
-		catch (PortalException portalException) {
-			throw portalException;
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-
-			return false;
+			return true;
 		}
 
 		return false;
@@ -155,18 +141,12 @@ public class AnalyticsReportsContentDashboardItemActionProviderImpl
 			httpServletRequest, new InfoItemReference(className, classPK));
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AnalyticsReportsContentDashboardItemActionProviderImpl.class);
+	@Reference
+	private AnalyticsReportsInfoItemObjectProviderTracker
+		_analyticsReportsInfoItemObjectProviderTracker;
 
 	@Reference
-	private AnalyticsReportsInfoItemObjectProviderRegistry
-		_analyticsReportsInfoItemObjectProviderRegistry;
-
-	@Reference
-	private AnalyticsReportsInfoItemRegistry _analyticsReportsInfoItemRegistry;
-
-	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
+	private AnalyticsReportsInfoItemTracker _analyticsReportsInfoItemTracker;
 
 	@Reference
 	private Portal _portal;

@@ -43,16 +43,14 @@ DispatchLog dispatchLog = (DispatchLog)row.getObject();
 			url="<%= viewURL %>"
 		/>
 
-		<c:if test="<%= DispatchTaskStatus.valueOf(dispatchLog.getStatus()) != DispatchTaskStatus.IN_PROGRESS %>">
-			<portlet:actionURL name="/dispatch/edit_dispatch_log" var="deleteURL">
-				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-				<portlet:param name="dispatchLogId" value="<%= String.valueOf(dispatchLog.getDispatchLogId()) %>" />
-			</portlet:actionURL>
+		<portlet:actionURL name="/dispatch/edit_dispatch_log" var="deleteURL">
+			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="dispatchLogId" value="<%= String.valueOf(dispatchLog.getDispatchLogId()) %>" />
+		</portlet:actionURL>
 
-			<liferay-ui:icon-delete
-				url="<%= deleteURL %>"
-			/>
-		</c:if>
+		<liferay-ui:icon-delete
+			url="<%= deleteURL %>"
+		/>
 	</c:if>
 </liferay-ui:icon-menu>

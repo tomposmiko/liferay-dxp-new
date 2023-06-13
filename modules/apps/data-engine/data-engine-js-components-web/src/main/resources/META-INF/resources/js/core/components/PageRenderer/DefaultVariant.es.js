@@ -21,26 +21,26 @@ import {useFormState} from '../../hooks/useForm.es';
 const DDM_FORM_ADMIN_PORTLET_NAMESPACE =
 	'com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormAdminPortlet';
 
-const JOURNAL_WEB_PORTLET_NAMESPACE =
-	'com_liferay_journal_web_portlet_JournalPortlet';
-
-export function Container({activePage, children, isBuilder = true, pageIndex}) {
-	return (
-		<div
-			className={classnames('fade tab-pane', {
-				'active show': activePage === pageIndex,
-				'hide': activePage !== pageIndex,
-			})}
-			role="tabpanel"
-		>
-			{isBuilder ? (
-				<div className="form-builder-layout">{children}</div>
-			) : (
-				children
-			)}
-		</div>
-	);
-}
+export const Container = ({
+	activePage,
+	children,
+	isBuilder = true,
+	pageIndex,
+}) => (
+	<div
+		className={classnames('fade tab-pane', {
+			'active show': activePage === pageIndex,
+			hide: activePage !== pageIndex,
+		})}
+		role="tabpanel"
+	>
+		{isBuilder ? (
+			<div className="form-builder-layout">{children}</div>
+		) : (
+			children
+		)}
+	</div>
+);
 
 Container.displayName = 'DefaultVariant.Container';
 
@@ -84,7 +84,7 @@ export const Column = forwardRef(
 				onMouseOver={onMouseOver}
 				ref={ref}
 			>
-				{!!column.fields.length && (
+				{column.fields.length > 0 && (
 					<div
 						className={classnames(
 							'ddm-field-container ddm-target h-100',
@@ -119,64 +119,52 @@ export const Column = forwardRef(
 
 Column.displayName = 'DefaultVariant.Column';
 
-export function Page({
+export const Page = ({
 	children,
 	forceAriaUpdate,
 	header: Header,
 	invalidFormMessage,
 	pageIndex,
-}) {
-	return (
-		<div
-			className="active ddm-form-page lfr-ddm-form-page"
-			data-ddm-page={pageIndex}
-		>
-			{invalidFormMessage && (
-				<span aria-atomic="true" aria-live="polite" className="sr-only">
-					{invalidFormMessage}
+}) => (
+	<div
+		className="active ddm-form-page lfr-ddm-form-page"
+		data-ddm-page={pageIndex}
+	>
+		{invalidFormMessage && (
+			<span aria-atomic="true" aria-live="polite" className="sr-only">
+				{invalidFormMessage}
+				<span aria-hidden="true">{forceAriaUpdate}</span>
+			</span>
+		)}
 
-					<span aria-hidden="true">{forceAriaUpdate}</span>
-				</span>
-			)}
+		{Header}
 
-			{Header}
-
-			{children}
-		</div>
-	);
-}
+		{children}
+	</div>
+);
 
 Page.displayName = 'DefaultVariant.Page';
 
-export function PageHeader({description, title}) {
-	const {portletId} = useFormState();
-	const isWebContentPortlet = portletId.includes(
-		JOURNAL_WEB_PORTLET_NAMESPACE
-	);
-
-	return (
-		<>
-			{title && <h2 className="lfr-ddm-form-page-title">{title}</h2>}
-			{!isWebContentPortlet && description && (
-				<h3 className="lfr-ddm-form-page-description">{description}</h3>
-			)}
-		</>
-	);
-}
+export const PageHeader = ({description, title}) => (
+	<>
+		{title && <h2 className="lfr-ddm-form-page-title">{title}</h2>}
+		{description && (
+			<h3 className="lfr-ddm-form-page-description">{description}</h3>
+		)}
+	</>
+);
 
 PageHeader.displayName = 'DefaultVariant.PageHeader';
 
-export function Row({children, index, row}) {
-	return (
-		<div className="position-relative row" key={index}>
-			{row.columns.map((column, index) => children({column, index}))}
-		</div>
-	);
-}
+export const Row = ({children, index, row}) => (
+	<div className="position-relative row" key={index}>
+		{row.columns.map((column, index) => children({column, index}))}
+	</div>
+);
 
 Row.displayName = 'DefaultVariant.Row';
 
-export function Rows({children, rows}) {
+export const Rows = ({children, rows}) => {
 	if (!rows) {
 		return null;
 	}
@@ -186,6 +174,6 @@ export function Rows({children, rows}) {
 			{children({index, row})}
 		</div>
 	));
-}
+};
 
 Rows.displayName = 'DefaultVariant.Rows';

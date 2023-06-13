@@ -59,7 +59,7 @@ public class ServiceWrapperRegistryTest {
 		ServiceRegistration<ServiceWrapper<?>> serviceRegistration =
 			bundleContext.registerService(
 				(Class<ServiceWrapper<?>>)(Class<?>)ServiceWrapper.class,
-				new EmailAddressLocalServiceWrapper() {
+				new EmailAddressLocalServiceWrapper(null) {
 
 					@Override
 					public EmailAddress getEmailAddress(long emailAddressId) {

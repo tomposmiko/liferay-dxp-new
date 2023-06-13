@@ -33,7 +33,7 @@ import com.liferay.commerce.wish.list.model.CommerceWishListItem;
 import com.liferay.commerce.wish.list.service.CommerceWishListItemService;
 import com.liferay.commerce.wish.list.service.CommerceWishListService;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = CommerceWishListResource.class)
+@Component(enabled = false, service = CommerceWishListResource.class)
 public class CommerceWishListResource {
 
 	@Path("/wish-list-item")
@@ -78,7 +78,7 @@ public class CommerceWishListResource {
 			long userId = _portal.getUserId(httpServletRequest);
 
 			if (userId == 0) {
-				User user = _userLocalService.getGuestUser(
+				User user = _userLocalService.getDefaultUser(
 					_portal.getCompanyId(httpServletRequest));
 
 				userId = user.getUserId();
@@ -104,8 +104,8 @@ public class CommerceWishListResource {
 
 			if (commerceWishList == null) {
 				commerceWishList = _commerceWishListService.addCommerceWishList(
-					_language.get(serviceContext.getLocale(), "default"), true,
-					serviceContext);
+					LanguageUtil.get(serviceContext.getLocale(), "default"),
+					true, serviceContext);
 			}
 
 			CPCatalogEntry cpCatalogEntry =
@@ -151,13 +151,13 @@ public class CommerceWishListResource {
 		catch (Exception exception) {
 			wishListItemUpdated.setSuccess(false);
 
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
-		return _getResponse(wishListItemUpdated);
+		return getResponse(wishListItemUpdated);
 	}
 
-	private Response _getResponse(Object object) {
+	protected Response getResponse(Object object) {
 		if (object == null) {
 			return Response.status(
 				Response.Status.NOT_FOUND
@@ -172,7 +172,7 @@ public class CommerceWishListResource {
 			).build();
 		}
 		catch (JsonProcessingException jsonProcessingException) {
-			_log.error(jsonProcessingException);
+			_log.error(jsonProcessingException, jsonProcessingException);
 		}
 
 		return Response.status(
@@ -207,9 +207,6 @@ public class CommerceWishListResource {
 
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

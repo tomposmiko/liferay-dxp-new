@@ -27,7 +27,10 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Marcellus Tavares
@@ -41,6 +44,8 @@ public class DefaultDDMFormFieldValueRendererTest {
 
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+
 		setUpHtmlUtil();
 	}
 
@@ -58,7 +63,7 @@ public class DefaultDDMFormFieldValueRendererTest {
 		Mockito.verify(
 			_html
 		).escape(
-			Mockito.anyString()
+			Matchers.anyString()
 		);
 	}
 
@@ -71,6 +76,8 @@ public class DefaultDDMFormFieldValueRendererTest {
 	private final DefaultDDMFormFieldValueRenderer
 		_defaultDDMFormFieldValueRenderer =
 			new DefaultDDMFormFieldValueRenderer();
-	private final Html _html = Mockito.mock(Html.class);
+
+	@Mock
+	private Html _html;
 
 }

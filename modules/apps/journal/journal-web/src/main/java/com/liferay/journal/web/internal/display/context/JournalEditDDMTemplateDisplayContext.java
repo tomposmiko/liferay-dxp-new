@@ -23,6 +23,9 @@ import com.liferay.journal.configuration.JournalFileUploadsConfiguration;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.web.internal.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.helper.JournalDDMTemplateHelper;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -30,14 +33,12 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil;
 import com.liferay.portal.kernel.template.TemplateVariableDefinition;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -45,7 +46,7 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.template.engine.TemplateContextHelper;
+import com.liferay.portal.template.TemplateContextHelper;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -67,15 +68,16 @@ public class JournalEditDDMTemplateDisplayContext {
 		_httpServletRequest = httpServletRequest;
 		_renderResponse = renderResponse;
 
-		_ddmTemplateHelper = (DDMTemplateHelper)httpServletRequest.getAttribute(
-			DDMTemplateHelper.class.getName());
+		_ddmTemplateHelper =
+			(DDMTemplateHelper)_httpServletRequest.getAttribute(
+				DDMTemplateHelper.class.getName());
 
 		_journalFileUploadsConfiguration =
-			(JournalFileUploadsConfiguration)httpServletRequest.getAttribute(
+			(JournalFileUploadsConfiguration)_httpServletRequest.getAttribute(
 				JournalFileUploadsConfiguration.class.getName());
 
 		_journalWebConfiguration =
-			(JournalWebConfiguration)httpServletRequest.getAttribute(
+			(JournalWebConfiguration)_httpServletRequest.getAttribute(
 				JournalWebConfiguration.class.getName());
 	}
 
@@ -213,12 +215,8 @@ public class JournalEditDDMTemplateDisplayContext {
 			return _script;
 		}
 
-		String script = BeanParamUtil.getString(
+		_script = BeanParamUtil.getString(
 			getDDMTemplate(), _httpServletRequest, "script");
-
-		if (Validator.isNotNull(script)) {
-			_script = new String(Base64.decode(script));
-		}
 
 		if (Validator.isNull(_script)) {
 			TemplateHandler templateHandler =
@@ -233,7 +231,7 @@ public class JournalEditDDMTemplateDisplayContext {
 			_httpServletRequest, "scriptContent");
 
 		if (Validator.isNotNull(scriptContent)) {
-			_script = new String(Base64.decode(scriptContent));
+			_script = scriptContent;
 		}
 
 		return _script;
@@ -290,6 +288,14 @@ public class JournalEditDDMTemplateDisplayContext {
 		}
 
 		return ResourceBundleUtil.getBundle(themeDisplay.getLocale(), clazz);
+	}
+
+	public String getTemplateLanguageTypeLabel(String templateLanguageType) {
+		return StringBundler.concat(
+			LanguageUtil.get(
+				_httpServletRequest, templateLanguageType + "[stands-for]"),
+			StringPool.SPACE, StringPool.OPEN_PARENTHESIS, StringPool.PERIOD,
+			templateLanguageType, StringPool.CLOSE_PARENTHESIS);
 	}
 
 	public JSONArray getTemplateVariableGroupJSONArray() throws Exception {
@@ -394,6 +400,11 @@ public class JournalEditDDMTemplateDisplayContext {
 
 	public String[] imageExtensions() {
 		return _journalFileUploadsConfiguration.imageExtensions();
+	}
+
+	public boolean isAutocompleteEnabled() {
+		return _ddmTemplateHelper.isAutocompleteEnabled(
+			TemplateConstants.LANG_TYPE_FTL);
 	}
 
 	public boolean isCacheable() {

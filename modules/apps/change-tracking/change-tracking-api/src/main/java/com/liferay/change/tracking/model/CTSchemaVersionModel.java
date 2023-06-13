@@ -122,8 +122,4 @@ public interface CTSchemaVersionModel
 	@Override
 	public CTSchemaVersion cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

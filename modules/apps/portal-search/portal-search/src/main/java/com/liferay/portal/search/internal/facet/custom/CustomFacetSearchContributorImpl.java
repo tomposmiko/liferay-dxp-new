@@ -53,7 +53,11 @@ public class CustomFacetSearchContributorImpl
 			facetContext -> facetContext.addFacet(facet));
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setFacetFactory(CustomFacetFactory customFacetFactory) {
+		_customFacetFactory = customFacetFactory;
+	}
+
 	private CustomFacetFactory _customFacetFactory;
 
 	private class CustomFacetBuilderImpl implements CustomFacetBuilder {

@@ -29,20 +29,19 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.RoleLocalService;
-import com.liferay.portal.kernel.service.permission.OrganizationPermission;
+import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.search.spi.model.permission.SearchPermissionFilterContributor;
 
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.User",
 	service = SearchPermissionFilterContributor.class
 )
@@ -85,7 +84,7 @@ public class UserSearchPermissionFilterContributor
 			long[] userOrgIds = userBag.getUserOrgIds();
 
 			for (long userOrgId : userOrgIds) {
-				if (_organizationPermission.contains(
+				if (OrganizationPermissionUtil.contains(
 						permissionChecker, userOrgId,
 						AccountActionKeys.MANAGE_ACCOUNTS)) {
 
@@ -113,7 +112,7 @@ public class UserSearchPermissionFilterContributor
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 	}
@@ -125,11 +124,9 @@ public class UserSearchPermissionFilterContributor
 		UserSearchPermissionFilterContributor.class);
 
 	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(model.class.name=com.liferay.account.model.AccountEntry)"
 	)
-	private volatile ModelResourcePermission<AccountEntry>
+	private ModelResourcePermission<AccountEntry>
 		_accountEntryModelResourcePermission;
 
 	@Reference
@@ -138,8 +135,5 @@ public class UserSearchPermissionFilterContributor
 
 	@Reference
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
-
-	@Reference
-	private OrganizationPermission _organizationPermission;
 
 }

@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -43,8 +41,12 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.reports.engine.console.model.Entry;
 import com.liferay.portal.reports.engine.console.service.EntryLocalService;
 import com.liferay.portal.reports.engine.console.service.EntryLocalServiceUtil;
+import com.liferay.portal.reports.engine.console.service.persistence.DefinitionFinder;
+import com.liferay.portal.reports.engine.console.service.persistence.DefinitionPersistence;
 import com.liferay.portal.reports.engine.console.service.persistence.EntryFinder;
 import com.liferay.portal.reports.engine.console.service.persistence.EntryPersistence;
+import com.liferay.portal.reports.engine.console.service.persistence.SourceFinder;
+import com.liferay.portal.reports.engine.console.service.persistence.SourcePersistence;
 
 import java.io.Serializable;
 
@@ -313,11 +315,6 @@ public abstract class EntryLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement EntryLocalServiceImpl#deleteEntry(Entry) to avoid orphaned data");
-		}
-
 		return entryLocalService.deleteEntry((Entry)persistedModel);
 	}
 
@@ -456,6 +453,12 @@ public abstract class EntryLocalServiceBaseImpl
 		}
 	}
 
+	@Reference
+	protected DefinitionPersistence definitionPersistence;
+
+	@Reference
+	protected DefinitionFinder definitionFinder;
+
 	protected EntryLocalService entryLocalService;
 
 	@Reference
@@ -465,10 +468,25 @@ public abstract class EntryLocalServiceBaseImpl
 	protected EntryFinder entryFinder;
 
 	@Reference
+	protected SourcePersistence sourcePersistence;
+
+	@Reference
+	protected SourceFinder sourceFinder;
+
+	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		EntryLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

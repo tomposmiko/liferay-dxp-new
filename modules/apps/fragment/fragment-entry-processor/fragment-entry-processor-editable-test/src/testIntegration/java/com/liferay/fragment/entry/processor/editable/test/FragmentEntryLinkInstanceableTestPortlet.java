@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.fragment.entry.processor.portlet.alias=fragment-entry-link-instanceable",
 		"com.liferay.portlet.add-default-resource=true",
@@ -32,8 +33,7 @@ import org.osgi.service.component.annotations.Component;
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.scopeable=true", "javax.portlet.display-name=Test",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.name=" + FragmentEntryLinkPortletKeys.FRAGMENT_ENTRY_LINK_INSTANCEABLE_TEST_PORTLET,
-		"javax.portlet.version=3.0"
+		"javax.portlet.name=" + FragmentEntryLinkPortletKeys.FRAGMENT_ENTRY_LINK_INSTANCEABLE_TEST_PORTLET
 	},
 	service = Portlet.class
 )

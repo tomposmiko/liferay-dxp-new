@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = GetMappingIndexRequestExecutor.class)
+@Component(immediate = true, service = GetMappingIndexRequestExecutor.class)
 public class GetMappingIndexRequestExecutorImpl
 	implements GetMappingIndexRequestExecutor {
 
@@ -48,7 +48,7 @@ public class GetMappingIndexRequestExecutorImpl
 		GetMappingsRequest getMappingsRequest = createGetMappingsRequest(
 			getMappingIndexRequest);
 
-		GetMappingsResponse getMappingsResponse = _getGetMappingsResponse(
+		GetMappingsResponse getMappingsResponse = getGetMappingsResponse(
 			getMappingsRequest, getMappingIndexRequest);
 
 		Map<String, MappingMetadata> mappings = getMappingsResponse.mappings();
@@ -76,7 +76,7 @@ public class GetMappingIndexRequestExecutorImpl
 		return getMappingsRequest;
 	}
 
-	private GetMappingsResponse _getGetMappingsResponse(
+	protected GetMappingsResponse getGetMappingsResponse(
 		GetMappingsRequest getMappingsRequest,
 		GetMappingIndexRequest getMappingIndexRequest) {
 
@@ -96,7 +96,13 @@ public class GetMappingIndexRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

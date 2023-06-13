@@ -20,11 +20,11 @@ import com.liferay.knowledge.base.exception.NoSuchCommentException;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.web.internal.constants.KBWebKeys;
 import com.liferay.portal.kernel.exception.NoSuchSubscriptionException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.IOException;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=knowledge-base-portlet knowledge-base-portlet-search",
 		"com.liferay.portlet.display-category=category.cms",
@@ -53,14 +54,13 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.always-send-redirect=true",
 		"javax.portlet.init-param.copy-request-parameters=true",
-		"javax.portlet.init-param.template-path=/META-INF/resources/",
-		"javax.portlet.init-param.view-template=/knowledge_base/view",
+		"javax.portlet.init-param.template-path=/search/",
+		"javax.portlet.init-param.view-template=/search/view.jsp",
 		"javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_SEARCH,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
 		"javax.portlet.supported-public-render-parameter=categoryId",
-		"javax.portlet.supported-public-render-parameter=tag",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supported-public-render-parameter=tag"
 	},
 	service = Portlet.class
 )
@@ -71,16 +71,31 @@ public class SearchPortlet extends BaseKBPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		if (SessionErrors.contains(
-				renderRequest, NoSuchArticleException.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest, NoSuchCommentException.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest, NoSuchSubscriptionException.class.getName()) ||
-			SessionErrors.contains(
-				renderRequest, PrincipalException.getNestedClasses())) {
+		String mvcPath = ParamUtil.getString(
+			renderRequest, "mvcPath", viewTemplate);
 
-			include("/admin/common/error.jsp", renderRequest, renderResponse);
+		long assetCategoryId = ParamUtil.getLong(renderRequest, "categoryId");
+		String assetTagName = ParamUtil.getString(renderRequest, "tag");
+
+		if ((mvcPath.equals(viewTemplate) && (assetCategoryId > 0)) ||
+			(mvcPath.equals(viewTemplate) &&
+			 Validator.isNotNull(assetTagName))) {
+
+			String path = templatePath + "view_prp_articles.jsp";
+
+			include(path, renderRequest, renderResponse);
+		}
+		else if (SessionErrors.contains(
+					renderRequest, NoSuchArticleException.class.getName()) ||
+				 SessionErrors.contains(
+					 renderRequest, NoSuchCommentException.class.getName()) ||
+				 SessionErrors.contains(
+					 renderRequest,
+					 NoSuchSubscriptionException.class.getName()) ||
+				 SessionErrors.contains(
+					 renderRequest, PrincipalException.getNestedClasses())) {
+
+			include(templatePath + "error.jsp", renderRequest, renderResponse);
 		}
 		else {
 			super.doDispatch(renderRequest, renderResponse);
@@ -93,39 +108,40 @@ public class SearchPortlet extends BaseKBPortlet {
 		throws IOException, PortletException {
 
 		try {
+			KBArticle kbArticle = null;
+
+			long resourcePrimKey = ParamUtil.getLong(
+				renderRequest, "resourcePrimKey");
+
+			if (resourcePrimKey > 0) {
+				kbArticle = kbArticleService.getLatestKBArticle(
+					resourcePrimKey, WorkflowConstants.STATUS_APPROVED);
+			}
+
 			renderRequest.setAttribute(
-				KBWebKeys.KNOWLEDGE_BASE_KB_ARTICLE,
-				_getKBArticle(renderRequest));
+				KBWebKeys.KNOWLEDGE_BASE_KB_ARTICLE, kbArticle);
 
 			renderRequest.setAttribute(
 				KBWebKeys.KNOWLEDGE_BASE_STATUS,
 				WorkflowConstants.STATUS_APPROVED);
 		}
-		catch (NoSuchArticleException | PrincipalException exception) {
-			SessionErrors.add(renderRequest, exception.getClass());
+		catch (Exception exception) {
+			if (exception instanceof NoSuchArticleException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(renderRequest, exception.getClass());
+			}
+			else {
+				throw new PortletException(exception);
+			}
 		}
-		catch (PortalException portalException) {
-			throw new PortletException(portalException);
-		}
-	}
-
-	private KBArticle _getKBArticle(RenderRequest renderRequest)
-		throws PortalException {
-
-		long resourcePrimKey = ParamUtil.getLong(
-			renderRequest, "resourcePrimKey");
-
-		if (resourcePrimKey > 0) {
-			return kbArticleService.getLatestKBArticle(
-				resourcePrimKey, WorkflowConstants.STATUS_APPROVED);
-		}
-
-		return null;
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.knowledge.base.web)(&(release.schema.version>=1.2.0)(!(release.schema.version>=2.0.0))))"
+		target = "(&(release.bundle.symbolic.name=com.liferay.knowledge.base.web)(&(release.schema.version>=1.2.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
 	)
-	private Release _release;
+	protected void setRelease(Release release) {
+	}
 
 }

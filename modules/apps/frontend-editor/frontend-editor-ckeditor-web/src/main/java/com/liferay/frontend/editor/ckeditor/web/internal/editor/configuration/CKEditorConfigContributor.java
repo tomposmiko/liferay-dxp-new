@@ -18,19 +18,20 @@ import com.liferay.document.library.kernel.util.AudioProcessorUtil;
 import com.liferay.frontend.editor.ckeditor.web.internal.constants.CKEditorConstants;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xuggler.XugglerUtil;
 
 import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Ambrín Chaudhary
@@ -60,8 +61,8 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 		);
 
 		String extraPlugins =
-			"addimages,autogrow,autolink,colordialog,filebrowser," +
-				"itemselector,lfrpopup,media,stylescombo,videoembed";
+			"addimages,autogrow,autolink,filebrowser,itemselector,lfrpopup," +
+				"media,stylescombo,videoembed";
 
 		boolean inlineEdit = GetterUtil.getBoolean(
 			(String)inputEditorTaglibAttributes.get(
@@ -75,7 +76,7 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 			"extraPlugins", extraPlugins
 		).put(
 			"filebrowserWindowFeatures",
-			"title=" + _language.get(themeDisplay.getLocale(), "browse")
+			"title=" + LanguageUtil.get(themeDisplay.getLocale(), "browse")
 		).put(
 			"pasteFromWordRemoveFontStyles", Boolean.FALSE
 		).put(
@@ -83,12 +84,12 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 		).put(
 			"removePlugins", "elementspath"
 		).put(
-			"stylesSet", _getStyleFormatsJSONArray(themeDisplay.getLocale())
+			"stylesSet", getStyleFormatsJSONArray(themeDisplay.getLocale())
 		).put(
 			"title", false
 		);
 
-		JSONArray toolbarSimpleJSONArray = _getToolbarSimpleJSONArray(
+		JSONArray toolbarSimpleJSONArray = getToolbarSimpleJSONArray(
 			inputEditorTaglibAttributes);
 
 		jsonObject.put(
@@ -107,93 +108,87 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 			"toolbar_tablet", toolbarSimpleJSONArray
 		).put(
 			"toolbar_text_advanced",
-			_getToolbarTextAdvancedJSONArray(inputEditorTaglibAttributes)
+			getToolbarTextAdvancedJSONArray(inputEditorTaglibAttributes)
 		).put(
 			"toolbar_text_simple",
-			_getToolbarTextSimpleJSONArray(inputEditorTaglibAttributes)
+			getToolbarTextSimpleJSONArray(inputEditorTaglibAttributes)
 		);
 	}
 
-	private JSONObject _getStyleFormatJSONObject(
+	protected JSONObject getStyleFormatJSONObject(
 		String styleFormatName, String element, String cssClass) {
 
-		return JSONUtil.put(
-			"attributes",
-			() -> {
-				if (Validator.isNotNull(cssClass)) {
-					return JSONUtil.put("class", cssClass);
-				}
+		JSONObject styleJSONObject = JSONFactoryUtil.createJSONObject();
 
-				return null;
-			}
-		).put(
+		if (Validator.isNotNull(cssClass)) {
+			JSONObject attributesJSONObject = JSONUtil.put("class", cssClass);
+
+			styleJSONObject.put("attributes", attributesJSONObject);
+		}
+
+		styleJSONObject.put(
 			"element", element
 		).put(
 			"name", styleFormatName
 		);
+
+		return styleJSONObject;
 	}
 
-	private JSONArray _getStyleFormatsJSONArray(Locale locale) {
+	protected JSONArray getStyleFormatsJSONArray(Locale locale) {
 		return JSONUtil.putAll(
-			_getStyleFormatJSONObject(
-				_language.get(locale, "normal"), "p", null),
-			_getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "1"), "h1", null),
-			_getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "2"), "h2", null),
-			_getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "3"), "h3", null),
-			_getStyleFormatJSONObject(
-				_language.format(locale, "heading-x", "4"), "h4", null),
-			_getStyleFormatJSONObject(
-				_language.get(locale, "preformatted-text"), "pre", null),
-			_getStyleFormatJSONObject(
-				_language.get(locale, "cited-work"), "cite", null),
-			_getStyleFormatJSONObject(
-				_language.get(locale, "computer-code"), "code", null),
-			_getStyleFormatJSONObject(
-				_language.get(locale, "info-message"), "div",
+			getStyleFormatJSONObject(
+				LanguageUtil.get(locale, "normal"), "p", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.format(locale, "heading-x", "1"), "h1", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.format(locale, "heading-x", "2"), "h2", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.format(locale, "heading-x", "3"), "h3", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.format(locale, "heading-x", "4"), "h4", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.get(locale, "preformatted-text"), "pre", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.get(locale, "cited-work"), "cite", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.get(locale, "computer-code"), "code", null),
+			getStyleFormatJSONObject(
+				LanguageUtil.get(locale, "info-message"), "div",
 				"overflow-auto portlet-msg-info"),
-			_getStyleFormatJSONObject(
-				_language.get(locale, "alert-message"), "div",
+			getStyleFormatJSONObject(
+				LanguageUtil.get(locale, "alert-message"), "div",
 				"overflow-auto portlet-msg-alert"),
-			_getStyleFormatJSONObject(
-				_language.get(locale, "error-message"), "div",
+			getStyleFormatJSONObject(
+				LanguageUtil.get(locale, "error-message"), "div",
 				"overflow-auto portlet-msg-error"));
 	}
 
-	private JSONArray _getToolbarSimpleJSONArray(
+	protected JSONArray getToolbarSimpleJSONArray(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
-		return JSONUtil.putAll(
+		JSONArray jsonArray = JSONUtil.putAll(
 			toJSONArray("['Undo', 'Redo']"),
 			toJSONArray("['Styles', 'Bold', 'Italic', 'Underline']"),
 			toJSONArray("['NumberedList', 'BulletedList']"),
 			toJSONArray("['Link', Unlink]"),
-			toJSONArray("['Table', 'ImageSelector', 'VideoSelector']")
-		).put(
-			() -> {
-				if (AudioProcessorUtil.isEnabled()) {
-					return toJSONArray("['AudioSelector']");
-				}
+			toJSONArray("['Table', 'ImageSelector', 'VideoSelector']"));
 
-				return null;
-			}
-		).put(
-			() -> {
-				if (isShowSource(inputEditorTaglibAttributes)) {
-					return toJSONArray("['Source', 'Expand']");
-				}
+		if (AudioProcessorUtil.isEnabled() || XugglerUtil.isEnabled()) {
+			jsonArray.put(toJSONArray("['AudioSelector']"));
+		}
 
-				return null;
-			}
-		);
+		if (isShowSource(inputEditorTaglibAttributes)) {
+			jsonArray.put(toJSONArray("['Source', 'Expand']"));
+		}
+
+		return jsonArray;
 	}
 
-	private JSONArray _getToolbarTextAdvancedJSONArray(
+	protected JSONArray getToolbarTextAdvancedJSONArray(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
-		return JSONUtil.putAll(
+		JSONArray jsonArray = JSONUtil.putAll(
 			toJSONArray("['Undo', 'Redo']"), toJSONArray("['Styles']"),
 			toJSONArray("['FontColor', 'BGColor']"),
 			toJSONArray("['Bold', 'Italic', 'Underline', 'Strikethrough']"),
@@ -201,38 +196,29 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 			toJSONArray("['NumberedList', 'BulletedList']"),
 			toJSONArray("['IncreaseIndent', 'DecreaseIndent']"),
 			toJSONArray("['IncreaseIndent', 'DecreaseIndent']"),
-			toJSONArray("['Link', Unlink]")
-		).put(
-			() -> {
-				if (isShowSource(inputEditorTaglibAttributes)) {
-					return toJSONArray("['Source', 'Expand']");
-				}
+			toJSONArray("['Link', Unlink]"));
 
-				return null;
-			}
-		);
+		if (isShowSource(inputEditorTaglibAttributes)) {
+			jsonArray.put(toJSONArray("['Source', 'Expand']"));
+		}
+
+		return jsonArray;
 	}
 
-	private JSONArray _getToolbarTextSimpleJSONArray(
+	protected JSONArray getToolbarTextSimpleJSONArray(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
-		return JSONUtil.putAll(
+		JSONArray jsonArray = JSONUtil.putAll(
 			toJSONArray("['Undo', 'Redo']"),
 			toJSONArray("['Styles', 'Bold', 'Italic', 'Underline']"),
 			toJSONArray("['NumberedList', 'BulletedList']"),
-			toJSONArray("['Link', Unlink]")
-		).put(
-			() -> {
-				if (isShowSource(inputEditorTaglibAttributes)) {
-					return toJSONArray("['Source', 'Expand']");
-				}
+			toJSONArray("['Link', Unlink]"));
 
-				return null;
-			}
-		);
+		if (isShowSource(inputEditorTaglibAttributes)) {
+			jsonArray.put(toJSONArray("['Source', 'Expand']"));
+		}
+
+		return jsonArray;
 	}
-
-	@Reference
-	private Language _language;
 
 }

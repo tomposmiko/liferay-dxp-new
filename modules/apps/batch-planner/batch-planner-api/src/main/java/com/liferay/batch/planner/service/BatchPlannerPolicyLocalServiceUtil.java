@@ -233,12 +233,6 @@ public class BatchPlannerPolicyLocalServiceUtil {
 		return getService().fetchBatchPlannerPolicy(batchPlannerPolicyId);
 	}
 
-	public static BatchPlannerPolicy fetchBatchPlannerPolicy(
-		long batchPlannerPlanId, String name) {
-
-		return getService().fetchBatchPlannerPolicy(batchPlannerPlanId, name);
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 

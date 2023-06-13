@@ -33,7 +33,7 @@ const QuickActionKebab = ({
 	iconItems = [],
 	items = [],
 }) => {
-	if (items.length) {
+	if (items.length > 0) {
 		dropDownItems = items;
 		iconItems = items.filter(({icon}) => icon);
 	}
@@ -44,7 +44,7 @@ const QuickActionKebab = ({
 
 	return (
 		<>
-			{!disabled && !!iconItems.length && (
+			{!disabled && iconItems.length > 0 && (
 				<div className="quick-action-menu">
 					{iconItems.map(({icon, onClick}, index) => (
 						<IconItem icon={icon} key={index} onClick={onClick} />
@@ -52,7 +52,7 @@ const QuickActionKebab = ({
 				</div>
 			)}
 
-			{!!dropDownItems.length && (
+			{dropDownItems.length > 0 && (
 				<KebabDropDown disabled={disabled} items={dropDownItems} />
 			)}
 		</>

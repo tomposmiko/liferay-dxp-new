@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -87,8 +88,18 @@ public interface CommerceShippingFixedOptionLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceShippingFixedOption addCommerceShippingFixedOption(
 			long userId, long groupId, long commerceShippingMethodId,
-			BigDecimal amount, Map<Locale, String> descriptionMap, String key,
-			Map<Locale, String> nameMap, double priority)
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			BigDecimal amount, double priority)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	public CommerceShippingFixedOption addCommerceShippingFixedOption(
+			long commerceShippingMethodId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, BigDecimal amount,
+			double priority, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -225,17 +236,7 @@ public interface CommerceShippingFixedOptionLocalService
 		long commerceShippingFixedOptionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public CommerceShippingFixedOption fetchCommerceShippingFixedOption(
-		long companyId, String key);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceShippingFixedOption>
-		getCommerceOrderTypeCommerceShippingFixedOptions(
-			long companyId, long commerceOrderTypeId,
-			long commerceShippingMethodId);
 
 	/**
 	 * Returns the commerce shipping fixed option with the primary key.
@@ -336,9 +337,9 @@ public interface CommerceShippingFixedOptionLocalService
 		CommerceShippingFixedOption commerceShippingFixedOption);
 
 	public CommerceShippingFixedOption updateCommerceShippingFixedOption(
-			long commerceShippingFixedOptionId, BigDecimal amount,
-			Map<Locale, String> descriptionMap, String key,
-			Map<Locale, String> nameMap, double priority)
+			long commerceShippingFixedOptionId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, BigDecimal amount,
+			double priority)
 		throws PortalException;
 
 }

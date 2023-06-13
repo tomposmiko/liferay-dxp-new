@@ -15,7 +15,7 @@
 package com.liferay.batch.planner.web.internal.portlet;
 
 import com.liferay.batch.planner.constants.BatchPlannerPortletKeys;
-import com.liferay.batch.planner.web.internal.display.context.BatchPlannerPlanDisplayContext;
+import com.liferay.batch.planner.web.internal.display.context.BatchPlannerLogDisplayContext;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -46,8 +46,7 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + BatchPlannerPortletKeys.BATCH_PLANNER,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -60,7 +59,7 @@ public class BatchPlannerPortlet extends MVCPortlet {
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new BatchPlannerPlanDisplayContext(renderRequest, renderResponse));
+			new BatchPlannerLogDisplayContext(renderRequest, renderResponse));
 
 		super.render(renderRequest, renderResponse);
 	}

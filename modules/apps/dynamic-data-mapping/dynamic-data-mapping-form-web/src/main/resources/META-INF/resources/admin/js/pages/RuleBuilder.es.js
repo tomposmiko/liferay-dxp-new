@@ -29,7 +29,7 @@ import {EVENT_TYPES} from '../eventTypes.es';
 import {RuleEditor} from './RuleEditor.es';
 import {RuleList} from './RuleList.es';
 
-export default function RuleBuilder({history, location}) {
+export const RuleBuilder = ({history, location}) => {
 	const {
 		cache,
 		dataProviderInstanceParameterSettingsURL,
@@ -64,7 +64,7 @@ export default function RuleBuilder({history, location}) {
 
 		visitor.mapFields(
 			(field, fieldIndex, columnIndex, rowIndex, pageIndex) => {
-				if (field.type !== 'fieldset') {
+				if (field.type != 'fieldset') {
 					fields.push({
 						...field,
 						pageIndex,
@@ -106,13 +106,11 @@ export default function RuleBuilder({history, location}) {
 	const navigate = useCallback(
 		(path) => {
 			const method =
-				path === history.location.pathname
-					? history.replace
-					: history.push;
+				path === location.pathname ? history.replace : history.push;
 
 			method(path);
 		},
-		[history]
+		[history, location.pathname]
 	);
 
 	useEffect(() => {
@@ -140,7 +138,6 @@ export default function RuleBuilder({history, location}) {
 				portletNamespace={portletNamespace}
 				variant="rules"
 			/>
-
 			<Switch>
 				<Route exact path="/rules">
 					<RuleList
@@ -164,7 +161,6 @@ export default function RuleBuilder({history, location}) {
 						rules={rules}
 					/>
 				</Route>
-
 				<Route path="/rules/editor">
 					<RuleEditor
 						dataProvider={dataProvider}
@@ -208,6 +204,6 @@ export default function RuleBuilder({history, location}) {
 			</Switch>
 		</ClayLayout.Container>
 	);
-}
+};
 
 RuleBuilder.displayName = 'RuleBuilder';

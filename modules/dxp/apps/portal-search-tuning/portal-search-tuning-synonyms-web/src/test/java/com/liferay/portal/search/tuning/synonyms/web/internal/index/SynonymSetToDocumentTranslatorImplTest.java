@@ -26,7 +26,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Wade Cao
@@ -40,6 +42,8 @@ public class SynonymSetToDocumentTranslatorImplTest {
 
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+
 		_synonymSetToDocumentTranslatorImpl =
 			new SynonymSetToDocumentTranslatorImpl();
 
@@ -65,7 +69,7 @@ public class SynonymSetToDocumentTranslatorImplTest {
 		).when(
 			documentBuilder
 		).setString(
-			Mockito.nullable(String.class), Mockito.nullable(String.class)
+			Mockito.anyString(), Mockito.anyString()
 		);
 
 		Mockito.doReturn(
@@ -83,8 +87,9 @@ public class SynonymSetToDocumentTranslatorImplTest {
 				Mockito.mock(SynonymSet.class)));
 	}
 
-	private final DocumentBuilderFactory _documentBuilderFactory = Mockito.mock(
-		DocumentBuilderFactory.class);
+	@Mock
+	private DocumentBuilderFactory _documentBuilderFactory;
+
 	private SynonymSetToDocumentTranslatorImpl
 		_synonymSetToDocumentTranslatorImpl;
 

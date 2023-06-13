@@ -906,6 +906,11 @@ public class StagedGroupImpl extends GroupWrapper implements StagedGroup {
 	}
 
 	@Override
+	public String toXmlString() {
+		return _group.toXmlString();
+	}
+
+	@Override
 	public void updateTreePath(String treePath) {
 		_group.updateTreePath(treePath);
 	}

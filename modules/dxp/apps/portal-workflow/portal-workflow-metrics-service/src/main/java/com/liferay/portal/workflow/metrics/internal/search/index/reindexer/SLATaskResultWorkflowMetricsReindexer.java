@@ -16,8 +16,6 @@ package com.liferay.portal.workflow.metrics.internal.search.index.reindexer;
 
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
-import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
@@ -34,15 +32,21 @@ import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetric
 import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsIndexNameBuilder;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexer;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "workflow.metrics.index.entity.name=sla-task-result",
 	service = WorkflowMetricsReindexer.class
 )
@@ -54,11 +58,16 @@ public class SLATaskResultWorkflowMetricsReindexer
 		_creatDefaultDocuments(companyId);
 	}
 
-	@Reference
-	protected SearchEngineAdapter searchEngineAdapter;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(search.engine.impl=Elasticsearch)"
+	)
+	protected volatile SearchEngineAdapter searchEngineAdapter;
 
 	private void _creatDefaultDocuments(long companyId) {
-		if (!_searchCapabilities.isWorkflowMetricsSupported() ||
+		if ((searchEngineAdapter == null) ||
 			!_hasIndex(
 				_nodeWorkflowMetricsIndexNameBuilder.getIndexName(companyId))) {
 
@@ -93,29 +102,37 @@ public class SLATaskResultWorkflowMetricsReindexer
 
 		BulkDocumentRequest bulkDocumentRequest = new BulkDocumentRequest();
 
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			Document document = searchHit.getDocument();
+		Stream.of(
+			searchHits.getSearchHits()
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).map(
+			document ->
+				_slaTaskResultWorkflowMetricsIndexer.creatDefaultDocument(
+					companyId, document.getLong("nodeId"),
+					document.getLong("processId"), document.getString("name"))
+		).map(
+			document -> new IndexDocumentRequest(
+				_slaTaskResultWorkflowMetricsIndexer.getIndexName(companyId),
+				document) {
 
-			bulkDocumentRequest.addBulkableDocumentRequest(
-				new IndexDocumentRequest(
-					_slaTaskResultWorkflowMetricsIndexer.getIndexName(
-						companyId),
-					_slaTaskResultWorkflowMetricsIndexer.creatDefaultDocument(
-						companyId, document.getLong("nodeId"),
-						document.getLong("processId"),
-						document.getString("name"))) {
+				{
+					setType(
+						_slaTaskResultWorkflowMetricsIndexer.getIndexType());
+				}
+			}
+		).forEach(
+			indexDocumentRequest -> {
+				bulkDocumentRequest.addBulkableDocumentRequest(
+					indexDocumentRequest);
 
-					{
-						setType(
-							_slaTaskResultWorkflowMetricsIndexer.
-								getIndexType());
-					}
-				});
-
-			_workflowMetricsReindexStatusMessageSender.sendStatusMessage(
-				atomicCounter.incrementAndGet(), searchHits.getTotalHits(),
-				"sla-task-result");
-		}
+				_workflowMetricsReindexStatusMessageSender.sendStatusMessage(
+					atomicCounter.incrementAndGet(), searchHits.getTotalHits(),
+					"sla-task-result");
+			}
+		);
 
 		if (ListUtil.isNotEmpty(
 				bulkDocumentRequest.getBulkableDocumentRequests())) {
@@ -129,6 +146,10 @@ public class SLATaskResultWorkflowMetricsReindexer
 	}
 
 	private boolean _hasIndex(String indexName) {
+		if (searchEngineAdapter == null) {
+			return false;
+		}
+
 		IndicesExistsIndexRequest indicesExistsIndexRequest =
 			new IndicesExistsIndexRequest(indexName);
 
@@ -144,9 +165,6 @@ public class SLATaskResultWorkflowMetricsReindexer
 
 	@Reference
 	private Queries _queries;
-
-	@Reference
-	private SearchCapabilities _searchCapabilities;
 
 	@Reference
 	private SLATaskResultWorkflowMetricsIndexer

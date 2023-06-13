@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.internal.io;
 
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.internal.io.util.DDMFormFieldSerializerUtil;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormSerializerSerializeRequest;
@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
-	property = "ddm.form.serializer.type=json",
+	immediate = true, property = "ddm.form.serializer.type=json",
 	service = DDMFormSerializer.class
 )
 public class DDMFormJSONSerializer implements DDMFormSerializer {
@@ -57,7 +57,7 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		addAvailableLanguageIds(jsonObject, ddmForm.getAvailableLocales());
 		addDefaultLanguageId(jsonObject, ddmForm.getDefaultLocale());
 		addRules(jsonObject, ddmForm.getDDMFormRules());
-		_addSuccessPageSettings(
+		addSuccessPageSettings(
 			jsonObject, ddmForm.getDDMFormSuccessPageSettings());
 
 		if (Validator.isNotNull(ddmForm.getDefinitionSchemaVersion())) {
@@ -67,7 +67,7 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		}
 
 		DDMFormFieldSerializerUtil.serialize(
-			ddmForm.getDDMFormFields(), _ddmFormFieldTypeServicesRegistry,
+			ddmForm.getDDMFormFields(), _ddmFormFieldTypeServicesTracker,
 			_jsonFactory, jsonObject);
 
 		DDMFormSerializerSerializeResponse.Builder builder =
@@ -105,6 +105,25 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 
 		jsonObject.put(
 			"rules", DDMFormRuleJSONSerializer.serialize(ddmFormRules));
+	}
+
+	protected void addSuccessPageSettings(
+		JSONObject jsonObject,
+		DDMFormSuccessPageSettings ddmFormSuccessPageSettings) {
+
+		jsonObject.put("successPage", toJSONObject(ddmFormSuccessPageSettings));
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMFormFieldTypeServicesTracker(
+		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {
+
+		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJSONFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
 	}
 
 	protected JSONObject toJSONObject(
@@ -145,17 +164,7 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		return jsonObject;
 	}
 
-	private void _addSuccessPageSettings(
-		JSONObject jsonObject,
-		DDMFormSuccessPageSettings ddmFormSuccessPageSettings) {
-
-		jsonObject.put("successPage", toJSONObject(ddmFormSuccessPageSettings));
-	}
-
-	@Reference
-	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
-
-	@Reference
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 	private JSONFactory _jsonFactory;
 
 }

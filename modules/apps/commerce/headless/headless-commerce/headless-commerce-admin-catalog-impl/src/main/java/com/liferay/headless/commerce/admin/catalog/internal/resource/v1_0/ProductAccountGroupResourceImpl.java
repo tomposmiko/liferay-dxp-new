@@ -14,21 +14,20 @@
 
 package com.liferay.headless.commerce.admin.catalog.internal.resource.v1_0;
 
-import com.liferay.account.model.AccountGroup;
-import com.liferay.account.model.AccountGroupRel;
-import com.liferay.account.service.AccountGroupLocalService;
-import com.liferay.account.service.AccountGroupRelLocalService;
+import com.liferay.commerce.account.model.CommerceAccountGroup;
+import com.liferay.commerce.account.model.CommerceAccountGroupRel;
+import com.liferay.commerce.account.service.CommerceAccountGroupRelService;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductAccountGroup;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductAccountGroupResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.Collections;
 
@@ -40,17 +39,17 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Zoltán Takács
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/product-account-group.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, ProductAccountGroupResource.class}
 )
-@CTAware
 public class ProductAccountGroupResourceImpl
 	extends BaseProductAccountGroupResourceImpl implements NestedFieldSupport {
 
 	@Override
 	public void deleteProductAccountGroup(Long id) throws Exception {
-		_accountGroupRelLocalService.deleteAccountGroupRel(id);
+		_commerceAccountGroupRelService.deleteCommerceAccountGroupRel(id);
 	}
 
 	@Override
@@ -58,7 +57,7 @@ public class ProductAccountGroupResourceImpl
 		throws Exception {
 
 		return toProductAccountGroup(
-			_accountGroupRelLocalService.getAccountGroupRel(id));
+			_commerceAccountGroupRelService.getCommerceAccountGroupRel(id));
 	}
 
 	@Override
@@ -76,18 +75,19 @@ public class ProductAccountGroupResourceImpl
 			return Page.of(Collections.emptyList());
 		}
 
+		int commerceAccountGroupRelsCount =
+			_commerceAccountGroupRelService.getCommerceAccountGroupRelsCount(
+				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId());
+
 		return Page.of(
-			transform(
-				_accountGroupRelLocalService.getAccountGroupRels(
+			TransformUtil.transform(
+				_commerceAccountGroupRelService.getCommerceAccountGroupRels(
 					CPDefinition.class.getName(),
 					cpDefinition.getCPDefinitionId(),
 					pagination.getStartPosition(), pagination.getEndPosition(),
 					null),
 				this::toProductAccountGroup),
-			pagination,
-			_accountGroupRelLocalService.getAccountGroupRelsCount(
-				CPDefinition.class.getName(),
-				cpDefinition.getCPDefinitionId()));
+			pagination, commerceAccountGroupRelsCount);
 	}
 
 	@NestedField(parentClass = Product.class, value = "productAccountGroups")
@@ -103,42 +103,42 @@ public class ProductAccountGroupResourceImpl
 			return Page.of(Collections.emptyList());
 		}
 
+		int commerceAccountGroupRelsCount =
+			_commerceAccountGroupRelService.getCommerceAccountGroupRelsCount(
+				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId());
+
 		return Page.of(
-			transform(
-				_accountGroupRelLocalService.getAccountGroupRels(
+			TransformUtil.transform(
+				_commerceAccountGroupRelService.getCommerceAccountGroupRels(
 					CPDefinition.class.getName(),
 					cpDefinition.getCPDefinitionId(),
 					pagination.getStartPosition(), pagination.getEndPosition(),
 					null),
 				this::toProductAccountGroup),
-			pagination,
-			_accountGroupRelLocalService.getAccountGroupRelsCount(
-				CPDefinition.class.getName(),
-				cpDefinition.getCPDefinitionId()));
+			pagination, commerceAccountGroupRelsCount);
 	}
 
 	public ProductAccountGroup toProductAccountGroup(
-			AccountGroupRel accountGroupRel)
+			CommerceAccountGroupRel commerceAccountGroupRel)
 		throws Exception {
 
-		AccountGroup accountGroup = _accountGroupLocalService.getAccountGroup(
-			accountGroupRel.getAccountGroupId());
+		CommerceAccountGroup commerceAccountGroup =
+			commerceAccountGroupRel.getCommerceAccountGroup();
 
 		return new ProductAccountGroup() {
 			{
-				accountGroupId = accountGroupRel.getAccountGroupId();
-				externalReferenceCode = accountGroup.getExternalReferenceCode();
-				id = accountGroupRel.getAccountGroupRelId();
-				name = accountGroup.getName();
+				accountGroupId =
+					commerceAccountGroupRel.getCommerceAccountGroupId();
+				externalReferenceCode =
+					commerceAccountGroup.getExternalReferenceCode();
+				id = commerceAccountGroupRel.getCommerceAccountGroupRelId();
+				name = commerceAccountGroup.getName();
 			}
 		};
 	}
 
 	@Reference
-	private AccountGroupLocalService _accountGroupLocalService;
-
-	@Reference
-	private AccountGroupRelLocalService _accountGroupRelLocalService;
+	private CommerceAccountGroupRelService _commerceAccountGroupRelService;
 
 	@Reference
 	private CPDefinitionService _cpDefinitionService;

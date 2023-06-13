@@ -14,14 +14,10 @@
 
 package com.liferay.wiki.web.internal.portlet.action;
 
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.engine.WikiEngineRenderer;
 
@@ -36,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI,
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN,
@@ -51,8 +48,6 @@ public class CompareVersionsMVCResourceCommand extends BaseMVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(3);
-
 		double sourceVersion = ParamUtil.getDouble(
 			resourceRequest, "filterSourceVersion");
 		double targetVersion = ParamUtil.getDouble(
@@ -62,29 +57,12 @@ public class CompareVersionsMVCResourceCommand extends BaseMVCResourceCommand {
 			sourceVersion, targetVersion, resourceRequest, resourceResponse,
 			_wikiEngineRenderer);
 
-		if (Validator.isNotNull(htmlDiffResult)) {
-			sb.append("<div class=\"taglib-diff-html\">");
-			sb.append(htmlDiffResult);
-			sb.append("</div>");
-		}
-		else {
-			sb.append("<div class=\"alert alert-info\">");
-			sb.append(
-				_language.get(
-					_portal.getHttpServletRequest(resourceRequest),
-					"these-versions-are-not-comparable"));
-			sb.append("</div>");
-		}
+		resourceRequest.setAttribute(WebKeys.DIFF_HTML_RESULTS, htmlDiffResult);
 
-		ServletResponseUtil.write(
-			_portal.getHttpServletResponse(resourceResponse), sb.toString());
+		include(
+			resourceRequest, resourceResponse,
+			"/wiki/compare_versions_diff_html.jsp");
 	}
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private Portal _portal;
 
 	@Reference
 	private WikiEngineRenderer _wikiEngineRenderer;

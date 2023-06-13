@@ -16,7 +16,6 @@ package com.liferay.portal.vulcan.internal.jaxrs.message.body;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.liferay.document.library.kernel.util.DLValidatorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.vulcan.internal.multipart.MultipartUtil;
@@ -61,6 +60,10 @@ import org.apache.commons.fileupload.util.Streams;
 public class MultipartBodyMessageBodyReader
 	implements MessageBodyReader<MultipartBody> {
 
+	public MultipartBodyMessageBodyReader(long fileMaxSize) {
+		_fileMaxSize = fileMaxSize;
+	}
+
 	@Override
 	public boolean isReadable(
 		Class<?> clazz, Type genericType, Annotation[] annotations,
@@ -102,7 +105,7 @@ public class MultipartBodyMessageBodyReader
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -110,6 +113,9 @@ public class MultipartBodyMessageBodyReader
 			try {
 				ServletFileUpload servletFileUpload = new ServletFileUpload(
 					new DiskFileItemFactory());
+
+				servletFileUpload.setFileSizeMax(_fileMaxSize);
+				servletFileUpload.setSizeMax(_fileMaxSize);
 
 				List<FileItem> fileItems = servletFileUpload.parseRequest(
 					_httpServletRequest);
@@ -135,7 +141,7 @@ public class MultipartBodyMessageBodyReader
 
 				throw new BadRequestException(
 					"Please enter a file with a valid file size no larger " +
-						"than " + DLValidatorUtil.getMaxAllowableSize(0, null),
+						"than " + _fileMaxSize,
 					sizeLimitExceededException);
 			}
 			catch (Exception exception) {
@@ -154,6 +160,8 @@ public class MultipartBodyMessageBodyReader
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		MultipartBodyMessageBodyReader.class);
+
+	private final long _fileMaxSize;
 
 	@Context
 	private HttpServletRequest _httpServletRequest;

@@ -1,7 +1,6 @@
 @component-name = "portal-security"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Login";
@@ -15,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -23,8 +22,8 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-75977. Redirect on expire."
-	@priority = 5
+	@description = "This is a use case for LPS-75977. Redirect on expire"
+	@priority = "5"
 	test RedirectOnExpire {
 		property custom.properties = "session.timeout=2${line.separator}session.timeout.redirect.on.expire=true";
 		property test.name.skip.portal.instance = "SessionTimeout#RedirectOnExpire";
@@ -33,9 +32,11 @@ definition {
 		task ("Add public page") {
 			Navigator.openURL();
 
-			JSONLayout.addPublicLayout(
-				groupName = "Guest",
-				layoutName = "Session Page");
+			ProductMenu.gotoPortlet(
+				category = "Site Builder",
+				portlet = "Pages");
+
+			SitePages.addPublicPage(pageName = "Session Page");
 		}
 
 		task ("Assert expired session error message and user sign in not present ") {
@@ -45,10 +46,7 @@ definition {
 		}
 
 		task ("Wait for expiration time") {
-
-			// This pause is required to allow the test to wait for the warning message of a session expiring soon.
-
-			Pause(locator1 = 60000);
+			Pause(locator1 = "60000");
 		}
 
 		task ("Assert expired session error message") {
@@ -56,10 +54,7 @@ definition {
 		}
 
 		task ("Wait and sign in") {
-
-			// This pause is required to allow the test to wait for the session to expire.
-
-			Pause(locator1 = 60000);
+			Pause(locator1 = "60000");
 
 			User.viewSignInPresent();
 		}
@@ -69,11 +64,10 @@ definition {
 		}
 	}
 
-	@description = "This is a use cae for LRQA-7765. Remember me checked."
-	@priority = 4
+	@description = "This is a use cae for LRQA-7765. Remember me checked"
+	@priority = "4"
 	test RememberMeChecked {
 		property custom.properties = "session.timeout=2";
-		property test.name.skip.portal.instance = "SessionTimeout#RememberMeChecked";
 		property web.xml.timeout = "2";
 
 		task ("Assert session not expired and user sign in not present") {
@@ -83,14 +77,11 @@ definition {
 		}
 
 		task ("Wait for expiration time") {
-
-			// This pause is required to allow the test to wait for the session to expire.
-
-			Pause(locator1 = 120000);
+			Pause(locator1 = "120000");
 		}
 
 		task ("Assert session expired message") {
-			User.viewExpiredSessionErrorMessage(message = "Danger:Due to inactivity, your session has expired. Before you continue, make sure your entered data is saved locally.");
+			User.viewExpiredSessionErrorMessage(message = "Danger:Due to inactivity, your session has expired. Please save any data you may have entered before refreshing the page.");
 		}
 
 		task ("Refresh and sign in") {
@@ -107,11 +98,11 @@ definition {
 		task ("Wait for session expired") {
 			Navigator.openURL();
 
-			// This pause is required to allow the test to wait for the session to expire.
-
-			Pause(locator1 = 120000);
-
+			Pause(locator1 = "120000");
 			User.viewSessionNotExpired(sigin = "False");
+
+			//AssertElementNotPresent(locator1 = "Home#ERROR_MESSAGE_EXPIRED_SESSION");
+
 		}
 
 		task ("Refresh and assert welcome message") {
@@ -121,7 +112,9 @@ definition {
 		}
 
 		task ("Logout and login") {
-			User.logoutAndLoginPG();
+			User.logoutPG();
+
+			User.loginPG();
 		}
 
 		task ("Open portal, assert session expired message and user sign in not present") {
@@ -131,12 +124,9 @@ definition {
 		}
 
 		task ("Wait for session expired") {
+			Pause(locator1 = "120000");
 
-			// This pause is required to allow the test to wait for the session to expire.
-
-			Pause(locator1 = 120000);
-
-			User.viewExpiredSessionErrorMessage(message = "Danger:Due to inactivity, your session has expired. Before you continue, make sure your entered data is saved locally.");
+			User.viewExpiredSessionErrorMessage(message = "Danger:Due to inactivity, your session has expired. Please save any data you may have entered before refreshing the page.");
 		}
 
 		task ("Refresh and assert user sign in present") {

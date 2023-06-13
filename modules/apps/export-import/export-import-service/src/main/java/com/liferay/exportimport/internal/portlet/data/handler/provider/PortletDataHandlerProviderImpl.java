@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Máté Thurzó
  */
-@Component(service = PortletDataHandlerProvider.class)
+@Component(immediate = true, service = PortletDataHandlerProvider.class)
 public class PortletDataHandlerProviderImpl
 	implements PortletDataHandlerProvider {
 
@@ -41,12 +41,12 @@ public class PortletDataHandlerProviderImpl
 		Portlet portlet = _portletLocalService.getPortletById(
 			companyId, portletId);
 
-		return _provide(portlet);
+		return doProvide(portlet);
 	}
 
 	@Override
 	public PortletDataHandler provide(Portlet portlet) {
-		return _provide(portlet);
+		return doProvide(portlet);
 	}
 
 	@Override
@@ -57,10 +57,10 @@ public class PortletDataHandlerProviderImpl
 
 		Portlet portlet = _portletLocalService.getPortletById(portletId);
 
-		return _provide(portlet);
+		return doProvide(portlet);
 	}
 
-	private PortletDataHandler _provide(Portlet portlet) {
+	protected PortletDataHandler doProvide(Portlet portlet) {
 		if ((portlet == null) || !portlet.isActive() ||
 			portlet.isUndeployedPortlet()) {
 
@@ -72,7 +72,7 @@ public class PortletDataHandlerProviderImpl
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;

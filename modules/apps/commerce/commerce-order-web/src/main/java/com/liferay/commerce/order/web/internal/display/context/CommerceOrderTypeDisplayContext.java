@@ -18,10 +18,11 @@ import com.liferay.commerce.constants.CommerceOrderActionKeys;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.frontend.model.HeaderActionModel;
 import com.liferay.commerce.model.CommerceOrderType;
-import com.liferay.commerce.order.web.internal.display.context.helper.CommerceOrderRequestHelper;
+import com.liferay.commerce.order.web.internal.display.context.util.CommerceOrderRequestHelper;
 import com.liferay.commerce.service.CommerceOrderTypeService;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
@@ -92,12 +92,12 @@ public class CommerceOrderTypeDisplayContext {
 			commerceOrderTypeId);
 	}
 
-	public List<FDSActionDropdownItem>
-			getCommerceOrderTypeFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getCommerceOrderTypeClayDataSetActionDropdownItems()
 		throws PortalException {
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				PortletURLBuilder.create(
 					PortletProviderUtil.getPortletURL(
 						httpServletRequest, CommerceOrderType.class.getName(),
@@ -111,11 +111,11 @@ public class CommerceOrderTypeDisplayContext {
 				).buildString(),
 				"pencil", "edit", LanguageUtil.get(httpServletRequest, "edit"),
 				"get", null, null),
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "delete",
 				LanguageUtil.get(httpServletRequest, "delete"), "delete",
 				"delete", "headless"),
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				_getManagePermissionsURL(), null, "permissions",
 				LanguageUtil.get(httpServletRequest, "permissions"), "get",
 				"permissions", "modal-permissions"));
@@ -218,7 +218,7 @@ public class CommerceOrderTypeDisplayContext {
 				commerceOrderRequestHelper.getScopeGroupId(),
 				CommerceOrderType.class.getName())) {
 
-			publishButtonLabel = "submit-for-workflow";
+			publishButtonLabel = "submit-for-publication";
 		}
 
 		String additionalClasses = "btn-primary";

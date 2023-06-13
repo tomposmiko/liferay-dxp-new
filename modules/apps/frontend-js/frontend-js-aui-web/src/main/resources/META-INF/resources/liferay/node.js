@@ -22,11 +22,11 @@
 AUI.add(
 	'liferay-node',
 	(A) => {
-		const getRegExp = A.DOM._getRegExp;
+		var getRegExp = A.DOM._getRegExp;
 
-		const prefix = A.Lang.String.prefix;
+		var prefix = A.Lang.String.prefix;
 
-		const formatSelectorNS = function (ns, selector) {
+		var formatSelectorNS = function (ns, selector) {
 			return selector.replace(
 				getRegExp('(#|\\[id=(\\"|\\\'))(?!' + ns + ')', 'g'),
 				'$1' + ns
@@ -35,13 +35,13 @@ AUI.add(
 
 		A.mix(A.Node.prototype, {
 			allNS(ns, selector) {
-				const instance = this;
+				var instance = this;
 
 				return instance.all(formatSelectorNS(ns, selector));
 			},
 
 			oneNS(ns, selector) {
-				const instance = this;
+				var instance = this;
 
 				return instance.one(formatSelectorNS(ns, selector));
 			},

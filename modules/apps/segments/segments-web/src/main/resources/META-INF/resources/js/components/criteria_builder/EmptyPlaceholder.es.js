@@ -12,21 +12,22 @@
  * details.
  */
 
-import ClayEmptyState from '@clayui/empty-state';
 import React from 'react';
 
-import {sub} from '../../utils/utils';
+import {sub} from '../../utils/utils.es';
 
 export default function EmptyPlaceholder() {
 	return (
-		<div className="c-mb-0 c-p-4 empty-contributors rounded">
-			<ClayEmptyState
-				description={Liferay.Language.get('empty-conditions-message')}
-				imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
-				title={sub(Liferay.Language.get('no-x-yet'), [
-					Liferay.Language.get('conditions'),
-				])}
-			></ClayEmptyState>
+		<div className="empty-contributors mb-0 p-5 rounded taglib-empty-result-message">
+			<div className="taglib-empty-result-message-header" />
+			<div className="sheet-text text-center">
+				<h1 className="mb-3 mt-4">
+					{sub(Liferay.Language.get('no-x-yet'), [
+						Liferay.Language.get('conditions'),
+					])}
+				</h1>
+				<p>{Liferay.Language.get('empty-conditions-message')}</p>
+			</div>
 		</div>
 	);
 }

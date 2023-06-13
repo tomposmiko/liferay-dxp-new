@@ -15,7 +15,7 @@
 package com.liferay.commerce.account.internal.events;
 
 import com.liferay.commerce.account.configuration.CommerceAccountServiceConfiguration;
-import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.account.service.CommerceAccountUserRelLocalService;
 import com.liferay.portal.kernel.events.Action;
 import com.liferay.portal.kernel.events.LifecycleAction;
 import com.liferay.portal.kernel.log.Log;
@@ -32,7 +32,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(property = "key=login.events.post", service = LifecycleAction.class)
+@Component(
+	enabled = false, immediate = true, property = "key=login.events.post",
+	service = LifecycleAction.class
+)
 public class LoginPostAction extends Action {
 
 	@Override
@@ -49,12 +52,12 @@ public class LoginPostAction extends Action {
 			if (commerceAccountServiceConfiguration.
 					applyDefaultRoleToExistingUsers()) {
 
-				_commerceAccountHelper.addDefaultRoles(
+				_commerceAccountUserRelLocalService.addDefaultRoles(
 					_portal.getUserId(httpServletRequest));
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -62,7 +65,8 @@ public class LoginPostAction extends Action {
 		LoginPostAction.class);
 
 	@Reference
-	private CommerceAccountHelper _commerceAccountHelper;
+	private CommerceAccountUserRelLocalService
+		_commerceAccountUserRelLocalService;
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;

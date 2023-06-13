@@ -72,24 +72,7 @@ public class PostgreSQLDBTest extends BaseDBTestCase {
 	@Test
 	public void testRewordRenameTable() throws Exception {
 		Assert.assertEquals(
-			"alter table a rename to b;alter table b rename constraint " +
-				"a_pkey to b_pkey;\n",
-			buildSQL(RENAME_TABLE_QUERY));
-	}
-
-	@Test
-	public void testRewordSQLWithOidColumn() throws Exception {
-		String sql = "alter table a add oidcUser varchar(75) null";
-
-		Assert.assertEquals(sql + "\n", buildSQL(sql));
-
-		sql = "alter table a add oidcUser oid";
-
-		String rewordedSQL = buildSQL(sql);
-
-		Assert.assertTrue(
-			rewordedSQL.contains(sql) &&
-			rewordedSQL.contains("create or replace rule"));
+			"alter table a rename to b;\n", buildSQL(RENAME_TABLE_QUERY));
 	}
 
 	@Override

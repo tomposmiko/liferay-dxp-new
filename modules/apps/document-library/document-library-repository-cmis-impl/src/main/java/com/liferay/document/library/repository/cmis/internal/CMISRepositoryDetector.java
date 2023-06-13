@@ -58,7 +58,7 @@ public class CMISRepositoryDetector {
 	 *
 	 * @param repositoryInfo the repository description
 	 */
-	private void _detectNuxeo(RepositoryInfo repositoryInfo) {
+	protected void detectNuxeo(RepositoryInfo repositoryInfo) {
 		String[] versionParts = StringUtil.split(
 			repositoryInfo.getProductVersion(), StringPool.PERIOD);
 
@@ -96,7 +96,7 @@ public class CMISRepositoryDetector {
 		if (productName.contains(_NUXEO_ID)) {
 			_nuxeo = true;
 
-			_detectNuxeo(repositoryInfo);
+			detectNuxeo(repositoryInfo);
 		}
 	}
 

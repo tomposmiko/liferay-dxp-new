@@ -70,9 +70,11 @@ public class PortletPreferencesExportImportTest
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
 			JournalContentPortletKeys.JOURNAL_CONTENT);
 
+		String portletPreferencesXML = _getPortletPreferencesXML(
+			"name", new String[] {"value"});
+
 		_addGroupEmbeddedPortlet(
-			portletInstanceId, portlet,
-			_getPortletPreferencesXML("name", new String[] {"value"}));
+			portletInstanceId, portlet, portletPreferencesXML);
 
 		exportImportLayouts(
 			new long[] {layout.getLayoutId()}, getImportParameterMap());

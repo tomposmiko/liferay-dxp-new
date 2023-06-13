@@ -61,8 +61,11 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 			size="12"
 		>
 			<div id="breadcrumb">
-				<liferay-site-navigation:breadcrumb
-					breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+				<liferay-ui:breadcrumb
+					showCurrentGroup="<%= false %>"
+					showGuestGroup="<%= false %>"
+					showLayout="<%= false %>"
+					showPortletBreadcrumb="<%= true %>"
 				/>
 			</div>
 		</clay:col>
@@ -194,30 +197,13 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(resourceBundle, "
 			<aui:button-row>
 				<aui:button href="" onClick='<%= liferayPortletResponse.getNamespace() + "showConfirmationModal(this);" %>' value="cancel" />
 
-				<aui:button id="submitForm" type="submit" value="save" />
+				<aui:button type="submit" value="save" />
 			</aui:button-row>
 		</div>
 	</aui:form>
 </clay:sheet>
 
 <aui:script>
-	var submitButton = document.querySelector('#<portlet:namespace />submitForm');
-	var form = document.querySelector(
-		"form[action='<%= editSyncedContactsURL %>']"
-	);
-
-	submitButton.addEventListener('click', () => {
-		var selectUsersFields = document.querySelector(
-			'#<portlet:namespace />selectUsersFields'
-		);
-
-		if (selectUsersFields) {
-			form.appendChild(selectUsersFields);
-		}
-
-		form.submit();
-	});
-
 	Liferay.provide(
 		window,
 		'<portlet:namespace />showConfirmationModal',

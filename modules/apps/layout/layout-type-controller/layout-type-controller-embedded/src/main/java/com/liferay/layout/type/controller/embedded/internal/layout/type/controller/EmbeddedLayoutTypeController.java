@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	property = "layout.type=" + LayoutConstants.TYPE_EMBEDDED,
+	immediate = true, property = "layout.type=" + LayoutConstants.TYPE_EMBEDDED,
 	service = LayoutTypeController.class
 )
 public class EmbeddedLayoutTypeController extends BaseLayoutTypeControllerImpl {
@@ -81,6 +81,22 @@ public class EmbeddedLayoutTypeController extends BaseLayoutTypeControllerImpl {
 		return false;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
+	}
+
 	@Override
 	protected ServletResponse createServletResponse(
 		HttpServletResponse httpServletResponse,
@@ -96,13 +112,16 @@ public class EmbeddedLayoutTypeController extends BaseLayoutTypeControllerImpl {
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	protected String getViewPage() {
 		return _VIEW_PAGE;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.embedded)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 
 	private static final String _EDIT_PAGE = "/layout/edit/embedded.jsp";
@@ -112,10 +131,5 @@ public class EmbeddedLayoutTypeController extends BaseLayoutTypeControllerImpl {
 			"p_v_l_s_g_id=${liferay:pvlsgid}";
 
 	private static final String _VIEW_PAGE = "/layout/view/embedded.jsp";
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.embedded)"
-	)
-	private ServletContext _servletContext;
 
 }

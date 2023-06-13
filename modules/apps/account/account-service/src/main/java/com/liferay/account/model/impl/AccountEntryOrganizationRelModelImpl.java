@@ -16,6 +16,7 @@ package com.liferay.account.model.impl;
 
 import com.liferay.account.model.AccountEntryOrganizationRel;
 import com.liferay.account.model.AccountEntryOrganizationRelModel;
+import com.liferay.account.model.AccountEntryOrganizationRelSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -31,15 +32,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -137,6 +141,59 @@ public class AccountEntryOrganizationRelModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AccountEntryOrganizationRel toModel(
+		AccountEntryOrganizationRelSoap soapModel) {
+
+		if (soapModel == null) {
+			return null;
+		}
+
+		AccountEntryOrganizationRel model =
+			new AccountEntryOrganizationRelImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setAccountEntryOrganizationRelId(
+			soapModel.getAccountEntryOrganizationRelId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setAccountEntryId(soapModel.getAccountEntryId());
+		model.setOrganizationId(soapModel.getOrganizationId());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AccountEntryOrganizationRel> toModels(
+		AccountEntryOrganizationRelSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AccountEntryOrganizationRel> models =
+			new ArrayList<AccountEntryOrganizationRel>(soapModels.length);
+
+		for (AccountEntryOrganizationRelSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public AccountEntryOrganizationRelModelImpl() {
 	}
 
@@ -215,86 +272,96 @@ public class AccountEntryOrganizationRelModelImpl
 	public Map<String, Function<AccountEntryOrganizationRel, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AccountEntryOrganizationRel, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AccountEntryOrganizationRel>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<AccountEntryOrganizationRel, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AccountEntryOrganizationRel.class.getClassLoader(),
+			AccountEntryOrganizationRel.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<AccountEntryOrganizationRel, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String,
-						 Function<AccountEntryOrganizationRel, Object>>();
+		try {
+			Constructor<AccountEntryOrganizationRel> constructor =
+				(Constructor<AccountEntryOrganizationRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AccountEntryOrganizationRel::getMvccVersion);
-			attributeGetterFunctions.put(
-				"accountEntryOrganizationRelId",
-				AccountEntryOrganizationRel::getAccountEntryOrganizationRelId);
-			attributeGetterFunctions.put(
-				"companyId", AccountEntryOrganizationRel::getCompanyId);
-			attributeGetterFunctions.put(
-				"accountEntryId",
-				AccountEntryOrganizationRel::getAccountEntryId);
-			attributeGetterFunctions.put(
-				"organizationId",
-				AccountEntryOrganizationRel::getOrganizationId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map
+		<String, Function<AccountEntryOrganizationRel, Object>>
+			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<AccountEntryOrganizationRel, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<AccountEntryOrganizationRel, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AccountEntryOrganizationRel, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<AccountEntryOrganizationRel, Object>>();
+		Map<String, BiConsumer<AccountEntryOrganizationRel, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<AccountEntryOrganizationRel, ?>>();
 
-		static {
-			Map<String, BiConsumer<AccountEntryOrganizationRel, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<AccountEntryOrganizationRel, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountEntryOrganizationRel::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AccountEntryOrganizationRel, Long>)
+				AccountEntryOrganizationRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"accountEntryOrganizationRelId",
+			AccountEntryOrganizationRel::getAccountEntryOrganizationRelId);
+		attributeSetterBiConsumers.put(
+			"accountEntryOrganizationRelId",
+			(BiConsumer<AccountEntryOrganizationRel, Long>)
+				AccountEntryOrganizationRel::setAccountEntryOrganizationRelId);
+		attributeGetterFunctions.put(
+			"companyId", AccountEntryOrganizationRel::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AccountEntryOrganizationRel, Long>)
+				AccountEntryOrganizationRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountEntryOrganizationRel::getAccountEntryId);
+		attributeSetterBiConsumers.put(
+			"accountEntryId",
+			(BiConsumer<AccountEntryOrganizationRel, Long>)
+				AccountEntryOrganizationRel::setAccountEntryId);
+		attributeGetterFunctions.put(
+			"organizationId", AccountEntryOrganizationRel::getOrganizationId);
+		attributeSetterBiConsumers.put(
+			"organizationId",
+			(BiConsumer<AccountEntryOrganizationRel, Long>)
+				AccountEntryOrganizationRel::setOrganizationId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AccountEntryOrganizationRel, Long>)
-					AccountEntryOrganizationRel::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"accountEntryOrganizationRelId",
-				(BiConsumer<AccountEntryOrganizationRel, Long>)
-					AccountEntryOrganizationRel::
-						setAccountEntryOrganizationRelId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AccountEntryOrganizationRel, Long>)
-					AccountEntryOrganizationRel::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"accountEntryId",
-				(BiConsumer<AccountEntryOrganizationRel, Long>)
-					AccountEntryOrganizationRel::setAccountEntryId);
-			attributeSetterBiConsumers.put(
-				"organizationId",
-				(BiConsumer<AccountEntryOrganizationRel, Long>)
-					AccountEntryOrganizationRel::setOrganizationId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -625,13 +692,45 @@ public class AccountEntryOrganizationRelModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AccountEntryOrganizationRel, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AccountEntryOrganizationRel, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AccountEntryOrganizationRel, Object>
+				attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply(
+					(AccountEntryOrganizationRel)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, AccountEntryOrganizationRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						AccountEntryOrganizationRel.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -643,8 +742,7 @@ public class AccountEntryOrganizationRelModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<AccountEntryOrganizationRel, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

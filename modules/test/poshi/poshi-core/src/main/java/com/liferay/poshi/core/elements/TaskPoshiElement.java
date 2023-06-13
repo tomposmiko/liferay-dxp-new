@@ -58,8 +58,10 @@ public class TaskPoshiElement extends PoshiElement {
 	public void parsePoshiScript(String poshiScript)
 		throws PoshiScriptParserException {
 
-		String summary = getDoubleQuotedContent(
-			getParentheticalContent(getBlockName(poshiScript)));
+		String parentheticalContent = getParentheticalContent(
+			getBlockName(poshiScript));
+
+		String summary = getDoubleQuotedContent(parentheticalContent);
 
 		addAttribute("summary", summary);
 

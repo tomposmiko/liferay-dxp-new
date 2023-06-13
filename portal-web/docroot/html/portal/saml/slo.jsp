@@ -94,6 +94,10 @@ JSONArray samlSloRequestInfosJSONArray = samlSloContextJSONObject.getJSONArray("
 </noscript>
 
 <aui:script use="aui-base,aui-io-request-deprecated,aui-template-deprecated">
+	var confirmLogout = function() {
+		return confirm('<liferay-ui:message key="leaving-this-window-might-leave-logout-unfinished" />');
+	};
+
 	var eventHandlers = [];
 
 	var detachHandlers = function() {
@@ -114,16 +118,12 @@ JSONArray samlSloRequestInfosJSONArray = samlSloContextJSONObject.getJSONArray("
 			Liferay.on(
 				'beforeNavigate',
 				function(event) {
-					Liferay.Util.openConfirmModal({
-						message: '<liferay-ui:message key="leaving-this-window-might-leave-logout-unfinished" />',
-						onConfirm: (isConfirmed) => {
-							if (isConfirmed) {
-								SAML.SLO.clearFinishTimeout();
-							} else {
-								event.originalEvent.preventDefault();
-							}
-						}
-					});
+					if (!confirmLogout()) {
+						event.originalEvent.preventDefault();
+					}
+					else {
+						SAML.SLO.clearFinishTimeout();
+					}
 				}
 			)
 		);
@@ -167,8 +167,8 @@ JSONArray samlSloRequestInfosJSONArray = samlSloContextJSONObject.getJSONArray("
 		'<tpl for="items">',
 			'<div class="saml-sp" id="samlSp{$i}">',
 				'<span class="portlet-msg-progress-label saml-sp-label">{name}</span>',
-				'<a class="hide saml-sp-retry" data-entityId="{entityId}" href="javascript:void(0);"><%= UnicodeLanguageUtil.get(request, "retry") %></a>',
-				'<iframe class="hide-accessible sr-only" src="?cmd=logout&entityId={entityId}"></iframe>',
+				'<a class="hide saml-sp-retry" data-entityId="{entityId}" href="javascript:;"><%= UnicodeLanguageUtil.get(request, "retry") %></a>',
+				'<iframe class="hide-accessible" src="?cmd=logout&entityId={entityId}"></iframe>',
 			'</div>',
 		'</tpl>'
 	);

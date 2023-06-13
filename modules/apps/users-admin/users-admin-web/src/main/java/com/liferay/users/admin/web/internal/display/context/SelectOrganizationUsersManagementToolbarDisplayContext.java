@@ -18,7 +18,9 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -26,20 +28,16 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.usersadmin.search.UserSearch;
 import com.liferay.portlet.usersadmin.search.UserSearchTerms;
-import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.web.internal.search.AddUserOrganizationChecker;
 
 import java.util.LinkedHashMap;
@@ -96,25 +94,19 @@ public class SelectOrganizationUsersManagementToolbarDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
+		if (_orderByCol == null) {
+			_orderByCol = ParamUtil.getString(
+				_renderRequest, "orderByCol", "last-name");
 		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, UsersAdminPortletKeys.USERS_ADMIN,
-			"select-organization-users-order-by-col", "last-name");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
+		if (_orderByType == null) {
+			_orderByType = ParamUtil.getString(
+				_renderRequest, "orderByType", "asc");
 		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, UsersAdminPortletKeys.USERS_ADMIN,
-			"select-organization-users-order-by-type", "asc");
 
 		return _orderByType;
 	}
@@ -157,6 +149,13 @@ public class SelectOrganizationUsersManagementToolbarDisplayContext {
 			return _userSearch;
 		}
 
+		UserSearch userSearch = new UserSearch(_renderRequest, getPortletURL());
+
+		RowChecker rowChecker = new AddUserOrganizationChecker(
+			_renderResponse, _organization);
+
+		userSearch.setRowChecker(rowChecker);
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -178,26 +177,25 @@ public class SelectOrganizationUsersManagementToolbarDisplayContext {
 				userParams.put("usersOrgsTree", user.getOrganizations(true));
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
-
-		UserSearch userSearch = new UserSearch(_renderRequest, getPortletURL());
 
 		UserSearchTerms searchTerms =
 			(UserSearchTerms)userSearch.getSearchTerms();
 
-		userSearch.setResultsAndTotal(
-			() -> UserLocalServiceUtil.search(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), userParams, userSearch.getStart(),
-				userSearch.getEnd(), userSearch.getOrderByComparator()),
-			UserLocalServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), userParams));
+		int total = UserLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), userParams);
 
-		userSearch.setRowChecker(
-			new AddUserOrganizationChecker(_renderResponse, _organization));
+		userSearch.setTotal(total);
+
+		List<User> results = UserLocalServiceUtil.search(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), userParams, userSearch.getStart(),
+			userSearch.getEnd(), userSearch.getOrderByComparator());
+
+		userSearch.setResults(results);
 
 		_userSearch = userSearch;
 

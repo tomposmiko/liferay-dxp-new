@@ -14,11 +14,6 @@
 
 package com.liferay.portal.search.web.internal.search.insights.display.context;
 
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.io.Serializable;
 
 /**
@@ -31,19 +26,11 @@ public class SearchInsightsDisplayContext implements Serializable {
 	}
 
 	public String getRequestString() {
-		if (_searchEngineVendor.equals("Solr")) {
-			return _requestString;
-		}
-
-		return _getPrettyPrintedJSON(_requestString);
+		return _requestString;
 	}
 
 	public String getResponseString() {
-		if (_searchEngineVendor.equals("Solr")) {
-			return _responseString;
-		}
-
-		return _getPrettyPrintedJSON(_responseString);
+		return _responseString;
 	}
 
 	public void setHelpMessage(String helpMessage) {
@@ -58,31 +45,8 @@ public class SearchInsightsDisplayContext implements Serializable {
 		_responseString = responseString;
 	}
 
-	public void setSearchEngineVendor(String searchEngineVendor) {
-		_searchEngineVendor = searchEngineVendor;
-	}
-
-	private String _getPrettyPrintedJSON(String json) {
-		try {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(json);
-
-			return jsonObject.toString(4);
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
-			}
-
-			return json;
-		}
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SearchInsightsDisplayContext.class);
-
 	private String _helpMessage;
 	private String _requestString;
 	private String _responseString;
-	private String _searchEngineVendor;
 
 }

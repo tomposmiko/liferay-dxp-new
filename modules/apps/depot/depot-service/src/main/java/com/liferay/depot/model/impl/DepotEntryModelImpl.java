@@ -16,6 +16,7 @@ package com.liferay.depot.model.impl;
 
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.model.DepotEntryModel;
+import com.liferay.depot.model.DepotEntrySoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -36,15 +37,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -151,6 +155,56 @@ public class DepotEntryModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static DepotEntry toModel(DepotEntrySoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		DepotEntry model = new DepotEntryImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setDepotEntryId(soapModel.getDepotEntryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<DepotEntry> toModels(DepotEntrySoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<DepotEntry> models = new ArrayList<DepotEntry>(soapModels.length);
+
+		for (DepotEntrySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public DepotEntryModelImpl() {
 	}
 
@@ -226,83 +280,94 @@ public class DepotEntryModelImpl
 	public Map<String, Function<DepotEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<DepotEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, DepotEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<DepotEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DepotEntry.class.getClassLoader(), DepotEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<DepotEntry, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<DepotEntry, Object>>();
+		try {
+			Constructor<DepotEntry> constructor =
+				(Constructor<DepotEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", DepotEntry::getMvccVersion);
-			attributeGetterFunctions.put("uuid", DepotEntry::getUuid);
-			attributeGetterFunctions.put(
-				"depotEntryId", DepotEntry::getDepotEntryId);
-			attributeGetterFunctions.put("groupId", DepotEntry::getGroupId);
-			attributeGetterFunctions.put("companyId", DepotEntry::getCompanyId);
-			attributeGetterFunctions.put("userId", DepotEntry::getUserId);
-			attributeGetterFunctions.put("userName", DepotEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", DepotEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", DepotEntry::getModifiedDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<DepotEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DepotEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<DepotEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<DepotEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DepotEntry, Object>>();
+		Map<String, BiConsumer<DepotEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<DepotEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<DepotEntry, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<DepotEntry, ?>>();
+		attributeGetterFunctions.put("mvccVersion", DepotEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<DepotEntry, Long>)DepotEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", DepotEntry::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<DepotEntry, String>)DepotEntry::setUuid);
+		attributeGetterFunctions.put(
+			"depotEntryId", DepotEntry::getDepotEntryId);
+		attributeSetterBiConsumers.put(
+			"depotEntryId",
+			(BiConsumer<DepotEntry, Long>)DepotEntry::setDepotEntryId);
+		attributeGetterFunctions.put("groupId", DepotEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId", (BiConsumer<DepotEntry, Long>)DepotEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", DepotEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DepotEntry, Long>)DepotEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", DepotEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<DepotEntry, Long>)DepotEntry::setUserId);
+		attributeGetterFunctions.put("userName", DepotEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<DepotEntry, String>)DepotEntry::setUserName);
+		attributeGetterFunctions.put("createDate", DepotEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<DepotEntry, Date>)DepotEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DepotEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<DepotEntry, Date>)DepotEntry::setModifiedDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<DepotEntry, Long>)DepotEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<DepotEntry, String>)DepotEntry::setUuid);
-			attributeSetterBiConsumers.put(
-				"depotEntryId",
-				(BiConsumer<DepotEntry, Long>)DepotEntry::setDepotEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<DepotEntry, Long>)DepotEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<DepotEntry, Long>)DepotEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<DepotEntry, Long>)DepotEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<DepotEntry, String>)DepotEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<DepotEntry, Date>)DepotEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<DepotEntry, Date>)DepotEntry::setModifiedDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -769,12 +834,41 @@ public class DepotEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<DepotEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<DepotEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<DepotEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((DepotEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DepotEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DepotEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -792,9 +886,8 @@ public class DepotEntryModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<DepotEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<DepotEntry, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

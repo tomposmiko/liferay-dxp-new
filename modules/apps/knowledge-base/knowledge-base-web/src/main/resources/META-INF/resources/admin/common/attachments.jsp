@@ -65,8 +65,7 @@ if (kbArticle != null) {
 					%>
 
 					<liferay-ui:icon-delete
-						icon="trash"
-						showIcon="<%= true %>"
+						label="<%= true %>"
 						url="<%= taglibURL %>"
 					/>
 				</div>
@@ -81,34 +80,31 @@ if (kbArticle != null) {
 
 <aui:script use="liferay-upload">
 	new Liferay.Upload({
-		'boundingBox': '#<portlet:namespace />fileUpload',
-		'deleteFile':
-			'<liferay-portlet:actionURL name="/knowledge_base/delete_temp_attachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>',
+		boundingBox: '#<portlet:namespace />fileUpload',
+		deleteFile:
+			'<liferay-portlet:actionURL name="deleteTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>',
 
 		<%
 		DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 		%>
 
-		'fileDescription':
+		fileDescription:
 			'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
-		'maxFileSize':
-			'<%= DLValidatorUtil.getMaxAllowableSize(themeDisplay.getScopeGroupId(), null) %> B',
-		'metadataContainer':
+		maxFileSize: '<%= dlConfiguration.fileMaxSize() %> B',
+		metadataContainer:
 			'#<portlet:namespace />selectedFileNameMetadataContainer',
-		'metadataExplanationContainer':
+		metadataExplanationContainer:
 			'#<portlet:namespace />metadataExplanationContainer',
-		'namespace': '<portlet:namespace />',
-		'tempFileURL': {
+		namespace: '<portlet:namespace />',
+		tempFileURL: {
 			method: Liferay.Service.bind('/kb.kbarticle/get-temp-attachment-names'),
 			params: {
 				groupId: <%= scopeGroupId %>,
 				tempFolderName: '<%= KBWebKeys.TEMP_FOLDER_NAME %>',
 			},
 		},
-		'strings.dropFilesText':
-			'<liferay-ui:message key="drag-and-drop-to-upload" />',
-		'uploadFile':
-			'<liferay-portlet:actionURL name="/knowledge_base/add_temp_attachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>',
+		uploadFile:
+			'<liferay-portlet:actionURL name="addTempAttachment"><portlet:param name="resourcePrimKey" value="<%= String.valueOf(resourcePrimKey) %>" /></liferay-portlet:actionURL>',
 	});
 </aui:script>
 

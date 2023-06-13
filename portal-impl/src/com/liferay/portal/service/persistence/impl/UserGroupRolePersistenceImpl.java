@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.model.UserGroupRoleTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.UserGroupRolePersistence;
-import com.liferay.portal.kernel.service.persistence.UserGroupRoleUtil;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelperUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -45,7 +44,6 @@ import com.liferay.portal.model.impl.UserGroupRoleModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -185,7 +183,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<UserGroupRole>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupRole userGroupRole : list) {
@@ -553,8 +551,7 @@ public class UserGroupRolePersistenceImpl
 
 			finderArgs = new Object[] {userId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -694,7 +691,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<UserGroupRole>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupRole userGroupRole : list) {
@@ -1062,8 +1059,7 @@ public class UserGroupRolePersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1202,7 +1198,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<UserGroupRole>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupRole userGroupRole : list) {
@@ -1570,8 +1566,7 @@ public class UserGroupRolePersistenceImpl
 
 			finderArgs = new Object[] {roleId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1719,7 +1714,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<UserGroupRole>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupRole userGroupRole : list) {
@@ -2117,8 +2112,7 @@ public class UserGroupRolePersistenceImpl
 
 			finderArgs = new Object[] {userId, groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2273,7 +2267,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<UserGroupRole>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (UserGroupRole userGroupRole : list) {
@@ -2671,8 +2665,7 @@ public class UserGroupRolePersistenceImpl
 
 			finderArgs = new Object[] {groupId, roleId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2805,7 +2798,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByU_G_R, finderArgs, this);
+				_finderPathFetchByU_G_R, finderArgs);
 		}
 
 		if (result instanceof UserGroupRole) {
@@ -2919,8 +2912,7 @@ public class UserGroupRolePersistenceImpl
 
 			finderArgs = new Object[] {userId, groupId, roleId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3323,9 +3315,7 @@ public class UserGroupRolePersistenceImpl
 	 */
 	@Override
 	public UserGroupRole fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				UserGroupRole.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(UserGroupRole.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3544,7 +3534,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<UserGroupRole>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3620,7 +3610,7 @@ public class UserGroupRolePersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3845,30 +3835,10 @@ public class UserGroupRolePersistenceImpl
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"userId", "groupId", "roleId"}, false);
-
-		_setUserGroupRoleUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setUserGroupRoleUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(UserGroupRoleImpl.class.getName());
-	}
-
-	private void _setUserGroupRoleUtilPersistence(
-		UserGroupRolePersistence userGroupRolePersistence) {
-
-		try {
-			Field field = UserGroupRoleUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, userGroupRolePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_USERGROUPROLE =

@@ -13,12 +13,34 @@
  */
 
 import updateItemConfigAction from '../../../../src/main/resources/META-INF/resources/page_editor/app/actions/updateItemConfig';
+import updatePageContents from '../../../../src/main/resources/META-INF/resources/page_editor/app/actions/updatePageContents';
 import LayoutService from '../../../../src/main/resources/META-INF/resources/page_editor/app/services/LayoutService';
 import updateItemConfig from '../../../../src/main/resources/META-INF/resources/page_editor/app/thunks/updateItemConfig';
 
 jest.mock(
 	'../../../../src/main/resources/META-INF/resources/page_editor/app/actions/updateItemConfig',
 	() => jest.fn()
+);
+
+jest.mock(
+	'../../../../src/main/resources/META-INF/resources/page_editor/app/actions/updatePageContents',
+	() => jest.fn()
+);
+
+jest.mock(
+	'../../../../src/main/resources/META-INF/resources/page_editor/app/services/InfoItemService',
+	() => ({
+		getPageContents: jest.fn(() =>
+			Promise.resolve([
+				{
+					classPK: 'pk',
+					name: 'contents',
+					title: 'title',
+					usagesCount: 1,
+				},
+			])
+		),
+	})
 );
 
 jest.mock(
@@ -38,14 +60,11 @@ describe('updateItemConfig', () => {
 			itemConfig: {},
 			itemId: '0',
 			segmentsExperienceId: '0',
-		})(
-			() => {},
-			() => ({})
-		);
+		})(() => {});
 
 	it('calls LayoutService.updateItemConfig with the given information', () => {
 		LayoutService.updateItemConfig.mockImplementation(() =>
-			Promise.resolve({})
+			Promise.resolve()
 		);
 
 		runThunk();
@@ -55,18 +74,8 @@ describe('updateItemConfig', () => {
 	it('dispatches updateItemConfig and updatePageContents actions', async () => {
 		LayoutService.updateItemConfig.mockImplementation(() =>
 			Promise.resolve({
-				layoutData: {
-					items: {},
-					version: 1,
-				},
-				pageContents: [
-					{
-						classPK: 'pk',
-						name: 'contents',
-						title: 'title',
-						usagesCount: 1,
-					},
-				],
+				items: {},
+				version: 1,
 			})
 		);
 
@@ -78,6 +87,9 @@ describe('updateItemConfig', () => {
 				items: {},
 				version: 1,
 			},
+		});
+
+		expect(updatePageContents).toHaveBeenCalledWith({
 			pageContents: [
 				{
 					classPK: 'pk',

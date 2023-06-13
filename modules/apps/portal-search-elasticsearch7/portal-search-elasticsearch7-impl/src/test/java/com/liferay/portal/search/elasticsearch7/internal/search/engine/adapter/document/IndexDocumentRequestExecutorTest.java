@@ -72,12 +72,20 @@ public class IndexDocumentRequestExecutorTest {
 
 	@Test
 	public void testIndexDocumentWithNoRefresh() {
-		_indexDocument(false);
+		doIndexDocument(false);
 	}
 
 	@Test
 	public void testIndexDocumentWithRefresh() {
-		_indexDocument(true);
+		doIndexDocument(true);
+	}
+
+	protected void assertFieldEquals(
+		String fieldName, Document expectedDocument, Document actualDocument) {
+
+		Assert.assertEquals(
+			expectedDocument.getString(fieldName),
+			actualDocument.getString(fieldName));
 	}
 
 	protected Document buildDocument(String fieldName, String fieldValue) {
@@ -88,15 +96,7 @@ public class IndexDocumentRequestExecutorTest {
 		).build();
 	}
 
-	private void _assertFieldEquals(
-		String fieldName, Document expectedDocument, Document actualDocument) {
-
-		Assert.assertEquals(
-			expectedDocument.getString(fieldName),
-			actualDocument.getString(fieldName));
-	}
-
-	private void _indexDocument(boolean refresh) {
+	protected void doIndexDocument(boolean refresh) {
 		Document document = buildDocument(_FIELD_NAME, "example test");
 
 		IndexDocumentRequest indexDocumentRequest = new IndexDocumentRequest(
@@ -107,7 +107,7 @@ public class IndexDocumentRequestExecutorTest {
 		IndexDocumentResponse indexDocumentResponse =
 			_indexDocumentRequestExecutor.execute(indexDocumentRequest);
 
-		_assertFieldEquals(
+		assertFieldEquals(
 			_FIELD_NAME, document,
 			_requestExecutorFixture.getDocumentById(
 				_INDEX_NAME, indexDocumentResponse.getUid()));

@@ -15,87 +15,42 @@
 package com.liferay.item.selector.criteria.upload.criterion;
 
 import com.liferay.item.selector.BaseItemSelectorCriterion;
-import com.liferay.item.selector.ItemSelectorReturnType;
-import com.liferay.portal.kernel.upload.configuration.UploadServletRequestConfigurationProviderUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
 
 /**
  * @author Ambrín Chaudhary
  */
 public class UploadItemSelectorCriterion extends BaseItemSelectorCriterion {
 
-	public static Builder builder() {
-		return new Builder() {
+	public UploadItemSelectorCriterion() {
+	}
 
-			@Override
-			public UploadItemSelectorCriterion build() {
-				if (_uploadItemSelectorCriterion.getMaxFileSize() <= 0) {
-					_uploadItemSelectorCriterion.setMaxFileSize(
-						UploadServletRequestConfigurationProviderUtil.
-							getMaxSize());
-				}
+	public UploadItemSelectorCriterion(
+		String portletId, String url, String repositoryName) {
 
-				return _uploadItemSelectorCriterion;
-			}
+		this(
+			portletId, url, repositoryName,
+			UploadServletRequestConfigurationHelperUtil.getMaxSize());
+	}
 
-			@Override
-			public Builder desiredItemSelectorReturnTypes(
-				ItemSelectorReturnType... desiredItemSelectorReturnTypes) {
+	public UploadItemSelectorCriterion(
+		String portletId, String url, String repositoryName, long maxFileSize) {
 
-				_uploadItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-					desiredItemSelectorReturnTypes);
+		_portletId = portletId;
+		_url = url;
+		_repositoryName = repositoryName;
+		_maxFileSize = maxFileSize;
+	}
 
-				return this;
-			}
+	public UploadItemSelectorCriterion(
+		String portletId, String url, String repositoryName, long maxFileSize,
+		String[] extensions) {
 
-			@Override
-			public Builder extensions(String[] extensions) {
-				_uploadItemSelectorCriterion.setExtensions(extensions);
-
-				return this;
-			}
-
-			@Override
-			public Builder maxFileSize(long maxFileSize) {
-				_uploadItemSelectorCriterion.setMaxFileSize(maxFileSize);
-
-				return this;
-			}
-
-			@Override
-			public Builder mimeTypeRestriction(String mimeTypeRestriction) {
-				_uploadItemSelectorCriterion._setMimeTypeRestriction(
-					mimeTypeRestriction);
-
-				return this;
-			}
-
-			@Override
-			public Builder portletId(String portletId) {
-				_uploadItemSelectorCriterion.setPortletId(portletId);
-
-				return this;
-			}
-
-			@Override
-			public Builder repositoryName(String repositoryName) {
-				_uploadItemSelectorCriterion.setRepositoryName(repositoryName);
-
-				return this;
-			}
-
-			@Override
-			public Builder url(String url) {
-				_uploadItemSelectorCriterion.setURL(url);
-
-				return this;
-			}
-
-			private final UploadItemSelectorCriterion
-				_uploadItemSelectorCriterion =
-					new UploadItemSelectorCriterion();
-
-		};
+		_portletId = portletId;
+		_url = url;
+		_repositoryName = repositoryName;
+		_maxFileSize = maxFileSize;
+		_extensions = extensions;
 	}
 
 	public String[] getExtensions() {
@@ -104,15 +59,6 @@ public class UploadItemSelectorCriterion extends BaseItemSelectorCriterion {
 
 	public long getMaxFileSize() {
 		return _maxFileSize;
-	}
-
-	@Override
-	public String getMimeTypeRestriction() {
-		if (Validator.isNull(_mimeTypeRestriction)) {
-			super.getMimeTypeRestriction();
-		}
-
-		return _mimeTypeRestriction;
 	}
 
 	public String getPortletId() {
@@ -147,34 +93,8 @@ public class UploadItemSelectorCriterion extends BaseItemSelectorCriterion {
 		_url = url;
 	}
 
-	public interface Builder {
-
-		public UploadItemSelectorCriterion build();
-
-		public Builder desiredItemSelectorReturnTypes(
-			ItemSelectorReturnType... desiredItemSelectorReturnTypes);
-
-		public Builder extensions(String[] extensions);
-
-		public Builder maxFileSize(long maxFileSize);
-
-		public Builder mimeTypeRestriction(String mimeTypeRestriction);
-
-		public Builder portletId(String portletId);
-
-		public Builder repositoryName(String repositoryName);
-
-		public Builder url(String url);
-
-	}
-
-	private void _setMimeTypeRestriction(String mimeTypeRestriction) {
-		_mimeTypeRestriction = mimeTypeRestriction;
-	}
-
 	private String[] _extensions;
 	private long _maxFileSize;
-	private String _mimeTypeRestriction;
 	private String _portletId;
 	private String _repositoryName;
 	private String _url;

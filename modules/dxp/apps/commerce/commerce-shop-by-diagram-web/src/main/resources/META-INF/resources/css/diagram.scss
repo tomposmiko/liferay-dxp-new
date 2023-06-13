@@ -45,6 +45,16 @@ $diagram-height: 700px;
 		}
 	}
 
+	.diagram-tooltip {
+		background: $white;
+		border-radius: 3px;
+		box-shadow: 1px 6px 11px rgba(0, 0, 0, 0.1);
+		padding: $spacer;
+		position: absolute;
+		width: 400px;
+		z-index: 4;
+	}
+
 	.empty-pin-node {
 		.pin-node-background {
 			fill: $primary;
@@ -191,47 +201,8 @@ $diagram-height: 700px;
 	height: $diagram-height;
 	max-height: $diagram-height;
 
-	.full-height-content {
-		flex-grow: 1;
-		padding-bottom: map-get($spacers, 5);
-		padding-top: map-get($spacers, 5);
-		text-align: center;
-	}
-
 	.inline-scroller {
 		flex-grow: 1;
 		max-height: none;
 	}
-}
-
-.diagram-tooltip-wrapper {
-	position: absolute;
-	transform: translate(0, -50%);
-	z-index: 990;
-
-	.diagram-tooltip {
-		background: $white;
-		border-radius: 3px;
-		box-shadow: 1px 6px 11px rgba(0, 0, 0, 0.1);
-		padding: map-get($spacers, 3);
-		width: 450px;
-
-		.loading-animation {
-			margin: 0;
-		}
-	}
-
-	.fill-cover .sticker-img {
-		height: 100%;
-		object-fit: cover;
-		object-position: 50%;
-		position: static;
-		transform: none;
-		width: 100%;
-	}
-}
-
-.shop-by-diagram-table .btn-add-to-order {
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
 }

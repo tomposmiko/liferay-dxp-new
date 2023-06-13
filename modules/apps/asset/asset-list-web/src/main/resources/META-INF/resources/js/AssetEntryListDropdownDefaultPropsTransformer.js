@@ -14,15 +14,15 @@
 
 import {openModal, openSimpleInputModal} from 'frontend-js-web';
 
-import openDeleteAssetEntryListModal from './openDeleteAssetEntryListModal';
-
 const ACTIONS = {
 	deleteAssetListEntry(itemData) {
-		openDeleteAssetEntryListModal({
-			onDelete: () => {
-				this.send(itemData.deleteAssetListEntryURL);
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			this.send(itemData.deleteAssetListEntryURL);
+		}
 	},
 
 	permissionsAssetEntryList(itemData) {
@@ -51,33 +51,25 @@ const ACTIONS = {
 	},
 };
 
-export default function propsTransformer({
-	actions,
-	items,
-	portletNamespace,
-	...props
-}) {
-	const updateItem = (item) => {
-		return {
-			...item,
-			items: item.items.map((child) => ({
-				...child,
-				onClick(event) {
-					const action = child.data?.action;
-
-					if (action) {
-						event.preventDefault();
-
-						ACTIONS[action](child.data, portletNamespace);
-					}
-				},
-			})),
-		};
-	};
-
+export default function propsTransformer({items, portletNamespace, ...props}) {
 	return {
 		...props,
-		actions: actions?.map(updateItem),
-		items: items?.map(updateItem),
+		items: items.map((item) => {
+			return {
+				...item,
+				items: item.items.map((child) => ({
+					...child,
+					onClick(event) {
+						const action = child.data?.action;
+
+						if (action) {
+							event.preventDefault();
+
+							ACTIONS[action](child.data, portletNamespace);
+						}
+					},
+				})),
+			};
+		}),
 	};
 }

@@ -19,10 +19,11 @@ import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.item.InfoItemFieldValues;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.info.pagination.Pagination;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -30,7 +31,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -51,10 +51,10 @@ import javax.servlet.http.HttpServletRequest;
 public class InfoCollectionProviderItemsDisplayContext {
 
 	public InfoCollectionProviderItemsDisplayContext(
-		InfoItemServiceRegistry infoItemServiceRegistry,
+		InfoItemServiceTracker infoItemServiceTracker,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
-		_infoItemServiceRegistry = infoItemServiceRegistry;
+		_infoItemServiceTracker = infoItemServiceTracker;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
@@ -108,7 +108,7 @@ public class InfoCollectionProviderItemsDisplayContext {
 			_getInfoCollectionProvider();
 
 		_infoItemFieldValuesProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class,
 				infoCollectionProvider.getCollectionItemClassName());
 
@@ -134,8 +134,8 @@ public class InfoCollectionProviderItemsDisplayContext {
 		InfoPage infoPage = infoCollectionProvider.getCollectionInfoPage(
 			collectionQuery);
 
-		searchContainer.setResultsAndTotal(
-			infoPage::getPageItems, infoPage.getTotalCount());
+		searchContainer.setResults(infoPage.getPageItems());
+		searchContainer.setTotal(infoPage.getTotalCount());
 
 		return searchContainer;
 	}
@@ -188,7 +188,7 @@ public class InfoCollectionProviderItemsDisplayContext {
 			return _infoCollectionProvider;
 		}
 
-		_infoCollectionProvider = _infoItemServiceRegistry.getInfoItemService(
+		_infoCollectionProvider = _infoItemServiceTracker.getInfoItemService(
 			InfoCollectionProvider.class, _getInfoCollectionProviderKey());
 
 		return _infoCollectionProvider;
@@ -221,7 +221,7 @@ public class InfoCollectionProviderItemsDisplayContext {
 		}
 		catch (PortletException portletException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portletException);
+				_log.debug(portletException, portletException);
 			}
 
 			return PortletURLBuilder.createRenderURL(
@@ -240,7 +240,7 @@ public class InfoCollectionProviderItemsDisplayContext {
 	private String _infoCollectionProviderClassName;
 	private String _infoCollectionProviderKey;
 	private InfoItemFieldValuesProvider<Object> _infoItemFieldValuesProvider;
-	private final InfoItemServiceRegistry _infoItemServiceRegistry;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private Boolean _showActions;

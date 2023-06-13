@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
 public class AddDefaultKaleoProcessStructuresPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
@@ -49,13 +49,13 @@ public class AddDefaultKaleoProcessStructuresPortalInstanceLifecycleListener
 
 		serviceContext.setScopeGroupId(group.getGroupId());
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			company.getCompanyId());
 
-		serviceContext.setUserId(guestUserId);
+		serviceContext.setUserId(defaultUserId);
 
 		_defaultDDMStructureHelper.addDDMStructures(
-			guestUserId, group.getGroupId(),
+			defaultUserId, group.getGroupId(),
 			_portal.getClassNameId(KaleoProcess.class),
 			AddDefaultKaleoProcessStructuresPortalInstanceLifecycleListener.
 				class.getClassLoader(),
@@ -65,22 +65,39 @@ public class AddDefaultKaleoProcessStructuresPortalInstanceLifecycleListener
 			serviceContext);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDefaultDDMStructureHelper(
+		DefaultDDMStructureHelper defaultDDMStructureHelper) {
+
+		_defaultDDMStructureHelper = defaultDDMStructureHelper;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKaleoProcessLocalService(
+		KaleoProcessLocalService kaleoProcessLocalService) {
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private DefaultDDMStructureHelper _defaultDDMStructureHelper;
-
-	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private KaleoProcessLocalService _kaleoProcessLocalService;
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

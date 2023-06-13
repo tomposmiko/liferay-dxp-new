@@ -34,17 +34,17 @@ import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
 import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.highlight.HighlightFieldBuilderFactory;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
+import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
 import com.liferay.portal.search.searcher.SearchTimeValue;
 
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.lucene.search.TotalHits;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -70,13 +70,13 @@ public class SearchSearchResponseAssemblerImpl
 			searchRequestBuilder, searchResponse, searchSearchRequest,
 			searchSearchResponse);
 
-		_addAggregations(
+		addAggregations(
 			searchResponse, searchSearchResponse, searchSearchRequest);
 		setCount(searchResponse, searchSearchResponse);
-		_setScrollId(searchResponse, searchSearchResponse);
-		_setSearchHits(
+		setScrollId(searchResponse, searchSearchResponse);
+		setSearchHits(
 			searchResponse, searchSearchResponse, searchSearchRequest);
-		_setSearchTimeValue(searchResponse, searchSearchResponse);
+		setSearchTimeValue(searchResponse, searchSearchResponse);
 
 		_searchResponseTranslator.populate(
 			searchSearchResponse, searchResponse, searchSearchRequest);
@@ -106,18 +106,7 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchAggregation, _aggregationResults);
 	}
 
-	protected void setCount(
-		SearchResponse searchResponse,
-		SearchSearchResponse searchSearchResponse) {
-
-		SearchHits searchHits = searchResponse.getHits();
-
-		TotalHits totalHits = searchHits.getTotalHits();
-
-		searchSearchResponse.setCount(totalHits.value);
-	}
-
-	private void _addAggregations(
+	protected void addAggregations(
 		SearchResponse searchResponse,
 		SearchSearchResponse searchSearchResponse,
 		SearchSearchRequest searchSearchRequest) {
@@ -141,16 +130,59 @@ public class SearchSearchResponseAssemblerImpl
 					this, this, aggregationsMap::get,
 					pipelineAggregationsMap::get);
 
-		List<AggregationResult> aggregationResults =
+		Stream<AggregationResult> stream =
 			elasticsearchAggregationResultsTranslator.translate(
 				elasticsearchAggregations);
 
-		for (AggregationResult aggregationResult : aggregationResults) {
-			searchSearchResponse.addAggregationResult(aggregationResult);
-		}
+		stream.forEach(searchSearchResponse::addAggregationResult);
 	}
 
-	private void _setScrollId(
+	@Reference(unbind = "-")
+	protected void setAggregationResults(
+		AggregationResults aggregationResults) {
+
+		_aggregationResults = aggregationResults;
+	}
+
+	@Reference(unbind = "-")
+	protected void setCommonSearchResponseAssembler(
+		CommonSearchResponseAssembler commonSearchResponseAssembler) {
+
+		_commonSearchResponseAssembler = commonSearchResponseAssembler;
+	}
+
+	protected void setCount(
+		SearchResponse searchResponse,
+		SearchSearchResponse searchSearchResponse) {
+
+		org.elasticsearch.search.SearchHits searchHits =
+			searchResponse.getHits();
+
+		TotalHits totalHits = searchHits.getTotalHits();
+
+		searchSearchResponse.setCount(totalHits.value);
+	}
+
+	@Reference(unbind = "-")
+	protected void setDocumentBuilderFactory(
+		DocumentBuilderFactory documentBuilderFactory) {
+
+		_documentBuilderFactory = documentBuilderFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGeoBuilders(GeoBuilders geoBuilders) {
+		_geoBuilders = geoBuilders;
+	}
+
+	@Reference(unbind = "-")
+	protected void setHighlightFieldBuilderFactory(
+		HighlightFieldBuilderFactory highlightFieldBuilderFactory) {
+
+		_highlightFieldBuilderFactory = highlightFieldBuilderFactory;
+	}
+
+	protected void setScrollId(
 		SearchResponse searchResponse,
 		SearchSearchResponse searchSearchResponse) {
 
@@ -159,7 +191,14 @@ public class SearchSearchResponseAssemblerImpl
 		}
 	}
 
-	private void _setSearchHits(
+	@Reference(unbind = "-")
+	protected void setSearchHitBuilderFactory(
+		SearchHitBuilderFactory searchHitBuilderFactory) {
+
+		_searchHitBuilderFactory = searchHitBuilderFactory;
+	}
+
+	protected void setSearchHits(
 		SearchResponse searchResponse,
 		SearchSearchResponse searchSearchResponse,
 		SearchSearchRequest searchSearchRequest) {
@@ -169,14 +208,31 @@ public class SearchSearchResponseAssemblerImpl
 			_documentBuilderFactory, _highlightFieldBuilderFactory,
 			_geoBuilders);
 
-		SearchHits searchHits = searchResponse.getHits();
+		org.elasticsearch.search.SearchHits elasticsearchSearchHits =
+			searchResponse.getHits();
 
-		searchSearchResponse.setSearchHits(
-			searchHitsTranslator.translate(
-				searchHits, searchSearchRequest.getAlternateUidFieldName()));
+		SearchHits searchHits = searchHitsTranslator.translate(
+			searchSearchRequest, elasticsearchSearchHits,
+			searchSearchRequest.getAlternateUidFieldName());
+
+		searchSearchResponse.setSearchHits(searchHits);
 	}
 
-	private void _setSearchTimeValue(
+	@Reference(unbind = "-")
+	protected void setSearchHitsBuilderFactory(
+		SearchHitsBuilderFactory searchHitsBuilderFactory) {
+
+		_searchHitsBuilderFactory = searchHitsBuilderFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchResponseTranslator(
+		SearchResponseTranslator searchResponseTranslator) {
+
+		_searchResponseTranslator = searchResponseTranslator;
+	}
+
+	protected void setSearchTimeValue(
 		SearchResponse searchResponse,
 		SearchSearchResponse searchSearchResponse) {
 
@@ -193,28 +249,13 @@ public class SearchSearchResponseAssemblerImpl
 		searchSearchResponse.setSearchTimeValue(builder.build());
 	}
 
-	@Reference
 	private AggregationResults _aggregationResults;
-
-	@Reference
 	private CommonSearchResponseAssembler _commonSearchResponseAssembler;
-
-	@Reference
 	private DocumentBuilderFactory _documentBuilderFactory;
-
-	@Reference
 	private GeoBuilders _geoBuilders;
-
-	@Reference
 	private HighlightFieldBuilderFactory _highlightFieldBuilderFactory;
-
-	@Reference
 	private SearchHitBuilderFactory _searchHitBuilderFactory;
-
-	@Reference
 	private SearchHitsBuilderFactory _searchHitsBuilderFactory;
-
-	@Reference
 	private SearchResponseTranslator _searchResponseTranslator;
 
 }

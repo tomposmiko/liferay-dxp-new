@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author István András Dézsi
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class KaleoInstanceTokenSearchRegistrar {
 
 	@Activate

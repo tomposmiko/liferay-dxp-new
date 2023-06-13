@@ -15,17 +15,18 @@
 package com.liferay.portal.search.web.internal.custom.filter.portlet.shared.search;
 
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.web.internal.custom.filter.constants.CustomFilterPortletKeys;
 import com.liferay.portal.search.web.internal.custom.filter.portlet.CustomFilterPortletPreferences;
 import com.liferay.portal.search.web.internal.custom.filter.portlet.CustomFilterPortletPreferencesImpl;
 import com.liferay.portal.search.web.internal.custom.filter.portlet.CustomFilterPortletUtil;
+import com.liferay.portal.search.web.internal.util.SearchOptionalUtil;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -34,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + CustomFilterPortletKeys.CUSTOM_FILTER,
 	service = PortletSharedSearchContributor.class
 )
@@ -50,54 +52,62 @@ public class CustomFilterPortletSharedSearchContributor
 
 		SearchRequestBuilder searchRequestBuilder =
 			portletSharedSearchSettings.getFederatedSearchRequestBuilder(
-				customFilterPortletPreferences.getFederatedSearchKey());
+				customFilterPortletPreferences.getFederatedSearchKeyOptional());
 
 		searchRequestBuilder.addComplexQueryPart(
 			_complexQueryPartBuilderFactory.builder(
 			).boost(
-				_getBoost(customFilterPortletPreferences)
+				getBoost(customFilterPortletPreferences)
 			).disabled(
 				customFilterPortletPreferences.isDisabled()
 			).field(
-				customFilterPortletPreferences.getFilterField()
+				customFilterPortletPreferences.getFilterFieldString()
 			).name(
-				customFilterPortletPreferences.getQueryName()
+				customFilterPortletPreferences.getQueryNameString()
 			).occur(
 				customFilterPortletPreferences.getOccur()
 			).parent(
-				customFilterPortletPreferences.getParentQueryName()
+				customFilterPortletPreferences.getParentQueryNameString()
 			).type(
 				customFilterPortletPreferences.getFilterQueryType()
 			).value(
-				_getFilterValue(
+				getFilterValue(
 					portletSharedSearchSettings, customFilterPortletPreferences)
 			).build());
 	}
 
-	private Float _getBoost(
+	protected Float getBoost(
 		CustomFilterPortletPreferences customFilterPortletPreferences) {
 
-		String boost = customFilterPortletPreferences.getBoost();
+		Optional<String> optional =
+			customFilterPortletPreferences.getBoostOptional();
 
-		if (Validator.isNull(boost)) {
-			return null;
-		}
-
-		return GetterUtil.getFloat(boost);
+		return optional.map(
+			GetterUtil::getFloat
+		).orElse(
+			null
+		);
 	}
 
-	private String _getFilterValue(
+	protected String getFilterValue(
 		PortletSharedSearchSettings portletSharedSearchSettings,
 		CustomFilterPortletPreferences customFilterPortletPreferences) {
 
-		String filterValue = customFilterPortletPreferences.getFilterValue();
+		Optional<String> optional = getFilterValueOptional(
+			customFilterPortletPreferences, portletSharedSearchSettings);
+
+		return optional.orElse(null);
+	}
+
+	protected Optional<String> getFilterValueOptional(
+		CustomFilterPortletPreferences customFilterPortletPreferences,
+		PortletSharedSearchSettings portletSharedSearchSettings) {
+
+		Optional<String> filterValueOptional =
+			customFilterPortletPreferences.getFilterValueOptional();
 
 		if (customFilterPortletPreferences.isImmutable()) {
-			if (Validator.isNotNull(filterValue)) {
-				return filterValue;
-			}
-
-			return null;
+			return filterValueOptional;
 		}
 
 		Optional<String> parameterValueOptional =
@@ -105,15 +115,9 @@ public class CustomFilterPortletSharedSearchContributor
 				CustomFilterPortletUtil.getParameterName(
 					customFilterPortletPreferences));
 
-		if (parameterValueOptional.isPresent()) {
-			return parameterValueOptional.get();
-		}
-
-		if (Validator.isNotNull(filterValue)) {
-			return filterValue;
-		}
-
-		return null;
+		return Optional.ofNullable(
+			SearchOptionalUtil.findFirstPresent(
+				Stream.of(parameterValueOptional, filterValueOptional), null));
 	}
 
 	@Reference

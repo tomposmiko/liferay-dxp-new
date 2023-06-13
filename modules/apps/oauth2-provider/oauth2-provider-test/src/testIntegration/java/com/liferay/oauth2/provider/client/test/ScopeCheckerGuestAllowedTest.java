@@ -30,6 +30,8 @@ import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.net.URISyntaxException;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -47,7 +49,6 @@ import org.osgi.framework.BundleActivator;
 
 /**
  * @author Tomas Polesovsky
- * @author Stian Sigvartsen
  */
 @RunWith(Arquillian.class)
 public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
@@ -185,32 +186,27 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 	}
 
 	protected void testApplication(
-		String path, String expectedValidTokenResponse,
-		int expectedNoTokenStatus) {
+			String path, String expectedValidTokenResponse,
+			int expectedInvalidTokenStatus)
+		throws URISyntaxException {
 
 		WebTarget webTarget = getWebTarget(path);
 
-		Invocation.Builder invocationBuilder = webTarget.request();
-
-		Response response = invocationBuilder.get();
-
-		Assert.assertEquals(
-			"No token: ", expectedNoTokenStatus, response.getStatus());
-
 		for (String invalidToken : _INVALID_TOKENS) {
-			invocationBuilder = webTarget.request();
+			Invocation.Builder invocationBuilder = webTarget.request();
 
 			if (invalidToken != null) {
 				invocationBuilder = authorize(invocationBuilder, invalidToken);
 			}
 
-			response = invocationBuilder.get();
+			Response response = invocationBuilder.get();
 
 			Assert.assertEquals(
-				"Token: " + invalidToken, 401, response.getStatus());
+				"Token: " + invalidToken, expectedInvalidTokenStatus,
+				response.getStatus());
 		}
 
-		invocationBuilder = authorize(
+		Invocation.Builder invocationBuilder = authorize(
 			webTarget.request(), getToken("oauthTestApplication"));
 
 		Assert.assertEquals(
@@ -219,7 +215,7 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 
 	private static final String[] _INVALID_TOKENS = {
 		OAuth2ProviderConstants.EXPIRED_TOKEN, StringPool.BLANK,
-		StringPool.NULL, "Invalid Token"
+		StringPool.NULL, "Invalid Token", null
 	};
 
 }

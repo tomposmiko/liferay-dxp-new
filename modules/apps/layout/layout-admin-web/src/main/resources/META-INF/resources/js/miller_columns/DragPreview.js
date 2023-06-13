@@ -12,7 +12,6 @@
  * details.
  */
 
-import {sub} from 'frontend-js-web';
 import React, {useEffect, useRef, useState} from 'react';
 import {useDragLayer} from 'react-dnd';
 
@@ -51,7 +50,12 @@ export default function DragPreview({rtl}) {
 	useEffect(() => {
 		if (items) {
 			if (items.length > 1) {
-				setLabel(sub(Liferay.Language.get('x-elements'), items.length));
+				setLabel(
+					Liferay.Util.sub(
+						Liferay.Language.get('x-elements'),
+						items.length
+					)
+				);
 			}
 			else {
 				const [item] = items;

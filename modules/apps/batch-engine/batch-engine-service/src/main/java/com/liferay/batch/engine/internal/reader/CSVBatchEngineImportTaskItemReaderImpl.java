@@ -15,126 +15,83 @@
 package com.liferay.batch.engine.internal.reader;
 
 import com.liferay.petra.io.unsync.UnsyncBufferedReader;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 
 /**
  * @author Ivica Cardic
- * @author Igor Beslic
- * @author Matija Petanjek
  */
 public class CSVBatchEngineImportTaskItemReaderImpl
 	implements BatchEngineImportTaskItemReader {
 
 	public CSVBatchEngineImportTaskItemReaderImpl(
-			String delimiter, InputStream inputStream,
-			Map<String, Serializable> parameters)
+			String delimiter, InputStream inputStream)
 		throws IOException {
 
-		_csvParser = CSVParser.parse(
-			new UnsyncBufferedReader(new InputStreamReader(inputStream)),
-			_getCSVFormat(
-				(String)parameters.getOrDefault("delimiter", delimiter),
-				(String)parameters.getOrDefault("enclosingCharacter", null)));
+		_delimiter = delimiter;
 
-		_iterator = _csvParser.iterator();
+		_inputStream = inputStream;
 
-		_fieldNames = _getFieldNames(
-			Boolean.valueOf(
-				(String)parameters.getOrDefault(
-					"containsHeaders", StringPool.TRUE)),
-			_iterator);
+		_unsyncBufferedReader = new UnsyncBufferedReader(
+			new InputStreamReader(_inputStream));
+
+		_fieldNames = StringUtil.split(
+			_unsyncBufferedReader.readLine(), delimiter);
 	}
 
 	@Override
 	public void close() throws IOException {
-		_csvParser.close();
+		_unsyncBufferedReader.close();
 	}
 
 	@Override
 	public Map<String, Object> read() throws Exception {
-		if (!_iterator.hasNext()) {
+		String line = _unsyncBufferedReader.readLine();
+
+		if (line == null) {
 			return null;
 		}
 
 		Map<String, Object> fieldNameValueMap = new HashMap<>();
 
-		CSVRecord csvRecord = _iterator.next();
+		String[] values = StringUtil.split(line, _delimiter);
 
-		List<String> values = csvRecord.toList();
-
-		for (int i = 0; i < values.size(); i++) {
+		for (int i = 0; i < values.length; i++) {
 			String fieldName = _fieldNames[i];
 
 			if (fieldName == null) {
 				continue;
 			}
 
-			FieldNameValueMapHandlerFactory.FieldNameValueMapHandler
-				fieldNameValueMapHandler =
-					FieldNameValueMapHandlerFactory.getFieldNameValueMapHandler(
-						fieldName);
+			String value = values[i].trim();
 
-			fieldNameValueMapHandler.handle(
-				fieldName, fieldNameValueMap, values.get(i));
+			if (value.isEmpty()) {
+				value = null;
+			}
+
+			int lastDelimiterIndex = fieldName.lastIndexOf('_');
+
+			if (lastDelimiterIndex == -1) {
+				fieldNameValueMap.put(fieldName, value);
+			}
+			else {
+				BatchEngineImportTaskItemReaderUtil.handleMapField(
+					fieldName, fieldNameValueMap, lastDelimiterIndex, value);
+			}
 		}
 
 		return fieldNameValueMap;
 	}
 
-	private CSVFormat _getCSVFormat(
-		String delimiter, String enclosingCharacter) {
-
-		CSVFormat.Builder builder = CSVFormat.Builder.create(
-		).setDelimiter(
-			delimiter
-		).setIgnoreEmptyLines(
-			true
-		);
-
-		if (Validator.isNotNull(enclosingCharacter)) {
-			builder.setQuote(enclosingCharacter.charAt(0));
-		}
-
-		return builder.build();
-	}
-
-	private String[] _getFieldNames(
-		boolean containsHeaders, Iterator<CSVRecord> csvRecordIterator) {
-
-		if (containsHeaders) {
-			CSVRecord csvRecord = csvRecordIterator.next();
-
-			List<String> fieldNamesList = csvRecord.toList();
-
-			return fieldNamesList.toArray(new String[0]);
-		}
-
-		String[] fieldNames = new String[100];
-
-		for (int i = 0; i < fieldNames.length; i++) {
-			fieldNames[i] = String.valueOf(i);
-		}
-
-		return fieldNames;
-	}
-
-	private final CSVParser _csvParser;
+	private final String _delimiter;
 	private final String[] _fieldNames;
-	private final Iterator<CSVRecord> _iterator;
+	private final InputStream _inputStream;
+	private final UnsyncBufferedReader _unsyncBufferedReader;
 
 }

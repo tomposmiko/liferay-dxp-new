@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"mvc.command.name=/journal/add_feed"
@@ -54,8 +55,8 @@ public class AddFeedMVCActionCommand extends BaseMVCActionCommand {
 		boolean autoFeedId = ParamUtil.getBoolean(actionRequest, "autoFeedId");
 		String name = ParamUtil.getString(actionRequest, "name");
 		String description = ParamUtil.getString(actionRequest, "description");
-		long ddmStructureId = ParamUtil.getLong(
-			actionRequest, "ddmStructureId");
+		String ddmStructureKey = ParamUtil.getString(
+			actionRequest, "ddmStructureKey");
 		String ddmTemplateKey = ParamUtil.getString(
 			actionRequest, "ddmTemplateKey");
 		String ddmRendererTemplateKey = ParamUtil.getString(
@@ -80,7 +81,7 @@ public class AddFeedMVCActionCommand extends BaseMVCActionCommand {
 			JournalFeed.class.getName(), actionRequest);
 
 		_journalFeedService.addFeed(
-			groupId, feedId, autoFeedId, name, description, ddmStructureId,
+			groupId, feedId, autoFeedId, name, description, ddmStructureKey,
 			ddmTemplateKey, ddmRendererTemplateKey, delta, orderByCol,
 			orderByType, targetLayoutFriendlyUrl, targetPortletId, contentField,
 			feedFormat, feedVersion, serviceContext);

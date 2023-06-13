@@ -15,10 +15,9 @@
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
-import ClayLabel from '@clayui/label';
-import {sub} from 'frontend-js-web';
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 
 import {updateLanguageId} from '../actions/index';
 import {BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/backgroundImageFragmentEntryProcessor';
@@ -83,13 +82,6 @@ const TRANSLATION_STATUS_LANGUAGE = {
 	),
 };
 
-const TRANSLATION_STATUS_DISPLAY_TYPE = {
-	[TRANSLATION_STATUS_TYPE.default]: 'info',
-	[TRANSLATION_STATUS_TYPE.translated]: 'success',
-	[TRANSLATION_STATUS_TYPE.translating]: 'warning',
-	[TRANSLATION_STATUS_TYPE.untranslated]: 'warning',
-};
-
 const TranslationItem = ({
 	editableValuesLength,
 	isDefault,
@@ -113,17 +105,18 @@ const TranslationItem = ({
 			) : (
 				<span>{languageLabel}</span>
 			)}
-
-			<span className="dropdown-item-indicator-end w-auto">
-				<ClayLabel
-					displayType={TRANSLATION_STATUS_DISPLAY_TYPE[status]}
+			<span className="dropdown-item-indicator-end page-editor__translation__label-wrapper">
+				<div
+					className={classNames(
+						'page-editor__translation__label label',
+						status
+					)}
 				>
 					{TRANSLATION_STATUS_LANGUAGE[status]}
-
 					{TRANSLATION_STATUS_TYPE[status] ===
 						TRANSLATION_STATUS_TYPE.translating &&
 						` ${translatedValuesLength}/${editableValuesLength}`}
-				</ClayLabel>
+				</div>
 			</span>
 		</ClayDropDown.Item>
 	);
@@ -137,6 +130,7 @@ export default function Translation({
 	languageId,
 	showNotTranslated = true,
 }) {
+	const [active, setActive] = useState(false);
 	const editableValues = useMemo(
 		() => getEditableValues(fragmentEntryLinks),
 		[fragmentEntryLinks]
@@ -155,11 +149,11 @@ export default function Translation({
 			.filter(
 				(languageId) =>
 					showNotTranslated ||
-					!!editableValues.filter(
+					editableValues.filter(
 						(editableValue) =>
 							isTranslated(editableValue, languageId) ||
 							languageId === defaultLanguageId
-					).length
+					).length > 0
 			)
 			.map((languageId) => ({
 				languageId,
@@ -174,11 +168,11 @@ export default function Translation({
 		showNotTranslated,
 	]);
 
-	const {languageIcon, w3cLanguageId} = availableLanguages[languageId];
+	const {languageIcon, languageLabel} = availableLanguages[languageId];
 
 	return (
 		<ClayDropDown
-			closeOnClick
+			active={active}
 			hasLeftSymbols
 			hasRightSymbols
 			menuElementAttrs={{
@@ -187,22 +181,16 @@ export default function Translation({
 					className: 'cadmin',
 				},
 			}}
+			onActiveChange={setActive}
 			trigger={
 				<ClayButton
+					aria-pressed={active}
 					className="btn-monospaced"
 					displayType="secondary"
-					size="sm"
+					small
 				>
 					<ClayIcon symbol={languageIcon} />
-
-					<span className="sr-only">
-						{sub(
-							Liferay.Language.get(
-								'select-a-language.-current-language-x'
-							),
-							w3cLanguageId
-						)}
-					</span>
+					<span className="sr-only">{languageLabel}</span>
 				</ClayButton>
 			}
 		>
@@ -227,6 +215,7 @@ export default function Translation({
 									languageId: language.languageId,
 								})
 							);
+							setActive(false);
 						}}
 						translatedValuesLength={language.values.length}
 					/>

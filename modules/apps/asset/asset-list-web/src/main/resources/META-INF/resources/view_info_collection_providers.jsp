@@ -26,8 +26,8 @@ InfoCollectionProviderDisplayContext infoCollectionProviderDisplayContext = (Inf
 />
 
 <div class="container-fluid container-fluid-max-xl lfr-search-container-wrapper" id="<portlet:namespace />collectionProviders">
-	<liferay-site-navigation:breadcrumb
-		breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, true, false, false, true, true) %>"
+	<liferay-ui:breadcrumb
+		showLayout="<%= false %>"
 	/>
 
 	<liferay-ui:search-container
@@ -41,7 +41,7 @@ InfoCollectionProviderDisplayContext infoCollectionProviderDisplayContext = (Inf
 			modelVar="infoCollectionProvider"
 		>
 			<liferay-ui:search-container-column-icon
-				icon="bolt"
+				icon="list"
 			/>
 
 			<liferay-ui:search-container-column-text
@@ -62,7 +62,6 @@ InfoCollectionProviderDisplayContext infoCollectionProviderDisplayContext = (Inf
 
 			<liferay-ui:search-container-column-text>
 				<clay:dropdown-actions
-					aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 					dropdownItems="<%= infoCollectionProviderActionDropdownItems.getActionDropdownItems() %>"
 					propsTransformer="js/InfoCollectionProviderDropdownDefaultPropsTransformer"
 				/>

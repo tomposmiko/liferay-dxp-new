@@ -17,10 +17,11 @@ package com.liferay.commerce.checkout.web.internal.util;
 import com.liferay.commerce.checkout.web.internal.display.context.PaymentProcessCheckoutStepDisplayContext;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
 import com.liferay.commerce.model.CommerceOrder;
+import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.util.BaseCommerceCheckoutStep;
 import com.liferay.commerce.util.CommerceCheckoutStep;
+import com.liferay.commerce.util.CommerceCheckoutStepServicesTracker;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
-import com.liferay.headless.commerce.delivery.cart.resource.v1_0.CartResource;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.checkout.step.name=" + PaymentProcessCommerceCheckoutStep.NAME,
 		"commerce.checkout.step.order:Integer=" + (Integer.MAX_VALUE - 90)
@@ -82,7 +84,8 @@ public class PaymentProcessCommerceCheckoutStep
 		PaymentProcessCheckoutStepDisplayContext
 			paymentProcessCheckoutStepDisplayContext =
 				new PaymentProcessCheckoutStepDisplayContext(
-					_cartResourceFactory, commerceOrder, httpServletRequest);
+					_commerceCheckoutStepServicesTracker, commerceOrder,
+					httpServletRequest, _portal);
 
 		// Redirection only works with the original servlet response
 
@@ -99,7 +102,7 @@ public class PaymentProcessCommerceCheckoutStep
 		}
 
 		String redirect = _portal.escapeRedirect(
-			paymentProcessCheckoutStepDisplayContext.getPaymentURL());
+			paymentProcessCheckoutStepDisplayContext.getPaymentServletUrl());
 
 		if (Validator.isNotNull(redirect) &&
 			!originalHttpServletResponse.isCommitted()) {
@@ -131,7 +134,11 @@ public class PaymentProcessCommerceCheckoutStep
 	}
 
 	@Reference
-	private CartResource.Factory _cartResourceFactory;
+	private CommerceCheckoutStepServicesTracker
+		_commerceCheckoutStepServicesTracker;
+
+	@Reference
+	private CommerceOrderPriceCalculation _commerceOrderPriceCalculation;
 
 	@Reference
 	private JSPRenderer _jspRenderer;

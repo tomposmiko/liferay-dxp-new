@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = FormValueProcessor.class)
+@Component(immediate = true, service = FormValueProcessor.class)
 public class DDMFormValueProcessor implements FormValueProcessor {
 
 	@Override
@@ -52,7 +52,7 @@ public class DDMFormValueProcessor implements FormValueProcessor {
 
 		DDMStructure ddmStructure = ddlRecordSet.getDDMStructure();
 
-		DDMFormValues ddmFormValues = _deserialize(
+		DDMFormValues ddmFormValues = deserialize(
 			formValues, ddmStructure.getDDMForm());
 
 		DDLRecord ddlRecord = _ddlRecordLocalService.addRecord(
@@ -68,7 +68,7 @@ public class DDMFormValueProcessor implements FormValueProcessor {
 		return kaleoTaskFormInstance;
 	}
 
-	private DDMFormValues _deserialize(String content, DDMForm ddmForm) {
+	protected DDMFormValues deserialize(String content, DDMForm ddmForm) {
 		DDMFormValuesDeserializerDeserializeRequest.Builder builder =
 			DDMFormValuesDeserializerDeserializeRequest.Builder.newBuilder(
 				content, ddmForm);

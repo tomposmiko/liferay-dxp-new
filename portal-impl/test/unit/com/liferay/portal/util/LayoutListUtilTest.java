@@ -84,7 +84,7 @@ public class LayoutListUtilTest {
 
 		ReflectionTestUtil.setFieldValue(
 			LayoutLocalServiceUtil.class, "_service",
-			new LayoutLocalServiceWrapper() {
+			new LayoutLocalServiceWrapper(null) {
 
 				@Override
 				public List<Layout> getLayouts(

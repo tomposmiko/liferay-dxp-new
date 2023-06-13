@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 
+import java.util.Optional;
+
 /**
  * @author Pavel Savinov
  */
@@ -40,8 +42,8 @@ public class DefaultSiteNavigationMenuItemTypeContext
 	}
 
 	@Override
-	public Group getGroup() {
-		return _group;
+	public Optional<Group> getGroupOptional() {
+		return Optional.of(_group);
 	}
 
 	private final Company _company;

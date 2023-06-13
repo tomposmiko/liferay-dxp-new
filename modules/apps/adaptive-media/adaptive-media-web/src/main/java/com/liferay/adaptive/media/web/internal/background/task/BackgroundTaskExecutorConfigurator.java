@@ -29,16 +29,16 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Sergio González
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class BackgroundTaskExecutorConfigurator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_registerBackgroundTaskExecutor(
+		registerBackgroundTaskExecutor(
 			bundleContext,
 			new OptimizeImagesSingleConfigurationBackgroundTaskExecutor());
 
-		_registerBackgroundTaskExecutor(
+		registerBackgroundTaskExecutor(
 			bundleContext,
 			new OptimizeImagesAllConfigurationsBackgroundTaskExecutor());
 	}
@@ -52,7 +52,7 @@ public class BackgroundTaskExecutorConfigurator {
 		}
 	}
 
-	private void _registerBackgroundTaskExecutor(
+	protected void registerBackgroundTaskExecutor(
 		BundleContext bundleContext,
 		BackgroundTaskExecutor backgroundTaskExecutor) {
 

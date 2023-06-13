@@ -18,6 +18,7 @@ import com.liferay.petra.lang.ClassLoaderPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateException;
@@ -25,12 +26,16 @@ import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceLoader;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.template.engine.BaseTemplateManager;
-import com.liferay.portal.template.engine.TemplateContextHelper;
+import com.liferay.portal.template.BaseTemplateManager;
+import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration;
-import com.liferay.portal.template.velocity.internal.helper.VelocityTemplateContextHelper;
+import com.liferay.taglib.util.VelocityTaglib;
+import com.liferay.taglib.util.VelocityTaglibImpl;
 
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.app.VelocityEngine;
@@ -38,6 +43,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -47,10 +53,32 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "language.type=" + TemplateConstants.LANG_TYPE_VM,
 	service = TemplateManager.class
 )
 public class VelocityManager extends BaseTemplateManager {
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public void addTaglibSupport(
+		Map<String, Object> contextObjects,
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
+
+		VelocityTaglib velocityTaglib = new VelocityTaglibImpl(
+			httpServletRequest.getServletContext(), httpServletRequest,
+			httpServletResponse, contextObjects);
+
+		contextObjects.put("taglibLiferay", velocityTaglib);
+
+		// Legacy support
+
+		contextObjects.put("theme", velocityTaglib);
+	}
 
 	@Override
 	public void destroy() {
@@ -60,7 +88,12 @@ public class VelocityManager extends BaseTemplateManager {
 
 		_velocityEngine = null;
 
-		_templateContextHelper.removeAllHelperUtilities();
+		templateContextHelper.removeAllHelperUtilities();
+	}
+
+	@Override
+	public void destroy(ClassLoader classLoader) {
+		templateContextHelper.removeHelperUtilities(classLoader);
 	}
 
 	@Override
@@ -129,7 +162,7 @@ public class VelocityManager extends BaseTemplateManager {
 				StringBundler.concat(
 					"liferay.", VelocityEngine.RESOURCE_LOADER, ".",
 					VelocityTemplateResourceLoader.class.getName()),
-				_templateResourceLoader);
+				templateResourceLoader);
 
 			boolean cacheEnabled = false;
 
@@ -164,7 +197,7 @@ public class VelocityManager extends BaseTemplateManager {
 
 			extendedProperties.setProperty(
 				VelocityTemplateResourceLoader.class.getName(),
-				_templateResourceLoader);
+				templateResourceLoader);
 
 			extendedProperties.setProperty(
 				VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS,
@@ -201,6 +234,22 @@ public class VelocityManager extends BaseTemplateManager {
 		}
 	}
 
+	@Override
+	@Reference(service = VelocityTemplateContextHelper.class, unbind = "-")
+	public void setTemplateContextHelper(
+		TemplateContextHelper templateContextHelper) {
+
+		super.setTemplateContextHelper(templateContextHelper);
+	}
+
+	@Override
+	@Reference(service = VelocityTemplateResourceLoader.class, unbind = "-")
+	public void setTemplateResourceLoader(
+		TemplateResourceLoader templateResourceLoader) {
+
+		super.setTemplateResourceLoader(templateResourceLoader);
+	}
+
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
@@ -215,12 +264,7 @@ public class VelocityManager extends BaseTemplateManager {
 
 		return new VelocityTemplate(
 			templateResource, helperUtilities, _velocityEngine,
-			_templateContextHelper, _velocityTemplateResourceCache, restricted);
-	}
-
-	@Override
-	protected TemplateContextHelper getTemplateContextHelper() {
-		return _templateContextHelper;
+			templateContextHelper, _velocityTemplateResourceCache, restricted);
 	}
 
 	private String _getVelocimacroLibrary(Class<?> clazz) {
@@ -251,11 +295,8 @@ public class VelocityManager extends BaseTemplateManager {
 	private static volatile VelocityEngineConfiguration
 		_velocityEngineConfiguration;
 
-	@Reference(service = VelocityTemplateContextHelper.class)
-	private TemplateContextHelper _templateContextHelper;
-
-	@Reference(service = VelocityTemplateResourceLoader.class)
-	private TemplateResourceLoader _templateResourceLoader;
+	@Reference
+	private SingleVMPool _singleVMPool;
 
 	private VelocityEngine _velocityEngine;
 

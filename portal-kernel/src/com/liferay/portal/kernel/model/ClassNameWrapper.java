@@ -174,11 +174,6 @@ public class ClassNameWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected ClassNameWrapper wrap(ClassName className) {
 		return new ClassNameWrapper(className);
 	}

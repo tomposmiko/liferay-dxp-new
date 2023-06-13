@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.upgrade.v7_0_0.util.ListTypeTable;
 
 /**
  * @author Brian Wing Shun Chan
@@ -23,7 +24,7 @@ public class UpgradeListType extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("ListType", "listTypeId", "LONG not null");
+		alter(ListTypeTable.class, new AlterColumnType("listTypeId", "LONG"));
 	}
 
 }

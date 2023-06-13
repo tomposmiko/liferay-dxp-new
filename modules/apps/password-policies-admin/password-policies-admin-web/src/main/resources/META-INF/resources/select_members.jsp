@@ -42,6 +42,10 @@ EditPasswordPolicyAssignmentsManagementToolbarDisplayContext editPasswordPolicyA
 SearchContainer<?> searchContainer = editPasswordPolicyAssignmentsManagementToolbarDisplayContext.getSearchContainer();
 %>
 
+<clay:navigation-bar
+	navigationItems="<%= passwordPolicyDisplayContext.getSelectMembersNavigationItems() %>"
+/>
+
 <clay:management-toolbar
 	clearResultsURL="<%= editPasswordPolicyAssignmentsManagementToolbarDisplayContext.getClearResultsURL() %>"
 	filterDropdownItems="<%= editPasswordPolicyAssignmentsManagementToolbarDisplayContext.getFilterDropdownItems() %>"

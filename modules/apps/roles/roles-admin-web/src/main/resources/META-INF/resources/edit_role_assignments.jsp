@@ -102,32 +102,16 @@ renderResponse.setTitle(role.getTitle(locale));
 	viewTypeItems="<%= editRoleAssignmentsManagementToolbarDisplayContext.getViewTypeItems() %>"
 />
 
-<c:if test='<%= !SegmentsEntryDisplayUtil.isRoleSegmentationEnabled(themeDisplay.getCompanyId()) && tabs2.equals("segments") %>'>
+<c:if test='<%= !SegmentsEntryDisplayContext.isRoleSegmentationEnabled() && tabs2.equals("segments") %>'>
 	<clay:stripe
-		displayType="warning"
-	>
-		<strong class="lead"><liferay-ui:message key="assigning-roles-by-segment-is-disabled" /></strong>
-
-		<%
-		String segmentsConfigurationURL = SegmentsEntryDisplayUtil.getSegmentsCompanyConfigurationURL(request);
-		%>
-
-		<c:choose>
-			<c:when test="<%= segmentsConfigurationURL != null %>">
-				<clay:link
-					cssClass="assign-roles-segments-warning"
-					href="<%= segmentsConfigurationURL %>"
-					label='<%= LanguageUtil.get(request, "to-enable,-go-to-instance-settings") %>'
-				/>
-			</c:when>
-			<c:otherwise>
-				<span><liferay-ui:message key="contact-your-system-administrator-to-enable-it" /></span>
-			</c:otherwise>
-		</c:choose>
-	</clay:stripe>
+		elementClasses="assign-roles-segments-warning"
+		message="assigning-roles-by-segment-is-disabled-.to-enable,-go-to-system-settings-segments-segments-service"
+		style="warning"
+		title="Warning"
+	/>
 </c:if>
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl container-form-view" method="post" name="fm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl container-form-view" method="post" name="fm">
 	<aui:input name="tabs2" type="hidden" value="<%= tabs2 %>" />
 	<aui:input name="tabs3" type="hidden" value="current" />
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -163,22 +147,20 @@ renderResponse.setTitle(role.getTitle(locale));
 	</c:choose>
 </aui:form>
 
-<aui:script require='<%= "frontend-js-web/index as frontendJsWeb, " + npmResolvedPackageName + "/js/add_assignees as addAssignees" %>'>
-	const {sessionStorage, COOKIE_TYPES} = frontendJsWeb;
-
+<aui:script require='<%= npmResolvedPackageName + "/js/add_assignees as addAssignees" %>'>
 	var modalSegmentState = '<%= RolesAdminWebKeys.MODAL_SEGMENT_STATE %>';
 
-	var state = sessionStorage.getItem(modalSegmentState, COOKIE_TYPES.NECESSARY);
+	var state = window.sessionStorage.getItem(modalSegmentState);
 
 	if (state === 'open') {
-		sessionStorage.removeItem(modalSegmentState);
+		window.sessionStorage.removeItem(modalSegmentState);
 
 		addAssignees.default({
 			editRoleAssignmentsURL: '<%= editRoleAssignmentsURL.toString() %>',
 			modalSegmentState: modalSegmentState,
 			namespace: '<portlet:namespace />',
 			portletURL: '<%= portletURL.toString() %>',
-			roleName: '<%= HtmlUtil.escapeJS(role.getName()) %>',
+			roleName: '<%= role.getName() %>',
 			selectAssigneesURL: '<%= selectAssigneesURL.toString() %>',
 		});
 	}

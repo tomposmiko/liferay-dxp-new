@@ -1,4 +1,4 @@
-# 7.4 Breaking Changes
+# What are the Breaking Changes for Liferay 7.4?
 
 This document presents a chronological list of changes that break existing functionality, APIs, or contracts with third party Liferay developers or users. We try our best to minimize these disruptions, but sometimes they are unavoidable.
 
@@ -12,7 +12,7 @@ Here are some of the types of changes documented in this file:
 * Execution requirements: Java version, J2EE Version, browser versions, etc.
 * Deprecations or end of support: For example, warning that a certain feature or API will be dropped in an upcoming version.
 
-*This document has been reviewed through the breaking change entry at commit `525b211de2d94caa9c0131a15080cf76908c9209`.*
+*This document has been reviewed through the breaking change entry at commit `6e818a6b84c5`.*
 
 Each change must have a brief descriptive title and contain the following information:
 
@@ -28,8 +28,8 @@ Here is the template to use for each breaking change (note how it ends with a ho
 
 ```
 ## Title
-- **Date:** YYYY-MMM-DD
-- **JIRA Ticket:** [LPS-1234](https://issues.liferay.com/browse/LPS-1234)
+- **Date: YYYY-MMM-DD**
+- **JIRA Ticket: [LPS-1234](https://issues.liferay.com/browse/LPS-1234)**
 
 ### What changed?
 
@@ -181,7 +181,7 @@ This affects you if you have custom entities for which display pages can be crea
 
 ### How should I update my code?
 
-If you have custom entities with display pages, swap the display page logic by adding the `BaseUpgradeAssetDisplayPageEntry` upgrade process to your application. The process receives a table, primary key column name, and a class name.
+If you have custom entities with display pages, swap the display page logic by adding the `BaseUpgradeAssetDisplayPageEntries` upgrade process to your application. The process receives a table, primary key column name, and a class name.
 
 ### Why was this change made?
 
@@ -857,7 +857,7 @@ The native OSGi API makes the bridged API unnecessary.
 
 ---------------------------------------
 
-## Removed Support for Web Content in Document Types
+## Remove support for Web Content in Document Types
 - ** Date:** 2021-Sep-30
 - ** JIRA Ticket:** [LPS-139710](https://issues.liferay.com/browse/LPS-139710)
 
@@ -867,516 +867,37 @@ Support for Web Content fields in Document Types has been removed.
 
 ### Who is affected?
 
-This affects anyone using a Web Content field Document Type.
+Anyone with Document Types that contain Web Content field types.
 
 ### How should I update my code?
 
-Remove all references to Web Content field Document Types.
+Remove all references to this field type to avoid issues.
 
 ### Why was this change made?
 
-The Web Content field Document Type was an accidental feature included in Documents and Media. Its use case was unclear. When staging was enabled, the feature was causing circularity problems between Web Content articles linked to Documents and Media documents.
+This is an accidental feature, included in Documents and Media with no clear use case behind it. Additionally, it is causing circularity problems when linking together Web Contents and Documents when staging is enabled.
 
 ---------------------------------------
 
-## OpenID Connect Provider Signing Algorithm Must Be Configured If Different From RS256
+### OpenId Connect provider signing algorithm must be configured if different to RS256
 
 - **Date:** 2021-Sep-30
-- **JIRA Ticket:** [LPS-138756](https://issues.liferay.com/browse/LPS-138756)
+- **JIRA Ticket:** LPS-138756
 
 #### What changed?
 
-The portal's OpenID Connect client now requires explicitly stating the ID Token signing algorithm agreed with the provider.
+The portal's OpenId Connect client now requires admins to explicitly state the ID Token signing algorithm agreed with the provider.
 
 #### Who is affected?
 
-This affects anyone integrating OpenID Connect providers that sign ID Tokens using a signing algorithm other than the **first** supported signing algorithm listed in the UI. The list is served by the provider's Discovery Endpoint, or configured offline in the UI.
+Anyone integrating OpenId Connect providers that sign ID Tokens using a different signing algorithm to the **first** algorithm listed as their supported signing algorithms. The list is served by the provider's Discovery Endpoint, or configured offline in portal.
 
 #### How should I update my code?
 
-In the UI, review the OpenID Connect Provider Connection configuration(s). Specify the agreed algorithm as the Registered ID Token Signing Algorithm.
+Review the "OpenId Connect Provider Connection" configuration(s). Specify the agreed algorithm in "Registered ID Token Signing Algorithm".
 
 #### Why was this change made?
 
-This improves using all signing algorithms supported by OpenID Connect providers.
+In order to better support all signing algorithms supported by OpenId Connect providers.
 
 ---------------------------------------
-
-## Restricted the Service Builder Task to Service Module Folders that have a Service XML File
-
-- **Date:** 2021-Nov-02
-- **JIRA Ticket:** [LPS-129696](https://issues.liferay.com/browse/LPS-129696)
-
-#### What changed?
-
-Automatically applied the Service Builder plugin to all OSGi projects but restricted the `buildService` task target to `*-service` module folders that contain a `service.xml` file.
-
-#### Who is affected?
-
-This affects you if you are running the `buildService` task in a the Liferay Workspace.
-
-#### How should I update my code?
-
-This requires no code changes. When you run the `buildService` task, you must target a `*-service` module folder that contains a `service.xml` file.
-
-#### Why was this change made?
-
-This was done to clarify the folder that `buildService` should target.
-
----------------------------------------
-
-## Updated addFragmentEntry methods in FragmentEntryLocalService and FragmentEntryService
-
-- **Date:** 2021-Dec-16
-- **JIRA Ticket:** [LPS-125034](https://issues.liferay.com/browse/LPS-125034)
-
-### What changed?
-
-The `addFragmentEntry` methods in `FragmentEntryLocalService` and `FragmentEntryService` have a new parameter for the icon of a `FragmentEntry`.
-
-### Who is affected?
-
-This affects anyone using `FragmentEntryLocalService` and `FragmentEntryService` to add fragment entries.
-
-### How should I update my code?
-
-When you use the new `addFragmentEntry` methods in `FragmentEntryLocalService` and `FragmentEntryService`, you must include a new `String` parameter for the `icon` of a `FragmentEntry`.
-
-### Why was this change made?
-
-This change was made so that a new icon can be used when importing a fragment.
-
----------------------------------------
-
-## The getSegmentsExperienceIds methods in FragmentEntryProcessorContext, DefaultFragmentEntryProcessorContext, FragmentRendererContext, DefaultFragmentRendererContext have been removed.
-- **Date:** 2021-Dec-17
-- **JIRA Ticket:** [LPS-141471](https://issues.liferay.com/browse/LPS-141471)
-
-### What changed?
-
-The `getSegmentsExperienceIds` methods from `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` and `DefaultFragmentRendererContext` have been removed. The method with signature `getContextObjects(JSONObject, String)` from `FragmentEntryConfigurationParser` has been removed.
-
-### Who is affected?
-
-This affects anyone using `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` or `DefaultFragmentRendererContext` to get the `long array` of `segmentsExperienceIds`, or if you use the method with signature `getContextObjects(JSONObject, String)` from `FragmentEntryConfigurationParser`.
-
-### How should I update my code?
-
-Use `getSegmentsEntryIds` in `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` and `DefaultFragmentRendererContext`. Use the method with signature `getContextObjects(JSONObject, String, long[])` from `FragmentEntryConfigurationParser`, where the third parameter represents the `long array` of `segmentsEntryIds`.
-
-### Why was this change made?
-
-This change was made so that a collection's variations can be retrieved when using collections in a fragment.
-
----------------------------------------
-
-## Renamed Google Cloud autotranslation module
-
-- **Date:** 2022-Jan-17
-- **JIRA Ticket:** [LPS-145450](http://issues.liferay.com/browse/LPS-145450)
-
-### What changed?
-
-The `translation-google-cloud-translator` module and its packages were renamed. Although these packages are internal, the rename is not backwards compatible, as it changes the PID of the service configuration.
-
-### Who is affected?
-
-Any installation that has configured the Google Cloud autotranslator service.
-
-### How should I update my code?
-
-No code changes are necessary. Administrators may need to reconfigure the Google Could autotranslator service.
-
----------------------------------------
-
-## Redirect URLs removed from Portal Properties
-- **Date:** 2022-May-24
-- **JIRA Ticket:** [LPS-128837](https://issues.liferay.com/browse/LPS-128837)
-
-### What changed?
-
-Redirect URL configuration is no longer configurable via portal properties. It can be configured in the UI, under [Redirect URLs](../../system-administration/configuring-liferay/virtual-instances/redirect-urls.md) in Instance Settings.
-
-### Who is affected?
-
-This affects anyone using portal properties to configure redirect URLs.
-
-### How should I update my code?
-
-Set your necessary configurations in the UI, under [Redirect URLs](../../system-administration/configuring-liferay/virtual-instances/redirect-urls.md) in Instance Settings.
-
-### Why was this change made?
-
-This change was made so that administrators can set separate redirect URL configurations for each Liferay instance.
-
----------------------------------------
-
-## Portal Libs Cleanup
-
-- **Date** 2022-May-26
-- **JIRA Ticket** [LPS-142130](https://issues.liferay.com/browse/LPS-142130)
-
-### Removed
-
-- abdera.jar, axiom-api.jar and axiom-impl.jar - [LPS-142131](https://issues.liferay.com/browse/LPS-142131)
-- xuggle-xuggler-noarch.jar - [LPS-143939](https://issues.liferay.com/browse/LPS-143939) Note, FFmpeg replaced Xuggler. See [Enabling FFmpeg for Audio and View Previews](../../content-authoring-and-management/documents-and-media/devops/enabling-ffmpeg-for-audio-and-video-previews.md) to learn more.
-- bcmail.jar and bcprov.jar - [LPS-143945](https://issues.liferay.com/browse/LPS-143945)
-- ant.jar - [LPS-143953](https://issues.liferay.com/browse/LPS-143953)
-- aspectj-rt.jar and aspectj-weaver.jar - [LPS-143999](https://issues.liferay.com/browse/LPS-143999)
-- jfreechart.jar and jcommon.jar - [LPS-144001](https://issues.liferay.com/browse/LPS-144001)
-- boilerpipe.jar - [LPS-144005](https://issues.liferay.com/browse/LPS-144005)
-- ecs.jar - [LPS-144081](https://issues.liferay.com/browse/LPS-144081)
-- chardet.jar - [LPS-144084](https://issues.liferay.com/browse/LPS-144084)
-- ical4j.jar - [LPS-144119](https://issues.liferay.com/browse/LPS-144119)
-- jrcs-diff.jar - [LPS-144476](https://issues.liferay.com/browse/LPS-144476)
-- curvesapi.jar - [LPS-144549](https://issues.liferay.com/browse/LPS-144549)
-- concurrent.jar - [LPS-144640](https://issues.liferay.com/browse/LPS-144640)
-- gif89.jar - [LPS-144861](https://issues.liferay.com/browse/LPS-144861)
-- antlr2.jar and antlr3.jar - [LPS-144863](https://issues.liferay.com/browse/LPS-144863)
-- bsf.jar - [LPS-145153](https://issues.liferay.com/browse/LPS-145153)
-- commons-chain.jar - [LPS-145154](https://issues.liferay.com/browse/LPS-145154)
-- freshcookies-security.jar - [LPS-145155](https://issues.liferay.com/browse/LPS-145155)
-- htmlparser.jar - [LPS-145367](https://issues.liferay.com/browse/LPS-145367)
-- jakarta-regexp.jar - [LPS-145500](https://issues.liferay.com/browse/LPS-145500)
-- xmpcore.jar - [LPS-145541](https://issues.liferay.com/browse/LPS-145541)
-- jcifs.jar - [LPS-145556](https://issues.liferay.com/browse/LPS-145556)
-- juh.jar, jurt.jar, ridl.jar and unoil.jar - [LPS-145918](https://issues.liferay.com/browse/LPS-145918)
-- xalan.jar - [LPS-145946](https://issues.liferay.com/browse/LPS-145946)
-- wsdl4j.jar - [LPS-145991](https://issues.liferay.com/browse/LPS-145991)
-- jsr107cache.jar - [LPS-146007](https://issues.liferay.com/browse/LPS-146007)
-- xstream.jar - [LPS-146069](https://issues.liferay.com/browse/LPS-146069)
-- liferay-icu.jar - [LPS-146089](https://issues.liferay.com/browse/LPS-146089)
-- stringtemplate.jar - [LPS-146169](https://issues.liferay.com/browse/LPS-146169)
-- rhino.jar - [LPS-146440](https://issues.liferay.com/browse/LPS-146440)
-- odmg.jar - [LPS-146547](https://issues.liferay.com/browse/LPS-146547)
-- closure-compiler.jar - [LPS-147006](https://issues.liferay.com/browse/LPS-147006)
-- nekohtml.jar - [LPS-147042](https://issues.liferay.com/browse/LPS-147042)
-- hessian.jar - [LPS-147424](https://issues.liferay.com/browse/LPS-147424)
-- jericho-html.jar - [LPS-147656](https://issues.liferay.com/browse/LPS-147656)
-- rmi-api.jar - [LPS-148863](https://issues.liferay.com/browse/LPS-148863)
-- commons-beanutils.jar - [LPS-149082](https://issues.liferay.com/browse/LPS-149082)
-- soap.jar - [LPS-149611](https://issues.liferay.com/browse/LPS-149611)
-- serializer.jar - [LPS-150261](https://issues.liferay.com/browse/LPS-150261)
-- jaxws-rt.jar - [LPS-150410](https://issues.liferay.com/browse/LPS-150410)
-- xbean-spring.jar - [LPS-150448](https://issues.liferay.com/browse/LPS-150448)
-- commons-math.jar - [LPS-150548](https://issues.liferay.com/browse/LPS-150548)
-- streambuffer.jar, mimepull.jar, saaj-api.jar and saaj-impl.jar - [LPS-150781](https://issues.liferay.com/browse/LPS-150781)
-- DBCP, c3p0 and Tomcat pool - [LPS-151028](https://issues.liferay.com/browse/LPS-151028)
-- stax.jar - [LPS-151308](https://issues.liferay.com/browse/LPS-151308)
-
-### Moved to Modules
-
-- im4java.jar and monte-cc.jar - [LPS-144170](https://issues.liferay.com/browse/LPS-144170)
-- java-diff.jar, daisydiff.jar and eclipse-core-runtime.jar - [LPS-144201](https://issues.liferay.com/browse/LPS-144201)
-- urlrewritefilter.jar - [LPS-145186](https://issues.liferay.com/browse/LPS-145186)
-- jai_core.jar and jai-codec.jar - [LPS-145778](https://issues.liferay.com/browse/LPS-145778)
-- ccpp.jar, ccpp-ri.jar, jena.jar, oro.jar and reffilter.jar - [LPS-145917](https://issues.liferay.com/browse/LPS-145917)
-- netty-buffer.jar, netty-codec.jar, netty-common.jar, netty-handler.jar, netty-resolver.jar and netty-transport.jar - [LPS-146451](https://issues.liferay.com/browse/LPS-146451)
-- jazzy.jar - [LPS-146894](https://issues.liferay.com/browse/LPS-146894)
-- commons-discovery.jar - [LPS-147205](https://issues.liferay.com/browse/LPS-147205)
-- scribe.jar - [LPS-147542](https://issues.liferay.com/browse/LPS-147542)
-- tika-core.jar, tika-parsers.jar, vorbis-java-core.jar and vorbis-java-tika.jar - [LPS-147938](https://issues.liferay.com/browse/LPS-147938)
-- commons-lang3.jar - [LPS-148100](https://issues.liferay.com/browse/LPS-148100)
-- commons-digester.jar and commons-validator.jar - [LPS-148191](https://issues.liferay.com/browse/LPS-148191)
-- jmatio.jar - [LPS-148218](https://issues.liferay.com/browse/LPS-148218)
-- mime4j.jar - [LPS-148287](https://issues.liferay.com/browse/LPS-148287)
-- poi.jar - [LPS-148302](https://issues.liferay.com/browse/LPS-148302)
-- metadata-extractor.jar and xmpcore.jar - [LPS-148460](https://issues.liferay.com/browse/LPS-148460)
-- commons-compress.jar - [LPS-148461](https://issues.liferay.com/browse/LPS-148461)
-- tagsoup.jar - [LPS-148497](https://issues.liferay.com/browse/LPS-148497)
-- java-libpstjar - [LPS-148577](https://issues.liferay.com/browse/LPS-148577)
-- mp4parser.jar - [LPS-148582](https://issues.liferay.com/browse/LPS-148582)
-- juniversalchardet.jar - [LPS-148666](https://issues.liferay.com/browse/LPS-148666)
-- jhighlight.jar - [LPS-148670](https://issues.liferay.com/browse/LPS-148670)
-- jna.jar - [LPS-148671](https://issues.liferay.com/browse/LPS-148671)
-- sparse-bit-set.jar - [LPS-148757](https://issues.liferay.com/browse/LPS-148757)
-- netcdf.jar - [LPS-148925](https://issues.liferay.com/browse/LPS-148925)
-- jaxb-runtime.jar and istack-commons-runtime.jar - [LPS-148926](https://issues.liferay.com/browse/LPS-148926)
-- commons-exec.jar - [LPS-149097](https://issues.liferay.com/browse/LPS-149097)
-- commons-collections4.jar - [LPS-149099](https://issues.liferay.com/browse/LPS-149099)
-- commons-math3.jar - [LPS-149151](https://issues.liferay.com/browse/LPS-149151)
-- pdfbox.jar - [LPS-149426](https://issues.liferay.com/browse/LPS-149426)
-- rometools.jar - [LPS-150149](https://issues.liferay.com/browse/LPS-150149)
-- passwordencryptor.jar - [LPS-150150](https://issues.liferay.com/browse/LPS-150150)
-- jdom2.jar - [LPS-150423](https://issues.liferay.com/browse/LPS-150423)
-- xbean.jar - [LPS-150447](https://issues.liferay.com/browse/LPS-150447)
-- asm.jar - [LPS-151419](https://issues.liferay.com/browse/LPS-151419)
-
-### Why was this change made ?
-
-This change was made to address vulnerabilities in outdated libraries that are no longer maintained.
-
----------------------------------------
-
-## Elasticsearch Sortable Type Mappings Were Changed from keyword to icu_collation_keyword
-
-- **Date:** 2022-May-12
-- **JIRA Ticket:** [LPS-152937](https://issues.liferay.com/browse/LPS-152937)
-
-### What changed?
-
-The Elasticsearch type mapping of localized sortable `*_<languageId>_sortable` and nested `ddmFieldArray.ddmFieldValueText_<languageId>_String_sortable` fields were changed from `keyword` to `icu_collation_keyword`.
-
-These fields' indexed information is now stored in an encoded format. For example, the `entity title` text is now stored as `MkRQOlBaBFA6UEAyARABEAA=`.
-
-This new `icu_collation_keyword` type allows sorting using the correct collation rules of each language. For more information see <https://www.elastic.co/guide/en/elasticsearch/plugins/7.17/analysis-icu-collation-keyword-field.html>.
-
-When updating an existing Liferay installation, perform a full reindex to create the new mappings.
-
-### Who is affected?
-
-If you use the `*_<languageId>_sortable` and `ddmFieldArray.ddmFieldValueText_<languageId>_String_sortable` fields,
-
-- Results are now sorted using each language's correct collation rules
-
-- Indexed information is now encoded when returned
-
-### How should I update my code?
-
-If you want to maintain the old sort behavior, you must customize the Elasticsearch mappings, removing the `icu_collation_keyword`. For more information about how to configure mappings, see https://learn.liferay.com/dxp/latest/en/using-search/installing-and-upgrading-a-search-engine/elasticsearch/advanced-configuration-of-the-liferay-elasticsearch-connector.html
-
-You can retrieve data from these fields from Elasticsearch's `_source` field (<https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping-source-field.html>). Alternatively, remove the `icu_collation_keyword` as explained above.
-
----------------------------------------
-
-## Upgraded MySQL Connector to 8.0.29 and Forced to Use Protocol TLSv1.2 for MySQL
-
-- **Date:** 2022-Jul-20
-- **JIRA Ticket:** [LPS-157036](https://issues.liferay.com/browse/LPS-157036), [LPS-157039](https://issues.liferay.com/browse/LPS-157039)
-
-### What changed?
-
-TLS 1.2 requires updating MySQL to 5.7.28 with MySQL Connector 8.0.29 or above.
-
-### Who is affected?
-
-Anyone using a MySQL version lower than 5.7.28, especially if they use the auto-downloaded MySQL connector on DXP U37 or higher.
-
-### How should I update my code?
-
-Upgrade MySQL to version 5.7.28 or higher, or set the protocol to TLSv1.2 manually (See https://dev.mysql.com/doc/refman/5.7/en/encrypted-connection-protocols-ciphers.html#encrypted-connection-supported-protocols).
-
-### Why was this change made?
-
-This change was made to address security vulnerabilities.
-
----------------------------------------
-
-## Removed UtilLocator
-
-- **Date:** 2022-Nov-2
-- **JIRA Ticket:** [LPS-165363](https://issues.liferay.com/browse/LPS-165363)
-
-### What changed?
-
-`UtilLocator` is removed. Templates can no longer use `utilLocator.findUtil()` to access `*Util` classes.
-
-### Who is affected?
-
-Anyone currently using `utilLocator` within templates to access `*Util` classes.
-
-### How should I update my code?
-
-There is no replacement for this removal.
-
-The workaround is to set the environment variable `LIFERAY_TEMPLATE_PERIOD_ENGINE_PERIOD_SERVICE_PERIOD_LOCATOR_PERIOD_RESTRICT` to false and access the desired util class using `ServiceLocator` instead. However, `ServiceLocator` opens unrestricted access to all published OSGi services within templates. Proceed with caution.
-
-### Why was this change made?
-
-This change was made to address a security vulnerability.
-
-`UtilLocator` currently gives unrestricted access to all `*Util` classes in templates, exposing these classes for misuse or a malicious attack. Commonly used `Util` classes such as `StringUtil` are already included in the template context and ready to be used.
-
----------------------------------------
-
-## Removed ConfigurationBeanDeclaration
-
-- **Date:** 2022-Nov-11
-- **JIRA Ticket:** [LPS-162830](https://issues.liferay.com/browse/LPS-162830)
-
-### What changed?
-
-Because `ConfigurationProvider` is no longer required to retrieve an annotated `*Configuration.java` interface, `ConfigurationBeanDeclaration` is removed.
-
-### Who is affected?
-
-Anyone who has implemented `ConfigurationBeanDeclaration` or references the class in their code.
-
-### How should I update my code?
-
-Delete implementations of `ConfigurationBeanDeclaration` and remove references to the class.
-
-### Why was this change made?
-
-`ConfigurationBeanDeclaration` was used to register configuration classes with the `ConfigurationProvider` framework, to be tracked by OSGi managed services. Liferay now analyzes a bundle's metatype information and registers configuration classes automatically at container registration. Now developers don't have to register configuration classes manually, because it happens in the background.
-
----------------------------------------
-
-## Removed FieldSetGroupTag
-
-- **Date:** 2022-Nov-22
-- **JIRA Ticket:** [LPS-168309](https://issues.liferay.com/browse/LPS-168309)
-
-### What changed?
-
-`FieldSetGroupTag` was removed because `<aui:fieldset-group>` and `<liferay-frontend:fieldset-group>` are no longer needed.
-
-### Who is affected?
-
-Anyone using `<aui:fieldset-group>` or `<liferay-frontend:fieldset-group>`.
-
-### How should I update my code?
-
-Delete usages of `<liferay-frontend:fieldset-group>` and replace usages of `<aui:fieldset-group>` with `<div class="sheet"><div class="panel-group panel-group-flush">`.
-
-### Why was this change made?
-
-The tags `<aui:fieldset-group>` and `<liferay-frontend:fieldset-group>` added unnecessary markup to the page and caused accessibility issues.
-
----------------------------------------
-
-## Removed ContainerTag
-
-- **Date:** 2022-Dec-22
-- **JIRA Ticket:** [LPS-166546](https://issues.liferay.com/browse/LPS-166546)
-
-### What changed?
-
-`ContainerTag` was removed, and with it the `<aui:container>` tag. The tag was also removed from the [AUI tld](https://learn.liferay.com/reference/latest/en/dxp/taglibs/util-taglib/aui/tld-summary.html).
-
-### Who is affected?
-
-Anyone using `<aui:container>`.
-
-### How should I update my code?
-
-Replace usages of `<aui:container>` with `<clay:container>`.
-
-### Why was this change made?
-
-The tag `<aui:container>` was deprecated in a previous version.
-
----------------------------------------
-
-## Removed Properties for Tika Configuration and Text Extraction
-
-- **Date:** 2022-Dec-13
-- **JIRA Ticket:** [LPS-147938](https://issues.liferay.com/browse/LPS-147938) and [LPS-169760](https://issues.liferay.com/browse/LPS-169760)
-
-### What changed?
-
-The Tika library was extracted from Liferay's core to the `com.liferay.portal.tika` module, changing the way it must be configured. The system property `tika.config` was removed, as were the portal properties `text.extraction.fork.process.enabled` and `text.extraction.fork.process.mime.types`. The Tika library and text extraction are no longer configurable through properties files.
-
-As part of the extraction to a module, the removed properties are added to the module's configuration interface and are configurable using System Settings or a `.config` configuration file.
-
-### Who is affected?
-
-This affects anyone using the removed system or portal properties.
-
-### How should I update my code?
-
-No code changes are necessary.
-
-Configure the same properties in System Settings &rarr; Infrastructure &rarr; Tika Configuration.
-
-### Why was this change made?
-
-These configuration changes were made because the Tika library was extracted to the `com.liferay.portal.tika` module.
-
----------------------------------------
-
-## Moved CTSQLModeThreadLocal to portal-kernel and Changed Package
-
-- **Date:** 2023-Apr-11
-- **JIRA Ticket:** [LPS-181233](https://issues.liferay.com/browse/LPS-181233)
-
-### What changed?
-
-The `CTSQLModeThreadLocal` class was moved from the `portal-impl` module into the `portal-kernel` module. Consequently, its package was changed from `com.liferay.portal.change.tracking.sql` to `com.liferay.portal.kernel.change.tracking.sql` to be consistent with the `portal-kernel` module's package naming scheme for the change tracking classes.
-
-### Who is affected?
-
-This affects anyone calling the `CTSQLModeThreadLocal` class from their code.
-
-### How should I update my code?
-
-1. Declare a dependency on the `portal-kernel` module.
-
-1. Modify `import` statements for the `CTSQLModeThreadLocal` class to use the new package:
-
-	```
-	import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
-	```
-
-### Why was this change made?
-
-To resolve [LPS-181233](https://issues.liferay.com/browse/LPS-181233), the value of the `CTSQLModeThreadLocal` must be set from the `portal-kernel` module. Moving the class into the `portal-kernel` module allows it to be referenced as required.
-
----------------------------------------
-
-## Remove Log4j1 compatibility
-
-- **Date:** 2023-May-9
-- **JIRA Ticket:** [LPS-181002](https://issues.liferay.com/browse/LPS-181002)
-
-### What changed?
-
-Log4j1 config format support is removed.
-
-### Who is affected?
-
-Code that's using Log4j1 config format's config files.
-
-### How should I update my code?
-
-Use Log4j2 strict XML format.
-
-### Why was this change made?
-
-Portal has been using Log4j2. After this change, all log4j config files will use log4j2 config format.
-
----------------------------------------
-
-## Remove verifyDB function from Server Administration
-
-- **Date:** 2023-May-10
-- **JIRA Ticket:** [LPS-184192](https://issues.liferay.com/browse/LPS-184192)
-
-### What changed?
-
-The verifyDB() method was removed from ServiceComponentLocalService. The "Verify database tables of all plugins." function was removed from "Server Administration" -> "Verification Actions"
-
-### Who is affected?
-
-This affects anyone calling the `ServiceComponentLocalService.verifyDB()` method from their code and using the UI function.
-
-### How should I update my code?
-
-Remove usage of `ServiceComponentLocalService.verifyDB()`
-
-### Why was this change made?
-
-Upgrade framework manages all modules' tables and Release record creation. This verifyDB function does not do anything.
-
----------------------------------------
-
-## Removed 7.1 methods in PortletSharedSearchSettings from portal-search-web-api module
-
-- **Date:** 2023-May-10
-- **JIRA Ticket:** [LPS-183921](https://issues.liferay.com/browse/LPS-183921)
-
-### What changed?
-
- `PortalSharedSearchSettings` methods related to 7.1 compatibility are removed.
-
-### Who is affected?
-
-This affects anyone who is calling these methods from there code: `getParameter71()`, `getParameterValues71()`, and `getPortletPreferences71()`
-
-### How should I update my code?
-
-Replace `getParameter71()` with `getParameterOptional()`, `getParameterValues71()` with `getParameterValues()`, and `getPortletPreferences71()` with `getPortletPreferencesOptional()`.
-
-### Why was this change made?
-
-These methods were added back in 7.2 for forward compatibility: [LPS-101007](https://issues.liferay.com/browse/LPS-101007). Now in 7.4, they are only redundant methods to their Optional and String version.

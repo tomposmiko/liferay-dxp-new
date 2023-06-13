@@ -52,7 +52,7 @@ public class UpgradeKaleoProcessTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_setUpUpgradeKaleoProcess();
+		setUpUpgradeKaleoProcess();
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class UpgradeKaleoProcessTest {
 		}
 	}
 
-	private void _setUpUpgradeKaleoProcess() {
+	protected void setUpUpgradeKaleoProcess() {
 		_upgradeStepRegistrator.register(
 			new UpgradeStepRegistrator.Registry() {
 
@@ -125,7 +125,7 @@ public class UpgradeKaleoProcessTest {
 	private UpgradeProcess _kaleoProcessUpgradeProcess;
 
 	@Inject(
-		filter = "component.name=com.liferay.portal.workflow.kaleo.forms.internal.upgrade.registry.KaleoFormsServiceUpgradeStepRegistrator"
+		filter = "component.name=com.liferay.portal.workflow.kaleo.forms.internal.upgrade.KaleoFormsServiceUpgrade"
 	)
 	private UpgradeStepRegistrator _upgradeStepRegistrator;
 

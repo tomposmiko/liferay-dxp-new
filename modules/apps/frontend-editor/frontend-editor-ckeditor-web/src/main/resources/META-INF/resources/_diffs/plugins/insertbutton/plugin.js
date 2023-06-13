@@ -26,110 +26,9 @@
 	);
 
 	CKEDITOR.plugins.add(pluginName, {
-		_createInsertTableToolbar({editor}) {
-			const instance = this;
+		_createTable() {
+			const editor = this.editor;
 
-			const tableToolbar = new CKEDITOR.ui.balloonToolbar(editor);
-
-			const tableData = {
-				columns: 3,
-				rows: 3,
-			};
-
-			const rowsInput = new CKEDITOR.ui.balloonToolbarNumberInput({
-				change(value) {
-					tableData.rows = value;
-				},
-				label: editor.lang.table.rows,
-				min: 1,
-				step: 1,
-				value: tableData.rows,
-			});
-
-			tableToolbar.addItem('rowsInput', rowsInput);
-
-			const columnsInput = new CKEDITOR.ui.balloonToolbarNumberInput({
-				change(value) {
-					tableData.columns = value;
-				},
-				label: editor.lang.table.columns,
-				min: 1,
-				step: 1,
-				value: tableData.columns,
-			});
-
-			tableToolbar.addItem('columnsInput', columnsInput);
-
-			const okButton = new CKEDITOR.ui.balloonToolbarButton({
-				click() {
-					instance._createTable({editor, tableData, tableToolbar});
-				},
-				icon: 'check',
-				title: editor.lang.common.ok,
-			});
-
-			tableToolbar.addItem('okButton', okButton);
-
-			return tableToolbar;
-		},
-
-		_createInsertToolbar({editor}) {
-			const instance = this;
-
-			const toolbar = new CKEDITOR.ui.balloonToolbar(editor);
-
-			toolbar.addItem(
-				'image',
-				new CKEDITOR.ui.balloonToolbarButton({
-					command: 'imageselector',
-					icon: 'image',
-					title: CKEDITOR.tools.capitalize(
-						editor.lang.image2.pathName
-					),
-				})
-			);
-
-			toolbar.addItem(
-				'video',
-				new CKEDITOR.ui.balloonToolbarButton({
-					command: 'videoselector',
-					icon: 'videoselector',
-					title: 'Video',
-				})
-			);
-
-			toolbar.addItem(
-				'table',
-				new CKEDITOR.ui.balloonToolbarButton({
-					click: () => {
-						toolbar.hide();
-
-						const tableToolbar = instance._getInsertTableToolbar({
-							editor,
-						});
-
-						tableToolbar.attach(editor.getSelection());
-
-						editor.focusManager.focus(tableToolbar);
-					},
-					icon: 'table',
-					title: editor.lang.table.toolbar,
-				})
-			);
-
-			toolbar.addItem(
-				'horizontalrule',
-				new CKEDITOR.ui.balloonToolbarButton({
-					command: 'horizontalrule',
-					icon: 'horizontalrule',
-					title: editor.lang.horizontalrule.toolbar,
-				})
-			);
-
-			return toolbar;
-		},
-
-		_createTable({editor, tableData, tableToolbar}) {
 			const tableElement = new CKEDITOR.dom.element('table');
 
 			tableElement.setAttributes({
@@ -144,8 +43,8 @@
 
 			tableElement.append(tbodyElement);
 
-			const columns = tableData.columns;
-			const rows = tableData.rows;
+			const columns = this._tableData.columns;
+			const rows = this._tableData.rows;
 
 			for (let i = 0; i < rows; i++) {
 				const tableRowElement = new CKEDITOR.dom.element('tr');
@@ -164,57 +63,189 @@
 
 			editor.insertElement(tableElement);
 
-			tableToolbar.hide();
+			this._tableToolbar.destroy();
+			this._tableToolbar = null;
 
-			requestAnimationFrame(() => {
+			setTimeout(() => {
 				const range = editor.createRange();
 
 				range.selectNodeContents(tableElement);
 
 				range.select();
+			}, 0);
+		},
+
+		_createTableToolbar() {
+			const instance = this;
+
+			if (instance._tableToolbar) {
+				return instance._tableToolbar;
+			}
+
+			const editor = instance.editor;
+
+			instance._tableToolbar = new CKEDITOR.ui.balloonToolbar(editor);
+
+			const rowsInput = new CKEDITOR.ui.balloonToolbarNumberInput({
+				change(value) {
+					instance._tableData.rows = value;
+				},
+				label: editor.lang.table.rows,
+				min: 1,
+				step: 1,
+				value: this._tableData.rows,
 			});
+
+			instance._tableToolbar.addItem('rowsInput', rowsInput);
+
+			const columnsInput = new CKEDITOR.ui.balloonToolbarNumberInput({
+				change(value) {
+					instance._tableData.columns = value;
+				},
+				label: editor.lang.table.columns,
+				min: 1,
+				step: 1,
+				value: this._tableData.columns,
+			});
+
+			instance._tableToolbar.addItem('columnsInput', columnsInput);
+
+			const okButton = new CKEDITOR.ui.balloonToolbarButton({
+				click: instance._createTable.bind(instance),
+				icon: 'check',
+				title: editor.lang.common.ok,
+			});
+
+			instance._tableToolbar.addItem('okButton', okButton);
+
+			return instance._tableToolbar;
 		},
 
-		_focusedEditorName: null,
-
-		_getInsertTableToolbar({editor}) {
-			const instance = this;
-
-			let toolbar = editor.liferayToolbars.insertTableToolbar;
-
-			if (toolbar) {
-				return toolbar;
+		_createToolbar() {
+			if (this._toolbar) {
+				return;
 			}
 
-			toolbar = instance._createInsertTableToolbar({editor});
-
-			editor.liferayToolbars.insertTableToolbar = toolbar;
-
-			return toolbar;
-		},
-
-		_getInsertToolbar({editor}) {
 			const instance = this;
 
-			let toolbar = editor.liferayToolbars.insertToolbar;
+			const editor = instance.editor;
 
-			if (toolbar) {
-				return toolbar;
-			}
+			instance._toolbar = new CKEDITOR.ui.balloonToolbar(editor);
 
-			toolbar = instance._createInsertToolbar({editor});
+			instance._toolbar.addItem(
+				'image',
+				new CKEDITOR.ui.balloonToolbarButton({
+					command: 'imageselector',
+					icon: 'image',
+					title: CKEDITOR.tools.capitalize(
+						editor.lang.image2.pathName
+					),
+				})
+			);
 
-			editor.liferayToolbars.insertToolbar = toolbar;
+			instance._toolbar.addItem(
+				'video',
+				new CKEDITOR.ui.balloonToolbarButton({
+					command: 'videoselector',
+					icon: 'videoselector',
+					title: 'Video',
+				})
+			);
 
-			return toolbar;
+			instance._toolbar.addItem(
+				'table',
+				new CKEDITOR.ui.balloonToolbarButton({
+					click() {
+						instance._toolbar.hide();
+
+						const tableToolbar = instance._createTableToolbar();
+
+						tableToolbar.attach(editor.getSelection());
+					},
+					icon: 'table',
+					title: editor.lang.table.toolbar,
+				})
+			);
+
+			instance._toolbar.addItem(
+				'horizontalrule',
+				new CKEDITOR.ui.balloonToolbarButton({
+					command: 'horizontalrule',
+					icon: 'horizontalrule',
+					title: editor.lang.horizontalrule.toolbar,
+				})
+			);
 		},
 
-		_positionButton({button, editor}) {
-			const selection = editor.getSelection();
+		_eventListeners: [],
+
+		_onAfterCommandExec() {
+			this.hide();
+		},
+
+		_onBlur() {
+			if (!this._toolbarVisible) {
+				this.hide();
+			}
+		},
+
+		_onButtonClick(event) {
+			event.cancel();
+
+			this._createToolbar();
+			this._toolbarVisible = true;
+			this._toolbar.attach(this.editor.getSelection());
+		},
+
+		_onChange() {
+			this.hide();
+		},
+
+		_onContentDom() {
+			this.documentBody = this.editor.document.getBody();
+
+			if (!this.documentBody.contains(this._button)) {
+				this.documentBody.append(this._button);
+			}
+		},
+
+		_onDestroy() {
+			CKEDITOR.tools.array.forEach(this._eventListeners, (listener) => {
+				listener.removeListener();
+			});
+
+			this._eventListeners = [];
+		},
+
+		_onSelectionChange() {
+			const selection = this.editor.getSelection();
+
+			const type = selection.getType();
+
+			const startElement = selection.getStartElement();
+
+			if (
+				type === CKEDITOR.SELECTION_TEXT &&
+				selection.getSelectedText() === '' &&
+				startElement.getText() === '\n'
+			) {
+				this._positionButton();
+
+				this.show();
+			}
+			else {
+				this.hide();
+			}
+		},
+
+		_positionButton() {
+			const selection = this.editor.getSelection();
 
 			const startElement = selection.getStartElement();
 
 			const selectionClientRect = startElement.getClientRect();
+
+			const button = this._button;
 
 			const buttonStyles = window.getComputedStyle(button.$);
 
@@ -222,7 +253,7 @@
 
 			let sideOffset = selectionClientRect.x + BUTTON_SIDE_OFFSET;
 
-			if (editor.config.contentsLangDirection === 'rtl') {
+			if (this.editor.config.contentsLangDirection === 'rtl') {
 				const buttonWidth = parseInt(buttonStyles.width, 10);
 
 				sideOffset =
@@ -236,99 +267,69 @@
 				left: `${sideOffset}px`,
 				top: `${
 					selectionClientRect.y +
-					document.defaultView.pageYOffset +
 					(selectionClientRect.height - buttonHeight) / 2
 				}px`,
 			});
 		},
 
+		_tableData: {
+			columns: 3,
+			rows: 3,
+		},
+
+		_tableToolbar: null,
+
+		_toolbarVisible: false,
+
+		hide() {
+			if (this._button.getStyle('display') !== 'none') {
+				this._button.setStyle('display', 'none');
+			}
+			if (this._toolbar) {
+				this._toolbar.hide();
+			}
+			if (this._tableToolbar) {
+				this._tableToolbar.destroy();
+			}
+		},
+
 		init(editor) {
-			editor.liferayToolbars = editor.liferayToolbars ?? {};
+			this.editor = editor;
 
-			const button = CKEDITOR.dom.element.createFromHtml(template.source);
+			this._eventListeners.push(
+				this.editor.on(
+					'afterCommandExec',
+					this._onAfterCommandExec.bind(this)
+				),
+				this.editor.on('blur', this._onBlur.bind(this)),
+				this.editor.on('change', this._onChange.bind(this)),
+				this.editor.on('contentDom', this._onContentDom.bind(this)),
+				this.editor.on('destroy', this._onDestroy.bind(this)),
+				this.editor.on('paste', this._onChange.bind(this)),
+				this.editor.on(
+					'selectionChange',
+					this._onSelectionChange.bind(this)
+				)
+			);
 
-			const hide = () => {
-				button.addClass('hide');
+			this._button = CKEDITOR.dom.element.createFromHtml(template.source);
 
-				editor.liferayToolbars.insertTableToolbar?.hide();
-				editor.liferayToolbars.insertToolbar?.hide();
-			};
+			this._button.setStyles({
+				display: 'none',
+				position: 'absolute',
+			});
 
-			const onBlur = () => {
-				requestAnimationFrame(() => {
-					if (this._focusedEditorName !== editor.name) {
-						hide();
-					}
-				});
-			};
-
-			const eventListeners = [];
-
-			eventListeners.push(
-				button.on('blur', onBlur),
-				editor.on('blur', onBlur),
-
-				button.on('click', (event) => {
-					event.cancel();
-
-					editor.liferayToolbars.insertTableToolbar?.hide();
-
-					const toolbar = this._getInsertToolbar({
-						editor,
-						eventListeners,
-					});
-
-					toolbar.attach(editor.getSelection());
-				}),
-
-				editor.on('afterCommandExec', hide),
-
-				editor.on('focus', () => {
-					this._focusedEditorName = editor.name;
-				}),
-
-				editor.on('change', hide),
-
-				editor.on('contentDom', () => {
-					const body = editor.document.getBody();
-
-					if (!body.contains(button)) {
-						body.append(button);
-					}
-				}),
-
-				editor.on('destroy', () => {
-					eventListeners.forEach((listener) => {
-						listener.removeListener();
-					});
-				}),
-
-				editor.on('paste', hide),
-
-				editor.on('selectionChange', () => {
-					const selection = editor.getSelection();
-
-					const type = selection.getType();
-
-					const startElement = selection.getStartElement();
-
-					if (
-						type === CKEDITOR.SELECTION_TEXT &&
-						selection.getSelectedText() === '' &&
-						startElement.getText() === '\n' &&
-						startElement.getName() !== 'td'
-					) {
-						this._positionButton({button, editor});
-
-						button.removeClass('hide');
-					}
-					else {
-						hide();
-					}
-				})
+			this._eventListeners.push(
+				this._button.on('click', this._onButtonClick.bind(this))
 			);
 		},
 
 		requires: ['balloontoolbar', 'uibutton', 'uinumberinput'],
+
+		show() {
+			if (this._button.getStyle('display') !== '') {
+				this._button.setStyle('display', '');
+			}
+		},
 	});
 })();

@@ -133,9 +133,7 @@ public class WikiPageSearchTest extends BaseSearchTestCase {
 
 	@Override
 	protected void deleteBaseModel(long primaryKey) throws Exception {
-		WikiPage page = WikiPageLocalServiceUtil.getPageByPageId(primaryKey);
-
-		WikiPageLocalServiceUtil.deletePage(page);
+		WikiPageLocalServiceUtil.deleteWikiPage(primaryKey);
 	}
 
 	@Override
@@ -269,8 +267,8 @@ public class WikiPageSearchTest extends BaseSearchTestCase {
 		}
 
 		protected boolean isSearchSpecificFieldsImplementedForSearchEngine() {
-			SearchEngine searchEngine =
-				SearchEngineHelperUtil.getSearchEngine();
+			SearchEngine searchEngine = SearchEngineHelperUtil.getSearchEngine(
+				SearchEngineHelperUtil.getDefaultSearchEngineId());
 
 			String vendor = searchEngine.getVendor();
 

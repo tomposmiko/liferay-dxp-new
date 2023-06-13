@@ -14,9 +14,12 @@
 
 package com.liferay.journal.web.internal.info.item.renderer;
 
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetRenderer;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
@@ -40,7 +43,7 @@ public class JournalArticleTitleInfoItemRenderer
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "title");
+		return LanguageUtil.get(locale, "title");
 	}
 
 	@Override
@@ -48,14 +51,17 @@ public class JournalArticleTitleInfoItemRenderer
 		JournalArticle article, HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
-		if (!JournalArticleRendererUtil.isShowArticle(
-				httpServletRequest, article)) {
-
-			return;
-		}
-
 		try {
-			httpServletRequest.setAttribute(WebKeys.JOURNAL_ARTICLE, article);
+			AssetRendererFactory<?> assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+					JournalArticle.class);
+
+			AssetRenderer<?> assetRenderer =
+				assetRendererFactory.getAssetRenderer(
+					article.getResourcePrimKey());
+
+			httpServletRequest.setAttribute(
+				WebKeys.ASSET_RENDERER, assetRenderer);
 
 			RequestDispatcher requestDispatcher =
 				_servletContext.getRequestDispatcher(
@@ -68,10 +74,13 @@ public class JournalArticleTitleInfoItemRenderer
 		}
 	}
 
-	@Reference
-	private Language _language;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.journal.web)", unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
 
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.journal.web)")
 	private ServletContext _servletContext;
 
 }

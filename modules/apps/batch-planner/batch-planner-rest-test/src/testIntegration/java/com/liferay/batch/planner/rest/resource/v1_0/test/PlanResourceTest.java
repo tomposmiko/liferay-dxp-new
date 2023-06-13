@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -31,24 +30,6 @@ import org.junit.runner.RunWith;
 public class PlanResourceTest extends BasePlanResourceTestCase {
 
 	@Override
-	@Test
-	public void testGetPlanTemplate() throws Exception {
-		assertHttpResponseStatusCode(
-			200,
-			planResource.getPlanTemplateHttpResponse(
-				"com.liferay.headless.admin.user.dto.v1_0.Account"));
-	}
-
-	@Override
-	protected Plan randomPatchPlan() {
-		Plan plan = randomPlan();
-
-		plan.setTemplate(true);
-
-		return plan;
-	}
-
-	@Override
 	protected Plan randomPlan() {
 		return new Plan() {
 			{
@@ -57,10 +38,10 @@ public class PlanResourceTest extends BasePlanResourceTestCase {
 				externalType = "JSON";
 				externalURL = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				id = RandomTestUtil.randomLong();
 				internalClassName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
-				template = RandomTestUtil.randomBoolean();
 			}
 		};
 	}
@@ -82,11 +63,7 @@ public class PlanResourceTest extends BasePlanResourceTestCase {
 
 	@Override
 	protected Plan testPatchPlan_addPlan() throws Exception {
-		Plan plan = randomPlan();
-
-		plan.setTemplate(true);
-
-		return planResource.postPlan(plan);
+		return _addPlan();
 	}
 
 	@Override

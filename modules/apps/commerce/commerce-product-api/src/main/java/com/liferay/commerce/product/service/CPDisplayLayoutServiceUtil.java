@@ -37,12 +37,11 @@ public class CPDisplayLayoutServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.commerce.product.service.impl.CPDisplayLayoutServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static CPDisplayLayout addCPDisplayLayout(
-			long groupId, Class<?> clazz, long classPK,
-			String layoutPageTemplateEntryUuid, String layoutUuid)
+			long groupId, Class<?> clazz, long classPK, String layoutUuid)
 		throws PortalException {
 
 		return getService().addCPDisplayLayout(
-			groupId, clazz, classPK, layoutPageTemplateEntryUuid, layoutUuid);
+			groupId, clazz, classPK, layoutUuid);
 	}
 
 	public static void deleteCPDisplayLayout(long cpDisplayLayoutId)
@@ -68,23 +67,20 @@ public class CPDisplayLayoutServiceUtil {
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult
 		<CPDisplayLayout> searchCPDisplayLayout(
-				long companyId, long groupId, String className, Integer type,
-				String keywords, int start, int end,
-				com.liferay.portal.kernel.search.Sort sort)
+				long companyId, long groupId, String className, String keywords,
+				int start, int end, com.liferay.portal.kernel.search.Sort sort)
 			throws PortalException {
 
 		return getService().searchCPDisplayLayout(
-			companyId, groupId, className, type, keywords, start, end, sort);
+			companyId, groupId, className, keywords, start, end, sort);
 	}
 
 	public static CPDisplayLayout updateCPDisplayLayout(
-			long cpDisplayLayoutId, long classPK,
-			String layoutPageTemplateEntryUuid, String layoutUuid)
+			long cpDisplayLayoutId, long classPK, String layoutUuid)
 		throws PortalException {
 
 		return getService().updateCPDisplayLayout(
-			cpDisplayLayoutId, classPK, layoutPageTemplateEntryUuid,
-			layoutUuid);
+			cpDisplayLayoutId, classPK, layoutUuid);
 	}
 
 	public static CPDisplayLayoutService getService() {

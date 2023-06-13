@@ -16,11 +16,9 @@ package com.liferay.portal.search.internal.background.task;
 
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
-import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
@@ -36,6 +34,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
@@ -48,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrew Betts
  */
 @Component(
+	immediate = true,
 	property = "background.task.executor.class.name=com.liferay.portal.search.internal.background.task.ReindexSingleIndexerBackgroundTaskExecutor",
 	service = {
 		BackgroundTaskExecutor.class,
@@ -94,9 +94,20 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 		}
 	}
 
+	protected boolean isSystemIndexer(Indexer<?> indexer) {
+		if (systemIndexers.size() > 0) {
+			for (Indexer<?> systemIndexer : systemIndexers) {
+				if (indexer.equals(systemIndexer)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	@Override
-	protected void reindex(
-			String className, long[] companyIds, String executionMode)
+	protected void reindex(String className, long[] companyIds)
 		throws Exception {
 
 		Indexer<?> indexer = indexerRegistry.getIndexer(className);
@@ -105,9 +116,10 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 			return;
 		}
 
-		SearchEngine searchEngine = searchEngineHelper.getSearchEngine();
+		Collection<SearchEngine> searchEngines =
+			searchEngineHelper.getSearchEngines();
 
-		boolean systemIndexer = _isSystemIndexer(indexer);
+		boolean systemIndexer = isSystemIndexer(indexer);
 
 		for (long companyId : companyIds) {
 			if (((companyId == CompanyConstants.SYSTEM) && !systemIndexer) ||
@@ -120,43 +132,23 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 				ReindexBackgroundTaskConstants.SINGLE_START, companyId,
 				companyIds);
 
-			if (_log.isInfoEnabled()) {
-				_log.info(
-					StringBundler.concat(
-						"Start reindexing company ", companyId,
-						" for class name ", className));
-			}
-
-			CTSQLModeThreadLocal.CTSQLMode ctSQLMode =
-				CTSQLModeThreadLocal.getCTSQLMode();
-
 			try {
-				CTSQLModeThreadLocal.setCTSQLModeWithSafeCloseable(
-					CTSQLModeThreadLocal.CTSQLMode.CT_ALL);
-
-				searchEngine.initialize(companyId);
+				for (SearchEngine searchEngine : searchEngines) {
+					searchEngine.initialize(companyId);
+				}
 
 				indexWriterHelper.deleteEntityDocuments(
-					companyId, className, true);
+					indexer.getSearchEngineId(), companyId, className, true);
 
 				indexer.reindex(new String[] {String.valueOf(companyId)});
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 			finally {
-				CTSQLModeThreadLocal.setCTSQLModeWithSafeCloseable(ctSQLMode);
-
 				reindexStatusMessageSender.sendStatusMessage(
 					ReindexBackgroundTaskConstants.SINGLE_END, companyId,
 					companyIds);
-
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Finished reindexing company ", companyId,
-							" for class name ", className));
-				}
 			}
 		}
 	}
@@ -176,19 +168,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 	@Reference
 	protected SearchEngineHelper searchEngineHelper;
 
-	protected ServiceTrackerList<Indexer<?>> systemIndexers;
-
-	private boolean _isSystemIndexer(Indexer<?> indexer) {
-		if (systemIndexers.size() > 0) {
-			for (Indexer<?> systemIndexer : systemIndexers) {
-				if (indexer.equals(systemIndexer)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
+	protected ServiceTrackerList<Indexer<?>, Indexer<?>> systemIndexers;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ReindexSingleIndexerBackgroundTaskExecutor.class);

@@ -12,13 +12,16 @@
  * details.
  */
 
-import {cancelDebounce, debounce, openToast} from 'frontend-js-web';
+import {cancelDebounce, debounce} from 'frontend-js-web';
 import {useRef} from 'react';
 
 import {client} from './client.es';
 import lang from './lang.es';
 
-export function dateToInternationalHuman(ISOString, language) {
+export function dateToInternationalHuman(
+	ISOString,
+	localeKey = navigator.language
+) {
 	const date = new Date(ISOString);
 
 	const options = {
@@ -26,10 +29,13 @@ export function dateToInternationalHuman(ISOString, language) {
 		hour: '2-digit',
 		minute: '2-digit',
 		month: 'short',
-		year: 'numeric',
 	};
 
-	const intl = new Intl.DateTimeFormat(language, options);
+	if (date.getFullYear() !== new Date().getFullYear()) {
+		options.year = 'numeric';
+	}
+
+	const intl = new Intl.DateTimeFormat(localeKey, options);
 
 	return intl.format(date);
 }
@@ -244,39 +250,4 @@ export function getContextLink(url) {
 	return {
 		headers: {Link: encodeURI(link)},
 	};
-}
-
-/**
- * Assign the properties for error, used by graphql-hooks/APIError.
- * @param {Object} error
- * @param {Object} error.fetchError
- * @param {string?} error.fetchError.message
- * @param {Object[]} error.graphQLErrors
- * @param {string} error.graphQLErrors[].message
- * @param {Object} error.httpError
- */
-
-export function processGraphQLError(error) {
-	const _error = {
-		message: error.message ?? '',
-		type: 'danger',
-	};
-
-	if (error.fetchError) {
-		_error.message = error.fetchError.message;
-	}
-
-	if (error.graphQLErrors) {
-		for (const graphQLError of error.graphQLErrors) {
-			_error.message += `${graphQLError.message} -`;
-		}
-	}
-
-	if (error.httpError) {
-		console.error('Forbidden ', error.httpError);
-
-		_error.message = Liferay.Language.get('an-unexpected-error-occurred');
-	}
-
-	openToast(_error);
 }

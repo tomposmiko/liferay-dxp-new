@@ -20,7 +20,7 @@ import com.liferay.commerce.price.list.service.CommercePriceListService;
 import com.liferay.commerce.pricing.constants.CommercePricingPortletKeys;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.service.CommerceCatalogService;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -132,28 +132,32 @@ public abstract class BaseCommercePriceListDisplayContext
 			actionId);
 	}
 
-	protected List<FDSActionDropdownItem> getFDSActionDropdownItems(
-		String portletURL, boolean sidePanel) {
+	protected List<ClayDataSetActionDropdownItem>
+		getClayDataSetActionDropdownItems(
+			String portletURL, boolean sidePanel) {
 
-		List<FDSActionDropdownItem> fdsActionDropdownItems = new ArrayList<>();
+		List<ClayDataSetActionDropdownItem> clayDataSetActionDropdownItems =
+			new ArrayList<>();
 
-		FDSActionDropdownItem fdsActionDropdownItem = new FDSActionDropdownItem(
-			portletURL, "pencil", "edit",
-			LanguageUtil.get(httpServletRequest, "edit"), "get", null, null);
+		ClayDataSetActionDropdownItem clayDataSetActionDropdownItem =
+			new ClayDataSetActionDropdownItem(
+				portletURL, "pencil", "edit",
+				LanguageUtil.get(httpServletRequest, "edit"), "get", null,
+				null);
 
 		if (sidePanel) {
-			fdsActionDropdownItem.setTarget("sidePanel");
+			clayDataSetActionDropdownItem.setTarget("sidePanel");
 		}
 
-		fdsActionDropdownItems.add(fdsActionDropdownItem);
+		clayDataSetActionDropdownItems.add(clayDataSetActionDropdownItem);
 
-		fdsActionDropdownItems.add(
-			new FDSActionDropdownItem(
+		clayDataSetActionDropdownItems.add(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "delete",
 				LanguageUtil.get(httpServletRequest, "delete"), "delete",
 				"delete", "headless"));
 
-		return fdsActionDropdownItems;
+		return clayDataSetActionDropdownItems;
 	}
 
 	protected CommerceCatalogService commerceCatalogService;

@@ -14,19 +14,19 @@
 
 package com.liferay.exportimport.internal.background.task;
 
-import com.liferay.document.library.kernel.service.DLAppHelperLocalService;
+import com.liferay.document.library.kernel.service.DLAppHelperLocalServiceUtil;
 import com.liferay.exportimport.internal.background.task.display.LayoutStagingBackgroundTaskDisplay;
-import com.liferay.exportimport.kernel.lar.ExportImportHelper;
+import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManagerUtil;
 import com.liferay.exportimport.kernel.lifecycle.constants.ExportImportLifecycleConstants;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
-import com.liferay.exportimport.kernel.service.ExportImportLocalService;
-import com.liferay.exportimport.kernel.service.StagingLocalService;
+import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
+import com.liferay.exportimport.kernel.service.StagingLocalServiceUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplay;
@@ -34,14 +34,14 @@ import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.LayoutSetBranchLocalService;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutSetBranchLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.trash.service.TrashEntryLocalService;
+import com.liferay.trash.service.TrashEntryLocalServiceUtil;
 
 import java.io.File;
 import java.io.Serializable;
@@ -50,16 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Julio Camarero
  */
-@Component(
-	property = "background.task.executor.class.name=com.liferay.exportimport.internal.background.task.LayoutStagingBackgroundTaskExecutor",
-	service = BackgroundTaskExecutor.class
-)
 public class LayoutStagingBackgroundTaskExecutor
 	extends BaseStagingBackgroundTaskExecutor {
 
@@ -70,7 +63,17 @@ public class LayoutStagingBackgroundTaskExecutor
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return this;
+		LayoutStagingBackgroundTaskExecutor
+			layoutStagingBackgroundTaskExecutor =
+				new LayoutStagingBackgroundTaskExecutor();
+
+		layoutStagingBackgroundTaskExecutor.
+			setBackgroundTaskStatusMessageTranslator(
+				getBackgroundTaskStatusMessageTranslator());
+		layoutStagingBackgroundTaskExecutor.setIsolationLevel(
+			getIsolationLevel());
+
+		return layoutStagingBackgroundTaskExecutor;
 	}
 
 	@Override
@@ -95,7 +98,7 @@ public class LayoutStagingBackgroundTaskExecutor
 		try {
 			ExportImportThreadLocal.setLayoutStagingInProcess(true);
 
-			Group targetGroup = _groupLocalService.fetchGroup(targetGroupId);
+			Group targetGroup = GroupLocalServiceUtil.fetchGroup(targetGroupId);
 
 			if (targetGroup == null) {
 				throw new NoSuchGroupException(
@@ -103,18 +106,19 @@ public class LayoutStagingBackgroundTaskExecutor
 						targetGroupId);
 			}
 
-			Group sourceGroup = _groupLocalService.getGroup(sourceGroupId);
+			Group sourceGroup = GroupLocalServiceUtil.getGroup(sourceGroupId);
 
 			if (sourceGroup.hasStagingGroup()) {
 				Group stagingGroup = sourceGroup.getStagingGroup();
 
 				if (stagingGroup.getGroupId() == targetGroupId) {
-					_dLAppHelperLocalService.cancelCheckOuts(sourceGroupId);
+					DLAppHelperLocalServiceUtil.cancelCheckOuts(sourceGroupId);
 
 					ExportImportThreadLocal.setInitialLayoutStagingInProcess(
 						true);
 
-					_trashEntryLocalService.deleteEntries(sourceGroupId, true);
+					TrashEntryLocalServiceUtil.deleteEntries(
+						sourceGroupId, true);
 				}
 			}
 
@@ -132,7 +136,7 @@ public class LayoutStagingBackgroundTaskExecutor
 
 			initThreadLocals(sourceGroupId, privateLayout);
 
-			file = _exportImportLocalService.exportLayoutsAsFile(
+			file = ExportImportLocalServiceUtil.exportLayoutsAsFile(
 				exportImportConfiguration);
 
 			markBackgroundTask(
@@ -159,7 +163,7 @@ public class LayoutStagingBackgroundTaskExecutor
 					exportImportConfiguration.getExportImportConfigurationId()),
 				exportImportConfiguration);
 
-			_exportImportHelper.processBackgroundTaskManifestSummary(
+			ExportImportHelperUtil.processBackgroundTaskManifestSummary(
 				userId, sourceGroupId, backgroundTask, file);
 		}
 		catch (Throwable throwable) {
@@ -175,18 +179,18 @@ public class LayoutStagingBackgroundTaskExecutor
 					exportImportConfiguration.getExportImportConfigurationId()),
 				exportImportConfiguration, throwable);
 
-			Group sourceGroup = _groupLocalService.getGroup(sourceGroupId);
+			Group sourceGroup = GroupLocalServiceUtil.getGroup(sourceGroupId);
 
 			if (sourceGroup.hasStagingGroup()) {
 				ServiceContext serviceContext = new ServiceContext();
 
 				serviceContext.setUserId(userId);
 
-				_stagingLocalService.disableStaging(
+				StagingLocalServiceUtil.disableStaging(
 					sourceGroup, serviceContext);
 
 				List<BackgroundTask> queuedBackgroundTasks =
-					_backgroundTaskManager.getBackgroundTasks(
+					BackgroundTaskManagerUtil.getBackgroundTasks(
 						sourceGroupId,
 						LayoutStagingBackgroundTaskExecutor.class.getName(),
 						BackgroundTaskConstants.STATUS_QUEUED);
@@ -194,7 +198,7 @@ public class LayoutStagingBackgroundTaskExecutor
 				for (BackgroundTask queuedBackgroundTask :
 						queuedBackgroundTasks) {
 
-					_backgroundTaskManager.amendBackgroundTask(
+					BackgroundTaskManagerUtil.amendBackgroundTask(
 						queuedBackgroundTask.getBackgroundTaskId(), null,
 						BackgroundTaskConstants.STATUS_CANCELLED,
 						new ServiceContext());
@@ -219,19 +223,19 @@ public class LayoutStagingBackgroundTaskExecutor
 		return new LayoutStagingBackgroundTaskDisplay(backgroundTask);
 	}
 
-	private void _initLayoutSetBranches(
+	protected void initLayoutSetBranches(
 			long userId, long sourceGroupId, long targetGroupId)
 		throws PortalException {
 
-		Group sourceGroup = _groupLocalService.getGroup(sourceGroupId);
+		Group sourceGroup = GroupLocalServiceUtil.getGroup(sourceGroupId);
 
 		if (!sourceGroup.hasStagingGroup()) {
 			return;
 		}
 
-		_layoutSetBranchLocalService.deleteLayoutSetBranches(
+		LayoutSetBranchLocalServiceUtil.deleteLayoutSetBranches(
 			targetGroupId, false, true);
-		_layoutSetBranchLocalService.deleteLayoutSetBranches(
+		LayoutSetBranchLocalServiceUtil.deleteLayoutSetBranches(
 			targetGroupId, true, true);
 
 		UnicodeProperties typeSettingsUnicodeProperties =
@@ -246,34 +250,10 @@ public class LayoutStagingBackgroundTaskExecutor
 
 		serviceContext.setUserId(userId);
 
-		_stagingLocalService.checkDefaultLayoutSetBranches(
+		StagingLocalServiceUtil.checkDefaultLayoutSetBranches(
 			userId, sourceGroup, branchingPublic, branchingPrivate, false,
 			serviceContext);
 	}
-
-	@Reference
-	private BackgroundTaskManager _backgroundTaskManager;
-
-	@Reference
-	private DLAppHelperLocalService _dLAppHelperLocalService;
-
-	@Reference
-	private ExportImportHelper _exportImportHelper;
-
-	@Reference
-	private ExportImportLocalService _exportImportLocalService;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private LayoutSetBranchLocalService _layoutSetBranchLocalService;
-
-	@Reference
-	private StagingLocalService _stagingLocalService;
-
-	@Reference
-	private TrashEntryLocalService _trashEntryLocalService;
 
 	private class LayoutStagingImportCallable
 		implements Callable<MissingReferences> {
@@ -293,19 +273,19 @@ public class LayoutStagingBackgroundTaskExecutor
 
 		@Override
 		public MissingReferences call() throws PortalException {
-			_exportImportLocalService.importLayoutsDataDeletions(
+			ExportImportLocalServiceUtil.importLayoutsDataDeletions(
 				_exportImportConfiguration, _file);
 
 			MissingReferences missingReferences =
-				_exportImportLocalService.validateImportLayoutsFile(
+				ExportImportLocalServiceUtil.validateImportLayoutsFile(
 					_exportImportConfiguration, _file);
 
 			markBackgroundTask(_backgroundTaskId, "validated");
 
-			_exportImportLocalService.importLayouts(
+			ExportImportLocalServiceUtil.importLayouts(
 				_exportImportConfiguration, _file);
 
-			_initLayoutSetBranches(_userId, _sourceGroupId, _targetGroupId);
+			initLayoutSetBranches(_userId, _sourceGroupId, _targetGroupId);
 
 			return missingReferences;
 		}

@@ -61,7 +61,6 @@ const DragPreview = ({rtl}) => {
 				{item && item.icon && (
 					<ClayIcon className="mr-3" symbol={item.icon} />
 				)}
-
 				{item && item.name
 					? item.name
 					: Liferay.Language.get('element')}

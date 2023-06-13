@@ -85,6 +85,16 @@ public interface JournalServiceConfiguration {
 	)
 	public boolean expireAllArticleVersionsEnabled();
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Meta.AD(
+		deflt = "true", description = "journal-article-view-permission-check",
+		name = "article-view-permissions-check-enabled", required = false
+	)
+	public boolean articleViewPermissionsCheckEnabled();
+
 	@Meta.AD(
 		deflt = "true", description = "journal-article-index-all-versions",
 		name = "index-all-article-versions-enabled", required = false
@@ -104,12 +114,10 @@ public interface JournalServiceConfiguration {
 	public boolean versionHistoryByDefaultEnabled();
 
 	@Meta.AD(
-		deflt = "true",
-		description = "journal-article-export-import-processor-cache-enabled-help",
-		name = "journal-article-export-import-processor-cache-enabled",
-		required = false
+		deflt = "false", description = "sync-content-search-on-startup-help",
+		name = "sync-content-search-on-startup", required = false
 	)
-	public boolean journalArticleExportImportProcessorCacheEnabled();
+	public boolean syncContentSearchOnStartup();
 
 	@Meta.AD(
 		deflt = "@page_break@",
@@ -143,16 +151,5 @@ public interface JournalServiceConfiguration {
 		required = false
 	)
 	public boolean enableContentTransformerListener();
-
-	@Meta.AD(
-		deflt = "0", name = "terms-of-use-journal-article-group-id",
-		required = false
-	)
-	public long termsOfUseJournalArticleGroupId();
-
-	@Meta.AD(
-		deflt = "", name = "terms-of-use-journal-article-id", required = false
-	)
-	public String termsOfUseJournalArticleId();
 
 }

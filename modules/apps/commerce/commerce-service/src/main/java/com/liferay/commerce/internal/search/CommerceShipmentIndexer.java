@@ -52,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alec Sloan
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CommerceShipmentIndexer extends BaseIndexer<CommerceShipment> {
 
 	public static final String CLASS_NAME = CommerceShipment.class.getName();
@@ -168,7 +168,7 @@ public class CommerceShipmentIndexer extends BaseIndexer<CommerceShipment> {
 		document.addKeyword(
 			"commerceAccountId", commerceShipment.getCommerceAccountId());
 		document.addKeyword(
-			"commerceAccountName", commerceShipment.getAccountEntryName());
+			"commerceAccountName", commerceShipment.getCommerceAccountName());
 		document.addKeyword(
 			"commerceChannelId", commerceChannel.getCommerceChannelId());
 		document.addKeyword("commerceChannelName", commerceChannel.getName());
@@ -212,7 +212,8 @@ public class CommerceShipmentIndexer extends BaseIndexer<CommerceShipment> {
 		throws Exception {
 
 		_indexWriterHelper.updateDocument(
-			commerceShipment.getCompanyId(), getDocument(commerceShipment));
+			getSearchEngineId(), commerceShipment.getCompanyId(),
+			getDocument(commerceShipment), isCommitImmediately());
 	}
 
 	@Override
@@ -224,7 +225,7 @@ public class CommerceShipmentIndexer extends BaseIndexer<CommerceShipment> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCommerceShipments(companyId);
+		reindexCommerceShipments(companyId);
 	}
 
 	@Override
@@ -242,7 +243,7 @@ public class CommerceShipmentIndexer extends BaseIndexer<CommerceShipment> {
 		return super.isUseSearchResultPermissionFilter(searchContext);
 	}
 
-	private void _reindexCommerceShipments(long companyId) throws Exception {
+	protected void reindexCommerceShipments(long companyId) throws Exception {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_commerceShipmentLocalService.getIndexableActionableDynamicQuery();
 
@@ -262,6 +263,7 @@ public class CommerceShipmentIndexer extends BaseIndexer<CommerceShipment> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}

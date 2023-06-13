@@ -77,7 +77,7 @@ public class InvokerFilterHelper {
 				filter.destroy();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -115,7 +115,7 @@ public class InvokerFilterHelper {
 			_serviceTracker.open();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw new ServletException(exception);
 		}
@@ -211,7 +211,7 @@ public class InvokerFilterHelper {
 				filter.destroy();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
@@ -496,7 +496,7 @@ public class InvokerFilterHelper {
 				filter.init(filterConfig);
 			}
 			catch (ServletException servletException) {
-				_log.error(servletException);
+				_log.error(servletException, servletException);
 
 				_bundleContext.ungetService(serviceReference);
 

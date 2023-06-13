@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Preston Crary
  */
-@Component(service = JSONStorageUpgradeStepFactory.class)
+@Component(immediate = true, service = JSONStorageUpgradeStepFactory.class)
 public class JSONStorageUpgradeStepFactoryImpl
 	implements JSONStorageUpgradeStepFactory {
 
@@ -89,7 +89,10 @@ public class JSONStorageUpgradeStepFactoryImpl
 				}
 			}
 
-			alterTableDropColumn(_tableName, _jsonColumnName);
+			runSQL(
+				StringBundler.concat(
+					"alter table ", _tableName, " drop column ",
+					_jsonColumnName));
 		}
 
 		private JSONStorageUpgradeProcess(

@@ -30,6 +30,8 @@ import javax.portlet.PortletException;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -38,8 +40,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
-		"javax.portlet.name=" + UsersAdminPortletKeys.SERVICE_ACCOUNTS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
 		"mvc.command.name=/users_admin/get_users_count"
 	},
@@ -55,7 +57,7 @@ public class GetUsersCountMVCResourceCommand implements MVCResourceCommand {
 		try {
 			PrintWriter printWriter = resourceResponse.getWriter();
 
-			printWriter.write(_getText(resourceRequest));
+			printWriter.write(getText(resourceRequest, resourceResponse));
 
 			return false;
 		}
@@ -64,7 +66,7 @@ public class GetUsersCountMVCResourceCommand implements MVCResourceCommand {
 		}
 	}
 
-	private int _getOrganizationUsersCount(
+	protected int getOrganizationUsersCount(
 			long companyId, long[] organizationIds, int status)
 		throws Exception {
 
@@ -81,27 +83,34 @@ public class GetUsersCountMVCResourceCommand implements MVCResourceCommand {
 		return count;
 	}
 
-	private String _getText(ResourceRequest resourceRequest) throws Exception {
-		long companyId = _portal.getCompanyId(resourceRequest);
+	protected String getText(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws Exception {
 
-		String className = ParamUtil.getString(resourceRequest, "className");
+		HttpServletRequest httpServletRequest =
+			_portal.getOriginalServletRequest(
+				_portal.getHttpServletRequest(resourceRequest));
+
+		long companyId = _portal.getCompanyId(httpServletRequest);
+
+		String className = ParamUtil.getString(httpServletRequest, "className");
 		long[] ids = StringUtil.split(
-			ParamUtil.getString(resourceRequest, "ids"), 0L);
-		int status = ParamUtil.getInteger(resourceRequest, "status");
+			ParamUtil.getString(httpServletRequest, "ids"), 0L);
+		int status = ParamUtil.getInteger(httpServletRequest, "status");
 
 		int count = 0;
 
 		if (className.equals(Organization.class.getName())) {
-			count = _getOrganizationUsersCount(companyId, ids, status);
+			count = getOrganizationUsersCount(companyId, ids, status);
 		}
 		else if (className.equals(UserGroup.class.getName())) {
-			count = _getUserGroupUsersCount(companyId, ids, status);
+			count = getUserGroupUsersCount(companyId, ids, status);
 		}
 
 		return String.valueOf(count);
 	}
 
-	private int _getUserGroupUsersCount(
+	protected int getUserGroupUsersCount(
 			long companyId, long[] userGroupIds, int status)
 		throws Exception {
 
@@ -118,10 +127,14 @@ public class GetUsersCountMVCResourceCommand implements MVCResourceCommand {
 		return count;
 	}
 
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

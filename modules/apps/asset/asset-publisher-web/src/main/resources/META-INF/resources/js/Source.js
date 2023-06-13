@@ -12,19 +12,12 @@
  * details.
  */
 
-import {
-	addParams,
-	delegate,
-	openSelectionModal,
-	sub,
-	toggleDisabled,
-	toggleSelectBox,
-} from 'frontend-js-web';
+import {delegate} from 'frontend-js-web';
 
-const ANY_VALUE = 'true';
-const SELECT_MORE_THAN_ONE_VALUE = 'false';
+const ANY = 'any';
+const SELECT_MORE_THAN_ONE = 'select-more-than-one';
 
-export default function ({assetPublisherNamespace, classTypes, namespace}) {
+export default function ({classTypes, namespace}) {
 	const mapDDMStructures = {};
 
 	const assetMultipleSelector = document.getElementById(
@@ -104,7 +97,7 @@ export default function ({assetPublisherNamespace, classTypes, namespace}) {
 
 		if (enabledInput) {
 			popupButtons.forEach((popupButton) => {
-				toggleDisabled(popupButton, !enabledInputChecked);
+				Liferay.Util.toggleDisabled(popupButton, !enabledInputChecked);
 			});
 		}
 	};
@@ -130,8 +123,8 @@ export default function ({assetPublisherNamespace, classTypes, namespace}) {
 
 		subtypeFieldsWrappers.forEach((subtypeFieldsWrapper) => {
 			if (
-				selectedSubtype !== ANY_VALUE &&
-				selectedSubtype !== SELECT_MORE_THAN_ONE_VALUE
+				selectedSubtype !== ANY &&
+				selectedSubtype !== SELECT_MORE_THAN_ONE
 			) {
 				if (orderingPanel) {
 					removeOptionsOrderByFilter();
@@ -170,7 +163,7 @@ export default function ({assetPublisherNamespace, classTypes, namespace}) {
 		const assetOptions = assetMultipleSelector.options;
 		const showOptions =
 			assetSelector.value === `${classNameId}` ||
-			(assetSelector.value === SELECT_MORE_THAN_ONE_VALUE &&
+			(assetSelector.value === SELECT_MORE_THAN_ONE &&
 				assetOptions.length === 1 &&
 				assetOptions[0].value === `${classNameId}`);
 
@@ -215,9 +208,9 @@ export default function ({assetPublisherNamespace, classTypes, namespace}) {
 	};
 
 	classTypes.forEach(({className, classSubtypes}) => {
-		toggleSelectBox(
+		Liferay.Util.toggleSelectBox(
 			`${namespace}anyClassType${className}`,
-			SELECT_MORE_THAN_ONE_VALUE,
+			SELECT_MORE_THAN_ONE,
 			`${namespace}${className}Boxes`
 		);
 
@@ -364,29 +357,28 @@ export default function ({assetPublisherNamespace, classTypes, namespace}) {
 	const openModal = ({delegateTarget}) => {
 		let url = delegateTarget.dataset.href;
 
-		url = addParams(
-			`_${assetPublisherNamespace}_ddmStructureDisplayFieldValue=${encodeURIComponent(
+		url = Liferay.Util.addParams(
+			`${namespace}ddmStructureDisplayFieldValue=${encodeURIComponent(
 				ddmStructureDisplayFieldValueInput.value
 			)}`,
 			url
 		);
-		url = addParams(
-			`_${assetPublisherNamespace}_ddmStructureFieldName=${encodeURIComponent(
+		url = Liferay.Util.addParams(
+			`${namespace}ddmStructureFieldName=${encodeURIComponent(
 				ddmStructureFieldNameInput.value
 			)}`,
 			url
 		);
-		url = addParams(
-			`_${assetPublisherNamespace}_ddmStructureFieldValue=${encodeURIComponent(
+		url = Liferay.Util.addParams(
+			`${namespace}ddmStructureFieldValue=${encodeURIComponent(
 				ddmStructureFieldValueInput.value
 			)}`,
 			url
 		);
 
-		openSelectionModal({
+		Liferay.Util.openSelectionModal({
 			customSelectEvent: true,
 			id: `${namespace}selectDDMStructure${delegateTarget.id}`,
-			iframeBodyCssClass: '',
 			onSelect: (selectedItem) => {
 				setDDMFields({
 					className: selectedItem.className,
@@ -397,7 +389,7 @@ export default function ({assetPublisherNamespace, classTypes, namespace}) {
 				});
 			},
 			selectEventName: `${namespace}selectDDMStructureField`,
-			title: sub(
+			title: Liferay.Util.sub(
 				Liferay.Language.get('select-x'),
 				Liferay.Language.get('structure-field')
 			),
@@ -414,9 +406,9 @@ export default function ({assetPublisherNamespace, classTypes, namespace}) {
 
 	eventDelegates.push(clickOpenModal);
 
-	toggleSelectBox(
+	Liferay.Util.toggleSelectBox(
 		`${namespace}anyAssetType`,
-		SELECT_MORE_THAN_ONE_VALUE,
+		SELECT_MORE_THAN_ONE,
 		`${namespace}classNamesBoxes`
 	);
 

@@ -24,9 +24,9 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.zip.ZipReader;
-import com.liferay.portal.kernel.zip.ZipReaderFactory;
+import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.kernel.zip.ZipWriterFactory;
+import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.user.associated.data.display.UADDisplay;
 import com.liferay.user.associated.data.exporter.UADExporter;
 import com.liferay.user.associated.data.web.internal.export.background.task.UADExportBackgroundTaskStatusMessageSender;
@@ -38,8 +38,9 @@ import java.io.UnsupportedEncodingException;
 
 import java.net.URLEncoder;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = UADApplicationExportController.class)
+@Component(immediate = true, service = UADApplicationExportController.class)
 public class UADApplicationExportController {
 
 	public File export(String applicationKey, long userId) throws Exception {
@@ -78,7 +79,8 @@ public class UADApplicationExportController {
 
 			if (file.exists()) {
 				try {
-					ZipReader zipReader = _zipReaderFactory.getZipReader(file);
+					ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(
+						file);
 
 					List<String> entries = zipReader.getEntries();
 
@@ -121,15 +123,16 @@ public class UADApplicationExportController {
 	private List<String> _getApplicationUADEntityRegistryKeys(
 		String applicationKey) {
 
-		List<String> typeKeys = new ArrayList<>();
+		Stream<UADDisplay<?>> uadDisplayStream =
+			_uadRegistry.getApplicationUADDisplayStream(applicationKey);
 
-		for (UADDisplay<?> uadDisplay :
-				_uadRegistry.getApplicationUADDisplays(applicationKey)) {
-
-			typeKeys.add(uadDisplay.getTypeKey());
-		}
-
-		return typeKeys;
+		return uadDisplayStream.map(
+			UADDisplay::getTypeClass
+		).map(
+			Class::getName
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private String _getEntryPath(
@@ -155,7 +158,9 @@ public class UADApplicationExportController {
 			}
 			catch (UnsupportedEncodingException unsupportedEncodingException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(unsupportedEncodingException);
+					_log.debug(
+						unsupportedEncodingException,
+						unsupportedEncodingException);
 				}
 
 				userName = String.valueOf(userId);
@@ -175,7 +180,7 @@ public class UADApplicationExportController {
 
 		String fileName = sb.toString();
 
-		return _zipWriterFactory.getZipWriter(
+		return ZipWriterFactoryUtil.getZipWriter(
 			new File(
 				SystemProperties.get(SystemProperties.TMP_DIR) +
 					StringPool.SLASH + fileName));
@@ -193,11 +198,5 @@ public class UADApplicationExportController {
 
 	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference
-	private ZipReaderFactory _zipReaderFactory;
-
-	@Reference
-	private ZipWriterFactory _zipWriterFactory;
 
 }

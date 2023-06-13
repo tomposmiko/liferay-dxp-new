@@ -16,7 +16,6 @@ package com.liferay.user.associated.data.web.internal.configuration.persistence.
 
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
@@ -25,6 +24,7 @@ import com.liferay.user.associated.data.web.internal.configuration.AnonymousUser
 import com.liferay.user.associated.data.web.internal.configuration.AnonymousUserConfigurationRetriever;
 
 import java.util.Dictionary;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.osgi.service.cm.Configuration;
@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.user.associated.data.web.internal.configuration.AnonymousUserConfiguration",
 	service = ConfigurationModelListener.class
 )
@@ -45,14 +46,8 @@ public class AnonymousUserConfigurationModelListener
 	public void onBeforeSave(String pid, Dictionary<String, Object> properties)
 		throws ConfigurationModelListenerException {
 
-		// LPS-142491
-
-		long companyThreadLocalCompanyId = CompanyThreadLocal.getCompanyId();
-
 		try {
 			long companyId = (long)properties.get("companyId");
-
-			CompanyThreadLocal.setCompanyId(companyId);
 
 			_companyLocalService.getCompanyById(companyId);
 
@@ -66,18 +61,21 @@ public class AnonymousUserConfigurationModelListener
 				exception.getMessage(), AnonymousUserConfiguration.class,
 				getClass(), properties);
 		}
-		finally {
-			CompanyThreadLocal.setCompanyId(companyThreadLocalCompanyId);
-		}
 	}
 
 	private void _validateUniqueConfiguration(String pid, long companyId)
 		throws Exception {
 
-		Configuration configuration = _anonymousUserConfigurationRetriever.get(
-			companyId);
+		Optional<Configuration> configurationOptional =
+			_anonymousUserConfigurationRetriever.getOptional(companyId);
 
-		if ((configuration == null) || pid.equals(configuration.getPid())) {
+		if (!configurationOptional.isPresent()) {
+			return;
+		}
+
+		Configuration configuration = configurationOptional.get();
+
+		if (pid.equals(configuration.getPid())) {
 			return;
 		}
 

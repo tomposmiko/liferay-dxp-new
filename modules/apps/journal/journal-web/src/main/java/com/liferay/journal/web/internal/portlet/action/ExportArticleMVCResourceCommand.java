@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"mvc.command.name=/journal/export_article"
@@ -105,13 +106,24 @@ public class ExportArticleMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setExportArticleHelper(
+		ExportArticleHelper exportArticleHelper) {
+
+		_exportArticleHelper = exportArticleHelper;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportArticleMVCResourceCommand.class);
 
-	@Reference
 	private ExportArticleHelper _exportArticleHelper;
-
-	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference

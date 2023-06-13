@@ -19,6 +19,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -29,14 +30,10 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.translation.url.provider.TranslationURLProvider;
 
 import java.util.List;
 import java.util.Objects;
@@ -64,9 +61,6 @@ public class LayoutsAdminManagementToolbarDisplayContext
 
 		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
-		_translationURLProvider =
-			(TranslationURLProvider)httpServletRequest.getAttribute(
-				TranslationURLProvider.class.getName());
 	}
 
 	@Override
@@ -74,6 +68,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "convertSelectedPages");
+
 				dropdownItem.putData(
 					"convertLayoutURL",
 					PortletURLBuilder.createActionURL(
@@ -83,7 +78,8 @@ public class LayoutsAdminManagementToolbarDisplayContext
 					).setRedirect(
 						_themeDisplay.getURLCurrent()
 					).buildString());
-				dropdownItem.setIcon("page");
+
+				dropdownItem.setIcon("change");
 				dropdownItem.setLabel(
 					LanguageUtil.get(
 						httpServletRequest, "convert-to-content-page"));
@@ -91,28 +87,8 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).add(
 			dropdownItem -> {
-				dropdownItem.putData("action", "exportTranslation");
-				dropdownItem.putData(
-					"exportTranslationURL",
-					PortletURLBuilder.create(
-						_translationURLProvider.getExportTranslationURL(
-							_themeDisplay.getScopeGroupId(),
-							PortalUtil.getClassNameId(Layout.class),
-							RequestBackedPortletURLFactoryUtil.create(
-								httpServletRequest))
-					).setRedirect(
-						_themeDisplay.getURLCurrent()
-					).buildString());
-				dropdownItem.setDisabled(false);
-				dropdownItem.setIcon("upload");
-				dropdownItem.setLabel(
-					LanguageUtil.get(
-						httpServletRequest, "export-for-translations"));
-				dropdownItem.setQuickAction(true);
-			}
-		).add(
-			dropdownItem -> {
 				dropdownItem.putData("action", "deleteSelectedPages");
+
 				dropdownItem.putData(
 					"deleteLayoutURL",
 					PortletURLBuilder.createActionURL(
@@ -122,7 +98,8 @@ public class LayoutsAdminManagementToolbarDisplayContext
 					).setRedirect(
 						_themeDisplay.getURLCurrent()
 					).buildString());
-				dropdownItem.setIcon("trash");
+
+				dropdownItem.setIcon("times-circle");
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "delete"));
 				dropdownItem.setQuickAction(true);
@@ -146,12 +123,15 @@ public class LayoutsAdminManagementToolbarDisplayContext
 
 	@Override
 	public CreationMenu getCreationMenu() {
+		long firstLayoutPageTemplateCollectionId =
+			_layoutsAdminDisplayContext.
+				getFirstLayoutPageTemplateCollectionId();
 		Layout selLayout = _layoutsAdminDisplayContext.getSelLayout();
 		long selPlid = _layoutsAdminDisplayContext.getSelPlid();
 
 		return CreationMenuBuilder.addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPublicLayouts() &&
+				_layoutsAdminDisplayContext.isShowPublicPages() &&
 				_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				(!_layoutsAdminDisplayContext.isPrivateLayout() ||
@@ -160,12 +140,14 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			dropdownItem -> {
 				dropdownItem.setHref(
 					_layoutsAdminDisplayContext.
-						getSelectLayoutPageTemplateEntryURL(0, selPlid, false));
+						getSelectLayoutPageTemplateEntryURL(
+							firstLayoutPageTemplateCollectionId, selPlid,
+							false));
 				dropdownItem.setLabel(_getLabel(false));
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPublicLayouts() &&
+				_layoutsAdminDisplayContext.isShowPublicPages() &&
 				_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				(!_layoutsAdminDisplayContext.isPrivateLayout() ||
@@ -179,7 +161,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowUserPrivateLayouts() &&
+				_layoutsAdminDisplayContext.isShowPrivatePages() &&
 				((_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				  _layoutsAdminDisplayContext.isPrivateLayout()) ||
@@ -188,12 +170,14 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			dropdownItem -> {
 				dropdownItem.setHref(
 					_layoutsAdminDisplayContext.
-						getSelectLayoutPageTemplateEntryURL(0, selPlid, true));
+						getSelectLayoutPageTemplateEntryURL(
+							firstLayoutPageTemplateCollectionId, selPlid,
+							true));
 				dropdownItem.setLabel(_getLabel(true));
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowUserPrivateLayouts() &&
+				_layoutsAdminDisplayContext.isShowPrivatePages() &&
 				(_layoutsAdminDisplayContext.isPrivateLayout() ||
 				 _layoutsAdminDisplayContext.isFirstColumn() ||
 				 !_layoutsAdminDisplayContext.hasLayouts()),
@@ -274,7 +258,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -313,12 +297,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 				httpServletRequest, "private-collection-page");
 		}
 
-		if (_layoutsAdminDisplayContext.isPrivateLayoutsEnabled()) {
-			return LanguageUtil.get(
-				httpServletRequest, "public-collection-page");
-		}
-
-		return LanguageUtil.get(httpServletRequest, "collection-page");
+		return LanguageUtil.get(httpServletRequest, "public-collection-page");
 	}
 
 	private String _getLabel(boolean privateLayout) {
@@ -339,11 +318,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			return LanguageUtil.get(httpServletRequest, "private-page");
 		}
 
-		if (_layoutsAdminDisplayContext.isPrivateLayoutsEnabled()) {
-			return LanguageUtil.get(httpServletRequest, "public-page");
-		}
-
-		return LanguageUtil.get(httpServletRequest, "page");
+		return LanguageUtil.get(httpServletRequest, "public-page");
 	}
 
 	private boolean _isSiteTemplate() {
@@ -368,6 +343,5 @@ public class LayoutsAdminManagementToolbarDisplayContext
 
 	private final LayoutsAdminDisplayContext _layoutsAdminDisplayContext;
 	private final ThemeDisplay _themeDisplay;
-	private final TranslationURLProvider _translationURLProvider;
 
 }

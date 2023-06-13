@@ -14,6 +14,7 @@
 
 package com.liferay.blogs.internal.upgrade.v2_2_0;
 
+import com.liferay.blogs.internal.upgrade.v2_2_0.util.BlogsEntryTable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 
@@ -25,15 +26,18 @@ public class BlogsEntryExternalReferenceCodeUpgradeProcess
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		if (!hasColumn("BlogsEntry", "externalReferenceCode")) {
-			alterTableAddColumn(
-				"BlogsEntry", "externalReferenceCode", "VARCHAR(75)");
+		if (!hasColumn(BlogsEntryTable.TABLE_NAME, "externalReferenceCode")) {
+			alter(
+				BlogsEntryTable.class,
+				new AlterTableAddColumn(
+					"externalReferenceCode", "VARCHAR(75)"));
 
 			runSQL(
 				StringBundler.concat(
-					"update BlogsEntry set externalReferenceCode = ",
-					"CAST_TEXT(entryId) where externalReferenceCode is null ",
-					"or externalReferenceCode = ''"));
+					"update ", BlogsEntryTable.TABLE_NAME,
+					" set externalReferenceCode = CAST_TEXT(entryId) where ",
+					"externalReferenceCode is null or externalReferenceCode =",
+					"''"));
 		}
 	}
 

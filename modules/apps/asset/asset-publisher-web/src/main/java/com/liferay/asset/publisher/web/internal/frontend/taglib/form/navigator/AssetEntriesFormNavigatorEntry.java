@@ -44,11 +44,6 @@ public class AssetEntriesFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public boolean isVisible(User user, Object object) {
 		if (isManualSelection()) {
 			return true;
@@ -58,14 +53,17 @@ public class AssetEntriesFormNavigatorEntry
 	}
 
 	@Override
-	protected String getJspPath() {
-		return "/configuration/asset_entries.jsp";
-	}
-
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)",
 		unbind = "-"
 	)
-	private ServletContext _servletContext;
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
+	protected String getJspPath() {
+		return "/configuration/asset_entries.jsp";
+	}
 
 }

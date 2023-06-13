@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,12 +48,10 @@ import com.liferay.redirect.model.RedirectNotFoundEntryTable;
 import com.liferay.redirect.model.impl.RedirectNotFoundEntryImpl;
 import com.liferay.redirect.model.impl.RedirectNotFoundEntryModelImpl;
 import com.liferay.redirect.service.persistence.RedirectNotFoundEntryPersistence;
-import com.liferay.redirect.service.persistence.RedirectNotFoundEntryUtil;
 import com.liferay.redirect.service.persistence.impl.constants.RedirectPersistenceConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -78,7 +77,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = RedirectNotFoundEntryPersistence.class)
+@Component(
+	service = {RedirectNotFoundEntryPersistence.class, BasePersistence.class}
+)
 public class RedirectNotFoundEntryPersistenceImpl
 	extends BasePersistenceImpl<RedirectNotFoundEntry>
 	implements RedirectNotFoundEntryPersistence {
@@ -196,7 +197,7 @@ public class RedirectNotFoundEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RedirectNotFoundEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (RedirectNotFoundEntry redirectNotFoundEntry : list) {
@@ -564,7 +565,7 @@ public class RedirectNotFoundEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -679,8 +680,7 @@ public class RedirectNotFoundEntryPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_U, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_U, finderArgs);
 		}
 
 		if (result instanceof RedirectNotFoundEntry) {
@@ -792,7 +792,7 @@ public class RedirectNotFoundEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, url};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1336,7 +1336,7 @@ public class RedirectNotFoundEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RedirectNotFoundEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1406,7 +1406,7 @@ public class RedirectNotFoundEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1500,31 +1500,11 @@ public class RedirectNotFoundEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "url"}, false);
-
-		_setRedirectNotFoundEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setRedirectNotFoundEntryUtilPersistence(null);
-
 		entityCache.removeCache(RedirectNotFoundEntryImpl.class.getName());
-	}
-
-	private void _setRedirectNotFoundEntryUtilPersistence(
-		RedirectNotFoundEntryPersistence redirectNotFoundEntryPersistence) {
-
-		try {
-			Field field = RedirectNotFoundEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, redirectNotFoundEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -1587,5 +1567,9 @@ public class RedirectNotFoundEntryPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private RedirectNotFoundEntryModelArgumentsResolver
+		_redirectNotFoundEntryModelArgumentsResolver;
 
 }

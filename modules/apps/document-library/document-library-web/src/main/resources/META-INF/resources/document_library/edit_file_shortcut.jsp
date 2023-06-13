@@ -38,35 +38,33 @@ renderResponse.setTitle(dlEditFileShortcutDisplayContext.getTitle());
 		<liferay-ui:error exception="<%= FileShortcutPermissionException.class %>" message="you-do-not-have-permission-to-create-a-shortcut-to-the-selected-document" />
 		<liferay-ui:error exception="<%= NoSuchFileEntryException.class %>" message="the-document-could-not-be-found" />
 
-		<div class="sheet">
-			<div class="panel-group panel-group-flush">
-				<aui:fieldset>
-					<div class="alert alert-info">
-						<liferay-ui:message key="you-can-create-a-shortcut-to-any-document-that-you-have-read-access-for" />
-					</div>
-
-					<div class="form-group">
-						<aui:input label="document" name="toFileEntryTitle" type="resource" value="<%= dlEditFileShortcutDisplayContext.getToFileEntryTitle() %>" />
-
-						<aui:button name="selectToFileEntryButton" value="select" />
-					</div>
-				</aui:fieldset>
-
-				<c:if test="<%= dlEditFileShortcutDisplayContext.isPermissionConfigurable() %>">
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-						<liferay-ui:input-permissions
-							modelName="<%= DLFileShortcutConstants.getClassName() %>"
-						/>
-					</aui:fieldset>
-				</c:if>
-
-				<div class="sheet-footer">
-					<aui:button type="submit" />
-
-					<aui:button href="<%= redirect %>" type="cancel" />
+		<aui:fieldset-group markupView="lexicon">
+			<aui:fieldset>
+				<div class="alert alert-info">
+					<liferay-ui:message key="you-can-create-a-shortcut-to-any-document-that-you-have-read-access-for" />
 				</div>
+
+				<div class="form-group">
+					<aui:input label="document" name="toFileEntryTitle" type="resource" value="<%= dlEditFileShortcutDisplayContext.getToFileEntryTitle() %>" />
+
+					<aui:button name="selectToFileEntryButton" value="select" />
+				</div>
+			</aui:fieldset>
+
+			<c:if test="<%= dlEditFileShortcutDisplayContext.isPermissionConfigurable() %>">
+				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
+					<liferay-ui:input-permissions
+						modelName="<%= DLFileShortcutConstants.getClassName() %>"
+					/>
+				</aui:fieldset>
+			</c:if>
+
+			<div class="sheet-footer">
+				<aui:button type="submit" />
+
+				<aui:button href="<%= redirect %>" type="cancel" />
 			</div>
-		</div>
+		</aui:fieldset-group>
 	</aui:form>
 </clay:container-fluid>
 

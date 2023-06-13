@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -34,8 +33,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface PhoneModel
-	extends AttachedModel, BaseModel<Phone>, CTModel<Phone>, MVCCModel,
-			ShardedModel, StagedAuditedModel {
+	extends AttachedModel, BaseModel<Phone>, MVCCModel, ShardedModel,
+			StagedAuditedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -48,7 +47,6 @@ public interface PhoneModel
 	 *
 	 * @return the primary key of this phone
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -56,7 +54,6 @@ public interface PhoneModel
 	 *
 	 * @param primaryKey the primary key of this phone
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -74,22 +71,6 @@ public interface PhoneModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this phone.
-	 *
-	 * @return the ct collection ID of this phone
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this phone.
-	 *
-	 * @param ctCollectionId the ct collection ID of this phone
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this phone.
@@ -292,18 +273,18 @@ public interface PhoneModel
 	public void setExtension(String extension);
 
 	/**
-	 * Returns the list type ID of this phone.
+	 * Returns the type ID of this phone.
 	 *
-	 * @return the list type ID of this phone
+	 * @return the type ID of this phone
 	 */
-	public long getListTypeId();
+	public long getTypeId();
 
 	/**
-	 * Sets the list type ID of this phone.
+	 * Sets the type ID of this phone.
 	 *
-	 * @param listTypeId the list type ID of this phone
+	 * @param typeId the type ID of this phone
 	 */
-	public void setListTypeId(long listTypeId);
+	public void setTypeId(long typeId);
 
 	/**
 	 * Returns the primary of this phone.
@@ -328,9 +309,5 @@ public interface PhoneModel
 
 	@Override
 	public Phone cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

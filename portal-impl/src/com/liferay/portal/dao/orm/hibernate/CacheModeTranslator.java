@@ -38,8 +38,7 @@ public class CacheModeTranslator {
 			return org.hibernate.CacheMode.REFRESH;
 		}
 
-		return org.hibernate.CacheMode.interpretExternalSetting(
-			cacheMode.getName());
+		return org.hibernate.CacheMode.parse(cacheMode.getName());
 	}
 
 }

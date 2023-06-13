@@ -14,23 +14,26 @@
 
 package com.liferay.portal.search.web.internal.portlet.shared.task;
 
-import com.liferay.portal.search.web.internal.portlet.shared.task.helper.PortletSharedRequestHelper;
+import com.liferay.portal.kernel.util.Props;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.web.portlet.shared.task.PortletSharedTask;
 import com.liferay.portal.search.web.portlet.shared.task.PortletSharedTaskExecutor;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.portlet.RenderRequest;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author André de Oliveira
  */
-@Component(service = PortletSharedTaskExecutor.class)
+@Component(immediate = true, service = PortletSharedTaskExecutor.class)
 public class PortletSharedTaskExecutorImpl
 	implements PortletSharedTaskExecutor {
 
@@ -39,27 +42,28 @@ public class PortletSharedTaskExecutorImpl
 		PortletSharedTask<T> portletSharedTask, String attributeSuffix,
 		RenderRequest renderRequest) {
 
-		FutureTask<T> futureTask = null;
+		String attributeName = _requestSharedAttribute.concat(attributeSuffix);
 
-		AtomicBoolean oldTaskExists = new AtomicBoolean(true);
-
-		String attributeName = "LIFERAY_SHARED_" + attributeSuffix;
+		Optional<FutureTask<T>> oldFutureTaskOptional;
+		FutureTask<T> futureTask;
 
 		synchronized (renderRequest) {
-			futureTask = portletSharedRequestHelper.getAttribute(
+			oldFutureTaskOptional = portletSharedRequestHelper.getAttribute(
 				attributeName, renderRequest);
 
-			if (futureTask == null) {
-				futureTask = new FutureTask<>(portletSharedTask::execute);
+			futureTask = oldFutureTaskOptional.orElseGet(
+				() -> {
+					FutureTask<T> newFutureTask = new FutureTask<>(
+						portletSharedTask::execute);
 
-				portletSharedRequestHelper.setAttribute(
-					attributeName, futureTask, renderRequest);
+					portletSharedRequestHelper.setAttribute(
+						attributeName, newFutureTask, renderRequest);
 
-				oldTaskExists.set(false);
-			}
+					return newFutureTask;
+				});
 		}
 
-		if (!oldTaskExists.get()) {
+		if (!oldFutureTaskOptional.isPresent()) {
 			futureTask.run();
 		}
 
@@ -71,7 +75,22 @@ public class PortletSharedTaskExecutorImpl
 		}
 	}
 
+	@Activate
+	protected void activate() {
+		String[] requestSharedAttributes = props.getArray(
+			PropsKeys.REQUEST_SHARED_ATTRIBUTES);
+
+		Arrays.sort(requestSharedAttributes);
+
+		_requestSharedAttribute = requestSharedAttributes[0];
+	}
+
 	@Reference
 	protected PortletSharedRequestHelper portletSharedRequestHelper;
+
+	@Reference
+	protected Props props;
+
+	private String _requestSharedAttribute;
 
 }

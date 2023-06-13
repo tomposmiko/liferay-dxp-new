@@ -107,7 +107,7 @@ export default function fieldChange({
 
 				dispatch({payload: properties, type: EVENT_TYPES.FIELD.CHANGE});
 
-				if (REVALIDATE_UPDATES.length) {
+				if (REVALIDATE_UPDATES.length > 0) {
 
 					// All nonevaluable operations that were performed after the request
 					// was sent are used here to revalidate the new data

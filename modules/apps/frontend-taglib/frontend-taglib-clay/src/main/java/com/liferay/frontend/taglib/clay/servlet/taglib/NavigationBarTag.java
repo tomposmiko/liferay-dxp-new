@@ -39,20 +39,12 @@ public class NavigationBarTag extends BaseContainerTag {
 		return super.doStartTag();
 	}
 
-	public String getActiveItemAriaCurrent() {
-		return _activeItemAriaCurrent;
-	}
-
 	public boolean getInverted() {
 		return _inverted;
 	}
 
 	public List<NavigationItem> getNavigationItems() {
 		return _navigationItems;
-	}
-
-	public void setActiveItemAriaCurrent(String activeItemAriaCurrent) {
-		_activeItemAriaCurrent = activeItemAriaCurrent;
 	}
 
 	public void setInverted(boolean inverted) {
@@ -67,19 +59,17 @@ public class NavigationBarTag extends BaseContainerTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
-		_activeItemAriaCurrent = "page";
 		_inverted = false;
 		_navigationItems = null;
 	}
 
 	@Override
 	protected String getHydratedModuleName() {
-		return "{NavigationBar} from frontend-taglib-clay";
+		return "frontend-taglib-clay/NavigationBar";
 	}
 
 	@Override
 	protected Map<String, Object> prepareProps(Map<String, Object> props) {
-		props.put("activeItemAriaCurrent", _activeItemAriaCurrent);
 		props.put("inverted", _inverted);
 		props.put("navigationItems", _navigationItems);
 
@@ -151,7 +141,6 @@ public class NavigationBarTag extends BaseContainerTag {
 
 	private static final String _ATTRIBUTE_NAMESPACE = "clay:navigation_bar:";
 
-	private String _activeItemAriaCurrent = "page";
 	private boolean _inverted;
 	private List<NavigationItem> _navigationItems;
 

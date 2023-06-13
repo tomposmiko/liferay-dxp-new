@@ -14,9 +14,6 @@
 
 package com.liferay.bean.portlet.spring.extension.internal;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.beans.PropertyDescriptor;
 
 import java.lang.annotation.Annotation;
@@ -66,9 +63,6 @@ public class JSR330BeanPortletPostProcessor
 			_autowiredAnnotationTypes.add(injectAnnotation);
 		}
 		catch (ClassNotFoundException classNotFoundException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(classNotFoundException);
-			}
 		}
 
 		_autowiredAnnotationTypes.add(Value.class);
@@ -276,9 +270,6 @@ public class JSR330BeanPortletPostProcessor
 
 		return injectionMetadata;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		JSR330BeanPortletPostProcessor.class);
 
 	private final Set<Class<? extends Annotation>> _autowiredAnnotationTypes =
 		new LinkedHashSet<>();

@@ -20,14 +20,14 @@ import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.web.internal.util.JournalPortletUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -63,21 +63,32 @@ public class JournalHistoryDisplayContext {
 		SearchContainer<JournalArticle> articleSearchContainer =
 			new SearchContainer(_renderRequest, getPortletURL(), null, null);
 
-		articleSearchContainer.setOrderByCol(getOrderByCol());
-		articleSearchContainer.setOrderByComparator(
-			JournalPortletUtil.getArticleOrderByComparator(
-				getOrderByCol(), getOrderByType()));
-		articleSearchContainer.setOrderByType(getOrderByType());
-		articleSearchContainer.setResultsAndTotal(
-			() -> JournalArticleServiceUtil.getArticlesByArticleId(
-				_article.getGroupId(), _article.getArticleId(),
-				articleSearchContainer.getStart(),
-				articleSearchContainer.getEnd(),
-				articleSearchContainer.getOrderByComparator()),
-			JournalArticleServiceUtil.getArticlesCountByArticleId(
-				_article.getGroupId(), _article.getArticleId()));
 		articleSearchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(_renderResponse));
+
+		articleSearchContainer.setOrderByCol(getOrderByCol());
+
+		OrderByComparator<JournalArticle> orderByComparator =
+			JournalPortletUtil.getArticleOrderByComparator(
+				getOrderByCol(), getOrderByType());
+
+		articleSearchContainer.setOrderByComparator(orderByComparator);
+
+		articleSearchContainer.setOrderByType(getOrderByType());
+
+		int articleVersionsCount =
+			JournalArticleServiceUtil.getArticlesCountByArticleId(
+				_article.getGroupId(), _article.getArticleId());
+
+		articleSearchContainer.setTotal(articleVersionsCount);
+
+		List<JournalArticle> articleVersions =
+			JournalArticleServiceUtil.getArticlesByArticleId(
+				_article.getGroupId(), _article.getArticleId(),
+				articleSearchContainer.getStart(),
+				articleSearchContainer.getEnd(), orderByComparator);
+
+		articleSearchContainer.setResults(articleVersions);
 
 		return articleSearchContainer;
 	}
@@ -98,8 +109,8 @@ public class JournalHistoryDisplayContext {
 		}
 
 		_displayStyle = SearchDisplayStyleUtil.getDisplayStyle(
-			_renderRequest, JournalPortletKeys.JOURNAL, "history-display-style",
-			"list");
+			PortalUtil.getHttpServletRequest(_renderRequest),
+			JournalPortletKeys.JOURNAL, "history-display-style", "list");
 
 		return _displayStyle;
 	}
@@ -115,25 +126,33 @@ public class JournalHistoryDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
+		if (_orderByCol != null) {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, JournalPortletKeys.JOURNAL,
-			"history-order-by-col", "version");
+		_orderByCol = ParamUtil.getString(
+			_renderRequest, "orderByCol", "version");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
+		if (_orderByType != null) {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, JournalPortletKeys.JOURNAL,
-			"history-order-by-type", "desc");
+		String orderByType = ParamUtil.getString(_renderRequest, "orderByType");
+
+		if (Validator.isNotNull(orderByType)) {
+			_portalPreferences.setValue(
+				JournalPortletKeys.JOURNAL, "orderByType", orderByType);
+		}
+		else {
+			orderByType = _portalPreferences.getValue(
+				JournalPortletKeys.JOURNAL, "orderByType", "asc");
+		}
+
+		_orderByType = orderByType;
 
 		return _orderByType;
 	}

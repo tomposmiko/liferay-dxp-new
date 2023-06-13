@@ -18,11 +18,7 @@ import ClayLayout from '@clayui/layout';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClaySticker from '@clayui/sticker';
 import classnames from 'classnames';
-import {
-	DRAG_TYPES,
-	useSetKeyboardDNDSourceItem,
-} from 'data-engine-js-components-web';
-import {sub} from 'frontend-js-web';
+import {DRAG_TYPES} from 'data-engine-js-components-web';
 import React, {useEffect, useState} from 'react';
 import {useDrag} from 'react-dnd';
 import {getEmptyImage} from 'react-dnd-html5-backend';
@@ -60,8 +56,6 @@ const FieldType = (props) => {
 		onDoubleClick,
 	} = props;
 
-	const setKeyboardDNDSourceItem = useSetKeyboardDNDSourceItem();
-
 	const [{dragging}, drag, preview] = useDrag({
 		canDrag: (_) => !disabled && draggable,
 		collect: (monitor) => ({
@@ -90,17 +84,6 @@ const FieldType = (props) => {
 		onDoubleClick?.({...props});
 	};
 
-	const handleOnKeyDown = (event) => {
-		if (event.key === ' ' || event.key === 'Enter') {
-			event.preventDefault();
-
-			setKeyboardDNDSourceItem({
-				dragType: 'add',
-				fieldType: props,
-			});
-		}
-	};
-
 	const [loading, setLoading] = useState(false);
 
 	const fieldIcon = ICONS[icon] ? ICONS[icon] : icon;
@@ -114,27 +97,15 @@ const FieldType = (props) => {
 				loading,
 			})}
 			data-field-type-name={name}
-			onClick={!disabled && onClick ? handleOnClick : null}
-			onDoubleClick={disabled ? null : handleOnDoubleClick}
-			ref={disabled ? null : drag}
-			role="button"
+			onClick={onClick && handleOnClick}
+			onDoubleClick={handleOnDoubleClick}
+			ref={drag}
 			title={label}
 			verticalAlign="center"
 		>
 			{draggable && dragAlignment === 'left' && (
 				<ClayLayout.ContentCol className="pl-2 pr-2">
-					<ClayButtonWithIcon
-						aria-label={sub(
-							Liferay.Language.get('press-enter-to-add-x-field'),
-							[label]
-						)}
-						disabled={disabled}
-						displayType="unstyled"
-						onKeyDown={disabled ? null : handleOnKeyDown}
-						role="application"
-						size="xs"
-						symbol="drag"
-					/>
+					<ClayIcon symbol="drag" />
 				</ClayLayout.ContentCol>
 			)}
 
@@ -151,18 +122,15 @@ const FieldType = (props) => {
 					<ClayIcon symbol={fieldIcon} />
 				</ClaySticker>
 			</ClayLayout.ContentCol>
-
 			<ClayLayout.ContentCol className="pr-2" expand>
 				<div className="d-flex list-group-title">
 					<span className="text-truncate">{label}</span>
-
 					{required && (
 						<span className="reference-mark">
 							<ClayIcon symbol="asterisk" />
 						</span>
 					)}
 				</div>
-
 				{description && (
 					<p className="list-group-subtitle text-truncate">
 						<small>{description}</small>

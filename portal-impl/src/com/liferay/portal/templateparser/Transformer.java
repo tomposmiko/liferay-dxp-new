@@ -111,9 +111,10 @@ public class Transformer {
 
 		String templateId = String.valueOf(contextObjects.get("template_id"));
 
-		Template template = getTemplate(
-			getTemplateId(templateId, companyId, companyGroupId, scopeGroupId),
-			script, langType);
+		templateId = getTemplateId(
+			templateId, companyId, companyGroupId, scopeGroupId);
+
+		Template template = getTemplate(templateId, script, langType);
 
 		try {
 			prepareTemplate(themeDisplay, template);

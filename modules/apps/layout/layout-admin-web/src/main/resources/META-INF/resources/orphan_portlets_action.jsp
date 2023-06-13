@@ -28,11 +28,9 @@ Portlet portlet = (Portlet)row.getObject();
 	<portlet:param name="selPlid" value="<%= String.valueOf(layoutsAdminDisplayContext.getSelPlid()) %>" />
 </portlet:actionURL>
 
-<clay:link
-	aria-label='<%= LanguageUtil.get(request, "delete") %>'
-	cssClass="lfr-portal-tooltip"
-	href="<%= deleteOrphanPortletsURL %>"
-	icon="trash"
-	monospaced="<%= true %>"
-	title='<%= LanguageUtil.get(request, "delete") %>'
+<liferay-ui:icon
+	icon="times-circle"
+	linkCssClass="icon-monospaced text-default"
+	markupView="lexicon"
+	url="<%= deleteOrphanPortletsURL %>"
 />

@@ -21,17 +21,17 @@ import com.liferay.portal.kernel.portlet.BaseControlPanelEntry;
 import com.liferay.portal.kernel.portlet.ControlPanelEntry;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.staging.constants.StagingProcessesPortletKeys;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + StagingProcessesPortletKeys.STAGING_PROCESSES,
 	service = ControlPanelEntry.class
 )
@@ -55,15 +55,15 @@ public class StagingProcessesControlPanelEntry extends BaseControlPanelEntry {
 		}
 
 		if (!group.isStaged() && !group.hasLocalOrRemoteStagingGroup() &&
-			(!_groupPermission.contains(
+			(!GroupPermissionUtil.contains(
 				permissionChecker, group, ActionKeys.MANAGE_STAGING) ||
-			 !_groupPermission.contains(
+			 !GroupPermissionUtil.contains(
 				 permissionChecker, group, ActionKeys.VIEW_STAGING))) {
 
 			return true;
 		}
 
-		if (!_groupPermission.contains(
+		if (!GroupPermissionUtil.contains(
 				permissionChecker, group, ActionKeys.VIEW_STAGING)) {
 
 			return true;
@@ -78,7 +78,7 @@ public class StagingProcessesControlPanelEntry extends BaseControlPanelEntry {
 			PermissionChecker permissionChecker, Group group, Portlet portlet)
 		throws PortalException {
 
-		if (_groupPermission.contains(
+		if (GroupPermissionUtil.contains(
 				permissionChecker, group, ActionKeys.VIEW_STAGING)) {
 
 			return true;
@@ -87,8 +87,5 @@ public class StagingProcessesControlPanelEntry extends BaseControlPanelEntry {
 		return super.hasAccessPermissionExplicitlyGranted(
 			permissionChecker, group, portlet);
 	}
-
-	@Reference
-	private GroupPermission _groupPermission;
 
 }

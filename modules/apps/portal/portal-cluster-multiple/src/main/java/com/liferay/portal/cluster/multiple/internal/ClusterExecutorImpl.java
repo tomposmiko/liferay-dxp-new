@@ -86,7 +86,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.portal.cluster.multiple.configuration.ClusterExecutorConfiguration",
-	enabled = false,
+	enabled = false, immediate = true,
 	service = {ClusterExecutor.class, ClusterExecutorImpl.class}
 )
 public class ClusterExecutorImpl implements ClusterExecutor {
@@ -235,6 +235,22 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 			new HashMapDictionary<String, Object>());
 	}
 
+	protected void configurePortalInstanceCommunications() {
+		if ((_localClusterNodeStatus == null) ||
+			Validator.isNull(_props.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL))) {
+
+			return;
+		}
+
+		ClusterNode localClusterNode = _localClusterNodeStatus.getClusterNode();
+
+		localClusterNode.setPortalProtocol(
+			_props.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL));
+
+		localClusterNode.setPortalInetSocketAddress(
+			getConfiguredPortalInetSocketAddress(_props));
+	}
+
 	@Deactivate
 	protected void deactivate() {
 		if (_clusterChannel != null) {
@@ -309,6 +325,13 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 		}
 	}
 
+	protected String generateClusterNodeId() {
+		UUID uuid = new UUID(
+			SecureRandomUtil.nextLong(), SecureRandomUtil.nextLong());
+
+		return uuid.toString();
+	}
+
 	protected ClusterChannel getClusterChannel() {
 		return _clusterChannel;
 	}
@@ -332,6 +355,54 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 		return null;
 	}
 
+	protected InetSocketAddress getConfiguredPortalInetSocketAddress(
+		Props props) {
+
+		String portalInstanceInetSocketAddress = props.get(
+			PropsKeys.PORTAL_INSTANCE_INET_SOCKET_ADDRESS);
+
+		if (Validator.isNull(portalInstanceInetSocketAddress)) {
+			throw new IllegalArgumentException(
+				"Portal instance host name and port needs to be set in the " +
+					"property \"portal.instance.inet.socket.address\"");
+		}
+
+		String[] parts = StringUtil.split(
+			portalInstanceInetSocketAddress, CharPool.COLON);
+
+		if (parts.length != 2) {
+			throw new IllegalArgumentException(
+				"Unable to parse the portal instance host name and port from " +
+					portalInstanceInetSocketAddress);
+		}
+
+		InetAddress hostInetAddress = null;
+
+		try {
+			hostInetAddress = InetAddress.getByName(parts[0]);
+		}
+		catch (UnknownHostException unknownHostException) {
+			throw new IllegalArgumentException(
+				"Unable to parse the portal instance host name and port from " +
+					portalInstanceInetSocketAddress,
+				unknownHostException);
+		}
+
+		int port = -1;
+
+		try {
+			port = GetterUtil.getIntegerStrict(parts[1]);
+		}
+		catch (NumberFormatException numberFormatException) {
+			throw new IllegalArgumentException(
+				"Unable to parse portal InetSocketAddress port from " +
+					portalInstanceInetSocketAddress,
+				numberFormatException);
+		}
+
+		return new InetSocketAddress(hostInetAddress, port);
+	}
+
 	protected ExecutorService getExecutorService() {
 		return _executorService;
 	}
@@ -345,7 +416,7 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 			Serializable result = clusterNodeResponse.getResult();
 
 			if (result instanceof ClusterNodeStatus) {
-				_memberJoined((ClusterNodeStatus)result);
+				memberJoined((ClusterNodeStatus)result);
 
 				return;
 			}
@@ -384,7 +455,7 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 		Serializable payload = clusterRequest.getPayload();
 
 		if (payload instanceof ClusterNodeStatus) {
-			_memberJoined((ClusterNodeStatus)payload);
+			memberJoined((ClusterNodeStatus)payload);
 
 			return ClusterNodeResponse.createResultClusterNodeResponse(
 				_localClusterNodeStatus.getClusterNode(),
@@ -420,18 +491,18 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 			channelName, clusterReceiver);
 
 		ClusterNode localClusterNode = new ClusterNode(
-			_generateClusterNodeId(), _clusterChannel.getBindInetAddress());
+			generateClusterNodeId(), _clusterChannel.getBindInetAddress());
 
 		_localClusterNodeStatus = new ClusterNodeStatus(
 			localClusterNode, _clusterChannel.getLocalAddress());
 
-		_memberJoined(_localClusterNodeStatus);
+		memberJoined(_localClusterNodeStatus);
 
 		sendNotifyRequest();
 
 		clusterReceiver.openLatch();
 
-		_configurePortalInstanceCommunications();
+		configurePortalInstanceCommunications();
 
 		manageDebugClusterEventListener();
 	}
@@ -449,9 +520,38 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 				 (_debugClusterEventListener != null)) {
 
 			removeClusterEventListener(_debugClusterEventListener);
-
-			_debugClusterEventListener = null;
 		}
+	}
+
+	protected boolean memberJoined(ClusterNodeStatus clusterNodeStatus) {
+		CompletableFuture<String> completableFuture =
+			_clusterNodeIdCompletableFutures.computeIfAbsent(
+				clusterNodeStatus.getAddress(),
+				key -> new CompletableFuture<>());
+
+		completableFuture.complete(clusterNodeStatus.getClusterNodeId());
+
+		ClusterNodeStatus oldClusterNodeStatus = _clusterNodeStatuses.put(
+			clusterNodeStatus.getClusterNodeId(), clusterNodeStatus);
+
+		if (oldClusterNodeStatus != null) {
+			if (!oldClusterNodeStatus.equals(clusterNodeStatus)) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Updated cluster node " +
+							clusterNodeStatus.getClusterNode());
+				}
+			}
+
+			return false;
+		}
+
+		ClusterEvent clusterEvent = ClusterEvent.join(
+			clusterNodeStatus.getClusterNode());
+
+		fireClusterEvent(clusterEvent);
+
+		return true;
 	}
 
 	protected void memberRemoved(List<Address> departAddresses) {
@@ -528,108 +628,6 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 
 	protected volatile ClusterExecutorConfiguration
 		clusterExecutorConfiguration;
-
-	private void _configurePortalInstanceCommunications() {
-		if ((_localClusterNodeStatus == null) ||
-			Validator.isNull(_props.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL))) {
-
-			return;
-		}
-
-		ClusterNode localClusterNode = _localClusterNodeStatus.getClusterNode();
-
-		localClusterNode.setPortalProtocol(
-			_props.get(PropsKeys.PORTAL_INSTANCE_PROTOCOL));
-
-		localClusterNode.setPortalInetSocketAddress(
-			_getConfiguredPortalInetSocketAddress(_props));
-	}
-
-	private String _generateClusterNodeId() {
-		UUID uuid = new UUID(
-			SecureRandomUtil.nextLong(), SecureRandomUtil.nextLong());
-
-		return uuid.toString();
-	}
-
-	private InetSocketAddress _getConfiguredPortalInetSocketAddress(
-		Props props) {
-
-		String portalInstanceInetSocketAddress = props.get(
-			PropsKeys.PORTAL_INSTANCE_INET_SOCKET_ADDRESS);
-
-		if (Validator.isNull(portalInstanceInetSocketAddress)) {
-			throw new IllegalArgumentException(
-				"Portal instance host name and port needs to be set in the " +
-					"property \"portal.instance.inet.socket.address\"");
-		}
-
-		String[] parts = StringUtil.split(
-			portalInstanceInetSocketAddress, CharPool.COLON);
-
-		if (parts.length != 2) {
-			throw new IllegalArgumentException(
-				"Unable to parse the portal instance host name and port from " +
-					portalInstanceInetSocketAddress);
-		}
-
-		InetAddress hostInetAddress = null;
-
-		try {
-			hostInetAddress = InetAddress.getByName(parts[0]);
-		}
-		catch (UnknownHostException unknownHostException) {
-			throw new IllegalArgumentException(
-				"Unable to parse the portal instance host name and port from " +
-					portalInstanceInetSocketAddress,
-				unknownHostException);
-		}
-
-		int port = -1;
-
-		try {
-			port = GetterUtil.getIntegerStrict(parts[1]);
-		}
-		catch (NumberFormatException numberFormatException) {
-			throw new IllegalArgumentException(
-				"Unable to parse portal InetSocketAddress port from " +
-					portalInstanceInetSocketAddress,
-				numberFormatException);
-		}
-
-		return new InetSocketAddress(hostInetAddress, port);
-	}
-
-	private boolean _memberJoined(ClusterNodeStatus clusterNodeStatus) {
-		CompletableFuture<String> completableFuture =
-			_clusterNodeIdCompletableFutures.computeIfAbsent(
-				clusterNodeStatus.getAddress(),
-				key -> new CompletableFuture<>());
-
-		completableFuture.complete(clusterNodeStatus.getClusterNodeId());
-
-		ClusterNodeStatus oldClusterNodeStatus = _clusterNodeStatuses.put(
-			clusterNodeStatus.getClusterNodeId(), clusterNodeStatus);
-
-		if (oldClusterNodeStatus != null) {
-			if (!oldClusterNodeStatus.equals(clusterNodeStatus)) {
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						"Updated cluster node " +
-							clusterNodeStatus.getClusterNode());
-				}
-			}
-
-			return false;
-		}
-
-		ClusterEvent clusterEvent = ClusterEvent.join(
-			clusterNodeStatus.getClusterNode());
-
-		fireClusterEvent(clusterEvent);
-
-		return true;
-	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ClusterExecutorImpl.class);

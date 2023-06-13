@@ -15,25 +15,38 @@
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayDropDown, {Align} from '@clayui/drop-down';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 
 import FrontendTokenSet from './FrontendTokenSet';
+import OldToolbar from './OldToolbar';
+import {StyleBookContext} from './StyleBookContext';
 import {config} from './config';
-import {useFrontendTokensValues} from './contexts/StyleBookEditorContext';
 
-export default React.memo(function Sidebar() {
+export default function Sidebar() {
+	const {frontendTokensValues = {}} = useContext(StyleBookContext);
 	const sidebarRef = useRef();
+
+	useEffect(() => {
+		if (sidebarRef.current) {
+			Object.values(frontendTokensValues).forEach(
+				({cssVariableMapping, value}) => {
+					sidebarRef.current.style.setProperty(
+						`--${cssVariableMapping}`,
+						value
+					);
+				}
+			);
+		}
+	}, [frontendTokensValues]);
 
 	return (
 		<div className="style-book-editor__sidebar" ref={sidebarRef}>
+			{!config.templatesPreviewEnabled && <OldToolbar />}
 			<div className="style-book-editor__sidebar-content">
 				<ThemeInformation />
 
 				{config.frontendTokenDefinition.frontendTokenCategories ? (
-					<>
-						<FrontendTokenCategories />
-						<UpdateStyle sidebarRef={sidebarRef} />
-					</>
+					<FrontendTokenCategories />
 				) : (
 					<ClayAlert className="m-3" displayType="info">
 						{Liferay.Language.get(
@@ -44,75 +57,27 @@ export default React.memo(function Sidebar() {
 			</div>
 		</div>
 	);
-});
-
-function UpdateStyle({sidebarRef}) {
-	const frontendTokensValues = useFrontendTokensValues();
-
-	useEffect(() => {
-		if (sidebarRef.current) {
-			sidebarRef.current.removeAttribute('style');
-
-			Object.values(frontendTokensValues).forEach(
-				({cssVariableMapping, value}) => {
-					sidebarRef.current.style.setProperty(
-						`--${cssVariableMapping}`,
-						value
-					);
-				}
-			);
-		}
-	}, [frontendTokensValues, sidebarRef]);
-
-	return null;
 }
 
 function ThemeInformation() {
 	return (
 		<div className="pb-3">
 			<p className="small text-secondary">
-				{IsValidFrontendTokenDefinition() ? (
-					config.isPrivateLayoutsEnabled ? (
-						Liferay.Language.get(
-							'this-token-definition-belongs-to-the-theme-set-for-public-pages'
-						)
-					) : (
-						Liferay.Language.get(
-							'this-token-definition-belongs-to-the-theme-set-for-pages'
-						)
-					)
-				) : (
-					<ClayAlert className="m-0" displayType="warning">
-						{Liferay.Language.get(
-							'the-current-theme-does-not-support-editing-style-book-values'
-						)}
-					</ClayAlert>
+				{Liferay.Language.get(
+					'this-token-definition-belongs-to-the-theme-set-for-public-pages'
 				)}
 			</p>
-
 			<p className="mb-0 small">
 				<span className="font-weight-semi-bold">
 					{`${Liferay.Language.get('theme')}: `}
 				</span>
-
 				{config.themeName}
 			</p>
 		</div>
 	);
 }
 
-function IsValidFrontendTokenDefinition() {
-	const frontendTokensValues = useFrontendTokensValues();
-	const frontendThemeValues = config.frontendTokens;
-
-	return Object.keys(frontendTokensValues).every(
-		(tokenValue) => frontendThemeValues[tokenValue]
-	);
-}
-
 function FrontendTokenCategories() {
-	const frontendTokensValues = useFrontendTokensValues();
-
 	const frontendTokenCategories =
 		config.frontendTokenDefinition.frontendTokenCategories;
 	const [active, setActive] = useState(false);
@@ -120,26 +85,12 @@ function FrontendTokenCategories() {
 		frontendTokenCategories[0]
 	);
 
-	const tokenValues = useMemo(() => {
-		const nextTokenValues = {...config.frontendTokens};
-
-		for (const [name, {value}] of Object.entries(frontendTokensValues)) {
-			nextTokenValues[name] = {
-				...nextTokenValues[name],
-				value: value || nextTokenValues[name].defaultValue,
-			};
-		}
-
-		return nextTokenValues;
-	}, [frontendTokensValues]);
-
 	return (
 		<>
 			{selectedCategory && (
 				<ClayDropDown
 					active={active}
 					alignmentPosition={Align.BottomLeft}
-					className="mb-4"
 					menuElementAttrs={{
 						containerProps: {
 							className: 'cadmin',
@@ -150,7 +101,7 @@ function FrontendTokenCategories() {
 						<ClayButton
 							className="form-control form-control-select form-control-sm mb-3 text-left"
 							displayType="secondary"
-							size="sm"
+							small
 							type="button"
 						>
 							{selectedCategory.label}
@@ -178,13 +129,12 @@ function FrontendTokenCategories() {
 			)}
 
 			{selectedCategory?.frontendTokenSets.map(
-				({frontendTokens, label, name}, index) => (
+				({frontendTokens, label, name}) => (
 					<FrontendTokenSet
 						frontendTokens={frontendTokens}
 						key={name}
 						label={label}
-						open={index === 0}
-						tokenValues={tokenValues}
+						name={name}
 					/>
 				)
 			)}

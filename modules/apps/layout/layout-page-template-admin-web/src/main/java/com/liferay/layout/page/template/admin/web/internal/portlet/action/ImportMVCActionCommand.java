@@ -14,10 +14,10 @@
 
 package com.liferay.layout.page.template.admin.web.internal.portlet.action;
 
-import com.liferay.layout.importer.LayoutsImporter;
-import com.liferay.layout.importer.LayoutsImporterResultEntry;
 import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminPortletKeys;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporter;
+import com.liferay.layout.page.template.importer.LayoutPageTemplatesImporterResultEntry;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
 		"mvc.command.name=/layout_page_template_admin/import"
@@ -57,7 +58,7 @@ public class ImportMVCActionCommand extends BaseMVCActionCommand {
 	protected void addSuccessMessage(
 		ActionRequest actionRequest, ActionResponse actionResponse) {
 
-		String successMessage = _language.get(
+		String successMessage = LanguageUtil.get(
 			_portal.getHttpServletRequest(actionRequest),
 			"the-file-was-processed-correctly");
 
@@ -84,22 +85,24 @@ public class ImportMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "overwrite", true);
 
 		try {
-			List<LayoutsImporterResultEntry> layoutsImporterResultEntries =
-				_layoutsImporter.importFile(
-					themeDisplay.getUserId(), themeDisplay.getScopeGroupId(),
-					layoutPageTemplateCollectionId, file, overwrite);
+			List<LayoutPageTemplatesImporterResultEntry>
+				layoutPageTemplatesImporterResultEntries =
+					_layoutPageTemplatesImporter.importFile(
+						themeDisplay.getUserId(),
+						themeDisplay.getScopeGroupId(),
+						layoutPageTemplateCollectionId, file, overwrite);
 
-			if (ListUtil.isEmpty(layoutsImporterResultEntries)) {
+			if (ListUtil.isEmpty(layoutPageTemplatesImporterResultEntries)) {
 				return;
 			}
 
 			SessionMessages.add(
-				actionRequest, "layoutsImporterResultEntries",
-				layoutsImporterResultEntries);
+				actionRequest, "layoutPageTemplatesImporterResultEntries",
+				layoutPageTemplatesImporterResultEntries);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			SessionErrors.add(actionRequest, exception.getClass(), exception);
@@ -112,10 +115,7 @@ public class ImportMVCActionCommand extends BaseMVCActionCommand {
 		ImportMVCActionCommand.class);
 
 	@Reference
-	private Language _language;
-
-	@Reference
-	private LayoutsImporter _layoutsImporter;
+	private LayoutPageTemplatesImporter _layoutPageTemplatesImporter;
 
 	@Reference
 	private Portal _portal;

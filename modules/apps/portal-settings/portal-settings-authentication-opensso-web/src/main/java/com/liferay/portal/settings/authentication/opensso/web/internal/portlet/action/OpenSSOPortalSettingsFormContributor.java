@@ -18,6 +18,8 @@ import com.liferay.portal.security.sso.opensso.constants.OpenSSOConstants;
 import com.liferay.portal.settings.authentication.opensso.web.internal.constants.PortalSettingsOpenSSOConstants;
 import com.liferay.portal.settings.portlet.action.PortalSettingsFormContributor;
 
+import java.util.Optional;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
@@ -27,13 +29,13 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Philip Jones
  */
-@Component(service = PortalSettingsFormContributor.class)
+@Component(immediate = true, service = PortalSettingsFormContributor.class)
 public class OpenSSOPortalSettingsFormContributor
 	implements PortalSettingsFormContributor {
 
 	@Override
-	public String getDeleteMVCActionCommandName() {
-		return "/portal_settings/opensso_delete";
+	public Optional<String> getDeleteMVCActionCommandNameOptional() {
+		return Optional.of("/portal_settings/opensso_delete");
 	}
 
 	@Override
@@ -42,8 +44,8 @@ public class OpenSSOPortalSettingsFormContributor
 	}
 
 	@Override
-	public String getSaveMVCActionCommandName() {
-		return "/portal_settings/opensso";
+	public Optional<String> getSaveMVCActionCommandNameOptional() {
+		return Optional.of("/portal_settings/opensso");
 	}
 
 	@Override

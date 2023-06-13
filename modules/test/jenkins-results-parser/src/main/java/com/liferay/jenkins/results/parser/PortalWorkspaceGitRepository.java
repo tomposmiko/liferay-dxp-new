@@ -49,21 +49,18 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 		MultiPattern multiPattern = new MultiPattern(
 			ciTestRelevantBypassFilePathPatterns.split("\\s*,\\s*"));
 
-		List<String> filePaths = new ArrayList<>();
+		List<String> modifiedFilePaths = new ArrayList<>();
 
 		GitWorkingDirectory gitWorkingDirectory = getGitWorkingDirectory();
 
 		for (File modifiedFile : gitWorkingDirectory.getModifiedFilesList()) {
-			filePaths.add(
+			modifiedFilePaths.add(
 				JenkinsResultsParserUtil.getCanonicalPath(modifiedFile));
 		}
 
-		for (File deletedFile : gitWorkingDirectory.getDeletedFilesList()) {
-			filePaths.add(
-				JenkinsResultsParserUtil.getCanonicalPath(deletedFile));
-		}
+		if (!multiPattern.matchesAll(
+				modifiedFilePaths.toArray(new String[0]))) {
 
-		if (!multiPattern.matchesAll(filePaths.toArray(new String[0]))) {
 			return false;
 		}
 
@@ -122,26 +119,13 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 			return;
 		}
 
-		Retryable<Object> setupProfileDXPRetryable = new Retryable<Object>(
-			true, _SETUP_PROFILE_DXP_RETRY_COUNT,
-			_SETUP_PROFILE_DXP_RETRY_DELAY, true) {
-
-			@Override
-			public Object execute() {
-				try {
-					AntUtil.callTarget(
-						getDirectory(), "build.xml", "setup-profile-dxp");
-				}
-				catch (AntException antException) {
-					throw new RuntimeException(antException);
-				}
-
-				return null;
-			}
-
-		};
-
-		setupProfileDXPRetryable.executeWithRetries();
+		try {
+			AntUtil.callTarget(
+				getDirectory(), "build.xml", "setup-profile-dxp");
+		}
+		catch (AntException antException) {
+			throw new RuntimeException(antException);
+		}
 	}
 
 	public void setUpTCKHome() {
@@ -221,17 +205,7 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 	}
 
 	private Properties _getPortalTestProperties() {
-		Properties testProperties = getProperties("portal.test.properties");
-
-		String companyDefaultLocale = System.getenv(
-			"TEST_COMPANY_DEFAULT_LOCALE");
-
-		if (!JenkinsResultsParserUtil.isNullOrEmpty(companyDefaultLocale)) {
-			testProperties.setProperty(
-				"test.company.default.locale", companyDefaultLocale);
-		}
-
-		return testProperties;
+		return getProperties("portal.test.properties");
 	}
 
 	private void _writeAppServerPropertiesFile() {
@@ -278,9 +252,5 @@ public class PortalWorkspaceGitRepository extends BaseWorkspaceGitRepository {
 					"test.", System.getenv("HOSTNAME"), ".properties")),
 			_getPortalTestProperties(), true);
 	}
-
-	private static final int _SETUP_PROFILE_DXP_RETRY_COUNT = 2;
-
-	private static final int _SETUP_PROFILE_DXP_RETRY_DELAY = 5;
 
 }

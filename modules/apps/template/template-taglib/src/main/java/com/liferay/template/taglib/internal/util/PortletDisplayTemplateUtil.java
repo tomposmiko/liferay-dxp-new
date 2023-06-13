@@ -15,34 +15,46 @@
 package com.liferay.template.taglib.internal.util;
 
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
+@Component(immediate = true, service = {})
 public class PortletDisplayTemplateUtil {
 
-	public static String getDisplayStyle(String ddmTemplateKey) {
-		PortletDisplayTemplate portletDisplayTemplate =
-			_portletDisplayTemplateSnapshot.get();
+	public static long getDDMTemplateGroupId(long groupId) {
+		return _portletDisplayTemplate.getDDMTemplateGroupId(groupId);
+	}
 
-		return portletDisplayTemplate.getDisplayStyle(ddmTemplateKey);
+	public static String getDisplayStyle(String ddmTemplateKey) {
+		return _portletDisplayTemplate.getDisplayStyle(ddmTemplateKey);
 	}
 
 	public static DDMTemplate getPortletDisplayTemplateDDMTemplate(
 		long groupId, long classNameId, String displayStyle,
 		boolean useDefault) {
 
-		PortletDisplayTemplate portletDisplayTemplate =
-			_portletDisplayTemplateSnapshot.get();
-
-		return portletDisplayTemplate.getPortletDisplayTemplateDDMTemplate(
+		return _portletDisplayTemplate.getPortletDisplayTemplateDDMTemplate(
 			groupId, classNameId, displayStyle, useDefault);
 	}
 
-	private static final Snapshot<PortletDisplayTemplate>
-		_portletDisplayTemplateSnapshot = new Snapshot<>(
-			PortletDisplayTemplateUtil.class, PortletDisplayTemplate.class);
+	@Deactivate
+	protected void deactivate() {
+		_portletDisplayTemplate = null;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortletDisplayTemplate(
+		PortletDisplayTemplate portletDisplayTemplate) {
+
+		_portletDisplayTemplate = portletDisplayTemplate;
+	}
+
+	private static PortletDisplayTemplate _portletDisplayTemplate;
 
 }

@@ -18,7 +18,7 @@ import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -32,12 +32,12 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-site-settings",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -48,8 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -67,7 +66,7 @@ public class SiteSettingsPortlet extends MVCPortlet {
 			renderRequest, "groupId", themeDisplay.getScopeGroupId());
 
 		try {
-			_groupPermission.check(
+			GroupPermissionUtil.check(
 				themeDisplay.getPermissionChecker(), groupId, ActionKeys.VIEW);
 		}
 		catch (PortalException portalException) {
@@ -76,8 +75,5 @@ public class SiteSettingsPortlet extends MVCPortlet {
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
-
-	@Reference
-	private GroupPermission _groupPermission;
 
 }

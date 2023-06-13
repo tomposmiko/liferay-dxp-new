@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Ivica Cardic
  */
-@Component(service = ConfigurationPidMapping.class)
+@Component(enabled = false, service = ConfigurationPidMapping.class)
 public class CPFriendlyURLConfigurationPidMapping
 	implements ConfigurationPidMapping {
 

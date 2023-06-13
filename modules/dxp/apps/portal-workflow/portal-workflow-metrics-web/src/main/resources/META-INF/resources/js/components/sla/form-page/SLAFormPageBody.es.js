@@ -61,14 +61,16 @@ function Body({history, id, processId, query}) {
 
 	usePageTitle(id ? sla.name : Liferay.Language.get('new-sla'));
 
-	const handleErrors = (dataError) => {
-		if (Array.isArray(dataError)) {
-			dataError.forEach(({fieldName, message}) => {
+	const handleErrors = (error) => {
+		const {data} = error.response || {};
+
+		if (Array.isArray(data)) {
+			data.forEach(({fieldName, message}) => {
 				errors[fieldName || ALERT_MESSAGE] = message;
 			});
 
 			const nodeKeys = [PAUSE_NODE_KEYS, START_NODE_KEYS, STOP_NODE_KEYS];
-			const nodeErrors = dataError.filter(({fieldName}) =>
+			const nodeErrors = data.filter(({fieldName}) =>
 				nodeKeys.includes(fieldName)
 			);
 

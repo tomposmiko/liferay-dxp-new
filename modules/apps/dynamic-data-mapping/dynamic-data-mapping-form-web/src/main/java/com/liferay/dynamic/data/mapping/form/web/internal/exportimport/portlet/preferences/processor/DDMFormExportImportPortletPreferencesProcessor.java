@@ -21,9 +21,7 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
-import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
-import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -48,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -65,23 +64,10 @@ public class DDMFormExportImportPortletPreferencesProcessor
 	}
 
 	@Override
-	public boolean isPublishDisplayedContent() {
-		return false;
-	}
-
-	@Override
 	public PortletPreferences processExportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
-
-		if (!MapUtil.getBoolean(
-				portletDataContext.getParameterMap(),
-				PortletDataHandlerKeys.PORTLET_DATA) &&
-			MergeLayoutPrototypesThreadLocal.isInProgress()) {
-
-			return portletPreferences;
-		}
 
 		try {
 			portletDataContext.addPortletPermissions(
@@ -141,9 +127,7 @@ public class DDMFormExportImportPortletPreferencesProcessor
 				return portletPreferences;
 			}
 
-			if (!group.isCompanyStagingGroup() && !group.isStaged() &&
-				!group.isStagingGroup()) {
-
+			if (!group.isCompanyStagingGroup() && !group.isStagingGroup()) {
 				return portletPreferences;
 			}
 		}
@@ -174,30 +158,19 @@ public class DDMFormExportImportPortletPreferencesProcessor
 				"Unable to export portlet permissions", portalException);
 		}
 
+		long importedFormInstanceId = GetterUtil.getLong(
+			portletPreferences.getValue("formInstanceId", null));
+
 		Map<Long, Long> formInstanceIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				DDMFormInstance.class);
 
-		long importedFormInstanceId = GetterUtil.getLong(
-			portletPreferences.getValue("formInstanceId", null));
-
 		long formInstanceId = MapUtil.getLong(
 			formInstanceIds, importedFormInstanceId, importedFormInstanceId);
-
-		Map<Long, Long> groupIds =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				Group.class);
-
-		long importedGroupId = GetterUtil.getLong(
-			portletPreferences.getValue("groupId", null));
-
-		long groupId = MapUtil.getLong(
-			groupIds, importedGroupId, importedGroupId);
 
 		try {
 			portletPreferences.setValue(
 				"formInstanceId", String.valueOf(formInstanceId));
-			portletPreferences.setValue("groupId", String.valueOf(groupId));
 		}
 		catch (ReadOnlyException readOnlyException) {
 			throw new PortletDataException(

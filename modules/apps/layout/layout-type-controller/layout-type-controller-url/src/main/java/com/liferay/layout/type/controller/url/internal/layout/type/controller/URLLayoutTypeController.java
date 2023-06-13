@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	property = "layout.type=" + LayoutConstants.TYPE_URL,
+	immediate = true, property = "layout.type=" + LayoutConstants.TYPE_URL,
 	service = LayoutTypeController.class
 )
 public class URLLayoutTypeController extends BaseLayoutTypeControllerImpl {
@@ -82,6 +82,22 @@ public class URLLayoutTypeController extends BaseLayoutTypeControllerImpl {
 		return false;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
+	}
+
 	@Override
 	protected ServletResponse createServletResponse(
 		HttpServletResponse httpServletResponse,
@@ -97,22 +113,20 @@ public class URLLayoutTypeController extends BaseLayoutTypeControllerImpl {
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	protected String getViewPage() {
 		return StringPool.BLANK;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.url)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 
 	private static final String _EDIT_PAGE = "/layout/edit/url.jsp";
 
 	private static final String _URL = "${url}";
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.url)"
-	)
-	private ServletContext _servletContext;
 
 }

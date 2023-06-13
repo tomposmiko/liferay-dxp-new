@@ -14,28 +14,22 @@
 
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo} from 'react';
 
-import {APP_LAYOUT_CONTENT_CLASS_NAME} from '../constants/appLayoutClassName';
-import {useConstants} from '../contexts/ConstantsContext';
 import {
 	useSetSidebarPanelId,
 	useSidebarPanelId,
 } from '../contexts/SidebarPanelIdContext';
-import DragPreview from './DragPreview';
-import KeyboardMovementText from './KeyboardMovementText';
 
 const DEFAULT_SIDEBAR_PANELS = [];
 
-export function AppLayout({
+export const AppLayout = ({
 	contentChildren,
 	sidebarPanels = DEFAULT_SIDEBAR_PANELS,
 	toolbarChildren,
-}) {
+}) => {
 	const setSidebarPanelId = useSetSidebarPanelId();
 	const sidebarPanelId = useSidebarPanelId();
-
-	const {portletNamespace} = useConstants();
 
 	const SidebarPanel = useMemo(
 		() =>
@@ -44,8 +38,6 @@ export function AppLayout({
 			)?.component,
 		[sidebarPanelId, sidebarPanels]
 	);
-
-	const appLayoutContentRef = useRef();
 
 	useEffect(() => {
 		const handler = onProductMenuOpen(() => setSidebarPanelId(null));
@@ -56,45 +48,32 @@ export function AppLayout({
 	}, [setSidebarPanelId]);
 
 	useEffect(() => {
+		setSidebarPanelId(null);
+	}, [setSidebarPanelId, sidebarPanels]);
+
+	useEffect(() => {
 		if (SidebarPanel) {
 			closeProductMenu();
 		}
 	}, [SidebarPanel]);
 
-	useEffect(() => {
-		const key = `${portletNamespace}itemAdded`;
-
-		const itemAdded = window.sessionStorage.getItem(key);
-
-		if (itemAdded) {
-			appLayoutContentRef.current?.scrollTo(
-				0,
-				appLayoutContentRef.current?.scrollHeight
-			);
-
-			window.sessionStorage.removeItem(key);
-		}
-	}, [portletNamespace]);
-
 	return (
 		<>
 			<div className="bg-white component-tbar tbar">
 				<div className="container-fluid container-fluid-max-xl">
-					<div className="cadmin px-1 tbar-nav">
-						{toolbarChildren}
-					</div>
+					<div className="px-1 tbar-nav">{toolbarChildren}</div>
 				</div>
 			</div>
 
 			<div
-				className={classNames(APP_LAYOUT_CONTENT_CLASS_NAME, {
-					[`${APP_LAYOUT_CONTENT_CLASS_NAME}--with-sidebar`]: !!SidebarPanel,
-				})}
-				ref={appLayoutContentRef}
+				className={classNames(
+					'align-items-stretch d-flex site_navigation_menu_editor_AppLayout-content',
+					{
+						'site_navigation_menu_editor_AppLayout-content--with-sidebar': !!SidebarPanel,
+					}
+				)}
 			>
-				<DragPreview wrapperRef={appLayoutContentRef} />
-
-				{contentChildren}
+				<div className="flex-grow-1">{contentChildren}</div>
 
 				<div
 					className={classNames(
@@ -106,12 +85,10 @@ export function AppLayout({
 				>
 					{SidebarPanel && <SidebarPanel />}
 				</div>
-
-				<KeyboardMovementText />
 			</div>
 		</>
 	);
-}
+};
 
 AppLayout.propTypes = {
 	contentChildren: PropTypes.node,

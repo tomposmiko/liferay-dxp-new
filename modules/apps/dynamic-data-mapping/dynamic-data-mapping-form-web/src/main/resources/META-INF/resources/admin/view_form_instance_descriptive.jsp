@@ -37,7 +37,7 @@ dateSearchEntry.setDate(ddmFormInstance.getModifiedDate());
 		<c:choose>
 			<c:when test="<%= hasValidDDMFormFields && hasValidStorageType %>">
 				<aui:a cssClass="form-instance-name" href="<%= (String)request.getAttribute(WebKeys.SEARCH_ENTRY_HREF) %>">
-					<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(ddmFormInstance.getName(locale))) %>
+					<%= HtmlUtil.escape(ddmFormInstance.getName(locale)) %>
 				</aui:a>
 			</c:when>
 			<c:otherwise>
@@ -62,7 +62,7 @@ dateSearchEntry.setDate(ddmFormInstance.getModifiedDate());
 					/>
 				</span>
 				<span class="invalid-form-instance">
-					<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(ddmFormInstance.getName(locale))) %>
+					<%= HtmlUtil.escape(ddmFormInstance.getName(locale)) %>
 				</span>
 			</c:otherwise>
 		</c:choose>
@@ -70,7 +70,7 @@ dateSearchEntry.setDate(ddmFormInstance.getModifiedDate());
 
 	<span class="text-default">
 		<div class="form-instance-description text-truncate">
-			<%= HtmlUtil.replaceNewLine(HtmlUtil.escape(ddmFormInstance.getDescription(locale))) %>
+			<%= HtmlUtil.escape(ddmFormInstance.getDescription(locale)) %>
 		</div>
 	</span>
 	<span class="text-default">

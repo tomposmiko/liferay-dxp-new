@@ -46,8 +46,6 @@ renderResponse.setTitle(group.getDescriptiveName(locale));
 
 	<clay:sheet>
 		<clay:sheet-header>
-			<liferay-ui:error exception="<%= ConfigurationModelListenerException.class %>" message="mime-type-size-limit-error" />
-
 			<h2 class="sheet-title"><%= formLabel %></h2>
 
 			<c:if test="<%= Validator.isNotNull(formDescription) %>">
@@ -55,9 +53,7 @@ renderResponse.setTitle(group.getDescriptiveName(locale));
 			</c:if>
 		</clay:sheet-header>
 
-		<clay:sheet-section
-			cssClass="lfr-depot-sheet-section"
-		>
+		<clay:sheet-section>
 			<liferay-util:include page="<%= jspPath %>" servletContext="<%= application %>" />
 		</clay:sheet-section>
 

@@ -73,7 +73,7 @@ const toggleRules = (managementToolbar) => {
  * Creates a simulation that this component is in React and deals with the
  * visibility of elements in the DOM and events such as click.
  */
-export function ManagementToolbar({
+export const ManagementToolbar = ({
 	onPlusClick,
 	onPreviewClick,
 	onPublishClick,
@@ -82,7 +82,7 @@ export function ManagementToolbar({
 	onShareClick,
 	portletNamespace,
 	variant = 'builder',
-}) {
+}) => {
 	const {published, showPublishAlert} = useConfig();
 
 	useEffect(() => {
@@ -159,4 +159,4 @@ export function ManagementToolbar({
 	);
 
 	return null;
-}
+};

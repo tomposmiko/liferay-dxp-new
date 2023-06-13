@@ -15,24 +15,24 @@
 AUI.add(
 	'liferay-calendar-util',
 	(A) => {
-		const DateMath = A.DataType.DateMath;
-		const Lang = A.Lang;
+		var DateMath = A.DataType.DateMath;
+		var Lang = A.Lang;
 
-		const Workflow = Liferay.Workflow;
+		var Workflow = Liferay.Workflow;
 
-		const isDate = Lang.isDate;
+		var isDate = Lang.isDate;
 
-		const toInt = function (value) {
+		var toInt = function (value) {
 			return Lang.toInt(value, 10, 0);
 		};
 
-		const REGEX_UNFILLED_PARAMETER = /\{\s*([^|}]+?)\s*(?:\|([^}]*))?\s*\}/g;
+		var REGEX_UNFILLED_PARAMETER = /\{\s*([^|}]+?)\s*(?:\|([^}]*))?\s*\}/g;
 
-		const STR_DASH = '-';
+		var STR_DASH = '-';
 
-		const STR_SPACE = ' ';
+		var STR_SPACE = ' ';
 
-		const Time = {
+		var Time = {
 			DAY: 86400000,
 			HOUR: 3600000,
 			MINUTE: 60000,
@@ -43,11 +43,11 @@ AUI.add(
 			TIME_DESC: ['weeks', 'days', 'hours', 'minutes'],
 
 			getDescription(milliseconds) {
-				let description = 'minutes';
-				let value = 0;
+				var description = 'minutes';
+				var value = 0;
 
 				if (milliseconds > 0) {
-					const timeArray = [
+					var timeArray = [
 						Time.WEEK,
 						Time.DAY,
 						Time.HOUR,
@@ -71,18 +71,18 @@ AUI.add(
 
 		Liferay.Time = Time;
 
-		const CalendarUtil = {
+		var CalendarUtil = {
 			NOTIFICATION_DEFAULT_TYPE: 'email',
 
 			createSchedulerEvent(calendarBooking) {
-				const endDate = new Date(
+				var endDate = new Date(
 					calendarBooking.endTimeYear,
 					calendarBooking.endTimeMonth,
 					calendarBooking.endTimeDay,
 					calendarBooking.endTimeHour,
 					calendarBooking.endTimeMinute
 				);
-				const startDate = new Date(
+				var startDate = new Date(
 					calendarBooking.startTimeYear,
 					calendarBooking.startTimeMonth,
 					calendarBooking.startTimeDay,
@@ -90,11 +90,10 @@ AUI.add(
 					calendarBooking.startTimeMinute
 				);
 
-				const schedulerEvent = new Liferay.SchedulerEvent({
+				var schedulerEvent = new Liferay.SchedulerEvent({
 					allDay: calendarBooking.allDay,
 					calendarBookingId: calendarBooking.calendarBookingId,
 					calendarId: calendarBooking.calendarId,
-					calendarResourceName: calendarBooking.calendarResourceName,
 					content: calendarBooking.title,
 					description: calendarBooking.description,
 					endDate: endDate.getTime(),
@@ -121,7 +120,7 @@ AUI.add(
 			},
 
 			destroyEvent(schedulerEvent) {
-				const scheduler = schedulerEvent.get('scheduler');
+				var scheduler = schedulerEvent.get('scheduler');
 
 				scheduler.removeEvents(schedulerEvent);
 
@@ -145,22 +144,22 @@ AUI.add(
 			},
 
 			getDateFromObject(object) {
-				const day = toInt(object.day);
-				const hour = toInt(object.hour);
-				const minute = toInt(object.minute);
-				const month = toInt(object.month);
-				const year = toInt(object.year);
+				var day = toInt(object.day);
+				var hour = toInt(object.hour);
+				var minute = toInt(object.minute);
+				var month = toInt(object.month);
+				var year = toInt(object.year);
 
 				return new Date(year, month, day, hour, minute);
 			},
 
 			getDatesList(startDate, total) {
-				const ADate = A.Date;
+				var ADate = A.Date;
 
-				const output = [];
+				var output = [];
 
 				if (ADate.isValidDate(startDate)) {
-					for (let i = 0; i < total; i++) {
+					for (var i = 0; i < total; i++) {
 						output.push(ADate.addDays(startDate, i));
 					}
 				}
@@ -169,7 +168,7 @@ AUI.add(
 			},
 
 			getLocalizationMap(value) {
-				const map = {};
+				var map = {};
 
 				map[themeDisplay.getLanguageId()] = value;
 
@@ -177,21 +176,19 @@ AUI.add(
 			},
 
 			setEventAttrs(schedulerEvent, data) {
-				const scheduler = schedulerEvent.get('scheduler');
+				var scheduler = schedulerEvent.get('scheduler');
 
-				const newCalendarId = data.calendarId;
+				var newCalendarId = data.calendarId;
 
-				const oldCalendarId = schedulerEvent.get('calendarId');
+				var oldCalendarId = schedulerEvent.get('calendarId');
 
 				if (scheduler) {
-					const calendarContainer = scheduler.get(
-						'calendarContainer'
-					);
+					var calendarContainer = scheduler.get('calendarContainer');
 
-					const newCalendar = calendarContainer.getCalendar(
+					var newCalendar = calendarContainer.getCalendar(
 						newCalendarId
 					);
-					const oldCalendar = calendarContainer.getCalendar(
+					var oldCalendar = calendarContainer.getCalendar(
 						oldCalendarId
 					);
 
@@ -251,7 +248,7 @@ AUI.add(
 			updateSchedulerEvents(schedulerEvents, calendarBooking) {
 				A.each(schedulerEvents, (schedulerEvent) => {
 					if (schedulerEvent.isRecurring()) {
-						const scheduler = schedulerEvent.get('scheduler');
+						var scheduler = schedulerEvent.get('scheduler');
 
 						scheduler.load();
 					}
@@ -263,7 +260,7 @@ AUI.add(
 
 		Liferay.CalendarUtil = CalendarUtil;
 
-		const CalendarWorkflow = {
+		var CalendarWorkflow = {
 			STATUS_MAYBE: 9,
 		};
 

@@ -20,14 +20,12 @@ import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
@@ -40,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class DEDataDefinitionFieldLinkStagedModelDataHandler
 	extends BaseStagedModelDataHandler<DEDataDefinitionFieldLink> {
 
@@ -86,20 +84,8 @@ public class DEDataDefinitionFieldLinkStagedModelDataHandler
 		Element deDataDefinitionFieldLinkElement =
 			portletDataContext.getExportDataElement(deDataDefinitionFieldLink);
 
-		String className = deDataDefinitionFieldLink.getClassName();
-
 		deDataDefinitionFieldLinkElement.addAttribute(
-			"link-class-name", className);
-
-		if (className.equals(DDMStructureLayout.class.getName())) {
-			DDMStructureLayout ddmStructureLayout =
-				_ddmStructureLayoutLocalService.getDDMStructureLayout(
-					deDataDefinitionFieldLink.getClassPK());
-
-			deDataDefinitionFieldLinkElement.addAttribute(
-				"layout-ddm-structure-id",
-				String.valueOf(ddmStructureLayout.getDDMStructureId()));
-		}
+			"link-class-name", deDataDefinitionFieldLink.getClassName());
 
 		portletDataContext.addClassedModel(
 			deDataDefinitionFieldLinkElement,
@@ -154,47 +140,25 @@ public class DEDataDefinitionFieldLinkStagedModelDataHandler
 			portletDataContext.getScopeGroupId());
 		importedDEDataDefinitionFieldLink.setCompanyId(
 			portletDataContext.getCompanyId());
-
-		String className = deDataDefinitionFieldLinkElement.attributeValue(
-			"link-class-name");
-
 		importedDEDataDefinitionFieldLink.setClassNameId(
-			_portal.getClassNameId(className));
-
-		if (className.equals(DDMStructureLayout.class.getName())) {
-			long layoutDDMStructureId = GetterUtil.getLong(
+			_portal.getClassNameId(
 				deDataDefinitionFieldLinkElement.attributeValue(
-					"layout-ddm-structure-id"));
-
-			layoutDDMStructureId = MapUtil.getLong(
-				ddmStructureIds, layoutDDMStructureId, layoutDDMStructureId);
-
-			DDMStructure ddmStructure =
-				_ddmStructureLocalService.getDDMStructure(layoutDDMStructureId);
-
-			DDMStructureVersion ddmStructureVersion =
-				ddmStructure.getStructureVersion();
-
-			DDMStructureLayout ddmStructureLayout =
-				_ddmStructureLayoutLocalService.
-					getStructureLayoutByStructureVersionId(
-						ddmStructureVersion.getStructureVersionId());
-
-			importedDEDataDefinitionFieldLink.setClassPK(
-				ddmStructureLayout.getStructureLayoutId());
-		}
-		else {
-			Map<Long, Long> newPrimaryKeysMap =
-				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-					className);
-
-			importedDEDataDefinitionFieldLink.setClassPK(
-				MapUtil.getLong(
-					newPrimaryKeysMap, deDataDefinitionFieldLink.getClassPK(),
-					deDataDefinitionFieldLink.getClassPK()));
-		}
-
+					"link-class-name")));
 		importedDEDataDefinitionFieldLink.setDdmStructureId(ddmStructureId);
+
+		DDMStructure ddmStructure = _ddmStructureLocalService.getDDMStructure(
+			ddmStructureId);
+
+		DDMStructureVersion structureVersion =
+			ddmStructure.getStructureVersion();
+
+		DDMStructureLayout structureLayout =
+			_ddmStructureLayoutLocalService.
+				getStructureLayoutByStructureVersionId(
+					structureVersion.getStructureVersionId());
+
+		importedDEDataDefinitionFieldLink.setClassPK(
+			structureLayout.getStructureLayoutId());
 
 		DEDataDefinitionFieldLink existingDEDataDefinitionFieldLink =
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
@@ -236,9 +200,6 @@ public class DEDataDefinitionFieldLinkStagedModelDataHandler
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
-	private DDMStructureVersionLocalService _ddmStructureVersionLocalService;
 
 	@Reference
 	private Portal _portal;

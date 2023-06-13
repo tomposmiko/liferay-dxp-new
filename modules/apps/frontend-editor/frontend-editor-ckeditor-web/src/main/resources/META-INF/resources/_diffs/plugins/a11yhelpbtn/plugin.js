@@ -13,31 +13,29 @@
  */
 
 (function () {
-	const pluginName = 'a11yhelpbtn';
+	var pluginName = 'a11yhelpbtn';
 
 	CKEDITOR.plugins.add(pluginName, {
 		init(editor) {
-			const helpText = CKEDITOR.env.mac ? ' Option+0' : ' Alt+0';
-
 			if (editor.ui.addButton) {
 				editor.ui.addButton('A11YBtn', {
 					command: 'a11yHelp',
-					label: Liferay.Language.get('action.HELP') + helpText,
+					label: Liferay.Language.get('action.HELP'),
 				});
 			}
 
 			editor.on('uiSpace', (event) => {
-				const toolbarHTML = event.data.html;
+				var toolbarHTML = event.data.html;
 
-				const a11ybtnIndex = toolbarHTML.indexOf('cke_button__a11ybtn');
+				var a11ybtnIndex = toolbarHTML.indexOf('cke_button__a11ybtn');
 
 				if (a11ybtnIndex !== -1) {
-					const a11ToolbarIndex = toolbarHTML.lastIndexOf(
+					var a11ToolbarIndex = toolbarHTML.lastIndexOf(
 						'class="cke_toolbar"',
 						a11ybtnIndex
 					);
 
-					let toolbarText = toolbarHTML
+					var toolbarText = toolbarHTML
 						.substr(a11ToolbarIndex)
 						.replace(
 							'class="cke_toolbar cke_toolbar_last"',

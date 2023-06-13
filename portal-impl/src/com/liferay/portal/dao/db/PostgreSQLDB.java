@@ -33,8 +33,6 @@ import java.sql.Types;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Alexander Chow
@@ -66,13 +64,6 @@ public class PostgreSQLDB extends BaseDB {
 
 	public PostgreSQLDB(int majorVersion, int minorVersion) {
 		super(DBType.POSTGRESQL, majorVersion, minorVersion);
-
-		if (majorVersion >= 13) {
-			_supportsNewUuidFunction = true;
-		}
-		else {
-			_supportsNewUuidFunction = false;
-		}
 	}
 
 	@Override
@@ -88,18 +79,10 @@ public class PostgreSQLDB extends BaseDB {
 	public List<Index> getIndexes(Connection connection) throws SQLException {
 		List<Index> indexes = new ArrayList<>();
 
-		// https://issues.liferay.com/browse/LPS-136307
-		// https://www.postgresql.org/docs/13/catalog-pg-index.html
-		// https://www.postgresql.org/docs/13/catalog-pg-class.html
-		// https://www.postgresql.org/docs/13/view-pg-indexes.html
-
 		String sql = StringBundler.concat(
-			"select pg_indexes.indexname, pg_indexes.tablename, ",
-			"pg_index.indisunique from pg_indexes, pg_index, pg_class where ",
-			"pg_indexes.schemaname = current_schema() and ",
-			"(pg_indexes.indexname like 'liferay_%' or pg_indexes.indexname ",
-			"like 'ix_%') and pg_class.relname = pg_indexes.indexname and ",
-			"pg_index.indexrelid = pg_class.oid");
+			"select indexname, tablename, indexdef from pg_indexes where ",
+			"schemaname = current_schema() and (indexname like 'liferay_%' or ",
+			"indexname like 'ix_%')");
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				sql);
@@ -108,18 +91,20 @@ public class PostgreSQLDB extends BaseDB {
 			while (resultSet.next()) {
 				String indexName = resultSet.getString("indexname");
 				String tableName = resultSet.getString("tablename");
-				boolean unique = resultSet.getBoolean("indisunique");
+				String indexSQL = StringUtil.toLowerCase(
+					StringUtil.trim(resultSet.getString("indexdef")));
+
+				boolean unique = true;
+
+				if (indexSQL.startsWith("create index ")) {
+					unique = false;
+				}
 
 				indexes.add(new Index(indexName, tableName, unique));
 			}
 		}
 
 		return indexes;
-	}
-
-	@Override
-	public String getNewUuidFunctionName() {
-		return "gen_random_uuid()";
 	}
 
 	@Override
@@ -135,11 +120,6 @@ public class PostgreSQLDB extends BaseDB {
 	}
 
 	@Override
-	public boolean isSupportsNewUuidFunction() {
-		return _supportsNewUuidFunction;
-	}
-
-	@Override
 	public boolean isSupportsQueryingAfterException() {
 		return _SUPPORTS_QUERYING_AFTER_EXCEPTION;
 	}
@@ -150,17 +130,8 @@ public class PostgreSQLDB extends BaseDB {
 	}
 
 	@Override
-	protected int[] getSQLVarcharSizes() {
-		return _SQL_VARCHAR_SIZES;
-	}
-
-	@Override
 	protected String[] getTemplate() {
 		return _POSTGRESQL;
-	}
-
-	protected boolean isSupportsDuplicatedIndexName() {
-		return _SUPPORTS_DUPLICATED_INDEX_NAME;
 	}
 
 	@Override
@@ -214,10 +185,7 @@ public class PostgreSQLDB extends BaseDB {
 					String[] template = buildTableNameTokens(line);
 
 					line = StringUtil.replace(
-						StringBundler.concat(
-							"alter table @old-table@ rename to @new-table@;",
-							"alter table @new-table@ rename constraint ",
-							"@old-table@_pkey to @new-table@_pkey;"),
+						"alter table @old-table@ rename to @new-table@;",
 						RENAME_TABLE_TEMPLATE, template);
 				}
 				else if (line.startsWith(CREATE_TABLE)) {
@@ -239,15 +207,11 @@ public class PostgreSQLDB extends BaseDB {
 						"@table@", tokens[2]);
 				}
 				else if (line.contains(getTemplateBlob())) {
-					Matcher matcher = _oidPattern.matcher(line);
+					String[] tokens = StringUtil.split(line, ' ');
 
-					if (matcher.find()) {
-						String[] tokens = StringUtil.split(line, ' ');
-
-						createRulesSQLSB.append(StringPool.NEW_LINE);
-						createRulesSQLSB.append(
-							getCreateRulesSQL(tableName, tokens[0]));
-					}
+					createRulesSQLSB.append(StringPool.NEW_LINE);
+					createRulesSQLSB.append(
+						getCreateRulesSQL(tableName, tokens[0]));
 				}
 				else if (line.contains("\\\'")) {
 					line = StringUtil.replace(line, "\\\'", "\'\'");
@@ -274,17 +238,6 @@ public class PostgreSQLDB extends BaseDB {
 		Types.INTEGER, Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
 	};
 
-	private static final int[] _SQL_VARCHAR_SIZES = {
-		SQL_VARCHAR_MAX_SIZE, SQL_VARCHAR_MAX_SIZE
-	};
-
-	private static final boolean _SUPPORTS_DUPLICATED_INDEX_NAME = false;
-
 	private static final boolean _SUPPORTS_QUERYING_AFTER_EXCEPTION = false;
-
-	private static final Pattern _oidPattern = Pattern.compile(
-		" oid(\\W|$)", Pattern.CASE_INSENSITIVE);
-
-	private final boolean _supportsNewUuidFunction;
 
 }

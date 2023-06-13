@@ -14,12 +14,9 @@
 
 package com.liferay.portal.search.web.internal.search.bar.portlet;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Validator;
 
-import javax.portlet.PortletPreferences;
+import java.util.Optional;
 
 /**
  * @author André de Oliveira
@@ -27,31 +24,15 @@ import javax.portlet.PortletPreferences;
 public class SearchBarPortletDestinationUtil {
 
 	public static boolean isSameDestination(
-		PortletPreferences portletPreferences, ThemeDisplay themeDisplay) {
-
-		String destination = GetterUtil.getString(
-			portletPreferences.getValue("destination", StringPool.BLANK));
-
-		if (Validator.isNull(destination) ||
-			isSameDestination(
-				destination,
-				themeDisplay.getLayoutFriendlyURL(themeDisplay.getLayout()))) {
-
-			return true;
-		}
-
-		return false;
-	}
-
-	public static boolean isSameDestination(
 		SearchBarPortletPreferences searchBarPortletPreferences,
 		ThemeDisplay themeDisplay) {
 
-		String destination = searchBarPortletPreferences.getDestination();
+		Optional<String> optional =
+			searchBarPortletPreferences.getDestination();
 
-		if (Validator.isNull(destination) ||
+		if (!optional.isPresent() ||
 			isSameDestination(
-				destination,
+				optional.get(),
 				themeDisplay.getLayoutFriendlyURL(themeDisplay.getLayout()))) {
 
 			return true;

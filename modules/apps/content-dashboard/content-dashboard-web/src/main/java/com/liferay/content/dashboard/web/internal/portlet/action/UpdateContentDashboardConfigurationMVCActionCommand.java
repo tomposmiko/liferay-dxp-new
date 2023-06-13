@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -34,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author David Arques
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentDashboardPortletKeys.CONTENT_DASHBOARD_ADMIN,
 		"mvc.command.name=/content_dashboard/update_content_dashboard_configuration"
@@ -48,19 +50,20 @@ public class UpdateContentDashboardConfigurationMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		String[] assetVocabularyIds = StringUtil.split(
-			ParamUtil.getString(actionRequest, "assetVocabularyIds"));
+		String[] assetVocabularyNames = StringUtil.split(
+			ParamUtil.getString(actionRequest, "assetVocabularyNames"));
 
-		if (assetVocabularyIds.length == 0) {
+		if (ArrayUtil.isEmpty(assetVocabularyNames)) {
 			hideDefaultSuccessMessage(actionRequest);
-			SessionMessages.add(actionRequest, "emptyAssetVocabularyIds", true);
+			SessionMessages.add(
+				actionRequest, "emptyAssetVocabularyNames", true);
 		}
 		else {
 			PortletPreferences portletPreferences =
 				actionRequest.getPreferences();
 
 			portletPreferences.setValues(
-				"assetVocabularyIds", assetVocabularyIds);
+				"assetVocabularyNames", assetVocabularyNames);
 
 			try {
 				portletPreferences.store();

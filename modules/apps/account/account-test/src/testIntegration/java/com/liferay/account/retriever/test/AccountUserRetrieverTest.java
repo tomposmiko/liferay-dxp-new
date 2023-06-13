@@ -18,9 +18,9 @@ import com.liferay.account.constants.AccountActionKeys;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.retriever.AccountUserRetriever;
+import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.account.service.AccountRoleLocalService;
-import com.liferay.account.service.test.util.AccountEntryArgs;
 import com.liferay.account.service.test.util.AccountEntryTestUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringPool;
@@ -67,7 +67,8 @@ public class AccountUserRetrieverTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_accountEntry = AccountEntryTestUtil.addAccountEntry();
+		_accountEntry = AccountEntryTestUtil.addAccountEntry(
+			_accountEntryLocalService);
 	}
 
 	@Test
@@ -136,12 +137,18 @@ public class AccountUserRetrieverTest {
 		User user1 = UserTestUtil.addUser();
 
 		AccountEntry accountEntry1 = AccountEntryTestUtil.addAccountEntry(
-			AccountEntryArgs.withUsers(user1));
+			_accountEntryLocalService);
+
+		_accountEntryUserRelLocalService.addAccountEntryUserRel(
+			accountEntry1.getAccountEntryId(), user1.getUserId());
 
 		User user2 = UserTestUtil.addUser();
 
 		AccountEntry accountEntry2 = AccountEntryTestUtil.addAccountEntry(
-			AccountEntryArgs.withUsers(user2));
+			_accountEntryLocalService);
+
+		_accountEntryUserRelLocalService.addAccountEntryUserRel(
+			accountEntry2.getAccountEntryId(), user2.getUserId());
 
 		BaseModelSearchResult<User> baseModelSearchResult = _searchAccountUsers(
 			new long[] {
@@ -315,8 +322,8 @@ public class AccountUserRetrieverTest {
 		throws Exception {
 
 		return _accountUserRetriever.searchAccountUsers(
-			accountEntryIds, keywords, null, WorkflowConstants.STATUS_APPROVED,
-			cur, delta, sortField, reverse);
+			accountEntryIds, keywords, WorkflowConstants.STATUS_APPROVED, cur,
+			delta, sortField, reverse);
 	}
 
 	private BaseModelSearchResult<User> _searchAccountUsers(
@@ -332,11 +339,14 @@ public class AccountUserRetrieverTest {
 		throws Exception {
 
 		return _accountUserRetriever.searchAccountUsers(
-			new long[] {_accountEntry.getAccountEntryId()}, keywords, null,
+			_accountEntry.getAccountEntryId(), keywords,
 			WorkflowConstants.STATUS_APPROVED, cur, delta, sortField, reverse);
 	}
 
 	private AccountEntry _accountEntry;
+
+	@Inject
+	private AccountEntryLocalService _accountEntryLocalService;
 
 	@Inject
 	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;

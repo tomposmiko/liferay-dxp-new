@@ -55,40 +55,25 @@ public class DLVideoExternalShortcutDLFileEntryTypeHelper {
 		_userLocalService = userLocalService;
 	}
 
-	public void addDLVideoExternalShortcutDLFileEntryType(boolean shortcut)
-		throws Exception {
-
-		if (shortcut &&
-			_ddmStructureLocalService.hasStructure(
-				_company.getGroupId(), _dlFileEntryMetadataClassNameId,
-				DLVideoConstants.
-					DDM_STRUCTURE_KEY_DL_VIDEO_EXTERNAL_SHORTCUT)) {
-
-			return;
-		}
-
+	public void addDLVideoExternalShortcutDLFileEntryType() throws Exception {
 		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
 			_company.getGroupId(), _dlFileEntryMetadataClassNameId,
 			DLVideoConstants.DDM_STRUCTURE_KEY_DL_VIDEO_EXTERNAL_SHORTCUT);
 
 		if (ddmStructure == null) {
 			ddmStructure = _addDLVideoExternalShortcutDDMStructure();
+		}
 
+		DLFileEntryType dlFileEntryType =
+			_dlFileEntryTypeLocalService.fetchDataDefinitionFileEntryType(
+				_company.getGroupId(), ddmStructure.getStructureId());
+
+		if (dlFileEntryType == null) {
 			_addDLVideoExternalShortcutDLFileEntryType(
 				ddmStructure.getStructureId());
 		}
 		else {
-			DLFileEntryType dlFileEntryType =
-				_dlFileEntryTypeLocalService.fetchDataDefinitionFileEntryType(
-					_company.getGroupId(), ddmStructure.getStructureId());
-
-			if (dlFileEntryType == null) {
-				_addDLVideoExternalShortcutDLFileEntryType(
-					ddmStructure.getStructureId());
-			}
-			else {
-				_updateDLFileEntryTypeNameMap(dlFileEntryType);
-			}
+			_updateDLFileEntryTypeNameMap(dlFileEntryType);
 		}
 	}
 
@@ -101,16 +86,16 @@ public class DLVideoExternalShortcutDLFileEntryTypeHelper {
 		serviceContext.setAddGuestPermissions(true);
 		serviceContext.setScopeGroupId(_company.getGroupId());
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			_company.getCompanyId());
 
-		serviceContext.setUserId(guestUserId);
+		serviceContext.setUserId(defaultUserId);
 
 		Class<?> clazz = getClass();
 
 		_defaultDDMStructureHelper.addDDMStructures(
-			guestUserId, _company.getGroupId(), _dlFileEntryMetadataClassNameId,
-			clazz.getClassLoader(),
+			defaultUserId, _company.getGroupId(),
+			_dlFileEntryMetadataClassNameId, clazz.getClassLoader(),
 			"com/liferay/document/library/video/internal/util/dependencies" +
 				"/dl-video-external-shortcut-metadata-structure.xml",
 			serviceContext);
@@ -132,7 +117,7 @@ public class DLVideoExternalShortcutDLFileEntryTypeHelper {
 	private void _addDLVideoExternalShortcutDLFileEntryType(long ddmStructureId)
 		throws Exception {
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			_company.getCompanyId());
 
 		Map<Locale, String> descriptionMap = new HashMap<>();
@@ -142,10 +127,10 @@ public class DLVideoExternalShortcutDLFileEntryTypeHelper {
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 		serviceContext.setScopeGroupId(_company.getGroupId());
-		serviceContext.setUserId(guestUserId);
+		serviceContext.setUserId(defaultUserId);
 
 		_dlFileEntryTypeLocalService.addFileEntryType(
-			guestUserId, _company.getGroupId(), ddmStructureId,
+			defaultUserId, _company.getGroupId(), ddmStructureId,
 			DLVideoConstants.DL_FILE_ENTRY_TYPE_KEY,
 			_getExternalVideoShortcutNameMap(
 				LanguageUtil.getAvailableLocales()),

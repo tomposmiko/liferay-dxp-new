@@ -32,8 +32,6 @@ public class COREntryRelTable extends BaseTable<COREntryRelTable> {
 
 	public static final COREntryRelTable INSTANCE = new COREntryRelTable();
 
-	public final Column<COREntryRelTable, Long> mvccVersion = createColumn(
-		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
 	public final Column<COREntryRelTable, Long> COREntryRelId = createColumn(
 		"COREntryRelId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<COREntryRelTable, Long> companyId = createColumn(

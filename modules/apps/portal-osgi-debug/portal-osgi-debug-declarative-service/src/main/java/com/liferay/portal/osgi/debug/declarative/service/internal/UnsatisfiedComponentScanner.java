@@ -36,7 +36,8 @@ import org.osgi.service.component.runtime.ServiceComponentRuntime;
  */
 @Component(
 	configurationPid = "com.liferay.portal.osgi.debug.declarative.service.internal.configuration.UnsatisfiedComponentScannerConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE, service = {}
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
+	service = {}
 )
 public class UnsatisfiedComponentScanner {
 

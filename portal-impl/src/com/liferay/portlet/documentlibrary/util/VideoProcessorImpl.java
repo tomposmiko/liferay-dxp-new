@@ -148,7 +148,7 @@ public class VideoProcessorImpl
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return hasVideo;
@@ -307,9 +307,10 @@ public class VideoProcessorImpl
 
 		stopWatch.start();
 
-		File thumbnailTempFile = getThumbnailTempFile(
-			DLUtil.getTempFileId(
-				fileVersion.getFileEntryId(), fileVersion.getVersion()));
+		String tempFileId = DLUtil.getTempFileId(
+			fileVersion.getFileEntryId(), fileVersion.getVersion());
+
+		File thumbnailTempFile = getThumbnailTempFile(tempFileId);
 
 		try {
 			try {
@@ -385,7 +386,7 @@ public class VideoProcessorImpl
 			}
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			throw exception;
@@ -427,11 +428,7 @@ public class VideoProcessorImpl
 			_fileVersionPreviewEventListener.onFailure(fileVersion);
 		}
 		catch (Exception exception) {
-			_log.error(
-				StringBundler.concat(
-					"Unable to process ", fileVersion.getFileVersionId(), " ",
-					fileVersion.getTitle()),
-				exception);
+			_log.error(exception, exception);
 
 			_fileVersionPreviewEventListener.onFailure(fileVersion);
 		}
@@ -488,7 +485,7 @@ public class VideoProcessorImpl
 					_fileVersionPreviewEventListener.onFailure(
 						destinationFileVersion);
 
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			}
 
@@ -497,13 +494,13 @@ public class VideoProcessorImpl
 					_generateThumbnail(destinationFileVersion, videoTempFile);
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			}
 		}
 		catch (NoSuchFileEntryException noSuchFileEntryException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileEntryException);
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
 			}
 
 			_fileVersionPreviewEventListener.onFailure(destinationFileVersion);

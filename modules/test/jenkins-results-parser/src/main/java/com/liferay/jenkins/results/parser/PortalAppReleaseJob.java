@@ -17,10 +17,7 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-
-import org.json.JSONObject;
 
 /**
  * @author Michael Hashimoto
@@ -30,30 +27,6 @@ public class PortalAppReleaseJob extends BaseJob implements PortalTestClassJob {
 	@Override
 	public Set<String> getDistTypes() {
 		return Collections.emptySet();
-	}
-
-	@Override
-	public List<String> getJobPropertyOptions() {
-		List<String> jobPropertyOptions = super.getJobPropertyOptions();
-
-		jobPropertyOptions.add(
-			_portalGitWorkingDirectory.getUpstreamBranchName());
-
-		return jobPropertyOptions;
-	}
-
-	@Override
-	public JSONObject getJSONObject() {
-		if (jsonObject != null) {
-			return jsonObject;
-		}
-
-		jsonObject = super.getJSONObject();
-
-		jsonObject.put(
-			"portal_upstream_branch_name", _portalUpstreamBranchName);
-
-		return jsonObject;
 	}
 
 	@Override
@@ -67,26 +40,10 @@ public class PortalAppReleaseJob extends BaseJob implements PortalTestClassJob {
 	}
 
 	protected PortalAppReleaseJob(
-		BuildProfile buildProfile, String jobName,
-		String portalUpstreamBranchName) {
+		String jobName, BuildProfile buildProfile, String portalBranchName) {
 
-		super(buildProfile, jobName);
+		super(jobName, buildProfile);
 
-		_portalUpstreamBranchName = portalUpstreamBranchName;
-
-		_initialize();
-	}
-
-	protected PortalAppReleaseJob(JSONObject jsonObject) {
-		super(jsonObject);
-
-		_portalUpstreamBranchName = jsonObject.getString(
-			"portal_upstream_branch_name");
-
-		_initialize();
-	}
-
-	private void _initialize() {
 		GitWorkingDirectory jenkinsGitWorkingDirectory =
 			GitWorkingDirectoryFactory.newJenkinsGitWorkingDirectory();
 
@@ -97,15 +54,38 @@ public class PortalAppReleaseJob extends BaseJob implements PortalTestClassJob {
 
 		_portalGitWorkingDirectory =
 			GitWorkingDirectoryFactory.newPortalGitWorkingDirectory(
-				_portalUpstreamBranchName);
+				portalBranchName);
 
 		jobPropertiesFiles.add(
 			new File(
 				_portalGitWorkingDirectory.getWorkingDirectory(),
 				"test.properties"));
+
+		readJobProperties();
 	}
 
-	private PortalGitWorkingDirectory _portalGitWorkingDirectory;
-	private final String _portalUpstreamBranchName;
+	@Override
+	protected Set<String> getRawBatchNames() {
+		BuildProfile buildProfile = getBuildProfile();
+
+		if (buildProfile == null) {
+			buildProfile = BuildProfile.PORTAL;
+		}
+
+		String testBatchName = JenkinsResultsParserUtil.getProperty(
+			getJobProperties(), "test.batch.names", false, getJobName(),
+			buildProfile.toString());
+
+		if (JenkinsResultsParserUtil.isNullOrEmpty(testBatchName)) {
+			testBatchName = JenkinsResultsParserUtil.getProperty(
+				getJobProperties(), "test.batch.names", false, getJobName(),
+				_portalGitWorkingDirectory.getUpstreamBranchName(),
+				buildProfile.toString());
+		}
+
+		return getSetFromString(testBatchName);
+	}
+
+	private final PortalGitWorkingDirectory _portalGitWorkingDirectory;
 
 }

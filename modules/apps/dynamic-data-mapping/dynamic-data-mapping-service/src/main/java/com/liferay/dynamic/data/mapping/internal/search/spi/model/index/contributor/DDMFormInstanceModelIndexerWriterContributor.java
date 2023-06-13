@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.internal.search.spi.model.index.contributor;
 
-import com.liferay.dynamic.data.mapping.internal.search.DDMFormInstanceRecordBatchReindexer;
+import com.liferay.dynamic.data.mapping.internal.search.util.DDMFormInstanceRecordBatchReindexer;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.portal.search.batch.BatchIndexingActionable;
@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance",
 	service = ModelIndexerWriterContributor.class
 )

@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -216,95 +217,108 @@ public class FriendlyURLEntryMappingModelImpl
 	public Map<String, Function<FriendlyURLEntryMapping, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<FriendlyURLEntryMapping, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, FriendlyURLEntryMapping>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<FriendlyURLEntryMapping, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			FriendlyURLEntryMapping.class.getClassLoader(),
+			FriendlyURLEntryMapping.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<FriendlyURLEntryMapping, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<FriendlyURLEntryMapping, Object>>();
+		try {
+			Constructor<FriendlyURLEntryMapping> constructor =
+				(Constructor<FriendlyURLEntryMapping>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", FriendlyURLEntryMapping::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", FriendlyURLEntryMapping::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"friendlyURLEntryMappingId",
-				FriendlyURLEntryMapping::getFriendlyURLEntryMappingId);
-			attributeGetterFunctions.put(
-				"companyId", FriendlyURLEntryMapping::getCompanyId);
-			attributeGetterFunctions.put(
-				"classNameId", FriendlyURLEntryMapping::getClassNameId);
-			attributeGetterFunctions.put(
-				"classPK", FriendlyURLEntryMapping::getClassPK);
-			attributeGetterFunctions.put(
-				"friendlyURLEntryId",
-				FriendlyURLEntryMapping::getFriendlyURLEntryId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<FriendlyURLEntryMapping, Object>>
+		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<FriendlyURLEntryMapping, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<FriendlyURLEntryMapping, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<FriendlyURLEntryMapping, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<FriendlyURLEntryMapping, Object>>();
+		Map<String, BiConsumer<FriendlyURLEntryMapping, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<FriendlyURLEntryMapping, ?>>();
 
-		static {
-			Map<String, BiConsumer<FriendlyURLEntryMapping, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<FriendlyURLEntryMapping, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", FriendlyURLEntryMapping::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<FriendlyURLEntryMapping, Long>)
+				FriendlyURLEntryMapping::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", FriendlyURLEntryMapping::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<FriendlyURLEntryMapping, Long>)
+				FriendlyURLEntryMapping::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"friendlyURLEntryMappingId",
+			FriendlyURLEntryMapping::getFriendlyURLEntryMappingId);
+		attributeSetterBiConsumers.put(
+			"friendlyURLEntryMappingId",
+			(BiConsumer<FriendlyURLEntryMapping, Long>)
+				FriendlyURLEntryMapping::setFriendlyURLEntryMappingId);
+		attributeGetterFunctions.put(
+			"companyId", FriendlyURLEntryMapping::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<FriendlyURLEntryMapping, Long>)
+				FriendlyURLEntryMapping::setCompanyId);
+		attributeGetterFunctions.put(
+			"classNameId", FriendlyURLEntryMapping::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<FriendlyURLEntryMapping, Long>)
+				FriendlyURLEntryMapping::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", FriendlyURLEntryMapping::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<FriendlyURLEntryMapping, Long>)
+				FriendlyURLEntryMapping::setClassPK);
+		attributeGetterFunctions.put(
+			"friendlyURLEntryId",
+			FriendlyURLEntryMapping::getFriendlyURLEntryId);
+		attributeSetterBiConsumers.put(
+			"friendlyURLEntryId",
+			(BiConsumer<FriendlyURLEntryMapping, Long>)
+				FriendlyURLEntryMapping::setFriendlyURLEntryId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<FriendlyURLEntryMapping, Long>)
-					FriendlyURLEntryMapping::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<FriendlyURLEntryMapping, Long>)
-					FriendlyURLEntryMapping::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"friendlyURLEntryMappingId",
-				(BiConsumer<FriendlyURLEntryMapping, Long>)
-					FriendlyURLEntryMapping::setFriendlyURLEntryMappingId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<FriendlyURLEntryMapping, Long>)
-					FriendlyURLEntryMapping::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<FriendlyURLEntryMapping, Long>)
-					FriendlyURLEntryMapping::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<FriendlyURLEntryMapping, Long>)
-					FriendlyURLEntryMapping::setClassPK);
-			attributeSetterBiConsumers.put(
-				"friendlyURLEntryId",
-				(BiConsumer<FriendlyURLEntryMapping, Long>)
-					FriendlyURLEntryMapping::setFriendlyURLEntryId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -682,13 +696,44 @@ public class FriendlyURLEntryMappingModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<FriendlyURLEntryMapping, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<FriendlyURLEntryMapping, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<FriendlyURLEntryMapping, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((FriendlyURLEntryMapping)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, FriendlyURLEntryMapping>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						FriendlyURLEntryMapping.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -702,8 +747,7 @@ public class FriendlyURLEntryMappingModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<FriendlyURLEntryMapping, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

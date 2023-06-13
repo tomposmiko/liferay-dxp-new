@@ -31,7 +31,7 @@ public class RangeTermQueryImpl
 		_includesLower = includesLower;
 		_includesUpper = includesUpper;
 
-		_setOperators(includesLower, includesUpper);
+		setOperators(includesLower, includesUpper);
 	}
 
 	public RangeTermQueryImpl(
@@ -44,7 +44,7 @@ public class RangeTermQueryImpl
 		_lowerBound = lowerBound;
 		_upperBound = upperBound;
 
-		_setOperators(includesLower, includesUpper);
+		setOperators(includesLower, includesUpper);
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class RangeTermQueryImpl
 			_upperBound, "), ", super.toString(), "}");
 	}
 
-	private void _setOperators(boolean includesLower, boolean includesUpper) {
+	protected void setOperators(boolean includesLower, boolean includesUpper) {
 		if (includesLower) {
 			_lowerBoundOperator = Operator.GTE;
 		}

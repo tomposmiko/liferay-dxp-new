@@ -16,14 +16,17 @@ package com.liferay.commerce.product.definitions.web.internal.security.permissio
 
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CommerceCatalog;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Marco Leo
  */
+@Component(enabled = false, immediate = true, service = {})
 public class CommerceCatalogPermission {
 
 	public static boolean contains(
@@ -31,10 +34,7 @@ public class CommerceCatalogPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<CommerceCatalog> modelResourcePermission =
-			_commerceCatalogModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _commerceCatalogModelResourcePermission.contains(
 			permissionChecker, cpDefinition.getCommerceCatalog(), actionId);
 	}
 
@@ -43,18 +43,21 @@ public class CommerceCatalogPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<CommerceCatalog> modelResourcePermission =
-			_commerceCatalogModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _commerceCatalogModelResourcePermission.contains(
 			permissionChecker, commerceCatalogId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<CommerceCatalog>>
-		_commerceCatalogModelResourcePermissionSnapshot = new Snapshot<>(
-			CommerceCatalogPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.commerce.product.model." +
-				"CommerceCatalog)");
+	@Reference(
+		target = "(model.class.name=com.liferay.commerce.product.model.CommerceCatalog)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<CommerceCatalog> modelResourcePermission) {
+
+		_commerceCatalogModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<CommerceCatalog>
+		_commerceCatalogModelResourcePermission;
 
 }

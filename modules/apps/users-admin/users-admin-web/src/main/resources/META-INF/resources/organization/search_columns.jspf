@@ -33,7 +33,7 @@
 			</h6>
 
 			<h6 class="text-default">
-				<liferay-ui:message key="<%= organization.getType() %>" />
+				<%= LanguageUtil.get(request, organization.getType()) %>
 			</h6>
 
 			<h6 class="text-default">
@@ -43,19 +43,36 @@
 			</h6>
 		</liferay-ui:search-container-column-text>
 
-		<liferay-ui:search-container-column-text>
-			<clay:dropdown-actions
-				aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-				dropdownItems="<%= organizationActionDropdownItems.getActionDropdownItems() %>"
-				propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-			/>
-		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-jsp
+			cssClass="entry-action-column"
+			path="/organization_action.jsp"
+		/>
 	</c:when>
 	<c:when test='<%= displayStyle.equals("icon") %>'>
+		<liferay-util:buffer
+			var="organizationLogoHTML"
+		>
+			<div class="user-card">
+				<div class="aspect-ratio-item-center-middle aspect-ratio-item-fluid card-type-asset-icon">
+					<span class="rounded-circle sticker sticker-primary">
+						<span class="sticker-overlay">
+							<img alt="thumbnail" class="img-fluid" src="<%= organization.getLogoURL() %>" />
+						</span>
+					</span>
+				</div>
+			</div>
+		</liferay-util:buffer>
+
 		<liferay-ui:search-container-column-text>
-			<clay:vertical-card
-				propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-				verticalCard="<%= new OrganizationVerticalCard(organizationActionDropdownItems.getActionDropdownItems(), organization, renderRequest, organizationSearchContainer.getRowChecker(), rowURL) %>"
+			<liferay-frontend:html-vertical-card
+				actionJsp="/organization_action.jsp"
+				actionJspServletContext="<%= application %>"
+				html="<%= organizationLogoHTML %>"
+				resultRow="<%= row %>"
+				rowChecker="<%= organizationSearchContainer.getRowChecker() %>"
+				subtitle="<%= LanguageUtil.get(request, organization.getType()) %>"
+				title="<%= organization.getName() %>"
+				url="<%= String.valueOf(rowURL) %>"
 			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>
@@ -105,12 +122,9 @@
 			/>
 		</c:if>
 
-		<liferay-ui:search-container-column-text>
-			<clay:dropdown-actions
-				aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
-				dropdownItems="<%= organizationActionDropdownItems.getActionDropdownItems() %>"
-				propsTransformer="js/OrganizationAndUserDropdownDefaultPropsTransformer"
-			/>
-		</liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-jsp
+			cssClass="entry-action-column"
+			path="/organization_action.jsp"
+		/>
 	</c:otherwise>
 </c:choose>

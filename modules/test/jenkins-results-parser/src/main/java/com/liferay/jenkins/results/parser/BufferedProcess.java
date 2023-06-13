@@ -30,12 +30,12 @@ public class BufferedProcess extends Process {
 		_process = process;
 
 		_standardErrorInputStreamBuffer = new InputStreamBuffer(
-			bufferSize, process.getErrorStream());
+			bufferSize, _process.getErrorStream());
 
 		_standardErrorInputStreamBuffer.start();
 
 		_standardOutInputStreamBuffer = new InputStreamBuffer(
-			bufferSize, process.getInputStream());
+			bufferSize, _process.getInputStream());
 
 		_standardOutInputStreamBuffer.start();
 	}

@@ -20,7 +20,7 @@ import {PagesVisitor} from '../../utils/visitors.es';
 import {EVENT_TYPES} from '../actions/eventTypes.es';
 import {useForm} from '../hooks/useForm.es';
 
-export function Tabs({activePage, pages}) {
+export const Tabs = ({activePage, pages}) => {
 	const dispatch = useForm();
 
 	const isAutocompleteVisible = useMemo(() => {
@@ -65,4 +65,4 @@ export function Tabs({activePage, pages}) {
 			</ClayLayout.ContainerFluid>
 		</nav>
 	);
-}
+};

@@ -61,6 +61,20 @@ public class CPDefinitionLinkLocalServiceUtil {
 		return getService().addCPDefinitionLink(cpDefinitionLink);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	public static CPDefinitionLink addCPDefinitionLink(
+			long cpDefinitionId1, long cpDefinitionId2, double priority,
+			String type,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addCPDefinitionLink(
+			cpDefinitionId1, cpDefinitionId2, priority, type, serviceContext);
+	}
+
 	public static CPDefinitionLink addCPDefinitionLinkByCProductId(
 			long cpDefinitionId, long cProductId, double priority, String type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -126,6 +140,16 @@ public class CPDefinitionLinkLocalServiceUtil {
 		throws PortalException {
 
 		return getService().deleteCPDefinitionLink(CPDefinitionLinkId);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	public static void deleteCPDefinitionLinks(long cpDefinitionId)
+		throws PortalException {
+
+		getService().deleteCPDefinitionLinks(cpDefinitionId);
 	}
 
 	public static void deleteCPDefinitionLinksByCPDefinitionId(
@@ -240,13 +264,6 @@ public class CPDefinitionLinkLocalServiceUtil {
 		long CPDefinitionLinkId) {
 
 		return getService().fetchCPDefinitionLink(CPDefinitionLinkId);
-	}
-
-	public static CPDefinitionLink fetchCPDefinitionLink(
-		long cpDefinitionId, long cProductId, String type) {
-
-		return getService().fetchCPDefinitionLink(
-			cpDefinitionId, cProductId, type);
 	}
 
 	/**
@@ -462,6 +479,19 @@ public class CPDefinitionLinkLocalServiceUtil {
 
 		getService().updateCPDefinitionLinkCProductIds(
 			cpDefinitionId, cProductIds, type, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
+	public static void updateCPDefinitionLinks(
+			long cpDefinitionId1, long[] cpDefinitionIds2, String type,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		getService().updateCPDefinitionLinks(
+			cpDefinitionId1, cpDefinitionIds2, type, serviceContext);
 	}
 
 	public static CPDefinitionLinkLocalService getService() {

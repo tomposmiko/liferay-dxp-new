@@ -38,31 +38,6 @@ public class BlogPostingResourceTest extends BaseBlogPostingResourceTestCase {
 
 	@Override
 	@Test
-	public void testDeleteBlogPostingMyRating() throws Exception {
-		super.testDeleteBlogPostingMyRating();
-
-		BlogPosting blogPosting =
-			testDeleteBlogPostingMyRating_addBlogPosting();
-
-		assertHttpResponseStatusCode(
-			204,
-			blogPostingResource.deleteBlogPostingMyRatingHttpResponse(
-				blogPosting.getId()));
-		assertHttpResponseStatusCode(
-			404,
-			blogPostingResource.deleteBlogPostingMyRatingHttpResponse(
-				blogPosting.getId()));
-
-		BlogPosting irrelevantBlogPosting = randomIrrelevantBlogPosting();
-
-		assertHttpResponseStatusCode(
-			404,
-			blogPostingResource.deleteBlogPostingMyRatingHttpResponse(
-				irrelevantBlogPosting.getId()));
-	}
-
-	@Override
-	@Test
 	public void testGetBlogPostingRenderedContentByDisplayPageDisplayPageKey()
 		throws Exception {
 
@@ -79,11 +54,14 @@ public class BlogPostingResourceTest extends BaseBlogPostingResourceTestCase {
 				ServiceContextTestUtil.getServiceContext(
 					testGroup.getGroupId()));
 
-		Assert.assertNotNull(
+		String blogPostingRenderedContentByDisplayPageDisplayPageKey =
 			blogPostingResource.
 				getBlogPostingRenderedContentByDisplayPageDisplayPageKey(
 					blogPosting.getId(),
-					layoutPageTemplateEntry.getLayoutPageTemplateEntryKey()));
+					layoutPageTemplateEntry.getLayoutPageTemplateEntryKey());
+
+		Assert.assertNotNull(
+			blogPostingRenderedContentByDisplayPageDisplayPageKey);
 	}
 
 	@Override
@@ -118,19 +96,6 @@ public class BlogPostingResourceTest extends BaseBlogPostingResourceTestCase {
 	@Override
 	protected String[] getIgnoredEntityFieldNames() {
 		return new String[] {"creatorId"};
-	}
-
-	@Override
-	protected BlogPosting testDeleteBlogPostingMyRating_addBlogPosting()
-		throws Exception {
-
-		BlogPosting blogPosting =
-			super.testDeleteBlogPostingMyRating_addBlogPosting();
-
-		blogPostingResource.putBlogPostingMyRating(
-			blogPosting.getId(), randomRating());
-
-		return blogPosting;
 	}
 
 	@Inject

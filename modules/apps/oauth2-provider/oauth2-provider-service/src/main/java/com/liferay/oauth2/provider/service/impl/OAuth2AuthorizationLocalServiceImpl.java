@@ -19,10 +19,10 @@ import com.liferay.oauth2.provider.exception.NoSuchOAuth2AuthorizationException;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.service.base.OAuth2AuthorizationLocalServiceBaseImpl;
+import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -106,35 +106,19 @@ public class OAuth2AuthorizationLocalServiceImpl
 	}
 
 	@Override
-	public void deleteExpiredOAuth2Authorizations() throws PortalException {
-		ActionableDynamicQuery actionableDynamicQuery =
-			oAuth2AuthorizationLocalService.getActionableDynamicQuery();
+	public void deleteExpiredOAuth2Authorizations() {
+		Date purgeDate = new Date();
 
-		actionableDynamicQuery.setAddCriteriaMethod(
-			dynamicQuery -> {
-				Date date = new Date(
-					System.currentTimeMillis() -
-						_expiredAuthorizationsAfterlifeDurationMillis);
+		purgeDate.setTime(
+			purgeDate.getTime() +
+				_expiredAuthorizationsAfterlifeDurationMillis);
 
-				dynamicQuery.add(
-					RestrictionsFactoryUtil.and(
-						RestrictionsFactoryUtil.lt(
-							"accessTokenExpirationDate", date),
-						RestrictionsFactoryUtil.or(
-							RestrictionsFactoryUtil.and(
-								RestrictionsFactoryUtil.isNotNull(
-									"refreshTokenExpirationDate"),
-								RestrictionsFactoryUtil.lt(
-									"refreshTokenExpirationDate", date)),
-							RestrictionsFactoryUtil.isNull(
-								"refreshTokenExpirationDate"))));
-			});
-		actionableDynamicQuery.setPerformActionMethod(
-			(OAuth2Authorization oAuth2Authorization) ->
-				oAuth2AuthorizationLocalService.deleteOAuth2Authorization(
-					oAuth2Authorization));
+		for (OAuth2Authorization oAuth2Authorization :
+				oAuth2AuthorizationFinder.findByPurgeDate(
+					purgeDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS)) {
 
-		actionableDynamicQuery.performActions();
+			oAuth2AuthorizationPersistence.remove(oAuth2Authorization);
+		}
 	}
 
 	@Override
@@ -185,7 +169,6 @@ public class OAuth2AuthorizationLocalServiceImpl
 		return null;
 	}
 
-	@Override
 	public OAuth2Authorization fetchOAuth2AuthorizationByRememberDeviceContent(
 		long userId, long oAuth2ApplicationId, String rememberDeviceContent) {
 
@@ -246,7 +229,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 	public Collection<OAuth2ScopeGrant> getOAuth2ScopeGrants(
 		long oAuth2AuthorizationId) {
 
-		return oAuth2ScopeGrantPersistence.
+		return _oAuth2ScopeGrantPersistence.
 			getOAuth2AuthorizationOAuth2ScopeGrants(oAuth2AuthorizationId);
 	}
 
@@ -264,7 +247,6 @@ public class OAuth2AuthorizationLocalServiceImpl
 		return oAuth2AuthorizationPersistence.countByUserId(userId);
 	}
 
-	@Override
 	public OAuth2Authorization updateRememberDeviceContent(
 		String refreshTokenContent, String rememberDeviceContent) {
 
@@ -277,21 +259,22 @@ public class OAuth2AuthorizationLocalServiceImpl
 	}
 
 	@Activate
-	@Modified
 	protected void activate(Map<String, Object> properties) {
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration =
 			ConfigurableUtil.createConfigurable(
 				OAuth2ProviderConfiguration.class, properties);
 
-		int expiredAuthorizationsAfterlifeDuration = Math.max(
+		int expiredAuthorizationsAfterlifeDuration =
 			oAuth2ProviderConfiguration.
-				expiredAuthorizationsAfterlifeDuration(),
-			0);
+				expiredAuthorizationsAfterlifeDuration();
 
 		_expiredAuthorizationsAfterlifeDurationMillis =
 			expiredAuthorizationsAfterlifeDuration * Time.SECOND;
 	}
 
-	private volatile long _expiredAuthorizationsAfterlifeDurationMillis;
+	private long _expiredAuthorizationsAfterlifeDurationMillis;
+
+	@Reference
+	private OAuth2ScopeGrantPersistence _oAuth2ScopeGrantPersistence;
 
 }

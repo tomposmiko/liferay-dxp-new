@@ -17,7 +17,9 @@ package com.liferay.headless.admin.workflow.internal.resource.v1_0;
 import com.liferay.headless.admin.workflow.dto.v1_0.Transition;
 import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.TransitionUtil;
 import com.liferay.headless.admin.workflow.resource.v1_0.TransitionResource;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -54,8 +56,10 @@ public class TransitionResourceImpl extends BaseTransitionResourceImpl {
 					nextTransitionNames, pagination.getStartPosition(),
 					pagination.getEndPosition()),
 				transitionName -> TransitionUtil.toTransition(
-					contextAcceptLanguage.getPreferredLocale(),
-					transitionName)),
+					_language, transitionName,
+					ResourceBundleUtil.getModuleAndPortalResourceBundle(
+						contextAcceptLanguage.getPreferredLocale(),
+						TransitionResourceImpl.class))),
 			pagination, nextTransitionNames.size());
 	}
 
@@ -66,7 +70,8 @@ public class TransitionResourceImpl extends BaseTransitionResourceImpl {
 
 		List<String> nextTransitionNames =
 			_workflowTaskManager.getNextTransitionNames(
-				contextUser.getUserId(), workflowTaskId);
+				contextCompany.getCompanyId(), contextUser.getUserId(),
+				workflowTaskId);
 
 		return Page.of(
 			transform(
@@ -74,10 +79,15 @@ public class TransitionResourceImpl extends BaseTransitionResourceImpl {
 					nextTransitionNames, pagination.getStartPosition(),
 					pagination.getEndPosition()),
 				transitionName -> TransitionUtil.toTransition(
-					contextAcceptLanguage.getPreferredLocale(),
-					transitionName)),
+					_language, transitionName,
+					ResourceBundleUtil.getModuleAndPortalResourceBundle(
+						contextAcceptLanguage.getPreferredLocale(),
+						TransitionResourceImpl.class))),
 			pagination, nextTransitionNames.size());
 	}
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private WorkflowInstanceManager _workflowInstanceManager;

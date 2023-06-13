@@ -12,26 +12,23 @@
  * details.
  */
 
-/* eslint-disable @liferay/aui/no-node */
-/* eslint-disable @liferay/aui/no-one */
-
 (function (A) {
-	const Lang = A.Lang;
+	var Lang = A.Lang;
 
-	const Util = Liferay.Util;
+	var Util = Liferay.Util;
 
-	const STR_HEAD = 'head';
+	var STR_HEAD = 'head';
 
-	const TPL_NOT_AJAXABLE = '<div class="alert alert-info">{0}</div>';
+	var TPL_NOT_AJAXABLE = '<div class="alert alert-info">{0}</div>';
 
-	const Portlet = {
+	var Portlet = {
 		...Liferay.Portlet,
 
 		_defCloseFn(event) {
 			event.portlet.remove(true);
 
 			if (!event.nestedPortlet) {
-				const formData = Liferay.Util.objectToFormData({
+				var formData = Liferay.Util.objectToFormData({
 					cmd: 'delete',
 					doAsUserId: event.doAsUserId,
 					p_auth: Liferay.authToken,
@@ -55,14 +52,14 @@
 		},
 
 		_loadMarkupHeadElements(response) {
-			const markupHeadElements = response.markupHeadElements;
+			var markupHeadElements = response.markupHeadElements;
 
 			if (markupHeadElements && markupHeadElements.length) {
-				const head = A.one(STR_HEAD);
+				var head = A.one(STR_HEAD);
 
 				head.append(markupHeadElements);
 
-				const container = A.Node.create('<div />');
+				var container = A.Node.create('<div />');
 
 				container.plug(A.Plugin.ParseContent);
 
@@ -70,51 +67,19 @@
 			}
 		},
 
-		_loadModules(moduleJavascriptPaths) {
-			return Promise.all(
-				moduleJavascriptPaths.map(
-					(path) =>
-						new Promise((resolve) => {
-							const script = document.createElement('script');
-
-							script.src = path;
-							script.type = 'module';
-
-							script.onload = script.onreadystatechange = () => {
-								if (
-									this.readyState &&
-									this.readyState !== 'complete' &&
-									this.readyState !== 'load'
-								) {
-									return;
-								}
-
-								script.onload = script.onreadystatechange = null;
-								script.onerror = null;
-
-								resolve();
-							};
-
-							script.onerror = () => {
-								script.onload = script.onreadystatechange = null;
-								script.onerror = null;
-
-								console.error('Unable to load', path);
-
-								resolve();
-							};
-
-							document.head.appendChild(script);
-						})
-				)
-			);
-		},
-
 		_loadPortletFiles(response, loadHTML) {
-			const footerCssPaths = response.footerCssPaths || [];
-			const headerCssPaths = response.headerCssPaths || [];
+			var footerCssPaths = response.footerCssPaths || [];
+			var headerCssPaths = response.headerCssPaths || [];
 
-			const head = A.one(STR_HEAD);
+			var javascriptPaths = response.headerJavaScriptPaths || [];
+
+			javascriptPaths = javascriptPaths.concat(
+				response.footerJavaScriptPaths || []
+			);
+
+			var body = A.getBody();
+
+			var head = A.one(STR_HEAD);
 
 			if (headerCssPaths.length) {
 				A.Get.css(headerCssPaths, {
@@ -122,7 +87,7 @@
 				});
 			}
 
-			const lastChild = document.body.lastChild;
+			var lastChild = body.get('lastChild').getDOM();
 
 			if (footerCssPaths.length) {
 				A.Get.css(footerCssPaths, {
@@ -130,29 +95,13 @@
 				});
 			}
 
-			const responseHTML = response.portletHTML;
-
-			let javascriptPaths = response.headerJavaScriptPaths || [];
-
-			javascriptPaths = javascriptPaths.concat(
-				response.footerJavaScriptPaths || []
-			);
+			var responseHTML = response.portletHTML;
 
 			if (javascriptPaths.length) {
-				const moduleJavascriptPaths = javascriptPaths
-					.filter((path) => path.startsWith('module:'))
-					.map((path) => path.substring(7));
-
-				javascriptPaths = javascriptPaths.filter(
-					(path) => !path.startsWith('module:')
-				);
-
-				Portlet._loadModules(moduleJavascriptPaths).then(() => {
-					A.Get.script(javascriptPaths, {
-						onEnd() {
-							loadHTML(responseHTML);
-						},
-					});
+				A.Get.script(javascriptPaths, {
+					onEnd() {
+						loadHTML(responseHTML);
+					},
 				});
 			}
 			else {
@@ -181,9 +130,9 @@
 		},
 
 		isStatic(portletId) {
-			const instance = this;
+			var instance = this;
 
-			const id = Util.getPortletId(portletId.id || portletId);
+			var id = Util.getPortletId(portletId.id || portletId);
 
 			return id in instance._staticPortlets;
 		},
@@ -195,7 +144,7 @@
 		refreshLayout(_portletBoundary) {},
 
 		register(portletId) {
-			const instance = this;
+			var instance = this;
 
 			if (instance.list.indexOf(portletId) < 0) {
 				instance.list.push(portletId);
@@ -207,18 +156,18 @@
 		Portlet,
 		'add',
 		function (options) {
-			const instance = this;
+			var instance = this;
 
 			Liferay.fire('initLayout');
 
-			const doAsUserId =
+			var doAsUserId =
 				options.doAsUserId || themeDisplay.getDoAsUserIdEncoded();
-			const plid = options.plid || themeDisplay.getPlid();
-			const portletData = options.portletData;
-			const portletId = options.portletId;
-			const portletItemId = options.portletItemId;
+			var plid = options.plid || themeDisplay.getPlid();
+			var portletData = options.portletData;
+			var portletId = options.portletId;
+			var portletItemId = options.portletItemId;
 
-			let placeHolder = options.placeHolder;
+			var placeHolder = options.placeHolder;
 
 			if (!placeHolder) {
 				placeHolder = A.Node.create(
@@ -229,10 +178,10 @@
 				placeHolder = A.one(placeHolder);
 			}
 
-			const beforePortletLoaded = options.beforePortletLoaded;
-			const onCompleteFn = options.onComplete;
+			var beforePortletLoaded = options.beforePortletLoaded;
+			var onCompleteFn = options.onComplete;
 
-			const onComplete = function (portlet, portletId) {
+			var onComplete = function (portlet, portletId) {
 				if (onCompleteFn) {
 					onCompleteFn(portlet, portletId);
 				}
@@ -248,7 +197,7 @@
 				});
 			};
 
-			let container = null;
+			var container = null;
 
 			if (Liferay.Layout && Liferay.Layout.INITIALIZED) {
 				container = Liferay.Layout.getActiveDropContainer();
@@ -258,14 +207,12 @@
 				return;
 			}
 
-			const containerId = container.attr('id');
+			var currentColumnId = Util.getColumnId(container.attr('id'));
 
-			let currentColumnId = containerId.replace(/layout-column_/, '');
-
-			let portletPosition = 0;
+			var portletPosition = 0;
 
 			if (options.placeHolder) {
-				const column = placeHolder.get('parentNode');
+				var column = placeHolder.get('parentNode');
 
 				if (!column) {
 					return;
@@ -273,15 +220,15 @@
 
 				placeHolder.addClass('portlet-boundary');
 
-				const columnPortlets = column.all('.portlet-boundary');
-				const nestedPortlets = column.all('.portlet-nested-portlets');
+				var columnPortlets = column.all('.portlet-boundary');
+				var nestedPortlets = column.all('.portlet-nested-portlets');
 
 				portletPosition = columnPortlets.indexOf(placeHolder);
 
-				let nestedPortletOffset = 0;
+				var nestedPortletOffset = 0;
 
 				nestedPortlets.some((nestedPortlet) => {
-					const nestedPortletIndex = columnPortlets.indexOf(
+					var nestedPortletIndex = columnPortlets.indexOf(
 						nestedPortlet
 					);
 
@@ -303,9 +250,9 @@
 				currentColumnId = Util.getColumnId(column.attr('id'));
 			}
 
-			const url = themeDisplay.getPathMain() + '/portal/update_layout';
+			var url = themeDisplay.getPathMain() + '/portal/update_layout';
 
-			const data = {
+			var data = {
 				cmd: 'add',
 				dataType: 'JSON',
 				doAsUserId,
@@ -320,8 +267,8 @@
 				portletData,
 			};
 
-			const firstPortlet = container.one('.portlet-boundary');
-			const hasStaticPortlet = firstPortlet && firstPortlet.isStatic;
+			var firstPortlet = container.one('.portlet-boundary');
+			var hasStaticPortlet = firstPortlet && firstPortlet.isStatic;
 
 			if (!options.placeHolder && !options.plid) {
 				if (!hasStaticPortlet) {
@@ -349,16 +296,16 @@
 		Portlet,
 		'addHTML',
 		function (options) {
-			const instance = this;
+			var instance = this;
 
-			let portletBoundary = null;
+			var portletBoundary = null;
 
-			const beforePortletLoaded = options.beforePortletLoaded;
-			const data = options.data;
-			let dataType = 'HTML';
-			const onComplete = options.onComplete;
-			const placeHolder = options.placeHolder;
-			const url = options.url;
+			var beforePortletLoaded = options.beforePortletLoaded;
+			var data = options.data;
+			var dataType = 'HTML';
+			var onComplete = options.onComplete;
+			var placeHolder = options.placeHolder;
+			var url = options.url;
 
 			if (data && Lang.isString(data.dataType)) {
 				dataType = data.dataType;
@@ -366,10 +313,10 @@
 
 			dataType = dataType.toUpperCase();
 
-			const addPortletReturn = function (html) {
-				const container = placeHolder.get('parentNode');
+			var addPortletReturn = function (html) {
+				var container = placeHolder.get('parentNode');
 
-				let portletBound = A.Node.create('<div></div>');
+				var portletBound = A.Node.create('<div></div>');
 
 				portletBound.plug(A.Plugin.ParseContent);
 
@@ -377,10 +324,10 @@
 
 				portletBound = portletBound.one('> *');
 
-				let portletId;
+				var portletId;
 
 				if (portletBound) {
-					const id = portletBound.attr('id');
+					var id = portletBound.attr('id');
 
 					portletId = Util.getPortletId(id);
 
@@ -394,12 +341,12 @@
 					instance.refreshLayout(portletBound);
 
 					if (window.location.hash) {
-						window.location.href = encodeURI(window.location.hash);
+						window.location.href = window.location.hash;
 					}
 
 					portletBoundary = portletBound;
 
-					const Layout = Liferay.Layout;
+					var Layout = Liferay.Layout;
 
 					if (Layout && Layout.INITIALIZED) {
 						Layout.updateCurrentPortletInfo(portletBoundary);
@@ -456,7 +403,7 @@
 					}
 				})
 				.catch((error) => {
-					const message =
+					var message =
 						typeof error === 'string'
 							? error
 							: Liferay.Language.get(
@@ -476,12 +423,22 @@
 		Portlet,
 		'close',
 		function (portlet, skipConfirm, options) {
-			const instance = this;
+			var instance = this;
 
-			const _removeComponent = () => {
-				const portletId = portlet.portletId;
+			portlet = A.one(portlet);
 
-				const portletIndex = instance.list.indexOf(portletId);
+			if (
+				portlet &&
+				(skipConfirm ||
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-remove-this-component'
+						)
+					))
+			) {
+				var portletId = portlet.portletId;
+
+				var portletIndex = instance.list.indexOf(portletId);
 
 				if (portletIndex >= 0) {
 					instance.list.splice(portletIndex, 1);
@@ -494,26 +451,6 @@
 				Liferay.fire('destroyPortlet', options);
 
 				Liferay.fire('closePortlet', options);
-			};
-
-			portlet = A.one(portlet);
-
-			if (portlet) {
-				if (!skipConfirm) {
-					Liferay.Util.openConfirmModal({
-						message: Liferay.Language.get(
-							'are-you-sure-you-want-to-remove-this-component'
-						),
-						onConfirm: (isConfirmed) => {
-							if (isConfirmed) {
-								_removeComponent();
-							}
-						},
-					});
-				}
-				else {
-					_removeComponent();
-				}
 			}
 			else {
 				A.config.win.focus();
@@ -529,7 +466,7 @@
 			portlet = A.one(portlet);
 
 			if (portlet) {
-				const portletId =
+				var portletId =
 					portlet.portletId || Util.getPortletId(portlet.attr('id'));
 
 				Portlet.destroyComponents(portletId);
@@ -547,22 +484,21 @@
 		Portlet,
 		'onLoad',
 		function (options) {
-			const instance = this;
+			var instance = this;
 
-			const canEditTitle = options.canEditTitle;
-			const columnPos = options.columnPos;
-			const isStatic =
-				options.isStatic === 'no' ? null : options.isStatic;
-			const namespacedId = options.namespacedId;
-			const portletId = options.portletId;
-			const refreshURL = options.refreshURL;
-			const refreshURLData = options.refreshURLData;
+			var canEditTitle = options.canEditTitle;
+			var columnPos = options.columnPos;
+			var isStatic = options.isStatic == 'no' ? null : options.isStatic;
+			var namespacedId = options.namespacedId;
+			var portletId = options.portletId;
+			var refreshURL = options.refreshURL;
+			var refreshURLData = options.refreshURLData;
 
 			if (isStatic) {
 				instance.registerStatic(portletId);
 			}
 
-			const portlet = A.one('#' + namespacedId);
+			var portlet = A.one('#' + namespacedId);
 
 			if (portlet && !portlet.portletProcessed) {
 				portlet.portletProcessed = true;
@@ -578,13 +514,13 @@
 
 					// https://github.com/yui/yui3/issues/1808
 
-					let events = 'focus';
+					var events = 'focus';
 
 					if (!A.UA.touchEnabled) {
 						events = ['focus', 'mousemove'];
 					}
 
-					const handle = portlet.on(events, () => {
+					var handle = portlet.on(events, () => {
 						Util.portletTitleEdit({
 							doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
 							// eslint-disable-next-line @liferay/no-abbreviations
@@ -618,16 +554,13 @@
 		Portlet,
 		'refresh',
 		function (portlet, data, mergeWithRefreshURLData) {
-			const instance = this;
+			var instance = this;
 
 			portlet = A.one(portlet);
 
 			if (portlet) {
 				if (mergeWithRefreshURLData) {
-					data = {
-						...(portlet.refreshURLData || {}),
-						...(data || {}),
-					};
+					data = A.merge(portlet.refreshURLData || {}, data || {});
 				}
 				else {
 					data = data || portlet.refreshURLData || {};
@@ -642,11 +575,11 @@
 					data.portletAjaxable = true;
 				}
 
-				const id = portlet.attr('portlet');
+				var id = portlet.attr('portlet');
 
-				let url = portlet.refreshURL;
+				var url = portlet.refreshURL;
 
-				const placeHolder = A.Node.create(
+				var placeHolder = A.Node.create(
 					'<div class="loading-animation" id="p_p_id' + id + '" />'
 				);
 
@@ -657,9 +590,9 @@
 
 					Portlet.destroyComponents(portlet.portletId);
 
-					let params = {};
+					var params = {};
 
-					const urlPieces = url.split('?');
+					var urlPieces = url.split('?');
 
 					if (urlPieces.length > 1) {
 						params = A.QueryString.parse(urlPieces[1]);
@@ -693,16 +626,13 @@
 				else if (!portlet.getData('pendingRefresh')) {
 					portlet.setData('pendingRefresh', true);
 
-					const nonAjaxableContentMessage = Lang.sub(
-						TPL_NOT_AJAXABLE,
-						[
-							Liferay.Language.get(
-								'this-change-will-only-be-shown-after-you-refresh-the-page'
-							),
-						]
-					);
+					var nonAjaxableContentMessage = Lang.sub(TPL_NOT_AJAXABLE, [
+						Liferay.Language.get(
+							'this-change-will-only-be-shown-after-you-refresh-the-page'
+						),
+					]);
 
-					const portletBody = portlet.one('.portlet-body');
+					var portletBody = portlet.one('.portlet-body');
 
 					portletBody.placeBefore(nonAjaxableContentMessage);
 
@@ -717,9 +647,9 @@
 		Portlet,
 		'registerStatic',
 		function (portletId) {
-			const instance = this;
+			var instance = this;
 
-			const Node = A.Node;
+			var Node = A.Node;
 
 			if (Node && portletId instanceof Node) {
 				portletId = portletId.attr('id');
@@ -728,7 +658,7 @@
 				portletId = portletId.id;
 			}
 
-			const id = Util.getPortletId(portletId);
+			var id = Util.getPortletId(portletId);
 
 			instance._staticPortlets[id] = true;
 		},

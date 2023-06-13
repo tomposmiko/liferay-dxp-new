@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Akos Thurzo
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.asset.kernel.model.adapter.StagedAssetLink",
 	service = {
 		StagedAssetLinkStagedModelRepository.class, StagedModelRepository.class
@@ -92,7 +93,7 @@ public class StagedAssetLinkStagedModelRepository
 		throws PortalException {
 
 		StagedAssetLink stagedAssetLink = fetchExistingAssetLink(
-			groupId, _parseAssetEntry1Uuid(uuid), _parseAssetEntry2Uuid(uuid));
+			groupId, parseAssetEntry1Uuid(uuid), parseAssetEntry2Uuid(uuid));
 
 		if (stagedAssetLink != null) {
 			deleteStagedModel(stagedAssetLink);
@@ -120,7 +121,7 @@ public class StagedAssetLinkStagedModelRepository
 			return null;
 		}
 
-		DynamicQuery dynamicQuery = _getAssetLinkDynamicQuery(
+		DynamicQuery dynamicQuery = getAssetLinkDynamicQuery(
 			assetEntry1.getEntryId(), assetEntry2.getEntryId());
 
 		List<AssetLink> assetLinks = _assetLinkLocalService.dynamicQuery(
@@ -145,9 +146,9 @@ public class StagedAssetLinkStagedModelRepository
 	public List<StagedAssetLink> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		DynamicQuery dynamicQuery = _getAssetLinkDynamicQuery(
-			companyId, 0, _parseAssetEntry1Uuid(uuid),
-			_parseAssetEntry2Uuid(uuid));
+		DynamicQuery dynamicQuery = getAssetLinkDynamicQuery(
+			companyId, 0, parseAssetEntry1Uuid(uuid),
+			parseAssetEntry2Uuid(uuid));
 
 		dynamicQuery.addOrder(OrderFactoryUtil.desc("linkId"));
 
@@ -195,16 +196,19 @@ public class StagedAssetLinkStagedModelRepository
 			StagedAssetLink stagedAssetLink)
 		throws PortalException {
 
+		long userId = portletDataContext.getUserId(
+			stagedAssetLink.getUserUuid());
+
 		AssetLink assetLink = _assetLinkLocalService.updateLink(
-			portletDataContext.getUserId(stagedAssetLink.getUserUuid()),
-			stagedAssetLink.getEntryId1(), stagedAssetLink.getEntryId2(),
-			stagedAssetLink.getType(), stagedAssetLink.getWeight());
+			userId, stagedAssetLink.getEntryId1(),
+			stagedAssetLink.getEntryId2(), stagedAssetLink.getType(),
+			stagedAssetLink.getWeight());
 
 		return ModelAdapterUtil.adapt(
 			assetLink, AssetLink.class, StagedAssetLink.class);
 	}
 
-	private DynamicQuery _getAssetLinkDynamicQuery(
+	protected DynamicQuery getAssetLinkDynamicQuery(
 		long entryId1, long entryId2) {
 
 		DynamicQuery dynamicQuery = _assetLinkLocalService.dynamicQuery();
@@ -220,7 +224,7 @@ public class StagedAssetLinkStagedModelRepository
 		return dynamicQuery;
 	}
 
-	private DynamicQuery _getAssetLinkDynamicQuery(
+	protected DynamicQuery getAssetLinkDynamicQuery(
 		long companyId, long groupId, String assetEntry1Uuid,
 		String assetEntry2Uuid) {
 
@@ -286,11 +290,11 @@ public class StagedAssetLinkStagedModelRepository
 		return dynamicQuery;
 	}
 
-	private String _parseAssetEntry1Uuid(String uuid) {
+	protected String parseAssetEntry1Uuid(String uuid) {
 		return uuid.substring(0, uuid.indexOf(StringPool.POUND));
 	}
 
-	private String _parseAssetEntry2Uuid(String uuid) {
+	protected String parseAssetEntry2Uuid(String uuid) {
 		return uuid.substring(uuid.indexOf(StringPool.POUND) + 1);
 	}
 

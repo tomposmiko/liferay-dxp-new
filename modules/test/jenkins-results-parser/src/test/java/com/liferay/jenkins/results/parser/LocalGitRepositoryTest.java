@@ -37,7 +37,7 @@ public class LocalGitRepositoryTest extends GitRepositoryTest {
 
 				errorCollector.addError(
 					new Throwable(
-						"The repository directory should be " +
+						"The repository directorydirectory should be " +
 							FILE_PATH_REPOSITORY));
 			}
 		}
@@ -68,13 +68,10 @@ public class LocalGitRepositoryTest extends GitRepositoryTest {
 
 		JSONObject expectedJSONObject = new JSONObject();
 
+		expectedJSONObject.put("directory", FILE_PATH_REPOSITORY);
+		expectedJSONObject.put("name", NAME_REPOSITORY);
 		expectedJSONObject.put(
-			"directory", FILE_PATH_REPOSITORY
-		).put(
-			"name", NAME_REPOSITORY
-		).put(
-			"upstream_branch_name", NAME_REPOSITORY_UPSTREAM_BRANCH
-		);
+			"upstream_branch_name", NAME_REPOSITORY_UPSTREAM_BRANCH);
 
 		JSONObject actualJSONObject = localGitRepository.getJSONObject();
 

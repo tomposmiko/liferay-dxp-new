@@ -27,10 +27,6 @@ public class CommerceMLForecastAlertEntryLocalServiceWrapper
 	implements CommerceMLForecastAlertEntryLocalService,
 			   ServiceWrapper<CommerceMLForecastAlertEntryLocalService> {
 
-	public CommerceMLForecastAlertEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceMLForecastAlertEntryLocalServiceWrapper(
 		CommerceMLForecastAlertEntryLocalService
 			commerceMLForecastAlertEntryLocalService) {

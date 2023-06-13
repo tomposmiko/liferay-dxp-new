@@ -21,7 +21,7 @@ import com.liferay.calendar.service.CalendarBookingLocalService;
 import com.liferay.calendar.test.util.CalendarBookingTestUtil;
 import com.liferay.calendar.test.util.CalendarTestUtil;
 import com.liferay.calendar.test.util.CalendarUpgradeTestUtil;
-import com.liferay.calendar.test.util.CheckBookingsSchedulerJobConfigurationTestUtil;
+import com.liferay.calendar.test.util.CheckBookingsMessageListenerTestUtil;
 import com.liferay.calendar.test.util.UpgradeDatabaseTestHelper;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -69,12 +69,12 @@ public class UpgradeSchemaTest {
 			"com.liferay.calendar.internal.upgrade.v2_0_0." +
 				"SchemaUpgradeProcess");
 
-		CheckBookingsSchedulerJobConfigurationTestUtil.setUp();
+		CheckBookingsMessageListenerTestUtil.setUp();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		CheckBookingsSchedulerJobConfigurationTestUtil.tearDown();
+		CheckBookingsMessageListenerTestUtil.tearDown();
 
 		_upgradeDatabaseTestHelper.close();
 	}
@@ -154,7 +154,7 @@ public class UpgradeSchemaTest {
 	private UpgradeProcess _upgradeProcess;
 
 	@Inject(
-		filter = "component.name=com.liferay.calendar.internal.upgrade.registry.CalendarServiceUpgradeStepRegistrator"
+		filter = "component.name=com.liferay.calendar.internal.upgrade.CalendarServiceUpgrade"
 	)
 	private UpgradeStepRegistrator _upgradeStepRegistrator;
 

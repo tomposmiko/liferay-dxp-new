@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Levente Hudák
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ImageUploaderPortletKeys.IMAGE_UPLOADER,
 		"mvc.command.name=/image_uploader/upload_image"

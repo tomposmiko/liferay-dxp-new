@@ -167,11 +167,10 @@ public class TemplatePortletDataHandler extends BasePortletDataHandler {
 		List<Element> ddmTemplateElements = ddmTemplatesElement.elements();
 
 		for (Element ddmTemplateElement : ddmTemplateElements) {
-			if (classNameIds.contains(
-					_portal.getClassNameId(
-						ddmTemplateElement.attributeValue(
-							"attached-class-name")))) {
+			long classNameId = _portal.getClassNameId(
+				ddmTemplateElement.attributeValue("attached-class-name"));
 
+			if (classNameIds.contains(classNameId)) {
 				StagedModelDataHandlerUtil.importStagedModel(
 					portletDataContext, ddmTemplateElement);
 			}
@@ -225,6 +224,11 @@ public class TemplatePortletDataHandler extends BasePortletDataHandler {
 				portletDataContext);
 
 		templateEntryExportActionableDynamicQuery.performCount();
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
 	private List<Long> _getClassNameIds(PortletDataContext portletDataContext) {
@@ -301,8 +305,12 @@ public class TemplatePortletDataHandler extends BasePortletDataHandler {
 		for (TemplateHandler templateHandler :
 				_templateHandlerRegistry.getTemplateHandlers()) {
 
-			ClassName className = _classNameLocalService.getClassName(
+			ClassName className = _classNameLocalService.fetchClassName(
 				templateHandler.getClassName());
+
+			if (className == null) {
+				continue;
+			}
 
 			portletDataHandlerControls.add(
 				new PortletDataHandlerBoolean(
@@ -340,9 +348,6 @@ public class TemplatePortletDataHandler extends BasePortletDataHandler {
 
 	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private Portal _portal;

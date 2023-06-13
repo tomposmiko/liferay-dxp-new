@@ -20,7 +20,6 @@ import com.liferay.change.tracking.model.CTAutoResolutionInfoTable;
 import com.liferay.change.tracking.model.impl.CTAutoResolutionInfoImpl;
 import com.liferay.change.tracking.model.impl.CTAutoResolutionInfoModelImpl;
 import com.liferay.change.tracking.service.persistence.CTAutoResolutionInfoPersistence;
-import com.liferay.change.tracking.service.persistence.CTAutoResolutionInfoUtil;
 import com.liferay.change.tracking.service.persistence.impl.constants.CTPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,7 +48,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -73,7 +72,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = CTAutoResolutionInfoPersistence.class)
+@Component(
+	service = {CTAutoResolutionInfoPersistence.class, BasePersistence.class}
+)
 public class CTAutoResolutionInfoPersistenceImpl
 	extends BasePersistenceImpl<CTAutoResolutionInfo>
 	implements CTAutoResolutionInfoPersistence {
@@ -196,7 +197,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTAutoResolutionInfo>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTAutoResolutionInfo ctAutoResolutionInfo : list) {
@@ -567,7 +568,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 
 		Object[] finderArgs = new Object[] {ctCollectionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -727,7 +728,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTAutoResolutionInfo>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTAutoResolutionInfo ctAutoResolutionInfo : list) {
@@ -1199,7 +1200,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param sourceModelClassPKs the source model class pks
+	 * @param sourceModelClassPK the source model class pk
 	 * @param start the lower bound of the range of ct auto resolution infos
 	 * @param end the upper bound of the range of ct auto resolution infos (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -1250,7 +1251,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTAutoResolutionInfo>)finderCache.getResult(
-				_finderPathWithPaginationFindByC_MCNI_SMCPK, finderArgs, this);
+				_finderPathWithPaginationFindByC_MCNI_SMCPK, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CTAutoResolutionInfo ctAutoResolutionInfo : list) {
@@ -1377,7 +1378,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 			ctCollectionId, modelClassNameId, sourceModelClassPK
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -1448,7 +1449,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByC_MCNI_SMCPK, finderArgs, this);
+			_finderPathWithPaginationCountByC_MCNI_SMCPK, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -1935,7 +1936,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CTAutoResolutionInfo>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2005,7 +2006,7 @@ public class CTAutoResolutionInfoPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2131,31 +2132,11 @@ public class CTAutoResolutionInfoPersistenceImpl
 				"ctCollectionId", "modelClassNameId", "sourceModelClassPK"
 			},
 			false);
-
-		_setCTAutoResolutionInfoUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setCTAutoResolutionInfoUtilPersistence(null);
-
 		entityCache.removeCache(CTAutoResolutionInfoImpl.class.getName());
-	}
-
-	private void _setCTAutoResolutionInfoUtilPersistence(
-		CTAutoResolutionInfoPersistence ctAutoResolutionInfoPersistence) {
-
-		try {
-			Field field = CTAutoResolutionInfoUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ctAutoResolutionInfoPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -2218,5 +2199,9 @@ public class CTAutoResolutionInfoPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private CTAutoResolutionInfoModelArgumentsResolver
+		_ctAutoResolutionInfoModelArgumentsResolver;
 
 }

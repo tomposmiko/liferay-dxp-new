@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
 
-<service-builder auto-import-default-references="false" auto-namespace-tables="false" change-tracking-enabled="true" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.commerce.product">
+<service-builder auto-namespace-tables="false" mvcc-enabled="false" package-path="com.liferay.commerce.product">
 	<author>Marco Leo</author>
 	<namespace>Commerce</namespace>
-	<entity external-reference-code="company" local-service="true" name="CommerceCatalog" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CommerceCatalog" remote-service="true">
 
 		<!-- PK fields -->
 
@@ -41,7 +41,7 @@
 			<finder-column name="system" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CommerceChannel" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CommerceChannel" remote-service="true">
 
 		<!-- PK fields -->
 
@@ -78,75 +78,6 @@
 		</finder>
 		<finder name="SiteGroupId" return-type="CommerceChannel">
 			<finder-column name="siteGroupId" />
-		</finder>
-	</entity>
-	<entity local-service="true" name="CommerceChannelAccountEntryRel" remote-service="true" table="CChannelAccountEntryRel">
-
-		<!-- PK fields -->
-
-		<column db-name="CChannelAccountEntryRelId" name="commerceChannelAccountEntryRelId" primary="true" type="long" />
-
-		<!-- Audit fields -->
-
-		<column name="companyId" type="long" />
-		<column name="userId" type="long" />
-		<column name="userName" type="String" />
-		<column name="createDate" type="Date" />
-		<column name="modifiedDate" type="Date" />
-
-		<!-- Other fields -->
-
-		<column name="accountEntryId" type="long" />
-		<column name="classNameId" type="long" />
-		<column name="classPK" type="long" />
-		<column name="commerceChannelId" type="long" />
-		<column name="overrideEligibility" type="boolean" />
-		<column name="priority" type="double" />
-		<column name="type" type="int" />
-
-		<!-- Order -->
-
-		<order by="desc">
-			<order-column name="priority" />
-		</order>
-
-		<!-- Finder methods -->
-
-		<finder name="AccountEntryId" return-type="Collection">
-			<finder-column name="accountEntryId" />
-		</finder>
-		<finder name="CommerceChannelId" return-type="Collection">
-			<finder-column name="commerceChannelId" />
-		</finder>
-		<finder name="A_T" return-type="Collection">
-			<finder-column name="accountEntryId" />
-			<finder-column name="type" />
-		</finder>
-		<finder name="C_C" return-type="Collection">
-			<finder-column name="classNameId" />
-			<finder-column name="classPK" />
-		</finder>
-		<finder name="C_T" return-type="Collection">
-			<finder-column name="commerceChannelId" />
-			<finder-column name="type" />
-		</finder>
-		<finder name="A_C_T" return-type="Collection">
-			<finder-column name="accountEntryId" />
-			<finder-column name="commerceChannelId" />
-			<finder-column name="type" />
-		</finder>
-		<finder name="C_C_C_T" return-type="Collection">
-			<finder-column name="classNameId" />
-			<finder-column name="classPK" />
-			<finder-column name="commerceChannelId" />
-			<finder-column name="type" />
-		</finder>
-		<finder name="A_C_C_C_T" return-type="CommerceChannelAccountEntryRel" unique="true">
-			<finder-column name="accountEntryId" />
-			<finder-column name="classNameId" />
-			<finder-column name="classPK" />
-			<finder-column name="commerceChannelId" />
-			<finder-column name="type" />
 		</finder>
 	</entity>
 	<entity local-service="true" name="CommerceChannelRel" remote-service="true">
@@ -190,7 +121,7 @@
 			<finder-column name="commerceChannelId" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CPAttachmentFileEntry" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CPAttachmentFileEntry" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
@@ -242,11 +173,6 @@
 		<finder name="LtD_S" return-type="Collection">
 			<finder-column comparator="&lt;" name="displayDate" />
 			<finder-column name="status" />
-		</finder>
-		<finder name="G_C_F" return-type="Collection">
-			<finder-column name="groupId" />
-			<finder-column name="classNameId" />
-			<finder-column name="fileEntryId" />
 		</finder>
 		<finder name="C_C_F" return-type="Collection">
 			<finder-column name="classNameId" />
@@ -360,9 +286,6 @@
 		</finder>
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
-		</finder>
-		<finder name="CProductId" return-type="Collection">
-			<finder-column name="CProductId" />
 		</finder>
 		<finder name="CPTaxCategoryId" return-type="Collection">
 			<finder-column name="CPTaxCategoryId" />
@@ -651,7 +574,6 @@
 
 		<column name="classNameId" type="long" />
 		<column name="classPK" type="long" />
-		<column name="layoutPageTemplateEntryUuid" type="String" />
 		<column name="layoutUuid" type="String" />
 
 		<!-- Finder methods -->
@@ -663,23 +585,11 @@
 			<finder-column name="groupId" />
 			<finder-column name="classNameId" />
 		</finder>
-		<finder name="G_LPTEU" return-type="Collection">
-			<finder-column name="groupId" />
-			<finder-column name="layoutPageTemplateEntryUuid" />
-		</finder>
 		<finder name="G_L" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="layoutUuid" />
 		</finder>
 		<finder name="C_C" return-type="Collection">
-			<finder-column name="classNameId" />
-			<finder-column name="classPK" />
-		</finder>
-		<finder name="C_C_LPTEU" return-type="Collection" where="layoutPageTemplateEntryUuid IS NOT NULL">
-			<finder-column name="classNameId" />
-			<finder-column name="classPK" />
-		</finder>
-		<finder name="C_C_L" return-type="Collection" where="layoutUuid IS NOT NULL">
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
 		</finder>
@@ -689,7 +599,7 @@
 			<finder-column name="classPK" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CPInstance" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CPInstance" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
@@ -738,10 +648,6 @@
 		<column db-name="deliverySubTypeSettings" name="deliverySubscriptionTypeSettings" type="String" />
 		<column name="deliveryMaxSubscriptionCycles" type="long" />
 		<column name="unspsc" type="String" />
-		<column name="discontinued" type="boolean" />
-		<column name="discontinuedDate" type="Date" />
-		<column name="replacementCPInstanceUuid" type="String" />
-		<column name="replacementCProductId" type="long" />
 		<column name="status" type="int" />
 		<column name="statusByUserId" type="long" />
 		<column name="statusByUserName" type="String" />
@@ -772,15 +678,11 @@
 			<finder-column name="groupId" />
 			<finder-column name="status" />
 		</finder>
-		<finder name="C_SKU" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="sku" />
-		</finder>
 		<finder name="C_C" return-type="CPInstance" unique="true">
 			<finder-column name="CPDefinitionId" />
 			<finder-column name="CPInstanceUuid" />
 		</finder>
-		<finder name="CPDI_SKU" return-type="CPInstance" unique="true">
+		<finder name="C_S" return-type="CPInstance" unique="true">
 			<finder-column name="CPDefinitionId" />
 			<finder-column name="sku" />
 		</finder>
@@ -844,7 +746,7 @@
 			<finder-column name="CPInstanceId" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CPMeasurementUnit" remote-service="true" uuid="true">
+	<entity local-service="true" name="CPMeasurementUnit" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
@@ -883,12 +785,13 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
-		<finder name="C_K" return-type="CPMeasurementUnit" unique="true">
-			<finder-column name="companyId" />
-			<finder-column case-sensitive="false" name="key" />
-		</finder>
 		<finder name="C_T" return-type="Collection">
 			<finder-column name="companyId" />
+			<finder-column name="type" />
+		</finder>
+		<finder name="C_K_T" return-type="CPMeasurementUnit" unique="true">
+			<finder-column name="companyId" />
+			<finder-column case-sensitive="false" name="key" />
 			<finder-column name="type" />
 		</finder>
 		<finder name="C_P_T" return-type="Collection">
@@ -897,7 +800,7 @@
 			<finder-column name="type" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CPOption" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CPOption" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
@@ -977,7 +880,7 @@
 			<finder-column name="key" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CPOptionValue" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CPOptionValue" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
@@ -1019,7 +922,7 @@
 			<finder-column name="key" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CProduct" remote-service="false" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CProduct" remote-service="false" uuid="true">
 
 		<!-- PK fields -->
 
@@ -1096,7 +999,7 @@
 			<finder-column name="key" />
 		</finder>
 	</entity>
-	<entity external-reference-code="company" local-service="true" name="CPTaxCategory" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CPTaxCategory" remote-service="true">
 
 		<!-- PK fields -->
 
@@ -1130,20 +1033,15 @@
 	<exceptions>
 		<exception>CommerceCatalogProducts</exception>
 		<exception>CommerceCatalogSystem</exception>
-		<exception>CommerceChannelAccountEntryRelType</exception>
-		<exception>CommerceChannelType</exception>
 		<exception>CPAttachmentFileEntryCDNURL</exception>
 		<exception>CPAttachmentFileEntryDisplayDate</exception>
 		<exception>CPAttachmentFileEntryExpirationDate</exception>
 		<exception>CPAttachmentFileEntryName</exception>
 		<exception>CPAttachmentFileEntryProtocol</exception>
 		<exception>CPAttachmentFileEntrySize</exception>
-		<exception>CPDefinitionDeliveryMaxSubscriptionCycles</exception>
-		<exception>CPDefinitionDeliverySubscriptionLength</exception>
 		<exception>CPDefinitionDisplayDate</exception>
 		<exception>CPDefinitionExpirationDate</exception>
 		<exception>CPDefinitionIgnoreSKUCombinations</exception>
-		<exception>CPDefinitionMaxSubscriptionCycles</exception>
 		<exception>CPDefinitionMetaDescription</exception>
 		<exception>CPDefinitionMetaKeywords</exception>
 		<exception>CPDefinitionMetaTitle</exception>
@@ -1155,19 +1053,13 @@
 		<exception>CPDefinitionOptionValueRelPrice</exception>
 		<exception>CPDefinitionOptionValueRelQuantity</exception>
 		<exception>CPDefinitionProductTypeName</exception>
-		<exception>CPDefinitionSubscriptionLength</exception>
 		<exception>CPDisplayLayoutEntry</exception>
-		<exception>CPDisplayLayoutEntryUuid</exception>
-		<exception>CPInstanceDeliverySubscriptionLength</exception>
-		<exception>CPInstanceDiscontinuedDate</exception>
+		<exception>CPDisplayLayoutLayoutUuid</exception>
 		<exception>CPInstanceDisplayDate</exception>
 		<exception>CPInstanceExpirationDate</exception>
 		<exception>CPInstanceJson</exception>
-		<exception>CPInstanceMaxPriceValue</exception>
-		<exception>CPInstanceReplacementCPInstanceUuid</exception>
 		<exception>CPInstanceSku</exception>
-		<exception>CPInstanceSubscriptionLength</exception>
-		<exception>CPMeasurementUnitType</exception>
+		<exception>CPMeasurementUnitKey</exception>
 		<exception>CPOptionCategoryKey</exception>
 		<exception>CPOptionKey</exception>
 		<exception>CPOptionSKUContributor</exception>
@@ -1175,17 +1067,12 @@
 		<exception>CPSpecificationOptionKey</exception>
 		<exception>CPSpecificationOptionTitle</exception>
 		<exception>CPTaxCategoryName</exception>
-		<exception>DuplicateCommerceChannel</exception>
-		<exception>DuplicateCommerceChannelAccountEntryRel</exception>
 		<exception>DuplicateCommerceChannelRel</exception>
 		<exception>DuplicateCPAttachmentFileEntry</exception>
 		<exception>DuplicateCPDefinitionOptionRelKey</exception>
-		<exception>DuplicateCPInstance</exception>
-		<exception>DuplicateCPMeasurementUnitExternalReferenceCode</exception>
-		<exception>DuplicateCPMeasurementUnitKey</exception>
 		<exception>DuplicateCProduct</exception>
 		<exception>DuplicateCPSpecificationOptionKey</exception>
-		<exception>DuplicateCPTaxCategory</exception>
+		<exception>InvalidCommerceChannelType</exception>
 		<exception>NoSuchSkuContributorCPDefinitionOptionRel</exception>
 	</exceptions>
 </service-builder>

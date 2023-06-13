@@ -12,42 +12,22 @@
  * details.
  */
 
-import {openConfirmModal} from 'frontend-js-web';
-
 const ACTIONS = {
 	deleteTeamUsers(itemData) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, itemData.deleteTeamUsersURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			submitForm(document.hrefFm, itemData.deleteTeamUsersURL);
+		}
 	},
 };
 
-export default function propsTransformer({actions, items, ...props}) {
+export default function propsTransformer({items, ...props}) {
 	return {
 		...props,
-		actions: actions?.map((item) => {
-			return {
-				...item,
-				onClick(event) {
-					const action = item.data?.action;
-
-					if (action) {
-						event.preventDefault();
-
-						ACTIONS[action](item.data);
-					}
-				},
-			};
-		}),
-
-		items: items?.map((item) => {
+		items: items.map((item) => {
 			return {
 				...item,
 				onClick(event) {

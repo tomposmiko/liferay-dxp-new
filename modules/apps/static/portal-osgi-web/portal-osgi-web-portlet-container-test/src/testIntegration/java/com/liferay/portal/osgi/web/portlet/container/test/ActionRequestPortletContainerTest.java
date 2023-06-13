@@ -15,16 +15,17 @@
 package com.liferay.portal.osgi.web.portlet.container.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.AuthToken;
 import com.liferay.portal.kernel.security.auth.AuthTokenWhitelist;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.osgi.web.portlet.container.test.util.PortletContainerTestUtil;
@@ -41,6 +42,7 @@ import java.io.PrintWriter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -187,12 +189,13 @@ public class ActionRequestPortletContainerTest
 
 			LogEntry logEntry = logEntries.get(0);
 
-			Throwable throwable = logEntry.getThrowable();
-
 			Assert.assertEquals(
-				"User 0 session does not have a CSRF token for " +
-					"com.liferay.portlet.SecurityPortletContainerWrapper",
-				throwable.getMessage());
+				StringBundler.concat(
+					"com.liferay.portal.kernel.security.auth.",
+					"PrincipalException$MustHaveSessionCSRFToken: User 0 ",
+					"session does not have a CSRF token for ",
+					"com.liferay.portlet.SecurityPortletContainerWrapper"),
+				logEntry.getMessage());
 
 			Assert.assertEquals(403, response.getCode());
 			Assert.assertFalse(testPortlet.isCalledAction());
@@ -223,8 +226,7 @@ public class ActionRequestPortletContainerTest
 				httpServletRequest, TEST_PORTLET_ID, layout.getPlid(),
 				PortletRequest.ACTION_PHASE));
 
-		url = HttpComponentsUtil.setParameter(
-			url, "p_auth", response.getBody());
+		url = HttpUtil.setParameter(url, "p_auth", response.getBody());
 
 		response = PortletContainerTestUtil.request(
 			url, Collections.singletonMap("Cookie", response.getCookies()));
@@ -315,7 +317,7 @@ public class ActionRequestPortletContainerTest
 				httpServletRequest, TEST_PORTLET_ID, layout.getPlid(),
 				PortletRequest.ACTION_PHASE));
 
-		url = HttpComponentsUtil.removeParameter(url, "p_auth");
+		url = HttpUtil.removeParameter(url, "p_auth");
 
 		response = PortletContainerTestUtil.request(
 			url,
@@ -344,10 +346,11 @@ public class ActionRequestPortletContainerTest
 
 			PortletURL portletURL = resourceResponse.createActionURL();
 
+			Map<String, String[]> parameterMap = HttpUtil.getParameterMap(
+				HttpUtil.getQueryString(portletURL.toString()));
+
 			String portalAuthenticationToken = MapUtil.getString(
-				HttpComponentsUtil.getParameterMap(
-					HttpComponentsUtil.getQueryString(portletURL.toString())),
-				"p_auth");
+				parameterMap, "p_auth");
 
 			printWriter.write(portalAuthenticationToken);
 		}

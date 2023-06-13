@@ -16,7 +16,6 @@ package com.liferay.headless.commerce.delivery.catalog.client.serdes.v1_0;
 
 import com.liferay.headless.commerce.delivery.catalog.client.dto.v1_0.Attachment;
 import com.liferay.headless.commerce.delivery.catalog.client.dto.v1_0.Category;
-import com.liferay.headless.commerce.delivery.catalog.client.dto.v1_0.LinkedProduct;
 import com.liferay.headless.commerce.delivery.catalog.client.dto.v1_0.Product;
 import com.liferay.headless.commerce.delivery.catalog.client.dto.v1_0.ProductOption;
 import com.liferay.headless.commerce.delivery.catalog.client.dto.v1_0.ProductSpecification;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -64,7 +64,7 @@ public class ProductSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (product.getAttachments() != null) {
 			if (sb.length() > 1) {
@@ -144,20 +144,6 @@ public class ProductSerDes {
 			sb.append(_toJSON(product.getExpando()));
 		}
 
-		if (product.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(product.getExternalReferenceCode()));
-
-			sb.append("\"");
-		}
-
 		if (product.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -181,26 +167,6 @@ public class ProductSerDes {
 				sb.append(String.valueOf(product.getImages()[i]));
 
 				if ((i + 1) < product.getImages().length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
-		if (product.getLinkedProducts() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"linkedProducts\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < product.getLinkedProducts().length; i++) {
-				sb.append(String.valueOf(product.getLinkedProducts()[i]));
-
-				if ((i + 1) < product.getLinkedProducts().length) {
 					sb.append(", ");
 				}
 			}
@@ -287,16 +253,6 @@ public class ProductSerDes {
 			sb.append(_escape(product.getName()));
 
 			sb.append("\"");
-		}
-
-		if (product.getProductConfiguration() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"productConfiguration\": ");
-
-			sb.append(String.valueOf(product.getProductConfiguration()));
 		}
 
 		if (product.getProductId() != null) {
@@ -472,16 +428,6 @@ public class ProductSerDes {
 			sb.append("\"");
 		}
 
-		if (product.getUrls() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"urls\": ");
-
-			sb.append(_toJSON(product.getUrls()));
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -501,7 +447,7 @@ public class ProductSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (product.getAttachments() == null) {
 			map.put("attachments", null);
@@ -540,15 +486,6 @@ public class ProductSerDes {
 			map.put("expando", String.valueOf(product.getExpando()));
 		}
 
-		if (product.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(product.getExternalReferenceCode()));
-		}
-
 		if (product.getId() == null) {
 			map.put("id", null);
 		}
@@ -561,14 +498,6 @@ public class ProductSerDes {
 		}
 		else {
 			map.put("images", String.valueOf(product.getImages()));
-		}
-
-		if (product.getLinkedProducts() == null) {
-			map.put("linkedProducts", null);
-		}
-		else {
-			map.put(
-				"linkedProducts", String.valueOf(product.getLinkedProducts()));
 		}
 
 		if (product.getMetaDescription() == null) {
@@ -617,15 +546,6 @@ public class ProductSerDes {
 		}
 		else {
 			map.put("name", String.valueOf(product.getName()));
-		}
-
-		if (product.getProductConfiguration() == null) {
-			map.put("productConfiguration", null);
-		}
-		else {
-			map.put(
-				"productConfiguration",
-				String.valueOf(product.getProductConfiguration()));
 		}
 
 		if (product.getProductId() == null) {
@@ -705,13 +625,6 @@ public class ProductSerDes {
 			map.put("urlImage", String.valueOf(product.getUrlImage()));
 		}
 
-		if (product.getUrls() == null) {
-			map.put("urls", null);
-		}
-		else {
-			map.put("urls", String.valueOf(product.getUrls()));
-		}
-
 		return map;
 	}
 
@@ -734,34 +647,26 @@ public class ProductSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "attachments")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Attachment[] attachmentsArray =
-						new Attachment[jsonParserFieldValues.length];
-
-					for (int i = 0; i < attachmentsArray.length; i++) {
-						attachmentsArray[i] = AttachmentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setAttachments(attachmentsArray);
+					product.setAttachments(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AttachmentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Attachment[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "categories")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Category[] categoriesArray =
-						new Category[jsonParserFieldValues.length];
-
-					for (int i = 0; i < categoriesArray.length; i++) {
-						categoriesArray[i] = CategorySerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setCategories(categoriesArray);
+					product.setCategories(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CategorySerDes.toDTO((String)object)
+						).toArray(
+							size -> new Category[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "createDate")) {
@@ -780,14 +685,6 @@ public class ProductSerDes {
 						(Map)ProductSerDes.toMap((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					product.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
 				if (jsonParserFieldValue != null) {
 					product.setId(Long.valueOf((String)jsonParserFieldValue));
@@ -795,34 +692,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "images")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Attachment[] imagesArray =
-						new Attachment[jsonParserFieldValues.length];
-
-					for (int i = 0; i < imagesArray.length; i++) {
-						imagesArray[i] = AttachmentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setImages(imagesArray);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "linkedProducts")) {
-				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					LinkedProduct[] linkedProductsArray =
-						new LinkedProduct[jsonParserFieldValues.length];
-
-					for (int i = 0; i < linkedProductsArray.length; i++) {
-						linkedProductsArray[i] = LinkedProductSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setLinkedProducts(linkedProductsArray);
+					product.setImages(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AttachmentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Attachment[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "metaDescription")) {
@@ -859,15 +736,6 @@ public class ProductSerDes {
 					product.setName((String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(
-						jsonParserFieldName, "productConfiguration")) {
-
-				if (jsonParserFieldValue != null) {
-					product.setProductConfiguration(
-						ProductConfigurationSerDes.toDTO(
-							(String)jsonParserFieldValue));
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "productId")) {
 				if (jsonParserFieldValue != null) {
 					product.setProductId(
@@ -876,40 +744,29 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "productOptions")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ProductOption[] productOptionsArray =
-						new ProductOption[jsonParserFieldValues.length];
-
-					for (int i = 0; i < productOptionsArray.length; i++) {
-						productOptionsArray[i] = ProductOptionSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setProductOptions(productOptionsArray);
+					product.setProductOptions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ProductOptionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new ProductOption[size]
+						));
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "productSpecifications")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ProductSpecification[] productSpecificationsArray =
-						new ProductSpecification[jsonParserFieldValues.length];
-
-					for (int i = 0; i < productSpecificationsArray.length;
-						 i++) {
-
-						productSpecificationsArray[i] =
-							ProductSpecificationSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					product.setProductSpecifications(
-						productSpecificationsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ProductSpecificationSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new ProductSpecification[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "productType")) {
@@ -919,18 +776,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "relatedProducts")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RelatedProduct[] relatedProductsArray =
-						new RelatedProduct[jsonParserFieldValues.length];
-
-					for (int i = 0; i < relatedProductsArray.length; i++) {
-						relatedProductsArray[i] = RelatedProductSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setRelatedProducts(relatedProductsArray);
+					product.setRelatedProducts(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RelatedProductSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RelatedProduct[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "shortDescription")) {
@@ -940,17 +793,14 @@ public class ProductSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "skus")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Sku[] skusArray = new Sku[jsonParserFieldValues.length];
-
-					for (int i = 0; i < skusArray.length; i++) {
-						skusArray[i] = SkuSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					product.setSkus(skusArray);
+					product.setSkus(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> SkuSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Sku[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "slug")) {
@@ -966,12 +816,6 @@ public class ProductSerDes {
 			else if (Objects.equals(jsonParserFieldName, "urlImage")) {
 				if (jsonParserFieldValue != null) {
 					product.setUrlImage((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "urls")) {
-				if (jsonParserFieldValue != null) {
-					product.setUrls(
-						(Map)ProductSerDes.toMap((String)jsonParserFieldValue));
 				}
 			}
 		}

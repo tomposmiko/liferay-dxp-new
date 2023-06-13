@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,31 +111,6 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 		_siblingTemplateNodes.add(templateNode);
 	}
 
-	@Override
-	public Object clone() {
-		TemplateNode templateNode = new TemplateNode(
-			_themeDisplay, getName(), getData(), getType(), getAttributes());
-
-		for (Map.Entry<String, TemplateNode> entry :
-				_childTemplateNodes.entrySet()) {
-
-			templateNode.appendChild(entry.getValue());
-		}
-
-		templateNode.appendOptions(getOptions());
-		templateNode.appendOptionsMap(getOptionsMap());
-
-		for (TemplateNode siblingTemplateNode : _siblingTemplateNodes) {
-			templateNode.appendSibling(siblingTemplateNode);
-		}
-
-		for (Map.Entry<String, Object> entry : entrySet()) {
-			templateNode.put(entry.getKey(), entry.getValue());
-		}
-
-		return templateNode;
-	}
-
 	public String getAttribute(String name) {
 		Map<String, String> attributes = getAttributes();
 
@@ -162,11 +136,8 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 	public String getData() {
 		String type = getType();
 
-		if (type.equals("color") || type.equals("ddm-color")) {
-			return _getColorData();
-		}
-		else if (type.equals("ddm-decimal") || type.equals("ddm-number") ||
-				 type.equals("numeric")) {
+		if (type.equals("ddm-decimal") || type.equals("ddm-number") ||
+			type.equals("numeric")) {
 
 			return _getNumericData();
 		}
@@ -225,13 +196,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 	}
 
 	public String getType() {
-		Object type = get("type");
-
-		if ((type == null) || (type instanceof String)) {
-			return (String)type;
-		}
-
-		return StringPool.BLANK;
+		return (String)get("type");
 	}
 
 	public String getUrl() {
@@ -257,7 +222,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 				return StringPool.BLANK;
 			}
 
-			return PortalUtil.getLayoutRelativeURL(layout, _themeDisplay);
+			return PortalUtil.getLayoutFriendlyURL(layout, _themeDisplay);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
@@ -266,16 +231,6 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 
 			return StringPool.BLANK;
 		}
-	}
-
-	private String _getColorData() {
-		String data = (String)get("data");
-
-		if (data.startsWith(StringPool.POUND)) {
-			return data;
-		}
-
-		return StringPool.POUND + data;
 	}
 
 	private String _getDDMJournalArticleFriendlyURL() {
@@ -322,7 +277,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -352,7 +307,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -383,11 +338,11 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 				"longitude", jsonObject.get("lng")
 			);
 
-			return jsonObject.toString();
+			return jsonObject.toJSONString();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -446,7 +401,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 				"uuid", assetRenderer.getUuid()
 			);
 
-			return jsonObject.toString();
+			return jsonObject.toJSONString();
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
@@ -455,7 +410,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception.getMessage());
 			}
 		}
 
@@ -467,13 +422,6 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 
 		DecimalFormat decimalFormat = (DecimalFormat)DecimalFormat.getInstance(
 			LocaleUtil.getMostRelevantLocale());
-
-		DecimalFormatSymbols decimalFormatSymbols =
-			decimalFormat.getDecimalFormatSymbols();
-
-		decimalFormatSymbols.setZeroDigit('0');
-
-		decimalFormat.setDecimalFormatSymbols(decimalFormatSymbols);
 
 		decimalFormat.setGroupingUsed(false);
 		decimalFormat.setMaximumFractionDigits(Integer.MAX_VALUE);

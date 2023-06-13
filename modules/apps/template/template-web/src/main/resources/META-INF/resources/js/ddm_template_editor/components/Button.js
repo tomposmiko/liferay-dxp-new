@@ -20,7 +20,7 @@ import React, {useState} from 'react';
 
 const noop = () => {};
 
-export function Button({label, onClick = noop, tooltip}) {
+export const Button = ({label, onClick = noop, tooltip}) => {
 	const [showPreview, setShowPreview] = useState(false);
 
 	return (
@@ -30,15 +30,13 @@ export function Button({label, onClick = noop, tooltip}) {
 			displayType="unstyled"
 			key={label}
 			onClick={onClick}
-			size="sm"
+			small
 		>
 			{label}
-
 			<ClayPopover
 				alignPosition="left"
 				disableScroll
 				header={label}
-				onShowChange={setShowPreview}
 				show={showPreview}
 				trigger={
 					<ClayIcon
@@ -56,7 +54,7 @@ export function Button({label, onClick = noop, tooltip}) {
 			</ClayPopover>
 		</ClayButton>
 	);
-}
+};
 
 Button.propTypes = {
 	label: PropTypes.string.isRequired,

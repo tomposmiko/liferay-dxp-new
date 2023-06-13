@@ -1,33 +1,9 @@
 @default = "refresh"
 definition {
 
-	function pauseRefresh {
-		WaitForSPARefresh();
-
-		selenium.pause(5000);
-
-		selenium.refresh();
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-
-		selenium.assertJavaScriptErrors();
-
-		selenium.assertLiferayErrors();
-	}
-
 	function refresh {
 		WaitForSPARefresh();
 
-		selenium.refresh();
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-
-		selenium.assertJavaScriptErrors();
-
-		selenium.assertLiferayErrors();
-	}
-
-	function refreshNoSPARefresh {
 		selenium.refresh();
 
 		WaitForLiferayEvent.initializeLiferayEventLog();

@@ -14,17 +14,24 @@
 
 package com.liferay.wiki.web.internal.portlet.configuration.icon;
 
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.portlet.configuration.icon.BaseJSPPortletConfigurationIcon;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.wiki.constants.WikiPortletKeys;
-
-import java.util.Map;
+import com.liferay.wiki.model.WikiNode;
+import com.liferay.wiki.model.WikiPage;
+import com.liferay.wiki.web.internal.portlet.action.ActionUtil;
 
 import javax.portlet.PortletRequest;
-
-import javax.servlet.ServletContext;
+import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -33,31 +40,71 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_ADMIN, "path=/wiki/view"
 	},
 	service = PortletConfigurationIcon.class
 )
 public class PrintPagePortletConfigurationIcon
-	extends BaseJSPPortletConfigurationIcon {
-
-	@Override
-	public Map<String, Object> getContext(PortletRequest portletRequest) {
-		return HashMapBuilder.<String, Object>put(
-			"action", getNamespace(portletRequest) + "print"
-		).put(
-			"globalAction", true
-		).build();
-	}
-
-	@Override
-	public String getJspPath() {
-		return "/wiki/configuration/icon/print.jsp";
-	}
+	extends BasePortletConfigurationIcon {
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "print");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "print");
+	}
+
+	@Override
+	public String getOnClick(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		try {
+			return StringBundler.concat(
+				"window.open('",
+				PortletURLBuilder.create(
+					_portal.getControlPanelPortletURL(
+						portletRequest, WikiPortletKeys.WIKI_ADMIN,
+						PortletRequest.RENDER_PHASE)
+				).setMVCRenderCommandName(
+					"/wiki/view"
+				).setParameter(
+					"nodeName",
+					() -> {
+						WikiNode node = ActionUtil.getNode(portletRequest);
+
+						return node.getName();
+					}
+				).setParameter(
+					"title",
+					() -> {
+						WikiPage page = ActionUtil.getPage(portletRequest);
+
+						return page.getTitle();
+					}
+				).setParameter(
+					"viewMode", Constants.PRINT
+				).setWindowState(
+					LiferayWindowState.POP_UP
+				).buildString(),
+				"', '', 'directories=0,height=480,left=80,location=1,",
+				"menubar=1,resizable=1,scrollbars=yes,status=0,",
+				"toolbar=0,top=180,width=640');");
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+
+		return StringPool.BLANK;
+	}
+
+	@Override
+	public String getURL(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		return "javascript:;";
 	}
 
 	@Override
@@ -71,14 +118,14 @@ public class PrintPagePortletConfigurationIcon
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	public boolean isToolTip() {
+		return false;
 	}
 
-	@Reference
-	private Language _language;
+	private static final Log _log = LogFactoryUtil.getLog(
+		PrintPagePortletConfigurationIcon.class);
 
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.wiki.web)")
-	private ServletContext _servletContext;
+	@Reference
+	private Portal _portal;
 
 }

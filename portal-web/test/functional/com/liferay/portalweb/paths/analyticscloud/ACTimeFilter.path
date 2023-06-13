@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!-- TIME FILTER ELEMENTS -->
-
 <tr>
 	<td>TIME_FILTER_DROPDOWN</td>
 	<td>//div[contains(@class,'dropdown-range-key-root')]/button</td>
@@ -60,7 +58,7 @@
 </tr>
 <tr>
 	<td>DATE_PICKER_DAY</td>
-	<td>//table[@class='calendar-root']//button[contains(@class,'day-root') and text()='${key_day}' and not(contains(@class,'outside-month'))]</td>
+	<td>//table[@class='calendar-root']//button[contains(@class,'day-root') and text()='${key_day}' and not(@disabled)]</td>
 	<td></td>
 </tr>
 <tr>

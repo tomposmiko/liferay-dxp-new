@@ -57,22 +57,9 @@ public class HypersonicDB extends BaseDB {
 		return StringPool.BLANK;
 	}
 
-	protected String getCopyTableStructureSQL(
-		String tableName, String newTableName) {
-
-		return StringBundler.concat(
-			"create table ", newTableName, " as (select * from ", tableName,
-			") without data");
-	}
-
 	@Override
 	protected int[] getSQLTypes() {
 		return _SQL_TYPES;
-	}
-
-	@Override
-	protected int[] getSQLVarcharSizes() {
-		return _SQL_VARCHAR_SIZES;
 	}
 
 	@Override
@@ -146,10 +133,6 @@ public class HypersonicDB extends BaseDB {
 	private static final int[] _SQL_TYPES = {
 		Types.BLOB, Types.BLOB, Types.BIT, Types.TIMESTAMP, Types.DOUBLE,
 		Types.INTEGER, Types.BIGINT, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
-	};
-
-	private static final int[] _SQL_VARCHAR_SIZES = {
-		SQL_VARCHAR_MAX_SIZE, SQL_VARCHAR_MAX_SIZE
 	};
 
 }

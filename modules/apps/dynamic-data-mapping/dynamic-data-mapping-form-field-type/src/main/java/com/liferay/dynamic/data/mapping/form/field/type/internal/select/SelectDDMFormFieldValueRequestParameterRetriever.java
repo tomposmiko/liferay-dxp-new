@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SELECT,
 	service = DDMFormFieldValueRequestParameterRetriever.class
 )
@@ -48,17 +49,15 @@ public class SelectDDMFormFieldValueRequestParameterRetriever
 		HttpServletRequest httpServletRequest, String ddmFormFieldParameterName,
 		String defaultDDMFormFieldParameterValue) {
 
-		return jsonFactory.serialize(
-			_getParameterValues(
-				httpServletRequest, ddmFormFieldParameterName,
-				_getDefaultDDMFormFieldParameterValues(
-					defaultDDMFormFieldParameterValue)));
+		String[] parameterValues = getParameterValues(
+			httpServletRequest, ddmFormFieldParameterName,
+			getDefaultDDMFormFieldParameterValues(
+				defaultDDMFormFieldParameterValue));
+
+		return jsonFactory.serialize(parameterValues);
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private String[] _getDefaultDDMFormFieldParameterValues(
+	protected String[] getDefaultDDMFormFieldParameterValues(
 		String defaultDDMFormFieldParameterValue) {
 
 		if (Validator.isNull(defaultDDMFormFieldParameterValue) ||
@@ -73,14 +72,14 @@ public class SelectDDMFormFieldValueRequestParameterRetriever
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringUtil.split(defaultDDMFormFieldParameterValue);
 		}
 	}
 
-	private String[] _getParameterValues(
+	protected String[] getParameterValues(
 		HttpServletRequest httpServletRequest, String ddmFormFieldParameterName,
 		String[] defaultDDMFormFieldParameterValues) {
 
@@ -97,6 +96,9 @@ public class SelectDDMFormFieldValueRequestParameterRetriever
 			httpServletRequest, ddmFormFieldParameterName,
 			defaultDDMFormFieldParameterValues);
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SelectDDMFormFieldValueRequestParameterRetriever.class);

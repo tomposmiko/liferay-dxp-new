@@ -13,7 +13,6 @@ package org.eclipse.equinox.metatype.impl;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.function.Supplier;
 import javax.xml.parsers.SAXParser;
 import org.eclipse.equinox.metatype.EquinoxObjectClassDefinition;
 import org.eclipse.osgi.util.NLS;
@@ -51,13 +50,13 @@ public class MetaTypeProviderImpl implements MetaTypeProvider {
 	/**
 	 * Constructor of class MetaTypeProviderImpl.
 	 */
-	MetaTypeProviderImpl(Bundle bundle, Supplier<SAXParser> parserSupplier, LogService logger) {
+	MetaTypeProviderImpl(Bundle bundle, SAXParser parser, LogService logger) {
 
 		this._bundle = bundle;
 		this.logger = logger;
 
 		// read all bundle's metadata files and build internal data structures
-		_isThereMeta = readMetaFiles(bundle, parserSupplier);
+		_isThereMeta = readMetaFiles(bundle, parser);
 
 		if (!_isThereMeta) {
 			logger.log(LogService.LOG_DEBUG, NLS.bind(MetaTypeMsg.METADATA_NOT_FOUND, bundle.getSymbolicName(), bundle.getBundleId()));
@@ -85,7 +84,7 @@ public class MetaTypeProviderImpl implements MetaTypeProvider {
 	 * @return void
 	 * @throws IOException If there are errors accessing the metadata.xml file
 	 */
-	private boolean readMetaFiles(Bundle bundle, Supplier<SAXParser> saxParserSupplier) {
+	private boolean readMetaFiles(Bundle bundle, SAXParser saxParser) {
 		Enumeration<URL> entries = bundle.findEntries(MetaTypeService.METATYPE_DOCUMENTS_LOCATION, "*", false); //$NON-NLS-1$
 		if (entries == null)
 			return false;
@@ -93,7 +92,7 @@ public class MetaTypeProviderImpl implements MetaTypeProvider {
 		for (URL entry : Collections.list(entries)) {
 			if (entry.getPath().endsWith("/")) //$NON-NLS-1$
 				continue;
-			DataParser parser = new DataParser(bundle, entry, saxParserSupplier.get(), logger);
+			DataParser parser = new DataParser(bundle, entry, saxParser, logger);
 			try {
 				Collection<Designate> designates = parser.doParse();
 				if (!designates.isEmpty()) {

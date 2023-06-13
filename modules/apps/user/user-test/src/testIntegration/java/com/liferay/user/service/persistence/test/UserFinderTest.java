@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
@@ -45,8 +44,12 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.social.kernel.model.SocialRelationConstants;
 import com.liferay.social.kernel.service.SocialRelationLocalService;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -156,6 +159,47 @@ public class UserFinderTest {
 		_groupLocalService.clearOrganizationGroups(
 			_organization1.getOrganizationId());
 		_groupLocalService.clearUserGroupGroups(_userGroup.getUserGroupId());
+	}
+
+	@Test
+	public void testCountByGroups() throws Exception {
+		long groupId = _group.getGroupId();
+
+		Map<Long, Integer> counts = _userFinder.countByGroups(
+			TestPropsValues.getCompanyId(), WorkflowConstants.STATUS_APPROVED,
+			new long[] {groupId});
+
+		Assert.assertEquals(counts.toString(), 1, counts.size());
+		Assert.assertEquals(2, (int)counts.get(groupId));
+
+		_groupLocalService.addOrganizationGroup(
+			_organization1.getOrganizationId(), groupId);
+
+		counts = _userFinder.countByGroups(
+			TestPropsValues.getCompanyId(), WorkflowConstants.STATUS_APPROVED,
+			new long[] {groupId});
+
+		Assert.assertEquals(counts.toString(), 1, counts.size());
+		Assert.assertEquals(3, (int)counts.get(groupId));
+
+		_groupLocalService.addUserGroupGroup(
+			_userGroup.getUserGroupId(), groupId);
+
+		counts = _userFinder.countByGroups(
+			TestPropsValues.getCompanyId(), WorkflowConstants.STATUS_APPROVED,
+			new long[] {groupId});
+
+		Assert.assertEquals(counts.toString(), 1, counts.size());
+		Assert.assertEquals(4, (int)counts.get(groupId));
+
+		long organizationGroupId = _organization1.getGroupId();
+
+		counts = _userFinder.countByGroups(
+			TestPropsValues.getCompanyId(), WorkflowConstants.STATUS_APPROVED,
+			new long[] {groupId, organizationGroupId});
+
+		Assert.assertEquals(counts.toString(), 2, counts.size());
+		Assert.assertEquals(1, (int)counts.get(organizationGroupId));
 	}
 
 	@Test
@@ -358,8 +402,23 @@ public class UserFinderTest {
 	private void _setOrganizationsMembershipStrict(boolean strict)
 		throws Exception {
 
-		ReflectionTestUtil.setFieldValue(
-			PropsValues.class, "ORGANIZATIONS_MEMBERSHIP_STRICT", strict);
+		Field modifiersField = Field.class.getDeclaredField("modifiers");
+
+		modifiersField.setAccessible(true);
+
+		Field organizationsMembershipStrict =
+			PropsValues.class.getDeclaredField(
+				"ORGANIZATIONS_MEMBERSHIP_STRICT");
+
+		modifiersField.setInt(
+			organizationsMembershipStrict,
+			organizationsMembershipStrict.getModifiers() & ~Modifier.FINAL);
+
+		organizationsMembershipStrict.setBoolean(null, strict);
+
+		modifiersField.setInt(
+			organizationsMembershipStrict,
+			organizationsMembershipStrict.getModifiers() | Modifier.FINAL);
 	}
 
 	private static Group _group;

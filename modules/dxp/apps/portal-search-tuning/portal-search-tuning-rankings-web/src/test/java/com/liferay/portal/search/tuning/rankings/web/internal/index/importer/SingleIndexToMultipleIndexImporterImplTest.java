@@ -35,6 +35,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -50,6 +51,8 @@ public class SingleIndexToMultipleIndexImporterImplTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_singleIndexToMultipleIndexImporterImpl =
 			new SingleIndexToMultipleIndexImporterImpl();
 
@@ -95,14 +98,14 @@ public class SingleIndexToMultipleIndexImporterImplTest
 		).when(
 			_rankingIndexReader
 		).isExists(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 
 		Mockito.doNothing(
 		).when(
 			_rankingIndexCreator
 		).create(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 
 		SearchHit searchHit = Mockito.mock(SearchHit.class);
@@ -147,7 +150,7 @@ public class SingleIndexToMultipleIndexImporterImplTest
 		).when(
 			searchEngineAdapter
 		).execute(
-			(BulkDocumentRequest)Mockito.any()
+			(BulkDocumentRequest)Mockito.anyObject()
 		);
 
 		_singleIndexToMultipleIndexImporterImpl.importRankings();
@@ -155,12 +158,12 @@ public class SingleIndexToMultipleIndexImporterImplTest
 		Mockito.verify(
 			searchEngineAdapter, Mockito.times(1)
 		).execute(
-			(BulkDocumentRequest)Mockito.any()
+			(BulkDocumentRequest)Mockito.anyObject()
 		);
 		Mockito.verify(
 			_rankingIndexCreator, Mockito.times(1)
 		).delete(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 	}
 
@@ -187,18 +190,21 @@ public class SingleIndexToMultipleIndexImporterImplTest
 		).when(
 			_rankingIndexReader
 		).isExists(
-			Mockito.any()
+			Mockito.anyObject()
 		);
 
 		Assert.assertTrue(_singleIndexToMultipleIndexImporterImpl.needImport());
 	}
 
-	private final CompanyService _companyService = Mockito.mock(
-		CompanyService.class);
-	private final RankingIndexCreator _rankingIndexCreator = Mockito.mock(
-		RankingIndexCreator.class);
-	private final RankingIndexReader _rankingIndexReader = Mockito.mock(
-		RankingIndexReader.class);
+	@Mock
+	private CompanyService _companyService;
+
+	@Mock
+	private RankingIndexCreator _rankingIndexCreator;
+
+	@Mock
+	private RankingIndexReader _rankingIndexReader;
+
 	private SingleIndexToMultipleIndexImporterImpl
 		_singleIndexToMultipleIndexImporterImpl;
 

@@ -13,12 +13,10 @@
  */
 
 import ClayForm, {ClaySelectWithOption} from '@clayui/form';
-import {
-	useControlledState,
-	useId,
-} from '@liferay/layout-content-page-editor-web';
 import PropTypes from 'prop-types';
 import React from 'react';
+
+import {useId} from '../useId';
 
 export default function SelectFrontendToken({
 	frontendToken,
@@ -26,7 +24,6 @@ export default function SelectFrontendToken({
 	value,
 }) {
 	const {label, validValues} = frontendToken;
-	const [nextValue, setNextValue] = useControlledState(value);
 
 	const id = useId();
 
@@ -35,16 +32,15 @@ export default function SelectFrontendToken({
 			<label htmlFor={id}>{label}</label>
 
 			<ClaySelectWithOption
+				defaultValue={value}
 				id={id}
 				onChange={(event) => {
-					const nextValue =
+					const value =
 						event.target.options[event.target.selectedIndex].value;
 
-					setNextValue(nextValue);
-					onValueSelect(nextValue);
+					onValueSelect(value);
 				}}
 				options={validValues}
-				value={nextValue}
 			/>
 		</ClayForm.Group>
 	);

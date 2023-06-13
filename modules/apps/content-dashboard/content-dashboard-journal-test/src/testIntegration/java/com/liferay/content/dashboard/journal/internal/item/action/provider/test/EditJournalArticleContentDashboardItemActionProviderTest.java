@@ -15,13 +15,16 @@
 package com.liferay.content.dashboard.journal.internal.item.action.provider.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
 import com.liferay.content.dashboard.item.action.provider.ContentDashboardItemActionProvider;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
@@ -39,6 +42,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -99,8 +103,6 @@ public class EditJournalArticleContentDashboardItemActionProviderTest {
 				journalArticle, mockHttpServletRequest);
 
 		String url = contentDashboardItemAction.getURL();
-
-		Assert.assertNotNull(url);
 
 		Assert.assertTrue(
 			url.contains("articleId=" + journalArticle.getArticleId()));
@@ -175,12 +177,17 @@ public class EditJournalArticleContentDashboardItemActionProviderTest {
 
 	private ThemeDisplay _getThemeDisplay(
 			HttpServletRequest httpServletRequest, Locale locale, User user)
-		throws PortalException {
+		throws Exception {
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		themeDisplay.setCompany(
 			_companyLocalService.fetchCompany(TestPropsValues.getCompanyId()));
+
+		Layout layout = LayoutTestUtil.addLayout(_group);
+
+		themeDisplay.setLayout(layout);
+		themeDisplay.setLayoutSet(layout.getLayoutSet());
 
 		themeDisplay.setLocale(locale);
 		themeDisplay.setPermissionChecker(
@@ -193,6 +200,10 @@ public class EditJournalArticleContentDashboardItemActionProviderTest {
 	}
 
 	@Inject
+	private AssetDisplayPageEntryLocalService
+		_assetDisplayPageEntryLocalService;
+
+	@Inject
 	private CompanyLocalService _companyLocalService;
 
 	@Inject(
@@ -203,6 +214,13 @@ public class EditJournalArticleContentDashboardItemActionProviderTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	@Inject
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
+
+	@Inject
+	private Portal _portal;
 
 	@Inject
 	private PortletLocalService _portletLocalService;

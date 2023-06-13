@@ -82,8 +82,12 @@ public class ExportImportTestUtil {
 		Element rootElement = SAXReaderUtil.createElement("root");
 
 		portletDataContext.setExportDataRootElement(rootElement);
+
+		Element missingReferencesElement = rootElement.addElement(
+			"missing-references");
+
 		portletDataContext.setMissingReferencesElement(
-			rootElement.addElement("missing-references"));
+			missingReferencesElement);
 
 		return portletDataContext;
 	}
@@ -123,8 +127,12 @@ public class ExportImportTestUtil {
 		Element rootElement = SAXReaderUtil.createElement("root");
 
 		portletDataContext.setImportDataRootElement(rootElement);
+
+		Element missingReferencesElement = rootElement.addElement(
+			"missing-references");
+
 		portletDataContext.setMissingReferencesElement(
-			rootElement.addElement("missing-references"));
+			missingReferencesElement);
 
 		return portletDataContext;
 	}

@@ -27,10 +27,6 @@ public class BatchEngineExportTaskLocalServiceWrapper
 	implements BatchEngineExportTaskLocalService,
 			   ServiceWrapper<BatchEngineExportTaskLocalService> {
 
-	public BatchEngineExportTaskLocalServiceWrapper() {
-		this(null);
-	}
-
 	public BatchEngineExportTaskLocalServiceWrapper(
 		BatchEngineExportTaskLocalService batchEngineExportTaskLocalService) {
 
@@ -60,16 +56,15 @@ public class BatchEngineExportTaskLocalServiceWrapper
 	@Override
 	public com.liferay.batch.engine.model.BatchEngineExportTask
 		addBatchEngineExportTask(
-			String externalReferenceCode, long companyId, long userId,
-			String callbackURL, String className, String contentType,
-			String executeStatus, java.util.List<String> fieldNamesList,
+			long companyId, long userId, String callbackURL, String className,
+			String contentType, String executeStatus,
+			java.util.List<String> fieldNamesList,
 			java.util.Map<String, java.io.Serializable> parameters,
 			String taskItemDelegateName) {
 
 		return _batchEngineExportTaskLocalService.addBatchEngineExportTask(
-			externalReferenceCode, companyId, userId, callbackURL, className,
-			contentType, executeStatus, fieldNamesList, parameters,
-			taskItemDelegateName);
+			companyId, userId, callbackURL, className, contentType,
+			executeStatus, fieldNamesList, parameters, taskItemDelegateName);
 	}
 
 	/**
@@ -262,16 +257,6 @@ public class BatchEngineExportTaskLocalServiceWrapper
 			batchEngineExportTaskId);
 	}
 
-	@Override
-	public com.liferay.batch.engine.model.BatchEngineExportTask
-		fetchBatchEngineExportTaskByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return _batchEngineExportTaskLocalService.
-			fetchBatchEngineExportTaskByExternalReferenceCode(
-				externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the batch engine export task with the matching UUID and company.
 	 *
@@ -309,17 +294,6 @@ public class BatchEngineExportTaskLocalServiceWrapper
 
 		return _batchEngineExportTaskLocalService.getBatchEngineExportTask(
 			batchEngineExportTaskId);
-	}
-
-	@Override
-	public com.liferay.batch.engine.model.BatchEngineExportTask
-			getBatchEngineExportTaskByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _batchEngineExportTaskLocalService.
-			getBatchEngineExportTaskByExternalReferenceCode(
-				externalReferenceCode, companyId);
 	}
 
 	/**

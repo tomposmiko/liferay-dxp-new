@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -29,26 +27,25 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8920 | Test Summary: Assert individuals overview top interest"
-	@priority = 5
+	@priority = "5"
 	test AssertIndividualOverviewTopInterest {
 		property portal.upstream = "quarantine";
 
-		// AC Quarantine Reason: Individual interest takes long time to load
+		// AC Refactor: data doesn't appear on time and the test needs data from a past date
+		// AC Refactor ticket: LRAC-9266
 
 		task ("Connect DXP to AC") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -58,10 +55,12 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science") {
-				ACUtils.addPage(layoutName = ${layoutName});
+				JSONLayout.addPublicLayout(
+					groupName = "Site Name",
+					layoutName = "${layoutName}");
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = ${layoutName},
+					layoutName = "${layoutName}",
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -70,9 +69,9 @@ definition {
 			for (var name : list "ac,usera") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 			}
 
 			ACDXPSettings.syncNewContactData();
@@ -84,14 +83,14 @@ definition {
 				userLoginFullName = "ac ac");
 
 			for (var pageName : list "Movies,Music,Science") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 
 			for (var pageName : list "Movies,Music") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -102,8 +101,8 @@ definition {
 				userLoginFullName = "usera usera");
 
 			for (var pageName : list "Movies") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -113,7 +112,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to Individule Overview Tab") {
@@ -132,9 +131,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8919 | Test Summary: Top Interests as of today shows the top 5 interest topics for all individuals"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ShowsTop5InterestTopicsForAllIndividuals {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-9267
@@ -147,10 +146,12 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science,Sports,Technology,Arts") {
-				ACUtils.addPage(layoutName = ${layoutName});
+				JSONLayout.addPublicLayout(
+					groupName = "Site Name",
+					layoutName = "${layoutName}");
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = ${layoutName},
+					layoutName = "${layoutName}",
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -159,9 +160,9 @@ definition {
 			for (var name : list "ac1,ac2,ac3,ac4,ac5,ac6") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 			}
 
 			ACDXPSettings.syncNewContactData();
@@ -173,8 +174,8 @@ definition {
 				userLoginFullName = "ac1 ac1");
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology,Arts") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -185,8 +186,8 @@ definition {
 				userLoginFullName = "ac2 ac2");
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -197,8 +198,8 @@ definition {
 				userLoginFullName = "ac3 ac3");
 
 			for (var pageName : list "Movies,Music,Science,Sports") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -209,8 +210,8 @@ definition {
 				userLoginFullName = "ac4 ac4");
 
 			for (var pageName : list "Movies,Music,Science") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -221,8 +222,8 @@ definition {
 				userLoginFullName = "ac5 ac5");
 
 			for (var pageName : list "Movies,Music") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -233,8 +234,8 @@ definition {
 				userLoginFullName = "ac6 ac6");
 
 			for (var pageName : list "Movies") {
-				ACUtils.navigateToSitePage(
-					pageName = ${pageName},
+				Navigator.gotoSitePage(
+					pageName = "${pageName}",
 					siteName = "Site Name");
 			}
 		}
@@ -244,7 +245,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Navigate to Individule Overview Tab") {

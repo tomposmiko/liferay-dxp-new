@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.subscription.web.internal.display.context;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceActionKeys;
 import com.liferay.commerce.frontend.model.HeaderActionModel;
 import com.liferay.commerce.model.CommerceOrder;
@@ -22,13 +22,14 @@ import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceSubscriptionEntry;
 import com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelLocalService;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.product.util.CPSubscriptionType;
 import com.liferay.commerce.product.util.CPSubscriptionTypeJSPContributor;
 import com.liferay.commerce.product.util.CPSubscriptionTypeJSPContributorRegistry;
 import com.liferay.commerce.product.util.CPSubscriptionTypeRegistry;
 import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.commerce.service.CommerceSubscriptionEntryLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -37,7 +38,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -90,7 +90,7 @@ public class CommerceSubscriptionEntryDisplayContext {
 		_cpRequestHelper = new CPRequestHelper(httpServletRequest);
 	}
 
-	public String getAccountEntryThumbnailURL() throws PortalException {
+	public String getCommerceAccountThumbnailURL() throws PortalException {
 		if (_commerceSubscriptionEntry == null) {
 			return StringPool.BLANK;
 		}
@@ -101,7 +101,7 @@ public class CommerceSubscriptionEntryDisplayContext {
 
 		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
 
-		AccountEntry accountEntry = commerceOrder.getAccountEntry();
+		CommerceAccount commerceAccount = commerceOrder.getCommerceAccount();
 
 		ThemeDisplay themeDisplay = _cpRequestHelper.getThemeDisplay();
 
@@ -109,12 +109,13 @@ public class CommerceSubscriptionEntryDisplayContext {
 
 		sb.append(themeDisplay.getPathImage());
 		sb.append("/organization_logo?img_id=");
-		sb.append(accountEntry.getLogoId());
+		sb.append(commerceAccount.getLogoId());
 
-		if (accountEntry.getLogoId() > 0) {
+		if (commerceAccount.getLogoId() > 0) {
 			sb.append("&t=");
 			sb.append(
-				WebServerServletTokenUtil.getToken(accountEntry.getLogoId()));
+				WebServerServletTokenUtil.getToken(
+					commerceAccount.getLogoId()));
 		}
 
 		return sb.toString();
@@ -370,7 +371,7 @@ public class CommerceSubscriptionEntryDisplayContext {
 			portletURL.setParameter("keywords", keywords);
 		}
 
-		portletURL.setParameter("navigation", _getNavigation());
+		portletURL.setParameter("navigation", getNavigation());
 
 		return portletURL;
 	}
@@ -411,13 +412,13 @@ public class CommerceSubscriptionEntryDisplayContext {
 			return commercePaymentMethodGroupRel.isActive();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException.getMessage(), portalException);
 		}
 
 		return false;
 	}
 
-	private String _getNavigation() {
+	protected String getNavigation() {
 		return ParamUtil.getString(_httpServletRequest, "navigation", "all");
 	}
 

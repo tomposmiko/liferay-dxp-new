@@ -15,19 +15,19 @@
 package com.liferay.asset.publisher.web.internal.util;
 
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * @author Pavel Savinov
  */
-@Component(service = AssetPublisherCustomizerRegistry.class)
+@Component(immediate = true, service = AssetPublisherCustomizerRegistry.class)
 public class DefaultAssetPublisherCustomizerRegistry
 	implements AssetPublisherCustomizerRegistry {
 
@@ -36,32 +36,35 @@ public class DefaultAssetPublisherCustomizerRegistry
 		String portletId) {
 
 		AssetPublisherCustomizer assetPublisherCustomizer =
-			_serviceTrackerMap.getService(portletId);
+			_assetPublisherCustomizers.get(portletId);
 
 		if (assetPublisherCustomizer == null) {
-			assetPublisherCustomizer = _serviceTrackerMap.getService(
+			assetPublisherCustomizer = _assetPublisherCustomizers.get(
 				AssetPublisherPortletKeys.ASSET_PUBLISHER);
 		}
 
 		return assetPublisherCustomizer;
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, AssetPublisherCustomizer.class, null,
-			ServiceReferenceMapperFactory.create(
-				bundleContext,
-				(assetPublisherCustomizer, emitter) -> emitter.emit(
-					assetPublisherCustomizer.getPortletId())));
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	public void registerAssetPublisherCustomizer(
+		AssetPublisherCustomizer assetPublisherCustomizer) {
+
+		_assetPublisherCustomizers.put(
+			assetPublisherCustomizer.getPortletId(), assetPublisherCustomizer);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
+	public void unregisterAssetPublisherCustomizer(
+		AssetPublisherCustomizer assetPublisherCustomizer) {
+
+		_assetPublisherCustomizers.remove(
+			assetPublisherCustomizer.getPortletId());
 	}
 
-	private ServiceTrackerMap<String, AssetPublisherCustomizer>
-		_serviceTrackerMap;
+	private final Map<String, AssetPublisherCustomizer>
+		_assetPublisherCustomizers = new ConcurrentHashMap<>();
 
 }

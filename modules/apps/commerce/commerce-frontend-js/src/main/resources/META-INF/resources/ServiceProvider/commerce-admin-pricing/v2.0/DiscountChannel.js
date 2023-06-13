@@ -24,9 +24,7 @@ function resolvePath(basePath = '', discountId = '', discountChannelId = '') {
 	return `${basePath}${VERSION}${DISCOUNTS_PATH}/${discountId}${DISCOUNT_RULES_PATH}/${discountChannelId}`;
 }
 
-export default function DiscountChannel(basePath) {
-	return {
-		addDiscountChannel: (discountId, json) =>
-			AJAX.POST(resolvePath(basePath, discountId), json),
-	};
-}
+export default (basePath) => ({
+	addDiscountChannel: (discountId, json) =>
+		AJAX.POST(resolvePath(basePath, discountId), json),
+});

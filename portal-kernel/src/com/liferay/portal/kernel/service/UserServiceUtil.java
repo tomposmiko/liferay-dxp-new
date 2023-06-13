@@ -72,8 +72,8 @@ public class UserServiceUtil {
 			boolean autoPassword, String password1, String password2,
 			boolean autoScreenName, String screenName, String emailAddress,
 			java.util.Locale locale, String firstName, String middleName,
-			String lastName, long prefixListTypeId, long suffixListTypeId,
-			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle,
 			List<com.liferay.portal.kernel.model.Address> addresses,
 			List<com.liferay.portal.kernel.model.EmailAddress> emailAddresses,
@@ -85,10 +85,9 @@ public class UserServiceUtil {
 		return getService().addOrUpdateUser(
 			externalReferenceCode, creatorUserId, companyId, autoPassword,
 			password1, password2, autoScreenName, screenName, emailAddress,
-			locale, firstName, middleName, lastName, prefixListTypeId,
-			suffixListTypeId, male, birthdayMonth, birthdayDay, birthdayYear,
-			jobTitle, addresses, emailAddresses, phones, websites, sendEmail,
-			serviceContext);
+			locale, firstName, middleName, lastName, prefixId, suffixId, male,
+			birthdayMonth, birthdayDay, birthdayYear, jobTitle, addresses,
+			emailAddresses, phones, websites, sendEmail, serviceContext);
 	}
 
 	/**
@@ -152,8 +151,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0 for
 	 January)
@@ -176,19 +175,19 @@ public class UserServiceUtil {
 			long companyId, boolean autoPassword, String password1,
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, boolean male, int birthdayMonth,
-			int birthdayDay, int birthdayYear, String jobTitle, long[] groupIds,
-			long[] organizationIds, long[] roleIds, long[] userGroupIds,
-			boolean sendEmail, ServiceContext serviceContext)
+			String middleName, String lastName, long prefixId, long suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String jobTitle, long[] groupIds, long[] organizationIds,
+			long[] roleIds, long[] userGroupIds, boolean sendEmail,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addUser(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, locale, firstName, middleName, lastName,
-			prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
-			roleIds, userGroupIds, sendEmail, serviceContext);
+			prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear,
+			jobTitle, groupIds, organizationIds, roleIds, userGroupIds,
+			sendEmail, serviceContext);
 	}
 
 	/**
@@ -214,8 +213,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0 for
 	 January)
@@ -243,10 +242,10 @@ public class UserServiceUtil {
 			long companyId, boolean autoPassword, String password1,
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, boolean male, int birthdayMonth,
-			int birthdayDay, int birthdayYear, String jobTitle, long[] groupIds,
-			long[] organizationIds, long[] roleIds, long[] userGroupIds,
+			String middleName, String lastName, long prefixId, long suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String jobTitle, long[] groupIds, long[] organizationIds,
+			long[] roleIds, long[] userGroupIds,
 			List<com.liferay.portal.kernel.model.Address> addresses,
 			List<com.liferay.portal.kernel.model.EmailAddress> emailAddresses,
 			List<com.liferay.portal.kernel.model.Phone> phones,
@@ -259,10 +258,10 @@ public class UserServiceUtil {
 		return getService().addUser(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, locale, firstName, middleName, lastName,
-			prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
-			roleIds, userGroupIds, addresses, emailAddresses, phones, websites,
-			announcementsDelivers, sendEmail, serviceContext);
+			prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear,
+			jobTitle, groupIds, organizationIds, roleIds, userGroupIds,
+			addresses, emailAddresses, phones, websites, announcementsDelivers,
+			sendEmail, serviceContext);
 	}
 
 	/**
@@ -290,8 +289,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0
 	 for January)
@@ -321,8 +320,8 @@ public class UserServiceUtil {
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, long facebookId, String openId,
 			java.util.Locale locale, String firstName, String middleName,
-			String lastName, long prefixListTypeId, long suffixListTypeId,
-			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle, long[] groupIds, long[] organizationIds,
 			long[] roleIds, long[] userGroupIds, boolean sendEmail,
 			ServiceContext serviceContext)
@@ -331,9 +330,9 @@ public class UserServiceUtil {
 		return getService().addUser(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, facebookId, openId, locale, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
+			middleName, lastName, prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
+			roleIds, userGroupIds, sendEmail, serviceContext);
 	}
 
 	/**
@@ -361,8 +360,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0
 	 for January)
@@ -397,8 +396,8 @@ public class UserServiceUtil {
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, long facebookId, String openId,
 			java.util.Locale locale, String firstName, String middleName,
-			String lastName, long prefixListTypeId, long suffixListTypeId,
-			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle, long[] groupIds, long[] organizationIds,
 			long[] roleIds, long[] userGroupIds,
 			List<com.liferay.portal.kernel.model.Address> addresses,
@@ -413,10 +412,10 @@ public class UserServiceUtil {
 		return getService().addUser(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, facebookId, openId, locale, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupIds, addresses, emailAddresses,
-			phones, websites, announcementsDelivers, sendEmail, serviceContext);
+			middleName, lastName, prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
+			roleIds, userGroupIds, addresses, emailAddresses, phones, websites,
+			announcementsDelivers, sendEmail, serviceContext);
 	}
 
 	/**
@@ -454,8 +453,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0 for
 	 January)
@@ -478,19 +477,19 @@ public class UserServiceUtil {
 			long companyId, boolean autoPassword, String password1,
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, boolean male, int birthdayMonth,
-			int birthdayDay, int birthdayYear, String jobTitle, long[] groupIds,
-			long[] organizationIds, long[] roleIds, long[] userGroupIds,
-			boolean sendEmail, ServiceContext serviceContext)
+			String middleName, String lastName, long prefixId, long suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String jobTitle, long[] groupIds, long[] organizationIds,
+			long[] roleIds, long[] userGroupIds, boolean sendEmail,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addUserWithWorkflow(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, locale, firstName, middleName, lastName,
-			prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
-			roleIds, userGroupIds, sendEmail, serviceContext);
+			prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear,
+			jobTitle, groupIds, organizationIds, roleIds, userGroupIds,
+			sendEmail, serviceContext);
 	}
 
 	/**
@@ -516,8 +515,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0 for
 	 January)
@@ -545,10 +544,10 @@ public class UserServiceUtil {
 			long companyId, boolean autoPassword, String password1,
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, boolean male, int birthdayMonth,
-			int birthdayDay, int birthdayYear, String jobTitle, long[] groupIds,
-			long[] organizationIds, long[] roleIds, long[] userGroupIds,
+			String middleName, String lastName, long prefixId, long suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String jobTitle, long[] groupIds, long[] organizationIds,
+			long[] roleIds, long[] userGroupIds,
 			List<com.liferay.portal.kernel.model.Address> addresses,
 			List<com.liferay.portal.kernel.model.EmailAddress> emailAddresses,
 			List<com.liferay.portal.kernel.model.Phone> phones,
@@ -561,10 +560,10 @@ public class UserServiceUtil {
 		return getService().addUserWithWorkflow(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, locale, firstName, middleName, lastName,
-			prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
-			roleIds, userGroupIds, addresses, emailAddresses, phones, websites,
-			announcementsDelivers, sendEmail, serviceContext);
+			prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear,
+			jobTitle, groupIds, organizationIds, roleIds, userGroupIds,
+			addresses, emailAddresses, phones, websites, announcementsDelivers,
+			sendEmail, serviceContext);
 	}
 
 	/**
@@ -592,8 +591,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0
 	 for January)
@@ -623,8 +622,8 @@ public class UserServiceUtil {
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, long facebookId, String openId,
 			java.util.Locale locale, String firstName, String middleName,
-			String lastName, long prefixListTypeId, long suffixListTypeId,
-			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle, long[] groupIds, long[] organizationIds,
 			long[] roleIds, long[] userGroupIds, boolean sendEmail,
 			ServiceContext serviceContext)
@@ -633,9 +632,9 @@ public class UserServiceUtil {
 		return getService().addUserWithWorkflow(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, facebookId, openId, locale, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
+			middleName, lastName, prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
+			roleIds, userGroupIds, sendEmail, serviceContext);
 	}
 
 	/**
@@ -663,8 +662,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0
 	 for January)
@@ -700,8 +699,8 @@ public class UserServiceUtil {
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, long facebookId, String openId,
 			java.util.Locale locale, String firstName, String middleName,
-			String lastName, long prefixListTypeId, long suffixListTypeId,
-			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle, long[] groupIds, long[] organizationIds,
 			long[] roleIds, long[] userGroupIds,
 			List<com.liferay.portal.kernel.model.Address> addresses,
@@ -716,10 +715,10 @@ public class UserServiceUtil {
 		return getService().addUserWithWorkflow(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, facebookId, openId, locale, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupIds, addresses, emailAddresses,
-			phones, websites, announcementsDelivers, sendEmail, serviceContext);
+			middleName, lastName, prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, jobTitle, groupIds, organizationIds,
+			roleIds, userGroupIds, addresses, emailAddresses, phones, websites,
+			announcementsDelivers, sendEmail, serviceContext);
 	}
 
 	/**
@@ -750,14 +749,6 @@ public class UserServiceUtil {
 	 */
 	public static void deleteUser(long userId) throws PortalException {
 		getService().deleteUser(userId);
-	}
-
-	public static User fetchUserByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException {
-
-		return getService().fetchUserByExternalReferenceCode(
-			companyId, externalReferenceCode);
 	}
 
 	public static List<User> getCompanyUsers(long companyId, int start, int end)
@@ -1358,8 +1349,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0 for
 	 January)
@@ -1378,19 +1369,17 @@ public class UserServiceUtil {
 			long companyId, boolean autoPassword, String password1,
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, boolean male, int birthdayMonth,
-			int birthdayDay, int birthdayYear, String jobTitle,
-			boolean updateUserInformation, boolean sendEmail,
+			String middleName, String lastName, long prefixId, long suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String jobTitle, boolean updateUserInformation, boolean sendEmail,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateIncompleteUser(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, locale, firstName, middleName, lastName,
-			prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, jobTitle, updateUserInformation,
-			sendEmail, serviceContext);
+			prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear,
+			jobTitle, updateUserInformation, sendEmail, serviceContext);
 	}
 
 	/**
@@ -1413,8 +1402,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's first name
 	 * @param middleName the user's middle name
 	 * @param lastName the user's last name
-	 * @param prefixListTypeId the user's name prefix ID
-	 * @param suffixListTypeId the user's name suffix ID
+	 * @param prefixId the user's name prefix ID
+	 * @param suffixId the user's name suffix ID
 	 * @param male whether the user is male
 	 * @param birthdayMonth the user's birthday month (0-based, meaning 0
 	 for January)
@@ -1441,8 +1430,8 @@ public class UserServiceUtil {
 			String password2, boolean autoScreenName, String screenName,
 			String emailAddress, long facebookId, String openId,
 			java.util.Locale locale, String firstName, String middleName,
-			String lastName, long prefixListTypeId, long suffixListTypeId,
-			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear,
 			String jobTitle, boolean updateUserInformation, boolean sendEmail,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -1450,9 +1439,9 @@ public class UserServiceUtil {
 		return getService().updateIncompleteUser(
 			companyId, autoPassword, password1, password2, autoScreenName,
 			screenName, emailAddress, facebookId, openId, locale, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, jobTitle,
-			updateUserInformation, sendEmail, serviceContext);
+			middleName, lastName, prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, jobTitle, updateUserInformation,
+			sendEmail, serviceContext);
 	}
 
 	/**
@@ -1601,8 +1590,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's new first name
 	 * @param middleName the user's new middle name
 	 * @param lastName the user's new last name
-	 * @param prefixListTypeId the user's new name prefix ID
-	 * @param suffixListTypeId the user's new name suffix ID
+	 * @param prefixId the user's new name prefix ID
+	 * @param suffixId the user's new name suffix ID
 	 * @param male whether user is male
 	 * @param birthdayMonth the user's new birthday month (0-based, meaning 0
 	 for January)
@@ -1637,11 +1626,11 @@ public class UserServiceUtil {
 			String screenName, String emailAddress, boolean hasPortrait,
 			byte[] portraitBytes, String languageId, String timeZoneId,
 			String greeting, String comments, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, boolean male, int birthdayMonth,
-			int birthdayDay, int birthdayYear, String smsSn, String facebookSn,
-			String jabberSn, String skypeSn, String twitterSn, String jobTitle,
-			long[] groupIds, long[] organizationIds, long[] roleIds,
+			String middleName, String lastName, long prefixId, long suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String smsSn, String facebookSn, String jabberSn, String skypeSn,
+			String twitterSn, String jobTitle, long[] groupIds,
+			long[] organizationIds, long[] roleIds,
 			List<com.liferay.portal.kernel.model.UserGroupRole> userGroupRoles,
 			long[] userGroupIds,
 			List<com.liferay.portal.kernel.model.Address> addresses,
@@ -1657,12 +1646,12 @@ public class UserServiceUtil {
 			userId, oldPassword, newPassword1, newPassword2, passwordReset,
 			reminderQueryQuestion, reminderQueryAnswer, screenName,
 			emailAddress, hasPortrait, portraitBytes, languageId, timeZoneId,
-			greeting, comments, firstName, middleName, lastName,
-			prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, smsSn, facebookSn, jabberSn, skypeSn,
-			twitterSn, jobTitle, groupIds, organizationIds, roleIds,
-			userGroupRoles, userGroupIds, addresses, emailAddresses, phones,
-			websites, announcementsDelivers, serviceContext);
+			greeting, comments, firstName, middleName, lastName, prefixId,
+			suffixId, male, birthdayMonth, birthdayDay, birthdayYear, smsSn,
+			facebookSn, jabberSn, skypeSn, twitterSn, jobTitle, groupIds,
+			organizationIds, roleIds, userGroupRoles, userGroupIds, addresses,
+			emailAddresses, phones, websites, announcementsDelivers,
+			serviceContext);
 	}
 
 	/**
@@ -1689,8 +1678,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's new first name
 	 * @param middleName the user's new middle name
 	 * @param lastName the user's new last name
-	 * @param prefixListTypeId the user's new name prefix ID
-	 * @param suffixListTypeId the user's new name suffix ID
+	 * @param prefixId the user's new name prefix ID
+	 * @param suffixId the user's new name suffix ID
 	 * @param male whether user is male
 	 * @param birthdayMonth the user's new birthday month (0-based, meaning
 	 0 for January)
@@ -1734,9 +1723,9 @@ public class UserServiceUtil {
 			String openId, boolean hasPortrait, byte[] portraitBytes,
 			String languageId, String timeZoneId, String greeting,
 			String comments, String firstName, String middleName,
-			String lastName, long prefixListTypeId, long suffixListTypeId,
-			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
-			String smsSn, String facebookSn, String jabberSn, String skypeSn,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear, String smsSn,
+			String facebookSn, String jabberSn, String skypeSn,
 			String twitterSn, String jobTitle, long[] groupIds,
 			long[] organizationIds, long[] roleIds,
 			List<com.liferay.portal.kernel.model.UserGroupRole> userGroupRoles,
@@ -1755,11 +1744,11 @@ public class UserServiceUtil {
 			reminderQueryQuestion, reminderQueryAnswer, screenName,
 			emailAddress, facebookId, openId, hasPortrait, portraitBytes,
 			languageId, timeZoneId, greeting, comments, firstName, middleName,
-			lastName, prefixListTypeId, suffixListTypeId, male, birthdayMonth,
-			birthdayDay, birthdayYear, smsSn, facebookSn, jabberSn, skypeSn,
-			twitterSn, jobTitle, groupIds, organizationIds, roleIds,
-			userGroupRoles, userGroupIds, addresses, emailAddresses, phones,
-			websites, announcementsDelivers, serviceContext);
+			lastName, prefixId, suffixId, male, birthdayMonth, birthdayDay,
+			birthdayYear, smsSn, facebookSn, jabberSn, skypeSn, twitterSn,
+			jobTitle, groupIds, organizationIds, roleIds, userGroupRoles,
+			userGroupIds, addresses, emailAddresses, phones, websites,
+			announcementsDelivers, serviceContext);
 	}
 
 	/**
@@ -1784,8 +1773,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's new first name
 	 * @param middleName the user's new middle name
 	 * @param lastName the user's new last name
-	 * @param prefixListTypeId the user's new name prefix ID
-	 * @param suffixListTypeId the user's new name suffix ID
+	 * @param prefixId the user's new name prefix ID
+	 * @param suffixId the user's new name suffix ID
 	 * @param male whether user is male
 	 * @param birthdayMonth the user's new birthday month (0-based, meaning
 	 0 for January)
@@ -1822,11 +1811,11 @@ public class UserServiceUtil {
 			String screenName, String emailAddress, long facebookId,
 			String openId, String languageId, String timeZoneId,
 			String greeting, String comments, String firstName,
-			String middleName, String lastName, long prefixListTypeId,
-			long suffixListTypeId, boolean male, int birthdayMonth,
-			int birthdayDay, int birthdayYear, String smsSn, String facebookSn,
-			String jabberSn, String skypeSn, String twitterSn, String jobTitle,
-			long[] groupIds, long[] organizationIds, long[] roleIds,
+			String middleName, String lastName, long prefixId, long suffixId,
+			boolean male, int birthdayMonth, int birthdayDay, int birthdayYear,
+			String smsSn, String facebookSn, String jabberSn, String skypeSn,
+			String twitterSn, String jobTitle, long[] groupIds,
+			long[] organizationIds, long[] roleIds,
 			List<com.liferay.portal.kernel.model.UserGroupRole> userGroupRoles,
 			long[] userGroupIds, ServiceContext serviceContext)
 		throws PortalException {
@@ -1835,11 +1824,10 @@ public class UserServiceUtil {
 			userId, oldPassword, newPassword1, newPassword2, passwordReset,
 			reminderQueryQuestion, reminderQueryAnswer, screenName,
 			emailAddress, facebookId, openId, languageId, timeZoneId, greeting,
-			comments, firstName, middleName, lastName, prefixListTypeId,
-			suffixListTypeId, male, birthdayMonth, birthdayDay, birthdayYear,
-			smsSn, facebookSn, jabberSn, skypeSn, twitterSn, jobTitle, groupIds,
-			organizationIds, roleIds, userGroupRoles, userGroupIds,
-			serviceContext);
+			comments, firstName, middleName, lastName, prefixId, suffixId, male,
+			birthdayMonth, birthdayDay, birthdayYear, smsSn, facebookSn,
+			jabberSn, skypeSn, twitterSn, jobTitle, groupIds, organizationIds,
+			roleIds, userGroupRoles, userGroupIds, serviceContext);
 	}
 
 	/**
@@ -1864,8 +1852,8 @@ public class UserServiceUtil {
 	 * @param firstName the user's new first name
 	 * @param middleName the user's new middle name
 	 * @param lastName the user's new last name
-	 * @param prefixListTypeId the user's new name prefix ID
-	 * @param suffixListTypeId the user's new name suffix ID
+	 * @param prefixId the user's new name prefix ID
+	 * @param suffixId the user's new name suffix ID
 	 * @param male whether user is male
 	 * @param birthdayMonth the user's new birthday month (0-based, meaning 0
 	 for January)
@@ -1894,11 +1882,10 @@ public class UserServiceUtil {
 			String reminderQueryQuestion, String reminderQueryAnswer,
 			String screenName, String emailAddress, String languageId,
 			String timeZoneId, String greeting, String comments,
-			String firstName, String middleName, String lastName,
-			long prefixListTypeId, long suffixListTypeId, boolean male,
-			int birthdayMonth, int birthdayDay, int birthdayYear, String smsSn,
-			String facebookSn, String jabberSn, String skypeSn,
-			String twitterSn, String jobTitle, long[] groupIds,
+			String firstName, String middleName, String lastName, long prefixId,
+			long suffixId, boolean male, int birthdayMonth, int birthdayDay,
+			int birthdayYear, String smsSn, String facebookSn, String jabberSn,
+			String skypeSn, String twitterSn, String jobTitle, long[] groupIds,
 			long[] organizationIds, long[] roleIds,
 			List<com.liferay.portal.kernel.model.UserGroupRole> userGroupRoles,
 			long[] userGroupIds, ServiceContext serviceContext)
@@ -1908,10 +1895,10 @@ public class UserServiceUtil {
 			userId, oldPassword, newPassword1, newPassword2, passwordReset,
 			reminderQueryQuestion, reminderQueryAnswer, screenName,
 			emailAddress, languageId, timeZoneId, greeting, comments, firstName,
-			middleName, lastName, prefixListTypeId, suffixListTypeId, male,
-			birthdayMonth, birthdayDay, birthdayYear, smsSn, facebookSn,
-			jabberSn, skypeSn, twitterSn, jobTitle, groupIds, organizationIds,
-			roleIds, userGroupRoles, userGroupIds, serviceContext);
+			middleName, lastName, prefixId, suffixId, male, birthdayMonth,
+			birthdayDay, birthdayYear, smsSn, facebookSn, jabberSn, skypeSn,
+			twitterSn, jobTitle, groupIds, organizationIds, roleIds,
+			userGroupRoles, userGroupIds, serviceContext);
 	}
 
 	public static UserService getService() {

@@ -46,7 +46,6 @@ public class CommerceDiscountAccountRelWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put(
 			"commerceDiscountAccountRelId", getCommerceDiscountAccountRelId());
@@ -65,12 +64,6 @@ public class CommerceDiscountAccountRelWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -145,10 +138,11 @@ public class CommerceDiscountAccountRelWrapper
 	}
 
 	@Override
-	public com.liferay.account.model.AccountEntry getAccountEntry()
+	public com.liferay.commerce.account.model.CommerceAccount
+			getCommerceAccount()
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return model.getAccountEntry();
+		return model.getCommerceAccount();
 	}
 
 	/**
@@ -226,16 +220,6 @@ public class CommerceDiscountAccountRelWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
-	}
-
-	/**
-	 * Returns the mvcc version of this commerce discount account rel.
-	 *
-	 * @return the mvcc version of this commerce discount account rel
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
 	}
 
 	/**
@@ -376,16 +360,6 @@ public class CommerceDiscountAccountRelWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce discount account rel.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce discount account rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the order of this commerce discount account rel.
 	 *
 	 * @param order the order of this commerce discount account rel
@@ -443,11 +417,6 @@ public class CommerceDiscountAccountRelWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

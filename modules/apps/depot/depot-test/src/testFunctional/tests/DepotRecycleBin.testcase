@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -30,30 +30,92 @@ definition {
 		}
 	}
 
-	@description = "This ensures that the document can be deleted after the recycle bin is disabled."
-	@priority = 5
-	@refactordone
-	test CanDeleteDocumentAfterDisabling {
+	@description = "This ensures that the expired entries can be removed automatically in the recycle bin."
+	@priority = "5"
+	@refactorneeded
+	test CheckExpiredEntries {
+		property custom.properties = "trash.entry.check.interval=1${line.separator}trash.entries.max.age=1";
+
 		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
 			groupName = "Test Depot Name");
 
-		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
+
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Test Depot Name",
+			site = "false",
+			title = "WC WebContent Title");
+
+		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
+
+		Check(
+			key_webContentTitle = "WC WebContent Title",
+			locator1 = "WC#ENTRY_LIST_CHECKBOX");
+
+		Depot.deleteContentViaBulkEditing(webContent = "true");
+
+		DepotNavigator.openDepotAdmin();
+
+		DepotNavigator.gotoDepotPortlet(
+			depotName = "Test Depot Name",
+			portlet = "Recycle Bin");
+
+		RecycleBin.viewCP(
+			assetName = "DM Document Title",
+			assetType = "Document",
+			customMaxAge = "1 minute",
+			deleteUser = "Test Test");
+
+		RecycleBin.viewCP(
+			assetName = "WC WebContent Title",
+			assetType = "Web Content Article",
+			customMaxAge = "1 minute",
+			deleteUser = "Test Test");
+
+		Pause(locator1 = "120000");
+
+		Refresh();
+
+		RecycleBin.viewDefaultCP();
+	}
+
+	@description = "This ensures that the document can be deleted after the recycle bin is disabled."
+	@priority = "5"
+	@refactorneeded
+	test DeleteDocumentAfterDisabling {
+		JSONDocument.addFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name");
+
+		DepotNavigator.openDepotAdmin();
+
+		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
+
+		Navigator.gotoNavTab(navTab = "General");
 
 		Depot.configureRecycleBin(recycleBin = "Disabled");
 
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
-		Depot.deleteContentViaBulkEditing(
-			dmDocumentTitle = "DM Document Title",
-			recycleBinDisabled = "true");
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		var key_dmDocumentTitle = "DM Document Title";
+
+		Check(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_CHECKBOX");
+
+		Depot.deleteContentViaBulkEditing(recycleBinDisabled = "true");
 	}
 
 	@description = "This ensures that the web content can be deleted after the recycle bin is disabled."
-	@priority = 5
-	@refactordone
-	test CanDeleteWCAfterDisabling {
+	@priority = "5"
+	@refactorneeded
+	test DeleteWCAfterDisabling {
 		DepotNavigator.openDepotAdmin();
 
 		DepotNavigator.gotoDepot(depotName = "Test Depot Name");
@@ -78,26 +140,20 @@ definition {
 	}
 
 	@description = "This ensures that the documents can be restored from recycle bin."
-	@priority = 5
-	@refactordone
-	test CanRestoreDocuments {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_1",
-			groupName = "Test Depot Name",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_2",
-			groupName = "Test Depot Name",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_2.jpg");
-
+	@priority = "5"
+	@refactorneeded
+	test RestoreDocuments {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
-		Depot.deleteContentViaBulkEditing(dmDocumentTitle = "Document_1,Document_2");
+		DMDocument.addMultipleCP(dmDocumentFileList = "Document_1.doc,Document_2.jpg");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		for (var key_dmDocumentTitle : list "Document_1,Document_2") {
+			Check(locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_CHECKBOX");
+		}
+
+		Depot.deleteContentViaBulkEditing();
 
 		DepotNavigator.openDepotAdmin();
 
@@ -111,7 +167,7 @@ definition {
 			assetType = "Document",
 			multipleAssets = "true");
 
-		DepotNavigator.openDepotRecycleBinAdmin(depotName = "Test Depot Name");
+		Refresh();
 
 		RecycleBin.restoreCP(
 			assetName = "Document_2",
@@ -121,16 +177,16 @@ definition {
 		for (var dmDocumentTitle : list "Document_1,Document_2") {
 			DepotNavigator.openToDMEntryInDepot(
 				depotName = "Test Depot Name",
-				dmDocumentTitle = ${dmDocumentTitle});
+				dmDocumentTitle = "${dmDocumentTitle}");
 
-			DMDocument.viewCP(dmDocumentTitle = ${dmDocumentTitle});
+			DMDocument.viewCP(dmDocumentTitle = "${dmDocumentTitle}");
 		}
 	}
 
 	@description = "This ensures that the web content can be restored from recycle bin."
-	@priority = 5
-	@refactordone
-	test CanRestoreWebContent {
+	@priority = "5"
+	@refactorneeded
+	test RestoreWebContent {
 		property portal.acceptance = "true";
 
 		JSONWebcontent.addWebContent(
@@ -145,7 +201,11 @@ definition {
 			assetType = "Web Content Article",
 			webContentTitle = "WC WebContent Title");
 
-		DepotNavigator.openDepotRecycleBinAdmin(depotName = "Test Depot Name");
+		DepotNavigator.openDepotAdmin();
+
+		DepotNavigator.gotoDepotPortlet(
+			depotName = "Test Depot Name",
+			portlet = "Recycle Bin");
 
 		RecycleBin.restoreCP(
 			assetName = "WC WebContent Title",
@@ -159,59 +219,6 @@ definition {
 		WebContent.viewCP(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title");
-	}
-
-	@description = "This ensures that the expired entries can be removed automatically in the recycle bin."
-	@priority = 5
-	@refactordone
-	test ExpiredEntriesCanBeRemoved {
-		property custom.properties = "trash.entry.check.interval=1${line.separator}trash.entries.max.age=1";
-
-		JSONDocument.addFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Test Depot Name");
-
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
-
-		JSONWebcontent.addWebContent(
-			content = "WC WebContent Content",
-			groupName = "Test Depot Name",
-			site = "false",
-			title = "WC WebContent Title");
-
-		DepotNavigator.openDepotWebContentAdmin(
-			depotName = "Test Depot Name",
-			webContent = "true",
-			webContentTitle = "WC WebContent Title");
-
-		Depot.deleteContentViaBulkEditing(
-			webContent = "true",
-			webContentTitle = "WC WebContent Title");
-
-		DepotNavigator.openDepotRecycleBinAdmin(depotName = "Test Depot Name");
-
-		RecycleBin.viewCP(
-			assetName = "DM Document Title",
-			assetType = "Document",
-			customMaxAge = "1 minute",
-			deleteUser = "Test Test");
-
-		RecycleBin.viewCP(
-			assetName = "WC WebContent Title",
-			assetType = "Web Content Article",
-			customMaxAge = "1 minute",
-			deleteUser = "Test Test");
-
-		// We need to wait for the system time to pass by 2 minutes in order for an article to be expired. There is currently no easy way to manipulate the system time in CI for automation. 2 minutes is the shortest value we can set while ensuring the stability of the test. See LPS-157957.
-
-		Pause(locator1 = 120000);
-
-		Refresh();
-
-		RecycleBin.viewDefaultCP();
 	}
 
 }

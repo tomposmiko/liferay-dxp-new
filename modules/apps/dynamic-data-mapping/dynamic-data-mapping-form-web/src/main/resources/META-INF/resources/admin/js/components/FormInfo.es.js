@@ -36,7 +36,7 @@ const isForbiddenKey = (event, limit) => {
 	return forbidden;
 };
 
-export function FormInfo() {
+export const FormInfo = () => {
 	const {portletNamespace} = useConfig();
 
 	const {
@@ -60,7 +60,7 @@ export function FormInfo() {
 	const onKeyDown = (event) => {
 		const charCode = event.which ? event.which : event.keyCode;
 
-		if (isForbiddenKey(event, 120) && Number(charCode) !== 91) {
+		if (isForbiddenKey(event, 120) && charCode != 91) {
 			event.preventDefault();
 		}
 	};
@@ -91,7 +91,6 @@ export function FormInfo() {
 						/>
 					</ClayForm.Group>
 				</h1>
-
 				<h5>
 					<ClayForm.Group>
 						<textarea
@@ -121,4 +120,4 @@ export function FormInfo() {
 			</ClayLayout.ContainerFluid>
 		</div>
 	);
-}
+};

@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Dylan Rebelak
  */
 @Component(
-	property = "search.engine.impl=Elasticsearch",
+	immediate = true, property = "search.engine.impl=Elasticsearch",
 	service = ClusterRequestExecutor.class
 )
 public class ElasticsearchClusterRequestExecutor
@@ -75,16 +75,39 @@ public class ElasticsearchClusterRequestExecutor
 			updateSettingsClusterRequest);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setHealthClusterRequestExecutor(
+		HealthClusterRequestExecutor healthClusterRequestExecutor) {
+
+		_healthClusterRequestExecutor = healthClusterRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setStateClusterRequestExecutor(
+		StateClusterRequestExecutor stateClusterRequestExecutor) {
+
+		_stateClusterRequestExecutor = stateClusterRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setStatsClusterRequestExecutor(
+		StatsClusterRequestExecutor statsClusterRequestExecutor) {
+
+		_statsClusterRequestExecutor = statsClusterRequestExecutor;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUpdateSettingsClusterRequestExecutor(
+		UpdateSettingsClusterRequestExecutor
+			updateSettingsClusterRequestExecutor) {
+
+		_updateSettingsClusterRequestExecutor =
+			updateSettingsClusterRequestExecutor;
+	}
+
 	private HealthClusterRequestExecutor _healthClusterRequestExecutor;
-
-	@Reference
 	private StateClusterRequestExecutor _stateClusterRequestExecutor;
-
-	@Reference
 	private StatsClusterRequestExecutor _statsClusterRequestExecutor;
-
-	@Reference
 	private UpdateSettingsClusterRequestExecutor
 		_updateSettingsClusterRequestExecutor;
 

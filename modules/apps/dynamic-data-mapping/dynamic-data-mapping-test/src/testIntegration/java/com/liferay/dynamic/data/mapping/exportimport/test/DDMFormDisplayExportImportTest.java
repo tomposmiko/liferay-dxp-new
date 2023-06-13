@@ -111,9 +111,6 @@ public class DDMFormDisplayExportImportTest
 			String.valueOf(importedDDMFormInstance.getFormInstanceId()),
 			importedPortletPreferences.getValue(
 				"formInstanceId", StringPool.BLANK));
-		Assert.assertEquals(
-			String.valueOf(importedDDMFormInstance.getGroupId()),
-			importedPortletPreferences.getValue("groupId", StringPool.BLANK));
 	}
 
 	@Override

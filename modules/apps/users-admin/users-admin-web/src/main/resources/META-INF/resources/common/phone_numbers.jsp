@@ -26,6 +26,7 @@ List<Phone> phones = PhoneServiceUtil.getPhones(className, classPK);
 %>
 
 <clay:content-row
+	containerElement="h3"
 	cssClass="sheet-subtitle"
 >
 	<clay:content-col
@@ -36,11 +37,11 @@ List<Phone> phones = PhoneServiceUtil.getPhones(className, classPK);
 
 	<clay:content-col>
 		<span class="heading-end">
-			<clay:link
-				aria-label='<%= LanguageUtil.format(request, "add-x", "phone-numbers") %>'
-				cssClass="add-phone-number-link btn btn-secondary btn-sm"
-				displayType="null"
-				href='<%=
+			<liferay-ui:icon
+				label="<%= true %>"
+				linkCssClass="add-phone-number-link btn btn-secondary btn-sm"
+				message="add"
+				url='<%=
 					PortletURLBuilder.createRenderURL(
 						liferayPortletResponse
 					).setMVCPath(
@@ -53,8 +54,6 @@ List<Phone> phones = PhoneServiceUtil.getPhones(className, classPK);
 						"classPK", classPK
 					).buildString()
 				%>'
-				label="add"
-				role="button"
 			/>
 		</span>
 	</clay:content-col>
@@ -72,8 +71,7 @@ List<Phone> phones = PhoneServiceUtil.getPhones(className, classPK);
 	total="<%= phones.size() %>"
 >
 	<liferay-ui:search-container-results
-		calculateStartAndEnd="<%= true %>"
-		results="<%= phones %>"
+		results="<%= phones.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
 	/>
 
 	<liferay-ui:search-container-row
@@ -89,7 +87,7 @@ List<Phone> phones = PhoneServiceUtil.getPhones(className, classPK);
 		/>
 
 		<%
-		ListType phoneListType = ListTypeServiceUtil.getListType(phone.getListTypeId());
+		ListType phoneListType = ListTypeServiceUtil.getListType(phone.getTypeId());
 
 		String phoneTypeKey = phoneListType.getName();
 		%>

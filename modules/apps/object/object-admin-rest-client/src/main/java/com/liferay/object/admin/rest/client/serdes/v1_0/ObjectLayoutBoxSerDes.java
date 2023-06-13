@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -119,20 +120,6 @@ public class ObjectLayoutBoxSerDes {
 			sb.append(objectLayoutBox.getPriority());
 		}
 
-		if (objectLayoutBox.getType() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"type\": ");
-
-			sb.append("\"");
-
-			sb.append(objectLayoutBox.getType());
-
-			sb.append("\"");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -191,13 +178,6 @@ public class ObjectLayoutBoxSerDes {
 			map.put("priority", String.valueOf(objectLayoutBox.getPriority()));
 		}
 
-		if (objectLayoutBox.getType() == null) {
-			map.put("type", null);
-		}
-		else {
-			map.put("type", String.valueOf(objectLayoutBox.getType()));
-		}
-
 		return map;
 	}
 
@@ -240,31 +220,21 @@ public class ObjectLayoutBoxSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "objectLayoutRows")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ObjectLayoutRow[] objectLayoutRowsArray =
-						new ObjectLayoutRow[jsonParserFieldValues.length];
-
-					for (int i = 0; i < objectLayoutRowsArray.length; i++) {
-						objectLayoutRowsArray[i] = ObjectLayoutRowSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					objectLayoutBox.setObjectLayoutRows(objectLayoutRowsArray);
+					objectLayoutBox.setObjectLayoutRows(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ObjectLayoutRowSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new ObjectLayoutRow[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "priority")) {
 				if (jsonParserFieldValue != null) {
 					objectLayoutBox.setPriority(
 						Integer.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "type")) {
-				if (jsonParserFieldValue != null) {
-					objectLayoutBox.setType(
-						ObjectLayoutBox.Type.create(
-							(String)jsonParserFieldValue));
 				}
 			}
 		}

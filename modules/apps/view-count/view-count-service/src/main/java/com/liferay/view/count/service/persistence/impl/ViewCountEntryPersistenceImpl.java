@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -39,12 +40,9 @@ import com.liferay.view.count.model.impl.ViewCountEntryImpl;
 import com.liferay.view.count.model.impl.ViewCountEntryModelImpl;
 import com.liferay.view.count.service.persistence.ViewCountEntryPK;
 import com.liferay.view.count.service.persistence.ViewCountEntryPersistence;
-import com.liferay.view.count.service.persistence.ViewCountEntryUtil;
 import com.liferay.view.count.service.persistence.impl.constants.ViewCountPersistenceConstants;
 
 import java.io.Serializable;
-
-import java.lang.reflect.Field;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Preston Crary
  * @generated
  */
-@Component(service = ViewCountEntryPersistence.class)
+@Component(service = {ViewCountEntryPersistence.class, BasePersistence.class})
 public class ViewCountEntryPersistenceImpl
 	extends BasePersistenceImpl<ViewCountEntry>
 	implements ViewCountEntryPersistence {
@@ -453,7 +451,7 @@ public class ViewCountEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ViewCountEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -523,7 +521,7 @@ public class ViewCountEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -593,31 +591,11 @@ public class ViewCountEntryPersistenceImpl
 		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
-
-		_setViewCountEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setViewCountEntryUtilPersistence(null);
-
 		entityCache.removeCache(ViewCountEntryImpl.class.getName());
-	}
-
-	private void _setViewCountEntryUtilPersistence(
-		ViewCountEntryPersistence viewCountEntryPersistence) {
-
-		try {
-			Field field = ViewCountEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, viewCountEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -673,5 +651,9 @@ public class ViewCountEntryPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private ViewCountEntryModelArgumentsResolver
+		_viewCountEntryModelArgumentsResolver;
 
 }

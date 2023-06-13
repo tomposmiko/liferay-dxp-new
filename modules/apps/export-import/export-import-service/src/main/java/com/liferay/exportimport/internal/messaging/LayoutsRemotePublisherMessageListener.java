@@ -20,10 +20,10 @@ import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.MessageListener;
-import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.messaging.MessageStatus;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -35,7 +35,10 @@ import java.io.Serializable;
 
 import java.util.Map;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -43,14 +46,32 @@ import org.osgi.service.component.annotations.Reference;
  * @author Daniel Kocsis
  */
 @Component(
-	property = "destination.name=" + DestinationNames.LAYOUTS_REMOTE_PUBLISHER,
-	service = MessageListener.class
+	immediate = true,
+	property = {
+		"destination.name=" + DestinationNames.LAYOUTS_REMOTE_PUBLISHER,
+		"message.status.destination.name=" + DestinationNames.MESSAGE_BUS_MESSAGE_STATUS
+	},
+	service = LayoutsRemotePublisherMessageListener.class
 )
 public class LayoutsRemotePublisherMessageListener
 	extends BasePublisherMessageListener {
 
+	@Activate
+	protected void activate(ComponentContext componentContext) {
+		initialize(componentContext);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		if (serviceRegistration != null) {
+			serviceRegistration.unregister();
+		}
+	}
+
 	@Override
-	public void receive(Message message) throws MessageListenerException {
+	protected void doReceive(Message message, MessageStatus messageStatus)
+		throws PortalException {
+
 		long exportImportConfigurationId = GetterUtil.getLong(
 			message.getPayload());
 
@@ -67,6 +88,8 @@ public class LayoutsRemotePublisherMessageListener
 
 			return;
 		}
+
+		messageStatus.setPayload(exportImportConfiguration);
 
 		Map<String, Serializable> settingsMap =
 			exportImportConfiguration.getSettingsMap();
@@ -89,38 +112,54 @@ public class LayoutsRemotePublisherMessageListener
 		boolean remotePrivateLayout = MapUtil.getBoolean(
 			settingsMap, "remotePrivateLayout");
 
+		initThreadLocals(userId, parameterMap);
+
+		User user = _userLocalService.getUserById(userId);
+
+		CompanyThreadLocal.setCompanyId(user.getCompanyId());
+
 		try {
-			initThreadLocals(userId, parameterMap);
-
-			User user = _userLocalService.getUserById(userId);
-
-			CompanyThreadLocal.setCompanyId(user.getCompanyId());
-
 			_staging.copyRemoteLayouts(
 				sourceGroupId, privateLayout, layoutIdMap,
 				exportImportConfiguration.getName(), parameterMap,
 				remoteAddress, remotePort, remotePathContext, secureConnection,
 				targetGroupId, remotePrivateLayout);
 		}
-		catch (PortalException portalException) {
-			throw new MessageListenerException(portalException);
-		}
 		finally {
 			resetThreadLocals();
 		}
 	}
 
+	@Override
+	protected Destination getDestination() {
+		return _destination;
+	}
+
+	@Reference(
+		target = "(destination.name=" + DestinationNames.LAYOUTS_REMOTE_PUBLISHER + ")",
+		unbind = "-"
+	)
+	protected void setDestination(Destination destination) {
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.exportimport.service)(release.schema.version=1.0.2))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutsRemotePublisherMessageListener.class);
+
+	@Reference(
+		target = "(destination.name=" + DestinationNames.MESSAGE_BUS_MESSAGE_STATUS + ")"
+	)
+	private Destination _destination;
 
 	@Reference
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.exportimport.service)(release.schema.version=1.0.2))"
-	)
-	private Release _release;
 
 	@Reference
 	private Staging _staging;

@@ -20,6 +20,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = {
 		"auth.public.path=/portal/comment/discussion/edit",
 		"auth.public.path=/portal/comment/discussion/get_comments",

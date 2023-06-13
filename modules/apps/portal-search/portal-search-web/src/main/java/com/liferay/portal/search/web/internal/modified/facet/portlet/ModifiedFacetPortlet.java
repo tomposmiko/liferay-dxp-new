@@ -18,7 +18,11 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.CalendarFactory;
+import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactory;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.modified.ModifiedFacetFactory;
@@ -27,13 +31,15 @@ import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.web.internal.display.context.PortletRequestThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.display.context.ThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.modified.facet.constants.ModifiedFacetPortletKeys;
+import com.liferay.portal.search.web.internal.modified.facet.display.context.ModifiedFacetDisplayBuilder;
 import com.liferay.portal.search.web.internal.modified.facet.display.context.ModifiedFacetDisplayContext;
-import com.liferay.portal.search.web.internal.modified.facet.display.context.builder.ModifiedFacetDisplayContextBuilder;
 import com.liferay.portal.search.web.internal.util.SearchOptionalUtil;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchRequest;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchResponse;
 
 import java.io.IOException;
+
+import java.util.Optional;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
@@ -49,6 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-modified-facet",
@@ -68,8 +75,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/modified/facet/view.jsp",
 		"javax.portlet.name=" + ModifiedFacetPortletKeys.MODIFIED_FACET,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -81,10 +87,10 @@ public class ModifiedFacetPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		PortletSharedSearchResponse portletSharedSearchResponse =
-			_portletSharedSearchRequest.search(renderRequest);
+			portletSharedSearchRequest.search(renderRequest);
 
 		ModifiedFacetDisplayContext modifiedFacetDisplayContext =
-			_buildDisplayContext(portletSharedSearchResponse, renderRequest);
+			buildDisplayContext(portletSharedSearchResponse, renderRequest);
 
 		if (modifiedFacetDisplayContext.isRenderNothing()) {
 			renderRequest.setAttribute(
@@ -97,89 +103,103 @@ public class ModifiedFacetPortlet extends MVCPortlet {
 		super.render(renderRequest, renderResponse);
 	}
 
-	private ModifiedFacetDisplayContext _buildDisplayContext(
+	protected ModifiedFacetDisplayContext buildDisplayContext(
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		RenderRequest renderRequest) {
-
-		ModifiedFacetDisplayContextBuilder modifiedFacetDisplayContextBuilder =
-			_createModifiedFacetDisplayContextBuilder(
-				_dateFormatFactory, renderRequest);
-
-		modifiedFacetDisplayContextBuilder.setCurrentURL(
-			_portal.getCurrentURL(renderRequest));
-		modifiedFacetDisplayContextBuilder.setFacet(
-			portletSharedSearchResponse.getFacet(_getFieldName()));
 
 		ModifiedFacetPortletPreferences modifiedFacetPortletPreferences =
 			new ModifiedFacetPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
 					renderRequest));
 
+		ModifiedFacetDisplayBuilder modifiedFacetDisplayBuilder =
+			createModifiedFacetDisplayBuilder(
+				getCalendarFactory(), getDateFormatFactory(), http,
+				renderRequest);
+
+		modifiedFacetDisplayBuilder.setCurrentURL(
+			portal.getCurrentURL(renderRequest));
+		modifiedFacetDisplayBuilder.setFacet(
+			portletSharedSearchResponse.getFacet(getFieldName()));
+
+		ThemeDisplay themeDisplay = getThemeDisplay(renderRequest);
+
+		modifiedFacetDisplayBuilder.setLocale(themeDisplay.getLocale());
+
+		modifiedFacetDisplayBuilder.setPaginationStartParameterName(
+			getPaginationStartParameterName(portletSharedSearchResponse));
+
 		String parameterName =
 			modifiedFacetPortletPreferences.getParameterName();
 
-		SearchOptionalUtil.copy(
-			() -> portletSharedSearchResponse.getParameter(
-				parameterName + "From", renderRequest),
-			modifiedFacetDisplayContextBuilder::setFromParameterValue);
-
-		modifiedFacetDisplayContextBuilder.setFrequenciesVisible(
-			modifiedFacetPortletPreferences.isFrequenciesVisible());
-		modifiedFacetDisplayContextBuilder.setFrequencyThreshold(
-			modifiedFacetPortletPreferences.getFrequencyThreshold());
-
-		ThemeDisplay themeDisplay = _getThemeDisplay(renderRequest);
-
-		modifiedFacetDisplayContextBuilder.setLocale(themeDisplay.getLocale());
-
-		modifiedFacetDisplayContextBuilder.setOrder(
-			modifiedFacetPortletPreferences.getOrder());
-		modifiedFacetDisplayContextBuilder.setPaginationStartParameterName(
-			_getPaginationStartParameterName(portletSharedSearchResponse));
-		modifiedFacetDisplayContextBuilder.setParameterName(parameterName);
+		modifiedFacetDisplayBuilder.setParameterName(parameterName);
 
 		SearchOptionalUtil.copy(
 			() -> portletSharedSearchResponse.getParameterValues(
 				parameterName, renderRequest),
-			modifiedFacetDisplayContextBuilder::setParameterValues);
+			modifiedFacetDisplayBuilder::setParameterValues);
 
-		modifiedFacetDisplayContextBuilder.setTimeZone(
-			themeDisplay.getTimeZone());
+		SearchOptionalUtil.copy(
+			() -> portletSharedSearchResponse.getParameter(
+				parameterName + "From", renderRequest),
+			modifiedFacetDisplayBuilder::setFromParameterValue);
 
 		SearchOptionalUtil.copy(
 			() -> portletSharedSearchResponse.getParameter(
 				parameterName + "To", renderRequest),
-			modifiedFacetDisplayContextBuilder::setToParameterValue);
+			modifiedFacetDisplayBuilder::setToParameterValue);
 
 		SearchResponse searchResponse =
 			portletSharedSearchResponse.getSearchResponse();
 
-		modifiedFacetDisplayContextBuilder.setTotalHits(
-			searchResponse.getTotalHits());
+		modifiedFacetDisplayBuilder.setTimeZone(themeDisplay.getTimeZone());
+		modifiedFacetDisplayBuilder.setTotalHits(searchResponse.getTotalHits());
 
-		return modifiedFacetDisplayContextBuilder.build();
+		return modifiedFacetDisplayBuilder.build();
 	}
 
-	private ModifiedFacetDisplayContextBuilder
-		_createModifiedFacetDisplayContextBuilder(
-			DateFormatFactory dateFormatFactory, RenderRequest renderRequest) {
+	protected ModifiedFacetDisplayBuilder createModifiedFacetDisplayBuilder(
+		CalendarFactory calendarFactory, DateFormatFactory dateFormatFactory,
+		Http http, RenderRequest renderRequest) {
 
 		try {
-			return new ModifiedFacetDisplayContextBuilder(
-				dateFormatFactory, renderRequest);
+			return new ModifiedFacetDisplayBuilder(
+				calendarFactory, dateFormatFactory, http, renderRequest);
 		}
 		catch (ConfigurationException configurationException) {
 			throw new RuntimeException(configurationException);
 		}
 	}
 
-	private String _getFieldName() {
-		Facet facet = _modifiedFacetFactory.newInstance(null);
+	protected CalendarFactory getCalendarFactory() {
+
+		// See LPS-72507 and LPS-76500
+
+		if (calendarFactory != null) {
+			return calendarFactory;
+		}
+
+		return CalendarFactoryUtil.getCalendarFactory();
+	}
+
+	protected DateFormatFactory getDateFormatFactory() {
+
+		// See LPS-72507 and LPS-76500
+
+		if (dateFormatFactory != null) {
+			return dateFormatFactory;
+		}
+
+		return DateFormatFactoryUtil.getDateFormatFactory();
+	}
+
+	protected String getFieldName() {
+		Facet facet = modifiedFacetFactory.newInstance(null);
 
 		return facet.getFieldName();
 	}
 
-	private String _getPaginationStartParameterName(
+	protected String getPaginationStartParameterName(
 		PortletSharedSearchResponse portletSharedSearchResponse) {
 
 		SearchResponse searchResponse =
@@ -190,23 +210,33 @@ public class ModifiedFacetPortlet extends MVCPortlet {
 		return searchRequest.getPaginationStartParameterName();
 	}
 
-	private ThemeDisplay _getThemeDisplay(RenderRequest renderRequest) {
+	protected ModifiedFacetPortletPreferencesImpl getPortletPreferences(
+		RenderRequest renderRequest) {
+
+		return new ModifiedFacetPortletPreferencesImpl(
+			Optional.ofNullable(renderRequest.getPreferences()));
+	}
+
+	protected ThemeDisplay getThemeDisplay(RenderRequest renderRequest) {
 		ThemeDisplaySupplier themeDisplaySupplier =
 			new PortletRequestThemeDisplaySupplier(renderRequest);
 
 		return themeDisplaySupplier.getThemeDisplay();
 	}
 
-	@Reference
-	private DateFormatFactory _dateFormatFactory;
+	protected CalendarFactory calendarFactory;
+	protected DateFormatFactory dateFormatFactory;
 
 	@Reference
-	private ModifiedFacetFactory _modifiedFacetFactory;
+	protected Http http;
 
 	@Reference
-	private Portal _portal;
+	protected ModifiedFacetFactory modifiedFacetFactory;
 
 	@Reference
-	private PortletSharedSearchRequest _portletSharedSearchRequest;
+	protected Portal portal;
+
+	@Reference
+	protected PortletSharedSearchRequest portletSharedSearchRequest;
 
 }

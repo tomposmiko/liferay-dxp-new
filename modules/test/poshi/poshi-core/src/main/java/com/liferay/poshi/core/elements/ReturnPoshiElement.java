@@ -19,7 +19,6 @@ import com.liferay.poshi.core.util.RegexUtil;
 import com.liferay.poshi.core.util.StringUtil;
 
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dom4j.Attribute;
@@ -65,17 +64,7 @@ public class ReturnPoshiElement extends PoshiElement {
 			return;
 		}
 
-		Matcher matcher = _returnPattern.matcher(poshiScript.trim());
-
-		matcher.find();
-
-		String value = matcher.group(1);
-
-		if (isQuotedContent(value)) {
-			value = getDoubleQuotedContent(value);
-		}
-
-		addAttribute("value", value);
+		addAttribute("value", getDoubleQuotedContent(poshiScript));
 	}
 
 	@Override
@@ -84,13 +73,8 @@ public class ReturnPoshiElement extends PoshiElement {
 			return "";
 		}
 
-		String value = attributeValue("value");
-
-		if (!value.matches(_UNQUOTED_VALUE_REGEX)) {
-			value = "\"" + value + "\"";
-		}
-
-		return StringUtil.combine("\n\n", getPad(), "return ", value, ";");
+		return StringUtil.combine(
+			"\n\n", getPad(), "return \"", attributeValue("value"), "\";");
 	}
 
 	@Override
@@ -161,10 +145,7 @@ public class ReturnPoshiElement extends PoshiElement {
 
 	private static final String _ELEMENT_NAME = "return";
 
-	private static final String _UNQUOTED_VALUE_REGEX =
-		"(\\$\\{[\\w_-]+\\}|\\d+)";
-
 	private static final Pattern _returnPattern = Pattern.compile(
-		"^return[\\s]+(\\$\\{[\\w_-]+\\}|\\d+|\".*\")[\\s]*;$");
+		"^return[\\s]*\"[\\s\\S]*\"[\\s]*;$");
 
 }

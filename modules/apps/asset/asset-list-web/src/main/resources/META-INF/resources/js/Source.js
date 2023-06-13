@@ -12,14 +12,7 @@
  * details.
  */
 
-import {
-	addParams,
-	delegate,
-	openSelectionModal,
-	sub,
-	toggleDisabled,
-	toggleSelectBox,
-} from 'frontend-js-web';
+import {delegate} from 'frontend-js-web';
 
 export default function ({classTypes, namespace}) {
 	const mapDDMStructures = {};
@@ -100,7 +93,7 @@ export default function ({classTypes, namespace}) {
 
 		if (enabledInput) {
 			popupButtons.forEach((popupButton) => {
-				toggleDisabled(popupButton, !enabledInputChecked);
+				Liferay.Util.toggleDisabled(popupButton, !enabledInputChecked);
 			});
 		}
 	};
@@ -135,7 +128,7 @@ export default function ({classTypes, namespace}) {
 		);
 
 		subtypeFieldsWrappers.forEach((subtypeFieldsWrapper) => {
-			if (selectedSubtype !== 'false' && selectedSubtype !== 'true') {
+			if (selectedSubtype != 'false' && selectedSubtype != 'true') {
 				if (orderingPanel) {
 					removeOptionsOrderByFilter();
 
@@ -172,10 +165,10 @@ export default function ({classTypes, namespace}) {
 	const toggle = (assetSelectorValue, {className, classNameId}) => {
 		const assetOptions = assetMultipleSelector.options;
 		const showOptions =
-			assetSelector.value === `${classNameId}` ||
-			(assetSelector.value === 'false' &&
-				assetOptions.length === 1 &&
-				assetOptions[0].value === `${classNameId}`);
+			assetSelector.value == `${classNameId}` ||
+			(assetSelector.value == 'false' &&
+				assetOptions.length == 1 &&
+				assetOptions[0].value == `${classNameId}`);
 
 		if (showOptions) {
 			options[className].classList.remove('hide');
@@ -193,6 +186,7 @@ export default function ({classTypes, namespace}) {
 		if (classTypeSelected) {
 			selectedSubtype = subtypeSelector[classTypeSelected.className];
 		}
+
 		toggleSaveButton(
 			assetSelector.value === '' || selectedSubtype?.value === ''
 		);
@@ -231,7 +225,7 @@ export default function ({classTypes, namespace}) {
 	};
 
 	classTypes.forEach(({className, classSubtypes}) => {
-		toggleSelectBox(
+		Liferay.Util.toggleSelectBox(
 			`${namespace}anyClassType${className}`,
 			'false',
 			`${namespace}${className}Boxes`
@@ -361,42 +355,34 @@ export default function ({classTypes, namespace}) {
 
 		if (fromBox.attr('id') === id || toBox.attr('id') === id) {
 			toggleSubclasses();
-
-			if (!document.getElementById(id).options.length) {
-				toggleSaveButton(true);
-			}
-			else {
-				toggleSaveButton(false);
-			}
 		}
 	});
 
 	const openModal = ({delegateTarget}) => {
 		let url = delegateTarget.dataset.href;
 
-		url = addParams(
+		url = Liferay.Util.addParams(
 			`${namespace}ddmStructureDisplayFieldValue=${encodeURIComponent(
 				ddmStructureDisplayFieldValueInput.value
 			)}`,
 			url
 		);
-		url = addParams(
+		url = Liferay.Util.addParams(
 			`${namespace}ddmStructureFieldName=${encodeURIComponent(
 				ddmStructureFieldNameInput.value
 			)}`,
 			url
 		);
-		url = addParams(
+		url = Liferay.Util.addParams(
 			`${namespace}ddmStructureFieldValue=${encodeURIComponent(
 				ddmStructureFieldValueInput.value
 			)}`,
 			url
 		);
 
-		openSelectionModal({
+		Liferay.Util.openSelectionModal({
 			customSelectEvent: true,
 			id: `${namespace}selectDDMStructure${delegateTarget.id}`,
-			iframeBodyCssClass: '',
 			onSelect: (selectedItem) => {
 				setDDMFields({
 					className: selectedItem.className,
@@ -407,7 +393,7 @@ export default function ({classTypes, namespace}) {
 				});
 			},
 			selectEventName: `${namespace}selectDDMStructureField`,
-			title: sub(
+			title: Liferay.Util.sub(
 				Liferay.Language.get('select-x'),
 				Liferay.Language.get('structure-field')
 			),
@@ -424,7 +410,7 @@ export default function ({classTypes, namespace}) {
 
 	eventDelegates.push(clickOpenModal);
 
-	toggleSelectBox(
+	Liferay.Util.toggleSelectBox(
 		`${namespace}anyAssetType`,
 		'false',
 		`${namespace}classNamesBoxes`

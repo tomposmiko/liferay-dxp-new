@@ -12,9 +12,9 @@
 AUI.add(
 	'liferay-kaleo-designer-remote-services',
 	(A) => {
-		const KaleoDesignerRemoteServices = {
+		var KaleoDesignerRemoteServices = {
 			_invokeResourceURL(params) {
-				const url = Liferay.PortletURL.createResourceURL();
+				var url = Liferay.PortletURL.createResourceURL();
 
 				url.setParameters(params.queryParameters);
 				url.setPortletId(
@@ -22,7 +22,6 @@ AUI.add(
 				);
 				url.setResourceId(params.resourceId);
 
-				// eslint-disable-next-line @liferay/aui/no-io
 				A.io.request(url.toString(), {
 					dataType: 'JSON',
 					on: {
@@ -35,7 +34,7 @@ AUI.add(
 			},
 
 			getRole(roleId, callback) {
-				const instance = this;
+				var instance = this;
 
 				instance._invokeResourceURL({
 					callback,
@@ -48,7 +47,7 @@ AUI.add(
 			},
 
 			getScriptLanguages(callback) {
-				const instance = this;
+				var instance = this;
 
 				instance._invokeResourceURL({
 					callback,
@@ -59,7 +58,7 @@ AUI.add(
 			},
 
 			getUser(emailAddress, screenName, userId, callback) {
-				const instance = this;
+				var instance = this;
 
 				instance._invokeResourceURL({
 					callback,

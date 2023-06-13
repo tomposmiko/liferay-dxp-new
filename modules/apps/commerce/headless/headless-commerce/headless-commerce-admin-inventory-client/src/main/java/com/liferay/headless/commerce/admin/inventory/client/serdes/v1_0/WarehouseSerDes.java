@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -53,16 +54,6 @@ public class WarehouseSerDes {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
-
-		if (warehouse.getActions() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"actions\": ");
-
-			sb.append(_toJSON(warehouse.getActions()));
-		}
 
 		if (warehouse.getActive() != null) {
 			if (sb.length() > 1) {
@@ -109,7 +100,11 @@ public class WarehouseSerDes {
 
 			sb.append("\"description\": ");
 
-			sb.append(_toJSON(warehouse.getDescription()));
+			sb.append("\"");
+
+			sb.append(_escape(warehouse.getDescription()));
+
+			sb.append("\"");
 		}
 
 		if (warehouse.getExternalReferenceCode() != null) {
@@ -156,6 +151,16 @@ public class WarehouseSerDes {
 			sb.append(warehouse.getLongitude());
 		}
 
+		if (warehouse.getMvccVersion() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"mvccVersion\": ");
+
+			sb.append(warehouse.getMvccVersion());
+		}
+
 		if (warehouse.getName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -163,7 +168,11 @@ public class WarehouseSerDes {
 
 			sb.append("\"name\": ");
 
-			sb.append(_toJSON(warehouse.getName()));
+			sb.append("\"");
+
+			sb.append(_escape(warehouse.getName()));
+
+			sb.append("\"");
 		}
 
 		if (warehouse.getRegionISOCode() != null) {
@@ -288,13 +297,6 @@ public class WarehouseSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (warehouse.getActions() == null) {
-			map.put("actions", null);
-		}
-		else {
-			map.put("actions", String.valueOf(warehouse.getActions()));
-		}
-
 		if (warehouse.getActive() == null) {
 			map.put("active", null);
 		}
@@ -353,6 +355,13 @@ public class WarehouseSerDes {
 		}
 		else {
 			map.put("longitude", String.valueOf(warehouse.getLongitude()));
+		}
+
+		if (warehouse.getMvccVersion() == null) {
+			map.put("mvccVersion", null);
+		}
+		else {
+			map.put("mvccVersion", String.valueOf(warehouse.getMvccVersion()));
 		}
 
 		if (warehouse.getName() == null) {
@@ -434,14 +443,7 @@ public class WarehouseSerDes {
 			Warehouse warehouse, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "actions")) {
-				if (jsonParserFieldValue != null) {
-					warehouse.setActions(
-						(Map)WarehouseSerDes.toMap(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "active")) {
+			if (Objects.equals(jsonParserFieldName, "active")) {
 				if (jsonParserFieldValue != null) {
 					warehouse.setActive((Boolean)jsonParserFieldValue);
 				}
@@ -458,9 +460,7 @@ public class WarehouseSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
-					warehouse.setDescription(
-						(Map)WarehouseSerDes.toMap(
-							(String)jsonParserFieldValue));
+					warehouse.setDescription((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(
@@ -488,11 +488,15 @@ public class WarehouseSerDes {
 						Double.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "mvccVersion")) {
+				if (jsonParserFieldValue != null) {
+					warehouse.setMvccVersion(
+						Integer.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
-					warehouse.setName(
-						(Map)WarehouseSerDes.toMap(
-							(String)jsonParserFieldValue));
+					warehouse.setName((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "regionISOCode")) {
@@ -522,18 +526,14 @@ public class WarehouseSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "warehouseItems")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					WarehouseItem[] warehouseItemsArray =
-						new WarehouseItem[jsonParserFieldValues.length];
-
-					for (int i = 0; i < warehouseItemsArray.length; i++) {
-						warehouseItemsArray[i] = WarehouseItemSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					warehouse.setWarehouseItems(warehouseItemsArray);
+					warehouse.setWarehouseItems(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> WarehouseItemSerDes.toDTO((String)object)
+						).toArray(
+							size -> new WarehouseItem[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "zip")) {

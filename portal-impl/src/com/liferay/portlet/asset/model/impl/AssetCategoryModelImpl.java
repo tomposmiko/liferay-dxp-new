@@ -16,6 +16,7 @@ package com.liferay.portlet.asset.model.impl;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryModel;
+import com.liferay.asset.kernel.model.AssetCategorySoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -40,15 +41,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -198,6 +202,66 @@ public class AssetCategoryModelImpl
 	@Deprecated
 	public static final long VOCABULARYID_COLUMN_BITMASK = 128L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AssetCategory toModel(AssetCategorySoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		AssetCategory model = new AssetCategoryImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
+		model.setUuid(soapModel.getUuid());
+		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
+		model.setCategoryId(soapModel.getCategoryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setParentCategoryId(soapModel.getParentCategoryId());
+		model.setTreePath(soapModel.getTreePath());
+		model.setName(soapModel.getName());
+		model.setTitle(soapModel.getTitle());
+		model.setDescription(soapModel.getDescription());
+		model.setVocabularyId(soapModel.getVocabularyId());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AssetCategory> toModels(AssetCategorySoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AssetCategory> models = new ArrayList<AssetCategory>(
+			soapModels.length);
+
+		for (AssetCategorySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.asset.kernel.model.AssetCategory"));
@@ -278,141 +342,141 @@ public class AssetCategoryModelImpl
 	public Map<String, Function<AssetCategory, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AssetCategory, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AssetCategory>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AssetCategory, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetCategory.class.getClassLoader(), AssetCategory.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AssetCategory, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<AssetCategory, Object>>();
+		try {
+			Constructor<AssetCategory> constructor =
+				(Constructor<AssetCategory>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AssetCategory::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", AssetCategory::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", AssetCategory::getUuid);
-			attributeGetterFunctions.put(
-				"externalReferenceCode",
-				AssetCategory::getExternalReferenceCode);
-			attributeGetterFunctions.put(
-				"categoryId", AssetCategory::getCategoryId);
-			attributeGetterFunctions.put("groupId", AssetCategory::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", AssetCategory::getCompanyId);
-			attributeGetterFunctions.put("userId", AssetCategory::getUserId);
-			attributeGetterFunctions.put(
-				"userName", AssetCategory::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", AssetCategory::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", AssetCategory::getModifiedDate);
-			attributeGetterFunctions.put(
-				"parentCategoryId", AssetCategory::getParentCategoryId);
-			attributeGetterFunctions.put(
-				"treePath", AssetCategory::getTreePath);
-			attributeGetterFunctions.put("name", AssetCategory::getName);
-			attributeGetterFunctions.put("title", AssetCategory::getTitle);
-			attributeGetterFunctions.put(
-				"description", AssetCategory::getDescription);
-			attributeGetterFunctions.put(
-				"vocabularyId", AssetCategory::getVocabularyId);
-			attributeGetterFunctions.put(
-				"lastPublishDate", AssetCategory::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AssetCategory, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AssetCategory, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AssetCategory, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AssetCategory, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetCategory, Object>>();
+		Map<String, BiConsumer<AssetCategory, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AssetCategory, ?>>();
 
-		static {
-			Map<String, BiConsumer<AssetCategory, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<AssetCategory, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", AssetCategory::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AssetCategory, Long>)AssetCategory::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetCategory::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<AssetCategory, Long>)AssetCategory::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", AssetCategory::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<AssetCategory, String>)AssetCategory::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", AssetCategory::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<AssetCategory, String>)
+				AssetCategory::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"categoryId", AssetCategory::getCategoryId);
+		attributeSetterBiConsumers.put(
+			"categoryId",
+			(BiConsumer<AssetCategory, Long>)AssetCategory::setCategoryId);
+		attributeGetterFunctions.put("groupId", AssetCategory::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<AssetCategory, Long>)AssetCategory::setGroupId);
+		attributeGetterFunctions.put("companyId", AssetCategory::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AssetCategory, Long>)AssetCategory::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetCategory::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<AssetCategory, Long>)AssetCategory::setUserId);
+		attributeGetterFunctions.put("userName", AssetCategory::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<AssetCategory, String>)AssetCategory::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AssetCategory::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<AssetCategory, Date>)AssetCategory::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AssetCategory::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<AssetCategory, Date>)AssetCategory::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentCategoryId", AssetCategory::getParentCategoryId);
+		attributeSetterBiConsumers.put(
+			"parentCategoryId",
+			(BiConsumer<AssetCategory, Long>)
+				AssetCategory::setParentCategoryId);
+		attributeGetterFunctions.put("treePath", AssetCategory::getTreePath);
+		attributeSetterBiConsumers.put(
+			"treePath",
+			(BiConsumer<AssetCategory, String>)AssetCategory::setTreePath);
+		attributeGetterFunctions.put("name", AssetCategory::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<AssetCategory, String>)AssetCategory::setName);
+		attributeGetterFunctions.put("title", AssetCategory::getTitle);
+		attributeSetterBiConsumers.put(
+			"title",
+			(BiConsumer<AssetCategory, String>)AssetCategory::setTitle);
+		attributeGetterFunctions.put(
+			"description", AssetCategory::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<AssetCategory, String>)AssetCategory::setDescription);
+		attributeGetterFunctions.put(
+			"vocabularyId", AssetCategory::getVocabularyId);
+		attributeSetterBiConsumers.put(
+			"vocabularyId",
+			(BiConsumer<AssetCategory, Long>)AssetCategory::setVocabularyId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", AssetCategory::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<AssetCategory, Date>)AssetCategory::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AssetCategory, Long>)AssetCategory::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<AssetCategory, Long>)
-					AssetCategory::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<AssetCategory, String>)AssetCategory::setUuid);
-			attributeSetterBiConsumers.put(
-				"externalReferenceCode",
-				(BiConsumer<AssetCategory, String>)
-					AssetCategory::setExternalReferenceCode);
-			attributeSetterBiConsumers.put(
-				"categoryId",
-				(BiConsumer<AssetCategory, Long>)AssetCategory::setCategoryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<AssetCategory, Long>)AssetCategory::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AssetCategory, Long>)AssetCategory::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<AssetCategory, Long>)AssetCategory::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<AssetCategory, String>)AssetCategory::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<AssetCategory, Date>)AssetCategory::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<AssetCategory, Date>)
-					AssetCategory::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"parentCategoryId",
-				(BiConsumer<AssetCategory, Long>)
-					AssetCategory::setParentCategoryId);
-			attributeSetterBiConsumers.put(
-				"treePath",
-				(BiConsumer<AssetCategory, String>)AssetCategory::setTreePath);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<AssetCategory, String>)AssetCategory::setName);
-			attributeSetterBiConsumers.put(
-				"title",
-				(BiConsumer<AssetCategory, String>)AssetCategory::setTitle);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<AssetCategory, String>)
-					AssetCategory::setDescription);
-			attributeSetterBiConsumers.put(
-				"vocabularyId",
-				(BiConsumer<AssetCategory, Long>)
-					AssetCategory::setVocabularyId);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<AssetCategory, Date>)
-					AssetCategory::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1441,12 +1505,41 @@ public class AssetCategoryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AssetCategory, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AssetCategory, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AssetCategory, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((AssetCategory)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetCategory>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetCategory.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1476,8 +1569,7 @@ public class AssetCategoryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<AssetCategory, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

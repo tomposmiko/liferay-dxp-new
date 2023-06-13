@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the sxp blueprint service. This utility wraps <code>com.liferay.search.experiences.service.persistence.impl.SXPBlueprintPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -887,78 +891,6 @@ public class SXPBlueprintUtil {
 	}
 
 	/**
-	 * Returns the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchSXPBlueprintException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching sxp blueprint
-	 * @throws NoSuchSXPBlueprintException if a matching sxp blueprint could not be found
-	 */
-	public static SXPBlueprint findByERC_C(
-			String externalReferenceCode, long companyId)
-		throws com.liferay.search.experiences.exception.
-			NoSuchSXPBlueprintException {
-
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
-	 */
-	public static SXPBlueprint fetchByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
-	 */
-	public static SXPBlueprint fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
-
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
-	}
-
-	/**
-	 * Removes the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the sxp blueprint that was removed
-	 */
-	public static SXPBlueprint removeByERC_C(
-			String externalReferenceCode, long companyId)
-		throws com.liferay.search.experiences.exception.
-			NoSuchSXPBlueprintException {
-
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the number of sxp blueprints where externalReferenceCode = &#63; and companyId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the number of matching sxp blueprints
-	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
-	}
-
-	/**
 	 * Caches the sxp blueprint in the entity cache if it is enabled.
 	 *
 	 * @param sxpBlueprint the sxp blueprint
@@ -1108,9 +1040,25 @@ public class SXPBlueprintUtil {
 	}
 
 	public static SXPBlueprintPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile SXPBlueprintPersistence _persistence;
+	private static ServiceTracker
+		<SXPBlueprintPersistence, SXPBlueprintPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(SXPBlueprintPersistence.class);
+
+		ServiceTracker<SXPBlueprintPersistence, SXPBlueprintPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<SXPBlueprintPersistence, SXPBlueprintPersistence>(
+						bundle.getBundleContext(),
+						SXPBlueprintPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

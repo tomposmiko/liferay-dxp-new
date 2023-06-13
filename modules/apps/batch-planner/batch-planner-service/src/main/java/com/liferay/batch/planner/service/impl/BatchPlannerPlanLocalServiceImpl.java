@@ -16,36 +16,24 @@ package com.liferay.batch.planner.service.impl;
 
 import com.liferay.batch.planner.constants.BatchPlannerPlanConstants;
 import com.liferay.batch.planner.exception.BatchPlannerPlanExternalTypeException;
-import com.liferay.batch.planner.exception.BatchPlannerPlanInternalClassNameException;
 import com.liferay.batch.planner.exception.BatchPlannerPlanNameException;
 import com.liferay.batch.planner.exception.DuplicateBatchPlannerPlanException;
-import com.liferay.batch.planner.exception.RequiredBatchPlannerPlanException;
+import com.liferay.batch.planner.model.BatchPlannerLog;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.batch.planner.service.base.BatchPlannerPlanLocalServiceBaseImpl;
-import com.liferay.batch.planner.service.persistence.BatchPlannerMappingPersistence;
-import com.liferay.batch.planner.service.persistence.BatchPlannerPolicyPersistence;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ResourceLocalService;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Igor Beslic
@@ -60,20 +48,15 @@ public class BatchPlannerPlanLocalServiceImpl
 	@Override
 	public BatchPlannerPlan addBatchPlannerPlan(
 			long userId, boolean export, String externalType,
-			String externalURL, String internalClassName, String name, int size,
-			String taskItemDelegateName, boolean template)
+			String externalURL, String internalClassName, String name,
+			boolean template)
 		throws PortalException {
 
 		_validateExternalType(externalType);
-		_validateInternalClassName(internalClassName);
 
-		if (Validator.isNull(name) && !template) {
-			name = _generateName(internalClassName);
-		}
+		User user = userLocalService.getUser(userId);
 
-		User user = _userLocalService.getUser(userId);
-
-		_validateName(0, user.getCompanyId(), name, template);
+		_validateName(0, user.getCompanyId(), name);
 
 		BatchPlannerPlan batchPlannerPlan = batchPlannerPlanPersistence.create(
 			counterLocalService.increment());
@@ -81,54 +64,21 @@ public class BatchPlannerPlanLocalServiceImpl
 		batchPlannerPlan.setCompanyId(user.getCompanyId());
 		batchPlannerPlan.setUserId(userId);
 		batchPlannerPlan.setUserName(user.getFullName());
-		batchPlannerPlan.setActive(true);
 		batchPlannerPlan.setExport(export);
 		batchPlannerPlan.setExternalType(externalType);
 		batchPlannerPlan.setExternalURL(externalURL);
 		batchPlannerPlan.setInternalClassName(internalClassName);
 		batchPlannerPlan.setName(name);
-		batchPlannerPlan.setSize(size);
-		batchPlannerPlan.setTaskItemDelegateName(taskItemDelegateName);
 		batchPlannerPlan.setTemplate(template);
 
 		batchPlannerPlan = batchPlannerPlanPersistence.update(batchPlannerPlan);
 
-		_resourceLocalService.addResources(
+		resourceLocalService.addResources(
 			user.getCompanyId(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			user.getUserId(), BatchPlannerPlan.class.getName(),
 			batchPlannerPlan.getBatchPlannerPlanId(), false, true, false);
 
 		return batchPlannerPlan;
-	}
-
-	@Override
-	public void deactivateBatchPlannerPlan(String batchEngineTaskERC) {
-		BatchPlannerPlan batchPlannerPlan =
-			batchPlannerPlanPersistence.fetchByPrimaryKey(
-				GetterUtil.getLong(batchEngineTaskERC));
-
-		if (batchPlannerPlan == null) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					StringBundler.concat(
-						"Unable to update batch planner plan for batch engine ",
-						"task ERC ", batchEngineTaskERC));
-			}
-
-			return;
-		}
-
-		batchPlannerPlan.setActive(false);
-
-		batchPlannerPlanPersistence.update(batchPlannerPlan);
-	}
-
-	@Override
-	public BatchPlannerPlan deleteBatchPlannerPlan(
-			BatchPlannerPlan batchPlannerPlan)
-		throws PortalException {
-
-		return deleteBatchPlannerPlan(batchPlannerPlan.getBatchPlannerPlanId());
 	}
 
 	@Override
@@ -138,57 +88,55 @@ public class BatchPlannerPlanLocalServiceImpl
 		BatchPlannerPlan batchPlannerPlan = batchPlannerPlanPersistence.remove(
 			batchPlannerPlanId);
 
-		_resourceLocalService.deleteResource(
-			batchPlannerPlan, ResourceConstants.SCOPE_INDIVIDUAL);
+		resourceLocalService.deleteResource(
+			batchPlannerPlan, ResourceConstants.SCOPE_COMPANY);
 
-		_batchPlannerMappingPersistence.removeByBatchPlannerPlanId(
+		BatchPlannerLog batchPlannerLog =
+			batchPlannerLogPersistence.fetchByBatchPlannerPlanId(
+				batchPlannerPlanId);
+
+		if (batchPlannerLog != null) {
+			batchPlannerLogPersistence.removeByBatchPlannerPlanId(
+				batchPlannerPlanId);
+		}
+
+		batchPlannerMappingPersistence.removeByBatchPlannerPlanId(
 			batchPlannerPlanId);
 
-		_batchPlannerPolicyPersistence.removeByBatchPlannerPlanId(
+		batchPlannerPolicyPersistence.removeByBatchPlannerPlanId(
 			batchPlannerPlanId);
 
 		return batchPlannerPlan;
 	}
 
 	@Override
-	public BatchPlannerPlan updateBatchPlannerPlan(
-			long batchPlannerPlanId, String externalType,
-			String internalClassName, String name)
+	public BatchPlannerPlan updateActive(
+			long batchPlannerPlanId, boolean active)
 		throws PortalException {
 
 		BatchPlannerPlan batchPlannerPlan =
 			batchPlannerPlanPersistence.findByPrimaryKey(batchPlannerPlanId);
 
-		if (!batchPlannerPlan.isTemplate()) {
-			throw new RequiredBatchPlannerPlanException(
-				"Batch planner plan is not a template");
-		}
-
-		_validateName(
-			batchPlannerPlanId, batchPlannerPlan.getCompanyId(), name, true);
-
-		batchPlannerPlan.setExternalType(externalType);
-		batchPlannerPlan.setInternalClassName(internalClassName);
-		batchPlannerPlan.setName(name);
+		batchPlannerPlan.setActive(active);
 
 		return batchPlannerPlanPersistence.update(batchPlannerPlan);
 	}
 
 	@Override
-	public BatchPlannerPlan updateStatus(long batchPlannerPlanId, int status)
+	public BatchPlannerPlan updateBatchPlannerPlan(
+			long userId, long batchPlannerPlanId, String name)
 		throws PortalException {
 
 		BatchPlannerPlan batchPlannerPlan =
 			batchPlannerPlanPersistence.findByPrimaryKey(batchPlannerPlanId);
 
-		batchPlannerPlan.setStatus(status);
+		User user = userLocalService.getUser(userId);
+
+		_validateName(batchPlannerPlanId, user.getCompanyId(), name);
+
+		batchPlannerPlan.setName(name);
 
 		return batchPlannerPlanPersistence.update(batchPlannerPlan);
-	}
-
-	private String _generateName(String value) {
-		return value.substring(value.lastIndexOf(StringPool.PERIOD) + 1) +
-			" Plan Execution " + System.currentTimeMillis();
 	}
 
 	private void _validateExternalType(String externalType)
@@ -208,22 +156,13 @@ public class BatchPlannerPlanLocalServiceImpl
 				merge);
 	}
 
-	private void _validateInternalClassName(String internalClassName)
-		throws PortalException {
-
-		if (Validator.isNull(internalClassName)) {
-			throw new BatchPlannerPlanInternalClassNameException();
-		}
-	}
-
 	private void _validateName(
-			long batchPlannerPlanId, long companyId, String name,
-			boolean template)
+			long batchPlannerPlanId, long companyId, String name)
 		throws PortalException {
 
 		if (Validator.isNull(name)) {
 			throw new BatchPlannerPlanNameException(
-				"Batch planner plan name is null");
+				"Batch planner plan name is null for company " + companyId);
 		}
 
 		int maxLength = ModelHintsUtil.getMaxLength(
@@ -234,39 +173,19 @@ public class BatchPlannerPlanLocalServiceImpl
 				"Batch planner plan name must not be longer than " + maxLength);
 		}
 
-		if (!template) {
+		BatchPlannerPlan batchPlannerPlan =
+			batchPlannerPlanPersistence.fetchByC_N(companyId, name);
+
+		if ((batchPlannerPlan == null) ||
+			(batchPlannerPlan.getBatchPlannerPlanId() == batchPlannerPlanId)) {
+
 			return;
 		}
 
-		List<BatchPlannerPlan> batchPlannerPlans =
-			batchPlannerPlanPersistence.findByC_T(companyId, template);
-
-		for (BatchPlannerPlan batchPlannerPlan : batchPlannerPlans) {
-			if ((batchPlannerPlan.getBatchPlannerPlanId() !=
-					batchPlannerPlanId) &&
-				Objects.equals(name, batchPlannerPlan.getName())) {
-
-				throw new DuplicateBatchPlannerPlanException(
-					StringBundler.concat(
-						"Batch planner plan name \"", name,
-						"\" already exists for company ", companyId));
-			}
-		}
+		throw new DuplicateBatchPlannerPlanException(
+			StringBundler.concat(
+				"Batch planner plan name \"", name,
+				"\" already exists for company ", companyId));
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BatchPlannerPlanLocalServiceImpl.class);
-
-	@Reference
-	private BatchPlannerMappingPersistence _batchPlannerMappingPersistence;
-
-	@Reference
-	private BatchPlannerPolicyPersistence _batchPlannerPolicyPersistence;
-
-	@Reference
-	private ResourceLocalService _resourceLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

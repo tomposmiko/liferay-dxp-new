@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  * @author Lucas Marques
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class AssetVocabularySearchRegistrar {
 
 	@Activate
@@ -39,9 +39,8 @@ public class AssetVocabularySearchRegistrar {
 			AssetVocabulary.class, bundleContext,
 			modelSearchDefinition -> {
 				modelSearchDefinition.setDefaultSelectedFieldNames(
-					Field.ASSET_VOCABULARY_ID, Field.COMPANY_ID,
-					Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
-					Field.GROUP_ID, Field.UID);
+					Field.ASSET_VOCABULARY_ID, Field.COMPANY_ID, Field.GROUP_ID,
+					Field.UID);
 				modelSearchDefinition.setModelIndexWriteContributor(
 					modelIndexWriterContributor);
 			});

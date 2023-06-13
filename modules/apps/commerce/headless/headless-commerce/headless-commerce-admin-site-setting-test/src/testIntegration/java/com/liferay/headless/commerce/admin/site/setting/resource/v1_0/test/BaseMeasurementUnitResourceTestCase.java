@@ -28,8 +28,6 @@ import com.liferay.headless.commerce.admin.site.setting.client.pagination.Page;
 import com.liferay.headless.commerce.admin.site.setting.client.pagination.Pagination;
 import com.liferay.headless.commerce.admin.site.setting.client.resource.v1_0.MeasurementUnitResource;
 import com.liferay.headless.commerce.admin.site.setting.client.serdes.v1_0.MeasurementUnitSerDes;
-import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -44,36 +42,32 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -186,9 +180,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 
 		MeasurementUnit measurementUnit = randomMeasurementUnit();
 
-		measurementUnit.setExternalReferenceCode(regex);
 		measurementUnit.setKey(regex);
-		measurementUnit.setType(regex);
 
 		String json = MeasurementUnitSerDes.toJSON(measurementUnit);
 
@@ -196,730 +188,91 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 
 		measurementUnit = MeasurementUnitSerDes.toDTO(json);
 
-		Assert.assertEquals(regex, measurementUnit.getExternalReferenceCode());
 		Assert.assertEquals(regex, measurementUnit.getKey());
-		Assert.assertEquals(regex, measurementUnit.getType());
 	}
 
 	@Test
-	public void testGetMeasurementUnitsPage() throws Exception {
-		Page<MeasurementUnit> page =
-			measurementUnitResource.getMeasurementUnitsPage(
-				null, Pagination.of(1, 10), null);
-
-		long totalCount = page.getTotalCount();
-
-		MeasurementUnit measurementUnit1 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		MeasurementUnit measurementUnit2 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		page = measurementUnitResource.getMeasurementUnitsPage(
-			null, Pagination.of(1, 10), null);
-
-		Assert.assertEquals(totalCount + 2, page.getTotalCount());
-
-		assertContains(
-			measurementUnit1, (List<MeasurementUnit>)page.getItems());
-		assertContains(
-			measurementUnit2, (List<MeasurementUnit>)page.getItems());
-		assertValid(page, testGetMeasurementUnitsPage_getExpectedActions());
-
-		measurementUnitResource.deleteMeasurementUnit(measurementUnit1.getId());
-
-		measurementUnitResource.deleteMeasurementUnit(measurementUnit2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetMeasurementUnitsPage_getExpectedActions()
+	public void testGetCommerceAdminSiteSettingGroupMeasurementUnitPage()
 		throws Exception {
 
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithFilterDateTimeEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DATE_TIME);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		MeasurementUnit measurementUnit1 = randomMeasurementUnit();
-
-		measurementUnit1 = testGetMeasurementUnitsPage_addMeasurementUnit(
-			measurementUnit1);
-
-		for (EntityField entityField : entityFields) {
-			Page<MeasurementUnit> page =
-				measurementUnitResource.getMeasurementUnitsPage(
-					getFilterString(entityField, "between", measurementUnit1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(measurementUnit1),
-				(List<MeasurementUnit>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		MeasurementUnit measurementUnit1 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		MeasurementUnit measurementUnit2 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		for (EntityField entityField : entityFields) {
-			Page<MeasurementUnit> page =
-				measurementUnitResource.getMeasurementUnitsPage(
-					getFilterString(entityField, "eq", measurementUnit1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(measurementUnit1),
-				(List<MeasurementUnit>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithFilterStringEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.STRING);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		MeasurementUnit measurementUnit1 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		MeasurementUnit measurementUnit2 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		for (EntityField entityField : entityFields) {
-			Page<MeasurementUnit> page =
-				measurementUnitResource.getMeasurementUnitsPage(
-					getFilterString(entityField, "eq", measurementUnit1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(measurementUnit1),
-				(List<MeasurementUnit>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithPagination() throws Exception {
-		Page<MeasurementUnit> totalPage =
-			measurementUnitResource.getMeasurementUnitsPage(null, null, null);
-
-		int totalCount = GetterUtil.getInteger(totalPage.getTotalCount());
-
-		MeasurementUnit measurementUnit1 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		MeasurementUnit measurementUnit2 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		MeasurementUnit measurementUnit3 =
-			testGetMeasurementUnitsPage_addMeasurementUnit(
-				randomMeasurementUnit());
-
-		Page<MeasurementUnit> page1 =
-			measurementUnitResource.getMeasurementUnitsPage(
-				null, Pagination.of(1, totalCount + 2), null);
-
-		List<MeasurementUnit> measurementUnits1 =
-			(List<MeasurementUnit>)page1.getItems();
-
-		Assert.assertEquals(
-			measurementUnits1.toString(), totalCount + 2,
-			measurementUnits1.size());
-
-		Page<MeasurementUnit> page2 =
-			measurementUnitResource.getMeasurementUnitsPage(
-				null, Pagination.of(2, totalCount + 2), null);
-
-		Assert.assertEquals(totalCount + 3, page2.getTotalCount());
-
-		List<MeasurementUnit> measurementUnits2 =
-			(List<MeasurementUnit>)page2.getItems();
-
-		Assert.assertEquals(
-			measurementUnits2.toString(), 1, measurementUnits2.size());
-
-		Page<MeasurementUnit> page3 =
-			measurementUnitResource.getMeasurementUnitsPage(
-				null, Pagination.of(1, totalCount + 3), null);
-
-		assertContains(
-			measurementUnit1, (List<MeasurementUnit>)page3.getItems());
-		assertContains(
-			measurementUnit2, (List<MeasurementUnit>)page3.getItems());
-		assertContains(
-			measurementUnit3, (List<MeasurementUnit>)page3.getItems());
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithSortDateTime() throws Exception {
-		testGetMeasurementUnitsPageWithSort(
-			EntityField.Type.DATE_TIME,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				BeanTestUtil.setProperty(
-					measurementUnit1, entityField.getName(),
-					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithSortDouble() throws Exception {
-		testGetMeasurementUnitsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				BeanTestUtil.setProperty(
-					measurementUnit1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					measurementUnit2, entityField.getName(), 0.5);
-			});
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithSortInteger() throws Exception {
-		testGetMeasurementUnitsPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				BeanTestUtil.setProperty(
-					measurementUnit1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					measurementUnit2, entityField.getName(), 1);
-			});
-	}
-
-	@Test
-	public void testGetMeasurementUnitsPageWithSortString() throws Exception {
-		testGetMeasurementUnitsPageWithSort(
-			EntityField.Type.STRING,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				Class<?> clazz = measurementUnit1.getClass();
-
-				String entityFieldName = entityField.getName();
-
-				Method method = clazz.getMethod(
-					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
-
-				Class<?> returnType = method.getReturnType();
-
-				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
-						measurementUnit1, entityFieldName,
-						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
-						measurementUnit2, entityFieldName,
-						Collections.singletonMap("Bbb", "Bbb"));
-				}
-				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
-						measurementUnit1, entityFieldName,
-						"aaa" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()) +
-									"@liferay.com");
-					BeanTestUtil.setProperty(
-						measurementUnit2, entityFieldName,
-						"bbb" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()) +
-									"@liferay.com");
-				}
-				else {
-					BeanTestUtil.setProperty(
-						measurementUnit1, entityFieldName,
-						"aaa" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
-						measurementUnit2, entityFieldName,
-						"bbb" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()));
-				}
-			});
-	}
-
-	protected void testGetMeasurementUnitsPageWithSort(
-			EntityField.Type type,
-			UnsafeTriConsumer
-				<EntityField, MeasurementUnit, MeasurementUnit, Exception>
-					unsafeTriConsumer)
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(type);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		MeasurementUnit measurementUnit1 = randomMeasurementUnit();
-		MeasurementUnit measurementUnit2 = randomMeasurementUnit();
-
-		for (EntityField entityField : entityFields) {
-			unsafeTriConsumer.accept(
-				entityField, measurementUnit1, measurementUnit2);
-		}
-
-		measurementUnit1 = testGetMeasurementUnitsPage_addMeasurementUnit(
-			measurementUnit1);
-
-		measurementUnit2 = testGetMeasurementUnitsPage_addMeasurementUnit(
-			measurementUnit2);
-
-		for (EntityField entityField : entityFields) {
-			Page<MeasurementUnit> ascPage =
-				measurementUnitResource.getMeasurementUnitsPage(
-					null, Pagination.of(1, 2), entityField.getName() + ":asc");
-
-			assertEquals(
-				Arrays.asList(measurementUnit1, measurementUnit2),
-				(List<MeasurementUnit>)ascPage.getItems());
-
-			Page<MeasurementUnit> descPage =
-				measurementUnitResource.getMeasurementUnitsPage(
-					null, Pagination.of(1, 2), entityField.getName() + ":desc");
-
-			assertEquals(
-				Arrays.asList(measurementUnit2, measurementUnit1),
-				(List<MeasurementUnit>)descPage.getItems());
-		}
-	}
-
-	protected MeasurementUnit testGetMeasurementUnitsPage_addMeasurementUnit(
-			MeasurementUnit measurementUnit)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetMeasurementUnitsPage() throws Exception {
-		GraphQLField graphQLField = new GraphQLField(
-			"measurementUnits",
-			new HashMap<String, Object>() {
-				{
-					put("page", 1);
-					put("pageSize", 10);
-				}
-			},
-			new GraphQLField("items", getGraphQLFields()),
-			new GraphQLField("page"), new GraphQLField("totalCount"));
-
-		JSONObject measurementUnitsJSONObject = JSONUtil.getValueAsJSONObject(
-			invokeGraphQLQuery(graphQLField), "JSONObject/data",
-			"JSONObject/measurementUnits");
-
-		long totalCount = measurementUnitsJSONObject.getLong("totalCount");
-
-		MeasurementUnit measurementUnit1 =
-			testGraphQLGetMeasurementUnitsPage_addMeasurementUnit();
-		MeasurementUnit measurementUnit2 =
-			testGraphQLGetMeasurementUnitsPage_addMeasurementUnit();
-
-		measurementUnitsJSONObject = JSONUtil.getValueAsJSONObject(
-			invokeGraphQLQuery(graphQLField), "JSONObject/data",
-			"JSONObject/measurementUnits");
-
-		Assert.assertEquals(
-			totalCount + 2, measurementUnitsJSONObject.getLong("totalCount"));
-
-		assertContains(
-			measurementUnit1,
-			Arrays.asList(
-				MeasurementUnitSerDes.toDTOs(
-					measurementUnitsJSONObject.getString("items"))));
-		assertContains(
-			measurementUnit2,
-			Arrays.asList(
-				MeasurementUnitSerDes.toDTOs(
-					measurementUnitsJSONObject.getString("items"))));
-	}
-
-	protected MeasurementUnit
-			testGraphQLGetMeasurementUnitsPage_addMeasurementUnit()
-		throws Exception {
-
-		return testGraphQLMeasurementUnit_addMeasurementUnit();
-	}
-
-	@Test
-	public void testPostMeasurementUnit() throws Exception {
-		MeasurementUnit randomMeasurementUnit = randomMeasurementUnit();
-
-		MeasurementUnit postMeasurementUnit =
-			testPostMeasurementUnit_addMeasurementUnit(randomMeasurementUnit);
-
-		assertEquals(randomMeasurementUnit, postMeasurementUnit);
-		assertValid(postMeasurementUnit);
-	}
-
-	protected MeasurementUnit testPostMeasurementUnit_addMeasurementUnit(
-			MeasurementUnit measurementUnit)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testDeleteMeasurementUnitByExternalReferenceCode()
-		throws Exception {
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		MeasurementUnit measurementUnit =
-			testDeleteMeasurementUnitByExternalReferenceCode_addMeasurementUnit();
-
-		assertHttpResponseStatusCode(
-			204,
-			measurementUnitResource.
-				deleteMeasurementUnitByExternalReferenceCodeHttpResponse(
-					measurementUnit.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			measurementUnitResource.
-				getMeasurementUnitByExternalReferenceCodeHttpResponse(
-					measurementUnit.getExternalReferenceCode()));
-
-		assertHttpResponseStatusCode(
-			404,
-			measurementUnitResource.
-				getMeasurementUnitByExternalReferenceCodeHttpResponse(
-					measurementUnit.getExternalReferenceCode()));
-	}
-
-	protected MeasurementUnit
-			testDeleteMeasurementUnitByExternalReferenceCode_addMeasurementUnit()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetMeasurementUnitByExternalReferenceCode()
-		throws Exception {
-
-		MeasurementUnit postMeasurementUnit =
-			testGetMeasurementUnitByExternalReferenceCode_addMeasurementUnit();
-
-		MeasurementUnit getMeasurementUnit =
-			measurementUnitResource.getMeasurementUnitByExternalReferenceCode(
-				postMeasurementUnit.getExternalReferenceCode());
-
-		assertEquals(postMeasurementUnit, getMeasurementUnit);
-		assertValid(getMeasurementUnit);
-	}
-
-	protected MeasurementUnit
-			testGetMeasurementUnitByExternalReferenceCode_addMeasurementUnit()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetMeasurementUnitByExternalReferenceCode()
-		throws Exception {
-
-		MeasurementUnit measurementUnit =
-			testGraphQLGetMeasurementUnitByExternalReferenceCode_addMeasurementUnit();
-
-		Assert.assertTrue(
-			equals(
-				measurementUnit,
-				MeasurementUnitSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"measurementUnitByExternalReferenceCode",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"externalReferenceCode",
-											"\"" +
-												measurementUnit.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/measurementUnitByExternalReferenceCode"))));
-	}
-
-	@Test
-	public void testGraphQLGetMeasurementUnitByExternalReferenceCodeNotFound()
-		throws Exception {
-
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"measurementUnitByExternalReferenceCode",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected MeasurementUnit
-			testGraphQLGetMeasurementUnitByExternalReferenceCode_addMeasurementUnit()
-		throws Exception {
-
-		return testGraphQLMeasurementUnit_addMeasurementUnit();
-	}
-
-	@Test
-	public void testPatchMeasurementUnitByExternalReferenceCode()
-		throws Exception {
-
-		Assert.assertTrue(false);
-	}
-
-	@Test
-	public void testDeleteMeasurementUnitByKey() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		MeasurementUnit measurementUnit =
-			testDeleteMeasurementUnitByKey_addMeasurementUnit();
-
-		assertHttpResponseStatusCode(
-			204,
-			measurementUnitResource.deleteMeasurementUnitByKeyHttpResponse(
-				measurementUnit.getKey()));
-
-		assertHttpResponseStatusCode(
-			404,
-			measurementUnitResource.getMeasurementUnitByKeyHttpResponse(
-				measurementUnit.getKey()));
-
-		assertHttpResponseStatusCode(
-			404,
-			measurementUnitResource.getMeasurementUnitByKeyHttpResponse(
-				measurementUnit.getKey()));
-	}
-
-	protected MeasurementUnit
-			testDeleteMeasurementUnitByKey_addMeasurementUnit()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetMeasurementUnitByKey() throws Exception {
-		MeasurementUnit postMeasurementUnit =
-			testGetMeasurementUnitByKey_addMeasurementUnit();
-
-		MeasurementUnit getMeasurementUnit =
-			measurementUnitResource.getMeasurementUnitByKey(
-				postMeasurementUnit.getKey());
-
-		assertEquals(postMeasurementUnit, getMeasurementUnit);
-		assertValid(getMeasurementUnit);
-	}
-
-	protected MeasurementUnit testGetMeasurementUnitByKey_addMeasurementUnit()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetMeasurementUnitByKey() throws Exception {
-		MeasurementUnit measurementUnit =
-			testGraphQLGetMeasurementUnitByKey_addMeasurementUnit();
-
-		Assert.assertTrue(
-			equals(
-				measurementUnit,
-				MeasurementUnitSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"measurementUnitByKey",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"key",
-											"\"" + measurementUnit.getKey() +
-												"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data", "Object/measurementUnitByKey"))));
-	}
-
-	@Test
-	public void testGraphQLGetMeasurementUnitByKeyNotFound() throws Exception {
-		String irrelevantKey = "\"" + RandomTestUtil.randomString() + "\"";
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"measurementUnitByKey",
-						new HashMap<String, Object>() {
-							{
-								put("key", irrelevantKey);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected MeasurementUnit
-			testGraphQLGetMeasurementUnitByKey_addMeasurementUnit()
-		throws Exception {
-
-		return testGraphQLMeasurementUnit_addMeasurementUnit();
-	}
-
-	@Test
-	public void testPatchMeasurementUnitByKey() throws Exception {
-		Assert.assertTrue(false);
-	}
-
-	@Test
-	public void testGetMeasurementUnitsByType() throws Exception {
-		String measurementUnitType =
-			testGetMeasurementUnitsByType_getMeasurementUnitType();
-		String irrelevantMeasurementUnitType =
-			testGetMeasurementUnitsByType_getIrrelevantMeasurementUnitType();
+		Long groupId =
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_getGroupId();
+		Long irrelevantGroupId =
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_getIrrelevantGroupId();
 
 		Page<MeasurementUnit> page =
-			measurementUnitResource.getMeasurementUnitsByType(
-				measurementUnitType, Pagination.of(1, 10), null);
+			measurementUnitResource.
+				getCommerceAdminSiteSettingGroupMeasurementUnitPage(
+					groupId, null, Pagination.of(1, 10));
 
 		Assert.assertEquals(0, page.getTotalCount());
 
-		if (irrelevantMeasurementUnitType != null) {
+		if (irrelevantGroupId != null) {
 			MeasurementUnit irrelevantMeasurementUnit =
-				testGetMeasurementUnitsByType_addMeasurementUnit(
-					irrelevantMeasurementUnitType,
-					randomIrrelevantMeasurementUnit());
+				testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_addMeasurementUnit(
+					irrelevantGroupId, randomIrrelevantMeasurementUnit());
 
-			page = measurementUnitResource.getMeasurementUnitsByType(
-				irrelevantMeasurementUnitType, Pagination.of(1, 2), null);
+			page =
+				measurementUnitResource.
+					getCommerceAdminSiteSettingGroupMeasurementUnitPage(
+						irrelevantGroupId, null, Pagination.of(1, 2));
 
 			Assert.assertEquals(1, page.getTotalCount());
 
 			assertEquals(
 				Arrays.asList(irrelevantMeasurementUnit),
 				(List<MeasurementUnit>)page.getItems());
-			assertValid(
-				page,
-				testGetMeasurementUnitsByType_getExpectedActions(
-					irrelevantMeasurementUnitType));
+			assertValid(page);
 		}
 
 		MeasurementUnit measurementUnit1 =
-			testGetMeasurementUnitsByType_addMeasurementUnit(
-				measurementUnitType, randomMeasurementUnit());
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_addMeasurementUnit(
+				groupId, randomMeasurementUnit());
 
 		MeasurementUnit measurementUnit2 =
-			testGetMeasurementUnitsByType_addMeasurementUnit(
-				measurementUnitType, randomMeasurementUnit());
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_addMeasurementUnit(
+				groupId, randomMeasurementUnit());
 
-		page = measurementUnitResource.getMeasurementUnitsByType(
-			measurementUnitType, Pagination.of(1, 10), null);
+		page =
+			measurementUnitResource.
+				getCommerceAdminSiteSettingGroupMeasurementUnitPage(
+					groupId, null, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(measurementUnit1, measurementUnit2),
 			(List<MeasurementUnit>)page.getItems());
-		assertValid(
-			page,
-			testGetMeasurementUnitsByType_getExpectedActions(
-				measurementUnitType));
+		assertValid(page);
 
 		measurementUnitResource.deleteMeasurementUnit(measurementUnit1.getId());
 
 		measurementUnitResource.deleteMeasurementUnit(measurementUnit2.getId());
 	}
 
-	protected Map<String, Map<String, String>>
-			testGetMeasurementUnitsByType_getExpectedActions(
-				String measurementUnitType)
+	@Test
+	public void testGetCommerceAdminSiteSettingGroupMeasurementUnitPageWithPagination()
 		throws Exception {
 
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetMeasurementUnitsByTypeWithPagination() throws Exception {
-		String measurementUnitType =
-			testGetMeasurementUnitsByType_getMeasurementUnitType();
+		Long groupId =
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_getGroupId();
 
 		MeasurementUnit measurementUnit1 =
-			testGetMeasurementUnitsByType_addMeasurementUnit(
-				measurementUnitType, randomMeasurementUnit());
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_addMeasurementUnit(
+				groupId, randomMeasurementUnit());
 
 		MeasurementUnit measurementUnit2 =
-			testGetMeasurementUnitsByType_addMeasurementUnit(
-				measurementUnitType, randomMeasurementUnit());
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_addMeasurementUnit(
+				groupId, randomMeasurementUnit());
 
 		MeasurementUnit measurementUnit3 =
-			testGetMeasurementUnitsByType_addMeasurementUnit(
-				measurementUnitType, randomMeasurementUnit());
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_addMeasurementUnit(
+				groupId, randomMeasurementUnit());
 
 		Page<MeasurementUnit> page1 =
-			measurementUnitResource.getMeasurementUnitsByType(
-				measurementUnitType, Pagination.of(1, 2), null);
+			measurementUnitResource.
+				getCommerceAdminSiteSettingGroupMeasurementUnitPage(
+					groupId, null, Pagination.of(1, 2));
 
 		List<MeasurementUnit> measurementUnits1 =
 			(List<MeasurementUnit>)page1.getItems();
@@ -928,8 +281,9 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 			measurementUnits1.toString(), 2, measurementUnits1.size());
 
 		Page<MeasurementUnit> page2 =
-			measurementUnitResource.getMeasurementUnitsByType(
-				measurementUnitType, Pagination.of(2, 2), null);
+			measurementUnitResource.
+				getCommerceAdminSiteSettingGroupMeasurementUnitPage(
+					groupId, null, Pagination.of(2, 2));
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -940,175 +294,60 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 			measurementUnits2.toString(), 1, measurementUnits2.size());
 
 		Page<MeasurementUnit> page3 =
-			measurementUnitResource.getMeasurementUnitsByType(
-				measurementUnitType, Pagination.of(1, 3), null);
+			measurementUnitResource.
+				getCommerceAdminSiteSettingGroupMeasurementUnitPage(
+					groupId, null, Pagination.of(1, 3));
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(measurementUnit1, measurementUnit2, measurementUnit3),
 			(List<MeasurementUnit>)page3.getItems());
 	}
 
-	@Test
-	public void testGetMeasurementUnitsByTypeWithSortDateTime()
-		throws Exception {
-
-		testGetMeasurementUnitsByTypeWithSort(
-			EntityField.Type.DATE_TIME,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				BeanTestUtil.setProperty(
-					measurementUnit1, entityField.getName(),
-					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetMeasurementUnitsByTypeWithSortDouble() throws Exception {
-		testGetMeasurementUnitsByTypeWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				BeanTestUtil.setProperty(
-					measurementUnit1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					measurementUnit2, entityField.getName(), 0.5);
-			});
-	}
-
-	@Test
-	public void testGetMeasurementUnitsByTypeWithSortInteger()
-		throws Exception {
-
-		testGetMeasurementUnitsByTypeWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				BeanTestUtil.setProperty(
-					measurementUnit1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					measurementUnit2, entityField.getName(), 1);
-			});
-	}
-
-	@Test
-	public void testGetMeasurementUnitsByTypeWithSortString() throws Exception {
-		testGetMeasurementUnitsByTypeWithSort(
-			EntityField.Type.STRING,
-			(entityField, measurementUnit1, measurementUnit2) -> {
-				Class<?> clazz = measurementUnit1.getClass();
-
-				String entityFieldName = entityField.getName();
-
-				Method method = clazz.getMethod(
-					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
-
-				Class<?> returnType = method.getReturnType();
-
-				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
-						measurementUnit1, entityFieldName,
-						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
-						measurementUnit2, entityFieldName,
-						Collections.singletonMap("Bbb", "Bbb"));
-				}
-				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
-						measurementUnit1, entityFieldName,
-						"aaa" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()) +
-									"@liferay.com");
-					BeanTestUtil.setProperty(
-						measurementUnit2, entityFieldName,
-						"bbb" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()) +
-									"@liferay.com");
-				}
-				else {
-					BeanTestUtil.setProperty(
-						measurementUnit1, entityFieldName,
-						"aaa" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
-						measurementUnit2, entityFieldName,
-						"bbb" +
-							StringUtil.toLowerCase(
-								RandomTestUtil.randomString()));
-				}
-			});
-	}
-
-	protected void testGetMeasurementUnitsByTypeWithSort(
-			EntityField.Type type,
-			UnsafeTriConsumer
-				<EntityField, MeasurementUnit, MeasurementUnit, Exception>
-					unsafeTriConsumer)
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(type);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		String measurementUnitType =
-			testGetMeasurementUnitsByType_getMeasurementUnitType();
-
-		MeasurementUnit measurementUnit1 = randomMeasurementUnit();
-		MeasurementUnit measurementUnit2 = randomMeasurementUnit();
-
-		for (EntityField entityField : entityFields) {
-			unsafeTriConsumer.accept(
-				entityField, measurementUnit1, measurementUnit2);
-		}
-
-		measurementUnit1 = testGetMeasurementUnitsByType_addMeasurementUnit(
-			measurementUnitType, measurementUnit1);
-
-		measurementUnit2 = testGetMeasurementUnitsByType_addMeasurementUnit(
-			measurementUnitType, measurementUnit2);
-
-		for (EntityField entityField : entityFields) {
-			Page<MeasurementUnit> ascPage =
-				measurementUnitResource.getMeasurementUnitsByType(
-					measurementUnitType, Pagination.of(1, 2),
-					entityField.getName() + ":asc");
-
-			assertEquals(
-				Arrays.asList(measurementUnit1, measurementUnit2),
-				(List<MeasurementUnit>)ascPage.getItems());
-
-			Page<MeasurementUnit> descPage =
-				measurementUnitResource.getMeasurementUnitsByType(
-					measurementUnitType, Pagination.of(1, 2),
-					entityField.getName() + ":desc");
-
-			assertEquals(
-				Arrays.asList(measurementUnit2, measurementUnit1),
-				(List<MeasurementUnit>)descPage.getItems());
-		}
-	}
-
-	protected MeasurementUnit testGetMeasurementUnitsByType_addMeasurementUnit(
-			String measurementUnitType, MeasurementUnit measurementUnit)
+	protected MeasurementUnit
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_addMeasurementUnit(
+				Long groupId, MeasurementUnit measurementUnit)
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected String testGetMeasurementUnitsByType_getMeasurementUnitType()
+	protected Long
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_getGroupId()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected String
-			testGetMeasurementUnitsByType_getIrrelevantMeasurementUnitType()
+	protected Long
+			testGetCommerceAdminSiteSettingGroupMeasurementUnitPage_getIrrelevantGroupId()
 		throws Exception {
 
 		return null;
+	}
+
+	@Test
+	public void testPostCommerceAdminSiteSettingGroupMeasurementUnit()
+		throws Exception {
+
+		MeasurementUnit randomMeasurementUnit = randomMeasurementUnit();
+
+		MeasurementUnit postMeasurementUnit =
+			testPostCommerceAdminSiteSettingGroupMeasurementUnit_addMeasurementUnit(
+				randomMeasurementUnit);
+
+		assertEquals(randomMeasurementUnit, postMeasurementUnit);
+		assertValid(postMeasurementUnit);
+	}
+
+	protected MeasurementUnit
+			testPostCommerceAdminSiteSettingGroupMeasurementUnit_addMeasurementUnit(
+				MeasurementUnit measurementUnit)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -1143,7 +382,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	@Test
 	public void testGraphQLDeleteMeasurementUnit() throws Exception {
 		MeasurementUnit measurementUnit =
-			testGraphQLDeleteMeasurementUnit_addMeasurementUnit();
+			testGraphQLMeasurementUnit_addMeasurementUnit();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -1156,6 +395,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteMeasurementUnit"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -1169,13 +409,6 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected MeasurementUnit
-			testGraphQLDeleteMeasurementUnit_addMeasurementUnit()
-		throws Exception {
-
-		return testGraphQLMeasurementUnit_addMeasurementUnit();
 	}
 
 	@Test
@@ -1201,7 +434,7 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	@Test
 	public void testGraphQLGetMeasurementUnit() throws Exception {
 		MeasurementUnit measurementUnit =
-			testGraphQLGetMeasurementUnit_addMeasurementUnit();
+			testGraphQLMeasurementUnit_addMeasurementUnit();
 
 		Assert.assertTrue(
 			equals(
@@ -1240,19 +473,10 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 				"Object/code"));
 	}
 
-	protected MeasurementUnit testGraphQLGetMeasurementUnit_addMeasurementUnit()
-		throws Exception {
-
-		return testGraphQLMeasurementUnit_addMeasurementUnit();
-	}
-
 	@Test
-	public void testPatchMeasurementUnit() throws Exception {
+	public void testPutMeasurementUnit() throws Exception {
 		Assert.assertTrue(false);
 	}
-
-	@Rule
-	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected MeasurementUnit testGraphQLMeasurementUnit_addMeasurementUnit()
 		throws Exception {
@@ -1345,18 +569,8 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("companyId", additionalAssertFieldName)) {
-				if (measurementUnit.getCompanyId() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (measurementUnit.getExternalReferenceCode() == null) {
+			if (Objects.equals("groupId", additionalAssertFieldName)) {
+				if (measurementUnit.getGroupId() == null) {
 					valid = false;
 				}
 
@@ -1420,13 +634,6 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	}
 
 	protected void assertValid(Page<MeasurementUnit> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<MeasurementUnit> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<MeasurementUnit> measurementUnits =
@@ -1442,20 +649,6 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1526,23 +719,10 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
-			if (Objects.equals("companyId", additionalAssertFieldName)) {
+			if (Objects.equals("groupId", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
-						measurementUnit1.getCompanyId(),
-						measurementUnit2.getCompanyId())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						measurementUnit1.getExternalReferenceCode(),
-						measurementUnit2.getExternalReferenceCode())) {
+						measurementUnit1.getGroupId(),
+						measurementUnit2.getGroupId())) {
 
 					return false;
 				}
@@ -1662,16 +842,14 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1688,10 +866,6 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1701,18 +875,18 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1729,18 +903,9 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		sb.append(operator);
 		sb.append(" ");
 
-		if (entityFieldName.equals("companyId")) {
+		if (entityFieldName.equals("groupId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
-		}
-
-		if (entityFieldName.equals("externalReferenceCode")) {
-			sb.append("'");
-			sb.append(
-				String.valueOf(measurementUnit.getExternalReferenceCode()));
-			sb.append("'");
-
-			return sb.toString();
 		}
 
 		if (entityFieldName.equals("id")) {
@@ -1767,23 +932,18 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 		}
 
 		if (entityFieldName.equals("priority")) {
-			sb.append(String.valueOf(measurementUnit.getPriority()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("rate")) {
-			sb.append(String.valueOf(measurementUnit.getRate()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("type")) {
-			sb.append("'");
-			sb.append(String.valueOf(measurementUnit.getType()));
-			sb.append("'");
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		throw new IllegalArgumentException(
@@ -1830,15 +990,13 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	protected MeasurementUnit randomMeasurementUnit() throws Exception {
 		return new MeasurementUnit() {
 			{
-				companyId = RandomTestUtil.randomLong();
-				externalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
+				groupId = RandomTestUtil.randomLong();
 				id = RandomTestUtil.randomLong();
 				key = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				primary = RandomTestUtil.randomBoolean();
 				priority = RandomTestUtil.randomDouble();
 				rate = RandomTestUtil.randomDouble();
-				type = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				type = RandomTestUtil.randomInt();
 			}
 		};
 	}
@@ -1860,115 +1018,6 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -2044,6 +1093,18 @@ public abstract class BaseMeasurementUnitResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseMeasurementUnitResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

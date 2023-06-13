@@ -33,6 +33,7 @@ import com.liferay.portal.tools.service.builder.test.model.DataLimitEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -209,81 +210,87 @@ public class DataLimitEntryModelImpl
 	public Map<String, Function<DataLimitEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<DataLimitEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, DataLimitEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<DataLimitEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DataLimitEntry.class.getClassLoader(), DataLimitEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<DataLimitEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<DataLimitEntry, Object>>();
+		try {
+			Constructor<DataLimitEntry> constructor =
+				(Constructor<DataLimitEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"dataLimitEntryId", DataLimitEntry::getDataLimitEntryId);
-			attributeGetterFunctions.put(
-				"companyId", DataLimitEntry::getCompanyId);
-			attributeGetterFunctions.put("userId", DataLimitEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", DataLimitEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", DataLimitEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", DataLimitEntry::getModifiedDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<DataLimitEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DataLimitEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<DataLimitEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<DataLimitEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DataLimitEntry, Object>>();
+		Map<String, BiConsumer<DataLimitEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<DataLimitEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<DataLimitEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<DataLimitEntry, ?>>();
+		attributeGetterFunctions.put(
+			"dataLimitEntryId", DataLimitEntry::getDataLimitEntryId);
+		attributeSetterBiConsumers.put(
+			"dataLimitEntryId",
+			(BiConsumer<DataLimitEntry, Long>)
+				DataLimitEntry::setDataLimitEntryId);
+		attributeGetterFunctions.put("companyId", DataLimitEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<DataLimitEntry, Long>)DataLimitEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", DataLimitEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<DataLimitEntry, Long>)DataLimitEntry::setUserId);
+		attributeGetterFunctions.put("userName", DataLimitEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<DataLimitEntry, String>)DataLimitEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", DataLimitEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<DataLimitEntry, Date>)DataLimitEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DataLimitEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<DataLimitEntry, Date>)DataLimitEntry::setModifiedDate);
 
-			attributeSetterBiConsumers.put(
-				"dataLimitEntryId",
-				(BiConsumer<DataLimitEntry, Long>)
-					DataLimitEntry::setDataLimitEntryId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<DataLimitEntry, Long>)DataLimitEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<DataLimitEntry, Long>)DataLimitEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<DataLimitEntry, String>)
-					DataLimitEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<DataLimitEntry, Date>)
-					DataLimitEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<DataLimitEntry, Date>)
-					DataLimitEntry::setModifiedDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -643,12 +650,41 @@ public class DataLimitEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<DataLimitEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<DataLimitEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<DataLimitEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((DataLimitEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DataLimitEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DataLimitEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -662,8 +698,7 @@ public class DataLimitEntryModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<DataLimitEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -19,19 +19,11 @@ import com.liferay.dispatch.metadata.DispatchTriggerMetadataFactory;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.repository.DispatchFileRepository;
 import com.liferay.dispatch.talend.web.internal.executor.TalendDispatchTaskExecutor;
-import com.liferay.expando.kernel.model.ExpandoBridge;
-import com.liferay.expando.kernel.model.ExpandoColumnConstants;
-import com.liferay.expando.kernel.model.ExpandoTable;
-import com.liferay.expando.kernel.model.ExpandoTableConstants;
-import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
-import com.liferay.expando.kernel.service.ExpandoTableLocalService;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 
-import org.osgi.service.component.annotations.Activate;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -39,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Igor Beslic
  */
 @Component(
+	immediate = true,
 	property = "dispatch.task.executor.type=" + TalendDispatchTaskExecutor.TALEND,
 	service = DispatchTriggerMetadataFactory.class
 )
@@ -50,81 +43,18 @@ public class TalendDispatchTriggerMetadataFactory
 		FileEntry fileEntry = _dispatchFileRepository.fetchFileEntry(
 			dispatchTrigger.getDispatchTriggerId());
 
-		TalendDispatchTriggerMetadata.Builder builder =
-			new TalendDispatchTriggerMetadata.Builder();
-
 		if (fileEntry != null) {
-			builder.attribute(
-				"talend-archive-file-name",
-				_getTalendArchiveFileName(dispatchTrigger)
-			).ready(
-				true
-			);
-
-			return builder.build();
+			return new TalendDispatchTriggerMetadata(true);
 		}
 
-		builder.error("talend-archive-file-misses", null);
-		builder.ready(false);
+		Map<String, String> errors = new HashMap<>();
 
-		return builder.build();
+		errors.put("talend-archive-file-misses", null);
+
+		return new TalendDispatchTriggerMetadata(false, errors);
 	}
-
-	@Activate
-	protected void activate() {
-		_companyLocalService.forEachCompany(
-			company -> {
-				try {
-					_setupExpando(company.getCompanyId());
-				}
-				catch (Exception exception) {
-					_log.error("Unable to setup expando", exception);
-				}
-			});
-	}
-
-	private String _getTalendArchiveFileName(DispatchTrigger dispatchTrigger) {
-		ExpandoBridge expandoBridge = dispatchTrigger.getExpandoBridge();
-
-		return (String)expandoBridge.getAttribute("fileName");
-	}
-
-	private void _setupExpando(long companyId) throws Exception {
-		ExpandoTable expandoTable = _expandoTableLocalService.fetchTable(
-			companyId,
-			_classNameLocalService.getClassNameId(
-				DispatchTrigger.class.getName()),
-			ExpandoTableConstants.DEFAULT_TABLE_NAME);
-
-		if (expandoTable != null) {
-			return;
-		}
-
-		expandoTable = _expandoTableLocalService.addTable(
-			companyId, DispatchTrigger.class.getName(),
-			ExpandoTableConstants.DEFAULT_TABLE_NAME);
-
-		_expandoColumnLocalService.addColumn(
-			expandoTable.getTableId(), "fileName",
-			ExpandoColumnConstants.STRING);
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		TalendDispatchTriggerMetadataFactory.class);
-
-	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private DispatchFileRepository _dispatchFileRepository;
-
-	@Reference
-	private ExpandoColumnLocalService _expandoColumnLocalService;
-
-	@Reference
-	private ExpandoTableLocalService _expandoTableLocalService;
 
 }

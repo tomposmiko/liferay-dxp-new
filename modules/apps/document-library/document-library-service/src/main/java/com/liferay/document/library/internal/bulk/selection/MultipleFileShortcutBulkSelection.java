@@ -63,7 +63,7 @@ public class MultipleFileShortcutBulkSelection
 		}
 		catch (NoSuchFolderException noSuchFolderException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(noSuchFolderException);
+				_log.warn(noSuchFolderException, noSuchFolderException);
 			}
 
 			return null;

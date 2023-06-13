@@ -12,23 +12,14 @@
  * details.
  */
 
-import ClayIcon from '@clayui/icon';
 import {normalizeFieldName} from 'data-engine-js-components-web';
-import {sub} from 'frontend-js-web';
 import React, {useRef} from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import Text from '../Text/Text.es';
 import {useSyncValue} from '../hooks/useSyncValue.es';
 
-const KeyValue = ({
-	allowSpecialCharacters,
-	className,
-	disabled,
-	onChange,
-	value,
-	...otherProps
-}) => (
+const KeyValue = ({className, disabled, onChange, value, ...otherProps}) => (
 	<div className="active form-text key-value-editor">
 		<label className="control-label key-value-label">
 			{className === 'key-value-reference-input'
@@ -40,11 +31,10 @@ const KeyValue = ({
 		<input
 			{...otherProps}
 			className={`${disabled ? 'disabled ' : ''}${className}`}
-			onChange={({target: {value}}) =>
-				onChange(
-					allowSpecialCharacters ? value : normalizeFieldName(value)
-				)
-			}
+			onChange={(event) => {
+				const value = normalizeFieldName(event.target.value);
+				onChange({target: {value}});
+			}}
 			readOnly={disabled}
 			tabIndex={disabled ? '-1' : '0'}
 			type="text"
@@ -54,7 +44,6 @@ const KeyValue = ({
 );
 
 const Main = ({
-	allowSpecialCharacters,
 	editingLanguageId,
 	generateKeyword,
 	keyword: initialKeyword,
@@ -62,9 +51,7 @@ const Main = ({
 	name,
 	onBlur,
 	onChange,
-	onClick,
 	onFocus,
-	onKeyDown,
 	onKeywordBlur,
 	onKeywordChange,
 	onReferenceBlur,
@@ -73,7 +60,6 @@ const Main = ({
 	readOnly,
 	reference,
 	required,
-	showCloseButton,
 	showKeyword = false,
 	showLabel,
 	spritemap,
@@ -99,20 +85,17 @@ const Main = ({
 				editingLanguageId={editingLanguageId}
 				name={`keyValueLabel${name}`}
 				onBlur={onBlur}
-				onChange={({target: {value}}) => {
-					onChange(value);
+				onChange={(event) => {
+					const {value} = event.target;
+
+					onChange(event);
 
 					if (generateKeywordRef.current) {
-						onKeywordChange(
-							allowSpecialCharacters
-								? value
-								: normalizeFieldName(value),
-							true
-						);
+						const newKeyword = normalizeFieldName(value);
+						onKeywordChange(event, newKeyword, true);
 					}
 				}}
 				onFocus={onFocus}
-				onKeyDown={onKeyDown}
 				placeholder={placeholder}
 				readOnly={readOnly}
 				required={required}
@@ -122,41 +105,27 @@ const Main = ({
 				value={value}
 				visible={visible}
 			/>
-
-			{showCloseButton && (
-				<button
-					aria-label={sub(
-						Liferay.Language.get('remove-x-option'),
-						keyword
-					)}
-					className="close close-modal"
-					onClick={onClick}
-					type="button"
-				>
-					<ClayIcon symbol="times" />
-				</button>
-			)}
-
 			{showKeyword && (
 				<KeyValue
-					allowSpecialCharacters={allowSpecialCharacters}
 					className="key-value-input"
 					disabled={keywordReadOnly}
 					onBlur={onKeywordBlur}
-					onChange={(value) => {
+					onChange={(event) => {
+						const {value} = event.target;
+
 						generateKeywordRef.current = false;
-						onKeywordChange(value, false);
+						onKeywordChange(event, value, false);
 						setKeyword(value);
 					}}
 					value={keyword}
 				/>
 			)}
-
 			<KeyValue
-				allowSpecialCharacters={allowSpecialCharacters}
 				className="key-value-reference-input"
 				onBlur={onReferenceBlur}
-				onChange={onReferenceChange}
+				onChange={(event) => {
+					onReferenceChange(event);
+				}}
 				value={reference}
 			/>
 		</FieldBase>

@@ -31,8 +31,7 @@ import com.liferay.headless.admin.user.internal.dto.v1_0.util.EmailAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PhoneUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PostalAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.WebUrlUtil;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.OrgLabor;
@@ -53,13 +52,15 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -86,8 +87,8 @@ public class OrganizationResourceDTOConverter
 		throws Exception {
 
 		com.liferay.portal.kernel.model.Organization organization =
-			_organizationLocalService.fetchOrganizationByExternalReferenceCode(
-				externalReferenceCode, CompanyThreadLocal.getCompanyId());
+			_organizationLocalService.fetchOrganizationByReferenceCode(
+				CompanyThreadLocal.getCompanyId(), externalReferenceCode);
 
 		if (organization == null) {
 			organization = _organizationService.getOrganization(
@@ -123,7 +124,6 @@ public class OrganizationResourceDTOConverter
 					dtoConverterContext.getLocale());
 				dateCreated = organization.getCreateDate();
 				dateModified = organization.getModifiedDate();
-				externalReferenceCode = organization.getExternalReferenceCode();
 				id = String.valueOf(organization.getOrganizationId());
 				keywords = ListUtil.toArray(
 					_assetTagLocalService.getTags(
@@ -152,22 +152,19 @@ public class OrganizationResourceDTOConverter
 									return null;
 								}
 
-								Map<String, String> countryNames =
-									new HashMap<>();
+								Set<Locale> locales =
+									LanguageUtil.getCompanyAvailableLocales(
+										organization.getCompanyId());
+
+								Stream<Locale> localesStream = locales.stream();
 
 								Country country = _countryService.getCountry(
 									organization.getCountryId());
 
-								for (Locale locale :
-										_language.getCompanyAvailableLocales(
-											organization.getCompanyId())) {
-
-									countryNames.put(
-										LocaleUtil.toBCP47LanguageId(locale),
-										country.getName());
-								}
-
-								return countryNames;
+								return localesStream.collect(
+									Collectors.toMap(
+										LocaleUtil::toBCP47LanguageId,
+										country::getName));
 							});
 						setAddressRegion(
 							() -> {
@@ -275,7 +272,7 @@ public class OrganizationResourceDTOConverter
 	}
 
 	private Service _toService(OrgLabor orgLabor) throws Exception {
-		ListType listType = orgLabor.getListType();
+		ListType listType = orgLabor.getType();
 
 		return new Service() {
 			{
@@ -319,9 +316,6 @@ public class OrganizationResourceDTOConverter
 
 	@Reference
 	private EmailAddressService _emailAddressService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;

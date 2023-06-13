@@ -342,18 +342,18 @@ public interface OrganizationModel
 	public void setCountryId(long countryId);
 
 	/**
-	 * Returns the status list type ID of this organization.
+	 * Returns the status ID of this organization.
 	 *
-	 * @return the status list type ID of this organization
+	 * @return the status ID of this organization
 	 */
-	public long getStatusListTypeId();
+	public long getStatusId();
 
 	/**
-	 * Sets the status list type ID of this organization.
+	 * Sets the status ID of this organization.
 	 *
-	 * @param statusListTypeId the status list type ID of this organization
+	 * @param statusId the status ID of this organization
 	 */
-	public void setStatusListTypeId(long statusListTypeId);
+	public void setStatusId(long statusId);
 
 	/**
 	 * Returns the comments of this organization.
@@ -386,9 +386,5 @@ public interface OrganizationModel
 
 	@Override
 	public Organization cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

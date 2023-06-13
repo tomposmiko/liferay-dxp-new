@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Modified;
 		"com.liferay.portal.search.configuration.IndexStatusManagerConfiguration",
 		"com.liferay.portal.search.internal.index.configuration.IndexStatusManagerInternalConfiguration"
 	},
-	service = IndexStatusManager.class
+	immediate = true, service = IndexStatusManager.class
 )
 public class IndexStatusManagerImpl implements IndexStatusManager {
 

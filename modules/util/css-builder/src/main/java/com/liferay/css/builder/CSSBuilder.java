@@ -19,11 +19,12 @@ import com.beust.jcommander.ParameterException;
 
 import com.liferay.css.builder.internal.util.CSSBuilderUtil;
 import com.liferay.css.builder.internal.util.FileUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.rtl.css.RTLCSSConverter;
 import com.liferay.sass.compiler.SassCompiler;
-import com.liferay.sass.compiler.dart.internal.DartSassCompiler;
+import com.liferay.sass.compiler.jni.internal.JniSassCompiler;
+import com.liferay.sass.compiler.jsass.internal.JSassCompiler;
+import com.liferay.sass.compiler.ruby.internal.RubySassCompiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -91,9 +93,9 @@ public class CSSBuilder implements AutoCloseable {
 	public CSSBuilder(CSSBuilderArgs cssBuilderArgs) throws Exception {
 		_cssBuilderArgs = cssBuilderArgs;
 
-		List<File> importPaths = cssBuilderArgs.getImportPaths();
+		List<File> importPaths = _cssBuilderArgs.getImportPaths();
 
-		List<String> excludes = cssBuilderArgs.getExcludes();
+		List<String> excludes = _cssBuilderArgs.getExcludes();
 
 		_excludes = excludes.toArray(new String[0]);
 
@@ -118,7 +120,7 @@ public class CSSBuilder implements AutoCloseable {
 		}
 
 		List<String> rtlExcludedPathRegexps =
-			cssBuilderArgs.getRtlExcludedPathRegexps();
+			_cssBuilderArgs.getRtlExcludedPathRegexps();
 
 		_rtlExcludedPathPatterns = new Pattern[rtlExcludedPathRegexps.size()];
 
@@ -127,7 +129,7 @@ public class CSSBuilder implements AutoCloseable {
 				rtlExcludedPathRegexps.get(i));
 		}
 
-		_initSassCompiler(cssBuilderArgs.getSassCompilerClassName());
+		_initSassCompiler(_cssBuilderArgs.getSassCompilerClassName());
 	}
 
 	@Override
@@ -196,11 +198,13 @@ public class CSSBuilder implements AutoCloseable {
 		String[] scssFiles = _getScssFiles(basedir);
 
 		if (!_isModified(basedir, scssFiles)) {
-			long oldestSassModifiedTime = _getModifiedTime(
-				basedir, scssFiles, Comparator.naturalOrder());
+			long oldestSassModifiedTime = _getOldestModifiedTime(
+				basedir, scssFiles);
 
-			long newestFragmentModifiedTime = _getModifiedTime(
-				basedir, _getScssFragments(basedir), Comparator.reverseOrder());
+			String[] scssFragments = _getScssFragments(basedir);
+
+			long newestFragmentModifiedTime = _getNewestModifiedTime(
+				basedir, scssFragments);
 
 			if (oldestSassModifiedTime > newestFragmentModifiedTime) {
 				return fileNames;
@@ -218,21 +222,32 @@ public class CSSBuilder implements AutoCloseable {
 		return fileNames;
 	}
 
-	private long _getModifiedTime(
-		String baseDir, String[] fileNames, Comparator<Long> comparator) {
+	private long _getNewestModifiedTime(String baseDir, String[] fileNames) {
+		return Stream.of(
+			fileNames
+		).map(
+			fileName -> Paths.get(baseDir, fileName)
+		).map(
+			FileUtil::getLastModifiedTime
+		).max(
+			Comparator.naturalOrder()
+		).orElse(
+			Long.MIN_VALUE
+		);
+	}
 
-		List<Long> lastModifiedTimes = TransformUtil.transformToList(
-			fileNames,
-			fileName -> FileUtil.getLastModifiedTime(
-				Paths.get(baseDir, fileName)));
-
-		if (lastModifiedTimes.isEmpty()) {
-			return Long.MIN_VALUE;
-		}
-
-		lastModifiedTimes.sort(comparator);
-
-		return lastModifiedTimes.get(0);
+	private long _getOldestModifiedTime(String baseDir, String[] fileNames) {
+		return Stream.of(
+			fileNames
+		).map(
+			fileName -> Paths.get(baseDir, fileName)
+		).map(
+			FileUtil::getLastModifiedTime
+		).min(
+			Comparator.naturalOrder()
+		).orElse(
+			Long.MIN_VALUE
+		);
 	}
 
 	private String _getRtlCss(String fileName, String css) {
@@ -277,26 +292,47 @@ public class CSSBuilder implements AutoCloseable {
 
 		if ((sassCompilerClassName == null) ||
 			sassCompilerClassName.isEmpty() ||
-			sassCompilerClassName.equals("dart")) {
+			sassCompilerClassName.equals("jni")) {
 
-			System.out.println("Using Dart Sass compiler");
+			try {
+				_sassCompiler = new JSassCompiler(precision);
+
+				System.out.println("Using native Sass compiler");
+			}
+			catch (Throwable throwable) {
+				System.out.println(
+					"Unable to load native compiler, falling back to Ruby");
+
+				_sassCompiler = new RubySassCompiler(precision);
+			}
 		}
-		else if (sassCompilerClassName.equals("jni") ||
-				 sassCompilerClassName.equals("jni32") ||
-				 sassCompilerClassName.equals("ruby")) {
+		else if (sassCompilerClassName.equals("jni32")) {
+			try {
+				System.setProperty("jna.nosys", Boolean.TRUE.toString());
 
-			System.out.println(
-				"Using Dart Sass compiler because other sass compilers are " +
-					"no longer supported");
+				_sassCompiler = new JniSassCompiler(precision);
+
+				System.out.println("Using native 32-bit Sass compiler");
+			}
+			catch (Throwable throwable) {
+				System.out.println(
+					"Unable to load native compiler, falling back to Ruby");
+
+				_sassCompiler = new RubySassCompiler(precision);
+			}
 		}
+		else if (sassCompilerClassName.equals("ruby")) {
+			try {
+				_sassCompiler = new RubySassCompiler(precision);
 
-		try {
-			_sassCompiler = new DartSassCompiler(precision);
-		}
-		catch (Throwable throwable) {
-			System.out.println("Unable to load sass compiler");
+				System.out.println("Using Ruby Sass compiler");
+			}
+			catch (Exception exception) {
+				System.out.println(
+					"Unable to load Ruby compiler, falling back to native");
 
-			throw throwable;
+				_sassCompiler = new JSassCompiler(precision);
+			}
 		}
 	}
 

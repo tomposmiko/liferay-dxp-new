@@ -21,6 +21,6 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = DSRecipientManager.class)
+@Component(immediate = true, service = DSRecipientManager.class)
 public class DSRecipientManagerImpl implements DSRecipientManager {
 }

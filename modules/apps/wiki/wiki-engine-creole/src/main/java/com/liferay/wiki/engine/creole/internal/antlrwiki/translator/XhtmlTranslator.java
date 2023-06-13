@@ -17,15 +17,11 @@ package com.liferay.wiki.engine.creole.internal.antlrwiki.translator;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.LocaleThreadLocal;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TreeNode;
 import com.liferay.wiki.configuration.WikiGroupServiceConfiguration;
@@ -44,9 +40,7 @@ import com.liferay.wiki.service.WikiPageLocalServiceUtil;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletURL;
 
@@ -73,9 +67,9 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		append("<h");
 		append(headingNode.getLevel());
 
-		String unformattedText = _getUnformattedHeadingText(headingNode);
+		String unformattedText = getUnformattedHeadingText(headingNode);
 
-		String markup = _getHeadingMarkup(
+		String markup = getHeadingMarkup(
 			_page.getTitle(), unformattedText, _headingCounts);
 
 		append(" id=\"");
@@ -134,7 +128,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 
 		append("<a href=\"");
 
-		_appendHref(linkNode, title, wikiPage);
+		appendHref(linkNode, title, wikiPage);
 
 		append(StringPool.QUOTE);
 
@@ -183,32 +177,27 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		String title = tableOfContentsNode.getTitle();
 
 		if (title == null) {
-			title = _getTableOfContentsLabel();
-		}
-
-		if (title == null) {
 			title = "Table of Contents";
 		}
 
 		append(title);
 
 		append(StringPool.NBSP);
-		append("<a class=\"toc-trigger\" href=\"javascript:void(0);\">[-]");
-		append("</a></h4>");
+		append("<a class=\"toc-trigger\" href=\"javascript:;\">[-]</a></h4>");
 		append("<div class=\"toc-index\">");
 
-		_appendTableOfContents(tableOfContents, 1);
+		appendTableOfContents(tableOfContents, 1);
 
 		append("</div>");
 		append("</div>");
 		append("</div>");
 	}
 
-	private void _appendAbsoluteHref(LinkNode linkNode) {
+	protected void appendAbsoluteHref(LinkNode linkNode) {
 		append(HtmlUtil.escape(linkNode.getLink()));
 	}
 
-	private void _appendHref(
+	protected void appendHref(
 		LinkNode linkNode, String title, WikiPage wikiPage) {
 
 		if (linkNode.getLink() == null) {
@@ -220,14 +209,14 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		}
 
 		if (linkNode.isAbsoluteLink()) {
-			_appendAbsoluteHref(linkNode);
+			appendAbsoluteHref(linkNode);
 		}
 		else {
-			_appendWikiHref(linkNode, wikiPage, title);
+			appendWikiHref(linkNode, wikiPage, title);
 		}
 	}
 
-	private void _appendTableOfContents(
+	protected void appendTableOfContents(
 		TreeNode<HeadingNode> tableOfContents, int depth) {
 
 		List<TreeNode<HeadingNode>> treeNodes = tableOfContents.getChildNodes();
@@ -245,7 +234,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 
 			HeadingNode headingNode = treeNode.getValue();
 
-			String content = _getUnformattedHeadingText(headingNode);
+			String content = getUnformattedHeadingText(headingNode);
 
 			append("<a class=\"wikipage\" href=\"");
 
@@ -263,7 +252,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 
 			append(StringPool.POUND);
 			append(
-				_getHeadingMarkup(
+				getHeadingMarkup(
 					_page.getTitle(), content, _tableOfContentsHeadingCounts));
 			append("\">");
 			append(content);
@@ -273,7 +262,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 
 			_tableOfContentsHeadingCounts.put(content, count + 1);
 
-			_appendTableOfContents(treeNode, depth + 1);
+			appendTableOfContents(treeNode, depth + 1);
 
 			append("</li>");
 		}
@@ -281,10 +270,10 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		append("</ol>");
 	}
 
-	private void _appendWikiHref(
+	protected void appendWikiHref(
 		LinkNode linkNode, WikiPage wikiPage, String title) {
 
-		String attachmentLink = _searchLinkInAttachments(linkNode);
+		String attachmentLink = searchLinkInAttachments(linkNode);
 
 		if (attachmentLink != null) {
 
@@ -311,7 +300,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		}
 	}
 
-	private String _getHeadingMarkup(
+	protected String getHeadingMarkup(
 		String prefix, String text, Map<String, Integer> textCounts) {
 
 		String postfix = StringPool.BLANK;
@@ -327,32 +316,14 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 			CharPool.SPACE, CharPool.PLUS);
 	}
 
-	private ResourceBundle _getResourceBundle(Locale locale) {
-		Class<?> clazz = getClass();
-
-		return ResourceBundleUtil.getBundle(
-			"content.Language", locale, clazz.getClassLoader());
-	}
-
-	private String _getTableOfContentsLabel() {
-		Locale locale = LocaleThreadLocal.getSiteDefaultLocale();
-
-		if (locale == null) {
-			locale = LocaleUtil.getDefault();
-		}
-
-		return LanguageUtil.get(
-			_getResourceBundle(locale), "table-of-contents");
-	}
-
-	private String _getUnformattedHeadingText(HeadingNode headingNode) {
+	protected String getUnformattedHeadingText(HeadingNode headingNode) {
 		UnformattedHeadingTextVisitor unformattedHeadingTextVisitor =
 			new UnformattedHeadingTextVisitor();
 
 		return unformattedHeadingTextVisitor.getUnformattedText(headingNode);
 	}
 
-	private String _searchLinkInAttachments(LinkNode linkNode) {
+	protected String searchLinkInAttachments(LinkNode linkNode) {
 		try {
 			for (FileEntry fileEntry : _page.getAttachmentsFileEntries()) {
 				String title = fileEntry.getTitle();
@@ -364,7 +335,7 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

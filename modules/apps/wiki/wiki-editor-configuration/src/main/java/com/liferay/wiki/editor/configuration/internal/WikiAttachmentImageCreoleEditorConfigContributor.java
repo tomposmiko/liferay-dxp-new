@@ -26,6 +26,8 @@ import com.liferay.wiki.constants.WikiPortletKeys;
 
 import java.util.Map;
 
+import javax.portlet.PortletURL;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -63,10 +65,11 @@ public class WikiAttachmentImageCreoleEditorConfigContributor
 		ThemeDisplay themeDisplay) {
 
 		if (wikiPageResourcePrimKey == 0) {
-			return String.valueOf(
-				_itemSelector.getItemSelectorURL(
-					requestBackedPortletURLFactory, itemSelectedEventName,
-					getURLItemSelectorCriterion()));
+			PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+				requestBackedPortletURLFactory, itemSelectedEventName,
+				getURLItemSelectorCriterion());
+
+			return itemSelectorURL.toString();
 		}
 
 		ItemSelectorCriterion attachmentItemSelectorCriterion =
@@ -78,16 +81,22 @@ public class WikiAttachmentImageCreoleEditorConfigContributor
 				wikiPageResourcePrimKey, themeDisplay,
 				requestBackedPortletURLFactory);
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, itemSelectedEventName,
-				attachmentItemSelectorCriterion, getURLItemSelectorCriterion(),
-				uploadItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, itemSelectedEventName,
+			attachmentItemSelectorCriterion, getURLItemSelectorCriterion(),
+			uploadItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	@Override
 	protected WikiFileUploadConfiguration getWikiFileUploadConfiguration() {
 		return _wikiFileUploadConfiguration;
+	}
+
+	@Reference(unbind = "-")
+	protected void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
 	}
 
 	protected void setWikiFileUploadConfiguration(
@@ -96,9 +105,7 @@ public class WikiAttachmentImageCreoleEditorConfigContributor
 		_wikiFileUploadConfiguration = wikiFileUploadConfiguration;
 	}
 
-	@Reference
 	private ItemSelector _itemSelector;
-
 	private volatile WikiFileUploadConfiguration _wikiFileUploadConfiguration;
 
 }

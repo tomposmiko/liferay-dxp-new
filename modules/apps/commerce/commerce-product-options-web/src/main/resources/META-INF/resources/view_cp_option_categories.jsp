@@ -21,6 +21,8 @@ String specificationNavbarItemKey = ParamUtil.getString(request, "specificationN
 
 CPOptionCategoryDisplayContext cpOptionCategoryDisplayContext = (CPOptionCategoryDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
+String displayStyle = cpOptionCategoryDisplayContext.getDisplayStyle();
+
 PortletURL portletURL = PortletURLBuilder.create(
 	cpOptionCategoryDisplayContext.getPortletURL()
 ).setParameter(
@@ -34,10 +36,70 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 
 <%@ include file="/navbar_specifications.jspf" %>
 
-<clay:management-toolbar
-	managementToolbarDisplayContext="<%= new CPOptionCategoryManagementToolbarDisplayContext(cpOptionCategoryDisplayContext, request, liferayPortletRequest, liferayPortletResponse) %>"
-	propsTransformer="js/CPOptionCategoryManagementToolbarPropsTransformer"
-/>
+<liferay-frontend:management-bar
+	includeCheckBox="<%= true %>"
+	searchContainerId="cpOptionCategories"
+>
+	<liferay-frontend:management-bar-buttons>
+		<c:if test="<%= cpOptionCategoryDisplayContext.isShowInfoPanel() %>">
+			<liferay-frontend:management-bar-sidenav-toggler-button
+				icon="info-circle"
+				label="info"
+			/>
+		</c:if>
+
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= cpOptionCategoryDisplayContext.getPortletURL() %>"
+			selectedDisplayStyle="<%= displayStyle %>"
+		/>
+
+		<c:if test="<%= cpOptionCategoryDisplayContext.hasPermission(CPActionKeys.ADD_COMMERCE_PRODUCT_OPTION_CATEGORY) %>">
+			<liferay-portlet:renderURL var="addProductOptionCategoryURL">
+				<portlet:param name="mvcRenderCommandName" value="/cp_specification_options/edit_cp_option_category" />
+				<portlet:param name="redirect" value="<%= currentURL %>" />
+			</liferay-portlet:renderURL>
+
+			<liferay-frontend:add-menu
+				inline="<%= true %>"
+			>
+				<liferay-frontend:add-menu-item
+					title='<%= LanguageUtil.get(request, "add-specification-group") %>'
+					url="<%= addProductOptionCategoryURL.toString() %>"
+				/>
+			</liferay-frontend:add-menu>
+		</c:if>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= cpOptionCategoryDisplayContext.getPortletURL() %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= cpOptionCategoryDisplayContext.getOrderByCol() %>"
+			orderByType="<%= cpOptionCategoryDisplayContext.getOrderByType() %>"
+			orderColumns='<%= new String[] {"modified-date", "group", "priority"} %>'
+			portletURL="<%= cpOptionCategoryDisplayContext.getPortletURL() %>"
+		/>
+	</liferay-frontend:management-bar-filters>
+
+	<liferay-frontend:management-bar-action-buttons>
+		<c:if test="<%= cpOptionCategoryDisplayContext.isShowInfoPanel() %>">
+			<liferay-frontend:management-bar-sidenav-toggler-button
+				icon="info-circle"
+				label="info"
+			/>
+		</c:if>
+
+		<liferay-frontend:management-bar-button
+			href='<%= "javascript:" + liferayPortletResponse.getNamespace() + "deleteCPOptionCategories();" %>'
+			icon="times"
+			label="delete"
+		/>
+	</liferay-frontend:management-bar-action-buttons>
+</liferay-frontend:management-bar>
 
 <div id="<portlet:namespace />productOptionCategoriesContainer">
 	<div class="closed sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
@@ -54,10 +116,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 
 		<div class="sidenav-content">
 			<clay:container-fluid>
-				<portlet:actionURL name="/cp_specification_options/edit_cp_option_category" var="editCPOptionCategoryURL" />
-
-				<aui:form action="<%= editCPOptionCategoryURL %>" method="post" name="fm">
-					<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.DELETE %>" />
+				<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+					<aui:input name="<%= Constants.CMD %>" type="hidden" />
 					<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 					<aui:input name="deleteCPOptionCategoryIds" type="hidden" />
 
@@ -86,7 +146,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 								%>
 
 								<liferay-ui:search-container-column-text
-									cssClass="font-weight-bold important table-cell-expand"
+									cssClass="important table-cell-expand"
 									href="<%= rowURL %>"
 									name="group"
 									value="<%= HtmlUtil.escape(cpOptionCategory.getTitle(locale)) %>"
@@ -110,7 +170,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 							</liferay-ui:search-container-row>
 
 							<liferay-ui:search-iterator
-								displayStyle="list"
+								displayStyle="<%= displayStyle %>"
 								markupView="lexicon"
 							/>
 						</liferay-ui:search-container>
@@ -120,3 +180,30 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 		</div>
 	</div>
 </div>
+
+<aui:script>
+	function <portlet:namespace />deleteCPOptionCategories() {
+		if (
+			confirm(
+				'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-specification-groups" />'
+			)
+		) {
+			var form = window.document['<portlet:namespace />fm'];
+
+			form.setAttribute('method', 'post');
+			form['<portlet:namespace /><%= Constants.CMD %>'].value =
+				'<%= Constants.DELETE %>';
+			form[
+				'<portlet:namespace />deleteCPOptionCategoryIds'
+			].value = Liferay.Util.listCheckedExcept(
+				form,
+				'<portlet:namespace />allRowIds'
+			);
+
+			submitForm(
+				form,
+				'<portlet:actionURL name="/cp_specification_options/edit_cp_option_category" />'
+			);
+		}
+	}
+</aui:script>

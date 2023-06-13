@@ -15,6 +15,7 @@
 package com.liferay.portal.webdav.methods;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.Dom4jUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
@@ -53,7 +54,7 @@ public class PropfindMethodImpl extends BasePropMethodImpl implements Method {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(invalidRequestException);
+				_log.debug(invalidRequestException, invalidRequestException);
 			}
 
 			return HttpServletResponse.SC_BAD_REQUEST;
@@ -100,13 +101,13 @@ public class PropfindMethodImpl extends BasePropMethodImpl implements Method {
 				return generateProps(props);
 			}
 
-			Document document = SAXReaderUtil.read(xml);
-
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Request XML: \n" +
-						document.formattedString(StringPool.FOUR_SPACES));
+						Dom4jUtil.toString(xml, StringPool.FOUR_SPACES));
 			}
+
+			Document document = SAXReaderUtil.read(xml);
 
 			Element rootElement = document.getRootElement();
 

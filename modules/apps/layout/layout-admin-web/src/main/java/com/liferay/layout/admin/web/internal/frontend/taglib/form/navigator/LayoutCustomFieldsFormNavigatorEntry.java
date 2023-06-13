@@ -46,18 +46,8 @@ public class LayoutCustomFieldsFormNavigatorEntry
 	}
 
 	@Override
-	public String getFormNavigatorId() {
-		return FormNavigatorConstants.FORM_NAVIGATOR_ID_LAYOUT_DESIGN;
-	}
-
-	@Override
 	public String getKey() {
 		return "custom-fields";
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
 	}
 
 	@Override
@@ -83,11 +73,20 @@ public class LayoutCustomFieldsFormNavigatorEntry
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return hasCustomAttributesAvailable;
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
@@ -97,8 +96,5 @@ public class LayoutCustomFieldsFormNavigatorEntry
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutCustomFieldsFormNavigatorEntry.class);
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.admin.web)")
-	private ServletContext _servletContext;
 
 }

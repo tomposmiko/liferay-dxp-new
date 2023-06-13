@@ -25,7 +25,7 @@ import com.liferay.product.navigation.control.menu.BaseJSPProductNavigationContr
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
 import com.liferay.product.navigation.personal.menu.configuration.PersonalMenuConfiguration;
-import com.liferay.product.navigation.personal.menu.configuration.PersonalMenuConfigurationRegistry;
+import com.liferay.product.navigation.personal.menu.configuration.PersonalMenuConfigurationTracker;
 import com.liferay.product.navigation.personal.menu.web.internal.constants.PersonalMenuWebKeys;
 
 import java.io.IOException;
@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
 		"product.navigation.control.menu.entry.order:Integer=700"
@@ -68,7 +69,7 @@ public class PersonalMenuProductNavigationControlMenuEntry
 
 		User user = themeDisplay.getUser();
 
-		if (!user.isGuestUser() &&
+		if (!user.isDefaultUser() &&
 			(_userNotificationEventLocalService != null)) {
 
 			httpServletRequest.setAttribute(
@@ -92,7 +93,7 @@ public class PersonalMenuProductNavigationControlMenuEntry
 				WebKeys.THEME_DISPLAY);
 
 		PersonalMenuConfiguration personalMenuConfiguration =
-			_personalMenuConfigurationRegistry.
+			_personalMenuConfigurationTracker.
 				getCompanyPersonalMenuConfiguration(
 					themeDisplay.getCompanyId());
 
@@ -112,18 +113,16 @@ public class PersonalMenuProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.product.navigation.personal.menu.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Reference
-	private PersonalMenuConfigurationRegistry
-		_personalMenuConfigurationRegistry;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.product.navigation.personal.menu.web)"
-	)
-	private ServletContext _servletContext;
+	private PersonalMenuConfigurationTracker _personalMenuConfigurationTracker;
 
 	@Reference
 	private UserNotificationEventLocalService

@@ -39,7 +39,7 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 		<!-- End LPS-38289, LPS-55993, and LPS-61876 -->
 
 		<aui:input name="userId" type="hidden" value="<%= themeDisplay.getUserId() %>" />
-		<aui:input label="your-password" name="password" required="<%= true %>" size="30" type="password" />
+		<aui:input autocomplete="new-password" label="your-password" name="password" required="<%= true %>" size="30" type="password" />
 
 		<div class="form-text">
 			<liferay-ui:message key="enter-your-current-password-to-confirm-changes" />
@@ -85,12 +85,7 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 			.then((response) => {
 				var openingLiferay = Liferay.Util.getOpener().Liferay;
 
-				openingLiferay.fire('<%= HtmlUtil.escapeJS(eventName) %>', {
-					<c:if test='<%= eventName.equals(liferayPortletResponse.getNamespace() + "verifyPassword") %>'>
-						data: document.getElementById('<portlet:namespace />password')
-							.value,
-					</c:if>
-				});
+				openingLiferay.fire('<%= HtmlUtil.escapeJS(eventName) %>');
 				openingLiferay.fire('closeModal');
 			})
 			.catch((error) => {

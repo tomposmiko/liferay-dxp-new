@@ -21,6 +21,7 @@ CPDefinitionLinkDisplayContext cpDefinitionLinkDisplayContext = (CPDefinitionLin
 
 CPDefinition cpDefinition = cpDefinitionLinkDisplayContext.getCPDefinition();
 long cpDefinitionId = cpDefinitionLinkDisplayContext.getCPDefinitionId();
+PortletURL portletURL = cpDefinitionLinkDisplayContext.getPortletURL();
 %>
 
 <c:if test="<%= CommerceCatalogPermission.contains(permissionChecker, cpDefinition, ActionKeys.VIEW) %>">
@@ -35,25 +36,24 @@ long cpDefinitionId = cpDefinitionLinkDisplayContext.getCPDefinitionId();
 	</aui:form>
 
 	<div class="pt-4" id="<portlet:namespace />productDefinitionLinksContainer">
-		<portlet:actionURL name="/cp_definitions/edit_cp_definition" var="editProductDefinitionLinksActionURL" />
-
-		<aui:form action="<%= editProductDefinitionLinksActionURL %>" method="post" name="fm">
+		<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 			<aui:input name="<%= Constants.CMD %>" type="hidden" />
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
-			<aui:input name="cpDefinitionId" type="hidden" value="<%= cpDefinitionId %>" />
-			<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_SAVE_DRAFT %>" />
 
-			<frontend-data-set:classic-display
+			<clay:data-set-display
 				contextParams='<%=
 					HashMapBuilder.<String, String>put(
 						"cpDefinitionId", String.valueOf(cpDefinitionLinkDisplayContext.getCPDefinitionId())
 					).build()
 				%>'
 				creationMenu="<%= cpDefinitionLinkDisplayContext.getCreationMenu() %>"
-				dataProviderKey="<%= CommerceProductFDSNames.PRODUCT_LINKS %>"
-				formName="fm"
-				id="<%= CommerceProductFDSNames.PRODUCT_LINKS %>"
+				dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_LINKS %>"
+				formId="fm"
+				id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_LINKS %>"
 				itemsPerPage="<%= 10 %>"
+				namespace="<%= liferayPortletResponse.getNamespace() %>"
+				pageNumber="<%= 1 %>"
+				portletURL="<%= portletURL %>"
 				style="stacked"
 			/>
 		</aui:form>

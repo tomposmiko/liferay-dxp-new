@@ -94,7 +94,7 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 		Class<T> modelClass = getModelClass();
 
 		return LanguageUtil.get(
-			getResourceBundle(locale), "model.resource." + modelClass.getName(),
+			locale, "model.resource." + modelClass.getName(),
 			modelClass.getName());
 	}
 
@@ -130,10 +130,12 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			displayContext.getLocale(), getClass());
+
 		buildDisplay(
 			new DisplayBuilderImpl<>(
-				displayContext, getResourceBundle(displayContext.getLocale()),
-				themeDisplay));
+				displayContext, resourceBundle, themeDisplay));
 
 		writer.write("</table></div>");
 	}
@@ -157,20 +159,9 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 		}
 	}
 
-	protected ResourceBundle getResourceBundle(Locale locale) {
-		return ResourceBundleUtil.getBundle(locale, getClass());
-	}
-
 	protected interface DisplayBuilder<T> {
 
 		public DisplayBuilder<T> display(String languageKey, Object value);
-
-		public DisplayBuilder<T> display(
-			String languageKey, Object value, boolean escape);
-
-		public DisplayBuilder<T> display(
-			String languageKey, Object value, boolean escape,
-			boolean formatted);
 
 		public DisplayBuilder<T> display(
 			String languageKey, String value, boolean escape);
@@ -178,15 +169,6 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 		public DisplayBuilder<T> display(
 			String languageKey,
 			UnsafeSupplier<Object, Exception> unsafeSupplier);
-
-		public DisplayBuilder<T> display(
-			String languageKey,
-			UnsafeSupplier<Object, Exception> unsafeSupplier, boolean escape);
-
-		public DisplayBuilder<T> display(
-			String languageKey,
-			UnsafeSupplier<Object, Exception> unsafeSupplier, boolean escape,
-			boolean formatted);
 
 		public DisplayContext<T> getDisplayContext();
 
@@ -203,21 +185,6 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 
 		@Override
 		public DisplayBuilder<T> display(String languageKey, Object value) {
-			return display(languageKey, value, true);
-		}
-
-		@Override
-		public DisplayBuilder<T> display(
-			String languageKey, Object value, boolean escape) {
-
-			return display(languageKey, value, escape, false);
-		}
-
-		@Override
-		public DisplayBuilder<T> display(
-			String languageKey, Object value, boolean escape,
-			boolean formatted) {
-
 			HttpServletResponse httpServletResponse =
 				_displayContext.getHttpServletResponse();
 
@@ -228,10 +195,6 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 				writer.write("table-cell-expand-small\">");
 				writer.write(LanguageUtil.get(_resourceBundle, languageKey));
 				writer.write("</td><td class=\"table-cell-expand\">");
-
-				if (formatted) {
-					writer.write("<pre>");
-				}
 
 				if (value instanceof Blob) {
 					String downloadURL = _displayContext.getDownloadURL(
@@ -258,16 +221,7 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 					writer.write(format.format(value));
 				}
 				else {
-					if (escape) {
-						writer.write(HtmlUtil.escape(String.valueOf(value)));
-					}
-					else {
-						writer.write(String.valueOf(value));
-					}
-				}
-
-				if (formatted) {
-					writer.write("</pre>");
+					writer.write(HtmlUtil.escape(String.valueOf(value)));
 				}
 
 				writer.write("</td></tr>");
@@ -283,7 +237,30 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 		public DisplayBuilder<T> display(
 			String languageKey, String value, boolean escape) {
 
-			return display(languageKey, value, escape, false);
+			HttpServletResponse httpServletResponse =
+				_displayContext.getHttpServletResponse();
+
+			try {
+				Writer writer = httpServletResponse.getWriter();
+
+				writer.write("<tr><td class=\"publications-key-td ");
+				writer.write("table-cell-expand-small\">");
+				writer.write(LanguageUtil.get(_resourceBundle, languageKey));
+				writer.write("</td><td class=\"table-cell-expand\">");
+
+				if (escape) {
+					value = HtmlUtil.escape(value);
+				}
+
+				writer.write(value);
+
+				writer.write("</td></tr>");
+			}
+			catch (IOException ioException) {
+				throw new UncheckedIOException(ioException);
+			}
+
+			return this;
 		}
 
 		@Override
@@ -291,33 +268,16 @@ public abstract class BaseCTDisplayRenderer<T extends BaseModel<T>>
 			String languageKey,
 			UnsafeSupplier<Object, Exception> unsafeSupplier) {
 
-			return display(languageKey, unsafeSupplier, true);
-		}
-
-		@Override
-		public DisplayBuilder<T> display(
-			String languageKey,
-			UnsafeSupplier<Object, Exception> unsafeSupplier, boolean escape) {
-
-			return display(languageKey, unsafeSupplier, escape, false);
-		}
-
-		@Override
-		public DisplayBuilder<T> display(
-			String languageKey,
-			UnsafeSupplier<Object, Exception> unsafeSupplier, boolean escape,
-			boolean formatted) {
-
 			try {
 				Object value = unsafeSupplier.get();
 
 				if (value != null) {
-					display(languageKey, value, escape, formatted);
+					display(languageKey, value);
 				}
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(exception);
+					_log.warn(exception, exception);
 				}
 			}
 

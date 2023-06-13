@@ -73,7 +73,7 @@ public class UpdateStyleBookEntryDefaultMVCActionCommandTest {
 		_themeDisplay.setCompany(
 			_companyLocalService.getCompany(TestPropsValues.getCompanyId()));
 
-		Layout layout = LayoutTestUtil.addTypePortletLayout(_group);
+		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		_themeDisplay.setLayout(layout);
 		_themeDisplay.setLayoutTypePortlet(
@@ -88,21 +88,20 @@ public class UpdateStyleBookEntryDefaultMVCActionCommandTest {
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"defaultStyleBookEntry", Boolean.TRUE.toString());
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
+		actionRequest.setAttribute(
 			WebKeys.PORTLET_ID, StyleBookPortletKeys.STYLE_BOOK);
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		_updateStyleBookEntryDefaultMVCActionCommandTest.processAction(
-			mockLiferayPortletActionRequest, new MockActionResponse());
+			actionRequest, new MockActionResponse());
 
 		Assert.assertEquals(
 			styleBookEntry,
@@ -118,21 +117,20 @@ public class UpdateStyleBookEntryDefaultMVCActionCommandTest {
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"defaultStyleBookEntry", Boolean.TRUE.toString());
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry1.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
+		actionRequest.setAttribute(
 			WebKeys.PORTLET_ID, StyleBookPortletKeys.STYLE_BOOK);
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		_updateStyleBookEntryDefaultMVCActionCommandTest.processAction(
-			mockLiferayPortletActionRequest, new MockActionResponse());
+			actionRequest, new MockActionResponse());
 
 		Assert.assertEquals(
 			styleBookEntry1,
@@ -145,20 +143,19 @@ public class UpdateStyleBookEntryDefaultMVCActionCommandTest {
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
 
-		mockLiferayPortletActionRequest = new MockLiferayPortletActionRequest();
+		actionRequest = new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"defaultStyleBookEntry", Boolean.TRUE.toString());
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry2.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
+		actionRequest.setAttribute(
 			WebKeys.PORTLET_ID, StyleBookPortletKeys.STYLE_BOOK);
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		_updateStyleBookEntryDefaultMVCActionCommandTest.processAction(
-			mockLiferayPortletActionRequest, new MockActionResponse());
+			actionRequest, new MockActionResponse());
 
 		Assert.assertEquals(
 			styleBookEntry2,
@@ -178,41 +175,39 @@ public class UpdateStyleBookEntryDefaultMVCActionCommandTest {
 				RandomTestUtil.randomString(), StringPool.BLANK,
 				_serviceContext);
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"defaultStyleBookEntry", Boolean.TRUE.toString());
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
+		actionRequest.setAttribute(
 			WebKeys.PORTLET_ID, StyleBookPortletKeys.STYLE_BOOK);
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		_updateStyleBookEntryDefaultMVCActionCommandTest.processAction(
-			mockLiferayPortletActionRequest, new MockActionResponse());
+			actionRequest, new MockActionResponse());
 
 		Assert.assertEquals(
 			styleBookEntry,
 			_styleBookEntryLocalService.fetchDefaultStyleBookEntry(
 				_group.getGroupId()));
 
-		mockLiferayPortletActionRequest = new MockLiferayPortletActionRequest();
+		actionRequest = new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"defaultStyleBookEntry", Boolean.FALSE.toString());
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
-		mockLiferayPortletActionRequest.setAttribute(
+		actionRequest.setAttribute(
 			WebKeys.PORTLET_ID, StyleBookPortletKeys.STYLE_BOOK);
-		mockLiferayPortletActionRequest.setAttribute(
-			WebKeys.THEME_DISPLAY, _themeDisplay);
+		actionRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 
 		_updateStyleBookEntryDefaultMVCActionCommandTest.processAction(
-			mockLiferayPortletActionRequest, new MockActionResponse());
+			actionRequest, new MockActionResponse());
 
 		Assert.assertNull(
 			_styleBookEntryLocalService.fetchDefaultStyleBookEntry(

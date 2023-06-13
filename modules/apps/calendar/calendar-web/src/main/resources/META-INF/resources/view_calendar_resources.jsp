@@ -30,8 +30,6 @@ CalendarResourceDisplayTerms displayTerms = new CalendarResourceDisplayTerms(ren
 	searchContainerId="<%= calendarDisplayContext.getSearchContainerId() %>"
 	searchFormName="fm"
 	selectable="<%= false %>"
-	sortingOrder="<%= calendarDisplayContext.getOrderByType() %>"
-	sortingURL="<%= calendarDisplayContext.getSortingURL() %>"
 />
 
 <liferay-portlet:renderURL varImpl="iteratorURL">

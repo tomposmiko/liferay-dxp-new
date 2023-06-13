@@ -24,32 +24,31 @@ import com.liferay.commerce.pricing.exception.CommercePriceModifierExpirationDat
 import com.liferay.commerce.pricing.exception.CommercePriceModifierTargetException;
 import com.liferay.commerce.pricing.exception.CommercePriceModifierTitleException;
 import com.liferay.commerce.pricing.exception.CommercePriceModifierTypeException;
+import com.liferay.commerce.pricing.exception.DuplicateCommercePriceModifierException;
 import com.liferay.commerce.pricing.exception.NoSuchPriceModifierException;
 import com.liferay.commerce.pricing.model.CommercePriceModifier;
-import com.liferay.commerce.pricing.service.CommercePriceModifierRelLocalService;
 import com.liferay.commerce.pricing.service.CommercePricingClassLocalService;
 import com.liferay.commerce.pricing.service.base.CommercePriceModifierLocalServiceBaseImpl;
 import com.liferay.commerce.pricing.type.CommercePriceModifierType;
 import com.liferay.commerce.pricing.type.CommercePriceModifierTypeRegistry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -61,17 +60,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 /**
  * @author Riccardo Alberti
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.pricing.model.CommercePriceModifier",
-	service = AopService.class
-)
 public class CommercePriceModifierLocalServiceImpl
 	extends CommercePriceModifierLocalServiceBaseImpl {
 
@@ -133,13 +127,16 @@ public class CommercePriceModifierLocalServiceImpl
 			externalReferenceCode = null;
 		}
 
+		validateExternalReferenceCode(
+			externalReferenceCode, serviceContext.getCompanyId());
+
 		// Commerce price modifier
 
-		User user = _userLocalService.getUser(serviceContext.getUserId());
+		User user = userLocalService.getUser(serviceContext.getUserId());
 
 		Date date = new Date();
 
-		Date displayDate = _portal.getDate(
+		Date displayDate = PortalUtil.getDate(
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, user.getTimeZone(),
 			CommercePriceModifierDisplayDateException.class);
@@ -147,7 +144,7 @@ public class CommercePriceModifierLocalServiceImpl
 		Date expirationDate = null;
 
 		if (!neverExpire) {
-			expirationDate = _portal.getDate(
+			expirationDate = PortalUtil.getDate(
 				expirationDateMonth, expirationDateDay, expirationDateYear,
 				expirationDateHour, expirationDateMinute, user.getTimeZone(),
 				CommercePriceModifierExpirationDateException.class);
@@ -155,7 +152,7 @@ public class CommercePriceModifierLocalServiceImpl
 
 		long commercePriceModifierId = counterLocalService.increment();
 
-		_validate(title, target, modifierType, modifierAmount);
+		validate(title, target, modifierType, modifierAmount);
 
 		CommercePriceModifier commercePriceModifier =
 			commercePriceModifierPersistence.create(commercePriceModifierId);
@@ -192,7 +189,7 @@ public class CommercePriceModifierLocalServiceImpl
 
 		// Workflow
 
-		return _startWorkflowInstance(
+		return startWorkflowInstance(
 			user.getUserId(), commercePriceModifier, serviceContext);
 	}
 
@@ -235,8 +232,8 @@ public class CommercePriceModifierLocalServiceImpl
 
 		if (!Validator.isBlank(externalReferenceCode)) {
 			CommercePriceModifier commercePriceModifier =
-				commercePriceModifierPersistence.fetchByERC_C(
-					externalReferenceCode, serviceContext.getCompanyId());
+				commercePriceModifierPersistence.fetchByC_ERC(
+					serviceContext.getCompanyId(), externalReferenceCode);
 
 			if (commercePriceModifier != null) {
 				return commercePriceModifierLocalService.
@@ -264,8 +261,8 @@ public class CommercePriceModifierLocalServiceImpl
 
 	@Override
 	public void checkCommercePriceModifiers() throws PortalException {
-		_checkCommercePriceModifiersByDisplayDate();
-		_checkCommercePriceModifiersByExpirationDate();
+		checkCommercePriceModifiersByDisplayDate();
+		checkCommercePriceModifiersByExpirationDate();
 	}
 
 	@Override
@@ -276,7 +273,7 @@ public class CommercePriceModifierLocalServiceImpl
 
 		// Commerce price modifier rels
 
-		_commercePriceModifierRelLocalService.deleteCommercePriceModifierRels(
+		commercePriceModifierRelLocalService.deleteCommercePriceModifierRels(
 			commercePriceModifier.getCommercePriceModifierId());
 
 		// Commerce price modifier
@@ -351,8 +348,8 @@ public class CommercePriceModifierLocalServiceImpl
 			return null;
 		}
 
-		return commercePriceModifierPersistence.fetchByERC_C(
-			externalReferenceCode, companyId);
+		return commercePriceModifierPersistence.fetchByC_ERC(
+			companyId, externalReferenceCode);
 	}
 
 	@Override
@@ -408,25 +405,25 @@ public class CommercePriceModifierLocalServiceImpl
 			boolean neverExpire, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(serviceContext.getUserId());
+		User user = userLocalService.getUser(serviceContext.getUserId());
 
 		CommercePriceModifier commercePriceModifier =
 			commercePriceModifierPersistence.findByPrimaryKey(
 				commercePriceModifierId);
 
-		_validate(title, target, modifierType, modifierAmount);
+		validate(title, target, modifierType, modifierAmount);
 
 		String currentTarget = commercePriceModifier.getTarget();
 
 		if (!currentTarget.equals(target)) {
-			_commercePriceModifierRelLocalService.
+			commercePriceModifierRelLocalService.
 				deleteCommercePriceModifierRels(
 					commercePriceModifier.getCommercePriceModifierId());
 		}
 
 		Date date = new Date();
 
-		Date displayDate = _portal.getDate(
+		Date displayDate = PortalUtil.getDate(
 			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
 			displayDateMinute, user.getTimeZone(),
 			CommercePriceModifierDisplayDateException.class);
@@ -434,7 +431,7 @@ public class CommercePriceModifierLocalServiceImpl
 		Date expirationDate = null;
 
 		if (!neverExpire) {
-			expirationDate = _portal.getDate(
+			expirationDate = PortalUtil.getDate(
 				expirationDateMonth, expirationDateDay, expirationDateYear,
 				expirationDateHour, expirationDateMinute, user.getTimeZone(),
 				CommercePriceModifierExpirationDateException.class);
@@ -466,7 +463,7 @@ public class CommercePriceModifierLocalServiceImpl
 		commercePriceModifier = commercePriceModifierPersistence.update(
 			commercePriceModifier);
 
-		return _startWorkflowInstance(
+		return startWorkflowInstance(
 			user.getUserId(), commercePriceModifier, serviceContext);
 	}
 
@@ -477,7 +474,7 @@ public class CommercePriceModifierLocalServiceImpl
 			Map<String, Serializable> workflowContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 		Date date = new Date();
 
 		CommercePriceModifier commercePriceModifier =
@@ -521,7 +518,7 @@ public class CommercePriceModifierLocalServiceImpl
 		return commercePriceModifierPersistence.update(commercePriceModifier);
 	}
 
-	private void _checkCommercePriceModifiersByDisplayDate()
+	protected void checkCommercePriceModifiersByDisplayDate()
 		throws PortalException {
 
 		List<CommercePriceModifier> commercePriceModifiers =
@@ -531,7 +528,7 @@ public class CommercePriceModifierLocalServiceImpl
 		for (CommercePriceModifier commercePriceModifier :
 				commercePriceModifiers) {
 
-			long userId = _portal.getValidUserId(
+			long userId = PortalUtil.getValidUserId(
 				commercePriceModifier.getCompanyId(),
 				commercePriceModifier.getUserId());
 
@@ -547,7 +544,7 @@ public class CommercePriceModifierLocalServiceImpl
 		}
 	}
 
-	private void _checkCommercePriceModifiersByExpirationDate()
+	protected void checkCommercePriceModifiersByExpirationDate()
 		throws PortalException {
 
 		List<CommercePriceModifier> commercePriceModifiers =
@@ -566,7 +563,7 @@ public class CommercePriceModifierLocalServiceImpl
 			for (CommercePriceModifier commercePriceModifier :
 					commercePriceModifiers) {
 
-				long userId = _portal.getValidUserId(
+				long userId = PortalUtil.getValidUserId(
 					commercePriceModifier.getCompanyId(),
 					commercePriceModifier.getUserId());
 
@@ -584,29 +581,7 @@ public class CommercePriceModifierLocalServiceImpl
 		}
 	}
 
-	private long[] _getAssetCategoryIds(long cpDefinitionId) {
-		try {
-			AssetEntry assetEntry = _assetEntryLocalService.getEntry(
-				CPDefinition.class.getName(), cpDefinitionId);
-
-			Set<AssetCategory> assetCategories = new HashSet<>();
-
-			for (AssetCategory assetCategory : assetEntry.getCategories()) {
-				assetCategories.add(assetCategory);
-				assetCategories.addAll(assetCategory.getAncestors());
-			}
-
-			return TransformUtil.transformToLongArray(
-				assetCategories, AssetCategory::getCategoryId);
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
-		}
-
-		return new long[0];
-	}
-
-	private CommercePriceModifier _startWorkflowInstance(
+	protected CommercePriceModifier startWorkflowInstance(
 			long userId, CommercePriceModifier commercePriceModifier,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -620,7 +595,7 @@ public class CommercePriceModifierLocalServiceImpl
 			commercePriceModifier, serviceContext, workflowContext);
 	}
 
-	private void _validate(
+	protected void validate(
 			String title, String target, String modifierType,
 			BigDecimal modifierAmount)
 		throws PortalException {
@@ -651,33 +626,68 @@ public class CommercePriceModifierLocalServiceImpl
 		}
 	}
 
+	protected void validateExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException {
+
+		if (Validator.isNull(externalReferenceCode)) {
+			return;
+		}
+
+		CommercePriceModifier commercePriceModifier =
+			commercePriceModifierPersistence.fetchByC_ERC(
+				companyId, externalReferenceCode);
+
+		if (commercePriceModifier != null) {
+			throw new DuplicateCommercePriceModifierException(
+				"There is another commerce price modifier with external " +
+					"reference code " + externalReferenceCode);
+		}
+	}
+
+	private long[] _getAssetCategoryIds(long cpDefinitionId) {
+		try {
+			AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+				CPDefinition.class.getName(), cpDefinitionId);
+
+			Set<AssetCategory> assetCategories = new HashSet<>();
+
+			for (AssetCategory assetCategory : assetEntry.getCategories()) {
+				assetCategories.add(assetCategory);
+				assetCategories.addAll(assetCategory.getAncestors());
+			}
+
+			Stream<AssetCategory> stream = assetCategories.stream();
+
+			LongStream longStream = stream.mapToLong(
+				AssetCategory::getCategoryId);
+
+			return longStream.toArray();
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+		}
+
+		return new long[0];
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommercePriceModifierLocalServiceImpl.class);
 
-	@Reference
+	@ServiceReference(type = AssetEntryLocalService.class)
 	private AssetEntryLocalService _assetEntryLocalService;
 
-	@Reference
-	private CommercePriceModifierRelLocalService
-		_commercePriceModifierRelLocalService;
-
-	@Reference
+	@ServiceReference(type = CommercePriceModifierTypeRegistry.class)
 	private CommercePriceModifierTypeRegistry
 		_commercePriceModifierTypeRegistry;
 
-	@Reference
+	@BeanReference(type = CommercePricingClassLocalService.class)
 	private CommercePricingClassLocalService _commercePricingClassLocalService;
 
-	@Reference
+	@ServiceReference(type = ExpandoRowLocalService.class)
 	private ExpandoRowLocalService _expandoRowLocalService;
 
-	@Reference
-	private Portal _portal;
-
-	@Reference
-	private UserLocalService _userLocalService;
-
-	@Reference
+	@ServiceReference(type = WorkflowInstanceLinkLocalService.class)
 	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
 
 }

@@ -20,8 +20,8 @@
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 
 	<%
-	User guestUser = company.getGuestUser();
+	User defaultUser = company.getDefaultUser();
 	%>
 
-	<aui:input label="time-zone" name="timeZoneId" type="timeZone" value='<%= ParamUtil.getString(request, "timeZoneId", guestUser.getTimeZoneId()) %>' />
+	<aui:input label="time-zone" name="timeZoneId" type="timeZone" value='<%= ParamUtil.getString(request, "timeZoneId", defaultUser.getTimeZoneId()) %>' />
 </aui:fieldset>

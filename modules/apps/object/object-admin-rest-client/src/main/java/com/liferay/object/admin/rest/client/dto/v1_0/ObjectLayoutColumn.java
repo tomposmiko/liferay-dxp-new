@@ -53,26 +53,26 @@ public class ObjectLayoutColumn implements Cloneable, Serializable {
 
 	protected Long id;
 
-	public String getObjectFieldName() {
-		return objectFieldName;
+	public Long getObjectFieldId() {
+		return objectFieldId;
 	}
 
-	public void setObjectFieldName(String objectFieldName) {
-		this.objectFieldName = objectFieldName;
+	public void setObjectFieldId(Long objectFieldId) {
+		this.objectFieldId = objectFieldId;
 	}
 
-	public void setObjectFieldName(
-		UnsafeSupplier<String, Exception> objectFieldNameUnsafeSupplier) {
+	public void setObjectFieldId(
+		UnsafeSupplier<Long, Exception> objectFieldIdUnsafeSupplier) {
 
 		try {
-			objectFieldName = objectFieldNameUnsafeSupplier.get();
+			objectFieldId = objectFieldIdUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected String objectFieldName;
+	protected Long objectFieldId;
 
 	public Integer getPriority() {
 		return priority;

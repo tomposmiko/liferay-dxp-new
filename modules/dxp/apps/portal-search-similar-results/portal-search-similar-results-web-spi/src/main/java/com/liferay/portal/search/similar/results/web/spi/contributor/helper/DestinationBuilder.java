@@ -14,19 +14,14 @@
 
 package com.liferay.portal.search.similar.results.web.spi.contributor.helper;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * @author André de Oliveira
  */
-@ProviderType
 public interface DestinationBuilder {
 
 	public DestinationBuilder replace(String oldSub, String newSub);
 
 	public DestinationBuilder replaceParameter(
 		String parameter, String newValue);
-
-	public DestinationBuilder replaceURLString(String urlString);
 
 }

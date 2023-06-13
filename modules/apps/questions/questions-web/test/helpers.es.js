@@ -22,13 +22,13 @@ import {Router} from 'react-router-dom';
 
 import {AppContext} from '../src/main/resources/META-INF/resources/js/AppContext.es';
 
-export function renderComponent({
+export const renderComponent = ({
 	contextValue = {},
 	fetch,
 	ui,
 	route = '/',
 	history = createMemoryHistory({initialEntries: [route]}),
-}) {
+}) => {
 	window.scrollTo = jest.fn();
 
 	const client = new GraphQLClient({
@@ -49,4 +49,4 @@ export function renderComponent({
 		),
 		history,
 	};
-}
+};

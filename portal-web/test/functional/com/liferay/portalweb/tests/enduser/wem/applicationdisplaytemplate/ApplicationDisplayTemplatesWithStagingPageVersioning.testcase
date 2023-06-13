@@ -13,7 +13,7 @@ definition {
 		}
 
 		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Enable local live with page versioning enabled") {
@@ -27,7 +27,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -36,7 +36,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-130051. The user could apply widget template to Navigation Menu on content page when enable local live with page versioning."
-	@priority = 4
+	@priority = "4"
 	test ApplyWidgetTemplateToNavigationMenuOnContentPage {
 		task ("Add a content page") {
 			Staging.openStagingAdmin(siteURLKey = "test-site-name-staging");
@@ -53,9 +53,7 @@ definition {
 				pageName = "Test Page Name",
 				siteName = "Test Site Name Staging");
 
-			PageEditor.addWidget(
-				indexItem = 2,
-				portletName = "Menu Display");
+			PageEditor.addWidget(portletName = "Navigation Menu");
 		}
 
 		task ("Select the List Menu as display template in Navigation Menu") {
@@ -65,7 +63,7 @@ definition {
 
 			Portlet.saveAndCloseConfig();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the List Menu is applied to Navigation Menu at view mode in staging site") {

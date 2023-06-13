@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePricingPortletKeys.COMMERCE_DISCOUNT,
 		"mvc.command.name=/commerce_discount/edit_commerce_discount_rule"
@@ -47,29 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCommerceDiscountRuleMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommerceDiscountRule(actionRequest);
-			}
-			else {
-				_deleteCommerceDiscountCPDefinition(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			SessionErrors.add(actionRequest, exception.getClass());
-
-			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
-		}
-	}
-
-	private void _deleteCommerceDiscountCPDefinition(
+	protected void deleteCommerceDiscountCPDefinition(
 			ActionRequest actionRequest)
 		throws PortalException {
 
@@ -96,7 +75,29 @@ public class EditCommerceDiscountRuleMVCActionCommand
 			commerceDiscountRuleId, type, StringUtil.merge(typeSettingsArray));
 	}
 
-	private void _updateCommerceDiscountRule(ActionRequest actionRequest)
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
+				updateCommerceDiscountRule(actionRequest);
+			}
+			else {
+				deleteCommerceDiscountCPDefinition(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			SessionErrors.add(actionRequest, exception.getClass());
+
+			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+		}
+	}
+
+	protected void updateCommerceDiscountRule(ActionRequest actionRequest)
 		throws Exception {
 
 		String type = ParamUtil.getString(actionRequest, "type");

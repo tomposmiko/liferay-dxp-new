@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = MatchQueryTranslator.class)
+@Component(immediate = true, service = MatchQueryTranslator.class)
 public class MatchQueryTranslatorImpl
 	extends BaseMatchQueryTranslatorImpl implements MatchQueryTranslator {
 
@@ -57,19 +57,19 @@ public class MatchQueryTranslatorImpl
 		}
 
 		if ((type == null) || (type == MatchQuery.Type.BOOLEAN)) {
-			return _translateMatchQuery(field, value, matchQuery);
+			return translateMatchQuery(field, value, matchQuery);
 		}
 		else if (type == MatchQuery.Type.PHRASE) {
-			return _translateMatchPhraseQuery(field, value, matchQuery);
+			return translateMatchPhraseQuery(field, value, matchQuery);
 		}
 		else if (type == MatchQuery.Type.PHRASE_PREFIX) {
-			return _translateMatchPhrasePrefixQuery(field, value, matchQuery);
+			return translateMatchPhrasePrefixQuery(field, value, matchQuery);
 		}
 
 		throw new IllegalArgumentException("Invalid match query type: " + type);
 	}
 
-	private QueryBuilder _translateMatchPhrasePrefixQuery(
+	protected QueryBuilder translateMatchPhrasePrefixQuery(
 		String field, String value, MatchQuery matchQuery) {
 
 		MatchPhrasePrefixQueryBuilder matchPhrasePrefixQueryBuilder =
@@ -95,7 +95,7 @@ public class MatchQueryTranslatorImpl
 		return matchPhrasePrefixQueryBuilder;
 	}
 
-	private QueryBuilder _translateMatchPhraseQuery(
+	protected QueryBuilder translateMatchPhraseQuery(
 		String field, String value, MatchQuery matchQuery) {
 
 		MatchPhraseQueryBuilder matchPhraseQueryBuilder =
@@ -116,7 +116,7 @@ public class MatchQueryTranslatorImpl
 		return matchPhraseQueryBuilder;
 	}
 
-	private QueryBuilder _translateMatchQuery(
+	protected QueryBuilder translateMatchQuery(
 		String field, String value, MatchQuery matchQuery) {
 
 		MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(

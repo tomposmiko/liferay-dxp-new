@@ -14,7 +14,6 @@
 
 package com.liferay.user.associated.data.web.internal.portlet.action;
 
-import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -24,7 +23,6 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.user.associated.data.constants.UserAssociatedDataPortletKeys;
 import com.liferay.user.associated.data.display.UADDisplay;
@@ -37,10 +35,10 @@ import com.liferay.user.associated.data.web.internal.display.UADEntity;
 import com.liferay.user.associated.data.web.internal.display.UADHierarchyDisplay;
 import com.liferay.user.associated.data.web.internal.display.UADInfoPanelDisplay;
 import com.liferay.user.associated.data.web.internal.display.ViewUADEntitiesDisplay;
-import com.liferay.user.associated.data.web.internal.helper.SelectedUserHelper;
-import com.liferay.user.associated.data.web.internal.helper.UADApplicationSummaryHelper;
 import com.liferay.user.associated.data.web.internal.registry.UADRegistry;
 import com.liferay.user.associated.data.web.internal.util.GroupUtil;
+import com.liferay.user.associated.data.web.internal.util.SelectedUserHelper;
+import com.liferay.user.associated.data.web.internal.util.UADApplicationSummaryHelper;
 import com.liferay.user.associated.data.web.internal.util.UADSearchContainerBuilder;
 
 import java.util.ArrayList;
@@ -58,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UserAssociatedDataPortletKeys.USER_ASSOCIATED_DATA,
 		"mvc.command.name=/user_associated_data/review_uad_data"
@@ -220,7 +219,7 @@ public class ReviewUADDataMVCRenderCommand implements MVCRenderCommand {
 				getHierarchyUADEntitySearchContainer(
 					liferayPortletResponse, renderRequest, applicationKey,
 					currentURL, scopeDisplay.getGroupIds(),
-					uadHierarchyDisplay.getFirstContainerTypeKey(), 0L, user,
+					uadHierarchyDisplay.getFirstContainerTypeClass(), 0L, user,
 					uadHierarchyDisplay);
 		}
 
@@ -279,23 +278,10 @@ public class ReviewUADDataMVCRenderCommand implements MVCRenderCommand {
 		viewUADEntitiesDisplay.setApplicationKey(applicationKey);
 		viewUADEntitiesDisplay.setGroupIds(scopeDisplay.getGroupIds());
 		viewUADEntitiesDisplay.setScope(scopeDisplay.getScopeName());
-
-		SearchContainer<UADEntity<?>> searchContainer = _getSearchContainer(
-			applicationKey, renderRequest, renderResponse, scopeDisplay,
-			(UADDisplay<Object>)uadDisplay, uadHierarchyDisplay, user);
-
-		String id = StringUtil.replace(
-			applicationKey, CharPool.PERIOD, CharPool.UNDERLINE);
-
-		if (Validator.isNull(id)) {
-			id = StringUtil.randomId();
-		}
-
-		id = "uadEntities_" + id;
-
-		searchContainer.setId(id);
-
-		viewUADEntitiesDisplay.setSearchContainer(searchContainer);
+		viewUADEntitiesDisplay.setSearchContainer(
+			_getSearchContainer(
+				applicationKey, renderRequest, renderResponse, scopeDisplay,
+				(UADDisplay<Object>)uadDisplay, uadHierarchyDisplay, user));
 
 		if (uadHierarchyDisplay != null) {
 			viewUADEntitiesDisplay.setHierarchy(true);
@@ -303,12 +289,12 @@ public class ReviewUADDataMVCRenderCommand implements MVCRenderCommand {
 				new UADHierarchyResultRowSplitter(
 					LocaleThreadLocal.getThemeDisplayLocale(),
 					uadHierarchyDisplay.getUADDisplays()));
-			viewUADEntitiesDisplay.setTypeKeys(
-				uadHierarchyDisplay.getTypeKeys());
+			viewUADEntitiesDisplay.setTypeClasses(
+				uadHierarchyDisplay.getTypeClasses());
 		}
 		else {
-			viewUADEntitiesDisplay.setTypeKeys(
-				new String[] {uadDisplay.getTypeKey()});
+			viewUADEntitiesDisplay.setTypeClasses(
+				new Class<?>[] {uadDisplay.getTypeClass()});
 			viewUADEntitiesDisplay.setTypeName(
 				uadDisplay.getTypeName(
 					LocaleThreadLocal.getThemeDisplayLocale()));

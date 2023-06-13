@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -59,7 +60,7 @@ public class NavigationMenuItemSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (navigationMenuItem.getAvailableLanguages() != null) {
 			if (sb.length() > 1) {
@@ -88,20 +89,6 @@ public class NavigationMenuItemSerDes {
 			}
 
 			sb.append("]");
-		}
-
-		if (navigationMenuItem.getContentURL() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"contentURL\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(navigationMenuItem.getContentURL()));
-
-			sb.append("\"");
 		}
 
 		if (navigationMenuItem.getCreator() != null) {
@@ -314,7 +301,7 @@ public class NavigationMenuItemSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (navigationMenuItem.getAvailableLanguages() == null) {
 			map.put("availableLanguages", null);
@@ -323,15 +310,6 @@ public class NavigationMenuItemSerDes {
 			map.put(
 				"availableLanguages",
 				String.valueOf(navigationMenuItem.getAvailableLanguages()));
-		}
-
-		if (navigationMenuItem.getContentURL() == null) {
-			map.put("contentURL", null);
-		}
-		else {
-			map.put(
-				"contentURL",
-				String.valueOf(navigationMenuItem.getContentURL()));
 		}
 
 		if (navigationMenuItem.getCreator() == null) {
@@ -475,12 +453,6 @@ public class NavigationMenuItemSerDes {
 						toStrings((Object[])jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "contentURL")) {
-				if (jsonParserFieldValue != null) {
-					navigationMenuItem.setContentURL(
-						(String)jsonParserFieldValue);
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "creator")) {
 				if (jsonParserFieldValue != null) {
 					navigationMenuItem.setCreator(
@@ -533,20 +505,15 @@ public class NavigationMenuItemSerDes {
 						jsonParserFieldName, "navigationMenuItems")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					NavigationMenuItem[] navigationMenuItemsArray =
-						new NavigationMenuItem[jsonParserFieldValues.length];
-
-					for (int i = 0; i < navigationMenuItemsArray.length; i++) {
-						navigationMenuItemsArray[i] =
-							NavigationMenuItemSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					navigationMenuItem.setNavigationMenuItems(
-						navigationMenuItemsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> NavigationMenuItemSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new NavigationMenuItem[size]
+						));
 				}
 			}
 			else if (Objects.equals(

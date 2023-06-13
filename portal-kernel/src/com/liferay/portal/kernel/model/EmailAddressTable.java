@@ -34,8 +34,6 @@ public class EmailAddressTable extends BaseTable<EmailAddressTable> {
 
 	public final Column<EmailAddressTable, Long> mvccVersion = createColumn(
 		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<EmailAddressTable, Long> ctCollectionId = createColumn(
-		"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<EmailAddressTable, String> uuid = createColumn(
 		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<EmailAddressTable, Long> emailAddressId = createColumn(
@@ -56,8 +54,8 @@ public class EmailAddressTable extends BaseTable<EmailAddressTable> {
 		"classPK", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<EmailAddressTable, String> address = createColumn(
 		"address", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<EmailAddressTable, Long> listTypeId = createColumn(
-		"listTypeId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
+	public final Column<EmailAddressTable, Long> typeId = createColumn(
+		"typeId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<EmailAddressTable, Boolean> primary = createColumn(
 		"primary_", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 

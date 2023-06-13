@@ -36,7 +36,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
+import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
@@ -46,13 +46,11 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -65,12 +63,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -79,7 +77,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gabriel Albuquerque
  */
 @Component(
-	property = "ddm.storage.adapter.type=object",
+	immediate = true, property = "ddm.storage.adapter.type=object",
 	service = DDMStorageAdapter.class
 )
 public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
@@ -95,18 +93,13 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 			ObjectDefinition objectDefinition = _fetchObjectDefinition(
 				objectEntryId);
 
-			ObjectEntryManager objectEntryManager =
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					objectDefinition.getStorageType());
-
-			ObjectEntry objectEntry = objectEntryManager.fetchObjectEntry(
+			ObjectEntry objectEntry = _objectEntryManager.fetchObjectEntry(
 				_getDTOConverterContext(
 					null, null, LocaleUtil.getSiteDefault()),
 				objectDefinition, objectEntryId);
 
 			if (objectEntry != null) {
-				objectEntryManager.deleteObjectEntry(
-					objectDefinition, objectEntry.getId());
+				_objectEntryManager.deleteObjectEntry(objectEntry.getId());
 			}
 
 			return DDMStorageAdapterDeleteResponse.Builder.newBuilder(
@@ -130,14 +123,10 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 			ObjectDefinition objectDefinition = _fetchObjectDefinition(
 				objectEntryId);
 
-			ObjectEntryManager objectEntryManager =
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					objectDefinition.getStorageType());
-
 			return DDMStorageAdapterGetResponse.Builder.newBuilder(
 				_getDDMFormValues(
 					ddmForm,
-					objectEntryManager.getObjectEntry(
+					_objectEntryManager.getObjectEntry(
 						_getDTOConverterContext(
 							objectEntryId, null, ddmForm.getDefaultLocale()),
 						objectDefinition, objectEntryId))
@@ -169,48 +158,22 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 				_objectDefinitionLocalService.getObjectDefinition(
 					objectDefinitionId);
 
-			ObjectEntryManager objectEntryManager =
-				_objectEntryManagerRegistry.getObjectEntryManager(
-					objectDefinition.getStorageType());
-
-			long objectEntryId = ddmStorageAdapterSaveRequest.getPrimaryKey();
-
-			ObjectEntry objectEntry = objectEntryManager.fetchObjectEntry(
+			ObjectEntry addObjectEntry = _objectEntryManager.addObjectEntry(
 				_getDTOConverterContext(null, user, ddmForm.getDefaultLocale()),
-				objectDefinition, objectEntryId);
-
-			if (objectEntry == null) {
-				objectEntry = objectEntryManager.addObjectEntry(
-					_getDTOConverterContext(
-						null, user, ddmForm.getDefaultLocale()),
-					objectDefinition,
-					new ObjectEntry() {
-						{
-							properties = _getObjectEntryProperties(
-								ddmForm.getDDMFormFieldsMap(true),
-								ddmFormValues.getDDMFormFieldValues(),
-								_objectFieldLocalService.getObjectFields(
-									objectDefinitionId));
-						}
-					},
-					String.valueOf(ddmStorageAdapterSaveRequest.getGroupId()));
-			}
-			else {
-				objectEntry.setProperties(
-					_getObjectEntryProperties(
-						ddmForm.getDDMFormFieldsMap(true),
-						ddmFormValues.getDDMFormFieldValues(),
-						_objectFieldLocalService.getObjectFields(
-							objectDefinitionId)));
-
-				objectEntry = objectEntryManager.updateObjectEntry(
-					_getDTOConverterContext(
-						null, user, ddmForm.getDefaultLocale()),
-					objectDefinition, objectEntryId, objectEntry);
-			}
+				objectDefinition,
+				new ObjectEntry() {
+					{
+						properties = _getObjectEntryProperties(
+							ddmForm.getDDMFormFieldsReferencesMap(true),
+							ddmFormValues.getDDMFormFieldValues(),
+							_objectFieldLocalService.getObjectFields(
+								objectDefinitionId));
+					}
+				},
+				String.valueOf(ddmStorageAdapterSaveRequest.getGroupId()));
 
 			return DDMStorageAdapterSaveResponse.Builder.newBuilder(
-				objectEntry.getId()
+				addObjectEntry.getId()
 			).build();
 		}
 		catch (Exception exception) {
@@ -335,28 +298,12 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 
 		Map<String, Object> properties = new HashMap<>();
 
-		Map<String, String> objectFieldDBTypes = new HashMap<>();
+		Stream<ObjectField> stream = objectFields.stream();
 
-		for (ObjectField objectField : objectFields) {
-			objectFieldDBTypes.put(
-				objectField.getName(), objectField.getDBType());
-		}
-
-		Map<String, ObjectField> objectFieldsMap = _toObjectFieldsMap(
-			objectFields);
+		Map<String, String> objectFieldTypes = stream.collect(
+			Collectors.toMap(ObjectField::getName, ObjectField::getType));
 
 		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-			DDMFormField ddmFormField = ddmFormFieldsMap.get(
-				ddmFormFieldValue.getName());
-
-			if (ddmFormField.isTransient() &&
-				!StringUtil.equals(
-					ddmFormField.getType(),
-					DDMFormFieldTypeConstants.FIELDSET)) {
-
-				continue;
-			}
-
 			if (StringUtil.equals(
 					ddmFormFieldValue.getType(),
 					DDMFormFieldTypeConstants.FIELDSET)) {
@@ -373,25 +320,11 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 
 				Value value = ddmFormFieldValue.getValue();
 
-				ObjectField objectField = objectFieldsMap.get(objectFieldName);
-
-				if (objectField.getListTypeDefinitionId() > 0) {
-					properties.put(
-						objectFieldName,
-						HashMapBuilder.put(
-							"key",
-							_getOptionReferenceValue(
-								ddmFormFieldValue, ddmFormFieldsMap,
-								objectFieldName, objectFieldDBTypes, value)
-						).build());
-				}
-				else {
-					properties.put(
-						objectFieldName,
-						_getOptionReferenceValue(
-							ddmFormFieldValue, ddmFormFieldsMap,
-							objectFieldName, objectFieldDBTypes, value));
-				}
+				properties.put(
+					objectFieldName,
+					_getOptionReferenceValue(
+						ddmFormFieldValue, ddmFormFieldsMap, objectFieldName,
+						objectFieldTypes, value));
 			}
 		}
 
@@ -407,7 +340,7 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;
@@ -417,7 +350,7 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 	private String _getOptionReferenceValue(
 			DDMFormFieldValue ddmFormFieldValue,
 			Map<String, DDMFormField> ddmFormFieldsMap, String objectFieldName,
-			Map<String, String> objectFieldDBTypes, Value value)
+			Map<String, String> objectFieldTypes, Value value)
 		throws JSONException, ParseException {
 
 		DDMFormField ddmFormField = ddmFormFieldsMap.get(
@@ -455,86 +388,36 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 		}
 		else if (StringUtil.equals(
 					ddmFormFieldValue.getType(),
-					DDMFormFieldTypeConstants.GRID)) {
-
-			DDMFormFieldOptions columnsDDMFormFieldOptions =
-				(DDMFormFieldOptions)ddmFormField.getProperty("columns");
-
-			Map<String, String> columnOptionsReferences =
-				columnsDDMFormFieldOptions.getOptionsReferences();
-
-			DDMFormFieldOptions rowsDDMFormFieldOptions =
-				(DDMFormFieldOptions)ddmFormField.getProperty("rows");
-
-			Map<String, String> rowOptionsReferences =
-				rowsDDMFormFieldOptions.getOptionsReferences();
-
-			JSONObject optionValueJSONObject = _jsonFactory.createJSONObject(
-				value.getString(value.getDefaultLocale()));
-
-			Set<String> rowValues = optionValueJSONObject.keySet();
-
-			StringBundler sb = new StringBundler((rowValues.size() * 2) - 1);
-
-			for (String rowValue : rowValues) {
-				sb.append(rowOptionsReferences.get(rowValue));
-
-				sb.append(StringPool.COLON + StringPool.SPACE);
-
-				sb.append(
-					columnOptionsReferences.get(
-						optionValueJSONObject.get(rowValue)));
-
-				sb.append(StringPool.COMMA_AND_SPACE);
-			}
-
-			if (sb.index() > 0) {
-				sb.setIndex(sb.index() - 1);
-			}
-
-			return sb.toString();
-		}
-		else if (StringUtil.equals(
-					ddmFormFieldValue.getType(),
 					DDMFormFieldTypeConstants.RADIO)) {
 
 			return ddmFormFieldOptions.getOptionReference(
 				value.getString(value.getDefaultLocale()));
 		}
+		else {
+			Map<Locale, String> values = value.getValues();
 
-		Map<Locale, String> values = value.getValues();
-
-		return String.valueOf(
-			_getValue(
-				ddmFormFieldValue, value.getDefaultLocale(),
-				objectFieldDBTypes.get(objectFieldName),
-				values.get(value.getDefaultLocale())));
+			return String.valueOf(
+				_getValue(
+					value.getDefaultLocale(),
+					objectFieldTypes.get(objectFieldName),
+					values.get(value.getDefaultLocale())));
+		}
 	}
 
 	private Object _getValue(
-			DDMFormFieldValue ddmFormFieldValue, Locale locale,
-			String objectFieldDBType, String value)
-		throws JSONException, ParseException {
+			Locale locale, String objectFieldType, String value)
+		throws ParseException {
 
-		if (StringUtil.equals(
-				ddmFormFieldValue.getType(),
-				DDMFormFieldTypeConstants.DOCUMENT_LIBRARY)) {
-
-			JSONObject fileEntryValueJSONObject = _jsonFactory.createJSONObject(
-				value);
-
-			return fileEntryValueJSONObject.getString("fileEntryId");
+		if (Objects.equals(objectFieldType, "BigDecimal")) {
+			return GetterUtil.get(value, BigDecimal.ZERO);
 		}
-		else if (Objects.equals(objectFieldDBType, "BigDecimal")) {
-			if (value.isEmpty()) {
-				return GetterUtil.DEFAULT_DOUBLE;
-			}
-
-			NumberFormat numberFormat = NumberFormat.getInstance(locale);
-
-			return GetterUtil.get(numberFormat.parse(value), BigDecimal.ZERO);
+		else if (Objects.equals(objectFieldType, "Blob")) {
+			return value.getBytes();
 		}
-		else if (Objects.equals(objectFieldDBType, "Double")) {
+		else if (Objects.equals(objectFieldType, "Boolean")) {
+			return GetterUtil.getBoolean(value);
+		}
+		else if (Objects.equals(objectFieldType, "Double")) {
 			if (value.isEmpty()) {
 				return GetterUtil.DEFAULT_DOUBLE;
 			}
@@ -543,20 +426,15 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 
 			return GetterUtil.getDouble(numberFormat.parse(value));
 		}
-
-		return value;
-	}
-
-	private Map<String, ObjectField> _toObjectFieldsMap(
-		List<ObjectField> objectFields) {
-
-		Map<String, ObjectField> objectFieldsMap = new LinkedHashMap<>();
-
-		for (ObjectField objectField : objectFields) {
-			objectFieldsMap.put(objectField.getName(), objectField);
+		else if (Objects.equals(objectFieldType, "Integer")) {
+			return GetterUtil.getInteger(value);
 		}
-
-		return objectFieldsMap;
+		else if (Objects.equals(objectFieldType, "Long")) {
+			return GetterUtil.getLong(value);
+		}
+		else {
+			return value;
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -569,13 +447,16 @@ public class ObjectDDMStorageAdapter implements DDMStorageAdapter {
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
-	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
+	private ObjectEntryManager _objectEntryManager;
 
 	@Reference
 	private ObjectEntryService _objectEntryService;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

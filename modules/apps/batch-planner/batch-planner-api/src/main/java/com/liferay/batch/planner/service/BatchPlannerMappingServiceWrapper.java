@@ -27,10 +27,6 @@ public class BatchPlannerMappingServiceWrapper
 	implements BatchPlannerMappingService,
 			   ServiceWrapper<BatchPlannerMappingService> {
 
-	public BatchPlannerMappingServiceWrapper() {
-		this(null);
-	}
-
 	public BatchPlannerMappingServiceWrapper(
 		BatchPlannerMappingService batchPlannerMappingService) {
 
@@ -59,14 +55,6 @@ public class BatchPlannerMappingServiceWrapper
 
 		return _batchPlannerMappingService.deleteBatchPlannerMapping(
 			batchPlannerPlanId, externalFieldName, internalFieldName);
-	}
-
-	@Override
-	public void deleteBatchPlannerMappings(long batchPlannerPlanId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_batchPlannerMappingService.deleteBatchPlannerMappings(
-			batchPlannerPlanId);
 	}
 
 	@Override

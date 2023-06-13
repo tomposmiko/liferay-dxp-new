@@ -17,11 +17,14 @@ package com.liferay.dynamic.data.mapping.internal.io.exporter;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriter;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterRequest;
 import com.liferay.dynamic.data.mapping.io.exporter.DDMFormInstanceRecordWriterResponse;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -30,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
-	property = "ddm.form.instance.record.writer.type=json",
+	immediate = true, property = "ddm.form.instance.record.writer.type=json",
 	service = DDMFormInstanceRecordWriter.class
 )
 public class DDMFormInstanceRecordJSONWriter
@@ -42,10 +45,20 @@ public class DDMFormInstanceRecordJSONWriter
 				ddmFormInstanceRecordWriterRequest)
 		throws Exception {
 
-		String json = String.valueOf(
-			JSONUtil.toJSONArray(
-				ddmFormInstanceRecordWriterRequest.getDDMFormFieldValues(),
-				this::_createJSONObject));
+		List<Map<String, String>> ddmFormFieldsValueList =
+			ddmFormInstanceRecordWriterRequest.getDDMFormFieldValues();
+
+		JSONArray jsonArray = jsonFactory.createJSONArray();
+
+		Stream<Map<String, String>> stream = ddmFormFieldsValueList.stream();
+
+		stream.map(
+			this::createJSONObject
+		).forEach(
+			jsonArray::put
+		);
+
+		String json = jsonArray.toJSONString();
 
 		DDMFormInstanceRecordWriterResponse.Builder builder =
 			DDMFormInstanceRecordWriterResponse.Builder.newBuilder(
@@ -54,19 +67,22 @@ public class DDMFormInstanceRecordJSONWriter
 		return builder.build();
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private JSONObject _createJSONObject(
+	protected JSONObject createJSONObject(
 		Map<String, String> ddmFormFieldsValue) {
+
+		Set<Map.Entry<String, String>> entrySet = ddmFormFieldsValue.entrySet();
+
+		Stream<Map.Entry<String, String>> stream = entrySet.stream();
 
 		JSONObject jsonObject = jsonFactory.createJSONObject();
 
-		for (Map.Entry<String, String> entry : ddmFormFieldsValue.entrySet()) {
-			jsonObject.put(entry.getKey(), entry.getValue());
-		}
+		stream.forEach(
+			entry -> jsonObject.put(entry.getKey(), entry.getValue()));
 
 		return jsonObject;
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 }

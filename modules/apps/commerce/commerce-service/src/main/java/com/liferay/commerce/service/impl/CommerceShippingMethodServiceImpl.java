@@ -18,14 +18,14 @@ import com.liferay.commerce.model.CommerceAddressRestriction;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
-import com.liferay.commerce.service.CommerceAddressRestrictionLocalService;
 import com.liferay.commerce.service.base.CommerceShippingMethodServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.File;
 
@@ -33,20 +33,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Andrea Di Giorgi
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceShippingMethod"
-	},
-	service = AopService.class
-)
 public class CommerceShippingMethodServiceImpl
 	extends CommerceShippingMethodServiceBaseImpl {
 
@@ -79,16 +69,15 @@ public class CommerceShippingMethodServiceImpl
 	@Override
 	public CommerceShippingMethod addCommerceShippingMethod(
 			long groupId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, boolean active,
-			String engineKey, File imageFile, double priority,
-			String trackingURL)
+			Map<Locale, String> descriptionMap, File imageFile,
+			String engineKey, double priority, boolean active)
 		throws PortalException {
 
 		_checkCommerceChannel(groupId);
 
 		return commerceShippingMethodLocalService.addCommerceShippingMethod(
-			getUserId(), groupId, nameMap, descriptionMap, active, engineKey,
-			imageFile, priority, trackingURL);
+			getUserId(), groupId, nameMap, descriptionMap, imageFile, engineKey,
+			priority, active);
 	}
 
 	@Override
@@ -114,7 +103,7 @@ public class CommerceShippingMethodServiceImpl
 		throws PortalException {
 
 		CommerceAddressRestriction commerceAddressRestriction =
-			_commerceAddressRestrictionLocalService.
+			commerceAddressRestrictionLocalService.
 				getCommerceAddressRestriction(commerceAddressRestrictionId);
 
 		_checkCommerceChannel(commerceAddressRestriction.getGroupId());
@@ -133,7 +122,7 @@ public class CommerceShippingMethodServiceImpl
 
 		_checkCommerceChannel(commerceShippingMethod.getGroupId());
 
-		_commerceAddressRestrictionLocalService.
+		commerceAddressRestrictionLocalService.
 			deleteCommerceAddressRestrictions(
 				CommerceShippingMethod.class.getName(),
 				commerceShippingMethodId);
@@ -216,27 +205,24 @@ public class CommerceShippingMethodServiceImpl
 	}
 
 	@Override
-	public List<CommerceShippingMethod> getCommerceShippingMethods(
-			long groupId, boolean active, int start, int end,
-			OrderByComparator<CommerceShippingMethod> orderByComparator)
+	public List<CommerceShippingMethod> getCommerceShippingMethods(long groupId)
 		throws PortalException {
 
 		_checkCommerceChannel(groupId);
 
 		return commerceShippingMethodLocalService.getCommerceShippingMethods(
-			groupId, active, start, end, orderByComparator);
+			groupId);
 	}
 
 	@Override
 	public List<CommerceShippingMethod> getCommerceShippingMethods(
-			long groupId, int start, int end,
-			OrderByComparator<CommerceShippingMethod> orderByComparator)
+			long groupId, boolean active)
 		throws PortalException {
 
 		_checkCommerceChannel(groupId);
 
 		return commerceShippingMethodLocalService.getCommerceShippingMethods(
-			groupId, start, end, orderByComparator);
+			groupId, active);
 	}
 
 	@Override
@@ -251,13 +237,13 @@ public class CommerceShippingMethodServiceImpl
 	}
 
 	@Override
-	public int getCommerceShippingMethodsCount(long groupId)
+	public int getCommerceShippingMethodsCount(long groupId, boolean active)
 		throws PortalException {
 
 		_checkCommerceChannel(groupId);
 
 		return commerceShippingMethodLocalService.
-			getCommerceShippingMethodsCount(groupId);
+			getCommerceShippingMethodsCount(groupId, active);
 	}
 
 	@Override
@@ -280,8 +266,8 @@ public class CommerceShippingMethodServiceImpl
 	@Override
 	public CommerceShippingMethod updateCommerceShippingMethod(
 			long commerceShippingMethodId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, boolean active, File imageFile,
-			double priority, String trackingURL)
+			Map<Locale, String> descriptionMap, File imageFile, double priority,
+			boolean active)
 		throws PortalException {
 
 		CommerceShippingMethod commerceShippingMethod =
@@ -292,7 +278,7 @@ public class CommerceShippingMethodServiceImpl
 
 		return commerceShippingMethodLocalService.updateCommerceShippingMethod(
 			commerceShippingMethod.getCommerceShippingMethodId(), nameMap,
-			descriptionMap, active, imageFile, priority, trackingURL);
+			descriptionMap, imageFile, priority, active);
 	}
 
 	private void _checkCommerceChannel(long groupId) throws PortalException {
@@ -303,17 +289,14 @@ public class CommerceShippingMethodServiceImpl
 			getPermissionChecker(), commerceChannel, ActionKeys.UPDATE);
 	}
 
-	@Reference
-	private CommerceAddressRestrictionLocalService
-		_commerceAddressRestrictionLocalService;
+	private static volatile ModelResourcePermission<CommerceChannel>
+		_commerceChannelModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CommerceShippingMethodServiceImpl.class,
+				"_commerceChannelModelResourcePermission",
+				CommerceChannel.class);
 
-	@Reference
+	@ServiceReference(type = CommerceChannelLocalService.class)
 	private CommerceChannelLocalService _commerceChannelLocalService;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CommerceChannel)"
-	)
-	private ModelResourcePermission<CommerceChannel>
-		_commerceChannelModelResourcePermission;
 
 }

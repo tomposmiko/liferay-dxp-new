@@ -31,7 +31,10 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceDiscountRuleTypeJSPContributorRegistry.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceDiscountRuleTypeJSPContributorRegistry.class
+)
 public class CommerceDiscountRuleTypeJSPContributorRegistryImpl
 	implements CommerceDiscountRuleTypeJSPContributorRegistry {
 

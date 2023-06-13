@@ -536,13 +536,6 @@ public class DLFileEntryWrapper
 	}
 
 	@Override
-	public java.util.List<DLFileVersion> getFileVersions(
-		int status, int start, int end) {
-
-		return model.getFileVersions(status, start, end);
-	}
-
-	@Override
 	public int getFileVersionsCount(int status) {
 		return model.getFileVersionsCount(status);
 	}
@@ -751,6 +744,18 @@ public class DLFileEntryWrapper
 	}
 
 	/**
+	 * Returns the trash entry created when this document library file entry was moved to the Recycle Bin. The trash entry may belong to one of the ancestors of this document library file entry.
+	 *
+	 * @return the trash entry created when this document library file entry was moved to the Recycle Bin
+	 */
+	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getTrashEntry();
+	}
+
+	/**
 	 * Returns the class primary key of the trash entry for this document library file entry.
 	 *
 	 * @return the class primary key of the trash entry for this document library file entry
@@ -758,6 +763,18 @@ public class DLFileEntryWrapper
 	@Override
 	public long getTrashEntryClassPK() {
 		return model.getTrashEntryClassPK();
+	}
+
+	/**
+	 * Returns the trash handler for this document library file entry.
+	 *
+	 * @return the trash handler for this document library file entry
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
+		return model.getTrashHandler();
 	}
 
 	/**
@@ -843,6 +860,26 @@ public class DLFileEntryWrapper
 	@Override
 	public boolean isInTrash() {
 		return model.isInTrash();
+	}
+
+	/**
+	 * Returns <code>true</code> if the parent of this document library file entry is in the Recycle Bin.
+	 *
+	 * @return <code>true</code> if the parent of this document library file entry is in the Recycle Bin; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isInTrashContainer() {
+		return model.isInTrashContainer();
+	}
+
+	@Override
+	public boolean isInTrashExplicitly() {
+		return model.isInTrashExplicitly();
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		return model.isInTrashImplicitly();
 	}
 
 	/**
@@ -1231,11 +1268,6 @@ public class DLFileEntryWrapper
 	@Override
 	public void setVersion(String version) {
 		model.setVersion(version);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

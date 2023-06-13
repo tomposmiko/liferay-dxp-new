@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.display.order:Integer=9",
 		"ddm.form.field.type.icon=password-policies",

@@ -137,10 +137,6 @@ public interface SiteNavigationMenuItemLocalService
 			long siteNavigationMenuItemId)
 		throws PortalException;
 
-	public SiteNavigationMenuItem deleteSiteNavigationMenuItem(
-			long siteNavigationMenuItemId, boolean deleteChildren)
-		throws PortalException;
-
 	/**
 	 * Deletes the site navigation menu item from the database. Also notifies the appropriate model listeners.
 	 *

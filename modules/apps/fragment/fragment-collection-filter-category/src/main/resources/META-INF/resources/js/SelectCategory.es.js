@@ -18,7 +18,6 @@ import {
 	getCollectionFilterValue,
 	setCollectionFilterValue,
 } from '@liferay/fragment-renderer-collection-filter-impl';
-import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
@@ -81,6 +80,7 @@ export default function SelectCategory({
 	const items = singleSelection
 		? [
 				{
+					checked: selectedCategoryIds?.[0],
 					items: filteredCategories.map((category) => ({
 						label: category.label,
 						type: 'radio',
@@ -89,7 +89,6 @@ export default function SelectCategory({
 					name: 'categoryId',
 					onChange: (categoryId) => onSelectedClick(true, categoryId),
 					type: 'radiogroup',
-					value: selectedCategoryIds?.[0],
 				},
 		  ]
 		: filteredCategories.map((category) => ({
@@ -108,7 +107,7 @@ export default function SelectCategory({
 			)?.label || label;
 	}
 	else if (selectedCategoryIds.length > 1) {
-		label = sub(
+		label = Liferay.Util.sub(
 			Liferay.Language.get('x-selected'),
 			selectedCategoryIds.length
 		);
@@ -127,7 +126,7 @@ export default function SelectCategory({
 								selectedCategoryIds
 							)
 						}
-						size="sm"
+						small
 					>
 						{Liferay.Language.get('apply')}
 					</ClayButton>
@@ -146,9 +145,13 @@ export default function SelectCategory({
 			searchValue={searchValue}
 			searchable={showSearch}
 			trigger={
-				<button className="form-control form-control-select form-control-sm text-left w-100">
+				<ClayButton
+					className="bg-light font-weight-normal form-control-select form-control-sm text-left w-100"
+					displayType="secondary"
+					small
+				>
 					{label}
-				</button>
+				</ClayButton>
 			}
 		/>
 	);

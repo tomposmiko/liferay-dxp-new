@@ -15,11 +15,11 @@
 import ClayAlert from '@clayui/alert';
 import ClayLayout from '@clayui/layout';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
-import {fetch, navigate, openConfirmModal, unescapeHTML} from 'frontend-js-web';
+import {fetch, navigate} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useMemo, useReducer, useState} from 'react';
 
-import TranslateActionBar from './components/TranslateActionBar/TranslateActionBar';
+import TranslateActionBar from './components/TranslateActionBar';
 import TranslateFieldSetEntries from './components/TranslateFieldSetEntries';
 import TranslateHeader from './components/TranslateHeader';
 import {FETCH_STATUS} from './constants';
@@ -36,17 +36,14 @@ const getInfoFields = (infoFieldSetEntries = []) => {
 	const targetFields = {};
 
 	infoFieldSetEntries.forEach(({fields}) => {
-		fields.forEach(({id: idSet, sourceContent, targetContent}) => {
-			sourceContent.forEach((content, index) => {
-				const id = `${idSet}${index}`;
+		fields.forEach(({id, sourceContent, targetContent}) => {
+			sourceFields[id] = sourceContent;
 
-				sourceFields[id] = content;
-				targetFields[id] = {
-					content: targetContent[index],
-					message: '',
-					status: '',
-				};
-			});
+			targetFields[id] = {
+				content: targetContent,
+				message: '',
+				status: '',
+			};
 		});
 	});
 
@@ -133,20 +130,16 @@ const Translate = ({
 
 		if (!state.formHasChanges) {
 			navigate(url);
-
-			return;
 		}
-
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-leave-the-page-you-may-lose-your-changes'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					navigate(url);
-				}
-			},
-		});
+		else if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-leave-the-page-you-may-lose-your-changes'
+				)
+			)
+		) {
+			navigate(url);
+		}
 	};
 
 	const handleOnSaveDraft = () => {
@@ -189,7 +182,7 @@ const Translate = ({
 						payload: Object.entries(fields).reduce(
 							(acc, [id, content]) => {
 								acc[id] = {
-									content: unescapeHTML(content),
+									content: Liferay.Util.unescapeHTML(content),
 								};
 
 								return acc;
@@ -247,7 +240,9 @@ const Translate = ({
 					dispatch({
 						payload: {
 							field: {
-								content: unescapeHTML(fields[fieldId]),
+								content: Liferay.Util.unescapeHTML(
+									fields[fieldId]
+								),
 								message: Liferay.Language.get(
 									'field-translated'
 								),
@@ -293,7 +288,6 @@ const Translate = ({
 				name={`${portletNamespace}workflowAction`}
 				type="hidden"
 			/>
-
 			{Object.entries(additionalFields).map(([name, value]) => (
 				<input
 					defaultValue={value}
@@ -330,7 +324,6 @@ const Translate = ({
 					) : (
 						<>
 							<TranslateHeader
-								autoTranslateEnabled={autoTranslateEnabled}
 								sourceLanguageIdTitle={sourceLanguageIdTitle}
 								targetLanguageIdTitle={targetLanguageIdTitle}
 							/>
@@ -376,11 +369,9 @@ Translate.propTypes = {
 					id: PropTypes.string.isRequired,
 					label: PropTypes.string.isRequired,
 					multiline: PropTypes.bool,
-					sourceContent: PropTypes.arrayOf(PropTypes.string)
-						.isRequired,
+					sourceContent: PropTypes.string.isRequired,
 					sourceContentDir: PropTypes.string.isRequired,
-					targetContent: PropTypes.arrayOf(PropTypes.string)
-						.isRequired,
+					targetContent: PropTypes.string,
 					targetContentDir: PropTypes.string,
 				})
 			),

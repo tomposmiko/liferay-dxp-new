@@ -15,12 +15,32 @@
 package com.liferay.commerce.tax.engine.remote.internal.frontend.taglib.servlet.taglib;
 
 import com.liferay.commerce.constants.CommerceTaxScreenNavigationConstants;
+import com.liferay.commerce.tax.engine.remote.internal.RemoteCommerceTaxEngine;
+import com.liferay.commerce.tax.engine.remote.internal.configuration.RemoteCommerceTaxConfiguration;
+import com.liferay.commerce.tax.engine.remote.internal.constants.RemoteCommerceTaxEngineConstants;
+import com.liferay.commerce.tax.model.CommerceTaxMethod;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
+import com.liferay.portal.kernel.settings.ParameterMapSettingsLocator;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+
+import java.io.IOException;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,16 +49,29 @@ import org.osgi.service.component.annotations.Reference;
  * @author Ivica Cardic
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=20",
-	service = ScreenNavigationCategory.class
+	enabled = false,
+	property = {
+		"screen.navigation.category.order:Integer=20",
+		"screen.navigation.entry.order:Integer=10"
+	},
+	service = {ScreenNavigationCategory.class, ScreenNavigationEntry.class}
 )
 public class RemoteCommerceTaxMethodConfigurationScreenNavigationCategory
-	implements ScreenNavigationCategory {
+	implements ScreenNavigationCategory,
+			   ScreenNavigationEntry<CommerceTaxMethod> {
+
+	public static final String CATEGORY_KEY = "remote-configuration";
+
+	public static final String ENTRY_KEY = "remote-configuration";
 
 	@Override
 	public String getCategoryKey() {
-		return CommerceTaxScreenNavigationConstants.
-			CATEGORY_KEY_COMMERCE_REMOTE_CONFIGURATION;
+		return CATEGORY_KEY;
+	}
+
+	@Override
+	public String getEntryKey() {
+		return ENTRY_KEY;
 	}
 
 	@Override
@@ -46,7 +79,7 @@ public class RemoteCommerceTaxMethodConfigurationScreenNavigationCategory
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return language.get(resourceBundle, "configuration");
+		return LanguageUtil.get(resourceBundle, "configuration");
 	}
 
 	@Override
@@ -55,7 +88,66 @@ public class RemoteCommerceTaxMethodConfigurationScreenNavigationCategory
 			SCREEN_NAVIGATION_KEY_COMMERCE_TAX_METHOD;
 	}
 
+	@Override
+	public boolean isVisible(User user, CommerceTaxMethod commerceTaxMethod) {
+		if (commerceTaxMethod == null) {
+			return false;
+		}
+
+		String engineKey = commerceTaxMethod.getEngineKey();
+
+		if (engineKey.equals(RemoteCommerceTaxEngine.KEY)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public void render(
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws IOException {
+
+		httpServletRequest.setAttribute(
+			RemoteCommerceTaxConfiguration.class.getName(),
+			_getRemoteCommerceTaxConfiguration(httpServletRequest));
+
+		_jspRenderer.renderJSP(
+			_servletContext, httpServletRequest, httpServletResponse,
+			"/configuration.jsp");
+	}
+
+	private RemoteCommerceTaxConfiguration _getRemoteCommerceTaxConfiguration(
+		HttpServletRequest httpServletRequest) {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		try {
+			return _configurationProvider.getConfiguration(
+				RemoteCommerceTaxConfiguration.class,
+				new ParameterMapSettingsLocator(
+					httpServletRequest.getParameterMap(),
+					new GroupServiceSettingsLocator(
+						themeDisplay.getScopeGroupId(),
+						RemoteCommerceTaxEngineConstants.SERVICE_NAME)));
+		}
+		catch (ConfigurationException configurationException) {
+			throw new SystemException(configurationException);
+		}
+	}
+
 	@Reference
-	protected Language language;
+	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private JSPRenderer _jspRenderer;
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.tax.engine.remote)"
+	)
+	private ServletContext _servletContext;
 
 }

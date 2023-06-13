@@ -14,25 +14,23 @@
 
 package com.liferay.exportimport.web.internal.portlet.configuration.icon;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.portlet.configuration.icon.BaseJSPPortletConfigurationIcon;
+import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.GroupPermission;
+import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Map;
-
 import javax.portlet.PortletRequest;
-
-import javax.servlet.ServletContext;
+import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,18 +38,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = PortletConfigurationIcon.class)
+@Component(immediate = true, service = PortletConfigurationIcon.class)
 public class ExportImportPortletConfigurationIcon
-	extends BaseJSPPortletConfigurationIcon {
-
-	@Override
-	public Map<String, Object> getContext(PortletRequest portletRequest) {
-		return HashMapBuilder.<String, Object>put(
-			"action", getNamespace(portletRequest) + "exportImport"
-		).put(
-			"globalAction", true
-		).build();
-	}
+	extends BasePortletConfigurationIcon {
 
 	@Override
 	public String getCssClass() {
@@ -59,23 +48,61 @@ public class ExportImportPortletConfigurationIcon
 	}
 
 	@Override
-	public String getIconCssClass() {
-		return "order-arrow";
-	}
-
-	@Override
-	public String getJspPath() {
-		return "/configuration/icon/export_import.jsp";
-	}
-
-	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "export-import");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)), "export-import");
+	}
+
+	@Override
+	public String getMethod() {
+		return "get";
+	}
+
+	@Override
+	public String getOnClick(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		StringBundler sb = new StringBundler(13);
+
+		sb.append("Liferay.Portlet.openModal({namespace: '");
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		sb.append(portletDisplay.getNamespace());
+
+		sb.append("', onClose: function() {Liferay.Portlet.refresh('#p_p_id_");
+		sb.append(portletDisplay.getId());
+		sb.append("_')}, portletSelector: '#p_p_id_");
+		sb.append(portletDisplay.getId());
+		sb.append("_', portletId: '");
+		sb.append(portletDisplay.getId());
+		sb.append("', title: '");
+		sb.append(LanguageUtil.get(themeDisplay.getLocale(), "export-import"));
+		sb.append("', url: '");
+		sb.append(HtmlUtil.escapeJS(portletDisplay.getURLExportImport()));
+		sb.append("'}); return false;");
+
+		return sb.toString();
+	}
+
+	@Override
+	public String getURL(
+		PortletRequest portletRequest, PortletResponse portletResponse) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		return portletDisplay.getURLExportImport();
 	}
 
 	@Override
 	public double getWeight() {
-		return 102;
+		return 15.0;
 	}
 
 	@Override
@@ -83,9 +110,7 @@ public class ExportImportPortletConfigurationIcon
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Layout layout = themeDisplay.getLayout();
-
-		if (layout.isEmbeddedPersonalApplication()) {
+		if (isEmbeddedPersonalApplicationLayout(themeDisplay.getLayout())) {
 			return false;
 		}
 
@@ -96,7 +121,7 @@ public class ExportImportPortletConfigurationIcon
 		}
 
 		try {
-			return _groupPermission.contains(
+			return GroupPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getScopeGroup(),
 				ActionKeys.EXPORT_IMPORT_PORTLET_INFO);
@@ -106,7 +131,7 @@ public class ExportImportPortletConfigurationIcon
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -119,20 +144,14 @@ public class ExportImportPortletConfigurationIcon
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
+	public boolean isToolTip() {
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportImportPortletConfigurationIcon.class);
 
 	@Reference
-	private GroupPermission _groupPermission;
-
-	@Reference
-	private Language _language;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.exportimport.web)")
-	private ServletContext _servletContext;
+	private PortletLocalService _portletLocalService;
 
 }

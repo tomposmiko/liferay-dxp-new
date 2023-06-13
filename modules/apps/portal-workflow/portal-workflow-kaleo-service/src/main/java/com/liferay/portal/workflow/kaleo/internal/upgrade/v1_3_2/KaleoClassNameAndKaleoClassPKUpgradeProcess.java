@@ -29,17 +29,17 @@ public class KaleoClassNameAndKaleoClassPKUpgradeProcess
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeKaleoClassNameAndKaleoClassPK(
+		upgradeKaleoClassNameAndKaleoClassPK(
 			"KaleoAction", "kaleoNodeId", KaleoNode.class.getName());
-		_upgradeKaleoClassNameAndKaleoClassPK(
+		upgradeKaleoClassNameAndKaleoClassPK(
 			"KaleoLog", "kaleoNodeId", KaleoNode.class.getName());
-		_upgradeKaleoClassNameAndKaleoClassPK(
+		upgradeKaleoClassNameAndKaleoClassPK(
 			"KaleoNotification", "kaleoNodeId", KaleoNode.class.getName());
-		_upgradeKaleoClassNameAndKaleoClassPK(
+		upgradeKaleoClassNameAndKaleoClassPK(
 			"KaleoTaskAssignment", "kaleoTaskId", KaleoTask.class.getName());
 	}
 
-	private void _upgradeKaleoClassNameAndKaleoClassPK(
+	protected void upgradeKaleoClassNameAndKaleoClassPK(
 			String tableName, String columnName, String kaleoClassName)
 		throws Exception {
 

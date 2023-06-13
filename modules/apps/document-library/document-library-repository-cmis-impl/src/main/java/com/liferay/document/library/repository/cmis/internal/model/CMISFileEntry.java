@@ -98,7 +98,7 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -154,7 +154,7 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 				PrincipalThreadLocal.getUserId(), this, true);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		if (contentStream == null) {
@@ -179,7 +179,7 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 						PrincipalThreadLocal.getUserId(), this, true);
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 
 				if (contentStream == null) {
@@ -273,11 +273,6 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 	}
 
 	@Override
-	public List<FileVersion> getFileVersions(int status, int start, int end) {
-		return getFileVersions(status);
-	}
-
-	@Override
 	public int getFileVersionsCount(int status) {
 		try {
 			List<Document> documents = getAllVersions();
@@ -302,7 +297,7 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -321,7 +316,7 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 			setParentFolder(parentFolder);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return parentFolder;
@@ -436,7 +431,7 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return ContentTypes.APPLICATION_OCTET_STREAM;
@@ -553,7 +548,7 @@ public class CMISFileEntry extends BaseCMISModel implements FileEntry {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

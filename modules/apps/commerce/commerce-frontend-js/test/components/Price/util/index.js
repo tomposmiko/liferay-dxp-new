@@ -14,9 +14,9 @@
 
 import '@testing-library/jest-dom/extend-expect';
 
-import * as Pricetests_utilities from '../../../../src/main/resources/META-INF/resources/components/price/util/index';
+import * as PriceUtils from '../../../../src/main/resources/META-INF/resources/components/price/util/index';
 
-describe('Price tests_utilities', () => {
+describe('Price Utils', () => {
 	beforeEach(() => {
 		jest.resetAllMocks();
 	});
@@ -36,7 +36,7 @@ describe('Price tests_utilities', () => {
 			};
 
 			expect(
-				Pricetests_utilities.adaptLegacyPriceModel(
+				PriceUtils.adaptLegacyPriceModel(
 					CheckCPInstancePriceModel.cpInstance.prices
 				)
 			).toEqual({
@@ -68,7 +68,7 @@ describe('Price tests_utilities', () => {
 			};
 
 			expect(
-				Pricetests_utilities.adaptLegacyPriceModel(compatiblePriceModel)
+				PriceUtils.adaptLegacyPriceModel(compatiblePriceModel)
 			).toEqual(compatiblePriceModel);
 		});
 	});
@@ -89,23 +89,19 @@ describe('Price tests_utilities', () => {
 
 			const result = ['2.00', '5.40', '3.34', '0.00'];
 
-			expect(Pricetests_utilities.collectDiscountLevels(price)).toEqual(
-				result
-			);
+			expect(PriceUtils.collectDiscountLevels(price)).toEqual(result);
 		});
 	});
 
 	describe('isNonnull', () => {
 		it('checks that one or more numerical values are non-null', () => {
-			expect(Pricetests_utilities.isNonnull('0')).toBe(false);
-			expect(Pricetests_utilities.isNonnull('0', '0.000', 0)).toBe(false);
-			expect(Pricetests_utilities.isNonnull('1')).toBe(true);
-			expect(Pricetests_utilities.isNonnull('1.00', '2.4', '0')).toBe(
-				true
-			);
-			expect(Pricetests_utilities.isNonnull(0)).toBe(false);
-			expect(Pricetests_utilities.isNonnull(1)).toBe(true);
-			expect(Pricetests_utilities.isNonnull(1.2, '3.1', 0)).toBe(true);
+			expect(PriceUtils.isNonnull('0')).toBe(false);
+			expect(PriceUtils.isNonnull('0', '0.000', 0)).toBe(false);
+			expect(PriceUtils.isNonnull('1')).toBe(true);
+			expect(PriceUtils.isNonnull('1.00', '2.4', '0')).toBe(true);
+			expect(PriceUtils.isNonnull(0)).toBe(false);
+			expect(PriceUtils.isNonnull(1)).toBe(true);
+			expect(PriceUtils.isNonnull(1.2, '3.1', 0)).toBe(true);
 		});
 	});
 });

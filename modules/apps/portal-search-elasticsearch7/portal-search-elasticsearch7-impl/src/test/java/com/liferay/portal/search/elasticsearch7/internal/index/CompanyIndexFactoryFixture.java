@@ -15,8 +15,6 @@
 package com.liferay.portal.search.elasticsearch7.internal.index;
 
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
@@ -30,8 +28,6 @@ import java.util.HashMap;
 import org.elasticsearch.client.RestHighLevelClient;
 
 import org.mockito.Mockito;
-
-import org.osgi.framework.BundleContext;
 
 /**
  * @author Adam Brandizzi
@@ -76,45 +72,22 @@ public class CompanyIndexFactoryFixture {
 	}
 
 	public CompanyIndexFactory getCompanyIndexFactory() {
-		if (_companyIndexFactory != null) {
-			return _companyIndexFactory;
-		}
-
-		_companyIndexFactory = new CompanyIndexFactory();
-
-		ReflectionTestUtil.setFieldValue(
-			_companyIndexFactory, "_elasticsearchConfigurationWrapper",
-			createElasticsearchConfigurationWrapper());
-		ReflectionTestUtil.setFieldValue(
-			_companyIndexFactory, "_elasticsearchConnectionManager",
-			_elasticsearchConnectionManager);
-		ReflectionTestUtil.setFieldValue(
-			_companyIndexFactory, "_indexNameBuilder",
-			new TestIndexNameBuilder());
-		ReflectionTestUtil.setFieldValue(
-			_companyIndexFactory, "_jsonFactory", new JSONFactoryImpl());
-
-		ReflectionTestUtil.invoke(
-			_companyIndexFactory, "activate",
-			new Class<?>[] {BundleContext.class},
-			SystemBundleUtil.getBundleContext());
-
-		return _companyIndexFactory;
+		return new CompanyIndexFactory() {
+			{
+				setIndexNameBuilder(new TestIndexNameBuilder());
+				setJsonFactory(new JSONFactoryImpl());
+				setElasticsearchConfigurationWrapper(
+					createElasticsearchConfigurationWrapper());
+				setElasticsearchConnectionManager(
+					_elasticsearchConnectionManager);
+			}
+		};
 	}
 
 	public String getIndexName() {
 		IndexName indexName = new IndexName(_indexName);
 
 		return indexName.getName();
-	}
-
-	public void tearDown() {
-		if (_companyIndexFactory != null) {
-			ReflectionTestUtil.invoke(
-				_companyIndexFactory, "deactivate", new Class<?>[0]);
-
-			_companyIndexFactory = null;
-		}
 	}
 
 	protected ElasticsearchConfigurationWrapper
@@ -136,7 +109,6 @@ public class CompanyIndexFactoryFixture {
 
 	}
 
-	private CompanyIndexFactory _companyIndexFactory;
 	private final ElasticsearchClientResolver _elasticsearchClientResolver;
 	private final ElasticsearchConnectionManager
 		_elasticsearchConnectionManager;

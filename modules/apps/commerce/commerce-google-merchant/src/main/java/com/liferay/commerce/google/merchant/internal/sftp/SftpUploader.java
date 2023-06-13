@@ -31,13 +31,15 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 /**
  * @author Eric Chin
  */
 @Component(
 	configurationPid = "com.liferay.commerce.google.merchant.internal.sftp.SftpConfiguration",
-	service = SftpUploader.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
+	immediate = true, service = SftpUploader.class
 )
 public class SftpUploader {
 

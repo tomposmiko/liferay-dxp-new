@@ -15,12 +15,11 @@
 package com.liferay.analytics.reports.web.internal.portlet.action.test;
 
 import com.liferay.analytics.reports.test.util.MockContextUtil;
+import com.liferay.analytics.reports.web.internal.portlet.action.test.util.MockHttpUtil;
 import com.liferay.analytics.reports.web.internal.portlet.action.test.util.MockThemeDisplayUtil;
-import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.function.UnsafeSupplier;
-import com.liferay.portal.configuration.test.util.CompanyConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.exception.NestableRuntimeException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -33,17 +32,13 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayResourceResponse;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.test.util.MockHttp;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -80,58 +75,38 @@ public class GetTotalViewsMVCResourceCommandTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_layout = LayoutTestUtil.addTypePortletLayout(_group);
+		_layout = LayoutTestUtil.addLayout(_group);
 	}
 
 	@Test
 	public void testServeResponse() throws Exception {
-		try (CompanyConfigurationTemporarySwapper
-				companyConfigurationTemporarySwapper =
-					new CompanyConfigurationTemporarySwapper(
-						TestPropsValues.getCompanyId(),
-						AnalyticsConfiguration.class.getName(),
-						HashMapDictionaryBuilder.<String, Object>put(
-							"liferayAnalyticsDataSourceId",
-							RandomTestUtil.nextLong()
-						).put(
-							"liferayAnalyticsEnableAllGroupIds", true
-						).put(
-							"liferayAnalyticsFaroBackendSecuritySignature",
-							RandomTestUtil.randomString()
-						).put(
-							"liferayAnalyticsFaroBackendURL",
-							"http://" + RandomTestUtil.randomString()
-						).build(),
-						SettingsFactoryUtil.getSettingsFactory())) {
+		ReflectionTestUtil.setFieldValue(
+			_mvcResourceCommand, "_http",
+			MockHttpUtil.geHttp(
+				HashMapBuilder.<String, UnsafeSupplier<String, Exception>>put(
+					"/api/1.0/pages/view-count", () -> "12345"
+				).put(
+					"/api/1.0/pages/view-counts",
+					() -> {
+						LocalDate localDate = LocalDate.now();
 
-			ReflectionTestUtil.setFieldValue(
-				_mvcResourceCommand, "_http",
-				new MockHttp(
-					HashMapBuilder.
-						<String, UnsafeSupplier<String, Exception>>put(
-							"/api/1.0/pages/view-count", () -> "12345"
-						).put(
-							"/api/1.0/pages/view-counts",
-							() -> {
-								LocalDate localDate = LocalDate.now();
-
-								return () -> JSONUtil.put(
-									"histogram",
-									JSONUtil.put(
-										JSONUtil.put(
-											"key",
-											localDate.format(
-												DateTimeFormatter.
-													ISO_LOCAL_DATE)
-										).put(
-											"value", 5
-										))
+						return () -> JSONUtil.put(
+							"histogram",
+							JSONUtil.put(
+								JSONUtil.put(
+									"key",
+									localDate.format(
+										DateTimeFormatter.ISO_LOCAL_DATE)
 								).put(
 									"value", 5
-								).toString();
-							}
-						).build()));
+								))
+						).put(
+							"value", 5
+						).toJSONString();
+					}
+				).build()));
 
+		try {
 			MockContextUtil.testWithMockContext(
 				MockContextUtil.MockContext.builder(
 				).build(),
@@ -177,7 +152,7 @@ public class GetTotalViewsMVCResourceCommandTest {
 	public void testServeResponseWithError() throws Exception {
 		ReflectionTestUtil.setFieldValue(
 			_mvcResourceCommand, "_http",
-			new MockHttp(
+			MockHttpUtil.geHttp(
 				Collections.singletonMap(
 					"/api/1.0/pages/view-count",
 					() -> {

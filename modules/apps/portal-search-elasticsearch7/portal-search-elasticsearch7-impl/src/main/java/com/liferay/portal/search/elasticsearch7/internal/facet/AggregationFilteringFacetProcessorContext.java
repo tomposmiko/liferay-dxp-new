@@ -45,7 +45,7 @@ public class AggregationFilteringFacetProcessorContext
 
 	public static FacetProcessorContext newInstance(Collection<Facet> facets) {
 		return new AggregationFilteringFacetProcessorContext(
-			_getSelectionFiltersMap(facets));
+			getSelectionFiltersMap(facets));
 	}
 
 	@Override
@@ -54,8 +54,8 @@ public class AggregationFilteringFacetProcessorContext
 
 		String aggregationName = aggregationBuilder.getName();
 
-		AggregationBuilder superAggregationBuilder =
-			_getSuperAggregationBuilder(aggregationName);
+		AggregationBuilder superAggregationBuilder = getSuperAggregationBuilder(
+			aggregationName);
 
 		if (superAggregationBuilder != null) {
 			return superAggregationBuilder.subAggregation(aggregationBuilder);
@@ -64,7 +64,7 @@ public class AggregationFilteringFacetProcessorContext
 		return aggregationBuilder;
 	}
 
-	private static List<QueryBuilder> _getSelectionFilters(
+	protected static List<QueryBuilder> getSelectionFilters(
 		com.liferay.portal.search.facet.Facet facet) {
 
 		List<QueryBuilder> queryBuilders = new ArrayList<>();
@@ -94,7 +94,7 @@ public class AggregationFilteringFacetProcessorContext
 		else if (facet instanceof RangeFacet) {
 			for (String value : facet.getSelections()) {
 				queryBuilders.add(
-					_rangeQuery(fieldName, RangeParserUtil.parserRange(value)));
+					rangeQuery(fieldName, RangeParserUtil.parserRange(value)));
 			}
 		}
 		else {
@@ -105,7 +105,7 @@ public class AggregationFilteringFacetProcessorContext
 		return queryBuilders;
 	}
 
-	private static Map<String, List<QueryBuilder>> _getSelectionFiltersMap(
+	protected static Map<String, List<QueryBuilder>> getSelectionFiltersMap(
 		Collection<Facet> facets) {
 
 		Map<String, List<QueryBuilder>> map = new HashMap<>();
@@ -120,7 +120,7 @@ public class AggregationFilteringFacetProcessorContext
 				if (!ArrayUtil.isEmpty(osgiFacet.getSelections())) {
 					map.put(
 						osgiFacet.getAggregationName(),
-						_getSelectionFilters(osgiFacet));
+						getSelectionFilters(osgiFacet));
 				}
 			}
 		}
@@ -128,7 +128,9 @@ public class AggregationFilteringFacetProcessorContext
 		return map;
 	}
 
-	private static QueryBuilder _rangeQuery(String fieldName, String[] ranges) {
+	protected static QueryBuilder rangeQuery(
+		String fieldName, String[] ranges) {
+
 		RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(
 			fieldName);
 
@@ -138,13 +140,7 @@ public class AggregationFilteringFacetProcessorContext
 		return rangeQueryBuilder;
 	}
 
-	private AggregationFilteringFacetProcessorContext(
-		Map<String, List<QueryBuilder>> selectionFiltersMap) {
-
-		_selectionFiltersMap = selectionFiltersMap;
-	}
-
-	private BoolQueryBuilder _getSelectionFiltersOfOthersAsBoolQueryBuilder(
+	protected BoolQueryBuilder getSelectionFiltersOfOthersAsBoolQueryBuilder(
 		String aggregationName) {
 
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -166,7 +162,7 @@ public class AggregationFilteringFacetProcessorContext
 		return boolQueryBuilder;
 	}
 
-	private AggregationBuilder _getSuperAggregationBuilder(
+	protected AggregationBuilder getSuperAggregationBuilder(
 		String aggregationName) {
 
 		if (_selectionFiltersMap.isEmpty()) {
@@ -174,13 +170,19 @@ public class AggregationFilteringFacetProcessorContext
 		}
 
 		BoolQueryBuilder boolQueryBuilder =
-			_getSelectionFiltersOfOthersAsBoolQueryBuilder(aggregationName);
+			getSelectionFiltersOfOthersAsBoolQueryBuilder(aggregationName);
 
 		if (!boolQueryBuilder.hasClauses()) {
 			return null;
 		}
 
 		return new FilterAggregationBuilder(aggregationName, boolQueryBuilder);
+	}
+
+	private AggregationFilteringFacetProcessorContext(
+		Map<String, List<QueryBuilder>> selectionFiltersMap) {
+
+		_selectionFiltersMap = selectionFiltersMap;
 	}
 
 	private final Map<String, List<QueryBuilder>> _selectionFiltersMap;

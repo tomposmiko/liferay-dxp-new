@@ -16,7 +16,7 @@ package com.liferay.search.experiences.internal.blueprint.search.request.body.co
 
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
-import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
+import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
 /**
  * @author Petteri Karttunen
@@ -26,7 +26,7 @@ public class SuggestSXPSearchRequestBodyContributor
 
 	@Override
 	public void contribute(
-		Configuration configuration, SearchRequestBuilder searchRequestBuilder,
+		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint,
 		SXPParameterData sxpParameterData) {
 	}
 

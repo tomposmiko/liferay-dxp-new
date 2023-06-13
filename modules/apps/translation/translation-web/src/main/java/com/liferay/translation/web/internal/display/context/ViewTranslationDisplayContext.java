@@ -32,11 +32,11 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.translation.info.field.TranslationInfoFieldChecker;
 import com.liferay.translation.snapshot.TranslationSnapshot;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,7 +60,10 @@ public class ViewTranslationDisplayContext {
 		InfoField infoField,
 		InfoFieldType.Attribute<TextInfoFieldType, Boolean> attribute) {
 
-		return GetterUtil.getBoolean(infoField.getAttribute(attribute));
+		Optional<Boolean> attributeOptional = infoField.getAttributeOptional(
+			attribute);
+
+		return attributeOptional.orElse(false);
 	}
 
 	public String getInfoFieldLabel(InfoField infoField) {
@@ -119,21 +122,18 @@ public class ViewTranslationDisplayContext {
 		return _translationSnapshot.getSourceLocale();
 	}
 
-	public List<String> getStringValues(InfoField infoField, Locale locale) {
-		List<String> stringValues = new ArrayList<>();
-
+	public String getStringValue(InfoField infoField, Locale locale) {
 		InfoItemFieldValues infoItemFieldValues =
 			_translationSnapshot.getInfoItemFieldValues();
 
-		for (InfoFieldValue<Object> infoFieldValue :
-				infoItemFieldValues.getInfoFieldValues(
-					infoField.getUniqueId())) {
+		InfoFieldValue<Object> infoFieldValue =
+			infoItemFieldValues.getInfoFieldValue(infoField.getName());
 
-			stringValues.add(
-				GetterUtil.getString(infoFieldValue.getValue(locale)));
+		if (infoFieldValue != null) {
+			return GetterUtil.getString(infoFieldValue.getValue(locale));
 		}
 
-		return stringValues;
+		return null;
 	}
 
 	public String getTargetLanguageId() {

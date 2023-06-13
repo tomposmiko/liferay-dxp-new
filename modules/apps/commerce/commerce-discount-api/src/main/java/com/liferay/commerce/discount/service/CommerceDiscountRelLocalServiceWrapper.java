@@ -27,10 +27,6 @@ public class CommerceDiscountRelLocalServiceWrapper
 	implements CommerceDiscountRelLocalService,
 			   ServiceWrapper<CommerceDiscountRelLocalService> {
 
-	public CommerceDiscountRelLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceDiscountRelLocalServiceWrapper(
 		CommerceDiscountRelLocalService commerceDiscountRelLocalService) {
 
@@ -94,19 +90,6 @@ public class CommerceDiscountRelLocalServiceWrapper
 			primaryKeyObj);
 	}
 
-	@Override
-	public com.liferay.commerce.discount.model.CommerceDiscountRel
-			deleteCommerceDiscountRel(
-				com.liferay.commerce.discount.model.CommerceDiscount
-					commerceDiscount,
-				com.liferay.commerce.discount.model.CommerceDiscountRel
-					commerceDiscountRel)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceDiscountRelLocalService.deleteCommerceDiscountRel(
-			commerceDiscount, commerceDiscountRel);
-	}
-
 	/**
 	 * Deletes the commerce discount rel from the database. Also notifies the appropriate model listeners.
 	 *
@@ -116,12 +99,14 @@ public class CommerceDiscountRelLocalServiceWrapper
 	 *
 	 * @param commerceDiscountRel the commerce discount rel
 	 * @return the commerce discount rel that was removed
+	 * @throws PortalException
 	 */
 	@Override
 	public com.liferay.commerce.discount.model.CommerceDiscountRel
-		deleteCommerceDiscountRel(
-			com.liferay.commerce.discount.model.CommerceDiscountRel
-				commerceDiscountRel) {
+			deleteCommerceDiscountRel(
+				com.liferay.commerce.discount.model.CommerceDiscountRel
+					commerceDiscountRel)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceDiscountRelLocalService.deleteCommerceDiscountRel(
 			commerceDiscountRel);
@@ -148,13 +133,11 @@ public class CommerceDiscountRelLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteCommerceDiscountRels(
-			com.liferay.commerce.discount.model.CommerceDiscount
-				commerceDiscount)
+	public void deleteCommerceDiscountRels(long commerceDiscountId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_commerceDiscountRelLocalService.deleteCommerceDiscountRels(
-			commerceDiscount);
+			commerceDiscountId);
 	}
 
 	@Override

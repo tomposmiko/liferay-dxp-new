@@ -70,7 +70,6 @@ const ImportDataDefinitionModal = ({
 			<ClayModal.Header>
 				{Liferay.Language.get('import-structure')}
 			</ClayModal.Header>
-
 			<ClayModal.Body>
 				<ClayForm
 					action={importDataDefinitionURL}
@@ -86,12 +85,10 @@ const ImportDataDefinitionModal = ({
 							'the-import-process-will-run-in-the-background-and-may-take-a-few-minutes'
 						)}
 					</ClayAlert>
-
 					<ClayForm.Group>
 						<label htmlFor={nameInputId}>
 							{Liferay.Language.get('name')}
 						</label>
-
 						<ClayInput
 							id={nameInputId}
 							maxLength={nameMaxLength}
@@ -101,12 +98,10 @@ const ImportDataDefinitionModal = ({
 							value={name}
 						/>
 					</ClayForm.Group>
-
 					<ClayForm.Group>
 						<label htmlFor={jsonFileInputId}>
 							{Liferay.Language.get('json-file')}
 						</label>
-
 						<ClayInput.Group>
 							<ClayInput.GroupItem prepend>
 								<ClayInput
@@ -116,7 +111,6 @@ const ImportDataDefinitionModal = ({
 									value={fileName}
 								/>
 							</ClayInput.GroupItem>
-
 							<ClayInput.GroupItem append shrink>
 								<ClayButton
 									displayType="secondary"
@@ -125,7 +119,6 @@ const ImportDataDefinitionModal = ({
 									{Liferay.Language.get('select')}
 								</ClayButton>
 							</ClayInput.GroupItem>
-
 							{inputFile && (
 								<ClayInput.GroupItem shrink>
 									<ClayButton
@@ -144,7 +137,6 @@ const ImportDataDefinitionModal = ({
 							)}
 						</ClayInput.Group>
 					</ClayForm.Group>
-
 					<input
 						className="d-none"
 						name={jsonFileInputId}
@@ -162,14 +154,12 @@ const ImportDataDefinitionModal = ({
 					/>
 				</ClayForm>
 			</ClayModal.Body>
-
 			<ClayModal.Footer
 				last={
 					<ClayButton.Group spaced>
 						<ClayButton displayType="secondary" onClick={onClose}>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
-
 						<ClayButton
 							disabled={!inputFile || !name}
 							form={importDataDefinitionFormId}

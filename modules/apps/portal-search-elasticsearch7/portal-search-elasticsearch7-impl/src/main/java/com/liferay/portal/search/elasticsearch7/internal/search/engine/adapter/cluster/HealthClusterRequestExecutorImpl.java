@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = HealthClusterRequestExecutor.class)
+@Component(immediate = true, service = HealthClusterRequestExecutor.class)
 public class HealthClusterRequestExecutorImpl
 	implements HealthClusterRequestExecutor {
 
@@ -46,7 +46,7 @@ public class HealthClusterRequestExecutorImpl
 		ClusterHealthRequest clusterHealthRequest = createClusterHealthRequest(
 			healthClusterRequest);
 
-		ClusterHealthResponse clusterHealthResponse = _getClusterHealthResponse(
+		ClusterHealthResponse clusterHealthResponse = getClusterHealthResponse(
 			clusterHealthRequest, healthClusterRequest);
 
 		ClusterHealthStatus clusterHealthStatus =
@@ -83,7 +83,7 @@ public class HealthClusterRequestExecutorImpl
 		return clusterHealthRequest;
 	}
 
-	private ClusterHealthResponse _getClusterHealthResponse(
+	protected ClusterHealthResponse getClusterHealthResponse(
 		ClusterHealthRequest clusterHealthRequest,
 		HealthClusterRequest healthClusterRequest) {
 
@@ -103,10 +103,21 @@ public class HealthClusterRequestExecutorImpl
 		}
 	}
 
-	@Reference
-	private ClusterHealthStatusTranslator _clusterHealthStatusTranslator;
+	@Reference(unbind = "-")
+	protected void setClusterHealthStatusTranslator(
+		ClusterHealthStatusTranslator clusterHealthStatusTranslator) {
 
-	@Reference
+		_clusterHealthStatusTranslator = clusterHealthStatusTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	private ClusterHealthStatusTranslator _clusterHealthStatusTranslator;
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

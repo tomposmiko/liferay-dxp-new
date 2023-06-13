@@ -36,13 +36,13 @@ if (themeDisplay.isStatePopUp() || layoutTypePortlet.hasStateMax()) {
 	}
 
 	if (Validator.isNotNull(templateContent)) {
-		RuntimePageUtil.processTemplate(request, response, ppid, templateId, templateContent, langType);
+		RuntimePageUtil.processTemplate(request, response, ppid, new StringTemplateResource(templateId, templateContent), langType);
 	}
 }
 else {
-	UnicodeProperties typeSettingsUnicodeProperties = layout.getTypeSettingsProperties();
+	UnicodeProperties typeSettingsProperties = layout.getTypeSettingsProperties();
 
-	String description = typeSettingsUnicodeProperties.getProperty("panelLayoutDescription");
+	String description = typeSettingsProperties.getProperty("panelLayoutDescription");
 
 	if (Validator.isNull(description)) {
 		description = LanguageUtil.get(request, "please-select-a-tool-from-the-left-menu");

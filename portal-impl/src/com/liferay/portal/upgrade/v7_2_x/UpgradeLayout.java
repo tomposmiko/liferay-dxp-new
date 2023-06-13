@@ -16,8 +16,6 @@ package com.liferay.portal.upgrade.v7_2_x;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 /**
  * @author Matthew Chan
@@ -41,13 +39,8 @@ public class UpgradeLayout extends UpgradeProcess {
 		runSQL(
 			"update Layout set parentPlid = (select coalesce(parentPlid, 0) " +
 				"from TEMP_TABLE where Layout.plid = TEMP_TABLE.plid)");
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropTables("TEMP_TABLE")
-		};
+		runSQL("drop table TEMP_TABLE");
 	}
 
 }

@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Igor Fabiano Nazar
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.UserGroup",
 	service = ModelResourcePermission.class
 )

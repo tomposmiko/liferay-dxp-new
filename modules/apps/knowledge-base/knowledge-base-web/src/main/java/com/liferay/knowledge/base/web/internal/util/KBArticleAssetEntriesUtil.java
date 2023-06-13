@@ -28,6 +28,7 @@ import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.message.boards.model.MBMessage;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -35,7 +36,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -69,7 +69,6 @@ public class KBArticleAssetEntriesUtil {
 
 		assetEntryQuery.setAnyTagIds(assetTagIds);
 		assetEntryQuery.setClassNameIds(classNameIds);
-		assetEntryQuery.setEnablePermissions(true);
 		assetEntryQuery.setEnd(end + 1);
 		assetEntryQuery.setGroupIds(groupIds);
 		assetEntryQuery.setOrderByCol1(orderByColumn);
@@ -111,7 +110,7 @@ public class KBArticleAssetEntriesUtil {
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(principalException);
+					_log.debug(principalException, principalException);
 				}
 
 				continue;
@@ -173,8 +172,8 @@ public class KBArticleAssetEntriesUtil {
 					httpServletRequest,
 					KBPortletKeys.KNOWLEDGE_BASE_ARTICLE_DEFAULT_INSTANCE,
 					PortletRequest.RENDER_PHASE)
-			).setMVCRenderCommandName(
-				"/knowledge_base/view_kb_article"
+			).setMVCPath(
+				"/article/view_article.jsp"
 			).setParameter(
 				"resourcePrimKey", classPK
 			).buildPortletURL();

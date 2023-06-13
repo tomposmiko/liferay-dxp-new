@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.asset.display.page.model.AssetDisplayPageEntry",
 	service = StagedModelRepository.class
 )

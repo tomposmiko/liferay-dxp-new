@@ -12,12 +12,12 @@
  * details.
  */
 
-import {render} from '@testing-library/react';
+import {cleanup, render} from '@testing-library/react';
 import React from 'react';
 
 import '@testing-library/jest-dom/extend-expect';
 
-import SelectFileExtension from '../../../src/main/resources/META-INF/resources/js/components/SelectFileExtension';
+import SelectFileExtension from '../../../src/main/resources/META-INF/resources/js/SelectFileExtension';
 
 const mockProps = {
 	fileExtensionGroups: [
@@ -76,25 +76,24 @@ const mockProps = {
 		'_com_liferay_item_selector_web_portlet_ItemSelectorPortlet_',
 };
 
-jest.mock('frontend-js-web', () => ({
-	...jest.requireActual('frontend-js-web'),
-	getOpener: jest.fn(() => ({
-		Liferay: {
-			fire: jest.fn(),
-		},
-	})),
-}));
-
 describe('SelectFileExtension', () => {
+	beforeEach(() => {
+		cleanup();
+
+		window.Liferay.Util.getOpener = jest.fn().mockReturnValue({
+			Liferay: {
+				fire: jest.fn(),
+			},
+		});
+	});
+
 	it('renders a TreeFilter with parent nodes indicating the number of children', () => {
 		const {getByRole, getByText, queryByText} = render(
 			<SelectFileExtension {...mockProps} />
 		);
 
 		const {className} = getByRole('tree');
-		expect(className).toContain(
-			'treeview show-quick-actions-on-hover treeview-light'
-		);
+		expect(className).toContain('lfr-treeview-node-list');
 
 		expect(
 			getByText('Audio (5 items)', {exact: false})

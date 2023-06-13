@@ -20,7 +20,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.model.VirtualLayoutConstants;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -28,7 +27,7 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -74,7 +73,6 @@ public class I18nServletTest extends I18nServlet {
 	public static void setUpClass() throws Exception {
 		_availableLocales = _language.getAvailableLocales();
 		_defaultLocale = LocaleUtil.getDefault();
-		_hebrewLocale = new Locale("iw", "IL");
 		_localesEnabled = PropsValues.LOCALES_ENABLED;
 
 		_language.init();
@@ -83,15 +81,14 @@ public class I18nServletTest extends I18nServlet {
 			_portal.getDefaultCompanyId(),
 			Arrays.asList(
 				LocaleUtil.CANADA_FRENCH, LocaleUtil.SPAIN, LocaleUtil.UK,
-				LocaleUtil.US, _hebrewLocale),
+				LocaleUtil.US),
 			LocaleUtil.US);
 
 		PropsValues.LOCALES_ENABLED = new String[] {
 			_language.getLanguageId(LocaleUtil.CANADA_FRENCH),
 			_language.getLanguageId(LocaleUtil.SPAIN),
 			_language.getLanguageId(LocaleUtil.UK),
-			_language.getLanguageId(LocaleUtil.US),
-			_language.getLanguageId(_hebrewLocale)
+			_language.getLanguageId(LocaleUtil.US)
 		};
 	}
 
@@ -175,8 +172,7 @@ public class I18nServletTest extends I18nServlet {
 		I18nData i18nData = getI18nData(mockHttpServletRequest);
 
 		Assert.assertEquals(
-			HttpComponentsUtil.encodePath(specialCharacters),
-			i18nData.getPath());
+			HttpUtil.encodePath(specialCharacters), i18nData.getPath());
 	}
 
 	@Test
@@ -189,59 +185,13 @@ public class I18nServletTest extends I18nServlet {
 				"/%s_%s", LocaleUtil.SPAIN.getLanguage(),
 				LocaleUtil.SPAIN.getCountry()));
 
-		String specialCharacters = HttpComponentsUtil.encodePath("es/^_Ñ,í-ó");
+		String specialCharacters = HttpUtil.encodePath("es/^_Ñ,í-ó");
 
 		mockHttpServletRequest.setPathInfo(specialCharacters);
 
 		I18nData i18nData = getI18nData(mockHttpServletRequest);
 
 		Assert.assertEquals(specialCharacters, i18nData.getPath());
-	}
-
-	@Test
-	public void testI18nGroupControlPanelWithLocaleDisabledInCompany()
-		throws Exception {
-
-		_group = GroupTestUtil.updateDisplaySettings(
-			_group.getGroupId(), Arrays.asList(LocaleUtil.US), LocaleUtil.US);
-
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
-
-		Locale locale = LocaleUtil.NETHERLANDS;
-
-		mockHttpServletRequest.setServletPath(
-			String.format("/%s_%s", locale.getLanguage(), locale.getCountry()));
-
-		mockHttpServletRequest.setPathInfo(_getControlPanelPathInfo(_group));
-
-		Assert.assertNull(getI18nData(mockHttpServletRequest));
-	}
-
-	@Test
-	public void testI18nGroupControlPanelWithLocaleEnabledInCompany()
-		throws Exception {
-
-		_group = GroupTestUtil.updateDisplaySettings(
-			_group.getGroupId(), Arrays.asList(LocaleUtil.US), LocaleUtil.US);
-
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
-
-		Locale locale = LocaleUtil.SPAIN;
-
-		mockHttpServletRequest.setServletPath(
-			String.format("/%s_%s", locale.getLanguage(), locale.getCountry()));
-
-		String controlPanePathInfo = _getControlPanelPathInfo(_group);
-
-		mockHttpServletRequest.setPathInfo(controlPanePathInfo);
-
-		I18nServlet.I18nData i18nData = getI18nData(mockHttpServletRequest);
-
-		Assert.assertNotNull(i18nData);
-
-		_testGetI18nData(locale, controlPanePathInfo, i18nData);
 	}
 
 	@Test
@@ -395,42 +345,6 @@ public class I18nServletTest extends I18nServlet {
 	}
 
 	@Test
-	public void testSendRedirectWithLegacyLanguageCode() throws Exception {
-		MockServletContext mockServletContext = new MockServletContext();
-
-		String contextPath = StringPool.SLASH + RandomTestUtil.randomString(10);
-
-		mockServletContext.setContextPath(contextPath);
-
-		init(new MockServletConfig(mockServletContext));
-
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
-
-		mockHttpServletRequest.setServletPath(
-			String.format(
-				"/%s_%s", _hebrewLocale.getLanguage(),
-				_hebrewLocale.getCountry()));
-
-		MockHttpServletResponse mockHttpServletResponse =
-			new MockHttpServletResponse();
-
-		sendRedirect(
-			mockHttpServletRequest, mockHttpServletResponse,
-			getI18nData(mockHttpServletRequest));
-
-		Assert.assertEquals(
-			HttpServletResponse.SC_MOVED_PERMANENTLY,
-			mockHttpServletResponse.getStatus());
-
-		Assert.assertEquals(
-			String.format(
-				"%s/%s-%s/", contextPath, _hebrewLocale.getLanguage(),
-				_hebrewLocale.getCountry()),
-			mockHttpServletResponse.getHeader("Location"));
-	}
-
-	@Test
 	public void testSendRedirectWithoutContext() throws Exception {
 		init(new MockServletConfig(new MockServletContext()));
 
@@ -458,14 +372,6 @@ public class I18nServletTest extends I18nServlet {
 				"/%s-%s/", LocaleUtil.CANADA_FRENCH.getLanguage(),
 				LocaleUtil.CANADA_FRENCH.getCountry()),
 			mockHttpServletResponse.getHeader("Location"));
-	}
-
-	private String _getControlPanelPathInfo(Group group) {
-		return StringBundler.concat(
-			PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING,
-			group.getFriendlyURL(),
-			VirtualLayoutConstants.CANONICAL_URL_SEPARATOR,
-			GroupConstants.CONTROL_PANEL_FRIENDLY_URL);
 	}
 
 	private Locale _getDefaultLocale(Group group) throws Exception {
@@ -508,18 +414,10 @@ public class I18nServletTest extends I18nServlet {
 			Locale locale, I18nServlet.I18nData expectedI18nData)
 		throws Exception {
 
-		_testGetI18nData(locale, StringPool.SLASH, expectedI18nData);
-	}
-
-	private void _testGetI18nData(
-			Locale locale, String pathInfo,
-			I18nServlet.I18nData expectedI18nData)
-		throws Exception {
-
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
 
-		mockHttpServletRequest.setPathInfo(pathInfo);
+		mockHttpServletRequest.setPathInfo(StringPool.SLASH);
 		mockHttpServletRequest.setServletPath(
 			StringPool.SLASH + LocaleUtil.toLanguageId(locale));
 
@@ -595,7 +493,6 @@ public class I18nServletTest extends I18nServlet {
 
 	private static Set<Locale> _availableLocales;
 	private static Locale _defaultLocale;
-	private static Locale _hebrewLocale;
 
 	@Inject
 	private static Language _language;

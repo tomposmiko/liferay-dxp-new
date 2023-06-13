@@ -36,6 +36,8 @@ public class RankingSearchRequestBuilderTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_rankingSearchRequestBuilder = new RankingSearchRequestBuilder(
 			complexQueryPartBuilderFactory, queries,
 			searchRequestBuilderFactory);

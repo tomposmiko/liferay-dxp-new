@@ -141,27 +141,6 @@ public class Product implements Cloneable, Serializable {
 
 	protected Map<String, ?> expando;
 
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String externalReferenceCode;
-
 	public Long getId() {
 		return id;
 	}
@@ -201,28 +180,6 @@ public class Product implements Cloneable, Serializable {
 	}
 
 	protected Attachment[] images;
-
-	public LinkedProduct[] getLinkedProducts() {
-		return linkedProducts;
-	}
-
-	public void setLinkedProducts(LinkedProduct[] linkedProducts) {
-		this.linkedProducts = linkedProducts;
-	}
-
-	public void setLinkedProducts(
-		UnsafeSupplier<LinkedProduct[], Exception>
-			linkedProductsUnsafeSupplier) {
-
-		try {
-			linkedProducts = linkedProductsUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected LinkedProduct[] linkedProducts;
 
 	public String getMetaDescription() {
 		return metaDescription;
@@ -348,30 +305,6 @@ public class Product implements Cloneable, Serializable {
 	}
 
 	protected String name;
-
-	public ProductConfiguration getProductConfiguration() {
-		return productConfiguration;
-	}
-
-	public void setProductConfiguration(
-		ProductConfiguration productConfiguration) {
-
-		this.productConfiguration = productConfiguration;
-	}
-
-	public void setProductConfiguration(
-		UnsafeSupplier<ProductConfiguration, Exception>
-			productConfigurationUnsafeSupplier) {
-
-		try {
-			productConfiguration = productConfigurationUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected ProductConfiguration productConfiguration;
 
 	public Long getProductId() {
 		return productId;
@@ -583,27 +516,6 @@ public class Product implements Cloneable, Serializable {
 	}
 
 	protected String urlImage;
-
-	public Map<String, String> getUrls() {
-		return urls;
-	}
-
-	public void setUrls(Map<String, String> urls) {
-		this.urls = urls;
-	}
-
-	public void setUrls(
-		UnsafeSupplier<Map<String, String>, Exception> urlsUnsafeSupplier) {
-
-		try {
-			urls = urlsUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Map<String, String> urls;
 
 	@Override
 	public Product clone() throws CloneNotSupportedException {

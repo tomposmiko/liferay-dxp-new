@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Deactivate;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = "destination.name=" + AMDestinationNames.ADAPTIVE_MEDIA_PROCESSOR,
 	service = MessageListener.class
 )
@@ -80,12 +81,13 @@ public class AMMessageListener extends BaseMessageListener {
 			}
 			catch (NoSuchFileEntryException noSuchFileEntryException) {
 				if (_log.isInfoEnabled()) {
-					_log.info(noSuchFileEntryException);
+					_log.info(
+						noSuchFileEntryException, noSuchFileEntryException);
 				}
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(exception);
+					_log.warn(exception, exception);
 				}
 			}
 		}

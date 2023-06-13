@@ -14,12 +14,13 @@
 
 package com.liferay.portal.search.web.internal.portlet;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.web.internal.display.context.SearchResultPreferences;
 import com.liferay.portal.search.web.internal.display.context.ThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.document.DocumentFormPermissionChecker;
 import com.liferay.portal.search.web.internal.document.DocumentFormPermissionCheckerImpl;
+
+import java.util.Optional;
 
 import javax.portlet.PortletPreferences;
 
@@ -40,8 +41,8 @@ public class SearchPortletSearchResultPreferences
 	}
 
 	@Override
-	public String getFieldsToDisplay() {
-		return StringPool.BLANK;
+	public Optional<String> getFieldsToDisplayOptional() {
+		return Optional.empty();
 	}
 
 	@Override

@@ -19,7 +19,6 @@ import com.liferay.commerce.product.service.CPAttachmentFileEntryLocalService;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
@@ -30,6 +29,8 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MimeTypes;
@@ -55,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Andrea Di Giorgi
  */
-@Component(service = CPAttachmentFileEntryCreator.class)
+@Component(enabled = false, service = CPAttachmentFileEntryCreator.class)
 public class CPAttachmentFileEntryCreator {
 
 	@SuppressFBWarnings("PATH_TRAVERSAL_IN")
@@ -117,23 +118,23 @@ public class CPAttachmentFileEntryCreator {
 		}
 		catch (NoSuchFileEntryException noSuchFileEntryException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchFileEntryException);
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
 			}
 
 			Repository repository = _repositoryProvider.getRepository(
 				serviceContext.getScopeGroupId());
 
-			file = _file.createTempFile(inputStream);
+			file = FileUtil.createTempFile(inputStream);
 
 			fileEntry = _dlAppService.addFileEntry(
-				null, repository.getRepositoryId(),
+				repository.getRepositoryId(),
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, fileName,
-				_mimeTypes.getContentType(file), fileName, null, null, null,
-				file, null, null, serviceContext);
+				_mimeTypes.getContentType(file), fileName, null, null, file,
+				serviceContext);
 		}
 		finally {
 			if (file != null) {
-				_file.delete(file);
+				FileUtil.delete(file);
 			}
 
 			inputStream.close();
@@ -174,8 +175,8 @@ public class CPAttachmentFileEntryCreator {
 		long classPK = GetterUtil.getLong(classedModel.getPrimaryKeyObj());
 
 		return _cpAttachmentFileEntryLocalService.addCPAttachmentFileEntry(
-			StringPool.BLANK, serviceContext.getUserId(),
-			fileEntry.getGroupId(),
+			_friendlyURLNormalizer.normalize(fileName),
+			serviceContext.getUserId(), fileEntry.getGroupId(),
 			_portal.getClassNameId(classedModel.getModelClass()), classPK,
 			fileEntry.getFileEntryId(), false, null, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
@@ -195,7 +196,7 @@ public class CPAttachmentFileEntryCreator {
 	private DLAppService _dlAppService;
 
 	@Reference
-	private com.liferay.portal.kernel.util.File _file;
+	private FriendlyURLNormalizer _friendlyURLNormalizer;
 
 	@Reference
 	private MimeTypes _mimeTypes;

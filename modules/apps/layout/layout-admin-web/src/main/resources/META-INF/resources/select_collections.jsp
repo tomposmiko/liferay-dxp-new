@@ -44,10 +44,10 @@ SelectLayoutCollectionDisplayContext selectLayoutCollectionDisplayContext = (Sel
 	</liferay-ui:search-container>
 </div>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {delegate} = frontendJsWeb;
-
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 	var collections = document.getElementById('<portlet:namespace />collections');
+
+	var delegate = delegateModule.default;
 
 	var addCollectionActionOptionQueryClickHandler = delegate(
 		collections,

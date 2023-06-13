@@ -28,7 +28,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = {})
+@Component(
+	enabled = false, immediate = true, service = ServletContextUtil.class
+)
 public class ServletContextUtil {
 
 	public static CPContentHelper getCPContentHelper() {

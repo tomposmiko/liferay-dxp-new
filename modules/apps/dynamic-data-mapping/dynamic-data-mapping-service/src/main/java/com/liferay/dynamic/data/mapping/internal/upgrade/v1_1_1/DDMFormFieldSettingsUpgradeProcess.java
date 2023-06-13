@@ -74,7 +74,7 @@ public class DDMFormFieldSettingsUpgradeProcess extends UpgradeProcess {
 				while (resultSet.next()) {
 					String definition = resultSet.getString(2);
 
-					String newDefinition = _upgradeRecordSetStructure(
+					String newDefinition = upgradeRecordSetStructure(
 						definition);
 
 					if (Objects.equals(definition, newDefinition)) {
@@ -97,7 +97,7 @@ public class DDMFormFieldSettingsUpgradeProcess extends UpgradeProcess {
 						while (resultSet2.next()) {
 							definition = resultSet2.getString("definition");
 
-							newDefinition = _upgradeRecordSetStructure(
+							newDefinition = upgradeRecordSetStructure(
 								definition);
 
 							if (Objects.equals(definition, newDefinition)) {
@@ -123,7 +123,7 @@ public class DDMFormFieldSettingsUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private String _upgradeRecordSetStructure(String definition)
+	protected String upgradeRecordSetStructure(String definition)
 		throws Exception {
 
 		DDMForm ddmForm = DDMFormDeserializeUtil.deserialize(

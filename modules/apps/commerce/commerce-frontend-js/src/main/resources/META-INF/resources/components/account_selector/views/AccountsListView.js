@@ -12,15 +12,13 @@
  * details.
  */
 
-import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
+import {ClayButtonWithIcon} from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
-import {useModal} from '@clayui/modal';
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 
 import ServiceProvider from '../../../ServiceProvider/index';
 import Sticker from '../Sticker';
 import {VIEWS} from '../util/constants';
-import AccountCreationModal from './AccountCreationModal';
 import EmptyListView from './EmptyListView';
 import ListView from './ListView';
 
@@ -28,24 +26,17 @@ const {baseURL: ACCOUNTS_RESOURCE_ENDPOINT} = ServiceProvider.AdminAccountAPI(
 	'v1'
 );
 
-export default function AccountsListView({
+function AccountsListView({
 	accountEntryAllowedTypes,
 	changeAccount,
 	currentAccount,
-	currentUser,
 	disabled,
 	setCurrentView,
 }) {
-	const [modalVisible, setModalVisible] = useState(false);
-
-	const {observer, onClose} = useModal({
-		onClose: () => setModalVisible(false),
-	});
-
 	const accountsListRef = useRef();
 
 	const apiUrl = new URL(
-		`${themeDisplay.getPathContext()}${ACCOUNTS_RESOURCE_ENDPOINT}`,
+		ACCOUNTS_RESOURCE_ENDPOINT,
 		themeDisplay.getPortalURL()
 	);
 
@@ -102,12 +93,7 @@ export default function AccountsListView({
 									>
 										<Sticker
 											className="current-account-thumbnail mr-2"
-											logoURL={
-												themeDisplay.getPathContext() +
-												account.logoURL
-											}
-											name={account.name}
-											size={account.size}
+											{...account}
 										/>
 
 										<span className="ml-2 text-truncate-inline">
@@ -127,28 +113,11 @@ export default function AccountsListView({
 
 			<ClayDropDown.Divider />
 
-			<ClayDropDown.ItemList className="accounts-list">
-				<ClayDropDown.Section>
-					<div ref={accountsListRef} />
-				</ClayDropDown.Section>
-			</ClayDropDown.ItemList>
-
-			{!!currentUser.actions?.create && (
-				<ClayDropDown.Section>
-					<ClayButton onClick={() => setModalVisible(true)}>
-						{Liferay.Language.get('create-new-account')}
-					</ClayButton>
-				</ClayDropDown.Section>
-			)}
-
-			{modalVisible && (
-				<AccountCreationModal
-					accountTypes={accountEntryAllowedTypes}
-					closeModal={onClose}
-					handleAccountChange={changeAccount}
-					observer={observer}
-				/>
-			)}
+			<li>
+				<div ref={accountsListRef} />
+			</li>
 		</ClayDropDown.ItemList>
 	);
 }
+
+export default AccountsListView;

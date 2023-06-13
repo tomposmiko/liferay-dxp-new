@@ -80,7 +80,7 @@ public abstract class BaseRoleDemoDataCreator implements RoleDemoDataCreator {
 
 		Company company = companyLocalService.fetchCompany(companyId);
 
-		User user = company.getGuestUser();
+		User user = company.getDefaultUser();
 
 		Role role = roleLocalService.addRole(
 			user.getUserId(), null, 0, roleName, null, null, roleType, null,
@@ -102,7 +102,7 @@ public abstract class BaseRoleDemoDataCreator implements RoleDemoDataCreator {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 	}

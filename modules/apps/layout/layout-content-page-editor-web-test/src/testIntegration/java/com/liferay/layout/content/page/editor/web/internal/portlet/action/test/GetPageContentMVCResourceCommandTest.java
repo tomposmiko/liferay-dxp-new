@@ -20,16 +20,13 @@ import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
+import com.liferay.fragment.constants.FragmentConstants;
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryLinkService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
-import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
-import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
-import com.liferay.layout.test.util.ContentLayoutTestUtil;
-import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
@@ -41,6 +38,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -67,13 +65,11 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.segments.constants.SegmentsEntryConstants;
-import com.liferay.segments.model.SegmentsExperience;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
-import com.liferay.segments.test.util.SegmentsTestUtil;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -106,7 +102,7 @@ public class GetPageContentMVCResourceCommandTest {
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 
-		_layout = LayoutTestUtil.addTypeContentLayout(_group);
+		_layout = _addLayout();
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			_group.getGroupId(), TestPropsValues.getUserId());
@@ -140,9 +136,7 @@ public class GetPageContentMVCResourceCommandTest {
 			});
 
 		MockLiferayResourceRequest mockLiferayResourceRequest =
-			_getMockLiferayPortletResourceRequest(
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()));
+			_getMockLiferayPortletResourceRequest();
 
 		JSONArray jsonArray = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getPageContentsJSONArray",
@@ -196,9 +190,7 @@ public class GetPageContentMVCResourceCommandTest {
 			});
 
 		MockLiferayResourceRequest mockLiferayResourceRequest =
-			_getMockLiferayPortletResourceRequest(
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()));
+			_getMockLiferayPortletResourceRequest();
 
 		JSONArray jsonArray = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getPageContentsJSONArray",
@@ -244,9 +236,7 @@ public class GetPageContentMVCResourceCommandTest {
 			});
 
 		MockLiferayResourceRequest mockLiferayResourceRequest =
-			_getMockLiferayPortletResourceRequest(
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()));
+			_getMockLiferayPortletResourceRequest();
 
 		JSONArray jsonArray = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getPageContentsJSONArray",
@@ -266,15 +256,25 @@ public class GetPageContentMVCResourceCommandTest {
 
 	@Test
 	public void testFragmentEntryLinkMapped() throws Exception {
-		long defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				_layout.getPlid());
 		JournalArticle journalArticle = _createJournalArticle();
 
-		ContentLayoutTestUtil.addFragmentEntryLinkToLayout(
+		FragmentEntry fragmentEntry =
+			_fragmentEntryLocalService.addFragmentEntry(
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
+				StringUtil.randomString(), StringUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+				FragmentConstants.TYPE_COMPONENT,
+				WorkflowConstants.STATUS_APPROVED, _serviceContext);
+
+		_fragmentEntryLinkService.addFragmentEntryLink(
+			_group.getGroupId(), 0, fragmentEntry.getFragmentEntryId(),
+			SegmentsExperienceConstants.ID_DEFAULT, _layout.getPlid(),
+			fragmentEntry.getCss(), fragmentEntry.getHtml(),
+			fragmentEntry.getJs(), fragmentEntry.getConfiguration(),
 			JSONUtil.put(
-				FragmentEntryProcessorConstants.
-					KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
+				"com.liferay.fragment.entry.processor.editable." +
+					"EditableFragmentEntryProcessor",
 				JSONUtil.put(
 					"test",
 					JSONUtil.put(
@@ -284,10 +284,10 @@ public class GetPageContentMVCResourceCommandTest {
 						"classPK", journalArticle.getResourcePrimKey()
 					))
 			).toString(),
-			_layout, defaultSegmentsExperienceId);
+			StringPool.BLANK, 0, null, _serviceContext);
 
 		MockLiferayResourceRequest mockLiferayResourceRequest =
-			_getMockLiferayPortletResourceRequest(defaultSegmentsExperienceId);
+			_getMockLiferayPortletResourceRequest();
 
 		JSONArray jsonArray = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getPageContentsJSONArray",
@@ -303,76 +303,6 @@ public class GetPageContentMVCResourceCommandTest {
 		Assert.assertEquals(
 			journalArticle.getTitle(LocaleUtil.US),
 			jsonObject.getString("title"));
-	}
-
-	@Test
-	public void testFragmentEntryLinkMappedInAnotherSegmentsExperience()
-		throws Exception {
-
-		long defaultSegmentsExperienceId =
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				_layout.getPlid());
-		JournalArticle journalArticle = _createJournalArticle();
-
-		ContentLayoutTestUtil.addFragmentEntryLinkToLayout(
-			JSONUtil.put(
-				FragmentEntryProcessorConstants.
-					KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
-				JSONUtil.put(
-					"test",
-					JSONUtil.put(
-						"classNameId",
-						_portal.getClassNameId(JournalArticle.class)
-					).put(
-						"classPK", journalArticle.getResourcePrimKey()
-					))
-			).toString(),
-			_layout, defaultSegmentsExperienceId);
-
-		JSONArray jsonArray = ReflectionTestUtil.invoke(
-			_mvcResourceCommand, "_getPageContentsJSONArray",
-			new Class<?>[] {ResourceRequest.class, ResourceResponse.class},
-			_getMockLiferayPortletResourceRequest(defaultSegmentsExperienceId),
-			new MockLiferayResourceResponse());
-
-		Assert.assertEquals(1, jsonArray.length());
-
-		SegmentsExperience segmentsExperience =
-			SegmentsTestUtil.addSegmentsExperience(
-				_group.getGroupId(), SegmentsEntryConstants.ID_DEFAULT,
-				_layout.getPlid());
-
-		ContentLayoutTestUtil.addFragmentEntryLinkToLayout(
-			JSONUtil.put(
-				FragmentEntryProcessorConstants.
-					KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
-				JSONUtil.put(
-					"test",
-					JSONUtil.put(
-						"classNameId",
-						_portal.getClassNameId(JournalArticle.class)
-					).put(
-						"classPK", journalArticle.getResourcePrimKey()
-					))
-			).toString(),
-			_layout, segmentsExperience.getSegmentsExperienceId());
-
-		jsonArray = ReflectionTestUtil.invoke(
-			_mvcResourceCommand, "_getPageContentsJSONArray",
-			new Class<?>[] {ResourceRequest.class, ResourceResponse.class},
-			_getMockLiferayPortletResourceRequest(
-				segmentsExperience.getSegmentsExperienceId()),
-			new MockLiferayResourceResponse());
-
-		Assert.assertEquals(1, jsonArray.length());
-
-		jsonArray = ReflectionTestUtil.invoke(
-			_mvcResourceCommand, "_getPageContentsJSONArray",
-			new Class<?>[] {ResourceRequest.class, ResourceResponse.class},
-			_getMockLiferayPortletResourceRequest(-1),
-			new MockLiferayResourceResponse());
-
-		Assert.assertEquals(0, jsonArray.length());
 	}
 
 	@Test
@@ -410,9 +340,7 @@ public class GetPageContentMVCResourceCommandTest {
 			});
 
 		MockLiferayResourceRequest mockLiferayResourceRequest =
-			_getMockLiferayPortletResourceRequest(
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()));
+			_getMockLiferayPortletResourceRequest();
 
 		JSONArray jsonArray = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getPageContentsJSONArray",
@@ -420,6 +348,19 @@ public class GetPageContentMVCResourceCommandTest {
 			mockLiferayResourceRequest, new MockLiferayResourceResponse());
 
 		Assert.assertEquals(1, jsonArray.length());
+	}
+
+	private Layout _addLayout() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
+
+		return _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK, serviceContext);
 	}
 
 	private JournalArticle _createJournalArticle() throws Exception {
@@ -440,13 +381,15 @@ public class GetPageContentMVCResourceCommandTest {
 			UnsafeConsumer<LayoutStructure, Exception> layoutStructureConsumer)
 		throws Exception {
 
-		LayoutPageTemplateStructure layoutPageTemplateStructure =
-			LayoutPageTemplateStructureLocalServiceUtil.
-				fetchLayoutPageTemplateStructure(
-					_group.getGroupId(), _layout.getPlid());
+		LayoutStructure layoutStructure = new LayoutStructure();
 
-		LayoutStructure layoutStructure = LayoutStructure.of(
-			layoutPageTemplateStructure.getDefaultSegmentsExperienceData());
+		layoutStructure.addRootLayoutStructureItem();
+
+		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
+			TestPropsValues.getUserId(), _group.getGroupId(), _layout.getPlid(),
+			layoutStructure.toString(),
+			ServiceContextTestUtil.getServiceContext(
+				_group, TestPropsValues.getUserId()));
 
 		layoutStructureConsumer.accept(layoutStructure);
 
@@ -456,15 +399,12 @@ public class GetPageContentMVCResourceCommandTest {
 				layoutStructure.toString());
 	}
 
-	private MockLiferayResourceRequest _getMockLiferayPortletResourceRequest(
-			long segmentsExperienceId)
+	private MockLiferayResourceRequest _getMockLiferayPortletResourceRequest()
 		throws Exception {
 
 		MockLiferayResourceRequest mockLiferayResourceRequest =
 			new MockLiferayResourceRequest();
 
-		mockLiferayResourceRequest.addParameter(
-			"segmentsExperienceId", String.valueOf(segmentsExperienceId));
 		mockLiferayResourceRequest.setAttribute(
 			JavaConstants.JAVAX_PORTLET_CONFIG, null);
 
@@ -541,9 +481,6 @@ public class GetPageContentMVCResourceCommandTest {
 
 	@Inject
 	private Portal _portal;
-
-	@Inject
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	private ServiceContext _serviceContext;
 

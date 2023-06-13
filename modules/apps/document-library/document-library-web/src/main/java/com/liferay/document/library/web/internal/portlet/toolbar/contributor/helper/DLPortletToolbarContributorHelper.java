@@ -63,11 +63,11 @@ public class DLPortletToolbarContributorHelper {
 		}
 		catch (NoSuchFolderException | PrincipalException exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
@@ -82,7 +82,7 @@ public class DLPortletToolbarContributorHelper {
 			rootFolderId = dlPortletInstanceSettings.getRootFolderId();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		if (rootFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
@@ -94,13 +94,13 @@ public class DLPortletToolbarContributorHelper {
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				folder = null;
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -125,17 +125,21 @@ public class DLPortletToolbarContributorHelper {
 				}
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
 		return true;
 	}
 
+	@Reference(unbind = "-")
+	protected void setDLAppLocalService(DLAppLocalService dlAppLocalService) {
+		_dlAppLocalService = dlAppLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLPortletToolbarContributorHelper.class);
 
-	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
 }

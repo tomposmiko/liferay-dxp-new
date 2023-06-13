@@ -19,44 +19,36 @@ import com.liferay.account.admin.web.internal.display.AccountEntryDisplay;
 import com.liferay.account.admin.web.internal.security.permission.resource.AccountEntryPermission;
 import com.liferay.account.constants.AccountActionKeys;
 import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownGroupItemBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownGroupItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowEngineManagerUtil;
-import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import javax.portlet.PortletURL;
 
@@ -77,18 +69,19 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			searchContainer);
-
-		_workflowEnabled = _isWorkflowEnabled(
-			PortalUtil.getCompanyId(httpServletRequest));
 	}
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		return DropdownItemListBuilder.add(
-			() -> Objects.equals(getNavigation(), "active"),
-			dropdownItem -> {
-				dropdownItem.putData("action", "deactivateAccountEntries");
-				dropdownItem.putData(
+		return DropdownItemList.of(
+			() -> {
+				if (Objects.equals(getNavigation(), "inactive")) {
+					return null;
+				}
+
+				return DropdownItemBuilder.putData(
+					"action", "deactivateAccountEntries"
+				).putData(
 					"deactivateAccountEntriesURL",
 					PortletURLBuilder.createActionURL(
 						liferayPortletResponse
@@ -98,17 +91,23 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 						Constants.DEACTIVATE
 					).setNavigation(
 						getNavigation()
-					).buildString());
-				dropdownItem.setIcon("hidden");
-				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "deactivate"));
-				dropdownItem.setQuickAction(true);
-			}
-		).add(
-			() -> Objects.equals(getNavigation(), "inactive"),
-			dropdownItem -> {
-				dropdownItem.putData("action", "activateAccountEntries");
-				dropdownItem.putData(
+					).buildString()
+				).setIcon(
+					"hidden"
+				).setLabel(
+					LanguageUtil.get(httpServletRequest, "deactivate")
+				).setQuickAction(
+					true
+				).build();
+			},
+			() -> {
+				if (Objects.equals(getNavigation(), "active")) {
+					return null;
+				}
+
+				return DropdownItemBuilder.putData(
+					"action", "activateAccountEntries"
+				).putData(
 					"activateAccountEntriesURL",
 					PortletURLBuilder.createActionURL(
 						liferayPortletResponse
@@ -118,30 +117,33 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 						Constants.RESTORE
 					).setNavigation(
 						getNavigation()
-					).buildString());
-				dropdownItem.setIcon("undo");
-				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "activate"));
-				dropdownItem.setQuickAction(true);
-			}
-		).add(
-			dropdownItem -> {
-				dropdownItem.putData("action", "deleteAccountEntries");
-				dropdownItem.putData(
-					"deleteAccountEntriesURL",
-					PortletURLBuilder.createActionURL(
-						liferayPortletResponse
-					).setActionName(
-						"/account_admin/delete_account_entry"
-					).setNavigation(
-						getNavigation()
-					).buildString());
-				dropdownItem.setIcon("times-circle");
-				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "delete"));
-				dropdownItem.setQuickAction(true);
-			}
-		).build();
+					).buildString()
+				).setIcon(
+					"undo"
+				).setLabel(
+					LanguageUtil.get(httpServletRequest, "activate")
+				).setQuickAction(
+					true
+				).build();
+			},
+			() -> DropdownItemBuilder.putData(
+				"action", "deleteAccountEntries"
+			).putData(
+				"deleteAccountEntriesURL",
+				PortletURLBuilder.createActionURL(
+					liferayPortletResponse
+				).setActionName(
+					"/account_admin/delete_account_entry"
+				).setNavigation(
+					getNavigation()
+				).buildString()
+			).setIcon(
+				"times-circle"
+			).setLabel(
+				LanguageUtil.get(httpServletRequest, "delete")
+			).setQuickAction(
+				true
+			).build());
 	}
 
 	public List<String> getAvailableActions(
@@ -161,10 +163,10 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 			return availableActions;
 		}
 
-		if (accountEntryDisplay.isApproved()) {
+		if (accountEntryDisplay.isActive()) {
 			availableActions.add("deactivateAccountEntries");
 		}
-		else if (accountEntryDisplay.isInactive()) {
+		else {
 			availableActions.add("activateAccountEntries");
 		}
 
@@ -209,7 +211,7 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 	public List<DropdownItem> getFilterDropdownItems() {
 		List<DropdownItem> filterDropdownItems = super.getFilterDropdownItems();
 
-		_addFilterTypeDropdownItems(filterDropdownItems);
+		addFilterTypeDropdownItems(filterDropdownItems);
 
 		return filterDropdownItems;
 	}
@@ -226,15 +228,17 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 					).setNavigation(
 						(String)null
 					).buildString());
+
 				labelItem.setCloseable(true);
-				labelItem.setLabel(
-					String.format(
-						"%s: %s",
-						LanguageUtil.get(httpServletRequest, "status"),
-						LanguageUtil.get(httpServletRequest, getNavigation())));
+
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(httpServletRequest, "status"),
+					LanguageUtil.get(httpServletRequest, getNavigation()));
+
+				labelItem.setLabel(label);
 			}
 		).add(
-			() -> !Objects.equals(_getType(), "all"),
+			() -> !Objects.equals(getType(), "all"),
 			labelItem -> {
 				labelItem.putData(
 					"removeLabelURL",
@@ -243,11 +247,14 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 					).setParameter(
 						"type", (String)null
 					).buildString());
+
 				labelItem.setCloseable(true);
-				labelItem.setLabel(
-					String.format(
-						"%s: %s", LanguageUtil.get(httpServletRequest, "type"),
-						LanguageUtil.get(httpServletRequest, _getType())));
+
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(httpServletRequest, "type"),
+					LanguageUtil.get(httpServletRequest, getType()));
+
+				labelItem.setLabel(label);
 			}
 		).build();
 	}
@@ -264,11 +271,23 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return liferayPortletResponse.createRenderURL();
 		}
+	}
+
+	@Override
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
+
+		return searchActionURL.toString();
+	}
+
+	@Override
+	public Boolean isDisabled() {
+		return false;
 	}
 
 	@Override
@@ -282,6 +301,28 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 			AccountActionKeys.ADD_ACCOUNT_ENTRY);
 	}
 
+	protected void addFilterTypeDropdownItems(
+		List<DropdownItem> filterDropdownItems) {
+
+		DropdownGroupItem filterDropdownItemsGroup = new DropdownGroupItem();
+
+		filterDropdownItemsGroup.setDropdownItems(
+			getDropdownItems(
+				getDefaultEntriesMap(getFilterByTypeKeys()), getPortletURL(),
+				"type", getType()));
+		filterDropdownItemsGroup.setLabel(
+			LanguageUtil.get(httpServletRequest, "filter-by-type"));
+
+		filterDropdownItems.add(1, filterDropdownItemsGroup);
+	}
+
+	protected String[] getFilterByTypeKeys() {
+		return GetterUtil.getStringValues(
+			liferayPortletRequest.getAttribute(
+				AccountWebKeys.ACCOUNT_ENTRY_ALLOWED_TYPES),
+			AccountConstants.ACCOUNT_ENTRY_TYPES);
+	}
+
 	@Override
 	protected String getNavigation() {
 		return ParamUtil.getString(
@@ -290,14 +331,7 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getNavigationKeys() {
-		String[] navigationKeys = {"all", "active", "inactive"};
-
-		if (_workflowEnabled) {
-			navigationKeys = ArrayUtil.append(
-				navigationKeys, new String[] {"pending", "draft"});
-		}
-
-		return navigationKeys;
+		return new String[] {"active", "inactive"};
 	}
 
 	@Override
@@ -305,50 +339,11 @@ public class ViewAccountEntriesManagementToolbarDisplayContext
 		return new String[] {"name"};
 	}
 
-	private void _addFilterTypeDropdownItems(
-		List<DropdownItem> filterDropdownItems) {
-
-		filterDropdownItems.add(
-			1,
-			DropdownGroupItemBuilder.setDropdownItems(
-				getDropdownItems(
-					getDefaultEntriesMap(_getFilterByTypeKeys()),
-					getPortletURL(), "type", _getType())
-			).setLabel(
-				LanguageUtil.get(httpServletRequest, "filter-by-type")
-			).build());
-	}
-
-	private String[] _getFilterByTypeKeys() {
-		return GetterUtil.getStringValues(
-			liferayPortletRequest.getAttribute(
-				AccountWebKeys.ACCOUNT_ENTRY_ALLOWED_TYPES),
-			AccountConstants.ACCOUNT_ENTRY_TYPES);
-	}
-
-	private String _getType() {
+	protected String getType() {
 		return ParamUtil.getString(liferayPortletRequest, "type", "all");
-	}
-
-	private boolean _isWorkflowEnabled(long companyId) {
-		Supplier<WorkflowDefinitionLink> workflowDefinitionLinkSupplier = () ->
-			WorkflowDefinitionLinkLocalServiceUtil.fetchWorkflowDefinitionLink(
-				companyId, GroupConstants.DEFAULT_LIVE_GROUP_ID,
-				AccountEntry.class.getName(), 0, 0);
-
-		if (WorkflowThreadLocal.isEnabled() &&
-			WorkflowEngineManagerUtil.isDeployed() &&
-			(workflowDefinitionLinkSupplier.get() != null)) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ViewAccountEntriesManagementToolbarDisplayContext.class);
-
-	private final boolean _workflowEnabled;
 
 }

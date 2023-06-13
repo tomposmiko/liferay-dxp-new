@@ -96,8 +96,23 @@
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
+		<servlet-name>Atom Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.servlet.AtomServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet>
 		<servlet-name>Combo Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.ComboServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet>
+		<servlet-name>Display Chart</servlet-name>
+		<servlet-class>com.liferay.portal.servlet.DisplayChartServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet>
+		<servlet-name>Dynamic Resource Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.webserver.DynamicResourceServlet</servlet-class>
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
@@ -143,8 +158,8 @@
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
-		<servlet-name>JSON Web Service Redirect Servlet</servlet-name>
-		<servlet-class>com.liferay.portal.jsonwebservice.JSONWebServiceRedirectServlet</servlet-class>
+		<servlet-name>JSON Web Service Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.jsonwebservice.JSONWebServiceServlet</servlet-class>
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
@@ -160,6 +175,11 @@
 	<servlet>
 		<servlet-name>Netvibes Servlet</servlet-name>
 		<servlet-class>com.liferay.portal.servlet.NetvibesServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet>
+		<servlet-name>Poller Servlet</servlet-name>
+		<servlet-class>com.liferay.portal.poller.PollerServlet</servlet-class>
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
@@ -240,6 +260,14 @@
 		<url-pattern>/combo/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>Display Chart</servlet-name>
+		<url-pattern>/display_chart/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Dynamic Resource Servlet</servlet-name>
+		<url-pattern>/sprite/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>Friendly URL Servlet - Private Group</servlet-name>
 		<url-pattern>/group/*</url-pattern>
 	</servlet-mapping>
@@ -293,19 +321,11 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/ca-ES-VALENCIA/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/ca_AD/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/ca_ES/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/ca_ES_VALENCIA/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
@@ -389,35 +409,11 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/es-AR/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/es-CO/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/es-ES/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/es-MX/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/es_AR/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/es_CO/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/es_ES/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/es_MX/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
@@ -597,18 +593,6 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/km/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/km-KH/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/km_KH/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>I18n Servlet</servlet-name>
 		<url-pattern>/ko/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
@@ -777,7 +761,7 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
-		<url-pattern>/sr-RS-latin/*</url-pattern>
+		<url-pattern>/sr-RS_latin/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>I18n Servlet</servlet-name>
@@ -888,6 +872,10 @@
 		<url-pattern>/netvibes/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>Poller Servlet</servlet-name>
+		<url-pattern>/poller/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>Portal Delegator Servlet</servlet-name>
 		<url-pattern>/delegate/*</url-pattern>
 	</servlet-mapping>
@@ -940,11 +928,15 @@
 		<url-pattern>/xmlrpc/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>Atom Servlet</servlet-name>
+		<url-pattern>/api/atom/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>JSON Servlet</servlet-name>
 		<url-pattern>/api/json/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>JSON Web Service Redirect Servlet</servlet-name>
+		<servlet-name>JSON Web Service Servlet</servlet-name>
 		<url-pattern>/api/jsonws/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>

@@ -105,7 +105,6 @@ public class MockLiferayPortletContext implements LiferayPortletContext {
 		return null;
 	}
 
-	@Override
 	public Portlet getPortlet() {
 		return null;
 	}
@@ -149,7 +148,6 @@ public class MockLiferayPortletContext implements LiferayPortletContext {
 		return null;
 	}
 
-	@Override
 	public ServletContext getServletContext() {
 		return null;
 	}

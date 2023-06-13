@@ -19,34 +19,30 @@ import com.liferay.layout.seo.service.LayoutSEOSiteLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.change.tracking.CTTransactionException;
 import com.liferay.portal.kernel.exception.LocaleException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.LayoutSetService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -57,7 +53,6 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.liveusers.LiveUsers;
-import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.ratings.kernel.RatingsType;
 import com.liferay.site.admin.web.internal.constants.SiteAdminConstants;
 import com.liferay.site.admin.web.internal.constants.SiteAdminPortletKeys;
@@ -66,7 +61,6 @@ import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.initializer.SiteInitializerRegistry;
 import com.liferay.sites.kernel.util.Sites;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +78,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SiteAdminPortletKeys.SITE_ADMIN,
 		"mvc.command.name=/site_admin/add_group"
@@ -97,13 +92,13 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		try {
-			Callable<Group> callable = new GroupCallable(actionRequest);
+			Callable<Group> groupCallable = new GroupCallable(actionRequest);
 
 			Group group = TransactionInvokerUtil.invoke(
-				_transactionConfig, callable);
+				_transactionConfig, groupCallable);
 
 			long liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 
@@ -123,9 +118,7 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 				"redirect", siteAdministrationURL.toString());
 			siteAdministrationURL.setParameter(
 				"historyKey",
-				HttpComponentsUtil.getParameter(
-					ParamUtil.getString(actionRequest, "redirect"),
-					actionResponse.getNamespace() + "historyKey", false));
+				ActionUtil.getHistoryKey(actionRequest, actionResponse));
 
 			jsonObject.put("redirectURL", siteAdministrationURL.toString());
 
@@ -149,7 +142,6 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 			throw ctTransactionException;
 		}
 		catch (Exception exception) {
-			hideDefaultErrorMessage(actionRequest);
 			hideDefaultSuccessMessage(actionRequest);
 
 			_groupExceptionRequestHandler.handlePortalException(
@@ -206,10 +198,10 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContextThreadLocal.pushServiceContext(serviceContext);
 
 		String name = ParamUtil.getString(actionRequest, "name");
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 		int type = ParamUtil.getInteger(
 			actionRequest, "type", GroupConstants.TYPE_SITE_OPEN);
 		String friendlyURL = ParamUtil.getString(
@@ -236,7 +228,7 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 		boolean openGraphEnabled = ParamUtil.getBoolean(
 			actionRequest, "openGraphEnabled", true);
 		Map<Locale, String> openGraphImageAltMap =
-			_localization.getLocalizationMap(
+			LocalizationUtil.getLocalizationMap(
 				actionRequest, "openGraphImageAlt");
 		long openGraphImageFileEntryId = ParamUtil.getLong(
 			actionRequest, "openGraphImageFileEntryId");
@@ -301,27 +293,6 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 
 				typeSettingsUnicodeProperties.setProperty(
 					"googleAnalyticsId", googleAnalyticsId);
-			}
-			else if (StringUtil.equalsIgnoreCase(
-						analyticsType, "googleAnalytics4")) {
-
-				String googleAnalytics4CustomConfiguration =
-					ParamUtil.getString(
-						actionRequest, "googleAnalytics4CustomConfiguration",
-						typeSettingsUnicodeProperties.getProperty(
-							"googleAnalytics4CustomConfiguration"));
-
-				typeSettingsUnicodeProperties.setProperty(
-					"googleAnalytics4CustomConfiguration",
-					googleAnalytics4CustomConfiguration);
-
-				String googleAnalytics4Id = ParamUtil.getString(
-					actionRequest, "googleAnalytics4Id",
-					typeSettingsUnicodeProperties.getProperty(
-						"googleAnalytics4Id"));
-
-				typeSettingsUnicodeProperties.setProperty(
-					"googleAnalytics4Id", googleAnalytics4Id);
 			}
 			else {
 				String analyticsScript = ParamUtil.getString(
@@ -391,9 +362,10 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 			formTypeSettingsUnicodeProperties.setProperty(
 				PropsKeys.LOCALES,
 				StringUtil.merge(
-					LocaleUtil.toLanguageIds(_language.getAvailableLocales())));
+					LocaleUtil.toLanguageIds(
+						LanguageUtil.getAvailableLocales())));
 
-			User user = themeDisplay.getGuestUser();
+			User user = themeDisplay.getDefaultUser();
 
 			formTypeSettingsUnicodeProperties.setProperty(
 				"languageId", user.getLanguageId());
@@ -437,7 +409,7 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 
 		// Virtual hosts
 
-		Set<Locale> availableLocales = _language.getAvailableLocales(
+		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(
 			liveGroup.getGroupId());
 
 		_layoutSetService.updateVirtualHosts(
@@ -527,28 +499,7 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 
 		ActionUtil.updateLayoutSetPrototypesLinks(actionRequest, group);
 
-		long layoutSetPrototypeId = ParamUtil.getLong(
-			actionRequest, "layoutSetPrototypeId");
-
-		Group layoutSetPrototypeGroup =
-			_groupLocalService.getLayoutSetPrototypeGroup(
-				group.getCompanyId(), layoutSetPrototypeId);
-
-		List<WorkflowDefinitionLink> workflowDefinitionLinks =
-			_workflowDefinitionLinkLocalService.getWorkflowDefinitionLinks(
-				group.getCompanyId(), layoutSetPrototypeGroup.getGroupId(), 0);
-
-		for (WorkflowDefinitionLink workflowDefinitionLink :
-				workflowDefinitionLinks) {
-
-			_workflowDefinitionLinkLocalService.addWorkflowDefinitionLink(
-				group.getCreatorUserId(), group.getCompanyId(),
-				group.getGroupId(), workflowDefinitionLink.getClassName(),
-				workflowDefinitionLink.getClassPK(),
-				workflowDefinitionLink.getTypePK(),
-				workflowDefinitionLink.getWorkflowDefinitionName(),
-				workflowDefinitionLink.getWorkflowDefinitionVersion());
-		}
+		ActionUtil.updateWorkflowDefinitionLinks(actionRequest, group);
 	}
 
 	private static final TransactionConfig _transactionConfig =
@@ -559,16 +510,7 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 	private GroupExceptionRequestHandler _groupExceptionRequestHandler;
 
 	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
 	private GroupService _groupService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private LayoutSEOSiteLocalService _layoutSEOSiteLocalService;
@@ -577,34 +519,16 @@ public class AddGroupMVCActionCommand extends BaseMVCActionCommand {
 	private LayoutSetService _layoutSetService;
 
 	@Reference
-	private Localization _localization;
-
-	@Reference
 	private Portal _portal;
 
 	@Reference
 	private SiteInitializerRegistry _siteInitializerRegistry;
 
-	@Reference
-	private WorkflowDefinitionLinkLocalService
-		_workflowDefinitionLinkLocalService;
-
 	private class GroupCallable implements Callable<Group> {
 
 		@Override
 		public Group call() throws Exception {
-			try {
-				return _updateGroup(_actionRequest);
-			}
-			catch (Exception exception) {
-
-				// LPS-169057
-
-				PermissionCacheUtil.clearCache(
-					_portal.getUserId(_actionRequest));
-
-				throw exception;
-			}
+			return _updateGroup(_actionRequest);
 		}
 
 		private GroupCallable(ActionRequest actionRequest) {

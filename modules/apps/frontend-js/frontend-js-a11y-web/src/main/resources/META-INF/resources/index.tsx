@@ -19,6 +19,25 @@ import {A11yIframe} from './A11yIframe';
 
 import type {A11yCheckerOptions} from './A11yChecker';
 
+declare global {
+	var Liferay: {
+		Language: {
+			get(value: string): string;
+		};
+		Util: {
+			sub(...value: string[]): string;
+		};
+	};
+
+	interface ThemeDisplay {
+		isStatePopUp(): boolean;
+	}
+
+	interface Window {
+		themeDisplay: ThemeDisplay;
+	}
+}
+
 const DEFAULT_CONTAINER_ID = 'a11yContainer';
 
 const getDefaultContainer = () => {
@@ -33,12 +52,10 @@ const getDefaultContainer = () => {
 	return container;
 };
 
-export default function main(
-	props: Omit<A11yCheckerOptions, 'callback' | 'targets'>
-) {
+export default (props: Omit<A11yCheckerOptions, 'callback' | 'targets'>) => {
 	render(
 		window.themeDisplay.isStatePopUp() ? A11yIframe : A11y,
 		props,
 		getDefaultContainer()
 	);
-}
+};

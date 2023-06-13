@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  */
-@Component(service = ReportCompiler.class)
+@Component(immediate = true, service = ReportCompiler.class)
 public class CachedReportCompiler implements ReportCompiler {
 
 	@Override

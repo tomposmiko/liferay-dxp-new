@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  * @author André de Oliveira
  */
-@Component(service = SearchResultContributor.class)
+@Component(immediate = true, service = SearchResultContributor.class)
 public class MBMessageCommentSearchResultContributor
 	implements SearchResultContributor {
 
@@ -68,10 +68,19 @@ public class MBMessageCommentSearchResultContributor
 		return MBMessage.class.getName();
 	}
 
-	@Reference
-	private CommentManager _commentManager;
+	@Reference(unbind = "-")
+	public void setCommentManager(CommentManager commentManager) {
+		_commentManager = commentManager;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	public void setMBMessageLocalService(
+		MBMessageLocalService mbMessageLocalService) {
+
+		_mbMessageLocalService = mbMessageLocalService;
+	}
+
+	private CommentManager _commentManager;
 	private MBMessageLocalService _mbMessageLocalService;
 
 }

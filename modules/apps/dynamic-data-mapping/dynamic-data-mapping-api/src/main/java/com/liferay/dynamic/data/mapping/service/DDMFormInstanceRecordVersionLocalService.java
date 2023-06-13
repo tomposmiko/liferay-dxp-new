@@ -107,12 +107,10 @@ public interface DDMFormInstanceRecordVersionLocalService
 	 *
 	 * @param ddmFormInstanceRecordVersion the ddm form instance record version
 	 * @return the ddm form instance record version that was removed
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	public DDMFormInstanceRecordVersion deleteDDMFormInstanceRecordVersion(
-			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion)
-		throws PortalException;
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion);
 
 	/**
 	 * Deletes the ddm form instance record version with the primary key from the database. Also notifies the appropriate model listeners.
@@ -270,10 +268,6 @@ public interface DDMFormInstanceRecordVersionLocalService
 	public List<DDMFormInstanceRecordVersion> getFormInstanceRecordVersions(
 		long ddmFormInstanceRecordId, int start, int end,
 		OrderByComparator<DDMFormInstanceRecordVersion> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<DDMFormInstanceRecordVersion> getFormInstanceRecordVersions(
-		long userId, long formInstanceId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFormInstanceRecordVersionsCount(long ddmFormInstanceRecordId);

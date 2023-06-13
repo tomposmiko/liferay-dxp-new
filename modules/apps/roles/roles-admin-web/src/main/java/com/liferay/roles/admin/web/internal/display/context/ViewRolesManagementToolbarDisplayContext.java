@@ -20,13 +20,13 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.rolesadmin.search.RoleSearch;
 import com.liferay.portlet.rolesadmin.search.RoleSearchTerms;
-import com.liferay.roles.admin.constants.RolesAdminPortletKeys;
 import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
 import com.liferay.roles.admin.web.internal.role.type.contributor.util.RoleTypeContributorRetrieverUtil;
 import com.liferay.roles.admin.web.internal.search.RoleChecker;
@@ -96,11 +95,12 @@ public class ViewRolesManagementToolbarDisplayContext {
 					"/edit_role.jsp", "redirect", getPortletURL(), "tabs1",
 					"details", "roleType",
 					String.valueOf(_currentRoleTypeContributor.getType()));
+
+				String label = _currentRoleTypeContributor.getTitle(
+					_renderRequest.getLocale());
+
 				dropdownItem.setLabel(
-					LanguageUtil.get(
-						_httpServletRequest,
-						_currentRoleTypeContributor.getTitle(
-							_renderRequest.getLocale())));
+					LanguageUtil.get(_httpServletRequest, label));
 			}
 		).build();
 	}
@@ -132,25 +132,19 @@ public class ViewRolesManagementToolbarDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
+		if (Validator.isNull(_orderByCol)) {
+			_orderByCol = ParamUtil.getString(
+				_httpServletRequest, "orderByCol", "title");
 		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, RolesAdminPortletKeys.ROLES_ADMIN,
-			"view-roles-order-by-col", "title");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
+		if (Validator.isNull(_orderByType)) {
+			_orderByType = ParamUtil.getString(
+				_httpServletRequest, "orderByType", "asc");
 		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, RolesAdminPortletKeys.ROLES_ADMIN,
-			"view-roles-order-by-type", "asc");
 
 		return _orderByType;
 	}
@@ -203,6 +197,9 @@ public class ViewRolesManagementToolbarDisplayContext {
 
 		RoleSearch roleSearch = new RoleSearch(_renderRequest, getPortletURL());
 
+		roleSearch.setRowChecker(
+			new RoleChecker(_renderRequest, _renderResponse));
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -210,14 +207,14 @@ public class ViewRolesManagementToolbarDisplayContext {
 		RoleSearchTerms roleSearchTerms =
 			(RoleSearchTerms)roleSearch.getSearchTerms();
 
-		roleSearch.setResultsAndTotal(
+		BaseModelSearchResult<Role> baseModelSearchResult =
 			_currentRoleTypeContributor.searchRoles(
 				themeDisplay.getCompanyId(), roleSearchTerms.getKeywords(),
 				roleSearch.getStart(), roleSearch.getEnd(),
-				roleSearch.getOrderByComparator()));
+				roleSearch.getOrderByComparator());
 
-		roleSearch.setRowChecker(
-			new RoleChecker(_renderRequest, _renderResponse));
+		roleSearch.setResults(baseModelSearchResult.getBaseModels());
+		roleSearch.setTotal(baseModelSearchResult.getLength());
 
 		_roleSearch = roleSearch;
 

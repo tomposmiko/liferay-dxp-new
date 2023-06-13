@@ -105,8 +105,6 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 				<%
 				CPDefinition cpDefinition = commerceOrderItem.getCPDefinition();
-
-				String cpInstanceCDNURL = commerceCartContentMiniDisplayContext.getCPInstanceCDNURL(commerceOrderItem);
 				%>
 
 				<liferay-ui:search-container-column-text
@@ -114,17 +112,10 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 				>
 					<span class="sticker sticker-xl">
 						<span class="sticker-overlay">
-							<c:choose>
-								<c:when test="<%= Validator.isNotNull(cpInstanceCDNURL) %>">
-									<img class="sticker-img" src="<%= cpInstanceCDNURL %>" />
-								</c:when>
-								<c:otherwise>
-									<liferay-adaptive-media:img
-										class="sticker-img"
-										fileVersion="<%= commerceCartContentMiniDisplayContext.getCPInstanceImageFileVersion(commerceOrderItem) %>"
-									/>
-								</c:otherwise>
-							</c:choose>
+							<liferay-adaptive-media:img
+								class="sticker-img"
+								fileVersion="<%= commerceCartContentMiniDisplayContext.getCPInstanceImageFileVersion(commerceOrderItem) %>"
+							/>
 						</span>
 					</span>
 				</liferay-ui:search-container-column-text>
@@ -287,8 +278,24 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 	</ul>
 
 	<%@ include file="/cart_mini/transition.jspf" %>
-</liferay-ddm:template-renderer>
 
-<liferay-frontend:component
-	module="js/cart_mini/view"
-/>
+	<aui:script use="aui-base">
+		var orderTransition = A.one('#<portlet:namespace />orderTransition');
+
+		if (orderTransition) {
+			orderTransition.delegate(
+				'click',
+				(event) => {
+					<portlet:namespace />transition(event);
+				},
+				'.transition-link'
+			);
+		}
+	</aui:script>
+
+	<aui:script>
+		Liferay.after('current-order-updated', (event) => {
+			Liferay.Portlet.refresh('#p_p_id<portlet:namespace />');
+		});
+	</aui:script>
+</liferay-ddm:template-renderer>

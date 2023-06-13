@@ -20,7 +20,7 @@ import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.field.type.URLInfoFieldType;
 import com.liferay.info.item.field.reader.InfoItemFieldReader;
 import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
-import com.liferay.info.item.field.reader.InfoItemFieldReaderRegistry;
+import com.liferay.info.item.field.reader.InfoItemFieldReaderTracker;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.sanitizer.SanitizerException;
@@ -39,7 +39,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  * @author Jorge Ferrer
  */
-@Component(service = InfoItemFieldReaderFieldSetProvider.class)
+@Component(
+	immediate = true, service = InfoItemFieldReaderFieldSetProvider.class
+)
 public class InfoItemFieldReaderFieldSetProviderImpl
 	implements InfoItemFieldReaderFieldSetProvider {
 
@@ -49,7 +51,7 @@ public class InfoItemFieldReaderFieldSetProviderImpl
 		).infoFieldSetEntry(
 			unsafeConsumer -> {
 				List<InfoItemFieldReader> infoItemFieldReaders =
-					_infoItemFieldReaderRegistry.getInfoItemFieldReaders(
+					_infoItemFieldReaderTracker.getInfoItemFieldReaders(
 						className);
 
 				for (InfoItemFieldReader infoItemFieldReader :
@@ -72,7 +74,7 @@ public class InfoItemFieldReaderFieldSetProviderImpl
 		List<InfoFieldValue<Object>> infoFieldValues = new ArrayList<>();
 
 		List<InfoItemFieldReader> infoItemFieldReaders =
-			_infoItemFieldReaderRegistry.getInfoItemFieldReaders(className);
+			_infoItemFieldReaderTracker.getInfoItemFieldReaders(className);
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -105,6 +107,6 @@ public class InfoItemFieldReaderFieldSetProviderImpl
 	}
 
 	@Reference
-	private InfoItemFieldReaderRegistry _infoItemFieldReaderRegistry;
+	private InfoItemFieldReaderTracker _infoItemFieldReaderTracker;
 
 }

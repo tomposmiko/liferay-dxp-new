@@ -2,7 +2,7 @@
 definition {
 
 	property osgi.module.configuration.file.names = "com.liferay.portal.search.web.internal.configuration.SearchWebConfiguration.config";
-	property osgi.module.configurations = "classicSearchPortletInFrontPage=\"true\"";
+	property osgi.module.configurations = "classicSearchPortletInFrontPage=&quot;true&quot;";
 	property portal.release = "true";
 	property portal.suite.search.engine = "elasticsearch7";
 	property portal.upstream = "true";
@@ -17,18 +17,28 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchByAssetAndModifiedRangeFacets {
-		JSONBlog.addEntry(
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Blogs");
+
+		Blogs.addEntry(
 			entryContent = "Blogs Entry1 AssetContent",
 			entryTitle = "Blogs Entry1 Title");
 
-		JSONBlog.addEntry(
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Blogs");
+
+		Blogs.addEntry(
 			entryContent = "Blogs Entry2 Content",
 			entryTitle = "Blogs Entry2 Title");
 
@@ -42,87 +52,126 @@ definition {
 			groupName = "Guest",
 			title = "WC WebContent2 Title");
 
-		JSONWiki.addWikiPage(
-			groupName = "Guest",
-			wikiNodeName = "Main",
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Wiki");
+
+		WikiNavigator.gotoNode(wikiNodeName = "Main");
+
+		WikiNavigator.gotoAllPagesCP();
+
+		WikiPage.addCP(
 			wikiPageContent = "Wiki Page1 Content",
-			wikiPageName = "Wiki Page1 Title");
+			wikiPageTitle = "Wiki Page1 Title");
 
-		JSONWiki.addWikiPage(
-			groupName = "Guest",
-			wikiNodeName = "Main",
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Wiki");
+
+		WikiNavigator.gotoNode(wikiNodeName = "Main");
+
+		WikiNavigator.gotoAllPagesCP();
+
+		WikiPage.addCP(
 			wikiPageContent = "Wiki Page2 AssetContent",
-			wikiPageName = "Wiki Page2 Title");
+			wikiPageTitle = "Wiki Page2 Title");
 
-		JSONDocument.addFileWithUploadedFile(
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Documents and Media");
+
+		DMDocument.addCP(
 			dmDocumentDescription = "DM Document AssetContent Description ",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Guest",
-			mimeType = "application/msword",
-			sourceFileName = "Document_1.doc");
+			dmDocumentFile = "Document_1.doc",
+			dmDocumentSize = "22k",
+			dmDocumentTitle = "DM Document Title");
+
+		Navigator.openURL();
 
 		ClassicSearch.search(searchTerm = '''"AssetContent"''');
 
 		for (var searchAssetTitle : list "Blogs Entry1 Title,WC WebContent2 Title,Wiki Page2 Title,DM Document Title") {
-			var key_searchAssetTitle = ${searchAssetTitle};
+			var key_searchAssetTitle = "${searchAssetTitle}";
 
 			AssertTextEquals(
 				locator1 = "SearchResults#CLASSIC_ASSET_ENTRY_TABLE_TITLE",
-				value1 = ${searchAssetTitle});
+				value1 = "${searchAssetTitle}");
 		}
 
 		for (var searchAssetTitle : list "Blogs Entry2 Title,WC WebContent1 Title,Wiki Page1 Title") {
-			var key_searchAssetTitle = ${searchAssetTitle};
+			var key_searchAssetTitle = "${searchAssetTitle}";
 
 			AssertElementNotPresent(locator1 = "SearchResults#CLASSIC_ASSET_ENTRY_TABLE_TITLE");
 		}
 
-		ClassicSearch.viewAssetTypeFacetPG(
-			facetFrequency = 1,
+		// Workaround COMMERCE-7285
+
+		/*ClassicSearch.viewAssetTypeFacetPG(
+			facetFrequency = "1",
 			searchAssetTitle = "Wiki Page2 Title",
-			searchAssetType = "Wiki Page");
+			searchAssetType = "Wiki Page");*/
 
 		ClassicSearch.unscopeAssetFacetPG();
 
 		ClassicSearch.gotoModifiedRangeFacetPG(searchModifiedRange = "Past Month");
 
 		for (var searchAssetTitle : list "Blogs Entry1 Title,WC WebContent2 Title,Wiki Page2 Title,DM Document Title") {
-			var key_searchAssetTitle = ${searchAssetTitle};
+			var key_searchAssetTitle = "${searchAssetTitle}";
 
 			AssertTextEquals(
 				locator1 = "SearchResults#CLASSIC_ASSET_ENTRY_TABLE_TITLE",
-				value1 = ${searchAssetTitle});
+				value1 = "${searchAssetTitle}");
 		}
 
 		for (var searchAssetTitle : list "Blogs Entry2 Title,WC WebContent1 Title,Wiki Page1 Title") {
-			var key_searchAssetTitle = ${searchAssetTitle};
+			var key_searchAssetTitle = "${searchAssetTitle}";
 
 			AssertElementNotPresent(locator1 = "SearchResults#CLASSIC_ASSET_ENTRY_TABLE_TITLE");
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchByPermission {
-		property custom.properties = "jsonws.web.service.paths.excludes=";
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Web Content");
 
-		JSONWebcontent.addWebContent(
-			content = "WC Content",
-			groupName = "Guest",
-			title = "WC Title");
+		WebContentNavigator.gotoAddCP();
 
-		JSONUser.addUser(
+		WebContent.addCP(
+			webContentContent = "WC Content",
+			webContentTitle = "WC Title");
+
+		PortletEntry.publish();
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.addCP(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			newPassword = "password",
-			requireReset = "false",
-			userEmailAddress = "userea@liferay.com");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		Site.openSiteMembershipsAdmin(siteURLKey = "guest");
+		User.editPasswordCP(
+			password = "password",
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn");
+
+		ProductMenu.gotoPortlet(
+			category = "People",
+			portlet = "Memberships");
 
 		Site.addAllMembersCP();
 
@@ -139,26 +188,51 @@ definition {
 			searchAssetType = "Web Content Article");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SearchByUserFacet {
-		property custom.properties = "jsonws.web.service.paths.excludes=";
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		JSONUser.addUser(
+		User.addCP(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			requireReset = "false",
-			userEmailAddress = "userea@liferay.com");
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
 
-		JSONRole.assignRoleToUser(
+		User.editPasswordCP(
+			password = "password",
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.assignRegularRoleCP(
 			roleTitle = "Administrator",
-			userEmailAddress = "userea@liferay.com");
+			userScreenName = "usersn");
 
-		JSONBlog.addEntry(
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			portlet = "Pages");
+
+		SitePages.addPublicPage(pageName = "Blogs Page");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
+
+		Portlet.addPG(portletName = "Blogs");
+
+		Blogs.addEntry(
 			entryContent = "Blogs Super Admin Entry Content",
 			entryTitle = "Blogs Super Admin Entry Title");
 
@@ -168,15 +242,18 @@ definition {
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
-		JSONBlog.addEntry(
+		Navigator.gotoPage(pageName = "Blogs Page");
+
+		Blogs.addEntry(
 			entryContent = "Blogs User Entry Content",
-			entryTitle = "Blogs User Entry Title",
-			userEmailAddress = "userea@liferay.com");
+			entryTitle = "Blogs User Entry Title");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
 
 		ClassicSearch.search(searchTerm = "Entry");
 
 		ClassicSearch.viewUserFacetPG(
-			facetFrequency = 1,
+			facetFrequency = "1",
 			searchAssetSummary = "Blogs Super Admin Entry Content",
 			searchAssetTitle = "Blogs Super Admin Entry Title",
 			searchAssetType = "Blogs Entry",
@@ -191,7 +268,7 @@ definition {
 			value1 = "Any User");
 
 		ClassicSearch.viewUserFacetPG(
-			facetFrequency = 1,
+			facetFrequency = "1",
 			searchAssetSummary = "Blogs User Entry Content",
 			searchAssetTitle = "Blogs User Entry Title",
 			searchAssetType = "Blogs Entry",
@@ -201,17 +278,26 @@ definition {
 			searchAssetSummary = "Blogs Super Admin Entry Content",
 			searchAssetTitle = "Blogs Super Admin Entry Title");
 
-		Navigator.openURL();
+		Navigator.gotoPage(pageName = "Blogs Page");
 
 		ClassicSearch.removeUserFacetDisplayPG();
+
+		Navigator.gotoPage(pageName = "Blogs Page");
 
 		ClassicSearch.search(searchTerm = "Entry");
 
 		AssertElementNotPresent(locator1 = "SearchResults#USER_FACET_ANY_USER");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SearchTwiceScopeEverything {
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
 		JSONUser.addUser(
 			userEmailAddress = "userea1@liferay.com",
 			userFirstName = "userfn1",
@@ -227,6 +313,8 @@ definition {
 		JSONUser.addUserToSite(
 			groupName = "Guest",
 			userEmailAddress = "userea1@liferay.com");
+
+		Navigator.openURL();
 
 		ClassicSearch.configureScope(searchScope = "Everything");
 
@@ -251,8 +339,15 @@ definition {
 			searchAssetType = "User");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SearchTwiceScopeLetUserChoose {
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
 		JSONUser.addUser(
 			userEmailAddress = "userea1@liferay.com",
 			userFirstName = "userfn1",
@@ -268,6 +363,8 @@ definition {
 		JSONUser.addUserToSite(
 			groupName = "Guest",
 			userEmailAddress = "userea1@liferay.com");
+
+		Navigator.openURL();
 
 		ClassicSearch.configureScope(searchScope = "Let the User Choose");
 
@@ -314,8 +411,15 @@ definition {
 			searchAssetType = "User");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test SearchTwiceScopeThisSite {
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
 		JSONUser.addUser(
 			userEmailAddress = "userea1@liferay.com",
 			userFirstName = "userfn1",
@@ -331,6 +435,8 @@ definition {
 		JSONUser.addUserToSite(
 			groupName = "Guest",
 			userEmailAddress = "userea1@liferay.com");
+
+		Navigator.openURL();
 
 		ClassicSearch.configureScope(searchScope = "This Site");
 
@@ -351,36 +457,17 @@ definition {
 		ClassicSearch.viewSearchNoPG(searchAssetTitle = "userfn2 userln2");
 	}
 
-	@priority = 3
-	test SearchWebContentWithCategorization {
-		JSONCategory.addVocabulary(
-			groupName = "Guest",
-			title = "Vocabulary Test");
-
-		var categoryId = JSONCategory.addCategory(
-			groupName = "Guest",
-			title = "category test",
-			vocabularyName = "Vocabulary Test");
-
-		JSONWebcontent.addWebContent(
-			assetCategoryIds = ${categoryId},
-			content = "Web Content Content",
-			groupName = "Guest",
-			title = "web");
-
-		ClassicSearch.search(searchTerm = "web");
-
-		ClassicSearch.viewSearchResultPG(
-			searchAssetTitle = "web",
-			searchAssetType = "Web Content Article");
-	}
-
-	@priority = 4
+	@priority = "4"
 	test ViewSearchResultForLongURL {
-		JSONDocument.addFile(
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			portlet = "Documents and Media");
+
+		DMDocument.addCP(
 			dmDocumentDescription = "DM Document Description 1",
-			dmDocumentTitle = "DM Document Title 1",
-			groupName = "Guest");
+			dmDocumentTitle = "DM Document Title 1");
+
+		Navigator.openURL();
 
 		ClassicSearch.search(searchTerm = "Document");
 

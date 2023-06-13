@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rachael Koestartyo
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class AnalyticsMessagingConfigurator {
 
 	@Activate
@@ -69,11 +69,15 @@ public class AnalyticsMessagingConfigurator {
 		_bundleContext = null;
 	}
 
+	@Reference(unbind = "-")
+	protected void setDestinationFactory(
+		DestinationFactory destinationFactory) {
+
+		_destinationFactory = destinationFactory;
+	}
+
 	private volatile BundleContext _bundleContext;
-
-	@Reference
 	private DestinationFactory _destinationFactory;
-
 	private ServiceRegistration<Destination> _serviceRegistration;
 
 }

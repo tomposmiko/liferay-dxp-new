@@ -6,28 +6,22 @@ definition {
 	property testray.main.component.name = "Fragments";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
+		User.firstLoginPG();
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
-		task ("Add a content page") {
-			JSONLayout.addPublicLayout(
-				groupName = "Test Site Name",
-				layoutName = "Content Page Name",
-				type = "content");
-		}
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Content Page Name",
+			type = "content");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -36,7 +30,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-95042, LPS-108339 and LPS-122017. View the Banner Center in content page. Can add Banner Center directly without Container to page."
-	@priority = 4
+	@priority = "4"
 	test ViewBannerCenterInContentPage {
 		task ("Add a Banner Center to page") {
 			ContentPagesNavigator.openEditContentPage(
@@ -51,8 +45,8 @@ definition {
 
 		task ("View the Banner Center is not inside of Container element") {
 			AssertElementNotPresent(
-				key_elementHeader = "//div[@aria-label='Container']//div[contains(@class,'page-editor__topper__content')]//div[contains(@class,'bg-gray500Color')][contains(@class,'page-editor__container')]",
-				key_position = 1,
+				key_elementHeader = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Container')]//following-sibling::div[contains(@class,'page-editor__topper__content')]//div[contains(@class,'bg-gray500Color')][contains(@class,'page-editor__container')]",
+				key_position = "1",
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 		}
 
@@ -74,7 +68,7 @@ definition {
 
 			PageEditor.viewContainerStyle(backgroundColor = "gray-500");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the Banner Center shown in view mode") {
@@ -82,25 +76,28 @@ definition {
 				pageName = "Content Page Name",
 				siteName = "Test Site Name");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
+			AssertVisible(
 				id = "element-text",
-				text = "Banner Title Example");
+				key_position = "1",
+				key_text = "Banner Title Example",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "paragraph",
+			AssertVisible(
 				id = "element-text",
-				text = "This is a simple banner component that you can use when you need extra attention to featured content or information.");
+				key_position = "2",
+				key_text = "This is a simple banner component that you can use when you need extra attention to featured content or information.",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
+			AssertVisible(
 				id = "link",
-				text = "Go Somewhere");
+				key_position = "1",
+				key_text = "Go Somewhere",
+				locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_AT_VIEW_MODE");
 
-			ContentPages.viewFragmentCommonStyle(
-				fragmentName = "container",
-				styleName = "backgroundColor",
-				styleValue = "gray-500");
+			AssertVisible(
+				backgroundImageStyle = "background-color: var(--gray-500)",
+				locator1 = "Fragment#BACKGROUND_IMAGE_STYLE",
+				position = "1");
 		}
 	}
 

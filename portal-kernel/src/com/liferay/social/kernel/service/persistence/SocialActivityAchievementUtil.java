@@ -14,6 +14,7 @@
 
 package com.liferay.social.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -1310,9 +1311,16 @@ public class SocialActivityAchievementUtil {
 	}
 
 	public static SocialActivityAchievementPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(SocialActivityAchievementPersistence)
+					PortalBeanLocatorUtil.locate(
+						SocialActivityAchievementPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile SocialActivityAchievementPersistence _persistence;
+	private static SocialActivityAchievementPersistence _persistence;
 
 }

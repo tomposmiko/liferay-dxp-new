@@ -20,7 +20,6 @@ import com.liferay.message.boards.model.MBCategoryTable;
 import com.liferay.message.boards.model.impl.MBCategoryImpl;
 import com.liferay.message.boards.model.impl.MBCategoryModelImpl;
 import com.liferay.message.boards.service.persistence.MBCategoryPersistence;
-import com.liferay.message.boards.service.persistence.MBCategoryUtil;
 import com.liferay.message.boards.service.persistence.impl.constants.MBPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -40,6 +39,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -51,11 +51,10 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = MBCategoryPersistence.class)
+@Component(service = {MBCategoryPersistence.class, BasePersistence.class})
 public class MBCategoryPersistenceImpl
 	extends BasePersistenceImpl<MBCategory> implements MBCategoryPersistence {
 
@@ -206,7 +205,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -595,7 +594,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -731,7 +730,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof MBCategory) {
@@ -851,7 +850,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1023,7 +1022,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -1444,7 +1443,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1605,7 +1604,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -2294,7 +2293,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2486,7 +2485,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -2853,7 +2852,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3004,7 +3003,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -3925,7 +3924,7 @@ public class MBCategoryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param parentCategoryIds the parent category IDs
+	 * @param parentCategoryId the parent category ID
 	 * @param start the lower bound of the range of message boards categories
 	 * @param end the upper bound of the range of message boards categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3975,7 +3974,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_P, finderArgs, this);
+				_finderPathWithPaginationFindByG_P, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -4095,7 +4094,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, parentCategoryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4168,7 +4167,7 @@ public class MBCategoryPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_P, finderArgs, this);
+				_finderPathWithPaginationCountByG_P, finderArgs);
 		}
 
 		if (count == null) {
@@ -4462,7 +4461,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -5193,7 +5192,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5402,7 +5401,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -5799,7 +5798,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {companyId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5954,7 +5953,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -6573,9 +6572,9 @@ public class MBCategoryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBCategoryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param groupId the group ID
-	 * @param parentCategoryIds the parent category IDs
+	 * @param parentCategoryId the parent category ID
 	 * @param start the lower bound of the range of message boards categories
 	 * @param end the upper bound of the range of message boards categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -6635,7 +6634,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				_finderPathWithPaginationFindByNotC_G_P, finderArgs, this);
+				_finderPathWithPaginationFindByNotC_G_P, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -6778,7 +6777,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {categoryId, groupId, parentCategoryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6866,7 +6865,7 @@ public class MBCategoryPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByNotC_G_P, finderArgs, this);
+				_finderPathWithPaginationCountByNotC_G_P, finderArgs);
 		}
 
 		if (count == null) {
@@ -7222,7 +7221,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -8199,7 +8198,7 @@ public class MBCategoryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param parentCategoryIds the parent category IDs
+	 * @param parentCategoryId the parent category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards categories
 	 * @param end the upper bound of the range of message boards categories (not inclusive)
@@ -8251,7 +8250,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_P_S, finderArgs, this);
+				_finderPathWithPaginationFindByG_P_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -8380,7 +8379,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, parentCategoryId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -8460,7 +8459,7 @@ public class MBCategoryPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_P_S, finderArgs, this);
+				_finderPathWithPaginationCountByG_P_S, finderArgs);
 		}
 
 		if (count == null) {
@@ -8779,7 +8778,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -9756,7 +9755,7 @@ public class MBCategoryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param parentCategoryIds the parent category IDs
+	 * @param parentCategoryId the parent category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards categories
 	 * @param end the upper bound of the range of message boards categories (not inclusive)
@@ -9808,7 +9807,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_P_NotS, finderArgs, this);
+				_finderPathWithPaginationFindByG_P_NotS, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -9942,7 +9941,7 @@ public class MBCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, parentCategoryId, status};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -10022,7 +10021,7 @@ public class MBCategoryPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_P_NotS, finderArgs, this);
+				_finderPathWithPaginationCountByG_P_NotS, finderArgs);
 		}
 
 		if (count == null) {
@@ -10347,7 +10346,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -11004,9 +11003,9 @@ public class MBCategoryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>MBCategoryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param categoryIds the category IDs
+	 * @param categoryId the category ID
 	 * @param groupId the group ID
-	 * @param parentCategoryIds the parent category IDs
+	 * @param parentCategoryId the parent category ID
 	 * @param status the status
 	 * @param start the lower bound of the range of message boards categories
 	 * @param end the upper bound of the range of message boards categories (not inclusive)
@@ -11067,7 +11066,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				_finderPathWithPaginationFindByNotC_G_P_S, finderArgs, this);
+				_finderPathWithPaginationFindByNotC_G_P_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBCategory mbCategory : list) {
@@ -11221,7 +11220,7 @@ public class MBCategoryPersistenceImpl
 				categoryId, groupId, parentCategoryId, status
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11315,7 +11314,7 @@ public class MBCategoryPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByNotC_G_P_S, finderArgs, this);
+				_finderPathWithPaginationCountByNotC_G_P_S, finderArgs);
 		}
 
 		if (count == null) {
@@ -11711,7 +11710,7 @@ public class MBCategoryPersistenceImpl
 		mbCategory.setNew(true);
 		mbCategory.setPrimaryKey(categoryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		mbCategory.setUuid(uuid);
 
@@ -11829,7 +11828,7 @@ public class MBCategoryPersistenceImpl
 			(MBCategoryModelImpl)mbCategory;
 
 		if (Validator.isNull(mbCategory.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			mbCategory.setUuid(uuid);
 		}
@@ -11953,9 +11952,7 @@ public class MBCategoryPersistenceImpl
 	 */
 	@Override
 	public MBCategory fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				MBCategory.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(MBCategory.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -12171,7 +12168,7 @@ public class MBCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBCategory>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -12247,7 +12244,7 @@ public class MBCategoryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -12622,30 +12619,11 @@ public class MBCategoryPersistenceImpl
 				"categoryId", "groupId", "parentCategoryId", "status"
 			},
 			false);
-
-		_setMBCategoryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMBCategoryUtilPersistence(null);
-
 		entityCache.removeCache(MBCategoryImpl.class.getName());
-	}
-
-	private void _setMBCategoryUtilPersistence(
-		MBCategoryPersistence mbCategoryPersistence) {
-
-		try {
-			Field field = MBCategoryUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mbCategoryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -12738,6 +12716,6 @@ public class MBCategoryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private MBCategoryModelArgumentsResolver _mbCategoryModelArgumentsResolver;
 
 }

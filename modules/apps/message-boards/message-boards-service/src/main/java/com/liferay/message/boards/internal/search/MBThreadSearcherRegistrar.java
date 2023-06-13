@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Luan Maoski
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class MBThreadSearcherRegistrar {
 
 	@Activate

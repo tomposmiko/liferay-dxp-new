@@ -15,7 +15,6 @@
 import '@testing-library/jest-dom/extend-expect';
 import {cleanup, render} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {FormProvider} from 'data-engine-js-components-web';
 import React from 'react';
 
 import Numeric from '../../../src/main/resources/META-INF/resources/Numeric/Numeric';
@@ -78,12 +77,9 @@ describe('Field Numeric', () => {
 	});
 
 	it('has a label', () => {
-		const {getAllByText} = render(<Numeric label="label" />);
+		const {getByText} = render(<Numeric label="label" />);
 
-		const allByText = getAllByText(/label/);
-		expect(allByText).toHaveLength(2);
-		expect(allByText[0]).toBeInTheDocument();
-		expect(allByText[1]).toBeInTheDocument();
+		expect(getByText(/label/)).toBeInTheDocument();
 	});
 
 	it('has a placeholder', () => {
@@ -101,14 +97,9 @@ describe('Field Numeric', () => {
 	});
 
 	it('renders Label if showLabel is true', () => {
-		const {getAllByText} = render(
-			<Numeric label="Numeric Field" showLabel />
-		);
+		const {getByText} = render(<Numeric label="Numeric Field" showLabel />);
 
-		const allByText = getAllByText(/Numeric Field/);
-		expect(allByText).toHaveLength(2);
-		expect(allByText[0]).toHaveClass('ddm-label');
-		expect(allByText[1]).toHaveClass('sr-only');
+		expect(getByText(/Numeric Field/)).toHaveClass('ddm-label');
 	});
 
 	it('has a value', () => {
@@ -165,39 +156,6 @@ describe('Field Numeric', () => {
 		);
 
 		expect(container.querySelector('input').value).toBe('2282');
-	});
-
-	it('updates decimal symbol using the current value of symbols', () => {
-		const {container} = render(
-			<Numeric
-				dataType="double"
-				symbols={{decimalSymbol: ','}}
-				value="-1.2"
-			/>
-		);
-
-		expect(container.querySelector('input').value).toBe('-1,2');
-	});
-
-	it('updates decimal symbol using the localizedSymbols based on current editing language', () => {
-		const {container} = render(
-			<FormProvider initialState={{editingLanguageId: 'pt_BR'}}>
-				<Numeric
-					dataType="double"
-					localizedSymbols={{
-						en_US: {
-							decimalSymbol: '.',
-						},
-						pt_BR: {
-							decimalSymbol: ',',
-						},
-					}}
-					value="1.2"
-				/>
-			</FormProvider>
-		);
-
-		expect(container.querySelector('input').value).toBe('1,2');
 	});
 
 	describe('Confirmation Field', () => {
@@ -339,16 +297,6 @@ describe('Field Numeric', () => {
 			expect(input.value).toBe('1234');
 		});
 
-		it('allows input mask format to have only numbers', () => {
-			const {container} = render(
-				<Numeric inputMask inputMaskFormat={99} value="1234" />
-			);
-
-			const input = container.querySelector('input');
-
-			expect(input.value).toBe('12');
-		});
-
 		/**
 		 * This test was skipped due to an issue on userEvent.type() that not
 		 * allows simulate backspace key pressing (with the current
@@ -467,7 +415,6 @@ describe('Field Numeric', () => {
 			const {container} = render(
 				<Numeric
 					dataType="double"
-					decimalPlaces="2"
 					inputMask
 					name="numericField"
 					symbols={{decimalSymbol: ','}}
@@ -477,28 +424,6 @@ describe('Field Numeric', () => {
 			const input = container.querySelector('input');
 
 			expect(input).toHaveAttribute('placeholder', '0,00');
-		});
-
-		it('allows user to input only the decimal quantity defined by decimal places field', () => {
-			const onChange = jest.fn();
-			const {container} = render(
-				<Numeric
-					dataType="double"
-					decimalPlaces={3}
-					inputMask
-					name="numericField"
-					onChange={onChange}
-					symbols={{decimalSymbol: ','}}
-				/>
-			);
-
-			const input = container.querySelector('input');
-
-			userEvent.type(input, '1,2345678');
-
-			expect(onChange).toHaveBeenLastCalledWith({
-				target: {value: '1,234'},
-			});
 		});
 
 		/**
@@ -523,54 +448,6 @@ describe('Field Numeric', () => {
 			userEvent.type(input, 'a# @e');
 
 			expect(onChange).not.toHaveBeenCalled();
-		});
-
-		/**
-		 * LPS-141862
-		 */
-
-		it('does not allow typing zeroes not followed by decimal symbol', () => {
-			const onChange = jest.fn();
-			const {container} = render(
-				<Numeric
-					dataType="double"
-					decimalPlaces={3}
-					inputMask
-					name="numericField"
-					onChange={onChange}
-					symbols={{decimalSymbol: ','}}
-				/>
-			);
-
-			const input = container.querySelector('input');
-
-			userEvent.type(input, '0083,5');
-
-			expect(onChange).toHaveBeenLastCalledWith({
-				target: {value: '83,5'},
-			});
-		});
-
-		it('does not allow typing sequence of zeroes', () => {
-			const onChange = jest.fn();
-			const {container} = render(
-				<Numeric
-					dataType="double"
-					decimalPlaces={3}
-					inputMask
-					name="numericField"
-					onChange={onChange}
-					symbols={{decimalSymbol: ','}}
-				/>
-			);
-
-			const input = container.querySelector('input');
-
-			userEvent.type(input, '00,083');
-
-			expect(onChange).toHaveBeenLastCalledWith({
-				target: {value: '0,083'},
-			});
 		});
 	});
 });

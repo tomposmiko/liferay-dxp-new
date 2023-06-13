@@ -20,7 +20,6 @@ import com.liferay.document.library.sync.model.DLSyncEventTable;
 import com.liferay.document.library.sync.model.impl.DLSyncEventImpl;
 import com.liferay.document.library.sync.model.impl.DLSyncEventModelImpl;
 import com.liferay.document.library.sync.service.persistence.DLSyncEventPersistence;
-import com.liferay.document.library.sync.service.persistence.DLSyncEventUtil;
 import com.liferay.document.library.sync.service.persistence.impl.constants.DLSyncPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -35,6 +34,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.util.SetUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
@@ -70,7 +69,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DLSyncEventPersistence.class)
+@Component(service = {DLSyncEventPersistence.class, BasePersistence.class})
 public class DLSyncEventPersistenceImpl
 	extends BasePersistenceImpl<DLSyncEvent> implements DLSyncEventPersistence {
 
@@ -177,7 +176,7 @@ public class DLSyncEventPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLSyncEvent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLSyncEvent dlSyncEvent : list) {
@@ -535,7 +534,7 @@ public class DLSyncEventPersistenceImpl
 
 		Object[] finderArgs = new Object[] {modifiedTime};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -639,7 +638,7 @@ public class DLSyncEventPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByTypePK, finderArgs, this);
+				_finderPathFetchByTypePK, finderArgs);
 		}
 
 		if (result instanceof DLSyncEvent) {
@@ -727,7 +726,7 @@ public class DLSyncEventPersistenceImpl
 
 		Object[] finderArgs = new Object[] {typePK};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1165,7 +1164,7 @@ public class DLSyncEventPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLSyncEvent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1235,7 +1234,7 @@ public class DLSyncEventPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1327,31 +1326,11 @@ public class DLSyncEventPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByTypePK",
 			new String[] {Long.class.getName()}, new String[] {"typePK"},
 			false);
-
-		_setDLSyncEventUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDLSyncEventUtilPersistence(null);
-
 		entityCache.removeCache(DLSyncEventImpl.class.getName());
-	}
-
-	private void _setDLSyncEventUtilPersistence(
-		DLSyncEventPersistence dlSyncEventPersistence) {
-
-		try {
-			Field field = DLSyncEventUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, dlSyncEventPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -1416,5 +1395,9 @@ public class DLSyncEventPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private DLSyncEventModelArgumentsResolver
+		_dlSyncEventModelArgumentsResolver;
 
 }

@@ -20,15 +20,15 @@ import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.service.CommercePriceEntryService;
 import com.liferay.commerce.price.list.service.CommercePriceListService;
 import com.liferay.commerce.product.service.CommerceCatalogService;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -143,10 +143,12 @@ public class CommercePriceEntryDisplayContext
 		return creationMenu;
 	}
 
-	public List<FDSActionDropdownItem> getPriceEntriesFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getPriceEntriesClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		List<FDSActionDropdownItem> fdsActionDropdownItems = new ArrayList<>();
+		List<ClayDataSetActionDropdownItem> clayDataSetActionDropdownItems =
+			new ArrayList<>();
 
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
@@ -164,22 +166,22 @@ public class CommercePriceEntryDisplayContext
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
 		}
 		catch (WindowStateException windowStateException) {
-			_log.error(windowStateException);
+			_log.error(windowStateException, windowStateException);
 		}
 
-		fdsActionDropdownItems.add(
-			new FDSActionDropdownItem(
+		clayDataSetActionDropdownItems.add(
+			new ClayDataSetActionDropdownItem(
 				portletURL.toString(), "pencil", "edit",
 				LanguageUtil.get(httpServletRequest, "edit"), "get", null,
 				"sidePanel"));
 
-		fdsActionDropdownItems.add(
-			new FDSActionDropdownItem(
+		clayDataSetActionDropdownItems.add(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "remove",
 				LanguageUtil.get(httpServletRequest, "remove"), "delete",
 				"delete", "headless"));
 
-		return fdsActionDropdownItems;
+		return clayDataSetActionDropdownItems;
 	}
 
 	public String getPriceEntryApiURL() throws PortalException {

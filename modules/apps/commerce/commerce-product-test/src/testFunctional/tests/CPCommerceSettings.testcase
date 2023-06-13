@@ -3,67 +3,26 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "Product Info Management";
 
 	setUp {
-		CommerceConfiguration.commerceSetUp();
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
 	}
 
 	tearDown {
-		CommerceConfiguration.commerceTearDown();
+		Navigator.openURL();
+
+		if (IsElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE")) {
+			User.logoutPG();
+		}
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceAdminTearDown();
 	}
 
-	@description = "This is a test for COMMERCE-6912. Bulk delete countries"
-	@priority = 3
-	test BulkDeleteCountries {
-		property portal.acceptance = "false";
-		property test.name.skip.portal.instance = "CPCommerceSettings#BulkDeleteCountries";
-
-		task ("Given a Admin goes to Countries") {
-			CommerceNavigator.gotoPortlet(
-				category = "Settings",
-				portlet = "Countries");
-		}
-
-		task ("And verifies if the Trash icon is not present in the header") {
-			AssertElementNotPresent(locator1 = "Button#TRASH_ENABLED");
-		}
-
-		task ("And the admin selects one country using the checkbox and verifies if the Trash icon is now present in the header") {
-			CommerceNavigator.searchEntry(entryName = "Qatar");
-
-			Click.clickNoMouseOverNoWaitForVisible(
-				key_productName = "Qatar",
-				locator1 = "CommerceEntry#PRODUCT_ENTRY_CHECKBOX");
-
-			AssertElementPresent(locator1 = "Button#TRASH_ENABLED");
-		}
-
-		task ("Then the admin can remove the country by clicking on the Trash icon") {
-			ClickNoError(locator1 = "Button#TRASH_ENABLED");
-
-			AssertConfirm(value1 = "Are you sure you want to delete the selected countries?");
-		}
-
-		task ("And the admin select the delete country to check if it was deleted") {
-			CommerceNavigator.searchEntry(entryName = "Qatar");
-
-			AssertElementNotPresent(
-				key_entryName = "Qatar",
-				locator1 = "CommerceNavigation#ENTRY_NAME");
-		}
-
-		task ("And the admin can delete all the countries with one click by using the select all checkbox") {
-			CommerceNavigator.searchEntry(entryName = "");
-
-			while (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
-				CommerceProducts.deleteEntries(deleteMessage = "Are you sure you want to delete the selected countries?");
-			}
-		}
-	}
-
-	@priority = 5
 	test CreateNewAvailabilityEstimate {
 		property portal.acceptance = "true";
 
@@ -91,9 +50,9 @@ definition {
 		Click(locator1 = "Button#PLUS");
 
 		CommerceEntry.addNewCountriesEntry(
-			entryIsoNumber = 020,
+			entryIsoNumber = "020",
 			entryIsoThreeLetters = "TCO",
-			entryIsoTwoLetters = 54,
+			entryIsoTwoLetters = "54",
 			entryName = "Test Country");
 
 		Button.clickSave();
@@ -117,7 +76,6 @@ definition {
 			locator1 = "CommerceNavigation#ANY_ENTRY_NAME");
 	}
 
-	@priority = 5
 	test CreateNewMeasurementUnits {
 		property portal.acceptance = "true";
 
@@ -144,10 +102,8 @@ definition {
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 	}
 
-	@priority = 5
 	test ViewInstanceCurrenciesAvailable {
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,rockylinux,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		CommerceNavigator.gotoPortlet(

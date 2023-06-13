@@ -15,6 +15,7 @@
 package com.liferay.portal.search.elasticsearch7.internal.suggest;
 
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.suggest.AggregateSuggester;
 import com.liferay.portal.kernel.search.suggest.CompletionSuggester;
 import com.liferay.portal.kernel.search.suggest.PhraseSuggester;
 import com.liferay.portal.kernel.search.suggest.Suggester;
@@ -31,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	property = "search.engine.impl=Elasticsearch",
+	immediate = true, property = "search.engine.impl=Elasticsearch",
 	service = SuggesterTranslator.class
 )
 public class ElasticsearchSuggesterTranslator
@@ -43,6 +44,11 @@ public class ElasticsearchSuggesterTranslator
 		Suggester suggester, SearchContext searchContext) {
 
 		return suggester.accept(this);
+	}
+
+	@Override
+	public SuggestionBuilder visit(AggregateSuggester aggregateSuggester) {
+		return null;
 	}
 
 	@Override
@@ -60,13 +66,29 @@ public class ElasticsearchSuggesterTranslator
 		return _termSuggesterTranslator.translate(termSuggester);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setCompletionSuggesterTranslator(
+		CompletionSuggesterTranslator completionSuggesterTranslator) {
+
+		_completionSuggesterTranslator = completionSuggesterTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPhraseSuggesterTranslator(
+		PhraseSuggesterTranslator phraseSuggesterTranslator) {
+
+		_phraseSuggesterTranslator = phraseSuggesterTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setTermSuggesterTranslator(
+		TermSuggesterTranslator termSuggesterTranslator) {
+
+		_termSuggesterTranslator = termSuggesterTranslator;
+	}
+
 	private CompletionSuggesterTranslator _completionSuggesterTranslator;
-
-	@Reference
 	private PhraseSuggesterTranslator _phraseSuggesterTranslator;
-
-	@Reference
 	private TermSuggesterTranslator _termSuggesterTranslator;
 
 }

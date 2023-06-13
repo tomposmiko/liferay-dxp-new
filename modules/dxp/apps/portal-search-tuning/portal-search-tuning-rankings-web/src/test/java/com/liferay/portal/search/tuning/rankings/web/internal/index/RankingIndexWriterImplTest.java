@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.index;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
@@ -28,6 +27,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -42,14 +42,13 @@ public class RankingIndexWriterImplTest extends BaseRankingsIndexTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_rankingIndexWriterImpl = new RankingIndexWriterImpl();
 
-		ReflectionTestUtil.setFieldValue(
-			_rankingIndexWriterImpl, "_rankingToDocumentTranslator",
+		_rankingIndexWriterImpl.setRankingToDocumentTranslator(
 			_rankingToDocumentTranslator);
-		ReflectionTestUtil.setFieldValue(
-			_rankingIndexWriterImpl, "_searchEngineAdapter",
-			searchEngineAdapter);
+		_rankingIndexWriterImpl.setSearchEngineAdapter(searchEngineAdapter);
 	}
 
 	@Test
@@ -81,7 +80,7 @@ public class RankingIndexWriterImplTest extends BaseRankingsIndexTestCase {
 		Mockito.verify(
 			searchEngineAdapter, Mockito.times(1)
 		).execute(
-			(DeleteDocumentRequest)Mockito.any()
+			(DeleteDocumentRequest)Mockito.anyObject()
 		);
 	}
 
@@ -94,12 +93,13 @@ public class RankingIndexWriterImplTest extends BaseRankingsIndexTestCase {
 		Mockito.verify(
 			searchEngineAdapter, Mockito.times(1)
 		).execute(
-			(IndexDocumentRequest)Mockito.any()
+			(IndexDocumentRequest)Mockito.anyObject()
 		);
 	}
 
 	private RankingIndexWriterImpl _rankingIndexWriterImpl;
-	private final RankingToDocumentTranslator _rankingToDocumentTranslator =
-		Mockito.mock(RankingToDocumentTranslator.class);
+
+	@Mock
+	private RankingToDocumentTranslator _rankingToDocumentTranslator;
 
 }

@@ -52,57 +52,13 @@ public class LanguagePropertyTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		FileSystem fileSystem = FileSystems.getDefault();
+		List<String> modulesFileNames = _getFileNames(
+			"./modules/**/src/**/Language*.properties");
+		List<String> portalImplFileNames = _getFileNames(
+			"./portal-impl/src/**/Language*.properties");
 
-		PathMatcher modulePathMatcher = fileSystem.getPathMatcher(
-			"glob:./modules/**/src/**/Language*.properties");
-		PathMatcher portalLanguageLangPathMatcher = fileSystem.getPathMatcher(
-			"glob:./modules/apps/portal-language/portal-language-lang/src" +
-				"/main/resources/content/Language*.properties");
-
-		FileVisitor<Path> simpleFileVisitor = new SimpleFileVisitor<Path>() {
-
-			@Override
-			public FileVisitResult visitFile(
-					Path path, BasicFileAttributes basicFileAttributes)
-				throws IOException {
-
-				Map<String, Properties> propertiesMap = null;
-
-				if (portalLanguageLangPathMatcher.matches(path)) {
-					propertiesMap = _portalLanguageLangPropertiesMap;
-				}
-				else if (modulePathMatcher.matches(path)) {
-					propertiesMap = _modulesPropertiesMap;
-				}
-
-				if (propertiesMap != null) {
-					String fileName = path.toString();
-
-					Properties properties = new Properties();
-
-					try (InputStream inputStream = new FileInputStream(
-							fileName)) {
-
-						properties.load(inputStream);
-					}
-
-					propertiesMap.put(fileName, properties);
-				}
-
-				return FileVisitResult.CONTINUE;
-			}
-
-			@Override
-			public FileVisitResult visitFileFailed(
-				Path path, IOException ioException) {
-
-				return FileVisitResult.CONTINUE;
-			}
-
-		};
-
-		Files.walkFileTree(Paths.get("./"), simpleFileVisitor);
+		_modulesPropertiesMap = _getPropertiesMap(modulesFileNames);
+		_portalImplPropertiesMap = _getPropertiesMap(portalImplFileNames);
 	}
 
 	@Test
@@ -152,12 +108,12 @@ public class LanguagePropertyTest {
 
 	@Test
 	public void testUserNameRequiredFieldNamesSubsetOfUserNameFieldNames() {
-		Set<String> paths = _portalLanguageLangPropertiesMap.keySet();
+		Set<String> paths = _portalImplPropertiesMap.keySet();
 
 		List<String> failureMessages = new ArrayList<>();
 
 		for (String path : paths) {
-			Properties properties = _portalLanguageLangPropertiesMap.get(path);
+			Properties properties = _portalImplPropertiesMap.get(path);
 
 			String userNameFieldNamesString = properties.getProperty(
 				LanguageConstants.KEY_USER_NAME_FIELD_NAMES);
@@ -237,6 +193,60 @@ public class LanguagePropertyTest {
 		_testValidKey(LanguageConstants.KEY_USER_NAME_SUFFIX_VALUES);
 	}
 
+	private static List<String> _getFileNames(String pattern) throws Exception {
+		final List<String> fileNames = new ArrayList<>();
+
+		FileSystem fileSystem = FileSystems.getDefault();
+
+		final PathMatcher pathMatcher = fileSystem.getPathMatcher(
+			"glob:" + pattern);
+
+		FileVisitor<Path> simpleFileVisitor = new SimpleFileVisitor<Path>() {
+
+			@Override
+			public FileVisitResult visitFile(
+				Path path, BasicFileAttributes basicFileAttributes) {
+
+				if (pathMatcher.matches(path)) {
+					fileNames.add(path.toString());
+				}
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFileFailed(
+				Path path, IOException ioException) {
+
+				return FileVisitResult.CONTINUE;
+			}
+
+		};
+
+		Files.walkFileTree(Paths.get("./"), simpleFileVisitor);
+
+		return fileNames;
+	}
+
+	private static Map<String, Properties> _getPropertiesMap(
+			List<String> fileNames)
+		throws Exception {
+
+		Map<String, Properties> propertiesMap = new HashMap<>();
+
+		for (String fileName : fileNames) {
+			Properties properties = new Properties();
+
+			try (InputStream inputStream = new FileInputStream(fileName)) {
+				properties.load(inputStream);
+			}
+
+			propertiesMap.put(fileName, properties);
+		}
+
+		return propertiesMap;
+	}
+
 	private void _testSpecialKey(String key) {
 		List<String> invalidFileNames = new ArrayList<>();
 
@@ -261,10 +271,10 @@ public class LanguagePropertyTest {
 	private void _testValidKey(String key) {
 		List<String> invalidFileNames = new ArrayList<>();
 
-		Set<String> fileNames = _portalLanguageLangPropertiesMap.keySet();
+		Set<String> fileNames = _portalImplPropertiesMap.keySet();
 
 		for (String path : fileNames) {
-			Properties properties = _portalLanguageLangPropertiesMap.get(path);
+			Properties properties = _portalImplPropertiesMap.get(path);
 
 			String value = properties.getProperty(key);
 
@@ -280,9 +290,7 @@ public class LanguagePropertyTest {
 			invalidFileNames.isEmpty());
 	}
 
-	private static final Map<String, Properties> _modulesPropertiesMap =
-		new HashMap<>();
-	private static final Map<String, Properties>
-		_portalLanguageLangPropertiesMap = new HashMap<>();
+	private static Map<String, Properties> _modulesPropertiesMap;
+	private static Map<String, Properties> _portalImplPropertiesMap;
 
 }

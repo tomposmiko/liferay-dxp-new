@@ -23,65 +23,42 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Mateus Santana
  */
-public class DataRecordCollectionUtilTest {
+@RunWith(MockitoJUnitRunner.class)
+public class DataRecordCollectionUtilTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
-	@BeforeClass
-	public static void setUpClass() {
-		LanguageUtil languageUtil = new LanguageUtil();
-
-		Language language = Mockito.mock(Language.class);
-
-		Mockito.when(
-			language.isAvailableLocale(LocaleUtil.BRAZIL)
-		).thenReturn(
-			true
-		);
-
-		Mockito.when(
-			language.isAvailableLocale(LocaleUtil.US)
-		).thenReturn(
-			true
-		);
-
-		Mockito.when(
-			language.getLanguageId(LocaleUtil.BRAZIL)
-		).thenReturn(
-			"pt_BR"
-		);
-
-		Mockito.when(
-			language.getLanguageId(LocaleUtil.US)
-		).thenReturn(
-			"en_US"
-		);
-
-		languageUtil.setLanguage(language);
+	@Before
+	public void setUp() {
+		_setUpLanguageUtil();
 	}
 
 	@Test
-	public void testToDataRecordCollectionEquals() {
-		Mockito.when(
+	public void testToDataRecordCollectionEquals() throws Exception {
+		when(
 			_ddlRecordSet.getDDMStructureId()
 		).thenReturn(
 			123L
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getDescriptionMap()
 		).thenReturn(
 			HashMapBuilder.put(
@@ -91,13 +68,13 @@ public class DataRecordCollectionUtilTest {
 			).build()
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getGroupId()
 		).thenReturn(
 			789L
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getNameMap()
 		).thenReturn(
 			HashMapBuilder.put(
@@ -107,13 +84,13 @@ public class DataRecordCollectionUtilTest {
 			).build()
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getRecordSetId()
 		).thenReturn(
 			456L
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getRecordSetKey()
 		).thenReturn(
 			"RecordSetId"
@@ -144,14 +121,14 @@ public class DataRecordCollectionUtilTest {
 	}
 
 	@Test
-	public void testToDataRecordCollectionNotEquals() {
-		Mockito.when(
+	public void testToDataRecordCollectionNotEquals() throws Exception {
+		when(
 			_ddlRecordSet.getDDMStructureId()
 		).thenReturn(
 			124L
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getDescriptionMap()
 		).thenReturn(
 			HashMapBuilder.put(
@@ -161,13 +138,13 @@ public class DataRecordCollectionUtilTest {
 			).build()
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getGroupId()
 		).thenReturn(
 			788L
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getNameMap()
 		).thenReturn(
 			HashMapBuilder.put(
@@ -177,13 +154,13 @@ public class DataRecordCollectionUtilTest {
 			).build()
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getRecordSetId()
 		).thenReturn(
 			457L
 		);
 
-		Mockito.when(
+		when(
 			_ddlRecordSet.getRecordSetKey()
 		).thenReturn(
 			"RecordSetId1"
@@ -220,6 +197,39 @@ public class DataRecordCollectionUtilTest {
 			DataRecordCollectionUtil.toDataRecordCollection(null));
 	}
 
-	private final DDLRecordSet _ddlRecordSet = Mockito.mock(DDLRecordSet.class);
+	private void _setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
+
+		Language language = mock(Language.class);
+
+		when(
+			language.isAvailableLocale(LocaleUtil.BRAZIL)
+		).thenReturn(
+			true
+		);
+
+		when(
+			language.isAvailableLocale(LocaleUtil.US)
+		).thenReturn(
+			true
+		);
+
+		when(
+			language.getLanguageId(LocaleUtil.BRAZIL)
+		).thenReturn(
+			"pt_BR"
+		);
+
+		when(
+			language.getLanguageId(LocaleUtil.US)
+		).thenReturn(
+			"en_US"
+		);
+
+		languageUtil.setLanguage(language);
+	}
+
+	@Mock
+	private DDLRecordSet _ddlRecordSet;
 
 }

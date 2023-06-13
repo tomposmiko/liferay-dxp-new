@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -36,6 +38,8 @@ public class RankingGetSearchResultsBuilderTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_rankingGetSearchResultsBuilder = new RankingGetSearchResultsBuilder(
 			complexQueryPartBuilderFactory, dlAppLocalService,
 			fastDateFormatFactory, queries, resourceActions, resourceRequest,
@@ -47,7 +51,7 @@ public class RankingGetSearchResultsBuilderTest
 		setUpComplexQueryPartBuilderFactory(setUpComplexQueryPartBuilder());
 		setUpDLAppLocalService();
 		setUpFastDateFormatFactory();
-		setUpPortalUtil();
+		setUpRankingResultUtil();
 		setUpQuery();
 		setUpResourceRequest();
 		setUpSearcher(setUpSearchResponse(setUpDocumentWithGetString()));
@@ -61,9 +65,11 @@ public class RankingGetSearchResultsBuilderTest
 	}
 
 	private String _getExpectedDocumentsString() {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
 		return JSONUtil.put(
 			"documents",
-			JSONUtil.put(
+			jsonArray.put(
 				JSONUtil.put(
 					"author", "theAuthor"
 				).put(
@@ -89,7 +95,7 @@ public class RankingGetSearchResultsBuilderTest
 				))
 		).put(
 			"total", 1
-		).toString();
+		).toJSONString();
 	}
 
 	private RankingGetSearchResultsBuilder _rankingGetSearchResultsBuilder;

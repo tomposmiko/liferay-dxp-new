@@ -7,120 +7,103 @@ definition {
 	property testray.main.component.name = "Highest Rated Assets";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
-
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		User.firstLoginPG();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
-		}
-		else {
-			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
-	@description = "View rating score in Highest Rated Assets widget."
-	@priority = 4
+	@priority = "4"
 	test ViewHighestRatedAsset {
-		task ("Add two widget pages") {
-			for (var i : list "1,2") {
-				JSONLayout.addPublicLayout(
-					groupName = "Test Site Name",
-					layoutName = "Test Page Name ${i}");
-			}
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		for (var n : list "1,2") {
+			JSONLayout.addPublicLayout(
+				groupName = "Site Name",
+				layoutName = "Test Page ${n}");
 		}
 
-		task ("Add a widget to each page") {
-			var i = 1;
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page 1",
+			widgetName = "Asset Publisher");
 
-			for (var widgetName : list "Asset Publisher,Highest Rated Assets") {
-				JSONLayout.addWidgetToPublicLayout(
-					groupName = "Test Site Name",
-					layoutName = "Test Page Name ${i}",
-					widgetName = ${widgetName});
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page 2",
+			widgetName = "Highest Rated Assets");
 
-				var i = ${i} + 1;
-			}
+		Navigator.gotoSitePage(
+			pageName = "Test Page 1",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.configureDisplaySettings(displaySettings = "Ratings");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page 2",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.configureDisplaySettings(
+			displaySettings = "Ratings",
+			portletName = "Highest Rated Assets");
+
+		for (var n : list "1,2") {
+			JSONWebcontent.addWebContent(
+				content = "Web Content Content",
+				groupName = "Site Name",
+				title = "Web Content Title ${n}");
 		}
 
-		task ("Enable ratings to each widget") {
-			var i = 1;
+		Navigator.gotoSitePage(
+			pageName = "Test Page 1",
+			siteName = "Site Name");
 
-			for (var portletName : list "Asset Publisher,Highest Rated Assets") {
-				Navigator.gotoSitePage(
-					pageName = "Test Page Name ${i}",
-					siteName = "Test Site Name");
+		AssetPublisherPortlet.viewAssetDetailsPG(
+			assetContent = "Web Content Content",
+			assetTitle = "Web Content Title 1");
 
-				AssetPublisherPortlet.configureDisplaySettings(
-					displaySettings = "Ratings",
-					portletName = ${portletName});
+		Ratings.rateStar(ratingStarCount = "3");
 
-				var i = ${i} + 1;
-			}
-		}
+		Navigator.gotoSitePage(
+			pageName = "Test Page 2",
+			siteName = "Site Name");
 
-		task ("Add two web contents") {
-			for (var i : list "1,2") {
-				JSONWebcontent.addWebContent(
-					content = "Web Content Content",
-					groupName = "Test Site Name",
-					title = "Web Content Title ${i}");
-			}
-		}
+		AssetPublisherPortlet.viewAssetDetailsPG(
+			assetContent = "Web Content Content",
+			assetTitle = "Web Content Title 2");
 
-		task ("Add three stars to first web content on the first page") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name 1",
-				siteName = "Test Site Name");
+		Ratings.rateStar(ratingStarCount = "5");
 
-			AssetPublisherPortlet.viewAssetDetailsPG(
-				assetContent = "Web Content Content",
-				assetTitle = "Web Content Title 1");
+		Navigator.gotoSitePage(
+			pageName = "Test Page 2",
+			siteName = "Site Name");
 
-			Ratings.rateStar(ratingStarCount = 3);
-		}
+		AssetPublisherPortlet.viewAssetDetailsPG(
+			assetContent = "Web Content Content",
+			assetTitle = "Web Content Title 1");
 
-		task ("Add five stars to second web content on the second page") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name 2",
-				siteName = "Test Site Name");
+		Ratings.viewRateStar(
+			averageRatingStarCount = "3.0",
+			ratingStarCount = "3");
 
-			AssetPublisherPortlet.viewAssetDetailsPG(
-				assetContent = "Web Content Content",
-				assetTitle = "Web Content Title 2");
+		Navigator.gotoSitePage(
+			pageName = "Test Page 2",
+			siteName = "Site Name");
 
-			Ratings.rateStar(ratingStarCount = 5);
-		}
+		AssetPublisherPortlet.viewAssetDetailsPG(
+			assetContent = "Web Content Content",
+			assetTitle = "Web Content Title 2");
 
-		task ("View rating stars are shown on Highest Rated Assets") {
-			var i = 1;
-
-			for (var starCount : list "3,5") {
-				Navigator.gotoSitePage(
-					pageName = "Test Page Name 2",
-					siteName = "Test Site Name");
-
-				AssetPublisherPortlet.viewAssetDetailsPG(
-					assetContent = "Web Content Content",
-					assetTitle = "Web Content Title ${i}");
-
-				Ratings.viewRateStar(
-					averageRatingStarCount = "${starCount}.0",
-					ratingStarCount = ${starCount});
-
-				var i = ${i} + 1;
-			}
-		}
+		Ratings.viewRateStar(
+			averageRatingStarCount = "5.0",
+			ratingStarCount = "5");
 	}
 
 }

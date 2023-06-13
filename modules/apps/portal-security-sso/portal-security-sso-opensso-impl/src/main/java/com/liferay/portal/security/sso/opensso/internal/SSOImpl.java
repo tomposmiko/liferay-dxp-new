@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Michael C. Han
  */
-@Component(service = SSO.class)
+@Component(immediate = true, service = SSO.class)
 public class SSOImpl implements SSO {
 
 	@Override
@@ -74,7 +74,17 @@ public class SSOImpl implements SSO {
 
 	@Override
 	public boolean isSessionRedirectOnExpire(long companyId) {
-		return _isSessionRedirectOnExpire(_getOpenSSOConfiguration(companyId));
+		OpenSSOConfiguration openSSOConfiguration = _getOpenSSOConfiguration(
+			companyId);
+
+		return _isSessionRedirectOnExpire(openSSOConfiguration);
+	}
+
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
 	}
 
 	private OpenSSOConfiguration _getOpenSSOConfiguration(long companyId) {
@@ -104,7 +114,6 @@ public class SSOImpl implements SSO {
 
 	private static final Log _log = LogFactoryUtil.getLog(SSOImpl.class);
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 }

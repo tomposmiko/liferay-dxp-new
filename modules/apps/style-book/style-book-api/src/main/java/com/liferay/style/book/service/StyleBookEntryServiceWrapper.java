@@ -27,10 +27,6 @@ import com.liferay.style.book.model.StyleBookEntry;
 public class StyleBookEntryServiceWrapper
 	implements ServiceWrapper<StyleBookEntryService>, StyleBookEntryService {
 
-	public StyleBookEntryServiceWrapper() {
-		this(null);
-	}
-
 	public StyleBookEntryServiceWrapper(
 		StyleBookEntryService styleBookEntryService) {
 
@@ -61,12 +57,12 @@ public class StyleBookEntryServiceWrapper
 
 	@Override
 	public StyleBookEntry copyStyleBookEntry(
-			long groupId, long sourceStyleBookEntryId,
+			long groupId, long styleBookEntryId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _styleBookEntryService.copyStyleBookEntry(
-			groupId, sourceStyleBookEntryId, serviceContext);
+			groupId, styleBookEntryId, serviceContext);
 	}
 
 	@Override

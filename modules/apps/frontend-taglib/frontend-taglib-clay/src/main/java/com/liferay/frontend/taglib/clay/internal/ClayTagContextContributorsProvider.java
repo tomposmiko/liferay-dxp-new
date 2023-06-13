@@ -19,36 +19,71 @@ import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReference
 import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceMapper;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
+import java.util.Collections;
 import java.util.List;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Rodolfo Roza Miranda
  */
+@Component(immediate = true, service = {})
 public class ClayTagContextContributorsProvider {
 
 	public static List<ClayTagContextContributor> getClayTagContextContributors(
 		String clayTagContextContributorKey) {
 
-		return _serviceTrackerMap.getService(clayTagContextContributorKey);
+		if (_clayTagContextContributorsProvider == null) {
+			_log.error(
+				"No Clay tag context contributor is associated with " +
+					clayTagContextContributorKey);
+
+			return Collections.emptyList();
+		}
+
+		ServiceTrackerMap<String, List<ClayTagContextContributor>>
+			clayTagContextContributors =
+				_clayTagContextContributorsProvider._clayTagContextContributors;
+
+		return clayTagContextContributors.getService(
+			clayTagContextContributorKey);
 	}
 
-	private static final ServiceTrackerMap
-		<String, List<ClayTagContextContributor>> _serviceTrackerMap;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(
-			ClayTagContextContributorsProvider.class);
-
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
-			bundle.getBundleContext(), ClayTagContextContributor.class,
-			"(clay.tag.context.contributor.key=*)",
-			new PropertyServiceReferenceMapper<>(
-				"clay.tag.context.contributor.key"),
-			new PropertyServiceReferenceComparator<>("service.ranking"));
+	public ClayTagContextContributorsProvider() {
+		_clayTagContextContributorsProvider = this;
 	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_clayTagContextContributors =
+			ServiceTrackerMapFactory.openMultiValueMap(
+				bundleContext, ClayTagContextContributor.class,
+				"(clay.tag.context.contributor.key=*)",
+				new PropertyServiceReferenceMapper<>(
+					"clay.tag.context.contributor.key"),
+				new PropertyServiceReferenceComparator<>("service.ranking"));
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_clayTagContextContributors.close();
+
+		_clayTagContextContributors = null;
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ClayTagContextContributorsProvider.class);
+
+	private static ClayTagContextContributorsProvider
+		_clayTagContextContributorsProvider;
+
+	private ServiceTrackerMap<String, List<ClayTagContextContributor>>
+		_clayTagContextContributors;
 
 }

@@ -36,10 +36,9 @@ import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
-import com.liferay.document.library.util.DLFileEntryTypeUtil;
 import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMBeanTranslator;
 import com.liferay.petra.string.StringPool;
@@ -47,7 +46,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
@@ -316,9 +315,7 @@ public class EditFileEntryImageEditorMVCActionCommand
 		DLFileEntryType dlFileEntryType =
 			_dlFileEntryTypeLocalService.getDLFileEntryType(fileEntryTypeId);
 
-		for (DDMStructure ddmStructure :
-				DLFileEntryTypeUtil.getDDMStructures(dlFileEntryType)) {
-
+		for (DDMStructure ddmStructure : dlFileEntryType.getDDMStructures()) {
 			String className =
 				com.liferay.dynamic.data.mapping.kernel.DDMFormValues.class.
 					getName();
@@ -326,7 +323,7 @@ public class EditFileEntryImageEditorMVCActionCommand
 			DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
 				_getDDMStructureHttpServletRequest(
 					serviceContext.getRequest(), ddmStructure.getStructureId()),
-				ddmStructure.getDDMForm());
+				_ddmBeanTranslator.translate(ddmStructure.getDDMForm()));
 
 			serviceContext.setAttribute(
 				className + StringPool.POUND + ddmStructure.getStructureId(),
@@ -362,8 +359,7 @@ public class EditFileEntryImageEditorMVCActionCommand
 
 			fileEntry = _dlAppService.updateFileEntry(
 				fileEntryId, fileEntry.getFileName(), contentType,
-				fileEntry.getTitle(), fileEntry.getTitle(),
-				fileEntry.getDescription(), changeLog,
+				fileEntry.getTitle(), fileEntry.getDescription(), changeLog,
 				DLVersionNumberIncrease.AUTOMATIC, inputStream, size,
 				fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
 				serviceContext);
@@ -379,7 +375,7 @@ public class EditFileEntryImageEditorMVCActionCommand
 
 			SessionMessages.add(
 				actionRequest, "requestProcessed",
-				_language.get(
+				LanguageUtil.get(
 					themeDisplay.getLocale(),
 					"the-image-was-edited-successfully"));
 
@@ -407,9 +403,6 @@ public class EditFileEntryImageEditorMVCActionCommand
 
 	@Reference
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference(target = "(upload.response.handler=multiple)")
 	private UploadResponseHandler _multipleUploadResponseHandler;

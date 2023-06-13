@@ -37,11 +37,8 @@ import com.liferay.portal.tools.service.builder.test.model.impl.LocalizedEntryIm
 import com.liferay.portal.tools.service.builder.test.model.impl.LocalizedEntryModelImpl;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LocalizedEntryLocalizationPersistence;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LocalizedEntryPersistence;
-import com.liferay.portal.tools.service.builder.test.service.persistence.LocalizedEntryUtil;
 
 import java.io.Serializable;
-
-import java.lang.reflect.Field;
 
 import java.util.List;
 import java.util.Map;
@@ -443,7 +440,7 @@ public class LocalizedEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<LocalizedEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -513,7 +510,7 @@ public class LocalizedEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -577,30 +574,10 @@ public class LocalizedEntryPersistenceImpl
 		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
-
-		_setLocalizedEntryUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setLocalizedEntryUtilPersistence(null);
-
 		entityCache.removeCache(LocalizedEntryImpl.class.getName());
-	}
-
-	private void _setLocalizedEntryUtilPersistence(
-		LocalizedEntryPersistence localizedEntryPersistence) {
-
-		try {
-			Field field = LocalizedEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, localizedEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@ServiceReference(type = EntityCache.class)

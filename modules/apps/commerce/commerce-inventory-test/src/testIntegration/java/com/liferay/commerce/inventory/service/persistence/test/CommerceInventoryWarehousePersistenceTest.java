@@ -15,7 +15,6 @@
 package com.liferay.commerce.inventory.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.inventory.exception.DuplicateCommerceInventoryWarehouseExternalReferenceCodeException;
 import com.liferay.commerce.inventory.exception.NoSuchInventoryWarehouseException;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseLocalServiceUtil;
@@ -134,8 +133,6 @@ public class CommerceInventoryWarehousePersistenceTest {
 
 		newCommerceInventoryWarehouse.setMvccVersion(RandomTestUtil.nextLong());
 
-		newCommerceInventoryWarehouse.setUuid(RandomTestUtil.randomString());
-
 		newCommerceInventoryWarehouse.setExternalReferenceCode(
 			RandomTestUtil.randomString());
 
@@ -190,9 +187,6 @@ public class CommerceInventoryWarehousePersistenceTest {
 		Assert.assertEquals(
 			existingCommerceInventoryWarehouse.getMvccVersion(),
 			newCommerceInventoryWarehouse.getMvccVersion());
-		Assert.assertEquals(
-			existingCommerceInventoryWarehouse.getUuid(),
-			newCommerceInventoryWarehouse.getUuid());
 		Assert.assertEquals(
 			existingCommerceInventoryWarehouse.getExternalReferenceCode(),
 			newCommerceInventoryWarehouse.getExternalReferenceCode());
@@ -260,50 +254,6 @@ public class CommerceInventoryWarehousePersistenceTest {
 			newCommerceInventoryWarehouse.getType());
 	}
 
-	@Test(
-		expected = DuplicateCommerceInventoryWarehouseExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceInventoryWarehouse commerceInventoryWarehouse =
-			addCommerceInventoryWarehouse();
-
-		CommerceInventoryWarehouse newCommerceInventoryWarehouse =
-			addCommerceInventoryWarehouse();
-
-		newCommerceInventoryWarehouse.setCompanyId(
-			commerceInventoryWarehouse.getCompanyId());
-
-		newCommerceInventoryWarehouse = _persistence.update(
-			newCommerceInventoryWarehouse);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceInventoryWarehouse);
-
-		newCommerceInventoryWarehouse.setExternalReferenceCode(
-			commerceInventoryWarehouse.getExternalReferenceCode());
-
-		_persistence.update(newCommerceInventoryWarehouse);
-	}
-
-	@Test
-	public void testCountByUuid() throws Exception {
-		_persistence.countByUuid("");
-
-		_persistence.countByUuid("null");
-
-		_persistence.countByUuid((String)null);
-	}
-
-	@Test
-	public void testCountByUuid_C() throws Exception {
-		_persistence.countByUuid_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByUuid_C("null", 0L);
-
-		_persistence.countByUuid_C((String)null, 0L);
-	}
-
 	@Test
 	public void testCountByCompanyId() throws Exception {
 		_persistence.countByCompanyId(RandomTestUtil.nextLong());
@@ -340,12 +290,12 @@ public class CommerceInventoryWarehousePersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -378,14 +328,13 @@ public class CommerceInventoryWarehousePersistenceTest {
 		getOrderByComparator() {
 
 		return OrderByComparatorFactoryUtil.create(
-			"CIWarehouse", "mvccVersion", true, "uuid", true,
-			"externalReferenceCode", true, "commerceInventoryWarehouseId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "name", true, "description", true,
-			"active", true, "street1", true, "street2", true, "street3", true,
-			"city", true, "zip", true, "commerceRegionCode", true,
-			"countryTwoLettersISOCode", true, "latitude", true, "longitude",
-			true, "type", true);
+			"CIWarehouse", "mvccVersion", true, "externalReferenceCode", true,
+			"commerceInventoryWarehouseId", true, "companyId", true, "userId",
+			true, "userName", true, "createDate", true, "modifiedDate", true,
+			"name", true, "description", true, "active", true, "street1", true,
+			"street2", true, "street3", true, "city", true, "zip", true,
+			"commerceRegionCode", true, "countryTwoLettersISOCode", true,
+			"latitude", true, "longitude", true, "type", true);
 	}
 
 	@Test
@@ -692,15 +641,15 @@ public class CommerceInventoryWarehousePersistenceTest {
 		CommerceInventoryWarehouse commerceInventoryWarehouse) {
 
 		Assert.assertEquals(
-			commerceInventoryWarehouse.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				commerceInventoryWarehouse, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(commerceInventoryWarehouse.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				commerceInventoryWarehouse, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			commerceInventoryWarehouse.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				commerceInventoryWarehouse, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CommerceInventoryWarehouse addCommerceInventoryWarehouse()
@@ -712,8 +661,6 @@ public class CommerceInventoryWarehousePersistenceTest {
 			_persistence.create(pk);
 
 		commerceInventoryWarehouse.setMvccVersion(RandomTestUtil.nextLong());
-
-		commerceInventoryWarehouse.setUuid(RandomTestUtil.randomString());
 
 		commerceInventoryWarehouse.setExternalReferenceCode(
 			RandomTestUtil.randomString());

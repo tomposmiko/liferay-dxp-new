@@ -104,13 +104,14 @@ public class UpgradeKernelPackage extends UpgradeProcess {
 			ResultSet resultSet = preparedStatement1.executeQuery();
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection, updateSQL)) {
+					connection.prepareStatement(updateSQL))) {
 
 			while (resultSet.next()) {
 				preparedStatement2.setString(
 					1,
 					StringUtil.replace(
 						resultSet.getString(columnName), name[0], name[1]));
+
 				preparedStatement2.setLong(
 					2, resultSet.getLong(primaryKeyColumnName));
 
@@ -215,7 +216,11 @@ public class UpgradeKernelPackage extends UpgradeProcess {
 			sb2.append("', '");
 			sb2.append(name[1]);
 			sb2.append("') ");
-			sb2.append(_getWhereClause(columnName, name[0], wildcardMode));
+
+			String whereClause = _getWhereClause(
+				columnName, name[0], wildcardMode);
+
+			sb2.append(whereClause);
 
 			runSQL(sb2.toString());
 

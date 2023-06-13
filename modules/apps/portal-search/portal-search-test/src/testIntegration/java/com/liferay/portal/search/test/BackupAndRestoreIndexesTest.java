@@ -17,6 +17,7 @@ package com.liferay.portal.search.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.IndexAdminHelper;
+import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -55,7 +56,8 @@ public class BackupAndRestoreIndexesTest {
 
 			backupName = backupName + "-" + System.currentTimeMillis();
 
-			_indexAdminHelper.backup(companyId, backupName);
+			_indexAdminHelper.backup(
+				companyId, SearchEngineHelper.SYSTEM_ENGINE_ID, backupName);
 
 			backupNames.put(companyId, backupName);
 		}

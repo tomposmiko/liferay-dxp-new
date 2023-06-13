@@ -14,28 +14,19 @@
 
 package com.liferay.commerce.product.content.web.internal.portlet;
 
-import com.liferay.adaptive.media.image.html.AMImageHTMLTagFactory;
-import com.liferay.commerce.media.CommerceCatalogDefaultImage;
-import com.liferay.commerce.media.CommerceMediaResolver;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.content.render.list.CPContentListRendererRegistry;
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
 import com.liferay.commerce.product.content.web.internal.display.context.CPPublisherDisplayContext;
-import com.liferay.commerce.product.content.web.internal.helper.CPPublisherWebHelper;
+import com.liferay.commerce.product.content.web.internal.util.CPPublisherWebHelper;
 import com.liferay.commerce.product.data.source.CPDataSourceRegistry;
-import com.liferay.commerce.product.service.CPAttachmentFileEntryLocalService;
-import com.liferay.commerce.product.service.CPDefinitionLocalService;
-import com.liferay.commerce.product.type.CPTypeRegistry;
-import com.liferay.commerce.product.url.CPFriendlyURL;
+import com.liferay.commerce.product.service.CPDefinitionService;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
-import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
-import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -53,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-product-publisher",
@@ -69,10 +61,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/product_publisher/view.jsp",
 		"javax.portlet.name=" + CPPortletKeys.CP_PUBLISHER_WEB,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CPPublisherPortlet.class, Portlet.class}
 )
 public class CPPublisherPortlet extends MVCPortlet {
 
@@ -84,22 +75,17 @@ public class CPPublisherPortlet extends MVCPortlet {
 		try {
 			CPPublisherDisplayContext cpPublisherDisplayContext =
 				new CPPublisherDisplayContext(
-					_amImageHTMLTagFactory, _commerceCatalogDefaultImage,
-					_commerceMediaResolver, _cpAttachmentFileEntryLocalService,
 					_cpContentListEntryRendererRegistry,
 					_cpContentListRendererRegistry, _cpDataSourceRegistry,
-					_cpDefinitionHelper, _cpDefinitionLocalService,
-					_cpFriendlyURL, _cpPublisherWebHelper, _cpTypeRegistry,
-					_dlFileEntryLocalService,
-					_dlFileEntryModelResourcePermission,
-					_friendlyURLEntryLocalService,
-					_portal.getHttpServletRequest(renderRequest), _portal);
+					_cpDefinitionHelper, _cpPublisherWebHelper,
+					_cpTypeServicesTracker,
+					_portal.getHttpServletRequest(renderRequest));
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT, cpPublisherDisplayContext);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		super.render(renderRequest, renderResponse);
@@ -107,19 +93,6 @@ public class CPPublisherPortlet extends MVCPortlet {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CPPublisherPortlet.class);
-
-	@Reference
-	private AMImageHTMLTagFactory _amImageHTMLTagFactory;
-
-	@Reference
-	private CommerceCatalogDefaultImage _commerceCatalogDefaultImage;
-
-	@Reference
-	private CommerceMediaResolver _commerceMediaResolver;
-
-	@Reference
-	private CPAttachmentFileEntryLocalService
-		_cpAttachmentFileEntryLocalService;
 
 	@Reference
 	private CPContentListEntryRendererRegistry
@@ -135,28 +108,13 @@ public class CPPublisherPortlet extends MVCPortlet {
 	private CPDefinitionHelper _cpDefinitionHelper;
 
 	@Reference
-	private CPDefinitionLocalService _cpDefinitionLocalService;
-
-	@Reference
-	private CPFriendlyURL _cpFriendlyURL;
+	private CPDefinitionService _cpDefinitionService;
 
 	@Reference
 	private CPPublisherWebHelper _cpPublisherWebHelper;
 
 	@Reference
-	private CPTypeRegistry _cpTypeRegistry;
-
-	@Reference
-	private DLFileEntryLocalService _dlFileEntryLocalService;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.document.library.kernel.model.DLFileEntry)"
-	)
-	private ModelResourcePermission<DLFileEntry>
-		_dlFileEntryModelResourcePermission;
-
-	@Reference
-	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
+	private CPTypeServicesTracker _cpTypeServicesTracker;
 
 	@Reference
 	private Portal _portal;

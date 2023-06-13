@@ -12,7 +12,7 @@
  * details.
  */
 
-import {openConfirmModal, postForm} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
 
 export default function propsTransformer({
 	additionalProps: {
@@ -40,27 +40,12 @@ export default function propsTransformer({
 					'are-you-sure-you-want-to-delete-the-selected-entries'
 			  );
 
-		if (trashEnabled) {
+		if (trashEnabled || confirm(message)) {
 			postForm(form, {
 				data: {
 					cmd: deleteEntriesCmd,
 				},
 				url: editEntryURL,
-			});
-		}
-		else {
-			openConfirmModal({
-				message,
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						postForm(form, {
-							data: {
-								cmd: deleteEntriesCmd,
-							},
-							url: editEntryURL,
-						});
-					}
-				},
 			});
 		}
 	};

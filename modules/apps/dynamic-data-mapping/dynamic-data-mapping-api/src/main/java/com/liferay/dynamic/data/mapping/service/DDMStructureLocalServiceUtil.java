@@ -158,7 +158,7 @@ public class DDMStructureLocalServiceUtil {
 	 * and description.
 	 *
 	 * @param userId the primary key of the structure's creator/owner
-	 * @param sourceStructureId the primary key of the structure to be copied
+	 * @param structureId the primary key of the structure to be copied
 	 * @param nameMap the new structure's locales and localized names
 	 * @param descriptionMap the new structure's locales and localized
 	 descriptions
@@ -168,23 +168,22 @@ public class DDMStructureLocalServiceUtil {
 	 * @return the new structure
 	 */
 	public static DDMStructure copyStructure(
-			long userId, long sourceStructureId,
+			long userId, long structureId,
 			Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyStructure(
-			userId, sourceStructureId, nameMap, descriptionMap, serviceContext);
+			userId, structureId, nameMap, descriptionMap, serviceContext);
 	}
 
 	public static DDMStructure copyStructure(
-			long userId, long sourceStructureId,
+			long userId, long structureId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
-		return getService().copyStructure(
-			userId, sourceStructureId, serviceContext);
+		return getService().copyStructure(userId, structureId, serviceContext);
 	}
 
 	/**
@@ -1030,12 +1029,6 @@ public class DDMStructureLocalServiceUtil {
 	 */
 	public static int getStructuresCount(long[] groupIds, long classNameId) {
 		return getService().getStructuresCount(groupIds, classNameId);
-	}
-
-	public static boolean hasStructure(
-		long groupId, long classNameId, String structureKey) {
-
-		return getService().hasStructure(groupId, classNameId, structureKey);
 	}
 
 	public static String prepareLocalizedDefinitionForImport(

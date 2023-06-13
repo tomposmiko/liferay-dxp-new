@@ -15,22 +15,24 @@
 package com.liferay.layout.content.page.editor.web.internal.sidebar.panel;
 
 import com.liferay.layout.content.page.editor.sidebar.panel.ContentPageEditorSidebarPanel;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.service.permission.LayoutPermission;
+import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
-	property = "service.ranking:Integer=800",
+	immediate = true, property = "service.ranking:Integer=800",
 	service = ContentPageEditorSidebarPanel.class
 )
 public class FragmentsContentPageEditorSidebarPanel
@@ -43,12 +45,15 @@ public class FragmentsContentPageEditorSidebarPanel
 
 	@Override
 	public String getId() {
-		return "fragments_and_widgets";
+		return "fragments-widgets";
 	}
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "fragments-and-widgets");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return LanguageUtil.get(resourceBundle, "fragments-and-widgets");
 	}
 
 	@Override
@@ -56,17 +61,15 @@ public class FragmentsContentPageEditorSidebarPanel
 		PermissionChecker permissionChecker, long plid, int layoutType) {
 
 		try {
-			if (_layoutPermission.containsLayoutRestrictedUpdatePermission(
-					permissionChecker, plid)) {
+			if (LayoutPermissionUtil.contains(
+					permissionChecker, plid, ActionKeys.UPDATE)) {
 
 				return true;
 			}
-
-			return false;
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -75,11 +78,5 @@ public class FragmentsContentPageEditorSidebarPanel
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		FragmentsContentPageEditorSidebarPanel.class);
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private LayoutPermission _layoutPermission;
 
 }

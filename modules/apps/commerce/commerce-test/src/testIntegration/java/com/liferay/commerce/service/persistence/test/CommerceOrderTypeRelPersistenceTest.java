@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.exception.DuplicateCommerceOrderTypeRelExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderTypeRelException;
 import com.liferay.commerce.model.CommerceOrderTypeRel;
 import com.liferay.commerce.service.CommerceOrderTypeRelLocalServiceUtil;
@@ -128,10 +127,6 @@ public class CommerceOrderTypeRelPersistenceTest {
 
 		CommerceOrderTypeRel newCommerceOrderTypeRel = _persistence.create(pk);
 
-		newCommerceOrderTypeRel.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCommerceOrderTypeRel.setUuid(RandomTestUtil.randomString());
-
 		newCommerceOrderTypeRel.setExternalReferenceCode(
 			RandomTestUtil.randomString());
 
@@ -159,12 +154,6 @@ public class CommerceOrderTypeRelPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommerceOrderTypeRel.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceOrderTypeRel.getMvccVersion(),
-			newCommerceOrderTypeRel.getMvccVersion());
-		Assert.assertEquals(
-			existingCommerceOrderTypeRel.getUuid(),
-			newCommerceOrderTypeRel.getUuid());
 		Assert.assertEquals(
 			existingCommerceOrderTypeRel.getExternalReferenceCode(),
 			newCommerceOrderTypeRel.getExternalReferenceCode());
@@ -199,48 +188,6 @@ public class CommerceOrderTypeRelPersistenceTest {
 			newCommerceOrderTypeRel.getCommerceOrderTypeId());
 	}
 
-	@Test(
-		expected = DuplicateCommerceOrderTypeRelExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceOrderTypeRel commerceOrderTypeRel = addCommerceOrderTypeRel();
-
-		CommerceOrderTypeRel newCommerceOrderTypeRel =
-			addCommerceOrderTypeRel();
-
-		newCommerceOrderTypeRel.setCompanyId(
-			commerceOrderTypeRel.getCompanyId());
-
-		newCommerceOrderTypeRel = _persistence.update(newCommerceOrderTypeRel);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceOrderTypeRel);
-
-		newCommerceOrderTypeRel.setExternalReferenceCode(
-			commerceOrderTypeRel.getExternalReferenceCode());
-
-		_persistence.update(newCommerceOrderTypeRel);
-	}
-
-	@Test
-	public void testCountByUuid() throws Exception {
-		_persistence.countByUuid("");
-
-		_persistence.countByUuid("null");
-
-		_persistence.countByUuid((String)null);
-	}
-
-	@Test
-	public void testCountByUuid_C() throws Exception {
-		_persistence.countByUuid_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByUuid_C("null", 0L);
-
-		_persistence.countByUuid_C((String)null, 0L);
-	}
-
 	@Test
 	public void testCountByCommerceOrderTypeId() throws Exception {
 		_persistence.countByCommerceOrderTypeId(RandomTestUtil.nextLong());
@@ -266,12 +213,12 @@ public class CommerceOrderTypeRelPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -302,11 +249,10 @@ public class CommerceOrderTypeRelPersistenceTest {
 
 	protected OrderByComparator<CommerceOrderTypeRel> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceOrderTypeRel", "mvccVersion", true, "uuid", true,
-			"externalReferenceCode", true, "commerceOrderTypeRelId", true,
-			"companyId", true, "userId", true, "userName", true, "createDate",
-			true, "modifiedDate", true, "classNameId", true, "classPK", true,
-			"commerceOrderTypeId", true);
+			"CommerceOrderTypeRel", "externalReferenceCode", true,
+			"commerceOrderTypeRelId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"classNameId", true, "classPK", true, "commerceOrderTypeId", true);
 	}
 
 	@Test
@@ -617,25 +563,21 @@ public class CommerceOrderTypeRelPersistenceTest {
 				new Class<?>[] {String.class}, "commerceOrderTypeId"));
 
 		Assert.assertEquals(
-			commerceOrderTypeRel.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				commerceOrderTypeRel, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(commerceOrderTypeRel.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				commerceOrderTypeRel, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			commerceOrderTypeRel.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				commerceOrderTypeRel, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CommerceOrderTypeRel addCommerceOrderTypeRel() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceOrderTypeRel commerceOrderTypeRel = _persistence.create(pk);
-
-		commerceOrderTypeRel.setMvccVersion(RandomTestUtil.nextLong());
-
-		commerceOrderTypeRel.setUuid(RandomTestUtil.randomString());
 
 		commerceOrderTypeRel.setExternalReferenceCode(
 			RandomTestUtil.randomString());

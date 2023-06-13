@@ -35,8 +35,6 @@ public class KBArticleTable extends BaseTable<KBArticleTable> {
 
 	public final Column<KBArticleTable, Long> mvccVersion = createColumn(
 		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<KBArticleTable, Long> ctCollectionId = createColumn(
-		"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<KBArticleTable, String> uuid = createColumn(
 		"uuid_", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<KBArticleTable, Long> kbArticleId = createColumn(
@@ -93,10 +91,6 @@ public class KBArticleTable extends BaseTable<KBArticleTable> {
 		"main", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<KBArticleTable, String> sourceURL = createColumn(
 		"sourceURL", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
-	public final Column<KBArticleTable, Date> expirationDate = createColumn(
-		"expirationDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
-	public final Column<KBArticleTable, Date> reviewDate = createColumn(
-		"reviewDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<KBArticleTable, Date> lastPublishDate = createColumn(
 		"lastPublishDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<KBArticleTable, Integer> status = createColumn(

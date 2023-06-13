@@ -24,12 +24,10 @@ exports[`DigitalSignature renders 1`] = `
                 class="dropdown"
               >
                 <button
-                  aria-controls="clay-dropdown-menu-1"
-                  aria-expanded="false"
-                  aria-haspopup="true"
                   class="dropdown-toggle nav-link btn btn-unstyled"
                   disabled=""
                   id="filter-and-order"
+                  style=""
                   type="button"
                 >
                   <span
@@ -181,37 +179,20 @@ exports[`DigitalSignature renders 1`] = `
         </div>
       </nav>
       <div
-        class="c-empty-state c-empty-state-animation"
+        class="taglib-empty-result-message"
       >
         <div
-          class="c-empty-state-image"
+          class="text-center"
         >
           <div
-            class="c-empty-state-aspect-ratio"
+            class="taglib-empty-state"
+          />
+          <h1
+            class="taglib-empty-result-message-title"
           >
-            <img
-              alt=""
-              class="aspect-ratio-item aspect-ratio-item-fluid"
-              src="http://localhost:8080/o/admin-theme/images/states/empty_state.gif"
-            />
-          </div>
+            there-are-no-entries
+          </h1>
         </div>
-        <div
-          class="c-empty-state-title"
-        >
-          <span
-            class="text-truncate-inline"
-          >
-            <span
-              class="text-truncate"
-            >
-              there-are-no-entries
-            </span>
-          </span>
-        </div>
-        <div
-          class="c-empty-state-text"
-        />
       </div>
     </div>
   </div>

@@ -17,21 +17,21 @@
 <%@ include file="/facets/init.jsp" %>
 
 <%
-UserSearchFacetDisplayContextBuilder userSearchFacetDisplayContextBuilder = new UserSearchFacetDisplayContextBuilder(renderRequest);
+UserSearchFacetDisplayBuilder userSearchFacetDisplayBuilder = new UserSearchFacetDisplayBuilder(renderRequest);
 
-userSearchFacetDisplayContextBuilder.setFacet(facet);
-userSearchFacetDisplayContextBuilder.setFrequenciesVisible(dataJSONObject.getBoolean("showAssetCount", true));
-userSearchFacetDisplayContextBuilder.setFrequencyThreshold(dataJSONObject.getInt("frequencyThreshold"));
-userSearchFacetDisplayContextBuilder.setMaxTerms(dataJSONObject.getInt("maxTerms", 10));
-userSearchFacetDisplayContextBuilder.setParamName(facet.getFieldId());
-userSearchFacetDisplayContextBuilder.setParamValue(fieldParam);
+userSearchFacetDisplayBuilder.setFacet(facet);
+userSearchFacetDisplayBuilder.setFrequenciesVisible(dataJSONObject.getBoolean("showAssetCount", true));
+userSearchFacetDisplayBuilder.setFrequencyThreshold(dataJSONObject.getInt("frequencyThreshold"));
+userSearchFacetDisplayBuilder.setMaxTerms(dataJSONObject.getInt("maxTerms", 10));
+userSearchFacetDisplayBuilder.setParamName(facet.getFieldId());
+userSearchFacetDisplayBuilder.setParamValue(fieldParam);
 
-UserSearchFacetDisplayContext userSearchFacetDisplayContext = userSearchFacetDisplayContextBuilder.build();
+UserSearchFacetDisplayContext userSearchFacetDisplayContext = userSearchFacetDisplayBuilder.build();
 %>
 
 <c:choose>
 	<c:when test="<%= userSearchFacetDisplayContext.isRenderNothing() %>">
-		<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParameterName()) %>" type="hidden" value="<%= userSearchFacetDisplayContext.getParameterValue() %>" />
+		<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParamName()) %>" type="hidden" value="<%= userSearchFacetDisplayContext.getParamValue() %>" />
 	</c:when>
 	<c:otherwise>
 		<div class="panel panel-secondary">
@@ -42,26 +42,26 @@ UserSearchFacetDisplayContext userSearchFacetDisplayContext = userSearchFacetDis
 			</div>
 
 			<div class="panel-body">
-				<div class="<%= cssClass %>" data-facetFieldName="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParameterName()) %>" id="<%= randomNamespace %>facet">
-					<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParameterName()) %>" type="hidden" value="<%= userSearchFacetDisplayContext.getParameterValue() %>" />
+				<div class="<%= cssClass %>" data-facetFieldName="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParamName()) %>" id="<%= randomNamespace %>facet">
+					<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParamName()) %>" type="hidden" value="<%= userSearchFacetDisplayContext.getParamValue() %>" />
 
 					<ul class="list-unstyled users">
 						<li class="default facet-value">
-							<a class="<%= userSearchFacetDisplayContext.isNothingSelected() ? "facet-term-selected" : "facet-term-unselected" %>" data-value="" href="javascript:void(0);"><liferay-ui:message key="<%= HtmlUtil.escape(facetConfiguration.getLabel()) %>" /></a>
+							<a class="<%= userSearchFacetDisplayContext.isNothingSelected() ? "facet-term-selected" : "facet-term-unselected" %>" data-value="" href="javascript:;"><liferay-ui:message key="<%= HtmlUtil.escape(facetConfiguration.getLabel()) %>" /></a>
 						</li>
 
 						<%
-						java.util.List<BucketDisplayContext> bucketDisplayContexts = userSearchFacetDisplayContext.getBucketDisplayContexts();
+						java.util.List<UserSearchFacetTermDisplayContext> userSearchFacetTermDisplayContexts = userSearchFacetDisplayContext.getTermDisplayContexts();
 
-						for (BucketDisplayContext bucketDisplayContext : bucketDisplayContexts) {
+						for (UserSearchFacetTermDisplayContext userSearchFacetTermDisplayContext : userSearchFacetTermDisplayContexts) {
 						%>
 
 							<li class="facet-value">
-								<a class="<%= bucketDisplayContext.isSelected() ? "facet-term-selected" : "facet-term-unselected" %>" data-value="<%= HtmlUtil.escapeAttribute(bucketDisplayContext.getBucketText()) %>" href="javascript:void(0);">
-									<%= HtmlUtil.escape(bucketDisplayContext.getBucketText()) %>
+								<a class="<%= userSearchFacetTermDisplayContext.isSelected() ? "facet-term-selected" : "facet-term-unselected" %>" data-value="<%= HtmlUtil.escapeAttribute(userSearchFacetTermDisplayContext.getUserName()) %>" href="javascript:;">
+									<%= HtmlUtil.escape(userSearchFacetTermDisplayContext.getUserName()) %>
 
-									<c:if test="<%= bucketDisplayContext.isFrequencyVisible() %>">
-										<span class="frequency">(<%= bucketDisplayContext.getFrequency() %>)</span>
+									<c:if test="<%= userSearchFacetTermDisplayContext.isFrequencyVisible() %>">
+										<span class="frequency">(<%= userSearchFacetTermDisplayContext.getFrequency() %>)</span>
 									</c:if>
 								</a>
 							</li>

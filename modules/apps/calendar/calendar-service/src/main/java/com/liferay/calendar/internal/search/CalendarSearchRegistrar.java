@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class CalendarSearchRegistrar {
 
 	@Activate

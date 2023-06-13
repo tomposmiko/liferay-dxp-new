@@ -41,23 +41,14 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = SchedulerResponseManager.class)
 public class SchedulerResponseManagerImpl implements SchedulerResponseManager {
 
-	@Override
 	public Date getNextFireDate(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse =
-			_schedulerEngineHelper.getScheduledJob(
-				jobName, groupName, storageType);
-
-		if (schedulerResponse == null) {
-			return null;
-		}
-
-		return _schedulerEngineHelper.getNextFireTime(schedulerResponse);
+		return _schedulerEngineHelper.getNextFireTime(
+			jobName, groupName, storageType);
 	}
 
-	@Override
 	public List<SchedulerResponse> getSchedulerResponses(int start, int end) {
 		List<SchedulerResponse> schedulerResponses = new ArrayList<>();
 
@@ -88,7 +79,6 @@ public class SchedulerResponseManagerImpl implements SchedulerResponseManager {
 			start, Math.min(end, schedulerResponses.size()));
 	}
 
-	@Override
 	public int getSchedulerResponsesCount() {
 		List<SchedulerResponse> schedulerResponses = null;
 
@@ -110,25 +100,16 @@ public class SchedulerResponseManagerImpl implements SchedulerResponseManager {
 			});
 	}
 
-	@Override
 	public String getSimpleJobName(String jobName) {
 		return jobName.substring(jobName.lastIndexOf(StringPool.PERIOD) + 1);
 	}
 
-	@Override
 	public TriggerState getTriggerState(
 			String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		SchedulerResponse schedulerResponse =
-			_schedulerEngineHelper.getScheduledJob(
-				jobName, groupName, storageType);
-
-		if (schedulerResponse == null) {
-			return null;
-		}
-
-		return _schedulerEngineHelper.getJobState(schedulerResponse);
+		return _schedulerEngineHelper.getJobState(
+			jobName, groupName, storageType);
 	}
 
 	@Override
@@ -147,12 +128,16 @@ public class SchedulerResponseManagerImpl implements SchedulerResponseManager {
 	}
 
 	@Override
-	public void run(
-			long companyId, String jobName, String groupName,
-			StorageType storageType)
+	public void run(String jobName, String groupName, StorageType storageType)
 		throws SchedulerException {
 
-		_schedulerEngineHelper.run(companyId, jobName, groupName, storageType);
+		SchedulerResponse schedulerResponse =
+			_schedulerEngineHelper.getScheduledJob(
+				jobName, groupName, storageType);
+
+		_messageBus.sendMessage(
+			schedulerResponse.getDestinationName(),
+			schedulerResponse.getMessage());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

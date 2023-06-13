@@ -23,6 +23,7 @@ import com.liferay.portal.settings.portlet.action.PortalSettingsFormContributor;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -37,7 +38,10 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Michael C. Han
  */
-@Component(service = {})
+@Component(
+	immediate = true,
+	service = PortalSettingsContributorServiceTrackerCustomizer.class
+)
 public class PortalSettingsContributorServiceTrackerCustomizer
 	implements ServiceTrackerCustomizer
 		<PortalSettingsFormContributor, PortalSettingsFormContributor> {
@@ -53,29 +57,41 @@ public class PortalSettingsContributorServiceTrackerCustomizer
 			mvcActionCommandServiceRegistrationHolder =
 				new MVCActionCommandServiceRegistrationHolder();
 
-		DeletePortalSettingsFormMVCActionCommand
-			deletePortalSettingsFormMVCActionCommand =
-				new DeletePortalSettingsFormMVCActionCommand(
-					_portletPreferencesLocalService,
-					portalSettingsFormContributor);
+		Optional<String> deleteMVCActionCommandNameOptional =
+			portalSettingsFormContributor.
+				getDeleteMVCActionCommandNameOptional();
 
-		mvcActionCommandServiceRegistrationHolder.
-			_deleteMVCActionCommandServiceRegistration =
-				_registerMVCActionCommand(
-					portalSettingsFormContributor.
-						getDeleteMVCActionCommandName(),
-					deletePortalSettingsFormMVCActionCommand);
+		deleteMVCActionCommandNameOptional.ifPresent(
+			mvcActionName -> {
+				DeletePortalSettingsFormMVCActionCommand
+					deletePortalSettingsFormMVCActionCommand =
+						new DeletePortalSettingsFormMVCActionCommand(
+							_portletPreferencesLocalService,
+							portalSettingsFormContributor);
 
-		SavePortalSettingsFormMVCActionCommand
-			savePortalSettingsFormMVCActionCommand =
-				new SavePortalSettingsFormMVCActionCommand(
-					portalSettingsFormContributor);
+				mvcActionCommandServiceRegistrationHolder.
+					_deleteMVCActionCommandServiceReference =
+						registerMVCActionCommand(
+							mvcActionName,
+							deletePortalSettingsFormMVCActionCommand);
+			});
 
-		mvcActionCommandServiceRegistrationHolder.
-			_saveMVCActionCommandServiceRegistration =
-				_registerMVCActionCommand(
-					portalSettingsFormContributor.getSaveMVCActionCommandName(),
-					savePortalSettingsFormMVCActionCommand);
+		Optional<String> saveMVCActionCommandNameOptional =
+			portalSettingsFormContributor.getSaveMVCActionCommandNameOptional();
+
+		saveMVCActionCommandNameOptional.ifPresent(
+			mvcActionName -> {
+				SavePortalSettingsFormMVCActionCommand
+					savePortalSettingsFormMVCActionCommand =
+						new SavePortalSettingsFormMVCActionCommand(
+							portalSettingsFormContributor);
+
+				mvcActionCommandServiceRegistrationHolder.
+					_saveMVCActionCommandServiceReference =
+						registerMVCActionCommand(
+							mvcActionName,
+							savePortalSettingsFormMVCActionCommand);
+			});
 
 		_serviceRegistrationHolders.put(
 			portalSettingsFormContributor.getSettingsId(),
@@ -89,7 +105,7 @@ public class PortalSettingsContributorServiceTrackerCustomizer
 		ServiceReference<PortalSettingsFormContributor> serviceReference,
 		PortalSettingsFormContributor service) {
 
-		_unregister(service);
+		unregister(service);
 
 		addingService(serviceReference);
 	}
@@ -99,7 +115,7 @@ public class PortalSettingsContributorServiceTrackerCustomizer
 		ServiceReference<PortalSettingsFormContributor> serviceReference,
 		PortalSettingsFormContributor service) {
 
-		_unregister(service);
+		unregister(service);
 	}
 
 	@Activate
@@ -117,7 +133,7 @@ public class PortalSettingsContributorServiceTrackerCustomizer
 		_serviceTracker.close();
 	}
 
-	private ServiceRegistration<MVCActionCommand> _registerMVCActionCommand(
+	protected ServiceRegistration<MVCActionCommand> registerMVCActionCommand(
 		String mvcActionCommandName, MVCActionCommand mvcActionCommand) {
 
 		return _bundleContext.registerService(
@@ -130,7 +146,7 @@ public class PortalSettingsContributorServiceTrackerCustomizer
 			).build());
 	}
 
-	private void _unregister(
+	protected void unregister(
 		PortalSettingsFormContributor portalSettingsFormContributor) {
 
 		MVCActionCommandServiceRegistrationHolder
@@ -143,17 +159,17 @@ public class PortalSettingsContributorServiceTrackerCustomizer
 		}
 
 		if (mvcActionCommandServiceRegistrationHolder.
-				_deleteMVCActionCommandServiceRegistration != null) {
+				_deleteMVCActionCommandServiceReference != null) {
 
 			mvcActionCommandServiceRegistrationHolder.
-				_deleteMVCActionCommandServiceRegistration.unregister();
+				_deleteMVCActionCommandServiceReference.unregister();
 		}
 
 		if (mvcActionCommandServiceRegistrationHolder.
-				_saveMVCActionCommandServiceRegistration != null) {
+				_saveMVCActionCommandServiceReference != null) {
 
 			mvcActionCommandServiceRegistrationHolder.
-				_saveMVCActionCommandServiceRegistration.unregister();
+				_saveMVCActionCommandServiceReference.unregister();
 		}
 	}
 
@@ -171,9 +187,9 @@ public class PortalSettingsContributorServiceTrackerCustomizer
 	private class MVCActionCommandServiceRegistrationHolder {
 
 		private ServiceRegistration<MVCActionCommand>
-			_deleteMVCActionCommandServiceRegistration;
+			_deleteMVCActionCommandServiceReference;
 		private ServiceRegistration<MVCActionCommand>
-			_saveMVCActionCommandServiceRegistration;
+			_saveMVCActionCommandServiceReference;
 
 	}
 

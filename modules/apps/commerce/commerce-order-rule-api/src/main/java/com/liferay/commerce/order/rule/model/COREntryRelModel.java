@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.AuditedModel;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 
 import java.util.Date;
@@ -38,8 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface COREntryRelModel
-	extends AttachedModel, AuditedModel, BaseModel<COREntryRel>, MVCCModel,
-			ShardedModel {
+	extends AttachedModel, AuditedModel, BaseModel<COREntryRel>, ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -60,22 +58,6 @@ public interface COREntryRelModel
 	 * @param primaryKey the primary key of this cor entry rel
 	 */
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this cor entry rel.
-	 *
-	 * @return the mvcc version of this cor entry rel
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this cor entry rel.
-	 *
-	 * @param mvccVersion the mvcc version of this cor entry rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the cor entry rel ID of this cor entry rel.
@@ -246,9 +228,5 @@ public interface COREntryRelModel
 
 	@Override
 	public COREntryRel cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

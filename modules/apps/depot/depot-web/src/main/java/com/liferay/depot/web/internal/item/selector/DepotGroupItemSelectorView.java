@@ -31,7 +31,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -111,9 +111,6 @@ public class DepotGroupItemSelectorView
 	private DepotAdminGroupSearchProvider _depotAdminGroupSearchProvider;
 
 	@Reference
-	private Html _html;
-
-	@Reference
 	private ItemSelectorViewDescriptorRenderer<DepotGroupItemSelectorCriterion>
 		_itemSelectorViewDescriptorRenderer;
 
@@ -189,7 +186,7 @@ public class DepotGroupItemSelectorView
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 			}
 
@@ -198,15 +195,15 @@ public class DepotGroupItemSelectorView
 
 		private String _getTitle(Locale locale) {
 			try {
-				return _html.escape(_group.getDescriptiveName(locale));
+				return HtmlUtil.escape(_group.getDescriptiveName(locale));
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 
-			return _html.escape(_group.getName(locale));
+			return HtmlUtil.escape(_group.getName(locale));
 		}
 
 		private final Group _group;

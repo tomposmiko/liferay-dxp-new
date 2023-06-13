@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Javier Gamarra
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.message.boards.model.MBCategory",
 	service = ModelDocumentContributor.class
 )

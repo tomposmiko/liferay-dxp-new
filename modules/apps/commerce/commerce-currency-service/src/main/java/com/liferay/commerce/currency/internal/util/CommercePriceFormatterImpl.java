@@ -14,9 +14,6 @@
 
 package com.liferay.commerce.currency.internal.util;
 
-import com.ibm.icu.text.DecimalFormat;
-import com.ibm.icu.text.DecimalFormatSymbols;
-
 import com.liferay.commerce.currency.configuration.RoundingTypeConfiguration;
 import com.liferay.commerce.currency.constants.CommerceCurrencyConstants;
 import com.liferay.commerce.currency.model.CommerceCurrency;
@@ -28,6 +25,9 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 import java.util.Locale;
 import java.util.Map;
@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.currency.configuration.RoundingTypeConfiguration",
-	service = CommercePriceFormatter.class
+	enabled = false, immediate = true, service = CommercePriceFormatter.class
 )
 public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 
@@ -52,7 +52,7 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 	public String format(BigDecimal price, Locale locale)
 		throws PortalException {
 
-		DecimalFormat decimalFormat = _getDecimalFormat(null, locale);
+		DecimalFormat decimalFormat = getDecimalFormat(null, locale);
 
 		return decimalFormat.format(price);
 	}
@@ -62,7 +62,7 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 			CommerceCurrency commerceCurrency, BigDecimal price, Locale locale)
 		throws PortalException {
 
-		DecimalFormat decimalFormat = _getDecimalFormat(
+		DecimalFormat decimalFormat = getDecimalFormat(
 			commerceCurrency, locale);
 
 		return decimalFormat.format(price);
@@ -77,7 +77,7 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 			return StringPool.BLANK;
 		}
 
-		DecimalFormat decimalFormat = _getDecimalFormat(
+		DecimalFormat decimalFormat = getDecimalFormat(
 			commerceCurrency, locale);
 
 		if (relativePrice.signum() == -1) {
@@ -102,10 +102,10 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 		_roundingTypeConfiguration = null;
 	}
 
-	private DecimalFormat _getDecimalFormat(
+	protected DecimalFormat getDecimalFormat(
 		CommerceCurrency commerceCurrency, Locale locale) {
 
-		String formatPattern = CommerceCurrencyConstants.DECIMAL_FORMAT_PATTERN;
+		String formatPattern = CommerceCurrencyConstants.DEFAULT_FORMAT_PATTERN;
 		int maxFractionDigits =
 			_roundingTypeConfiguration.maximumFractionDigits();
 		int minFractionDigits =
@@ -131,7 +131,7 @@ public class CommercePriceFormatterImpl implements CommercePriceFormatter {
 
 		decimalFormat.setMaximumFractionDigits(maxFractionDigits);
 		decimalFormat.setMinimumFractionDigits(minFractionDigits);
-		decimalFormat.setRoundingMode(roundingMode.ordinal());
+		decimalFormat.setRoundingMode(roundingMode);
 
 		return decimalFormat;
 	}

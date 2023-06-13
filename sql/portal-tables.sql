@@ -1,9 +1,8 @@
 create table Address (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
-	addressId LONG not null,
+	addressId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
@@ -12,8 +11,8 @@ create table Address (
 	classNameId LONG,
 	classPK LONG,
 	countryId LONG,
-	listTypeId LONG,
 	regionId LONG,
+	typeId LONG,
 	city VARCHAR(75) null,
 	description STRING null,
 	latitude DOUBLE,
@@ -26,8 +25,7 @@ create table Address (
 	street3 VARCHAR(255) null,
 	validationDate DATE null,
 	validationStatus INTEGER,
-	zip VARCHAR(75) null,
-	primary key (addressId, ctCollectionId)
+	zip VARCHAR(75) null
 );
 
 create table AnnouncementsDelivery (
@@ -213,6 +211,7 @@ create table Company (
 	mx VARCHAR(200) null,
 	homeURL STRING null,
 	logoId LONG,
+	system_ BOOLEAN,
 	maxUsers INTEGER,
 	active_ BOOLEAN,
 	name VARCHAR(75) null,
@@ -223,9 +222,7 @@ create table Company (
 	tickerSymbol VARCHAR(75) null,
 	industry VARCHAR(75) null,
 	type_ VARCHAR(75) null,
-	size_ VARCHAR(75) null,
-	indexNameCurrent VARCHAR(75) null,
-	indexNameNext VARCHAR(75) null
+	size_ VARCHAR(75) null
 );
 
 create table CompanyInfo (
@@ -250,8 +247,8 @@ create table Contact_ (
 	firstName VARCHAR(75) null,
 	middleName VARCHAR(75) null,
 	lastName VARCHAR(75) null,
-	prefixListTypeId LONG,
-	suffixListTypeId LONG,
+	prefixId LONG,
+	suffixId LONG,
 	male BOOLEAN,
 	birthday DATE null,
 	smsSn VARCHAR(75) null,
@@ -435,7 +432,6 @@ create table DLFileVersion (
 	version VARCHAR(75) null,
 	size_ LONG,
 	checksum VARCHAR(75) null,
-	storeUUID VARCHAR(255) null,
 	expirationDate DATE null,
 	reviewDate DATE null,
 	lastPublishDate DATE null,
@@ -450,7 +446,6 @@ create table DLFolder (
 	mvccVersion LONG default 0 not null,
 	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	externalReferenceCode VARCHAR(75) null,
 	folderId LONG not null,
 	groupId LONG,
 	companyId LONG,
@@ -478,9 +473,8 @@ create table DLFolder (
 
 create table EmailAddress (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	emailAddressId LONG not null,
+	emailAddressId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
@@ -489,9 +483,8 @@ create table EmailAddress (
 	classNameId LONG,
 	classPK LONG,
 	address VARCHAR(254) null,
-	listTypeId LONG,
-	primary_ BOOLEAN,
-	primary key (emailAddressId, ctCollectionId)
+	typeId LONG,
+	primary_ BOOLEAN
 );
 
 create table ExpandoColumn (
@@ -499,7 +492,6 @@ create table ExpandoColumn (
 	ctCollectionId LONG default 0 not null,
 	columnId LONG not null,
 	companyId LONG,
-	modifiedDate DATE null,
 	tableId LONG,
 	name VARCHAR(75) null,
 	type_ INTEGER,
@@ -569,7 +561,6 @@ create table Group_ (
 	groupId LONG not null,
 	companyId LONG,
 	creatorUserId LONG,
-	modifiedDate DATE null,
 	classNameId LONG,
 	classPK LONG,
 	parentGroupId LONG,
@@ -663,7 +654,6 @@ create table Layout (
 	styleBookEntryId LONG,
 	css TEXT null,
 	priority INTEGER,
-	faviconFileEntryId LONG,
 	masterLayoutPlid LONG,
 	layoutPrototypeUuid VARCHAR(75) null,
 	layoutPrototypeLinkEnabled BOOLEAN,
@@ -712,9 +702,8 @@ create table LayoutFriendlyURL (
 
 create table LayoutPrototype (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	layoutPrototypeId LONG not null,
+	layoutPrototypeId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
@@ -723,8 +712,7 @@ create table LayoutPrototype (
 	name TEXT null,
 	description TEXT null,
 	settings_ STRING null,
-	active_ BOOLEAN,
-	primary key (layoutPrototypeId, ctCollectionId)
+	active_ BOOLEAN
 );
 
 create table LayoutRevision (
@@ -771,7 +759,6 @@ create table LayoutSet (
 	logoId LONG,
 	themeId VARCHAR(75) null,
 	colorSchemeId VARCHAR(75) null,
-	faviconFileEntryId LONG,
 	css TEXT null,
 	settings_ TEXT null,
 	layoutSetPrototypeUuid VARCHAR(75) null,
@@ -837,28 +824,6 @@ create table MembershipRequest (
 	statusId LONG
 );
 
-create table OrgLabor (
-	mvccVersion LONG default 0 not null,
-	orgLaborId LONG not null primary key,
-	companyId LONG,
-	organizationId LONG,
-	listTypeId LONG,
-	sunOpen INTEGER,
-	sunClose INTEGER,
-	monOpen INTEGER,
-	monClose INTEGER,
-	tueOpen INTEGER,
-	tueClose INTEGER,
-	wedOpen INTEGER,
-	wedClose INTEGER,
-	thuOpen INTEGER,
-	thuClose INTEGER,
-	friOpen INTEGER,
-	friClose INTEGER,
-	satOpen INTEGER,
-	satClose INTEGER
-);
-
 create table Organization_ (
 	mvccVersion LONG default 0 not null,
 	ctCollectionId LONG default 0 not null,
@@ -877,10 +842,41 @@ create table Organization_ (
 	recursable BOOLEAN,
 	regionId LONG,
 	countryId LONG,
-	statusListTypeId LONG,
+	statusId LONG,
 	comments STRING null,
 	logoId LONG,
 	primary key (organizationId, ctCollectionId)
+);
+
+create table OrgGroupRole (
+	mvccVersion LONG default 0 not null,
+	organizationId LONG not null,
+	groupId LONG not null,
+	roleId LONG not null,
+	companyId LONG,
+	primary key (organizationId, groupId, roleId)
+);
+
+create table OrgLabor (
+	mvccVersion LONG default 0 not null,
+	orgLaborId LONG not null primary key,
+	companyId LONG,
+	organizationId LONG,
+	typeId LONG,
+	sunOpen INTEGER,
+	sunClose INTEGER,
+	monOpen INTEGER,
+	monClose INTEGER,
+	tueOpen INTEGER,
+	tueClose INTEGER,
+	wedOpen INTEGER,
+	wedClose INTEGER,
+	thuOpen INTEGER,
+	thuClose INTEGER,
+	friOpen INTEGER,
+	friClose INTEGER,
+	satOpen INTEGER,
+	satClose INTEGER
 );
 
 create table PasswordPolicy (
@@ -941,9 +937,8 @@ create table PasswordTracker (
 
 create table Phone (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	phoneId LONG not null,
+	phoneId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
 	userName VARCHAR(75) null,
@@ -953,9 +948,8 @@ create table Phone (
 	classPK LONG,
 	number_ VARCHAR(75) null,
 	extension VARCHAR(75) null,
-	listTypeId LONG,
-	primary_ BOOLEAN,
-	primary key (phoneId, ctCollectionId)
+	typeId LONG,
+	primary_ BOOLEAN
 );
 
 create table PluginSetting (
@@ -1143,9 +1137,8 @@ create table Release_ (
 
 create table Repository (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	repositoryId LONG not null,
+	repositoryId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -1158,15 +1151,13 @@ create table Repository (
 	portletId VARCHAR(200) null,
 	typeSettings TEXT null,
 	dlFolderId LONG,
-	lastPublishDate DATE null,
-	primary key (repositoryId, ctCollectionId)
+	lastPublishDate DATE null
 );
 
 create table RepositoryEntry (
 	mvccVersion LONG default 0 not null,
-	ctCollectionId LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	repositoryEntryId LONG not null,
+	repositoryEntryId LONG not null primary key,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
@@ -1176,8 +1167,7 @@ create table RepositoryEntry (
 	repositoryId LONG,
 	mappedId VARCHAR(255) null,
 	manualCheckInRequired BOOLEAN,
-	lastPublishDate DATE null,
-	primary key (repositoryEntryId, ctCollectionId)
+	lastPublishDate DATE null
 );
 
 create table ResourceAction (
@@ -1218,7 +1208,7 @@ create table Role_ (
 	classPK LONG,
 	name VARCHAR(75) null,
 	title STRING null,
-	description TEXT null,
+	description STRING null,
 	type_ INTEGER,
 	subtype VARCHAR(75) null,
 	primary key (roleId, ctCollectionId)
@@ -1433,6 +1423,7 @@ create table User_ (
 	companyId LONG,
 	createDate DATE null,
 	modifiedDate DATE null,
+	defaultUser BOOLEAN,
 	contactId LONG,
 	password_ VARCHAR(75) null,
 	passwordEncrypted BOOLEAN,
@@ -1467,7 +1458,6 @@ create table User_ (
 	lockoutDate DATE null,
 	agreedToTermsOfUse BOOLEAN,
 	emailAddressVerified BOOLEAN,
-	type_ INTEGER,
 	status INTEGER,
 	primary key (userId, ctCollectionId)
 );
@@ -1648,7 +1638,7 @@ create table Website (
 	classNameId LONG,
 	classPK LONG,
 	url STRING null,
-	listTypeId LONG,
+	typeId LONG,
 	primary_ BOOLEAN,
 	lastPublishDate DATE null
 );

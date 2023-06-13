@@ -19,6 +19,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.object.model.ObjectLayoutTab;
 import com.liferay.object.model.ObjectLayoutTabModel;
+import com.liferay.object.model.ObjectLayoutTabSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.LocaleException;
@@ -40,15 +41,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -140,20 +144,14 @@ public class ObjectLayoutTabModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTRELATIONSHIPID_COLUMN_BITMASK = 4L;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
-	 */
-	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 8L;
+	public static final long UUID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long OBJECTLAYOUTTABID_COLUMN_BITMASK = 16L;
+	public static final long OBJECTLAYOUTTABID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -167,6 +165,62 @@ public class ObjectLayoutTabModelImpl
 	 */
 	@Deprecated
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	}
+
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static ObjectLayoutTab toModel(ObjectLayoutTabSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		ObjectLayoutTab model = new ObjectLayoutTabImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setObjectLayoutTabId(soapModel.getObjectLayoutTabId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setObjectLayoutId(soapModel.getObjectLayoutId());
+		model.setObjectRelationshipId(soapModel.getObjectRelationshipId());
+		model.setName(soapModel.getName());
+		model.setPriority(soapModel.getPriority());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<ObjectLayoutTab> toModels(
+		ObjectLayoutTabSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<ObjectLayoutTab> models = new ArrayList<ObjectLayoutTab>(
+			soapModels.length);
+
+		for (ObjectLayoutTabSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
 
 	public ObjectLayoutTabModelImpl() {
@@ -245,115 +299,119 @@ public class ObjectLayoutTabModelImpl
 	public Map<String, Function<ObjectLayoutTab, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ObjectLayoutTab, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ObjectLayoutTab>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ObjectLayoutTab, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ObjectLayoutTab.class.getClassLoader(), ObjectLayoutTab.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ObjectLayoutTab, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<ObjectLayoutTab, Object>>();
+		try {
+			Constructor<ObjectLayoutTab> constructor =
+				(Constructor<ObjectLayoutTab>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", ObjectLayoutTab::getMvccVersion);
-			attributeGetterFunctions.put("uuid", ObjectLayoutTab::getUuid);
-			attributeGetterFunctions.put(
-				"objectLayoutTabId", ObjectLayoutTab::getObjectLayoutTabId);
-			attributeGetterFunctions.put(
-				"companyId", ObjectLayoutTab::getCompanyId);
-			attributeGetterFunctions.put("userId", ObjectLayoutTab::getUserId);
-			attributeGetterFunctions.put(
-				"userName", ObjectLayoutTab::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", ObjectLayoutTab::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", ObjectLayoutTab::getModifiedDate);
-			attributeGetterFunctions.put(
-				"objectLayoutId", ObjectLayoutTab::getObjectLayoutId);
-			attributeGetterFunctions.put(
-				"objectRelationshipId",
-				ObjectLayoutTab::getObjectRelationshipId);
-			attributeGetterFunctions.put("name", ObjectLayoutTab::getName);
-			attributeGetterFunctions.put(
-				"priority", ObjectLayoutTab::getPriority);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ObjectLayoutTab, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ObjectLayoutTab, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ObjectLayoutTab, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ObjectLayoutTab, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<ObjectLayoutTab, Object>>();
+		Map<String, BiConsumer<ObjectLayoutTab, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<ObjectLayoutTab, ?>>();
 
-		static {
-			Map<String, BiConsumer<ObjectLayoutTab, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<ObjectLayoutTab, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", ObjectLayoutTab::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<ObjectLayoutTab, Long>)ObjectLayoutTab::setMvccVersion);
+		attributeGetterFunctions.put("uuid", ObjectLayoutTab::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<ObjectLayoutTab, String>)ObjectLayoutTab::setUuid);
+		attributeGetterFunctions.put(
+			"objectLayoutTabId", ObjectLayoutTab::getObjectLayoutTabId);
+		attributeSetterBiConsumers.put(
+			"objectLayoutTabId",
+			(BiConsumer<ObjectLayoutTab, Long>)
+				ObjectLayoutTab::setObjectLayoutTabId);
+		attributeGetterFunctions.put(
+			"companyId", ObjectLayoutTab::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<ObjectLayoutTab, Long>)ObjectLayoutTab::setCompanyId);
+		attributeGetterFunctions.put("userId", ObjectLayoutTab::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<ObjectLayoutTab, Long>)ObjectLayoutTab::setUserId);
+		attributeGetterFunctions.put("userName", ObjectLayoutTab::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<ObjectLayoutTab, String>)ObjectLayoutTab::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", ObjectLayoutTab::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<ObjectLayoutTab, Date>)ObjectLayoutTab::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", ObjectLayoutTab::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<ObjectLayoutTab, Date>)
+				ObjectLayoutTab::setModifiedDate);
+		attributeGetterFunctions.put(
+			"objectLayoutId", ObjectLayoutTab::getObjectLayoutId);
+		attributeSetterBiConsumers.put(
+			"objectLayoutId",
+			(BiConsumer<ObjectLayoutTab, Long>)
+				ObjectLayoutTab::setObjectLayoutId);
+		attributeGetterFunctions.put(
+			"objectRelationshipId", ObjectLayoutTab::getObjectRelationshipId);
+		attributeSetterBiConsumers.put(
+			"objectRelationshipId",
+			(BiConsumer<ObjectLayoutTab, Long>)
+				ObjectLayoutTab::setObjectRelationshipId);
+		attributeGetterFunctions.put("name", ObjectLayoutTab::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<ObjectLayoutTab, String>)ObjectLayoutTab::setName);
+		attributeGetterFunctions.put("priority", ObjectLayoutTab::getPriority);
+		attributeSetterBiConsumers.put(
+			"priority",
+			(BiConsumer<ObjectLayoutTab, Integer>)ObjectLayoutTab::setPriority);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<ObjectLayoutTab, Long>)
-					ObjectLayoutTab::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<ObjectLayoutTab, String>)ObjectLayoutTab::setUuid);
-			attributeSetterBiConsumers.put(
-				"objectLayoutTabId",
-				(BiConsumer<ObjectLayoutTab, Long>)
-					ObjectLayoutTab::setObjectLayoutTabId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<ObjectLayoutTab, Long>)
-					ObjectLayoutTab::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<ObjectLayoutTab, Long>)ObjectLayoutTab::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<ObjectLayoutTab, String>)
-					ObjectLayoutTab::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<ObjectLayoutTab, Date>)
-					ObjectLayoutTab::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<ObjectLayoutTab, Date>)
-					ObjectLayoutTab::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"objectLayoutId",
-				(BiConsumer<ObjectLayoutTab, Long>)
-					ObjectLayoutTab::setObjectLayoutId);
-			attributeSetterBiConsumers.put(
-				"objectRelationshipId",
-				(BiConsumer<ObjectLayoutTab, Long>)
-					ObjectLayoutTab::setObjectRelationshipId);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<ObjectLayoutTab, String>)ObjectLayoutTab::setName);
-			attributeSetterBiConsumers.put(
-				"priority",
-				(BiConsumer<ObjectLayoutTab, Integer>)
-					ObjectLayoutTab::setPriority);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -565,16 +623,6 @@ public class ObjectLayoutTabModelImpl
 		}
 
 		_objectRelationshipId = objectRelationshipId;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getColumnOriginalValue(String)}
-	 */
-	@Deprecated
-	public long getOriginalObjectRelationshipId() {
-		return GetterUtil.getLong(
-			this.<Long>getColumnOriginalValue("objectRelationshipId"));
 	}
 
 	@JSON
@@ -1060,12 +1108,41 @@ public class ObjectLayoutTabModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ObjectLayoutTab, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ObjectLayoutTab, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ObjectLayoutTab, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ObjectLayoutTab)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ObjectLayoutTab>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ObjectLayoutTab.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1088,8 +1165,7 @@ public class ObjectLayoutTabModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<ObjectLayoutTab, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

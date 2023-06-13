@@ -15,18 +15,25 @@
 package com.liferay.commerce.internal.upgrade.v3_1_0;
 
 import com.liferay.commerce.constants.CommerceOrderConstants;
+import com.liferay.commerce.internal.upgrade.base.BaseCommerceServiceUpgradeProcess;
 import com.liferay.commerce.model.impl.CommerceOrderModelImpl;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 /**
  * @author Marco Leo
  */
-public class CommerceOrderUpgradeProcess extends UpgradeProcess {
+public class CommerceOrderUpgradeProcess
+	extends BaseCommerceServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CommerceOrderModelImpl.class, CommerceOrderModelImpl.TABLE_NAME,
+			"couponCode", "VARCHAR(75)");
+
+		addColumn(
+			CommerceOrderModelImpl.class, CommerceOrderModelImpl.TABLE_NAME,
+			"lastPriceUpdateDate", "DATE");
+
 		if (hasColumn(
 				CommerceOrderModelImpl.TABLE_NAME, "lastPriceUpdateDate")) {
 
@@ -39,15 +46,6 @@ public class CommerceOrderUpgradeProcess extends UpgradeProcess {
 					sql, CommerceOrderModelImpl.TABLE_NAME,
 					CommerceOrderConstants.ORDER_STATUS_OPEN));
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommerceOrder", "couponCode VARCHAR(75)",
-				"lastPriceUpdateDate DATE")
-		};
 	}
 
 }

@@ -16,18 +16,13 @@ package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
-import com.liferay.layout.responsive.ViewportSize;
 import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
-import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.ColumnLayoutStructureItem;
-import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
-import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -37,6 +32,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import java.util.Objects;
 
@@ -50,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Víctor Galán
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/add_item"
@@ -58,66 +55,21 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class AddItemMVCActionCommand extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
-
-		try {
-			jsonObject = _addItemToLayoutData(actionRequest);
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
-			String errorMessage = "an-unexpected-error-occurred";
-
-			jsonObject.put(
-				"error",
-				_language.get(
-					_portal.getHttpServletRequest(actionRequest),
-					errorMessage));
-		}
-
-		hideDefaultSuccessMessage(actionRequest);
-
-		JSONPortletResponseUtil.writeJSON(
-			actionRequest, actionResponse, jsonObject);
-	}
-
-	private LayoutStructureItem _addCollectionStyledLayoutStructureItem(
-		LayoutStructure layoutStructure, String parentItemId, int position) {
-
-		CollectionStyledLayoutStructureItem
-			collectionStyledLayoutStructureItem =
-				(CollectionStyledLayoutStructureItem)
-					layoutStructure.addCollectionStyledLayoutStructureItem(
-						parentItemId, position);
-
-		collectionStyledLayoutStructureItem.setViewportConfiguration(
-			ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
-			JSONUtil.put("numberOfColumns", 1));
-
-		return collectionStyledLayoutStructureItem;
-	}
-
-	private JSONObject _addItemToLayoutData(ActionRequest actionRequest)
+	protected JSONObject addItemToLayoutData(ActionRequest actionRequest)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		long segmentsExperienceId = ParamUtil.getLong(
-			actionRequest, "segmentsExperienceId");
+			actionRequest, "segmentsExperienceId",
+			SegmentsExperienceConstants.ID_DEFAULT);
 		String itemType = ParamUtil.getString(actionRequest, "itemType");
 		String parentItemId = ParamUtil.getString(
 			actionRequest, "parentItemId");
 		int position = ParamUtil.getInteger(actionRequest, "position");
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		JSONObject layoutDataJSONObject = null;
 
@@ -130,8 +82,9 @@ public class AddItemMVCActionCommand extends BaseMVCActionCommand {
 					themeDisplay.getPlid(),
 					layoutStructure -> {
 						LayoutStructureItem layoutStructureItem =
-							_addCollectionStyledLayoutStructureItem(
-								layoutStructure, parentItemId, position);
+							layoutStructure.
+								addCollectionStyledLayoutStructureItem(
+									parentItemId, position);
 
 						jsonObject.put(
 							"addedItemId", layoutStructureItem.getItemId());
@@ -146,8 +99,20 @@ public class AddItemMVCActionCommand extends BaseMVCActionCommand {
 					themeDisplay.getPlid(),
 					layoutStructure -> {
 						LayoutStructureItem layoutStructureItem =
-							_addRowSyledLayoutStructureItem(
-								layoutStructure, parentItemId, position);
+							layoutStructure.addRowStyledLayoutStructureItem(
+								parentItemId, position, _DEFAULT_ROW_COLUMNS);
+
+						for (int i = 0; i < _DEFAULT_ROW_COLUMNS; i++) {
+							ColumnLayoutStructureItem
+								columnLayoutStructureItem =
+									(ColumnLayoutStructureItem)
+										layoutStructure.
+											addColumnLayoutStructureItem(
+												layoutStructureItem.getItemId(),
+												i);
+
+							columnLayoutStructureItem.setSize(4);
+						}
 
 						jsonObject.put(
 							"addedItemId", layoutStructureItem.getItemId());
@@ -171,44 +136,40 @@ public class AddItemMVCActionCommand extends BaseMVCActionCommand {
 		return jsonObject.put("layoutData", layoutDataJSONObject);
 	}
 
-	private LayoutStructureItem _addRowSyledLayoutStructureItem(
-		LayoutStructure layoutStructure, String parentItemId, int position) {
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
 
-		RowStyledLayoutStructureItem rowStyledLayoutStructureItem =
-			(RowStyledLayoutStructureItem)
-				layoutStructure.addRowStyledLayoutStructureItem(
-					parentItemId, position, _DEFAULT_ROW_COLUMNS);
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		rowStyledLayoutStructureItem.setViewportConfiguration(
-			ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
-			JSONUtil.put("modulesPerRow", 1));
+		try {
+			jsonObject = addItemToLayoutData(actionRequest);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 
-		for (int i = 0; i < _DEFAULT_ROW_COLUMNS; i++) {
-			ColumnLayoutStructureItem columnLayoutStructureItem =
-				(ColumnLayoutStructureItem)
-					layoutStructure.addColumnLayoutStructureItem(
-						rowStyledLayoutStructureItem.getItemId(), i);
+			String errorMessage = "an-unexpected-error-occurred";
 
-			columnLayoutStructureItem.setViewportConfiguration(
-				ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
-				JSONUtil.put("size", 12));
-
-			columnLayoutStructureItem.setSize(4);
+			jsonObject.put(
+				"error",
+				LanguageUtil.get(
+					_portal.getHttpServletRequest(actionRequest),
+					errorMessage));
 		}
 
-		return rowStyledLayoutStructureItem;
+		hideDefaultSuccessMessage(actionRequest);
+
+		JSONPortletResponseUtil.writeJSON(
+			actionRequest, actionResponse, jsonObject);
 	}
 
 	private static final int _DEFAULT_ROW_COLUMNS = 3;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AddItemMVCActionCommand.class);
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

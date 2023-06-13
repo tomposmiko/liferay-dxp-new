@@ -24,7 +24,6 @@ import com.liferay.portal.configuration.metatype.definitions.ExtendedMetaTypeSer
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -33,11 +32,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -56,7 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  * @author Michael C. Han
  */
-@Component(service = ConfigurationModelRetriever.class)
+@Component(immediate = true, service = ConfigurationModelRetriever.class)
 public class ConfigurationModelRetrieverImpl
 	implements ConfigurationModelRetriever {
 
@@ -77,7 +74,7 @@ public class ConfigurationModelRetrieverImpl
 
 			if (curConfigurationModels == null) {
 				curConfigurationModels = new TreeSet<>(
-					_getConfigurationModelComparator());
+					getConfigurationModelComparator());
 
 				categorizedConfigurationModels.put(
 					configurationCategory, curConfigurationModels);
@@ -95,31 +92,17 @@ public class ConfigurationModelRetrieverImpl
 		Serializable scopePK) {
 
 		try {
-			String pidFilter = _getPidFilterString(pid, scope);
+			String pidFilter = getPidFilterString(pid, scope, scopePK);
 
 			Configuration[] configurations =
 				_configurationAdmin.listConfigurations(pidFilter);
 
 			if (configurations != null) {
-				for (Configuration configuration : configurations) {
-					if (scope.equals(
-							ExtendedObjectClassDefinition.Scope.SYSTEM)) {
-
-						return configuration;
-					}
-
-					Dictionary<String, Object> properties =
-						configuration.getProcessedProperties(null);
-
-					if (Objects.equals(
-							properties.get(scope.getPropertyKey()), scopePK)) {
-
-						return configuration;
-					}
-				}
+				return configurations[0];
 			}
+			else if (scope.equals(
+						ExtendedObjectClassDefinition.Scope.COMPANY)) {
 
-			if (scope.equals(ExtendedObjectClassDefinition.Scope.COMPANY)) {
 				return getConfiguration(
 					pid, ExtendedObjectClassDefinition.Scope.SYSTEM, null);
 			}
@@ -151,7 +134,7 @@ public class ConfigurationModelRetrieverImpl
 
 		Map<String, ConfigurationModel> configurationModels = new HashMap<>();
 
-		_collectConfigurationModels(
+		collectConfigurationModels(
 			bundle, configurationModels, null, scope, scopePK);
 
 		return configurationModels;
@@ -178,7 +161,7 @@ public class ConfigurationModelRetrieverImpl
 				continue;
 			}
 
-			_collectConfigurationModels(
+			collectConfigurationModels(
 				bundle, configurationModels, locale, scope, scopePK);
 		}
 
@@ -212,7 +195,7 @@ public class ConfigurationModelRetrieverImpl
 			ExtendedObjectClassDefinition.Scope scope, Serializable scopePK)
 		throws IOException {
 
-		Configuration[] configurations = _getFactoryConfigurations(
+		Configuration[] configurations = getFactoryConfigurations(
 			factoryConfigurationModel.getFactoryPid(), scope.getPropertyKey(),
 			String.valueOf(scopePK));
 
@@ -240,7 +223,7 @@ public class ConfigurationModelRetrieverImpl
 		_bundleContext = bundleContext;
 	}
 
-	private void _collectConfigurationModels(
+	protected void collectConfigurationModels(
 		Bundle bundle, Map<String, ConfigurationModel> configurationModels,
 		String locale, ExtendedObjectClassDefinition.Scope scope,
 		Serializable scopePK) {
@@ -253,7 +236,7 @@ public class ConfigurationModelRetrieverImpl
 		}
 
 		for (String pid : extendedMetaTypeInformation.getFactoryPids()) {
-			ConfigurationModel configurationModel = _getConfigurationModel(
+			ConfigurationModel configurationModel = getConfigurationModel(
 				bundle, extendedMetaTypeInformation, pid, true, locale, scope,
 				scopePK);
 
@@ -265,7 +248,7 @@ public class ConfigurationModelRetrieverImpl
 		}
 
 		for (String pid : extendedMetaTypeInformation.getPids()) {
-			ConfigurationModel configurationModel = _getConfigurationModel(
+			ConfigurationModel configurationModel = getConfigurationModel(
 				bundle, extendedMetaTypeInformation, pid, false, locale, scope,
 				scopePK);
 
@@ -277,12 +260,12 @@ public class ConfigurationModelRetrieverImpl
 		}
 	}
 
-	private String _getAndFilterString(String... filterStrings) {
-		return _getLogicalOperatorFilterString(
+	protected String getAndFilterString(String... filterStrings) {
+		return getLogicalOperatorFilterString(
 			StringPool.AMPERSAND, filterStrings);
 	}
 
-	private ConfigurationModel _getConfigurationModel(
+	protected ConfigurationModel getConfigurationModel(
 		Bundle bundle, ExtendedMetaTypeInformation extendedMetaTypeInformation,
 		String pid, boolean factory, String locale,
 		ExtendedObjectClassDefinition.Scope scope, Serializable scopePK) {
@@ -296,10 +279,6 @@ public class ConfigurationModelRetrieverImpl
 			extendedMetaTypeInformation.getObjectClassDefinition(pid, locale),
 			factory);
 
-		if (!StringUtil.equals(configurationModel.getFactoryPid(), pid)) {
-			configurationModel.setFactoryPid(pid);
-		}
-
 		if (scope.equals(scope.COMPANY) && configurationModel.isSystemScope()) {
 			return null;
 		}
@@ -311,44 +290,50 @@ public class ConfigurationModelRetrieverImpl
 		return configurationModel;
 	}
 
-	private Comparator<ConfigurationModel> _getConfigurationModelComparator() {
+	protected Comparator<ConfigurationModel> getConfigurationModelComparator() {
 		return new ConfigurationModelComparator();
 	}
 
-	private String _getExcludedPropertyFilterString(String propertyName) {
+	protected String getExcludedPropertyFilterString(String propertyName) {
 		return StringBundler.concat(
-			"(!", _getPropertyFilterString(propertyName, "*"), ")");
+			"(!", getPropertyFilterString(propertyName, "*"), ")");
 	}
 
-	private Configuration[] _getFactoryConfigurations(
+	protected Configuration[] getFactoryConfigurations(String factoryPid)
+		throws IOException {
+
+		return getFactoryConfigurations(factoryPid, null, null);
+	}
+
+	protected Configuration[] getFactoryConfigurations(
 			String factoryPid, String property, String value)
 		throws IOException {
 
 		Configuration[] configurations = null;
 
-		String filterString = _getPropertyFilterString(
+		String filterString = getPropertyFilterString(
 			ConfigurationAdmin.SERVICE_FACTORYPID, factoryPid);
 
-		String propertyFilterString = _getPropertyFilterString(property, value);
+		String propertyFilterString = getPropertyFilterString(property, value);
 
 		if (Validator.isNotNull(propertyFilterString)) {
-			filterString = _getAndFilterString(
+			filterString = getAndFilterString(
 				filterString, propertyFilterString);
 		}
 		else {
-			filterString = _getAndFilterString(
+			filterString = getAndFilterString(
 				filterString,
-				_getOrFilterString(
-					_getExcludedPropertyFilterString(
+				getOrFilterString(
+					getExcludedPropertyFilterString(
 						ExtendedObjectClassDefinition.Scope.COMPANY.
 							getPropertyKey()),
-					_getPropertyFilterString(
+					getPropertyFilterString(
 						ExtendedObjectClassDefinition.Scope.COMPANY.
 							getPropertyKey(),
 						String.valueOf(CompanyConstants.SYSTEM))),
-				_getExcludedPropertyFilterString(
+				getExcludedPropertyFilterString(
 					ExtendedObjectClassDefinition.Scope.GROUP.getPropertyKey()),
-				_getExcludedPropertyFilterString(
+				getExcludedPropertyFilterString(
 					ExtendedObjectClassDefinition.Scope.PORTLET_INSTANCE.
 						getPropertyKey()));
 		}
@@ -364,7 +349,7 @@ public class ConfigurationModelRetrieverImpl
 		return configurations;
 	}
 
-	private String _getLogicalOperatorFilterString(
+	protected String getLogicalOperatorFilterString(
 		String logicalOperator, String... filterStrings) {
 
 		StringBundler sb = new StringBundler(filterStrings.length + 3);
@@ -385,23 +370,27 @@ public class ConfigurationModelRetrieverImpl
 		return sb.toString();
 	}
 
-	private String _getOrFilterString(String... filterStrings) {
-		return _getLogicalOperatorFilterString(StringPool.PIPE, filterStrings);
+	protected String getOrFilterString(String... filterStrings) {
+		return getLogicalOperatorFilterString(StringPool.PIPE, filterStrings);
 	}
 
-	private String _getPidFilterString(
-		String pid, ExtendedObjectClassDefinition.Scope scope) {
+	protected String getPidFilterString(
+		String pid, ExtendedObjectClassDefinition.Scope scope,
+		Serializable scopePK) {
 
 		if (scope.equals(ExtendedObjectClassDefinition.Scope.SYSTEM)) {
-			return _getPropertyFilterString(Constants.SERVICE_PID, pid);
+			return getPropertyFilterString(Constants.SERVICE_PID, pid);
 		}
 
-		return _getPropertyFilterString(
-			ConfigurationAdmin.SERVICE_FACTORYPID,
-			_getUnscopedPid(pid) + ".scoped");
+		return getAndFilterString(
+			getPropertyFilterString(
+				ConfigurationAdmin.SERVICE_FACTORYPID,
+				getUnscopedPid(pid) + ".scoped"),
+			getPropertyFilterString(
+				scope.getPropertyKey(), String.valueOf(scopePK)));
 	}
 
-	private String _getPropertyFilterString(String key, String value) {
+	protected String getPropertyFilterString(String key, String value) {
 		if (Validator.isNull(key) || Validator.isNull(value)) {
 			return StringPool.BLANK;
 		}
@@ -411,7 +400,7 @@ public class ConfigurationModelRetrieverImpl
 			StringPool.CLOSE_PARENTHESIS);
 	}
 
-	private String _getUnscopedPid(String pid) {
+	protected String getUnscopedPid(String pid) {
 		return pid.replaceFirst("\\.scoped.*", StringPool.BLANK);
 	}
 

@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.util.Portal;
 public class AssigneeUtil {
 
 	public static Assignee toAssignee(Portal portal, User user) {
-		if ((user == null) || user.isGuestUser()) {
+		if ((user == null) || user.isDefaultUser()) {
 			return null;
 		}
 

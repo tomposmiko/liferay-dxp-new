@@ -53,25 +53,17 @@ public class EqualsPoshiElement extends PoshiElement {
 	public void parsePoshiScript(String poshiScript)
 		throws PoshiScriptParserException {
 
-		if (poshiScript.startsWith("(") && poshiScript.endsWith(")")) {
-			poshiScript = poshiScript.substring(1, poshiScript.length() - 1);
-		}
-
 		String[] equalsContentArray = poshiScript.split("==");
 
 		String arg1 = equalsContentArray[0].trim();
 
-		if (isQuotedContent(arg1)) {
-			arg1 = getDoubleQuotedContent(arg1);
-		}
+		arg1 = getDoubleQuotedContent(arg1);
 
 		addAttribute("arg1", arg1);
 
 		String arg2 = equalsContentArray[1].trim();
 
-		if (isQuotedContent(arg2)) {
-			arg2 = getDoubleQuotedContent(arg2);
-		}
+		arg2 = getDoubleQuotedContent(arg2);
 
 		addAttribute("arg2", arg2);
 	}
@@ -80,32 +72,11 @@ public class EqualsPoshiElement extends PoshiElement {
 	public String toPoshiScript() {
 		StringBuilder sb = new StringBuilder();
 
-		String arg1 = attributeValue("arg1");
-
-		String arg2 = attributeValue("arg2");
-
-		if (isQuotedContent(arg1)) {
-			arg1 = "\"" + arg1 + "\"";
-		}
-
-		sb.append(arg1);
-
-		sb.append(" == ");
-
-		if (isQuotedContent(arg2)) {
-			arg2 = "\"" + arg2 + "\"";
-		}
-
-		sb.append(arg2);
-
-		PoshiElement parentPoshiElement = (PoshiElement)getParent();
-
-		if (parentPoshiElement instanceof AndPoshiElement ||
-			parentPoshiElement instanceof OrPoshiElement) {
-
-			sb.insert(0, "(");
-			sb.append(")");
-		}
+		sb.append("\"");
+		sb.append(attributeValue("arg1"));
+		sb.append("\" == \"");
+		sb.append(attributeValue("arg2"));
+		sb.append("\"");
 
 		return sb.toString();
 	}
@@ -165,7 +136,6 @@ public class EqualsPoshiElement extends PoshiElement {
 	private static final String _ELEMENT_NAME = "equals";
 
 	private static final Pattern _conditionPattern = Pattern.compile(
-		"^[\\(]*(?:\\d+|(?:\\$\\{|\\\")[\\s\\S]*(?:\\}|\"))[\\s]*==" +
-			"[\\s]*(?:\\d+|(?:\\$\\{|\\\")[\\s\\S]*(?:\\}|\"))[\\)]*$");
+		"^[\\(]*\"[\\s\\S]*\"[\\s]*==[\\s]*\"[\\s\\S]*\"[\\)]*$");
 
 }

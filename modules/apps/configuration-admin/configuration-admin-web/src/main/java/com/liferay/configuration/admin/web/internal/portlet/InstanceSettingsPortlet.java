@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-instance-settings",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -48,8 +49,7 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -60,7 +60,7 @@ public class InstanceSettingsPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws IOException, PortletException {
 
-		_checkCompanyAdmin();
+		checkCompanyAdmin();
 
 		super.processAction(actionRequest, actionResponse);
 	}
@@ -70,7 +70,7 @@ public class InstanceSettingsPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		_checkCompanyAdmin();
+		checkCompanyAdmin();
 
 		super.render(renderRequest, renderResponse);
 	}
@@ -80,12 +80,12 @@ public class InstanceSettingsPortlet extends MVCPortlet {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
 
-		_checkCompanyAdmin();
+		checkCompanyAdmin();
 
 		super.serveResource(resourceRequest, resourceResponse);
 	}
 
-	private void _checkCompanyAdmin() throws PortletException {
+	protected void checkCompanyAdmin() throws PortletException {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 

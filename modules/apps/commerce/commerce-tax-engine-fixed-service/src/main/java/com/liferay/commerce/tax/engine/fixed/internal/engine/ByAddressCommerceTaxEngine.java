@@ -25,7 +25,7 @@ import com.liferay.commerce.tax.engine.fixed.model.CommerceTaxFixedRateAddressRe
 import com.liferay.commerce.tax.engine.fixed.service.CommerceTaxFixedRateAddressRelLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
@@ -46,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.tax.engine.key=" + ByAddressCommerceTaxEngine.KEY,
 	service = CommerceTaxEngine.class
 )
@@ -65,7 +66,7 @@ public class ByAddressCommerceTaxEngine implements CommerceTaxEngine {
 		long commerceAddressId =
 			commerceTaxCalculateRequest.getCommerceBillingAddressId();
 
-		if (_isTaxAppliedToShippingAddress(
+		if (isTaxAppliedToShippingAddress(
 				commerceTaxCalculateRequest.getCommerceChannelGroupId())) {
 
 			commerceAddressId =
@@ -118,21 +119,16 @@ public class ByAddressCommerceTaxEngine implements CommerceTaxEngine {
 
 	@Override
 	public String getDescription(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			_getResourceBundle(locale), "by-address-tax-rate-description");
 	}
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(_getResourceBundle(locale), KEY);
+		return LanguageUtil.get(_getResourceBundle(locale), KEY);
 	}
 
-	private ResourceBundle _getResourceBundle(Locale locale) {
-		return ResourceBundleUtil.getBundle(
-			"content.Language", locale, getClass());
-	}
-
-	private boolean _isTaxAppliedToShippingAddress(long groupId) {
+	protected boolean isTaxAppliedToShippingAddress(long groupId) {
 		try {
 			CommerceTaxByAddressTypeConfiguration
 				commerceTaxByAddressTypeConfiguration =
@@ -147,10 +143,15 @@ public class ByAddressCommerceTaxEngine implements CommerceTaxEngine {
 				taxAppliedToShippingAddress();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return false;
 		}
+	}
+
+	private ResourceBundle _getResourceBundle(Locale locale) {
+		return ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
 	}
 
 	private static final BigDecimal _ONE_HUNDRED = BigDecimal.valueOf(100);
@@ -166,8 +167,5 @@ public class ByAddressCommerceTaxEngine implements CommerceTaxEngine {
 	@Reference
 	private CommerceTaxFixedRateAddressRelLocalService
 		_commerceTaxFixedRateAddressRelLocalService;
-
-	@Reference
-	private Language _language;
 
 }

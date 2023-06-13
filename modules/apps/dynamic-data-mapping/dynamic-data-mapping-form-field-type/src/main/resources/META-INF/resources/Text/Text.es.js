@@ -15,69 +15,18 @@
 import ClayAutocomplete from '@clayui/autocomplete';
 import ClayDropDown from '@clayui/drop-down';
 import {ClayInput} from '@clayui/form';
-import {ClayTooltipProvider} from '@clayui/tooltip';
 import {usePrevious} from '@liferay/frontend-js-react-web';
 import {normalizeFieldName} from 'data-engine-js-components-web';
-import {sub} from 'frontend-js-web';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import {useSyncValue} from '../hooks/useSyncValue.es';
-import {getTooltipTitle} from '../util/tooltip';
 import withConfirmationField from '../util/withConfirmationField.es';
 
-const CounterContainer = ({
-	counter,
-	displayErrors,
-	error,
-	maxLength,
-	setError,
-	showCounter,
-	valid,
-}) => {
-	if (
-		!showCounter ||
-		(displayErrors === true && !valid && !Object.keys(error).length)
-	) {
-		return null;
-	}
-
-	const message = sub(
-		Liferay.Language.get('x-of-x-characters'),
-		counter,
-		maxLength
-	);
-
-	if (counter > maxLength) {
-		if (error.errorMessage !== message) {
-			setError({
-				displayErrors: true,
-				errorMessage: message,
-				valid: false,
-			});
-		}
-
-		return null;
-	}
-
-	if (error.displayErrors) {
-		setError({});
-	}
-
-	return (
-		<span aria-hidden="true" className="form-text">
-			{message}
-		</span>
-	);
-};
-
 const Text = ({
-	accessibleProps,
 	defaultLanguageId,
 	disabled,
-	displayErrors,
 	editingLanguageId,
-	error,
 	fieldName,
 	id,
 	invalidCharacters,
@@ -89,13 +38,9 @@ const Text = ({
 	onBlur,
 	onChange,
 	onFocus,
-	onKeyDown,
 	placeholder,
-	setError,
 	shouldUpdateValue,
-	showCounter,
 	syncDelay,
-	valid,
 	value: initialValue,
 }) => {
 	const [value, setValue] = useSyncValue(
@@ -145,130 +90,86 @@ const Text = ({
 		shouldUpdateValue,
 	]);
 
-	const handleChangeInput = (event) => {
-		const {value} = event.target;
-
-		if (normalizeField) {
-			event.target.value = normalizeFieldName(value);
-		}
-		else if (invalidCharacters) {
-			const regex = new RegExp(invalidCharacters, 'g');
-
-			event.target.value = value.replace(regex, '');
-		}
-
-		onChange(event);
-		setValue(event.target.value);
-	};
-
 	return (
-		<>
-			<ClayTooltipProvider autoAlign>
-				<div
-					data-tooltip-align="top"
-					{...getTooltipTitle({placeholder, value})}
-				>
-					<ClayInput
-						{...accessibleProps}
-						className="ddm-field-text"
-						dir={Liferay.Language.direction[editingLanguageId]}
-						disabled={disabled}
-						id={id}
-						lang={editingLanguageId?.replaceAll('_', '-')}
-						maxLength={showCounter ? '' : maxLength}
-						name={name}
-						onBlur={(event) => {
-							onBlur(event);
-							handleChangeInput(event);
-						}}
-						onChange={handleChangeInput}
-						onFocus={onFocus}
-						onKeyDown={onKeyDown}
-						placeholder={placeholder}
-						ref={inputRef}
-						type="text"
-						value={value}
-					/>
-				</div>
-			</ClayTooltipProvider>
+		<ClayInput
+			aria-labelledby={id}
+			className="ddm-field-text"
+			dir={Liferay.Language.direction[editingLanguageId]}
+			disabled={disabled}
+			id={id}
+			lang={editingLanguageId}
+			maxLength={maxLength}
+			name={name}
+			onBlur={(event) => {
+				if (normalizeField) {
+					onBlur({target: {value: initialValue}});
+				}
+				else {
+					onBlur(event);
+				}
+			}}
+			onChange={(event) => {
+				const {value} = event.target;
 
-			<CounterContainer
-				counter={value?.length}
-				displayErrors={displayErrors}
-				error={error}
-				maxLength={maxLength}
-				setError={setError}
-				showCounter={showCounter}
-				valid={valid}
-			/>
-		</>
+				if (normalizeField) {
+					event.target.value = normalizeFieldName(value);
+				}
+				else if (invalidCharacters) {
+					const regex = new RegExp(invalidCharacters, 'g');
+
+					event.target.value = value.replace(regex, '');
+				}
+
+				setValue(event.target.value);
+				onChange(event);
+			}}
+			onFocus={onFocus}
+			placeholder={placeholder}
+			ref={inputRef}
+			type="text"
+			value={value}
+		/>
 	);
 };
 
 const Textarea = ({
-	accessibleProps,
 	disabled,
-	displayErrors,
 	editingLanguageId,
-	error,
 	id,
-	maxLength,
 	name,
 	onBlur,
 	onChange,
 	onFocus,
 	placeholder,
-	setError,
-	showCounter,
 	syncDelay,
-	valid,
 	value: initialValue,
 }) => {
 	const [value, setValue] = useSyncValue(initialValue, syncDelay);
 
 	return (
-		<>
-			<ClayTooltipProvider autoAlign>
-				<div
-					data-tooltip-align="top"
-					{...getTooltipTitle({placeholder, value})}
-				>
-					<textarea
-						{...accessibleProps}
-						className="ddm-field-text form-control"
-						dir={Liferay.Language.direction[editingLanguageId]}
-						disabled={disabled}
-						id={id}
-						lang={editingLanguageId?.replaceAll('_', '-')}
-						name={name}
-						onBlur={onBlur}
-						onChange={(event) => {
-							setValue(event.target.value);
-							onChange(event);
-						}}
-						onFocus={onFocus}
-						placeholder={placeholder}
-						style={disabled ? {resize: 'none'} : null}
-						value={value}
-					/>
-				</div>
-			</ClayTooltipProvider>
-
-			<CounterContainer
-				counter={value?.length}
-				displayErrors={displayErrors}
-				error={error}
-				maxLength={maxLength}
-				setError={setError}
-				showCounter={showCounter}
-				valid={valid}
-			/>
-		</>
+		<textarea
+			aria-labelledby={id}
+			className="ddm-field-text form-control"
+			dir={Liferay.Language.direction[editingLanguageId]}
+			disabled={disabled}
+			id={id}
+			lang={editingLanguageId}
+			name={name}
+			onBlur={onBlur}
+			onChange={(event) => {
+				setValue(event.target.value);
+				onChange(event);
+			}}
+			onFocus={onFocus}
+			placeholder={placeholder}
+			style={disabled ? {resize: 'none'} : null}
+			type="text"
+			value={value}
+		/>
 	);
 };
 
 const Autocomplete = ({
-	accessibleProps,
 	disabled,
 	editingLanguageId,
 	id,
@@ -349,11 +250,11 @@ const Autocomplete = ({
 	return (
 		<ClayAutocomplete>
 			<ClayAutocomplete.Input
-				{...accessibleProps}
+				aria-labelledby={id}
 				dir={Liferay.Language.direction[editingLanguageId]}
 				disabled={disabled}
 				id={id}
-				lang={editingLanguageId?.replaceAll('_', '-')}
+				lang={editingLanguageId}
 				name={name}
 				onBlur={onBlur}
 				onChange={(event) => {
@@ -373,7 +274,7 @@ const Autocomplete = ({
 					if (
 						(event.key === 'Tab' || event.key === 'ArrowDown') &&
 						!event.shiftKey &&
-						!!filteredItems.length &&
+						filteredItems.length > 0 &&
 						visible
 					) {
 						event.preventDefault();
@@ -413,12 +314,11 @@ const Autocomplete = ({
 					}}
 					ref={itemListRef}
 				>
-					{!filteredItems.length && (
+					{filteredItems.length === 0 && (
 						<ClayDropDown.Item className="disabled">
 							{Liferay.Language.get('no-results-were-found')}
 						</ClayDropDown.Item>
 					)}
-
 					{filteredItems.map((label, index) => (
 						<ClayAutocomplete.Item
 							key={index}
@@ -448,9 +348,7 @@ const Main = ({
 	autocomplete,
 	autocompleteEnabled,
 	defaultLanguageId,
-	displayErrors,
 	displayStyle = 'singleline',
-	showCounter,
 	fieldName,
 	id,
 	invalidCharacters = '',
@@ -463,23 +361,18 @@ const Main = ({
 	onBlur,
 	onChange,
 	onFocus,
-	onKeyDown,
 	options = [],
 	placeholder,
 	predefinedValue = '',
 	readOnly,
 	shouldUpdateValue = false,
 	syncDelay = true,
-	valid,
 	value,
 	...otherProps
 }) => {
 	const optionsMemo = useMemo(() => options.map((option) => option.label), [
 		options,
 	]);
-
-	const [error, setError] = useState({});
-
 	const Component =
 		DISPLAY_STYLE[
 			autocomplete || autocompleteEnabled
@@ -487,36 +380,23 @@ const Main = ({
 				: displayStyle ?? `singleline`
 		];
 
+	const fieldDetailsId = id ? id + '_fieldDetails' : name + '_fieldDetails';
+
 	return (
 		<FieldBase
 			{...otherProps}
-			{...error}
-			displayErrors={error.displayErrors ?? displayErrors}
 			fieldName={fieldName}
 			id={id}
 			localizedValue={localizedValue}
 			name={name}
 			readOnly={readOnly}
-			valid={error.valid ?? valid}
 		>
 			<Component
-				accessibleProps={{
-					...(otherProps.tip && {
-						'aria-describedby': `${id ?? name}_fieldHelp`,
-					}),
-					...(otherProps.errorMessage && {
-						'aria-errormessage': `${id ?? name}_fieldError`,
-					}),
-					'aria-invalid': !valid,
-					'aria-required': otherProps.required,
-				}}
 				defaultLanguageId={defaultLanguageId}
 				disabled={readOnly}
-				displayErrors={displayErrors}
 				editingLanguageId={locale}
-				error={error}
 				fieldName={fieldName}
-				id={id ?? name}
+				id={fieldDetailsId}
 				invalidCharacters={invalidCharacters}
 				localizable={localizable}
 				localizedValue={localizedValue}
@@ -526,15 +406,11 @@ const Main = ({
 				onBlur={onBlur}
 				onChange={onChange}
 				onFocus={onFocus}
-				onKeyDown={onKeyDown}
 				options={optionsMemo}
 				placeholder={placeholder}
-				setError={setError}
 				shouldUpdateValue={shouldUpdateValue}
-				showCounter={showCounter}
 				syncDelay={syncDelay}
-				valid={valid}
-				value={value ? value : predefinedValue}
+				value={value ?? predefinedValue}
 			/>
 		</FieldBase>
 	);

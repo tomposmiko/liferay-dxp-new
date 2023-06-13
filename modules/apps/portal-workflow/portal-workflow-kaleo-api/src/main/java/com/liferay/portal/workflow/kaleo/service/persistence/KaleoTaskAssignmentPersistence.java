@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchTaskAssignmentException;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignment;
 
@@ -34,8 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoTaskAssignmentPersistence
-	extends BasePersistence<KaleoTaskAssignment>,
-			CTPersistence<KaleoTaskAssignment> {
+	extends BasePersistence<KaleoTaskAssignment> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

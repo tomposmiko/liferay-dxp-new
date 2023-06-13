@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM,
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
@@ -48,8 +49,6 @@ public class UploadFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		_uploadHandler.upload(
 			_ddmFormUploadFileEntryHandler, _ddmFormUploadResponseHandler,
 			actionRequest, actionResponse);
-
-		hideDefaultSuccessMessage(actionRequest);
 	}
 
 	@Reference

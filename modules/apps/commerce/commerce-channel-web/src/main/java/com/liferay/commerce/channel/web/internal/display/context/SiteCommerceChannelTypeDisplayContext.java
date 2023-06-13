@@ -16,12 +16,12 @@ package com.liferay.commerce.channel.web.internal.display.context;
 
 import com.liferay.commerce.currency.service.CommerceCurrencyService;
 import com.liferay.commerce.item.selector.criterion.SimpleSiteItemSelectorCriterion;
+import com.liferay.commerce.payment.method.CommercePaymentMethodRegistry;
 import com.liferay.commerce.product.channel.CommerceChannelHealthStatusRegistry;
 import com.liferay.commerce.product.channel.CommerceChannelTypeRegistry;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CPTaxCategoryLocalService;
 import com.liferay.commerce.product.service.CommerceChannelService;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
@@ -38,6 +38,8 @@ import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 
 import java.util.Collections;
 
+import javax.portlet.PortletURL;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -47,30 +49,29 @@ public class SiteCommerceChannelTypeDisplayContext
 	extends CommerceChannelDisplayContext {
 
 	public SiteCommerceChannelTypeDisplayContext(
-		CommerceChannelHealthStatusRegistry commerceChannelHealthStatusRegistry,
 		ModelResourcePermission<CommerceChannel>
 			commerceChannelModelResourcePermission,
+		CommerceChannelHealthStatusRegistry commerceChannelHealthStatusRegistry,
 		CommerceChannelService commerceChannelService,
 		CommerceChannelTypeRegistry commerceChannelTypeRegistry,
 		CommerceCurrencyService commerceCurrencyService,
+		CommercePaymentMethodRegistry commercePaymentMethodRegistry,
 		ConfigurationProvider configurationProvider,
-		CPTaxCategoryLocalService cpTaxCategoryLocalService,
-		DLAppLocalService dlAppLocalService,
 		GroupLocalService groupLocalService,
 		HttpServletRequest httpServletRequest, ItemSelector itemSelector,
 		Portal portal,
 		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService,
-		WorkflowDefinitionManager workflowDefinitionManager) {
+		WorkflowDefinitionManager workflowDefinitionManager,
+		CPTaxCategoryLocalService cpTaxCategoryLocalService) {
 
 		super(
-			commerceChannelHealthStatusRegistry,
-			commerceChannelModelResourcePermission, commerceChannelService,
+			commerceChannelModelResourcePermission,
+			commerceChannelHealthStatusRegistry, commerceChannelService,
 			commerceChannelTypeRegistry, commerceCurrencyService,
-			configurationProvider, cpTaxCategoryLocalService, dlAppLocalService,
-			httpServletRequest, itemSelector, portal,
-			workflowDefinitionLinkLocalService, workflowDefinitionManager);
+			commercePaymentMethodRegistry, configurationProvider,
+			httpServletRequest, portal, workflowDefinitionLinkLocalService,
+			workflowDefinitionManager, cpTaxCategoryLocalService);
 
-		_dlAppLocalService = dlAppLocalService;
 		_groupLocalService = groupLocalService;
 		_itemSelector = itemSelector;
 	}
@@ -96,13 +97,13 @@ public class SiteCommerceChannelTypeDisplayContext
 			Collections.<ItemSelectorReturnType>singletonList(
 				new UUIDItemSelectorReturnType()));
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, "sitesSelectItem",
-				simpleSiteItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "sitesSelectItem",
+			simpleSiteItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
-	private final DLAppLocalService _dlAppLocalService;
 	private final GroupLocalService _groupLocalService;
 	private final ItemSelector _itemSelector;
 

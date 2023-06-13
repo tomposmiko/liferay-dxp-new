@@ -20,13 +20,15 @@
 	<liferay-frontend:component
 		context='<%=
 			HashMapBuilder.<String, Object>put(
-				"datasetId", COREntryFDSNames.COR_ENTRY_QUALIFIER_ACCOUNT_ENTRIES
+				"datasetId", COREntryClayDataSetDisplayNames.COR_ENTRY_QUALIFIER_ACCOUNT_ENTRIES
 			).put(
 				"orderRuleExternalReferenceCode", HtmlUtil.escapeJS(corEntry.getExternalReferenceCode())
 			).put(
 				"orderRuleId", corEntryId
 			).put(
 				"rootPortletId", portletDisplay.getRootPortletId()
+			).put(
+				"spritemap", themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
 			).build()
 		%>'
 		module="js/account_entries"
@@ -36,12 +38,15 @@
 		bodyClasses="p-0"
 		title='<%= LanguageUtil.get(request, "accounts") %>'
 	>
-		<frontend-data-set:headless-display
+		<clay:headless-data-set-display
 			apiURL="<%= corEntryQualifiersDisplayContext.getAccountEntryCOREntriesAPIURL() %>"
-			fdsActionDropdownItems="<%= corEntryQualifiersDisplayContext.getAccountEntryFDSActionDropdownItems() %>"
-			formName="fm"
-			id="<%= COREntryFDSNames.COR_ENTRY_QUALIFIER_ACCOUNT_ENTRIES %>"
+			clayDataSetActionDropdownItems="<%= corEntryQualifiersDisplayContext.getAccountEntryClayDataSetActionDropdownItems() %>"
+			formId="fm"
+			id="<%= COREntryClayDataSetDisplayNames.COR_ENTRY_QUALIFIER_ACCOUNT_ENTRIES %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= currentURLObj %>"
 		/>
 	</commerce-ui:panel>
 </c:if>

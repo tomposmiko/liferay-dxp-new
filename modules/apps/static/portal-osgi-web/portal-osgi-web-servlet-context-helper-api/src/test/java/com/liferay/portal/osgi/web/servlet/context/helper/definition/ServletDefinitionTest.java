@@ -14,9 +14,6 @@
 
 package com.liferay.portal.osgi.web.servlet.context.helper.definition;
 
-import com.liferay.portal.kernel.util.ProxyFactory;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,19 +22,24 @@ import java.util.Map;
 import javax.servlet.Servlet;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.mockito.Mock;
+
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Miguel Pastor
  */
+@RunWith(PowerMockRunner.class)
 public class ServletDefinitionTest {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+	@Before
+	public void setUp() {
+		_servletDefinition = new ServletDefinition();
+	}
 
 	@Test
 	public void testAddMultipleURLPatterns() {
@@ -97,11 +99,9 @@ public class ServletDefinitionTest {
 
 	@Test
 	public void testSetServlet() {
-		Servlet servlet = ProxyFactory.newDummyInstance(Servlet.class);
+		_servletDefinition.setServlet(_servlet);
 
-		_servletDefinition.setServlet(servlet);
-
-		Assert.assertSame(servlet, _servletDefinition.getServlet());
+		Assert.assertEquals(_servlet, _servletDefinition.getServlet());
 	}
 
 	@Test
@@ -128,7 +128,9 @@ public class ServletDefinitionTest {
 		Assert.assertEquals(value, initParameters.get(key));
 	}
 
-	private final ServletDefinition _servletDefinition =
-		new ServletDefinition();
+	@Mock
+	private Servlet _servlet;
+
+	private ServletDefinition _servletDefinition;
 
 }

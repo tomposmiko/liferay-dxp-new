@@ -20,7 +20,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,12 +37,12 @@ public class JaxWsApiRegistrationTest extends BaseJaxWsTestCase {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
-	@Ignore
 	@Test
 	public void testGreeter() throws Exception {
-		Assert.assertEquals(
-			"Greetings.",
-			getGreeting("http://localhost:8080/o/soap-test/greeterApi?wsdl"));
+		String greeting = getGreeting(
+			"http://localhost:8080/o/soap-test/greeterApi?wsdl");
+
+		Assert.assertEquals("Greetings.", greeting);
 	}
 
 	@Override

@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Nícolas Moura
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DigitalSignaturePortletKeys.DIGITAL_SIGNATURE,
 		"mvc.command.name=/digital_signature/delete_ds_envelope"

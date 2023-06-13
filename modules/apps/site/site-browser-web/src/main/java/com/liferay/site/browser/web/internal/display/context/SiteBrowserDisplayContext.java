@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicyUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -75,7 +74,7 @@ public class SiteBrowserDisplayContext {
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 
-		_selUser = PortalUtil.getSelectedUser(httpServletRequest);
+		_selUser = PortalUtil.getSelectedUser(_httpServletRequest);
 	}
 
 	public String getDisplayStyle() {
@@ -174,34 +173,27 @@ public class SiteBrowserDisplayContext {
 
 		total += additionalSites;
 
+		groupSearch.setTotal(total);
+
+		int start = groupSearch.getStart();
+
+		if (groupSearch.getStart() > additionalSites) {
+			start = groupSearch.getStart() - additionalSites;
+		}
+
+		List<Group> groups = null;
+
 		if (Objects.equals(type, "layoutScopes")) {
-			int additionalSitesCount = additionalSites;
+			groups = GroupLocalServiceUtil.getGroups(
+				company.getCompanyId(), Layout.class.getName(), _getGroupId(),
+				start, groupSearch.getResultEnd() - additionalSites);
 
-			groupSearch.setResultsAndTotal(
-				() -> {
-					int start = groupSearch.getStart();
-
-					if (groupSearch.getStart() > additionalSitesCount) {
-						start = groupSearch.getStart() - additionalSitesCount;
-					}
-
-					results.addAll(
-						_filterLayoutGroups(
-							GroupLocalServiceUtil.getGroups(
-								company.getCompanyId(), Layout.class.getName(),
-								_getGroupId(), start,
-								groupSearch.getResultEnd() -
-									additionalSitesCount),
-							_isPrivateLayout()));
-
-					return results;
-				},
-				total);
+			groups = _filterLayoutGroups(groups, _isPrivateLayout());
 		}
 		else if (Objects.equals(type, "parent-sites")) {
 			Group group = GroupLocalServiceUtil.getGroup(_getGroupId());
 
-			List<Group> groups = group.getAncestors();
+			groups = group.getAncestors();
 
 			String filter = _getFilter();
 
@@ -213,12 +205,10 @@ public class SiteBrowserDisplayContext {
 
 			total += additionalSites;
 
-			results.addAll(groups);
-
-			groupSearch.setResultsAndTotal(() -> results, total);
+			groupSearch.setTotal(total);
 		}
 		else {
-			List<Group> groups = GroupLocalServiceUtil.search(
+			groups = GroupLocalServiceUtil.search(
 				company.getCompanyId(), classNameIds,
 				groupSearchTerms.getKeywords(), _getGroupParams(),
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
@@ -228,25 +218,15 @@ public class SiteBrowserDisplayContext {
 
 			total += additionalSites;
 
-			int additionalSitesCount = additionalSites;
+			groupSearch.setTotal(total);
 
-			groupSearch.setResultsAndTotal(
-				() -> {
-					int start = groupSearch.getStart();
-
-					if (groupSearch.getStart() > additionalSitesCount) {
-						start = groupSearch.getStart() - additionalSitesCount;
-					}
-
-					results.addAll(
-						groups.subList(
-							start,
-							groupSearch.getResultEnd() - additionalSitesCount));
-
-					return results;
-				},
-				total);
+			groups = groups.subList(
+				start, groupSearch.getResultEnd() - additionalSites);
 		}
+
+		results.addAll(groups);
+
+		groupSearch.setResults(results);
 
 		_groupSearch = groupSearch;
 
@@ -291,8 +271,8 @@ public class SiteBrowserDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, SiteBrowserPortletKeys.SITE_BROWSER, "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -307,7 +287,7 @@ public class SiteBrowserDisplayContext {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -399,7 +379,7 @@ public class SiteBrowserDisplayContext {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -505,9 +485,9 @@ public class SiteBrowserDisplayContext {
 		).build();
 
 		if (Objects.equals(type, "child-sites")) {
-			_groupParams.put(
-				"groupsTree",
-				ListUtil.fromArray(GroupLocalServiceUtil.getGroup(groupId)));
+			Group parentGroup = GroupLocalServiceUtil.getGroup(groupId);
+
+			_groupParams.put("groupsTree", ListUtil.fromArray(parentGroup));
 		}
 		else if (filterManageableGroups) {
 			if (Objects.equals(type, "sites-that-i-administer")) {
@@ -551,8 +531,8 @@ public class SiteBrowserDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, SiteBrowserPortletKeys.SITE_BROWSER, "name");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}

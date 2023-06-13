@@ -76,7 +76,7 @@ else {
 	viewTypeItems="<%= selectRoleManagementToolbarDisplayContext.getViewTypeItems() %>"
 />
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl container-form-lg" method="post" name="selectOrganizationRoleFm">
+<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl container-form-lg" method="post" name="selectOrganizationRoleFm">
 	<c:choose>
 		<c:when test="<%= step == 1 %>">
 			<aui:input name="organizationId" type="hidden" />
@@ -139,19 +139,15 @@ else {
 
 						<%
 						Group group = organization.getGroup();
+
+						Map<String, Object> data = HashMapBuilder.<String, Object>put(
+							"groupid", group.getGroupId()
+						).put(
+							"organizationid", organization.getOrganizationId()
+						).build();
 						%>
 
-						<aui:button
-							cssClass="organization-selector-button"
-							data='<%=
-								HashMapBuilder.<String, Object>put(
-									"groupid", group.getGroupId()
-								).put(
-									"organizationid", organization.getOrganizationId()
-								).build()
-							%>'
-							value="choose"
-						/>
+						<aui:button cssClass="organization-selector-button" data="<%= data %>" value="choose" />
 					</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>
 
@@ -160,10 +156,10 @@ else {
 				/>
 			</liferay-ui:search-container>
 
-			<aui:script require="frontend-js-web/index as frontendJsWeb">
-				var {delegate} = frontendJsWeb;
-
+			<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 				var form = document.<portlet:namespace />selectOrganizationRoleFm;
+
+				var delegate = delegateModule.default;
 
 				delegate(form, 'click', '.organization-selector-button', (event) => {
 					Liferay.Util.postForm(form, {
@@ -182,21 +178,6 @@ else {
 			</aui:script>
 		</c:when>
 		<c:when test="<%= step == 2 %>">
-
-			<%
-			String groupEventName = ParamUtil.getString(request, "groupEventName");
-			%>
-
-			<c:if test="<%= Validator.isNotNull(groupEventName) %>">
-				<aui:script>
-					const openingLiferay = Liferay.Util.getOpener().Liferay;
-
-					openingLiferay.fire('<%= HtmlUtil.escapeJS(groupEventName) %>', {
-						data: '<%= organizationId %>',
-					});
-				</aui:script>
-			</c:if>
-
 			<aui:input name="step" type="hidden" value="2" />
 			<aui:input name="organizationId" type="hidden" value="<%= String.valueOf(organizationId) %>" />
 

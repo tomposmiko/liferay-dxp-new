@@ -16,20 +16,20 @@
  * @deprecated As of Athanasius (7.3.x), with no direct replacement
  */
 (function () {
-	const ALLOY = YUI();
+	var ALLOY = YUI();
 
 	if (ALLOY.html5shiv) {
 		ALLOY.html5shiv();
 	}
 
-	const originalUse = ALLOY.use;
+	var originalUse = ALLOY.use;
 
 	ALLOY.use = function () {
-		const args = Array.prototype.slice.call(arguments, 0);
+		var args = Array.prototype.slice.call(arguments, 0);
 
-		const currentURL = Liferay.currentURL;
+		var currentURL = Liferay.currentURL;
 
-		const originalCallback = args[args.length - 1];
+		var originalCallback = args[args.length - 1];
 
 		if (typeof originalCallback === 'function') {
 			args[args.length - 1] = function () {

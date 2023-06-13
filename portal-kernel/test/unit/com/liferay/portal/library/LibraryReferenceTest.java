@@ -103,11 +103,10 @@ public class LibraryReferenceTest {
 
 	@Test
 	public void testIntelliJLibPreModules() {
-		StringBundler sb = new StringBundler();
-
 		for (Map.Entry<String, List<String>> entry :
 				_intelliJModuleSourceModules.entrySet()) {
 
+			String intelliJFileName = entry.getKey();
 			List<String> modules = entry.getValue();
 
 			List<String> missingModules = new ArrayList<>();
@@ -124,15 +123,12 @@ public class LibraryReferenceTest {
 				}
 			}
 
-			if (!missingModules.isEmpty()) {
-				sb.append(entry.getKey());
-				sb.append(" is missing orderEntry elements for modules: ");
-				sb.append(missingModules);
-				sb.append(StringPool.NEW_LINE);
-			}
+			Assert.assertTrue(
+				intelliJFileName +
+					" is missing orderEntry elements for modules " +
+						missingModules,
+				missingModules.isEmpty());
 		}
-
-		Assert.assertEquals(sb.toString(), 0, sb.index());
 	}
 
 	@Test
@@ -143,10 +139,6 @@ public class LibraryReferenceTest {
 	@Test
 	public void testLibDependencyJarsInVersionsExt() {
 		for (String jar : _libDependencyJars) {
-			if (_excludeJars.contains(jar)) {
-				continue;
-			}
-
 			Assert.assertTrue(
 				_VERSIONS_EXT_FILE_NAME + " is missing a reference to " + jar,
 				_versionsExtJars.contains(jar));
@@ -354,7 +346,7 @@ public class LibraryReferenceTest {
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Element element = (Element)nodeList.item(i);
 
-				if (Objects.equals(element.getAttribute("type"), "module")) {
+				if (Objects.equals("module", element.getAttribute("type"))) {
 					intelliJModuleSourceModules.add(
 						element.getAttribute("module-name"));
 				}
@@ -544,10 +536,10 @@ public class LibraryReferenceTest {
 			for (int j = 0; j < childNodeList.getLength(); j++) {
 				Node childNode = childNodeList.item(j);
 
-				if (Objects.equals(childNode.getNodeName(), "file-name")) {
+				if (Objects.equals("file-name", childNode.getNodeName())) {
 					jar = childNode.getTextContent();
 				}
-				else if (Objects.equals(childNode.getNodeName(), "version")) {
+				else if (Objects.equals("version", childNode.getNodeName())) {
 					version = childNode.getTextContent();
 				}
 			}

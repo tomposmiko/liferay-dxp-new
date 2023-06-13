@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + BlogsPortletKeys.BLOGS_AGGREGATOR,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -70,13 +71,13 @@ public class BlogsAggregatorExportImportPortletPreferencesProcessor
 		throws PortletDataException {
 
 		try {
-			return _updateExportPortletPreferences(
+			return updateExportPortletPreferences(
 				portletDataContext, portletDataContext.getRootPortletId(),
 				portletPreferences);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return portletPreferences;
@@ -90,19 +91,19 @@ public class BlogsAggregatorExportImportPortletPreferencesProcessor
 		throws PortletDataException {
 
 		try {
-			return _updateImportPortletPreferences(
+			return updateImportPortletPreferences(
 				portletDataContext, portletPreferences);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return portletPreferences;
 		}
 	}
 
-	private PortletPreferences _updateExportPortletPreferences(
+	protected PortletPreferences updateExportPortletPreferences(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
@@ -145,7 +146,7 @@ public class BlogsAggregatorExportImportPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
-	private PortletPreferences _updateImportPortletPreferences(
+	protected PortletPreferences updateImportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws Exception {

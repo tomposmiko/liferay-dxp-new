@@ -43,10 +43,6 @@ public class AlertTag extends BaseContainerTag {
 		return _autoClose;
 	}
 
-	public boolean getDefaultTitleDisabled() {
-		return _defaultTitleDisabled;
-	}
-
 	public boolean getDismissible() {
 		return _dismissible;
 	}
@@ -57,10 +53,6 @@ public class AlertTag extends BaseContainerTag {
 
 	public String getMessage() {
 		return _message;
-	}
-
-	public String getSymbol() {
-		return _symbol;
 	}
 
 	public String getTitle() {
@@ -75,10 +67,6 @@ public class AlertTag extends BaseContainerTag {
 		_autoClose = autoClose;
 	}
 
-	public void setDefaultTitleDisabled(boolean defaultTitleDisabled) {
-		_defaultTitleDisabled = defaultTitleDisabled;
-	}
-
 	public void setDismissible(boolean dismissible) {
 		_dismissible = dismissible;
 	}
@@ -89,10 +77,6 @@ public class AlertTag extends BaseContainerTag {
 
 	public void setMessage(String message) {
 		_message = message;
-	}
-
-	public void setSymbol(String symbol) {
-		_symbol = symbol;
 	}
 
 	public void setTitle(String title) {
@@ -108,11 +92,9 @@ public class AlertTag extends BaseContainerTag {
 		super.cleanUp();
 
 		_autoClose = false;
-		_defaultTitleDisabled = false;
 		_dismissible = false;
 		_displayType = "info";
 		_message = null;
-		_symbol = null;
 		_title = null;
 		_variant = null;
 	}
@@ -143,12 +125,7 @@ public class AlertTag extends BaseContainerTag {
 		jspWriter.write("</div></div>");
 
 		if (_dismissible) {
-			jspWriter.write("<button aria-label=\"");
-			jspWriter.write(
-				LanguageUtil.get(
-					TagResourceBundleUtil.getResourceBundle(pageContext),
-					"close"));
-			jspWriter.write("\" class=\"close\" onclick=\"");
+			jspWriter.write("<button class=\"close\" onclick=\"");
 			jspWriter.write("event.target.closest('[role=alert]').remove()\"");
 			jspWriter.write(" type=\"button\">");
 
@@ -188,33 +165,15 @@ public class AlertTag extends BaseContainerTag {
 
 		IconTag iconTag = new IconTag();
 
-		if (Validator.isNotNull(_symbol)) {
-			iconTag.setSymbol(_symbol);
-		}
-		else {
-			iconTag.setSymbol(_getIcon(_displayType));
-		}
+		iconTag.setSymbol(_getIcon(_displayType));
 
 		iconTag.doTag(pageContext);
 
 		jspWriter.write("</span></div></div><div class=\"autofit-col ");
 		jspWriter.write("autofit-col-expand\"><div class=\"autofit-section\">");
-
-		if (_defaultTitleDisabled) {
-			if (Validator.isNotNull(_title)) {
-				jspWriter.write("<strong class=\"lead\">");
-				jspWriter.write(
-					LanguageUtil.get(
-						TagResourceBundleUtil.getResourceBundle(pageContext),
-						_title));
-				jspWriter.write("</strong>");
-			}
-		}
-		else {
-			jspWriter.write("<strong class=\"lead\">");
-			jspWriter.write(_getTitle(_title, _displayType));
-			jspWriter.write(":</strong>");
-		}
+		jspWriter.write("<strong class=\"lead\">");
+		jspWriter.write(_getTitle(_title, _displayType));
+		jspWriter.write(":</strong>");
 
 		if (Validator.isNotNull(_message)) {
 			jspWriter.write(
@@ -238,11 +197,9 @@ public class AlertTag extends BaseContainerTag {
 		else if (displayType.equals("warning")) {
 			return "warning-full";
 		}
-		else if (displayType.equals("secondary")) {
-			return "password-policies";
+		else {
+			return "info-circle";
 		}
-
-		return "info-circle";
 	}
 
 	private String _getTitle(String title, String displayType) {
@@ -261,11 +218,9 @@ public class AlertTag extends BaseContainerTag {
 	private static final String _ATTRIBUTE_NAMESPACE = "clay:alert:";
 
 	private boolean _autoClose;
-	private boolean _defaultTitleDisabled;
 	private boolean _dismissible;
 	private String _displayType = "info";
 	private String _message;
-	private String _symbol;
 	private String _title;
 	private String _variant;
 

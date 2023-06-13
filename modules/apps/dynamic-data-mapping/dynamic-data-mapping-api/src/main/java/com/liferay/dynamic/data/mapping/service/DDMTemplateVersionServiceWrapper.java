@@ -28,10 +28,6 @@ public class DDMTemplateVersionServiceWrapper
 	implements DDMTemplateVersionService,
 			   ServiceWrapper<DDMTemplateVersionService> {
 
-	public DDMTemplateVersionServiceWrapper() {
-		this(null);
-	}
-
 	public DDMTemplateVersionServiceWrapper(
 		DDMTemplateVersionService ddmTemplateVersionService) {
 

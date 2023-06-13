@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.captcha.configuration.CaptchaConfiguration",
 	service = ConfigurationModelListener.class
 )
@@ -49,7 +50,7 @@ public class CaptchaConfigurationModelListener
 			if (Validator.isNotNull(captchaEngine) &&
 				captchaEngine.equals(ReCaptchaImpl.class.getName())) {
 
-				_validateReCaptchaKeys(properties);
+				validateReCaptchaKeys(properties);
 			}
 		}
 		catch (CaptchaConfigurationException captchaConfigurationException) {
@@ -60,7 +61,7 @@ public class CaptchaConfigurationModelListener
 		}
 	}
 
-	private ResourceBundle _getResourceBundle() {
+	protected ResourceBundle getResourceBundle() {
 		if (_resourceBundle == null) {
 			Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
 
@@ -71,7 +72,7 @@ public class CaptchaConfigurationModelListener
 		return _resourceBundle;
 	}
 
-	private void _validateReCaptchaKeys(Dictionary<String, Object> properties)
+	protected void validateReCaptchaKeys(Dictionary<String, Object> properties)
 		throws CaptchaConfigurationException {
 
 		String reCaptchaPublicKey = (String)properties.get(
@@ -80,7 +81,7 @@ public class CaptchaConfigurationModelListener
 		if (Validator.isNull(reCaptchaPublicKey)) {
 			throw new CaptchaConfigurationException(
 				ResourceBundleUtil.getString(
-					_getResourceBundle(),
+					getResourceBundle(),
 					"the-recaptcha-public-key-is-not-valid"));
 		}
 
@@ -90,7 +91,7 @@ public class CaptchaConfigurationModelListener
 		if (Validator.isNull(reCaptchaPrivateKey)) {
 			throw new CaptchaConfigurationException(
 				ResourceBundleUtil.getString(
-					_getResourceBundle(),
+					getResourceBundle(),
 					"the-recaptcha-private-key-is-not-valid"));
 		}
 	}

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.highlight;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -29,7 +29,7 @@ public interface HighlightFieldBuilder {
 
 	public HighlightField build();
 
-	public HighlightFieldBuilder fragments(List<String> fragments);
+	public HighlightFieldBuilder fragments(Stream<String> fragmentStream);
 
 	public HighlightFieldBuilder name(String name);
 

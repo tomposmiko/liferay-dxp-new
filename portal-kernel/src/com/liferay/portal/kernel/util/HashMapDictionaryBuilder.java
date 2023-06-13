@@ -221,12 +221,6 @@ public class HashMapDictionaryBuilder<K, V> extends BaseMapBuilder {
 			return this;
 		}
 
-		public HashMapDictionaryWrapper<K, V> remove(K key) {
-			_hashMapDictionary.remove(key);
-
-			return this;
-		}
-
 		protected HashMapDictionary<K, V> getDictionary() {
 			return _hashMapDictionary;
 		}

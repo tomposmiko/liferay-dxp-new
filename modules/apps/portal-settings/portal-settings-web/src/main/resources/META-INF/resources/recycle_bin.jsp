@@ -33,15 +33,13 @@
 
 			trashEnabledCheckbox.addEventListener('change', (event) => {
 				if (!trashEnabledCheckbox.checked && trashEnabledDefault) {
-					Liferay.Util.openConfirmModal({
-						message:
-							'<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "disabling-the-recycle-bin-prevents-the-restoring-of-content-that-has-been-moved-to-the-recycle-bin")) %>',
-						onConfirm: (isConfirmed) => {
-							if (!isConfirmed) {
-								trashEnabledCheckbox.checked = true;
-							}
-						},
-					});
+					if (
+						!confirm(
+							'<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "disabling-the-recycle-bin-prevents-the-restoring-of-content-that-has-been-moved-to-the-recycle-bin")) %>'
+						)
+					) {
+						trashEnabledCheckbox.checked = true;
+					}
 				}
 			});
 		}

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
 
-<service-builder auto-import-default-references="false" auto-namespace-tables="false" change-tracking-enabled="true" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.friendly.url">
+<service-builder auto-namespace-tables="false" change-tracking-enabled="true" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.friendly.url">
 	<namespace>FURL</namespace>
 	<entity local-service="true" name="FriendlyURLEntry" remote-service="false" uuid="true">
 
@@ -34,7 +34,7 @@
 
 			<!-- Finder methods -->
 
-			<finder name="G_C_U" return-type="Collection">
+			<finder name="G_C_U" return-type="FriendlyURLEntryLocalization" unique="true">
 				<finder-column name="groupId" />
 				<finder-column name="classNameId" />
 				<finder-column name="urlTitle" />
@@ -44,18 +44,6 @@
 				<finder-column name="classNameId" />
 				<finder-column name="classPK" />
 				<finder-column name="languageId" />
-			</finder>
-			<finder name="G_C_L_U" return-type="FriendlyURLEntryLocalization" unique="true">
-				<finder-column name="groupId" />
-				<finder-column name="classNameId" />
-				<finder-column name="languageId" />
-				<finder-column name="urlTitle" />
-			</finder>
-			<finder name="G_C_NotL_U" return-type="Collection">
-				<finder-column name="groupId" />
-				<finder-column name="classNameId" />
-				<finder-column comparator="!=" name="languageId" />
-				<finder-column name="urlTitle" />
 			</finder>
 		</localized-entity>
 
@@ -81,7 +69,7 @@
 
 		<column name="classNameId" type="long" />
 		<column name="classPK" type="long" />
-		<column change-tracking-resolution-type="merge" name="friendlyURLEntryId" type="long" />
+		<column name="friendlyURLEntryId" type="long" />
 
 		<!-- Finder methods -->
 

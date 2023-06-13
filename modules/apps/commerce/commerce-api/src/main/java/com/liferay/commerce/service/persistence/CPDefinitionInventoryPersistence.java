@@ -17,7 +17,6 @@ package com.liferay.commerce.service.persistence;
 import com.liferay.commerce.exception.NoSuchCPDefinitionInventoryException;
 import com.liferay.commerce.model.CPDefinitionInventory;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -34,8 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CPDefinitionInventoryPersistence
-	extends BasePersistence<CPDefinitionInventory>,
-			CTPersistence<CPDefinitionInventory> {
+	extends BasePersistence<CPDefinitionInventory> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

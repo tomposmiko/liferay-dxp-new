@@ -64,18 +64,16 @@ public class BatchEngineImportTaskLocalServiceUtil {
 	}
 
 	public static BatchEngineImportTask addBatchEngineImportTask(
-			String externalReferenceCode, long companyId, long userId,
-			long batchSize, String callbackURL, String className,
-			byte[] content, String contentType, String executeStatus,
-			Map<String, String> fieldNameMappingMap, int importStrategy,
-			String operation, Map<String, Serializable> parameters,
-			String taskItemDelegateName)
-		throws PortalException {
+		long companyId, long userId, long batchSize, String callbackURL,
+		String className, byte[] content, String contentType,
+		String executeStatus, Map<String, String> fieldNameMappingMap,
+		String operation, Map<String, Serializable> parameters,
+		String taskItemDelegateName) {
 
 		return getService().addBatchEngineImportTask(
-			externalReferenceCode, companyId, userId, batchSize, callbackURL,
-			className, content, contentType, executeStatus, fieldNameMappingMap,
-			importStrategy, operation, parameters, taskItemDelegateName);
+			companyId, userId, batchSize, callbackURL, className, content,
+			contentType, executeStatus, fieldNameMappingMap, operation,
+			parameters, taskItemDelegateName);
 	}
 
 	/**
@@ -237,14 +235,6 @@ public class BatchEngineImportTaskLocalServiceUtil {
 		return getService().fetchBatchEngineImportTask(batchEngineImportTaskId);
 	}
 
-	public static BatchEngineImportTask
-		fetchBatchEngineImportTaskByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return getService().fetchBatchEngineImportTaskByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the batch engine import task with the matching UUID and company.
 	 *
@@ -278,15 +268,6 @@ public class BatchEngineImportTaskLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getBatchEngineImportTask(batchEngineImportTaskId);
-	}
-
-	public static BatchEngineImportTask
-			getBatchEngineImportTaskByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getBatchEngineImportTaskByExternalReferenceCode(
-			externalReferenceCode, companyId);
 	}
 
 	/**

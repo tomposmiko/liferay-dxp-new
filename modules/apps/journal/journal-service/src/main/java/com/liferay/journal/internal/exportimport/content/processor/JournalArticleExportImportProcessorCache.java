@@ -24,7 +24,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = JournalArticleExportImportProcessorCache.class)
+@Component(
+	immediate = true, service = JournalArticleExportImportProcessorCache.class
+)
 public class JournalArticleExportImportProcessorCache {
 
 	public void clear() {

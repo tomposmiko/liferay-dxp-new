@@ -20,7 +20,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
@@ -35,7 +35,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Chema Balsas
@@ -53,7 +52,7 @@ public class CKEditorEmbedConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		jsonObject.put("embedProviders", _getEditorEmbedProvidersJSONArray());
+		jsonObject.put("embedProviders", getEditorEmbedProvidersJSONArray());
 	}
 
 	@Activate
@@ -76,9 +75,17 @@ public class CKEditorEmbedConfigContributor
 		_serviceTrackerMap.close();
 	}
 
-	private JSONObject _getEditorEmbedProviderJSONObject(
+	protected JSONObject getEditorEmbedProviderJSONObject(
 		String editorEmbedProviderType,
 		EditorEmbedProvider editorEmbedProvider) {
+
+		JSONArray urlSchemesJSONArray = JSONFactoryUtil.createJSONArray();
+
+		String[] urlSchemes = editorEmbedProvider.getURLSchemes();
+
+		for (String urlScheme : urlSchemes) {
+			urlSchemesJSONArray.put(urlScheme);
+		}
 
 		return JSONUtil.put(
 			"id", editorEmbedProvider.getId()
@@ -87,23 +94,12 @@ public class CKEditorEmbedConfigContributor
 		).put(
 			"type", editorEmbedProviderType
 		).put(
-			"urlSchemes",
-			() -> {
-				JSONArray urlSchemesJSONArray = _jsonFactory.createJSONArray();
-
-				String[] urlSchemes = editorEmbedProvider.getURLSchemes();
-
-				for (String urlScheme : urlSchemes) {
-					urlSchemesJSONArray.put(urlScheme);
-				}
-
-				return urlSchemesJSONArray;
-			}
+			"urlSchemes", urlSchemesJSONArray
 		);
 	}
 
-	private JSONArray _getEditorEmbedProvidersJSONArray() {
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+	protected JSONArray getEditorEmbedProvidersJSONArray() {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		Set<String> editorEmbedProviderTypes = _serviceTrackerMap.keySet();
 
@@ -114,15 +110,12 @@ public class CKEditorEmbedConfigContributor
 
 				editorEmbedProviders.forEach(
 					editorEmbedProvider -> jsonArray.put(
-						_getEditorEmbedProviderJSONObject(
+						getEditorEmbedProviderJSONObject(
 							editorEmbedProviderType, editorEmbedProvider)));
 			});
 
 		return jsonArray;
 	}
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	private ServiceTrackerMap<String, List<EditorEmbedProvider>>
 		_serviceTrackerMap;

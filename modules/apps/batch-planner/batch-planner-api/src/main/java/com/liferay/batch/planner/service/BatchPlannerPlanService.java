@@ -54,8 +54,7 @@ public interface BatchPlannerPlanService extends BaseService {
 	 */
 	public BatchPlannerPlan addBatchPlannerPlan(
 			boolean export, String externalType, String externalURL,
-			String internalClassName, String name, int size,
-			String taskItemDelegateName, boolean template)
+			String internalClassName, String name, boolean template)
 		throws PortalException;
 
 	public BatchPlannerPlan deleteBatchPlannerPlan(long batchPlannerPlanId)
@@ -76,21 +75,8 @@ public interface BatchPlannerPlanService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<BatchPlannerPlan> getBatchPlannerPlans(
-			long companyId, boolean export, boolean template,
-			String searchByKeyword, int start, int end,
-			OrderByComparator<BatchPlannerPlan> orderByComparator)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BatchPlannerPlan> getBatchPlannerPlans(
-		long companyId, boolean template, int start, int end,
+		long companyId, boolean export, int start, int end,
 		OrderByComparator<BatchPlannerPlan> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BatchPlannerPlan> getBatchPlannerPlans(
-			long companyId, boolean template, String searchByKeyword, int start,
-			int end, OrderByComparator<BatchPlannerPlan> orderByComparator)
-		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<BatchPlannerPlan> getBatchPlannerPlans(
@@ -105,22 +91,11 @@ public interface BatchPlannerPlanService extends BaseService {
 	public int getBatchPlannerPlansCount(long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getBatchPlannerPlansCount(long companyId, boolean template);
+	public int getBatchPlannerPlansCount(long companyId, boolean export);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getBatchPlannerPlansCount(
 		long companyId, boolean export, boolean template);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getBatchPlannerPlansCount(
-			long companyId, boolean export, boolean template,
-			String searchByKeyword)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getBatchPlannerPlansCount(
-			long companyId, boolean template, String searchByKeyword)
-		throws PortalException;
 
 	/**
 	 * Returns the OSGi service identifier.
@@ -130,8 +105,7 @@ public interface BatchPlannerPlanService extends BaseService {
 	public String getOSGiServiceIdentifier();
 
 	public BatchPlannerPlan updateBatchPlannerPlan(
-			long batchPlannerPlanId, String externalType,
-			String internalClassName, String name)
+			long batchPlannerPlanId, String name)
 		throws PortalException;
 
 }

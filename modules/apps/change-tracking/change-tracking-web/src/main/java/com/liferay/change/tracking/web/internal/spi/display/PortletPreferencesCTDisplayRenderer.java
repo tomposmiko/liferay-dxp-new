@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author David Truong
  */
-@Component(service = CTDisplayRenderer.class)
+@Component(immediate = true, service = CTDisplayRenderer.class)
 public class PortletPreferencesCTDisplayRenderer
 	extends BaseCTDisplayRenderer<PortletPreferences> {
 
@@ -66,7 +66,7 @@ public class PortletPreferencesCTDisplayRenderer
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			arguments.add(portlet.getPortletName());
@@ -134,7 +134,7 @@ public class PortletPreferencesCTDisplayRenderer
 				}
 				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(exception);
+						_log.warn(exception, exception);
 					}
 
 					return portlet.getPortletName();

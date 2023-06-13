@@ -15,9 +15,9 @@
 package com.liferay.dynamic.data.mapping.internal.report;
 
 import com.liferay.dynamic.data.mapping.constants.DDMFormInstanceReportConstants;
-import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -25,13 +25,11 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
-import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -40,13 +38,18 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Marcos Martins
  */
-public class GridDDMFormFieldTypeReportProcessorTest {
+@RunWith(MockitoJUnitRunner.class)
+public class GridDDMFormFieldTypeReportProcessorTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -57,10 +60,6 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 	public void setUp() throws Exception {
 		_gridDDMFormFieldTypeReportProcessor.ddmFormInstanceRecordLocalService =
 			_ddmFormInstanceRecordLocalService;
-
-		ReflectionTestUtil.setFieldValue(
-			_gridDDMFormFieldTypeReportProcessor, "_jsonFactory",
-			new JSONFactoryImpl());
 
 		_mockDDMFormInstanceRecord();
 	}
@@ -76,7 +75,7 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 			_gridDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.GRID
+					"type", DDMFormFieldType.GRID
 				).put(
 					"values",
 					JSONFactoryUtil.createJSONObject(
@@ -110,7 +109,7 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 			_gridDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.GRID
+					"type", DDMFormFieldType.GRID
 				).put(
 					"values", JSONFactoryUtil.createJSONObject()
 				),
@@ -118,8 +117,7 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
 
 		Assert.assertEquals(
-			DDMFormFieldTypeConstants.GRID,
-			processedFieldJSONObject.getString("type"));
+			DDMFormFieldType.GRID, processedFieldJSONObject.getString("type"));
 
 		JSONObject valuesJSONObject = processedFieldJSONObject.getJSONObject(
 			"values");
@@ -145,7 +143,7 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 			_gridDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.GRID
+					"type", DDMFormFieldType.GRID
 				).put(
 					"values", JSONFactoryUtil.createJSONObject()
 				),
@@ -153,8 +151,7 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 				DDMFormInstanceReportConstants.EVENT_ADD_RECORD_VERSION);
 
 		Assert.assertEquals(
-			DDMFormFieldTypeConstants.GRID,
-			processedFieldJSONObject.getString("type"));
+			DDMFormFieldType.GRID, processedFieldJSONObject.getString("type"));
 
 		JSONObject valuesJSONObject = processedFieldJSONObject.getJSONObject(
 			"values");
@@ -178,7 +175,7 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 			_gridDDMFormFieldTypeReportProcessor.process(
 				ddmFormFieldValue,
 				JSONUtil.put(
-					"type", DDMFormFieldTypeConstants.GRID
+					"type", DDMFormFieldType.GRID
 				).put(
 					"values",
 					JSONFactoryUtil.createJSONObject(
@@ -228,19 +225,18 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 	private DDMFormFieldValue _mockDDMFormFieldValue(
 		String name, JSONObject valueJSONObject) {
 
-		DDMFormFieldValue ddmFormFieldValue = Mockito.mock(
-			DDMFormFieldValue.class);
+		DDMFormFieldValue ddmFormFieldValue = mock(DDMFormFieldValue.class);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getName()
 		).thenReturn(
 			name
 		);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getType()
 		).thenReturn(
-			DDMFormFieldTypeConstants.GRID
+			DDMFormFieldType.GRID
 		);
 
 		Value value = new LocalizedValue();
@@ -248,7 +244,7 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 		value.addString(value.getDefaultLocale(), valueJSONObject.toString());
 		value.setDefaultLocale(LocaleUtil.US);
 
-		Mockito.when(
+		when(
 			ddmFormFieldValue.getValue()
 		).thenReturn(
 			value
@@ -260,31 +256,31 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 	private DDMFormInstance _mockDDMFormInstance(String fieldName)
 		throws Exception {
 
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
 
-		DDMStructure ddmStructure = Mockito.mock(DDMStructure.class);
+		DDMStructure ddmStructure = mock(DDMStructure.class);
 
-		DDMFormField ddmFormField = Mockito.mock(DDMFormField.class);
+		DDMFormField ddmFormField = mock(DDMFormField.class);
 
-		Mockito.when(
+		when(
 			ddmFormField.getProperty("columns")
 		).thenReturn(
 			_createDDMFormOptions()
 		);
 
-		Mockito.when(
+		when(
 			ddmFormField.getProperty("rows")
 		).thenReturn(
 			_createDDMFormOptions()
 		);
 
-		Mockito.when(
+		when(
 			ddmStructure.getDDMFormField(fieldName)
 		).thenReturn(
 			ddmFormField
 		);
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getStructure()
 		).thenReturn(
 			ddmStructure
@@ -296,18 +292,18 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 	private void _mockDDMFormInstanceRecord()
 		throws Exception, PortalException {
 
-		DDMFormInstanceRecord ddmFormInstanceRecord = Mockito.mock(
+		DDMFormInstanceRecord ddmFormInstanceRecord = mock(
 			DDMFormInstanceRecord.class);
 
 		DDMFormInstance ddmFormInstance = _mockDDMFormInstance("field1");
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecord.getFormInstance()
 		).thenReturn(
 			ddmFormInstance
 		);
 
-		Mockito.when(
+		when(
 			_ddmFormInstanceRecordLocalService.getDDMFormInstanceRecord(
 				_FORM_INSTANCE_RECORD_ID)
 		).thenReturn(
@@ -317,9 +313,10 @@ public class GridDDMFormFieldTypeReportProcessorTest {
 
 	private static final long _FORM_INSTANCE_RECORD_ID = 0;
 
-	private final DDMFormInstanceRecordLocalService
-		_ddmFormInstanceRecordLocalService = Mockito.mock(
-			DDMFormInstanceRecordLocalService.class);
+	@Mock
+	private DDMFormInstanceRecordLocalService
+		_ddmFormInstanceRecordLocalService;
+
 	private final GridDDMFormFieldTypeReportProcessor
 		_gridDDMFormFieldTypeReportProcessor =
 			new GridDDMFormFieldTypeReportProcessor();

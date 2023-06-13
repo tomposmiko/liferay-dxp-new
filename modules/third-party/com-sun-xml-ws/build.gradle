@@ -1,26 +1,18 @@
 apply plugin: "nebula.optional-base"
 
-task jarManifest
+dependencies {
+	compileOnly group: "com.sun.xml.ws", name: "jaxws-rt", transitive: false, version: "2.1.7"
+}
+
 task jarPatched(type: Zip)
 
 sourceCompatibility = "1.6"
 targetCompatibility = "1.6"
 
-dependencies {
-	compileOnly group: "com.sun.xml.ws", name: "jaxws-rt", transitive: false, version: "2.1.7"
-}
-
 jar {
 	setActions([])
 
 	dependsOn jarPatched
-	finalizedBy jarManifest
-}
-
-jarManifest {
-	doLast {
-		ant.jar(destfile: jar.archivePath, update: true)
-	}
 }
 
 jarPatched {

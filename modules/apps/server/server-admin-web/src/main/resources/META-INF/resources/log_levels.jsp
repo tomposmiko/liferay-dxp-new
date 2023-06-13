@@ -52,7 +52,10 @@ for (Map.Entry<String, String> entry : priorities.entrySet()) {
 	}
 }
 
-loggerSearchContainer.setResultsAndTotal(ListUtil.fromCollection(currentPriorities.entrySet()));
+List<Map.Entry<String, String>> currentPrioritiesList = ListUtil.fromCollection(currentPriorities.entrySet());
+
+loggerSearchContainer.setResults(ListUtil.subList(currentPrioritiesList, loggerSearchContainer.getStart(), loggerSearchContainer.getEnd()));
+loggerSearchContainer.setTotal(currentPrioritiesList.size());
 
 PortletURL addLogCategoryURL = PortletURLBuilder.createRenderURL(
 	renderResponse
@@ -99,13 +102,11 @@ CreationMenu creationMenu =
 			%>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-expand table-title"
 				name="category"
 				value="<%= HtmlUtil.escape(name) %>"
 			/>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-expand-smallest table-cell-minw-150 table-cell-ws-nowrap"
 				name="level"
 			>
 
@@ -113,19 +114,19 @@ CreationMenu creationMenu =
 				String priority = (String)entry.getValue();
 				%>
 
-				<aui:select label="" name='<%= liferayPortletResponse.getNamespace() + "logLevel" + HtmlUtil.escapeAttribute(name) %>' useNamespace="<%= false %>" wrapperCssClass="mb-0">
+				<select name="<%= liferayPortletResponse.getNamespace() + "logLevel" + HtmlUtil.escapeAttribute(name) %>">
 
 					<%
 					for (int j = 0; j < _ALL_PRIORITIES.length; j++) {
 					%>
 
-						<aui:option label="<%= _ALL_PRIORITIES[j] %>" selected="<%= priority.equals(_ALL_PRIORITIES[j]) %>" value="<%= _ALL_PRIORITIES[j] %>" />
+						<option <%= priority.equals(_ALL_PRIORITIES[j]) ? "selected" : StringPool.BLANK %> value="<%= _ALL_PRIORITIES[j] %>"><%= _ALL_PRIORITIES[j] %></option>
 
 					<%
 					}
 					%>
 
-				</aui:select>
+				</select>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
 

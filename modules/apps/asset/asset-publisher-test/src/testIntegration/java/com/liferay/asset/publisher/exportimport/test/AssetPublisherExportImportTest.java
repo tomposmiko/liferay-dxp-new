@@ -86,7 +86,6 @@ import com.liferay.portletmvc4spring.test.mock.web.portlet.MockPortletRequest;
 import java.io.Serializable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -502,7 +501,7 @@ public class AssetPublisherExportImportTest
 
 		groups.add(layoutGroup1);
 
-		Layout layout2 = LayoutTestUtil.addTypePortletLayout(group);
+		Layout layout2 = LayoutTestUtil.addLayout(group);
 
 		Group layoutGroup2 = GroupTestUtil.addGroup(
 			TestPropsValues.getUserId(), layout2);
@@ -815,7 +814,7 @@ public class AssetPublisherExportImportTest
 		Company company = _companyLocalService.getCompany(
 			layout.getCompanyId());
 
-		Layout secondLayout = LayoutTestUtil.addTypePortletLayout(group);
+		Layout secondLayout = LayoutTestUtil.addLayout(group);
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), secondLayout);
 
@@ -856,7 +855,7 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testSeveralLegacyLayoutScopeIds() throws Exception {
-		Layout secondLayout = LayoutTestUtil.addTypePortletLayout(group);
+		Layout secondLayout = LayoutTestUtil.addLayout(group);
 
 		GroupTestUtil.addGroup(TestPropsValues.getUserId(), secondLayout);
 
@@ -970,7 +969,7 @@ public class AssetPublisherExportImportTest
 					ExportImportHelperUtil.getLayoutIds(layouts),
 					getExportParameterMap());
 
-		ExportImportConfiguration exportImportConfiguration =
+		ExportImportConfiguration exportConfiguration =
 			_exportImportConfigurationLocalService.
 				addDraftExportImportConfiguration(
 					user.getUserId(),
@@ -978,7 +977,7 @@ public class AssetPublisherExportImportTest
 					exportLayoutSettingsMap);
 
 		larFile = _exportImportLocalService.exportLayoutsAsFile(
-			exportImportConfiguration);
+			exportConfiguration);
 
 		// Import site LAR
 
@@ -988,15 +987,14 @@ public class AssetPublisherExportImportTest
 					user, importedGroup.getGroupId(), layout.isPrivateLayout(),
 					null, getImportParameterMap());
 
-		exportImportConfiguration =
+		ExportImportConfiguration importConfiguration =
 			_exportImportConfigurationLocalService.
 				addDraftExportImportConfiguration(
 					user.getUserId(),
 					ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
 					importLayoutSettingsMap);
 
-		_exportImportLocalService.importLayouts(
-			exportImportConfiguration, larFile);
+		_exportImportLocalService.importLayouts(importConfiguration, larFile);
 
 		importedLayout = _layoutLocalService.getLayoutByUuidAndGroupId(
 			layout.getUuid(), importedGroup.getGroupId(),
@@ -1083,7 +1081,7 @@ public class AssetPublisherExportImportTest
 
 		SearchContainer<AssetEntry> searchContainer = new SearchContainer<>();
 
-		searchContainer.setResultsAndTotal(Collections::emptyList, 10);
+		searchContainer.setTotal(10);
 
 		List<AssetEntryResult> actualAssetEntryResults =
 			_assetPublisherHelper.getAssetEntryResults(
@@ -1131,10 +1129,10 @@ public class AssetPublisherExportImportTest
 			assetEntries = addAssetEntries(
 				scopeGroup, 3, assetEntries, serviceContext);
 
-			scopeIds = ArrayUtil.append(
-				scopeIds,
-				_assetPublisherHelper.getScopeId(
-					scopeGroup, group.getGroupId()));
+			String scopeId = _assetPublisherHelper.getScopeId(
+				scopeGroup, group.getGroupId());
+
+			scopeIds = ArrayUtil.append(scopeIds, scopeId);
 		}
 
 		PortletPreferences importedPortletPreferences =
@@ -1143,8 +1141,6 @@ public class AssetPublisherExportImportTest
 					"assetEntryXml", getAssetEntriesXmls(assetEntries)
 				).put(
 					"scopeIds", scopeIds
-				).put(
-					"selectionStyle", new String[] {"dynamic"}
 				).build());
 
 		String[] importedScopeIds = importedPortletPreferences.getValues(
@@ -1212,7 +1208,7 @@ public class AssetPublisherExportImportTest
 				" does not belong to group ", expectedGroupId),
 			expectedGroupId, importedVocabulary.getGroupId());
 
-		_assetVocabularyLocalService.deleteVocabulary(assetVocabulary);
+		_assetVocabularyLocalService.deleteAssetVocabulary(assetVocabulary);
 	}
 
 	private static Configuration _assetPublisherWebConfiguration;

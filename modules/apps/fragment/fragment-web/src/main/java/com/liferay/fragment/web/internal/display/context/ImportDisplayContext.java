@@ -15,11 +15,12 @@
 package com.liferay.fragment.web.internal.display.context;
 
 import com.liferay.fragment.importer.FragmentsImporterResultEntry;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.RenderRequest;
 
@@ -47,15 +48,17 @@ public class ImportDisplayContext {
 			return null;
 		}
 
-		return TransformUtil.transform(
-			fragmentsImporterResultEntries,
-			fragmentsImporterResultEntry -> {
-				if (fragmentsImporterResultEntry.getStatus() == status) {
-					return fragmentsImporterResultEntry.getName();
-				}
+		Stream<FragmentsImporterResultEntry> stream =
+			fragmentsImporterResultEntries.stream();
 
-				return null;
-			});
+		return stream.filter(
+			fragmentsImporterResultEntry ->
+				fragmentsImporterResultEntry.getStatus() == status
+		).map(
+			FragmentsImporterResultEntry::getName
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private List<FragmentsImporterResultEntry>

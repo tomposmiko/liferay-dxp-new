@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -62,14 +63,11 @@ public class PageElementSerDes {
 
 			sb.append("\"definition\": ");
 
-			if (pageElement.getDefinition() instanceof String) {
-				sb.append("\"");
-				sb.append((String)pageElement.getDefinition());
-				sb.append("\"");
-			}
-			else {
-				sb.append(pageElement.getDefinition());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(pageElement.getDefinition()));
+
+			sb.append("\"");
 		}
 
 		if (pageElement.getPageElements() != null) {
@@ -175,18 +173,14 @@ public class PageElementSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "pageElements")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					PageElement[] pageElementsArray =
-						new PageElement[jsonParserFieldValues.length];
-
-					for (int i = 0; i < pageElementsArray.length; i++) {
-						pageElementsArray[i] = PageElementSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					pageElement.setPageElements(pageElementsArray);
+					pageElement.setPageElements(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> PageElementSerDes.toDTO((String)object)
+						).toArray(
+							size -> new PageElement[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {

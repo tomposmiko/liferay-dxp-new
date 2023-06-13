@@ -84,7 +84,7 @@ List<Folder> folders = dlInfoPanelDisplayContext.getFolders();
 
 						<c:if test="<%= folder != null %>">
 							<dt class="sidebar-dt">
-								<liferay-ui:message key="created-by" />
+								<liferay-ui:message key="created" />
 							</dt>
 							<dd class="sidebar-dd">
 								<%= HtmlUtil.escape(folder.getUserName()) %>
@@ -95,32 +95,6 @@ List<Folder> folders = dlInfoPanelDisplayContext.getFolders();
 							%>
 
 							<liferay-util:include page="/document_library/info_panel_location.jsp" servletContext="<%= application %>" />
-
-							<%
-							DLPortletInstanceSettings dlPortletInstanceSettings = dlRequestHelper.getDLPortletInstanceSettings();
-							%>
-
-							<c:if test="<%= dlPortletInstanceSettings.isEnableRatings() && folder.isSupportsSocial() %>">
-
-								<%
-								RatingsType ratingsType = PortletRatingsDefinitionUtil.getRatingsType(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), DLFileEntry.class.getName());
-
-								if (ratingsType == null) {
-									ratingsType = RatingsType.STARS;
-								}
-								%>
-
-								<dt class="sidebar-dt">
-									<liferay-ui:message key="ratings" />
-								</dt>
-								<dd class="sidebar-dd">
-									<liferay-ratings:ratings
-										className="<%= DLFolderConstants.getClassName() %>"
-										classPK="<%= folder.getFolderId() %>"
-										type="<%= ratingsType.toString() %>"
-									/>
-								</dd>
-							</c:if>
 						</c:if>
 					</dl>
 				</liferay-ui:section>
@@ -160,16 +134,9 @@ List<Folder> folders = dlInfoPanelDisplayContext.getFolders();
 
 				<div class="autofit-col">
 					<ul class="autofit-padded-no-gutters autofit-row">
-
-						<%
-						DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlRequestHelper);
-						%>
-
-						<c:if test="<%= dlPortletInstanceSettingsHelper.isShowActions() %>">
-							<li class="autofit-col">
-								<liferay-util:include page="/document_library/file_entry_action.jsp" servletContext="<%= application %>" />
-							</li>
-						</c:if>
+						<li class="autofit-col">
+							<liferay-util:include page="/document_library/file_entry_action.jsp" servletContext="<%= application %>" />
+						</li>
 					</ul>
 				</div>
 			</div>

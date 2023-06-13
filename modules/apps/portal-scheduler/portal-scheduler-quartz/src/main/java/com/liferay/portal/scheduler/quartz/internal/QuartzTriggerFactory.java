@@ -38,7 +38,7 @@ import org.quartz.TriggerBuilder;
  * @author Tina Tian
  */
 @Component(
-	enabled = false,
+	enabled = false, immediate = true,
 	service = {QuartzTriggerFactory.class, TriggerFactory.class}
 )
 public class QuartzTriggerFactory implements TriggerFactory {
@@ -62,11 +62,6 @@ public class QuartzTriggerFactory implements TriggerFactory {
 		if (interval <= 0) {
 			return createTrigger(
 				jobName, groupName, startDate, endDate, (ScheduleBuilder)null);
-		}
-
-		if (startDate == null) {
-			startDate = new Date(
-				System.currentTimeMillis() + timeUnit.toMillis(interval));
 		}
 
 		if (timeUnit == TimeUnit.MILLISECOND) {

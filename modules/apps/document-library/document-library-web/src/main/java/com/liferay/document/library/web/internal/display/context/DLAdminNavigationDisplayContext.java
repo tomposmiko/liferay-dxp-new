@@ -15,14 +15,14 @@
 package com.liferay.document.library.web.internal.display.context;
 
 import com.liferay.document.library.constants.DLPortletKeys;
-import com.liferay.document.library.web.internal.display.context.helper.DLRequestHelper;
+import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -91,6 +91,7 @@ public class DLAdminNavigationDisplayContext {
 			).setMVCRenderCommandName(
 				"/document_library/view"
 			).buildString());
+
 		navigationItem.setLabel(
 			LanguageUtil.get(
 				_liferayPortletRequest.getHttpServletRequest(), "files"));
@@ -100,12 +101,14 @@ public class DLAdminNavigationDisplayContext {
 		NavigationItem navigationItem, String navigation) {
 
 		navigationItem.setActive(navigation.equals("file_entry_types"));
+
 		navigationItem.setHref(
 			PortletURLBuilder.createRenderURL(
 				_liferayPortletResponse
 			).setNavigation(
 				"file_entry_types"
 			).buildString());
+
 		navigationItem.setLabel(
 			LanguageUtil.get(
 				_liferayPortletRequest.getHttpServletRequest(),
@@ -127,6 +130,7 @@ public class DLAdminNavigationDisplayContext {
 			).setParameter(
 				"groupId", _themeDisplay.getScopeGroupId()
 			).buildString());
+
 		navigationItem.setLabel(
 			LanguageUtil.get(
 				_liferayPortletRequest.getHttpServletRequest(),

@@ -18,6 +18,7 @@ import com.liferay.blogs.constants.BlogsConstants;
 import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
+import com.liferay.blogs.service.BlogsStatsUserLocalService;
 import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -115,6 +116,9 @@ public class BlogsAdminPortletDataHandler extends BasePortletDataHandler {
 		_blogsEntryLocalService.deleteEntries(
 			portletDataContext.getScopeGroupId());
 
+		_blogsStatsUserLocalService.deleteStatsUserByGroupId(
+			portletDataContext.getScopeGroupId());
+
 		return portletPreferences;
 	}
 
@@ -209,6 +213,9 @@ public class BlogsAdminPortletDataHandler extends BasePortletDataHandler {
 
 	@Reference
 	private BlogsEntryLocalService _blogsEntryLocalService;
+
+	@Reference
+	private BlogsStatsUserLocalService _blogsStatsUserLocalService;
 
 	@Reference
 	private Staging _staging;

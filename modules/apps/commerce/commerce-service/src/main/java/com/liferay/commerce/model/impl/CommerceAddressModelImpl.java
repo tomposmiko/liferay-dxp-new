@@ -16,6 +16,7 @@ package com.liferay.commerce.model.impl;
 
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceAddressModel;
+import com.liferay.commerce.model.CommerceAddressSoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -37,15 +38,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -74,7 +78,7 @@ public class CommerceAddressModelImpl
 	public static final String TABLE_NAME = "CommerceAddress";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"externalReferenceCode", Types.VARCHAR},
+		{"externalReferenceCode", Types.VARCHAR},
 		{"commerceAddressId", Types.BIGINT}, {"groupId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
@@ -93,7 +97,6 @@ public class CommerceAddressModelImpl
 		new HashMap<String, Integer>();
 
 	static {
-		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commerceAddressId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -122,7 +125,7 @@ public class CommerceAddressModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceAddress (mvccVersion LONG default 0 not null,externalReferenceCode VARCHAR(75) null,commerceAddressId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,name VARCHAR(255) null,description STRING null,street1 VARCHAR(255) null,street2 VARCHAR(255) null,street3 VARCHAR(255) null,city VARCHAR(75) null,zip VARCHAR(75) null,regionId LONG,countryId LONG,latitude DOUBLE,longitude DOUBLE,phoneNumber VARCHAR(75) null,defaultBilling BOOLEAN,defaultShipping BOOLEAN,type_ INTEGER)";
+		"create table CommerceAddress (externalReferenceCode VARCHAR(75) null,commerceAddressId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,name VARCHAR(255) null,description STRING null,street1 VARCHAR(255) null,street2 VARCHAR(255) null,street3 VARCHAR(255) null,city VARCHAR(75) null,zip VARCHAR(75) null,regionId LONG,countryId LONG,latitude DOUBLE,longitude DOUBLE,phoneNumber VARCHAR(75) null,defaultBilling BOOLEAN,defaultShipping BOOLEAN,type_ INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommerceAddress";
 
@@ -137,6 +140,24 @@ public class CommerceAddressModelImpl
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean ENTITY_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean FINDER_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean COLUMN_BITMASK_ENABLED = true;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
@@ -206,18 +227,77 @@ public class CommerceAddressModelImpl
 	public static final long CREATEDATE_COLUMN_BITMASK = 1024L;
 
 	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+	public static CommerceAddress toModel(CommerceAddressSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		CommerceAddress model = new CommerceAddressImpl();
+
+		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
+		model.setCommerceAddressId(soapModel.getCommerceAddressId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setClassNameId(soapModel.getClassNameId());
+		model.setClassPK(soapModel.getClassPK());
+		model.setName(soapModel.getName());
+		model.setDescription(soapModel.getDescription());
+		model.setStreet1(soapModel.getStreet1());
+		model.setStreet2(soapModel.getStreet2());
+		model.setStreet3(soapModel.getStreet3());
+		model.setCity(soapModel.getCity());
+		model.setZip(soapModel.getZip());
+		model.setRegionId(soapModel.getRegionId());
+		model.setCountryId(soapModel.getCountryId());
+		model.setLatitude(soapModel.getLatitude());
+		model.setLongitude(soapModel.getLongitude());
+		model.setPhoneNumber(soapModel.getPhoneNumber());
+		model.setDefaultBilling(soapModel.isDefaultBilling());
+		model.setDefaultShipping(soapModel.isDefaultShipping());
+		model.setType(soapModel.getType());
+
+		return model;
 	}
 
 	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	public static List<CommerceAddress> toModels(
+		CommerceAddressSoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<CommerceAddress> models = new ArrayList<CommerceAddress>(
+			soapModels.length);
+
+		for (CommerceAddressSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.commerce.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.commerce.model.CommerceAddress"));
 
 	public CommerceAddressModelImpl() {
 	}
@@ -295,208 +375,179 @@ public class CommerceAddressModelImpl
 	public Map<String, Function<CommerceAddress, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CommerceAddress, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CommerceAddress>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CommerceAddress, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceAddress.class.getClassLoader(), CommerceAddress.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<CommerceAddress, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<CommerceAddress, Object>>();
+		try {
+			Constructor<CommerceAddress> constructor =
+				(Constructor<CommerceAddress>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CommerceAddress::getMvccVersion);
-			attributeGetterFunctions.put(
-				"externalReferenceCode",
-				CommerceAddress::getExternalReferenceCode);
-			attributeGetterFunctions.put(
-				"commerceAddressId", CommerceAddress::getCommerceAddressId);
-			attributeGetterFunctions.put(
-				"groupId", CommerceAddress::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", CommerceAddress::getCompanyId);
-			attributeGetterFunctions.put("userId", CommerceAddress::getUserId);
-			attributeGetterFunctions.put(
-				"userName", CommerceAddress::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", CommerceAddress::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", CommerceAddress::getModifiedDate);
-			attributeGetterFunctions.put(
-				"classNameId", CommerceAddress::getClassNameId);
-			attributeGetterFunctions.put(
-				"classPK", CommerceAddress::getClassPK);
-			attributeGetterFunctions.put("name", CommerceAddress::getName);
-			attributeGetterFunctions.put(
-				"description", CommerceAddress::getDescription);
-			attributeGetterFunctions.put(
-				"street1", CommerceAddress::getStreet1);
-			attributeGetterFunctions.put(
-				"street2", CommerceAddress::getStreet2);
-			attributeGetterFunctions.put(
-				"street3", CommerceAddress::getStreet3);
-			attributeGetterFunctions.put("city", CommerceAddress::getCity);
-			attributeGetterFunctions.put("zip", CommerceAddress::getZip);
-			attributeGetterFunctions.put(
-				"regionId", CommerceAddress::getRegionId);
-			attributeGetterFunctions.put(
-				"countryId", CommerceAddress::getCountryId);
-			attributeGetterFunctions.put(
-				"latitude", CommerceAddress::getLatitude);
-			attributeGetterFunctions.put(
-				"longitude", CommerceAddress::getLongitude);
-			attributeGetterFunctions.put(
-				"phoneNumber", CommerceAddress::getPhoneNumber);
-			attributeGetterFunctions.put(
-				"defaultBilling", CommerceAddress::getDefaultBilling);
-			attributeGetterFunctions.put(
-				"defaultShipping", CommerceAddress::getDefaultShipping);
-			attributeGetterFunctions.put("type", CommerceAddress::getType);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
-	}
-
-	private static class AttributeSetterBiConsumersHolder {
-
-		private static final Map<String, BiConsumer<CommerceAddress, Object>>
-			_attributeSetterBiConsumers;
-
-		static {
-			Map<String, BiConsumer<CommerceAddress, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<CommerceAddress, ?>>();
-
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CommerceAddress, Long>)
-					CommerceAddress::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"externalReferenceCode",
-				(BiConsumer<CommerceAddress, String>)
-					CommerceAddress::setExternalReferenceCode);
-			attributeSetterBiConsumers.put(
-				"commerceAddressId",
-				(BiConsumer<CommerceAddress, Long>)
-					CommerceAddress::setCommerceAddressId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<CommerceAddress, Long>)CommerceAddress::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CommerceAddress, Long>)
-					CommerceAddress::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<CommerceAddress, Long>)CommerceAddress::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<CommerceAddress, String>)
-					CommerceAddress::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CommerceAddress, Date>)
-					CommerceAddress::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<CommerceAddress, Date>)
-					CommerceAddress::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<CommerceAddress, Long>)
-					CommerceAddress::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<CommerceAddress, Long>)CommerceAddress::setClassPK);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<CommerceAddress, String>)CommerceAddress::setName);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<CommerceAddress, String>)
-					CommerceAddress::setDescription);
-			attributeSetterBiConsumers.put(
-				"street1",
-				(BiConsumer<CommerceAddress, String>)
-					CommerceAddress::setStreet1);
-			attributeSetterBiConsumers.put(
-				"street2",
-				(BiConsumer<CommerceAddress, String>)
-					CommerceAddress::setStreet2);
-			attributeSetterBiConsumers.put(
-				"street3",
-				(BiConsumer<CommerceAddress, String>)
-					CommerceAddress::setStreet3);
-			attributeSetterBiConsumers.put(
-				"city",
-				(BiConsumer<CommerceAddress, String>)CommerceAddress::setCity);
-			attributeSetterBiConsumers.put(
-				"zip",
-				(BiConsumer<CommerceAddress, String>)CommerceAddress::setZip);
-			attributeSetterBiConsumers.put(
-				"regionId",
-				(BiConsumer<CommerceAddress, Long>)
-					CommerceAddress::setRegionId);
-			attributeSetterBiConsumers.put(
-				"countryId",
-				(BiConsumer<CommerceAddress, Long>)
-					CommerceAddress::setCountryId);
-			attributeSetterBiConsumers.put(
-				"latitude",
-				(BiConsumer<CommerceAddress, Double>)
-					CommerceAddress::setLatitude);
-			attributeSetterBiConsumers.put(
-				"longitude",
-				(BiConsumer<CommerceAddress, Double>)
-					CommerceAddress::setLongitude);
-			attributeSetterBiConsumers.put(
-				"phoneNumber",
-				(BiConsumer<CommerceAddress, String>)
-					CommerceAddress::setPhoneNumber);
-			attributeSetterBiConsumers.put(
-				"defaultBilling",
-				(BiConsumer<CommerceAddress, Boolean>)
-					CommerceAddress::setDefaultBilling);
-			attributeSetterBiConsumers.put(
-				"defaultShipping",
-				(BiConsumer<CommerceAddress, Boolean>)
-					CommerceAddress::setDefaultShipping);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<CommerceAddress, Integer>)CommerceAddress::setType);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
 		}
-
 	}
 
-	@JSON
-	@Override
-	public long getMvccVersion() {
-		return _mvccVersion;
-	}
+	private static final Map<String, Function<CommerceAddress, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceAddress, Object>>
+		_attributeSetterBiConsumers;
 
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
+	static {
+		Map<String, Function<CommerceAddress, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<CommerceAddress, Object>>();
+		Map<String, BiConsumer<CommerceAddress, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CommerceAddress, ?>>();
 
-		_mvccVersion = mvccVersion;
+		attributeGetterFunctions.put(
+			"externalReferenceCode", CommerceAddress::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<CommerceAddress, String>)
+				CommerceAddress::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceAddressId", CommerceAddress::getCommerceAddressId);
+		attributeSetterBiConsumers.put(
+			"commerceAddressId",
+			(BiConsumer<CommerceAddress, Long>)
+				CommerceAddress::setCommerceAddressId);
+		attributeGetterFunctions.put("groupId", CommerceAddress::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceAddress::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceAddress::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setUserId);
+		attributeGetterFunctions.put("userName", CommerceAddress::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<CommerceAddress, String>)CommerceAddress::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceAddress::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CommerceAddress, Date>)CommerceAddress::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceAddress::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<CommerceAddress, Date>)
+				CommerceAddress::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CommerceAddress::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setClassNameId);
+		attributeGetterFunctions.put("classPK", CommerceAddress::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setClassPK);
+		attributeGetterFunctions.put("name", CommerceAddress::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<CommerceAddress, String>)CommerceAddress::setName);
+		attributeGetterFunctions.put(
+			"description", CommerceAddress::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<CommerceAddress, String>)
+				CommerceAddress::setDescription);
+		attributeGetterFunctions.put("street1", CommerceAddress::getStreet1);
+		attributeSetterBiConsumers.put(
+			"street1",
+			(BiConsumer<CommerceAddress, String>)CommerceAddress::setStreet1);
+		attributeGetterFunctions.put("street2", CommerceAddress::getStreet2);
+		attributeSetterBiConsumers.put(
+			"street2",
+			(BiConsumer<CommerceAddress, String>)CommerceAddress::setStreet2);
+		attributeGetterFunctions.put("street3", CommerceAddress::getStreet3);
+		attributeSetterBiConsumers.put(
+			"street3",
+			(BiConsumer<CommerceAddress, String>)CommerceAddress::setStreet3);
+		attributeGetterFunctions.put("city", CommerceAddress::getCity);
+		attributeSetterBiConsumers.put(
+			"city",
+			(BiConsumer<CommerceAddress, String>)CommerceAddress::setCity);
+		attributeGetterFunctions.put("zip", CommerceAddress::getZip);
+		attributeSetterBiConsumers.put(
+			"zip",
+			(BiConsumer<CommerceAddress, String>)CommerceAddress::setZip);
+		attributeGetterFunctions.put("regionId", CommerceAddress::getRegionId);
+		attributeSetterBiConsumers.put(
+			"regionId",
+			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setRegionId);
+		attributeGetterFunctions.put(
+			"countryId", CommerceAddress::getCountryId);
+		attributeSetterBiConsumers.put(
+			"countryId",
+			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setCountryId);
+		attributeGetterFunctions.put("latitude", CommerceAddress::getLatitude);
+		attributeSetterBiConsumers.put(
+			"latitude",
+			(BiConsumer<CommerceAddress, Double>)CommerceAddress::setLatitude);
+		attributeGetterFunctions.put(
+			"longitude", CommerceAddress::getLongitude);
+		attributeSetterBiConsumers.put(
+			"longitude",
+			(BiConsumer<CommerceAddress, Double>)CommerceAddress::setLongitude);
+		attributeGetterFunctions.put(
+			"phoneNumber", CommerceAddress::getPhoneNumber);
+		attributeSetterBiConsumers.put(
+			"phoneNumber",
+			(BiConsumer<CommerceAddress, String>)
+				CommerceAddress::setPhoneNumber);
+		attributeGetterFunctions.put(
+			"defaultBilling", CommerceAddress::getDefaultBilling);
+		attributeSetterBiConsumers.put(
+			"defaultBilling",
+			(BiConsumer<CommerceAddress, Boolean>)
+				CommerceAddress::setDefaultBilling);
+		attributeGetterFunctions.put(
+			"defaultShipping", CommerceAddress::getDefaultShipping);
+		attributeSetterBiConsumers.put(
+			"defaultShipping",
+			(BiConsumer<CommerceAddress, Boolean>)
+				CommerceAddress::setDefaultShipping);
+		attributeGetterFunctions.put("type", CommerceAddress::getType);
+		attributeSetterBiConsumers.put(
+			"type",
+			(BiConsumer<CommerceAddress, Integer>)CommerceAddress::setType);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1131,7 +1182,6 @@ public class CommerceAddressModelImpl
 	public Object clone() {
 		CommerceAddressImpl commerceAddressImpl = new CommerceAddressImpl();
 
-		commerceAddressImpl.setMvccVersion(getMvccVersion());
 		commerceAddressImpl.setExternalReferenceCode(
 			getExternalReferenceCode());
 		commerceAddressImpl.setCommerceAddressId(getCommerceAddressId());
@@ -1168,8 +1218,6 @@ public class CommerceAddressModelImpl
 	public CommerceAddress cloneWithOriginalValues() {
 		CommerceAddressImpl commerceAddressImpl = new CommerceAddressImpl();
 
-		commerceAddressImpl.setMvccVersion(
-			this.<Long>getColumnOriginalValue("mvccVersion"));
 		commerceAddressImpl.setExternalReferenceCode(
 			this.<String>getColumnOriginalValue("externalReferenceCode"));
 		commerceAddressImpl.setCommerceAddressId(
@@ -1272,7 +1320,7 @@ public class CommerceAddressModelImpl
 	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return true;
+		return ENTITY_CACHE_ENABLED;
 	}
 
 	/**
@@ -1281,7 +1329,7 @@ public class CommerceAddressModelImpl
 	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return true;
+		return FINDER_CACHE_ENABLED;
 	}
 
 	@Override
@@ -1297,8 +1345,6 @@ public class CommerceAddressModelImpl
 	public CacheModel<CommerceAddress> toCacheModel() {
 		CommerceAddressCacheModel commerceAddressCacheModel =
 			new CommerceAddressCacheModel();
-
-		commerceAddressCacheModel.mvccVersion = getMvccVersion();
 
 		commerceAddressCacheModel.externalReferenceCode =
 			getExternalReferenceCode();
@@ -1480,16 +1526,44 @@ public class CommerceAddressModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CommerceAddress, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CommerceAddress, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CommerceAddress, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((CommerceAddress)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommerceAddress>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommerceAddress.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
-	private long _mvccVersion;
 	private String _externalReferenceCode;
 	private long _commerceAddressId;
 	private long _groupId;
@@ -1521,8 +1595,7 @@ public class CommerceAddressModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<CommerceAddress, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -1547,7 +1620,6 @@ public class CommerceAddressModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
-		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("commerceAddressId", _commerceAddressId);
@@ -1597,57 +1669,55 @@ public class CommerceAddressModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("mvccVersion", 1L);
+		columnBitmasks.put("externalReferenceCode", 1L);
 
-		columnBitmasks.put("externalReferenceCode", 2L);
+		columnBitmasks.put("commerceAddressId", 2L);
 
-		columnBitmasks.put("commerceAddressId", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("classNameId", 256L);
 
-		columnBitmasks.put("classNameId", 512L);
+		columnBitmasks.put("classPK", 512L);
 
-		columnBitmasks.put("classPK", 1024L);
+		columnBitmasks.put("name", 1024L);
 
-		columnBitmasks.put("name", 2048L);
+		columnBitmasks.put("description", 2048L);
 
-		columnBitmasks.put("description", 4096L);
+		columnBitmasks.put("street1", 4096L);
 
-		columnBitmasks.put("street1", 8192L);
+		columnBitmasks.put("street2", 8192L);
 
-		columnBitmasks.put("street2", 16384L);
+		columnBitmasks.put("street3", 16384L);
 
-		columnBitmasks.put("street3", 32768L);
+		columnBitmasks.put("city", 32768L);
 
-		columnBitmasks.put("city", 65536L);
+		columnBitmasks.put("zip", 65536L);
 
-		columnBitmasks.put("zip", 131072L);
+		columnBitmasks.put("regionId", 131072L);
 
-		columnBitmasks.put("regionId", 262144L);
+		columnBitmasks.put("countryId", 262144L);
 
-		columnBitmasks.put("countryId", 524288L);
+		columnBitmasks.put("latitude", 524288L);
 
-		columnBitmasks.put("latitude", 1048576L);
+		columnBitmasks.put("longitude", 1048576L);
 
-		columnBitmasks.put("longitude", 2097152L);
+		columnBitmasks.put("phoneNumber", 2097152L);
 
-		columnBitmasks.put("phoneNumber", 4194304L);
+		columnBitmasks.put("defaultBilling", 4194304L);
 
-		columnBitmasks.put("defaultBilling", 8388608L);
+		columnBitmasks.put("defaultShipping", 8388608L);
 
-		columnBitmasks.put("defaultShipping", 16777216L);
-
-		columnBitmasks.put("type_", 33554432L);
+		columnBitmasks.put("type_", 16777216L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

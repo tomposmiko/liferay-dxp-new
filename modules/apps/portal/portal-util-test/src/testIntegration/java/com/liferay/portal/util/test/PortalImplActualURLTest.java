@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.webdav.methods.Method;
@@ -102,7 +102,7 @@ public class PortalImplActualURLTest {
 		}
 		catch (NoSuchLayoutException noSuchLayoutException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchLayoutException);
+				_log.debug(noSuchLayoutException, noSuchLayoutException);
 			}
 		}
 	}
@@ -128,8 +128,7 @@ public class PortalImplActualURLTest {
 		Layout nodeLayout = _layoutLocalService.addLayout(
 			serviceContext.getUserId(), _group.getGroupId(), true,
 			homeLayout.getLayoutId(), "Node", StringPool.BLANK,
-			StringPool.BLANK, LayoutConstants.TYPE_NODE, false,
-			StringPool.BLANK, serviceContext);
+			StringPool.BLANK, "node", false, StringPool.BLANK, serviceContext);
 
 		Layout childLayout = _layoutLocalService.addLayout(
 			serviceContext.getUserId(), _group.getGroupId(), true,
@@ -137,19 +136,23 @@ public class PortalImplActualURLTest {
 			StringPool.BLANK, LayoutConstants.TYPE_PORTLET, false,
 			StringPool.BLANK, serviceContext);
 
-		Map<String, String[]> parameterMap = HttpComponentsUtil.getParameterMap(
-			HttpComponentsUtil.getQueryString(
-				_portal.getActualURL(
-					_group.getGroupId(), true, Portal.PATH_MAIN,
-					"/~/" + userGroup.getUserGroupId() + "/node",
-					new HashMap<>(), _getRequestContext())));
+		String queryString = _http.getQueryString(
+			_portal.getActualURL(
+				_group.getGroupId(), true, Portal.PATH_MAIN,
+				"/~/" + userGroup.getUserGroupId() + "/node", new HashMap<>(),
+				_getRequestContext()));
+
+		Map<String, String[]> parameterMap = _http.getParameterMap(queryString);
 
 		Assert.assertNull(parameterMap.get("p_l_id"));
+
 		Assert.assertEquals(
 			childLayout.getGroupId(), MapUtil.getLong(parameterMap, "groupId"));
+
 		Assert.assertEquals(
 			childLayout.isPrivateLayout(),
 			MapUtil.getBoolean(parameterMap, "privateLayout"));
+
 		Assert.assertEquals(
 			childLayout.getLayoutId(),
 			MapUtil.getLong(parameterMap, "layoutId"));
@@ -166,6 +169,9 @@ public class PortalImplActualURLTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	@Inject
+	private Http _http;
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;

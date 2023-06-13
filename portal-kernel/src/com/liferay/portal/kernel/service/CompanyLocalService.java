@@ -87,6 +87,8 @@ public interface CompanyLocalService
 	 * @param webId the the company's web domain
 	 * @param virtualHostname the company's virtual host name
 	 * @param mx the company's mail domain
+	 * @param system whether the company is the very first company (i.e., the
+	 super company)
 	 * @param maxUsers the max number of company users (optionally
 	 <code>0</code>)
 	 * @param active whether the company is active
@@ -94,7 +96,7 @@ public interface CompanyLocalService
 	 */
 	public Company addCompany(
 			Long companyId, String webId, String virtualHostname, String mx,
-			int maxUsers, boolean active)
+			boolean system, int maxUsers, boolean active)
 		throws PortalException;
 
 	/**
@@ -115,8 +117,8 @@ public interface CompanyLocalService
 	 */
 	@Deprecated
 	public Company addCompany(
-			String webId, String virtualHostname, String mx, int maxUsers,
-			boolean active)
+			String webId, String virtualHostname, String mx, boolean system,
+			int maxUsers, boolean active)
 		throws PortalException;
 
 	/**
@@ -140,6 +142,10 @@ public interface CompanyLocalService
 	 * @param mx the company's mail domain
 	 * @return the company with the web domain and mail domain
 	 */
+	@Transactional(
+		isolation = Isolation.PORTAL,
+		rollbackFor = {PortalException.class, SystemException.class}
+	)
 	public Company checkCompany(String webId, String mx) throws PortalException;
 
 	/**
@@ -335,6 +341,19 @@ public interface CompanyLocalService
 	public List<Company> getCompanies();
 
 	/**
+	 * Returns all the companies used by WSRP.
+	 *
+	 * @param system whether the company is the very first company (i.e., the
+	 super company)
+	 * @return the companies used by WSRP
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Company> getCompanies(boolean system);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Company> getCompanies(boolean system, int start, int end);
+
+	/**
 	 * Returns a range of all the companies.
 	 *
 	 * <p>
@@ -355,6 +374,16 @@ public interface CompanyLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCompaniesCount();
+
+	/**
+	 * Returns the number of companies used by WSRP.
+	 *
+	 * @param system whether the company is the very first company (i.e., the
+	 super company)
+	 * @return the number of companies used by WSRP
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getCompaniesCount(boolean system);
 
 	/**
 	 * Returns the company with the primary key.
@@ -573,13 +602,6 @@ public interface CompanyLocalService
 
 	@Async
 	public void updateDisplayGroupNames(long companyId) throws PortalException;
-
-	public Company updateIndexNameNext(long companyId, String indexNameNext)
-		throws PortalException;
-
-	public Company updateIndexNames(
-			long companyId, String indexNameCurrent, String indexNameNext)
-		throws PortalException;
 
 	/**
 	 * Updates the company's logo.

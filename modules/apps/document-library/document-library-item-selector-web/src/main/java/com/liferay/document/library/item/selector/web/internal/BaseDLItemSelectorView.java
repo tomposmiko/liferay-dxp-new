@@ -18,7 +18,6 @@ import com.liferay.asset.kernel.service.AssetVocabularyService;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.item.selector.web.internal.constants.DLItemSelectorWebKeys;
 import com.liferay.document.library.item.selector.web.internal.display.context.DLItemSelectorViewDisplayContext;
-import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolverHandler;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -91,8 +90,7 @@ public abstract class BaseDLItemSelectorView<T extends ItemSelectorCriterion>
 
 		DLItemSelectorViewDisplayContext dlItemSelectorViewDisplayContext =
 			new DLItemSelectorViewDisplayContext<>(
-				assetVocabularyService, classNameLocalService,
-				dlFileEntryTypeLocalService, this,
+				assetVocabularyService, classNameLocalService, this,
 				folderModelResourcePermission,
 				(HttpServletRequest)servletRequest, t, itemSelectedEventName,
 				itemSelectorReturnTypeResolverHandler, portletURL, search,
@@ -117,9 +115,6 @@ public abstract class BaseDLItemSelectorView<T extends ItemSelectorCriterion>
 
 	@Reference
 	protected ClassNameLocalService classNameLocalService;
-
-	@Reference
-	protected DLFileEntryTypeLocalService dlFileEntryTypeLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.portal.kernel.repository.model.Folder)"

@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -48,11 +47,6 @@ import org.osgi.service.component.annotations.Reference;
 public class LiferayRefreshTokenAccessTokenGrantHandler
 	extends BaseAccessTokenGrantHandler {
 
-	@Override
-	public List<String> getSupportedGrantTypes() {
-		return _refreshTokenGrantHandler.getSupportedGrantTypes();
-	}
-
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		_refreshTokenGrantHandler = new RefreshTokenGrantHandler();
@@ -64,10 +58,8 @@ public class LiferayRefreshTokenAccessTokenGrantHandler
 	}
 
 	@Override
-	protected ServerAccessToken doCreateAccessToken(
-		Client client, MultivaluedMap<String, String> params) {
-
-		return _refreshTokenGrantHandler.createAccessToken(client, params);
+	protected AccessTokenGrantHandler getAccessTokenGrantHandler() {
+		return _refreshTokenGrantHandler;
 	}
 
 	@Override

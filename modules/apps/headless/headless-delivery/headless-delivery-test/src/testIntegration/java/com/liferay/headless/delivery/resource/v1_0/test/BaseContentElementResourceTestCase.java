@@ -25,14 +25,12 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.ContentElement;
-import com.liferay.headless.delivery.client.dto.v1_0.Field;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
 import com.liferay.headless.delivery.client.resource.v1_0.ContentElementResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.ContentElementSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -57,7 +55,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -66,16 +64,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -240,10 +240,7 @@ public abstract class BaseContentElementResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantContentElement),
 				(List<ContentElement>)page.getItems());
-			assertValid(
-				page,
-				testGetAssetLibraryContentElementsPage_getExpectedActions(
-					irrelevantAssetLibraryId));
+			assertValid(page);
 		}
 
 		ContentElement contentElement1 =
@@ -262,20 +259,7 @@ public abstract class BaseContentElementResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(contentElement1, contentElement2),
 			(List<ContentElement>)page.getItems());
-		assertValid(
-			page,
-			testGetAssetLibraryContentElementsPage_getExpectedActions(
-				assetLibraryId));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetAssetLibraryContentElementsPage_getExpectedActions(
-				Long assetLibraryId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -303,42 +287,6 @@ public abstract class BaseContentElementResourceTestCase {
 				contentElementResource.getAssetLibraryContentElementsPage(
 					assetLibraryId, null, null,
 					getFilterString(entityField, "between", contentElement1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(contentElement1),
-				(List<ContentElement>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetAssetLibraryContentElementsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long assetLibraryId =
-			testGetAssetLibraryContentElementsPage_getAssetLibraryId();
-
-		ContentElement contentElement1 =
-			testGetAssetLibraryContentElementsPage_addContentElement(
-				assetLibraryId, randomContentElement());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ContentElement contentElement2 =
-			testGetAssetLibraryContentElementsPage_addContentElement(
-				assetLibraryId, randomContentElement());
-
-		for (EntityField entityField : entityFields) {
-			Page<ContentElement> page =
-				contentElementResource.getAssetLibraryContentElementsPage(
-					assetLibraryId, null, null,
-					getFilterString(entityField, "eq", contentElement1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -440,23 +388,9 @@ public abstract class BaseContentElementResourceTestCase {
 		testGetAssetLibraryContentElementsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, contentElement1, contentElement2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					contentElement1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetAssetLibraryContentElementsPageWithSortDouble()
-		throws Exception {
-
-		testGetAssetLibraryContentElementsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, contentElement1, contentElement2) -> {
-				BeanTestUtil.setProperty(
-					contentElement1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					contentElement2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -467,9 +401,9 @@ public abstract class BaseContentElementResourceTestCase {
 		testGetAssetLibraryContentElementsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, contentElement1, contentElement2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					contentElement1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					contentElement2, entityField.getName(), 1);
 			});
 	}
@@ -485,27 +419,27 @@ public abstract class BaseContentElementResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -513,12 +447,12 @@ public abstract class BaseContentElementResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -627,10 +561,7 @@ public abstract class BaseContentElementResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantContentElement),
 				(List<ContentElement>)page.getItems());
-			assertValid(
-				page,
-				testGetSiteContentElementsPage_getExpectedActions(
-					irrelevantSiteId));
+			assertValid(page);
 		}
 
 		ContentElement contentElement1 =
@@ -649,17 +580,7 @@ public abstract class BaseContentElementResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(contentElement1, contentElement2),
 			(List<ContentElement>)page.getItems());
-		assertValid(
-			page, testGetSiteContentElementsPage_getExpectedActions(siteId));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetSiteContentElementsPage_getExpectedActions(Long siteId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -685,41 +606,6 @@ public abstract class BaseContentElementResourceTestCase {
 				contentElementResource.getSiteContentElementsPage(
 					siteId, null, null,
 					getFilterString(entityField, "between", contentElement1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(contentElement1),
-				(List<ContentElement>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetSiteContentElementsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long siteId = testGetSiteContentElementsPage_getSiteId();
-
-		ContentElement contentElement1 =
-			testGetSiteContentElementsPage_addContentElement(
-				siteId, randomContentElement());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ContentElement contentElement2 =
-			testGetSiteContentElementsPage_addContentElement(
-				siteId, randomContentElement());
-
-		for (EntityField entityField : entityFields) {
-			Page<ContentElement> page =
-				contentElementResource.getSiteContentElementsPage(
-					siteId, null, null,
-					getFilterString(entityField, "eq", contentElement1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -819,23 +705,9 @@ public abstract class BaseContentElementResourceTestCase {
 		testGetSiteContentElementsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, contentElement1, contentElement2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					contentElement1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetSiteContentElementsPageWithSortDouble()
-		throws Exception {
-
-		testGetSiteContentElementsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, contentElement1, contentElement2) -> {
-				BeanTestUtil.setProperty(
-					contentElement1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					contentElement2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -846,9 +718,9 @@ public abstract class BaseContentElementResourceTestCase {
 		testGetSiteContentElementsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, contentElement1, contentElement2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					contentElement1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					contentElement2, entityField.getName(), 1);
 			});
 	}
@@ -864,27 +736,27 @@ public abstract class BaseContentElementResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -892,12 +764,12 @@ public abstract class BaseContentElementResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						contentElement2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -998,9 +870,9 @@ public abstract class BaseContentElementResourceTestCase {
 		Assert.assertEquals(0, contentElementsJSONObject.get("totalCount"));
 
 		ContentElement contentElement1 =
-			testGraphQLGetSiteContentElementsPage_addContentElement();
+			testGraphQLContentElement_addContentElement();
 		ContentElement contentElement2 =
-			testGraphQLGetSiteContentElementsPage_addContentElement();
+			testGraphQLContentElement_addContentElement();
 
 		contentElementsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -1013,13 +885,6 @@ public abstract class BaseContentElementResourceTestCase {
 			Arrays.asList(
 				ContentElementSerDes.toDTOs(
 					contentElementsJSONObject.getString("items"))));
-	}
-
-	protected ContentElement
-			testGraphQLGetSiteContentElementsPage_addContentElement()
-		throws Exception {
-
-		return testGraphQLContentElement_addContentElement();
 	}
 
 	@Rule
@@ -1153,13 +1018,6 @@ public abstract class BaseContentElementResourceTestCase {
 	}
 
 	protected void assertValid(Page<ContentElement> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<ContentElement> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<ContentElement> contentElements = page.getItems();
@@ -1174,20 +1032,6 @@ public abstract class BaseContentElementResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1349,16 +1193,14 @@ public abstract class BaseContentElementResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1375,10 +1217,6 @@ public abstract class BaseContentElementResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1388,18 +1226,18 @@ public abstract class BaseContentElementResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1515,115 +1353,6 @@ public abstract class BaseContentElementResourceTestCase {
 	protected DepotEntry testDepotEntry;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1698,6 +1427,18 @@ public abstract class BaseContentElementResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseContentElementResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

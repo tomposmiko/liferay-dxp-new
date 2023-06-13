@@ -228,11 +228,6 @@ public class AccountRoleWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected AccountRoleWrapper wrap(AccountRole accountRole) {
 		return new AccountRoleWrapper(accountRole);
 	}

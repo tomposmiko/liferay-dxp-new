@@ -20,11 +20,9 @@ import com.liferay.fragment.exception.FragmentEntryConfigurationException;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.exception.FragmentEntryNameException;
 import com.liferay.fragment.model.FragmentCollection;
-import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
-import com.liferay.fragment.util.FragmentCompositionTestUtil;
 import com.liferay.fragment.util.FragmentEntryTestUtil;
 import com.liferay.fragment.util.FragmentTestUtil;
 import com.liferay.fragment.util.comparator.FragmentEntryCreateDateComparator;
@@ -53,9 +51,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -103,17 +99,17 @@ public class FragmentEntryServiceTest {
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			StringUtil.randomString(), StringUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			StringUtil.randomString(), StringUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		List<FragmentEntry> actualFragmentEntries =
 			_fragmentEntryService.getFragmentEntries(
@@ -135,8 +131,8 @@ public class FragmentEntryServiceTest {
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			StringUtil.randomString(), name, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), false,
-			"{fieldSets: []}", null, 0, FragmentConstants.TYPE_SECTION, null,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			"{fieldSets: []}", 0, FragmentConstants.TYPE_SECTION,
 			WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
@@ -148,29 +144,32 @@ public class FragmentEntryServiceTest {
 
 	@Test(expected = FragmentEntryNameException.class)
 	public void testAddFragmentEntryUsingEmptyName() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-			StringPool.BLANK, StringPool.BLANK, false, StringPool.BLANK, null,
-			0, FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			StringPool.BLANK, StringPool.BLANK, 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 	}
 
 	@Test(expected = FragmentEntryConfigurationException.class)
 	public void testAddFragmentEntryUsingInvalidConfiguration()
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
-			"<div></div>", null, false,
-			_read("configuration-invalid-missing-field-sets.json"), null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			"<div></div>", null,
+			_read("configuration-invalid-missing-field-sets.json"), 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 	}
 
 	@Test
@@ -183,9 +182,8 @@ public class FragmentEntryServiceTest {
 
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
-			html, null, false, StringPool.BLANK, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
+			StringPool.BLANK, RandomTestUtil.randomString(), null, html, null,
+			StringPool.BLANK, 0, FragmentConstants.TYPE_COMPONENT,
 			WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
@@ -197,37 +195,41 @@ public class FragmentEntryServiceTest {
 
 	@Test(expected = FragmentEntryContentException.class)
 	public void testAddFragmentEntryUsingNullHTML() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
-			null, null, false, StringPool.BLANK, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			StringPool.BLANK, RandomTestUtil.randomString(), null, null, null,
+			StringPool.BLANK, 0, FragmentConstants.TYPE_COMPONENT,
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
 	@Test(expected = FragmentEntryNameException.class)
 	public void testAddFragmentEntryUsingNullName() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), null, null, StringPool.BLANK, null,
-			false, StringPool.BLANK, null, 0, FragmentConstants.TYPE_COMPONENT,
-			null, WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			StringPool.BLANK, null, 0, FragmentConstants.TYPE_COMPONENT,
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
 	@Test
 	public void testAddFragmentEntryUsingPlainTextHTML() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
-			"Text only fragment", null, false, StringPool.BLANK, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			StringPool.BLANK, RandomTestUtil.randomString(), null,
+			"Text only fragment", null, StringPool.BLANK, 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 	}
 
 	@Test
@@ -241,9 +243,9 @@ public class FragmentEntryServiceTest {
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
-			"<div></div>", null, false, configuration, null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			"<div></div>", null, configuration, 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(
@@ -255,14 +257,17 @@ public class FragmentEntryServiceTest {
 
 	@Test
 	public void testAddFragmentEntryWithFragmentEntryKey() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			"FRAGMENTENTRYKEY", RandomTestUtil.randomString(), null,
-			"<div></div>", null, false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			"FRAGMENTENTRYKEY", RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(
@@ -279,14 +284,17 @@ public class FragmentEntryServiceTest {
 	public void testAddFragmentEntryWithFragmentEntryKeyAndType()
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			"FRAGMENTENTRYKEY", RandomTestUtil.randomString(), null,
-			RandomTestUtil.randomString(), null, false, "{fieldSets: []}", null,
-			0, FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			"FRAGMENTENTRYKEY", RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(
@@ -309,8 +317,8 @@ public class FragmentEntryServiceTest {
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			StringPool.BLANK, RandomTestUtil.randomString(), null, html, null,
-			false, StringPool.BLANK, null, 0, FragmentConstants.TYPE_COMPONENT,
-			null, WorkflowConstants.STATUS_APPROVED, serviceContext);
+			StringPool.BLANK, 0, FragmentConstants.TYPE_COMPONENT,
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(
@@ -321,14 +329,17 @@ public class FragmentEntryServiceTest {
 
 	@Test
 	public void testAddFragmentEntryWithType() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			StringPool.BLANK, RandomTestUtil.randomString(), null,
-			RandomTestUtil.randomString(), null, false, StringPool.BLANK, null,
-			0, FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(
@@ -349,8 +360,8 @@ public class FragmentEntryServiceTest {
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			StringPool.BLANK, RandomTestUtil.randomString(), null, html, null,
-			false, StringPool.BLANK, null, 0, FragmentConstants.TYPE_COMPONENT,
-			null, WorkflowConstants.STATUS_APPROVED, serviceContext);
+			StringPool.BLANK, 0, FragmentConstants.TYPE_COMPONENT,
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(
@@ -372,9 +383,9 @@ public class FragmentEntryServiceTest {
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			StringPool.BLANK, name, "div {\ncolor: red\n}", "<div>Test</div>",
-			"alert(\"test\")", false, StringPool.BLANK, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			"alert(\"test\")", StringPool.BLANK, 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		FragmentEntry copyFragmentEntry =
 			_fragmentEntryService.copyFragmentEntry(
@@ -398,9 +409,9 @@ public class FragmentEntryServiceTest {
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			StringPool.BLANK, name, "div {\ncolor: red\n}", "<div>Test</div>",
-			"alert(\"test\")", false, StringPool.BLANK, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			"alert(\"test\")", StringPool.BLANK, 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		FragmentEntry copyFragmentEntry =
 			_fragmentEntryService.copyFragmentEntry(
@@ -459,147 +470,6 @@ public class FragmentEntryServiceTest {
 				fragmentEntry.getFragmentEntryId());
 
 		Assert.assertEquals(name, persistedFragmentEntry.getName());
-	}
-
-	@Test
-	public void testGetFragmentCompositionsAndFragmentEntriesCaseInsensitive()
-		throws Exception {
-
-		String keyword = RandomTestUtil.randomString();
-
-		FragmentCompositionTestUtil.addFragmentComposition(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		FragmentComposition fragmentComposition1 =
-			FragmentCompositionTestUtil.addFragmentComposition(
-				_fragmentCollection.getFragmentCollectionId(),
-				RandomTestUtil.randomString() + keyword);
-
-		FragmentCompositionTestUtil.addFragmentComposition(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		FragmentComposition fragmentComposition2 =
-			FragmentCompositionTestUtil.addFragmentComposition(
-				_fragmentCollection.getFragmentCollectionId(),
-				RandomTestUtil.randomString() + keyword +
-					RandomTestUtil.randomString());
-
-		FragmentCompositionTestUtil.addFragmentComposition(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		FragmentComposition fragmentComposition3 =
-			FragmentCompositionTestUtil.addFragmentComposition(
-				_fragmentCollection.getFragmentCollectionId(),
-				keyword + RandomTestUtil.randomString());
-
-		FragmentCompositionTestUtil.addFragmentComposition(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		FragmentEntryTestUtil.addFragmentEntry(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		FragmentEntry fragmentEntry1 = FragmentEntryTestUtil.addFragmentEntry(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString() + keyword);
-
-		FragmentEntryTestUtil.addFragmentEntry(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		FragmentEntry fragmentEntry2 = FragmentEntryTestUtil.addFragmentEntry(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString() + keyword +
-				RandomTestUtil.randomString());
-
-		FragmentEntryTestUtil.addFragmentEntry(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		FragmentEntry fragmentEntry3 = FragmentEntryTestUtil.addFragmentEntry(
-			_fragmentCollection.getFragmentCollectionId(),
-			keyword + RandomTestUtil.randomString());
-
-		FragmentEntryTestUtil.addFragmentEntry(
-			_fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString());
-
-		List<Object> list =
-			_fragmentEntryService.getFragmentCompositionsAndFragmentEntries(
-				_fragmentCollection.getGroupId(),
-				_fragmentCollection.getFragmentCollectionId(), keyword,
-				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null);
-
-		Assert.assertEquals(list.toString(), 6, list.size());
-
-		List<FragmentComposition> fragmentCompositions = new ArrayList<>();
-		List<FragmentEntry> fragmentEntries = new ArrayList<>();
-
-		for (Object object : list) {
-			if (object instanceof FragmentComposition) {
-				FragmentComposition fragmentComposition =
-					(FragmentComposition)object;
-
-				Assert.assertTrue(
-					Objects.equals(
-						fragmentComposition.getFragmentCompositionId(),
-						fragmentComposition1.getFragmentCompositionId()) ||
-					Objects.equals(
-						fragmentComposition.getFragmentCompositionId(),
-						fragmentComposition2.getFragmentCompositionId()) ||
-					Objects.equals(
-						fragmentComposition.getFragmentCompositionId(),
-						fragmentComposition3.getFragmentCompositionId()));
-
-				fragmentCompositions.add(fragmentComposition);
-			}
-			else {
-				FragmentEntry fragmentEntry = (FragmentEntry)object;
-
-				Assert.assertTrue(
-					Objects.equals(
-						fragmentEntry.getFragmentEntryId(),
-						fragmentEntry1.getFragmentEntryId()) ||
-					Objects.equals(
-						fragmentEntry.getFragmentEntryId(),
-						fragmentEntry2.getFragmentEntryId()) ||
-					Objects.equals(
-						fragmentEntry.getFragmentEntryId(),
-						fragmentEntry3.getFragmentEntryId()));
-
-				fragmentEntries.add(fragmentEntry);
-			}
-		}
-
-		Assert.assertEquals(
-			fragmentCompositions.toString(), 3, fragmentCompositions.size());
-		Assert.assertEquals(
-			fragmentEntries.toString(), 3, fragmentEntries.size());
-
-		List<Object> lowerCaseList =
-			_fragmentEntryService.getFragmentCompositionsAndFragmentEntries(
-				_fragmentCollection.getGroupId(),
-				_fragmentCollection.getFragmentCollectionId(),
-				StringUtil.toLowerCase(keyword),
-				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null);
-
-		Assert.assertEquals(lowerCaseList.toString(), list, lowerCaseList);
-
-		List<Object> upperCaseList =
-			_fragmentEntryService.getFragmentCompositionsAndFragmentEntries(
-				_fragmentCollection.getGroupId(),
-				_fragmentCollection.getFragmentCollectionId(),
-				StringUtil.toUpperCase(keyword),
-				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null);
-
-		Assert.assertEquals(upperCaseList.toString(), list, upperCaseList);
 	}
 
 	@Test
@@ -675,35 +545,35 @@ public class FragmentEntryServiceTest {
 
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), "AC Fragment Entry",
+			StringUtil.randomString(), "AC Fragment Entry",
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), "AA Fragment",
+			StringUtil.randomString(), "AA Fragment",
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), "AB Fragment Entry",
+			StringUtil.randomString(), "AB Fragment Entry",
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_DRAFT, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_DRAFT,
+			serviceContext);
 
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			RandomTestUtil.randomString(), "AD Fragment Entry",
+			StringUtil.randomString(), "AD Fragment Entry",
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		FragmentEntryNameComparator fragmentEntryNameComparatorAsc =
 			new FragmentEntryNameComparator(true);
@@ -963,17 +833,17 @@ public class FragmentEntryServiceTest {
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			"FRAGMENTENTRYKEYONE", "Fragment Entry One",
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		_fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
 			"FRAGMENTENTRYKEYTWO", "Fragment Entry Two",
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
-			FragmentConstants.TYPE_SECTION, null,
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
+			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			FragmentConstants.TYPE_SECTION, WorkflowConstants.STATUS_APPROVED,
+			serviceContext);
 
 		List<FragmentEntry> actualFragmentEntries =
 			_fragmentEntryService.getFragmentEntriesByTypeAndStatus(
@@ -1365,7 +1235,7 @@ public class FragmentEntryServiceTest {
 			_updatedFragmentCollection.getFragmentCollectionId(),
 			"Fragment Entry Updated", "div {\ncolor: red;\n}",
 			"<div>Updated</div>", "alert(\"test\");", false,
-			"{\n\t\"fieldSets\": [\n\t]\n}", fragmentEntry.getIcon(), 1,
+			"{\n\t\"fieldSets\": [\n\t]\n}", 1,
 			WorkflowConstants.STATUS_APPROVED);
 
 		FragmentEntry persistedFragmentEntry =
@@ -1407,23 +1277,21 @@ public class FragmentEntryServiceTest {
 
 	@Test
 	public void testUpdateFragmentEntryValues() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			"FRAGMENTENTRYKEY", "Fragment Entry Original",
-			RandomTestUtil.randomString(), "<div>Original</div>",
-			RandomTestUtil.randomString(), false, StringPool.BLANK, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_DRAFT,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			"FRAGMENTENTRYKEY", "Fragment Entry Original", null,
+			"<div>Original</div>", null, StringPool.BLANK, 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_DRAFT,
+			serviceContext);
 
 		fragmentEntry = _fragmentEntryService.updateFragmentEntry(
-			fragmentEntry.getFragmentEntryId(),
-			fragmentEntry.getFragmentCollectionId(), "Fragment Entry Updated",
+			fragmentEntry.getFragmentEntryId(), "Fragment Entry Updated",
 			"div {\ncolor: red;\n}", "<div>Updated</div>", "alert(\"test\");",
-			fragmentEntry.isCacheable(), "{\n\t\"fieldSets\": [\n\t]\n}",
-			fragmentEntry.getIcon(), fragmentEntry.getPreviewFileEntryId(),
-			WorkflowConstants.STATUS_APPROVED);
+			"{\n\t\"fieldSets\": [\n\t]\n}", WorkflowConstants.STATUS_APPROVED);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(
@@ -1445,24 +1313,24 @@ public class FragmentEntryServiceTest {
 	public void testUpdateFragmentEntryValuesAndPreviewFileEntryId()
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		FragmentEntry fragmentEntry = _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), _fragmentCollection.getFragmentCollectionId(),
-			"FRAGMENTENTRYKEY", "Fragment Entry Original",
-			RandomTestUtil.randomString(), "<div>Original</div>",
-			RandomTestUtil.randomString(), false, StringPool.BLANK, null, 0,
-			FragmentConstants.TYPE_COMPONENT, null,
-			WorkflowConstants.STATUS_DRAFT,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			"FRAGMENTENTRYKEY", "Fragment Entry Original", null,
+			"<div>Original</div>", null, StringPool.BLANK, 0,
+			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_DRAFT,
+			serviceContext);
 
 		Assert.assertEquals(0, fragmentEntry.getPreviewFileEntryId());
 
 		fragmentEntry = _fragmentEntryService.updateFragmentEntry(
-			fragmentEntry.getFragmentEntryId(),
-			fragmentEntry.getFragmentCollectionId(), "Fragment Entry Updated",
+			fragmentEntry.getFragmentEntryId(), "Fragment Entry Updated",
 			"div {\ncolor: red;\n}", "<div>Updated</div>", "alert(\"test\");",
-			fragmentEntry.isCacheable(), "{\n\t\"fieldSets\": [\n\t]\n}",
-			fragmentEntry.getIcon(), 1, WorkflowConstants.STATUS_APPROVED);
+			"{\n\t\"fieldSets\": [\n\t]\n}", 1,
+			WorkflowConstants.STATUS_APPROVED);
 
 		FragmentEntry persistedFragmentEntry =
 			_fragmentEntryPersistence.fetchByPrimaryKey(

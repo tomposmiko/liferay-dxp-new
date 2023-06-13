@@ -53,7 +53,7 @@ public class GetIndexIndexRequestExecutorImpl
 		GetIndexRequest getIndexRequest = createGetIndexRequest(
 			getIndexIndexRequest);
 
-		GetIndexResponse getIndexResponse = _getGetIndexResponse(
+		GetIndexResponse getIndexResponse = getGetIndexResponse(
 			getIndexRequest, getIndexIndexRequest);
 
 		GetIndexIndexResponse getIndexIndexResponse =
@@ -64,27 +64,17 @@ public class GetIndexIndexRequestExecutorImpl
 		ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetadata>>
 			indicesMappings = getIndexResponse.getMappings();
 
-		getIndexIndexResponse.setMappings(_convertMappings(indicesMappings));
+		getIndexIndexResponse.setMappings(convertMappings(indicesMappings));
 
 		ImmutableOpenMap<String, Settings> indicesSettings =
 			getIndexResponse.getSettings();
 
-		getIndexIndexResponse.setSettings(_convertSettings(indicesSettings));
+		getIndexIndexResponse.setSettings(convertSettings(indicesSettings));
 
 		return getIndexIndexResponse;
 	}
 
-	protected GetIndexRequest createGetIndexRequest(
-		GetIndexIndexRequest getIndexIndexRequest) {
-
-		GetIndexRequest getIndexRequest = new GetIndexRequest();
-
-		getIndexRequest.indices(getIndexIndexRequest.getIndexNames());
-
-		return getIndexRequest;
-	}
-
-	private Map<String, Map<String, String>> _convertMappings(
+	protected Map<String, Map<String, String>> convertMappings(
 		ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetadata>>
 			indicesMappings) {
 
@@ -129,7 +119,7 @@ public class GetIndexIndexRequestExecutorImpl
 		return indexMappings;
 	}
 
-	private Map<String, String> _convertSettings(
+	protected Map<String, String> convertSettings(
 		ImmutableOpenMap<String, Settings> indicesSettings) {
 
 		Iterator<ObjectObjectCursor<String, Settings>> iterator =
@@ -149,7 +139,17 @@ public class GetIndexIndexRequestExecutorImpl
 		return indicesSettingsMap;
 	}
 
-	private GetIndexResponse _getGetIndexResponse(
+	protected GetIndexRequest createGetIndexRequest(
+		GetIndexIndexRequest getIndexIndexRequest) {
+
+		GetIndexRequest getIndexRequest = new GetIndexRequest();
+
+		getIndexRequest.indices(getIndexIndexRequest.getIndexNames());
+
+		return getIndexRequest;
+	}
+
+	protected GetIndexResponse getGetIndexResponse(
 		GetIndexRequest getIndexRequest,
 		GetIndexIndexRequest getIndexIndexRequest) {
 
@@ -168,7 +168,13 @@ public class GetIndexIndexRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

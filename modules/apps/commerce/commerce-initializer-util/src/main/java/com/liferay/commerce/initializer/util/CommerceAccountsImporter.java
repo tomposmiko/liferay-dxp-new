@@ -14,16 +14,17 @@
 
 package com.liferay.commerce.initializer.util;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.exception.NoSuchGroupException;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.model.AccountEntryOrganizationRel;
-import com.liferay.account.model.AccountGroup;
-import com.liferay.account.model.AccountGroupRel;
-import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
-import com.liferay.account.service.AccountGroupLocalService;
-import com.liferay.account.service.AccountGroupRelLocalService;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.exception.NoSuchAccountGroupException;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.model.CommerceAccountGroup;
+import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRel;
+import com.liferay.commerce.account.model.CommerceAccountOrganizationRel;
+import com.liferay.commerce.account.service.CommerceAccountGroupCommerceAccountRelLocalService;
+import com.liferay.commerce.account.service.CommerceAccountGroupLocalService;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
+import com.liferay.commerce.account.service.CommerceAccountOrganizationRelLocalService;
+import com.liferay.commerce.account.service.persistence.CommerceAccountOrganizationRelPK;
 import com.liferay.commerce.exception.NoSuchCountryException;
 import com.liferay.commerce.price.list.exception.NoSuchPriceListException;
 import com.liferay.commerce.price.list.model.CommercePriceList;
@@ -50,10 +51,9 @@ import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RegionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.File;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -66,7 +66,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alec Sloan
  */
-@Component(service = CommerceAccountsImporter.class)
+@Component(enabled = false, service = CommerceAccountsImporter.class)
 public class CommerceAccountsImporter {
 
 	public void importCommerceAccounts(
@@ -116,12 +116,12 @@ public class CommerceAccountsImporter {
 
 		String name = jsonObject.getString("name");
 
-		AccountEntry accountEntry =
-			_accountEntryLocalService.fetchAccountEntryByExternalReferenceCode(
-				_friendlyURLNormalizer.normalize(name),
-				serviceContext.getCompanyId());
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.fetchCommerceAccountByReferenceCode(
+				serviceContext.getCompanyId(),
+				FriendlyURLNormalizerUtil.normalize(name));
 
-		if (accountEntry != null) {
+		if (commerceAccount != null) {
 			return;
 		}
 
@@ -131,15 +131,17 @@ public class CommerceAccountsImporter {
 
 		// Add Commerce Account
 
-		accountEntry = _accountEntryLocalService.addAccountEntry(
-			serviceContext.getUserId(),
-			AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, name, null, null,
-			email, null, taxId, accountType, WorkflowConstants.STATUS_APPROVED,
-			serviceContext);
+		int commerceAccountType = 1;
 
-		accountEntry = _accountEntryLocalService.updateExternalReferenceCode(
-			accountEntry.getAccountEntryId(),
-			_friendlyURLNormalizer.normalize(accountEntry.getName()));
+		if (accountType.equals("Business")) {
+			commerceAccountType =
+				CommerceAccountConstants.ACCOUNT_TYPE_BUSINESS;
+		}
+
+		commerceAccount = _commerceAccountLocalService.addCommerceAccount(
+			name, CommerceAccountConstants.DEFAULT_PARENT_ACCOUNT_ID, email,
+			taxId, commerceAccountType, true,
+			FriendlyURLNormalizerUtil.normalize(name), serviceContext);
 
 		String twoLetterISOCode = jsonObject.getString("country");
 
@@ -157,7 +159,7 @@ public class CommerceAccountsImporter {
 				regionId = region.getRegionId();
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -168,10 +170,11 @@ public class CommerceAccountsImporter {
 		// Add Commerce Address
 
 		_commerceAddressLocalService.addCommerceAddress(
-			AccountEntry.class.getName(), accountEntry.getAccountEntryId(),
-			accountEntry.getName(), StringPool.BLANK, street1, StringPool.BLANK,
-			StringPool.BLANK, city, zip, regionId, country.getCountryId(),
-			StringPool.BLANK, true, true, serviceContext);
+			commerceAccount.getModelClassName(),
+			commerceAccount.getCommerceAccountId(), commerceAccount.getName(),
+			StringPool.BLANK, street1, StringPool.BLANK, StringPool.BLANK, city,
+			zip, regionId, country.getCountryId(), StringPool.BLANK, true, true,
+			serviceContext);
 
 		// Add Company Logo
 
@@ -188,14 +191,11 @@ public class CommerceAccountsImporter {
 						"No file found at " + filePath);
 				}
 
-				_accountEntryLocalService.updateAccountEntry(
-					accountEntry.getAccountEntryId(),
-					accountEntry.getParentAccountEntryId(),
-					accountEntry.getName(), accountEntry.getDescription(),
-					false, accountEntry.getDomainsArray(),
-					accountEntry.getEmailAddress(), _file.getBytes(inputStream),
-					accountEntry.getTaxIdNumber(),
-					WorkflowConstants.STATUS_APPROVED, serviceContext);
+				_commerceAccountLocalService.updateCommerceAccount(
+					commerceAccount.getCommerceAccountId(),
+					commerceAccount.getName(), true,
+					FileUtil.getBytes(inputStream), commerceAccount.getEmail(),
+					commerceAccount.getTaxId(), true, serviceContext);
 			}
 		}
 
@@ -217,17 +217,21 @@ public class CommerceAccountsImporter {
 					StringPool.BLANK, false, serviceContext);
 			}
 
-			AccountEntryOrganizationRel accountEntryOrganizationRel =
-				_accountEntryOrganizationRelLocalService.
-					fetchAccountEntryOrganizationRel(
-						accountEntry.getAccountEntryId(),
-						organization.getOrganizationId());
+			CommerceAccountOrganizationRelPK commerceAccountOrganizationRelPK =
+				new CommerceAccountOrganizationRelPK(
+					commerceAccount.getCommerceAccountId(),
+					organization.getOrganizationId());
 
-			if (accountEntryOrganizationRel == null) {
-				_accountEntryOrganizationRelLocalService.
-					addAccountEntryOrganizationRel(
-						accountEntry.getAccountEntryId(),
-						organization.getOrganizationId());
+			CommerceAccountOrganizationRel commerceAccountOrganizationRel =
+				_commerceAccountOrganizationRelLocalService.
+					fetchCommerceAccountOrganizationRel(
+						commerceAccountOrganizationRelPK);
+
+			if (commerceAccountOrganizationRel == null) {
+				_commerceAccountOrganizationRelLocalService.
+					addCommerceAccountOrganizationRel(
+						commerceAccount.getCommerceAccountId(),
+						organization.getOrganizationId(), serviceContext);
 			}
 		}
 
@@ -239,7 +243,7 @@ public class CommerceAccountsImporter {
 			for (int i = 0; i < priceListsJSONArray.length(); i++) {
 				try {
 					String externalReferenceCode =
-						_friendlyURLNormalizer.normalize(
+						FriendlyURLNormalizerUtil.normalize(
 							priceListsJSONArray.getString(i));
 
 					CommercePriceList commercePriceList =
@@ -253,12 +257,13 @@ public class CommerceAccountsImporter {
 							addCommercePriceListAccountRel(
 								serviceContext.getUserId(),
 								commercePriceList.getCommercePriceListId(),
-								accountEntry.getAccountEntryId(), 0,
+								commerceAccount.getCommerceAccountId(), 0,
 								serviceContext);
 					}
 				}
 				catch (NoSuchPriceListException noSuchPriceListException) {
-					_log.error(noSuchPriceListException);
+					_log.error(
+						noSuchPriceListException, noSuchPriceListException);
 				}
 			}
 		}
@@ -275,47 +280,49 @@ public class CommerceAccountsImporter {
 						i);
 
 					String externalReferenceCode =
-						_friendlyURLNormalizer.normalize(accountGroupName);
+						FriendlyURLNormalizerUtil.normalize(accountGroupName);
 
-					AccountGroup accountGroup =
-						_accountGroupLocalService.
-							fetchAccountGroupByExternalReferenceCode(
-								externalReferenceCode,
-								serviceContext.getCompanyId());
+					CommerceAccountGroup commerceAccountGroup =
+						_commerceAccountGroupLocalService.
+							fetchByExternalReferenceCode(
+								serviceContext.getCompanyId(),
+								externalReferenceCode);
 
-					if (accountGroup == null) {
-						accountGroup =
-							_accountGroupLocalService.addAccountGroup(
-								serviceContext.getUserId(), null,
-								accountGroupName, serviceContext);
-
-						accountGroup.setExternalReferenceCode(
-							externalReferenceCode);
-						accountGroup.setDefaultAccountGroup(false);
-						accountGroup.setType(
-							AccountConstants.ACCOUNT_GROUP_TYPE_GUEST);
-						accountGroup.setExpandoBridgeAttributes(serviceContext);
-
-						accountGroup =
-							_accountGroupLocalService.updateAccountGroup(
-								accountGroup);
+					if (commerceAccountGroup == null) {
+						commerceAccountGroup =
+							_commerceAccountGroupLocalService.
+								addCommerceAccountGroup(
+									serviceContext.getCompanyId(),
+									accountGroupName,
+									CommerceAccountConstants.
+										ACCOUNT_GROUP_TYPE_GUEST,
+									false, externalReferenceCode,
+									serviceContext);
 					}
 
-					AccountGroupRel accountGroupRel =
-						_accountGroupRelLocalService.fetchAccountGroupRel(
-							accountGroup.getAccountGroupId(),
-							AccountEntry.class.getName(),
-							accountEntry.getAccountEntryId());
+					CommerceAccountGroupCommerceAccountRel
+						commerceAccountGroupCommerceAccountRel =
+							_commerceAccountGroupCommerceAccountRelLocalService.
+								fetchCommerceAccountGroupCommerceAccountRel(
+									commerceAccountGroup.
+										getCommerceAccountGroupId(),
+									commerceAccount.getCommerceAccountId());
 
-					if (accountGroupRel == null) {
-						_accountGroupRelLocalService.addAccountGroupRel(
-							accountGroup.getAccountGroupId(),
-							AccountEntry.class.getName(),
-							accountEntry.getAccountEntryId());
+					if (commerceAccountGroupCommerceAccountRel == null) {
+						_commerceAccountGroupCommerceAccountRelLocalService.
+							addCommerceAccountGroupCommerceAccountRel(
+								commerceAccountGroup.
+									getCommerceAccountGroupId(),
+								commerceAccount.getCommerceAccountId(),
+								serviceContext);
 					}
 				}
-				catch (NoSuchGroupException noSuchGroupException) {
-					_log.error(noSuchGroupException);
+				catch (NoSuchAccountGroupException
+							noSuchAccountGroupException) {
+
+					_log.error(
+						noSuchAccountGroupException,
+						noSuchAccountGroupException);
 				}
 			}
 		}
@@ -325,17 +332,18 @@ public class CommerceAccountsImporter {
 		CommerceAccountsImporter.class);
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private CommerceAccountGroupCommerceAccountRelLocalService
+		_commerceAccountGroupCommerceAccountRelLocalService;
 
 	@Reference
-	private AccountEntryOrganizationRelLocalService
-		_accountEntryOrganizationRelLocalService;
+	private CommerceAccountGroupLocalService _commerceAccountGroupLocalService;
 
 	@Reference
-	private AccountGroupLocalService _accountGroupLocalService;
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Reference
-	private AccountGroupRelLocalService _accountGroupRelLocalService;
+	private CommerceAccountOrganizationRelLocalService
+		_commerceAccountOrganizationRelLocalService;
 
 	@Reference
 	private CommerceAddressLocalService _commerceAddressLocalService;
@@ -349,12 +357,6 @@ public class CommerceAccountsImporter {
 
 	@Reference
 	private CountryLocalService _countryLocalService;
-
-	@Reference
-	private File _file;
-
-	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;

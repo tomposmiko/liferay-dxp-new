@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsFactory;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -68,6 +67,17 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class BaseAnalyticsMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected void checkPermissions(ThemeDisplay themeDisplay)
+		throws PrincipalException {
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (!permissionChecker.isCompanyAdmin(themeDisplay.getCompanyId())) {
+			throw new PrincipalException();
+		}
+	}
 
 	protected void checkResponse(long companyId, HttpResponse httpResponse)
 		throws Exception {
@@ -102,7 +112,7 @@ public abstract class BaseAnalyticsMVCActionCommand
 			PrefsPropsUtil.getStringArray(
 				companyId, "liferayAnalyticsGroupIds", StringPool.COMMA));
 
-		_removeCompanyPreferences(companyId);
+		removeCompanyPreferences(companyId);
 
 		configurationProvider.deleteCompanyConfiguration(
 			AnalyticsConfiguration.class, companyId);
@@ -117,9 +127,9 @@ public abstract class BaseAnalyticsMVCActionCommand
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-			_checkPermissions(themeDisplay);
+			checkPermissions(themeDisplay);
 
-			_saveCompanyConfiguration(actionRequest, themeDisplay);
+			saveCompanyConfiguration(actionRequest, themeDisplay);
 
 			String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
@@ -148,7 +158,7 @@ public abstract class BaseAnalyticsMVCActionCommand
 			}
 		}
 		catch (PrincipalException principalException) {
-			_log.error(principalException);
+			_log.error(principalException, principalException);
 
 			SessionErrors.add(actionRequest, principalException.getClass());
 
@@ -158,64 +168,13 @@ public abstract class BaseAnalyticsMVCActionCommand
 			mutableRenderParameters.setValue("mvcPath", "/error.jsp");
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw exception;
 		}
 	}
 
-	protected void removeChannelId(String[] groupIds) {
-		for (String groupId : groupIds) {
-			Group group = groupLocalService.fetchGroup(
-				GetterUtil.getLong(groupId));
-
-			if (group == null) {
-				continue;
-			}
-
-			UnicodeProperties typeSettingsUnicodeProperties =
-				group.getTypeSettingsProperties();
-
-			typeSettingsUnicodeProperties.remove("analyticsChannelId");
-
-			group.setTypeSettingsProperties(typeSettingsUnicodeProperties);
-
-			groupLocalService.updateGroup(group);
-		}
-	}
-
-	protected abstract void updateConfigurationProperties(
-			ActionRequest actionRequest,
-			Dictionary<String, Object> configurationProperties)
-		throws Exception;
-
-	@Reference
-	protected CompanyService companyService;
-
-	@Reference
-	protected ConfigurationProvider configurationProvider;
-
-	@Reference
-	protected GroupLocalService groupLocalService;
-
-	@Reference
-	protected SettingsFactory settingsFactory;
-
-	@Reference
-	protected SettingsLocatorHelper settingsLocatorHelper;
-
-	private void _checkPermissions(ThemeDisplay themeDisplay)
-		throws PrincipalException {
-
-		PermissionChecker permissionChecker =
-			PermissionThreadLocal.getPermissionChecker();
-
-		if (!permissionChecker.isCompanyAdmin(themeDisplay.getCompanyId())) {
-			throw new PrincipalException();
-		}
-	}
-
-	private String _getConfigurationPid() {
+	protected String getConfigurationPid() {
 		Class<?> clazz = AnalyticsConfiguration.class;
 
 		Meta.OCD ocd = clazz.getAnnotation(Meta.OCD.class);
@@ -223,7 +182,7 @@ public abstract class BaseAnalyticsMVCActionCommand
 		return ocd.id();
 	}
 
-	private Dictionary<String, Object> _getConfigurationProperties(
+	protected Dictionary<String, Object> getConfigurationProperties(
 			String pid, long scopePK)
 		throws Exception {
 
@@ -233,7 +192,7 @@ public abstract class BaseAnalyticsMVCActionCommand
 			new CompanyServiceSettingsLocator(scopePK, pid));
 
 		SettingsDescriptor settingsDescriptor =
-			settingsLocatorHelper.getSettingsDescriptor(pid);
+			settingsFactory.getSettingsDescriptor(pid);
 
 		if (settingsDescriptor == null) {
 			return configurationProperties;
@@ -259,7 +218,27 @@ public abstract class BaseAnalyticsMVCActionCommand
 		return configurationProperties;
 	}
 
-	private void _removeCompanyPreferences(long companyId) throws Exception {
+	protected void removeChannelId(String[] groupIds) {
+		for (String groupId : groupIds) {
+			Group group = groupLocalService.fetchGroup(
+				GetterUtil.getLong(groupId));
+
+			if (group == null) {
+				continue;
+			}
+
+			UnicodeProperties typeSettingsUnicodeProperties =
+				group.getTypeSettingsProperties();
+
+			typeSettingsUnicodeProperties.remove("analyticsChannelId");
+
+			group.setTypeSettingsProperties(typeSettingsUnicodeProperties);
+
+			groupLocalService.updateGroup(group);
+		}
+	}
+
+	protected void removeCompanyPreferences(long companyId) throws Exception {
 		companyService.removePreferences(
 			companyId,
 			new String[] {
@@ -271,13 +250,13 @@ public abstract class BaseAnalyticsMVCActionCommand
 			});
 	}
 
-	private void _saveCompanyConfiguration(
+	protected void saveCompanyConfiguration(
 			ActionRequest actionRequest, ThemeDisplay themeDisplay)
 		throws Exception {
 
 		Dictionary<String, Object> configurationProperties =
-			_getConfigurationProperties(
-				_getConfigurationPid(), themeDisplay.getCompanyId());
+			getConfigurationProperties(
+				getConfigurationPid(), themeDisplay.getCompanyId());
 
 		updateConfigurationProperties(actionRequest, configurationProperties);
 
@@ -311,6 +290,23 @@ public abstract class BaseAnalyticsMVCActionCommand
 				configurationProperties);
 		}
 	}
+
+	protected abstract void updateConfigurationProperties(
+			ActionRequest actionRequest,
+			Dictionary<String, Object> configurationProperties)
+		throws Exception;
+
+	@Reference
+	protected CompanyService companyService;
+
+	@Reference
+	protected ConfigurationProvider configurationProvider;
+
+	@Reference
+	protected GroupLocalService groupLocalService;
+
+	@Reference
+	protected SettingsFactory settingsFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseAnalyticsMVCActionCommand.class);

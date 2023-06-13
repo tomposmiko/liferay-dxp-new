@@ -14,9 +14,9 @@
 
 package com.liferay.login.web.internal.servlet.taglib.include;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Shuyang Zhou
  */
 @Component(
+	immediate = true,
 	property = {
 		"login.web.navigation.position=pre", "service.ranking:Integer=100"
 	},
@@ -100,7 +101,6 @@ public class SignInNavigationPrePageInclude implements PageInclude {
 
 		IconTag iconTag = new IconTag();
 
-		iconTag.setCssClass("text-4");
 		iconTag.setMessage("sign-in");
 		iconTag.setUrl(signInURL);
 

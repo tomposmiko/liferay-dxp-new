@@ -19,13 +19,13 @@ import ClayLabel from '@clayui/label';
 import classNames from 'classnames';
 import React, {forwardRef} from 'react';
 
-const LabelOptionListItem = ({onCloseButtonClicked, option, readOnly}) => (
+const LabelOptionListItem = ({onCloseButtonClicked, option}) => (
 	<li>
 		<ClayLabel
 			className="ddm-select-option-label"
 			closeButtonProps={{
 				'data-testid': `closeButton${option.value}`,
-				'onClick': (event) => {
+				onClick: (event) => {
 					event.preventDefault();
 					event.stopPropagation();
 
@@ -33,7 +33,6 @@ const LabelOptionListItem = ({onCloseButtonClicked, option, readOnly}) => (
 				},
 			}}
 			value={option.value}
-			withClose={!readOnly}
 		>
 			{option.label}
 		</ClayLabel>
@@ -69,7 +68,7 @@ const VisibleSelectInput = forwardRef(
 			? Liferay.Language.get('choose-options')
 			: Liferay.Language.get('choose-an-option');
 
-		const isValueEmpty = !value.length;
+		const isValueEmpty = value.length === 0;
 
 		const selectedLabel = () => {
 			if (isValueEmpty) {
@@ -87,8 +86,7 @@ const VisibleSelectInput = forwardRef(
 			<div
 				className={classNames(
 					className,
-					'form-builder-select-field input-group-container',
-					'lfr__ddm-select-input-trigger'
+					'form-builder-select-field input-group-container'
 				)}
 				onClick={onClick}
 				onKeyDown={onKeyDown}
@@ -98,7 +96,7 @@ const VisibleSelectInput = forwardRef(
 					className={classNames(
 						'form-control results-chosen select-field-trigger',
 						{
-							'disabled': readOnly,
+							disabled: readOnly,
 							'multiple-label-list': multiple,
 						}
 					)}
@@ -112,35 +110,30 @@ const VisibleSelectInput = forwardRef(
 							label={selectedLabel()}
 						/>
 					) : (
-						<>
-							{value.map((item) => {
-								const option = options.find(
-									(option) => option.value === item
-								);
+						value.map((item) => {
+							const option = options.find(
+								(option) => option.value === item
+							);
 
-								return (
-									<>
-										{option && (
-											<LabelOptionListItem
-												key={`${option.value}-${option.label}`}
-												onCloseButtonClicked={
-													onCloseButtonClicked
-												}
-												option={option}
-												readOnly={readOnly}
-											/>
-										)}
-									</>
-								);
-							})}
-						</>
+							return (
+								<>
+									{option && (
+										<LabelOptionListItem
+											key={`${option.value}-${option.label}`}
+											onCloseButtonClicked={
+												onCloseButtonClicked
+											}
+											option={option}
+										/>
+									)}
+								</>
+							);
+						})
 					)}
 
-					<div className="lfr__ddm-form-field-type-select-arrow-down">
-						<a className="select-arrow-down-container">
-							<ClayIcon symbol="caret-double" />
-						</a>
-					</div>
+					<a className="select-arrow-down-container">
+						<ClayIcon symbol="caret-double" />
+					</a>
 				</div>
 			</div>
 		);

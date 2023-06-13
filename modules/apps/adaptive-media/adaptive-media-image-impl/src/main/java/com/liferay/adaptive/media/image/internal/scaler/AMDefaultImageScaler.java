@@ -22,7 +22,7 @@ import com.liferay.adaptive.media.image.scaler.AMImageScaledImage;
 import com.liferay.adaptive.media.image.scaler.AMImageScaler;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.image.ImageTool;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.GetterUtil;
 
@@ -33,12 +33,13 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Adolfo Pérez
  */
-@Component(property = "mime.type=*", service = AMImageScaler.class)
+@Component(
+	immediate = true, property = "mime.type=*", service = AMImageScaler.class
+)
 public class AMDefaultImageScaler implements AMImageScaler {
 
 	@Override
@@ -56,13 +57,13 @@ public class AMDefaultImageScaler implements AMImageScaler {
 			int maxHeight = GetterUtil.getInteger(properties.get("max-height"));
 			int maxWidth = GetterUtil.getInteger(properties.get("max-width"));
 
-			RenderedImage scaledRenderedImage = _imageTool.scale(
+			RenderedImage scaledRenderedImage = ImageToolUtil.scale(
 				renderedImage, maxHeight, maxWidth);
 
 			return new AMImageScaledImageImpl(
 				RenderedImageUtil.getRenderedImageContentStream(
 					scaledRenderedImage, fileVersion.getMimeType()),
-				scaledRenderedImage.getHeight(), fileVersion.getMimeType(),
+				scaledRenderedImage.getHeight(),
 				scaledRenderedImage.getWidth());
 		}
 		catch (AMRuntimeException.IOException | PortalException exception) {
@@ -83,8 +84,5 @@ public class AMDefaultImageScaler implements AMImageScaler {
 			throw new AMRuntimeException.IOException(portalException);
 		}
 	}
-
-	@Reference
-	private ImageTool _imageTool;
 
 }

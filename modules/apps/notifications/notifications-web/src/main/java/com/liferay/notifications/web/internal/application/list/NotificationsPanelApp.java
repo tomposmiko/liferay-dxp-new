@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + NotificationsPortletKeys.NOTIFICATIONS,
 		"panel.app.order:Integer=400",
@@ -52,21 +53,27 @@ public class NotificationsPanelApp extends BasePanelApp {
 	}
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return NotificationsPortletKeys.NOTIFICATIONS;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + NotificationsPortletKeys.NOTIFICATIONS + ")"
+		target = "(javax.portlet.name=" + NotificationsPortletKeys.NOTIFICATIONS + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
-	@Reference
+	@Override
+	@Reference(unbind = "-")
+	protected void setUserNotificationEventLocalService(
+		UserNotificationEventLocalService userNotificationEventLocalService) {
+
+		_userNotificationEventLocalService = userNotificationEventLocalService;
+	}
+
 	private UserNotificationEventLocalService
 		_userNotificationEventLocalService;
 

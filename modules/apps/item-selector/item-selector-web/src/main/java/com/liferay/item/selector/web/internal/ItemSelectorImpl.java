@@ -19,6 +19,7 @@ import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.ItemSelectorCriterionHandler;
 import com.liferay.item.selector.ItemSelectorCriterionSerializer;
 import com.liferay.item.selector.ItemSelectorRendering;
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.ItemSelectorViewRenderer;
 import com.liferay.item.selector.ItemSelectorViewRendererCustomizer;
@@ -36,7 +37,7 @@ import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -45,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +61,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * @author Iván Zaera
@@ -86,7 +91,7 @@ public class ItemSelectorImpl implements ItemSelector {
 		String namespace = _portal.getPortletNamespace(
 			ItemSelectorPortletKeys.ITEM_SELECTOR);
 
-		return HttpComponentsUtil.getParameter(
+		return _http.getParameter(
 			itemSelectorURL,
 			namespace.concat(PARAMETER_ITEM_SELECTED_EVENT_NAME), false);
 	}
@@ -96,7 +101,7 @@ public class ItemSelectorImpl implements ItemSelector {
 		Map<String, String[]> parameters) {
 
 		List<Class<? extends ItemSelectorCriterion>>
-			itemSelectorCriterionClasses = _getItemSelectorCriterionClasses(
+			itemSelectorCriterionClasses = getItemSelectorCriterionClasses(
 				parameters);
 
 		List<ItemSelectorCriterion> itemSelectorCriteria = new ArrayList<>(
@@ -119,8 +124,8 @@ public class ItemSelectorImpl implements ItemSelector {
 	public List<ItemSelectorCriterion> getItemSelectorCriteria(
 		String itemSelectorURL) {
 
-		Map<String, String[]> parameters = HttpComponentsUtil.getParameterMap(
-			HttpComponentsUtil.getQueryString(itemSelectorURL));
+		Map<String, String[]> parameters = _http.getParameterMap(
+			_http.getQueryString(itemSelectorURL));
 
 		Map<String, String[]> itemSelectorURLParameterMap = new HashMap<>();
 
@@ -143,7 +148,7 @@ public class ItemSelectorImpl implements ItemSelector {
 		if (matcher.matches()) {
 			itemSelectorURLParameterMap.put(
 				PARAMETER_CRITERIA,
-				new String[] {HttpComponentsUtil.decodePath(matcher.group(1))});
+				new String[] {_http.decodePath(matcher.group(1))});
 			itemSelectorURLParameterMap.put(
 				PARAMETER_ITEM_SELECTED_EVENT_NAME,
 				new String[] {matcher.group(2)});
@@ -178,9 +183,8 @@ public class ItemSelectorImpl implements ItemSelector {
 
 			ItemSelectorCriterionHandler<ItemSelectorCriterion>
 				itemSelectorCriterionHandler =
-					_itemSelectorCriterionHandlerServiceTrackerMap.getService(
-						ItemSelectorKeyUtil.getItemSelectorCriterionKey(
-							itemSelectorCriterionClass));
+					_itemSelectionCriterionHandlers.get(
+						itemSelectorCriterionClass.getName());
 
 			List<ItemSelectorView<ItemSelectorCriterion>> itemSelectorViews =
 				itemSelectorCriterionHandler.getItemSelectorViews(
@@ -205,7 +209,7 @@ public class ItemSelectorImpl implements ItemSelector {
 					_applyCustomizations(
 						new ItemSelectorViewRendererImpl(
 							itemSelectorView, itemSelectorCriterion, portletURL,
-							itemSelectedEventName, _isSearch(parameters))));
+							itemSelectedEventName, isSearch(parameters))));
 			}
 		}
 
@@ -261,39 +265,52 @@ public class ItemSelectorImpl implements ItemSelector {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_itemSelectorCriterionHandlerServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
+		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
+			bundleContext, ItemSelectorViewRendererCustomizer.class, null,
+			ServiceReferenceMapperFactory.create(
 				bundleContext,
-				(Class<ItemSelectorCriterionHandler<ItemSelectorCriterion>>)
-					(Class<?>)ItemSelectorCriterionHandler.class,
-				null,
-				ServiceReferenceMapperFactory.create(
-					bundleContext,
-					(itemSelectorCriterionHandler, emitter) -> emitter.emit(
-						ItemSelectorKeyUtil.getItemSelectorCriterionKey(
-							itemSelectorCriterionHandler.
-								getItemSelectorCriterionClass()))));
-		_itemSelectorViewRendererCustomizersServiceTrackerMap =
-			ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, ItemSelectorViewRendererCustomizer.class, null,
-				ServiceReferenceMapperFactory.create(
-					bundleContext,
-					(itemSelectorViewRendererCustomizer, emitter) -> {
-						for (Class<? extends ItemSelectorCriterion>
-								itemSelectorCriterionClass :
-									itemSelectorViewRendererCustomizer.
-										getSupportedItemSelectorCriterionClasses()) {
+				(itemSelectorViewRendererCustomizer, emitter) -> {
+					for (Class<? extends ItemSelectorCriterion>
+							itemSelectorCriterionClass :
+								itemSelectorViewRendererCustomizer.
+									getSupportedItemSelectorCriterionClasses()) {
 
-							emitter.emit(itemSelectorCriterionClass.getName());
-						}
-					}));
+						emitter.emit(itemSelectorCriterionClass.getName());
+					}
+				}));
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_itemSelectorCriterionHandlerServiceTrackerMap.close();
+		_serviceTrackerMap.close();
+	}
 
-		_itemSelectorViewRendererCustomizersServiceTrackerMap.close();
+	protected List<Class<? extends ItemSelectorCriterion>>
+		getItemSelectorCriterionClasses(Map<String, String[]> parameters) {
+
+		String criteria = getValue(parameters, PARAMETER_CRITERIA);
+
+		String[] itemSelectorCriterionClassNames = criteria.split(",");
+
+		List<Class<? extends ItemSelectorCriterion>>
+			itemSelectorCriterionClasses = new ArrayList<>(
+				itemSelectorCriterionClassNames.length);
+
+		for (String itemSelectorCriterionClassName :
+				itemSelectorCriterionClassNames) {
+
+			ItemSelectorCriterionHandler<?> itemSelectorCriterionHandler =
+				_itemSelectionCriterionHandlers.get(
+					itemSelectorCriterionClassName);
+
+			if (itemSelectorCriterionHandler != null) {
+				itemSelectorCriterionClasses.add(
+					itemSelectorCriterionHandler.
+						getItemSelectorCriterionClass());
+			}
+		}
+
+		return itemSelectorCriterionClasses;
 	}
 
 	protected Map<String, String[]> getItemSelectorParameters(
@@ -384,6 +401,60 @@ public class ItemSelectorImpl implements ItemSelector {
 		return values[0];
 	}
 
+	protected boolean isSearch(Map<String, String[]> parameters) {
+		String keywords = getValue(parameters, "keywords");
+
+		if (Validator.isNotNull(keywords)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	@SuppressWarnings("rawtypes")
+	protected
+		<T extends ItemSelectorCriterion, S extends ItemSelectorReturnType> void
+			setItemSelectionCriterionHandler(
+				ItemSelectorCriterionHandler<T> itemSelectionCriterionHandler) {
+
+		Class<T> itemSelectorCriterionClass =
+			itemSelectionCriterionHandler.getItemSelectorCriterionClass();
+
+		_itemSelectionCriterionHandlers.put(
+			itemSelectorCriterionClass.getName(),
+			(ItemSelectorCriterionHandler)itemSelectionCriterionHandler);
+		_itemSelectionCriterionHandlers.put(
+			ItemSelectorKeyUtil.getItemSelectorCriterionKey(
+				itemSelectorCriterionClass),
+			(ItemSelectorCriterionHandler)itemSelectionCriterionHandler);
+	}
+
+	@Reference(unbind = "-")
+	protected void setItemSelectorCriterionSerializer(
+		ItemSelectorCriterionSerializer itemSelectorCriterionSerializer) {
+
+		_itemSelectionCriterionSerializer = itemSelectorCriterionSerializer;
+	}
+
+	protected
+		<T extends ItemSelectorCriterion, S extends ItemSelectorReturnType> void
+			unsetItemSelectionCriterionHandler(
+				ItemSelectorCriterionHandler<T> itemSelectionCriterionHandler) {
+
+		Class<T> itemSelectorCriterionClass =
+			itemSelectionCriterionHandler.getItemSelectorCriterionClass();
+
+		_itemSelectionCriterionHandlers.remove(
+			itemSelectorCriterionClass.getName());
+		_itemSelectionCriterionHandlers.remove(
+			ItemSelectorKeyUtil.getItemSelectorCriterionKey(
+				itemSelectorCriterionClass));
+	}
+
 	private ItemSelectorViewRenderer _applyCustomizations(
 		ItemSelectorViewRenderer itemSelectorViewRenderer) {
 
@@ -394,9 +465,8 @@ public class ItemSelectorImpl implements ItemSelector {
 			itemSelectorCriterion.getClass();
 
 		List<ItemSelectorViewRendererCustomizer>
-			itemSelectorViewRendererCustomizers =
-				_itemSelectorViewRendererCustomizersServiceTrackerMap.
-					getService(clazz.getName());
+			itemSelectorViewRendererCustomizers = _serviceTrackerMap.getService(
+				clazz.getName());
 
 		if (itemSelectorViewRendererCustomizers == null) {
 			return itemSelectorViewRenderer;
@@ -414,57 +484,21 @@ public class ItemSelectorImpl implements ItemSelector {
 		return itemSelectorViewRenderer;
 	}
 
-	private List<Class<? extends ItemSelectorCriterion>>
-		_getItemSelectorCriterionClasses(Map<String, String[]> parameters) {
-
-		String criteria = getValue(parameters, PARAMETER_CRITERIA);
-
-		String[] itemSelectorCriterionClassNames = criteria.split(",");
-
-		List<Class<? extends ItemSelectorCriterion>>
-			itemSelectorCriterionClasses = new ArrayList<>(
-				itemSelectorCriterionClassNames.length);
-
-		for (String itemSelectorCriterionClassName :
-				itemSelectorCriterionClassNames) {
-
-			ItemSelectorCriterionHandler<?> itemSelectorCriterionHandler =
-				_itemSelectorCriterionHandlerServiceTrackerMap.getService(
-					itemSelectorCriterionClassName);
-
-			if (itemSelectorCriterionHandler != null) {
-				itemSelectorCriterionClasses.add(
-					itemSelectorCriterionHandler.
-						getItemSelectorCriterionClass());
-			}
-		}
-
-		return itemSelectorCriterionClasses;
-	}
-
-	private boolean _isSearch(Map<String, String[]> parameters) {
-		String keywords = getValue(parameters, "keywords");
-
-		if (Validator.isNotNull(keywords)) {
-			return true;
-		}
-
-		return false;
-	}
-
 	private static final Pattern _itemSelectorURLPattern = Pattern.compile(
 		".*select\\/([^/]+)\\/([^$?/]+).*");
 
 	@Reference
-	private ItemSelectorCriterionSerializer _itemSelectionCriterionSerializer;
+	private Http _http;
 
-	private ServiceTrackerMap
+	private final ConcurrentMap
 		<String, ItemSelectorCriterionHandler<ItemSelectorCriterion>>
-			_itemSelectorCriterionHandlerServiceTrackerMap;
-	private ServiceTrackerMap<String, List<ItemSelectorViewRendererCustomizer>>
-		_itemSelectorViewRendererCustomizersServiceTrackerMap;
+			_itemSelectionCriterionHandlers = new ConcurrentHashMap<>();
+	private ItemSelectorCriterionSerializer _itemSelectionCriterionSerializer;
 
 	@Reference
 	private Portal _portal;
+
+	private ServiceTrackerMap<String, List<ItemSelectorViewRendererCustomizer>>
+		_serviceTrackerMap;
 
 }

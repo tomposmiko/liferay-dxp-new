@@ -15,6 +15,7 @@
 package com.liferay.portal.webdav.methods;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.Dom4jUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
@@ -57,7 +58,9 @@ public class ProppatchMethodImpl extends BasePropMethodImpl {
 		}
 		catch (InvalidRequestException invalidRequestException) {
 			if (_log.isInfoEnabled()) {
-				_log.info(invalidRequestException);
+				_log.info(
+					invalidRequestException.getMessage(),
+					invalidRequestException);
 			}
 
 			return HttpServletResponse.SC_BAD_REQUEST;
@@ -67,7 +70,7 @@ public class ProppatchMethodImpl extends BasePropMethodImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(lockException);
+				_log.debug(lockException, lockException);
 			}
 
 			return WebDAVUtil.SC_LOCKED;
@@ -126,15 +129,15 @@ public class ProppatchMethodImpl extends BasePropMethodImpl {
 				return newProps;
 			}
 
-			WebDAVProps webDAVProps = getStoredProperties(webDAVRequest);
-
-			Document document = SAXReaderUtil.read(xml);
-
 			if (_log.isInfoEnabled()) {
 				_log.info(
 					"Request XML: \n" +
-						document.formattedString(StringPool.FOUR_SPACES));
+						Dom4jUtil.toString(xml, StringPool.FOUR_SPACES));
 			}
+
+			WebDAVProps webDAVProps = getStoredProperties(webDAVRequest);
+
+			Document document = SAXReaderUtil.read(xml);
 
 			Element rootElement = document.getRootElement();
 

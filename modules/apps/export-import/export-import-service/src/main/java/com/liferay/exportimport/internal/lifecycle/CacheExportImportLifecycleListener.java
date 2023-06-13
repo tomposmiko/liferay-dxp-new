@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Máté Thurzó
  */
-@Component(service = ExportImportLifecycleListener.class)
+@Component(immediate = true, service = ExportImportLifecycleListener.class)
 public class CacheExportImportLifecycleListener
 	implements EventAwareExportImportLifecycleListener {
 
@@ -62,7 +62,7 @@ public class CacheExportImportLifecycleListener
 	public void onLayoutImportProcessFinished(
 		PortletDataContext portletDataContext) {
 
-		_clearCache();
+		clearCache();
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public class CacheExportImportLifecycleListener
 	public void onPortletImportProcessFinished(
 		PortletDataContext portletDataContext) {
 
-		_clearCache();
+		clearCache();
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class CacheExportImportLifecycleListener
 		throws Exception {
 	}
 
-	private void _clearCache() {
+	protected void clearCache() {
 		CacheUtil.clearCache();
 		PermissionCacheUtil.clearCache();
 	}

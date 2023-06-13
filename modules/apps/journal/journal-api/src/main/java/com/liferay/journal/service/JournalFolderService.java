@@ -58,8 +58,8 @@ public interface JournalFolderService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFolderServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the journal folder remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link JournalFolderServiceUtil} if injection and service tracking are not available.
 	 */
 	public JournalFolder addFolder(
-			String externalReferenceCode, long groupId, long parentFolderId,
-			String name, String description, ServiceContext serviceContext)
+			long groupId, long parentFolderId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public void deleteFolder(long folderId) throws PortalException;
@@ -83,11 +83,6 @@ public interface JournalFolderService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public JournalFolder getFolder(long folderId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public JournalFolder getFolderByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Long> getFolderIds(long groupId, long folderId)
@@ -132,12 +127,6 @@ public interface JournalFolderService extends BaseService {
 		int start, int end, OrderByComparator<?> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Object> getFoldersAndArticles(
-		long groupId, long userId, long folderId, long ddmStructureId,
-		int status, Locale locale, int start, int end,
-		OrderByComparator<?> orderByComparator);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFoldersAndArticlesCount(
 		long groupId, List<Long> folderIds, int status);
 
@@ -151,11 +140,6 @@ public interface JournalFolderService extends BaseService {
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFoldersAndArticlesCount(
 		long groupId, long userId, long folderId, int status);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getFoldersAndArticlesCount(
-		long groupId, long userId, long folderId, long ddmStructureId,
-		int status);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFoldersCount(long groupId, long parentFolderId);
@@ -196,12 +180,6 @@ public interface JournalFolderService extends BaseService {
 			long companyId, long[] groupIds, long folderId, int restrictionType,
 			String keywords, int start, int end,
 			OrderByComparator<DDMStructure> orderByComparator)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchDDMStructuresCount(
-			long companyId, long[] groupIds, long folderId, int restrictionType,
-			String keywords)
 		throws PortalException;
 
 	public void subscribe(long groupId, long folderId) throws PortalException;

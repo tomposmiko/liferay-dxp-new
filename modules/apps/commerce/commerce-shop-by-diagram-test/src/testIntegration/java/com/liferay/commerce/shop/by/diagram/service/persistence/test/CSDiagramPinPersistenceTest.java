@@ -124,10 +124,6 @@ public class CSDiagramPinPersistenceTest {
 
 		CSDiagramPin newCSDiagramPin = _persistence.create(pk);
 
-		newCSDiagramPin.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCSDiagramPin.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newCSDiagramPin.setCompanyId(RandomTestUtil.nextLong());
 
 		newCSDiagramPin.setUserId(RandomTestUtil.nextLong());
@@ -151,12 +147,6 @@ public class CSDiagramPinPersistenceTest {
 		CSDiagramPin existingCSDiagramPin = _persistence.findByPrimaryKey(
 			newCSDiagramPin.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCSDiagramPin.getMvccVersion(),
-			newCSDiagramPin.getMvccVersion());
-		Assert.assertEquals(
-			existingCSDiagramPin.getCtCollectionId(),
-			newCSDiagramPin.getCtCollectionId());
 		Assert.assertEquals(
 			existingCSDiagramPin.getCSDiagramPinId(),
 			newCSDiagramPin.getCSDiagramPinId());
@@ -218,9 +208,8 @@ public class CSDiagramPinPersistenceTest {
 
 	protected OrderByComparator<CSDiagramPin> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CSDiagramPin", "mvccVersion", true, "ctCollectionId", true,
-			"CSDiagramPinId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
+			"CSDiagramPin", "CSDiagramPinId", true, "companyId", true, "userId",
+			true, "userName", true, "createDate", true, "modifiedDate", true,
 			"CPDefinitionId", true, "positionX", true, "positionY", true,
 			"sequence", true);
 	}
@@ -442,10 +431,6 @@ public class CSDiagramPinPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CSDiagramPin csDiagramPin = _persistence.create(pk);
-
-		csDiagramPin.setMvccVersion(RandomTestUtil.nextLong());
-
-		csDiagramPin.setCtCollectionId(RandomTestUtil.nextLong());
 
 		csDiagramPin.setCompanyId(RandomTestUtil.nextLong());
 

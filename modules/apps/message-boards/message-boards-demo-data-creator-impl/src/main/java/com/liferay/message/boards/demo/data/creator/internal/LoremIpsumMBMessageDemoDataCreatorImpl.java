@@ -70,6 +70,13 @@ public class LoremIpsumMBMessageDemoDataCreatorImpl
 			content);
 	}
 
+	@Reference(unbind = "-")
+	protected void setMBCategoryLocalService(
+		MBCategoryLocalService mbCategoryLocalService) {
+
+		_mbCategoryLocalService = mbCategoryLocalService;
+	}
+
 	private static List<String> _read(String fileName) {
 		return Arrays.asList(
 			StringUtil.split(
@@ -99,7 +106,6 @@ public class LoremIpsumMBMessageDemoDataCreatorImpl
 	private static final List<String> _paragraphs = _read("paragraphs");
 	private static final List<String> _titles = _read("titles");
 
-	@Reference
 	private MBCategoryLocalService _mbCategoryLocalService;
 
 }

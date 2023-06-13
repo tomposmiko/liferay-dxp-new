@@ -15,20 +15,20 @@
 AUI.add(
 	'liferay-menu-filter',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const CSS_HIDE = 'hide';
+		var CSS_HIDE = 'hide';
 
-		const STR_EMPTY = '';
+		var STR_EMPTY = '';
 
-		const TPL_INPUT_FILTER =
+		var TPL_INPUT_FILTER =
 			'<li class="btn-toolbar search-panel">' +
 			'<div class="form-group">' +
 			'<input class="col-md-12 field focus menu-item-filter search-query" placeholder="{placeholder}" type="text" />' +
 			'</div>' +
 			'</li>';
 
-		const MenuFilter = A.Component.create({
+		var MenuFilter = A.Component.create({
 			ATTRS: {
 				content: {
 					setter: A.one,
@@ -39,15 +39,10 @@ AUI.add(
 					value: '.menu-item-filter',
 				},
 
-				menu: {
-					validator: Lang.isObject,
-					value: {},
-				},
-
 				strings: {
 					validator: Lang.isObject,
 					value: {
-						placeholder: Liferay.Language.get('search'),
+						placeholder: 'Search',
 					},
 				},
 			},
@@ -60,26 +55,21 @@ AUI.add(
 
 			prototype: {
 				_filterMenu(event) {
-					const instance = this;
-					const menuInstance = instance.get('menu');
+					var instance = this;
 
 					instance._menuItems.addClass(CSS_HIDE);
 
 					event.results.forEach((result) => {
 						result.raw.node.removeClass(CSS_HIDE);
 					});
-
-					if (menuInstance) {
-						menuInstance._focusManager.refresh();
-					}
 				},
 
 				_renderUI() {
-					const instance = this;
+					var instance = this;
 
-					const node = instance.get('content');
+					var node = instance.get('content');
 
-					const menuItems = node.all('li');
+					var menuItems = node.all('li');
 
 					node.prepend(
 						Lang.sub(TPL_INPUT_FILTER, {
@@ -93,7 +83,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._renderUI();
 					instance._bindUIACBase();
@@ -101,7 +91,7 @@ AUI.add(
 				},
 
 				reset() {
-					const instance = this;
+					var instance = this;
 
 					instance.get('inputNode').val(STR_EMPTY);
 

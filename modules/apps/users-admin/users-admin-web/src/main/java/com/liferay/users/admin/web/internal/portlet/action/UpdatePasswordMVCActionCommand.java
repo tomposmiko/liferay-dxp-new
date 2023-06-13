@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.security.ldap.LDAPSettingsUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
-import com.liferay.portal.kernel.service.permission.UserPermission;
+import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -39,13 +39,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
 
-import java.util.Date;
-
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
@@ -74,7 +70,7 @@ public class UpdatePasswordMVCActionCommand extends BaseMVCActionCommand {
 
 			User user = _portal.getSelectedUser(actionRequest);
 
-			_userPermission.check(
+			UserPermissionUtil.check(
 				themeDisplay.getPermissionChecker(), user.getUserId(),
 				ActionKeys.UPDATE);
 
@@ -113,21 +109,21 @@ public class UpdatePasswordMVCActionCommand extends BaseMVCActionCommand {
 			if (Validator.isNotNull(newPassword1) ||
 				Validator.isNotNull(newPassword2)) {
 
-				user = _userLocalService.updatePassword(
+				_userLocalService.updatePassword(
 					user.getUserId(), newPassword1, newPassword2,
 					passwordReset);
 
 				passwordModified = true;
 			}
 
-			user = _userLocalService.updatePasswordReset(
+			_userLocalService.updatePasswordReset(
 				user.getUserId(), passwordReset);
 
 			if (Validator.isNotNull(reminderQueryQuestion) &&
 				Validator.isNotNull(reminderQueryAnswer) &&
 				!reminderQueryAnswer.equals(Portal.TEMP_OBFUSCATION_VALUE)) {
 
-				user = _userLocalService.updateReminderQuery(
+				_userLocalService.updateReminderQuery(
 					user.getUserId(), reminderQueryQuestion,
 					reminderQueryAnswer);
 			}
@@ -151,22 +147,9 @@ public class UpdatePasswordMVCActionCommand extends BaseMVCActionCommand {
 					login = String.valueOf(user.getUserId());
 				}
 
-				HttpServletRequest httpServletRequest =
-					_portal.getOriginalServletRequest(
-						_portal.getHttpServletRequest(actionRequest));
-
-				if (httpServletRequest != null) {
-					HttpSession httpSession = httpServletRequest.getSession();
-
-					Date passwordModifiedDate = user.getPasswordModifiedDate();
-
-					httpSession.setAttribute(
-						WebKeys.USER_PASSWORD_MODIFIED_TIME,
-						passwordModifiedDate.getTime());
-				}
-
 				_authenticatedSessionManager.login(
-					httpServletRequest,
+					_portal.getOriginalServletRequest(
+						_portal.getHttpServletRequest(actionRequest)),
 					_portal.getHttpServletResponse(actionResponse), login,
 					newPassword1, false, null);
 			}
@@ -204,9 +187,6 @@ public class UpdatePasswordMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference
-	private UserPermission _userPermission;
 
 	@Reference
 	private UserService _userService;

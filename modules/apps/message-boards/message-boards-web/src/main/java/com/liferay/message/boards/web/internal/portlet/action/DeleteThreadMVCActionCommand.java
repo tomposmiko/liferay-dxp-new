@@ -52,30 +52,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class DeleteThreadMVCActionCommand extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.DELETE)) {
-				_deleteThreads(actionRequest, false);
-			}
-			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
-				_deleteThreads(actionRequest, true);
-			}
-		}
-		catch (LockedThreadException | PrincipalException exception) {
-			SessionErrors.add(actionRequest, exception.getClass());
-
-			actionResponse.setRenderParameter(
-				"mvcPath", "/message_boards/error.jsp");
-		}
-	}
-
-	private void _deleteThreads(
+	protected void deleteThreads(
 			ActionRequest actionRequest, boolean moveToTrash)
 		throws Exception {
 
@@ -111,6 +88,29 @@ public class DeleteThreadMVCActionCommand extends BaseMVCActionCommand {
 				HashMapBuilder.<String, Object>put(
 					"trashedModels", trashedModels
 				).build());
+		}
+	}
+
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.DELETE)) {
+				deleteThreads(actionRequest, false);
+			}
+			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
+				deleteThreads(actionRequest, true);
+			}
+		}
+		catch (LockedThreadException | PrincipalException exception) {
+			SessionErrors.add(actionRequest, exception.getClass());
+
+			actionResponse.setRenderParameter(
+				"mvcPath", "/message_boards/error.jsp");
 		}
 	}
 

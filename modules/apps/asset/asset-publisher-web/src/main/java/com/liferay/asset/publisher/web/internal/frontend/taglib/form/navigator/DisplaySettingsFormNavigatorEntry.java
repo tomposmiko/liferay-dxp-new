@@ -43,18 +43,17 @@ public class DisplaySettingsFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
 	protected String getJspPath() {
 		return "/configuration/display_settings.jsp";
 	}
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)"
-	)
-	private ServletContext _servletContext;
 
 }

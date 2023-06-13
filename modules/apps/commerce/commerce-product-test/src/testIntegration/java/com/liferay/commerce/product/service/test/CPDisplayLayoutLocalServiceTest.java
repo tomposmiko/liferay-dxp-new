@@ -30,11 +30,13 @@ import com.liferay.commerce.product.service.CommerceChannelLocalServiceUtil;
 import com.liferay.commerce.product.test.util.CPTestUtil;
 import com.liferay.commerce.product.type.simple.constants.SimpleCPTypeConstants;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -48,6 +50,7 @@ import org.frutilla.FrutillaRule;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,17 +69,23 @@ public class CPDisplayLayoutLocalServiceTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_company = CompanyTestUtil.addCompany();
+
+		_user = UserTestUtil.addUser(_company);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		_group1 = GroupTestUtil.addGroup();
-
-		_user = UserTestUtil.addUser();
+		_group1 = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
-			_group1.getCompanyId(), _group1.getGroupId(), _user.getUserId());
+			_company.getCompanyId(), _group1.getGroupId(), _user.getUserId());
 
 		_group2 = GroupTestUtil.addGroup(
-			_group1.getCompanyId(), _user.getUserId(), 0);
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		_commerceChannel1 = CommerceChannelLocalServiceUtil.addCommerceChannel(
 			StringPool.BLANK, _group2.getGroupId(),
@@ -85,7 +94,7 @@ public class CPDisplayLayoutLocalServiceTest {
 			_serviceContext);
 
 		_group3 = GroupTestUtil.addGroup(
-			_group1.getCompanyId(), _user.getUserId(), 0);
+			_company.getCompanyId(), _user.getUserId(), 0);
 
 		_commerceChannel2 = CommerceChannelLocalServiceUtil.addCommerceChannel(
 			StringPool.BLANK, _group3.getGroupId(),
@@ -121,26 +130,26 @@ public class CPDisplayLayoutLocalServiceTest {
 		);
 
 		AssetCategory assetCategory = AssetCategoryLocalServiceUtil.addCategory(
-			_user.getUserId(), _group1.getGroupId(),
+			_user.getUserId(), _company.getGroupId(),
 			RandomTestUtil.randomString(), _assetVocabulary.getVocabularyId(),
 			_serviceContext);
 
 		_cpDisplayLayoutLocalService.addCPDisplayLayout(
 			_user.getUserId(), _commerceChannel1.getSiteGroupId(),
-			AssetCategory.class, assetCategory.getCategoryId(), null,
+			AssetCategory.class, assetCategory.getCategoryId(),
 			RandomTestUtil.randomString());
 
 		_cpDisplayLayoutLocalService.addCPDisplayLayout(
 			_user.getUserId(), _commerceChannel1.getSiteGroupId(),
-			CPDefinition.class, _cpDefinition.getCPDefinitionId(), null,
+			CPDefinition.class, _cpDefinition.getCPDefinitionId(),
 			RandomTestUtil.randomString());
 		_cpDisplayLayoutLocalService.addCPDisplayLayout(
 			_user.getUserId(), _commerceChannel2.getSiteGroupId(),
-			AssetCategory.class, assetCategory.getCategoryId(), null,
+			AssetCategory.class, assetCategory.getCategoryId(),
 			RandomTestUtil.randomString());
 		_cpDisplayLayoutLocalService.addCPDisplayLayout(
 			_user.getUserId(), _commerceChannel2.getSiteGroupId(),
-			CPDefinition.class, _cpDefinition.getCPDefinitionId(), null,
+			CPDefinition.class, _cpDefinition.getCPDefinitionId(),
 			RandomTestUtil.randomString());
 
 		Assert.assertEquals(
@@ -157,7 +166,7 @@ public class CPDisplayLayoutLocalServiceTest {
 
 		Assert.assertEquals(
 			2, _cpDisplayLayoutLocalService.getCPDisplayLayoutsCount());
-		AssetCategoryLocalServiceUtil.deleteCategory(assetCategory);
+		AssetCategoryLocalServiceUtil.deleteAssetCategory(assetCategory);
 		Assert.assertEquals(
 			0, _cpDisplayLayoutLocalService.getCPDisplayLayoutsCount());
 	}
@@ -165,6 +174,7 @@ public class CPDisplayLayoutLocalServiceTest {
 	@Rule
 	public FrutillaRule frutillaRule = new FrutillaRule();
 
+	private static Company _company;
 	private static User _user;
 
 	@DeleteAfterTestRun

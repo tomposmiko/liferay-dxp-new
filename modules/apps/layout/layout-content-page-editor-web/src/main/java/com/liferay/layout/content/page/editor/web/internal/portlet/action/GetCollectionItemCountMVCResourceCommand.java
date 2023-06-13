@@ -16,20 +16,20 @@ package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.info.exception.NoSuchInfoItemException;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.web.internal.util.LayoutObjectReferenceUtil;
 import com.liferay.layout.list.retriever.DefaultLayoutListRetrieverContext;
 import com.liferay.layout.list.retriever.LayoutListRetriever;
-import com.liferay.layout.list.retriever.LayoutListRetrieverRegistry;
+import com.liferay.layout.list.retriever.LayoutListRetrieverTracker;
 import com.liferay.layout.list.retriever.ListObjectReference;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactory;
-import com.liferay.layout.list.retriever.ListObjectReferenceFactoryRegistry;
+import com.liferay.layout.list.retriever.ListObjectReferenceFactoryTracker;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -52,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Verónica González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/get_collection_item_count"
@@ -66,7 +67,7 @@ public class GetCollectionItemCountMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -84,7 +85,7 @@ public class GetCollectionItemCountMVCResourceCommand
 
 			jsonObject.put(
 				"error",
-				_language.get(
+				LanguageUtil.get(
 					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
 		}
 
@@ -96,21 +97,20 @@ public class GetCollectionItemCountMVCResourceCommand
 			HttpServletRequest httpServletRequest, String layoutObjectReference)
 		throws PortalException {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		JSONObject layoutObjectReferenceJSONObject =
-			_jsonFactory.createJSONObject(layoutObjectReference);
+			JSONFactoryUtil.createJSONObject(layoutObjectReference);
 
 		String type = layoutObjectReferenceJSONObject.getString("type");
 
 		LayoutListRetriever<?, ListObjectReference> layoutListRetriever =
 			(LayoutListRetriever<?, ListObjectReference>)
-				_layoutListRetrieverRegistry.getLayoutListRetriever(type);
+				_layoutListRetrieverTracker.getLayoutListRetriever(type);
 
 		if (layoutListRetriever != null) {
 			ListObjectReferenceFactory<?> listObjectReferenceFactory =
-				_listObjectReferenceFactoryRegistry.getListObjectReference(
-					type);
+				_listObjectReferenceFactoryTracker.getListObjectReference(type);
 
 			if (listObjectReferenceFactory != null) {
 				DefaultLayoutListRetrieverContext
@@ -128,11 +128,14 @@ public class GetCollectionItemCountMVCResourceCommand
 						infoItem);
 				}
 
+				ListObjectReference listObjectReference =
+					listObjectReferenceFactory.getListObjectReference(
+						layoutObjectReferenceJSONObject);
+
 				jsonObject.put(
 					"totalNumberOfItems",
 					layoutListRetriever.getListCount(
-						listObjectReferenceFactory.getListObjectReference(
-							layoutObjectReferenceJSONObject),
+						listObjectReference,
 						defaultLayoutListRetrieverContext));
 			}
 		}
@@ -150,7 +153,7 @@ public class GetCollectionItemCountMVCResourceCommand
 
 		InfoItemObjectProvider<Object> infoItemObjectProvider =
 			(InfoItemObjectProvider<Object>)
-				_infoItemServiceRegistry.getFirstInfoItemService(
+				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemObjectProvider.class,
 					_portal.getClassName(classNameId));
 
@@ -167,7 +170,7 @@ public class GetCollectionItemCountMVCResourceCommand
 		}
 		catch (NoSuchInfoItemException noSuchInfoItemException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchInfoItemException);
+				_log.debug(noSuchInfoItemException, noSuchInfoItemException);
 			}
 		}
 
@@ -178,20 +181,14 @@ public class GetCollectionItemCountMVCResourceCommand
 		GetCollectionItemCountMVCResourceCommand.class);
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private LayoutListRetrieverTracker _layoutListRetrieverTracker;
 
 	@Reference
-	private Language _language;
-
-	@Reference
-	private LayoutListRetrieverRegistry _layoutListRetrieverRegistry;
-
-	@Reference
-	private ListObjectReferenceFactoryRegistry
-		_listObjectReferenceFactoryRegistry;
+	private ListObjectReferenceFactoryTracker
+		_listObjectReferenceFactoryTracker;
 
 	@Reference
 	private Portal _portal;

@@ -19,6 +19,7 @@ import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration;
 import com.liferay.asset.util.AssetEntryQueryProcessor;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Map;
 
+import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
@@ -44,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration",
-	service = AssetPublisherCustomizer.class
+	immediate = true, service = AssetPublisherCustomizer.class
 )
 public class DefaultAssetPublisherCustomizer
 	implements AssetPublisherCustomizer {
@@ -54,13 +56,6 @@ public class DefaultAssetPublisherCustomizer
 		PortletPreferences portletPreferences = getPortletPreferences(
 			httpServletRequest);
 
-		return GetterUtil.getInteger(
-			portletPreferences.getValue("delta", null),
-			SearchContainer.DEFAULT_DELTA);
-	}
-
-	@Override
-	public Integer getDelta(PortletPreferences portletPreferences) {
 		return GetterUtil.getInteger(
 			portletPreferences.getValue("delta", null),
 			SearchContainer.DEFAULT_DELTA);
@@ -161,10 +156,11 @@ public class DefaultAssetPublisherCustomizer
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		assetEntryQuery.setGroupIds(
-			assetPublisherHelper.getGroupIds(
-				getPortletPreferences(httpServletRequest),
-				themeDisplay.getScopeGroupId(), themeDisplay.getLayout()));
+		long[] groupIds = assetPublisherHelper.getGroupIds(
+			getPortletPreferences(httpServletRequest),
+			themeDisplay.getScopeGroupId(), themeDisplay.getLayout());
+
+		assetEntryQuery.setGroupIds(groupIds);
 	}
 
 	@Activate
@@ -172,6 +168,18 @@ public class DefaultAssetPublisherCustomizer
 	protected void activate(Map<String, Object> properties) {
 		assetPublisherWebConfiguration = ConfigurableUtil.createConfigurable(
 			AssetPublisherWebConfiguration.class, properties);
+	}
+
+	protected String getPortletName(HttpServletRequest httpServletRequest) {
+		PortletConfig portletConfig =
+			(PortletConfig)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_CONFIG);
+
+		if (portletConfig == null) {
+			return StringPool.BLANK;
+		}
+
+		return portletConfig.getPortletName();
 	}
 
 	protected PortletPreferences getPortletPreferences(

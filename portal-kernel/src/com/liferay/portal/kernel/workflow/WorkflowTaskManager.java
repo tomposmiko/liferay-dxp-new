@@ -14,7 +14,8 @@
 
 package com.liferay.portal.kernel.workflow;
 
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.messaging.proxy.MessagingProxy;
+import com.liferay.portal.kernel.messaging.proxy.ProxyMode;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.search.WorkflowModelSearchResult;
@@ -33,6 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Brian Wing Shun Chan
  * @author Marcellus Tavares
  */
+@MessagingProxy(mode = ProxyMode.SYNC)
 @ProviderType
 public interface WorkflowTaskManager {
 
@@ -46,20 +48,20 @@ public interface WorkflowTaskManager {
 			long companyId, long userId, long workflowTaskId,
 			long assigneeUserId, String comment, Date dueDate,
 			Map<String, Serializable> workflowContext)
-		throws PortalException;
+		throws WorkflowException;
 
 	public WorkflowTask completeWorkflowTask(
 			long companyId, long userId, long workflowTaskId,
 			String transitionName, String comment,
 			Map<String, Serializable> workflowContext)
-		throws PortalException;
+		throws WorkflowException;
 
 	public default WorkflowTask completeWorkflowTask(
 			long companyId, long userId, long workflowTaskId,
 			String transitionName, String comment,
 			Map<String, Serializable> workflowContext,
 			boolean waitForCompletion)
-		throws PortalException {
+		throws WorkflowException {
 
 		if (waitForCompletion) {
 			throw new UnsupportedOperationException();
@@ -70,25 +72,21 @@ public interface WorkflowTaskManager {
 			workflowContext);
 	}
 
-	public WorkflowTask fetchWorkflowTask(long workflowTaskId)
+	public WorkflowTask fetchWorkflowTask(long companyId, long workflowTaskId)
 		throws WorkflowException;
 
-	public default List<User> getAssignableUsers(long workflowTaskId)
+	public default List<User> getAssignableUsers(
+			long companyId, long workflowTaskId)
 		throws WorkflowException {
 
 		throw new UnsupportedOperationException();
 	}
 
-	public List<String> getNextTransitionNames(long userId, long workflowTaskId)
+	public List<String> getNextTransitionNames(
+			long companyId, long userId, long workflowTaskId)
 		throws WorkflowException;
 
-	public default List<User> getNotifiableUsers(long workflowTaskId)
-		throws WorkflowException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	public WorkflowTask getWorkflowTask(long workflowTaskId)
+	public WorkflowTask getWorkflowTask(long companyId, long workflowTaskId)
 		throws WorkflowException;
 
 	public int getWorkflowTaskCount(long companyId, Boolean completed)
@@ -151,11 +149,7 @@ public interface WorkflowTaskManager {
 			OrderByComparator<WorkflowTask> orderByComparator)
 		throws WorkflowException;
 
-	public List<WorkflowTransition> getWorkflowTaskWorkflowTransitions(
-			long workflowTaskId)
-		throws WorkflowException;
-
-	public boolean hasAssignableUsers(long workflowTaskId)
+	public boolean hasAssignableUsers(long companyId, long workflowTaskId)
 		throws WorkflowException;
 
 	public default List<WorkflowTask> search(

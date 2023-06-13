@@ -53,19 +53,25 @@ request.setAttribute("contact_information.jsp-classPK", selContactId);
 </clay:sheet-section>
 
 <clay:sheet-section>
-	<div class="sheet-subtitle"><liferay-ui:message key="instant-messenger" /></div>
+	<h3 class="sheet-subtitle"><liferay-ui:message key="instant-messenger" /></h3>
 
 	<liferay-util:include page="/user/instant_messenger.jsp" servletContext="<%= application %>" />
 </clay:sheet-section>
 
 <clay:sheet-section>
-	<div class="sheet-subtitle"><liferay-ui:message key="sms" /></div>
+	<h3 class="sheet-subtitle"><liferay-ui:message key="sms" /></h3>
 
 	<liferay-util:include page="/user/sms.jsp" servletContext="<%= application %>" />
 </clay:sheet-section>
 
 <clay:sheet-section>
-	<div class="sheet-subtitle"><liferay-ui:message key="social-network" /></div>
+	<h3 class="sheet-subtitle"><liferay-ui:message key="social-network" /></h3>
 
 	<liferay-util:include page="/user/social_network.jsp" servletContext="<%= application %>" />
+</clay:sheet-section>
+
+<clay:sheet-section>
+	<h3 class="sheet-subtitle"><liferay-ui:message key="openid" /></h3>
+
+	<liferay-util:include page="/user/openid.jsp" servletContext="<%= application %>" />
 </clay:sheet-section>

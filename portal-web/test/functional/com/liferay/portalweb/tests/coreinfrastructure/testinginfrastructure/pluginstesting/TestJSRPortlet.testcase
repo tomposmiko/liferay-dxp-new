@@ -1,7 +1,6 @@
 @component-name = "portal-test-plugins"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property portlet.plugins.includes = "test-jsr-286-plt-26-6-portlet";
@@ -12,16 +11,16 @@ definition {
 	}
 
 	tearDown {
-		PagesAdmin.tearDownCP();
+		Page.tearDownCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewJSR {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Test JSR 286 PLT.26.6 Page");
+		SitePages.addPublicPage(pageName = "Test JSR 286 PLT.26.6 Page");
 
 		Navigator.gotoPage(pageName = "Test JSR 286 PLT.26.6 Page");
 

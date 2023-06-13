@@ -88,7 +88,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 			sb.append("{");
 
-			_append(sb, "active", false, false);
+			append(sb, "active", false, false);
 
 			sb.append("}");
 
@@ -105,7 +105,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 		sb.append("{");
 
-		_append(sb, "active", tokenIntrospection.isActive(), false);
+		append(sb, "active", tokenIntrospection.isActive(), false);
 
 		if (tokenIntrospection.getAud() != null) {
 			List<String> audience = new ArrayList<>(
@@ -121,32 +121,32 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 
 					Iterator<String> iterator = audience.iterator();
 
-					_append(audienceSB, "aud", iterator.next());
+					append(audienceSB, "aud", iterator.next());
 				}
 				else {
 					audienceSB = new StringBundler(5);
 
-					_append(audienceSB, "aud", audience);
+					append(audienceSB, "aud", audience);
 				}
 
 				sb.append(audienceSB);
 			}
 		}
 
-		_append(sb, OAuthConstants.CLIENT_ID, tokenIntrospection.getClientId());
+		append(sb, OAuthConstants.CLIENT_ID, tokenIntrospection.getClientId());
 
-		_append(sb, "exp", tokenIntrospection.getExp());
-		_append(sb, "iat", tokenIntrospection.getIat());
-		_append(sb, "iss", tokenIntrospection.getIss());
-		_append(sb, "jti", tokenIntrospection.getJti());
-		_append(sb, "nbf", tokenIntrospection.getNbf());
-		_append(sb, OAuthConstants.SCOPE, tokenIntrospection.getScope());
-		_append(sb, "sub", tokenIntrospection.getSub());
-		_append(
+		append(sb, "exp", tokenIntrospection.getExp());
+		append(sb, "iat", tokenIntrospection.getIat());
+		append(sb, "iss", tokenIntrospection.getIss());
+		append(sb, "jti", tokenIntrospection.getJti());
+		append(sb, "nbf", tokenIntrospection.getNbf());
+		append(sb, OAuthConstants.SCOPE, tokenIntrospection.getScope());
+		append(sb, "sub", tokenIntrospection.getSub());
+		append(
 			sb, OAuthConstants.ACCESS_TOKEN_TYPE,
 			tokenIntrospection.getTokenType());
 
-		_append(sb, "username", tokenIntrospection.getUsername());
+		append(sb, "username", tokenIntrospection.getUsername());
 
 		Map<String, String> extensions = tokenIntrospection.getExtensions();
 
@@ -155,7 +155,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 				extensions.size() * 7);
 
 			for (Map.Entry<String, String> extension : extensions.entrySet()) {
-				_append(extensionSB, extension.getKey(), extension.getValue());
+				append(extensionSB, extension.getKey(), extension.getValue());
 			}
 
 			sb.append(extensionSB);
@@ -170,7 +170,7 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 		outputStream.flush();
 	}
 
-	private void _append(StringBundler sb, String key, List<String> value) {
+	protected void append(StringBundler sb, String key, List<String> value) {
 		StringBundler arraySB = new StringBundler(((value.size() * 3) - 1) + 2);
 
 		arraySB.append("[");
@@ -180,47 +180,47 @@ public class TokenIntrospectionJSONProviderMessageBodyWriter
 				arraySB.append(",");
 			}
 
-			_appendValue(arraySB, value.get(i), true);
+			appendValue(arraySB, value.get(i), true);
 		}
 
 		arraySB.append("]");
 
 		sb.append(",");
 
-		_append(sb, key, arraySB.toString(), false);
+		append(sb, key, arraySB.toString(), false);
 	}
 
-	private void _append(StringBundler sb, String key, Long value) {
+	protected void append(StringBundler sb, String key, Long value) {
 		if (value == null) {
 			return;
 		}
 
 		sb.append(",");
 
-		_append(sb, key, value, false);
+		append(sb, key, value, false);
 	}
 
-	private void _append(
+	protected void append(
 		StringBundler sb, String key, Object value, boolean quote) {
 
 		sb.append("\"");
 		sb.append(key);
 		sb.append("\":");
 
-		_appendValue(sb, value, quote);
+		appendValue(sb, value, quote);
 	}
 
-	private void _append(StringBundler sb, String key, String value) {
+	protected void append(StringBundler sb, String key, String value) {
 		if (value == null) {
 			return;
 		}
 
 		sb.append(",");
 
-		_append(sb, key, value, true);
+		append(sb, key, value, true);
 	}
 
-	private void _appendValue(StringBundler sb, Object value, boolean quote) {
+	protected void appendValue(StringBundler sb, Object value, boolean quote) {
 		if (quote) {
 			sb.append("\"");
 

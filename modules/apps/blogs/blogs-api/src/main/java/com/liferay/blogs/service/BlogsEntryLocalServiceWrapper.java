@@ -14,10 +14,7 @@
 
 package com.liferay.blogs.service;
 
-import com.liferay.blogs.model.BlogsEntry;
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 /**
  * Provides a wrapper for {@link BlogsEntryLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class BlogsEntryLocalServiceWrapper
 	implements BlogsEntryLocalService, ServiceWrapper<BlogsEntryLocalService> {
 
-	public BlogsEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public BlogsEntryLocalServiceWrapper(
 		BlogsEntryLocalService blogsEntryLocalService) {
 
@@ -42,7 +35,8 @@ public class BlogsEntryLocalServiceWrapper
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry
 			addAttachmentFileEntry(
-				BlogsEntry entry, long userId, String fileName, String mimeType,
+				com.liferay.blogs.model.BlogsEntry entry, long userId,
+				String fileName, String mimeType,
 				java.io.InputStream inputStream)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -69,7 +63,9 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the blogs entry that was added
 	 */
 	@Override
-	public BlogsEntry addBlogsEntry(BlogsEntry blogsEntry) {
+	public com.liferay.blogs.model.BlogsEntry addBlogsEntry(
+		com.liferay.blogs.model.BlogsEntry blogsEntry) {
+
 		return _blogsEntryLocalService.addBlogsEntry(blogsEntry);
 	}
 
@@ -84,7 +80,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry addEntry(
+	public com.liferay.blogs.model.BlogsEntry addEntry(
 			long userId, String title, String content,
 			java.util.Date displayDate,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -95,7 +91,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry addEntry(
+	public com.liferay.blogs.model.BlogsEntry addEntry(
 			long userId, String title, String content,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -105,7 +101,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry addEntry(
+	public com.liferay.blogs.model.BlogsEntry addEntry(
 			long userId, String title, String subtitle, String description,
 			String content, java.util.Date displayDate, boolean allowPingbacks,
 			boolean allowTrackbacks, String[] trackbacks,
@@ -124,7 +120,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry addEntry(
+	public com.liferay.blogs.model.BlogsEntry addEntry(
 			long userId, String title, String subtitle, String description,
 			String content, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
@@ -145,7 +141,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry addEntry(
+	public com.liferay.blogs.model.BlogsEntry addEntry(
 			String externalReferenceCode, long userId, String title,
 			String subtitle, String urlTitle, String description,
 			String content, java.util.Date displayDate, boolean allowPingbacks,
@@ -166,7 +162,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry addEntry(
+	public com.liferay.blogs.model.BlogsEntry addEntry(
 			String externalReferenceCode, long userId, String title,
 			String subtitle, String urlTitle, String description,
 			String content, int displayDateMonth, int displayDateDay,
@@ -190,8 +186,8 @@ public class BlogsEntryLocalServiceWrapper
 
 	@Override
 	public void addEntryResources(
-			BlogsEntry entry, boolean addGroupPermissions,
-			boolean addGuestPermissions)
+			com.liferay.blogs.model.BlogsEntry entry,
+			boolean addGroupPermissions, boolean addGuestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_blogsEntryLocalService.addEntryResources(
@@ -200,7 +196,7 @@ public class BlogsEntryLocalServiceWrapper
 
 	@Override
 	public void addEntryResources(
-			BlogsEntry entry,
+			com.liferay.blogs.model.BlogsEntry entry,
 			com.liferay.portal.kernel.service.permission.ModelPermissions
 				modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -263,7 +259,7 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the new blogs entry
 	 */
 	@Override
-	public BlogsEntry createBlogsEntry(long entryId) {
+	public com.liferay.blogs.model.BlogsEntry createBlogsEntry(long entryId) {
 		return _blogsEntryLocalService.createBlogsEntry(entryId);
 	}
 
@@ -289,7 +285,9 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the blogs entry that was removed
 	 */
 	@Override
-	public BlogsEntry deleteBlogsEntry(BlogsEntry blogsEntry) {
+	public com.liferay.blogs.model.BlogsEntry deleteBlogsEntry(
+		com.liferay.blogs.model.BlogsEntry blogsEntry) {
+
 		return _blogsEntryLocalService.deleteBlogsEntry(blogsEntry);
 	}
 
@@ -305,7 +303,7 @@ public class BlogsEntryLocalServiceWrapper
 	 * @throws PortalException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry deleteBlogsEntry(long entryId)
+	public com.liferay.blogs.model.BlogsEntry deleteBlogsEntry(long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.deleteBlogsEntry(entryId);
@@ -319,7 +317,8 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry deleteEntry(BlogsEntry entry)
+	public com.liferay.blogs.model.BlogsEntry deleteEntry(
+			com.liferay.blogs.model.BlogsEntry entry)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.deleteEntry(entry);
@@ -453,16 +452,36 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry fetchBlogsEntry(long entryId) {
+	public com.liferay.blogs.model.BlogsEntry fetchBlogsEntry(long entryId) {
 		return _blogsEntryLocalService.fetchBlogsEntry(entryId);
 	}
 
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
+	 */
 	@Override
-	public BlogsEntry fetchBlogsEntryByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+	public com.liferay.blogs.model.BlogsEntry
+		fetchBlogsEntryByExternalReferenceCode(
+			long groupId, String externalReferenceCode) {
 
 		return _blogsEntryLocalService.fetchBlogsEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchBlogsEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.blogs.model.BlogsEntry fetchBlogsEntryByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return _blogsEntryLocalService.fetchBlogsEntryByReferenceCode(
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -473,7 +492,7 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry fetchBlogsEntryByUuidAndGroupId(
+	public com.liferay.blogs.model.BlogsEntry fetchBlogsEntryByUuidAndGroupId(
 		String uuid, long groupId) {
 
 		return _blogsEntryLocalService.fetchBlogsEntryByUuidAndGroupId(
@@ -481,7 +500,9 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry fetchEntry(long groupId, String urlTitle) {
+	public com.liferay.blogs.model.BlogsEntry fetchEntry(
+		long groupId, String urlTitle) {
+
 		return _blogsEntryLocalService.fetchEntry(groupId, urlTitle);
 	}
 
@@ -504,7 +525,9 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the range of blogs entries
 	 */
 	@Override
-	public java.util.List<BlogsEntry> getBlogsEntries(int start, int end) {
+	public java.util.List<com.liferay.blogs.model.BlogsEntry> getBlogsEntries(
+		int start, int end) {
+
 		return _blogsEntryLocalService.getBlogsEntries(start, end);
 	}
 
@@ -516,8 +539,8 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the matching blogs entries, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<BlogsEntry> getBlogsEntriesByUuidAndCompanyId(
-		String uuid, long companyId) {
+	public java.util.List<com.liferay.blogs.model.BlogsEntry>
+		getBlogsEntriesByUuidAndCompanyId(String uuid, long companyId) {
 
 		return _blogsEntryLocalService.getBlogsEntriesByUuidAndCompanyId(
 			uuid, companyId);
@@ -534,10 +557,11 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the range of matching blogs entries, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<BlogsEntry> getBlogsEntriesByUuidAndCompanyId(
-		String uuid, long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<BlogsEntry>
-			orderByComparator) {
+	public java.util.List<com.liferay.blogs.model.BlogsEntry>
+		getBlogsEntriesByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.blogs.model.BlogsEntry> orderByComparator) {
 
 		return _blogsEntryLocalService.getBlogsEntriesByUuidAndCompanyId(
 			uuid, companyId, start, end, orderByComparator);
@@ -561,19 +585,28 @@ public class BlogsEntryLocalServiceWrapper
 	 * @throws PortalException if a blogs entry with the primary key could not be found
 	 */
 	@Override
-	public BlogsEntry getBlogsEntry(long entryId)
+	public com.liferay.blogs.model.BlogsEntry getBlogsEntry(long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.getBlogsEntry(entryId);
 	}
 
+	/**
+	 * Returns the blogs entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the blogs entry's external reference code
+	 * @return the matching blogs entry
+	 * @throws PortalException if a matching blogs entry could not be found
+	 */
 	@Override
-	public BlogsEntry getBlogsEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+	public com.liferay.blogs.model.BlogsEntry
+			getBlogsEntryByExternalReferenceCode(
+				long groupId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.getBlogsEntryByExternalReferenceCode(
-			externalReferenceCode, groupId);
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -585,7 +618,8 @@ public class BlogsEntryLocalServiceWrapper
 	 * @throws PortalException if a matching blogs entry could not be found
 	 */
 	@Override
-	public BlogsEntry getBlogsEntryByUuidAndGroupId(String uuid, long groupId)
+	public com.liferay.blogs.model.BlogsEntry getBlogsEntryByUuidAndGroupId(
+			String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.getBlogsEntryByUuidAndGroupId(
@@ -593,10 +627,10 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<BlogsEntry> getCompanyEntries(
+	public java.util.List<com.liferay.blogs.model.BlogsEntry> getCompanyEntries(
 		long companyId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getCompanyEntries(
 			companyId, displayDate, queryDefinition);
@@ -605,29 +639,31 @@ public class BlogsEntryLocalServiceWrapper
 	@Override
 	public int getCompanyEntriesCount(
 		long companyId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getCompanyEntriesCount(
 			companyId, displayDate, queryDefinition);
 	}
 
 	@Override
-	public BlogsEntry[] getEntriesPrevAndNext(long entryId)
+	public com.liferay.blogs.model.BlogsEntry[] getEntriesPrevAndNext(
+			long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.getEntriesPrevAndNext(entryId);
 	}
 
 	@Override
-	public BlogsEntry getEntry(long entryId)
+	public com.liferay.blogs.model.BlogsEntry getEntry(long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.getEntry(entryId);
 	}
 
 	@Override
-	public BlogsEntry getEntry(long groupId, String urlTitle)
+	public com.liferay.blogs.model.BlogsEntry getEntry(
+			long groupId, String urlTitle)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.getEntry(groupId, urlTitle);
@@ -644,20 +680,20 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<BlogsEntry> getGroupEntries(
+	public java.util.List<com.liferay.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getGroupEntries(
 			groupId, displayDate, queryDefinition);
 	}
 
 	@Override
-	public java.util.List<BlogsEntry> getGroupEntries(
+	public java.util.List<com.liferay.blogs.model.BlogsEntry> getGroupEntries(
 		long groupId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getGroupEntries(
 			groupId, queryDefinition);
@@ -666,8 +702,8 @@ public class BlogsEntryLocalServiceWrapper
 	@Override
 	public int getGroupEntriesCount(
 		long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getGroupEntriesCount(
 			groupId, displayDate, queryDefinition);
@@ -676,28 +712,29 @@ public class BlogsEntryLocalServiceWrapper
 	@Override
 	public int getGroupEntriesCount(
 		long groupId,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getGroupEntriesCount(
 			groupId, queryDefinition);
 	}
 
 	@Override
-	public java.util.List<BlogsEntry> getGroupsEntries(
+	public java.util.List<com.liferay.blogs.model.BlogsEntry> getGroupsEntries(
 		long companyId, long groupId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getGroupsEntries(
 			companyId, groupId, displayDate, queryDefinition);
 	}
 
 	@Override
-	public java.util.List<BlogsEntry> getGroupUserEntries(
-		long groupId, long userId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+	public java.util.List<com.liferay.blogs.model.BlogsEntry>
+		getGroupUserEntries(
+			long groupId, long userId, java.util.Date displayDate,
+			com.liferay.portal.kernel.dao.orm.QueryDefinition
+				<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getGroupUserEntries(
 			groupId, userId, displayDate, queryDefinition);
@@ -706,8 +743,8 @@ public class BlogsEntryLocalServiceWrapper
 	@Override
 	public int getGroupUserEntriesCount(
 		long groupId, long userId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getGroupUserEntriesCount(
 			groupId, userId, displayDate, queryDefinition);
@@ -721,10 +758,11 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<BlogsEntry> getOrganizationEntries(
-		long organizationId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+	public java.util.List<com.liferay.blogs.model.BlogsEntry>
+		getOrganizationEntries(
+			long organizationId, java.util.Date displayDate,
+			com.liferay.portal.kernel.dao.orm.QueryDefinition
+				<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getOrganizationEntries(
 			organizationId, displayDate, queryDefinition);
@@ -733,8 +771,8 @@ public class BlogsEntryLocalServiceWrapper
 	@Override
 	public int getOrganizationEntriesCount(
 		long organizationId, java.util.Date displayDate,
-		com.liferay.portal.kernel.dao.orm.QueryDefinition<BlogsEntry>
-			queryDefinition) {
+		com.liferay.portal.kernel.dao.orm.QueryDefinition
+			<com.liferay.blogs.model.BlogsEntry> queryDefinition) {
 
 		return _blogsEntryLocalService.getOrganizationEntriesCount(
 			organizationId, displayDate, queryDefinition);
@@ -762,7 +800,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public String getUniqueUrlTitle(BlogsEntry entry) {
+	public String getUniqueUrlTitle(com.liferay.blogs.model.BlogsEntry entry) {
 		return _blogsEntryLocalService.getUniqueUrlTitle(entry);
 	}
 
@@ -782,7 +820,8 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the moved blogs entry
 	 */
 	@Override
-	public BlogsEntry moveEntryToTrash(long userId, BlogsEntry entry)
+	public com.liferay.blogs.model.BlogsEntry moveEntryToTrash(
+			long userId, com.liferay.blogs.model.BlogsEntry entry)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.moveEntryToTrash(userId, entry);
@@ -796,7 +835,8 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the moved blogs entry
 	 */
 	@Override
-	public BlogsEntry moveEntryToTrash(long userId, long entryId)
+	public com.liferay.blogs.model.BlogsEntry moveEntryToTrash(
+			long userId, long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.moveEntryToTrash(userId, entryId);
@@ -811,7 +851,8 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the restored blogs entry from the recycle bin
 	 */
 	@Override
-	public BlogsEntry restoreEntryFromTrash(long userId, long entryId)
+	public com.liferay.blogs.model.BlogsEntry restoreEntryFromTrash(
+			long userId, long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _blogsEntryLocalService.restoreEntryFromTrash(userId, entryId);
@@ -833,8 +874,9 @@ public class BlogsEntryLocalServiceWrapper
 
 	@Override
 	public void updateAsset(
-			long userId, BlogsEntry entry, long[] assetCategoryIds,
-			String[] assetTagNames, long[] assetLinkEntryIds, Double priority)
+			long userId, com.liferay.blogs.model.BlogsEntry entry,
+			long[] assetCategoryIds, String[] assetTagNames,
+			long[] assetLinkEntryIds, Double priority)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_blogsEntryLocalService.updateAsset(
@@ -853,12 +895,14 @@ public class BlogsEntryLocalServiceWrapper
 	 * @return the blogs entry that was updated
 	 */
 	@Override
-	public BlogsEntry updateBlogsEntry(BlogsEntry blogsEntry) {
+	public com.liferay.blogs.model.BlogsEntry updateBlogsEntry(
+		com.liferay.blogs.model.BlogsEntry blogsEntry) {
+
 		return _blogsEntryLocalService.updateBlogsEntry(blogsEntry);
 	}
 
 	@Override
-	public BlogsEntry updateEntry(
+	public com.liferay.blogs.model.BlogsEntry updateEntry(
 			long userId, long entryId, String title, String content,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -868,7 +912,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry updateEntry(
+	public com.liferay.blogs.model.BlogsEntry updateEntry(
 			long userId, long entryId, String title, String subtitle,
 			String description, String content, java.util.Date displayDate,
 			boolean allowPingbacks, boolean allowTrackbacks,
@@ -887,7 +931,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry updateEntry(
+	public com.liferay.blogs.model.BlogsEntry updateEntry(
 			long userId, long entryId, String title, String subtitle,
 			String description, String content, int displayDateMonth,
 			int displayDateDay, int displayDateYear, int displayDateHour,
@@ -910,7 +954,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry updateEntry(
+	public com.liferay.blogs.model.BlogsEntry updateEntry(
 			long userId, long entryId, String title, String subtitle,
 			String urlTitle, String description, String content,
 			java.util.Date displayDate, boolean allowPingbacks,
@@ -931,7 +975,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry updateEntry(
+	public com.liferay.blogs.model.BlogsEntry updateEntry(
 			long userId, long entryId, String title, String subtitle,
 			String urlTitle, String description, String content,
 			int displayDateMonth, int displayDateDay, int displayDateYear,
@@ -955,7 +999,7 @@ public class BlogsEntryLocalServiceWrapper
 
 	@Override
 	public void updateEntryResources(
-			BlogsEntry entry,
+			com.liferay.blogs.model.BlogsEntry entry,
 			com.liferay.portal.kernel.service.permission.ModelPermissions
 				modelPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -965,7 +1009,7 @@ public class BlogsEntryLocalServiceWrapper
 
 	@Override
 	public void updateEntryResources(
-			BlogsEntry entry, String[] groupPermissions,
+			com.liferay.blogs.model.BlogsEntry entry, String[] groupPermissions,
 			String[] guestPermissions)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -974,7 +1018,7 @@ public class BlogsEntryLocalServiceWrapper
 	}
 
 	@Override
-	public BlogsEntry updateStatus(
+	public com.liferay.blogs.model.BlogsEntry updateStatus(
 			long userId, long entryId, int status,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext,
 			java.util.Map<String, java.io.Serializable> workflowContext)
@@ -982,26 +1026,6 @@ public class BlogsEntryLocalServiceWrapper
 
 		return _blogsEntryLocalService.updateStatus(
 			userId, entryId, status, serviceContext, workflowContext);
-	}
-
-	@Override
-	public CTPersistence<BlogsEntry> getCTPersistence() {
-		return _blogsEntryLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<BlogsEntry> getModelClass() {
-		return _blogsEntryLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<BlogsEntry>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _blogsEntryLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

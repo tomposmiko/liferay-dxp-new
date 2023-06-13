@@ -49,13 +49,11 @@ public class ViewCountUpgradeProcess extends UpgradeProcess {
 
 			preparedStatement.executeUpdate();
 		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns(_tableName, _viewCountColumnName)
-		};
+		runSQL(
+			StringBundler.concat(
+				"alter table ", _tableName, " drop column ",
+				_viewCountColumnName));
 	}
 
 	private final Class<?> _clazz;

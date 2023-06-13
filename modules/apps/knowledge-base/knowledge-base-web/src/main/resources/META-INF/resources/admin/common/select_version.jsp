@@ -38,7 +38,7 @@ PortletURL portletURL = PortletURLBuilder.createRenderURL(
 %>
 
 <clay:container-fluid>
-	<aui:form action="<%= portletURL %>" method="post" name="selectVersionFm">
+	<aui:form action="<%= portletURL.toString() %>" method="post" name="selectVersionFm">
 		<liferay-ui:search-container
 			id="articleVersionSearchContainer"
 			iteratorURL="<%= portletURL %>"
@@ -79,7 +79,7 @@ PortletURL portletURL = PortletURLBuilder.createRenderURL(
 										"targetversion", curTargetVersion
 									).build()
 								%>'
-								href="javascript:void(0);"
+								href="javascript:;"
 							>
 								<%= String.valueOf(curKBArticle.getVersion()) %>
 							</aui:a>

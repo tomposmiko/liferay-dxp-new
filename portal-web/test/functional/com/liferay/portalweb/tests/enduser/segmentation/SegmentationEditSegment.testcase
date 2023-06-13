@@ -11,7 +11,7 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
 		task ("Add segment in Test Site Name") {
 			JSONSegmentsentry.addSegment(
@@ -28,7 +28,7 @@ definition {
 
 		Navigator.openURL();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -36,73 +36,8 @@ definition {
 		}
 	}
 
-	@description = "LPS-94874 Bug: Can't edit segment if the segment has a select input"
-	@priority = 5
-	@uitest
-	test CanEditSegmentIfHaveASelectInput {
-		property portal.acceptance = "true";
-
-		task ("Go to segments portlet") {
-			Segmentation.openSegmentsAdmin(siteURLKey = "test-site-name");
-		}
-
-		task ("Edit the segment with a select input") {
-			Segmentation.editSegment(entry = "EditSegment Test");
-
-			AssertVisible(
-				ariaLabel = "Enter View Mode",
-				locator1 = "Button#ANY_WITH_ARIA_LABEL");
-
-			Segmentation.deleteProperty();
-
-			Segmentation.addProperties(propertyOption = "Regular Role");
-
-			Segmentation.fillProperty(selectCheckbox = "Administrator");
-
-			Segmentation.fillTitle(titleField = "EditSegmentIfHaveASelectInput Test");
-
-			Segmentation.viewMembers(memberName = "Test Test");
-
-			Button.clickSave();
-		}
-
-		task ("Assert segment edited") {
-			Segmentation.editSegment(entry = "EditSegmentIfHaveASelectInput Test");
-
-			AssertValue(
-				locator1 = "Segmentation#CRITERION_INPUT_ANY",
-				value1 = "Administrator");
-
-			Segmentation.fillProperty(selectCheckbox = "Power User");
-
-			Button.clickSave();
-
-			Segmentation.editSegment(entry = "EditSegmentIfHaveASelectInput Test");
-
-			AssertVisible(
-				ariaLabel = "Enter View Mode",
-				locator1 = "Button#ANY_WITH_ARIA_LABEL");
-
-			AssertValue(
-				locator1 = "Segmentation#CRITERION_INPUT_ANY",
-				value1 = "Power User");
-		}
-
-		task ("Assert the segment cannot be edited with the toggle off") {
-			Click(
-				key_text = "cog",
-				locator1 = "Icon#ANY");
-
-			AssertVisible(
-				ariaLabel = "Enter Edit Mode",
-				locator1 = "Button#ANY_WITH_ARIA_LABEL");
-
-			AssertElementNotPresent(locator1 = "Button#SELECT");
-		}
-	}
-
 	@description = "LPS-102740 Validate if the user can edit a segment with Properties Country"
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test EditSegmentUserByOrganizationCountry {
 		property portal.acceptance = "true";
@@ -116,7 +51,7 @@ definition {
 
 			Segmentation.fillTitle(titleField = "EditSegmentUserByCountry Test");
 
-			Segmentation.deleteProperty();
+			Segmentation.deleteProperties();
 
 			Segmentation.gotoSidebar(fieldType = "Organization");
 
@@ -132,14 +67,14 @@ definition {
 		task ("Assert segment edited") {
 			Segmentation.editSegment(entry = "EditSegmentUserByCountry Test");
 
-			AssertValue(
-				locator1 = "Segmentation#CRITERION_INPUT_ANY",
-				value1 = "china");
+			Segmentation.viewSegment(
+				criterion = "options",
+				value = "china");
 		}
 	}
 
 	@description = "LPS-102740 Validate if the user can edit a segment with Properties Region"
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test EditSegmentUserByOrganizationRegion {
 		property portal.acceptance = "true";
@@ -151,7 +86,7 @@ definition {
 		task ("Edit the segment") {
 			Segmentation.editSegment(entry = "EditSegment Test");
 
-			Segmentation.deleteProperty();
+			Segmentation.deleteProperties();
 
 			Segmentation.gotoSidebar(fieldType = "Organization");
 
@@ -169,14 +104,14 @@ definition {
 		task ("Assert segment edited") {
 			Segmentation.editSegment(entry = "EditSegmentUserByRegion Test");
 
-			AssertValue(
-				locator1 = "Segmentation#CRITERION_INPUT_ANY",
-				value1 = "madrid");
+			Segmentation.viewSegment(
+				criterion = "options",
+				value = "madrid");
 		}
 	}
 
 	@description = "LPS-102743 Validate if the user can edit a segment with Properties Session URL"
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test EditSegmentUserBySessionURL {
 		property portal.acceptance = "true";
@@ -190,13 +125,13 @@ definition {
 
 			Segmentation.fillTitle(titleField = "EditSegmentUserBySessionURL Test");
 
-			Segmentation.deleteProperty();
+			Segmentation.deleteProperties();
 
 			Segmentation.gotoSidebar(fieldType = "Session");
 
 			Segmentation.addProperties(propertyOption = "URL");
 
-			Segmentation.fillProperty(criterionValue = "http://localhost:8080");
+			Segmentation.fillProperty(propertyField = "http://localhost:8080");
 
 			Button.clickSave();
 		}
@@ -204,14 +139,12 @@ definition {
 		task ("Assert segment edited") {
 			Segmentation.editSegment(entry = "EditSegmentUserBySessionURL Test");
 
-			AssertValue(
-				locator1 = "Segmentation#CRITERION_INPUT_ANY",
-				value1 = "http://localhost:8080");
+			Segmentation.viewSegment(propertyField = "http://localhost:8080");
 		}
 	}
 
 	@description = "Validate if the user can edit a segment with User Tag"
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test EditSegmentUserByUserTag {
 		property portal.acceptance = "true";
@@ -232,7 +165,7 @@ definition {
 		task ("Edit the segment") {
 			Segmentation.editSegment(entry = "EditSegment Test");
 
-			Segmentation.deleteProperty();
+			Segmentation.deleteProperties();
 
 			Segmentation.addProperties(propertyOption = "Tag");
 
@@ -248,14 +181,14 @@ definition {
 		task ("Assert segment edited") {
 			Segmentation.editSegment(entry = "EditSegmentUserByUserTag Test");
 
-			AssertValue(
-				locator1 = "Segmentation#CRITERION_INPUT_ANY",
-				value1 = "tagname");
+			Segmentation.viewSegment(
+				criterion = "select-input",
+				value = "tagname");
 		}
 	}
 
 	@description = "Validate if the user can edit a segment with Properties User and Email Segment with Contains to Equals Option"
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test EditSegmentUserEmailAddressContainsToEquals {
 		property portal.acceptance = "true";
@@ -277,9 +210,7 @@ definition {
 		task ("Assert segment edited") {
 			Segmentation.editSegment(entry = "EditSegmentUserEmailAddressContainsToEquals Test");
 
-			AssertValue(
-				locator1 = "Segmentation#CRITERION_OPERATOR",
-				value1 = "eq");
+			Segmentation.viewSegment(criterionInputOption = "eq");
 		}
 	}
 

@@ -24,7 +24,7 @@ import {
 	VIEW_DETAILS,
 } from '../../../src/main/resources/META-INF/resources/components/mini_cart/util/constants';
 import {DEFAULT_LABELS} from '../../../src/main/resources/META-INF/resources/components/mini_cart/util/labels';
-import * as Basetests_utilities from '../../../src/main/resources/META-INF/resources/utilities';
+import * as BaseUtils from '../../../src/main/resources/META-INF/resources/utilities';
 import {PRODUCT_REMOVED_FROM_CART} from '../../../src/main/resources/META-INF/resources/utilities/eventsDefinitions';
 
 describe('MiniCart Items List Actions', () => {
@@ -56,7 +56,7 @@ describe('MiniCart Items List Actions', () => {
 			.fn()
 			.mockReturnValue(Promise.resolve());
 
-		jest.spyOn(Basetests_utilities, 'liferayNavigate');
+		jest.spyOn(BaseUtils, 'liferayNavigate');
 
 		window.Liferay = {
 			Language: {
@@ -231,9 +231,7 @@ describe('MiniCart Items List Actions', () => {
 					});
 
 					await wait(() => {
-						expect(
-							Basetests_utilities.liferayNavigate
-						).toHaveBeenCalledWith(
+						expect(BaseUtils.liferayNavigate).toHaveBeenCalledWith(
 							WITH_ITEMS_CONTEXT_MOCK.actionURLs.orderDetailURL
 						);
 					});

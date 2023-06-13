@@ -18,37 +18,27 @@ import com.liferay.commerce.inventory.constants.CommerceInventoryActionKeys;
 import com.liferay.commerce.inventory.model.CommerceInventoryReplenishmentItem;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.service.base.CommerceInventoryReplenishmentItemServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 
 import java.util.Date;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Luca Pellizzon
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceInventoryReplenishmentItem"
-	},
-	service = AopService.class
-)
 public class CommerceInventoryReplenishmentItemServiceImpl
 	extends CommerceInventoryReplenishmentItemServiceBaseImpl {
 
 	@Override
 	public CommerceInventoryReplenishmentItem
 			addCommerceInventoryReplenishmentItem(
-				String externalReferenceCode, long commerceInventoryWarehouseId,
-				String sku, Date availabilityDate, int quantity)
+				long commerceInventoryWarehouseId, String sku,
+				Date availabilityDate, int quantity)
 		throws PortalException {
 
 		_commerceInventoryWarehouseModelResourcePermission.check(
@@ -57,8 +47,8 @@ public class CommerceInventoryReplenishmentItemServiceImpl
 
 		return commerceInventoryReplenishmentItemLocalService.
 			addCommerceInventoryReplenishmentItem(
-				externalReferenceCode, getUserId(),
-				commerceInventoryWarehouseId, sku, availabilityDate, quantity);
+				getUserId(), commerceInventoryWarehouseId, sku,
+				availabilityDate, quantity);
 	}
 
 	@Override
@@ -85,32 +75,15 @@ public class CommerceInventoryReplenishmentItemServiceImpl
 	}
 
 	@Override
-	public void deleteCommerceInventoryReplenishmentItems(
-			long companyId, String sku)
-		throws PortalException {
-
-		PortletResourcePermission portletResourcePermission =
-			_commerceInventoryWarehouseModelResourcePermission.
-				getPortletResourcePermission();
-
-		portletResourcePermission.check(
-			getPermissionChecker(), null,
-			CommerceInventoryActionKeys.MANAGE_INVENTORY);
-
-		commerceInventoryReplenishmentItemLocalService.
-			deleteCommerceInventoryReplenishmentItems(companyId, sku);
-	}
-
-	@Override
 	public CommerceInventoryReplenishmentItem
-			fetchCommerceInventoryReplenishmentItemByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
+			getCommerceInventoryReplenishmentItem(
+				long commerceInventoryReplenishmentItemId)
 		throws PortalException {
 
 		CommerceInventoryReplenishmentItem commerceInventoryReplenishmentItem =
 			commerceInventoryReplenishmentItemLocalService.
-				fetchCommerceInventoryReplenishmentItemByExternalReferenceCode(
-					externalReferenceCode, companyId);
+				fetchCommerceInventoryReplenishmentItem(
+					commerceInventoryReplenishmentItemId);
 
 		if (commerceInventoryReplenishmentItem != null) {
 			_commerceInventoryWarehouseModelResourcePermission.check(
@@ -120,42 +93,9 @@ public class CommerceInventoryReplenishmentItemServiceImpl
 				ActionKeys.VIEW);
 		}
 
-		return commerceInventoryReplenishmentItem;
-	}
-
-	@Override
-	public CommerceInventoryReplenishmentItem
-			getCommerceInventoryReplenishmentItem(
-				long commerceInventoryReplenishmentItemId)
-		throws PortalException {
-
-		CommerceInventoryReplenishmentItem commerceInventoryReplenishmentItem =
-			commerceInventoryReplenishmentItemLocalService.
-				getCommerceInventoryReplenishmentItem(
-					commerceInventoryReplenishmentItemId);
-
-		_commerceInventoryWarehouseModelResourcePermission.check(
-			getPermissionChecker(),
-			commerceInventoryReplenishmentItem.
-				getCommerceInventoryWarehouseId(),
-			ActionKeys.VIEW);
-
-		return commerceInventoryReplenishmentItem;
-	}
-
-	@Override
-	public List<CommerceInventoryReplenishmentItem>
-			getCommerceInventoryReplenishmentItemsByCommerceInventoryWarehouseId(
-				long commerceInventoryWarehouseId, int start, int end)
-		throws PortalException {
-
-		_commerceInventoryWarehouseModelResourcePermission.check(
-			getPermissionChecker(), commerceInventoryWarehouseId,
-			ActionKeys.VIEW);
-
 		return commerceInventoryReplenishmentItemLocalService.
-			getCommerceInventoryReplenishmentItemsByCommerceInventoryWarehouseId(
-				commerceInventoryWarehouseId, start, end);
+			getCommerceInventoryReplenishmentItem(
+				commerceInventoryReplenishmentItemId);
 	}
 
 	@Override
@@ -192,21 +132,6 @@ public class CommerceInventoryReplenishmentItemServiceImpl
 	}
 
 	@Override
-	public int
-			getCommerceInventoryReplenishmentItemsCountByCommerceInventoryWarehouseId(
-				long commerceInventoryWarehouseId)
-		throws PortalException {
-
-		_commerceInventoryWarehouseModelResourcePermission.check(
-			getPermissionChecker(), commerceInventoryWarehouseId,
-			ActionKeys.VIEW);
-
-		return commerceInventoryReplenishmentItemLocalService.
-			getCommerceInventoryReplenishmentItemsCountByCommerceInventoryWarehouseId(
-				commerceInventoryWarehouseId);
-	}
-
-	@Override
 	public int getCommerceInventoryReplenishmentItemsCountByCompanyIdAndSku(
 			long companyId, String sku)
 		throws PortalException {
@@ -227,7 +152,6 @@ public class CommerceInventoryReplenishmentItemServiceImpl
 	@Override
 	public CommerceInventoryReplenishmentItem
 			updateCommerceInventoryReplenishmentItem(
-				String externalReferenceCode,
 				long commerceInventoryReplenishmentItemId,
 				Date availabilityDate, int quantity, long mvccVersion)
 		throws PortalException {
@@ -247,14 +171,15 @@ public class CommerceInventoryReplenishmentItemServiceImpl
 
 		return commerceInventoryReplenishmentItemLocalService.
 			updateCommerceInventoryReplenishmentItem(
-				externalReferenceCode, commerceInventoryReplenishmentItemId,
-				availabilityDate, quantity, mvccVersion);
+				commerceInventoryReplenishmentItemId, availabilityDate,
+				quantity, mvccVersion);
 	}
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.inventory.model.CommerceInventoryWarehouse)"
-	)
-	private ModelResourcePermission<CommerceInventoryWarehouse>
-		_commerceInventoryWarehouseModelResourcePermission;
+	private static volatile ModelResourcePermission<CommerceInventoryWarehouse>
+		_commerceInventoryWarehouseModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CommerceInventoryReplenishmentItemServiceImpl.class,
+				"_commerceInventoryWarehouseModelResourcePermission",
+				CommerceInventoryWarehouse.class);
 
 }

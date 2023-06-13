@@ -285,14 +285,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceUtil {
 			uuid, groupId);
 	}
 
-	public static List<AssetListEntrySegmentsEntryRel>
-		fetchAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds) {
-
-		return getService().fetchAssetListEntrySegmentsEntryRels(
-			assetListEntryId, segmentsEntryIds);
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
@@ -364,16 +356,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceUtil {
 
 		return getService().getAssetListEntrySegmentsEntryRels(
 			assetListEntryId, start, end);
-	}
-
-	public static List<AssetListEntrySegmentsEntryRel>
-		getAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds, int start, int end,
-			OrderByComparator<AssetListEntrySegmentsEntryRel>
-				orderByComparator) {
-
-		return getService().getAssetListEntrySegmentsEntryRels(
-			assetListEntryId, segmentsEntryIds, start, end, orderByComparator);
 	}
 
 	/**
@@ -486,10 +468,6 @@ public class AssetListEntrySegmentsEntryRelLocalServiceUtil {
 
 		return getService().updateAssetListEntrySegmentsEntryRelTypeSettings(
 			assetListEntryId, segmentsEntryId, typeSettings);
-	}
-
-	public static void updateVariationsPriority(long[] variationsPriority) {
-		getService().updateVariationsPriority(variationsPriority);
 	}
 
 	public static AssetListEntrySegmentsEntryRelLocalService getService() {

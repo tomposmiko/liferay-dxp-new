@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=300",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_DESIGN
@@ -38,11 +39,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = PanelApp.class
 )
 public class FragmentPanelApp extends BasePanelApp {
-
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
 
 	@Override
 	public String getPortletId() {
@@ -62,10 +58,14 @@ public class FragmentPanelApp extends BasePanelApp {
 		return super.isShow(permissionChecker, group);
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + FragmentPortletKeys.FRAGMENT + ")"
+		target = "(javax.portlet.name=" + FragmentPortletKeys.FRAGMENT + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 	@Reference
 	private StagingGroupHelper _stagingGroupHelper;

@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = AMImageURLFactory.class)
+@Component(immediate = true, service = AMImageURLFactory.class)
 public class AMImageURLFactoryImpl implements AMImageURLFactory {
 
 	@Override

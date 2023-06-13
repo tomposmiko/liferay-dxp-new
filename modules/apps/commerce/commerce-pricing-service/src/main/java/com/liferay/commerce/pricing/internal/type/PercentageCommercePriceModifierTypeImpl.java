@@ -21,7 +21,7 @@ import com.liferay.commerce.pricing.constants.CommercePriceModifierConstants;
 import com.liferay.commerce.pricing.model.CommercePriceModifier;
 import com.liferay.commerce.pricing.type.CommercePriceModifierType;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.math.BigDecimal;
@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.price.modifier.type.key=" + CommercePriceModifierConstants.MODIFIER_TYPE_PERCENTAGE,
 		"commerce.price.modifier.type.order:Integer=20"
@@ -66,10 +67,10 @@ public class PercentageCommercePriceModifierTypeImpl
 			commerceCurrency.getRoundingMode());
 
 		BigDecimal percentage = BigDecimal.ONE.add(
-			modifierAmount.scaleByPowerOfTen(-2));
+			modifierAmount.divide(_ONE_HUNDRED));
 
 		MathContext mathContext = new MathContext(
-			originalPrice.precision(), roundingMode);
+			percentage.precision(), roundingMode);
 
 		return originalPrice.multiply(percentage, mathContext);
 	}
@@ -84,13 +85,12 @@ public class PercentageCommercePriceModifierTypeImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "percentage");
+		return LanguageUtil.get(resourceBundle, "percentage");
 	}
+
+	private static final BigDecimal _ONE_HUNDRED = BigDecimal.valueOf(100);
 
 	@Reference
 	private CommercePriceListLocalService _commercePriceListLocalService;
-
-	@Reference
-	private Language _language;
 
 }

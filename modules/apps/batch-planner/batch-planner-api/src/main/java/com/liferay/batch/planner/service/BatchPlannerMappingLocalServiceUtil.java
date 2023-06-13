@@ -137,10 +137,6 @@ public class BatchPlannerMappingLocalServiceUtil {
 			batchPlannerPlanId, externalFieldName, internalFieldName);
 	}
 
-	public static void deleteBatchPlannerMappings(long batchPlannerPlanId) {
-		getService().deleteBatchPlannerMappings(batchPlannerPlanId);
-	}
-
 	/**
 	 * @throws PortalException
 	 */

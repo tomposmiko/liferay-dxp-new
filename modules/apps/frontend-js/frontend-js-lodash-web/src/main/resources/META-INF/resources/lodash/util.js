@@ -14,7 +14,7 @@
 
 _.mixin({
 	bindKeyRight(context, key) {
-		const args = _.toArray(arguments).slice(2);
+		var args = _.toArray(arguments).slice(2);
 
 		args.unshift(_.bindKey(context, key));
 
@@ -22,7 +22,7 @@ _.mixin({
 	},
 
 	bindRight(fn, context) {
-		const args = _.toArray(arguments).slice(2);
+		var args = _.toArray(arguments).slice(2);
 
 		args.unshift(_.bind(fn, context));
 
@@ -50,8 +50,8 @@ _.mixin(
 				path = path.split('.');
 			}
 
-			for (let i = 0; i < path.length; i++) {
-				const name = path[i];
+			for (var i = 0; i < path.length; i++) {
+				var name = path[i];
 
 				object[name] = object[name] || {};
 				object = object[name];

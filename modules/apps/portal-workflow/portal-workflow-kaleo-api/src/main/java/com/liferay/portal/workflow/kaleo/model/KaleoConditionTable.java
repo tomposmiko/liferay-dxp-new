@@ -36,9 +36,6 @@ public class KaleoConditionTable extends BaseTable<KaleoConditionTable> {
 
 	public final Column<KaleoConditionTable, Long> mvccVersion = createColumn(
 		"mvccVersion", Long.class, Types.BIGINT, Column.FLAG_NULLITY);
-	public final Column<KaleoConditionTable, Long> ctCollectionId =
-		createColumn(
-			"ctCollectionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);
 	public final Column<KaleoConditionTable, Long> kaleoConditionId =
 		createColumn(
 			"kaleoConditionId", Long.class, Types.BIGINT, Column.FLAG_PRIMARY);

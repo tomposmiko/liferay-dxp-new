@@ -15,22 +15,22 @@
 AUI.add(
 	'liferay-calendar-message-util',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const TPL_MESSAGE_UPDATE_ALL_INVITED =
+		var TPL_MESSAGE_UPDATE_ALL_INVITED =
 			'<p class="calendar-portlet-confirmation-text">' +
 			Liferay.Language.get('invited-users-will-be-notified') +
 			'</p>';
 
 		Liferay.CalendarMessageUtil = {
 			_queueableQuestionUpdateAllInvited(data) {
-				const instance = this;
+				var instance = this;
 
-				const answers = data.answers;
+				var answers = data.answers;
 
-				const showNextQuestion = A.bind('run', instance.queue);
+				var showNextQuestion = A.bind('run', instance.queue);
 
 				if (answers.cancel) {
 					A.soon(showNextQuestion);
@@ -51,11 +51,11 @@ AUI.add(
 			},
 
 			_queueableQuestionUpdateRecurring(data) {
-				const instance = this;
+				var instance = this;
 
-				const answers = data.answers;
+				var answers = data.answers;
 
-				const showNextQuestion = A.bind('run', instance.queue);
+				var showNextQuestion = A.bind('run', instance.queue);
 
 				if (answers.cancel) {
 					A.soon(showNextQuestion);
@@ -85,17 +85,17 @@ AUI.add(
 			},
 
 			_queueableQuestionUserCalendarOnly(data) {
-				const instance = this;
+				var instance = this;
 
-				const answers = data.answers;
+				var answers = data.answers;
 
-				const showNextQuestion = A.bind('run', instance.queue);
+				var showNextQuestion = A.bind('run', instance.queue);
 
 				if (answers.cancel) {
 					A.soon(showNextQuestion);
 				}
 				else {
-					const content = [
+					var content = [
 						'<p class="calendar-portlet-confirmation-text">',
 						Lang.sub(
 							Liferay.Language.get(
@@ -121,9 +121,9 @@ AUI.add(
 			},
 
 			confirm(message, yesButtonLabel, noButtonLabel, yesFn, noFn) {
-				let confirmationPanel; // eslint-disable-line prefer-const
+				var confirmationPanel;
 
-				const getButtonConfig = function (label, callback) {
+				var getButtonConfig = function (label, callback) {
 					return {
 						label,
 						on: {
@@ -159,11 +159,11 @@ AUI.add(
 			},
 
 			promptSchedulerEventUpdate(data) {
-				const instance = this;
+				var instance = this;
 
 				data.answers = {};
 
-				const queue = new A.AsyncQueue();
+				var queue = new A.AsyncQueue();
 
 				if (data.recurring) {
 					queue.add({

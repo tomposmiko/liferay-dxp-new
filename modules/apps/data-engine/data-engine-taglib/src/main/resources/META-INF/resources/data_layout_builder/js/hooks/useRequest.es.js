@@ -16,7 +16,7 @@ import {useEffect, useState} from 'react';
 
 import {request} from '../utils/client.es';
 
-export default function useRequest(endpoint) {
+export default (endpoint) => {
 	const [state, setState] = useState({
 		error: null,
 		isLoading: true,
@@ -43,4 +43,4 @@ export default function useRequest(endpoint) {
 	}, [endpoint]);
 
 	return state;
-}
+};

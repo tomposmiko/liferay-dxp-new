@@ -113,12 +113,13 @@ public class CPDefinitionHelperTest {
 		CPInstance[] cpInstances = _addCPInstances(
 			_commerceCatalog.getGroupId(), _CP_INSTANCES_COUNT);
 
+		SearchContext searchContext = CPTestUtil.getSearchContext(
+			null, WorkflowConstants.STATUS_APPROVED,
+			_commerceCatalog.getGroup());
+
 		CPDataSourceResult cpDataSourceResult = _cpDefinitionHelper.search(
-			_commerceCatalog.getGroupId(),
-			CPTestUtil.getSearchContext(
-				null, WorkflowConstants.STATUS_APPROVED,
-				_commerceCatalog.getGroup()),
-			new CPQuery(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			_commerceCatalog.getGroupId(), searchContext, new CPQuery(),
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		List<CPCatalogEntry> cpCatalogEntries =
 			cpDataSourceResult.getCPCatalogEntries();
@@ -212,7 +213,7 @@ public class CPDefinitionHelperTest {
 		Assert.assertTrue(
 			actualCPDefinitionIds.containsAll(cpDefinitionIdsList));
 
-		AssetCategoryLocalServiceUtil.deleteCategory(
+		AssetCategoryLocalServiceUtil.deleteAssetCategory(
 			assetCategory.getCategoryId());
 	}
 
@@ -238,12 +239,13 @@ public class CPDefinitionHelperTest {
 
 		CPDefinition cpDefinition = randomCPInstance.getCPDefinition();
 
+		SearchContext searchContext = CPTestUtil.getSearchContext(
+			cpDefinition.getName(), WorkflowConstants.STATUS_APPROVED,
+			_commerceCatalog.getGroup());
+
 		CPDataSourceResult cpDataSourceResult = _cpDefinitionHelper.search(
-			_commerceCatalog.getGroupId(),
-			CPTestUtil.getSearchContext(
-				cpDefinition.getName(), WorkflowConstants.STATUS_APPROVED,
-				_commerceCatalog.getGroup()),
-			new CPQuery(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			_commerceCatalog.getGroupId(), searchContext, new CPQuery(),
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		List<CPCatalogEntry> cpCatalogEntries =
 			cpDataSourceResult.getCPCatalogEntries();

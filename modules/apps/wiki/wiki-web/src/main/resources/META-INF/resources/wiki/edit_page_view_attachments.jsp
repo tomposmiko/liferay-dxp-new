@@ -59,7 +59,7 @@ if (wikiPage != null) {
 	</portlet:renderURL>
 
 	<div align="right">
-		<a href="javascript:void(0);" id="view-removed-attachments-link"><liferay-ui:message arguments="<%= deletedAttachmentsCount %>" key='<%= (deletedAttachmentsCount == 1) ? "x-recently-removed-attachment" : "x-recently-removed-attachments" %>' /> &raquo;</a>
+		<a href="javascript:;" id="view-removed-attachments-link"><liferay-ui:message arguments="<%= deletedAttachmentsCount %>" key='<%= (deletedAttachmentsCount == 1) ? "x-recently-removed-attachment" : "x-recently-removed-attachments" %>' /> &raquo;</a>
 	</div>
 
 	<aui:script use="liferay-util-window">
@@ -67,10 +67,6 @@ if (wikiPage != null) {
 
 		viewRemovedAttachmentsLink.on('click', (event) => {
 			Liferay.Util.openWindow({
-				dialog: {
-					destroyOnHide: true,
-					modal: true,
-				},
 				id: '<portlet:namespace />openRemovedPageAttachments',
 				title: '<%= LanguageUtil.get(request, "removed-attachments") %>',
 				uri: '<%= viewTrashAttachmentsURL %>',

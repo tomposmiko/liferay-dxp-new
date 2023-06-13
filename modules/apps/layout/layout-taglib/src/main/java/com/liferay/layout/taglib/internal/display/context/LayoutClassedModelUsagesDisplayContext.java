@@ -14,31 +14,47 @@
 
 package com.liferay.layout.taglib.internal.display.context;
 
-import com.liferay.fragment.helper.FragmentEntryLinkHelper;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.fragment.constants.FragmentActionKeys;
+import com.liferay.fragment.constants.FragmentConstants;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.renderer.FragmentRenderer;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
+import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.model.LayoutClassedModelUsage;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalServiceUtil;
-import com.liferay.layout.taglib.internal.helper.LayoutClassedModelUsagesHelper;
-import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.layout.util.LayoutClassedModelUsageActionMenuContributor;
 import com.liferay.layout.util.LayoutClassedModelUsageActionMenuContributorRegistryUtil;
 import com.liferay.layout.util.comparator.LayoutClassedModelUsageModifiedDateComparator;
 import com.liferay.layout.util.constants.LayoutClassedModelUsageConstants;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -46,8 +62,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletException;
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -67,11 +85,19 @@ public class LayoutClassedModelUsagesDisplayContext {
 		_classPK = classPK;
 
 		_classNameId = PortalUtil.getClassNameId(className);
-		_fragmentEntryLinkHelper =
-			(FragmentEntryLinkHelper)renderRequest.getAttribute(
-				FragmentEntryLinkHelper.class.getName());
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_fragmentCollectionContributorTracker =
+			(FragmentCollectionContributorTracker)renderRequest.getAttribute(
+				ContentPageEditorWebKeys.
+					FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER);
+		_fragmentRendererTracker =
+			(FragmentRendererTracker)renderRequest.getAttribute(
+				FragmentActionKeys.FRAGMENT_RENDERER_TRACKER);
+
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		_resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", _themeDisplay.getLocale(), getClass());
 	}
 
 	public int getAllUsageCount() {
@@ -111,21 +137,67 @@ public class LayoutClassedModelUsagesDisplayContext {
 	public String getLayoutClassedModelUsageName(
 		LayoutClassedModelUsage layoutClassedModelUsage) {
 
-		LayoutClassedModelUsagesHelper layoutClassedModelUsagesHelper =
-			ServletContextUtil.getLayoutClassedModelUsagesHelper();
+		if (layoutClassedModelUsage.getType() ==
+				LayoutClassedModelUsageConstants.TYPE_LAYOUT) {
 
-		return layoutClassedModelUsagesHelper.getName(
-			layoutClassedModelUsage, _themeDisplay.getLocale());
+			Layout layout = LayoutLocalServiceUtil.fetchLayout(
+				layoutClassedModelUsage.getPlid());
+
+			if (layout == null) {
+				return StringPool.BLANK;
+			}
+
+			if (!layout.isDraftLayout()) {
+				return layout.getName(_themeDisplay.getLocale());
+			}
+
+			return StringBundler.concat(
+				layout.getName(_themeDisplay.getLocale()), " (",
+				LanguageUtil.get(_themeDisplay.getLocale(), "draft"), ")");
+		}
+
+		long plid = layoutClassedModelUsage.getPlid();
+
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(
+			layoutClassedModelUsage.getPlid());
+
+		if (layout.isDraftLayout()) {
+			plid = layout.getClassPK();
+		}
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			LayoutPageTemplateEntryLocalServiceUtil.
+				fetchLayoutPageTemplateEntryByPlid(plid);
+
+		if (layoutPageTemplateEntry == null) {
+			return StringPool.BLANK;
+		}
+
+		if (!layout.isDraftLayout()) {
+			return layoutPageTemplateEntry.getName();
+		}
+
+		return StringBundler.concat(
+			layoutPageTemplateEntry.getName(), " (",
+			LanguageUtil.get(_themeDisplay.getLocale(), "draft"), ")");
 	}
 
 	public String getLayoutClassedModelUsageTypeLabel(
 		LayoutClassedModelUsage layoutClassedModelUsage) {
 
-		LayoutClassedModelUsagesHelper layoutClassedModelUsagesHelper =
-			ServletContextUtil.getLayoutClassedModelUsagesHelper();
+		if (layoutClassedModelUsage.getType() ==
+				LayoutClassedModelUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE) {
 
-		return layoutClassedModelUsagesHelper.getTypeLabel(
-			layoutClassedModelUsage);
+			return "display-page-template";
+		}
+
+		if (layoutClassedModelUsage.getType() ==
+				LayoutClassedModelUsageConstants.TYPE_LAYOUT) {
+
+			return "page";
+		}
+
+		return "page-template";
 	}
 
 	public String getLayoutClassedModelUsageWhereLabel(
@@ -137,12 +209,13 @@ public class LayoutClassedModelUsagesDisplayContext {
 			(layoutClassedModelUsage.getContainerType() !=
 				PortalUtil.getClassNameId(LayoutPageTemplateStructure.class))) {
 
+			String portletTitle = PortalUtil.getPortletTitle(
+				PortletIdCodec.decodePortletName(
+					layoutClassedModelUsage.getContainerKey()),
+				_themeDisplay.getLocale());
+
 			return LanguageUtil.format(
-				_themeDisplay.getLocale(), "x-widget",
-				PortalUtil.getPortletTitle(
-					PortletIdCodec.decodePortletName(
-						layoutClassedModelUsage.getContainerKey()),
-					_themeDisplay.getLocale()));
+				_resourceBundle, "x-widget", portletTitle);
 		}
 
 		if (layoutClassedModelUsage.getContainerType() ==
@@ -153,26 +226,25 @@ public class LayoutClassedModelUsagesDisplayContext {
 					GetterUtil.getLong(
 						layoutClassedModelUsage.getContainerKey()));
 
-			String name = _fragmentEntryLinkHelper.getFragmentEntryName(
-				fragmentEntryLink, _themeDisplay.getLocale());
+			String name = _getFragmentEntryName(fragmentEntryLink);
 
 			if (Validator.isNull(name)) {
 				return StringPool.BLANK;
 			}
 
-			if (!fragmentEntryLink.isTypeSection()) {
-				return LanguageUtil.format(
-					_themeDisplay.getLocale(), "x-element", name);
+			if (_getType(fragmentEntryLink) ==
+					FragmentConstants.TYPE_COMPONENT) {
+
+				return LanguageUtil.format(_resourceBundle, "x-element", name);
 			}
 
-			return LanguageUtil.format(
-				_themeDisplay.getLocale(), "x-section", name);
+			return LanguageUtil.format(_resourceBundle, "x-section", name);
 		}
 
 		if (layoutClassedModelUsage.getContainerType() ==
 				PortalUtil.getClassNameId(LayoutPageTemplateStructure.class)) {
 
-			return LanguageUtil.get(_themeDisplay.getLocale(), "section");
+			return LanguageUtil.get(_resourceBundle, "section");
 		}
 
 		return StringPool.BLANK;
@@ -203,20 +275,59 @@ public class LayoutClassedModelUsagesDisplayContext {
 	}
 
 	public PortletURL getPortletURL() throws PortletException {
-		return PortletURLUtil.clone(
-			PortletURLUtil.getCurrent(_renderRequest, _renderResponse),
-			_renderResponse);
+		PortletURL currentURLObj = PortletURLUtil.getCurrent(
+			_renderRequest, _renderResponse);
+
+		return PortletURLUtil.clone(currentURLObj, _renderResponse);
 	}
 
 	public String getPreviewURL(LayoutClassedModelUsage layoutClassedModelUsage)
-		throws Exception {
+		throws PortalException {
 
-		LayoutClassedModelUsagesHelper layoutClassedModelUsagesHelper =
-			ServletContextUtil.getLayoutClassedModelUsagesHelper();
+		String layoutURL = null;
 
-		return layoutClassedModelUsagesHelper.getPreviewURL(
-			layoutClassedModelUsage,
-			PortalUtil.getHttpServletRequest(_renderRequest));
+		if (layoutClassedModelUsage.getContainerType() ==
+				PortalUtil.getClassNameId(FragmentEntryLink.class)) {
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_renderRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			Layout layout = LayoutLocalServiceUtil.fetchLayout(
+				layoutClassedModelUsage.getPlid());
+
+			layoutURL = PortalUtil.getLayoutFriendlyURL(layout, themeDisplay);
+
+			layoutURL = HttpUtil.setParameter(
+				layoutURL, "previewClassNameId",
+				String.valueOf(layoutClassedModelUsage.getClassNameId()));
+			layoutURL = HttpUtil.setParameter(
+				layoutURL, "previewClassPK",
+				String.valueOf(layoutClassedModelUsage.getClassPK()));
+			layoutURL = HttpUtil.setParameter(
+				layoutURL, "previewType",
+				String.valueOf(AssetRendererFactory.TYPE_LATEST));
+		}
+		else {
+			layoutURL = PortletURLBuilder.create(
+				PortletURLFactoryUtil.create(
+					_renderRequest, layoutClassedModelUsage.getContainerKey(),
+					layoutClassedModelUsage.getPlid(),
+					PortletRequest.RENDER_PHASE)
+			).setParameter(
+				"previewClassNameId", layoutClassedModelUsage.getClassNameId()
+			).setParameter(
+				"previewClassPK", layoutClassedModelUsage.getClassPK()
+			).setParameter(
+				"previewType", AssetRendererFactory.TYPE_LATEST
+			).buildString();
+		}
+
+		String portletURLString = HttpUtil.addParameter(
+			layoutURL, "p_l_mode", Constants.PREVIEW);
+
+		return portletURLString + "#portlet_" +
+			layoutClassedModelUsage.getContainerKey();
 	}
 
 	public String getRedirect() {
@@ -240,8 +351,6 @@ public class LayoutClassedModelUsagesDisplayContext {
 			layoutClassedModelUsagesSearchContainer = new SearchContainer(
 				_renderRequest, getPortletURL(), null, "there-are-no-usages");
 
-		layoutClassedModelUsagesSearchContainer.setOrderByCol(_getOrderByCol());
-
 		boolean orderByAsc = false;
 
 		String orderByType = _getOrderByType();
@@ -250,101 +359,152 @@ public class LayoutClassedModelUsagesDisplayContext {
 			orderByAsc = true;
 		}
 
+		OrderByComparator<LayoutClassedModelUsage> orderByComparator =
+			new LayoutClassedModelUsageModifiedDateComparator(orderByAsc);
+
+		layoutClassedModelUsagesSearchContainer.setOrderByCol(_getOrderByCol());
 		layoutClassedModelUsagesSearchContainer.setOrderByComparator(
-			new LayoutClassedModelUsageModifiedDateComparator(orderByAsc));
+			orderByComparator);
 		layoutClassedModelUsagesSearchContainer.setOrderByType(
 			_getOrderByType());
 
+		List<LayoutClassedModelUsage> layoutClassedModelUsages = null;
+
+		int layoutClassedModelUsagesCount = 0;
+
 		if (Objects.equals(getNavigation(), "pages")) {
-			layoutClassedModelUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					LayoutClassedModelUsageLocalServiceUtil.
-						getLayoutClassedModelUsages(
-							_classNameId, _classPK,
-							LayoutClassedModelUsageConstants.TYPE_LAYOUT,
-							layoutClassedModelUsagesSearchContainer.getStart(),
-							layoutClassedModelUsagesSearchContainer.getEnd(),
-							layoutClassedModelUsagesSearchContainer.
-								getOrderByComparator()),
-				getPagesUsageCount());
+			layoutClassedModelUsages =
+				LayoutClassedModelUsageLocalServiceUtil.
+					getLayoutClassedModelUsages(
+						_classNameId, _classPK,
+						LayoutClassedModelUsageConstants.TYPE_LAYOUT,
+						layoutClassedModelUsagesSearchContainer.getStart(),
+						layoutClassedModelUsagesSearchContainer.getEnd(),
+						orderByComparator);
+
+			layoutClassedModelUsagesCount = getPagesUsageCount();
 		}
 		else if (Objects.equals(getNavigation(), "page-templates")) {
-			layoutClassedModelUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					LayoutClassedModelUsageLocalServiceUtil.
-						getLayoutClassedModelUsages(
-							_classNameId, _classPK,
-							LayoutClassedModelUsageConstants.TYPE_PAGE_TEMPLATE,
-							layoutClassedModelUsagesSearchContainer.getStart(),
-							layoutClassedModelUsagesSearchContainer.getEnd(),
-							layoutClassedModelUsagesSearchContainer.
-								getOrderByComparator()),
-				getPageTemplatesUsageCount());
+			layoutClassedModelUsages =
+				LayoutClassedModelUsageLocalServiceUtil.
+					getLayoutClassedModelUsages(
+						_classNameId, _classPK,
+						LayoutClassedModelUsageConstants.TYPE_PAGE_TEMPLATE,
+						layoutClassedModelUsagesSearchContainer.getStart(),
+						layoutClassedModelUsagesSearchContainer.getEnd(),
+						orderByComparator);
+
+			layoutClassedModelUsagesCount = getPageTemplatesUsageCount();
 		}
 		else if (Objects.equals(getNavigation(), "display-page-templates")) {
-			layoutClassedModelUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					LayoutClassedModelUsageLocalServiceUtil.
-						getLayoutClassedModelUsages(
-							_classNameId, _classPK,
-							LayoutClassedModelUsageConstants.
-								TYPE_DISPLAY_PAGE_TEMPLATE,
-							layoutClassedModelUsagesSearchContainer.getStart(),
-							layoutClassedModelUsagesSearchContainer.getEnd(),
-							layoutClassedModelUsagesSearchContainer.
-								getOrderByComparator()),
-				getDisplayPagesUsageCount());
+			layoutClassedModelUsages =
+				LayoutClassedModelUsageLocalServiceUtil.
+					getLayoutClassedModelUsages(
+						_classNameId, _classPK,
+						LayoutClassedModelUsageConstants.
+							TYPE_DISPLAY_PAGE_TEMPLATE,
+						layoutClassedModelUsagesSearchContainer.getStart(),
+						layoutClassedModelUsagesSearchContainer.getEnd(),
+						orderByComparator);
+
+			layoutClassedModelUsagesCount = getDisplayPagesUsageCount();
 		}
 		else {
-			layoutClassedModelUsagesSearchContainer.setResultsAndTotal(
-				() ->
-					LayoutClassedModelUsageLocalServiceUtil.
-						getLayoutClassedModelUsages(
-							_classNameId, _classPK,
-							layoutClassedModelUsagesSearchContainer.getStart(),
-							layoutClassedModelUsagesSearchContainer.getEnd(),
-							layoutClassedModelUsagesSearchContainer.
-								getOrderByComparator()),
-				getAllUsageCount());
+			layoutClassedModelUsages =
+				LayoutClassedModelUsageLocalServiceUtil.
+					getLayoutClassedModelUsages(
+						_classNameId, _classPK,
+						layoutClassedModelUsagesSearchContainer.getStart(),
+						layoutClassedModelUsagesSearchContainer.getEnd(),
+						orderByComparator);
+
+			layoutClassedModelUsagesCount = getAllUsageCount();
 		}
+
+		layoutClassedModelUsagesSearchContainer.setResults(
+			layoutClassedModelUsages);
+		layoutClassedModelUsagesSearchContainer.setTotal(
+			layoutClassedModelUsagesCount);
 
 		_searchContainer = layoutClassedModelUsagesSearchContainer;
 
 		return _searchContainer;
 	}
 
-	public Map<String, Object> getUsagesData() {
-		return HashMapBuilder.<String, Object>put(
-			"getUsagesURL",
-			_getLayoutClassedModelUsagesURL(_className, _classPK)
-		).build();
-	}
-
 	public boolean isShowPreview(
 		LayoutClassedModelUsage layoutClassedModelUsage) {
 
-		LayoutClassedModelUsagesHelper layoutClassedModelUsagesHelper =
-			ServletContextUtil.getLayoutClassedModelUsagesHelper();
+		if (layoutClassedModelUsage.getType() ==
+				LayoutClassedModelUsageConstants.TYPE_LAYOUT) {
 
-		return layoutClassedModelUsagesHelper.isShowPreview(
-			layoutClassedModelUsage);
+			return true;
+		}
+
+		if ((layoutClassedModelUsage.getType() ==
+				LayoutClassedModelUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE) ||
+			(layoutClassedModelUsage.getType() !=
+				LayoutClassedModelUsageConstants.TYPE_PAGE_TEMPLATE)) {
+
+			return false;
+		}
+
+		long plid = layoutClassedModelUsage.getPlid();
+
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
+		if (layout.isDraftLayout()) {
+			plid = layout.getClassPK();
+		}
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			LayoutPageTemplateEntryLocalServiceUtil.
+				fetchLayoutPageTemplateEntryByPlid(plid);
+
+		if ((layoutPageTemplateEntry == null) ||
+			(layoutPageTemplateEntry.getType() ==
+				LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE)) {
+
+			return false;
+		}
+
+		return true;
 	}
 
-	private String _getLayoutClassedModelUsagesURL(
-		String className, long classPK) {
+	private String _getFragmentEntryName(FragmentEntryLink fragmentEntryLink) {
+		FragmentEntry fragmentEntry =
+			FragmentEntryLocalServiceUtil.fetchFragmentEntry(
+				fragmentEntryLink.getFragmentEntryId());
 
-		StringBundler sb = new StringBundler(6);
+		if (fragmentEntry != null) {
+			return fragmentEntry.getName();
+		}
 
-		sb.append(
-			PortalUtil.getPortalURL(
-				PortalUtil.getHttpServletRequest(_renderRequest)));
-		sb.append(_themeDisplay.getPathMain());
-		sb.append("/portal/get_layout_classed_model_usages?className=");
-		sb.append(className);
-		sb.append("&classPK=");
-		sb.append(String.valueOf(classPK));
+		String rendererKey = fragmentEntryLink.getRendererKey();
 
-		return sb.toString();
+		if (Validator.isNull(rendererKey)) {
+			return StringPool.BLANK;
+		}
+
+		Map<String, FragmentEntry> fragmentEntries =
+			_fragmentCollectionContributorTracker.getFragmentEntries(
+				_themeDisplay.getLocale());
+
+		FragmentEntry contributedFragmentEntry = fragmentEntries.get(
+			rendererKey);
+
+		if (contributedFragmentEntry != null) {
+			return contributedFragmentEntry.getName();
+		}
+
+		FragmentRenderer fragmentRenderer =
+			_fragmentRendererTracker.getFragmentRenderer(
+				fragmentEntryLink.getRendererKey());
+
+		if (fragmentRenderer != null) {
+			return fragmentRenderer.getLabel(_themeDisplay.getLocale());
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private String _getOrderByCol() {
@@ -369,16 +529,55 @@ public class LayoutClassedModelUsagesDisplayContext {
 		return _orderByType;
 	}
 
+	private int _getType(FragmentEntryLink fragmentEntryLink) {
+		FragmentEntry fragmentEntry =
+			FragmentEntryLocalServiceUtil.fetchFragmentEntry(
+				fragmentEntryLink.getFragmentEntryId());
+
+		if (fragmentEntry != null) {
+			return fragmentEntry.getType();
+		}
+
+		String rendererKey = fragmentEntryLink.getRendererKey();
+
+		if (Validator.isNull(rendererKey)) {
+			return 0;
+		}
+
+		Map<String, FragmentEntry> fragmentEntries =
+			_fragmentCollectionContributorTracker.getFragmentEntries();
+
+		FragmentEntry contributedFragmentEntry = fragmentEntries.get(
+			rendererKey);
+
+		if (contributedFragmentEntry != null) {
+			return contributedFragmentEntry.getType();
+		}
+
+		FragmentRenderer fragmentRenderer =
+			_fragmentRendererTracker.getFragmentRenderer(
+				fragmentEntryLink.getRendererKey());
+
+		if (fragmentRenderer != null) {
+			return fragmentRenderer.getType();
+		}
+
+		return 0;
+	}
+
 	private final String _className;
 	private final long _classNameId;
 	private final long _classPK;
-	private final FragmentEntryLinkHelper _fragmentEntryLinkHelper;
+	private final FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
+	private final FragmentRendererTracker _fragmentRendererTracker;
 	private String _navigation;
 	private String _orderByCol;
 	private String _orderByType;
 	private String _redirect;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
+	private final ResourceBundle _resourceBundle;
 	private SearchContainer<LayoutClassedModelUsage> _searchContainer;
 	private final ThemeDisplay _themeDisplay;
 

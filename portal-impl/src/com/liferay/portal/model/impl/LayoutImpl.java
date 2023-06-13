@@ -14,12 +14,9 @@
 
 package com.liferay.portal.model.impl;
 
-import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
 import com.liferay.portal.kernel.exception.LayoutFriendlyURLException;
 import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -45,7 +42,6 @@ import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -58,20 +54,17 @@ import com.liferay.portal.kernel.service.ThemeLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LayoutTypePortletFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
@@ -84,7 +77,6 @@ import com.liferay.portal.util.PropsValues;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -308,34 +300,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return layouts;
 	}
 
-	@Override
-	public String getBreadcrumb(Locale locale) throws PortalException {
-		List<Layout> layouts = getAncestors();
-
-		StringBundler sb = new StringBundler((4 * layouts.size()) + 5);
-
-		Group group = getGroup();
-
-		sb.append(group.getLayoutRootNodeName(isPrivateLayout(), locale));
-
-		sb.append(StringPool.SPACE);
-		sb.append(StringPool.GREATER_THAN);
-		sb.append(StringPool.SPACE);
-
-		Collections.reverse(layouts);
-
-		for (Layout layout : layouts) {
-			sb.append(HtmlUtil.escape(layout.getName(locale)));
-			sb.append(StringPool.SPACE);
-			sb.append(StringPool.GREATER_THAN);
-			sb.append(StringPool.SPACE);
-		}
-
-		sb.append(HtmlUtil.escape(getName(locale)));
-
-		return sb.toString();
-	}
-
 	/**
 	 * Returns all child layouts of the current layout, independent of user
 	 * access permissions.
@@ -442,7 +406,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -454,7 +418,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -536,23 +500,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return portlets;
 	}
 
-	@Override
-	public String getFaviconURL() {
-		if (_faviconURL != null) {
-			return _faviconURL;
-		}
-
-		String faviconURL = _getFaviconURL(getFaviconFileEntryId());
-
-		if (faviconURL != null) {
-			_faviconURL = faviconURL;
-
-			return _faviconURL;
-		}
-
-		return _faviconURL;
-	}
-
 	/**
 	 * Returns the layout's friendly URL for the given locale.
 	 *
@@ -593,7 +540,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -618,31 +565,28 @@ public class LayoutImpl extends LayoutBaseImpl {
 				layoutFriendlyURL.getFriendlyURL());
 		}
 
+		// If the site/portal default language changes, there may not exist a
+		// value for the new default language. In this situation, we will use
+		// the value from the previous default language.
+
+		Locale defaultSiteLocale = LocaleUtil.getSiteDefault();
+
+		if (Validator.isNull(friendlyURLMap.get(defaultSiteLocale))) {
+			Locale defaultLocale = LocaleUtil.fromLanguageId(
+				getDefaultLanguageId());
+
+			String defaultFriendlyURL = friendlyURLMap.get(defaultLocale);
+
+			friendlyURLMap.put(defaultSiteLocale, defaultFriendlyURL);
+		}
+
 		return friendlyURLMap;
 	}
 
 	@Override
 	public String getFriendlyURLsXML() {
-		Map<Locale, String> friendlyURLMap = getFriendlyURLMap();
-
-		if (MapUtil.isNotEmpty(friendlyURLMap) &&
-			!friendlyURLMap.containsKey(LocaleUtil.getSiteDefault())) {
-
-			String friendlyURL = friendlyURLMap.get(getDefaultLanguageId());
-
-			if (friendlyURL == null) {
-				Collection<String> values = friendlyURLMap.values();
-
-				Iterator<String> iterator = values.iterator();
-
-				friendlyURL = iterator.next();
-			}
-
-			friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
-		}
-
 		return LocalizationUtil.updateLocalization(
-			friendlyURLMap, StringPool.BLANK, "FriendlyURL",
+			getFriendlyURLMap(), StringPool.BLANK, "FriendlyURL",
 			LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
 	}
 
@@ -700,23 +644,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 
 		return htmlTitle;
-	}
-
-	@Override
-	public String getIcon() {
-		if (isTypeCollection()) {
-			return "list";
-		}
-
-		if (isTypeContent()) {
-			return "page";
-		}
-
-		if (isTypeURL() || isTypeLinkToLayout()) {
-			return "link";
-		}
-
-		return "page-template";
 	}
 
 	/**
@@ -827,7 +754,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchGroupException);
+				_log.debug(noSuchGroupException, noSuchGroupException);
 			}
 		}
 
@@ -1078,23 +1005,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return false;
 	}
 
-	@Override
-	public boolean isEmbeddedPersonalApplication() {
-		if (isTypeControlPanel()) {
-			return false;
-		}
-
-		if (isSystem() &&
-			Objects.equals(
-				getFriendlyURL(),
-				PropsUtil.get(PropsKeys.CONTROL_PANEL_LAYOUT_FRIENDLY_URL))) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	/**
 	 * Returns <code>true</code> if the current layout is the first layout in
 	 * its parent's hierarchical list of children layouts.
@@ -1237,24 +1147,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return !isPrivateLayout();
 	}
 
-	@Override
-	public boolean isPublished() {
-		if (!isTypeContent()) {
-			return true;
-		}
-
-		Layout draftLayout = fetchDraftLayout();
-
-		if ((draftLayout == null) ||
-			GetterUtil.getBoolean(
-				draftLayout.getTypeSettingsProperty("published"))) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	/**
 	 * Returns <code>true</code> if the current layout is the root layout.
 	 *
@@ -1308,15 +1200,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 				_getLayoutTypeControllerType(),
 				LayoutConstants.TYPE_ASSET_DISPLAY)) {
 
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isTypeCollection() {
-		if (Objects.equals(getType(), LayoutConstants.TYPE_COLLECTION)) {
 			return true;
 		}
 
@@ -1496,32 +1379,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 	}
 
-	private String _getFaviconURL(long faviconFileEntryId) {
-		if (faviconFileEntryId <= 0) {
-			return null;
-		}
-
-		try {
-			FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
-				faviconFileEntryId);
-
-			return HtmlUtil.escape(
-				StringBundler.concat(
-					PortalUtil.getPathContext(), "/documents/",
-					fileEntry.getRepositoryId(), StringPool.SLASH,
-					fileEntry.getFolderId(), StringPool.SLASH,
-					URLCodec.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())),
-					StringPool.SLASH, URLCodec.encodeURL(fileEntry.getUuid())));
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		return null;
-	}
-
 	private Set<String> _getLayoutPortletIds() {
 		Set<String> layoutPortletIds = new HashSet<>();
 
@@ -1592,11 +1449,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 		if (getMasterLayoutPlid() <= 0) {
 			return null;
-		}
-
-		if (getMasterLayoutPlid() == getPlid()) {
-			throw new UnsupportedOperationException(
-				"Master page cannot point to itself");
 		}
 
 		_masterLayout = LayoutLocalServiceUtil.fetchLayout(
@@ -1697,7 +1549,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 		String url = PortalUtil.getLayoutURL(this, themeDisplay);
 
-		if (!CookiesManagerUtil.hasSessionId(httpServletRequest) &&
+		if (!CookieKeys.hasSessionId(httpServletRequest) &&
 			(url.startsWith(PortalUtil.getPortalURL(httpServletRequest)) ||
 			 url.startsWith(StringPool.SLASH))) {
 
@@ -1711,12 +1563,12 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 
 		if (PropsValues.LAYOUT_DEFAULT_P_L_RESET && !resetRenderParameters) {
-			url = HttpComponentsUtil.addParameter(url, "p_l_reset", 0);
+			url = HttpUtil.addParameter(url, "p_l_reset", 0);
 		}
 		else if (!PropsValues.LAYOUT_DEFAULT_P_L_RESET &&
 				 resetRenderParameters) {
 
-			url = HttpComponentsUtil.addParameter(url, "p_l_reset", 1);
+			url = HttpUtil.addParameter(url, "p_l_reset", 1);
 		}
 
 		return url;
@@ -1730,7 +1582,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 		_initFriendlyURLKeywords();
 	}
 
-	private String _faviconURL;
 	private LayoutSet _layoutSet;
 	private transient LayoutType _layoutType;
 	private Layout _masterLayout;

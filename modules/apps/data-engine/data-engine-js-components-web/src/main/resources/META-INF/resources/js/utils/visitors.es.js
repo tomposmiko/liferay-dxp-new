@@ -83,24 +83,31 @@ class PagesVisitor {
 		this._pages = [...pages];
 	}
 
-	visitFields(evaluateField) {
-		const evaluateNode = (node) => {
-			if (!node) {
-				return false;
+	visitFields(fn) {
+		const isFieldNode = (node) =>
+			Object.prototype.hasOwnProperty.call(node, 'fieldName');
+
+		const getChildren = (node) => {
+			if (isFieldNode(node)) {
+				return node.nestedFields || [];
 			}
 
-			if (node.fieldName) {
-				return evaluateField(node) || evaluateNode(node.nestedFields);
-			}
-
-			if (Array.isArray(node)) {
-				return node.some((item) => evaluateNode(item));
-			}
-
-			return evaluateNode(node.fields ?? node.rows ?? node.columns);
+			return node.fields || node.rows || node.columns || [];
 		};
 
-		return evaluateNode(this._pages);
+		const collection = [...this._pages];
+
+		while (collection.length) {
+			const node = collection.shift();
+
+			if (isFieldNode(node) && fn(node)) {
+				return true;
+			}
+
+			collection.unshift(...getChildren(node));
+		}
+
+		return false;
 	}
 
 	_map(pageMapper, rowMapper, columnMapper, fieldFn) {

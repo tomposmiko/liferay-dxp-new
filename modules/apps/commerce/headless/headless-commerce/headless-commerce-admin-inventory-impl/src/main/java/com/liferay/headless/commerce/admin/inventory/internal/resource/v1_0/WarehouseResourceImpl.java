@@ -20,27 +20,25 @@ import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseItemServ
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseService;
 import com.liferay.headless.commerce.admin.inventory.dto.v1_0.Warehouse;
 import com.liferay.headless.commerce.admin.inventory.dto.v1_0.WarehouseItem;
+import com.liferay.headless.commerce.admin.inventory.internal.dto.v1_0.WarehouseDTOConverter;
 import com.liferay.headless.commerce.admin.inventory.internal.odata.entity.v1_0.WarehouseEntityModel;
 import com.liferay.headless.commerce.admin.inventory.resource.v1_0.WarehouseResource;
-import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.odata.entity.EntityModel;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
-import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.util.Collections;
-import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -53,13 +51,15 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/warehouse.properties",
 	scope = ServiceScope.PROTOTYPE, service = WarehouseResource.class
 )
-public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
+public class WarehouseResourceImpl
+	extends BaseWarehouseResourceImpl implements EntityModelResource {
 
 	@Override
-	public void deleteWarehouseByExternalReferenceCode(
+	public Response deleteWarehousByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception {
 
@@ -75,11 +75,19 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 
 		_commerceInventoryWarehouseService.deleteCommerceInventoryWarehouse(
 			commerceInventoryWarehouse.getCommerceInventoryWarehouseId());
+
+		Response.ResponseBuilder responseBuilder = Response.ok();
+
+		return responseBuilder.build();
 	}
 
 	@Override
-	public void deleteWarehouseId(Long id) throws Exception {
+	public Response deleteWarehousId(Long id) throws Exception {
 		_commerceInventoryWarehouseService.deleteCommerceInventoryWarehouse(id);
+
+		Response.ResponseBuilder responseBuilder = Response.ok();
+
+		return responseBuilder.build();
 	}
 
 	@Override
@@ -90,7 +98,7 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 	}
 
 	@Override
-	public Warehouse getWarehouseByExternalReferenceCode(
+	public Warehouse getWarehousByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception {
 
@@ -104,12 +112,10 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 					externalReferenceCode);
 		}
 
-		return _toWarehouse(commerceInventoryWarehouse);
-	}
-
-	@Override
-	public Warehouse getWarehouseId(Long id) throws Exception {
-		return _toWarehouse(GetterUtil.getLong(id));
+		return _warehouseDTOConverter.toDTO(
+			new DefaultDTOConverterContext(
+				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
+				contextAcceptLanguage.getPreferredLocale()));
 	}
 
 	@Override
@@ -124,8 +130,15 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 			pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
-			searchContext -> searchContext.setCompanyId(
-				contextCompany.getCompanyId()),
+			new UnsafeConsumer() {
+
+				public void accept(Object object) throws Exception {
+					SearchContext searchContext = (SearchContext)object;
+
+					searchContext.setCompanyId(contextCompany.getCompanyId());
+				}
+
+			},
 			sorts,
 			document -> _toWarehouse(
 				_commerceInventoryWarehouseService.
@@ -135,7 +148,15 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 	}
 
 	@Override
-	public Response patchWarehouseByExternalReferenceCode(
+	public Warehouse getWarehousId(Long id) throws Exception {
+		return _warehouseDTOConverter.toDTO(
+			new DefaultDTOConverterContext(
+				GetterUtil.getLong(id),
+				contextAcceptLanguage.getPreferredLocale()));
+	}
+
+	@Override
+	public Response patchWarehousByExternalReferenceCode(
 			String externalReferenceCode, Warehouse warehouse)
 		throws Exception {
 
@@ -157,7 +178,7 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 	}
 
 	@Override
-	public Response patchWarehouseId(Long id, Warehouse warehouse)
+	public Response patchWarehousId(Long id, Warehouse warehouse)
 		throws Exception {
 
 		_updateWarehouse(
@@ -171,7 +192,7 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 	}
 
 	@Override
-	public Warehouse postWarehouse(Warehouse warehouse) throws Exception {
+	public Warehouse postWarehous(Warehouse warehouse) throws Exception {
 		CommerceInventoryWarehouse commerceInventoryWarehouse =
 			_commerceInventoryWarehouseService.fetchByExternalReferenceCode(
 				warehouse.getExternalReferenceCode(),
@@ -182,9 +203,7 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 				_commerceInventoryWarehouseService.
 					addCommerceInventoryWarehouse(
 						warehouse.getExternalReferenceCode(),
-						LanguageUtils.getLocalizedMap(warehouse.getName()),
-						LanguageUtils.getLocalizedMap(
-							warehouse.getDescription()),
+						warehouse.getName(), warehouse.getDescription(),
 						GetterUtil.get(warehouse.getActive(), true),
 						warehouse.getStreet1(), warehouse.getStreet2(),
 						warehouse.getStreet3(), warehouse.getCity(),
@@ -203,42 +222,10 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 
 		_updateNestedResources(warehouse, commerceInventoryWarehouse);
 
-		return _toWarehouse(commerceInventoryWarehouse);
-	}
-
-	private Map<String, Map<String, String>> _getActions(
-			CommerceInventoryWarehouse commerceInventoryWarehouse)
-		throws Exception {
-
-		return HashMapBuilder.<String, Map<String, String>>put(
-			"delete",
-			addAction(
-				"DELETE",
+		return _warehouseDTOConverter.toDTO(
+			new DefaultDTOConverterContext(
 				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				"deleteWarehouseId",
-				_commerceInventoryWarehouseModelResourcePermission)
-		).put(
-			"get",
-			addAction(
-				"VIEW",
-				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				"getWarehousesPage",
-				_commerceInventoryWarehouseModelResourcePermission)
-		).put(
-			"permissions",
-			addAction(
-				"PERMISSIONS",
-				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				"patchWarehouseId",
-				_commerceInventoryWarehouseModelResourcePermission)
-		).put(
-			"update",
-			addAction(
-				"UPDATE",
-				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				"patchWarehouseId",
-				_commerceInventoryWarehouseModelResourcePermission)
-		).build();
+				contextAcceptLanguage.getPreferredLocale()));
 	}
 
 	private Warehouse _toWarehouse(
@@ -247,19 +234,8 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 
 		return _warehouseDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
-				contextAcceptLanguage.isAcceptAllLanguages(),
-				_getActions(commerceInventoryWarehouse), _dtoConverterRegistry,
 				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
-				contextUser));
-	}
-
-	private Warehouse _toWarehouse(long commerceInventoryWarehouseId)
-		throws Exception {
-
-		return _toWarehouse(
-			_commerceInventoryWarehouseService.getCommerceInventoryWarehouse(
-				commerceInventoryWarehouseId));
+				contextAcceptLanguage.getPreferredLocale()));
 	}
 
 	private void _updateNestedResources(
@@ -288,8 +264,11 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 		commerceInventoryWarehouse =
 			_commerceInventoryWarehouseService.updateCommerceInventoryWarehouse(
 				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				LanguageUtils.getLocalizedMap(warehouse.getName()),
-				LanguageUtils.getLocalizedMap(warehouse.getDescription()),
+				GetterUtil.get(
+					warehouse.getName(), commerceInventoryWarehouse.getName()),
+				GetterUtil.get(
+					warehouse.getDescription(),
+					commerceInventoryWarehouse.getDescription()),
 				GetterUtil.get(
 					warehouse.getActive(),
 					commerceInventoryWarehouse.isActive()),
@@ -318,7 +297,9 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 				GetterUtil.get(
 					warehouse.getLongitude(),
 					commerceInventoryWarehouse.getLongitude()),
-				commerceInventoryWarehouse.getMvccVersion(),
+				GetterUtil.get(
+					warehouse.getMvccVersion(),
+					commerceInventoryWarehouse.getMvccVersion()),
 				_serviceContextHelper.getServiceContext());
 
 		// Update nested resources
@@ -334,26 +315,14 @@ public class WarehouseResourceImpl extends BaseWarehouseResourceImpl {
 	private CommerceInventoryWarehouseItemService
 		_commerceInventoryWarehouseItemService;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.inventory.model.CommerceInventoryWarehouse)"
-	)
-	private ModelResourcePermission<CommerceInventoryWarehouse>
-		_commerceInventoryWarehouseModelResourcePermission;
-
 	@Reference
 	private CommerceInventoryWarehouseService
 		_commerceInventoryWarehouseService;
 
 	@Reference
-	private DTOConverterRegistry _dtoConverterRegistry;
-
-	@Reference
 	private ServiceContextHelper _serviceContextHelper;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.inventory.internal.dto.v1_0.WarehouseDTOConverter)"
-	)
-	private DTOConverter<CommerceInventoryWarehouse, Warehouse>
-		_warehouseDTOConverter;
+	@Reference
+	private WarehouseDTOConverter _warehouseDTOConverter;
 
 }

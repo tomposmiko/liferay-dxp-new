@@ -50,11 +50,11 @@ public class EditContactInformationDisplayContext {
 
 		if (_primaryKey > 0) {
 			_sheetTitle = LanguageUtil.get(
-				httpServletRequest, "edit-" + contactInfoTypeName);
+				_httpServletRequest, "edit-" + contactInfoTypeName);
 		}
 		else {
 			_sheetTitle = LanguageUtil.get(
-				httpServletRequest, "add-" + contactInfoTypeName);
+				_httpServletRequest, "add-" + contactInfoTypeName);
 		}
 	}
 

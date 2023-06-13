@@ -35,6 +35,7 @@ import com.liferay.subscription.model.SubscriptionModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -241,105 +242,111 @@ public class SubscriptionModelImpl
 	public Map<String, Function<Subscription, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<Subscription, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, Subscription>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<Subscription, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Subscription.class.getClassLoader(), Subscription.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<Subscription, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<Subscription, Object>>();
+		try {
+			Constructor<Subscription> constructor =
+				(Constructor<Subscription>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", Subscription::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", Subscription::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"subscriptionId", Subscription::getSubscriptionId);
-			attributeGetterFunctions.put("groupId", Subscription::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", Subscription::getCompanyId);
-			attributeGetterFunctions.put("userId", Subscription::getUserId);
-			attributeGetterFunctions.put("userName", Subscription::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", Subscription::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", Subscription::getModifiedDate);
-			attributeGetterFunctions.put(
-				"classNameId", Subscription::getClassNameId);
-			attributeGetterFunctions.put("classPK", Subscription::getClassPK);
-			attributeGetterFunctions.put(
-				"frequency", Subscription::getFrequency);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<Subscription, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<Subscription, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<Subscription, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<Subscription, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Subscription, Object>>();
+		Map<String, BiConsumer<Subscription, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<Subscription, ?>>();
 
-		static {
-			Map<String, BiConsumer<Subscription, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<Subscription, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", Subscription::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<Subscription, Long>)Subscription::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", Subscription::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<Subscription, Long>)Subscription::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"subscriptionId", Subscription::getSubscriptionId);
+		attributeSetterBiConsumers.put(
+			"subscriptionId",
+			(BiConsumer<Subscription, Long>)Subscription::setSubscriptionId);
+		attributeGetterFunctions.put("groupId", Subscription::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<Subscription, Long>)Subscription::setGroupId);
+		attributeGetterFunctions.put("companyId", Subscription::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<Subscription, Long>)Subscription::setCompanyId);
+		attributeGetterFunctions.put("userId", Subscription::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<Subscription, Long>)Subscription::setUserId);
+		attributeGetterFunctions.put("userName", Subscription::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<Subscription, String>)Subscription::setUserName);
+		attributeGetterFunctions.put("createDate", Subscription::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<Subscription, Date>)Subscription::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", Subscription::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<Subscription, Date>)Subscription::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", Subscription::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<Subscription, Long>)Subscription::setClassNameId);
+		attributeGetterFunctions.put("classPK", Subscription::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<Subscription, Long>)Subscription::setClassPK);
+		attributeGetterFunctions.put("frequency", Subscription::getFrequency);
+		attributeSetterBiConsumers.put(
+			"frequency",
+			(BiConsumer<Subscription, String>)Subscription::setFrequency);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<Subscription, Long>)Subscription::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<Subscription, Long>)
-					Subscription::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"subscriptionId",
-				(BiConsumer<Subscription, Long>)
-					Subscription::setSubscriptionId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<Subscription, Long>)Subscription::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<Subscription, Long>)Subscription::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<Subscription, Long>)Subscription::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<Subscription, String>)Subscription::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<Subscription, Date>)Subscription::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<Subscription, Date>)Subscription::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<Subscription, Long>)Subscription::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<Subscription, Long>)Subscription::setClassPK);
-			attributeSetterBiConsumers.put(
-				"frequency",
-				(BiConsumer<Subscription, String>)Subscription::setFrequency);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -890,12 +897,41 @@ public class SubscriptionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<Subscription, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<Subscription, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<Subscription, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((Subscription)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Subscription>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Subscription.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -914,9 +950,8 @@ public class SubscriptionModelImpl
 	private String _frequency;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<Subscription, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<Subscription, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

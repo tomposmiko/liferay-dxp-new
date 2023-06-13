@@ -22,24 +22,17 @@ import com.liferay.commerce.account.exception.NoSuchAccountGroupCommerceAccountR
 import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRel;
 import com.liferay.commerce.account.model.impl.CommerceAccountGroupCommerceAccountRelImpl;
 import com.liferay.commerce.account.service.base.CommerceAccountGroupCommerceAccountRelLocalServiceBaseImpl;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRel",
-	service = AopService.class
-)
 public class CommerceAccountGroupCommerceAccountRelLocalServiceImpl
 	extends CommerceAccountGroupCommerceAccountRelLocalServiceBaseImpl {
 
@@ -166,18 +159,6 @@ public class CommerceAccountGroupCommerceAccountRelLocalServiceImpl
 	}
 
 	@Override
-	public List<CommerceAccountGroupCommerceAccountRel>
-		getCommerceAccountGroupCommerceAccountRelsByCommerceAccountId(
-			long commerceAccountId, int start, int end) {
-
-		return TransformUtil.transform(
-			_accountGroupRelLocalService.getAccountGroupRels(
-				AccountEntry.class.getName(), commerceAccountId, start, end,
-				null),
-			CommerceAccountGroupCommerceAccountRelImpl::fromAccountGroupRel);
-	}
-
-	@Override
 	public int getCommerceAccountGroupCommerceAccountRelsCount(
 		long commerceAccountGroupId) {
 
@@ -187,16 +168,7 @@ public class CommerceAccountGroupCommerceAccountRelLocalServiceImpl
 					commerceAccountGroupId);
 	}
 
-	@Override
-	public int
-		getCommerceAccountGroupCommerceAccountRelsCountByCommerceAccountId(
-			long commerceAccountId) {
-
-		return _accountGroupRelLocalService.getAccountGroupRelsCount(
-			AccountEntry.class.getName(), commerceAccountId);
-	}
-
-	@Reference
+	@ServiceReference(type = AccountGroupRelLocalService.class)
 	private AccountGroupRelLocalService _accountGroupRelLocalService;
 
 }

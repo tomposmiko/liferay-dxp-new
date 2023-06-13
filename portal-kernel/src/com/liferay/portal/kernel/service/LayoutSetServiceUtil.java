@@ -48,14 +48,6 @@ public class LayoutSetServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static void updateFaviconFileEntryId(
-			long groupId, boolean privateLayout, long faviconFileEntryId)
-		throws PortalException {
-
-		getService().updateFaviconFileEntryId(
-			groupId, privateLayout, faviconFileEntryId);
-	}
-
 	/**
 	 * Updates the state of the layout set prototype link.
 	 *

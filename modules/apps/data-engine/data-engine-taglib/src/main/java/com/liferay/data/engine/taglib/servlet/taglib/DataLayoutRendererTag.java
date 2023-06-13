@@ -55,10 +55,6 @@ public class DataLayoutRendererTag extends BaseDataLayoutRendererTag {
 
 			dataLayoutRendererContext.setContainerId(getContainerId());
 
-			if (Validator.isNotNull(getContentType())) {
-				dataLayoutRendererContext.setContentType(getContentType());
-			}
-
 			HttpServletRequest httpServletRequest = getRequest();
 
 			if (Validator.isNotNull(getDataRecordId())) {
@@ -117,7 +113,7 @@ public class DataLayoutRendererTag extends BaseDataLayoutRendererTag {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

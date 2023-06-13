@@ -17,87 +17,75 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.checkbox;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Marcellus Tavares
  */
+@RunWith(PowerMockRunner.class)
 public class CheckboxDDMFormFieldValueRequestParameterRetrieverTest {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		_setUpJSONFactoryUtil();
+	@Before
+	public void setUp() throws Exception {
+		setUpJSONFactoryUtil();
 	}
 
 	@Test
 	public void testGetRequestParameterValueFalse() {
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
+		MockHttpServletRequest request = new MockHttpServletRequest();
 
 		String expectedParameterValue = StringPool.FALSE;
 
-		mockHttpServletRequest.addParameter(
-			"ddmFormFieldCheckbox", expectedParameterValue);
+		request.addParameter("ddmFormFieldCheckbox", expectedParameterValue);
 
 		String defaultParameterValue = StringPool.TRUE;
 
 		String actualParameterValue =
 			_checkboxDDMFormFieldValueRequestParameterRetriever.get(
-				mockHttpServletRequest, "ddmFormFieldCheckbox",
-				defaultParameterValue);
+				request, "ddmFormFieldCheckbox", defaultParameterValue);
 
 		Assert.assertEquals(expectedParameterValue, actualParameterValue);
 	}
 
 	@Test
 	public void testGetRequestParameterValueTrue() {
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
+		MockHttpServletRequest request = new MockHttpServletRequest();
 
 		String expectedParameterValue = StringPool.TRUE;
 
-		mockHttpServletRequest.addParameter(
-			"ddmFormFieldCheckbox", expectedParameterValue);
+		request.addParameter("ddmFormFieldCheckbox", expectedParameterValue);
 
 		String defaultParameterValue = StringPool.FALSE;
 
 		String actualParameterValue =
 			_checkboxDDMFormFieldValueRequestParameterRetriever.get(
-				mockHttpServletRequest, "ddmFormFieldCheckbox",
-				defaultParameterValue);
+				request, "ddmFormFieldCheckbox", defaultParameterValue);
 
 		Assert.assertEquals(expectedParameterValue, actualParameterValue);
 	}
 
 	@Test
 	public void testGetValueWithNullRequestParameter() {
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
+		MockHttpServletRequest request = new MockHttpServletRequest();
 
 		String defaultParameterValue = StringPool.TRUE;
 
 		String parameterValue =
 			_checkboxDDMFormFieldValueRequestParameterRetriever.get(
-				mockHttpServletRequest, "ddmFormFieldCheckbox",
-				defaultParameterValue);
+				request, "ddmFormFieldCheckbox", defaultParameterValue);
 
 		Assert.assertEquals(parameterValue, defaultParameterValue);
 	}
 
-	private static void _setUpJSONFactoryUtil() {
+	protected void setUpJSONFactoryUtil() {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());

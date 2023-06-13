@@ -30,9 +30,7 @@
 	<td>//h4[@class='no-results-title']</td>
 	<td></td>
 </tr>
-
 <!-- Individuals Interest -->
-
 <tr>
 	<td>INTEREST_CONTRIBUTING_PAGE</td>
 	<td>//td[@class='name-cell-root' and contains(.,'${key_interestTopic}')]//following-sibling::td[contains(.,'${key_interestContributingPage}')]</td>
@@ -43,9 +41,7 @@
 	<td>//tbody//tr[${resultOrder}]//a[contains(@class,'text-truncate') and text()='${key_interestTopic}']</td>
 	<td></td>
 </tr>
-
 <!-- Interest -->
-
 <tr>
 	<td>INTEREST_TOPIC</td>
 	<td>//tr[contains(.,'${key_interestTopic}')]/td[@class='name-cell-root']//a</td>
@@ -76,9 +72,7 @@
 	<td>//a[contains(@class,'button-root') and contains(.,'View All Interests')]</td>
 	<td></td>
 </tr>
-
 <!-- Interest Details -->
-
 <tr>
 	<td>INTEREST_HEADER</td>
 	<td>//h5[contains(.,'Interest')]/span[contains(@class,'interest-name') and contains(.,'${key_interestTopic}')]</td>

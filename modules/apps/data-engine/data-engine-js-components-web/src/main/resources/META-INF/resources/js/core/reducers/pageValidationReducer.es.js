@@ -20,7 +20,7 @@ import {EVENT_TYPES} from '../actions/eventTypes.es';
  * NOTE: This is a literal copy of the old LayoutProvider logic. Small changes
  * were made only to adapt to the reducer.
  */
-export default function pageValidationReducer(state, action) {
+export default (state, action) => {
 	switch (action.type) {
 		case EVENT_TYPES.PAGE.VALIDATION_FAILED: {
 			const {newPages, pageIndex} = action.payload;
@@ -45,8 +45,7 @@ export default function pageValidationReducer(state, action) {
 						field.errorMessage !== undefined &&
 						field.errorMessage !== '' &&
 						!field.valid &&
-						(firstInvalidFieldLabel === null ||
-							firstInvalidFieldLabel === undefined)
+						firstInvalidFieldLabel == null
 					) {
 						firstInvalidFieldLabel = field.label;
 						firstInvalidFieldInput = document.querySelector(
@@ -94,4 +93,4 @@ export default function pageValidationReducer(state, action) {
 		default:
 			return state;
 	}
-}
+};

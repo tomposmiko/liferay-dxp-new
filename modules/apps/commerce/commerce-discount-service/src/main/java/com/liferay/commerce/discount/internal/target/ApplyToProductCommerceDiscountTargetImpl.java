@@ -21,8 +21,7 @@ import com.liferay.commerce.discount.service.CommerceDiscountRelLocalService;
 import com.liferay.commerce.discount.target.CommerceDiscountProductTarget;
 import com.liferay.commerce.discount.target.CommerceDiscountTarget;
 import com.liferay.commerce.product.model.CPDefinition;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
@@ -31,8 +30,11 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.discount.target.key=" + CommerceDiscountConstants.TARGET_PRODUCTS,
 		"commerce.discount.target.order:Integer=20"
@@ -57,13 +60,20 @@ public class ApplyToProductCommerceDiscountTargetImpl
 	public void contributeDocument(
 		Document document, CommerceDiscount commerceDiscount) {
 
+		List<CommerceDiscountRel> commerceDiscountRels =
+			_commerceDiscountRelLocalService.getCommerceDiscountRels(
+				commerceDiscount.getCommerceDiscountId(),
+				CPDefinition.class.getName());
+
+		Stream<CommerceDiscountRel> stream = commerceDiscountRels.stream();
+
+		LongStream longStream = stream.mapToLong(
+			CommerceDiscountRel::getClassPK);
+
+		long[] cpDefinitionIds = longStream.toArray();
+
 		document.addKeyword(
-			"commerce_discount_target_cp_definition_ids",
-			TransformUtil.transformToLongArray(
-				_commerceDiscountRelLocalService.getCommerceDiscountRels(
-					commerceDiscount.getCommerceDiscountId(),
-					CPDefinition.class.getName()),
-				CommerceDiscountRel::getClassPK));
+			"commerce_discount_target_cp_definition_ids", cpDefinitionIds);
 	}
 
 	@Override
@@ -76,7 +86,7 @@ public class ApplyToProductCommerceDiscountTargetImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "products");
+		return LanguageUtil.get(resourceBundle, "products");
 	}
 
 	@Override
@@ -109,8 +119,5 @@ public class ApplyToProductCommerceDiscountTargetImpl
 
 	@Reference
 	private CommerceDiscountRelLocalService _commerceDiscountRelLocalService;
-
-	@Reference
-	private Language _language;
 
 }

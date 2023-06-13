@@ -239,8 +239,4 @@ public interface RatingsStatsModel
 	@Override
 	public RatingsStats cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

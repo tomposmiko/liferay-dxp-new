@@ -28,7 +28,6 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -39,7 +38,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.util.List;
 import java.util.Map;
@@ -68,7 +66,7 @@ public class FragmentEntryLinkStagedModelDataHandlerTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_layout = LayoutTestUtil.addTypeContentLayout(stagingGroup);
+		LayoutTestUtil.addLayout(stagingGroup);
 	}
 
 	@Test
@@ -96,8 +94,7 @@ public class FragmentEntryLinkStagedModelDataHandlerTest
 			"css", "html", "js", fragmentEntryLink.getConfiguration(),
 			fragmentEntryLink.getEditableValues(),
 			fragmentEntryLink.getNamespace(),
-			fragmentEntryLink.getPosition() + 1, fragmentEntryLink.getType(),
-			serviceContext);
+			fragmentEntryLink.getPosition() + 1, serviceContext);
 
 		try {
 			exportImportStagedModel(stagedModel);
@@ -118,17 +115,16 @@ public class FragmentEntryLinkStagedModelDataHandlerTest
 	public void testStageFragmentEntryLinkWithNoFragmentEntry()
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				stagingGroup.getGroupId(), TestPropsValues.getUserId());
+
 		StagedModel stagedModel =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), stagingGroup.getGroupId(), 0, 0,
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(_layout.getPlid()),
+				TestPropsValues.getUserId(), stagingGroup.getGroupId(), 0, 0, 0,
 				stagingGroup.getDefaultPublicPlid(), StringPool.BLANK, "html",
 				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-				StringPool.BLANK, 0, StringPool.BLANK,
-				FragmentConstants.TYPE_COMPONENT,
-				ServiceContextTestUtil.getServiceContext(
-					stagingGroup.getGroupId(), TestPropsValues.getUserId()));
+				StringPool.BLANK, 0, StringPool.BLANK, serviceContext);
 
 		try {
 			exportImportStagedModel(stagedModel);
@@ -198,19 +194,16 @@ public class FragmentEntryLinkStagedModelDataHandlerTest
 				fragmentCollection.getFragmentCollectionId(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), false, configuration, null, 0,
-				FragmentConstants.TYPE_COMPONENT, null,
+				RandomTestUtil.randomString(), configuration, 0,
+				FragmentConstants.TYPE_COMPONENT,
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 		return _fragmentEntryLinkLocalService.addFragmentEntryLink(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(), 0,
-			fragmentEntry.getFragmentEntryId(),
-			_segmentsExperienceLocalService.fetchDefaultSegmentsExperienceId(
-				_layout.getPlid()),
-			group.getDefaultPublicPlid(), fragmentEntry.getCss(),
-			fragmentEntry.getHtml(), fragmentEntry.getJs(),
-			fragmentEntry.getConfiguration(), StringPool.BLANK,
-			StringPool.BLANK, 1, StringPool.BLANK, fragmentEntry.getType(),
+			fragmentEntry.getFragmentEntryId(), 0, group.getDefaultPublicPlid(),
+			fragmentEntry.getCss(), fragmentEntry.getHtml(),
+			fragmentEntry.getJs(), fragmentEntry.getConfiguration(),
+			StringPool.BLANK, StringPool.BLANK, 1, StringPool.BLANK,
 			serviceContext);
 	}
 
@@ -265,10 +258,5 @@ public class FragmentEntryLinkStagedModelDataHandlerTest
 
 	@Inject
 	private FragmentEntryLocalService _fragmentEntryLocalService;
-
-	private Layout _layout;
-
-	@Inject
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 }

@@ -53,15 +53,14 @@ public class DLFolderSearchFixture {
 		throws Exception {
 
 		DLFolder dlFolder = dlFolderLocalService.addFolder(
-			null, user.getUserId(), group.getGroupId(), group.getGroupId(),
-			false, DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, keywords,
-			keywords, false, serviceContext);
+			user.getUserId(), group.getGroupId(), group.getGroupId(), false,
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, keywords, keywords,
+			false, serviceContext);
 
 		dlFileEntryLocalService.addFileEntry(
 			null, user.getUserId(), group.getGroupId(), group.getGroupId(),
 			dlFolder.getFolderId(), RandomTestUtil.randomString(), null,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			keywords, StringPool.BLANK,
+			RandomTestUtil.randomString(), keywords, StringPool.BLANK,
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT, null,
 			null, new ByteArrayInputStream(content.getBytes()), 0, null, null,
 			serviceContext);
@@ -77,7 +76,7 @@ public class DLFolderSearchFixture {
 		throws Exception {
 
 		Folder folder = dlAppLocalService.addFolder(
-			null, serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 			parentFolderId, name, description, serviceContext);
 
 		DLFolder dlFolder = (DLFolder)folder.getModel();

@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class TestEntityLocalServiceWrapper
 	implements ServiceWrapper<TestEntityLocalService>, TestEntityLocalService {
 
-	public TestEntityLocalServiceWrapper() {
-		this(null);
-	}
-
 	public TestEntityLocalServiceWrapper(
 		TestEntityLocalService testEntityLocalService) {
 

@@ -14,23 +14,29 @@
 
 package com.liferay.change.tracking.web.internal.portlet.action;
 
-import com.liferay.change.tracking.configuration.CTSettingsConfiguration;
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.change.tracking.exception.CTStagingEnabledException;
-import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
+import com.liferay.change.tracking.model.CTCollection;
+import com.liferay.change.tracking.model.CTPreferences;
+import com.liferay.change.tracking.service.CTCollectionLocalService;
+import com.liferay.change.tracking.service.CTPreferencesLocalService;
+import com.liferay.change.tracking.service.CTPreferencesService;
+import com.liferay.change.tracking.web.internal.scheduler.PublishScheduler;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.PortletPermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.util.PropsValues;
+
+import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -39,11 +45,15 @@ import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"mvc.command.name=/change_tracking/update_global_publications_configuration"
@@ -65,47 +75,24 @@ public class UpdateGlobalPublicationsConfigurationMVCActionCommand
 			actionRequest, CTPortletKeys.PUBLICATIONS,
 			PortletRequest.RENDER_PHASE);
 
-		long companyId = themeDisplay.getCompanyId();
+		boolean enablePublications = ParamUtil.getBoolean(
+			actionRequest, "enablePublications");
 
-		CTSettingsConfiguration ctSettingsConfiguration =
-			_ctSettingsConfigurationHelper.getCTSettingsConfiguration(
-				companyId);
+		CTPreferences ctPreferences =
+			_ctPreferencesLocalService.fetchCTPreferences(
+				themeDisplay.getCompanyId(), 0);
 
-		if (ctSettingsConfiguration.enabled()) {
+		if ((ctPreferences != null) || !enablePublications) {
 			redirectURL.setParameter(
 				"mvcRenderCommandName", "/change_tracking/view_settings");
 		}
 
-		boolean enablePublications = ParamUtil.getBoolean(
-			actionRequest, "enablePublications",
-			ctSettingsConfiguration.enabled());
-		boolean enableSandboxOnly = ParamUtil.getBoolean(
-			actionRequest, "enableSandboxOnly",
-			ctSettingsConfiguration.sandboxEnabled());
-		boolean enableUnapprovedChanges = ParamUtil.getBoolean(
-			actionRequest, "enableUnapprovedChanges",
-			ctSettingsConfiguration.unapprovedChangesAllowed());
-
 		try {
-			_portletPermission.check(
-				themeDisplay.getPermissionChecker(), CTPortletKeys.PUBLICATIONS,
-				ActionKeys.CONFIGURATION);
-
-			_ctSettingsConfigurationHelper.save(
-				companyId,
-				ctSettingsConfiguration.defaultCTCollectionTemplateId(),
-				ctSettingsConfiguration.defaultSandboxCTCollectionTemplateId(),
-				enablePublications, enableSandboxOnly, enableUnapprovedChanges);
+			_ctPreferencesService.enablePublications(
+				themeDisplay.getCompanyId(), enablePublications);
 		}
-		catch (ConfigurationException configurationException) {
-			Throwable throwable = configurationException.getCause();
-
-			if (throwable.getCause() instanceof CTStagingEnabledException) {
-				SessionErrors.add(actionRequest, "stagingEnabled");
-			}
-			else {
-				SessionErrors.add(actionRequest, throwable.getClass());
-			}
+		catch (CTStagingEnabledException ctStagingEnabledException) {
+			SessionErrors.add(actionRequest, "stagingEnabled");
 
 			redirectURL.setParameter(
 				"mvcRenderCommandName", "/change_tracking/view_settings");
@@ -115,10 +102,23 @@ public class UpdateGlobalPublicationsConfigurationMVCActionCommand
 			return;
 		}
 
+		if (!enablePublications && PropsValues.SCHEDULER_ENABLED) {
+			List<CTCollection> ctCollections =
+				_ctCollectionLocalService.getCTCollections(
+					themeDisplay.getCompanyId(),
+					WorkflowConstants.STATUS_SCHEDULED, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null);
+
+			for (CTCollection ctCollection : ctCollections) {
+				_publishScheduler.unschedulePublish(
+					ctCollection.getCtCollectionId());
+			}
+		}
+
 		hideDefaultSuccessMessage(actionRequest);
 
 		SessionMessages.add(
-			actionRequest, "requestProcessed",
+			_portal.getHttpServletRequest(actionRequest), "requestProcessed",
 			_language.get(
 				themeDisplay.getLocale(), "the-configuration-has-been-saved"));
 
@@ -126,7 +126,13 @@ public class UpdateGlobalPublicationsConfigurationMVCActionCommand
 	}
 
 	@Reference
-	private CTSettingsConfigurationHelper _ctSettingsConfigurationHelper;
+	private CTCollectionLocalService _ctCollectionLocalService;
+
+	@Reference
+	private CTPreferencesLocalService _ctPreferencesLocalService;
+
+	@Reference
+	private CTPreferencesService _ctPreferencesService;
 
 	@Reference
 	private Language _language;
@@ -134,7 +140,11 @@ public class UpdateGlobalPublicationsConfigurationMVCActionCommand
 	@Reference
 	private Portal _portal;
 
-	@Reference
-	private PortletPermission _portletPermission;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile PublishScheduler _publishScheduler;
 
 }

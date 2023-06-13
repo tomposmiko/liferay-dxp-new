@@ -17,14 +17,14 @@ package com.liferay.content.dashboard.web.internal.model;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author David Arques
@@ -45,9 +45,13 @@ public class AssetVocabularyMetric {
 
 		_key = key;
 		_name = name;
-		_assetCategoryMetrics =
-			(assetCategoryMetrics == null) ? Collections.emptyList() :
-				Collections.unmodifiableList(assetCategoryMetrics);
+		_assetCategoryMetrics = Optional.ofNullable(
+			assetCategoryMetrics
+		).map(
+			Collections::unmodifiableList
+		).orElse(
+			Collections.emptyList()
+		);
 	}
 
 	@Override
@@ -92,21 +96,21 @@ public class AssetVocabularyMetric {
 			return Collections.emptyList();
 		}
 
-		for (AssetCategoryMetric assetCategoryMetric : _assetCategoryMetrics) {
-			AssetVocabularyMetric assetVocabularyMetric =
-				assetCategoryMetric.getAssetVocabularyMetric();
+		Stream<AssetCategoryMetric> stream = _assetCategoryMetrics.stream();
 
-			if (ListUtil.isEmpty(
-					assetVocabularyMetric.getAssetCategoryMetrics())) {
-
-				continue;
-			}
-
-			return Collections.unmodifiableList(
-				Arrays.asList(_name, assetVocabularyMetric.getName()));
-		}
-
-		return Collections.singletonList(_name);
+		return stream.map(
+			AssetCategoryMetric::getAssetVocabularyMetric
+		).filter(
+			assetVocabularyMetric -> ListUtil.isNotEmpty(
+				assetVocabularyMetric.getAssetCategoryMetrics())
+		).findFirst(
+		).map(
+			AssetVocabularyMetric::getName
+		).map(
+			name -> Collections.unmodifiableList(Arrays.asList(_name, name))
+		).orElse(
+			Collections.unmodifiableList(Collections.singletonList(_name))
+		);
 	}
 
 	@Override
@@ -115,19 +119,18 @@ public class AssetVocabularyMetric {
 	}
 
 	public JSONArray toJSONArray() {
-		return JSONUtil.toJSONArray(
-			_assetCategoryMetrics,
-			assetCategoryMetric -> assetCategoryMetric.toJSONObject(_name),
-			_log);
+		Stream<AssetCategoryMetric> stream = _assetCategoryMetrics.stream();
+
+		return JSONUtil.putAll(
+			stream.map(
+				assetCategoryMetric -> assetCategoryMetric.toJSONObject(_name)
+			).toArray());
 	}
 
 	private static final AssetVocabularyMetric _EMPTY =
 		new AssetVocabularyMetric(StringPool.BLANK, StringPool.BLANK);
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetVocabularyMetric.class.getName());
-
-	private final List<AssetCategoryMetric> _assetCategoryMetrics;
+	private List<AssetCategoryMetric> _assetCategoryMetrics;
 	private final String _key;
 	private final String _name;
 

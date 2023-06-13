@@ -46,11 +46,13 @@ public class CommercePriceEntryTestUtil {
 			CommercePriceListLocalServiceUtil.getCommercePriceList(
 				commercePriceListId);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				commercePriceList.getGroupId());
+
 		return CommercePriceEntryLocalServiceUtil.addCommercePriceEntry(
 			externalReferenceCode, cpProductId, cpInstanceUuid,
-			commercePriceListId, price, BigDecimal.ZERO,
-			ServiceContextTestUtil.getServiceContext(
-				commercePriceList.getGroupId()));
+			commercePriceListId, price, BigDecimal.ZERO, serviceContext);
 	}
 
 	public static CommercePriceEntry addCommercePriceEntry(
@@ -69,7 +71,7 @@ public class CommercePriceEntryTestUtil {
 			ServiceContextTestUtil.getServiceContext(
 				commercePriceList.getGroupId());
 
-		User user = UserLocalServiceUtil.getGuestUser(
+		User user = UserLocalServiceUtil.getDefaultUser(
 			serviceContext.getCompanyId());
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(user.getTimeZone());
@@ -102,10 +104,13 @@ public class CommercePriceEntryTestUtil {
 		CommercePriceList commercePriceList =
 			commercePriceEntry.getCommercePriceList();
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				commercePriceList.getGroupId());
+
 		return CommerceTierPriceEntryLocalServiceUtil.addCommerceTierPriceEntry(
 			commercePriceEntryId, price, null, bulkPricing, minQuantity,
-			ServiceContextTestUtil.getServiceContext(
-				commercePriceList.getGroupId()));
+			serviceContext);
 	}
 
 	public static CommerceTierPriceEntry addCommerceTierPriceEntry(
@@ -127,7 +132,7 @@ public class CommercePriceEntryTestUtil {
 			ServiceContextTestUtil.getServiceContext(
 				commercePriceList.getGroupId());
 
-		User user = UserLocalServiceUtil.getGuestUser(
+		User user = UserLocalServiceUtil.getDefaultUser(
 			serviceContext.getCompanyId());
 
 		Calendar calendar = CalendarFactoryUtil.getCalendar(user.getTimeZone());

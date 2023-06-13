@@ -15,7 +15,7 @@
 package com.liferay.dynamic.data.mapping.data.provider.web.internal.exportimport.staged.model.repository;
 
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProvider;
-import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRegistry;
+import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderTracker;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeResponse;
@@ -28,7 +28,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
-import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryHelper;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -43,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Dylan Rebelak
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance",
 	service = StagedModelRepository.class
 )
@@ -65,10 +65,10 @@ public class DDMDataProviderInstanceStagedModelRepository
 			serviceContext.setUuid(dataProviderInstance.getUuid());
 		}
 
-		DDMForm ddmForm = _getDataProviderSettingsDDMForm(
+		DDMForm ddmForm = getDataProviderSettingsDDMForm(
 			dataProviderInstance.getType());
 
-		DDMFormValues ddmFormValues = _deserialize(
+		DDMFormValues ddmFormValues = deserialize(
 			dataProviderInstance.getDefinition(), ddmForm);
 
 		return _ddmDataProviderInstanceLocalService.addDataProviderInstance(
@@ -110,13 +110,6 @@ public class DDMDataProviderInstanceStagedModelRepository
 	}
 
 	@Override
-	public DDMDataProviderInstance fetchMissingReference(
-		String uuid, long groupId) {
-
-		return _stagedModelRepositoryHelper.fetchMissingReference(
-			uuid, groupId, this);
-	}
-
 	public DDMDataProviderInstance fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
@@ -179,10 +172,10 @@ public class DDMDataProviderInstanceStagedModelRepository
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			dataProviderInstance);
 
-		DDMForm ddmForm = _getDataProviderSettingsDDMForm(
+		DDMForm ddmForm = getDataProviderSettingsDDMForm(
 			dataProviderInstance.getType());
 
-		DDMFormValues ddmFormValues = _deserialize(
+		DDMFormValues ddmFormValues = deserialize(
 			dataProviderInstance.getDefinition(), ddmForm);
 
 		return _ddmDataProviderInstanceLocalService.updateDataProviderInstance(
@@ -192,7 +185,7 @@ public class DDMDataProviderInstanceStagedModelRepository
 			serviceContext);
 	}
 
-	private DDMFormValues _deserialize(String content, DDMForm ddmForm) {
+	protected DDMFormValues deserialize(String content, DDMForm ddmForm) {
 		DDMFormValuesDeserializerDeserializeRequest.Builder builder =
 			DDMFormValuesDeserializerDeserializeRequest.Builder.newBuilder(
 				content, ddmForm);
@@ -204,9 +197,9 @@ public class DDMDataProviderInstanceStagedModelRepository
 		return ddmFormValuesDeserializerDeserializeResponse.getDDMFormValues();
 	}
 
-	private DDMForm _getDataProviderSettingsDDMForm(String type) {
+	protected DDMForm getDataProviderSettingsDDMForm(String type) {
 		DDMDataProvider ddmDataProvider =
-			_ddmDataProviderRegistry.getDDMDataProvider(type);
+			_ddmDataProviderTracker.getDDMDataProvider(type);
 
 		if (ddmDataProvider == null) {
 			throw new IllegalStateException(
@@ -221,12 +214,9 @@ public class DDMDataProviderInstanceStagedModelRepository
 		_ddmDataProviderInstanceLocalService;
 
 	@Reference
-	private DDMDataProviderRegistry _ddmDataProviderRegistry;
+	private DDMDataProviderTracker _ddmDataProviderTracker;
 
 	@Reference(target = "(ddm.form.values.deserializer.type=json)")
 	private DDMFormValuesDeserializer _jsonDDMFormValuesDeserializer;
-
-	@Reference
-	private StagedModelRepositoryHelper _stagedModelRepositoryHelper;
 
 }

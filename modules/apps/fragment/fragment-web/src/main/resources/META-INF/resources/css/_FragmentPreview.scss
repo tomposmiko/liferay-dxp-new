@@ -1,7 +1,12 @@
+@import 'atlas-variables';
+
+@import 'variables';
+
 .fragment-preview {
 	background-color: $editorBackgroundColor;
 	border-bottom: solid $editorBorderWidth $editorBorderColor;
 	border-right: solid $editorBorderWidth $editorBorderColor;
+	box-sizing: border-box;
 	height: $editorHeight;
 	min-height: $editorMinHeight;
 	position: relative;
@@ -10,6 +15,7 @@
 	@include media-breakpoint-up(sm) {
 		float: left;
 		height: 50%;
+		text-align: center;
 		width: 50%;
 	}
 
@@ -55,6 +61,7 @@
 	&__toolbar {
 		background-color: $toolbarBackgroundColor;
 		border-bottom: solid $toolbarBorderWidth $toolbarBorderColor;
+		box-sizing: border-box;
 		height: $toolbarHeight;
 		justify-content: center;
 		margin: 0 auto;

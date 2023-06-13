@@ -19,7 +19,7 @@ import com.liferay.akismet.service.AkismetEntryLocalService;
 import com.liferay.akismet.service.AkismetEntryLocalServiceUtil;
 import com.liferay.akismet.service.persistence.AkismetEntryPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
-import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
@@ -32,18 +32,19 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
-import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
+import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -52,9 +53,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the base implementation for the akismet entry local service.
@@ -69,7 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 public abstract class AkismetEntryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements AkismetEntryLocalService, AopService, IdentifiableOSGiService {
+	implements AkismetEntryLocalService, IdentifiableOSGiService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -320,11 +318,6 @@ public abstract class AkismetEntryLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement AkismetEntryLocalServiceImpl#deleteAkismetEntry(AkismetEntry) to avoid orphaned data");
-		}
-
 		return akismetEntryLocalService.deleteAkismetEntry(
 			(AkismetEntry)persistedModel);
 	}
@@ -386,24 +379,187 @@ public abstract class AkismetEntryLocalServiceBaseImpl
 		return akismetEntryPersistence.update(akismetEntry);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_setLocalServiceUtilService(null);
+	/**
+	 * Returns the akismet entry local service.
+	 *
+	 * @return the akismet entry local service
+	 */
+	public AkismetEntryLocalService getAkismetEntryLocalService() {
+		return akismetEntryLocalService;
 	}
 
-	@Override
-	public Class<?>[] getAopInterfaces() {
-		return new Class<?>[] {
-			AkismetEntryLocalService.class, IdentifiableOSGiService.class,
-			PersistedModelLocalService.class
-		};
+	/**
+	 * Sets the akismet entry local service.
+	 *
+	 * @param akismetEntryLocalService the akismet entry local service
+	 */
+	public void setAkismetEntryLocalService(
+		AkismetEntryLocalService akismetEntryLocalService) {
+
+		this.akismetEntryLocalService = akismetEntryLocalService;
 	}
 
-	@Override
-	public void setAopProxy(Object aopProxy) {
-		akismetEntryLocalService = (AkismetEntryLocalService)aopProxy;
+	/**
+	 * Returns the akismet entry persistence.
+	 *
+	 * @return the akismet entry persistence
+	 */
+	public AkismetEntryPersistence getAkismetEntryPersistence() {
+		return akismetEntryPersistence;
+	}
+
+	/**
+	 * Sets the akismet entry persistence.
+	 *
+	 * @param akismetEntryPersistence the akismet entry persistence
+	 */
+	public void setAkismetEntryPersistence(
+		AkismetEntryPersistence akismetEntryPersistence) {
+
+		this.akismetEntryPersistence = akismetEntryPersistence;
+	}
+
+	/**
+	 * Returns the counter local service.
+	 *
+	 * @return the counter local service
+	 */
+	public com.liferay.counter.kernel.service.CounterLocalService
+		getCounterLocalService() {
+
+		return counterLocalService;
+	}
+
+	/**
+	 * Sets the counter local service.
+	 *
+	 * @param counterLocalService the counter local service
+	 */
+	public void setCounterLocalService(
+		com.liferay.counter.kernel.service.CounterLocalService
+			counterLocalService) {
+
+		this.counterLocalService = counterLocalService;
+	}
+
+	/**
+	 * Returns the class name local service.
+	 *
+	 * @return the class name local service
+	 */
+	public com.liferay.portal.kernel.service.ClassNameLocalService
+		getClassNameLocalService() {
+
+		return classNameLocalService;
+	}
+
+	/**
+	 * Sets the class name local service.
+	 *
+	 * @param classNameLocalService the class name local service
+	 */
+	public void setClassNameLocalService(
+		com.liferay.portal.kernel.service.ClassNameLocalService
+			classNameLocalService) {
+
+		this.classNameLocalService = classNameLocalService;
+	}
+
+	/**
+	 * Returns the class name persistence.
+	 *
+	 * @return the class name persistence
+	 */
+	public ClassNamePersistence getClassNamePersistence() {
+		return classNamePersistence;
+	}
+
+	/**
+	 * Sets the class name persistence.
+	 *
+	 * @param classNamePersistence the class name persistence
+	 */
+	public void setClassNamePersistence(
+		ClassNamePersistence classNamePersistence) {
+
+		this.classNamePersistence = classNamePersistence;
+	}
+
+	/**
+	 * Returns the resource local service.
+	 *
+	 * @return the resource local service
+	 */
+	public com.liferay.portal.kernel.service.ResourceLocalService
+		getResourceLocalService() {
+
+		return resourceLocalService;
+	}
+
+	/**
+	 * Sets the resource local service.
+	 *
+	 * @param resourceLocalService the resource local service
+	 */
+	public void setResourceLocalService(
+		com.liferay.portal.kernel.service.ResourceLocalService
+			resourceLocalService) {
+
+		this.resourceLocalService = resourceLocalService;
+	}
+
+	/**
+	 * Returns the user local service.
+	 *
+	 * @return the user local service
+	 */
+	public com.liferay.portal.kernel.service.UserLocalService
+		getUserLocalService() {
+
+		return userLocalService;
+	}
+
+	/**
+	 * Sets the user local service.
+	 *
+	 * @param userLocalService the user local service
+	 */
+	public void setUserLocalService(
+		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+
+		this.userLocalService = userLocalService;
+	}
+
+	/**
+	 * Returns the user persistence.
+	 *
+	 * @return the user persistence
+	 */
+	public UserPersistence getUserPersistence() {
+		return userPersistence;
+	}
+
+	/**
+	 * Sets the user persistence.
+	 *
+	 * @param userPersistence the user persistence
+	 */
+	public void setUserPersistence(UserPersistence userPersistence) {
+		this.userPersistence = userPersistence;
+	}
+
+	public void afterPropertiesSet() {
+		persistedModelLocalServiceRegistry.register(
+			"com.liferay.akismet.model.AkismetEntry", akismetEntryLocalService);
 
 		_setLocalServiceUtilService(akismetEntryLocalService);
+	}
+
+	public void destroy() {
+		persistedModelLocalServiceRegistry.unregister(
+			"com.liferay.akismet.model.AkismetEntry");
+
+		_setLocalServiceUtilService(null);
 	}
 
 	/**
@@ -464,16 +620,44 @@ public abstract class AkismetEntryLocalServiceBaseImpl
 		}
 	}
 
+	@BeanReference(type = AkismetEntryLocalService.class)
 	protected AkismetEntryLocalService akismetEntryLocalService;
 
-	@Reference
+	@BeanReference(type = AkismetEntryPersistence.class)
 	protected AkismetEntryPersistence akismetEntryPersistence;
 
-	@Reference
+	@ServiceReference(
+		type = com.liferay.counter.kernel.service.CounterLocalService.class
+	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AkismetEntryLocalServiceBaseImpl.class);
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ClassNameLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@ServiceReference(type = ClassNamePersistence.class)
+	protected ClassNamePersistence classNamePersistence;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.ResourceLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@ServiceReference(
+		type = com.liferay.portal.kernel.service.UserLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
+
+	@ServiceReference(type = UserPersistence.class)
+	protected UserPersistence userPersistence;
+
+	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
+	protected PersistedModelLocalServiceRegistry
+		persistedModelLocalServiceRegistry;
 
 }

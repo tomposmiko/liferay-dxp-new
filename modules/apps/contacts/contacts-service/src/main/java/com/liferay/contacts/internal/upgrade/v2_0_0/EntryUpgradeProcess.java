@@ -33,10 +33,10 @@ public class EntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateEntries();
+		updateEntries();
 	}
 
-	private void _updateEntries() throws Exception {
+	protected void updateEntries() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement = connection.prepareStatement(
 				"select companyId, emailAddress, entryId from Contacts_Entry");

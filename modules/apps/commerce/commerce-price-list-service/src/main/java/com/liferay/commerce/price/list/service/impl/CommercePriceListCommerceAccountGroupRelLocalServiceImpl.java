@@ -14,34 +14,25 @@
 
 package com.liferay.commerce.price.list.service.impl;
 
-import com.liferay.commerce.price.list.exception.DuplicateCommercePriceListCommerceAccountGroupRelException;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.model.CommercePriceListCommerceAccountGroupRel;
 import com.liferay.commerce.price.list.service.base.CommercePriceListCommerceAccountGroupRelLocalServiceBaseImpl;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.price.list.model.CommercePriceListCommerceAccountGroupRel",
-	service = AopService.class
-)
 public class CommercePriceListCommerceAccountGroupRelLocalServiceImpl
 	extends CommercePriceListCommerceAccountGroupRelLocalServiceBaseImpl {
 
@@ -53,31 +44,23 @@ public class CommercePriceListCommerceAccountGroupRelLocalServiceImpl
 				ServiceContext serviceContext)
 		throws PortalException {
 
+		User user = userLocalService.getUser(userId);
+
+		long commercePriceListCommerceAccountGroupRelId =
+			counterLocalService.increment();
+
 		CommercePriceListCommerceAccountGroupRel
 			commercePriceListCommerceAccountGroupRel =
-				commercePriceListCommerceAccountGroupRelPersistence.
-					fetchByCAGI_CPI(
-						commercePriceListId, commerceAccountGroupId);
-
-		if (commercePriceListCommerceAccountGroupRel != null) {
-			throw new DuplicateCommercePriceListCommerceAccountGroupRelException();
-		}
-
-		commercePriceListCommerceAccountGroupRel =
-			commercePriceListCommerceAccountGroupRelPersistence.create(
-				counterLocalService.increment());
+				commercePriceListCommerceAccountGroupRelPersistence.create(
+					commercePriceListCommerceAccountGroupRelId);
 
 		commercePriceListCommerceAccountGroupRel.setUuid(
 			serviceContext.getUuid());
-
-		User user = _userLocalService.getUser(userId);
-
 		commercePriceListCommerceAccountGroupRel.setCompanyId(
 			user.getCompanyId());
 		commercePriceListCommerceAccountGroupRel.setUserId(user.getUserId());
 		commercePriceListCommerceAccountGroupRel.setUserName(
 			user.getFullName());
-
 		commercePriceListCommerceAccountGroupRel.setCommercePriceListId(
 			commercePriceListId);
 		commercePriceListCommerceAccountGroupRel.setCommerceAccountGroupId(
@@ -90,7 +73,10 @@ public class CommercePriceListCommerceAccountGroupRelLocalServiceImpl
 			commercePriceListCommerceAccountGroupRelPersistence.update(
 				commercePriceListCommerceAccountGroupRel);
 
-		_reindexPriceList(commercePriceListId);
+		reindexPriceList(commercePriceListId);
+
+		commercePriceListLocalService.cleanPriceListCache(
+			serviceContext.getCompanyId());
 
 		return commercePriceListCommerceAccountGroupRel;
 	}
@@ -118,8 +104,11 @@ public class CommercePriceListCommerceAccountGroupRelLocalServiceImpl
 			commercePriceListCommerceAccountGroupRel.
 				getCommercePriceListCommerceAccountGroupRelId());
 
-		_reindexPriceList(
+		reindexPriceList(
 			commercePriceListCommerceAccountGroupRel.getCommercePriceListId());
+
+		commercePriceListLocalService.cleanPriceListCache(
+			commercePriceListCommerceAccountGroupRel.getCompanyId());
 
 		return commercePriceListCommerceAccountGroupRel;
 	}
@@ -234,14 +223,19 @@ public class CommercePriceListCommerceAccountGroupRelLocalServiceImpl
 
 		// Commerce price list
 
-		_reindexPriceList(
+		reindexPriceList(
 			commercePriceListCommerceAccountGroupRel.getCommercePriceListId());
+
+		// Cache
+
+		commercePriceListLocalService.cleanPriceListCache(
+			serviceContext.getScopeGroupId());
 
 		return commercePriceListCommerceAccountGroupRelPersistence.update(
 			commercePriceListCommerceAccountGroupRel);
 	}
 
-	private void _reindexPriceList(long commercePriceListId)
+	protected void reindexPriceList(long commercePriceListId)
 		throws PortalException {
 
 		Indexer<CommercePriceList> indexer =
@@ -250,10 +244,7 @@ public class CommercePriceListCommerceAccountGroupRelLocalServiceImpl
 		indexer.reindex(CommercePriceList.class.getName(), commercePriceListId);
 	}
 
-	@Reference
+	@ServiceReference(type = ExpandoRowLocalService.class)
 	private ExpandoRowLocalService _expandoRowLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

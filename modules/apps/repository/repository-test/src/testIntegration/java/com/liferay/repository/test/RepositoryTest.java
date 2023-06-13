@@ -120,7 +120,7 @@ public class RepositoryTest {
 		repositoryIds[0] = repository.getRepositoryId();
 
 		DLFolder dlFolder = DLFolderServiceUtil.addFolder(
-			null, _group.getGroupId(), _group.getGroupId(), false,
+			_group.getGroupId(), _group.getGroupId(), false,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			new ServiceContext());
@@ -154,8 +154,7 @@ public class RepositoryTest {
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString(), ContentTypes.APPLICATION_OCTET_STREAM,
 			StringUtil.randomString(), StringUtil.randomString(),
-			StringUtil.randomString(), StringUtil.randomString(), new byte[0],
-			null, null,
+			StringUtil.randomString(), new byte[0], null, null,
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		DLFileShortcutLocalServiceUtil.addFileShortcut(
@@ -372,24 +371,22 @@ public class RepositoryTest {
 			null, TestPropsValues.getUserId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK, inputStream,
-			_TEST_CONTENT.length(), null, null, new ServiceContext());
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
+			inputStream, _TEST_CONTENT.length(), null, null,
+			new ServiceContext());
 
 		Folder folder = localRepository.addFolder(
-			null, TestPropsValues.getUserId(),
+			TestPropsValues.getUserId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			new ServiceContext());
 
-		inputStream = new UnsyncByteArrayInputStream(_TEST_CONTENT.getBytes());
-
 		FileEntry folderFileEntry = localRepository.addFileEntry(
 			null, TestPropsValues.getUserId(), folder.getFolderId(),
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK, inputStream,
-			_TEST_CONTENT.length(), null, null, new ServiceContext());
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
+			inputStream, _TEST_CONTENT.length(), null, null,
+			new ServiceContext());
 
 		return new long[] {
 			fileEntry.getFileEntryId(), folder.getFolderId(),

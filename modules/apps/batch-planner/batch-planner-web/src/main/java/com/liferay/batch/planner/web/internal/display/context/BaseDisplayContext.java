@@ -44,14 +44,14 @@ public abstract class BaseDisplayContext {
 
 	public List<NavigationItem> getNavigationItems() {
 		String tabs1 = ParamUtil.getString(
-			renderRequest, "tabs1", "batch-planner-plans");
+			renderRequest, "tabs1", "batch-planner-logs");
 
 		return NavigationItemListBuilder.add(
 			navigationItem -> {
-				navigationItem.setActive(tabs1.equals("batch-planner-plans"));
+				navigationItem.setActive(tabs1.equals("batch-planner-logs"));
 				navigationItem.setHref(
 					renderResponse.createRenderURL(), "tabs1",
-					"batch-planner-plans");
+					"batch-planner-logs");
 				navigationItem.setLabel(
 					LanguageUtil.get(
 						PortalUtil.getHttpServletRequest(renderRequest),
@@ -59,12 +59,11 @@ public abstract class BaseDisplayContext {
 			}
 		).add(
 			navigationItem -> {
-				navigationItem.setActive(
-					tabs1.equals("batch-planner-plan-templates"));
+				navigationItem.setActive(tabs1.equals("batch-planner-plans"));
 				navigationItem.setHref(
 					renderResponse.createRenderURL(), "tabs1",
-					"batch-planner-plan-templates", "mvcRenderCommandName",
-					"/batch_planner/view_batch_planner_plan_templates");
+					"batch-planner-plans", "mvcRenderCommandName",
+					"/batch_planner/view_batch_planner_plans");
 				navigationItem.setLabel(
 					LanguageUtil.get(
 						PortalUtil.getHttpServletRequest(renderRequest),

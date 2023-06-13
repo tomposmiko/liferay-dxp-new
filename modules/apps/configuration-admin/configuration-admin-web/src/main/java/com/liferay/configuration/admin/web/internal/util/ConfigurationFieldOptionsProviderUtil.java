@@ -33,12 +33,16 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class ConfigurationFieldOptionsProviderUtil {
 
 	public static ConfigurationFieldOptionsProvider
 		getConfigurationFieldOptionsProvider(
 			String configurationPid, String fieldName) {
+
+		if (_serviceTrackerMap == null) {
+			return null;
+		}
 
 		return _serviceTrackerMap.getService(
 			_getKey(configurationPid, fieldName));
@@ -69,7 +73,7 @@ public class ConfigurationFieldOptionsProviderUtil {
 	}
 
 	@Deactivate
-	protected void deactivate() {
+	protected synchronized void deactivate() {
 		_serviceTrackerMap.close();
 	}
 
@@ -98,7 +102,7 @@ public class ConfigurationFieldOptionsProviderUtil {
 		return Arrays.asList((String)propertyValue);
 	}
 
-	private static ServiceTrackerMap<String, ConfigurationFieldOptionsProvider>
-		_serviceTrackerMap;
+	private static volatile ServiceTrackerMap
+		<String, ConfigurationFieldOptionsProvider> _serviceTrackerMap;
 
 }

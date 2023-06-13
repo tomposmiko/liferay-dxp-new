@@ -40,7 +40,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -99,89 +99,93 @@ public class AMImageProcessorTest {
 				amImageConfigurationEntry.getUUID());
 		}
 
-		FileEntry fileEntry = _addNonimageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-			_amImageFinder.getAdaptiveMedias(
+		FileEntry fileEntry = _addNonimageFileEntry(serviceContext);
+
+		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
+			_amImageFinder.getAdaptiveMediaStream(
 				amImageQueryBuilder -> amImageQueryBuilder.forFileEntry(
 					fileEntry
 				).done());
 
-		Assert.assertEquals(
-			adaptiveMedias.toString(), 0, adaptiveMedias.size());
+		Assert.assertEquals(0, adaptiveMediaStream.count());
 	}
 
 	@Test
 	public void testAddingFileEntryWithImageCreatesMedia() throws Exception {
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-			_amImageFinder.getAdaptiveMedias(
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
+
+		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
+			_amImageFinder.getAdaptiveMediaStream(
 				amImageQueryBuilder -> amImageQueryBuilder.forFileEntry(
 					fileEntry
 				).done());
 
-		Assert.assertEquals(
-			adaptiveMedias.toString(), _getVariantsCount(),
-			adaptiveMedias.size());
+		Assert.assertEquals(_getVariantsCount(), adaptiveMediaStream.count());
 	}
 
 	@Test
 	public void testAddingFileEntryWithNoImageCreatesNoMedia()
 		throws Exception {
 
-		FileEntry fileEntry = _addNonimageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
 
-		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-			_amImageFinder.getAdaptiveMedias(
+		FileEntry fileEntry = _addNonimageFileEntry(serviceContext);
+
+		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
+			_amImageFinder.getAdaptiveMediaStream(
 				amImageQueryBuilder -> amImageQueryBuilder.forFileEntry(
 					fileEntry
 				).done());
 
-		Assert.assertEquals(
-			adaptiveMedias.toString(), 0, adaptiveMedias.size());
+		Assert.assertEquals(0, adaptiveMediaStream.count());
 	}
 
 	@Test
 	public void testCleaningFileEntryWithImageRemovesMedia() throws Exception {
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
+
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
 
 		_amImageProcessor.cleanUp(fileEntry.getLatestFileVersion(true));
 
-		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-			_amImageFinder.getAdaptiveMedias(
+		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
+			_amImageFinder.getAdaptiveMediaStream(
 				amImageQueryBuilder -> amImageQueryBuilder.forFileEntry(
 					fileEntry
 				).done());
 
-		Assert.assertEquals(
-			adaptiveMedias.toString(), 0, adaptiveMedias.size());
+		Assert.assertEquals(0, adaptiveMediaStream.count());
 	}
 
 	@Test
 	public void testCleaningFileEntryWithNoImageDoesNothing() throws Exception {
-		FileEntry fileEntry = _addNonimageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
+
+		FileEntry fileEntry = _addNonimageFileEntry(serviceContext);
 
 		_amImageProcessor.cleanUp(fileEntry.getLatestFileVersion(true));
 
-		List<AdaptiveMedia<AMImageProcessor>> adaptiveMedias =
-			_amImageFinder.getAdaptiveMedias(
+		Stream<AdaptiveMedia<AMImageProcessor>> adaptiveMediaStream =
+			_amImageFinder.getAdaptiveMediaStream(
 				amImageQueryBuilder -> amImageQueryBuilder.forFileEntry(
 					fileEntry
 				).done());
 
-		Assert.assertEquals(
-			adaptiveMedias.toString(), 0, adaptiveMedias.size());
+		Assert.assertEquals(0, adaptiveMediaStream.count());
 	}
 
 	private FileEntry _addImageFileEntry(ServiceContext serviceContext)

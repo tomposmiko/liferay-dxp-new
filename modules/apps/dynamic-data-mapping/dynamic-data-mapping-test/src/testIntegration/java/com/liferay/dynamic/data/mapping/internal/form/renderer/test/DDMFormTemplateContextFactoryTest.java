@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,7 +63,7 @@ public class DDMFormTemplateContextFactoryTest {
 	public void setUp() throws Exception {
 		_httpServletRequest = new MockHttpServletRequest();
 
-		_setUpThemeDisplay();
+		setUpThemeDisplay();
 
 		_originalSiteDefaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
 		_originalThemeDisplayDefaultLocale =
@@ -169,24 +170,6 @@ public class DDMFormTemplateContextFactoryTest {
 			).build();
 
 		Assert.assertTrue((boolean)ddmFormTemplateContext.get("readOnly"));
-	}
-
-	@Test
-	public void testShowPartialResultsToRespondents() throws Exception {
-		Map<String, Object> ddmFormTemplateContext =
-			DDMFormTemplateContext.Builder.newBuilder(
-				_ddmFormTemplateContextFactory
-			).withHttpServletRequest(
-				_httpServletRequest
-			).withLocale(
-				LocaleUtil.US
-			).withProperty(
-				"showPartialResultsToRespondents", true
-			).build();
-
-		Assert.assertTrue(
-			(boolean)ddmFormTemplateContext.get(
-				"showPartialResultsToRespondents"));
 	}
 
 	@Test
@@ -383,9 +366,7 @@ public class DDMFormTemplateContextFactoryTest {
 		_assertValidations(
 			actualValidationsMap, "date",
 			HashMapBuilder.put(
-				"dateRange",
-				"futureDates({name}, \"{parameter}\") AND pastDates({name}, " +
-					"\"{parameter}\")"
+				"dateRange", "dateRange({name}, \"{parameter}\")"
 			).put(
 				"futureDates", "futureDates({name}, \"{parameter}\")"
 			).put(
@@ -441,6 +422,16 @@ public class DDMFormTemplateContextFactoryTest {
 		Assert.assertTrue((boolean)ddmFormTemplateContext.get("viewMode"));
 	}
 
+	protected void setUpThemeDisplay() throws Exception {
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		themeDisplay.setPathContext("/my/path/context/");
+		themeDisplay.setPathThemeImages("/my/theme/images/");
+		themeDisplay.setUser(TestPropsValues.getUser());
+
+		_httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
+	}
+
 	private void _assertValidations(
 		HashMap<String, Object> actualValidationsMap, String dataType,
 		HashMap<String, String> expectedValidationsMap) {
@@ -452,34 +443,27 @@ public class DDMFormTemplateContextFactoryTest {
 			Arrays.toString(actualValidations), expectedValidationsMap.size(),
 			actualValidations.length);
 
-		for (Object actualValidation : actualValidations) {
-			HashMap<String, Object> actualValidationMap =
-				(HashMap<String, Object>)actualValidation;
+		Stream.of(
+			actualValidations
+		).map(
+			HashMap.class::cast
+		).forEach(
+			actualValidation -> {
+				Assert.assertTrue(actualValidation.containsKey("label"));
+				Assert.assertTrue(actualValidation.containsKey("name"));
+				Assert.assertTrue(
+					actualValidation.containsKey("parameterMessage"));
+				Assert.assertTrue(actualValidation.containsKey("template"));
 
-			Assert.assertTrue(actualValidationMap.containsKey("label"));
-			Assert.assertTrue(actualValidationMap.containsKey("name"));
-			Assert.assertTrue(
-				actualValidationMap.containsKey("parameterMessage"));
-			Assert.assertTrue(actualValidationMap.containsKey("template"));
-
-			Assert.assertEquals(
-				expectedValidationsMap.remove(actualValidationMap.get("name")),
-				actualValidationMap.get("template"));
-		}
+				Assert.assertEquals(
+					expectedValidationsMap.remove(actualValidation.get("name")),
+					actualValidation.get("template"));
+			}
+		);
 
 		Assert.assertEquals(
 			expectedValidationsMap.toString(), 0,
 			expectedValidationsMap.size());
-	}
-
-	private void _setUpThemeDisplay() throws Exception {
-		ThemeDisplay themeDisplay = new ThemeDisplay();
-
-		themeDisplay.setPathContext("/my/path/context/");
-		themeDisplay.setPathThemeImages("/my/theme/images/");
-		themeDisplay.setUser(TestPropsValues.getUser());
-
-		_httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 	}
 
 	@Inject

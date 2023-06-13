@@ -20,7 +20,6 @@ import com.liferay.document.library.content.model.DLContentTable;
 import com.liferay.document.library.content.model.impl.DLContentImpl;
 import com.liferay.document.library.content.model.impl.DLContentModelImpl;
 import com.liferay.document.library.content.service.persistence.DLContentPersistence;
-import com.liferay.document.library.content.service.persistence.DLContentUtil;
 import com.liferay.document.library.content.service.persistence.impl.constants.DLPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -36,6 +35,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -48,7 +48,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -79,7 +78,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DLContentPersistence.class)
+@Component(service = {DLContentPersistence.class, BasePersistence.class})
 public class DLContentPersistenceImpl
 	extends BasePersistenceImpl<DLContent> implements DLContentPersistence {
 
@@ -207,7 +206,7 @@ public class DLContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DLContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLContent dlContent : list) {
@@ -604,7 +603,7 @@ public class DLContentPersistenceImpl
 
 			finderArgs = new Object[] {companyId, repositoryId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -769,7 +768,7 @@ public class DLContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DLContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLContent dlContent : list) {
@@ -1215,7 +1214,7 @@ public class DLContentPersistenceImpl
 
 			finderArgs = new Object[] {companyId, repositoryId, path};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1390,7 +1389,7 @@ public class DLContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DLContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLContent dlContent : list) {
@@ -1841,7 +1840,7 @@ public class DLContentPersistenceImpl
 
 			finderArgs = new Object[] {companyId, repositoryId, path};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2009,7 +2008,7 @@ public class DLContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_R_P_V, finderArgs, this);
+				_finderPathFetchByC_R_P_V, finderArgs);
 		}
 
 		if (result instanceof DLContent) {
@@ -2159,7 +2158,7 @@ public class DLContentPersistenceImpl
 
 			finderArgs = new Object[] {companyId, repositoryId, path, version};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2602,7 +2601,7 @@ public class DLContentPersistenceImpl
 	 */
 	@Override
 	public DLContent fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(DLContent.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(DLContent.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -2817,7 +2816,7 @@ public class DLContentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DLContent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2893,7 +2892,7 @@ public class DLContentPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3101,30 +3100,11 @@ public class DLContentPersistenceImpl
 			},
 			new String[] {"companyId", "repositoryId", "path_", "version"},
 			false);
-
-		_setDLContentUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDLContentUtilPersistence(null);
-
 		entityCache.removeCache(DLContentImpl.class.getName());
-	}
-
-	private void _setDLContentUtilPersistence(
-		DLContentPersistence dlContentPersistence) {
-
-		try {
-			Field field = DLContentUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, dlContentPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3192,5 +3172,8 @@ public class DLContentPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private DLContentModelArgumentsResolver _dlContentModelArgumentsResolver;
 
 }

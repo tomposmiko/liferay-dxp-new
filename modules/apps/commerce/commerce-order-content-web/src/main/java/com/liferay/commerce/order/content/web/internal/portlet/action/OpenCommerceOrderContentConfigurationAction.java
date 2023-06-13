@@ -17,13 +17,8 @@ package com.liferay.commerce.order.content.web.internal.portlet.action;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.model.CommerceOrder;
-import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.content.web.internal.display.context.CommerceOrderContentDisplayContext;
-import com.liferay.commerce.order.engine.CommerceOrderEngine;
-import com.liferay.commerce.order.importer.type.CommerceOrderImporterTypeRegistry;
-import com.liferay.commerce.order.status.CommerceOrderStatusRegistry;
-import com.liferay.commerce.payment.method.CommercePaymentMethodRegistry;
-import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelLocalService;
+import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelService;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
@@ -32,12 +27,8 @@ import com.liferay.commerce.service.CommerceOrderNoteService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.commerce.service.CommerceShipmentItemService;
-import com.liferay.commerce.term.service.CommerceTermEntryService;
-import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -46,6 +37,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "javax.portlet.name=" + CommercePortletKeys.COMMERCE_OPEN_ORDER_CONTENT,
 	service = ConfigurationAction.class
 )
@@ -78,16 +71,11 @@ public class OpenCommerceOrderContentConfigurationAction
 				commerceOrderContentDisplayContext =
 					new CommerceOrderContentDisplayContext(
 						_commerceAddressService, _commerceChannelLocalService,
-						_commerceOrderEngine, _commerceOrderHttpHelper,
-						_commerceOrderImporterTypeRegistry,
 						_commerceOrderNoteService,
 						_commerceOrderPriceCalculation, _commerceOrderService,
-						_commerceOrderStatusRegistry, _commerceOrderTypeService,
-						_commercePaymentMethodGroupRelServiceService,
-						_commercePaymentMethodRegistry,
-						_commerceShipmentItemService, _commerceTermEntryService,
-						_configurationProvider, _dlAppLocalService,
-						httpServletRequest, _itemSelector,
+						_commerceOrderTypeService,
+						_commercePaymentMethodGroupRelService,
+						_commerceShipmentItemService, httpServletRequest,
 						_modelResourcePermission, _percentageFormatter,
 						_portletResourcePermission);
 
@@ -96,10 +84,19 @@ public class OpenCommerceOrderContentConfigurationAction
 				commerceOrderContentDisplayContext);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.order.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -112,16 +109,6 @@ public class OpenCommerceOrderContentConfigurationAction
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	@Reference
-	private CommerceOrderEngine _commerceOrderEngine;
-
-	@Reference
-	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
-
-	@Reference
-	private CommerceOrderImporterTypeRegistry
-		_commerceOrderImporterTypeRegistry;
-
-	@Reference
 	private CommerceOrderNoteService _commerceOrderNoteService;
 
 	@Reference
@@ -131,32 +118,14 @@ public class OpenCommerceOrderContentConfigurationAction
 	private CommerceOrderService _commerceOrderService;
 
 	@Reference
-	private CommerceOrderStatusRegistry _commerceOrderStatusRegistry;
-
-	@Reference
 	private CommerceOrderTypeService _commerceOrderTypeService;
 
 	@Reference
-	private CommercePaymentMethodGroupRelLocalService
-		_commercePaymentMethodGroupRelServiceService;
-
-	@Reference
-	private CommercePaymentMethodRegistry _commercePaymentMethodRegistry;
+	private CommercePaymentMethodGroupRelService
+		_commercePaymentMethodGroupRelService;
 
 	@Reference
 	private CommerceShipmentItemService _commerceShipmentItemService;
-
-	@Reference
-	private CommerceTermEntryService _commerceTermEntryService;
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
-
-	@Reference
-	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private ItemSelector _itemSelector;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"

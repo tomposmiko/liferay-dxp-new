@@ -17,10 +17,12 @@ package com.liferay.portal.vulcan.util;
 import com.liferay.petra.function.UnsafeConsumer;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Luis Miguel Barcos
@@ -35,25 +37,20 @@ public class EntityExtensionUtil {
 
 		S extendedEntity = extendedEntityClass.newInstance();
 
-		Map<String, Field> extendedEntityFieldsMap = new HashMap<>();
-
 		Class<?> extendedEntityClassSuperclass =
 			extendedEntityClass.getSuperclass();
 
 		Field[] extendedEntityFields =
 			extendedEntityClassSuperclass.getDeclaredFields();
 
-		for (Field field : extendedEntityFields) {
-			extendedEntityFieldsMap.put(field.getName(), field);
-		}
+		Stream<Field> extendedEntityFieldsStream = Arrays.stream(
+			extendedEntityFields);
+
+		Map<String, Field> extendedEntityFieldsMap =
+			extendedEntityFieldsStream.collect(
+				Collectors.toMap(Field::getName, Function.identity()));
 
 		for (Field baseEntityField : baseEntityClass.getDeclaredFields()) {
-			int modifiers = baseEntityField.getModifiers();
-
-			if (Modifier.isFinal(modifiers) || Modifier.isStatic(modifiers)) {
-				continue;
-			}
-
 			Field extendedEntityField = extendedEntityFieldsMap.get(
 				baseEntityField.getName());
 

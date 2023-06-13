@@ -76,33 +76,6 @@ public class CTCollectionLocalServiceUtil {
 		return getService().checkConflicts(ctCollection);
 	}
 
-	public static Map
-		<Long, List<com.liferay.change.tracking.conflict.ConflictInfo>>
-				checkConflicts(
-					long companyId,
-					List<com.liferay.change.tracking.model.CTEntry> ctEntries,
-					long fromCTCollectionId, String fromCTCollectionName,
-					long toCTCollectionId, String toCTCollectionName)
-			throws PortalException {
-
-		return getService().checkConflicts(
-			companyId, ctEntries, fromCTCollectionId, fromCTCollectionName,
-			toCTCollectionId, toCTCollectionName);
-	}
-
-	public static Map
-		<Long, List<com.liferay.change.tracking.conflict.ConflictInfo>>
-				checkConflicts(
-					long companyId, long[] ctEntryIds, long fromCTCollectionId,
-					String fromCTCollectionName, long toCTCollectionId,
-					String toCTCollectionName)
-			throws PortalException {
-
-		return getService().checkConflicts(
-			companyId, ctEntryIds, fromCTCollectionId, fromCTCollectionName,
-			toCTCollectionId, toCTCollectionName);
-	}
-
 	/**
 	 * Creates a new ct collection with the primary key. Does not add the ct collection to the database.
 	 *
@@ -175,24 +148,6 @@ public class CTCollectionLocalServiceUtil {
 		throws PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
-	}
-
-	public static void discardCTEntries(
-			long ctCollectionId, long modelClassNameId, long modelClassPK,
-			boolean force)
-		throws PortalException {
-
-		getService().discardCTEntries(
-			ctCollectionId, modelClassNameId, modelClassPK, force);
-	}
-
-	public static void discardCTEntry(
-			long ctCollectionId, long modelClassNameId, long modelClassPK,
-			boolean force)
-		throws PortalException {
-
-		getService().discardCTEntry(
-			ctCollectionId, modelClassNameId, modelClassPK, force);
 	}
 
 	public static <T> T dslQuery(DSLQuery dslQuery) {
@@ -335,26 +290,12 @@ public class CTCollectionLocalServiceUtil {
 		return getService().getCTCollectionsCount();
 	}
 
-	public static List<com.liferay.change.tracking.mapping.CTMappingTableInfo>
-		getCTMappingTableInfos(long ctCollectionId) {
-
-		return getService().getCTMappingTableInfos(ctCollectionId);
-	}
-
 	public static List<com.liferay.change.tracking.model.CTEntry>
 		getDiscardCTEntries(
 			long ctCollectionId, long modelClassNameId, long modelClassPK) {
 
 		return getService().getDiscardCTEntries(
 			ctCollectionId, modelClassNameId, modelClassPK);
-	}
-
-	public static List<CTCollection> getExclusivePublishedCTCollections(
-			long modelClassNameId, long modelClassPK)
-		throws PortalException {
-
-		return getService().getExclusivePublishedCTCollections(
-			modelClassNameId, modelClassPK);
 	}
 
 	public static
@@ -380,18 +321,6 @@ public class CTCollectionLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getPersistedModel(primaryKeyObj);
-	}
-
-	public static List<com.liferay.change.tracking.model.CTEntry>
-		getRelatedCTEntries(long ctCollectionId, long[] ctEntryIds) {
-
-		return getService().getRelatedCTEntries(ctCollectionId, ctEntryIds);
-	}
-
-	public static boolean hasUnapprovedChanges(long ctCollectionId)
-		throws java.sql.SQLException {
-
-		return getService().hasUnapprovedChanges(ctCollectionId);
 	}
 
 	public static boolean isCTEntryEnclosed(

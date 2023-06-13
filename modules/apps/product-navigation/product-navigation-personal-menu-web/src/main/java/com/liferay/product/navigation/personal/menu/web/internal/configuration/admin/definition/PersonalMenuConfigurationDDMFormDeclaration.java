@@ -22,6 +22,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Samuel Trong Tran
  */
 @Component(
+	immediate = true,
 	property = "configurationPid=com.liferay.product.navigation.personal.menu.configuration.PersonalMenuConfiguration",
 	service = ConfigurationDDMFormDeclaration.class
 )

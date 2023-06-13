@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.workflow.WorkflowInstanceManagerUtil;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManagerUtil;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermission;
 
-import java.util.Objects;
-
 /**
  * @author Jorge Ferrer
  */
@@ -43,7 +41,7 @@ public class WorkflowPermissionImpl implements WorkflowPermission {
 				permissionChecker, groupId, className, classPK, actionId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return null;
@@ -66,13 +64,6 @@ public class WorkflowPermissionImpl implements WorkflowPermission {
 			WorkflowInstanceLink workflowInstanceLink =
 				WorkflowInstanceLinkLocalServiceUtil.getWorkflowInstanceLink(
 					companyId, groupId, className, classPK);
-
-			if (Objects.equals(actionId, ActionKeys.VIEW) &&
-				(permissionChecker.getUserId() ==
-					workflowInstanceLink.getUserId())) {
-
-				return Boolean.TRUE;
-			}
 
 			WorkflowInstance workflowInstance =
 				WorkflowInstanceManagerUtil.getWorkflowInstance(

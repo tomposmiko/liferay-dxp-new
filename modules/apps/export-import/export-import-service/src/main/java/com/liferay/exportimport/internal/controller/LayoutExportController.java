@@ -35,7 +35,7 @@ import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -52,7 +52,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateRange;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -72,7 +71,6 @@ import java.io.File;
 import java.io.Serializable;
 
 import java.util.Map;
-import java.util.Objects;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -92,6 +90,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.kernel.model.Layout",
 	service = {ExportImportController.class, LayoutExportController.class}
 )
@@ -165,7 +164,7 @@ public class LayoutExportController implements ExportController {
 
 		long companyId = portletDataContext.getCompanyId();
 
-		long guestUserId = _userLocalService.getGuestUserId(companyId);
+		long defaultUserId = _userLocalService.getDefaultUserId(companyId);
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.popServiceContext();
@@ -185,7 +184,7 @@ public class LayoutExportController implements ExportController {
 			serviceContext.setUserId(backgroundTask.getUserId());
 		}
 		else {
-			serviceContext.setUserId(guestUserId);
+			serviceContext.setUserId(defaultUserId);
 		}
 
 		serviceContext.setAttribute("exporting", Boolean.TRUE);
@@ -217,7 +216,7 @@ public class LayoutExportController implements ExportController {
 		headerElement.addAttribute(
 			"available-locales",
 			StringUtil.merge(
-				_language.getAvailableLocales(
+				LanguageUtil.getAvailableLocales(
 					portletDataContext.getScopeGroupId())));
 
 		headerElement.addAttribute(
@@ -278,8 +277,12 @@ public class LayoutExportController implements ExportController {
 
 		headerElement.addAttribute("type", type);
 		portletDataContext.setType(type);
+
+		Element missingReferencesElement = rootElement.addElement(
+			"missing-references");
+
 		portletDataContext.setMissingReferencesElement(
-			rootElement.addElement("missing-references"));
+			missingReferencesElement);
 
 		rootElement.addElement("site-portlets");
 		rootElement.addElement("site-services");
@@ -323,12 +326,10 @@ public class LayoutExportController implements ExportController {
 		_portletExportController.exportAssetLinks(portletDataContext);
 		_portletExportController.exportLocks(portletDataContext);
 
-		if (Objects.equals(portletDataContext.getType(), "layout-set")) {
-			portletDataContext.addDeletionSystemEventStagedModelTypes(
-				new StagedModelType(SegmentsExperience.class, Layout.class));
-			portletDataContext.addDeletionSystemEventStagedModelTypes(
-				new StagedModelType(StagedAssetLink.class));
-		}
+		portletDataContext.addDeletionSystemEventStagedModelTypes(
+			new StagedModelType(SegmentsExperience.class, Layout.class));
+		portletDataContext.addDeletionSystemEventStagedModelTypes(
+			new StagedModelType(StagedAssetLink.class));
 
 		_deletionSystemEventExporter.exportDeletionSystemEvents(
 			portletDataContext);
@@ -381,13 +382,7 @@ public class LayoutExportController implements ExportController {
 		long[] layoutIds = GetterUtil.getLongValues(
 			settingsMap.get("layoutIds"));
 
-		String cmd = MapUtil.getString(parameterMap, Constants.CMD);
-
-		if (ArrayUtil.contains(layoutIds, 0) &&
-			!Objects.equals(cmd, Constants.EXPORT) &&
-			!Objects.equals(cmd, Constants.PUBLISH_TO_LIVE) &&
-			!Objects.equals(cmd, Constants.PUBLISH_TO_REMOTE)) {
-
+		if (ArrayUtil.contains(layoutIds, 0)) {
 			layoutIds = _exportImportHelper.getAllLayoutIds(
 				sourceGroupId, privateLayout);
 		}
@@ -428,9 +423,6 @@ public class LayoutExportController implements ExportController {
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;

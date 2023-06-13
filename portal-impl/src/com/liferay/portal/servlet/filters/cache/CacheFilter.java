@@ -219,7 +219,7 @@ public class CacheFilter extends BasePortalFilter {
 		}
 		catch (NoSuchLayoutException noSuchLayoutException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(noSuchLayoutException);
+				_log.warn(noSuchLayoutException, noSuchLayoutException);
 			}
 		}
 		catch (Exception exception) {
@@ -244,7 +244,7 @@ public class CacheFilter extends BasePortalFilter {
 					groupId, privateLayout);
 			}
 			catch (Exception exception) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 
 				return 0;
 			}
@@ -312,7 +312,7 @@ public class CacheFilter extends BasePortalFilter {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;

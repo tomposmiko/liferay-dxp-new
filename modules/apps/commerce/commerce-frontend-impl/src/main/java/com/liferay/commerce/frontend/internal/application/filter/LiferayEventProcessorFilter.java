@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=CommerceUi.Application)",
 		"osgi.jaxrs.extension=true",
@@ -62,7 +63,7 @@ public class LiferayEventProcessorFilter implements ContainerRequestFilter {
 				_httpServletResponse);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 

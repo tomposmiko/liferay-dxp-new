@@ -162,7 +162,7 @@ public class InlineSQLHelperImplTest {
 			_groupThree.getCompanyId(), RoleConstants.USER);
 
 		long[] roleIds = ReflectionTestUtil.invoke(
-			_inlineSQLHelper, "_getRoleIds", new Class<?>[] {long.class},
+			_inlineSQLHelper, "getRoleIds", new Class<?>[] {long.class},
 			_groupThree.getGroupId());
 
 		String msg = StringUtil.merge(roleIds);
@@ -243,7 +243,11 @@ public class InlineSQLHelperImplTest {
 	public void testInvalidCompany() throws Exception {
 		_company = CompanyTestUtil.addCompany();
 
-		_groupThree = GroupTestUtil.addGroupToCompany(_company.getCompanyId());
+		_groupThree = GroupTestUtil.addGroup();
+
+		_groupThree.setCompanyId(_company.getCompanyId());
+
+		_groupLocalService.updateGroup(_groupThree);
 
 		_addGroupRole(_groupThree, RoleConstants.SITE_MEMBER);
 
@@ -256,19 +260,6 @@ public class InlineSQLHelperImplTest {
 			_GROUP_ID_FIELD,
 			new long[] {_groupOne.getGroupId(), _groupThree.getGroupId()},
 			null);
-	}
-
-	@Test
-	public void testIsNotEnabledForCompanyAdminWithNewCompany()
-		throws Exception {
-
-		_company = CompanyTestUtil.addCompany();
-
-		_user = UserTestUtil.addCompanyAdminUser(_company);
-
-		_setPermissionChecker();
-
-		Assert.assertFalse(_inlineSQLHelper.isEnabled());
 	}
 
 	@Test
@@ -315,8 +306,8 @@ public class InlineSQLHelperImplTest {
 				"ResourcePermission.companyId = ? and ResourcePermission.name ",
 				"= ? and ResourcePermission.scope = ? and ",
 				"ResourcePermission.viewActionId = ? and ",
-				"(ResourcePermission.roleId in (?, ?, ?, ?) or ",
-				"ResourcePermission.ownerId = ?)) or Layout.groupId in (?))"),
+				"(ResourcePermission.roleId in (?, ?, ?, ?) or Layout.userId ",
+				"= ?)) or Layout.groupId in (?))"),
 			dslQuery.toString());
 
 		_assertValidSql(dslQuery);
@@ -347,8 +338,8 @@ public class InlineSQLHelperImplTest {
 				"ResourcePermission.companyId = ? and ResourcePermission.name ",
 				"= ? and ResourcePermission.scope = ? and ",
 				"ResourcePermission.viewActionId = ? and ",
-				"(ResourcePermission.roleId in (?, ?, ?, ?) or ",
-				"ResourcePermission.ownerId = ?)) or Layout.groupId in (?))"),
+				"(ResourcePermission.roleId in (?, ?, ?, ?) or Layout.userId ",
+				"= ?)) or Layout.groupId in (?))"),
 			dslQuery.toString());
 
 		_assertValidSql(dslQuery);
@@ -365,8 +356,7 @@ public class InlineSQLHelperImplTest {
 				"ResourcePermission.companyId = ? and ResourcePermission.name ",
 				"= ? and ResourcePermission.scope = ? and ",
 				"ResourcePermission.viewActionId = ? and ",
-				"(ResourcePermission.roleId in (?, ?) or ",
-				"ResourcePermission.ownerId = ?))"),
+				"(ResourcePermission.roleId in (?, ?) or Layout.userId = ?))"),
 			dslQuery.toString());
 
 		_assertValidSql(dslQuery);

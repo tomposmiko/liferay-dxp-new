@@ -14,9 +14,6 @@
 
 package com.liferay.portal.scripting.internal;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
@@ -25,7 +22,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.scripting.Scripting;
 import com.liferay.portal.kernel.scripting.ScriptingException;
 import com.liferay.portal.kernel.scripting.ScriptingExecutor;
-import com.liferay.portal.kernel.scripting.ScriptingValidator;
 import com.liferay.portal.kernel.scripting.UnsupportedLanguageException;
 
 import java.io.IOException;
@@ -33,26 +29,27 @@ import java.io.LineNumberReader;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.time.StopWatch;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Alberto Montero
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  */
-@Component(service = Scripting.class)
+@Component(immediate = true, service = Scripting.class)
 public class ScriptingImpl implements Scripting {
 
 	@Override
 	public void clearCache(String language) throws ScriptingException {
-		ScriptingExecutor scriptingExecutor =
-			_scriptingExecutorsServiceTrackerMap.getService(language);
+		ScriptingExecutor scriptingExecutor = _scriptingExecutors.get(language);
 
 		if (scriptingExecutor == null) {
 			throw new UnsupportedLanguageException(language);
@@ -65,8 +62,7 @@ public class ScriptingImpl implements Scripting {
 	public ScriptingExecutor createScriptingExecutor(
 		String language, boolean executeInSeparateThread) {
 
-		ScriptingExecutor scriptingExecutor =
-			_scriptingExecutorsServiceTrackerMap.getService(language);
+		ScriptingExecutor scriptingExecutor = _scriptingExecutors.get(language);
 
 		return scriptingExecutor.newInstance(executeInSeparateThread);
 	}
@@ -77,8 +73,7 @@ public class ScriptingImpl implements Scripting {
 			Set<String> outputNames, String language, String script)
 		throws ScriptingException {
 
-		ScriptingExecutor scriptingExecutor =
-			_scriptingExecutorsServiceTrackerMap.getService(language);
+		ScriptingExecutor scriptingExecutor = _scriptingExecutors.get(language);
 
 		if (scriptingExecutor == null) {
 			throw new UnsupportedLanguageException(language);
@@ -94,7 +89,7 @@ public class ScriptingImpl implements Scripting {
 		}
 		catch (Exception exception) {
 			throw new ScriptingException(
-				_getErrorMessage(script, exception), exception);
+				getErrorMessage(script, exception), exception);
 		}
 		finally {
 			if (_log.isDebugEnabled()) {
@@ -115,44 +110,10 @@ public class ScriptingImpl implements Scripting {
 
 	@Override
 	public Set<String> getSupportedLanguages() {
-		return _scriptingExecutorsServiceTrackerMap.keySet();
+		return _scriptingExecutors.keySet();
 	}
 
-	@Override
-	public void validate(String language, String script)
-		throws ScriptingException {
-
-		ScriptingValidator scriptingValidator =
-			_scriptingValidatorsServiceTrackerMap.getService(language);
-
-		scriptingValidator.validate(script);
-	}
-
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_scriptingExecutorsServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, ScriptingExecutor.class, null,
-				ServiceReferenceMapperFactory.create(
-					bundleContext,
-					(scriptingExecutor, emitter) -> emitter.emit(
-						scriptingExecutor.getLanguage())));
-		_scriptingValidatorsServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, ScriptingValidator.class, null,
-				ServiceReferenceMapperFactory.create(
-					bundleContext,
-					(scriptingValidator, emitter) -> emitter.emit(
-						scriptingValidator.getLanguage())));
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_scriptingExecutorsServiceTrackerMap.close();
-		_scriptingValidatorsServiceTrackerMap.close();
-	}
-
-	private String _getErrorMessage(String script, Exception exception) {
+	protected String getErrorMessage(String script, Exception exception) {
 		StringBundler sb = new StringBundler();
 
 		sb.append(exception.getMessage());
@@ -178,7 +139,7 @@ public class ScriptingImpl implements Scripting {
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 
 			sb.setIndex(0);
@@ -191,11 +152,25 @@ public class ScriptingImpl implements Scripting {
 		return sb.toString();
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void setScriptingExecutors(ScriptingExecutor scriptingExecutor) {
+		_scriptingExecutors.put(
+			scriptingExecutor.getLanguage(), scriptingExecutor);
+	}
+
+	protected void unsetScriptingExecutors(
+		ScriptingExecutor scriptingExecutor) {
+
+		_scriptingExecutors.remove(scriptingExecutor.getLanguage());
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(ScriptingImpl.class);
 
-	private ServiceTrackerMap<String, ScriptingExecutor>
-		_scriptingExecutorsServiceTrackerMap;
-	private ServiceTrackerMap<String, ScriptingValidator>
-		_scriptingValidatorsServiceTrackerMap;
+	private final Map<String, ScriptingExecutor> _scriptingExecutors =
+		new ConcurrentHashMap<>();
 
 }

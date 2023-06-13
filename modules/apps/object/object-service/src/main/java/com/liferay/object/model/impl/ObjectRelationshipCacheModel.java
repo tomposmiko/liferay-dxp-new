@@ -78,7 +78,7 @@ public class ObjectRelationshipCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -102,8 +102,6 @@ public class ObjectRelationshipCacheModel
 		sb.append(objectDefinitionId2);
 		sb.append(", objectFieldId2=");
 		sb.append(objectFieldId2);
-		sb.append(", parameterObjectFieldId=");
-		sb.append(parameterObjectFieldId);
 		sb.append(", deletionType=");
 		sb.append(deletionType);
 		sb.append(", dbTableName=");
@@ -163,8 +161,6 @@ public class ObjectRelationshipCacheModel
 		objectRelationshipImpl.setObjectDefinitionId1(objectDefinitionId1);
 		objectRelationshipImpl.setObjectDefinitionId2(objectDefinitionId2);
 		objectRelationshipImpl.setObjectFieldId2(objectFieldId2);
-		objectRelationshipImpl.setParameterObjectFieldId(
-			parameterObjectFieldId);
 
 		if (deletionType == null) {
 			objectRelationshipImpl.setDeletionType("");
@@ -227,8 +223,6 @@ public class ObjectRelationshipCacheModel
 		objectDefinitionId2 = objectInput.readLong();
 
 		objectFieldId2 = objectInput.readLong();
-
-		parameterObjectFieldId = objectInput.readLong();
 		deletionType = objectInput.readUTF();
 		dbTableName = objectInput.readUTF();
 		label = objectInput.readUTF();
@@ -270,8 +264,6 @@ public class ObjectRelationshipCacheModel
 		objectOutput.writeLong(objectDefinitionId2);
 
 		objectOutput.writeLong(objectFieldId2);
-
-		objectOutput.writeLong(parameterObjectFieldId);
 
 		if (deletionType == null) {
 			objectOutput.writeUTF("");
@@ -322,7 +314,6 @@ public class ObjectRelationshipCacheModel
 	public long objectDefinitionId1;
 	public long objectDefinitionId2;
 	public long objectFieldId2;
-	public long parameterObjectFieldId;
 	public String deletionType;
 	public String dbTableName;
 	public String label;

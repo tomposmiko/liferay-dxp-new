@@ -26,8 +26,9 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Locale;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_SPECIFICATION_OPTIONS,
 		"mvc.command.name=/cp_specification_options/edit_cp_specification_option"
@@ -50,6 +52,34 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditCPSpecificationOptionMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected void deleteCPSpecificationOptions(ActionRequest actionRequest)
+		throws Exception {
+
+		long[] deleteCPSpecificationOptionIds = null;
+
+		long cpSpecificationOptionId = ParamUtil.getLong(
+			actionRequest, "cpSpecificationOptionId");
+
+		if (cpSpecificationOptionId > 0) {
+			deleteCPSpecificationOptionIds = new long[] {
+				cpSpecificationOptionId
+			};
+		}
+		else {
+			deleteCPSpecificationOptionIds = StringUtil.split(
+				ParamUtil.getString(
+					actionRequest, "deleteCPSpecificationOptionIds"),
+				0L);
+		}
+
+		for (long deleteCPSpecificationOptionId :
+				deleteCPSpecificationOptionIds) {
+
+			_cpSpecificationOptionService.deleteCPSpecificationOption(
+				deleteCPSpecificationOptionId);
+		}
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -60,12 +90,12 @@ public class EditCPSpecificationOptionMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.DELETE)) {
-				_deleteCPSpecificationOptions(actionRequest);
+				deleteCPSpecificationOptions(actionRequest);
 			}
 			else if (cmd.equals(Constants.ADD) ||
 					 cmd.equals(Constants.UPDATE)) {
 
-				_updateCPSpecificationOption(actionRequest);
+				updateCPSpecificationOption(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -92,33 +122,7 @@ public class EditCPSpecificationOptionMVCActionCommand
 		}
 	}
 
-	private void _deleteCPSpecificationOptions(ActionRequest actionRequest)
-		throws Exception {
-
-		long[] deleteCPSpecificationOptionIds = null;
-
-		long cpSpecificationOptionId = ParamUtil.getLong(
-			actionRequest, "cpSpecificationOptionId");
-
-		if (cpSpecificationOptionId > 0) {
-			deleteCPSpecificationOptionIds = new long[] {
-				cpSpecificationOptionId
-			};
-		}
-		else {
-			deleteCPSpecificationOptionIds = ParamUtil.getLongValues(
-				actionRequest, "rowIds");
-		}
-
-		for (long deleteCPSpecificationOptionId :
-				deleteCPSpecificationOptionIds) {
-
-			_cpSpecificationOptionService.deleteCPSpecificationOption(
-				deleteCPSpecificationOptionId);
-		}
-	}
-
-	private CPSpecificationOption _updateCPSpecificationOption(
+	protected CPSpecificationOption updateCPSpecificationOption(
 			ActionRequest actionRequest)
 		throws Exception {
 
@@ -127,10 +131,10 @@ public class EditCPSpecificationOptionMVCActionCommand
 
 		long cpOptionCategoryId = ParamUtil.getLong(
 			actionRequest, "CPOptionCategoryId");
-		Map<Locale, String> titleMap = _localization.getLocalizationMap(
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "title");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 		boolean facetable = ParamUtil.getBoolean(actionRequest, "facetable");
 		String key = ParamUtil.getString(actionRequest, "key");
 
@@ -163,8 +167,5 @@ public class EditCPSpecificationOptionMVCActionCommand
 
 	@Reference
 	private CPSpecificationOptionService _cpSpecificationOptionService;
-
-	@Reference
-	private Localization _localization;
 
 }

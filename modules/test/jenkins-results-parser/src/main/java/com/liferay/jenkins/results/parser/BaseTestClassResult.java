@@ -14,20 +14,10 @@
 
 package com.liferay.jenkins.results.parser;
 
-import com.liferay.jenkins.results.parser.test.clazz.JUnitTestClass;
-import com.liferay.jenkins.results.parser.test.clazz.TestClass;
-import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
-
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
-
-import org.dom4j.Element;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,68 +48,6 @@ public abstract class BaseTestClassResult implements TestClassResult {
 	@Override
 	public long getDuration() {
 		return _duration;
-	}
-
-	@Override
-	public Element getGitHubElement() {
-		return getGitHubElement(null);
-	}
-
-	@Override
-	public Element getGitHubElement(Boolean uniqueFailures) {
-		Element downstreamBuildListItemElement = Dom4JUtil.getNewElement(
-			"details", null);
-
-		Element summaryElement = Dom4JUtil.getNewElement(
-			"summary", downstreamBuildListItemElement);
-
-		summaryElement.add(
-			Dom4JUtil.getNewAnchorElement(
-				getTestClassReportURL(), getClassName()));
-
-		TestHistory testHistory = getTestHistory();
-
-		if (testHistory != null) {
-			summaryElement.addText(" - ");
-
-			summaryElement.add(
-				Dom4JUtil.getNewAnchorElement(
-					testHistory.getTestrayCaseResultURL(),
-					JenkinsResultsParserUtil.combine(
-						"Failed ",
-						String.valueOf(testHistory.getFailureCount()),
-						" of last ",
-						String.valueOf(testHistory.getTestCount()))));
-		}
-
-		List<Element> failureElements = new ArrayList<>();
-
-		for (TestResult testResult : getTestResults()) {
-			if (!testResult.isFailing()) {
-				continue;
-			}
-
-			if ((uniqueFailures == null) ||
-				(uniqueFailures && testResult.isUniqueFailure()) ||
-				(!uniqueFailures && !testResult.isUniqueFailure())) {
-
-				failureElements.add(
-					Dom4JUtil.getNewAnchorElement(
-						testResult.getTestReportURL(),
-						testResult.getTestName()));
-			}
-		}
-
-		if (failureElements.isEmpty()) {
-			return null;
-		}
-
-		Element failuresElement = Dom4JUtil.getNewElement(
-			"div", downstreamBuildListItemElement);
-
-		Dom4JUtil.getOrderedListElement(failureElements, failuresElement, 5);
-
-		return downstreamBuildListItemElement;
 	}
 
 	@Override
@@ -166,85 +94,6 @@ public abstract class BaseTestClassResult implements TestClassResult {
 	}
 
 	@Override
-	public TestClass getTestClass() {
-		if (_testClass != null) {
-			return _testClass;
-		}
-
-		Build build = getBuild();
-
-		if (!(build instanceof DownstreamBuild)) {
-			return null;
-		}
-
-		DownstreamBuild downstreamBuild = (DownstreamBuild)build;
-
-		AxisTestClassGroup axisTestClassGroup =
-			downstreamBuild.getAxisTestClassGroup();
-
-		if (axisTestClassGroup == null) {
-			return null;
-		}
-
-		String className = getClassName();
-
-		for (TestClass testClass : axisTestClassGroup.getTestClasses()) {
-			if (!(testClass instanceof JUnitTestClass)) {
-				continue;
-			}
-
-			JUnitTestClass jUnitTestClass = (JUnitTestClass)testClass;
-
-			if (Objects.equals(className, jUnitTestClass.getTestClassName())) {
-				_testClass = testClass;
-
-				return _testClass;
-			}
-		}
-
-		return null;
-	}
-
-	@Override
-	public String getTestClassReportURL() {
-		StringBuilder sb = new StringBuilder();
-
-		Build build = getBuild();
-
-		sb.append(build.getBuildURL());
-
-		sb.append("testReport/");
-		sb.append(getPackageName());
-		sb.append("/");
-		sb.append(getSimpleClassName());
-
-		String testClassReportURL = sb.toString();
-
-		if (testClassReportURL.startsWith("http")) {
-			try {
-				return JenkinsResultsParserUtil.encode(testClassReportURL);
-			}
-			catch (MalformedURLException | URISyntaxException exception) {
-				System.out.println(
-					"Unable to encode the test report " + testClassReportURL);
-			}
-		}
-
-		return testClassReportURL;
-	}
-
-	@Override
-	public TestHistory getTestHistory() {
-		TestClass testClass = getTestClass();
-
-		if (testClass == null) {
-			return null;
-		}
-
-		return testClass.getTestHistory();
-	}
-
-	@Override
 	public TestResult getTestResult(String testName) {
 		return _testResults.get(testName);
 	}
@@ -275,7 +124,7 @@ public abstract class BaseTestClassResult implements TestClassResult {
 		_build = build;
 		_suiteJSONObject = suiteJSONObject;
 
-		_duration = (long)(suiteJSONObject.getDouble("duration") * 1000);
+		_duration = (long)(suiteJSONObject.getDouble("duration") * 1000D);
 
 		if (!suiteJSONObject.has("cases")) {
 			return;
@@ -297,7 +146,6 @@ public abstract class BaseTestClassResult implements TestClassResult {
 	private final long _duration;
 	private Status _status;
 	private final JSONObject _suiteJSONObject;
-	private TestClass _testClass;
 	private final Map<String, TestResult> _testResults = new TreeMap<>();
 
 	private static enum Status {

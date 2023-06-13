@@ -112,8 +112,8 @@ public abstract class BaseMaxExpansionsTestCase
 		return Field.TITLE;
 	}
 
-	protected static final int MAX_EXPANSIONS = 5;
+	protected static final int MAX_EXPANSIONS = 60;
 
-	private static final int _TOTAL_DOCUMENTS = 10;
+	private static final int _TOTAL_DOCUMENTS = 65;
 
 }

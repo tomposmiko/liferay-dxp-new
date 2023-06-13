@@ -15,13 +15,13 @@
 						"maxWidth": "none",
 						"minHeight": "auto",
 						"minWidth": "auto",
+						"opacity": "100",
 						"overflow": "visible",
 						"shadow": "shadow-none",
 						"textAlign": "none",
 						"width": "w-auto"
 					},
 					"gutters": true,
-					"indexed": true,
 					"modulesPerRow": 1,
 					"numberOfColumns": 1,
 					"reverseOrder": false,
@@ -81,12 +81,12 @@
 										"maxWidth": "none",
 										"minHeight": "auto",
 										"minWidth": "auto",
+										"opacity": "100",
 										"overflow": "visible",
 										"shadow": "shadow-none",
 										"textAlign": "none",
 										"width": "w-auto"
 									},
-									"indexed": true,
 									"layout": {
 										"borderWidth": 0,
 										"marginBottom": 0,
@@ -115,6 +115,8 @@
 													"id": "element-text",
 													"value": {
 														"fragmentLink": {
+															"value_i18n": {
+															}
 														},
 														"text": {
 															"value_i18n": {
@@ -136,12 +138,12 @@
 												"maxWidth": "none",
 												"minHeight": "auto",
 												"minWidth": "auto",
+												"opacity": "100",
 												"overflow": "visible",
 												"shadow": "shadow-none",
 												"textAlign": "none",
 												"width": "w-auto"
-											},
-											"indexed": true
+											}
 										},
 										"type": "Fragment"
 									}

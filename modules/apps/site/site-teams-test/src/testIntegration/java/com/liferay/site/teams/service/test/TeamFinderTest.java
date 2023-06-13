@@ -111,10 +111,12 @@ public class TeamFinderTest {
 
 	@Test
 	public void testSearchTeams() throws Exception {
-		TeamLocalServiceUtil.addTeam(
-			_user.getUserId(), _group.getGroupId(), "team", "",
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _user.getUserId()));
+				_group.getGroupId(), _user.getUserId());
+
+		TeamLocalServiceUtil.addTeam(
+			_user.getUserId(), _group.getGroupId(), "team", "", serviceContext);
 
 		List<Team> teams = TeamLocalServiceUtil.search(
 			_group.getGroupId(), "team", "team", null, QueryUtil.ALL_POS,

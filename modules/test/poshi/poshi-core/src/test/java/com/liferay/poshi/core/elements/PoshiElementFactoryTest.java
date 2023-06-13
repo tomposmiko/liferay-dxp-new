@@ -17,8 +17,6 @@ package com.liferay.poshi.core.elements;
 import com.liferay.poshi.core.PoshiContext;
 import com.liferay.poshi.core.util.Dom4JUtil;
 import com.liferay.poshi.core.util.FileUtil;
-import com.liferay.poshi.core.util.PropsUtil;
-import com.liferay.poshi.core.util.TestUtil;
 
 import java.io.File;
 
@@ -44,21 +42,7 @@ public class PoshiElementFactoryTest {
 			"../poshi-runner-resources/src/main/resources/default" +
 				"/testFunctional/functions";
 
-		PropsUtil.clear();
-
-		PropsUtil.set("test.base.dir.name", poshiFileDir);
-
-		PoshiContext.readFiles(true, poshiFileNames, poshiFileDir);
-
-		PoshiContext.setFunctionFileNames("WaitForSPARefresh");
-
-		String[] macroFileNames = {
-			"Alert", "AlloyEditor", "Blogs", "FormFields", "KaleoDesigner",
-			"Navigator", "PortalInstances", "ProductMenu", "SignIn", "Smoke",
-			"TableEcho", "TestCase", "User"
-		};
-
-		PoshiContext.setMacroFileNames(macroFileNames);
+		PoshiContext.readFiles(poshiFileNames, poshiFileDir);
 	}
 
 	@Test
@@ -95,40 +79,21 @@ public class PoshiElementFactoryTest {
 	}
 
 	@Test
-	public void testPoshiScriptFunctionFormat() throws Exception {
-		String actualFileName = "UnformattedPoshiScriptFunction.function";
-		String expectedFileName = "PoshiScriptFunction.function";
-
-		PoshiElement actualElement = _getPoshiElement(actualFileName);
-
-		_assertEqualStrings(
-			actualFileName, actualElement.toPoshiScript(), expectedFileName,
-			FileUtil.read(_getFile(expectedFileName)),
-			"Poshi script was not formatted correctly");
-	}
-
-	@Test
 	public void testPoshiScriptFunctionToXML() throws Exception {
-		String actualFileName = "PoshiScriptFunction.function";
-		String expectedFileName = "PoshiSyntaxFunction.function";
-
-		PoshiElement actualElement = _getPoshiElement(
-			"PoshiScriptFunction.function");
-		Element expectedElement = _getDom4JElement(
-			"PoshiSyntaxFunction.function");
+		PoshiElement actualElement = _getPoshiElement("PoshiScript.function");
+		Element expectedElement = _getDom4JElement("PoshiSyntax.function");
 
 		_assertEqualElements(
-			actualFileName, actualElement, expectedFileName, expectedElement,
+			actualElement, expectedElement,
 			"Poshi script syntax does not translate to Poshi XML");
 	}
 
 	@Test
 	public void testPoshiScriptLineNumbers() throws Exception {
-		PoshiElement rootPoshiElement = _getPoshiElement(
-			"PoshiScriptMacro.macro");
+		PoshiElement rootPoshiElement = _getPoshiElement("PoshiScript.macro");
 
 		int[] expectedLineNumbers = {
-			4, 9, 11, 17, 19, 28, 29, 30, 32, 34, 38, 42, 46, 50, 54, 58
+			3, 8, 9, 10, 11, 13, 18, 22, 26, 30, 34, 38, 43, 45, 52, 54
 		};
 
 		int i = 0;
@@ -154,146 +119,83 @@ public class PoshiElementFactoryTest {
 	}
 
 	@Test
-	public void testPoshiScriptMacroFormat() throws Exception {
-		String actualFileName = "UnformattedPoshiScriptMacro.macro";
-		String expectedFileName = "PoshiScriptMacro.macro";
-
-		PoshiElement actualElement = _getPoshiElement(actualFileName);
-
-		_assertEqualStrings(
-			actualFileName, actualElement.toPoshiScript(), expectedFileName,
-			FileUtil.read(_getFile(expectedFileName)),
-			"Poshi script was not formatted correctly");
-	}
-
-	@Test
 	public void testPoshiScriptMacroToXML() throws Exception {
-		String actualFileName = "PoshiScriptMacro.macro";
-		String expectedFileName = "PoshiSyntaxMacro.macro";
-
-		PoshiElement actualElement = _getPoshiElement(actualFileName);
-		Element expectedElement = _getDom4JElement(expectedFileName);
+		PoshiElement actualElement = _getPoshiElement("PoshiScript.macro");
+		Element expectedElement = _getDom4JElement("PoshiSyntax.macro");
 
 		_assertEqualElements(
-			actualFileName, actualElement, expectedFileName, expectedElement,
+			actualElement, expectedElement,
 			"Poshi script syntax does not translate to Poshi XML");
-	}
-
-	@Test
-	public void testPoshiScriptTestFormat() throws Exception {
-		String actualFileName = "UnformattedPoshiScript.testcase";
-		String expectedFileName = "PoshiScript.testcase";
-
-		PoshiElement actualElement = _getPoshiElement(actualFileName);
-
-		_assertEqualStrings(
-			actualFileName, actualElement.toPoshiScript(), expectedFileName,
-			FileUtil.read(_getFile(expectedFileName)),
-			"Poshi script was not formatted correctly");
 	}
 
 	@Test
 	public void testPoshiScriptTestToPoshiXML() throws Exception {
-		String actualFileName = "PoshiScript.testcase";
-		String expectedFileName = "PoshiSyntax.testcase";
-
-		PoshiElement actualElement = _getPoshiElement(actualFileName);
-		Element expectedElement = _getDom4JElement(expectedFileName);
+		PoshiElement actualElement = _getPoshiElement("PoshiScript.testcase");
+		Element expectedElement = _getDom4JElement("PoshiSyntax.testcase");
 
 		_assertEqualElements(
-			actualFileName, actualElement, expectedFileName, expectedElement,
+			actualElement, expectedElement,
 			"Poshi script syntax does not translate to Poshi XML");
 	}
 
 	@Test
-	public void testPoshiScriptToPoshiXMLToPoshiScript() throws Exception {
-		String fileName = "PoshiScript.testcase";
-
-		PoshiElement actualElement = _getPoshiElement(fileName);
-
-		String actualContent = actualElement.toPoshiScript();
-
-		String expectedContent = FileUtil.read(_getFile(fileName));
-
-		_assertEqualStrings(
-			fileName, actualContent, fileName, expectedContent,
-			"Poshi XML syntax does not translate to Poshi script syntax");
-	}
-
-	@Test
 	public void testPoshiXMLFunctionToPoshiScript() throws Exception {
-		String expectedFileName = "PoshiScriptFunction.function";
+		String expected = FileUtil.read(_getFile("PoshiScript.function"));
 
-		String expectedContent = FileUtil.read(_getFile(expectedFileName));
+		PoshiElement poshiElement = _getPoshiElement("PoshiSyntax.function");
 
-		String actualFileName = "PoshiSyntaxFunction.function";
-
-		PoshiElement poshiElement = _getPoshiElement(actualFileName);
-
-		String actualContent = poshiElement.toPoshiScript();
+		String actual = poshiElement.toPoshiScript();
 
 		_assertEqualStrings(
-			actualFileName, actualContent, expectedFileName, expectedContent,
+			actual, expected,
 			"Poshi XML syntax does not translate to Poshi script syntax");
 	}
 
 	@Test
 	public void testPoshiXMLMacroAlternate() throws Exception {
-		String actualFileName = "AlternatePoshiScript.macro";
-		String expectedFileName = "PoshiSyntaxMacro.macro";
-
-		PoshiElement actualElement = _getPoshiElement(actualFileName);
-		Element expectedElement = _getDom4JElement(expectedFileName);
+		PoshiElement actualElement = _getPoshiElement(
+			"AlternatePoshiScript.macro");
+		Element expectedElement = _getDom4JElement("PoshiSyntax.macro");
 
 		_assertEqualElements(
-			actualFileName, actualElement, expectedFileName, expectedElement,
-			"Poshi XML syntax does not translate to XML");
+			actualElement, expectedElement,
+			"Poshi script syntax does not translate to Poshi XML");
 	}
 
 	@Test
 	public void testPoshiXMLMacroFormat() throws Exception {
-		String actualFileName = "UnformattedPoshiScriptMacro.macro";
-		String expectedFileName = "PoshiSyntaxMacro.macro";
-
-		PoshiElement actualElement = _getPoshiElement(actualFileName);
-		Element expectedElement = _getDom4JElement(expectedFileName);
+		PoshiElement actualElement = _getPoshiElement(
+			"UnformattedPoshiScript.macro");
+		Element expectedElement = _getDom4JElement("PoshiSyntax.macro");
 
 		_assertEqualElements(
-			actualFileName, actualElement, expectedFileName, expectedElement,
-			"Poshi XML syntax does not translate to XML");
+			actualElement, expectedElement,
+			"Poshi script syntax does not translate to Poshi XML");
 	}
 
 	@Test
 	public void testPoshiXMLMacroToPoshiScript() throws Exception {
-		String actualFileName = "PoshiSyntaxMacro.macro";
+		String expected = FileUtil.read(_getFile("PoshiScript.macro"));
 
-		PoshiElement poshiElement = _getPoshiElement(actualFileName);
+		PoshiElement poshiElement = _getPoshiElement("PoshiSyntax.macro");
 
-		String actualContent = poshiElement.toPoshiScript();
-
-		String expectedFileName = "PoshiScriptMacro.macro";
-
-		String expectedContent = FileUtil.read(_getFile(expectedFileName));
+		String actual = poshiElement.toPoshiScript();
 
 		_assertEqualStrings(
-			actualFileName, actualContent, expectedFileName, expectedContent,
+			actual, expected,
 			"Poshi XML syntax does not translate to Poshi script syntax");
 	}
 
 	@Test
 	public void testPoshiXMLTestToPoshiScript() throws Exception {
-		String actualFileName = "PoshiSyntax.testcase";
+		String expected = FileUtil.read(_getFile("PoshiScript.testcase"));
 
-		PoshiElement poshiElement = _getPoshiElement(actualFileName);
+		PoshiElement poshiElement = _getPoshiElement("PoshiSyntax.testcase");
 
-		String actualContent = poshiElement.toPoshiScript();
-
-		String expectedFileName = "PoshiScript.testcase";
-
-		String expectedContent = FileUtil.read(_getFile(expectedFileName));
+		String actual = poshiElement.toPoshiScript();
 
 		_assertEqualStrings(
-			actualFileName, actualContent, expectedFileName, expectedContent,
+			actual, expected,
 			"Poshi XML syntax does not translate to Poshi script syntax");
 	}
 
@@ -309,62 +211,47 @@ public class PoshiElementFactoryTest {
 			(PoshiElement)PoshiNodeFactory.newPoshiNode(
 				poshiScript, FileUtil.getURL(_getFile(fileName)));
 
-		Element expectedElement = _getDom4JElement(fileName);
+		Element expectedElement = _getDom4JElement("PoshiSyntax.testcase");
 
 		_assertEqualElements(
-			fileName, actualElement, fileName, expectedElement,
-			"Poshi XML syntax does not translate to XML");
+			actualElement, expectedElement,
+			"Poshi XML syntax is not preserved in full translation");
 	}
 
 	@Test
 	public void testPoshiXMLTestToXML() throws Exception {
-		String fileName = "PoshiSyntax.testcase";
-
-		PoshiElement actualElement = _getPoshiElement(fileName);
-
-		Element expectedElement = _getDom4JElement(fileName);
+		PoshiElement actualElement = _getPoshiElement("PoshiSyntax.testcase");
+		Element expectedElement = _getDom4JElement("PoshiSyntax.testcase");
 
 		_assertEqualElements(
-			fileName, actualElement, fileName, expectedElement,
+			actualElement, expectedElement,
 			"Poshi XML syntax does not translate to XML");
 	}
 
 	private void _assertEqualElements(
-			String actualFileName, Element actualElement,
-			String expectedFileName, Element expectedElement,
-			String errorMessage)
+			Element actualElement, Element expectedElement, String errorMessage)
 		throws Exception {
 
 		NodeComparator nodeComparator = new NodeComparator();
 
-		int compare = 1;
-
-		try {
-			compare = nodeComparator.compare(actualElement, expectedElement);
-		}
-		catch (NullPointerException nullPointerException) {
-			System.out.println("Unable to compare nodes");
-		}
+		int compare = nodeComparator.compare(actualElement, expectedElement);
 
 		if (compare != 0) {
-			TestUtil.printDiffs(
-				expectedFileName, Dom4JUtil.format(expectedElement),
-				actualFileName, Dom4JUtil.format(actualElement));
+			String actual = Dom4JUtil.format(actualElement);
+			String expected = Dom4JUtil.format(expectedElement);
+
+			errorMessage = _getErrorMessage(actual, expected, errorMessage);
 
 			throw new Exception(errorMessage);
 		}
 	}
 
 	private void _assertEqualStrings(
-			String actualFileName, String actualContent,
-			String expectedFileName, String expectedContent,
-			String errorMessage)
+			String actual, String expected, String errorMessage)
 		throws Exception {
 
-		if (!actualContent.equals(expectedContent)) {
-			TestUtil.printDiffs(
-				expectedFileName, expectedContent, actualFileName,
-				actualContent);
+		if (!actual.equals(expected)) {
+			errorMessage = _getErrorMessage(actual, expected, errorMessage);
 
 			throw new Exception(errorMessage);
 		}
@@ -380,6 +267,21 @@ public class PoshiElementFactoryTest {
 		Dom4JUtil.removeWhiteSpaceTextNodes(rootElement);
 
 		return rootElement;
+	}
+
+	private String _getErrorMessage(
+			String actual, String expected, String errorMessage)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(errorMessage);
+		sb.append("\n\nExpected:\n");
+		sb.append(expected);
+		sb.append("\n\nActual:\n");
+		sb.append(actual);
+
+		return sb.toString();
 	}
 
 	private File _getFile(String fileName) {

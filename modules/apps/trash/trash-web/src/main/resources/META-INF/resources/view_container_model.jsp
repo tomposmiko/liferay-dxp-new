@@ -78,9 +78,11 @@ TrashContainerModelDisplayContext trashContainerModelDisplayContext = new TrashC
 			>
 				<c:choose>
 					<c:when test="<%= curContainerModel.getContainerModelId() > 0 %>">
-						<clay:link
-							href="<%= containerURL.toString() %>"
-							label="<%= curContainerModel.getContainerModelName() %>"
+						<liferay-ui:icon
+							label="<%= true %>"
+							message="<%= curContainerModel.getContainerModelName() %>"
+							method="get"
+							url="<%= containerURL.toString() %>"
 						/>
 					</c:when>
 					<c:otherwise>

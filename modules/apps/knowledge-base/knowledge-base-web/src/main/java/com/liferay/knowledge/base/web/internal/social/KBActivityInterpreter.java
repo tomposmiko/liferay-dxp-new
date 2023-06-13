@@ -214,13 +214,35 @@ public class KBActivityInterpreter extends BaseSocialActivityInterpreter {
 			return true;
 		}
 		else if (className.equals(KBTemplate.class.getName())) {
+			KBTemplate kbTemplate = _kbTemplateLocalService.getKBTemplate(
+				activity.getClassPK());
+
 			return _kbTemplateModelResourcePermission.contains(
-				permissionChecker,
-				_kbTemplateLocalService.getKBTemplate(activity.getClassPK()),
-				KBActionKeys.VIEW);
+				permissionChecker, kbTemplate, KBActionKeys.VIEW);
 		}
 
 		return false;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKBArticleLocalService(
+		KBArticleLocalService kbArticleLocalService) {
+
+		_kbArticleLocalService = kbArticleLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKBCommentLocalService(
+		KBCommentLocalService kbCommentLocalService) {
+
+		_kbCommentLocalService = kbCommentLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKBTemplateLocalService(
+		KBTemplateLocalService kbTemplateLocalService) {
+
+		_kbTemplateLocalService = kbTemplateLocalService;
 	}
 
 	private static final String[] _CLASS_NAMES = {
@@ -228,7 +250,6 @@ public class KBActivityInterpreter extends BaseSocialActivityInterpreter {
 		KBTemplate.class.getName()
 	};
 
-	@Reference
 	private KBArticleLocalService _kbArticleLocalService;
 
 	@Reference(
@@ -237,10 +258,7 @@ public class KBActivityInterpreter extends BaseSocialActivityInterpreter {
 	private ModelResourcePermission<KBArticle>
 		_kbArticleModelResourcePermission;
 
-	@Reference
 	private KBCommentLocalService _kbCommentLocalService;
-
-	@Reference
 	private KBTemplateLocalService _kbTemplateLocalService;
 
 	@Reference(

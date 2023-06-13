@@ -36,7 +36,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.upload.UploadPortletRequestImpl;
 
@@ -55,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rodrigo Paulino
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"mvc.command.name=/journal/import_data_definition"
@@ -103,10 +103,12 @@ public class ImportDataDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			hideDefaultSuccessMessage(actionRequest);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 
 			SessionErrors.add(
-				actionRequest, "importDataDefinitionErrorMessage", exception);
+				actionRequest, "importDataDefinitionErrorMessage");
 
 			hideDefaultErrorMessage(actionRequest);
 		}
@@ -115,17 +117,8 @@ public class ImportDataDefinitionMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private String _generateFieldName(String fieldName) {
-		String newFieldName = null;
-
-		int index = fieldName.length() - 8;
-
-		if ((index >= 0) && Validator.isNumber(fieldName.substring(index))) {
-			newFieldName = DDMFormFieldUtil.getDDMFormFieldName(
-				fieldName.substring(0, index));
-		}
-		else {
-			newFieldName = DDMFormFieldUtil.getDDMFormFieldName(fieldName);
-		}
+		String newFieldName = DDMFormFieldUtil.getDDMFormFieldName(
+			fieldName.substring(0, fieldName.length() - 8));
 
 		while (_fieldNames.contains(newFieldName)) {
 			_generateFieldName(fieldName);

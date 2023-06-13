@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.workflow.kaleo.definition.AddressRecipient;
 import com.liferay.portal.workflow.kaleo.definition.NotificationReceptionType;
@@ -57,8 +56,7 @@ public class KaleoNotificationRecipientLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(
-			serviceContext.getGuestOrUserId());
+		User user = userLocalService.getUser(serviceContext.getGuestOrUserId());
 		Date date = new Date();
 
 		long kaleoNotificationRecipientId = counterLocalService.increment();
@@ -83,7 +81,7 @@ public class KaleoNotificationRecipientLocalServiceImpl
 		kaleoNotificationRecipient.setNotificationReceptionType(
 			notificationReceptionType.getValue());
 
-		_setRecipient(kaleoNotificationRecipient, recipient, serviceContext);
+		setRecipient(kaleoNotificationRecipient, recipient, serviceContext);
 
 		return kaleoNotificationRecipientPersistence.update(
 			kaleoNotificationRecipient);
@@ -110,7 +108,7 @@ public class KaleoNotificationRecipientLocalServiceImpl
 			kaleoNotificationId);
 	}
 
-	private void _setRecipient(
+	protected void setRecipient(
 			KaleoNotificationRecipient kaleoNotificationRecipient,
 			Recipient recipient, ServiceContext serviceContext)
 		throws PortalException {
@@ -169,15 +167,15 @@ public class KaleoNotificationRecipientLocalServiceImpl
 			User user = null;
 
 			if (userRecipient.getUserId() > 0) {
-				user = _userLocalService.getUser(userRecipient.getUserId());
+				user = userLocalService.getUser(userRecipient.getUserId());
 			}
 			else if (Validator.isNotNull(userRecipient.getScreenName())) {
-				user = _userLocalService.getUserByScreenName(
+				user = userLocalService.getUserByScreenName(
 					serviceContext.getCompanyId(),
 					userRecipient.getScreenName());
 			}
 			else if (Validator.isNotNull(userRecipient.getEmailAddress())) {
-				user = _userLocalService.getUserByEmailAddress(
+				user = userLocalService.getUserByEmailAddress(
 					serviceContext.getCompanyId(),
 					userRecipient.getEmailAddress());
 			}
@@ -191,8 +189,5 @@ public class KaleoNotificationRecipientLocalServiceImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

@@ -33,12 +33,3 @@
 	%>
 
 </div>
-
-<liferay-frontend:component
-	context='<%=
-		HashMapBuilder.<String, Object>put(
-			"portletId", selPortlet.getPortletName()
-		).build()
-	%>'
-	module="js/EditConfigurationEventHandler"
-/>

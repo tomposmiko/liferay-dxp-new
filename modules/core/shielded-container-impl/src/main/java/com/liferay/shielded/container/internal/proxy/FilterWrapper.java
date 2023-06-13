@@ -37,9 +37,10 @@ public class FilterWrapper implements Filter {
 
 		_proxyFactory = proxyFactory;
 		_filterSupplier = filterSupplier;
+
 		_servletContext = servletContext;
 
-		_classLoader = servletContext.getClassLoader();
+		_classLoader = _servletContext.getClassLoader();
 	}
 
 	@Override

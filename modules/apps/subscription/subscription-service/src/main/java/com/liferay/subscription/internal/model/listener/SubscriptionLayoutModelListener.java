@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shuyang Zhou
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class SubscriptionLayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
@@ -46,7 +46,13 @@ public class SubscriptionLayoutModelListener extends BaseModelListener<Layout> {
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setSubscriptionLocalService(
+		SubscriptionLocalService subscriptionLocalService) {
+
+		_subscriptionLocalService = subscriptionLocalService;
+	}
+
 	private SubscriptionLocalService _subscriptionLocalService;
 
 }

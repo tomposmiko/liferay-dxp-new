@@ -12,12 +12,6 @@
 import {fetch} from 'frontend-js-web';
 
 export default {
-	getAnalyticsReportsData(analyticsReportsURL, body) {
-		return _fetchWithError(analyticsReportsURL, {
-			body,
-			method: 'POST',
-		});
-	},
 	getHistoricalReads(
 		analyticsReportsHistoricalReadsURL,
 		{namespace, plid, timeSpanKey, timeSpanOffset}
@@ -60,11 +54,8 @@ export default {
 		});
 	},
 
-	getTrafficSources(
-		analyticsReportsTrafficSourcesURL,
-		{namespace, plid, timeSpanKey, timeSpanOffset}
-	) {
-		const body = {plid, timeSpanKey, timeSpanOffset};
+	getTrafficSources(analyticsReportsTrafficSourcesURL, {namespace, plid}) {
+		const body = {plid};
 
 		return _fetchWithError(analyticsReportsTrafficSourcesURL, {
 			body: _getFormDataRequest(body, namespace),

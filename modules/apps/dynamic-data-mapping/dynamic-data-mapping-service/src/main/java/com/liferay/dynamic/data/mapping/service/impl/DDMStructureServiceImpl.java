@@ -14,12 +14,13 @@
 
 package com.liferay.dynamic.data.mapping.service.impl;
 
-import com.liferay.dynamic.data.mapping.internal.search.helper.DDMSearchHelper;
+import com.liferay.dynamic.data.mapping.internal.search.util.DDMSearchHelper;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.security.permission.DDMPermissionSupport;
 import com.liferay.dynamic.data.mapping.service.base.DDMStructureServiceBaseImpl;
+import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureFinder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -30,6 +31,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -117,7 +119,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 * extracted from the original one. The new structure supports a new name
 	 * and description.
 	 *
-	 * @param  sourceStructureId the primary key of the structure to be copied
+	 * @param  structureId the primary key of the structure to be copied
 	 * @param  nameMap the new structure's locales and localized names
 	 * @param  descriptionMap the new structure's locales and localized
 	 *         descriptions
@@ -128,42 +130,41 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	 */
 	@Override
 	public DDMStructure copyStructure(
-			long sourceStructureId, Map<Locale, String> nameMap,
+			long structureId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMStructure sourceStructure = ddmStructurePersistence.findByPrimaryKey(
-			sourceStructureId);
+		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
+			structureId);
 
 		_ddmStructureModelResourcePermission.check(
-			getPermissionChecker(), sourceStructure, ActionKeys.VIEW);
+			getPermissionChecker(), structure, ActionKeys.VIEW);
 
 		_ddmPermissionSupport.checkAddStructurePermission(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			sourceStructure.getClassNameId());
+			structure.getClassNameId());
 
 		return ddmStructureLocalService.copyStructure(
-			getUserId(), sourceStructureId, nameMap, descriptionMap,
-			serviceContext);
+			getUserId(), structureId, nameMap, descriptionMap, serviceContext);
 	}
 
 	@Override
 	public DDMStructure copyStructure(
-			long sourceStructureId, ServiceContext serviceContext)
+			long structureId, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMStructure sourceStructure = ddmStructurePersistence.findByPrimaryKey(
-			sourceStructureId);
+		DDMStructure structure = ddmStructurePersistence.findByPrimaryKey(
+			structureId);
 
 		_ddmStructureModelResourcePermission.check(
-			getPermissionChecker(), sourceStructure, ActionKeys.VIEW);
+			getPermissionChecker(), structure, ActionKeys.VIEW);
 
 		_ddmPermissionSupport.checkAddStructurePermission(
 			getPermissionChecker(), serviceContext.getScopeGroupId(),
-			sourceStructure.getClassNameId());
+			structure.getClassNameId());
 
 		return ddmStructureLocalService.copyStructure(
-			getUserId(), sourceStructureId, serviceContext);
+			getUserId(), structureId, serviceContext);
 	}
 
 	/**
@@ -319,7 +320,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -344,7 +345,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -376,7 +377,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	public int getStructuresCount(
 		long companyId, long[] groupIds, long classNameId) {
 
-		return ddmStructureFinder.filterCountByC_G_C_S(
+		return _ddmStructureFinder.filterCountByC_G_C_S(
 			companyId, groupIds, classNameId, WorkflowConstants.STATUS_ANY);
 	}
 
@@ -399,33 +400,6 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 
 		ddmStructureLocalService.revertStructure(
 			getUserId(), structureId, version, serviceContext);
-	}
-
-	@Override
-	public List<DDMStructure> search(
-			long companyId, long[] groupIds, long classNameId, long classPK,
-			String keywords, int status, int start, int end,
-			OrderByComparator<DDMStructure> orderByComparator)
-		throws PortalException {
-
-		try {
-			SearchContext searchContext =
-				_ddmSearchHelper.buildStructureSearchContext(
-					companyId, groupIds, getUserId(), classNameId, classPK,
-					keywords, keywords, StringPool.BLANK, null, status, start,
-					end, orderByComparator);
-
-			return _ddmSearchHelper.doSearch(
-				searchContext, DDMStructure.class,
-				ddmStructureLocalService::fetchStructure);
-		}
-		catch (PrincipalException principalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
-			}
-		}
-
-		return Collections.emptyList();
 	}
 
 	/**
@@ -477,7 +451,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -531,7 +505,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -592,36 +566,11 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
 		return Collections.emptyList();
-	}
-
-	@Override
-	public int searchCount(
-			long companyId, long[] groupIds, long classNameId, long classPK,
-			String keywords, int status)
-		throws PortalException {
-
-		try {
-			SearchContext searchContext =
-				_ddmSearchHelper.buildStructureSearchContext(
-					companyId, groupIds, getUserId(), classNameId, classPK,
-					keywords, keywords, StringPool.BLANK, null, status,
-					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-
-			return _ddmSearchHelper.doSearchCount(
-				searchContext, DDMStructure.class);
-		}
-		catch (PrincipalException principalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
-			}
-		}
-
-		return 0;
 	}
 
 	/**
@@ -654,7 +603,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -693,7 +642,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -737,7 +686,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		}
 		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(principalException);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -782,16 +731,19 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMStructureServiceImpl.class);
 
+	private static volatile ModelResourcePermission<DDMStructure>
+		_ddmStructureModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				DDMStructureServiceImpl.class,
+				"_ddmStructureModelResourcePermission", DDMStructure.class);
+
 	@Reference
 	private DDMPermissionSupport _ddmPermissionSupport;
 
 	@Reference
 	private DDMSearchHelper _ddmSearchHelper;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMStructure)"
-	)
-	private ModelResourcePermission<DDMStructure>
-		_ddmStructureModelResourcePermission;
+	@Reference
+	private DDMStructureFinder _ddmStructureFinder;
 
 }

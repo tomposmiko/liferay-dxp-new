@@ -15,11 +15,10 @@
 package com.liferay.change.tracking.web.internal.portlet;
 
 import com.liferay.change.tracking.constants.CTPortletKeys;
-import com.liferay.change.tracking.service.CTCollectionLocalService;
+import com.liferay.change.tracking.model.CTPreferences;
 import com.liferay.change.tracking.service.CTCollectionService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
-import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
 import com.liferay.change.tracking.web.internal.constants.CTWebKeys;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
 import com.liferay.change.tracking.web.internal.display.context.PublicationsDisplayContext;
@@ -28,6 +27,7 @@ import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.permission.PortletPermission;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -66,8 +66,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/publications/view_publications.jsp",
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -87,9 +86,8 @@ public class PublicationsPortlet extends MVCPortlet {
 
 		PublicationsDisplayContext publicationsDisplayContext =
 			new PublicationsDisplayContext(
-				_ctCollectionLocalService, _ctCollectionService,
-				_ctDisplayRendererRegistry, _ctEntryLocalService,
-				_ctPreferencesLocalService,
+				_ctCollectionService, _ctDisplayRendererRegistry,
+				_ctEntryLocalService, _ctPreferencesLocalService,
 				_portal.getHttpServletRequest(renderRequest), _language,
 				renderRequest, renderResponse);
 
@@ -103,9 +101,14 @@ public class PublicationsPortlet extends MVCPortlet {
 	protected void checkPermissions(PortletRequest portletRequest)
 		throws Exception {
 
-		if (!_ctSettingsConfigurationHelper.isEnabled(
-				_portal.getCompanyId(portletRequest))) {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
 
+		CTPreferences ctPreferences =
+			_ctPreferencesLocalService.fetchCTPreferences(
+				permissionChecker.getCompanyId(), 0);
+
+		if (ctPreferences == null) {
 			String actionName = ParamUtil.getString(
 				portletRequest, ActionRequest.ACTION_NAME);
 			String mvcRenderCommandName = ParamUtil.getString(
@@ -122,12 +125,8 @@ public class PublicationsPortlet extends MVCPortlet {
 		}
 
 		_portletPermission.check(
-			PermissionThreadLocal.getPermissionChecker(),
-			CTPortletKeys.PUBLICATIONS, ActionKeys.VIEW);
+			permissionChecker, CTPortletKeys.PUBLICATIONS, ActionKeys.VIEW);
 	}
-
-	@Reference
-	private CTCollectionLocalService _ctCollectionLocalService;
 
 	@Reference
 	private CTCollectionService _ctCollectionService;
@@ -140,9 +139,6 @@ public class PublicationsPortlet extends MVCPortlet {
 
 	@Reference
 	private CTPreferencesLocalService _ctPreferencesLocalService;
-
-	@Reference
-	private CTSettingsConfigurationHelper _ctSettingsConfigurationHelper;
 
 	@Reference
 	private Language _language;

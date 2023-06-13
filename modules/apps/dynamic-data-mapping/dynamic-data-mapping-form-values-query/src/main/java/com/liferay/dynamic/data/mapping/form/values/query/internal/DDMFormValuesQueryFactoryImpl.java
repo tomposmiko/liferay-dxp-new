@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = DDMFormValuesQueryFactory.class)
+@Component(immediate = true, service = DDMFormValuesQueryFactory.class)
 public class DDMFormValuesQueryFactoryImpl
 	implements DDMFormValuesQueryFactory {
 
@@ -42,7 +42,7 @@ public class DDMFormValuesQueryFactoryImpl
 
 		try {
 			DDMFormValuesQueryParser.PathContext pathContext =
-				_createPathContext(query);
+				createPathContext(query);
 
 			DDMFormValuesQueryListener ddmFormValuesQueryListener =
 				new DDMFormValuesQueryListener();
@@ -60,7 +60,7 @@ public class DDMFormValuesQueryFactoryImpl
 		}
 	}
 
-	private DDMFormValuesQueryParser.PathContext _createPathContext(
+	protected DDMFormValuesQueryParser.PathContext createPathContext(
 		String query) {
 
 		CharStream charStream = new ANTLRInputStream(query);

@@ -64,10 +64,6 @@ public interface DispatchTrigger extends DispatchTriggerModel, PersistedModel {
 
 	public java.util.Date getNextFireDate();
 
-	public java.util.Date getTimeZoneEndDate();
-
-	public java.util.Date getTimeZoneStartDate();
-
 	public void setDispatchTaskSettingsUnicodeProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
 			dispatchTaskSettingsUnicodeProperties);

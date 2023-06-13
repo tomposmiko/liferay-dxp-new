@@ -52,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
-	property = "adaptive.media.key=document-library",
+	immediate = true, property = "adaptive.media.key=document-library",
 	service = AMImageOptimizer.class
 )
 public class DLAMImageOptimizer implements AMImageOptimizer {
@@ -172,7 +172,7 @@ public class DLAMImageOptimizer implements AMImageOptimizer {
 					}
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 
 					_sendStatusMessage(
@@ -185,7 +185,7 @@ public class DLAMImageOptimizer implements AMImageOptimizer {
 			actionableDynamicQuery.performActions();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 	}
 

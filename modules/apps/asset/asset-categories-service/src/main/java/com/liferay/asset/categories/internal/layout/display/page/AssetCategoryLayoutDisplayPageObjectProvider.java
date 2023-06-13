@@ -36,11 +36,6 @@ public class AssetCategoryLayoutDisplayPageObjectProvider
 	}
 
 	@Override
-	public String getClassName() {
-		return AssetCategory.class.getName();
-	}
-
-	@Override
 	public long getClassNameId() {
 		return _portal.getClassNameId(AssetCategory.class.getName());
 	}

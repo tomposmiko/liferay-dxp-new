@@ -3,37 +3,45 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testcase.url = "http://localhost:8080";
 	property testray.main.component.name = "Content Pages";
 
-	static var randomSiteName = StringUtil.randomString(8);
-
-	var siteURLKey = StringUtil.toLowerCase(${randomSiteName});
-
 	setUp {
-		task ("Sign in") {
+		task ("Set up instance and sign in") {
+			TestCase.setUpPortalInstance();
+
 			User.firstLoginPG();
 		}
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = ${randomSiteName});
+		task ("Add a site via JSON") {
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
 		task ("Activate local live staging with page versioning enabled") {
 			JSONStaging.enableLocalStaging(
 				branchingPrivate = "true",
 				branchingPublic = "true",
-				groupName = ${randomSiteName});
+				groupName = "Test Site Name");
+		}
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
 	@description = "This is a test for LPS-125755. Can switch to specific Site Pages Variation on content page when enable page versioning."
-	@priority = 5
+	@priority = "5"
 	test ChangeSitePagesVariationInViewMode {
 		property portal.acceptance = "true";
 
 		task ("Add a public content page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "${siteURLKey}-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			ContentPages.addPage(pageName = "Test Page Name");
 		}
@@ -43,20 +51,20 @@ definition {
 				collectionName = "Basic Components",
 				fragmentName = "Card");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the content page in the staging site") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Page Name",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 		}
 
 		task ("Assert the Card fragment is shown") {
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "card",
-				text = "Card Title Example");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "card",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Card Title Example");
 		}
 
 		task ("Assert the Main Variation is selected in Site Pages Variation field") {
@@ -70,16 +78,16 @@ definition {
 		task ("Assert the new site pages variation is selected in Site Pages Variation field") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Page Name",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 
 			Staging.viewSitePagesVariationPG(sitePagesVariationName = "Test Site Pages Variation");
 		}
 
 		task ("Assert the Card fragment is shown") {
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "card",
-				text = "Card Title Example");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "card",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Card Title Example");
 		}
 
 		task ("Change to Main Variation") {
@@ -93,93 +101,20 @@ definition {
 		}
 
 		task ("Assert the Card fragment is shown") {
-			ContentPages.viewFragmentText(
-				contributed = "false",
-				fragmentName = "card",
-				text = "Card Title Example");
-		}
-	}
-
-	@description = "This is a test for LPS-140483. The site admin could create page template from content page in site page variation."
-	@priority = 4
-	test CreatePageTemplateFromContentPageInSitePageVariation {
-		task ("Add a page template collection") {
-			JSONLayoutpagetemplate.addLayoutPageTemplateCollection(
-				groupName = "${randomSiteName}-staging",
-				layoutPageTemplateCollectionName = "Page Template Collection",
-				site = "false");
-		}
-
-		task ("Add a Heading fragment to a content page then publish") {
-			JSONLayout.addPublicLayout(
-				groupName = "${randomSiteName} (Staging)",
-				layoutName = "Test Page Name",
-				site = "false",
-				type = "content");
-
-			ContentPagesNavigator.openEditContentPage(
-				pageName = "Test Page Name",
-				siteName = "${randomSiteName} Staging");
-
-			PageEditor.addFragment(
-				collectionName = "Basic Components",
-				fragmentName = "Heading");
-
-			PageEditor.publish();
-		}
-
-		task ("Add a new site page variation at view mode") {
-			ContentPagesNavigator.openViewContentPage(
-				pageName = "Test Page Name",
-				siteName = "${randomSiteName} Staging");
-
-			Staging.addSitePagesVariationPG(sitePagesVariationName = "Test Site Pages Variation");
-
-			Staging.viewSitePagesVariationPG(sitePagesVariationName = "Test Site Pages Variation");
-		}
-
-		task ("Edit the inline text of Heading under new site page variation") {
-			ContentPages.gotoPageEditor();
-
-			PageEditor.editFragmentText(
-				fragmentName = "Heading",
-				id = "element-text",
-				text = "Welcome to Liferay");
-		}
-
-		task ("Create a content page template from the content page under page template collection") {
-			PageEditor.createPageTemplate(collectionName = "Page Template Collection");
-		}
-
-		task ("View the content page template shown in Page Templates admin") {
-			PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "${siteURLKey}-staging");
-
-			Navigator.gotoNavNested(navNested = "Page Template Collection");
-
-			PageTemplatesAdmin.viewPageTemplatePresent(pageTemplateName = "Test Page Name - Page Template");
-
-			PageTemplatesAdmin.viewEntryWorkflowStatus(
-				entry = "Test Page Name - Page Template",
-				workflowStatus = "Draft");
-		}
-
-		task ("View the Heading is shown in content page template") {
-			PageTemplatesAdmin.gotoPageTemplate(pageTemplateName = "Test Page Name - Page Template");
-
-			PageEditor.viewFragmentEditableText(
-				editableText = "Welcome to Liferay",
-				fragmentName = "Heading",
-				id = "element-text");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "card",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Card Title Example");
 		}
 	}
 
 	@description = "This is a test for LPS-125755. Can manage Site Pages Navigation on content page when enable page versioning."
-	@priority = 5
+	@priority = "5"
 	test ManageSitePagesVariationInViewMode {
 		property portal.acceptance = "true";
 
 		task ("Add a public content page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "${siteURLKey}-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			ContentPages.addPage(pageName = "Test Page Name");
 		}
@@ -189,20 +124,20 @@ definition {
 				collectionName = "Basic Components",
 				fragmentName = "Paragraph");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the content page in the staging site") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Page Name",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 		}
 
 		task ("Assert the Paragraph fragment is shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "paragraph",
-				id = "element-text",
-				text = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "paragraph",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea.");
 		}
 
 		task ("Assert the Main Variation is selected in Site Pages Variation field") {
@@ -217,7 +152,7 @@ definition {
 			LexiconEntry.openEntryMenu(rowEntry = "Main Variation");
 
 			for (var menuItem : list "Edit,Permissions,Merge") {
-				MenuItem.viewVisible(menuItem = ${menuItem});
+				MenuItem.viewVisible(menuItem = "${menuItem}");
 			}
 
 			MenuItem.viewNotPresent(menuItem = "Delete");
@@ -255,7 +190,7 @@ definition {
 			LexiconEntry.openEntryMenu(rowEntry = "Test Site Pages Variation");
 
 			for (var menuItem : list "Edit,Permissions,Merge,Delete") {
-				MenuItem.viewVisible(menuItem = ${menuItem});
+				MenuItem.viewVisible(menuItem = "${menuItem}");
 			}
 		}
 
@@ -274,29 +209,28 @@ definition {
 		task ("Assert the Default Variation is selected in Site Pages Variation field") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Page Name",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 
 			Staging.viewSitePagesVariationPG(sitePagesVariationName = "Default Variation");
 		}
 
 		task ("Assert the Paragraph fragment is shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "paragraph",
-				id = "element-text",
-				text = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "paragraph",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea.");
 		}
 	}
 
 	@description = "This is a test for LPS-125755. The Site Pages Variation is enabled on content page in view mode when enable page versioning."
-	@priority = 5
+	@priority = "5"
 	test PublishContentPageWithPageVariationToLive {
 		property portal.acceptance = "true";
-		property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 
 		task ("Add a public content page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "${siteURLKey}-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
-			ContentPages.addPublicPage(pageName = "Public Content Page Name");
+			ContentPages.addPage(pageName = "Public Content Page Name");
 		}
 
 		task ("Add a Heading fragment to page") {
@@ -304,20 +238,20 @@ definition {
 				collectionName = "Basic Components",
 				fragmentName = "Heading");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the public content page in the staging site") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Public Content Page Name",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 		}
 
 		task ("Assert the Heading fragment is shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
 		}
 
 		task ("Assert Live item is not shown on navbar") {
@@ -343,20 +277,20 @@ definition {
 		task ("Navigate to the public content page in the live site") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Public Content Page Name",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 
 			Click(locator1 = "Staging#LIVE_BUTTON");
 		}
 
 		task ("Assert the Heading fragment is shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "heading",
-				id = "element-text",
-				text = "Heading Example");
+			AssertTextEquals(
+				key_fragmentName = "heading",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Heading Example");
 		}
 
 		task ("Add a private content page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "${siteURLKey}-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			ContentPages.addPrivatePage(pageName = "Private Content Page Name");
 		}
@@ -366,21 +300,21 @@ definition {
 				collectionName = "Basic Components",
 				fragmentName = "Button");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the private content page in the staging site") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Private Content Page Name",
 				privateLayout = "true",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 		}
 
 		task ("Assert the Button fragment is shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
+			AssertTextEquals(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Go Somewhere");
 		}
 
 		task ("Assert Live item is not shown on navbar") {
@@ -407,24 +341,24 @@ definition {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Private Content Page Name",
 				privateLayout = "true",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 
 			Click(locator1 = "Staging#LIVE_BUTTON");
 		}
 
 		task ("Assert the Button fragment is shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "button",
-				id = "link",
-				text = "Go Somewhere");
+			AssertTextEquals(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Go Somewhere");
 		}
 	}
 
 	@description = "This is a test for LPS-125755. The Site Pages Variation is not shown on content page in edit mode when enable page versioning."
-	@priority = 4
+	@priority = "4"
 	test ViewSitePagesVariationOnlyShownInViewMode {
 		task ("Add a public content page") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "${siteURLKey}-staging");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
 			ContentPages.addPage(pageName = "Test Page Name");
 		}
@@ -448,13 +382,13 @@ definition {
 				collectionName = "Basic Components",
 				fragmentName = "HTML");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to the content page in the staging site") {
 			ContentPagesNavigator.openViewContentPage(
 				pageName = "Test Page Name",
-				siteName = "${randomSiteName} Staging");
+				siteName = "Test Site Name Staging");
 		}
 
 		task ("Assert the Site Page Variation is shown in staging bar") {
@@ -468,10 +402,10 @@ definition {
 		}
 
 		task ("Assert the HTML fragment is shown") {
-			ContentPages.viewFragmentText(
-				fragmentName = "html",
-				id = "element-html",
-				text = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
+			AssertTextEquals.assertPartialText(
+				key_fragmentName = "html",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "HTML Example");
 		}
 
 		task ("Access to content page in edit mode") {

@@ -15,16 +15,12 @@
 package com.liferay.commerce.inventory.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
-import com.liferay.portal.kernel.exception.LocaleException;
+import com.liferay.portal.kernel.model.AuditedModel;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.LocalizedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.StagedAuditedModel;
 
 import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -41,8 +37,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommerceInventoryWarehouseModel
-	extends BaseModel<CommerceInventoryWarehouse>, LocalizedModel, MVCCModel,
-			ShardedModel, StagedAuditedModel {
+	extends AuditedModel, BaseModel<CommerceInventoryWarehouse>, MVCCModel,
+			ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -79,23 +75,6 @@ public interface CommerceInventoryWarehouseModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the uuid of this commerce inventory warehouse.
-	 *
-	 * @return the uuid of this commerce inventory warehouse
-	 */
-	@AutoEscape
-	@Override
-	public String getUuid();
-
-	/**
-	 * Sets the uuid of this commerce inventory warehouse.
-	 *
-	 * @param uuid the uuid of this commerce inventory warehouse
-	 */
-	@Override
-	public void setUuid(String uuid);
 
 	/**
 	 * Returns the external reference code of this commerce inventory warehouse.
@@ -229,58 +208,8 @@ public interface CommerceInventoryWarehouseModel
 	 *
 	 * @return the name of this commerce inventory warehouse
 	 */
+	@AutoEscape
 	public String getName();
-
-	/**
-	 * Returns the localized name of this commerce inventory warehouse in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized name of this commerce inventory warehouse
-	 */
-	@AutoEscape
-	public String getName(Locale locale);
-
-	/**
-	 * Returns the localized name of this commerce inventory warehouse in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this commerce inventory warehouse. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
-	@AutoEscape
-	public String getName(Locale locale, boolean useDefault);
-
-	/**
-	 * Returns the localized name of this commerce inventory warehouse in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized name of this commerce inventory warehouse
-	 */
-	@AutoEscape
-	public String getName(String languageId);
-
-	/**
-	 * Returns the localized name of this commerce inventory warehouse in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized name of this commerce inventory warehouse
-	 */
-	@AutoEscape
-	public String getName(String languageId, boolean useDefault);
-
-	@AutoEscape
-	public String getNameCurrentLanguageId();
-
-	@AutoEscape
-	public String getNameCurrentValue();
-
-	/**
-	 * Returns a map of the locales and localized names of this commerce inventory warehouse.
-	 *
-	 * @return the locales and localized names of this commerce inventory warehouse
-	 */
-	public Map<Locale, String> getNameMap();
 
 	/**
 	 * Sets the name of this commerce inventory warehouse.
@@ -290,96 +219,12 @@ public interface CommerceInventoryWarehouseModel
 	public void setName(String name);
 
 	/**
-	 * Sets the localized name of this commerce inventory warehouse in the language.
-	 *
-	 * @param name the localized name of this commerce inventory warehouse
-	 * @param locale the locale of the language
-	 */
-	public void setName(String name, Locale locale);
-
-	/**
-	 * Sets the localized name of this commerce inventory warehouse in the language, and sets the default locale.
-	 *
-	 * @param name the localized name of this commerce inventory warehouse
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
-	public void setName(String name, Locale locale, Locale defaultLocale);
-
-	public void setNameCurrentLanguageId(String languageId);
-
-	/**
-	 * Sets the localized names of this commerce inventory warehouse from the map of locales and localized names.
-	 *
-	 * @param nameMap the locales and localized names of this commerce inventory warehouse
-	 */
-	public void setNameMap(Map<Locale, String> nameMap);
-
-	/**
-	 * Sets the localized names of this commerce inventory warehouse from the map of locales and localized names, and sets the default locale.
-	 *
-	 * @param nameMap the locales and localized names of this commerce inventory warehouse
-	 * @param defaultLocale the default locale
-	 */
-	public void setNameMap(Map<Locale, String> nameMap, Locale defaultLocale);
-
-	/**
 	 * Returns the description of this commerce inventory warehouse.
 	 *
 	 * @return the description of this commerce inventory warehouse
 	 */
+	@AutoEscape
 	public String getDescription();
-
-	/**
-	 * Returns the localized description of this commerce inventory warehouse in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the locale of the language
-	 * @return the localized description of this commerce inventory warehouse
-	 */
-	@AutoEscape
-	public String getDescription(Locale locale);
-
-	/**
-	 * Returns the localized description of this commerce inventory warehouse in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param locale the local of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this commerce inventory warehouse. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
-	 */
-	@AutoEscape
-	public String getDescription(Locale locale, boolean useDefault);
-
-	/**
-	 * Returns the localized description of this commerce inventory warehouse in the language. Uses the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @return the localized description of this commerce inventory warehouse
-	 */
-	@AutoEscape
-	public String getDescription(String languageId);
-
-	/**
-	 * Returns the localized description of this commerce inventory warehouse in the language, optionally using the default language if no localization exists for the requested language.
-	 *
-	 * @param languageId the ID of the language
-	 * @param useDefault whether to use the default language if no localization exists for the requested language
-	 * @return the localized description of this commerce inventory warehouse
-	 */
-	@AutoEscape
-	public String getDescription(String languageId, boolean useDefault);
-
-	@AutoEscape
-	public String getDescriptionCurrentLanguageId();
-
-	@AutoEscape
-	public String getDescriptionCurrentValue();
-
-	/**
-	 * Returns a map of the locales and localized descriptions of this commerce inventory warehouse.
-	 *
-	 * @return the locales and localized descriptions of this commerce inventory warehouse
-	 */
-	public Map<Locale, String> getDescriptionMap();
 
 	/**
 	 * Sets the description of this commerce inventory warehouse.
@@ -387,42 +232,6 @@ public interface CommerceInventoryWarehouseModel
 	 * @param description the description of this commerce inventory warehouse
 	 */
 	public void setDescription(String description);
-
-	/**
-	 * Sets the localized description of this commerce inventory warehouse in the language.
-	 *
-	 * @param description the localized description of this commerce inventory warehouse
-	 * @param locale the locale of the language
-	 */
-	public void setDescription(String description, Locale locale);
-
-	/**
-	 * Sets the localized description of this commerce inventory warehouse in the language, and sets the default locale.
-	 *
-	 * @param description the localized description of this commerce inventory warehouse
-	 * @param locale the locale of the language
-	 * @param defaultLocale the default locale
-	 */
-	public void setDescription(
-		String description, Locale locale, Locale defaultLocale);
-
-	public void setDescriptionCurrentLanguageId(String languageId);
-
-	/**
-	 * Sets the localized descriptions of this commerce inventory warehouse from the map of locales and localized descriptions.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this commerce inventory warehouse
-	 */
-	public void setDescriptionMap(Map<Locale, String> descriptionMap);
-
-	/**
-	 * Sets the localized descriptions of this commerce inventory warehouse from the map of locales and localized descriptions, and sets the default locale.
-	 *
-	 * @param descriptionMap the locales and localized descriptions of this commerce inventory warehouse
-	 * @param defaultLocale the default locale
-	 */
-	public void setDescriptionMap(
-		Map<Locale, String> descriptionMap, Locale defaultLocale);
 
 	/**
 	 * Returns the active of this commerce inventory warehouse.
@@ -594,23 +403,6 @@ public interface CommerceInventoryWarehouseModel
 	public void setType(String type);
 
 	@Override
-	public String[] getAvailableLanguageIds();
-
-	@Override
-	public String getDefaultLanguageId();
-
-	@Override
-	public void prepareLocalizedFieldsForImport() throws LocaleException;
-
-	@Override
-	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
-		throws LocaleException;
-
-	@Override
 	public CommerceInventoryWarehouse cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

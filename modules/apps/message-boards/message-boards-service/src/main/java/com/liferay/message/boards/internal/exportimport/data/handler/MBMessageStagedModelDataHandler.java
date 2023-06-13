@@ -48,7 +48,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
 import com.liferay.ratings.kernel.model.RatingsEntry;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
-import com.liferay.trash.TrashHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class MBMessageStagedModelDataHandler
 	extends BaseStagedModelDataHandler<MBMessage> {
 
@@ -411,7 +410,7 @@ public class MBMessageStagedModelDataHandler
 				}
 				catch (IOException ioException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(ioException);
+						_log.warn(ioException, ioException);
 					}
 				}
 			}
@@ -443,7 +442,7 @@ public class MBMessageStagedModelDataHandler
 			}
 		}
 
-		if (_trashHelper.isInTrashContainer(existingMessage)) {
+		if (existingMessage.isInTrashContainer()) {
 			MBThread existingThread = existingMessage.getThread();
 
 			TrashHandler trashHandler =
@@ -468,7 +467,7 @@ public class MBMessageStagedModelDataHandler
 				_mbDiscussionLocalService.getThreadDiscussion(threadId);
 
 			return _mbMessageLocalService.addDiscussionMessage(
-				null, userId, message.getUserName(),
+				userId, message.getUserName(),
 				portletDataContext.getScopeGroupId(), discussion.getClassName(),
 				discussion.getClassPK(), threadId, parentMessageId,
 				message.getSubject(), message.getBody(), serviceContext);
@@ -516,7 +515,7 @@ public class MBMessageStagedModelDataHandler
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -587,8 +586,5 @@ public class MBMessageStagedModelDataHandler
 
 	@Reference
 	private RatingsEntryLocalService _ratingsEntryLocalService;
-
-	@Reference
-	private TrashHelper _trashHelper;
 
 }

@@ -25,9 +25,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
-import java.util.Locale;
-import java.util.Map;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -54,11 +51,8 @@ public interface ObjectActionService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.object.service.impl.ObjectActionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the object action remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link ObjectActionServiceUtil} if injection and service tracking are not available.
 	 */
 	public ObjectAction addObjectAction(
-			String externalReferenceCode, long objectDefinitionId,
-			boolean active, String conditionExpression, String description,
-			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
-			String name, String objectActionExecutorKey,
-			String objectActionTriggerKey,
+			long objectDefinitionId, boolean active, String name,
+			String objectActionExecutorKey, String objectActionTriggerKey,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException;
 
@@ -77,11 +71,7 @@ public interface ObjectActionService extends BaseService {
 	public String getOSGiServiceIdentifier();
 
 	public ObjectAction updateObjectAction(
-			String externalReferenceCode, long objectActionId, boolean active,
-			String conditionExpression, String description,
-			Map<Locale, String> errorMessageMap, Map<Locale, String> labelMap,
-			String name, String objectActionExecutorKey,
-			String objectActionTriggerKey,
+			long objectActionId, boolean active, String name,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException;
 

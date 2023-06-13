@@ -19,7 +19,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayModal from '@clayui/modal';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
 import {AssetCategoriesSelector} from 'asset-taglib';
-import {fetch, sub} from 'frontend-js-web';
+import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 
@@ -69,7 +69,7 @@ const EditCategoriesModal = ({
 			);
 		}
 
-		return sub(
+		return Liferay.Util.sub(
 			Liferay.Language.get(
 				'you-are-editing-the-common-categories-for-x-items.-select-edit-or-replace-current-categories'
 			),
@@ -143,12 +143,12 @@ const EditCategoriesModal = ({
 		}
 		else {
 			addedCategories = finalCategories.filter(
-				(categoryId) => initialCategories.indexOf(categoryId) === -1
+				(categoryId) => initialCategories.indexOf(categoryId) == -1
 			);
 		}
 
 		const removedCategories = initialCategories.filter(
-			(category) => finalCategories.indexOf(category) === -1
+			(category) => finalCategories.indexOf(category) == -1
 		);
 
 		fetchCategories(URL_UPDATE_CATEGORIES, append ? 'PATCH' : 'PUT', {
@@ -279,8 +279,10 @@ const EditCategoriesModal = ({
 					{multiple && (
 						<ClayRadioGroup
 							name="add-replace"
-							onChage={handleMultiSelectOptionChange}
-							value={selectedRadioGroupValue}
+							onSelectedValueChange={
+								handleMultiSelectOptionChange
+							}
+							selectedValue={selectedRadioGroupValue}
 						>
 							<ClayRadio
 								checked="true"
@@ -289,7 +291,7 @@ const EditCategoriesModal = ({
 							>
 								<div className="form-text">
 									{Liferay.Language.get(
-										'add-new-categories-or-remove-common-categories'
+										'these-categories-replace-all-existing-categories'
 									)}
 								</div>
 							</ClayRadio>
@@ -330,7 +332,6 @@ const EditCategoriesModal = ({
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
-
 							<ClayButton
 								disabled={!isValid}
 								displayType="primary"

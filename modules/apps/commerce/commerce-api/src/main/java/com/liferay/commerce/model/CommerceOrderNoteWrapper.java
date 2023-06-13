@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.model;
 
-import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
@@ -43,8 +42,6 @@ public class CommerceOrderNoteWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("commerceOrderNoteId", getCommerceOrderNoteId());
 		attributes.put("groupId", getGroupId());
@@ -62,18 +59,6 @@ public class CommerceOrderNoteWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		String uuid = (String)attributes.get("uuid");
-
-		if (uuid != null) {
-			setUuid(uuid);
-		}
-
 		String externalReferenceCode = (String)attributes.get(
 			"externalReferenceCode");
 
@@ -228,16 +213,6 @@ public class CommerceOrderNoteWrapper
 	}
 
 	/**
-	 * Returns the mvcc version of this commerce order note.
-	 *
-	 * @return the mvcc version of this commerce order note
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
 	 * Returns the primary key of this commerce order note.
 	 *
 	 * @return the primary key of this commerce order note
@@ -290,16 +265,6 @@ public class CommerceOrderNoteWrapper
 	@Override
 	public String getUserUuid() {
 		return model.getUserUuid();
-	}
-
-	/**
-	 * Returns the uuid of this commerce order note.
-	 *
-	 * @return the uuid of this commerce order note
-	 */
-	@Override
-	public String getUuid() {
-		return model.getUuid();
 	}
 
 	/**
@@ -398,16 +363,6 @@ public class CommerceOrderNoteWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this commerce order note.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce order note
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets the primary key of this commerce order note.
 	 *
 	 * @param primaryKey the primary key of this commerce order note
@@ -455,26 +410,6 @@ public class CommerceOrderNoteWrapper
 	@Override
 	public void setUserUuid(String userUuid) {
 		model.setUserUuid(userUuid);
-	}
-
-	/**
-	 * Sets the uuid of this commerce order note.
-	 *
-	 * @param uuid the uuid of this commerce order note
-	 */
-	@Override
-	public void setUuid(String uuid) {
-		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public StagedModelType getStagedModelType() {
-		return model.getStagedModelType();
 	}
 
 	@Override

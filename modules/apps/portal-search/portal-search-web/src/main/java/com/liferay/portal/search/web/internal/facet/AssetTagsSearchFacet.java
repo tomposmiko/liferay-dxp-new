@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = SearchFacet.class)
+@Component(immediate = true, service = SearchFacet.class)
 public class AssetTagsSearchFacet extends BaseJSPSearchFacet {
 
 	@Override
@@ -87,21 +87,23 @@ public class AssetTagsSearchFacet extends BaseJSPSearchFacet {
 
 	@Override
 	public JSONObject getJSONData(ActionRequest actionRequest) {
+		String displayStyleFacet = ParamUtil.getString(
+			actionRequest, getClassName() + "displayStyleFacet", "list");
+		int frequencyThreshold = ParamUtil.getInteger(
+			actionRequest, getClassName() + "frequencyThreshold", 1);
+		int maxTerms = ParamUtil.getInteger(
+			actionRequest, getClassName() + "maxTerms", 10);
+		boolean showAssetCount = ParamUtil.getBoolean(
+			actionRequest, getClassName() + "showAssetCount", true);
+
 		return JSONUtil.put(
-			"displayStyle",
-			ParamUtil.getString(
-				actionRequest, getClassName() + "displayStyleFacet", "list")
+			"displayStyle", displayStyleFacet
 		).put(
-			"frequencyThreshold",
-			ParamUtil.getInteger(
-				actionRequest, getClassName() + "frequencyThreshold", 1)
+			"frequencyThreshold", frequencyThreshold
 		).put(
-			"maxTerms",
-			ParamUtil.getInteger(actionRequest, getClassName() + "maxTerms", 10)
+			"maxTerms", maxTerms
 		).put(
-			"showAssetCount",
-			ParamUtil.getBoolean(
-				actionRequest, getClassName() + "showAssetCount", true)
+			"showAssetCount", showAssetCount
 		);
 	}
 
@@ -116,19 +118,20 @@ public class AssetTagsSearchFacet extends BaseJSPSearchFacet {
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.portal.search.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected FacetFactory getFacetFactory() {
 		return assetTagNamesFacetFactory;
 	}
 
-	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
 	@Reference
 	protected AssetTagNamesFacetFactory assetTagNamesFacetFactory;
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.portal.search.web)")
-	private ServletContext _servletContext;
 
 }

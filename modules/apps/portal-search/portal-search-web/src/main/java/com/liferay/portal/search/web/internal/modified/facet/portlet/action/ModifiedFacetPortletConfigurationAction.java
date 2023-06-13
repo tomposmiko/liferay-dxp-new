@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
@@ -29,7 +28,7 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.modified.facet.builder.DateRangeFactory;
 import com.liferay.portal.search.web.internal.modified.facet.constants.ModifiedFacetPortletKeys;
-import com.liferay.portal.search.web.internal.modified.facet.display.context.builder.ModifiedFacetDisplayContextBuilder;
+import com.liferay.portal.search.web.internal.modified.facet.display.context.ModifiedFacetDisplayBuilder;
 
 import java.text.ParseException;
 
@@ -47,6 +46,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Lino Alves
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + ModifiedFacetPortletKeys.MODIFIED_FACET,
 	service = ConfigurationAction.class
 )
@@ -68,12 +68,12 @@ public class ModifiedFacetPortletConfigurationAction
 			(RenderRequest)httpServletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_REQUEST);
 
-		ModifiedFacetDisplayContextBuilder modifiedFacetDisplayContextBuilder =
-			_createModifiedFacetDisplayContextBuilder(renderRequest);
+		ModifiedFacetDisplayBuilder modifiedFacetDisplayBuilder =
+			createModifiedFacetDisplayBuilder(renderRequest);
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			modifiedFacetDisplayContextBuilder.build());
+			modifiedFacetDisplayBuilder.build());
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
@@ -98,7 +98,7 @@ public class ModifiedFacetPortletConfigurationAction
 		catch (JSONException | ParseException exception) {
 			SessionErrors.add(actionRequest, "unparsableDate");
 
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		if (SessionErrors.isEmpty(actionRequest)) {
@@ -106,23 +106,12 @@ public class ModifiedFacetPortletConfigurationAction
 		}
 	}
 
-	private ModifiedFacetDisplayContextBuilder
-		_createModifiedFacetDisplayContextBuilder(RenderRequest renderRequest) {
+	protected ModifiedFacetDisplayBuilder createModifiedFacetDisplayBuilder(
+		RenderRequest renderRequest) {
 
 		try {
-			ModifiedFacetDisplayContextBuilder
-				modifiedFacetDisplayContextBuilder =
-					new ModifiedFacetDisplayContextBuilder(null, renderRequest);
-
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-			modifiedFacetDisplayContextBuilder.setLocale(
-				themeDisplay.getLocale());
-			modifiedFacetDisplayContextBuilder.setTimeZone(
-				themeDisplay.getTimeZone());
-
-			return modifiedFacetDisplayContextBuilder;
+			return new ModifiedFacetDisplayBuilder(
+				null, null, null, renderRequest);
 		}
 		catch (ConfigurationException configurationException) {
 			throw new RuntimeException(configurationException);

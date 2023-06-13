@@ -22,13 +22,15 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.type.CPType;
-import com.liferay.commerce.product.type.CPTypeRegistry;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -48,14 +50,14 @@ public class CPDefinitionItemSelectorViewDisplayContext
 	public CPDefinitionItemSelectorViewDisplayContext(
 		HttpServletRequest httpServletRequest, PortletURL portletURL,
 		String itemSelectedEventName, CPDefinitionService cpDefinitionService,
-		CPTypeRegistry cpTypeRegistry) {
+		CPTypeServicesTracker cpTypeServicesTracker) {
 
 		super(
 			httpServletRequest, portletURL, itemSelectedEventName,
 			CPDefinitionItemSelectorView.class.getSimpleName());
 
 		_cpDefinitionService = cpDefinitionService;
-		_cpTypeRegistry = cpTypeRegistry;
+		_cpTypeServicesTracker = cpTypeServicesTracker;
 
 		setDefaultOrderByCol("name");
 	}
@@ -65,7 +67,7 @@ public class CPDefinitionItemSelectorViewDisplayContext
 	}
 
 	public CPType getCPType(String name) {
-		return _cpTypeRegistry.getCPType(name);
+		return _cpTypeServicesTracker.getCPType(name);
 	}
 
 	@Override
@@ -83,18 +85,6 @@ public class CPDefinitionItemSelectorViewDisplayContext
 					httpServletRequest, "checkedCPDefinitionIds"));
 		}
 
-		long commerceChannelGroupId = ParamUtil.getLong(
-			httpServletRequest, CPField.COMMERCE_CHANNEL_GROUP_ID);
-
-		portletURL.setParameter(
-			CPField.COMMERCE_CHANNEL_GROUP_ID,
-			String.valueOf(commerceChannelGroupId));
-
-		portletURL.setParameter(
-			"ignoreCommerceAccountGroup",
-			Boolean.toString(
-				ParamUtil.getBoolean(
-					httpServletRequest, "ignoreCommerceAccountGroup")));
 		portletURL.setParameter(
 			"singleSelection", Boolean.toString(isSingleSelection()));
 
@@ -110,14 +100,25 @@ public class CPDefinitionItemSelectorViewDisplayContext
 		}
 
 		searchContainer = new SearchContainer<>(
-			liferayPortletRequest, getPortletURL(), null,
-			"no-products-were-found");
+			liferayPortletRequest, getPortletURL(), null, null);
+
+		searchContainer.setEmptyResultsMessage("no-products-were-found");
+
+		OrderByComparator<CPDefinition> orderByComparator =
+			CPItemSelectorViewUtil.getCPDefinitionOrderByComparator(
+				getOrderByCol(), getOrderByType());
 
 		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
-			CPItemSelectorViewUtil.getCPDefinitionOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+		searchContainer.setOrderByComparator(orderByComparator);
 		searchContainer.setOrderByType(getOrderByType());
+
+		if (!isSingleSelection()) {
+			RowChecker rowChecker = new CPDefinitionItemSelectorChecker(
+				cpRequestHelper.getRenderResponse(),
+				getCheckedCPDefinitionIds(), getCPDefinitionId());
+
+			searchContainer.setRowChecker(rowChecker);
+		}
 
 		Sort sort = CPItemSelectorViewUtil.getCPDefinitionSort(
 			getOrderByCol(), getOrderByType());
@@ -127,34 +128,24 @@ public class CPDefinitionItemSelectorViewDisplayContext
 		long commerceChannelGroupId = ParamUtil.getLong(
 			httpServletRequest, CPField.COMMERCE_CHANNEL_GROUP_ID);
 
-		boolean ignoreCommerceAccountGroup = ParamUtil.getBoolean(
-			httpServletRequest, "ignoreCommerceAccountGroup");
-
 		if (commerceChannelGroupId != 0) {
 			cpDefinitionBaseModelSearchResult =
 				_cpDefinitionService.searchCPDefinitionsByChannelGroupId(
 					cpRequestHelper.getCompanyId(), commerceChannelGroupId,
 					getKeywords(), WorkflowConstants.STATUS_APPROVED,
-					ignoreCommerceAccountGroup, searchContainer.getStart(),
-					searchContainer.getEnd(), sort);
+					searchContainer.getStart(), searchContainer.getEnd(), sort);
 		}
 		else {
 			cpDefinitionBaseModelSearchResult =
 				_cpDefinitionService.searchCPDefinitions(
 					cpRequestHelper.getCompanyId(), getKeywords(),
 					WorkflowConstants.STATUS_APPROVED,
-					ignoreCommerceAccountGroup, searchContainer.getStart(),
-					searchContainer.getEnd(), sort);
+					searchContainer.getStart(), searchContainer.getEnd(), sort);
 		}
 
-		searchContainer.setResultsAndTotal(cpDefinitionBaseModelSearchResult);
-
-		if (!isSingleSelection()) {
-			searchContainer.setRowChecker(
-				new CPDefinitionItemSelectorChecker(
-					cpRequestHelper.getRenderResponse(),
-					_getCheckedCPDefinitionIds(), getCPDefinitionId()));
-		}
+		searchContainer.setTotal(cpDefinitionBaseModelSearchResult.getLength());
+		searchContainer.setResults(
+			cpDefinitionBaseModelSearchResult.getBaseModels());
 
 		return searchContainer;
 	}
@@ -179,12 +170,17 @@ public class CPDefinitionItemSelectorViewDisplayContext
 		return ParamUtil.getBoolean(httpServletRequest, "singleSelection");
 	}
 
-	private long[] _getCheckedCPDefinitionIds() {
+	protected long[] getCheckedCPDefinitionIds() {
 		return ParamUtil.getLongValues(
 			httpServletRequest, "checkedCPDefinitionIds");
 	}
 
+	protected long[] getDisabledCPDefinitionIds() {
+		return ParamUtil.getLongValues(
+			httpServletRequest, "disabledCPDefinitionIds");
+	}
+
 	private final CPDefinitionService _cpDefinitionService;
-	private final CPTypeRegistry _cpTypeRegistry;
+	private final CPTypeServicesTracker _cpTypeServicesTracker;
 
 }

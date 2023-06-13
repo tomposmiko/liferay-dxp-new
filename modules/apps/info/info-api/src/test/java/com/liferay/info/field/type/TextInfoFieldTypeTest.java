@@ -15,8 +15,9 @@
 package com.liferay.info.field.type;
 
 import com.liferay.info.field.InfoField;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -38,15 +39,16 @@ public class TextInfoFieldTypeTest {
 		InfoField<TextInfoFieldType> infoField = InfoField.builder(
 		).infoFieldType(
 			TextInfoFieldType.INSTANCE
-		).namespace(
-			StringPool.BLANK
 		).name(
 			"test-field"
 		).attribute(
 			TextInfoFieldType.MULTILINE, false
 		).build();
 
-		Assert.assertFalse(infoField.getAttribute(TextInfoFieldType.MULTILINE));
+		Optional<Boolean> attributeOptional = infoField.getAttributeOptional(
+			TextInfoFieldType.MULTILINE);
+
+		Assert.assertFalse(attributeOptional.get());
 	}
 
 	@Test
@@ -54,15 +56,16 @@ public class TextInfoFieldTypeTest {
 		InfoField<TextInfoFieldType> infoField = InfoField.builder(
 		).infoFieldType(
 			TextInfoFieldType.INSTANCE
-		).namespace(
-			StringPool.BLANK
 		).name(
 			"test-field"
 		).attribute(
 			TextInfoFieldType.MULTILINE, true
 		).build();
 
-		Assert.assertTrue(infoField.getAttribute(TextInfoFieldType.MULTILINE));
+		Optional<Boolean> attributeOptional = infoField.getAttributeOptional(
+			TextInfoFieldType.MULTILINE);
+
+		Assert.assertTrue(attributeOptional.get());
 	}
 
 	@Test
@@ -70,13 +73,14 @@ public class TextInfoFieldTypeTest {
 		InfoField<TextInfoFieldType> infoField = InfoField.builder(
 		).infoFieldType(
 			TextInfoFieldType.INSTANCE
-		).namespace(
-			StringPool.BLANK
 		).name(
 			"test-field"
 		).build();
 
-		Assert.assertNull(infoField.getAttribute(TextInfoFieldType.MULTILINE));
+		Optional<Boolean> attributeOptional = infoField.getAttributeOptional(
+			TextInfoFieldType.MULTILINE);
+
+		Assert.assertFalse(attributeOptional.isPresent());
 	}
 
 }

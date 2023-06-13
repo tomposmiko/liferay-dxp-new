@@ -20,7 +20,6 @@ import com.liferay.message.boards.model.MBThreadFlagTable;
 import com.liferay.message.boards.model.impl.MBThreadFlagImpl;
 import com.liferay.message.boards.model.impl.MBThreadFlagModelImpl;
 import com.liferay.message.boards.service.persistence.MBThreadFlagPersistence;
-import com.liferay.message.boards.service.persistence.MBThreadFlagUtil;
 import com.liferay.message.boards.service.persistence.impl.constants.MBPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = MBThreadFlagPersistence.class)
+@Component(service = {MBThreadFlagPersistence.class, BasePersistence.class})
 public class MBThreadFlagPersistenceImpl
 	extends BasePersistenceImpl<MBThreadFlag>
 	implements MBThreadFlagPersistence {
@@ -203,7 +202,7 @@ public class MBThreadFlagPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThreadFlag>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThreadFlag mbThreadFlag : list) {
@@ -592,7 +591,7 @@ public class MBThreadFlagPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -728,7 +727,7 @@ public class MBThreadFlagPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof MBThreadFlag) {
@@ -848,7 +847,7 @@ public class MBThreadFlagPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1020,7 +1019,7 @@ public class MBThreadFlagPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThreadFlag>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThreadFlag mbThreadFlag : list) {
@@ -1443,7 +1442,7 @@ public class MBThreadFlagPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1603,7 +1602,7 @@ public class MBThreadFlagPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThreadFlag>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThreadFlag mbThreadFlag : list) {
@@ -1969,7 +1968,7 @@ public class MBThreadFlagPersistenceImpl
 
 			finderArgs = new Object[] {userId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2111,7 +2110,7 @@ public class MBThreadFlagPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThreadFlag>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThreadFlag mbThreadFlag : list) {
@@ -2478,7 +2477,7 @@ public class MBThreadFlagPersistenceImpl
 
 			finderArgs = new Object[] {threadId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2597,8 +2596,7 @@ public class MBThreadFlagPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByU_T, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByU_T, finderArgs);
 		}
 
 		if (result instanceof MBThreadFlag) {
@@ -2705,7 +2703,7 @@ public class MBThreadFlagPersistenceImpl
 
 			finderArgs = new Object[] {userId, threadId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2901,7 +2899,7 @@ public class MBThreadFlagPersistenceImpl
 		mbThreadFlag.setNew(true);
 		mbThreadFlag.setPrimaryKey(threadFlagId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		mbThreadFlag.setUuid(uuid);
 
@@ -3022,7 +3020,7 @@ public class MBThreadFlagPersistenceImpl
 			(MBThreadFlagModelImpl)mbThreadFlag;
 
 		if (Validator.isNull(mbThreadFlag.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			mbThreadFlag.setUuid(uuid);
 		}
@@ -3147,9 +3145,7 @@ public class MBThreadFlagPersistenceImpl
 	 */
 	@Override
 	public MBThreadFlag fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				MBThreadFlag.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(MBThreadFlag.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -3365,7 +3361,7 @@ public class MBThreadFlagPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<MBThreadFlag>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3441,7 +3437,7 @@ public class MBThreadFlagPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3668,31 +3664,11 @@ public class MBThreadFlagPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_T",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId", "threadId"}, false);
-
-		_setMBThreadFlagUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setMBThreadFlagUtilPersistence(null);
-
 		entityCache.removeCache(MBThreadFlagImpl.class.getName());
-	}
-
-	private void _setMBThreadFlagUtilPersistence(
-		MBThreadFlagPersistence mbThreadFlagPersistence) {
-
-		try {
-			Field field = MBThreadFlagUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, mbThreadFlagPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3762,6 +3738,7 @@ public class MBThreadFlagPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private MBThreadFlagModelArgumentsResolver
+		_mbThreadFlagModelArgumentsResolver;
 
 }

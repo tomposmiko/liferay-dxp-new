@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_CHANNELS,
 		"mvc.command.name=/commerce_channels/edit_commerce_notification_queue_entry"
@@ -45,36 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCommerceNotificationQueueEntryMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		try {
-			if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceNotificationQueues(actionRequest);
-			}
-			else if (cmd.equals("resend")) {
-				_resendCommerceNotificationQueueEntry(actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			if (exception instanceof NoSuchNotificationQueueEntryException ||
-				exception instanceof PrincipalException) {
-
-				SessionErrors.add(actionRequest, exception.getClass());
-
-				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
-			}
-			else {
-				throw exception;
-			}
-		}
-	}
-
-	private void _deleteCommerceNotificationQueues(ActionRequest actionRequest)
+	protected void deleteCommerceNotificationQueues(ActionRequest actionRequest)
 		throws PortalException {
 
 		long[] deleteCommerceNotificationQueueEntryIds = null;
@@ -103,7 +75,36 @@ public class EditCommerceNotificationQueueEntryMVCActionCommand
 		}
 	}
 
-	private void _resendCommerceNotificationQueueEntry(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		try {
+			if (cmd.equals(Constants.DELETE)) {
+				deleteCommerceNotificationQueues(actionRequest);
+			}
+			else if (cmd.equals("resend")) {
+				resendCommerceNotificationQueueEntry(actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			if (exception instanceof NoSuchNotificationQueueEntryException ||
+				exception instanceof PrincipalException) {
+
+				SessionErrors.add(actionRequest, exception.getClass());
+
+				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+			}
+			else {
+				throw exception;
+			}
+		}
+	}
+
+	protected void resendCommerceNotificationQueueEntry(
 			ActionRequest actionRequest)
 		throws PortalException {
 

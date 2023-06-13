@@ -20,21 +20,26 @@ import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marco Leo
  */
-@Component(service = CPDataSourceRegistry.class)
+@Component(
+	enabled = false, immediate = true, service = CPDataSourceRegistry.class
+)
 public class CPDataSourceRegistryImpl implements CPDataSourceRegistry {
 
 	@Override
@@ -43,7 +48,11 @@ public class CPDataSourceRegistryImpl implements CPDataSourceRegistry {
 			return null;
 		}
 
-		for (CPDataSource cpDataSource : _serviceTrackerList) {
+		Iterator<CPDataSource> iterator = _serviceTrackerList.iterator();
+
+		while (iterator.hasNext()) {
+			CPDataSource cpDataSource = iterator.next();
+
 			if (key.equals(cpDataSource.getName())) {
 				return cpDataSource;
 			}
@@ -84,6 +93,9 @@ public class CPDataSourceRegistryImpl implements CPDataSourceRegistry {
 	private static final Log _log = LogFactoryUtil.getLog(
 		CPDataSourceRegistryImpl.class);
 
-	private ServiceTrackerList<CPDataSource> _serviceTrackerList;
+	@Reference
+	private Portal _portal;
+
+	private ServiceTrackerList<CPDataSource, CPDataSource> _serviceTrackerList;
 
 }

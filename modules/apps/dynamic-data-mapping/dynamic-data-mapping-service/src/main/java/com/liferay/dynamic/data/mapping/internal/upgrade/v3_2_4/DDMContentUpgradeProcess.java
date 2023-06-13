@@ -80,7 +80,7 @@ public class DDMContentUpgradeProcess extends UpgradeProcess {
 							definitionJSONObject.getJSONArray("fields"))) {
 
 						preparedStatement2.setString(
-							1, dataJSONObject.toString());
+							1, dataJSONObject.toJSONString());
 
 						long contentId = resultSet.getLong("contentId");
 
@@ -175,7 +175,7 @@ public class DDMContentUpgradeProcess extends UpgradeProcess {
 							}
 							catch (ParseException parseException) {
 								if (_log.isWarnEnabled()) {
-									_log.warn(parseException);
+									_log.warn(parseException, parseException);
 								}
 							}
 						});

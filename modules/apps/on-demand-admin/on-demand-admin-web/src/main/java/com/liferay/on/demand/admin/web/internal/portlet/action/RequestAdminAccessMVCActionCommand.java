@@ -14,8 +14,8 @@
 
 package com.liferay.on.demand.admin.web.internal.portlet.action;
 
-import com.liferay.on.demand.admin.constants.OnDemandAdminPortletKeys;
 import com.liferay.on.demand.admin.manager.OnDemandAdminManager;
+import com.liferay.on.demand.admin.web.internal.constants.OnDemandAdminPortletKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.CompanyLocalService;
@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + OnDemandAdminPortletKeys.ON_DEMAND_ADMIN,
 		"mvc.command.name=/on_demand_admin/request_admin_access"
@@ -49,7 +50,7 @@ public class RequestAdminAccessMVCActionCommand extends BaseMVCActionCommand {
 		long companyId = ParamUtil.getLong(actionRequest, "companyId");
 
 		String loginURL = _onDemandAdminManager.getLoginURL(
-			_companyLocalService.getCompany(companyId), actionRequest,
+			_companyLocalService.getCompany(companyId),
 			_portal.getUserId(actionRequest));
 
 		if (Validator.isNotNull(loginURL)) {

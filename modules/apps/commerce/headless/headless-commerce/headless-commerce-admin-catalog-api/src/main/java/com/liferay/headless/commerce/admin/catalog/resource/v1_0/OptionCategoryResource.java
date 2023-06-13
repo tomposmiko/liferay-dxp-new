@@ -23,10 +23,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -57,13 +54,12 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface OptionCategoryResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Page<OptionCategory> getOptionCategoriesPage(
 			Filter filter, Pagination pagination, Sort[] sorts)
-		throws Exception;
-
-	public Response postOptionCategoriesPageExportBatch(
-			Filter filter, Sort[] sorts, String callbackURL, String contentType,
-			String fieldNames)
 		throws Exception;
 
 	public OptionCategory postOptionCategory(OptionCategory optionCategory)
@@ -74,7 +70,8 @@ public interface OptionCategoryResource {
 
 	public Response deleteOptionCategory(Long id) throws Exception;
 
-	public Response deleteOptionCategoryBatch(String callbackURL, Object object)
+	public Response deleteOptionCategoryBatch(
+			Long id, String callbackURL, Object object)
 		throws Exception;
 
 	public OptionCategory getOptionCategory(Long id) throws Exception;
@@ -119,16 +116,6 @@ public interface OptionCategoryResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineExportTaskResource(
-		VulcanBatchEngineExportTaskResource
-			vulcanBatchEngineExportTaskResource);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -140,8 +127,10 @@ public interface OptionCategoryResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

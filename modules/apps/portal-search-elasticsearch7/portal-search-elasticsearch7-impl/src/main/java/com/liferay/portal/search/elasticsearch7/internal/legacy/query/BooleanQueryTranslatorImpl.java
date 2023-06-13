@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.FilterTranslator;
 import com.liferay.portal.kernel.search.query.QueryVisitor;
 
-import java.util.List;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -35,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  * @author Miguel Angelo Caldas Gallindo
  */
-@Component(service = BooleanQueryTranslator.class)
+@Component(immediate = true, service = BooleanQueryTranslator.class)
 public class BooleanQueryTranslatorImpl implements BooleanQueryTranslator {
 
 	@Override
@@ -44,9 +42,7 @@ public class BooleanQueryTranslatorImpl implements BooleanQueryTranslator {
 
 		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
-		List<BooleanClause<Query>> clauses = booleanQuery.clauses();
-
-		for (BooleanClause<Query> clause : clauses) {
+		for (BooleanClause<Query> clause : booleanQuery.clauses()) {
 			_addClause(clause, boolQueryBuilder, queryVisitor);
 		}
 
@@ -66,7 +62,7 @@ public class BooleanQueryTranslatorImpl implements BooleanQueryTranslator {
 
 		BoolQueryBuilder wrapperBoolQueryBuilder = QueryBuilders.boolQuery();
 
-		if (!clauses.isEmpty()) {
+		if (booleanQuery.hasClauses()) {
 			wrapperBoolQueryBuilder.must(boolQueryBuilder);
 		}
 

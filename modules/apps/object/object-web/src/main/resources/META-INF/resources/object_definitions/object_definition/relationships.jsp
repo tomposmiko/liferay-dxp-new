@@ -29,41 +29,25 @@ portletDisplay.setURLBack(backURL);
 renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 %>
 
-<frontend-data-set:headless-display
+<clay:headless-data-set-display
 	apiURL="<%= objectDefinitionsRelationshipsDisplayContext.getAPIURL() %>"
+	clayDataSetActionDropdownItems="<%= objectDefinitionsRelationshipsDisplayContext.getClayDataSetActionDropdownItems() %>"
 	creationMenu="<%= objectDefinitionsRelationshipsDisplayContext.getCreationMenu() %>"
-	fdsActionDropdownItems="<%= objectDefinitionsRelationshipsDisplayContext.getFDSActionDropdownItems() %>"
-	formName="fm"
-	id="<%= ObjectDefinitionsFDSNames.OBJECT_RELATIONSHIPS %>"
+	formId="fm"
+	id="<%= ObjectDefinitionsClayDataSetDisplayNames.OBJECT_RELATIONSHIPS %>"
 	itemsPerPage="<%= 20 %>"
 	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	pageNumber="<%= 1 %>"
 	portletURL="<%= liferayPortletResponse.createRenderURL() %>"
-	propsTransformer="js/components/FDSPropsTransformer/ObjectRelationshipsFDSPropsTransformer"
 	style="fluid"
 />
 
-<div>
+<div id="<portlet:namespace />AddObjectRelationship">
 	<react:component
-		module="js/components/ObjectRelationship/AddRelationship"
+		module="js/components/ModalAddObjectRelationship"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
-				"ffOneToOneRelationshipConfigurationEnabled", objectDefinitionsRelationshipsDisplayContext.isFFOneToOneRelationshipConfigurationEnabled()
-			).put(
-				"objectDefinitionExternalReferenceCode", objectDefinition.getExternalReferenceCode()
-			).put(
-				"parameterRequired", objectDefinitionsRelationshipsDisplayContext.isParameterRequired(objectDefinition)
-			).build()
-		%>'
-	/>
-</div>
-
-<div>
-	<react:component
-		module="js/components/ObjectRelationship/DeleteRelationship"
-		props='<%=
-			HashMapBuilder.<String, Object>put(
-				"isApproved", objectDefinition.isApproved()
+				"apiURL", objectDefinitionsRelationshipsDisplayContext.getAPIURL()
 			).build()
 		%>'
 	/>

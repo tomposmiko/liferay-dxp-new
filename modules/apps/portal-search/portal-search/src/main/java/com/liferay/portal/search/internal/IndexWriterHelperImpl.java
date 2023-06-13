@@ -14,14 +14,14 @@
 
 package com.liferay.portal.search.internal;
 
+import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
-import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.IndexWriter;
@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.search.SearchPermissionChecker;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -50,6 +49,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -61,13 +61,14 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.configuration.IndexWriterHelperConfiguration",
-	service = IndexWriterHelper.class
+	immediate = true, service = IndexWriterHelper.class
 )
 public class IndexWriterHelperImpl implements IndexWriterHelper {
 
 	@Override
 	public void addDocument(
-			long companyId, Document document, boolean commitImmediately)
+			String searchEngineId, long companyId, Document document,
+			boolean commitImmediately)
 		throws SearchException {
 
 		_enforceStandardUID(document);
@@ -80,7 +81,8 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			_log.debug("Add document " + document.toString());
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -89,16 +91,17 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.addDocument(searchContext, document);
 	}
 
 	@Override
 	public void addDocuments(
-			long companyId, Collection<Document> documents,
-			boolean commitImmediately)
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
 		throws SearchException {
 
 		_enforceStandardUID(documents);
@@ -109,7 +112,8 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			return;
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -124,57 +128,66 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.addDocuments(searchContext, documents);
 	}
 
 	@Override
-	public void commit() throws SearchException {
-		for (Company company : _companyLocalService.getCompanies()) {
-			commit(company.getCompanyId());
+	public void commit(String searchEngineId) throws SearchException {
+		for (long companyId : _searchEngineHelper.getCompanyIds()) {
+			commit(searchEngineId, companyId);
 		}
 	}
 
 	@Override
-	public void commit(long companyId) throws SearchException {
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+	public void commit(String searchEngineId, long companyId)
+		throws SearchException {
+
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
 		indexWriter.commit(searchContext);
 	}
 
 	@Override
 	public void deleteDocument(
-			long companyId, String uid, boolean commitImmediately)
+			String searchEngineId, long companyId, String uid,
+			boolean commitImmediately)
 		throws SearchException {
 
 		if (_indexStatusManager.isIndexReadOnly()) {
 			return;
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.deleteDocument(searchContext, uid);
 	}
 
 	@Override
 	public void deleteDocuments(
-			long companyId, Collection<String> uids, boolean commitImmediately)
+			String searchEngineId, long companyId, Collection<String> uids,
+			boolean commitImmediately)
 		throws SearchException {
 
 		if (_indexStatusManager.isIndexReadOnly() || (uids == null) ||
@@ -183,29 +196,33 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			return;
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.deleteDocuments(searchContext, uids);
 	}
 
 	@Override
 	public void deleteEntityDocuments(
-			long companyId, String className, boolean commitImmediately)
+			String searchEngineId, long companyId, String className,
+			boolean commitImmediately)
 		throws SearchException {
 
 		if (_indexStatusManager.isIndexReadOnly()) {
 			return;
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		if (searchEngine == null) {
 			return;
@@ -216,8 +233,9 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.deleteEntityDocuments(searchContext, className);
 	}
@@ -241,7 +259,21 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			String keywordType, Locale locale)
 		throws SearchException {
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		String searchEngineId = _searchEngineHelper.getDefaultSearchEngineId();
+
+		indexKeyword(
+			searchEngineId, companyId, querySuggestion, weight, keywordType,
+			locale);
+	}
+
+	@Override
+	public void indexKeyword(
+			String searchEngineId, long companyId, String querySuggestion,
+			float weight, String keywordType, Locale locale)
+		throws SearchException {
+
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -250,6 +282,7 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		searchContext.setCompanyId(companyId);
 		searchContext.setKeywords(querySuggestion);
 		searchContext.setLocale(locale);
+		searchContext.setSearchEngineId(searchEngineId);
 
 		indexWriter.indexKeyword(searchContext, weight, keywordType);
 	}
@@ -258,13 +291,27 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 	public void indexQuerySuggestionDictionaries(long companyId)
 		throws SearchException {
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		Set<String> searchEngineIds = _searchEngineHelper.getSearchEngineIds();
+
+		for (String searchEngineId : searchEngineIds) {
+			indexQuerySuggestionDictionaries(searchEngineId, companyId);
+		}
+	}
+
+	@Override
+	public void indexQuerySuggestionDictionaries(
+			String searchEngineId, long companyId)
+		throws SearchException {
+
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
 		indexWriter.indexQuerySuggestionDictionaries(searchContext);
 	}
@@ -273,7 +320,18 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 	public void indexQuerySuggestionDictionary(long companyId, Locale locale)
 		throws SearchException {
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		String searchEngineId = _searchEngineHelper.getDefaultSearchEngineId();
+
+		indexQuerySuggestionDictionary(searchEngineId, companyId, locale);
+	}
+
+	@Override
+	public void indexQuerySuggestionDictionary(
+			String searchEngineId, long companyId, Locale locale)
+		throws SearchException {
+
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -281,6 +339,7 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 
 		searchContext.setCompanyId(companyId);
 		searchContext.setLocale(locale);
+		searchContext.setSearchEngineId(searchEngineId);
 
 		indexWriter.indexQuerySuggestionDictionary(searchContext);
 	}
@@ -289,13 +348,25 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 	public void indexSpellCheckerDictionaries(long companyId)
 		throws SearchException {
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		String searchEngineId = _searchEngineHelper.getDefaultSearchEngineId();
+
+		indexSpellCheckerDictionaries(searchEngineId, companyId);
+	}
+
+	@Override
+	public void indexSpellCheckerDictionaries(
+			String searchEngineId, long companyId)
+		throws SearchException {
+
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
 		indexWriter.indexSpellCheckerDictionaries(searchContext);
 	}
@@ -304,7 +375,18 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 	public void indexSpellCheckerDictionary(long companyId, Locale locale)
 		throws SearchException {
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		String searchEngineId = _searchEngineHelper.getDefaultSearchEngineId();
+
+		indexSpellCheckerDictionary(searchEngineId, companyId, locale);
+	}
+
+	@Override
+	public void indexSpellCheckerDictionary(
+			String searchEngineId, long companyId, Locale locale)
+		throws SearchException {
+
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -312,6 +394,7 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 
 		searchContext.setCompanyId(companyId);
 		searchContext.setLocale(locale);
+		searchContext.setSearchEngineId(searchEngineId);
 
 		indexWriter.indexSpellCheckerDictionary(searchContext);
 	}
@@ -338,7 +421,8 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 
 	@Override
 	public void partiallyUpdateDocument(
-			long companyId, Document document, boolean commitImmediately)
+			String searchEngineId, long companyId, Document document,
+			boolean commitImmediately)
 		throws SearchException {
 
 		_enforceStandardUID(document);
@@ -351,7 +435,8 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			_log.debug("Document " + document.toString());
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -360,16 +445,17 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.partiallyUpdateDocument(searchContext, document);
 	}
 
 	@Override
 	public void partiallyUpdateDocuments(
-			long companyId, Collection<Document> documents,
-			boolean commitImmediately)
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
 		throws SearchException {
 
 		_enforceStandardUID(documents);
@@ -380,7 +466,8 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			return;
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -395,8 +482,9 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.partiallyUpdateDocuments(searchContext, documents);
 	}
@@ -482,7 +570,9 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 	}
 
 	@Override
-	public void updateDocument(long companyId, Document document)
+	public void updateDocument(
+			String searchEngineId, long companyId, Document document,
+			boolean commitImmediately)
 		throws SearchException {
 
 		_enforceStandardUID(document);
@@ -495,7 +585,8 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			_log.debug("Document " + document.toString());
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -504,16 +595,19 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, true);
+		setCommitImmediately(
+			searchContext,
+			commitImmediately || ProxyModeThreadLocal.isForceSync());
 
 		indexWriter.updateDocument(searchContext, document);
 	}
 
 	@Override
 	public void updateDocuments(
-			long companyId, Collection<Document> documents,
-			boolean commitImmediately)
+			String searchEngineId, long companyId,
+			Collection<Document> documents, boolean commitImmediately)
 		throws SearchException {
 
 		_enforceStandardUID(documents);
@@ -524,7 +618,8 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			return;
 		}
 
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			searchEngineId);
 
 		IndexWriter indexWriter = searchEngine.getIndexWriter();
 
@@ -539,8 +634,9 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(companyId);
+		searchContext.setSearchEngineId(searchEngineId);
 
-		_setCommitImmediately(searchContext, commitImmediately);
+		setCommitImmediately(searchContext, commitImmediately);
 
 		indexWriter.updateDocuments(searchContext, documents);
 	}
@@ -570,6 +666,17 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 			indexWriterHelperConfiguration.indexCommitImmediately();
 	}
 
+	protected void setCommitImmediately(
+		SearchContext searchContext, boolean commitImmediately) {
+
+		if (!commitImmediately) {
+			searchContext.setCommitImmediately(_commitImmediately);
+		}
+		else {
+			searchContext.setCommitImmediately(true);
+		}
+	}
+
 	@Reference
 	protected UIDFactory uidFactory;
 
@@ -588,17 +695,6 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 		return names[0];
 	}
 
-	private void _setCommitImmediately(
-		SearchContext searchContext, boolean commitImmediately) {
-
-		if (!commitImmediately) {
-			searchContext.setCommitImmediately(_commitImmediately);
-		}
-		else {
-			searchContext.setCommitImmediately(true);
-		}
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		IndexWriterHelperImpl.class);
 
@@ -606,9 +702,6 @@ public class IndexWriterHelperImpl implements IndexWriterHelper {
 	private BackgroundTaskManager _backgroundTaskManager;
 
 	private volatile boolean _commitImmediately;
-
-	@Reference
-	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private IndexStatusManager _indexStatusManager;

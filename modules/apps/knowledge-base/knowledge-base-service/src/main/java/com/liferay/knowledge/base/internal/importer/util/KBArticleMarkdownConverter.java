@@ -44,12 +44,14 @@ import java.util.TreeSet;
 public class KBArticleMarkdownConverter {
 
 	public KBArticleMarkdownConverter(
-			String markdown, String fileEntryName,
-			MarkdownConverter markdownConverter, Map<String, String> metadata,
+			String markdown, String fileEntryName, Map<String, String> metadata,
 			DLURLHelper dlURLHelper)
 		throws KBArticleImportException {
 
 		_dlURLHelper = dlURLHelper;
+
+		MarkdownConverter markdownConverter =
+			MarkdownConverterFactoryUtil.create();
 
 		String html = null;
 
@@ -63,7 +65,7 @@ public class KBArticleMarkdownConverter {
 				ioException);
 		}
 
-		String heading = _getHeading(html);
+		String heading = getHeading(html);
 
 		if (Validator.isNull(heading)) {
 			throw new KBArticleImportException(
@@ -87,13 +89,13 @@ public class KBArticleMarkdownConverter {
 
 		_title = title;
 
-		html = _stripIds(html);
+		html = stripIds(html);
 
-		_html = _stripHeading(html);
+		_html = stripHeading(html);
 
 		String baseSourceURL = metadata.get(_METADATA_BASE_SOURCE_URL);
 
-		_sourceURL = _buildSourceURL(baseSourceURL, fileEntryName);
+		_sourceURL = buildSourceURL(baseSourceURL, fileEntryName);
 	}
 
 	public String getSourceURL() {
@@ -210,6 +212,49 @@ public class KBArticleMarkdownConverter {
 		return sb.toString();
 	}
 
+	protected String buildSourceURL(
+		String baseSourceURL, String fileEntryName) {
+
+		if (!Validator.isUrl(baseSourceURL)) {
+			return null;
+		}
+
+		int pos = baseSourceURL.length() - 1;
+
+		while (pos >= 0) {
+			char c = baseSourceURL.charAt(pos);
+
+			if (c != CharPool.SLASH) {
+				break;
+			}
+
+			pos--;
+		}
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(baseSourceURL.substring(0, pos + 1));
+
+		if (!fileEntryName.startsWith(StringPool.SLASH)) {
+			sb.append(StringPool.SLASH);
+		}
+
+		sb.append(FileUtil.replaceSeparator(fileEntryName));
+
+		return sb.toString();
+	}
+
+	protected String getHeading(String html) {
+		int x = html.indexOf("<h1>");
+		int y = html.indexOf("</h1>");
+
+		if ((x == -1) || (y == -1) || (x > y)) {
+			return null;
+		}
+
+		return html.substring(x + 4, y);
+	}
+
 	protected String getUrlTitle(String heading) {
 		int x = heading.indexOf("[](id=");
 
@@ -257,48 +302,7 @@ public class KBArticleMarkdownConverter {
 		return urlTitle;
 	}
 
-	private String _buildSourceURL(String baseSourceURL, String fileEntryName) {
-		if (!Validator.isUrl(baseSourceURL)) {
-			return null;
-		}
-
-		int pos = baseSourceURL.length() - 1;
-
-		while (pos >= 0) {
-			char c = baseSourceURL.charAt(pos);
-
-			if (c != CharPool.SLASH) {
-				break;
-			}
-
-			pos--;
-		}
-
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(baseSourceURL.substring(0, pos + 1));
-
-		if (!fileEntryName.startsWith(StringPool.SLASH)) {
-			sb.append(StringPool.SLASH);
-		}
-
-		sb.append(FileUtil.replaceSeparator(fileEntryName));
-
-		return sb.toString();
-	}
-
-	private String _getHeading(String html) {
-		int x = html.indexOf("<h1>");
-		int y = html.indexOf("</h1>");
-
-		if ((x == -1) || (y == -1) || (x > y)) {
-			return null;
-		}
-
-		return html.substring(x + 4, y);
-	}
-
-	private String _stripHeading(String html) {
+	protected String stripHeading(String html) {
 		int index = html.indexOf("</h1>");
 
 		if (index == -1) {
@@ -308,7 +312,7 @@ public class KBArticleMarkdownConverter {
 		return html.substring(index + 5);
 	}
 
-	private String _stripIds(String content) {
+	protected String stripIds(String content) {
 		int index = content.indexOf("[](id=");
 
 		if (index == -1) {

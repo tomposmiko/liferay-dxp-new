@@ -32,16 +32,11 @@ function AssigneeInput({setAssigneeId, taskId}) {
 		[setAssigneeId]
 	);
 
-	const promises = useMemo(
-		() => [fetchData()],
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[]
-	);
+	const promises = useMemo(() => [fetchData()], [fetchData]);
 
 	return (
 		<Autocomplete
-			items={data?.items}
+			items={data.items}
 			onSelect={handleSelect}
 			promises={promises}
 		/>
@@ -134,7 +129,6 @@ function Table({items, setAssigneeId}) {
 						}}
 					>
 						{`${Liferay.Language.get('new-assignee')}`}
-
 						<span
 							className="ml-1 workflow-tooltip"
 							data-tooltip-align="top"
@@ -151,7 +145,7 @@ function Table({items, setAssigneeId}) {
 
 			<ClayTable.Body>
 				{items &&
-					!!items.length &&
+					items.length > 0 &&
 					items.map((item, index) => (
 						<Table.Item
 							{...item}

@@ -91,11 +91,6 @@ public class UnlocalizedValue implements Value {
 	}
 
 	@Override
-	public void removeLocale(Locale locale) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public void setDefaultLocale(Locale defaultLocale) {
 		throw new UnsupportedOperationException();
 	}

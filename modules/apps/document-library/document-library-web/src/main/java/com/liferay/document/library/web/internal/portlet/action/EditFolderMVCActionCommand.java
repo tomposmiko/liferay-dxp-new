@@ -221,7 +221,7 @@ public class EditFolderMVCActionCommand extends BaseMVCActionCommand {
 		String description = ParamUtil.getString(actionRequest, "description");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DLFolder.class.getName(), actionRequest);
+			actionRequest);
 
 		if (folderId <= 0) {
 
@@ -233,7 +233,7 @@ public class EditFolderMVCActionCommand extends BaseMVCActionCommand {
 				actionRequest, "parentFolderId");
 
 			_dlAppService.addFolder(
-				null, repositoryId, parentFolderId, name, description,
+				repositoryId, parentFolderId, name, description,
 				serviceContext);
 		}
 		else {

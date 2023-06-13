@@ -346,6 +346,10 @@
 		},
 		{
 			"genericTypeCount": 1,
+			"name": "com.liferay.info.item.selector.InfoItemSelector"
+		},
+		{
+			"genericTypeCount": 1,
 			"name": "com.liferay.info.list.provider.InfoListProvider"
 		},
 		{
@@ -443,6 +447,18 @@
 		{
 			"genericTypeCount": 2,
 			"name": "com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple"
+		},
+		{
+			"genericTypeCount": 4,
+			"name": "com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder.Collector"
+		},
+		{
+			"genericTypeCount": 4,
+			"name": "com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder.Mapper"
+		},
+		{
+			"genericTypeCount": 2,
+			"name": "com.liferay.osgi.service.tracker.collections.ServiceTrackerMapBuilder.Selector"
 		},
 		{
 			"genericTypeCount": 1,
@@ -629,6 +645,34 @@
 			"name": "com.liferay.portal.deploy.hot.ServiceBag"
 		},
 		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.fabric.netty.codec.serialization.ObjectDecodeChannelInboundHandler"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.fabric.netty.worker.NettyFabricWorkerConfig"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.fabric.netty.worker.NettyFabricWorkerStub"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.fabric.repository.Repository"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.fabric.worker.FabricWorker"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.kernel.atom.BaseAtomCollectionAdapter"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.kernel.atom.BaseMediaAtomCollectionAdapter"
+		},
+		{
 			"genericTypeCount": 2,
 			"name": "com.liferay.portal.kernel.cache.PortalCache"
 		},
@@ -754,7 +798,23 @@
 		},
 		{
 			"genericTypeCount": 1,
+			"name": "com.liferay.portal.kernel.nio.intraband.CompletionHandler"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.kernel.nio.intraband.RecordCompletionHandler"
+		},
+		{
+			"genericTypeCount": 1,
 			"name": "com.liferay.portal.kernel.portlet.bridges.mvc.MVCCommandCache"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.kernel.process.ProcessCallable"
+		},
+		{
+			"genericTypeCount": 1,
+			"name": "com.liferay.portal.kernel.process.ProcessChannel"
 		},
 		{
 			"genericTypeCount": 1,
@@ -962,6 +1022,10 @@
 		},
 		{
 			"genericTypeCount": 1,
+			"name": "com.liferay.portal.nio.intraband.proxy.StubMap"
+		},
+		{
+			"genericTypeCount": 1,
 			"name": "com.liferay.portal.odata.filter.ExpressionConvert"
 		},
 		{
@@ -1027,14 +1091,6 @@
 		{
 			"genericTypeCount": 1,
 			"name": "com.liferay.portal.search.query.function.score.ScoreFunctionTranslator"
-		},
-		{
-			"genericTypeCount": 1,
-			"name": "com.liferay.portal.search.solr7.internal.facet.FacetProcessor"
-		},
-		{
-			"genericTypeCount": 1,
-			"name": "com.liferay.portal.search.solr7.internal.filter.FilterTranslator"
 		},
 		{
 			"genericTypeCount": 1,
@@ -1759,10 +1815,6 @@
 		{
 			"genericTypeCount": 1,
 			"name": "org.apache.shindig.protocol.RestfulCollection"
-		},
-		{
-			"genericTypeCount": 1,
-			"name": "org.apache.solr.common.util.NamedList"
 		},
 		{
 			"genericTypeCount": 1,

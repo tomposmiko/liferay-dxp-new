@@ -1,15 +1,9 @@
-@import 'atlas-variables';
-
 .segment-edit-page-root {
 	display: flex;
 	flex-direction: column;
 	height: calc(100vh - #{$topHeaderHeight});
 	margin-bottom: -35px;
 	width: 100%;
-
-	&--with-warning {
-		height: calc(100vh - #{$topHeaderHeightWithWarning});
-	}
 
 	.contributor-conjunction {
 		margin: 0 auto;
@@ -18,10 +12,10 @@
 
 	.form-header {
 		background-color: $white;
-		border-bottom: 1px solid $secondary-l2;
+		border-bottom: 1px solid $mainLighten65;
 
 		.edit-icon {
-			color: $secondary-l1;
+			color: $mainLighten52;
 		}
 
 		.form-header-container {

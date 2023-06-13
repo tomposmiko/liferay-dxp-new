@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-asset-publisher",
@@ -46,8 +47,7 @@ import org.osgi.service.component.annotations.Component;
 		"javax.portlet.supported-public-render-parameter=categoryId",
 		"javax.portlet.supported-public-render-parameter=resetCur",
 		"javax.portlet.supported-public-render-parameter=tag",
-		"javax.portlet.supported-public-render-parameter=tags",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supported-public-render-parameter=tags"
 	},
 	service = Portlet.class
 )

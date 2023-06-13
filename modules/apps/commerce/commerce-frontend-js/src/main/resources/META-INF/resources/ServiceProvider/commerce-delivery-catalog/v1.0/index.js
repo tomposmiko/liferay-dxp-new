@@ -13,4 +13,3 @@
  */
 
 export {default as productAPI} from './Product';
-export {default as skuAPI} from './Sku';

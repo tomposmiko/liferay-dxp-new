@@ -25,7 +25,7 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CProductLocalService;
 import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = RatingsImporter.class)
+@Component(enabled = false, service = RatingsImporter.class)
 public class RatingsImporter {
 
 	public void importRatings(File ratingsFile, long scopeGroupId, long userId)
@@ -72,7 +72,7 @@ public class RatingsImporter {
 		while (jsonFactoryParser.nextToken() != JsonToken.END_ARRAY) {
 			TreeNode treeNode = jsonFactoryParser.readValueAsTree();
 
-			JSONObject jsonObject = _jsonFactory.createJSONObject(
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				treeNode.toString());
 
 			if (_log.isDebugEnabled()) {
@@ -134,9 +134,8 @@ public class RatingsImporter {
 
 		// Retrieve CPDefinition
 
-		CProduct cProduct =
-			_cProductLocalService.fetchCProductByExternalReferenceCode(
-				externalReferenceId, serviceContext.getCompanyId());
+		CProduct cProduct = _cProductLocalService.fetchCProductByReferenceCode(
+			serviceContext.getCompanyId(), externalReferenceId);
 
 		if (cProduct == null) {
 			return;
@@ -211,9 +210,6 @@ public class RatingsImporter {
 
 	@Reference
 	private CProductLocalService _cProductLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private RatingsEntryLocalService _ratingsEntryLocalService;

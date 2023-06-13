@@ -14,12 +14,10 @@
 
 package com.liferay.portlet.asset.service.persistence.impl;
 
-import com.liferay.asset.kernel.exception.DuplicateAssetCategoryExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.NoSuchCategoryException;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryTable;
 import com.liferay.asset.kernel.service.persistence.AssetCategoryPersistence;
-import com.liferay.asset.kernel.service.persistence.AssetCategoryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
@@ -55,7 +53,6 @@ import com.liferay.portlet.asset.model.impl.AssetCategoryModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -199,7 +196,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -590,8 +587,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -727,7 +723,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof AssetCategory) {
@@ -847,8 +843,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1020,7 +1015,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -1445,8 +1440,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1607,7 +1601,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -2306,8 +2300,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2500,7 +2493,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -2877,8 +2870,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {parentCategoryId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3024,7 +3016,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -3394,8 +3386,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3545,7 +3536,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -4295,8 +4286,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, parentCategoryId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4506,7 +4496,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -5453,8 +5443,8 @@ public class AssetCategoryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetCategoryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param groupId the group ID
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5511,7 +5501,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				_finderPathWithPaginationFindByG_V, finderArgs, this);
+				_finderPathWithPaginationFindByG_V, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -5639,8 +5629,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5720,7 +5709,7 @@ public class AssetCategoryPersistenceImpl
 			};
 
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathWithPaginationCountByG_V, finderArgs, this);
+				_finderPathWithPaginationCountByG_V, finderArgs);
 		}
 
 		if (count == null) {
@@ -6043,7 +6032,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -6469,8 +6458,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {parentCategoryId, name};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6644,7 +6632,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -7045,8 +7033,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {parentCategoryId, vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7204,7 +7191,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -7629,8 +7616,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {name, vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7813,7 +7799,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -8608,8 +8594,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, parentCategoryId, vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -8832,7 +8817,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -9675,8 +9660,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, treePath, vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -9924,7 +9908,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -10985,9 +10969,9 @@ public class AssetCategoryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetCategoryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param name the name
-	 * @param vocabularyIds the vocabulary IDs
+	 * @param vocabularyId the vocabulary ID
 	 * @param start the lower bound of the range of asset categories
 	 * @param end the upper bound of the range of asset categories (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -11048,7 +11032,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				_finderPathWithPaginationFindByG_LikeN_V, finderArgs, this);
+				_finderPathWithPaginationFindByG_LikeN_V, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategory assetCategory : list) {
@@ -11203,8 +11187,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, name, vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11305,7 +11288,7 @@ public class AssetCategoryPersistenceImpl
 			};
 
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathWithPaginationCountByG_LikeN_V, finderArgs, this);
+				_finderPathWithPaginationCountByG_LikeN_V, finderArgs);
 		}
 
 		if (count == null) {
@@ -11676,7 +11659,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByP_N_V, finderArgs, this);
+				_finderPathFetchByP_N_V, finderArgs);
 		}
 
 		if (result instanceof AssetCategory) {
@@ -11807,8 +11790,7 @@ public class AssetCategoryPersistenceImpl
 
 			finderArgs = new Object[] {parentCategoryId, name, vocabularyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -11879,34 +11861,35 @@ public class AssetCategoryPersistenceImpl
 	private static final String _FINDER_COLUMN_P_N_V_VOCABULARYID_2 =
 		"assetCategory.vocabularyId = ?";
 
-	private FinderPath _finderPathFetchByERC_G;
-	private FinderPath _finderPathCountByERC_G;
+	private FinderPath _finderPathFetchByC_ERC;
+	private FinderPath _finderPathCountByC_ERC;
 
 	/**
-	 * Returns the asset category where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
+	 * Returns the asset category where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchCategoryException</code> if it could not be found.
 	 *
+	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
 	 * @return the matching asset category
 	 * @throws NoSuchCategoryException if a matching asset category could not be found
 	 */
 	@Override
-	public AssetCategory findByERC_G(String externalReferenceCode, long groupId)
+	public AssetCategory findByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws NoSuchCategoryException {
 
-		AssetCategory assetCategory = fetchByERC_G(
-			externalReferenceCode, groupId);
+		AssetCategory assetCategory = fetchByC_ERC(
+			companyId, externalReferenceCode);
 
 		if (assetCategory == null) {
 			StringBundler sb = new StringBundler(6);
 
 			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-			sb.append("externalReferenceCode=");
-			sb.append(externalReferenceCode);
+			sb.append("companyId=");
+			sb.append(companyId);
 
-			sb.append(", groupId=");
-			sb.append(groupId);
+			sb.append(", externalReferenceCode=");
+			sb.append(externalReferenceCode);
 
 			sb.append("}");
 
@@ -11921,30 +11904,30 @@ public class AssetCategoryPersistenceImpl
 	}
 
 	/**
-	 * Returns the asset category where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the asset category where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
+	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
 	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	 */
 	@Override
-	public AssetCategory fetchByERC_G(
-		String externalReferenceCode, long groupId) {
+	public AssetCategory fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return fetchByERC_G(externalReferenceCode, groupId, true);
+		return fetchByC_ERC(companyId, externalReferenceCode, true);
 	}
 
 	/**
-	 * Returns the asset category where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the asset category where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
+	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
 	 */
 	@Override
-	public AssetCategory fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache) {
+	public AssetCategory fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
@@ -11954,23 +11937,23 @@ public class AssetCategoryPersistenceImpl
 		Object[] finderArgs = null;
 
 		if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {externalReferenceCode, groupId};
+			finderArgs = new Object[] {companyId, externalReferenceCode};
 		}
 
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByERC_G, finderArgs, this);
+				_finderPathFetchByC_ERC, finderArgs);
 		}
 
 		if (result instanceof AssetCategory) {
 			AssetCategory assetCategory = (AssetCategory)result;
 
-			if (!Objects.equals(
+			if ((companyId != assetCategory.getCompanyId()) ||
+				!Objects.equals(
 					externalReferenceCode,
-					assetCategory.getExternalReferenceCode()) ||
-				(groupId != assetCategory.getGroupId())) {
+					assetCategory.getExternalReferenceCode())) {
 
 				result = null;
 			}
@@ -11981,18 +11964,18 @@ public class AssetCategoryPersistenceImpl
 
 			sb.append(_SQL_SELECT_ASSETCATEGORY_WHERE);
 
+			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
+
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
 			}
-
-			sb.append(_FINDER_COLUMN_ERC_G_GROUPID_2);
 
 			String sql = sb.toString();
 
@@ -12005,21 +11988,38 @@ public class AssetCategoryPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
+				queryPos.add(companyId);
+
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
-
-				queryPos.add(groupId);
 
 				List<AssetCategory> list = query.list();
 
 				if (list.isEmpty()) {
 					if (useFinderCache && productionMode) {
 						FinderCacheUtil.putResult(
-							_finderPathFetchByERC_G, finderArgs, list);
+							_finderPathFetchByC_ERC, finderArgs, list);
 					}
 				}
 				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							if (!productionMode || !useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, externalReferenceCode
+								};
+							}
+
+							_log.warn(
+								"AssetCategoryPersistenceImpl.fetchByC_ERC(long, String, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
 					AssetCategory assetCategory = list.get(0);
 
 					result = assetCategory;
@@ -12044,32 +12044,32 @@ public class AssetCategoryPersistenceImpl
 	}
 
 	/**
-	 * Removes the asset category where externalReferenceCode = &#63; and groupId = &#63; from the database.
+	 * Removes the asset category where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
+	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
 	 * @return the asset category that was removed
 	 */
 	@Override
-	public AssetCategory removeByERC_G(
-			String externalReferenceCode, long groupId)
+	public AssetCategory removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws NoSuchCategoryException {
 
-		AssetCategory assetCategory = findByERC_G(
-			externalReferenceCode, groupId);
+		AssetCategory assetCategory = findByC_ERC(
+			companyId, externalReferenceCode);
 
 		return remove(assetCategory);
 	}
 
 	/**
-	 * Returns the number of asset categories where externalReferenceCode = &#63; and groupId = &#63;.
+	 * Returns the number of asset categories where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
+	 * @param companyId the company ID
 	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
 	 * @return the number of matching asset categories
 	 */
 	@Override
-	public int countByERC_G(String externalReferenceCode, long groupId) {
+	public int countByC_ERC(long companyId, String externalReferenceCode) {
 		externalReferenceCode = Objects.toString(externalReferenceCode, "");
 
 		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
@@ -12081,12 +12081,11 @@ public class AssetCategoryPersistenceImpl
 		Long count = null;
 
 		if (productionMode) {
-			finderPath = _finderPathCountByERC_G;
+			finderPath = _finderPathCountByC_ERC;
 
-			finderArgs = new Object[] {externalReferenceCode, groupId};
+			finderArgs = new Object[] {companyId, externalReferenceCode};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -12094,18 +12093,18 @@ public class AssetCategoryPersistenceImpl
 
 			sb.append(_SQL_COUNT_ASSETCATEGORY_WHERE);
 
+			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
+
 			boolean bindExternalReferenceCode = false;
 
 			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_3);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
 			}
 			else {
 				bindExternalReferenceCode = true;
 
-				sb.append(_FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_2);
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
 			}
-
-			sb.append(_FINDER_COLUMN_ERC_G_GROUPID_2);
 
 			String sql = sb.toString();
 
@@ -12118,11 +12117,11 @@ public class AssetCategoryPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
+				queryPos.add(companyId);
+
 				if (bindExternalReferenceCode) {
 					queryPos.add(externalReferenceCode);
 				}
-
-				queryPos.add(groupId);
 
 				count = (Long)query.uniqueResult();
 
@@ -12141,14 +12140,14 @@ public class AssetCategoryPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_2 =
-		"assetCategory.externalReferenceCode = ? AND ";
+	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
+		"assetCategory.companyId = ? AND ";
 
-	private static final String _FINDER_COLUMN_ERC_G_EXTERNALREFERENCECODE_3 =
-		"(assetCategory.externalReferenceCode IS NULL OR assetCategory.externalReferenceCode = '') AND ";
+	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
+		"assetCategory.externalReferenceCode = ?";
 
-	private static final String _FINDER_COLUMN_ERC_G_GROUPID_2 =
-		"assetCategory.groupId = ?";
+	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
+		"(assetCategory.externalReferenceCode IS NULL OR assetCategory.externalReferenceCode = '')";
 
 	public AssetCategoryPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
@@ -12194,10 +12193,10 @@ public class AssetCategoryPersistenceImpl
 			assetCategory);
 
 		FinderCacheUtil.putResult(
-			_finderPathFetchByERC_G,
+			_finderPathFetchByC_ERC,
 			new Object[] {
-				assetCategory.getExternalReferenceCode(),
-				assetCategory.getGroupId()
+				assetCategory.getCompanyId(),
+				assetCategory.getExternalReferenceCode()
 			},
 			assetCategory);
 	}
@@ -12300,14 +12299,14 @@ public class AssetCategoryPersistenceImpl
 			_finderPathFetchByP_N_V, args, assetCategoryModelImpl);
 
 		args = new Object[] {
-			assetCategoryModelImpl.getExternalReferenceCode(),
-			assetCategoryModelImpl.getGroupId()
+			assetCategoryModelImpl.getCompanyId(),
+			assetCategoryModelImpl.getExternalReferenceCode()
 		};
 
 		FinderCacheUtil.putResult(
-			_finderPathCountByERC_G, args, Long.valueOf(1));
+			_finderPathCountByC_ERC, args, Long.valueOf(1));
 		FinderCacheUtil.putResult(
-			_finderPathFetchByERC_G, args, assetCategoryModelImpl);
+			_finderPathFetchByC_ERC, args, assetCategoryModelImpl);
 	}
 
 	/**
@@ -12449,35 +12448,6 @@ public class AssetCategoryPersistenceImpl
 			assetCategory.setUuid(uuid);
 		}
 
-		if (Validator.isNull(assetCategory.getExternalReferenceCode())) {
-			assetCategory.setExternalReferenceCode(assetCategory.getUuid());
-		}
-		else {
-			AssetCategory ercAssetCategory = fetchByERC_G(
-				assetCategory.getExternalReferenceCode(),
-				assetCategory.getGroupId());
-
-			if (isNew) {
-				if (ercAssetCategory != null) {
-					throw new DuplicateAssetCategoryExternalReferenceCodeException(
-						"Duplicate asset category with external reference code " +
-							assetCategory.getExternalReferenceCode() +
-								" and group " + assetCategory.getGroupId());
-				}
-			}
-			else {
-				if ((ercAssetCategory != null) &&
-					(assetCategory.getCategoryId() !=
-						ercAssetCategory.getCategoryId())) {
-
-					throw new DuplicateAssetCategoryExternalReferenceCodeException(
-						"Duplicate asset category with external reference code " +
-							assetCategory.getExternalReferenceCode() +
-								" and group " + assetCategory.getGroupId());
-				}
-			}
-		}
-
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -12598,9 +12568,7 @@ public class AssetCategoryPersistenceImpl
 	 */
 	@Override
 	public AssetCategory fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				AssetCategory.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(AssetCategory.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -12819,7 +12787,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategory>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -12895,7 +12863,7 @@ public class AssetCategoryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -13016,9 +12984,6 @@ public class AssetCategoryPersistenceImpl
 
 		_uniqueIndexColumnNames.add(
 			new String[] {"parentCategoryId", "name", "vocabularyId"});
-
-		_uniqueIndexColumnNames.add(
-			new String[] {"externalReferenceCode", "groupId"});
 	}
 
 	/**
@@ -13315,39 +13280,19 @@ public class AssetCategoryPersistenceImpl
 			},
 			new String[] {"parentCategoryId", "name", "vocabularyId"}, false);
 
-		_finderPathFetchByERC_G = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByERC_G",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "groupId"}, true);
+		_finderPathFetchByC_ERC = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "externalReferenceCode"}, true);
 
-		_finderPathCountByERC_G = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_G",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "groupId"}, false);
-
-		_setAssetCategoryUtilPersistence(this);
+		_finderPathCountByC_ERC = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "externalReferenceCode"}, false);
 	}
 
 	public void destroy() {
-		_setAssetCategoryUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(AssetCategoryImpl.class.getName());
-	}
-
-	private void _setAssetCategoryUtilPersistence(
-		AssetCategoryPersistence assetCategoryPersistence) {
-
-		try {
-			Field field = AssetCategoryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, assetCategoryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_ASSETCATEGORY =

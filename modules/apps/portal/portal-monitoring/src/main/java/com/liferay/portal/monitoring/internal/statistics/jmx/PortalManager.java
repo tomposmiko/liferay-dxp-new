@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	enabled = false,
+	enabled = false, immediate = true,
 	property = {
 		"jmx.objectname=com.liferay.portal.monitoring:classification=portal_statistic,name=PortalManager",
 		"jmx.objectname.cache.key=PortalManager"
@@ -231,10 +231,19 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 		_serverStatistics.reset(webId);
 	}
 
-	@Reference
-	private ServerStatistics _serverStatistics;
+	@Reference(unbind = "-")
+	protected void setServerStatistics(ServerStatistics serverStatistics) {
+		_serverStatistics = serverStatistics;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setServerSummaryStatistics(
+		ServerSummaryStatistics serverSummaryStatistics) {
+
+		_serverSummaryStatistics = serverSummaryStatistics;
+	}
+
+	private ServerStatistics _serverStatistics;
 	private ServerSummaryStatistics _serverSummaryStatistics;
 
 }

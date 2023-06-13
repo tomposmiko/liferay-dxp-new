@@ -21,9 +21,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -45,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Lucas Marques
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.asset.kernel.model.AssetCategory",
 	service = ModelDocumentContributor.class
 )
@@ -56,7 +56,7 @@ public class AssetCategoryModelDocumentContributor
 		document.addKeyword(
 			Field.ASSET_CATEGORY_ID, assetCategory.getCategoryId());
 
-		_addSearchAssetCategoryTitles(
+		addSearchAssetCategoryTitles(
 			document, Field.ASSET_CATEGORY_TITLE,
 			Collections.singletonList(assetCategory));
 
@@ -66,22 +66,11 @@ public class AssetCategoryModelDocumentContributor
 		document.addKeyword(
 			Field.ASSET_VOCABULARY_ID, assetCategory.getVocabularyId());
 
-		String[] availableLanguageIds = _localization.getAvailableLanguageIds(
-			assetCategory.getDescription());
-
-		for (String availableLanguageId : availableLanguageIds) {
-			document.addText(
-				_localization.getLocalizedName(
-					Field.DESCRIPTION, availableLanguageId),
-				_html.stripHtml(
-					assetCategory.getDescription(availableLanguageId)));
-		}
-
 		Locale siteDefaultLocale = getSiteDefaultLocale(assetCategory);
 
-		document.addText(
-			Field.DESCRIPTION,
-			_html.stripHtml(assetCategory.getDescription(siteDefaultLocale)));
+		_searchLocalizationHelper.addLocalizedField(
+			document, Field.DESCRIPTION, siteDefaultLocale,
+			assetCategory.getDescriptionMap());
 
 		document.addText(Field.NAME, assetCategory.getName());
 
@@ -92,26 +81,14 @@ public class AssetCategoryModelDocumentContributor
 		document.addKeyword("treePath", assetCategory.getTreePath());
 		document.addLocalizedKeyword(
 			"localized_title",
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				assetCategory.getTitleMap(),
 				assetCategory.getDefaultLanguageId(),
 				assetCategory.getGroupId()),
 			true, true);
 	}
 
-	protected Locale getSiteDefaultLocale(AssetCategory assetCategory) {
-		try {
-			return portal.getSiteDefaultLocale(assetCategory.getGroupId());
-		}
-		catch (PortalException portalException) {
-			throw new SystemException(portalException);
-		}
-	}
-
-	@Reference
-	protected Portal portal;
-
-	private void _addSearchAssetCategoryTitles(
+	protected void addSearchAssetCategoryTitles(
 		Document document, String field, List<AssetCategory> assetCategories) {
 
 		Map<Locale, List<String>> assetCategoryTitles = new HashMap<>();
@@ -162,11 +139,17 @@ public class AssetCategoryModelDocumentContributor
 		}
 	}
 
-	@Reference
-	private Html _html;
+	protected Locale getSiteDefaultLocale(AssetCategory assetCategory) {
+		try {
+			return portal.getSiteDefaultLocale(assetCategory.getGroupId());
+		}
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
+		}
+	}
 
 	@Reference
-	private Localization _localization;
+	protected Portal portal;
 
 	@Reference
 	private SearchLocalizationHelper _searchLocalizationHelper;

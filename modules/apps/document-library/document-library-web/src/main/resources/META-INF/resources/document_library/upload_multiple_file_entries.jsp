@@ -78,8 +78,7 @@ if (portletTitleBasedNavigation) {
 									'<liferay-portlet:actionURL name="/document_library/upload_multiple_file_entries"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /><portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" /></liferay-portlet:actionURL>',
 								fileDescription:
 									'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
-								maxFileSize:
-									'<%= DLValidatorUtil.getMaxAllowableSize(themeDisplay.getScopeGroupId(), null) %> B',
+								maxFileSize: '<%= dlConfiguration.fileMaxSize() %> B',
 								metadataContainer: '#<portlet:namespace />commonFileMetadataContainer',
 								metadataExplanationContainer:
 									'#<portlet:namespace />metadataExplanationContainer',
@@ -112,9 +111,7 @@ if (portletTitleBasedNavigation) {
 						PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-multiple-file-entries"), currentURL);
 						%>
 
-						<aui:script require="frontend-js-web/index as frontendJsWeb">
-							var {runScriptsInElement} = frontendJsWeb;
-
+						<aui:script require="frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 							AUI().use('aui-base', 'aui-loading-mask-deprecated', 'node-load', (A) => {
 								Liferay.on('tempFileRemoved', () => {
 									Liferay.Util.openToast({
@@ -174,7 +171,7 @@ if (portletTitleBasedNavigation) {
 													'input[data-fileName="' + item.originalFileName + '"]'
 												);
 
-												var li = checkBox.ancestor('li');
+												var li = checkBox.ancestor();
 
 												checkBox.remove(true);
 
@@ -198,28 +195,28 @@ if (portletTitleBasedNavigation) {
 
 													if (originalFileName === item.fileName) {
 														childHTML =
-															'<div class="card-footer small text-success"><%= UnicodeLanguageUtil.get(request, "successfully-saved") %></div>';
+															'<span class="card-bottom success-message"><%= UnicodeLanguageUtil.get(request, "successfully-saved") %></span>';
 													}
 													else {
 														childHTML =
-															'<div class="card-footer small text-success"><%= UnicodeLanguageUtil.get(request, "successfully-saved") %> (' +
+															'<span class="card-bottom success-message"><%= UnicodeLanguageUtil.get(request, "successfully-saved") %> (' +
 															item.fileName +
-															')</div>';
+															')</span>';
 													}
 												}
 												else {
 													cssClass = 'upload-error';
 
 													childHTML =
-														'<div class="card-footer small text-danger">' +
+														'<span class="card-bottom error-message">' +
 														item.errorMessage +
-														'</div>';
+														'</span>';
 
 													itemFailed = true;
 												}
 
 												li.addClass(cssClass);
-												li.one('.card').append(childHTML);
+												li.append(childHTML);
 											}
 
 											<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/document_library/upload_multiple_file_entries" var="uploadMultipleFileEntries">
@@ -235,7 +232,7 @@ if (portletTitleBasedNavigation) {
 													'<%= uploadMultipleFileEntries %>',
 													undefined,
 													() => {
-														runScriptsInElement(
+														runScriptsInElement.default(
 															document.getElementById(
 																'<portlet:namespace />commonFileMetadataContainer'
 															)

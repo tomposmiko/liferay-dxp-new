@@ -25,7 +25,6 @@ import {errorToast} from './utils/toast';
 const Ratings = ({
 	className,
 	classPK,
-	contentTitle,
 	enabled = false,
 	inTrash = false,
 	signedIn,
@@ -61,7 +60,6 @@ const Ratings = ({
 			Liferay.fire('ratings:vote', {
 				className,
 				classPK,
-				contentTitle: contentTitle || '',
 				ratingType: type,
 				score,
 			});
@@ -83,7 +81,7 @@ const Ratings = ({
 					errorToast();
 				});
 		},
-		[className, classPK, contentTitle, type, url]
+		[className, classPK, type, url]
 	);
 
 	const RatingsTypes = {

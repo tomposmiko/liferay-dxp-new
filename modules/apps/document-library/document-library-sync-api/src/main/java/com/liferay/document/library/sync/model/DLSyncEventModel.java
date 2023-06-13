@@ -145,8 +145,4 @@ public interface DLSyncEventModel extends BaseModel<DLSyncEvent>, ShardedModel {
 	@Override
 	public DLSyncEvent cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

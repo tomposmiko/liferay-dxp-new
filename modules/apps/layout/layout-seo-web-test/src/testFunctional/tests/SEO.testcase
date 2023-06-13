@@ -1,7 +1,6 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "SEO";
@@ -11,13 +10,13 @@ definition {
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -26,10 +25,10 @@ definition {
 	}
 
 	@description = "This test ensures that user can map the blogs with SEO meta tags for display pages."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanMapBlogsToDisplayPage {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
 			contentType = "Blogs Entry",
@@ -49,20 +48,6 @@ definition {
 			pageTemplateName = "Display Page Template Name");
 
 		OpenGraph.viewDefaultMappedField(portlet = "SEO");
-
-		OpenGraph.mapEditableTextToField(
-			field = "Description",
-			mappedField = "description",
-			mappedFieldName = "Description",
-			mappedFieldText = "Description is ",
-			textType = "TextArea");
-
-		Button.clickSave();
-
-		OpenGraph.viewMappedField(
-			mappedField = "description",
-			mappedFieldValue = "Description is Description: ${description:Description}",
-			textType = "TextArea");
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "test-site-name");
 
@@ -85,14 +70,14 @@ definition {
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/b/blogs-entry-title");
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Blogs Entry Title - Test Site Name - ${siteName},content="Description is Description: Custom Abstract"''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Blogs Entry Title - Test Site Name - ${siteName},content="Custom Abstract"''');
 	}
 
 	@description = "This test ensures that user can map the document with SEO meta tags for display pages."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanMapDocumentToDisplayPage {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
 			contentType = "Document",
@@ -132,11 +117,11 @@ definition {
 
 		OpenGraph.viewMappedField(
 			mappedField = "title",
-			mappedFieldValue = "HTML Title is File Name: ${fileName:File Name}Author Name: ${authorName:Author Name}");
+			mappedFieldValue = "HTML Title is File Name: ${fileName} Author Name: ${authorName}");
 
 		OpenGraph.viewMappedField(
 			mappedField = "description",
-			mappedFieldValue = "Description is MIME Type: ${mimeType:MIME Type}Version: ${version:Version}",
+			mappedFieldValue = "Description is MIME Type: ${mimeType} Version: ${version}",
 			textType = "TextArea");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
@@ -153,28 +138,26 @@ definition {
 			pageName = "Display Page Template Name",
 			siteURLKey = "test-site-name");
 
-		var dmFileEntryId = JSONDocument.getFileEntryId(
+		var dmFileEntryID = JSONDocument.getFileEntryId(
 			dmDocumentTitle = "Document_1.jpg",
 			groupName = "Test Site Name");
 		var portalURL = PropsUtil.get("portal.url");
-		var siteId = JSONGroupAPI._getGroupIdByName(
-			groupName = "Test Site Name",
-			site = "true");
+		var siteID = JSONGroupAPI._getGroupIdByName(groupName = "Test Site Name", site = "true");
 
 		Navigator.openSpecificURL(url = "${portalURL}/c/portal/logout");
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/d/${dmFileEntryId}");
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/d/${dmFileEntryID}");
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''HTML Title is File Name: Document_1.jpgAuthor Name: Test Test - Test Site Name - ${siteName}''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''HTML Title is File Name: Document_1.jpg Author Name: Test Test - Test Site Name - ${siteName}''');
 
-		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Description is MIME Type: image/jpegVersion: 1.0''');
+		OpenGraph.viewOpenGraphProperties(ogPropertyList = '''Description is MIME Type: image/jpeg Version: 1.0''');
 	}
 
 	@description = "This test ensures that user can map the web content with SEO meta tags for display pages."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanMapWebContentToDisplayPage {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
 			contentType = "Web Content Article",
@@ -214,11 +197,11 @@ definition {
 
 		OpenGraph.viewMappedField(
 			mappedField = "title",
-			mappedFieldValue = "HTML Title is Author Name: ${authorName:Author Name}");
+			mappedFieldValue = "HTML Title is Author Name: ${authorName}");
 
 		OpenGraph.viewMappedField(
 			mappedField = "description",
-			mappedFieldValue = "Description is Content: ${content:Content}",
+			mappedFieldValue = "Description is Content: ${Content}",
 			textType = "TextArea");
 
 		JSONWebcontent.addWebContent(

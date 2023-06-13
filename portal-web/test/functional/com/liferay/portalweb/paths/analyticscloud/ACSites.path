@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!-- AC Sites -->
-
 <tr>
 	<td>ACTIVITIES_CARD</td>
 	<td>//h5[contains(text(),'Activities')]/parent::div/following-sibling::div//span[contains(text(),'Unique Visitors')]</td>
@@ -20,7 +18,7 @@
 </tr>
 <tr>
 	<td>OVERVIEW_HEADER_PROPERTY_NAME</td>
-	<td>//a[contains(@class,'breadcrumb') and contains(text(), '${propertyName}')]</td>
+	<td>//div[contains(@class,'card-header')]//h5[contains(text(),'${propertyName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -105,7 +103,7 @@
 </tr>
 <tr>
 	<td>COHORT_ANALYSIS_DAY_ZERO_PERCENTAGE</td>
-	<td>xpath=(//th[contains(@class, 'period table-cell-expand')]/ancestor::tr/following-sibling::tr//th[contains(., '100.00%')])[1]</td>
+	<td>//th[text()='Day 0']/ancestor::tr/following-sibling::tr//th[3]</td>
 	<td></td>
 </tr>
 <tr>
@@ -129,28 +127,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>SITE_METRIC_VALUE</td>
-	<td>//span[@class='title'and text()='${metricName}']/..//div[@class='metric-value']</td>
+	<td>SITE_ACTIVITY_VALUE_CARD</td>
+	<td>//li[contains(@class,'card-tab active') and contains(.,'${key_cardName}')]//div[contains(@class,'metric-value') and contains(.,'${key_totalValue}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>VISITED_TOP_PAGES_CARD</td>
-	<td>//tr[${key_index}]//div[contains(@class,'text-truncate')]//div[contains(@class,'table-title')and text()='${key_pageName}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISPLAYED_ASSETS_CARD</td>
-	<td>//*[contains(@class,'table-hover')]//span[text()='${key_nameList}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SITE_PATH</td>
-	<td>//*[name()='svg']//*[contains(@class, 'analytics-sankey-title') and @y='0']//*[text()='${key_pageName}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>POPOVER_ACTIVITIES_DATE_AND_TIME</td>
-	<td>//thead[@class="analytics-tooltip-chart-header"]//div[contains(@class,'text-right')]</td>
+	<td>//tr[${key_index}]//div[contains(@class,'text-truncate')]//div[contains(@class,'table-title')]</td>
 	<td></td>
 </tr>
 </tbody>

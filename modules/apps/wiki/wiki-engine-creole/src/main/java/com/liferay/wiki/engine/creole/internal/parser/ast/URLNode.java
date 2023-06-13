@@ -23,13 +23,13 @@ import com.liferay.wiki.engine.creole.internal.util.WikiEngineCreoleComponentPro
 public abstract class URLNode extends ASTNode {
 
 	public URLNode() {
-		_initSupportedProtocols();
+		initSupportedProtocols();
 	}
 
 	public URLNode(int token) {
 		super(token);
 
-		_initSupportedProtocols();
+		initSupportedProtocols();
 	}
 
 	public URLNode(int token, String link) {
@@ -37,13 +37,13 @@ public abstract class URLNode extends ASTNode {
 
 		_link = link;
 
-		_initSupportedProtocols();
+		initSupportedProtocols();
 	}
 
 	public URLNode(String link) {
 		_link = link;
 
-		_initSupportedProtocols();
+		initSupportedProtocols();
 	}
 
 	public String getLink() {
@@ -72,7 +72,7 @@ public abstract class URLNode extends ASTNode {
 		_supportedProtocols = supportedProtocols;
 	}
 
-	private void _initSupportedProtocols() {
+	protected void initSupportedProtocols() {
 		WikiEngineCreoleComponentProvider wikiEngineCreoleComponentProvider =
 			WikiEngineCreoleComponentProvider.
 				getWikiEngineCreoleComponentProvider();

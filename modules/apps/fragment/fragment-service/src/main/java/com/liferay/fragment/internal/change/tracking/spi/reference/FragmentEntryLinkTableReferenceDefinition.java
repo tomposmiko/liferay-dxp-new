@@ -17,7 +17,6 @@ package com.liferay.fragment.internal.change.tracking.spi.reference;
 import com.liferay.change.tracking.spi.reference.TableReferenceDefinition;
 import com.liferay.change.tracking.spi.reference.builder.ChildTableReferenceInfoBuilder;
 import com.liferay.change.tracking.spi.reference.builder.ParentTableReferenceInfoBuilder;
-import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.model.FragmentEntryLinkTable;
 import com.liferay.fragment.service.persistence.FragmentEntryLinkPersistence;
 import com.liferay.portal.kernel.model.LayoutTable;
@@ -38,10 +37,6 @@ public class FragmentEntryLinkTableReferenceDefinition
 	public void defineChildTableReferences(
 		ChildTableReferenceInfoBuilder<FragmentEntryLinkTable>
 			childTableReferenceInfoBuilder) {
-
-		childTableReferenceInfoBuilder.systemEventReference(
-			FragmentEntryLinkTable.INSTANCE.fragmentEntryLinkId,
-			FragmentEntryLink.class);
 	}
 
 	@Override
@@ -66,6 +61,9 @@ public class FragmentEntryLinkTableReferenceDefinition
 						LayoutTable.INSTANCE.plid)
 				)
 			)
+		).parentColumnReference(
+			FragmentEntryLinkTable.INSTANCE.fragmentEntryLinkId,
+			FragmentEntryLinkTable.INSTANCE.originalFragmentEntryLinkId
 		);
 	}
 

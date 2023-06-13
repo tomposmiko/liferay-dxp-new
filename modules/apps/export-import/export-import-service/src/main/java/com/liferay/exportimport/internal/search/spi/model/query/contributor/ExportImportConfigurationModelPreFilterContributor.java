@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.exportimport.kernel.model.ExportImportConfiguration",
 	service = ModelPreFilterContributor.class
 )
@@ -46,7 +47,7 @@ public class ExportImportConfigurationModelPreFilterContributor
 		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
 		SearchContext searchContext) {
 
-		_addStatus(booleanFilter, searchContext);
+		addStatus(booleanFilter, searchContext);
 
 		booleanFilter.addRequiredTerm(
 			Field.COMPANY_ID, searchContext.getCompanyId());
@@ -62,7 +63,7 @@ public class ExportImportConfigurationModelPreFilterContributor
 		}
 	}
 
-	private void _addStatus(
+	protected void addStatus(
 		BooleanFilter contextBooleanFilter, SearchContext searchContext) {
 
 		int[] statuses = GetterUtil.getIntegerValues(

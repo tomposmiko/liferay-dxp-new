@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import {fetch} from 'frontend-js-web';
 import Component from 'metal-component';
 import Soy, {Config} from 'metal-soy';
@@ -21,8 +23,6 @@ import template from './AddressModal.soy';
 import 'clay-modal';
 
 import '../input_utils/CommerceInputText';
-
-import '../css/main.scss';
 
 class AddressModal extends Component {
 	attached() {
@@ -70,7 +70,7 @@ class AddressModal extends Component {
 			};
 
 			const country = this._countries.filter(
-				(country) => country.id === value
+				(country) => country.id == value
 			);
 
 			if (country.length === 1) {

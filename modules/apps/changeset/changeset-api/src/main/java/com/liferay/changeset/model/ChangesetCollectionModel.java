@@ -218,8 +218,4 @@ public interface ChangesetCollectionModel
 	@Override
 	public ChangesetCollection cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

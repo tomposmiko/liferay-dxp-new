@@ -14,25 +14,26 @@
 
 import {openSimpleInputModal} from 'frontend-js-web';
 
-import openDeleteAssetEntryListModal from './openDeleteAssetEntryListModal';
-
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	return {
 		...otherProps,
 		onActionButtonClick(event, {item}) {
 			if (item?.data?.action === 'deleteSelectedAssetListEntries') {
-				openDeleteAssetEntryListModal({
-					multiple: true,
-					onDelete: () => {
-						const form = document.getElementById(
-							`${portletNamespace}fm`
-						);
+				if (
+					confirm(
+						Liferay.Language.get(
+							'are-you-sure-you-want-to-delete-this'
+						)
+					)
+				) {
+					const form = document.getElementById(
+						`${portletNamespace}fm`
+					);
 
-						if (form) {
-							submitForm(form);
-						}
-					},
-				});
+					if (form) {
+						submitForm(form);
+					}
+				}
 			}
 		},
 		onCreationMenuItemClick(event, {item}) {

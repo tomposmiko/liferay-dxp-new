@@ -27,11 +27,10 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Marco Leo
  */
-@Component(service = RESTContextPathResolverRegistry.class)
+@Component(immediate = true, service = RESTContextPathResolverRegistry.class)
 public class RESTContextPathResolverRegistryImpl
 	implements RESTContextPathResolverRegistry {
 
-	@Override
 	public RESTContextPathResolver getRESTContextPathResolver(
 		String className) {
 

@@ -21,12 +21,16 @@ import com.liferay.adaptive.media.image.media.query.MediaQueryProvider;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Roberto Díaz
  */
 @Component(
-	property = "service.ranking:Integer=100",
+	immediate = true, property = "service.ranking:Integer=100",
 	service = ItemSelectorReturnTypeResolver.class
 )
 public class FileEntryAMImageURLItemSelectorReturnTypeResolver
@@ -70,32 +74,38 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolver
 				themeDisplay, fileEntry, "&imagePreview=1", false);
 		}
 
+		JSONArray sourcesJSONArray = JSONFactoryUtil.createJSONArray();
+
+		List<MediaQuery> mediaQueries = _mediaQueryProvider.getMediaQueries(
+			fileEntry);
+
+		Stream<MediaQuery> mediaQueryStream = mediaQueries.stream();
+
+		mediaQueryStream.map(
+			this::_getSourceJSONObject
+		).forEach(
+			sourcesJSONArray::put
+		);
+
 		return JSONUtil.put(
 			"defaultSource", previewURL
 		).put(
 			"fileEntryId", String.valueOf(fileEntry.getFileEntryId())
 		).put(
-			"sources",
-			JSONUtil.toJSONArray(
-				_mediaQueryProvider.getMediaQueries(fileEntry),
-				this::_getSourceJSONObject)
+			"sources", sourcesJSONArray
 		).toString();
 	}
 
 	private JSONObject _getSourceJSONObject(MediaQuery mediaQuery) {
+		JSONObject attributesJSONObject = JSONFactoryUtil.createJSONObject();
+
+		for (Condition condition : mediaQuery.getConditions()) {
+			attributesJSONObject.put(
+				condition.getAttribute(), condition.getValue());
+		}
+
 		return JSONUtil.put(
-			"attributes",
-			() -> {
-				JSONObject attributesJSONObject =
-					_jsonFactory.createJSONObject();
-
-				for (Condition condition : mediaQuery.getConditions()) {
-					attributesJSONObject.put(
-						condition.getAttribute(), condition.getValue());
-				}
-
-				return attributesJSONObject;
-			}
+			"attributes", attributesJSONObject
 		).put(
 			"src", mediaQuery.getSrc()
 		);
@@ -103,9 +113,6 @@ public class FileEntryAMImageURLItemSelectorReturnTypeResolver
 
 	@Reference
 	private DLURLHelper _dlURLHelper;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private MediaQueryProvider _mediaQueryProvider;

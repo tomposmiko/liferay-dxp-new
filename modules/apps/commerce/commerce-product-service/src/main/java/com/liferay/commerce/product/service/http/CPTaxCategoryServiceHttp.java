@@ -46,9 +46,54 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Marco Leo
+ * @see CPTaxCategoryServiceSoap
  * @generated
  */
 public class CPTaxCategoryServiceHttp {
+
+	public static com.liferay.commerce.product.model.CPTaxCategory
+			addCPTaxCategory(
+				HttpPrincipal httpPrincipal,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				CPTaxCategoryServiceUtil.class, "addCPTaxCategory",
+				_addCPTaxCategoryParameterTypes0);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, nameMap, descriptionMap, serviceContext);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.commerce.product.model.CPTaxCategory)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
 
 	public static com.liferay.commerce.product.model.CPTaxCategory
 			addCPTaxCategory(
@@ -61,7 +106,7 @@ public class CPTaxCategoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class, "addCPTaxCategory",
-				_addCPTaxCategoryParameterTypes0);
+				_addCPTaxCategoryParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, nameMap, descriptionMap,
@@ -103,7 +148,7 @@ public class CPTaxCategoryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class,
 				"countCPTaxCategoriesByCompanyId",
-				_countCPTaxCategoriesByCompanyIdParameterTypes1);
+				_countCPTaxCategoriesByCompanyIdParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, keyword);
@@ -143,7 +188,7 @@ public class CPTaxCategoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class, "deleteCPTaxCategory",
-				_deleteCPTaxCategoryParameterTypes2);
+				_deleteCPTaxCategoryParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpTaxCategoryId);
@@ -183,7 +228,7 @@ public class CPTaxCategoryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class,
 				"findCPTaxCategoriesByCompanyId",
-				_findCPTaxCategoriesByCompanyIdParameterTypes3);
+				_findCPTaxCategoriesByCompanyIdParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, keyword, start, end);
@@ -225,7 +270,7 @@ public class CPTaxCategoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class, "getCPTaxCategories",
-				_getCPTaxCategoriesParameterTypes4);
+				_getCPTaxCategoriesParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId);
@@ -270,7 +315,7 @@ public class CPTaxCategoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class, "getCPTaxCategories",
-				_getCPTaxCategoriesParameterTypes5);
+				_getCPTaxCategoriesParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId, start, end, orderByComparator);
@@ -311,7 +356,7 @@ public class CPTaxCategoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class, "getCPTaxCategoriesCount",
-				_getCPTaxCategoriesCountParameterTypes6);
+				_getCPTaxCategoriesCountParameterTypes7);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, companyId);
@@ -351,10 +396,53 @@ public class CPTaxCategoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class, "getCPTaxCategory",
-				_getCPTaxCategoryParameterTypes7);
+				_getCPTaxCategoryParameterTypes8);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpTaxCategoryId);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.commerce.product.model.CPTaxCategory)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static com.liferay.commerce.product.model.CPTaxCategory
+			updateCPTaxCategory(
+				HttpPrincipal httpPrincipal, long cpTaxCategoryId,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				CPTaxCategoryServiceUtil.class, "updateCPTaxCategory",
+				_updateCPTaxCategoryParameterTypes9);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, cpTaxCategoryId, nameMap, descriptionMap);
 
 			Object returnObj = null;
 
@@ -395,7 +483,7 @@ public class CPTaxCategoryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CPTaxCategoryServiceUtil.class, "updateCPTaxCategory",
-				_updateCPTaxCategoryParameterTypes8);
+				_updateCPTaxCategoryParameterTypes10);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, cpTaxCategoryId, nameMap,
@@ -434,31 +522,38 @@ public class CPTaxCategoryServiceHttp {
 
 	private static final Class<?>[] _addCPTaxCategoryParameterTypes0 =
 		new Class[] {
+			java.util.Map.class, java.util.Map.class,
+			com.liferay.portal.kernel.service.ServiceContext.class
+		};
+	private static final Class<?>[] _addCPTaxCategoryParameterTypes1 =
+		new Class[] {
 			String.class, java.util.Map.class, java.util.Map.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[]
-		_countCPTaxCategoriesByCompanyIdParameterTypes1 = new Class[] {
+		_countCPTaxCategoriesByCompanyIdParameterTypes2 = new Class[] {
 			long.class, String.class
 		};
-	private static final Class<?>[] _deleteCPTaxCategoryParameterTypes2 =
+	private static final Class<?>[] _deleteCPTaxCategoryParameterTypes3 =
 		new Class[] {long.class};
 	private static final Class<?>[]
-		_findCPTaxCategoriesByCompanyIdParameterTypes3 = new Class[] {
+		_findCPTaxCategoriesByCompanyIdParameterTypes4 = new Class[] {
 			long.class, String.class, int.class, int.class
 		};
-	private static final Class<?>[] _getCPTaxCategoriesParameterTypes4 =
-		new Class[] {long.class};
 	private static final Class<?>[] _getCPTaxCategoriesParameterTypes5 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getCPTaxCategoriesParameterTypes6 =
 		new Class[] {
 			long.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
-	private static final Class<?>[] _getCPTaxCategoriesCountParameterTypes6 =
+	private static final Class<?>[] _getCPTaxCategoriesCountParameterTypes7 =
 		new Class[] {long.class};
-	private static final Class<?>[] _getCPTaxCategoryParameterTypes7 =
+	private static final Class<?>[] _getCPTaxCategoryParameterTypes8 =
 		new Class[] {long.class};
-	private static final Class<?>[] _updateCPTaxCategoryParameterTypes8 =
+	private static final Class<?>[] _updateCPTaxCategoryParameterTypes9 =
+		new Class[] {long.class, java.util.Map.class, java.util.Map.class};
+	private static final Class<?>[] _updateCPTaxCategoryParameterTypes10 =
 		new Class[] {
 			String.class, long.class, java.util.Map.class, java.util.Map.class
 		};

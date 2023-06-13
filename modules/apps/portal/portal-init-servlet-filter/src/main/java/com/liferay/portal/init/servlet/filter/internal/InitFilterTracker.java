@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Matthew Tambara
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class InitFilterTracker {
 
 	@Activate
@@ -58,7 +58,7 @@ public class InitFilterTracker {
 		}
 		catch (IllegalStateException illegalStateException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(illegalStateException);
+				_log.debug(illegalStateException, illegalStateException);
 			}
 		}
 	}

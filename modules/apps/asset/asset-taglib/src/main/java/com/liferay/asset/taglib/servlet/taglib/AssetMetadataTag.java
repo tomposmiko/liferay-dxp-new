@@ -123,7 +123,7 @@ public class AssetMetadataTag extends IncludeTag {
 				assetRendererFactory.getAssetRenderer(_classPK));
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		httpServletRequest.setAttribute(

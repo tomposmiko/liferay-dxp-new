@@ -20,10 +20,10 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.servlet.taglib.BaseDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilder;
 import com.liferay.portal.url.builder.AbsolutePortalURLBuilderFactory;
-import com.liferay.portal.url.builder.ComboRequestAbsolutePortalURLBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.frontend.js.jquery.web.internal.configuration.JSJQueryConfiguration",
-	service = DynamicInclude.class
+	immediate = true, service = DynamicInclude.class
 )
 public class JQueryTopHeadDynamicInclude extends BaseDynamicInclude {
 
@@ -74,22 +74,33 @@ public class JQueryTopHeadDynamicInclude extends BaseDynamicInclude {
 		if (themeDisplay.isThemeJsFastLoad()) {
 			sb.append("<script data-senna-track=\"permanent\" src=\"");
 
-			ComboRequestAbsolutePortalURLBuilder
-				comboRequestAbsolutePortalURLBuilder =
-					absolutePortalURLBuilder.forComboRequest();
+			String comboPath = _portal.getStaticResourceURL(
+				httpServletRequest, "/combo", "minifierType=js", _lastModified);
 
-			comboRequestAbsolutePortalURLBuilder.setTimestamp(_lastModified);
+			boolean cdnDynamicResourcesEnabled =
+				_portal.isCDNDynamicResourcesEnabled(
+					themeDisplay.getCompanyId());
 
-			for (String fileName : _FILE_NAMES) {
-				comboRequestAbsolutePortalURLBuilder.addFile(
-					absolutePortalURLBuilder.forBundleScript(
-						_bundleContext.getBundle(), fileName
-					).ignoreCDNHost(
-					).ignorePathProxy(
-					).build());
+			if (!cdnDynamicResourcesEnabled) {
+				absolutePortalURLBuilder.ignoreCDNHost();
 			}
 
-			sb.append(comboRequestAbsolutePortalURLBuilder.build());
+			sb.append(
+				absolutePortalURLBuilder.forResource(
+					comboPath
+				).build());
+
+			if (cdnDynamicResourcesEnabled) {
+				absolutePortalURLBuilder.ignoreCDNHost();
+			}
+
+			for (String fileName : _FILE_NAMES) {
+				sb.append("&");
+				sb.append(
+					absolutePortalURLBuilder.forModuleScript(
+						_bundleContext.getBundle(), fileName
+					).build());
+			}
 
 			sb.append("\" type=\"text/javascript\"></script>");
 		}
@@ -97,7 +108,7 @@ public class JQueryTopHeadDynamicInclude extends BaseDynamicInclude {
 			for (String fileName : _FILE_NAMES) {
 				sb.append("<script data-senna-track=\"permanent\" src=\"");
 				sb.append(
-					absolutePortalURLBuilder.forBundleScript(
+					absolutePortalURLBuilder.forModuleScript(
 						_bundleContext.getBundle(), fileName
 					).build());
 				sb.append("\" type=\"text/javascript\"></script>");
@@ -140,5 +151,8 @@ public class JQueryTopHeadDynamicInclude extends BaseDynamicInclude {
 	private volatile BundleContext _bundleContext;
 	private volatile JSJQueryConfiguration _jsJQueryConfiguration;
 	private volatile long _lastModified;
+
+	@Reference
+	private Portal _portal;
 
 }

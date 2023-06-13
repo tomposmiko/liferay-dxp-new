@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 
@@ -48,17 +50,18 @@ public class DebugUtils {
 		List<StackTraceElement> stackTraceElements = new ArrayList<>(
 			Arrays.asList(throwable.getStackTrace()));
 
-		List<String> classNameAndMethodNames = new ArrayList<>();
+		Stream<StackTraceElement> stream = stackTraceElements.stream();
 
-		for (StackTraceElement stackTraceElement : stackTraceElements) {
-			classNameAndMethodNames.add(
-				_toClassNameAndMethodName(stackTraceElement.toString()));
-		}
-
-		return String.join(System.lineSeparator(), classNameAndMethodNames);
+		return String.join(
+			System.lineSeparator(),
+			stream.map(
+				element -> _toClassAndMethod(element.toString())
+			).collect(
+				Collectors.toList()
+			));
 	}
 
-	private static String _toClassNameAndMethodName(String line) {
+	private static String _toClassAndMethod(String line) {
 		Matcher matcher = _stackLinePattern.matcher(line);
 
 		if (!matcher.matches()) {

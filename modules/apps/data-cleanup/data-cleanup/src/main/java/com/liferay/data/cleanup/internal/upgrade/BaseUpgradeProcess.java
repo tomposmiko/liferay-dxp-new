@@ -15,7 +15,6 @@
 package com.liferay.data.cleanup.internal.upgrade;
 
 import com.liferay.data.cleanup.internal.upgrade.util.LayoutTypeSettingsUtil;
-import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -27,25 +26,6 @@ import java.sql.ResultSet;
  * @author Alberto Chaparro
  */
 public abstract class BaseUpgradeProcess extends UpgradeProcess {
-
-	protected void removeExpandoData(
-			ExpandoTableLocalService expandoTableLocalService,
-			String expandoTableName)
-		throws Exception {
-
-		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				"select tableId from ExpandoTable where name = ?")) {
-
-			preparedStatement.setString(1, expandoTableName);
-
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				while (resultSet.next()) {
-					expandoTableLocalService.deleteTable(
-						resultSet.getLong("tableId"));
-				}
-			}
-		}
-	}
 
 	protected void removePortletData(
 			String[] bundleSymbolicNames, String[] oldPortletIds,
@@ -82,16 +62,16 @@ public abstract class BaseUpgradeProcess extends UpgradeProcess {
 
 	protected void removeServiceData(
 			String buildNamespace, String[] bundleSymbolicNames,
-			String[] modelResourceNames, String[] tableNames)
+			String[] classNames, String[] tableNames)
 		throws Exception {
 
-		_deleteFromClassName(modelResourceNames);
+		_deleteFromClassName(classNames);
 
 		_deleteFromRelease(bundleSymbolicNames);
 
-		_deleteFromResourceAction(modelResourceNames);
+		_deleteFromResourceAction(classNames);
 
-		_deleteFromResourcePermission(modelResourceNames);
+		_deleteFromResourcePermission(classNames);
 
 		_deleteFromServiceComponent(buildNamespace);
 

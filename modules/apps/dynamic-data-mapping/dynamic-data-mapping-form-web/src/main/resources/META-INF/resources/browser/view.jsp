@@ -60,7 +60,7 @@
 								"forminstancename", formInstance.getName(locale)
 							).build()
 						%>'
-						href="javascript:void(0);"
+						href="javascript:;"
 					>
 						<%= HtmlUtil.escape(formInstance.getName(locale)) %>
 					</aui:a>

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.background.task.internal;
 
-import com.liferay.portal.background.task.internal.lock.helper.BackgroundTaskLockHelper;
+import com.liferay.portal.background.task.internal.lock.BackgroundTaskLockHelper;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
@@ -54,7 +54,7 @@ public class SerialBackgroundTaskExecutor
 
 		try {
 			if (isSerial()) {
-				lock = _acquireLock(backgroundTask);
+				lock = acquireLock(backgroundTask);
 			}
 
 			BackgroundTaskExecutor backgroundTaskExecutor =
@@ -69,7 +69,7 @@ public class SerialBackgroundTaskExecutor
 		}
 	}
 
-	private Lock _acquireLock(BackgroundTask backgroundTask)
+	protected Lock acquireLock(BackgroundTask backgroundTask)
 		throws DuplicateLockException {
 
 		Lock lock = _backgroundTaskLockHelper.lockBackgroundTask(

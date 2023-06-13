@@ -27,10 +27,6 @@ public class CPDefinitionVirtualSettingServiceWrapper
 	implements CPDefinitionVirtualSettingService,
 			   ServiceWrapper<CPDefinitionVirtualSettingService> {
 
-	public CPDefinitionVirtualSettingServiceWrapper() {
-		this(null);
-	}
-
 	public CPDefinitionVirtualSettingServiceWrapper(
 		CPDefinitionVirtualSettingService cpDefinitionVirtualSettingService) {
 
@@ -80,17 +76,6 @@ public class CPDefinitionVirtualSettingServiceWrapper
 			maxUsages, useSample, sampleFileEntryId, sampleUrl,
 			termsOfUseRequired, termsOfUseContentMap,
 			termsOfUseJournalArticleResourcePrimKey, serviceContext);
-	}
-
-	@Override
-	public
-		com.liferay.commerce.product.type.virtual.model.
-			CPDefinitionVirtualSetting deleteCPDefinitionVirtualSetting(
-					String className, long classPK)
-				throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionVirtualSettingService.
-			deleteCPDefinitionVirtualSetting(className, classPK);
 	}
 
 	@Override

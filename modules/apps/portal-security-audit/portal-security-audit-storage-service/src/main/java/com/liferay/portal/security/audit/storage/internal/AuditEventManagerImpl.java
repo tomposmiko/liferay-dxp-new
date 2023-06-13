@@ -31,19 +31,23 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Greenwald
  */
-@Component(service = AuditEventManager.class)
+@Component(immediate = true, service = AuditEventManager.class)
 public class AuditEventManagerImpl implements AuditEventManager {
 
 	@Override
 	public AuditEvent addAuditEvent(AuditMessage auditMessage) {
-		return _createAuditEvent(
-			_auditEventLocalService.addAuditEvent(auditMessage));
+		com.liferay.portal.security.audit.storage.model.AuditEvent auditEvent =
+			_auditEventLocalService.addAuditEvent(auditMessage);
+
+		return createAuditEvent(auditEvent);
 	}
 
 	@Override
 	public AuditEvent fetchAuditEvent(long auditEventId) {
-		return _createAuditEvent(
-			_auditEventLocalService.fetchAuditEvent(auditEventId));
+		com.liferay.portal.security.audit.storage.model.AuditEvent auditEvent =
+			_auditEventLocalService.fetchAuditEvent(auditEventId);
+
+		return createAuditEvent(auditEvent);
 	}
 
 	@Override
@@ -53,9 +57,11 @@ public class AuditEventManagerImpl implements AuditEventManager {
 			<com.liferay.portal.security.audit.storage.model.AuditEvent>
 				orderByComparator) {
 
-		return _translate(
-			_auditEventLocalService.getAuditEvents(
-				companyId, start, end, orderByComparator));
+		List<com.liferay.portal.security.audit.storage.model.AuditEvent>
+			auditEvents = _auditEventLocalService.getAuditEvents(
+				companyId, start, end, orderByComparator);
+
+		return translate(auditEvents);
 	}
 
 	@Override
@@ -68,12 +74,14 @@ public class AuditEventManagerImpl implements AuditEventManager {
 			<com.liferay.portal.security.audit.storage.model.AuditEvent>
 				orderByComparator) {
 
-		return _translate(
-			_auditEventLocalService.getAuditEvents(
+		List<com.liferay.portal.security.audit.storage.model.AuditEvent>
+			auditEvents = _auditEventLocalService.getAuditEvents(
 				companyId, userId, userName, createDateGT, createDateLT,
 				eventType, className, classPK, clientHost, clientIP, serverName,
 				serverPort, sessionID, andSearch, start, end,
-				orderByComparator));
+				orderByComparator);
+
+		return translate(auditEvents);
 	}
 
 	@Override
@@ -94,14 +102,14 @@ public class AuditEventManagerImpl implements AuditEventManager {
 			sessionID, andSearch);
 	}
 
-	private AuditEvent _createAuditEvent(
+	protected AuditEvent createAuditEvent(
 		com.liferay.portal.security.audit.storage.model.AuditEvent
 			auditEventModel) {
 
 		return AuditEventAutoEscapeBeanHandler.createProxy(auditEventModel);
 	}
 
-	private List<AuditEvent> _translate(
+	protected List<AuditEvent> translate(
 		List<com.liferay.portal.security.audit.storage.model.AuditEvent>
 			auditEventModels) {
 
@@ -114,7 +122,7 @@ public class AuditEventManagerImpl implements AuditEventManager {
 		for (com.liferay.portal.security.audit.storage.model.AuditEvent
 				auditEventModel : auditEventModels) {
 
-			auditEvents.add(_createAuditEvent(auditEventModel));
+			auditEvents.add(createAuditEvent(auditEventModel));
 		}
 
 		return auditEvents;

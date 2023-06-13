@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONObject;
-
 /**
  * @author Michael Hashimoto
  */
@@ -79,15 +77,9 @@ public class JUnitSegmentTestClassGroup extends SegmentTestClassGroup {
 	}
 
 	protected JUnitSegmentTestClassGroup(
-		BatchTestClassGroup batchTestClassGroup) {
+		BatchTestClassGroup parentBatchTestClassGroup) {
 
-		super(batchTestClassGroup);
-	}
-
-	protected JUnitSegmentTestClassGroup(
-		BatchTestClassGroup batchTestClassGroup, JSONObject jsonObject) {
-
-		super(batchTestClassGroup, jsonObject);
+		super(parentBatchTestClassGroup);
 	}
 
 	private static final Pattern _pattern = Pattern.compile(

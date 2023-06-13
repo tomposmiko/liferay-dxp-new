@@ -22,12 +22,10 @@ import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowDefinition
 import com.liferay.headless.admin.workflow.resource.v1_0.test.util.WorkflowDefinitionTestUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 import com.liferay.portal.test.rule.Inject;
 
@@ -124,22 +122,6 @@ public class WorkflowDefinitionResourceTest
 			404,
 			workflowDefinitionResource.getWorkflowDefinitionByNameHttpResponse(
 				workflowDefinition.getName(), 2));
-
-		testPostWorkflowDefinitionDeploy_addWorkflowDefinition(
-			workflowDefinition);
-
-		assertHttpResponseStatusCode(
-			200,
-			workflowDefinitionResource.getWorkflowDefinitionByNameHttpResponse(
-				workflowDefinition.getName(), 2));
-
-		WorkflowDefinition latestWorkflowDefinition =
-			workflowDefinitionResource.getWorkflowDefinitionByName(
-				workflowDefinition.getName(), null);
-
-		Assert.assertEquals(
-			workflowDefinition.getDateCreated(),
-			latestWorkflowDefinition.getDateCreated());
 	}
 
 	@Override
@@ -200,40 +182,9 @@ public class WorkflowDefinitionResourceTest
 	}
 
 	@Override
-	@Test
-	public void testPutWorkflowDefinition() throws Exception {
-		WorkflowDefinition postWorkflowDefinition =
-			testPutWorkflowDefinition_addWorkflowDefinition();
-
-		WorkflowDefinition randomWorkflowDefinition =
-			randomWorkflowDefinition();
-
-		randomWorkflowDefinition.setName(postWorkflowDefinition.getName());
-		randomWorkflowDefinition.setVersion("2");
-
-		WorkflowDefinition putWorkflowDefinition =
-			workflowDefinitionResource.putWorkflowDefinition(
-				postWorkflowDefinition.getId(), randomWorkflowDefinition);
-
-		_workflowDefinitions.put(
-			putWorkflowDefinition.getName(), putWorkflowDefinition);
-
-		assertEquals(randomWorkflowDefinition, putWorkflowDefinition);
-		assertValid(putWorkflowDefinition);
-
-		WorkflowDefinition getWorkflowDefinition =
-			workflowDefinitionResource.getWorkflowDefinition(
-				putWorkflowDefinition.getId());
-
-		assertEquals(randomWorkflowDefinition, getWorkflowDefinition);
-		assertValid(getWorkflowDefinition);
-	}
-
-	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {
-			"active", "name", "nodes", "title", "title_i18n", "transitions",
-			"version"
+			"active", "name", "nodes", "title", "transitions", "version"
 		};
 	}
 
@@ -245,7 +196,7 @@ public class WorkflowDefinitionResourceTest
 		workflowDefinition.setActive(true);
 		workflowDefinition.setContent(
 			WorkflowDefinitionTestUtil.getContent(
-				workflowDefinition.getDescription(), "workflow-definition.xml",
+				workflowDefinition.getDescription(),
 				workflowDefinition.getName()));
 		workflowDefinition.setNodes(
 			new Node[] {
@@ -278,11 +229,6 @@ public class WorkflowDefinitionResourceTest
 					}
 				}
 			});
-		workflowDefinition.setTitle_i18n(
-			HashMapBuilder.put(
-				LanguageUtil.getLanguageId(LocaleUtil.US),
-				workflowDefinition.getTitle()
-			).build());
 		workflowDefinition.setTransitions(
 			new Transition[] {
 				new Transition() {
@@ -325,24 +271,6 @@ public class WorkflowDefinitionResourceTest
 
 	@Override
 	protected WorkflowDefinition
-			testDeleteWorkflowDefinition_addWorkflowDefinition()
-		throws Exception {
-
-		return testGetWorkflowDefinitionsPage_addWorkflowDefinition(
-			randomWorkflowDefinition());
-	}
-
-	@Override
-	protected WorkflowDefinition
-			testGetWorkflowDefinition_addWorkflowDefinition()
-		throws Exception {
-
-		return testGetWorkflowDefinitionsPage_addWorkflowDefinition(
-			randomWorkflowDefinition());
-	}
-
-	@Override
-	protected WorkflowDefinition
 			testGetWorkflowDefinitionsPage_addWorkflowDefinition(
 				WorkflowDefinition workflowDefinition)
 		throws Exception {
@@ -355,24 +283,6 @@ public class WorkflowDefinitionResourceTest
 			workflowDefinition.getName(), workflowDefinition);
 
 		return workflowDefinition;
-	}
-
-	@Override
-	protected WorkflowDefinition
-			testGraphQLWorkflowDefinition_addWorkflowDefinition()
-		throws Exception {
-
-		return testGetWorkflowDefinition_addWorkflowDefinition();
-	}
-
-	@Override
-	protected WorkflowDefinition
-			testPostWorkflowDefinition_addWorkflowDefinition(
-				WorkflowDefinition workflowDefinition)
-		throws Exception {
-
-		return testGetWorkflowDefinitionsPage_addWorkflowDefinition(
-			workflowDefinition);
 	}
 
 	@Override
@@ -413,25 +323,9 @@ public class WorkflowDefinitionResourceTest
 			workflowDefinition);
 	}
 
-	@Override
-	protected WorkflowDefinition
-			testPutWorkflowDefinition_addWorkflowDefinition()
-		throws Exception {
-
-		return testGetWorkflowDefinition_addWorkflowDefinition();
-	}
-
 	private static void _undeployWorkflowDefinition(
 			String workflowDefinitionName, int workflowDefinitionVersion)
 		throws Exception {
-
-		int workflowDefinitionsCount =
-			_workflowDefinitionManager.getWorkflowDefinitionsCount(
-				TestPropsValues.getCompanyId(), workflowDefinitionName);
-
-		if (workflowDefinitionsCount == 0) {
-			return;
-		}
 
 		_workflowDefinitionManager.updateActive(
 			TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),

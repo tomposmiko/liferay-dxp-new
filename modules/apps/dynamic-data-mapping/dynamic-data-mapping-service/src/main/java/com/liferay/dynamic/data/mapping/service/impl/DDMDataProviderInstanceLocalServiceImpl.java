@@ -54,12 +54,15 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.net.URL;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -87,7 +90,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		_validate(nameMap, ddmFormValues);
+		validate(nameMap, ddmFormValues);
 
 		long dataProviderInstanceId = counterLocalService.increment();
 
@@ -101,7 +104,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		dataProviderInstance.setUserName(user.getFullName());
 		dataProviderInstance.setNameMap(nameMap);
 		dataProviderInstance.setDescriptionMap(descriptionMap);
-		dataProviderInstance.setDefinition(_serialize(ddmFormValues));
+		dataProviderInstance.setDefinition(serialize(ddmFormValues));
 		dataProviderInstance.setType(type);
 
 		dataProviderInstance = ddmDataProviderInstancePersistence.update(
@@ -112,12 +115,12 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		if (serviceContext.isAddGroupPermissions() ||
 			serviceContext.isAddGuestPermissions()) {
 
-			_addDataProviderInstanceResources(
+			addDataProviderInstanceResources(
 				dataProviderInstance, serviceContext.isAddGroupPermissions(),
 				serviceContext.isAddGuestPermissions());
 		}
 		else {
-			_addDataProviderInstanceResources(
+			addDataProviderInstanceResources(
 				dataProviderInstance, serviceContext.getModelPermissions());
 		}
 
@@ -185,6 +188,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		actionableDynamicQuery.setPerformActionMethod(
 			(DDMDataProviderInstance ddmDataProviderInstance) ->
 				deleteDataProviderInstance(ddmDataProviderInstance));
+
 		actionableDynamicQuery.setCompanyId(companyId);
 
 		actionableDynamicQuery.performActions();
@@ -302,7 +306,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			DDMFormValues ddmFormValues, ServiceContext serviceContext)
 		throws PortalException {
 
-		_validate(nameMap, ddmFormValues);
+		validate(nameMap, ddmFormValues);
 
 		DDMDataProviderInstance dataProviderInstance =
 			ddmDataProviderInstancePersistence.findByPrimaryKey(
@@ -316,12 +320,12 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		dataProviderInstance.setModifiedDate(new Date());
 		dataProviderInstance.setNameMap(nameMap);
 		dataProviderInstance.setDescriptionMap(descriptionMap);
-		dataProviderInstance.setDefinition(_serialize(ddmFormValues));
+		dataProviderInstance.setDefinition(serialize(ddmFormValues));
 
 		return ddmDataProviderInstancePersistence.update(dataProviderInstance);
 	}
 
-	private void _addDataProviderInstanceResources(
+	protected void addDataProviderInstanceResources(
 			DDMDataProviderInstance dataProviderInstance,
 			boolean addGroupPermissions, boolean addGuestPermissions)
 		throws PortalException {
@@ -334,7 +338,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			addGroupPermissions, addGuestPermissions);
 	}
 
-	private void _addDataProviderInstanceResources(
+	protected void addDataProviderInstanceResources(
 			DDMDataProviderInstance dataProviderInstance,
 			ModelPermissions modelPermissions)
 		throws PortalException {
@@ -346,23 +350,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			dataProviderInstance.getDataProviderInstanceId(), modelPermissions);
 	}
 
-	private boolean _isLocalNetworkURL(String value) {
-		try {
-			URL url = new URL(value);
-
-			return InetAddressUtil.isLocalInetAddress(
-				InetAddressUtil.getInetAddressByName(url.getHost()));
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-		}
-
-		return true;
-	}
-
-	private String _serialize(DDMFormValues ddmFormValues) {
+	protected String serialize(DDMFormValues ddmFormValues) {
 		DDMFormValuesSerializerSerializeRequest.Builder builder =
 			DDMFormValuesSerializerSerializeRequest.Builder.newBuilder(
 				ddmFormValues);
@@ -374,7 +362,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		return ddmFormValuesSerializerSerializeResponse.getContent();
 	}
 
-	private void _validate(
+	protected void validate(
 			Map<Locale, String> nameMap, DDMFormValues ddmFormValues)
 		throws PortalException {
 
@@ -400,6 +388,22 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		_ddmFormValuesValidator.validate(ddmFormValues);
 	}
 
+	private boolean _isLocalNetworkURL(String value) {
+		try {
+			URL url = new URL(value);
+
+			return InetAddressUtil.isLocalInetAddress(
+				InetAddressUtil.getInetAddressByName(url.getHost()));
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+
+		return true;
+	}
+
 	private void _validateInputParameterNames(DDMFormValues ddmFormValues)
 		throws PortalException {
 
@@ -410,34 +414,45 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			return;
 		}
 
-		Set<String> inputParameterNames = new HashSet<>();
+		List<DDMFormFieldValue> inputParameters = ddmFormFieldValuesMap.get(
+			"inputParameters");
 
-		for (DDMFormFieldValue inputParametersDDMFormFieldValue :
-				ddmFormFieldValuesMap.get("inputParameters")) {
+		Stream<DDMFormFieldValue> inputParametersStream =
+			inputParameters.stream();
 
-			Map<String, List<DDMFormFieldValue>> nestedDDMFormFieldValuesMap =
-				inputParametersDDMFormFieldValue.
-					getNestedDDMFormFieldValuesMap();
+		List<DDMFormFieldValue> inputParameterNamesList =
+			inputParametersStream.flatMap(
+				inputParameter -> inputParameter.getNestedDDMFormFieldValuesMap(
+				).get(
+					"inputParameterName"
+				).stream()
+			).collect(
+				Collectors.toList()
+			);
 
-			for (DDMFormFieldValue inputParameterNameDDMFormFieldValue :
-					nestedDDMFormFieldValuesMap.get("inputParameterName")) {
+		Stream<DDMFormFieldValue> inputParameterNamesStream =
+			inputParameterNamesList.stream();
 
-				Value inputParameterNameValue =
-					inputParameterNameDDMFormFieldValue.getValue();
+		Collection<String> inputParameterNames =
+			inputParameterNamesStream.flatMap(
+				inputParameterName -> inputParameterName.getValue(
+				).getValues(
+				).values(
+				).stream()
+			).collect(
+				Collectors.toList()
+			);
 
-				Map<Locale, String> inputParameterNameValuesMap =
-					inputParameterNameValue.getValues();
+		Set<String> inputParameterNamesSet = new HashSet<>();
 
-				for (String inputParameterName :
-						inputParameterNameValuesMap.values()) {
-
-					if (!inputParameterNames.add(inputParameterName)) {
-						throw new DuplicateDataProviderInstanceInputParameterNameException(
-							"Duplicate data provider input parameter name: " +
-								inputParameterName);
-					}
-				}
+		for (String inputParameterName : inputParameterNames) {
+			if (inputParameterNamesSet.contains(inputParameterName)) {
+				throw new DuplicateDataProviderInstanceInputParameterNameException(
+					"Duplicate data provider input parameter name: " +
+						inputParameterName);
 			}
+
+			inputParameterNamesSet.add(inputParameterName);
 		}
 	}
 
@@ -451,9 +466,10 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			return;
 		}
 
-		for (DDMFormFieldValue ddmFormFieldValue :
-				ddmFormFieldValuesMap.get("url")) {
+		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
+			"url");
 
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
 			Value value = ddmFormFieldValue.getValue();
 
 			for (Locale locale : value.getAvailableLocales()) {

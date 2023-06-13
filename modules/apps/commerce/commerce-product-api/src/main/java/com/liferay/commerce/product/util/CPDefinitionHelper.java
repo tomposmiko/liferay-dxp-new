@@ -19,19 +19,16 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPQuery;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
-import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 
-import java.util.List;
 import java.util.Locale;
 
 /**
  * @author Marco Leo
  * @author Andrea Di Giorgi
- * @author Alessio Antonio Rendina
  */
 @ProviderType
 public interface CPDefinitionHelper {
@@ -41,10 +38,6 @@ public interface CPDefinitionHelper {
 	public CPCatalogEntry getCPCatalogEntry(
 			long commerceAccountId, long groupId, long cpDefinitionId,
 			Locale locale)
-		throws PortalException;
-
-	public String getDefaultImageFileURL(
-			long commerceAccountId, long cpDefinitionId)
 		throws PortalException;
 
 	public String getFriendlyURL(long cpDefinitionId, ThemeDisplay themeDisplay)
@@ -57,11 +50,6 @@ public interface CPDefinitionHelper {
 
 	public long searchCount(
 			long groupId, SearchContext searchContext, CPQuery cpQuery)
-		throws PortalException;
-
-	public List<CPDefinition> searchCPDefinitions(
-			long groupId, SearchContext searchContext, CPQuery cpQuery,
-			int start, int end)
 		throws PortalException;
 
 }

@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -83,7 +82,7 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 			}
 		}
@@ -281,7 +280,7 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 				}
 				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(exception);
+						_log.debug(exception, exception);
 					}
 				}
 			}
@@ -289,11 +288,13 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 			count = filteredEntries.size();
 
 			if ((end != QueryUtil.ALL_POS) && (start != QueryUtil.ALL_POS)) {
-				int[] startAndEnd = SearchPaginationUtil.calculateStartAndEnd(
-					start, end, count);
+				if (end > count) {
+					end = count;
+				}
 
-				start = startAndEnd[0];
-				end = startAndEnd[1];
+				if (start > count) {
+					start = count;
+				}
 
 				filteredEntries = filteredEntries.subList(start, end);
 			}

@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Jeyvison Nascimento
  */
-@Component(service = DataEngineNativeObject.class)
+@Component(immediate = true, service = DataEngineNativeObject.class)
 public class UserDataEngineNativeObject implements DataEngineNativeObject {
 
 	@Override

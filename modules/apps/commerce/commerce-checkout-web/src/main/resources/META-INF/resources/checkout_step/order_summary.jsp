@@ -17,10 +17,6 @@
 <%@ include file="/init.jsp" %>
 
 <%
-CommerceContext commerceContext = (CommerceContext)request.getAttribute(CommerceWebKeys.COMMERCE_CONTEXT);
-
-AccountEntry accountEntry = commerceContext.getAccountEntry();
-
 OrderSummaryCheckoutStepDisplayContext orderSummaryCheckoutStepDisplayContext = (OrderSummaryCheckoutStepDisplayContext)request.getAttribute(CommerceCheckoutWebKeys.COMMERCE_CHECKOUT_STEP_DISPLAY_CONTEXT);
 
 CommerceOrder commerceOrder = orderSummaryCheckoutStepDisplayContext.getCommerceOrder();
@@ -46,7 +42,17 @@ if (priceDisplayType.equals(CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
 	totalOrderCommerceMoney = commerceOrderPrice.getTotalWithTaxAmount();
 }
 
-Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap = orderSummaryCheckoutStepDisplayContext.getCommerceOrderValidatorResultsMap();
+String commercePaymentMethodName = StringPool.BLANK;
+
+String commercePaymentMethodKey = commerceOrder.getCommercePaymentMethodKey();
+
+if (commercePaymentMethodKey != null) {
+	commercePaymentMethodName = orderSummaryCheckoutStepDisplayContext.getPaymentMethodName(commercePaymentMethodKey, locale);
+}
+
+String commerceShippingOptionName = commerceOrder.getShippingOptionName();
+
+Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = orderSummaryCheckoutStepDisplayContext.getCommerceOrderValidatorResults();
 %>
 
 <div class="commerce-order-summary">
@@ -58,11 +64,8 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 	<liferay-ui:error exception="<%= CommerceOrderShippingMethodException.class %>" message="please-select-a-valid-shipping-method" />
 	<liferay-ui:error exception="<%= NoSuchDiscountException.class %>" message="the-inserted-coupon-is-no-longer-valid" />
 
-	<clay:row>
-		<clay:col
-			cssClass="commerce-checkout-summary"
-			size="8"
-		>
+	<aui:row>
+		<aui:col cssClass="commerce-checkout-summary" width="<%= 70 %>">
 			<ul class="commerce-checkout-summary-header">
 				<li class="autofit-row">
 					<div class="autofit-col autofit-col-expand">
@@ -90,8 +93,6 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 
 						<%
 						CPDefinition cpDefinition = commerceOrderItem.getCPDefinition();
-
-						String cpInstanceCDNURL = orderSummaryCheckoutStepDisplayContext.getCPInstanceCDNURL(commerceOrderItem);
 						%>
 
 						<liferay-ui:search-container-column-text
@@ -100,17 +101,10 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 						>
 							<span class="sticker sticker-xl">
 								<span class="sticker-overlay">
-									<c:choose>
-										<c:when test="<%= Validator.isNotNull(cpInstanceCDNURL) %>">
-											<img class="sticker-img" src="<%= cpInstanceCDNURL %>" />
-										</c:when>
-										<c:otherwise>
-											<liferay-adaptive-media:img
-												class="sticker-img"
-												fileVersion="<%= orderSummaryCheckoutStepDisplayContext.getCPInstanceImageFileVersion(commerceOrderItem) %>"
-											/>
-										</c:otherwise>
-									</c:choose>
+									<liferay-adaptive-media:img
+										class="sticker-img"
+										fileVersion="<%= orderSummaryCheckoutStepDisplayContext.getCPInstanceImageFileVersion(commerceOrderItem) %>"
+									/>
 								</span>
 							</span>
 						</liferay-ui:search-container-column-text>
@@ -134,10 +128,10 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 
 								<div class="list-group-subtitle"><%= HtmlUtil.escape(stringJoiner.toString()) %></div>
 
-								<c:if test="<%= !commerceOrderValidatorResultsMap.isEmpty() %>">
+								<c:if test="<%= !commerceOrderValidatorResultMap.isEmpty() %>">
 
 									<%
-									List<CommerceOrderValidatorResult> commerceOrderValidatorResults = commerceOrderValidatorResultsMap.get(commerceOrderItem.getCommerceOrderItemId());
+									List<CommerceOrderValidatorResult> commerceOrderValidatorResults = commerceOrderValidatorResultMap.get(commerceOrderItem.getCommerceOrderItemId());
 
 									for (CommerceOrderValidatorResult commerceOrderValidatorResult : commerceOrderValidatorResults) {
 									%>
@@ -185,7 +179,7 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 								<div class="value-section">
 									<span class="price">
 										<c:choose>
-											<c:when test="<%= !unitPromoPriceCommerceMoney.isEmpty() && CommerceBigDecimalUtil.gt(unitPromoPriceCommerceMoney.getPrice(), BigDecimal.ZERO) && CommerceBigDecimalUtil.lt(unitPromoPriceCommerceMoney.getPrice(), unitPriceCommerceMoney.getPrice()) %>">
+											<c:when test="<%= !unitPromoPriceCommerceMoney.isEmpty() && CommerceBigDecimalUtil.gt(unitPromoPriceCommerceMoney.getPrice(), BigDecimal.ZERO) %>">
 												<span class="price-value price-value-promo">
 													<%= HtmlUtil.escape(unitPromoPriceCommerceMoney.format(locale)) %>
 												</span>
@@ -385,12 +379,9 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 					</div>
 				</li>
 			</ul>
-		</clay:col>
+		</aui:col>
 
-		<clay:col
-			cssClass="commerce-checkout-info"
-			size="4"
-		>
+		<aui:col cssClass="commerce-checkout-info" width="<%= 30 %>">
 
 			<%
 			CommerceAddress shippingAddress = commerceOrder.getShippingAddress();
@@ -399,7 +390,7 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 			<c:if test="<%= shippingAddress != null %>">
 				<address class="shipping-address">
 					<h5>
-						<liferay-ui:message key="shipping-address-and-date" />
+						<liferay-ui:message key="shipping-address" />
 					</h5>
 
 					<%
@@ -426,95 +417,11 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 					<c:if test="<%= country != null %>">
 						<%= HtmlUtil.escape(country.getTitle(locale)) %><br />
 					</c:if>
-
-					<br />
-
-					<c:if test="<%= orderSummaryCheckoutStepDisplayContext.isCheckoutRequestedDeliveryDateEnabled() %>">
-
-						<%
-						int requestedDeliveryDay = 0;
-						int requestedDeliveryMonth = -1;
-						int requestedDeliveryYear = 0;
-
-						Date requestedDeliveryDate = commerceOrder.getRequestedDeliveryDate();
-
-						if (requestedDeliveryDate != null) {
-							Calendar calendar = CalendarFactoryUtil.getCalendar(requestedDeliveryDate.getTime());
-
-							requestedDeliveryDay = calendar.get(Calendar.DAY_OF_MONTH);
-							requestedDeliveryMonth = calendar.get(Calendar.MONTH);
-							requestedDeliveryYear = calendar.get(Calendar.YEAR);
-						}
-						%>
-
-						<div class="form-group input-date-wrapper">
-							<label for="requestedDeliveryDate"><liferay-ui:message key="requested-delivery-date" /></label>
-
-							<liferay-ui:input-date
-								dayParam="requestedDeliveryDateDay"
-								dayValue="<%= requestedDeliveryDay %>"
-								disabled="<%= false %>"
-								firstEnabledDate="<%= new Date() %>"
-								monthParam="requestedDeliveryDateMonth"
-								monthValue="<%= requestedDeliveryMonth %>"
-								name="requestedDeliveryDate"
-								nullable="<%= true %>"
-								showDisableCheckbox="<%= false %>"
-								yearParam="requestedDeliveryDateYear"
-								yearValue="<%= requestedDeliveryYear %>"
-							/>
-						</div>
-					</c:if>
 				</address>
 			</c:if>
-
-			<%
-			CommerceAddress commerceBillingAddress = commerceOrder.getBillingAddress();
-			%>
-
-			<c:if test="<%= (commerceBillingAddress != null) && orderSummaryCheckoutStepDisplayContext.hasViewBillingAddressPermission(permissionChecker, accountEntry) %>">
-				<address class="billing-address">
-					<h5>
-						<liferay-ui:message key="billing-address" />
-					</h5>
-
-					<%
-					request.setAttribute("address.jsp-commerceAddress", commerceBillingAddress);
-					%>
-
-					<%= HtmlUtil.escape(commerceBillingAddress.getName()) %> <br />
-					<%= HtmlUtil.escape(commerceBillingAddress.getStreet1()) %> <br />
-
-					<c:if test="<%= Validator.isNotNull(commerceBillingAddress.getStreet2()) %>">
-						<%= HtmlUtil.escape(commerceBillingAddress.getStreet2()) %> <br />
-					</c:if>
-
-					<c:if test="<%= Validator.isNotNull(commerceBillingAddress.getStreet3()) %>">
-						<%= HtmlUtil.escape(commerceBillingAddress.getStreet3()) %> <br />
-					</c:if>
-
-					<%= HtmlUtil.escape(commerceBillingAddress.getCity()) %> <br />
-
-					<%
-					Country country = commerceBillingAddress.getCountry();
-					%>
-
-					<c:if test="<%= country != null %>">
-						<%= HtmlUtil.escape(country.getTitle(locale)) %><br />
-					</c:if>
-				</address>
-			</c:if>
-
-			<%
-			String commerceShippingOptionName = StringPool.BLANK;
-
-			if (commerceOrder.getShippingOptionName() != null) {
-				commerceShippingOptionName = orderSummaryCheckoutStepDisplayContext.getShippingOptionName(commerceOrder.getShippingOptionName(), locale);
-			}
-			%>
 
 			<c:if test="<%= Validator.isNotNull(commerceShippingOptionName) %>">
-				<div class="panel-body shipping-method">
+				<div class="shipping-method">
 					<h5>
 						<liferay-ui:message key="method" />
 					</h5>
@@ -529,16 +436,8 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 				</div>
 			</c:if>
 
-			<%
-			String commercePaymentMethodName = StringPool.BLANK;
-
-			if (commerceOrder.getCommercePaymentMethodKey() != null) {
-				commercePaymentMethodName = orderSummaryCheckoutStepDisplayContext.getPaymentMethodName(commerceOrder.getCommercePaymentMethodKey(), locale);
-			}
-			%>
-
 			<c:if test="<%= Validator.isNotNull(commercePaymentMethodName) %>">
-				<div class="panel-body payment-method">
+				<div class="payment-method">
 					<h5>
 						<liferay-ui:message key="payment" />
 					</h5>
@@ -548,64 +447,6 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultsMap =
 					</div>
 				</div>
 			</c:if>
-
-			<%
-			String deliveryTermEntryName = orderSummaryCheckoutStepDisplayContext.getDeliveryTermEntryName(locale);
-			%>
-
-			<c:if test="<%= Validator.isNotNull(deliveryTermEntryName) %>">
-				<div class="panel-body payment-method">
-					<h5>
-						<liferay-ui:message key="delivery-terms" />
-					</h5>
-
-					<div class="shipping-description">
-						<a href="#" id="<%= commerceOrder.getDeliveryCommerceTermEntryId() %>"><%= HtmlUtil.escape(deliveryTermEntryName) %></a>
-
-						<liferay-frontend:component
-							context='<%=
-								HashMapBuilder.<String, Object>put(
-									"HTMLElementId", commerceOrder.getDeliveryCommerceTermEntryId()
-								).put(
-									"modalContent", commerceOrder.getDeliveryCommerceTermEntryDescription()
-								).put(
-									"modalTitle", deliveryTermEntryName
-								).build()
-							%>'
-							module="js/attachModalToHTMLElement"
-						/>
-					</div>
-				</div>
-			</c:if>
-
-			<%
-			String paymentTermEntryName = orderSummaryCheckoutStepDisplayContext.getPaymentTermEntryName(locale);
-			%>
-
-			<c:if test="<%= Validator.isNotNull(paymentTermEntryName) %>">
-				<div class="panel-body payment-method">
-					<h5>
-						<liferay-ui:message key="payment-terms" />
-					</h5>
-
-					<div class="shipping-description">
-						<a href="#" id="<%= commerceOrder.getPaymentCommerceTermEntryId() %>"><%= HtmlUtil.escape(paymentTermEntryName) %></a>
-
-						<liferay-frontend:component
-							context='<%=
-								HashMapBuilder.<String, Object>put(
-									"HTMLElementId", commerceOrder.getPaymentCommerceTermEntryId()
-								).put(
-									"modalContent", commerceOrder.getPaymentCommerceTermEntryDescription()
-								).put(
-									"modalTitle", paymentTermEntryName
-								).build()
-							%>'
-							module="js/attachModalToHTMLElement"
-						/>
-					</div>
-				</div>
-			</c:if>
-		</clay:col>
-	</clay:row>
+		</aui:col>
+	</aui:row>
 </div>

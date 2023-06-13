@@ -40,23 +40,28 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import java.net.URI;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Alejandro Tardín
  */
+@RunWith(MockitoJUnitRunner.class)
 public class MediaQueryProviderImplTest {
 
 	@ClassRule
@@ -67,9 +72,9 @@ public class MediaQueryProviderImplTest {
 	@Before
 	public void setUp() throws PortalException {
 		Mockito.when(
-			_amImageFinder.getAdaptiveMedias(Mockito.any(Function.class))
+			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
-			invocation -> Collections.emptyList()
+			invocation -> Stream.empty()
 		);
 
 		Mockito.when(
@@ -645,11 +650,11 @@ public class MediaQueryProviderImplTest {
 		throws Exception {
 
 		Mockito.when(
-			_amImageFinder.getAdaptiveMedias(Mockito.any(Function.class))
+			_amImageFinder.getAdaptiveMediaStream(Mockito.any(Function.class))
 		).thenAnswer(
 			invocation -> {
 				Function<AMImageQueryBuilder, AMQuery<?, ?>>
-					amImageQueryBuilderFunction = invocation.getArgument(
+					amImageQueryBuilderFunction = invocation.getArgumentAt(
 						0, Function.class);
 
 				AMImageQueryBuilderImpl amImageQueryBuilderImpl =
@@ -659,14 +664,16 @@ public class MediaQueryProviderImplTest {
 					amImageQueryBuilderImpl);
 
 				if (!AMImageQueryBuilderImpl.AM_QUERY.equals(amQuery)) {
-					return Collections.emptyList();
+					return Stream.empty();
 				}
 
 				for (AdaptiveMedia<AMImageProcessor> adaptiveMedia :
 						adaptiveMedias) {
 
-					String configurationUuid = adaptiveMedia.getValue(
+					Optional<String> optional = adaptiveMedia.getValueOptional(
 						AMAttribute.getConfigurationUuidAMAttribute());
+
+					String configurationUuid = optional.get();
 
 					if (Objects.equals(
 							fileEntry.getFileVersion(),
@@ -674,11 +681,11 @@ public class MediaQueryProviderImplTest {
 						configurationUuid.equals(
 							amImageQueryBuilderImpl.getConfigurationUuid())) {
 
-						return Collections.singletonList(adaptiveMedia);
+						return Stream.of(adaptiveMedia);
 					}
 				}
 
-				return Collections.emptyList();
+				return Stream.empty();
 			}
 		);
 	}
@@ -803,14 +810,21 @@ public class MediaQueryProviderImplTest {
 
 	private static final long _COMPANY_ID = 1L;
 
-	private final AMImageConfigurationHelper _amImageConfigurationHelper =
-		Mockito.mock(AMImageConfigurationHelper.class);
-	private final AMImageFinder _amImageFinder = Mockito.mock(
-		AMImageFinder.class);
-	private final AMImageURLFactory _amImageURLFactory = Mockito.mock(
-		AMImageURLFactory.class);
-	private final FileEntry _fileEntry = Mockito.mock(FileEntry.class);
-	private final FileVersion _fileVersion = Mockito.mock(FileVersion.class);
+	@Mock
+	private AMImageConfigurationHelper _amImageConfigurationHelper;
+
+	@Mock
+	private AMImageFinder _amImageFinder;
+
+	@Mock
+	private AMImageURLFactory _amImageURLFactory;
+
+	@Mock
+	private FileEntry _fileEntry;
+
+	@Mock
+	private FileVersion _fileVersion;
+
 	private final MediaQueryProviderImpl _mediaQueryProviderImpl =
 		new MediaQueryProviderImpl();
 

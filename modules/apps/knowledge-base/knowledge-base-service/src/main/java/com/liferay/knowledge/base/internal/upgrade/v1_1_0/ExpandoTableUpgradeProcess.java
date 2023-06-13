@@ -30,10 +30,10 @@ public class ExpandoTableUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateExpandoTable(PortalUtil.getDefaultCompanyId());
+		updateExpandoTable(PortalUtil.getDefaultCompanyId());
 	}
 
-	private void _updateExpandoTable(long companyId) throws Exception {
+	protected void updateExpandoTable(long companyId) throws Exception {
 		ExpandoTable expandoTable = null;
 
 		try {
@@ -45,7 +45,7 @@ public class ExpandoTableUpgradeProcess extends UpgradeProcess {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchTableException);
+				_log.debug(noSuchTableException, noSuchTableException);
 			}
 
 			return;

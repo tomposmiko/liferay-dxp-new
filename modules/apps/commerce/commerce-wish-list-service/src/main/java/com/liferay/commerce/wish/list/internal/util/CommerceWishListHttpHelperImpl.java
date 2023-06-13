@@ -20,12 +20,11 @@ import com.liferay.commerce.wish.list.service.CommerceWishListItemService;
 import com.liferay.commerce.wish.list.service.CommerceWishListLocalService;
 import com.liferay.commerce.wish.list.util.CommerceWishListHttpHelper;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -42,7 +41,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Andrea Di Giorgi
  */
-@Component(service = CommerceWishListHttpHelper.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceWishListHttpHelper.class
+)
 public class CommerceWishListHttpHelperImpl
 	implements CommerceWishListHttpHelper {
 
@@ -84,14 +86,13 @@ public class CommerceWishListHttpHelperImpl
 		User user = _portal.getUser(httpServletRequest);
 
 		if (user == null) {
-			user = _userLocalService.getGuestUser(
+			user = _userLocalService.getDefaultUser(
 				_portal.getCompanyId(httpServletRequest));
 		}
 
 		String cookieName = _getCookieName(groupId);
 
-		String guestUuid = CookiesManagerUtil.getCookieValue(
-			cookieName, httpServletRequest);
+		String guestUuid = CookieKeys.getCookie(httpServletRequest, cookieName);
 
 		CommerceWishList commerceWishList =
 			_commerceWishListLocalService.getDefaultCommerceWishList(
@@ -101,24 +102,23 @@ public class CommerceWishListHttpHelperImpl
 			return commerceWishList;
 		}
 
-		if (user.isGuestUser()) {
+		if (user.isDefaultUser()) {
 			if (Validator.isNull(guestUuid)) {
 				Cookie cookie = new Cookie(
 					cookieName, commerceWishList.getUuid());
 
-				cookie.setMaxAge(CookiesConstants.MAX_AGE);
+				cookie.setMaxAge(CookieKeys.MAX_AGE);
 				cookie.setPath(StringPool.SLASH);
 
-				CookiesManagerUtil.addCookie(
-					CookiesConstants.CONSENT_TYPE_NECESSARY, cookie,
-					httpServletRequest, httpServletResponse);
+				CookieKeys.addCookie(
+					httpServletRequest, httpServletResponse, cookie);
 			}
 		}
 		else {
 			if (Validator.isNotNull(guestUuid)) {
-				CookiesManagerUtil.deleteCookies(
-					CookiesManagerUtil.getDomain(httpServletRequest),
-					httpServletRequest, httpServletResponse, cookieName);
+				CookieKeys.deleteCookies(
+					httpServletRequest, httpServletResponse,
+					CookieKeys.getDomain(httpServletRequest), cookieName);
 			}
 		}
 

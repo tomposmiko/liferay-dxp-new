@@ -32,6 +32,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Leonardo Barros
@@ -168,48 +171,39 @@ public class LocalizedValueUtil {
 			return Collections.emptyMap();
 		}
 
-		Map<String, Object> localizedValues = new HashMap<>();
-
 		Map<Locale, String> values = localizedValue.getValues();
 
-		for (Map.Entry<Locale, String> entry : values.entrySet()) {
-			String languageId = LanguageUtil.getLanguageId(entry.getKey());
+		Set<Map.Entry<Locale, String>> entrySet = values.entrySet();
 
-			String value = entry.getValue();
+		Stream<Map.Entry<Locale, String>> stream = entrySet.stream();
 
-			if (Validator.isNull(value)) {
-				localizedValues.put(languageId, value);
+		return stream.collect(
+			Collectors.toMap(
+				entry -> LanguageUtil.getLanguageId(entry.getKey()),
+				entry -> {
+					String value = entry.getValue();
 
-				continue;
-			}
+					if (Validator.isNotNull(value)) {
+						try {
+							Object deserializedObject =
+								JSONFactoryUtil.looseDeserialize(value);
 
-			try {
-				Object deserializedObject = JSONFactoryUtil.looseDeserialize(
-					value);
+							if (deserializedObject instanceof List) {
+								return JSONFactoryUtil.createJSONArray(value);
+							}
+							else if (deserializedObject instanceof Map) {
+								return JSONFactoryUtil.createJSONObject(value);
+							}
+						}
+						catch (Exception exception) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(exception, exception);
+							}
+						}
+					}
 
-				if (deserializedObject instanceof List) {
-					localizedValues.put(
-						languageId,
-						JSONFactoryUtil.createJSONArray(
-							(List<?>)deserializedObject));
-				}
-				else if (deserializedObject instanceof Map) {
-					localizedValues.put(
-						languageId,
-						JSONFactoryUtil.createJSONObject(
-							(Map<?, ?>)deserializedObject));
-				}
-			}
-			catch (Exception exception) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
-				}
-
-				localizedValues.put(languageId, value);
-			}
-		}
-
-		return localizedValues;
+					return value;
+				}));
 	}
 
 	public static Map<String, Object> toStringObjectMap(

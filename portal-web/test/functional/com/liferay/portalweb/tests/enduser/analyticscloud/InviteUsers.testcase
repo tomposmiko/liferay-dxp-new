@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -17,19 +15,17 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Automation ID: LRAC-9072 | Test Summary: Admin can invite users"
-	@priority = 3
+	@priority = "3"
 	test AdminCanInviteUsers {
 		task ("sign out and login as member") {
 			ACWorkspace.signOut();
@@ -79,7 +75,7 @@ definition {
 	}
 
 	@description = "Automation ID: LRAC-9070 | Test Summary: Invite multiple users at a time"
-	@priority = 3
+	@priority = "3"
 	test CanInviteMultipleUsers {
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
 
@@ -88,12 +84,12 @@ definition {
 
 			ACSettings.goToUserManagement();
 
-			ACSettings.addUser(userInvite = ${emailList});
+			ACSettings.addUser(userInvite = "${emailList}");
 
-			for (var n : list ${emailList}) {
-				ACUtils.searchBar(searchItem = ${n});
+			for (var n : list "${emailList}") {
+				ACUtils.searchBar(searchItem = "${n}");
 
-				ACSettings.assertUserListEmail(userEmail = ${n});
+				ACSettings.assertUserListEmail(userEmail = "${n}");
 			}
 		}
 
@@ -103,7 +99,7 @@ definition {
 	}
 
 	@description = "Automation ID: LRAC-9069 | Test Summary: Invite a single user"
-	@priority = 5
+	@priority = "5"
 	test CanInviteSingleUser {
 		task ("go to user management and add user") {
 			ACNavigation.goToSettings();
@@ -123,7 +119,7 @@ definition {
 	}
 
 	@description = "Automation ID: LRAC-9073 | Test Summary: Member cannot invite users"
-	@priority = 3
+	@priority = "3"
 	test MemberCannotInviteUsers {
 		task ("sign out and login as member") {
 			ACWorkspace.signOut();
@@ -145,7 +141,7 @@ definition {
 	}
 
 	@description = "Automation ID: LRAC-9071 | Test Summary: Owner can invite users"
-	@priority = 5
+	@priority = "5"
 	test OwnerCanInviteUsers {
 		task ("sign out and login as member") {
 			ACWorkspace.signOut();

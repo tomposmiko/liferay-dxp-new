@@ -50,29 +50,29 @@ public class BlogsCoverImageCaptionAlloyEditorConfigContributor
 		jsonObject.put(
 			"extraPlugins", "ae_placeholder,ae_selectionregion,ae_uicore"
 		).put(
-			"toolbars", _getToolbarsJSONObject()
+			"toolbars", getToolbarsJSONObject()
 		);
 	}
 
-	private JSONObject _getToolbarsJSONObject() {
-		return JSONUtil.put("styles", _getToolbarsStylesJSONObject());
+	protected JSONObject getToolbarsJSONObject() {
+		return JSONUtil.put("styles", getToolbarsStylesJSONObject());
 	}
 
-	private JSONObject _getToolbarsStylesJSONObject() {
+	protected JSONObject getToolbarsStylesJSONObject() {
 		return JSONUtil.put(
-			"selections", _getToolbarStylesSelectionsJSONArray()
+			"selections", getToolbarStylesSelectionsJSONArray()
 		).put(
 			"tabIndex", 1
 		);
 	}
 
-	private JSONArray _getToolbarStylesSelectionsJSONArray() {
+	protected JSONArray getToolbarStylesSelectionsJSONArray() {
 		return JSONUtil.putAll(
-			_getToolbarStylesSelectionsLinkJSONObject(),
-			_getToolbarStylesSelectionsTextJSONObject());
+			getToolbarStylesSelectionsLinkJSONObject(),
+			getToolbarStylesSelectionsTextJSONObject());
 	}
 
-	private JSONObject _getToolbarStylesSelectionsLinkJSONObject() {
+	protected JSONObject getToolbarStylesSelectionsLinkJSONObject() {
 		return JSONUtil.put(
 			"buttons", toJSONArray("['linkEdit']")
 		).put(
@@ -82,7 +82,7 @@ public class BlogsCoverImageCaptionAlloyEditorConfigContributor
 		);
 	}
 
-	private JSONObject _getToolbarStylesSelectionsTextJSONObject() {
+	protected JSONObject getToolbarStylesSelectionsTextJSONObject() {
 		return JSONUtil.put(
 			"buttons", toJSONArray("['link']")
 		).put(

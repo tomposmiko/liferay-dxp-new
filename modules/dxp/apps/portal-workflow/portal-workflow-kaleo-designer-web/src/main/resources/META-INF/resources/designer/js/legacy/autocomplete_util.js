@@ -12,9 +12,9 @@
 AUI.add(
 	'liferay-kaleo-designer-autocomplete-util',
 	(A) => {
-		const AArray = A.Array;
+		var AArray = A.Array;
 
-		const AutoCompleteUtil = {
+		var AutoCompleteUtil = {
 			_INSTANCES: [],
 
 			create(
@@ -25,7 +25,7 @@ AUI.add(
 				resultTextLocator,
 				selectFn
 			) {
-				const instance = this;
+				var instance = this;
 
 				if (!inputNode.ac) {
 					inputNode.plug(A.Plugin.AutoComplete, {
@@ -49,9 +49,9 @@ AUI.add(
 			},
 
 			destroyAll() {
-				const instance = this;
+				var instance = this;
 
-				const INSTANCES = instance._INSTANCES;
+				var INSTANCES = instance._INSTANCES;
 
 				AArray.invoke(INSTANCES, 'destroy');
 

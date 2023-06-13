@@ -19,12 +19,11 @@ import React, {useState} from 'react';
 
 const {Item, ItemList} = ClayDropDown;
 
-export default function DropDown({actions, className, disabled}) {
+export default ({actions, className, disabled}) => {
 	const [active, setActive] = useState(false);
 
 	const DropdownButton = (
 		<ClayButtonWithIcon
-			aria-label={Liferay.Language.get('actions')}
 			className="page-link"
 			disabled={disabled}
 			displayType="unstyled"
@@ -32,7 +31,7 @@ export default function DropDown({actions, className, disabled}) {
 		/>
 	);
 
-	if (!actions.length) {
+	if (actions.length === 0) {
 		return DropdownButton;
 	}
 
@@ -66,4 +65,4 @@ export default function DropDown({actions, className, disabled}) {
 			</ItemList>
 		</ClayDropDown>
 	);
-}
+};

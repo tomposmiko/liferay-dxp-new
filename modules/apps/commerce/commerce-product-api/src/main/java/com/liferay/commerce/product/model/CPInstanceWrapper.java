@@ -23,8 +23,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -47,8 +45,6 @@ public class CPInstanceWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("CPInstanceId", getCPInstanceId());
@@ -96,11 +92,6 @@ public class CPInstanceWrapper
 			"deliveryMaxSubscriptionCycles",
 			getDeliveryMaxSubscriptionCycles());
 		attributes.put("unspsc", getUnspsc());
-		attributes.put("discontinued", isDiscontinued());
-		attributes.put("discontinuedDate", getDiscontinuedDate());
-		attributes.put(
-			"replacementCPInstanceUuid", getReplacementCPInstanceUuid());
-		attributes.put("replacementCProductId", getReplacementCProductId());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
@@ -111,18 +102,6 @@ public class CPInstanceWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
-		Long mvccVersion = (Long)attributes.get("mvccVersion");
-
-		if (mvccVersion != null) {
-			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
-		}
-
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -364,32 +343,6 @@ public class CPInstanceWrapper
 			setUnspsc(unspsc);
 		}
 
-		Boolean discontinued = (Boolean)attributes.get("discontinued");
-
-		if (discontinued != null) {
-			setDiscontinued(discontinued);
-		}
-
-		Date discontinuedDate = (Date)attributes.get("discontinuedDate");
-
-		if (discontinuedDate != null) {
-			setDiscontinuedDate(discontinuedDate);
-		}
-
-		String replacementCPInstanceUuid = (String)attributes.get(
-			"replacementCPInstanceUuid");
-
-		if (replacementCPInstanceUuid != null) {
-			setReplacementCPInstanceUuid(replacementCPInstanceUuid);
-		}
-
-		Long replacementCProductId = (Long)attributes.get(
-			"replacementCProductId");
-
-		if (replacementCProductId != null) {
-			setReplacementCProductId(replacementCProductId);
-		}
-
 		Integer status = (Integer)attributes.get("status");
 
 		if (status != null) {
@@ -502,16 +455,6 @@ public class CPInstanceWrapper
 	}
 
 	/**
-	 * Returns the ct collection ID of this cp instance.
-	 *
-	 * @return the ct collection ID of this cp instance
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
-	}
-
-	/**
 	 * Returns the delivery max subscription cycles of this cp instance.
 	 *
 	 * @return the delivery max subscription cycles of this cp instance
@@ -563,9 +506,9 @@ public class CPInstanceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.util.UnicodeProperties
-		getDeliverySubscriptionTypeSettingsUnicodeProperties() {
+		getDeliverySubscriptionTypeSettingsProperties() {
 
-		return model.getDeliverySubscriptionTypeSettingsUnicodeProperties();
+		return model.getDeliverySubscriptionTypeSettingsProperties();
 	}
 
 	/**
@@ -576,26 +519,6 @@ public class CPInstanceWrapper
 	@Override
 	public double getDepth() {
 		return model.getDepth();
-	}
-
-	/**
-	 * Returns the discontinued of this cp instance.
-	 *
-	 * @return the discontinued of this cp instance
-	 */
-	@Override
-	public boolean getDiscontinued() {
-		return model.getDiscontinued();
-	}
-
-	/**
-	 * Returns the discontinued date of this cp instance.
-	 *
-	 * @return the discontinued date of this cp instance
-	 */
-	@Override
-	public Date getDiscontinuedDate() {
-		return model.getDiscontinuedDate();
 	}
 
 	/**
@@ -699,16 +622,6 @@ public class CPInstanceWrapper
 	}
 
 	/**
-	 * Returns the mvcc version of this cp instance.
-	 *
-	 * @return the mvcc version of this cp instance
-	 */
-	@Override
-	public long getMvccVersion() {
-		return model.getMvccVersion();
-	}
-
-	/**
 	 * Returns the override subscription info of this cp instance.
 	 *
 	 * @return the override subscription info of this cp instance
@@ -766,26 +679,6 @@ public class CPInstanceWrapper
 	@Override
 	public boolean getPurchasable() {
 		return model.getPurchasable();
-	}
-
-	/**
-	 * Returns the replacement cp instance uuid of this cp instance.
-	 *
-	 * @return the replacement cp instance uuid of this cp instance
-	 */
-	@Override
-	public String getReplacementCPInstanceUuid() {
-		return model.getReplacementCPInstanceUuid();
-	}
-
-	/**
-	 * Returns the replacement c product ID of this cp instance.
-	 *
-	 * @return the replacement c product ID of this cp instance
-	 */
-	@Override
-	public long getReplacementCProductId() {
-		return model.getReplacementCProductId();
 	}
 
 	/**
@@ -890,9 +783,9 @@ public class CPInstanceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.util.UnicodeProperties
-		getSubscriptionTypeSettingsUnicodeProperties() {
+		getSubscriptionTypeSettingsProperties() {
 
-		return model.getSubscriptionTypeSettingsUnicodeProperties();
+		return model.getSubscriptionTypeSettingsProperties();
 	}
 
 	/**
@@ -993,16 +886,6 @@ public class CPInstanceWrapper
 	@Override
 	public boolean isDenied() {
 		return model.isDenied();
-	}
-
-	/**
-	 * Returns <code>true</code> if this cp instance is discontinued.
-	 *
-	 * @return <code>true</code> if this cp instance is discontinued; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isDiscontinued() {
-		return model.isDiscontinued();
 	}
 
 	/**
@@ -1171,16 +1054,6 @@ public class CPInstanceWrapper
 	}
 
 	/**
-	 * Sets the ct collection ID of this cp instance.
-	 *
-	 * @param ctCollectionId the ct collection ID of this cp instance
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
-	}
-
-	/**
 	 * Sets the delivery max subscription cycles of this cp instance.
 	 *
 	 * @param deliveryMaxSubscriptionCycles the delivery max subscription cycles of this cp instance
@@ -1238,11 +1111,11 @@ public class CPInstanceWrapper
 	}
 
 	@Override
-	public void setDeliverySubscriptionTypeSettingsUnicodeProperties(
+	public void setDeliverySubscriptionTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
 			deliverySubscriptionTypeSettingsUnicodeProperties) {
 
-		model.setDeliverySubscriptionTypeSettingsUnicodeProperties(
+		model.setDeliverySubscriptionTypeSettingsProperties(
 			deliverySubscriptionTypeSettingsUnicodeProperties);
 	}
 
@@ -1254,26 +1127,6 @@ public class CPInstanceWrapper
 	@Override
 	public void setDepth(double depth) {
 		model.setDepth(depth);
-	}
-
-	/**
-	 * Sets whether this cp instance is discontinued.
-	 *
-	 * @param discontinued the discontinued of this cp instance
-	 */
-	@Override
-	public void setDiscontinued(boolean discontinued) {
-		model.setDiscontinued(discontinued);
-	}
-
-	/**
-	 * Sets the discontinued date of this cp instance.
-	 *
-	 * @param discontinuedDate the discontinued date of this cp instance
-	 */
-	@Override
-	public void setDiscontinuedDate(Date discontinuedDate) {
-		model.setDiscontinuedDate(discontinuedDate);
 	}
 
 	/**
@@ -1377,16 +1230,6 @@ public class CPInstanceWrapper
 	}
 
 	/**
-	 * Sets the mvcc version of this cp instance.
-	 *
-	 * @param mvccVersion the mvcc version of this cp instance
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		model.setMvccVersion(mvccVersion);
-	}
-
-	/**
 	 * Sets whether this cp instance is override subscription info.
 	 *
 	 * @param overrideSubscriptionInfo the override subscription info of this cp instance
@@ -1444,26 +1287,6 @@ public class CPInstanceWrapper
 	@Override
 	public void setPurchasable(boolean purchasable) {
 		model.setPurchasable(purchasable);
-	}
-
-	/**
-	 * Sets the replacement cp instance uuid of this cp instance.
-	 *
-	 * @param replacementCPInstanceUuid the replacement cp instance uuid of this cp instance
-	 */
-	@Override
-	public void setReplacementCPInstanceUuid(String replacementCPInstanceUuid) {
-		model.setReplacementCPInstanceUuid(replacementCPInstanceUuid);
-	}
-
-	/**
-	 * Sets the replacement c product ID of this cp instance.
-	 *
-	 * @param replacementCProductId the replacement c product ID of this cp instance
-	 */
-	@Override
-	public void setReplacementCProductId(long replacementCProductId) {
-		model.setReplacementCProductId(replacementCProductId);
 	}
 
 	/**
@@ -1567,11 +1390,11 @@ public class CPInstanceWrapper
 	}
 
 	@Override
-	public void setSubscriptionTypeSettingsUnicodeProperties(
+	public void setSubscriptionTypeSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties
 			subscriptionTypeSettingsUnicodeProperties) {
 
-		model.setSubscriptionTypeSettingsUnicodeProperties(
+		model.setSubscriptionTypeSettingsProperties(
 			subscriptionTypeSettingsUnicodeProperties);
 	}
 
@@ -1643,25 +1466,6 @@ public class CPInstanceWrapper
 	@Override
 	public void setWidth(double width) {
 		model.setWidth(width);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<CPInstance, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<CPInstance, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

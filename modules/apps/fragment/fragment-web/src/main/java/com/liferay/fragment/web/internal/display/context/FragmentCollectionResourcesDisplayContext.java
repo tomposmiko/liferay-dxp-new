@@ -14,21 +14,19 @@
 
 package com.liferay.fragment.web.internal.display.context;
 
-import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
-import com.liferay.portal.kernel.model.Repository;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -51,11 +49,57 @@ public class FragmentCollectionResourcesDisplayContext {
 		_renderResponse = renderResponse;
 		_fragmentDisplayContext = fragmentDisplayContext;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public long getFolderId() throws PortalException {
+	public SearchContainer<FileEntry> getSearchContainer()
+		throws PortalException {
+
+		if (_searchContainer != null) {
+			return _searchContainer;
+		}
+
+		PortletURL portletURL = PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCRenderCommandName(
+			"/fragment/view"
+		).setRedirect(
+			_fragmentDisplayContext.getRedirect()
+		).setTabs1(
+			"resources"
+		).setParameter(
+			"fragmentCollectionId",
+			_fragmentDisplayContext.getFragmentCollectionId()
+		).buildPortletURL();
+
+		SearchContainer<FileEntry> searchContainer = new SearchContainer(
+			_renderRequest, portletURL, null, "there-are-no-resources");
+
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
+
+		int fileEntriesCount =
+			PortletFileRepositoryUtil.getPortletFileEntriesCount(
+				_themeDisplay.getScopeGroupId(), _getFolderId());
+
+		searchContainer.setTotal(fileEntriesCount);
+
+		List<FileEntry> fileEntries =
+			PortletFileRepositoryUtil.getPortletFileEntries(
+				_themeDisplay.getScopeGroupId(), _getFolderId(),
+				WorkflowConstants.STATUS_ANY, searchContainer.getStart(),
+				searchContainer.getEnd(),
+				searchContainer.getOrderByComparator());
+
+		searchContainer.setResults(fileEntries);
+
+		_searchContainer = searchContainer;
+
+		return _searchContainer;
+	}
+
+	private long _getFolderId() throws PortalException {
 		if (_folderId != null) {
 			return _folderId;
 		}
@@ -69,85 +113,11 @@ public class FragmentCollectionResourcesDisplayContext {
 		return _folderId;
 	}
 
-	public long getRepositoryId() throws PortalException {
-		if (_repositoryId != null) {
-			return _repositoryId;
-		}
-
-		FragmentCollection fragmentCollection =
-			_fragmentDisplayContext.getFragmentCollection();
-
-		Repository repository =
-			PortletFileRepositoryUtil.fetchPortletRepository(
-				fragmentCollection.getGroupId(), FragmentPortletKeys.FRAGMENT);
-
-		if (repository == null) {
-			ServiceContext serviceContext = new ServiceContext();
-
-			serviceContext.setAddGroupPermissions(true);
-			serviceContext.setAddGuestPermissions(true);
-
-			repository = PortletFileRepositoryUtil.addPortletRepository(
-				fragmentCollection.getGroupId(), FragmentPortletKeys.FRAGMENT,
-				serviceContext);
-		}
-
-		_repositoryId = repository.getRepositoryId();
-
-		return _repositoryId;
-	}
-
-	public SearchContainer<FileEntry> getSearchContainer()
-		throws PortalException {
-
-		if (_searchContainer != null) {
-			return _searchContainer;
-		}
-
-		PortletURL portletURL = PortletURLBuilder.createRenderURL(
-			_renderResponse
-		).setRedirect(
-			_fragmentDisplayContext.getRedirect()
-		).setTabs1(
-			"resources"
-		).setParameter(
-			"fragmentCollectionId",
-			_fragmentDisplayContext.getFragmentCollectionId()
-		).buildPortletURL();
-
-		SearchContainer<FileEntry> searchContainer = new SearchContainer(
-			_renderRequest, portletURL, null, "there-are-no-resources");
-
-		searchContainer.setResultsAndTotal(
-			() -> PortletFileRepositoryUtil.getPortletFileEntries(
-				_themeDisplay.getScopeGroupId(), getFolderId(),
-				WorkflowConstants.STATUS_ANY, searchContainer.getStart(),
-				searchContainer.getEnd(),
-				searchContainer.getOrderByComparator()),
-			PortletFileRepositoryUtil.getPortletFileEntriesCount(
-				_themeDisplay.getScopeGroupId(), getFolderId()));
-		searchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(_renderResponse));
-
-		_searchContainer = searchContainer;
-
-		return _searchContainer;
-	}
-
-	public boolean isShowRepositoryBrowser() {
-		if (FeatureFlagManagerUtil.isEnabled("LPS-158675")) {
-			return true;
-		}
-
-		return false;
-	}
-
 	private Long _folderId;
 	private final FragmentDisplayContext _fragmentDisplayContext;
 	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private Long _repositoryId;
 	private SearchContainer<FileEntry> _searchContainer;
 	private final ThemeDisplay _themeDisplay;
 

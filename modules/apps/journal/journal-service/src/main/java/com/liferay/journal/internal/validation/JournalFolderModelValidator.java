@@ -15,6 +15,7 @@
 package com.liferay.journal.internal.validation;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.exception.DuplicateFolderNameException;
 import com.liferay.journal.exception.InvalidDDMStructureException;
@@ -25,8 +26,9 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.journal.service.persistence.JournalFolderPersistence;
 import com.liferay.journal.util.JournalValidator;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.validation.ModelValidationResults;
@@ -42,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.journal.model.JournalFolder",
 	service = ModelValidator.class
 )
@@ -59,15 +62,36 @@ public class JournalFolderModelValidator
 		JournalFolder folder = _journalFolderPersistence.findByPrimaryKey(
 			folderId);
 
-		for (JournalArticle article :
-				_journalArticleLocalService.getArticles(
-					folder.getGroupId(), folderId)) {
+		List<JournalArticle> articles = _journalArticleLocalService.getArticles(
+			folder.getGroupId(), folderId);
 
-			if (!ArrayUtil.contains(
-					ddmStructureIds, article.getDDMStructureId())) {
+		if (!articles.isEmpty()) {
+			long classNameId = _classNameLocalService.getClassNameId(
+				JournalArticle.class);
 
-				throw new InvalidDDMStructureException(
-					"Invalid DDM structure " + article.getDDMStructureId());
+			for (JournalArticle article : articles) {
+				DDMStructure ddmStructure =
+					_ddmStructureLocalService.fetchStructure(
+						article.getGroupId(), classNameId,
+						article.getDDMStructureKey(), true);
+
+				if (ddmStructure == null) {
+					throw new InvalidDDMStructureException(
+						StringBundler.concat(
+							"No DDM structure exists for group ",
+							article.getGroupId(), ", class name ", classNameId,
+							", and structure key ",
+							article.getDDMStructureKey(),
+							" that includes ancestor structures"));
+				}
+
+				if (!ArrayUtil.contains(
+						ddmStructureIds, ddmStructure.getStructureId())) {
+
+					throw new InvalidDDMStructureException(
+						"Invalid DDM structure " +
+							ddmStructure.getStructureId());
+				}
 			}
 		}
 
@@ -118,14 +142,20 @@ public class JournalFolderModelValidator
 			restrictionType = parentFolder.getRestrictionType();
 		}
 
-		validateArticleDDMStructures(
-			folderId,
-			TransformUtil.transformToLongArray(
-				_journalFolderLocalService.getDDMStructures(
-					_portal.getCurrentAndAncestorSiteGroupIds(
-						folder.getGroupId()),
-					parentFolderId, restrictionType),
-				DDMStructure::getStructureId));
+		List<DDMStructure> folderDDMStructures =
+			_journalFolderLocalService.getDDMStructures(
+				_portal.getCurrentAndAncestorSiteGroupIds(folder.getGroupId()),
+				parentFolderId, restrictionType);
+
+		long[] ddmStructureIds = new long[folderDDMStructures.size()];
+
+		for (int i = 0; i < folderDDMStructures.size(); i++) {
+			DDMStructure folderDDMStructure = folderDDMStructures.get(i);
+
+			ddmStructureIds[i] = folderDDMStructure.getStructureId();
+		}
+
+		validateArticleDDMStructures(folderId, ddmStructureIds);
 	}
 
 	@Override
@@ -133,11 +163,18 @@ public class JournalFolderModelValidator
 		long[] ddmStructureIds = null;
 
 		try {
-			ddmStructureIds = TransformUtil.transformToLongArray(
+			List<DDMStructure> ddmStructures =
 				_journalFolderLocalService.getDDMStructures(
 					new long[] {folder.getGroupId()}, folder.getFolderId(),
-					folder.getRestrictionType()),
-				DDMStructure::getStructureId);
+					folder.getRestrictionType());
+
+			ddmStructureIds = new long[ddmStructures.size()];
+
+			int i = 0;
+
+			for (DDMStructure ddmStructure : ddmStructures) {
+				ddmStructureIds[i] = ddmStructure.getStructureId();
+			}
 		}
 		catch (PortalException portalException) {
 			ModelValidationResults.FailureBuilder failureBuilder =
@@ -206,6 +243,12 @@ public class JournalFolderModelValidator
 				folder, InvalidFolderException.CANNOT_MOVE_INTO_CHILD_FOLDER);
 		}
 	}
+
+	@Reference
+	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;

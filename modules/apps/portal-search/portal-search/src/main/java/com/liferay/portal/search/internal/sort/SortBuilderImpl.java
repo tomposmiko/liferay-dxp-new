@@ -40,7 +40,7 @@ public class SortBuilderImpl implements SortBuilder {
 	@Override
 	public Sort build() {
 		if (!Validator.isBlank(_field)) {
-			return _sorts.field(_getSortableField(), _sortOrder);
+			return _sorts.field(getSortableField(), _sortOrder);
 		}
 
 		throw new UnsupportedOperationException();
@@ -67,7 +67,7 @@ public class SortBuilderImpl implements SortBuilder {
 		return this;
 	}
 
-	private Localization _getLocalization() {
+	protected Localization getLocalization() {
 
 		// See LPS-72507 and LPS-76500
 
@@ -78,17 +78,17 @@ public class SortBuilderImpl implements SortBuilder {
 		return LocalizationUtil.getLocalization();
 	}
 
-	private String _getLocalizedName(String name, Locale locale) {
-		Localization localization = _getLocalization();
+	protected String getLocalizedName(String name, Locale locale) {
+		Localization localization = getLocalization();
 
 		return localization.getLocalizedName(
 			name, LocaleUtil.toLanguageId(locale));
 	}
 
-	private String _getSortableField() {
+	protected String getSortableField() {
 		if ((_locale != null) && _field.equals(Field.TITLE)) {
 			return StringBundler.concat(
-				"localized_", _getLocalizedName(_field, _locale), "_sortable");
+				"localized_", getLocalizedName(_field, _locale), "_sortable");
 		}
 
 		return _field;

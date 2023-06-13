@@ -14,7 +14,6 @@
 
 package com.liferay.dispatch.web.internal.dao.search;
 
-import com.liferay.dispatch.constants.DispatchPortletKeys;
 import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.service.DispatchLogServiceUtil;
 import com.liferay.petra.string.StringBundler;
@@ -24,7 +23,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -50,29 +48,31 @@ public class DispatchLogSearchContainerFactory {
 				null, "no-dispatch-logs-were-found");
 
 		dispatchLogSearchContainer.setId("dispatchLogs");
-		dispatchLogSearchContainer.setOrderByCol(
-			_getColumnName(
-				SearchOrderByUtil.getOrderByCol(
-					liferayPortletRequest, DispatchPortletKeys.DISPATCH,
-					"modified-date")));
-		dispatchLogSearchContainer.setOrderByType(
-			SearchOrderByUtil.getOrderByType(
-				liferayPortletRequest, DispatchPortletKeys.DISPATCH, "desc"));
+
+		String orderByCol = _getColumnName(
+			ParamUtil.getString(
+				liferayPortletRequest, "orderByCol", "modified-date"));
+
+		dispatchLogSearchContainer.setOrderByCol(orderByCol);
+
+		String orderByType = ParamUtil.getString(
+			liferayPortletRequest, "orderByType", "asc");
+
+		dispatchLogSearchContainer.setOrderByType(orderByType);
+
+		dispatchLogSearchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(liferayPortletResponse));
 
 		long dispatchTriggerId = ParamUtil.getLong(
 			liferayPortletRequest, "dispatchTriggerId");
 
-		dispatchLogSearchContainer.setResultsAndTotal(
-			() -> DispatchLogServiceUtil.getDispatchLogs(
+		dispatchLogSearchContainer.setResults(
+			DispatchLogServiceUtil.getDispatchLogs(
 				dispatchTriggerId, dispatchLogSearchContainer.getStart(),
 				dispatchLogSearchContainer.getEnd(),
-				_getOrderByComparator(
-					dispatchLogSearchContainer.getOrderByCol(),
-					_isAscending(dispatchLogSearchContainer.getOrderByType()))),
+				_getOrderByComparator(orderByCol, _isAscending(orderByType))));
+		dispatchLogSearchContainer.setTotal(
 			DispatchLogServiceUtil.getDispatchLogsCount(dispatchTriggerId));
-
-		dispatchLogSearchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(liferayPortletResponse));
 
 		return dispatchLogSearchContainer;
 	}

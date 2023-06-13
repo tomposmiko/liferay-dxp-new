@@ -43,10 +43,6 @@ public class ConfigYAML {
 		return _clientMavenGroupId;
 	}
 
-	public int getCompatibilityVersion() {
-		return _compatibilityVersion;
-	}
-
 	public String getGraphQLNamespace() {
 		return _graphQLNamespace;
 	}
@@ -135,10 +131,6 @@ public class ConfigYAML {
 		_clientMavenGroupId = clientMavenGroupId;
 	}
 
-	public void setCompatibilityVersion(int compatibilityVersion) {
-		_compatibilityVersion = compatibilityVersion;
-	}
-
 	public void setForceClientVersionDescription(
 		boolean forceClientVersionDescription) {
 
@@ -219,7 +211,6 @@ public class ConfigYAML {
 	private String _author;
 	private String _clientDir;
 	private String _clientMavenGroupId;
-	private int _compatibilityVersion = 1;
 	private boolean _forceClientVersionDescription = true;
 	private boolean _forcePredictableContentApplicationXML = true;
 	private boolean _forcePredictableOperationId;

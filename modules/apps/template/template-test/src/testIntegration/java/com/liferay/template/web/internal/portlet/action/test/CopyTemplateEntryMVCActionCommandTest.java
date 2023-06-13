@@ -17,7 +17,7 @@ package com.liferay.template.web.internal.portlet.action.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -49,6 +49,7 @@ import com.liferay.template.test.util.TemplateTestUtil;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -88,7 +89,7 @@ public class CopyTemplateEntryMVCActionCommandTest {
 		ServiceContextThreadLocal.pushServiceContext(_serviceContext);
 
 		_templateEntry = TemplateTestUtil.addAnyTemplateEntry(
-			_infoItemServiceRegistry, _serviceContext);
+			_infoItemServiceTracker, _serviceContext);
 	}
 
 	@Test
@@ -126,30 +127,29 @@ public class CopyTemplateEntryMVCActionCommandTest {
 
 		Assert.assertTrue(templateEntries.size() > 1);
 
-		TemplateEntry templateEntry = null;
-
 		DDMTemplate originalDDMTemplate =
 			_ddmTemplateLocalService.getDDMTemplate(
 				_templateEntry.getDDMTemplateId());
 
-		for (TemplateEntry curTemplateEntry : templateEntries) {
-			DDMTemplate ddmTemplate = _ddmTemplateLocalService.fetchDDMTemplate(
-				curTemplateEntry.getDDMTemplateId());
+		Stream<TemplateEntry> templateEntriesStream = templateEntries.stream();
 
-			if ((ddmTemplate != null) &&
-				Objects.equals(name, ddmTemplate.getName(languageId)) &&
-				Objects.equals(
-					description, ddmTemplate.getDescription(languageId)) &&
-				Objects.equals(
-					originalDDMTemplate.getScript(), ddmTemplate.getScript())) {
-
-				templateEntry = curTemplateEntry;
-
-				break;
-			}
-		}
-
-		Assert.assertNotNull(templateEntry);
+		Assert.assertTrue(
+			templateEntriesStream.map(
+				templateEntry -> _ddmTemplateLocalService.fetchDDMTemplate(
+					templateEntry.getDDMTemplateId())
+			).filter(
+				Objects::nonNull
+			).filter(
+				ddmTemplate -> Objects.equals(
+					name, ddmTemplate.getName(languageId))
+			).filter(
+				ddmTemplate -> Objects.equals(
+					description, ddmTemplate.getDescription(languageId))
+			).filter(
+				ddmTemplate -> Objects.equals(
+					originalDDMTemplate.getScript(), ddmTemplate.getScript())
+			).findAny(
+			).isPresent());
 	}
 
 	private MockLiferayPortletActionRequest
@@ -195,7 +195,7 @@ public class CopyTemplateEntryMVCActionCommandTest {
 	private Group _group;
 
 	@Inject
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Inject(filter = "mvc.command.name=/template/copy_template_entry")
 	private MVCActionCommand _mvcActionCommand;

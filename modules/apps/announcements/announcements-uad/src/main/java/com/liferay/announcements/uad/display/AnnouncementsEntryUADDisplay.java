@@ -15,11 +15,11 @@
 package com.liferay.announcements.uad.display;
 
 import com.liferay.announcements.kernel.model.AnnouncementsEntry;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.user.associated.data.display.UADDisplay;
 
@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Noah Sherrill
  */
-@Component(service = UADDisplay.class)
+@Component(immediate = true, service = UADDisplay.class)
 public class AnnouncementsEntryUADDisplay
 	extends BaseAnnouncementsEntryUADDisplay {
 
@@ -42,12 +42,12 @@ public class AnnouncementsEntryUADDisplay
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
+		String portletId = PortletProviderUtil.getPortletId(
+			AnnouncementsEntry.class.getName(), PortletProvider.Action.VIEW);
+
 		return PortletURLBuilder.createLiferayPortletURL(
 			liferayPortletResponse,
-			portal.getControlPanelPlid(liferayPortletRequest),
-			PortletProviderUtil.getPortletId(
-				AnnouncementsEntry.class.getName(),
-				PortletProvider.Action.VIEW),
+			portal.getControlPanelPlid(liferayPortletRequest), portletId,
 			PortletRequest.RENDER_PHASE
 		).setMVCRenderCommandName(
 			"/announcements/edit_entry"

@@ -11,7 +11,7 @@
 
 import {ClayCheckbox, ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import {Autocomplete} from '../../../../../../shared/components/autocomplete/Autocomplete.es';
@@ -39,7 +39,7 @@ export default function Header({data}) {
 		}
 	}, [data]);
 
-	const disableBulk = reassigning || !assignees.length;
+	const disableBulk = reassigning || assignees.length === 0;
 
 	const handleCheck = ({target}) => {
 		setBulkReassign({
@@ -79,9 +79,9 @@ export default function Header({data}) {
 
 	return (
 		<PromisesResolver.Resolved>
-			<ManagementToolbar.Container className="border-bottom mb-0 px-3">
-				<ManagementToolbar.ItemList>
-					<ManagementToolbar.Item className="pt-2">
+			<ClayManagementToolbar className="border-bottom mb-0 px-3">
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item className="pt-2">
 						<ClayCheckbox
 							checked={useSameAssignee}
 							disabled={disableBulk}
@@ -90,10 +90,9 @@ export default function Header({data}) {
 							)}
 							onChange={handleCheck}
 						/>
-					</ManagementToolbar.Item>
-				</ManagementToolbar.ItemList>
-
-				<ManagementToolbar.Search onSubmit={handleSubmit}>
+					</ClayManagementToolbar.Item>
+				</ClayManagementToolbar.ItemList>
+				<ClayManagementToolbar.Search onSubmit={handleSubmit}>
 					<Autocomplete
 						defaultValue={selectedAssignee?.name || ''}
 						disabled={disableBulk || !useSameAssignee}
@@ -107,8 +106,8 @@ export default function Header({data}) {
 							<ClayIcon className="m-2" symbol="search" />
 						</ClayInput.GroupInsetItem>
 					</Autocomplete>
-				</ManagementToolbar.Search>
-			</ManagementToolbar.Container>
+				</ClayManagementToolbar.Search>
+			</ClayManagementToolbar>
 		</PromisesResolver.Resolved>
 	);
 }

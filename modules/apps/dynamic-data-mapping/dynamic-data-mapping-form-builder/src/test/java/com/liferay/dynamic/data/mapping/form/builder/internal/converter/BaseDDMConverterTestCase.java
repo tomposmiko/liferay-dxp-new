@@ -36,11 +36,16 @@ public abstract class BaseDDMConverterTestCase {
 		return jsonDeserializer.deserialize(serializedDDMFormRules, targetType);
 	}
 
+	protected String getBasePath() {
+		return "com/liferay/dynamic/data/mapping/form/builder/internal" +
+			"/converter/dependencies/";
+	}
+
 	protected String read(String fileName) throws Exception {
 		Class<?> clazz = getClass();
 
 		return StringUtil.read(
-			clazz.getClassLoader(), _getBasePath() + fileName);
+			clazz.getClassLoader(), getBasePath() + fileName);
 	}
 
 	protected <T> String serialize(List<T> rules) {
@@ -50,10 +55,5 @@ public abstract class BaseDDMConverterTestCase {
 	}
 
 	protected final JSONFactory jsonFactory = new JSONFactoryImpl();
-
-	private String _getBasePath() {
-		return "com/liferay/dynamic/data/mapping/form/builder/internal" +
-			"/converter/dependencies/";
-	}
 
 }

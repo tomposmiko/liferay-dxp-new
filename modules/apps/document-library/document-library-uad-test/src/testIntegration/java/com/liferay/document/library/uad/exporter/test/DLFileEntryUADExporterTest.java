@@ -84,7 +84,8 @@ public class DLFileEntryUADExporterTest
 	@ExpectedLogs(
 		expectedLogs = {
 			@ExpectedLog(
-				expectedLog = "null", expectedType = ExpectedType.EXACT
+				expectedLog = "com.liferay.document.library.kernel.exception.NoSuchFileException",
+				expectedType = ExpectedType.CONTAINS
 			)
 		},
 		level = "ERROR", loggerClass = DynamicQueryUADExporter.class

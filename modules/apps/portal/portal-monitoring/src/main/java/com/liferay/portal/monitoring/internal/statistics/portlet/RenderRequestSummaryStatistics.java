@@ -26,7 +26,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  */
-@Component(enabled = false, service = RenderRequestSummaryStatistics.class)
+@Component(
+	enabled = false, immediate = true,
+	service = RenderRequestSummaryStatistics.class
+)
 public class RenderRequestSummaryStatistics
 	implements PortletSummaryStatistics {
 
@@ -648,7 +651,11 @@ public class RenderRequestSummaryStatistics
 		return requestStatistics.getTimeoutCount();
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setServerStatistics(ServerStatistics serverStatistics) {
+		_serverStatistics = serverStatistics;
+	}
+
 	private ServerStatistics _serverStatistics;
 
 }

@@ -27,11 +27,10 @@ import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.message.boards.service.MBThreadService;
 import com.liferay.message.boards.settings.MBGroupServiceSettings;
-import com.liferay.message.boards.web.internal.util.MBRequestUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.LiferayActionResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -72,7 +71,7 @@ public class SplitThreadMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		try {
-			_splitThread(actionRequest, actionResponse);
+			splitThread(actionRequest, actionResponse);
 		}
 		catch (PrincipalException | RequiredMessageException exception) {
 			SessionErrors.add(actionRequest, exception.getClass());
@@ -87,7 +86,7 @@ public class SplitThreadMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _splitThread(
+	protected void splitThread(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -116,8 +115,7 @@ public class SplitThreadMVCActionCommand extends BaseMVCActionCommand {
 			String body = ParamUtil.getString(actionRequest, "body");
 
 			MBGroupServiceSettings mbGroupServiceSettings =
-				MBRequestUtil.getMBGroupServiceSettings(
-					_portal.getHttpServletRequest(actionRequest),
+				MBGroupServiceSettings.getInstance(
 					themeDisplay.getScopeGroupId());
 
 			String layoutFullURL = _portal.getLayoutFullURL(themeDisplay);

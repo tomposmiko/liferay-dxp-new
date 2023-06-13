@@ -16,7 +16,6 @@ package com.liferay.search.experiences.internal.blueprint.search.spi.searcher;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -25,7 +24,6 @@ import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.spi.searcher.SearchRequestContributor;
 import com.liferay.search.experiences.blueprint.search.request.enhancer.SXPBlueprintSearchRequestEnhancer;
-import com.liferay.search.experiences.exception.SXPExceptionUtil;
 import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.service.SXPBlueprintLocalService;
 
@@ -36,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Petteri Karttunen
  */
 @Component(
-	enabled = false,
+	immediate = true,
 	property = "search.request.contributor.id=com.liferay.search.experiences.blueprint",
 	service = SearchRequestContributor.class
 )
@@ -97,33 +95,14 @@ public class SXPBlueprintSearchRequestContributor
 			_log.debug("Search experiences blueprint JSON " + sxpBlueprintJSON);
 		}
 
-		RuntimeException runtimeException = new RuntimeException();
-
-		try {
-			if (Validator.isNotNull(sxpBlueprintJSON)) {
-				_sxpBlueprintSearchRequestEnhancer.enhance(
-					searchRequestBuilder, sxpBlueprintJSON);
-			}
-		}
-		catch (Exception exception) {
-			runtimeException.addSuppressed(exception);
-		}
-
-		if (ArrayUtil.isNotEmpty(runtimeException.getSuppressed())) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(runtimeException);
-			}
-		}
-
-		if (SXPExceptionUtil.hasErrors(runtimeException)) {
-			throw runtimeException;
+		if (Validator.isNotNull(sxpBlueprintJSON)) {
+			_sxpBlueprintSearchRequestEnhancer.enhance(
+				searchRequestBuilder, sxpBlueprintJSON);
 		}
 	}
 
 	private void _enhance(
 		SearchRequestBuilder searchRequestBuilder, long... sxpBlueprintIds) {
-
-		RuntimeException runtimeException = new RuntimeException();
 
 		for (long sxpBlueprintId : sxpBlueprintIds) {
 			if (sxpBlueprintId == 0) {
@@ -137,25 +116,10 @@ public class SXPBlueprintSearchRequestContributor
 				_log.debug("Search experiences blueprint " + sxpBlueprint);
 			}
 
-			try {
-				if (sxpBlueprint != null) {
-					_sxpBlueprintSearchRequestEnhancer.enhance(
-						searchRequestBuilder, sxpBlueprint);
-				}
+			if (sxpBlueprint != null) {
+				_sxpBlueprintSearchRequestEnhancer.enhance(
+					searchRequestBuilder, sxpBlueprint);
 			}
-			catch (Exception exception) {
-				runtimeException.addSuppressed(exception);
-			}
-		}
-
-		if (ArrayUtil.isNotEmpty(runtimeException.getSuppressed())) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(runtimeException);
-			}
-		}
-
-		if (SXPExceptionUtil.hasErrors(runtimeException)) {
-			throw runtimeException;
 		}
 	}
 

@@ -30,10 +30,6 @@ public class JournalArticleResourceLocalServiceWrapper
 	implements JournalArticleResourceLocalService,
 			   ServiceWrapper<JournalArticleResourceLocalService> {
 
-	public JournalArticleResourceLocalServiceWrapper() {
-		this(null);
-	}
-
 	public JournalArticleResourceLocalServiceWrapper(
 		JournalArticleResourceLocalService journalArticleResourceLocalService) {
 

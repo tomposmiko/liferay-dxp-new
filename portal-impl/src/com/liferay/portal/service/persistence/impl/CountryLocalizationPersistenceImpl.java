@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.model.CountryLocalization;
 import com.liferay.portal.kernel.model.CountryLocalizationTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CountryLocalizationPersistence;
-import com.liferay.portal.kernel.service.persistence.CountryLocalizationUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -43,7 +42,6 @@ import com.liferay.portal.model.impl.CountryLocalizationModelImpl;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
@@ -180,7 +178,7 @@ public class CountryLocalizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CountryLocalization>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CountryLocalization countryLocalization : list) {
@@ -548,8 +546,7 @@ public class CountryLocalizationPersistenceImpl
 
 		Object[] finderArgs = new Object[] {countryId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -669,7 +666,7 @@ public class CountryLocalizationPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByCountryId_LanguageId, finderArgs, this);
+				_finderPathFetchByCountryId_LanguageId, finderArgs);
 		}
 
 		if (result instanceof CountryLocalization) {
@@ -785,8 +782,7 @@ public class CountryLocalizationPersistenceImpl
 
 		Object[] finderArgs = new Object[] {countryId, languageId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1269,7 +1265,7 @@ public class CountryLocalizationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CountryLocalization>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1339,7 +1335,7 @@ public class CountryLocalizationPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1433,30 +1429,10 @@ public class CountryLocalizationPersistenceImpl
 			"countByCountryId_LanguageId",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"countryId", "languageId"}, false);
-
-		_setCountryLocalizationUtilPersistence(this);
 	}
 
 	public void destroy() {
-		_setCountryLocalizationUtilPersistence(null);
-
 		EntityCacheUtil.removeCache(CountryLocalizationImpl.class.getName());
-	}
-
-	private void _setCountryLocalizationUtilPersistence(
-		CountryLocalizationPersistence countryLocalizationPersistence) {
-
-		try {
-			Field field = CountryLocalizationUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, countryLocalizationPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	private static final String _SQL_SELECT_COUNTRYLOCALIZATION =

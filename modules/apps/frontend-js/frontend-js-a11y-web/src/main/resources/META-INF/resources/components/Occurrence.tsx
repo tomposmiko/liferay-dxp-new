@@ -89,25 +89,20 @@ function Occurrence({params, previous, violations}: OccurrenceProps) {
 						'open-developer-tools-in-the-browser-to-see-the-selected-occurrence'
 					)}
 				</p>
-
 				<div className="my-3">
 					<span>{Liferay.Language.get('target')}</span>
 				</div>
-
 				<CodeBlock aria-label={Liferay.Language.get('target-selector')}>
 					{target}
 				</CodeBlock>
-
 				<div className="my-3">
 					<span>{Liferay.Language.get('code')}</span>
 				</div>
-
 				<CodeBlock
 					aria-label={Liferay.Language.get('code-of-the-element')}
 				>
 					{html}
 				</CodeBlock>
-
 				<ClayPanel
 					className="mt-4"
 					displayTitle={Liferay.Language.get('how-to-fix')}
@@ -124,7 +119,6 @@ function Occurrence({params, previous, violations}: OccurrenceProps) {
 								)}
 							/>
 						)}
-
 						{Boolean(all.length) && (
 							<Check
 								data={all}

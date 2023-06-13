@@ -14,12 +14,12 @@
 
 import {useResource} from '@clayui/data-provider';
 import {usePrevious} from '@liferay/frontend-js-react-web';
+import {useFormState} from 'data-engine-js-components-web';
+import {getFields} from 'data-engine-js-components-web/js/utils/fields.es';
 import {
-	getFields,
 	getObjectFieldName,
 	getSelectedValue,
-	useFormState,
-} from 'data-engine-js-components-web';
+} from 'data-engine-js-components-web/js/utils/objectFields';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo} from 'react';
 
@@ -35,6 +35,10 @@ const normalizeDataType = (type) => {
 	const formattedType = type.toLowerCase();
 
 	return dataTypes[formattedType] ?? formattedType;
+};
+
+const formatLanguageId = (languageId) => {
+	return languageId.replace('_', '-');
 };
 
 const ObjectField = ({
@@ -59,47 +63,25 @@ const ObjectField = ({
 
 	const options = useMemo(() => {
 		const filteredObjectFields = objectFields.filter(
-			({
-				businessType,
-				listTypeDefinitionExternalReferenceCode,
-				relationshipType,
-				system,
-				type,
-			}) => {
+			({listTypeDefinitionId, type}) => {
 				if (
-					!listTypeDefinitionExternalReferenceCode &&
-					(focusedFieldType === 'radio' ||
-						focusedFieldType === 'select') &&
+					!listTypeDefinitionId &&
+					(focusedFieldType == 'radio' ||
+						focusedFieldType == 'select') &&
 					normalizedDataType.includes(type.toLowerCase())
 				) {
 					return false;
 				}
 				else if (
-					listTypeDefinitionExternalReferenceCode &&
-					(focusedFieldType === 'checkbox_multiple' ||
-						focusedFieldType === 'color' ||
-						focusedFieldType === 'grid' ||
-						focusedFieldType === 'rich_text' ||
-						focusedFieldType === 'text') &&
+					listTypeDefinitionId &&
+					(focusedFieldType == 'checkbox_multiple' ||
+						focusedFieldType == 'color' ||
+						focusedFieldType == 'grid' ||
+						focusedFieldType == 'rich_text' ||
+						focusedFieldType == 'text') &&
 					normalizedDataType.includes(type.toLowerCase())
 				) {
 					return false;
-				}
-				else if (
-					(focusedFieldType === 'rich_text' ||
-						focusedFieldType === 'text') &&
-					type === 'Clob'
-				) {
-					return true;
-				}
-				else if (relationshipType || system) {
-					return false;
-				}
-				else if (
-					businessType === 'Attachment' &&
-					focusedFieldType === 'document_library'
-				) {
-					return true;
 				}
 
 				return normalizedDataType.includes(type.toLowerCase());
@@ -120,7 +102,10 @@ const ObjectField = ({
 
 			return filteredObjectFields.map(({label, name}) => ({
 				disabled: !!mappedFields.includes(name),
-				label: label[themeDisplay.getDefaultLanguageId()] ?? name,
+				label:
+					label[
+						formatLanguageId(themeDisplay.getDefaultLanguageId())
+					] ?? name,
 				value: name,
 			}));
 		}
@@ -183,7 +168,10 @@ const ObjectDefinitionObjectField = ({
 	const options =
 		resource?.objectFields?.map(({label, name}) => {
 			return {
-				label: label[themeDisplay.getDefaultLanguageId()] ?? name,
+				label:
+					label[
+						formatLanguageId(themeDisplay.getDefaultLanguageId())
+					] ?? name,
 				value: name,
 			};
 		}) || [];

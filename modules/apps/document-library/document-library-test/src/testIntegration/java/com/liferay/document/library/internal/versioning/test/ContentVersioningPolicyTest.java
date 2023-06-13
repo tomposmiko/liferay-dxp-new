@@ -24,6 +24,8 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileVersionImpl;
 
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -70,13 +72,14 @@ public class ContentVersioningPolicyTest {
 		nextDLFileVersionImpl.setSize(previousDLFileVersionImpl.getSize());
 		nextDLFileVersionImpl.setChecksum(StringUtil.randomString(6));
 
-		DLVersionNumberIncrease dlVersionNumberIncrease =
+		Optional<DLVersionNumberIncrease> dlVersionNumberIncreaseOptional =
 			_versioningPolicy.computeDLVersionNumberIncrease(
 				previousDLFileVersionImpl, nextDLFileVersionImpl);
 
-		Assert.assertNotNull(dlVersionNumberIncrease);
+		Assert.assertTrue(dlVersionNumberIncreaseOptional.isPresent());
 		Assert.assertEquals(
-			DLVersionNumberIncrease.MAJOR, dlVersionNumberIncrease);
+			DLVersionNumberIncrease.MAJOR,
+			dlVersionNumberIncreaseOptional.get());
 	}
 
 	@Test
@@ -89,13 +92,14 @@ public class ContentVersioningPolicyTest {
 
 		nextDLFileVersionImpl.setSize(previousDLFileVersionImpl.getSize() + 1);
 
-		DLVersionNumberIncrease dlVersionNumberIncrease =
+		Optional<DLVersionNumberIncrease> dlVersionNumberIncreaseOptional =
 			_versioningPolicy.computeDLVersionNumberIncrease(
 				previousDLFileVersionImpl, nextDLFileVersionImpl);
 
-		Assert.assertNotNull(dlVersionNumberIncrease);
+		Assert.assertTrue(dlVersionNumberIncreaseOptional.isPresent());
 		Assert.assertEquals(
-			DLVersionNumberIncrease.MAJOR, dlVersionNumberIncrease);
+			DLVersionNumberIncrease.MAJOR,
+			dlVersionNumberIncreaseOptional.get());
 	}
 
 	@Test
@@ -111,11 +115,11 @@ public class ContentVersioningPolicyTest {
 		nextDLFileVersionImpl.setChecksum(
 			previousDLFileVersionImpl.getChecksum());
 
-		DLVersionNumberIncrease dlVersionNumberIncrease =
+		Optional<DLVersionNumberIncrease> dlVersionNumberIncreaseOptional =
 			_versioningPolicy.computeDLVersionNumberIncrease(
 				previousDLFileVersionImpl, nextDLFileVersionImpl);
 
-		Assert.assertNull(dlVersionNumberIncrease);
+		Assert.assertFalse(dlVersionNumberIncreaseOptional.isPresent());
 	}
 
 	@Test
@@ -128,11 +132,11 @@ public class ContentVersioningPolicyTest {
 
 		nextDLFileVersionImpl.setSize(RandomUtil.nextInt(100) + 1);
 
-		DLVersionNumberIncrease dlVersionNumberIncrease =
+		Optional<DLVersionNumberIncrease> dlVersionNumberIncreaseOptional =
 			_versioningPolicy.computeDLVersionNumberIncrease(
 				previousDLFileVersionImpl, nextDLFileVersionImpl);
 
-		Assert.assertNull(dlVersionNumberIncrease);
+		Assert.assertFalse(dlVersionNumberIncreaseOptional.isPresent());
 	}
 
 	@Inject(filter = "component.name=*.ContentVersioningPolicy")

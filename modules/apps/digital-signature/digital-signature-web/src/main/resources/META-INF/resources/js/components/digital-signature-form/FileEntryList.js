@@ -53,7 +53,6 @@ const FileEntryList = ({errors, fileEntries = [], setFieldValue}) => {
 				>
 					<ClayList.ItemField expand>
 						<ClayList.ItemTitle>{title}</ClayList.ItemTitle>
-
 						{hasError(fileEntryId) && (
 							<ClayList.ItemTitle className="text-error">
 								{Liferay.Language.get(
@@ -62,7 +61,6 @@ const FileEntryList = ({errors, fileEntries = [], setFieldValue}) => {
 							</ClayList.ItemTitle>
 						)}
 					</ClayList.ItemField>
-
 					<ClayList.ItemField>
 						<ClayButtonWithIcon
 							displayType="unstyled"

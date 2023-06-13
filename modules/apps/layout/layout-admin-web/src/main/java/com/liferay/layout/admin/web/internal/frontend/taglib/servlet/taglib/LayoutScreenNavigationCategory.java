@@ -16,12 +16,11 @@ package com.liferay.layout.admin.web.internal.frontend.taglib.servlet.taglib;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
 import com.liferay.layout.admin.constants.LayoutScreenNavigationEntryConstants;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
@@ -37,7 +36,7 @@ public class LayoutScreenNavigationCategory
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "general");
+		return LanguageUtil.get(locale, "general");
 	}
 
 	@Override
@@ -45,8 +44,5 @@ public class LayoutScreenNavigationCategory
 		return LayoutScreenNavigationEntryConstants.
 			SCREEN_NAVIGATION_KEY_LAYOUT;
 	}
-
-	@Reference
-	private Language _language;
 
 }

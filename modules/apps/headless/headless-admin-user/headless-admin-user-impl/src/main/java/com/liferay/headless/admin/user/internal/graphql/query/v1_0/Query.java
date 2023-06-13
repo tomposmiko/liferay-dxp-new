@@ -25,9 +25,7 @@ import com.liferay.headless.admin.user.dto.v1_0.Segment;
 import com.liferay.headless.admin.user.dto.v1_0.SegmentUser;
 import com.liferay.headless.admin.user.dto.v1_0.Site;
 import com.liferay.headless.admin.user.dto.v1_0.Subscription;
-import com.liferay.headless.admin.user.dto.v1_0.Ticket;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
-import com.liferay.headless.admin.user.dto.v1_0.UserGroup;
 import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
 import com.liferay.headless.admin.user.resource.v1_0.AccountRoleResource;
@@ -40,9 +38,7 @@ import com.liferay.headless.admin.user.resource.v1_0.SegmentResource;
 import com.liferay.headless.admin.user.resource.v1_0.SegmentUserResource;
 import com.liferay.headless.admin.user.resource.v1_0.SiteResource;
 import com.liferay.headless.admin.user.resource.v1_0.SubscriptionResource;
-import com.liferay.headless.admin.user.resource.v1_0.TicketResource;
 import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
-import com.liferay.headless.admin.user.resource.v1_0.UserGroupResource;
 import com.liferay.headless.admin.user.resource.v1_0.WebUrlResource;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
@@ -166,28 +162,12 @@ public class Query {
 			subscriptionResourceComponentServiceObjects;
 	}
 
-	public static void setTicketResourceComponentServiceObjects(
-		ComponentServiceObjects<TicketResource>
-			ticketResourceComponentServiceObjects) {
-
-		_ticketResourceComponentServiceObjects =
-			ticketResourceComponentServiceObjects;
-	}
-
 	public static void setUserAccountResourceComponentServiceObjects(
 		ComponentServiceObjects<UserAccountResource>
 			userAccountResourceComponentServiceObjects) {
 
 		_userAccountResourceComponentServiceObjects =
 			userAccountResourceComponentServiceObjects;
-	}
-
-	public static void setUserGroupResourceComponentServiceObjects(
-		ComponentServiceObjects<UserGroupResource>
-			userGroupResourceComponentServiceObjects) {
-
-		_userGroupResourceComponentServiceObjects =
-			userGroupResourceComponentServiceObjects;
 	}
 
 	public static void setWebUrlResourceComponentServiceObjects(
@@ -228,7 +208,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCode(externalReferenceCode: ___){accountUserAccounts, actions, customFields, description, domains, externalReferenceCode, id, name, numberOfUsers, organizationIds, parentAccountId, status, type}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCode(externalReferenceCode: ___){accountUserAccounts, actions, description, domains, externalReferenceCode, id, name, numberOfUsers, organizationIds, parentAccountId, status, type}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public Account accountByExternalReferenceCode(
@@ -246,7 +226,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {account(accountId: ___){accountUserAccounts, actions, customFields, description, domains, externalReferenceCode, id, name, numberOfUsers, organizationIds, parentAccountId, status, type}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {account(accountId: ___){accountUserAccounts, actions, description, domains, externalReferenceCode, id, name, numberOfUsers, organizationIds, parentAccountId, status, type}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public Account account(@GraphQLName("accountId") Long accountId)
@@ -289,7 +269,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRoles(accountExternalReferenceCode: ___, externalReferenceCode: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRoles(accountExternalReferenceCode: ___, userAccountExternalReferenceCode: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(
 		description = "Gets a user's account roles by their external reference code from an account by external reference code"
@@ -298,8 +278,8 @@ public class Query {
 			accountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRoles(
 				@GraphQLName("accountExternalReferenceCode") String
 					accountExternalReferenceCode,
-				@GraphQLName("externalReferenceCode") String
-					externalReferenceCode)
+				@GraphQLName("userAccountExternalReferenceCode") String
+					userAccountExternalReferenceCode)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -308,19 +288,19 @@ public class Query {
 			accountRoleResource -> new AccountRolePage(
 				accountRoleResource.
 					getAccountByExternalReferenceCodeUserAccountByExternalReferenceCodeAccountRolesPage(
-						accountExternalReferenceCode, externalReferenceCode)));
+						accountExternalReferenceCode,
+						userAccountExternalReferenceCode)));
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountAccountRolesByExternalReferenceCode(externalReferenceCode: ___, filter: ___, keywords: ___, page: ___, pageSize: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountAccountRolesByExternalReferenceCode(externalReferenceCode: ___, keywords: ___, page: ___, pageSize: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Gets the account's roles")
 	public AccountRolePage accountAccountRolesByExternalReferenceCode(
 			@GraphQLName("externalReferenceCode") String externalReferenceCode,
 			@GraphQLName("keywords") String keywords,
-			@GraphQLName("filter") String filterString,
 			@GraphQLName("pageSize") int pageSize,
 			@GraphQLName("page") int page,
 			@GraphQLName("sort") String sortsString)
@@ -333,8 +313,6 @@ public class Query {
 				accountRoleResource.
 					getAccountAccountRolesByExternalReferenceCodePage(
 						externalReferenceCode, keywords,
-						_filterBiFunction.apply(
-							accountRoleResource, filterString),
 						Pagination.of(page, pageSize),
 						_sortsBiFunction.apply(
 							accountRoleResource, sortsString))));
@@ -367,13 +345,12 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountAccountRoles(accountId: ___, filter: ___, keywords: ___, page: ___, pageSize: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountAccountRoles(accountId: ___, keywords: ___, page: ___, pageSize: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Gets the account's roles")
 	public AccountRolePage accountAccountRoles(
 			@GraphQLName("accountId") Long accountId,
 			@GraphQLName("keywords") String keywords,
-			@GraphQLName("filter") String filterString,
 			@GraphQLName("pageSize") int pageSize,
 			@GraphQLName("page") int page,
 			@GraphQLName("sort") String sortsString)
@@ -384,9 +361,7 @@ public class Query {
 			this::_populateResourceContext,
 			accountRoleResource -> new AccountRolePage(
 				accountRoleResource.getAccountAccountRolesPage(
-					accountId, keywords,
-					_filterBiFunction.apply(accountRoleResource, filterString),
-					Pagination.of(page, pageSize),
+					accountId, keywords, Pagination.of(page, pageSize),
 					_sortsBiFunction.apply(accountRoleResource, sortsString))));
 	}
 
@@ -446,66 +421,6 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCodeOrganizations(externalReferenceCode: ___, filter: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField(
-		description = "Retrieves the account's organizations. Results can be paginated, filtered, searched, and sorted."
-	)
-	public OrganizationPage accountByExternalReferenceCodeOrganizations(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page,
-			@GraphQLName("sort") String sortsString)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource -> new OrganizationPage(
-				organizationResource.
-					getAccountByExternalReferenceCodeOrganizationsPage(
-						externalReferenceCode, search,
-						_filterBiFunction.apply(
-							organizationResource, filterString),
-						Pagination.of(page, pageSize),
-						_sortsBiFunction.apply(
-							organizationResource, sortsString))));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountOrganizations(accountId: ___, filter: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField(
-		description = "Retrieves the account's organizations. Results can be paginated, filtered, searched, and sorted."
-	)
-	public OrganizationPage accountOrganizations(
-			@GraphQLName("accountId") Long accountId,
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page,
-			@GraphQLName("sort") String sortsString)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource -> new OrganizationPage(
-				organizationResource.getAccountOrganizationsPage(
-					accountId, search,
-					_filterBiFunction.apply(organizationResource, filterString),
-					Pagination.of(page, pageSize),
-					_sortsBiFunction.apply(
-						organizationResource, sortsString))));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {organizations(filter: ___, flatten: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(
@@ -535,25 +450,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {organizationByExternalReferenceCode(externalReferenceCode: ___){actions, childOrganizations, comment, customFields, dateCreated, dateModified, externalReferenceCode, id, image, keywords, location, name, numberOfAccounts, numberOfOrganizations, numberOfUsers, organizationAccounts, organizationContactInformation, parentOrganization, services, userAccounts}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public Organization organizationByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_organizationResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			organizationResource ->
-				organizationResource.getOrganizationByExternalReferenceCode(
-					externalReferenceCode));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {organization(organizationId: ___){actions, childOrganizations, comment, customFields, dateCreated, dateModified, externalReferenceCode, id, image, keywords, location, name, numberOfAccounts, numberOfOrganizations, numberOfUsers, organizationAccounts, organizationContactInformation, parentOrganization, services, userAccounts}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {organization(organizationId: ___){actions, childOrganizations, comment, customFields, dateCreated, dateModified, id, image, keywords, location, name, numberOfAccounts, numberOfOrganizations, numberOfUsers, organizationAccounts, organizationContactInformation, parentOrganization, services, userAccounts}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Retrieves the organization.")
 	public Organization organization(
@@ -677,24 +574,6 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountPostalAddresses(accountId: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField(description = "Retrieves the account's postal addresses.")
-	public PostalAddressPage accountPostalAddresses(
-			@GraphQLName("accountId") Long accountId)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_postalAddressResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			postalAddressResource -> new PostalAddressPage(
-				postalAddressResource.getAccountPostalAddressesPage(
-					accountId)));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {organizationPostalAddresses(organizationId: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(
@@ -715,7 +594,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {postalAddress(postalAddressId: ___){addressCountry, addressCountry_i18n, addressLocality, addressRegion, addressType, id, name, postalCode, primary, streetAddressLine1, streetAddressLine2, streetAddressLine3}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {postalAddress(postalAddressId: ___){addressCountry, addressCountry_i18n, addressLocality, addressRegion, addressType, id, postalCode, primary, streetAddressLine1, streetAddressLine2, streetAddressLine3}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Retrieves the postal address.")
 	public PostalAddress postalAddress(
@@ -750,14 +629,13 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {roles(page: ___, pageSize: ___, search: ___, types: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {roles(page: ___, pageSize: ___, types: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(
 		description = "Retrieves the portal instance's roles. Results can be paginated."
 	)
 	public RolePage roles(
 			@GraphQLName("types") Integer[] types,
-			@GraphQLName("search") String search,
 			@GraphQLName("pageSize") int pageSize,
 			@GraphQLName("page") int page)
 		throws Exception {
@@ -767,13 +645,13 @@ public class Query {
 			this::_populateResourceContext,
 			roleResource -> new RolePage(
 				roleResource.getRolesPage(
-					types, search, Pagination.of(page, pageSize))));
+					types, Pagination.of(page, pageSize))));
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {role(roleId: ___){actions, availableLanguages, creator, dateCreated, dateModified, description, description_i18n, externalReferenceCode, id, name, name_i18n, roleType}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {role(roleId: ___){actions, availableLanguages, creator, dateCreated, dateModified, description, description_i18n, id, name, name_i18n, roleType}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Retrieves the role.")
 	public Role role(@GraphQLName("roleId") Long roleId) throws Exception {
@@ -866,7 +744,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {byFriendlyUrlPath(friendlyUrlPath: ___){availableLanguages, creator, description, description_i18n, descriptiveName, descriptiveName_i18n, friendlyUrlPath, id, key, membershipType, name, name_i18n, parentSiteId, sites}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {byFriendlyUrlPath(friendlyUrlPath: ___){availableLanguages, creator, description, description_i18n, friendlyUrlPath, id, key, membershipType, name, name_i18n, parentSiteId, sites}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public Site byFriendlyUrlPath(
@@ -883,7 +761,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {site(siteKey: ___){availableLanguages, creator, description, description_i18n, descriptiveName, descriptiveName_i18n, friendlyUrlPath, id, key, membershipType, name, name_i18n, parentSiteId, sites}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {site(siteKey: ___){availableLanguages, creator, description, description_i18n, friendlyUrlPath, id, key, membershipType, name, name_i18n, parentSiteId, sites}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public Site site(@GraphQLName("siteKey") @NotEmpty String siteKey)
@@ -931,43 +809,6 @@ public class Query {
 			subscriptionResource ->
 				subscriptionResource.getMyUserAccountSubscription(
 					subscriptionId));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userAccountEmailVerificationTicket(userAccountId: ___){expirationDate, extraInfo, id, key}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField(
-		description = "Retrieves the user's email verification ticket."
-	)
-	public Ticket userAccountEmailVerificationTicket(
-			@GraphQLName("userAccountId") Long userAccountId)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_ticketResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			ticketResource ->
-				ticketResource.getUserAccountEmailVerificationTicket(
-					userAccountId));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userAccountPasswordResetTicket(userAccountId: ___){expirationDate, extraInfo, id, key}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField(description = "Retrieves the user's password reset ticket.")
-	public Ticket userAccountPasswordResetTicket(
-			@GraphQLName("userAccountId") Long userAccountId)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_ticketResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			ticketResource -> ticketResource.getUserAccountPasswordResetTicket(
-				userAccountId));
 	}
 
 	/**
@@ -1028,7 +869,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {myUserAccount{accountBriefs, actions, additionalName, alternateName, birthDate, currentPassword, customFields, dashboardURL, dateCreated, dateModified, emailAddress, externalReferenceCode, familyName, givenName, honorificPrefix, honorificSuffix, id, image, jobTitle, keywords, lastLoginDate, name, organizationBriefs, password, profileURL, roleBriefs, siteBriefs, userAccountContactInformation, userGroupBriefs}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {myUserAccount{accountBriefs, actions, additionalName, alternateName, birthDate, customFields, dashboardURL, dateCreated, dateModified, emailAddress, externalReferenceCode, familyName, givenName, honorificPrefix, honorificSuffix, id, image, jobTitle, keywords, lastLoginDate, name, organizationBriefs, profileURL, roleBriefs, siteBriefs, userAccountContactInformation}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(
 		description = "Retrieves information about the user who made the request."
@@ -1126,7 +967,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userAccountByExternalReferenceCode(externalReferenceCode: ___){accountBriefs, actions, additionalName, alternateName, birthDate, currentPassword, customFields, dashboardURL, dateCreated, dateModified, emailAddress, externalReferenceCode, familyName, givenName, honorificPrefix, honorificSuffix, id, image, jobTitle, keywords, lastLoginDate, name, organizationBriefs, password, profileURL, roleBriefs, siteBriefs, userAccountContactInformation, userGroupBriefs}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userAccountByExternalReferenceCode(externalReferenceCode: ___){accountBriefs, actions, additionalName, alternateName, birthDate, customFields, dashboardURL, dateCreated, dateModified, emailAddress, externalReferenceCode, familyName, givenName, honorificPrefix, honorificSuffix, id, image, jobTitle, keywords, lastLoginDate, name, organizationBriefs, profileURL, roleBriefs, siteBriefs, userAccountContactInformation}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public UserAccount userAccountByExternalReferenceCode(
@@ -1144,7 +985,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userAccount(userAccountId: ___){accountBriefs, actions, additionalName, alternateName, birthDate, currentPassword, customFields, dashboardURL, dateCreated, dateModified, emailAddress, externalReferenceCode, familyName, givenName, honorificPrefix, honorificSuffix, id, image, jobTitle, keywords, lastLoginDate, name, organizationBriefs, password, profileURL, roleBriefs, siteBriefs, userAccountContactInformation, userGroupBriefs}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userAccount(userAccountId: ___){accountBriefs, actions, additionalName, alternateName, birthDate, customFields, dashboardURL, dateCreated, dateModified, emailAddress, externalReferenceCode, familyName, givenName, honorificPrefix, honorificSuffix, id, image, jobTitle, keywords, lastLoginDate, name, organizationBriefs, profileURL, roleBriefs, siteBriefs, userAccountContactInformation}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Retrieves the user account.")
 	public UserAccount userAccount(
@@ -1156,81 +997,6 @@ public class Query {
 			this::_populateResourceContext,
 			userAccountResource -> userAccountResource.getUserAccount(
 				userAccountId));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userUserGroups(userAccountId: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField(description = "Retrieves the user's user groups.")
-	public UserGroupPage userUserGroups(
-			@GraphQLName("userAccountId") Long userAccountId)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> new UserGroupPage(
-				userGroupResource.getUserUserGroups(userAccountId)));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userGroups(filter: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public UserGroupPage userGroups(
-			@GraphQLName("search") String search,
-			@GraphQLName("filter") String filterString,
-			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page,
-			@GraphQLName("sort") String sortsString)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> new UserGroupPage(
-				userGroupResource.getUserGroupsPage(
-					search,
-					_filterBiFunction.apply(userGroupResource, filterString),
-					Pagination.of(page, pageSize),
-					_sortsBiFunction.apply(userGroupResource, sortsString))));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userGroupByExternalReferenceCode(externalReferenceCode: ___){actions, description, externalReferenceCode, id, name, usersCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public UserGroup userGroupByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource ->
-				userGroupResource.getUserGroupByExternalReferenceCode(
-					externalReferenceCode));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {userGroup(userGroupId: ___){actions, description, externalReferenceCode, id, name, usersCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public UserGroup userGroup(@GraphQLName("userGroupId") Long userGroupId)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_userGroupResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			userGroupResource -> userGroupResource.getUserGroup(userGroupId));
 	}
 
 	/**
@@ -1346,7 +1112,6 @@ public class Query {
 		@GraphQLField(description = "Gets the account's roles")
 		public AccountRolePage accountRoles(
 				@GraphQLName("keywords") String keywords,
-				@GraphQLName("filter") String filterString,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page,
 				@GraphQLName("sort") String sortsString)
@@ -1358,14 +1123,103 @@ public class Query {
 				accountRoleResource -> new AccountRolePage(
 					accountRoleResource.getAccountAccountRolesPage(
 						_account.getId(), keywords,
-						_filterBiFunction.apply(
-							accountRoleResource, filterString),
 						Pagination.of(page, pageSize),
 						_sortsBiFunction.apply(
 							accountRoleResource, sortsString))));
 		}
 
 		private Account _account;
+
+	}
+
+	@GraphQLTypeExtension(Site.class)
+	public class GetSiteUserAccountsPageTypeExtension {
+
+		public GetSiteUserAccountsPageTypeExtension(Site site) {
+			_site = site;
+		}
+
+		@GraphQLField(
+			description = "Retrieves the site members' user accounts. Results can be paginated, filtered, searched, and sorted."
+		)
+		public UserAccountPage userAccounts(
+				@GraphQLName("search") String search,
+				@GraphQLName("filter") String filterString,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page,
+				@GraphQLName("sort") String sortsString)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_userAccountResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				userAccountResource -> new UserAccountPage(
+					userAccountResource.getSiteUserAccountsPage(
+						_site.getId(), search,
+						_filterBiFunction.apply(
+							userAccountResource, filterString),
+						Pagination.of(page, pageSize),
+						_sortsBiFunction.apply(
+							userAccountResource, sortsString))));
+		}
+
+		private Site _site;
+
+	}
+
+	@GraphQLTypeExtension(Account.class)
+	public class
+		GetAccountUserAccountsByExternalReferenceCodePageTypeExtension {
+
+		public GetAccountUserAccountsByExternalReferenceCodePageTypeExtension(
+			Account account) {
+
+			_account = account;
+		}
+
+		@GraphQLField(description = "Gets the users assigned to an account")
+		public UserAccountPage userAccountsByExternalReferenceCode(
+				@GraphQLName("search") String search,
+				@GraphQLName("filter") String filterString,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page,
+				@GraphQLName("sort") String sortsString)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_userAccountResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				userAccountResource -> new UserAccountPage(
+					userAccountResource.
+						getAccountUserAccountsByExternalReferenceCodePage(
+							_account.getExternalReferenceCode(), search,
+							_filterBiFunction.apply(
+								userAccountResource, filterString),
+							Pagination.of(page, pageSize),
+							_sortsBiFunction.apply(
+								userAccountResource, sortsString))));
+		}
+
+		private Account _account;
+
+	}
+
+	@GraphQLTypeExtension(AccountRole.class)
+	public class GetRoleTypeExtension {
+
+		public GetRoleTypeExtension(AccountRole accountRole) {
+			_accountRole = accountRole;
+		}
+
+		@GraphQLField(description = "Retrieves the role.")
+		public Role role() throws Exception {
+			return _applyComponentServiceObjects(
+				_roleResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				roleResource -> roleResource.getRole(_accountRole.getRoleId()));
+		}
+
+		private AccountRole _accountRole;
 
 	}
 
@@ -1382,7 +1236,6 @@ public class Query {
 		@GraphQLField(description = "Gets the account's roles")
 		public AccountRolePage accountRolesByExternalReferenceCode(
 				@GraphQLName("keywords") String keywords,
-				@GraphQLName("filter") String filterString,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page,
 				@GraphQLName("sort") String sortsString)
@@ -1395,8 +1248,6 @@ public class Query {
 					accountRoleResource.
 						getAccountAccountRolesByExternalReferenceCodePage(
 							_account.getExternalReferenceCode(), keywords,
-							_filterBiFunction.apply(
-								accountRoleResource, filterString),
 							Pagination.of(page, pageSize),
 							_sortsBiFunction.apply(
 								accountRoleResource, sortsString))));
@@ -1406,13 +1257,13 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(Organization.class)
+	@GraphQLTypeExtension(UserAccount.class)
 	public class GetAccountByExternalReferenceCodeTypeExtension {
 
 		public GetAccountByExternalReferenceCodeTypeExtension(
-			Organization organization) {
+			UserAccount userAccount) {
 
-			_organization = organization;
+			_userAccount = userAccount;
 		}
 
 		@GraphQLField
@@ -1422,10 +1273,10 @@ public class Query {
 				Query.this::_populateResourceContext,
 				accountResource ->
 					accountResource.getAccountByExternalReferenceCode(
-						_organization.getExternalReferenceCode()));
+						_userAccount.getExternalReferenceCode()));
 		}
 
-		private Organization _organization;
+		private UserAccount _userAccount;
 
 	}
 
@@ -1461,6 +1312,63 @@ public class Query {
 		}
 
 		private Organization _organization;
+
+	}
+
+	@GraphQLTypeExtension(Account.class)
+	public class
+		GetAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPageTypeExtension {
+
+		public GetAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPageTypeExtension(
+			Account account) {
+
+			_account = account;
+		}
+
+		@GraphQLField(
+			description = "Gets a user's account roles by their email address from an account by external reference code"
+		)
+		public AccountRolePage
+				byExternalReferenceCodeUserAccountByEmailAddressAccountRoles(
+					@GraphQLName("emailAddress") String emailAddress)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_accountRoleResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				accountRoleResource -> new AccountRolePage(
+					accountRoleResource.
+						getAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPage(
+							_account.getExternalReferenceCode(),
+							emailAddress)));
+		}
+
+		private Account _account;
+
+	}
+
+	@GraphQLTypeExtension(Site.class)
+	public class GetSiteSegmentsPageTypeExtension {
+
+		public GetSiteSegmentsPageTypeExtension(Site site) {
+			_site = site;
+		}
+
+		@GraphQLField(description = "Gets a site's segments.")
+		public SegmentPage segments(
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_segmentResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				segmentResource -> new SegmentPage(
+					segmentResource.getSiteSegmentsPage(
+						_site.getId(), Pagination.of(page, pageSize))));
+		}
+
+		private Site _site;
 
 	}
 
@@ -1562,6 +1470,29 @@ public class Query {
 	}
 
 	@GraphQLTypeExtension(Organization.class)
+	public class GetOrganizationWebUrlsPageTypeExtension {
+
+		public GetOrganizationWebUrlsPageTypeExtension(
+			Organization organization) {
+
+			_organization = organization;
+		}
+
+		@GraphQLField(description = "Retrieves the organization's URLs.")
+		public WebUrlPage webUrls() throws Exception {
+			return _applyComponentServiceObjects(
+				_webUrlResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				webUrlResource -> new WebUrlPage(
+					webUrlResource.getOrganizationWebUrlsPage(
+						_organization.getId())));
+		}
+
+		private Organization _organization;
+
+	}
+
+	@GraphQLTypeExtension(Organization.class)
 	public class GetOrganizationPostalAddressesPageTypeExtension {
 
 		public GetOrganizationPostalAddressesPageTypeExtension(
@@ -1583,45 +1514,6 @@ public class Query {
 		}
 
 		private Organization _organization;
-
-	}
-
-	@GraphQLTypeExtension(Account.class)
-	public class
-		GetAccountByExternalReferenceCodeOrganizationsPageTypeExtension {
-
-		public GetAccountByExternalReferenceCodeOrganizationsPageTypeExtension(
-			Account account) {
-
-			_account = account;
-		}
-
-		@GraphQLField(
-			description = "Retrieves the account's organizations. Results can be paginated, filtered, searched, and sorted."
-		)
-		public OrganizationPage byExternalReferenceCodeOrganizations(
-				@GraphQLName("search") String search,
-				@GraphQLName("filter") String filterString,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page,
-				@GraphQLName("sort") String sortsString)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_organizationResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				organizationResource -> new OrganizationPage(
-					organizationResource.
-						getAccountByExternalReferenceCodeOrganizationsPage(
-							_account.getExternalReferenceCode(), search,
-							_filterBiFunction.apply(
-								organizationResource, filterString),
-							Pagination.of(page, pageSize),
-							_sortsBiFunction.apply(
-								organizationResource, sortsString))));
-		}
-
-		private Account _account;
 
 	}
 
@@ -1683,285 +1575,6 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(Organization.class)
-	public class GetOrganizationEmailAddressesPageTypeExtension {
-
-		public GetOrganizationEmailAddressesPageTypeExtension(
-			Organization organization) {
-
-			_organization = organization;
-		}
-
-		@GraphQLField(
-			description = "Retrieves the organization's email addresses."
-		)
-		public EmailAddressPage emailAddresses() throws Exception {
-			return _applyComponentServiceObjects(
-				_emailAddressResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				emailAddressResource -> new EmailAddressPage(
-					emailAddressResource.getOrganizationEmailAddressesPage(
-						_organization.getId())));
-		}
-
-		private Organization _organization;
-
-	}
-
-	@GraphQLTypeExtension(Account.class)
-	public class GetUserGroupByExternalReferenceCodeTypeExtension {
-
-		public GetUserGroupByExternalReferenceCodeTypeExtension(
-			Account account) {
-
-			_account = account;
-		}
-
-		@GraphQLField
-		public UserGroup userGroupByExternalReferenceCode() throws Exception {
-			return _applyComponentServiceObjects(
-				_userGroupResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				userGroupResource ->
-					userGroupResource.getUserGroupByExternalReferenceCode(
-						_account.getExternalReferenceCode()));
-		}
-
-		private Account _account;
-
-	}
-
-	@GraphQLTypeExtension(Site.class)
-	public class GetSiteUserAccountsPageTypeExtension {
-
-		public GetSiteUserAccountsPageTypeExtension(Site site) {
-			_site = site;
-		}
-
-		@GraphQLField(
-			description = "Retrieves the site members' user accounts. Results can be paginated, filtered, searched, and sorted."
-		)
-		public UserAccountPage userAccounts(
-				@GraphQLName("search") String search,
-				@GraphQLName("filter") String filterString,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page,
-				@GraphQLName("sort") String sortsString)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_userAccountResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				userAccountResource -> new UserAccountPage(
-					userAccountResource.getSiteUserAccountsPage(
-						_site.getId(), search,
-						_filterBiFunction.apply(
-							userAccountResource, filterString),
-						Pagination.of(page, pageSize),
-						_sortsBiFunction.apply(
-							userAccountResource, sortsString))));
-		}
-
-		private Site _site;
-
-	}
-
-	@GraphQLTypeExtension(Account.class)
-	public class
-		GetAccountUserAccountsByExternalReferenceCodePageTypeExtension {
-
-		public GetAccountUserAccountsByExternalReferenceCodePageTypeExtension(
-			Account account) {
-
-			_account = account;
-		}
-
-		@GraphQLField(description = "Gets the users assigned to an account")
-		public UserAccountPage userAccountsByExternalReferenceCode(
-				@GraphQLName("search") String search,
-				@GraphQLName("filter") String filterString,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page,
-				@GraphQLName("sort") String sortsString)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_userAccountResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				userAccountResource -> new UserAccountPage(
-					userAccountResource.
-						getAccountUserAccountsByExternalReferenceCodePage(
-							_account.getExternalReferenceCode(), search,
-							_filterBiFunction.apply(
-								userAccountResource, filterString),
-							Pagination.of(page, pageSize),
-							_sortsBiFunction.apply(
-								userAccountResource, sortsString))));
-		}
-
-		private Account _account;
-
-	}
-
-	@GraphQLTypeExtension(AccountRole.class)
-	public class GetRoleTypeExtension {
-
-		public GetRoleTypeExtension(AccountRole accountRole) {
-			_accountRole = accountRole;
-		}
-
-		@GraphQLField(description = "Retrieves the role.")
-		public Role role() throws Exception {
-			return _applyComponentServiceObjects(
-				_roleResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				roleResource -> roleResource.getRole(_accountRole.getRoleId()));
-		}
-
-		private AccountRole _accountRole;
-
-	}
-
-	@GraphQLTypeExtension(Account.class)
-	public class GetAccountOrganizationsPageTypeExtension {
-
-		public GetAccountOrganizationsPageTypeExtension(Account account) {
-			_account = account;
-		}
-
-		@GraphQLField(
-			description = "Retrieves the account's organizations. Results can be paginated, filtered, searched, and sorted."
-		)
-		public OrganizationPage organizations(
-				@GraphQLName("search") String search,
-				@GraphQLName("filter") String filterString,
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page,
-				@GraphQLName("sort") String sortsString)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_organizationResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				organizationResource -> new OrganizationPage(
-					organizationResource.getAccountOrganizationsPage(
-						_account.getId(), search,
-						_filterBiFunction.apply(
-							organizationResource, filterString),
-						Pagination.of(page, pageSize),
-						_sortsBiFunction.apply(
-							organizationResource, sortsString))));
-		}
-
-		private Account _account;
-
-	}
-
-	@GraphQLTypeExtension(Account.class)
-	public class
-		GetAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPageTypeExtension {
-
-		public GetAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPageTypeExtension(
-			Account account) {
-
-			_account = account;
-		}
-
-		@GraphQLField(
-			description = "Gets a user's account roles by their email address from an account by external reference code"
-		)
-		public AccountRolePage
-				byExternalReferenceCodeUserAccountByEmailAddressAccountRoles(
-					@GraphQLName("emailAddress") String emailAddress)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_accountRoleResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				accountRoleResource -> new AccountRolePage(
-					accountRoleResource.
-						getAccountByExternalReferenceCodeUserAccountByEmailAddressAccountRolesPage(
-							_account.getExternalReferenceCode(),
-							emailAddress)));
-		}
-
-		private Account _account;
-
-	}
-
-	@GraphQLTypeExtension(Site.class)
-	public class GetSiteSegmentsPageTypeExtension {
-
-		public GetSiteSegmentsPageTypeExtension(Site site) {
-			_site = site;
-		}
-
-		@GraphQLField(description = "Gets a site's segments.")
-		public SegmentPage segments(
-				@GraphQLName("pageSize") int pageSize,
-				@GraphQLName("page") int page)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_segmentResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				segmentResource -> new SegmentPage(
-					segmentResource.getSiteSegmentsPage(
-						_site.getId(), Pagination.of(page, pageSize))));
-		}
-
-		private Site _site;
-
-	}
-
-	@GraphQLTypeExtension(Organization.class)
-	public class GetOrganizationWebUrlsPageTypeExtension {
-
-		public GetOrganizationWebUrlsPageTypeExtension(
-			Organization organization) {
-
-			_organization = organization;
-		}
-
-		@GraphQLField(description = "Retrieves the organization's URLs.")
-		public WebUrlPage webUrls() throws Exception {
-			return _applyComponentServiceObjects(
-				_webUrlResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				webUrlResource -> new WebUrlPage(
-					webUrlResource.getOrganizationWebUrlsPage(
-						_organization.getId())));
-		}
-
-		private Organization _organization;
-
-	}
-
-	@GraphQLTypeExtension(UserAccount.class)
-	public class GetUserAccountEmailVerificationTicketTypeExtension {
-
-		public GetUserAccountEmailVerificationTicketTypeExtension(
-			UserAccount userAccount) {
-
-			_userAccount = userAccount;
-		}
-
-		@GraphQLField(
-			description = "Retrieves the user's email verification ticket."
-		)
-		public Ticket emailVerificationTicket() throws Exception {
-			return _applyComponentServiceObjects(
-				_ticketResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				ticketResource ->
-					ticketResource.getUserAccountEmailVerificationTicket(
-						_userAccount.getId()));
-		}
-
-		private UserAccount _userAccount;
-
-	}
-
 	@GraphQLTypeExtension(Subscription.class)
 	public class GetSiteTypeExtension {
 
@@ -2003,74 +1616,28 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(UserAccount.class)
-	public class GetUserAccountPasswordResetTicketTypeExtension {
+	@GraphQLTypeExtension(Organization.class)
+	public class GetOrganizationEmailAddressesPageTypeExtension {
 
-		public GetUserAccountPasswordResetTicketTypeExtension(
-			UserAccount userAccount) {
+		public GetOrganizationEmailAddressesPageTypeExtension(
+			Organization organization) {
 
-			_userAccount = userAccount;
+			_organization = organization;
 		}
 
 		@GraphQLField(
-			description = "Retrieves the user's password reset ticket."
+			description = "Retrieves the organization's email addresses."
 		)
-		public Ticket passwordResetTicket() throws Exception {
+		public EmailAddressPage emailAddresses() throws Exception {
 			return _applyComponentServiceObjects(
-				_ticketResourceComponentServiceObjects,
+				_emailAddressResourceComponentServiceObjects,
 				Query.this::_populateResourceContext,
-				ticketResource ->
-					ticketResource.getUserAccountPasswordResetTicket(
-						_userAccount.getId()));
+				emailAddressResource -> new EmailAddressPage(
+					emailAddressResource.getOrganizationEmailAddressesPage(
+						_organization.getId())));
 		}
 
-		private UserAccount _userAccount;
-
-	}
-
-	@GraphQLTypeExtension(Account.class)
-	public class GetAccountPostalAddressesPageTypeExtension {
-
-		public GetAccountPostalAddressesPageTypeExtension(Account account) {
-			_account = account;
-		}
-
-		@GraphQLField(description = "Retrieves the account's postal addresses.")
-		public PostalAddressPage postalAddresses() throws Exception {
-			return _applyComponentServiceObjects(
-				_postalAddressResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				postalAddressResource -> new PostalAddressPage(
-					postalAddressResource.getAccountPostalAddressesPage(
-						_account.getId())));
-		}
-
-		private Account _account;
-
-	}
-
-	@GraphQLTypeExtension(Account.class)
-	public class GetOrganizationByExternalReferenceCodeTypeExtension {
-
-		public GetOrganizationByExternalReferenceCodeTypeExtension(
-			Account account) {
-
-			_account = account;
-		}
-
-		@GraphQLField
-		public Organization organizationByExternalReferenceCode()
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_organizationResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				organizationResource ->
-					organizationResource.getOrganizationByExternalReferenceCode(
-						_account.getExternalReferenceCode()));
-		}
-
-		private Account _account;
+		private Organization _organization;
 
 	}
 
@@ -2099,26 +1666,6 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(UserAccount.class)
-	public class GetUserUserGroupsTypeExtension {
-
-		public GetUserUserGroupsTypeExtension(UserAccount userAccount) {
-			_userAccount = userAccount;
-		}
-
-		@GraphQLField(description = "Retrieves the user's user groups.")
-		public UserGroupPage userUserGroups() throws Exception {
-			return _applyComponentServiceObjects(
-				_userGroupResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				userGroupResource -> new UserGroupPage(
-					userGroupResource.getUserUserGroups(_userAccount.getId())));
-		}
-
-		private UserAccount _userAccount;
-
-	}
-
 	@GraphQLName("AccountPage")
 	public class AccountPage {
 
@@ -2133,7 +1680,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Account> items;
@@ -2166,7 +1713,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<AccountRole> items;
@@ -2199,7 +1746,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<EmailAddress> items;
@@ -2232,7 +1779,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Organization> items;
@@ -2265,7 +1812,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Phone> items;
@@ -2298,7 +1845,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<PostalAddress> items;
@@ -2331,7 +1878,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Role> items;
@@ -2364,7 +1911,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Segment> items;
@@ -2397,7 +1944,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<SegmentUser> items;
@@ -2430,7 +1977,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Site> items;
@@ -2463,43 +2010,10 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Subscription> items;
-
-		@GraphQLField
-		protected long lastPage;
-
-		@GraphQLField
-		protected long page;
-
-		@GraphQLField
-		protected long pageSize;
-
-		@GraphQLField
-		protected long totalCount;
-
-	}
-
-	@GraphQLName("TicketPage")
-	public class TicketPage {
-
-		public TicketPage(Page ticketPage) {
-			actions = ticketPage.getActions();
-
-			items = ticketPage.getItems();
-			lastPage = ticketPage.getLastPage();
-			page = ticketPage.getPage();
-			pageSize = ticketPage.getPageSize();
-			totalCount = ticketPage.getTotalCount();
-		}
-
-		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
-
-		@GraphQLField
-		protected java.util.Collection<Ticket> items;
 
 		@GraphQLField
 		protected long lastPage;
@@ -2529,43 +2043,10 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<UserAccount> items;
-
-		@GraphQLField
-		protected long lastPage;
-
-		@GraphQLField
-		protected long page;
-
-		@GraphQLField
-		protected long pageSize;
-
-		@GraphQLField
-		protected long totalCount;
-
-	}
-
-	@GraphQLName("UserGroupPage")
-	public class UserGroupPage {
-
-		public UserGroupPage(Page userGroupPage) {
-			actions = userGroupPage.getActions();
-
-			items = userGroupPage.getItems();
-			lastPage = userGroupPage.getLastPage();
-			page = userGroupPage.getPage();
-			pageSize = userGroupPage.getPageSize();
-			totalCount = userGroupPage.getTotalCount();
-		}
-
-		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
-
-		@GraphQLField
-		protected java.util.Collection<UserGroup> items;
 
 		@GraphQLField
 		protected long lastPage;
@@ -2595,7 +2076,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<WebUrl> items;
@@ -2833,19 +2314,6 @@ public class Query {
 		subscriptionResource.setRoleLocalService(_roleLocalService);
 	}
 
-	private void _populateResourceContext(TicketResource ticketResource)
-		throws Exception {
-
-		ticketResource.setContextAcceptLanguage(_acceptLanguage);
-		ticketResource.setContextCompany(_company);
-		ticketResource.setContextHttpServletRequest(_httpServletRequest);
-		ticketResource.setContextHttpServletResponse(_httpServletResponse);
-		ticketResource.setContextUriInfo(_uriInfo);
-		ticketResource.setContextUser(_user);
-		ticketResource.setGroupLocalService(_groupLocalService);
-		ticketResource.setRoleLocalService(_roleLocalService);
-	}
-
 	private void _populateResourceContext(
 			UserAccountResource userAccountResource)
 		throws Exception {
@@ -2858,19 +2326,6 @@ public class Query {
 		userAccountResource.setContextUser(_user);
 		userAccountResource.setGroupLocalService(_groupLocalService);
 		userAccountResource.setRoleLocalService(_roleLocalService);
-	}
-
-	private void _populateResourceContext(UserGroupResource userGroupResource)
-		throws Exception {
-
-		userGroupResource.setContextAcceptLanguage(_acceptLanguage);
-		userGroupResource.setContextCompany(_company);
-		userGroupResource.setContextHttpServletRequest(_httpServletRequest);
-		userGroupResource.setContextHttpServletResponse(_httpServletResponse);
-		userGroupResource.setContextUriInfo(_uriInfo);
-		userGroupResource.setContextUser(_user);
-		userGroupResource.setGroupLocalService(_groupLocalService);
-		userGroupResource.setRoleLocalService(_roleLocalService);
 	}
 
 	private void _populateResourceContext(WebUrlResource webUrlResource)
@@ -2908,12 +2363,8 @@ public class Query {
 		_siteResourceComponentServiceObjects;
 	private static ComponentServiceObjects<SubscriptionResource>
 		_subscriptionResourceComponentServiceObjects;
-	private static ComponentServiceObjects<TicketResource>
-		_ticketResourceComponentServiceObjects;
 	private static ComponentServiceObjects<UserAccountResource>
 		_userAccountResourceComponentServiceObjects;
-	private static ComponentServiceObjects<UserGroupResource>
-		_userGroupResourceComponentServiceObjects;
 	private static ComponentServiceObjects<WebUrlResource>
 		_webUrlResourceComponentServiceObjects;
 

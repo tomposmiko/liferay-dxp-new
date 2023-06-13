@@ -60,7 +60,7 @@ Group group = siteAdministrationPanelCategoryDisplayContext.getGroup();
 					}
 					catch (RemoteExportException | SystemException e) {
 						if (e instanceof SystemException) {
-							_log.error(e);
+							_log.error(e, e);
 						}
 					%>
 
@@ -94,7 +94,7 @@ Group group = siteAdministrationPanelCategoryDisplayContext.getGroup();
 				/>
 			</c:if>
 
-			<c:if test="<%= (group != null) && !group.isCompany() && !group.isDepot() %>">
+			<c:if test="<%= !group.isDepot() && !group.isCompany() %>">
 				<clay:button
 					cssClass="list-group-heading navigation-link panel-header-link"
 					disabled="<%= !siteAdministrationPanelCategoryDisplayContext.isShowLayoutsTree() %>"
@@ -114,7 +114,22 @@ Group group = siteAdministrationPanelCategoryDisplayContext.getGroup();
 	</c:if>
 </c:if>
 
-<c:if test="<%= (group != null) && !group.isCompany() && !group.isDepot() %>">
+<c:if test="<%= !group.isDepot() && !group.isCompany() %>">
+
+	<%
+	PortletURL portletURL = PortletURLBuilder.create(
+		PortletURLFactoryUtil.create(request, ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU, RenderRequest.RENDER_PHASE)
+	).setMVCPath(
+		"/portlet/pages_tree.jsp"
+	).setRedirect(
+		themeDisplay.getURLCurrent()
+	).setParameter(
+		"selPpid", portletDisplay.getId()
+	).setWindowState(
+		LiferayWindowState.EXCLUSIVE
+	).buildPortletURL();
+	%>
+
 	<aui:script sandbox="<%= true %>">
 		var pagesTreeToggle = document.getElementById(
 			'<portlet:namespace />pagesTreeSidenavToggleId'
@@ -127,9 +142,7 @@ Group group = siteAdministrationPanelCategoryDisplayContext.getGroup();
 				'com.liferay.product.navigation.product.menu.web_pagesTreeState',
 				'open'
 			).then(() => {
-				Liferay.Util.fetch(
-					'<%= siteAdministrationPanelCategoryDisplayContext.getPageTreeURL() %>'
-				)
+				Liferay.Util.fetch('<%= portletURL.toString() %>')
 					.then((response) => {
 						if (!response.ok) {
 							throw new Error(

@@ -20,7 +20,6 @@ import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowTaskTransition;
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowTaskTransitions;
 import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.TransitionUtil;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowTaskTransitionsResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
@@ -42,7 +41,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE,
 	service = WorkflowTaskTransitionsResource.class
 )
-@CTAware
 public class WorkflowTaskTransitionsResourceImpl
 	extends BaseWorkflowTaskTransitionsResourceImpl {
 
@@ -64,9 +62,11 @@ public class WorkflowTaskTransitionsResourceImpl
 							workflowTaskTransitions.add(
 								_createWorkflowTaskTransition(
 									_workflowTaskManager.getNextTransitionNames(
+										contextCompany.getCompanyId(),
 										contextUser.getUserId(),
 										workflowTaskId),
 									_workflowTaskManager.getWorkflowTask(
+										contextCompany.getCompanyId(),
 										workflowTaskId)));
 						}
 
@@ -87,7 +87,10 @@ public class WorkflowTaskTransitionsResourceImpl
 			transformToArray(
 				transitionNames,
 				transitionName -> TransitionUtil.toTransition(
-					contextAcceptLanguage.getPreferredLocale(), transitionName),
+					_language, transitionName,
+					ResourceBundleUtil.getModuleAndPortalResourceBundle(
+						contextAcceptLanguage.getPreferredLocale(),
+						WorkflowTaskTransitionsResourceImpl.class)),
 				Transition.class));
 		workflowTaskTransition.setWorkflowDefinitionVersion(
 			String.valueOf(workflowTask.getWorkflowDefinitionVersion()));

@@ -22,6 +22,7 @@ import com.liferay.commerce.price.list.service.CommercePriceListService;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceList;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListChannel;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.PriceListChannelDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v2_0.PriceListChannelUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListChannelResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -49,6 +49,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/price-list-channel.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {NestedFieldSupport.class, PriceListChannelResource.class}
@@ -224,11 +225,8 @@ public class PriceListChannelResourceImpl
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.PriceListChannelDTOConverter)"
-	)
-	private DTOConverter<CommercePriceListChannelRel, PriceListChannel>
-		_priceListChannelDTOConverter;
+	@Reference
+	private PriceListChannelDTOConverter _priceListChannelDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

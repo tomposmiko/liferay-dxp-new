@@ -122,7 +122,7 @@ public interface OrganizationLocalService
 	 * @param type the organization's type
 	 * @param regionId the primary key of the organization's region
 	 * @param countryId the primary key of the organization's country
-	 * @param statusListTypeId the organization's workflow status
+	 * @param statusId the organization's workflow status
 	 * @param comments the comments about the organization
 	 * @param site whether the organization is to be associated with a main
 	 site
@@ -133,8 +133,8 @@ public interface OrganizationLocalService
 	 */
 	public Organization addOrganization(
 			long userId, long parentOrganizationId, String name, String type,
-			long regionId, long countryId, long statusListTypeId,
-			String comments, boolean site, ServiceContext serviceContext)
+			long regionId, long countryId, long statusId, String comments,
+			boolean site, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -162,14 +162,6 @@ public interface OrganizationLocalService
 
 	public User addOrganizationUserByEmailAddress(
 			String emailAddress, long organizationId,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	public Organization addOrUpdateOrganization(
-			String externalReferenceCode, long userId,
-			long parentOrganizationId, String name, String type, long regionId,
-			long countryId, long statusListTypeId, String comments,
-			boolean hasLogo, byte[] logoBytes, boolean site,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -369,9 +361,24 @@ public interface OrganizationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Organization fetchOrganization(long companyId, String name);
 
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization, or <code>null</code> if a matching organization could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Organization fetchOrganizationByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
+		long companyId, String externalReferenceCode);
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchOrganizationByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Organization fetchOrganizationByReferenceCode(
+		long companyId, String externalReferenceCode);
 
 	/**
 	 * Returns the organization with the matching UUID and company.
@@ -451,9 +458,17 @@ public interface OrganizationLocalService
 	public Organization getOrganization(long companyId, String name)
 		throws PortalException;
 
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization
+	 * @throws PortalException if a matching organization could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Organization getOrganizationByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	/**
@@ -547,11 +562,6 @@ public interface OrganizationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Organization> getOrganizations(long companyId, String treePath);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Organization> getOrganizations(
-		long companyId, String name, int start, int end,
-		OrderByComparator<Organization> orderByComparator);
-
 	/**
 	 * Returns the organizations with the primary keys.
 	 *
@@ -620,9 +630,6 @@ public interface OrganizationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getOrganizationsCount(
 		long companyId, long parentOrganizationId, String name);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getOrganizationsCount(long companyId, String name);
 
 	/**
 	 * Returns the OSGi service identifier.
@@ -1290,9 +1297,6 @@ public interface OrganizationLocalService
 			String[] assetTagNames)
 		throws PortalException;
 
-	public Organization updateLogo(long organizationId, byte[] logoBytes)
-		throws PortalException;
-
 	/**
 	 * Updates the organization.
 	 *
@@ -1304,7 +1308,7 @@ public interface OrganizationLocalService
 	 * @param type the organization's type
 	 * @param regionId the primary key of the organization's region
 	 * @param countryId the primary key of the organization's country
-	 * @param statusListTypeId the organization's workflow status
+	 * @param statusId the organization's workflow status
 	 * @param comments the comments about the organization
 	 * @param hasLogo if the organization has a custom logo
 	 * @param logoBytes the new logo image data
@@ -1319,8 +1323,8 @@ public interface OrganizationLocalService
 	public Organization updateOrganization(
 			long companyId, long organizationId, long parentOrganizationId,
 			String name, String type, long regionId, long countryId,
-			long statusListTypeId, String comments, boolean hasLogo,
-			byte[] logoBytes, boolean site, ServiceContext serviceContext)
+			long statusId, String comments, boolean hasLogo, byte[] logoBytes,
+			boolean site, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**

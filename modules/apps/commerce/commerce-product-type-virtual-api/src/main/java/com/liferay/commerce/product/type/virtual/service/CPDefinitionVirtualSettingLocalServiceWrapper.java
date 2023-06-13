@@ -27,10 +27,6 @@ public class CPDefinitionVirtualSettingLocalServiceWrapper
 	implements CPDefinitionVirtualSettingLocalService,
 			   ServiceWrapper<CPDefinitionVirtualSettingLocalService> {
 
-	public CPDefinitionVirtualSettingLocalServiceWrapper() {
-		this(null);
-	}
-
 	public CPDefinitionVirtualSettingLocalServiceWrapper(
 		CPDefinitionVirtualSettingLocalService
 			cpDefinitionVirtualSettingLocalService) {

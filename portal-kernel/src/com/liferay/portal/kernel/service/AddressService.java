@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -38,7 +37,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @AccessControlled
-@CTAware
 @JSONWebService
 @ProviderType
 @Transactional(
@@ -55,7 +53,7 @@ public interface AddressService extends BaseService {
 	public Address addAddress(
 			String className, long classPK, String street1, String street2,
 			String street3, String city, String zip, long regionId,
-			long countryId, long listTypeId, boolean mailing, boolean primary,
+			long countryId, long typeId, boolean mailing, boolean primary,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -77,8 +75,8 @@ public interface AddressService extends BaseService {
 
 	public Address updateAddress(
 			long addressId, String street1, String street2, String street3,
-			String city, String zip, long regionId, long countryId,
-			long listTypeId, boolean mailing, boolean primary)
+			String city, String zip, long regionId, long countryId, long typeId,
+			boolean mailing, boolean primary)
 		throws PortalException;
 
 }

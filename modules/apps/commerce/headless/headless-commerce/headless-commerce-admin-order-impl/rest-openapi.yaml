@@ -36,6 +36,18 @@ components:
                     maximum: 2
                     minimum: 0
                     type: integer
+        AccountGroup:
+            properties:
+                id:
+                    example: 30130
+                    format: int64
+                    minimum: 0
+                    readOnly: true
+                    type: integer
+                name:
+                    example: AccountGroup Name
+                    type: string
+            type: object
         BillingAddress:
             properties:
                 city:
@@ -113,39 +125,6 @@ components:
                 type:
                     type: string
             type: object
-        CustomField:
-            # @review
-            description:
-                Represents the value of each custom field. Fields can contain different information types (e.g.,
-                geolocation, strings, etc.).
-            properties:
-                customValue:
-                    $ref: "#/components/schemas/CustomValue"
-                dataType:
-                    description:
-                        The field type (e.g., image, text, etc.).
-                    readOnly: true
-                    type: string
-                name:
-                    description:
-                        The field's internal name. This is valid for comparisons and unique in the structured content.
-                    type: string
-        CustomValue:
-            properties:
-                data:
-                    description:
-                        The field's content for simple types.
-                    type: object
-                data_i18n:
-                    additionalProperties:
-                        type: string
-                    type: object
-                geo:
-                    allOf:
-                        - $ref: "#/components/schemas/Geo"
-                    description:
-                        A point determined by latitude and longitude.
-            type: object
         Error:
             properties:
                 errorCode:
@@ -175,21 +154,6 @@ components:
                 - errorDescription
                 - message
                 - status
-            type: object
-        Geo:
-            description:
-                A point determined by latitude and longitude.
-            properties:
-                latitude:
-                    description:
-                        The latitude of a point in space.
-                    format: double
-                    type: number
-                longitude:
-                    description:
-                        The longitude of a point in space.
-                    format: double
-                    type: number
             type: object
         Order:
             properties:
@@ -239,28 +203,12 @@ components:
                     example: 2017-07-21
                     format: date
                     type: string
-                creatorEmailAddress:
-                    format: email
-                    type: string
                 currencyCode:
                     example: USD
                     type: string
                 customFields:
                     additionalProperties: true
                     type: object
-                deliveryTermDescription:
-                    example: Orders delivery terms description
-                    readOnly: true
-                    type: string
-                deliveryTermId:
-                    example: 30130
-                    format: int64
-                    minimum: 0
-                    type: integer
-                deliveryTermName:
-                    example: Orders delivery terms name
-                    readOnly: true
-                    type: string
                 externalReferenceCode:
                     example: AB-34098-789-N
                     type: string
@@ -312,19 +260,6 @@ components:
                 paymentStatusInfo:
                     $ref: "#/components/schemas/Status"
                     readOnly: true
-                paymentTermDescription:
-                    example: Orders payment terms description
-                    readOnly: true
-                    type: string
-                paymentTermId:
-                    example: 30130
-                    format: int64
-                    minimum: 0
-                    type: integer
-                paymentTermName:
-                    example: Orders payment terms name
-                    readOnly: true
-                    type: string
                 printedNote:
                     example: Order printed note
                     type: string
@@ -355,55 +290,52 @@ components:
                     minimum: 0
                     type: number
                 shippingDiscountAmount:
-                    format: bigdecimal
+                    format: double
                     type: number
                 shippingDiscountAmountFormatted:
                     type: string
-                shippingDiscountAmountValue:
-                    format: double
-                    type: number
                 shippingDiscountPercentageLevel1:
                     example: 20
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountPercentageLevel1WithTaxAmount:
                     example: 20
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountPercentageLevel2:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountPercentageLevel2WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountPercentageLevel3:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountPercentageLevel3WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountPercentageLevel4:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountPercentageLevel4WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 shippingDiscountWithTaxAmount:
-                    format: bigdecimal
+                    format: double
                     type: number
                 shippingDiscountWithTaxAmountFormatted:
                     type: string
@@ -433,52 +365,52 @@ components:
                     readOnly: true
                     type: number
                 subtotalDiscountAmount:
-                    format: bigdecimal
+                    format: double
                     type: number
                 subtotalDiscountAmountFormatted:
                     type: string
                 subtotalDiscountPercentageLevel1:
                     example: 20
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountPercentageLevel1WithTaxAmount:
                     example: 20
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountPercentageLevel2:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountPercentageLevel2WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountPercentageLevel3:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountPercentageLevel3WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountPercentageLevel4:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountPercentageLevel4WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 subtotalDiscountWithTaxAmount:
-                    format: bigdecimal
+                    format: double
                     type: number
                 subtotalDiscountWithTaxAmountFormatted:
                     type: string
@@ -518,68 +450,58 @@ components:
                     type: number
                 totalDiscountAmount:
                     example: 11
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountAmountFormatted:
                     type: string
-                totalDiscountAmountValue:
-                    example: 11
-                    format: double
-                    minimum: 0
-                    type: number
                 totalDiscountPercentageLevel1:
                     example: 20
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountPercentageLevel1WithTaxAmount:
                     example: 20
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountPercentageLevel2:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountPercentageLevel2WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountPercentageLevel3:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountPercentageLevel3WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountPercentageLevel4:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountPercentageLevel4WithTaxAmount:
                     example: 0
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountWithTaxAmount:
                     example: 11
-                    format: bigdecimal
+                    format: double
                     minimum: 0
                     type: number
                 totalDiscountWithTaxAmountFormatted:
                     type: string
-                totalDiscountWithTaxAmountValue:
-                    example: 11
-                    format: double
-                    minimum: 0
-                    type: number
                 totalFormatted:
                     type: string
                 totalWithTaxAmount:
@@ -604,18 +526,6 @@ components:
                 - channelId
                 - currencyCode
             type: object
-        OrderAccountGroup:
-            properties:
-                id:
-                    example: 30130
-                    format: int64
-                    minimum: 0
-                    readOnly: true
-                    type: integer
-                name:
-                    example: OrderAccountGroup Name
-                    type: string
-            type: object
         OrderItem:
             properties:
                 bookedQuantityId:
@@ -624,14 +534,8 @@ components:
                     minimum: 0
                     type: integer
                 customFields:
-                    items:
-                        $ref: "#/components/schemas/CustomField"
-                    type: array
-                decimalQuantity:
-                    example: 10.1
-                    format: bigdecimal
-                    minimum: 0
-                    type: number
+                    additionalProperties: true
+                    type: object
                 deliveryGroup:
                     example: separate package
                     type: string
@@ -640,10 +544,6 @@ components:
                     format: bigdecimal
                     minimum: 0
                     type: number
-                discountManuallyAdjusted:
-                    example: true
-                    readOnly: true
-                    type: boolean
                 discountPercentageLevel1:
                     example: 20
                     format: bigdecimal
@@ -702,9 +602,6 @@ components:
                     format: bigdecimal
                     minimum: 0
                     type: number
-                formattedQuantity:
-                    readOnly: true
-                    type: string
                 id:
                     example: 30130
                     format: int64
@@ -718,8 +615,6 @@ components:
                         hr_HR: Product Name HR
                         hu_HU: Product Name HU
                     type: object
-                options:
-                    type: string
                 orderExternalReferenceCode:
                     example: CAB-34098-789-N
                     type: string
@@ -728,10 +623,6 @@ components:
                     format: int64
                     minimum: 0
                     type: integer
-                priceManuallyAdjusted:
-                    example: true
-                    readOnly: true
-                    type: boolean
                 printedNote:
                     example: Order item printed note
                     type: string
@@ -749,13 +640,6 @@ components:
                     example: 2
                     format: int32
                     minimum: 0
-                    type: integer
-                replacedSku:
-                    example: "1234123124"
-                    readOnly: true
-                    type: string
-                replacedSkuId:
-                    format: int64
                     type: integer
                 requestedDeliveryDate:
                     example: 2017-07-21
@@ -787,9 +671,6 @@ components:
                 subscription:
                     example: true
                     type: boolean
-                unitOfMeasure:
-                    example: pc
-                    type: string
                 unitPrice:
                     example: 101
                     format: bigdecimal
@@ -800,11 +681,6 @@ components:
                     format: bigdecimal
                     minimum: 0
                     type: number
-                virtualItemURLs:
-                    items:
-                        type: string
-                    readOnly: true
-                    type: array
             type: object
         OrderNote:
             properties:
@@ -953,7 +829,7 @@ components:
         OrderRuleAccountGroup:
             properties:
                 accountGroup:
-                    $ref: "#/components/schemas/OrderAccountGroup"
+                    $ref: "#/components/schemas/AccountGroup"
                     readOnly: true
                 accountGroupExternalReferenceCode:
                     example: DAB-34098-789-N
@@ -1236,122 +1112,6 @@ components:
                     example: black
                     type: string
             type: object
-        Term:
-            properties:
-                actions:
-                    additionalProperties:
-                        additionalProperties:
-                            type: string
-                        type: object
-                    readOnly: true
-                    type: object
-                active:
-                    example: true
-                    type: boolean
-                createDate:
-                    example: 2017-07-21
-                    format: date
-                    type: string
-                description:
-                    additionalProperties:
-                        type: string
-                    example:
-                        en_US: Term Description US
-                        hr_HR: Term Description HR
-                        hu_HU: Term Description HU
-                    type: object
-                displayDate:
-                    example: "2017-07-21"
-                    format: date
-                    type: string
-                expirationDate:
-                    example: "2017-08-21"
-                    format: date
-                    type: string
-                externalReferenceCode:
-                    example: AB-34098-789-N
-                    type: string
-                id:
-                    example: 30130
-                    format: int64
-                    minimum: 0
-                    type: integer
-                label:
-                    additionalProperties:
-                        type: string
-                    example:
-                        en_US: Term Label US
-                        hr_HR: Term Label HR
-                        hu_HU: Term Label HU
-                    type: object
-                name:
-                    example: Laptops, Beverages
-                    type: string
-                neverExpire:
-                    example: true
-                    type: boolean
-                priority:
-                    example: 1.2
-                    format: double
-                    type: number
-                termOrderType:
-                    items:
-                        $ref: "#/components/schemas/TermOrderType"
-                    type: array
-                type:
-                    example: payment-terms
-                    type: string
-                typeLocalized:
-                    example: Payment Terms
-                    type: string
-                typeSettings:
-                    type: string
-                workflowStatusInfo:
-                    allOf:
-                        - $ref: "#/components/schemas/Status"
-                    readOnly: true
-            required:
-                - name
-                - type
-            type: object
-        TermOrderType:
-            properties:
-                actions:
-                    additionalProperties:
-                        additionalProperties:
-                            type: string
-                        type: object
-                    readOnly: true
-                    type: object
-                orderType:
-                    $ref: "#/components/schemas/OrderType"
-                    readOnly: true
-                orderTypeExternalReferenceCode:
-                    example: DAB-34098-789-N
-                    type: string
-                orderTypeId:
-                    example: 30324
-                    format: int64
-                    minimum: 0
-                    type: integer
-                termExternalReferenceCode:
-                    example: PAB-34098-789-N
-                    type: string
-                termId:
-                    example: 30130
-                    format: int64
-                    minimum: 0
-                    type: integer
-                termOrderTypeId:
-                    example: 30643
-                    format: int64
-                    minimum: 0
-                    readOnly: true
-                    type: integer
-            required:
-                - orderTypeId
-                - termId
-            type: object
     securitySchemes:
         BasicAuth:
             scheme: basic
@@ -1375,7 +1135,7 @@ info:
         name: Commerce Team
     description:
         "Liferay Commerce Admin Order API. A Java client JAR is available for use with the group ID 'com.liferay',
-        artifact ID 'com.liferay.headless.commerce.admin.order.client', and version '4.0.30'."
+        artifact ID 'com.liferay.headless.commerce.admin.order.client', and version '4.0.7'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -1439,10 +1199,10 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/OrderAccountGroup"
+                                $ref: "#/components/schemas/AccountGroup"
                         application/xml:
                             schema:
-                                $ref: "#/components/schemas/OrderAccountGroup"
+                                $ref: "#/components/schemas/AccountGroup"
                     description:
                         Successful operation
                 400:
@@ -1484,7 +1244,7 @@ paths:
                 - OAuth2:
                       - HeadlessCommerceAdminOrder.read
             summary: Gets account group associated to the pricing object.
-            tags: ["OrderAccountGroup"]
+            tags: ["AccountGroup"]
     /order-rule-accounts/{orderRuleAccountId}:
         delete:
             operationId: deleteOrderRuleAccount
@@ -3622,7 +3382,6 @@ paths:
                 - OAuth2:
                       - HeadlessCommerceAdminOrder.write
             summary: Creates or updates a Order rule Order Type.
-            tags: ["OrderRuleOrderType"]
     /order-type-channels/{orderTypeChannelId}:
         delete:
             operationId: deleteOrderTypeChannel
@@ -4565,86 +4324,6 @@ paths:
                       - CommerceOpenApiAdmin.write
             summary: Creates or updates a Order Type Channel.
             tags: ["OrderTypeChannel"]
-    /orderItems:
-        get:
-            parameters:
-                - in: query
-                  name: filter
-                  required: false
-                  schema:
-                      type: string
-                - in: query
-                  name: page
-                  required: false
-                  schema:
-                      type: integer
-                - in: query
-                  name: pageSize
-                  required: false
-                  schema:
-                      type: integer
-                - in: query
-                  name: search
-                  required: false
-                  schema:
-                      type: string
-                - in: query
-                  name: sort
-                  required: false
-                  schema:
-                      type: string
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/OrderItem"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/OrderItem"
-                                type: array
-                    description:
-                        Successful operation
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.read
-            summary: Gets a list of Order Items.
-            tags: ["OrderItem"]
     /orderItems/by-externalReferenceCode/{externalReferenceCode}:
         delete:
             operationId: deleteOrderItemByExternalReferenceCode
@@ -4772,78 +4451,6 @@ paths:
                 204:
                     description:
                         Updated
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - CommerceOpenApiAdmin.write
-            summary: Updates an Order Item by external reference code.
-            tags:
-                - OrderItem
-        put:
-            parameters:
-                - in: path
-                  name: externalReferenceCode
-                  required: true
-                  schema:
-                      description:
-                          The resource external reference code
-                      example: AB-34098-789-N
-                      minLength: 1
-                      type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/OrderItem"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/OrderItem"
-                required: true
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/OrderItem"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/OrderItem"
-                    description:
-                        Successful operation
                 400:
                     description:
                         Invalid input
@@ -5054,79 +4661,6 @@ paths:
                 - OAuth2:
                       - CommerceOpenApiAdmin.write
             summary: Updates an Order Item by ID.
-            tags:
-                - OrderItem
-        put:
-            parameters:
-                - in: path
-                  name: id
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/OrderItem"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/OrderItem"
-                required: true
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/OrderItem"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/OrderItem"
-                    description:
-                        Successful operation
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - CommerceOpenApiAdmin.write
-            summary: Update an Order Item by ID.
             tags:
                 - OrderItem
     /orderItems/{id}/shippingAddress:
@@ -7465,935 +6999,6 @@ paths:
             summary: Updates a shipping Address related to an Order.
             tags:
                 - ShippingAddress
-    /term-order-types/{termOrderTypeId}:
-        delete:
-            operationId: deleteTermOrderType
-            parameters:
-                - in: path
-                  explode: false
-                  name: termOrderTypeId
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-                  style: simple
-            responses:
-                204:
-                    content:
-                        application/json: {}
-                        application/xml: {}
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.write
-            summary: Deletes a Term Order Type by ID.
-            tags: ["TermOrderType"]
-    /term-order-types/{termOrderTypeId}/order-type:
-        get:
-            operationId: getTermOrderTypeOrderType
-            parameters:
-                - in: path
-                  name: termOrderTypeId
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/OrderType"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/OrderType"
-                    description:
-                        Successful operation
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.read
-            summary: Gets order type associated to the term.
-            tags: ["OrderType"]
-    /terms:
-        get:
-            operationId: getTermsPage
-            parameters:
-                - in: query
-                  name: filter
-                  required: false
-                  schema:
-                      type: string
-                - in: query
-                  name: page
-                  required: false
-                  schema:
-                      type: integer
-                - in: query
-                  name: pageSize
-                  required: false
-                  schema:
-                      type: integer
-                - in: query
-                  name: search
-                  required: false
-                  schema:
-                      type: string
-                - in: query
-                  name: sort
-                  required: false
-                  schema:
-                      type: string
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/Term"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/Term"
-                                type: array
-                    description:
-                        Successful operation
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.read
-            summary: Gets a list of Terms.
-            tags: ["Term"]
-        post:
-            operationId: postTerm
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/Term"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/Term"
-                required: true
-            responses:
-                201:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                    description:
-                        Created
-                202:
-                    description:
-                        Async
-                204:
-                    description:
-                        Updated
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.write
-            summary: Creates or updates a Term.
-            tags: ["Term"]
-    /terms/by-externalReferenceCode/{externalReferenceCode}:
-        delete:
-            operationId: deleteTermByExternalReferenceCode
-            parameters:
-                - in: path
-                  explode: false
-                  name: externalReferenceCode
-                  required: true
-                  schema:
-                      description:
-                          The resource external reference code
-                      example: AB-34098-789-N
-                      minLength: 1
-                      type: string
-                  style: simple
-            responses:
-                204:
-                    content:
-                        application/json: {}
-                        application/xml: {}
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.write
-            summary: Deletes a Term by external reference code.
-            tags: ["Term"]
-        get:
-            operationId: getTermByExternalReferenceCode
-            parameters:
-                - in: path
-                  explode: false
-                  name: externalReferenceCode
-                  required: true
-                  schema:
-                      description:
-                          The resource external reference code
-                      example: AB-34098-789-N
-                      minLength: 1
-                      type: string
-                  style: simple
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                    description:
-                        Successful operation
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.read
-            summary: Gets a Term by external reference code.
-            tags: ["Term"]
-        patch:
-            operationId: patchTermByExternalReferenceCode
-            parameters:
-                - in: path
-                  explode: false
-                  name: externalReferenceCode
-                  required: true
-                  schema:
-                      description:
-                          The resource external reference code
-                      example: AB-34098-789-N
-                      minLength: 1
-                      type: string
-                  style: simple
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/Term"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/Term"
-                required: true
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                    description:
-                        Succesfully update the Term
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.write
-            summary: Updates a Term by external reference code.
-            tags: ["Term"]
-    /terms/by-externalReferenceCode/{externalReferenceCode}/term-order-types:
-        get:
-            operationId: getTermByExternalReferenceCodeTermOrderTypesPage
-            parameters:
-                - in: path
-                  explode: false
-                  name: externalReferenceCode
-                  required: true
-                  schema:
-                      description:
-                          The resource external reference code
-                      example: AB-34098-789-N
-                      minLength: 1
-                      type: string
-                  style: simple
-                - in: query
-                  explode: true
-                  name: page
-                  required: false
-                  schema:
-                      type: integer
-                  style: form
-                - in: query
-                  explode: true
-                  name: pageSize
-                  required: false
-                  schema:
-                      type: integer
-                  style: form
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/TermOrderType"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/TermOrderType"
-                                type: array
-                    description:
-                        Successful operation
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.read
-            summary: Gets a list of Term Order Types.
-            tags: ["TermOrderType"]
-        post:
-            operationId: postTermByExternalReferenceCodeTermOrderType
-            parameters:
-                - in: path
-                  explode: false
-                  name: externalReferenceCode
-                  required: true
-                  schema:
-                      description:
-                          The resource external reference code
-                      example: AB-34098-789-N
-                      minLength: 1
-                      type: string
-                  style: simple
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/TermOrderType"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/TermOrderType"
-                required: true
-            responses:
-                201:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/TermOrderType"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/TermOrderType"
-                    description:
-                        Created
-                202:
-                    description:
-                        Async
-                204:
-                    description:
-                        Updated
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.write
-            summary: Creates or updates a Term Order Type.
-            tags: ["TermOrderType"]
-    /terms/{id}:
-        delete:
-            parameters:
-                - in: path
-                  name: id
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-            responses:
-                204:
-                    content:
-                        application/json: {}
-                        application/xml: {}
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - CommerceOpenApiAdmin.write
-            summary: Deletes an Term by ID.
-            tags:
-                - Term
-        get:
-            parameters:
-                - in: path
-                  name: id
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                    description:
-                        Successful operation
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - CommerceOpenApiAdmin.read
-            summary: Gets a Term by ID.
-            tags:
-                - Term
-        patch:
-            parameters:
-                - in: path
-                  name: id
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/Term"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/Term"
-                required: true
-            responses:
-                202:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Term"
-                    description:
-                        Succesfully update the Term
-                204:
-                    description:
-                        Updated
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - CommerceOpenApiAdmin.write
-            summary: Updates an Term by ID.
-            tags:
-                - Term
-    /terms/{id}/term-order-types:
-        get:
-            operationId: getTermIdTermOrderTypesPage
-            parameters:
-                - in: path
-                  explode: false
-                  name: id
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-                  style: simple
-                - in: query
-                  name: page
-                  required: false
-                  schema:
-                      type: integer
-                - in: query
-                  name: pageSize
-                  required: false
-                  schema:
-                      type: integer
-                - in: query
-                  name: search
-                  required: false
-                  schema:
-                      type: string
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/TermOrderType"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/TermOrderType"
-                                type: array
-                    description:
-                        Successful operation
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.read
-            summary: Gets a list of Term Order Types.
-            tags: ["TermOrderType"]
-        post:
-            operationId: postTermIdTermOrderType
-            parameters:
-                - in: path
-                  explode: false
-                  name: id
-                  required: true
-                  schema:
-                      description:
-                          The resource Id
-                      example: 30130
-                      format: int64
-                      minimum: 0
-                      type: integer
-                  style: simple
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/TermOrderType"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/TermOrderType"
-                required: true
-            responses:
-                201:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/TermOrderType"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/TermOrderType"
-                    description:
-                        Created
-                202:
-                    description:
-                        Async
-                204:
-                    description:
-                        Updated
-                400:
-                    description:
-                        Invalid input
-                401:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Authentication information is missing or invalid
-                404:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        The specified resource was not found
-                500:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/Error"
-                    description:
-                        Unexpected error
-            security:
-                - BasicAuth: []
-                - BearerAuth: []
-                - OAuth2:
-                      - HeadlessCommerceAdminOrder.write
-            summary: Creates or updates a Term Order Type.
-            tags: ["TermOrderType"]
 servers:
     - description:
           Liferay Commerce API server

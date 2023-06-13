@@ -22,8 +22,7 @@ public class ChatUpgradeProcess extends BaseUpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 		removePortletData(
-			new String[] {"com.liferay.chat.web"},
-			new String[] {"1_WAR_chatportlet"},
+			new String[] {"com.liferay.chat.web"}, null,
 			new String[] {"com_liferay_chat_web_portlet_ChatPortlet"});
 
 		removeServiceData(

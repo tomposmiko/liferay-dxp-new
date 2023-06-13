@@ -22,32 +22,32 @@
 AUI.add(
 	'liferay-list-view',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const isString = Lang.isString;
+		var isString = Lang.isString;
 
-		const CONTENT_BOX = 'contentBox';
+		var CONTENT_BOX = 'contentBox';
 
-		const CSS_DATA_CONTAINER = 'lfr-list-view-data-container';
+		var CSS_DATA_CONTAINER = 'lfr-list-view-data-container';
 
-		const NAME = 'listview';
+		var NAME = 'listview';
 
-		const STR_BOTTOM = 'bottom';
+		var STR_BOTTOM = 'bottom';
 
-		const STR_LEFT = 'left';
+		var STR_LEFT = 'left';
 
-		const STR_REGION = 'region';
+		var STR_REGION = 'region';
 
-		const STR_RIGHT = 'right';
+		var STR_RIGHT = 'right';
 
-		const STR_TOP = 'top';
+		var STR_TOP = 'top';
 
-		const TPL_DATA_CONTAINER =
+		var TPL_DATA_CONTAINER =
 			'<div class="' + CSS_DATA_CONTAINER + ' hide"></div>';
 
-		const UI_SRC = A.Widget.UI_SRC;
+		var UI_SRC = A.Widget.UI_SRC;
 
-		const ListView = A.Component.create({
+		var ListView = A.Component.create({
 			ATTRS: {
 				cssClass: {
 					value: 'lfr-list-view',
@@ -98,14 +98,14 @@ AUI.add(
 
 			prototype: {
 				_afterDataChange(event) {
-					const instance = this;
+					var instance = this;
 
-					const useTransition = instance.get('useTransition');
+					var useTransition = instance.get('useTransition');
 
-					const newData = event.newVal;
+					var newData = event.newVal;
 
 					if (useTransition) {
-						const dataContainer = instance._dataContainer;
+						var dataContainer = instance._dataContainer;
 
 						dataContainer.plug(A.Plugin.ParseContent);
 
@@ -114,7 +114,7 @@ AUI.add(
 						instance._moveContainer();
 					}
 					else {
-						const contentBox = instance.get(CONTENT_BOX);
+						var contentBox = instance.get(CONTENT_BOX);
 
 						contentBox.plug(A.Plugin.ParseContent);
 
@@ -123,9 +123,9 @@ AUI.add(
 				},
 
 				_defTransitionCompletedFn() {
-					const instance = this;
+					var instance = this;
 
-					const dataContainer = instance._dataContainer;
+					var dataContainer = instance._dataContainer;
 
 					instance
 						.get(CONTENT_BOX)
@@ -136,19 +136,19 @@ AUI.add(
 				},
 
 				_moveContainer() {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance.get(CONTENT_BOX);
+					var contentBox = instance.get(CONTENT_BOX);
 
-					const targetRegion = contentBox.get(STR_REGION);
+					var targetRegion = contentBox.get(STR_REGION);
 
 					instance._setDataContainerPosition(targetRegion);
 
-					const dataContainer = instance._dataContainer;
+					var dataContainer = instance._dataContainer;
 
 					dataContainer.show();
 
-					const transitionConfig = instance.get('transitionConfig');
+					var transitionConfig = instance.get('transitionConfig');
 
 					dataContainer.transition(
 						transitionConfig,
@@ -157,7 +157,7 @@ AUI.add(
 				},
 
 				_onItemChosen(event) {
-					const instance = this;
+					var instance = this;
 
 					event.preventDefault();
 
@@ -175,31 +175,31 @@ AUI.add(
 				},
 
 				_setDataContainerPosition(targetRegion) {
-					const instance = this;
+					var instance = this;
 
 					targetRegion =
 						targetRegion ||
 						instance.get(CONTENT_BOX).get(STR_REGION);
 
-					const direction = instance.get('direction');
+					var direction = instance.get('direction');
 
-					const dataContainer = instance._dataContainer;
+					var dataContainer = instance._dataContainer;
 
-					const styles = {
+					var styles = {
 						left: 0,
 						top: 0,
 					};
 
-					if (direction === STR_LEFT) {
+					if (direction == STR_LEFT) {
 						styles.left = targetRegion.width;
 					}
-					else if (direction === STR_RIGHT) {
+					else if (direction == STR_RIGHT) {
 						styles.left = -targetRegion.width;
 					}
-					else if (direction === STR_TOP) {
+					else if (direction == STR_TOP) {
 						styles.top = -targetRegion.height;
 					}
-					else if (direction === STR_BOTTOM) {
+					else if (direction == STR_BOTTOM) {
 						styles.top = targetRegion.height;
 					}
 
@@ -220,12 +220,12 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance.get(CONTENT_BOX);
+					var contentBox = instance.get(CONTENT_BOX);
 
-					const itemChosenEvent = instance.get('itemChosenEvent');
-					const itemSelector = instance.get('itemSelector');
+					var itemChosenEvent = instance.get('itemChosenEvent');
+					var itemSelector = instance.get('itemSelector');
 
 					instance._itemChosenHandle = contentBox.delegate(
 						itemChosenEvent,
@@ -242,7 +242,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._itemChosenHandle) {
 						instance._itemChosenHandle.detach();
@@ -254,7 +254,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._transitionCompleteProxy = A.fn(
 						instance.fire,
@@ -264,11 +264,11 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
-					const boundingBox = instance.get('boundingBox');
+					var boundingBox = instance.get('boundingBox');
 
-					const dataContainer = A.Node.create(TPL_DATA_CONTAINER);
+					var dataContainer = A.Node.create(TPL_DATA_CONTAINER);
 
 					boundingBox.append(dataContainer);
 

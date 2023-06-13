@@ -18,31 +18,27 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Carolina Barbosa
  */
+@RunWith(PowerMockRunner.class)
 public class CheckboxMultipleDDMFormFieldTemplateContextContributorTest {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
+	@Before
+	public void setUp() throws Exception {
 		_setUpJSONFactory();
 	}
 
@@ -82,12 +78,6 @@ public class CheckboxMultipleDDMFormFieldTemplateContextContributorTest {
 			parameters.get("predefinedValue"));
 	}
 
-	private static void _setUpJSONFactory() {
-		ReflectionTestUtil.setFieldValue(
-			_checkboxMultipleDDMFormFieldTemplateContextContributor,
-			"jsonFactory", new JSONFactoryImpl());
-	}
-
 	private DDMFormField _createDDMFormField() {
 		DDMFormField ddmFormField = new DDMFormField(
 			"field", "checkbox_multiple");
@@ -112,7 +102,17 @@ public class CheckboxMultipleDDMFormFieldTemplateContextContributorTest {
 		return ddmFormFieldRenderingContext;
 	}
 
-	private static final CheckboxMultipleDDMFormFieldTemplateContextContributor
+	private void _setUpJSONFactory() throws Exception {
+		PowerMockito.field(
+			CheckboxMultipleDDMFormFieldTemplateContextContributor.class,
+			"jsonFactory"
+		).set(
+			_checkboxMultipleDDMFormFieldTemplateContextContributor,
+			new JSONFactoryImpl()
+		);
+	}
+
+	private final CheckboxMultipleDDMFormFieldTemplateContextContributor
 		_checkboxMultipleDDMFormFieldTemplateContextContributor =
 			new CheckboxMultipleDDMFormFieldTemplateContextContributor();
 

@@ -120,10 +120,12 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 					ddmStructure.getStructureId(), fileVersionId);
 
 			if (dlFileEntryMetadata != null) {
-				ddmFormValuesMap.put(
-					ddmStructure.getStructureKey(),
+				DDMFormValues ddmFormValues =
 					StorageEngineManagerUtil.getDDMFormValues(
-						dlFileEntryMetadata.getDDMStorageId()));
+						dlFileEntryMetadata.getDDMStorageId());
+
+				ddmFormValuesMap.put(
+					ddmStructure.getStructureKey(), ddmFormValues);
 			}
 		}
 
@@ -145,7 +147,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 
@@ -170,7 +172,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 				_extraSettingsUnicodeProperties.load(super.getExtraSettings());
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 
@@ -198,12 +200,6 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 	public List<DLFileVersion> getFileVersions(int status) {
 		return DLFileVersionLocalServiceUtil.getFileVersions(
 			getFileEntryId(), status);
-	}
-
-	@Override
-	public List<DLFileVersion> getFileVersions(int status, int start, int end) {
-		return DLFileVersionLocalServiceUtil.getFileVersions(
-			getFileEntryId(), status, start, end);
 	}
 
 	@Override
@@ -301,7 +297,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return WorkflowConstants.STATUS_APPROVED;
@@ -322,7 +318,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 
@@ -348,7 +344,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(portalException);
+				_log.warn(portalException, portalException);
 			}
 		}
 

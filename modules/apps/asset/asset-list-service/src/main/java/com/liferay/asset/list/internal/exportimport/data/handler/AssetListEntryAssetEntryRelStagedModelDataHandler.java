@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class AssetListEntryAssetEntryRelStagedModelDataHandler
 	extends BaseStagedModelDataHandler<AssetListEntryAssetEntryRel> {
 

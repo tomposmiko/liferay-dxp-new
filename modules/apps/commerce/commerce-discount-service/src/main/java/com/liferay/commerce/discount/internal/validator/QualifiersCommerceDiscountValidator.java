@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.discount.internal.validator;
 
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.discount.constants.CommerceDiscountConstants;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.service.CommerceDiscountLocalService;
 import com.liferay.commerce.discount.validator.CommerceDiscountValidator;
 import com.liferay.commerce.discount.validator.CommerceDiscountValidatorResult;
-import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import org.osgi.service.component.annotations.Component;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.discount.validator.key=" + QualifiersCommerceDiscountValidator.KEY,
 		"commerce.discount.validator.priority:Integer=20",
@@ -52,10 +53,17 @@ public class QualifiersCommerceDiscountValidator
 			CommerceContext commerceContext, CommerceDiscount commerceDiscount)
 		throws PortalException {
 
+		long commerceAccountId = 0;
+
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+
+		if (commerceAccount != null) {
+			commerceAccountId = commerceAccount.getCommerceAccountId();
+		}
+
 		int validCommerceDiscountsCount =
 			_commerceDiscountLocalService.getValidCommerceDiscountsCount(
-				CommerceUtil.getCommerceAccountId(commerceContext),
-				commerceContext.getCommerceAccountGroupIds(),
+				commerceAccountId, commerceContext.getCommerceAccountGroupIds(),
 				commerceContext.getCommerceChannelId(),
 				commerceDiscount.getCommerceDiscountId());
 

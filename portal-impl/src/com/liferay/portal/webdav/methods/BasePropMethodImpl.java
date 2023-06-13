@@ -15,6 +15,7 @@
 package com.liferay.portal.webdav.methods;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.DocUtil;
 import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -22,7 +23,6 @@ import com.liferay.portal.kernel.model.WebDAVProps;
 import com.liferay.portal.kernel.service.WebDAVPropsLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.webdav.Resource;
 import com.liferay.portal.kernel.webdav.WebDAVRequest;
@@ -71,6 +71,21 @@ public abstract class BasePropMethodImpl implements Method {
 		return SAXReaderUtil.createQName(name, WebDAVUtil.DAV_URI);
 	}
 
+	protected void addResponse(String href, Element multistatusElement)
+		throws Exception {
+
+		Element responseElement = DocUtil.add(
+			multistatusElement, createQName("response"));
+
+		DocUtil.add(responseElement, createQName("href"), href);
+
+		Element propstatElement = DocUtil.add(
+			responseElement, createQName("propstat"));
+
+		DocUtil.add(
+			propstatElement, createQName("status"), "HTTP/1.1 404 Not Found");
+	}
+
 	protected void addResponse(
 			WebDAVRequest webDAVRequest, Resource resource, Set<QName> props,
 			Element multistatus)
@@ -82,26 +97,24 @@ public abstract class BasePropMethodImpl implements Method {
 
 		// Start building multistatus response
 
-		Element responseElement = multistatus.addElement(
-			createQName("response"));
+		Element responseElement = DocUtil.add(
+			multistatus, createQName("response"));
 
-		Element hrefElement = responseElement.addElement(createQName("href"));
-
-		hrefElement.addText(GetterUtil.getString(resource.getHREF()));
+		DocUtil.add(responseElement, createQName("href"), resource.getHREF());
 
 		// Build success and failure propstat elements
 
-		Element successStatElement = responseElement.addElement(
-			createQName("propstat"));
+		Element successStatElement = DocUtil.add(
+			responseElement, createQName("propstat"));
 
-		Element successPropElement = successStatElement.addElement(
-			createQName("prop"));
+		Element successPropElement = DocUtil.add(
+			successStatElement, createQName("prop"));
 
-		Element failureStatElement = responseElement.addElement(
-			createQName("propstat"));
+		Element failureStatElement = DocUtil.add(
+			responseElement, createQName("propstat"));
 
-		Element failurePropElement = failureStatElement.addElement(
-			createQName("prop"));
+		Element failurePropElement = DocUtil.add(
+			failureStatElement, createQName("prop"));
 
 		boolean hasSuccess = false;
 		boolean hasFailure = false;
@@ -122,11 +135,9 @@ public abstract class BasePropMethodImpl implements Method {
 		if (props.contains(CREATIONDATE)) {
 			props.remove(CREATIONDATE);
 
-			Element successCreationDateElement = successPropElement.addElement(
-				CREATIONDATE);
-
-			successCreationDateElement.addText(
-				GetterUtil.getString(resource.getCreateDateString()));
+			DocUtil.add(
+				successPropElement, CREATIONDATE,
+				resource.getCreateDateString());
 
 			hasSuccess = true;
 		}
@@ -134,11 +145,8 @@ public abstract class BasePropMethodImpl implements Method {
 		if (props.contains(DISPLAYNAME)) {
 			props.remove(DISPLAYNAME);
 
-			Element successDisplayNameElement = successPropElement.addElement(
-				DISPLAYNAME);
-
-			successDisplayNameElement.addText(
-				GetterUtil.getString(resource.getDisplayName()));
+			DocUtil.add(
+				successPropElement, DISPLAYNAME, resource.getDisplayName());
 
 			hasSuccess = true;
 		}
@@ -146,11 +154,9 @@ public abstract class BasePropMethodImpl implements Method {
 		if (props.contains(GETLASTMODIFIED)) {
 			props.remove(GETLASTMODIFIED);
 
-			Element successGetLastModifiedElement =
-				successPropElement.addElement(GETLASTMODIFIED);
-
-			successGetLastModifiedElement.addText(
-				GetterUtil.getString(resource.getModifiedDate()));
+			DocUtil.add(
+				successPropElement, GETLASTMODIFIED,
+				resource.getModifiedDate());
 
 			hasSuccess = true;
 		}
@@ -158,11 +164,8 @@ public abstract class BasePropMethodImpl implements Method {
 		if (props.contains(GETCONTENTTYPE)) {
 			props.remove(GETCONTENTTYPE);
 
-			Element successGetContentTypeElement =
-				successPropElement.addElement(GETCONTENTTYPE);
-
-			successGetContentTypeElement.addText(
-				GetterUtil.getString(resource.getContentType()));
+			DocUtil.add(
+				successPropElement, GETCONTENTTYPE, resource.getContentType());
 
 			hasSuccess = true;
 		}
@@ -171,16 +174,13 @@ public abstract class BasePropMethodImpl implements Method {
 			props.remove(GETCONTENTLENGTH);
 
 			if (!resource.isCollection()) {
-				Element successGetContentLengthElement =
-					successPropElement.addElement(GETCONTENTLENGTH);
-
-				successGetContentLengthElement.addText(
-					String.valueOf(resource.getSize()));
+				DocUtil.add(
+					successPropElement, GETCONTENTLENGTH, resource.getSize());
 
 				hasSuccess = true;
 			}
 			else {
-				failurePropElement.addElement(GETCONTENTLENGTH);
+				DocUtil.add(failurePropElement, GETCONTENTLENGTH);
 
 				hasFailure = true;
 			}
@@ -189,16 +189,15 @@ public abstract class BasePropMethodImpl implements Method {
 		if (props.contains(ISREADONLY)) {
 			props.remove(ISREADONLY);
 
-			Element successIsReadOnlyElement = successPropElement.addElement(
-				ISREADONLY);
-
 			Lock lock = resource.getLock();
 
 			if ((lock == null) || resource.isLocked()) {
-				successIsReadOnlyElement.addText(Boolean.FALSE.toString());
+				DocUtil.add(
+					successPropElement, ISREADONLY, Boolean.FALSE.toString());
 			}
 			else {
-				successIsReadOnlyElement.addText(Boolean.TRUE.toString());
+				DocUtil.add(
+					successPropElement, ISREADONLY, Boolean.TRUE.toString());
 			}
 
 			hasSuccess = true;
@@ -210,33 +209,29 @@ public abstract class BasePropMethodImpl implements Method {
 			Lock lock = resource.getLock();
 
 			if (lock != null) {
-				Element lockDiscoveryElement = successPropElement.addElement(
-					LOCKDISCOVERY);
+				Element lockDiscoveryElement = DocUtil.add(
+					successPropElement, LOCKDISCOVERY);
 
-				Element activeLockElement = lockDiscoveryElement.addElement(
-					createQName("activelock"));
+				Element activeLockElement = DocUtil.add(
+					lockDiscoveryElement, createQName("activelock"));
 
-				Element lockTypeElement = activeLockElement.addElement(
-					createQName("locktype"));
+				Element lockTypeElement = DocUtil.add(
+					activeLockElement, createQName("locktype"));
 
-				lockTypeElement.addElement(createQName("write"));
+				DocUtil.add(lockTypeElement, createQName("write"));
 
-				Element lockScopeElement = activeLockElement.addElement(
-					createQName("lockscope"));
+				Element lockScopeElement = DocUtil.add(
+					activeLockElement, createQName("lockscope"));
 
-				lockScopeElement.addElement(createQName("exclusive"));
+				DocUtil.add(lockScopeElement, createQName("exclusive"));
 
 				if (resource.isCollection()) {
-					Element depthElement = activeLockElement.addElement(
-						createQName("depth"));
-
-					depthElement.addText("Infinity");
+					DocUtil.add(
+						activeLockElement, createQName("depth"), "Infinity");
 				}
 
-				Element ownerElement = activeLockElement.addElement(
-					createQName("owner"));
-
-				ownerElement.addText(GetterUtil.getString(lock.getOwner()));
+				DocUtil.add(
+					activeLockElement, createQName("owner"), lock.getOwner());
 
 				long timeRemaining = 0;
 
@@ -253,32 +248,29 @@ public abstract class BasePropMethodImpl implements Method {
 					}
 				}
 
-				Element timeoutElement = activeLockElement.addElement(
-					createQName("timeout"));
-
 				if (timeRemaining > 0) {
-					timeoutElement.addText("Second-" + timeRemaining);
+					DocUtil.add(
+						activeLockElement, createQName("timeout"),
+						"Second-" + timeRemaining);
 				}
 				else {
-					timeoutElement.addText("Infinite");
+					DocUtil.add(
+						activeLockElement, createQName("timeout"), "Infinite");
 				}
 
 				if (webDAVRequest.getUserId() == lock.getUserId()) {
-					Element lockTokenElement = activeLockElement.addElement(
-						createQName("locktoken"));
+					Element lockTokenElement = DocUtil.add(
+						activeLockElement, createQName("locktoken"));
 
-					hrefElement = lockTokenElement.addElement(
-						createQName("href"));
-
-					hrefElement.addText(
-						GetterUtil.getString(
-							"opaquelocktoken:" + lock.getUuid()));
+					DocUtil.add(
+						lockTokenElement, createQName("href"),
+						"opaquelocktoken:" + lock.getUuid());
 				}
 
 				hasSuccess = true;
 			}
 			else {
-				failurePropElement.addElement(LOCKDISCOVERY);
+				DocUtil.add(failurePropElement, LOCKDISCOVERY);
 
 				hasFailure = true;
 			}
@@ -287,11 +279,11 @@ public abstract class BasePropMethodImpl implements Method {
 		if (props.contains(RESOURCETYPE)) {
 			props.remove(RESOURCETYPE);
 
-			Element resourceTypeElement = successPropElement.addElement(
-				RESOURCETYPE);
+			Element resourceTypeElement = DocUtil.add(
+				successPropElement, RESOURCETYPE);
 
 			if (resource.isCollection()) {
-				resourceTypeElement.addElement(createQName("collection"));
+				DocUtil.add(resourceTypeElement, createQName("collection"));
 			}
 
 			hasSuccess = true;
@@ -307,20 +299,17 @@ public abstract class BasePropMethodImpl implements Method {
 
 		for (QName qName : props) {
 			if (customProps.contains(qName)) {
-				Element qNameElement = successPropElement.addElement(qName);
-
 				Namespace namespace = qName.getNamespace();
 
-				qNameElement.addText(
-					GetterUtil.getString(
-						webDAVProps.getText(
-							qName.getName(), namespace.getPrefix(),
-							namespace.getURI())));
+				String text = webDAVProps.getText(
+					qName.getName(), namespace.getPrefix(), namespace.getURI());
+
+				DocUtil.add(successPropElement, qName, text);
 
 				hasSuccess = true;
 			}
 			else {
-				failurePropElement.addElement(qName);
+				DocUtil.add(failurePropElement, qName);
 
 				hasFailure = true;
 			}
@@ -329,20 +318,17 @@ public abstract class BasePropMethodImpl implements Method {
 		// Clean up propstats
 
 		if (hasSuccess) {
-			Element successStatusElement = successStatElement.addElement(
-				createQName("status"));
-
-			successStatusElement.addText("HTTP/1.1 200 OK");
+			DocUtil.add(
+				successStatElement, createQName("status"), "HTTP/1.1 200 OK");
 		}
 		else {
 			responseElement.remove(successStatElement);
 		}
 
 		if (!hasSuccess && hasFailure) {
-			Element failureStatusElement = failureStatElement.addElement(
-				createQName("status"));
-
-			failureStatusElement.addText("HTTP/1.1 404 Not Found");
+			DocUtil.add(
+				failureStatElement, createQName("status"),
+				"HTTP/1.1 404 Not Found");
 		}
 		else {
 			responseElement.remove(failureStatElement);
@@ -414,7 +400,7 @@ public abstract class BasePropMethodImpl implements Method {
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(exception);
+					_log.warn(exception, exception);
 				}
 			}
 

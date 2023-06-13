@@ -78,14 +78,10 @@ public class DispatchTriggerCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(41);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
-		sb.append(", uuid=");
-		sb.append(uuid);
-		sb.append(", externalReferenceCode=");
-		sb.append(externalReferenceCode);
 		sb.append(", dispatchTriggerId=");
 		sb.append(dispatchTriggerId);
 		sb.append(", companyId=");
@@ -118,8 +114,6 @@ public class DispatchTriggerCacheModel
 		sb.append(startDate);
 		sb.append(", system=");
 		sb.append(system);
-		sb.append(", timeZoneId=");
-		sb.append(timeZoneId);
 		sb.append("}");
 
 		return sb.toString();
@@ -130,21 +124,6 @@ public class DispatchTriggerCacheModel
 		DispatchTriggerImpl dispatchTriggerImpl = new DispatchTriggerImpl();
 
 		dispatchTriggerImpl.setMvccVersion(mvccVersion);
-
-		if (uuid == null) {
-			dispatchTriggerImpl.setUuid("");
-		}
-		else {
-			dispatchTriggerImpl.setUuid(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			dispatchTriggerImpl.setExternalReferenceCode("");
-		}
-		else {
-			dispatchTriggerImpl.setExternalReferenceCode(externalReferenceCode);
-		}
-
 		dispatchTriggerImpl.setDispatchTriggerId(dispatchTriggerId);
 		dispatchTriggerImpl.setCompanyId(companyId);
 		dispatchTriggerImpl.setUserId(userId);
@@ -221,13 +200,6 @@ public class DispatchTriggerCacheModel
 
 		dispatchTriggerImpl.setSystem(system);
 
-		if (timeZoneId == null) {
-			dispatchTriggerImpl.setTimeZoneId("");
-		}
-		else {
-			dispatchTriggerImpl.setTimeZoneId(timeZoneId);
-		}
-
 		dispatchTriggerImpl.resetOriginalValues();
 
 		return dispatchTriggerImpl;
@@ -238,8 +210,6 @@ public class DispatchTriggerCacheModel
 		throws ClassNotFoundException, IOException {
 
 		mvccVersion = objectInput.readLong();
-		uuid = objectInput.readUTF();
-		externalReferenceCode = objectInput.readUTF();
 
 		dispatchTriggerId = objectInput.readLong();
 
@@ -263,26 +233,11 @@ public class DispatchTriggerCacheModel
 		startDate = objectInput.readLong();
 
 		system = objectInput.readBoolean();
-		timeZoneId = objectInput.readUTF();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
-
-		if (uuid == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(uuid);
-		}
-
-		if (externalReferenceCode == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(externalReferenceCode);
-		}
 
 		objectOutput.writeLong(dispatchTriggerId);
 
@@ -338,18 +293,9 @@ public class DispatchTriggerCacheModel
 		objectOutput.writeLong(startDate);
 
 		objectOutput.writeBoolean(system);
-
-		if (timeZoneId == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(timeZoneId);
-		}
 	}
 
 	public long mvccVersion;
-	public String uuid;
-	public String externalReferenceCode;
 	public long dispatchTriggerId;
 	public long companyId;
 	public long userId;
@@ -366,6 +312,5 @@ public class DispatchTriggerCacheModel
 	public boolean overlapAllowed;
 	public long startDate;
 	public boolean system;
-	public String timeZoneId;
 
 }

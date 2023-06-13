@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.organizations.internal.configuration.OrganizationTypeConfiguration",
-	service = OrganizationTypeConfigurationWrapper.class
+	immediate = true, service = OrganizationTypeConfigurationWrapper.class
 )
 public class OrganizationTypeConfigurationWrapper {
 

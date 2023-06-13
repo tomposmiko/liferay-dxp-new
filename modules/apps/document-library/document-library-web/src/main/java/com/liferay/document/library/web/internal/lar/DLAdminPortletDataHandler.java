@@ -14,7 +14,6 @@
 
 package com.liferay.document.library.web.internal.lar;
 
-import com.liferay.data.engine.model.DEDataDefinitionFieldLink;
 import com.liferay.document.library.constants.DLPortletDataHandlerConstants;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFileEntry;
@@ -34,14 +33,12 @@ import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
-import com.liferay.exportimport.kernel.lar.PortletDataHandlerChoice;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryRegistryUtil;
-import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -141,17 +138,7 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 				NAMESPACE, "documents", true, false,
 				new PortletDataHandlerControl[] {
 					new PortletDataHandlerBoolean(
-						NAMESPACE, "previews-and-thumbnails"),
-					new PortletDataHandlerBoolean(
-						getNamespace(), "referenced-content", true, false,
-						new PortletDataHandlerControl[] {
-							new PortletDataHandlerChoice(
-								getNamespace(), "referenced-content-behavior",
-								0,
-								new String[] {
-									"include-always", "include-if-modified"
-								})
-						})
+						NAMESPACE, "previews-and-thumbnails")
 				},
 				DLFileEntryConstants.getClassName()),
 			new PortletDataHandlerBoolean(
@@ -181,8 +168,7 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 			return portletPreferences;
 		}
 
-		_dlAppLocalService.deleteAllRepositories(
-			portletDataContext.getScopeGroupId());
+		_dlAppLocalService.deleteAll(portletDataContext.getScopeGroupId());
 		_dlFileEntryTypeLocalService.deleteFileEntryTypes(
 			portletDataContext.getScopeGroupId());
 
@@ -199,9 +185,7 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 		portletPreferences.setValue("fileEntryColumns", StringPool.BLANK);
 		portletPreferences.setValue("folderColumns", StringPool.BLANK);
 		portletPreferences.setValue("foldersPerPage", StringPool.BLANK);
-		portletPreferences.setValue("repositoryId", StringPool.BLANK);
 		portletPreferences.setValue("rootFolderId", StringPool.BLANK);
-		portletPreferences.setValue("selectedRepositoryId", StringPool.BLANK);
 		portletPreferences.setValue("showFoldersSearch", StringPool.BLANK);
 		portletPreferences.setValue("showSubfolders", StringPool.BLANK);
 
@@ -374,28 +358,6 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 				StagedModelDataHandlerUtil.importStagedModel(
 					portletDataContext, ddmStructureElement);
 			}
-
-			for (Element ddmStructureElement : ddmStructureElements) {
-				List<Element> deDataDefinitionFieldLinkElements =
-					portletDataContext.getReferenceDataElements(
-						ddmStructureElement, DEDataDefinitionFieldLink.class,
-						null);
-
-				for (Element deDataDefinitionFieldLinkElement :
-						deDataDefinitionFieldLinkElements) {
-
-					String path =
-						deDataDefinitionFieldLinkElement.attributeValue("path");
-
-					DEDataDefinitionFieldLink deDataDefinitionFieldLink =
-						(DEDataDefinitionFieldLink)
-							portletDataContext.getZipEntryAsObject(
-								deDataDefinitionFieldLinkElement, path);
-
-					StagedModelDataHandlerUtil.importStagedModel(
-						portletDataContext, deDataDefinitionFieldLink);
-				}
-			}
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "repositories")) {
@@ -422,18 +384,6 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 				StagedModelDataHandlerUtil.importStagedModel(
 					portletDataContext, fileShortcutElement);
 			}
-		}
-
-		Element friendlyURLEntriesElement =
-			portletDataContext.getImportDataGroupElement(
-				FriendlyURLEntry.class);
-
-		List<Element> friendlyURLEntryElements =
-			friendlyURLEntriesElement.elements();
-
-		for (Element friendlyURLEntryElement : friendlyURLEntryElements) {
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, friendlyURLEntryElement);
 		}
 
 		return portletPreferences;

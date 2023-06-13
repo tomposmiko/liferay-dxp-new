@@ -27,10 +27,6 @@ import com.liferay.segments.model.SegmentsEntry;
 public class SegmentsEntryServiceWrapper
 	implements SegmentsEntryService, ServiceWrapper<SegmentsEntryService> {
 
-	public SegmentsEntryServiceWrapper() {
-		this(null);
-	}
-
 	public SegmentsEntryServiceWrapper(
 		SegmentsEntryService segmentsEntryService) {
 
@@ -122,21 +118,6 @@ public class SegmentsEntryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<SegmentsEntry> getSegmentsEntries(
-		long companyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator<SegmentsEntry>
-			orderByComparator) {
-
-		return _segmentsEntryService.getSegmentsEntries(
-			companyId, start, end, orderByComparator);
-	}
-
-	@Override
-	public int getSegmentsEntriesCount(long companyId) {
-		return _segmentsEntryService.getSegmentsEntriesCount(companyId);
-	}
-
-	@Override
 	public int getSegmentsEntriesCount(
 		long groupId, boolean includeAncestorSegmentsEntries) {
 
@@ -162,17 +143,6 @@ public class SegmentsEntryServiceWrapper
 		return _segmentsEntryService.searchSegmentsEntries(
 			companyId, groupId, keywords, includeAncestorSegmentsEntries, start,
 			end, sort);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.search.BaseModelSearchResult<SegmentsEntry>
-			searchSegmentsEntries(
-				long companyId, String keywords, int start, int end,
-				com.liferay.portal.kernel.search.Sort sort)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _segmentsEntryService.searchSegmentsEntries(
-			companyId, keywords, start, end, sort);
 	}
 
 	@Override

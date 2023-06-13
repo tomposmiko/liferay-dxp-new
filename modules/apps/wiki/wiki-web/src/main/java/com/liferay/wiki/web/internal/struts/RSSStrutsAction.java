@@ -29,7 +29,7 @@ import com.liferay.rss.util.RSSUtil;
 import com.liferay.wiki.configuration.WikiGroupServiceOverriddenConfiguration;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.service.WikiPageService;
-import com.liferay.wiki.web.internal.display.context.helper.WikiRequestHelper;
+import com.liferay.wiki.web.internal.display.context.util.WikiRequestHelper;
 import com.liferay.wiki.web.internal.util.WikiUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +50,7 @@ public class RSSStrutsAction implements StrutsAction {
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		if (!_isRSSFeedsEnabled(httpServletRequest)) {
+		if (!isRSSFeedsEnabled(httpServletRequest)) {
 			_portal.sendRSSFeedsDisabledError(
 				httpServletRequest, httpServletResponse);
 
@@ -60,7 +60,7 @@ public class RSSStrutsAction implements StrutsAction {
 		try {
 			ServletResponseUtil.sendFile(
 				httpServletRequest, httpServletResponse, null,
-				_getRSS(httpServletRequest), ContentTypes.TEXT_XML_UTF8);
+				getRSS(httpServletRequest), ContentTypes.TEXT_XML_UTF8);
 
 			return null;
 		}
@@ -72,7 +72,7 @@ public class RSSStrutsAction implements StrutsAction {
 		}
 	}
 
-	private byte[] _getRSS(HttpServletRequest httpServletRequest)
+	protected byte[] getRSS(HttpServletRequest httpServletRequest)
 		throws Exception {
 
 		String rss = StringPool.BLANK;
@@ -96,10 +96,12 @@ public class RSSStrutsAction implements StrutsAction {
 			httpServletRequest, "version", RSSUtil.VERSION_DEFAULT);
 		String displayStyle = ParamUtil.getString(
 			httpServletRequest, "displayStyle", RSSUtil.DISPLAY_STYLE_DEFAULT);
+
+		String layoutFullURL = _portal.getLayoutFullURL(
+			themeDisplay.getScopeGroupId(), WikiPortletKeys.WIKI);
+
 		String feedURL = StringBundler.concat(
-			_portal.getLayoutFullURL(
-				themeDisplay.getScopeGroupId(), WikiPortletKeys.WIKI),
-			Portal.FRIENDLY_URL_SEPARATOR, "wiki/", nodeId);
+			layoutFullURL, Portal.FRIENDLY_URL_SEPARATOR, "wiki/", nodeId);
 
 		String entryURL = feedURL + StringPool.SLASH + title;
 
@@ -120,7 +122,7 @@ public class RSSStrutsAction implements StrutsAction {
 		return rss.getBytes(StringPool.UTF8);
 	}
 
-	private boolean _isRSSFeedsEnabled(HttpServletRequest httpServletRequest)
+	protected boolean isRSSFeedsEnabled(HttpServletRequest httpServletRequest)
 		throws Exception {
 
 		WikiRequestHelper wikiRequestHelper = new WikiRequestHelper(
@@ -133,10 +135,14 @@ public class RSSStrutsAction implements StrutsAction {
 		return wikiGroupServiceOverriddenConfiguration.enableRss();
 	}
 
+	@Reference(unbind = "-")
+	protected void setWikiPageService(WikiPageService wikiPageService) {
+		_wikiPageService = wikiPageService;
+	}
+
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private WikiPageService _wikiPageService;
 
 }

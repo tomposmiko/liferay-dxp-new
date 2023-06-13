@@ -19,9 +19,12 @@ import com.liferay.commerce.product.item.selector.web.internal.search.CommerceCh
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelRelService;
 import com.liferay.commerce.product.service.CommerceChannelService;
+import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ParamUtil;
+
+import java.util.List;
 
 import javax.portlet.PortletURL;
 
@@ -70,8 +73,8 @@ public class CommerceChannelItemSelectorViewDisplayContext
 
 	@Override
 	public PortletURL getPortletURL() {
-		_portletURL.setParameter("className", _getClassName());
-		_portletURL.setParameter("classPK", String.valueOf(_getClassPK()));
+		_portletURL.setParameter("className", getClassName());
+		_portletURL.setParameter("classPK", String.valueOf(getClassPK()));
 
 		return _portletURL;
 	}
@@ -86,35 +89,43 @@ public class CommerceChannelItemSelectorViewDisplayContext
 
 		_searchContainer = new SearchContainer<>(
 			cpRequestHelper.getLiferayPortletRequest(), getPortletURL(), null,
-			"there-are-no-channels");
+			null);
+
+		_searchContainer.setEmptyResultsMessage("there-are-no-channels");
 
 		_searchContainer.setOrderByCol(getOrderByCol());
 		_searchContainer.setOrderByType(getOrderByType());
-		_searchContainer.setResultsAndTotal(
-			() -> _commerceChannelService.search(
-				cpRequestHelper.getCompanyId(), getKeywords(),
-				_searchContainer.getStart(), _searchContainer.getEnd(), null),
-			_commerceChannelService.searchCommerceChannelsCount(
-				cpRequestHelper.getCompanyId(), getKeywords()));
-		_searchContainer.setRowChecker(
-			new CommerceChannelItemSelectorChecker(
-				cpRequestHelper.getRenderResponse(),
-				_getCheckedCommerceChannelIds()));
+
+		RowChecker rowChecker = new CommerceChannelItemSelectorChecker(
+			cpRequestHelper.getRenderResponse(),
+			getCheckedCommerceChannelIds());
+
+		_searchContainer.setRowChecker(rowChecker);
+
+		int total = _commerceChannelService.searchCommerceChannelsCount(
+			cpRequestHelper.getCompanyId(), getKeywords());
+
+		List<CommerceChannel> results = _commerceChannelService.search(
+			cpRequestHelper.getCompanyId(), getKeywords(),
+			_searchContainer.getStart(), _searchContainer.getEnd(), null);
+
+		_searchContainer.setTotal(total);
+		_searchContainer.setResults(results);
 
 		return _searchContainer;
 	}
 
-	private long[] _getCheckedCommerceChannelIds() {
+	protected long[] getCheckedCommerceChannelIds() {
 		return ParamUtil.getLongValues(
 			cpRequestHelper.getRenderRequest(), "checkedCommerceChannelIds");
 	}
 
-	private String _getClassName() {
+	protected String getClassName() {
 		return ParamUtil.getString(
 			cpRequestHelper.getRenderRequest(), "className");
 	}
 
-	private long _getClassPK() {
+	protected long getClassPK() {
 		return ParamUtil.getLong(cpRequestHelper.getRenderRequest(), "classPK");
 	}
 

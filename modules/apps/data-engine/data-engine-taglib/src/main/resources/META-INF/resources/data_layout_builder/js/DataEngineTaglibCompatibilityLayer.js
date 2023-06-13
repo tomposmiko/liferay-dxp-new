@@ -12,14 +12,7 @@
  * details.
  */
 
-import {State} from '@liferay/frontend-js-state-web';
-import {
-	EVENT_TYPES,
-	useConfig,
-	useForm,
-	useFormState,
-} from 'data-engine-js-components-web';
-import {activeLanguageIdsAtom} from 'frontend-js-components-web';
+import {useConfig, useForm, useFormState} from 'data-engine-js-components-web';
 import {useEffect, useRef} from 'react';
 
 const SYMBOL_INTERNAL = Symbol('data.engine.internal');
@@ -48,7 +41,7 @@ class DataEngineCompatibilityLayer {
  * application to be accessible via Liferay.componentReady, this implementation
  * is only for the use case of modules that use the data engine via taglib
  */
-export function DataEngineTaglibCompatibilityLayer() {
+export const DataEngineTaglibCompatibilityLayer = () => {
 	const {dataLayoutBuilderId} = useConfig();
 	const dispatch = useForm();
 
@@ -82,19 +75,5 @@ export function DataEngineTaglibCompatibilityLayer() {
 		};
 	}, [dataEngineCompatibilityLayerRef, dataLayoutBuilderId]);
 
-	useEffect(() => {
-		const {dispose} = State.subscribe(
-			activeLanguageIdsAtom,
-			(activeLanguageIds) => {
-				dispatch({
-					payload: {activeLanguageIds},
-					type: EVENT_TYPES.LANGUAGE.UPDATE,
-				});
-			}
-		);
-
-		return dispose;
-	}, [dispatch]);
-
 	return null;
-}
+};

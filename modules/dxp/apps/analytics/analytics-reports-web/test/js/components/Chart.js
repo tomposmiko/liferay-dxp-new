@@ -10,7 +10,7 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {render, waitFor} from '@testing-library/react';
+import {cleanup, render, wait} from '@testing-library/react';
 import React from 'react';
 
 import Chart from '../../../src/main/resources/META-INF/resources/js/components/Chart';
@@ -145,16 +145,17 @@ const mockTimeSpanOptions = [
 describe('Chart', () => {
 	afterEach(() => {
 		jest.clearAllMocks();
+		cleanup();
 	});
 
 	it('displays total views and date range title for default time span', async () => {
 		const testProps = {
-			pagePublishDate: 'Thu Aug 10 08:17:57 GMT 2019',
-			timeRange: {endDate: '2020-02-02', startDate: '2020-01-27'},
+			pagePublishDate: 'Thu Aug 10 08:17:57 GMT 2020',
+			timeRange: {endDate: '2020-01-27', startDate: '2020-02-02'},
 			timeSpanKey: 'last-7-days',
 		};
 
-		const {getByText, queryByText} = render(
+		const {getByText} = render(
 			<StoreContextProvider value={{languageTag: mockLanguageTag}}>
 				<ChartStateContextProvider
 					publishDate={testProps.pagePublishDate}
@@ -170,25 +171,23 @@ describe('Chart', () => {
 			</StoreContextProvider>
 		);
 
-		await waitFor(() =>
+		await wait(() =>
 			expect(mockViewsDataProvider).toHaveBeenCalledTimes(1)
 		);
 
 		expect(getByText('225')).toBeInTheDocument();
 
-		// TimeSpan selector is now in Main component, not in Chart
-
-		expect(queryByText('Jan 27 - Feb 2, 2020')).not.toBeInTheDocument();
+		expect(getByText('Jan 27 - Feb 2, 2020')).toBeInTheDocument();
 	});
 
 	it('displays total views and reads and date range title for default time span', async () => {
 		const testProps = {
-			pagePublishDate: 'Thu Aug 10 08:17:57 GMT 2019',
-			timeRange: {endDate: '2020-02-02', startDate: '2020-01-27'},
+			pagePublishDate: 'Thu Aug 10 08:17:57 GMT 2020',
+			timeRange: {endDate: '2020-01-27', startDate: '2020-02-02'},
 			timeSpanKey: 'last-7-days',
 		};
 
-		const {getByText, queryByText} = render(
+		const {getByText} = render(
 			<StoreContextProvider value={{languageTag: mockLanguageTag}}>
 				<ChartStateContextProvider
 					publishDate={testProps.pagePublishDate}
@@ -207,7 +206,7 @@ describe('Chart', () => {
 			</StoreContextProvider>
 		);
 
-		await waitFor(() => {
+		await wait(() => {
 			expect(mockViewsDataProvider).toHaveBeenCalledTimes(1);
 			expect(mockReadsDataProvider).toHaveBeenCalledTimes(1);
 		});
@@ -215,8 +214,6 @@ describe('Chart', () => {
 		expect(getByText('225')).toBeInTheDocument();
 		expect(getByText('226')).toBeInTheDocument();
 
-		// TimeSpan selector is now in Main component, not in Chart
-
-		expect(queryByText('Jan 27 - Feb 2, 2020')).not.toBeInTheDocument();
+		expect(getByText('Jan 27 - Feb 2, 2020')).toBeInTheDocument();
 	});
 });

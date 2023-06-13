@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -308,144 +307,6 @@ public class Plan implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Policy[] policies;
 
-	@Schema
-	public Integer getSize() {
-		return size;
-	}
-
-	public void setSize(Integer size) {
-		this.size = size;
-	}
-
-	@JsonIgnore
-	public void setSize(UnsafeSupplier<Integer, Exception> sizeUnsafeSupplier) {
-		try {
-			size = sizeUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer size;
-
-	@Schema
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	@JsonIgnore
-	public void setStatus(
-		UnsafeSupplier<Integer, Exception> statusUnsafeSupplier) {
-
-		try {
-			status = statusUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer status;
-
-	@Schema
-	public String getTaskItemDelegateName() {
-		return taskItemDelegateName;
-	}
-
-	public void setTaskItemDelegateName(String taskItemDelegateName) {
-		this.taskItemDelegateName = taskItemDelegateName;
-	}
-
-	@JsonIgnore
-	public void setTaskItemDelegateName(
-		UnsafeSupplier<String, Exception> taskItemDelegateNameUnsafeSupplier) {
-
-		try {
-			taskItemDelegateName = taskItemDelegateNameUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String taskItemDelegateName;
-
-	@Schema
-	public Boolean getTemplate() {
-		return template;
-	}
-
-	public void setTemplate(Boolean template) {
-		this.template = template;
-	}
-
-	@JsonIgnore
-	public void setTemplate(
-		UnsafeSupplier<Boolean, Exception> templateUnsafeSupplier) {
-
-		try {
-			template = templateUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean template;
-
-	@Schema
-	public Integer getTotal() {
-		return total;
-	}
-
-	public void setTotal(Integer total) {
-		this.total = total;
-	}
-
-	@JsonIgnore
-	public void setTotal(
-		UnsafeSupplier<Integer, Exception> totalUnsafeSupplier) {
-
-		try {
-			total = totalUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer total;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -599,60 +460,6 @@ public class Plan implements Serializable {
 			sb.append("]");
 		}
 
-		if (size != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"size\": ");
-
-			sb.append(size);
-		}
-
-		if (status != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"status\": ");
-
-			sb.append(status);
-		}
-
-		if (taskItemDelegateName != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"taskItemDelegateName\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(taskItemDelegateName));
-
-			sb.append("\"");
-		}
-
-		if (template != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"template\": ");
-
-			sb.append(template);
-		}
-
-		if (total != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"total\": ");
-
-			sb.append(total);
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -666,9 +473,9 @@ public class Plan implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -694,7 +501,7 @@ public class Plan implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -726,7 +533,7 @@ public class Plan implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -742,10 +549,5 @@ public class Plan implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

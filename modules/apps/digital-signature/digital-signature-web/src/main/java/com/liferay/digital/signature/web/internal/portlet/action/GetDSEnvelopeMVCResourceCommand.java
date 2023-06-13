@@ -19,6 +19,7 @@ import com.liferay.digital.signature.manager.DSEnvelopeManager;
 import com.liferay.digital.signature.model.DSEnvelope;
 import com.liferay.document.library.kernel.model.DLProcessorConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.document.library.kernel.util.DLProcessor;
 import com.liferay.document.library.kernel.util.ImageProcessor;
 import com.liferay.document.library.kernel.util.PDFProcessorUtil;
 import com.liferay.document.library.util.DLURLHelperUtil;
@@ -50,6 +51,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Keven Leone
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DigitalSignaturePortletKeys.DIGITAL_SIGNATURE,
 		"mvc.command.name=/digital_signature/get_ds_envelope"
@@ -82,6 +84,15 @@ public class GetDSEnvelopeMVCResourceCommand extends BaseMVCResourceCommand {
 						dsDocument.getDSDocumentId(), themeDisplay),
 					_log)
 			));
+	}
+
+	@Reference(
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(type=" + DLProcessorConstants.IMAGE_PROCESSOR + ")",
+		unbind = "-"
+	)
+	protected void setDLProcessor(DLProcessor dlProcessor) {
+		_imageProcessor = (ImageProcessor)dlProcessor;
 	}
 
 	private JSONObject _toJSONObject(
@@ -131,10 +142,6 @@ public class GetDSEnvelopeMVCResourceCommand extends BaseMVCResourceCommand {
 	@Reference
 	private DSEnvelopeManager _dsEnvelopeManager;
 
-	@Reference(
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(type=" + DLProcessorConstants.IMAGE_PROCESSOR + ")"
-	)
 	private ImageProcessor _imageProcessor;
 
 }

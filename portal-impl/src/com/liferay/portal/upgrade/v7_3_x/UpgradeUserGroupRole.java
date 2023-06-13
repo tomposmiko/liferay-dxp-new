@@ -51,8 +51,9 @@ public class UpgradeUserGroupRole extends UpgradeProcess {
 
 		removePrimaryKey("UserGroupRole");
 
-		alterTableAddColumn(
-			"UserGroupRole", "userGroupRoleId", "LONG default 0 not null");
+		runSQL(
+			"alter table UserGroupRole add userGroupRoleId LONG default 0 " +
+				"not null");
 
 		long userGroupRoleId = 0;
 
@@ -61,9 +62,9 @@ public class UpgradeUserGroupRole extends UpgradeProcess {
 					"select userId, groupId, roleId from UserGroupRole");
 			PreparedStatement updatePreparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update UserGroupRole set userGroupRoleId = ? where " +
-						"userId = ? and groupId = ? and roleId = ?");
+					connection.prepareStatement(
+						"update UserGroupRole set userGroupRoleId = ? where " +
+							"userId = ? and groupId = ? and roleId = ?"));
 			ResultSet resultSet = selectPreparedStatement.executeQuery()) {
 
 			while (resultSet.next()) {

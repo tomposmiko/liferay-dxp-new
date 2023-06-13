@@ -67,7 +67,7 @@ public class FilterMapping {
 
 		_dispatchers = dispatchers;
 
-		if (dispatchers.isEmpty()) {
+		if (_dispatchers.isEmpty()) {
 			_dispatchers.add(Dispatcher.REQUEST);
 		}
 	}

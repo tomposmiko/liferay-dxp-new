@@ -18,7 +18,8 @@ import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.search.experiences.internal.blueprint.highlight.HighlightConverter;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
-import com.liferay.search.experiences.rest.dto.v1_0.HighlightConfiguration;
+import com.liferay.search.experiences.rest.dto.v1_0.Highlight;
+import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
 /**
  * @author Petteri Karttunen
@@ -34,25 +35,24 @@ public class HighlightSXPSearchRequestBodyContributor
 
 	@Override
 	public void contribute(
-		Configuration configuration, SearchRequestBuilder searchRequestBuilder,
+		SearchRequestBuilder searchRequestBuilder, SXPBlueprint sxpBlueprint,
 		SXPParameterData sxpParameterData) {
 
-		HighlightConfiguration highlightConfiguration =
-			configuration.getHighlightConfiguration();
+		Configuration configuration = sxpBlueprint.getConfiguration();
 
-		if ((highlightConfiguration == null) ||
-			(highlightConfiguration.getFields() == null)) {
+		Highlight highlight = configuration.getHighlight();
 
+		if (highlight == null) {
 			return;
 		}
 
 		searchRequestBuilder.highlight(
-			_highlightConverter.toHighlight(highlightConfiguration));
+			_highlightConverter.toHighlight(highlight));
 	}
 
 	@Override
 	public String getName() {
-		return "highlightConfiguration";
+		return "highlight";
 	}
 
 	private final HighlightConverter _highlightConverter;

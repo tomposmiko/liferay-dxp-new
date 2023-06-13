@@ -37,7 +37,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.StagedModel;
@@ -50,6 +49,8 @@ import com.liferay.staging.StagingGroupHelper;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -57,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class AssetListEntryStagedModelDataHandler
 	extends BaseStagedModelDataHandler<AssetListEntry> {
 
@@ -207,11 +208,14 @@ public class AssetListEntryStagedModelDataHandler
 			AssetListEntry assetListEntry)
 		throws Exception {
 
+		List<AssetListEntryAssetEntryRel> assetListEntryAssetEntryRels =
+			_assetListEntryAssetEntryRelLocalService.
+				getAssetListEntryAssetEntryRels(
+					assetListEntry.getAssetListEntryId(), QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS);
+
 		for (AssetListEntryAssetEntryRel assetListEntryAssetEntryRel :
-				_assetListEntryAssetEntryRelLocalService.
-					getAssetListEntryAssetEntryRels(
-						assetListEntry.getAssetListEntryId(), QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS)) {
+				assetListEntryAssetEntryRels) {
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, assetListEntry, assetListEntryAssetEntryRel,
@@ -257,13 +261,17 @@ public class AssetListEntryStagedModelDataHandler
 					assetListEntry.getAssetListEntryId(), QueryUtil.ALL_POS,
 					QueryUtil.ALL_POS);
 
-		for (AssetEntry assetEntry :
-				TransformUtil.transform(
-					assetListEntryAssetEntryRels,
-					assetListEntryAssetEntryRel ->
-						_assetEntryLocalService.fetchEntry(
-							assetListEntryAssetEntryRel.getAssetEntryId()))) {
+		Stream<AssetListEntryAssetEntryRel> stream =
+			assetListEntryAssetEntryRels.stream();
 
+		List<AssetEntry> assetEntries = stream.map(
+			assetListEntryAssetEntryRel -> _assetEntryLocalService.fetchEntry(
+				assetListEntryAssetEntryRel.getAssetEntryId())
+		).collect(
+			Collectors.toList()
+		);
+
+		for (AssetEntry assetEntry : assetEntries) {
 			AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
 
 			if ((assetRenderer == null) ||

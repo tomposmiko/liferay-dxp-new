@@ -18,8 +18,6 @@ import com.liferay.change.tracking.spi.reference.TableReferenceDefinition;
 import com.liferay.change.tracking.spi.reference.builder.ChildTableReferenceInfoBuilder;
 import com.liferay.change.tracking.spi.reference.builder.ParentTableReferenceInfoBuilder;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.workflow.kaleo.model.KaleoInstanceTokenTable;
-import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstanceTable;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceTokenTable;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoTaskInstanceTokenPersistence;
 
@@ -37,10 +35,6 @@ public class KaleoTaskInstanceTokenTableReferenceDefinition
 	public void defineChildTableReferences(
 		ChildTableReferenceInfoBuilder<KaleoTaskInstanceTokenTable>
 			childTableReferenceInfoBuilder) {
-
-		childTableReferenceInfoBuilder.singleColumnReference(
-			KaleoTaskInstanceTokenTable.INSTANCE.kaleoTaskInstanceTokenId,
-			KaleoTaskAssignmentInstanceTable.INSTANCE.kaleoTaskInstanceTokenId);
 	}
 
 	@Override
@@ -49,11 +43,7 @@ public class KaleoTaskInstanceTokenTableReferenceDefinition
 			parentTableReferenceInfoBuilder) {
 
 		parentTableReferenceInfoBuilder.groupedModel(
-			KaleoTaskInstanceTokenTable.INSTANCE
-		).singleColumnReference(
-			KaleoTaskInstanceTokenTable.INSTANCE.kaleoInstanceTokenId,
-			KaleoInstanceTokenTable.INSTANCE.kaleoInstanceTokenId
-		);
+			KaleoTaskInstanceTokenTable.INSTANCE);
 	}
 
 	@Override

@@ -25,10 +25,6 @@ public class LayoutSetPrototypeLocalServiceWrapper
 	implements LayoutSetPrototypeLocalService,
 			   ServiceWrapper<LayoutSetPrototypeLocalService> {
 
-	public LayoutSetPrototypeLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutSetPrototypeLocalServiceWrapper(
 		LayoutSetPrototypeLocalService layoutSetPrototypeLocalService) {
 

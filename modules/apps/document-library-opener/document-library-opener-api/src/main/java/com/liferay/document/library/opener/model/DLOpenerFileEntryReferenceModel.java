@@ -247,8 +247,4 @@ public interface DLOpenerFileEntryReferenceModel
 	@Override
 	public DLOpenerFileEntryReference cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

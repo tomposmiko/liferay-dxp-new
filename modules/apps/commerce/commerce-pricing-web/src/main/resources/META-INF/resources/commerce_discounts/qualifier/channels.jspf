@@ -38,11 +38,11 @@
 				.then(() => {
 					Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 						id:
-							'<%= CommercePricingFDSNames.DISCOUNT_QUALIFIER_CHANNELS %>',
+							'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_CHANNELS %>',
 					});
 				})
 				.catch((error) => {
-					return Promise.reject(error.title);
+					return Promise.reject(error);
 				});
 		}
 
@@ -56,7 +56,7 @@
 			inputPlaceholder: '<%= LanguageUtil.get(request, "find-a-channel") %>',
 			itemSelectedMessage: '<%= LanguageUtil.get(request, "channel-selected") %>',
 			linkedDatasetsId: [
-				'<%= CommercePricingFDSNames.DISCOUNT_QUALIFIER_CHANNELS %>',
+				'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_CHANNELS %>',
 			],
 			itemCreation: false,
 			itemsKey: 'id',
@@ -69,7 +69,7 @@
 					fieldName: 'name',
 				},
 			],
-			spritemap: '<%= themeDisplay.getPathThemeSpritemap() %>',
+			spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 			titleLabel: '<%= LanguageUtil.get(request, "add-existing-channel") %>',
 		});
 	</aui:script>
@@ -78,12 +78,15 @@
 		bodyClasses="p-0"
 		title='<%= LanguageUtil.get(request, "channels") %>'
 	>
-		<frontend-data-set:headless-display
+		<clay:headless-data-set-display
 			apiURL="<%= commerceDiscountQualifiersDisplayContext.getDiscountChannelsAPIURL() %>"
-			fdsActionDropdownItems="<%= commerceDiscountQualifiersDisplayContext.getDiscountChannelFDSActionDropdownItems() %>"
-			formName="fm"
-			id="<%= CommercePricingFDSNames.DISCOUNT_QUALIFIER_CHANNELS %>"
+			clayDataSetActionDropdownItems="<%= commerceDiscountQualifiersDisplayContext.getDiscountChannelClayDataSetActionDropdownItems() %>"
+			formId="fm"
+			id="<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_CHANNELS %>"
 			itemsPerPage="<%= 10 %>"
+			namespace="<%= liferayPortletResponse.getNamespace() %>"
+			pageNumber="<%= 1 %>"
+			portletURL="<%= portletDiscountRuleURL %>"
 		/>
 	</commerce-ui:panel>
 </c:if>

@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.workflow;
 
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * @author Micha Kiener
@@ -41,19 +40,15 @@ public interface WorkflowLog extends WorkflowModel {
 
 	public Date getCreateDate();
 
-	public String getCurrentWorkflowNodeLabel(Locale locale);
-
-	public String getCurrentWorkflowNodeName();
-
 	public long getPreviousRoleId();
+
+	public String getPreviousState();
 
 	public long getPreviousUserId();
 
-	public String getPreviousWorkflowNodeLabel(Locale locale);
-
-	public String getPreviousWorkflowNodeName();
-
 	public long getRoleId();
+
+	public String getState();
 
 	public int getType();
 

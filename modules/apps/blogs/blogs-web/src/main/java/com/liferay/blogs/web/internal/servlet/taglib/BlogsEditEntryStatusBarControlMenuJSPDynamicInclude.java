@@ -36,14 +36,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jorge González
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class BlogsEditEntryStatusBarControlMenuJSPDynamicInclude
 	extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -85,10 +80,15 @@ public class BlogsEditEntryStatusBarControlMenuJSPDynamicInclude
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.blogs.web)", unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		BlogsEditEntryStatusBarControlMenuJSPDynamicInclude.class);
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.blogs.web)")
-	private ServletContext _servletContext;
 
 }

@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS,
 		"mvc.command.name=/segments/preview_segments_entry_users"
@@ -72,12 +73,16 @@ public class PreviewSegmentsEntryUsersMVCRenderCommand
 		ODataRetriever<User> userODataRetriever = _serviceTrackerMap.getService(
 			User.class.getName());
 
+		PreviewSegmentsEntryUsersDisplayContext
+			previewSegmentsEntryUsersDisplayContext =
+				new PreviewSegmentsEntryUsersDisplayContext(
+					httpServletRequest, renderRequest, renderResponse,
+					_segmentsEntryProviderRegistry, _segmentsEntryService,
+					userODataRetriever, _userLocalService);
+
 		renderRequest.setAttribute(
-			PreviewSegmentsEntryUsersDisplayContext.class.getName(),
-			new PreviewSegmentsEntryUsersDisplayContext(
-				httpServletRequest, renderRequest, renderResponse,
-				_segmentsEntryProviderRegistry, _segmentsEntryService,
-				userODataRetriever, _userLocalService));
+			SegmentsWebKeys.PREVIEW_SEGMENTS_ENTRY_USERS_DISPLAY_CONTEXT,
+			previewSegmentsEntryUsersDisplayContext);
 
 		return "/preview_segments_entry_users.jsp";
 	}

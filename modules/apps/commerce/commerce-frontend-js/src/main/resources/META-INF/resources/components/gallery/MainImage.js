@@ -30,19 +30,22 @@ export default function MainImage({
 }) {
 	return (
 		<div className="card main-image" onClick={onZoom} style={{background}}>
-			{adaptiveMediaImageHTMLTag ? (
-				<div
-					className="h-100 w-100"
-					dangerouslySetInnerHTML={{
-						__html: adaptiveMediaImageHTMLTag,
-					}}
-				/>
-			) : (
-				<img alt={title} className="product-img" src={src} />
-			)}
-
+			<div className="aspect-ratio aspect-ratio-4-to-3">
+				{adaptiveMediaImageHTMLTag ? (
+					<div
+						dangerouslySetInnerHTML={{
+							__html: adaptiveMediaImageHTMLTag,
+						}}
+					/>
+				) : (
+					<img
+						alt={title}
+						className="aspect-ratio-item-center-middle aspect-ratio-item-fluid aspect-ratio-item-vertical-fluid"
+						src={src}
+					/>
+				)}
+			</div>
 			<Arrows onNext={onNext} onPrev={onPrev} />
-
 			{loading ? <ClayLoadingIndicator /> : null}
 		</div>
 	);

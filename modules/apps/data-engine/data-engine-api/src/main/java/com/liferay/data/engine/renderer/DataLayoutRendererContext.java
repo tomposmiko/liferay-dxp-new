@@ -28,10 +28,6 @@ public class DataLayoutRendererContext {
 		return _containerId;
 	}
 
-	public String getContentType() {
-		return _contentType;
-	}
-
 	public Map<String, Object> getDataRecordValues() {
 		return _dataRecordValues;
 	}
@@ -74,10 +70,6 @@ public class DataLayoutRendererContext {
 
 	public void setContainerId(String containerId) {
 		_containerId = containerId;
-	}
-
-	public void setContentType(String contentType) {
-		_contentType = contentType;
 	}
 
 	public void setDataRecordValues(Map<String, Object> dataRecordValues) {
@@ -123,7 +115,6 @@ public class DataLayoutRendererContext {
 	}
 
 	private String _containerId;
-	private String _contentType;
 	private Map<String, Object> _dataRecordValues;
 	private String _defaultLanguageId;
 	private HttpServletRequest _httpServletRequest;

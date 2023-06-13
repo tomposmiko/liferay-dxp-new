@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -271,44 +270,6 @@ public class Layout implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContentDisplay contentDisplay;
-
-	@Schema
-	@Valid
-	public FlexWrap getFlexWrap() {
-		return flexWrap;
-	}
-
-	@JsonIgnore
-	public String getFlexWrapAsString() {
-		if (flexWrap == null) {
-			return null;
-		}
-
-		return flexWrap.toString();
-	}
-
-	public void setFlexWrap(FlexWrap flexWrap) {
-		this.flexWrap = flexWrap;
-	}
-
-	@JsonIgnore
-	public void setFlexWrap(
-		UnsafeSupplier<FlexWrap, Exception> flexWrapUnsafeSupplier) {
-
-		try {
-			flexWrap = flexWrapUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected FlexWrap flexWrap;
 
 	@Schema(deprecated = true)
 	@Valid
@@ -823,20 +784,6 @@ public class Layout implements Serializable {
 			sb.append("\"");
 		}
 
-		if (flexWrap != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"flexWrap\": ");
-
-			sb.append("\"");
-
-			sb.append(flexWrap);
-
-			sb.append("\"");
-		}
-
 		if (justify != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1145,44 +1092,6 @@ public class Layout implements Serializable {
 
 	}
 
-	@GraphQLName("FlexWrap")
-	public static enum FlexWrap {
-
-		NO_WRAP("NoWrap"), WRAP("Wrap"), WRAP_REVERSE("WrapReverse");
-
-		@JsonCreator
-		public static FlexWrap create(String value) {
-			if ((value == null) || value.equals("")) {
-				return null;
-			}
-
-			for (FlexWrap flexWrap : values()) {
-				if (Objects.equals(flexWrap.getValue(), value)) {
-					return flexWrap;
-				}
-			}
-
-			throw new IllegalArgumentException("Invalid enum value: " + value);
-		}
-
-		@JsonValue
-		public String getValue() {
-			return _value;
-		}
-
-		@Override
-		public String toString() {
-			return _value;
-		}
-
-		private FlexWrap(String value) {
-			_value = value;
-		}
-
-		private final String _value;
-
-	}
-
 	@GraphQLName("Justify")
 	public static enum Justify {
 
@@ -1300,9 +1209,9 @@ public class Layout implements Serializable {
 	}
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -1328,7 +1237,7 @@ public class Layout implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -1360,7 +1269,7 @@ public class Layout implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -1376,10 +1285,5 @@ public class Layout implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

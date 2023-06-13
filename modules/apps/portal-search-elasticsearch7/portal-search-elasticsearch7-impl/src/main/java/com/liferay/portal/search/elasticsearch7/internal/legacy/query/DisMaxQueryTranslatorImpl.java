@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = DisMaxQueryTranslator.class)
+@Component(immediate = true, service = DisMaxQueryTranslator.class)
 public class DisMaxQueryTranslatorImpl implements DisMaxQueryTranslator {
 
 	@Override

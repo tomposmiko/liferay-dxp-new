@@ -25,7 +25,10 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  */
-@Component(property = "reportFormat=xml", service = ReportFormatExporter.class)
+@Component(
+	immediate = true, property = "reportFormat=xml",
+	service = ReportFormatExporter.class
+)
 public class XmlReportFormatExporter extends BaseReportFormatExporter {
 
 	@Override

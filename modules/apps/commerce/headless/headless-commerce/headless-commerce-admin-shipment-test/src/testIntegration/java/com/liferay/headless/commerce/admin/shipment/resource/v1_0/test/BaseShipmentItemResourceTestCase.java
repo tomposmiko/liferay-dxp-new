@@ -28,7 +28,6 @@ import com.liferay.headless.commerce.admin.shipment.client.pagination.Page;
 import com.liferay.headless.commerce.admin.shipment.client.pagination.Pagination;
 import com.liferay.headless.commerce.admin.shipment.client.resource.v1_0.ShipmentItemResource;
 import com.liferay.headless.commerce.admin.shipment.client.serdes.v1_0.ShipmentItemSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -51,25 +50,24 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -182,8 +180,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 
 		ShipmentItem shipmentItem = randomShipmentItem();
 
-		shipmentItem.setExternalReferenceCode(regex);
-		shipmentItem.setShipmentExternalReferenceCode(regex);
 		shipmentItem.setUserName(regex);
 
 		String json = ShipmentItemSerDes.toJSON(shipmentItem);
@@ -192,123 +188,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 
 		shipmentItem = ShipmentItemSerDes.toDTO(json);
 
-		Assert.assertEquals(regex, shipmentItem.getExternalReferenceCode());
-		Assert.assertEquals(
-			regex, shipmentItem.getShipmentExternalReferenceCode());
 		Assert.assertEquals(regex, shipmentItem.getUserName());
-	}
-
-	@Test
-	public void testDeleteShipmentItemByExternalReferenceCode()
-		throws Exception {
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		ShipmentItem shipmentItem =
-			testDeleteShipmentItemByExternalReferenceCode_addShipmentItem();
-
-		assertHttpResponseStatusCode(
-			204,
-			shipmentItemResource.
-				deleteShipmentItemByExternalReferenceCodeHttpResponse(
-					shipmentItem.getExternalReferenceCode()));
-	}
-
-	protected ShipmentItem
-			testDeleteShipmentItemByExternalReferenceCode_addShipmentItem()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetShipmentByExternalReferenceCodeItem() throws Exception {
-		ShipmentItem postShipmentItem =
-			testGetShipmentByExternalReferenceCodeItem_addShipmentItem();
-
-		ShipmentItem getShipmentItem =
-			shipmentItemResource.getShipmentByExternalReferenceCodeItem(
-				postShipmentItem.getExternalReferenceCode());
-
-		assertEquals(postShipmentItem, getShipmentItem);
-		assertValid(getShipmentItem);
-	}
-
-	protected ShipmentItem
-			testGetShipmentByExternalReferenceCodeItem_addShipmentItem()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGraphQLGetShipmentByExternalReferenceCodeItem()
-		throws Exception {
-
-		ShipmentItem shipmentItem =
-			testGraphQLGetShipmentByExternalReferenceCodeItem_addShipmentItem();
-
-		Assert.assertTrue(
-			equals(
-				shipmentItem,
-				ShipmentItemSerDes.toDTO(
-					JSONUtil.getValueAsString(
-						invokeGraphQLQuery(
-							new GraphQLField(
-								"shipmentByExternalReferenceCodeItem",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"externalReferenceCode",
-											"\"" +
-												shipmentItem.
-													getExternalReferenceCode() +
-														"\"");
-									}
-								},
-								getGraphQLFields())),
-						"JSONObject/data",
-						"Object/shipmentByExternalReferenceCodeItem"))));
-	}
-
-	@Test
-	public void testGraphQLGetShipmentByExternalReferenceCodeItemNotFound()
-		throws Exception {
-
-		String irrelevantExternalReferenceCode =
-			"\"" + RandomTestUtil.randomString() + "\"";
-
-		Assert.assertEquals(
-			"Not Found",
-			JSONUtil.getValueAsString(
-				invokeGraphQLQuery(
-					new GraphQLField(
-						"shipmentByExternalReferenceCodeItem",
-						new HashMap<String, Object>() {
-							{
-								put(
-									"externalReferenceCode",
-									irrelevantExternalReferenceCode);
-							}
-						},
-						getGraphQLFields())),
-				"JSONArray/errors", "Object/0", "JSONObject/extensions",
-				"Object/code"));
-	}
-
-	protected ShipmentItem
-			testGraphQLGetShipmentByExternalReferenceCodeItem_addShipmentItem()
-		throws Exception {
-
-		return testGraphQLShipmentItem_addShipmentItem();
-	}
-
-	@Test
-	public void testPatchShipmentItemByExternalReferenceCode()
-		throws Exception {
-
-		Assert.assertTrue(false);
 	}
 
 	@Test
@@ -339,8 +219,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteShipmentItem() throws Exception {
-		ShipmentItem shipmentItem =
-			testGraphQLDeleteShipmentItem_addShipmentItem();
+		ShipmentItem shipmentItem = testGraphQLShipmentItem_addShipmentItem();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -353,6 +232,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteShipmentItem"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -366,12 +246,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected ShipmentItem testGraphQLDeleteShipmentItem_addShipmentItem()
-		throws Exception {
-
-		return testGraphQLShipmentItem_addShipmentItem();
 	}
 
 	@Test
@@ -394,8 +268,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 
 	@Test
 	public void testGraphQLGetShipmentItem() throws Exception {
-		ShipmentItem shipmentItem =
-			testGraphQLGetShipmentItem_addShipmentItem();
+		ShipmentItem shipmentItem = testGraphQLShipmentItem_addShipmentItem();
 
 		Assert.assertTrue(
 			equals(
@@ -436,12 +309,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 				"Object/code"));
 	}
 
-	protected ShipmentItem testGraphQLGetShipmentItem_addShipmentItem()
-		throws Exception {
-
-		return testGraphQLShipmentItem_addShipmentItem();
-	}
-
 	@Test
 	public void testPatchShipmentItem() throws Exception {
 		ShipmentItem postShipmentItem = testPatchShipmentItem_addShipmentItem();
@@ -454,8 +321,8 @@ public abstract class BaseShipmentItemResourceTestCase {
 
 		ShipmentItem expectedPatchShipmentItem = postShipmentItem.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchShipmentItem, expectedPatchShipmentItem);
+		_beanUtilsBean.copyProperties(
+			expectedPatchShipmentItem, randomPatchShipmentItem);
 
 		ShipmentItem getShipmentItem = shipmentItemResource.getShipmentItem(
 			patchShipmentItem.getId());
@@ -465,194 +332,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 	}
 
 	protected ShipmentItem testPatchShipmentItem_addShipmentItem()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testGetShipmentByExternalReferenceCodeItemsPage()
-		throws Exception {
-
-		String externalReferenceCode =
-			testGetShipmentByExternalReferenceCodeItemsPage_getExternalReferenceCode();
-		String irrelevantExternalReferenceCode =
-			testGetShipmentByExternalReferenceCodeItemsPage_getIrrelevantExternalReferenceCode();
-
-		Page<ShipmentItem> page =
-			shipmentItemResource.getShipmentByExternalReferenceCodeItemsPage(
-				externalReferenceCode, Pagination.of(1, 10));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
-		if (irrelevantExternalReferenceCode != null) {
-			ShipmentItem irrelevantShipmentItem =
-				testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-					irrelevantExternalReferenceCode,
-					randomIrrelevantShipmentItem());
-
-			page =
-				shipmentItemResource.
-					getShipmentByExternalReferenceCodeItemsPage(
-						irrelevantExternalReferenceCode, Pagination.of(1, 2));
-
-			Assert.assertEquals(1, page.getTotalCount());
-
-			assertEquals(
-				Arrays.asList(irrelevantShipmentItem),
-				(List<ShipmentItem>)page.getItems());
-			assertValid(
-				page,
-				testGetShipmentByExternalReferenceCodeItemsPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
-		}
-
-		ShipmentItem shipmentItem1 =
-			testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-				externalReferenceCode, randomShipmentItem());
-
-		ShipmentItem shipmentItem2 =
-			testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-				externalReferenceCode, randomShipmentItem());
-
-		page = shipmentItemResource.getShipmentByExternalReferenceCodeItemsPage(
-			externalReferenceCode, Pagination.of(1, 10));
-
-		Assert.assertEquals(2, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(shipmentItem1, shipmentItem2),
-			(List<ShipmentItem>)page.getItems());
-		assertValid(
-			page,
-			testGetShipmentByExternalReferenceCodeItemsPage_getExpectedActions(
-				externalReferenceCode));
-
-		shipmentItemResource.deleteShipmentItem(shipmentItem1.getId());
-
-		shipmentItemResource.deleteShipmentItem(shipmentItem2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetShipmentByExternalReferenceCodeItemsPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetShipmentByExternalReferenceCodeItemsPageWithPagination()
-		throws Exception {
-
-		String externalReferenceCode =
-			testGetShipmentByExternalReferenceCodeItemsPage_getExternalReferenceCode();
-
-		ShipmentItem shipmentItem1 =
-			testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-				externalReferenceCode, randomShipmentItem());
-
-		ShipmentItem shipmentItem2 =
-			testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-				externalReferenceCode, randomShipmentItem());
-
-		ShipmentItem shipmentItem3 =
-			testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-				externalReferenceCode, randomShipmentItem());
-
-		Page<ShipmentItem> page1 =
-			shipmentItemResource.getShipmentByExternalReferenceCodeItemsPage(
-				externalReferenceCode, Pagination.of(1, 2));
-
-		List<ShipmentItem> shipmentItems1 =
-			(List<ShipmentItem>)page1.getItems();
-
-		Assert.assertEquals(
-			shipmentItems1.toString(), 2, shipmentItems1.size());
-
-		Page<ShipmentItem> page2 =
-			shipmentItemResource.getShipmentByExternalReferenceCodeItemsPage(
-				externalReferenceCode, Pagination.of(2, 2));
-
-		Assert.assertEquals(3, page2.getTotalCount());
-
-		List<ShipmentItem> shipmentItems2 =
-			(List<ShipmentItem>)page2.getItems();
-
-		Assert.assertEquals(
-			shipmentItems2.toString(), 1, shipmentItems2.size());
-
-		Page<ShipmentItem> page3 =
-			shipmentItemResource.getShipmentByExternalReferenceCodeItemsPage(
-				externalReferenceCode, Pagination.of(1, 3));
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(shipmentItem1, shipmentItem2, shipmentItem3),
-			(List<ShipmentItem>)page3.getItems());
-	}
-
-	protected ShipmentItem
-			testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-				String externalReferenceCode, ShipmentItem shipmentItem)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetShipmentByExternalReferenceCodeItemsPage_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetShipmentByExternalReferenceCodeItemsPage_getIrrelevantExternalReferenceCode()
-		throws Exception {
-
-		return null;
-	}
-
-	@Test
-	public void testPutShipmentByExternalReferenceCodeItem() throws Exception {
-		ShipmentItem postShipmentItem =
-			testPutShipmentByExternalReferenceCodeItem_addShipmentItem();
-
-		ShipmentItem randomShipmentItem = randomShipmentItem();
-
-		ShipmentItem putShipmentItem =
-			shipmentItemResource.putShipmentByExternalReferenceCodeItem(
-				testPutShipmentByExternalReferenceCodeItem_getExternalReferenceCode(
-					postShipmentItem),
-				randomShipmentItem);
-
-		assertEquals(randomShipmentItem, putShipmentItem);
-		assertValid(putShipmentItem);
-
-		ShipmentItem getShipmentItem =
-			shipmentItemResource.getShipmentByExternalReferenceCodeItem(
-				testPutShipmentByExternalReferenceCodeItem_getExternalReferenceCode(
-					putShipmentItem));
-
-		assertEquals(randomShipmentItem, getShipmentItem);
-		assertValid(getShipmentItem);
-	}
-
-	protected String
-			testPutShipmentByExternalReferenceCodeItem_getExternalReferenceCode(
-				ShipmentItem shipmentItem)
-		throws Exception {
-
-		return shipmentItem.getExternalReferenceCode();
-	}
-
-	protected ShipmentItem
-			testPutShipmentByExternalReferenceCodeItem_addShipmentItem()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
@@ -683,10 +362,7 @@ public abstract class BaseShipmentItemResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantShipmentItem),
 				(List<ShipmentItem>)page.getItems());
-			assertValid(
-				page,
-				testGetShipmentItemsPage_getExpectedActions(
-					irrelevantShipmentId));
+			assertValid(page);
 		}
 
 		ShipmentItem shipmentItem1 = testGetShipmentItemsPage_addShipmentItem(
@@ -703,21 +379,11 @@ public abstract class BaseShipmentItemResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(shipmentItem1, shipmentItem2),
 			(List<ShipmentItem>)page.getItems());
-		assertValid(
-			page, testGetShipmentItemsPage_getExpectedActions(shipmentId));
+		assertValid(page);
 
 		shipmentItemResource.deleteShipmentItem(shipmentItem1.getId());
 
 		shipmentItemResource.deleteShipmentItem(shipmentItem2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetShipmentItemsPage_getExpectedActions(Long shipmentId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -803,10 +469,8 @@ public abstract class BaseShipmentItemResourceTestCase {
 
 		Assert.assertEquals(0, shipmentItemsJSONObject.get("totalCount"));
 
-		ShipmentItem shipmentItem1 =
-			testGraphQLGetShipmentItemsPage_addShipmentItem();
-		ShipmentItem shipmentItem2 =
-			testGraphQLGetShipmentItemsPage_addShipmentItem();
+		ShipmentItem shipmentItem1 = testGraphQLShipmentItem_addShipmentItem();
+		ShipmentItem shipmentItem2 = testGraphQLShipmentItem_addShipmentItem();
 
 		shipmentItemsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -819,12 +483,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 			Arrays.asList(
 				ShipmentItemSerDes.toDTOs(
 					shipmentItemsJSONObject.getString("items"))));
-	}
-
-	protected ShipmentItem testGraphQLGetShipmentItemsPage_addShipmentItem()
-		throws Exception {
-
-		return testGraphQLShipmentItem_addShipmentItem();
 	}
 
 	@Test
@@ -947,16 +605,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (shipmentItem.getExternalReferenceCode() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
 				if (shipmentItem.getModifiedDate() == null) {
 					valid = false;
@@ -981,17 +629,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals(
-					"shipmentExternalReferenceCode",
-					additionalAssertFieldName)) {
-
-				if (shipmentItem.getShipmentExternalReferenceCode() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("shipmentId", additionalAssertFieldName)) {
 				if (shipmentItem.getShipmentId() == null) {
 					valid = false;
@@ -1002,16 +639,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 
 			if (Objects.equals("userName", additionalAssertFieldName)) {
 				if (shipmentItem.getUserName() == null) {
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"validateInventory", additionalAssertFieldName)) {
-
-				if (shipmentItem.getValidateInventory() == null) {
 					valid = false;
 				}
 
@@ -1035,13 +662,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 	}
 
 	protected void assertValid(Page<ShipmentItem> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<ShipmentItem> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<ShipmentItem> shipmentItems = page.getItems();
@@ -1056,20 +676,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1162,19 +768,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals(
-					"externalReferenceCode", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						shipmentItem1.getExternalReferenceCode(),
-						shipmentItem2.getExternalReferenceCode())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("id", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						shipmentItem1.getId(), shipmentItem2.getId())) {
@@ -1218,20 +811,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals(
-					"shipmentExternalReferenceCode",
-					additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						shipmentItem1.getShipmentExternalReferenceCode(),
-						shipmentItem2.getShipmentExternalReferenceCode())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
 			if (Objects.equals("shipmentId", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						shipmentItem1.getShipmentId(),
@@ -1247,19 +826,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 				if (!Objects.deepEquals(
 						shipmentItem1.getUserName(),
 						shipmentItem2.getUserName())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
-					"validateInventory", additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						shipmentItem1.getValidateInventory(),
-						shipmentItem2.getValidateInventory())) {
 
 					return false;
 				}
@@ -1315,16 +881,14 @@ public abstract class BaseShipmentItemResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1341,10 +905,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1354,18 +914,18 @@ public abstract class BaseShipmentItemResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1418,14 +978,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("externalReferenceCode")) {
-			sb.append("'");
-			sb.append(String.valueOf(shipmentItem.getExternalReferenceCode()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1470,19 +1022,8 @@ public abstract class BaseShipmentItemResourceTestCase {
 		}
 
 		if (entityFieldName.equals("quantity")) {
-			sb.append(String.valueOf(shipmentItem.getQuantity()));
-
-			return sb.toString();
-		}
-
-		if (entityFieldName.equals("shipmentExternalReferenceCode")) {
-			sb.append("'");
-			sb.append(
-				String.valueOf(
-					shipmentItem.getShipmentExternalReferenceCode()));
-			sb.append("'");
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shipmentId")) {
@@ -1496,11 +1037,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 			sb.append("'");
 
 			return sb.toString();
-		}
-
-		if (entityFieldName.equals("validateInventory")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("warehouseId")) {
@@ -1553,18 +1089,13 @@ public abstract class BaseShipmentItemResourceTestCase {
 		return new ShipmentItem() {
 			{
 				createDate = RandomTestUtil.nextDate();
-				externalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				modifiedDate = RandomTestUtil.nextDate();
 				orderItemId = RandomTestUtil.randomLong();
 				quantity = RandomTestUtil.randomInt();
-				shipmentExternalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				shipmentId = RandomTestUtil.randomLong();
 				userName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
-				validateInventory = RandomTestUtil.randomBoolean();
 				warehouseId = RandomTestUtil.randomLong();
 			}
 		};
@@ -1584,115 +1115,6 @@ public abstract class BaseShipmentItemResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1768,6 +1190,18 @@ public abstract class BaseShipmentItemResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseShipmentItemResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

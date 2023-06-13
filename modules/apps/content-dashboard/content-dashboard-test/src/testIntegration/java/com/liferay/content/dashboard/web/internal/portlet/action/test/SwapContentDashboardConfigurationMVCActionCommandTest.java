@@ -51,7 +51,7 @@ public class SwapContentDashboardConfigurationMVCActionCommandTest {
 			mockLiferayPortletActionRequest.getPreferences();
 
 		portletPreferences.setValues(
-			"assetVocabularyIds", "vocabularyId1", "vocabularyId2");
+			"assetVocabularyNames", "vocabulary1", "vocabulary2");
 
 		_mvcActionCommand.processAction(
 			mockLiferayPortletActionRequest,
@@ -60,8 +60,9 @@ public class SwapContentDashboardConfigurationMVCActionCommandTest {
 		portletPreferences = mockLiferayPortletActionRequest.getPreferences();
 
 		Assert.assertArrayEquals(
-			new String[] {"vocabularyId2", "vocabularyId1"},
-			portletPreferences.getValues("assetVocabularyIds", new String[0]));
+			new String[] {"vocabulary2", "vocabulary1"},
+			portletPreferences.getValues(
+				"assetVocabularyNames", new String[0]));
 	}
 
 	@Test
@@ -74,7 +75,7 @@ public class SwapContentDashboardConfigurationMVCActionCommandTest {
 		PortletPreferences portletPreferences =
 			mockLiferayPortletActionRequest.getPreferences();
 
-		portletPreferences.setValues("assetVocabularyIds", "vocabulary1");
+		portletPreferences.setValues("assetVocabularyNames", "vocabulary1");
 
 		_mvcActionCommand.processAction(
 			mockLiferayPortletActionRequest,
@@ -84,7 +85,8 @@ public class SwapContentDashboardConfigurationMVCActionCommandTest {
 
 		Assert.assertArrayEquals(
 			new String[] {"vocabulary1"},
-			portletPreferences.getValues("assetVocabularyIds", new String[0]));
+			portletPreferences.getValues(
+				"assetVocabularyNames", new String[0]));
 	}
 
 	@Inject(

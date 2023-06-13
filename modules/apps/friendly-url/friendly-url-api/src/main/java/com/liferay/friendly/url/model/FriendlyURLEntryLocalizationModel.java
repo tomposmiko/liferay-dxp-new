@@ -227,8 +227,4 @@ public interface FriendlyURLEntryLocalizationModel
 	@Override
 	public FriendlyURLEntryLocalization cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

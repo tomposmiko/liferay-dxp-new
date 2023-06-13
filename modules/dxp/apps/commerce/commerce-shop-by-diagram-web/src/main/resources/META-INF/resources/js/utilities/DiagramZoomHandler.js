@@ -18,17 +18,12 @@ import {
 import {ZOOM_VALUES} from './constants';
 
 class DiagramZoomHandler {
-	constructor() {
-		this._handleClickOutside = this._handleClickOutside.bind(this);
-	}
-
 	_handleClickOutside(event) {
 		if (
 			!this._diagramWrapper.parentNode.contains(event.target) &&
-			!event.target.closest('.diagram-tooltip-wrapper') &&
-			!event.target.closest('.dropdown-menu')
+			!event.target.closest('.autocomplete-dropdown-menu')
 		) {
-			this.resetActivePinsState();
+			this._resetActivePinsState();
 		}
 	}
 
@@ -44,7 +39,11 @@ class DiagramZoomHandler {
 		this._currentScale = d3event.transform.k;
 
 		if (d3event.sourceEvent) {
-			this._updateZoomState(this._currentScale);
+			this._updateZoomState(
+				this._currentScale,
+				d3event.transform,
+				d3event
+			);
 		}
 
 		this._d3zoomWrapper.attr('transform', d3event.transform);
@@ -54,12 +53,16 @@ class DiagramZoomHandler {
 		window.removeEventListener('click', this._handleClickOutside);
 	}
 
-	updateZoom(scale, duration = 800) {
+	updateZoom(scale) {
 		this._currentScale = scale;
 
+		this._animateZoom();
+	}
+
+	_animateZoom() {
 		const transition = this._d3diagramWrapper
 			.transition()
-			.duration(duration)
+			.duration(800)
 			.tween(
 				'resize',
 				window.ResizeObserver
@@ -67,21 +70,12 @@ class DiagramZoomHandler {
 					: () => this._d3diagramWrapper.dispatch('toggle')
 			);
 
-		return new Promise((resolve) => {
-			this._d3diagramWrapper
-				.transition(transition)
-				.call(this._zoom.scaleTo, this._currentScale)
-				.on('end', resolve);
-		});
+		this._d3diagramWrapper
+			.transition(transition)
+			.call(this._zoom.scaleTo, this._currentScale);
 	}
 
-	_recenterViewport(x, y, duration, k) {
-		if (k) {
-			this._currentScale = k;
-		}
-
-		this._updateZoomState(this._currentScale);
-
+	_recenterViewport(x, y, duration) {
 		return new Promise((resolve) => {
 			this._d3diagramWrapper
 				.transition(

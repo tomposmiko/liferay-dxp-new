@@ -15,14 +15,17 @@
 package com.liferay.dynamic.data.lists.web.internal.security.permission.resource;
 
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Preston Crary
  */
+@Component(immediate = true, service = {})
 public class DDLRecordSetPermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class DDLRecordSetPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DDLRecordSet> modelResourcePermission =
-			_ddlRecordSetModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ddlRecordSetModelResourcePermission.contains(
 			permissionChecker, recordSet, actionId);
 	}
 
@@ -42,18 +42,21 @@ public class DDLRecordSetPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DDLRecordSet> modelResourcePermission =
-			_ddlRecordSetModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ddlRecordSetModelResourcePermission.contains(
 			permissionChecker, recordSetId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<DDLRecordSet>>
-		_ddlRecordSetModelResourcePermissionSnapshot = new Snapshot<>(
-			DDLRecordSetPermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.dynamic.data.lists.model." +
-				"DDLRecordSet)");
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<DDLRecordSet> modelResourcePermission) {
+
+		_ddlRecordSetModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<DDLRecordSet>
+		_ddlRecordSetModelResourcePermission;
 
 }

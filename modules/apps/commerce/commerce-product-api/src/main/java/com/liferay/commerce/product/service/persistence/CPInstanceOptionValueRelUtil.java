@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the cp instance option value rel service. This utility wraps <code>com.liferay.commerce.product.service.persistence.impl.CPInstanceOptionValueRelPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1454,9 +1458,29 @@ public class CPInstanceOptionValueRelUtil {
 	}
 
 	public static CPInstanceOptionValueRelPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile CPInstanceOptionValueRelPersistence _persistence;
+	private static ServiceTracker
+		<CPInstanceOptionValueRelPersistence,
+		 CPInstanceOptionValueRelPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			CPInstanceOptionValueRelPersistence.class);
+
+		ServiceTracker
+			<CPInstanceOptionValueRelPersistence,
+			 CPInstanceOptionValueRelPersistence> serviceTracker =
+				new ServiceTracker
+					<CPInstanceOptionValueRelPersistence,
+					 CPInstanceOptionValueRelPersistence>(
+						 bundle.getBundleContext(),
+						 CPInstanceOptionValueRelPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

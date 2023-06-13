@@ -1,20 +1,7 @@
-@default = "assertNotEditable"
-definition {
+<definition default="assertNotEditable">
+	<command name="assertNotEditable">
+		<execute selenium="waitForVisible" />
 
-	function assertNotEditable {
-		selenium.waitForVisible();
-
-		selenium.waitForNotEditable();
-
-		selenium.assertNotEditable();
-	}
-
-	function assertNotEditableNotVisible {
-		selenium.waitForElementPresent();
-
-		selenium.waitForNotEditable();
-
-		selenium.assertNotEditable();
-	}
-
-}
+		<execute selenium="assertNotEditable" />
+	</command>
+</definition>

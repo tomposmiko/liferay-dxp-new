@@ -20,7 +20,7 @@ import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
@@ -50,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(service = EntityModelFieldMapper.class)
+@Component(immediate = true, service = EntityModelFieldMapper.class)
 public class EntityModelFieldMapper {
 
 	public Map<String, EntityField> getCustomFieldEntityFields(
@@ -119,6 +120,30 @@ public class EntityModelFieldMapper {
 		return fields;
 	}
 
+	protected Field getField(
+		String fieldName, String fieldType, PortletRequest portletRequest,
+		ResourceBundle resourceBundle,
+		Optional<SegmentsFieldCustomizer> segmentsFieldCustomizerOptional) {
+
+		if (segmentsFieldCustomizerOptional.isPresent()) {
+			SegmentsFieldCustomizer segmentsFieldCustomizer =
+				segmentsFieldCustomizerOptional.get();
+
+			return new Field(
+				fieldName,
+				segmentsFieldCustomizer.getLabel(
+					fieldName, resourceBundle.getLocale()),
+				fieldType,
+				segmentsFieldCustomizer.getOptions(resourceBundle.getLocale()),
+				segmentsFieldCustomizer.getSelectEntity(portletRequest));
+		}
+
+		String fieldLabel = LanguageUtil.get(
+			resourceBundle, "field." + CamelCaseUtil.fromCamelCase(fieldName));
+
+		return new Field(fieldName, fieldLabel, fieldType);
+	}
+
 	protected List<Field> getFields(
 		EntityModel entityModel, EntityField entityField,
 		PortletRequest portletRequest) {
@@ -140,20 +165,47 @@ public class EntityModelFieldMapper {
 				resourceBundle);
 		}
 
-		SegmentsFieldCustomizer segmentsFieldCustomizer =
-			_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizer(
+		Optional<SegmentsFieldCustomizer> segmentsFieldCustomizerOptional =
+			_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizerOptional(
 				entityModel.getName(), entityField.getName());
 
 		if ((entityFieldType == EntityField.Type.ID) &&
-			(segmentsFieldCustomizer == null)) {
+			!segmentsFieldCustomizerOptional.isPresent()) {
 
 			return Collections.emptyList();
 		}
 
 		return Collections.singletonList(
-			_getField(
-				entityField.getName(), _getType(entityField.getType()),
-				portletRequest, resourceBundle, segmentsFieldCustomizer));
+			getField(
+				entityField.getName(), getType(entityField.getType()),
+				portletRequest, resourceBundle,
+				segmentsFieldCustomizerOptional));
+	}
+
+	protected String getType(EntityField.Type entityFieldType) {
+		if (entityFieldType == EntityField.Type.BOOLEAN) {
+			return "boolean";
+		}
+		else if (entityFieldType == EntityField.Type.COLLECTION) {
+			return "collection";
+		}
+		else if (entityFieldType == EntityField.Type.DATE) {
+			return "date";
+		}
+		else if (entityFieldType == EntityField.Type.DATE_TIME) {
+			return "date-time";
+		}
+		else if (entityFieldType == EntityField.Type.DOUBLE) {
+			return "double";
+		}
+		else if (entityFieldType == EntityField.Type.ID) {
+			return "id";
+		}
+		else if (entityFieldType == EntityField.Type.INTEGER) {
+			return "integer";
+		}
+
+		return "string";
 	}
 
 	private List<Field> _getComplexFields(
@@ -169,21 +221,23 @@ public class EntityModelFieldMapper {
 
 		entityFieldsMap.forEach(
 			(entityFieldName, entityField) -> {
-				SegmentsFieldCustomizer segmentsFieldCustomizer =
-					_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizer(
-						entityModelName, entityField.getName());
+				Optional<SegmentsFieldCustomizer>
+					segmentsFieldCustomizerOptional =
+						_segmentsFieldCustomizerRegistry.
+							getSegmentsFieldCustomizerOptional(
+								entityModelName, entityField.getName());
 
 				if ((entityField.getType() == EntityField.Type.ID) &&
-					(segmentsFieldCustomizer == null)) {
+					!segmentsFieldCustomizerOptional.isPresent()) {
 
 					return;
 				}
 
 				complexFields.add(
-					_getField(
+					getField(
 						"customContext/" + entityField.getName(),
-						_getType(entityField.getType()), portletRequest,
-						resourceBundle, segmentsFieldCustomizer));
+						getType(entityField.getType()), portletRequest,
+						resourceBundle, segmentsFieldCustomizerOptional));
 			});
 
 		return complexFields;
@@ -209,7 +263,7 @@ public class EntityModelFieldMapper {
 				customFields.add(
 					new Field(
 						"customField/" + entityFieldName, label,
-						_getType(entityField.getType()),
+						getType(entityField.getType()),
 						_getExpandoColumnFieldOptions(expandoColumn), null));
 			});
 
@@ -273,61 +327,11 @@ public class EntityModelFieldMapper {
 		return fieldOptions;
 	}
 
-	private Field _getField(
-		String fieldName, String fieldType, PortletRequest portletRequest,
-		ResourceBundle resourceBundle,
-		SegmentsFieldCustomizer segmentsFieldCustomizer) {
-
-		if (segmentsFieldCustomizer != null) {
-			return new Field(
-				fieldName,
-				segmentsFieldCustomizer.getLabel(
-					fieldName, resourceBundle.getLocale()),
-				fieldType,
-				segmentsFieldCustomizer.getOptions(resourceBundle.getLocale()),
-				segmentsFieldCustomizer.getSelectEntity(portletRequest));
-		}
-
-		String fieldLabel = _language.get(
-			resourceBundle, "field." + CamelCaseUtil.fromCamelCase(fieldName));
-
-		return new Field(fieldName, fieldLabel, fieldType);
-	}
-
-	private String _getType(EntityField.Type entityFieldType) {
-		if (entityFieldType == EntityField.Type.BOOLEAN) {
-			return "boolean";
-		}
-		else if (entityFieldType == EntityField.Type.COLLECTION) {
-			return "collection";
-		}
-		else if (entityFieldType == EntityField.Type.DATE) {
-			return "date";
-		}
-		else if (entityFieldType == EntityField.Type.DATE_TIME) {
-			return "date-time";
-		}
-		else if (entityFieldType == EntityField.Type.DOUBLE) {
-			return "double";
-		}
-		else if (entityFieldType == EntityField.Type.ID) {
-			return "id";
-		}
-		else if (entityFieldType == EntityField.Type.INTEGER) {
-			return "integer";
-		}
-
-		return "string";
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		EntityModelFieldMapper.class);
 
 	@Reference
 	private ExpandoColumnLocalService _expandoColumnLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

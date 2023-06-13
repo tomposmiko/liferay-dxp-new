@@ -15,42 +15,38 @@
 AUI.add(
 	'liferay-calendar-simple-color-picker',
 	(A) => {
-		const AArray = A.Array;
-		const KeyMap = A.Event.KeyMap;
-		const Lang = A.Lang;
+		var AArray = A.Array;
+		var Lang = A.Lang;
 
-		const STR_BLANK = '';
+		var STR_BLANK = '';
 
-		const STR_DOT = '.';
+		var STR_DOT = '.';
 
-		const getClassName = A.getClassName;
+		var getClassName = A.getClassName;
 
-		const CSS_SIMPLE_COLOR_PICKER_ITEM = getClassName(
+		var CSS_SIMPLE_COLOR_PICKER_ITEM = getClassName(
 			'simple-color-picker',
 			'item'
 		);
 
-		const CSS_SIMPLE_COLOR_PICKER_ITEM_SELECTED = getClassName(
+		var CSS_SIMPLE_COLOR_PICKER_ITEM_SELECTED = getClassName(
 			'simple-color-picker',
 			'item',
 			'selected'
 		);
 
-		const TPL_COLOR_ALERT =
-			'<span aria-live="assertive" class="sr-only" role="alert"></span>';
-
-		const TPL_SIMPLE_COLOR_PICKER_ITEM = new A.Template(
+		var TPL_SIMPLE_COLOR_PICKER_ITEM = new A.Template(
 			'<tpl for="pallete">',
-			'<button aria-label="{.}" class="',
+			'<div class="',
 			CSS_SIMPLE_COLOR_PICKER_ITEM,
 			'" style="background-color: {.}',
 			'; border-color:',
 			'{.};',
-			'" role="radio"></button>',
+			'"></div>',
 			'</tpl>'
 		);
 
-		const SimpleColorPicker = A.Component.create({
+		var SimpleColorPicker = A.Component.create({
 			ATTRS: {
 				color: {
 					setter(val) {
@@ -96,10 +92,6 @@ AUI.add(
 						'#c244ab',
 					],
 				},
-
-				trigger: {
-					value: null,
-				},
 			},
 
 			NAME: 'simple-color-picker',
@@ -107,97 +99,19 @@ AUI.add(
 			UI_ATTRS: ['color', 'pallete'],
 
 			prototype: {
-				_focusItem(index) {
-					const instance = this;
-
-					const items = instance.items;
-
-					const size = items.size();
-
-					if (index !== undefined) {
-						index = (index + size) % size;
-
-						const item = items.item(index);
-
-						item.getDOMNode().focus();
-					}
-				},
-
 				_onClickColor(event) {
-					const instance = this;
+					var instance = this;
 
-					const pallete = instance.get('pallete');
+					var pallete = instance.get('pallete');
 
-					const color =
-						pallete[instance.items.indexOf(event.currentTarget)];
-
-					instance.set('color', color);
-
-					instance.colorAlert.setContent(
-						Lang.sub(Liferay.Language.get('color-x-selected'), [
-							color,
-						])
+					instance.set(
+						'color',
+						pallete[instance.items.indexOf(event.currentTarget)]
 					);
 				},
 
-				_onKeyDownColor(event) {
-					const instance = this;
-
-					const items = instance.items;
-
-					const currentIndex = items.indexOf(event.currentTarget);
-
-					const {keyCode} = event;
-
-					if (keyCode === KeyMap.ESC) {
-						event.preventDefault();
-						event.stopPropagation();
-
-						const trigger = instance.trigger;
-
-						if (trigger) {
-							trigger.focus();
-						}
-					}
-					else if (
-						keyCode === KeyMap.DOWN ||
-						keyCode === KeyMap.RIGHT
-					) {
-						event.preventDefault();
-
-						instance._focusItem(currentIndex + 1);
-					}
-					else if (
-						keyCode === KeyMap.UP ||
-						keyCode === KeyMap.LEFT
-					) {
-						event.preventDefault();
-
-						instance._focusItem(currentIndex - 1);
-					}
-					else if (
-						keyCode === KeyMap.SPACE ||
-						keyCode === KeyMap.ENTER
-					) {
-						event.preventDefault();
-						event.stopPropagation();
-
-						instance._onClickColor(event);
-					}
-				},
-
-				_renderColorAlert() {
-					const instance = this;
-
-					instance.colorAlert = A.Node.create(TPL_COLOR_ALERT);
-
-					const contentBox = instance.get('contentBox');
-
-					contentBox.prepend(instance.colorAlert);
-				},
-
 				_renderPallete() {
-					const instance = this;
+					var instance = this;
 
 					instance.items = A.NodeList.create(
 						TPL_SIMPLE_COLOR_PICKER_ITEM.parse({
@@ -205,46 +119,27 @@ AUI.add(
 						})
 					);
 
-					const contentBox = instance.get('contentBox');
-
-					contentBox.setAttribute('role', 'radiogroup');
-
-					contentBox.setContent(instance.items);
+					instance.get('contentBox').setContent(instance.items);
 				},
 
 				_uiSetColor(val) {
-					const instance = this;
+					var instance = this;
 
-					const pallete = instance.get('pallete');
+					var pallete = instance.get('pallete');
 
 					instance.items.removeClass(
 						CSS_SIMPLE_COLOR_PICKER_ITEM_SELECTED
 					);
 
-					instance.items.setAttribute('aria-checked', 'false');
-
-					const newNode = instance.items.item(pallete.indexOf(val));
+					var newNode = instance.items.item(pallete.indexOf(val));
 
 					if (newNode) {
 						newNode.addClass(CSS_SIMPLE_COLOR_PICKER_ITEM_SELECTED);
-						newNode.setAttribute('aria-checked', 'true');
 					}
-
-					const contentBox = instance.get('contentBox');
-
-					contentBox.setAttribute(
-						'aria-label',
-						Lang.sub(
-							Liferay.Language.get(
-								'color-picker.-color-selected-x.-use-arrow-keys-to-move-to-different-colors.-press-enter-or-space-to-select-a-color.-press-escape-to-leave-the-color-picker'
-							),
-							[val]
-						)
-					);
 				},
 
 				_uiSetPallete() {
-					const instance = this;
+					var instance = this;
 
 					if (instance.get('rendered')) {
 						instance._renderPallete();
@@ -252,9 +147,9 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
-					const contentBox = instance.get('contentBox');
+					var contentBox = instance.get('contentBox');
 
 					contentBox.delegate(
 						'click',
@@ -262,28 +157,12 @@ AUI.add(
 						STR_DOT + CSS_SIMPLE_COLOR_PICKER_ITEM,
 						instance
 					);
-					contentBox.delegate(
-						'keydown',
-						instance._onKeyDownColor,
-						STR_DOT + CSS_SIMPLE_COLOR_PICKER_ITEM,
-						instance
-					);
-				},
-
-				focus(trigger) {
-					const instance = this;
-
-					instance.trigger = trigger;
-
-					instance.items.first().focus();
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._renderPallete();
-
-					instance._renderColorAlert();
 				},
 			},
 		});

@@ -19,7 +19,7 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Sku;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.SkuDTOConverter;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.search.Document;
@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -45,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = SkuHelper.class)
+@Component(enabled = false, immediate = true, service = SkuHelper.class)
 public class SkuHelper {
 
 	public Page<Sku> getSkusPage(long id, Locale locale, Pagination pagination)
@@ -60,12 +59,14 @@ public class SkuHelper {
 
 		List<CPInstance> cpInstances =
 			_cpInstanceService.getCPDefinitionInstances(
-				cpDefinition.getCPDefinitionId(), WorkflowConstants.STATUS_ANY,
+				cpDefinition.getCPDefinitionId(),
+				WorkflowConstants.STATUS_APPROVED,
 				pagination.getStartPosition(), pagination.getEndPosition(),
 				null);
 
 		int totalItems = _cpInstanceService.getCPDefinitionInstancesCount(
-			cpDefinition.getCPDefinitionId(), WorkflowConstants.STATUS_ANY);
+			cpDefinition.getCPDefinitionId(),
+			WorkflowConstants.STATUS_APPROVED);
 
 		return Page.of(toSKUs(cpInstances, locale), pagination, totalItems);
 	}
@@ -86,8 +87,6 @@ public class SkuHelper {
 				public void accept(Object object) throws Exception {
 					SearchContext searchContext = (SearchContext)object;
 
-					searchContext.setAttribute(
-						Field.STATUS, WorkflowConstants.STATUS_ANY);
 					searchContext.setCompanyId(companyId);
 				}
 
@@ -116,7 +115,7 @@ public class SkuHelper {
 	@Reference
 	private CPInstanceService _cpInstanceService;
 
-	@Reference(target = DTOConverterConstants.SKU_DTO_CONVERTER)
-	private DTOConverter<CPInstance, Sku> _skuDTOConverter;
+	@Reference
+	private SkuDTOConverter _skuDTOConverter;
 
 }

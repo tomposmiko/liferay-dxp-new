@@ -15,6 +15,7 @@
 package com.liferay.fragment.web.internal.servlet.taglib.util;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.web.internal.configuration.FragmentPortletConfiguration;
@@ -27,12 +28,12 @@ import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.upload.criterion.UploadItemSelectorCriterion;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.upload.configuration.UploadServletRequestConfigurationProviderUtil;
+import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -80,7 +81,8 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 					DropdownItemListBuilder.add(
 						() ->
 							hasManageFragmentEntriesPermission &&
-							!_fragmentEntry.isTypeReact(),
+							(_fragmentEntry.getType() !=
+								FragmentConstants.TYPE_REACT),
 						_getEditFragmentEntryActionUnsafeConsumer()
 					).build());
 				dropdownGroupItem.setSeparator(true);
@@ -106,7 +108,8 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 							(_fragmentEntry.isDraft() ||
 							 (_fragmentEntry.fetchDraftFragmentEntry() !=
 								 null)) &&
-							!_fragmentEntry.isTypeReact(),
+							(_fragmentEntry.getType() !=
+								FragmentConstants.TYPE_REACT),
 						_getDeleteDraftFragmentEntryActionUnsafeConsumer()
 					).add(
 						() ->
@@ -116,32 +119,18 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 					).add(
 						() ->
 							hasManageFragmentEntriesPermission &&
-							!_fragmentEntry.isCacheable() &&
-							!_fragmentEntry.isReadOnly() &&
-							!_fragmentEntry.isTypeInput() &&
-							!_fragmentEntry.isTypeReact(),
-						_getMarkAsCacheableActionUnsafeConsumer()
-					).add(
-						() ->
-							hasManageFragmentEntriesPermission &&
-							_fragmentEntry.isCacheable() &&
-							!_fragmentEntry.isReadOnly() &&
-							!_fragmentEntry.isTypeInput() &&
-							!_fragmentEntry.isTypeReact(),
-						_getUnmarkAsCacheableActionUnsafeConsumer()
-					).add(
-						() ->
-							hasManageFragmentEntriesPermission &&
 							!_fragmentEntry.isReadOnly() &&
 							(_fragmentEntry.getGroupId() ==
-								_themeDisplay.getCompanyGroupId()),
+								_themeDisplay.getCompanyGroupId()) &&
+							(_fragmentEntry.getGlobalUsageCount() > 0),
 						_getViewGroupFragmentEntryUsagesActionUnsafeConsumer()
 					).add(
 						() ->
 							hasManageFragmentEntriesPermission &&
 							!_fragmentEntry.isReadOnly() &&
 							(_fragmentEntry.getGroupId() !=
-								_themeDisplay.getCompanyGroupId()),
+								_themeDisplay.getCompanyGroupId()) &&
+							(_fragmentEntry.getUsageCount() > 0),
 						_getViewFragmentEntryUsagesActionUnsafeConsumer()
 					).build());
 				dropdownGroupItem.setSeparator(true);
@@ -153,7 +142,8 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 						() ->
 							hasManageFragmentEntriesPermission &&
 							!_fragmentEntry.isReadOnly() &&
-							!_fragmentEntry.isTypeReact(),
+							(_fragmentEntry.getType() !=
+								FragmentConstants.TYPE_REACT),
 						_getExportFragmentEntryActionUnsafeConsumer()
 					).add(
 						() -> hasManageFragmentEntriesPermission,
@@ -201,7 +191,15 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 			dropdownItem.putData(
 				"fragmentEntryId",
 				String.valueOf(_fragmentEntry.getFragmentEntryId()));
-			dropdownItem.setIcon("copy");
+			dropdownItem.putData(
+				"selectFragmentCollectionURL",
+				PortletURLBuilder.createRenderURL(
+					_renderResponse
+				).setMVCRenderCommandName(
+					"/fragment/select_fragment_collection"
+				).setWindowState(
+					LiferayWindowState.POP_UP
+				).buildString());
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "make-a-copy"));
 		};
@@ -244,7 +242,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 				).setParameter(
 					"fragmentEntryId", _fragmentEntry.getFragmentEntryId()
 				).buildString());
-			dropdownItem.setIcon("trash");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "delete"));
 		};
@@ -261,8 +258,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 					_renderResponse
 				).setActionName(
 					"/fragment/delete_fragment_entry_preview"
-				).setRedirect(
-					_themeDisplay.getURLCurrent()
 				).setParameter(
 					"fragmentEntryId", _fragmentEntry.getFragmentEntryId()
 				).buildString());
@@ -299,7 +294,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 				_themeDisplay.getURLCurrent(), "fragmentCollectionId",
 				editFragmentEntry.getFragmentCollectionId(), "fragmentEntryId",
 				editFragmentEntry.getFragmentEntryId());
-			dropdownItem.setIcon("pencil");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "edit"));
 		};
@@ -320,7 +314,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 		return dropdownItem -> {
 			dropdownItem.setDisabled(_fragmentEntry.isDraft());
 			dropdownItem.setHref(exportFragmentEntryURL);
-			dropdownItem.setIcon("upload");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "export"));
 		};
@@ -328,24 +321,16 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 
 	private String _getItemSelectorURL() {
 		ItemSelectorCriterion itemSelectorCriterion =
-			UploadItemSelectorCriterion.builder(
-			).desiredItemSelectorReturnTypes(
-				new FileEntryItemSelectorReturnType()
-			).extensions(
-				_fragmentPortletConfiguration.thumbnailExtensions()
-			).maxFileSize(
-				UploadServletRequestConfigurationProviderUtil.getMaxSize()
-			).portletId(
-				FragmentPortletKeys.FRAGMENT
-			).repositoryName(
-				LanguageUtil.get(_themeDisplay.getLocale(), "fragments")
-			).url(
+			new UploadItemSelectorCriterion(
+				FragmentPortletKeys.FRAGMENT,
 				PortletURLBuilder.createActionURL(
 					_renderResponse
 				).setActionName(
 					"/fragment/upload_fragment_entry_preview"
-				).buildString()
-			).build();
+				).buildString(),
+				LanguageUtil.get(_themeDisplay.getLocale(), "fragments"),
+				UploadServletRequestConfigurationHelperUtil.getMaxSize(),
+				_fragmentPortletConfiguration.thumbnailExtensions());
 
 		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new FileEntryItemSelectorReturnType());
@@ -358,27 +343,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 		).setParameter(
 			"fragmentEntryId", _fragmentEntry.getFragmentEntryId()
 		).buildString();
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
-		_getMarkAsCacheableActionUnsafeConsumer() {
-
-		return dropdownItem -> {
-			dropdownItem.putData("action", "markAsCacheableFragmentEntry");
-			dropdownItem.putData(
-				"markAsCacheableFragmentEntryURL",
-				PortletURLBuilder.createActionURL(
-					_renderResponse
-				).setActionName(
-					"/fragment/mark_as_cacheable_fragment_entry"
-				).setRedirect(
-					_themeDisplay.getURLCurrent()
-				).setParameter(
-					"fragmentEntryId", _fragmentEntry.getFragmentEntryId()
-				).buildString());
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "mark-as-cacheable"));
-		};
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception>
@@ -408,7 +372,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 				).setWindowState(
 					LiferayWindowState.POP_UP
 				).buildString());
-			dropdownItem.setIcon("move-folder");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "move"));
 		};
@@ -441,27 +404,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception>
-		_getUnmarkAsCacheableActionUnsafeConsumer() {
-
-		return dropdownItem -> {
-			dropdownItem.putData("action", "unmarkAsCacheableFragmentEntry");
-			dropdownItem.putData(
-				"unmarkAsCacheableFragmentEntryURL",
-				PortletURLBuilder.createActionURL(
-					_renderResponse
-				).setActionName(
-					"/fragment/unmark_as_cacheable_fragment_entry"
-				).setRedirect(
-					_themeDisplay.getURLCurrent()
-				).setParameter(
-					"fragmentEntryId", _fragmentEntry.getFragmentEntryId()
-				).buildString());
-			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "unmark-as-cacheable"));
-		};
-	}
-
-	private UnsafeConsumer<DropdownItem, Exception>
 		_getUpdateFragmentEntryPreviewActionUnsafeConsumer() {
 
 		return dropdownItem -> {
@@ -470,7 +412,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 				"fragmentEntryId",
 				String.valueOf(_fragmentEntry.getFragmentEntryId()));
 			dropdownItem.putData("itemSelectorURL", _getItemSelectorURL());
-			dropdownItem.setIcon("change");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "change-thumbnail"));
 		};
@@ -480,14 +421,12 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 		_getViewFragmentEntryUsagesActionUnsafeConsumer() {
 
 		return dropdownItem -> {
-			dropdownItem.setDisabled(_fragmentEntry.getUsageCount() == 0);
 			dropdownItem.setHref(
 				_renderResponse.createRenderURL(), "mvcRenderCommandName",
 				"/fragment/view_fragment_entry_usages", "redirect",
 				_themeDisplay.getURLCurrent(), "fragmentCollectionId",
 				_fragmentEntry.getFragmentCollectionId(), "fragmentEntryId",
 				_fragmentEntry.getFragmentEntryId());
-			dropdownItem.setIcon("list-ul");
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "view-usages"));
 		};
@@ -497,7 +436,6 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 		_getViewGroupFragmentEntryUsagesActionUnsafeConsumer() {
 
 		return dropdownItem -> {
-			dropdownItem.setDisabled(_fragmentEntry.getGlobalUsageCount() == 0);
 			dropdownItem.setHref(
 				_renderResponse.createRenderURL(), "mvcRenderCommandName",
 				"/fragment/view_group_fragment_entry_usages", "redirect",

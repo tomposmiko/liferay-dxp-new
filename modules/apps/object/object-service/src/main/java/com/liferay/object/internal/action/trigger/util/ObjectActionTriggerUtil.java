@@ -53,13 +53,8 @@ public class ObjectActionTriggerUtil {
 					new ObjectActionTrigger(
 						ObjectActionTriggerConstants.KEY_ON_AFTER_ADD),
 					new ObjectActionTrigger(
-						ObjectActionTriggerConstants.
-							KEY_ON_AFTER_ATTACHMENT_DOWNLOAD),
-					new ObjectActionTrigger(
 						ObjectActionTriggerConstants.KEY_ON_AFTER_DELETE),
 					new ObjectActionTrigger(
-						ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE),
-					new ObjectActionTrigger(
-						ObjectActionTriggerConstants.KEY_STANDALONE))));
+						ObjectActionTriggerConstants.KEY_ON_AFTER_UPDATE))));
 
 }

@@ -23,10 +23,9 @@ export default function getCountries(callback) {
 	}
 
 	Liferay.Service(
-		'/country/get-company-countries',
+		'/country/get-countries',
 		{
 			active: true,
-			companyId: Liferay.ThemeDisplay.getCompanyId(),
 		},
 		callback
 	);

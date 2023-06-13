@@ -3,19 +3,32 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "Product Info Management";
 
 	setUp {
-		CommerceConfiguration.commerceSetUp(storeFront = "true");
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceStoreFrontSetUp();
 	}
 
 	tearDown {
-		CommerceConfiguration.commerceTearDown();
+		Navigator.openURL();
+
+		if (IsElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE")) {
+			User.logoutPG();
+		}
+
+		User.firstLoginPG();
+
+		CommerceConfiguration.commerceAdminTearDown();
+
+		CommerceConfiguration.commerceInitializersTearDown();
 	}
 
 	@description = "This is a test for COMMERCE-6062. AddAProductRelations"
-	@priority = 3
+	@priority = "3"
 	test AddAProductRelations {
 		property portal.acceptance = "false";
 
@@ -50,21 +63,21 @@ definition {
 
 			AssertElementPresent(
 				key_productName = "Shoes",
-				key_value = ${valueList},
+				key_Value = "${valueList}",
 				locator1 = "CommerceEntry#VALUE_PRODUCT_RELATIONS");
 		}
 	}
 
 	@description = "This is a test for COMMERCE-6064. EditAProductRelations"
-	@priority = 5
+	@priority = "3"
 	test EditAProductRelations {
-		property portal.acceptance = "true";
+		property portal.acceptance = "false";
 
 		CommerceNavigator.gotoPortlet(
 			category = "Product Management",
 			portlet = "Products");
 
-		WaitForElementPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER");
+		Pause(locator1 = "3000");
 
 		CPCommerceCatalog.newProductsEntry(
 			productCatalog = "Master",
@@ -89,17 +102,17 @@ definition {
 		CommerceRelations.addProductRelation(productNameRelation = "Shoes");
 
 		CommerceRelations.productRelationSetPriority(
-			priorityValue = 1,
+			priorityValue = "1",
 			productNameRelation = "Shoes");
 
 		AssertElementPresent(
 			key_productName = "Shoes",
-			key_value = 1,
+			key_Value = "1",
 			locator1 = "CommerceEntry#VALUE_PRODUCT_RELATIONS");
 	}
 
 	@description = "This is a test for COMMERCE-6063. RemoveAProductRelations"
-	@priority = 3
+	@priority = "3"
 	test RemoveAProductRelations {
 		property portal.acceptance = "false";
 
@@ -146,67 +159,9 @@ definition {
 		for (var valueList : list "Up-Sell,Cross-Sell,Related,Accessories,Spare") {
 			AssertElementNotPresent(
 				key_productName = "Shoes",
-				key_value = ${valueList},
+				key_Value = "${valueList}",
 				locator1 = "CommerceEntry#VALUE_PRODUCT_RELATIONS");
 		}
-	}
-
-	@description = "This is a test for COMMERCE-8308. SearchProductRelations"
-	@priority = 5
-	test SearchProductRelations {
-		property portal.acceptance = "true";
-
-		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
-
-		CommerceNavigator.gotoPortlet(
-			category = "Product Management",
-			portlet = "Products");
-
-		AppBuilderAdmin.searchByItem(itemName = "Turbocharger");
-
-		CommerceNavigator.gotoEntry(entryName = "Turbocharger");
-
-		CommerceEntry.gotoMenuTab(menuTab = "Media");
-
-		for (var number : list "106,107,108") {
-			CommerceEntry.checkImageName(uploadFileName = "Minium_ProductImage_${number}.png");
-		}
-
-		CommerceEntry.gotoMenuTab(menuTab = "Visibility");
-
-		for (var nameList : list "Channels,Account Groups") {
-			CommerceEntry.assertCheckedSpecificToggle(name = ${nameList});
-		}
-
-		CommerceEntry.gotoMenuTab(menuTab = "Product Relations");
-
-		Click(locator1 = "Button#PLUS");
-
-		Click(
-			key_selectAction = "Add Up-Sell Product",
-			locator1 = "FormViewBuilder#FIELD_ELLIPSIS_ACTION_FIELDSET");
-
-		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
-
-		AppBuilderAdmin.searchByItem(itemName = "Turbocharger");
-
-		AssertElementPresent(
-			key_entry = "Turbocharger",
-			locator1 = "CommerceNavigation#TD_ANY_ENTRY_NAME");
-
-		CommerceNavigator.clearSearchBar();
-
-		AssertElementNotPresent(
-			key_entry = "Turbocharger",
-			locator1 = "CommerceNavigation#TD_ANY_ENTRY_NAME");
-
-		Click(
-			key_pageNumber = 3,
-			locator1 = "CommerceNavigation#PAGINATION_ANY_PAGE");
-
-		AssertElementPresent(
-			key_entry = "Turbocharger",
-			locator1 = "CommerceNavigation#TD_ANY_ENTRY_NAME");
 	}
 
 }

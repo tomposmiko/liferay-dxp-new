@@ -26,8 +26,8 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
-page import="com.liferay.portal.search.web.internal.result.display.context.SearchResultContentDisplayContext" %><%@
-page import="com.liferay.portal.search.web.internal.result.display.context.builder.SearchResultContentDisplayContextBuilder" %>
+page import="com.liferay.portal.search.web.internal.result.display.builder.SearchResultContentDisplayBuilder" %><%@
+page import="com.liferay.portal.search.web.internal.result.display.context.SearchResultContentDisplayContext" %>
 
 <liferay-theme:defineObjects />
 
@@ -36,17 +36,17 @@ page import="com.liferay.portal.search.web.internal.result.display.context.build
 <%
 portletDisplay.setShowBackIcon(false);
 
-SearchResultContentDisplayContextBuilder searchResultContentDisplayContextBuilder = new SearchResultContentDisplayContextBuilder();
+SearchResultContentDisplayBuilder searchResultContentDisplayBuilder = new SearchResultContentDisplayBuilder();
 
-searchResultContentDisplayContextBuilder.setAssetEntryId(ParamUtil.getLong(request, "assetEntryId"));
-searchResultContentDisplayContextBuilder.setLocale(locale);
-searchResultContentDisplayContextBuilder.setPermissionChecker(permissionChecker);
-searchResultContentDisplayContextBuilder.setPortal(PortalUtil.getPortal());
-searchResultContentDisplayContextBuilder.setRenderRequest(renderRequest);
-searchResultContentDisplayContextBuilder.setRenderResponse(renderResponse);
-searchResultContentDisplayContextBuilder.setType(ParamUtil.getString(request, "type"));
+searchResultContentDisplayBuilder.setAssetEntryId(ParamUtil.getLong(request, "assetEntryId"));
+searchResultContentDisplayBuilder.setLocale(locale);
+searchResultContentDisplayBuilder.setPermissionChecker(permissionChecker);
+searchResultContentDisplayBuilder.setPortal(PortalUtil.getPortal());
+searchResultContentDisplayBuilder.setRenderRequest(renderRequest);
+searchResultContentDisplayBuilder.setRenderResponse(renderResponse);
+searchResultContentDisplayBuilder.setType(ParamUtil.getString(request, "type"));
 
-SearchResultContentDisplayContext searchResultContentDisplayContext = searchResultContentDisplayContextBuilder.build();
+SearchResultContentDisplayContext searchResultContentDisplayContext = searchResultContentDisplayBuilder.build();
 %>
 
 <liferay-ui:success key='<%= portletDisplay.getId() + "requestProcessed" %>' message="your-request-completed-successfully" />

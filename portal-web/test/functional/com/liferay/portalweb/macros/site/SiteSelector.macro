@@ -1,22 +1,24 @@
 definition {
 
 	macro _searchSite {
-		if (contains(${site}, "Liferay")) {
+		if (contains("${site}", "Liferay")) {
 			var searchTerm = "guest";
 		}
 		else {
-			var searchTerm = ${site};
+			var searchTerm = "${site}";
 		}
 
-		Search.searchCP(searchTerm = ${searchTerm});
+		Search.searchCP(searchTerm = "${searchTerm}");
 	}
 
 	macro selectSite {
 		LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
-		SiteSelector._searchSite(site = ${site});
+		SiteSelector._searchSite(site = "${site}");
 
-		LexiconEntry.gotoEntry(rowEntry = ${site});
+		Pause(locator1 = "3000");
+
+		LexiconEntry.gotoEntry(rowEntry = "${site}");
 
 		SelectFrameTop();
 	}
@@ -24,13 +26,11 @@ definition {
 	macro viewSite {
 		LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
-		SiteSelector._searchSite(site = ${site});
+		SiteSelector._searchSite(site = "${site}");
 
-		AssertTextEquals(
-			key_columnName = "title",
-			key_tableEntry = ${site},
-			locator1 = "LexiconTable#TABLE_ENTRY_INFO",
-			value1 = ${site});
+		AssertElementPresent(
+			key_rowEntry = "${site}",
+			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK");
 
 		SelectFrameTop();
 	}

@@ -14,8 +14,6 @@
 
 package com.liferay.document.library.web.internal.portlet.action;
 
-import com.liferay.diff.Diff;
-import com.liferay.diff.DiffResult;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
@@ -23,13 +21,15 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.diff.DiffResult;
+import com.liferay.portal.kernel.diff.DiffUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -104,7 +104,7 @@ public class CompareVersionsMVCRenderCommand implements MVCRenderCommand {
 		InputStream targetInputStream = _getFileVersionInputStream(
 			targetFileVersion);
 
-		List<DiffResult>[] diffResults = _diff.diff(
+		List<DiffResult>[] diffResults = DiffUtil.diff(
 			new InputStreamReader(sourceInputStream),
 			new InputStreamReader(targetInputStream));
 
@@ -131,7 +131,7 @@ public class CompareVersionsMVCRenderCommand implements MVCRenderCommand {
 			extension.equals("html") || extension.equals("js") ||
 			extension.equals("txt") || extension.equals("xml")) {
 
-			String content = _html.escape(StringUtil.read(inputStream));
+			String content = HtmlUtil.escape(StringUtil.read(inputStream));
 
 			inputStream = new UnsyncByteArrayInputStream(
 				content.getBytes(StandardCharsets.UTF_8));
@@ -152,15 +152,9 @@ public class CompareVersionsMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	@Reference
-	private Diff _diff;
-
-	@Reference
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
 	private DLAppService _dlAppService;
-
-	@Reference
-	private Html _html;
 
 }

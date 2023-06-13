@@ -15,7 +15,6 @@
 package com.liferay.portal.servlet.filters.absoluteredirects;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.NoSuchVirtualHostException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -27,7 +26,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.util.PortalInstances;
-import com.liferay.portal.util.PropsValues;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,22 +58,13 @@ public class AbsoluteRedirectsFilter
 
 		//response.setContentType(ContentTypes.TEXT_HTML_UTF8);
 
-		// Company ID needs to always be called here so that it is properly set
+		// Company id needs to always be called here so that it's properly set
 		// in subsequent calls
 
-		try {
-			PortalInstances.getCompanyId(
-				httpServletRequest, PropsValues.VIRTUAL_HOSTS_STRICT_ACCESS);
-		}
-		catch (NoSuchVirtualHostException noSuchVirtualHostException) {
-			_log.error(noSuchVirtualHostException);
+		long companyId = PortalInstances.getCompanyId(httpServletRequest);
 
-			httpServletRequest.setAttribute(
-				WebKeys.UNKNOWN_VIRTUAL_HOST, Boolean.TRUE);
-
-			httpServletResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
-
-			return null;
+		if (_log.isDebugEnabled()) {
+			_log.debug("Company id " + companyId);
 		}
 
 		PortalUtil.getCurrentCompleteURL(httpServletRequest);

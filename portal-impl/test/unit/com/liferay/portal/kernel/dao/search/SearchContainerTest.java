@@ -17,10 +17,6 @@ package com.liferay.portal.kernel.dao.search;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
@@ -47,7 +43,7 @@ public class SearchContainerTest {
 	public void testCalculateCurWhenEmptyResultsPage() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(() -> _getResultsOfSize(10), 10);
+		_searchContainer.setTotal(10);
 
 		Assert.assertEquals(1, _searchContainer.getCur());
 	}
@@ -56,7 +52,7 @@ public class SearchContainerTest {
 	public void testCalculateCurWhenFullResultsPage() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(() -> _getResultsOfSize(20), 20);
+		_searchContainer.setTotal(20);
 
 		Assert.assertEquals(1, _searchContainer.getCur());
 	}
@@ -65,7 +61,7 @@ public class SearchContainerTest {
 	public void testCalculateCurWhenNoResults() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(Collections::emptyList, 0);
+		_searchContainer.setTotal(0);
 
 		Assert.assertEquals(1, _searchContainer.getCur());
 	}
@@ -74,7 +70,7 @@ public class SearchContainerTest {
 	public void testCalculateCurWhenResultsPage() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(() -> _getResultsOfSize(80), 80);
+		_searchContainer.setTotal(80);
 
 		Assert.assertEquals(2, _searchContainer.getCur());
 	}
@@ -83,7 +79,7 @@ public class SearchContainerTest {
 	public void testCalculateStartAndEndWhenEmptyResultsPage() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(() -> _getResultsOfSize(10), 10);
+		_searchContainer.setTotal(10);
 
 		Assert.assertEquals(0, _searchContainer.getStart());
 		Assert.assertEquals(20, _searchContainer.getEnd());
@@ -93,7 +89,7 @@ public class SearchContainerTest {
 	public void testCalculateStartAndEndWhenFullResultsPage() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(() -> _getResultsOfSize(20), 20);
+		_searchContainer.setTotal(20);
 
 		Assert.assertEquals(0, _searchContainer.getStart());
 		Assert.assertEquals(20, _searchContainer.getEnd());
@@ -103,7 +99,7 @@ public class SearchContainerTest {
 	public void testCalculateStartAndEndWhenNoResults() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(Collections::emptyList, 0);
+		_searchContainer.setTotal(0);
 
 		Assert.assertEquals(0, _searchContainer.getStart());
 		Assert.assertEquals(20, _searchContainer.getEnd());
@@ -113,7 +109,7 @@ public class SearchContainerTest {
 	public void testCalculateStartAndEndWhenResultsPage() {
 		buildSearchContainer(2);
 
-		_searchContainer.setResultsAndTotal(() -> _getResultsOfSize(80), 80);
+		_searchContainer.setTotal(80);
 
 		Assert.assertEquals(20, _searchContainer.getStart());
 		Assert.assertEquals(40, _searchContainer.getEnd());
@@ -123,7 +119,7 @@ public class SearchContainerTest {
 	public void testNotCalculateCurWhenNoResultsAndInitialPage() {
 		buildSearchContainer(1);
 
-		_searchContainer.setResultsAndTotal(Collections::emptyList, 0);
+		_searchContainer.setTotal(0);
 
 		Assert.assertFalse(_searchContainer.isRecalculateCur());
 	}
@@ -132,7 +128,7 @@ public class SearchContainerTest {
 	public void testNotCalculateStartAndEndWhenNoResultsAndInitialPage() {
 		buildSearchContainer(1);
 
-		_searchContainer.setResultsAndTotal(Collections::emptyList, 0);
+		_searchContainer.setTotal(0);
 
 		Assert.assertEquals(0, _searchContainer.getStart());
 		Assert.assertEquals(20, _searchContainer.getEnd());
@@ -145,18 +141,8 @@ public class SearchContainerTest {
 			ProxyFactory.newDummyInstance(PortletURL.class), null, null);
 	}
 
-	private List<Object> _getResultsOfSize(int size) {
-		List<Object> objects = new ArrayList<>();
-
-		while (objects.size() < size) {
-			objects.add(new Object());
-		}
-
-		return objects;
-	}
-
 	private static final int _DEFAULT_DELTA = 20;
 
-	private SearchContainer<Object> _searchContainer;
+	private SearchContainer<?> _searchContainer;
 
 }

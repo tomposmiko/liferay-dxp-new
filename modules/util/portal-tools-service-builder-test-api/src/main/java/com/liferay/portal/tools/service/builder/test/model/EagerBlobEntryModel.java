@@ -115,8 +115,4 @@ public interface EagerBlobEntryModel extends BaseModel<EagerBlobEntry> {
 	@Override
 	public EagerBlobEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

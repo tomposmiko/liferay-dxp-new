@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -88,7 +89,7 @@ public class JournalArticleLocalizationModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table JournalArticleLocalization (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,articleLocalizationId LONG not null,companyId LONG,articlePK LONG,title VARCHAR(800) null,description STRING null,languageId VARCHAR(75) null,primary key (articleLocalizationId, ctCollectionId))";
+		"create table JournalArticleLocalization (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,articleLocalizationId LONG not null,companyId LONG,articlePK LONG,title VARCHAR(400) null,description STRING null,languageId VARCHAR(75) null,primary key (articleLocalizationId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table JournalArticleLocalization";
@@ -228,102 +229,114 @@ public class JournalArticleLocalizationModelImpl
 	public Map<String, Function<JournalArticleLocalization, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<JournalArticleLocalization, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, JournalArticleLocalization>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<JournalArticleLocalization, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			JournalArticleLocalization.class.getClassLoader(),
+			JournalArticleLocalization.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<JournalArticleLocalization, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String,
-						 Function<JournalArticleLocalization, Object>>();
+		try {
+			Constructor<JournalArticleLocalization> constructor =
+				(Constructor<JournalArticleLocalization>)
+					proxyClass.getConstructor(InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", JournalArticleLocalization::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId",
-				JournalArticleLocalization::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"articleLocalizationId",
-				JournalArticleLocalization::getArticleLocalizationId);
-			attributeGetterFunctions.put(
-				"companyId", JournalArticleLocalization::getCompanyId);
-			attributeGetterFunctions.put(
-				"articlePK", JournalArticleLocalization::getArticlePK);
-			attributeGetterFunctions.put(
-				"title", JournalArticleLocalization::getTitle);
-			attributeGetterFunctions.put(
-				"description", JournalArticleLocalization::getDescription);
-			attributeGetterFunctions.put(
-				"languageId", JournalArticleLocalization::getLanguageId);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map
+		<String, Function<JournalArticleLocalization, Object>>
+			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<JournalArticleLocalization, Object>>
+			_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<JournalArticleLocalization, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<JournalArticleLocalization, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<JournalArticleLocalization, Object>>();
+		Map<String, BiConsumer<JournalArticleLocalization, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<JournalArticleLocalization, ?>>();
 
-		static {
-			Map<String, BiConsumer<JournalArticleLocalization, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<JournalArticleLocalization, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", JournalArticleLocalization::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<JournalArticleLocalization, Long>)
+				JournalArticleLocalization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", JournalArticleLocalization::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<JournalArticleLocalization, Long>)
+				JournalArticleLocalization::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"articleLocalizationId",
+			JournalArticleLocalization::getArticleLocalizationId);
+		attributeSetterBiConsumers.put(
+			"articleLocalizationId",
+			(BiConsumer<JournalArticleLocalization, Long>)
+				JournalArticleLocalization::setArticleLocalizationId);
+		attributeGetterFunctions.put(
+			"companyId", JournalArticleLocalization::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<JournalArticleLocalization, Long>)
+				JournalArticleLocalization::setCompanyId);
+		attributeGetterFunctions.put(
+			"articlePK", JournalArticleLocalization::getArticlePK);
+		attributeSetterBiConsumers.put(
+			"articlePK",
+			(BiConsumer<JournalArticleLocalization, Long>)
+				JournalArticleLocalization::setArticlePK);
+		attributeGetterFunctions.put(
+			"title", JournalArticleLocalization::getTitle);
+		attributeSetterBiConsumers.put(
+			"title",
+			(BiConsumer<JournalArticleLocalization, String>)
+				JournalArticleLocalization::setTitle);
+		attributeGetterFunctions.put(
+			"description", JournalArticleLocalization::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<JournalArticleLocalization, String>)
+				JournalArticleLocalization::setDescription);
+		attributeGetterFunctions.put(
+			"languageId", JournalArticleLocalization::getLanguageId);
+		attributeSetterBiConsumers.put(
+			"languageId",
+			(BiConsumer<JournalArticleLocalization, String>)
+				JournalArticleLocalization::setLanguageId);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<JournalArticleLocalization, Long>)
-					JournalArticleLocalization::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<JournalArticleLocalization, Long>)
-					JournalArticleLocalization::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"articleLocalizationId",
-				(BiConsumer<JournalArticleLocalization, Long>)
-					JournalArticleLocalization::setArticleLocalizationId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<JournalArticleLocalization, Long>)
-					JournalArticleLocalization::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"articlePK",
-				(BiConsumer<JournalArticleLocalization, Long>)
-					JournalArticleLocalization::setArticlePK);
-			attributeSetterBiConsumers.put(
-				"title",
-				(BiConsumer<JournalArticleLocalization, String>)
-					JournalArticleLocalization::setTitle);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<JournalArticleLocalization, String>)
-					JournalArticleLocalization::setDescription);
-			attributeSetterBiConsumers.put(
-				"languageId",
-				(BiConsumer<JournalArticleLocalization, String>)
-					JournalArticleLocalization::setLanguageId);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -754,13 +767,45 @@ public class JournalArticleLocalizationModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<JournalArticleLocalization, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<JournalArticleLocalization, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<JournalArticleLocalization, Object>
+				attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply(
+					(JournalArticleLocalization)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, JournalArticleLocalization>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						JournalArticleLocalization.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
@@ -775,8 +820,7 @@ public class JournalArticleLocalizationModelImpl
 
 	public <T> T getColumnValue(String columnName) {
 		Function<JournalArticleLocalization, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

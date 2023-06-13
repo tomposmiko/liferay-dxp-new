@@ -79,16 +79,16 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 	);
 	const [showPageInput, setShowPageInput] = useState(false);
 
-	const imageContainerRef = useRef();
-	const pageInputRef = useRef();
-	const showPageInputButtonRef = useRef();
+	const imageContainer = useRef();
+	const pageInput = useRef();
+	const showPageInputButton = useRef();
 
 	const isMounted = useIsMounted();
 
 	if (showPageInput) {
 		setTimeout(() => {
 			if (isMounted()) {
-				pageInputRef.current.focus();
+				pageInput.current.focus();
 			}
 		}, 100);
 	}
@@ -144,7 +144,7 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 			loadCurrentPage(page);
 		}
 
-		imageContainerRef.current.scrollTop = 0;
+		imageContainer.current.scrollTop = 0;
 
 		setCurrentPage(page);
 	};
@@ -165,7 +165,7 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 		if (returnFocus) {
 			setTimeout(() => {
 				if (isMounted()) {
-					showPageInputButtonRef.current.focus();
+					showPageInputButton.current.focus();
 				}
 			}, 100);
 		}
@@ -208,7 +208,7 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 						'image-container-expanded': expanded,
 					}
 				)}
-				ref={imageContainerRef}
+				ref={imageContainer}
 			>
 				{currentPageLoading ? (
 					<ClayLoadingIndicator />
@@ -222,7 +222,6 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 					/>
 				)}
 			</div>
-
 			<div className="preview-toolbar-container">
 				<ClayButton.Group className="floating-bar">
 					<ClayButton.Group>
@@ -231,7 +230,7 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 							onClick={() => {
 								setShowPageInput(true);
 							}}
-							ref={showPageInputButtonRef}
+							ref={showPageInputButton}
 							title={
 								totalPages > 1
 									? Liferay.Language.get(
@@ -244,7 +243,6 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 								'page'
 							)} ${currentPage} / ${totalPages}`}
 						</ClayButton>
-
 						{showPageInput && (
 							<div className="floating-bar-input-wrapper">
 								<input
@@ -256,13 +254,12 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 									placeholder={Liferay.Language.get(
 										'page-...'
 									)}
-									ref={pageInputRef}
+									ref={pageInput}
 									type="number"
 								/>
 							</div>
 						)}
 					</ClayButton.Group>
-
 					<ClayButton
 						className="btn-floating-bar"
 						disabled={previousPageDisabled}
@@ -274,7 +271,6 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 					>
 						<ClayIcon symbol="caret-top" />
 					</ClayButton>
-
 					<ClayButton
 						className="btn-floating-bar"
 						disabled={nextPageDisabled}
@@ -286,9 +282,7 @@ const DocumentPreviewer = ({baseImageURL, initialPage, totalPages}) => {
 					>
 						<ClayIcon symbol="caret-bottom" />
 					</ClayButton>
-
 					<div className="separator-floating-bar"></div>
-
 					<ClayButton
 						className="btn-floating-bar"
 						monospaced

@@ -16,25 +16,16 @@ package com.liferay.commerce.tax.engine.fixed.service.impl;
 
 import com.liferay.commerce.tax.engine.fixed.model.CommerceTaxFixedRateAddressRel;
 import com.liferay.commerce.tax.engine.fixed.service.base.CommerceTaxFixedRateAddressRelLocalServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.tax.engine.fixed.model.CommerceTaxFixedRateAddressRel",
-	service = AopService.class
-)
 public class CommerceTaxFixedRateAddressRelLocalServiceImpl
 	extends CommerceTaxFixedRateAddressRelLocalServiceBaseImpl {
 
@@ -45,7 +36,7 @@ public class CommerceTaxFixedRateAddressRelLocalServiceImpl
 			double rate)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		long commerceTaxFixedRateAddressRelId = counterLocalService.increment();
 
@@ -200,8 +191,5 @@ public class CommerceTaxFixedRateAddressRelLocalServiceImpl
 		return commerceTaxFixedRateAddressRelPersistence.update(
 			commerceTaxFixedRateAddressRel);
 	}
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

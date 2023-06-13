@@ -16,8 +16,7 @@ package com.liferay.portal.upgrade.v7_4_x;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
+import com.liferay.portal.upgrade.v7_4_x.util.AssetVocabularyTable;
 
 /**
  * @author Luis Miguel Barcos
@@ -26,19 +25,21 @@ public class UpgradeAssetVocabulary extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		if (!hasColumn(
+				AssetVocabularyTable.TABLE_NAME, "externalReferenceCode")) {
+
+			alter(
+				AssetVocabularyTable.class,
+				new AlterTableAddColumn(
+					"externalReferenceCode", "VARCHAR(75)"));
+		}
+
 		runSQL(
 			StringBundler.concat(
-				"update AssetVocabulary set externalReferenceCode = ",
-				"CAST_TEXT(vocabularyId) where externalReferenceCode is null ",
-				"or externalReferenceCode =''"));
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"AssetVocabulary", "externalReferenceCode VARCHAR(75)")
-		};
+				"update ", AssetVocabularyTable.TABLE_NAME,
+				" set externalReferenceCode = CAST_TEXT(vocabularyId)",
+				" where externalReferenceCode is null or ",
+				"externalReferenceCode =''"));
 	}
 
 }

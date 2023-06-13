@@ -295,11 +295,6 @@ public class SamlIdpSsoSessionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected SamlIdpSsoSessionWrapper wrap(
 		SamlIdpSsoSession samlIdpSsoSession) {
 

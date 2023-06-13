@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Peter Shin
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + ReportsEngineConsolePortletKeys.REPORTS_ADMIN,
 	service = ConfigurationAction.class
 )
@@ -54,19 +55,19 @@ public class ReportsAdminConfigurationAction
 		String tabs2 = ParamUtil.getString(actionRequest, "tabs2");
 
 		if (tabs2.equals("delivery-email")) {
-			_validateEmailDelivery(actionRequest);
+			validateEmailDelivery(actionRequest);
 		}
 		else if (tabs2.equals("email-from")) {
 			validateEmailFrom(actionRequest);
 		}
 		else if (tabs2.equals("notifications-email")) {
-			_validateEmailNotifications(actionRequest);
+			validateEmailNotifications(actionRequest);
 		}
 
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	private void _validateEmailDelivery(ActionRequest actionRequest)
+	protected void validateEmailDelivery(ActionRequest actionRequest)
 		throws Exception {
 
 		String emailDeliverySubject = getParameter(
@@ -82,7 +83,7 @@ public class ReportsAdminConfigurationAction
 		}
 	}
 
-	private void _validateEmailNotifications(ActionRequest actionRequest)
+	protected void validateEmailNotifications(ActionRequest actionRequest)
 		throws Exception {
 
 		String emailNotificationsSubject = getParameter(

@@ -20,7 +20,6 @@ import com.liferay.changeset.model.ChangesetEntryTable;
 import com.liferay.changeset.model.impl.ChangesetEntryImpl;
 import com.liferay.changeset.model.impl.ChangesetEntryModelImpl;
 import com.liferay.changeset.service.persistence.ChangesetEntryPersistence;
-import com.liferay.changeset.service.persistence.ChangesetEntryUtil;
 import com.liferay.changeset.service.persistence.impl.constants.ChangesetPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -46,7 +46,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -71,7 +70,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = ChangesetEntryPersistence.class)
+@Component(service = {ChangesetEntryPersistence.class, BasePersistence.class})
 public class ChangesetEntryPersistenceImpl
 	extends BasePersistenceImpl<ChangesetEntry>
 	implements ChangesetEntryPersistence {
@@ -189,7 +188,7 @@ public class ChangesetEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
@@ -548,7 +547,7 @@ public class ChangesetEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -686,7 +685,7 @@ public class ChangesetEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
@@ -1045,7 +1044,7 @@ public class ChangesetEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1188,7 +1187,7 @@ public class ChangesetEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
@@ -1558,7 +1557,7 @@ public class ChangesetEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {changesetCollectionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1703,7 +1702,7 @@ public class ChangesetEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
@@ -2093,7 +2092,7 @@ public class ChangesetEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, classNameId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2248,7 +2247,7 @@ public class ChangesetEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ChangesetEntry changesetEntry : list) {
@@ -2640,7 +2639,7 @@ public class ChangesetEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {changesetCollectionId, classNameId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2773,8 +2772,7 @@ public class ChangesetEntryPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C_C, finderArgs);
 		}
 
 		if (result instanceof ChangesetEntry) {
@@ -2886,7 +2884,7 @@ public class ChangesetEntryPersistenceImpl
 			changesetCollectionId, classNameId, classPK
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3372,7 +3370,7 @@ public class ChangesetEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<ChangesetEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3442,7 +3440,7 @@ public class ChangesetEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3618,31 +3616,11 @@ public class ChangesetEntryPersistenceImpl
 			},
 			new String[] {"changesetCollectionId", "classNameId", "classPK"},
 			false);
-
-		_setChangesetEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setChangesetEntryUtilPersistence(null);
-
 		entityCache.removeCache(ChangesetEntryImpl.class.getName());
-	}
-
-	private void _setChangesetEntryUtilPersistence(
-		ChangesetEntryPersistence changesetEntryPersistence) {
-
-		try {
-			Field field = ChangesetEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, changesetEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -3704,5 +3682,9 @@ public class ChangesetEntryPersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private ChangesetEntryModelArgumentsResolver
+		_changesetEntryModelArgumentsResolver;
 
 }

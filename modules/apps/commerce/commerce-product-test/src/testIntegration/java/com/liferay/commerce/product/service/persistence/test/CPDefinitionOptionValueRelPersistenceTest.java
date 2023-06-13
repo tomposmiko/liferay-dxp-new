@@ -132,11 +132,6 @@ public class CPDefinitionOptionValueRelPersistenceTest {
 		CPDefinitionOptionValueRel newCPDefinitionOptionValueRel =
 			_persistence.create(pk);
 
-		newCPDefinitionOptionValueRel.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCPDefinitionOptionValueRel.setCtCollectionId(
-			RandomTestUtil.nextLong());
-
 		newCPDefinitionOptionValueRel.setUuid(RandomTestUtil.randomString());
 
 		newCPDefinitionOptionValueRel.setGroupId(RandomTestUtil.nextLong());
@@ -182,12 +177,6 @@ public class CPDefinitionOptionValueRelPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCPDefinitionOptionValueRel.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCPDefinitionOptionValueRel.getMvccVersion(),
-			newCPDefinitionOptionValueRel.getMvccVersion());
-		Assert.assertEquals(
-			existingCPDefinitionOptionValueRel.getCtCollectionId(),
-			newCPDefinitionOptionValueRel.getCtCollectionId());
 		Assert.assertEquals(
 			existingCPDefinitionOptionValueRel.getUuid(),
 			newCPDefinitionOptionValueRel.getUuid());
@@ -359,11 +348,11 @@ public class CPDefinitionOptionValueRelPersistenceTest {
 		getOrderByComparator() {
 
 		return OrderByComparatorFactoryUtil.create(
-			"CPDefinitionOptionValueRel", "mvccVersion", true, "ctCollectionId",
-			true, "uuid", true, "CPDefinitionOptionValueRelId", true, "groupId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "CPDefinitionOptionRelId",
-			true, "CPInstanceUuid", true, "CProductId", true, "name", true,
+			"CPDefinitionOptionValueRel", "uuid", true,
+			"CPDefinitionOptionValueRelId", true, "groupId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "CPDefinitionOptionRelId", true,
+			"CPInstanceUuid", true, "CProductId", true, "name", true,
 			"priority", true, "key", true, "quantity", true, "preselected",
 			true, "price", true);
 	}
@@ -702,10 +691,6 @@ public class CPDefinitionOptionValueRelPersistenceTest {
 
 		CPDefinitionOptionValueRel cpDefinitionOptionValueRel =
 			_persistence.create(pk);
-
-		cpDefinitionOptionValueRel.setMvccVersion(RandomTestUtil.nextLong());
-
-		cpDefinitionOptionValueRel.setCtCollectionId(RandomTestUtil.nextLong());
 
 		cpDefinitionOptionValueRel.setUuid(RandomTestUtil.randomString());
 

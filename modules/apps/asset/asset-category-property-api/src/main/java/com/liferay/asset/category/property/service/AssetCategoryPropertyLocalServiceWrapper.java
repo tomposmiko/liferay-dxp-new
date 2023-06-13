@@ -30,10 +30,6 @@ public class AssetCategoryPropertyLocalServiceWrapper
 	implements AssetCategoryPropertyLocalService,
 			   ServiceWrapper<AssetCategoryPropertyLocalService> {
 
-	public AssetCategoryPropertyLocalServiceWrapper() {
-		this(null);
-	}
-
 	public AssetCategoryPropertyLocalServiceWrapper(
 		AssetCategoryPropertyLocalService assetCategoryPropertyLocalService) {
 

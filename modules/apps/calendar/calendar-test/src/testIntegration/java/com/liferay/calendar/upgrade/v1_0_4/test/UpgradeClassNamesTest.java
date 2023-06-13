@@ -305,7 +305,7 @@ public class UpgradeClassNamesTest {
 	private UpgradeProcess _upgradeProcess;
 
 	@Inject(
-		filter = "component.name=com.liferay.calendar.internal.upgrade.registry.CalendarServiceUpgradeStepRegistrator"
+		filter = "component.name=com.liferay.calendar.internal.upgrade.CalendarServiceUpgrade"
 	)
 	private UpgradeStepRegistrator _upgradeStepRegistrator;
 

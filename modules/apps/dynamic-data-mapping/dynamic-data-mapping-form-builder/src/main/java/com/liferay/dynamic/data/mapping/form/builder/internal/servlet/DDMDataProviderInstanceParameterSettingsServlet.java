@@ -18,7 +18,7 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProvider;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderInputParametersSettings;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderOutputParametersSettings;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderParameterSettings;
-import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRegistry;
+import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderTracker;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeResponse;
@@ -55,6 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.http.whiteboard.context.path=/dynamic-data-mapping-form-builder-provider-instance-parameter-settings",
 		"osgi.http.whiteboard.servlet.name=com.liferay.dynamic.data.mapping.form.builder.internal.servlet.DDMDataProviderInstanceParameterSettingsServlet",
@@ -84,11 +85,11 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 
 		parametersJSONObject.put(
 			"inputs",
-			_getInputParametersJSONArray(
+			getInputParametersJSONArray(
 				ddmDataProviderParameterSetting.inputParameters())
 		).put(
 			"outputs",
-			_getOutputParametersJSONArray(
+			getOutputParametersJSONArray(
 				ddmDataProviderParameterSetting.outputParameters())
 		);
 
@@ -113,7 +114,7 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 			HttpServletResponse httpServletResponse)
 		throws IOException, ServletException {
 
-		JSONObject parametersJSONObject = _getParameterSettingsJSONObject(
+		JSONObject parametersJSONObject = getParameterSettingsJSONObject(
 			httpServletRequest);
 
 		if (parametersJSONObject == null) {
@@ -126,7 +127,7 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
 		ServletResponseUtil.write(
-			httpServletResponse, parametersJSONObject.toString());
+			httpServletResponse, parametersJSONObject.toJSONString());
 	}
 
 	protected DDMFormValues getDataProviderFormValues(
@@ -138,7 +139,7 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 		return deserialize(ddmDataProviderInstance.getDefinition(), ddmForm);
 	}
 
-	private DDMDataProviderInstance _getDDMDataProviderInstance(
+	protected DDMDataProviderInstance getDDMDataProviderInstance(
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
@@ -149,7 +150,7 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 			ddmDataProviderInstanceId);
 	}
 
-	private JSONArray _getInputParametersJSONArray(
+	protected JSONArray getInputParametersJSONArray(
 			DDMDataProviderInputParametersSettings[]
 				ddmDataProviderInputParametersSettings)
 		throws Exception {
@@ -162,49 +163,43 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 
 			String name =
 				ddmDataProviderInputParameterSetting.inputParameterName();
-			String type = _getType(
+			String type = getType(
 				ddmDataProviderInputParameterSetting.inputParameterType());
 
 			if (Validator.isNull(name) || Validator.isNull(type)) {
 				continue;
 			}
 
-			inputsJSONArray.put(
-				() -> {
-					JSONObject inputJSONObject =
-						_jsonFactory.createJSONObject();
+			String label =
+				ddmDataProviderInputParameterSetting.inputParameterLabel();
 
-					return inputJSONObject.put(
-						"id", name
-					).put(
-						"label",
-						() -> {
-							String label =
-								ddmDataProviderInputParameterSetting.
-									inputParameterLabel();
+			JSONObject inputJSONObject = _jsonFactory.createJSONObject();
 
-							if (Validator.isNotNull(label)) {
-								return label;
-							}
+			if (Validator.isNotNull(label)) {
+				inputJSONObject.put("label", label);
+			}
+			else {
+				inputJSONObject.put("label", name);
+			}
 
-							return name;
-						}
-					).put(
-						"name", name
-					).put(
-						"required",
-						ddmDataProviderInputParameterSetting.
-							inputParameterRequired()
-					).put(
-						"type", type
-					);
-				});
+			inputJSONObject.put(
+				"id", name
+			).put(
+				"name", name
+			).put(
+				"required",
+				ddmDataProviderInputParameterSetting.inputParameterRequired()
+			).put(
+				"type", type
+			);
+
+			inputsJSONArray.put(inputJSONObject);
 		}
 
 		return inputsJSONArray;
 	}
 
-	private JSONArray _getOutputParametersJSONArray(
+	protected JSONArray getOutputParametersJSONArray(
 			DDMDataProviderOutputParametersSettings[]
 				ddmDataProviderOutputParametersSettings)
 		throws Exception {
@@ -217,53 +212,46 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 
 			String path =
 				ddmDataProviderOutputParameterSetting.outputParameterPath();
-			String type = _getType(
+			String type = getType(
 				ddmDataProviderOutputParameterSetting.outputParameterType());
 
 			if (Validator.isNull(path) || Validator.isNull(type)) {
 				continue;
 			}
 
-			outputsJSONArray.put(
-				() -> {
-					JSONObject outputJSONObject =
-						_jsonFactory.createJSONObject();
+			String name =
+				ddmDataProviderOutputParameterSetting.outputParameterName();
 
-					return outputJSONObject.put(
-						"id",
-						ddmDataProviderOutputParameterSetting.
-							outputParameterId()
-					).put(
-						"name",
-						() -> {
-							String name =
-								ddmDataProviderOutputParameterSetting.
-									outputParameterName();
+			JSONObject outputJSONObject = _jsonFactory.createJSONObject();
 
-							if (Validator.isNotNull(name)) {
-								return name;
-							}
+			if (Validator.isNotNull(name)) {
+				outputJSONObject.put("name", name);
+			}
+			else {
+				outputJSONObject.put("name", path);
+			}
 
-							return path;
-						}
-					).put(
-						"type", type
-					);
-				});
+			outputJSONObject.put(
+				"id", ddmDataProviderOutputParameterSetting.outputParameterId()
+			).put(
+				"type", type
+			);
+
+			outputsJSONArray.put(outputJSONObject);
 		}
 
 		return outputsJSONArray;
 	}
 
-	private JSONObject _getParameterSettingsJSONObject(
+	protected JSONObject getParameterSettingsJSONObject(
 		HttpServletRequest httpServletRequest) {
 
 		try {
 			DDMDataProviderInstance ddmDataProviderInstance =
-				_getDDMDataProviderInstance(httpServletRequest);
+				getDDMDataProviderInstance(httpServletRequest);
 
 			DDMDataProvider ddmDataProvider =
-				_ddmDataProviderRegistry.getDDMDataProvider(
+				_ddmDataProviderTracker.getDDMDataProvider(
 					ddmDataProviderInstance.getType());
 
 			DDMFormValues ddmFormValues = getDataProviderFormValues(
@@ -273,14 +261,14 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return null;
 	}
 
-	private String _getType(String type) {
+	protected String getType(String type) {
 		try {
 			JSONArray typeJSONArray = _jsonFactory.createJSONArray(type);
 
@@ -288,7 +276,7 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
+				_log.debug(jsonException, jsonException);
 			}
 
 			return type;
@@ -304,7 +292,7 @@ public class DDMDataProviderInstanceParameterSettingsServlet
 	private DDMDataProviderInstanceService _ddmDataProviderInstanceService;
 
 	@Reference
-	private DDMDataProviderRegistry _ddmDataProviderRegistry;
+	private DDMDataProviderTracker _ddmDataProviderTracker;
 
 	@Reference(target = "(ddm.form.values.deserializer.type=json)")
 	private DDMFormValuesDeserializer _jsonDDMFormValuesDeserializer;

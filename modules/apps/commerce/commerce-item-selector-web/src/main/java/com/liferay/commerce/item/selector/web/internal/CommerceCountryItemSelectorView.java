@@ -19,7 +19,7 @@ import com.liferay.commerce.item.selector.web.internal.display.context.CommerceC
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = ItemSelectorView.class)
+@Component(enabled = false, immediate = true, service = ItemSelectorView.class)
 public class CommerceCountryItemSelectorView
 	implements ItemSelectorView<CommerceCountryItemSelectorCriterion> {
 
@@ -67,7 +67,7 @@ public class CommerceCountryItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "countries");
+		return LanguageUtil.get(locale, "countries");
 	}
 
 	@Override
@@ -105,9 +105,6 @@ public class CommerceCountryItemSelectorView
 
 	@Reference
 	private CountryService _countryService;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.item.selector.web)"

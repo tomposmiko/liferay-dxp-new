@@ -15,7 +15,6 @@
 package com.liferay.message.boards.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.message.boards.exception.DuplicateMBMessageExternalReferenceCodeException;
 import com.liferay.message.boards.exception.NoSuchMessageException;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBMessageLocalServiceUtil;
@@ -264,26 +263,6 @@ public class MBMessagePersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingMBMessage.getStatusDate()),
 			Time.getShortTimestamp(newMBMessage.getStatusDate()));
-	}
-
-	@Test(expected = DuplicateMBMessageExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		MBMessage mbMessage = addMBMessage();
-
-		MBMessage newMBMessage = addMBMessage();
-
-		newMBMessage.setGroupId(mbMessage.getGroupId());
-
-		newMBMessage = _persistence.update(newMBMessage);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newMBMessage);
-
-		newMBMessage.setExternalReferenceCode(
-			mbMessage.getExternalReferenceCode());
-
-		_persistence.update(newMBMessage);
 	}
 
 	@Test
@@ -557,12 +536,12 @@ public class MBMessagePersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_G() throws Exception {
-		_persistence.countByERC_G("", RandomTestUtil.nextLong());
+	public void testCountByG_ERC() throws Exception {
+		_persistence.countByG_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_G("null", 0L);
+		_persistence.countByG_ERC(0L, "null");
 
-		_persistence.countByERC_G((String)null, 0L);
+		_persistence.countByG_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -888,15 +867,15 @@ public class MBMessagePersistenceTest {
 				new Class<?>[] {String.class}, "urlSubject"));
 
 		Assert.assertEquals(
-			mbMessage.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				mbMessage, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(mbMessage.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
 				mbMessage, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "groupId"));
+		Assert.assertEquals(
+			mbMessage.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				mbMessage, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected MBMessage addMBMessage() throws Exception {

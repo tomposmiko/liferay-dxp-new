@@ -61,13 +61,13 @@ public class PortletDisplayTemplateImportCapability implements Capability {
 		throws PortletDataException {
 
 		try {
-			return _importDisplayStyle(
+			return importDisplayStyle(
 				portletDataContext, portletDataContext.getPortletId(),
 				portletPreferences);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return portletPreferences;
@@ -89,7 +89,7 @@ public class PortletDisplayTemplateImportCapability implements Capability {
 		return _portal.getClassNameId(templateHandler.getClassName());
 	}
 
-	private PortletPreferences _importDisplayStyle(
+	protected PortletPreferences importDisplayStyle(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {

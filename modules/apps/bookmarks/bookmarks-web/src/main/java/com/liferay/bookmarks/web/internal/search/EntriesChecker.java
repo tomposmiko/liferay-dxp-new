@@ -90,7 +90,7 @@ public class EntriesChecker extends EmptyOnClickRowChecker {
 			name = BookmarksFolder.class.getSimpleName();
 		}
 
-		String checkBoxRowIds = _getEntryRowIds();
+		String checkBoxRowIds = getEntryRowIds();
 		String checkBoxAllRowIds = "'#" + getAllRowIds() + "'";
 
 		return getRowCheckBox(
@@ -99,7 +99,7 @@ public class EntriesChecker extends EmptyOnClickRowChecker {
 			primaryKey, checkBoxRowIds, checkBoxAllRowIds, StringPool.BLANK);
 	}
 
-	private String _getEntryRowIds() {
+	protected String getEntryRowIds() {
 		return StringBundler.concat(
 			"['", _liferayPortletResponse.getNamespace(), RowChecker.ROW_IDS,
 			Folder.class.getSimpleName(), "', '",

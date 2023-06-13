@@ -16,7 +16,7 @@ package com.liferay.message.boards.internal.util;
 
 import com.liferay.message.boards.constants.MBMessageConstants;
 import com.liferay.message.boards.model.MBMessage;
-import com.liferay.petra.io.StreamUtil;
+import com.liferay.petra.mail.JavaMailUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -53,6 +53,8 @@ public class MBMailUtil {
 
 		Object partContent = _getPartContent(part);
 
+		String contentType = StringUtil.toLowerCase(part.getContentType());
+
 		if ((part.getDisposition() != null) &&
 			StringUtil.equalsIgnoreCase(
 				part.getDisposition(), MimeMessage.ATTACHMENT)) {
@@ -69,7 +71,7 @@ public class MBMailUtil {
 				bytes = s.getBytes();
 			}
 			else if (partContent instanceof InputStream) {
-				bytes = StreamUtil.toByteArray(part.getInputStream());
+				bytes = JavaMailUtil.getBytes(part);
 			}
 
 			mbMailMessage.addBytes(part.getFileName(), bytes);
@@ -85,9 +87,6 @@ public class MBMailUtil {
 				}
 			}
 			else if (partContent instanceof String) {
-				String contentType = StringUtil.toLowerCase(
-					part.getContentType());
-
 				String messageBody = SanitizerUtil.sanitize(
 					0, 0, 0, MBMessage.class.getName(), 0, contentType,
 					Sanitizer.MODE_ALL, (String)partContent,

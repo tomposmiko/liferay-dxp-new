@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.sharepoint.BaseSharepointStorageImpl;
@@ -105,8 +105,7 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 		serviceContext.setAddGuestPermissions(true);
 
 		DLAppServiceUtil.addFolder(
-			null, groupId, parentFolderId, folderName, description,
-			serviceContext);
+			groupId, parentFolderId, folderName, description, serviceContext);
 	}
 
 	@Override
@@ -210,8 +209,7 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 		long parentFolderId = folderIds.get(folderIds.size() - 1);
 
 		Folder folder = DLAppServiceUtil.getFolder(
-			groupId, parentFolderId,
-			HttpComponentsUtil.decodePath(pathArray[0]));
+			groupId, parentFolderId, HttpUtil.decodePath(pathArray[0]));
 
 		folderIds.add(folder.getFolderId());
 
@@ -246,9 +244,6 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 					fileEntry = getFileEntry(sharepointRequest);
 				}
 				catch (Exception exception2) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(exception2);
-					}
 				}
 			}
 		}
@@ -285,17 +280,17 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 				file = FileUtil.createTempFile(inputStream);
 
-				serviceContext.setAssetTagNames(
-					AssetTagLocalServiceUtil.getTagNames(
-						DLFileEntryConstants.getClassName(),
-						fileEntry.getFileEntryId()));
+				String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(
+					DLFileEntryConstants.getClassName(),
+					fileEntry.getFileEntryId());
+
+				serviceContext.setAssetTagNames(assetTagNames);
 
 				fileEntry = DLAppServiceUtil.updateFileEntry(
-					fileEntryId, newName, mimeType, newName, StringPool.BLANK,
-					description, changeLog,
-					DLVersionNumberIncrease.fromMajorVersion(false), file,
-					fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
-					serviceContext);
+					fileEntryId, newName, mimeType, newName, description,
+					changeLog, DLVersionNumberIncrease.fromMajorVersion(false),
+					file, fileEntry.getExpirationDate(),
+					fileEntry.getReviewDate(), serviceContext);
 
 				if (folderId != newParentFolderId) {
 					fileEntry = DLAppServiceUtil.moveFileEntry(
@@ -380,27 +375,28 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 				description = fileEntry.getDescription();
 
-				serviceContext.setAssetTagNames(
-					AssetTagLocalServiceUtil.getTagNames(
-						DLFileEntryConstants.getClassName(),
-						fileEntry.getFileEntryId()));
+				String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(
+					DLFileEntryConstants.getClassName(),
+					fileEntry.getFileEntryId());
+
+				serviceContext.setAssetTagNames(assetTagNames);
 
 				DLAppServiceUtil.updateFileEntry(
 					fileEntry.getFileEntryId(), title, contentType, title,
-					StringPool.BLANK, description, changeLog,
+					description, changeLog,
 					DLVersionNumberIncrease.fromMajorVersion(false), file,
 					fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
 					serviceContext);
 			}
 			catch (NoSuchFileEntryException noSuchFileEntryException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchFileEntryException);
+					_log.debug(
+						noSuchFileEntryException, noSuchFileEntryException);
 				}
 
 				DLAppServiceUtil.addFileEntry(
-					null, groupId, parentFolderId, title, contentType, null,
-					null, description, changeLog, file, null, null,
-					serviceContext);
+					null, groupId, parentFolderId, title, contentType, title,
+					description, changeLog, file, null, null, serviceContext);
 			}
 		}
 		finally {
@@ -430,9 +426,6 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 					fileEntry = getFileEntry(sharepointRequest);
 				}
 				catch (Exception exception2) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(exception2);
-					}
 				}
 			}
 		}
@@ -454,17 +447,10 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 				removedDocsTree.addChild(documentTree);
 			}
 			catch (Exception exception1) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception1);
-				}
-
 				try {
 					failedDocsTree.addChild(documentTree);
 				}
 				catch (Exception exception2) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(exception2);
-					}
 				}
 			}
 		}
@@ -479,17 +465,10 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 				removedDirsTree.addChild(folderTree);
 			}
 			catch (Exception exception1) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception1);
-				}
-
 				try {
 					failedDirsTree.addChild(folderTree);
 				}
 				catch (Exception exception2) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(exception2);
-					}
 				}
 			}
 		}

@@ -459,8 +459,4 @@ public interface CountryModel
 	@Override
 	public Country cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

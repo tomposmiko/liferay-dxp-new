@@ -17,29 +17,38 @@ package com.liferay.commerce.internal.price;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
+import com.liferay.commerce.currency.model.CommerceMoneyFactory;
 import com.liferay.commerce.discount.CommerceDiscountCalculation;
 import com.liferay.commerce.discount.CommerceDiscountValue;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.price.CommerceOrderPrice;
-import com.liferay.commerce.price.CommerceOrderPriceCalculation;
 import com.liferay.commerce.price.CommerceOrderPriceImpl;
 import com.liferay.commerce.product.model.CommerceChannel;
+import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.tax.CommerceTaxCalculation;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import java.math.BigDecimal;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  * @author Marco Leo
  */
-@Component(service = CommerceOrderPriceCalculation.class)
 public class CommerceOrderPriceCalculationV2Impl
 	extends BaseCommerceOrderPriceCalculation {
+
+	public CommerceOrderPriceCalculationV2Impl(
+		CommerceChannelLocalService commerceChannelLocalService,
+		CommerceDiscountCalculation commerceDiscountCalculation,
+		CommerceMoneyFactory commerceMoneyFactory,
+		CommerceTaxCalculation commerceTaxCalculation) {
+
+		super(commerceChannelLocalService, commerceMoneyFactory);
+
+		_commerceDiscountCalculation = commerceDiscountCalculation;
+		_commerceTaxCalculation = commerceTaxCalculation;
+	}
 
 	@Override
 	public CommerceOrderPrice getCommerceOrderPrice(
@@ -396,10 +405,7 @@ public class CommerceOrderPriceCalculationV2Impl
 		return getTotal(commerceOrder, true, commerceContext);
 	}
 
-	@Reference
-	private CommerceDiscountCalculation _commerceDiscountCalculation;
-
-	@Reference
-	private CommerceTaxCalculation _commerceTaxCalculation;
+	private final CommerceDiscountCalculation _commerceDiscountCalculation;
+	private final CommerceTaxCalculation _commerceTaxCalculation;
 
 }

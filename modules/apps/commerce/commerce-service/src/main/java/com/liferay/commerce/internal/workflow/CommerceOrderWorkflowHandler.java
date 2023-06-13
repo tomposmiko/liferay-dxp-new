@@ -20,6 +20,7 @@ import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -39,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false,
 	property = "model.class.name=com.liferay.commerce.model.CommerceOrder",
 	service = WorkflowHandler.class
 )
@@ -101,8 +103,11 @@ public class CommerceOrderWorkflowHandler
 			(String)workflowContext.get(
 				WorkflowConstants.CONTEXT_ENTRY_CLASS_PK));
 
+		ServiceContext serviceContext = (ServiceContext)workflowContext.get(
+			"serviceContext");
+
 		return _commerceOrderLocalService.updateStatus(
-			userId, classPK, status, workflowContext);
+			userId, classPK, status, serviceContext, workflowContext);
 	}
 
 	private static final boolean _VISIBLE = false;

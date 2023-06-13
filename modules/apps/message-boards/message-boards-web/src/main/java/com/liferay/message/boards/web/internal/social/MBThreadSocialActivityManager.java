@@ -18,7 +18,7 @@ import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.social.BaseSocialActivityManager;
 import com.liferay.portal.kernel.social.SocialActivityManager;
@@ -45,11 +45,11 @@ public class MBThreadSocialActivityManager
 		throws PortalException {
 
 		if (type == SocialActivityConstants.TYPE_SUBSCRIBE) {
-			_addSubscribeSocialActivity(
+			addSubscribeSocialActivity(
 				userId, thread.getGroupId(), thread, extraData);
 		}
 		else if (type == SocialActivityConstants.TYPE_VIEW) {
-			_addViewSocialActivity(
+			addViewSocialActivity(
 				userId, thread, type, extraData, receiverUserId);
 		}
 		else {
@@ -57,16 +57,11 @@ public class MBThreadSocialActivityManager
 		}
 	}
 
-	@Override
-	protected SocialActivityLocalService getSocialActivityLocalService() {
-		return _socialActivityLocalService;
-	}
-
-	private void _addSubscribeSocialActivity(
+	protected void addSubscribeSocialActivity(
 			long userId, long groupId, MBThread thread, String extraData)
 		throws PortalException {
 
-		JSONObject extraDataJSONObject = _jsonFactory.createJSONObject(
+		JSONObject extraDataJSONObject = JSONFactoryUtil.createJSONObject(
 			extraData);
 
 		extraDataJSONObject.put("threadId", thread.getThreadId());
@@ -77,7 +72,7 @@ public class MBThreadSocialActivityManager
 			extraDataJSONObject.toString(), 0);
 	}
 
-	private void _addViewSocialActivity(
+	protected void addViewSocialActivity(
 			long userId, MBThread thread, int type, String extraData,
 			long receiverUserId)
 		throws PortalException {
@@ -94,8 +89,10 @@ public class MBThreadSocialActivityManager
 			rootMessage.getMessageId(), type, extraData, receiverUserId);
 	}
 
-	@Reference
-	private JSONFactory _jsonFactory;
+	@Override
+	protected SocialActivityLocalService getSocialActivityLocalService() {
+		return _socialActivityLocalService;
+	}
 
 	@Reference
 	private MBMessageLocalService _mbMessageLocalService;

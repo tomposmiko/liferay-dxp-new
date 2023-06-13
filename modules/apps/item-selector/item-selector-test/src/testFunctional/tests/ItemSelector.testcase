@@ -1,7 +1,6 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Item Selector";
@@ -15,26 +14,23 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			WikiPage.tearDownCP();
-
 			BlogsEntry.tearDownCP();
 
 			Depot.tearDownCP();
-
-			Site.tearDownCP();
 
 			User.logoutPG();
 		}
 	}
 
 	@description = "This makes sure that an image can be uploaded via URL."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanAddBlogsImageViaURL {
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "ItemSelector#AddBlogsImageViaURL";
 
 		JSONDocument.addFileWithUploadedFile(
@@ -71,10 +67,10 @@ definition {
 	}
 
 	@description = "This test covers LPS-105188. It ensures that a user can change selected page for Navigation Menu item based on page after creation."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanChangeSelectedPageForNavigationMenu {
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
 		for (var i : list "1,2") {
 			JSONLayout.addPublicLayout(
@@ -100,13 +96,13 @@ definition {
 		NavigationMenusAdmin.editItem(
 			item = "Page",
 			itemName = "Test Page Name 1",
-			pageName = "Test Page Name 2");
+			pageNames = "Test Page Name 2");
 
 		NavigationMenusAdmin.viewItem(itemName = "Test Page Name 2");
 	}
 
 	@description = "This test covers LPS-119899, It ensures that the search results can be cleared after filtering everywhere in the item selector."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanClearFilterResults {
 		JSONDepot.addDepot(
@@ -119,7 +115,7 @@ definition {
 			site = "false",
 			title = "Web Content From Depot");
 
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Site",
@@ -160,37 +156,11 @@ definition {
 			webContentTitle = "Web Content From Depot");
 	}
 
-	@description = "This is a test for LPS-107014. It checks that the site pagination can be displayed correctly in item selector."
-	@priority = 4
-	test CanDisplaySitePaginationCorrectly {
-		for (var i : list "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20") {
-			HeadlessSite.addSite(siteName = "Site Name ${i}");
-		}
-
-		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
-
-		BlogsNavigator.gotoSelectFile();
-
-		ItemSelector.changeWorkspaces(
-			navTab = "Documents and Media",
-			workspacesType = "Site");
-
-		Pagination.viewResults(results = "Showing 1 to 20 of 22 entries.");
-
-		Click(locator1 = "Pagination#NEXT_LINK");
-
-		Pagination.viewResults(results = "Showing 21 to 22 of 22 entries.");
-
-		AssertTextNotPresent(
-			locator1 = "Message#EMPTY_INFO",
-			value1 = "No sites were found.");
-	}
-
 	@description = "This test ensures that documents can filter by the current site in the item selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanFilterByCurrentSite {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -225,11 +195,8 @@ definition {
 			viewNoLocationInfo = "Site Name");
 	}
 
-	// Ignored until LPS-159228 implemented
-
 	@description = "This test ensures that web content using a structure can be filtered from the current depot."
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanFilterCustomWCFromCurrentDepot {
 		JSONDepot.addDepot(
@@ -278,11 +245,8 @@ definition {
 			itemType = "Web Content Article");
 	}
 
-	// Ignored until LPS-159228 implemented
-
 	@description = "This test ensures that a document folder can be filtered from the current depot."
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanFilterDMFolderFromCurrentDepot {
 		JSONDepot.addDepot(
@@ -309,11 +273,8 @@ definition {
 			itemType = "Documents Folder");
 	}
 
-	// Ignored until LPS-159228 implemented
-
 	@description = "This test ensures that a document can be filtered from the current depot."
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanFilterImageFromCurrentDepot {
 		JSONDepot.addDepot(
@@ -344,14 +305,11 @@ definition {
 			itemType = "Document");
 	}
 
-	// Ignored until LPS-159228 implemented
-
 	@description = "This test ensures that web contents can filter by the current site in the item selector."
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanFilterWCByCurrentSite {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -362,7 +320,7 @@ definition {
 			layoutName = "Web Content Display Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Site Name",
 			layoutName = "Web Content Display Page",
 			widgetName = "Web Content Display");
@@ -394,11 +352,8 @@ definition {
 			webContentTitle = "Web Content From Site");
 	}
 
-	// Ignored until LPS-159228 implemented
-
 	@description = "This test ensures that the web content folder can be filtered from the current depot."
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanFilterWCFolderFromCurrentDepot {
 		JSONDepot.addDepot(
@@ -426,11 +381,8 @@ definition {
 			itemType = "Web Content Folder");
 	}
 
-	// Ignored until LPS-159228 implemented
-
 	@description = "This test ensures that web content can be filtered from the current depot."
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanFilterWCFromCurrentDepot {
 		JSONDepot.addDepot(
@@ -461,7 +413,7 @@ definition {
 	}
 
 	@description = "This ensures that a message is displayed in the preview section of the item selector when pasting an invalid URL."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CannotPreviewVideosWithInvalidURL {
 		KBArticle.openToAddKBArticle(
@@ -507,21 +459,17 @@ definition {
 	}
 
 	@description = "This is a test for LPS-136947. It checks that unsupported files cannot be uploaded to Blogs."
-	@priority = 3
+	@ignore = "true"
+	@priority = "3"
 	test CannotUploadUnsupportedFilesToBlogs {
 		property portal.acceptance = "false";
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
+		// TODO LPS-136947 CannotUploadUnsupportedFilesToBlogs pending implementation
 
-		BlogsNavigator.gotoSelectFile();
-
-		ItemSelector.uploadFile(
-			invalidFileValidation = "Please enter a file with a valid extension (.gif,.jpeg,.jpg,.png).",
-			uploadFileName = "Document_1.pdf");
 	}
 
 	@description = "This test covers LPS-119709. It ensures that the blog images can not filter by the everywhere and the current site."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CannotViewFilterScopeInBlogImagesTab {
 		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
@@ -531,15 +479,15 @@ definition {
 		SelectFrame(locator1 = "ItemSelector#ITEM_SELECTOR_IFRAME");
 
 		for (var subheaderItem : list "Everywhere,Current Site") {
-			ManagementBar.viewNoSubheaderInFilterAndOrder(subheaderItem = ${subheaderItem});
+			ManagementBar.viewNoSubheaderInFilterAndOrder(subheaderItem = "${subheaderItem}");
 		}
 	}
 
 	@description = "It ensures that the web content draft in an Asset Library cannot be found when searching in an Item Selector in that Library."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CannotViewWCDraftViaFilterResults {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -585,12 +533,12 @@ definition {
 	}
 
 	@description = "This ensures that users can preview the Facebook video in item selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewFacebookVideo {
 		property test.name.skip.portal.instance = "ItemSelector#PreviewFacebookVideo";
 
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -622,7 +570,7 @@ definition {
 	}
 
 	@description = "This ensures that users can preview the supported videos in the item selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewSupportedVideos {
 		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
@@ -642,7 +590,7 @@ definition {
 			ItemSelector.addVideoFromURL(
 				navTab = "URL",
 				unpublish = "true",
-				videoSourceURL = ${videoSourceURL});
+				videoSourceURL = "${videoSourceURL}");
 
 			ItemSelector.previewEmbeddedVideo(validURL = "https://player.twitch.tv");
 		}
@@ -663,19 +611,17 @@ definition {
 	}
 
 	@description = "This ensures that users can preview the SVG image in item selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewSVG {
-		HeadlessSite.addSite(siteName = "Site Name");
-
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.svg",
-			groupName = "Site Name",
+			groupName = "Guest",
 			mimeType = "image/svg+xml",
 			sourceFileName = "Document_1.svg");
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -687,12 +633,12 @@ definition {
 	}
 
 	@description = "This ensures that users can preview the Twitch video in item selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewTwitchVideo {
 		property test.name.skip.portal.instance = "ItemSelector#PreviewTwitchVideo";
 
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -729,7 +675,7 @@ definition {
 	}
 
 	@description = "This ensures that users can preview the Vimeo video in item selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewVimeoVideo {
 		DMNavigator.openToAddEntry(
@@ -755,7 +701,7 @@ definition {
 	}
 
 	@description = "This ensures that users can preview the YouTube video in item selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanPreviewYouTubeVideo {
 		DMNavigator.openToAddEntry(
@@ -781,11 +727,9 @@ definition {
 	}
 
 	@description = "This ensures that a blog cover image uploaded from blogs images can be viewed in the blogs images tab of item selector."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanSearchForUploadedImageFromBlogsImages {
-		property portal.acceptance = "false";
-
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
 		Blogs.addEntryWithUploadedCoverImage(
@@ -806,15 +750,13 @@ definition {
 	}
 
 	@description = "This ensures that a blog cover image uploaded from DM images can be viewed in the blogs images tab of item selector."
-	@priority = 3
+	@priority = "3"
 	@refactordone
 	test CanSearchForUploadedImageFromDMImages {
-		property portal.acceptance = "false";
-
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
 		Blogs.addEntryWithUploadedCoverImage(
-			coverImageName = "document_1",
+			coverImageName = "Document_1",
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
@@ -830,11 +772,11 @@ definition {
 		ItemSelector.searchDMImages(imageFileName = "Document_1.jpg");
 	}
 
-	@description = "This is a use case for LPS-106776. This ensures that the background image of a fragment can be added."
-	@priority = 5
+	@description = "This ensures that the background image of a fragment can be added."
+	@priority = "5"
 	@refactordone
 	test CanSelectBackgroundImageForFragment {
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -860,84 +802,30 @@ definition {
 			backgroundImage = "Direct",
 			entryTitle = "Document_1.jpeg",
 			navItem = "Documents and Media",
-			paddingTop = 2,
+			paddingTop = "2",
 			panel = "Styles");
 
-		PageEditor.publish();
+		PageEditor.clickPublish();
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-content-page-name");
 
-		ContentPages.viewFragmentBackgroundImage(image = "document_1-jpeg");
+		AssertVisible(
+			key_imageName = "Document_1.jpeg",
+			locator1 = "Fragment#FRAGMENT_SECTION_BACKGROUND_IMAGE");
 	}
-
-	@description = "Checks if user can edit a KB article adding an Image via Upload Image."
-	@priority = 3
-	test CanUploadImageInKBContentField {
-		JSONKnowledgeBase.addkBArticle(
-			groupName = "Guest",
-			kbArticleContent = "Knowledge Base Article Content",
-			kbArticleTitle = "Knowledge Base Article Title");
-
-		KBAdmin.openKBAdmin(siteURLKey = "guest");
-
-		KBArticle.editCP(
-			kbArticleTitle = "Knowledge Base Article Title",
-			kbArticleTitleEdit = "Knowledge Base Article Title Edit",
-			navTab = "Upload Image",
-			uploadFileName = "Document_1.jpg");
-
-		KBArticle.viewImageIsPresent(
-			contentImageName = "Document_1.jpg",
-			kbArticleTitle = "Knowledge Base Article Title Edit");
-	}
-
-	@description = "Checks if user can edit a Wiki page adding an Image via URL."
-	@priority = 3
-	test CanUploadImageInWikiPage {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_2.jpg",
-			groupName = "Guest",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_2.jpg");
-
-		JSONWiki.addWikiPage(
-			groupName = "Guest",
-			wikiNodeName = "Main",
-			wikiPageContent = "Wiki Page Content",
-			wikiPageName = "Wiki Page Title");
-
-		WikiNavigator.openToEditPage(
-			groupName = "Guest",
-			siteURLKey = "guest",
-			wikiNodeName = "Main",
-			wikiPageTitle = "Wiki Page Title");
-
-		WikiNode.addImage(
-			contentImageName = "Document_2.jpg",
-			imageSourceURL = "http://localhost:8080/webdav/guest/document_library/Document_2.jpg",
-			navTab = "URL");
-
-		WikiNode.viewImageIsPresent(
-			contentImageName = "Document_2.jpg",
-			wikiPageTitle = "Wiki Page Title");
-	}
-
-	// Ignored until LPS-159228 implemented
 
 	@description = "This test covers LPS-119553. It ensures that the assets in the connected site can not be filtered out after navigating to the depot through the breadcrumb."
-	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewCorrectFilterResultsInSpecificBreadcrumb {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
 			layoutName = "Web Content Display Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = 1,
+			column = "1",
 			groupName = "Site Name",
 			layoutName = "Web Content Display Page",
 			widgetName = "Web Content Display");
@@ -988,14 +876,11 @@ definition {
 		LexiconEntry.viewNoEntry(rowEntry = "WC WebContent From Site");
 	}
 
-	// Ignored until LPS-159228 implemented
-
 	@description = "This ensures that the location info of depot web content can be viewed through WCD on a connected site."
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewCorrectWCLocationInfo {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -1037,10 +922,10 @@ definition {
 	}
 
 	@description = "This ensures that the location info of the documents can be viewed through Blogs on a connected site."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewDocumentsCorrectLocationInfo {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -1097,17 +982,17 @@ definition {
 			BlogsNavigator.gotoSelectFile();
 
 			ItemSelector.viewLocationInfoViaBlogs(
-				locationName = ${locationName},
+				locationName = "${locationName}",
 				navTab = "Documents and Media",
 				titleList = "Document_1.jpg,Document_2.jpg,DM Folder Name");
 		}
 	}
 
 	@description = "This test covers LPS-118808. It ensures that an image in the depot folder can be viewed through everywhere filter on a connected site."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewFolderImageViaFilterResults {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -1141,10 +1026,10 @@ definition {
 	}
 
 	@description = "This test covers LPS-119707. It ensures that the web content in the depot folder can be viewed through everywhere filter on a connected site."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test CanViewFolderWCViaFilterResults {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -1198,16 +1083,16 @@ definition {
 		ItemSelector.viewWCEverywhereFilterResults(
 			folderWebContentTitle = "WC WebContent From Depot",
 			siteName = "Test Depot Name",
-			viewFolderWc = "true",
+			viewFolderWC = "true",
 			wcFolderName = "WC Folder Name",
 			webContentTitle = "WC WebContent From Site");
 	}
 
 	@description = "This ensures that the video thumbnails can be viewed in Item Selector."
-	@priority = 5
+	@priority = "5"
 	@refactordone
 	test CanViewVideoThumbnailsViaWC {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -1268,21 +1153,19 @@ definition {
 	}
 
 	@description = "This makes sure that the files in item selector can display by pagination."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test FilePaginationDisplaysCorrectCount {
-		HeadlessSite.addSite(siteName = "Site Name");
-
 		for (var documentTitle : list "Document_1,Document_2,Document_3,Document_4,Commerce_Black,Commerce_White") {
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
-				dmDocumentTitle = ${documentTitle},
-				groupName = "Site Name",
+				dmDocumentTitle = "${documentTitle}",
+				groupName = "Guest",
 				mimeType = "image/jpeg",
 				sourceFileName = "${documentTitle}.jpg");
 		}
 
-		BlogsNavigator.openToAddEntry(siteURLKey = "site-name");
+		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -1291,15 +1174,15 @@ definition {
 		ItemSelector.switchTab(navTab = "Documents and Media");
 
 		for (var card : list "Document_1,Document_2,Document_3,Document_4,Commerce_Black,Commerce_White") {
-			LexiconCard.viewCardTitle(card = ${card});
+			LexiconCard.viewCardTitle(card = "${card}");
 		}
 
 		Pagination.viewResults(results = "Showing 1 to 6 of 6 entries.");
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		for (var card : list "Document_1,Document_2,Commerce_Black,Commerce_White") {
-			LexiconCard.viewCardTitle(card = ${card});
+			LexiconCard.viewCardTitle(card = "${card}");
 		}
 
 		Pagination.viewResults(results = "Showing 1 to 4 of 6 entries.");
@@ -1307,17 +1190,17 @@ definition {
 		Click(locator1 = "Pagination#NEXT_LINK");
 
 		for (var card : list "Document_3,Document_4") {
-			LexiconCard.viewCardTitle(card = ${card});
+			LexiconCard.viewCardTitle(card = "${card}");
 		}
 
 		Pagination.viewResults(results = "Showing 5 to 6 of 6 entries.");
 	}
 
 	@description = "This test covers LPS-122139. It ensures that the files in the item selector can display by pagination after scoped everywhere filter."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test FilePaginationForFilteredResultsDisplaysCorrectCount {
-		HeadlessSite.addSite(siteName = "Site Name");
+		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -1355,7 +1238,7 @@ definition {
 			filterBy = "Everywhere",
 			navTab = "Documents and Media");
 
-		Pagination.changePagination(itemsPerPage = 40);
+		Pagination.changePagination(itemsPerPage = "40");
 
 		Pagination.viewResults(results = "Showing 1 to 30 of 30 entries.");
 
@@ -1372,62 +1255,49 @@ definition {
 		Pagination.viewResults(results = "Showing 21 to 30 of 30 entries.");
 	}
 
-	@description = "This is a test for LPS-136945. It checks that only 'File Upload', 'Folder', and 'External Video Shortcut' options appear when adding a document."
-	@priority = 3
+	@description = "This is a test for LPS-136945. It checks that only 'File Upload,' 'Folder,' and 'External Video Shortcut' options appear when adding a document."
+	@ignore = "true"
+	@priority = "3"
 	test OnlyRelevantSelectionsAppearWhenAddingDocuments {
 		property portal.acceptance = "false";
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		// TODO LPS-136945 OnlyRelevantSelectionsAppearWhenAddingDocuments pending implementation
 
-		NavItem.gotoStructures();
-
-		WebContentStructures.addCP(structureName = "Structure Name");
-
-		DataEngine.addField(
-			fieldFieldLabel = "Upload",
-			fieldName = "Upload");
-
-		WebContentStructures.saveCP(structureName = "Structure Name");
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
-
-		LexiconEntry.gotoAddMenuItem(menuItem = "Structure Name");
-
-		Click(
-			key_text = "Select",
-			locator1 = "Button#ANY_LAST");
-
-		ItemSelector.viewRelevantSelections(addDocumentOptions = "true");
 	}
 
 	@description = "This is a test for LPS-136943. It checks that only 'File Upload' and 'Folder' options appear when adding images."
-	@priority = 3
+	@ignore = "true"
+	@priority = "3"
 	test OnlyRelevantSelectionsAppearWhenAddingImages {
 		property portal.acceptance = "false";
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+		// TODO LPS-136943 OnlyRelevantSelectionsAppearWhenAddingImages pending implementation
 
-		LexiconEntry.gotoAddMenuItem(menuItem = "Basic Web Content");
+	}
 
-		ItemSelector.gotoItemSelectorViaCKEditor();
+	@description = "This is a test for LPS-136944. It checks that only 'File Upload,' 'Folder,' and 'External Video Shortcut' options appear when adding a video."
+	@ignore = "true"
+	@priority = "3"
+	test OnlyRelevantSelectionsAppearWhenAddingVideos {
+		property portal.acceptance = "false";
 
-		ItemSelector.viewRelevantSelections(addImageOptions = "true");
+		// TODO LPS-136944 OnlyRelevantSelectionsAppearWhenAddingVideos pending implementation
+
 	}
 
 	@description = "This test covers LPS-96564. It ensures that a private site cannot be viewed by a non-site member in calendar widget."
-	@priority = 4
+	@priority = "4"
 	@refactordone
 	test PrivateSiteShouldNotBeViewableWithoutPermissionsInCalendar {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
-		property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 
 		var portalURL = PropsUtil.get("portal.url");
 
-		HeadlessSite.addSite(
-			membershipType = "Private",
-			siteName = "Site A");
+		JSONGroup.addGroup(
+			groupName = "Site A",
+			type = "Private");
 
-		HeadlessSite.addSite(siteName = "Site X");
+		JSONGroup.addGroup(groupName = "Site X");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -1444,7 +1314,7 @@ definition {
 
 		User.gotoAddPage(userName = "userfn userln");
 
-		PagesAdmin.addPrivatePage(pageName = "Private Test Page");
+		SitePages.addPrivatePage(pageName = "Private Test Page");
 
 		Navigator.gotoSpecificURLPage(
 			pageName = "Private Test Page",

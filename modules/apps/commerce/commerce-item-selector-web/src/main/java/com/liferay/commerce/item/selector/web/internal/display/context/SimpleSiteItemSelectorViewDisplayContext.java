@@ -16,24 +16,28 @@ package com.liferay.commerce.item.selector.web.internal.display.context;
 
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
+import com.liferay.frontend.taglib.servlet.taglib.ManagementBarFilterItem;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.comparator.GroupNameComparator;
 
+import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
+import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -112,34 +116,36 @@ public class SimpleSiteItemSelectorViewDisplayContext
 			cpRequestHelper.getRenderRequest(), getPortletURL(), null,
 			emptyResultsMessage);
 
-		searchContainer.setOrderByCol(getOrderByCol());
+		String orderByCol = getOrderByCol();
 
-		boolean orderByAsc = false;
+		String orderByType = getOrderByType();
 
-		if (Objects.equals(getOrderByType(), "asc")) {
-			orderByAsc = true;
-		}
+		OrderByComparator<Group> orderByComparator = new GroupNameComparator(
+			orderByType.equals("asc"));
 
-		searchContainer.setOrderByComparator(
-			new GroupNameComparator(orderByAsc));
-		searchContainer.setOrderByType(getOrderByType());
-		searchContainer.setResultsAndTotal(
-			() -> _groupService.search(
-				cpRequestHelper.getCompanyId(),
-				new long[] {
-					ClassNameLocalServiceUtil.getClassNameId(Group.class),
-					ClassNameLocalServiceUtil.getClassNameId(Organization.class)
-				},
-				null,
-				LinkedHashMapBuilder.<String, Object>put(
-					"active", true
-				).put(
-					"site", true
-				).build(),
-				searchContainer.getStart(), searchContainer.getEnd(), null),
-			_groupService.searchCount(
-				cpRequestHelper.getCompanyId(), null, null, new String[0]));
+		searchContainer.setOrderByCol(orderByCol);
+		searchContainer.setOrderByComparator(orderByComparator);
+		searchContainer.setOrderByType(orderByType);
 		searchContainer.setSearch(_search);
+
+		int total = _groupService.searchCount(
+			cpRequestHelper.getCompanyId(), null, null, new String[0]);
+		List<Group> groups = _groupService.search(
+			cpRequestHelper.getCompanyId(),
+			new long[] {
+				ClassNameLocalServiceUtil.getClassNameId(Group.class),
+				ClassNameLocalServiceUtil.getClassNameId(Organization.class)
+			},
+			null,
+			LinkedHashMapBuilder.<String, Object>put(
+				"active", true
+			).put(
+				"site", true
+			).build(),
+			searchContainer.getStart(), searchContainer.getEnd(), null);
+
+		searchContainer.setTotal(total);
+		searchContainer.setResults(groups);
 
 		return searchContainer;
 	}
@@ -154,6 +160,26 @@ public class SimpleSiteItemSelectorViewDisplayContext
 		}
 
 		return false;
+	}
+
+	protected ManagementBarFilterItem getManagementBarFilterItem(
+			long siteGroupId, String label)
+		throws PortletException {
+
+		boolean active = false;
+
+		if (getGroupId() == siteGroupId) {
+			active = true;
+		}
+
+		return new ManagementBarFilterItem(
+			active, String.valueOf(siteGroupId), label,
+			PortletURLBuilder.create(
+				PortletURLUtil.clone(
+					getPortletURL(), cpRequestHelper.getRenderResponse())
+			).setParameter(
+				"siteGroupId", siteGroupId
+			).buildString());
 	}
 
 	private final CommerceChannelLocalService _commerceChannelLocalService;

@@ -14,11 +14,19 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayInput} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
 import React, {useEffect, useRef, useState} from 'react';
 
 const SearchInput = React.forwardRef(
-	({onChange = () => {}, setSearchClicked, searchText = ''}, ref) => {
+	(
+		{
+			clearButton = true,
+			onChange = () => {},
+			onSubmit = () => {},
+			searchText = '',
+			...restProps
+		},
+		ref
+	) => {
 		const [value, setValue] = useState(searchText);
 		const fallbackRef = useRef(null);
 		const searchInputRef = ref ? ref : fallbackRef;
@@ -33,12 +41,19 @@ const SearchInput = React.forwardRef(
 			searchInputRef.current.focus();
 		};
 
-		let SearchButton = <ClayIcon className="mr-2 mt-0" symbol="search" />;
+		let SearchButton = (
+			<ClayButtonWithIcon
+				displayType="unstyled"
+				key="searcgButton"
+				onClick={(_) => onSubmit(value)}
+				symbol="search"
+				{...restProps}
+			/>
+		);
 
-		if (value) {
+		if (clearButton && value) {
 			SearchButton = (
 				<ClayButtonWithIcon
-					aria-label={Liferay.Language.get('clear')}
 					displayType="unstyled"
 					key="clearButton"
 					onClick={onClear}
@@ -53,16 +68,15 @@ const SearchInput = React.forwardRef(
 					<ClayInput
 						aria-label={Liferay.Language.get('search')}
 						className="input-group-inset input-group-inset-after"
-						onBlur={() => setSearchClicked(false)}
 						onChange={({target: {value}}) => {
 							setValue(value);
 							onChange(value);
 						}}
-						onFocus={() => setSearchClicked(true)}
 						placeholder={`${Liferay.Language.get('search')}...`}
 						ref={searchInputRef}
 						type="text"
 						value={value}
+						{...restProps}
 					/>
 
 					<ClayInput.GroupInsetItem after>

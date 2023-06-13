@@ -67,13 +67,15 @@ public class DDMFormInstanceLocalServiceTest extends BaseDDMServiceTestCase {
 		DDMFormValues settingsDDMFormValues =
 			DDMFormValuesTestUtil.createDDMFormValues(settingsDDMForm);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group, TestPropsValues.getUserId());
+
 		DDMFormInstance formInstance =
 			DDMFormInstanceLocalServiceUtil.addFormInstance(
 				structure.getUserId(), structure.getGroupId(),
 				structure.getStructureId(), structure.getNameMap(),
-				structure.getNameMap(), settingsDDMFormValues,
-				ServiceContextTestUtil.getServiceContext(
-					group, TestPropsValues.getUserId()));
+				structure.getNameMap(), settingsDDMFormValues, serviceContext);
 
 		DDMFormInstanceVersion latestFormInstanceVersion =
 			formInstance.getFormInstanceVersion(formInstance.getVersion());

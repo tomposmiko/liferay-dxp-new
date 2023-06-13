@@ -14,10 +14,9 @@
 
 package com.liferay.segments.experiment.web.internal.portlet.action;
 
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -49,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sarai Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
 		"mvc.command.name=/segments_experiment/edit_segments_experiment_status"
@@ -85,7 +85,7 @@ public class EditSegmentsExperimentStatusMVCActionCommand
 
 			jsonObject = JSONUtil.put(
 				"error",
-				_language.get(
+				LanguageUtil.get(
 					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
 		}
 
@@ -99,26 +99,20 @@ public class EditSegmentsExperimentStatusMVCActionCommand
 			ActionRequest actionRequest)
 		throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		SegmentsExperiment segmentsExperiment =
+			_segmentsExperimentService.updateSegmentsExperimentStatus(
+				ParamUtil.getLong(actionRequest, "segmentsExperimentId"),
+				ParamUtil.getLong(
+					actionRequest, "winnerSegmentsExperienceId", -1),
+				ParamUtil.getInteger(actionRequest, "status"));
+
 		return JSONUtil.put(
 			"segmentsExperiment",
-			() -> {
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)actionRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				SegmentsExperiment segmentsExperiment =
-					_segmentsExperimentService.updateSegmentsExperimentStatus(
-						ParamUtil.getLong(
-							actionRequest, "segmentsExperimentId"),
-						ParamUtil.getLong(
-							actionRequest, "winnerSegmentsExperienceId", -1),
-						ParamUtil.getInteger(actionRequest, "status"));
-
-				return SegmentsExperimentUtil.toSegmentsExperimentJSONObject(
-					_analyticsSettingsManager.getAnalyticsConfiguration(
-						themeDisplay.getCompanyId()),
-					themeDisplay.getLocale(), segmentsExperiment);
-			});
+			SegmentsExperimentUtil.toSegmentsExperimentJSONObject(
+				themeDisplay.getLocale(), segmentsExperiment));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -127,12 +121,6 @@ public class EditSegmentsExperimentStatusMVCActionCommand
 	private static final TransactionConfig _transactionConfig =
 		TransactionConfig.Factory.create(
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
-
-	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

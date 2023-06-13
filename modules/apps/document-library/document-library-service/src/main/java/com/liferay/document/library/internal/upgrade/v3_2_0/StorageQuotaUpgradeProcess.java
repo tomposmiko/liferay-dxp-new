@@ -32,10 +32,10 @@ public class StorageQuotaUpgradeProcess extends UpgradeProcess {
 					"companyId");
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"insert into DLStorageQuota (mvccVersion, " +
-						"dlStorageQuotaId, companyId, storageSize) values (" +
-							"?, ?, ?, ?)");
+					connection.prepareStatement(
+						"insert into DLStorageQuota (mvccVersion, " +
+							"dlStorageQuotaId, companyId, storageSize) " +
+								"values (?, ?, ?, ?)"));
 			ResultSet resultSet = preparedStatement1.executeQuery()) {
 
 			while (resultSet.next()) {

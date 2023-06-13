@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.ListTypeModel;
+import com.liferay.portal.kernel.model.ListTypeSoap;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -31,15 +32,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -127,6 +131,51 @@ public class ListTypeModelImpl
 	@Deprecated
 	public static final long TYPE_COLUMN_BITMASK = 2L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static ListType toModel(ListTypeSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		ListType model = new ListTypeImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setListTypeId(soapModel.getListTypeId());
+		model.setName(soapModel.getName());
+		model.setType(soapModel.getType());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<ListType> toModels(ListTypeSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<ListType> models = new ArrayList<ListType>(soapModels.length);
+
+		for (ListTypeSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.portal.kernel.model.ListType"));
@@ -206,60 +255,72 @@ public class ListTypeModelImpl
 	public Map<String, Function<ListType, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ListType, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ListType>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ListType, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ListType.class.getClassLoader(), ListType.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ListType, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<ListType, Object>>();
+		try {
+			Constructor<ListType> constructor =
+				(Constructor<ListType>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", ListType::getMvccVersion);
-			attributeGetterFunctions.put("listTypeId", ListType::getListTypeId);
-			attributeGetterFunctions.put("name", ListType::getName);
-			attributeGetterFunctions.put("type", ListType::getType);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ListType, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ListType, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ListType, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ListType, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ListType, Object>>();
+		Map<String, BiConsumer<ListType, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<ListType, ?>>();
 
-		static {
-			Map<String, BiConsumer<ListType, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<ListType, ?>>();
+		attributeGetterFunctions.put("mvccVersion", ListType::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<ListType, Long>)ListType::setMvccVersion);
+		attributeGetterFunctions.put("listTypeId", ListType::getListTypeId);
+		attributeSetterBiConsumers.put(
+			"listTypeId", (BiConsumer<ListType, Long>)ListType::setListTypeId);
+		attributeGetterFunctions.put("name", ListType::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<ListType, String>)ListType::setName);
+		attributeGetterFunctions.put("type", ListType::getType);
+		attributeSetterBiConsumers.put(
+			"type", (BiConsumer<ListType, String>)ListType::setType);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<ListType, Long>)ListType::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"listTypeId",
-				(BiConsumer<ListType, Long>)ListType::setListTypeId);
-			attributeSetterBiConsumers.put(
-				"name", (BiConsumer<ListType, String>)ListType::setName);
-			attributeSetterBiConsumers.put(
-				"type", (BiConsumer<ListType, String>)ListType::setType);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -571,12 +632,41 @@ public class ListTypeModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ListType, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ListType, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ListType, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ListType)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ListType>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ListType.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -588,9 +678,8 @@ public class ListTypeModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<ListType, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<ListType, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

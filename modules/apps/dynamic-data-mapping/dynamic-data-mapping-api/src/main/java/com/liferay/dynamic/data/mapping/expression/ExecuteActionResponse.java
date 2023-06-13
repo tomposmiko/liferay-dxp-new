@@ -16,14 +16,19 @@ package com.liferay.dynamic.data.mapping.expression;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Leonardo Barros
  */
 public final class ExecuteActionResponse {
 
-	public <T> T getOutput(String name) {
-		return (T)_output.get(name);
+	public <T> Optional<T> getOutputOptional(String name) {
+		if (!_output.containsKey(name)) {
+			return Optional.empty();
+		}
+
+		return Optional.of((T)_output.get(name));
 	}
 
 	public static class Builder {

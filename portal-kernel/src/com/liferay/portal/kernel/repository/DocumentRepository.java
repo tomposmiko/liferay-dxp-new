@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.repository;
 
+import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.capabilities.CapabilityProvider;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.model.RepositoryEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.io.File;
@@ -39,16 +41,16 @@ public interface DocumentRepository extends CapabilityProvider {
 	public FileEntry addFileEntry(
 			String externalReferenceCode, long userId, long folderId,
 			String sourceFileName, String mimeType, String title,
-			String urlTitle, String description, String changeLog, File file,
+			String description, String changeLog, File file,
 			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException;
 
 	public FileEntry addFileEntry(
 			String externalReferenceCode, long userId, long folderId,
 			String sourceFileName, String mimeType, String title,
-			String urlTitle, String description, String changeLog,
-			InputStream inputStream, long size, Date expirationDate,
-			Date reviewDate, ServiceContext serviceContext)
+			String description, String changeLog, InputStream inputStream,
+			long size, Date expirationDate, Date reviewDate,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public FileShortcut addFileShortcut(
@@ -57,8 +59,8 @@ public interface DocumentRepository extends CapabilityProvider {
 		throws PortalException;
 
 	public Folder addFolder(
-			String externalReferenceCode, long userId, long parentFolderId,
-			String name, String description, ServiceContext serviceContext)
+			long userId, long parentFolderId, String name, String description,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public void checkInFileEntry(
@@ -89,24 +91,10 @@ public interface DocumentRepository extends CapabilityProvider {
 
 	public void deleteFolder(long folderId) throws PortalException;
 
-	public default FileEntry fetchFileEntry(long folderId, String title)
-		throws PortalException {
-
-		return getFileEntry(folderId, title);
-	}
-
 	public default FileEntry fetchFileEntryByExternalReferenceCode(
 		String externalReferenceCode) {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	public default Folder fetchFolderByExternalReferenceCode(
-		String externalReferenceCode) {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return null;
 	}
 
 	public List<FileEntry> getFileEntries(
@@ -155,8 +143,16 @@ public interface DocumentRepository extends CapabilityProvider {
 			String externalReferenceCode)
 		throws PortalException {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		try {
+			return getFileEntry(
+				GetterUtil.getLongStrict(externalReferenceCode));
+		}
+		catch (NumberFormatException numberFormatException) {
+			throw new NoSuchFileEntryException(
+				"No file entry exists with external reference code " +
+					externalReferenceCode,
+				numberFormatException);
+		}
 	}
 
 	public default FileEntry getFileEntryByFileName(
@@ -178,14 +174,6 @@ public interface DocumentRepository extends CapabilityProvider {
 
 	public Folder getFolder(long parentFolderId, String name)
 		throws PortalException;
-
-	public default Folder getFolderByExternalReferenceCode(
-			String externalReferenceCode)
-		throws PortalException {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
 
 	public List<Folder> getFolders(
 			long parentFolderId, boolean includeMountFolders, int start,
@@ -237,16 +225,15 @@ public interface DocumentRepository extends CapabilityProvider {
 
 	public FileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog, DLVersionNumberIncrease dlVersionNumberIncrease,
-			File file, Date expirationDate, Date reviewDate,
-			ServiceContext serviceContext)
+			String mimeType, String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease, File file,
+			Date expirationDate, Date reviewDate, ServiceContext serviceContext)
 		throws PortalException;
 
 	public FileEntry updateFileEntry(
 			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String urlTitle, String description,
-			String changeLog, DLVersionNumberIncrease dlVersionNumberIncrease,
+			String mimeType, String title, String description, String changeLog,
+			DLVersionNumberIncrease dlVersionNumberIncrease,
 			InputStream inputStream, long size, Date expirationDate,
 			Date reviewDate, ServiceContext serviceContext)
 		throws PortalException;

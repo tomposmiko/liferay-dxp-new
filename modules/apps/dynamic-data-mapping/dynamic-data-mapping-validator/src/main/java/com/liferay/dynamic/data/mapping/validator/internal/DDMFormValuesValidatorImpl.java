@@ -18,7 +18,7 @@ import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpression;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionException;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueAccessor;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueValidator;
 import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldValueAccessor;
@@ -44,19 +44,22 @@ import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidator;
 import com.liferay.dynamic.data.mapping.validator.internal.expression.DDMFormFieldValueExpressionParameterAccessor;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -67,14 +70,26 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = DDMFormValuesValidator.class)
+@Component(immediate = true, service = DDMFormValuesValidator.class)
 public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 
 	@Override
 	public void validate(DDMFormValues ddmFormValues)
 		throws DDMFormValuesValidationException {
 
-		validate(ddmFormValues, null);
+		DDMForm ddmForm = ddmFormValues.getDDMForm();
+
+		if (ddmForm == null) {
+			throw new NullPointerException("A DDM Form instance was never set");
+		}
+
+		traverseDDMFormFields(
+			ddmForm.getDDMFormFields(),
+			ddmFormValues.getDDMFormFieldValuesMap());
+
+		traverseDDMFormFieldValues(
+			ddmFormValues.getDDMFormFieldValues(),
+			ddmForm.getDDMFormFieldsMap(false));
 	}
 
 	@Override
@@ -83,21 +98,9 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 
 		_ddmFormFieldValueExpressionParameterAccessor =
 			new DDMFormFieldValueExpressionParameterAccessor(
-				_jsonFactory, ddmFormValues.getDefaultLocale(), timeZoneId);
+				ddmFormValues.getDefaultLocale(), timeZoneId);
 
-		DDMForm ddmForm = ddmFormValues.getDDMForm();
-
-		if (ddmForm == null) {
-			throw new NullPointerException("A DDM Form instance was never set");
-		}
-
-		_traverseDDMFormFields(
-			ddmForm.getDDMFormFields(),
-			ddmFormValues.getDDMFormFieldValuesMap());
-
-		_traverseDDMFormFieldValues(
-			ddmFormValues.getDDMFormFieldValues(),
-			ddmForm.getDDMFormFieldsMap(false));
+		validate(ddmFormValues);
 	}
 
 	@Activate
@@ -112,21 +115,13 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 		_serviceTrackerMap.close();
 	}
 
-	protected Boolean evaluateValidationExpression(
+	protected boolean evaluateValidationExpression(
 			String dataType, String ddmFormFieldName,
-			DDMFormFieldValidation ddmFormFieldValidation,
-			DDMFormFieldValue ddmFormFieldValue)
+			DDMFormFieldValidation ddmFormFieldValidation, Locale locale,
+			Value value)
 		throws DDMFormValuesValidationException {
 
-		if (ddmFormFieldValue.getValue() == null) {
-			return true;
-		}
-
-		Value value = ddmFormFieldValue.getValue();
-
-		Locale locale = value.getDefaultLocale();
-
-		if (Validator.isNull(value.getString(locale))) {
+		if ((value == null) || Validator.isNull(value.getString(locale))) {
 			return true;
 		}
 
@@ -148,11 +143,12 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 
 				ddmExpression = _ddmExpressionFactory.createExpression(
 					CreateExpressionRequest.Builder.newBuilder(
-						ddmFormFieldValidationExpression.getExpression(
-							ddmFormFieldValue.getDDMFormValues(),
-							parameterLocalizedValue.getString(locale),
-							_ddmFormFieldValueExpressionParameterAccessor.
-								getTimeZoneId())
+						StringUtil.replace(
+							ddmFormFieldValidationExpression.getValue(),
+							"{parameter}",
+							parameterLocalizedValue.getString(locale))
+					).withDDMExpressionDateValidation(
+						StringUtil.equals(dataType, FieldConstants.DATE)
 					).withDDMExpressionParameterAccessor(
 						_ddmFormFieldValueExpressionParameterAccessor
 					).build());
@@ -197,56 +193,35 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 		catch (DDMExpressionException ddmExpressionException) {
 			throw new DDMFormValuesValidationException(ddmExpressionException);
 		}
-	}
+		catch (NullPointerException nullPointerException) {
 
-	protected boolean isNull(
-		DDMFormField ddmFormField, DDMFormFieldValue ddmFormFieldValue) {
+			// LRQA-66928
 
-		Value value = ddmFormFieldValue.getValue();
+			String ddmExpressionString = StringPool.NULL;
 
-		if ((value == null) || SetUtil.isEmpty(value.getAvailableLocales())) {
-			return true;
-		}
-
-		DDMFormFieldValueAccessor<?> ddmFormFieldValueAccessor =
-			_getDDMFormFieldValueAccessor(ddmFormField.getType());
-
-		for (Locale locale : value.getAvailableLocales()) {
-			if (!ddmFormFieldValueAccessor.isEmpty(ddmFormFieldValue, locale)) {
-				return false;
+			if (ddmExpression != null) {
+				ddmExpressionString = ddmExpression.toString();
 			}
-		}
 
-		return true;
-	}
+			String ddmExpressionFactoryString = StringPool.NULL;
 
-	protected void validateDDMFormFieldValidationExpression(
-			DDMFormField ddmFormField, DDMFormFieldValue ddmFormFieldValue)
-		throws DDMFormValuesValidationException {
+			if (_ddmExpressionFactory != null) {
+				ddmExpressionFactoryString = _ddmExpressionFactory.toString();
+			}
 
-		DDMFormFieldValidation ddmFormFieldValidation =
-			ddmFormField.getDDMFormFieldValidation();
-
-		if (ddmFormFieldValidation == null) {
-			return;
-		}
-
-		Boolean valid = evaluateValidationExpression(
-			ddmFormField.getDataType(), ddmFormField.getName(),
-			ddmFormFieldValidation, ddmFormFieldValue);
-
-		if (!Objects.equals(Boolean.TRUE, valid)) {
-			throw new MustSetValidValue(
-				ddmFormField.getLabel(), ddmFormField.getName());
+			throw new NullPointerException(
+				StringBundler.concat(
+					nullPointerException.getMessage(), ", DDM expression: ",
+					ddmExpressionString, ", DDM expression factory: ",
+					ddmExpressionFactoryString));
 		}
 	}
 
-	private DDMFormFieldValueAccessor<?> _getDDMFormFieldValueAccessor(
+	protected DDMFormFieldValueAccessor<?> getDDMFormFieldValueAccessor(
 		String type) {
 
 		DDMFormFieldValueAccessor<?> ddmFormFieldValueAccessor =
-			_ddmFormFieldTypeServicesRegistry.getDDMFormFieldValueAccessor(
-				type);
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldValueAccessor(type);
 
 		if (ddmFormFieldValueAccessor != null) {
 			return ddmFormFieldValueAccessor;
@@ -255,7 +230,7 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 		return _defaultDDMFormFieldValueAccessor;
 	}
 
-	private List<DDMFormFieldValue> _getDDMFormFieldValuesByFieldName(
+	protected List<DDMFormFieldValue> getDDMFormFieldValuesByFieldName(
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap,
 		String fieldName) {
 
@@ -269,7 +244,7 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 		return ddmFormFieldValues;
 	}
 
-	private void _invokeDDMFormFieldValueValidator(
+	protected void invokeDDMFormFieldValueValidator(
 			DDMFormField ddmFormField, DDMFormFieldValue ddmFormFieldValue)
 		throws DDMFormValuesValidationException {
 
@@ -291,32 +266,71 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 					exception);
 			}
 
-			throw new MustSetValidValue(
-				ddmFormField.getLabel(), ddmFormField.getName());
+			throw new MustSetValidValue(ddmFormField.getName());
 		}
 	}
 
-	private void _traverseDDMFormFields(
+	protected boolean isNull(
+		DDMFormField ddmFormField, DDMFormFieldValue ddmFormFieldValue) {
+
+		Value value = ddmFormFieldValue.getValue();
+
+		if ((value == null) || SetUtil.isEmpty(value.getAvailableLocales())) {
+			return true;
+		}
+
+		DDMFormFieldValueAccessor<?> ddmFormFieldValueAccessor =
+			getDDMFormFieldValueAccessor(ddmFormField.getType());
+
+		Set<Locale> locales = value.getAvailableLocales();
+
+		Stream<Locale> stream = locales.stream();
+
+		return stream.allMatch(
+			locale -> ddmFormFieldValueAccessor.isEmpty(
+				ddmFormFieldValue, locale));
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMExpressionFactory(
+		DDMExpressionFactory ddmExpressionFactory) {
+
+		_ddmExpressionFactory = ddmExpressionFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMFormFieldTypeServicesTracker(
+		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {
+
+		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJSONFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
+	}
+
+	protected void traverseDDMFormFields(
 			List<DDMFormField> ddmFormFields,
 			Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap)
 		throws DDMFormValuesValidationException {
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
 			List<DDMFormFieldValue> ddmFormFieldValues =
-				_getDDMFormFieldValuesByFieldName(
+				getDDMFormFieldValuesByFieldName(
 					ddmFormFieldValuesMap, ddmFormField.getName());
 
-			_validateDDMFormFieldValues(ddmFormField, ddmFormFieldValues);
+			validateDDMFormFieldValues(ddmFormField, ddmFormFieldValues);
 
 			for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-				_traverseDDMFormFields(
+				traverseDDMFormFields(
 					ddmFormField.getNestedDDMFormFields(),
 					ddmFormFieldValue.getNestedDDMFormFieldValuesMap());
 			}
 		}
 	}
 
-	private void _traverseDDMFormFieldValues(
+	protected void traverseDDMFormFieldValues(
 			List<DDMFormFieldValue> ddmFormFieldValues,
 			Map<String, DDMFormField> ddmFormFieldsMap)
 		throws DDMFormValuesValidationException {
@@ -326,40 +340,59 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 				ddmFormFieldValue.getName());
 
 			if (ddmFormField != null) {
-				_validateDDMFormFieldValue(
+				validateDDMFormFieldValue(
 					ddmFormFieldsMap.get(ddmFormFieldValue.getName()),
 					ddmFormFieldValue);
 
-				_traverseDDMFormFieldValues(
+				traverseDDMFormFieldValues(
 					ddmFormFieldValue.getNestedDDMFormFieldValues(),
 					ddmFormField.getNestedDDMFormFieldsMap());
 			}
 		}
 	}
 
-	private void _validateDDMFormFieldValue(
+	protected void validateDDMFormFieldValidationExpression(
+			DDMFormField ddmFormField, Value value)
+		throws DDMFormValuesValidationException {
+
+		DDMFormFieldValidation ddmFormFieldValidation =
+			ddmFormField.getDDMFormFieldValidation();
+
+		if (ddmFormFieldValidation == null) {
+			return;
+		}
+
+		boolean valid = evaluateValidationExpression(
+			ddmFormField.getDataType(), ddmFormField.getName(),
+			ddmFormFieldValidation, value.getDefaultLocale(), value);
+
+		if (!valid) {
+			throw new MustSetValidValue(ddmFormField.getName());
+		}
+	}
+
+	protected void validateDDMFormFieldValue(
 			DDMFormField ddmFormField, DDMFormFieldValue ddmFormFieldValue)
 		throws DDMFormValuesValidationException {
 
 		if (ddmFormField == null) {
-			throw new MustSetValidField(
-				ddmFormField.getLabel(), ddmFormFieldValue.getName());
+			throw new MustSetValidField(ddmFormFieldValue.getName());
 		}
 
 		DDMFormValues ddmFormValues = ddmFormFieldValue.getDDMFormValues();
 
-		_validateDDMFormFieldValue(
+		validateDDMFormFieldValue(
 			ddmFormField, ddmFormValues.getAvailableLocales(),
 			ddmFormValues.getDefaultLocale(), ddmFormFieldValue);
 
-		_invokeDDMFormFieldValueValidator(ddmFormField, ddmFormFieldValue);
+		invokeDDMFormFieldValueValidator(ddmFormField, ddmFormFieldValue);
 
-		_traverseDDMFormFieldValues(
+		traverseDDMFormFieldValues(
 			ddmFormFieldValue.getNestedDDMFormFieldValues(),
 			ddmFormField.getNestedDDMFormFieldsMap());
 	}
 
-	private void _validateDDMFormFieldValue(
+	protected void validateDDMFormFieldValue(
 			DDMFormField ddmFormField, Set<Locale> availableLocales,
 			Locale defaultLocale, DDMFormFieldValue ddmFormFieldValue)
 		throws DDMFormValuesValidationException {
@@ -368,8 +401,7 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 
 		if (Validator.isNull(ddmFormField.getDataType())) {
 			if (value != null) {
-				throw new MustNotSetValue(
-					ddmFormField.getLabel(), ddmFormField.getName());
+				throw new MustNotSetValue(ddmFormField.getName());
 			}
 		}
 		else {
@@ -377,26 +409,23 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 				(ddmFormField.isRequired() &&
 				 isNull(ddmFormField, ddmFormFieldValue))) {
 
-				throw new RequiredValue(
-					ddmFormField.getLabel(), ddmFormField.getName());
+				throw new RequiredValue(ddmFormField.getName());
 			}
 
 			if ((ddmFormField.isLocalizable() && !value.isLocalized()) ||
 				(!ddmFormField.isLocalizable() && value.isLocalized())) {
 
-				throw new MustSetValidValue(
-					ddmFormField.getLabel(), ddmFormField.getName());
+				throw new MustSetValidValue(ddmFormField.getName());
 			}
 
-			_validateDDMFormFieldValueLocales(
+			validateDDMFormFieldValueLocales(
 				ddmFormField, availableLocales, defaultLocale, value);
 
-			validateDDMFormFieldValidationExpression(
-				ddmFormField, ddmFormFieldValue);
+			validateDDMFormFieldValidationExpression(ddmFormField, value);
 		}
 	}
 
-	private void _validateDDMFormFieldValueLocales(
+	protected void validateDDMFormFieldValueLocales(
 			DDMFormField ddmFormField, Set<Locale> availableLocales,
 			Locale defaultLocale, Value value)
 		throws DDMFormValuesValidationException {
@@ -406,50 +435,39 @@ public class DDMFormValuesValidatorImpl implements DDMFormValuesValidator {
 		}
 
 		if (!availableLocales.equals(value.getAvailableLocales())) {
-			throw new MustSetValidAvailableLocales(
-				ddmFormField.getLabel(), ddmFormField.getName());
+			throw new MustSetValidAvailableLocales(ddmFormField.getName());
 		}
 
 		if (!defaultLocale.equals(value.getDefaultLocale())) {
-			throw new MustSetValidDefaultLocale(
-				ddmFormField.getLabel(), ddmFormField.getName());
+			throw new MustSetValidDefaultLocale(ddmFormField.getName());
 		}
 	}
 
-	private void _validateDDMFormFieldValues(
+	protected void validateDDMFormFieldValues(
 			DDMFormField ddmFormField,
 			List<DDMFormFieldValue> ddmFormFieldValues)
 		throws DDMFormValuesValidationException {
 
 		if (ddmFormField.isRequired() && ddmFormFieldValues.isEmpty()) {
-			throw new RequiredValue(
-				ddmFormField.getLabel(), ddmFormField.getName());
+			throw new RequiredValue(ddmFormField.getName());
 		}
 
 		if (!ddmFormField.isRepeatable() && (ddmFormFieldValues.size() > 1)) {
-			throw new MustSetValidValuesSize(
-				ddmFormField.getLabel(), ddmFormField.getName());
+			throw new MustSetValidValuesSize(ddmFormField.getName());
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormValuesValidatorImpl.class);
 
-	@Reference
 	private DDMExpressionFactory _ddmExpressionFactory;
-
-	@Reference
-	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
-
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 	private DDMFormFieldValueExpressionParameterAccessor
 		_ddmFormFieldValueExpressionParameterAccessor;
 	private final DDMFormFieldValueAccessor<String>
 		_defaultDDMFormFieldValueAccessor =
 			new DefaultDDMFormFieldValueAccessor();
-
-	@Reference
 	private JSONFactory _jsonFactory;
-
 	private ServiceTrackerMap<String, DDMFormFieldValueValidator>
 		_serviceTrackerMap;
 

@@ -94,7 +94,7 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 					long structureId = resultSet.getLong(3);
 					long recordSetId = resultSet.getLong(4);
 
-					String newDefinition = _upgradeRecordSetStructureDefinition(
+					String newDefinition = upgradeRecordSetStructureDefinition(
 						definition);
 
 					preparedStatement2.setString(1, newDefinition);
@@ -109,7 +109,7 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 
 					preparedStatement3.addBatch();
 
-					_updateRecords(
+					updateRecords(
 						DDMFormDeserializeUtil.deserialize(
 							_ddmFormDeserializer, definition),
 						recordSetId);
@@ -122,7 +122,9 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 		}
 	}
 
-	private JSONArray _getOptionsJSONArray(JSONObject checkboxFieldJSONObject) {
+	protected JSONArray getOptionsJSONArray(
+		JSONObject checkboxFieldJSONObject) {
+
 		return JSONUtil.putAll(
 			JSONUtil.put(
 				"label", checkboxFieldJSONObject.getJSONObject("label")
@@ -131,7 +133,7 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 			));
 	}
 
-	private JSONObject _getPredefinedValueJSONObject(
+	protected JSONObject getPredefinedValueJSONObject(
 		JSONObject checkboxFieldJSONObject) {
 
 		JSONObject oldPredefinedValueJSONObject =
@@ -161,22 +163,22 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 		return newPredefinedValueJSONObject;
 	}
 
-	private void _transformCheckboxDDMFormField(
+	protected void transformCheckboxDDMFormField(
 		JSONObject checkboxFieldJSONObject) {
 
 		checkboxFieldJSONObject.put(
 			"dataType", "string"
 		).put(
-			"options", _getOptionsJSONArray(checkboxFieldJSONObject)
+			"options", getOptionsJSONArray(checkboxFieldJSONObject)
 		).put(
 			"predefinedValue",
-			_getPredefinedValueJSONObject(checkboxFieldJSONObject)
+			getPredefinedValueJSONObject(checkboxFieldJSONObject)
 		).put(
 			"type", "checkbox_multiple"
 		);
 	}
 
-	private void _transformCheckboxDDMFormFieldValues(
+	protected void transformCheckboxDDMFormFieldValues(
 			DDMFormValues ddmFormValues)
 		throws Exception {
 
@@ -189,7 +191,7 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 		ddmFormValuesTransformer.transform();
 	}
 
-	private void _updateRecords(DDMForm ddmForm, long recordSetId)
+	protected void updateRecords(DDMForm ddmForm, long recordSetId)
 		throws Exception {
 
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
@@ -214,7 +216,7 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 						DDMFormValuesDeserializeUtil.deserialize(
 							data_, ddmForm, _ddmFormValuesDeserializer);
 
-					_transformCheckboxDDMFormFieldValues(ddmFormValues);
+					transformCheckboxDDMFormFieldValues(ddmFormValues);
 
 					preparedStatement2.setString(
 						1,
@@ -233,7 +235,7 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 		}
 	}
 
-	private String _upgradeRecordSetStructureDefinition(String definition)
+	protected String upgradeRecordSetStructureDefinition(String definition)
 		throws JSONException {
 
 		JSONObject definitionJSONObject = _jsonFactory.createJSONObject(
@@ -241,26 +243,26 @@ public class CheckboxFieldToCheckboxMultipleFieldUpgradeProcess
 
 		JSONArray fieldsJSONArray = definitionJSONObject.getJSONArray("fields");
 
-		_upgradeRecordSetStructureFields(fieldsJSONArray);
+		upgradeRecordSetStructureFields(fieldsJSONArray);
 
 		return definitionJSONObject.toString();
 	}
 
-	private void _upgradeRecordSetStructureFields(JSONArray fieldsJSONArray) {
+	protected void upgradeRecordSetStructureFields(JSONArray fieldsJSONArray) {
 		for (int i = 0; i < fieldsJSONArray.length(); i++) {
 			JSONObject fieldJSONObject = fieldsJSONArray.getJSONObject(i);
 
 			String type = fieldJSONObject.getString("type");
 
 			if (type.equals("checkbox")) {
-				_transformCheckboxDDMFormField(fieldJSONObject);
+				transformCheckboxDDMFormField(fieldJSONObject);
 			}
 
 			JSONArray nestedFieldsJSONArray = fieldJSONObject.getJSONArray(
 				"nestedFields");
 
 			if (nestedFieldsJSONArray != null) {
-				_upgradeRecordSetStructureFields(nestedFieldsJSONArray);
+				upgradeRecordSetStructureFields(nestedFieldsJSONArray);
 			}
 		}
 	}

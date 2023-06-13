@@ -28,10 +28,10 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_updateWorkflowDefinition();
+		updateWorkflowDefinition();
 	}
 
-	private void _updateKaleoProcess(
+	protected void updateKaleoProcess(
 			long kaleoProcessId, String workflowDefinitioName,
 			int workflowDefinitionVersion)
 		throws Exception {
@@ -48,7 +48,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateWorkflowDefinition() throws Exception {
+	protected void updateWorkflowDefinition() throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select classPK, workflowDefinitionName, " +
 					"workflowDefinitionVersion from WorkflowDefinitionLink " +
@@ -67,7 +67,7 @@ public class KaleoProcessUpgradeProcess extends UpgradeProcess {
 					int workflowDefinitionVersion = resultSet.getInt(
 						"workflowDefinitionVersion");
 
-					_updateKaleoProcess(
+					updateKaleoProcess(
 						kaleoProcessId, workflowDefinitionName,
 						workflowDefinitionVersion);
 				}

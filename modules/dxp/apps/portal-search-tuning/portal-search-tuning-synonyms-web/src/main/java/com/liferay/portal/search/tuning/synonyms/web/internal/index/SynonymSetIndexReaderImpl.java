@@ -24,9 +24,11 @@ import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexResponse;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.tuning.synonyms.index.name.SynonymSetIndexName;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,16 +40,14 @@ import org.osgi.service.component.annotations.Reference;
 public class SynonymSetIndexReaderImpl implements SynonymSetIndexReader {
 
 	@Override
-	public SynonymSet fetch(
+	public Optional<SynonymSet> fetchOptional(
 		SynonymSetIndexName synonymSetIndexName, String id) {
 
-		Document document = _getDocument(synonymSetIndexName, id);
-
-		if (document == null) {
-			return null;
-		}
-
-		return translate(document, id);
+		return _getDocumentOptional(
+			synonymSetIndexName, id
+		).map(
+			document -> translate(document, id)
+		);
 	}
 
 	@Override
@@ -78,15 +78,22 @@ public class SynonymSetIndexReaderImpl implements SynonymSetIndexReader {
 			searchSearchResponse.getSearchHits());
 	}
 
+	@Reference(unbind = "-")
+	protected void setSearchEngineAdapter(
+		SearchEngineAdapter searchEngineAdapter) {
+
+		_searchEngineAdapter = searchEngineAdapter;
+	}
+
 	protected SynonymSet translate(Document document, String id) {
 		return _documentToSynonymSetTranslator.translate(document, id);
 	}
 
-	private Document _getDocument(
+	private Optional<Document> _getDocumentOptional(
 		SynonymSetIndexName synonymSetIndexName, String id) {
 
 		if (Validator.isNull(id)) {
-			return null;
+			return Optional.empty();
 		}
 
 		GetDocumentRequest getDocumentRequest = new GetDocumentRequest(
@@ -99,17 +106,20 @@ public class SynonymSetIndexReaderImpl implements SynonymSetIndexReader {
 		GetDocumentResponse getDocumentResponse = _searchEngineAdapter.execute(
 			getDocumentRequest);
 
-		if (!getDocumentResponse.isExists()) {
-			return null;
+		if (getDocumentResponse.isExists()) {
+			return Optional.of(getDocumentResponse.getDocument());
 		}
 
-		return getDocumentResponse.getDocument();
+		return Optional.empty();
 	}
 
 	private static final int _SIZE = 10000;
 
 	@Reference
 	private DocumentToSynonymSetTranslator _documentToSynonymSetTranslator;
+
+	@Reference
+	private Queries _queries;
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;

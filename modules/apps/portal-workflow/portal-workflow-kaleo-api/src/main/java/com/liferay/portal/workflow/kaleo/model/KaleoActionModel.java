@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -38,8 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoActionModel
-	extends BaseModel<KaleoAction>, CTModel<KaleoAction>, GroupedModel,
-			MVCCModel, ShardedModel {
+	extends BaseModel<KaleoAction>, GroupedModel, MVCCModel, ShardedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -52,7 +50,6 @@ public interface KaleoActionModel
 	 *
 	 * @return the primary key of this kaleo action
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -60,7 +57,6 @@ public interface KaleoActionModel
 	 *
 	 * @param primaryKey the primary key of this kaleo action
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -78,22 +74,6 @@ public interface KaleoActionModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this kaleo action.
-	 *
-	 * @return the ct collection ID of this kaleo action
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this kaleo action.
-	 *
-	 * @param ctCollectionId the ct collection ID of this kaleo action
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the kaleo action ID of this kaleo action.
@@ -398,40 +378,7 @@ public interface KaleoActionModel
 	 */
 	public void setPriority(int priority);
 
-	/**
-	 * Returns the type of this kaleo action.
-	 *
-	 * @return the type of this kaleo action
-	 */
-	@AutoEscape
-	public String getType();
-
-	/**
-	 * Sets the type of this kaleo action.
-	 *
-	 * @param type the type of this kaleo action
-	 */
-	public void setType(String type);
-
-	/**
-	 * Returns the status of this kaleo action.
-	 *
-	 * @return the status of this kaleo action
-	 */
-	public int getStatus();
-
-	/**
-	 * Sets the status of this kaleo action.
-	 *
-	 * @param status the status of this kaleo action
-	 */
-	public void setStatus(int status);
-
 	@Override
 	public KaleoAction cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

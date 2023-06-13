@@ -15,7 +15,6 @@
 package com.liferay.poshi.core.elements;
 
 import com.liferay.poshi.core.script.PoshiScriptParserException;
-import com.liferay.poshi.core.util.StringUtil;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -71,30 +70,16 @@ public class PropertyPoshiElement extends VarPoshiElement {
 		super(_ELEMENT_NAME, parentPoshiElement, poshiScript);
 	}
 
-	@Override
-	protected Pattern getStatementPattern() {
-		return _statementPattern;
-	}
-
 	private boolean _isElementType(String poshiScript) {
-		return isValidPoshiScriptStatement(
-			_partialStatementPattern, poshiScript);
+		return isValidPoshiScriptStatement(_statementPattern, poshiScript);
 	}
 
 	private static final String _ELEMENT_NAME = "property";
 
 	private static final String _POSHI_SCRIPT_KEYWORD = _ELEMENT_NAME;
 
-	private static final String _PROPERTY_VALUE_REGEX = StringUtil.combine(
-		"(", "\".*?\"", "|", "'''.*?'''", ")");
-
-	private static final Pattern _partialStatementPattern = Pattern.compile(
-		"^" + _POSHI_SCRIPT_KEYWORD + "[\\s]+[\\w\\.-]+" + ASSIGNMENT_REGEX +
-			_PROPERTY_VALUE_REGEX,
-		Pattern.DOTALL);
 	private static final Pattern _statementPattern = Pattern.compile(
-		"^" + _POSHI_SCRIPT_KEYWORD + "[\\s]+[\\w\\.-]+" + ASSIGNMENT_REGEX +
-			_PROPERTY_VALUE_REGEX + "(;|)$",
-		Pattern.DOTALL | Pattern.MULTILINE);
+		"^" + _POSHI_SCRIPT_KEYWORD + "[\\s]*[\\w\\.-]*" + ASSIGNMENT_REGEX +
+			".*" + STATEMENT_END_REGEX);
 
 }

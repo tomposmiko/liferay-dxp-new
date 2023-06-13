@@ -13,12 +13,9 @@
  */
 
 import {getNumberOfWords} from '../utils/assets';
-import {WEB_CONTENT} from '../utils/constants';
-import {debounce} from '../utils/debounce';
-import {clickEvent, onEvents, onReady} from '../utils/events';
-import {isPartiallyInViewport} from '../utils/scroll';
+import {clickEvent, onReady} from '../utils/events';
 
-const applicationId = WEB_CONTENT;
+const applicationId = 'WebContent';
 
 /**
  * Returns analytics payload with WebContent information.
@@ -64,44 +61,30 @@ function trackWebContentClicked(analytics) {
 }
 
 /**
- * Sends information the first time a WebContent enters into the viewport.
+ * Sends information when user scrolls on a WebContent.
  * @param {Object} The Analytics client instance
  */
 function trackWebContentViewed(analytics) {
-	const markViewedElements = debounce(() => {
-		const elements = Array.prototype.slice
+	const stopTrackingOnReady = onReady(() => {
+		Array.prototype.slice
 			.call(
 				document.querySelectorAll(
-					'[data-analytics-asset-type="web-content"]:not([data-analytics-asset-viewed="true"]'
+					'[data-analytics-asset-type="web-content"]'
 				)
 			)
-			.filter((element) => isTrackableWebContent(element));
-
-		elements.forEach((element) => {
-			if (isPartiallyInViewport(element)) {
+			.filter((element) => isTrackableWebContent(element))
+			.forEach((element) => {
 				const payload = getWebContentPayload(element);
 
 				Object.assign(payload, {
 					numberOfWords: getNumberOfWords(element),
 				});
 
-				element.dataset.analyticsAssetViewed = true;
-
 				analytics.send('webContentViewed', applicationId, payload);
-			}
-		});
-	}, 250);
+			});
+	});
 
-	const stopTrackingOnReady = onReady(markViewedElements);
-	const stopTrackingEvents = onEvents(
-		['scroll', 'resize', 'orientationchange'],
-		markViewedElements
-	);
-
-	return () => {
-		stopTrackingEvents();
-		stopTrackingOnReady();
-	};
+	return () => stopTrackingOnReady();
 }
 
 /**

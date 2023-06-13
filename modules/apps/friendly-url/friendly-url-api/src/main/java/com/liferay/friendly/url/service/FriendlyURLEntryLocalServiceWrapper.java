@@ -30,10 +30,6 @@ public class FriendlyURLEntryLocalServiceWrapper
 	implements FriendlyURLEntryLocalService,
 			   ServiceWrapper<FriendlyURLEntryLocalService> {
 
-	public FriendlyURLEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public FriendlyURLEntryLocalServiceWrapper(
 		FriendlyURLEntryLocalService friendlyURLEntryLocalService) {
 
@@ -357,28 +353,10 @@ public class FriendlyURLEntryLocalServiceWrapper
 	@Override
 	public com.liferay.friendly.url.model.FriendlyURLEntryLocalization
 		fetchFriendlyURLEntryLocalization(
-			long groupId, long classNameId, String languageId,
-			String urlTitle) {
-
-		return _friendlyURLEntryLocalService.fetchFriendlyURLEntryLocalization(
-			groupId, classNameId, languageId, urlTitle);
-	}
-
-	@Override
-	public com.liferay.friendly.url.model.FriendlyURLEntryLocalization
-		fetchFriendlyURLEntryLocalization(
 			long friendlyURLEntryId, String languageId) {
 
 		return _friendlyURLEntryLocalService.fetchFriendlyURLEntryLocalization(
 			friendlyURLEntryId, languageId);
-	}
-
-	@Override
-	public FriendlyURLEntry fetchMainFriendlyURLEntry(
-		long classNameId, long classPK) {
-
-		return _friendlyURLEntryLocalService.fetchMainFriendlyURLEntry(
-			classNameId, classPK);
 	}
 
 	@Override
@@ -517,18 +495,6 @@ public class FriendlyURLEntryLocalServiceWrapper
 	@Override
 	public com.liferay.friendly.url.model.FriendlyURLEntryLocalization
 			getFriendlyURLEntryLocalization(
-				long groupId, long classNameId, String languageId,
-				String urlTitle)
-		throws com.liferay.friendly.url.exception.
-			NoSuchFriendlyURLEntryLocalizationException {
-
-		return _friendlyURLEntryLocalService.getFriendlyURLEntryLocalization(
-			groupId, classNameId, languageId, urlTitle);
-	}
-
-	@Override
-	public com.liferay.friendly.url.model.FriendlyURLEntryLocalization
-			getFriendlyURLEntryLocalization(
 				long friendlyURLEntryId, String languageId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -605,6 +571,19 @@ public class FriendlyURLEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _friendlyURLEntryLocalService.getPersistedModel(primaryKeyObj);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getUniqueUrlTitle(long, long, long, String, String)}
+	 */
+	@Deprecated
+	@Override
+	public String getUniqueUrlTitle(
+		long groupId, long classNameId, long classPK, String urlTitle) {
+
+		return _friendlyURLEntryLocalService.getUniqueUrlTitle(
+			groupId, classNameId, classPK, urlTitle);
 	}
 
 	@Override
@@ -710,16 +689,6 @@ public class FriendlyURLEntryLocalServiceWrapper
 
 		_friendlyURLEntryLocalService.validate(
 			groupId, classNameId, classPK, urlTitle);
-	}
-
-	@Override
-	public void validate(
-			long groupId, long classNameId, long classPK, String languageId,
-			String urlTitle)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_friendlyURLEntryLocalService.validate(
-			groupId, classNameId, classPK, languageId, urlTitle);
 	}
 
 	@Override

@@ -20,8 +20,7 @@ import com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValue;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.service.CPDefinitionSpecificationOptionValueService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductSpecification;
-import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.constants.DTOConverterConstants;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.ProductSpecificationDTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -36,7 +35,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Ferrari
  */
-@Component(service = ProductSpecificationHelper.class)
+@Component(
+	enabled = false, immediate = true,
+	service = ProductSpecificationHelper.class
+)
 public class ProductSpecificationHelper {
 
 	public Page<ProductSpecification> getProductSpecificationsPage(
@@ -100,11 +102,7 @@ public class ProductSpecificationHelper {
 	private CPDefinitionSpecificationOptionValueService
 		_cpDefinitionSpecificationOptionValueService;
 
-	@Reference(
-		target = DTOConverterConstants.PRODUCT_SPECIFICATION_DTO_CONVERTER
-	)
-	private DTOConverter
-		<CPDefinitionSpecificationOptionValue, ProductSpecification>
-			_productSpecificationDTOConverter;
+	@Reference
+	private ProductSpecificationDTOConverter _productSpecificationDTOConverter;
 
 }

@@ -14,8 +14,8 @@ definition {
 
 	macro gotoPortlet {
 		Click(
-			key_category = ${category},
-			key_portlet = ${portlet},
+			key_category = "${category}",
+			key_portlet = "${portlet}",
 			locator1 = "ApplicationsMenu#PORTLET");
 	}
 
@@ -28,12 +28,10 @@ definition {
 	}
 
 	macro openWorkspace {
-		if (IsElementNotPresent(key_title = "Select Site", locator1 = "IFrame#MODAL_ANY")) {
+		if (IsElementNotPresent(locator1 = "Portlet#MODAL_TITLE")) {
 			Click(locator1 = "ApplicationsMenu#VIEW_ALL_LINK");
 
-			AssertVisible(
-				key_title = "Select Site",
-				locator1 = "IFrame#MODAL_ANY");
+			AssertVisible(locator1 = "Portlet#MODAL_TITLE");
 		}
 	}
 

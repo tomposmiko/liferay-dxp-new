@@ -18,19 +18,17 @@ import com.liferay.analytics.message.sender.model.AnalyticsMessage;
 import com.liferay.analytics.message.sender.util.AnalyticsExpandoBridgeUtil;
 import com.liferay.analytics.message.storage.service.AnalyticsMessageLocalService;
 import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
-import com.liferay.analytics.settings.configuration.AnalyticsConfigurationRegistry;
+import com.liferay.analytics.settings.configuration.AnalyticsConfigurationTracker;
 import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.expando.kernel.model.ExpandoRow;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.ExpandoTableConstants;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -57,7 +55,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -72,6 +70,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Reference;
@@ -136,7 +135,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 			analyticsMessageLocalService.addAnalyticsMessage(
 				shardedModel.getCompanyId(),
-				userLocalService.getGuestUserId(shardedModel.getCompanyId()),
+				userLocalService.getDefaultUserId(shardedModel.getCompanyId()),
 				analyticsMessageJSON.getBytes(Charset.defaultCharset()));
 		}
 		catch (Exception exception) {
@@ -164,9 +163,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 
-		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
-			!analyticsConfigurationRegistry.isActive()) {
-
+		if (!analyticsConfigurationTracker.isActive()) {
 			return;
 		}
 
@@ -177,9 +174,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onAfterCreate(T model) throws ModelListenerException {
-		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
-			!analyticsConfigurationRegistry.isActive()) {
-
+		if (!analyticsConfigurationTracker.isActive()) {
 			return;
 		}
 
@@ -195,9 +190,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			Object associationClassPK)
 		throws ModelListenerException {
 
-		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
-			!analyticsConfigurationRegistry.isActive()) {
-
+		if (!analyticsConfigurationTracker.isActive()) {
 			return;
 		}
 
@@ -208,9 +201,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	@Override
 	public void onBeforeRemove(T model) throws ModelListenerException {
-		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
-			!analyticsConfigurationRegistry.isActive()) {
-
+		if (!analyticsConfigurationTracker.isActive()) {
 			return;
 		}
 
@@ -221,9 +212,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	public void onBeforeUpdate(T originalModel, T model)
 		throws ModelListenerException {
 
-		if (FeatureFlagManagerUtil.isEnabled("LRAC-10632") ||
-			!analyticsConfigurationRegistry.isActive()) {
-
+		if (!analyticsConfigurationTracker.isActive()) {
 			return;
 		}
 
@@ -286,7 +275,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 	protected List<String> getUserAttributeNames(long companyId) {
 		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationRegistry.getAnalyticsConfiguration(companyId);
+			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
 
 		if (ArrayUtil.isEmpty(analyticsConfiguration.syncedUserFieldNames())) {
 			return _userAttributeNames;
@@ -336,7 +325,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		ShardedModel shardedModel = (ShardedModel)model;
 
 		Dictionary<String, Object> analyticsConfigurationProperties =
-			analyticsConfigurationRegistry.getAnalyticsConfigurationProperties(
+			analyticsConfigurationTracker.getAnalyticsConfigurationProperties(
 				shardedModel.getCompanyId());
 
 		if (analyticsConfigurationProperties == null) {
@@ -358,7 +347,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 
 		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationRegistry.getAnalyticsConfiguration(
+			analyticsConfigurationTracker.getAnalyticsConfiguration(
 				user.getCompanyId());
 
 		if (analyticsConfiguration.syncAllContacts()) {
@@ -372,7 +361,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return true;
@@ -418,15 +407,18 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				try {
 					List<Group> groups = user.getSiteGroups();
 
-					if (!groups.isEmpty()) {
-						memberships.put(
-							Group.class.getName(),
-							TransformUtil.transformToLongArray(
-								groups, Group::getGroupId));
+					Stream<Group> stream = groups.stream();
+
+					long[] membershipIds = stream.mapToLong(
+						Group::getGroupId
+					).toArray();
+
+					if (membershipIds.length != 0) {
+						memberships.put(Group.class.getName(), membershipIds);
 					}
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 
 				try {
@@ -438,7 +430,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 					}
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 
 				long[] membershipIds = user.getRoleIds();
@@ -464,30 +456,29 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				continue;
 			}
 			else if (includeAttributeName.equals("expando")) {
-				jsonObject.put(
-					"expando",
-					() -> {
-						if (StringUtil.equals(
-								baseModel.getModelClassName(),
-								User.class.getName())) {
+				if (StringUtil.equals(
+						baseModel.getModelClassName(), User.class.getName())) {
 
-							ShardedModel shardedModel = (ShardedModel)baseModel;
+					ShardedModel shardedModel = (ShardedModel)baseModel;
 
-							AnalyticsConfiguration analyticsConfiguration =
-								analyticsConfigurationRegistry.
-									getAnalyticsConfiguration(
-										shardedModel.getCompanyId());
+					AnalyticsConfiguration analyticsConfiguration =
+						analyticsConfigurationTracker.getAnalyticsConfiguration(
+							shardedModel.getCompanyId());
 
-							return AnalyticsExpandoBridgeUtil.getAttributes(
-								baseModel.getExpandoBridge(),
-								ListUtil.fromArray(
-									analyticsConfiguration.
-										syncedUserFieldNames()));
-						}
-
-						return AnalyticsExpandoBridgeUtil.getAttributes(
-							baseModel.getExpandoBridge(), null);
-					});
+					jsonObject.put(
+						"expando",
+						AnalyticsExpandoBridgeUtil.getAttributes(
+							baseModel.getExpandoBridge(),
+							ListUtil.fromArray(
+								analyticsConfiguration.
+									syncedUserFieldNames())));
+				}
+				else {
+					jsonObject.put(
+						"expando",
+						AnalyticsExpandoBridgeUtil.getAttributes(
+							baseModel.getExpandoBridge(), null));
+				}
 
 				continue;
 			}
@@ -501,19 +492,13 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				String[] ids = StringUtil.split(
 					treePath.substring(1), StringPool.SLASH);
 
-				jsonObject.put(
-					"nameTreePath", _buildNameTreePath(ids)
-				).put(
-					"parentName",
-					() -> {
-						if (ids.length > 1) {
-							return _getName(
-								GetterUtil.getLong(ids[ids.length - 2]));
-						}
+				jsonObject.put("nameTreePath", _buildNameTreePath(ids));
 
-						return null;
-					}
-				);
+				if (ids.length > 1) {
+					jsonObject.put(
+						"parentName",
+						_getName(GetterUtil.getLong(ids[ids.length - 2])));
+				}
 
 				continue;
 			}
@@ -534,15 +519,11 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			}
 		}
 
-		return jsonObject.put(
-			getPrimaryKeyName(),
-			() -> {
-				if (modelAttributes.containsKey(getPrimaryKeyName())) {
-					return baseModel.getPrimaryKeyObj();
-				}
+		if (modelAttributes.containsKey(getPrimaryKeyName())) {
+			jsonObject.put(getPrimaryKeyName(), baseModel.getPrimaryKeyObj());
+		}
 
-				return null;
-			});
+		return jsonObject;
 	}
 
 	protected void updateConfigurationProperties(
@@ -550,7 +531,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		String preferencePropertyName) {
 
 		Dictionary<String, Object> configurationProperties =
-			analyticsConfigurationRegistry.getAnalyticsConfigurationProperties(
+			analyticsConfigurationTracker.getAnalyticsConfigurationProperties(
 				companyId);
 
 		if (configurationProperties == null) {
@@ -567,15 +548,14 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		modelIds = ArrayUtil.remove(modelIds, modelId);
 
 		if (Validator.isNotNull(preferencePropertyName)) {
+			UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+
+			unicodeProperties.setProperty(
+				preferencePropertyName,
+				StringUtil.merge(modelIds, StringPool.COMMA));
+
 			try {
-				companyService.updatePreferences(
-					companyId,
-					UnicodePropertiesBuilder.create(
-						true
-					).put(
-						preferencePropertyName,
-						StringUtil.merge(modelIds, StringPool.COMMA)
-					).build());
+				companyService.updatePreferences(companyId, unicodeProperties);
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
@@ -603,7 +583,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 	}
 
 	@Reference
-	protected AnalyticsConfigurationRegistry analyticsConfigurationRegistry;
+	protected AnalyticsConfigurationTracker analyticsConfigurationTracker;
 
 	@Reference
 	protected AnalyticsMessageLocalService analyticsMessageLocalService;
@@ -678,7 +658,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return null;
@@ -733,8 +713,8 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 
 				if (user.fetchContact() != null) {
 					AnalyticsConfiguration analyticsConfiguration =
-						analyticsConfigurationRegistry.
-							getAnalyticsConfiguration(user.getCompanyId());
+						analyticsConfigurationTracker.getAnalyticsConfiguration(
+							user.getCompanyId());
 
 					addAnalyticsMessage(
 						"update",
@@ -765,7 +745,7 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 				analyticsMessageBuilder.buildJSONString();
 
 			analyticsMessageLocalService.addAnalyticsMessage(
-				companyId, userLocalService.getGuestUserId(companyId),
+				companyId, userLocalService.getDefaultUserId(companyId),
 				analyticsMessageJSON.getBytes(Charset.defaultCharset()));
 		}
 		catch (Exception exception) {
@@ -787,10 +767,10 @@ public abstract class BaseEntityModelListener<T extends BaseModel<T>>
 			"treePath", "type");
 	private static final List<String> _userAttributeNames = Arrays.asList(
 		"agreedToTermsOfUse", "comments", "companyId", "contactId",
-		"createDate", "emailAddress", "emailAddressVerified", "expando",
-		"externalReferenceCode", "facebookId", "firstName", "googleUserId",
-		"greeting", "jobTitle", "languageId", "lastName", "ldapServerId",
-		"memberships", "middleName", "modifiedDate", "openId", "portraitId",
-		"screenName", "status", "timeZoneId", "uuid");
+		"createDate", "defaultUser", "emailAddress", "emailAddressVerified",
+		"expando", "externalReferenceCode", "facebookId", "firstName",
+		"googleUserId", "greeting", "jobTitle", "languageId", "lastName",
+		"ldapServerId", "memberships", "middleName", "modifiedDate", "openId",
+		"portraitId", "screenName", "status", "timeZoneId", "uuid");
 
 }

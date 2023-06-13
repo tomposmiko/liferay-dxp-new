@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  * @author Lucas Marques
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class AssetCategorySearchRegistrar {
 
 	@Activate
@@ -39,9 +39,8 @@ public class AssetCategorySearchRegistrar {
 			AssetCategory.class, bundleContext,
 			modelSearchDefinition -> {
 				modelSearchDefinition.setDefaultSelectedFieldNames(
-					Field.ASSET_CATEGORY_ID, Field.COMPANY_ID,
-					Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
-					Field.GROUP_ID, Field.UID);
+					Field.ASSET_CATEGORY_ID, Field.COMPANY_ID, Field.GROUP_ID,
+					Field.UID);
 				modelSearchDefinition.setModelIndexWriteContributor(
 					modelIndexWriterContributor);
 			});

@@ -23,10 +23,9 @@ import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.util.AssetHelper;
-import com.liferay.layout.portlet.category.PortletCategoryManager;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.asset.util.AssetPublisherAddItemHolder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -34,35 +33,63 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletApp;
+import com.liferay.portal.kernel.model.PortletCategory;
+import com.liferay.portal.kernel.model.PortletItem;
+import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
+import com.liferay.portal.kernel.service.PortletItemLocalServiceUtil;
+import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SessionClicks;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.util.comparator.PortletCategoryComparator;
+import com.liferay.portal.kernel.util.comparator.PortletTitleComparator;
+import com.liferay.portal.util.PortletCategoryUtil;
+import com.liferay.portal.util.WebAppPool;
+import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuPortletKeys;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.portlet.PortletConfig;
 import javax.portlet.ResourceURL;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author Eudaldo Alonso
@@ -78,12 +105,9 @@ public class AddContentPanelDisplayContext {
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 
-		_assetHelper = (AssetHelper)httpServletRequest.getAttribute(
+		_assetHelper = (AssetHelper)_httpServletRequest.getAttribute(
 			AssetWebKeys.ASSET_HELPER);
-		_portletCategoryManager =
-			(PortletCategoryManager)httpServletRequest.getAttribute(
-				PortletCategoryManager.class.getName());
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -129,7 +153,7 @@ public class AddContentPanelDisplayContext {
 			"widgets",
 			() -> {
 				if (hasAddApplicationsPermission()) {
-					return _getWidgetsJSONArray();
+					return _getWidgets();
 				}
 
 				return Collections.emptyList();
@@ -142,7 +166,6 @@ public class AddContentPanelDisplayContext {
 
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
-		assetEntryQuery.setAttribute("showNonindexable", Boolean.TRUE);
 		assetEntryQuery.setClassNameIds(_getAvailableClassNameIds());
 		assetEntryQuery.setEnd(_getDelta());
 		assetEntryQuery.setGroupIds(
@@ -193,7 +216,9 @@ public class AddContentPanelDisplayContext {
 				).put(
 					"title",
 					HtmlUtil.escape(
-						assetRenderer.getTitle(_themeDisplay.getLocale()))
+						StringUtil.shorten(
+							assetRenderer.getTitle(_themeDisplay.getLocale()),
+							60))
 				).put(
 					"type",
 					_getAssetEntryTypeLabel(
@@ -305,11 +330,16 @@ public class AddContentPanelDisplayContext {
 	}
 
 	private List<Map<String, Object>> _getAddContentsURLs() throws Exception {
-		return TransformUtil.transform(
+		List<AssetPublisherAddItemHolder> assetPublisherAddItemHolders =
 			_assetHelper.getAssetPublisherAddItemHolders(
 				_liferayPortletRequest, _liferayPortletResponse,
 				_themeDisplay.getScopeGroupId(), _getClassNameIds(),
-				new long[0], null, null, _getRedirectURL()),
+				new long[0], null, null, _getRedirectURL());
+
+		Stream<AssetPublisherAddItemHolder> stream =
+			assetPublisherAddItemHolders.stream();
+
+		return stream.map(
 			assetPublisherAddItemHolder -> HashMapBuilder.<String, Object>put(
 				"label", assetPublisherAddItemHolder.getModelResource()
 			).put(
@@ -328,10 +358,18 @@ public class AddContentPanelDisplayContext {
 
 					return _assetHelper.getAddURLPopUp(
 						curGroupId, _themeDisplay.getPlid(),
-						assetPublisherAddItemHolder.getPortletURL(), false,
-						_themeDisplay.getLayout());
+						PortletURLBuilder.create(
+							assetPublisherAddItemHolder.getPortletURL()
+						).setPortletResource(
+							ProductNavigationControlMenuPortletKeys.
+								PRODUCT_NAVIGATION_CONTROL_MENU
+						).buildPortletURL(),
+						false, _themeDisplay.getLayout());
 				}
-			).build());
+			).build()
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private String _getAssetEntryTypeLabel(String className, long classTypeId) {
@@ -366,7 +404,7 @@ public class AddContentPanelDisplayContext {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -375,8 +413,22 @@ public class AddContentPanelDisplayContext {
 	}
 
 	private long[] _getAvailableClassNameIds() {
-		return AssetRendererFactoryRegistryUtil.getClassNameIds(
-			_themeDisplay.getCompanyId(), true);
+		long[] availableClassNameIds =
+			AssetRendererFactoryRegistryUtil.getClassNameIds(
+				_themeDisplay.getCompanyId());
+
+		for (long classNameId : availableClassNameIds) {
+			AssetRendererFactory<?> assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassNameId(classNameId);
+
+			if (!assetRendererFactory.isSelectable()) {
+				availableClassNameIds = ArrayUtil.remove(
+					availableClassNameIds, classNameId);
+			}
+		}
+
+		return availableClassNameIds;
 	}
 
 	private long[] _getClassNameIds() {
@@ -413,28 +465,227 @@ public class AddContentPanelDisplayContext {
 	}
 
 	private Map<String, String> _getLanguageDirection() {
-		Map<String, String> map = new HashMap<>();
+		Set<Locale> locales = LanguageUtil.getAvailableLocales(
+			_themeDisplay.getScopeGroupId());
 
-		for (Locale locale :
-				LanguageUtil.getAvailableLocales(
-					_themeDisplay.getScopeGroupId())) {
+		Stream<Locale> stream = locales.stream();
 
-			map.put(
-				LocaleUtil.toLanguageId(locale),
-				LanguageUtil.get(locale, "lang.dir"));
+		return stream.collect(
+			Collectors.toMap(
+				LocaleUtil::toLanguageId,
+				locale -> LanguageUtil.get(locale, "lang.dir")));
+	}
+
+	private Set<String> _getLayoutDecodedPortletNames() {
+		if (_layoutDecodedPortletNames != null) {
+			return _layoutDecodedPortletNames;
 		}
 
-		return map;
+		Set<String> layoutDecodedPortletNames = new HashSet<>();
+
+		LayoutTypePortlet layoutTypePortlet =
+			_themeDisplay.getLayoutTypePortlet();
+
+		for (Portlet layoutPortlet : layoutTypePortlet.getPortlets()) {
+			String decodedPortletName = PortletIdCodec.decodePortletName(
+				layoutPortlet.getPortletId());
+
+			layoutDecodedPortletNames.add(decodedPortletName);
+		}
+
+		_layoutDecodedPortletNames = layoutDecodedPortletNames;
+
+		return _layoutDecodedPortletNames;
+	}
+
+	private String _getPortletCategoryTitle(PortletCategory portletCategory) {
+		for (String portletId :
+				PortletCategoryUtil.getFirstChildPortletIds(portletCategory)) {
+
+			Portlet portlet = PortletLocalServiceUtil.getPortletById(
+				_themeDisplay.getCompanyId(), portletId);
+
+			if (portlet == null) {
+				continue;
+			}
+
+			PortletApp portletApp = portlet.getPortletApp();
+
+			if (!portletApp.isWARFile()) {
+				continue;
+			}
+
+			PortletConfig portletConfig = PortletConfigFactoryUtil.create(
+				portlet, _httpServletRequest.getServletContext());
+
+			ResourceBundle portletResourceBundle =
+				portletConfig.getResourceBundle(_themeDisplay.getLocale());
+
+			String title = ResourceBundleUtil.getString(
+				portletResourceBundle, portletCategory.getName());
+
+			if (Validator.isNotNull(title)) {
+				return title;
+			}
+		}
+
+		return LanguageUtil.get(_httpServletRequest, portletCategory.getName());
+	}
+
+	private List<Map<String, Object>> _getPortletItems(Portlet portlet) {
+		List<PortletItem> portletItems =
+			PortletItemLocalServiceUtil.getPortletItems(
+				_themeDisplay.getScopeGroupId(), portlet.getPortletId(),
+				PortletPreferences.class.getName());
+
+		if (ListUtil.isEmpty(portletItems)) {
+			return Collections.emptyList();
+		}
+
+		Stream<PortletItem> stream = portletItems.stream();
+
+		return stream.map(
+			portletItem -> HashMapBuilder.<String, Object>put(
+				"instanceable", portlet.isInstanceable()
+			).put(
+				"portletId", portlet.getPortletId()
+			).put(
+				"portletItemId", portletItem.getPortletItemId()
+			).put(
+				"title", HtmlUtil.escape(portletItem.getName())
+			).put(
+				"used", _isUsed(portlet)
+			).build()
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	private List<Map<String, Object>> _getPortlets(
+		PortletCategory portletCategory) {
+
+		HttpSession httpSession = _httpServletRequest.getSession();
+
+		ServletContext servletContext = httpSession.getServletContext();
+
+		Set<String> portletIds = portletCategory.getPortletIds();
+
+		Stream<String> stream = portletIds.stream();
+
+		return stream.map(
+			portletId -> PortletLocalServiceUtil.getPortletById(
+				_themeDisplay.getCompanyId(), portletId)
+		).filter(
+			portlet -> {
+				if (portlet == null) {
+					return false;
+				}
+
+				try {
+					return PortletPermissionUtil.contains(
+						_themeDisplay.getPermissionChecker(),
+						_themeDisplay.getLayout(), portlet,
+						ActionKeys.ADD_TO_PAGE);
+				}
+				catch (PortalException portalException) {
+					_log.error(
+						"Unable to check portlet permissions for " +
+							portlet.getPortletId(),
+						portalException);
+
+					return false;
+				}
+			}
+		).sorted(
+			new PortletTitleComparator(
+				servletContext, _themeDisplay.getLocale())
+		).map(
+			portlet -> HashMapBuilder.<String, Object>put(
+				"instanceable", portlet.isInstanceable()
+			).put(
+				"portletId", portlet.getPortletId()
+			).put(
+				"portletItems", _getPortletItems(portlet)
+			).put(
+				"title",
+				PortalUtil.getPortletTitle(
+					portlet, servletContext, _themeDisplay.getLocale())
+			).put(
+				"used", _isUsed(portlet)
+			).build()
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private String _getRedirectURL() throws Exception {
-		return PortalUtil.getLayoutFullURL(
+		String layoutFullURL = PortalUtil.getLayoutFullURL(
 			_themeDisplay.getLayout(), _themeDisplay);
+
+		return HttpUtil.addParameter(
+			layoutFullURL, "portletResource",
+			ProductNavigationControlMenuPortletKeys.
+				PRODUCT_NAVIGATION_CONTROL_MENU);
 	}
 
-	private JSONArray _getWidgetsJSONArray() throws Exception {
-		return _portletCategoryManager.getPortletsJSONArray(
-			_httpServletRequest, _themeDisplay);
+	private List<Map<String, Object>> _getWidgetCategories(
+		PortletCategory portletCategory) {
+
+		Collection<PortletCategory> portletCategories =
+			portletCategory.getCategories();
+
+		Stream<PortletCategory> stream = portletCategories.stream();
+
+		return stream.sorted(
+			new PortletCategoryComparator(_themeDisplay.getLocale())
+		).filter(
+			currentPortletCategory -> !currentPortletCategory.isHidden()
+		).map(
+			currentPortletCategory -> HashMapBuilder.<String, Object>put(
+				"categories", _getWidgetCategories(currentPortletCategory)
+			).put(
+				"path",
+				StringUtil.replace(
+					currentPortletCategory.getPath(), new String[] {"/", "."},
+					new String[] {"-", "-"})
+			).put(
+				"portlets", _getPortlets(currentPortletCategory)
+			).put(
+				"title", _getPortletCategoryTitle(currentPortletCategory)
+			).build()
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	private List<Map<String, Object>> _getWidgets() throws Exception {
+		PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
+			_themeDisplay.getCompanyId(), WebKeys.PORTLET_CATEGORY);
+
+		portletCategory = PortletCategoryUtil.getRelevantPortletCategory(
+			_themeDisplay.getPermissionChecker(), _themeDisplay.getCompanyId(),
+			_themeDisplay.getLayout(), portletCategory,
+			_themeDisplay.getLayoutTypePortlet());
+
+		return _getWidgetCategories(portletCategory);
+	}
+
+	private boolean _isUsed(Portlet portlet) {
+		if (portlet.isInstanceable()) {
+			return false;
+		}
+
+		Set<String> layoutDecodedPortletNames = _getLayoutDecodedPortletNames();
+		LayoutTypePortlet layoutTypePortlet =
+			_themeDisplay.getLayoutTypePortlet();
+
+		if (layoutDecodedPortletNames.contains(portlet.getPortletId()) ||
+			layoutTypePortlet.hasPortletId(portlet.getPortletId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -448,9 +699,9 @@ public class AddContentPanelDisplayContext {
 	private Boolean _hasLayoutUpdatePermission;
 	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
+	private Set<String> _layoutDecodedPortletNames;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final PortletCategoryManager _portletCategoryManager;
 	private final ThemeDisplay _themeDisplay;
 
 }

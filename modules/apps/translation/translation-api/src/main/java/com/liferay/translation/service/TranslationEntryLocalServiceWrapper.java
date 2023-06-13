@@ -30,10 +30,6 @@ public class TranslationEntryLocalServiceWrapper
 	implements ServiceWrapper<TranslationEntryLocalService>,
 			   TranslationEntryLocalService {
 
-	public TranslationEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public TranslationEntryLocalServiceWrapper(
 		TranslationEntryLocalService translationEntryLocalService) {
 
@@ -422,14 +418,6 @@ public class TranslationEntryLocalServiceWrapper
 	@Override
 	public int getTranslationEntriesCount() {
 		return _translationEntryLocalService.getTranslationEntriesCount();
-	}
-
-	@Override
-	public int getTranslationEntriesCount(
-		String className, long classPK, int[] statuses, boolean exclude) {
-
-		return _translationEntryLocalService.getTranslationEntriesCount(
-			className, classPK, statuses, exclude);
 	}
 
 	/**

@@ -21,7 +21,6 @@ String backURL = ParamUtil.getString(request, "backURL", String.valueOf(renderRe
 
 ObjectEntryDisplayContext objectEntryDisplayContext = (ObjectEntryDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
-ObjectDefinition objectDefinition2 = objectEntryDisplayContext.getObjectDefinition2();
 ObjectEntry objectEntry = objectEntryDisplayContext.getObjectEntry();
 ObjectLayoutTab objectLayoutTab = objectEntryDisplayContext.getObjectLayoutTab();
 
@@ -38,68 +37,62 @@ portletDisplay.setURLBack(backURL);
 	<aui:input name="objectEntryId" type="hidden" value="<%= (objectEntry == null) ? 0 : objectEntry.getObjectEntryId() %>" />
 	<aui:input name="objectRelationshipPrimaryKey2" type="hidden" value="" />
 
-	<c:choose>
-		<c:when test="<%= objectDefinition2.isUnmodifiableSystemObject() %>">
-			<frontend-data-set:classic-display
-				contextParams="<%= objectEntryDisplayContext.getRelationshipContextParams() %>"
-				creationMenu="<%= objectEntryDisplayContext.getRelatedModelCreationMenu(objectEntryDisplayContext.getObjectRelationship()) %>"
-				dataProviderKey="<%= ObjectEntriesFDSNames.SYSTEM_RELATED_MODELS %>"
-				formName="fm"
-				id="<%= ObjectEntriesFDSNames.SYSTEM_RELATED_MODELS %>"
-				style="fluid"
-			/>
-		</c:when>
-		<c:otherwise>
-			<frontend-data-set:classic-display
-				contextParams="<%= objectEntryDisplayContext.getRelationshipContextParams() %>"
-				creationMenu="<%= objectEntryDisplayContext.getRelatedModelCreationMenu(objectEntryDisplayContext.getObjectRelationship()) %>"
-				dataProviderKey="<%= ObjectEntriesFDSNames.RELATED_MODELS %>"
-				formName="fm"
-				id="<%= ObjectEntriesFDSNames.RELATED_MODELS %>"
-				style="fluid"
-			/>
-		</c:otherwise>
-	</c:choose>
+	<clay:data-set-display
+		contextParams='<%=
+			HashMapBuilder.<String, String>put(
+				"objectEntryId", String.valueOf(objectEntry.getObjectEntryId())
+			).put(
+				"objectRelationshipId", String.valueOf(objectLayoutTab.getObjectRelationshipId())
+			).build()
+		%>'
+		creationMenu="<%= objectEntryDisplayContext.getRelatedModelCreationMenu() %>"
+		dataProviderKey="<%= ObjectEntriesClayDataSetDisplayNames.RELATED_MODELS %>"
+		formId="fm"
+		id="<%= ObjectEntriesClayDataSetDisplayNames.RELATED_MODELS %>"
+		itemsPerPage="<%= 20 %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= liferayPortletResponse.createRenderURL() %>"
+		style="fluid"
+	/>
 </aui:form>
 
-<c:if test="<%= !objectEntryDisplayContext.isGuestUser() %>">
-	<aui:script sandbox="<%= true %>">
-		const eventHandlers = [];
+<aui:script sandbox="<%= true %>">
+	const eventHandlers = [];
 
-		const selectRelatedModelHandler = Liferay.on(
-			'<portlet:namespace />selectRelatedModel',
-			() => {
-				Liferay.Util.openSelectionModal({
-					multiple: false,
-					onSelect: (selectedItem) => {
-						const objectEntry = JSON.parse(selectedItem.value);
+	const selectRelatedModelHandler = Liferay.on(
+		'<portlet:namespace />selectRelatedModel',
+		() => {
+			Liferay.Util.openSelectionModal({
+				multiple: false,
+				onSelect: (selectedItem) => {
+					const objectEntry = JSON.parse(selectedItem.value);
 
-						const objectRelationshipPrimaryKey2Input = document.getElementById(
-							'<portlet:namespace />objectRelationshipPrimaryKey2'
-						);
+					const objectRelationshipPrimaryKey2Input = document.getElementById(
+						'<portlet:namespace />objectRelationshipPrimaryKey2'
+					);
 
-						objectRelationshipPrimaryKey2Input.value = objectEntry.classPK;
+					objectRelationshipPrimaryKey2Input.value = objectEntry.classPK;
 
-						const form = document.getElementById('<portlet:namespace />fm');
+					const form = document.getElementById('<portlet:namespace />fm');
 
-						if (form) {
-							submitForm(form);
-						}
-					},
-					selectEventName: '<portlet:namespace />selectRelatedModalEntry',
-					title: '<liferay-ui:message key="select" />',
-					url:
-						'<%= objectEntryDisplayContext.getRelatedObjectEntryItemSelectorURL(objectEntryDisplayContext.getObjectRelationship()) %>',
-				});
-			}
-		);
-
-		eventHandlers.push(selectRelatedModelHandler);
-
-		Liferay.on('destroyPortlet', () => {
-			eventHandlers.forEach((eventHandler) => {
-				eventHandler.detach();
+					if (form) {
+						submitForm(form);
+					}
+				},
+				selectEventName: '<portlet:namespace />selectRelatedModalEntry',
+				title: '<liferay-ui:message key="select" />',
+				url:
+					'<%= objectEntryDisplayContext.getRelatedObjectEntryItemSelectorURL() %>',
 			});
+		}
+	);
+
+	eventHandlers.push(selectRelatedModelHandler);
+
+	Liferay.on('destroyPortlet', () => {
+		eventHandlers.forEach((eventHandler) => {
+			eventHandler.detach();
 		});
-	</aui:script>
-</c:if>
+	});
+</aui:script>

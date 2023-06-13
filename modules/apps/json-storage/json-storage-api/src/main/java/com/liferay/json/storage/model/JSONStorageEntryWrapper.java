@@ -432,11 +432,6 @@ public class JSONStorageEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<JSONStorageEntry, Object>>
 		getAttributeGetterFunctions() {
 

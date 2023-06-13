@@ -26,58 +26,41 @@ definition {
 			portlet = "Pages",
 			site = "Site Name");
 
-		WaitForPageLoad();
+		SitePages.addPublicPage(pageName = "Test Page1");
 
-		Click.waitForMenuToggleJSClick(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
+		SitePages.addPublicPage(pageName = "Test Page2");
 
-		if (IsElementPresent(key_menuItem = "Configuration", locator1 = "MenuItem#DROPDOWN_MENU_ITEM")) {
-			PagesAdmin.addPage(pageName = "Test Page1");
-
-			PagesAdmin.addPage(
-				pageName = "Test Page2",
-				sitePageType = "Widget Page");
-
-			PagesAdmin.addPage(pageName = "Test Page3");
-		}
-		else {
-			PagesAdmin.addPublicPage(pageName = "Test Page1");
-
-			PagesAdmin.addPublicPage(
-				pageName = "Test Page2",
-				sitePageType = "Widget Page");
-
-			PagesAdmin.addPublicPage(pageName = "Test Page3");
-		}
+		SitePages.addPublicPage(pageName = "Test Page3");
 
 		var pageName = "Test Page1";
 		var portletBody = "Test Page1";
-		var portletName = "Menu Display";
+		var portletName = "Navigation Menu";
 		var siteName = "Site Name";
 
 		task ("Add a '${portletName}' portlet to the page named '${pageName}'") {
 			Navigator.gotoSitePage(
-				pageName = ${pageName},
-				siteName = ${siteName});
+				pageName = "${pageName}",
+				siteName = "${siteName}");
 
 			Portlet.addPG(
-				i = ${i},
-				portletName = ${portletName});
+				i = "${i}",
+				portletName = "${portletName}");
 
-			Portlet.viewTitle(portletName = ${portletName});
+			Portlet.viewTitle(portletName = "${portletName}");
 
 			Portlet.viewBody(
-				portletBody = ${portletBody},
-				portletName = ${portletName});
+				portletBody = "${portletBody}",
+				portletName = "${portletName}");
 
 			Navigator.gotoSitePage(
-				pageName = ${pageName},
-				siteName = ${siteName});
+				pageName = "${pageName}",
+				siteName = "${siteName}");
 
-			Portlet.viewTitle(portletName = ${portletName});
+			Portlet.viewTitle(portletName = "${portletName}");
 
 			Portlet.viewBody(
-				portletBody = ${portletBody},
-				portletName = ${portletName});
+				portletBody = "${portletBody}",
+				portletName = "${portletName}");
 		}
 
 		var collectionName = "Basic Components";
@@ -87,34 +70,25 @@ definition {
 
 		task ("Add a '${fragmentName}' fragment to the content page named '${contentPageName}'") {
 			task ("Create a Content Page") {
-				PagesAdmin.openPagesAdmin(siteURLKey = ${siteName});
+				SitePages.openPagesAdmin(siteURLKey = "${siteName}");
 
-				WaitForPageLoad();
-
-				Click.waitForMenuToggleJSClick(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
-
-				if (IsElementPresent(key_menuItem = "Configuration", locator1 = "MenuItem#DROPDOWN_MENU_ITEM")) {
-					ContentPages.addPage(pageName = ${contentPageName});
-				}
-				else {
-					ContentPages.addPublicPage(pageName = ${contentPageName});
-				}
+				ContentPages.addPage(pageName = "${contentPageName}");
 			}
 
 			task ("Add a basic '${fragmentName}' component") {
 				PageEditor.addFragment(
-					collectionName = ${collectionName},
-					fragmentName = ${fragmentName});
+					collectionName = "${collectionName}",
+					fragmentName = "${fragmentName}");
 			}
 
 			task ("Publish Content Page") {
-				PageEditor.publish();
+				PageEditor.clickPublish();
 			}
 
 			task ("Navigate to the content page") {
 				Navigator.gotoSitePage(
-					pageName = ${contentPageName},
-					siteName = ${siteName});
+					pageName = "${contentPageName}",
+					siteName = "${siteName}");
 			}
 
 			task ("Assert the '${fragmentName}' fragment is present") {
@@ -128,10 +102,10 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			ProductMenu.gotoPortlet(
-				category = "Content & Data",
-				portlet = ${portlet});
+				category = "Content &amp; Data",
+				portlet = "${portlet}");
 
-			SiteAdmin.viewPortletTitle(portletTitle = ${portlet});
+			SiteAdmin.viewPortletTitle(portletTitle = "${portlet}");
 		}
 
 		var webContentContent = "Web Content Content";
@@ -141,26 +115,27 @@ definition {
 			WebContentNavigator.gotoAddCP();
 
 			WebContent.addCP(
-				webContentContent = ${webContentContent},
-				webContentTitle = ${webContentTitle});
+				webContentContent = "${webContentContent}",
+				webContentTitle = "${webContentTitle}");
 
 			PortletEntry.publish();
 
-			WebContent.viewTitle(webContentTitle = ${webContentTitle});
+			WebContent.viewTitle(webContentTitle = "${webContentTitle}");
 		}
 	}
 
 	@summary = "View default welcome content page while signed in as '${userFirstName} ${userLastName}' and check that image is present"
 	macro viewWelcomeContentPage {
-		ContentPages.viewFragmentText(
-			fragmentName = "heading",
-			id = "element-text",
-			text = "Welcome to Liferay");
+		AssertTextEquals(
+			key_fragmentName = "heading",
+			locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+			value1 = "Welcome to Liferay");
 
-		ContentPages.viewFragmentImage(
-			fragmentName = "image",
+		AssertVisible(
 			id = "image-square",
-			image = "tree.png");
+			key_image = "tree.png",
+			key_imageDescription = "Responsive Image",
+			locator1 = "Fragment#CONTRIBUTED_FRAGMENT_EDITABLE_FIELD_IMAGE_PROPERTIES");
 	}
 
 }

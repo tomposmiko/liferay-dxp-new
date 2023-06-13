@@ -16,6 +16,16 @@
 
 <%@ include file="/announcements/init.jsp" %>
 
+<%
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/announcements/view"
+).setTabs1(
+	announcementsRequestHelper.getTabs1()
+).buildPortletURL();
+%>
+
 <c:if test="<%= announcementsDisplayContext.isTabs1Visible() %>">
 	<liferay-ui:tabs
 		names="<%= announcementsDisplayContext.getTabs1Names() %>"

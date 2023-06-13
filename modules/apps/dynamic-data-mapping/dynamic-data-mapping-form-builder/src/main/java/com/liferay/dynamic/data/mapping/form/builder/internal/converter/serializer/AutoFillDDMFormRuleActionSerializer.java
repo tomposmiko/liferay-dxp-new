@@ -72,11 +72,11 @@ public class AutoFillDDMFormRuleActionSerializer
 			_FUNCTION_CALL_TERNARY_EXPRESSION_FORMAT, "call",
 			StringUtil.quote(
 				_autoFillDDMFormRuleAction.getDDMDataProviderInstanceUUID()),
-			_convertAutoFillInputParameters(inputParametersMapper),
-			_convertAutoFillOutputParameters(outputParametersMapper));
+			convertAutoFillInputParameters(inputParametersMapper),
+			convertAutoFillOutputParameters(outputParametersMapper));
 	}
 
-	private String _convertAutoFillInputParameters(
+	protected String convertAutoFillInputParameters(
 		Map<String, String> inputParametersMapper) {
 
 		if (MapUtil.isEmpty(inputParametersMapper)) {
@@ -100,7 +100,7 @@ public class AutoFillDDMFormRuleActionSerializer
 		return StringUtil.quote(sb.toString());
 	}
 
-	private String _convertAutoFillOutputParameters(
+	protected String convertAutoFillOutputParameters(
 		Map<String, String> outputParametersMapper) {
 
 		if (MapUtil.isEmpty(outputParametersMapper)) {

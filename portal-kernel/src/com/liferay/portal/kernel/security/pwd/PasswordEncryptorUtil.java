@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.security.pwd;
 import com.liferay.portal.kernel.exception.PwdEncryptorException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 /**
  * @author Brian Wing Shun Chan
@@ -27,10 +26,30 @@ import com.liferay.portal.kernel.util.ServiceProxyFactory;
  */
 public class PasswordEncryptorUtil {
 
+	public static final String TYPE_BCRYPT = "BCRYPT";
+
+	public static final String TYPE_MD2 = "MD2";
+
+	public static final String TYPE_MD5 = "MD5";
+
+	public static final String TYPE_NONE = "NONE";
+
+	public static final String TYPE_PBKDF2 = "PBKDF2";
+
+	public static final String TYPE_SHA = "SHA";
+
+	public static final String TYPE_SHA_256 = "SHA-256";
+
+	public static final String TYPE_SHA_384 = "SHA-384";
+
+	public static final String TYPE_SSHA = "SSHA";
+
+	public static final String TYPE_UFC_CRYPT = "UFC-CRYPT";
+
 	public static String encrypt(String plainTextPassword)
 		throws PwdEncryptorException {
 
-		return encrypt(plainTextPassword, (String)null);
+		return encrypt(plainTextPassword, null);
 	}
 
 	public static String encrypt(
@@ -57,19 +76,6 @@ public class PasswordEncryptorUtil {
 	}
 
 	public static String encrypt(
-			String plainTextPassword, String encryptedPassword,
-			Boolean upgradeHashSecurity)
-		throws PwdEncryptorException {
-
-		if (upgradeHashSecurity) {
-			encryptedPassword = null;
-		}
-
-		return _passwordEncryptor.encrypt(
-			null, plainTextPassword, encryptedPassword, upgradeHashSecurity);
-	}
-
-	public static String encrypt(
 			String algorithm, String plainTextPassword,
 			String encryptedPassword)
 		throws PwdEncryptorException {
@@ -78,16 +84,21 @@ public class PasswordEncryptorUtil {
 			algorithm, plainTextPassword, encryptedPassword);
 	}
 
-	public static String getDefaultPasswordEncryptionAlgorithm() {
-		return _passwordEncryptor.getDefaultPasswordEncryptionAlgorithm();
+	public static String getDefaultPasswordAlgorithmType() {
+		return _passwordEncryptor.getDefaultPasswordAlgorithmType();
+	}
+
+	public PasswordEncryptor getPasswordEncryptor() {
+		return _passwordEncryptor;
+	}
+
+	public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
+		_passwordEncryptor = passwordEncryptor;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		PasswordEncryptorUtil.class);
 
-	private static volatile PasswordEncryptor _passwordEncryptor =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			PasswordEncryptor.class, PasswordEncryptorUtil.class,
-			"_passwordEncryptor", "(composite=true)", true);
+	private static PasswordEncryptor _passwordEncryptor;
 
 }

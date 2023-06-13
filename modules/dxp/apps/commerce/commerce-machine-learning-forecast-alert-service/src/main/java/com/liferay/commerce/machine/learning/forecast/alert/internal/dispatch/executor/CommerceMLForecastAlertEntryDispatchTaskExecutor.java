@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.machine.learning.forecast.alert.internal.dispatch.executor;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
 import com.liferay.commerce.machine.learning.forecast.CommerceAccountCommerceMLForecast;
 import com.liferay.commerce.machine.learning.forecast.CommerceAccountCommerceMLForecastManager;
 import com.liferay.commerce.machine.learning.forecast.alert.constants.CommerceMLForecastAlertConstants;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Ferrari
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"dispatch.task.executor.name=" + CommerceMLForecastAlertEntryDispatchTaskExecutor.KEY,
 		"dispatch.task.executor.type=" + CommerceMLForecastAlertEntryDispatchTaskExecutor.KEY
@@ -86,16 +87,18 @@ public class CommerceMLForecastAlertEntryDispatchTaskExecutor
 					COMMERCE_ML_FORECAST_ALERT_ENTRY_THRESHOLD),
 			_DEFAULT_COMMERCE_ML_FORECAST_ALERT_ENTRY_THRESHOLD);
 
-		long[] accountEntryIds = ListUtil.toLongArray(
-			_accountEntryLocalService.getAccountEntries(
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-			AccountEntry::getAccountEntryId);
+		List<CommerceAccount> commerceAccounts =
+			_commerceAccountLocalService.getCommerceAccounts(
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		long[] commerceAccountIds = ListUtil.toLongArray(
+			commerceAccounts, CommerceAccount::getCommerceAccountId);
 
 		List<CommerceAccountCommerceMLForecast>
 			commerceAccountCommerceMLForecasts =
 				_commerceAccountCommerceMLForecastManager.
 					getMonthlyRevenueCommerceAccountCommerceMLForecasts(
-						dispatchTrigger.getCompanyId(), accountEntryIds,
+						dispatchTrigger.getCompanyId(), commerceAccountIds,
 						commerceMLForecastAlertEntryCheckDate, 1, 0);
 
 		for (CommerceAccountCommerceMLForecast
@@ -159,11 +162,11 @@ public class CommerceMLForecastAlertEntryDispatchTaskExecutor
 		CommerceMLForecastAlertEntryDispatchTaskExecutor.class);
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Reference
 	private CommerceAccountCommerceMLForecastManager
 		_commerceAccountCommerceMLForecastManager;
+
+	@Reference
+	private CommerceAccountLocalService _commerceAccountLocalService;
 
 	@Reference
 	private CommerceMLForecastAlertEntryLocalService

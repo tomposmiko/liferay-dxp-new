@@ -19,16 +19,11 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
-import com.liferay.document.library.kernel.model.DLFileEntryType;
-import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -37,20 +32,18 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.kernel.search.filter.ExistsFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -73,8 +66,9 @@ public class ContentDashboardSearchContextBuilder {
 		SearchContext searchContext = SearchContextFactory.getInstance(
 			_httpServletRequest);
 
-		int status = ParamUtil.getInteger(
-			_httpServletRequest, "status", WorkflowConstants.STATUS_ANY);
+		Integer status = GetterUtil.getInteger(
+			ParamUtil.getInteger(
+				_httpServletRequest, "status", WorkflowConstants.STATUS_ANY));
 
 		if (status == WorkflowConstants.STATUS_APPROVED) {
 			searchContext.setAttribute("head", Boolean.TRUE);
@@ -92,9 +86,8 @@ public class ContentDashboardSearchContextBuilder {
 					_assetCategoryLocalService, _assetVocabularyLocalService),
 				ParamUtil.getStringValues(_httpServletRequest, "assetTagId"),
 				ParamUtil.getLongValues(_httpServletRequest, "authorIds"),
-				PortalUtil.getCompanyId(_httpServletRequest),
-				ParamUtil.getStringValues(_httpServletRequest, "fileExtension"),
-				ParamUtil.getString(_httpServletRequest, "reviewDate")));
+				ParamUtil.getStringValues(
+					_httpServletRequest, "fileExtension")));
 
 		String[] contentDashboardItemSubtypePayloads =
 			ParamUtil.getParameterValues(
@@ -103,58 +96,32 @@ public class ContentDashboardSearchContextBuilder {
 
 		if (!ArrayUtil.isEmpty(contentDashboardItemSubtypePayloads)) {
 			searchContext.setClassTypeIds(
-				TransformUtil.transformToLongArray(
-					Arrays.asList(contentDashboardItemSubtypePayloads),
+				Stream.of(
+					contentDashboardItemSubtypePayloads
+				).map(
 					contentDashboardItemSubtypePayload -> {
 						try {
-							JSONObject jsonObject =
+							return Optional.of(
 								JSONFactoryUtil.createJSONObject(
-									contentDashboardItemSubtypePayload);
-
-							if (jsonObject.isNull("classPK")) {
-								return null;
-							}
-
-							return jsonObject.getLong("classPK");
+									contentDashboardItemSubtypePayload));
 						}
 						catch (JSONException jsonException) {
-							_log.error(jsonException);
+							_log.error(jsonException, jsonException);
 
-							return null;
+							return Optional.<JSONObject>empty();
 						}
-					}));
+					}
+				).filter(
+					Optional::isPresent
+				).map(
+					Optional::get
+				).mapToLong(
+					jsonObject -> jsonObject.getLong("classPK")
+				).toArray());
 		}
 
 		if (_end != null) {
 			searchContext.setEnd(_end);
-		}
-
-		if (!ArrayUtil.isEmpty(contentDashboardItemSubtypePayloads)) {
-			searchContext.setEntryClassNames(
-				TransformUtil.transform(
-					contentDashboardItemSubtypePayloads,
-					contentDashboardItemSubtypePayload -> {
-						try {
-							JSONObject jsonObject =
-								JSONFactoryUtil.createJSONObject(
-									contentDashboardItemSubtypePayload);
-
-							String entryClassName = jsonObject.getString(
-								Field.ENTRY_CLASS_NAME);
-
-							if (Validator.isNull(entryClassName)) {
-								return null;
-							}
-
-							return entryClassName;
-						}
-						catch (JSONException jsonException) {
-							_log.error(jsonException);
-
-							return null;
-						}
-					},
-					String.class));
 		}
 
 		long groupId = ParamUtil.getLong(_httpServletRequest, "scopeId");
@@ -169,7 +136,7 @@ public class ContentDashboardSearchContextBuilder {
 		searchContext.setIncludeInternalAssetCategories(true);
 		searchContext.setIncludeStagingGroups(Boolean.FALSE);
 
-		if (ArrayUtil.isNotEmpty(_sort)) {
+		if (_sort != null) {
 			searchContext.setSorts(_sort);
 		}
 
@@ -186,7 +153,7 @@ public class ContentDashboardSearchContextBuilder {
 		return this;
 	}
 
-	public ContentDashboardSearchContextBuilder withSort(Sort... sort) {
+	public ContentDashboardSearchContextBuilder withSort(Sort sort) {
 		_sort = sort;
 
 		return this;
@@ -198,7 +165,7 @@ public class ContentDashboardSearchContextBuilder {
 		return this;
 	}
 
-	private Filter _getAssetCategoryIdsFilter(
+	private Optional<Filter> _getAssetCategoryIdsFilterOptional(
 		AssetCategoryIds assetCategoryIds) {
 
 		if ((assetCategoryIds == null) ||
@@ -207,7 +174,7 @@ public class ContentDashboardSearchContextBuilder {
 			 ArrayUtil.isEmpty(
 				 assetCategoryIds.getInternalAssetCategoryIds()))) {
 
-			return null;
+			return Optional.empty();
 		}
 
 		BooleanFilter booleanFilter = new BooleanFilter();
@@ -232,12 +199,14 @@ public class ContentDashboardSearchContextBuilder {
 				BooleanClauseOccur.MUST);
 		}
 
-		return booleanFilter;
+		return Optional.of(booleanFilter);
 	}
 
-	private Filter _getAssetTagNamesFilter(String[] assetTagNames) {
+	private Optional<Filter> _getAssetTagNamesFilterOptional(
+		String[] assetTagNames) {
+
 		if (ArrayUtil.isEmpty(assetTagNames)) {
-			return null;
+			return Optional.empty();
 		}
 
 		BooleanFilter booleanFilter = new BooleanFilter();
@@ -248,12 +217,12 @@ public class ContentDashboardSearchContextBuilder {
 				BooleanClauseOccur.MUST);
 		}
 
-		return booleanFilter;
+		return Optional.of(booleanFilter);
 	}
 
-	private Filter _getAuthorIdsFilter(long[] authorIds) {
+	private Optional<Filter> _getAuthorIdsFilterOptional(long[] authorIds) {
 		if (ArrayUtil.isEmpty(authorIds)) {
-			return null;
+			return Optional.empty();
 		}
 
 		TermsFilter termsFilter = new TermsFilter(Field.USER_ID);
@@ -262,31 +231,47 @@ public class ContentDashboardSearchContextBuilder {
 			termsFilter.addValue(String.valueOf(authorId));
 		}
 
-		return termsFilter;
+		return Optional.of(termsFilter);
 	}
 
 	private BooleanClause[] _getBooleanClauses(
 		AssetCategoryIds assetCategoryIds, String[] assetTagNames,
-		long[] authorIds, long companyId, String[] fileExtensions,
-		String reviewDate) {
+		long[] authorIds, String[] fileExtensions) {
 
 		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
 
 		BooleanFilter booleanFilter = new BooleanFilter();
 
-		for (Filter filter :
-				Arrays.asList(
-					_getAssetCategoryIdsFilter(assetCategoryIds),
-					_getAssetTagNamesFilter(assetTagNames),
-					_getAuthorIdsFilter(authorIds),
-					_getFileExtensionsFilter(fileExtensions),
-					_getGoogleDriveShortcutFilter(companyId),
-					_getReviewDateFilter(reviewDate))) {
+		Optional<Filter> assetCategoryIdsFilterOptional =
+			_getAssetCategoryIdsFilterOptional(assetCategoryIds);
 
-			if (filter != null) {
-				booleanFilter.add(filter, BooleanClauseOccur.MUST);
-			}
+		if (assetCategoryIdsFilterOptional.isPresent()) {
+			booleanFilter.add(
+				assetCategoryIdsFilterOptional.get(), BooleanClauseOccur.MUST);
 		}
+
+		Optional<Filter> assetTagNamesFilterOptional =
+			_getAssetTagNamesFilterOptional(assetTagNames);
+
+		if (assetTagNamesFilterOptional.isPresent()) {
+			booleanFilter.add(
+				assetTagNamesFilterOptional.get(), BooleanClauseOccur.MUST);
+		}
+
+		Optional<Filter> authorIdsFilterOptional = _getAuthorIdsFilterOptional(
+			authorIds);
+
+		if (authorIdsFilterOptional.isPresent()) {
+			booleanFilter.add(
+				authorIdsFilterOptional.get(), BooleanClauseOccur.MUST);
+		}
+
+		Optional<Filter> fileExtensionsFilterOptional =
+			_getFileExtensionsFilterOptional(fileExtensions);
+
+		fileExtensionsFilterOptional.map(
+			fileExtensionsFilter -> booleanFilter.add(
+				fileExtensionsFilterOptional.get(), BooleanClauseOccur.MUST));
 
 		booleanQueryImpl.setPreBooleanFilter(booleanFilter);
 
@@ -296,9 +281,11 @@ public class ContentDashboardSearchContextBuilder {
 		};
 	}
 
-	private Filter _getFileExtensionsFilter(String[] fileExtensions) {
+	private Optional<Filter> _getFileExtensionsFilterOptional(
+		String[] fileExtensions) {
+
 		if (ArrayUtil.isEmpty(fileExtensions)) {
-			return null;
+			return Optional.empty();
 		}
 
 		TermsFilter termsFilter = new TermsFilter("fileExtension");
@@ -307,49 +294,7 @@ public class ContentDashboardSearchContextBuilder {
 			termsFilter.addValue(fileExtension);
 		}
 
-		return termsFilter;
-	}
-
-	private Filter _getGoogleDriveShortcutFilter(long companyId) {
-		try {
-			Company company = CompanyLocalServiceUtil.getCompany(companyId);
-
-			DLFileEntryType googleDocsDLFileEntryType =
-				DLFileEntryTypeLocalServiceUtil.fetchFileEntryType(
-					company.getGroupId(), "GOOGLE_DOCS");
-
-			if (googleDocsDLFileEntryType == null) {
-				return null;
-			}
-
-			BooleanFilter booleanFilter = new BooleanFilter();
-
-			booleanFilter.addTerm(
-				"classTypeId",
-				String.valueOf(googleDocsDLFileEntryType.getFileEntryTypeId()),
-				BooleanClauseOccur.MUST_NOT);
-
-			return booleanFilter;
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
-		}
-
-		return null;
-	}
-
-	private Filter _getReviewDateFilter(String reviewDateString) {
-		if (Validator.isNull(reviewDateString)) {
-			return null;
-		}
-
-		ExistsFilter existsFilter = new ExistsFilter("reviewDate");
-
-		BooleanFilter existBooleanFilter = new BooleanFilter();
-
-		existBooleanFilter.add(existsFilter, BooleanClauseOccur.MUST);
-
-		return existBooleanFilter;
+		return Optional.of(termsFilter);
 	}
 
 	private BooleanFilter _getTermsFilter(String field, long[] values) {
@@ -370,7 +315,7 @@ public class ContentDashboardSearchContextBuilder {
 	private final AssetVocabularyLocalService _assetVocabularyLocalService;
 	private Integer _end;
 	private final HttpServletRequest _httpServletRequest;
-	private Sort[] _sort;
+	private Sort _sort;
 	private Integer _start;
 
 	private static class AssetCategoryIds {

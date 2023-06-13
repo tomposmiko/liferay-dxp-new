@@ -27,10 +27,6 @@ public class CommerceOrderTypeServiceWrapper
 	implements CommerceOrderTypeService,
 			   ServiceWrapper<CommerceOrderTypeService> {
 
-	public CommerceOrderTypeServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceOrderTypeServiceWrapper(
 		CommerceOrderTypeService commerceOrderTypeService) {
 

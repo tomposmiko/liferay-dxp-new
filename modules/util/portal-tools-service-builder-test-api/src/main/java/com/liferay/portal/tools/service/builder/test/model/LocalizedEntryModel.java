@@ -109,8 +109,4 @@ public interface LocalizedEntryModel extends BaseModel<LocalizedEntry> {
 	@Override
 	public LocalizedEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

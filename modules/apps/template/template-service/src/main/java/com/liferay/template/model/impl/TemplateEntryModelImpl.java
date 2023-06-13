@@ -35,6 +35,7 @@ import com.liferay.template.model.TemplateEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -251,123 +252,126 @@ public class TemplateEntryModelImpl
 	public Map<String, Function<TemplateEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<TemplateEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, TemplateEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<TemplateEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			TemplateEntry.class.getClassLoader(), TemplateEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<TemplateEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<TemplateEntry, Object>>();
+		try {
+			Constructor<TemplateEntry> constructor =
+				(Constructor<TemplateEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", TemplateEntry::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", TemplateEntry::getCtCollectionId);
-			attributeGetterFunctions.put("uuid", TemplateEntry::getUuid);
-			attributeGetterFunctions.put(
-				"templateEntryId", TemplateEntry::getTemplateEntryId);
-			attributeGetterFunctions.put("groupId", TemplateEntry::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", TemplateEntry::getCompanyId);
-			attributeGetterFunctions.put("userId", TemplateEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", TemplateEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", TemplateEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", TemplateEntry::getModifiedDate);
-			attributeGetterFunctions.put(
-				"ddmTemplateId", TemplateEntry::getDDMTemplateId);
-			attributeGetterFunctions.put(
-				"infoItemClassName", TemplateEntry::getInfoItemClassName);
-			attributeGetterFunctions.put(
-				"infoItemFormVariationKey",
-				TemplateEntry::getInfoItemFormVariationKey);
-			attributeGetterFunctions.put(
-				"lastPublishDate", TemplateEntry::getLastPublishDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<TemplateEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<TemplateEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<TemplateEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<TemplateEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<TemplateEntry, Object>>();
+		Map<String, BiConsumer<TemplateEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<TemplateEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<TemplateEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<TemplateEntry, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", TemplateEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<TemplateEntry, Long>)TemplateEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", TemplateEntry::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<TemplateEntry, Long>)TemplateEntry::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", TemplateEntry::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<TemplateEntry, String>)TemplateEntry::setUuid);
+		attributeGetterFunctions.put(
+			"templateEntryId", TemplateEntry::getTemplateEntryId);
+		attributeSetterBiConsumers.put(
+			"templateEntryId",
+			(BiConsumer<TemplateEntry, Long>)TemplateEntry::setTemplateEntryId);
+		attributeGetterFunctions.put("groupId", TemplateEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<TemplateEntry, Long>)TemplateEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", TemplateEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<TemplateEntry, Long>)TemplateEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", TemplateEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<TemplateEntry, Long>)TemplateEntry::setUserId);
+		attributeGetterFunctions.put("userName", TemplateEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<TemplateEntry, String>)TemplateEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", TemplateEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<TemplateEntry, Date>)TemplateEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", TemplateEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<TemplateEntry, Date>)TemplateEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"ddmTemplateId", TemplateEntry::getDDMTemplateId);
+		attributeSetterBiConsumers.put(
+			"ddmTemplateId",
+			(BiConsumer<TemplateEntry, Long>)TemplateEntry::setDDMTemplateId);
+		attributeGetterFunctions.put(
+			"infoItemClassName", TemplateEntry::getInfoItemClassName);
+		attributeSetterBiConsumers.put(
+			"infoItemClassName",
+			(BiConsumer<TemplateEntry, String>)
+				TemplateEntry::setInfoItemClassName);
+		attributeGetterFunctions.put(
+			"infoItemFormVariationKey",
+			TemplateEntry::getInfoItemFormVariationKey);
+		attributeSetterBiConsumers.put(
+			"infoItemFormVariationKey",
+			(BiConsumer<TemplateEntry, String>)
+				TemplateEntry::setInfoItemFormVariationKey);
+		attributeGetterFunctions.put(
+			"lastPublishDate", TemplateEntry::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<TemplateEntry, Date>)TemplateEntry::setLastPublishDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<TemplateEntry, Long>)TemplateEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<TemplateEntry, Long>)
-					TemplateEntry::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<TemplateEntry, String>)TemplateEntry::setUuid);
-			attributeSetterBiConsumers.put(
-				"templateEntryId",
-				(BiConsumer<TemplateEntry, Long>)
-					TemplateEntry::setTemplateEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<TemplateEntry, Long>)TemplateEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<TemplateEntry, Long>)TemplateEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<TemplateEntry, Long>)TemplateEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<TemplateEntry, String>)TemplateEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<TemplateEntry, Date>)TemplateEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<TemplateEntry, Date>)
-					TemplateEntry::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"ddmTemplateId",
-				(BiConsumer<TemplateEntry, Long>)
-					TemplateEntry::setDDMTemplateId);
-			attributeSetterBiConsumers.put(
-				"infoItemClassName",
-				(BiConsumer<TemplateEntry, String>)
-					TemplateEntry::setInfoItemClassName);
-			attributeSetterBiConsumers.put(
-				"infoItemFormVariationKey",
-				(BiConsumer<TemplateEntry, String>)
-					TemplateEntry::setInfoItemFormVariationKey);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<TemplateEntry, Date>)
-					TemplateEntry::setLastPublishDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -985,12 +989,41 @@ public class TemplateEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<TemplateEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<TemplateEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<TemplateEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((TemplateEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, TemplateEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					TemplateEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1014,8 +1047,7 @@ public class TemplateEntryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<TemplateEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

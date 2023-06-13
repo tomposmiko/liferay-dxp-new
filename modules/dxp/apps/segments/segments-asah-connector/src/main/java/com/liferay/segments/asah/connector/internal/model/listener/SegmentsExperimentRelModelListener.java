@@ -14,16 +14,16 @@
 
 package com.liferay.segments.asah.connector.internal.model.listener;
 
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.portal.kernel.exception.ModelListenerException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.segments.asah.connector.internal.client.AsahFaroBackendClientImpl;
+import com.liferay.segments.asah.connector.internal.client.JSONWebServiceClient;
 import com.liferay.segments.asah.connector.internal.processor.AsahSegmentsExperimentProcessor;
 import com.liferay.segments.asah.connector.internal.util.AsahUtil;
 import com.liferay.segments.model.SegmentsExperiment;
@@ -94,8 +94,7 @@ public class SegmentsExperimentRelModelListener
 	@Activate
 	protected void activate() {
 		_asahSegmentsExperimentProcessor = new AsahSegmentsExperimentProcessor(
-			_analyticsSettingsManager,
-			new AsahFaroBackendClientImpl(_analyticsSettingsManager, _http),
+			new AsahFaroBackendClientImpl(_jsonWebServiceClient),
 			_companyLocalService, _groupLocalService, _layoutLocalService,
 			_portal, _segmentsEntryLocalService,
 			_segmentsExperienceLocalService);
@@ -108,10 +107,10 @@ public class SegmentsExperimentRelModelListener
 
 	private void _processUpdateSegmentsExperimentRel(
 			SegmentsExperimentRel segmentsExperimentRel)
-		throws Exception {
+		throws PortalException {
 
 		if (AsahUtil.isSkipAsahEvent(
-				_analyticsSettingsManager, segmentsExperimentRel.getCompanyId(),
+				segmentsExperimentRel.getCompanyId(),
 				segmentsExperimentRel.getGroupId())) {
 
 			return;
@@ -124,9 +123,6 @@ public class SegmentsExperimentRelModelListener
 				segmentsExperimentRel.getSegmentsExperimentId()));
 	}
 
-	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
-
 	private AsahSegmentsExperimentProcessor _asahSegmentsExperimentProcessor;
 
 	@Reference
@@ -136,7 +132,7 @@ public class SegmentsExperimentRelModelListener
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private Http _http;
+	private JSONWebServiceClient _jsonWebServiceClient;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

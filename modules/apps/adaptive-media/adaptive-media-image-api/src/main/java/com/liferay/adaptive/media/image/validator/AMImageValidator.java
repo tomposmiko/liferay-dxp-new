@@ -14,7 +14,6 @@
 
 package com.liferay.adaptive.media.image.validator;
 
-import com.liferay.adaptive.media.AdaptiveMedia;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 
 /**
@@ -23,9 +22,6 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
  * @author Sergio González
  */
 public interface AMImageValidator {
-
-	public <T> boolean isProcessingRequired(
-		AdaptiveMedia<T> adaptiveMedia, FileVersion fileVersion);
 
 	/**
 	 * Returns <code>true</code> if the provided file version supports image

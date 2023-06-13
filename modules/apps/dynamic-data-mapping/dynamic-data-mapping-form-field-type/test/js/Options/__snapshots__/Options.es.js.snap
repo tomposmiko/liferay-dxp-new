@@ -3,7 +3,7 @@
 exports[`Options shows the options 1`] = `
 <div>
   <div
-    aria-labelledby="options_fieldDetails"
+    aria-labelledby="options"
     class="form-group hide"
     data-field-name="options"
     tabindex="0"
@@ -34,51 +34,33 @@ exports[`Options shows the options 1`] = `
           class="ddm-option-entry"
         >
           <div
-            aria-labelledby="option0_fieldDetails"
+            aria-labelledby="option0"
             class="form-group hide"
             data-field-name="option0"
             tabindex="0"
           >
             <div
-              aria-labelledby="keyValueLabeloption0_fieldDetails"
+              aria-labelledby="keyValueLabeloption0"
               class="form-group hide"
               data-field-name="keyValueLabeloption0"
               tabindex="0"
             >
-              <div
-                data-tooltip-align="top"
-                title="Option 1"
-              >
-                <input
-                  aria-invalid="true"
-                  class="form-control ddm-field-text"
-                  id="keyValueLabeloption0"
-                  name="keyValueLabeloption0"
-                  placeholder="enter-an-option"
-                  type="text"
-                  value="Option 1"
-                />
-              </div>
+              <input
+                aria-labelledby="keyValueLabeloption0_fieldDetails"
+                class="form-control ddm-field-text"
+                id="keyValueLabeloption0_fieldDetails"
+                name="keyValueLabeloption0"
+                placeholder="enter-an-option"
+                type="text"
+                value="Option 1"
+              />
               <input
                 name="keyValueLabeloption0_edited"
                 type="hidden"
                 value="false"
               />
+              
             </div>
-            <button
-              aria-label="remove-x-option"
-              class="close close-modal"
-              type="button"
-            >
-              <svg
-                class="lexicon-icon lexicon-icon-times"
-                role="presentation"
-              >
-                <use
-                  xlink:href="#times"
-                />
-              </svg>
-            </button>
             <div
               class="active form-text key-value-editor"
             >
@@ -116,7 +98,21 @@ exports[`Options shows the options 1`] = `
               type="hidden"
               value="false"
             />
+            
           </div>
+          <button
+            class="close close-modal"
+            type="button"
+          >
+            <svg
+              class="lexicon-icon lexicon-icon-times"
+              role="presentation"
+            >
+              <use
+                xlink:href="#times"
+              />
+            </svg>
+          </button>
         </div>
       </div>
       <div
@@ -142,51 +138,33 @@ exports[`Options shows the options 1`] = `
           class="ddm-option-entry"
         >
           <div
-            aria-labelledby="option1_fieldDetails"
+            aria-labelledby="option1"
             class="form-group hide"
             data-field-name="option1"
             tabindex="0"
           >
             <div
-              aria-labelledby="keyValueLabeloption1_fieldDetails"
+              aria-labelledby="keyValueLabeloption1"
               class="form-group hide"
               data-field-name="keyValueLabeloption1"
               tabindex="0"
             >
-              <div
-                data-tooltip-align="top"
-                title="Option 2"
-              >
-                <input
-                  aria-invalid="true"
-                  class="form-control ddm-field-text"
-                  id="keyValueLabeloption1"
-                  name="keyValueLabeloption1"
-                  placeholder="enter-an-option"
-                  type="text"
-                  value="Option 2"
-                />
-              </div>
+              <input
+                aria-labelledby="keyValueLabeloption1_fieldDetails"
+                class="form-control ddm-field-text"
+                id="keyValueLabeloption1_fieldDetails"
+                name="keyValueLabeloption1"
+                placeholder="enter-an-option"
+                type="text"
+                value="Option 2"
+              />
               <input
                 name="keyValueLabeloption1_edited"
                 type="hidden"
                 value="false"
               />
+              
             </div>
-            <button
-              aria-label="remove-x-option"
-              class="close close-modal"
-              type="button"
-            >
-              <svg
-                class="lexicon-icon lexicon-icon-times"
-                role="presentation"
-              >
-                <use
-                  xlink:href="#times"
-                />
-              </svg>
-            </button>
             <div
               class="active form-text key-value-editor"
             >
@@ -224,7 +202,21 @@ exports[`Options shows the options 1`] = `
               type="hidden"
               value="false"
             />
+            
           </div>
+          <button
+            class="close close-modal"
+            type="button"
+          >
+            <svg
+              class="lexicon-icon lexicon-icon-times"
+              role="presentation"
+            >
+              <use
+                xlink:href="#times"
+              />
+            </svg>
+          </button>
         </div>
       </div>
       <div
@@ -250,36 +242,32 @@ exports[`Options shows the options 1`] = `
           class="ddm-option-entry"
         >
           <div
-            aria-labelledby="option2_fieldDetails"
+            aria-labelledby="option2"
             class="form-group hide"
             data-field-name="option2"
             tabindex="0"
           >
             <div
-              aria-labelledby="keyValueLabeloption2_fieldDetails"
+              aria-labelledby="keyValueLabeloption2"
               class="form-group hide"
               data-field-name="keyValueLabeloption2"
               tabindex="0"
             >
-              <div
-                data-tooltip-align="top"
-                title="enter-an-option"
-              >
-                <input
-                  aria-invalid="true"
-                  class="form-control ddm-field-text"
-                  id="keyValueLabeloption2"
-                  name="keyValueLabeloption2"
-                  placeholder="enter-an-option"
-                  type="text"
-                  value=""
-                />
-              </div>
+              <input
+                aria-labelledby="keyValueLabeloption2_fieldDetails"
+                class="form-control ddm-field-text"
+                id="keyValueLabeloption2_fieldDetails"
+                name="keyValueLabeloption2"
+                placeholder="enter-an-option"
+                type="text"
+                value=""
+              />
               <input
                 name="keyValueLabeloption2_edited"
                 type="hidden"
                 value="false"
               />
+              
             </div>
             <div
               class="active form-text key-value-editor"
@@ -318,6 +306,7 @@ exports[`Options shows the options 1`] = `
               type="hidden"
               value="false"
             />
+            
           </div>
         </div>
       </div>
@@ -327,6 +316,7 @@ exports[`Options shows the options 1`] = `
       type="hidden"
       value="false"
     />
+    
   </div>
 </div>
 `;

@@ -48,17 +48,6 @@ public class CPDefinitionGroupedEntryServiceUtil {
 			cpDefinitionId, entryCPDefinitionIds, serviceContext);
 	}
 
-	public static CPDefinitionGroupedEntry addCPDefinitionGroupedEntry(
-			long cpDefinitionId, long entryCProductId, double priority,
-			int quantity,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addCPDefinitionGroupedEntry(
-			cpDefinitionId, entryCProductId, priority, quantity,
-			serviceContext);
-	}
-
 	public static CPDefinitionGroupedEntry deleteCPDefinitionGroupedEntry(
 			long cpDefinitionGroupedEntryId)
 		throws PortalException {
@@ -88,24 +77,6 @@ public class CPDefinitionGroupedEntryServiceUtil {
 
 		return getService().getCPDefinitionGroupedEntry(
 			cpDefinitionGroupedEntryId);
-	}
-
-	public static List<CPDefinitionGroupedEntry>
-			getEntryCProductCPDefinitionGroupedEntries(
-				long entryCProductId, int start, int end,
-				OrderByComparator<CPDefinitionGroupedEntry> orderByComparator)
-		throws PortalException {
-
-		return getService().getEntryCProductCPDefinitionGroupedEntries(
-			entryCProductId, start, end, orderByComparator);
-	}
-
-	public static int getEntryCProductCPDefinitionGroupedEntriesCount(
-			long entryCProductId)
-		throws PortalException {
-
-		return getService().getEntryCProductCPDefinitionGroupedEntriesCount(
-			entryCProductId);
 	}
 
 	/**

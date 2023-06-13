@@ -1,38 +1,33 @@
-@component-name = "portal-security"
+@component-name = "portal-authentication-ee"
 definition {
 
 	property app.server.bundles.size = "1";
-	property ci.retries.disabled = "true";
-	property custom.properties = "jsonws.web.service.paths.excludes=";
+	property custom.properties = "javascript.single.page.application.enabled=false${line.separator}jsonws.web.service.paths.excludes=";
 	property databases.size = "1";
 	property dummy.socket.proxy.disabled = "true";
-	property minimum.slave.ram = "24";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property test.run.environment = "EE";
 	property testray.main.component.name = "SAML";
 
+	// All test cases are currently configured to run Liferay SAML as both the IdP and SP.
+
 	setUp {
-		TestCase.setUpPortalInstance();
-
-		User.firstLoginPG();
-
-		SAML.enableSAMLDebugLogs();
+		User.firstLoginUI();
 	}
 
 	@description = "This is a use case for LPS-32577. Add user inherited roles as SAML attribute statements."
-	@priority = 5
+	@priority = "5"
 	test AddUserInheritedRolesAsSAMLAttributeStatements {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#AddUserInheritedRolesAsSAMLAttributeStatements";
 
 		task ("Configure SAML as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Configure SAML as IdP") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spAttributes = "siteRoles",
 				spURL = "http://www.able.com:9080");
 		}
@@ -42,11 +37,11 @@ definition {
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			ServerAdministration.openServerAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet");
 
 			ServerAdministration.addCategoryLogLevels(
-				categoryLevel = "DEBUG",
-				categoryName = "com.liferay.saml.opensaml.integration");
+				categoryName = "com.liferay.saml.opensaml.integration",
+				categoryPriority = "DEBUG");
 		}
 
 		task ("Add site role") {
@@ -56,38 +51,71 @@ definition {
 		}
 
 		task ("Add CP") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			Navigator.openURL();
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage/-/sites/");
+
+			Site.addBlankCP(siteName = "Site Name");
 		}
 
 		task ("Add user group CP") {
-			JSONUserGroup.addUserGroup(userGroupName = "UG UserGroup Name");
+			Navigator.openURL();
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_user_groups_admin_web_portlet_UserGroupsAdminPortlet");
+
+			UserGroup.addCP(userGroupName = "UG UserGroup Name");
 		}
 
 		task ("Assign user group as member CP") {
-			JSONGroup.assignUserGroupToGroup(
-				groupName = "Site Name",
+			Navigator.openURL();
+
+			SitePages.openPagesAdmin(siteURLKey = "Site Name");
+
+			ProductMenu.gotoPortlet(
+				category = "People",
+				portlet = "Memberships");
+
+			Site.assignUserGroupAsMemberCP(
+				siteName = "Site Name",
 				userGroupName = "UG UserGroup Name");
 		}
 
 		task ("Assign site role to user group") {
-			JSONUserGroup.assignGroupRoleToUserGroup(
-				groupName = "Site Name",
-				roleTitle = "TestSiteRole",
+			Navigator.openURL();
+
+			SitePages.openPagesAdmin(siteURLKey = "Site Name");
+
+			ProductMenu.gotoPortlet(
+				category = "People",
+				portlet = "Memberships");
+
+			Site.assignSiteRoleToUserGroup(
+				roleName = "TestSiteRole",
 				userGroupName = "UG UserGroup Name");
 		}
 
 		task ("Assign member CP") {
-			JSONUser.addUserToUserGroup(
-				userEmailAddress = "test@liferay.com",
-				userGroupName = "UG UserGroup Name");
+			Navigator.openURL();
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_user_groups_admin_web_portlet_UserGroupsAdminPortlet");
+
+			UserGroup.assignMemberCP(
+				userGroupName = "UG UserGroup Name",
+				userScreenName = "test");
 		}
 
 		task ("View user information roles CP") {
-			User.openUsersAdmin();
+			Navigator.openURL();
 
-			UserNavigator.gotoUser(userScreenName = "test");
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet");
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
 
-			User.viewUserInformationRolesCP(
+			User.gotoEditCP(userScreenName = "test");
+
+			User.viewUserInfomationRolesCP(
 				roleTitle = "TestSiteRole",
 				roleType = "Inherited Site Roles");
 		}
@@ -114,13 +142,18 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LRQA-57574 TC-1: Combines SAML.CreateAndSyncUserAfterSAMLSetupWithMatchingScreenNameAttribute and OAuth2.AuthorizeExternalApplication to verify that the portal works when OAuth 2 and SAML are both enabled with a synced user on SP. - Blocked by LPS-160238."
-	@ignore = "true"
-	@priority = 4
+	@description = "This is a use case for LRQA-57574 TC-1: Combines SAML.CreateAndSyncUserAfterSAMLSetupWithMatchingScreenNameAttribute and OAuth2.AuthorizeExternalApplication to verify that the portal works when OAuth 2 and SAML are both enabled with a synced user on SP."
+	@priority = "4"
 	test AssertAuthorizationOnOAuth2WithSAMLConnectionWithExistingUser {
-		property oauth2.local.enabled = "true";
-		property portal.ssl.enabled = "true";
+		property app.server.bundles.size = "1";
+		property minimum.slave.ram = "24";
 		property test.name.skip.portal.instance = "SAML#AssertAuthorizationOnOAuth2WithSAMLConnectionWithExistingUser";
+
+		// Enable SAML debug logs
+
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
 
 		task ("Logout") {
 			User.logoutPG();
@@ -128,33 +161,37 @@ definition {
 			User.viewLoggedOutPG();
 		}
 
+		// Setting up IDP and SP role
+
 		task ("Setup IDP role") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Setup SP role") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
 
+		// Setting up IDP and SP connection
+
 		task ("Add IDP configurations to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com",
 				userResolution = "dynamic");
 
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
@@ -168,11 +205,13 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:9080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
+
+		// Test starts here
 
 		task ("Login at able.com:9080 and logout") {
 			User.firstLoginUI(
@@ -190,11 +229,11 @@ definition {
 				userEmailAddress = "test@liferay.com");
 		}
 
-		task ("Add OAuth 2 external application") {
+		task ("Add external app") {
 			OAuth2.addAndEditExternalApplication(
 				applicationName = "Third-party Application",
 				baseURL = "http://www.able.com:9080",
-				callbackUri = '''https://localhost:8443/oauth2-tester/?url=${portalURL}&client_id=abc123''',
+				callbackURI = '''http://martamedio.com/oauth2-tester/?url=${portalURL}&client_id=abc123''',
 				clientId = "abc123",
 				clientProfile = "Web Application",
 				clientSecret = "abc123");
@@ -212,7 +251,7 @@ definition {
 			User.viewLoggedOutPG();
 		}
 
-		task ("Authorize OAuth 2 app and launch request") {
+		task ("Authorize app and launch request") {
 			OAuth2.authorizeMyApplication(
 				clientId = "abc123",
 				clientSecret = "abc123",
@@ -220,6 +259,8 @@ definition {
 
 			OAuth2.launchRequest(requestURL = "http://www.able.com:9080/api/jsonws/user/get-current-user");
 		}
+
+		// Assert the user information for verification
 
 		task ("View request results") {
 			SAML.viewTesterRequestResults(
@@ -230,13 +271,16 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LRQA-57574 TC-2: Combines SAML.CreateAndSyncUserAfterSAMLSetupWithMatchingScreenNameAttribute and OAuth2.AuthorizeExternalApplication to verify that the portal works when OAuth 2 and SAML are both enabled and authenticating with a user who is not synced to SP. - Blocked by LPS-160238."
-	@ignore = "true"
-	@priority = 4
+	@description = "This is a use case for LRQA-57574 TC-2: Combines SAML.CreateAndSyncUserAfterSAMLSetupWithMatchingScreenNameAttribute and OAuth2.AuthorizeExternalApplication to verify that the portal works when OAuth 2 and SAML are both enabled and authenticating with a user who is not synced to SP."
+	@priority = "4"
 	test AssertAuthorizationOnOAuth2WithSAMLConnectionWithoutExistingUser {
-		property oauth2.local.enabled = "true";
-		property portal.ssl.enabled = "true";
+		property app.server.bundles.size = "1";
+		property minimum.slave.ram = "24";
 		property test.name.skip.portal.instance = "SAML#AssertAuthorizationOnOAuth2WithSAMLConnectionWithoutExistingUser";
+
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
 
 		task ("Logout") {
 			User.logoutPG();
@@ -247,23 +291,25 @@ definition {
 		task ("Setup IdP") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Setup SP") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
 
+		// Setting up IDP and SP connection
+
 		task ("Setup IdP connection") {
 			SAML.addIDPConfigurationsToServiceProvider(
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com",
@@ -272,7 +318,7 @@ definition {
 
 		task ("Enable SP roles") {
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
@@ -286,11 +332,13 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:9080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
+
+		// Test starts here
 
 		task ("Login at able.com:9080") {
 			User.firstLoginUI(
@@ -298,17 +346,19 @@ definition {
 				userEmailAddress = "test@liferay.com");
 		}
 
-		task ("Add OAuth 2 external application") {
+		// Add new OAuth2 application
+
+		task ("Add external app") {
 			OAuth2.addAndEditExternalApplication(
 				applicationName = "Third-party Application",
 				baseURL = "http://www.able.com:9080",
-				callbackUri = '''https://localhost:8443/oauth2-tester/?url=${portalURL}&client_id=abc123''',
+				callbackURI = '''http://martamedio.com/oauth2-tester/?url=${portalURL}&client_id=abc123''',
 				clientId = "abc123",
 				clientProfile = "Web Application",
 				clientSecret = "abc123");
 		}
 
-		task ("Add OAuth 2 app permission role") {
+		task ("Add app permission role") {
 			OAuth2.addApplicationPermissionToRole(
 				applicationName = "Third-party Application",
 				userRole = "user");
@@ -320,7 +370,9 @@ definition {
 			User.viewLoggedOutPG();
 		}
 
-		task ("Authorize OAuth 2 app and launch request") {
+		// Authorize the new application
+
+		task ("Authorize app and launch request") {
 			OAuth2.authorizeMyApplication(
 				clientId = "abc123",
 				clientSecret = "abc123",
@@ -328,6 +380,8 @@ definition {
 
 			OAuth2.launchRequest(requestURL = "http://www.able.com:9080/api/jsonws/user/get-current-user");
 		}
+
+		// Assert the user information for verification
 
 		task ("View request results") {
 			SAML.viewTesterRequestResults(
@@ -339,25 +393,26 @@ definition {
 	}
 
 	@description = "LPS-123218 TC-6: Assertion for: empty attribute mapping cannot be used for user matching."
-	@priority = 4
+	@priority = "4"
 	test AssertEmptyMappingCannotBeUsedForUserMatching {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#AssertEmptyMappingCannotBeUsedForUserMatching";
 
 		task ("Configure samlsp as SP") {
 			var baseURL = PropsUtil.get("portal.url");
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLRole.configure(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				samlRoleType = "Service Provider");
 		}
 
 		task ("Add samlidp as identity provider") {
 			SAMLNavigation.gotoIdentityProviderConnections();
 
-			SAMLPortlet.addIdentityProviderConnectionWithBasicSetupWithEmptyUserMapping(idpEntityId = "samlidp");
+			SAMLPortlet.addIdentityProviderConnectionWithBasicSetup(idpEntityID = "samlidp");
 		}
 
 		task ("Assert No mapping selected") {
@@ -366,15 +421,14 @@ definition {
 	}
 
 	@description = "LPS-123218 TC-2 Assertion for: first name cannot be used for user matching even if LDAP import is enabled."
-	@priority = 4
+	@priority = "4"
 	test AssertFirstNameCannotBeUsedForUserMatchingEvenWithLDAPEnabled {
 		property apacheds.enabled = "true";
 		property app.server.bundles.size = "0";
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#AssertFirstNameCannotBeUsedForUserMatchingEvenWithLDAPEnabled";
 
 		task ("Ad LDAP server and test connection") {
-			LDAP.addLDAPServerAndTestConnection(ldapServerName = "ApacheDS Server");
+			LDAP.addLDAPServerAndTestConnection(LDAPServerName = "ApacheDS Server");
 		}
 
 		task ("Enable LDAP settings") {
@@ -384,17 +438,17 @@ definition {
 		task ("Configure samlsp as service provider") {
 			var baseURL = PropsUtil.get("portal.url");
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLRole.configure(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				samlRoleType = "Service Provider");
 		}
 
 		task ("Add IdP connection with basic setup") {
 			SAMLNavigation.gotoIdentityProviderConnections();
 
-			SAMLPortlet.addIdentityProviderConnectionWithBasicSetup(idpEntityId = "samlidp");
+			SAMLPortlet.addIdentityProviderConnectionWithBasicSetup(idpEntityID = "samlidp");
 		}
 
 		task ("Add IdP attribute for user matching") {
@@ -407,9 +461,8 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105165. Assert instance admin cannot configure IdP when disable IdP role."
-	@priority = 5
+	@priority = "5"
 	test AssertInstanceAdminCannotConfigureIdPWhenDisableIdPRole {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#AssertInstanceAdminCannotConfigureIdPWhenDisableIdPRole";
 
 		task ("Disable IdP role to be configured") {
@@ -423,10 +476,14 @@ definition {
 		}
 
 		task ("Add CP able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_portal_instances_web_portlet_PortalInstancesPortlet");
+
+			PortalInstances.addCP(
+				mailDomain = "www.able.com",
+				virtualHost = "www.able.com",
+				webId = "www.able.com");
+
+			PortalInstances.viewCP(virtualHost = "www.able.com");
 		}
 
 		task ("Assert IdP role disabled message in SAML admin") {
@@ -435,18 +492,22 @@ definition {
 				specificURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
-			SAML.goToSAMLAdmin(baseURL = "http://www.able.com:8080");
+			var baseURL1 = PropsUtil.get("portal.url");
 
-			AssertElementPresent(locator1 = "CPSAMLAdmin#SAML_ROLE_SELECT_DISABLED");
+			Navigator.openSpecificURL(url = "${baseURL1}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
+
+			SAML.viewIdPIconTooltip();
 		}
 	}
 
 	@description = "This is a use case for LPS-94699. assert keep alive to keep my SAML session alive."
-	@priority = 4
+	@priority = "4"
 	test AssertKeepAliveToKeepMySAMLSessionAlive {
 		property test.name.skip.portal.instance = "SAML#AssertKeepAliveToKeepMySAMLSessionAlive";
 
-		task ("Sign out and Login at localhost:9080") {
+		// Add 2 new SP to the second portal instance at port 9080
+
+		task ("Sign out and login at localhost:9080") {
 			UserBar.signOut();
 
 			User.firstLoginUI(
@@ -456,7 +517,9 @@ definition {
 		}
 
 		task ("Add CP able.com and baker.com") {
-			PortalInstances.openVirtualInstancesAdmin(baseURL = "http://localhost:9080");
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_portal_instances_web_portlet_PortalInstancesPortlet");
 
 			PortalInstances.addCP(
 				mailDomain = "www.able.com",
@@ -514,13 +577,13 @@ definition {
 		}
 
 		task ("Configure samlidp ad IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp as SP") {
 			SAML.configureLiferaySAMLAsSP(
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:9080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:9080");
 		}
@@ -528,7 +591,7 @@ definition {
 		task ("Configure samlsp2 as SP") {
 			SAML.configureLiferaySAMLAsSP(
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				samlEntityId = "samlsp2",
+				samlEntityID = "samlsp2",
 				spKeepAliveURL = "http://www.baker.com:9080/c/portal/saml/keep_alive",
 				spURL = "http://www.baker.com:9080");
 		}
@@ -571,19 +634,19 @@ definition {
 		}
 
 		task ("Assert response has 2 document.write commands") {
-			SAML.assertTextCountFromHtml(value = 2);
+			SAML.assertTextCountFromHtml(value = "2");
 		}
 	}
 
 	@description = "LPS-123218 TC-3 Assertion for: last name cannot be used for user matching even if LDAP import is enabled."
-	@priority = 4
+	@priority = "4"
 	test AssertLastNameCannotBeUsedForUserMatchingEvenWithLDAPEnabled {
 		property apacheds.enabled = "true";
 		property app.server.bundles.size = "0";
 		property test.name.skip.portal.instance = "SAML#AssertLastNameCannotBeUsedForUserMatchingEvenWithLDAPEnabled";
 
 		task ("Add LDAP server and test connection") {
-			LDAP.addLDAPServerAndTestConnection(ldapServerName = "ApacheDS Server");
+			LDAP.addLDAPServerAndTestConnection(LDAPServerName = "ApacheDS Server");
 		}
 
 		task ("Enable LDAP settings") {
@@ -593,17 +656,17 @@ definition {
 		task ("Configure samlsp as SP") {
 			var baseURL = PropsUtil.get("portal.url");
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/guest/~/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLRole.configure(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				samlRoleType = "Service Provider");
 		}
 
 		task ("Add IdP connection with basic setup") {
 			SAMLNavigation.gotoIdentityProviderConnections();
 
-			SAMLPortlet.addIdentityProviderConnectionWithBasicSetup(idpEntityId = "samlidp");
+			SAMLPortlet.addIdentityProviderConnectionWithBasicSetup(idpEntityID = "samlidp");
 		}
 
 		task ("Add invalid attribute for user matching") {
@@ -616,17 +679,17 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-39013. Assert SAML SP user information updates after changing on IdP."
-	@priority = 4
+	@priority = "4"
 	test AssertSAMLSPUserInformationUpdatesAfterChangingOnIdP {
 		property test.name.skip.portal.instance = "SAML#AssertSAMLSPUserInformationUpdatesAfterChangingOnIdP";
 
 		task ("Configure samlidp as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp as SP") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spAttributes = "firstName",
 				spURL = "http://www.able.com:9080",
 				userResolution = "dynamic");
@@ -662,7 +725,7 @@ definition {
 		}
 
 		task ("Edit user information") {
-			MyAccount.openMyAccountAdmin();
+			Navigator.gotoAccountSettings();
 
 			User.editUserInformation(userFirstNameEdit = "Testedit");
 		}
@@ -672,7 +735,10 @@ definition {
 
 			Navigator.gotoLoginPage();
 
-			User.openUsersAdmin(baseURL = "http://www.able.com:9080");
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
 
 			User.viewCP(
 				userEmailAddress = "test@liferay.com",
@@ -683,21 +749,22 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-47412. Assert signed SAML metadata."
-	@priority = 4
+	@priority = "4"
 	test AssertSignedSAMLMetadata {
-		property test.assert.javascript.errors = "false";
 		property test.name.skip.portal.instance = "SAML#AssertSignedSAMLMetadata";
 
 		task ("Configure samlidp as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
-		task ("Assert ds:Signature present in HTML source text") {
+		task ("Assert ds:Signature present in HTMK source text") {
 			Open.openNoError(locator1 = "http://localhost:8080/c/portal/saml/metadata");
 
-			AssertHTMLSourceTextPresent.assertHTMLSourceTextPresentNoSPARefresh(value1 = "ds:Signature");
+			AssertHTMLSourceTextPresent(value1 = "ds:Signature");
 
-			Open.openNoErrorNoSPARefresh(locator1 = "http://localhost:8080/group/guest/~/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 		}
 
 		task ("Disable IdP") {
@@ -706,48 +773,45 @@ definition {
 			SAMLPortlet.configureIdentityProvider(signMetadata = "disable");
 		}
 
-		task ("Assert ds:Signature not present in HTML source text") {
+		task ("Assert ds:Signature not present in HTMK source text") {
 			Open.openNoError(locator1 = "http://localhost:8080/c/portal/saml/metadata");
 
-			AssertHTMLSourceTextNotPresent.assertHTMLSourceTextNotPresentNoSPARefresh(value1 = "ds:Signature");
+			AssertHTMLSourceTextNotPresent(value1 = "ds:Signature");
 		}
 	}
 
 	@description = "This is a use case for LPS-96104. Assert SSO fails when algorithms mismatch."
-	@priority = 4
+	@priority = "4"
 	test AssertSSOFailsWhenAlgorithmsMismatch {
 		property blacklist.saml.algorithms = "true";
-		property test.assert.javascript.errors = "false";
 		property test.name.skip.portal.instance = "SAML#AssertSSOFailsWhenAlgorithmsMismatch";
 
 		task ("Configure samlidp as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp as SP at able.com:9080") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
 		task ("Assert http://www.w3.org/2000/09/xmldsig#rsa-sha1 not present in able.com:9080 HTML source text ") {
 			Open.openNoError(locator1 = "http://www.able.com:9080/c/portal/saml/metadata");
 
-			AssertHTMLSourceTextNotPresent.assertHTMLSourceTextNotPresentNoSPARefresh(value1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+			AssertHTMLSourceTextNotPresent(value1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 		}
 
 		task ("Assert http://www.w3.org/2001/04/xmldsig-more#rsa-sha256,http://www.w3.org/2001/04/xmldsig-more#rsa-sha384,http://www.w3.org/2001/04/xmldsig-more#rsa-sha512 not present in localhost:8080 HTML source text ") {
-			Open.openNoErrorNoSPARefresh(locator1 = "http://localhost:8080/c/portal/saml/metadata");
+			Open.openNoError(locator1 = "http://localhost:8080/c/portal/saml/metadata");
 
 			for (var algorithm : list "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256,http://www.w3.org/2001/04/xmldsig-more#rsa-sha384,http://www.w3.org/2001/04/xmldsig-more#rsa-sha512") {
-				AssertHTMLSourceTextNotPresent.assertHTMLSourceTextNotPresentNoSPARefresh(value1 = "algorithm");
+				AssertHTMLSourceTextNotPresent(value1 = "algorithm");
 			}
 		}
 
 		task ("Logout and open able.com:9080") {
-			Open.openNoErrorNoSPARefresh(locator1 = "http://localhost:8080/web/guest/home");
-
-			UserBar.signOut();
+			User.logoutPG();
 
 			User.viewLoggedOutPG();
 
@@ -759,23 +823,23 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LRQA-35866. Assert SSO idle session takes precedence over IdP session time out."
-	@priority = 4
+	@description = "This is a use case for LRQA-35866. Assert SSO idle session takes predence over IdP session time out."
+	@priority = "4"
 	test AssertSSOIdleSessionTakesPrecedenceOverIdPSessionTimeout {
-		property custom.properties = "session.timeout=2${line.separator}jsonws.web.service.paths.excludes=";
+		property custom.properties = "session.timeout=2";
 		property test.name.skip.portal.instance = "SAML#AssertSSOIdleSessionTakesPrecedenceOverIdPSessionTimeout";
 		property web.xml.timeout = "2";
 
 		task ("Configure samlidp as IdP with 480 as idle timout") {
 			SAML.configureLiferaySAMLAsIdP(
-				idpSessionIdleTimeout = 480,
-				idpSessionMaximumAge = 0,
-				samlEntityId = "samlidp");
+				idpSessionIdleTimeout = "480",
+				idpSessionMaximumAge = "0",
+				samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp as SP") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -787,7 +851,7 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				samlEnabled = "true",
 				spURL = "http://www.able.com:9080",
@@ -797,7 +861,7 @@ definition {
 		task ("Wait for idle time and Assert expired session error message") {
 			Navigator.openURL();
 
-			SAML.viewSessionExpired(timer = 120000);
+			SAML.viewSessionExpired(timer = "120000");
 		}
 
 		task ("Refresh and view logged in PG") {
@@ -807,13 +871,13 @@ definition {
 		}
 
 		task ("Configure IdP idle timout as 60") {
-			SAML.goToSAMLAdmin(baseURL = ${portalURL});
+			Navigator.openSpecificURL(url = "${portalURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoIdentityProvider();
 
 			SAMLRole.configureIdentityProvider(
-				idpSessionIdleTimeout = 60,
-				idpSessionMaximumAge = 0);
+				idpSessionIdleTimeout = "60",
+				idpSessionMaximumAge = "0");
 		}
 
 		task ("Logout and execute IdP initiated SSO at http://www.able.com:9080") {
@@ -822,7 +886,7 @@ definition {
 			User.viewLoggedOutPG();
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				samlEnabled = "true",
 				spURL = "http://www.able.com:9080",
@@ -832,13 +896,11 @@ definition {
 		task ("execute IdP initiated SSO at http://www.able.com:9080") {
 			Navigator.openURL();
 
-			// This pause is waiting to test how the login behaves when timeout is reached. See LRQA-35814 for more details.
-
-			Pause(locator1 = 60000);
+			Pause(locator1 = "60000");
 
 			SAML.executeIdPInitiatedSSO(
 				autoLogin = "true",
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				samlEnabled = "true",
 				spURL = "http://www.able.com:9080",
@@ -848,7 +910,7 @@ definition {
 		task ("Wait for idle time and assert expired session error message") {
 			Navigator.openURL();
 
-			SAML.viewSessionExpired(timer = 120000);
+			SAML.viewSessionExpired(timer = "120000");
 		}
 
 		task ("Assert user logged out") {
@@ -858,108 +920,20 @@ definition {
 		}
 	}
 
-	@description = "LPS-143338. Assert SSO reject assertion when nameId value is null."
-	@priority = 4
-	test AssertSSORejectAssertionWithoutANameIDValue {
-		property app.server.bundles.size = "0";
-		property test.name.skip.portal.instance = "SAML#AssertSSORejectAssertionWithoutANameIDValue";
-
-		var identityProviderEntityId = "samlidp";
-		var serviceProviderEntityId = "samlsp";
-
-		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
-		}
-
-		task ("Setup IdP at localhost:8080 and SP at able.com:8080") {
-			SAML.setupIDP(
-				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
-				userEmailAddress = "test@liferay.com");
-
-			SAML.setupSP(
-				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-		}
-
-		task ("Add IdP configurations to SP and enable SP roles") {
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "emailAddress",
-				idpAttributeMappingText = "emailAddress",
-				idpEntityId = ${identityProviderEntityId},
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Unspecified",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com",
-				userResolution = "dynamic");
-
-			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-		}
-
-		task ("Add SP configurations to IdP") {
-			SAML.addSPConfigurationsToIdentityProvider(
-				idpURL = "http://localhost:8080",
-				nameIdentifierAttributeName = "expando:inputField",
-				nameIdentifierFormat = "Unspecified",
-				spAttributes = '''emailAddress
-					firstName
-					lastName
-					screenName''',
-				spEntityId = ${serviceProviderEntityId},
-				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
-				spURL = "http://www.able.com:8080");
-		}
-
-		task ("Add new user") {
-			JSONUser.addUser(
-				userEmailAddress = "usera@liferay.com",
-				userFirstName = "user",
-				userLastName = "a",
-				userScreenName = "usera");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "usera@liferay.com");
-		}
-
-		task ("SSO with new user to SP and assert authentication failed error message") {
-			User.firstLoginUI(
-				emailPassword = "test",
-				specificURL = "http://www.able.com:8080",
-				userEmailAddress = "usera@liferay.com");
-
-			SAML.viewUnableToProcessSAMLRequest();
-		}
-	}
-
-	@description = "This is a use case for LRQA-35784. Assert SSO session exists after SP session timeout."
-	@priority = 4
+	@description = "This is a use case for LRQA-35784. Assert SSO session existis after SP session timeout."
+	@priority = "4"
 	test AssertSSOSessionExistsAfterSPSessionTimeout {
-		property custom.properties = "session.timeout=2${line.separator}jsonws.web.service.paths.excludes=";
+		property custom.properties = "session.timeout=2";
 		property test.name.skip.portal.instance = "SAML#AssertSSOSessionExistsAfterSPSessionTimeout";
 		property web.xml.timeout = "2";
 
 		task ("Configure samlidp as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp as SP at able.com:9080") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -971,7 +945,7 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
@@ -980,7 +954,7 @@ definition {
 		}
 
 		task ("Wait for idle and assert expired session error message") {
-			SAML.viewSessionExpired(timer = 120000);
+			SAML.viewSessionExpired(timer = "120000");
 		}
 
 		task ("Refresh and click sign in") {
@@ -993,22 +967,22 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-35833. Assert SSO expires after maximum session age."
-	@priority = 4
+	@priority = "4"
 	test AssertSSOSessionExpiresAfterMaximumSessionAge {
-		property custom.properties = "session.timeout=2${line.separator}jsonws.web.service.paths.excludes=";
+		property custom.properties = "session.timeout=2";
 		property test.name.skip.portal.instance = "SAML#AssertSSOSessionExpiresAfterMaximumSessionAge";
 		property web.xml.timeout = "2";
 
 		task ("Configure SAML as IdP with session maximum age as 180") {
 			SAML.configureLiferaySAMLAsIdP(
-				idpSessionIdleTimeout = 0,
-				idpSessionMaximumAge = 180,
-				samlEntityId = "samlidp");
+				idpSessionIdleTimeout = "0",
+				idpSessionMaximumAge = "180",
+				samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp as SP at able.com:9080") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -1020,7 +994,7 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				samlEnabled = "true",
 				spURL = "http://www.able.com:9080",
@@ -1030,7 +1004,7 @@ definition {
 		}
 
 		task ("Wait for idle time and assert session expired error message") {
-			SAML.viewSessionExpired(timer = 120000);
+			SAML.viewSessionExpired(timer = "120000");
 		}
 
 		task ("Refresh and assert logged in") {
@@ -1040,7 +1014,7 @@ definition {
 		}
 
 		task ("Wait for idle and assert session expired error message") {
-			SAML.viewSessionExpired(timer = 120000);
+			SAML.viewSessionExpired(timer = "120000");
 		}
 
 		task ("Refresh and assert logged out") {
@@ -1051,10 +1025,12 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-88924 - Using virtual instances. Assert SSO with encryption and decryption."
-	@priority = 4
+	@priority = "4"
 	test AssertSSOWithEncryptionAndDecryption {
 		property app.server.bundles.size = "0";
 		property test.name.skip.portal.instance = "SAML#AssertSSOWithEncryptionAndDecryption";
+
+		// Change screen name so it will differ from the SP portal instance admin screen name. Only needed for virtual instance test
 
 		task ("Edit user screen name") {
 			MyAccount.openMyAccountAdmin();
@@ -1062,28 +1038,34 @@ definition {
 			User.editUserInformation(userScreenNameEdit = "tester");
 		}
 
+		task ("Enable SAML debug logs") {
+
+			// Enable SAML debug logs
+
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Adding SP as a virtual instance
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IdP") {
+
+			// Setting up IDP and SP role
+
 			SAML.setupIDP(
-				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				idpURL = "http://localhost:8080/",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Setup SP") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -1091,18 +1073,18 @@ definition {
 		task ("Add IdP configurations to service provider") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
 				userResolution = "dynamic");
 		}
 
-		task ("Enable SP roles and SP configurations to IdP") {
+		task ("Enalble SP roles and SP configurations to IdP") {
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
@@ -1115,17 +1097,20 @@ definition {
 				lastName
 				screenName
 				uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Enable encryption on SP connection") {
-			SAML.enableEncryptionOnSPConnection(samlEntityId = "samlsp");
+			SAML.enableEncryptionOnSPConnection(samlEntityID = "samlsp");
 		}
 
 		task ("Delete SP certificate") {
+
+			// Test starts here
+
 			SAML.deleteSPCertificate(
 				specificURL = "http://www.able.com:8080/web/guest/home?p_p_id=com_liferay_login_web_portlet_LoginPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&saveLastPath=false&_com_liferay_login_web_portlet_LoginPortlet_mvcRenderCommandName=%2Flogin%2Flogin0",
 				userEmailAddress = "test@www.able.com");
@@ -1143,23 +1128,23 @@ definition {
 		task ("View text(Data encryption key was null in port) present on node port 8080") {
 			Clustering.viewTextPresentOnSpecificNode(
 				expectedText = "Data encryption key was null",
-				nodePort = 8080);
+				nodePort = "8080");
 		}
 	}
 
 	@description = "This is a use case for LPS-128578 and LPS-69388. Assert SSO with sign auth and request."
-	@priority = 4
+	@priority = "4"
 	test AssertSSOWithSignAuthnRequests {
 		property test.name.skip.portal.instance = "SAML#AssertSSOWithSignAuthnRequests";
 
 		task ("Configure samlidp as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Disable auth and request signature required on IdP") {
 			var baseURL = PropsUtil.get("portal.url");
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoIdentityProvider();
 
@@ -1172,7 +1157,7 @@ definition {
 
 		task ("Configure samlsp as SP on able.com:9080") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -1184,7 +1169,7 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
@@ -1203,7 +1188,7 @@ definition {
 		task ("Configure IdP") {
 			var baseURL = PropsUtil.get("portal.url");
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoIdentityProvider();
 
@@ -1240,7 +1225,7 @@ definition {
 		task ("Disable auth and request signature required on IdP") {
 			var baseURL = PropsUtil.get("portal.url");
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoIdentityProvider();
 
@@ -1248,7 +1233,11 @@ definition {
 		}
 
 		task ("Disable sign auth and requests on SP") {
-			SAML.goToSAMLAdmin(baseURL = "http://www.able.com:9080");
+			Navigator.openSpecificURL(url = "http://www.able.com:9080");
+
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoServiceProvider();
 
@@ -1283,11 +1272,13 @@ definition {
 		}
 
 		task ("Exit Runtime Metadata Refresh Interval value to 9999") {
-			Navigator.openSpecificURL(url = "http://www.able.com:9080/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_factoryPid=com.liferay.saml.runtime.configuration.SamlConfiguration&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_mvcRenderCommandName=%2Fconfiguration_admin%2Fedit_configuration");
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_factoryPid=com.liferay.saml.runtime.configuration.SamlConfiguration&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_mvcRenderCommandName=%2Fconfiguration_admin%2Fedit_configuration");
 
 			SystemSettings.editTextSetting(
 				settingName = "Runtime Metadata Refresh Interval",
-				settingValue = 9999);
+				settingValue = "9999");
 
 			SystemSettings.saveConfiguration();
 		}
@@ -1295,7 +1286,7 @@ definition {
 		task ("Configure IdP") {
 			Navigator.openURL();
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoIdentityProvider();
 
@@ -1313,42 +1304,40 @@ definition {
 
 			Navigator.gotoLoginPage();
 
-			if (IsElementPresent(locator1 = "TextInput#EMAIL_ADDRESS")) {
-				Navigator.openSpecificURL(url = "http://www.able.com:9080");
-
-				Navigator.gotoLoginPage();
-			}
-
 			AssertConsoleTextPresent(value1 = "org.opensaml.messaging.handler.MessageHandlerException: Message context was not authenticated");
 		}
 	}
 
 	@description = "This is a use case for LPS-105170 TC-5: Verification for portal User Attributes when they are duplicated in the mapping  when saving the SAML configuration - Using virtual instances."
-	@priority = 3
+	@priority = "3"
 	test AssertVerificationForDuplicatedUserAttributeMappingSAML {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#AssertVerificationForDuplicatedUserAttributeMappingSAML";
 
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance to be the SP site
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IDP as localhost:8080 and SP as able.com:8080") {
+
+			// Setup localhost as IDP role
+
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -1361,21 +1350,23 @@ definition {
 		}
 
 		task ("Add IdP connection") {
-			SAML.goToSAMLAdmin(baseURL = "http://www.able.com:8080");
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoIdentityProviderConnections();
 
 			SAMLPortlet.addIdentityProviderConnection(
 				idpAttributeMapping = "UUID,UUID,lastName,lastName",
 				idpAttributeMappingText = "UUID,UUID,lastName,lastName",
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpNameId = "samlidp",
-				idpURL = "http://localhost:8080",
+				idpNameID = "samlidp",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 1,
+				userMatchingAttributeIndex = "1",
 				userResolution = "attribute");
 		}
 
@@ -1384,7 +1375,7 @@ definition {
 		}
 
 		task ("Delete Entry 4") {
-			SAML.removeEntryFromTable(rowNumber = 4);
+			SAML.removeEntryFromTable(rowNumber = "4");
 		}
 
 		task ("Assert error message (Basic User Fields: Each user field can only be mapped to one SAML attribute.)") {
@@ -1394,7 +1385,7 @@ definition {
 		}
 
 		task ("Delete entry 2") {
-			SAML.removeEntryFromTable(rowNumber = 2);
+			SAML.removeEntryFromTable(rowNumber = "2");
 		}
 
 		task ("Assert error message (Basic User Fields: Each user field can only be mapped to one SAML attribute.)") {
@@ -1409,36 +1400,45 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105170 TC-4: Verification for portal User Attributes when they are without SAML attribute value in the mapping when saving the SAML configuration - Using virtual instances."
-	@priority = 3
+	@priority = "3"
 	test AssertVerificationForEmptyUserAttributeMappingSAML {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#AssertVerificationForEmptyUserAttributeMappingSAML";
 
+		// Enable SAML debug logs
+
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance to be the SP site
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IDP as localhost:8080 and SP as able.com:8080") {
+
+			// Setting up IDP and SP connection
+
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
-		task ("Login at able.com:8080") {
+		task ("Login at able.com:8008") {
+
+			// Test starts here
+
 			User.firstLoginUI(
 				password = "test",
 				specificURL = "http://www.able.com:8080",
@@ -1446,22 +1446,24 @@ definition {
 		}
 
 		task ("Add IdP connection") {
-			SAML.goToSAMLAdmin(baseURL = "http://www.able.com:8080");
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoIdentityProviderConnections();
 
 			SAMLPortlet.addIdentityProviderConnection(
 				idpAttributeMapping = "screenName,screenName,UUID,UUID",
 				idpAttributeMappingText = ",,,,",
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpMetadataURL = "http://localhost:8080/c/portal/saml/metadata",
-				idpNameId = "samlidp",
-				idpURL = "http://localhost:8080",
+				idpNameID = "samlidp",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 3,
+				userMatchingAttributeIndex = "3",
 				userResolution = "attribute");
 		}
 
@@ -1470,119 +1472,19 @@ definition {
 		}
 	}
 
-	@description = "LPS-128600 TC-3. User can't log in with invalid custom field mapping on SP. Blocked by LPS-142222."
-	@priority = 4
-	test CannotLoginWithInvalidCustomFieldMappingInSAML {
-		property app.server.bundles.size = "0";
-		property portal.release = "quarantine";
-		property portal.upstream = "quarantine";
-		property test.name.skip.portal.instance = "SAML#CannotLoginWithInvalidCustomFieldMappingInSAML";
-
-		task ("Given: User adds a virtual instance") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-		}
-
-		task ("And: Add a boolean custom field on localhost") {
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customBooleanDefaultValue = "False",
-				customFieldName = "boolean",
-				customFieldType = "True",
-				nameLocalization = "false",
-				resourceName = "User");
-		}
-
-		task ("And: Add an inputfield custom field on able.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User");
-		}
-
-		task ("And: Add a new user on localhost") {
-			JSONUser.addUser(
-				userEmailAddress = "usera@liferay.com",
-				userFirstName = "user",
-				userLastName = "a",
-				userScreenName = "usera");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "usera@liferay.com");
-		}
-
-		task ("When: User configures SP and IdP connection") {
-			SAML.configureLiferaySAMLAsIdP(
-				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp");
-
-			SAML.setupSP(
-				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			SAML.connectSPAndIdP(
-				idpAttributeMapping = "UUID,screenName,firstName,lastName,emailAddress",
-				idpCustomFieldAttributeMapping = "inputfield",
-				idpCustomFieldAttributeMappingText = "boolean",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				spAttributes = '''emailAddress
-			firstName
-			lastName
-			screenName
-			uuid
-			expando:boolean''',
-				spEntityId = "samlsp",
-				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
-				spURL = "http://www.able.com:8080",
-				sPUserEmailAddress = "test@www.able.com",
-				userResolution = "dynamic");
-
-			User.logoutPG();
-		}
-
-		task ("Then: User is unable to initiate SP SSO on able.com") {
-			User.firstLoginUI(
-				idpName = "samlidp",
-				password = "test",
-				specificURL = "http://www.able.com:8080",
-				userEmailAddress = "usera@liferay.com");
-
-			User.viewLoggedOutPG();
-		}
-	}
-
 	@description = "This is a use case for LPS-129373. Configure SAML to import users from LDAP."
-	@priority = 4
+	@priority = "4"
 	test ConfigureSAMLToImportUsersFromLDAP {
 		property apacheds.enabled = "true";
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#ConfigureSAMLToImportUsersFromLDAP";
 
 		task ("Configure samlidp as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp as SP on able.com:9080") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -1591,9 +1493,11 @@ definition {
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			PortalSettings.addLDAPServer(ldapServerName = "ApacheDS Server");
+			Navigator.openSpecificURL(url = "${baseURL}group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_InstanceSettingsPortlet");
 
-			PortalSettings.editLDAPServer(ldapServerName = "ApacheDS Server");
+			PortalSettings.addLDAPServer(LDAPServerName = "ApacheDS Server");
+
+			PortalSettings.editLDAPServer(LDAPServerName = "ApacheDS Server");
 
 			PortalSettings.testLDAPConnection();
 		}
@@ -1601,15 +1505,17 @@ definition {
 		task ("Open able.com:9080 and add LDAP server") {
 			Navigator.openSpecificURL(url = "http://www.able.com:9080");
 
-			Navigator.gotoLoginPage();
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_InstanceSettingsPortlet");
 
 			PortalSettings.addLDAPServer(
 				baseURL = "http://www.able.com:9080",
-				ldapServerName = "ApacheDS Server");
+				LDAPServerName = "ApacheDS Server");
 
 			PortalSettings.editLDAPServer(
 				baseURL = "http://www.able.com:9080",
-				ldapServerName = "ApacheDS Server");
+				LDAPServerName = "ApacheDS Server");
 		}
 
 		task ("Test LDAP connection") {
@@ -1621,9 +1527,9 @@ definition {
 
 			var enableSettingList = "enabled,ldapImportEnabled,importOnStartup";
 
-			PortalSettings.configureLDAPSetting(enableSettingList = ${enableSettingList});
+			PortalSettings.configureLDAPSetting(enableSettingList = "${enableSettingList}");
 
-			PortalSettings.viewEnabledLDAPSetting(enableSettingList = ${enableSettingList});
+			PortalSettings.viewEnabledLDAPSetting(enableSettingList = "${enableSettingList}");
 		}
 
 		task ("Logout and restart server") {
@@ -1635,17 +1541,15 @@ definition {
 		}
 
 		task ("Login and reindex search indexes") {
-			User.firstLoginUI(
-				password = "test",
-				userEmailAddress = "test@liferay.com");
+			var baseURL = PropsUtil.get("portal.url");
 
-			SearchAdministration.executeReindex();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_portal_search_admin_web_portlet_SearchAdminPortlet");
+
+			SearchAdministration.executeSearchActions(actionsDescription = "Reindex search indexes.");
 		}
 
 		task ("View CP ldapuseremail@liferay.com information") {
-			var baseURL = PropsUtil.get("portal.url");
-
-			User.openUsersAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet");
 
 			User.viewCP(
 				userEmailAddress = "ldapuseremail@liferay.com",
@@ -1667,15 +1571,19 @@ definition {
 			Navigator.openSpecificURL(url = "http://www.able.com:9080");
 
 			SAML.loginIfProductMenuNotOpened();
+		}
 
-			SAML.goToSAMLAdmin(baseURL = "http://www.able.com:9080");
+		task ("Login and reindex search indexes") {
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAMLNavigation.gotoServiceProvider();
 
-			SAMLPortlet.configureServiceProvider(ldapImport = "enable");
+			SAMLPortlet.configureServiceProvider(LDAPImport = "enable");
 		}
 
-		task ("Logout from able.com:9080, login at able.com:9080 as ldapuseremail, logout from able.com:9080, login at able.com:9080 as test@liferay.com ") {
+		task ("Logout from able.com:9080, login at able.com:9080 as ldapuseremail, logout from able.com:9080, login at able.com:9080 as test@lifera.com ") {
 			User.logoutPG(specificURL = "http://www.able.com:9080");
 
 			User.firstLoginUI(
@@ -1691,8 +1599,10 @@ definition {
 				userEmailAddress = "test@liferay.com");
 		}
 
-		task ("View CP at able.com:9080") {
-			User.openUsersAdmin(baseURL = "http://www.able.com:9080");
+		task ("View CP") {
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet");
 
 			User.viewCP(
 				userEmailAddress = "ldapuseremail@liferay.com",
@@ -1703,53 +1613,61 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105170 TC-2: User creation and sync after SAML setup, using email Address for IdP Identifier and screenName for Attribute matching - Using virtual instances."
-	@priority = 3
+	@priority = "3"
 	test CreateAndSyncUserAfterSAMLSetupMatchingEmailAddressNameIDWithScreenNameAttribute {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#CreateAndSyncUserAfterSAMLSetupMatchingEmailAddressNameIDWithScreenNameAttribute";
 
+		// Enable SAML debug logs
+
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance to be the SP site
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Logout, setup IdP and SP") {
 			User.logoutPG();
 
+			// Setting up IDP and SP role
+
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Add IdP configurations to SP") {
+
+			// Setting up IDP and SP connection
+
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
+				userMatchingAttributeIndex = "4",
 				userResolution = "attribute");
 		}
 
 		task ("Enable SP roles") {
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -1764,13 +1682,16 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Add and sync new user") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
@@ -1780,10 +1701,13 @@ definition {
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "tester",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Open portal and assert logged in") {
+
+			// Verify IdP is also logged in
+
 			Navigator.openURL();
 
 			User.viewLoggedInPG();
@@ -1791,54 +1715,62 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105170 TC-3: User creation and sync after SAML setup, using screenName for IdP Identifier and UUID for Attribute matching - Using virtual instances."
-	@priority = 3
+	@priority = "3"
 	test CreateAndSyncUserAfterSAMLSetupMatchingScreenNameIdentifierWithUUIDAttribute {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#CreateAndSyncUserAfterSAMLSetupMatchingScreenNameIdentifierWithUUIDAttribute";
 
+		task ("Enable SAML debug logs") {
+
+			// Enable SAML debug logs
+
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance to be the SP site
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Logout, setup IdP and SP") {
 			User.logoutPG();
 
+			// Setting up IDP and SP connection
+
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Add IdP configurations to SP") {
+
+			// Setting up IDP and SP connection
+
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,emailAddress,firstName,lastName,UUID",
-				idpAttributeMappingText = "screenName,emailAddress,firstName,lastName,uuid",
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
+				userMatchingAttributeIndex = "4",
 				userResolution = "attribute");
 		}
 
 		task ("Enable SP and add SP configurations to IdP") {
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
@@ -1851,13 +1783,16 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Add and sync new user") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
@@ -1867,10 +1802,13 @@ definition {
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "tester",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Open site and assert logged in") {
+
+			// Verify IdP is also logged in
+
 			Navigator.openURL();
 
 			User.viewLoggedInPG();
@@ -1878,52 +1816,60 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105170 TC-1: User creation and sync after SAML setup, using screenName field both for User Matching and IdP Identifier - Using virtual instances."
-	@priority = 5
-	test CreateAndSyncUserAfterSAMLSetupWithMatchingScreenNameAttribute {
+	@priority = "5"
+	test CreateAndSyncUserAfterSAMLSetupwithMatchingScreenNameAttribute {
 		property app.server.bundles.size = "0";
-		property portal.acceptance = "true";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#CreateAndSyncUserAfterSAMLSetupwithMatchingScreenNameAttribute";
 
+		task ("Enable SAML debug logs") {
+
+			// Enable SAML debug logs
+
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance to be the SP site
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Logout, setup IdP and SP") {
 			User.logoutPG();
 
+			// Setting up IDP and SP role
+
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Add IdP configurations to SP and enable SP roles") {
+
+			// Setting up IDP and SP connection
+
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
+				userMatchingAttributeIndex = "4",
 				userResolution = "attribute");
 
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -1938,13 +1884,16 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Add and sync new user") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
@@ -1954,10 +1903,13 @@ definition {
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "tester",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Open site and assert logged in") {
+
+			// Verify IdP is also logged in
+
 			Navigator.openURL();
 
 			User.viewLoggedInPG();
@@ -1965,74 +1917,76 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105170 TC-7: User creation and sync after SAML setup with 2 IdP portal - Using virtual instances."
-	@priority = 3
+	@priority = "3"
 	test CreateAndSyncUserAfterSAMLSetupWithMultipleIdPs {
 		property app.server.bundles.size = "0";
-		property test.name.skip.portal.instance = "SAML#CreateAndSyncUserAfterSAMLSetupWithMultipleIdPs";
+		property portal.upstream = "true";
 
-		task ("Add virtual instance able.com and baker.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
 
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.baker.com",
-				portalInstanceId = "www.baker.com",
-				virtualHost = "www.baker.com");
+		task ("Add vitual instance able.com and baker.com") {
 
-			User.logoutPG();
+			// Add 2 virtual instance
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
+
+			User.firstLoginUI();
+
+			SAML.addVirtualInstances(virtualHosts = "www.baker.com");
 		}
 
 		task ("Setup IdP samlidp1 at localhost:8080 and samlidp2 at baker.com:8080") {
+
+			// Setting up the 2 IDP and SP connection
+
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp1",
+				samlEntityID = "samlidp1",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupIDP(
-				idpURL = "http://www.baker.com:8080",
-				samlEntityId = "samlidp2",
+				idpURL = "www.baker.com:8080",
+				samlEntityID = "samlidp2",
 				userEmailAddress = "test@www.baker.com");
 		}
 
 		task ("Setup sp samlsp at able.com:8080") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
+				samlEntityID = "samlsp",
+				spURL = "www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
 
 		task ("Add IdP samlidp1 and samlidp2 configurations to SP able.com:8080") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,emailAddress,firstName,lastName,UUID",
-				idpEntityId = "samlidp1",
+				idpEntityID = "samlidp1",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 1,
+				userMatchingAttributeIndex = "1",
 				userResolution = "attribute");
 
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,UUID,firstName,lastName,emailAddress",
-				idpEntityId = "samlidp2",
+				idpEntityID = "samlidp2",
 				idpKeepAliveURL = "www.baker.com:8080/c/portal/saml/keep_alive",
 				idpURL = "http://www.baker.com:8080",
 				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
+				userMatchingAttributeIndex = "4",
 				userResolution = "attribute");
 		}
 
 		task ("Enable SP roles") {
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -2047,13 +2001,13 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.addSPConfigurationsToIdentityProvider(
-				idpURL = "http://www.baker.com:8080",
+				idpURL = "www.baker.com:8080",
 				nameIdentifierAttributeName = "emailAddress",
 				nameIdentifierFormat = "Email Address",
 				spAttributes = '''emailAddress
@@ -2061,13 +2015,16 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.baker.com");
 		}
 
-		task ("Add and sync users at localhost:8080 and able.com:8080") {
+		task ("Add and syns users at localhost:8080 and able.com:8080") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
@@ -2079,7 +2036,7 @@ definition {
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
 				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 
 			User.logoutPG(specificURL = "http://www.able.com:8080");
 
@@ -2094,714 +2051,54 @@ definition {
 				newUserScreenName = "user2",
 				portalInstanceName = "www.baker.com",
 				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Verify IdP is logged in at baker.com:8080") {
+
+			// Verify IdP is also logged in
+
 			Navigator.openURL(baseURL = "http://www.baker.com:8080");
 
 			User.viewLoggedInPG();
 		}
 	}
 
-	@description = "LPS-128600 TC-1. Custom fields and their values will sync on SAML connection."
-	@priority = 5
-	test CustomFieldsCanBeConfiguredForSAML {
-		property app.server.bundles.size = "0";
-		property test.name.skip.portal.instance = "SAML#CustomFieldsCanBeConfiguredForSAML";
-
-		task ("Given: User adds 1 virtual instance") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-		}
-
-		task ("And: Add new custom fields on localhost") {
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User",
-				startingValue = "more text");
-
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "Dropdown",
-				customFieldType = "Dropdown",
-				resourceName = "User",
-				startingValue = '''Option2
-						Option1
-						Option3''');
-
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customBooleanDefaultValue = "False",
-				customFieldName = "Boolean",
-				customFieldType = "True",
-				resourceName = "User");
-		}
-
-		task ("And: Add a new user on localhost") {
-			JSONUser.addUser(
-				userEmailAddress = "usera@liferay.com",
-				userFirstName = "user",
-				userLastName = "a",
-				userScreenName = "usera");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "usera@liferay.com");
-
-			User.logoutPG();
-		}
-
-		task ("And: Add the same custom fields on able.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customFieldName = "dropdown",
-				customFieldType = "Dropdown",
-				nameLocalization = "false",
-				resourceName = "User",
-				startingValue = '''Option1
-						Option2
-						Option3''');
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customBooleanDefaultValue = "True",
-				customFieldName = "boolean",
-				customFieldType = "True",
-				nameLocalization = "false",
-				resourceName = "User");
-		}
-
-		task ("When: The SAML connection is established ") {
-			SAML.configureLiferaySAMLAsIdP(
-				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp");
-
-			SAML.setupSP(
-				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			SAML.connectSPAndIdP(
-				idpAttributeMapping = "UUID,screenName,firstName,lastName,emailAddress",
-				idpCustomFieldAttributeMapping = "Boolean,Dropdown,inputfield",
-				idpCustomFieldAttributeMappingText = "boolean,dropdown,inputfield",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				spAttributes = '''emailAddress
-			firstName
-			lastName
-			screenName
-			uuid
-			expando:dropdown
-			expando:inputfield
-			expando:boolean''',
-				spEntityId = "samlsp",
-				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
-				spURL = "http://www.able.com:8080",
-				sPUserEmailAddress = "test@www.able.com",
-				userResolution = "dynamic");
-		}
-
-		task ("And: User executes SP initiated SSO on able.com:8080") {
-			User.logoutPG();
-
-			SAML.executeSPInitiatedSSO(
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "usera@liferay.com");
-
-			User.logoutPG(specificURL = "http://www.able.com:8080");
-		}
-
-		task ("Then: The custom field values are updated on user profile at able.com:8080") {
-			User.firstLoginUI(
-				specificURL = "http://www.able.com:8080/web/guest/home?p_p_id=com_liferay_login_web_portlet_LoginPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&saveLastPath=false&_com_liferay_login_web_portlet_LoginPortlet_mvcRenderCommandName=%2Flogin%2Flogin",
-				userEmailAddress = "test@www.able.com");
-
-			User.openUsersAdmin(baseURL = "http://www.able.com:8080");
-
-			UserNavigator.gotoUser(userScreenName = "usera");
-
-			User.viewUserCustomFieldsCP(
-				customFieldName = "inputfield",
-				customFieldValue = "more text");
-
-			User.viewUserCustomFieldsCP(
-				customFieldName = "boolean",
-				customFieldValue = "False");
-
-			User.viewUserCustomFieldsCP(
-				customFieldName = "dropdown",
-				customFieldValue = "Option2");
-		}
-	}
-
-	@description = "LPS-128600 TC-2. Custom fields and their values will sync with 2 IdP provider. "
-	@priority = 5
-	test CustomFieldsCanBeConfiguredForSAMLWithMultipleIdPs {
-		property app.server.bundles.size = "0";
-		property test.name.skip.portal.instance = "SAML#CustomFieldsCanBeConfiguredForSAMLWithMultipleIdPs";
-
-		task ("Given: User adds 2 virtual instance") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.baker.com",
-				portalInstanceId = "www.baker.com",
-				virtualHost = "www.baker.com");
-		}
-
-		task ("And: Add new custom fields on localhost") {
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User",
-				startingValue = "localhost text");
-
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "Dropdown",
-				customFieldType = "Dropdown",
-				resourceName = "User",
-				startingValue = '''Option1
-						Option2
-						Option3''');
-
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customBooleanDefaultValue = "False",
-				customFieldName = "Boolean",
-				customFieldType = "True",
-				resourceName = "User");
-
-			takeScreenshot();
-
-			User.logoutPG();
-		}
-
-		task ("And: Add the same custom fields on able.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User",
-				startingValue = "able text");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customFieldName = "dropdown",
-				customFieldType = "Dropdown",
-				nameLocalization = "false",
-				resourceName = "User",
-				startingValue = '''Option2
-						Option1
-						Option3''');
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customBooleanDefaultValue = "False",
-				customFieldName = "boolean",
-				customFieldType = "True",
-				nameLocalization = "false",
-				resourceName = "User");
-
-			takeScreenshot();
-		}
-
-		task ("And: Add the same custom fields on baker.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.baker.com:8080",
-				userEmailAddress = "test@www.baker.com");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.baker.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.baker.com:8080",
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User",
-				startingValue = "baker text");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.baker.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.baker.com:8080",
-				customFieldName = "Dropdown",
-				customFieldType = "Dropdown",
-				resourceName = "User",
-				startingValue = '''Option3
-						Option2
-						Option1''');
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.baker.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.baker.com:8080",
-				customBooleanDefaultValue = "False",
-				customFieldName = "Boolean",
-				customFieldType = "True",
-				resourceName = "User");
-
-			takeScreenshot();
-
-			User.logoutPG(specificURL = "http://www.baker.com:8080");
-		}
-
-		task ("When: User configure localhost and baker.com as IdP") {
-			SAML.setupIDP(
-				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp1",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.setupIDP(
-				idpURL = "http://www.baker.com:8080",
-				samlEntityId = "samlidp2",
-				userEmailAddress = "test@www.baker.com");
-		}
-
-		task ("And: Configure able.com as SP") {
-			SAML.setupSP(
-				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-		}
-
-		task ("And: Add IdP connection samlidp1 and samlidp2 to SP") {
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "screenName,emailAddress,firstName,lastName,UUID",
-				idpCustomFieldAttributeMapping = "Boolean,Dropdown,inputfield",
-				idpCustomFieldAttributeMappingText = "boolean,dropdown,inputfield",
-				idpEntityId = "samlidp1",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com",
-				userResolution = "dynamic");
-
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "screenName,UUID,firstName,lastName,emailAddress",
-				idpCustomFieldAttributeMapping = "Boolean,Dropdown,inputfield",
-				idpCustomFieldAttributeMappingText = "boolean,dropdown,inputfield",
-				idpEntityId = "samlidp2",
-				idpKeepAliveURL = "www.baker.com:8080/c/portal/saml/keep_alive",
-				idpURL = "http://www.baker.com:8080",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com",
-				userResolution = "dynamic");
-		}
-
-		task ("And: Enable SP role") {
-			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-		}
-
-		task ("And: Add SP connection samlsp to IdP on localhost and on baker.com") {
-			SAML.addSPConfigurationsToIdentityProvider(
-				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Email Address",
-				spAttributes = '''emailAddress
-					firstName
-					lastName
-					screenName
-					uuid
-					expando:dropdown
-					expando:inputfield
-					expando:boolean''',
-				spEntityId = "samlsp",
-				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.addSPConfigurationsToIdentityProvider(
-				idpURL = "http://www.baker.com:8080",
-				nameIdentifierFormat = "Email Address",
-				spAttributes = '''emailAddress
-					firstName
-					lastName
-					screenName
-					uuid
-					expando:dropdown
-					expando:inputfield
-					expando:boolean''',
-				spEntityId = "samlsp",
-				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.baker.com");
-		}
-
-		task ("And: Add a new user in localhost") {
-			JSONUser.addUser(
-				userEmailAddress = "usera@liferay.com",
-				userFirstName = "user",
-				userLastName = "a",
-				userScreenName = "usera");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "usera@liferay.com");
-		}
-
-		task ("And: Add the same user in baker.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.baker.com:8080",
-				userEmailAddress = "test@www.baker.com");
-
-			User.openUsersAdmin(baseURL = "http://www.baker.com:8080");
-
-			User.addCP(
-				userEmailAddress = "usera@liferay.com",
-				userFirstName = "user",
-				userLastName = "a",
-				userScreenName = "usera");
-
-			User.openUsersAdmin(baseURL = "http://www.baker.com:8080");
-
-			UserNavigator.gotoUser(userScreenName = "usera");
-
-			User.editPassword(newPassword = "test");
-
-			User.logoutPG(specificURL = "http://www.baker.com:8080");
-		}
-
-		task ("Then: SP initiated SSO can be executed on able.com from localhost") {
-			SAML.executeSPInitiatedSSO(
-				idpName = "samlidp1",
-				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "usera@liferay.com");
-
-			User.logoutPG(specificURL = "http://www.able.com:8080");
-		}
-
-		task ("And: SP initiated SSO can be executed on able.com from baker.com") {
-			User.logoutPG();
-
-			SAML.executeSPInitiatedSSO(
-				idpName = "samlidp2",
-				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "usera@liferay.com");
-
-			User.logoutPG(specificURL = "http://www.able.com:8080");
-		}
-
-		task ("And: the custom field values are updated on 5z3 profile of the new user on able.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.able.com:8080/web/guest/home?p_p_id=com_liferay_login_web_portlet_LoginPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&saveLastPath=false&_com_liferay_login_web_portlet_LoginPortlet_mvcRenderCommandName=%2Flogin%2Flogin",
-				userEmailAddress = "test@www.able.com");
-
-			User.openUsersAdmin(baseURL = "http://www.able.com:8080");
-
-			UserNavigator.gotoUser(userScreenName = "usera");
-
-			User.viewUserCustomFieldsCP(
-				customFieldName = "inputfield",
-				customFieldValue = "baker more text");
-
-			User.viewUserCustomFieldsCP(
-				customFieldName = "boolean",
-				customFieldValue = "False");
-
-			User.viewUserCustomFieldsCP(
-				customFieldName = "dropdown",
-				customFieldValue = "Option3");
-		}
-	}
-
-	@description = "LPS-128600 TC-6-7. Custom fields can be used for User matching in a SAML connection."
-	@priority = 4
-	test CustomFieldsCanBeUsedForUserMatchingInSAML {
-		property app.server.bundles.size = "0";
-		property test.name.skip.portal.instance = "SAML#CustomFieldsCanBeUsedForUserMatchingInSAML";
-
-		task ("Given: User adds a virtual instance") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-		}
-
-		task ("And: Add an Inputfield custom field on localhost") {
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User",
-				startingValue = "more text");
-		}
-
-		task ("And: Add a new user in localhost") {
-			JSONUser.addUser(
-				userEmailAddress = "usera@liferay.com",
-				userFirstName = "user",
-				userLastName = "a",
-				userScreenName = "usera");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "usera@liferay.com");
-
-			User.logoutPG();
-		}
-
-		task ("And: Add the same custom field on able.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			CustomFields.openCustomFieldAdmin(baseURL = "http://www.able.com:8080");
-
-			CustomFields.addCP(
-				baseURL = "http://www.able.com:8080",
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User");
-
-			User.logoutPG(specificURL = "http://www.able.com:8080");
-		}
-
-		task ("When: User configure localhost as IdP and able.com as SP") {
-			SAML.setupIDP(
-				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.setupSP(
-				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-		}
-
-		task ("And: Establish SP and IdP connection") {
-			SAML.connectSPAndIdP(
-				customFieldUserMatching = "true",
-				idpAttributeMapping = "UUID,screenName,firstName,lastName,emailAddress",
-				idpCustomFieldAttributeMapping = "inputfield",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				spAttributes = '''emailAddress
-			firstName
-			lastName
-			screenName
-			uuid
-			expando:inputfield''',
-				spEntityId = "samlsp",
-				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
-				spURL = "http://www.able.com:8080",
-				sPUserEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 0,
-				userResolution = "attribute");
-
-			User.logoutPG();
-		}
-
-		task ("And: Execute SP initiated SSO on able.com") {
-			SAML.executeSPInitiatedSSO(
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "usera@liferay.com");
-
-			User.viewLoggedInPG();
-		}
-
-		task ("Then: The correct console log will appear") {
-			AssertConsoleTextPresent(value1 = "Resolving user with user field expression: expando:inputfield");
-
-			User.logoutPG(specificURL = "http://www.able.com:8080");
-		}
-
-		task ("When: User changes the value of the custom field on the created user's profile") {
-			User.firstLoginPG();
-
-			User.openUsersAdmin();
-
-			UserNavigator.gotoUser(userScreenName = "usera");
-
-			AssertElementPresent.assertElementPresent(locator1 = "TextInput#FIRST_NAME");
-
-			Type(
-				key_fieldLabel = "inputfield",
-				locator1 = "TextInput#GENERIC_TEXT_INPUT",
-				value1 = "textChanged");
-
-			PortletEntry.save();
-
-			User.logoutPG();
-		}
-
-		task ("And: Execute SP initiated SSO on able.com") {
-			SAML.executeSPInitiatedSSO(
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "usera@liferay.com");
-
-			User.viewLoggedInPG();
-		}
-
-		task ("Then: The correct console log will appear, verifying that the correct attribute was used for user matching") {
-			WaitForConsoleTextPresent(value1 = "Resolving user with user field expression: expando:inputfield");
-
-			User.logoutPG(specificURL = "http://www.able.com:8080");
-		}
-
-		task ("And: The new user has the correct information on his profile on able.com") {
-			User.firstLoginUI(
-				specificURL = "http://www.able.com:8080/web/guest/home?p_p_id=com_liferay_login_web_portlet_LoginPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&saveLastPath=false&_com_liferay_login_web_portlet_LoginPortlet_mvcRenderCommandName=%2Flogin%2Flogin",
-				userEmailAddress = "test@www.able.com");
-
-			User.openUsersAdmin(baseURL = "http://www.able.com:8080");
-
-			UserNavigator.gotoUser(userScreenName = "usera");
-
-			User.viewUserCustomFieldsCP(
-				customFieldName = "inputfield",
-				customFieldValue = "textChanged");
-		}
-	}
-
-	@description = "LPS-128600 TC-4. SAML connection cannot be saved if a custom field value is used more than once."
-	@priority = 4
-	test CustomFieldUsedMultipleTimesCannotBeSavedInSAML {
-		property app.server.bundles.size = "0";
-		property test.name.skip.portal.instance = "SAML#CustomFieldUsedMultipleTimesCannotBeSavedInSAML";
-
-		task ("Given: User adds new custom fields") {
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "inputfield",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User");
-		}
-
-		task ("And: Enable SP role") {
-			SAML.goToSAMLAdmin();
-
-			SAMLRole.configure(
-				samlEntityId = "samlsp",
-				samlRoleType = "Service Provider");
-		}
-
-		task ("When: User tries to establish IdP connection with 1 custom field used two times") {
-			SAML.goToSAMLAdmin();
-
-			SAMLNavigation.gotoIdentityProviderConnections();
-
-			SAMLPortlet.addIdentityProviderConnection(
-				idpAttributeMapping = "UUID,UUID,lastName,lastName",
-				idpCustomFieldAttributeMapping = "inputfield,inputfield",
-				idpCustomFieldAttributeMappingText = "attribute1,attribute2",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpNameId = "samlidp",
-				idpURL = "http://localhost:8080",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com",
-				userResolution = "dynamic");
-		}
-
-		task ("Then: The save fails and the correct error message appears") {
-			AssertTextEquals.assertPartialText(
-				locator1 = "Message#ERROR_DISMISSIBLE",
-				value1 = "User Custom Fields: Each user field can only be mapped to one SAML attribute.");
-		}
-	}
-
 	@description = "This is a use case for LPS-105170 TC-8: Verifying that deleting a User will sync with the SP site - Using virtual instances."
-	@priority = 3
+	@priority = "3"
 	test DeleteUserAfterSAMLSetupAndVerify {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#DeleteUserAfterSAMLSetupAndVerify";
 
-		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
+		// Enable SAML debug logs
 
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
 		}
 
-		task ("Setup IdP samlidp at localhost:8080") {
+		task ("Add virtul instance able.com") {
+
+			// Add new virtual instance to be the SP site
+
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
+		}
+
+		task ("Setup IdP samlidp at localhost:8008") {
 			User.logoutPG();
+
+			// Setup localhost as IDP role
 
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp",
+				samlEntityID = "samlidp",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Setup SP samlsp at albe.com:8080") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -2809,20 +2106,19 @@ definition {
 		task ("Add IdP configurations to SP") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,emailAddress,firstName,lastName,UUID",
-				idpAttributeMappingText = "screenName,emailAddress,firstName,lastName,uuid",
-				idpEntityId = "samlidp",
+				idpEntityID = "samlidp",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
+				idpURL = "http://localhost:8080/",
 				nameIdentifierFormat = "Unspecified",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
+				userMatchingAttributeIndex = "4",
 				userResolution = "attribute");
 		}
 
 		task ("Enable SP roles and add SP configurations to IdP") {
 			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
@@ -2835,13 +2131,16 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Add and sync new user") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
@@ -2854,14 +2153,14 @@ definition {
 				spURL = "http://www.able.com:8080");
 		}
 
-		task ("Logout from able.com:8080 and single deactivate CP user") {
+		task ("Logout from able.com:8080 and single deactivfate CP user") {
 			User.logoutPG(specificURL = "http://www.able.com:8080");
 
 			User.firstLoginUI();
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			User.openUsersAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet");
 
 			User.singleDeactivateCP(userFirstName = "first");
 
@@ -2877,103 +2176,48 @@ definition {
 
 			User.firstLoginUI(
 				emailPassword = "test",
-				specificURL = "http://www.able.com:8080",
+				specificURL = "http://www.able.com:8080/",
 				userEmailAddress = "user1@liferay.com");
 
 			SAML.viewAuthenticationFailedErrorMessage();
 		}
 	}
 
-	@description = "LPS-128600 TC-5. SAML connection cannot be saved if more than one custom field value is mapped with the same SAML attribute. Blocked by LPS-141959."
-	@priority = 4
-	test DuplicatedCustomFieldMappingCannotBeSavedInSAML {
-		property app.server.bundles.size = "0";
-		property portal.release = "quarantine";
-		property portal.upstream = "quarantine";
-		property test.name.skip.portal.instance = "SAML#DuplicatedCustomFieldMappingCannotBeSavedInSAML";
-
-		task ("Given: new custom fields are added") {
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "inputfield1",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User");
-
-			CustomFields.openCustomFieldAdmin();
-
-			CustomFields.addCP(
-				customFieldName = "inputfield2",
-				customFieldType = "Input Field",
-				customInputDataType = "Text",
-				nameLocalization = "false",
-				resourceName = "User");
-		}
-
-		task ("And: Enable SP role") {
-			SAML.goToSAMLAdmin();
-
-			SAMLRole.configure(
-				samlEntityId = "samlsp",
-				samlRoleType = "Service Provider");
-		}
-
-		task ("When: User tries to add IdP connection with 2 custom field mapped with the same attribute") {
-			SAML.goToSAMLAdmin();
-
-			SAMLNavigation.gotoIdentityProviderConnections();
-
-			SAMLPortlet.addIdentityProviderConnection(
-				idpAttributeMapping = "UUID,UUID,lastName,lastName",
-				idpCustomFieldAttributeMapping = "inputfield1,inputfield2",
-				idpCustomFieldAttributeMappingText = "attribute,attribute",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpNameId = "samlidp",
-				idpURL = "http://localhost:8080",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com",
-				userResolution = "dynamic");
-		}
-
-		task ("Then: The save of the connection fails and the correct error message appears") {
-			AssertTextEquals.assertPartialText(
-				locator1 = "Message#ERROR_DISMISSIBLE",
-				value1 = "User Custom Fields: Each user field can only be mapped to one SAML attribute.");
-		}
-	}
-
 	@description = "This is a use case for LPS-110344. Hot deploy SAML app."
-	@priority = 5
+	@priority = "5"
 	test HotDeploySAMLApp {
 		property hot.deploy.osgi.app.includes = "saml";
+		property osgi.app.includes = "";
 		property test.name.skip.portal.instance = "SAML#HotDeploySAMLApp";
 
 		task ("Assert healthy instance started with liferay connector to SAML 2.0") {
 			AssertConsoleTextNotPresent(value1 = "The portal instance needs to be restarted");
 
-			AssertConsoleTextPresent(value1 = "STARTED Liferay Foundation - Liferay Connector to SAML 2.0");
+			AssertConsoleTextPresent(value1 = "STARTED Liferay Connector to SAML 2.0");
 		}
 
 		task ("configure samlidp as IdP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_mvcRenderCommandName=%2Fconfiguration_admin%2Fedit_configuration&_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_pid=com.liferay.saml.runtime.configuration.SamlConfiguration");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
+
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 	}
 
 	@description = "This is a use case for LPS-108077. Import encryption certificate from PKCS12 keystore file."
-	@priority = 5
+	@priority = "5"
 	test ImportEncryptionCertificateFromPKCS12KeystoreFile {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#ImportEncryptionCertificateFromPKCS12KeystoreFile";
 
 		task ("Configure samlidp as IdP and samlsp as SP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
 				encryptionCertificate = "true",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -2982,7 +2226,7 @@ definition {
 
 			SAMLPortlet.configureServiceProviderConnection(
 				forceEncryption = "enable",
-				samlEntityId = "samlsp");
+				samlEntityID = "samlsp");
 		}
 
 		task ("Logout and execute SP initiated SSO") {
@@ -2999,14 +2243,18 @@ definition {
 		}
 
 		task ("Convert encryption certificate") {
-			SAML.goToSAMLAdmin(baseURL = "http://www.able.com:9080");
+			Navigator.openSpecificURL(url = "http://www.able.com:9080");
+
+			var baseURL = PropsUtil.get("portal.url");
+
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAML.downloadCertificate(certificate = "ENCRYPTION");
 
 			SAMLRole.convertEncryptionCertificate();
 		}
 
-		task ("Import certificate and private key") {
+		task ("Importe certificate and private key") {
 			SAMLRole.importCertificateAndPrivateKey(
 				certificateUsage = "ENCRYPTION",
 				keyStoreAlias = "samlsp-encryption");
@@ -3021,188 +2269,16 @@ definition {
 		}
 	}
 
-	@description = "LPS-152122 TC6. Import JSon file to configure the SAML IdP provider via Import/Export Center."
-	@priority = 4
-	test ImportJSONFileToConfigureSAMLIDP {
-		property app.server.bundles.size = "0";
-		property custom.properties = "feature.flag.COMMERCE-8087=true";
-		property keystore.enabled = "true";
-		property portal.release = "false";
-		property test.name.skip.portal.instance = "SAML#ImportJSONFileToConfigureSAMLIDP";
-
-		task ("Given: Add SAP") {
-			var baseURL = PropsUtil.get("portal.url");
-
-			ServiceAccessPolicy.openServiceAccessPolicyAdmin();
-
-			ServiceAccessPolicy.addServiceAccessPolicy(
-				enabled = "true",
-				methodName = "*",
-				policyName = "SAML_Provider",
-				serviceClass = "com.liferay.saml.admin.rest.internal.resource.v1_0.SamlProviderResourceImpl",
-				title = "Configure SAML provider");
-		}
-
-		task ("When: Import the JSON file via Import/Export Center") {
-			ImportExport.openImportExportAdmin();
-
-			ImportExport.gotoImport();
-
-			ImportExport.configureImport(
-				entityType = "SamlProvider (v1_0 - Liferay SAML Admin REST)",
-				fileName = "identity-provider-configuration.json",
-				importStrategy = "Only Add New Records");
-
-			Button.click(button = "Next");
-
-			Button.click(button = "Start Import");
-
-			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
-		}
-
-		task ("Then: SAML is enabled with IDP role") {
-			SAML.goToSAMLAdmin();
-
-			SAMLRole.viewGeneralConfigurations(
-				samlEntityId = "samlidp",
-				samlRoleType = "Identity Provider");
-		}
-
-		task ("And: All the configurations which defines in identity-provider-configuration.json are configured") {
-			SAMLNavigation.gotoIdentityProvider();
-
-			SAMLPortlet.viewIdentityProviderConfigurations(sessionMaximum = 10000);
-		}
-	}
-
-	@description = "LPS-152122 TC5. Import JSon file to configure the SAML SP provider via Import/Export Center."
-	@priority = 4
-	test ImportJSONFileToConfigureSAMLSP {
-		property app.server.bundles.size = "0";
-		property custom.properties = "feature.flag.COMMERCE-8087=true";
-		property keystore.enabled = "true";
-		property portal.release = "false";
-		property test.name.skip.portal.instance = "SAML#ImportJSONFileToConfigureSAMLSP";
-
-		task ("Given: Add SAP") {
-			var baseURL = PropsUtil.get("portal.url");
-
-			ServiceAccessPolicy.openServiceAccessPolicyAdmin();
-
-			ServiceAccessPolicy.addServiceAccessPolicy(
-				enabled = "true",
-				methodName = "*",
-				policyName = "SAML_Provider",
-				serviceClass = "com.liferay.saml.admin.rest.internal.resource.v1_0.SamlProviderResourceImpl",
-				title = "Configure SAML provider");
-		}
-
-		task ("When: Import the JSON file via Import/Export Center") {
-			ImportExport.openImportExportAdmin();
-
-			ImportExport.gotoImport();
-
-			ImportExport.configureImport(
-				entityType = "SamlProvider (v1_0 - Liferay SAML Admin REST)",
-				fileName = "service-provider-configuration.json",
-				importStrategy = "Only Add New Records");
-
-			Button.click(button = "Next");
-
-			Button.click(button = "Start Import");
-
-			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
-		}
-
-		task ("Then: SAML is enabled with SP role") {
-			SAML.goToSAMLAdmin();
-
-			SAMLRole.viewGeneralConfigurations(
-				samlEntityId = "samlsp",
-				samlRoleType = "Service Provider");
-		}
-
-		task ("And: All the configurations which defines in service-provider-configuration.json are configured") {
-			SAMLNavigation.gotoServiceProvider();
-
-			SAMLPortlet.viewServiceProviderConfigurations(clockSkew = 3500);
-		}
-	}
-
-	@description = "LPS-152122 TC7. Import JSON file to configure the SAML SP provider via Import/Export Center in a non-default port."
-	@priority = 4
-	test ImportJSONFileToConfigureSAMLSPOnNonDefaultPort {
-		property custom.properties = "feature.flag.COMMERCE-8087=true";
-		property keystore.enabled = "true";
-		property portal.release = "false";
-		property skip.start.app.server.index = "1";
-		property test.name.skip.portal.instance = "SAML#ImportJSONFileToConfigureSAMLSPOnNonDefaultPort";
-
-		task ("Given: Start up second bundle and add SAP") {
-			Clustering.startSpecificServer(
-				deleteLiferayHome = "false",
-				nodePort = 9080);
-
-			User.logoutPG();
-
-			User.firstLoginUI(
-				password = "test",
-				specificURL = "http://localhost:9080",
-				userEmailAddress = "test@liferay.com");
-
-			ServiceAccessPolicy.openServiceAccessPolicyAdmin(baseURL = "http://localhost:9080");
-
-			ServiceAccessPolicy.addServiceAccessPolicy(
-				enabled = "true",
-				methodName = "*",
-				policyName = "SAML_Provider",
-				serviceClass = "com.liferay.saml.admin.rest.internal.resource.v1_0.SamlProviderResourceImpl",
-				title = "Configure SAML provider");
-		}
-
-		task ("When: Import the JSON file via Import/Export Center") {
-			ImportExport.openImportExportAdmin(baseURL = "http://localhost:9080");
-
-			ImportExport.gotoImport();
-
-			ImportExport.configureImport(
-				entityType = "SamlProvider (v1_0 - Liferay SAML Admin REST)",
-				fileName = "service-provider-configuration.json",
-				importStrategy = "Only Add New Records");
-
-			Button.click(button = "Next");
-
-			Button.click(button = "Start Import");
-
-			WaitForElementPresent(locator1 = "ImportExport#EXECUTION_SUCCESS");
-		}
-
-		task ("Then: SAML is enabled with SP role") {
-			SAML.goToSAMLAdmin(baseURL = "http://localhost:9080");
-
-			SAMLRole.viewGeneralConfigurations(
-				samlEntityId = "samlsp",
-				samlRoleType = "Service Provider");
-		}
-
-		task ("And: All the configurations which defines in service-provider-configuration.json are configured") {
-			SAMLNavigation.gotoServiceProvider();
-
-			SAMLPortlet.viewServiceProviderConfigurations(clockSkew = 3500);
-		}
-	}
-
 	@description = "This is a use case for LPS-108077. Import signing certificate from PKCS12 keystore file."
-	@priority = 5
+	@priority = "5"
 	test ImportSigningCertificateFromPKCS12KeystoreFile {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#ImportSigningCertificateFromPKCS12KeystoreFile";
 
 		task ("Configure samlidp as IdP and samlsp as SP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spAttributes = "firstName",
 				spURL = "http://www.able.com:9080",
 				userResolution = "dynamic");
@@ -3226,7 +2302,7 @@ definition {
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			SAML.goToSAMLAdmin();
+			Navigator.openSpecificURL(url = "${baseURL}/group/control_panel/manage?p_p_id=com_liferay_saml_web_internal_portlet_SamlAdminPortlet");
 
 			SAML.downloadCertificate(certificate = "SIGNING");
 
@@ -3250,179 +2326,31 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-147809. TC2: Metadata source is changed after changed from XML File To URL."
-	@priority = 3
-	test MetadataSourceIsChangedAfterChangedFromXMLFileToURL {
-		property app.server.bundles.size = "0";
-		property keystore.enabled = "true";
-		property test.name.skip.portal.instance = "SAML#MetadataSourceIsChangedAfterChangedFromXMLFileToURL";
-
-		task ("Given: Add SAML configuration files") {
-			OSGiConfig.copyOSGiConfigFile(
-				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
-				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlKeyStoreManagerConfiguration.config");
-
-			OSGiConfig.copyOSGiConfigFile(
-				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
-				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlProviderConfiguration.config");
-		}
-
-		task ("And: Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
-		}
-
-		task ("When: User configures SP and IdP connection") {
-			SAML.setupIDP(
-				idpURL = "http://localhost:8080",
-				keystoreEnabled = "true",
-				samlEntityId = "samlidp",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.setupSP(
-				keystoreEnabled = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Email Address",
-				spURL = "http://www.able.com:8080",
-				uploadMetadataXML = "identity-provider-metadata.xml",
-				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
-				userResolution = "attribute");
-		}
-
-		task ("And: Edit IdP connection and change to a metadata URL instead of uploading the metadata XML file") {
-			SAML.editIdentityProviderConnection(
-				changeToURL = "true",
-				idpEntityId = "samlidp",
-				idpMetadataURL = "http://localhost:8080/c/portal/saml/metadata",
-				metadata = "true",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-		}
-
-		task ("Then: Metadata URL is changed as requested") {
-			SAMLPortlet.viewMetadataConfigurationsOfSP(
-				idpEntityId = "samlidp",
-				metadataURL = "true");
-		}
-	}
-
-	@description = "This is a use case for LPS-147809. TC3: SAML Metadata URL is no longer shown after change metadata source from URL to file."
-	@priority = 3
-	test MetadataURLDisappearsAfterChangedFromURLToXMLFile {
-		property app.server.bundles.size = "0";
-		property keystore.enabled = "true";
-		property test.name.skip.portal.instance = "SAML#MetadataURLDisappearsAfterChangedFromURLToXMLFile";
-
-		task ("Given: Add SAML configuration files") {
-			OSGiConfig.copyOSGiConfigFile(
-				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
-				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlKeyStoreManagerConfiguration.config");
-
-			OSGiConfig.copyOSGiConfigFile(
-				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
-				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlProviderConfiguration.config");
-		}
-
-		task ("And: Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
-		}
-
-		task ("When: User configures SP and IdP connection") {
-			SAML.setupIDP(
-				idpURL = "http://localhost:8080",
-				keystoreEnabled = "true",
-				samlEntityId = "samlidp",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.setupSP(
-				keystoreEnabled = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Email Address",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
-				userResolution = "attribute");
-		}
-
-		task ("And: Edit IdP connection and replace metadata URL with metadata XML file") {
-			SAML.editIdentityProviderConnection(
-				changeToXML = "true",
-				idpEntityId = "samlidp",
-				metadata = "true",
-				spURL = "http://www.able.com:8080",
-				uploadMetadataXML = "identity-provider-metadata.xml",
-				userEmailAddress = "test@www.able.com",
-				viewMetadata = "true");
-		}
-
-		task ("Then: Metadata URL is changed as requested") {
-			SAMLPortlet.viewMetadataConfigurationsOfSP(
-				idpEntityId = "samlidp",
-				metadataXML = "true");
-		}
-	}
-
 	@description = "LPS-105169 TC-3: SP initiated login should not sync IdP&SP user attributes if not part of attribute mapping - Using virtual instances."
-	@priority = 4
+	@priority = "4"
 	test SPInitiatedSSODoesNotSyncAttributesIfNotMapped {
 		property app.server.bundles.size = "0";
-		property portal.release = "quarantine";
 		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "SAML#SPInitiatedSSODoesNotSyncAttributesIfNotMapped";
 
 		var identityProviderEntityId = "samlidp";
 		var serviceProviderEntityId = "samlsp";
 
+		// Add new virtual instance and setup SAML link between IdP and SP
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IdP at localhost:8080 and SP at able.com:8080") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
+				samlEntityID = "${identityProviderEntityId}",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -3430,7 +2358,7 @@ definition {
 		task ("Add IdP configurations to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "emailAddress,screenName,firstName,lastName,UUID",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
@@ -3439,7 +2367,7 @@ definition {
 				userResolution = "dynamic");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -3454,7 +2382,7 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 		}
@@ -3465,11 +2393,11 @@ definition {
 				creatorPassword = "test",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 
 			User.logoutPG(specificURL = "http://www.able.com:8080");
 		}
@@ -3478,14 +2406,15 @@ definition {
 			SAML.editIdentityProviderConnection(
 				idpAttributeMappingNew = "emailAddress,screenName,firstName,UUID",
 				idpAttributeMappingOld = "emailAddress,screenName,firstName,lastName,UUID",
-				idpEntityId = ${identityProviderEntityId},
-				spURL = "http://www.able.com:8080",
+				idpEntityID = "${identityProviderEntityId}",
+				spURL = "www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
-
-			User.logoutPG(specificURL = "http://www.able.com:8080");
 		}
 
 		task ("Update user and execute Sp initiated SSO") {
+
+			// Test starts here
+
 			JSONUser.updateUser(
 				screenNameUpdate = "user1_changed",
 				userEmailAddress = "user1@liferay.com",
@@ -3500,18 +2429,18 @@ definition {
 		}
 
 		task ("View user information at able.com:8080") {
-			MyAccount.openMyAccountAdmin(baseURL = "http://www.able.com:8080");
+			MyAccount.openMyAccountAdmin(baseURL = "www.able.com:8080");
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1@liferay.com",
 				userFirstName = "user_changed",
-				userLastName = 1,
+				userLastName = "1",
 				userScreenName = "user1_changed");
 		}
 	}
 
 	@description = "LPS-105169 TC-4: SP initiated login should not sync IdP&SP user attributes if not sent by IdP - Using virtual instances."
-	@priority = 4
+	@priority = "4"
 	test SPInitiatedSSODoesNotSyncAttributesIfNotSent {
 		property app.server.bundles.size = "0";
 		property test.name.skip.portal.instance = "SAML#SPInitiatedSSODoesNotSyncAttributesIfNotSent";
@@ -3520,27 +2449,23 @@ definition {
 		var serviceProviderEntityId = "samlsp";
 
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance and setup SAML link between IdP and SP
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IdP as localhost:8080") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
+				samlEntityID = "${identityProviderEntityId}",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Setup SP as able.com:8080") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -3548,7 +2473,7 @@ definition {
 		task ("Add IdP configuration to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,emailAddress,firstName,lastName,UUID",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
@@ -3557,7 +2482,7 @@ definition {
 				userResolution = "dynamic");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -3572,22 +2497,22 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 		}
 
-		task ("Add and sync new user without validation and edit service provider connection") {
+		task ("Add and sync new user without validation" and edit service provider connection) {
 			SAML.addAndSyncNewUserWithoutValidation(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 
 			User.logoutPG(specificURL = "http://www.able.com:8080");
 
@@ -3597,8 +2522,10 @@ definition {
 					firstName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId});
+				spEntityID = "${serviceProviderEntityId}");
 		}
+
+		// Test starts here
 
 		task ("Update user and execute SP initiated SSO") {
 			JSONUser.updateUser(
@@ -3615,54 +2542,45 @@ definition {
 		}
 
 		task ("View user information") {
-			MyAccount.openMyAccountAdmin(baseURL = "http://www.able.com:8080");
+			MyAccount.openMyAccountAdmin(baseURL = "www.able.com:8080");
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1@liferay.com",
 				userFirstName = "user_changed",
-				userLastName = 1,
+				userLastName = "1",
 				userScreenName = "user1");
 		}
 	}
 
-	@description = "LPS-105169 TC-1: SP initiated login should sync IdP&SP user attributes based on user attribute mapping - Using virtual instances. Blocked by LPS-137141."
-	@priority = 5
+	@description = "LPS-105169 TC-1: SP initiated login should sync IdP&SP user attributes based on user attribute mapping - Using virtual instances."
+	@priority = "5"
 	test SPInitiatedSSOSyncsUserAttributesFromIdPToSPDefaultMapping {
 		property app.server.bundles.size = "0";
-		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,rockylinux,solaris,suse,ubuntu,windows";
-		property portal.acceptance = "quarantine";
-		property portal.release = "quarantine";
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "SAML#SPInitiatedSSOSyncsUserAttributesFromIdPToSPDefaultMapping";
 
 		var identityProviderEntityId = "samlidp";
 		var serviceProviderEntityId = "samlsp";
 
+		// Add new virtual instance and setup SAML link between IdP and SP
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance and setup SAML link between IdP and SP
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IdP as localhost:8080") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
+				samlEntityID = "${identityProviderEntityId}",
 				userEmailAddress = "test@liferay.com");
 		}
 
 		task ("Setup SP as able.com:8080") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -3670,16 +2588,16 @@ definition {
 		task ("Add IdP configuration to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,emailAddress,firstName,lastName,UUID",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Unspecified",
+				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
 				userResolution = "dynamic");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -3687,29 +2605,32 @@ definition {
 		task ("Add SP configurations to IdP") {
 			SAML.addSPConfigurationsToIdentityProvider(
 				idpURL = "http://localhost:8080",
-				nameIdentifierAttributeName = "screenName",
-				nameIdentifierFormat = "Unspecified",
+				nameIdentifierAttributeName = "emailAddress",
+				nameIdentifierFormat = "Email Address",
 				spAttributes = '''emailAddress
 					firstName
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 		}
 
 		task ("Add and sync new user without validation") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUserWithoutValidation(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Logout and update user") {
@@ -3718,7 +2639,7 @@ definition {
 			User.viewLoggedOutPG();
 
 			JSONUser.updateUser(
-				screenNameUpdate = "user1",
+				screenNameUpdate = "user1_changed",
 				userEmailAddress = "user1@liferay.com",
 				userEmailAddressUpdate = "user1changed@liferay.com",
 				userFirstName = "user_changed",
@@ -3733,21 +2654,20 @@ definition {
 		}
 
 		task ("View user information") {
-			MyAccount.openMyAccountAdmin(baseURL = "http://www.able.com:8080");
+			MyAccount.openMyAccountAdmin(baseURL = "www.able.com:8080");
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1changed@liferay.com",
 				userFirstName = "user_changed",
 				userLastName = "1_changed",
-				userScreenName = "user1");
+				userScreenName = "user1_changed");
 		}
 	}
 
 	@description = "LPS-105169 TC-2: SP initiated login should sync IdPs&SP user attributes based on custom user attribute mapping - Using virtual instances."
-	@priority = 4
+	@priority = "4"
 	test SPInitiatedSSOSyncsUserAttributesFromMultipleIdPToSPCustomMapping {
 		property app.server.bundles.size = "0";
-		property portal.release = "quarantine";
 		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "SAML#SPInitiatedSSOSyncsUserAttributesFromMultipleIdPToSPCustomMapping";
 
@@ -3755,38 +2675,28 @@ definition {
 		var identityProviderEntityId2 = "samlidp2";
 		var serviceProviderEntityId = "samlsp";
 
+		// Add new virtual instance and setup SAML link between IdP and SP
+
 		task ("Add 2 virtual instances") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.baker.com",
-				portalInstanceId = "www.baker.com",
-				virtualHost = "www.baker.com");
-
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com,www.baker.com");
 		}
 
 		task ("Setup IdP at localhost:8080 and baker.com:8080") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId1},
+				samlEntityID = "${identityProviderEntityId1}",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupIDP(
 				idpURL = "http://www.baker.com:8080",
-				samlEntityId = ${identityProviderEntityId2},
+				samlEntityID = "${identityProviderEntityId2}",
 				userEmailAddress = "test@www.baker.com");
 		}
 
 		task ("Setup SP") {
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -3795,7 +2705,7 @@ definition {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "emailAddress,firstName,lastName,screenName,UUID",
 				idpAttributeMappingText = "emailAddress,firstName,jobTitle,screenName,UUID",
-				idpEntityId = ${identityProviderEntityId1},
+				idpEntityID = "${identityProviderEntityId1}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
@@ -3806,7 +2716,7 @@ definition {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "emailAddress,firstName,lastName,screenName,UUID",
 				idpAttributeMappingText = "emailAddress,firstName,jobTitle,screenName,UUID",
-				idpEntityId = ${identityProviderEntityId2},
+				idpEntityID = "${identityProviderEntityId2}",
 				idpKeepAliveURL = "http://www.baker.com:8080/c/portal/saml/keep_alive",
 				idpURL = "http://www.baker.com:8080",
 				nameIdentifierFormat = "Email Address",
@@ -3815,9 +2725,9 @@ definition {
 				userResolution = "dynamic");
 		}
 
-		task ("Enable SP roles and add SP configurations to localhost:8080 and baker.com:8080 IdP") {
+		task ("Enable SP roles and add SP conigurations to localhost:8080 and baker.com:8080 IdP") {
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
@@ -3831,7 +2741,7 @@ definition {
 					screenName
 					uuid
 					jobTitle''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 
@@ -3845,32 +2755,35 @@ definition {
 					screenName
 					uuid
 					jobTitle''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.baker.com");
 		}
 
 		task ("Add and sync new user without validation") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUserWithoutValidation(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
-				idpName = ${identityProviderEntityId1},
+				idpName = "${identityProviderEntityId1}",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "userIDP1",
 				newUserJobTitle = "engineerIDP1",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user_shared",
 				portalInstanceName = "localhost",
 				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Assert user information") {
-			MyAccount.openMyAccountAdmin(baseURL = "http://www.able.com:8080");
+			MyAccount.openMyAccountAdmin(baseURL = "www.able.com:8080");
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1@liferay.com",
 				userFirstName = "userIDP1",
 				userJobTitle = "",
@@ -3886,22 +2799,22 @@ definition {
 			SAML.addAndSyncNewUserWithoutValidation(
 				creatorEmailAddress = "test@www.baker.com",
 				creatorPassword = "test",
-				idpName = ${identityProviderEntityId2},
+				idpName = "${identityProviderEntityId2}",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "userIDP2",
 				newUserJobTitle = "engineerIDP2",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://www.baker.com:8080",
 				newUserScreenName = "user_shared",
 				portalInstanceName = "www.baker.com",
 				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Assert user information") {
-			MyAccount.openMyAccountAdmin(baseURL = "http://www.baker.com:8080");
+			MyAccount.openMyAccountAdmin(baseURL = "www.baker.com:8080");
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1@liferay.com",
 				userFirstName = "userIDP2",
 				userJobTitle = "",
@@ -3911,26 +2824,29 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-35866. SP initiated SSO with screen name identifier."
-	@priority = 4
+	@priority = "4"
 	test SPInitiatedSSOWithScreenNameIdentifier {
 		property test.name.skip.portal.instance = "SAML#SPInitiatedSSOWithScreenNameIdentifier";
 
-		task ("Configure samlidp as IdP and samlsp as SP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+		task ("Configura samlidp as IdP and samlsp as SP") {
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
 				nameIdentifierAttributeName = "screenName",
 				nameIdentifierFormat = "Unspecified",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
-		task ("Add category levels and log out") {
-			ServerAdministration.openServerAdmin();
+		task ("Add categoty levels and log out") {
+			ApplicationsMenu.gotoPortlet(
+				category = "System",
+				panel = "Control Panel",
+				portlet = "Server Administration");
 
 			ServerAdministration.addCategoryLogLevels(
-				categoryLevel = "DEBUG",
-				categoryName = "com.liferay.saml.opensaml.integration");
+				categoryName = "com.liferay.saml.opensaml.integration",
+				categoryPriority = "DEBUG");
 
 			User.logoutPG();
 
@@ -3950,16 +2866,15 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-50747. Validate vulnerabilities XML attacks."
-	@priority = 5
+	@priority = "5"
 	test ValidateVulnerabilitiesXMLAttacks {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#ValidateVulnerabilitiesXMLAttacks";
 
-		task ("Configure samlidp as IdP and samlsp as SP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+		task ("Configura samlidp as IdP and samlsp as SP") {
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -3977,9 +2892,9 @@ definition {
 		}
 
 		task ("Add WC CP with malicious URL") {
-			WebContentNavigator.openWebContentAdmin(
-				baseURL = "http://www.able.com:9080",
-				siteURLKey = "guest");
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				portlet = "Web Content");
 
 			WebContentNavigator.gotoAddCP();
 
@@ -3989,7 +2904,7 @@ definition {
 					${adminEditURL}/&_15_content=%3C!DOCTYPE%20lolz%20%5B%0A%3C!ENTITY%20lol%20%22lol%22%3E%0A%3C!ENTITY%20lol2%20%22%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%22%3E%0A%3C!ENTITY%20lol3%20%22%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%22%3E%0A%3C!ENTITY%20lol4%20%22%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%22%3E%0A%3C!ENTITY%20lol5%20%22%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%22%3E%0A%3C!ENTITY%20lol6%20%22%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%22%3E%0A%3C!ENTITY%20lol7%20%22%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%22%3E%0A%3C!ENTITY%20lol8%20%22%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%22%3E%0A%3C!ENTITY%20lol9%20%22%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%22%3E%0A%5D%3E%0A%3Clolz%3E%26lol9%3B%3C%2Flolz%3E
 				''';
 
-			Navigator.openSpecificURL(url = ${maliciousURL});
+			Navigator.openSpecificURL(url = "${maliciousURL}");
 
 			WebContent.addCP(
 				webContentContent = "Web Content Content",
@@ -4003,13 +2918,15 @@ definition {
 
 			User.viewLoggedInPG();
 
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+			ProductMenu.gotoPortlet(
+				category = "Content &amp; Data",
+				portlet = "Web Content");
 
 			WebContentNavigator.gotoAddCP();
 
 			var adminEditURL = Navigator.getCurrentURL();
 
-			Navigator.openSpecificURL(url = ${maliciousURL});
+			Navigator.openSpecificURL(url = "${maliciousURL}");
 
 			WebContent.addCP(
 				webContentContent = "Web Content Content 2",
@@ -4020,16 +2937,15 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-35866. Sign into portal by executing a IdP initiated SSO login. After a successful login, the IdP will redirect to the SP. If the same users with the same email address are present on both instances, it will authenticate and show the SP. SAML can authenticate across major portal versions, that is, the IdP can be Portal 6.1 EE GA3 and the SP can be Portal 6.2. EE GA1. For testing purposes, it is obvious if the authentication succeeds or fails if the IdP and SP are different portal versions."
-	@priority = 4
+	@priority = "4"
 	test ViewIdPInitiatedSSO {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#ViewIdPInitiatedSSO";
 
 		task ("Configure samlidp as IdP and samlsp as SP at able.com:9080") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -4041,7 +2957,7 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
@@ -4069,15 +2985,15 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-50220. IdP initiated SSO login should work regardless if 'Remember Me' is checked or not."
-	@priority = 4
+	@priority = "4"
 	test ViewIdPInitiatedSSOWithRememberMeChecked {
 		property test.name.skip.portal.instance = "SAML#ViewIdPInitiatedSSOWithRememberMeChecked";
 
 		task ("Configure samlidp as IdP and samlsp as SP at able.com:9080") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
@@ -4089,7 +3005,7 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				rememberMeChecked = "true",
 				spURL = "http://www.able.com:9080",
@@ -4103,7 +3019,6 @@ definition {
 
 			User.viewLoggedInPG();
 		}
-
 		task ("Logout SP and verify SP is logged out") {
 			User.logoutPG(specificURL = "http://www.able.com:9080");
 
@@ -4117,25 +3032,30 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-129934. View IdP single logout with multiple SPs - Using virtual instances."
-	@priority = 4
+	@description = "This is a use case for LPS-129934 - Using virtual instances. View IdP single logout with multiple SPs."
+	@priority = "4"
 	test ViewIdPSingleLogoutWithMultipleSPs {
-		property portal.acceptance = "true";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#ViewIdPSingleLogoutWithMultipleSPs";
 
 		task ("Add CP able.com and baker.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
+			ApplicationsMenu.gotoPortlet(
+				category = "System",
+				panel = "Control Panel",
+				portlet = "Virtual Instances");
 
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.baker.com",
-				portalInstanceId = "www.baker.com",
-				virtualHost = "www.baker.com");
+			PortalInstances.addCP(
+				mailDomain = "www.able.com",
+				virtualHost = "www.able.com",
+				webId = "www.able.com");
+
+			PortalInstances.addCP(
+				mailDomain = "www.baker.com",
+				virtualHost = "www.baker.com",
+				webId = "www.baker.com");
 		}
 
-		task ("Edit user screen name to localhost") {
+		task ("Edit user screen name to localhsot") {
 			MyAccount.openMyAccountAdmin();
 
 			User.editUserInformation(userScreenNameEdit = "localhost");
@@ -4183,17 +3103,17 @@ definition {
 			User.viewLoggedOutPG();
 		}
 
-		task ("Login and configure saml entity Id to samlidp") {
+		task ("login and configure saml entity Id to samlidp") {
 			User.firstLoginUI();
 
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Logout and configure samlsp as SP") {
 			User.logoutPG();
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spAttributes = '''emailAddress
 					firstName
 					lastName
@@ -4208,7 +3128,7 @@ definition {
 			User.logoutPG();
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp2",
+				samlEntityID = "samlsp2",
 				spAttributes = '''emailAddress
 					firstName
 					lastName
@@ -4266,9 +3186,8 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-31886. View single logout and force auth with multiple SPs."
-	@priority = 4
+	@priority = "4"
 	test ViewSingleLogoutAndForceAuthWithMultipleSPs {
-		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSingleLogoutAndForceAuthWithMultipleSPs";
 
 		task ("Login at localhost:9080 and Add 2 CP able.com and baker.com") {
@@ -4279,7 +3198,10 @@ definition {
 				specificURL = "http://localhost:9080",
 				userEmailAddress = "test@liferay.com");
 
-			PortalInstances.openVirtualInstancesAdmin(baseURL = "http://localhost:9080");
+			ApplicationsMenu.gotoPortlet(
+				category = "System",
+				panel = "Control Panel",
+				portlet = "Virtual Instances");
 
 			PortalInstances.addCP(
 				mailDomain = "www.able.com",
@@ -4293,6 +3215,17 @@ definition {
 		}
 
 		task ("Login at able.com:9080, edit user email address and logout") {
+			User.firstLoginUI(
+				password = "test",
+				specificURL = "http://www.able.com:9080",
+				userEmailAddress = "test@www.able.com");
+
+			User.openUsersAdmin(baseURL = "http://www.able.com:9080");
+
+			User.editEmailAddressCP(
+				password = "test",
+				userEmailAddress = "test@liferay.com",
+				userScreenName = "test");
 			User.firstLoginUI(
 				password = "test",
 				specificURL = "http://www.able.com:9080",
@@ -4328,19 +3261,19 @@ definition {
 			User.viewLoggedOutPG();
 		}
 
-		task ("Login and configure samlidp as IdP") {
+		task ("Login and vconfigure samlidp as IdP") {
 			User.firstLoginUI();
 
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlsp and samlsp2 as SP at able.com:9080 and baker.com:9080") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp2",
+				samlEntityID = "samlsp2",
 				spURL = "http://www.baker.com:9080");
 		}
 
@@ -4380,6 +3313,9 @@ definition {
 		}
 
 		task ("Verify seconde SP is also logged out") {
+
+			// Verify second SP is also logged out
+
 			Navigator.openSpecificURL(url = "http://www.baker.com:9080");
 
 			User.viewLoggedOutPG();
@@ -4391,13 +3327,16 @@ definition {
 				specificURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 
-			SAML.goToSAMLAdmin(baseURL = "http://www.able.com:9080");
+			ApplicationsMenu.gotoPortlet(
+				category = "Security",
+				panel = "Control Panel",
+				portlet = "SAML Admin");
 
 			SAMLNavigation.gotoIdentityProviderConnections();
 
 			SAMLPortlet.configureIdentityProviderConnection(
 				forceAuthn = "enable",
-				samlEntityId = "samlidp");
+				samlEntityID = "samlidp");
 		}
 
 		task ("Open baker.com:9080 and configure IdP connection") {
@@ -4405,13 +3344,16 @@ definition {
 
 			Navigator.gotoLoginPage();
 
-			SAML.goToSAMLAdmin(baseURL = "http://www.baker.com:9080");
+			ApplicationsMenu.gotoPortlet(
+				category = "Security",
+				panel = "Control Panel",
+				portlet = "SAML Admin");
 
 			SAMLNavigation.gotoIdentityProviderConnections();
 
 			SAMLPortlet.configureIdentityProviderConnection(
 				forceAuthn = "enable",
-				samlEntityId = "samlidp");
+				samlEntityID = "samlidp");
 		}
 
 		task ("Logout and wait for SLO") {
@@ -4441,24 +3383,27 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-49666. SAML Single Logout should support HTTP-POST binding."
-	@priority = 4
+	@priority = "4"
 	test ViewSingleLogoutHTTPPostBindingInConsole {
 		property test.name.skip.portal.instance = "SAML#ViewSingleLogoutHTTPPostBindingInConsole";
 
 		task ("Configure samlidp as IdP and samlsp as SP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080");
 		}
 
 		task ("Add category log levels") {
-			ServerAdministration.openServerAdmin();
+			ApplicationsMenu.gotoPortlet(
+				category = "System",
+				panel = "Control Panel",
+				portlet = "Server Administration");
 
 			ServerAdministration.addCategoryLogLevels(
-				categoryLevel = "DEBUG",
-				categoryName = "com.liferay.saml.opensaml.integration");
+				categoryName = "com.liferay.saml.opensaml.integration",
+				categoryPriority = "DEBUG");
 		}
 
 		task ("Logout and execute IdP initiated SSO") {
@@ -4469,14 +3414,14 @@ definition {
 			var portalURL = PropsUtil.get("portal.url");
 
 			SAML.executeIdPInitiatedSSO(
-				idpInitiatedSsourl = "${portalURL}/c/portal/saml/sso?entityId=samlsp&RelayState=http://www.able.com:9080",
+				idpInitiatedSSOURL = "${portalURL}/c/portal/saml/sso?entityId=samlsp&amp;RelayState=http://www.able.com:9080",
 				password = "test",
 				rememberMeChecked = "true",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
 
-		task ("Logout and assert urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST message present on console") {
+		task ("logout and assert urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST message present on console") {
 			User.logoutPG(specificURL = "http://www.able.com:9080");
 
 			User.viewLoggedOutPG();
@@ -4485,18 +3430,17 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-50687. Sign into portal by executing a SP initiated SSO login. This is done by clicking on the 'Sign In' link in the top menu on the SP. After the SP is logged in, and if both instances has the same user and email address, the IdP will also be logged in."
-	@priority = 4
+	@description = "This is a use case for LPS-50687. Sign into portal by executing a SP initiated SSO login. This is done by clicking on the 'Sign In' link in the dockbar on the SP. After the SP is logged in, and if both instances has the same user and email address, the IdP will also be logged in."
+	@priority = "4"
 	test ViewSPInitiatedSSO {
-		property app.server.types = "jboss,tcserver,tomcat,wildfly";
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSO";
 
 		task ("Configure samlidp as IdP and samlsp as SP") {
-			SAML.configureLiferaySAMLAsIdP(samlEntityId = "samlidp");
+			SAML.configureLiferaySAMLAsIdP(samlEntityID = "samlidp");
 
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.able.com:9080",
 				userEmailAddress = "test@liferay.com");
 		}
@@ -4505,6 +3449,8 @@ definition {
 			User.logoutPG();
 
 			User.viewLoggedOutPG();
+
+			// Initiate Single Sign-On via SP
 
 			SAML.executeSPInitiatedSSO(
 				password = "test",
@@ -4534,15 +3480,22 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-88089. View SP initiated SSO with multiple IdPs and assert render login portlet without IdPs matched."
-	@priority = 4
+	@priority = "4"
 	test ViewSPInitiatedSSOWithMultipleIdPsAndAssertRenderLoginPortletWithoutIdpsMatched {
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithMultipleIdPsAndAssertRenderLoginPortletWithoutIdpsMatched";
 
 		task ("Add CP able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
+			ApplicationsMenu.gotoPortlet(
+				category = "System",
+				panel = "Control Panel",
+				portlet = "Virtual Instances");
+
+			PortalInstances.addCP(
+				mailDomain = "www.able.com",
+				virtualHost = "www.able.com",
+				webId = "www.able.com");
+
+			PortalInstances.viewCP(virtualHost = "www.able.com");
 		}
 
 		task ("Login at able.com and edit email information") {
@@ -4559,7 +3512,7 @@ definition {
 				userScreenName = "test");
 		}
 
-		task ("Logout from able.com:8080 and take screenshot") {
+		task ("logout from able.com:8080 and take screenshot") {
 			User.logoutPG(specificURL = "http://www.able.com:8080");
 
 			takeScreenshot();
@@ -4580,7 +3533,7 @@ definition {
 			User.viewLoggedOutPG();
 		}
 
-		task ("Logout from localhost:8080") {
+		task ("Logut from localhost:8080") {
 			User.logoutPG(specificURL = "http://localhost:8080");
 
 			User.viewLoggedOutPG();
@@ -4589,18 +3542,18 @@ definition {
 		task ("Configure samlidp as IdP at localhost:8080") {
 			SAML.configureLiferaySAMLAsIdP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp");
+				samlEntityID = "samlidp");
 		}
 
 		task ("Configure samlidp2 as IdP at able.com:8080") {
 			SAML.configureLiferaySAMLAsIdP(
 				idpURL = "http://www.able.com:8080",
-				samlEntityId = "samlidp2");
+				samlEntityID = "samlidp2");
 		}
 
 		task ("Configure samlsp as SP at baker.com:9080") {
 			SAML.configureLiferaySAMLAsSP(
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spURL = "http://www.baker.com:9080");
 		}
 
@@ -4610,9 +3563,9 @@ definition {
 			User.viewLoggedOutPG();
 
 			SAML.connectSPAndIdP(
-				idpEntityId = "samlidp2",
+				idpEntityID = "samlidp2",
 				idpURL = "http://www.able.com:8080",
-				spEntityId = "samlsp",
+				spEntityID = "samlsp",
 				spURL = "http://www.baker.com:9080");
 		}
 
@@ -4621,12 +3574,17 @@ definition {
 
 			User.viewLoggedOutPG();
 
+			// Initiate Single Sign-On via SP with first IdP
+
 			SAML.executeSPInitiatedSSO(
 				idpName = "samlidp",
 				samlMultiIdPs = "true",
 				spURL = "http://www.baker.com:9080");
 
 			User.viewLoggedInPG();
+
+			// Verify first IdP is logged in
+
 		}
 
 		task ("Open URL and logout from baker.com:9080") {
@@ -4634,18 +3592,26 @@ definition {
 
 			User.viewLoggedInPG();
 
+			// Initiate Single Logout via SP with first IdP
+
 			User.logoutPG(specificURL = "http://www.baker.com:9080");
 
 			User.viewLoggedOutPG();
 		}
 
 		task ("Open URL and assert logged out") {
+
+			// Verify first IdP is logged out
+
 			Navigator.openURL();
 
 			User.viewLoggedOutPG();
 		}
 
 		task ("Execute SP initiated SSO baker.com:9080") {
+
+			// Initiate Single Sign-On via SP with second IdP
+
 			SAML.executeSPInitiatedSSO(
 				idpName = "samlidp2",
 				samlMultiIdPs = "true",
@@ -4681,16 +3647,19 @@ definition {
 				userEmailAddress = "test@liferay.com");
 		}
 
-		task ("Delete SAML connection samlidp and samlidp2") {
-			SAML.goToSAMLAdmin(baseURL = "http://www.baker.com:9080");
+		task ("Deelete SAML connection samlidp and samlidp2") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Security",
+				panel = "Control Panel",
+				portlet = "SAML Admin");
 
 			SAMLNavigation.gotoIdentityProviderConnections();
 
-			SAMLPortlet.deleteSAMLConnection(samlEntityId = "samlidp");
+			SAMLPortlet.deleteSAMLConnection(samlEntityID = "samlidp");
 
 			SAMLNavigation.gotoIdentityProviderConnections();
 
-			SAMLPortlet.deleteSAMLConnection(samlEntityId = "samlidp2");
+			SAMLPortlet.deleteSAMLConnection(samlEntityID = "samlidp2");
 		}
 
 		task ("Assert You must configure at least one identity provider connection for SAML to function. message at SAML admin") {
@@ -4711,7 +3680,10 @@ definition {
 		}
 
 		task ("Disable allow showing the login portlet") {
-			SAML.goToSAMLAdmin(baseURL = "http://www.baker.com:9080");
+			ApplicationsMenu.gotoPortlet(
+				category = "Security",
+				panel = "Control Panel",
+				portlet = "SAML Admin");
 
 			SAMLNavigation.gotoServiceProvider();
 
@@ -4729,301 +3701,36 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-180198 TC-1 and TC-4: The user could be assigned to an existing user group at Portal, during login using Okta as SAML IDP (AC-1), and the missing user group is not created at Portal."
-	@priority = 5
-	test ViewSPInitiatedSSOWithOktaAndUserGroups {
-		property app.server.types = "jboss,tcserver,tomcat,wildfly";
-		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}feature.flag.LPS-180198=true";
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.release = "false";
-		property portal.ssl.enabled = "true";
-		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithOktaAndUserGroups";
-
-		var userPassword = PropsUtil.get("openid.provider.okta.test.account.password");
-
-		task ("Given: Setup SAML connection with Okta as Identity Probider") {
-			JSONUserGroup.addUserGroup(
-				userGroupDescription = "Okta User Group Description",
-				userGroupName = "Okta-UserGroup 1");
-
-			SAML.setupSP(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "http://www.okta.com/exk4vnzhchhTz7tAc697",
-				idpMetadataURLRaw = "https://trial-1460961.okta.com/app/exk4vnzhchhTz7tAc697/sso/saml/metadata",
-				idpUserMembershipsAttributeMapping = "userGroups",
-				idpUserMembershipsAttributeMappingText = "userGroup",
-				nameIdentifierFormat = "Email Address",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userResolution = "dynamic");
-
-			SAML.enableSPRoles(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-		}
-
-		task ("When: User logs in with multiline User Group value in SAML assertion") {
-			SAML.accountSignInOkta(
-				specificURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userPassword = ${userPassword});
-		}
-
-		task ("Then: User logged in succesfully and assigned to the existing user group only with matching name at Portal") {
-			WaitForConsoleTextPresent(value1 = "Ignored unknown user group: Okta-UserGroup 2");
-
-			User.viewLoggedInPG();
-
-			MyAccount.openMyAccountAdmin();
-
-			UserNavigator.gotoMemberships();
-
-			AssertTextPresent(value1 = "Okta-UserGroup 1");
-
-			AssertTextNotPresent(value1 = "Okta-UserGroup 2");
-		}
-	}
-
-	@description = "This is a use case for LPS-180198 TC-5: Verify the user group could be assigned even if it's not present at first time login from Okta."
-	@priority = 5
-	test ViewSPInitiatedSSOWithOktaUserGroupCanBeAssignedLater {
-		property app.server.types = "jboss,tcserver,tomcat,wildfly";
-		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}feature.flag.LPS-180198=true";
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.release = "false";
-		property portal.ssl.enabled = "true";
-		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithOktaUserGroupCanBeAssignedLater";
-
-		var userPassword = PropsUtil.get("openid.provider.okta.test.account.password");
-
-		task ("Given: Setup SAML connection with Okta as Identity Probider") {
-			SAML.setupSP(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "http://www.okta.com/exk4vnzhchhTz7tAc697",
-				idpMetadataURLRaw = "https://trial-1460961.okta.com/app/exk4vnzhchhTz7tAc697/sso/saml/metadata",
-				idpUserMembershipsAttributeMapping = "userGroups",
-				idpUserMembershipsAttributeMappingText = "userGroup",
-				nameIdentifierFormat = "Email Address",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userResolution = "dynamic");
-
-			SAML.enableSPRoles(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-		}
-
-		task ("When: User logs in with multiline User Group value in SAML assertion, but the user groups are not exists at Portal") {
-			SAML.accountSignInOkta(
-				specificURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userPassword = ${userPassword});
-
-			WaitForConsoleTextPresent(value1 = "Ignored unknown user group: Okta-UserGroup 2");
-
-			User.viewLoggedInPG();
-
-			MyAccount.openMyAccountAdmin();
-
-			UserNavigator.gotoMemberships();
-
-			AssertTextNotPresent(value1 = "Okta-UserGroup 1");
-
-			AssertTextNotPresent(value1 = "Okta-UserGroup 2");
-
-			User.logoutPG();
-		}
-
-		task ("Then: We can add the user group to Portal later, and the same user will be assigned to it during his second login") {
-			JSONUserGroup.addUserGroup(
-				userGroupDescription = "Okta User Group Description",
-				userGroupName = "Okta-UserGroup 1");
-
-			Navigator.openURL();
-
-			AssertClick(
-				locator1 = "UserBar#USER_SIGN_IN",
-				value1 = "Sign In");
-
-			User.viewLoggedInPG();
-
-			MyAccount.openMyAccountAdmin();
-
-			UserNavigator.gotoMemberships();
-
-			AssertTextPresent(value1 = "Okta-UserGroup 1");
-
-			AssertTextNotPresent(value1 = "Okta-UserGroup 2");
-		}
-	}
-
-	@description = "This is a use case for LPS-180198 TC-3: The user's non-existing user group at Portal is not created when logging in using Okta as SAML IDP."
-	@priority = 5
-	test ViewSPInitiatedSSOWithOktaUserGroupsAreNotCreatedDuringLogin {
-		property app.server.types = "jboss,tcserver,tomcat,wildfly";
-		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}feature.flag.LPS-180198=true";
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.release = "false";
-		property portal.ssl.enabled = "true";
-		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithOktaUserGroupsAreNotCreatedDuringLogin";
-
-		var userPassword = PropsUtil.get("openid.provider.okta.test.account.password");
-
-		task ("Given: Setup SAML connection with Okta as Identity Probider") {
-			SAML.setupSP(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "http://www.okta.com/exk4vnzhchhTz7tAc697",
-				idpMetadataURLRaw = "https://trial-1460961.okta.com/app/exk4vnzhchhTz7tAc697/sso/saml/metadata",
-				idpUserMembershipsAttributeMapping = "userGroups",
-				idpUserMembershipsAttributeMappingText = "userGroup",
-				nameIdentifierFormat = "Email Address",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userResolution = "dynamic");
-
-			SAML.enableSPRoles(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-		}
-
-		task ("When: User logs in with multiline User Group value in SAML assertion") {
-			SAML.accountSignInOkta(
-				specificURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userPassword = ${userPassword});
-		}
-
-		task ("Then: User logged in succesfully but not assigned to any user group as they are not exists at Portal") {
-			WaitForConsoleTextPresent(value1 = "Ignored unknown user group: Okta-UserGroup 1");
-
-			WaitForConsoleTextPresent(value1 = "Ignored unknown user group: Okta-UserGroup 2");
-
-			User.viewLoggedInPG();
-
-			MyAccount.openMyAccountAdmin();
-
-			UserNavigator.gotoMemberships();
-
-			AssertTextNotPresent(value1 = "Okta-UserGroup 1");
-
-			AssertTextNotPresent(value1 = "Okta-UserGroup 2");
-		}
-	}
-
-	@description = "This is a use case for LPS-180198 TC-2: The user could be assigned to multiple existing user groups at the Portal, during login using Okta as SAML IDP."
-	@priority = 5
-	test ViewSPInitiatedSSOWithOktaWithMultipleUserGroups {
-		property app.server.types = "jboss,tcserver,tomcat,wildfly";
-		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}feature.flag.LPS-180198=true";
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.release = "false";
-		property portal.ssl.enabled = "true";
-		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithOktaWithMultipleUserGroups";
-
-		var userPassword = PropsUtil.get("openid.provider.okta.test.account.password");
-
-		task ("Given: Setup SAML connection with Okta as Identity Probider") {
-			JSONUserGroup.addUserGroup(
-				userGroupDescription = "Okta User Group Description",
-				userGroupName = "Okta-UserGroup 1");
-
-			JSONUserGroup.addUserGroup(
-				userGroupDescription = "Okta User Group Description",
-				userGroupName = "Okta-UserGroup 2");
-
-			SAML.setupSP(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "http://www.okta.com/exk4vnzhchhTz7tAc697",
-				idpMetadataURLRaw = "https://trial-1460961.okta.com/app/exk4vnzhchhTz7tAc697/sso/saml/metadata",
-				idpUserMembershipsAttributeMapping = "userGroups",
-				idpUserMembershipsAttributeMappingText = "userGroup",
-				nameIdentifierFormat = "Email Address",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userResolution = "dynamic");
-
-			SAML.enableSPRoles(
-				samlEntityId = "SP1",
-				spURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com");
-		}
-
-		task ("When: User logs in with multiline User Group value in SAML assertion") {
-			SAML.accountSignInOkta(
-				specificURL = "https://localhost:8443",
-				userEmailAddress = "test@liferay.com",
-				userPassword = ${userPassword});
-		}
-
-		task ("Then: User logged in succesfully and assigned to the existing user groups only with matching name at Portal") {
-			AssertConsoleTextNotPresent(value1 = "Ignored unknown user group: Okta-UserGroup 1");
-
-			AssertConsoleTextNotPresent(value1 = "Ignored unknown user group: Okta-UserGroup 2");
-
-			User.viewLoggedInPG();
-
-			MyAccount.openMyAccountAdmin();
-
-			UserNavigator.gotoMemberships();
-
-			AssertTextPresent(value1 = "Okta-UserGroup 1");
-
-			AssertTextPresent(value1 = "Okta-UserGroup 2");
-		}
-	}
-
 	@description = "LPS-123218 TC-5: SP initiated login, using email address for user matching - Using virtual instances."
-	@priority = 4
+	@priority = "4"
 	test ViewSPInitiatedSSOWithSAMLAttributeEmailAddressUsedForUserMatching {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithSAMLAttributeEmailAddressUsedForUserMatching";
 
 		var identityProviderEntityId = "samlidp";
 		var serviceProviderEntityId = "samlsp";
 
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance and setup SAML link between IdP and SP
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IdP and SP") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
+				samlEntityID = "${identityProviderEntityId}",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5031,17 +3738,17 @@ definition {
 		task ("Add IdP configurations to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "emailAddress,UUID,firstName,lastName,screenName",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 0,
+				userMatchingAttributeIndex = "0",
 				userResolution = "attribute");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5056,10 +3763,12 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 		}
+
+		// Test starts here
 
 		task ("Add and sync new user") {
 			SAML.addAndSyncNewUser(
@@ -5067,11 +3776,11 @@ definition {
 				creatorPassword = "test",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Logout and assert message Resolving user with user field expression: emailAddress. On console") {
@@ -5099,7 +3808,7 @@ definition {
 
 			MyAccount.openMyAccountAdmin();
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1@liferay.com",
 				userFirstName = "user_changed",
 				userLastName = "1_changed",
@@ -5108,34 +3817,35 @@ definition {
 	}
 
 	@description = "LPS-123218 TC-4: SP initiated login, using screenName for user matching - Using virtual instances."
-	@priority = 4
+	@priority = "4"
 	test ViewSPInitiatedSSOWithSAMLAttributeScreenNameUsedForUserMatching {
 		property app.server.bundles.size = "0";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithSAMLAttributeScreenNameUsedForUserMatching";
 
 		var identityProviderEntityId = "samlidp";
 		var serviceProviderEntityId = "samlsp";
 
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual intance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			User.logoutPG();
+			// Add new virtual instance and setup SAML link between IdP and SP
 
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IdP and SP") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
+				samlEntityID = "${identityProviderEntityId}",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5143,17 +3853,17 @@ definition {
 		task ("Add IdP configurations to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,UUID,emailAddress,firstName,lastName",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 0,
+				userMatchingAttributeIndex = "0",
 				userResolution = "attribute");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5168,10 +3878,12 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 		}
+
+		// Test starts here
 
 		task ("Add and sync new user") {
 			SAML.addAndSyncNewUser(
@@ -5179,11 +3891,11 @@ definition {
 				creatorPassword = "test",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Logout and assert Resolving user with user field expression: screenName. Message present on console") {
@@ -5203,7 +3915,7 @@ definition {
 				userLastName = "1_changed");
 		}
 
-		task ("Execute SP initiated SSO and confirm user information") {
+		task ("Execute SP intiated SSO and confirm user information") {
 			SAML.executeSPInitiatedSSO(
 				password = "test",
 				spURL = "http://www.able.com:8080",
@@ -5211,7 +3923,7 @@ definition {
 
 			MyAccount.openMyAccountAdmin();
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1changed@liferay.com",
 				userFirstName = "user_changed",
 				userLastName = "1_changed",
@@ -5219,48 +3931,42 @@ definition {
 		}
 	}
 
-	@description = "LPS-123218 TC-7: SP initiated login, using screenName for user matching, multiple IDPs - Using virtual instances. Blocked by LPS-137141."
-	@priority = 4
+	@description = "LPS-123218 TC-7: SP initiated login, using screenName for user matching, multiple IDPs - Using virtual instances."
+	@priority = "4"
 	test ViewSPInitiatedSSOWithSAMLAttributeScreenNameUsedForUserMatchingMultipleIdP {
 		property app.server.bundles.size = "0";
-		property portal.release = "quarantine";
-		property portal.upstream = "quarantine";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithSAMLAttributeScreenNameUsedForUserMatchingMultipleIdP";
 
 		var identityProviderEntityId1 = "samlidp1";
 		var identityProviderEntityId2 = "samlidp2";
 		var serviceProviderEntityId = "samlsp";
 
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instances able.com and baker.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.baker.com",
-				portalInstanceId = "www.baker.com",
-				virtualHost = "www.baker.com");
+			// Add new virtual instances and setup SAML link between 2 IdP and 1 SP
 
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com,www.baker.com");
 		}
 
 		task ("Setup IdPs and SP") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId1},
+				samlEntityID = "${identityProviderEntityId1}",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupIDP(
 				idpURL = "http://www.baker.com:8080",
-				samlEntityId = ${identityProviderEntityId2},
+				samlEntityID = "${identityProviderEntityId2}",
 				userEmailAddress = "test@www.baker.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5268,30 +3974,30 @@ definition {
 		task ("Add samlidp1 configurations to SP") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,UUID,emailAddress,firstName,lastName",
-				idpEntityId = ${identityProviderEntityId1},
+				idpEntityID = "${identityProviderEntityId1}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 0,
+				userMatchingAttributeIndex = "0",
 				userResolution = "attribute");
 		}
 
 		task ("Add samlidp2 configurations to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,UUID,emailAddress,firstName,lastName",
-				idpEntityId = ${identityProviderEntityId2},
+				idpEntityID = "${identityProviderEntityId2}",
 				idpKeepAliveURL = "http://www.baker.com:8080/c/portal/saml/keep_alive",
 				idpURL = "http://www.baker.com:8080",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 0,
+				userMatchingAttributeIndex = "0",
 				userResolution = "attribute");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5306,7 +4012,7 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 
@@ -5319,25 +4025,27 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.baker.com");
 		}
 
+		// Test starts here
+
 		task ("Add and sync new user at localhost:8080") {
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
-				idpName = ${identityProviderEntityId1},
+				idpName = "${identityProviderEntityId1}",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user_able",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user_shared",
 				portalInstanceName = "localhost",
 				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Logout and assert Resolving user with user field expression: screenName. Message present on console") {
@@ -5352,48 +4060,48 @@ definition {
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@www.baker.com",
 				creatorPassword = "test",
-				idpName = ${identityProviderEntityId2},
+				idpName = "${identityProviderEntityId2}",
 				newUserEmailAddress = "user2@www.baker.com",
 				newUserFirstName = "user_baker",
-				newUserLastName = 2,
+				newUserLastName = "2",
 				newUserPortalURL = "http://www.baker.com:8080",
 				newUserScreenName = "user_shared",
 				portalInstanceName = "www.baker.com",
 				samlMultiIdPs = "true",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 	}
 
 	@description = "LPS-123218 TC-1: SP initiated login, using UUID for user matching - Using virtual instances."
-	@priority = 5
+	@priority = "5"
 	test ViewSPInitiatedSSOWithSAMLAttributeUUIDUsedForUserMatching {
 		property app.server.bundles.size = "0";
-		property portal.acceptance = "true";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithSAMLAttributeUUIDUsedForUserMatching";
 
 		var identityProviderEntityId = "samlidp";
 		var serviceProviderEntityId = "samlsp";
 
-		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
 
-			User.logoutPG();
+		task ("Add virtal instance able.com") {
 
-			User.viewLoggedOutPG();
+			// Add new virtual instance and setup SAML link between IdP and SP
+
+			SAML.addVirtualInstances(virtualHosts = "www.able.com");
 		}
 
 		task ("Setup IdP and SP") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
+				samlEntityID = "${identityProviderEntityId}",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5401,18 +4109,17 @@ definition {
 		task ("Add IdP configurations to SP and enable SP roles") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpAttributeMappingText = "uuid,emailAddress,firstName,lastName,screenName",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 0,
+				userMatchingAttributeIndex = "0",
 				userResolution = "attribute");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId},
+				samlEntityID = "${serviceProviderEntityId}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 		}
@@ -5427,22 +4134,25 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId},
+				spEntityID = "${serviceProviderEntityId}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 		}
 
 		task ("Add and sync new user") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Logout and assert Resolving user with user field expression: uuid. Message present on console") {
@@ -5470,7 +4180,7 @@ definition {
 
 			MyAccount.openMyAccountAdmin();
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1changed@liferay.com",
 				userFirstName = "user_changed",
 				userLastName = "1_changed",
@@ -5479,47 +4189,42 @@ definition {
 	}
 
 	@description = "LPS-123218 TC-8: SP initiated login, using UUID for user matching, multiple SPs - Using virtual instances."
-	@priority = 4
+	@priority = "4"
 	test ViewSPInitiatedSSOWithSAMLAttributeUUIDUsedForUserMatchingMultipleSP {
 		property app.server.bundles.size = "0";
-		property portal.acceptance = "true";
+		property portal.upstream = "true";
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithSAMLAttributeUUIDUsedForUserMatchingMultipleSP";
 
 		var identityProviderEntityId = "samlidp";
 		var serviceProviderEntityId1 = "samlsp1";
 		var serviceProviderEntityId2 = "samlsp2";
 
+		task ("Enable SAML debug logs") {
+			SAML.enableSAMLDebugLogs();
+		}
+
 		task ("Add virtual instances able.com and baker.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
 
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.baker.com",
-				portalInstanceId = "www.baker.com",
-				virtualHost = "www.baker.com");
+			// Add new virtual instances and setup SAML link between 1 IdP and 2 SP
 
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
+			SAML.addVirtualInstances(virtualHosts = "www.able.com,www.baker.com");
 		}
 
 		task ("Setup IdP and SPs") {
 			SAML.setupIDP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = ${identityProviderEntityId},
+				samlEntityID = "${identityProviderEntityId}",
 				userEmailAddress = "test@liferay.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId1},
+				samlEntityID = "${serviceProviderEntityId1}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
 			SAML.setupSP(
 				encryptionCertificate = "true",
-				samlEntityId = ${serviceProviderEntityId2},
+				samlEntityID = "${serviceProviderEntityId2}",
 				spURL = "http://www.baker.com:8080",
 				userEmailAddress = "test@www.baker.com");
 		}
@@ -5527,37 +4232,35 @@ definition {
 		task ("Add IdP configurations to SPs") {
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,UUID,emailAddress,firstName,lastName",
-				idpAttributeMappingText = "screenName,uuid,emailAddress,firstName,lastName",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 1,
+				userMatchingAttributeIndex = "1",
 				userResolution = "attribute");
 
 			SAML.addIDPConfigurationsToServiceProvider(
 				idpAttributeMapping = "screenName,UUID,emailAddress,firstName,lastName",
-				idpAttributeMappingText = "screenName,uuid,emailAddress,firstName,lastName",
-				idpEntityId = ${identityProviderEntityId},
+				idpEntityID = "${identityProviderEntityId}",
 				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
 				idpURL = "http://localhost:8080",
 				nameIdentifierFormat = "Email Address",
 				spURL = "http://www.baker.com:8080",
 				userEmailAddress = "test@www.baker.com",
-				userMatchingAttributeIndex = 1,
+				userMatchingAttributeIndex = "1",
 				userResolution = "attribute");
 		}
 
 		task ("Enable SPs roles") {
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId1},
+				samlEntityID = "${serviceProviderEntityId1}",
 				spURL = "http://www.able.com:8080",
 				userEmailAddress = "test@www.able.com");
 
 			SAML.enableSPRoles(
-				samlEntityId = ${serviceProviderEntityId2},
+				samlEntityID = "${serviceProviderEntityId2}",
 				spURL = "http://www.baker.com:8080",
 				userEmailAddress = "test@www.baker.com");
 		}
@@ -5572,7 +4275,7 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId1},
+				spEntityID = "${serviceProviderEntityId1}",
 				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.able.com:8080");
 
@@ -5585,22 +4288,25 @@ definition {
 					lastName
 					screenName
 					uuid''',
-				spEntityId = ${serviceProviderEntityId2},
+				spEntityID = "${serviceProviderEntityId2}",
 				spKeepAliveURL = "http://www.baker.com:8080/c/portal/saml/keep_alive",
 				spURL = "http://www.baker.com:8080");
 		}
 
 		task ("Add and sync new user") {
+
+			// Test starts here
+
 			SAML.addAndSyncNewUser(
 				creatorEmailAddress = "test@liferay.com",
 				creatorPassword = "test",
 				newUserEmailAddress = "user1@liferay.com",
 				newUserFirstName = "user",
-				newUserLastName = 1,
+				newUserLastName = "1",
 				newUserPortalURL = "http://localhost:8080",
 				newUserScreenName = "user1",
 				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
+				spURL = "www.able.com:8080");
 		}
 
 		task ("Logout and view Resolving user with user field expression: uuid. Message on console") {
@@ -5611,7 +4317,7 @@ definition {
 			AssertConsoleTextPresent(value1 = "Resolving user with user field expression: uuid");
 		}
 
-		task ("Execute SP initiated SSO baker.com:8080 and logout") {
+		task ("Execute SP initiatied SSO baker.com:8080 and logout") {
 			SAML.executeSPInitiatedSSO(
 				password = "test",
 				spURL = "http://www.baker.com:8080",
@@ -5631,7 +4337,9 @@ definition {
 				userLastName = "1_changed");
 		}
 
-		task ("Execute SP initiated SSO able.com:8080 and confirm user information") {
+		// Log in to able.com with updated user and verify attributes
+
+		task ("Execute SP initiatied SSO able.com:8080 and confirm user information") {
 			SAML.executeSPInitiatedSSO(
 				password = "test",
 				spURL = "http://www.able.com:8080",
@@ -5639,7 +4347,7 @@ definition {
 
 			MyAccount.openMyAccountAdmin();
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1_changed@liferay.com",
 				userFirstName = "user_changed",
 				userLastName = "1_changed",
@@ -5653,6 +4361,9 @@ definition {
 		}
 
 		task ("Execute SP initiated SSO baker.com:8080 and confirm user information") {
+
+			// Log in to baker.com with updated user and verify attributes
+
 			SAML.executeSPInitiatedSSO(
 				password = "test",
 				spURL = "http://www.baker.com:8080",
@@ -5660,7 +4371,7 @@ definition {
 
 			MyAccount.openMyAccountAdmin();
 
-			User.viewUserInformation(
+			User.viewUserInfomation(
 				userEmailAddress = "user1_changed@liferay.com",
 				userFirstName = "user_changed",
 				userLastName = "1_changed",
@@ -5668,26 +4379,39 @@ definition {
 		}
 	}
 
-	@description = "LPS-125272 User profile match up when NameID is transient, and screenName is in SAML Attributes list."
-	@priority = 4
+	@description = "LPS-125272 User profile matchup when NameID is transient, and screenName is in SAML Attributes list."
+	@priority = "4"
 	test ViewSPInitiatedSSOWithTransientNameId {
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithTransientNameId";
 
+		// Add new virtual instance to be the SP site
+
 		task ("Add CP able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
+			ApplicationsMenu.gotoPortlet(
+				category = "System",
+				panel = "Control Panel",
+				portlet = "Virtual Instances");
+
+			PortalInstances.addCP(
+				mailDomain = "www.able.com",
+				virtualHost = "www.able.com",
+				webId = "www.able.com");
+
+			PortalInstances.viewCP(virtualHost = "www.able.com");
 		}
 
 		task ("Configure samlidp as IdP and samlsp as SP") {
 			User.logoutPG();
 
+			// Setup localhost as IDP role
+
 			SAML.configureLiferaySAMLAsIdP(
 				idpURL = "http://localhost:8080",
-				samlEntityId = "samlidp");
+				samlEntityID = "samlidp");
 
 			User.logoutPG();
+
+			// Create IDP - SP link, with transient name id and attribute maps containing screenName and emailAddress
 
 			SAML.configureLiferaySAMLAsSP(
 				idpAttributes = '''emailAddress=emailAddress
@@ -5697,7 +4421,7 @@ screenName=screenName
 uuid=uuid''',
 				nameIdentifierAttributeName = "static:CustomNameIDValue",
 				nameIdentifierFormat = "Transient",
-				samlEntityId = "samlsp",
+				samlEntityID = "samlsp",
 				spAttributes = '''emailAddress
 firstName
 lastName
@@ -5712,6 +4436,8 @@ uuid''',
 
 			User.viewLoggedOutPG();
 
+			// Initiate Single Sign-On via SP
+
 			SAML.executeSPInitiatedSSO(
 				password = "test",
 				spURL = "http://www.able.com:8080",
@@ -5721,108 +4447,16 @@ uuid''',
 		}
 
 		task ("Assert duplicate user not present") {
-			User.openUsersAdmin(baseURL = "http://www.able.com:8080");
+
+			// Assert duplicate user doesn't exist
+
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
 
 			SAML.viewNoDuplicateUser(user = "Test Test");
-
 			AssertElementNotPresent(locator1 = "xpath=(//tr[contains(.,'${user}')][2]/td[2]/a)");
-		}
-	}
-
-	@description = "This is a use case for LPS-147809. TC1: SP initiated SSO with uploaded metadata XML file."
-	@priority = 4
-	test ViewSPInitiatedSSOWithUploadMetadataXML {
-		property app.server.bundles.size = "0";
-		property keystore.enabled = "true";
-		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithUploadMetadataXML";
-
-		task ("Add SAML configuration files") {
-			OSGiConfig.copyOSGiConfigFile(
-				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
-				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlKeyStoreManagerConfiguration.config");
-
-			OSGiConfig.copyOSGiConfigFile(
-				osgiConfigFileBaseDir = "test/functional/com/liferay/portalweb/tests/coreinfrastructureee/security/dependencies",
-				osgiConfigFileName = "com.liferay.saml.runtime.configuration.SamlProviderConfiguration.config");
-		}
-
-		task ("Add virtual instance able.com") {
-			HeadlessPortalInstanceAPI.addPortalInstance(
-				domain = "www.able.com",
-				portalInstanceId = "www.able.com",
-				virtualHost = "www.able.com");
-
-			User.logoutPG();
-
-			User.viewLoggedOutPG();
-		}
-
-		task ("Setup IdP and SP") {
-			SAML.setupIDP(
-				idpURL = "http://localhost:8080",
-				keystoreEnabled = "true",
-				samlEntityId = "samlidp",
-				userEmailAddress = "test@liferay.com");
-
-			SAML.setupSP(
-				keystoreEnabled = "true",
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-		}
-
-		task ("Add IdP configurations to service provider") {
-			SAML.addIDPConfigurationsToServiceProvider(
-				idpAttributeMapping = "UUID,emailAddress,firstName,lastName,screenName",
-				idpEntityId = "samlidp",
-				idpKeepAliveURL = "http://localhost:8080/c/portal/saml/keep_alive",
-				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Email Address",
-				spURL = "http://www.able.com:8080",
-				uploadMetadataXML = "identity-provider-metadata.xml",
-				userEmailAddress = "test@www.able.com",
-				userMatchingAttributeIndex = 4,
-				userResolution = "attribute");
-		}
-
-		task ("Enable SP roles and add SP configurations to IdP") {
-			SAML.enableSPRoles(
-				samlEntityId = "samlsp",
-				spURL = "http://www.able.com:8080",
-				userEmailAddress = "test@www.able.com");
-
-			SAML.addSPConfigurationsToIdentityProvider(
-				idpURL = "http://localhost:8080",
-				nameIdentifierFormat = "Email Address",
-				spAttributes = '''emailAddress
-				firstName
-				lastName
-				screenName
-				uuid''',
-				spEntityId = "samlsp",
-				spKeepAliveURL = "http://www.able.com:8080/c/portal/saml/keep_alive",
-				spURL = "http://www.able.com:8080",
-				uploadMetadataXML = "service-provider-metadata.xml",
-				userEmailAddress = "test@liferay.com");
-		}
-
-		task ("Add and sync new user") {
-			SAML.addAndSyncNewUser(
-				creatorEmailAddress = "test@liferay.com",
-				creatorPassword = "test",
-				newUserEmailAddress = "tester@localhost.com",
-				newUserFirstName = "first",
-				newUserLastName = "tester",
-				newUserPortalURL = "http://localhost:8080",
-				newUserScreenName = "tester",
-				portalInstanceName = "localhost",
-				spURL = "http://www.able.com:8080");
-		}
-
-		task ("Open portal and assert logged in") {
-			Navigator.openURL();
-
-			User.viewLoggedInPG();
 		}
 	}
 

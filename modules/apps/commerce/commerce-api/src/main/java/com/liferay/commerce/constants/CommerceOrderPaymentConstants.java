@@ -35,15 +35,9 @@ public class CommerceOrderPaymentConstants {
 
 	public static final int STATUS_PENDING = WorkflowConstants.STATUS_PENDING;
 
-	public static final int STATUS_REFUNDED = 17;
-
 	public static final int[] STATUSES = {
 		STATUS_AUTHORIZED, STATUS_CANCELLED, STATUS_COMPLETED, STATUS_FAILED,
 		STATUS_PENDING
-	};
-
-	public static final int[] STATUSES_RETRY_PAYMENT = {
-		STATUS_AUTHORIZED, STATUS_CANCELLED
 	};
 
 	public static String getOrderPaymentLabelStyle(int orderPaymentStatus) {

@@ -14,22 +14,18 @@
 
 package com.liferay.headless.commerce.admin.account.internal.dto.v1_0.converter;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.Account;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.webserver.WebServerServletToken;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
-
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,11 +34,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "dto.class.name=com.liferay.account.model.AccountEntry",
-	service = DTOConverter.class
+	enabled = false,
+	property = "dto.class.name=com.liferay.commerce.account.model.CommerceAccount",
+	service = {AccountDTOConverter.class, DTOConverter.class}
 )
 public class AccountDTOConverter
-	implements DTOConverter<AccountEntry, Account> {
+	implements DTOConverter<CommerceAccount, Account> {
 
 	@Override
 	public String getContentType() {
@@ -53,7 +50,7 @@ public class AccountDTOConverter
 	public Account toDTO(DTOConverterContext dtoConverterContext)
 		throws Exception {
 
-		AccountEntry accountEntry;
+		CommerceAccount commerceAccount;
 
 		if ((Long)dtoConverterContext.getId() == -1) {
 			User user = dtoConverterContext.getUser();
@@ -63,37 +60,37 @@ public class AccountDTOConverter
 					PrincipalThreadLocal.getUserId());
 			}
 
-			accountEntry = _accountEntryLocalService.getGuestAccountEntry(
-				user.getCompanyId());
+			commerceAccount =
+				_commerceAccountLocalService.getGuestCommerceAccount(
+					user.getCompanyId());
 		}
 		else {
-			accountEntry = _accountEntryLocalService.getAccountEntry(
+			commerceAccount = _commerceAccountService.getCommerceAccount(
 				(Long)dtoConverterContext.getId());
 		}
 
-		ExpandoBridge expandoBridge = accountEntry.getExpandoBridge();
+		ExpandoBridge expandoBridge = commerceAccount.getExpandoBridge();
 
 		return new Account() {
 			{
-				active = _toCommerceAccountActive(accountEntry.getStatus());
+				active = commerceAccount.isActive();
 				customFields = expandoBridge.getAttributes();
-				dateCreated = accountEntry.getCreateDate();
-				dateModified = accountEntry.getModifiedDate();
+				dateCreated = commerceAccount.getCreateDate();
+				dateModified = commerceAccount.getModifiedDate();
 				defaultBillingAccountAddressId =
-					accountEntry.getDefaultBillingAddressId();
+					commerceAccount.getDefaultBillingAddressId();
 				defaultShippingAccountAddressId =
-					accountEntry.getDefaultShippingAddressId();
-				emailAddresses = new String[] {accountEntry.getEmailAddress()};
-				externalReferenceCode = accountEntry.getExternalReferenceCode();
-				id = accountEntry.getAccountEntryId();
-				logoId = accountEntry.getLogoId();
-				logoURL = _getLogoURL(accountEntry.getLogoId());
-				name = accountEntry.getName();
-				root =
-					accountEntry.getParentAccountEntryId() ==
-						AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT;
-				taxId = accountEntry.getTaxIdNumber();
-				type = _toCommerceAccountType(accountEntry.getType());
+					commerceAccount.getDefaultShippingAddressId();
+				emailAddresses = new String[] {commerceAccount.getEmail()};
+				externalReferenceCode =
+					commerceAccount.getExternalReferenceCode();
+				id = commerceAccount.getCommerceAccountId();
+				logoId = commerceAccount.getLogoId();
+				logoURL = _getLogoURL(commerceAccount.getLogoId());
+				name = commerceAccount.getName();
+				root = commerceAccount.isRoot();
+				taxId = commerceAccount.getTaxId();
+				type = commerceAccount.getType();
 			}
 		};
 	}
@@ -101,47 +98,16 @@ public class AccountDTOConverter
 	private String _getLogoURL(long logoId) {
 		return StringBundler.concat(
 			"/image/organization_logo?img_id=", logoId, "&t=",
-			_webServerServletToken.getToken(logoId));
-	}
-
-	private boolean _toCommerceAccountActive(int accountEntryStatus) {
-		if (accountEntryStatus == WorkflowConstants.STATUS_APPROVED) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private Integer _toCommerceAccountType(String accountEntryType) {
-		if (Objects.equals(
-				accountEntryType,
-				AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS)) {
-
-			return CommerceAccountConstants.ACCOUNT_TYPE_BUSINESS;
-		}
-		else if (Objects.equals(
-					accountEntryType,
-					AccountConstants.ACCOUNT_ENTRY_TYPE_GUEST)) {
-
-			return CommerceAccountConstants.ACCOUNT_TYPE_GUEST;
-		}
-		else if (Objects.equals(
-					accountEntryType,
-					AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON)) {
-
-			return CommerceAccountConstants.ACCOUNT_TYPE_PERSONAL;
-		}
-
-		return CommerceAccountConstants.ACCOUNT_TYPE_GUEST;
+			WebServerServletTokenUtil.getToken(logoId));
 	}
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private CommerceAccountLocalService _commerceAccountLocalService;
+
+	@Reference
+	private CommerceAccountService _commerceAccountService;
 
 	@Reference
 	private UserLocalService _userLocalService;
-
-	@Reference
-	private WebServerServletToken _webServerServletToken;
 
 }

@@ -810,8 +810,4 @@ public interface LayoutSEOEntryModel
 	@Override
 	public LayoutSEOEntry cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

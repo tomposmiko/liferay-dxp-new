@@ -15,8 +15,7 @@
 package com.liferay.commerce.internal.order.status;
 
 import com.liferay.commerce.constants.CommerceOrderConstants;
-import com.liferay.commerce.constants.CommerceOrderPaymentConstants;
-import com.liferay.commerce.constants.CommercePaymentMethodConstants;
+import com.liferay.commerce.constants.CommercePaymentConstants;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.order.status.CommerceOrderStatus;
@@ -24,7 +23,7 @@ import com.liferay.commerce.payment.method.CommercePaymentMethod;
 import com.liferay.commerce.payment.method.CommercePaymentMethodRegistry;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
@@ -44,6 +43,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.order.status.key=" + PendingCommerceOrderStatusImpl.KEY,
 		"commerce.order.status.priority:Integer=" + PendingCommerceOrderStatusImpl.PRIORITY
@@ -96,7 +96,7 @@ public class PendingCommerceOrderStatusImpl implements CommerceOrderStatus {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			locale, CommerceOrderConstants.getOrderStatusLabel(KEY));
 	}
 
@@ -127,9 +127,10 @@ public class PendingCommerceOrderStatusImpl implements CommerceOrderStatus {
 		}
 
 		if ((commerceOrder.getPaymentStatus() ==
-				CommerceOrderPaymentConstants.STATUS_COMPLETED) ||
+				CommerceOrderConstants.PAYMENT_STATUS_PAID) ||
 			(commercePaymentMethod.getPaymentType() ==
-				CommercePaymentMethodConstants.TYPE_OFFLINE)) {
+				CommercePaymentConstants.
+					COMMERCE_PAYMENT_METHOD_TYPE_OFFLINE)) {
 
 			return _commerceOrderValidatorRegistry.isValid(
 				LocaleUtil.getSiteDefault(), commerceOrder);
@@ -166,9 +167,6 @@ public class PendingCommerceOrderStatusImpl implements CommerceOrderStatus {
 
 	@Reference
 	private CommercePaymentMethodRegistry _commercePaymentMethodRegistry;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private WorkflowDefinitionLinkLocalService

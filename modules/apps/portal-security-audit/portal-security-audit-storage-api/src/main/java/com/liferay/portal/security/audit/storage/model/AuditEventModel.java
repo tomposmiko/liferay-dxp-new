@@ -295,8 +295,4 @@ public interface AuditEventModel extends BaseModel<AuditEvent>, ShardedModel {
 	@Override
 	public AuditEvent cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

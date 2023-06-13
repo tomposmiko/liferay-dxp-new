@@ -24,10 +24,9 @@ public class LayoutFriendlyURLSeparatorComposite
 	extends LayoutFriendlyURLComposite {
 
 	public LayoutFriendlyURLSeparatorComposite(
-		Layout layout, String friendlyURL, String urlSeparator,
-		boolean redirect) {
+		Layout layout, String friendlyURL, String urlSeparator) {
 
-		super(layout, friendlyURL, redirect);
+		super(layout, friendlyURL);
 
 		_urlSeparator = urlSeparator;
 	}
@@ -38,8 +37,7 @@ public class LayoutFriendlyURLSeparatorComposite
 
 		super(
 			layoutFriendlyURLComposite.getLayout(),
-			layoutFriendlyURLComposite.getFriendlyURL(),
-			layoutFriendlyURLComposite.isRedirect());
+			layoutFriendlyURLComposite.getFriendlyURL());
 
 		_urlSeparator = urlSeparator;
 	}

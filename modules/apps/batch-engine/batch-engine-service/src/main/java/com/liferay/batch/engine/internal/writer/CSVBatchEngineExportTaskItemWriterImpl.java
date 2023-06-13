@@ -14,119 +14,77 @@
 
 package com.liferay.batch.engine.internal.writer;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.liferay.petra.io.unsync.UnsyncPrintWriter;
+import com.liferay.petra.string.StringUtil;
 
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.util.ListUtil;
-
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
 
 import java.lang.reflect.Field;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
 /**
  * @author Ivica Cardic
- * @author Igor Beslic
- * @author Matija Petanjek
  */
 public class CSVBatchEngineExportTaskItemWriterImpl
 	implements BatchEngineExportTaskItemWriter {
 
 	public CSVBatchEngineExportTaskItemWriterImpl(
-			String delimiter, Map<String, Field> fieldsMap,
-			List<String> fieldNames, OutputStream outputStream,
-			Map<String, Serializable> parameters)
-		throws IOException {
+		String delimiter, Map<String, Field> fieldMap, List<String> fieldNames,
+		OutputStream outputStream) {
 
 		if (fieldNames.isEmpty()) {
 			throw new IllegalArgumentException("Field names are not set");
 		}
 
-		_csvPrinter = new CSVPrinter(
-			new BufferedWriter(new OutputStreamWriter(outputStream)),
-			_getCSVFormat(delimiter));
-
-		fieldNames = ListUtil.sort(
-			fieldNames, (value1, value2) -> value1.compareToIgnoreCase(value2));
+		_delimiter = delimiter;
 
 		_columnValuesExtractor = new ColumnValuesExtractor(
-			fieldsMap, fieldNames);
+			fieldMap, fieldNames);
 
-		if (Boolean.valueOf(
-				(String)parameters.getOrDefault(
-					"containsHeaders", StringPool.TRUE))) {
+		_unsyncPrintWriter = new UnsyncPrintWriter(outputStream);
 
-			_csvPrinter.printRecord(_columnValuesExtractor.getHeaders());
-		}
+		_unsyncPrintWriter.println(StringUtil.merge(fieldNames, delimiter));
 	}
 
 	@Override
 	public void close() throws IOException {
-		_csvPrinter.close();
+		_unsyncPrintWriter.close();
 	}
 
 	@Override
 	public void write(Collection<?> items) throws Exception {
-		DateFormat dateFormat = new ISO8601DateFormat();
+		DateFormat dateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
 		for (Object item : items) {
-			for (Object[] values : _columnValuesExtractor.extractValues(item)) {
-				_write(dateFormat, values);
-			}
+			_write(dateFormat, _columnValuesExtractor.extractValues(item));
 		}
 	}
 
-	private CSVFormat _getCSVFormat(String delimiter) {
-		CSVFormat.Builder builder = CSVFormat.Builder.create();
+	private void _write(DateFormat dateFormat, Collection<?> values) {
+		_unsyncPrintWriter.println(
+			StringUtil.merge(
+				values,
+				value -> {
+					if (value instanceof Date) {
+						return dateFormat.format(value);
+					}
 
-		builder.setDelimiter(delimiter);
-
-		return builder.build();
-	}
-
-	private void _write(DateFormat dateFormat, Object[] values)
-		throws Exception {
-
-		for (Object value : values) {
-			if (value instanceof Date) {
-				value = dateFormat.format((Date)value);
-			}
-			else if (value instanceof Map) {
-				Map<String, Object> map = (Map<String, Object>)value;
-
-				StringBundler sb = new StringBundler();
-
-				for (Map.Entry<String, Object> entry : map.entrySet()) {
-					sb.append(entry.getKey());
-					sb.append(StringPool.COLON);
-					sb.append(entry.getValue());
-					sb.append(StringPool.RETURN_NEW_LINE);
-				}
-
-				value = sb.toString();
-			}
-
-			_csvPrinter.print(value);
-		}
-
-		_csvPrinter.println();
+					return String.valueOf(value);
+				},
+				_delimiter));
 	}
 
 	private final ColumnValuesExtractor _columnValuesExtractor;
-	private final CSVPrinter _csvPrinter;
+	private final String _delimiter;
+	private final UnsyncPrintWriter _unsyncPrintWriter;
 
 }

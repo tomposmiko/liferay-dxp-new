@@ -97,7 +97,7 @@ public class ContactsCenterRequestInterpreter
 				StringPool.BLANK, request.getReceiverUserId());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return true;

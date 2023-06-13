@@ -33,11 +33,8 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.frontend.view.state.model.impl.FVSEntryImpl",
-		"table.name=FVSEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {FVSEntryModelArgumentsResolver.class, ArgumentsResolver.class}
 )
 public class FVSEntryModelArgumentsResolver implements ArgumentsResolver {
 

@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=300",
 		"panel.category.key=" + PanelCategoryKeys.USER_MY_ACCOUNT
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class MyWorkflowTaskPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return PortletKeys.MY_WORKFLOW_TASK;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + PortletKeys.MY_WORKFLOW_TASK + ")"
+		target = "(javax.portlet.name=" + PortletKeys.MY_WORKFLOW_TASK + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

@@ -21,13 +21,14 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -70,18 +71,10 @@ public class ViewFlatUsersManagementToolbarDisplayContext
 		return DropdownItemListBuilder.add(
 			() -> _showRestoreButton,
 			dropdownItem -> {
-				dropdownItem.putData("action", "activateUsers");
-				dropdownItem.putData(
-					"activateUsersURL",
-					PortletURLBuilder.createActionURL(
-						liferayPortletResponse
-					).setActionName(
-						"/users_admin/edit_user"
-					).setCMD(
-						Constants.RESTORE
-					).setNavigation(
-						getNavigation()
-					).buildString());
+				dropdownItem.setHref(
+					StringBundler.concat(
+						"javascript:", liferayPortletResponse.getNamespace(),
+						"deleteUsers('", Constants.RESTORE, "');"));
 				dropdownItem.setIcon("undo");
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "activate"));
@@ -93,26 +86,16 @@ public class ViewFlatUsersManagementToolbarDisplayContext
 				UserSearchTerms userSearchTerms =
 					(UserSearchTerms)searchContainer.getSearchTerms();
 
-				String action = "deleteUsers";
-				String cmd = Constants.DELETE;
+				String action = Constants.DELETE;
 
 				if (userSearchTerms.isActive()) {
-					action = "deactivateUsers";
-					cmd = Constants.DEACTIVATE;
+					action = Constants.DEACTIVATE;
 				}
 
-				dropdownItem.putData("action", action);
-				dropdownItem.putData(
-					"editUsersURL",
-					PortletURLBuilder.createActionURL(
-						liferayPortletResponse
-					).setActionName(
-						"/users_admin/edit_user"
-					).setCMD(
-						cmd
-					).setNavigation(
-						getNavigation()
-					).buildString());
+				dropdownItem.setHref(
+					StringBundler.concat(
+						"javascript:", liferayPortletResponse.getNamespace(),
+						"deleteUsers('", action, "');"));
 
 				String icon = "times-circle";
 
@@ -123,7 +106,7 @@ public class ViewFlatUsersManagementToolbarDisplayContext
 				dropdownItem.setIcon(icon);
 
 				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, cmd));
+					LanguageUtil.get(httpServletRequest, action));
 				dropdownItem.setQuickAction(true);
 			}
 		).build();
@@ -167,18 +150,31 @@ public class ViewFlatUsersManagementToolbarDisplayContext
 					).buildString());
 
 				labelItem.setCloseable(true);
-				labelItem.setLabel(
-					String.format(
-						"%s: %s",
-						LanguageUtil.get(httpServletRequest, "status"),
-						LanguageUtil.get(httpServletRequest, _navigation)));
+
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(httpServletRequest, "status"),
+					LanguageUtil.get(httpServletRequest, _navigation));
+
+				labelItem.setLabel(label);
 			}
 		).build();
 	}
 
 	@Override
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
+
+		return searchActionURL.toString();
+	}
+
+	@Override
 	public String getSearchFormName() {
 		return "searchFm";
+	}
+
+	@Override
+	public Boolean isDisabled() {
+		return false;
 	}
 
 	@Override
@@ -214,7 +210,7 @@ public class ViewFlatUsersManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getNavigationKeys() {
-		return new String[] {"all", "active", "inactive"};
+		return new String[] {"active", "inactive"};
 	}
 
 	@Override

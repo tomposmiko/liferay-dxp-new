@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author István András Dézsi
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.name=" + DDMFormFieldTypeConstants.DDM_IMAGE,
 		"ddm.form.field.type.system=true"

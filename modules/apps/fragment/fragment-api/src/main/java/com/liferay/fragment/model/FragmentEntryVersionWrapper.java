@@ -66,11 +66,9 @@ public class FragmentEntryVersionWrapper
 		attributes.put("js", getJs());
 		attributes.put("cacheable", isCacheable());
 		attributes.put("configuration", getConfiguration());
-		attributes.put("icon", getIcon());
 		attributes.put("previewFileEntryId", getPreviewFileEntryId());
 		attributes.put("readOnly", isReadOnly());
 		attributes.put("type", getType());
-		attributes.put("typeOptions", getTypeOptions());
 		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
 		attributes.put("statusByUserId", getStatusByUserId());
@@ -204,12 +202,6 @@ public class FragmentEntryVersionWrapper
 			setConfiguration(configuration);
 		}
 
-		String icon = (String)attributes.get("icon");
-
-		if (icon != null) {
-			setIcon(icon);
-		}
-
 		Long previewFileEntryId = (Long)attributes.get("previewFileEntryId");
 
 		if (previewFileEntryId != null) {
@@ -226,12 +218,6 @@ public class FragmentEntryVersionWrapper
 
 		if (type != null) {
 			setType(type);
-		}
-
-		String typeOptions = (String)attributes.get("typeOptions");
-
-		if (typeOptions != null) {
-			setTypeOptions(typeOptions);
 		}
 
 		Date lastPublishDate = (Date)attributes.get("lastPublishDate");
@@ -391,16 +377,6 @@ public class FragmentEntryVersionWrapper
 	}
 
 	/**
-	 * Returns the icon of this fragment entry version.
-	 *
-	 * @return the icon of this fragment entry version
-	 */
-	@Override
-	public String getIcon() {
-		return model.getIcon();
-	}
-
-	/**
 	 * Returns the js of this fragment entry version.
 	 *
 	 * @return the js of this fragment entry version
@@ -538,16 +514,6 @@ public class FragmentEntryVersionWrapper
 	@Override
 	public int getType() {
 		return model.getType();
-	}
-
-	/**
-	 * Returns the type options of this fragment entry version.
-	 *
-	 * @return the type options of this fragment entry version
-	 */
-	@Override
-	public String getTypeOptions() {
-		return model.getTypeOptions();
 	}
 
 	/**
@@ -821,16 +787,6 @@ public class FragmentEntryVersionWrapper
 	}
 
 	/**
-	 * Sets the icon of this fragment entry version.
-	 *
-	 * @param icon the icon of this fragment entry version
-	 */
-	@Override
-	public void setIcon(String icon) {
-		model.setIcon(icon);
-	}
-
-	/**
 	 * Sets the js of this fragment entry version.
 	 *
 	 * @param js the js of this fragment entry version
@@ -971,16 +927,6 @@ public class FragmentEntryVersionWrapper
 	}
 
 	/**
-	 * Sets the type options of this fragment entry version.
-	 *
-	 * @param typeOptions the type options of this fragment entry version
-	 */
-	@Override
-	public void setTypeOptions(String typeOptions) {
-		model.setTypeOptions(typeOptions);
-	}
-
-	/**
 	 * Sets the user ID of this fragment entry version.
 	 *
 	 * @param userId the user ID of this fragment entry version
@@ -1028,11 +974,6 @@ public class FragmentEntryVersionWrapper
 	@Override
 	public void setVersion(int version) {
 		model.setVersion(version);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

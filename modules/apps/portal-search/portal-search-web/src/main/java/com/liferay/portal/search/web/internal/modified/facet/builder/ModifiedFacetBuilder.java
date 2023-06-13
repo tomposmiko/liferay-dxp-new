@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.CalendarFactory;
 import com.liferay.portal.kernel.util.DateFormatFactory;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.facet.Facet;
@@ -37,9 +37,11 @@ public class ModifiedFacetBuilder {
 
 	public ModifiedFacetBuilder(
 		ModifiedFacetFactory modifiedFacetFactory,
-		DateFormatFactory dateFormatFactory, JSONFactory jsonFactory) {
+		CalendarFactory calendarFactory, DateFormatFactory dateFormatFactory,
+		JSONFactory jsonFactory) {
 
 		_modifiedFacetFactory = modifiedFacetFactory;
+		_calendarFactory = calendarFactory;
 		_jsonFactory = jsonFactory;
 
 		_dateRangeFactory = new DateRangeFactory(dateFormatFactory);
@@ -48,7 +50,7 @@ public class ModifiedFacetBuilder {
 	public Facet build() {
 		Facet facet = _modifiedFacetFactory.newInstance(_searchContext);
 
-		facet.setFacetConfiguration(_buildFacetConfiguration(facet));
+		facet.setFacetConfiguration(buildFacetConfiguration(facet));
 
 		String rangeString = _getSelectedRangeString(facet);
 
@@ -67,10 +69,6 @@ public class ModifiedFacetBuilder {
 		_customRangeTo = customRangeTo;
 	}
 
-	public void setOrder(String order) {
-		_order = order;
-	}
-
 	public void setRangesJSONArray(JSONArray rangesJSONArray) {
 		_rangesJSONArray = rangesJSONArray;
 	}
@@ -83,32 +81,27 @@ public class ModifiedFacetBuilder {
 		_selectedRanges = selectedRanges;
 	}
 
-	protected JSONArray getRangesJSONArray(Calendar calendar) {
-		if (_rangesJSONArray == null) {
-			_rangesJSONArray = _getDefaultRangesJSONArray(calendar);
-		}
-
-		return _rangesJSONArray;
-	}
-
-	private FacetConfiguration _buildFacetConfiguration(Facet facet) {
+	protected FacetConfiguration buildFacetConfiguration(Facet facet) {
 		FacetConfiguration facetConfiguration = new FacetConfiguration();
+
+		facetConfiguration.setDataJSONObject(_jsonFactory.createJSONObject());
 
 		facetConfiguration.setFieldName(facet.getFieldName());
 		facetConfiguration.setLabel("any-time");
-		facetConfiguration.setOrder(_order);
+		facetConfiguration.setOrder("OrderHitsDesc");
 		facetConfiguration.setStatic(false);
 		facetConfiguration.setWeight(1.0);
 
-		JSONObject jsonObject = facetConfiguration.getData();
+		ModifiedFacetConfiguration modifiedFacetConfiguration =
+			new ModifiedFacetConfigurationImpl(facetConfiguration);
 
-		jsonObject.put(
-			"ranges", getRangesJSONArray(CalendarFactoryUtil.getCalendar()));
+		modifiedFacetConfiguration.setRangesJSONArray(
+			getRangesJSONArray(_calendarFactory.getCalendar()));
 
 		return facetConfiguration;
 	}
 
-	private JSONArray _getDefaultRangesJSONArray(Calendar calendar) {
+	protected JSONArray getDefaultRangesJSONArray(Calendar calendar) {
 		JSONArray rangesJSONArray = _jsonFactory.createJSONArray();
 
 		Map<String, String> map = _dateRangeFactory.getRangeStrings(calendar);
@@ -129,7 +122,15 @@ public class ModifiedFacetBuilder {
 		return rangesJSONArray;
 	}
 
-	private Map<String, String> _getRangesMap(JSONArray rangesJSONArray) {
+	protected JSONArray getRangesJSONArray(Calendar calendar) {
+		if (_rangesJSONArray == null) {
+			_rangesJSONArray = getDefaultRangesJSONArray(calendar);
+		}
+
+		return _rangesJSONArray;
+	}
+
+	protected Map<String, String> getRangesMap(JSONArray rangesJSONArray) {
 		Map<String, String> rangesMap = new HashMap<>();
 
 		for (int i = 0; i < rangesJSONArray.length(); i++) {
@@ -156,7 +157,7 @@ public class ModifiedFacetBuilder {
 		}
 
 		if (!ArrayUtil.isEmpty(_selectedRanges)) {
-			Map<String, String> rangesMap = _getRangesMap(_rangesJSONArray);
+			Map<String, String> rangesMap = getRangesMap(_rangesJSONArray);
 
 			String selectedRange = _selectedRanges[_selectedRanges.length - 1];
 
@@ -165,18 +166,18 @@ public class ModifiedFacetBuilder {
 			}
 
 			return _dateRangeFactory.getRangeString(
-				selectedRange, CalendarFactoryUtil.getCalendar());
+				selectedRange, _calendarFactory.getCalendar());
 		}
 
 		return null;
 	}
 
+	private final CalendarFactory _calendarFactory;
 	private String _customRangeFrom;
 	private String _customRangeTo;
 	private final DateRangeFactory _dateRangeFactory;
 	private final JSONFactory _jsonFactory;
 	private final ModifiedFacetFactory _modifiedFacetFactory;
-	private String _order;
 	private JSONArray _rangesJSONArray;
 	private SearchContext _searchContext;
 	private String[] _selectedRanges;

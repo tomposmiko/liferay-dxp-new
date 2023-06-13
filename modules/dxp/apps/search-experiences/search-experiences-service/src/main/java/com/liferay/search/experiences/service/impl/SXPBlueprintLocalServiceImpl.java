@@ -24,15 +24,17 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
+import com.liferay.search.experiences.exception.SXPBlueprintConfigurationJSONException;
 import com.liferay.search.experiences.exception.SXPBlueprintTitleException;
 import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.service.base.SXPBlueprintLocalServiceBaseImpl;
 import com.liferay.search.experiences.validator.SXPBlueprintValidator;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -44,7 +46,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Petteri Karttunen
  */
 @Component(
-	enabled = false,
 	property = "model.class.name=com.liferay.search.experiences.model.SXPBlueprint",
 	service = AopService.class
 )
@@ -54,18 +55,15 @@ public class SXPBlueprintLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SXPBlueprint addSXPBlueprint(
-			String externalReferenceCode, long userId, String configurationJSON,
+			long userId, String configurationJSON,
 			Map<Locale, String> descriptionMap, String elementInstancesJSON,
-			String schemaVersion, Map<Locale, String> titleMap,
-			ServiceContext serviceContext)
+			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException {
 
-		_validate(titleMap, serviceContext);
+		_validate(configurationJSON, titleMap, serviceContext);
 
 		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.create(
 			counterLocalService.increment());
-
-		sxpBlueprint.setExternalReferenceCode(externalReferenceCode);
 
 		User user = _userLocalService.getUser(userId);
 
@@ -76,13 +74,8 @@ public class SXPBlueprintLocalServiceImpl
 		sxpBlueprint.setConfigurationJSON(configurationJSON);
 		sxpBlueprint.setDescriptionMap(descriptionMap);
 		sxpBlueprint.setElementInstancesJSON(elementInstancesJSON);
-		sxpBlueprint.setSchemaVersion(schemaVersion);
 		sxpBlueprint.setTitleMap(titleMap);
-		sxpBlueprint.setVersion(
-			String.format(
-				"%.1f",
-				GetterUtil.getFloat(sxpBlueprint.getVersion(), 0.9F) + 0.1));
-		sxpBlueprint.setStatus(WorkflowConstants.STATUS_APPROVED);
+		sxpBlueprint.setStatus(WorkflowConstants.STATUS_DRAFT);
 		sxpBlueprint.setStatusByUserId(user.getUserId());
 		sxpBlueprint.setStatusDate(serviceContext.getModifiedDate(null));
 
@@ -90,19 +83,9 @@ public class SXPBlueprintLocalServiceImpl
 
 		_resourceLocalService.addModelResources(sxpBlueprint, serviceContext);
 
+		_startWorkflowInstance(userId, sxpBlueprint, serviceContext);
+
 		return sxpBlueprint;
-	}
-
-	@Override
-	public void deleteCompanySXPBlueprints(long companyId)
-		throws PortalException {
-
-		List<SXPBlueprint> sxpBlueprints =
-			sxpBlueprintPersistence.findByCompanyId(companyId);
-
-		for (SXPBlueprint sxpBlueprint : sxpBlueprints) {
-			sxpBlueprintLocalService.deleteSXPBlueprint(sxpBlueprint);
-		}
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -128,10 +111,13 @@ public class SXPBlueprintLocalServiceImpl
 		_resourceLocalService.deleteResource(
 			sxpBlueprint, ResourceConstants.SCOPE_INDIVIDUAL);
 
+		_workflowInstanceLinkLocalService.deleteWorkflowInstanceLinks(
+			sxpBlueprint.getCompanyId(), 0, SXPBlueprint.class.getName(),
+			sxpBlueprint.getSXPBlueprintId());
+
 		return sxpBlueprint;
 	}
 
-	@Override
 	public int getSXPBlueprintsCount(long companyId) {
 		return sxpBlueprintPersistence.countByCompanyId(companyId);
 	}
@@ -163,15 +149,13 @@ public class SXPBlueprintLocalServiceImpl
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
-	@Override
 	public SXPBlueprint updateSXPBlueprint(
 			long userId, long sxpBlueprintId, String configurationJSON,
 			Map<Locale, String> descriptionMap, String elementInstancesJSON,
-			String schemaVersion, Map<Locale, String> titleMap,
-			ServiceContext serviceContext)
+			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException {
 
-		_validate(titleMap, serviceContext);
+		_validate(configurationJSON, titleMap, serviceContext);
 
 		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.findByPrimaryKey(
 			sxpBlueprintId);
@@ -180,17 +164,26 @@ public class SXPBlueprintLocalServiceImpl
 		sxpBlueprint.setDescriptionMap(descriptionMap);
 		sxpBlueprint.setElementInstancesJSON(elementInstancesJSON);
 		sxpBlueprint.setTitleMap(titleMap);
-		sxpBlueprint.setVersion(
-			String.format(
-				"%.1f",
-				GetterUtil.getFloat(sxpBlueprint.getVersion(), 0.9F) + 0.1));
 
 		return updateSXPBlueprint(sxpBlueprint);
 	}
 
+	private void _startWorkflowInstance(
+			long userId, SXPBlueprint sxpBlueprint,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			sxpBlueprint.getCompanyId(), 0, userId,
+			SXPBlueprint.class.getName(), sxpBlueprint.getSXPBlueprintId(),
+			sxpBlueprint, serviceContext);
+	}
+
 	private void _validate(
-			Map<Locale, String> titleMap, ServiceContext serviceContext)
-		throws SXPBlueprintTitleException {
+			String configurationJSON, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
+		throws SXPBlueprintConfigurationJSONException,
+			   SXPBlueprintTitleException {
 
 		if (!GetterUtil.getBoolean(
 				serviceContext.getAttribute(
@@ -201,7 +194,7 @@ public class SXPBlueprintLocalServiceImpl
 			return;
 		}
 
-		_sxpBlueprintValidator.validate(titleMap);
+		_sxpBlueprintValidator.validate(configurationJSON, titleMap);
 	}
 
 	@Reference
@@ -212,5 +205,8 @@ public class SXPBlueprintLocalServiceImpl
 
 	@Reference
 	private UserLocalService _userLocalService;
+
+	@Reference
+	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
 
 }

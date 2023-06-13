@@ -14,10 +14,10 @@
 
 package com.liferay.commerce.internal.order.term.contributor;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.model.AccountEntryUserRel;
-import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.model.CommerceAccountUserRel;
+import com.liferay.commerce.account.service.CommerceAccountUserRelLocalService;
 import com.liferay.commerce.constants.CommerceDefinitionTermConstants;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommerceSubscriptionNotificationConstants;
@@ -28,7 +28,7 @@ import com.liferay.commerce.order.CommerceDefinitionTermContributor;
 import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
@@ -36,12 +36,14 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -50,6 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.definition.term.contributor.key=" + CommerceRecipientCommerceDefinitionTermContributor.KEY,
 		"commerce.notification.type.key=" + CommerceOrderConstants.ORDER_NOTIFICATION_AWAITING_SHIPMENT,
@@ -96,30 +99,36 @@ public class CommerceRecipientCommerceDefinitionTermContributor
 		}
 
 		if (term.equals(_ACCOUNT_ROLE_ADMINISTRATOR)) {
-			AccountEntry accountEntry = commerceOrder.getAccountEntry();
+			CommerceAccount commerceAccount =
+				commerceOrder.getCommerceAccount();
 
 			Role accountAdminRole = _roleLocalService.getRole(
 				commerceOrder.getCompanyId(),
 				CommerceAccountConstants.ROLE_NAME_ACCOUNT_ADMINISTRATOR);
 
-			return _getUserIds(accountEntry, accountAdminRole);
+			return _getUserIds(commerceAccount, accountAdminRole);
 		}
 
 		if (term.equals(_ACCOUNT_ROLE_ORDER_MANAGER)) {
-			AccountEntry accountEntry = commerceOrder.getAccountEntry();
+			CommerceAccount commerceAccount =
+				commerceOrder.getCommerceAccount();
 
 			Role orderManagerRole = _roleLocalService.getRole(
 				commerceOrder.getCompanyId(),
 				CommerceAccountConstants.ROLE_NAME_ACCOUNT_ORDER_MANAGER);
 
-			return _getUserIds(accountEntry, orderManagerRole);
+			return _getUserIds(commerceAccount, orderManagerRole);
 		}
 
 		if (term.equals(_ORDER_CREATOR)) {
-			AccountEntry accountEntry = commerceOrder.getAccountEntry();
+			CommerceAccount commerceAccount =
+				commerceOrder.getCommerceAccount();
 
-			if (accountEntry.isPersonalAccount()) {
-				User user = _userLocalService.getUser(accountEntry.getUserId());
+			if (commerceAccount.getType() ==
+					CommerceAccountConstants.ACCOUNT_TYPE_PERSONAL) {
+
+				User user = _userLocalService.getUser(
+					commerceAccount.getUserId());
 
 				return String.valueOf(user.getUserId());
 			}
@@ -132,9 +141,10 @@ public class CommerceRecipientCommerceDefinitionTermContributor
 
 			String userGroupName = StringUtil.removeChars(s[2], '%', ']');
 
-			return _getUserIds(
-				_userGroupLocalService.getUserGroup(
-					commerceOrder.getCompanyId(), userGroupName));
+			UserGroup userGroup = _userGroupLocalService.getUserGroup(
+				commerceOrder.getCompanyId(), userGroupName);
+
+			return _getUserIds(userGroup);
 		}
 
 		return term;
@@ -142,31 +152,37 @@ public class CommerceRecipientCommerceDefinitionTermContributor
 
 	@Override
 	public String getLabel(String term, Locale locale) {
-		return _language.get(locale, _languageKeys.get(term));
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return LanguageUtil.get(
+			resourceBundle, _commerceOrderDefinitionTermsMap.get(term));
 	}
 
 	@Override
 	public List<String> getTerms() {
-		return new ArrayList<>(_languageKeys.keySet());
+		return new ArrayList<>(_commerceOrderDefinitionTermsMap.keySet());
 	}
 
-	private String _getUserIds(AccountEntry accountEntry, Role role)
+	private String _getUserIds(CommerceAccount commerceAccount, Role role)
 		throws PortalException {
 
-		List<AccountEntryUserRel> accountEntryUserRels =
-			_accountEntryUserRelLocalService.
-				getAccountEntryUserRelsByAccountEntryId(
-					accountEntry.getAccountEntryId());
+		List<CommerceAccountUserRel> commerceAccountUserRels =
+			_commerceAccountUserRelLocalService.getCommerceAccountUserRels(
+				commerceAccount.getCommerceAccountId());
 
 		StringBundler resultsSB = new StringBundler();
 
-		for (AccountEntryUserRel accountEntryUserRel : accountEntryUserRels) {
+		for (CommerceAccountUserRel commerceAccountUserRel :
+				commerceAccountUserRels) {
+
 			List<Role> userRoles = _roleLocalService.getUserGroupRoles(
-				accountEntryUserRel.getAccountUserId(),
-				accountEntry.getAccountEntryGroupId());
+				commerceAccountUserRel.getCommerceAccountUserId(),
+				commerceAccount.getCommerceAccountGroupId());
 
 			if (userRoles.contains(role)) {
-				resultsSB.append(accountEntryUserRel.getAccountUserId());
+				resultsSB.append(
+					commerceAccountUserRel.getCommerceAccountUserId());
 				resultsSB.append(",");
 			}
 		}
@@ -198,24 +214,23 @@ public class CommerceRecipientCommerceDefinitionTermContributor
 
 	private static final String _USER_GROUP_NAME = "[%USER_GROUP_NAME%]";
 
-	private static final Map<String, String> _languageKeys = HashMapBuilder.put(
-		_ACCOUNT_ROLE_ADMINISTRATOR, "account-role-administrator"
-	).put(
-		_ACCOUNT_ROLE_ORDER_MANAGER, "account-role-order-manager"
-	).put(
-		_ORDER_CREATOR, "order-creator-definition-term"
-	).put(
-		_USER_GROUP_NAME, "user-group-name"
-	).build();
+	private static final Map<String, String> _commerceOrderDefinitionTermsMap =
+		HashMapBuilder.put(
+			_ACCOUNT_ROLE_ADMINISTRATOR, "account-role-administrator"
+		).put(
+			_ACCOUNT_ROLE_ORDER_MANAGER, "account-role-order-manager"
+		).put(
+			_ORDER_CREATOR, "order-creator-definition-term"
+		).put(
+			_USER_GROUP_NAME, "user-group-name"
+		).build();
 
 	@Reference
-	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
+	private CommerceAccountUserRelLocalService
+		_commerceAccountUserRelLocalService;
 
 	@Reference
 	private CommerceOrderItemLocalService _commerceOrderItemLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

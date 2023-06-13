@@ -142,8 +142,7 @@ public class LocalizationImplUnitTest {
 
 				}));
 
-		Locale locale = LocaleUtil.fromLanguageId(
-			defaultContentLanguageId, false);
+		Locale locale = LocaleUtil.fromLanguageId(defaultContentLanguageId);
 
 		LocaleUtil.setDefault(
 			locale.getLanguage(), locale.getCountry(), locale.getVariant());
@@ -152,22 +151,25 @@ public class LocalizationImplUnitTest {
 
 		localizationUtil.setLocalization(new LocalizationImpl());
 
-		Locale contentDefaultLocale = LocaleUtil.fromLanguageId("es_ES", false);
+		Locale contentDefaultLocale = LocaleUtil.fromLanguageId("es_ES");
+
+		Locale[] contentAvailableLocales = _getContentAvailableLocales(
+			"es_ES,en_US,de_DE");
 
 		Locale defaultImportLocale = LocalizationUtil.getDefaultImportLocale(
 			"com.liferay.portal.className", 0L, contentDefaultLocale,
-			_getContentAvailableLocales("es_ES,en_US,de_DE"));
+			contentAvailableLocales);
 
 		if (expectedResult) {
 			Assert.assertTrue(
 				LocaleUtil.equals(
-					LocaleUtil.fromLanguageId(expectedLanguageId, false),
+					LocaleUtil.fromLanguageId(expectedLanguageId),
 					defaultImportLocale));
 		}
 		else {
 			Assert.assertFalse(
 				LocaleUtil.equals(
-					LocaleUtil.fromLanguageId(expectedLanguageId, false),
+					LocaleUtil.fromLanguageId(expectedLanguageId),
 					defaultImportLocale));
 		}
 	}

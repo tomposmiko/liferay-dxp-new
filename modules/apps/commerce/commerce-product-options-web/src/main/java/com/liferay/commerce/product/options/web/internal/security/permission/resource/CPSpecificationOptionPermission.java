@@ -15,14 +15,17 @@
 package com.liferay.commerce.product.options.web.internal.security.permission.resource;
 
 import com.liferay.commerce.product.model.CPSpecificationOption;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Marco Leo
  */
+@Component(enabled = false, immediate = true, service = {})
 public class CPSpecificationOptionPermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class CPSpecificationOptionPermission {
 			CPSpecificationOption cpSpecificationOption, String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<CPSpecificationOption> modelResourcePermission =
-			_cpSpecificationOptionModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _cpSpecificationOptionModelResourcePermission.contains(
 			permissionChecker, cpSpecificationOption, actionId);
 	}
 
@@ -42,20 +42,22 @@ public class CPSpecificationOptionPermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<CPSpecificationOption> modelResourcePermission =
-			_cpSpecificationOptionModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _cpSpecificationOptionModelResourcePermission.contains(
 			permissionChecker, cpSpecificationOptionId, actionId);
 	}
 
-	private static final Snapshot
-		<ModelResourcePermission<CPSpecificationOption>>
-			_cpSpecificationOptionModelResourcePermissionSnapshot =
-				new Snapshot<>(
-					CPSpecificationOptionPermission.class,
-					Snapshot.cast(ModelResourcePermission.class),
-					"(model.class.name=com.liferay.commerce.product.model." +
-						"CPSpecificationOption)");
+	@Reference(
+		target = "(model.class.name=com.liferay.commerce.product.model.CPSpecificationOption)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<CPSpecificationOption>
+			modelResourcePermission) {
+
+		_cpSpecificationOptionModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<CPSpecificationOption>
+		_cpSpecificationOptionModelResourcePermission;
 
 }

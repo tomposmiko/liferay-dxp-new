@@ -18,7 +18,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -35,12 +35,11 @@ import java.util.ResourceBundle;
 import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Stian Sigvartsen
  */
-@Component(service = CertificateUploadResponseHandler.class)
+@Component(immediate = true, service = CertificateUploadResponseHandler.class)
 public class CertificateUploadResponseHandler implements UploadResponseHandler {
 
 	@Override
@@ -57,24 +56,24 @@ public class CertificateUploadResponseHandler implements UploadResponseHandler {
 		String errorMessage = StringPool.BLANK;
 
 		if (portalException instanceof PrincipalException) {
-			errorMessage = _language.format(
+			errorMessage = LanguageUtil.format(
 				resourceBundle, "you-must-be-an-admin-to-complete-this-action",
 				null);
 		}
 		else if (portalException.getCause() instanceof CertificateException) {
-			errorMessage = _language.format(
+			errorMessage = LanguageUtil.format(
 				resourceBundle,
 				"there-was-a-problem-reading-one-or-more-certificates-in-the-" +
 					"keystore",
 				null);
 		}
 		else if (portalException.getCause() instanceof KeyStoreException) {
-			errorMessage = _language.format(
+			errorMessage = LanguageUtil.format(
 				resourceBundle, "the-file-is-not-a-pkcs12-formatted-keystore",
 				null);
 		}
 		else {
-			errorMessage = _language.format(
+			errorMessage = LanguageUtil.format(
 				resourceBundle, "an-unexpected-error-occurred", null);
 		}
 
@@ -99,8 +98,5 @@ public class CertificateUploadResponseHandler implements UploadResponseHandler {
 			"uuid", fileEntry.getUuid()
 		);
 	}
-
-	@Reference
-	private Language _language;
 
 }

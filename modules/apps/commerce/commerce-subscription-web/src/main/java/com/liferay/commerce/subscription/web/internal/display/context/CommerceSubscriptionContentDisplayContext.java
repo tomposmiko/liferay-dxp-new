@@ -20,13 +20,12 @@ import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceSubscriptionEntry;
 import com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelLocalService;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.product.util.CPInstanceHelper;
 import com.liferay.commerce.service.CommerceSubscriptionEntryService;
-import com.liferay.commerce.subscription.web.internal.display.context.helper.CommerceSubscriptionDisplayContextHelper;
-import com.liferay.commerce.util.CommerceUtil;
+import com.liferay.commerce.subscription.web.internal.display.context.util.CommerceSubscriptionDisplayContextHelper;
 import com.liferay.commerce.util.comparator.CommerceSubscriptionEntryCreateDateComparator;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -92,12 +92,7 @@ public class CommerceSubscriptionContentDisplayContext {
 			CommerceSubscriptionEntry commerceSubscriptionEntry)
 		throws Exception {
 
-		HttpServletRequest httpServletRequest = _cpRequestHelper.getRequest();
-
 		return _cpInstanceHelper.getCPInstanceThumbnailSrc(
-			CommerceUtil.getCommerceAccountId(
-				(CommerceContext)httpServletRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT)),
 			commerceSubscriptionEntry.getCPInstanceId());
 	}
 
@@ -169,20 +164,26 @@ public class CommerceSubscriptionContentDisplayContext {
 			_cpRequestHelper.getLiferayPortletRequest(), getPortletURL(), null,
 			"there-are-no-subscriptions");
 
-		_searchContainer.setResultsAndTotal(
-			() ->
-				_commerceSubscriptionEntryService.
-					getCommerceSubscriptionEntries(
-						_cpRequestHelper.getCompanyId(),
-						_cpRequestHelper.getCommerceChannelGroupId(),
-						_cpRequestHelper.getUserId(),
-						_searchContainer.getStart(), _searchContainer.getEnd(),
-						new CommerceSubscriptionEntryCreateDateComparator()),
+		OrderByComparator<CommerceSubscriptionEntry> orderByComparator =
+			new CommerceSubscriptionEntryCreateDateComparator();
+
+		List<CommerceSubscriptionEntry> subscriptionEntries =
+			_commerceSubscriptionEntryService.getCommerceSubscriptionEntries(
+				_cpRequestHelper.getCompanyId(),
+				_cpRequestHelper.getCommerceChannelGroupId(),
+				_cpRequestHelper.getUserId(), _searchContainer.getStart(),
+				_searchContainer.getEnd(), orderByComparator);
+
+		_searchContainer.setResults(subscriptionEntries);
+
+		int subscriptionEntriesCount =
 			_commerceSubscriptionEntryService.
 				getCommerceSubscriptionEntriesCount(
 					_cpRequestHelper.getCompanyId(),
 					_cpRequestHelper.getCommerceChannelGroupId(),
-					_cpRequestHelper.getUserId()));
+					_cpRequestHelper.getUserId());
+
+		_searchContainer.setTotal(subscriptionEntriesCount);
 
 		return _searchContainer;
 	}
@@ -218,7 +219,7 @@ public class CommerceSubscriptionContentDisplayContext {
 			return commercePaymentMethodGroupRel.isActive();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException.getMessage(), portalException);
 		}
 
 		return false;

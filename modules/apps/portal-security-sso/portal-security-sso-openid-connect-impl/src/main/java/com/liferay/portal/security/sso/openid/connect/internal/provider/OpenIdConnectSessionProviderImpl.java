@@ -45,7 +45,6 @@ public class OpenIdConnectSessionProviderImpl
 			OpenIdConnectWebKeys.OPEN_ID_CONNECT_SESSION, openIdConnectSession);
 	}
 
-	@Override
 	public OpenIdConnectSession getOpenIdConnectSession(
 		HttpSession httpSession) {
 

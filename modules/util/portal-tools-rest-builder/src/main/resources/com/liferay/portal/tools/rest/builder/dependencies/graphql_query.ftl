@@ -20,7 +20,7 @@ import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 <#assign
 	javaMethodSignatures = freeMarkerTool.getGraphQLJavaMethodSignatures(configYAML, "query", openAPIYAML)
 
-	generateAggregationFunction = freeMarkerTool.containsParameterType(javaMethodSignatures, "com.liferay.portal.vulcan.aggregation.Aggregation")
+	generateAggregationFunction = freeMarkerTool.containsAggregationFunction(javaMethodSignatures)
 />
 
 <#if generateAggregationFunction>
@@ -164,7 +164,7 @@ public class Query {
 			}
 
 			@GraphQLField
-			protected Map<String, Map<String, String>> actions;
+			protected Map<String, Map> actions;
 
 			<#if generateAggregationFunction>
 				@GraphQLField

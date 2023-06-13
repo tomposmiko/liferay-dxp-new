@@ -18,21 +18,15 @@ import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.exception.NoSuchEntryException;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryService;
-import com.liferay.petra.string.StringPool;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
-import com.liferay.portal.kernel.portlet.bridges.mvc.BaseTransactionalMVCActionCommand;
+import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.upload.UploadRequest;
-import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
-
-import java.io.File;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -44,17 +38,19 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/edit_fragment_entry"
 	},
-	service = MVCActionCommand.class
+	service = AopService.class
 )
 public class EditFragmentEntryMVCActionCommand
-	extends BaseTransactionalMVCActionCommand {
+	extends BaseMVCActionCommand implements AopService, MVCActionCommand {
 
 	@Override
-	protected void doTransactionalCommand(
+	@Transactional(rollbackFor = Exception.class)
+	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
@@ -86,40 +82,23 @@ public class EditFragmentEntryMVCActionCommand
 			}
 		}
 
-		UploadPortletRequest uploadPortletRequest =
-			_portal.getUploadPortletRequest(actionRequest);
-
 		String name = ParamUtil.getString(actionRequest, "name");
-		String css = _read("cssContent", uploadPortletRequest);
-		String html = _read("htmlContent", uploadPortletRequest);
-		String js = _read("jsContent", uploadPortletRequest);
+		String css = ParamUtil.getString(actionRequest, "cssContent");
+		String html = ParamUtil.getString(actionRequest, "htmlContent");
+		String js = ParamUtil.getString(actionRequest, "jsContent");
+		boolean cacheable = ParamUtil.getBoolean(actionRequest, "cacheable");
 		String configuration = ParamUtil.getString(
 			actionRequest, "configurationContent");
 		int status = ParamUtil.getInteger(actionRequest, "status");
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		draftFragmentEntry.setName(name);
 		draftFragmentEntry.setCss(css);
 		draftFragmentEntry.setHtml(html);
 		draftFragmentEntry.setJs(js);
+		draftFragmentEntry.setCacheable(cacheable);
 		draftFragmentEntry.setConfiguration(configuration);
-
-		if (draftFragmentEntry.isTypeInput()) {
-			String[] fieldTypes = ParamUtil.getStringValues(
-				actionRequest, "fieldTypes");
-
-			JSONArray fieldTypesJSONArray = _jsonFactory.createJSONArray(
-				fieldTypes);
-
-			JSONObject typeOptionsJSONObject = _jsonFactory.createJSONObject(
-				draftFragmentEntry.getTypeOptions());
-
-			typeOptionsJSONObject.put("fieldTypes", fieldTypesJSONArray);
-
-			draftFragmentEntry.setTypeOptions(typeOptionsJSONObject.toString());
-		}
-
 		draftFragmentEntry.setStatus(status);
 
 		try {
@@ -135,25 +114,7 @@ public class EditFragmentEntryMVCActionCommand
 			actionRequest, actionResponse, jsonObject);
 	}
 
-	private String _read(String fileName, UploadRequest uploadRequest)
-		throws Exception {
-
-		File file = uploadRequest.getFile(fileName);
-
-		if (file != null) {
-			return FileUtil.read(file);
-		}
-
-		return StringPool.BLANK;
-	}
-
 	@Reference
 	private FragmentEntryService _fragmentEntryService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Portal _portal;
 
 }

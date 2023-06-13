@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 
@@ -53,15 +52,7 @@ public interface MapToDDMFormValuesConverterStrategy {
 
 		if (locale == null) {
 			for (Map.Entry<String, ?> entry : localizedValues.entrySet()) {
-				if (entry.getValue() instanceof Collection) {
-					JSONArray jsonArray = JSONFactoryUtil.createJSONArray(
-						(Collection<?>)entry.getValue());
-
-					localizedValue.addString(
-						LocaleUtil.fromLanguageId(entry.getKey()),
-						jsonArray.toString());
-				}
-				else if (entry.getValue() instanceof Map) {
+				if (entry.getValue() instanceof Map) {
 					JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 						(Map)entry.getValue());
 
@@ -88,20 +79,13 @@ public interface MapToDDMFormValuesConverterStrategy {
 		else {
 			String languageId = LanguageUtil.getLanguageId(locale);
 
-			Object object = localizedValues.get(languageId);
-
-			if (object == null) {
+			if (!localizedValues.containsKey(languageId)) {
 				return localizedValue;
 			}
 
-			if (object instanceof Collection) {
-				JSONArray jsonArray = JSONFactoryUtil.createJSONArray(
-					(Collection<?>)object);
-
-				localizedValue.addString(locale, jsonArray.toString());
-			}
-			else if (object instanceof Object[]) {
-				JSONArray jsonArray = JSONUtil.putAll((Object[])object);
+			if (localizedValues.get(languageId) instanceof Object[]) {
+				JSONArray jsonArray = JSONUtil.putAll(
+					(Object[])localizedValues.get(languageId));
 
 				localizedValue.addString(locale, jsonArray.toString());
 			}
@@ -119,9 +103,7 @@ public interface MapToDDMFormValuesConverterStrategy {
 		DDMFormField ddmFormField, Locale locale, Object value) {
 
 		if (value instanceof Object[]) {
-			value = JSONUtil.putAll(
-				(Object[])value
-			).toString();
+			value = String.valueOf(JSONUtil.putAll((Object[])value));
 		}
 
 		if (ddmFormField.isLocalizable()) {

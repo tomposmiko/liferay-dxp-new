@@ -14,9 +14,7 @@
 
 import {
 	createPortletURL,
-	getCheckedCheckboxes,
 	navigate,
-	openConfirmModal,
 	openSelectionModal,
 	postForm,
 } from 'frontend-js-web';
@@ -27,7 +25,7 @@ const updateAccountUsers = (portletNamespace, url) => {
 	if (form) {
 		postForm(form, {
 			data: {
-				accountUserIds: getCheckedCheckboxes(
+				accountUserIds: Liferay.Util.listCheckedExcept(
 					form,
 					`${portletNamespace}allRowIds`
 				),
@@ -43,44 +41,38 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 	};
 
 	const deactivateAccountUsers = (itemData) => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-deactivate-the-selected-users'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					updateAccountUsers(
-						portletNamespace,
-						itemData?.deactivateAccountUsersURL
-					);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-deactivate-the-selected-users'
+				)
+			)
+		) {
+			updateAccountUsers(
+				portletNamespace,
+				itemData?.deactivateAccountUsersURL
+			);
+		}
 	};
 
 	const deleteAccountUsers = (itemData) => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-the-selected-users'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					updateAccountUsers(
-						portletNamespace,
-						itemData?.deleteAccountUsersURL
-					);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get(
+					'are-you-sure-you-want-to-delete-the-selected-users'
+				)
+			)
+		) {
+			updateAccountUsers(
+				portletNamespace,
+				itemData?.deleteAccountUsersURL
+			);
+		}
 	};
 
 	const selectAccountEntries = (itemData) => {
 		openSelectionModal({
 			buttonAddLabel: Liferay.Language.get('select'),
-			containerProps: {
-				className: '',
-			},
-			iframeBodyCssClass: '',
 			multiple: true,
 			onSelect: (selectedItems) => {
 				if (!selectedItems?.length) {
@@ -90,7 +82,7 @@ export default function propsTransformer({portletNamespace, ...otherProps}) {
 				const values = selectedItems.map((item) => item.value);
 
 				const redirectURL = createPortletURL(itemData?.redirectURL, {
-					accountEntriesNavigation: 'selected-accounts',
+					accountEntriesNavigation: 'accounts',
 					accountEntryIds: values.join(','),
 				});
 

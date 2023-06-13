@@ -21,11 +21,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
@@ -91,10 +94,16 @@ public class RequiresScopeAnnotationFinder {
 			Collections.addAll(scopes, requiresScope.value());
 		}
 
-		for (Method method : clazz.getMethods()) {
-			if (_isAnnotatedMethod(method)) {
-				_find(classes, scopes, recurse, method);
-			}
+		Stream<Method> stream = Arrays.stream(clazz.getMethods());
+
+		List<Method> methods = stream.filter(
+			RequiresScopeAnnotationFinder::_isAnnotatedMethod
+		).collect(
+			Collectors.toList()
+		);
+
+		for (Method method : methods) {
+			_find(classes, scopes, recurse, method);
 		}
 
 		classes.remove(clazz);

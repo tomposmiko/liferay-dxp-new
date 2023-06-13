@@ -46,16 +46,15 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Gabriel Albuquerque
+ * @see ListTypeDefinitionServiceSoap
  * @generated
  */
 public class ListTypeDefinitionServiceHttp {
 
 	public static com.liferay.list.type.model.ListTypeDefinition
 			addListTypeDefinition(
-				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				java.util.Map<java.util.Locale, String> nameMap,
-				java.util.List<com.liferay.list.type.model.ListTypeEntry>
-					listTypeEntries)
+				HttpPrincipal httpPrincipal,
+				java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -63,8 +62,7 @@ public class ListTypeDefinitionServiceHttp {
 				ListTypeDefinitionServiceUtil.class, "addListTypeDefinition",
 				_addListTypeDefinitionParameterTypes0);
 
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, nameMap, listTypeEntries);
+			MethodHandler methodHandler = new MethodHandler(methodKey, nameMap);
 
 			Object returnObj = null;
 
@@ -179,49 +177,6 @@ public class ListTypeDefinitionServiceHttp {
 	}
 
 	public static com.liferay.list.type.model.ListTypeDefinition
-			fetchListTypeDefinitionByExternalReferenceCode(
-				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				ListTypeDefinitionServiceUtil.class,
-				"fetchListTypeDefinitionByExternalReferenceCode",
-				_fetchListTypeDefinitionByExternalReferenceCodeParameterTypes3);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, companyId);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return (com.liferay.list.type.model.ListTypeDefinition)returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static com.liferay.list.type.model.ListTypeDefinition
 			getListTypeDefinition(
 				HttpPrincipal httpPrincipal, long listTypeDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -229,53 +184,10 @@ public class ListTypeDefinitionServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ListTypeDefinitionServiceUtil.class, "getListTypeDefinition",
-				_getListTypeDefinitionParameterTypes4);
+				_getListTypeDefinitionParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, listTypeDefinitionId);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return (com.liferay.list.type.model.ListTypeDefinition)returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static com.liferay.list.type.model.ListTypeDefinition
-			getListTypeDefinitionByExternalReferenceCode(
-				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				ListTypeDefinitionServiceUtil.class,
-				"getListTypeDefinitionByExternalReferenceCode",
-				_getListTypeDefinitionByExternalReferenceCodeParameterTypes5);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, companyId);
 
 			Object returnObj = null;
 
@@ -312,7 +224,7 @@ public class ListTypeDefinitionServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ListTypeDefinitionServiceUtil.class, "getListTypeDefinitions",
-				_getListTypeDefinitionsParameterTypes6);
+				_getListTypeDefinitionsParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, start, end);
@@ -344,7 +256,7 @@ public class ListTypeDefinitionServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				ListTypeDefinitionServiceUtil.class,
 				"getListTypeDefinitionsCount",
-				_getListTypeDefinitionsCountParameterTypes7);
+				_getListTypeDefinitionsCountParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey);
 
@@ -371,21 +283,17 @@ public class ListTypeDefinitionServiceHttp {
 
 	public static com.liferay.list.type.model.ListTypeDefinition
 			updateListTypeDefinition(
-				HttpPrincipal httpPrincipal, String externalReferenceCode,
-				long listTypeDefinitionId,
-				java.util.Map<java.util.Locale, String> nameMap,
-				java.util.List<com.liferay.list.type.model.ListTypeEntry>
-					listTypeEntries)
+				HttpPrincipal httpPrincipal, long listTypeDefinitionId,
+				java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
 			MethodKey methodKey = new MethodKey(
 				ListTypeDefinitionServiceUtil.class, "updateListTypeDefinition",
-				_updateListTypeDefinitionParameterTypes8);
+				_updateListTypeDefinitionParameterTypes6);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, externalReferenceCode, listTypeDefinitionId, nameMap,
-				listTypeEntries);
+				methodKey, listTypeDefinitionId, nameMap);
 
 			Object returnObj = null;
 
@@ -419,26 +327,18 @@ public class ListTypeDefinitionServiceHttp {
 		ListTypeDefinitionServiceHttp.class);
 
 	private static final Class<?>[] _addListTypeDefinitionParameterTypes0 =
-		new Class[] {String.class, java.util.Map.class, java.util.List.class};
+		new Class[] {java.util.Map.class};
 	private static final Class<?>[] _deleteListTypeDefinitionParameterTypes1 =
 		new Class[] {com.liferay.list.type.model.ListTypeDefinition.class};
 	private static final Class<?>[] _deleteListTypeDefinitionParameterTypes2 =
 		new Class[] {long.class};
-	private static final Class<?>[]
-		_fetchListTypeDefinitionByExternalReferenceCodeParameterTypes3 =
-			new Class[] {String.class, long.class};
-	private static final Class<?>[] _getListTypeDefinitionParameterTypes4 =
+	private static final Class<?>[] _getListTypeDefinitionParameterTypes3 =
 		new Class[] {long.class};
-	private static final Class<?>[]
-		_getListTypeDefinitionByExternalReferenceCodeParameterTypes5 =
-			new Class[] {String.class, long.class};
-	private static final Class<?>[] _getListTypeDefinitionsParameterTypes6 =
+	private static final Class<?>[] _getListTypeDefinitionsParameterTypes4 =
 		new Class[] {int.class, int.class};
 	private static final Class<?>[]
-		_getListTypeDefinitionsCountParameterTypes7 = new Class[] {};
-	private static final Class<?>[] _updateListTypeDefinitionParameterTypes8 =
-		new Class[] {
-			String.class, long.class, java.util.Map.class, java.util.List.class
-		};
+		_getListTypeDefinitionsCountParameterTypes5 = new Class[] {};
+	private static final Class<?>[] _updateListTypeDefinitionParameterTypes6 =
+		new Class[] {long.class, java.util.Map.class};
 
 }

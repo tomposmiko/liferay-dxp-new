@@ -28,7 +28,7 @@ import com.liferay.commerce.service.CPDefinitionInventoryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -46,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Ivica Cardic
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.product.content.contributor.name=" + CPContentContributorConstants.AVAILABILITY_NAME,
 	service = CPContentContributor.class
 )
@@ -90,8 +91,7 @@ public class AvailabilityCPContentContributor implements CPContentContributor {
 		if (displayAvailability) {
 			String availabilityStatus =
 				_commerceInventoryEngine.getAvailabilityStatus(
-					cpInstance.getCompanyId(), cpInstance.getGroupId(),
-					commerceChannel.getGroupId(),
+					cpInstance.getCompanyId(), commerceChannel.getGroupId(),
 					cpDefinitionInventoryEngine.getMinStockQuantity(cpInstance),
 					cpInstance.getSku());
 
@@ -101,7 +101,7 @@ public class AvailabilityCPContentContributor implements CPContentContributor {
 
 			jsonObject.put(
 				CPContentContributorConstants.AVAILABILITY_NAME,
-				_language.get(themeDisplay.getLocale(), availabilityStatus));
+				LanguageUtil.get(themeDisplay.getLocale(), availabilityStatus));
 
 			String availabilityDisplayType = "success";
 
@@ -136,9 +136,6 @@ public class AvailabilityCPContentContributor implements CPContentContributor {
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

@@ -14,9 +14,12 @@
 
 package com.liferay.mail.kernel.service;
 
-import com.liferay.mail.kernel.model.Account;
+import com.liferay.mail.kernel.model.Filter;
 import com.liferay.mail.kernel.model.MailMessage;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.util.ReferenceRegistry;
+
+import java.util.List;
 
 import javax.mail.Session;
 
@@ -25,14 +28,50 @@ import javax.mail.Session;
  */
 public class MailServiceUtil {
 
+	public static void addForward(
+		long companyId, long userId, List<Filter> filters,
+		List<String> emailAddresses, boolean leaveCopy) {
+
+		getService().addForward(
+			companyId, userId, filters, emailAddresses, leaveCopy);
+	}
+
+	public static void addUser(
+		long companyId, long userId, String password, String firstName,
+		String middleName, String lastName, String emailAddress) {
+
+		getService().addUser(
+			companyId, userId, password, firstName, middleName, lastName,
+			emailAddress);
+	}
+
+	public static void addVacationMessage(
+		long companyId, long userId, String emailAddress,
+		String vacationMessage) {
+
+		getService().addVacationMessage(
+			companyId, userId, emailAddress, vacationMessage);
+	}
+
 	public static void clearSession() {
 		getService().clearSession();
+	}
+
+	public static void deleteEmailAddress(long companyId, long userId) {
+		getService().deleteEmailAddress(companyId, userId);
+	}
+
+	public static void deleteUser(long companyId, long userId) {
+		getService().deleteUser(companyId, userId);
 	}
 
 	public static MailService getService() {
 		if (_mailService == null) {
 			_mailService = (MailService)PortalBeanLocatorUtil.locate(
 				MailService.class.getName());
+
+			ReferenceRegistry.registerReference(
+				MailServiceUtil.class, "_mailService");
 		}
 
 		return _mailService;
@@ -42,20 +81,33 @@ public class MailServiceUtil {
 		return getService().getSession();
 	}
 
-	public static Session getSession(Account account) {
-		return getService().getSession(account);
-	}
-
-	public static Session getSession(long companyId) {
-		return getService().getSession(companyId);
-	}
-
 	public static void sendEmail(MailMessage mailMessage) {
 		getService().sendEmail(mailMessage);
 	}
 
+	public static void updateBlocked(
+		long companyId, long userId, List<String> blocked) {
+
+		getService().updateBlocked(companyId, userId, blocked);
+	}
+
+	public static void updateEmailAddress(
+		long companyId, long userId, String emailAddress) {
+
+		getService().updateEmailAddress(companyId, userId, emailAddress);
+	}
+
+	public static void updatePassword(
+		long companyId, long userId, String password) {
+
+		getService().updatePassword(companyId, userId, password);
+	}
+
 	public void setService(MailService mailService) {
 		_mailService = mailService;
+
+		ReferenceRegistry.registerReference(
+			MailServiceUtil.class, "_mailService");
 	}
 
 	private static MailService _mailService;

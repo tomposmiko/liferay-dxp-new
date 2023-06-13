@@ -22,35 +22,32 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Carolina Barbosa
  */
+@RunWith(PowerMockRunner.class)
 public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -59,9 +56,6 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 
 		_setUpJSONFactory();
 		_setUpJSONFactoryUtil();
-
-		_setUpLanguage();
-
 		_setUpLanguageUtil();
 		_setUpPortal();
 	}
@@ -76,7 +70,6 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 
 		Assert.assertEquals("$", parameters.get("append"));
 		Assert.assertEquals("prefix", parameters.get("appendType"));
-		Assert.assertEquals(2, parameters.get("decimalPlaces"));
 		Assert.assertEquals(",", parameters.get("decimalSymbol"));
 
 		List<Object> decimalSymbols = (List<Object>)parameters.get(
@@ -171,8 +164,6 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 			).put(
 				"appendType", "prefix"
 			).put(
-				"decimalPlaces", 2
-			).put(
 				"symbols",
 				JSONUtil.put(
 					"decimalSymbol", ","
@@ -184,10 +175,14 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 		return ddmFormFieldRenderingContext;
 	}
 
-	private void _setUpJSONFactory() {
-		ReflectionTestUtil.setFieldValue(
+	private void _setUpJSONFactory() throws Exception {
+		PowerMockito.field(
+			NumericInputMaskDDMFormFieldTemplateContextContributor.class,
+			"_jsonFactory"
+		).set(
 			_numericInputMaskDDMFormFieldTemplateContextContributor,
-			"_jsonFactory", new JSONFactoryImpl());
+			new JSONFactoryImpl()
+		);
 	}
 
 	private void _setUpJSONFactoryUtil() {
@@ -196,44 +191,42 @@ public class NumericInputMaskDDMFormFieldTemplateContextContributorTest
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
-	private void _setUpLanguage() {
-		language = Mockito.mock(Language.class);
+	private void _setUpLanguageUtil() {
+		LanguageUtil languageUtil = new LanguageUtil();
 
-		Mockito.when(
-			language.get(Mockito.any(ResourceBundle.class), Mockito.eq("none"))
+		Language language = mock(Language.class);
+
+		when(
+			language.get(
+				Matchers.any(ResourceBundle.class), Matchers.eq("none"))
 		).thenReturn(
 			"None"
 		);
 
-		Mockito.when(
+		when(
 			language.getAvailableLocales()
 		).thenReturn(
-			SetUtil.fromArray(LocaleUtil.US)
+			SetUtil.fromArray(new Locale[] {LocaleUtil.US})
 		);
 
-		Mockito.when(
+		when(
 			language.getLanguageId(LocaleUtil.US)
 		).thenReturn(
 			"en_US"
 		);
 
-		ReflectionTestUtil.setFieldValue(
-			_numericInputMaskDDMFormFieldTemplateContextContributor,
-			"_language", language);
-	}
-
-	private void _setUpLanguageUtil() {
-		LanguageUtil languageUtil = new LanguageUtil();
-
 		languageUtil.setLanguage(language);
 	}
 
-	private void _setUpPortal() {
-		Portal portal = Mockito.mock(Portal.class);
+	private void _setUpPortal() throws Exception {
+		Portal portal = mock(Portal.class);
 
-		ReflectionTestUtil.setFieldValue(
-			_numericInputMaskDDMFormFieldTemplateContextContributor, "_portal",
-			portal);
+		PowerMockito.field(
+			NumericInputMaskDDMFormFieldTemplateContextContributor.class,
+			"_portal"
+		).set(
+			_numericInputMaskDDMFormFieldTemplateContextContributor, portal
+		);
 	}
 
 	private final NumericInputMaskDDMFormFieldTemplateContextContributor

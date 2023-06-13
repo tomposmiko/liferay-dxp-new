@@ -83,9 +83,8 @@ public interface BatchEngineExportTaskLocalService
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public BatchEngineExportTask addBatchEngineExportTask(
-		String externalReferenceCode, long companyId, long userId,
-		String callbackURL, String className, String contentType,
-		String executeStatus, List<String> fieldNamesList,
+		long companyId, long userId, String callbackURL, String className,
+		String contentType, String executeStatus, List<String> fieldNamesList,
 		Map<String, Serializable> parameters, String taskItemDelegateName);
 
 	/**
@@ -217,11 +216,6 @@ public interface BatchEngineExportTaskLocalService
 	public BatchEngineExportTask fetchBatchEngineExportTask(
 		long batchEngineExportTaskId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BatchEngineExportTask
-		fetchBatchEngineExportTaskByExternalReferenceCode(
-			String externalReferenceCode, long companyId);
-
 	/**
 	 * Returns the batch engine export task with the matching UUID and company.
 	 *
@@ -246,12 +240,6 @@ public interface BatchEngineExportTaskLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BatchEngineExportTask getBatchEngineExportTask(
 			long batchEngineExportTaskId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BatchEngineExportTask
-			getBatchEngineExportTaskByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
 		throws PortalException;
 
 	/**

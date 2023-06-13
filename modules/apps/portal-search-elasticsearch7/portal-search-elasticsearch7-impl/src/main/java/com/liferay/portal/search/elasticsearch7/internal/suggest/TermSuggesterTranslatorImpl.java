@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = TermSuggesterTranslator.class)
+@Component(immediate = true, service = TermSuggesterTranslator.class)
 public class TermSuggesterTranslatorImpl
 	extends BaseSuggesterTranslatorImpl implements TermSuggesterTranslator {
 

@@ -41,28 +41,42 @@ public abstract class BaseMBUploadFileEntryHandler
 	public FileEntry upload(UploadPortletRequest uploadPortletRequest)
 		throws IOException, PortalException {
 
+		dlValidator.validateFileSize(
+			uploadPortletRequest.getFileName(getParameterName()),
+			uploadPortletRequest.getSize(getParameterName()));
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)uploadPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		dlValidator.validateFileSize(
-			themeDisplay.getScopeGroupId(),
-			uploadPortletRequest.getFileName(getParameterName()),
-			uploadPortletRequest.getContentType(getParameterName()),
-			uploadPortletRequest.getSize(getParameterName()));
-
 		long categoryId = ParamUtil.getLong(uploadPortletRequest, "categoryId");
 
-		try (InputStream inputStream = _getFileAsInputStream(
+		try (InputStream inputStream = getFileAsInputStream(
 				uploadPortletRequest)) {
+
+			String tempFileName = TempFileEntryUtil.getTempFileName(
+				getFileName(uploadPortletRequest));
 
 			return mbMessageService.addTempAttachment(
 				themeDisplay.getScopeGroupId(), categoryId,
-				MBMessageConstants.TEMP_FOLDER_NAME,
-				TempFileEntryUtil.getTempFileName(
-					_getFileName(uploadPortletRequest)),
-				inputStream, _getContentType(uploadPortletRequest));
+				MBMessageConstants.TEMP_FOLDER_NAME, tempFileName, inputStream,
+				getContentType(uploadPortletRequest));
 		}
+	}
+
+	protected String getContentType(UploadPortletRequest uploadPortletRequest) {
+		return uploadPortletRequest.getContentType(getParameterName());
+	}
+
+	protected InputStream getFileAsInputStream(
+			UploadPortletRequest uploadPortletRequest)
+		throws IOException {
+
+		return uploadPortletRequest.getFileAsStream(getParameterName());
+	}
+
+	protected String getFileName(UploadPortletRequest uploadPortletRequest) {
+		return uploadPortletRequest.getFileName(getParameterName());
 	}
 
 	protected abstract String getParameterName();
@@ -72,20 +86,5 @@ public abstract class BaseMBUploadFileEntryHandler
 
 	@Reference
 	protected MBMessageService mbMessageService;
-
-	private String _getContentType(UploadPortletRequest uploadPortletRequest) {
-		return uploadPortletRequest.getContentType(getParameterName());
-	}
-
-	private InputStream _getFileAsInputStream(
-			UploadPortletRequest uploadPortletRequest)
-		throws IOException {
-
-		return uploadPortletRequest.getFileAsStream(getParameterName());
-	}
-
-	private String _getFileName(UploadPortletRequest uploadPortletRequest) {
-		return uploadPortletRequest.getFileName(getParameterName());
-	}
 
 }

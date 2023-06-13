@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class ObjectLayoutTabServiceWrapper
 	implements ObjectLayoutTabService, ServiceWrapper<ObjectLayoutTabService> {
 
-	public ObjectLayoutTabServiceWrapper() {
-		this(null);
-	}
-
 	public ObjectLayoutTabServiceWrapper(
 		ObjectLayoutTabService objectLayoutTabService) {
 

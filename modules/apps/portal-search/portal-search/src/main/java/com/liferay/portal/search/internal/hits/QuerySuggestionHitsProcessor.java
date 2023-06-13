@@ -28,7 +28,9 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  * @author Josef Sustacek
  */
-@Component(property = "sort.order=3", service = HitsProcessor.class)
+@Component(
+	immediate = true, property = "sort.order=3", service = HitsProcessor.class
+)
 public class QuerySuggestionHitsProcessor implements HitsProcessor {
 
 	@Override
@@ -48,8 +50,10 @@ public class QuerySuggestionHitsProcessor implements HitsProcessor {
 			IndexSearcherHelperUtil.suggestKeywordQueries(
 				searchContext, queryConfig.getQuerySuggestionMax());
 
-		hits.setQuerySuggestions(
-			ArrayUtil.remove(querySuggestions, searchContext.getKeywords()));
+		querySuggestions = ArrayUtil.remove(
+			querySuggestions, searchContext.getKeywords());
+
+		hits.setQuerySuggestions(querySuggestions);
 
 		return true;
 	}

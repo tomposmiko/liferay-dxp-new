@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
-import com.liferay.portal.search.tuning.rankings.web.internal.searcher.helper.RankingSearchRequestHelper;
+import com.liferay.portal.search.tuning.rankings.web.internal.searcher.RankingSearchRequestHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Before;
@@ -26,6 +26,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -41,6 +42,8 @@ public class GetResultsMVCResourceCommandTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_getResultsMVCResourceCommand = new GetResultsMVCResourceCommand();
 
 		ReflectionTestUtil.setFieldValue(
@@ -84,6 +87,7 @@ public class GetResultsMVCResourceCommandTest
 		setUpPortletRequestParamValue(
 			resourceRequest, "getHiddenResultsJSONObject", Constants.CMD);
 		setUpRankingIndexReader();
+		setUpRankingResultUtil();
 		setUpResourceRequest();
 		setUpResourceResponse();
 
@@ -137,6 +141,7 @@ public class GetResultsMVCResourceCommandTest
 		setUpFastDateFormatFactory();
 		setUpQuery();
 		setUpRankingIndexReader();
+		setUpRankingResultUtil();
 		setUpResourceRequest();
 		setUpResourceResponse();
 		setUpSearcher(setUpSearchResponse(setUpDocumentWithGetString()));
@@ -147,9 +152,11 @@ public class GetResultsMVCResourceCommandTest
 	}
 
 	private GetResultsMVCResourceCommand _getResultsMVCResourceCommand;
-	private final RankingSearchRequestHelper _rankingSearchRequestHelper =
-		Mockito.mock(RankingSearchRequestHelper.class);
-	private final ResourceActions _resourceActions = Mockito.mock(
-		ResourceActions.class);
+
+	@Mock
+	private RankingSearchRequestHelper _rankingSearchRequestHelper;
+
+	@Mock
+	private ResourceActions _resourceActions;
 
 }

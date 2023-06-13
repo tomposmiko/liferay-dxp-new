@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=210",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_CONFIGURATION
@@ -36,18 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class RedirectPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return RedirectPortletKeys.REDIRECT;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + RedirectPortletKeys.REDIRECT + ")"
+		target = "(javax.portlet.name=" + RedirectPortletKeys.REDIRECT + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

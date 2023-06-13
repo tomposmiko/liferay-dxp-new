@@ -19,6 +19,7 @@ import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBCategoryLocalService;
 import com.liferay.message.boards.service.MBThreadLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -26,20 +27,19 @@ import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashRenderer;
+import com.liferay.portal.kernel.trash.TrashRendererFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.trash.BaseTrashHandler;
-import com.liferay.trash.TrashHelper;
 import com.liferay.trash.constants.TrashActionKeys;
 
 import java.util.ArrayList;
@@ -279,8 +279,7 @@ public class MBCategoryTrashHandler extends BaseTrashHandler {
 
 	@Override
 	public TrashRenderer getTrashRenderer(long classPK) throws PortalException {
-		return new MBCategoryTrashRenderer(
-			_mbCategoryLocalService.getCategory(classPK));
+		return _trashRendererFactory.getTrashRenderer(classPK);
 	}
 
 	@Override
@@ -301,6 +300,11 @@ public class MBCategoryTrashHandler extends BaseTrashHandler {
 
 	@Override
 	public boolean isContainerModel() {
+		return true;
+	}
+
+	@Override
+	public boolean isMovable() {
 		return true;
 	}
 
@@ -340,7 +344,7 @@ public class MBCategoryTrashHandler extends BaseTrashHandler {
 			return false;
 		}
 
-		return !_trashHelper.isInTrashContainer(category);
+		return !category.isInTrashContainer();
 	}
 
 	@Override
@@ -419,22 +423,42 @@ public class MBCategoryTrashHandler extends BaseTrashHandler {
 			actionId);
 	}
 
+	@Reference(unbind = "-")
+	protected void setMBCategoryLocalService(
+		MBCategoryLocalService mbCategoryLocalService) {
+
+		_mbCategoryLocalService = mbCategoryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMBThreadLocalService(
+		MBThreadLocalService mbThreadLocalService) {
+
+		_mbThreadLocalService = mbThreadLocalService;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.message.boards.model.MBCategory)",
+		unbind = "-"
+	)
+	protected void setTrashRendererFactory(
+		TrashRendererFactory trashRendererFactory) {
+
+		_trashRendererFactory = trashRendererFactory;
+	}
+
 	@Reference(
 		target = "(model.class.name=com.liferay.message.boards.model.MBCategory)"
 	)
 	private ModelResourcePermission<MBCategory>
 		_categoryModelResourcePermission;
 
-	@Reference
 	private MBCategoryLocalService _mbCategoryLocalService;
-
-	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
-	private TrashHelper _trashHelper;
+	private TrashRendererFactory _trashRendererFactory;
 
 }

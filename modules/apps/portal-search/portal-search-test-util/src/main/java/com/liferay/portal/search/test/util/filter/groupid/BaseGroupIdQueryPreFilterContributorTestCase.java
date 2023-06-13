@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.internal.spi.model.query.contributor.GroupIdQueryPreFilterContributor;
 import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
@@ -33,7 +32,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Tibor Lipusz
@@ -46,6 +47,8 @@ public abstract class BaseGroupIdQueryPreFilterContributorTestCase
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+
+		MockitoAnnotations.initMocks(this);
 
 		Mockito.doReturn(
 			Arrays.asList(INACTIVE_GROUP_ID1, INACTIVE_GROUP_ID2)
@@ -162,7 +165,7 @@ public abstract class BaseGroupIdQueryPreFilterContributorTestCase
 					searchResponse ->
 						DocumentsAssert.assertValuesIgnoreRelevance(
 							searchResponse.getRequestString(),
-							searchResponse.getDocuments(), Field.GROUP_ID,
+							searchResponse.getDocumentsStream(), Field.GROUP_ID,
 							expected));
 			});
 	}
@@ -171,8 +174,7 @@ public abstract class BaseGroupIdQueryPreFilterContributorTestCase
 		GroupIdQueryPreFilterContributor contributor =
 			new GroupIdQueryPreFilterContributor();
 
-		ReflectionTestUtil.setFieldValue(
-			contributor, "_groupLocalService", groupLocalService);
+		contributor.setGroupLocalService(groupLocalService);
 
 		BooleanFilter booleanFilter = new BooleanFilter();
 
@@ -185,7 +187,7 @@ public abstract class BaseGroupIdQueryPreFilterContributorTestCase
 
 	protected static final long INACTIVE_GROUP_ID2 = 5L;
 
-	protected GroupLocalService groupLocalService = Mockito.mock(
-		GroupLocalService.class);
+	@Mock
+	protected GroupLocalService groupLocalService;
 
 }

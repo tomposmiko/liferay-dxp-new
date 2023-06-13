@@ -26,9 +26,7 @@ export default function JoinNode({
 			title={label}
 		>
 			<ClayIcon className="mr-2" symbol="arrow-join" />
-
 			<span>{label}</span>
-
 			{done && (
 				<ClayIcon
 					className="done-icon hexagon-done-icon"

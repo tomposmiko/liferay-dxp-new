@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Display Page Templates";
+	property testray.main.component.name = "Display Pages";
 
 	setUp {
 		task ("Set up instance and sign in") {
@@ -13,14 +13,14 @@ definition {
 		}
 
 		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-86193. Can export display page template based on custom master and import."
-	@priority = 3
+	@priority = "3"
 	test ExportImportDisplayPageTemplateBasedOnCustomMaster {
 		task ("Add a custom master with Header and Footer element") {
 			JSONLayoutpagetemplate.addMasterPageTemplateEntry(
@@ -52,7 +52,9 @@ definition {
 				fragmentName = "Footer Nav Dark",
 				scope = "Master");
 
-			MastersPageTemplates.publishMaster();
+			Button.click(button = "Publish Master");
+
+			Alert.viewSuccessMessage();
 		}
 
 		task ("Add a display page template based on custom master") {
@@ -75,7 +77,7 @@ definition {
 				key_type = "dark",
 				locator1 = "PageEditor#FOOTERS");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export display page template") {
@@ -99,7 +101,7 @@ definition {
 		}
 
 		task ("Import masters page template in new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			MastersPageTemplatesAdmin.openMastersAdmin(siteURLKey = "site-name");
 
@@ -132,20 +134,21 @@ definition {
 			Click(locator1 = "PageEditor#MORE_LINK");
 
 			AssertTextEquals(
-				locator1 = "PagesAdmin#MASTER_LAYOUT_NAME",
+				key_masterLayoutName = "Custom Masters Page Template",
+				locator1 = "SitePagesEditPage#MASTER_LAYOUT_NAME",
 				value1 = "Custom Masters Page Template");
 		}
 	}
 
 	@description = "This is a use case for LPS-86193. The Collection Display with mapping content should be exported and imported with display page template."
-	@priority = 4
+	@priority = "4"
 	test ExportImportDisplayPageTemplateWithCollectionDisplayContainingMappingContent {
 		task ("Add three Web Content Articles based on Basic Web Content") {
 			for (var entryTitle : list "First Web Content,Second Web Content,Third Web Content") {
 				JSONWebcontent.addWebContent(
 					content = "Web Content Content",
 					groupName = "Test Site Name",
-					title = ${entryTitle});
+					title = "${entryTitle}");
 			}
 		}
 
@@ -182,20 +185,20 @@ definition {
 		}
 
 		task ("Assert the title of three Web Content Articles are respectively shown in each cell") {
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Third,Second,First") {
 				AssertVisible(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_entryTitle = "${title} Web Content",
 					key_fragmentName = "Collection Display",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;
 			}
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Export display page template") {
@@ -209,7 +212,7 @@ definition {
 		}
 
 		task ("Import display page template in a new site") {
-			HeadlessSite.addSite(siteName = "Site Name");
+			JSONGroup.addGroup(groupName = "Site Name");
 
 			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "site-name");
 
@@ -221,16 +224,18 @@ definition {
 		task ("Assert the Collection Display containing mapping content is imported") {
 			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
-			PageEditor.clickConfigurableField(fragmentName = "Collection Display");
+			Click.clickNoWaitForVisible(
+				key_fragmentName = "Collection Display",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Third,Second,First") {
 				AssertVisible(
-					key_colPosition = 1,
+					key_colPosition = "1",
 					key_entryTitle = "${title} Web Content",
 					key_fragmentName = "Collection Display",
-					key_rowPosition = ${n},
+					key_rowPosition = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;

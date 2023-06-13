@@ -30,27 +30,31 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * @author Mateus Santana
  */
-public class LocalizedValueUtilTest {
+@RunWith(MockitoJUnitRunner.class)
+public class LocalizedValueUtilTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
-	@BeforeClass
-	public static void setUpClass() {
+	@Before
+	public void setUp() {
 		_setUpJSONFactoryUtil();
 		_setUpLanguageUtil();
 	}
@@ -114,7 +118,7 @@ public class LocalizedValueUtilTest {
 		JSONAssert.assertEquals(
 			JSONUtil.put(
 				"eng"
-			).toString(),
+			).toJSONString(),
 			String.valueOf(map.get("en_US")), false);
 	}
 
@@ -133,7 +137,7 @@ public class LocalizedValueUtilTest {
 		JSONAssert.assertEquals(
 			JSONUtil.put(
 				"language", "eng"
-			).toString(),
+			).toJSONString(),
 			String.valueOf(map.get("en_US")), false);
 	}
 
@@ -172,36 +176,36 @@ public class LocalizedValueUtilTest {
 				).build()));
 	}
 
-	private static void _setUpJSONFactoryUtil() {
+	private void _setUpJSONFactoryUtil() {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
-	private static void _setUpLanguageUtil() {
+	private void _setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
-		Language language = Mockito.mock(Language.class);
+		Language language = mock(Language.class);
 
-		Mockito.when(
+		when(
 			language.isAvailableLocale(LocaleUtil.BRAZIL)
 		).thenReturn(
 			true
 		);
 
-		Mockito.when(
+		when(
 			language.isAvailableLocale(LocaleUtil.US)
 		).thenReturn(
 			true
 		);
 
-		Mockito.when(
+		when(
 			language.getLanguageId(LocaleUtil.BRAZIL)
 		).thenReturn(
 			"pt_BR"
 		);
 
-		Mockito.when(
+		when(
 			language.getLanguageId(LocaleUtil.US)
 		).thenReturn(
 			"en_US"

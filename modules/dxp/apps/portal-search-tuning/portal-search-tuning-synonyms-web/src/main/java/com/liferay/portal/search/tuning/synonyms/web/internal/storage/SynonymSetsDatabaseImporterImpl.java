@@ -30,7 +30,6 @@ import com.liferay.portal.search.tuning.synonyms.storage.SynonymSetsDatabaseImpo
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.DocumentToSynonymSetTranslator;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSet;
 import com.liferay.portal.search.tuning.synonyms.web.internal.index.SynonymSetIndexReindexer;
-import com.liferay.portal.search.tuning.synonyms.web.internal.storage.helper.SynonymSetJSONStorageHelper;
 
 import java.util.List;
 
@@ -142,8 +141,7 @@ public class SynonymSetsDatabaseImporterImpl
 		}
 		catch (Exception exception) {
 			_log.error(
-				"Unable to reindex " + synonymSetIndexName.getIndexName(),
-				exception);
+				"Unable to reindex " + synonymSetIndexName.getIndexName());
 		}
 	}
 

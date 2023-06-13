@@ -27,10 +27,7 @@ import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 
-import java.io.Serializable;
-
 import java.util.List;
-import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -77,26 +74,6 @@ public interface DDLRecordService extends BaseService {
 	public DDLRecord addRecord(
 			long groupId, long recordSetId, int displayIndex,
 			DDMFormValues ddmFormValues, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * Adds a record referencing the record set.
-	 *
-	 * @param groupId the primary key of the record's group
-	 * @param recordSetId the primary key of the record set
-	 * @param displayIndex the index position in which the record is
-	 displayed in the spreadsheet view
-	 * @param fieldsMap the record values. The fieldsMap is a map of field
-	 names and its serializable values.
-	 * @param serviceContext the service context to be applied. This can
-	 set the UUID, guest permissions, and group permissions for
-	 the record.
-	 * @return the record
-	 * @throws PortalException if a portal exception occurred
-	 */
-	public DDLRecord addRecord(
-			long groupId, long recordSetId, int displayIndex,
-			Map<String, Serializable> fieldsMap, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -165,27 +142,6 @@ public interface DDLRecordService extends BaseService {
 	public DDLRecord updateRecord(
 			long recordId, boolean majorVersion, int displayIndex,
 			DDMFormValues ddmFormValues, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * Updates a record, replacing its display index and values.
-	 *
-	 * @param recordId the primary key of the record
-	 * @param displayIndex the index position in which the record is
-	 displayed in the spreadsheet view
-	 * @param fieldsMap the record values. The fieldsMap is a map of field
-	 names and its serializable values.
-	 * @param mergeFields whether to merge the new fields with the existing
-	 ones; otherwise replace the existing fields
-	 * @param serviceContext the service context to be applied. This can
-	 set the record modified date.
-	 * @return the record
-	 * @throws PortalException if a portal exception occurred
-	 */
-	public DDLRecord updateRecord(
-			long recordId, int displayIndex,
-			Map<String, Serializable> fieldsMap, boolean mergeFields,
-			ServiceContext serviceContext)
 		throws PortalException;
 
 }

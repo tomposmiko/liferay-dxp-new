@@ -94,66 +94,33 @@ public class MetaTypeProviderImpl
 
         if ( ocd == null )
         {
-            final ArrayList<AttributeDefinition> optionalAdList =
-                new ArrayList<AttributeDefinition>();
-            final ArrayList<AttributeDefinition> requiredAdList =
-                new ArrayList<AttributeDefinition>();
+            final ArrayList<AttributeDefinition> adList = new ArrayList<AttributeDefinition>();
 
-            requiredAdList.add(
-                new AttributeDefinitionImpl(
-                    Configuration.PROP_THREAD_POOL_SIZE,
-                    "org-apache-felix-eventadmin-ThreadPoolSize",
-                    "org-apache-felix-eventadmin-ThreadPoolSize-help",
-                    m_threadPoolSize));
-            requiredAdList.add(
-                new AttributeDefinitionImpl(
-                    Configuration.PROP_ASYNC_TO_SYNC_THREAD_RATIO,
-                    "org-apache-felix-eventadmin-AsyncToSyncThreadRatio",
+            adList.add( new AttributeDefinitionImpl( Configuration.PROP_THREAD_POOL_SIZE, "org-apache-felix-eventadmin-ThreadPoolSize",
+                "org-apache-felix-eventadmin-ThreadPoolSize-help",
+                m_threadPoolSize ) );
+            adList.add( new AttributeDefinitionImpl( Configuration.PROP_ASYNC_TO_SYNC_THREAD_RATIO, "org-apache-felix-eventadmin-AsyncToSyncThreadRatio",
                     "org-apache-felix-eventadmin-AsyncToSyncThreadRatio-help",
                     m_asyncThreadPoolRatio));
-            requiredAdList.add(
-                new AttributeDefinitionImpl(
-                    Configuration.PROP_TIMEOUT,
-                    "org-apache-felix-eventadmin-Timeout",
-                    "org-apache-felix-eventadmin-Timeout-help", m_timeout));
-            requiredAdList.add(
-                new AttributeDefinitionImpl(
-                    Configuration.PROP_REQUIRE_TOPIC,
-                    "org-apache-felix-eventadmin-RequireTopic",
+
+            adList.add( new AttributeDefinitionImpl( Configuration.PROP_TIMEOUT, "org-apache-felix-eventadmin-Timeout",
+                    "org-apache-felix-eventadmin-Timeout-help",
+                    m_timeout ) );
+
+            adList.add( new AttributeDefinitionImpl( Configuration.PROP_REQUIRE_TOPIC, "org-apache-felix-eventadmin-RequireTopic",
                     "org-apache-felix-eventadmin-RequireTopic-help",
-                    m_requireTopic));
-
-            optionalAdList.add(
-                new AttributeDefinitionImpl(
-                    Configuration.PROP_IGNORE_TIMEOUT,
-                    "org-apache-felix-eventadmin-IgnoreTimeout",
+                    m_requireTopic ) );
+            adList.add( new AttributeDefinitionImpl( Configuration.PROP_IGNORE_TIMEOUT, "org-apache-felix-eventadmin-IgnoreTimeout",
                     "org-apache-felix-eventadmin-IgnoreTimeout-help",
-                    AttributeDefinition.STRING, m_ignoreTimeout,
-                    Integer.MAX_VALUE, null, null));
-            optionalAdList.add(
-                new AttributeDefinitionImpl(
-                    Configuration.PROP_IGNORE_TOPIC,
-                    "org-apache-felix-eventadmin-IgnoreTopic",
+                    AttributeDefinition.STRING, m_ignoreTimeout, Integer.MAX_VALUE, null, null));
+            adList.add( new AttributeDefinitionImpl( Configuration.PROP_IGNORE_TOPIC, "org-apache-felix-eventadmin-IgnoreTopic",
                     "org-apache-felix-eventadmin-IgnoreTopic-help",
-                    AttributeDefinition.STRING, m_ignoreTopic,
-                    Integer.MAX_VALUE, null, null));
-
-            final ArrayList<AttributeDefinition> adList =
-                new ArrayList<AttributeDefinition>(requiredAdList);
-
-            adList.addAll(optionalAdList);
-
+                    AttributeDefinition.STRING, m_ignoreTopic, Integer.MAX_VALUE, null, null));
             ocd = new ObjectClassDefinition()
             {
 
-                private final AttributeDefinition[] attrs = adList.toArray(
-                    new AttributeDefinition[adList.size()]);
-                private final AttributeDefinition[] optionalAttrs =
-                    optionalAdList.toArray(
-                        new AttributeDefinition[optionalAdList.size()]);
-                private final AttributeDefinition[] requiredAttrs =
-                    requiredAdList.toArray(
-                        new AttributeDefinition[requiredAdList.size()]);
+                private final AttributeDefinition[] attrs = adList
+                    .toArray( new AttributeDefinition[adList.size()] );
 
 
                 @Override
@@ -187,14 +154,7 @@ public class MetaTypeProviderImpl
                 @Override
                 public AttributeDefinition[] getAttributeDefinitions( int filter )
                 {
-                    if (filter == OPTIONAL) {
-                        return optionalAttrs;
-                    }
-                    else if (filter == REQUIRED) {
-                        return requiredAttrs;
-                    }
-
-                    return attrs;
+                    return ( filter == OPTIONAL ) ? null : attrs;
                 }
             };
         }

@@ -81,47 +81,15 @@ public class GitUtil {
 		return deleteFileNames;
 	}
 
-	public static String getCurrentBranchDiff(
-			String baseDirName, String gitWorkingBranchName)
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public static String getCurrentBranchFileContent(
+			String gitWorkingBranchName, String fileName)
 		throws Exception {
 
-		return getCurrentBranchFileDiff(baseDirName, gitWorkingBranchName, "");
-	}
-
-	public static String getCurrentBranchFileDiff(
-			String baseDirName, String gitWorkingBranchName, String fileName)
-		throws Exception {
-
-		String gitWorkingBranchLatestCommitId = _getLatestCommitId(
-			gitWorkingBranchName, "origin/" + gitWorkingBranchName,
-			"upstream/" + gitWorkingBranchName);
-
-		StringBundler sb = new StringBundler();
-
-		String gitCommand =
-			"git diff " + gitWorkingBranchLatestCommitId + "..HEAD";
-
-		if (Validator.isNotNull(fileName)) {
-			gitCommand = gitCommand + " -- " + fileName;
-		}
-
-		try (UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
-				gitCommand)) {
-
-			String line = null;
-
-			while ((line = unsyncBufferedReader.readLine()) != null) {
-				sb.append(line);
-
-				sb.append("\n");
-			}
-		}
-
-		if (sb.length() > 0) {
-			sb.setIndex(sb.index() - 1);
-		}
-
-		return sb.toString();
+		return getFileContent(gitWorkingBranchName, fileName);
 	}
 
 	public static List<String> getCurrentBranchFileNames(
@@ -175,6 +143,16 @@ public class GitUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public static String getLatestAuthorFileContent(String fileName)
+		throws Exception {
+
+		return getFileContent(getLatestAuthorCommitId(), fileName);
+	}
+
 	public static List<String> getLatestAuthorFileNames(String baseDirName)
 		throws Exception {
 
@@ -196,8 +174,14 @@ public class GitUtil {
 		return fileNames;
 	}
 
-	public static String getLatestCommitId() throws Exception {
-		return _getLatestCommitId("HEAD");
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public static String getLocalChangesFileContent(String fileName)
+		throws Exception {
+
+		return getFileContent("HEAD", fileName);
 	}
 
 	public static List<String> getLocalChangesFileNames(String baseDirName)
@@ -341,6 +325,20 @@ public class GitUtil {
 		}
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	protected static String getCurrentBranchCommitId(
+			String gitWorkingBranchName)
+		throws Exception {
+
+		UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
+			"git merge-base HEAD " + gitWorkingBranchName);
+
+		return unsyncBufferedReader.readLine();
+	}
+
 	protected static List<String> getDeletedFileNames(
 			String baseDirName, String commitId)
 		throws Exception {
@@ -350,7 +348,7 @@ public class GitUtil {
 		UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
 			StringBundler.concat(
 				"git diff --diff-filter=RD --name-status ", commitId, " ",
-				getLatestCommitId()));
+				_getLatestCommitId()));
 
 		String line = null;
 
@@ -400,6 +398,17 @@ public class GitUtil {
 		return dirNames;
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #getFileContent(String)}
+	 */
+	@Deprecated
+	protected static String getFileContent(String commitId, String fileName)
+		throws Exception {
+
+		return getFileContent(fileName);
+	}
+
 	protected static String getFileName(String fileName, int gitLevel) {
 		for (int i = 0; i < gitLevel; i++) {
 			int x = fileName.indexOf(StringPool.SLASH);
@@ -419,7 +428,7 @@ public class GitUtil {
 		UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
 			StringBundler.concat(
 				"git diff --diff-filter=AMR --name-only ", commitId, " ",
-				getLatestCommitId()));
+				_getLatestCommitId()));
 
 		String line = null;
 
@@ -554,6 +563,10 @@ public class GitUtil {
 				return null;
 			}
 		}
+	}
+
+	private static String _getLatestCommitId() throws Exception {
+		return _getLatestCommitId("HEAD");
 	}
 
 	private static String _getLatestCommitId(String... branchNames)

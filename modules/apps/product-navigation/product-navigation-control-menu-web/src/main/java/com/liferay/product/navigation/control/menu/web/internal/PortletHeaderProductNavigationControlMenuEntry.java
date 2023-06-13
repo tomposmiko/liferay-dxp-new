@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Julio Camarero
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.TOOLS,
 		"product.navigation.control.menu.entry.order:Integer=100"
@@ -95,13 +96,12 @@ public class PortletHeaderProductNavigationControlMenuEntry
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
 	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.product.navigation.control.menu.web)"
+		target = "(osgi.web.symbolicname=com.liferay.product.navigation.control.menu.web)",
+		unbind = "-"
 	)
-	private ServletContext _servletContext;
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
 
 }

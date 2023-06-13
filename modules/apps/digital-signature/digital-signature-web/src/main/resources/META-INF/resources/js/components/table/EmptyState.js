@@ -12,8 +12,7 @@
  * details.
  */
 
-import ClayEmptyState from '@clayui/empty-state';
-import {sub} from 'frontend-js-web';
+import classNames from 'classnames';
 import React from 'react';
 
 const DEFAULT_EMPTY = {
@@ -30,44 +29,51 @@ const DEFAULT_EMPTY = {
 const EmptyState = ({
 	button,
 	className = '',
-	description = null,
+	description,
 	title = DEFAULT_EMPTY.empty.title,
 }) => {
 	return (
-		<ClayEmptyState
-			className={className}
-			description={description}
-			imgSrc={
-				className === DEFAULT_EMPTY.search.className
-					? `${themeDisplay.getPathThemeImages()}/states/search_state.gif`
-					: `${themeDisplay.getPathThemeImages()}/states/empty_state.gif`
-			}
-			title={title}
-		>
-			{button && button()}
-		</ClayEmptyState>
+		<div className="taglib-empty-result-message">
+			<div className="text-center">
+				<div className={classNames('taglib-empty-state', className)} />
+
+				{title && (
+					<h1 className="taglib-empty-result-message-title">
+						{title}
+					</h1>
+				)}
+
+				{description && (
+					<p className="empty-message-color taglib-empty-result-message-description">
+						{description}
+					</p>
+				)}
+
+				{button && button()}
+			</div>
+		</div>
 	);
 };
 
-export function FilteredEmpty(props) {
+export const FilteredEmpty = (props) => {
 	const description = Liferay.Language.get(
 		'there-are-no-envelopes-with-these-attributes'
 	);
 
 	return <EmptyState description={description} {...props} />;
-}
+};
 
-export function SearchEmpty({keywords, ...otherProps}) {
-	const description = sub(
+export const SearchEmpty = ({keywords, ...otherProps}) => {
+	const description = Liferay.Util.sub(
 		Liferay.Language.get('there-are-no-envelopes-for-x'),
 		keywords
 	);
 
 	return <EmptyState description={description} {...otherProps} />;
-}
+};
 
-export function SearchAndFilteredEmpty({keywords, ...otherProps}) {
-	const description = sub(
+export const SearchAndFilteredEmpty = ({keywords, ...otherProps}) => {
+	const description = Liferay.Util.sub(
 		Liferay.Language.get(
 			'there-are-no-envelopes-for-x-with-these-attributes'
 		),
@@ -75,9 +81,9 @@ export function SearchAndFilteredEmpty({keywords, ...otherProps}) {
 	);
 
 	return <EmptyState description={description} {...otherProps} />;
-}
+};
 
-export function withEmpty(Component) {
+export const withEmpty = (Component) => {
 	const Wrapper = ({
 		emptyState,
 		isEmpty,
@@ -122,6 +128,6 @@ export function withEmpty(Component) {
 	};
 
 	return Wrapper;
-}
+};
 
 export default EmptyState;

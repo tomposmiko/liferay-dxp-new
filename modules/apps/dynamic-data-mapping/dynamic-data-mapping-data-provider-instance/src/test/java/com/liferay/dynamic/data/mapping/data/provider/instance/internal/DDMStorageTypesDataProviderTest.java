@@ -16,39 +16,46 @@ package com.liferay.dynamic.data.mapping.data.provider.instance.internal;
 
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
-import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterRegistry;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Leonardo Barros
  */
-public class DDMStorageTypesDataProviderTest {
+@RunWith(MockitoJUnitRunner.class)
+public class DDMStorageTypesDataProviderTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
-	@BeforeClass
-	public static void setUpClass() {
+	@Before
+	public void setUp() {
 		_ddmStorageTypesDataProvider = new DDMStorageTypesDataProvider();
 
-		_ddmStorageTypesDataProvider.ddmStorageAdapterRegistry =
-			_ddmStorageAdapterRegistry;
+		_ddmStorageTypesDataProvider.ddmStorageAdapterTracker =
+			_ddmStorageAdapterTracker;
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
@@ -57,7 +64,7 @@ public class DDMStorageTypesDataProviderTest {
 	}
 
 	@Test
-	public void testMultipleStorageAdapter() {
+	public void testMultipleStorageAdapter() throws Exception {
 		Set<String> expectedSet = new TreeSet<String>() {
 			{
 				add("json");
@@ -70,7 +77,7 @@ public class DDMStorageTypesDataProviderTest {
 	}
 
 	@Test
-	public void testSingleStorageAdapter() {
+	public void testSingleStorageAdapter() throws Exception {
 		Set<String> expectedSet = new TreeSet<String>() {
 			{
 				add("json");
@@ -80,22 +87,22 @@ public class DDMStorageTypesDataProviderTest {
 		_testStorageTypes(expectedSet);
 	}
 
-	private void _testStorageTypes(Set<String> expectedSet) {
-		Mockito.when(
-			_ddmStorageAdapterRegistry.getDDMStorageAdapterTypes()
+	private void _testStorageTypes(Set<String> expectedSet) throws Exception {
+		when(
+			_ddmStorageAdapterTracker.getDDMStorageAdapterTypes()
 		).thenReturn(
 			expectedSet
 		);
 
-		List<KeyValuePair> expectedKeyValuePairs = new ArrayList<>();
+		List<KeyValuePair> keyValuePairs = new ArrayList<>();
 
-		for (String type : expectedSet) {
-			if (type.equals("json")) {
-				continue;
-			}
+		Stream<String> stream = expectedSet.stream();
 
-			expectedKeyValuePairs.add(new KeyValuePair(type, type));
-		}
+		stream.map(
+			type -> new KeyValuePair(type, type)
+		).forEach(
+			keyValuePairs::add
+		);
 
 		DDMDataProviderRequest.Builder builder =
 			DDMDataProviderRequest.Builder.newBuilder();
@@ -105,15 +112,18 @@ public class DDMStorageTypesDataProviderTest {
 
 		Assert.assertTrue(ddmDataProviderResponse.hasOutput("Default-Output"));
 
-		List<KeyValuePair> keyValuePairs = ddmDataProviderResponse.getOutput(
-			"Default-Output", List.class);
+		Optional<List<KeyValuePair>> optional =
+			ddmDataProviderResponse.getOutputOptional(
+				"Default-Output", List.class);
 
-		Assert.assertNotNull(keyValuePairs);
-		Assert.assertEquals(expectedKeyValuePairs, keyValuePairs);
+		Assert.assertTrue(optional.isPresent());
+
+		Assert.assertEquals(keyValuePairs, optional.get());
 	}
 
-	private static final DDMStorageAdapterRegistry _ddmStorageAdapterRegistry =
-		Mockito.mock(DDMStorageAdapterRegistry.class);
-	private static DDMStorageTypesDataProvider _ddmStorageTypesDataProvider;
+	@Mock
+	private DDMStorageAdapterTracker _ddmStorageAdapterTracker;
+
+	private DDMStorageTypesDataProvider _ddmStorageTypesDataProvider;
 
 }

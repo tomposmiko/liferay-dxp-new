@@ -83,7 +83,7 @@ public class EditRepositoryMVCActionCommand extends BaseMVCActionCommand {
 				"mvcPath", "/document_library/error.jsp");
 		}
 		catch (InvalidRepositoryException invalidRepositoryException) {
-			_log.error(invalidRepositoryException);
+			_log.error(invalidRepositoryException, invalidRepositoryException);
 
 			SessionErrors.add(
 				actionRequest, invalidRepositoryException.getClass());

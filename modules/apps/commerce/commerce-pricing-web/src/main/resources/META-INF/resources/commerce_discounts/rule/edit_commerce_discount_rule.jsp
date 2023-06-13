@@ -43,7 +43,7 @@ String type = BeanParamUtil.getString(commerceDiscountRule, request, "type");
 					bodyClasses="flex-fill"
 					title='<%= LanguageUtil.get(request, "details") %>'
 				>
-					<aui:input name="name" required="<%= true %>" />
+					<aui:input autoFocus="<%= true %>" name="name" required="<%= true %>" />
 
 					<aui:select disabled="<%= true %>" name="type" required="<%= true %>">
 
@@ -118,16 +118,16 @@ String type = BeanParamUtil.getString(commerceDiscountRule, request, "type");
 					);
 
 					window.parent.Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
-						id: '<%= CommercePricingFDSNames.DISCOUNT_RULES %>',
+						id:
+							'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_RULES %>',
 					});
 
 					return;
 				})
 				.catch(() => {
-					Liferay.Util.openAlertModal({
-						message:
-							'<liferay-ui:message key="your-request-failed-to-complete" />',
-					});
+					alert(
+						'<liferay-ui:message key="your-request-failed-to-complete" />'
+					);
 
 					return;
 				});

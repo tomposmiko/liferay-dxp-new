@@ -23,7 +23,83 @@ long classPK = GetterUtil.getLong((String)request.getAttribute("liferay-layout:l
 LayoutClassedModelUsagesDisplayContext layoutClassedModelUsagesDisplayContext = new LayoutClassedModelUsagesDisplayContext(renderRequest, renderResponse, className, classPK);
 %>
 
-<react:component
-	module="layout_classed_model_usages_view/js/ViewUsages"
-	props="<%= layoutClassedModelUsagesDisplayContext.getUsagesData() %>"
-/>
+<div id="<portlet:namespace />layoutClassedModelUsagesList">
+	<liferay-ui:search-container
+		compactEmptyResultsMessage="<%= true %>"
+		searchContainer="<%= layoutClassedModelUsagesDisplayContext.getSearchContainer() %>"
+	>
+		<liferay-ui:search-container-row
+			className="com.liferay.layout.model.LayoutClassedModelUsage"
+			modelVar="layoutClassedModelUsage"
+		>
+			<liferay-ui:search-container-column-text
+				name="pages"
+			>
+				<h5>
+					<%= HtmlUtil.escape(layoutClassedModelUsagesDisplayContext.getLayoutClassedModelUsageName(layoutClassedModelUsage)) %>
+				</h5>
+
+				<div class="text-secondary">
+					<%= LanguageUtil.get(request, layoutClassedModelUsagesDisplayContext.getLayoutClassedModelUsageTypeLabel(layoutClassedModelUsage)) %>
+				</div>
+			</liferay-ui:search-container-column-text>
+
+			<liferay-ui:search-container-column-text
+				cssClass="text-right"
+			>
+				<c:if test="<%= layoutClassedModelUsagesDisplayContext.isShowPreview(layoutClassedModelUsage) %>">
+
+					<%
+					Layout curLayout = LayoutLocalServiceUtil.fetchLayout(layoutClassedModelUsage.getPlid());
+					%>
+
+					<c:if test="<%= curLayout != null %>">
+						<clay:button
+							cssClass="preview-layout-classed-model-usage table-action-link"
+							data-href="<%= layoutClassedModelUsagesDisplayContext.getPreviewURL(layoutClassedModelUsage) %>"
+							displayType="secondary"
+							icon="view"
+						/>
+					</c:if>
+				</c:if>
+			</liferay-ui:search-container-column-text>
+		</liferay-ui:search-container-row>
+
+		<liferay-ui:search-iterator
+			markupView="lexicon"
+			paginate="<%= false %>"
+			searchResultCssClass="table table-autofit table-heading-nowrap"
+		/>
+	</liferay-ui:search-container>
+</div>
+
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+	if (
+		document.querySelector('#<portlet:namespace />layoutClassedModelUsagesList')
+	) {
+		var delegate = delegateModule.default;
+
+		var previewLayoutClassedModelUsagesList = delegate(
+			document.querySelector(
+				'#<portlet:namespace />layoutClassedModelUsagesList'
+			),
+			'click',
+			'.preview-layout-classed-model-usage',
+			(event) => {
+				Liferay.Util.openModal({
+					iframeBodyCssClass: 'article-preview',
+					title: '<liferay-ui:message key="preview" />',
+					url: event.delegateTarget.getAttribute('data-href'),
+				});
+			}
+		);
+
+		function removeListener() {
+			previewLayoutClassedModelUsagesList.dispose();
+
+			Liferay.detach('destroyPortlet', removeListener);
+		}
+
+		Liferay.on('destroyPortlet', removeListener);
+	}
+</aui:script>

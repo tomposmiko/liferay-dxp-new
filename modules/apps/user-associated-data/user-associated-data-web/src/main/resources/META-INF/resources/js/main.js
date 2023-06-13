@@ -15,15 +15,15 @@
 AUI.add(
 	'liferay-uad-export',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const isString = Lang.isString;
+		var isString = Lang.isString;
 
-		const RENDER_INTERVAL_IDLE = 60000;
+		var RENDER_INTERVAL_IDLE = 60000;
 
-		const RENDER_INTERVAL_IN_PROGRESS = 2000;
+		var RENDER_INTERVAL_IN_PROGRESS = 2000;
 
-		const UADExport = A.Component.create({
+		var UADExport = A.Component.create({
 			ATTRS: {
 				exportProcessesNode: {
 					setter: '_setNode',
@@ -42,9 +42,9 @@ AUI.add(
 
 			prototype: {
 				_isBackgroundTaskInProgress() {
-					const instance = this;
+					var instance = this;
 
-					const exportProcessesNode = instance.get(
+					var exportProcessesNode = instance.get(
 						'exportProcessesNode'
 					);
 
@@ -54,12 +54,12 @@ AUI.add(
 				},
 
 				_renderExportProcesses() {
-					const instance = this;
+					var instance = this;
 
-					const exportProcessesNode = instance.get(
+					var exportProcessesNode = instance.get(
 						'exportProcessesNode'
 					);
-					const exportProcessesResourceURL = instance.get(
+					var exportProcessesResourceURL = instance.get(
 						'exportProcessesResourceURL'
 					);
 
@@ -81,9 +81,9 @@ AUI.add(
 				},
 
 				_scheduleRenderProcess() {
-					const instance = this;
+					var instance = this;
 
-					let renderInterval = RENDER_INTERVAL_IDLE;
+					var renderInterval = RENDER_INTERVAL_IDLE;
 
 					if (instance._isBackgroundTaskInProgress()) {
 						renderInterval = RENDER_INTERVAL_IN_PROGRESS;
@@ -97,7 +97,7 @@ AUI.add(
 				},
 
 				_setNode(val) {
-					const instance = this;
+					var instance = this;
 
 					if (isString(val)) {
 						val = instance.one(val);
@@ -110,7 +110,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._renderTimer) {
 						instance._renderTimer.cancel();
@@ -118,7 +118,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._renderTimer = A.later(
 						RENDER_INTERVAL_IN_PROGRESS,

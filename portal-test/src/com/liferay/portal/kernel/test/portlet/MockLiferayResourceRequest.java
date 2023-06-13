@@ -159,7 +159,7 @@ public class MockLiferayResourceRequest
 
 	@Override
 	public Portlet getPortlet() {
-		return _portlet;
+		return null;
 	}
 
 	@Override
@@ -231,10 +231,6 @@ public class MockLiferayResourceRequest
 		_mockHttpServletRequest.setParameters(parameters);
 	}
 
-	public void setPortlet(Portlet portlet) {
-		_portlet = portlet;
-	}
-
 	@Override
 	public void setPortletRequestDispatcherRequest(
 		HttpServletRequest httpServletRequest) {
@@ -256,6 +252,5 @@ public class MockLiferayResourceRequest
 	}
 
 	private final MockHttpServletRequest _mockHttpServletRequest;
-	private Portlet _portlet;
 
 }

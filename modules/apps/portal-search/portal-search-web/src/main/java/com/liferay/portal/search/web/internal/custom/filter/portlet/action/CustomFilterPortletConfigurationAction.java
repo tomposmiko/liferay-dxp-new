@@ -21,8 +21,8 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.custom.filter.constants.CustomFilterPortletKeys;
+import com.liferay.portal.search.web.internal.custom.filter.display.context.CustomFilterDisplayBuilder;
 import com.liferay.portal.search.web.internal.custom.filter.display.context.CustomFilterDisplayContext;
-import com.liferay.portal.search.web.internal.custom.filter.display.context.builder.CustomFilterDisplayContextBuilder;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.RenderRequest;
@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + CustomFilterPortletKeys.CUSTOM_FILTER,
 	service = ConfigurationAction.class
 )
@@ -64,26 +65,26 @@ public class CustomFilterPortletConfigurationAction
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			_createCustomFilterDisplayContext(renderRequest));
+			createCustomFilterDisplayContext(renderRequest));
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
 
-	private CustomFilterDisplayContext _buildDisplayContext(
+	protected CustomFilterDisplayContext buildDisplayContext(
 			RenderRequest renderRequest)
 		throws ConfigurationException {
 
-		return CustomFilterDisplayContextBuilder.builder(
+		return CustomFilterDisplayBuilder.builder(
 		).themeDisplay(
 			(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY)
 		).build();
 	}
 
-	private CustomFilterDisplayContext _createCustomFilterDisplayContext(
+	protected CustomFilterDisplayContext createCustomFilterDisplayContext(
 		RenderRequest renderRequest) {
 
 		try {
-			return _buildDisplayContext(renderRequest);
+			return buildDisplayContext(renderRequest);
 		}
 		catch (ConfigurationException configurationException) {
 			throw new RuntimeException(configurationException);

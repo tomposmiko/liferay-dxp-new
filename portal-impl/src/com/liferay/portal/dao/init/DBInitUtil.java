@@ -16,7 +16,6 @@ package com.liferay.portal.dao.init;
 
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.dao.jdbc.util.DynamicDataSource;
 import com.liferay.portal.db.partition.DBPartitionUtil;
 import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -55,27 +54,27 @@ public class DBInitUtil {
 		return _dataSource;
 	}
 
+	public static DataSource getReadDataSource() {
+		return _readDataSource;
+	}
+
+	public static DataSource getWriteDataSource() {
+		return _writeDataSource;
+	}
+
 	public static void init() throws Exception {
 		_readDataSource = _initDataSource("jdbc.read.");
 
 		_writeDataSource = _initDataSource("jdbc.write.");
 
-		if ((_readDataSource != null) && (_writeDataSource != null)) {
-			_dataSource = new DynamicDataSource(
-				_readDataSource, _writeDataSource);
-		}
-		else {
-			_dataSource = _initDataSource("jdbc.default.");
-		}
+		_dataSource = _writeDataSource;
 
-		if (_dataSource == null) {
-			throw new IllegalStateException("Data source is null");
+		if ((_readDataSource == null) && (_writeDataSource == null)) {
+			_dataSource = _initDataSource("jdbc.default.");
 		}
 
 		try (Connection connection = _dataSource.getConnection()) {
 			_init(DBManagerUtil.getDB(), connection);
-
-			_dataSource = DBPartitionUtil.wrapDataSource(_dataSource);
 
 			DBPartitionUtil.setDefaultCompanyId(connection);
 		}
@@ -121,14 +120,14 @@ public class DBInitUtil {
 			if (!resultSet.next()) {
 				_addReleaseInfo(connection);
 
-				_setDBNew();
+				StartupHelperUtil.setDbNew(true);
 			}
 
 			return true;
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception.getMessage(), exception);
 			}
 		}
 
@@ -152,7 +151,22 @@ public class DBInitUtil {
 
 		_addReleaseInfo(connection);
 
-		_setDBNew();
+		StartupHelperUtil.setDbNew(true);
+
+		ServiceLatch serviceLatch = SystemBundleUtil.newServiceLatch();
+
+		serviceLatch.waitFor(
+			DependencyManagerSync.class,
+			dependencyManagerSync -> dependencyManagerSync.registerSyncCallable(
+				() -> {
+					StartupHelperUtil.setDbNew(false);
+
+					return null;
+				}));
+
+		serviceLatch.openOn(
+			() -> {
+			});
 	}
 
 	private static boolean _hasDefaultReleaseWithTestString(
@@ -190,7 +204,7 @@ public class DBInitUtil {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception.getMessage());
 			}
 		}
 
@@ -201,16 +215,7 @@ public class DBInitUtil {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-		}
-
-		try {
-			db.runSQL(connection, "alter table Release_ add state_ INTEGER");
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception.getMessage());
 			}
 		}
 
@@ -238,8 +243,8 @@ public class DBInitUtil {
 			return null;
 		}
 
-		DataSource dataSource = DataSourceFactoryUtil.initDataSource(
-			properties);
+		DataSource dataSource = DBPartitionUtil.wrapDataSource(
+			DataSourceFactoryUtil.initDataSource(properties));
 
 		DBManagerUtil.setDB(DialectDetector.getDialect(dataSource), dataSource);
 
@@ -256,25 +261,6 @@ public class DBInitUtil {
 				classLoader.getResourceAsStream(
 					"com/liferay/portal/tools/sql/dependencies/".concat(path))),
 			false);
-	}
-
-	private static void _setDBNew() {
-		StartupHelperUtil.setDBNew(true);
-
-		ServiceLatch serviceLatch = SystemBundleUtil.newServiceLatch();
-
-		serviceLatch.waitFor(
-			DependencyManagerSync.class,
-			dependencyManagerSync -> dependencyManagerSync.registerSyncCallable(
-				() -> {
-					StartupHelperUtil.setDBNew(false);
-
-					return null;
-				}));
-
-		serviceLatch.openOn(
-			() -> {
-			});
 	}
 
 	private static void _setSupportsStringCaseSensitiveQuery(

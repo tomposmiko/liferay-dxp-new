@@ -14,17 +14,16 @@
 
 package com.liferay.commerce.account.item.selector.web.internal;
 
-import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.account.service.AccountGroupRelLocalService;
-import com.liferay.account.service.AccountGroupService;
 import com.liferay.commerce.account.item.selector.criterion.CommerceAccountGroupAccountItemSelectorCriterion;
 import com.liferay.commerce.account.item.selector.web.internal.display.context.CommerceAccountGroupAccountItemSelectorViewDisplayContext;
-import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.account.service.CommerceAccountGroupCommerceAccountRelLocalService;
+import com.liferay.commerce.account.service.CommerceAccountGroupService;
+import com.liferay.commerce.account.service.CommerceAccountService;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.Base64ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -49,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = ItemSelectorView.class)
+@Component(enabled = false, immediate = true, service = ItemSelectorView.class)
 public class CommerceAccountGroupAccountItemSelectorView
 	implements ItemSelectorView
 		<CommerceAccountGroupAccountItemSelectorCriterion> {
@@ -72,7 +71,7 @@ public class CommerceAccountGroupAccountItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "accounts");
+		return LanguageUtil.get(locale, "accounts");
 	}
 
 	@Override
@@ -89,8 +88,8 @@ public class CommerceAccountGroupAccountItemSelectorView
 		CommerceAccountGroupAccountItemSelectorViewDisplayContext
 			commerceAccountGroupAccountItemSelectorViewDisplayContext =
 				new CommerceAccountGroupAccountItemSelectorViewDisplayContext(
-					_accountGroupRelLocalService, _accountGroupService,
-					_accountEntryLocalService, _commerceAccountHelper,
+					_commerceAccountGroupCommerceAccountRelLocalService,
+					_commerceAccountGroupService, _commerceAccountService,
 					httpServletRequest, portletURL, itemSelectedEventName);
 
 		httpServletRequest.setAttribute(
@@ -113,19 +112,14 @@ public class CommerceAccountGroupAccountItemSelectorView
 				new UUIDItemSelectorReturnType()));
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private CommerceAccountGroupCommerceAccountRelLocalService
+		_commerceAccountGroupCommerceAccountRelLocalService;
 
 	@Reference
-	private AccountGroupRelLocalService _accountGroupRelLocalService;
+	private CommerceAccountGroupService _commerceAccountGroupService;
 
 	@Reference
-	private AccountGroupService _accountGroupService;
-
-	@Reference
-	private CommerceAccountHelper _commerceAccountHelper;
-
-	@Reference
-	private Language _language;
+	private CommerceAccountService _commerceAccountService;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.account.item.selector.web)"

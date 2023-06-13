@@ -16,7 +16,6 @@ package com.liferay.document.library.internal.util;
 
 import com.liferay.document.library.configuration.DLFileEntryConfiguration;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
-import com.liferay.document.library.kernel.exception.NoSuchFileVersionException;
 import com.liferay.document.library.kernel.util.DLProcessor;
 import com.liferay.document.library.kernel.util.DLProcessorRegistry;
 import com.liferay.document.library.kernel.util.DLProcessorThreadLocal;
@@ -269,17 +268,15 @@ public class DLProcessorRegistryImpl implements DLProcessorRegistry {
 		try {
 			return fileEntry.getLatestFileVersion(trusted);
 		}
-		catch (NoSuchFileEntryException | NoSuchFileVersionException
-					exception) {
-
+		catch (NoSuchFileEntryException noSuchFileEntryException) {
 			if (_log.isInfoEnabled()) {
-				_log.info(exception);
+				_log.info(noSuchFileEntryException, noSuchFileEntryException);
 			}
 
 			return null;
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return null;
 		}

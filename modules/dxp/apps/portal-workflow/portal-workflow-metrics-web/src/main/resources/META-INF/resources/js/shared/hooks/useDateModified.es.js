@@ -9,20 +9,48 @@
  * distribution rights of the Software.
  */
 
-import {useState} from 'react';
+import {useCallback, useContext, useState} from 'react';
 
-import {useFetch} from './useFetch.es';
+import {AppContext} from '../../components/AppContext.es';
 
-const useDateModified = ({admin = false, params = {}, processId}) => {
+const useDateModified = ({
+	admin = false,
+	callback = (data) => data,
+	params = {},
+	processId,
+	fetchDateModified = false,
+}) => {
+	const {getClient} = useContext(AppContext);
 	const [dateModified, setDateModified] = useState(null);
 
-	const url = `/processes/${processId}/last-sla-result`;
+	const client = getClient(admin);
+	const queryParamsStr = JSON.stringify(params);
 
-	const callback = (data) => {
-		setDateModified(data.dateModified);
-	};
+	const url = `processes/${processId}/last-sla-result`;
 
-	const {fetchData} = useFetch({admin, callback, params, url});
+	const fetchData = useCallback(
+		() => {
+			if (fetchDateModified) {
+				return client.get(url, {params}).then(({data, status}) => {
+					if (status === 200) {
+						setDateModified(data.dateModified);
+
+						return callback(data.dateModified);
+					}
+					setDateModified(null);
+
+					return callback(null);
+				});
+			}
+			else {
+				setDateModified(null);
+
+				return callback(null);
+			}
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[client, fetchDateModified, queryParamsStr, url]
+	);
 
 	return {
 		dateModified,

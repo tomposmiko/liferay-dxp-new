@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -41,19 +42,17 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.template.exception.NoSuchTemplateEntryException;
 import com.liferay.template.model.TemplateEntry;
 import com.liferay.template.model.TemplateEntryTable;
 import com.liferay.template.model.impl.TemplateEntryImpl;
 import com.liferay.template.model.impl.TemplateEntryModelImpl;
 import com.liferay.template.service.persistence.TemplateEntryPersistence;
-import com.liferay.template.service.persistence.TemplateEntryUtil;
 import com.liferay.template.service.persistence.impl.constants.TemplatePersistenceConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = TemplateEntryPersistence.class)
+@Component(service = {TemplateEntryPersistence.class, BasePersistence.class})
 public class TemplateEntryPersistenceImpl
 	extends BasePersistenceImpl<TemplateEntry>
 	implements TemplateEntryPersistence {
@@ -205,7 +204,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<TemplateEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (TemplateEntry templateEntry : list) {
@@ -596,7 +595,7 @@ public class TemplateEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -732,7 +731,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof TemplateEntry) {
@@ -852,7 +851,7 @@ public class TemplateEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1024,7 +1023,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<TemplateEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (TemplateEntry templateEntry : list) {
@@ -1449,7 +1448,7 @@ public class TemplateEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1611,7 +1610,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<TemplateEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (TemplateEntry templateEntry : list) {
@@ -2006,7 +2005,7 @@ public class TemplateEntryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TemplateEntryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of template entries
 	 * @param end the upper bound of the range of template entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2052,7 +2051,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<TemplateEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByGroupId, finderArgs, this);
+				_finderPathWithPaginationFindByGroupId, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (TemplateEntry templateEntry : list) {
@@ -2162,7 +2161,7 @@ public class TemplateEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2228,7 +2227,7 @@ public class TemplateEntryPersistenceImpl
 			finderArgs = new Object[] {StringUtil.merge(groupIds)};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByGroupId, finderArgs, this);
+				_finderPathWithPaginationCountByGroupId, finderArgs);
 		}
 
 		if (count == null) {
@@ -2356,7 +2355,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByDDMTemplateId, finderArgs, this);
+				_finderPathFetchByDDMTemplateId, finderArgs);
 		}
 
 		if (result instanceof TemplateEntry) {
@@ -2470,7 +2469,7 @@ public class TemplateEntryPersistenceImpl
 
 			finderArgs = new Object[] {ddmTemplateId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2624,7 +2623,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<TemplateEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (TemplateEntry templateEntry : list) {
@@ -3050,7 +3049,7 @@ public class TemplateEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, infoItemClassName};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3117,7 +3116,6 @@ public class TemplateEntryPersistenceImpl
 	private FinderPath _finderPathWithPaginationFindByG_IICN_IIFVK;
 	private FinderPath _finderPathWithoutPaginationFindByG_IICN_IIFVK;
 	private FinderPath _finderPathCountByG_IICN_IIFVK;
-	private FinderPath _finderPathWithPaginationCountByG_IICN_IIFVK;
 
 	/**
 	 * Returns all the template entries where groupId = &#63; and infoItemClassName = &#63; and infoItemFormVariationKey = &#63;.
@@ -3241,7 +3239,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<TemplateEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (TemplateEntry templateEntry : list) {
@@ -3682,258 +3680,6 @@ public class TemplateEntryPersistenceImpl
 	}
 
 	/**
-	 * Returns all the template entries where groupId = any &#63; and infoItemClassName = &#63; and infoItemFormVariationKey = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TemplateEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param groupIds the group IDs
-	 * @param infoItemClassName the info item class name
-	 * @param infoItemFormVariationKey the info item form variation key
-	 * @return the matching template entries
-	 */
-	@Override
-	public List<TemplateEntry> findByG_IICN_IIFVK(
-		long[] groupIds, String infoItemClassName,
-		String infoItemFormVariationKey) {
-
-		return findByG_IICN_IIFVK(
-			groupIds, infoItemClassName, infoItemFormVariationKey,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-	}
-
-	/**
-	 * Returns a range of all the template entries where groupId = any &#63; and infoItemClassName = &#63; and infoItemFormVariationKey = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TemplateEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param groupIds the group IDs
-	 * @param infoItemClassName the info item class name
-	 * @param infoItemFormVariationKey the info item form variation key
-	 * @param start the lower bound of the range of template entries
-	 * @param end the upper bound of the range of template entries (not inclusive)
-	 * @return the range of matching template entries
-	 */
-	@Override
-	public List<TemplateEntry> findByG_IICN_IIFVK(
-		long[] groupIds, String infoItemClassName,
-		String infoItemFormVariationKey, int start, int end) {
-
-		return findByG_IICN_IIFVK(
-			groupIds, infoItemClassName, infoItemFormVariationKey, start, end,
-			null);
-	}
-
-	/**
-	 * Returns an ordered range of all the template entries where groupId = any &#63; and infoItemClassName = &#63; and infoItemFormVariationKey = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TemplateEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param groupIds the group IDs
-	 * @param infoItemClassName the info item class name
-	 * @param infoItemFormVariationKey the info item form variation key
-	 * @param start the lower bound of the range of template entries
-	 * @param end the upper bound of the range of template entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching template entries
-	 */
-	@Override
-	public List<TemplateEntry> findByG_IICN_IIFVK(
-		long[] groupIds, String infoItemClassName,
-		String infoItemFormVariationKey, int start, int end,
-		OrderByComparator<TemplateEntry> orderByComparator) {
-
-		return findByG_IICN_IIFVK(
-			groupIds, infoItemClassName, infoItemFormVariationKey, start, end,
-			orderByComparator, true);
-	}
-
-	/**
-	 * Returns an ordered range of all the template entries where groupId = &#63; and infoItemClassName = &#63; and infoItemFormVariationKey = &#63;, optionally using the finder cache.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>TemplateEntryModelImpl</code>.
-	 * </p>
-	 *
-	 * @param groupIds the group IDs
-	 * @param infoItemClassName the info item class name
-	 * @param infoItemFormVariationKey the info item form variation key
-	 * @param start the lower bound of the range of template entries
-	 * @param end the upper bound of the range of template entries (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching template entries
-	 */
-	@Override
-	public List<TemplateEntry> findByG_IICN_IIFVK(
-		long[] groupIds, String infoItemClassName,
-		String infoItemFormVariationKey, int start, int end,
-		OrderByComparator<TemplateEntry> orderByComparator,
-		boolean useFinderCache) {
-
-		if (groupIds == null) {
-			groupIds = new long[0];
-		}
-		else if (groupIds.length > 1) {
-			groupIds = ArrayUtil.sortedUnique(groupIds);
-		}
-
-		infoItemClassName = Objects.toString(infoItemClassName, "");
-		infoItemFormVariationKey = Objects.toString(
-			infoItemFormVariationKey, "");
-
-		if (groupIds.length == 1) {
-			return findByG_IICN_IIFVK(
-				groupIds[0], infoItemClassName, infoItemFormVariationKey, start,
-				end, orderByComparator);
-		}
-
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			TemplateEntry.class);
-
-		Object[] finderArgs = null;
-
-		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
-			(orderByComparator == null)) {
-
-			if (useFinderCache && productionMode) {
-				finderArgs = new Object[] {
-					StringUtil.merge(groupIds), infoItemClassName,
-					infoItemFormVariationKey
-				};
-			}
-		}
-		else if (useFinderCache && productionMode) {
-			finderArgs = new Object[] {
-				StringUtil.merge(groupIds), infoItemClassName,
-				infoItemFormVariationKey, start, end, orderByComparator
-			};
-		}
-
-		List<TemplateEntry> list = null;
-
-		if (useFinderCache && productionMode) {
-			list = (List<TemplateEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_IICN_IIFVK, finderArgs, this);
-
-			if ((list != null) && !list.isEmpty()) {
-				for (TemplateEntry templateEntry : list) {
-					if (!ArrayUtil.contains(
-							groupIds, templateEntry.getGroupId()) ||
-						!infoItemClassName.equals(
-							templateEntry.getInfoItemClassName()) ||
-						!infoItemFormVariationKey.equals(
-							templateEntry.getInfoItemFormVariationKey())) {
-
-						list = null;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (list == null) {
-			StringBundler sb = new StringBundler();
-
-			sb.append(_SQL_SELECT_TEMPLATEENTRY_WHERE);
-
-			if (groupIds.length > 0) {
-				sb.append("(");
-
-				sb.append(_FINDER_COLUMN_G_IICN_IIFVK_GROUPID_7);
-
-				sb.append(StringUtil.merge(groupIds));
-
-				sb.append(")");
-
-				sb.append(")");
-
-				sb.append(WHERE_AND);
-			}
-
-			boolean bindInfoItemClassName = false;
-
-			if (infoItemClassName.isEmpty()) {
-				sb.append(_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMCLASSNAME_3);
-			}
-			else {
-				bindInfoItemClassName = true;
-
-				sb.append(_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMCLASSNAME_2);
-			}
-
-			boolean bindInfoItemFormVariationKey = false;
-
-			if (infoItemFormVariationKey.isEmpty()) {
-				sb.append(
-					_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMFORMVARIATIONKEY_3);
-			}
-			else {
-				bindInfoItemFormVariationKey = true;
-
-				sb.append(
-					_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMFORMVARIATIONKEY_2);
-			}
-
-			sb.setStringAt(
-				removeConjunction(sb.stringAt(sb.index() - 1)), sb.index() - 1);
-
-			if (orderByComparator != null) {
-				appendOrderByComparator(
-					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
-			}
-			else {
-				sb.append(TemplateEntryModelImpl.ORDER_BY_JPQL);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindInfoItemClassName) {
-					queryPos.add(infoItemClassName);
-				}
-
-				if (bindInfoItemFormVariationKey) {
-					queryPos.add(infoItemFormVariationKey);
-				}
-
-				list = (List<TemplateEntry>)QueryUtil.list(
-					query, getDialect(), start, end);
-
-				cacheResult(list);
-
-				if (useFinderCache && productionMode) {
-					finderCache.putResult(
-						_finderPathWithPaginationFindByG_IICN_IIFVK, finderArgs,
-						list);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return list;
-	}
-
-	/**
 	 * Removes all the template entries where groupId = &#63; and infoItemClassName = &#63; and infoItemFormVariationKey = &#63; from the database.
 	 *
 	 * @param groupId the group ID
@@ -3986,7 +3732,7 @@ public class TemplateEntryPersistenceImpl
 				groupId, infoItemClassName, infoItemFormVariationKey
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4058,136 +3804,8 @@ public class TemplateEntryPersistenceImpl
 		return count.intValue();
 	}
 
-	/**
-	 * Returns the number of template entries where groupId = any &#63; and infoItemClassName = &#63; and infoItemFormVariationKey = &#63;.
-	 *
-	 * @param groupIds the group IDs
-	 * @param infoItemClassName the info item class name
-	 * @param infoItemFormVariationKey the info item form variation key
-	 * @return the number of matching template entries
-	 */
-	@Override
-	public int countByG_IICN_IIFVK(
-		long[] groupIds, String infoItemClassName,
-		String infoItemFormVariationKey) {
-
-		if (groupIds == null) {
-			groupIds = new long[0];
-		}
-		else if (groupIds.length > 1) {
-			groupIds = ArrayUtil.sortedUnique(groupIds);
-		}
-
-		infoItemClassName = Objects.toString(infoItemClassName, "");
-		infoItemFormVariationKey = Objects.toString(
-			infoItemFormVariationKey, "");
-
-		boolean productionMode = ctPersistenceHelper.isProductionMode(
-			TemplateEntry.class);
-
-		Object[] finderArgs = null;
-
-		Long count = null;
-
-		if (productionMode) {
-			finderArgs = new Object[] {
-				StringUtil.merge(groupIds), infoItemClassName,
-				infoItemFormVariationKey
-			};
-
-			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_IICN_IIFVK, finderArgs, this);
-		}
-
-		if (count == null) {
-			StringBundler sb = new StringBundler();
-
-			sb.append(_SQL_COUNT_TEMPLATEENTRY_WHERE);
-
-			if (groupIds.length > 0) {
-				sb.append("(");
-
-				sb.append(_FINDER_COLUMN_G_IICN_IIFVK_GROUPID_7);
-
-				sb.append(StringUtil.merge(groupIds));
-
-				sb.append(")");
-
-				sb.append(")");
-
-				sb.append(WHERE_AND);
-			}
-
-			boolean bindInfoItemClassName = false;
-
-			if (infoItemClassName.isEmpty()) {
-				sb.append(_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMCLASSNAME_3);
-			}
-			else {
-				bindInfoItemClassName = true;
-
-				sb.append(_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMCLASSNAME_2);
-			}
-
-			boolean bindInfoItemFormVariationKey = false;
-
-			if (infoItemFormVariationKey.isEmpty()) {
-				sb.append(
-					_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMFORMVARIATIONKEY_3);
-			}
-			else {
-				bindInfoItemFormVariationKey = true;
-
-				sb.append(
-					_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMFORMVARIATIONKEY_2);
-			}
-
-			sb.setStringAt(
-				removeConjunction(sb.stringAt(sb.index() - 1)), sb.index() - 1);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindInfoItemClassName) {
-					queryPos.add(infoItemClassName);
-				}
-
-				if (bindInfoItemFormVariationKey) {
-					queryPos.add(infoItemFormVariationKey);
-				}
-
-				count = (Long)query.uniqueResult();
-
-				if (productionMode) {
-					finderCache.putResult(
-						_finderPathWithPaginationCountByG_IICN_IIFVK,
-						finderArgs, count);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
 	private static final String _FINDER_COLUMN_G_IICN_IIFVK_GROUPID_2 =
 		"templateEntry.groupId = ? AND ";
-
-	private static final String _FINDER_COLUMN_G_IICN_IIFVK_GROUPID_7 =
-		"templateEntry.groupId IN (";
 
 	private static final String
 		_FINDER_COLUMN_G_IICN_IIFVK_INFOITEMCLASSNAME_2 =
@@ -4350,7 +3968,7 @@ public class TemplateEntryPersistenceImpl
 		templateEntry.setNew(true);
 		templateEntry.setPrimaryKey(templateEntryId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		templateEntry.setUuid(uuid);
 
@@ -4471,7 +4089,7 @@ public class TemplateEntryPersistenceImpl
 			(TemplateEntryModelImpl)templateEntry;
 
 		if (Validator.isNull(templateEntry.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			templateEntry.setUuid(uuid);
 		}
@@ -4596,9 +4214,7 @@ public class TemplateEntryPersistenceImpl
 	 */
 	@Override
 	public TemplateEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				TemplateEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(TemplateEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4817,7 +4433,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<TemplateEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4893,7 +4509,7 @@ public class TemplateEntryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -5162,42 +4778,11 @@ public class TemplateEntryPersistenceImpl
 				"groupId", "infoItemClassName", "infoItemFormVariationKey"
 			},
 			false);
-
-		_finderPathWithPaginationCountByG_IICN_IIFVK = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_IICN_IIFVK",
-			new String[] {
-				Long.class.getName(), String.class.getName(),
-				String.class.getName()
-			},
-			new String[] {
-				"groupId", "infoItemClassName", "infoItemFormVariationKey"
-			},
-			false);
-
-		_setTemplateEntryUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setTemplateEntryUtilPersistence(null);
-
 		entityCache.removeCache(TemplateEntryImpl.class.getName());
-	}
-
-	private void _setTemplateEntryUtilPersistence(
-		TemplateEntryPersistence templateEntryPersistence) {
-
-		try {
-			Field field = TemplateEntryUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, templateEntryPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -5267,6 +4852,7 @@ public class TemplateEntryPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private TemplateEntryModelArgumentsResolver
+		_templateEntryModelArgumentsResolver;
 
 }

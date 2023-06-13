@@ -24,8 +24,6 @@ import java.util.List;
  */
 public interface NotificationSender {
 
-	public String getNotificationType();
-
 	public void sendNotification(
 			List<KaleoNotificationRecipient> notificationRecipients,
 			String subject, String notificationMessage,

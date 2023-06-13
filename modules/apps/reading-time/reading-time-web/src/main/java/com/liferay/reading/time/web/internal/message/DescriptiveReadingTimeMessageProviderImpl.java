@@ -14,7 +14,7 @@
 
 package com.liferay.reading.time.web.internal.message;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.reading.time.message.ReadingTimeMessageProvider;
 import com.liferay.reading.time.model.ReadingTimeEntry;
 
@@ -23,13 +23,12 @@ import java.time.Duration;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alejandro Tardín
  */
 @Component(
-	property = "display.style=descriptive",
+	immediate = true, property = "display.style=descriptive",
 	service = ReadingTimeMessageProvider.class
 )
 public class DescriptiveReadingTimeMessageProviderImpl
@@ -40,13 +39,14 @@ public class DescriptiveReadingTimeMessageProviderImpl
 		long readingTimeInMinutes = readingTimeDuration.toMinutes();
 
 		if (readingTimeInMinutes == 0) {
-			return _language.get(locale, "less-than-a-minute-read");
+			return LanguageUtil.get(locale, "less-than-a-minute-read");
 		}
 		else if (readingTimeInMinutes == 1) {
-			return _language.get(locale, "a-minute-read");
+			return LanguageUtil.get(locale, "a-minute-read");
 		}
 
-		return _language.format(locale, "x-minute-read", readingTimeInMinutes);
+		return LanguageUtil.format(
+			locale, "x-minute-read", readingTimeInMinutes);
 	}
 
 	@Override
@@ -54,8 +54,5 @@ public class DescriptiveReadingTimeMessageProviderImpl
 		return provide(
 			Duration.ofMillis(readingTimeEntry.getReadingTime()), locale);
 	}
-
-	@Reference
-	private Language _language;
 
 }

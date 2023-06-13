@@ -16,6 +16,7 @@ package com.liferay.asset.list.web.internal.display.context;
 
 import com.liferay.asset.list.constants.AssetListActionKeys;
 import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
+import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.web.internal.security.permission.resource.AssetListEntryPermission;
 import com.liferay.asset.list.web.internal.security.permission.resource.AssetListPermission;
@@ -24,17 +25,22 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.staging.StagingGroupHelper;
+import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.List;
+
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,16 +59,15 @@ public class AssetListManagementToolbarDisplayContext
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			assetListDisplayContext.getAssetListEntriesSearchContainer());
-
-		_assetListDisplayContext = assetListDisplayContext;
-
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 	}
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		if (_assetListDisplayContext.isLiveGroup()) {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if (_isLiveGroup(themeDisplay)) {
 			return null;
 		}
 
@@ -70,7 +75,7 @@ public class AssetListManagementToolbarDisplayContext
 			dropdownItem -> {
 				dropdownItem.putData(
 					"action", "deleteSelectedAssetListEntries");
-				dropdownItem.setIcon("trash");
+				dropdownItem.setIcon("times-circle");
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "delete"));
 				dropdownItem.setQuickAction(true);
@@ -81,9 +86,13 @@ public class AssetListManagementToolbarDisplayContext
 	public String getAvailableActions(AssetListEntry assetListEntry)
 		throws PortalException {
 
-		if (!_assetListDisplayContext.isLiveGroup() &&
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if (!_isLiveGroup(themeDisplay) &&
 			AssetListEntryPermission.contains(
-				_themeDisplay.getPermissionChecker(), assetListEntry,
+				themeDisplay.getPermissionChecker(), assetListEntry,
 				ActionKeys.DELETE)) {
 
 			return "deleteSelectedAssetListEntries";
@@ -154,28 +163,30 @@ public class AssetListManagementToolbarDisplayContext
 	}
 
 	@Override
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
+
+		return searchActionURL.toString();
+	}
+
+	@Override
 	public String getSearchContainerId() {
 		return "assetListEntries";
 	}
 
 	@Override
-	public Boolean isSelectable() {
-		if (_assetListDisplayContext.isLiveGroup()) {
-			return false;
-		}
-
-		return super.isSelectable();
-	}
-
-	@Override
 	public Boolean isShowCreationMenu() {
-		if (_assetListDisplayContext.isLiveGroup()) {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if (_isLiveGroup(themeDisplay)) {
 			return false;
 		}
 
 		if (AssetListPermission.contains(
-				_themeDisplay.getPermissionChecker(),
-				_themeDisplay.getScopeGroupId(),
+				themeDisplay.getPermissionChecker(),
+				themeDisplay.getScopeGroupId(),
 				AssetListActionKeys.ADD_ASSET_LIST_ENTRY)) {
 
 			return true;
@@ -185,16 +196,28 @@ public class AssetListManagementToolbarDisplayContext
 	}
 
 	@Override
-	protected String[] getDisplayViews() {
-		return new String[] {"list", "descriptive", "icon"};
-	}
-
-	@Override
 	protected String[] getOrderByKeys() {
 		return new String[] {"title", "create-date"};
 	}
 
-	private final AssetListDisplayContext _assetListDisplayContext;
-	private final ThemeDisplay _themeDisplay;
+	private boolean _isLiveGroup(ThemeDisplay themeDisplay) {
+		Group group = themeDisplay.getScopeGroup();
+
+		if (group.isLayout()) {
+			group = group.getParentGroup();
+		}
+
+		StagingGroupHelper stagingGroupHelper =
+			StagingGroupHelperUtil.getStagingGroupHelper();
+
+		if (stagingGroupHelper.isLiveGroup(group) &&
+			stagingGroupHelper.isStagedPortlet(
+				group, AssetListPortletKeys.ASSET_LIST)) {
+
+			return true;
+		}
+
+		return false;
+	}
 
 }

@@ -17,6 +17,7 @@ package com.liferay.translation.web.internal.application.list;
 import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.constants.PanelCategoryKeys;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.translation.constants.TranslationPortletKeys;
 
@@ -27,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alicia Garcia
  */
 @Component(
+	immediate = true,
 	property = {
 		"panel.app.order:Integer=1300",
 		"panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT
@@ -36,18 +38,20 @@ import org.osgi.service.component.annotations.Reference;
 public class TranslationPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return TranslationPortletKeys.TRANSLATION;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + TranslationPortletKeys.TRANSLATION + ")"
+		target = "(javax.portlet.name=" + TranslationPortletKeys.TRANSLATION + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
+
+	@Reference
+	private Language _language;
 
 }

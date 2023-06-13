@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING,
 		"mvc.command.name=/dynamic_data_mapping/delete_structure"
@@ -62,7 +63,13 @@ public class DeleteStructureMVCActionCommand extends BaseDDMMVCActionCommand {
 		setRedirectAttribute(actionRequest);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDMStructureService(
+		DDMStructureService ddmStructureService) {
+
+		_ddmStructureService = ddmStructureService;
+	}
+
 	private DDMStructureService _ddmStructureService;
 
 }

@@ -133,20 +133,6 @@ public class LayoutSerDes {
 			sb.append("\"");
 		}
 
-		if (layout.getFlexWrap() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"flexWrap\": ");
-
-			sb.append("\"");
-
-			sb.append(layout.getFlexWrap());
-
-			sb.append("\"");
-		}
-
 		if (layout.getJustify() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -350,13 +336,6 @@ public class LayoutSerDes {
 				"contentDisplay", String.valueOf(layout.getContentDisplay()));
 		}
 
-		if (layout.getFlexWrap() == null) {
-			map.put("flexWrap", null);
-		}
-		else {
-			map.put("flexWrap", String.valueOf(layout.getFlexWrap()));
-		}
-
 		if (layout.getJustify() == null) {
 			map.put("justify", null);
 		}
@@ -506,12 +485,6 @@ public class LayoutSerDes {
 					layout.setContentDisplay(
 						Layout.ContentDisplay.create(
 							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "flexWrap")) {
-				if (jsonParserFieldValue != null) {
-					layout.setFlexWrap(
-						Layout.FlexWrap.create((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "justify")) {

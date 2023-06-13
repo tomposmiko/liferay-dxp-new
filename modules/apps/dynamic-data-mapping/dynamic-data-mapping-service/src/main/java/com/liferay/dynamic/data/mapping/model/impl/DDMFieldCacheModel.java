@@ -147,9 +147,7 @@ public class DDMFieldCacheModel
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput)
-		throws ClassNotFoundException, IOException {
-
+	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
 
 		ctCollectionId = objectInput.readLong();
@@ -163,7 +161,7 @@ public class DDMFieldCacheModel
 		storageId = objectInput.readLong();
 
 		structureVersionId = objectInput.readLong();
-		fieldName = (String)objectInput.readObject();
+		fieldName = objectInput.readUTF();
 		fieldType = objectInput.readUTF();
 		instanceId = objectInput.readUTF();
 
@@ -189,10 +187,10 @@ public class DDMFieldCacheModel
 		objectOutput.writeLong(structureVersionId);
 
 		if (fieldName == null) {
-			objectOutput.writeObject("");
+			objectOutput.writeUTF("");
 		}
 		else {
-			objectOutput.writeObject(fieldName);
+			objectOutput.writeUTF(fieldName);
 		}
 
 		if (fieldType == null) {

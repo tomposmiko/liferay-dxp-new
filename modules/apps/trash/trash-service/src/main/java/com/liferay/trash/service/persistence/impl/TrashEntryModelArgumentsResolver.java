@@ -33,11 +33,8 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.trash.model.impl.TrashEntryImpl",
-		"table.name=TrashEntry"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {TrashEntryModelArgumentsResolver.class, ArgumentsResolver.class}
 )
 public class TrashEntryModelArgumentsResolver implements ArgumentsResolver {
 

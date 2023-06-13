@@ -59,7 +59,7 @@ public class UpgradeMessageBoards extends UpgradeProcess {
 			throw new UpgradeException(exception);
 		}
 		finally {
-			dropTable(tempTableName);
+			runSQL("drop table " + tempTableName);
 		}
 	}
 

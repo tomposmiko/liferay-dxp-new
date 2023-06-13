@@ -14,6 +14,7 @@
 
 package com.liferay.search.experiences.rest.client.serdes.v1_0;
 
+import com.liferay.search.experiences.rest.client.dto.v1_0.Document;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SearchResponse;
 import com.liferay.search.experiences.rest.client.json.BaseJSONParser;
 
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -55,24 +57,34 @@ public class SearchResponseSerDes {
 
 		sb.append("{");
 
-		if (searchResponse.getErrors() != null) {
+		if (searchResponse.getDocuments() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"errors\": ");
+			sb.append("\"documents\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < searchResponse.getErrors().length; i++) {
-				sb.append(searchResponse.getErrors()[i]);
+			for (int i = 0; i < searchResponse.getDocuments().length; i++) {
+				sb.append(String.valueOf(searchResponse.getDocuments()[i]));
 
-				if ((i + 1) < searchResponse.getErrors().length) {
+				if ((i + 1) < searchResponse.getDocuments().length) {
 					sb.append(", ");
 				}
 			}
 
 			sb.append("]");
+		}
+
+		if (searchResponse.getMaxScore() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"maxScore\": ");
+
+			sb.append(searchResponse.getMaxScore());
 		}
 
 		if (searchResponse.getPage() != null) {
@@ -102,14 +114,11 @@ public class SearchResponseSerDes {
 
 			sb.append("\"request\": ");
 
-			if (searchResponse.getRequest() instanceof String) {
-				sb.append("\"");
-				sb.append((String)searchResponse.getRequest());
-				sb.append("\"");
-			}
-			else {
-				sb.append(searchResponse.getRequest());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(searchResponse.getRequest()));
+
+			sb.append("\"");
 		}
 
 		if (searchResponse.getRequestString() != null) {
@@ -133,14 +142,11 @@ public class SearchResponseSerDes {
 
 			sb.append("\"response\": ");
 
-			if (searchResponse.getResponse() instanceof String) {
-				sb.append("\"");
-				sb.append((String)searchResponse.getResponse());
-				sb.append("\"");
-			}
-			else {
-				sb.append(searchResponse.getResponse());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(searchResponse.getResponse()));
+
+			sb.append("\"");
 		}
 
 		if (searchResponse.getResponseString() != null) {
@@ -157,16 +163,6 @@ public class SearchResponseSerDes {
 			sb.append("\"");
 		}
 
-		if (searchResponse.getSearchHits() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"searchHits\": ");
-
-			sb.append(String.valueOf(searchResponse.getSearchHits()));
-		}
-
 		if (searchResponse.getSearchRequest() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -175,6 +171,16 @@ public class SearchResponseSerDes {
 			sb.append("\"searchRequest\": ");
 
 			sb.append(String.valueOf(searchResponse.getSearchRequest()));
+		}
+
+		if (searchResponse.getTotalHits() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"totalHits\": ");
+
+			sb.append(searchResponse.getTotalHits());
 		}
 
 		sb.append("}");
@@ -196,11 +202,18 @@ public class SearchResponseSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (searchResponse.getErrors() == null) {
-			map.put("errors", null);
+		if (searchResponse.getDocuments() == null) {
+			map.put("documents", null);
 		}
 		else {
-			map.put("errors", String.valueOf(searchResponse.getErrors()));
+			map.put("documents", String.valueOf(searchResponse.getDocuments()));
+		}
+
+		if (searchResponse.getMaxScore() == null) {
+			map.put("maxScore", null);
+		}
+		else {
+			map.put("maxScore", String.valueOf(searchResponse.getMaxScore()));
 		}
 
 		if (searchResponse.getPage() == null) {
@@ -249,14 +262,6 @@ public class SearchResponseSerDes {
 				String.valueOf(searchResponse.getResponseString()));
 		}
 
-		if (searchResponse.getSearchHits() == null) {
-			map.put("searchHits", null);
-		}
-		else {
-			map.put(
-				"searchHits", String.valueOf(searchResponse.getSearchHits()));
-		}
-
 		if (searchResponse.getSearchRequest() == null) {
 			map.put("searchRequest", null);
 		}
@@ -264,6 +269,13 @@ public class SearchResponseSerDes {
 			map.put(
 				"searchRequest",
 				String.valueOf(searchResponse.getSearchRequest()));
+		}
+
+		if (searchResponse.getTotalHits() == null) {
+			map.put("totalHits", null);
+		}
+		else {
+			map.put("totalHits", String.valueOf(searchResponse.getTotalHits()));
 		}
 
 		return map;
@@ -287,9 +299,22 @@ public class SearchResponseSerDes {
 			SearchResponse searchResponse, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "errors")) {
+			if (Objects.equals(jsonParserFieldName, "documents")) {
 				if (jsonParserFieldValue != null) {
-					searchResponse.setErrors((Map[])jsonParserFieldValue);
+					searchResponse.setDocuments(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DocumentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Document[size]
+						));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "maxScore")) {
+				if (jsonParserFieldValue != null) {
+					searchResponse.setMaxScore(
+						Double.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "page")) {
@@ -326,17 +351,17 @@ public class SearchResponseSerDes {
 						(String)jsonParserFieldValue);
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "searchHits")) {
-				if (jsonParserFieldValue != null) {
-					searchResponse.setSearchHits(
-						SearchHitsSerDes.toDTO((String)jsonParserFieldValue));
-				}
-			}
 			else if (Objects.equals(jsonParserFieldName, "searchRequest")) {
 				if (jsonParserFieldValue != null) {
 					searchResponse.setSearchRequest(
 						SearchRequestSerDes.toDTO(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "totalHits")) {
+				if (jsonParserFieldValue != null) {
+					searchResponse.setTotalHits(
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 		}

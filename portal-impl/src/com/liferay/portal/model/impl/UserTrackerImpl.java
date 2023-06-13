@@ -38,7 +38,9 @@ public class UserTrackerImpl extends UserTrackerBaseImpl {
 		}
 		catch (ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(arrayIndexOutOfBoundsException);
+				_log.warn(
+					arrayIndexOutOfBoundsException,
+					arrayIndexOutOfBoundsException);
 			}
 		}
 
@@ -71,7 +73,7 @@ public class UserTrackerImpl extends UserTrackerBaseImpl {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -95,7 +97,7 @@ public class UserTrackerImpl extends UserTrackerBaseImpl {
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 			}
 		}

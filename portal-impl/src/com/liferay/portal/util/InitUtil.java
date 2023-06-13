@@ -14,7 +14,9 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.petra.log4j.Log4JUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.configuration.ConfigurationFactoryImpl;
 import com.liferay.portal.dao.db.DBManagerImpl;
@@ -25,7 +27,6 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
-import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.log.SanitizerLogWrapper;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
@@ -36,24 +37,27 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.JavaDetector;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OSDetector;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.log.Log4jLogFactoryImpl;
-import com.liferay.portal.log4j.Log4JUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtil;
 import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
 import com.liferay.portal.spring.bean.LiferayBeanFactory;
+import com.liferay.portal.spring.compat.CompatBeanDefinitionRegistryPostProcessor;
 import com.liferay.portal.spring.configurator.ConfigurableApplicationContextConfigurator;
 import com.liferay.portal.spring.context.ArrayApplicationContext;
 import com.liferay.portal.xml.SAXReaderImpl;
+
+import com.sun.syndication.io.XmlReader;
 
 import java.lang.reflect.Field;
 
@@ -91,9 +95,7 @@ public class InitUtil {
 			}
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
+			exception.printStackTrace();
 		}
 
 		StopWatch stopWatch = new StopWatch();
@@ -126,14 +128,12 @@ public class InitUtil {
 			PortalClassLoaderUtil.setClassLoader(classLoader);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
+			exception.printStackTrace();
 		}
 
 		// Properties
 
-		PropsUtil.setProps(new PropsImpl());
+		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
 
 		// Shared log
 
@@ -141,9 +141,7 @@ public class InitUtil {
 			LogFactoryUtil.setLogFactory(new Log4jLogFactoryImpl());
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
+			exception.printStackTrace();
 		}
 
 		// Log4J
@@ -190,6 +188,8 @@ public class InitUtil {
 
 		unsecureSAXReaderUtil.setSAXReader(new SAXReaderImpl());
 
+		XmlReader.setDefaultEncoding(StringPool.UTF8);
+
 		if (_PRINT_TIME) {
 			System.out.println(
 				"InitAction takes " + stopWatch.getTime() + " ms");
@@ -199,8 +199,17 @@ public class InitUtil {
 	}
 
 	public static synchronized void initWithSpring(
+		boolean initModuleFramework, boolean registerContext) {
+
+		List<String> configLocations = ListUtil.fromArray(
+			PropsUtil.getArray(PropsKeys.SPRING_CONFIGS));
+
+		initWithSpring(configLocations, initModuleFramework, registerContext);
+	}
+
+	public static synchronized void initWithSpring(
 		List<String> configLocations, boolean initModuleFramework,
-		boolean registerContext, Runnable initFrameworkCallbackRunnable) {
+		boolean registerContext) {
 
 		if (_initialized) {
 			return;
@@ -214,10 +223,6 @@ public class InitUtil {
 					System.getProperty(SystemProperties.TMP_DIR);
 
 				ModuleFrameworkUtil.initFramework();
-
-				if (initFrameworkCallbackRunnable != null) {
-					initFrameworkCallbackRunnable.run();
-				}
 			}
 
 			DBInitUtil.init();
@@ -258,6 +263,9 @@ public class InitUtil {
 				configurableApplicationContextConfigurator.configure(
 					configurableApplicationContext);
 			}
+
+			configurableApplicationContext.addBeanFactoryPostProcessor(
+				new CompatBeanDefinitionRegistryPostProcessor());
 
 			configurableApplicationContext.refresh();
 
@@ -326,8 +334,6 @@ public class InitUtil {
 	}
 
 	private static final boolean _PRINT_TIME = false;
-
-	private static final Log _log = LogFactoryUtil.getLog(InitUtil.class);
 
 	private static ApplicationContext _appApplicationContext;
 	private static boolean _initialized;

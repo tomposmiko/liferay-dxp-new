@@ -21,7 +21,7 @@ import com.liferay.asset.kernel.service.AssetCategoryService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -45,9 +45,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-asset-categories-selector",
+		"com.liferay.portlet.header-portlet-css=/css/tree.css",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
@@ -58,8 +60,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + AssetCategoriesSelectorPortletKeys.ASSET_CATEGORIES_SELECTOR,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -75,10 +76,9 @@ public class AssetCategoriesSelectorPortlet extends MVCPortlet {
 
 		if (resourceID.equals("getCategories")) {
 			try {
-				JSONArray jsonArray = _jsonFactory.createJSONArray();
+				JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-				List<AssetCategory> categories = _getCategories(
-					resourceRequest);
+				List<AssetCategory> categories = getCategories(resourceRequest);
 
 				for (AssetCategory category : categories) {
 					List<AssetCategory> childCategories =
@@ -113,7 +113,7 @@ public class AssetCategoriesSelectorPortlet extends MVCPortlet {
 		}
 	}
 
-	private List<AssetCategory> _getCategories(PortletRequest portletRequest)
+	protected List<AssetCategory> getCategories(PortletRequest portletRequest)
 		throws PortalException {
 
 		long categoryId = ParamUtil.getLong(portletRequest, "categoryId");
@@ -143,8 +143,5 @@ public class AssetCategoriesSelectorPortlet extends MVCPortlet {
 
 	@Reference
 	private AssetCategoryService _assetCategoryService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

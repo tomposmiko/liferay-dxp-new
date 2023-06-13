@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.web.servlet.context.helper.definition.WebResourceCollectionDefinition;
@@ -69,7 +68,7 @@ public class CustomServletContextHelper
 
 		_overrideDirName = StringBundler.concat(
 			PropsValues.LIFERAY_HOME, File.separator, "work", File.separator,
-			bundle.getSymbolicName(), StringPool.DASH, bundle.getVersion());
+			_bundle.getSymbolicName(), StringPool.DASH, _bundle.getVersion());
 
 		Class<?> clazz = getClass();
 
@@ -94,11 +93,6 @@ public class CustomServletContextHelper
 		ServletContextClassLoaderPool.register(
 			_servletContext.getServletContextName(),
 			bundleWiring.getClassLoader());
-	}
-
-	@Override
-	public String getMimeType(String name) {
-		return MimeTypesUtil.getContentType(name);
 	}
 
 	@Override
@@ -204,7 +198,7 @@ public class CustomServletContextHelper
 		if (path.startsWith("/META-INF/") || path.startsWith("/OSGI-INF/") ||
 			path.startsWith("/OSGI-OPT/") || path.startsWith("/WEB-INF/")) {
 
-			return _sendErrorForbidden(
+			return sendErrorForbidden(
 				httpServletRequest, httpServletResponse, path);
 		}
 
@@ -226,7 +220,7 @@ public class CustomServletContextHelper
 					String patternExtension = urlPattern.substring(2);
 
 					if (Validator.isNotNull(patternExtension) &&
-						Objects.equals(patternExtension, "*")) {
+						Objects.equals("*", patternExtension)) {
 
 						forbidden = true;
 
@@ -299,7 +293,7 @@ public class CustomServletContextHelper
 			}
 
 			if (forbidden) {
-				return _sendErrorForbidden(
+				return sendErrorForbidden(
 					httpServletRequest, httpServletResponse, path);
 			}
 		}
@@ -312,7 +306,7 @@ public class CustomServletContextHelper
 		return _string;
 	}
 
-	private boolean _sendErrorForbidden(
+	protected boolean sendErrorForbidden(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, String path) {
 
@@ -330,7 +324,7 @@ public class CustomServletContextHelper
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
+				_log.debug(ioException, ioException);
 			}
 
 			httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);

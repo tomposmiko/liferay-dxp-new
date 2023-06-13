@@ -17,9 +17,13 @@ package com.liferay.portal.workflow.kaleo.metrics.integration.internal.model.lis
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ModelListener;
-import com.liferay.portal.workflow.kaleo.metrics.integration.internal.helper.IndexerHelper;
+import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
+import com.liferay.portal.workflow.kaleo.model.KaleoNode;
+import com.liferay.portal.workflow.kaleo.model.KaleoTask;
 import com.liferay.portal.workflow.kaleo.model.KaleoTransition;
+import com.liferay.portal.workflow.kaleo.service.KaleoNodeLocalService;
+import com.liferay.portal.workflow.kaleo.service.KaleoTaskLocalService;
 import com.liferay.portal.workflow.metrics.search.index.TransitionWorkflowMetricsIndexer;
 
 import java.util.Objects;
@@ -30,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class KaleoTransitionModelListener
 	extends BaseKaleoModelListener<KaleoTransition> {
 
@@ -46,8 +50,17 @@ public class KaleoTransitionModelListener
 
 		try {
 			_transitionWorkflowMetricsIndexer.addTransition(
-				_indexerHelper.createAddTransitionRequest(
-					kaleoTransition, kaleoDefinitionVersion.getVersion()));
+				kaleoTransition.getCompanyId(), kaleoTransition.getCreateDate(),
+				kaleoTransition.getModifiedDate(), kaleoTransition.getName(),
+				_getNodeId(kaleoTransition.getKaleoNodeId()),
+				kaleoTransition.getKaleoDefinitionId(),
+				kaleoDefinitionVersion.getVersion(),
+				_getNodeId(kaleoTransition.getSourceKaleoNodeId()),
+				kaleoTransition.getSourceKaleoNodeName(),
+				_getNodeId(kaleoTransition.getTargetKaleoNodeId()),
+				kaleoTransition.getTargetKaleoNodeName(),
+				kaleoTransition.getKaleoTransitionId(),
+				kaleoTransition.getUserId());
 		}
 		catch (PortalException portalException) {
 			throw new ModelListenerException(portalException);
@@ -57,11 +70,31 @@ public class KaleoTransitionModelListener
 	@Override
 	public void onAfterRemove(KaleoTransition kaleoTransition) {
 		_transitionWorkflowMetricsIndexer.deleteTransition(
-			_indexerHelper.createDeleteTransitionRequest(kaleoTransition));
+			kaleoTransition.getCompanyId(),
+			kaleoTransition.getKaleoTransitionId());
+	}
+
+	private long _getNodeId(long kaleoNodeId) throws PortalException {
+		KaleoNode kaleoNode = _kaleoNodeLocalService.fetchKaleoNode(
+			kaleoNodeId);
+
+		if ((kaleoNode == null) ||
+			!Objects.equals(kaleoNode.getType(), NodeType.TASK.name())) {
+
+			return kaleoNodeId;
+		}
+
+		KaleoTask kaleoTask = _kaleoTaskLocalService.getKaleoNodeKaleoTask(
+			kaleoNode.getKaleoNodeId());
+
+		return kaleoTask.getKaleoTaskId();
 	}
 
 	@Reference
-	private IndexerHelper _indexerHelper;
+	private KaleoNodeLocalService _kaleoNodeLocalService;
+
+	@Reference
+	private KaleoTaskLocalService _kaleoTaskLocalService;
 
 	@Reference
 	private TransitionWorkflowMetricsIndexer _transitionWorkflowMetricsIndexer;

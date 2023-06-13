@@ -56,10 +56,10 @@ public class CalendarResourceUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeCalendarResourceUserIds();
+		upgradeCalendarResourceUserIds();
 	}
 
-	private long _getCompanyAdminUserId(Company company)
+	protected long getCompanyAdminUserId(Company company)
 		throws PortalException {
 
 		Role role = RoleLocalServiceUtil.getRole(
@@ -106,7 +106,7 @@ public class CalendarResourceUpgradeProcess extends UpgradeProcess {
 				company.getCompanyId());
 	}
 
-	private void _updateCalendarUserId(long calendarId, long userId)
+	protected void updateCalendarUserId(long calendarId, long userId)
 		throws SQLException {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -119,8 +119,8 @@ public class CalendarResourceUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateCalendarUserIds(
-			long groupClassNameId, long guestUserId, long adminUserId)
+	protected void updateCalendarUserIds(
+			long groupClassNameId, long defaultUserId, long adminUserId)
 		throws SQLException {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -132,20 +132,20 @@ public class CalendarResourceUpgradeProcess extends UpgradeProcess {
 					"CalendarResource.userId = ?"))) {
 
 			preparedStatement.setLong(1, groupClassNameId);
-			preparedStatement.setLong(2, guestUserId);
+			preparedStatement.setLong(2, defaultUserId);
 
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
 				while (resultSet.next()) {
 					long calendarId = resultSet.getLong(1);
 
-					_updateCalendarUserId(calendarId, adminUserId);
+					updateCalendarUserId(calendarId, adminUserId);
 				}
 			}
 		}
 	}
 
-	private void _upgradeCalendarResourceUserId(
-			long groupClassNameId, long guestUserId, long companyAdminUserId)
+	protected void upgradeCalendarResourceUserId(
+			long groupClassNameId, long defaultUserId, long companyAdminUserId)
 		throws SQLException {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -153,28 +153,28 @@ public class CalendarResourceUpgradeProcess extends UpgradeProcess {
 					"classNameId = ?")) {
 
 			preparedStatement.setLong(1, companyAdminUserId);
-			preparedStatement.setLong(2, guestUserId);
+			preparedStatement.setLong(2, defaultUserId);
 			preparedStatement.setLong(3, groupClassNameId);
 
 			preparedStatement.execute();
 		}
 	}
 
-	private void _upgradeCalendarResourceUserIds() throws Exception {
+	protected void upgradeCalendarResourceUserIds() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			_companyLocalService.forEachCompany(
 				company -> {
 					long classNameId = _classNameLocalService.getClassNameId(
 						Group.class);
-					long guestUserId = _userLocalService.getGuestUserId(
+					long defaultUserId = _userLocalService.getDefaultUserId(
 						company.getCompanyId());
-					long companyAdminUserId = _getCompanyAdminUserId(company);
+					long companyAdminUserId = getCompanyAdminUserId(company);
 
-					_updateCalendarUserIds(
-						classNameId, guestUserId, companyAdminUserId);
+					updateCalendarUserIds(
+						classNameId, defaultUserId, companyAdminUserId);
 
-					_upgradeCalendarResourceUserId(
-						classNameId, guestUserId, companyAdminUserId);
+					upgradeCalendarResourceUserId(
+						classNameId, defaultUserId, companyAdminUserId);
 				});
 		}
 	}

@@ -90,7 +90,7 @@ describe('Read Plugin', () => {
 	});
 
 	describe('readPage event', () => {
-		it('is fired when reaches scroll and time', async () => {
+		it('is fired when reaches scroll and time', () => {
 			const blogElement = createMainContent();
 			const expectedReadDuration = Math.trunc(
 				getExpectedViewDuration(blogElement.innerText)
@@ -102,7 +102,7 @@ describe('Read Plugin', () => {
 			window.scrollTo(0, SCROLL_HEIGHT);
 			document.dispatchEvent(new Event('scroll'));
 
-			await jest.advanceTimersByTime(expectedReadDuration);
+			jest.advanceTimersByTime(expectedReadDuration);
 
 			const events = Analytics.getEvents().filter(
 				({eventId}) => eventId === 'pageRead'
@@ -113,7 +113,7 @@ describe('Read Plugin', () => {
 			document.body.removeChild(blogElement);
 		});
 
-		it('is not fired when reaches scroll only', async () => {
+		it('is not fired when reaches scroll only', () => {
 			const blogElement = createMainContent();
 			const expectedReadDuration = Math.trunc(
 				getExpectedViewDuration(blogElement.innerText)
@@ -123,7 +123,7 @@ describe('Read Plugin', () => {
 			document.dispatchEvent(domContentLoaded);
 
 			window.scrollTo(0, SCROLL_HEIGHT);
-			await document.dispatchEvent(new Event('scroll'));
+			document.dispatchEvent(new Event('scroll'));
 
 			jest.advanceTimersByTime(expectedReadDuration / 2);
 
@@ -136,7 +136,7 @@ describe('Read Plugin', () => {
 			document.body.removeChild(blogElement);
 		});
 
-		it('is not fired when reaches time only', async () => {
+		it('is not fired when reaches time only', () => {
 			const blogElement = createMainContent();
 			const expectedReadDuration = Math.trunc(
 				getExpectedViewDuration(blogElement.innerText)
@@ -146,7 +146,7 @@ describe('Read Plugin', () => {
 			document.dispatchEvent(domContentLoaded);
 
 			window.scrollTo(0, PAGE_HEIGHT / 2);
-			await document.dispatchEvent(new Event('scroll'));
+			document.dispatchEvent(new Event('scroll'));
 
 			jest.advanceTimersByTime(expectedReadDuration + 1000);
 
@@ -159,7 +159,7 @@ describe('Read Plugin', () => {
 			document.body.removeChild(blogElement);
 		});
 
-		it('is fired when there is not scroll on the page and reaches time', async () => {
+		it('is fired when there is not scroll on the page and reaches time', () => {
 
 			// Redefining scrollHeight
 
@@ -180,7 +180,7 @@ describe('Read Plugin', () => {
 			const domContentLoaded = new Event('DOMContentLoaded');
 			document.dispatchEvent(domContentLoaded);
 
-			await jest.advanceTimersByTime(expectedReadDuration);
+			jest.advanceTimersByTime(expectedReadDuration);
 
 			const events = Analytics.getEvents().filter(
 				({eventId}) => eventId === 'pageRead'
@@ -191,7 +191,7 @@ describe('Read Plugin', () => {
 			document.body.removeChild(blogElement);
 		});
 
-		it('is not fired twice when reaches scroll 75 and 100', async () => {
+		it('is not fired twice when reaches scroll 75 and 100', () => {
 			const blogElement = createMainContent();
 			const expectedReadDuration = Math.trunc(
 				getExpectedViewDuration(blogElement.innerText)
@@ -203,7 +203,7 @@ describe('Read Plugin', () => {
 			window.scrollTo(0, SCROLL_HEIGHT * 0.5);
 			document.dispatchEvent(new Event('scroll'));
 
-			await jest.advanceTimersByTime(expectedReadDuration);
+			jest.advanceTimersByTime(expectedReadDuration);
 
 			window.scrollTo(0, SCROLL_HEIGHT);
 			document.dispatchEvent(new Event('scroll'));

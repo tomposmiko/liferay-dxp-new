@@ -15,25 +15,23 @@
 import duplicateItemAction from '../actions/duplicateItem';
 import FragmentService from '../services/FragmentService';
 
-export default function duplicateItem({itemId, selectItem = () => {}}) {
-	return (dispatch, getState) => {
+export default function duplicateItem({
+	itemId,
+	segmentsExperienceId,
+	selectItem = () => {},
+}) {
+	return (dispatch) => {
 		FragmentService.duplicateItem({
 			itemId,
 			onNetworkStatus: dispatch,
-			segmentsExperienceId: getState().segmentsExperienceId,
+			segmentsExperienceId,
 		}).then(
-			({
-				duplicatedFragmentEntryLinks,
-				duplicatedItemId,
-				layoutData,
-				restrictedItemIds,
-			}) => {
+			({duplicatedFragmentEntryLinks, duplicatedItemId, layoutData}) => {
 				dispatch(
 					duplicateItemAction({
 						addedFragmentEntryLinks: duplicatedFragmentEntryLinks,
 						itemId: duplicatedItemId,
 						layoutData,
-						restrictedItemIds,
 					})
 				);
 

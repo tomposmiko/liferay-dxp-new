@@ -68,7 +68,7 @@ SelectTeamDisplayContext selectTeamDisplayContext = new SelectTeamDisplayContext
 						<h5>
 							<c:choose>
 								<c:when test="<%= !disabled %>">
-									<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:void(0);">
+									<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
 										<%= HtmlUtil.escape(curTeam.getName()) %>
 									</aui:a>
 								</c:when>
@@ -90,7 +90,7 @@ SelectTeamDisplayContext selectTeamDisplayContext = new SelectTeamDisplayContext
 					>
 						<c:choose>
 							<c:when test="<%= !disabled %>">
-								<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:void(0);">
+								<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
 									<%= HtmlUtil.escape(curTeam.getName()) %>
 								</aui:a>
 							</c:when>

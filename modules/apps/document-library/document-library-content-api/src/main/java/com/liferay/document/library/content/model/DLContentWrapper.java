@@ -353,11 +353,6 @@ public class DLContentWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DLContent, Object>>
 		getAttributeGetterFunctions() {
 

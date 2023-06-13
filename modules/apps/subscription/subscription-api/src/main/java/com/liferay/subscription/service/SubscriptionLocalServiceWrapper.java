@@ -30,10 +30,6 @@ public class SubscriptionLocalServiceWrapper
 	implements ServiceWrapper<SubscriptionLocalService>,
 			   SubscriptionLocalService {
 
-	public SubscriptionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SubscriptionLocalServiceWrapper(
 		SubscriptionLocalService subscriptionLocalService) {
 
@@ -600,14 +596,6 @@ public class SubscriptionLocalServiceWrapper
 	@Override
 	public Subscription updateSubscription(Subscription subscription) {
 		return _subscriptionLocalService.updateSubscription(subscription);
-	}
-
-	@Override
-	public void updateSubscriptions(
-		long companyId, long classNameId, long oldClassPK, long newClassPK) {
-
-		_subscriptionLocalService.updateSubscriptions(
-			companyId, classNameId, oldClassPK, newClassPK);
 	}
 
 	@Override

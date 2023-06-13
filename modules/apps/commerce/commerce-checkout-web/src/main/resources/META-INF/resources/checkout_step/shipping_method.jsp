@@ -34,15 +34,13 @@ if (Validator.isNull(commerceShippingOptionKey)) {
 
 	<c:choose>
 		<c:when test="<%= commerceShippingMethods.isEmpty() %>">
-			<clay:row>
-				<clay:col
-					size="12"
-				>
+			<aui:row>
+				<aui:col widht="100">
 					<aui:alert type="info">
 						<liferay-ui:message key="there-are-no-available-shipping-methods" />
 					</aui:alert>
-				</clay:col>
-			</clay:row>
+				</aui:col>
+			</aui:row>
 
 			<aui:script use="aui-base">
 				var continueButton = A.one('#<portlet:namespace />continue');
@@ -57,7 +55,7 @@ if (Validator.isNull(commerceShippingOptionKey)) {
 
 				<%
 				for (CommerceShippingMethod commerceShippingMethod : commerceShippingMethods) {
-					List<CommerceShippingOption> commerceShippingOptions = shippingMethodCheckoutStepDisplayContext.getFilteredCommerceShippingOptions(commerceShippingMethod);
+					List<CommerceShippingOption> commerceShippingOptions = shippingMethodCheckoutStepDisplayContext.getCommerceShippingOptions(commerceShippingMethod);
 				%>
 
 					<c:if test="<%= commerceShippingOptions.isEmpty() %>">
@@ -72,13 +70,13 @@ if (Validator.isNull(commerceShippingOptionKey)) {
 
 					<%
 					for (CommerceShippingOption commerceShippingOption : commerceShippingOptions) {
-						String commerceShippingOptionName = shippingMethodCheckoutStepDisplayContext.getCommerceShippingOptionName(commerceShippingOption);
-						String curCommerceShippingOptionKey = shippingMethodCheckoutStepDisplayContext.getCommerceShippingOptionKey(commerceShippingMethod.getCommerceShippingMethodId(), commerceShippingOption.getKey());
+						String curCommerceShippingOptionKey = shippingMethodCheckoutStepDisplayContext.getCommerceShippingOptionKey(commerceShippingMethod.getCommerceShippingMethodId(), commerceShippingOption.getName());
+						String label = shippingMethodCheckoutStepDisplayContext.getCommerceShippingOptionLabel(commerceShippingOption);
 					%>
 
 						<li class="commerce-shipping-types list-group-item list-group-item-flex">
 							<div class="autofit-col autofit-col-expand">
-								<aui:input checked="<%= curCommerceShippingOptionKey.equals(commerceShippingOptionKey) %>" label="<%= HtmlUtil.escape(commerceShippingOptionName) %>" name="commerceShippingOptionKey" type="radio" value="<%= curCommerceShippingOptionKey %>" />
+								<aui:input checked="<%= curCommerceShippingOptionKey.equals(commerceShippingOptionKey) %>" label="<%= HtmlUtil.escape(label) %>" name="commerceShippingOptionKey" type="radio" value="<%= curCommerceShippingOptionKey %>" />
 							</div>
 
 							<%
@@ -87,7 +85,7 @@ if (Validator.isNull(commerceShippingOptionKey)) {
 
 							<c:if test="<%= Validator.isNotNull(thumbnailSrc) %>">
 								<div class="autofit-col">
-									<img alt="<%= HtmlUtil.escapeAttribute(commerceShippingOptionName) %>" src="<%= HtmlUtil.escapeAttribute(thumbnailSrc) %>" />
+									<img alt="<%= HtmlUtil.escapeAttribute(label) %>" src="<%= HtmlUtil.escapeAttribute(thumbnailSrc) %>" />
 								</div>
 							</c:if>
 						</li>

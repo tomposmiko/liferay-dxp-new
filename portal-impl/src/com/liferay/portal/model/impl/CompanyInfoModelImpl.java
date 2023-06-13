@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -208,64 +209,76 @@ public class CompanyInfoModelImpl
 	public Map<String, Function<CompanyInfo, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CompanyInfo, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CompanyInfo>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<CompanyInfo, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CompanyInfo.class.getClassLoader(), CompanyInfo.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<CompanyInfo, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<CompanyInfo, Object>>();
+		try {
+			Constructor<CompanyInfo> constructor =
+				(Constructor<CompanyInfo>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CompanyInfo::getMvccVersion);
-			attributeGetterFunctions.put(
-				"companyInfoId", CompanyInfo::getCompanyInfoId);
-			attributeGetterFunctions.put(
-				"companyId", CompanyInfo::getCompanyId);
-			attributeGetterFunctions.put("key", CompanyInfo::getKey);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<CompanyInfo, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CompanyInfo, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<CompanyInfo, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<CompanyInfo, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CompanyInfo, Object>>();
+		Map<String, BiConsumer<CompanyInfo, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CompanyInfo, ?>>();
 
-		static {
-			Map<String, BiConsumer<CompanyInfo, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<CompanyInfo, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", CompanyInfo::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setMvccVersion);
+		attributeGetterFunctions.put(
+			"companyInfoId", CompanyInfo::getCompanyInfoId);
+		attributeSetterBiConsumers.put(
+			"companyInfoId",
+			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyInfoId);
+		attributeGetterFunctions.put("companyId", CompanyInfo::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyId);
+		attributeGetterFunctions.put("key", CompanyInfo::getKey);
+		attributeSetterBiConsumers.put(
+			"key", (BiConsumer<CompanyInfo, String>)CompanyInfo::setKey);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CompanyInfo, Long>)CompanyInfo::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"companyInfoId",
-				(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyInfoId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"key", (BiConsumer<CompanyInfo, String>)CompanyInfo::setKey);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -558,12 +571,41 @@ public class CompanyInfoModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CompanyInfo, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CompanyInfo, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CompanyInfo, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((CompanyInfo)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CompanyInfo>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CompanyInfo.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -575,9 +617,8 @@ public class CompanyInfoModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<CompanyInfo, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<CompanyInfo, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

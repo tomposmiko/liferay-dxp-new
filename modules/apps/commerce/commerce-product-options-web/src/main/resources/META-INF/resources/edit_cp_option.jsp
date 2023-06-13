@@ -77,7 +77,7 @@ else {
 			<liferay-ui:error exception="<%= CPOptionKeyException.class %>" message="that-key-is-already-being-used" />
 
 			<aui:fieldset>
-				<aui:input name="name" wrapperCssClass="commerce-product-option-title" />
+				<aui:input autoFocus="<%= true %>" name="name" wrapperCssClass="commerce-product-option-title" />
 
 				<aui:input name="description" wrapperCssClass="commerce-product-option-description" />
 
@@ -121,12 +121,15 @@ else {
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "values") %>'
 			>
-				<frontend-data-set:headless-display
+				<clay:headless-data-set-display
 					apiURL='<%= "/o/headless-commerce-admin-catalog/v1.0/options/" + cpOptionId + "/optionValues" %>'
+					clayDataSetActionDropdownItems="<%= cpOptionDisplayContext.getOptionValueClayDataSetActionDropdownItems() %>"
 					creationMenu="<%= cpOptionDisplayContext.getOptionValueCreationMenu(cpOptionId) %>"
-					fdsActionDropdownItems="<%= cpOptionDisplayContext.getOptionValueFDSActionDropdownItems() %>"
-					id="<%= CommerceOptionFDSNames.OPTION_VALUES %>"
+					id="<%= CommerceOptionDataSetConstants.COMMERCE_DATA_SET_KEY_OPTION_VALUES %>"
 					itemsPerPage="<%= 10 %>"
+					namespace="<%= liferayPortletResponse.getNamespace() %>"
+					pageNumber="<%= 1 %>"
+					portletURL="<%= renderResponse.createRenderURL() %>"
 					style="stacked"
 				/>
 			</commerce-ui:panel>

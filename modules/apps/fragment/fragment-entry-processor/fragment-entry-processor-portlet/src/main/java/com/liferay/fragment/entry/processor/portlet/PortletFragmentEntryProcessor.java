@@ -22,21 +22,20 @@ import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.renderer.FragmentPortletRenderer;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.layout.constants.LayoutWebKeys;
-import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
-import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
-import com.liferay.layout.util.structure.LayoutStructure;
-import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ModelHintsConstants;
 import com.liferay.portal.kernel.model.Portlet;
-import com.liferay.portal.kernel.model.impl.DefaultLayoutTypeAccessPolicyImpl;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
@@ -46,17 +45,18 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.PortletPreferencesImpl;
-import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletPreferences;
 
@@ -74,10 +74,66 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
-	property = "fragment.entry.processor.priority:Integer=3",
+	immediate = true, property = "fragment.entry.processor.priority:Integer=3",
 	service = FragmentEntryProcessor.class
 )
 public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
+
+	@Override
+	public void deleteFragmentEntryLinkData(
+		FragmentEntryLink fragmentEntryLink) {
+
+		Document document = _getDocument(fragmentEntryLink.getHtml());
+
+		for (Element element : document.select("*")) {
+			String tagName = element.tagName();
+
+			if (!StringUtil.startsWith(tagName, "lfr-widget-")) {
+				continue;
+			}
+
+			String alias = StringUtil.removeSubstring(tagName, "lfr-widget-");
+
+			String portletName = _portletRegistry.getPortletName(alias);
+
+			if (Validator.isNull(portletName)) {
+				continue;
+			}
+
+			try {
+				_portletPreferencesLocalService.deletePortletPreferences(
+					PortletKeys.PREFS_OWNER_ID_DEFAULT,
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
+					fragmentEntryLink.getPlid(),
+					_getPortletId(
+						portletName, fragmentEntryLink.getNamespace(),
+						element.attr("id")));
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
+			}
+		}
+	}
+
+	@Override
+	public JSONArray getAvailableTagsJSONArray() {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		for (String alias : _portletRegistry.getPortletAliases()) {
+			jsonArray.put(
+				JSONUtil.put(
+					"content",
+					StringBundler.concat(
+						"<lfr-widget-", alias, "></lfr-widget-", alias, ">")
+				).put(
+					"name", "lfr-widget-" + alias
+				));
+		}
+
+		return jsonArray;
+	}
 
 	@Override
 	public String processFragmentEntryLinkHTML(
@@ -85,25 +141,22 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			FragmentEntryProcessorContext fragmentEntryProcessorContext)
 		throws PortalException {
 
-		HttpServletRequest httpServletRequest =
-			fragmentEntryProcessorContext.getHttpServletRequest();
+		Document document = _getDocument(html);
 
-		if (httpServletRequest != null) {
-			httpServletRequest.setAttribute(
-				FragmentWebKeys.FRAGMENT_ENTRY_LINK, fragmentEntryLink);
-		}
+		_validateFragmentEntryHTMLDocument(document);
 
-		if (fragmentEntryLink.isTypePortlet()) {
+		String editableValues = fragmentEntryLink.getEditableValues();
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			editableValues);
+
+		if (Validator.isNotNull(jsonObject.getString("portletId"))) {
 			return _renderWidgetHTML(
-				fragmentEntryLink.getEditableValues(),
+				editableValues, fragmentEntryLink,
 				fragmentEntryProcessorContext);
 		}
 
-		Document document = _getDocument(html);
-
-		_validateFragmentEntryHTMLDocument(
-			document, fragmentEntryProcessorContext.getLocale());
-
+		FragmentEntryLink originalFragmentEntryLink = null;
 		Set<String> processedPortletIds = new HashSet<>();
 
 		for (Element element : document.select("*")) {
@@ -113,6 +166,14 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			if (Validator.isNull(portletName)) {
 				continue;
+			}
+
+			if ((originalFragmentEntryLink == null) &&
+				(fragmentEntryLink.getOriginalFragmentEntryLinkId() > 0)) {
+
+				originalFragmentEntryLink =
+					_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+						fragmentEntryLink.getOriginalFragmentEntryLinkId());
 			}
 
 			Portlet portlet = _portletLocalService.getPortletById(portletName);
@@ -127,36 +188,28 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			}
 			else if (processedPortletIds.contains(portletName) ||
 					 _checkNoninstanceablePortletUsed(
-						 fragmentEntryLink, portletName,
-						 fragmentEntryProcessorContext.
-							 getHttpServletRequest())) {
+						 fragmentEntryLink, portletName)) {
 
 				throw new FragmentEntryContentException(
-					_language.get(
-						fragmentEntryProcessorContext.getLocale(),
+					LanguageUtil.get(
+						_resourceBundle,
 						"noninstanceable-widgets-can-be-embedded-only-once-" +
 							"on-the-same-page"));
 			}
+
+			String defaultPreferences = StringPool.BLANK;
 
 			long plid = ParamUtil.getLong(
 				fragmentEntryProcessorContext.getHttpServletRequest(),
 				"p_l_id");
 
-			String defaultPreferences = portlet.getDefaultPreferences();
-
-			boolean stagingAdvicesThreadLocalEnabled =
-				StagingAdvicesThreadLocal.isEnabled();
-
-			try {
-				StagingAdvicesThreadLocal.setEnabled(false);
-
+			if (originalFragmentEntryLink != null) {
 				defaultPreferences = _getPreferences(
-					plid, portletName, fragmentEntryLink, id,
-					portlet.getDefaultPreferences());
+					plid, portletName, originalFragmentEntryLink, id,
+					StringPool.BLANK);
 			}
-			finally {
-				StagingAdvicesThreadLocal.setEnabled(
-					stagingAdvicesThreadLocalEnabled);
+			else {
+				defaultPreferences = portlet.getDefaultPreferences();
 			}
 
 			String portletHTML = _fragmentPortletRenderer.renderPortlet(
@@ -183,102 +236,49 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 		return bodyElement.html();
 	}
 
-	private boolean _checkNoninstanceablePortletUsed(
-			FragmentEntryLink currentFragmentEntryLink,
-			String currentPortletName, HttpServletRequest httpServletRequest)
+	@Override
+	public void validateFragmentEntryHTML(String html, String configuration)
 		throws PortalException {
 
-		if ((currentFragmentEntryLink.getFragmentEntryLinkId() <= 0) ||
-			(currentFragmentEntryLink.getPlid() <= 0)) {
+		_validateFragmentEntryHTMLDocument(_getDocument(html));
+	}
 
-			return false;
-		}
+	private boolean _checkNoninstanceablePortletUsed(
+		FragmentEntryLink currentFragmentEntryLink, String currentPortletName) {
 
 		List<FragmentEntryLink> fragmentEntryLinks =
-			_fragmentEntryLinkLocalService.
-				getFragmentEntryLinksBySegmentsExperienceId(
-					currentFragmentEntryLink.getGroupId(),
-					currentFragmentEntryLink.getSegmentsExperienceId(),
-					currentFragmentEntryLink.getPlid());
-
-		LayoutStructure layoutStructure = null;
-
-		if (httpServletRequest != null) {
-			layoutStructure = (LayoutStructure)httpServletRequest.getAttribute(
-				LayoutWebKeys.LAYOUT_STRUCTURE);
-		}
-
-		if (layoutStructure == null) {
-			LayoutPageTemplateStructure layoutPageTemplateStructure =
-				_layoutPageTemplateStructureLocalService.
-					fetchLayoutPageTemplateStructure(
-						currentFragmentEntryLink.getGroupId(),
-						currentFragmentEntryLink.getPlid(), true);
-
-			layoutStructure = LayoutStructure.of(
-				layoutPageTemplateStructure.getData(
-					currentFragmentEntryLink.getSegmentsExperienceId()));
-		}
+			_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
+				currentFragmentEntryLink.getGroupId(),
+				currentFragmentEntryLink.getPlid());
 
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-			if (currentFragmentEntryLink.getFragmentEntryLinkId() ==
-					fragmentEntryLink.getFragmentEntryLinkId()) {
+			if ((currentFragmentEntryLink.getFragmentEntryLinkId() ==
+					fragmentEntryLink.getFragmentEntryLinkId()) ||
+				(currentFragmentEntryLink.getSegmentsExperienceId() !=
+					fragmentEntryLink.getSegmentsExperienceId())) {
 
 				continue;
 			}
 
-			Set<String> portletNames = new HashSet<>();
+			List<String> portletIds =
+				_portletRegistry.getFragmentEntryLinkPortletIds(
+					fragmentEntryLink);
 
-			for (String portletId :
-					_portletRegistry.getFragmentEntryLinkPortletIds(
-						fragmentEntryLink)) {
+			Stream<String> stream = portletIds.stream();
 
-				portletNames.add(PortletIdCodec.decodePortletName(portletId));
-			}
+			List<String> portletNames = stream.map(
+				portletId -> PortletIdCodec.decodePortletName(portletId)
+			).distinct(
+			).collect(
+				Collectors.toList()
+			);
 
-			if (!portletNames.contains(currentPortletName)) {
-				continue;
-			}
-
-			LayoutStructureItem layoutStructureItem =
-				layoutStructure.getLayoutStructureItemByFragmentEntryLinkId(
-					fragmentEntryLink.getFragmentEntryLinkId());
-
-			if (!layoutStructure.isItemMarkedForDeletion(
-					layoutStructureItem.getItemId())) {
-
+			if (portletNames.contains(currentPortletName)) {
 				return true;
 			}
 		}
 
 		return false;
-	}
-
-	private boolean _comparePreferences(
-		PortletPreferences currentPortletPreferences,
-		PortletPreferences sourcePortletPreferences) {
-
-		Map<String, String[]> currentPreferences =
-			currentPortletPreferences.getMap();
-
-		Map<String, String[]> sourcePreferences =
-			sourcePortletPreferences.getMap();
-
-		if (currentPreferences.size() != sourcePreferences.size()) {
-			return false;
-		}
-
-		for (Map.Entry<String, String[]> entry :
-				currentPreferences.entrySet()) {
-
-			if (!Arrays.equals(
-					sourcePreferences.get(entry.getKey()), entry.getValue())) {
-
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	private Document _getDocument(String html) {
@@ -368,11 +368,12 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 	}
 
 	private String _renderWidgetHTML(
-			String editableValues,
+			String editableValues, FragmentEntryLink fragmentEntryLink,
 			FragmentEntryProcessorContext fragmentEntryProcessorContext)
 		throws PortalException {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(editableValues);
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			editableValues);
 
 		String portletId = jsonObject.getString("portletId");
 
@@ -380,45 +381,24 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			return StringPool.BLANK;
 		}
 
-		String instanceId = jsonObject.getString("instanceId");
-
-		String encodedPortletId = PortletIdCodec.encode(portletId, instanceId);
-
-		String html = _fragmentPortletRenderer.renderPortlet(
-			fragmentEntryProcessorContext.getHttpServletRequest(),
-			fragmentEntryProcessorContext.getHttpServletResponse(), portletId,
-			instanceId,
-			PortletPreferencesFactoryUtil.toXML(
-				PortletPreferencesFactoryUtil.getPortletPreferences(
-					fragmentEntryProcessorContext.getHttpServletRequest(),
-					encodedPortletId)));
-
 		HttpServletRequest httpServletRequest =
 			fragmentEntryProcessorContext.getHttpServletRequest();
 
-		FragmentEntryLink fragmentEntryLink =
-			(FragmentEntryLink)httpServletRequest.getAttribute(
-				FragmentWebKeys.FRAGMENT_ENTRY_LINK);
+		httpServletRequest.setAttribute(
+			FragmentWebKeys.FRAGMENT_ENTRY_LINK, fragmentEntryLink);
 
-		if (fragmentEntryLink != null) {
-			String checkAccessAllowedToPortletCacheKey = StringBundler.concat(
-				"LIFERAY_SHARED_",
-				DefaultLayoutTypeAccessPolicyImpl.class.getName(), "#",
-				ParamUtil.getLong(
-					fragmentEntryProcessorContext.getHttpServletRequest(),
-					"p_l_id"),
-				"#", encodedPortletId);
+		String instanceId = jsonObject.getString("instanceId");
 
-			httpServletRequest.setAttribute(
-				FragmentWebKeys.ACCESS_ALLOWED_TO_FRAGMENT_ENTRY_LINK_ID +
-					fragmentEntryLink.getFragmentEntryLinkId(),
-				GetterUtil.getBoolean(
-					httpServletRequest.getAttribute(
-						checkAccessAllowedToPortletCacheKey),
-					true));
-		}
+		PortletPreferences portletPreferences =
+			PortletPreferencesFactoryUtil.getPortletPreferences(
+				fragmentEntryProcessorContext.getHttpServletRequest(),
+				PortletIdCodec.encode(portletId, instanceId));
 
-		return html;
+		return _fragmentPortletRenderer.renderPortlet(
+			httpServletRequest,
+			fragmentEntryProcessorContext.getHttpServletResponse(), portletId,
+			instanceId,
+			PortletPreferencesFactoryUtil.toXML(portletPreferences));
 	}
 
 	private void _updateLayoutPortletSetup(
@@ -433,6 +413,9 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			plid = layoutPlid;
 		}
 
+		String portletPreferencesXML = PortletPreferencesFactoryUtil.toXML(
+			jxPortletPreferences);
+
 		for (com.liferay.portal.kernel.model.PortletPreferences
 				portletPreferencesImpl : portletPreferencesList) {
 
@@ -441,8 +424,10 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 					portletPreferencesImpl);
 
 			if ((plid != portletPreferencesImpl.getPlid()) ||
-				_comparePreferences(
-					currentPortletPreferences, jxPortletPreferences)) {
+				Objects.equals(
+					PortletPreferencesFactoryUtil.toXML(
+						currentPortletPreferences),
+					portletPreferencesXML)) {
 
 				continue;
 			}
@@ -455,8 +440,7 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 		}
 	}
 
-	private void _validateFragmentEntryHTMLDocument(
-			Document document, Locale locale)
+	private void _validateFragmentEntryHTMLDocument(Document document)
 		throws PortalException {
 
 		for (Element element : document.select("*")) {
@@ -471,17 +455,17 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			if (Validator.isNull(_portletRegistry.getPortletName(alias))) {
 				throw new FragmentEntryContentException(
-					_language.format(
-						locale, "there-is-no-widget-available-for-alias-x",
-						alias));
+					LanguageUtil.format(
+						_resourceBundle,
+						"there-is-no-widget-available-for-alias-x", alias));
 			}
 
 			String id = element.id();
 
 			if (Validator.isNotNull(id) && !Validator.isAlphanumericName(id)) {
 				throw new FragmentEntryContentException(
-					_language.format(
-						locale,
+					LanguageUtil.format(
+						_resourceBundle,
 						"widget-id-must-contain-only-alphanumeric-characters",
 						alias));
 			}
@@ -491,15 +475,17 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 				if (elements.size() > 1) {
 					throw new FragmentEntryContentException(
-						_language.get(locale, "widget-id-must-be-unique"));
+						LanguageUtil.get(
+							_resourceBundle, "widget-id-must-be-unique"));
 				}
 
 				if (id.length() > GetterUtil.getInteger(
 						ModelHintsConstants.TEXT_MAX_LENGTH)) {
 
 					throw new FragmentEntryContentException(
-						_language.format(
-							locale, "widget-id-cannot-exceed-x-characters",
+						LanguageUtil.format(
+							_resourceBundle,
+							"widget-id-cannot-exceed-x-characters",
 							ModelHintsConstants.TEXT_MAX_LENGTH));
 				}
 			}
@@ -508,8 +494,8 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			if ((elements.size() > 1) && Validator.isNull(id)) {
 				throw new FragmentEntryContentException(
-					_language.get(
-						locale,
+					LanguageUtil.get(
+						_resourceBundle,
 						"duplicate-widgets-within-the-same-fragment-must-" +
 							"have-an-id"));
 			}
@@ -520,14 +506,17 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 				if (!portlet.isInstanceable()) {
 					throw new FragmentEntryContentException(
-						_language.format(
-							locale,
+						LanguageUtil.format(
+							_resourceBundle,
 							"you-cannot-add-the-widget-x-more-than-once",
 							alias));
 				}
 			}
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		PortletFragmentEntryProcessor.class);
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
@@ -536,14 +525,8 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 	private FragmentPortletRenderer _fragmentPortletRenderer;
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private LayoutPageTemplateStructureLocalService
-		_layoutPageTemplateStructureLocalService;
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
 
 	@Reference
 	private PortletLocalService _portletLocalService;
@@ -557,5 +540,8 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 	@Reference
 	private PortletRegistry _portletRegistry;
+
+	private final ResourceBundle _resourceBundle = ResourceBundleUtil.getBundle(
+		"content.Language", getClass());
 
 }

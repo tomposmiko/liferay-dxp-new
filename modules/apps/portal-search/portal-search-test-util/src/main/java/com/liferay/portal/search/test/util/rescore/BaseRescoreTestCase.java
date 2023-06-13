@@ -14,12 +14,12 @@
 
 package com.liferay.portal.search.test.util.rescore;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.rescore.Rescore;
@@ -29,13 +29,14 @@ import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author Adam Brandizzi
- * @author Wade Cao
  */
 public abstract class BaseRescoreTestCase extends BaseIndexingTestCase {
 
@@ -43,98 +44,98 @@ public abstract class BaseRescoreTestCase extends BaseIndexingTestCase {
 	public void testRescore() {
 		addDocuments(
 			value -> DocumentCreationHelpers.singleText(_TITLE, value),
-			"alpha zeta", "alpha alpha", "alpha beta beta");
+			Arrays.asList("alpha zeta", "alpha alpha", "alpha beta beta"));
 
 		Query query = queries.string(_TITLE.concat(":alpha"));
 
 		assertSearch(
-			Arrays.asList("alpha alpha", "alpha zeta", "alpha beta beta"),
-			_TITLE, query, null, null);
+			_TITLE, query, (List<Rescore>)null,
+			Arrays.asList("alpha alpha", "alpha zeta", "alpha beta beta"));
 
 		assertSearch(
-			Arrays.asList("alpha beta beta", "alpha alpha", "alpha zeta"),
-			_TITLE, query, null, Arrays.asList(buildRescore(_TITLE, "beta")));
+			_TITLE, query, Arrays.asList(buildRescore(_TITLE, "beta")),
+			Arrays.asList("alpha beta beta", "alpha alpha", "alpha zeta"));
 	}
 
 	@Test
 	public void testRescoreQuery() {
 		addDocuments(
 			value -> DocumentCreationHelpers.singleText(_TITLE, value),
-			"alpha alpha", "alpha gamma gamma", "alpha beta beta");
+			Arrays.asList(
+				"alpha alpha", "alpha gamma gamma", "alpha beta beta"));
 
 		Query query = queries.string(_TITLE.concat(":alpha"));
 
 		assertSearch(
+			_TITLE, query, (Query)null,
 			Arrays.asList(
-				"alpha alpha", "alpha gamma gamma", "alpha beta beta"),
-			_TITLE, query, null, null);
+				"alpha alpha", "alpha gamma gamma", "alpha beta beta"));
+
+		Query rescoreQuery = queries.match(_TITLE, "beta");
 
 		assertSearch(
+			_TITLE, query, rescoreQuery,
 			Arrays.asList(
-				"alpha beta beta", "alpha alpha", "alpha gamma gamma"),
-			_TITLE, query, queries.match(_TITLE, "beta"), null);
+				"alpha beta beta", "alpha alpha", "alpha gamma gamma"));
 	}
 
 	@Test
 	public void testRescores() {
 		addDocuments(
 			value -> DocumentCreationHelpers.singleText(_TITLE, value),
-			"alpha alpha", "alpha gamma gamma", "alpha beta beta beta");
+			Arrays.asList(
+				"alpha alpha", "alpha gamma gamma", "alpha beta beta beta"));
 
 		Query query = queries.string(_TITLE.concat(":alpha"));
 
 		assertSearch(
+			_TITLE, query, (List<Rescore>)null,
 			Arrays.asList(
-				"alpha alpha", "alpha gamma gamma", "alpha beta beta beta"),
-			_TITLE, query, null, null);
+				"alpha alpha", "alpha gamma gamma", "alpha beta beta beta"));
 
 		assertSearch(
+			_TITLE, query,
 			Arrays.asList(
-				"alpha beta beta beta", "alpha gamma gamma", "alpha alpha"),
-			_TITLE, query, null,
+				buildRescore(_TITLE, "beta"), buildRescore(_TITLE, "gamma")),
 			Arrays.asList(
-				buildRescore(_TITLE, "beta"), buildRescore(_TITLE, "gamma")));
+				"alpha beta beta beta", "alpha gamma gamma", "alpha alpha"));
 	}
 
 	protected void assertSearch(
-		List<String> expectedValues, String fieldName, Query query,
-		Query rescoreQuery, List<Rescore> rescores) {
+		String fieldName, Query query, List<Rescore> rescores,
+		List<String> expectedValues) {
 
 		assertSearch(
 			indexingTestHelper -> {
 				SearchSearchRequest searchSearchRequest =
-					new SearchSearchRequest();
+					getSearchSearchRequest(query);
 
-				searchSearchRequest.setIndexNames(
-					String.valueOf(getCompanyId()));
-				searchSearchRequest.setQuery(query);
-				searchSearchRequest.setRescoreQuery(rescoreQuery);
 				searchSearchRequest.setRescores(rescores);
-				searchSearchRequest.setSize(30);
 
-				SearchEngineAdapter searchEngineAdapter =
-					getSearchEngineAdapter();
-
-				SearchSearchResponse searchSearchResponse =
-					searchEngineAdapter.execute(searchSearchRequest);
-
-				SearchHits searchHits = searchSearchResponse.getSearchHits();
+				List<String> actualValues = getFieldValues(
+					searchSearchRequest, fieldName);
 
 				Assert.assertEquals(
-					expectedValues.toString(),
-					String.valueOf(
-						TransformUtil.transform(
-							searchHits.getSearchHits(),
-							searchHit -> {
-								Document document = searchHit.getDocument();
+					expectedValues.toString(), actualValues.toString());
+			});
+	}
 
-								Map<String, Field> fields =
-									document.getFields();
+	protected void assertSearch(
+		String fieldName, Query query, Query rescoreQuery,
+		List<String> expectedValues) {
 
-								Field field = fields.get(fieldName);
+		assertSearch(
+			indexingTestHelper -> {
+				SearchSearchRequest searchSearchRequest =
+					getSearchSearchRequest(query);
 
-								return (String)field.getValue();
-							})));
+				searchSearchRequest.setRescoreQuery(rescoreQuery);
+
+				List<String> actualValues = getFieldValues(
+					searchSearchRequest, fieldName);
+
+				Assert.assertEquals(
+					expectedValues.toString(), actualValues.toString());
 			});
 	}
 
@@ -144,6 +145,47 @@ public abstract class BaseRescoreTestCase extends BaseIndexingTestCase {
 		).windowSize(
 			100
 		).build();
+	}
+
+	protected String getFieldValue(String fieldName, SearchHit searchHit) {
+		Document document = searchHit.getDocument();
+
+		Map<String, Field> fields = document.getFields();
+
+		Field field = fields.get(fieldName);
+
+		return (String)field.getValue();
+	}
+
+	protected List<String> getFieldValues(
+		SearchSearchRequest searchSearchRequest, String fieldName) {
+
+		SearchEngineAdapter searchEngineAdapter = getSearchEngineAdapter();
+
+		SearchSearchResponse searchSearchResponse = searchEngineAdapter.execute(
+			searchSearchRequest);
+
+		SearchHits searchHits = searchSearchResponse.getSearchHits();
+
+		List<SearchHit> searchHitsList = searchHits.getSearchHits();
+
+		Stream<SearchHit> stream = searchHitsList.stream();
+
+		return stream.map(
+			searchHit -> getFieldValue(fieldName, searchHit)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	protected SearchSearchRequest getSearchSearchRequest(Query query) {
+		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
+
+		searchSearchRequest.setIndexNames("_all");
+		searchSearchRequest.setQuery(query);
+		searchSearchRequest.setSize(30);
+
+		return searchSearchRequest;
 	}
 
 	private static final String _TITLE = "title";

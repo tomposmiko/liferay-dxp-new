@@ -14,11 +14,10 @@
 
 package com.liferay.commerce.internal.upgrade.v4_10_0;
 
+import com.liferay.commerce.internal.upgrade.base.BaseCommerceServiceUpgradeProcess;
+import com.liferay.commerce.internal.upgrade.v4_10_0.util.CommerceOrderItemTable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,10 +26,75 @@ import java.sql.Statement;
 /**
  * @author Luca Pellizzon
  */
-public class CommerceOrderItemUpgradeProcess extends UpgradeProcess {
+public class CommerceOrderItemUpgradeProcess
+	extends BaseCommerceServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"deliveryMaxSubscriptionCycles", "LONG");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"deliverySubscriptionLength", "INTEGER");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"deliverySubscriptionType", "VARCHAR(75)");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"deliverySubTypeSettings", "VARCHAR(75)");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"depth", "DOUBLE");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"freeShipping", "BOOLEAN");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"height", "DOUBLE");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"maxSubscriptionCycles", "LONG");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"shipSeparately", "BOOLEAN");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"shippable", "BOOLEAN");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"shippingExtraPrice", "DOUBLE");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"subscriptionLength", "INTEGER");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"subscriptionType", "VARCHAR(75)");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"subscriptionTypeSettings", "VARCHAR(75)");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"weight", "DOUBLE");
+
+		addColumn(
+			CommerceOrderItemTable.class, CommerceOrderItemTable.TABLE_NAME,
+			"width", "DOUBLE");
+
 		String updateCommerceOrderItemSQL = StringBundler.concat(
 			"update CommerceOrderItem SET shippable = ?, freeShipping = ?, ",
 			"shipSeparately = ?, shippingExtraPrice = ?, width = ?, height = ",
@@ -157,23 +221,6 @@ public class CommerceOrderItemUpgradeProcess extends UpgradeProcess {
 
 			preparedStatement1.executeBatch();
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommerceOrderItem", "deliveryMaxSubscriptionCycles LONG",
-				"deliverySubscriptionLength INTEGER",
-				"deliverySubscriptionType VARCHAR(75)",
-				"deliverySubTypeSettings VARCHAR(75)", "depth DOUBLE",
-				"freeShipping BOOLEAN", "height DOUBLE",
-				"maxSubscriptionCycles LONG", "shipSeparately BOOLEAN",
-				"shippable BOOLEAN", "shippingExtraPrice DOUBLE",
-				"subscriptionLength INTEGER", "subscriptionType VARCHAR(75)",
-				"subscriptionTypeSettings VARCHAR(75)", "weight DOUBLE",
-				"width DOUBLE")
-		};
 	}
 
 }

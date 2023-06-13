@@ -51,7 +51,7 @@ public class DDMFormLayoutJSONDeserializerTest extends BaseDDMTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_setUpDDMFormLayoutJSONDeserializer();
+		setUpDDMFormLayoutJSONDeserializer();
 	}
 
 	@Test
@@ -144,7 +144,7 @@ public class DDMFormLayoutJSONDeserializerTest extends BaseDDMTestCase {
 		return ddmFormLayoutDeserializerDeserializeResponse.getDDMFormLayout();
 	}
 
-	private void _setUpDDMFormLayoutJSONDeserializer() throws Exception {
+	protected void setUpDDMFormLayoutJSONDeserializer() throws Exception {
 		Field field = ReflectionUtil.getDeclaredField(
 			DDMFormLayoutJSONDeserializer.class, "_jsonFactory");
 

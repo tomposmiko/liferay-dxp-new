@@ -11,7 +11,7 @@
 
 import ClayButton from '@clayui/button';
 import ClayLink from '@clayui/link';
-import {ManagementToolbar} from 'frontend-js-components-web';
+import ClayManagementToolbar from '@clayui/management-toolbar';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
@@ -40,12 +40,12 @@ class PageToolbar extends Component {
 		} = this.props;
 
 		return (
-			<ManagementToolbar.Container
+			<ClayManagementToolbar
 				aria-label={Liferay.Language.get('save')}
 				className="page-toolbar-root"
 			>
-				<ManagementToolbar.ItemList>
-					<ManagementToolbar.Item>
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item>
 						<label
 							className="toggle-switch"
 							htmlFor="active-switch-input"
@@ -68,13 +68,15 @@ class PageToolbar extends Component {
 									: Liferay.Language.get('active')}
 							</span>
 						</label>
-					</ManagementToolbar.Item>
-				</ManagementToolbar.ItemList>
+					</ClayManagementToolbar.Item>
+				</ClayManagementToolbar.ItemList>
 
-				<ManagementToolbar.ItemList expand></ManagementToolbar.ItemList>
+				<ClayManagementToolbar.ItemList
+					expand
+				></ClayManagementToolbar.ItemList>
 
-				<ManagementToolbar.ItemList>
-					<ManagementToolbar.Item>
+				<ClayManagementToolbar.ItemList>
+					<ClayManagementToolbar.Item>
 						<ClayLink
 							displayType="secondary"
 							href={onCancel}
@@ -82,10 +84,10 @@ class PageToolbar extends Component {
 						>
 							{Liferay.Language.get('cancel')}
 						</ClayLink>
-					</ManagementToolbar.Item>
+					</ClayManagementToolbar.Item>
 
 					{onSaveAsDraft && (
-						<ManagementToolbar.Item>
+						<ClayManagementToolbar.Item>
 							<ClayButton
 								displayType="secondary"
 								onClick={onSaveAsDraft}
@@ -93,10 +95,10 @@ class PageToolbar extends Component {
 							>
 								{Liferay.Language.get('save-as-draft')}
 							</ClayButton>
-						</ManagementToolbar.Item>
+						</ClayManagementToolbar.Item>
 					)}
 
-					<ManagementToolbar.Item>
+					<ClayManagementToolbar.Item>
 						<ClayButton
 							disabled={submitDisabled}
 							onClick={onPublish}
@@ -105,9 +107,9 @@ class PageToolbar extends Component {
 						>
 							{Liferay.Language.get('save')}
 						</ClayButton>
-					</ManagementToolbar.Item>
-				</ManagementToolbar.ItemList>
-			</ManagementToolbar.Container>
+					</ClayManagementToolbar.Item>
+				</ClayManagementToolbar.ItemList>
+			</ClayManagementToolbar>
 		);
 	}
 }

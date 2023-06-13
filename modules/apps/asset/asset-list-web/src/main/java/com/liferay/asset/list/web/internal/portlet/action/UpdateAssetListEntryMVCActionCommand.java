@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.Portal;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AssetListPortletKeys.ASSET_LIST,
 		"mvc.command.name=/asset_list/update_asset_list_entry"
@@ -60,15 +62,13 @@ public class UpdateAssetListEntryMVCActionCommand extends BaseMVCActionCommand {
 			_assetListEntryService.updateAssetListEntry(
 				assetListEntryId, title);
 
-			JSONObject jsonObject = JSONUtil.put(
-				"redirectURL",
-				() -> {
-					LiferayPortletResponse liferayPortletResponse =
-						_portal.getLiferayPortletResponse(actionResponse);
+			LiferayPortletResponse liferayPortletResponse =
+				_portal.getLiferayPortletResponse(actionResponse);
 
-					return String.valueOf(
-						liferayPortletResponse.createRenderURL());
-				});
+			PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+			JSONObject jsonObject = JSONUtil.put(
+				"redirectURL", portletURL.toString());
 
 			if (SessionErrors.contains(
 					actionRequest, "assetListEntryNameInvalid")) {

@@ -20,6 +20,8 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
+import com.liferay.commerce.product.util.CPInstanceHelper;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -35,12 +37,11 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.WildcardQuery;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.search.generic.MultiMatchQuery;
-import com.liferay.portal.kernel.search.generic.TermQueryImpl;
+import com.liferay.portal.kernel.search.generic.WildcardQueryImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -61,7 +62,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 
 	public static final String CLASS_NAME = CPInstance.class.getName();
@@ -159,14 +160,15 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 			SearchContext searchContext)
 		throws Exception {
 
-		addSearchTerm(
-			searchQuery, searchContext, CPField.EXTERNAL_REFERENCE_CODE, false);
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, Field.CONTENT, false);
+		addSearchLocalizedTerm(searchQuery, searchContext, Field.NAME, false);
 		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		addSearchTerm(searchQuery, searchContext, Field.NAME, false);
-		addSearchLocalizedTerm(searchQuery, searchContext, Field.NAME, false);
+		addSearchTerm(searchQuery, searchContext, CPField.SKU, false);
 		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
+		addSearchTerm(
+			searchQuery, searchContext, CPField.EXTERNAL_REFERENCE_CODE, false);
 
 		LinkedHashMap<String, Object> params =
 			(LinkedHashMap<String, Object>)searchContext.getAttribute("params");
@@ -185,27 +187,9 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 			try {
 				keywords = StringUtil.toLowerCase(keywords);
 
-				BooleanQuery booleanQuery = new BooleanQueryImpl();
-
-				booleanQuery.add(
-					new TermQueryImpl("sku.1_10_ngram", keywords),
+				searchQuery.add(
+					_getTrailingWildcardQuery(CPField.SKU, keywords),
 					BooleanClauseOccur.SHOULD);
-
-				MultiMatchQuery multiMatchQuery = new MultiMatchQuery(
-					searchContext.getKeywords());
-
-				multiMatchQuery.addField(CPField.SKU);
-				multiMatchQuery.addField("sku.reverse");
-				multiMatchQuery.setType(MultiMatchQuery.Type.PHRASE_PREFIX);
-
-				booleanQuery.add(multiMatchQuery, BooleanClauseOccur.SHOULD);
-
-				if (searchContext.isAndSearch()) {
-					searchQuery.add(booleanQuery, BooleanClauseOccur.MUST);
-				}
-				else {
-					searchQuery.add(booleanQuery, BooleanClauseOccur.SHOULD);
-				}
 			}
 			catch (ParseException parseException) {
 				throw new SystemException(parseException);
@@ -228,35 +212,12 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 
 		Document document = getBaseModelDocument(CLASS_NAME, cpInstance);
 
-		document.addKeyword(
-			CPField.CP_DEFINITION_ID, cpInstance.getCPDefinitionId());
-		document.addKeyword(
-			CPField.CP_DEFINITION_STATUS, cpDefinition.getStatus());
-		document.addDateSortable(
-			CPField.DISPLAY_DATE, cpInstance.getDisplayDate());
-		document.addKeyword(
-			CPField.EXTERNAL_REFERENCE_CODE,
-			cpInstance.getExternalReferenceCode());
-		document.addText(
-			CPField.EXTERNAL_REFERENCE_CODE,
-			cpInstance.getExternalReferenceCode());
-		document.addKeyword(
-			CPField.HAS_CHILD_CP_DEFINITIONS,
-			_cpDefinitionLocalService.hasChildCPDefinitions(
-				cpDefinition.getCPDefinitionId()));
-		document.addKeyword(CPField.PUBLISHED, cpInstance.isPublished());
-		document.addKeyword(CPField.PURCHASABLE, cpInstance.isPurchasable());
-		document.addTextSortable(CPField.SKU, cpInstance.getSku());
-		document.addKeyword(CPField.UNSPSC, cpInstance.getUnspsc());
-		document.addText(Field.CONTENT, cpInstance.getSku());
-		document.addText(Field.NAME, cpDefinition.getName());
-
 		List<String> languageIds =
 			_cpDefinitionLocalService.getCPDefinitionLocalizationLanguageIds(
 				cpInstance.getCPDefinitionId());
 
 		String cpDefinitionDefaultLanguageId =
-			_localization.getDefaultLanguageId(cpDefinition.getName());
+			LocalizationUtil.getDefaultLanguageId(cpDefinition.getName());
 
 		for (String languageId : languageIds) {
 			String name = cpDefinition.getName(languageId);
@@ -267,8 +228,34 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 			}
 
 			document.addText(
-				_localization.getLocalizedName(Field.NAME, languageId), name);
+				LocalizationUtil.getLocalizedName(Field.NAME, languageId),
+				name);
 		}
+
+		document.addText(Field.NAME, cpDefinition.getName());
+
+		document.addText(
+			CPField.EXTERNAL_REFERENCE_CODE,
+			cpInstance.getExternalReferenceCode());
+
+		document.addText(Field.CONTENT, cpInstance.getSku());
+		document.addDateSortable(
+			CPField.DISPLAY_DATE, cpInstance.getDisplayDate());
+		document.addTextSortable(CPField.SKU, cpInstance.getSku());
+		document.addKeyword(
+			CPField.CP_DEFINITION_ID, cpInstance.getCPDefinitionId());
+		document.addKeyword(
+			CPField.CP_DEFINITION_STATUS, cpDefinition.getStatus());
+		document.addKeyword(CPField.PUBLISHED, cpInstance.isPublished());
+		document.addKeyword(CPField.PURCHASABLE, cpInstance.isPurchasable());
+		document.addKeyword(
+			CPField.EXTERNAL_REFERENCE_CODE,
+			cpInstance.getExternalReferenceCode());
+		document.addKeyword(
+			CPField.HAS_CHILD_CP_DEFINITIONS,
+			_cpDefinitionLocalService.hasChildCPDefinitions(
+				cpDefinition.getCPDefinitionId()));
+		document.addKeyword(CPField.UNSPSC, cpInstance.getUnspsc());
 
 		CommerceCatalog commerceCatalog = cpDefinition.getCommerceCatalog();
 
@@ -297,7 +284,8 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 	@Override
 	protected void doReindex(CPInstance cpInstance) throws Exception {
 		_indexWriterHelper.updateDocument(
-			cpInstance.getCompanyId(), getDocument(cpInstance));
+			getSearchEngineId(), cpInstance.getCompanyId(),
+			getDocument(cpInstance), isCommitImmediately());
 	}
 
 	@Override
@@ -309,10 +297,10 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPInstances(companyId);
+		reindexCPInstances(companyId);
 	}
 
-	private void _reindexCPInstances(long companyId) throws Exception {
+	protected void reindexCPInstances(long companyId) throws PortalException {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpInstanceLocalService.getIndexableActionableDynamicQuery();
 
@@ -332,8 +320,15 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
+	}
+
+	private WildcardQuery _getTrailingWildcardQuery(
+		String field, String value) {
+
+		return new WildcardQueryImpl(field, value + StringPool.STAR);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -343,12 +338,12 @@ public class CPInstanceIndexer extends BaseIndexer<CPInstance> {
 	private CPDefinitionLocalService _cpDefinitionLocalService;
 
 	@Reference
+	private CPInstanceHelper _cpInstanceHelper;
+
+	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Localization _localization;
 
 }

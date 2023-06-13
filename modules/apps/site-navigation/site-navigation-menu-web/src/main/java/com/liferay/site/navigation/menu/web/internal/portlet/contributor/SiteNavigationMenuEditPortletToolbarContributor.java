@@ -14,14 +14,14 @@
 
 package com.liferay.site.navigation.menu.web.internal.portlet.contributor;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.PortletToolbarContributor;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SiteNavigationMenuPortletKeys.SITE_NAVIGATION_MENU,
 		"mvc.path=-", "mvc.path=/view.jsp"
@@ -118,24 +119,20 @@ public class SiteNavigationMenuEditPortletToolbarContributor
 		URLMenuItem urlMenuItem = new URLMenuItem();
 
 		urlMenuItem.setLabel(
-			_language.get(
+			LanguageUtil.get(
 				_portal.getHttpServletRequest(portletRequest), "edit"));
 
 		SiteNavigationMenu siteNavigationMenu =
-			_siteNavigationMenuLocalService.fetchSiteNavigationMenu(
+			_siteNavigationMenuLocalService.getSiteNavigationMenu(
 				siteNavigationMenuId);
 
-		if (siteNavigationMenu == null) {
-			return null;
-		}
+		Group group = _groupLocalService.getGroup(
+			siteNavigationMenu.getGroupId());
 
 		urlMenuItem.setURL(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
-					portletRequest,
-					_groupLocalService.getGroup(
-						siteNavigationMenu.getGroupId()),
-					SiteNavigationMenu.class.getName(),
+					portletRequest, group, SiteNavigationMenu.class.getName(),
 					PortletProvider.Action.EDIT)
 			).setMVCPath(
 				"/edit_site_navigation_menu.jsp"
@@ -184,9 +181,6 @@ public class SiteNavigationMenuEditPortletToolbarContributor
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

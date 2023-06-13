@@ -72,7 +72,8 @@ public class TestrayS3Object {
 		try {
 			_url = new URL(
 				JenkinsResultsParserUtil.combine(
-					testrayS3Bucket.getTestrayS3BaseURL(), "/", getKey()));
+					_testrayS3Bucket.getTestrayS3BaseURL(), "/", getKey(),
+					"?authuser=0"));
 		}
 		catch (MalformedURLException malformedURLException) {
 			throw new RuntimeException(malformedURLException);

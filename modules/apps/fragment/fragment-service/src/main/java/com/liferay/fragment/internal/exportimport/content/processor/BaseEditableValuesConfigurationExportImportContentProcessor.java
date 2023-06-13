@@ -16,7 +16,6 @@ package com.liferay.fragment.internal.exportimport.content.processor;
 
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.util.configuration.FragmentConfigurationField;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
@@ -25,8 +24,11 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.util.ListUtil;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Víctor Galán
@@ -51,8 +53,7 @@ public abstract class
 
 		JSONObject editableProcessorJSONObject =
 			editableValuesJSONObject.getJSONObject(
-				FragmentEntryProcessorConstants.
-					KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR);
+				_KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR);
 
 		if (editableProcessorJSONObject == null) {
 			return editableValuesJSONObject;
@@ -88,8 +89,7 @@ public abstract class
 
 		JSONObject editableProcessorJSONObject =
 			editableValuesJSONObject.getJSONObject(
-				FragmentEntryProcessorConstants.
-					KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR);
+				_KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR);
 
 		if (editableProcessorJSONObject == null) {
 			return editableValuesJSONObject;
@@ -135,11 +135,21 @@ public abstract class
 		FragmentEntryConfigurationParser fragmentEntryConfigurationParser =
 			getFragmentEntryConfigurationParser();
 
-		return ListUtil.filter(
+		return Stream.of(
 			fragmentEntryConfigurationParser.getFragmentConfigurationFields(
-				fragmentEntryLink.getConfiguration()),
+				fragmentEntryLink.getConfiguration())
+		).flatMap(
+			Collection::stream
+		).filter(
 			fragmentConfigurationField -> Objects.equals(
-				fragmentConfigurationField.getType(), getConfigurationType()));
+				fragmentConfigurationField.getType(), getConfigurationType())
+		).collect(
+			Collectors.toList()
+		);
 	}
+
+	private static final String _KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR =
+		"com.liferay.fragment.entry.processor.freemarker." +
+			"FreeMarkerFragmentEntryProcessor";
 
 }

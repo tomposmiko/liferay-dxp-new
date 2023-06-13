@@ -58,7 +58,7 @@ public class SetOptionsFunction
 		UpdateFieldPropertyRequest.Builder builder =
 			UpdateFieldPropertyRequest.Builder.newBuilder(
 				field, "options",
-				_createKeyValuePairList(
+				createKeyValuePairList(
 					json, _ddmExpressionParameterAccessor.getLocale()));
 
 		_ddmExpressionObserver.updateFieldProperty(builder.build());
@@ -85,9 +85,7 @@ public class SetOptionsFunction
 		_ddmExpressionParameterAccessor = ddmExpressionParameterAccessor;
 	}
 
-	protected JSONFactory jsonFactory;
-
-	private List<KeyValuePair> _createKeyValuePairList(
+	protected List<KeyValuePair> createKeyValuePairList(
 		String value, Locale locale) {
 
 		String languageId = LanguageUtil.getLanguageId(locale);
@@ -123,11 +121,13 @@ public class SetOptionsFunction
 			}
 		}
 		catch (JSONException jsonException) {
-			_log.error(jsonException);
+			_log.error(jsonException, jsonException);
 		}
 
 		return keyValuePairs;
 	}
+
+	protected JSONFactory jsonFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SetOptionsFunction.class);

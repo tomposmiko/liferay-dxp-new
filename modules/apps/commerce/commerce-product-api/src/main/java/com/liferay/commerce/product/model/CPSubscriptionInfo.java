@@ -53,9 +53,7 @@ public class CPSubscriptionInfo {
 		return _deliverySubscriptionType;
 	}
 
-	public UnicodeProperties
-		getDeliverySubscriptionTypeSettingsUnicodeProperties() {
-
+	public UnicodeProperties getDeliverySubscriptionTypeSettingsProperties() {
 		return _deliverySubscriptionTypeSettingsUnicodeProperties;
 	}
 
@@ -71,7 +69,7 @@ public class CPSubscriptionInfo {
 		return _subscriptionType;
 	}
 
-	public UnicodeProperties getSubscriptionTypeSettingsUnicodeProperties() {
+	public UnicodeProperties getSubscriptionTypeSettingsProperties() {
 		return _subscriptionTypeSettingsUnicodeProperties;
 	}
 

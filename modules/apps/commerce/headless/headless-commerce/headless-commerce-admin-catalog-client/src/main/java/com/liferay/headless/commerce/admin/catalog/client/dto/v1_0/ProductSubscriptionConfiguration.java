@@ -191,7 +191,7 @@ public class ProductSubscriptionConfiguration
 
 	public static enum SubscriptionType {
 
-		DAILY("daily"), MONTHLY("monthly"), WEEKLY("weekly"), YEARLY("yearly");
+		DAY("day"), MONTH("month"), WEEK("week"), YEAR("year");
 
 		public static SubscriptionType create(String value) {
 			for (SubscriptionType subscriptionType : values()) {

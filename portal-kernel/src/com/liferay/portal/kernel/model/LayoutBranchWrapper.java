@@ -405,11 +405,6 @@ public class LayoutBranchWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected LayoutBranchWrapper wrap(LayoutBranch layoutBranch) {
 		return new LayoutBranchWrapper(layoutBranch);
 	}

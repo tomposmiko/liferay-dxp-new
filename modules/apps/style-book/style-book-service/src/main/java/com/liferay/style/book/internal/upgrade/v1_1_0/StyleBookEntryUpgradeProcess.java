@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.style.book.internal.upgrade.v1_1_0.util.StyleBookEntryTable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,12 +30,14 @@ public class StyleBookEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeSchema();
+		upgradeSchema();
 	}
 
-	private void _upgradeSchema() throws Exception {
-		alterTableAddColumn("StyleBookEntry", "uuid_", "VARCHAR(75) null");
-		alterTableAddColumn("StyleBookEntry", "modifiedDate", "DATE null");
+	protected void upgradeSchema() throws Exception {
+		alter(
+			StyleBookEntryTable.class,
+			new AlterTableAddColumn("uuid_", "VARCHAR(75) null"),
+			new AlterTableAddColumn("modifiedDate", "DATE null"));
 
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			try (PreparedStatement preparedStatement1 =
@@ -42,9 +45,9 @@ public class StyleBookEntryUpgradeProcess extends UpgradeProcess {
 						"select styleBookEntryId from StyleBookEntry");
 				PreparedStatement preparedStatement2 =
 					AutoBatchPreparedStatementUtil.autoBatch(
-						connection,
-						"update StyleBookEntry set uuid_ = ? where " +
-							"styleBookEntryId = ?");
+						connection.prepareStatement(
+							"update StyleBookEntry set uuid_ = ? where " +
+								"styleBookEntryId = ?"));
 				ResultSet resultSet = preparedStatement1.executeQuery()) {
 
 				while (resultSet.next()) {

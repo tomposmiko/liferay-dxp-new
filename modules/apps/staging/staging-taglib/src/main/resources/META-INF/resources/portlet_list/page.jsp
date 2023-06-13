@@ -78,9 +78,9 @@
 		boolean displayCounts = (exportModelCount > 0) || (modelDeletionCount > 0);
 
 		if (!type.equals(Constants.EXPORT)) {
-			UnicodeProperties liveGroupTypeSettingsUnicodeProperties = liveGroup.getTypeSettingsProperties();
+			UnicodeProperties liveGroupTypeSettings = liveGroup.getTypeSettingsProperties();
 
-			displayCounts = displayCounts && GetterUtil.getBoolean(liveGroupTypeSettingsUnicodeProperties.getProperty(StagingUtil.getStagedPortletId(portlet.getRootPortletId())), portletDataHandler.isPublishToLiveByDefault());
+			displayCounts = displayCounts && GetterUtil.getBoolean(liveGroupTypeSettings.getProperty(StagingUtil.getStagedPortletId(portlet.getRootPortletId())), portletDataHandler.isPublishToLiveByDefault());
 		}
 
 		if (!displayCounts && !showAllPortlets) {
@@ -90,7 +90,7 @@
 		boolean showPortletDataInput = MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PORTLET_DATA + StringPool.UNDERLINE + portlet.getPortletId(), portletDataHandler.isPublishToLiveByDefault()) || MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PORTLET_DATA_ALL);
 	%>
 
-		<li class="tree-item <%= ((exportModelCount > 0) || showAllPortlets) ? StringPool.BLANK : "deletions" %>">
+		<li class="tree-item">
 			<liferay-staging:checkbox
 				checked="<%= showPortletDataInput %>"
 				deletions="<%= modelDeletionCount %>"
@@ -208,7 +208,7 @@
 									"portlettitle", portletTitle
 								).build()
 							%>'
-							href="javascript:void(0);"
+							href="javascript:;"
 							id='<%= "contentLink_" + portlet.getPortletId() %>'
 							label="change"
 							method="get"
@@ -244,7 +244,7 @@ html = html.trim();
 		<span class="selected-labels" id="<portlet:namespace />selectedContentOptions"></span>
 
 		<span <%= !disableInputs ? StringPool.BLANK : "class=\"hide\"" %>>
-			<aui:a cssClass="modify-link" href="javascript:void(0);" id="contentOptionsLink" label="change" method="get" />
+			<aui:a cssClass="modify-link" href="javascript:;" id="contentOptionsLink" label="change" method="get" />
 		</span>
 
 		<div class="hide" id="<portlet:namespace />contentOptions">

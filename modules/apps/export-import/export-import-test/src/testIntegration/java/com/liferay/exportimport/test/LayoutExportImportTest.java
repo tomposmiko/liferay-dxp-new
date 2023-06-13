@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
@@ -37,8 +36,6 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -77,11 +74,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 
 	@Test
 	public void testDeleteMissingLayouts() throws Exception {
-		Layout layout1 = LayoutTestUtil.addTypePortletLayout(group);
-		Layout layout2 = LayoutTestUtil.addTypePortletLayout(group);
+		Layout layout1 = LayoutTestUtil.addLayout(group);
+		Layout layout2 = LayoutTestUtil.addLayout(group);
 
-		long[] layoutIds = ExportImportHelperUtil.getLayoutIds(
-			LayoutLocalServiceUtil.getLayouts(group.getGroupId(), false));
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			group.getGroupId(), false);
+
+		long[] layoutIds = ExportImportHelperUtil.getLayoutIds(layouts);
 
 		exportImportLayouts(layoutIds, getImportParameterMap());
 
@@ -89,7 +88,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 			LayoutLocalServiceUtil.getLayoutsCount(group, false),
 			LayoutLocalServiceUtil.getLayoutsCount(importedGroup, false));
 
-		LayoutTestUtil.addTypePortletLayout(importedGroup);
+		LayoutTestUtil.addLayout(importedGroup);
 
 		Map<String, String[]> parameterMap = getImportParameterMap();
 
@@ -134,13 +133,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap(), true);
+			exportImportLayouts(layoutIds, getImportParameterMap());
 
 			Assert.fail();
 		}
 		catch (LARTypeException larTypeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(larTypeException);
+				_log.debug(larTypeException, larTypeException);
 			}
 		}
 		finally {
@@ -153,13 +152,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		importedGroup = originalGroup;
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap(), true);
+			exportImportLayouts(layoutIds, getImportParameterMap());
 
 			Assert.fail();
 		}
 		catch (LARTypeException larTypeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(larTypeException);
+				_log.debug(larTypeException, larTypeException);
 			}
 		}
 		finally {
@@ -184,13 +183,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap(), true);
+			exportImportLayouts(layoutIds, getImportParameterMap());
 
 			Assert.fail();
 		}
 		catch (LARTypeException larTypeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(larTypeException);
+				_log.debug(larTypeException, larTypeException);
 			}
 		}
 
@@ -202,13 +201,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		importedGroup = layoutSetPrototype.getGroup();
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap(), true);
+			exportImportLayouts(layoutIds, getImportParameterMap());
 
 			Assert.fail();
 		}
 		catch (LARTypeException larTypeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(larTypeException);
+				_log.debug(larTypeException, larTypeException);
 			}
 		}
 		finally {
@@ -221,11 +220,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 
 	@Test
 	public void testExportImportLayouts() throws Exception {
-		LayoutTestUtil.addTypePortletLayout(group);
+		LayoutTestUtil.addLayout(group);
+
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			group.getGroupId(), false);
 
 		exportImportLayouts(
-			ExportImportHelperUtil.getLayoutIds(
-				LayoutLocalServiceUtil.getLayouts(group.getGroupId(), false)),
+			ExportImportHelperUtil.getLayoutIds(layouts),
 			getImportParameterMap());
 
 		Assert.assertEquals(
@@ -246,13 +247,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap(), true);
+			exportImportLayouts(layoutIds, getImportParameterMap());
 
 			Assert.fail();
 		}
 		catch (LARTypeException larTypeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(larTypeException);
+				_log.debug(larTypeException, larTypeException);
 			}
 		}
 
@@ -264,13 +265,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		importedGroup = layoutSetPrototype.getGroup();
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap(), true);
+			exportImportLayouts(layoutIds, getImportParameterMap());
 
 			Assert.fail();
 		}
 		catch (LARTypeException larTypeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(larTypeException);
+				_log.debug(larTypeException, larTypeException);
 			}
 		}
 		finally {
@@ -297,13 +298,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 			long[] layoutIds = new long[0];
 
 			try {
-				exportImportLayouts(layoutIds, getImportParameterMap(), true);
+				exportImportLayouts(layoutIds, getImportParameterMap());
 
 				Assert.fail();
 			}
 			catch (LARTypeException larTypeException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(larTypeException);
+					_log.debug(larTypeException, larTypeException);
 				}
 			}
 
@@ -315,13 +316,13 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 			importedGroup = layoutPrototype.getGroup();
 
 			try {
-				exportImportLayouts(layoutIds, getImportParameterMap(), true);
+				exportImportLayouts(layoutIds, getImportParameterMap());
 
 				Assert.fail();
 			}
 			catch (LARTypeException larTypeException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(larTypeException);
+					_log.debug(larTypeException, larTypeException);
 				}
 			}
 		}
@@ -344,9 +345,9 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 
 	@Test
 	public void testExportImportLayoutsPriorities() throws Exception {
-		Layout layout1 = LayoutTestUtil.addTypePortletLayout(group);
-		Layout layout2 = LayoutTestUtil.addTypePortletLayout(group);
-		Layout layout3 = LayoutTestUtil.addTypePortletLayout(group);
+		Layout layout1 = LayoutTestUtil.addLayout(group);
+		Layout layout2 = LayoutTestUtil.addLayout(group);
+		Layout layout3 = LayoutTestUtil.addLayout(group);
 
 		int priority = layout1.getPriority();
 
@@ -375,9 +376,11 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		Assert.assertNotEquals(
 			layout2.getPriority(), importedLayout2.getPriority());
 
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			group.getGroupId(), false);
+
 		exportImportLayouts(
-			ExportImportHelperUtil.getLayoutIds(
-				LayoutLocalServiceUtil.getLayouts(group.getGroupId(), false)),
+			ExportImportHelperUtil.getLayoutIds(layouts),
 			getImportParameterMap());
 
 		importedLayout1 = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
@@ -412,7 +415,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 
 	@Test
 	public void testExportImportSelectedLayouts() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(group);
+		Layout layout = LayoutTestUtil.addLayout(group);
 
 		long[] layoutIds = {layout.getLayoutId()};
 
@@ -428,56 +431,20 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		Assert.assertNotNull(importedLayout);
 	}
 
-	@Test
-	public void testExportImportUnselectedChildLayouts() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(group);
-
-		Layout childLayout = LayoutTestUtil.addTypePortletLayout(
-			group, layout.getPlid());
-
-		Map<Long, Boolean> selectedLayouts = HashMapBuilder.put(
-			LayoutConstants.DEFAULT_PLID, true
-		).put(
-			layout.getPlid(), false
-		).build();
-
-		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-			group.getGroupId(), false);
-
-		Map<String, String[]> exportParameterMap = getExportParameterMap();
-
-		exportParameterMap.put(Constants.CMD, new String[] {Constants.EXPORT});
-
-		exportLayouts(
-			ExportImportHelperUtil.getLayoutIds(selectedLayouts),
-			exportParameterMap);
-
-		importLayouts(getImportParameterMap());
-
-		Assert.assertNotEquals(
-			layouts.size(),
-			LayoutLocalServiceUtil.getLayoutsCount(importedGroup, false));
-
-		importedLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
-			childLayout.getUuid(), importedGroup.getGroupId(), false);
-
-		Assert.assertNull(importedLayout);
-	}
-
 	@Ignore
 	@Test
 	public void testFriendlyURLCollision() throws Exception {
 		String defaultLanguageId = LocaleUtil.toLanguageId(
 			LocaleUtil.getDefault());
 
-		Layout layoutA = LayoutTestUtil.addTypePortletLayout(group);
+		Layout layoutA = LayoutTestUtil.addLayout(group);
 
 		String friendlyURLA = layoutA.getFriendlyURL();
 
 		layoutA = LayoutLocalServiceUtil.updateFriendlyURL(
 			layoutA.getUserId(), layoutA.getPlid(), friendlyURLA + "-de", "de");
 
-		Layout layoutB = LayoutTestUtil.addTypePortletLayout(group);
+		Layout layoutB = LayoutTestUtil.addLayout(group);
 
 		String friendlyURLB = layoutB.getFriendlyURL();
 
@@ -521,18 +488,18 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		importedGroup = GroupTestUtil.updateDisplaySettings(
 			importedGroup.getGroupId(), targetAvailableLocales, null);
 
-		LayoutTestUtil.addTypePortletLayout(group);
+		LayoutTestUtil.addLayout(group);
 
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap(), true);
+			exportImportLayouts(layoutIds, getImportParameterMap());
 
 			Assert.assertFalse(expectFailure);
 		}
 		catch (LocaleException localeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(localeException);
+				_log.debug(localeException, localeException);
 			}
 
 			Assert.assertTrue(expectFailure);

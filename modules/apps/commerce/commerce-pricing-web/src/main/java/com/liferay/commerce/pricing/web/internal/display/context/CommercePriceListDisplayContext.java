@@ -26,19 +26,19 @@ import com.liferay.commerce.pricing.model.CommercePriceModifier;
 import com.liferay.commerce.pricing.service.CommercePriceModifierService;
 import com.liferay.commerce.pricing.type.CommercePriceModifierType;
 import com.liferay.commerce.pricing.type.CommercePriceModifierTypeRegistry;
-import com.liferay.commerce.pricing.web.internal.constants.CommercePriceListScreenNavigationConstants;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.pricing.web.internal.servlet.taglib.ui.constants.CommercePriceListScreenNavigationConstants;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.service.CommerceCatalogService;
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
@@ -209,7 +209,7 @@ public class CommercePriceListDisplayContext
 				cpRequestHelper.getScopeGroupId(),
 				CommercePriceList.class.getName())) {
 
-			publishButtonLabel = "submit-for-workflow";
+			publishButtonLabel = "submit-for-publication";
 		}
 
 		String additionalClasses = "btn-primary";
@@ -260,50 +260,12 @@ public class CommercePriceListDisplayContext
 		return commercePriceList.getParentCommercePriceListId();
 	}
 
-	public CreationMenu getPriceListCreationMenu(String portletName)
-		throws Exception {
-
-		CreationMenu creationMenu = new CreationMenu();
-
-		if (hasPermission(
-				CommercePriceListActionKeys.ADD_COMMERCE_PRICE_LIST)) {
-
-			if (portletName.equals(
-					CommercePricingPortletKeys.COMMERCE_PRICE_LIST)) {
-
-				creationMenu.addDropdownItem(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							getAddCommercePriceListRenderURL());
-						dropdownItem.setLabel(
-							LanguageUtil.get(
-								httpServletRequest, "create-new-price-list"));
-						dropdownItem.setTarget("modal-lg");
-					});
-			}
-			else if (portletName.equals(
-						CommercePricingPortletKeys.COMMERCE_PROMOTION)) {
-
-				creationMenu.addDropdownItem(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							getAddCommercePriceListRenderURL());
-						dropdownItem.setLabel(
-							LanguageUtil.get(
-								httpServletRequest, "create-new-promotion"));
-						dropdownItem.setTarget("modal-lg");
-					});
-			}
-		}
-
-		return creationMenu;
-	}
-
-	public List<FDSActionDropdownItem> getPriceListFDSActionDropdownItems()
+	public List<ClayDataSetActionDropdownItem>
+			getPriceListClayDataSetActionDropdownItems()
 		throws PortalException {
 
-		List<FDSActionDropdownItem> fdsActionDropdownItems =
-			getFDSActionDropdownItems(
+		List<ClayDataSetActionDropdownItem> clayDataSetActionDropdownItems =
+			getClayDataSetActionDropdownItems(
 				PortletURLBuilder.createRenderURL(
 					commercePricingRequestHelper.getRenderResponse()
 				).setMVCRenderCommandName(
@@ -319,13 +281,32 @@ public class CommercePriceListDisplayContext
 				).buildString(),
 				false);
 
-		fdsActionDropdownItems.add(
-			new FDSActionDropdownItem(
+		clayDataSetActionDropdownItems.add(
+			new ClayDataSetActionDropdownItem(
 				_getManagePriceListPermissionsURL(), null, "permissions",
 				LanguageUtil.get(httpServletRequest, "permissions"), "get",
 				"permissions", "modal-permissions"));
 
-		return fdsActionDropdownItems;
+		return clayDataSetActionDropdownItems;
+	}
+
+	public CreationMenu getPriceListCreationMenu() throws Exception {
+		CreationMenu creationMenu = new CreationMenu();
+
+		if (hasPermission(
+				CommercePriceListActionKeys.ADD_COMMERCE_PRICE_LIST)) {
+
+			creationMenu.addDropdownItem(
+				dropdownItem -> {
+					dropdownItem.setHref(getAddCommercePriceListRenderURL());
+					dropdownItem.setLabel(
+						LanguageUtil.get(
+							httpServletRequest, "create-new-price-list"));
+					dropdownItem.setTarget("modal-lg");
+				});
+		}
+
+		return creationMenu;
 	}
 
 	public String getPriceListsApiUrl(String portletName) {
@@ -335,8 +316,10 @@ public class CommercePriceListDisplayContext
 				StringPool.APOSTROPHE),
 			true);
 
-		return "/o/headless-commerce-admin-pricing/v2.0/price-lists?filter=" +
-			encodedFilter;
+		return StringBundler.concat(
+			PortalUtil.getPortalURL(httpServletRequest),
+			"/o/headless-commerce-admin-pricing/v2.0/price-lists?filter=",
+			encodedFilter);
 	}
 
 	public String getPriceModifierCategoriesApiUrl() throws PortalException {
@@ -345,11 +328,11 @@ public class CommercePriceListDisplayContext
 				"/price-modifier-categories?nestedFields=category";
 	}
 
-	public List<FDSActionDropdownItem>
-		getPriceModifierCategoryFDSActionDropdownItems() {
+	public List<ClayDataSetActionDropdownItem>
+		getPriceModifierCategoryClayDataSetActionDropdownItems() {
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "remove",
 				LanguageUtil.get(httpServletRequest, "remove"), "delete",
 				"delete", "headless"));
@@ -361,11 +344,21 @@ public class CommercePriceListDisplayContext
 				"/price-modifier-products?nestedFields=product";
 	}
 
-	public List<FDSActionDropdownItem>
-		getPriceModifierCPDefinitionFDSActionDropdownItems() {
+	public List<ClayDataSetActionDropdownItem>
+		getPriceModifierCPDefinitionClayDataSetActionDropdownItems() {
 
 		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
+				null, "trash", "remove",
+				LanguageUtil.get(httpServletRequest, "remove"), "delete",
+				"delete", "headless"));
+	}
+
+	public List<ClayDataSetActionDropdownItem>
+		getPriceModifierPricingClassClayDataSetActionDropdownItems() {
+
+		return ListUtil.fromArray(
+			new ClayDataSetActionDropdownItem(
 				null, "trash", "remove",
 				LanguageUtil.get(httpServletRequest, "remove"), "delete",
 				"delete", "headless"));
@@ -377,16 +370,6 @@ public class CommercePriceListDisplayContext
 		return "/o/headless-commerce-admin-pricing/v2.0/price-modifiers/" +
 			getCommercePriceModifierId() +
 				"/price-modifier-product-groups?nestedFields=productGroup";
-	}
-
-	public List<FDSActionDropdownItem>
-		getPriceModifierPricingClassFDSActionDropdownItems() {
-
-		return ListUtil.fromArray(
-			new FDSActionDropdownItem(
-				null, "trash", "remove",
-				LanguageUtil.get(httpServletRequest, "remove"), "delete",
-				"delete", "headless"));
 	}
 
 	public CreationMenu getPriceModifiersCreationMenu() throws Exception {

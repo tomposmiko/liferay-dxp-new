@@ -14,9 +14,9 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib;
 
-import com.liferay.frontend.taglib.clay.internal.servlet.taglib.util.DropdownItemListUtil;
+import com.liferay.frontend.taglib.clay.servlet.taglib.soy.UserCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
@@ -146,13 +146,13 @@ public class UserCardTag extends BaseCardTag {
 
 	@Override
 	protected String getHydratedModuleName() {
-		return "{UserCard} from frontend-taglib-clay";
+		return "frontend-taglib-clay/cards/UserCard";
 	}
 
 	@Override
 	protected Map<String, Object> prepareProps(Map<String, Object> props) {
 		props.put("description", getSubtitle());
-		props.put("name", HtmlUtil.unescape(getName()));
+		props.put("name", getName());
 		props.put("userDisplayType", getUserColorClass());
 		props.put("userImageAlt", getImageAlt());
 		props.put("userImageSrc", getImageSrc());
@@ -294,7 +294,7 @@ public class UserCardTag extends BaseCardTag {
 
 		List<DropdownItem> actionDropdownItems = getActionDropdownItems();
 
-		if (!DropdownItemListUtil.isEmpty(actionDropdownItems)) {
+		if (!ListUtil.isEmpty(actionDropdownItems)) {
 			jspWriter.write("<div class=\"autofit-col\">");
 
 			DropdownActionsTag dropdownActionsTag = new DropdownActionsTag();

@@ -69,26 +69,6 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().addObjectEntry(objectEntry);
 	}
 
-	public static ObjectEntry addObjectEntry(
-			String externalReferenceCode, long userId,
-			com.liferay.object.model.ObjectDefinition objectDefinition)
-		throws PortalException {
-
-		return getService().addObjectEntry(
-			externalReferenceCode, userId, objectDefinition);
-	}
-
-	public static void addOrUpdateExtensionDynamicObjectDefinitionTableValues(
-			long userId,
-			com.liferay.object.model.ObjectDefinition objectDefinition,
-			long primaryKey, Map<String, Serializable> values,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		getService().addOrUpdateExtensionDynamicObjectDefinitionTableValues(
-			userId, objectDefinition, primaryKey, values, serviceContext);
-	}
-
 	public static ObjectEntry addOrUpdateObjectEntry(
 			String externalReferenceCode, long userId, long groupId,
 			long objectDefinitionId, Map<String, Serializable> values,
@@ -118,15 +98,6 @@ public class ObjectEntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().createPersistedModel(primaryKeyObj);
-	}
-
-	public static void deleteExtensionDynamicObjectDefinitionTableValues(
-			com.liferay.object.model.ObjectDefinition objectDefinition,
-			long primaryKey)
-		throws PortalException {
-
-		getService().deleteExtensionDynamicObjectDefinitionTableValues(
-			objectDefinition, primaryKey);
 	}
 
 	/**
@@ -278,13 +249,6 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().fetchObjectEntry(objectEntryId);
 	}
 
-	public static ObjectEntry fetchObjectEntry(
-		String externalReferenceCode, long objectDefinitionId) {
-
-		return getService().fetchObjectEntry(
-			externalReferenceCode, objectDefinitionId);
-	}
-
 	/**
 	 * Returns the object entry matching the UUID and group.
 	 *
@@ -304,33 +268,12 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().getActionableDynamicQuery();
 	}
 
-	public static Map<Object, Long> getAggregationCounts(
-			long groupId, long objectDefinitionId, String aggregationTerm,
-			com.liferay.petra.sql.dsl.expression.Predicate predicate, int start,
-			int end)
-		throws PortalException {
-
-		return getService().getAggregationCounts(
-			groupId, objectDefinitionId, aggregationTerm, predicate, start,
-			end);
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
 		getExportActionableDynamicQuery(
 			com.liferay.exportimport.kernel.lar.PortletDataContext
 				portletDataContext) {
 
 		return getService().getExportActionableDynamicQuery(portletDataContext);
-	}
-
-	public static Map<String, Serializable>
-			getExtensionDynamicObjectDefinitionTableValues(
-				com.liferay.object.model.ObjectDefinition objectDefinition,
-				long primaryKey)
-		throws PortalException {
-
-		return getService().getExtensionDynamicObjectDefinitionTableValues(
-			objectDefinition, primaryKey);
 	}
 
 	public static
@@ -340,23 +283,22 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
-	public static List<ObjectEntry> getManyToManyObjectEntries(
+	public static List<ObjectEntry> getManyToManyRelatedObjectEntries(
 			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related, boolean reverse, int start, int end)
+			boolean reverse, int start, int end)
 		throws PortalException {
 
-		return getService().getManyToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, related, reverse, start,
-			end);
+		return getService().getManyToManyRelatedObjectEntries(
+			groupId, objectRelationshipId, primaryKey, reverse, start, end);
 	}
 
-	public static int getManyToManyObjectEntriesCount(
+	public static int getManyToManyRelatedObjectEntriesCount(
 			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related, boolean reverse)
+			boolean reverse)
 		throws PortalException {
 
-		return getService().getManyToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related, reverse);
+		return getService().getManyToManyRelatedObjectEntriesCount(
+			groupId, objectRelationshipId, primaryKey, reverse);
 	}
 
 	/**
@@ -375,17 +317,11 @@ public class ObjectEntryLocalServiceUtil {
 	}
 
 	public static List<ObjectEntry> getObjectEntries(
-		long groupId, long objectDefinitionId, int start, int end) {
+			long groupId, long objectDefinitionId, int start, int end)
+		throws PortalException {
 
 		return getService().getObjectEntries(
 			groupId, objectDefinitionId, start, end);
-	}
-
-	public static List<ObjectEntry> getObjectEntries(
-		long groupId, long objectDefinitionId, int status, int start, int end) {
-
-		return getService().getObjectEntries(
-			groupId, objectDefinitionId, status, start, end);
 	}
 
 	/**
@@ -448,14 +384,6 @@ public class ObjectEntryLocalServiceUtil {
 	}
 
 	public static ObjectEntry getObjectEntry(
-			String externalReferenceCode, long objectDefinitionId)
-		throws PortalException {
-
-		return getService().getObjectEntry(
-			externalReferenceCode, objectDefinitionId);
-	}
-
-	public static ObjectEntry getObjectEntry(
 			String externalReferenceCode, long companyId, long groupId)
 		throws PortalException {
 
@@ -478,22 +406,21 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().getObjectEntryByUuidAndGroupId(uuid, groupId);
 	}
 
-	public static List<ObjectEntry> getOneToManyObjectEntries(
-			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related, int start, int end)
+	public static List<ObjectEntry> getOneToManyRelatedObjectEntries(
+			long groupId, long objectRelationshipId, long primaryKey, int start,
+			int end)
 		throws PortalException {
 
-		return getService().getOneToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, related, start, end);
+		return getService().getOneToManyRelatedObjectEntries(
+			groupId, objectRelationshipId, primaryKey, start, end);
 	}
 
-	public static int getOneToManyObjectEntriesCount(
-			long groupId, long objectRelationshipId, long primaryKey,
-			boolean related)
+	public static int getOneToManyRelatedObjectEntriesCount(
+			long groupId, long objectRelationshipId, long primaryKey)
 		throws PortalException {
 
-		return getService().getOneToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, related);
+		return getService().getOneToManyRelatedObjectEntriesCount(
+			groupId, objectRelationshipId, primaryKey);
 	}
 
 	/**
@@ -514,28 +441,6 @@ public class ObjectEntryLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static Map<String, Object> getSystemModelAttributes(
-			com.liferay.object.model.ObjectDefinition objectDefinition,
-			long primaryKey)
-		throws PortalException {
-
-		return getService().getSystemModelAttributes(
-			objectDefinition, primaryKey);
-	}
-
-	public static Map<String, Serializable> getSystemValues(
-			ObjectEntry objectEntry)
-		throws PortalException {
-
-		return getService().getSystemValues(objectEntry);
-	}
-
-	public static String getTitleValue(long objectDefinitionId, long primaryKey)
-		throws PortalException {
-
-		return getService().getTitleValue(objectDefinitionId, primaryKey);
-	}
-
 	public static Map<String, Serializable> getValues(long objectEntryId)
 		throws PortalException {
 
@@ -549,35 +454,20 @@ public class ObjectEntryLocalServiceUtil {
 	}
 
 	public static List<Map<String, Serializable>> getValuesList(
-			long groupId, long companyId, long userId, long objectDefinitionId,
-			com.liferay.petra.sql.dsl.expression.Predicate predicate,
-			String search, int start, int end,
-			com.liferay.petra.sql.dsl.query.sort.OrderByExpression[]
-				orderByExpressions)
+			long objectDefinitionId, int[] statuses, int start, int end)
 		throws PortalException {
 
 		return getService().getValuesList(
-			groupId, companyId, userId, objectDefinitionId, predicate, search,
-			start, end, orderByExpressions);
-	}
-
-	public static int getValuesListCount(
-			long groupId, long companyId, long userId, long objectDefinitionId,
-			com.liferay.petra.sql.dsl.expression.Predicate predicate,
-			String search)
-		throws PortalException {
-
-		return getService().getValuesListCount(
-			groupId, companyId, userId, objectDefinitionId, predicate, search);
+			objectDefinitionId, statuses, start, end);
 	}
 
 	public static void insertIntoOrUpdateExtensionTable(
-			long userId, long objectDefinitionId, long primaryKey,
+			long objectDefinitionId, long primaryKey,
 			Map<String, Serializable> values)
 		throws PortalException {
 
 		getService().insertIntoOrUpdateExtensionTable(
-			userId, objectDefinitionId, primaryKey, values);
+			objectDefinitionId, primaryKey, values);
 	}
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult

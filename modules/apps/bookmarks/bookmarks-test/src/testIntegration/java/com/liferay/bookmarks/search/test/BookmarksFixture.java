@@ -69,11 +69,13 @@ public class BookmarksFixture {
 			long folderId, String name, String description)
 		throws Exception {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), _user.getUserId());
+
 		BookmarksEntry bookmarksEntry = _bookmarksEntryLocalService.addEntry(
 			_user.getUserId(), _group.getGroupId(), folderId, name,
-			"https://www.liferay.com", description,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _user.getUserId()));
+			"https://www.liferay.com", description, serviceContext);
 
 		_bookmarksEntries.add(bookmarksEntry);
 
@@ -92,10 +94,13 @@ public class BookmarksFixture {
 	}
 
 	public BookmarksFolder createBookmarksFolder(String name) throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), _user.getUserId());
+
 		BookmarksFolder bookmarksFolder = addFolder(
 			BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID, name,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), _user.getUserId()));
+			serviceContext);
 
 		_bookmarksFolders.add(bookmarksFolder);
 

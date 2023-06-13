@@ -23,8 +23,8 @@ declare type TViolationNext = {
 declare type onFilterChange = (
 	type: keyof typeof TYPES,
 	payload: {
-		key: keyof RuleRaw;
 		value: string;
+		key: keyof RuleRaw;
 	}
 ) => void;
 declare type ViolationsPanelProps = {

@@ -35,9 +35,12 @@ import org.hamcrest.CoreMatchers;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author André de Oliveira
@@ -73,6 +76,11 @@ public class ElasticsearchConnectionHttpTest {
 	@AfterClass
 	public static void tearDownClass() {
 		_elasticsearchConnectionFixture.destroyNode();
+	}
+
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test

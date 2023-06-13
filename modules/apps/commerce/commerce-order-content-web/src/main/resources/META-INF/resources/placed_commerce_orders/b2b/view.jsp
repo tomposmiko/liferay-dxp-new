@@ -27,10 +27,13 @@
 	displayStyleGroupId="<%= commerceOrderContentDisplayContext.getDisplayStyleGroupId(CommercePortletKeys.COMMERCE_ORDER_CONTENT) %>"
 	entries="<%= commerceOrderSearchContainer.getResults() %>"
 >
-	<frontend-data-set:classic-display
-		dataProviderKey="<%= CommerceOrderFDSNames.PLACED_ORDERS %>"
-		id="<%= CommerceOrderFDSNames.PLACED_ORDERS %>"
+	<clay:data-set-display
+		dataProviderKey="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PLACED_ORDERS %>"
+		id="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PLACED_ORDERS %>"
 		itemsPerPage="<%= 10 %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= commerceOrderContentDisplayContext.getPortletURL() %>"
 		style="stacked"
 	/>
 </liferay-ddm:template-renderer>

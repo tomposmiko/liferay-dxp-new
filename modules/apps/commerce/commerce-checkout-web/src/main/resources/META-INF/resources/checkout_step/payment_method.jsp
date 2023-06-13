@@ -31,15 +31,13 @@ String commercePaymentMethodKey = BeanParamUtil.getString(commerceOrder, request
 
 	<c:choose>
 		<c:when test="<%= commercePaymentMethods.isEmpty() %>">
-			<clay:row>
-				<clay:col
-					size="12"
-				>
+			<aui:row>
+				<aui:col width="<%= 100 %>">
 					<aui:alert type="info">
 						<liferay-ui:message key="there-are-no-available-payment-methods" />
 					</aui:alert>
-				</clay:col>
-			</clay:row>
+				</aui:col>
+			</aui:row>
 
 			<aui:script use="aui-base">
 				var continueButton = A.one('#<portlet:namespace />continue');

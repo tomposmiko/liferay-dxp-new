@@ -15,9 +15,11 @@
 package com.liferay.commerce.product.type.grouped.internal.upgrade.v1_1_0;
 
 import com.liferay.commerce.product.type.grouped.model.impl.CPDefinitionGroupedEntryModelImpl;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,6 +33,11 @@ public class CPDefinitionGroupedEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		_addColumn(
+			CPDefinitionGroupedEntryModelImpl.class,
+			CPDefinitionGroupedEntryModelImpl.TABLE_NAME, "entryCProductId",
+			"LONG");
+
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"update CPDefinitionGroupedEntry set entryCProductId = ? " +
 					"where entryCPDefinitionId = ?");
@@ -44,28 +51,67 @@ public class CPDefinitionGroupedEntryUpgradeProcess extends UpgradeProcess {
 
 				preparedStatement.setLong(
 					1, _getCProductId(entryCPDefinitionId));
+
 				preparedStatement.setLong(2, entryCPDefinitionId);
 
 				preparedStatement.execute();
 			}
 		}
+
+		_dropColumn(
+			CPDefinitionGroupedEntryModelImpl.TABLE_NAME,
+			"entryCPDefinitionId");
 	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns(
-				CPDefinitionGroupedEntryModelImpl.TABLE_NAME,
-				"entryCPDefinitionId")
-		};
+	private void _addColumn(
+			Class<?> entityClass, String tableName, String columnName,
+			String columnType)
+		throws Exception {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				String.format(
+					"Adding column %s to table %s", columnName, tableName));
+		}
+
+		if (!hasColumn(tableName, columnName)) {
+			alter(
+				entityClass,
+				new AlterTableAddColumn(
+					columnName + StringPool.SPACE + columnType));
+		}
+		else {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					String.format(
+						"Column %s already exists on table %s", columnName,
+						tableName));
+			}
+		}
 	}
 
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CPDefinitionGroupedEntry", "entryCProductId LONG")
-		};
+	private void _dropColumn(String tableName, String columnName)
+		throws Exception {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				String.format(
+					"Dropping column %s from table %s", columnName, tableName));
+		}
+
+		if (hasColumn(tableName, columnName)) {
+			runSQL(
+				StringBundler.concat(
+					"alter table ", tableName, " drop column ", columnName));
+		}
+		else {
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					String.format(
+						"Column %s already does not exist on table %s",
+						columnName, tableName));
+			}
+		}
 	}
 
 	private long _getCProductId(long cpDefinitionId) throws Exception {
@@ -81,5 +127,8 @@ public class CPDefinitionGroupedEntryUpgradeProcess extends UpgradeProcess {
 
 		return 0;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CPDefinitionGroupedEntryUpgradeProcess.class);
 
 }

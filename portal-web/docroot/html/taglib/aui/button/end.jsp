@@ -21,7 +21,7 @@
 </c:if>
 
 <c:choose>
-	<c:when test='<%= Validator.isNotNull(escapedHREF) && !type.equals("cancel") %>'>
+	<c:when test="<%= Validator.isNotNull(escapedHREF) %>">
 		<a
 			class="<%= AUIUtil.buildCss(AUIUtil.BUTTON_PREFIX, disabled, false, false, cssClass) %>"
 			href="<%= escapedHREF %>"
@@ -30,8 +30,6 @@
 			<c:if test="<%= Validator.isNotNull(onClick) %>">
 				onClick="<%= onClick %>"
 			</c:if>
-
-			role="button"
 
 			<%= AUIUtil.buildData(data) %>
 			<%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>
@@ -51,14 +49,9 @@
 				name="<%= namespace %><%= name %>"
 			</c:if>
 
-			<c:choose>
-				<c:when test="<%= Validator.isNotNull(onClick) %>">
-					onClick="<%= onClick %>"
-				</c:when>
-				<c:when test="<%= Validator.isNotNull(escapedHREF) %>">
-					onClick="Liferay.Util.navigate('<%= escapedHREF %>')"
-				</c:when>
-			</c:choose>
+			<c:if test="<%= Validator.isNotNull(onClick) %>">
+				onClick="<%= onClick %>"
+			</c:if>
 
 			type="<%= type.equals("cancel") ? "button" : type %>"
 
@@ -73,7 +66,7 @@
 </c:if>
 
 <c:if test="<%= Validator.isNotNull(value) %>">
-	<span class="lfr-btn-label"><liferay-ui:message key="<%= value %>" /></span>
+	<span class="lfr-btn-label"><%= LanguageUtil.get(resourceBundle, value) %></span>
 </c:if>
 
 <c:if test='<%= Validator.isNotNull(icon) && iconAlign.equals("right") %>'>
@@ -90,7 +83,7 @@
 </c:choose>
 
 <c:if test="<%= dropdown %>">
-	<button aria-expanded="false" aria-haspopup="true" class="btn btn-primary dropdown-toggle <%= cssClass %>" data-toggle="liferay-dropdown" <%= disabled ? "disabled" : StringPool.BLANK %> id="<%= id %>Toggle" type="button">
+	<button aria-expanded="false" class="btn btn-primary dropdown-toggle <%= cssClass %>" data-toggle="liferay-dropdown" <%= disabled ? "disabled" : StringPool.BLANK %> id="<%= id %>Toggle" type="button">
 		<span class="caret"></span>
 
 		<span class="sr-only"><liferay-ui:message key="toggle-dropdown" /></span>
@@ -109,12 +102,13 @@
 		Liferay.delegateClick(
 			'<%= namespace + name %>',
 			function(event) {
-				event.preventDefault();
-
-				Liferay.Util.openWindow({
-					dialogIframe: {
-						bodyCssClass: 'dialog-with-footer'
-					}}
+				Liferay.Util.openInDialog(
+					event,
+					{
+						dialogIframe: {
+							bodyCssClass: 'dialog-with-footer'
+						}
+					}
 				);
 			}
 		);

@@ -14,8 +14,6 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib;
 
-import com.liferay.portal.kernel.util.Validator;
-
 import javax.servlet.jsp.JspException;
 
 /**
@@ -28,10 +26,7 @@ public class ContainerFluidTag extends ContainerTag {
 		setAttributeNamespace(_ATTRIBUTE_NAMESPACE);
 
 		setFluid(true);
-
-		if (Validator.isNull(getSize())) {
-			setSize("xl");
-		}
+		setSize("xl");
 
 		return super.doStartTag();
 	}

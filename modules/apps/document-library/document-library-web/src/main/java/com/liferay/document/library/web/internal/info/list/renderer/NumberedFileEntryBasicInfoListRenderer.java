@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Pavel Savinov
  */
-@Component(service = InfoListRenderer.class)
+@Component(immediate = true, service = InfoListRenderer.class)
 public class NumberedFileEntryBasicInfoListRenderer
 	extends BaseFileEntryBasicInfoListRenderer
 	implements NumberedBasicInfoListRenderer<FileEntry> {

@@ -17,14 +17,13 @@ package com.liferay.redirect.web.internal.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.redirect.model.RedirectEntry;
 import com.liferay.redirect.service.RedirectEntryLocalService;
 import com.liferay.redirect.web.internal.constants.RedirectPortletKeys;
-import com.liferay.redirect.web.internal.display.context.RedirectEntryInfoPanelDisplayContext;
+import com.liferay.redirect.web.internal.constants.RedirectWebKeys;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -36,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + RedirectPortletKeys.REDIRECT,
 		"mvc.command.name=/redirect/info_panel"
@@ -49,26 +49,19 @@ public class InfoPanelMVCResourceCommand extends BaseMVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		List<RedirectEntry> redirectEntries = new ArrayList<>();
-
-		for (long redirectEntryId :
-				ParamUtil.getLongValues(resourceRequest, "rowIds")) {
-
-			redirectEntries.add(
-				_redirectEntryLocalService.fetchRedirectEntry(redirectEntryId));
-		}
+		LongStream longStream = Arrays.stream(
+			ParamUtil.getLongValues(resourceRequest, "rowIds"));
 
 		resourceRequest.setAttribute(
-			RedirectEntryInfoPanelDisplayContext.class.getName(),
-			new RedirectEntryInfoPanelDisplayContext(
-				_portal.getLiferayPortletRequest(resourceRequest),
-				redirectEntries));
+			RedirectWebKeys.REDIRECT_ENTRIES,
+			longStream.mapToObj(
+				_redirectEntryLocalService::fetchRedirectEntry
+			).collect(
+				Collectors.toList()
+			));
 
 		include(resourceRequest, resourceResponse, "/info_panel.jsp");
 	}
-
-	@Reference
-	private Portal _portal;
 
 	@Reference
 	private RedirectEntryLocalService _redirectEntryLocalService;

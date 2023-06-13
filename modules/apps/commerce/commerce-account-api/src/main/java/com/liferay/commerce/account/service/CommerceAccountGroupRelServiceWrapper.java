@@ -27,10 +27,6 @@ public class CommerceAccountGroupRelServiceWrapper
 	implements CommerceAccountGroupRelService,
 			   ServiceWrapper<CommerceAccountGroupRelService> {
 
-	public CommerceAccountGroupRelServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAccountGroupRelServiceWrapper(
 		CommerceAccountGroupRelService commerceAccountGroupRelService) {
 
@@ -108,8 +104,8 @@ public class CommerceAccountGroupRelServiceWrapper
 	}
 
 	@Override
-	public int getCommerceAccountGroupRelsCount(
-		String className, long classPK) {
+	public int getCommerceAccountGroupRelsCount(String className, long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceAccountGroupRelService.getCommerceAccountGroupRelsCount(
 			className, classPK);

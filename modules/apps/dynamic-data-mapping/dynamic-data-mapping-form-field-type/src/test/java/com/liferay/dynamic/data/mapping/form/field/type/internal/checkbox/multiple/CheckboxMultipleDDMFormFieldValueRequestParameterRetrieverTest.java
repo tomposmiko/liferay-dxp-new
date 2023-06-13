@@ -50,14 +50,14 @@ public class CheckboxMultipleDDMFormFieldValueRequestParameterRetrieverTest {
 
 	@Test
 	public void testCompletedSubmission() {
-		String expectedResult = _createJSONArrayString("Option 2");
+		String expectedResult = createJSONArrayString("Option 2");
 
-		String defaultDDMFormFieldParameterValue = _createJSONArrayString(
+		String defaultDDMFormFieldParameterValue = createJSONArrayString(
 			"Option 1");
 
 		String actualResult =
 			_checkboxMultipleDDMFormFieldValueRequestParameterRetriever.get(
-				_createHttpServletRequest("Option 2"),
+				createHttpServletRequest("Option 2"),
 				_CHECKBOX_MULTIPLE_SUBMISSION,
 				defaultDDMFormFieldParameterValue);
 
@@ -68,18 +68,18 @@ public class CheckboxMultipleDDMFormFieldValueRequestParameterRetrieverTest {
 	public void testEmptySubmission() {
 		String expectedResult = "[]";
 
-		String defaultDDMFormFieldParameterValue = _createJSONArrayString(
+		String defaultDDMFormFieldParameterValue = createJSONArrayString(
 			"Option 1");
 
 		String actualResult =
 			_checkboxMultipleDDMFormFieldValueRequestParameterRetriever.get(
-				_createHttpServletRequest(), _CHECKBOX_MULTIPLE_SUBMISSION,
+				createHttpServletRequest(), _CHECKBOX_MULTIPLE_SUBMISSION,
 				defaultDDMFormFieldParameterValue);
 
 		Assert.assertEquals(expectedResult, actualResult);
 	}
 
-	private MockHttpServletRequest _createHttpServletRequest() {
+	protected MockHttpServletRequest createHttpServletRequest() {
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
 
@@ -93,9 +93,9 @@ public class CheckboxMultipleDDMFormFieldValueRequestParameterRetrieverTest {
 		return mockHttpServletRequest;
 	}
 
-	private HttpServletRequest _createHttpServletRequest(String... strings) {
+	protected HttpServletRequest createHttpServletRequest(String... strings) {
 		MockHttpServletRequest mockHttpServletRequest =
-			_createHttpServletRequest();
+			createHttpServletRequest();
 
 		mockHttpServletRequest.addParameter(
 			_CHECKBOX_MULTIPLE_SUBMISSION, strings);
@@ -103,7 +103,7 @@ public class CheckboxMultipleDDMFormFieldValueRequestParameterRetrieverTest {
 		return mockHttpServletRequest;
 	}
 
-	private String _createJSONArrayString(String... strings) {
+	protected String createJSONArrayString(String... strings) {
 		JSONArray jsonArray = _jsonFactory.createJSONArray();
 
 		for (String string : strings) {

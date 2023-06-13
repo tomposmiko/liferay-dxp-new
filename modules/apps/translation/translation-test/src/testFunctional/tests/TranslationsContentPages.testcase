@@ -1,18 +1,16 @@
-@component-name = "portal-lima"
+@component-name = "portal-collaboration"
 definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Translations Management";
-
-	// This testcase validates the Content Page translations feature for both default and custom experiences.
+	property testray.main.component.name = "Translation Management";
 
 	setUp {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
 
-		HeadlessSite.addSite(siteName = "Test Site Name");
+		JSONGroup.addGroup(groupName = "Test Site Name");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
@@ -23,7 +21,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -32,10 +30,9 @@ definition {
 	}
 
 	@description = "This ensures that a translator without permissions cannot translate a content page to Chinese."
-	@priority = 5
+	@priority = "5"
 	test CannotTranslateToChineseWithoutPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
-		property portal.acceptance = "true";
 
 		ContentPagesNavigator.openEditContentPage(
 			pageName = "Test Content Page Name",
@@ -45,7 +42,7 @@ definition {
 			collectionName = "Basic Components",
 			fragmentName = "Button");
 
-		PageEditor.publish();
+		PageEditor.clickPublish();
 
 		Permissions.setUpRegRoleLoginUserCP(
 			roleTitle = "Regrole Name",
@@ -78,7 +75,7 @@ definition {
 			userLoginEmailAddress = "userea@liferay.com",
 			userLoginFullName = "userfn userln");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		WaitForPageLoad();
 
@@ -90,139 +87,26 @@ definition {
 			targetLocale = "es-ES");
 	}
 
-	@description = "This ensures that a translator can modify languages in translations when he has permissions for."
-	@priority = 5
-	test CanOnlyTranslateToSpanishWithExperience {
-		property custom.properties = "jsonws.web.service.paths.excludes=";
-
-		Permissions.setUpRegRoleLoginUserCP(
-			roleTitle = "Regrole Name",
-			userEmailAddress = "userea@liferay.com",
-			userFirstName = "userfn",
-			userLastName = "userln",
-			userScreenName = "usersn");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "ACCESS_IN_CONTROL_PANEL",
-			resourceName = "com_liferay_layout_admin_web_portlet_GroupPagesPortlet",
-			roleTitle = "Regrole Name");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "VIEW_SITE_ADMINISTRATION",
-			resourceName = "com.liferay.portal.kernel.model.Group",
-			roleTitle = "Regrole Name");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "UPDATE_LAYOUT_CONTENT",
-			resourceName = "com.liferay.portal.kernel.model.Layout",
-			roleTitle = "Regrole Name");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "TRANSLATE",
-			resourceName = "com.liferay.translation.es_ES",
-			roleTitle = "Regrole Name");
-
-		Permissions.definePermissionViaJSONAPI(
-			resourceAction = "VIEW",
-			resourceName = "com.liferay.segments.model.SegmentsExperience",
-			roleTitle = "Regrole Name");
-
-		JSONSegmentsentry.addSegment(
-			fieldName = "Email Address",
-			groupName = "Test Site Name",
-			operator = "contains",
-			segmentName = "Segment Email Address",
-			text = "test@liferay.com");
-
+	@description = "This ensures that a button on a content page can be translated and published properly."
+	@priority = "5"
+	test CanPublishTranslatedHeadingAfterReview {
 		ContentPagesNavigator.openEditContentPage(
 			pageName = "Test Content Page Name",
 			siteName = "Test Site Name");
-
-		PageEditor.addExperience(
-			experienceName = "Segment Email Experience",
-			segmentName = "Segment Email Address");
 
 		PageEditor.addFragment(
 			collectionName = "Basic Components",
 			fragmentName = "Heading");
 
-		PageEditor.publish();
+		PageEditor.clickPublish();
 
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "userea@liferay.com",
-			userLoginFullName = "userfn userln");
+		Workflow.openWorkflowAdmin(siteURLKey = "test-site-name");
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		Workflow.configureWorkflow(
+			workflowDefinition = "Single Approver",
+			workflowResourceValue = "Translation");
 
-		WaitForPageLoad();
-
-		ContentPagesNavigator.goToTranslation(pageName = "Test Content Page Name");
-
-		Translations.viewTargetLocales(
-			currentTargetLocale = "es-ES",
-			noTargetLocale = "zh-CN,ar-SA,ca-ES,nl-NL,fi-FI,fr-FR,de-DE,hu-HU,ja-JP,pt-BR,sv-SE",
-			targetLocale = "es-ES");
-
-		Translations.translateFragmentField(
-			experienceName = "Segment Email Experience",
-			fieldName = "element-text",
-			fragmentText = "esta es la nueva experiencia");
-
-		PortletEntry.publish();
-
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "test@liferay.com",
-			userLoginFullName = "Test Test");
-
-		ContentPagesNavigator.openEditContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
-
-		PageEditor.changeExperience(newExperience = "Segment Email Experience");
-
-		PageEditor.prioritizeExperience(experienceName = "Segment Email Experience");
-
-		PageEditor.changeLocale(
-			currentLocale = "en-US",
-			locale = "es-ES");
-
-		PageEditor.viewFragmentEditableText(
-			editableText = "esta es la nueva experiencia",
-			fragmentName = "Heading",
-			id = "element-text");
-
-		PageEditor.publish();
-
-		Navigator.openWithAppendToBaseURL(urlAppend = "es/web/test-site-name/test-content-page-name");
-
-		AssertTextEquals(
-			locator1 = "Experience#FRAGMENT_HEADING",
-			value1 = "esta es la nueva experiencia");
-	}
-
-	@description = "This ensures that a heading on a content page with a new experience can be translated and published properly."
-	@priority = 5
-	test CanPublishTranslatedHeadingWithExperience {
-		JSONSegmentsentry.addSegment(
-			fieldName = "Email Address",
-			groupName = "Test Site Name",
-			operator = "contains",
-			segmentName = "Segment Email Address",
-			text = "test@liferay.com");
-
-		ContentPagesNavigator.openEditContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
-
-		PageEditor.addExperience(
-			experienceName = "Segment Email Experience",
-			segmentName = "Segment Email Address");
-
-		PageEditor.addFragment(
-			collectionName = "Basic Components",
-			fragmentName = "Heading");
-
-		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		WaitForPageLoad();
 
@@ -233,47 +117,61 @@ definition {
 			newTargetLocale = "ja-JP");
 
 		Translations.translateFragmentField(
-			experienceName = "Segment Email Experience",
 			fieldName = "element-text",
-			fragmentText = "経験をテストする");
+			fragmentText = "これは見出しです");
 
-		PortletEntry.publish();
+		Button.clickSubmitForPublication();
 
-		Translations.openTranslationAdmin(siteURLKey = "test-site-name");
-
-		Translations.viewTranslationEntry(
-			language = "ja-JP",
-			status = "Approved",
-			title = "Translation of Test Content Page Name (Segment Email Experience) to ja-JP");
+		Alert.viewSuccessMessage();
 
 		ContentPagesNavigator.openEditContentPage(
 			pageName = "Test Content Page Name",
 			siteName = "Test Site Name");
-
-		PageEditor.changeExperience(newExperience = "Segment Email Experience");
-
-		PageEditor.prioritizeExperience(experienceName = "Segment Email Experience");
 
 		PageEditor.changeLocale(
 			currentLocale = "en-US",
 			locale = "ja-JP");
 
 		PageEditor.viewFragmentEditableText(
-			editableText = "経験をテストする",
+			editableText = "Heading Example",
 			fragmentName = "Heading",
 			id = "element-text");
 
-		PageEditor.publish();
+		ContentPagesNavigator.openViewContentPage(
+			pageName = "Test Content Page Name",
+			siteName = "Test Site Name");
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "ja/web/test-site-name/test-content-page-name");
+		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+		Workflow.assignToMeTaskByActions(
+			workflowAssetTitle = "Translation of Test Content Page Name to ja-JP",
+			workflowAssetType = "Translation",
+			workflowTask = "Review");
+
+		Workflow.approveTaskByActions(
+			workflowAssetTitle = "Translation of Test Content Page Name to ja-JP",
+			workflowAssetType = "Translation",
+			workflowTask = "Review");
+
+		ContentPagesNavigator.openEditContentPage(
+			pageName = "Test Content Page Name",
+			siteName = "Test Site Name");
+
+		PageEditor.clickPublish();
+
+		ContentPagesNavigator.openViewContentPage(
+			locale = "ja",
+			pageName = "Test Content Page Name",
+			siteName = "Test Site Name");
 
 		AssertTextEquals(
-			locator1 = "Experience#FRAGMENT_HEADING",
-			value1 = "経験をテストする");
+			key_fragmentName = "heading",
+			locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+			value1 = "これは見出しです");
 	}
 
 	@description = "This ensures that a button on a content page can be translated and published properly."
-	@priority = 5
+	@priority = "5"
 	test CanTranslateAndPublishButtonFragment {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -285,9 +183,9 @@ definition {
 			collectionName = "Basic Components",
 			fragmentName = "Button");
 
-		PageEditor.publish();
+		PageEditor.clickPublish();
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		WaitForPageLoad();
 
@@ -307,21 +205,21 @@ definition {
 			pageName = "Test Content Page Name",
 			siteName = "Test Site Name");
 
-		PageEditor.publish();
+		PageEditor.clickPublish();
 
 		ContentPagesNavigator.openViewContentPage(
 			locale = "ja",
 			pageName = "Test Content Page Name",
 			siteName = "Test Site Name");
 
-		ContentPages.viewFragmentText(
-			fragmentName = "button",
-			id = "link",
-			text = "これはボタンリンクです");
+		AssertTextEquals(
+			key_fragmentName = "button",
+			locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+			value1 = "これはボタンリンクです");
 	}
 
 	@description = "This ensures that an HTML fragment on a content page can be translated and published properly."
-	@priority = 5
+	@priority = "5"
 	test CanTranslateAndPublishHTMLFragment {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -334,9 +232,9 @@ definition {
 			collectionName = "Basic Components",
 			fragmentName = "HTML");
 
-		PageEditor.publish();
+		PageEditor.clickPublish();
 
-		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
 		WaitForPageLoad();
 
@@ -347,7 +245,7 @@ definition {
 			newTargetLocale = "es-ES");
 
 		Translations.translateFragmentField(
-			fieldName = "HTML",
+			fieldName = "element-html",
 			fragmentText = "este es un campo html");
 
 		PortletEntry.publish();
@@ -356,7 +254,7 @@ definition {
 			pageName = "Test Content Page Name",
 			siteName = "Test Site Name");
 
-		PageEditor.publish();
+		PageEditor.clickPublish();
 
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -365,71 +263,10 @@ definition {
 			pageName = "Test Content Page Name",
 			siteName = "Test Site Name");
 
-		ContentPages.viewFragmentText(
-			fragmentName = "html",
-			id = "element-html",
-			text = "este es un campo html");
-	}
-
-	@description = "This ensures that the translated page field can be inherited by new experience."
-	@priority = 5
-	test TranslatedPageFieldCanBeInherited {
-		JSONSegmentsentry.addSegment(
-			fieldName = "Email Address",
-			groupName = "Test Site Name",
-			operator = "contains",
-			segmentName = "Segment Email Address",
-			text = "test@liferay.com");
-
-		ContentPagesNavigator.openEditContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
-
-		PageEditor.addExperience(
-			experienceName = "Segment Email Experience",
-			segmentName = "Segment Email Address");
-
-		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
-
-		WaitForPageLoad();
-
-		ContentPagesNavigator.goToTranslation(pageName = "Test Content Page Name");
-
-		Translations.changeTargetLocale(
-			currentTargetLocale = "ar-SA",
-			newTargetLocale = "ja-JP");
-
-		Translations.translateFragmentField(
-			fieldName = "Name",
-			fragmentText = "テストページ");
-
-		PortletEntry.publish();
-
-		ContentPagesNavigator.openEditContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
-
-		PageEditor.publish();
-
-		ContentPagesNavigator.openViewContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
-
-		Navigator.ensureLocaleURL(locale = "ja");
-
-		Page.viewCurrentPage(pageName = "テストページ");
-
-		ContentPagesNavigator.openViewContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
-
-		ContentPages.changeExperience(
-			experienceName = "Segment Email Experience",
-			locale = "ja");
-
-		Navigator.ensureLocaleURL(locale = "ja");
-
-		Page.viewCurrentPage(pageName = "テストページ");
+		AssertTextEquals(
+			key_fragmentName = "html",
+			locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+			value1 = "este es un campo html");
 	}
 
 }

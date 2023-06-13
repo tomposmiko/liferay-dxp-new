@@ -19,7 +19,7 @@ import com.liferay.mobile.fcm.Notification;
 import com.liferay.mobile.fcm.Sender;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
@@ -37,13 +37,13 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Bruno Farache
  */
 @Component(
 	configurationPid = "com.liferay.push.notifications.sender.firebase.internal.configuration.FirebasePushNotificationsSenderConfiguration",
+	immediate = true,
 	property = "platform=" + FirebasePushNotificationsSender.PLATFORM,
 	service = PushNotificationsSender.class
 )
@@ -62,7 +62,7 @@ public class FirebasePushNotificationsSender
 					"properly");
 		}
 
-		_sender.send(_buildMessage(tokens, payloadJSONObject));
+		_sender.send(buildMessage(tokens, payloadJSONObject));
 	}
 
 	@Activate
@@ -83,12 +83,7 @@ public class FirebasePushNotificationsSender
 		_sender = new Sender(apiKey);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_sender = null;
-	}
-
-	private Message _buildMessage(
+	protected Message buildMessage(
 		List<String> tokens, JSONObject payloadJSONObject) {
 
 		Message.Builder builder = new Message.Builder();
@@ -100,10 +95,10 @@ public class FirebasePushNotificationsSender
 			builder.contentAvailable(silent);
 		}
 
-		builder.notification(_buildNotification(payloadJSONObject));
+		builder.notification(buildNotification(payloadJSONObject));
 		builder.to(tokens);
 
-		JSONObject newPayloadJSONObject = _jsonFactory.createJSONObject();
+		JSONObject newPayloadJSONObject = JSONFactoryUtil.createJSONObject();
 
 		Iterator<String> iterator = payloadJSONObject.keys();
 
@@ -133,7 +128,7 @@ public class FirebasePushNotificationsSender
 		return builder.build();
 	}
 
-	private Notification _buildNotification(JSONObject payloadJSONObject) {
+	protected Notification buildNotification(JSONObject payloadJSONObject) {
 		Notification.Builder builder = new Notification.Builder();
 
 		if (payloadJSONObject.has(PushNotificationsConstants.KEY_BADGE)) {
@@ -211,12 +206,13 @@ public class FirebasePushNotificationsSender
 		return builder.build();
 	}
 
+	@Deactivate
+	protected void deactivate() {
+		_sender = null;
+	}
+
 	private volatile FirebasePushNotificationsSenderConfiguration
 		_firebasePushNotificationsSenderConfiguration;
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
 	private volatile Sender _sender;
 
 }

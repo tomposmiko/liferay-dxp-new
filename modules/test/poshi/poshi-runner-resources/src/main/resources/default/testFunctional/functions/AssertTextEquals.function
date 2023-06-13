@@ -1,55 +1,63 @@
-@default = "assertTextEquals"
-@summary = "Assert that '${locator1}' equals the value '${value1}'"
-definition {
+<definition default="assertTextEquals" summary="Assert that '${locator1}' equals the value '${value1}'">
+	<command name="assertCKEditorText">
+		<execute argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" selenium="waitForVisible" />
 
-	@summary = "Assert that '${locator1}' contains the value '${value1}'"
-	function assertPartialText {
-		selenium.waitForVisible();
+		<execute selenium="selectFrame" />
 
-		selenium.waitForPartialTextCaseInsensitive();
+		<execute argument1="//html/body" selenium="waitForVisible" />
 
-		selenium.assertPartialTextCaseInsensitive();
-	}
+		<execute argument1="//html/body" selenium="assertText" />
 
-	function assertPartialTextAceEditor {
-		selenium.waitForVisible();
+		<execute argument1="relative=parent" selenium="selectFrame" />
+	</command>
 
-		selenium.waitForPartialTextAceEditor();
+	<command name="assertPartialText" summary="Assert that '${locator1}' contains the value '${value1}'">
+		<execute selenium="waitForVisible" />
 
-		selenium.assertPartialTextAceEditor();
-	}
+		<execute selenium="waitForPartialText" />
 
-	function assertText {
-		selenium.waitForVisible();
+		<execute selenium="assertPartialText" />
+	</command>
 
-		selenium.waitForTextCaseInsensitive();
+	<command name="assertPartialTextAceEditor">
+		<execute selenium="waitForVisible" />
 
-		selenium.assertTextCaseInsensitive();
-	}
+		<execute selenium="waitForPartialTextAceEditor" />
 
-	function assertTextCaseSensitive {
-		selenium.waitForVisible();
+		<execute selenium="assertPartialTextAceEditor" />
+	</command>
 
-		selenium.waitForText();
+	<command name="assertText">
+		<execute selenium="waitForVisible" />
 
-		selenium.assertText();
-	}
+		<execute selenium="waitForText" />
 
-	function assertTextEquals {
-		if (contains("${locator1}", "/input")) {
-			AssertTextEquals.assertValue();
-		}
-		else {
-			AssertTextEquals.assertText();
-		}
-	}
+		<execute selenium="assertText" />
+	</command>
 
-	function assertValue {
-		selenium.waitForVisible();
+	<command name="assertTextEquals">
+		<if>
+			<contains string="${locator1}" substring="/input" />
+			<then>
+				<execute function="AssertTextEquals#assertValue" />
+			</then>
+			<else>
+				<execute function="AssertTextEquals#assertText" />
+			</else>
+		</if>
+	</command>
 
-		selenium.waitForValue();
+	<command name="assertTextWaitForCKEditor">
+		<execute argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" selenium="waitForVisible" />
 
-		selenium.assertValue();
-	}
+		<execute function="AssertTextEquals#assertText" />
+	</command>
 
-}
+	<command name="assertValue">
+		<execute selenium="waitForVisible" />
+
+		<execute selenium="waitForValue" />
+
+		<execute selenium="assertValue" />
+	</command>
+</definition>

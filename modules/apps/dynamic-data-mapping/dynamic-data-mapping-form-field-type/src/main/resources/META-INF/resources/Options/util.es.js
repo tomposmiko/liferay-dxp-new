@@ -14,26 +14,25 @@
 
 import {FieldSupport, normalizeFieldName} from 'data-engine-js-components-web';
 
-export function random(a) {
+export const random = (a) => {
 	return a
 		? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
 		: ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, random);
-}
+};
 
-export function compose(...fns) {
-	return fns.reduceRight((f, g) => (...xs) => {
+export const compose = (...fns) =>
+	fns.reduceRight((f, g) => (...xs) => {
 		const r = g(...xs);
 
 		return Array.isArray(r) ? f(...r) : f(r);
 	});
-}
 
-export function isOptionValueGenerated(
+export const isOptionValueGenerated = (
 	defaultLanguageId,
 	editingLanguageId,
 	options,
 	option
-) {
+) => {
 	if (defaultLanguageId !== editingLanguageId) {
 		return false;
 	}
@@ -70,14 +69,14 @@ export function isOptionValueGenerated(
 	}
 
 	return true;
-}
+};
 
 /**
  * Deduplicates the value by checking if there is a
  * value in the fields, always incrementing an integer
  * in front of the value to be friendly for the user.
  */
-export function dedupValue(fields, value, id, generateValueUsingLabel) {
+export const dedupValue = (fields, value, id, generateValueUsingLabel) => {
 	let counter = 0;
 
 	const recursive = (fields, currentValue) => {
@@ -103,26 +102,30 @@ export function dedupValue(fields, value, id, generateValueUsingLabel) {
 	recursive(fields, value);
 
 	return value;
-}
+};
 
-export function findDuplicateReference(fields, currentIndex, currentReference) {
+export const findDuplicateReference = (
+	fields,
+	currentIndex,
+	currentReference
+) => {
 	return fields
 		.filter((field, index) => index !== currentIndex)
 		.some(
 			({reference}) =>
 				reference?.toLowerCase() === currentReference?.toLowerCase()
 		);
-}
+};
 
-export function getDefaultOptionValue(generateValueUsingLabel, optionLabel) {
+export const getDefaultOptionValue = (generateValueUsingLabel, optionLabel) => {
 	const defaultValue = generateValueUsingLabel
 		? optionLabel
 		: FieldSupport.getDefaultFieldName(true);
 
 	return defaultValue;
-}
+};
 
-export function normalizeReference(fields, currentField, index) {
+export const normalizeReference = (fields, currentField, index) => {
 	const {reference, value} = currentField;
 
 	if (!reference || findDuplicateReference(fields, index, reference)) {
@@ -130,7 +133,7 @@ export function normalizeReference(fields, currentField, index) {
 	}
 
 	return reference;
-}
+};
 
 /**
  * If the value is null or undefined, normalize follows a
@@ -142,12 +145,11 @@ export function normalizeReference(fields, currentField, index) {
  * decides which of these two values will be used.
  * 2. If the default value is null, use the string Option.
  */
-export function normalizeValue(
-	allowSpecialCharacters,
-	currentField,
+export const normalizeValue = (
 	fields,
+	currentField,
 	generateValueUsingLabel
-) {
+) => {
 	const {label, value: prevValue} = currentField;
 
 	let value = prevValue
@@ -160,21 +162,12 @@ export function normalizeValue(
 
 	value = dedupValue(fields, value, currentField.id, generateValueUsingLabel);
 
-	return allowSpecialCharacters ? value : normalizeFieldName(value);
-}
+	return normalizeFieldName(value);
+};
 
-export function normalizeFields(
-	allowSpecialCharacters,
-	fields,
-	generateValueUsingLabel
-) {
+export const normalizeFields = (fields, generateValueUsingLabel) => {
 	return fields.map((field, index) => {
-		const value = normalizeValue(
-			allowSpecialCharacters,
-			field,
-			fields,
-			generateValueUsingLabel
-		);
+		const value = normalizeValue(fields, field, generateValueUsingLabel);
 
 		return {
 			...field,
@@ -189,4 +182,4 @@ export function normalizeFields(
 			value,
 		};
 	});
-}
+};

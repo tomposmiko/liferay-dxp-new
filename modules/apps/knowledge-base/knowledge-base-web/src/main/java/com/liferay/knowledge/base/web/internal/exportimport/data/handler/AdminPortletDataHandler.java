@@ -36,6 +36,7 @@ import com.liferay.knowledge.base.service.KBFolderLocalService;
 import com.liferay.knowledge.base.service.KBTemplateLocalService;
 import com.liferay.knowledge.base.util.comparator.KBArticleVersionComparator;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -157,7 +158,7 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "kb-articles")) {
 			ActionableDynamicQuery kbArticleActionableDynamicQuery =
-				_getKBArticleActionableDynamicQuery(portletDataContext);
+				getKBArticleActionableDynamicQuery(portletDataContext);
 
 			kbArticleActionableDynamicQuery.performActions();
 		}
@@ -172,7 +173,7 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "kb-comments")) {
 			ActionableDynamicQuery kbCommentActionableDynamicQuery =
-				_getKBCommentActionableDynamicQuery(portletDataContext);
+				getKBCommentActionableDynamicQuery(portletDataContext);
 
 			kbCommentActionableDynamicQuery.performActions();
 		}
@@ -280,12 +281,12 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 		kbTemplateActionableDynamicQuery.performCount();
 
 		ActionableDynamicQuery kbCommentActionableDynamicQuery =
-			_getKBCommentActionableDynamicQuery(portletDataContext);
+			getKBCommentActionableDynamicQuery(portletDataContext);
 
 		kbCommentActionableDynamicQuery.performCount();
 	}
 
-	private ActionableDynamicQuery _getKBArticleActionableDynamicQuery(
+	protected ActionableDynamicQuery getKBArticleActionableDynamicQuery(
 			PortletDataContext portletDataContext)
 		throws Exception {
 
@@ -298,19 +299,24 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 				exportActionableDynamicQuery.getAddOrderCriteriaMethod();
 
 		exportActionableDynamicQuery.setAddOrderCriteriaMethod(
-			dynamicQuery -> {
-				if (addOrderCriteriaMethod != null) {
-					addOrderCriteriaMethod.addOrderCriteria(dynamicQuery);
+			new ActionableDynamicQuery.AddOrderCriteriaMethod() {
+
+				@Override
+				public void addOrderCriteria(DynamicQuery dynamicQuery) {
+					if (addOrderCriteriaMethod != null) {
+						addOrderCriteriaMethod.addOrderCriteria(dynamicQuery);
+					}
+
+					OrderFactoryUtil.addOrderByComparator(
+						dynamicQuery, new KBArticleVersionComparator(true));
 				}
 
-				OrderFactoryUtil.addOrderByComparator(
-					dynamicQuery, new KBArticleVersionComparator(true));
 			});
 
 		return exportActionableDynamicQuery;
 	}
 
-	private ActionableDynamicQuery _getKBCommentActionableDynamicQuery(
+	protected ActionableDynamicQuery getKBCommentActionableDynamicQuery(
 			PortletDataContext portletDataContext)
 		throws Exception {
 
@@ -326,19 +332,43 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 		return exportActionableDynamicQuery;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setKBArticleLocalService(
+		KBArticleLocalService kbArticleLocalService) {
+
+		_kbArticleLocalService = kbArticleLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKBCommentLocalService(
+		KBCommentLocalService kbCommentLocalService) {
+
+		_kbCommentLocalService = kbCommentLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKBFolderLocalService(
+		KBFolderLocalService kbFolderLocalService) {
+
+		_kbFolderLocalService = kbFolderLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setKBTemplateLocalService(
+		KBTemplateLocalService kbTemplateLocalService) {
+
+		_kbTemplateLocalService = kbTemplateLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
+	}
+
 	private KBArticleLocalService _kbArticleLocalService;
-
-	@Reference
 	private KBCommentLocalService _kbCommentLocalService;
-
-	@Reference
 	private KBFolderLocalService _kbFolderLocalService;
-
-	@Reference
 	private KBTemplateLocalService _kbTemplateLocalService;
-
-	@Reference
 	private Portal _portal;
 
 	@Reference

@@ -26,6 +26,7 @@ import com.liferay.segments.field.customizer.SegmentsFieldCustomizer;
 import com.liferay.segments.field.customizer.SegmentsFieldCustomizerRegistry;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS,
 		"mvc.command.name=/segments/get_segments_field_value_name"
@@ -66,21 +68,29 @@ public class GetSegmentsFieldValueNameMVCResourceCommand
 
 		return JSONUtil.put(
 			"fieldValueName",
-			_getFieldValueName(entityName, fieldName, fieldValue, locale));
+			_getFieldValueName(
+				entityName, fieldName, fieldValue, locale
+			).orElse(
+				null
+			));
 	}
 
-	private String _getFieldValueName(
+	private Optional<String> _getFieldValueName(
 		String entityName, String fieldName, String fieldValue, Locale locale) {
 
-		SegmentsFieldCustomizer segmentsFieldCustomizer =
-			_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizer(
+		Optional<SegmentsFieldCustomizer> segmentsFieldCustomizerOptional =
+			_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizerOptional(
 				entityName, fieldName);
 
-		if (segmentsFieldCustomizer == null) {
-			return null;
+		if (!segmentsFieldCustomizerOptional.isPresent()) {
+			return Optional.empty();
 		}
 
-		return segmentsFieldCustomizer.getFieldValueName(fieldValue, locale);
+		SegmentsFieldCustomizer segmentsFieldCustomizer =
+			segmentsFieldCustomizerOptional.get();
+
+		return Optional.ofNullable(
+			segmentsFieldCustomizer.getFieldValueName(fieldValue, locale));
 	}
 
 	@Reference

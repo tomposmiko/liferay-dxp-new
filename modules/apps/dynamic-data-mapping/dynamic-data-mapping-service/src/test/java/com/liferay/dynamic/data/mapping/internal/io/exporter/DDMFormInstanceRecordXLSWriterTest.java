@@ -39,14 +39,20 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Leonardo Barros
  */
-public class DDMFormInstanceRecordXLSWriterTest {
+@RunWith(MockitoJUnitRunner.class)
+public class DDMFormInstanceRecordXLSWriterTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -58,19 +64,19 @@ public class DDMFormInstanceRecordXLSWriterTest {
 		DDMFormInstanceRecordXLSWriter ddmFormInstanceRecordXLSWriter =
 			new DDMFormInstanceRecordXLSWriter();
 
-		Workbook workbook = Mockito.mock(Workbook.class);
+		Workbook workbook = mock(Workbook.class);
 
-		Font font = Mockito.mock(Font.class);
+		Font font = mock(Font.class);
 
-		Mockito.when(
+		when(
 			workbook.createFont()
 		).thenReturn(
 			font
 		);
 
-		CellStyle cellStyle = Mockito.mock(CellStyle.class);
+		CellStyle cellStyle = mock(CellStyle.class);
 
-		Mockito.when(
+		when(
 			workbook.createCellStyle()
 		).thenReturn(
 			cellStyle
@@ -119,29 +125,29 @@ public class DDMFormInstanceRecordXLSWriterTest {
 		DDMFormInstanceRecordXLSWriter ddmFormInstanceRecordXLSWriter =
 			new DDMFormInstanceRecordXLSWriter();
 
-		CellStyle cellStyle = Mockito.mock(CellStyle.class);
+		CellStyle cellStyle = mock(CellStyle.class);
 
-		Sheet sheet = Mockito.mock(Sheet.class);
+		Sheet sheet = mock(Sheet.class);
 
-		Row row = Mockito.mock(Row.class);
+		Row row = mock(Row.class);
 
-		Mockito.when(
+		when(
 			sheet.createRow(0)
 		).thenReturn(
 			row
 		);
 
-		Cell cell1 = Mockito.mock(Cell.class);
+		Cell cell1 = mock(Cell.class);
 
-		Mockito.when(
+		when(
 			row.createCell(0, CellType.STRING)
 		).thenReturn(
 			cell1
 		);
 
-		Cell cell2 = Mockito.mock(Cell.class);
+		Cell cell2 = mock(Cell.class);
 
-		Mockito.when(
+		when(
 			row.createCell(1, CellType.STRING)
 		).thenReturn(
 			cell2
@@ -221,27 +227,27 @@ public class DDMFormInstanceRecordXLSWriterTest {
 		DDMFormInstanceRecordWriterRequest ddmFormInstanceRecordWriterRequest =
 			builder.build();
 
-		DDMFormInstanceRecordXLSWriter ddmFormInstanceRecordXLSWriter =
-			Mockito.mock(DDMFormInstanceRecordXLSWriter.class);
+		DDMFormInstanceRecordXLSWriter ddmFormInstanceRecordXLSWriter = mock(
+			DDMFormInstanceRecordXLSWriter.class);
 
-		ByteArrayOutputStream byteArrayOutputStream = Mockito.mock(
+		ByteArrayOutputStream byteArrayOutputStream = mock(
 			ByteArrayOutputStream.class);
 
-		Mockito.when(
-			byteArrayOutputStream.toByteArray()
-		).thenReturn(
-			new byte[] {1, 2, 3}
-		);
-
-		Mockito.when(
+		when(
 			ddmFormInstanceRecordXLSWriter.createByteArrayOutputStream()
 		).thenReturn(
 			byteArrayOutputStream
 		);
 
-		Workbook workbook = Mockito.mock(Workbook.class);
+		when(
+			byteArrayOutputStream.toByteArray()
+		).thenReturn(
+			new byte[] {1, 2, 3}
+		);
 
-		Mockito.when(
+		Workbook workbook = mock(Workbook.class);
+
+		when(
 			ddmFormInstanceRecordXLSWriter.createWorkbook()
 		).thenReturn(
 			workbook
@@ -254,17 +260,7 @@ public class DDMFormInstanceRecordXLSWriterTest {
 			byteArrayOutputStream
 		);
 
-		CellStyle cellStyle = Mockito.mock(CellStyle.class);
-
-		Mockito.when(
-			ddmFormInstanceRecordXLSWriter.createCellStyle(
-				Mockito.any(Workbook.class), Mockito.anyBoolean(),
-				Mockito.anyString(), Mockito.anyShort())
-		).thenReturn(
-			cellStyle
-		);
-
-		Mockito.when(
+		when(
 			ddmFormInstanceRecordXLSWriter.write(
 				ddmFormInstanceRecordWriterRequest)
 		).thenCallRealMethod();
@@ -287,29 +283,29 @@ public class DDMFormInstanceRecordXLSWriterTest {
 		inOrder.verify(
 			ddmFormInstanceRecordXLSWriter, Mockito.times(1)
 		).createCellStyle(
-			Mockito.any(Workbook.class), Mockito.anyBoolean(),
-			Mockito.anyString(), Mockito.anyShort()
+			Matchers.any(Workbook.class), Matchers.anyBoolean(),
+			Matchers.anyString(), Matchers.anyByte()
 		);
 
 		inOrder.verify(
 			ddmFormInstanceRecordXLSWriter, Mockito.times(1)
 		).createRow(
-			Mockito.anyInt(), Mockito.nullable(CellStyle.class),
-			Mockito.anyCollection(), Mockito.nullable(Sheet.class)
+			Matchers.anyInt(), Matchers.any(CellStyle.class),
+			Matchers.anyCollection(), Matchers.any(Sheet.class)
 		);
 
 		inOrder.verify(
 			ddmFormInstanceRecordXLSWriter, Mockito.times(1)
 		).createCellStyle(
-			Mockito.any(Workbook.class), Mockito.anyBoolean(),
-			Mockito.anyString(), Mockito.anyShort()
+			Matchers.any(Workbook.class), Matchers.anyBoolean(),
+			Matchers.anyString(), Matchers.anyByte()
 		);
 
 		inOrder.verify(
 			ddmFormInstanceRecordXLSWriter, Mockito.times(2)
 		).createRow(
-			Mockito.anyInt(), Mockito.nullable(CellStyle.class),
-			Mockito.anyCollection(), Mockito.nullable(Sheet.class)
+			Matchers.anyInt(), Matchers.any(CellStyle.class),
+			Matchers.anyCollection(), Matchers.any(Sheet.class)
 		);
 
 		inOrder.verify(

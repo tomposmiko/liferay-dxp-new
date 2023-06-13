@@ -23,19 +23,13 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.service.permission.LayoutPermission;
-import com.liferay.portal.kernel.service.permission.PortletPermission;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -45,7 +39,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.ui.UserPortraitTag;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -67,6 +60,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -75,8 +69,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.name=" + MentionsPortletKeys.MENTIONS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator"
 	},
 	service = Portlet.class
 )
@@ -101,9 +94,7 @@ public class MentionsPortlet extends MVCPortlet {
 				_getSupplier(
 					themeDisplay,
 					ParamUtil.getString(resourceRequest, "strategy"),
-					ParamUtil.getString(resourceRequest, "query"),
-					ParamUtil.getString(
-						resourceRequest, "discussionPortletId")),
+					ParamUtil.getString(resourceRequest, "query")),
 				themeDisplay);
 
 			HttpServletResponse httpServletResponse =
@@ -115,7 +106,7 @@ public class MentionsPortlet extends MVCPortlet {
 				httpServletResponse, jsonArray.toString());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -134,10 +125,10 @@ public class MentionsPortlet extends MVCPortlet {
 			Supplier<List<User>> usersSupplier, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (User user : usersSupplier.get()) {
-			if (user.isGuestUser() ||
+			if (user.isDefaultUser() ||
 				(themeDisplay.getUserId() == user.getUserId())) {
 
 				continue;
@@ -177,7 +168,8 @@ public class MentionsPortlet extends MVCPortlet {
 			return JSONUtil.put("strategy", "default");
 		}
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(strategyString);
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			strategyString);
 
 		if (jsonObject.isNull("strategy")) {
 			throw new PortalException(
@@ -188,8 +180,7 @@ public class MentionsPortlet extends MVCPortlet {
 	}
 
 	private Supplier<List<User>> _getSupplier(
-			ThemeDisplay themeDisplay, String strategyString, String query,
-			String discussionPortletId)
+			ThemeDisplay themeDisplay, String strategyString, String query)
 		throws PortalException {
 
 		JSONObject jsonObject = _getJSONObject(strategyString);
@@ -206,33 +197,12 @@ public class MentionsPortlet extends MVCPortlet {
 
 		return () -> {
 			try {
-				List<User> filteredUsers = new ArrayList<>();
-
-				List<User> users = mentionsStrategy.getUsers(
-					themeDisplay.getCompanyId(), themeDisplay.getSiteGroupId(),
-					themeDisplay.getUserId(), query, jsonObject);
-
-				for (User user : users) {
-					PermissionChecker permissionChecker =
-						PermissionCheckerFactoryUtil.create(user);
-
-					Layout layout = themeDisplay.getLayout();
-
-					if ((layout != null) &&
-						_layoutPermission.contains(
-							permissionChecker, layout, true, ActionKeys.VIEW) &&
-						_portletPermission.contains(
-							permissionChecker, layout, discussionPortletId,
-							ActionKeys.VIEW)) {
-
-						filteredUsers.add(user);
-					}
-				}
-
-				return filteredUsers;
+				return mentionsStrategy.getUsers(
+					themeDisplay.getCompanyId(), themeDisplay.getUserId(),
+					query, jsonObject);
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 
 				return Collections.emptyList();
 			}
@@ -243,16 +213,7 @@ public class MentionsPortlet extends MVCPortlet {
 		MentionsPortlet.class);
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private LayoutPermission _layoutPermission;
-
-	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortletPermission _portletPermission;
 
 	private ServiceTrackerMap<String, MentionsStrategy> _serviceTrackerMap;
 

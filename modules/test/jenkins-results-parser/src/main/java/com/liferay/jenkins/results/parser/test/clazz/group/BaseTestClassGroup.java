@@ -17,7 +17,6 @@ package com.liferay.jenkins.results.parser.test.clazz.group;
 import com.liferay.jenkins.results.parser.BuildDatabase;
 import com.liferay.jenkins.results.parser.BuildDatabaseUtil;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 
 import java.io.File;
 
@@ -31,7 +30,7 @@ import java.util.Properties;
 public abstract class BaseTestClassGroup implements TestClassGroup {
 
 	@Override
-	public List<TestClass> getTestClasses() {
+	public List<TestClassGroup.TestClass> getTestClasses() {
 		return testClasses;
 	}
 
@@ -39,50 +38,84 @@ public abstract class BaseTestClassGroup implements TestClassGroup {
 	public List<File> getTestClassFiles() {
 		List<File> testClassFiles = new ArrayList<>();
 
-		for (TestClass testClass : testClasses) {
+		for (TestClassGroup.TestClass testClass : testClasses) {
 			testClassFiles.add(testClass.getTestClassFile());
 		}
 
 		return testClassFiles;
 	}
 
-	@Override
-	public boolean hasTestClasses() {
-		List<TestClass> testClasses = getTestClasses();
+	public abstract static class BaseTestClass
+		implements TestClassGroup.TestClass {
 
-		if ((testClasses != null) && !testClasses.isEmpty()) {
-			return true;
+		@Override
+		public int compareTo(TestClassGroup.TestClass testClass) {
+			if (testClass == null) {
+				throw new NullPointerException("Test class is null");
+			}
+
+			return _testClassFile.compareTo(testClass.getTestClassFile());
 		}
 
-		return false;
+		@Override
+		public File getTestClassFile() {
+			return _testClassFile;
+		}
+
+		@Override
+		public List<TestClassGroup.TestClass.TestClassMethod>
+			getTestClassMethods() {
+
+			return _testClassMethods;
+		}
+
+		@Override
+		public boolean isIgnored() {
+			return false;
+		}
+
+		protected BaseTestClass(File testClassFile) {
+			_testClassFile = testClassFile;
+		}
+
+		protected void addTestClassMethod(
+			boolean methodIgnored, String methodName) {
+
+			addTestClassMethod(
+				new TestClassMethod(methodIgnored, methodName, this));
+		}
+
+		protected void addTestClassMethod(String methodName) {
+			addTestClassMethod(false, methodName);
+		}
+
+		protected void addTestClassMethod(
+			TestClassGroup.TestClass.TestClassMethod testClassMethod) {
+
+			_testClassMethods.add(testClassMethod);
+		}
+
+		private final File _testClassFile;
+		private final List<TestClassMethod> _testClassMethods =
+			new ArrayList<>();
+
 	}
 
-	protected void addTestClass(TestClass testClass) {
-		if (!testClasses.contains(testClass)) {
-			testClasses.add(testClass);
-		}
-	}
-
-	protected void addTestClasses(List<TestClass> testClasses) {
-		for (TestClass testClass : testClasses) {
-			addTestClass(testClass);
-		}
+	protected void addTestClass(TestClassGroup.TestClass testClass) {
+		testClasses.add(testClass);
 	}
 
 	protected String getBuildStartProperty(String propertyName) {
 		BuildDatabase buildDatabase = BuildDatabaseUtil.getBuildDatabase();
 
-		if (buildDatabase.hasProperties("start.properties")) {
-			Properties startProperties = buildDatabase.getProperties(
-				"start.properties");
+		Properties startProperties = buildDatabase.getProperties(
+			"start.properties");
 
-			return JenkinsResultsParserUtil.getProperty(
-				startProperties, propertyName);
-		}
-
-		return null;
+		return JenkinsResultsParserUtil.getProperty(
+			startProperties, propertyName);
 	}
 
-	protected final List<TestClass> testClasses = new ArrayList<>();
+	protected final List<TestClassGroup.TestClass> testClasses =
+		new ArrayList<>();
 
 }

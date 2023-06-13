@@ -14,14 +14,13 @@
 
 package com.liferay.commerce.internal.order.test;
 
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.model.AccountEntryOrganizationRel;
-import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
-import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
-import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.model.CommerceAccountOrganizationRel;
+import com.liferay.commerce.account.service.CommerceAccountLocalService;
+import com.liferay.commerce.account.service.CommerceAccountOrganizationRelLocalService;
+import com.liferay.commerce.account.service.CommerceAccountUserRelLocalService;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.constants.CommerceAddressConstants;
 import com.liferay.commerce.constants.CommerceConstants;
@@ -185,7 +184,7 @@ public class CommerceOrderTest {
 			commerceContext instanceof TestCustomCommerceContextHttp);
 
 		CommerceOrder commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
-			_user.getUserId(), _commerceChannel.getGroupId(),
+			_user.getUserId(), _group.getGroupId(),
 			commerceContext.getCommerceCurrency());
 
 		Assert.assertEquals(
@@ -218,28 +217,29 @@ public class CommerceOrderTest {
 			"If they are added to the second account they should see 2 orders"
 		);
 
-		AccountEntry accountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_serviceContext.getUserId(), "Test Business Account", null,
-				null, new long[] {_user.getUserId()}, null, _serviceContext);
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account", 0, null, null, true, null,
+				new long[] {_user.getUserId()},
+				new String[] {_user.getEmailAddress()}, _serviceContext);
 
 		CommerceOrder commerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				_user.getUserId(), _commerceChannel.getGroupId(),
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		User secondUser = UserTestUtil.addUser();
 
-		AccountEntry secondAccountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_serviceContext.getUserId(), "Second Test Business Account",
-				null, null, null, null, _serviceContext);
+		CommerceAccount secondCommerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Second Test Business Account", 0, null, null, true, null, null,
+				null, _serviceContext);
 
 		CommerceOrder secondCommerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				secondUser.getUserId(), _commerceChannel.getGroupId(),
-				secondAccountEntry.getAccountEntryId(),
+				secondCommerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		List<CommerceOrder> commerceOrders = _getUserOrders(
@@ -250,19 +250,19 @@ public class CommerceOrderTest {
 
 		CommerceOrder actualCommerceOrder = commerceOrders.get(0);
 
-		AccountEntry actualAccountEntry = actualCommerceOrder.getAccountEntry();
-
 		Assert.assertEquals(commerceOrder, actualCommerceOrder);
-
-		Assert.assertEquals(accountEntry, actualAccountEntry);
-		Assert.assertNotEquals(secondAccountEntry, actualAccountEntry);
+		Assert.assertEquals(
+			commerceAccount, actualCommerceOrder.getCommerceAccount());
+		Assert.assertNotEquals(
+			secondCommerceAccount, actualCommerceOrder.getCommerceAccount());
 		Assert.assertNotEquals(secondCommerceOrder, actualCommerceOrder);
 
 		// Add the user to the second account and they should see 2 orders
 
-		CommerceAccountTestUtil.addAccountEntryUserRels(
-			secondAccountEntry.getAccountEntryId(),
-			new long[] {_user.getUserId()}, _serviceContext);
+		_commerceAccountUserRelLocalService.addCommerceAccountUserRels(
+			secondCommerceAccount.getCommerceAccountId(),
+			new long[] {_user.getUserId()},
+			new String[] {_user.getEmailAddress()}, null, _serviceContext);
 
 		commerceOrders = _getUserOrders(_commerceChannel.getGroupId(), false);
 
@@ -274,8 +274,9 @@ public class CommerceOrderTest {
 
 		_commerceOrderLocalService.deleteCommerceOrders(
 			_commerceChannel.getGroupId());
-		_accountEntryLocalService.deleteAccountEntry(accountEntry);
-		_accountEntryLocalService.deleteAccountEntry(secondAccountEntry);
+		_commerceAccountLocalService.deleteCommerceAccount(commerceAccount);
+		_commerceAccountLocalService.deleteCommerceAccount(
+			secondCommerceAccount);
 		_userLocalService.deleteUser(secondUser);
 	}
 
@@ -300,36 +301,38 @@ public class CommerceOrderTest {
 				"see 1 order"
 		);
 
-		AccountEntry accountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_serviceContext.getUserId(), "Test Business Account", null,
-				null, new long[] {_user.getUserId()}, null, _serviceContext);
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account", 0, null, null, true, null,
+				new long[] {_user.getUserId()},
+				new String[] {_user.getEmailAddress()}, _serviceContext);
 
 		long commerceChannelGroupId = _commerceChannel.getGroupId();
 
 		CommerceOrder commerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				_user.getUserId(), commerceChannelGroupId,
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		User secondUser = UserTestUtil.addUser();
 
-		AccountEntry secondAccountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_serviceContext.getUserId(), "Second Test Business Account",
-				null, null, null, null, _serviceContext);
+		CommerceAccount secondCommerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Second Test Business Account", 0, null, null, true, null, null,
+				null, _serviceContext);
 
 		// Add the user to the second account
 
-		CommerceAccountTestUtil.addAccountEntryUserRels(
-			secondAccountEntry.getAccountEntryId(),
-			new long[] {_user.getUserId()}, _serviceContext);
+		_commerceAccountUserRelLocalService.addCommerceAccountUserRels(
+			secondCommerceAccount.getCommerceAccountId(),
+			new long[] {_user.getUserId()},
+			new String[] {_user.getEmailAddress()}, null, _serviceContext);
 
 		CommerceOrder secondCommerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				secondUser.getUserId(), commerceChannelGroupId,
-				secondAccountEntry.getAccountEntryId(),
+				secondCommerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		List<CommerceOrder> commerceOrders = _getUserOrders(
@@ -343,8 +346,8 @@ public class CommerceOrderTest {
 
 		// Remove the user from the second account and get user's orders again
 
-		_accountEntryUserRelLocalService.deleteAccountEntryUserRels(
-			secondAccountEntry.getAccountEntryId(),
+		_commerceAccountUserRelLocalService.deleteCommerceAccountUserRels(
+			secondCommerceAccount.getCommerceAccountId(),
 			new long[] {_user.getUserId()});
 
 		commerceOrders = _getUserOrders(commerceChannelGroupId, false);
@@ -354,17 +357,17 @@ public class CommerceOrderTest {
 
 		CommerceOrder actualCommerceOrder = commerceOrders.get(0);
 
-		AccountEntry acutalAccountEntry = actualCommerceOrder.getAccountEntry();
-
 		Assert.assertEquals(commerceOrder, actualCommerceOrder);
-
-		Assert.assertEquals(accountEntry, acutalAccountEntry);
-		Assert.assertNotEquals(secondAccountEntry, acutalAccountEntry);
+		Assert.assertEquals(
+			commerceAccount, actualCommerceOrder.getCommerceAccount());
+		Assert.assertNotEquals(
+			secondCommerceAccount, actualCommerceOrder.getCommerceAccount());
 		Assert.assertNotEquals(secondCommerceOrder, actualCommerceOrder);
 
 		_commerceOrderLocalService.deleteCommerceOrders(commerceChannelGroupId);
-		_accountEntryLocalService.deleteAccountEntry(accountEntry);
-		_accountEntryLocalService.deleteAccountEntry(secondAccountEntry);
+		_commerceAccountLocalService.deleteCommerceAccount(commerceAccount);
+		_commerceAccountLocalService.deleteCommerceAccount(
+			secondCommerceAccount);
 		_userLocalService.deleteUser(secondUser);
 	}
 
@@ -393,7 +396,7 @@ public class CommerceOrderTest {
 		int accountsToCreate = RandomTestUtil.randomInt(2, 10);
 
 		List<User> randomUsers = new ArrayList<>();
-		List<AccountEntry> randomAccountEntries = new ArrayList<>();
+		List<CommerceAccount> randomAccounts = new ArrayList<>();
 		List<CommerceOrder> randomOrders = new ArrayList<>();
 
 		for (int i = 0; i < accountsToCreate; i++) {
@@ -401,13 +404,13 @@ public class CommerceOrderTest {
 
 			randomUsers.add(user);
 
-			AccountEntry accountEntry =
-				CommerceAccountTestUtil.addBusinessAccountEntry(
-					_user.getUserId(), "Test Generated Account " + i, null,
-					null, new long[] {_user.getUserId()}, null,
-					_serviceContext);
+			CommerceAccount commerceAccount =
+				_commerceAccountLocalService.addBusinessCommerceAccount(
+					"Test Generated Account " + i, 0, null, null, true, null,
+					new long[] {user.getUserId()},
+					new String[] {user.getEmailAddress()}, _serviceContext);
 
-			randomAccountEntries.add(accountEntry);
+			randomAccounts.add(commerceAccount);
 
 			int ordersToCreate = RandomTestUtil.randomInt(1, 3);
 
@@ -415,7 +418,7 @@ public class CommerceOrderTest {
 				randomOrders.add(
 					_commerceOrderLocalService.addCommerceOrder(
 						user.getUserId(), commerceChannelGroupId,
-						accountEntry.getAccountEntryId(),
+						commerceAccount.getCommerceAccountId(),
 						_commerceCurrency.getCommerceCurrencyId(), 0));
 			}
 
@@ -480,8 +483,8 @@ public class CommerceOrderTest {
 
 		_commerceOrderLocalService.deleteCommerceOrders(commerceChannelGroupId);
 
-		for (AccountEntry accountEntry : randomAccountEntries) {
-			_accountEntryLocalService.deleteAccountEntry(accountEntry);
+		for (CommerceAccount commerceAccount : randomAccounts) {
+			_commerceAccountLocalService.deleteCommerceAccount(commerceAccount);
 		}
 
 		for (User user : randomUsers) {
@@ -539,26 +542,26 @@ public class CommerceOrderTest {
 
 		long commerceChannelGroupId = _commerceChannel.getGroupId();
 
-		AccountEntry accountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_serviceContext.getUserId(), "Test Business Account", null,
-				null, null, null, _serviceContext);
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account", 0, null, null, true, null, null, null,
+				_serviceContext);
 
 		CommerceOrder commerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				adminUserId, commerceChannelGroupId,
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
-		AccountEntry secondAccountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_serviceContext.getUserId(), "Test Business Account 2", null,
-				null, null, null, _serviceContext);
+		CommerceAccount secondCommerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account 2", 0, null, null, true, null, null,
+				null, _serviceContext);
 
 		CommerceOrder secondCommerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				adminUserId, commerceChannelGroupId,
-				secondAccountEntry.getAccountEntryId(),
+				secondCommerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		Role role = _roleLocalService.fetchRole(
@@ -569,7 +572,7 @@ public class CommerceOrderTest {
 		}
 
 		_userGroupRoleLocalService.addUserGroupRoles(
-			_user.getUserId(), accountEntry.getAccountEntryGroupId(),
+			_user.getUserId(), commerceAccount.getCommerceAccountGroupId(),
 			new long[] {role.getRoleId()});
 
 		long ordersCountByUser = _getUserOrdersCount(
@@ -587,11 +590,11 @@ public class CommerceOrderTest {
 
 		// The Sales Agent's first organization is added to the first Account
 
-		AccountEntryOrganizationRel accountEntryOrganizationRel =
-			_accountEntryOrganizationRelLocalService.
-				addAccountEntryOrganizationRel(
-					accountEntry.getAccountEntryId(),
-					organization.getOrganizationId());
+		CommerceAccountOrganizationRel commerceAccountOrganizationRel =
+			_commerceAccountOrganizationRelLocalService.
+				addCommerceAccountOrganizationRel(
+					commerceAccount.getCommerceAccountId(),
+					organization.getOrganizationId(), _serviceContext);
 
 		ordersCountByUser = _getUserOrdersCount(commerceChannelGroupId, false);
 
@@ -608,11 +611,11 @@ public class CommerceOrderTest {
 
 		// The Sales Agent's Second organization is added to the second Account
 
-		AccountEntryOrganizationRel secondAccountEntryOrganizationRel =
-			_accountEntryOrganizationRelLocalService.
-				addAccountEntryOrganizationRel(
-					secondAccountEntry.getAccountEntryId(),
-					secondOrganization.getOrganizationId());
+		CommerceAccountOrganizationRel secondCommerceAccountOrganizationRel =
+			_commerceAccountOrganizationRelLocalService.
+				addCommerceAccountOrganizationRel(
+					secondCommerceAccount.getCommerceAccountId(),
+					secondOrganization.getOrganizationId(), _serviceContext);
 
 		ordersCountByUser = _getUserOrdersCount(commerceChannelGroupId, false);
 
@@ -636,7 +639,7 @@ public class CommerceOrderTest {
 		// Checkout the first order
 
 		CommerceAddress commerceAddress = _addAddressToAccount(
-			accountEntry.getAccountEntryId());
+			commerceAccount.getCommerceAccountId());
 
 		commerceOrder.setBillingAddressId(
 			commerceAddress.getCommerceAddressId());
@@ -666,7 +669,7 @@ public class CommerceOrderTest {
 		// Checkout the second order
 
 		CommerceAddress secondCommerceAddress = _addAddressToAccount(
-			secondAccountEntry.getAccountEntryId());
+			secondCommerceAccount.getCommerceAccountId());
 
 		secondCommerceOrder.setBillingAddressId(
 			secondCommerceAddress.getCommerceAddressId());
@@ -711,9 +714,9 @@ public class CommerceOrderTest {
 
 		// Remove the Organization association from the second account
 
-		_accountEntryOrganizationRelLocalService.
-			deleteAccountEntryOrganizationRel(
-				secondAccountEntryOrganizationRel);
+		_commerceAccountOrganizationRelLocalService.
+			deleteCommerceAccountOrganizationRel(
+				secondCommerceAccountOrganizationRel);
 
 		ordersCountByUser = _getUserOrdersCount(commerceChannelGroupId, true);
 
@@ -730,8 +733,9 @@ public class CommerceOrderTest {
 
 		// Remove the Organization association from the first account
 
-		_accountEntryOrganizationRelLocalService.
-			deleteAccountEntryOrganizationRel(accountEntryOrganizationRel);
+		_commerceAccountOrganizationRelLocalService.
+			deleteCommerceAccountOrganizationRel(
+				commerceAccountOrganizationRel);
 
 		ordersCountByUser = _getUserOrdersCount(commerceChannelGroupId, true);
 
@@ -747,8 +751,9 @@ public class CommerceOrderTest {
 		_commerceAddressLocalService.deleteCommerceAddress(commerceAddress);
 		_commerceAddressLocalService.deleteCommerceAddress(
 			secondCommerceAddress);
-		_accountEntryLocalService.deleteAccountEntry(accountEntry);
-		_accountEntryLocalService.deleteAccountEntry(secondAccountEntry);
+		_commerceAccountLocalService.deleteCommerceAccount(commerceAccount);
+		_commerceAccountLocalService.deleteCommerceAccount(
+			secondCommerceAccount);
 		_organizationLocalService.deleteUserOrganization(
 			_user.getUserId(), organization);
 		_organizationLocalService.deleteUserOrganization(
@@ -774,29 +779,30 @@ public class CommerceOrderTest {
 			"I should be able to get it both ways"
 		);
 
-		AccountEntry accountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_user.getUserId(), "Test Business Account", null, null,
-				new long[] {_user.getUserId()}, null, _serviceContext);
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account", 0, null, null, true, null,
+				new long[] {_user.getUserId()},
+				new String[] {_user.getEmailAddress()}, _serviceContext);
 
 		long commerceChannelGroupId = _commerceChannel.getGroupId();
 
 		CommerceOrder commerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				_user.getUserId(), commerceChannelGroupId,
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		int ordersCountByAccountId =
 			_commerceOrderService.getPendingCommerceOrdersCount(
-				commerceChannelGroupId, accountEntry.getAccountEntryId(),
+				commerceChannelGroupId, commerceAccount.getCommerceAccountId(),
 				StringPool.BLANK);
 
 		Assert.assertEquals(1, ordersCountByAccountId);
 
 		List<CommerceOrder> commerceOrders =
 			_commerceOrderService.getPendingCommerceOrders(
-				commerceChannelGroupId, accountEntry.getAccountEntryId(),
+				commerceChannelGroupId, commerceAccount.getCommerceAccountId(),
 				StringPool.BLANK, 0, 1);
 
 		CommerceOrder actualCommerceOrder = commerceOrders.get(0);
@@ -815,7 +821,7 @@ public class CommerceOrderTest {
 		Assert.assertEquals(commerceOrder, actualCommerceOrder);
 
 		_commerceOrderLocalService.deleteCommerceOrders(commerceChannelGroupId);
-		_accountEntryLocalService.deleteAccountEntry(accountEntry);
+		_commerceAccountLocalService.deleteCommerceAccount(commerceAccount);
 	}
 
 	@Test
@@ -834,17 +840,18 @@ public class CommerceOrderTest {
 			"I should be able to get the order"
 		);
 
-		AccountEntry accountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_user.getUserId(), "Test Business Account", null, null,
-				new long[] {_user.getUserId()}, null, _serviceContext);
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account", 0, null, null, true, null,
+				new long[] {_user.getUserId()},
+				new String[] {_user.getEmailAddress()}, _serviceContext);
 
 		long commerceChannelGroupId = _commerceChannel.getGroupId();
 
 		CommerceOrder commerceOrder1 =
 			_commerceOrderLocalService.addCommerceOrder(
 				_user.getUserId(), commerceChannelGroupId,
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		String commerceOrderId = String.valueOf(
@@ -855,14 +862,14 @@ public class CommerceOrderTest {
 
 		int ordersCountByAccountId =
 			_commerceOrderService.getPendingCommerceOrdersCount(
-				commerceChannelGroupId, accountEntry.getAccountEntryId(),
+				commerceChannelGroupId, commerceAccount.getCommerceAccountId(),
 				partialCommerceOrderId);
 
 		Assert.assertEquals(1, ordersCountByAccountId);
 
 		List<CommerceOrder> commerceOrders =
 			_commerceOrderService.getPendingCommerceOrders(
-				commerceChannelGroupId, accountEntry.getAccountEntryId(),
+				commerceChannelGroupId, commerceAccount.getCommerceAccountId(),
 				partialCommerceOrderId, 0, 1);
 
 		CommerceOrder actualCommerceOrder = commerceOrders.get(0);
@@ -879,7 +886,7 @@ public class CommerceOrderTest {
 		Assert.assertEquals(commerceOrder1, commerceOrders.get(0));
 
 		_commerceOrderLocalService.deleteCommerceOrders(commerceChannelGroupId);
-		_accountEntryLocalService.deleteAccountEntry(accountEntry);
+		_commerceAccountLocalService.deleteCommerceAccount(commerceAccount);
 	}
 
 	@Test
@@ -899,21 +906,22 @@ public class CommerceOrderTest {
 			"I should be able to get it both ways"
 		);
 
-		AccountEntry accountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_user.getUserId(), "Test Business Account", null, null,
-				new long[] {_user.getUserId()}, null, _serviceContext);
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account", 0, null, null, true, null,
+				new long[] {_user.getUserId()},
+				new String[] {_user.getEmailAddress()}, _serviceContext);
 
 		long commerceChannelGroupId = _commerceChannel.getGroupId();
 
 		CommerceOrder commerceOrder =
 			_commerceOrderLocalService.addCommerceOrder(
 				_user.getUserId(), commerceChannelGroupId,
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		CommerceAddress commerceAddress = _addAddressToAccount(
-			accountEntry.getAccountEntryId());
+			commerceAccount.getCommerceAccountId());
 
 		commerceOrder.setBillingAddressId(
 			commerceAddress.getCommerceAddressId());
@@ -928,14 +936,14 @@ public class CommerceOrderTest {
 
 		int ordersCountByAccountId =
 			_commerceOrderService.getPlacedCommerceOrdersCount(
-				commerceChannelGroupId, accountEntry.getAccountEntryId(),
+				commerceChannelGroupId, commerceAccount.getCommerceAccountId(),
 				StringPool.BLANK);
 
 		Assert.assertEquals(1, ordersCountByAccountId);
 
 		List<CommerceOrder> commerceOrders =
 			_commerceOrderService.getPlacedCommerceOrders(
-				commerceChannelGroupId, accountEntry.getAccountEntryId(),
+				commerceChannelGroupId, commerceAccount.getCommerceAccountId(),
 				StringPool.BLANK, 0, 1);
 
 		CommerceOrder actualCommerceOrder = commerceOrders.get(0);
@@ -954,7 +962,8 @@ public class CommerceOrderTest {
 		Assert.assertEquals(commerceOrder, actualCommerceOrder);
 
 		_commerceOrderLocalService.deleteCommerceOrders(commerceChannelGroupId);
-		_accountEntryLocalService.deleteAccountEntry(accountEntry);
+		_commerceAccountLocalService.deleteCommerceAccount(commerceAccount);
+		_commerceAddressLocalService.deleteCommerceAddress(commerceAddress);
 	}
 
 	@Test
@@ -986,27 +995,28 @@ public class CommerceOrderTest {
 
 		modifiableSettings.store();
 
-		AccountEntry accountEntry =
-			CommerceAccountTestUtil.addBusinessAccountEntry(
-				_user.getUserId(), "Test Business Account", null, null,
-				new long[] {_user.getUserId()}, null, _serviceContext);
+		CommerceAccount commerceAccount =
+			_commerceAccountLocalService.addBusinessCommerceAccount(
+				"Test Business Account", 0, null, null, true, null,
+				new long[] {_user.getUserId()},
+				new String[] {_user.getEmailAddress()}, _serviceContext);
 
 		long commerceChannelGroupId = _commerceChannel.getGroupId();
 
 		_commerceOrderLocalService.addCommerceOrder(
 			_user.getUserId(), commerceChannelGroupId,
-			accountEntry.getAccountEntryId(),
+			commerceAccount.getCommerceAccountId(),
 			_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		_commerceOrderLocalService.addCommerceOrder(
 			_user.getUserId(), commerceChannelGroupId,
-			accountEntry.getAccountEntryId(),
+			commerceAccount.getCommerceAccountId(),
 			_commerceCurrency.getCommerceCurrencyId(), 0);
 
 		try {
 			_commerceOrderLocalService.addCommerceOrder(
 				_user.getUserId(), commerceChannelGroupId,
-				accountEntry.getAccountEntryId(),
+				commerceAccount.getCommerceAccountId(),
 				_commerceCurrency.getCommerceCurrencyId(), 0);
 		}
 		catch (CommerceOrderAccountLimitException
@@ -1015,13 +1025,14 @@ public class CommerceOrderTest {
 			Assert.assertNotNull(commerceOrderAccountLimitException);
 		}
 
-		Assert.assertEquals(
-			2,
+		int pendingCommerceOrdersCount =
 			_commerceOrderService.getPendingCommerceOrdersCount(
-				commerceChannelGroupId, accountEntry.getAccountEntryId(),
-				StringPool.BLANK));
+				commerceChannelGroupId, commerceAccount.getCommerceAccountId(),
+				StringPool.BLANK);
 
-		_accountEntries.add(accountEntry);
+		Assert.assertEquals(2, pendingCommerceOrdersCount);
+
+		_commerceAccounts.add(commerceAccount);
 	}
 
 	@Rule
@@ -1049,7 +1060,7 @@ public class CommerceOrderTest {
 		}
 
 		return _commerceAddressLocalService.addCommerceAddress(
-			AccountEntry.class.getName(), commerceAccountId,
+			CommerceAccount.class.getName(), commerceAccountId,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
@@ -1068,7 +1079,7 @@ public class CommerceOrderTest {
 			null, 1, null, _serviceContext);
 
 		_resourcePermissionLocalService.addResourcePermission(
-			_serviceContext.getCompanyId(), Organization.class.getName(), 1,
+			_serviceContext.getCompanyId(), "com.liferay.commerce.account", 1,
 			String.valueOf(role.getCompanyId()), role.getRoleId(),
 			"MANAGE_AVAILABLE_ACCOUNTS");
 
@@ -1119,20 +1130,21 @@ public class CommerceOrderTest {
 	@Inject
 	private static ServiceComponentRuntime _serviceComponentRuntime;
 
-	private final List<AccountEntry> _accountEntries = new ArrayList<>();
-
-	@Inject
-	private AccountEntryLocalService _accountEntryLocalService;
-
-	@Inject
-	private AccountEntryOrganizationRelLocalService
-		_accountEntryOrganizationRelLocalService;
-
-	@Inject
-	private AccountEntryUserRelLocalService _accountEntryUserRelLocalService;
-
 	@Inject
 	private CommerceAccountHelper _commerceAccountHelper;
+
+	@Inject
+	private CommerceAccountLocalService _commerceAccountLocalService;
+
+	@Inject
+	private CommerceAccountOrganizationRelLocalService
+		_commerceAccountOrganizationRelLocalService;
+
+	private final List<CommerceAccount> _commerceAccounts = new ArrayList<>();
+
+	@Inject
+	private CommerceAccountUserRelLocalService
+		_commerceAccountUserRelLocalService;
 
 	@Inject
 	private CommerceAddressLocalService _commerceAddressLocalService;

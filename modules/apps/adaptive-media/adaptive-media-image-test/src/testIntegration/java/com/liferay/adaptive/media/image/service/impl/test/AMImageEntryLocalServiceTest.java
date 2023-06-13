@@ -25,12 +25,10 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
-import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.User;
@@ -418,18 +416,13 @@ public class AMImageEntryLocalServiceTest {
 			null;
 
 		try {
-			int counter = RandomTestUtil.randomInt(100, 300);
-
 			amImageCounterServiceRegistration = _registerAMImageCounter(
-				"test", counter);
+				"test", 100);
 
-			int expectedAMImageEntriesCount =
+			Assert.assertEquals(
+				100,
 				AMImageEntryLocalServiceUtil.getExpectedAMImageEntriesCount(
-					company.getCompanyId());
-
-			Assert.assertTrue(
-				String.valueOf(expectedAMImageEntriesCount),
-				expectedAMImageEntriesCount >= counter);
+					company.getCompanyId()));
 		}
 		finally {
 			_unregisterAMImageCounter(amImageCounterServiceRegistration);
@@ -450,23 +443,15 @@ public class AMImageEntryLocalServiceTest {
 			null;
 
 		try {
-			int counter1 = RandomTestUtil.randomInt(100, 300);
-
 			amImageCounterServiceRegistration1 = _registerAMImageCounter(
-				"test1", counter1);
-
-			int counter2 = RandomTestUtil.randomInt(100, 300);
-
+				"test1", 100);
 			amImageCounterServiceRegistration2 = _registerAMImageCounter(
-				"test2", counter2);
+				"test2", 50);
 
-			int expectedAMImageEntriesCount =
+			Assert.assertEquals(
+				150,
 				AMImageEntryLocalServiceUtil.getExpectedAMImageEntriesCount(
-					company.getCompanyId());
-
-			Assert.assertTrue(
-				String.valueOf(expectedAMImageEntriesCount),
-				expectedAMImageEntriesCount >= (counter1 + counter2));
+					company.getCompanyId()));
 		}
 		finally {
 			_unregisterAMImageCounter(amImageCounterServiceRegistration1);
@@ -509,10 +494,11 @@ public class AMImageEntryLocalServiceTest {
 				amImageConfigurationEntry, fileEntry.getFileVersion(), 100, 200,
 				new UnsyncByteArrayInputStream(bytes), 12345);
 
-			int percentage = AMImageEntryLocalServiceUtil.getPercentage(
-				company.getCompanyId(), amImageConfigurationEntry.getUUID());
-
-			Assert.assertTrue(String.valueOf(percentage), percentage <= 20);
+			Assert.assertEquals(
+				20,
+				AMImageEntryLocalServiceUtil.getPercentage(
+					company.getCompanyId(),
+					amImageConfigurationEntry.getUUID()));
 		}
 		finally {
 			_unregisterAMImageCounter(amImageCounterServiceRegistration);
@@ -540,9 +526,7 @@ public class AMImageEntryLocalServiceTest {
 
 		try {
 			amImageCounterServiceRegistration = _registerAMImageCounter(
-				"test",
-				-AMImageEntryLocalServiceUtil.getExpectedAMImageEntriesCount(
-					company.getCompanyId()));
+				"test", -1);
 
 			ServiceContext serviceContext =
 				ServiceContextTestUtil.getServiceContext(group.getGroupId());
@@ -594,57 +578,6 @@ public class AMImageEntryLocalServiceTest {
 		finally {
 			_companyLocalService.deleteCompany(company);
 		}
-	}
-
-	@Test
-	public void testHasAMImageEntryContentWhenContentPresent()
-		throws Exception {
-
-		AMImageConfigurationEntry amImageConfigurationEntry =
-			_addAMImageConfigurationEntry("uuid", 100, 200);
-
-		byte[] bytes = _getImageBytes();
-
-		FileEntry fileEntry = _addFileEntry(
-			bytes,
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
-
-		FileVersion fileVersion = fileEntry.getFileVersion();
-
-		AMImageEntryLocalServiceUtil.addAMImageEntry(
-			amImageConfigurationEntry, fileVersion, 100, 300,
-			new UnsyncByteArrayInputStream(bytes), 12345);
-
-		Assert.assertTrue(
-			AMImageEntryLocalServiceUtil.hasAMImageEntryContent(
-				amImageConfigurationEntry.getUUID(), fileVersion));
-	}
-
-	@Test
-	public void testHasAMImageEntryContentWhenNoContentPresent()
-		throws Exception {
-
-		AMImageConfigurationEntry amImageConfigurationEntry =
-			_addAMImageConfigurationEntry("uuid", 100, 200);
-
-		byte[] bytes = _getImageBytes();
-
-		FileEntry fileEntry = _addFileEntry(
-			bytes,
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
-
-		FileVersion fileVersion = fileEntry.getFileVersion();
-
-		AMImageEntryLocalServiceUtil.addAMImageEntry(
-			amImageConfigurationEntry, fileVersion, 100, 300,
-			new UnsyncByteArrayInputStream(bytes), 12345);
-
-		DLStoreUtil.deleteDirectory(
-			fileEntry.getCompanyId(), CompanyConstants.SYSTEM, "adaptive");
-
-		Assert.assertFalse(
-			AMImageEntryLocalServiceUtil.hasAMImageEntryContent(
-				amImageConfigurationEntry.getUUID(), fileVersion));
 	}
 
 	protected void deleteAllAMImageConfigurationEntries()
@@ -703,8 +636,7 @@ public class AMImageEntryLocalServiceTest {
 			null, userId, groupId, groupId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.IMAGE_JPEG,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			StringPool.BLANK, StringPool.BLANK,
+			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
 			DLFileEntryTypeConstants.COMPANY_ID_BASIC_DOCUMENT,
 			Collections.emptyMap(), null, new UnsyncByteArrayInputStream(bytes),
 			bytes.length, null, null, serviceContext);

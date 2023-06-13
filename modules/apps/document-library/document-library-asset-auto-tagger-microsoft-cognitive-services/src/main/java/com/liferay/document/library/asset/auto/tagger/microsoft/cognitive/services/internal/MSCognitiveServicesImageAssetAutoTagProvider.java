@@ -19,7 +19,7 @@ import com.liferay.document.library.asset.auto.tagger.microsoft.cognitive.servic
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -65,8 +66,7 @@ public class MSCognitiveServicesImageAssetAutoTagProvider
 		try {
 			MSCognitiveServicesAssetAutoTagProviderCompanyConfiguration
 				msCognitiveServicesAssetAutoTagProviderCompanyConfiguration =
-					_getMSCognitiveServicesAssetAutoTagProviderCompanyConfiguration(
-						fileEntry);
+					_getConfiguration(fileEntry);
 
 			if (!msCognitiveServicesAssetAutoTagProviderCompanyConfiguration.
 					enabled() ||
@@ -76,7 +76,7 @@ public class MSCognitiveServicesImageAssetAutoTagProvider
 				return Collections.emptyList();
 			}
 
-			_checkAPIEndpoint(
+			checkAPIEndpoint(
 				msCognitiveServicesAssetAutoTagProviderCompanyConfiguration.
 					apiEndpoint());
 
@@ -93,14 +93,14 @@ public class MSCognitiveServicesImageAssetAutoTagProvider
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return Collections.emptyList();
 		}
 	}
 
-	private void _checkAPIEndpoint(String apiEndpoint)
+	protected void checkAPIEndpoint(String apiEndpoint)
 		throws MalformedURLException, UnknownHostException {
 
 		URL url = new URL(apiEndpoint);
@@ -115,8 +115,7 @@ public class MSCognitiveServicesImageAssetAutoTagProvider
 	}
 
 	private MSCognitiveServicesAssetAutoTagProviderCompanyConfiguration
-			_getMSCognitiveServicesAssetAutoTagProviderCompanyConfiguration(
-				FileEntry fileEntry)
+			_getConfiguration(FileEntry fileEntry)
 		throws ConfigurationException {
 
 		return _configurationProvider.getCompanyConfiguration(
@@ -157,7 +156,8 @@ public class MSCognitiveServicesImageAssetAutoTagProvider
 		httpURLConnection.getResponseMessage();
 
 		try (InputStream inputStream = httpURLConnection.getInputStream()) {
-			return _jsonFactory.createJSONObject(StringUtil.read(inputStream));
+			return JSONFactoryUtil.createJSONObject(
+				StringUtil.read(inputStream));
 		}
 		catch (Exception exception) {
 			try (InputStream inputStream = httpURLConnection.getErrorStream()) {
@@ -183,6 +183,6 @@ public class MSCognitiveServicesImageAssetAutoTagProvider
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private Http _http;
 
 }

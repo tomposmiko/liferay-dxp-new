@@ -54,10 +54,6 @@ public class LayoutStructureItemUtil {
 			return new DropZoneLayoutStructureItem(parentItemId);
 		}
 
-		if (Objects.equals(itemType, LayoutDataItemTypeConstants.TYPE_FORM)) {
-			return new FormStyledLayoutStructureItem(parentItemId);
-		}
-
 		if (Objects.equals(
 				itemType, LayoutDataItemTypeConstants.TYPE_FRAGMENT)) {
 
@@ -82,35 +78,6 @@ public class LayoutStructureItemUtil {
 		return null;
 	}
 
-	public static LayoutStructureItem getAncestor(
-		String itemId, String itemType, LayoutStructure layoutStructure) {
-
-		LayoutStructureItem layoutStructureItem =
-			layoutStructure.getLayoutStructureItem(itemId);
-
-		LayoutStructureItem parentLayoutStructureItem =
-			layoutStructure.getLayoutStructureItem(
-				layoutStructureItem.getParentItemId());
-
-		if (parentLayoutStructureItem == null) {
-			return null;
-		}
-
-		if (Objects.equals(parentLayoutStructureItem.getItemType(), itemType)) {
-			return parentLayoutStructureItem;
-		}
-
-		if (Objects.equals(
-				parentLayoutStructureItem.getItemType(),
-				LayoutDataItemTypeConstants.TYPE_ROOT)) {
-
-			return null;
-		}
-
-		return getAncestor(
-			parentLayoutStructureItem.getItemId(), itemType, layoutStructure);
-	}
-
 	public static boolean hasAncestor(
 		String itemId, String itemType, LayoutStructure layoutStructure) {
 
@@ -120,10 +87,6 @@ public class LayoutStructureItemUtil {
 		LayoutStructureItem parentLayoutStructureItem =
 			layoutStructure.getLayoutStructureItem(
 				layoutStructureItem.getParentItemId());
-
-		if (parentLayoutStructureItem == null) {
-			return false;
-		}
 
 		if (Objects.equals(parentLayoutStructureItem.getItemType(), itemType)) {
 			return true;

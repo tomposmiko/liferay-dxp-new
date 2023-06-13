@@ -50,12 +50,12 @@ import javax.mail.internet.InternetHeaders;
 public class UnsubscribeHooks {
 
 	public UnsubscribeHooks(
-		SubscriptionConfiguration subscriptionConfiguration,
+		SubscriptionConfiguration configuration,
 		TicketLocalService ticketLocalService,
 		UserLocalService userLocalService,
 		SubscriptionSender subscriptionSender) {
 
-		_subscriptionConfiguration = subscriptionConfiguration;
+		_configuration = configuration;
 		_ticketLocalService = ticketLocalService;
 		_userLocalService = userLocalService;
 		_subscriptionSender = subscriptionSender;
@@ -148,8 +148,7 @@ public class UnsubscribeHooks {
 		Calendar calendar = Calendar.getInstance();
 
 		calendar.add(
-			Calendar.DATE,
-			_subscriptionConfiguration.unsubscriptionTicketExpirationTime());
+			Calendar.DATE, _configuration.unsubscriptionTicketExpirationTime());
 
 		List<Ticket> tickets = _ticketLocalService.getTickets(
 			subscription.getCompanyId(), Subscription.class.getName(),
@@ -185,7 +184,7 @@ public class UnsubscribeHooks {
 			ticket.getKey(), "&userId=", user.getUserId());
 	}
 
-	private final SubscriptionConfiguration _subscriptionConfiguration;
+	private final SubscriptionConfiguration _configuration;
 	private final SubscriptionSender _subscriptionSender;
 	private final TicketLocalService _ticketLocalService;
 	private final UserLocalService _userLocalService;

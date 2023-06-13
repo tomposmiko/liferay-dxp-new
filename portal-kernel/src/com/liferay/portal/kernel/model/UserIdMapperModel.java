@@ -175,8 +175,4 @@ public interface UserIdMapperModel
 	@Override
 	public UserIdMapper cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

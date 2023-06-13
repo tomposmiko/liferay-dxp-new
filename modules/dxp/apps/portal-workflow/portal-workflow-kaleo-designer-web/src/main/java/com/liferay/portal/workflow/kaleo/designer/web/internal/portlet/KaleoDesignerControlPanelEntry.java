@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Inácio Nery
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + KaleoDesignerPortletKeys.KALEO_DESIGNER,
 	service = ControlPanelEntry.class
 )

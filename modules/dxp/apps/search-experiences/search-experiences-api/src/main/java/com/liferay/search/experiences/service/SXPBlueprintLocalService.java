@@ -70,10 +70,9 @@ public interface SXPBlueprintLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public SXPBlueprint addSXPBlueprint(
-			String externalReferenceCode, long userId, String configurationJSON,
+			long userId, String configurationJSON,
 			Map<Locale, String> descriptionMap, String elementInstancesJSON,
-			String schemaVersion, Map<Locale, String> titleMap,
-			ServiceContext serviceContext)
+			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -103,9 +102,6 @@ public interface SXPBlueprintLocalService
 	 */
 	@Transactional(enabled = false)
 	public SXPBlueprint createSXPBlueprint(long sxpBlueprintId);
-
-	public void deleteCompanySXPBlueprints(long companyId)
-		throws PortalException;
 
 	/**
 	 * @throws PortalException
@@ -221,10 +217,6 @@ public interface SXPBlueprintLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SXPBlueprint fetchSXPBlueprint(long sxpBlueprintId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SXPBlueprint fetchSXPBlueprintByExternalReferenceCode(
-		String externalReferenceCode, long companyId);
-
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *
@@ -270,11 +262,6 @@ public interface SXPBlueprintLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SXPBlueprint getSXPBlueprint(long sxpBlueprintId)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SXPBlueprint getSXPBlueprintByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
 		throws PortalException;
 
 	/**
@@ -325,8 +312,7 @@ public interface SXPBlueprintLocalService
 	public SXPBlueprint updateSXPBlueprint(
 			long userId, long sxpBlueprintId, String configurationJSON,
 			Map<Locale, String> descriptionMap, String elementInstancesJSON,
-			String schemaVersion, Map<Locale, String> titleMap,
-			ServiceContext serviceContext)
+			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**

@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.search;
 
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.search.filter.FilterTranslator;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.search.aggregation.Aggregation;
@@ -28,7 +28,6 @@ import com.liferay.portal.search.elasticsearch7.internal.stats.StatsTranslator;
 import com.liferay.portal.search.engine.adapter.search.BaseSearchRequest;
 import com.liferay.portal.search.filter.ComplexQueryBuilderFactory;
 import com.liferay.portal.search.filter.ComplexQueryPart;
-import com.liferay.portal.search.pit.PointInTime;
 import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.rescore.Rescore;
@@ -49,7 +48,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.PipelineAggregationBuilder;
-import org.elasticsearch.search.builder.PointInTimeBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.rescore.QueryRescoreMode;
 import org.elasticsearch.search.rescore.QueryRescorerBuilder;
@@ -69,71 +67,26 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest, SearchRequest searchRequest) {
 
-		_setAggregations(searchSourceBuilder, baseSearchRequest);
-		_setExplain(searchSourceBuilder, baseSearchRequest);
-		_setFacets(searchSourceBuilder, baseSearchRequest);
-		_setIndexBoosts(searchSourceBuilder, baseSearchRequest);
-		_setIndices(searchRequest, baseSearchRequest);
-		_setMinScore(searchSourceBuilder, baseSearchRequest);
-		_setPipelineAggregations(searchSourceBuilder, baseSearchRequest);
-		_setPointInTime(searchSourceBuilder, baseSearchRequest);
-		_setPostFilter(searchSourceBuilder, baseSearchRequest);
+		setAggregations(searchSourceBuilder, baseSearchRequest);
+		setExplain(searchSourceBuilder, baseSearchRequest);
+		setFacets(searchSourceBuilder, baseSearchRequest);
+		setIndexBoosts(searchSourceBuilder, baseSearchRequest);
+		setIndices(searchRequest, baseSearchRequest);
+		setMinScore(searchSourceBuilder, baseSearchRequest);
+		setPipelineAggregations(searchSourceBuilder, baseSearchRequest);
+		setPostFilter(searchSourceBuilder, baseSearchRequest);
 		setQuery(searchSourceBuilder, baseSearchRequest);
-		_setRequestCache(searchRequest, baseSearchRequest);
-		_setRescorer(searchSourceBuilder, baseSearchRequest);
-		_setStatsRequests(searchSourceBuilder, baseSearchRequest);
-		_setTimeout(searchSourceBuilder, baseSearchRequest);
-		_setTrackTotalHits(searchSourceBuilder, baseSearchRequest);
-		_setTypes(searchRequest, baseSearchRequest);
+		setRequestCache(searchRequest, baseSearchRequest);
+		setRescorer(searchSourceBuilder, baseSearchRequest);
+		setStatsRequests(searchSourceBuilder, baseSearchRequest);
+		setTimeout(searchSourceBuilder, baseSearchRequest);
+		setTrackTotalHits(searchSourceBuilder, baseSearchRequest);
+		setTypes(searchRequest, baseSearchRequest);
 
 		searchRequest.source(searchSourceBuilder);
 	}
 
-	protected void setQuery(
-		SearchSourceBuilder searchSourceBuilder,
-		BaseSearchRequest baseSearchRequest) {
-
-		searchSourceBuilder.query(_getQueryBuilder(baseSearchRequest));
-	}
-
-	protected BoolQueryBuilder translate(
-		List<ComplexQueryPart> complexQueryParts) {
-
-		if (ListUtil.isEmpty(complexQueryParts)) {
-			return null;
-		}
-
-		BooleanQuery booleanQuery = _buildComplexQuery(complexQueryParts);
-
-		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-
-		_transfer(booleanQuery, boolQueryBuilder);
-
-		return boolQueryBuilder;
-	}
-
-	protected QueryRescoreMode translate(Rescore.ScoreMode scoreMode) {
-		if (scoreMode == Rescore.ScoreMode.AVG) {
-			return QueryRescoreMode.Avg;
-		}
-		else if (scoreMode == Rescore.ScoreMode.MAX) {
-			return QueryRescoreMode.Max;
-		}
-		else if (scoreMode == Rescore.ScoreMode.MIN) {
-			return QueryRescoreMode.Min;
-		}
-		else if (scoreMode == Rescore.ScoreMode.MULTIPLY) {
-			return QueryRescoreMode.Multiply;
-		}
-		else if (scoreMode == Rescore.ScoreMode.TOTAL) {
-			return QueryRescoreMode.Total;
-		}
-
-		throw new IllegalArgumentException(
-			"Invalid Rescore.ScoreMode: " + scoreMode);
-	}
-
-	private BooleanQuery _buildComplexQuery(
+	protected BooleanQuery buildComplexQuery(
 		List<ComplexQueryPart> complexQueryParts) {
 
 		return (BooleanQuery)_complexQueryBuilderFactory.builder(
@@ -142,7 +95,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		).build();
 	}
 
-	private QueryBuilder _buildQueryBuilder(
+	protected QueryBuilder buildQueryBuilder(
 		BaseSearchRequest baseSearchRequest) {
 
 		QueryBuilder queryBuilder = null;
@@ -156,42 +109,13 @@ public class CommonSearchSourceBuilderAssemblerImpl
 			baseSearchRequest.getPostFilterComplexQueryParts();
 
 		if (!postFilterQueryParts.isEmpty()) {
-			queryBuilder = _combine(queryBuilder, postFilterQueryParts);
+			queryBuilder = combine(queryBuilder, postFilterQueryParts);
 		}
 
 		return queryBuilder;
 	}
 
-	private void _combine(
-		BoolQueryBuilder boolQueryBuilder, ComplexQueryPart complexQueryPart) {
-
-		Query query = _complexQueryBuilderFactory.builder(
-		).buildPart(
-			complexQueryPart
-		);
-
-		if (query == null) {
-			return;
-		}
-
-		String occur = GetterUtil.getString(
-			complexQueryPart.getOccur(), "must");
-
-		if (occur.equals("filter")) {
-			boolQueryBuilder.filter(_translateQuery(query));
-		}
-		else if (occur.equals("must")) {
-			boolQueryBuilder.must(_translateQuery(query));
-		}
-		else if (occur.equals("must_not")) {
-			boolQueryBuilder.mustNot(_translateQuery(query));
-		}
-		else if (occur.equals("should")) {
-			boolQueryBuilder.should(_translateQuery(query));
-		}
-	}
-
-	private QueryBuilder _combine(
+	protected QueryBuilder combine(
 		BoolQueryBuilder boolQueryBuilder, QueryBuilder queryBuilder,
 		BiConsumer<BoolQueryBuilder, QueryBuilder> biConsumer) {
 
@@ -206,7 +130,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		return boolQueryBuilder;
 	}
 
-	private QueryBuilder _combine(
+	protected QueryBuilder combine(
 		QueryBuilder queryBuilder, List<ComplexQueryPart> complexQueryParts) {
 
 		List<ComplexQueryPart> additiveComplexQueryParts = new ArrayList<>();
@@ -217,30 +141,20 @@ public class CommonSearchSourceBuilderAssemblerImpl
 				additiveComplexQueryParts.add(complexQueryPart);
 			}
 			else {
-				if (complexQueryPart.isRootClause() &&
-					(queryBuilder instanceof BoolQueryBuilder)) {
-
-					BoolQueryBuilder boolQueryBuilder =
-						(BoolQueryBuilder)queryBuilder;
-
-					_combine(boolQueryBuilder, complexQueryPart);
-				}
-				else {
-					nonadditiveComplexQueryParts.add(complexQueryPart);
-				}
+				nonadditiveComplexQueryParts.add(complexQueryPart);
 			}
 		}
 
-		QueryBuilder queryBuilder1 = _combine(
+		QueryBuilder queryBuilder1 = combine(
 			translate(nonadditiveComplexQueryParts), queryBuilder,
 			BoolQueryBuilder::must);
 
-		return _combine(
+		return combine(
 			translate(additiveComplexQueryParts), queryBuilder1,
 			BoolQueryBuilder::should);
 	}
 
-	private QueryBuilder _combine(
+	protected QueryBuilder combine(
 		QueryBuilder queryBuilder1, QueryBuilder queryBuilder2) {
 
 		if (queryBuilder1 == null) {
@@ -260,34 +174,36 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		);
 	}
 
-	private void _copy(List<Query> clauses, Consumer<QueryBuilder> consumer) {
+	protected void copy(List<Query> clauses, Consumer<QueryBuilder> consumer) {
 		for (Query query : clauses) {
-			consumer.accept(_translateQuery(query));
+			consumer.accept(translateQuery(query));
 		}
 	}
 
-	private QueryBuilder _getQueryBuilder(BaseSearchRequest baseSearchRequest) {
-		QueryBuilder queryBuilder1 = _combine(
-			_translateQuery(baseSearchRequest.getQuery()),
-			_translateQuery(baseSearchRequest.getQuery71()));
+	protected QueryBuilder getQueryBuilder(
+		BaseSearchRequest baseSearchRequest) {
+
+		QueryBuilder queryBuilder1 = combine(
+			translateQuery(baseSearchRequest.getQuery()),
+			translateQuery(baseSearchRequest.getQuery71()));
 
 		List<ComplexQueryPart> complexQueryParts =
 			baseSearchRequest.getComplexQueryParts();
 
 		if (complexQueryParts.isEmpty()) {
-			QueryBuilder queryBuilder2 = _combine(
+			QueryBuilder queryBuilder2 = combine(
 				translate(Collections.emptyList()), queryBuilder1,
 				BoolQueryBuilder::must);
 
-			return _combine(
+			return combine(
 				translate(Collections.emptyList()), queryBuilder2,
 				BoolQueryBuilder::should);
 		}
 
-		return _combine(queryBuilder1, complexQueryParts);
+		return combine(queryBuilder1, complexQueryParts);
 	}
 
-	private void _setAggregations(
+	protected void setAggregations(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -307,7 +223,21 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setExplain(
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setAggregationTranslator(
+		AggregationTranslator<AggregationBuilder> aggregationTranslator) {
+
+		_aggregationTranslator = aggregationTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setComplexQueryBuilderFactory(
+		ComplexQueryBuilderFactory complexQueryBuilderFactory) {
+
+		_complexQueryBuilderFactory = complexQueryBuilderFactory;
+	}
+
+	protected void setExplain(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -316,7 +246,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setFacets(
+	protected void setFacets(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -326,7 +256,19 @@ public class CommonSearchSourceBuilderAssemblerImpl
 			baseSearchRequest.isBasicFacetSelection());
 	}
 
-	private void _setIndexBoosts(
+	@Reference(unbind = "-")
+	protected void setFacetTranslator(FacetTranslator facetTranslator) {
+		_facetTranslator = facetTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setFilterToQueryBuilderTranslator(
+		FilterToQueryBuilderTranslator filterToQueryBuilderTranslator) {
+
+		_filterToQueryBuilderTranslator = filterToQueryBuilderTranslator;
+	}
+
+	protected void setIndexBoosts(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -337,15 +279,21 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setIndices(
+	protected void setIndices(
 		SearchRequest searchRequest, BaseSearchRequest baseSearchRequest) {
 
-		if (baseSearchRequest.getPointInTime() == null) {
-			searchRequest.indices(baseSearchRequest.getIndexNames());
-		}
+		searchRequest.indices(baseSearchRequest.getIndexNames());
 	}
 
-	private void _setMinScore(
+	@Reference(unbind = "-")
+	protected void setLegacyQueryToQueryBuilderTranslator(
+		com.liferay.portal.search.elasticsearch7.internal.legacy.query.
+			QueryToQueryBuilderTranslator queryToQueryBuilderTranslator) {
+
+		_legacyQueryToQueryBuilderTranslator = queryToQueryBuilderTranslator;
+	}
+
+	protected void setMinScore(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -354,7 +302,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setPipelineAggregations(
+	protected void setPipelineAggregations(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -376,29 +324,19 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setPointInTime(
-		SearchSourceBuilder searchSourceBuilder,
-		BaseSearchRequest baseSearchRequest) {
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setPipelineAggregationTranslator(
+		PipelineAggregationTranslator<PipelineAggregationBuilder>
+			pipelineAggregationTranslator) {
 
-		PointInTime pointInTime = baseSearchRequest.getPointInTime();
-
-		if (pointInTime != null) {
-			PointInTimeBuilder pointInTimeBuilder = new PointInTimeBuilder(
-				pointInTime.getPointInTimeId());
-
-			if (pointInTime.getKeepAlive() != null) {
-				pointInTimeBuilder.setKeepAlive(pointInTime.getKeepAlive());
-			}
-
-			searchSourceBuilder.pointInTimeBuilder(pointInTimeBuilder);
-		}
+		_pipelineAggregationTranslator = pipelineAggregationTranslator;
 	}
 
-	private void _setPostFilter(
+	protected void setPostFilter(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
-		QueryBuilder queryBuilder = _buildQueryBuilder(baseSearchRequest);
+		QueryBuilder queryBuilder = buildQueryBuilder(baseSearchRequest);
 
 		if (queryBuilder != null) {
 			searchSourceBuilder.postFilter(queryBuilder);
@@ -410,7 +348,21 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setRequestCache(
+	protected void setQuery(
+		SearchSourceBuilder searchSourceBuilder,
+		BaseSearchRequest baseSearchRequest) {
+
+		searchSourceBuilder.query(getQueryBuilder(baseSearchRequest));
+	}
+
+	@Reference(unbind = "-")
+	protected void setQueryToQueryBuilderTranslator(
+		QueryToQueryBuilderTranslator queryToQueryBuilderTranslator) {
+
+		_queryToQueryBuilderTranslator = queryToQueryBuilderTranslator;
+	}
+
+	protected void setRequestCache(
 		SearchRequest searchRequest, BaseSearchRequest baseSearchRequest) {
 
 		if (baseSearchRequest.getRequestCache() != null) {
@@ -418,17 +370,17 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setRescorer(
+	protected void setRescorer(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
-		_setRescorers(searchSourceBuilder, baseSearchRequest.getRescores());
+		setRescorers(searchSourceBuilder, baseSearchRequest.getRescores());
 
-		_setRescorerQuery(
+		setRescorerQuery(
 			searchSourceBuilder, baseSearchRequest.getRescoreQuery());
 	}
 
-	private void _setRescorerQuery(
+	protected void setRescorerQuery(
 		SearchSourceBuilder searchSourceBuilder, Query query) {
 
 		if (query == null) {
@@ -440,7 +392,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 				_queryToQueryBuilderTranslator.translate(query)));
 	}
 
-	private void _setRescorers(
+	protected void setRescorers(
 		SearchSourceBuilder searchSourceBuilder, List<Rescore> rescores) {
 
 		if (rescores == null) {
@@ -475,20 +427,25 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setStatsRequests(
+	protected void setStatsRequests(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
 		List<StatsRequest> statsRequests = baseSearchRequest.getStatsRequests();
 
-		if (ListUtil.isNotEmpty(statsRequests)) {
+		if (!ListUtil.isEmpty(statsRequests)) {
 			statsRequests.forEach(
 				statsRequest -> _statsTranslator.populateRequest(
 					searchSourceBuilder, statsRequest));
 		}
 	}
 
-	private void _setTimeout(
+	@Reference(unbind = "-")
+	protected void setStatsTranslator(StatsTranslator statsTranslator) {
+		_statsTranslator = statsTranslator;
+	}
+
+	protected void setTimeout(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -499,7 +456,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setTrackTotalHits(
+	protected void setTrackTotalHits(
 		SearchSourceBuilder searchSourceBuilder,
 		BaseSearchRequest baseSearchRequest) {
 
@@ -509,7 +466,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _setTypes(
+	protected void setTypes(
 		SearchRequest searchRequest, BaseSearchRequest baseSearchRequest) {
 
 		if (baseSearchRequest.getTypes() != null) {
@@ -517,16 +474,54 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		}
 	}
 
-	private void _transfer(
+	protected void transfer(
 		BooleanQuery booleanQuery, BoolQueryBuilder boolQueryBuilder) {
 
-		_copy(booleanQuery.getFilterQueryClauses(), boolQueryBuilder::filter);
-		_copy(booleanQuery.getMustNotQueryClauses(), boolQueryBuilder::mustNot);
-		_copy(booleanQuery.getMustQueryClauses(), boolQueryBuilder::must);
-		_copy(booleanQuery.getShouldQueryClauses(), boolQueryBuilder::should);
+		copy(booleanQuery.getFilterQueryClauses(), boolQueryBuilder::filter);
+		copy(booleanQuery.getMustNotQueryClauses(), boolQueryBuilder::mustNot);
+		copy(booleanQuery.getMustQueryClauses(), boolQueryBuilder::must);
+		copy(booleanQuery.getShouldQueryClauses(), boolQueryBuilder::should);
 	}
 
-	private QueryBuilder _translateQuery(
+	protected BoolQueryBuilder translate(
+		List<ComplexQueryPart> complexQueryParts) {
+
+		if (ListUtil.isEmpty(complexQueryParts)) {
+			return null;
+		}
+
+		BooleanQuery booleanQuery = buildComplexQuery(complexQueryParts);
+
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+		transfer(booleanQuery, boolQueryBuilder);
+
+		return boolQueryBuilder;
+	}
+
+	protected QueryRescoreMode translate(Rescore.ScoreMode scoreMode) {
+		if (scoreMode == Rescore.ScoreMode.AVG) {
+			return QueryRescoreMode.Avg;
+		}
+		else if (scoreMode == Rescore.ScoreMode.MAX) {
+			return QueryRescoreMode.Max;
+		}
+		else if (scoreMode == Rescore.ScoreMode.MIN) {
+			return QueryRescoreMode.Min;
+		}
+		else if (scoreMode == Rescore.ScoreMode.MULTIPLY) {
+			return QueryRescoreMode.Multiply;
+		}
+		else if (scoreMode == Rescore.ScoreMode.TOTAL) {
+			return QueryRescoreMode.Total;
+		}
+		else {
+			throw new IllegalArgumentException(
+				"Invalid Rescore.ScoreMode: " + scoreMode);
+		}
+	}
+
+	protected QueryBuilder translateQuery(
 		com.liferay.portal.kernel.search.Query query) {
 
 		if (query == null) {
@@ -558,7 +553,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		return boolQueryBuilder;
 	}
 
-	private QueryBuilder _translateQuery(Query query) {
+	protected QueryBuilder translateQuery(Query query) {
 		if (query != null) {
 			return _queryToQueryBuilderTranslator.translate(query);
 		}
@@ -566,30 +561,15 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		return null;
 	}
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
 	private AggregationTranslator<AggregationBuilder> _aggregationTranslator;
-
-	@Reference
 	private ComplexQueryBuilderFactory _complexQueryBuilderFactory;
-
-	@Reference
 	private FacetTranslator _facetTranslator;
-
-	@Reference
-	private FilterToQueryBuilderTranslator _filterToQueryBuilderTranslator;
-
-	@Reference
+	private FilterTranslator<QueryBuilder> _filterToQueryBuilderTranslator;
 	private com.liferay.portal.search.elasticsearch7.internal.legacy.query.
 		QueryToQueryBuilderTranslator _legacyQueryToQueryBuilderTranslator;
-
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
 	private PipelineAggregationTranslator<PipelineAggregationBuilder>
 		_pipelineAggregationTranslator;
-
-	@Reference
 	private QueryToQueryBuilderTranslator _queryToQueryBuilderTranslator;
-
-	@Reference
 	private StatsTranslator _statsTranslator;
 
 }

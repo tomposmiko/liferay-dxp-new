@@ -61,6 +61,23 @@ public class AssetListEntryUsageLocalServiceUtil {
 		return getService().addAssetListEntryUsage(assetListEntryUsage);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addAssetListEntryUsage(long, long, long, long, long, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
+	public static AssetListEntryUsage addAssetListEntryUsage(
+			long userId, long groupId, long assetListEntryId, long classNameId,
+			long classPK, String portletId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addAssetListEntryUsage(
+			userId, groupId, assetListEntryId, classNameId, classPK, portletId,
+			serviceContext);
+	}
+
 	public static AssetListEntryUsage addAssetListEntryUsage(
 			long userId, long groupId, long classNameId, String containerKey,
 			long containerType, String key, long plid,
@@ -126,12 +143,6 @@ public class AssetListEntryUsageLocalServiceUtil {
 		throws PortalException {
 
 		return getService().deleteAssetListEntryUsage(assetListEntryUsageId);
-	}
-
-	public static void deleteAssetListEntryUsages(
-		long containerType, long plid) {
-
-		getService().deleteAssetListEntryUsages(containerType, plid);
 	}
 
 	public static void deleteAssetListEntryUsages(
@@ -242,6 +253,18 @@ public class AssetListEntryUsageLocalServiceUtil {
 		return getService().fetchAssetListEntryUsage(assetListEntryUsageId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(String, long, long)}
+	 */
+	@Deprecated
+	public static AssetListEntryUsage fetchAssetListEntryUsage(
+		long classNameId, long classPK, String portletId) {
+
+		return getService().fetchAssetListEntryUsage(
+			classNameId, classPK, portletId);
+	}
+
 	public static AssetListEntryUsage fetchAssetListEntryUsage(
 		long groupId, long classNameId, String containerKey, long containerType,
 		String key, long plid) {
@@ -268,12 +291,6 @@ public class AssetListEntryUsageLocalServiceUtil {
 		getActionableDynamicQuery() {
 
 		return getService().getActionableDynamicQuery();
-	}
-
-	public static List<AssetListEntryUsage> getAssetEntryListUsages(
-		long containerType, long plid) {
-
-		return getService().getAssetEntryListUsages(containerType, plid);
 	}
 
 	public static List<AssetListEntryUsage> getAssetEntryListUsagesByPlid(
@@ -327,6 +344,57 @@ public class AssetListEntryUsageLocalServiceUtil {
 		int start, int end) {
 
 		return getService().getAssetListEntryUsages(start, end);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String)}
+	 */
+	@Deprecated
+	public static List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId) {
+
+		return getService().getAssetListEntryUsages(assetListEntryId);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
+	public static List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId, int start, int end,
+		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
+		return getService().getAssetListEntryUsages(
+			assetListEntryId, start, end, orderByComparator);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String, int)}
+	 */
+	@Deprecated
+	public static List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId, long classNameId) {
+
+		return getService().getAssetListEntryUsages(
+			assetListEntryId, classNameId);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsages(long, long, String, int, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
+	public static List<AssetListEntryUsage> getAssetListEntryUsages(
+		long assetListEntryId, long classNameId, int start, int end,
+		OrderByComparator<AssetListEntryUsage> orderByComparator) {
+
+		return getService().getAssetListEntryUsages(
+			assetListEntryId, classNameId, start, end, orderByComparator);
 	}
 
 	public static List<AssetListEntryUsage> getAssetListEntryUsages(
@@ -407,6 +475,27 @@ public class AssetListEntryUsageLocalServiceUtil {
 		return getService().getAssetListEntryUsagesCount();
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsagesCount(long, long, String)}
+	 */
+	@Deprecated
+	public static int getAssetListEntryUsagesCount(long assetListEntryId) {
+		return getService().getAssetListEntryUsagesCount(assetListEntryId);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #getAssetListEntryUsagesCount(long, long, String, int)}
+	 */
+	@Deprecated
+	public static int getAssetListEntryUsagesCount(
+		long assetListEntryId, long classNameId) {
+
+		return getService().getAssetListEntryUsagesCount(
+			assetListEntryId, classNameId);
+	}
+
 	public static int getAssetListEntryUsagesCount(
 		long groupId, long classNameId, String key) {
 
@@ -419,13 +508,6 @@ public class AssetListEntryUsageLocalServiceUtil {
 
 		return getService().getAssetListEntryUsagesCount(
 			groupId, classNameId, key, type);
-	}
-
-	public static int getCompanyAssetListEntryUsagesCount(
-		long companyId, long classNameId, String key) {
-
-		return getService().getCompanyAssetListEntryUsagesCount(
-			companyId, classNameId, key);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery

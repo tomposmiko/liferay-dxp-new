@@ -21,8 +21,6 @@ import com.liferay.data.engine.rest.resource.v2_0.test.util.content.type.TestDat
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestHelper;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
@@ -138,10 +136,7 @@ public class DataDefinitionTestUtil {
 		InputStream inputStream = clazz.getResourceAsStream(
 			"dependencies/" + fileName);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			StringUtil.read(inputStream));
-
-		return jsonObject.toString();
+		return StringUtil.read(inputStream);
 	}
 
 	private static DataDefinition _randomDataDefinition(long groupId)

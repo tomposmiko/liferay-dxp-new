@@ -38,6 +38,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Marcellus Tavares
@@ -71,7 +73,12 @@ public class DDMFormFieldFactoryHelper {
 
 			if (value instanceof String[]) {
 				ddmFormField.setProperty(
-					entry.getKey(), _getValues((String[])value));
+					entry.getKey(),
+					Stream.of(
+						(String[])value
+					).map(
+						this::getValue
+					).toArray());
 			}
 			else {
 				ddmFormField.setProperty(entry.getKey(), getValue(value));
@@ -283,16 +290,12 @@ public class DDMFormFieldFactoryHelper {
 	}
 
 	protected Map<String, String[]> getDDMFormFieldProperties() {
-		Map<String, String[]> ddmFormFieldProperties = new HashMap<>();
-
-		for (DDMFormFieldProperty ddmFormFieldProperty :
-				_ddmFormField.ddmFormFieldProperties()) {
-
-			ddmFormFieldProperties.put(
-				ddmFormFieldProperty.name(), ddmFormFieldProperty.value());
-		}
-
-		return ddmFormFieldProperties;
+		return Stream.of(
+			_ddmFormField.ddmFormFieldProperties()
+		).collect(
+			Collectors.toMap(
+				DDMFormFieldProperty::name, DDMFormFieldProperty::value)
+		);
 	}
 
 	protected LocalizedValue getDDMFormFieldTip() {
@@ -333,12 +336,6 @@ public class DDMFormFieldFactoryHelper {
 			ddmFormFieldValidation.setDDMFormFieldValidationExpression(
 				new DDMFormFieldValidationExpression() {
 					{
-						if (Validator.isNotNull(
-								_ddmFormField.validationExpressionName())) {
-
-							setName(_ddmFormField.validationExpressionName());
-						}
-
 						setValue(_ddmFormField.validationExpression());
 					}
 				});
@@ -357,11 +354,6 @@ public class DDMFormFieldFactoryHelper {
 
 			ddmFormFieldValidation.setErrorMessageLocalizedValue(
 				createLocalizedValue(validationErrorMessage));
-		}
-
-		if (Validator.isNotNull(_ddmFormField.validationParameter())) {
-			ddmFormFieldValidation.setParameterLocalizedValue(
-				createLocalizedValue(_ddmFormField.validationParameter()));
 		}
 
 		return ddmFormFieldValidation;
@@ -502,16 +494,6 @@ public class DDMFormFieldFactoryHelper {
 		}
 
 		return returnType;
-	}
-
-	private Object[] _getValues(String[] values) {
-		Object[] objects = new Object[values.length];
-
-		for (int i = 0; i < values.length; i++) {
-			objects[i] = getValue(values[i]);
-		}
-
-		return objects;
 	}
 
 	private Set<Locale> _availableLocales;

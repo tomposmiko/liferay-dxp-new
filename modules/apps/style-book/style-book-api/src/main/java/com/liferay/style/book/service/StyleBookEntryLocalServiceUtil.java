@@ -88,12 +88,12 @@ public class StyleBookEntryLocalServiceUtil {
 	}
 
 	public static StyleBookEntry copyStyleBookEntry(
-			long userId, long groupId, long sourceStyleBookEntryId,
+			long userId, long groupId, long styleBookEntryId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyStyleBookEntry(
-			userId, groupId, sourceStyleBookEntryId, serviceContext);
+			userId, groupId, styleBookEntryId, serviceContext);
 	}
 
 	/**
@@ -529,7 +529,7 @@ public class StyleBookEntryLocalServiceUtil {
 	 * <strong>Important:</strong> Inspect StyleBookEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftStyleBookEntry the style book entry
+	 * @param styleBookEntry the style book entry
 	 * @return the style book entry that was updated
 	 */
 	public static StyleBookEntry updateStyleBookEntry(

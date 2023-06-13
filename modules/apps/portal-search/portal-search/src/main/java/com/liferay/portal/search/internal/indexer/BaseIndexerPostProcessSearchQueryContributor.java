@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.PostProcessSearchQueryContributor;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.search.internal.indexer.helper.PostProcessSearchQueryContributorHelper;
 
 import java.util.Collection;
 
@@ -29,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author André de Oliveira
  */
-@Component(service = PostProcessSearchQueryContributor.class)
+@Component(immediate = true, service = PostProcessSearchQueryContributor.class)
 public class BaseIndexerPostProcessSearchQueryContributor
 	implements PostProcessSearchQueryContributor {
 

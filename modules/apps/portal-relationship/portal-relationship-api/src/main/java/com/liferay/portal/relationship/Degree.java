@@ -14,9 +14,6 @@
 
 package com.liferay.portal.relationship;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 /**
  * @author Máté Thurzó
  */
@@ -52,10 +49,6 @@ public class Degree {
 			return new Degree(degree);
 		}
 		catch (NumberFormatException numberFormatException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(numberFormatException);
-			}
-
 			return one();
 		}
 	}
@@ -71,8 +64,6 @@ public class Degree {
 	private Degree(int degree) {
 		_degree = degree;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(Degree.class);
 
 	private final int _degree;
 

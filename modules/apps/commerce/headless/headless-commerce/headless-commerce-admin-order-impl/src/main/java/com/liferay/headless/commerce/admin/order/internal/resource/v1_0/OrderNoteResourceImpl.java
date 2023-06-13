@@ -21,10 +21,10 @@ import com.liferay.commerce.model.CommerceOrderNote;
 import com.liferay.commerce.service.CommerceOrderNoteService;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderNote;
+import com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderNoteDTOConverter;
 import com.liferay.headless.commerce.admin.order.resource.v1_0.OrderNoteResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/order-note.properties",
 	scope = ServiceScope.PROTOTYPE, service = OrderNoteResource.class
 )
@@ -240,7 +241,7 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 		throws Exception {
 
 		commerceOrderNote = _commerceOrderNoteService.updateCommerceOrderNote(
-			commerceOrderNote.getCommerceOrderNoteId(),
+			orderNote.getOrderId(),
 			GetterUtil.get(
 				orderNote.getContent(), commerceOrderNote.getContent()),
 			GetterUtil.get(
@@ -258,10 +259,8 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 	@Reference
 	private CommerceOrderService _commerceOrderService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.order.internal.dto.v1_0.converter.OrderNoteDTOConverter)"
-	)
-	private DTOConverter<CommerceOrderNote, OrderNote> _orderNoteDTOConverter;
+	@Reference
+	private OrderNoteDTOConverter _orderNoteDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

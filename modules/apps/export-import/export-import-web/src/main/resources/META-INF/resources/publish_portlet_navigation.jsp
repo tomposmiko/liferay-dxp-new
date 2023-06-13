@@ -16,56 +16,46 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+String tabs3 = ParamUtil.getString(request, "tabs3", "new-publish-process");
+
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/export_import/publish_portlet"
+).setPortletResource(
+	portletResource
+).buildPortletURL();
+%>
+
 <c:if test="<%= (themeDisplay.getURLPublishToLive() != null) || layout.isTypeControlPanel() %>">
+	<aui:nav-bar cssClass="navbar-collapse-absolute navbar-expand-md navbar-underline navigation-bar navigation-bar-light" markupView="lexicon">
+		<aui:nav cssClass="navbar-nav">
 
-	<%
-	String tabs3 = ParamUtil.getString(request, "tabs3", "new-publish-process");
+			<%
+			portletURL.setParameter("tabs3", "new-publish-process");
+			%>
 
-	PortletURL portletURL = PortletURLBuilder.createRenderURL(
-		renderResponse
-	).setMVCRenderCommandName(
-		"/export_import/publish_portlet"
-	).setPortletResource(
-		portletResource
-	).buildPortletURL();
-	%>
+			<aui:nav-item href="<%= portletURL.toString() %>" label="new-publish-process" selected='<%= tabs3.equals("new-publish-process") %>' />
 
-	<clay:navigation-bar
-		navigationItems='<%=
-			new JSPNavigationItemList(pageContext) {
-				{
-					portletURL.setParameter("tabs3", "new-publish-process");
+			<%
+			Group scopeGroup = themeDisplay.getScopeGroup();
+			%>
 
-					add(
-						navigationItem -> {
-							navigationItem.setActive(tabs3.equals("new-publish-process"));
-							navigationItem.setHref(portletURL.toString());
-							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "new-publish-process"));
-						});
+			<c:if test="<%= !scopeGroup.isStagedRemotely() %>">
 
-					Group scopeGroup = themeDisplay.getScopeGroup();
+				<%
+				portletURL.setParameter("tabs3", "copy-from-live");
+				%>
 
-					if (!scopeGroup.isStagedRemotely()) {
-						portletURL.setParameter("tabs3", "copy-from-live");
+				<aui:nav-item href="<%= portletURL.toString() %>" label="copy-from-live" selected='<%= tabs3.equals("copy-from-live") %>' />
+			</c:if>
 
-						add(
-							navigationItem -> {
-								navigationItem.setActive(tabs3.equals("copy-from-live"));
-								navigationItem.setHref(portletURL.toString());
-								navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "copy-from-live"));
-							});
-					}
+			<%
+			portletURL.setParameter("tabs3", "current-and-previous");
+			%>
 
-					portletURL.setParameter("tabs3", "current-and-previous");
-
-					add(
-						navigationItem -> {
-							navigationItem.setActive(tabs3.equals("current-and-previous"));
-							navigationItem.setHref(portletURL.toString());
-							navigationItem.setLabel(LanguageUtil.get(httpServletRequest, "current-and-previous"));
-						});
-				}
-			}
-		%>'
-	/>
+			<aui:nav-item href="<%= portletURL.toString() %>" label="current-and-previous" selected='<%= tabs3.equals("current-and-previous") %>' />
+		</aui:nav>
+	</aui:nav-bar>
 </c:if>

@@ -14,16 +14,9 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.notification.recipient;
 
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.util.ClassUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.workflow.kaleo.definition.NotificationReceptionType;
-import com.liferay.portal.workflow.kaleo.definition.ScriptLanguage;
-import com.liferay.portal.workflow.kaleo.definition.exception.KaleoDefinitionValidationException;
 import com.liferay.portal.workflow.kaleo.model.KaleoNotificationRecipient;
 import com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
@@ -39,17 +32,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
  */
 @Component(
-	property = "recipient.type=SCRIPT",
+	immediate = true, property = "recipient.type=SCRIPT",
 	service = NotificationRecipientBuilder.class
 )
 public class ScriptNotificationRecipientBuilder
@@ -63,7 +53,7 @@ public class ScriptNotificationRecipientBuilder
 			ExecutionContext executionContext)
 		throws Exception {
 
-		Map<String, ?> results = _evaluate(
+		Map<String, ?> results = _notificationRecipientEvaluator.evaluate(
 			kaleoNotificationRecipient, executionContext);
 
 		Map<String, Serializable> resultsWorkflowContext =
@@ -105,89 +95,10 @@ public class ScriptNotificationRecipientBuilder
 		throws Exception {
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, NotificationRecipientEvaluator.class,
-			"(scripting.language=*)",
-			(serviceReference, emitter) -> {
-				Object propertyValue = serviceReference.getProperty(
-					"scripting.language");
-
-				NotificationRecipientEvaluator notificationRecipientEvaluator =
-					bundleContext.getService(serviceReference);
-
-				try {
-					for (String scriptingLanguage :
-							GetterUtil.getStringValues(
-								propertyValue,
-								new String[] {String.valueOf(propertyValue)})) {
-
-						emitter.emit(
-							_getNotificationRecipientEvaluatorKey(
-								scriptingLanguage,
-								ClassUtil.getClassName(
-									notificationRecipientEvaluator)));
-					}
-				}
-				catch (KaleoDefinitionValidationException
-							kaleoDefinitionValidationException) {
-
-					throw new RuntimeException(
-						kaleoDefinitionValidationException);
-				}
-				finally {
-					bundleContext.ungetService(serviceReference);
-				}
-			});
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
-	}
-
-	private Map<String, ?> _evaluate(
-			KaleoNotificationRecipient kaleoNotificationRecipient,
-			ExecutionContext executionContext)
-		throws Exception {
-
-		String notificationRecipientEvaluatorKey =
-			_getNotificationRecipientEvaluatorKey(
-				kaleoNotificationRecipient.getRecipientScriptLanguage(),
-				kaleoNotificationRecipient.getRecipientScript());
-
-		NotificationRecipientEvaluator notificationRecipientEvaluator =
-			_serviceTrackerMap.getService(notificationRecipientEvaluatorKey);
-
-		if (notificationRecipientEvaluator == null) {
-			throw new IllegalArgumentException(
-				"No notification recipient evaluator for script language " +
-					notificationRecipientEvaluatorKey);
-		}
-
-		return notificationRecipientEvaluator.evaluate(
-			kaleoNotificationRecipient, executionContext);
-	}
-
-	private String _getNotificationRecipientEvaluatorKey(
-			String language, String notificationRecipientEvaluatorClassName)
-		throws KaleoDefinitionValidationException {
-
-		ScriptLanguage scriptLanguage = ScriptLanguage.parse(language);
-
-		if (scriptLanguage.equals(ScriptLanguage.JAVA)) {
-			return language + StringPool.COLON +
-				notificationRecipientEvaluatorClassName;
-		}
-
-		return language;
-	}
+	@Reference(target = "(!(scripting.language=*))")
+	private NotificationRecipientEvaluator _notificationRecipientEvaluator;
 
 	@Reference
 	private RoleNotificationRecipientBuilder _roleNotificationRecipientBuilder;
-
-	private ServiceTrackerMap<String, NotificationRecipientEvaluator>
-		_serviceTrackerMap;
 
 }

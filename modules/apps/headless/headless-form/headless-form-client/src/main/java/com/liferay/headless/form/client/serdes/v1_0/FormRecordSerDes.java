@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -58,7 +59,7 @@ public class FormRecordSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (formRecord.getCreator() != null) {
 			if (sb.length() > 1) {
@@ -184,7 +185,7 @@ public class FormRecordSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (formRecord.getCreator() == null) {
 			map.put("creator", null);
@@ -302,18 +303,14 @@ public class FormRecordSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "formFieldValues")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					FormFieldValue[] formFieldValuesArray =
-						new FormFieldValue[jsonParserFieldValues.length];
-
-					for (int i = 0; i < formFieldValuesArray.length; i++) {
-						formFieldValuesArray[i] = FormFieldValueSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					formRecord.setFormFieldValues(formFieldValuesArray);
+					formRecord.setFormFieldValues(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> FormFieldValueSerDes.toDTO((String)object)
+						).toArray(
+							size -> new FormFieldValue[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "formId")) {

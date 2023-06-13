@@ -16,6 +16,7 @@ package com.liferay.nested.portlets.web.internal.portlet.action;
 
 import com.liferay.nested.portlets.web.internal.constants.NestedPortletsPortletKeys;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTemplate;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
@@ -42,6 +43,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -52,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + NestedPortletsPortletKeys.NESTED_PORTLETS,
 	service = ConfigurationAction.class
 )
@@ -78,7 +81,7 @@ public class NestedPortletsConfigurationAction
 			String portletResource = ParamUtil.getString(
 				actionRequest, "portletResource");
 
-			_reorganizeNestedColumns(
+			reorganizeNestedColumns(
 				actionRequest, portletResource, layoutTemplateId,
 				oldLayoutTemplateId);
 		}
@@ -86,7 +89,16 @@ public class NestedPortletsConfigurationAction
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	private List<String> _getColumnNames(String content, String portletId) {
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.nested.portlets.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	protected List<String> getColumnNames(String content, String portletId) {
 		Matcher matcher = _pattern.matcher(content);
 
 		Set<String> columnIds = new HashSet<>();
@@ -110,10 +122,10 @@ public class NestedPortletsConfigurationAction
 		return new ArrayList<>(columnNames);
 	}
 
-	private void _reorganizeNestedColumns(
+	protected void reorganizeNestedColumns(
 			ActionRequest actionRequest, String portletResource,
 			String newLayoutTemplateId, String oldLayoutTemplateId)
-		throws Exception {
+		throws PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -124,23 +136,21 @@ public class NestedPortletsConfigurationAction
 
 		Theme theme = themeDisplay.getTheme();
 
+		LayoutTemplate newLayoutTemplate =
+			_layoutTemplateLocalService.getLayoutTemplate(
+				newLayoutTemplateId, false, theme.getThemeId());
+
+		List<String> newColumns = getColumnNames(
+			newLayoutTemplate.getContent(), portletResource);
+
 		LayoutTemplate oldLayoutTemplate =
 			_layoutTemplateLocalService.getLayoutTemplate(
 				oldLayoutTemplateId, false, theme.getThemeId());
 
-		if (oldLayoutTemplate != null) {
-			LayoutTemplate newLayoutTemplate =
-				_layoutTemplateLocalService.getLayoutTemplate(
-					newLayoutTemplateId, false, theme.getThemeId());
+		List<String> oldColumns = getColumnNames(
+			oldLayoutTemplate.getContent(), portletResource);
 
-			List<String> newColumns = _getColumnNames(
-				newLayoutTemplate.getContent(), portletResource);
-
-			List<String> oldColumns = _getColumnNames(
-				oldLayoutTemplate.getContent(), portletResource);
-
-			layoutTypePortlet.reorganizePortlets(newColumns, oldColumns);
-		}
+		layoutTypePortlet.reorganizePortlets(newColumns, oldColumns);
 
 		layoutTypePortlet.setStateMax(StringPool.BLANK);
 
@@ -149,13 +159,24 @@ public class NestedPortletsConfigurationAction
 			layout.getTypeSettings());
 	}
 
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutTemplateLocalService(
+		LayoutTemplateLocalService layoutTemplateLocalService) {
+
+		_layoutTemplateLocalService = layoutTemplateLocalService;
+	}
+
 	private static final Pattern _pattern = Pattern.compile(
 		"processColumn[(]\"(.*?)\"(?:, *\"(?:.*?)\")?[)]", Pattern.DOTALL);
 
-	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
 	private LayoutTemplateLocalService _layoutTemplateLocalService;
 
 	@Reference

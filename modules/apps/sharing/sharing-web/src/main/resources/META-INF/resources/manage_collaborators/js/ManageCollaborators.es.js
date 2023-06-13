@@ -21,7 +21,7 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClaySticker from '@clayui/sticker';
 import {useTimeout} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
-import {fetch, getOpener, objectToFormData, sub} from 'frontend-js-web';
+import {fetch, objectToFormData} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
@@ -67,7 +67,7 @@ const ManageCollaborators = ({
 	};
 
 	const closeDialog = () => {
-		getOpener().Liferay.fire('closeModal', {
+		Liferay.Util.getOpener().Liferay.fire('closeModal', {
 			id: 'sharingDialog',
 		});
 	};
@@ -103,7 +103,7 @@ const ManageCollaborators = ({
 	};
 
 	const getTooltipDate = (expirationDate) => {
-		return sub(
+		return Liferay.Util.sub(
 			Liferay.Language.get('until-x'),
 			new Date(expirationDate).toLocaleDateString(
 				Liferay.ThemeDisplay.getBCP47LanguageId()
@@ -138,7 +138,7 @@ const ManageCollaborators = ({
 
 		setCurrentCollaborators(
 			currentCollaborators.filter(
-				(collaborator) => collaborator.userId !== collaboratorId
+				(collaborator) => collaborator.userId != collaboratorId
 			)
 		);
 
@@ -224,7 +224,7 @@ const ManageCollaborators = ({
 	};
 
 	const showNotification = (message, error) => {
-		const parentOpenToast = getOpener().Liferay.Util.openToast;
+		const parentOpenToast = Liferay.Util.getOpener().Liferay.Util.openToast;
 
 		const openToastParams = {
 			message,
@@ -429,7 +429,6 @@ const ManageCollaborators = ({
 							/>
 						</ClayLayout.ContentCol>
 					</ClayLayout.ContentRow>
-
 					<div
 						className={classNames({
 							hide: userId !== expandedCollaboratorId,
@@ -542,7 +541,6 @@ const ManageCollaborators = ({
 								<h3>
 									{Liferay.Language.get('no-collaborators')}
 								</h3>
-
 								<p>
 									{Liferay.Language.get(
 										'to-add-collaborators-share-the-file-again'
@@ -563,14 +561,12 @@ const ManageCollaborators = ({
 						>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
-
 						<ClayButton
 							disabled={loadingResponse || expirationDateError}
 							displayType="primary"
 							onClick={handleSaveButtonClick}
 						>
 							{loadingResponse && <ClayLoadingIndicator />}
-
 							{Liferay.Language.get('save')}
 						</ClayButton>
 					</ClayButton.Group>

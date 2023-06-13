@@ -202,7 +202,10 @@ public class ServletContextUtil {
 						String jarEntryName = jarEntry.getName();
 
 						if (jarEntryName.endsWith(_EXT_CLASS)) {
-							classNames.add(_getClassName(null, jarEntryName));
+							String className = _getClassName(
+								null, jarEntryName);
+
+							classNames.add(className);
 						}
 					}
 				}
@@ -260,7 +263,7 @@ public class ServletContextUtil {
 					}
 					catch (IOException ioException) {
 						if (_log.isDebugEnabled()) {
-							_log.debug(ioException);
+							_log.debug(ioException, ioException);
 						}
 					}
 				}

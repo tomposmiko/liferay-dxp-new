@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.shop.by.diagram.service;
 
-import com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -28,10 +27,6 @@ public class CSDiagramSettingServiceWrapper
 	implements CSDiagramSettingService,
 			   ServiceWrapper<CSDiagramSettingService> {
 
-	public CSDiagramSettingServiceWrapper() {
-		this(null);
-	}
-
 	public CSDiagramSettingServiceWrapper(
 		CSDiagramSettingService csDiagramSettingService) {
 
@@ -39,9 +34,10 @@ public class CSDiagramSettingServiceWrapper
 	}
 
 	@Override
-	public CSDiagramSetting addCSDiagramSetting(
-			long cpDefinitionId, long cpAttachmentFileEntryId, String color,
-			double radius, String type)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting
+			addCSDiagramSetting(
+				long cpDefinitionId, long cpAttachmentFileEntryId, String color,
+				double radius, String type)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramSettingService.addCSDiagramSetting(
@@ -49,8 +45,8 @@ public class CSDiagramSettingServiceWrapper
 	}
 
 	@Override
-	public CSDiagramSetting fetchCSDiagramSettingByCPDefinitionId(
-			long cpDefinitionId)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting
+			fetchCSDiagramSettingByCPDefinitionId(long cpDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramSettingService.fetchCSDiagramSettingByCPDefinitionId(
@@ -58,15 +54,16 @@ public class CSDiagramSettingServiceWrapper
 	}
 
 	@Override
-	public CSDiagramSetting getCSDiagramSetting(long csDiagramSettingId)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting
+			getCSDiagramSetting(long csDiagramSettingId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramSettingService.getCSDiagramSetting(csDiagramSettingId);
 	}
 
 	@Override
-	public CSDiagramSetting getCSDiagramSettingByCPDefinitionId(
-			long cpDefinitionId)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting
+			getCSDiagramSettingByCPDefinitionId(long cpDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramSettingService.getCSDiagramSettingByCPDefinitionId(
@@ -84,9 +81,10 @@ public class CSDiagramSettingServiceWrapper
 	}
 
 	@Override
-	public CSDiagramSetting updateCSDiagramSetting(
-			long csDiagramSettingId, long cpAttachmentFileEntryId, String color,
-			double radius, String type)
+	public com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting
+			updateCSDiagramSetting(
+				long csDiagramSettingId, long cpAttachmentFileEntryId,
+				String color, double radius, String type)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _csDiagramSettingService.updateCSDiagramSetting(

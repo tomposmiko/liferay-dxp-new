@@ -19,9 +19,9 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.change.tracking.spi.display.BaseCTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Cheryl Tang
  */
-@Component(service = CTDisplayRenderer.class)
+@Component(immediate = true, service = CTDisplayRenderer.class)
 public class AssetCategoryCTDisplayRenderer
 	extends BaseCTDisplayRenderer<AssetCategory> {
 
@@ -74,7 +74,7 @@ public class AssetCategoryCTDisplayRenderer
 				AssetCategoriesAdminPortletKeys.ASSET_CATEGORIES_ADMIN, 0, 0,
 				PortletRequest.RENDER_PHASE)
 		).setMVCPath(
-			"/edit_asset_category.jsp"
+			"/edit_category.jsp"
 		).setRedirect(
 			_portal.getCurrentURL(httpServletRequest)
 		).setParameter(

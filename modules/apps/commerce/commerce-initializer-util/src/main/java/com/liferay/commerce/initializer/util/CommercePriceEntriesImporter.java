@@ -38,7 +38,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.SystemSettingsLocator;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 
 import java.math.BigDecimal;
 
@@ -52,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommercePriceEntriesImporter.class)
+@Component(enabled = false, service = CommercePriceEntriesImporter.class)
 public class CommercePriceEntriesImporter {
 
 	public void importBaseCommercePriceListEntries(
@@ -157,7 +157,7 @@ public class CommercePriceEntriesImporter {
 		String name = jsonObject.getString("priceList");
 
 		String priceListExternalReferenceCode =
-			_friendlyURLNormalizer.normalize(name);
+			FriendlyURLNormalizerUtil.normalize(name);
 
 		CommercePriceList commercePriceList =
 			_commercePriceListLocalService.fetchByExternalReferenceCode(
@@ -168,8 +168,9 @@ public class CommercePriceEntriesImporter {
 				"No price list found with name " + name);
 		}
 
-		String externalReferenceCode = jsonObject.getString(
-			"externalReferenceCode");
+		String sku = jsonObject.getString("sku");
+
+		String externalReferenceCode = FriendlyURLNormalizerUtil.normalize(sku);
 
 		CPInstance cpInstance =
 			_cpInstanceLocalService.fetchByExternalReferenceCode(
@@ -177,8 +178,7 @@ public class CommercePriceEntriesImporter {
 
 		if (cpInstance == null) {
 			throw new NoSuchCPInstanceException(
-				"No CP instance found with external reference code " +
-					externalReferenceCode);
+				"No cpInstance found with sku " + sku);
 		}
 
 		CommercePriceEntry commercePriceEntry =
@@ -220,9 +220,6 @@ public class CommercePriceEntriesImporter {
 
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
-
-	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
 
 	@Reference
 	private UserLocalService _userLocalService;

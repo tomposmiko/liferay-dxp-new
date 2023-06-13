@@ -22,23 +22,19 @@ JournalArticle article = journalDisplayContext.getArticle();
 JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalEditArticleDisplayContext(request, liferayPortletResponse, article);
 %>
 
-<c:if test="<%= Validator.isNotNull(journalEditArticleDisplayContext.getFriendlyURLDuplicatedWarningMessage()) %>">
-	<clay:alert
-		dismissible="<%= true %>"
-		displayType="warning"
-		message="<%= journalEditArticleDisplayContext.getFriendlyURLDuplicatedWarningMessage() %>"
-	/>
-</c:if>
-
 <p class="text-secondary"><liferay-ui:message key="changing-the-friendly-url-will-affect-all-web-content-article-versions-even-when-saving-it-as-a-draft" /></p>
 
 <p class="text-secondary"><liferay-ui:message key="the-friendly-url-may-be-modified-to-ensure-uniqueness" /></p>
 
-<liferay-friendly-url:input
-	className="<%= JournalArticle.class.getName() %>"
-	classPK="<%= (article == null) || (article.getPrimaryKey() == 0) ? 0 : article.getResourcePrimKey() %>"
-	inputAddon="<%= journalEditArticleDisplayContext.getFriendlyURLBase() %>"
+<p class="mb-2 text-secondary">
+	<%= journalEditArticleDisplayContext.getFriendlyURLBase() %>
+</p>
+
+<liferay-ui:input-localized
+	availableLocales="<%= journalEditArticleDisplayContext.getAvailableLocales() %>"
+	defaultLanguageId="<%= journalEditArticleDisplayContext.getDefaultArticleLanguageId() %>"
+	maxLength='<%= String.valueOf(ModelHintsUtil.getMaxLength(JournalArticle.class.getName(), "urlTitle")) %>'
 	name="friendlyURL"
-	showHistory="<%= false %>"
-	showLabel="<%= false %>"
+	selectedLanguageId="<%= journalEditArticleDisplayContext.getSelectedLanguageId() %>"
+	xml="<%= (article != null) ? HttpUtil.decodeURL(article.getFriendlyURLsXML()) : StringPool.BLANK %>"
 />

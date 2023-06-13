@@ -28,11 +28,11 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
-import com.liferay.portal.kernel.image.ImageTool;
+import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
@@ -47,9 +47,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -58,6 +61,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/get_available_image_configurations"
@@ -76,23 +80,19 @@ public class GetAvailableImageConfigurationsMVCResourceCommand
 
 		FileEntry fileEntry = _dlAppService.getFileEntry(fileEntryId);
 
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
+			resourceRequest);
+		Image image = ImageToolUtil.getImage(fileEntry.getContentStream());
+
 		JSONArray jsonArray = JSONUtil.put(
 			JSONUtil.put(
-				"label",
-				_language.get(
-					_portal.getHttpServletRequest(resourceRequest), "auto")
+				"label", LanguageUtil.get(httpServletRequest, "auto")
 			).put(
 				"size", fileEntry.getSize() / 1000
 			).put(
 				"value", "auto"
 			).put(
-				"width",
-				() -> {
-					Image image = _imageTool.getImage(
-						fileEntry.getContentStream());
-
-					return image.getWidth();
-				}
+				"width", image.getWidth()
 			));
 
 		Map<String, String> mediaQueriesMap = new HashMap<>();
@@ -142,12 +142,16 @@ public class GetAvailableImageConfigurationsMVCResourceCommand
 				"width", amImageEntry.getWidth()
 			);
 
-			AMImageConfigurationEntry amImageConfigurationEntry =
-				_amImageConfigurationHelper.getAMImageConfigurationEntry(
-					fileEntry.getCompanyId(),
-					amImageEntry.getConfigurationUuid());
+			Optional<AMImageConfigurationEntry>
+				amImageConfigurationEntryOptional =
+					_amImageConfigurationHelper.getAMImageConfigurationEntry(
+						fileEntry.getCompanyId(),
+						amImageEntry.getConfigurationUuid());
 
-			if (amImageConfigurationEntry != null) {
+			if (amImageConfigurationEntryOptional.isPresent()) {
+				AMImageConfigurationEntry amImageConfigurationEntry =
+					amImageConfigurationEntryOptional.get();
+
 				URI uri = _amImageURLFactory.createFileEntryURL(
 					fileEntry.getFileVersion(), amImageConfigurationEntry);
 
@@ -176,12 +180,6 @@ public class GetAvailableImageConfigurationsMVCResourceCommand
 
 	@Reference
 	private DLAppService _dlAppService;
-
-	@Reference
-	private ImageTool _imageTool;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private MediaQueryProvider _mediaQueryProvider;

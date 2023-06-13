@@ -18,29 +18,29 @@
 YUI.add(
 	'liferay-browser-selectors',
 	(A) => {
-		const REGEX_VERSION_DOT = /\./g;
+		var REGEX_VERSION_DOT = /\./g;
 
-		const YUI3_JS_ENABLED = 'yui3-js-enabled';
+		var YUI3_JS_ENABLED = 'yui3-js-enabled';
 
-		const parseVersionNumber = function (str) {
-			let count = 0;
+		var parseVersionNumber = function (str) {
+			var count = 0;
 
 			return parseFloat(
 				str.replace(REGEX_VERSION_DOT, () => {
-					return count++ === 1 ? '' : '.';
+					return count++ == 1 ? '' : '.';
 				})
 			);
 		};
 
-		const DEFAULTS_VERSION = ['0', '0'];
+		var DEFAULTS_VERSION = ['0', '0'];
 
-		const getVersion = function (regex, userAgent) {
-			const version = (userAgent.match(regex) || DEFAULTS_VERSION)[1];
+		var getVersion = function (regex, userAgent) {
+			var version = (userAgent.match(regex) || DEFAULTS_VERSION)[1];
 
 			return parseVersionNumber(version);
 		};
 
-		const BROWSERS = [
+		var BROWSERS = [
 			'ie',
 			'opera',
 			'chrome',
@@ -56,24 +56,24 @@ YUI.add(
 			'safari',
 		];
 
-		const MAP_OS_SELECTORS = {
+		var MAP_OS_SELECTORS = {
 			macintosh: 'mac',
 			windows: 'win',
 		};
 
-		const nav = navigator;
+		var nav = navigator;
 
-		const CONFIG = A.config;
+		var CONFIG = A.config;
 
-		const DOC = CONFIG.doc;
+		var DOC = CONFIG.doc;
 
-		const userAgent = nav.userAgent;
+		var userAgent = nav.userAgent;
 
-		const UA = A.UA;
+		var UA = A.UA;
 
-		const OS = UA.os;
+		var OS = UA.os;
 
-		const UAX = {
+		var UAX = {
 			agent: userAgent,
 
 			aol: 0,
@@ -88,11 +88,11 @@ YUI.add(
 			safari: 0,
 		};
 
-		UAX.mac = OS === 'macintosh';
-		UAX.rhino = OS === 'rhino';
-		UAX.win = OS === 'windows';
+		UAX.mac = OS == 'macintosh';
+		UAX.rhino = OS == 'rhino';
+		UAX.win = OS == 'windows';
 
-		const BrowserSelectors = {
+		var BrowserSelectors = {
 			getSelectors() {
 
 				// The methods in this if block only run once across all instances
@@ -108,7 +108,7 @@ YUI.add(
 							userAgent
 						);
 
-						const docMode = DOC.documentMode;
+						var docMode = DOC.documentMode;
 
 						if (docMode) {
 							UA.browser = UA.ie;
@@ -145,8 +145,8 @@ YUI.add(
 					}
 
 					if (!UAX.win && !UAX.mac) {
-						const linux = /Linux/.test(userAgent);
-						const sun = /Solaris|SunOS/.test(userAgent);
+						var linux = /Linux/.test(userAgent);
+						var sun = /Solaris|SunOS/.test(userAgent);
 
 						if (linux) {
 							UA.os = 'linux';
@@ -158,27 +158,27 @@ YUI.add(
 						}
 					}
 
-					const touch = UA.touchEnabled;
+					var touch = UA.touchEnabled;
 
 					UAX.touch = touch;
 					UAX.touchMobile = touch && !!UA.mobile;
 
 					A.mix(UA, UAX);
 
-					const browserList = [];
-					let versionMajor = 0;
+					var browserList = [];
+					var versionMajor = 0;
 
-					let browser;
-					let uaVersionMajor;
-					let uaVersionMinor;
-					let version;
+					var browser;
+					var uaVersionMajor;
+					var uaVersionMinor;
+					var version;
 
-					const versionObj = {
+					var versionObj = {
 						major: versionMajor,
 						string: '',
 					};
 
-					let i = BROWSERS.length;
+					var i = BROWSERS.length;
 
 					while (i--) {
 						browser = BROWSERS[i];
@@ -237,9 +237,9 @@ YUI.add(
 					 * Browser selectors
 					 */
 
-					const selectors = [UA.renderer, 'js'].concat(browserList);
+					var selectors = [UA.renderer, 'js'].concat(browserList);
 
-					const osSelector = MAP_OS_SELECTORS[UA.os] || UA.os;
+					var osSelector = MAP_OS_SELECTORS[UA.os] || UA.os;
 
 					selectors.push(osSelector);
 
@@ -257,8 +257,8 @@ YUI.add(
 
 					UA.selectors = selectors.join(' ');
 
-					let svg;
-					let vml;
+					var svg;
+					var vml;
 
 					vml = !(svg = !!(
 						CONFIG.win.SVGAngle ||
@@ -269,19 +269,17 @@ YUI.add(
 					));
 
 					if (vml) {
-						let div = DOC.createElement('div');
+						var behaviorObj;
+						var div = DOC.createElement('div');
 
 						div.innerHTML = '<v:shape adj="1"/>';
 
-						const behaviorObj = div.firstChild;
+						behaviorObj = div.firstChild;
 
 						behaviorObj.style.behavior = 'url(#default#VML)';
 
 						if (
-							!(
-								behaviorObj &&
-								typeof behaviorObj.adj === 'object'
-							)
+							!(behaviorObj && typeof behaviorObj.adj == 'object')
 						) {
 							vml = false;
 						}
@@ -300,9 +298,9 @@ YUI.add(
 			},
 
 			run() {
-				const documentElement = DOC.documentElement;
+				var documentElement = DOC.documentElement;
 
-				let selectors = this.getSelectors();
+				var selectors = this.getSelectors();
 
 				UA.dir = documentElement.getAttribute('dir') || 'ltr';
 

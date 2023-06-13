@@ -15,7 +15,7 @@
 package com.liferay.fragment.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentPortletKeys;
-import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/edit_fragment_entry"
@@ -54,7 +55,7 @@ public class EditFragmentEntryMVCRenderCommand implements MVCRenderCommand {
 				renderRequest, "fragmentEntryKey");
 
 			fragmentEntry =
-				_fragmentCollectionContributorRegistry.getFragmentEntry(
+				_fragmentCollectionContributorTracker.getFragmentEntry(
 					fragmentEntryKey);
 		}
 
@@ -66,8 +67,8 @@ public class EditFragmentEntryMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	@Reference
-	private FragmentCollectionContributorRegistry
-		_fragmentCollectionContributorRegistry;
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
 	private FragmentEntryLocalService _fragmentEntryLocalService;

@@ -45,8 +45,7 @@ public class LayoutSegmentsExperienceInfoItemFieldValuesUpdater
 		InfoItemFieldValues infoItemFieldValues) {
 
 		_layoutInfoItemFieldValuesUpdaterHelper.updateFromInfoItemFieldValues(
-			_getLayout(segmentsExperience), infoItemFieldValues,
-			segmentsExperience.getSegmentsExperienceId());
+			_getLayout(segmentsExperience), infoItemFieldValues);
 
 		return segmentsExperience;
 	}
@@ -62,7 +61,7 @@ public class LayoutSegmentsExperienceInfoItemFieldValuesUpdater
 	private Layout _getLayout(SegmentsExperience segmentsExperience) {
 		try {
 			Layout layout = _layoutLocalService.getLayout(
-				segmentsExperience.getPlid());
+				segmentsExperience.getClassPK());
 
 			if (layout.isDraftLayout()) {
 				return layout;

@@ -18,16 +18,15 @@ import com.liferay.message.boards.constants.MBThreadConstants;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
 
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Ambrín Chaudhary
@@ -65,9 +64,10 @@ public class CKEditorBBCodeConfigContributor
 			"format_tags", "p;pre"
 		).put(
 			"imagesPath",
-			_html.escape(themeDisplay.getPathThemeImages()) + "/message_boards/"
+			HtmlUtil.escape(themeDisplay.getPathThemeImages()) +
+				"/message_boards/"
 		).put(
-			"lang", _getLangJSONObject(inputEditorTaglibAttributes)
+			"lang", getLangJSONObject(inputEditorTaglibAttributes)
 		).put(
 			"newThreadURL", MBThreadConstants.NEW_THREAD_URL
 		).put(
@@ -83,26 +83,20 @@ public class CKEditorBBCodeConfigContributor
 			toJSONArray(BBCodeTranslatorUtil.getEmoticonFiles())
 		).put(
 			"smiley_path",
-			_html.escape(themeDisplay.getPathThemeImages()) + "/emoticons/"
+			HtmlUtil.escape(themeDisplay.getPathThemeImages()) + "/emoticons/"
 		).put(
 			"smiley_symbols",
 			toJSONArray(BBCodeTranslatorUtil.getEmoticonSymbols())
 		);
 	}
 
-	private JSONObject _getLangJSONObject(
+	protected JSONObject getLangJSONObject(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
 		return JSONUtil.put(
 			"code",
-			_language.get(
+			LanguageUtil.get(
 				getContentsLocale(inputEditorTaglibAttributes), "code"));
 	}
-
-	@Reference
-	private Html _html;
-
-	@Reference
-	private Language _language;
 
 }

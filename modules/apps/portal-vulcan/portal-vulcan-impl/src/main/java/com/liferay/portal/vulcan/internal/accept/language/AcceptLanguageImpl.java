@@ -120,13 +120,6 @@ public class AcceptLanguageImpl implements AcceptLanguage {
 
 	@Override
 	public boolean isAcceptAllLanguages() {
-		String acceptAllLanguages = _httpServletRequest.getHeader(
-			"X-Liferay-Accept-All-Languages");
-
-		if (acceptAllLanguages != null) {
-			return GetterUtil.getBoolean(acceptAllLanguages);
-		}
-
 		return GetterUtil.getBoolean(
 			_httpServletRequest.getHeader("X-Accept-All-Languages"));
 	}

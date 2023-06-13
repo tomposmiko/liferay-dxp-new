@@ -80,7 +80,7 @@ public abstract class BaseMBMessageDemoDataCreator
 			}
 			catch (NoSuchMessageException noSuchMessageException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(noSuchMessageException);
+					_log.warn(noSuchMessageException, noSuchMessageException);
 				}
 			}
 
@@ -88,12 +88,20 @@ public abstract class BaseMBMessageDemoDataCreator
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setMBMessageLocalService(
+		MBMessageLocalService mbMessageLocalService) {
+
+		this.mbMessageLocalService = mbMessageLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		this.userLocalService = userLocalService;
+	}
+
 	protected MBMessageLocalService mbMessageLocalService;
-
 	protected final List<Long> messageIds = new CopyOnWriteArrayList<>();
-
-	@Reference
 	protected UserLocalService userLocalService;
 
 	private static final Log _log = LogFactoryUtil.getLog(

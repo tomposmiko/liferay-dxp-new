@@ -48,6 +48,16 @@ public class ReplicasClusterListener
 		}
 	}
 
+	protected int getNumberOfReplicas() {
+		int liferayClusterSize = _replicasClusterContext.getClusterSize();
+
+		if (liferayClusterSize > 0) {
+			return liferayClusterSize - 1;
+		}
+
+		return 0;
+	}
+
 	protected synchronized void updateNumberOfReplicas() {
 		if (!_replicasClusterContext.isEmbeddedOperationMode()) {
 			return;
@@ -58,7 +68,7 @@ public class ReplicasClusterListener
 				_replicasClusterContext.getReplicasManager();
 
 			replicasManager.updateNumberOfReplicas(
-				_getNumberOfReplicas(),
+				getNumberOfReplicas(),
 				_replicasClusterContext.getTargetIndexNames());
 		}
 		catch (Exception exception) {
@@ -66,16 +76,6 @@ public class ReplicasClusterListener
 				_log.warn("Unable to update number of replicas", exception);
 			}
 		}
-	}
-
-	private int _getNumberOfReplicas() {
-		int liferayClusterSize = _replicasClusterContext.getClusterSize();
-
-		if (liferayClusterSize > 0) {
-			return liferayClusterSize - 1;
-		}
-
-		return 0;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

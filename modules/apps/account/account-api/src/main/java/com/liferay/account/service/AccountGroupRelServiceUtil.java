@@ -14,9 +14,6 @@
 
 package com.liferay.account.service;
 
-import com.liferay.account.model.AccountGroupRel;
-import com.liferay.portal.kernel.exception.PortalException;
-
 /**
  * Provides the remote service utility for AccountGroupRel. This utility wraps
  * <code>com.liferay.account.service.impl.AccountGroupRelServiceImpl</code> and is an
@@ -36,49 +33,13 @@ public class AccountGroupRelServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.account.service.impl.AccountGroupRelServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static AccountGroupRel addAccountGroupRel(
-			long accountGroupId, String className, long classPK)
-		throws PortalException {
-
-		return getService().addAccountGroupRel(
-			accountGroupId, className, classPK);
-	}
-
-	public static void addAccountGroupRels(
-			long accountGroupId, String className, long[] classPKs)
-		throws PortalException {
-
-		getService().addAccountGroupRels(accountGroupId, className, classPKs);
-	}
-
-	public static AccountGroupRel deleteAccountGroupRel(long accountGroupRelId)
-		throws PortalException {
-
-		return getService().deleteAccountGroupRel(accountGroupRelId);
-	}
-
-	public static void deleteAccountGroupRels(
-			long accountGroupId, String className, long[] classPKs)
-		throws PortalException {
-
-		getService().deleteAccountGroupRels(
-			accountGroupId, className, classPKs);
-	}
-
-	public static AccountGroupRel fetchAccountGroupRel(
-			long accountGroupId, String className, long classPK)
-		throws PortalException {
-
-		return getService().fetchAccountGroupRel(
-			accountGroupId, className, classPK);
-	}
 
 	/**
 	 * Returns the OSGi service identifier.
 	 *
 	 * @return the OSGi service identifier
 	 */
-	public static String getOSGiServiceIdentifier() {
+	public static java.lang.String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
 	}
 

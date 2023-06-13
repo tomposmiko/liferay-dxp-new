@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.document.library.model.impl.DLStorageQuotaImpl",
-		"table.name=DLStorageQuota"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		DLStorageQuotaModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class DLStorageQuotaModelArgumentsResolver implements ArgumentsResolver {
 

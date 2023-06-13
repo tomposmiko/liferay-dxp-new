@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.model.ListTypeConstants;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -39,22 +40,17 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Michael C. Han
@@ -71,6 +67,16 @@ public class AssetTagLocalServiceTest {
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
+
+		_organizationIndexer = IndexerRegistryUtil.getIndexer(
+			Organization.class);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		if (_organizationIndexer != null) {
+			IndexerRegistryUtil.register(_organizationIndexer);
+		}
 	}
 
 	@Test(expected = DuplicateTagException.class)
@@ -111,20 +117,26 @@ public class AssetTagLocalServiceTest {
 
 	@Test
 	public void testAddTag() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTag assetTag = AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(), "tag",
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 
 		Assert.assertEquals("tag", assetTag.getName());
 	}
 
 	@Test(expected = AssetTagNameException.class)
 	public void testAddTagWithEmptyName() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(), StringPool.BLANK,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 	}
 
 	@Test(expected = AssetTagException.class)
@@ -143,38 +155,50 @@ public class AssetTagLocalServiceTest {
 
 	@Test
 	public void testAddTagWithMultipleWords() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTag tag = AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(), "tag name",
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 
 		Assert.assertEquals("tag name", tag.getName());
 	}
 
 	@Test(expected = AssetTagNameException.class)
 	public void testAddTagWithNullName() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(), null,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 	}
 
 	@Test(expected = AssetTagNameException.class)
 	public void testAddTagWithOnlySpacesInName() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(), StringPool.SPACE,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 	}
 
 	@Test
 	public void testAddTagWithPermittedSpecialCharacter()
 		throws PortalException {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(), "-_^()!$",
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 	}
 
 	@Test
@@ -196,10 +220,13 @@ public class AssetTagLocalServiceTest {
 
 	@Test
 	public void testAddUTF8FormattedTags() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTag assetTag = AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(), "標籤名稱",
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			serviceContext);
 
 		Assert.assertEquals("標籤名稱", assetTag.getName());
 	}
@@ -229,25 +256,17 @@ public class AssetTagLocalServiceTest {
 		testAssetIndexer.setExpectedValues(
 			Organization.class.getName(), _organization.getOrganizationId());
 
-		Bundle bundle = FrameworkUtil.getBundle(getClass());
-
-		BundleContext bundleContext = bundle.getBundleContext();
-
-		ServiceRegistration<?> serviceRegistration =
-			bundleContext.registerService(
-				Indexer.class, testAssetIndexer,
-				MapUtil.singletonDictionary(
-					"service.ranking", Integer.MAX_VALUE));
-
-		try {
-			AssetTagLocalServiceUtil.deleteTag(assetTag);
-
-			Assert.assertNull(
-				AssetTagLocalServiceUtil.fetchAssetTag(assetTag.getTagId()));
+		if (_organizationIndexer == null) {
+			_organizationIndexer = IndexerRegistryUtil.getIndexer(
+				Organization.class);
 		}
-		finally {
-			serviceRegistration.unregister();
-		}
+
+		IndexerRegistryUtil.register(testAssetIndexer);
+
+		AssetTagLocalServiceUtil.deleteTag(assetTag);
+
+		Assert.assertNull(
+			AssetTagLocalServiceUtil.fetchAssetTag(assetTag.getTagId()));
 	}
 
 	@Test
@@ -273,11 +292,13 @@ public class AssetTagLocalServiceTest {
 	public void testIncrementAssetCountWithAssetTagNameGreaterThan75()
 		throws PortalException {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		AssetTagLocalServiceUtil.addTag(
 			TestPropsValues.getUserId(), _group.getGroupId(),
-			RandomTestUtil.randomString(100),
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			RandomTestUtil.randomString(100), serviceContext);
 	}
 
 	@DeleteAfterTestRun
@@ -285,5 +306,7 @@ public class AssetTagLocalServiceTest {
 
 	@DeleteAfterTestRun
 	private Organization _organization;
+
+	private Indexer<Organization> _organizationIndexer;
 
 }

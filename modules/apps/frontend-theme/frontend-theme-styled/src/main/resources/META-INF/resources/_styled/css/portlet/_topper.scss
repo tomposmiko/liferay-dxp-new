@@ -79,6 +79,10 @@ html#{$cadmin-selector} {
 	}
 
 	.lfr-configurator-visibility {
+		@include media-breakpoint-down(sm) {
+			opacity: 0.5;
+		}
+
 		@include media-breakpoint-up(sm) {
 			.portlet {
 				&:hover,
@@ -88,6 +92,10 @@ html#{$cadmin-selector} {
 						opacity: 0.5;
 					}
 				}
+			}
+
+			.portlet-content-editable {
+				opacity: 0.5;
 			}
 		}
 	}
@@ -112,18 +120,18 @@ html#{$cadmin-selector} {
 					}
 				}
 			}
-
-			&.open {
-				> .cadmin.portlet-topper {
-					@include media-breakpoint-up(md) {
-						transition-duration: 0ms;
-					}
-				}
-			}
 		}
 	}
 
 	.controls-visible {
+		.portlet-content-editable {
+			@include media-breakpoint-down(sm) {
+				border-color: $portlet-topper-border;
+				border-top-left-radius: 0;
+				border-top-right-radius: 0;
+			}
+		}
+
 		.cadmin {
 			&.portlet-topper {
 				@include media-breakpoint-down(sm) {
@@ -143,7 +151,29 @@ html#{$cadmin-selector} {
 	margin-bottom: 10px;
 	position: relative;
 
-	.controls-visible & {
+	> .portlet-content-editable {
+		border-color: transparent;
+	}
+
+	> .portlet-topper {
+		display: none;
+
+		@include media-breakpoint-up(md) {
+			display: flex;
+			left: 0;
+			opacity: 0;
+			position: absolute;
+			right: 0;
+
+			@include transition(opacity 0.25s, transform 0.25s);
+
+			top: 0;
+		}
+	}
+}
+
+.controls-visible {
+	.portlet {
 		&:hover,
 		&.open,
 		&.focus {
@@ -163,18 +193,6 @@ html#{$cadmin-selector} {
 			}
 		}
 	}
-
-	@include media-breakpoint-up(sm) {
-		.lfr-configurator-visibility & {
-			&:hover,
-			&.focus,
-			&.open {
-				.portlet-topper {
-					opacity: 0.5;
-				}
-			}
-		}
-	}
 }
 
 .portlet-content-editable {
@@ -182,18 +200,12 @@ html#{$cadmin-selector} {
 	border-radius: $portlet-content-border-radius;
 	border-style: solid;
 	border-width: $portlet-content-border-width;
+}
 
-	.portlet > & {
-		border-color: transparent;
-	}
+// ---------- Portlet topper ----------
 
-	@include media-breakpoint-down(sm) {
-		.controls-visible & {
-			border-color: $portlet-topper-border;
-			border-top-left-radius: 0;
-			border-top-right-radius: 0;
-		}
-	}
+.portlet-actions {
+	float: right;
 }
 
 .portlet-name-text {
@@ -233,29 +245,6 @@ html#{$cadmin-selector} {
 	display: flex;
 	padding: 3px 12px 3px 24px;
 	position: relative;
-
-	.portlet > & {
-		display: none;
-
-		@include media-breakpoint-up(md) {
-			display: flex;
-			left: 0;
-			opacity: 0;
-			position: absolute;
-			right: 0;
-
-			@include transition(opacity 0.25s, transform 0.25s);
-
-			top: 0;
-		}
-	}
-
-	@include media-breakpoint-down(sm) {
-		.controls-visible & {
-			display: box;
-			display: flex;
-		}
-	}
 }
 
 .portlet-topper-toolbar {
@@ -274,8 +263,49 @@ html#{$cadmin-selector} {
 			text-decoration: none;
 		}
 	}
+}
 
-	.controls-visible & {
+.lfr-configurator-visibility {
+	@include media-breakpoint-down(sm) {
+		opacity: 0.5;
+	}
+
+	@include media-breakpoint-up(sm) {
+		.portlet {
+			&:hover,
+			&.focus,
+			&.open {
+				.portlet-topper {
+					opacity: 0.5;
+				}
+			}
+		}
+
+		.portlet-content-editable {
+			opacity: 0.5;
+		}
+	}
+}
+
+// ---------- Portlet controls in mobile ----------
+
+.controls-visible {
+	.portlet-content-editable {
+		@include media-breakpoint-down(sm) {
+			border-color: $portlet-topper-border;
+			border-top-left-radius: 0;
+			border-top-right-radius: 0;
+		}
+	}
+
+	.portlet-topper {
+		@include media-breakpoint-down(sm) {
+			display: box;
+			display: flex;
+		}
+	}
+
+	.portlet-topper-toolbar {
 		display: block;
 	}
 }

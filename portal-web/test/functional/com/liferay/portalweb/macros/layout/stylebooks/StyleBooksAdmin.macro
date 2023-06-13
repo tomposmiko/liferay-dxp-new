@@ -3,65 +3,19 @@ definition {
 	macro addStyleBooks {
 		LexiconEntry.gotoAdd();
 
-		PortletEntry.inputName(name = ${styleBookName});
+		PortletEntry.inputName(name = "${styleBookName}");
 
 		Button.clickSave();
 	}
 
-	macro deleteStyleBook {
-		StyleBooksAdmin.gotoStyleBookEllipsisItem(
-			item = "Delete",
-			styleBookName = ${styleBookName});
-
-		AssertTextEquals(
-			locator1 = "Modal#BODY",
-			value1 = "Deleting a style book is an action impossible to revert. All Style Book tokens and values will be removed and it will not be possible to recover it. Watch out for critical impact on the site's look and feel.");
-
-		Click(
-			key_text = "Delete",
-			locator1 = "Modal#MODAL_FOOTER_BUTTON");
-	}
-
 	macro gotoStyleBook {
-		LexiconCard.clickCardTitle(card = ${styleBookName});
+		LexiconCard.clickCardTitle(card = "${styleBookName}");
 	}
 
 	macro gotoStyleBookEllipsisItem {
 		LexiconCard.clickEllipsisItem(
-			card = ${styleBookName},
-			item = ${item});
-	}
-
-	macro importStyleBookFromTempFolder {
-		Click.waitForMenuToggleJSClick(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
-
-		MenuItem.click(menuItem = "Import");
-
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
-
-		var stylebookZipFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "style-book-*.zip");
-
-		UploadTempFile(
-			locator1 = "TextInput#FILE",
-			value1 = ${stylebookZipFileName});
-
-		Button.clickImport();
-
-		Alert.viewSuccessMessage();
-
-		IFrame.closeFrame();
-	}
-
-	macro markStyleBookAsDefault {
-		StyleBooksAdmin.gotoStyleBookEllipsisItem(
-			item = "Mark as Default",
-			styleBookName = ${styleBookName});
-
-		AssertConfirm(value1 = ${confirmMessage});
-
-		LexiconCard.viewCardSticker(
-			card = ${styleBookName},
-			icon = "check-circle");
+			card = "${styleBookName}",
+			item = "${item}");
 	}
 
 	macro openStyleBooksAdmin {
@@ -69,7 +23,7 @@ definition {
 	}
 
 	macro viewStyleBooksPresent {
-		LexiconCard.viewCardPresent(card = ${styleBookName});
+		LexiconCard.viewCardPresent(card = "${styleBookName}");
 	}
 
 }

@@ -213,8 +213,4 @@ public interface DDMFieldAttributeModel
 	@Override
 	public DDMFieldAttribute cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

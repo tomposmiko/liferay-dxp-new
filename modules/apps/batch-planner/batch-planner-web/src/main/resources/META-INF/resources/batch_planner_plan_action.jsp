@@ -19,7 +19,7 @@
 <%
 ResultRow resultRow = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
-BatchPlannerPlanDisplay batchPlannerPlanDisplay = (BatchPlannerPlanDisplay)resultRow.getObject();
+BatchPlannerPlan batchPlannerPlan = (BatchPlannerPlan)resultRow.getObject();
 %>
 
 <liferay-ui:icon-menu
@@ -29,66 +29,24 @@ BatchPlannerPlanDisplay batchPlannerPlanDisplay = (BatchPlannerPlanDisplay)resul
 	message="<%= StringPool.BLANK %>"
 	showWhenSingleIcon="<%= true %>"
 >
-	<c:if test="<%= batchPlannerPlanDisplay.getFailedItemsCount() > 0 %>">
-		<liferay-ui:icon
-			id='<%= "downloadErrorReport" + batchPlannerPlanDisplay.getBatchPlannerPlanId() %>'
-			message="download-error-report"
-			url="#"
-		/>
+	<portlet:renderURL var="editURL">
+		<portlet:param name="mvcRenderCommandName" value='<%= batchPlannerPlan.isExport() ? "/batch_planner/edit_export_batch_planner_plan" : "/batch_planner/edit_import_batch_planner_plan" %>' />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
+		<portlet:param name="batchPlannerPlanId" value="<%= String.valueOf(batchPlannerPlan.getBatchPlannerPlanId()) %>" />
+	</portlet:renderURL>
 
-		<liferay-frontend:component
-			context='<%=
-				HashMapBuilder.<String, Object>put(
-					"externalReferenceCode", batchPlannerPlanDisplay.getBatchPlannerPlanId()
-				).put(
-					"HTMLElementId", liferayPortletResponse.getNamespace() + "downloadErrorReport" + batchPlannerPlanDisplay.getBatchPlannerPlanId()
-				).put(
-					"type", "errorReport"
-				).build()
-			%>'
-			module="js/DownloadHelper"
-		/>
-	</c:if>
+	<liferay-ui:icon
+		message="edit"
+		url="<%= editURL %>"
+	/>
 
-	<c:if test="<%= (batchPlannerPlanDisplay.isStatusCompleted() || batchPlannerPlanDisplay.isStatusFailed()) && !batchPlannerPlanDisplay.isExport() %>">
-		<liferay-ui:icon
-			id='<%= "downloadOriginalFile" + batchPlannerPlanDisplay.getBatchPlannerPlanId() %>'
-			message="download-original-file"
-			url="#"
-		/>
+	<portlet:actionURL name="/batch_planner/delete_batch_planner_plan" var="deleteURL">
+		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
+		<portlet:param name="redirect" value="<%= currentURL %>" />
+		<portlet:param name="batchPlannerPlanId" value="<%= String.valueOf(batchPlannerPlan.getBatchPlannerPlanId()) %>" />
+	</portlet:actionURL>
 
-		<liferay-frontend:component
-			context='<%=
-				HashMapBuilder.<String, Object>put(
-					"externalReferenceCode", batchPlannerPlanDisplay.getBatchPlannerPlanId()
-				).put(
-					"HTMLElementId", liferayPortletResponse.getNamespace() + "downloadOriginalFile" + batchPlannerPlanDisplay.getBatchPlannerPlanId()
-				).put(
-					"type", "importFile"
-				).build()
-			%>'
-			module="js/DownloadHelper"
-		/>
-	</c:if>
-
-	<c:if test="<%= batchPlannerPlanDisplay.isExport() && batchPlannerPlanDisplay.isStatusCompleted() %>">
-		<liferay-ui:icon
-			id='<%= "downloadExportFile" + batchPlannerPlanDisplay.getBatchPlannerPlanId() %>'
-			message="download-file"
-			url="#"
-		/>
-
-		<liferay-frontend:component
-			context='<%=
-				HashMapBuilder.<String, Object>put(
-					"externalReferenceCode", batchPlannerPlanDisplay.getBatchPlannerPlanId()
-				).put(
-					"HTMLElementId", liferayPortletResponse.getNamespace() + "downloadExportFile" + batchPlannerPlanDisplay.getBatchPlannerPlanId()
-				).put(
-					"type", "exportFile"
-				).build()
-			%>'
-			module="js/DownloadHelper"
-		/>
-	</c:if>
+	<liferay-ui:icon-delete
+		url="<%= deleteURL %>"
+	/>
 </liferay-ui:icon-menu>

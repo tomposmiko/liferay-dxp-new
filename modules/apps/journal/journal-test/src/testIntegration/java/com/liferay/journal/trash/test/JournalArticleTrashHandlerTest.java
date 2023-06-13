@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -465,15 +464,12 @@ public class JournalArticleTrashHandlerTest
 	}
 
 	@Override
-	protected boolean isInTrashContainer(TrashedModel trashedModel) {
-		return _trashHelper.isInTrashContainer(trashedModel);
-	}
-
-	@Override
 	protected void moveBaseModelToTrash(long primaryKey) throws Exception {
+		JournalArticle article = JournalArticleLocalServiceUtil.getArticle(
+			primaryKey);
+
 		JournalArticleLocalServiceUtil.moveArticleToTrash(
-			TestPropsValues.getUserId(),
-			JournalArticleLocalServiceUtil.getArticle(primaryKey));
+			TestPropsValues.getUserId(), article);
 	}
 
 	private static final int _FOLDER_NAME_MAX_LENGTH = 100;

@@ -37,10 +37,6 @@ public class PortalSessionListener implements HttpSessionListener {
 	public void sessionCreated(HttpSessionEvent httpSessionEvent) {
 		HttpSession httpSession = httpSessionEvent.getSession();
 
-		if (_log.isDebugEnabled()) {
-			_log.debug("Session " + httpSession.getId() + " was created");
-		}
-
 		if (CompoundSessionIdSplitterUtil.hasSessionDelimiter()) {
 			httpSession = new CompoundSessionIdHttpSession(
 				httpSessionEvent.getSession());
@@ -65,10 +61,6 @@ public class PortalSessionListener implements HttpSessionListener {
 	@Override
 	public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
 		HttpSession httpSession = httpSessionEvent.getSession();
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Session " + httpSession.getId() + " was destroyed");
-		}
 
 		if (CompoundSessionIdSplitterUtil.hasSessionDelimiter()) {
 			httpSession = new CompoundSessionIdHttpSession(

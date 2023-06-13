@@ -20,7 +20,8 @@ import com.liferay.commerce.inventory.type.constants.CommerceInventoryAuditTypeC
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.service.UserLocalService;
 
 import java.util.Locale;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luca Pellizzon
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.inventory.audit.type.key=" + CommerceInventoryConstants.AUDIT_TYPE_BOOKED_QUANTITY,
 	service = CommerceInventoryAuditType.class
 )
@@ -45,7 +47,7 @@ public class BookedQuantityCommerceInventoryAuditTypeImpl
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject(context);
 
-		return _language.format(
+		return LanguageUtil.format(
 			locale, "x-placed-order-x-booking-quantity",
 			new Object[] {
 				jsonObject.get(
@@ -79,6 +81,6 @@ public class BookedQuantityCommerceInventoryAuditTypeImpl
 	private JSONFactory _jsonFactory;
 
 	@Reference
-	private Language _language;
+	private UserLocalService _userLocalService;
 
 }

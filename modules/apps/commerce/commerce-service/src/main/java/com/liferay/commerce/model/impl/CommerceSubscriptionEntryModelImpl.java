@@ -16,6 +16,7 @@ package com.liferay.commerce.model.impl;
 
 import com.liferay.commerce.model.CommerceSubscriptionEntry;
 import com.liferay.commerce.model.CommerceSubscriptionEntryModel;
+import com.liferay.commerce.model.CommerceSubscriptionEntrySoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
@@ -37,15 +38,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -75,8 +79,7 @@ public class CommerceSubscriptionEntryModelImpl
 	public static final String TABLE_NAME = "CommerceSubscriptionEntry";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
-		{"commerceSubscriptionEntryId", Types.BIGINT},
+		{"uuid_", Types.VARCHAR}, {"commerceSubscriptionEntryId", Types.BIGINT},
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -104,7 +107,6 @@ public class CommerceSubscriptionEntryModelImpl
 		new HashMap<String, Integer>();
 
 	static {
-		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commerceSubscriptionEntryId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -137,7 +139,7 @@ public class CommerceSubscriptionEntryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceSubscriptionEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,commerceSubscriptionEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPInstanceUuid VARCHAR(75) null,CProductId LONG,commerceOrderItemId LONG,subscriptionLength INTEGER,subscriptionType VARCHAR(75) null,subscriptionTypeSettings TEXT null,currentCycle LONG,maxSubscriptionCycles LONG,subscriptionStatus INTEGER,lastIterationDate DATE null,nextIterationDate DATE null,startDate DATE null,deliverySubscriptionLength INTEGER,deliverySubscriptionType VARCHAR(75) null,deliverySubTypeSettings VARCHAR(75) null,deliveryCurrentCycle LONG,deliveryMaxSubscriptionCycles LONG,deliverySubscriptionStatus INTEGER,deliveryLastIterationDate DATE null,deliveryNextIterationDate DATE null,deliveryStartDate DATE null)";
+		"create table CommerceSubscriptionEntry (uuid_ VARCHAR(75) null,commerceSubscriptionEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPInstanceUuid VARCHAR(75) null,CProductId LONG,commerceOrderItemId LONG,subscriptionLength INTEGER,subscriptionType VARCHAR(75) null,subscriptionTypeSettings TEXT null,currentCycle LONG,maxSubscriptionCycles LONG,subscriptionStatus INTEGER,lastIterationDate DATE null,nextIterationDate DATE null,startDate DATE null,deliverySubscriptionLength INTEGER,deliverySubscriptionType VARCHAR(75) null,deliverySubTypeSettings VARCHAR(75) null,deliveryCurrentCycle LONG,deliveryMaxSubscriptionCycles LONG,deliverySubscriptionStatus INTEGER,deliveryLastIterationDate DATE null,deliveryNextIterationDate DATE null,deliveryStartDate DATE null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CommerceSubscriptionEntry";
@@ -153,6 +155,24 @@ public class CommerceSubscriptionEntryModelImpl
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean ENTITY_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean FINDER_CACHE_ENABLED = true;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final boolean COLUMN_BITMASK_ENABLED = true;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
@@ -210,18 +230,92 @@ public class CommerceSubscriptionEntryModelImpl
 	public static final long CREATEDATE_COLUMN_BITMASK = 256L;
 
 	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+	public static CommerceSubscriptionEntry toModel(
+		CommerceSubscriptionEntrySoap soapModel) {
+
+		if (soapModel == null) {
+			return null;
+		}
+
+		CommerceSubscriptionEntry model = new CommerceSubscriptionEntryImpl();
+
+		model.setUuid(soapModel.getUuid());
+		model.setCommerceSubscriptionEntryId(
+			soapModel.getCommerceSubscriptionEntryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setCPInstanceUuid(soapModel.getCPInstanceUuid());
+		model.setCProductId(soapModel.getCProductId());
+		model.setCommerceOrderItemId(soapModel.getCommerceOrderItemId());
+		model.setSubscriptionLength(soapModel.getSubscriptionLength());
+		model.setSubscriptionType(soapModel.getSubscriptionType());
+		model.setSubscriptionTypeSettings(
+			soapModel.getSubscriptionTypeSettings());
+		model.setCurrentCycle(soapModel.getCurrentCycle());
+		model.setMaxSubscriptionCycles(soapModel.getMaxSubscriptionCycles());
+		model.setSubscriptionStatus(soapModel.getSubscriptionStatus());
+		model.setLastIterationDate(soapModel.getLastIterationDate());
+		model.setNextIterationDate(soapModel.getNextIterationDate());
+		model.setStartDate(soapModel.getStartDate());
+		model.setDeliverySubscriptionLength(
+			soapModel.getDeliverySubscriptionLength());
+		model.setDeliverySubscriptionType(
+			soapModel.getDeliverySubscriptionType());
+		model.setDeliverySubscriptionTypeSettings(
+			soapModel.getDeliverySubscriptionTypeSettings());
+		model.setDeliveryCurrentCycle(soapModel.getDeliveryCurrentCycle());
+		model.setDeliveryMaxSubscriptionCycles(
+			soapModel.getDeliveryMaxSubscriptionCycles());
+		model.setDeliverySubscriptionStatus(
+			soapModel.getDeliverySubscriptionStatus());
+		model.setDeliveryLastIterationDate(
+			soapModel.getDeliveryLastIterationDate());
+		model.setDeliveryNextIterationDate(
+			soapModel.getDeliveryNextIterationDate());
+		model.setDeliveryStartDate(soapModel.getDeliveryStartDate());
+
+		return model;
 	}
 
 	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
 	@Deprecated
-	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+	public static List<CommerceSubscriptionEntry> toModels(
+		CommerceSubscriptionEntrySoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<CommerceSubscriptionEntry> models =
+			new ArrayList<CommerceSubscriptionEntry>(soapModels.length);
+
+		for (CommerceSubscriptionEntrySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
 	}
+
+	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
+		com.liferay.commerce.service.util.ServiceProps.get(
+			"lock.expiration.time.com.liferay.commerce.model.CommerceSubscriptionEntry"));
 
 	public CommerceSubscriptionEntryModelImpl() {
 	}
@@ -300,266 +394,256 @@ public class CommerceSubscriptionEntryModelImpl
 	public Map<String, Function<CommerceSubscriptionEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<CommerceSubscriptionEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, CommerceSubscriptionEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<CommerceSubscriptionEntry, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceSubscriptionEntry.class.getClassLoader(),
+			CommerceSubscriptionEntry.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<CommerceSubscriptionEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<CommerceSubscriptionEntry, Object>>();
+		try {
+			Constructor<CommerceSubscriptionEntry> constructor =
+				(Constructor<CommerceSubscriptionEntry>)
+					proxyClass.getConstructor(InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", CommerceSubscriptionEntry::getMvccVersion);
-			attributeGetterFunctions.put(
-				"uuid", CommerceSubscriptionEntry::getUuid);
-			attributeGetterFunctions.put(
-				"commerceSubscriptionEntryId",
-				CommerceSubscriptionEntry::getCommerceSubscriptionEntryId);
-			attributeGetterFunctions.put(
-				"groupId", CommerceSubscriptionEntry::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", CommerceSubscriptionEntry::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", CommerceSubscriptionEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", CommerceSubscriptionEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", CommerceSubscriptionEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", CommerceSubscriptionEntry::getModifiedDate);
-			attributeGetterFunctions.put(
-				"CPInstanceUuid", CommerceSubscriptionEntry::getCPInstanceUuid);
-			attributeGetterFunctions.put(
-				"CProductId", CommerceSubscriptionEntry::getCProductId);
-			attributeGetterFunctions.put(
-				"commerceOrderItemId",
-				CommerceSubscriptionEntry::getCommerceOrderItemId);
-			attributeGetterFunctions.put(
-				"subscriptionLength",
-				CommerceSubscriptionEntry::getSubscriptionLength);
-			attributeGetterFunctions.put(
-				"subscriptionType",
-				CommerceSubscriptionEntry::getSubscriptionType);
-			attributeGetterFunctions.put(
-				"subscriptionTypeSettings",
-				CommerceSubscriptionEntry::getSubscriptionTypeSettings);
-			attributeGetterFunctions.put(
-				"currentCycle", CommerceSubscriptionEntry::getCurrentCycle);
-			attributeGetterFunctions.put(
-				"maxSubscriptionCycles",
-				CommerceSubscriptionEntry::getMaxSubscriptionCycles);
-			attributeGetterFunctions.put(
-				"subscriptionStatus",
-				CommerceSubscriptionEntry::getSubscriptionStatus);
-			attributeGetterFunctions.put(
-				"lastIterationDate",
-				CommerceSubscriptionEntry::getLastIterationDate);
-			attributeGetterFunctions.put(
-				"nextIterationDate",
-				CommerceSubscriptionEntry::getNextIterationDate);
-			attributeGetterFunctions.put(
-				"startDate", CommerceSubscriptionEntry::getStartDate);
-			attributeGetterFunctions.put(
-				"deliverySubscriptionLength",
-				CommerceSubscriptionEntry::getDeliverySubscriptionLength);
-			attributeGetterFunctions.put(
-				"deliverySubscriptionType",
-				CommerceSubscriptionEntry::getDeliverySubscriptionType);
-			attributeGetterFunctions.put(
-				"deliverySubscriptionTypeSettings",
-				CommerceSubscriptionEntry::getDeliverySubscriptionTypeSettings);
-			attributeGetterFunctions.put(
-				"deliveryCurrentCycle",
-				CommerceSubscriptionEntry::getDeliveryCurrentCycle);
-			attributeGetterFunctions.put(
-				"deliveryMaxSubscriptionCycles",
-				CommerceSubscriptionEntry::getDeliveryMaxSubscriptionCycles);
-			attributeGetterFunctions.put(
-				"deliverySubscriptionStatus",
-				CommerceSubscriptionEntry::getDeliverySubscriptionStatus);
-			attributeGetterFunctions.put(
-				"deliveryLastIterationDate",
-				CommerceSubscriptionEntry::getDeliveryLastIterationDate);
-			attributeGetterFunctions.put(
-				"deliveryNextIterationDate",
-				CommerceSubscriptionEntry::getDeliveryNextIterationDate);
-			attributeGetterFunctions.put(
-				"deliveryStartDate",
-				CommerceSubscriptionEntry::getDeliveryStartDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
-	}
-
-	private static class AttributeSetterBiConsumersHolder {
-
-		private static final Map
-			<String, BiConsumer<CommerceSubscriptionEntry, Object>>
-				_attributeSetterBiConsumers;
-
-		static {
-			Map<String, BiConsumer<CommerceSubscriptionEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<CommerceSubscriptionEntry, ?>>();
-
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<CommerceSubscriptionEntry, String>)
-					CommerceSubscriptionEntry::setUuid);
-			attributeSetterBiConsumers.put(
-				"commerceSubscriptionEntryId",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setCommerceSubscriptionEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<CommerceSubscriptionEntry, String>)
-					CommerceSubscriptionEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"CPInstanceUuid",
-				(BiConsumer<CommerceSubscriptionEntry, String>)
-					CommerceSubscriptionEntry::setCPInstanceUuid);
-			attributeSetterBiConsumers.put(
-				"CProductId",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setCProductId);
-			attributeSetterBiConsumers.put(
-				"commerceOrderItemId",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setCommerceOrderItemId);
-			attributeSetterBiConsumers.put(
-				"subscriptionLength",
-				(BiConsumer<CommerceSubscriptionEntry, Integer>)
-					CommerceSubscriptionEntry::setSubscriptionLength);
-			attributeSetterBiConsumers.put(
-				"subscriptionType",
-				(BiConsumer<CommerceSubscriptionEntry, String>)
-					CommerceSubscriptionEntry::setSubscriptionType);
-			attributeSetterBiConsumers.put(
-				"subscriptionTypeSettings",
-				(BiConsumer<CommerceSubscriptionEntry, String>)
-					CommerceSubscriptionEntry::setSubscriptionTypeSettings);
-			attributeSetterBiConsumers.put(
-				"currentCycle",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setCurrentCycle);
-			attributeSetterBiConsumers.put(
-				"maxSubscriptionCycles",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setMaxSubscriptionCycles);
-			attributeSetterBiConsumers.put(
-				"subscriptionStatus",
-				(BiConsumer<CommerceSubscriptionEntry, Integer>)
-					CommerceSubscriptionEntry::setSubscriptionStatus);
-			attributeSetterBiConsumers.put(
-				"lastIterationDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setLastIterationDate);
-			attributeSetterBiConsumers.put(
-				"nextIterationDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setNextIterationDate);
-			attributeSetterBiConsumers.put(
-				"startDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setStartDate);
-			attributeSetterBiConsumers.put(
-				"deliverySubscriptionLength",
-				(BiConsumer<CommerceSubscriptionEntry, Integer>)
-					CommerceSubscriptionEntry::setDeliverySubscriptionLength);
-			attributeSetterBiConsumers.put(
-				"deliverySubscriptionType",
-				(BiConsumer<CommerceSubscriptionEntry, String>)
-					CommerceSubscriptionEntry::setDeliverySubscriptionType);
-			attributeSetterBiConsumers.put(
-				"deliverySubscriptionTypeSettings",
-				(BiConsumer<CommerceSubscriptionEntry, String>)
-					CommerceSubscriptionEntry::
-						setDeliverySubscriptionTypeSettings);
-			attributeSetterBiConsumers.put(
-				"deliveryCurrentCycle",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::setDeliveryCurrentCycle);
-			attributeSetterBiConsumers.put(
-				"deliveryMaxSubscriptionCycles",
-				(BiConsumer<CommerceSubscriptionEntry, Long>)
-					CommerceSubscriptionEntry::
-						setDeliveryMaxSubscriptionCycles);
-			attributeSetterBiConsumers.put(
-				"deliverySubscriptionStatus",
-				(BiConsumer<CommerceSubscriptionEntry, Integer>)
-					CommerceSubscriptionEntry::setDeliverySubscriptionStatus);
-			attributeSetterBiConsumers.put(
-				"deliveryLastIterationDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setDeliveryLastIterationDate);
-			attributeSetterBiConsumers.put(
-				"deliveryNextIterationDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setDeliveryNextIterationDate);
-			attributeSetterBiConsumers.put(
-				"deliveryStartDate",
-				(BiConsumer<CommerceSubscriptionEntry, Date>)
-					CommerceSubscriptionEntry::setDeliveryStartDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
 		}
-
 	}
 
-	@JSON
-	@Override
-	public long getMvccVersion() {
-		return _mvccVersion;
-	}
+	private static final Map
+		<String, Function<CommerceSubscriptionEntry, Object>>
+			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceSubscriptionEntry, Object>>
+			_attributeSetterBiConsumers;
 
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
+	static {
+		Map<String, Function<CommerceSubscriptionEntry, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<CommerceSubscriptionEntry, Object>>();
+		Map<String, BiConsumer<CommerceSubscriptionEntry, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<CommerceSubscriptionEntry, ?>>();
 
-		_mvccVersion = mvccVersion;
+		attributeGetterFunctions.put(
+			"uuid", CommerceSubscriptionEntry::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<CommerceSubscriptionEntry, String>)
+				CommerceSubscriptionEntry::setUuid);
+		attributeGetterFunctions.put(
+			"commerceSubscriptionEntryId",
+			CommerceSubscriptionEntry::getCommerceSubscriptionEntryId);
+		attributeSetterBiConsumers.put(
+			"commerceSubscriptionEntryId",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setCommerceSubscriptionEntryId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceSubscriptionEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceSubscriptionEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceSubscriptionEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceSubscriptionEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<CommerceSubscriptionEntry, String>)
+				CommerceSubscriptionEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceSubscriptionEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceSubscriptionEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"CPInstanceUuid", CommerceSubscriptionEntry::getCPInstanceUuid);
+		attributeSetterBiConsumers.put(
+			"CPInstanceUuid",
+			(BiConsumer<CommerceSubscriptionEntry, String>)
+				CommerceSubscriptionEntry::setCPInstanceUuid);
+		attributeGetterFunctions.put(
+			"CProductId", CommerceSubscriptionEntry::getCProductId);
+		attributeSetterBiConsumers.put(
+			"CProductId",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setCProductId);
+		attributeGetterFunctions.put(
+			"commerceOrderItemId",
+			CommerceSubscriptionEntry::getCommerceOrderItemId);
+		attributeSetterBiConsumers.put(
+			"commerceOrderItemId",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setCommerceOrderItemId);
+		attributeGetterFunctions.put(
+			"subscriptionLength",
+			CommerceSubscriptionEntry::getSubscriptionLength);
+		attributeSetterBiConsumers.put(
+			"subscriptionLength",
+			(BiConsumer<CommerceSubscriptionEntry, Integer>)
+				CommerceSubscriptionEntry::setSubscriptionLength);
+		attributeGetterFunctions.put(
+			"subscriptionType", CommerceSubscriptionEntry::getSubscriptionType);
+		attributeSetterBiConsumers.put(
+			"subscriptionType",
+			(BiConsumer<CommerceSubscriptionEntry, String>)
+				CommerceSubscriptionEntry::setSubscriptionType);
+		attributeGetterFunctions.put(
+			"subscriptionTypeSettings",
+			CommerceSubscriptionEntry::getSubscriptionTypeSettings);
+		attributeSetterBiConsumers.put(
+			"subscriptionTypeSettings",
+			(BiConsumer<CommerceSubscriptionEntry, String>)
+				CommerceSubscriptionEntry::setSubscriptionTypeSettings);
+		attributeGetterFunctions.put(
+			"currentCycle", CommerceSubscriptionEntry::getCurrentCycle);
+		attributeSetterBiConsumers.put(
+			"currentCycle",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setCurrentCycle);
+		attributeGetterFunctions.put(
+			"maxSubscriptionCycles",
+			CommerceSubscriptionEntry::getMaxSubscriptionCycles);
+		attributeSetterBiConsumers.put(
+			"maxSubscriptionCycles",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setMaxSubscriptionCycles);
+		attributeGetterFunctions.put(
+			"subscriptionStatus",
+			CommerceSubscriptionEntry::getSubscriptionStatus);
+		attributeSetterBiConsumers.put(
+			"subscriptionStatus",
+			(BiConsumer<CommerceSubscriptionEntry, Integer>)
+				CommerceSubscriptionEntry::setSubscriptionStatus);
+		attributeGetterFunctions.put(
+			"lastIterationDate",
+			CommerceSubscriptionEntry::getLastIterationDate);
+		attributeSetterBiConsumers.put(
+			"lastIterationDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setLastIterationDate);
+		attributeGetterFunctions.put(
+			"nextIterationDate",
+			CommerceSubscriptionEntry::getNextIterationDate);
+		attributeSetterBiConsumers.put(
+			"nextIterationDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setNextIterationDate);
+		attributeGetterFunctions.put(
+			"startDate", CommerceSubscriptionEntry::getStartDate);
+		attributeSetterBiConsumers.put(
+			"startDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setStartDate);
+		attributeGetterFunctions.put(
+			"deliverySubscriptionLength",
+			CommerceSubscriptionEntry::getDeliverySubscriptionLength);
+		attributeSetterBiConsumers.put(
+			"deliverySubscriptionLength",
+			(BiConsumer<CommerceSubscriptionEntry, Integer>)
+				CommerceSubscriptionEntry::setDeliverySubscriptionLength);
+		attributeGetterFunctions.put(
+			"deliverySubscriptionType",
+			CommerceSubscriptionEntry::getDeliverySubscriptionType);
+		attributeSetterBiConsumers.put(
+			"deliverySubscriptionType",
+			(BiConsumer<CommerceSubscriptionEntry, String>)
+				CommerceSubscriptionEntry::setDeliverySubscriptionType);
+		attributeGetterFunctions.put(
+			"deliverySubscriptionTypeSettings",
+			CommerceSubscriptionEntry::getDeliverySubscriptionTypeSettings);
+		attributeSetterBiConsumers.put(
+			"deliverySubscriptionTypeSettings",
+			(BiConsumer<CommerceSubscriptionEntry, String>)
+				CommerceSubscriptionEntry::setDeliverySubscriptionTypeSettings);
+		attributeGetterFunctions.put(
+			"deliveryCurrentCycle",
+			CommerceSubscriptionEntry::getDeliveryCurrentCycle);
+		attributeSetterBiConsumers.put(
+			"deliveryCurrentCycle",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setDeliveryCurrentCycle);
+		attributeGetterFunctions.put(
+			"deliveryMaxSubscriptionCycles",
+			CommerceSubscriptionEntry::getDeliveryMaxSubscriptionCycles);
+		attributeSetterBiConsumers.put(
+			"deliveryMaxSubscriptionCycles",
+			(BiConsumer<CommerceSubscriptionEntry, Long>)
+				CommerceSubscriptionEntry::setDeliveryMaxSubscriptionCycles);
+		attributeGetterFunctions.put(
+			"deliverySubscriptionStatus",
+			CommerceSubscriptionEntry::getDeliverySubscriptionStatus);
+		attributeSetterBiConsumers.put(
+			"deliverySubscriptionStatus",
+			(BiConsumer<CommerceSubscriptionEntry, Integer>)
+				CommerceSubscriptionEntry::setDeliverySubscriptionStatus);
+		attributeGetterFunctions.put(
+			"deliveryLastIterationDate",
+			CommerceSubscriptionEntry::getDeliveryLastIterationDate);
+		attributeSetterBiConsumers.put(
+			"deliveryLastIterationDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setDeliveryLastIterationDate);
+		attributeGetterFunctions.put(
+			"deliveryNextIterationDate",
+			CommerceSubscriptionEntry::getDeliveryNextIterationDate);
+		attributeSetterBiConsumers.put(
+			"deliveryNextIterationDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setDeliveryNextIterationDate);
+		attributeGetterFunctions.put(
+			"deliveryStartDate",
+			CommerceSubscriptionEntry::getDeliveryStartDate);
+		attributeSetterBiConsumers.put(
+			"deliveryStartDate",
+			(BiConsumer<CommerceSubscriptionEntry, Date>)
+				CommerceSubscriptionEntry::setDeliveryStartDate);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1201,7 +1285,6 @@ public class CommerceSubscriptionEntryModelImpl
 		CommerceSubscriptionEntryImpl commerceSubscriptionEntryImpl =
 			new CommerceSubscriptionEntryImpl();
 
-		commerceSubscriptionEntryImpl.setMvccVersion(getMvccVersion());
 		commerceSubscriptionEntryImpl.setUuid(getUuid());
 		commerceSubscriptionEntryImpl.setCommerceSubscriptionEntryId(
 			getCommerceSubscriptionEntryId());
@@ -1260,8 +1343,6 @@ public class CommerceSubscriptionEntryModelImpl
 		CommerceSubscriptionEntryImpl commerceSubscriptionEntryImpl =
 			new CommerceSubscriptionEntryImpl();
 
-		commerceSubscriptionEntryImpl.setMvccVersion(
-			this.<Long>getColumnOriginalValue("mvccVersion"));
 		commerceSubscriptionEntryImpl.setUuid(
 			this.<String>getColumnOriginalValue("uuid_"));
 		commerceSubscriptionEntryImpl.setCommerceSubscriptionEntryId(
@@ -1374,7 +1455,7 @@ public class CommerceSubscriptionEntryModelImpl
 	@Deprecated
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return true;
+		return ENTITY_CACHE_ENABLED;
 	}
 
 	/**
@@ -1383,7 +1464,7 @@ public class CommerceSubscriptionEntryModelImpl
 	@Deprecated
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return true;
+		return FINDER_CACHE_ENABLED;
 	}
 
 	@Override
@@ -1400,8 +1481,6 @@ public class CommerceSubscriptionEntryModelImpl
 		CommerceSubscriptionEntryCacheModel
 			commerceSubscriptionEntryCacheModel =
 				new CommerceSubscriptionEntryCacheModel();
-
-		commerceSubscriptionEntryCacheModel.mvccVersion = getMvccVersion();
 
 		commerceSubscriptionEntryCacheModel.uuid = getUuid();
 
@@ -1651,17 +1730,47 @@ public class CommerceSubscriptionEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<CommerceSubscriptionEntry, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<CommerceSubscriptionEntry, Object>>
+				entry : attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<CommerceSubscriptionEntry, Object>
+				attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((CommerceSubscriptionEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function
 			<InvocationHandler, CommerceSubscriptionEntry>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceSubscriptionEntry.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
-	private long _mvccVersion;
 	private String _uuid;
 	private long _commerceSubscriptionEntryId;
 	private long _groupId;
@@ -1697,8 +1806,7 @@ public class CommerceSubscriptionEntryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<CommerceSubscriptionEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(
@@ -1723,7 +1831,6 @@ public class CommerceSubscriptionEntryModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
-		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"commerceSubscriptionEntryId", _commerceSubscriptionEntryId);
@@ -1789,65 +1896,63 @@ public class CommerceSubscriptionEntryModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("mvccVersion", 1L);
+		columnBitmasks.put("uuid_", 1L);
 
-		columnBitmasks.put("uuid_", 2L);
+		columnBitmasks.put("commerceSubscriptionEntryId", 2L);
 
-		columnBitmasks.put("commerceSubscriptionEntryId", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("CPInstanceUuid", 256L);
 
-		columnBitmasks.put("CPInstanceUuid", 512L);
+		columnBitmasks.put("CProductId", 512L);
 
-		columnBitmasks.put("CProductId", 1024L);
+		columnBitmasks.put("commerceOrderItemId", 1024L);
 
-		columnBitmasks.put("commerceOrderItemId", 2048L);
+		columnBitmasks.put("subscriptionLength", 2048L);
 
-		columnBitmasks.put("subscriptionLength", 4096L);
+		columnBitmasks.put("subscriptionType", 4096L);
 
-		columnBitmasks.put("subscriptionType", 8192L);
+		columnBitmasks.put("subscriptionTypeSettings", 8192L);
 
-		columnBitmasks.put("subscriptionTypeSettings", 16384L);
+		columnBitmasks.put("currentCycle", 16384L);
 
-		columnBitmasks.put("currentCycle", 32768L);
+		columnBitmasks.put("maxSubscriptionCycles", 32768L);
 
-		columnBitmasks.put("maxSubscriptionCycles", 65536L);
+		columnBitmasks.put("subscriptionStatus", 65536L);
 
-		columnBitmasks.put("subscriptionStatus", 131072L);
+		columnBitmasks.put("lastIterationDate", 131072L);
 
-		columnBitmasks.put("lastIterationDate", 262144L);
+		columnBitmasks.put("nextIterationDate", 262144L);
 
-		columnBitmasks.put("nextIterationDate", 524288L);
+		columnBitmasks.put("startDate", 524288L);
 
-		columnBitmasks.put("startDate", 1048576L);
+		columnBitmasks.put("deliverySubscriptionLength", 1048576L);
 
-		columnBitmasks.put("deliverySubscriptionLength", 2097152L);
+		columnBitmasks.put("deliverySubscriptionType", 2097152L);
 
-		columnBitmasks.put("deliverySubscriptionType", 4194304L);
+		columnBitmasks.put("deliverySubTypeSettings", 4194304L);
 
-		columnBitmasks.put("deliverySubTypeSettings", 8388608L);
+		columnBitmasks.put("deliveryCurrentCycle", 8388608L);
 
-		columnBitmasks.put("deliveryCurrentCycle", 16777216L);
+		columnBitmasks.put("deliveryMaxSubscriptionCycles", 16777216L);
 
-		columnBitmasks.put("deliveryMaxSubscriptionCycles", 33554432L);
+		columnBitmasks.put("deliverySubscriptionStatus", 33554432L);
 
-		columnBitmasks.put("deliverySubscriptionStatus", 67108864L);
+		columnBitmasks.put("deliveryLastIterationDate", 67108864L);
 
-		columnBitmasks.put("deliveryLastIterationDate", 134217728L);
+		columnBitmasks.put("deliveryNextIterationDate", 134217728L);
 
-		columnBitmasks.put("deliveryNextIterationDate", 268435456L);
-
-		columnBitmasks.put("deliveryStartDate", 536870912L);
+		columnBitmasks.put("deliveryStartDate", 268435456L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

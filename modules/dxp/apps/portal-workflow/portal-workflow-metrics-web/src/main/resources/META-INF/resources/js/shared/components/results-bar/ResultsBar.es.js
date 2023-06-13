@@ -12,7 +12,6 @@
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
-import ClayList from '@clayui/list';
 import React, {useCallback} from 'react';
 
 import {useFilter} from '../../hooks/useFilter.es';
@@ -28,9 +27,7 @@ const ResultsBar = ({children}) => {
 	return (
 		<nav className="mt-0 subnav-tbar subnav-tbar-primary tbar tbar-inline-xs-down">
 			<ClayLayout.ContainerFluid>
-				<ClayList.ItemText className="tbar-nav tbar-nav-wrap">
-					{children}
-				</ClayList.ItemText>
+				<ul className="tbar-nav tbar-nav-wrap">{children}</ul>
 			</ClayLayout.ContainerFluid>
 		</nav>
 	);
@@ -62,7 +59,7 @@ const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 	}, [filterState, routerProps, withoutRouteParams]);
 
 	return (
-		<ClayList.ItemText className="tbar-item tbar-item-expand">
+		<li className="tbar-item tbar-item-expand">
 			<div className="tbar-section text-right">
 				<ClayButton
 					className="component-link tbar-link"
@@ -73,7 +70,7 @@ const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 					{Liferay.Language.get('clear-all')}
 				</ClayButton>
 			</div>
-		</ClayList.ItemText>
+		</li>
 	);
 };
 
@@ -103,7 +100,7 @@ const FilterItem = ({filter, item, withoutRouteParams}) => {
 	}, [filterState, routerProps, withoutRouteParams]);
 
 	return (
-		<ClayList.ItemText className="tbar-item">
+		<li className="tbar-item">
 			<div className="tbar-section">
 				<span className="component-label label label-dismissible tbar-label">
 					<span className="label-item label-item-expand">
@@ -131,7 +128,7 @@ const FilterItem = ({filter, item, withoutRouteParams}) => {
 					)}
 				</span>
 			</div>
-		</ClayList.ItemText>
+		</li>
 	);
 };
 
@@ -161,7 +158,7 @@ const TotalCount = ({search, totalCount}) => {
 	}
 
 	return (
-		<ClayList.ItemText className="tbar-item">
+		<li className="tbar-item">
 			<div className="tbar-section">
 				<span className="component-text text-truncate-inline">
 					<span className="text-truncate">
@@ -169,7 +166,7 @@ const TotalCount = ({search, totalCount}) => {
 					</span>
 				</span>
 			</div>
-		</ClayList.ItemText>
+		</li>
 	);
 };
 

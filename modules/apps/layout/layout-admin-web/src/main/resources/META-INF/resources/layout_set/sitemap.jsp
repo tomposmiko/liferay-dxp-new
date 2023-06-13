@@ -36,43 +36,22 @@ if (!virtualHostnames.containsKey(PortalUtil.getHost(request))) {
 <liferay-util:buffer
 	var="linkContent"
 >
-	<a href="http://www.sitemaps.org" target="_blank">
-		http://www.sitemaps.org
-	</a>
+	<aui:a href="http://www.sitemaps.org" target="_blank">http://www.sitemaps.org</aui:a>
 </liferay-util:buffer>
 
-<div class="text-secondary">
-	<p>
-		<liferay-ui:message key="the-sitemap-protocol-notifies-search-engines-of-the-structure-of-the-website" /> <liferay-ui:message arguments="<%= linkContent %>" key="see-x-for-more-information" translateArguments="<%= false %>" />
-	</p>
+<div class="text-muted">
+	<liferay-ui:message key="the-sitemap-protocol-notifies-search-engines-of-the-structure-of-the-website" /> <liferay-ui:message arguments="<%= linkContent %>" key="see-x-for-more-information" translateArguments="<%= false %>" />
 
-	<%
-	String sitemapUrlLink = "<a target=\"_blank\" href=\"" + HtmlUtil.escapeAttribute(sitemapUrl) + "\">";
-	%>
+	<br /><br />
 
-	<p>
-		<liferay-ui:message arguments='<%= new Object[] {sitemapUrlLink, "</a>"} %>' key="send-sitemap-information-to-preview" translateArguments="<%= false %>" />
-	</p>
+	<%= LanguageUtil.format(request, "send-sitemap-information-to-preview", new Object[] {"<a target=\"_blank\" href=\"" + HtmlUtil.escapeAttribute(sitemapUrl) + "\">", "</a>"}, false) %>
 
-	<ul class="list-unstyled">
+	<ul>
 		<li>
-			<clay:link
-				href='<%= "http://www.google.com/webmasters/sitemaps/ping?sitemap=" + HtmlUtil.escapeURL(sitemapUrl) %>'
-				label="Google"
-				target="_blank"
-			/>
+			<aui:a href='<%= "http://www.google.com/webmasters/sitemaps/ping?sitemap=" + HtmlUtil.escapeURL(sitemapUrl) %>' target="_blank">Google</aui:a>
 		</li>
 		<li>
-			<div class="d-flex">
-				<clay:link
-					cssClass="mr-2"
-					href='<%= "https://siteexplorer.search.yahoo.com/submit/ping?sitemap=" + HtmlUtil.escapeURL(sitemapUrl) %>'
-					label="Yahoo!"
-					target="_blank"
-				/>
-
-				<liferay-ui:message key="requires-log-in" />
-			</div>
+			<aui:a href='<%= "https://siteexplorer.search.yahoo.com/submit/ping?sitemap=" + HtmlUtil.escapeURL(sitemapUrl) %>' target="_blank">Yahoo!</aui:a> (<liferay-ui:message key="requires-log-in" />)
 		</li>
 	</ul>
 </div>

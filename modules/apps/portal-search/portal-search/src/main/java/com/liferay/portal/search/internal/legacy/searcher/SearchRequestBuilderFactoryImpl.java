@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author André de Oliveira
  */
-@Component(service = SearchRequestBuilderFactory.class)
+@Component(immediate = true, service = SearchRequestBuilderFactory.class)
 public class SearchRequestBuilderFactoryImpl
 	implements SearchRequestBuilderFactory {
 
@@ -34,7 +34,14 @@ public class SearchRequestBuilderFactoryImpl
 			_searchRequestBuilderFactory, searchContext);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	public void setSearchRequestBuilderFactory(
+		com.liferay.portal.search.searcher.SearchRequestBuilderFactory
+			searchRequestBuilderFactory) {
+
+		_searchRequestBuilderFactory = searchRequestBuilderFactory;
+	}
+
 	private com.liferay.portal.search.searcher.SearchRequestBuilderFactory
 		_searchRequestBuilderFactory;
 

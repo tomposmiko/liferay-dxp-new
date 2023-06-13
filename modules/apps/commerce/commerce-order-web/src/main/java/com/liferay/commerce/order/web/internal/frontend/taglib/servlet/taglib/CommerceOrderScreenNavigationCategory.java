@@ -14,22 +14,21 @@
 
 package com.liferay.commerce.order.web.internal.frontend.taglib.servlet.taglib;
 
-import com.liferay.commerce.order.web.internal.constants.CommerceOrderScreenNavigationConstants;
+import com.liferay.commerce.order.web.internal.servlet.taglib.ui.constants.CommerceOrderScreenNavigationConstants;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationCategory;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Alec Sloan
  */
 @Component(
-	property = "screen.navigation.category.order:Integer=50",
+	enabled = false, property = "screen.navigation.category.order:Integer=50",
 	service = ScreenNavigationCategory.class
 )
 public class CommerceOrderScreenNavigationCategory
@@ -46,7 +45,7 @@ public class CommerceOrderScreenNavigationCategory
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, getCategoryKey());
+		return LanguageUtil.get(resourceBundle, getCategoryKey());
 	}
 
 	@Override
@@ -54,8 +53,5 @@ public class CommerceOrderScreenNavigationCategory
 		return CommerceOrderScreenNavigationConstants.
 			SCREEN_NAVIGATION_KEY_COMMERCE_ORDER_GENERAL;
 	}
-
-	@Reference
-	private Language _language;
 
 }

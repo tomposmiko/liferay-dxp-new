@@ -455,11 +455,6 @@ public class MFAFIDO2CredentialEntryWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected MFAFIDO2CredentialEntryWrapper wrap(
 		MFAFIDO2CredentialEntry mfaFIDO2CredentialEntry) {
 

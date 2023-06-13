@@ -13,14 +13,14 @@ definition {
 		}
 
 		task ("Add a site via JSON") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
+			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,8 +29,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-113929. The page creator could use Clear Filters to reset the filters."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test ResetAppliedFilters {
 		property portal.acceptance = "true";
 
@@ -45,10 +44,12 @@ definition {
 				groupName = "Test Site Name",
 				title = "Large",
 				vocabularyName = "Size");
+
 			var mediumId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Medium",
 				vocabularyName = "Size");
+
 			var smallId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Small",
@@ -57,7 +58,7 @@ definition {
 
 		task ("Add the first web content with Large") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${largeId},
+				assetCategoryIds = "${largeId}",
 				content = "Levis 511",
 				groupName = "Test Site Name",
 				title = "Levis 511");
@@ -65,7 +66,7 @@ definition {
 
 		task ("Add the second web content with Medium") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${mediumId},
+				assetCategoryIds = "${mediumId}",
 				content = "Levis 501",
 				groupName = "Test Site Name",
 				title = "Levis 501");
@@ -73,7 +74,7 @@ definition {
 
 		task ("Add the third web content with Small") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${smallId},
+				assetCategoryIds = "${smallId}",
 				content = "Levis 510",
 				groupName = "Test Site Name",
 				title = "Levis 510");
@@ -87,9 +88,9 @@ definition {
 		}
 
 		task ("Add the first collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -98,8 +99,8 @@ definition {
 		task ("Select the Bordered List in Collection Display") {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
-				selectedName = "Dynamic Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				selectedName = "Dynamic Collection");
 		}
 
 		task ("Add an Applied Filters above the Container") {
@@ -140,15 +141,17 @@ definition {
 		}
 
 		task ("Reset applied filters at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -167,7 +170,7 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 511']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			Page.clearFiltersInAppliedFilters();
@@ -176,21 +179,21 @@ definition {
 				filterName = "Large",
 				locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Reset applied filters at Preview mode") {
@@ -198,13 +201,13 @@ definition {
 				pageName = "Collection Page Name",
 				siteName = "Test Site Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -223,7 +226,7 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 511']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			Page.clearFiltersInAppliedFilters();
@@ -232,13 +235,13 @@ definition {
 				filterName = "Large",
 				locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -247,8 +250,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-113929. The page creator could see the alert info in the General panel of Applied Filters fragment. The Applied Filters fragment could show applied category and keywords filters in Preview and View mode."
-	@priority = 5
-	@uitest
+	@priority = "5"
 	test ViewAppliedCategoryAndKeywordsFilters {
 		property portal.acceptance = "true";
 
@@ -263,10 +265,12 @@ definition {
 				groupName = "Test Site Name",
 				title = "Large",
 				vocabularyName = "Size");
+
 			var mediumId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Medium",
 				vocabularyName = "Size");
+
 			var smallId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Small",
@@ -275,7 +279,7 @@ definition {
 
 		task ("Add the first web content with Large") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${largeId},
+				assetCategoryIds = "${largeId}",
 				content = "Levis 511",
 				groupName = "Test Site Name",
 				title = "Levis 511");
@@ -283,7 +287,7 @@ definition {
 
 		task ("Add the second web content with Medium") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${mediumId},
+				assetCategoryIds = "${mediumId}",
 				content = "Levis 501",
 				groupName = "Test Site Name",
 				title = "Levis 501");
@@ -291,7 +295,7 @@ definition {
 
 		task ("Add the third web content with Small") {
 			JSONWebcontent.addWebContent(
-				assetCategoryIds = ${smallId},
+				assetCategoryIds = "${smallId}",
 				content = "Levis 510",
 				groupName = "Test Site Name",
 				title = "Levis 510");
@@ -305,9 +309,9 @@ definition {
 		}
 
 		task ("Add the first collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name 1",
 				tabName = "Collections");
@@ -316,8 +320,8 @@ definition {
 		task ("Select the Bordered List in Collection Display") {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
-				selectedName = "Dynamic Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				selectedName = "Dynamic Collection");
 		}
 
 		task ("Add an Applied Filters above the Container") {
@@ -364,19 +368,21 @@ definition {
 		}
 
 		task ("View the Applied Filters doesn't present when no applied filter at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
+
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
 
 			AssertElementNotPresent(locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_PLACEHOLDER");
 		}
 
 		task ("View applied category filter at Preview mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -395,12 +401,12 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 511']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -414,13 +420,13 @@ definition {
 		}
 
 		task ("View applied category filter at View mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -439,20 +445,20 @@ definition {
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 510']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 
 		task ("Add the second collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name 2",
 				tabName = "Collections");
@@ -461,8 +467,8 @@ definition {
 		task ("Select the Bordered List in Collection Display") {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
-				selectedName = "Dynamic Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				selectedName = "Dynamic Collection");
 		}
 
 		task ("Add an Applied Filters above the Container") {
@@ -493,35 +499,37 @@ definition {
 		}
 
 		task ("View applied category filter at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			Page.searchInCollectionFilter(searchTerm = 501);
+			Page.searchInCollectionFilter(searchTerm = "501");
 
 			AssertVisible(
-				filterName = 501,
+				filterName = "501",
 				locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 501']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Navigate to page in view mode") {
@@ -531,46 +539,46 @@ definition {
 		}
 
 		task ("View applied category filter at View mode") {
-			var n = 1;
+			var n = "1";
 
 			for (var style : list "510,501,511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='Levis ${style}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
 			}
 
-			Page.searchInCollectionFilter(searchTerm = 510);
+			Page.searchInCollectionFilter(searchTerm = "510");
 
 			AssertVisible(
-				filterName = 510,
+				filterName = "510",
 				locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 510']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 		}
 	}
 
 	@description = "This is a test for LPS-113929. The Applied Filters will show the second line and Show More button when there are lots of applied filters."
-	@priority = 4
+	@priority = "4"
 	test ViewShowMoreButtonWhenTheNumberOfAppliedFiltersMoreThanLimitation {
 		task ("Add two vocabularies") {
 			for (var vocabularyName : list "Color,Gender") {
 				JSONCategory.addVocabulary(
 					groupName = "Test Site Name",
-					title = ${vocabularyName});
+					title = "${vocabularyName}");
 			}
 		}
 
@@ -579,6 +587,7 @@ definition {
 				groupName = "Test Site Name",
 				title = "Male",
 				vocabularyName = "Gender");
+
 			var femaleId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Female",
@@ -590,30 +599,37 @@ definition {
 				groupName = "Test Site Name",
 				title = "Red",
 				vocabularyName = "Color");
+
 			var brownId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Brown",
 				vocabularyName = "Color");
+
 			var blackId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Black",
 				vocabularyName = "Color");
+
 			var greyId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Grey",
 				vocabularyName = "Color");
+
 			var blueId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Blue",
 				vocabularyName = "Color");
+
 			var greenId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Green",
 				vocabularyName = "Color");
+
 			var yellowId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "Yellow",
 				vocabularyName = "Color");
+
 			var whiteId = JSONCategory.addCategory(
 				groupName = "Test Site Name",
 				title = "White",
@@ -660,9 +676,9 @@ definition {
 		}
 
 		task ("Add a collection page based on dynamic collection") {
-			PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+			SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
-			ContentPages.addCollectionPage(
+			ContentPages.addPublicCollectionPage(
 				collectionName = "Dynamic Collection",
 				pageName = "Collection Page Name",
 				tabName = "Collections");
@@ -671,8 +687,8 @@ definition {
 		task ("Select the Bordered List in Collection Display") {
 			PageEditor.editCollectionDisplay(
 				fragmentName = "Collection Display",
-				selectedName = "Dynamic Collection",
-				styleDisplay = "Bordered List");
+				listStyle = "Bordered List",
+				selectedName = "Dynamic Collection");
 		}
 
 		task ("Add a Grid above the Container") {
@@ -685,7 +701,7 @@ definition {
 
 		task ("Change Number of Modules to 4") {
 			PageEditor.editLayoutGrid(
-				columnCount = 4,
+				columnCount = "4",
 				panel = "General");
 		}
 
@@ -693,7 +709,7 @@ definition {
 			for (var columnNumber : list "1,2,3") {
 				PageEditor.addElementToColumn(
 					collectionName = "Content Display",
-					columnNumber = ${columnNumber},
+					columnNumber = "${columnNumber}",
 					fragmentName = "Collection Filter",
 					navTab = "Fragments");
 			}
@@ -702,14 +718,14 @@ definition {
 		task ("Add an Applied Filters to the fourth modules of Grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Content Display",
-				columnNumber = 4,
+				columnNumber = "4",
 				fragmentName = "Applied Filters",
 				navTab = "Fragments");
 		}
 
 		task ("Select the dynamic collection as Target Collection and Select the Keywords as Filter in the first Collection Filter") {
 			PageEditor.editCollectionFilter(
-				columnNumber = 1,
+				columnNumber = "1",
 				filter = "Keywords",
 				fragmentName = "Collection Filter",
 				targetCollection = "Dynamic Collection");
@@ -718,7 +734,7 @@ definition {
 		task ("Select the dynamic collection as Target Collection and Select the Category as Filter, Gender vocabulary as Source and Single Selection in the second Collection Filter") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Male,Female",
-				columnNumber = 2,
+				columnNumber = "2",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				singleSelection = "true",
@@ -729,7 +745,7 @@ definition {
 		task ("Select the dynamic collection as Target Collection and Select the Category as Filter and Color vocabulary as Source in the third Collection Filter") {
 			PageEditor.editCollectionFilter(
 				categoryNameList = "Red,Brown,Black,Grey,Blue,Green,Yellow,White",
-				columnNumber = 3,
+				columnNumber = "3",
 				filter = "Category",
 				fragmentName = "Collection Filter",
 				targetCollection = "Dynamic Collection",
@@ -738,20 +754,22 @@ definition {
 
 		task ("Select the dynamic collection as Target Collection in the Applied Filters") {
 			PageEditor.editAppliedFilters(
-				columnNumber = 4,
+				columnNumber = "4",
 				targetCollection = "Dynamic Collection");
 		}
 
 		task ("View the Show More button when the number of applied filters more than limitation at Preview mode") {
-			PageEditor.previewInANewTab();
+			PageEditor.openPreviewMode();
 
-			var n = 1;
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			var n = "1";
 
 			for (var title : list "Lee 709,Levis 510,Levis 501,Levis 511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -760,46 +778,46 @@ definition {
 			Page.searchInCollectionFilter(searchTerm = "Levis");
 
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				filterName = "Female",
 				selectedName = "Female",
 				title = "Gender");
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Yellow,White",
-				columnNumber = 3,
+				columnNumber = "3",
 				multipleSelection = "true",
 				selectedName = "2 Selected",
 				title = "Color");
 
 			for (var filterName : list "Levis,Female,Yellow,White") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 501']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Red,Green,Brown",
-				columnNumber = 3,
+				columnNumber = "3",
 				multipleSelection = "true",
 				selectedName = "5 Selected",
 				title = "Color");
 
 			for (var filterName : list "Levis,Female") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 
@@ -808,13 +826,13 @@ definition {
 				locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST",
 				value1 = "max-height: 4em;");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Levis 510,Levis 501") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -831,7 +849,7 @@ definition {
 
 			for (var filterName : list "Levis,Female,Yellow,White,Red,Green,Brown") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 
@@ -846,13 +864,13 @@ definition {
 
 			for (var filterName : list "Levis,Female") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 
-			Close.closeWindow();
+			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("View the Show More button when the number of applied filters more than limitation at View mode") {
@@ -860,13 +878,13 @@ definition {
 				pageName = "Collection Page Name",
 				siteName = "Test Site Name");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Lee 709,Levis 510,Levis 501,Levis 511") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -875,46 +893,46 @@ definition {
 			Page.searchInCollectionFilter(searchTerm = "Levis");
 
 			Page.selectFilterInCollectionFilter(
-				columnNumber = 2,
+				columnNumber = "2",
 				filterName = "Female",
 				selectedName = "Female",
 				title = "Gender");
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Yellow,White,Red",
-				columnNumber = 3,
+				columnNumber = "3",
 				multipleSelection = "true",
 				selectedName = "3 Selected",
 				title = "Color");
 
 			for (var filterName : list "Levis,Female,Yellow,White,Red") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 
 			AssertVisible(
 				key_entryContent = "[normalize-space(text())='Levis 501']",
 				key_fragmentName = "Collection Display",
-				key_position = 1,
+				key_position = "1",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			AssertElementNotPresent(
 				key_entryContent = "",
 				key_fragmentName = "Collection Display",
-				key_position = 2,
+				key_position = "2",
 				locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 			Page.selectFilterInCollectionFilter(
 				categoryNameList = "Green,Brown",
-				columnNumber = 3,
+				columnNumber = "3",
 				multipleSelection = "true",
 				selectedName = "5 Selected",
 				title = "Color");
 
 			for (var filterName : list "Levis,Female,Yellow,White") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 
@@ -923,13 +941,13 @@ definition {
 				locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST",
 				value1 = "max-height: 4em;");
 
-			var n = 1;
+			var n = "1";
 
 			for (var title : list "Levis 510,Levis 501") {
 				AssertVisible(
 					key_entryContent = "[normalize-space(text())='${title}']",
 					key_fragmentName = "Collection Display",
-					key_position = ${n},
+					key_position = "${n}",
 					locator1 = "PageEditor#COLLECTION_ITEM_CONTENT_IN_BORDERED_LIST_AT_VIEW_MODE");
 
 				var n = ${n} + 1;
@@ -946,7 +964,7 @@ definition {
 
 			for (var filterName : list "Levis,Female,Yellow,White,Red,Green,Brown") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 
@@ -961,7 +979,7 @@ definition {
 
 			for (var filterName : list "Levis,Female,Yellow,White") {
 				AssertVisible(
-					filterName = ${filterName},
+					filterName = "${filterName}",
 					locator1 = "PageEditor#APPLIED_FILTERS_FILTER_LIST_FILTER_ITEM");
 			}
 		}

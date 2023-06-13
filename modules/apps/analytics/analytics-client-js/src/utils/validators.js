@@ -13,15 +13,13 @@
  */
 
 import {
-	DXP_APPLICATION_IDS,
 	VALIDATION_PROPERTIES_MAXIMUM_LENGTH,
 	VALIDATION_PROPERTY_NAME_MAXIMUM_LENGTH,
 	VALIDATION_PROPERTY_VALUE_MAXIMUM_LENGTH,
 } from './constants';
 
-const isValidEvent = ({applicationId, eventId, eventProps}) => {
+const isValidEvent = ({eventId, eventProps}) => {
 	const validationsEventId = _validate([
-		validateIsString('eventId'),
 		validateEmptyString('eventId'),
 		validateMaxLength(),
 	]);
@@ -30,31 +28,21 @@ const isValidEvent = ({applicationId, eventId, eventProps}) => {
 		validateEmptyString('eventPropKey'),
 		validateMaxLength(),
 	]);
-	const validateValue = [
+	const validationsValue = _validate([
 		validateMaxLength(VALIDATION_PROPERTY_VALUE_MAXIMUM_LENGTH),
-	];
-
-	// Ignore validation by attribute if applicationId is from DXP
-
-	if (!DXP_APPLICATION_IDS.includes(applicationId)) {
-		validateValue.push(validateAttributeType);
-	}
-
-	const validationsValue = _validate(validateValue);
-
+	]);
 	let errors = [];
 
-	errors = errors.concat(validationsEventId(eventId));
+	errors = errors.concat(
+		validationsEventId(eventId),
+		validationsEventProps({eventId, eventProps})
+	);
 
-	if (eventProps) {
-		errors = errors.concat(validationsEventProps({eventId, eventProps}));
-
-		for (const key in eventProps) {
-			errors = errors.concat(
-				validationsKey(key),
-				validationsValue(eventProps[key])
-			);
-		}
+	for (const key in eventProps) {
+		errors = errors.concat(
+			validationsKey(key),
+			validationsValue(eventProps[key])
+		);
 	}
 
 	if (errors.length) {
@@ -66,35 +54,11 @@ const isValidEvent = ({applicationId, eventId, eventProps}) => {
 	return true;
 };
 
-const validateAttributeType = (attributeValue) => {
-	let error = '';
-
-	const valid = ['string', 'number', 'boolean'].includes(
-		typeof attributeValue
-	);
-
-	if (!valid) {
-		error = 'Attribute must be a String, Number, or Boolean.';
-	}
-
-	return error;
-};
-
 const validateEmptyString = (labelField) => (str) => {
 	let error = '';
 
 	if (!String(str).length) {
 		error = `${labelField} is required.`;
-	}
-
-	return error;
-};
-
-const validateIsString = (labelField) => (val) => {
-	let error = '';
-
-	if (typeof val !== 'string') {
-		error = `${labelField} must be a string.`;
 	}
 
 	return error;
@@ -138,9 +102,7 @@ const _showErrors = (errorsArr) =>
 
 export {
 	isValidEvent,
-	validateAttributeType,
 	validateEmptyString,
 	validateMaxLength,
 	validatePropsLength,
-	validateIsString,
 };

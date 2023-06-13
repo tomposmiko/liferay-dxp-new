@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class DDMFormInstanceStagedModelDataHandler
 	extends BaseStagedModelDataHandler<DDMFormInstance> {
 
@@ -95,7 +95,7 @@ public class DDMFormInstanceStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_STRONG);
 		}
 
-		_exportFormInstanceSettings(
+		exportFormInstanceSettings(
 			portletDataContext, formInstance, formInstanceElement);
 
 		portletDataContext.addClassedModel(
@@ -166,7 +166,7 @@ public class DDMFormInstanceStagedModelDataHandler
 		Element formInstanceElement = portletDataContext.getImportDataElement(
 			formInstance);
 
-		DDMFormValues settingsDDMFormValues = _getImportFormInstanceSettings(
+		DDMFormValues settingsDDMFormValues = getImportFormInstanceSettings(
 			portletDataContext, formInstanceElement);
 
 		_ddmFormInstanceLocalService.updateFormInstance(
@@ -180,14 +180,7 @@ public class DDMFormInstanceStagedModelDataHandler
 			formInstance, importedFormInstance);
 	}
 
-	@Override
-	protected StagedModelRepository<DDMFormInstance>
-		getStagedModelRepository() {
-
-		return _stagedModelRepository;
-	}
-
-	private void _exportFormInstanceSettings(
+	protected void exportFormInstanceSettings(
 		PortletDataContext portletDataContext, DDMFormInstance formInstance,
 		Element formInstanceElement) {
 
@@ -201,7 +194,7 @@ public class DDMFormInstanceStagedModelDataHandler
 			settingsDDMFormValuesPath, formInstance.getSettings());
 	}
 
-	private DDMFormValues _getImportFormInstanceSettings(
+	protected DDMFormValues getImportFormInstanceSettings(
 			PortletDataContext portletDataContext, Element formInstanceElement)
 		throws Exception {
 
@@ -216,15 +209,35 @@ public class DDMFormInstanceStagedModelDataHandler
 		return deserialize(serializedSettingsDDMFormValues, ddmForm);
 	}
 
-	@Reference
+	@Override
+	protected StagedModelRepository<DDMFormInstance>
+		getStagedModelRepository() {
+
+		return _stagedModelRepository;
+	}
+
+	@Reference(unbind = "-")
+	protected void setDDMFormInstanceLocalService(
+		DDMFormInstanceLocalService ddmFormInstanceLocalService) {
+
+		_ddmFormInstanceLocalService = ddmFormInstanceLocalService;
+	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance)",
+		unbind = "-"
+	)
+	protected void setStagedModelRepository(
+		StagedModelRepository<DDMFormInstance> stagedModelRepository) {
+
+		_stagedModelRepository = stagedModelRepository;
+	}
+
 	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
 
 	@Reference(target = "(ddm.form.values.deserializer.type=json)")
 	private DDMFormValuesDeserializer _jsonDDMFormValuesDeserializer;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance)"
-	)
 	private StagedModelRepository<DDMFormInstance> _stagedModelRepository;
 
 }

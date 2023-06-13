@@ -79,7 +79,7 @@ public class BlogsEntryImageSelectorHelperTest {
 		}
 
 		Class<?> clazz = bundle.loadClass(
-			"com.liferay.blogs.web.internal.helper." +
+			"com.liferay.blogs.web.internal.util." +
 				"BlogsEntryImageSelectorHelper");
 
 		_constructor = clazz.getConstructor(
@@ -126,8 +126,7 @@ public class BlogsEntryImageSelectorHelperTest {
 				null, TestPropsValues.getUserId(), _group.getGroupId(),
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, _IMAGE_TITLE,
 				MimeTypesUtil.getContentType(_IMAGE_TITLE), "image",
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, bytes,
-				null, null,
+				StringPool.BLANK, StringPool.BLANK, bytes, null, null,
 				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 			Object blogsEntryImageSelectorHelper = _constructor.newInstance(
@@ -183,7 +182,7 @@ public class BlogsEntryImageSelectorHelperTest {
 				null, TestPropsValues.getUserId(), _group.getGroupId(),
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, _IMAGE_TITLE,
 				MimeTypesUtil.getContentType(_IMAGE_TITLE), "image",
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK,
 				FileUtil.getBytes(inputStream), null, null,
 				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 

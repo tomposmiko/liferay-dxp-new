@@ -15,14 +15,14 @@
 AUI.add(
 	'liferay-search-custom-filter',
 	(A) => {
-		const FacetUtil = Liferay.Search.FacetUtil;
+		var FacetUtil = Liferay.Search.FacetUtil;
 
-		const CustomFilter = function (form) {
+		var CustomFilter = function (form) {
 			if (!form) {
 				return;
 			}
 
-			const instance = this;
+			var instance = this;
 
 			instance.form = form;
 
@@ -32,9 +32,7 @@ AUI.add(
 				'.custom-filter-value-input'
 			);
 
-			const applyButton = instance.form.one(
-				'.custom-filter-apply-button'
-			);
+			var applyButton = instance.form.one('.custom-filter-apply-button');
 
 			if (applyButton) {
 				applyButton.on('click', A.bind(instance._onClick, instance));
@@ -43,13 +41,13 @@ AUI.add(
 
 		A.mix(CustomFilter.prototype, {
 			_onClick() {
-				const instance = this;
+				var instance = this;
 
 				instance.search();
 			},
 
 			_onSubmit(event) {
-				const instance = this;
+				var instance = this;
 
 				event.stopPropagation();
 
@@ -57,19 +55,19 @@ AUI.add(
 			},
 
 			getFilterValue() {
-				const instance = this;
+				var instance = this;
 
-				const filterValue = instance.filterValueInput.val();
+				var filterValue = instance.filterValueInput.val();
 
 				return filterValue;
 			},
 
 			search() {
-				const instance = this;
+				var instance = this;
 
-				const searchURL = instance.form.get('action');
+				var searchURL = instance.form.get('action');
 
-				const queryString = instance.updateQueryString(
+				var queryString = instance.updateQueryString(
 					document.location.search
 				);
 
@@ -77,9 +75,9 @@ AUI.add(
 			},
 
 			updateQueryString(queryString) {
-				const instance = this;
+				var instance = this;
 
-				let hasQuestionMark = false;
+				var hasQuestionMark = false;
 
 				if (queryString[0] === '?') {
 					hasQuestionMark = true;

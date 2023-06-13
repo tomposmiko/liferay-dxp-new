@@ -1,58 +1,27 @@
 definition {
 
-	macro addLinkToContent {
-		Click(locator1 = "CKEditor#TOOLBAR_LINK_BUTTON_BALLOON");
-
-		if (isSet(externalLink)) {
-			Type(
-				key_text = "URL",
-				locator1 = "TextInput#ANY",
-				value1 = ${externalLink});
-		}
-
-		Click(locator1 = "CKEditor#OK_BUTTON");
-	}
-
 	macro addPageContent {
 		SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
 
 		Type(
 			locator1 = "CKEditor#BODY",
-			value1 = ${wikiPageContent});
+			value1 = "${wikiPageContent}");
 
 		SelectFrame(value1 = "relative=top");
 	}
 
-	macro addPageContentTable {
-		Click(locator1 = "CKEditor#TABLE_ICON");
-
-		Click(locator1 = "CKEditor#OK_BUTTON");
-	}
-
-	macro addPageSummary {
-		Panel.expandPanel(panel = "Configuration");
-
-		Type(
-			key_text = "Summary",
-			locator1 = "TextInput#ANY",
-			value1 = ${wikiPageSummary});
-
-		Button.clickPublish();
-
-		Alert.viewSuccessMessage();
-	}
-
 	macro addPageTitle {
 		if (isSet(wikiPageTitle)) {
-			var title = ${wikiPageTitle};
+			var title = "${wikiPageTitle}";
 		}
+
 		else if (isSet(wikiChildPageTitle)) {
-			var title = ${wikiChildPageTitle};
+			var title = "${wikiChildPageTitle}";
 		}
 
 		Type(
 			locator1 = "Wiki#ENTRY_TITLE",
-			value1 = ${title});
+			value1 = "${title}");
 	}
 
 	macro cancel {
@@ -79,19 +48,19 @@ definition {
 
 			SelectNoError(
 				locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN",
-				value1 = ${pageFormat});
+				value1 = "${pageFormat}");
 		}
 		else if (IsVisible(locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN")) {
 			SelectNoError(
 				locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN",
-				value1 = ${pageFormat});
+				value1 = "${pageFormat}");
 		}
 	}
 
 	macro viewPageContentBody {
 		AssertTextEquals(
 			locator1 = "WikiEntry#BODY",
-			value1 = ${wikiPageContent});
+			value1 = "${wikiPageContent}");
 	}
 
 }

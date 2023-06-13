@@ -244,7 +244,7 @@ public class SystemEventAdvice extends ChainableMethodAdvice {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;

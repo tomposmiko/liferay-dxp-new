@@ -316,8 +316,4 @@ public interface AssetListEntryAssetEntryRelModel
 	@Override
 	public AssetListEntryAssetEntryRel cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

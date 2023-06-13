@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  * @author Brian Wing Shun Chan
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class RoleModelListener extends BaseModelListener<Role> {
 
 	@Override
@@ -49,7 +49,7 @@ public class RoleModelListener extends BaseModelListener<Role> {
 			Object associationClassPK)
 		throws ModelListenerException {
 
-		_auditOnAddorRemoveAssociation(
+		auditOnAddorRemoveAssociation(
 			EventTypes.ASSIGN, classPK, associationClassName,
 			associationClassPK);
 	}
@@ -68,7 +68,7 @@ public class RoleModelListener extends BaseModelListener<Role> {
 			Object associationClassPK)
 		throws ModelListenerException {
 
-		_auditOnAddorRemoveAssociation(
+		auditOnAddorRemoveAssociation(
 			EventTypes.UNASSIGN, classPK, associationClassName,
 			associationClassPK);
 	}
@@ -77,7 +77,7 @@ public class RoleModelListener extends BaseModelListener<Role> {
 		throws ModelListenerException {
 
 		try {
-			List<Attribute> attributes = _getModifiedAttributes(
+			List<Attribute> attributes = getModifiedAttributes(
 				originalRole, role);
 
 			if (!attributes.isEmpty()) {
@@ -94,21 +94,7 @@ public class RoleModelListener extends BaseModelListener<Role> {
 		}
 	}
 
-	protected void auditOnCreateOrRemove(String eventType, Role role)
-		throws ModelListenerException {
-
-		try {
-			AuditMessage auditMessage = AuditMessageBuilder.buildAuditMessage(
-				eventType, Role.class.getName(), role.getRoleId(), null);
-
-			_auditRouter.route(auditMessage);
-		}
-		catch (Exception exception) {
-			throw new ModelListenerException(exception);
-		}
-	}
-
-	private void _auditOnAddorRemoveAssociation(
+	protected void auditOnAddorRemoveAssociation(
 			String eventType, Object classPK, String associationClassName,
 			Object associationClassPK)
 		throws ModelListenerException {
@@ -155,7 +141,21 @@ public class RoleModelListener extends BaseModelListener<Role> {
 		}
 	}
 
-	private List<Attribute> _getModifiedAttributes(
+	protected void auditOnCreateOrRemove(String eventType, Role role)
+		throws ModelListenerException {
+
+		try {
+			AuditMessage auditMessage = AuditMessageBuilder.buildAuditMessage(
+				eventType, Role.class.getName(), role.getRoleId(), null);
+
+			_auditRouter.route(auditMessage);
+		}
+		catch (Exception exception) {
+			throw new ModelListenerException(exception);
+		}
+	}
+
+	protected List<Attribute> getModifiedAttributes(
 		Role originalRole, Role role) {
 
 		AttributesBuilder attributesBuilder = new AttributesBuilder(

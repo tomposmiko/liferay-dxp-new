@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Map;
@@ -49,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING,
 		"mvc.command.name=/dynamic_data_mapping/render_structure_field"
@@ -58,36 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 public class RenderStructureFieldMVCResourceCommand
 	extends BaseMVCResourceCommand {
 
-	@Override
-	protected void doServeResource(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws Exception {
-
-		HttpServletResponse httpServletResponse =
-			_portal.getHttpServletResponse(resourceResponse);
-
-		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
-			resourceRequest);
-
-		DDMFormField ddmFormField = _getDDMFormField(httpServletRequest);
-
-		DDMFormFieldRenderer ddmFormFieldRenderer =
-			_ddmFormFieldRendererRegistry.getDDMFormFieldRenderer(
-				ddmFormField.getType());
-
-		DDMFormFieldRenderingContext ddmFormFieldRenderingContext =
-			_createDDMFormFieldRenderingContext(
-				httpServletRequest, httpServletResponse);
-
-		String ddmFormFieldHTML = ddmFormFieldRenderer.render(
-			ddmFormField, ddmFormFieldRenderingContext);
-
-		httpServletResponse.setContentType(ContentTypes.TEXT_HTML);
-
-		ServletResponseUtil.write(httpServletResponse, ddmFormFieldHTML);
-	}
-
-	private DDMFormFieldRenderingContext _createDDMFormFieldRenderingContext(
+	protected DDMFormFieldRenderingContext createDDMFormFieldRenderingContext(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
@@ -97,17 +68,12 @@ public class RenderStructureFieldMVCResourceCommand
 
 		String mode = ParamUtil.getString(httpServletRequest, "mode");
 		String namespace = ParamUtil.getString(httpServletRequest, "namespace");
-		String portletId = ParamUtil.getString(httpServletRequest, "portletId");
 		String portletNamespace = ParamUtil.getString(
 			httpServletRequest, "portletNamespace");
 		boolean readOnly = ParamUtil.getBoolean(httpServletRequest, "readOnly");
 
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext =
 			new DDMFormFieldRenderingContext();
-
-		if (Validator.isNotNull(portletId)) {
-			httpServletRequest.setAttribute(WebKeys.PORTLET_ID, portletId);
-		}
 
 		httpServletRequest.setAttribute(
 			"aui:form:portletNamespace", portletNamespace);
@@ -125,7 +91,36 @@ public class RenderStructureFieldMVCResourceCommand
 		return ddmFormFieldRenderingContext;
 	}
 
-	private DDMFormField _getDDMFormField(
+	@Override
+	protected void doServeResource(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws Exception {
+
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(resourceResponse);
+
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
+			resourceRequest);
+
+		DDMFormField ddmFormField = getDDMFormField(httpServletRequest);
+
+		DDMFormFieldRenderer ddmFormFieldRenderer =
+			_ddmFormFieldRendererRegistry.getDDMFormFieldRenderer(
+				ddmFormField.getType());
+
+		DDMFormFieldRenderingContext ddmFormFieldRenderingContext =
+			createDDMFormFieldRenderingContext(
+				httpServletRequest, httpServletResponse);
+
+		String ddmFormFieldHTML = ddmFormFieldRenderer.render(
+			ddmFormField, ddmFormFieldRenderingContext);
+
+		httpServletResponse.setContentType(ContentTypes.TEXT_HTML);
+
+		ServletResponseUtil.write(httpServletResponse, ddmFormFieldHTML);
+	}
+
+	protected DDMFormField getDDMFormField(
 		HttpServletRequest httpServletRequest) {
 
 		String definition = ParamUtil.getString(
@@ -148,7 +143,13 @@ public class RenderStructureFieldMVCResourceCommand
 		return ddmFormFieldsMap.get(fieldName);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDMFormFieldRendererRegistry(
+		DDMFormFieldRendererRegistry ddmFormFieldRendererRegistry) {
+
+		_ddmFormFieldRendererRegistry = ddmFormFieldRendererRegistry;
+	}
+
 	private DDMFormFieldRendererRegistry _ddmFormFieldRendererRegistry;
 
 	@Reference(target = "(ddm.form.deserializer.type=json)")

@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.address.web.internal.display.context;
 
-import com.liferay.commerce.address.web.internal.display.context.helper.CommerceCountryRequestHelper;
-import com.liferay.commerce.address.web.internal.portlet.action.helper.ActionHelper;
+import com.liferay.commerce.address.web.internal.display.context.util.CommerceCountryRequestHelper;
+import com.liferay.commerce.address.web.internal.portlet.action.ActionHelper;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.CommerceChannelRelService;
@@ -23,20 +23,21 @@ import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.starter.CommerceRegionsStarter;
 import com.liferay.commerce.starter.CommerceRegionsStarterRegistry;
 import com.liferay.commerce.util.CommerceUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.Region;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.RegionServiceUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -52,7 +53,7 @@ public class CommerceCountriesDisplayContext
 		CommerceChannelRelService commerceChannelRelService,
 		CommerceChannelService commerceChannelService,
 		CommerceRegionsStarterRegistry commerceRegionsStarterRegistry,
-		CountryService countryService, Portal portal,
+		CountryService countryService,
 		PortletResourcePermission portletResourcePermission,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
@@ -66,17 +67,22 @@ public class CommerceCountriesDisplayContext
 		_countryService = countryService;
 
 		_commerceCountryRequestHelper = new CommerceCountryRequestHelper(
-			portal.getHttpServletRequest(renderRequest));
+			renderRequest);
 	}
 
 	public long[] getCommerceChannelRelCommerceChannelIds()
 		throws PortalException {
 
-		return TransformUtil.transformToLongArray(
+		List<CommerceChannelRel> commerceChannelRels =
 			_commerceChannelRelService.getCommerceChannelRels(
 				Country.class.getName(), getCountryId(), null,
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS),
-			CommerceChannelRel::getCommerceChannelId);
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Stream<CommerceChannelRel> stream = commerceChannelRels.stream();
+
+		return stream.mapToLong(
+			CommerceChannelRel::getCommerceChannelId
+		).toArray();
 	}
 
 	public List<CommerceChannel> getCommerceChannels() throws PortalException {
@@ -122,46 +128,53 @@ public class CommerceCountriesDisplayContext
 		searchContainer = new SearchContainer<>(
 			renderRequest, getPortletURL(), null, emptyResultsMessage);
 
-		searchContainer.setOrderByCol(getOrderByCol());
-		searchContainer.setOrderByComparator(
-			CommerceUtil.getCountryOrderByComparator(
-				getOrderByCol(), getOrderByType()));
-		searchContainer.setOrderByType(getOrderByType());
+		String orderByCol = getOrderByCol();
+		String orderByType = getOrderByType();
 
-		if (_isSearch()) {
-			searchContainer.setResultsAndTotal(
+		OrderByComparator<Country> orderByComparator =
+			CommerceUtil.getCountryOrderByComparator(orderByCol, orderByType);
+
+		searchContainer.setOrderByCol(orderByCol);
+		searchContainer.setOrderByComparator(orderByComparator);
+		searchContainer.setOrderByType(orderByType);
+		searchContainer.setRowChecker(getRowChecker());
+
+		int total;
+		List<Country> results;
+
+		if (isSearch()) {
+			BaseModelSearchResult<Country> baseModelSearchResult =
 				_countryService.searchCountries(
 					_commerceCountryRequestHelper.getCompanyId(), active,
-					_getKeywords(), searchContainer.getStart(),
-					searchContainer.getEnd(),
-					searchContainer.getOrderByComparator()));
+					getKeywords(), searchContainer.getStart(),
+					searchContainer.getEnd(), orderByComparator);
+
+			total = baseModelSearchResult.getLength();
+			results = baseModelSearchResult.getBaseModels();
 		}
 		else {
 			if (active == null) {
-				searchContainer.setResultsAndTotal(
-					() -> _countryService.getCompanyCountries(
-						_commerceCountryRequestHelper.getCompanyId(),
-						searchContainer.getStart(), searchContainer.getEnd(),
-						searchContainer.getOrderByComparator()),
-					_countryService.getCompanyCountriesCount(
-						_commerceCountryRequestHelper.getCompanyId()));
+				total = _countryService.getCompanyCountriesCount(
+					_commerceCountryRequestHelper.getCompanyId());
+
+				results = _countryService.getCompanyCountries(
+					_commerceCountryRequestHelper.getCompanyId(),
+					searchContainer.getStart(), searchContainer.getEnd(),
+					orderByComparator);
 			}
 			else {
-				boolean navigationActive = active;
+				total = _countryService.getCompanyCountriesCount(
+					_commerceCountryRequestHelper.getCompanyId(), active);
 
-				searchContainer.setResultsAndTotal(
-					() -> _countryService.getCompanyCountries(
-						_commerceCountryRequestHelper.getCompanyId(),
-						navigationActive, searchContainer.getStart(),
-						searchContainer.getEnd(),
-						searchContainer.getOrderByComparator()),
-					_countryService.getCompanyCountriesCount(
-						_commerceCountryRequestHelper.getCompanyId(),
-						navigationActive));
+				results = _countryService.getCompanyCountries(
+					_commerceCountryRequestHelper.getCompanyId(), active,
+					searchContainer.getStart(), searchContainer.getEnd(),
+					orderByComparator);
 			}
 		}
 
-		searchContainer.setRowChecker(getRowChecker());
+		searchContainer.setTotal(total);
+		searchContainer.setResults(results);
 
 		return searchContainer;
 	}
@@ -173,7 +186,7 @@ public class CommerceCountriesDisplayContext
 		return !regions.isEmpty();
 	}
 
-	private String _getKeywords() {
+	protected String getKeywords() {
 		if (Validator.isNotNull(_keywords)) {
 			return _keywords;
 		}
@@ -183,8 +196,8 @@ public class CommerceCountriesDisplayContext
 		return _keywords;
 	}
 
-	private boolean _isSearch() {
-		if (Validator.isNotNull(_getKeywords())) {
+	protected boolean isSearch() {
+		if (Validator.isNotNull(getKeywords())) {
 			return true;
 		}
 

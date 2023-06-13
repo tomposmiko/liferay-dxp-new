@@ -14,25 +14,25 @@
 
 package com.liferay.portlet.internal;
 
-import com.liferay.petra.concurrent.DCLSingleton;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.module.util.ServiceTrackerFieldUpdaterCustomizer;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapperTracker;
 import com.liferay.portal.kernel.portlet.Route;
 import com.liferay.portal.kernel.portlet.Router;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
-import com.liferay.portlet.RouterImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Raymond Augé
@@ -51,6 +50,30 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 
 	public FriendlyURLMapperTrackerImpl(Portlet portlet) throws Exception {
 		_portlet = portlet;
+
+		String filterString = null;
+
+		String portletId = portlet.getPortletId();
+
+		String portletName = portlet.getPortletName();
+
+		if (portletId.equals(portletName)) {
+			filterString = StringBundler.concat(
+				"(&(javax.portlet.name=", portletId, ")(objectClass=",
+				FriendlyURLMapper.class.getName(), "))");
+		}
+		else {
+			filterString = StringBundler.concat(
+				"(&(|(javax.portlet.name=", portletId, ")(javax.portlet.name=",
+				portletName, "))(objectClass=",
+				FriendlyURLMapper.class.getName(), "))");
+		}
+
+		_serviceTracker = new ServiceTracker<>(
+			_bundleContext, SystemBundleUtil.createFilter(filterString),
+			new FriendlyURLMapperServiceTrackerCustomizer());
+
+		_serviceTracker.open();
 	}
 
 	@Override
@@ -63,15 +86,12 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 			serviceRegistration.unregister();
 		}
 
-		_serviceTrackerDCLSingleton.destroy(ServiceTracker::close);
+		_serviceTracker.close();
 	}
 
 	@Override
 	public FriendlyURLMapper getFriendlyURLMapper() {
-		ServiceTracker<FriendlyURLMapper, FriendlyURLMapper> serviceTracker =
-			_serviceTrackerDCLSingleton.getSingleton(this::_openServiceTracker);
-
-		return serviceTracker.getService();
+		return _friendlyURLMapper;
 	}
 
 	@Override
@@ -101,7 +121,7 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 	protected String getContent(ClassLoader classLoader, String fileName)
 		throws Exception {
 
-		String queryString = HttpComponentsUtil.getQueryString(fileName);
+		String queryString = HttpUtil.getQueryString(fileName);
 
 		if (Validator.isNull(queryString)) {
 			return StringUtil.read(classLoader, fileName);
@@ -111,7 +131,7 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 
 		String xml = StringUtil.read(classLoader, fileName.substring(0, pos));
 
-		Map<String, String[]> parameterMap = HttpComponentsUtil.getParameterMap(
+		Map<String, String[]> parameterMap = HttpUtil.getParameterMap(
 			queryString);
 
 		if (parameterMap == null) {
@@ -133,61 +153,35 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 		return xml;
 	}
 
-	private ServiceTracker<FriendlyURLMapper, FriendlyURLMapper>
-		_openServiceTracker() {
-
-		String filterString = null;
-
-		String portletId = _portlet.getPortletId();
-
-		if (portletId.equals(_portlet.getPortletName())) {
-			filterString = StringBundler.concat(
-				"(&(javax.portlet.name=", portletId, ")(objectClass=",
-				FriendlyURLMapper.class.getName(), "))");
-		}
-		else {
-			filterString = StringBundler.concat(
-				"(&(|(javax.portlet.name=", portletId, ")(javax.portlet.name=",
-				_portlet.getPortletName(), "))(objectClass=",
-				FriendlyURLMapper.class.getName(), "))");
-		}
-
-		ServiceTracker<FriendlyURLMapper, FriendlyURLMapper> serviceTracker =
-			new ServiceTracker<>(
-				_bundleContext, SystemBundleUtil.createFilter(filterString),
-				new FriendlyURLMapperServiceTrackerCustomizer());
-
-		serviceTracker.open();
-
-		return serviceTracker;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		FriendlyURLMapperTrackerImpl.class);
 
 	private final BundleContext _bundleContext =
 		SystemBundleUtil.getBundleContext();
+	private volatile FriendlyURLMapper _friendlyURLMapper;
 	private final Portlet _portlet;
 	private final Map<FriendlyURLMapper, ServiceRegistration<?>>
 		_serviceRegistrations = new ConcurrentHashMap<>();
-	private final DCLSingleton
-		<ServiceTracker<FriendlyURLMapper, FriendlyURLMapper>>
-			_serviceTrackerDCLSingleton = new DCLSingleton<>();
+	private final ServiceTracker<FriendlyURLMapper, FriendlyURLMapper>
+		_serviceTracker;
 
 	private class FriendlyURLMapperServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer
+		extends ServiceTrackerFieldUpdaterCustomizer
 			<FriendlyURLMapper, FriendlyURLMapper> {
 
 		@Override
-		public FriendlyURLMapper addingService(
+		protected FriendlyURLMapper doAddingService(
 			ServiceReference<FriendlyURLMapper> serviceReference) {
 
 			FriendlyURLMapper friendlyURLMapper = _bundleContext.getService(
 				serviceReference);
 
 			try {
-				friendlyURLMapper.setMapping(
-					_portlet.getFriendlyURLMapping(false));
+				if (Validator.isNotNull(_portlet.getFriendlyURLMapping())) {
+					friendlyURLMapper.setMapping(
+						_portlet.getFriendlyURLMapping());
+				}
+
 				friendlyURLMapper.setPortletId(_portlet.getPortletId());
 				friendlyURLMapper.setPortletInstanceable(
 					_portlet.isInstanceable());
@@ -210,26 +204,12 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 				friendlyURLMapper.setRouter(newFriendlyURLRouter(xml));
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				return null;
 			}
 
 			return friendlyURLMapper;
-		}
-
-		@Override
-		public void modifiedService(
-			ServiceReference<FriendlyURLMapper> serviceReference,
-			FriendlyURLMapper friendlyURLMapper) {
-		}
-
-		@Override
-		public void removedService(
-			ServiceReference<FriendlyURLMapper> serviceReference,
-			FriendlyURLMapper friendlyURLMapper) {
-
-			_bundleContext.ungetService(serviceReference);
 		}
 
 		protected Router newFriendlyURLRouter(String xml) throws Exception {
@@ -291,6 +271,13 @@ public class FriendlyURLMapperTrackerImpl implements FriendlyURLMapperTracker {
 			}
 
 			return router;
+		}
+
+		private FriendlyURLMapperServiceTrackerCustomizer() throws Exception {
+			super(
+				ReflectionUtil.getDeclaredField(
+					FriendlyURLMapperTrackerImpl.class, "_friendlyURLMapper"),
+				FriendlyURLMapperTrackerImpl.this, null);
 		}
 
 	}

@@ -43,28 +43,28 @@ if (Validator.isNotNull(tempFileName)) {
 
 		<aui:script use="liferay-upload">
 			var liferayUpload = new Liferay.Upload({
-				'boundingBox': '#<portlet:namespace />fileUpload',
+				boundingBox: '#<portlet:namespace />fileUpload',
 
 				<%
 				DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
 				%>
 
-				'decimalSeparator': '<%= decimalFormatSymbols.getDecimalSeparator() %>',
-				'deleteFile':
+				decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+				deleteFile:
 					'<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/admin/update_certificate"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /></liferay-portlet:resourceURL>',
-				'fileDescription': '*.p12 *.pfx',
-				'maxFileSize':
-					'<%= UploadServletRequestConfigurationProviderUtil.getMaxSize() %> B',
-				'multipleFiles': false,
-				'namespace': '<portlet:namespace />',
-				'tempFileURL':
+				fileDescription: '*.p12 *.pfx',
+				maxFileSize:
+					'<%= UploadServletRequestConfigurationHelperUtil.getMaxSize() %> B',
+				multipleFiles: false,
+				namespace: '<portlet:namespace />',
+				tempFileURL:
 					'<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/admin/update_certificate"><portlet:param name="selectUploadedFile" value="<%= Constants.GET_TEMP %>" /><portlet:param name="selectUploadedFile" value='<%= ParamUtil.getString(request, "selectUploadedFile") %>' /></liferay-portlet:resourceURL>',
-				'tempRandomSuffix': '<%= SamlTempFileEntryUtil.TEMP_RANDOM_SUFFIX %>',
+				tempRandomSuffix: '<%= SamlTempFileEntryUtil.TEMP_RANDOM_SUFFIX %>',
 				'strings.dropFileText':
 					'<liferay-ui:message key="drop-a-pkcs12-formatted-keystore-file-here-to-inspect" />',
 				'strings.fileCannotBeSavedText':
 					'<liferay-ui:message key="the-file-x-cannot-be-inspected" />',
-				'uploadFile':
+				uploadFile:
 					'<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/admin/update_certificate"><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" /></liferay-portlet:resourceURL>',
 			});
 
@@ -106,7 +106,7 @@ if (Validator.isNotNull(tempFileName)) {
 		CertificateTool certificateTool = (CertificateTool)request.getAttribute(SamlWebKeys.SAML_CERTIFICATE_TOOL);
 		int otherEntriesCount = 0;
 
-		Enumeration<String> enumeration = keyStore.aliases();
+		Enumeration<String> enu = keyStore.aliases();
 		%>
 
 		<liferay-util:buffer
@@ -115,8 +115,8 @@ if (Validator.isNotNull(tempFileName)) {
 			<div data-keyStoreEntryAlias=""><liferay-ui:message key="select-a-keystore-entry-to-see-a-preview" /></div>
 
 			<%
-			while (enumeration.hasMoreElements()) {
-				String alias = enumeration.nextElement();
+			while (enu.hasMoreElements()) {
+				String alias = enu.nextElement();
 
 				if (!keyStore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
 					otherEntriesCount++;
@@ -176,13 +176,11 @@ if (Validator.isNotNull(tempFileName)) {
 					</div>
 
 					<div class="certificate-preview col-lg-9 col-sm-12">
-						<div class="sheet">
-							<div class="panel-group panel-group-flush">
-								<aui:fieldset label="preview">
-									<%= previews %>
-								</aui:fieldset>
-							</div>
-						</div>
+						<aui:fieldset-group markupView="lexicon">
+							<aui:fieldset label="preview">
+								<%= previews %>
+							</aui:fieldset>
+						</aui:fieldset-group>
 					</div>
 				</div>
 			</c:if>

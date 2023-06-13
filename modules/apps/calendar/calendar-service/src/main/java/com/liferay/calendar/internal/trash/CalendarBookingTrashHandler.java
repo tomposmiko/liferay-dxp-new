@@ -22,8 +22,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.trash.BaseTrashHandler;
 import com.liferay.trash.constants.TrashActionKeys;
 
 import org.osgi.service.component.annotations.Component;
@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pier Paolo Ramon
  */
-@Component(service = TrashHandler.class)
+@Component(immediate = true, service = TrashHandler.class)
 public class CalendarBookingTrashHandler extends BaseTrashHandler {
 
 	@Override

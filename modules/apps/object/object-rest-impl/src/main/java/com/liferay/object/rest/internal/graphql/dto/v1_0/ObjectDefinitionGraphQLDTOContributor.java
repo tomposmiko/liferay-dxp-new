@@ -14,53 +14,35 @@
 
 package com.liferay.object.rest.internal.graphql.dto.v1_0;
 
-import com.liferay.object.constants.ObjectFieldConstants;
-import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.rest.dto.v1_0.FileEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
-import com.liferay.object.rest.dto.v1_0.Status;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
-import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryRelatedObjectsResourceImpl;
-import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.scope.ObjectScopeProvider;
-import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.graphql.dto.GraphQLDTOContributor;
 import com.liferay.portal.vulcan.graphql.dto.GraphQLDTOProperty;
-import com.liferay.portal.vulcan.graphql.dto.v1_0.Creator;
-import com.liferay.portal.vulcan.list.type.ListEntry;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
-
-import java.lang.reflect.Method;
 
 import java.math.BigDecimal;
 
 import java.sql.Blob;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Javier de Arcos
@@ -69,104 +51,31 @@ public class ObjectDefinitionGraphQLDTOContributor
 	implements GraphQLDTOContributor<Map<String, Object>, Map<String, Object>> {
 
 	public static ObjectDefinitionGraphQLDTOContributor of(
-		FilterPredicateFactory filterPredicateFactory,
 		ObjectDefinition objectDefinition,
-		ObjectEntryManager objectEntryManager,
-		ObjectFieldLocalService objectFieldLocalService,
-		ObjectRelationshipLocalService objectRelationshipLocalService,
+		ObjectEntryManager objectEntryManager, List<ObjectField> objectFields,
 		ObjectScopeProvider objectScopeProvider) {
 
 		List<GraphQLDTOProperty> graphQLDTOProperties = new ArrayList<>();
 
 		graphQLDTOProperties.add(
 			GraphQLDTOProperty.of(
-				objectDefinition.getPKObjectFieldName(), true, Long.class));
-		graphQLDTOProperties.add(
-			GraphQLDTOProperty.of("creator", true, Creator.class));
-		graphQLDTOProperties.add(
-			GraphQLDTOProperty.of("dateCreated", true, Date.class));
-		graphQLDTOProperties.add(
-			GraphQLDTOProperty.of("dateModified", true, Date.class));
-		graphQLDTOProperties.add(
-			GraphQLDTOProperty.of("externalReferenceCode", String.class));
-		graphQLDTOProperties.add(
-			GraphQLDTOProperty.of("status", true, String.class));
-
-		List<GraphQLDTOProperty> relationshipGraphQLDTOProperties =
-			new ArrayList<>();
-
-		List<ObjectField> objectFields =
-			objectFieldLocalService.getObjectFields(
-				objectDefinition.getObjectDefinitionId());
+				objectDefinition.getPKObjectFieldName(), Long.class));
 
 		for (ObjectField objectField : objectFields) {
-			if (Objects.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
-
-				graphQLDTOProperties.add(
-					GraphQLDTOProperty.of(
-						objectField.getName(), FileEntry.class));
-			}
-			else if (objectField.getListTypeDefinitionId() != 0) {
-				graphQLDTOProperties.add(
-					GraphQLDTOProperty.of(
-						objectField.getName(), ListEntry.class));
-			}
-			else if (Objects.equals(
-						objectField.getRelationshipType(), "oneToMany")) {
-
-				String objectFieldName = objectField.getName();
-
-				String relationshipIdName =
-					objectFieldName.split(StringPool.UNDERLINE)[1];
-
-				graphQLDTOProperties.add(
-					GraphQLDTOProperty.of(relationshipIdName, Long.class));
-
-				String relationshipName = StringUtil.replaceLast(
-					relationshipIdName, "Id", "");
-
-				relationshipGraphQLDTOProperties.add(
-					GraphQLDTOProperty.of(relationshipName, Map.class));
-			}
-			else {
-				graphQLDTOProperties.add(
-					GraphQLDTOProperty.of(
-						objectField.getName(),
-						_typedClasses.getOrDefault(
-							objectField.getDBType(), Object.class)));
-			}
-		}
-
-		List<ObjectRelationship> objectRelationships =
-			objectRelationshipLocalService.getObjectRelationships(
-				objectDefinition.getObjectDefinitionId());
-
-		for (ObjectRelationship objectRelationship : objectRelationships) {
-			if (!Objects.equals(
-					objectRelationship.getType(),
-					ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
-
-				continue;
-			}
-
 			graphQLDTOProperties.add(
 				GraphQLDTOProperty.of(
-					objectRelationship.getName(), Long.class));
-			relationshipGraphQLDTOProperties.add(
-				GraphQLDTOProperty.of(objectRelationship.getName(), Map.class));
+					objectField.getName(),
+					_typedClasses.getOrDefault(
+						objectField.getType(), Object.class)));
 		}
 
 		return new ObjectDefinitionGraphQLDTOContributor(
 			objectDefinition.getCompanyId(),
-			new ObjectEntryEntityModel(objectFields), filterPredicateFactory,
-			graphQLDTOProperties,
+			new ObjectEntryEntityModel(objectFields), graphQLDTOProperties,
 			StringUtil.removeSubstring(
 				objectDefinition.getPKObjectFieldName(), "c_"),
 			objectDefinition, objectEntryManager, objectScopeProvider,
-			relationshipGraphQLDTOProperties, objectDefinition.getShortName(),
-			objectDefinition.getName());
+			objectDefinition.getShortName(), objectDefinition.getName());
 	}
 
 	@Override
@@ -182,14 +91,9 @@ public class ObjectDefinitionGraphQLDTOContributor
 
 	@Override
 	public boolean deleteDTO(long id) throws Exception {
-		_objectEntryManager.deleteObjectEntry(_objectDefinition, id);
+		_objectEntryManager.deleteObjectEntry(id);
 
 		return true;
-	}
-
-	@Override
-	public String getApplicationName() {
-		return _objectDefinition.getOSGiJaxRsName();
 	}
 
 	@Override
@@ -217,16 +121,20 @@ public class ObjectDefinitionGraphQLDTOContributor
 			(Long)dtoConverterContext.getAttribute("companyId"),
 			_objectDefinition,
 			(String)dtoConverterContext.getAttribute("scopeKey"), aggregation,
-			dtoConverterContext, pagination,
-			_filterPredicateFactory.create(
-				(String)dtoConverterContext.getAttribute("filter"),
-				_objectDefinition.getObjectDefinitionId()),
-			search, sorts);
+			dtoConverterContext, filter, pagination, search, sorts);
+
+		Collection<ObjectEntry> items = page.getItems();
+
+		Stream<ObjectEntry> stream = items.stream();
 
 		return Page.of(
 			page.getActions(), page.getFacets(),
-			TransformUtil.transform(page.getItems(), this::_toMap), pagination,
-			page.getTotalCount());
+			stream.map(
+				this::_toMap
+			).collect(
+				Collectors.toList()
+			),
+			pagination, page.getTotalCount());
 	}
 
 	@Override
@@ -245,82 +153,10 @@ public class ObjectDefinitionGraphQLDTOContributor
 	}
 
 	@Override
-	public List<GraphQLDTOProperty> getRelationshipGraphQLDTOProperties() {
-		return _relationshipGraphQLDTOProperties;
-	}
-
-	@Override
-	public <T> T getRelationshipValue(
-			DTOConverterContext dtoConverterContext, long id,
-			Class<T> relationshipClass, String relationshipName)
-		throws Exception {
-
-		if (!Objects.equals(relationshipClass, Map.class)) {
-			return null;
-		}
-
-		ObjectEntry objectEntry = _objectEntryManager.getObjectEntry(
-			dtoConverterContext, _objectDefinition, id);
-
-		long relationshipId = _getRelationshipId(objectEntry.getProperties());
-
-		if (relationshipId <= 0) {
-			Page<ObjectEntry> page =
-				_objectEntryManager.getObjectEntryRelatedObjectEntries(
-					dtoConverterContext, _objectDefinition, id,
-					relationshipName,
-					Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS));
-
-			return (T)TransformUtil.transform(
-				page.getItems(), itemObjectEntry -> _toMap(itemObjectEntry));
-		}
-
-		return (T)_toMap(
-			_objectEntryManager.fetchObjectEntry(
-				dtoConverterContext, null, relationshipId),
-			relationshipName);
-	}
-
-	@Override
-	public Class<?> getResourceClass(Operation operation) {
-		ObjectValuePair<Class<?>, String> objectValuePair =
-			_objectValuePairs.get(operation);
-
-		if (objectValuePair == null) {
-			return null;
-		}
-
-		return objectValuePair.getKey();
-	}
-
-	@Override
-	public Method getResourceMethod(Operation operation) {
-		ObjectValuePair<Class<?>, String> objectValuePair =
-			_objectValuePairs.get(operation);
-
-		if (objectValuePair == null) {
-			return null;
-		}
-
-		Class<?> clazz = objectValuePair.getKey();
-
-		String methodName = objectValuePair.getValue();
-
-		for (Method method : clazz.getMethods()) {
-			if (Objects.equals(method.getName(), methodName)) {
-				return method;
-			}
-		}
-
-		return null;
-	}
-
-	@Override
 	public String getResourceName() {
 		return _resourceName;
 	}
 
-	@Override
 	public String getTypeName() {
 		return _typeName;
 	}
@@ -344,69 +180,27 @@ public class ObjectDefinitionGraphQLDTOContributor
 
 	private ObjectDefinitionGraphQLDTOContributor(
 		long companyId, EntityModel entityModel,
-		FilterPredicateFactory filterPredicateFactory,
 		List<GraphQLDTOProperty> graphQLDTOProperties, String idName,
 		ObjectDefinition objectDefinition,
 		ObjectEntryManager objectEntryManager,
-		ObjectScopeProvider objectScopeProvider,
-		List<GraphQLDTOProperty> relationshipGraphQLDTOProperties,
-		String resourceName, String typeName) {
+		ObjectScopeProvider objectScopeProvider, String resourceName,
+		String typeName) {
 
 		_companyId = companyId;
 		_entityModel = entityModel;
-		_filterPredicateFactory = filterPredicateFactory;
 		_graphQLDTOProperties = graphQLDTOProperties;
 		_idName = idName;
 		_objectDefinition = objectDefinition;
 		_objectEntryManager = objectEntryManager;
 		_objectScopeProvider = objectScopeProvider;
-		_relationshipGraphQLDTOProperties = relationshipGraphQLDTOProperties;
 		_resourceName = resourceName;
 		_typeName = typeName;
 	}
 
-	private long _getRelationshipId(Map<String, Object> properties) {
-		for (Map.Entry<String, Object> entry : properties.entrySet()) {
-			Matcher matcher = _relationshipIdNamePattern.matcher(
-				entry.getKey());
-
-			if (matcher.matches()) {
-				if (entry.getValue() instanceof Long) {
-					return (long)entry.getValue();
-				}
-
-				return 0;
-			}
-		}
-
-		return 0;
-	}
-
 	private Map<String, Object> _toMap(ObjectEntry objectEntry) {
-		return _toMap(objectEntry, getIdName());
-	}
-
-	private Map<String, Object> _toMap(
-		ObjectEntry objectEntry, String objectEntryIdName) {
-
-		if (objectEntry == null) {
-			return null;
-		}
-
 		Map<String, Object> properties = objectEntry.getProperties();
 
-		properties.put(objectEntryIdName, objectEntry.getId());
-
-		properties.put("creator", objectEntry.getCreator());
-		properties.put("dateCreated", objectEntry.getDateCreated());
-		properties.put("dateModified", objectEntry.getDateModified());
-		properties.put(
-			"externalReferenceCode", objectEntry.getExternalReferenceCode());
-		properties.put("id", objectEntry.getId());
-
-		Status status = objectEntry.getStatus();
-
-		properties.put("status", status.getLabel());
+		properties.put(getIdName(), objectEntry.getId());
 
 		return properties;
 	}
@@ -429,36 +223,6 @@ public class ObjectDefinitionGraphQLDTOContributor
 		return objectEntry;
 	}
 
-	private static final Map<Operation, ObjectValuePair<Class<?>, String>>
-		_objectValuePairs =
-			HashMapBuilder.<Operation, ObjectValuePair<Class<?>, String>>put(
-				Operation.CREATE,
-				new ObjectValuePair<>(
-					ObjectEntryResourceImpl.class, "postObjectEntry")
-			).put(
-				Operation.DELETE,
-				new ObjectValuePair<>(
-					ObjectEntryResourceImpl.class, "deleteObjectEntry")
-			).put(
-				Operation.GET,
-				new ObjectValuePair<>(
-					ObjectEntryResourceImpl.class, "getObjectEntry")
-			).put(
-				Operation.GET_RELATIONSHIP,
-				new ObjectValuePair<>(
-					ObjectEntryRelatedObjectsResourceImpl.class,
-					"getCurrentObjectEntriesObjectRelationshipNamePage")
-			).put(
-				Operation.LIST,
-				new ObjectValuePair<>(
-					ObjectEntryResourceImpl.class, "getObjectEntriesPage")
-			).put(
-				Operation.UPDATE,
-				new ObjectValuePair<>(
-					ObjectEntryResourceImpl.class, "putObjectEntry")
-			).build();
-	private static final Pattern _relationshipIdNamePattern = Pattern.compile(
-		"r_.+_c_.+Id");
 	private static final Map<String, Class<?>> _typedClasses =
 		HashMapBuilder.<String, Class<?>>put(
 			"BigDecimal", BigDecimal.class
@@ -480,13 +244,11 @@ public class ObjectDefinitionGraphQLDTOContributor
 
 	private final long _companyId;
 	private final EntityModel _entityModel;
-	private final FilterPredicateFactory _filterPredicateFactory;
 	private final List<GraphQLDTOProperty> _graphQLDTOProperties;
 	private final String _idName;
 	private final ObjectDefinition _objectDefinition;
 	private final ObjectEntryManager _objectEntryManager;
 	private final ObjectScopeProvider _objectScopeProvider;
-	private final List<GraphQLDTOProperty> _relationshipGraphQLDTOProperties;
 	private final String _resourceName;
 	private final String _typeName;
 

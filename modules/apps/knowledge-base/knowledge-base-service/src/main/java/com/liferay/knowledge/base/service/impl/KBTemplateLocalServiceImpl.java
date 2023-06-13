@@ -21,7 +21,6 @@ import com.liferay.knowledge.base.exception.NoSuchTemplateException;
 import com.liferay.knowledge.base.internal.util.KBCommentUtil;
 import com.liferay.knowledge.base.model.KBTemplate;
 import com.liferay.knowledge.base.service.base.KBTemplateLocalServiceBaseImpl;
-import com.liferay.knowledge.base.service.persistence.KBCommentPersistence;
 import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -42,10 +41,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -78,11 +74,11 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 
 		// KB template
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 		long groupId = serviceContext.getScopeGroupId();
 		Date date = new Date();
 
-		_validate(title, content);
+		validate(title, content);
 
 		long kbTemplateId = counterLocalService.increment();
 
@@ -102,7 +98,7 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.addModelResources(kbTemplate, serviceContext);
+		resourceLocalService.addModelResources(kbTemplate, serviceContext);
 
 		// Social
 
@@ -141,15 +137,15 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.deleteResource(
+		resourceLocalService.deleteResource(
 			kbTemplate.getCompanyId(), KBTemplate.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL, kbTemplate.getKbTemplateId());
 
 		// KB Comments
 
 		KBCommentUtil.deleteKBComments(
-			KBTemplate.class.getName(), _classNameLocalService,
-			kbTemplate.getKbTemplateId(), _kbCommentPersistence);
+			KBTemplate.class.getName(), classNameLocalService,
+			kbTemplate.getKbTemplateId(), kbCommentPersistence);
 
 		// Social
 
@@ -180,7 +176,8 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 			}
 			catch (NoSuchTemplateException noSuchTemplateException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchTemplateException);
+					_log.debug(
+						noSuchTemplateException, noSuchTemplateException);
 				}
 
 				continue;
@@ -210,7 +207,7 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 		Date endDate, boolean andOperator, int start, int end,
 		OrderByComparator<KBTemplate> orderByComparator) {
 
-		DynamicQuery dynamicQuery = _buildDynamicQuery(
+		DynamicQuery dynamicQuery = buildDynamicQuery(
 			groupId, title, content, startDate, endDate, andOperator);
 
 		return dynamicQuery(dynamicQuery, start, end, orderByComparator);
@@ -224,7 +221,7 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 
 		// KB template
 
-		_validate(title, content);
+		validate(title, content);
 
 		KBTemplate kbTemplate = kbTemplatePersistence.findByPrimaryKey(
 			kbTemplateId);
@@ -255,13 +252,13 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 			String[] guestPermissions)
 		throws PortalException {
 
-		_resourceLocalService.updateResources(
+		resourceLocalService.updateResources(
 			kbTemplate.getCompanyId(), kbTemplate.getGroupId(),
 			KBTemplate.class.getName(), kbTemplate.getKbTemplateId(),
 			groupPermissions, guestPermissions);
 	}
 
-	private DynamicQuery _buildDynamicQuery(
+	protected DynamicQuery buildDynamicQuery(
 		long groupId, String title, String content, Date startDate,
 		Date endDate, boolean andOperator) {
 
@@ -331,7 +328,7 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 		return dynamicQuery.add(junction);
 	}
 
-	private void _validate(String title, String content)
+	protected void validate(String title, String content)
 		throws PortalException {
 
 		if (Validator.isNull(title)) {
@@ -347,18 +344,6 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 		KBTemplateLocalServiceImpl.class);
 
 	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private KBCommentPersistence _kbCommentPersistence;
-
-	@Reference
-	private ResourceLocalService _resourceLocalService;
-
-	@Reference
 	private SocialActivityLocalService _socialActivityLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

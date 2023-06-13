@@ -38,15 +38,24 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_OPEN_ORDER_CONTENT,
-		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_ORDER_CONTENT,
 		"mvc.command.name=/commerce_open_order_content/edit_commerce_order_note"
 	},
 	service = MVCActionCommand.class
 )
 public class EditCommerceOrderNoteMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected void deleteCommerceOrderNote(ActionRequest actionRequest)
+		throws Exception {
+
+		long commerceOrderNoteId = ParamUtil.getLong(
+			actionRequest, "commerceOrderNoteId");
+
+		_commerceOrderNoteService.deleteCommerceOrderNote(commerceOrderNoteId);
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -57,12 +66,12 @@ public class EditCommerceOrderNoteMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceOrderNote(actionRequest);
+				deleteCommerceOrderNote(actionRequest);
 			}
 			else if (cmd.equals(Constants.ADD) ||
 					 cmd.equals(Constants.UPDATE)) {
 
-				_updateCommerceOrderNote(actionRequest);
+				updateCommerceOrderNote(actionRequest);
 			}
 		}
 		catch (Exception exception) {
@@ -82,16 +91,7 @@ public class EditCommerceOrderNoteMVCActionCommand
 		}
 	}
 
-	private void _deleteCommerceOrderNote(ActionRequest actionRequest)
-		throws Exception {
-
-		long commerceOrderNoteId = ParamUtil.getLong(
-			actionRequest, "commerceOrderNoteId");
-
-		_commerceOrderNoteService.deleteCommerceOrderNote(commerceOrderNoteId);
-	}
-
-	private void _updateCommerceOrderNote(ActionRequest actionRequest)
+	protected void updateCommerceOrderNote(ActionRequest actionRequest)
 		throws Exception {
 
 		String content = ParamUtil.getString(actionRequest, "content");

@@ -243,8 +243,4 @@ public interface ResourcePermissionModel
 	@Override
 	public ResourcePermission cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

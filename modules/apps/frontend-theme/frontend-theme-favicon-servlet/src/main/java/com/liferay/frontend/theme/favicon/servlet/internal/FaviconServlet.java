@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Bruno Basto
  */
 @Component(
+	immediate = true,
 	property = {
 		"osgi.http.whiteboard.context.path=/favicon",
 		"osgi.http.whiteboard.servlet.name=com.liferay.frontend.theme.favicon.servlet.internal.FaviconServlet",
@@ -53,7 +54,8 @@ public class FaviconServlet extends HttpServlet {
 				WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay != null) {
-			httpServletResponse.sendRedirect(themeDisplay.getFaviconURL());
+			httpServletResponse.sendRedirect(
+				themeDisplay.getPathImage() + "/favicon.ico");
 
 			return;
 		}

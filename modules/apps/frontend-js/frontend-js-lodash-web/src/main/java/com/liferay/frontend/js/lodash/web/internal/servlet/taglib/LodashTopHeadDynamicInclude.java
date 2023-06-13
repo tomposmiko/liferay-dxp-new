@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.frontend.js.lodash.web.internal.configuration.JSLodashConfiguration",
-	service = DynamicInclude.class
+	immediate = true, service = DynamicInclude.class
 )
 public class LodashTopHeadDynamicInclude extends BaseDynamicInclude {
 
@@ -65,7 +65,7 @@ public class LodashTopHeadDynamicInclude extends BaseDynamicInclude {
 			printWriter.print("<script data-senna-track=\"permanent\" src=\"");
 
 			printWriter.print(
-				absolutePortalURLBuilder.forBundleScript(
+				absolutePortalURLBuilder.forModuleScript(
 					_bundleContext.getBundle(), fileName
 				).build());
 

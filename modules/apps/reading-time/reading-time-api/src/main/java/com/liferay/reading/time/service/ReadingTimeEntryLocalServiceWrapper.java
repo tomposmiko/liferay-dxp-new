@@ -14,10 +14,7 @@
 
 package com.liferay.reading.time.service;
 
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
-import com.liferay.reading.time.model.ReadingTimeEntry;
 
 /**
  * Provides a wrapper for {@link ReadingTimeEntryLocalService}.
@@ -30,10 +27,6 @@ public class ReadingTimeEntryLocalServiceWrapper
 	implements ReadingTimeEntryLocalService,
 			   ServiceWrapper<ReadingTimeEntryLocalService> {
 
-	public ReadingTimeEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ReadingTimeEntryLocalServiceWrapper(
 		ReadingTimeEntryLocalService readingTimeEntryLocalService) {
 
@@ -41,7 +34,7 @@ public class ReadingTimeEntryLocalServiceWrapper
 	}
 
 	@Override
-	public ReadingTimeEntry addReadingTimeEntry(
+	public com.liferay.reading.time.model.ReadingTimeEntry addReadingTimeEntry(
 		com.liferay.portal.kernel.model.GroupedModel groupedModel,
 		java.time.Duration readingTimeDuration) {
 
@@ -50,7 +43,7 @@ public class ReadingTimeEntryLocalServiceWrapper
 	}
 
 	@Override
-	public ReadingTimeEntry addReadingTimeEntry(
+	public com.liferay.reading.time.model.ReadingTimeEntry addReadingTimeEntry(
 		long groupId, long classNameId, long classPK,
 		java.time.Duration readingTimeDuration) {
 
@@ -69,8 +62,8 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the reading time entry that was added
 	 */
 	@Override
-	public ReadingTimeEntry addReadingTimeEntry(
-		ReadingTimeEntry readingTimeEntry) {
+	public com.liferay.reading.time.model.ReadingTimeEntry addReadingTimeEntry(
+		com.liferay.reading.time.model.ReadingTimeEntry readingTimeEntry) {
 
 		return _readingTimeEntryLocalService.addReadingTimeEntry(
 			readingTimeEntry);
@@ -95,7 +88,9 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the new reading time entry
 	 */
 	@Override
-	public ReadingTimeEntry createReadingTimeEntry(long readingTimeEntryId) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		createReadingTimeEntry(long readingTimeEntryId) {
+
 		return _readingTimeEntryLocalService.createReadingTimeEntry(
 			readingTimeEntryId);
 	}
@@ -113,8 +108,9 @@ public class ReadingTimeEntryLocalServiceWrapper
 	}
 
 	@Override
-	public ReadingTimeEntry deleteReadingTimeEntry(
-		com.liferay.portal.kernel.model.GroupedModel groupedModel) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		deleteReadingTimeEntry(
+			com.liferay.portal.kernel.model.GroupedModel groupedModel) {
 
 		return _readingTimeEntryLocalService.deleteReadingTimeEntry(
 			groupedModel);
@@ -132,7 +128,8 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @throws PortalException if a reading time entry with the primary key could not be found
 	 */
 	@Override
-	public ReadingTimeEntry deleteReadingTimeEntry(long readingTimeEntryId)
+	public com.liferay.reading.time.model.ReadingTimeEntry
+			deleteReadingTimeEntry(long readingTimeEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _readingTimeEntryLocalService.deleteReadingTimeEntry(
@@ -140,8 +137,8 @@ public class ReadingTimeEntryLocalServiceWrapper
 	}
 
 	@Override
-	public ReadingTimeEntry deleteReadingTimeEntry(
-		long groupId, long classNameId, long classPK) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		deleteReadingTimeEntry(long groupId, long classNameId, long classPK) {
 
 		return _readingTimeEntryLocalService.deleteReadingTimeEntry(
 			groupId, classNameId, classPK);
@@ -158,8 +155,9 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the reading time entry that was removed
 	 */
 	@Override
-	public ReadingTimeEntry deleteReadingTimeEntry(
-		ReadingTimeEntry readingTimeEntry) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		deleteReadingTimeEntry(
+			com.liferay.reading.time.model.ReadingTimeEntry readingTimeEntry) {
 
 		return _readingTimeEntryLocalService.deleteReadingTimeEntry(
 			readingTimeEntry);
@@ -269,30 +267,34 @@ public class ReadingTimeEntryLocalServiceWrapper
 	}
 
 	@Override
-	public ReadingTimeEntry fetchOrAddReadingTimeEntry(
-		com.liferay.portal.kernel.model.GroupedModel groupedModel) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		fetchOrAddReadingTimeEntry(
+			com.liferay.portal.kernel.model.GroupedModel groupedModel) {
 
 		return _readingTimeEntryLocalService.fetchOrAddReadingTimeEntry(
 			groupedModel);
 	}
 
 	@Override
-	public ReadingTimeEntry fetchReadingTimeEntry(
-		com.liferay.portal.kernel.model.GroupedModel groupedModel) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		fetchReadingTimeEntry(
+			com.liferay.portal.kernel.model.GroupedModel groupedModel) {
 
 		return _readingTimeEntryLocalService.fetchReadingTimeEntry(
 			groupedModel);
 	}
 
 	@Override
-	public ReadingTimeEntry fetchReadingTimeEntry(long readingTimeEntryId) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		fetchReadingTimeEntry(long readingTimeEntryId) {
+
 		return _readingTimeEntryLocalService.fetchReadingTimeEntry(
 			readingTimeEntryId);
 	}
 
 	@Override
-	public ReadingTimeEntry fetchReadingTimeEntry(
-		long groupId, long classNameId, long classPK) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		fetchReadingTimeEntry(long groupId, long classNameId, long classPK) {
 
 		return _readingTimeEntryLocalService.fetchReadingTimeEntry(
 			groupId, classNameId, classPK);
@@ -306,8 +308,8 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the matching reading time entry, or <code>null</code> if a matching reading time entry could not be found
 	 */
 	@Override
-	public ReadingTimeEntry fetchReadingTimeEntryByUuidAndGroupId(
-		String uuid, long groupId) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		fetchReadingTimeEntryByUuidAndGroupId(String uuid, long groupId) {
 
 		return _readingTimeEntryLocalService.
 			fetchReadingTimeEntryByUuidAndGroupId(uuid, groupId);
@@ -371,8 +373,8 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the range of reading time entries
 	 */
 	@Override
-	public java.util.List<ReadingTimeEntry> getReadingTimeEntries(
-		int start, int end) {
+	public java.util.List<com.liferay.reading.time.model.ReadingTimeEntry>
+		getReadingTimeEntries(int start, int end) {
 
 		return _readingTimeEntryLocalService.getReadingTimeEntries(start, end);
 	}
@@ -385,7 +387,7 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the matching reading time entries, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<ReadingTimeEntry>
+	public java.util.List<com.liferay.reading.time.model.ReadingTimeEntry>
 		getReadingTimeEntriesByUuidAndCompanyId(String uuid, long companyId) {
 
 		return _readingTimeEntryLocalService.
@@ -403,11 +405,12 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the range of matching reading time entries, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<ReadingTimeEntry>
+	public java.util.List<com.liferay.reading.time.model.ReadingTimeEntry>
 		getReadingTimeEntriesByUuidAndCompanyId(
 			String uuid, long companyId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator<ReadingTimeEntry>
-				orderByComparator) {
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.reading.time.model.ReadingTimeEntry>
+					orderByComparator) {
 
 		return _readingTimeEntryLocalService.
 			getReadingTimeEntriesByUuidAndCompanyId(
@@ -432,7 +435,8 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @throws PortalException if a reading time entry with the primary key could not be found
 	 */
 	@Override
-	public ReadingTimeEntry getReadingTimeEntry(long readingTimeEntryId)
+	public com.liferay.reading.time.model.ReadingTimeEntry getReadingTimeEntry(
+			long readingTimeEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _readingTimeEntryLocalService.getReadingTimeEntry(
@@ -448,8 +452,8 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @throws PortalException if a matching reading time entry could not be found
 	 */
 	@Override
-	public ReadingTimeEntry getReadingTimeEntryByUuidAndGroupId(
-			String uuid, long groupId)
+	public com.liferay.reading.time.model.ReadingTimeEntry
+			getReadingTimeEntryByUuidAndGroupId(String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _readingTimeEntryLocalService.
@@ -457,17 +461,19 @@ public class ReadingTimeEntryLocalServiceWrapper
 	}
 
 	@Override
-	public ReadingTimeEntry updateReadingTimeEntry(
-		com.liferay.portal.kernel.model.GroupedModel groupedModel) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		updateReadingTimeEntry(
+			com.liferay.portal.kernel.model.GroupedModel groupedModel) {
 
 		return _readingTimeEntryLocalService.updateReadingTimeEntry(
 			groupedModel);
 	}
 
 	@Override
-	public ReadingTimeEntry updateReadingTimeEntry(
-		long groupId, long classNameId, long classPK,
-		java.time.Duration readingTimeDuration) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		updateReadingTimeEntry(
+			long groupId, long classNameId, long classPK,
+			java.time.Duration readingTimeDuration) {
 
 		return _readingTimeEntryLocalService.updateReadingTimeEntry(
 			groupId, classNameId, classPK, readingTimeDuration);
@@ -484,31 +490,12 @@ public class ReadingTimeEntryLocalServiceWrapper
 	 * @return the reading time entry that was updated
 	 */
 	@Override
-	public ReadingTimeEntry updateReadingTimeEntry(
-		ReadingTimeEntry readingTimeEntry) {
+	public com.liferay.reading.time.model.ReadingTimeEntry
+		updateReadingTimeEntry(
+			com.liferay.reading.time.model.ReadingTimeEntry readingTimeEntry) {
 
 		return _readingTimeEntryLocalService.updateReadingTimeEntry(
 			readingTimeEntry);
-	}
-
-	@Override
-	public CTPersistence<ReadingTimeEntry> getCTPersistence() {
-		return _readingTimeEntryLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<ReadingTimeEntry> getModelClass() {
-		return _readingTimeEntryLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<ReadingTimeEntry>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _readingTimeEntryLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

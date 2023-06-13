@@ -148,8 +148,4 @@ public interface LocalizedEntryLocalizationModel
 	@Override
 	public LocalizedEntryLocalization cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

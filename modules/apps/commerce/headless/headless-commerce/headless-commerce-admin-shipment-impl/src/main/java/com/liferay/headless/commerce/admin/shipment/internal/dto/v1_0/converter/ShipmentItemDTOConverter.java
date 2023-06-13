@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.shipment.internal.dto.v1_0.converter;
 
-import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.model.CommerceShipmentItem;
 import com.liferay.commerce.service.CommerceShipmentItemService;
 import com.liferay.headless.commerce.admin.shipment.dto.v1_0.ShipmentItem;
@@ -26,11 +25,11 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Andrea Sbarra
- * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.model.CommerceShipmentItem",
-	service = DTOConverter.class
+	service = {DTOConverter.class, ShipmentItemDTOConverter.class}
 )
 public class ShipmentItemDTOConverter
 	implements DTOConverter<CommerceShipmentItem, ShipmentItem> {
@@ -52,8 +51,6 @@ public class ShipmentItemDTOConverter
 			{
 				actions = dtoConverterContext.getActions();
 				createDate = commerceShipmentItem.getCreateDate();
-				externalReferenceCode =
-					commerceShipmentItem.getExternalReferenceCode();
 				id = commerceShipmentItem.getCommerceShipmentItemId();
 				modifiedDate = commerceShipmentItem.getModifiedDate();
 				orderItemId = commerceShipmentItem.getCommerceOrderItemId();
@@ -62,14 +59,6 @@ public class ShipmentItemDTOConverter
 				userName = commerceShipmentItem.getUserName();
 				warehouseId =
 					commerceShipmentItem.getCommerceInventoryWarehouseId();
-
-				setShipmentExternalReferenceCode(
-					() -> {
-						CommerceShipment commerceShipment =
-							commerceShipmentItem.getCommerceShipment();
-
-						return commerceShipment.getExternalReferenceCode();
-					});
 			}
 		};
 	}

@@ -41,10 +41,10 @@ public abstract class BaseKaleoProcessFormNavigatorEntry
 
 	@Override
 	public String getLabel(Locale locale) {
-		return LanguageUtil.get(_getResourceBundle(locale), getKey());
+		return LanguageUtil.get(getResourceBundle(locale), getKey());
 	}
 
-	private ResourceBundle _getResourceBundle(Locale locale) {
+	protected ResourceBundle getResourceBundle(Locale locale) {
 		Class<?> clazz = getClass();
 
 		return ResourceBundleUtil.getBundle(locale, clazz.getClassLoader());

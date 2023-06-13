@@ -16,11 +16,14 @@ package com.liferay.portal.spring.context;
 
 import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.lang.ClassLoaderPool;
+import com.liferay.petra.log4j.Log4JUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.dao.init.DBInitUtil;
+import com.liferay.portal.dao.orm.hibernate.FieldInterceptionHelperUtil;
 import com.liferay.portal.deploy.hot.CustomJspBagRegistryUtil;
 import com.liferay.portal.deploy.hot.ServiceWrapperRegistry;
 import com.liferay.portal.events.StartupHelperUtil;
@@ -37,26 +40,25 @@ import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.module.util.ServiceLatch;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
-import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.DirectServletRegistryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.ClearThreadLocalUtil;
 import com.liferay.portal.kernel.util.ClearTimerThreadUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
-import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
-import com.liferay.portal.log4j.Log4JUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.module.framework.ModuleFrameworkUtil;
 import com.liferay.portal.spring.aop.DynamicProxyCreator;
+import com.liferay.portal.spring.compat.CompatBeanDefinitionRegistryPostProcessor;
 import com.liferay.portal.spring.configurator.ConfigurableApplicationContextConfigurator;
-import com.liferay.portal.spring.override.OverrideBeanDefinitionRegistryPostProcessor;
 import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalClassPathUtil;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.beans.PropertyDescriptor;
@@ -81,13 +83,14 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.FutureTask;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import javax.sql.DataSource;
+
+import org.apache.tika.config.ServiceLoader;
 
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -130,22 +133,24 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			DirectServletRegistryUtil.clearServlets();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		try {
 			HotDeployUtil.reset();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		try {
 			PortalLifecycleUtil.reset();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
+
+		closeDataSource("counterDataSource");
 
 		closeDataSource("liferayDataSource");
 
@@ -153,17 +158,17 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		_cleanUpJDBCDrivers();
 
-		ModuleFrameworkUtil.unregisterContext(_arrayApplicationContext);
-
-		_arrayApplicationContext.close();
-
 		try {
 			ModuleFrameworkUtil.stopFramework(
 				PropsValues.MODULE_FRAMEWORK_STOP_WAIT_TIMEOUT);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
+
+		ModuleFrameworkUtil.unregisterContext(_arrayApplicationContext);
+
+		_arrayApplicationContext.close();
 
 		ClassLoaderPool.unregister(_portalServletContextName);
 		ServletContextClassLoaderPool.unregister(_portalServletContextName);
@@ -172,14 +177,14 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			ClearThreadLocalUtil.clearThreadLocal();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		try {
 			ClearTimerThreadUtil.clearTimerThread();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		Log4JUtil.shutdownLog4J();
@@ -194,7 +199,19 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			throw new RuntimeException(classNotFoundException);
 		}
 
+		FieldInterceptionHelperUtil.initialize();
+
 		ServletContext servletContext = servletContextEvent.getServletContext();
+
+		String portalLibDir = servletContext.getRealPath("/WEB-INF/lib");
+
+		portalLibDir = StringUtil.replace(
+			portalLibDir, CharPool.BACK_SLASH, CharPool.FORWARD_SLASH);
+
+		if (Validator.isNotNull(portalLibDir)) {
+			SystemProperties.set(
+				PropsKeys.LIFERAY_LIB_PORTAL_DIR, portalLibDir);
+		}
 
 		PortalClassPathUtil.initializeClassPaths(servletContext);
 
@@ -260,11 +277,11 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		serviceLatch.openOn(
 			() -> _serviceWrapperRegistry = new ServiceWrapperRegistry());
 
+		ServiceLoader.setContextClassLoader(portalClassLoader);
+
 		FutureTask<Void> springInitTask = null;
 
-		if (ModuleFrameworkPropsValues.
-				MODULE_FRAMEWORK_CONCURRENT_STARTUP_ENABLED) {
-
+		if (PropsValues.MODULE_FRAMEWORK_CONCURRENT_STARTUP_ENABLED) {
 			springInitTask = new FutureTask<>(
 				() -> {
 					super.contextInitialized(servletContextEvent);
@@ -330,28 +347,19 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		dynamicProxyCreator.clear();
 
-		if (PropsValues.UPGRADE_DATABASE_AUTO_RUN) {
-			StartupHelperUtil.setUpgrading(true);
+		try {
+			if (PropsValues.UPGRADE_DATABASE_AUTO_RUN) {
+				DBUpgrader.upgrade(applicationContext);
 
-			try {
-				DBUpgrader.upgradePortal();
+				StartupHelperUtil.setUpgrading(false);
 			}
-			catch (Exception exception) {
-				throw new RuntimeException(exception);
+			else {
+				ModuleFrameworkUtil.registerContext(applicationContext);
 			}
 		}
-		else {
-
-			// Check class names
-
-			if (_log.isDebugEnabled()) {
-				_log.debug("Check class names");
-			}
-
-			ClassNameLocalServiceUtil.checkClassNames();
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
 		}
-
-		ModuleFrameworkUtil.registerContext(applicationContext);
 
 		CustomJspBagRegistryUtil.getCustomJspBags();
 	}
@@ -369,7 +377,7 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			filteredPropertyDescriptorsCache.clear();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -390,7 +398,7 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 				closeable.close();
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 	}
@@ -409,12 +417,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		configurableApplicationContextConfigurator.configure(
 			configurableWebApplicationContext);
 
-		Properties properties = PropsUtil.getProperties("spring.bean.", true);
-
-		if (!properties.isEmpty()) {
-			configurableWebApplicationContext.addBeanFactoryPostProcessor(
-				new OverrideBeanDefinitionRegistryPostProcessor(properties));
-		}
+		configurableWebApplicationContext.addBeanFactoryPostProcessor(
+			new CompatBeanDefinitionRegistryPostProcessor());
 	}
 
 	private void _cleanUpJDBCDrivers() {

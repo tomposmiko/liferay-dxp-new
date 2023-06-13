@@ -55,6 +55,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @author Marta Medio
  */
 @Component(
+	immediate = true,
 	property = {
 		"default.registration.property=filter.init.auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=*",
 		"default.registration.property=filter.init.auth.verifier.OAuth2RESTAuthVerifier.urls.includes=*",
@@ -79,11 +80,11 @@ public class AuthVerifierFilterTracker {
 
 		_bundleContext = bundleContext;
 
-		_defaultRegistrationProperties = _toDictionary(
+		_defaultRegistrationProperties = toDictionary(
 			StringPlus.asList(properties.get("default.registration.property")));
 		_defaultRemoteAccessFilterServiceRanking = MapUtil.getInteger(
 			properties, "default.remote.access.filter.service.ranking", -10);
-		_defaultWhiteboardProperties = _toDictionary(
+		_defaultWhiteboardProperties = toDictionary(
 			StringPlus.asList(properties.get("default.whiteboard.property")));
 
 		String servletContextHelperSelectFilterString = MapUtil.getString(
@@ -104,7 +105,7 @@ public class AuthVerifierFilterTracker {
 		_serviceTracker.close();
 	}
 
-	private Dictionary<String, Object> _toDictionary(
+	protected Dictionary<String, Object> toDictionary(
 		List<String> propertiesList) {
 
 		Dictionary<String, Object> dictionary = new HashMapDictionary<>();

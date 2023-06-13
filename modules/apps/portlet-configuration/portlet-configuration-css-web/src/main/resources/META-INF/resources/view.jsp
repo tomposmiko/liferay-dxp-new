@@ -24,8 +24,6 @@
 
 		<liferay-frontend:edit-form
 			action="<%= updateLookAndFeelURL %>"
-			cssClass="pt-0"
-			fluid="<%= true %>"
 			method="post"
 			name="fm"
 		>
@@ -40,12 +38,14 @@
 			</liferay-frontend:edit-form-body>
 
 			<liferay-frontend:edit-form-footer>
-				<liferay-frontend:edit-form-buttons />
+				<aui:button type="submit" />
+
+				<aui:button type="cancel" />
 			</liferay-frontend:edit-form-footer>
 		</liferay-frontend:edit-form>
 
-		<aui:script require="frontend-js-web/index as frontendJsWeb">
-			var {delegate} = frontendJsWeb;
+		<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+			var delegate = delegateModule.default;
 
 			delegate(
 				document.getElementById('<portlet:namespace />fm'),
@@ -54,30 +54,15 @@
 				(event) => {
 					var toggle = event.delegateTarget;
 
-					var disableOnChecked =
-						toggle.dataset.disableonchecked === undefined ||
-						toggle.dataset.disableonchecked === 'true';
+					var disableOnChecked = toggle.dataset.disableonchecked;
 					var inputs = document.querySelectorAll(toggle.dataset.inputselector);
 
 					for (var i = 0; i < inputs.length; i++) {
 						var input = inputs[i];
 
 						input.disabled = disableOnChecked
-							? toggle.checked
-							: !toggle.checked;
-
-						if (!input.disabled) {
-							input.classList.remove('disabled');
-
-							if (input.labels.length > 0) {
-								input.labels[0].classList.remove('disabled');
-							}
-						}
-						else {
-							if (input.labels.length > 0) {
-								input.labels[0].classList.add('disabled');
-							}
-						}
+							? !toggle.checked
+							: toggle.checked;
 					}
 				}
 			);

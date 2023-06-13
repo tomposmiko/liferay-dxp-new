@@ -14,9 +14,9 @@
 
 package com.liferay.commerce.machine.learning.internal.recommendation.data.source;
 
-import com.liferay.account.model.AccountEntry;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.machine.learning.recommendation.UserCommerceMLRecommendation;
 import com.liferay.commerce.machine.learning.recommendation.UserCommerceMLRecommendationManager;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
@@ -24,10 +24,9 @@ import com.liferay.commerce.product.constants.CPWebKeys;
 import com.liferay.commerce.product.data.source.CPDataSource;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
 import com.liferay.commerce.product.model.CPDefinition;
-import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -46,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Ferrari
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.product.data.source.name=" + UserCommerceMLRecommendationCPDataSourceImpl.NAME,
 	service = CPDataSource.class
 )
@@ -56,7 +56,7 @@ public class UserCommerceMLRecommendationCPDataSourceImpl
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			getResourceBundle(locale),
 			"user-interaction-based-product-recommendations");
 	}
@@ -71,15 +71,10 @@ public class UserCommerceMLRecommendationCPDataSourceImpl
 			HttpServletRequest httpServletRequest, int start, int end)
 		throws Exception {
 
-		long groupId = portal.getScopeGroupId(httpServletRequest);
+		CommerceAccount commerceAccount =
+			commerceAccountHelper.getCurrentCommerceAccount(httpServletRequest);
 
-		AccountEntry accountEntry =
-			commerceAccountHelper.getCurrentAccountEntry(
-				_commerceChannelLocalService.
-					getCommerceChannelGroupIdBySiteGroupId(groupId),
-				httpServletRequest);
-
-		if (accountEntry == null) {
+		if (commerceAccount == null) {
 			return new CPDataSourceResult(Collections.emptyList(), 0);
 		}
 
@@ -101,11 +96,13 @@ public class UserCommerceMLRecommendationCPDataSourceImpl
 			_userCommerceMLRecommendationManager.
 				getUserCommerceMLRecommendations(
 					portal.getCompanyId(httpServletRequest),
-					accountEntry.getAccountEntryId(), categoryIds);
+					commerceAccount.getCommerceAccountId(), categoryIds);
 
 		if (userCommerceMLRecommendations.isEmpty()) {
 			return new CPDataSourceResult(Collections.emptyList(), 0);
 		}
+
+		long groupId = portal.getScopeGroupId(httpServletRequest);
 
 		List<CPCatalogEntry> cpCatalogEntries = new ArrayList<>();
 
@@ -128,7 +125,7 @@ public class UserCommerceMLRecommendationCPDataSourceImpl
 			try {
 				CPCatalogEntry recommendedCPCatalogEntry =
 					cpDefinitionHelper.getCPCatalogEntry(
-						accountEntry.getAccountEntryId(), groupId,
+						commerceAccount.getCommerceAccountId(), groupId,
 						recommendedEntryClassPK,
 						portal.getLocale(httpServletRequest));
 
@@ -136,7 +133,7 @@ public class UserCommerceMLRecommendationCPDataSourceImpl
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}
@@ -150,12 +147,6 @@ public class UserCommerceMLRecommendationCPDataSourceImpl
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
-
-	@Reference
-	private CommerceChannelLocalService _commerceChannelLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private UserCommerceMLRecommendationManager

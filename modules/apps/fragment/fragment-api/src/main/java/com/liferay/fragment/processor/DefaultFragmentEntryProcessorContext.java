@@ -15,13 +15,11 @@
 package com.liferay.fragment.processor;
 
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.fragment.constants.FragmentEntryLinkConstants;
-import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemIdentifier;
-import com.liferay.info.item.InfoItemReference;
 
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,13 +41,13 @@ public class DefaultFragmentEntryProcessorContext
 	}
 
 	@Override
-	public InfoItemReference getContextInfoItemReference() {
-		return _infoItemReference;
+	public Optional<Object> getDisplayObjectOptional() {
+		return Optional.ofNullable(_displayObject);
 	}
 
 	@Override
-	public String getFragmentElementId() {
-		return _fragmentElementId;
+	public Optional<Map<String, Object>> getFieldValuesOptional() {
+		return Optional.ofNullable(_fieldValues);
 	}
 
 	@Override
@@ -60,11 +58,6 @@ public class DefaultFragmentEntryProcessorContext
 	@Override
 	public HttpServletResponse getHttpServletResponse() {
 		return _httpServletResponse;
-	}
-
-	@Override
-	public InfoForm getInfoForm() {
-		return _infoForm;
 	}
 
 	@Override
@@ -98,49 +91,16 @@ public class DefaultFragmentEntryProcessorContext
 	}
 
 	@Override
-	public long[] getSegmentsEntryIds() {
-		return _segmentsEntryIds;
+	public long[] getSegmentsExperienceIds() {
+		return _segmentsExperienceIds;
 	}
 
-	@Override
-	public boolean isEditMode() {
-		if (Objects.equals(getMode(), FragmentEntryLinkConstants.EDIT)) {
-			return true;
-		}
-
-		return false;
+	public void setDisplayObject(Object object) {
+		_displayObject = object;
 	}
 
-	@Override
-	public boolean isIndexMode() {
-		if (Objects.equals(getMode(), FragmentEntryLinkConstants.INDEX)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isViewMode() {
-		if (Objects.equals(getMode(), FragmentEntryLinkConstants.VIEW)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public void setContextInfoItemReference(
-		InfoItemReference infoItemReference) {
-
-		_infoItemReference = infoItemReference;
-	}
-
-	public void setFragmentElementId(String fragmentElementId) {
-		_fragmentElementId = fragmentElementId;
-	}
-
-	public void setInfoForm(InfoForm infoForm) {
-		_infoForm = infoForm;
+	public void setFieldValues(Map<String, Object> fieldValues) {
+		_fieldValues = fieldValues;
 	}
 
 	public void setPreviewClassNameId(long previewClassNameId) {
@@ -159,21 +119,20 @@ public class DefaultFragmentEntryProcessorContext
 		_previewVersion = previewVersion;
 	}
 
-	public void setSegmentsEntryIds(long[] segmentsEntryIds) {
-		_segmentsEntryIds = segmentsEntryIds;
+	public void setSegmentsExperienceIds(long[] segmentsExperienceIds) {
+		_segmentsExperienceIds = segmentsExperienceIds;
 	}
 
-	private String _fragmentElementId;
+	private Object _displayObject;
+	private Map<String, Object> _fieldValues;
 	private final HttpServletRequest _httpServletRequest;
 	private final HttpServletResponse _httpServletResponse;
-	private InfoForm _infoForm;
-	private InfoItemReference _infoItemReference;
 	private final Locale _locale;
 	private final String _mode;
 	private long _previewClassNameId;
 	private long _previewClassPK;
 	private int _previewType = AssetRendererFactory.TYPE_LATEST_APPROVED;
 	private String _previewVersion = InfoItemIdentifier.VERSION_LATEST_APPROVED;
-	private long[] _segmentsEntryIds = new long[0];
+	private long[] _segmentsExperienceIds = new long[0];
 
 }

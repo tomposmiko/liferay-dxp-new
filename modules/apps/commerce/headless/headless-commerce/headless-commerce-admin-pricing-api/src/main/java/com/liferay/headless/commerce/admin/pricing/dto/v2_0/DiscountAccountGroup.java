@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -49,7 +48,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Generated("")
 @GraphQLName("DiscountAccountGroup")
 @JsonFilter("Liferay.Vulcan")
-@Schema(requiredProperties = {"accountGroupId"})
+@Schema(requiredProperties = {"accountGroupId", "discountId"})
 @XmlRootElement(name = "DiscountAccountGroup")
 public class DiscountAccountGroup implements Serializable {
 
@@ -64,18 +63,17 @@ public class DiscountAccountGroup implements Serializable {
 
 	@Schema
 	@Valid
-	public PricingAccountGroup getAccountGroup() {
+	public AccountGroup getAccountGroup() {
 		return accountGroup;
 	}
 
-	public void setAccountGroup(PricingAccountGroup accountGroup) {
+	public void setAccountGroup(AccountGroup accountGroup) {
 		this.accountGroup = accountGroup;
 	}
 
 	@JsonIgnore
 	public void setAccountGroup(
-		UnsafeSupplier<PricingAccountGroup, Exception>
-			accountGroupUnsafeSupplier) {
+		UnsafeSupplier<AccountGroup, Exception> accountGroupUnsafeSupplier) {
 
 		try {
 			accountGroup = accountGroupUnsafeSupplier.get();
@@ -90,9 +88,9 @@ public class DiscountAccountGroup implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected PricingAccountGroup accountGroup;
+	protected AccountGroup accountGroup;
 
-	@Schema(example = "PAB-34098-789-N")
+	@Schema
 	public String getAccountGroupExternalReferenceCode() {
 		return accountGroupExternalReferenceCode;
 	}
@@ -126,7 +124,7 @@ public class DiscountAccountGroup implements Serializable {
 	protected String accountGroupExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getAccountGroupId() {
 		return accountGroupId;
 	}
@@ -186,7 +184,7 @@ public class DiscountAccountGroup implements Serializable {
 	protected Map<String, Map<String, String>> actions;
 
 	@DecimalMin("0")
-	@Schema(example = "30643")
+	@Schema
 	public Long getDiscountAccountGroupId() {
 		return discountAccountGroupId;
 	}
@@ -214,7 +212,7 @@ public class DiscountAccountGroup implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long discountAccountGroupId;
 
-	@Schema(example = "DAB-34098-789-N")
+	@Schema
 	public String getDiscountExternalReferenceCode() {
 		return discountExternalReferenceCode;
 	}
@@ -247,7 +245,7 @@ public class DiscountAccountGroup implements Serializable {
 	protected String discountExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30324")
+	@Schema
 	public Long getDiscountId() {
 		return discountId;
 	}
@@ -272,7 +270,8 @@ public class DiscountAccountGroup implements Serializable {
 	}
 
 	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	@NotNull
 	protected Long discountId;
 
 	@Override
@@ -394,9 +393,9 @@ public class DiscountAccountGroup implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -422,7 +421,7 @@ public class DiscountAccountGroup implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -454,7 +453,7 @@ public class DiscountAccountGroup implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -470,10 +469,5 @@ public class DiscountAccountGroup implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

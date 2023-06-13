@@ -55,6 +55,7 @@ export default function Multiselect({
 						disabledClearAll={disabledClearAll}
 						id={id}
 						inputName={inputName}
+						inputValue={inputValue}
 						isValid={isValid}
 						items={selectedItems}
 						locator={multiselectLocator}
@@ -65,7 +66,6 @@ export default function Multiselect({
 							inputValue,
 							multiselectLocator?.label ?? 'label'
 						)}
-						value={inputValue}
 						{...otherProps}
 					/>
 

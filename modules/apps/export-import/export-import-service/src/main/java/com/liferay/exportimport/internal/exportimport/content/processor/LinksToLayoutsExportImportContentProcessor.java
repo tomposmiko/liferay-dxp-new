@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Gergely Mathe
  */
 @Component(
-	property = "content.processor.type=LinksToLayouts",
+	immediate = true, property = "content.processor.type=LinksToLayouts",
 	service = ExportImportContentProcessor.class
 )
 public class LinksToLayoutsExportImportContentProcessor
@@ -63,7 +63,7 @@ public class LinksToLayoutsExportImportContentProcessor
 			boolean escapeContent)
 		throws Exception {
 
-		return _replaceExportLinksToLayouts(
+		return replaceExportLinksToLayouts(
 			portletDataContext, stagedModel, content);
 	}
 
@@ -73,35 +73,35 @@ public class LinksToLayoutsExportImportContentProcessor
 			String content)
 		throws Exception {
 
-		return _replaceImportLinksToLayouts(portletDataContext, content);
+		return replaceImportLinksToLayouts(portletDataContext, content);
 	}
 
 	@Override
 	public void validateContentReferences(long groupId, String content)
 		throws PortalException {
 
-		if (_isValidateLinksToLayoutsReferences()) {
-			_validateLinksToLayoutsReferences(content);
+		if (isValidateLinksToLayoutsReferences()) {
+			validateLinksToLayoutsReferences(content);
 		}
 	}
 
-	private boolean _isValidateLinksToLayoutsReferences() {
+	protected boolean isValidateLinksToLayoutsReferences() {
 		try {
-			ExportImportServiceConfiguration exportImportServiceConfiguration =
+			ExportImportServiceConfiguration configuration =
 				_configurationProvider.getCompanyConfiguration(
 					ExportImportServiceConfiguration.class,
 					CompanyThreadLocal.getCompanyId());
 
-			return exportImportServiceConfiguration.validateLayoutReferences();
+			return configuration.validateLayoutReferences();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return true;
 	}
 
-	private String _replaceExportLinksToLayouts(
+	protected String replaceExportLinksToLayouts(
 			PortletDataContext portletDataContext, StagedModel stagedModel,
 			String content)
 		throws Exception {
@@ -168,7 +168,7 @@ public class LinksToLayoutsExportImportContentProcessor
 			ArrayUtil.toStringArray(newLinksToLayout.toArray()));
 	}
 
-	private String _replaceImportLinksToLayouts(
+	protected String replaceImportLinksToLayouts(
 			PortletDataContext portletDataContext, String content)
 		throws Exception {
 
@@ -281,7 +281,14 @@ public class LinksToLayoutsExportImportContentProcessor
 			ArrayUtil.toStringArray(newLinksToLayout.toArray()));
 	}
 
-	private void _validateLinksToLayoutsReferences(String content)
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
+	protected void validateLinksToLayoutsReferences(String content)
 		throws PortalException {
 
 		Matcher matcher = _exportLinksToLayoutPattern.matcher(content);
@@ -331,7 +338,6 @@ public class LinksToLayoutsExportImportContentProcessor
 	private static final Pattern _importLinksToLayoutPattern = Pattern.compile(
 		"\\[([\\d]+)@(private(-group|-user)?|public)@([\\d]+)(@([\\d]+))?\\]");
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference

@@ -36,10 +36,11 @@ public class MySubscriptionsManagementToolbarDisplayContext {
 
 		_httpServletRequest = httpServletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+
 		_user = user;
 
 		_totalItems = SubscriptionLocalServiceUtil.getUserSubscriptionsCount(
-			user.getUserId());
+			_user.getUserId());
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {

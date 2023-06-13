@@ -12,10 +12,9 @@
  * details.
  */
 
-import {FORM} from '../utils/constants';
 import {onReady} from '../utils/events';
 
-const applicationId = FORM;
+const applicationId = 'Form';
 
 /**
  * Returns an identifier for a form element.
@@ -40,7 +39,7 @@ function getFormKey(form) {
 function getFieldPayload({form, name}) {
 	return {
 		fieldName: name,
-		...getFormPayload(form),
+		formId: getFormKey(form),
 	};
 }
 

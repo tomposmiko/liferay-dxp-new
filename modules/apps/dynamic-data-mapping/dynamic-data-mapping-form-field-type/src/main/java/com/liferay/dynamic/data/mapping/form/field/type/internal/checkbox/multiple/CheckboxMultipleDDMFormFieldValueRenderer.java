@@ -17,7 +17,6 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.checkbox.multi
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRenderer;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
-import com.liferay.portal.kernel.util.Html;
 
 import java.util.Locale;
 
@@ -28,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Dylan Rebelak
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE,
 	service = DDMFormFieldValueRenderer.class
 )
@@ -36,16 +36,12 @@ public class CheckboxMultipleDDMFormFieldValueRenderer
 
 	@Override
 	public String render(DDMFormFieldValue ddmFormFieldValue, Locale locale) {
-		return _html.escape(
-			checkboxMultipleDDMFormFieldValueAccessor.getOptionsLabels(
-				ddmFormFieldValue, locale));
+		return checkboxMultipleDDMFormFieldValueAccessor.getOptionsLabels(
+			ddmFormFieldValue, locale);
 	}
 
 	@Reference
 	protected CheckboxMultipleDDMFormFieldValueAccessor
 		checkboxMultipleDDMFormFieldValueAccessor;
-
-	@Reference
-	private Html _html;
 
 }

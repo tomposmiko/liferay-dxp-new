@@ -70,21 +70,6 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 			getModifiedFilesList());
 	}
 
-	public List<File> getModifiedNonposhiModules() throws IOException {
-		List<File> modifiedFilesList = getModifiedFilesList();
-
-		List<File> modifiedNonposhiFilesList = new ArrayList<>();
-
-		for (File modifiedFile : modifiedFilesList) {
-			if (!JenkinsResultsParserUtil.isPoshiFile(modifiedFile)) {
-				modifiedNonposhiFilesList.add(modifiedFile);
-			}
-		}
-
-		return JenkinsResultsParserUtil.getDirectoriesContainingFiles(
-			getModuleDirsList(null, null), modifiedNonposhiFilesList);
-	}
-
 	public List<File> getModifiedNPMTestModuleDirsList() throws IOException {
 		List<File> modifiedModuleDirsList = getModifiedModuleDirsList();
 
@@ -98,21 +83,6 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		}
 
 		return modifiedNPMTestModuleDirsList;
-	}
-
-	public List<File> getModifiedPoshiModules() throws IOException {
-		List<File> modifiedFilesList = getModifiedFilesList();
-
-		List<File> modifiedPoshiFilesList = new ArrayList<>();
-
-		for (File modifiedFile : modifiedFilesList) {
-			if (JenkinsResultsParserUtil.isPoshiFile(modifiedFile)) {
-				modifiedPoshiFilesList.add(modifiedFile);
-			}
-		}
-
-		return JenkinsResultsParserUtil.getDirectoriesContainingFiles(
-			getModuleDirsList(null, null), modifiedPoshiFilesList);
 	}
 
 	public List<File> getModuleAppDirs() {
@@ -221,16 +191,10 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 	}
 
 	public List<File> getModulePullSubrepoDirs() {
-		File modulesDir = new File(getWorkingDirectory(), "modules");
-
-		if (!modulesDir.exists()) {
-			return new ArrayList<>();
-		}
-
 		List<File> moduleSubrepoDirs = new ArrayList<>();
 
 		List<File> gitrepoFiles = JenkinsResultsParserUtil.findFiles(
-			modulesDir, "\\.gitrepo");
+			new File(getWorkingDirectory(), "modules"), "\\.gitrepo");
 
 		for (File gitrepoFile : gitrepoFiles) {
 			Properties gitrepoProperties =
@@ -291,15 +255,8 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 			return _testProperties;
 		}
 
-		File testPropertiesFile = new File(
-			getWorkingDirectory(), "test.properties");
-
-		if (!testPropertiesFile.exists()) {
-			return _testProperties;
-		}
-
 		_testProperties = JenkinsResultsParserUtil.getProperties(
-			testPropertiesFile);
+			new File(getWorkingDirectory(), "test.properties"));
 
 		return _testProperties;
 	}

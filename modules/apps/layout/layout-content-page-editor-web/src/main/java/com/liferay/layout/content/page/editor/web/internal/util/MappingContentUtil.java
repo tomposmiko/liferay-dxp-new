@@ -14,90 +14,52 @@
 
 package com.liferay.layout.content.page.editor.web.internal.util;
 
+import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldSet;
 import com.liferay.info.field.InfoFieldSetEntry;
 import com.liferay.info.field.type.InfoFieldType;
 import com.liferay.info.form.InfoForm;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFormProvider;
-import com.liferay.info.search.InfoSearchClassMapperRegistryUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author Eudaldo Alonso
  */
 public class MappingContentUtil {
 
-	public static JSONArray getEditableMappingFieldsJSONArray(
-			String formVariationKey, long groupId,
-			InfoItemServiceRegistry infoItemServiceRegistry,
-			String itemClassName, Locale locale)
-		throws Exception {
-
-		return _getMappingFieldsJSONArray(
-			formVariationKey, groupId, true, infoItemServiceRegistry,
-			itemClassName, locale);
-	}
-
 	public static JSONArray getMappingFieldsJSONArray(
 			String formVariationKey, long groupId,
-			InfoItemServiceRegistry infoItemServiceRegistry,
-			String itemClassName, Locale locale)
+			InfoItemServiceTracker infoItemServiceTracker, String itemClassName,
+			Locale locale)
 		throws Exception {
 
-		return _getMappingFieldsJSONArray(
-			formVariationKey, groupId, false, infoItemServiceRegistry,
-			itemClassName, locale);
-	}
+		// LPS-111037
 
-	private static JSONObject _getInfoFieldJSONObject(
-		InfoField<?> infoField, Locale locale) {
+		if (Objects.equals(
+				DLFileEntryConstants.getClassName(), itemClassName)) {
 
-		return JSONUtil.put(
-			"key", infoField.getUniqueId()
-		).put(
-			"label", infoField.getLabel(locale)
-		).put(
-			"name", infoField.getName()
-		).put(
-			"required", infoField.isRequired()
-		).put(
-			"type",
-			() -> {
-				InfoFieldType infoFieldType = infoField.getInfoFieldType();
-
-				return infoFieldType.getName();
-			}
-		);
-	}
-
-	private static JSONArray _getMappingFieldsJSONArray(
-			String formVariationKey, long groupId,
-			boolean includeEditableInfoFields,
-			InfoItemServiceRegistry infoItemServiceRegistry,
-			String itemClassName, Locale locale)
-		throws Exception {
-
-		String className = InfoSearchClassMapperRegistryUtil.getClassName(
-			itemClassName);
+			itemClassName = FileEntry.class.getName();
+		}
 
 		InfoItemFormProvider<?> infoItemFormProvider =
-			infoItemServiceRegistry.getFirstInfoItemService(
-				InfoItemFormProvider.class, className);
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemFormProvider.class, itemClassName);
 
 		if (infoItemFormProvider == null) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to get info item form provider for class " +
-						className);
+						itemClassName);
 			}
 
 			return JSONFactoryUtil.createJSONArray();
@@ -116,12 +78,18 @@ public class MappingContentUtil {
 				infoForm.getInfoFieldSetEntries()) {
 
 			if (infoFieldSetEntry instanceof InfoField) {
-				InfoField<?> infoField = (InfoField<?>)infoFieldSetEntry;
+				InfoField infoField = (InfoField)infoFieldSetEntry;
 
-				if (!includeEditableInfoFields || infoField.isEditable()) {
-					defaultFieldSetFieldsJSONArray.put(
-						_getInfoFieldJSONObject(infoField, locale));
-				}
+				InfoFieldType infoFieldType = infoField.getInfoFieldType();
+
+				defaultFieldSetFieldsJSONArray.put(
+					JSONUtil.put(
+						"key", infoField.getName()
+					).put(
+						"label", infoField.getLabel(locale)
+					).put(
+						"type", infoFieldType.getName()
+					));
 			}
 			else if (infoFieldSetEntry instanceof InfoFieldSet) {
 				JSONArray fieldSetFieldsJSONArray =
@@ -129,11 +97,17 @@ public class MappingContentUtil {
 
 				InfoFieldSet infoFieldSet = (InfoFieldSet)infoFieldSetEntry;
 
-				for (InfoField<?> infoField : infoFieldSet.getAllInfoFields()) {
-					if (!includeEditableInfoFields || infoField.isEditable()) {
-						fieldSetFieldsJSONArray.put(
-							_getInfoFieldJSONObject(infoField, locale));
-					}
+				for (InfoField infoField : infoFieldSet.getAllInfoFields()) {
+					InfoFieldType infoFieldType = infoField.getInfoFieldType();
+
+					fieldSetFieldsJSONArray.put(
+						JSONUtil.put(
+							"key", infoField.getName()
+						).put(
+							"label", infoField.getLabel(locale)
+						).put(
+							"type", infoFieldType.getName()
+						));
 				}
 
 				if (fieldSetFieldsJSONArray.length() > 0) {

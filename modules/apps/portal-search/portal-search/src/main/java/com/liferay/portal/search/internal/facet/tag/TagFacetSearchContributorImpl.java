@@ -53,7 +53,13 @@ public class TagFacetSearchContributorImpl
 			facetContext -> facetContext.addFacet(facet));
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setAssetTagNamesFacetFactory(
+		AssetTagNamesFacetFactory assetTagNamesFacetFactory) {
+
+		_assetTagNamesFacetFactory = assetTagNamesFacetFactory;
+	}
+
 	private AssetTagNamesFacetFactory _assetTagNamesFacetFactory;
 
 	private class TagFacetBuilderImpl implements TagFacetBuilder {

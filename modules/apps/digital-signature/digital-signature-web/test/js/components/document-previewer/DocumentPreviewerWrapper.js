@@ -26,7 +26,7 @@ describe('DocumentPreviewerWrapper', () => {
 		const {asFragment, container} = render(<DocumentPreviewerWrapper />);
 
 		const emptyResultMessage = container.querySelector(
-			'div.c-empty-state.c-empty-state-animation'
+			'div.taglib-empty-result-message'
 		);
 
 		expect(emptyResultMessage).toBeTruthy();
@@ -85,13 +85,15 @@ describe('DocumentPreviewerWrapper', () => {
 			},
 		];
 
-		const {asFragment, container} = render(
+		const {asFragment, getByText} = render(
 			<DocumentPreviewerWrapper fileEntries={fileEntries} />
 		);
 
-		const messageElement = container.querySelector('.c-empty-state-text');
+		const message = getByText(
+			'the-envelope-does-not-have-a-document-to-preview'
+		);
 
-		expect(messageElement).toBeTruthy();
+		expect(message).toBeTruthy();
 
 		expect(asFragment()).toMatchSnapshot();
 	});

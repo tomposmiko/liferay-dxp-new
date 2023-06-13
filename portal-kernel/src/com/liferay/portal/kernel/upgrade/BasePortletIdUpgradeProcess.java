@@ -151,6 +151,30 @@ public abstract class BasePortletIdUpgradeProcess extends UpgradeProcess {
 		return new String[0];
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	protected void updateGroup(long groupId, String typeSettings)
+		throws Exception {
+
+		String sql =
+			"update Group_ set typeSettings = ? where groupId = " + groupId;
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				sql)) {
+
+			preparedStatement.setString(1, typeSettings);
+
+			preparedStatement.executeUpdate();
+		}
+		catch (SQLException sqlException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(sqlException, sqlException);
+			}
+		}
+	}
+
 	protected void updateGroup(String oldRootPortletId, String newRootPortletId)
 		throws Exception {
 
@@ -295,7 +319,7 @@ public abstract class BasePortletIdUpgradeProcess extends UpgradeProcess {
 					connection.prepareStatement(selectSQL);
 				PreparedStatement updatePreparedStatement =
 					AutoBatchPreparedStatementUtil.autoBatch(
-						connection, updateSQL);
+						connection.prepareStatement(updateSQL));
 				ResultSet resultSet = selectPreparedStatement.executeQuery()) {
 
 				while (resultSet.next()) {
@@ -356,7 +380,7 @@ public abstract class BasePortletIdUpgradeProcess extends UpgradeProcess {
 		}
 		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(sqlException);
+				_log.warn(sqlException, sqlException);
 			}
 		}
 	}
@@ -382,7 +406,7 @@ public abstract class BasePortletIdUpgradeProcess extends UpgradeProcess {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 	}
@@ -404,7 +428,7 @@ public abstract class BasePortletIdUpgradeProcess extends UpgradeProcess {
 		}
 		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(sqlException);
+				_log.warn(sqlException, sqlException);
 			}
 		}
 	}
@@ -508,7 +532,7 @@ public abstract class BasePortletIdUpgradeProcess extends UpgradeProcess {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 		}
 	}

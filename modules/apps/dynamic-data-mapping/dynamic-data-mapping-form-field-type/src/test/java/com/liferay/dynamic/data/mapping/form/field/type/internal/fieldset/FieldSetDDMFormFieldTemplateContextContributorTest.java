@@ -17,10 +17,12 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.fieldset;
 import com.liferay.dynamic.data.mapping.form.field.type.BaseDDMFormFieldTypeSettingsTestCase;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
@@ -45,13 +47,12 @@ public class FieldSetDDMFormFieldTemplateContextContributorTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_fieldSetDDMFormFieldTemplateContextContributor.jsonFactory =
-			new JSONFactoryImpl();
+		_setUpJSONFactoryUtil();
 	}
 
 	@Test
 	public void testGetRows() throws Exception {
-		String ddmFormLayoutDefinition = _read("ddm-structure-layout.json");
+		String ddmFormLayoutDefinition = read("ddm-structure-layout.json");
 
 		JSONArray rowsJSONArray =
 			_fieldSetDDMFormFieldTemplateContextContributor.getRowsJSONArray(
@@ -117,13 +118,19 @@ public class FieldSetDDMFormFieldTemplateContextContributorTest
 		Assert.assertEquals(12, firstColumnJSONObject.getInt("size"));
 	}
 
-	private String _read(String fileName) throws Exception {
+	protected String read(String fileName) throws IOException {
 		Class<?> clazz = getClass();
 
 		InputStream inputStream = clazz.getResourceAsStream(
 			"dependencies/" + fileName);
 
 		return StringUtil.read(inputStream);
+	}
+
+	private void _setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
 	private final FieldSetDDMFormFieldTemplateContextContributor

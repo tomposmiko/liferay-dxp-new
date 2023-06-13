@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -129,8 +128,6 @@ public interface PortletDataContext extends Serializable {
 		String referenceType, boolean missing);
 
 	public boolean addScopedPrimaryKey(Class<?> clazz, String primaryKey);
-
-	public void addScopedPrimaryKeys(Collection<String> scopedPrimaryKeys);
 
 	public void addZipEntry(String path, byte[] bytes);
 
@@ -292,8 +289,6 @@ public interface PortletDataContext extends Serializable {
 		StagedModel parentStagedModel, Class<?> clazz);
 
 	public String getRootPortletId();
-
-	public Set<String> getScopedPrimaryKeys();
 
 	public long getScopeGroupId();
 

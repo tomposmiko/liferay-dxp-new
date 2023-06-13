@@ -699,11 +699,6 @@ public class DDMFormInstanceRecordVersionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<DDMFormInstanceRecordVersion, Object>>
 		getAttributeGetterFunctions() {
 

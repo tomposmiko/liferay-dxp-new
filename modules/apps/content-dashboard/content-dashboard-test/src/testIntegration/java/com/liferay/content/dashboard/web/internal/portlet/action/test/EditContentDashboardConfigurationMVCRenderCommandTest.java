@@ -17,29 +17,24 @@ package com.liferay.content.dashboard.web.internal.portlet.action.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
-import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletPreferences;
@@ -71,85 +66,39 @@ public class EditContentDashboardConfigurationMVCRenderCommandTest {
 		_audienceAssetVocabulary =
 			_assetVocabularyLocalService.fetchGroupVocabulary(
 				_company.getGroupId(), "audience");
+
 		_stageAssetVocabulary =
 			_assetVocabularyLocalService.fetchGroupVocabulary(
 				_company.getGroupId(), "stage");
-		_topicAssetVocabulary =
-			_assetVocabularyLocalService.fetchGroupVocabulary(
-				_company.getGroupId(), "topic");
 	}
 
 	@Test
 	public void testGetAvailableVocabularyNames() throws Exception {
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest(
-				String.valueOf(_audienceAssetVocabulary.getVocabularyId()),
-				String.valueOf(_stageAssetVocabulary.getVocabularyId()));
+				_audienceAssetVocabulary.getName(),
+				_stageAssetVocabulary.getName());
 
 		_mvcRenderCommand.render(
 			mockLiferayPortletRenderRequest,
 			new MockLiferayPortletRenderResponse());
 
-		JSONArray keyValuePairsJSONArray = ReflectionTestUtil.invoke(
+		List<KeyValuePair> keyValuePairs = ReflectionTestUtil.invoke(
 			mockLiferayPortletRenderRequest.getAttribute(
-				"com.liferay.content.dashboard.web.internal.display.context." +
-					"ContentDashboardAdminConfigurationDisplayContext"),
-			"getAvailableVocabularyJSONArray", new Class<?>[0]);
+				"CONTENT_DASHBOARD_ADMIN_CONFIGURATION_DISPLAY_CONTEXT"),
+			"getAvailableVocabularyNames", new Class<?>[0]);
 
-		Assert.assertTrue(keyValuePairsJSONArray.length() > 0);
+		Assert.assertFalse(
+			keyValuePairs.contains(
+				new KeyValuePair(
+					_audienceAssetVocabulary.getName(),
+					_audienceAssetVocabulary.getTitle(_locale))));
 
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Topic"
-			));
-	}
-
-	@Test
-	public void testGetAvailableVocabularyNamesWithAudienceAndNonglobalAssetVocabulary()
-		throws Exception {
-
-		User testUser = UserTestUtil.addUser();
-
-		Group testGroup = GroupTestUtil.addGroup();
-
-		Company testCompany = CompanyLocalServiceUtil.getCompany(
-			testGroup.getCompanyId());
-
-		_assetVocabularyLocalService.addVocabulary(
-			testUser.getUserId(), testGroup.getGroupId(),
-			"NonGlobalAssetVocabulary",
-			ServiceContextTestUtil.getServiceContext(
-				testCompany.getCompanyId(), testGroup.getGroupId(),
-				testUser.getUserId()));
-
-		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
-			_getMockLiferayPortletRenderRequest(
-				String.valueOf(_stageAssetVocabulary.getVocabularyId()),
-				String.valueOf(_topicAssetVocabulary.getVocabularyId()));
-
-		_mvcRenderCommand.render(
-			mockLiferayPortletRenderRequest,
-			new MockLiferayPortletRenderResponse());
-
-		JSONArray keyValuePairsJSONArray = ReflectionTestUtil.invoke(
-			mockLiferayPortletRenderRequest.getAttribute(
-				"com.liferay.content.dashboard.web.internal.display.context." +
-					"ContentDashboardAdminConfigurationDisplayContext"),
-			"getAvailableVocabularyJSONArray", new Class<?>[0]);
-
-		Assert.assertTrue(keyValuePairsJSONArray.length() > 0);
-
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Audience"
-			));
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"NonGlobalAssetVocabulary"
-			));
+		Assert.assertFalse(
+			keyValuePairs.contains(
+				new KeyValuePair(
+					_stageAssetVocabulary.getName(),
+					_stageAssetVocabulary.getTitle(_locale))));
 	}
 
 	@Test
@@ -158,110 +107,59 @@ public class EditContentDashboardConfigurationMVCRenderCommandTest {
 
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest(
-				String.valueOf(_audienceAssetVocabulary.getVocabularyId()));
+				_audienceAssetVocabulary.getName());
 
 		_mvcRenderCommand.render(
 			mockLiferayPortletRenderRequest,
 			new MockLiferayPortletRenderResponse());
 
-		JSONArray keyValuePairsJSONArray = ReflectionTestUtil.invoke(
+		List<KeyValuePair> keyValuePairs = ReflectionTestUtil.invoke(
 			mockLiferayPortletRenderRequest.getAttribute(
-				"com.liferay.content.dashboard.web.internal.display.context." +
-					"ContentDashboardAdminConfigurationDisplayContext"),
-			"getAvailableVocabularyJSONArray", new Class<?>[0]);
+				"CONTENT_DASHBOARD_ADMIN_CONFIGURATION_DISPLAY_CONTEXT"),
+			"getAvailableVocabularyNames", new Class<?>[0]);
 
-		Assert.assertTrue(keyValuePairsJSONArray.length() > 0);
+		Assert.assertFalse(
+			keyValuePairs.contains(
+				new KeyValuePair(
+					_audienceAssetVocabulary.getName(),
+					_audienceAssetVocabulary.getTitle(_locale))));
 
 		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Stage"
-			));
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Topic"
-			));
+			keyValuePairs.contains(
+				new KeyValuePair(
+					_stageAssetVocabulary.getName(),
+					_stageAssetVocabulary.getTitle(_locale))));
 	}
 
 	@Test
 	public void testGetCurrentVocabularyNames() throws Exception {
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest(
-				String.valueOf(_audienceAssetVocabulary.getVocabularyId()),
-				String.valueOf(_stageAssetVocabulary.getVocabularyId()));
+				_audienceAssetVocabulary.getName(),
+				_stageAssetVocabulary.getName());
 
 		_mvcRenderCommand.render(
 			mockLiferayPortletRenderRequest,
 			new MockLiferayPortletRenderResponse());
 
-		JSONArray keyValuePairsJSONArray = ReflectionTestUtil.invoke(
+		List<KeyValuePair> keyValuePairs = ReflectionTestUtil.invoke(
 			mockLiferayPortletRenderRequest.getAttribute(
-				"com.liferay.content.dashboard.web.internal.display.context." +
-					"ContentDashboardAdminConfigurationDisplayContext"),
-			"getCurrentVocabularyJSONArray", new Class<?>[0]);
+				"CONTENT_DASHBOARD_ADMIN_CONFIGURATION_DISPLAY_CONTEXT"),
+			"getCurrentVocabularyNames", new Class<?>[0]);
 
-		Assert.assertEquals(2, keyValuePairsJSONArray.length());
+		Assert.assertEquals(keyValuePairs.toString(), 2, keyValuePairs.size());
 
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Audience"
-			));
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Stage"
-			));
-	}
+		Assert.assertEquals(
+			keyValuePairs.get(0),
+			new KeyValuePair(
+				_audienceAssetVocabulary.getName(),
+				_audienceAssetVocabulary.getTitle(_locale)));
 
-	@Test
-	public void testGetCurrentVocabularyNamesWithAudienceAndNonglobalAssetVocabulary()
-		throws Exception {
-
-		User testUser = UserTestUtil.addUser();
-
-		Group testGroup = GroupTestUtil.addGroup();
-
-		Company testCompany = CompanyLocalServiceUtil.getCompany(
-			testGroup.getCompanyId());
-
-		AssetVocabulary nonglobalAssetVocabulary =
-			_assetVocabularyLocalService.addVocabulary(
-				testUser.getUserId(), testGroup.getGroupId(),
-				"NonGlobalAssetVocabulary",
-				ServiceContextTestUtil.getServiceContext(
-					testCompany.getCompanyId(), testGroup.getGroupId(),
-					testUser.getUserId()));
-
-		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
-			_getMockLiferayPortletRenderRequest(
-				String.valueOf(_audienceAssetVocabulary.getVocabularyId()),
-				String.valueOf(nonglobalAssetVocabulary.getVocabularyId()));
-
-		_mvcRenderCommand.render(
-			mockLiferayPortletRenderRequest,
-			new MockLiferayPortletRenderResponse());
-
-		JSONArray keyValuePairsJSONArray = ReflectionTestUtil.invoke(
-			mockLiferayPortletRenderRequest.getAttribute(
-				"com.liferay.content.dashboard.web.internal.display.context." +
-					"ContentDashboardAdminConfigurationDisplayContext"),
-			"getCurrentVocabularyJSONArray", new Class<?>[0]);
-
-		Assert.assertEquals(2, keyValuePairsJSONArray.length());
-
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"NonGlobalAssetVocabulary"
-			));
-
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Audience"
-			));
+		Assert.assertEquals(
+			keyValuePairs.get(1),
+			new KeyValuePair(
+				_stageAssetVocabulary.getName(),
+				_stageAssetVocabulary.getTitle(_locale)));
 	}
 
 	@Test
@@ -270,29 +168,28 @@ public class EditContentDashboardConfigurationMVCRenderCommandTest {
 
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest(
-				String.valueOf(_audienceAssetVocabulary.getVocabularyId()));
+				_audienceAssetVocabulary.getName());
 
 		_mvcRenderCommand.render(
 			mockLiferayPortletRenderRequest,
 			new MockLiferayPortletRenderResponse());
 
-		JSONArray keyValuePairsJSONArray = ReflectionTestUtil.invoke(
+		List<KeyValuePair> keyValuePairs = ReflectionTestUtil.invoke(
 			mockLiferayPortletRenderRequest.getAttribute(
-				"com.liferay.content.dashboard.web.internal.display.context." +
-					"ContentDashboardAdminConfigurationDisplayContext"),
-			"getCurrentVocabularyJSONArray", new Class<?>[0]);
+				"CONTENT_DASHBOARD_ADMIN_CONFIGURATION_DISPLAY_CONTEXT"),
+			"getCurrentVocabularyNames", new Class<?>[0]);
 
-		Assert.assertEquals(1, keyValuePairsJSONArray.length());
+		Assert.assertEquals(keyValuePairs.toString(), 1, keyValuePairs.size());
 
-		Assert.assertTrue(
-			keyValuePairsJSONArray.toString(
-			).contains(
-				"Audience"
-			));
+		Assert.assertEquals(
+			keyValuePairs.get(0),
+			new KeyValuePair(
+				_audienceAssetVocabulary.getName(),
+				_audienceAssetVocabulary.getTitle(_locale)));
 	}
 
 	private MockLiferayPortletRenderRequest _getMockLiferayPortletRenderRequest(
-			String... assetVocabularyIds)
+			String... assetVocabularyNames)
 		throws Exception {
 
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
@@ -301,7 +198,8 @@ public class EditContentDashboardConfigurationMVCRenderCommandTest {
 		PortletPreferences portletPreferences =
 			mockLiferayPortletRenderRequest.getPreferences();
 
-		portletPreferences.setValues("assetVocabularyIds", assetVocabularyIds);
+		portletPreferences.setValues(
+			"assetVocabularyNames", assetVocabularyNames);
 
 		mockLiferayPortletRenderRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
@@ -330,7 +228,6 @@ public class EditContentDashboardConfigurationMVCRenderCommandTest {
 
 	private static final Locale _locale = LocaleUtil.US;
 	private static AssetVocabulary _stageAssetVocabulary;
-	private static AssetVocabulary _topicAssetVocabulary;
 
 	@Inject(
 		filter = "mvc.command.name=/content_dashboard/edit_content_dashboard_configuration",

@@ -15,8 +15,6 @@
 package com.liferay.item.selector.taglib.internal.display.context;
 
 import com.liferay.document.library.display.context.DLUIItemKeys;
-import com.liferay.document.library.kernel.model.DLFolderConstants;
-import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.portlet.toolbar.contributor.DLPortletToolbarContributor;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
@@ -28,19 +26,15 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.item.selector.taglib.internal.document.library.portlet.toolbar.contributor.DLPortletToolbarContributorRegistryUtil;
 import com.liferay.item.selector.taglib.servlet.taglib.RepositoryEntryBrowserTag;
 import com.liferay.item.selector.taglib.servlet.taglib.util.RepositoryEntryBrowserTagUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
-import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -75,13 +69,15 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 			repositoryEntryBrowserDisplayContext) {
 
 		_httpServletRequest = httpServletRequest;
+
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 		_repositoryEntryBrowserDisplayContext =
 			repositoryEntryBrowserDisplayContext;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
-			liferayPortletRequest, liferayPortletResponse);
+			_liferayPortletRequest, _liferayPortletResponse);
+
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			liferayPortletRequest);
 	}
@@ -98,13 +94,6 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 		DLPortletToolbarContributor dlPortletToolbarContributor =
 			DLPortletToolbarContributorRegistryUtil.
 				getDLPortletToolbarContributor();
-
-		Folder folder = _getFolder();
-
-		if (folder != null) {
-			_liferayPortletRequest.setAttribute(
-				WebKeys.DOCUMENT_LIBRARY_FOLDER, folder);
-		}
 
 		List<Menu> menus = dlPortletToolbarContributor.getPortletTitleMenus(
 			_liferayPortletRequest, _liferayPortletResponse);
@@ -228,11 +217,12 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 					).buildString());
 
 				labelItem.setCloseable(true);
-				labelItem.setLabel(
-					String.format(
-						"%s: %s",
-						LanguageUtil.get(_httpServletRequest, "scope"),
-						_getScopeLabel(scope)));
+
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(_httpServletRequest, "scope"),
+					_getScopeLabel(scope));
+
+				labelItem.setLabel(label);
 			}
 		).build();
 	}
@@ -313,7 +303,7 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 
 		if (allowedCreationMenuUIItemKeys == null) {
 			return SetUtil.fromArray(
-				DLUIItemKeys.ADD_FOLDER, DLUIItemKeys.UPLOAD);
+				new String[] {DLUIItemKeys.ADD_FOLDER, DLUIItemKeys.UPLOAD});
 		}
 
 		return allowedCreationMenuUIItemKeys;
@@ -351,27 +341,6 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 
 	private String[] _getDisplayStyles() {
 		return RepositoryEntryBrowserTag.DISPLAY_STYLES;
-	}
-
-	private Folder _getFolder() {
-		long folderId = GetterUtil.getLong(
-			_httpServletRequest.getAttribute(
-				"liferay-item-selector:repository-entry-browser:folderId"));
-
-		if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			return null;
-		}
-
-		Folder folder = null;
-
-		try {
-			folder = DLAppLocalServiceUtil.getFolder(folderId);
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
-		}
-
-		return folder;
 	}
 
 	private String _getOrderByCol() {
@@ -444,9 +413,6 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 
 		return _showScopeFilter;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ItemSelectorRepositoryEntryManagementToolbarDisplayContext.class);
 
 	private final PortletURL _currentURLObj;
 	private final HttpServletRequest _httpServletRequest;

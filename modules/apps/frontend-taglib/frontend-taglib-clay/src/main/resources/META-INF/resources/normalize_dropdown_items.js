@@ -57,20 +57,19 @@ function filterEmptyGroups(items) {
 		);
 }
 
-function updateItemProps(item) {
+function spreadDataAttributes(item) {
 	const {data, ...rest} = item;
 
 	const dataAttributes = getDataAttributes(data);
 
 	const items = Array.isArray(item.items)
-		? item.items.map(updateItemProps)
+		? item.items.map(spreadDataAttributes)
 		: item.items;
 
 	return {
 		...dataAttributes,
 		...rest,
 		items,
-		symbolLeft: item.icon,
 	};
 }
 
@@ -81,9 +80,9 @@ export default function normalizeDropdownItems(items) {
 
 	const filteredItems = filterEmptyGroups(items);
 
-	if (!filteredItems.length) {
-		return null;
+	if (filteredItems.length === 0) {
+		return [];
 	}
 
-	return addSeparators(filteredItems.map(updateItemProps));
+	return addSeparators(filteredItems.map(spreadDataAttributes));
 }

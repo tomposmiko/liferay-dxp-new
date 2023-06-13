@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = AMAsyncProcessorLocator.class)
+@Component(immediate = true, service = AMAsyncProcessorLocator.class)
 public class AMAsyncProcessorLocatorImpl implements AMAsyncProcessorLocator {
 
 	@Override

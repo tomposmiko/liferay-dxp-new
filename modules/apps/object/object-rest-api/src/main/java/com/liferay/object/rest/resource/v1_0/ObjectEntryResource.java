@@ -23,10 +23,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineExportTaskResource;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -53,15 +50,14 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface ObjectEntryResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Page<ObjectEntry> getObjectEntriesPage(
 			Boolean flatten, String search,
 			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
 			Filter filter, Pagination pagination, Sort[] sorts)
-		throws Exception;
-
-	public Response postObjectEntriesPageExportBatch(
-			String search, Filter filter, Sort[] sorts, String callbackURL,
-			String contentType, String fieldNames)
 		throws Exception;
 
 	public ObjectEntry postObjectEntry(ObjectEntry objectEntry)
@@ -70,31 +66,14 @@ public interface ObjectEntryResource {
 	public Response postObjectEntryBatch(String callbackURL, Object object)
 		throws Exception;
 
-	public ObjectEntry
-			putByExternalReferenceCodeCurrentExternalReferenceCodeObjectRelationshipNameRelatedExternalReferenceCode(
-				String currentExternalReferenceCode,
-				String objectRelationshipName,
-				String relatedExternalReferenceCode)
-		throws Exception;
-
 	public void deleteByExternalReferenceCode(String externalReferenceCode)
 		throws Exception;
 
 	public ObjectEntry getByExternalReferenceCode(String externalReferenceCode)
 		throws Exception;
 
-	public ObjectEntry patchByExternalReferenceCode(
-			String externalReferenceCode, ObjectEntry objectEntry)
-		throws Exception;
-
 	public ObjectEntry putByExternalReferenceCode(
 			String externalReferenceCode, ObjectEntry objectEntry)
-		throws Exception;
-
-	public void
-			putByExternalReferenceCodeObjectEntryExternalReferenceCodeObjectActionObjectActionName(
-				String objectEntryExternalReferenceCode,
-				String objectActionName)
 		throws Exception;
 
 	public void deleteScopeScopeKeyByExternalReferenceCode(
@@ -105,20 +84,9 @@ public interface ObjectEntryResource {
 			String scopeKey, String externalReferenceCode)
 		throws Exception;
 
-	public ObjectEntry patchScopeScopeKeyByExternalReferenceCode(
-			String scopeKey, String externalReferenceCode,
-			ObjectEntry objectEntry)
-		throws Exception;
-
 	public ObjectEntry putScopeScopeKeyByExternalReferenceCode(
 			String scopeKey, String externalReferenceCode,
 			ObjectEntry objectEntry)
-		throws Exception;
-
-	public void
-			putScopeScopeKeyByExternalReferenceCodeObjectActionObjectActionName(
-				String scopeKey, String externalReferenceCode,
-				String objectActionName)
 		throws Exception;
 
 	public void deleteObjectEntry(Long objectEntryId) throws Exception;
@@ -137,20 +105,6 @@ public interface ObjectEntryResource {
 		throws Exception;
 
 	public Response putObjectEntryBatch(String callbackURL, Object object)
-		throws Exception;
-
-	public void putObjectEntryObjectActionObjectActionName(
-			Long objectEntryId, String objectActionName)
-		throws Exception;
-
-	public Page<com.liferay.portal.vulcan.permission.Permission>
-			getObjectEntryPermissionsPage(Long objectEntryId, String roleNames)
-		throws Exception;
-
-	public Page<com.liferay.portal.vulcan.permission.Permission>
-			putObjectEntryPermissionsPage(
-				Long objectEntryId,
-				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public Page<ObjectEntry> getScopeScopeKeyPage(
@@ -200,16 +154,6 @@ public interface ObjectEntryResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineExportTaskResource(
-		VulcanBatchEngineExportTaskResource
-			vulcanBatchEngineExportTaskResource);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -221,8 +165,10 @@ public interface ObjectEntryResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

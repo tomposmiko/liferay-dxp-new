@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alicia García
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
 public class LayoutSEOEntryDDMStructureInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
@@ -48,15 +48,15 @@ public class LayoutSEOEntryDDMStructureInstanceLifecycleListener
 
 		serviceContext.setScopeGroupId(group.getGroupId());
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			company.getCompanyId());
 
-		serviceContext.setUserId(guestUserId);
+		serviceContext.setUserId(defaultUserId);
 
 		Class<?> clazz = getClass();
 
 		_defaultDDMStructureHelper.addDDMStructures(
-			guestUserId, group.getGroupId(),
+			defaultUserId, group.getGroupId(),
 			_classNameLocalService.getClassNameId(LayoutSEOEntry.class),
 			clazz.getClassLoader(),
 			"com/liferay/layout/seo/internal/instance/lifecycle/dependencies" +

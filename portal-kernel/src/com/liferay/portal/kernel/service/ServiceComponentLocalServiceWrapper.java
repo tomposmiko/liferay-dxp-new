@@ -25,10 +25,6 @@ public class ServiceComponentLocalServiceWrapper
 	implements ServiceComponentLocalService,
 			   ServiceWrapper<ServiceComponentLocalService> {
 
-	public ServiceComponentLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ServiceComponentLocalServiceWrapper(
 		ServiceComponentLocalService serviceComponentLocalService) {
 
@@ -128,6 +124,16 @@ public class ServiceComponentLocalServiceWrapper
 
 		return _serviceComponentLocalService.deleteServiceComponent(
 			serviceComponent);
+	}
+
+	@Override
+	public void destroyServiceComponent(
+		com.liferay.portal.kernel.service.configuration.
+			ServiceComponentConfiguration serviceComponentConfiguration,
+		java.lang.ClassLoader classLoader) {
+
+		_serviceComponentLocalService.destroyServiceComponent(
+			serviceComponentConfiguration, classLoader);
 	}
 
 	@Override
@@ -375,6 +381,11 @@ public class ServiceComponentLocalServiceWrapper
 		_serviceComponentLocalService.upgradeDB(
 			classLoader, buildNamespace, buildNumber, previousServiceComponent,
 			tablesSQL, sequencesSQL, indexesSQL);
+	}
+
+	@Override
+	public void verifyDB() {
+		_serviceComponentLocalService.verifyDB();
 	}
 
 	@Override

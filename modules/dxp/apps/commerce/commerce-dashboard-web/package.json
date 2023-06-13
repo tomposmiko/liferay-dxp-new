@@ -1,6 +1,11 @@
 {
 	"dependencies": {
-		"frontend-js-web": "*"
+		"@clayui/charts": "3.37.0",
+		"@clayui/css": "3.37.0",
+		"@liferay/frontend-js-react-web": "*",
+		"frontend-js-web": "*",
+		"react": "16.12.0",
+		"resize-observer-polyfill": "^1.5.1"
 	},
 	"name": "commerce-dashboard-web",
 	"private": true,
@@ -11,5 +16,5 @@
 		"watch": "liferay-npm-scripts webpack --watch"
 	},
 	"sideEffects": false,
-	"version": "4.0.37"
+	"version": "4.0.13"
 }

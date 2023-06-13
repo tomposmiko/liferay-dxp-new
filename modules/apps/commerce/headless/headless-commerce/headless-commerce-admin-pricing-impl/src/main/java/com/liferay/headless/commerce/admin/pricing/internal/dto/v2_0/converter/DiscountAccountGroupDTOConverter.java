@@ -14,7 +14,7 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter;
 
-import com.liferay.account.model.AccountGroup;
+import com.liferay.commerce.account.model.CommerceAccountGroup;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountCommerceAccountGroupRel;
 import com.liferay.commerce.discount.service.CommerceDiscountCommerceAccountGroupRelService;
@@ -29,8 +29,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.commerce.discount.model.CommerceDiscountCommerceAccountGroupRel",
-	service = DTOConverter.class
+	service = {DiscountAccountGroupDTOConverter.class, DTOConverter.class}
 )
 public class DiscountAccountGroupDTOConverter
 	implements DTOConverter
@@ -51,16 +52,17 @@ public class DiscountAccountGroupDTOConverter
 					getCommerceDiscountCommerceAccountGroupRel(
 						(Long)dtoConverterContext.getId());
 
-		AccountGroup discountAccountGroup =
-			commerceDiscountCommerceAccountGroupRel.getAccountGroup();
+		CommerceAccountGroup commerceAccountGroup =
+			commerceDiscountCommerceAccountGroupRel.getCommerceAccountGroup();
 		CommerceDiscount commerceDiscount =
 			commerceDiscountCommerceAccountGroupRel.getCommerceDiscount();
 
 		return new DiscountAccountGroup() {
 			{
 				accountGroupExternalReferenceCode =
-					discountAccountGroup.getExternalReferenceCode();
-				accountGroupId = discountAccountGroup.getAccountGroupId();
+					commerceAccountGroup.getExternalReferenceCode();
+				accountGroupId =
+					commerceAccountGroup.getCommerceAccountGroupId();
 				actions = dtoConverterContext.getActions();
 				discountAccountGroupId =
 					commerceDiscountCommerceAccountGroupRel.

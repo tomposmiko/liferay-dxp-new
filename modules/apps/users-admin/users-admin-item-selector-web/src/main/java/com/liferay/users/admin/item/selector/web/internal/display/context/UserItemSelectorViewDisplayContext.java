@@ -21,12 +21,15 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.usersadmin.search.UserSearch;
 import com.liferay.portlet.usersadmin.search.UserSearchTerms;
 import com.liferay.users.admin.item.selector.web.internal.search.UserItemSelectorChecker;
 import com.liferay.users.admin.kernel.util.UsersAdmin;
+
+import java.util.List;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -101,11 +104,18 @@ public class UserItemSelectorViewDisplayContext {
 		_searchContainer = new UserSearch(_portletRequest, getPortletURL());
 
 		_searchContainer.setEmptyResultsMessage("no-users-were-found");
-		_searchContainer.setOrderByCol(getOrderByCol());
-		_searchContainer.setOrderByComparator(
+
+		OrderByComparator<User> orderByComparator =
 			_usersAdmin.getUserOrderByComparator(
-				getOrderByCol(), getOrderByType()));
+				getOrderByCol(), getOrderByType());
+
+		RowChecker rowChecker = new UserItemSelectorChecker(
+			_renderResponse, getCheckedUserIds(), isCheckedUseIdsEnable());
+
+		_searchContainer.setOrderByCol(getOrderByCol());
+		_searchContainer.setOrderByComparator(orderByComparator);
 		_searchContainer.setOrderByType(getOrderByType());
+		_searchContainer.setRowChecker(rowChecker);
 
 		UserSearchTerms userSearchTerms =
 			(UserSearchTerms)_searchContainer.getSearchTerms();
@@ -114,17 +124,16 @@ public class UserItemSelectorViewDisplayContext {
 		String keywords = userSearchTerms.getKeywords();
 		int status = userSearchTerms.getStatus();
 
-		_searchContainer.setResultsAndTotal(
-			() -> _userLocalService.search(
-				companyId, keywords, status, null, _searchContainer.getStart(),
-				_searchContainer.getEnd(),
-				_searchContainer.getOrderByComparator()),
-			_userLocalService.searchCount(companyId, keywords, status, null));
+		int total = _userLocalService.searchCount(
+			companyId, keywords, status, null);
 
-		_searchContainer.setRowChecker(
-			new UserItemSelectorChecker(
-				_renderResponse, _getCheckedUserIds(),
-				_isCheckedUseIdsEnable()));
+		_searchContainer.setTotal(total);
+
+		List<User> results = _userLocalService.search(
+			companyId, keywords, status, null, _searchContainer.getStart(),
+			_searchContainer.getEnd(), orderByComparator);
+
+		_searchContainer.setResults(results);
 
 		return _searchContainer;
 	}
@@ -133,11 +142,11 @@ public class UserItemSelectorViewDisplayContext {
 		return "users";
 	}
 
-	private long[] _getCheckedUserIds() {
+	protected long[] getCheckedUserIds() {
 		return ParamUtil.getLongValues(_portletRequest, "checkedUserIds");
 	}
 
-	private boolean _isCheckedUseIdsEnable() {
+	protected boolean isCheckedUseIdsEnable() {
 		return ParamUtil.getBoolean(_portletRequest, "checkedUserIdsEnabled");
 	}
 

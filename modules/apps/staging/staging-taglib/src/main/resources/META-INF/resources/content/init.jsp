@@ -50,12 +50,7 @@ Map<String, String[]> parameterMap = Collections.emptyMap();
 ExportImportConfiguration exportImportConfiguration = ExportImportConfigurationLocalServiceUtil.fetchExportImportConfiguration(exportImportConfigurationId);
 
 if (exportImportConfiguration != null) {
-	if (Validator.isNotNull(request.getParameter("startDate")) && Validator.isNotNull(request.getParameter("endDate"))) {
-		dateRange = ExportImportDateUtil.getDateRange(renderRequest, exportGroupId, privateLayout, 0, null, defaultRange);
-	}
-	else {
-		dateRange = ExportImportDateUtil.getDateRange(exportImportConfiguration);
-	}
+	dateRange = ExportImportDateUtil.getDateRange(exportImportConfiguration);
 
 	settingsMap = exportImportConfiguration.getSettingsMap();
 

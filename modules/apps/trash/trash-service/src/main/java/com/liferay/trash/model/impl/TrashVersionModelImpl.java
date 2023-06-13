@@ -32,6 +32,7 @@ import com.liferay.trash.model.TrashVersionModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -222,91 +223,99 @@ public class TrashVersionModelImpl
 	public Map<String, Function<TrashVersion, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<TrashVersion, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, TrashVersion>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<TrashVersion, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			TrashVersion.class.getClassLoader(), TrashVersion.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<TrashVersion, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<TrashVersion, Object>>();
+		try {
+			Constructor<TrashVersion> constructor =
+				(Constructor<TrashVersion>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", TrashVersion::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", TrashVersion::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"versionId", TrashVersion::getVersionId);
-			attributeGetterFunctions.put(
-				"companyId", TrashVersion::getCompanyId);
-			attributeGetterFunctions.put("entryId", TrashVersion::getEntryId);
-			attributeGetterFunctions.put(
-				"classNameId", TrashVersion::getClassNameId);
-			attributeGetterFunctions.put("classPK", TrashVersion::getClassPK);
-			attributeGetterFunctions.put(
-				"typeSettings", TrashVersion::getTypeSettings);
-			attributeGetterFunctions.put("status", TrashVersion::getStatus);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<TrashVersion, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<TrashVersion, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<TrashVersion, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<TrashVersion, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<TrashVersion, Object>>();
+		Map<String, BiConsumer<TrashVersion, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<TrashVersion, ?>>();
 
-		static {
-			Map<String, BiConsumer<TrashVersion, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<TrashVersion, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", TrashVersion::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<TrashVersion, Long>)TrashVersion::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", TrashVersion::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<TrashVersion, Long>)TrashVersion::setCtCollectionId);
+		attributeGetterFunctions.put("versionId", TrashVersion::getVersionId);
+		attributeSetterBiConsumers.put(
+			"versionId",
+			(BiConsumer<TrashVersion, Long>)TrashVersion::setVersionId);
+		attributeGetterFunctions.put("companyId", TrashVersion::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<TrashVersion, Long>)TrashVersion::setCompanyId);
+		attributeGetterFunctions.put("entryId", TrashVersion::getEntryId);
+		attributeSetterBiConsumers.put(
+			"entryId",
+			(BiConsumer<TrashVersion, Long>)TrashVersion::setEntryId);
+		attributeGetterFunctions.put(
+			"classNameId", TrashVersion::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<TrashVersion, Long>)TrashVersion::setClassNameId);
+		attributeGetterFunctions.put("classPK", TrashVersion::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<TrashVersion, Long>)TrashVersion::setClassPK);
+		attributeGetterFunctions.put(
+			"typeSettings", TrashVersion::getTypeSettings);
+		attributeSetterBiConsumers.put(
+			"typeSettings",
+			(BiConsumer<TrashVersion, String>)TrashVersion::setTypeSettings);
+		attributeGetterFunctions.put("status", TrashVersion::getStatus);
+		attributeSetterBiConsumers.put(
+			"status",
+			(BiConsumer<TrashVersion, Integer>)TrashVersion::setStatus);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<TrashVersion, Long>)TrashVersion::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<TrashVersion, Long>)
-					TrashVersion::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"versionId",
-				(BiConsumer<TrashVersion, Long>)TrashVersion::setVersionId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<TrashVersion, Long>)TrashVersion::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"entryId",
-				(BiConsumer<TrashVersion, Long>)TrashVersion::setEntryId);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<TrashVersion, Long>)TrashVersion::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<TrashVersion, Long>)TrashVersion::setClassPK);
-			attributeSetterBiConsumers.put(
-				"typeSettings",
-				(BiConsumer<TrashVersion, String>)
-					TrashVersion::setTypeSettings);
-			attributeSetterBiConsumers.put(
-				"status",
-				(BiConsumer<TrashVersion, Integer>)TrashVersion::setStatus);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -733,12 +742,41 @@ public class TrashVersionModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<TrashVersion, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<TrashVersion, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<TrashVersion, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((TrashVersion)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, TrashVersion>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					TrashVersion.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -753,9 +791,8 @@ public class TrashVersionModelImpl
 	private int _status;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<TrashVersion, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<TrashVersion, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

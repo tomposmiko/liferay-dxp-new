@@ -161,8 +161,4 @@ public interface ModuleModel extends BaseModel<Module>, ShardedModel {
 	@Override
 	public Module cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

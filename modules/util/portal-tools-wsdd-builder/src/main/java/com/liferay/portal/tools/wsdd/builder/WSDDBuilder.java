@@ -16,13 +16,13 @@ package com.liferay.portal.tools.wsdd.builder;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.tools.ToolsUtil;
-import com.liferay.portal.tools.wsdd.builder.util.Java2WsddTask;
 import com.liferay.portal.xml.SAXReaderFactory;
+import com.liferay.util.ant.Java2WsddTask;
+import com.liferay.util.xml.XMLSafeReader;
 
 import java.io.File;
 
@@ -67,10 +67,6 @@ public class WSDDBuilder {
 	}
 
 	public void build() throws Exception {
-		System.setProperty(
-			"javax.xml.parsers.SAXParserFactory",
-			"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl");
-
 		File serverConfigFile = new File(_serverConfigFileName);
 
 		if (!serverConfigFile.exists()) {
@@ -87,7 +83,7 @@ public class WSDDBuilder {
 		SAXReader saxReader = _getSAXReader();
 
 		Document document = saxReader.read(
-			new UnsyncStringReader(ToolsUtil.getContent(_fileName)));
+			new XMLSafeReader(ToolsUtil.getContent(_fileName)));
 
 		Element rootElement = document.getRootElement();
 

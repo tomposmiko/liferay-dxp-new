@@ -12,7 +12,8 @@
  * details.
  */
 
-import {fieldToDataDefinition} from '../../utils/dataConverter';
+import {DataConverter} from 'data-engine-taglib';
+
 import {PagesVisitor} from '../../utils/visitors.es';
 import {SYMBOL_CACHE, SYMBOL_RAW, Schema} from './Schema.es';
 
@@ -54,7 +55,9 @@ export class DataDefinitionSchema extends Schema {
 			const visitor = new PagesVisitor(pages);
 
 			visitor.mapFields((field) => {
-				const dataDefinitionField = fieldToDataDefinition(field);
+				const dataDefinitionField = DataConverter.getDataDefinitionField(
+					field
+				);
 				fields.push(dataDefinitionField);
 			});
 

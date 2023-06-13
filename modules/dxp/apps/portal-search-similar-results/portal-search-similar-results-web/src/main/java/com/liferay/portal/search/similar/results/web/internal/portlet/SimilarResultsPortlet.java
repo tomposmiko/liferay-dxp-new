@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -49,7 +50,6 @@ import java.util.Optional;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
-import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -62,6 +62,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Kevin Tan
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-similar-results",
@@ -73,8 +74,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/similar/results/view.jsp",
 		"javax.portlet.name=" + SimilarResultsPortletKeys.SIMILAR_RESULTS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )
@@ -90,33 +90,28 @@ public class SimilarResultsPortlet extends MVCPortlet {
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			_buildDisplayContext(
+			buildDisplayContext(
 				portletSharedSearchResponse, renderRequest, renderResponse));
 
 		super.render(renderRequest, renderResponse);
 	}
 
-	@Reference
-	protected SimilarResultsContributorsRegistry
-		similarResultsContributorsRegistry;
-
-	private SimilarResultsDisplayContext _buildDisplayContext(
+	protected SimilarResultsDisplayContext buildDisplayContext(
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		SimilarResultsDisplayContext similarResultsDisplayContext =
-			_createSimilarResultsDisplayContext(renderRequest);
-
-		Optional<PortletPreferences> portletPreferencesOptional =
-			portletSharedSearchResponse.getPortletPreferences(renderRequest);
+			createSimilarResultsDisplayContext(renderRequest);
 
 		SimilarResultsPortletPreferences similarResultsPortletPreferences =
 			new SimilarResultsPortletPreferencesImpl(
-				portletPreferencesOptional.orElse(null));
+				portletSharedSearchResponse.getPortletPreferences(
+					renderRequest));
 
 		SearchResponse searchResponse =
 			portletSharedSearchResponse.getFederatedSearchResponse(
-				similarResultsPortletPreferences.getFederatedSearchKey());
+				Optional.of(
+					similarResultsPortletPreferences.getFederatedSearchKey()));
 
 		if (searchResponse == null) {
 			return similarResultsDisplayContext;
@@ -127,7 +122,7 @@ public class SimilarResultsPortlet extends MVCPortlet {
 
 		List<Document> legacyDocuments = searchResponse.getDocuments71();
 
-		legacyDocuments = _excludingDocumentByUID(
+		legacyDocuments = excludingDocumentByUID(
 			renderRequest, legacyDocuments);
 
 		int maxItemDisplay =
@@ -139,19 +134,25 @@ public class SimilarResultsPortlet extends MVCPortlet {
 
 		similarResultsDisplayContext.setDocuments(legacyDocuments);
 
+		ThemeDisplay themeDisplay = portletSharedSearchResponse.getThemeDisplay(
+			renderRequest);
+
+		Optional<SimilarResultsRoute> optional =
+			similarResultsContributorsRegistry.detectRoute(
+				_portal.getCurrentURL(renderRequest));
+
+		SimilarResultsRoute similarResultsRoute = optional.orElse(null);
+
 		similarResultsDisplayContext.setSimilarResultsDocumentDisplayContexts(
-			_buildSimilarResultsDocumentDisplayContexts(
-				legacyDocuments,
-				similarResultsContributorsRegistry.detectRoute(
-					_portal.getCurrentURL(renderRequest)),
-				renderRequest, renderResponse,
-				portletSharedSearchResponse.getThemeDisplay(renderRequest)));
+			buildSimilarResultsDocumentDisplayContexts(
+				legacyDocuments, similarResultsRoute, renderRequest,
+				renderResponse, themeDisplay));
 
 		return similarResultsDisplayContext;
 	}
 
-	private List<SimilarResultsDocumentDisplayContext>
-		_buildSimilarResultsDocumentDisplayContexts(
+	protected List<SimilarResultsDocumentDisplayContext>
+		buildSimilarResultsDocumentDisplayContexts(
 			List<Document> documents, SimilarResultsRoute similarResultsRoute,
 			RenderRequest renderRequest, RenderResponse renderResponse,
 			ThemeDisplay themeDisplay) {
@@ -161,7 +162,7 @@ public class SimilarResultsPortlet extends MVCPortlet {
 
 		for (Document document : documents) {
 			SimilarResultsDocumentDisplayContext
-				similarResultsDocumentDisplayContext = _buildSummary(
+				similarResultsDocumentDisplayContext = doBuildSummary(
 					document, similarResultsRoute, renderRequest,
 					renderResponse, themeDisplay);
 
@@ -176,7 +177,19 @@ public class SimilarResultsPortlet extends MVCPortlet {
 		return similarResultsDocumentDisplayContexts;
 	}
 
-	private SimilarResultsDocumentDisplayContext _buildSummary(
+	protected SimilarResultsDisplayContext createSimilarResultsDisplayContext(
+		RenderRequest renderRequest) {
+
+		try {
+			return new SimilarResultsDisplayContext(
+				getHttpServletRequest(renderRequest));
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
+		}
+	}
+
+	protected SimilarResultsDocumentDisplayContext doBuildSummary(
 		Document document, SimilarResultsRoute similarResultsRoute,
 		RenderRequest renderRequest, RenderResponse renderResponse,
 		ThemeDisplay themeDisplay) {
@@ -196,6 +209,8 @@ public class SimilarResultsPortlet extends MVCPortlet {
 			_fastDateFormatFactory
 		).setHighlightEnabled(
 			false
+		).setHttp(
+			_http
 		).setIndexerRegistry(
 			_indexerRegistry
 		).setLocale(
@@ -217,19 +232,7 @@ public class SimilarResultsPortlet extends MVCPortlet {
 		return similarResultsDocumentDisplayContextBuilder.build();
 	}
 
-	private SimilarResultsDisplayContext _createSimilarResultsDisplayContext(
-		RenderRequest renderRequest) {
-
-		try {
-			return new SimilarResultsDisplayContext(
-				_getHttpServletRequest(renderRequest));
-		}
-		catch (ConfigurationException configurationException) {
-			throw new RuntimeException(configurationException);
-		}
-	}
-
-	private List<Document> _excludingDocumentByUID(
+	protected List<Document> excludingDocumentByUID(
 		RenderRequest renderRequest, List<Document> documents71) {
 
 		String uid = (String)renderRequest.getAttribute(Field.UID);
@@ -254,7 +257,7 @@ public class SimilarResultsPortlet extends MVCPortlet {
 		return legacyDocuments;
 	}
 
-	private HttpServletRequest _getHttpServletRequest(
+	protected HttpServletRequest getHttpServletRequest(
 		RenderRequest renderRequest) {
 
 		LiferayPortletRequest liferayPortletRequest =
@@ -262,6 +265,10 @@ public class SimilarResultsPortlet extends MVCPortlet {
 
 		return liferayPortletRequest.getHttpServletRequest();
 	}
+
+	@Reference
+	protected SimilarResultsContributorsRegistry
+		similarResultsContributorsRegistry;
 
 	private boolean _isReplyMBMessageDocument(Document legacyDocument) {
 		String className = legacyDocument.get(Field.ENTRY_CLASS_NAME);
@@ -300,6 +307,9 @@ public class SimilarResultsPortlet extends MVCPortlet {
 
 	@Reference
 	private FastDateFormatFactory _fastDateFormatFactory;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private IndexerRegistry _indexerRegistry;

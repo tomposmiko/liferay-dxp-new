@@ -18,6 +18,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
@@ -43,6 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -58,20 +60,21 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	configurationPid = "com.liferay.portal.security.sso.token.configuration.TokenConfiguration",
+	configurationPid = "com.liferay.portal.security.sso.token.internal.configuration.TokenConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = AutoLogin.class
 )
 public class TokenAutoLogin extends BaseAutoLogin {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+		_tokenRetrievers = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, TokenRetriever.class, "token.location");
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_tokenRetrievers.close();
 	}
 
 	@Override
@@ -82,21 +85,21 @@ public class TokenAutoLogin extends BaseAutoLogin {
 
 		long companyId = _portal.getCompanyId(httpServletRequest);
 
-		TokenConfiguration tokenConfiguration =
+		TokenConfiguration tokenCompanyServiceSettings =
 			_configurationProvider.getConfiguration(
 				TokenConfiguration.class,
 				new CompanyServiceSettingsLocator(
 					companyId, TokenConstants.SERVICE_NAME));
 
-		if (!tokenConfiguration.enabled()) {
+		if (!tokenCompanyServiceSettings.enabled()) {
 			return null;
 		}
 
-		String userTokenName = tokenConfiguration.userTokenName();
+		String userTokenName = tokenCompanyServiceSettings.userTokenName();
 
-		String tokenLocation = tokenConfiguration.tokenLocation();
+		String tokenLocation = tokenCompanyServiceSettings.tokenLocation();
 
-		TokenRetriever tokenRetriever = _serviceTrackerMap.getService(
+		TokenRetriever tokenRetriever = _tokenRetrievers.getService(
 			tokenLocation);
 
 		if (tokenRetriever == null) {
@@ -118,7 +121,7 @@ public class TokenAutoLogin extends BaseAutoLogin {
 			return null;
 		}
 
-		User user = _getUser(companyId, login, tokenConfiguration);
+		User user = getUser(companyId, login, tokenCompanyServiceSettings);
 
 		addRedirect(httpServletRequest);
 
@@ -131,9 +134,10 @@ public class TokenAutoLogin extends BaseAutoLogin {
 		return credentials;
 	}
 
-	private User _getUser(
-			long companyId, String login, TokenConfiguration tokenConfiguration)
-		throws Exception {
+	protected User getUser(
+			long companyId, String login,
+			TokenConfiguration tokenCompanyServiceSettings)
+		throws PortalException {
 
 		User user = null;
 
@@ -141,7 +145,7 @@ public class TokenAutoLogin extends BaseAutoLogin {
 			companyId, PropsKeys.COMPANY_SECURITY_AUTH_TYPE,
 			PropsValues.COMPANY_SECURITY_AUTH_TYPE);
 
-		if (tokenConfiguration.importFromLDAP()) {
+		if (tokenCompanyServiceSettings.importFromLDAP()) {
 			try {
 				if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
 					user = _userImporter.importUser(
@@ -195,20 +199,32 @@ public class TokenAutoLogin extends BaseAutoLogin {
 		return user;
 	}
 
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserImporter(UserImporter userImporter) {
+		_userImporter = userImporter;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(TokenAutoLogin.class);
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private Portal _portal;
 
-	private ServiceTrackerMap<String, TokenRetriever> _serviceTrackerMap;
-
-	@Reference
+	private ServiceTrackerMap<String, TokenRetriever> _tokenRetrievers;
 	private UserImporter _userImporter;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

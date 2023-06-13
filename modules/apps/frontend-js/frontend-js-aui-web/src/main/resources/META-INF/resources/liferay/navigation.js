@@ -15,14 +15,14 @@
 AUI.add(
 	'liferay-navigation',
 	(A) => {
-		const ANode = A.Node;
-		const Lang = A.Lang;
+		var ANode = A.Node;
+		var Lang = A.Lang;
 
-		const STR_EMPTY = '';
+		var STR_EMPTY = '';
 
-		const TPL_LINK = '<a href="{url}">{pageTitle}</a>';
+		var TPL_LINK = '<a href="{url}">{pageTitle}</a>';
 
-		const TPL_TAB_LINK =
+		var TPL_TAB_LINK =
 			'<a href="{url}">' + '<span>{pageTitle}</span>' + '</a>';
 
 		/**
@@ -32,7 +32,7 @@ AUI.add(
 		 * navBlock {string|object}: A selector or DOM element of the navigation.
 		 */
 
-		const Navigation = A.Component.create({
+		var Navigation = A.Component.create({
 			ATTRS: {
 				navBlock: {
 					lazyAdd: false,
@@ -55,12 +55,12 @@ AUI.add(
 
 			prototype: {
 				_createTempTab(tpl) {
-					const tempLink = Lang.sub(tpl, {
+					var tempLink = Lang.sub(tpl, {
 						pageTitle: STR_EMPTY,
 						url: '#',
 					});
 
-					const tempTab = ANode.create('<li>');
+					var tempTab = ANode.create('<li>');
 
 					tempTab.append(tempLink);
 
@@ -68,23 +68,23 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const navBlock = instance.get('navBlock');
+					var navBlock = instance.get('navBlock');
 
 					if (navBlock) {
-						const navListSelector =
+						var navListSelector =
 							Liferay.Data.NAV_LIST_SELECTOR || '> ul';
 
-						const navItemSelector =
+						var navItemSelector =
 							Liferay.Data.NAV_ITEM_SELECTOR ||
 							navListSelector + '> li';
 
-						const navItemChildToggleSelector =
+						var navItemChildToggleSelector =
 							Liferay.Data.NAV_ITEM_CHILD_TOGGLE_SELECTOR ||
 							'> span';
 
-						const navList = navBlock.one(navListSelector);
+						var navList = navBlock.one(navListSelector);
 
 						instance._navItemChildToggleSelector = navItemChildToggleSelector;
 						instance._navItemSelector = navItemSelector;

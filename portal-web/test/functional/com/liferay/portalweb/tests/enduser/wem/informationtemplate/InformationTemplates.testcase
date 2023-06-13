@@ -6,21 +6,17 @@ definition {
 	property testray.main.component.name = "Content and Application Templates";
 
 	setUp {
-		task ("Set up instance and sign in") {
-			TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
-			User.firstLoginPG();
-		}
+		User.firstLoginPG();
 
-		task ("Add a site") {
-			HeadlessSite.addSite(siteName = "Test Site Name");
-		}
+		JSONGroup.addGroup(groupName = "Test Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +27,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-124478. The template creator could create an information template."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test AddInformationTemplate {
 		property portal.acceptance = "true";
@@ -54,7 +50,7 @@ definition {
 		task ("Add the Title and Description fields") {
 			for (var fieldName : list "Title,Description") {
 				InformationTemplates.addField(
-					fieldName = ${fieldName},
+					fieldName = "${fieldName}",
 					panelTitle = "Basic Information");
 			}
 		}
@@ -76,7 +72,7 @@ definition {
 
 			for (var fieldName : list "Template Key,URL,WebDAV URL") {
 				AssertTextNotEquals(
-					key_text = ${fieldName},
+					key_text = "${fieldName}",
 					locator1 = "TextInput#ANY",
 					value1 = "");
 			}
@@ -111,7 +107,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-124478. The template creator could create an information template via script file."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test AddInformationTemplateViaScriptFile {
 		task ("Navigate to the Information Templates admin") {
@@ -158,7 +154,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-124478. The template creator could copy an information template."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test CopyInformationTemplate {
 		task ("Add an information template for Asset") {
@@ -194,14 +190,14 @@ definition {
 		task ("View both information templates shown") {
 			for (var informationTemplateName : list "Test Information Template,Test Information Template (Copy)") {
 				InformationTemplates.viewTemplate(
-					informationTemplateName = ${informationTemplateName},
+					informationTemplateName = "${informationTemplateName}",
 					itemType = "Asset");
 			}
 		}
 	}
 
 	@description = "This is a use case for LPS-124478. The template creator could define permissions of an information template."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test DefinePermissionsOfInformationTemplate {
 		task ("Add a custom object") {
@@ -211,7 +207,6 @@ definition {
 				pluralLabelName = "Additional Orders");
 
 			ObjectAdmin.addObjectFieldViaAPI(
-				fieldBusinessType = "Text",
 				fieldLabelName = "Order Number",
 				fieldName = "orderNumber",
 				fieldType = "String",
@@ -229,9 +224,9 @@ definition {
 				itemType = "Additional Order");
 		}
 
-		task ("Add the Author and Order Number fields") {
+		task ("Add the User Name and Order Number fields") {
 			InformationTemplates.addField(
-				fieldName = "Author",
+				fieldName = "User Name",
 				panelTitle = "Basic Information");
 
 			InformationTemplates.addField(
@@ -277,7 +272,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-124478. The template creator could delete an information template."
-	@priority = 4
+	@priority = "4"
 	@uitest
 	test DeleteInformationTemplate {
 		task ("Add an information template for Document and Basic Document") {
@@ -292,7 +287,7 @@ definition {
 		task ("Add the Title and Preview Image fields") {
 			for (var fieldName : list "Title,Preview Image") {
 				InformationTemplates.addField(
-					fieldName = ${fieldName},
+					fieldName = "${fieldName}",
 					panelTitle = "Basic Information");
 			}
 		}
@@ -318,7 +313,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-124478. The template creator could edit an information template."
-	@priority = 5
+	@priority = "5"
 	@uitest
 	test EditInformationTemplate {
 		property portal.acceptance = "true";
@@ -334,7 +329,7 @@ definition {
 		task ("Add the Name and Vocabulary fields") {
 			for (var fieldName : list "Name,Vocabulary") {
 				InformationTemplates.addField(
-					fieldName = ${fieldName},
+					fieldName = "${fieldName}",
 					panelTitle = "Basic Information");
 			}
 		}
@@ -366,7 +361,7 @@ definition {
 		task ("Add the Name and Description fields") {
 			for (var fieldName : list "Name,Description") {
 				InformationTemplates.addField(
-					fieldName = ${fieldName},
+					fieldName = "${fieldName}",
 					panelTitle = "Basic Information");
 			}
 		}
@@ -393,7 +388,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-137569. The page creator could use information template in Content Display."
-	@priority = 5
+	@priority = "5"
 	test MapToContentDisplay {
 		property portal.acceptance = "true";
 
@@ -484,7 +479,7 @@ definition {
 		task ("Add the Title and Author fields") {
 			for (var fieldName : list "Title,Author Name") {
 				InformationTemplates.addField(
-					fieldName = ${fieldName},
+					fieldName = "${fieldName}",
 					panelTitle = "Basic Information");
 			}
 
@@ -500,7 +495,7 @@ definition {
 		task ("Add the Name and Vocabulary fields") {
 			for (var fieldName : list "Name,Vocabulary") {
 				InformationTemplates.addField(
-					fieldName = ${fieldName},
+					fieldName = "${fieldName}",
 					panelTitle = "Basic Information");
 			}
 
@@ -533,11 +528,12 @@ definition {
 		}
 
 		task ("View the title and content of web content are shown") {
-			AssertTextEquals(
-				index = 1,
-				key_fragmentName = "Content Display",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
-				value1 = "Web Content Title Web Content Content");
+			for (var text : list "Title,Content") {
+				AssertTextEquals.assertPartialText(
+					key_fragmentName = "Content Display",
+					locator1 = "Fragment#FRAGMENT_BODY",
+					value1 = "Web Content ${text}");
+			}
 		}
 
 		task ("Select the blogs entry and information template in Content Display") {
@@ -550,9 +546,8 @@ definition {
 
 		task ("View the title and description of blogs are shown") {
 			AssertTextEquals(
-				index = 1,
 				key_fragmentName = "Content Display",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Blogs Entry Title Blogs Entry Description");
 		}
 
@@ -566,9 +561,8 @@ definition {
 
 		task ("View the title and author name of documents are shown") {
 			AssertTextEquals(
-				index = 1,
 				key_fragmentName = "Content Display",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Document Title Test Test");
 		}
 
@@ -582,15 +576,14 @@ definition {
 
 		task ("View the category and vocabulary names are shown") {
 			AssertTextEquals(
-				index = 1,
 				key_fragmentName = "Content Display",
-				locator1 = "Fragment#FRAGMENT_CONTENT",
+				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "Category Name Vocabulary Name");
 		}
 	}
 
 	@description = "This is a use case for LPS-137569. The page creator could use information template in Collection Display."
-	@priority = 5
+	@priority = "5"
 	test MapToEditableFieldInCollectionDisplay {
 		property portal.acceptance = "true";
 
@@ -712,10 +705,12 @@ definition {
 		}
 
 		task ("View the title and content of web content are shown") {
-			PageEditor.viewFragmentEditableText(
-				editableText = "Web Content Title Web Content Content",
-				fragmentName = "Button",
-				id = "link");
+			for (var text : list "Title,Content") {
+				AssertTextEquals.assertPartialText(
+					key_fragmentName = "button",
+					locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+					value1 = "Web Content ${text}");
+			}
 		}
 
 		task ("Select the manual collection in Collection Display") {
@@ -732,10 +727,10 @@ definition {
 		}
 
 		task ("View the title and description of blogs entry are shown") {
-			PageEditor.viewFragmentEditableText(
-				editableText = "Blogs Entry Title Blogs Entry Description",
-				fragmentName = "Button",
-				id = "link");
+			AssertTextEquals(
+				key_fragmentName = "button",
+				locator1 = "Fragment#FRAGMENT_BASIC_COMPONENT",
+				value1 = "Blogs Entry Title Blogs Entry Description");
 		}
 	}
 

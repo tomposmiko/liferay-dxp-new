@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -230,71 +231,82 @@ public class ModuleModelImpl
 	}
 
 	public Map<String, Function<Module, Object>> getAttributeGetterFunctions() {
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<Module, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, Module>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<Module, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Module.class.getClassLoader(), Module.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<Module, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<Module, Object>>();
+		try {
+			Constructor<Module> constructor =
+				(Constructor<Module>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put("uuid", Module::getUuid);
-			attributeGetterFunctions.put("moduleId", Module::getModuleId);
-			attributeGetterFunctions.put("companyId", Module::getCompanyId);
-			attributeGetterFunctions.put("appId", Module::getAppId);
-			attributeGetterFunctions.put(
-				"bundleSymbolicName", Module::getBundleSymbolicName);
-			attributeGetterFunctions.put(
-				"bundleVersion", Module::getBundleVersion);
-			attributeGetterFunctions.put("contextName", Module::getContextName);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<Module, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<Module, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<Module, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<Module, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Module, Object>>();
+		Map<String, BiConsumer<Module, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<Module, ?>>();
 
-		static {
-			Map<String, BiConsumer<Module, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<Module, ?>>();
+		attributeGetterFunctions.put("uuid", Module::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<Module, String>)Module::setUuid);
+		attributeGetterFunctions.put("moduleId", Module::getModuleId);
+		attributeSetterBiConsumers.put(
+			"moduleId", (BiConsumer<Module, Long>)Module::setModuleId);
+		attributeGetterFunctions.put("companyId", Module::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<Module, Long>)Module::setCompanyId);
+		attributeGetterFunctions.put("appId", Module::getAppId);
+		attributeSetterBiConsumers.put(
+			"appId", (BiConsumer<Module, Long>)Module::setAppId);
+		attributeGetterFunctions.put(
+			"bundleSymbolicName", Module::getBundleSymbolicName);
+		attributeSetterBiConsumers.put(
+			"bundleSymbolicName",
+			(BiConsumer<Module, String>)Module::setBundleSymbolicName);
+		attributeGetterFunctions.put("bundleVersion", Module::getBundleVersion);
+		attributeSetterBiConsumers.put(
+			"bundleVersion",
+			(BiConsumer<Module, String>)Module::setBundleVersion);
+		attributeGetterFunctions.put("contextName", Module::getContextName);
+		attributeSetterBiConsumers.put(
+			"contextName", (BiConsumer<Module, String>)Module::setContextName);
 
-			attributeSetterBiConsumers.put(
-				"uuid", (BiConsumer<Module, String>)Module::setUuid);
-			attributeSetterBiConsumers.put(
-				"moduleId", (BiConsumer<Module, Long>)Module::setModuleId);
-			attributeSetterBiConsumers.put(
-				"companyId", (BiConsumer<Module, Long>)Module::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"appId", (BiConsumer<Module, Long>)Module::setAppId);
-			attributeSetterBiConsumers.put(
-				"bundleSymbolicName",
-				(BiConsumer<Module, String>)Module::setBundleSymbolicName);
-			attributeSetterBiConsumers.put(
-				"bundleVersion",
-				(BiConsumer<Module, String>)Module::setBundleVersion);
-			attributeSetterBiConsumers.put(
-				"contextName",
-				(BiConsumer<Module, String>)Module::setContextName);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -719,12 +731,40 @@ public class ModuleModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<Module, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<Module, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<Module, Object> attributeGetterFunction = entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((Module)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Module>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Module.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -739,9 +779,8 @@ public class ModuleModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<Module, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<Module, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

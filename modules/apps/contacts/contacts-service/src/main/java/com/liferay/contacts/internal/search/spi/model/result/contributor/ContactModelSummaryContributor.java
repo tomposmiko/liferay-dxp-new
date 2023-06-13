@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Lucas Marques de Paula
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.Contact",
 	service = ModelSummaryContributor.class
 )

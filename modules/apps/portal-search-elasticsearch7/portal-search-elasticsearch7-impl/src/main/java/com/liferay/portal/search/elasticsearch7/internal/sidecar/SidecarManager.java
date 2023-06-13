@@ -31,20 +31,27 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.Elasticsearc
 import com.liferay.portal.search.elasticsearch7.internal.connection.constants.ConnectionConstants;
 import com.liferay.portal.search.elasticsearch7.internal.index.constants.SidecarVersionConstants;
 import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
+import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Tina Tian
  */
-@Component(enabled = true, service = {})
+@Component(enabled = true, immediate = true, service = {})
 public class SidecarManager implements ElasticsearchConfigurationObserver {
 
 	@Override
@@ -70,6 +77,18 @@ public class SidecarManager implements ElasticsearchConfigurationObserver {
 		elasticsearchConfigurationWrapper.register(this);
 
 		applyConfigurations();
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(operation.mode=SIDECAR)"
+	)
+	protected void addSettingsContributor(
+		SettingsContributor settingsContributor) {
+
+		_settingsContributors.add(settingsContributor);
 	}
 
 	protected void applyConfigurations() {
@@ -98,8 +117,9 @@ public class SidecarManager implements ElasticsearchConfigurationObserver {
 
 			_sidecar = new Sidecar(
 				clusterExecutor, elasticsearchConfigurationWrapper,
-				_getElasticsearchInstancePaths(), processExecutor,
-				new ProcessExecutorPathsImpl(props), this);
+				getElasticsearchInstancePaths(), processExecutor,
+				new ProcessExecutorPathsImpl(props), _settingsContributors,
+				this);
 
 			ElasticsearchConnectionBuilder elasticsearchConnectionBuilder =
 				new ElasticsearchConnectionBuilder();
@@ -108,10 +128,6 @@ public class SidecarManager implements ElasticsearchConfigurationObserver {
 				true
 			).connectionId(
 				ConnectionConstants.SIDECAR_CONNECTION_ID
-			).maxConnections(
-				elasticsearchConfigurationWrapper.maxConnections()
-			).maxConnectionsPerRoute(
-				elasticsearchConfigurationWrapper.maxConnectionsPerRoute()
 			).postCloseRunnable(
 				_sidecar::stop
 			).preConnectElasticsearchConnectionConsumer(
@@ -135,30 +151,7 @@ public class SidecarManager implements ElasticsearchConfigurationObserver {
 		elasticsearchConfigurationWrapper.unregister(this);
 	}
 
-	protected boolean isStartupSuccessful() {
-		return _startupSuccessful;
-	}
-
-	@Reference
-	protected ClusterExecutor clusterExecutor;
-
-	@Reference
-	protected volatile ElasticsearchConfigurationWrapper
-		elasticsearchConfigurationWrapper;
-
-	@Reference
-	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
-
-	@Reference
-	protected OperationModeResolver operationModeResolver;
-
-	@Reference
-	protected ProcessExecutor processExecutor;
-
-	@Reference
-	protected Props props;
-
-	private ElasticsearchInstancePaths _getElasticsearchInstancePaths() {
+	protected ElasticsearchInstancePaths getElasticsearchInstancePaths() {
 		ElasticsearchInstancePathsBuilder elasticsearchInstancePathsBuilder =
 			new ElasticsearchInstancePathsBuilder();
 
@@ -169,13 +162,23 @@ public class SidecarManager implements ElasticsearchConfigurationObserver {
 		return elasticsearchInstancePathsBuilder.dataPath(
 			dataPath
 		).homePath(
-			_resolveHomePath(workPath)
+			resolveHomePath(workPath)
 		).workPath(
 			workPath
 		).build();
 	}
 
-	private Path _resolveHomePath(Path path) {
+	protected boolean isStartupSuccessful() {
+		return _startupSuccessful;
+	}
+
+	protected void removeSettingsContributor(
+		SettingsContributor settingsContributor) {
+
+		_settingsContributors.remove(settingsContributor);
+	}
+
+	protected Path resolveHomePath(Path path) {
 		String sidecarHome = elasticsearchConfigurationWrapper.sidecarHome();
 
 		if (sidecarHome.equals("elasticsearch-sidecar")) {
@@ -198,8 +201,29 @@ public class SidecarManager implements ElasticsearchConfigurationObserver {
 		return relativeSidecarHomePath;
 	}
 
+	@Reference
+	protected ClusterExecutor clusterExecutor;
+
+	@Reference
+	protected volatile ElasticsearchConfigurationWrapper
+		elasticsearchConfigurationWrapper;
+
+	@Reference
+	protected ElasticsearchConnectionManager elasticsearchConnectionManager;
+
+	@Reference
+	protected OperationModeResolver operationModeResolver;
+
+	@Reference
+	protected ProcessExecutor processExecutor;
+
+	@Reference
+	protected Props props;
+
 	private static final Log _log = LogFactoryUtil.getLog(SidecarManager.class);
 
+	private final Set<SettingsContributor> _settingsContributors =
+		new ConcurrentSkipListSet<>();
 	private Sidecar _sidecar;
 	private boolean _startupSuccessful;
 

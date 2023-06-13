@@ -21,10 +21,10 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.OrganizationService;
-import com.liferay.portal.kernel.service.permission.OrganizationPermission;
+import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + UsersAdminPortletKeys.MY_ORGANIZATIONS,
 		"javax.portlet.name=" + UsersAdminPortletKeys.USERS_ADMIN,
@@ -57,7 +58,7 @@ public class UpdateOrganizationReminderQueriesMVCActionCommand
 		throws Exception {
 
 		try {
-			_updateReminderQueries(actionRequest);
+			updateReminderQueries(actionRequest);
 		}
 		catch (Exception exception) {
 			String mvcPath = "/edit_organization.jsp";
@@ -74,7 +75,7 @@ public class UpdateOrganizationReminderQueriesMVCActionCommand
 		}
 	}
 
-	private void _updateReminderQueries(PortletRequest portletRequest)
+	protected void updateReminderQueries(PortletRequest portletRequest)
 		throws Exception {
 
 		long organizationId = ParamUtil.getLong(
@@ -86,7 +87,7 @@ public class UpdateOrganizationReminderQueriesMVCActionCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		_organizationPermission.check(
+		OrganizationPermissionUtil.check(
 			themeDisplay.getPermissionChecker(), organization,
 			ActionKeys.UPDATE);
 
@@ -94,19 +95,13 @@ public class UpdateOrganizationReminderQueriesMVCActionCommand
 
 		PortletPreferences portletPreferences = organization.getPreferences();
 
-		_localization.setLocalizedPreferencesValues(
+		LocalizationUtil.setLocalizedPreferencesValues(
 			portletRequest, portletPreferences, "reminderQueries");
 
 		portletPreferences.setValue("reminderQueries", reminderQueries);
 
 		portletPreferences.store();
 	}
-
-	@Reference
-	private Localization _localization;
-
-	@Reference
-	private OrganizationPermission _organizationPermission;
 
 	@Reference
 	private OrganizationService _organizationService;

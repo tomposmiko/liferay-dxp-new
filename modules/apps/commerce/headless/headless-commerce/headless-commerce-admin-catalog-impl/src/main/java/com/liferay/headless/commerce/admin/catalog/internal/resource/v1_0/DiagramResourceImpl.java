@@ -17,19 +17,15 @@ package com.liferay.headless.commerce.admin.catalog.internal.resource.v1_0;
 import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryService;
-import com.liferay.commerce.product.service.CPDefinitionOptionRelService;
-import com.liferay.commerce.product.service.CPDefinitionOptionValueRelService;
 import com.liferay.commerce.product.service.CPDefinitionService;
-import com.liferay.commerce.product.service.CPOptionService;
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramSetting;
 import com.liferay.commerce.shop.by.diagram.service.CSDiagramSettingService;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Diagram;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Product;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.DiagramDTOConverter;
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.DiagramUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.DiagramResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.kernel.change.tracking.CTAware;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
@@ -43,11 +39,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/diagram.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {DiagramResource.class, NestedFieldSupport.class}
 )
-@CTAware
 public class DiagramResourceImpl
 	extends BaseDiagramResourceImpl implements NestedFieldSupport {
 
@@ -103,9 +99,8 @@ public class DiagramResourceImpl
 
 		DiagramUtil.updateCSDiagramSetting(
 			contextCompany.getCompanyId(), _cpAttachmentFileEntryService,
-			_cpDefinitionOptionRelService, _cpDefinitionOptionValueRelService,
-			_cpOptionService, csDiagramSetting, _csDiagramSettingService,
-			diagram, cpDefinition.getGroupId(),
+			csDiagramSetting, _csDiagramSettingService, diagram,
+			cpDefinition.getGroupId(),
 			contextAcceptLanguage.getPreferredLocale(), _serviceContextHelper,
 			_uniqueFileNameProvider);
 
@@ -130,9 +125,8 @@ public class DiagramResourceImpl
 
 		CSDiagramSetting csDiagramSetting = DiagramUtil.addCSDiagramSetting(
 			contextCompany.getCompanyId(), _cpAttachmentFileEntryService,
-			cpDefinition.getCPDefinitionId(), _cpDefinitionOptionRelService,
-			_cpDefinitionOptionValueRelService, _cpOptionService,
-			_csDiagramSettingService, diagram, cpDefinition.getGroupId(),
+			cpDefinition.getCPDefinitionId(), _csDiagramSettingService, diagram,
+			cpDefinition.getGroupId(),
 			contextAcceptLanguage.getPreferredLocale(), _serviceContextHelper,
 			_uniqueFileNameProvider);
 
@@ -153,9 +147,8 @@ public class DiagramResourceImpl
 
 		CSDiagramSetting csDiagramSetting = DiagramUtil.addCSDiagramSetting(
 			contextCompany.getCompanyId(), _cpAttachmentFileEntryService,
-			cpDefinition.getCPDefinitionId(), _cpDefinitionOptionRelService,
-			_cpDefinitionOptionValueRelService, _cpOptionService,
-			_csDiagramSettingService, diagram, cpDefinition.getGroupId(),
+			cpDefinition.getCPDefinitionId(), _csDiagramSettingService, diagram,
+			cpDefinition.getGroupId(),
 			contextAcceptLanguage.getPreferredLocale(), _serviceContextHelper,
 			_uniqueFileNameProvider);
 
@@ -173,25 +166,13 @@ public class DiagramResourceImpl
 	private CPAttachmentFileEntryService _cpAttachmentFileEntryService;
 
 	@Reference
-	private CPDefinitionOptionRelService _cpDefinitionOptionRelService;
-
-	@Reference
-	private CPDefinitionOptionValueRelService
-		_cpDefinitionOptionValueRelService;
-
-	@Reference
 	private CPDefinitionService _cpDefinitionService;
-
-	@Reference
-	private CPOptionService _cpOptionService;
 
 	@Reference
 	private CSDiagramSettingService _csDiagramSettingService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter.DiagramDTOConverter)"
-	)
-	private DTOConverter<CSDiagramSetting, Diagram> _diagramDTOConverter;
+	@Reference
+	private DiagramDTOConverter _diagramDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

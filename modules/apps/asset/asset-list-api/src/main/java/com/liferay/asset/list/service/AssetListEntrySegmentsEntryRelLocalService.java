@@ -250,11 +250,6 @@ public interface AssetListEntrySegmentsEntryRelLocalService
 			String uuid, long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AssetListEntrySegmentsEntryRel>
-		fetchAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	/**
@@ -307,13 +302,6 @@ public interface AssetListEntrySegmentsEntryRelLocalService
 	public List<AssetListEntrySegmentsEntryRel>
 		getAssetListEntrySegmentsEntryRels(
 			long assetListEntryId, int start, int end);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<AssetListEntrySegmentsEntryRel>
-		getAssetListEntrySegmentsEntryRels(
-			long assetListEntryId, long[] segmentsEntryIds, int start, int end,
-			OrderByComparator<AssetListEntrySegmentsEntryRel>
-				orderByComparator);
 
 	/**
 	 * Returns all the asset list entry segments entry rels matching the UUID and company.
@@ -394,8 +382,6 @@ public interface AssetListEntrySegmentsEntryRelLocalService
 	public AssetListEntrySegmentsEntryRel
 		updateAssetListEntrySegmentsEntryRelTypeSettings(
 			long assetListEntryId, long segmentsEntryId, String typeSettings);
-
-	public void updateVariationsPriority(long[] variationsPriority);
 
 	@Override
 	@Transactional(enabled = false)

@@ -189,7 +189,7 @@ public class SearchRequestBuilderHighlightTest {
 	@Inject
 	private HighlightBuilderFactory _highlightBuilderFactory;
 
-	@Inject
+	@Inject(filter = "search.engine.id=SYSTEM_ENGINE")
 	private SearchEngine _searchEngine;
 
 	@Inject

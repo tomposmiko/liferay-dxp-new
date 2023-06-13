@@ -132,7 +132,7 @@ public class DDMTemplateServiceUtil {
 	 * extracted from the original one. This method supports defining a new name
 	 * and description.
 	 *
-	 * @param sourceTemplateId the primary key of the template to be copied
+	 * @param templateId the primary key of the template to be copied
 	 * @param nameMap the new template's locales and localized names
 	 * @param descriptionMap the new template's locales and localized
 	 descriptions
@@ -143,21 +143,21 @@ public class DDMTemplateServiceUtil {
 	 * @return the new template
 	 */
 	public static DDMTemplate copyTemplate(
-			long sourceTemplateId, Map<java.util.Locale, String> nameMap,
+			long templateId, Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyTemplate(
-			sourceTemplateId, nameMap, descriptionMap, serviceContext);
+			templateId, nameMap, descriptionMap, serviceContext);
 	}
 
 	public static DDMTemplate copyTemplate(
-			long sourceTemplateId,
+			long templateId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
-		return getService().copyTemplate(sourceTemplateId, serviceContext);
+		return getService().copyTemplate(templateId, serviceContext);
 	}
 
 	/**
@@ -167,10 +167,10 @@ public class DDMTemplateServiceUtil {
 	 *
 	 * @param classNameId the primary key of the class name for template's
 	 related model
-	 * @param sourceClassPK the primary key of the old template's related entity
+	 * @param oldClassPK the primary key of the old template's related entity
 	 * @param resourceClassNameId the primary key of the class name for
 	 template's resource model
-	 * @param targetClassPK the primary key of the new template's related entity
+	 * @param newClassPK the primary key of the new template's related entity
 	 * @param type the template's type. For more information, see
 	 DDMTemplateConstants in the dynamic-data-mapping-api module.
 	 * @param serviceContext the service context to be applied. Must have the
@@ -180,14 +180,14 @@ public class DDMTemplateServiceUtil {
 	 * @return the new template
 	 */
 	public static List<DDMTemplate> copyTemplates(
-			long classNameId, long sourceClassPK, long resourceClassNameId,
-			long targetClassPK, String type,
+			long classNameId, long oldClassPK, long resourceClassNameId,
+			long newClassPK, String type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyTemplates(
-			classNameId, sourceClassPK, resourceClassNameId, targetClassPK,
-			type, serviceContext);
+			classNameId, oldClassPK, resourceClassNameId, newClassPK, type,
+			serviceContext);
 	}
 
 	/**

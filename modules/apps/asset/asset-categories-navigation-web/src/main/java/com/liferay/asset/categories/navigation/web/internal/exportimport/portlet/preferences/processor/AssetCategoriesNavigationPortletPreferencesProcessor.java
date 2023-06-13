@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + AssetCategoriesNavigationPortletKeys.ASSET_CATEGORIES_NAVIGATION,
 	service = ExportImportPortletPreferencesProcessor.class
 )
@@ -70,7 +71,7 @@ public class AssetCategoriesNavigationPortletPreferencesProcessor
 		throws PortletDataException {
 
 		try {
-			return _updateExportPortletPreferences(
+			return updateExportPortletPreferences(
 				portletDataContext, portletPreferences,
 				portletDataContext.getPortletId());
 		}
@@ -89,7 +90,7 @@ public class AssetCategoriesNavigationPortletPreferencesProcessor
 		throws PortletDataException {
 
 		try {
-			return _updateImportPortletPreferences(
+			return updateImportPortletPreferences(
 				portletDataContext, portletPreferences);
 		}
 		catch (Exception exception) {
@@ -176,7 +177,7 @@ public class AssetCategoriesNavigationPortletPreferencesProcessor
 		return null;
 	}
 
-	private PortletPreferences _updateExportPortletPreferences(
+	protected PortletPreferences updateExportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences, String portletId)
 		throws Exception {
@@ -199,7 +200,7 @@ public class AssetCategoriesNavigationPortletPreferencesProcessor
 		return portletPreferences;
 	}
 
-	private PortletPreferences _updateImportPortletPreferences(
+	protected PortletPreferences updateImportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws Exception {

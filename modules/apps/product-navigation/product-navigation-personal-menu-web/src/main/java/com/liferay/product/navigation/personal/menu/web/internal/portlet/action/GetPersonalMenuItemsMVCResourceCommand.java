@@ -14,16 +14,13 @@
 
 package com.liferay.product.navigation.personal.menu.web.internal.portlet.action;
 
-import com.liferay.osgi.service.tracker.collections.map.PropertyServiceReferenceComparator;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -33,7 +30,7 @@ import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Html;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -41,12 +38,11 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.product.navigation.personal.menu.PersonalMenuEntry;
 import com.liferay.product.navigation.personal.menu.constants.PersonalMenuPortletKeys;
 import com.liferay.product.navigation.personal.menu.util.PersonalApplicationURLUtil;
+import com.liferay.product.navigation.personal.menu.web.internal.PersonalMenuEntryRegistry;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.TreeSet;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
@@ -54,8 +50,6 @@ import javax.portlet.ResourceResponse;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -63,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + PersonalMenuPortletKeys.PERSONAL_MENU,
 		"mvc.command.name=/product_navigation_personal_menu/get_personal_menu_items"
@@ -71,20 +66,6 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class GetPersonalMenuItemsMVCResourceCommand
 	extends BaseMVCResourceCommand {
-
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
-			bundleContext, PersonalMenuEntry.class,
-			"(product.navigation.personal.menu.group=*)",
-			(serviceReference, emitter) -> emitter.emit(
-				String.valueOf(
-					serviceReference.getProperty(
-						"product.navigation.personal.menu.group"))),
-			Collections.reverseOrder(
-				new PropertyServiceReferenceComparator<>(
-					"product.navigation.personal.menu.entry.order")));
-	}
 
 	@Override
 	protected void doServeResource(
@@ -103,7 +84,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 				httpServletResponse, jsonArray.toString());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
@@ -114,31 +95,29 @@ public class GetPersonalMenuItemsMVCResourceCommand
 		User realUser = themeDisplay.getRealUser();
 		User user = themeDisplay.getUser();
 
-		String realUserURL = HttpComponentsUtil.removeParameter(
+		String realUserURL = _http.removeParameter(
 			ParamUtil.getString(portletRequest, "currentURL"), "doAsUserId");
 
-		String userProfileURL = HttpComponentsUtil.getPath(
+		String userProfileURL = _http.getPath(
 			user.getDisplayURL(themeDisplay, false));
 
 		if (realUserURL.startsWith(userProfileURL)) {
 			realUserURL = StringUtil.replace(
 				realUserURL, userProfileURL,
-				HttpComponentsUtil.getPath(
-					realUser.getDisplayURL(themeDisplay, false)));
+				_http.getPath(realUser.getDisplayURL(themeDisplay, false)));
 
 			PersonalApplicationURLUtil.
 				getOrAddEmbeddedPersonalApplicationLayout(
 					realUser, realUser.getGroup(), false);
 		}
 
-		String userDashboardURL = HttpComponentsUtil.getPath(
+		String userDashboardURL = _http.getPath(
 			user.getDisplayURL(themeDisplay, true));
 
 		if (realUserURL.startsWith(userDashboardURL)) {
 			realUserURL = StringUtil.replace(
 				realUserURL, userDashboardURL,
-				HttpComponentsUtil.getPath(
-					realUser.getDisplayURL(themeDisplay, true)));
+				_http.getPath(realUser.getDisplayURL(themeDisplay, true)));
 
 			PersonalApplicationURLUtil.
 				getOrAddEmbeddedPersonalApplicationLayout(
@@ -150,7 +129,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 				"href", realUserURL
 			).put(
 				"label",
-				_language.get(themeDisplay.getLocale(), "be-yourself-again")
+				LanguageUtil.get(themeDisplay.getLocale(), "be-yourself-again")
 			).put(
 				"symbolRight", "change"
 			));
@@ -169,7 +148,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 				Objects.equals(
 					locale.getCountry(), realUserLocale.getCountry())) {
 
-				changeLanguageLabel = _language.format(
+				changeLanguageLabel = LanguageUtil.format(
 					realUserLocale, "use-x's-preferred-language-(x)",
 					new String[] {
 						_html.escape(user.getFullName()),
@@ -181,7 +160,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 					userLocale.getLanguage() + "_" + userLocale.getCountry();
 			}
 			else {
-				changeLanguageLabel = _language.format(
+				changeLanguageLabel = LanguageUtil.format(
 					realUserLocale, "use-your-preferred-language-(x)",
 					realUserLocale.getDisplayLanguage(realUserLocale), false);
 
@@ -193,7 +172,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 			jsonArray.put(
 				JSONUtil.put(
 					"href",
-					HttpComponentsUtil.setParameter(
+					_http.setParameter(
 						ParamUtil.getString(portletRequest, "currentURL"),
 						"doAsUserLanguageId", doAsUserLanguageId)
 				).put(
@@ -211,7 +190,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 			List<PersonalMenuEntry> personalMenuEntries)
 		throws PortalException {
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -230,21 +209,13 @@ public class GetPersonalMenuItemsMVCResourceCommand
 					ParamUtil.getString(portletRequest, "portletId")));
 
 			try {
-				String href = personalMenuEntry.getPortletURL(
-					_portal.getHttpServletRequest(portletRequest));
-
-				if (href != null) {
-					jsonObject.put("href", href);
-				}
-				else {
-					jsonObject.put(
-						"jsOnClickConfig",
-						personalMenuEntry.getJSOnClickConfigJSONObject(
-							_portal.getHttpServletRequest(portletRequest)));
-				}
+				jsonObject.put(
+					"href",
+					personalMenuEntry.getPortletURL(
+						_portal.getHttpServletRequest(portletRequest)));
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 
 			jsonObject.put(
@@ -263,7 +234,10 @@ public class GetPersonalMenuItemsMVCResourceCommand
 			PortletRequest portletRequest)
 		throws PortalException {
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		List<List<PersonalMenuEntry>> groupedPersonalMenuEntries =
+			_personalMenuEntryRegistry.getGroupedPersonalMenuEntries();
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -281,7 +255,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 
 						return StringUtil.appendParentheticalSuffix(
 							user.getFullName(),
-							_language.get(
+							LanguageUtil.get(
 								themeDisplay.getLocale(), "impersonated"));
 					}
 				).put(
@@ -291,13 +265,12 @@ public class GetPersonalMenuItemsMVCResourceCommand
 
 		JSONObject dividerJSONObject = JSONUtil.put("type", "divider");
 
-		for (String personalMenuGroup :
-				new TreeSet<>(_serviceTrackerMap.keySet())) {
+		for (List<PersonalMenuEntry> groupedPersonalMenuEntry :
+				groupedPersonalMenuEntries) {
 
 			JSONArray personalMenuEntriesJSONArray =
 				_getPersonalMenuEntriesJSONArray(
-					portletRequest,
-					_serviceTrackerMap.getService(personalMenuGroup));
+					portletRequest, groupedPersonalMenuEntry);
 
 			if (personalMenuEntriesJSONArray.length() == 0) {
 				continue;
@@ -333,15 +306,12 @@ public class GetPersonalMenuItemsMVCResourceCommand
 	private Html _html;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private Http _http;
 
 	@Reference
-	private Language _language;
+	private PersonalMenuEntryRegistry _personalMenuEntryRegistry;
 
 	@Reference
 	private Portal _portal;
-
-	private ServiceTrackerMap<String, List<PersonalMenuEntry>>
-		_serviceTrackerMap;
 
 }

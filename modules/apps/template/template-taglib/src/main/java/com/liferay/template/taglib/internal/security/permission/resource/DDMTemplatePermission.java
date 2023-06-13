@@ -15,14 +15,17 @@
 package com.liferay.template.taglib.internal.security.permission.resource;
 
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Eudaldo Alonso
  */
+@Component(immediate = true, service = {})
 public class DDMTemplatePermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class DDMTemplatePermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DDMTemplate> modelResourcePermission =
-			_ddmTemplateModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ddmTemplateModelResourcePermission.contains(
 			permissionChecker, ddmTemplate, actionId);
 	}
 
@@ -42,18 +42,21 @@ public class DDMTemplatePermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DDMTemplate> modelResourcePermission =
-			_ddmTemplateModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ddmTemplateModelResourcePermission.contains(
 			permissionChecker, templateId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<DDMTemplate>>
-		_ddmTemplateModelResourcePermissionSnapshot = new Snapshot<>(
-			DDMTemplatePermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.dynamic.data.mapping.model." +
-				"DDMTemplate)");
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMTemplate)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<DDMTemplate> modelResourcePermission) {
+
+		_ddmTemplateModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<DDMTemplate>
+		_ddmTemplateModelResourcePermission;
 
 }

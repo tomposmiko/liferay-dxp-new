@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class PermissionServiceWrapper
 	implements PermissionService, ServiceWrapper<PermissionService> {
 
-	public PermissionServiceWrapper() {
-		this(null);
-	}
-
 	public PermissionServiceWrapper(PermissionService permissionService) {
 		_permissionService = permissionService;
 	}

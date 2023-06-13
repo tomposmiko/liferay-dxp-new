@@ -14,6 +14,7 @@
 
 package com.liferay.portal.properties.swapper.internal;
 
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
@@ -21,11 +22,12 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
-import com.liferay.portal.kernel.util.Portal;
 
 import java.io.InputStream;
 
 import java.net.URL;
+
+import java.util.List;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -36,13 +38,36 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shuyang Zhou
  */
-@Component(enabled = false, service = {})
+@Component(enabled = false, immediate = true, service = {})
 public class DefaultGuestGroupLogoSwapper {
+
+	@Reference(unbind = "-")
+	public void setCompanyLocalService(
+		CompanyLocalService companyLocalService) {
+
+		_companyLocalService = companyLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setLayoutSetLocalService(
+		LayoutSetLocalService layoutSetLocalService) {
+
+		_layoutSetLocalService = layoutSetLocalService;
+	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) throws Exception {
+		List<Company> companies = _companyLocalService.getCompanies(0, 1);
+
+		Company company = companies.get(0);
+
 		Group group = _groupLocalService.getGroup(
-			_portal.getDefaultCompanyId(), GroupConstants.GUEST);
+			company.getCompanyId(), GroupConstants.GUEST);
 
 		LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
 			group.getGroupId(), false);
@@ -63,19 +88,11 @@ public class DefaultGuestGroupLogoSwapper {
 		}
 	}
 
-	@Reference
 	private CompanyLocalService _companyLocalService;
-
-	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
 	private LayoutSetLocalService _layoutSetLocalService;
 
 	@Reference(target = ModuleServiceLifecycle.PORTLETS_INITIALIZED)
 	private ModuleServiceLifecycle _moduleServiceLifecycle;
-
-	@Reference
-	private Portal _portal;
 
 }

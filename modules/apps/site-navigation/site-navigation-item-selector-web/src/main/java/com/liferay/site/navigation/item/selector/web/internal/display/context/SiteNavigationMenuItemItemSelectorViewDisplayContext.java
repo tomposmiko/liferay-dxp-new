@@ -19,11 +19,11 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.navigation.constants.SiteNavigationConstants;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
@@ -34,6 +34,7 @@ import com.liferay.site.navigation.type.SiteNavigationMenuItemType;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -136,19 +137,7 @@ public class SiteNavigationMenuItemItemSelectorViewDisplayContext {
 		if (siteNavigationMenuType ==
 				SiteNavigationConstants.TYPE_PUBLIC_PAGES_HIERARCHY) {
 
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)_httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			Group group = themeDisplay.getScopeGroup();
-
-			if (group.isPrivateLayoutsEnabled()) {
-				name = "public-pages-hierarchy";
-			}
-			else {
-				name = "pages-hierarchy";
-			}
-
+			name = "public-pages-hierarchy";
 			privateLayout = false;
 		}
 
@@ -166,8 +155,15 @@ public class SiteNavigationMenuItemItemSelectorViewDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			themeDisplay.getLocale(),
+			SiteNavigationMenuItemItemSelectorViewDisplayContext.class);
+
 		jsonObject.put(
-			"name", LanguageUtil.get(themeDisplay.getLocale(), name));
+			"name",
+			LanguageUtil.get(
+				themeDisplay.getLocale(),
+				ResourceBundleUtil.getString(resourceBundle, name)));
 
 		jsonArray.put(jsonObject);
 

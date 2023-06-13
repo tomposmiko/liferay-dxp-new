@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  * @author Chema Balsas
  */
-@Component(enabled = false, service = {})
+@Component(enabled = false, immediate = true, service = {})
 public class JSBundleConfigPortalWebResources {
 
 	@Activate
@@ -57,10 +57,10 @@ public class JSBundleConfigPortalWebResources {
 	}
 
 	@Reference
-	private JSBundleConfigRegistry _jsBundleConfigRegistry;
+	private JSBundleConfigServlet _jsBundleConfigServlet;
 
 	@Reference
-	private JSBundleConfigServlet _jsBundleConfigServlet;
+	private JSBundleConfigTracker _jsBundleConfigTracker;
 
 	private ServiceRegistration<?> _serviceRegistration;
 
@@ -73,7 +73,7 @@ public class JSBundleConfigPortalWebResources {
 
 		@Override
 		public long getLastModified() {
-			return _jsBundleConfigRegistry.getLastModified();
+			return _jsBundleConfigTracker.getLastModified();
 		}
 
 		@Override

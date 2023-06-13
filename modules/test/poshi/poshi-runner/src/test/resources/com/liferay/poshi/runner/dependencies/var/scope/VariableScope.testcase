@@ -1,53 +1,72 @@
-definition {
+<definition>
+	<var name="testCaseStaticVar" static="true" value="A static var set in the definition." />
 
-	static var testCaseStaticVar = "A static var set in the definition.";
+	<set-up>
+		<if>
+			<not>
+				<equals arg1="${testCaseStaticVar}" arg2="A static var set in the definition." />
+			</not>
+			<then>
+				<fail message="Expected static var value does not match actual value" />
+			</then>
+		</if>
 
-	setUp {
-		if ("${testCaseStaticVar}" != "A static var set in the definition.") {
-			fail("Expected static var value does not match actual value");
-		}
+		<var name="testCaseStaticVar" value="A static var overridden in the set up." />
+	</set-up>
 
-		var testCaseStaticVar = "A static var overridden in the set up.";
-	}
+	<command name="ExecuteVarInheritance">
+		<execute macro="RootVar#assertExecuteVar">
+			<var name="executeVar" value="An execute var that will referenced by another execute var." />
+			<var name="referenceExecuteVar" value="${executeVar}" />
+		</execute>
 
-	test ExecuteVarInheritance {
-		RootVar.assertExecuteVar(
-			executeVar = "An execute var that will referenced by another execute var.",
-			referenceExecuteVar = "${executeVar}");
+		<var name="commandVar" value="A command var that will be overridden by an execute var." />
 
-		var commandVar = "A command var that will be overridden by an execute var.";
+		<execute macro="RootVar#assertExecuteVar">
+			<var name="commandVar" value="An execute var that will referenced by another execute var." />
+			<var name="referenceExecuteVar" value="${commandVar}" />
+		</execute>
+	</command>
 
-		RootVar.assertExecuteVar(
-			commandVar = "An execute var that will referenced by another execute var.",
-			referenceExecuteVar = "${commandVar}");
-	}
+	<command name="MacroStaticVarInheritance">
+		<execute macro="MacroVar#setStaticVar" />
 
-	test MacroStaticVarInheritance {
-		MacroVar.setStaticVar();
+		<execute macro="MacroVar#callStaticVar" />
+	</command>
 
-		MacroVar.callStaticVar();
-	}
+	<command name="RootVarInheritance">
+		<execute macro="RootVar#assertRootVar" />
 
-	test RootVarInheritance {
-		RootVar.assertRootVar();
+		<execute macro="RootVar#assertRootVarInNestedMacro" />
 
-		RootVar.assertRootVarInNestedMacro();
+		<execute macro="RootVar#overrideRootVar">
+			<var name="rootVar" value="An execute variable passed into a macro." />
+		</execute>
 
-		RootVar.overrideRootVar(rootVar = "An execute variable passed into a macro.");
+		<execute macro="RootVar#overrideRootVarInNestedMacro">
+			<var name="rootVar" value="An execute variable passed into a macro." />
+		</execute>
+	</command>
 
-		RootVar.overrideRootVarInNestedMacro(rootVar = "An execute variable passed into a macro.");
-	}
+	<command name="TestCaseStaticVarInheritance">
+		<if>
+			<not>
+				<equals arg1="${testCaseStaticVar}" arg2="A static var overridden in the set up." />
+			</not>
+			<then>
+				<fail message="Expected static var value does not match actual value" />
+			</then>
+		</if>
 
-	test TestCaseStaticVarInheritance {
-		if ("${testCaseStaticVar}" != "A static var overridden in the set up.") {
-			fail("Expected static var value does not match actual value");
-		}
+		<var name="testCaseStaticVar" value="A static var overridden in the command." />
 
-		var testCaseStaticVar = "A static var overridden in the command.";
-
-		if ("${testCaseStaticVar}" != "A static var overridden in the command.") {
-			fail("Expected static var value does not match actual value");
-		}
-	}
-
-}
+		<if>
+			<not>
+				<equals arg1="${testCaseStaticVar}" arg2="A static var overridden in the command." />
+			</not>
+			<then>
+				<fail message="Expected static var value does not match actual value" />
+			</then>
+		</if>
+	</command>
+</definition>

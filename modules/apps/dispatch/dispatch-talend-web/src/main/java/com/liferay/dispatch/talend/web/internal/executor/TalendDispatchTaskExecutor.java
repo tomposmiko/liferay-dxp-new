@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Igor Beslic
  */
 @Component(
+	immediate = true,
 	property = {
 		"dispatch.task.executor.name=" + TalendDispatchTaskExecutor.TALEND,
 		"dispatch.task.executor.type=" + TalendDispatchTaskExecutor.TALEND
@@ -66,7 +67,7 @@ public class TalendDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 			DispatchTaskExecutorOutput dispatchTaskExecutorOutput)
 		throws PortalException {
 
-		TalendArchive talendArchive = _fetchTalendArchive(
+		TalendArchive talendArchive = fetchTalendArchive(
 			dispatchTrigger.getDispatchTriggerId());
 
 		if (talendArchive == null) {
@@ -112,7 +113,22 @@ public class TalendDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 
 	@Override
 	public String getName() {
-		return TALEND;
+		return null;
+	}
+
+	protected TalendArchive fetchTalendArchive(long dispatchTriggerId)
+		throws PortalException {
+
+		FileEntry fileEntry = _dispatchFileRepository.fetchFileEntry(
+			dispatchTriggerId);
+
+		if (fileEntry == null) {
+			throw new DispatchRepositoryException(
+				"Unable to get file entry for dispatch trigger ID " +
+					dispatchTriggerId);
+		}
+
+		return TalendArchiveParserUtil.parse(fileEntry.getContentStream());
 	}
 
 	private void _checkTalendProcessOutput(
@@ -128,21 +144,6 @@ public class TalendDispatchTaskExecutor extends BaseDispatchTaskExecutor {
 				"Subprocess terminated with exit code " +
 					talendProcessOutput.getExitCode());
 		}
-	}
-
-	private TalendArchive _fetchTalendArchive(long dispatchTriggerId)
-		throws PortalException {
-
-		FileEntry fileEntry = _dispatchFileRepository.fetchFileEntry(
-			dispatchTriggerId);
-
-		if (fileEntry == null) {
-			throw new DispatchRepositoryException(
-				"Unable to get file entry for dispatch trigger ID " +
-					dispatchTriggerId);
-		}
-
-		return TalendArchiveParserUtil.parse(fileEntry.getContentStream());
 	}
 
 	private TalendProcess _getTalendProcess(

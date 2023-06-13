@@ -42,8 +42,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -268,21 +266,48 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 		return dlFileEntryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
+	/**
+	 * Returns the document library file entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the document library file entry's external reference code
+	 * @return the matching document library file entry, or <code>null</code> if a matching document library file entry could not be found
+	 */
 	@Override
 	public DLFileEntry fetchDLFileEntryByExternalReferenceCode(
-		String externalReferenceCode, long groupId) {
+		long groupId, String externalReferenceCode) {
 
-		return dlFileEntryPersistence.fetchByERC_G(
-			externalReferenceCode, groupId);
+		return dlFileEntryPersistence.fetchByG_ERC(
+			groupId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchDLFileEntryByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public DLFileEntry fetchDLFileEntryByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return fetchDLFileEntryByExternalReferenceCode(
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the document library file entry with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the document library file entry's external reference code
+	 * @return the matching document library file entry
+	 * @throws PortalException if a matching document library file entry could not be found
+	 */
 	@Override
 	public DLFileEntry getDLFileEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
-		return dlFileEntryPersistence.findByERC_G(
-			externalReferenceCode, groupId);
+		return dlFileEntryPersistence.findByG_ERC(
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -449,11 +474,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement DLFileEntryLocalServiceImpl#deleteDLFileEntry(DLFileEntry) to avoid orphaned data");
-		}
 
 		return dlFileEntryLocalService.deleteDLFileEntry(
 			(DLFileEntry)persistedModel);
@@ -747,9 +767,6 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLFileEntryLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

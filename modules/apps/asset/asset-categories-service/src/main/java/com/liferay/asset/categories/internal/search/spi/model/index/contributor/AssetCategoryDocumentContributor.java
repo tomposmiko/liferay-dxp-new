@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = DocumentContributor.class)
+@Component(immediate = true, service = DocumentContributor.class)
 public class AssetCategoryDocumentContributor
 	implements DocumentContributor<AssetCategory> {
 
@@ -58,20 +57,35 @@ public class AssetCategoryDocumentContributor
 			document, Field.ASSET_INTERNAL_CATEGORY_IDS,
 			Field.ASSET_INTERNAL_CATEGORY_TITLES,
 			AssetVocabularyConstants.VISIBILITY_TYPE_INTERNAL);
-		_addAssetVocabularyCategoriesFields(
-			document, "assetVocabularyCategoryIds",
-			AssetVocabularyConstants.VISIBILITY_TYPE_PUBLIC);
 	}
 
 	private void _addAssetCategoriesFields(
 		Document document, String assetCategoryIdsFieldName,
 		String assetCategoryTitlesFieldName, int visibilityType) {
 
+		Map<Long, AssetVocabulary> assetVocabulariesMap = new HashMap<>();
 		List<AssetCategory> filteredAssetCategories = new ArrayList<>();
 
-		_populate(
-			document, filteredAssetCategories, visibilityType,
-			assetCategory -> assetCategory);
+		String className = document.get(Field.ENTRY_CLASS_NAME);
+		long classPK = GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK));
+
+		List<AssetCategory> assetCategories =
+			_assetCategoryLocalService.getCategories(className, classPK);
+
+		for (AssetCategory assetCategory : assetCategories) {
+			AssetVocabulary assetVocabulary =
+				assetVocabulariesMap.computeIfAbsent(
+					assetCategory.getVocabularyId(),
+					vocabularyId ->
+						_assetVocabularyLocalService.fetchAssetVocabulary(
+							vocabularyId));
+
+			if ((assetVocabulary != null) &&
+				(assetVocabulary.getVisibilityType() == visibilityType)) {
+
+				filteredAssetCategories.add(assetCategory);
+			}
+		}
 
 		long[] filteredAssetCategoryIds = ListUtil.toLongArray(
 			filteredAssetCategories, AssetCategory.CATEGORY_ID_ACCESSOR);
@@ -120,51 +134,6 @@ public class AssetCategoryDocumentContributor
 				StringBundler.concat(
 					field, StringPool.UNDERLINE, locale.toString()),
 				titlesArray);
-		}
-	}
-
-	private void _addAssetVocabularyCategoriesFields(
-		Document document, String assetVocabularyCategoryIdsFieldName,
-		int visibilityType) {
-
-		List<String> filteredAssetVocabularyCategoryStrings = new ArrayList<>();
-
-		_populate(
-			document, filteredAssetVocabularyCategoryStrings, visibilityType,
-			assetCategory ->
-				assetCategory.getVocabularyId() + StringPool.DASH +
-					assetCategory.getCategoryId());
-
-		document.addKeyword(
-			assetVocabularyCategoryIdsFieldName,
-			filteredAssetVocabularyCategoryStrings.toArray(new String[0]));
-	}
-
-	private <T> void _populate(
-		Document document, List<T> list, int visibilityType,
-		Function<AssetCategory, T> function) {
-
-		Map<Long, AssetVocabulary> assetVocabulariesMap = new HashMap<>();
-
-		String className = document.get(Field.ENTRY_CLASS_NAME);
-		long classPK = GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK));
-
-		List<AssetCategory> assetCategories =
-			_assetCategoryLocalService.getCategories(className, classPK);
-
-		for (AssetCategory assetCategory : assetCategories) {
-			AssetVocabulary assetVocabulary =
-				assetVocabulariesMap.computeIfAbsent(
-					assetCategory.getVocabularyId(),
-					vocabularyId ->
-						_assetVocabularyLocalService.fetchAssetVocabulary(
-							vocabularyId));
-
-			if ((assetVocabulary != null) &&
-				(assetVocabulary.getVisibilityType() == visibilityType)) {
-
-				list.add((T)function.apply(assetCategory));
-			}
 		}
 	}
 

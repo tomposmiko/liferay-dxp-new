@@ -21,6 +21,4 @@ const APIs = {
 	v1,
 };
 
-export default function main(version) {
-	return composeAPI(version, APIs, BASE_ENDPOINT);
-}
+export default (version) => composeAPI(version, APIs, BASE_ENDPOINT);

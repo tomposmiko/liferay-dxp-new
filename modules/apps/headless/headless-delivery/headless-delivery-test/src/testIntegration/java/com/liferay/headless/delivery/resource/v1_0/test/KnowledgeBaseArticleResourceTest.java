@@ -46,40 +46,12 @@ public class KnowledgeBaseArticleResourceTest
 		serviceContext.setScopeGroupId(testGroup.getGroupId());
 
 		_kbFolder = KBFolderLocalServiceUtil.addKBFolder(
-			null, UserLocalServiceUtil.getGuestUserId(testGroup.getCompanyId()),
+			null,
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
 			testGroup.getGroupId(),
 			PortalUtil.getClassNameId(KBFolder.class.getName()), 0,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
-	}
-
-	@Override
-	@Test
-	public void testDeleteKnowledgeBaseArticleMyRating() throws Exception {
-		super.testDeleteKnowledgeBaseArticleMyRating();
-
-		KnowledgeBaseArticle knowledgeBaseArticle =
-			testDeleteKnowledgeBaseArticleMyRating_addKnowledgeBaseArticle();
-
-		assertHttpResponseStatusCode(
-			204,
-			knowledgeBaseArticleResource.
-				deleteKnowledgeBaseArticleMyRatingHttpResponse(
-					knowledgeBaseArticle.getId()));
-		assertHttpResponseStatusCode(
-			404,
-			knowledgeBaseArticleResource.
-				deleteKnowledgeBaseArticleMyRatingHttpResponse(
-					knowledgeBaseArticle.getId()));
-
-		KnowledgeBaseArticle irrelevantKnowledgeBaseArticle =
-			randomIrrelevantKnowledgeBaseArticle();
-
-		assertHttpResponseStatusCode(
-			404,
-			knowledgeBaseArticleResource.
-				deleteKnowledgeBaseArticleMyRatingHttpResponse(
-					irrelevantKnowledgeBaseArticle.getId()));
 	}
 
 	@Override
@@ -127,21 +99,6 @@ public class KnowledgeBaseArticleResourceTest
 	}
 
 	@Override
-	protected KnowledgeBaseArticle
-			testDeleteKnowledgeBaseArticleMyRating_addKnowledgeBaseArticle()
-		throws Exception {
-
-		KnowledgeBaseArticle knowledgeBaseArticle =
-			super.
-				testDeleteKnowledgeBaseArticleMyRating_addKnowledgeBaseArticle();
-
-		knowledgeBaseArticleResource.putKnowledgeBaseArticleMyRating(
-			knowledgeBaseArticle.getId(), randomRating());
-
-		return knowledgeBaseArticle;
-	}
-
-	@Override
 	protected Long
 			testGetKnowledgeBaseArticleKnowledgeBaseArticlesPage_getParentKnowledgeBaseArticleId()
 		throws Exception {
@@ -151,11 +108,12 @@ public class KnowledgeBaseArticleResourceTest
 		serviceContext.setScopeGroupId(testGroup.getGroupId());
 
 		KBArticle kbArticle = KBArticleLocalServiceUtil.addKBArticle(
-			null, UserLocalServiceUtil.getGuestUserId(testGroup.getCompanyId()),
+			null,
+			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
 			PortalUtil.getClassNameId(KBFolder.class.getName()), 0,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
-			null, null, null, null, serviceContext);
+			null, null, serviceContext);
 
 		return kbArticle.getResourcePrimKey();
 	}

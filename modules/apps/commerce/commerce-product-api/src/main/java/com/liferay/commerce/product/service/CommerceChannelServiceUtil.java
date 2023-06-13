@@ -53,21 +53,6 @@ public class CommerceChannelServiceUtil {
 			serviceContext);
 	}
 
-	public static CommerceChannel addOrUpdateCommerceChannel(
-			String externalReferenceCode, long siteGroupId, String name,
-			String type,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				typeSettingsUnicodeProperties,
-			String commerceCurrencyCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addOrUpdateCommerceChannel(
-			externalReferenceCode, siteGroupId, name, type,
-			typeSettingsUnicodeProperties, commerceCurrencyCode,
-			serviceContext);
-	}
-
 	public static CommerceChannel deleteCommerceChannel(long commerceChannelId)
 		throws PortalException {
 
@@ -98,6 +83,12 @@ public class CommerceChannelServiceUtil {
 		throws PortalException {
 
 		return getService().getCommerceChannelByOrderGroupId(groupId);
+	}
+
+	public static List<CommerceChannel> getCommerceChannels(int start, int end)
+		throws PortalException {
+
+		return getService().getCommerceChannels(start, end);
 	}
 
 	public static List<CommerceChannel> getCommerceChannels(long companyId)

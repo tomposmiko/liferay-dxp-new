@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.ArrayList;
@@ -37,13 +36,12 @@ import java.util.List;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Jorge Ferrer
  */
-@Component(service = InfoItemFormVariationsProvider.class)
+@Component(immediate = true, service = InfoItemFormVariationsProvider.class)
 public class JournalArticleInfoItemFormVariationsProvider
 	implements InfoItemFormVariationsProvider<JournalArticle> {
 
@@ -67,8 +65,6 @@ public class JournalArticleInfoItemFormVariationsProvider
 		return new InfoItemFormVariation(
 			groupId, String.valueOf(ddmStructure.getStructureId()),
 			InfoLocalizedValue.<String>builder(
-			).defaultLocale(
-				LocaleUtil.fromLanguageId(ddmStructure.getDefaultLanguageId())
 			).values(
 				ddmStructure.getNameMap()
 			).build());
@@ -105,9 +101,6 @@ public class JournalArticleInfoItemFormVariationsProvider
 					ddmStructure.getGroupId(),
 					String.valueOf(ddmStructure.getStructureId()),
 					InfoLocalizedValue.<String>builder(
-					).defaultLocale(
-						LocaleUtil.fromLanguageId(
-							ddmStructure.getDefaultLanguageId())
 					).values(
 						ddmStructure.getNameMap()
 					).build()));
@@ -138,7 +131,6 @@ public class JournalArticleInfoItemFormVariationsProvider
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
 	private volatile DepotEntryLocalService _depotEntryLocalService;

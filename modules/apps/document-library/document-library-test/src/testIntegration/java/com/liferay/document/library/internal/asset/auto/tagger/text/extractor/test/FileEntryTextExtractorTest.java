@@ -16,7 +16,7 @@ package com.liferay.document.library.internal.asset.auto.tagger.text.extractor.t
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.auto.tagger.text.extractor.TextExtractor;
-import com.liferay.asset.auto.tagger.text.extractor.TextExtractorRegistry;
+import com.liferay.asset.auto.tagger.text.extractor.TextExtractorTracker;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
@@ -61,11 +61,11 @@ public class FileEntryTextExtractorTest {
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN,
 			RandomTestUtil.randomString(), StringPool.BLANK, StringPool.BLANK,
-			StringPool.BLANK, new ByteArrayInputStream(bytes), bytes.length,
-			null, null, ServiceContextTestUtil.getServiceContext());
+			new ByteArrayInputStream(bytes), bytes.length, null, null,
+			ServiceContextTestUtil.getServiceContext());
 
 		TextExtractor<FileEntry> textExtractor =
-			(TextExtractor<FileEntry>)_textExtractorRegistry.getTextExtractor(
+			(TextExtractor<FileEntry>)_textExtractorTracker.getTextExtractor(
 				DLFileEntryConstants.getClassName());
 
 		Assert.assertEquals(
@@ -74,6 +74,6 @@ public class FileEntryTextExtractorTest {
 	}
 
 	@Inject
-	private TextExtractorRegistry _textExtractorRegistry;
+	private TextExtractorTracker _textExtractorTracker;
 
 }

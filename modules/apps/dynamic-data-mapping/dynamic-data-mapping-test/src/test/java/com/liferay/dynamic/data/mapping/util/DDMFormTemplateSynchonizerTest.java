@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PropsValues;
 
 import java.util.Iterator;
 import java.util.List;
@@ -41,19 +41,26 @@ import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Marcellus Tavares
  */
+@PrepareForTest({LocaleUtil.class, PropsValues.class})
+@RunWith(PowerMockRunner.class)
+@SuppressStaticInitializationFor(
+	{
+		"com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil",
+		"com.liferay.portal.kernel.xml.SAXReaderUtil",
+		"com.liferay.portal.util.PropsValues"
+	}
+)
 public class DDMFormTemplateSynchonizerTest extends BaseDDMTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
@@ -65,6 +72,8 @@ public class DDMFormTemplateSynchonizerTest extends BaseDDMTestCase {
 		setUpDDMFormJSONDeserializer();
 		setUpJSONFactoryUtil();
 		setUpLanguageUtil();
+		setUpLocaleUtil();
+		setUpPropsValues();
 		setUpSAXReaderUtil();
 	}
 
@@ -226,8 +235,10 @@ public class DDMFormTemplateSynchonizerTest extends BaseDDMTestCase {
 
 		label.addString(LocaleUtil.US, StringUtil.randomString());
 
-		ddmFormField.setDDMFormFieldOptions(
-			createDDMFormFieldOptions(availableOptions));
+		DDMFormFieldOptions ddmFormFieldOptions = createDDMFormFieldOptions(
+			availableOptions);
+
+		ddmFormField.setDDMFormFieldOptions(ddmFormFieldOptions);
 
 		return ddmFormField;
 	}
@@ -244,8 +255,10 @@ public class DDMFormTemplateSynchonizerTest extends BaseDDMTestCase {
 
 		label.addString(LocaleUtil.US, StringUtil.randomString());
 
-		ddmFormField.setDDMFormFieldOptions(
-			createDDMFormFieldOptions(availableOptions));
+		DDMFormFieldOptions ddmFormFieldOptions = createDDMFormFieldOptions(
+			availableOptions);
+
+		ddmFormField.setDDMFormFieldOptions(ddmFormFieldOptions);
 
 		return ddmFormField;
 	}

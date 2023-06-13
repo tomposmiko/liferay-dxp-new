@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.bookmarks.model.BookmarksEntry",
 	service = {
 		BookmarksEntryStagedModelRepository.class, StagedModelRepository.class
@@ -159,9 +160,11 @@ public class BookmarksEntryStagedModelRepository
 			if (trashHandler.isRestorable(
 					existingBookmarksEntry.getEntryId())) {
 
+				long userId = portletDataContext.getUserId(
+					bookmarksEntry.getUserUuid());
+
 				trashHandler.restoreTrashEntry(
-					portletDataContext.getUserId(bookmarksEntry.getUserUuid()),
-					existingBookmarksEntry.getEntryId());
+					userId, existingBookmarksEntry.getEntryId());
 			}
 		}
 		catch (PortalException portalException) {

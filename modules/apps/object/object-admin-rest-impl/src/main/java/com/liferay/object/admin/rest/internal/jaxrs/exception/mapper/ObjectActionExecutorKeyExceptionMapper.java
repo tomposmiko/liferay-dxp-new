@@ -18,12 +18,13 @@ import com.liferay.object.exception.ObjectActionExecutorKeyException;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.osgi.service.component.annotations.Component;
 
 /**
- * @author Murilo Stodolni
+ * @author Javier Gamarra
  */
 @Component(
 	property = {
@@ -40,7 +41,9 @@ public class ObjectActionExecutorKeyExceptionMapper
 	protected Problem getProblem(
 		ObjectActionExecutorKeyException objectActionExecutorKeyException) {
 
-		return new Problem(objectActionExecutorKeyException);
+		return new Problem(
+			Response.Status.BAD_REQUEST,
+			objectActionExecutorKeyException.getMessage());
 	}
 
 }

@@ -128,7 +128,7 @@ class Surface extends Disposable {
 	 * @return {Element}
 	 */
 	createChild(screenId) {
-		const child = document.createElement('div');
+		var child = document.createElement('div');
 		child.setAttribute('id', this.makeId_(screenId));
 
 		return child;
@@ -192,43 +192,12 @@ class Surface extends Disposable {
 	 * inside the default child will be replaced by navigation.
 	 */
 	maybeWrapContentAsDefault_() {
-		const element = this.getElement();
+		var element = this.getElement();
 		if (element && !this.defaultChild) {
-			const childNodesToWrap = [];
-
-			element.childNodes.forEach((childNode) => {
-
-				/*
-				 * Some child nodes must be kept out of the Senna surface.
-				 *
-				 * We don't have any good mechanism to do it and we don't want
-				 * to put anything in place given all this is more or less
-				 * legacy.
-				 *
-				 * Thus, we simply skip some nodes that are known to us and
-				 * leave them as direct children of <body>, outside the default
-				 * Senna surface.
-				 *
-				 * See LPS-151462 for more information.
-				 */
-				if (childNode.classList) {
-					if (
-						childNode.classList.contains('yui3-dd-proxy') ||
-						childNode.classList.contains('yui3-dd-shim')
-					) {
-						return;
-					}
-				}
-
-				childNodesToWrap.push(childNode);
-			});
-
-			const fragment = document.createDocumentFragment();
-
-			childNodesToWrap.forEach((childNode) => {
-				fragment.appendChild(childNode);
-			});
-
+			var fragment = document.createDocumentFragment();
+			while (element.firstChild) {
+				fragment.appendChild(element.firstChild);
+			}
 			this.defaultChild = this.addContent(Surface.DEFAULT, fragment);
 			this.transition(null, this.defaultChild);
 		}
@@ -257,8 +226,8 @@ class Surface extends Disposable {
 	 * @return {Promise} Pauses the navigation until it is resolved.
 	 */
 	show(screenId) {
-		const from = this.activeChild;
-		let to = this.getChild(screenId);
+		var from = this.activeChild;
+		var to = this.getChild(screenId);
 		if (!to) {
 			to = this.defaultChild;
 		}
@@ -276,7 +245,7 @@ class Surface extends Disposable {
 	 * @param {!string} screenId The screen id to remove.
 	 */
 	remove(screenId) {
-		const child = this.getChild(screenId);
+		var child = this.getChild(screenId);
 		if (child) {
 			child.remove();
 		}
@@ -297,7 +266,7 @@ class Surface extends Disposable {
 	 *     navigation until it is resolved.
 	 */
 	transition(from, to) {
-		const transitionFn = this.transitionFn || Surface.defaultTransition;
+		var transitionFn = this.transitionFn || Surface.defaultTransition;
 
 		return Promise.resolve(transitionFn.call(this, from, to));
 	}

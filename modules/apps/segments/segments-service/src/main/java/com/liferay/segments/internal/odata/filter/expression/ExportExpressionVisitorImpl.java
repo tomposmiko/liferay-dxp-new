@@ -47,6 +47,7 @@ import com.liferay.segments.internal.odata.entity.EntityModelFieldMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Eduardo García
@@ -201,13 +202,16 @@ public class ExportExpressionVisitorImpl implements ExpressionVisitor<Object> {
 			return;
 		}
 
-		SegmentsFieldCustomizer segmentsFieldCustomizer =
-			_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizer(
+		Optional<SegmentsFieldCustomizer> segmentsFieldCustomizerOptional =
+			_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizerOptional(
 				_entityModel.getName(), entityField.getName());
 
-		if (segmentsFieldCustomizer == null) {
+		if (!segmentsFieldCustomizerOptional.isPresent()) {
 			return;
 		}
+
+		SegmentsFieldCustomizer segmentsFieldCustomizer =
+			segmentsFieldCustomizerOptional.get();
 
 		ClassedModel classedModel = segmentsFieldCustomizer.getClassedModel(
 			(String)value);

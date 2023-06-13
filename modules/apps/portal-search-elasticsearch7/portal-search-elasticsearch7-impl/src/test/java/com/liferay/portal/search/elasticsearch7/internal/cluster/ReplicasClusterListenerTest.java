@@ -30,7 +30,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author André de Oliveira
@@ -44,8 +46,10 @@ public class ReplicasClusterListenerTest {
 
 	@Before
 	public void setUp() {
-		_setEmbeddedCluster(true);
-		_setMasterExecutor(true);
+		MockitoAnnotations.initMocks(this);
+
+		setEmbeddedCluster(true);
+		setMasterExecutor(true);
 
 		Mockito.when(
 			_replicasClusterContext.getClusterSize()
@@ -72,7 +76,7 @@ public class ReplicasClusterListenerTest {
 	@Test
 	public void testAHappyDay() {
 		processClusterEvent();
-		_assertReplicasChanged();
+		assertReplicasChanged();
 	}
 
 	@Test
@@ -96,32 +100,32 @@ public class ReplicasClusterListenerTest {
 	public void testMasterTokenAcquired() {
 		masterTokenAcquired();
 
-		_assertReplicasChanged();
+		assertReplicasChanged();
 	}
 
 	@Test
 	public void testMasterTokenReleased() {
 		masterTokenReleased();
 
-		_assertReplicasUnchanged();
+		assertReplicasUnchanged();
 	}
 
 	@Test
 	public void testNonmasterLiferayNodeDoesNothing() {
-		_setMasterExecutor(false);
+		setMasterExecutor(false);
 
 		processClusterEvent();
 
-		_assertReplicasUnchanged();
+		assertReplicasUnchanged();
 	}
 
 	@Test
 	public void testRemoteElasticsearchClusterIsLeftAlone() {
-		_setEmbeddedCluster(false);
+		setEmbeddedCluster(false);
 
 		processClusterEvent();
 
-		_assertReplicasUnchanged();
+		assertReplicasUnchanged();
 	}
 
 	@Test
@@ -133,7 +137,7 @@ public class ReplicasClusterListenerTest {
 		).when(
 			_replicasManager
 		).updateNumberOfReplicas(
-			Mockito.anyInt(), Mockito.any()
+			Mockito.anyInt(), (String[])Mockito.anyVararg()
 		);
 
 		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
@@ -153,6 +157,22 @@ public class ReplicasClusterListenerTest {
 		}
 	}
 
+	protected void assertReplicasChanged() {
+		Mockito.verify(
+			_replicasManager
+		).updateNumberOfReplicas(
+			_REPLICAS, _INDICES
+		);
+	}
+
+	protected void assertReplicasUnchanged() {
+		Mockito.verify(
+			_replicasManager, Mockito.never()
+		).updateNumberOfReplicas(
+			Mockito.anyInt(), (String[])Mockito.anyVararg()
+		);
+	}
+
 	protected void masterTokenAcquired() {
 		_replicasClusterListener.masterTokenAcquired();
 	}
@@ -165,23 +185,7 @@ public class ReplicasClusterListenerTest {
 		_replicasClusterListener.processClusterEvent(ClusterEvent.join());
 	}
 
-	private void _assertReplicasChanged() {
-		Mockito.verify(
-			_replicasManager
-		).updateNumberOfReplicas(
-			_REPLICAS, _INDICES
-		);
-	}
-
-	private void _assertReplicasUnchanged() {
-		Mockito.verify(
-			_replicasManager, Mockito.never()
-		).updateNumberOfReplicas(
-			Mockito.anyInt(), Mockito.any()
-		);
-	}
-
-	private void _setEmbeddedCluster(boolean value) {
+	protected void setEmbeddedCluster(boolean value) {
 		Mockito.when(
 			_replicasClusterContext.isEmbeddedOperationMode()
 		).thenReturn(
@@ -189,7 +193,7 @@ public class ReplicasClusterListenerTest {
 		);
 	}
 
-	private void _setMasterExecutor(boolean value) {
+	protected void setMasterExecutor(boolean value) {
 		Mockito.when(
 			_replicasClusterContext.isMaster()
 		).thenReturn(
@@ -203,10 +207,12 @@ public class ReplicasClusterListenerTest {
 
 	private static final int _REPLICAS = RandomTestUtil.randomInt() - 1;
 
-	private final ReplicasClusterContext _replicasClusterContext = Mockito.mock(
-		ReplicasClusterContext.class);
+	@Mock
+	private ReplicasClusterContext _replicasClusterContext;
+
 	private ReplicasClusterListener _replicasClusterListener;
-	private final ReplicasManager _replicasManager = Mockito.mock(
-		ReplicasManager.class);
+
+	@Mock
+	private ReplicasManager _replicasManager;
 
 }

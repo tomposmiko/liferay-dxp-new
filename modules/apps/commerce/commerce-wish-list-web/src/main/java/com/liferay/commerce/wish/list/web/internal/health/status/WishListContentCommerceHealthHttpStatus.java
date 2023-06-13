@@ -18,7 +18,7 @@ import com.liferay.commerce.constants.CommerceHealthStatusConstants;
 import com.liferay.commerce.health.status.CommerceHealthHttpStatus;
 import com.liferay.commerce.wish.list.constants.CommerceWishListPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Andrea Di Giorgi
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.health.status.display.order:Integer=20",
 		"commerce.health.status.key=" + WishListContentCommerceHealthHttpStatus.KEY
@@ -96,7 +97,7 @@ public class WishListContentCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle, "wish-list-content-health-status-description");
 	}
 
@@ -110,7 +111,7 @@ public class WishListContentCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle, "wish-list-content-health-status-name");
 	}
 
@@ -134,9 +135,6 @@ public class WishListContentCommerceHealthHttpStatus
 
 		return false;
 	}
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private LayoutService _layoutService;

@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Inácio Nery
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.wiki.model.WikiPage",
 	service = PortletLayoutFinder.class
 )

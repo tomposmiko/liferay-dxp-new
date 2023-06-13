@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -91,7 +90,7 @@ public class MBCategoryIndexerIndexedFieldsTest {
 
 	protected void setUpIndexedFieldsFixture() {
 		indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper);
+			resourcePermissionLocalService);
 	}
 
 	protected void setUpMBCategoryIndexerFixture() {
@@ -126,9 +125,6 @@ public class MBCategoryIndexerIndexedFieldsTest {
 	@Inject
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
 	protected UserSearchFixture userSearchFixture;
 
 	private Map<String, String> _expectedFieldValues(MBCategory mbCategory)
@@ -155,8 +151,6 @@ public class MBCategoryIndexerIndexedFieldsTest {
 			Field.USER_ID, String.valueOf(mbCategory.getUserId())
 		).put(
 			Field.USER_NAME, StringUtil.lowerCase(mbCategory.getUserName())
-		).put(
-			"statusByUserId", String.valueOf(mbCategory.getStatusByUserId())
 		).build();
 
 		indexedFieldsFixture.populateUID(

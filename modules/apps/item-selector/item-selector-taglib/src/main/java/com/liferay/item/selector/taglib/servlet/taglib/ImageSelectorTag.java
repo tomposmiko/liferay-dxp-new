@@ -186,8 +186,6 @@ public class ImageSelectorTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
 		httpServletRequest.setAttribute(
-			"liferay-ui:image-selector:draggable", isDraggable());
-		httpServletRequest.setAttribute(
 			"liferay-ui:image-selector:fileEntryId", _fileEntryId);
 		httpServletRequest.setAttribute(
 			"liferay-ui:image-selector:imageCropDirection",
@@ -196,6 +194,8 @@ public class ImageSelectorTag extends IncludeTag {
 			"liferay-ui:image-selector:imageCropRegion", _imageCropRegion);
 		httpServletRequest.setAttribute(
 			"liferay-ui:image-selector:imageURL", _imageURL);
+		httpServletRequest.setAttribute(
+			"liferay-ui:image-selector:isDraggable", isDraggable());
 		httpServletRequest.setAttribute(
 			"liferay-ui:image-selector:itemSelectorEventName",
 			_itemSelectorEventName);

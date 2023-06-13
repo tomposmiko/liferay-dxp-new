@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"mvc.command.name=/journal/add_folder"
@@ -46,8 +47,6 @@ public class AddFolderMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		String externalReferenceCode = ParamUtil.getString(
-			actionRequest, "externalReferenceCode");
 		long parentFolderId = ParamUtil.getLong(
 			actionRequest, "parentFolderId");
 		String name = ParamUtil.getString(actionRequest, "name");
@@ -57,8 +56,8 @@ public class AddFolderMVCActionCommand extends BaseMVCActionCommand {
 			JournalFolder.class.getName(), actionRequest);
 
 		_journalFolderService.addFolder(
-			externalReferenceCode, serviceContext.getScopeGroupId(),
-			parentFolderId, name, description, serviceContext);
+			serviceContext.getScopeGroupId(), parentFolderId, name, description,
+			serviceContext);
 	}
 
 	@Reference

@@ -14,23 +14,19 @@
 
 package com.liferay.site.navigation.admin.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.navigation.admin.constants.SiteNavigationAdminPortletKeys;
-import com.liferay.site.navigation.admin.web.internal.util.SiteNavigationMenuPortletUtil;
 import com.liferay.site.navigation.exception.InvalidSiteNavigationMenuItemOrderException;
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemService;
-import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -42,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SiteNavigationAdminPortletKeys.SITE_NAVIGATION_ADMIN,
 		"mvc.command.name=/site_navigation_admin/edit_site_navigation_menu_item_parent"
@@ -56,11 +53,6 @@ public class EditSiteNavigationMenuItemParentMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject();
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		long siteNavigationMenuItemId = ParamUtil.getLong(
 			actionRequest, "siteNavigationMenuItemId");
 
@@ -74,53 +66,53 @@ public class EditSiteNavigationMenuItemParentMVCActionCommand
 					siteNavigationMenuItemId, parentSiteNavigationMenuItemId,
 					order);
 
-			jsonObject.put(
-				"siteNavigationMenuItems",
-				SiteNavigationMenuPortletUtil.
-					getSiteNavigationMenuItemsJSONArray(
-						0, siteNavigationMenuItem.getSiteNavigationMenuId(),
-						_siteNavigationMenuItemTypeRegistry, themeDisplay));
+			String redirect = _getRedirect(
+				actionRequest, siteNavigationMenuItem);
+
+			actionRequest.setAttribute(WebKeys.REDIRECT, redirect);
 		}
 		catch (InvalidSiteNavigationMenuItemOrderException
 					invalidSiteNavigationMenuItemOrderException) {
 
-			Class<?> exceptionClass =
-				invalidSiteNavigationMenuItemOrderException.getClass();
+			SessionErrors.add(
+				actionRequest,
+				invalidSiteNavigationMenuItemOrderException.getClass());
 
-			jsonObject.put(
-				"error",
-				_language.get(
-					themeDisplay.getRequest(), exceptionClass.getName()));
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-
-			jsonObject.put(
-				"error",
-				_language.get(
-					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
+			sendRedirect(actionRequest, actionResponse);
 		}
 
 		hideDefaultSuccessMessage(actionRequest);
-
-		JSONPortletResponseUtil.writeJSON(
-			actionRequest, actionResponse, jsonObject);
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		EditSiteNavigationMenuItemParentMVCActionCommand.class);
+	private String _getRedirect(
+		ActionRequest actionRequest,
+		SiteNavigationMenuItem siteNavigationMenuItem) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return PortletURLBuilder.create(
+			PortletURLFactoryUtil.create(
+				actionRequest,
+				SiteNavigationAdminPortletKeys.SITE_NAVIGATION_ADMIN,
+				themeDisplay.getPlid(), ActionRequest.RENDER_PHASE)
+		).setMVCPath(
+			"/edit_site_navigation_menu.jsp"
+		).setRedirect(
+			ParamUtil.getString(actionRequest, "redirect")
+		).setParameter(
+			"selectedSiteNavigationMenuItemId",
+			siteNavigationMenuItem.getSiteNavigationMenuItemId()
+		).setParameter(
+			"siteNavigationMenuId",
+			siteNavigationMenuItem.getSiteNavigationMenuId()
+		).buildString();
+	}
 
 	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
+	private Http _http;
 
 	@Reference
 	private SiteNavigationMenuItemService _siteNavigationMenuItemService;
-
-	@Reference
-	private SiteNavigationMenuItemTypeRegistry
-		_siteNavigationMenuItemTypeRegistry;
 
 }

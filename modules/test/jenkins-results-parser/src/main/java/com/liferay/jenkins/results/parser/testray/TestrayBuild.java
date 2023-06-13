@@ -14,20 +14,17 @@
 
 package com.liferay.jenkins.results.parser.testray;
 
-import com.liferay.jenkins.results.parser.BuildReportFactory;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.TopLevelBuildReport;
+import com.liferay.jenkins.results.parser.StopWatchRecord;
+import com.liferay.jenkins.results.parser.StopWatchRecordsGroup;
 
-import java.io.IOException;
+import java.io.File;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,172 +32,68 @@ import org.json.JSONObject;
 /**
  * @author Michael Hashimoto
  */
-public class TestrayBuild implements Comparable<TestrayBuild> {
+public class TestrayBuild {
 
 	public TestrayBuild(TestrayRoutine testrayRoutine, JSONObject jsonObject) {
 		_testrayRoutine = testrayRoutine;
 		_jsonObject = jsonObject;
 
-		_testrayProject = testrayRoutine.getTestrayProject();
-		_testrayServer = testrayRoutine.getTestrayServer();
+		_testrayProject = _testrayRoutine.getTestrayProject();
+		_testrayServer = _testrayRoutine.getTestrayServer();
 
 		_testrayProductVersion = _testrayProject.getTestrayProductVersionByID(
-			jsonObject.getLong("testrayProductVersionId"));
-	}
-
-	@Override
-	public int compareTo(TestrayBuild testrayBuild) {
-		if (testrayBuild == null) {
-			throw new NullPointerException("Testray build is null");
-		}
-
-		Long id = testrayBuild.getID();
-
-		return id.compareTo(getID());
+			_jsonObject.getInt("testrayProductVersionId"));
 	}
 
 	public String getDescription() {
 		return _jsonObject.getString("description");
 	}
 
-	public long getID() {
-		return _jsonObject.getLong("testrayBuildId");
+	public List<Long> getDownstreamBuildDurations() {
+		_initBuildResultData();
+
+		return _downstreamBuildDurations;
+	}
+
+	public int getID() {
+		return _jsonObject.getInt("testrayBuildId");
 	}
 
 	public String getName() {
 		return _jsonObject.getString("name");
 	}
 
-	public String getPortalBranch() {
-		Matcher matcher = _portalBranchPattern.matcher(
-			_jsonObject.optString("description"));
+	public String getResult() {
+		_initBuildResultData();
 
-		if (!matcher.find()) {
-			return null;
-		}
-
-		return matcher.group("portalBranch");
-	}
-
-	public String getPortalSHA() {
-		Matcher matcher = _portalSHAPattern.matcher(
-			_jsonObject.optString("description"));
-
-		if (!matcher.find()) {
-			return null;
-		}
-
-		return matcher.group("portalSHA");
-	}
-
-	public JSONObject getRunsJSONObject() {
-		if (_runsJSONObject != null) {
-			return _runsJSONObject;
-		}
-
-		TestrayServer testrayServer = getTestrayServer();
-
-		try {
-			_runsJSONObject = JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.combine(
-					String.valueOf(testrayServer.getURL()),
-					"/home/-/testray/runs.json?delta=200&testrayBuildId=",
-					String.valueOf(getID())));
-		}
-		catch (IOException ioException) {
-		}
-
-		return _runsJSONObject;
-	}
-
-	public String getStartYearMonth() {
-		Matcher matcher = _getTestrayAttachmentURLMatcher();
-
-		if (matcher == null) {
-			return null;
-		}
-
-		return matcher.group("startYearMonth");
+		return _result;
 	}
 
 	public List<TestrayCaseResult> getTestrayCaseResults() {
-		return getTestrayCaseResults(null, null);
-	}
-
-	public List<TestrayCaseResult> getTestrayCaseResults(
-		TestrayCaseType testrayCaseType, TestrayRun testrayRun) {
-
 		List<TestrayCaseResult> testrayCaseResults = new ArrayList<>();
 
-		TestrayServer testrayServer = getTestrayServer();
+		String urlString = String.valueOf(getURL());
 
-		StringBuilder sb = new StringBuilder();
+		String caseResultsAPIURLString = urlString.replace(
+			"runs", "case_results.json");
 
-		sb.append(testrayServer.getURL());
-		sb.append("/home/-/testray/case_results.json?delta=");
-		sb.append(_PAGE_DELTA);
-		sb.append("&orderByCol=status_sortable");
-		sb.append("&orderByType=asc");
-		sb.append("&resetCur=false");
-		sb.append("&testrayBuildId=");
-		sb.append(getID());
+		try {
+			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
+				caseResultsAPIURLString);
 
-		if (testrayCaseType != null) {
-			sb.append("&testrayCaseTypeId=");
-			sb.append(testrayCaseType.getID());
-		}
+			JSONArray dataJSONArray = jsonObject.getJSONArray("data");
 
-		if (testrayRun != null) {
-			sb.append("&testrayRunId=");
-			sb.append(testrayRun.getRunID());
-		}
+			for (int i = 0; i < dataJSONArray.length(); i++) {
+				JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
 
-		long previousTestrayCaseResultID = -1;
+				TestrayCaseResult testrayCaseResult = new TestrayCaseResult(
+					this, dataJSONObject);
 
-		for (int page = 1; page < _PAGE_COUNT; page++) {
-			try {
-				String testrayCaseResultsURL = sb + "&cur=" + page;
-
-				System.out.println(testrayCaseResultsURL);
-
-				JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-					testrayCaseResultsURL,
-					_testrayServer.getHTTPAuthorization());
-
-				JSONArray dataJSONArray = jsonObject.getJSONArray("data");
-
-				if (dataJSONArray.isEmpty()) {
-					break;
-				}
-
-				JSONObject firstDataJSONObject = dataJSONArray.getJSONObject(0);
-
-				if (Objects.equals(
-						firstDataJSONObject.optLong("testrayCaseResultId"),
-						previousTestrayCaseResultID)) {
-
-					break;
-				}
-
-				previousTestrayCaseResultID = firstDataJSONObject.getLong(
-					"testrayCaseResultId");
-
-				for (int i = 0; i < dataJSONArray.length(); i++) {
-					JSONObject dataJSONObject = dataJSONArray.getJSONObject(i);
-
-					TestrayCaseResult testrayCaseResult = new TestrayCaseResult(
-						this, dataJSONObject);
-
-					testrayCaseResults.add(testrayCaseResult);
-				}
-
-				if (dataJSONArray.length() < _PAGE_DELTA) {
-					break;
-				}
+				testrayCaseResults.add(testrayCaseResult);
 			}
-			catch (Exception exception) {
-				exception.printStackTrace();
-			}
+		}
+		catch (Exception exception) {
+			exception.printStackTrace();
 		}
 
 		return testrayCaseResults;
@@ -222,78 +115,16 @@ public class TestrayBuild implements Comparable<TestrayBuild> {
 		return _testrayServer;
 	}
 
-	public TopLevelBuildReport getTopLevelBuildReport() {
-		if (_topLevelBuildReport != null) {
-			return _topLevelBuildReport;
-		}
+	public Long getTopLevelActiveBuildDuration() {
+		_initBuildResultData();
 
-		URL topLevelBuildReportURL = getTopLevelBuildReportURL();
-
-		if ((topLevelBuildReportURL == null) ||
-			!JenkinsResultsParserUtil.exists(topLevelBuildReportURL)) {
-
-			return null;
-		}
-
-		_topLevelBuildReport = BuildReportFactory.newTopLevelBuildReport(this);
-
-		return _topLevelBuildReport;
+		return _topLevelActiveBuildDuration;
 	}
 
-	public URL getTopLevelBuildReportURL() {
-		Matcher matcher = _getTestrayAttachmentURLMatcher();
+	public Long getTopLevelBuildDuration() {
+		_initBuildResultData();
 
-		if (matcher == null) {
-			return null;
-		}
-
-		try {
-			return new URL(
-				JenkinsResultsParserUtil.combine(
-					"http://", matcher.group("topLevelMasterHostname"),
-					"/userContent/jobs/", matcher.group("topLevelJobName"),
-					"/builds/", matcher.group("topLevelBuildNumber"),
-					"/build-report.json.gz"));
-		}
-		catch (MalformedURLException malformedURLException) {
-			throw new RuntimeException(malformedURLException);
-		}
-	}
-
-	public URL getTopLevelBuildURL() {
-		Matcher matcher = _getTestrayAttachmentURLMatcher();
-
-		if (matcher == null) {
-			return null;
-		}
-
-		try {
-			return new URL(
-				JenkinsResultsParserUtil.combine(
-					"https://", matcher.group("topLevelMasterHostname"),
-					".liferay.com/job/", matcher.group("topLevelJobName"), "/",
-					matcher.group("topLevelBuildNumber"), "/"));
-		}
-		catch (MalformedURLException malformedURLException) {
-			throw new RuntimeException(malformedURLException);
-		}
-	}
-
-	public TestrayCaseResult getTopLevelTestrayCaseResult() {
-		List<TestrayCaseResult> testrayCaseResults = getTestrayCaseResults(
-			_testrayServer.getTestrayCaseType("Batch"), null);
-
-		for (TestrayCaseResult testrayCaseResult : testrayCaseResults) {
-			if (!Objects.equals(
-					testrayCaseResult.getName(), "Top Level Build")) {
-
-				continue;
-			}
-
-			return testrayCaseResult;
-		}
-
-		return null;
+		return _topLevelBuildDuration;
 	}
 
 	public URL getURL() {
@@ -305,67 +136,84 @@ public class TestrayBuild implements Comparable<TestrayBuild> {
 		}
 	}
 
-	protected TestrayBuild(URL testrayBuildURL) {
-		Matcher matcher = _testrayBuildURLPattern.matcher(
-			testrayBuildURL.toString());
+	private void _addChildStopWatchRecords(
+		StopWatchRecordsGroup stopWatchRecordsGroup,
+		StopWatchRecord stopWatchRecord, JSONObject stopWatchRecordJSONObject) {
 
-		if (!matcher.find()) {
-			throw new RuntimeException("Invalid Build URL " + testrayBuildURL);
+		if (!stopWatchRecordJSONObject.has("childStopWatchRecords")) {
+			return;
 		}
 
-		String serverURL = matcher.group("serverURL");
+		JSONArray childStopWatchRecordsJSONArray =
+			stopWatchRecordJSONObject.getJSONArray("childStopWatchRecords");
 
-		_testrayServer = TestrayFactory.newTestrayServer(
-			matcher.group("serverURL"));
+		for (int i = 0; i < childStopWatchRecordsJSONArray.length(); i++) {
+			JSONObject childStopWatchRecordJSONObject =
+				childStopWatchRecordsJSONArray.getJSONObject(i);
 
-		try {
-			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
-				JenkinsResultsParserUtil.combine(
-					serverURL, "/home/-/testray/builds/",
-					matcher.group("buildID"), ".json"),
-				_testrayServer.getHTTPAuthorization());
+			childStopWatchRecordJSONObject.put(
+				"startTimestamp", _startTimestamp);
 
-			_jsonObject = jsonObject.getJSONObject("data");
+			_startTimestamp++;
 
-			_testrayRoutine = TestrayFactory.newTestrayRoutine(
-				JenkinsResultsParserUtil.combine(
-					String.valueOf(_testrayServer.getURL()),
-					"/home/-/testray/builds?testrayRoutineId=",
-					_jsonObject.getString("testrayRoutineId")));
+			StopWatchRecord childStopWatchRecord = new StopWatchRecord(
+				childStopWatchRecordJSONObject);
 
-			_testrayProject = _testrayRoutine.getTestrayProject();
+			stopWatchRecordsGroup.add(childStopWatchRecord);
 
-			_testrayProductVersion =
-				_testrayProject.getTestrayProductVersionByID(
-					_jsonObject.getLong("testrayProductVersionId"));
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
+			stopWatchRecord.addChildStopWatchRecord(childStopWatchRecord);
+
+			_addChildStopWatchRecords(
+				stopWatchRecordsGroup, childStopWatchRecord,
+				childStopWatchRecordJSONObject);
 		}
 	}
 
-	private Matcher _getTestrayAttachmentURLMatcher() {
-		if (_testrayAttachmentURLMatcher != null) {
-			return _testrayAttachmentURLMatcher;
+	private JSONObject _getBuildResultJSONObject() {
+		if (_buildResultJSONObject != null) {
+			return _buildResultJSONObject;
 		}
 
-		TestrayCaseResult topLevelTestrayCaseResult =
-			getTopLevelTestrayCaseResult();
+		URL buildResultURL = _getBuildResultURL();
 
-		if (topLevelTestrayCaseResult != null) {
-			for (TestrayAttachment testrayAttachment :
-					topLevelTestrayCaseResult.getTestrayAttachments()) {
+		if (buildResultURL == null) {
+			return null;
+		}
 
-				Matcher testrayAttachmentURLMatcher =
-					_testrayAttachmentURLPattern.matcher(
-						String.valueOf(testrayAttachment.getURL()));
+		File jsonFile = new File(getID() + ".json");
+		File jsonGzFile = new File(getID() + ".json.gz");
 
-				if (testrayAttachmentURLMatcher.find()) {
-					_testrayAttachmentURLMatcher = testrayAttachmentURLMatcher;
+		try {
+			JenkinsResultsParserUtil.toFile(buildResultURL, jsonGzFile);
 
-					return _testrayAttachmentURLMatcher;
-				}
+			JenkinsResultsParserUtil.unGzip(jsonGzFile, jsonFile);
+
+			_buildResultJSONObject = JenkinsResultsParserUtil.createJSONObject(
+				JenkinsResultsParserUtil.read(jsonFile));
+
+			_buildResultJSONObject.put("name", getName());
+
+			return _buildResultJSONObject;
+		}
+		catch (Exception exception) {
+			exception.printStackTrace();
+		}
+		finally {
+			if (jsonFile.exists()) {
+				JenkinsResultsParserUtil.delete(jsonFile);
 			}
+
+			if (jsonGzFile.exists()) {
+				JenkinsResultsParserUtil.delete(jsonGzFile);
+			}
+		}
+
+		return null;
+	}
+
+	private URL _getBuildResultURL() {
+		if (_buildResultURL != null) {
+			return _buildResultURL;
 		}
 
 		List<TestrayCaseResult> testrayCaseResults = getTestrayCaseResults();
@@ -374,59 +222,257 @@ public class TestrayBuild implements Comparable<TestrayBuild> {
 			return null;
 		}
 
-		int count = 0;
+		TestrayCaseResult testrayCaseResult = testrayCaseResults.get(0);
 
-		for (TestrayCaseResult testrayCaseResult : testrayCaseResults) {
-			count++;
+		TestrayAttachment buildResultTestrayAttachment =
+			testrayCaseResult.getBuildResultTestrayAttachment();
 
-			if (count >= 5) {
-				break;
-			}
+		if (buildResultTestrayAttachment == null) {
+			return null;
+		}
 
-			for (TestrayAttachment testrayAttachment :
-					testrayCaseResult.getTestrayAttachments()) {
+		_buildResultURL = buildResultTestrayAttachment.getURL();
 
-				Matcher testrayAttachmentURLMatcher =
-					_testrayAttachmentURLPattern.matcher(
-						String.valueOf(testrayAttachment.getURL()));
+		return _buildResultURL;
+	}
 
-				if (testrayAttachmentURLMatcher.find()) {
-					_testrayAttachmentURLMatcher = testrayAttachmentURLMatcher;
+	private List<Long> _getDownstreamBuildDurations(
+		JSONObject buildResultJSONObject) {
 
-					return _testrayAttachmentURLMatcher;
+		if ((buildResultJSONObject == null) ||
+			!buildResultJSONObject.has("batchResults")) {
+
+			return new ArrayList<>();
+		}
+
+		JSONArray batchResultsJSONArray = buildResultJSONObject.getJSONArray(
+			"batchResults");
+
+		List<Long> downstreamBuildDurations = new ArrayList<>();
+
+		for (int i = 0; i < batchResultsJSONArray.length(); i++) {
+			JSONObject batchResultJSONObject =
+				batchResultsJSONArray.getJSONObject(i);
+
+			JSONArray buildResultsJSONArray =
+				batchResultJSONObject.getJSONArray("buildResults");
+
+			for (int j = 0; j < buildResultsJSONArray.length(); j++) {
+				JSONObject buildResultsJSONObject =
+					buildResultsJSONArray.getJSONObject(j);
+
+				if (!buildResultsJSONObject.has("duration")) {
+					continue;
 				}
+
+				downstreamBuildDurations.add(
+					buildResultsJSONObject.getLong("duration"));
 			}
+		}
+
+		return downstreamBuildDurations;
+	}
+
+	private String _getResult(JSONObject buildResultJSONObject) {
+		if ((buildResultJSONObject != null) &&
+			buildResultJSONObject.has("result")) {
+
+			return buildResultJSONObject.getString("result");
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		String urlString = String.valueOf(getURL());
+
+		sb.append(urlString.replace("runs", "case_results.json"));
+
+		sb.append("&statuses=");
+
+		for (TestrayCaseResult.Status failedStatus :
+				TestrayCaseResult.Status.getFailedStatuses()) {
+
+			sb.append(failedStatus.getID());
+			sb.append(",");
+		}
+
+		try {
+			JSONObject jsonObject = JenkinsResultsParserUtil.toJSONObject(
+				sb.toString());
+
+			JSONArray dataJSONArray = jsonObject.getJSONArray("data");
+
+			if ((dataJSONArray != null) && (dataJSONArray.length() > 0)) {
+				return "FAILURE";
+			}
+		}
+		catch (Exception exception) {
+			return "FAILURE";
+		}
+
+		return "SUCCESS";
+	}
+
+	private StopWatchRecordsGroup _getStopWatchRecordsGroup(
+		JSONObject buildResultJSONObject) {
+
+		Long topLevelBuildDuration = _getTopLevelBuildDuration(
+			buildResultJSONObject);
+
+		if (topLevelBuildDuration == null) {
+			return null;
+		}
+
+		StopWatchRecordsGroup stopWatchRecordsGroup =
+			new StopWatchRecordsGroup();
+
+		StopWatchRecord stopWatchRecord = new StopWatchRecord(
+			"top.level.build", _startTimestamp);
+
+		_startTimestamp++;
+
+		stopWatchRecord.setDuration(topLevelBuildDuration);
+
+		stopWatchRecordsGroup.add(stopWatchRecord);
+
+		if ((buildResultJSONObject == null) ||
+			!buildResultJSONObject.has("stopWatchRecords")) {
+
+			return stopWatchRecordsGroup;
+		}
+
+		JSONArray stopWatchRecordsJSONArray =
+			buildResultJSONObject.getJSONArray("stopWatchRecords");
+
+		for (int i = 0; i < stopWatchRecordsJSONArray.length(); i++) {
+			JSONObject childStopWatchRecordJSONObject =
+				stopWatchRecordsJSONArray.getJSONObject(i);
+
+			childStopWatchRecordJSONObject.put(
+				"startTimestamp", _startTimestamp);
+
+			if (!childStopWatchRecordJSONObject.has("duration") ||
+				!childStopWatchRecordJSONObject.has("name")) {
+
+				continue;
+			}
+
+			_startTimestamp++;
+
+			StopWatchRecord childStopWatchRecord = new StopWatchRecord(
+				childStopWatchRecordJSONObject);
+
+			stopWatchRecord.addChildStopWatchRecord(childStopWatchRecord);
+
+			stopWatchRecordsGroup.add(childStopWatchRecord);
+
+			_addChildStopWatchRecords(
+				stopWatchRecordsGroup, childStopWatchRecord,
+				childStopWatchRecordJSONObject);
+		}
+
+		return stopWatchRecordsGroup;
+	}
+
+	private Long _getTopLevelActiveBuildDuration(
+		JSONObject buildResultJSONObject) {
+
+		Long topLevelBuildDuration = _getTopLevelBuildDuration(
+			buildResultJSONObject);
+		Long topLevelPassiveBuildDuration = _getTopLevelPassiveBuildDuration(
+			buildResultJSONObject);
+
+		if ((topLevelBuildDuration == null) ||
+			(topLevelPassiveBuildDuration == null)) {
+
+			return null;
+		}
+
+		return topLevelBuildDuration - topLevelPassiveBuildDuration;
+	}
+
+	private Long _getTopLevelBuildDuration(JSONObject buildResultJSONObject) {
+		if ((buildResultJSONObject == null) ||
+			!buildResultJSONObject.has("duration")) {
+
+			return null;
+		}
+
+		return buildResultJSONObject.getLong("duration");
+	}
+
+	private Long _getTopLevelPassiveBuildDuration(
+		JSONObject buildResultJSONObject) {
+
+		StopWatchRecordsGroup stopWatchRecordsGroup = _getStopWatchRecordsGroup(
+			buildResultJSONObject);
+
+		if (stopWatchRecordsGroup == null) {
+			return null;
+		}
+
+		StopWatchRecord waitForInvokedJobsStopWatchRecord =
+			stopWatchRecordsGroup.get("wait.for.invoked.jobs");
+		StopWatchRecord waitForInvokedSmokeJobsStopWatchRecord =
+			stopWatchRecordsGroup.get("wait.for.invoked.smoke.jobs");
+
+		if ((waitForInvokedJobsStopWatchRecord != null) ||
+			(waitForInvokedSmokeJobsStopWatchRecord != null)) {
+
+			long topLevelPassiveBuildDuration = 0L;
+
+			if (waitForInvokedJobsStopWatchRecord != null) {
+				topLevelPassiveBuildDuration +=
+					waitForInvokedJobsStopWatchRecord.getDuration();
+			}
+
+			if (waitForInvokedSmokeJobsStopWatchRecord != null) {
+				topLevelPassiveBuildDuration +=
+					waitForInvokedSmokeJobsStopWatchRecord.getDuration();
+			}
+
+			return topLevelPassiveBuildDuration;
+		}
+
+		StopWatchRecord invokeDownstreamBuildsStopWatchRecord =
+			stopWatchRecordsGroup.get("invoke.downstream.builds");
+
+		if (invokeDownstreamBuildsStopWatchRecord != null) {
+			return invokeDownstreamBuildsStopWatchRecord.getDuration();
 		}
 
 		return null;
 	}
 
-	private static final int _PAGE_COUNT = 100;
+	private synchronized void _initBuildResultData() {
+		if (_buildResultDataPopulated) {
+			return;
+		}
 
-	private static final int _PAGE_DELTA = 200;
+		_buildResultDataPopulated = true;
 
-	private static final Pattern _portalBranchPattern = Pattern.compile(
-		"Portal Branch: (?<portalBranch>[^;]+);");
-	private static final Pattern _portalSHAPattern = Pattern.compile(
-		"Portal SHA: (?<portalSHA>[^;]+);");
-	private static final Pattern _testrayAttachmentURLPattern = Pattern.compile(
-		JenkinsResultsParserUtil.combine(
-			"https://testray.liferay.com/reports/production/logs/",
-			"(?<startYearMonth>\\d{4}-\\d{2})/",
-			"(?<topLevelMasterHostname>test-\\d+-\\d+)/",
-			"(?<topLevelJobName>[^/]+)/(?<topLevelBuildNumber>\\d+)/.*"));
-	private static final Pattern _testrayBuildURLPattern = Pattern.compile(
-		JenkinsResultsParserUtil.combine(
-			"(?<serverURL>https://[^/]+)/home/-/testray/runs\\?",
-			"testrayBuildId=(?<buildID>\\d+)"));
+		JSONObject buildResultJSONObject = _getBuildResultJSONObject();
 
+		_downstreamBuildDurations = _getDownstreamBuildDurations(
+			buildResultJSONObject);
+		_result = _getResult(buildResultJSONObject);
+		_topLevelActiveBuildDuration = _getTopLevelActiveBuildDuration(
+			buildResultJSONObject);
+		_topLevelBuildDuration = _getTopLevelBuildDuration(
+			buildResultJSONObject);
+	}
+
+	private boolean _buildResultDataPopulated;
+	private JSONObject _buildResultJSONObject;
+	private URL _buildResultURL;
+	private List<Long> _downstreamBuildDurations;
 	private final JSONObject _jsonObject;
-	private JSONObject _runsJSONObject;
-	private Matcher _testrayAttachmentURLMatcher;
+	private String _result;
+	private int _startTimestamp;
 	private final TestrayProductVersion _testrayProductVersion;
 	private final TestrayProject _testrayProject;
 	private final TestrayRoutine _testrayRoutine;
 	private final TestrayServer _testrayServer;
-	private TopLevelBuildReport _topLevelBuildReport;
+	private Long _topLevelActiveBuildDuration;
+	private Long _topLevelBuildDuration;
 
 }

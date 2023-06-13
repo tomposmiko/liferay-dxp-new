@@ -26,8 +26,6 @@ import java.util.Map;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -57,8 +55,7 @@ public interface DDMHelper {
 
 	public String renderCPAttachmentFileEntryOptions(
 			long cpDefinitionId, String json, PageContext pageContext,
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
+			RenderRequest renderRequest, RenderResponse renderResponse,
 			Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
 				cpDefinitionOptionRelCPDefinitionOptionValueRels)
 		throws PortalException;
@@ -76,16 +73,14 @@ public interface DDMHelper {
 
 	public String renderCPInstanceOptions(
 			long cpDefinitionId, String json, boolean ignoreSKUCombinations,
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
+			RenderRequest renderRequest, RenderResponse renderResponse,
 			Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
 				cpDefinitionOptionRelCPDefinitionOptionValueRels)
 		throws PortalException;
 
 	public String renderPublicStoreOptions(
 			long cpDefinitionId, String json, boolean ignoreSKUCombinations,
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
+			RenderRequest renderRequest, RenderResponse renderResponse,
 			Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
 				cpDefinitionOptionRelCPDefinitionOptionValueRels)
 		throws PortalException;

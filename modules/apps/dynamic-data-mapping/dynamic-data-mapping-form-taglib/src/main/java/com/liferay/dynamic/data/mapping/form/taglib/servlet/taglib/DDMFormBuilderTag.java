@@ -14,29 +14,14 @@
 
 package com.liferay.dynamic.data.mapping.form.taglib.servlet.taglib;
 
-import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormBuilderContextFactory;
-import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormBuilderContextRequest;
-import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormBuilderContextResponse;
 import com.liferay.dynamic.data.mapping.form.builder.settings.DDMFormBuilderSettingsRequest;
 import com.liferay.dynamic.data.mapping.form.builder.settings.DDMFormBuilderSettingsResponse;
-import com.liferay.dynamic.data.mapping.form.builder.settings.DDMFormBuilderSettingsRetriever;
+import com.liferay.dynamic.data.mapping.form.taglib.internal.servlet.taglib.util.DDMFormTaglibUtil;
 import com.liferay.dynamic.data.mapping.form.taglib.servlet.taglib.base.BaseDDMFormBuilderTag;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.dynamic.data.mapping.service.DDMStructureVersionLocalServiceUtil;
-import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
-import com.liferay.osgi.util.service.Snapshot;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -48,103 +33,28 @@ public class DDMFormBuilderTag extends BaseDDMFormBuilderTag {
 	public String getDDMFormBuilderContext(
 		HttpServletRequest httpServletRequest) {
 
-		String serializedFormBuilderContext = ParamUtil.getString(
-			httpServletRequest, "serializedFormBuilderContext");
-
-		if (Validator.isNotNull(serializedFormBuilderContext)) {
-			return serializedFormBuilderContext;
-		}
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
-
-		long ddmStructureId = GetterUtil.getLong(getDdmStructureId());
-
-		DDMStructure ddmStructure =
-			DDMStructureLocalServiceUtil.fetchDDMStructure(ddmStructureId);
-
-		long ddmStructureVersionId = GetterUtil.getLong(
-			getDdmStructureVersionId());
-
-		DDMStructureVersion ddmStructureVersion =
-			DDMStructureVersionLocalServiceUtil.fetchDDMStructureVersion(
-				ddmStructureVersionId);
-
-		Locale locale = themeDisplay.getSiteDefaultLocale();
-
-		if ((ddmStructure != null) || (ddmStructureVersion != null)) {
-			DDMForm ddmForm = getDDMForm(ddmStructureId, ddmStructureVersionId);
-
-			locale = ddmForm.getDefaultLocale();
-		}
-
-		DDMFormBuilderContextRequest ddmFormBuilderContextRequest =
-			DDMFormBuilderContextRequest.with(
-				ddmStructure, themeDisplay.getRequest(),
-				themeDisplay.getResponse(), locale, true);
-
-		ddmFormBuilderContextRequest.addProperty(
-			"ddmStructureVersion", ddmStructureVersion);
-
-		DDMFormBuilderContextFactory ddmFormBuilderContextFactory =
-			_ddmFormBuilderContextFactorySnapshot.get();
-
-		DDMFormBuilderContextResponse ddmFormBuilderContextResponse =
-			ddmFormBuilderContextFactory.create(ddmFormBuilderContextRequest);
-
-		return jsonSerializer.serializeDeep(
-			ddmFormBuilderContextResponse.getContext());
+		return DDMFormTaglibUtil.getFormBuilderContext(
+			GetterUtil.getLong(getDdmStructureId()),
+			GetterUtil.getLong(getDdmStructureVersionId()), httpServletRequest);
 	}
 
-	protected DDMForm getDDMForm(
-		long ddmStructureId, long ddmStructureVersionId) {
-
-		if (ddmStructureVersionId > 0) {
-			DDMStructureVersion ddmStructureVersion =
-				DDMStructureVersionLocalServiceUtil.fetchDDMStructureVersion(
-					ddmStructureVersionId);
-
-			if (ddmStructureVersion != null) {
-				return ddmStructureVersion.getDDMForm();
-			}
-		}
-
-		if (ddmStructureId > 0) {
-			DDMStructure ddmStructure =
-				DDMStructureLocalServiceUtil.fetchDDMStructure(ddmStructureId);
-
-			if (ddmStructure != null) {
-				return ddmStructure.getDDMForm();
-			}
-		}
-
-		return new DDMForm();
+	protected DDMForm getDDMForm() {
+		return DDMFormTaglibUtil.getDDMForm(
+			GetterUtil.getLong(getDdmStructureId()),
+			GetterUtil.getLong(getDdmStructureVersionId()));
 	}
 
 	protected DDMFormBuilderSettingsResponse getDDMFormBuilderSettings(
 		HttpServletRequest httpServletRequest) {
 
-		DDMFormBuilderSettingsRetriever ddmFormBuilderSettingsRetriever =
-			_ddmFormBuilderSettingsRetrieverSnapshot.get();
-
-		if (ddmFormBuilderSettingsRetriever == null) {
-			throw new IllegalStateException();
-		}
-
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return ddmFormBuilderSettingsRetriever.getSettings(
+		return DDMFormTaglibUtil.getDDMFormBuilderSettings(
 			DDMFormBuilderSettingsRequest.with(
 				themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
-				getFieldSetClassNameId(),
-				getDDMForm(
-					GetterUtil.getLong(getDdmStructureId()),
-					GetterUtil.getLong(getDdmStructureVersionId())),
+				getFieldSetClassNameId(), getDDMForm(),
 				themeDisplay.getLocale()));
 	}
 
@@ -184,13 +94,9 @@ public class DDMFormBuilderTag extends BaseDDMFormBuilderTag {
 		setNamespacedAttribute(
 			httpServletRequest, "functionsURL",
 			ddmFormBuilderSettingsResponse.getFunctionsURL());
-
-		NPMResolver npmResolver = _npmResolverSnapshot.get();
-
 		setNamespacedAttribute(
 			httpServletRequest, "npmResolvedPackageName",
-			npmResolver.resolveModuleName("dynamic-data-mapping-form-builder"));
-
+			DDMFormTaglibUtil.getNPMResolvedPackageName());
 		setNamespacedAttribute(
 			httpServletRequest, "rolesURL",
 			ddmFormBuilderSettingsResponse.getRolesURL());
@@ -198,14 +104,5 @@ public class DDMFormBuilderTag extends BaseDDMFormBuilderTag {
 			httpServletRequest, "serializedDDMFormRules",
 			ddmFormBuilderSettingsResponse.getSerializedDDMFormRules());
 	}
-
-	private static final Snapshot<DDMFormBuilderContextFactory>
-		_ddmFormBuilderContextFactorySnapshot = new Snapshot<>(
-			DDMFormBuilderTag.class, DDMFormBuilderContextFactory.class);
-	private static final Snapshot<DDMFormBuilderSettingsRetriever>
-		_ddmFormBuilderSettingsRetrieverSnapshot = new Snapshot<>(
-			DDMFormBuilderTag.class, DDMFormBuilderSettingsRetriever.class);
-	private static final Snapshot<NPMResolver> _npmResolverSnapshot =
-		new Snapshot<>(DDMFormBuilderTag.class, NPMResolver.class);
 
 }

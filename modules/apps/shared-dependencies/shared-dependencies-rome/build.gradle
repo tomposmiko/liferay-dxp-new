@@ -1,4 +1,0 @@
-dependencies {
-	compileInclude group: "com.rometools", name: "rome", version: "1.16.0"
-	compileInclude group: "com.rometools", name: "rome-utils", version: "1.16.0"
-}

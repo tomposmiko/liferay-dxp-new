@@ -15,20 +15,17 @@
 import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayLayout from '@clayui/layout';
-import {Context as ModalContext} from '@clayui/modal';
-import React, {useContext} from 'react';
+import React from 'react';
 
 import {EVENT_TYPES as CORE_EVENT_TYPES} from '../../../core/actions/eventTypes.es';
 import {useForm, useFormState} from '../../../core/hooks/useForm.es';
 import {usePage} from '../../../core/hooks/usePage.es';
-import pageReset from '../../../core/thunks/pageReset.es';
 import {sub} from '../../../utils/strings';
-import {EVENT_TYPES} from '../eventTypes';
+import {EVENT_TYPES} from '../eventTypes.es';
 
-export function Container({children, empty, pageIndex, pages}) {
-	const {editingLanguageId, rules, successPageSettings} = useFormState();
+export const Container = ({children, empty, pageIndex, pages}) => {
+	const {editingLanguageId, successPageSettings} = useFormState();
 	const dispatch = useForm();
-	const [{onClose}, modalDispatch] = useContext(ModalContext);
 
 	const pageSettingsItems = [
 		empty
@@ -40,18 +37,10 @@ export function Container({children, empty, pageIndex, pages}) {
 			: {
 					label: Liferay.Language.get('reset-page'),
 					onClick: () =>
-						dispatch(
-							pageReset({
-								action: {
-									payload: {pageIndex},
-									type: EVENT_TYPES.PAGE.RESET,
-								},
-								modalDispatch,
-								onClose,
-								pages,
-								rules,
-							})
-						),
+						dispatch({
+							payload: {pageIndex},
+							type: EVENT_TYPES.PAGE.RESET,
+						}),
 			  },
 		pageIndex > 0
 			? {
@@ -170,7 +159,6 @@ export function Container({children, empty, pageIndex, pages}) {
 
 				<div className="add-page-button-container">
 					<div className="horizontal-line" />
-
 					<ClayButton
 						className="add-page-button"
 						displayType="secondary"
@@ -184,14 +172,12 @@ export function Container({children, empty, pageIndex, pages}) {
 					>
 						{Liferay.Language.get('new-page')}
 					</ClayButton>
-
 					<div className="horizontal-line" />
 				</div>
 
 				{pages.length - 1 === pageIndex && (
 					<div className="add-page-button-container">
 						<div className="horizontal-line" />
-
 						<ClayButton
 							className="add-page-button"
 							displayType="secondary"
@@ -200,18 +186,17 @@ export function Container({children, empty, pageIndex, pages}) {
 						>
 							{Liferay.Language.get('add-success-page')}
 						</ClayButton>
-
 						<div className="horizontal-line" />
 					</div>
 				)}
 			</div>
 		</>
 	);
-}
+};
 
 Container.displayName = 'MultiPagesVariant.Container';
 
-export function PageHeader({localizedDescription, localizedTitle}) {
+export const PageHeader = ({localizedDescription, localizedTitle}) => {
 	const {defaultLanguageId, editingLanguageId} = useFormState();
 	const {pageIndex} = usePage();
 
@@ -234,7 +219,6 @@ export function PageHeader({localizedDescription, localizedTitle}) {
 					localizedTitle[defaultLanguageId]
 				}
 			/>
-
 			<input
 				className="form-builder-page-header-description form-control p-0"
 				maxLength="120"
@@ -254,6 +238,6 @@ export function PageHeader({localizedDescription, localizedTitle}) {
 			/>
 		</div>
 	);
-}
+};
 
 PageHeader.displayName = 'MultiPagesVariant.PageHeader';

@@ -12,7 +12,7 @@
 <tbody>
 <tr>
 	<td>ANY_TEXT_INPUT</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//..//input[not(contains(@type,'hidden'))])[${index}]</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::input[not(contains(@type,'hidden'))])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -37,22 +37,22 @@
 </tr>
 <tr>
 	<td>DATE_INPUT</td>
-	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div//input[@type='text']</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'date-picker')]//input[@type='text']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_LIST_AUTHOR</td>
-	<td>//dd[contains(.,'${key_entryTitle}')]//span[contains(.,'${key_entryAuthor}')]</td>
+	<td>//li[contains(.,'${key_entryTitle}')]//span[contains(.,'${key_entryAuthor}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>HELP_TEXT</td>
-	<td>//div[contains(@class,'form-group')]//div[contains(@class,'form-feedback-group') and contains(.,'${value1}')] | //div[contains(@data-field-name,'${key_fieldName}')]//p[@class='liferay-ddm-form-field-tip'] | //div[contains(@data-field-name,'${key_fieldName}')]//div[contains(@class,'form-feedback-group')]</td>
+	<td>//div[contains(@class,'form-group')]//span[contains(@class,'form-text') and contains(text(),'${value1}')] | //div[contains(@data-field-name,'${key_fieldName}')]//p[@class='liferay-ddm-form-field-tip'] | //div[contains(@data-field-name,'${key_fieldName}')]//span[contains(@class, 'form-text')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FIELD_REQUIRED_ALERT</td>
-	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::div[contains(@class,'form-feedback-group')]//div[contains(@class,'form-feedback-item')] | //fieldset[legend[normalize-space(text())='${key_fieldFieldLabel}']]/following-sibling::span[contains(@class,'form-feedback-group')]//div[contains(@class,'form-feedback-item')] | //div[text()='This field is required.']</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::span[contains(@class,'form-feedback-group')]//div[contains(@class,'form-feedback-item')] | //legend[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::span[contains(@class,'form-feedback-group')]//div[contains(@class,'form-feedback-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -63,14 +63,6 @@
 <tr>
 	<td>IMAGE_PICKER_PREVIEW</td>
 	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'image-picker-preview')]//img[contains(@src,'${key_image}')]</td>
-	<td></td>
-</tr>
-
-<!--SIDEBAR-->
-
-<tr>
-	<td>DEFAULT_LANGUAGE</td>
-	<td>//div[contains(@class,'article-default-language')]//p[normalize-space()='Default Language: ${defaultLanguage}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -94,16 +86,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>MARKER</td>
-	<td>//img[contains(@class,'marker-icon')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>MARKER_POSITION</td>
-	<td>//img[contains(@class,'marker-icon')][contains(@style,'translate3d("${position}")')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>SELECT_BUTTON_2</td>
 	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form')]//button[normalize-space()='Select'])[2]</td>
 	<td></td>
@@ -120,12 +102,7 @@
 </tr>
 <tr>
 	<td>SELECT_FIELD_TRIGGER</td>
-	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//..//div[contains(@class,'select-field')]//div[contains(@class,'select-field-trigger')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SELECT_FIELD_TRIGGER_2</td>
-	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//..//div[contains(@class,'select-field')]//div[contains(@class,'select-field-trigger')])[2]</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'select-field')]//div[contains(@class,'select-field-trigger')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -150,12 +127,7 @@
 </tr>
 <tr>
 	<td>TEXT_INPUT</td>
-	<td>//div[@class='ddm-field']//label[normalize-space(text())='${key_fieldFieldLabel}']//..//input</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TEXT_INPUT_2</td>
-	<td>xpath=(//div[@class='ddm-field']//label[normalize-space(text())='${key_fieldFieldLabel}']//..//input[@type='text'])[2]</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::input</td>
 	<td></td>
 </tr>
 <tr>
@@ -188,9 +160,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--VIEW_HISTORY-->
-
 <tr>
 	<td>VIEW_HISTORY_VERSION_CHECKBOX</td>
 	<td>//tr[contains(.,'${key_webContentTitle}')]/td//input</td>
@@ -211,12 +181,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--REPEATED FIELD ON WEB CONTENT-->
-
 <tr>
 	<td>REPEATED_FIELD</td>
-	<td>xpath=(//div[contains(@class,'ddm')]//label[contains(text(),'${key_fieldName}')])[${key_index}]</td>
+	<td>xpath=(//div[contains(@class,'ddm-field')][contains(@data-field-name,'${key_fieldName}')][not(contains(@class,'container'))])[${key_index}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -224,9 +192,7 @@
 	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'date-picker')]//input[@type='text'])[${index}]</td>
 	<td></td>
 </tr>
-
 <!--REPEATED FIELD BY INDEX-->
-
 <tr>
 	<td>REPEATED_FIELD_BY_INDEX</td>
 	<td>xpath=//div[contains(@class,'ddm-field') and contains(@data-field-name,'${key_fieldReference}')][${key_index}]</td>

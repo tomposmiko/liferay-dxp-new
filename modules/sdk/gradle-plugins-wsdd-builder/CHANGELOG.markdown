@@ -1,48 +1,5 @@
 # Liferay Gradle Plugins WSDD Builder Change Log
 
-## 1.0.21 - 2023-04-02
-
-### Dependencies
-- [LPS-142696] Update the com.liferay.portal.tools.wsdd.builder dependency to
-version 1.0.15.
-
-## 1.0.20 - 2023-02-08
-
-### Dependencies
-- [LPS-172713] Update the com.liferay.portal.tools.wsdd.builder dependency to
-version 1.0.14.
-
-## 1.0.19 - 2023-02-08
-
-### Dependencies
-- [LPS-172713] Update the com.liferay.portal.tools.wsdd.builder dependency to
-version 1.0.13.
-
-## 1.0.18 - 2023-02-05
-
-### Commits
-- [LPS-150857] Update README.markdown (77ff7e244f)
-- [LPS-150857] Update plugins Gradle version (4c389b37ce)
-- [LPS-151447] Manual update. (db27b0116f)
-- [LPS-136872] Fixed the impact of LPS-136872 on other former gradleTests
-(96be8fe844)
-- [LPS-105380] Remove empty constructors (2441f12379)
-- [LPS-133200] Use com.liferay.petra.string.StringBundler (3bc40139d1)
-
-### Dependencies
-- [LPS-172713] Update the com.liferay.portal.tools.wsdd.builder dependency to
-version 1.0.12.
-- [LPS-51081] Update the com.liferay.gradle.util dependency to version 1.0.47.
-- [LRCI-2670] Update the com.liferay.gradle.util dependency to version 1.0.46.
-- [LPS-143280] Update the com.liferay.gradle.util dependency to version 1.0.45.
-
-## 1.0.17 - 2021-05-18
-
-### Commits
-- [COMMERCE-4584] Fix buildWSDD (9928360b66)
-- [LPS-105380] Partial revert (aafd3818ae)
-- [LPS-105380] Auto SF, XMLDTDVersionCheck (a7cb83d66b)
-
 ## 1.0.16 - 2020-11-02
 
 ### Commits
@@ -283,7 +240,6 @@ resolution (5343a0699e)
 - [LPS-51081] Use Gradle utilities (be5dfc70dc)
 - [LPS-51081] Rename (0285936b82)
 
-[COMMERCE-4584]: https://issues.liferay.com/browse/COMMERCE-4584
 [LPS-51081]: https://issues.liferay.com/browse/LPS-51081
 [LPS-51801]: https://issues.liferay.com/browse/LPS-51801
 [LPS-55043]: https://issues.liferay.com/browse/LPS-55043
@@ -345,12 +301,4 @@ resolution (5343a0699e)
 [LPS-111896]: https://issues.liferay.com/browse/LPS-111896
 [LPS-113624]: https://issues.liferay.com/browse/LPS-113624
 [LPS-115020]: https://issues.liferay.com/browse/LPS-115020
-[LPS-133200]: https://issues.liferay.com/browse/LPS-133200
-[LPS-136872]: https://issues.liferay.com/browse/LPS-136872
-[LPS-142696]: https://issues.liferay.com/browse/LPS-142696
-[LPS-143280]: https://issues.liferay.com/browse/LPS-143280
-[LPS-150857]: https://issues.liferay.com/browse/LPS-150857
-[LPS-151447]: https://issues.liferay.com/browse/LPS-151447
-[LPS-172713]: https://issues.liferay.com/browse/LPS-172713
-[LRCI-2670]: https://issues.liferay.com/browse/LRCI-2670
 [LRDOCS-4319]: https://issues.liferay.com/browse/LRDOCS-4319

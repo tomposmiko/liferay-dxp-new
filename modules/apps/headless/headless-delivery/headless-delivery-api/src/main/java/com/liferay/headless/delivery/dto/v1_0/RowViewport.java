@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.util.ObjectMapperUtil;
@@ -64,7 +63,7 @@ public class RowViewport implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(RowViewport.class, json);
 	}
 
-	@Schema(description = "The row viewport's ID.")
+	@Schema(description = "The row vieport's ID.")
 	public String getId() {
 		return id;
 	}
@@ -86,12 +85,12 @@ public class RowViewport implements Serializable {
 		}
 	}
 
-	@GraphQLField(description = "The row viewport's ID.")
+	@GraphQLField(description = "The row vieport's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String id;
 
-	@Schema(description = "The definition of the row viewport.")
+	@Schema(description = "The definition of the row vieport.")
 	@Valid
 	public RowViewportDefinition getRowViewportDefinition() {
 		return rowViewportDefinition;
@@ -119,7 +118,7 @@ public class RowViewport implements Serializable {
 		}
 	}
 
-	@GraphQLField(description = "The definition of the row viewport.")
+	@GraphQLField(description = "The definition of the row vieport.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotNull
 	protected RowViewportDefinition rowViewportDefinition;
@@ -188,9 +187,9 @@ public class RowViewport implements Serializable {
 	public String xClassName;
 
 	private static String _escape(Object object) {
-		return StringUtil.replace(
-			String.valueOf(object), _JSON_ESCAPE_STRINGS[0],
-			_JSON_ESCAPE_STRINGS[1]);
+		String string = String.valueOf(object);
+
+		return string.replaceAll("\"", "\\\\\"");
 	}
 
 	private static boolean _isArray(Object value) {
@@ -216,7 +215,7 @@ public class RowViewport implements Serializable {
 			Map.Entry<String, ?> entry = iterator.next();
 
 			sb.append("\"");
-			sb.append(_escape(entry.getKey()));
+			sb.append(entry.getKey());
 			sb.append("\": ");
 
 			Object value = entry.getValue();
@@ -248,7 +247,7 @@ public class RowViewport implements Serializable {
 			}
 			else if (value instanceof String) {
 				sb.append("\"");
-				sb.append(_escape(value));
+				sb.append(value);
 				sb.append("\"");
 			}
 			else {
@@ -264,10 +263,5 @@ public class RowViewport implements Serializable {
 
 		return sb.toString();
 	}
-
-	private static final String[][] _JSON_ESCAPE_STRINGS = {
-		{"\\", "\"", "\b", "\f", "\n", "\r", "\t"},
-		{"\\\\", "\\\"", "\\b", "\\f", "\\n", "\\r", "\\t"}
-	};
 
 }

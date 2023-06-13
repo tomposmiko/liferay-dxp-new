@@ -12,12 +12,11 @@
  * details.
  */
 
-import {sub} from 'frontend-js-web';
+const sub = Liferay.Util.sub;
 
 const DEFAULT_BALLOON_EDITOR_CONFIG = {
 	extraAllowedContent: '*',
-	extraPlugins:
-		'itemselector,stylescombo,ballooneditor,videoembed,insertbutton',
+	extraPlugins: 'itemselector,stylescombo,ballooneditor,videoembed',
 	removePlugins: 'contextmenu,link,liststyle,tabletools',
 	stylesSet: [
 		{

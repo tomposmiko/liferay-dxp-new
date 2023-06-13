@@ -30,8 +30,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.search.Indexable;
-import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -55,25 +53,12 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 
-	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CTProcess addCTProcess(long userId, long ctCollectionId)
 		throws PortalException {
 
-		return addCTProcess(
-			userId, ctCollectionId, CTConstants.CT_COLLECTION_ID_PRODUCTION,
-			null);
-	}
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public CTProcess addCTProcess(
-			long userId, long fromCTCollectionId, long toCTCollectionId,
-			long[] ctEntryIds)
-		throws PortalException {
-
 		CTCollection ctCollection = _ctCollectionPersistence.findByPrimaryKey(
-			fromCTCollectionId);
+			ctCollectionId);
 
 		if (ctCollection.getStatus() == WorkflowConstants.STATUS_APPROVED) {
 			throw new IllegalStateException(
@@ -81,14 +66,12 @@ public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 					ctCollection);
 		}
 
-		if (toCTCollectionId == CTConstants.CT_COLLECTION_ID_PRODUCTION) {
-			ctCollection.setStatus(WorkflowConstants.STATUS_PENDING);
+		ctCollection.setStatus(WorkflowConstants.STATUS_PENDING);
 
-			ctCollection = _ctCollectionPersistence.update(ctCollection);
+		ctCollection = _ctCollectionPersistence.update(ctCollection);
 
-			_ctPreferencesLocalService.resetCTPreferences(
-				ctCollection.getCtCollectionId());
-		}
+		_ctPreferencesLocalService.resetCTPreferences(
+			ctCollection.getCtCollectionId());
 
 		long ctProcessId = counterLocalService.increment(
 			CTProcess.class.getName());
@@ -98,40 +81,26 @@ public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 		ctProcess.setCompanyId(ctCollection.getCompanyId());
 		ctProcess.setUserId(userId);
 		ctProcess.setCreateDate(new Date());
-		ctProcess.setCtCollectionId(fromCTCollectionId);
+		ctProcess.setCtCollectionId(ctCollectionId);
 
-		if (toCTCollectionId != CTConstants.CT_COLLECTION_ID_PRODUCTION) {
-			ctProcess.setType(CTConstants.CT_PROCESS_MOVE);
-		}
+		Company company = _companyLocalService.getCompany(
+			ctCollection.getCompanyId());
 
 		Map<String, Serializable> taskContextMap =
 			HashMapBuilder.<String, Serializable>put(
-				"ctEntryIds", ctEntryIds
+				"ctCollectionId", ctCollectionId
 			).put(
 				"ctProcessId", ctProcessId
-			).put(
-				"fromCTCollectionId", fromCTCollectionId
-			).put(
-				"toCTCollectionId", toCTCollectionId
 			).build();
 
 		try (SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
-
-			Company company = _companyLocalService.getCompany(
-				ctCollection.getCompanyId());
-
-			String name = String.valueOf(fromCTCollectionId);
-
-			if (toCTCollectionId != CTConstants.CT_COLLECTION_ID_PRODUCTION) {
-				name =
-					String.valueOf(fromCTCollectionId) + "_" +
-						String.valueOf(toCTCollectionId);
-			}
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			BackgroundTask backgroundTask =
 				_backgroundTaskLocalService.addBackgroundTask(
-					userId, company.getGroupId(), name, null,
+					userId, company.getGroupId(),
+					String.valueOf(ctCollectionId), null,
 					CTPublishBackgroundTaskExecutor.class, taskContextMap,
 					null);
 
@@ -141,7 +110,6 @@ public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 		return ctProcessPersistence.update(ctProcess);
 	}
 
-	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public CTProcess deleteCTProcess(CTProcess ctProcess) {
 		BackgroundTask backgroundTask =
@@ -154,7 +122,7 @@ public class CTProcessLocalServiceImpl extends CTProcessLocalServiceBaseImpl {
 					backgroundTask);
 			}
 			catch (PortalException portalException) {
-				_log.error(portalException);
+				_log.error(portalException, portalException);
 			}
 		}
 

@@ -24,21 +24,12 @@ import com.liferay.portal.kernel.model.BaseModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CPInstanceOptionValueRel.
  *
  * @author Marco Leo
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.product.model.impl.CPInstanceOptionValueRelImpl",
-		"table.name=CPInstanceOptionValueRel"
-	},
-	service = ArgumentsResolver.class
-)
 public class CPInstanceOptionValueRelModelArgumentsResolver
 	implements ArgumentsResolver {
 

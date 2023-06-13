@@ -17,7 +17,7 @@ package com.liferay.social.activities.web.internal.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.social.activities.constants.SocialActivitiesPortletKeys;
 import com.liferay.social.activities.web.internal.constants.SocialActivitiesWebKeys;
-import com.liferay.social.activities.web.internal.helper.SocialActivitiesQueryHelper;
+import com.liferay.social.activities.web.internal.util.SocialActivitiesQueryHelper;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SocialActivitiesPortletKeys.SOCIAL_ACTIVITIES,
 		"mvc.command.name=/"
@@ -50,7 +51,13 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		return "/view.jsp";
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setSocialActivitiesQueryHelper(
+		SocialActivitiesQueryHelper socialActivitiesQueryHelper) {
+
+		_socialActivitiesQueryHelper = socialActivitiesQueryHelper;
+	}
+
 	private SocialActivitiesQueryHelper _socialActivitiesQueryHelper;
 
 }

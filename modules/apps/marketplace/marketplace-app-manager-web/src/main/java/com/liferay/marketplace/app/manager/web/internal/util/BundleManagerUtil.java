@@ -15,30 +15,32 @@
 package com.liferay.marketplace.app.manager.web.internal.util;
 
 import com.liferay.marketplace.bundle.BundleManager;
-import com.liferay.osgi.util.service.Snapshot;
 
 import java.util.List;
 
 import org.osgi.framework.Bundle;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Matthew Tambara
  */
+@Component(immediate = true, service = {})
 public class BundleManagerUtil {
 
 	public static Bundle getBundle(String symbolicName, String version) {
-		BundleManager bundleManager = _bundleManagerSnapshot.get();
-
-		return bundleManager.getBundle(symbolicName, version);
+		return _bundleManager.getBundle(symbolicName, version);
 	}
 
 	public static List<Bundle> getBundles() {
-		BundleManager bundleManager = _bundleManagerSnapshot.get();
-
-		return bundleManager.getBundles();
+		return _bundleManager.getBundles();
 	}
 
-	private static final Snapshot<BundleManager> _bundleManagerSnapshot =
-		new Snapshot<>(BundleManagerUtil.class, BundleManager.class);
+	@Reference(unbind = "-")
+	protected void setBundleManger(BundleManager bundleManager) {
+		_bundleManager = bundleManager;
+	}
+
+	private static BundleManager _bundleManager;
 
 }

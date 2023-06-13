@@ -16,6 +16,7 @@ package com.liferay.portlet.announcements.model.impl;
 
 import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
 import com.liferay.announcements.kernel.model.AnnouncementsDeliveryModel;
+import com.liferay.announcements.kernel.model.AnnouncementsDeliverySoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringBundler;
@@ -34,15 +35,18 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -153,6 +157,60 @@ public class AnnouncementsDeliveryModelImpl
 	@Deprecated
 	public static final long DELIVERYID_COLUMN_BITMASK = 8L;
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AnnouncementsDelivery toModel(
+		AnnouncementsDeliverySoap soapModel) {
+
+		if (soapModel == null) {
+			return null;
+		}
+
+		AnnouncementsDelivery model = new AnnouncementsDeliveryImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setDeliveryId(soapModel.getDeliveryId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setType(soapModel.getType());
+		model.setEmail(soapModel.isEmail());
+		model.setSms(soapModel.isSms());
+		model.setWebsite(soapModel.isWebsite());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AnnouncementsDelivery> toModels(
+		AnnouncementsDeliverySoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AnnouncementsDelivery> models =
+			new ArrayList<AnnouncementsDelivery>(soapModels.length);
+
+		for (AnnouncementsDeliverySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.announcements.kernel.model.AnnouncementsDelivery"));
@@ -234,98 +292,108 @@ public class AnnouncementsDeliveryModelImpl
 	public Map<String, Function<AnnouncementsDelivery, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AnnouncementsDelivery, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AnnouncementsDelivery>
+		_getProxyProviderFunction() {
 
-		private static final Map
-			<String, Function<AnnouncementsDelivery, Object>>
-				_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AnnouncementsDelivery.class.getClassLoader(),
+			AnnouncementsDelivery.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<AnnouncementsDelivery, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<AnnouncementsDelivery, Object>>();
+		try {
+			Constructor<AnnouncementsDelivery> constructor =
+				(Constructor<AnnouncementsDelivery>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", AnnouncementsDelivery::getMvccVersion);
-			attributeGetterFunctions.put(
-				"deliveryId", AnnouncementsDelivery::getDeliveryId);
-			attributeGetterFunctions.put(
-				"companyId", AnnouncementsDelivery::getCompanyId);
-			attributeGetterFunctions.put(
-				"userId", AnnouncementsDelivery::getUserId);
-			attributeGetterFunctions.put(
-				"type", AnnouncementsDelivery::getType);
-			attributeGetterFunctions.put(
-				"email", AnnouncementsDelivery::getEmail);
-			attributeGetterFunctions.put("sms", AnnouncementsDelivery::getSms);
-			attributeGetterFunctions.put(
-				"website", AnnouncementsDelivery::getWebsite);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AnnouncementsDelivery, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AnnouncementsDelivery, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<AnnouncementsDelivery, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AnnouncementsDelivery, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<AnnouncementsDelivery, Object>>();
+		Map<String, BiConsumer<AnnouncementsDelivery, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<AnnouncementsDelivery, ?>>();
 
-		static {
-			Map<String, BiConsumer<AnnouncementsDelivery, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<AnnouncementsDelivery, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", AnnouncementsDelivery::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<AnnouncementsDelivery, Long>)
+				AnnouncementsDelivery::setMvccVersion);
+		attributeGetterFunctions.put(
+			"deliveryId", AnnouncementsDelivery::getDeliveryId);
+		attributeSetterBiConsumers.put(
+			"deliveryId",
+			(BiConsumer<AnnouncementsDelivery, Long>)
+				AnnouncementsDelivery::setDeliveryId);
+		attributeGetterFunctions.put(
+			"companyId", AnnouncementsDelivery::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AnnouncementsDelivery, Long>)
+				AnnouncementsDelivery::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", AnnouncementsDelivery::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<AnnouncementsDelivery, Long>)
+				AnnouncementsDelivery::setUserId);
+		attributeGetterFunctions.put("type", AnnouncementsDelivery::getType);
+		attributeSetterBiConsumers.put(
+			"type",
+			(BiConsumer<AnnouncementsDelivery, String>)
+				AnnouncementsDelivery::setType);
+		attributeGetterFunctions.put("email", AnnouncementsDelivery::getEmail);
+		attributeSetterBiConsumers.put(
+			"email",
+			(BiConsumer<AnnouncementsDelivery, Boolean>)
+				AnnouncementsDelivery::setEmail);
+		attributeGetterFunctions.put("sms", AnnouncementsDelivery::getSms);
+		attributeSetterBiConsumers.put(
+			"sms",
+			(BiConsumer<AnnouncementsDelivery, Boolean>)
+				AnnouncementsDelivery::setSms);
+		attributeGetterFunctions.put(
+			"website", AnnouncementsDelivery::getWebsite);
+		attributeSetterBiConsumers.put(
+			"website",
+			(BiConsumer<AnnouncementsDelivery, Boolean>)
+				AnnouncementsDelivery::setWebsite);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<AnnouncementsDelivery, Long>)
-					AnnouncementsDelivery::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"deliveryId",
-				(BiConsumer<AnnouncementsDelivery, Long>)
-					AnnouncementsDelivery::setDeliveryId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AnnouncementsDelivery, Long>)
-					AnnouncementsDelivery::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<AnnouncementsDelivery, Long>)
-					AnnouncementsDelivery::setUserId);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<AnnouncementsDelivery, String>)
-					AnnouncementsDelivery::setType);
-			attributeSetterBiConsumers.put(
-				"email",
-				(BiConsumer<AnnouncementsDelivery, Boolean>)
-					AnnouncementsDelivery::setEmail);
-			attributeSetterBiConsumers.put(
-				"sms",
-				(BiConsumer<AnnouncementsDelivery, Boolean>)
-					AnnouncementsDelivery::setSms);
-			attributeSetterBiConsumers.put(
-				"website",
-				(BiConsumer<AnnouncementsDelivery, Boolean>)
-					AnnouncementsDelivery::setWebsite);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -760,12 +828,42 @@ public class AnnouncementsDeliveryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AnnouncementsDelivery, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AnnouncementsDelivery, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AnnouncementsDelivery, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(
+				attributeGetterFunction.apply((AnnouncementsDelivery)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AnnouncementsDelivery>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AnnouncementsDelivery.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -782,8 +880,7 @@ public class AnnouncementsDeliveryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<AnnouncementsDelivery, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

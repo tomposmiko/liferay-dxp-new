@@ -16,12 +16,10 @@
 
 <%@ include file="/checkbox/init.jsp" %>
 
-<div class="form-group">
-	<div class="custom-checkbox custom-control">
-		<label>
-			<aui:input checked="<%= checked %>" cssClass="custom-control-input" data-qa-id="<%= name %>" disabled="<%= disabled %>" id="<%= id %>" ignoreRequestValue="<%= true %>" label="" name="<%= name %>" type="checkbox" wrappedField="<%= true %>" />
+<liferay-util:buffer
+	var="extendedLabel"
+>
+	<%@ include file="/checkbox/extended_label.jspf" %>
+</liferay-util:buffer>
 
-			<%@ include file="/checkbox/extended_label.jspf" %>
-		</label>
-	</div>
-</div>
+<aui:input checked="<%= checked %>" data-qa-id="<%= name %>" disabled="<%= disabled %>" id="<%= id %>" ignoreRequestValue="<%= true %>" label="<%= extendedLabel %>" name="<%= name %>" type="checkbox" />

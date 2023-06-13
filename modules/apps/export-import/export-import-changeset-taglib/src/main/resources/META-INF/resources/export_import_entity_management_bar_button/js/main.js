@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-export-import-management-bar-button',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const ExportImportManagementBarButton = A.Component.create({
+		var ExportImportManagementBarButton = A.Component.create({
 			ATTRS: {
 				actionNamespace: {
 					validator: Lang.isString(),
@@ -48,7 +48,7 @@ AUI.add(
 
 			prototype: {
 				_bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = [
 						Liferay.on(
@@ -60,31 +60,31 @@ AUI.add(
 				},
 
 				_exportImportEntity() {
-					const instance = this;
+					var instance = this;
 
-					const searchContainer = instance._searchContainer.plug(
+					var searchContainer = instance._searchContainer.plug(
 						A.Plugin.SearchContainerSelect
 					);
 
-					const selectedRows = searchContainer.select.getAllSelectedElements();
+					var selectedRows = searchContainer.select.getAllSelectedElements();
 
-					const namespace = instance.NS;
+					var namespace = instance.NS;
 
-					const searchContainerMapping = A.one(
+					var searchContainerMapping = A.one(
 						'#' +
 							namespace +
 							instance.get('searchContainerMappingId')
 					);
 
-					const form = document.getElementById('hrefFm');
+					var form = document.getElementById('hrefFm');
 
 					if (form) {
 						selectedRows._nodes.forEach((selectedElement) => {
-							const node = searchContainerMapping.one(
+							var node = searchContainerMapping.one(
 								'div[data-rowpk=' + selectedElement.value + ']'
 							);
 
-							const input = document.createElement('input');
+							var input = document.createElement('input');
 							input.setAttribute('type', 'hidden');
 							input.setAttribute(
 								'name',
@@ -108,17 +108,17 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					new A.EventHandle(instance._eventHandles).detach();
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const namespace = instance.NS;
+					var namespace = instance.NS;
 
-					const searchContainer = Liferay.SearchContainer.get(
+					var searchContainer = Liferay.SearchContainer.get(
 						namespace + instance.get('searchContainerId')
 					);
 

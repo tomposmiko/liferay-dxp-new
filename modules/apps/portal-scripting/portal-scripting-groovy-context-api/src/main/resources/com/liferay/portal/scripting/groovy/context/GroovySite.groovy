@@ -86,7 +86,7 @@ class GroovySite {
 		}
 		catch (NoSuchTeamException nste) {
 			team = TeamLocalServiceUtil.addTeam(
-				groovyScriptingContext.guestUserId, group.getGroupId(),
+				groovyScriptingContext.defaultUserId, group.getGroupId(),
 				teamName, null);
 		}
 
@@ -112,7 +112,7 @@ class GroovySite {
 		}
 		catch (NoSuchTeamException nste) {
 			team = TeamLocalServiceUtil.addTeam(
-				groovyScriptingContext.guestUserId, group.getGroupId(),
+				groovyScriptingContext.defaultUserId, group.getGroupId(),
 				teamName, null);
 		}
 
@@ -135,7 +135,7 @@ class GroovySite {
 		}
 
 		group = GroupLocalServiceUtil.addGroup(
-			groovyScriptingContext.guestUserId,
+			groovyScriptingContext.defaultUserId,
 			GroupConstants.DEFAULT_PARENT_GROUP_ID, null, 0, 0, name,
 			description, type, true,
 			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, true, true,

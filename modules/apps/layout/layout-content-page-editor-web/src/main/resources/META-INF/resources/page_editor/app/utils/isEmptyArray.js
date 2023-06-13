@@ -13,5 +13,5 @@
  */
 
 export default function isEmptyArray(array) {
-	return Array.isArray(array) && !array.length;
+	return Array.isArray(array) && array.length === 0;
 }

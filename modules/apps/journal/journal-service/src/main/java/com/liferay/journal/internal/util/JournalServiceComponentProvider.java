@@ -15,21 +15,16 @@
 package com.liferay.journal.internal.util;
 
 import com.liferay.journal.configuration.JournalGroupServiceConfiguration;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-
-import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Juergen Kappler
  */
-@Component(
-	configurationPid = "com.liferay.journal.configuration.JournalGroupServiceConfiguration",
-	service = {}
-)
+@Component(immediate = true, service = {})
 public class JournalServiceComponentProvider {
 
 	public static JournalServiceComponentProvider
@@ -44,11 +39,15 @@ public class JournalServiceComponentProvider {
 		return _journalGroupServiceConfiguration;
 	}
 
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_journalGroupServiceConfiguration = ConfigurableUtil.createConfigurable(
-			JournalGroupServiceConfiguration.class, properties);
+	@Reference
+	public void setJournalGroupServiceConfiguration(
+		JournalGroupServiceConfiguration journalGroupServiceConfiguration) {
 
+		_journalGroupServiceConfiguration = journalGroupServiceConfiguration;
+	}
+
+	@Activate
+	protected void activate() {
 		_journalServiceComponentProvider = this;
 	}
 

@@ -14,14 +14,13 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
-import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.rest.openapi.v1_0.ObjectEntryOpenAPIResource;
-import com.liferay.object.rest.openapi.v1_0.ObjectEntryOpenAPIResourceProvider;
+import com.liferay.portal.vulcan.openapi.OpenAPISchemaFilter;
+import com.liferay.portal.vulcan.resource.OpenAPIResource;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -39,10 +38,13 @@ import javax.ws.rs.core.UriInfo;
 public class OpenAPIResourceImpl {
 
 	public OpenAPIResourceImpl(
-		ObjectEntryOpenAPIResourceProvider objectEntryOpenAPIResourceProvider) {
+		OpenAPIResource openAPIResource,
+		OpenAPISchemaFilter openAPISchemaFilter,
+		Set<Class<?>> resourceClasses) {
 
-		_objectEntryOpenAPIResourceProvider =
-			objectEntryOpenAPIResourceProvider;
+		_openAPIResource = openAPIResource;
+		_openAPISchemaFilter = openAPISchemaFilter;
+		_resourceClasses = resourceClasses;
 	}
 
 	@GET
@@ -51,22 +53,13 @@ public class OpenAPIResourceImpl {
 	public Response getOpenAPI(@PathParam("type") String type)
 		throws Exception {
 
-		ObjectEntryOpenAPIResource objectEntryOpenAPIResource =
-			_objectEntryOpenAPIResourceProvider.getObjectEntryOpenAPIResource(
-				_objectDefinition);
-
-		return objectEntryOpenAPIResource.getOpenAPI(
-			_httpServletRequest, type, _uriInfo);
+		return _openAPIResource.getOpenAPI(
+			_openAPISchemaFilter, _resourceClasses, type, _uriInfo);
 	}
 
-	@Context
-	private HttpServletRequest _httpServletRequest;
-
-	@Context
-	private ObjectDefinition _objectDefinition;
-
-	private final ObjectEntryOpenAPIResourceProvider
-		_objectEntryOpenAPIResourceProvider;
+	private final OpenAPIResource _openAPIResource;
+	private final OpenAPISchemaFilter _openAPISchemaFilter;
+	private final Set<Class<?>> _resourceClasses;
 
 	@Context
 	private UriInfo _uriInfo;

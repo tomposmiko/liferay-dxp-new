@@ -85,6 +85,5 @@ const parseSchema = (props, schema) =>
  * schema otherwise nothing is done. It should not be used directly, it
  * is exposed through `useFormState`.
  */
-export function useDataView(props, schema) {
-	return schema ? parseSchema(props, schema) : props;
-}
+export const useDataView = (props, schema) =>
+	schema ? parseSchema(props, schema) : props;

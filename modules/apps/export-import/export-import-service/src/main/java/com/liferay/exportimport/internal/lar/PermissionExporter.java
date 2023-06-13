@@ -122,15 +122,12 @@ public class PermissionExporter {
 
 		Element permissionsElement = portletElement.addElement("permissions");
 
-		_exportPermissions(
+		exportPermissions(
 			portletDataContext, resourceName, resourcePrimKey,
 			permissionsElement);
 	}
 
-	private PermissionExporter() {
-	}
-
-	private void _exportPermissions(
+	protected void exportPermissions(
 			PortletDataContext portletDataContext, String resourceName,
 			String resourcePrimKey, Element permissionsElement)
 		throws Exception {
@@ -160,7 +157,7 @@ public class PermissionExporter {
 					// LPS-52675
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(portalException);
+						_log.debug(portalException, portalException);
 					}
 				}
 			}
@@ -182,6 +179,9 @@ public class PermissionExporter {
 				actionKeyElement.addText(actionId);
 			}
 		}
+	}
+
+	private PermissionExporter() {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

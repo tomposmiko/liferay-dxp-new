@@ -14,15 +14,14 @@
 
 import {ClayButtonWithIcon} from '@clayui/button';
 import ClayForm, {ClayInput} from '@clayui/form';
-import {sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import {VIEWPORT_SIZES} from '../../app/config/constants/viewportSizes';
 import {useSelector} from '../../app/contexts/StoreContext';
 import {selectPageContents} from '../../app/selectors/selectPageContents';
-import {useId} from '../hooks/useId';
-import {openImageSelector} from '../openImageSelector';
+import {useId} from '../../app/utils/useId';
+import {openImageSelector} from '../../core/openImageSelector';
 
 export function ImageSelector({
 	fileEntryId,
@@ -45,13 +44,6 @@ export function ImageSelector({
 
 	const hasImageTitle = !!imageTitle.length;
 
-	const selectButtonLabel = sub(
-		hasImageTitle
-			? Liferay.Language.get('change-x')
-			: Liferay.Language.get('select-x'),
-		Liferay.Language.get('image')
-	);
-
 	return selectedViewportSize === VIEWPORT_SIZES.desktop ? (
 		<>
 			<ClayForm.Group>
@@ -73,32 +65,31 @@ export function ImageSelector({
 							value={selectedImageTitle}
 						/>
 					</ClayInput.GroupItem>
-
 					<ClayInput.GroupItem shrink>
 						<ClayButtonWithIcon
-							aria-label={selectButtonLabel}
 							displayType="secondary"
 							onClick={() =>
 								openImageSelector((image) => {
 									onImageSelected(image);
 								})
 							}
-							size="sm"
+							small
 							symbol={hasImageTitle ? 'change' : 'plus'}
-							title={selectButtonLabel}
+							title={Liferay.Util.sub(
+								hasImageTitle
+									? Liferay.Language.get('change-x')
+									: Liferay.Language.get('select-x'),
+								Liferay.Language.get('image')
+							)}
 						/>
 					</ClayInput.GroupItem>
-
 					{hasImageTitle && (
 						<>
 							<ClayInput.GroupItem shrink>
 								<ClayButtonWithIcon
-									aria-label={Liferay.Language.get(
-										'clear-selection'
-									)}
 									displayType="secondary"
 									onClick={onClearButtonPressed}
-									size="sm"
+									small
 									symbol="times-circle"
 									title={Liferay.Language.get(
 										'clear-selection'

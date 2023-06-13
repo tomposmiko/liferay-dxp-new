@@ -69,131 +69,119 @@ else {
 	<aui:input name="definitionId" type="hidden" />
 
 	<c:if test="<%= definition != null %>">
-		<div class="management-bar management-bar-light navbar navbar-expand-md">
-			<clay:container-fluid>
-				<ul class="m-auto navbar-nav"></ul>
+		<liferay-frontend:info-bar>
+			<span class="text-muted">
+				<span class="definition-id-label"><liferay-ui:message key="id" />:</span>
 
-				<ul class="middle navbar-nav">
-					<li class="nav-item">
-						<span class="text-muted">
-							<span class="definition-id-label"><liferay-ui:message key="id" />:</span>
-
-							<span class="definition-id-value"><%= definition.getDefinitionId() %></span>
-						</span>
-					</li>
-				</ul>
-
-				<ul class="end m-auto navbar-nav"></ul>
-			</clay:container-fluid>
-		</div>
+				<span class="definition-id-value"><%= definition.getDefinitionId() %></span>
+			</span>
+		</liferay-frontend:info-bar>
 	</c:if>
 
-	<div class="sheet">
-		<div class="panel-group panel-group-flush">
-			<aui:fieldset>
-				<aui:input label="definition-name" name="name" />
+	<aui:fieldset-group markupView="lexicon">
+		<aui:fieldset>
+			<aui:input label="definition-name" name="name" />
 
-				<aui:input name="description" />
+			<aui:input name="description" />
 
-				<aui:select label="data-source-name" name="sourceId">
-					<aui:option label="<%= ReportDataSourceType.PORTAL.getValue() %>" selected="<%= sourceId == 0 %>" value="<%= 0 %>" />
+			<aui:select label="data-source-name" name="sourceId">
+				<aui:option label="<%= ReportDataSourceType.PORTAL.getValue() %>" selected="<%= sourceId == 0 %>" value="<%= 0 %>" />
+
+				<%
+				for (Source source : SourceServiceUtil.getSources(themeDisplay.getSiteGroupId(), null, null, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+				%>
+
+					<aui:option label="<%= HtmlUtil.escape(source.getName(locale)) %>" selected="<%= sourceId == source.getSourceId() %>" value="<%= source.getSourceId() %>" />
+
+				<%
+				}
+				%>
+
+			</aui:select>
+
+			<aui:field-wrapper>
+				<aui:input cssClass="template-report" name="templateReport" style='<%= Validator.isNull(reportName) ? "display: block;" : "display: none;" %>' type="file" />
+
+				<span class="existing-report" style="<%= Validator.isNull(reportName) ? "display: none;" : "display: block;" %>">
+					<%= HtmlUtil.escape(reportName) %>
+
+					<img class="remove-existing-report" src="<%= themeDisplay.getPathThemeImages() %>/arrows/02_x.png" />
+
+					<aui:input name="reportName" type="hidden" value="<%= reportName %>" />
+				</span>
+
+				<aui:button cssClass="cancel-update-template-report" style="display: none;" value="cancel" />
+			</aui:field-wrapper>
+		</aui:fieldset>
+
+		<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="report-parameters">
+			<aui:input cssClass="report-parameters" name="reportParameters" type="hidden" />
+
+			<clay:row>
+				<clay:col
+					md="4"
+				>
+					<aui:input cssClass="parameters-key" name="key" size="20" type="text" />
+				</clay:col>
+
+				<clay:col
+					md="4"
+				>
 
 					<%
-					for (Source source : SourceServiceUtil.getSources(themeDisplay.getSiteGroupId(), null, null, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+					Calendar calendar = CalendarFactoryUtil.getCalendar(timeZone, locale);
 					%>
 
-						<aui:option label="<%= HtmlUtil.escape(source.getName(locale)) %>" selected="<%= sourceId == source.getSourceId() %>" value="<%= source.getSourceId() %>" />
+					<aui:field-wrapper>
+						<aui:input cssClass="parameters-value parameters-value-field-set" name="value" size="20" type="text" />
 
-					<%
-					}
-					%>
+						<liferay-ui:input-date
+							cssClass="parameters-input-date"
+							dayParam="parameterDateDay"
+							dayValue="<%= calendar.get(Calendar.DATE) %>"
+							disabled="<%= false %>"
+							firstDayOfWeek="<%= calendar.getFirstDayOfWeek() - 1 %>"
+							monthParam="parameterDateMonth"
+							monthValue="<%= calendar.get(Calendar.MONTH) %>"
+							yearParam="parameterDateYear"
+							yearValue="<%= calendar.get(Calendar.YEAR) %>"
+						/>
+					</aui:field-wrapper>
+				</clay:col>
 
-				</aui:select>
+				<clay:col
+					md="2"
+				>
+					<aui:select cssClass="parameters-input-type" label="type" name="type">
+						<aui:option label="text" value="text" />
+						<aui:option label="date" value="date" />
+					</aui:select>
+				</clay:col>
 
-				<aui:field-wrapper>
-					<aui:input cssClass="template-report" name="templateReport" style='<%= Validator.isNull(reportName) ? "display: block;" : "display: none;" %>' type="file" />
+				<clay:col
+					md="2"
+				>
+					<aui:button-row cssClass="add-parameter">
+						<aui:button value="add-parameter" />
+					</aui:button-row>
+				</clay:col>
+			</clay:row>
 
-					<span class="existing-report" style="<%= Validator.isNull(reportName) ? "display: none;" : "display: block;" %>">
-						<%= HtmlUtil.escape(reportName) %>
+			<aui:field-wrapper>
+				<clay:col>
+					<div class="report-tags"></div>
+				</clay:col>
+			</aui:field-wrapper>
+		</aui:fieldset>
 
-						<img class="remove-existing-report" src="<%= themeDisplay.getPathThemeImages() %>/arrows/02_x.png" />
-
-						<aui:input name="reportName" type="hidden" value="<%= reportName %>" />
-					</span>
-
-					<aui:button cssClass="cancel-update-template-report" style="display: none;" value="cancel" />
-				</aui:field-wrapper>
+		<c:if test="<%= definition == null %>">
+			<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
+				<liferay-ui:input-permissions
+					modelName="<%= Definition.class.getName() %>"
+				/>
 			</aui:fieldset>
-
-			<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="report-parameters">
-				<aui:input cssClass="report-parameters" name="reportParameters" type="hidden" />
-
-				<clay:row>
-					<clay:col
-						md="4"
-					>
-						<aui:input cssClass="parameters-key" name="key" size="20" type="text" />
-					</clay:col>
-
-					<clay:col
-						md="4"
-					>
-
-						<%
-						Calendar calendar = CalendarFactoryUtil.getCalendar(timeZone, locale);
-						%>
-
-						<aui:field-wrapper>
-							<aui:input cssClass="parameters-value parameters-value-field-set" name="value" size="20" type="text" />
-
-							<liferay-ui:input-date
-								cssClass="parameters-input-date"
-								dayParam="parameterDateDay"
-								dayValue="<%= calendar.get(Calendar.DATE) %>"
-								disabled="<%= false %>"
-								firstDayOfWeek="<%= calendar.getFirstDayOfWeek() - 1 %>"
-								monthParam="parameterDateMonth"
-								monthValue="<%= calendar.get(Calendar.MONTH) %>"
-								yearParam="parameterDateYear"
-								yearValue="<%= calendar.get(Calendar.YEAR) %>"
-							/>
-						</aui:field-wrapper>
-					</clay:col>
-
-					<clay:col
-						md="2"
-					>
-						<aui:select cssClass="parameters-input-type" label="type" name="type">
-							<aui:option label="text" value="text" />
-							<aui:option label="date" value="date" />
-						</aui:select>
-					</clay:col>
-
-					<clay:col
-						md="2"
-					>
-						<aui:button-row cssClass="add-parameter">
-							<aui:button value="add-parameter" />
-						</aui:button-row>
-					</clay:col>
-				</clay:row>
-
-				<aui:field-wrapper>
-					<clay:col>
-						<div class="report-tags"></div>
-					</clay:col>
-				</aui:field-wrapper>
-			</aui:fieldset>
-
-			<c:if test="<%= definition == null %>">
-				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="permissions">
-					<liferay-ui:input-permissions
-						modelName="<%= Definition.class.getName() %>"
-					/>
-				</aui:fieldset>
-			</c:if>
-		</div>
-	</div>
+		</c:if>
+	</aui:fieldset-group>
 
 	<aui:button-row>
 		<portlet:renderURL var="viewURL">
@@ -217,7 +205,7 @@ else {
 	</aui:button-row>
 </aui:form>
 
-<aui:script>
+<script type="text/javascript">
 	AUI().ready((A) => {
 		Liferay.Report.initialize({
 			namespace: '<portlet:namespace />',
@@ -241,17 +229,15 @@ else {
 	}
 
 	function <portlet:namespace />deleteDefinition() {
-		Liferay.Util.openConfirmModal({
-			message:
-				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>',
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(
-						document.<portlet:namespace />fm,
-						'<portlet:actionURL name="/reports_admin/delete_definition"><portlet:param name="redirect" value="<%= definitionsURL %>" /></portlet:actionURL>'
-					);
-				}
-			},
-		});
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			submitForm(
+				document.<portlet:namespace />fm,
+				'<portlet:actionURL name="/reports_admin/delete_definition"><portlet:param name="redirect" value="<%= definitionsURL %>" /></portlet:actionURL>'
+			);
+		}
 	}
-</aui:script>
+</script>

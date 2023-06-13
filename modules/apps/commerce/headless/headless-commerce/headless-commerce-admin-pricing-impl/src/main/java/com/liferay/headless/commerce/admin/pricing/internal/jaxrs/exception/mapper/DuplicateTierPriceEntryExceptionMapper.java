@@ -28,10 +28,11 @@ import org.osgi.service.component.annotations.Component;
  * @author Zoltán Takács
  */
 @Component(
+	enabled = false,
 	property = {
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Pricing)",
 		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Pricing.DuplicateTierPriceEntryExceptionMapper"
+		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Pricing.DuplicateTierPriceEntryException"
 	},
 	service = ExceptionMapper.class
 )

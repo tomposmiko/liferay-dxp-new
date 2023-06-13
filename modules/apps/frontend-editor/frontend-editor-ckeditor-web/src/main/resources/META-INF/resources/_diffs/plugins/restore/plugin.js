@@ -13,7 +13,7 @@
  */
 
 (function () {
-	const pluginName = 'restore';
+	var pluginName = 'restore';
 
 	CKEDITOR.plugins.add(pluginName, {
 		init(editor) {

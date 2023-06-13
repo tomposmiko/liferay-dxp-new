@@ -14,16 +14,17 @@
 
 package com.liferay.segments.experiment.web.internal.servlet.taglib;
 
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.taglib.BaseJSPDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
+import com.liferay.segments.constants.SegmentsWebKeys;
 import com.liferay.segments.experiment.web.internal.constants.SegmentsExperimentWebKeys;
-import com.liferay.segments.manager.SegmentsExperienceManager;
+import com.liferay.segments.experiment.web.internal.util.SegmentsExperimentUtil;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 
@@ -39,14 +40,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eduardo García
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class SegmentsExperimentAnalyticsTopHeadJSPDynamicInclude
 	extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void include(
@@ -58,27 +54,20 @@ public class SegmentsExperimentAnalyticsTopHeadJSPDynamicInclude
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		try {
-			if (!_analyticsSettingsManager.isSiteIdSynced(
-					themeDisplay.getCompanyId(),
-					themeDisplay.getScopeGroupId())) {
+		if (!SegmentsExperimentUtil.isAnalyticsSynced(
+				themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId())) {
 
-				return;
-			}
-		}
-		catch (Exception exception) {
-			throw new IOException(exception);
+			return;
 		}
 
-		SegmentsExperienceManager segmentsExperienceManager =
-			new SegmentsExperienceManager(_segmentsExperienceLocalService);
+		long[] segmentsExperienceIds = GetterUtil.getLongValues(
+			httpServletRequest.getAttribute(
+				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS));
 
 		httpServletRequest.setAttribute(
 			SegmentsExperimentWebKeys.
 				SEGMENTS_EXPERIMENT_SEGMENTS_EXPERIENCE_KEY,
-			_getSegmentsExperienceKey(
-				segmentsExperienceManager.getSegmentsExperienceId(
-					httpServletRequest)));
+			_getSegmentsExperienceKey(segmentsExperienceIds));
 
 		super.include(httpServletRequest, httpServletResponse, key);
 	}
@@ -99,13 +88,24 @@ public class SegmentsExperimentAnalyticsTopHeadJSPDynamicInclude
 		return _log;
 	}
 
-	private String _getSegmentsExperienceKey(long segmentsExperienceId) {
-		SegmentsExperience segmentsExperience =
-			_segmentsExperienceLocalService.fetchSegmentsExperience(
-				segmentsExperienceId);
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.segments.experiment.web)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
 
-		if (segmentsExperience != null) {
-			return segmentsExperience.getSegmentsExperienceKey();
+	private String _getSegmentsExperienceKey(long[] segmentsExperienceIds) {
+		if (segmentsExperienceIds.length > 0) {
+			SegmentsExperience segmentsExperience =
+				_segmentsExperienceLocalService.fetchSegmentsExperience(
+					segmentsExperienceIds[0]);
+
+			if (segmentsExperience != null) {
+				return segmentsExperience.getSegmentsExperienceKey();
+			}
 		}
 
 		return SegmentsExperienceConstants.KEY_DEFAULT;
@@ -115,14 +115,6 @@ public class SegmentsExperimentAnalyticsTopHeadJSPDynamicInclude
 		SegmentsExperimentAnalyticsTopHeadJSPDynamicInclude.class);
 
 	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
-
-	@Reference
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.segments.experiment.web)"
-	)
-	private ServletContext _servletContext;
 
 }

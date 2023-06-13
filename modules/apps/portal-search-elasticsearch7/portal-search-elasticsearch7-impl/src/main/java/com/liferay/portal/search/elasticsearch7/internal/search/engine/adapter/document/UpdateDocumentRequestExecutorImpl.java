@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = UpdateDocumentRequestExecutor.class)
+@Component(immediate = true, service = UpdateDocumentRequestExecutor.class)
 public class UpdateDocumentRequestExecutorImpl
 	implements UpdateDocumentRequestExecutor {
 
@@ -44,7 +44,7 @@ public class UpdateDocumentRequestExecutorImpl
 			_elasticsearchBulkableDocumentRequestTranslator.translate(
 				updateDocumentRequest);
 
-		UpdateResponse updateResponse = _getUpdateResponse(
+		UpdateResponse updateResponse = getUpdateResponse(
 			updateRequest, updateDocumentRequest);
 
 		RestStatus restStatus = updateResponse.status();
@@ -52,7 +52,7 @@ public class UpdateDocumentRequestExecutorImpl
 		return new UpdateDocumentResponse(restStatus.getStatus());
 	}
 
-	private UpdateResponse _getUpdateResponse(
+	protected UpdateResponse getUpdateResponse(
 		UpdateRequest updateRequest,
 		UpdateDocumentRequest updateDocumentRequest) {
 
@@ -70,11 +70,24 @@ public class UpdateDocumentRequestExecutorImpl
 		}
 	}
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)")
+	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
+	protected void setBulkableDocumentRequestTranslator(
+		ElasticsearchBulkableDocumentRequestTranslator
+			elasticsearchBulkableDocumentRequestTranslator) {
+
+		_elasticsearchBulkableDocumentRequestTranslator =
+			elasticsearchBulkableDocumentRequestTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ElasticsearchBulkableDocumentRequestTranslator
 		_elasticsearchBulkableDocumentRequestTranslator;
-
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

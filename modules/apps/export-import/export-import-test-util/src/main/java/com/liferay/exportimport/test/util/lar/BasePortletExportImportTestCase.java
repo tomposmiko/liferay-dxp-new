@@ -18,8 +18,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
-import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
+import com.liferay.dynamic.data.mapping.kernel.DDMTemplate;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
@@ -58,6 +57,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portlet.dynamicdatamapping.util.test.DDMTemplateTestUtil;
 
 import java.io.Serializable;
 
@@ -427,7 +427,7 @@ public abstract class BasePortletExportImportTestCase
 			larFile = ExportImportLocalServiceUtil.exportPortletInfoAsFile(
 				exportImportConfiguration);
 
-			importedLayout = LayoutTestUtil.addTypePortletLayout(importedGroup);
+			importedLayout = LayoutTestUtil.addLayout(importedGroup);
 
 			MapUtil.merge(getImportParameterMap(), importParameterMap);
 
@@ -510,7 +510,7 @@ public abstract class BasePortletExportImportTestCase
 				buildFullPublishParameterMap();
 
 		if (importedLayout == null) {
-			importedLayout = LayoutTestUtil.addTypePortletLayout(importedGroup);
+			importedLayout = LayoutTestUtil.addLayout(importedGroup);
 		}
 
 		Map<String, Serializable> settingsMap =
@@ -565,7 +565,7 @@ public abstract class BasePortletExportImportTestCase
 		}
 		catch (LocaleException localeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(localeException);
+				_log.debug(localeException, localeException);
 			}
 
 			Assert.assertTrue(expectFailure);

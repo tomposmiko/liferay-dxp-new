@@ -1,14 +1,13 @@
-@default = "mouseDown"
-definition {
+<definition default="mouseDown">
+	<command name="javaScriptMouseDown">
+		<execute selenium="javaScriptMouseDown" />
+	</command>
 
-	function mouseDown {
-		selenium.mouseDown();
-	}
+	<command name="mouseDown">
+		<execute selenium="mouseDown" />
+	</command>
 
-	function mouseDownAt {
-		selenium.waitForVisible();
-
-		selenium.mouseDownAt("${locator1}", "${value1}");
-	}
-
-}
+	<command name="mouseDownAt">
+		<execute selenium="mouseDownAt" />
+	</command>
+</definition>

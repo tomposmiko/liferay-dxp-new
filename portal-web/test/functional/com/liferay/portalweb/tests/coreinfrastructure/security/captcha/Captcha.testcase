@@ -1,7 +1,6 @@
 @component-name = "portal-security"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "CAPTCHA";
@@ -13,21 +12,20 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			User.firstLoginPG();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
-	@description = "This is a use case for LRQA-29540. Verify CAPTCHA is enabled when creating an account."
-	@priority = 4
-	test AssertCaptchaEnabled {
+	@description = "This is a use case for LRQA-29540."
+	@priority = "4"
+	test ViewCaptchaEnabled {
 		property captcha.enabled = "true";
-		property portal.acceptance = "true";
 
 		task ("View captcha") {
 			SignInNavigator.gotoCreateAccount();
@@ -36,13 +34,12 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-84310. Verify reCAPTCHA is enabled in account creation after deploying a CAPTCHA OSGi config file."
-	@priority = 4
-	test AssertRecaptchaEnabled {
+	@description = "This is a use case for LPS-84310. This test will deploy an OSGI configuration file."
+	@priority = "4"
+	test ViewRecaptchaEnabled {
 		property captcha.enabled = "true";
 		property osgi.module.configuration.file.names = "com.liferay.captcha.configuration.CaptchaConfiguration.config";
-		property osgi.module.configurations = "maxChallenges=\"0\"";
-		property portal.acceptance = "true";
+		property osgi.module.configurations = "maxChallenges=&quot;0&quot;";
 		property test.name.skip.portal.instance = "Captcha#ViewRecaptchaEnabled";
 
 		var recaptchaPrivateKey = PropsUtil.get("recaptcha.private.key");
@@ -51,7 +48,10 @@ definition {
 		task ("go to reCAPTCHA setting") {
 			User.firstLoginPG();
 
-			SystemSettings.openSystemSettingsAdmin();
+			ApplicationsMenu.gotoPortlet(
+				category = "Configuration",
+				panel = "Control Panel",
+				portlet = "System Settings");
 
 			SystemSettings.gotoConfiguration(
 				configurationCategory = "Security Tools",
@@ -66,13 +66,13 @@ definition {
 		task ("Edit reCAPTCHA private key") {
 			SystemSettings.editTextAreaSetting(
 				settingName = "reCAPTCHA Private Key",
-				settingValue = ${recaptchaPrivateKey});
+				settingValue = "${recaptchaPrivateKey}");
 		}
 
 		task ("Edit reCAPTCHA public key and save configuration") {
 			SystemSettings.editTextAreaSetting(
 				settingName = "reCAPTCHA Public Key",
-				settingValue = ${recaptchaPublicKey});
+				settingValue = "${recaptchaPublicKey}");
 
 			SystemSettings.saveConfiguration();
 		}

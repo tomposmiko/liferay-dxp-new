@@ -29,7 +29,6 @@ import com.liferay.headless.commerce.admin.pricing.client.pagination.Pagination;
 import com.liferay.headless.commerce.admin.pricing.client.resource.v2_0.DiscountOrderTypeResource;
 import com.liferay.headless.commerce.admin.pricing.client.serdes.v2_0.DiscountOrderTypeSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -52,7 +51,7 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -61,16 +60,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -242,10 +243,7 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDiscountOrderType),
 				(List<DiscountOrderType>)page.getItems());
-			assertValid(
-				page,
-				testGetDiscountByExternalReferenceCodeDiscountOrderTypesPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
+			assertValid(page);
 		}
 
 		DiscountOrderType discountOrderType1 =
@@ -266,20 +264,7 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(discountOrderType1, discountOrderType2),
 			(List<DiscountOrderType>)page.getItems());
-		assertValid(
-			page,
-			testGetDiscountByExternalReferenceCodeDiscountOrderTypesPage_getExpectedActions(
-				externalReferenceCode));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDiscountByExternalReferenceCodeDiscountOrderTypesPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -410,10 +395,7 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDiscountOrderType),
 				(List<DiscountOrderType>)page.getItems());
-			assertValid(
-				page,
-				testGetDiscountIdDiscountOrderTypesPage_getExpectedActions(
-					irrelevantId));
+			assertValid(page);
 		}
 
 		DiscountOrderType discountOrderType1 =
@@ -432,18 +414,7 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(discountOrderType1, discountOrderType2),
 			(List<DiscountOrderType>)page.getItems());
-		assertValid(
-			page,
-			testGetDiscountIdDiscountOrderTypesPage_getExpectedActions(id));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDiscountIdDiscountOrderTypesPage_getExpectedActions(Long id)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -470,41 +441,6 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 				discountOrderTypeResource.getDiscountIdDiscountOrderTypesPage(
 					id, null,
 					getFilterString(entityField, "between", discountOrderType1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(discountOrderType1),
-				(List<DiscountOrderType>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetDiscountIdDiscountOrderTypesPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long id = testGetDiscountIdDiscountOrderTypesPage_getId();
-
-		DiscountOrderType discountOrderType1 =
-			testGetDiscountIdDiscountOrderTypesPage_addDiscountOrderType(
-				id, randomDiscountOrderType());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		DiscountOrderType discountOrderType2 =
-			testGetDiscountIdDiscountOrderTypesPage_addDiscountOrderType(
-				id, randomDiscountOrderType());
-
-		for (EntityField entityField : entityFields) {
-			Page<DiscountOrderType> page =
-				discountOrderTypeResource.getDiscountIdDiscountOrderTypesPage(
-					id, null,
-					getFilterString(entityField, "eq", discountOrderType1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -605,23 +541,9 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 		testGetDiscountIdDiscountOrderTypesPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, discountOrderType1, discountOrderType2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					discountOrderType1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetDiscountIdDiscountOrderTypesPageWithSortDouble()
-		throws Exception {
-
-		testGetDiscountIdDiscountOrderTypesPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, discountOrderType1, discountOrderType2) -> {
-				BeanTestUtil.setProperty(
-					discountOrderType1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					discountOrderType2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -632,9 +554,9 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 		testGetDiscountIdDiscountOrderTypesPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, discountOrderType1, discountOrderType2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					discountOrderType1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					discountOrderType2, entityField.getName(), 1);
 			});
 	}
@@ -650,27 +572,27 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountOrderType1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountOrderType2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountOrderType1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountOrderType2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -678,12 +600,12 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountOrderType1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountOrderType2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -958,13 +880,6 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 	}
 
 	protected void assertValid(Page<DiscountOrderType> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<DiscountOrderType> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<DiscountOrderType> discountOrderTypes =
@@ -980,20 +895,6 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1200,16 +1101,14 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1226,10 +1125,6 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1239,18 +1134,18 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1313,9 +1208,8 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 		}
 
 		if (entityFieldName.equals("priority")) {
-			sb.append(String.valueOf(discountOrderType.getPriority()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		throw new IllegalArgumentException(
@@ -1394,115 +1288,6 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1577,6 +1362,18 @@ public abstract class BaseDiscountOrderTypeResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseDiscountOrderTypeResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

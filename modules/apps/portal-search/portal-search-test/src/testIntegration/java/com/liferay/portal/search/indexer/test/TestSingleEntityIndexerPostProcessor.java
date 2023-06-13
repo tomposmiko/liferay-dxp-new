@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Gregory Amerson
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.Contact",
 	service = IndexerPostProcessor.class
 )

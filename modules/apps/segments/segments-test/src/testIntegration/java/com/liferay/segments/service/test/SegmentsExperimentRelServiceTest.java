@@ -79,7 +79,7 @@ public class SegmentsExperimentRelServiceTest {
 
 		_user = UserTestUtil.addGroupUser(_group, _role.getName());
 
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		_classNameId = _classNameLocalService.getClassNameId(Layout.class);
 
@@ -118,10 +118,12 @@ public class SegmentsExperimentRelServiceTest {
 	}
 
 	private SegmentsExperience _addSegmentsExperience() throws Exception {
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		long classNameId = _classNameLocalService.getClassNameId(
+			Layout.class.getName());
+		Layout layout = LayoutTestUtil.addLayout(_group);
 
 		return SegmentsTestUtil.addSegmentsExperience(
-			_group.getGroupId(), layout.getPlid());
+			_group.getGroupId(), classNameId, layout.getPlid());
 	}
 
 	private SegmentsExperiment _addSegmentsExperiment() throws Exception {
@@ -136,8 +138,8 @@ public class SegmentsExperimentRelServiceTest {
 
 		return SegmentsTestUtil.addSegmentsExperiment(
 			_group.getGroupId(), segmentsExperience.getSegmentsExperienceId(),
-			_classNameLocalService.getClassNameId(Layout.class.getName()),
-			segmentsExperience.getPlid());
+			segmentsExperience.getClassNameId(),
+			segmentsExperience.getClassPK());
 	}
 
 	private SegmentsExperimentRel _addSegmentsExperimentRel(

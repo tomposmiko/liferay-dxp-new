@@ -23,6 +23,8 @@ import com.liferay.portal.search.batch.BatchIndexingHelper;
 import com.liferay.portal.search.configuration.ReindexConfiguration;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -34,24 +36,25 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.configuration.ReindexConfiguration",
-	service = BatchIndexingHelper.class
+	immediate = true, service = BatchIndexingHelper.class
 )
 public class BatchIndexingHelperImpl implements BatchIndexingHelper {
 
 	@Override
 	public int getBulkSize(String entryClassName) {
-		for (String indexingBatchSize :
-				_reindexConfiguration.indexingBatchSizes()) {
+		Optional<Integer> optional = Stream.of(
+			_reindexConfiguration.indexingBatchSizes()
+		).map(
+			line -> StringUtil.split(line, StringPool.EQUAL)
+		).filter(
+			pair -> pair.length == 2
+		).filter(
+			pair -> entryClassName.equals(pair[0])
+		).map(
+			pair -> GetterUtil.getInteger(pair[1])
+		).findAny();
 
-			String[] pair = StringUtil.split(
-				indexingBatchSize, StringPool.EQUAL);
-
-			if ((pair.length == 2) && entryClassName.equals(pair[0])) {
-				return GetterUtil.getInteger(pair[1]);
-			}
-		}
-
-		return Indexer.DEFAULT_INTERVAL;
+		return optional.orElse(Indexer.DEFAULT_INTERVAL);
 	}
 
 	@Activate

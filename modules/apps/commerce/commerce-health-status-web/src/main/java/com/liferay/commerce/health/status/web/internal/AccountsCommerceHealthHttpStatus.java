@@ -19,7 +19,7 @@ import com.liferay.commerce.account.util.CommerceAccountRoleHelper;
 import com.liferay.commerce.constants.CommerceHealthStatusConstants;
 import com.liferay.commerce.health.status.CommerceHealthHttpStatus;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Role;
@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.health.status.display.order:Integer=110",
 		"commerce.health.status.key=" + CommerceHealthStatusConstants.ACCOUNTS_COMMERCE_HEALTH_STATUS_KEY
@@ -77,7 +78,7 @@ public class AccountsCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.
 				ACCOUNTS_COMMERCE_HEALTH_STATUS_DESCRIPTION);
@@ -94,7 +95,7 @@ public class AccountsCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.ACCOUNTS_COMMERCE_HEALTH_STATUS_KEY);
 	}
@@ -129,9 +130,6 @@ public class AccountsCommerceHealthHttpStatus
 
 	@Reference
 	private CommerceAccountRoleHelper _commerceAccountRoleHelper;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

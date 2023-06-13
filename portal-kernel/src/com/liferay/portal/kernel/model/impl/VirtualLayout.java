@@ -76,7 +76,7 @@ public class VirtualLayout extends LayoutWrapper {
 			sb.append(group.getFriendlyURL());
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		if (locale == null) {

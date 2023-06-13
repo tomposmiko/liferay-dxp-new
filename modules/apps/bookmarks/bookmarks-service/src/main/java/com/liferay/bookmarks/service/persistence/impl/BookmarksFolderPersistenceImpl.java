@@ -20,7 +20,6 @@ import com.liferay.bookmarks.model.BookmarksFolderTable;
 import com.liferay.bookmarks.model.impl.BookmarksFolderImpl;
 import com.liferay.bookmarks.model.impl.BookmarksFolderModelImpl;
 import com.liferay.bookmarks.service.persistence.BookmarksFolderPersistence;
-import com.liferay.bookmarks.service.persistence.BookmarksFolderUtil;
 import com.liferay.bookmarks.service.persistence.impl.constants.BookmarksPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
@@ -39,6 +38,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -78,7 +77,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = BookmarksFolderPersistence.class)
+@Component(service = {BookmarksFolderPersistence.class, BasePersistence.class})
 public class BookmarksFolderPersistenceImpl
 	extends BasePersistenceImpl<BookmarksFolder>
 	implements BookmarksFolderPersistence {
@@ -195,7 +194,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -579,7 +578,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -709,7 +708,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof BookmarksFolder) {
@@ -820,7 +819,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -986,7 +985,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -1402,7 +1401,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1559,7 +1558,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -2251,7 +2250,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2437,7 +2436,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -2799,7 +2798,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2943,7 +2942,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -3686,7 +3685,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, parentFolderId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3878,7 +3877,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -4268,7 +4267,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -4426,7 +4425,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -5205,7 +5204,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, parentFolderId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -5420,7 +5419,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -6201,7 +6200,7 @@ public class BookmarksFolderPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, parentFolderId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -6424,7 +6423,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksFolder bookmarksFolder : list) {
@@ -6699,7 +6698,7 @@ public class BookmarksFolderPersistenceImpl
 			folderId, companyId, parentFolderId, status
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -6890,7 +6889,7 @@ public class BookmarksFolderPersistenceImpl
 		bookmarksFolder.setNew(true);
 		bookmarksFolder.setPrimaryKey(folderId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		bookmarksFolder.setUuid(uuid);
 
@@ -7008,7 +7007,7 @@ public class BookmarksFolderPersistenceImpl
 			(BookmarksFolderModelImpl)bookmarksFolder;
 
 		if (Validator.isNull(bookmarksFolder.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			bookmarksFolder.setUuid(uuid);
 		}
@@ -7207,7 +7206,7 @@ public class BookmarksFolderPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksFolder>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -7277,7 +7276,7 @@ public class BookmarksFolderPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -7525,31 +7524,11 @@ public class BookmarksFolderPersistenceImpl
 			},
 			new String[] {"folderId", "companyId", "parentFolderId", "status"},
 			false);
-
-		_setBookmarksFolderUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setBookmarksFolderUtilPersistence(null);
-
 		entityCache.removeCache(BookmarksFolderImpl.class.getName());
-	}
-
-	private void _setBookmarksFolderUtilPersistence(
-		BookmarksFolderPersistence bookmarksFolderPersistence) {
-
-		try {
-			Field field = BookmarksFolderUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, bookmarksFolderPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -7639,6 +7618,7 @@ public class BookmarksFolderPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private BookmarksFolderModelArgumentsResolver
+		_bookmarksFolderModelArgumentsResolver;
 
 }

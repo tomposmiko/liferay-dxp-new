@@ -20,20 +20,16 @@ import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
-import com.liferay.document.library.web.internal.display.context.helper.DLPortletInstanceSettingsHelper;
-import com.liferay.document.library.web.internal.display.context.helper.DLRequestHelper;
+import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
+import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFolderPermission;
-import com.liferay.item.selector.ItemSelector;
-import com.liferay.item.selector.criteria.FolderItemSelectorReturnType;
-import com.liferay.item.selector.criteria.folder.criterion.FolderItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
@@ -41,15 +37,17 @@ import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.asset.util.comparator.AssetVocabularyGroupLocalizedTitleComparator;
-import com.liferay.taglib.security.PermissionsURLTag;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -104,6 +102,16 @@ public class DLViewDisplayContext {
 		).buildString();
 	}
 
+	public String getColumnNames() {
+		return Stream.of(
+			_dlPortletInstanceSettingsHelper.getEntryColumns()
+		).map(
+			HtmlUtil::escapeJS
+		).collect(
+			Collectors.joining("','")
+		);
+	}
+
 	public String getDownloadEntryURL() {
 		ResourceURL resourceURL = _renderResponse.createResourceURL();
 
@@ -127,8 +135,6 @@ public class DLViewDisplayContext {
 			_renderResponse
 		).setActionName(
 			"/document_library/edit_entry"
-		).setRedirect(
-			_getRedirect()
 		).buildString();
 	}
 
@@ -140,30 +146,12 @@ public class DLViewDisplayContext {
 		).buildString();
 	}
 
-	public String[] getEntryColumnNames() {
-		return _dlPortletInstanceSettingsHelper.getEntryColumns();
-	}
-
 	public Folder getFolder() {
 		return _dlAdminDisplayContext.getFolder();
 	}
 
 	public long getFolderId() {
 		return _dlAdminDisplayContext.getFolderId();
-	}
-
-	public String getPermissionURL(String className) throws Exception {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		if (!themeDisplay.isSignedIn()) {
-			return StringPool.BLANK;
-		}
-
-		return PermissionsURLTag.doTag(
-			null, className, themeDisplay.getScopeGroupId(),
-			LiferayWindowState.POP_UP.toString(), _httpServletRequest);
 	}
 
 	public long getRepositoryId() {
@@ -177,14 +165,6 @@ public class DLViewDisplayContext {
 			"/document_library/edit_entry"
 		).setCMD(
 			Constants.RESTORE
-		).buildString();
-	}
-
-	public String getSelectAssetTagsURL() throws PortletException {
-		return PortletURLBuilder.create(
-			PortletURLUtil.clone(_getCurrentPortletURL(), _renderResponse)
-		).setParameter(
-			"assetTagId", (String)null
 		).buildString();
 	}
 
@@ -208,14 +188,6 @@ public class DLViewDisplayContext {
 		).buildString();
 	}
 
-	public String getSelectExtensionURL() throws PortletException {
-		return PortletURLBuilder.create(
-			PortletURLUtil.clone(_getCurrentPortletURL(), _renderResponse)
-		).setParameter(
-			"extension", (String)null
-		).buildString();
-	}
-
 	public String getSelectFileEntryTypeURL() throws WindowStateException {
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
@@ -229,27 +201,15 @@ public class DLViewDisplayContext {
 	}
 
 	public String getSelectFolderURL() throws WindowStateException {
-		ItemSelector itemSelector =
-			(ItemSelector)_httpServletRequest.getAttribute(
-				ItemSelector.class.getName());
-
-		FolderItemSelectorCriterion folderItemSelectorCriterion =
-			new FolderItemSelectorCriterion();
-
-		folderItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new FolderItemSelectorReturnType());
-		folderItemSelectorCriterion.setFolderId(getFolderId());
-		folderItemSelectorCriterion.setRepositoryId(
-			_dlAdminDisplayContext.getSelectedRepositoryId());
-		folderItemSelectorCriterion.setSelectedFolderId(getFolderId());
-		folderItemSelectorCriterion.setSelectedRepositoryId(
-			_dlAdminDisplayContext.getSelectedRepositoryId());
-
-		PortletURL portletURL = itemSelector.getItemSelectorURL(
-			RequestBackedPortletURLFactoryUtil.create(_renderRequest),
-			"itemSelected", folderItemSelectorCriterion);
-
-		return portletURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCRenderCommandName(
+			"/document_library/select_folder"
+		).setParameter(
+			"folderId", _dlAdminDisplayContext.getFolderId()
+		).setWindowState(
+			LiferayWindowState.POP_UP
+		).buildString();
 	}
 
 	public String getSidebarPanelURL() {

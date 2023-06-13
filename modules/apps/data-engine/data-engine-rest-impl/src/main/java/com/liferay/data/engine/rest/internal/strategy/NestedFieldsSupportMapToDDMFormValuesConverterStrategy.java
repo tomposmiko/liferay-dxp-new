@@ -19,8 +19,12 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDM;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -28,6 +32,8 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * @author Rafael Praxedes
@@ -54,24 +60,21 @@ public class NestedFieldsSupportMapToDDMFormValuesConverterStrategy
 				entry.getKey(), DDM.INSTANCE_SEPARATOR);
 
 			ddmFormValues.addDDMFormFieldValue(
-				_createDDMFormFieldValue(
+				createDDMFormFieldValue(
 					ddmFormFields.get(parts[0]), ddmFormFields,
 					(Map<String, Object>)entry.getValue(), parts[1], locale));
 		}
 	}
 
-	private NestedFieldsSupportMapToDDMFormValuesConverterStrategy() {
-	}
-
-	private DDMFormFieldValue _createDDMFormFieldValue(
+	protected DDMFormFieldValue createDDMFormFieldValue(
 		DDMFormField ddmFormField, Map<String, DDMFormField> ddmFormFields,
 		Map<String, Object> fieldInstanceValue, String instanceId,
 		Locale locale) {
 
 		DDMFormFieldValue ddmFormFieldValue = new DDMFormFieldValue() {
 			{
-				setInstanceId(instanceId);
 				setName(ddmFormField.getName());
+				setInstanceId(instanceId);
 			}
 		};
 
@@ -90,6 +93,9 @@ public class NestedFieldsSupportMapToDDMFormValuesConverterStrategy
 					fieldInstanceValue.get("nestedValues"),
 					new HashMap<String, Object>());
 
+			_addMissingValues(
+				ddmFormField.getNestedDDMFormFieldsMap(), locale, nestedValues);
+
 			if (MapUtil.isEmpty(nestedValues)) {
 				return ddmFormFieldValue;
 			}
@@ -99,7 +105,7 @@ public class NestedFieldsSupportMapToDDMFormValuesConverterStrategy
 					entry.getKey(), DDM.INSTANCE_SEPARATOR);
 
 				ddmFormFieldValue.addNestedDDMFormFieldValue(
-					_createDDMFormFieldValue(
+					createDDMFormFieldValue(
 						ddmFormFields.get(parts[0]), ddmFormFields,
 						(Map<String, Object>)entry.getValue(), parts[1],
 						locale));
@@ -107,6 +113,46 @@ public class NestedFieldsSupportMapToDDMFormValuesConverterStrategy
 		}
 
 		return ddmFormFieldValue;
+	}
+
+	private NestedFieldsSupportMapToDDMFormValuesConverterStrategy() {
+	}
+
+	private void _addMissingValues(
+		Map<String, DDMFormField> ddmFormFieldsMap, Locale locale,
+		Map<String, Object> values) {
+
+		for (Map.Entry<String, DDMFormField> entry :
+				ddmFormFieldsMap.entrySet()) {
+
+			Set<String> keys = values.keySet();
+
+			Stream<String> stream = keys.stream();
+
+			if (stream.anyMatch(
+					key -> StringUtil.startsWith(key, entry.getKey()))) {
+
+				continue;
+			}
+
+			Object value = StringPool.BLANK;
+
+			DDMFormField ddmFormField = entry.getValue();
+
+			if (ddmFormField.isLocalizable()) {
+				value = HashMapBuilder.<String, Object>put(
+					LocaleUtil.toLanguageId(locale), StringPool.BLANK
+				).build();
+			}
+
+			values.put(
+				StringBundler.concat(
+					entry.getKey(), DDM.INSTANCE_SEPARATOR,
+					StringUtil.randomString()),
+				HashMapBuilder.<String, Object>put(
+					"value", value
+				).build());
+		}
 	}
 
 	private static final NestedFieldsSupportMapToDDMFormValuesConverterStrategy

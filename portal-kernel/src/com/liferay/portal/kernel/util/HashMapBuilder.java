@@ -186,12 +186,6 @@ public class HashMapBuilder<K, V> extends BaseMapBuilder {
 			return this;
 		}
 
-		public HashMapWrapper<K, V> remove(K key) {
-			_hashMap.remove(key);
-
-			return this;
-		}
-
 		@Override
 		protected HashMap<K, V> getMap() {
 			return _hashMap;

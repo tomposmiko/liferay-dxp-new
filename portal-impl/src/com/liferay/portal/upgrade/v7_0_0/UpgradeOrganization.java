@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.upgrade.v7_0_0.util.OrganizationTable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +35,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Brian Wing Shun Chan
@@ -43,7 +46,7 @@ public class UpgradeOrganization extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("Organization_", "statusId", "LONG");
+		alter(OrganizationTable.class, new AlterColumnType("statusId", "LONG"));
 
 		upgradeOrganizationLogoId();
 		upgradeOrganizationSiteHierarchy();
@@ -94,9 +97,9 @@ public class UpgradeOrganization extends UpgradeProcess {
 					" and Group_.classPK = Organization_.organizationId"));
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update Group_ set parentGroupId = ?, treePath = ? where " +
-						"groupId = ?")) {
+					connection.prepareStatement(
+						"update Group_ set parentGroupId = ?, treePath = ? " +
+							"where groupId = ?"))) {
 
 			List<OrganizationGroup> organizationGroups = new ArrayList<>();
 
@@ -117,26 +120,26 @@ public class UpgradeOrganization extends UpgradeProcess {
 					continue;
 				}
 
-				List<String> organizationIds = StringUtil.split(
+				List<String> treePaths = StringUtil.split(
 					organizationGroup._organizationTreePath, CharPool.SLASH);
 
-				StringBundler sb = new StringBundler(
-					(2 * organizationIds.size()) + 1);
+				Stream<String> stream = treePaths.stream();
 
-				sb.append(StringPool.SLASH);
-
-				for (String organizationId : organizationIds) {
-					if (organizationId.length() > 0) {
-						sb.append(OrganizationGroup.getGroupId(organizationId));
-						sb.append(StringPool.SLASH);
-					}
-				}
+				String groupTreePath = stream.filter(
+					organizationId -> organizationId.length() > 0
+				).map(
+					organizationId -> String.valueOf(
+						OrganizationGroup.getGroupId(organizationId))
+				).collect(
+					Collectors.joining(
+						StringPool.SLASH, StringPool.SLASH, StringPool.SLASH)
+				);
 
 				preparedStatement2.setLong(
 					1,
 					OrganizationGroup.getGroupId(
 						organizationGroup._parentOrganizationId));
-				preparedStatement2.setString(2, sb.toString());
+				preparedStatement2.setString(2, groupTreePath);
 				preparedStatement2.setLong(3, organizationGroup._groupId);
 
 				preparedStatement2.addBatch();

@@ -21,7 +21,7 @@ import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
-import com.liferay.object.service.ObjectEntryService;
+import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringBundler;
@@ -44,16 +44,15 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 
 	public ObjectEntry1toMObjectRelatedModelsProviderImpl(
 		ObjectDefinition objectDefinition,
-		ObjectEntryService objectEntryService,
+		ObjectEntryLocalService objectEntryLocalService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService) {
 
-		_objectEntryService = objectEntryService;
+		_objectEntryLocalService = objectEntryLocalService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 
 		_className = objectDefinition.getClassName();
-		_companyId = objectDefinition.getCompanyId();
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 				ObjectRelationshipConstants.DELETION_TYPE_CASCADE)) {
 
 			for (ObjectEntry objectEntry : relatedModels) {
-				_objectEntryService.deleteObjectEntry(
+				_objectEntryLocalService.deleteObjectEntry(
 					objectEntry.getObjectEntryId());
 			}
 		}
@@ -91,8 +90,8 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 				objectRelationship.getObjectFieldId2());
 
 			for (ObjectEntry objectEntry : relatedModels) {
-				_objectEntryService.updateObjectEntry(
-					objectEntry.getObjectEntryId(),
+				_objectEntryLocalService.updateObjectEntry(
+					userId, objectEntry.getObjectEntryId(),
 					HashMapBuilder.<String, Serializable>put(
 						objectField.getName(), 0
 					).build(),
@@ -117,8 +116,8 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			long primaryKey2)
 		throws PortalException {
 
-		_objectEntryService.updateObjectEntry(
-			primaryKey2,
+		_objectEntryLocalService.updateObjectEntry(
+			userId, primaryKey2,
 			HashMapBuilder.<String, Serializable>put(
 				() -> {
 					ObjectRelationship objectRelationship =
@@ -142,11 +141,6 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 	}
 
 	@Override
-	public long getCompanyId() {
-		return _companyId;
-	}
-
-	@Override
 	public String getObjectRelationshipType() {
 		return ObjectRelationshipConstants.TYPE_ONE_TO_MANY;
 	}
@@ -157,8 +151,8 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			int end)
 		throws PortalException {
 
-		return _objectEntryService.getOneToManyObjectEntries(
-			groupId, objectRelationshipId, primaryKey, true, start, end);
+		return _objectEntryLocalService.getOneToManyRelatedObjectEntries(
+			groupId, objectRelationshipId, primaryKey, start, end);
 	}
 
 	@Override
@@ -166,24 +160,12 @@ public class ObjectEntry1toMObjectRelatedModelsProviderImpl
 			long groupId, long objectRelationshipId, long primaryKey)
 		throws PortalException {
 
-		return _objectEntryService.getOneToManyObjectEntriesCount(
-			groupId, objectRelationshipId, primaryKey, true);
-	}
-
-	@Override
-	public List<ObjectEntry> getUnrelatedModels(
-			long companyId, long groupId, ObjectDefinition objectDefinition,
-			long objectEntryId, long objectRelationshipId)
-		throws PortalException {
-
-		return _objectEntryService.getOneToManyObjectEntries(
-			groupId, objectRelationshipId, objectEntryId, false,
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		return _objectEntryLocalService.getOneToManyRelatedObjectEntriesCount(
+			groupId, objectRelationshipId, primaryKey);
 	}
 
 	private final String _className;
-	private final long _companyId;
-	private final ObjectEntryService _objectEntryService;
+	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;

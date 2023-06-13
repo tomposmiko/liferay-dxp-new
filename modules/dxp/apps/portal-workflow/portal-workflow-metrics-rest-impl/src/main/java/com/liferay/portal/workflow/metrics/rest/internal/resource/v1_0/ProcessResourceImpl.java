@@ -18,7 +18,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.engine.adapter.search.SearchRequestExecutor;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
@@ -27,9 +26,6 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
-import com.liferay.portal.workflow.metrics.model.AddProcessRequest;
-import com.liferay.portal.workflow.metrics.model.DeleteProcessRequest;
-import com.liferay.portal.workflow.metrics.model.UpdateProcessRequest;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util.ProcessUtil;
 import com.liferay.portal.workflow.metrics.rest.internal.resource.exception.NoSuchProcessException;
@@ -40,6 +36,7 @@ import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsInde
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -58,15 +55,8 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 	public void deleteProcess(Long processId) throws Exception {
 		Process process = getProcess(processId);
 
-		DeleteProcessRequest.Builder builder =
-			new DeleteProcessRequest.Builder();
-
 		_processWorkflowMetricsIndexer.deleteProcess(
-			builder.companyId(
-				contextCompany.getCompanyId()
-			).processId(
-				process.getId()
-			).build());
+			contextCompany.getCompanyId(), process.getId());
 	}
 
 	@Override
@@ -78,23 +68,24 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 				contextCompany.getCompanyId()));
 		searchSearchRequest.setQuery(_createBooleanQuery(processId));
 
-		SearchSearchResponse searchSearchResponse =
-			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
-
-		SearchHits searchHits = searchSearchResponse.getSearchHits();
-
-		List<SearchHit> searchHitsList = searchHits.getSearchHits();
-
-		if (searchHitsList.isEmpty()) {
-			throw new NoSuchProcessException(
-				"No process exists with the process ID " + processId);
-		}
-
-		SearchHit searchHit = searchHitsList.get(0);
-
-		return ProcessUtil.toProcess(
-			searchHit.getDocument(),
-			contextAcceptLanguage.getPreferredLocale());
+		return Stream.of(
+			_searchRequestExecutor.executeSearchRequest(searchSearchRequest)
+		).map(
+			SearchSearchResponse::getSearchHits
+		).map(
+			SearchHits::getSearchHits
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).findFirst(
+		).map(
+			document -> ProcessUtil.toProcess(
+				document, contextAcceptLanguage.getPreferredLocale())
+		).orElseThrow(
+			() -> new NoSuchProcessException(
+				"No process exists with the process ID " + processId)
+		);
 	}
 
 	@Override
@@ -110,61 +101,46 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 			_getTitleFieldName(contextAcceptLanguage.getPreferredLocale()),
 			_getTitleFieldName(LocaleThreadLocal.getDefaultLocale()));
 
-		SearchSearchResponse searchSearchResponse =
-			_searchRequestExecutor.executeSearchRequest(searchSearchRequest);
+		return Stream.of(
+			_searchRequestExecutor.executeSearchRequest(searchSearchRequest)
+		).map(
+			SearchSearchResponse::getSearchHits
+		).map(
+			SearchHits::getSearchHits
+		).flatMap(
+			List::stream
+		).map(
+			SearchHit::getDocument
+		).findFirst(
+		).map(
+			document -> {
+				String title = document.getString(
+					_getTitleFieldName(
+						contextAcceptLanguage.getPreferredLocale()));
 
-		SearchHits searchHits = searchSearchResponse.getSearchHits();
+				if (Validator.isNull(title)) {
+					title = document.getString(
+						_getTitleFieldName(
+							LocaleThreadLocal.getDefaultLocale()));
+				}
 
-		List<SearchHit> searchHitsList = searchHits.getSearchHits();
-
-		if (searchHitsList.isEmpty()) {
-			return StringPool.BLANK;
-		}
-
-		SearchHit searchHit = searchHitsList.get(0);
-
-		Document document = searchHit.getDocument();
-
-		String title = document.getString(
-			_getTitleFieldName(contextAcceptLanguage.getPreferredLocale()));
-
-		if (Validator.isNull(title)) {
-			title = document.getString(
-				_getTitleFieldName(LocaleThreadLocal.getDefaultLocale()));
-		}
-
-		return title;
+				return title;
+			}
+		).orElseGet(
+			() -> StringPool.BLANK
+		);
 	}
 
 	@Override
 	public Process postProcess(Process process) throws Exception {
-		AddProcessRequest.Builder builder = new AddProcessRequest.Builder();
-
 		return ProcessUtil.toProcess(
 			_processWorkflowMetricsIndexer.addProcess(
-				builder.active(
-					process.getActive()
-				).companyId(
-					contextCompany.getCompanyId()
-				).createDate(
-					process.getDateCreated()
-				).description(
-					process.getDescription()
-				).modifiedDate(
-					process.getDateModified()
-				).name(
-					process.getName()
-				).processId(
-					process.getId()
-				).title(
-					process.getTitle()
-				).titleMap(
-					LocalizedMapUtil.getLocalizedMap(process.getTitle_i18n())
-				).version(
-					process.getVersion()
-				).versions(
-					new String[] {process.getVersion()}
-				).build()),
+				process.getActive(), contextCompany.getCompanyId(),
+				process.getDateModified(), process.getDescription(),
+				process.getDateModified(), process.getName(), process.getId(),
+				process.getTitle(),
+				LocalizedMapUtil.getLocalizedMap(process.getTitle_i18n()),
+				process.getVersion()),
 			contextAcceptLanguage.getPreferredLocale());
 	}
 
@@ -175,27 +151,12 @@ public class ProcessResourceImpl extends BaseProcessResourceImpl {
 		Map<Locale, String> titleMap = LocalizedMapUtil.getLocalizedMap(
 			process.getTitle_i18n());
 
-		UpdateProcessRequest.Builder builder =
-			new UpdateProcessRequest.Builder();
-
 		_processWorkflowMetricsIndexer.updateProcess(
-			builder.active(
-				process.getActive()
-			).companyId(
-				contextCompany.getCompanyId()
-			).description(
-				process.getDescription()
-			).modifiedDate(
-				process.getDateModified()
-			).processId(
-				getProcess.getId()
-			).title(
-				titleMap.get(contextAcceptLanguage.getPreferredLocale())
-			).titleMap(
-				titleMap
-			).version(
-				process.getVersion()
-			).build());
+			process.getActive(), contextCompany.getCompanyId(),
+			process.getDescription(), process.getDateModified(),
+			getProcess.getId(),
+			titleMap.get(contextAcceptLanguage.getPreferredLocale()), titleMap,
+			process.getVersion());
 	}
 
 	private BooleanQuery _createBooleanQuery(Long processId) {

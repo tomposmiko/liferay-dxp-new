@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommerceCurrencyPortletKeys.COMMERCE_CURRENCY,
 		"mvc.command.name=/commerce_currency/edit_exchange_rate"
@@ -71,7 +72,7 @@ public class EditExchangeRateMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (cmd.equals(Constants.UPDATE)) {
-				_updateExchangeRateConfiguration(actionRequest, serviceContext);
+				updateExchangeRateConfiguration(actionRequest, serviceContext);
 
 				updateExchangeRates(serviceContext);
 			}
@@ -102,6 +103,28 @@ public class EditExchangeRateMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
+	protected void updateExchangeRateConfiguration(
+			ActionRequest actionRequest, ServiceContext serviceContext)
+		throws Exception {
+
+		Map<String, String> parameterMap = PropertiesParamUtil.getProperties(
+			actionRequest, "exchangeRateConfiguration--");
+
+		Settings settings = _settingsFactory.getSettings(
+			new CompanyServiceSettingsLocator(
+				serviceContext.getCompanyId(),
+				CommerceCurrencyExchangeRateConstants.SERVICE_NAME));
+
+		ModifiableSettings modifiableSettings =
+			settings.getModifiableSettings();
+
+		for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
+			modifiableSettings.setValue(entry.getKey(), entry.getValue());
+		}
+
+		modifiableSettings.store();
+	}
+
 	protected void updateExchangeRates(ServiceContext serviceContext)
 		throws Exception {
 
@@ -122,28 +145,6 @@ public class EditExchangeRateMVCActionCommand extends BaseMVCActionCommand {
 				commerceCurrency.getCommerceCurrencyId(),
 				commerceCurrencyConfiguration.defaultExchangeRateProviderKey());
 		}
-	}
-
-	private void _updateExchangeRateConfiguration(
-			ActionRequest actionRequest, ServiceContext serviceContext)
-		throws Exception {
-
-		Map<String, String> parameterMap = PropertiesParamUtil.getProperties(
-			actionRequest, "exchangeRateConfiguration--");
-
-		Settings settings = _settingsFactory.getSettings(
-			new CompanyServiceSettingsLocator(
-				serviceContext.getCompanyId(),
-				CommerceCurrencyExchangeRateConstants.SERVICE_NAME));
-
-		ModifiableSettings modifiableSettings =
-			settings.getModifiableSettings();
-
-		for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
-			modifiableSettings.setValue(entry.getKey(), entry.getValue());
-		}
-
-		modifiableSettings.store();
 	}
 
 	@Reference

@@ -19,13 +19,11 @@ import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
-import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.clientcred.ClientCredentialsGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenGrantHandler;
 
@@ -43,11 +41,6 @@ import org.osgi.service.component.annotations.Reference;
 public class LiferayClientCredentialsAccessTokenGrantHandler
 	extends BaseAccessTokenGrantHandler {
 
-	@Override
-	public List<String> getSupportedGrantTypes() {
-		return _clientCredentialsGrantHandler.getSupportedGrantTypes();
-	}
-
 	@Activate
 	protected void activate(Map<String, Object> properties) {
 		_clientCredentialsGrantHandler = new ClientCredentialsGrantHandler();
@@ -60,10 +53,8 @@ public class LiferayClientCredentialsAccessTokenGrantHandler
 	}
 
 	@Override
-	protected ServerAccessToken doCreateAccessToken(
-		Client client, MultivaluedMap<String, String> params) {
-
-		return _clientCredentialsGrantHandler.createAccessToken(client, params);
+	protected AccessTokenGrantHandler getAccessTokenGrantHandler() {
+		return _clientCredentialsGrantHandler;
 	}
 
 	@Override
@@ -74,7 +65,7 @@ public class LiferayClientCredentialsAccessTokenGrantHandler
 			_liferayOAuthDataProvider.resolveOAuth2Application(client);
 
 		return hasCreateTokenPermission(
-			oAuth2Application.getClientCredentialUserId(), oAuth2Application);
+			oAuth2Application.getUserId(), oAuth2Application);
 	}
 
 	@Override

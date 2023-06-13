@@ -16,19 +16,19 @@ package com.liferay.dynamic.data.mapping.form.evaluator.internal.validation;
 
 import com.liferay.dynamic.data.mapping.form.validation.DDMValidation;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Bruno Oliveira
  * @author Carolina Barbosa
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.validation.data.type=date", "ddm.validation.ranking:Float=1"
 	},
@@ -38,7 +38,7 @@ public class FutureDatesDDMValidation implements DDMValidation {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			ResourceBundleUtil.getModuleAndPortalResourceBundle(
 				locale, getClass()),
 			"future-dates");
@@ -58,8 +58,5 @@ public class FutureDatesDDMValidation implements DDMValidation {
 	public String getTemplate() {
 		return "futureDates({name}, \"{parameter}\")";
 	}
-
-	@Reference
-	private Language _language;
 
 }

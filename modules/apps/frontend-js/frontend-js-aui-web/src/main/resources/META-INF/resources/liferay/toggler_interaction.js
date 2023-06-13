@@ -18,25 +18,25 @@
 AUI.add(
 	'liferay-toggler-interaction',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const NAME = 'togglerinteraction';
+		var NAME = 'togglerinteraction';
 
-		const STR_CHILDREN = 'children';
+		var STR_CHILDREN = 'children';
 
-		const STR_CONTAINER = 'container';
+		var STR_CONTAINER = 'container';
 
-		const STR_DESCENDANTS = 'descendants';
+		var STR_DESCENDANTS = 'descendants';
 
-		const STR_HEADER = 'header';
+		var STR_HEADER = 'header';
 
-		const STR_HOST = 'host';
+		var STR_HOST = 'host';
 
-		const STR_KEYS = 'keys';
+		var STR_KEYS = 'keys';
 
-		const STR_TOGGLER = 'toggler';
+		var STR_TOGGLER = 'toggler';
 
-		const TogglerInteraction = A.Component.create({
+		var TogglerInteraction = A.Component.create({
 			ATTRS: {
 				children: {
 					validator: Lang.isString,
@@ -68,17 +68,17 @@ AUI.add(
 
 			prototype: {
 				_childrenEventHandler(event) {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const target = event.currentTarget;
+					var target = event.currentTarget;
 
-					const header = target
+					var header = target
 						.ancestor(instance.get('parents'))
 						.one(host.get(STR_HEADER));
 
-					let toggler = header.getData(STR_TOGGLER);
+					var toggler = header.getData(STR_TOGGLER);
 
 					if (!toggler) {
 						host.createAll();
@@ -94,12 +94,12 @@ AUI.add(
 				},
 
 				_getDescendants() {
-					const instance = this;
+					var instance = this;
 
-					let result =
+					var result =
 						instance.get(STR_HOST).get(STR_HEADER) + ':visible';
 
-					const children = instance.get(STR_CHILDREN);
+					var children = instance.get(STR_CHILDREN);
 
 					if (children) {
 						result += ', ' + children + ':visible';
@@ -109,7 +109,7 @@ AUI.add(
 				},
 
 				_headerEventHandler(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._focusManager.refresh();
 
@@ -120,15 +120,14 @@ AUI.add(
 				},
 
 				_onExpandedChange(event) {
-					const instance = this;
+					var instance = this;
 
 					if (event.silent) {
-						const host = instance.get(STR_HOST);
+						var host = instance.get(STR_HOST);
 
-						const container = host.get(STR_CONTAINER);
+						var container = host.get(STR_CONTAINER);
 
-						const headerCssClass =
-							host.get(STR_HEADER) + ':visible';
+						var headerCssClass = host.get(STR_HEADER) + ':visible';
 
 						instance._focusManager.refresh();
 
@@ -140,17 +139,17 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					new A.EventHandle(instance._eventHandles).detach();
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const container = host.get(STR_CONTAINER);
+					var container = host.get(STR_CONTAINER);
 
 					container.plug(A.Plugin.NodeFocusManager, {
 						descendants: instance.get(STR_DESCENDANTS),

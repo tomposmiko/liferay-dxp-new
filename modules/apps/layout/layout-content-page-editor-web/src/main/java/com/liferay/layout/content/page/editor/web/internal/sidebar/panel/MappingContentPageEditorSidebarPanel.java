@@ -16,17 +16,20 @@ package com.liferay.layout.content.page.editor.web.internal.sidebar.panel;
 
 import com.liferay.layout.content.page.editor.sidebar.panel.ContentPageEditorSidebarPanel;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.permission.LayoutPermission;
+import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	property = "service.ranking:Integer=400",
+	immediate = true, property = "service.ranking:Integer=500",
 	service = ContentPageEditorSidebarPanel.class
 )
 public class MappingContentPageEditorSidebarPanel
@@ -53,7 +56,10 @@ public class MappingContentPageEditorSidebarPanel
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "mapping");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", locale, getClass());
+
+		return LanguageUtil.get(resourceBundle, "mapping");
 	}
 
 	@Override
@@ -72,17 +78,15 @@ public class MappingContentPageEditorSidebarPanel
 		}
 
 		try {
-			if (_layoutPermission.containsLayoutRestrictedUpdatePermission(
-					permissionChecker, plid)) {
+			if (LayoutPermissionUtil.contains(
+					permissionChecker, plid, ActionKeys.UPDATE)) {
 
 				return true;
 			}
-
-			return false;
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -93,12 +97,6 @@ public class MappingContentPageEditorSidebarPanel
 		MappingContentPageEditorSidebarPanel.class);
 
 	@Reference
-	private Language _language;
-
-	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private LayoutPermission _layoutPermission;
 
 }

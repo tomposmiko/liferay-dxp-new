@@ -41,17 +41,16 @@ public class PublicationsPortletURLUtil {
 		String backURL, long ctCollectionId, Language language) {
 
 		return StringBundler.concat(
-			"javascript:Liferay.Util.openConfirmModal({message: '",
+			"javascript: if (confirm('",
 			language.get(
 				httpServletRequest,
 				"are-you-sure-you-want-to-delete-this-publication"),
-			"', onConfirm: (isConfirmed) => {if (isConfirmed) {",
-			"submitForm(document.hrefFm, '",
+			"')) { submitForm(document.hrefFm, '",
 			getHref(
 				renderResponse.createActionURL(), ActionRequest.ACTION_NAME,
 				"/change_tracking/delete_ct_collection", "redirect", backURL,
 				"ctCollectionId", String.valueOf(ctCollectionId)),
-			"');} else {self.focus();}}});");
+			"');} else {self.focus();}");
 	}
 
 	public static String getHref(PortletURL portletURL, Object... parameters) {
@@ -78,7 +77,7 @@ public class PublicationsPortletURLUtil {
 		throws Exception {
 
 		return StringBundler.concat(
-			"javascript:Liferay.Util.openWindow({dialog: {destroyOnHide: ",
+			"javascript: Liferay.Util.openWindow({dialog: {destroyOnHide: ",
 			"true,}, dialogIframe: {bodyCssClass: 'dialog-with-footer'}, ",
 			"title:'", language.get(httpServletRequest, "permissions"),
 			"', uri:'",

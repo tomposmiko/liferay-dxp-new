@@ -15,7 +15,6 @@
 package com.liferay.portal.workflow.kaleo.service.persistence;
 
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchTransitionException;
 import com.liferay.portal.workflow.kaleo.model.KaleoTransition;
 
@@ -34,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface KaleoTransitionPersistence
-	extends BasePersistence<KaleoTransition>, CTPersistence<KaleoTransition> {
+	extends BasePersistence<KaleoTransition> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

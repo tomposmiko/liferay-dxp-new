@@ -434,11 +434,6 @@ public class SamlSpSessionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected SamlSpSessionWrapper wrap(SamlSpSession samlSpSession) {
 		return new SamlSpSessionWrapper(samlSpSession);
 	}

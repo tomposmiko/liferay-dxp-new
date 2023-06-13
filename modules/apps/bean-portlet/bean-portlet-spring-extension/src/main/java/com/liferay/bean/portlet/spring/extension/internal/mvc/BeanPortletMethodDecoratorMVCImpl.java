@@ -100,7 +100,7 @@ public class BeanPortletMethodDecoratorMVCImpl
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return eventObject;

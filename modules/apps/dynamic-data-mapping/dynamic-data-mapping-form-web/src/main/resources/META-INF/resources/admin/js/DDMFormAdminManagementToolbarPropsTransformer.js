@@ -12,11 +12,7 @@
  * details.
  */
 
-import {
-	getCheckedCheckboxes,
-	openConfirmModal,
-	postForm,
-} from 'frontend-js-web';
+import {postForm} from 'frontend-js-web';
 
 export default function propsTransformer({
 	additionalProps: {deleteFormInstanceURL, deleteStructureURL},
@@ -24,65 +20,59 @@ export default function propsTransformer({
 	...otherProps
 }) {
 	const deleteFormInstances = () => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const form = document.getElementById(
-						`${portletNamespace}searchContainerForm`
-					);
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			const form = document.getElementById(
+				`${portletNamespace}searchContainerForm`
+			);
 
-					const searchContainer = document.getElementById(
-						otherProps.searchContainerId
-					);
+			const searchContainer = document.getElementById(
+				otherProps.searchContainerId
+			);
 
-					if (form && searchContainer) {
-						postForm(form, {
-							data: {
-								deleteFormInstanceIds: getCheckedCheckboxes(
-									searchContainer,
-									`${portletNamespace}allRowIds`
-								),
-							},
-							url: deleteFormInstanceURL,
-						});
-					}
-				}
-			},
-		});
+			if (form && searchContainer) {
+				postForm(form, {
+					data: {
+						deleteFormInstanceIds: Liferay.Util.listCheckedExcept(
+							searchContainer,
+							`${portletNamespace}allRowIds`
+						),
+					},
+					url: deleteFormInstanceURL,
+				});
+			}
+		}
 	};
 
 	const deleteStructures = () => {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					const form = document.getElementById(
-						`${portletNamespace}searchContainerForm`
-					);
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			const form = document.getElementById(
+				`${portletNamespace}searchContainerForm`
+			);
 
-					const searchContainer = document.getElementById(
-						otherProps.searchContainerId
-					);
+			const searchContainer = document.getElementById(
+				otherProps.searchContainerId
+			);
 
-					if (form && searchContainer) {
-						postForm(form, {
-							data: {
-								deleteStructureIds: getCheckedCheckboxes(
-									searchContainer,
-									`${portletNamespace}allRowIds`
-								),
-							},
-							url: deleteStructureURL,
-						});
-					}
-				}
-			},
-		});
+			if (form && searchContainer) {
+				postForm(form, {
+					data: {
+						deleteStructureIds: Liferay.Util.listCheckedExcept(
+							searchContainer,
+							`${portletNamespace}allRowIds`
+						),
+					},
+					url: deleteStructureURL,
+				});
+			}
+		}
 	};
 
 	return {

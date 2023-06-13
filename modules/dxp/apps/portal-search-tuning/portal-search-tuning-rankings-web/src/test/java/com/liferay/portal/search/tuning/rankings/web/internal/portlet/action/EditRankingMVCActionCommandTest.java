@@ -37,6 +37,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -52,6 +54,8 @@ public class EditRankingMVCActionCommandTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_editRankingMVCActionCommand = new EditRankingMVCActionCommand();
 
 		ReflectionTestUtil.setFieldValue(
@@ -87,7 +91,7 @@ public class EditRankingMVCActionCommandTest
 		Mockito.verify(
 			_actionRequest, Mockito.times(1)
 		).setAttribute(
-			Mockito.anyString(), Mockito.any()
+			Mockito.anyString(), Mockito.anyObject()
 		);
 	}
 
@@ -261,8 +265,9 @@ public class EditRankingMVCActionCommandTest
 				else if (argument.equals(JavaConstants.JAVAX_PORTLET_CONFIG)) {
 					return portletConfig;
 				}
-
-				return "undefined";
+				else {
+					return "undefined";
+				}
 			}
 		);
 	}
@@ -276,8 +281,8 @@ public class EditRankingMVCActionCommandTest
 		).when(
 			portletURLFactory
 		).create(
-			Mockito.any(PortletRequest.class), Mockito.anyString(),
-			Mockito.anyString()
+			Matchers.any(PortletRequest.class), Matchers.anyString(),
+			Matchers.anyString()
 		);
 
 		PortletURLFactoryUtil portletURLFactoryUtil =
@@ -286,10 +291,12 @@ public class EditRankingMVCActionCommandTest
 		portletURLFactoryUtil.setPortletURLFactory(portletURLFactory);
 	}
 
-	private final ActionRequest _actionRequest = Mockito.mock(
-		ActionRequest.class);
-	private final ActionResponse _actionResponse = Mockito.mock(
-		ActionResponse.class);
+	@Mock
+	private ActionRequest _actionRequest;
+
+	@Mock
+	private ActionResponse _actionResponse;
+
 	private EditRankingMVCActionCommand _editRankingMVCActionCommand;
 
 }

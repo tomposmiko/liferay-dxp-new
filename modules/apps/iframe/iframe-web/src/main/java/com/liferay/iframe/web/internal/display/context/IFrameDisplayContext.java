@@ -97,7 +97,7 @@ public class IFrameDisplayContext {
 		List<KeyValuePair> hiddenVariableKVPs = new ArrayList<>();
 
 		List<String> hiddenVariables = ListUtil.fromArray(
-			StringUtil.split(getHiddenVariables(), CharPool.PIPE));
+			StringUtil.split(getHiddenVariables(), CharPool.SEMICOLON));
 
 		hiddenVariables.addAll(getIFrameVariables());
 
@@ -169,7 +169,7 @@ public class IFrameDisplayContext {
 
 		_iFrameSrc += (String)_request.getAttribute(IFrameWebKeys.IFRAME_SRC);
 
-		if (ListUtil.isNotEmpty(getIFrameVariables())) {
+		if (!ListUtil.isEmpty(getIFrameVariables())) {
 			if (_iFrameSrc.contains(StringPool.QUESTION)) {
 				_iFrameSrc += StringPool.AMPERSAND;
 			}

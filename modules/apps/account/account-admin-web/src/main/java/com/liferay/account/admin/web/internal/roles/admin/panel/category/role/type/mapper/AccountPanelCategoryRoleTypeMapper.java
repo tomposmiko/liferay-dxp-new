@@ -15,8 +15,6 @@
 package com.liferay.account.admin.web.internal.roles.admin.panel.category.role.type.mapper;
 
 import com.liferay.account.constants.AccountPanelCategoryKeys;
-import com.liferay.account.constants.AccountPortletKeys;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.roles.admin.panel.category.role.type.mapper.PanelCategoryRoleTypeMapper;
 
@@ -28,11 +26,6 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = PanelCategoryRoleTypeMapper.class)
 public class AccountPanelCategoryRoleTypeMapper
 	implements PanelCategoryRoleTypeMapper {
-
-	@Override
-	public String[] getExcludedPanelAppKeys(Role role) {
-		return new String[] {AccountPortletKeys.ACCOUNT_GROUPS_ADMIN};
-	}
 
 	@Override
 	public String getPanelCategoryKey() {

@@ -41,7 +41,6 @@ LiferayPortletResponse finalLiferayPortletResponse = liferayPortletResponse;
 		</c:if>
 
 			<clay:navigation-bar
-				activeItemAriaCurrent='<%= ListUtil.isNotEmpty(screenNavigationEntries) && (screenNavigationEntries.size() > 1) ? "false" : "page" %>'
 				inverted="<%= inverted %>"
 				navigationItems='<%=
 					new JSPNavigationItemList(pageContext) {
@@ -94,7 +93,6 @@ LiferayPortletResponse finalLiferayPortletResponse = liferayPortletResponse;
 
 								<li class="nav-item">
 									<a
-										aria-current="<%= Objects.equals(selectedScreenNavigationEntry.getEntryKey(), screenNavigationEntry.getEntryKey()) ? "page" : "false" %>"
 										class="nav-link <%= Objects.equals(selectedScreenNavigationEntry.getEntryKey(), screenNavigationEntry.getEntryKey()) ? "active" : StringPool.BLANK %>" href="<%=
 PortletURLBuilder.create(
 									PortletURLUtil.clone(portletURL, liferayPortletResponse)
@@ -119,20 +117,6 @@ PortletURLBuilder.create(
 		<div class="<%= (screenNavigationEntries.size() > 1) ? containerCssClass : fullContainerCssClass %>">
 
 			<%
-			String selectedScreenNavigationEntryLabel = selectedScreenNavigationEntry.getLabel(themeDisplay.getLocale());
-
-			if (Validator.isNotNull(selectedScreenNavigationEntryLabel)) {
-				PortalUtil.addPageSubtitle(selectedScreenNavigationEntryLabel, request);
-			}
-
-			if (selectedScreenNavigationCategory != null) {
-				String selectedScreenNavigationCategoryLabel = selectedScreenNavigationCategory.getLabel(themeDisplay.getLocale());
-
-				if (Validator.isNotNull(selectedScreenNavigationCategoryLabel)) {
-					PortalUtil.addPageSubtitle(selectedScreenNavigationCategoryLabel, request);
-				}
-			}
-
 			selectedScreenNavigationEntry.render(request, PipingServletResponseFactory.createPipingServletResponse(pageContext));
 			%>
 

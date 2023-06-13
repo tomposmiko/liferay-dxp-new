@@ -16,46 +16,44 @@
 
 <%@ include file="/info_list_basic_table/init.jsp" %>
 
-<c:if test="<%= ListUtil.isNotEmpty(infoListObjectColumnNames) && ListUtil.isNotEmpty(infoListObjects) %>">
-	<div class="table-responsive">
-		<table class="table table-autofit">
-			<thead>
-				<tr>
-
-					<%
-					for (String infoListObjectColumnName : infoListObjectColumnNames) {
-					%>
-
-						<th class="table-cell-expand-smallest">
-							<liferay-ui:message key="<%= infoListObjectColumnName %>" />
-						</th>
-
-					<%
-					}
-					%>
-
-				</tr>
-			</thead>
-
-			<tbody>
+<div class="table-responsive">
+	<table class="table table-autofit">
+		<thead>
+			<tr>
 
 				<%
-				for (Object infoListObject : infoListObjects) {
+				for (String infoListObjectColumnName : infoListObjectColumnNames) {
 				%>
 
-					<tr>
-
-						<%
-						infoItemRenderer.render(infoListObject, request, PipingServletResponseFactory.createPipingServletResponse(pageContext));
-						%>
-
-					</tr>
+					<th class="table-cell-expand-smallest">
+						<liferay-ui:message key="<%= infoListObjectColumnName %>" />
+					</th>
 
 				<%
 				}
 				%>
 
-			</tbody>
-		</table>
-	</div>
-</c:if>
+			</tr>
+		</thead>
+
+		<tbody>
+
+			<%
+			for (Object infoListObject : infoListObjects) {
+			%>
+
+				<tr>
+
+					<%
+					infoItemRenderer.render(infoListObject, request, PipingServletResponseFactory.createPipingServletResponse(pageContext));
+					%>
+
+				</tr>
+
+			<%
+			}
+			%>
+
+		</tbody>
+	</table>
+</div>

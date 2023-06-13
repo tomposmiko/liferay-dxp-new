@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Sites Administration";
+	property testray.main.component.name = "Site Administration";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -22,25 +22,25 @@ definition {
 
 			Site.tearDownCP();
 
-			PagesAdmin.tearDownCP();
+			Page.tearDownCP();
 		}
 	}
 
 	@description = "This is for LPS-121422. The elements are still shown in edit mode after executing reset changes."
-	@priority = 3
+	@priority = "3"
 	test SitesTemplatePermissionPersistence {
-		property testray.component.names = "Permissions,Sites Administration";
+		property testray.component.names = "Permissions,Site Administration";
 
 		task ("Add a new site template") {
 			SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 		}
 
 		task ("Add widgets to Home page of the new site template") {
-			var siteName = TestCase.getSiteName(siteName = ${siteName});
+			var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 			SiteTemplatesNavigator.gotoSiteTemplatesPage(
 				pageName = "Home",
-				siteName = ${siteName},
+				siteName = "${siteName}",
 				siteTemplateName = "Site Template Name");
 
 			ContentPages.gotoPageEditor();
@@ -50,15 +50,15 @@ definition {
 				fragmentName = "Grid");
 
 			PageEditor.editLayoutGrid(
-				columnCount = 2,
+				columnCount = "2",
 				panel = "General");
 
 			PageEditor.addElementToColumn(
-				columnNumber = 1,
+				columnNumber = "1",
 				navTab = "Widgets",
 				portletName = "Message Boards");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Add a search page in the new site template") {
@@ -71,25 +71,23 @@ definition {
 		}
 
 		task ("Add a new site based on the new site template") {
-			HeadlessSite.addSite(
-				siteName = "Site Name",
-				templateName = "Site Template Name",
-				templateType = "Site Template");
-		}
-
-		task ("Assert permissions of each widgets in Home page") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Sites",
 				panel = "Control Panel",
 				portlet = "Sites");
 
-			LexiconTable.clickEllipsisItem(
-				item = "Go to Pages",
-				tableEntry = "Site Name");
+			Site.addCP(
+				siteName = "Site Name",
+				siteTemplateName = "Site Template Name",
+				siteType = "Site Template");
+		}
 
-			SelectWindow.selectPopUp(locator1 = "null");
+		task ("Assert permissions of each widgets in Home page") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Home",
+				siteName = "Site Name");
 
-			ContentPages.gotoPageEditor();
+			PageEditor.assertFragmentSidebarLoaded();
 
 			PermissionsInline.gotoConfigurationPG(portletName = "Message Boards");
 
@@ -98,12 +96,12 @@ definition {
 			IFrame.closeFrame();
 
 			PageEditor.addElementToColumn(
-				columnNumber = 2,
+				columnNumber = "2",
 				height = "Tall",
 				navTab = "Widgets",
 				portletName = "Asset Publisher");
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Reset Page Changes") {
@@ -115,11 +113,13 @@ definition {
 				key_portletName = "AssetPublisher",
 				locator1 = "Home#PORTLET_BORDERLESS");
 
-			SiteTemplates.resetPageChanges(portletName = "Asset Publisher");
+			SiteTemplates.resetPageChanges(widgetName = "Asset Publisher");
 
 			ContentPages.gotoPageEditor();
 
-			PageEditor.viewFragmentNotPresent(fragmentName = "Asset Publisher");
+			AssertElementNotPresent(
+				key_fragmentName = "Asset Publisher",
+				locator1 = "Fragment#FRAGMENT_HEADER");
 		}
 
 		task ("Assert permissions of each widgets in Home page") {
@@ -141,7 +141,7 @@ definition {
 
 			MessageboardsThread.gotoPG(
 				lastPostUserName = "Test Test",
-				replyCount = 0,
+				replyCount = "0",
 				threadBody = "This is the message boards thread.",
 				threadSubject = "Thread");
 
@@ -159,7 +159,7 @@ definition {
 
 			MessageboardsThread.gotoPG(
 				lastPostUserName = "Test Test",
-				replyCount = 0,
+				replyCount = "0",
 				threadBody = "This is the message boards thread.",
 				threadSubject = "Thread");
 
@@ -189,7 +189,7 @@ definition {
 
 			IFrame.closeFrame();
 
-			PageEditor.publish();
+			PageEditor.clickPublish();
 		}
 
 		task ("Assert the Message Boards is invisible to guest") {

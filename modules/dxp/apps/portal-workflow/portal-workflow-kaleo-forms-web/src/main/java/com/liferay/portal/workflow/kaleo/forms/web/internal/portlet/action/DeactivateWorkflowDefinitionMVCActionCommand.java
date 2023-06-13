@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + KaleoFormsPortletKeys.KALEO_FORMS_ADMIN,
 		"mvc.command.name=/kaleo_forms_admin/deactivate_workflow_definition"
@@ -73,7 +74,7 @@ public class DeactivateWorkflowDefinitionMVCActionCommand
 		catch (Exception exception) {
 			if (isSessionErrorException(exception)) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
+					_log.debug(exception, exception);
 				}
 
 				SessionErrors.add(

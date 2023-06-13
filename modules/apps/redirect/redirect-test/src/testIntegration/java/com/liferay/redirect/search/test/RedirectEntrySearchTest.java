@@ -477,7 +477,8 @@ public class RedirectEntrySearchTest extends BaseSearchTestCase {
 	}
 
 	private boolean _isSearchEngine(String engine) {
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine();
+		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
+			_searchEngineHelper.getDefaultSearchEngineId());
 
 		String vendor = searchEngine.getVendor();
 

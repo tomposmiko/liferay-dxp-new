@@ -57,6 +57,8 @@ public class ParallelDestinationPrototype implements DestinationPrototype {
 			destinationConfiguration.getWorkersCoreSize(),
 			destinationConfiguration.getWorkersMaxSize());
 
+		parallelDestination.afterPropertiesSet();
+
 		return parallelDestination;
 	}
 

@@ -14,7 +14,6 @@
 
 package com.liferay.segments.asah.connector.internal.provider;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -31,19 +30,26 @@ import com.liferay.segments.context.Context;
 import com.liferay.segments.model.SegmentsEntryRel;
 import com.liferay.segments.service.SegmentsEntryRelLocalService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.LongStream;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author David Arques
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AsahSegmentsEntryProviderTest {
 
 	@ClassRule
@@ -73,9 +79,13 @@ public class AsahSegmentsEntryProviderTest {
 			RandomTestUtil.randomLong(), RandomTestUtil.randomLong()
 		};
 
-		List<SegmentsEntryRel> segmentsEntryRels =
-			TransformUtil.transformToList(
-				segmentsEntryRelIds, this::_createSegmentsEntryRel);
+		List<SegmentsEntryRel> segmentsEntryRels = new ArrayList<>();
+
+		LongStream longStream = Arrays.stream(segmentsEntryRelIds);
+
+		longStream.forEach(
+			segmentsEntryRelId -> segmentsEntryRels.add(
+				_createSegmentsEntryRel(segmentsEntryRelId)));
 
 		long segmentsEntryId = RandomTestUtil.randomLong();
 
@@ -111,9 +121,7 @@ public class AsahSegmentsEntryProviderTest {
 	}
 
 	@Test
-	public void testGetSegmentsEntryIdsWithCachedUserSegments()
-		throws PortalException {
-
+	public void testGetSegmentsEntryIdsWithCachedUserSegments() {
 		String userId = RandomTestUtil.randomString();
 
 		long[] segmentsEntryIds = {
@@ -147,9 +155,7 @@ public class AsahSegmentsEntryProviderTest {
 	}
 
 	@Test
-	public void testGetSegmentsEntryIdsWithContextAndEmptyAcClientUserId()
-		throws PortalException {
-
+	public void testGetSegmentsEntryIdsWithContextAndEmptyAcClientUserId() {
 		Context context = new Context();
 
 		context.put(
@@ -165,9 +171,7 @@ public class AsahSegmentsEntryProviderTest {
 	}
 
 	@Test
-	public void testGetSegmentsEntryIdsWithEmptyContext()
-		throws PortalException {
-
+	public void testGetSegmentsEntryIdsWithEmptyContext() {
 		Assert.assertArrayEquals(
 			new long[0],
 			_asahSegmentsEntryProvider.getSegmentsEntryIds(
@@ -176,9 +180,7 @@ public class AsahSegmentsEntryProviderTest {
 	}
 
 	@Test
-	public void testGetSegmentsEntryIdsWithNullContext()
-		throws PortalException {
-
+	public void testGetSegmentsEntryIdsWithNullContext() {
 		Assert.assertArrayEquals(
 			new long[0],
 			_asahSegmentsEntryProvider.getSegmentsEntryIds(
@@ -187,9 +189,7 @@ public class AsahSegmentsEntryProviderTest {
 	}
 
 	@Test
-	public void testGetSegmentsEntryIdsWithUncachedUserSegments()
-		throws PortalException {
-
+	public void testGetSegmentsEntryIdsWithUncachedUserSegments() {
 		long groupId = RandomTestUtil.randomLong();
 
 		Mockito.when(
@@ -239,14 +239,19 @@ public class AsahSegmentsEntryProviderTest {
 		return segmentsEntryRel;
 	}
 
-	private final AsahSegmentsEntryCache _asahSegmentsEntryCache = Mockito.mock(
-		AsahSegmentsEntryCache.class);
+	@Mock
+	private AsahSegmentsEntryCache _asahSegmentsEntryCache;
+
 	private final AsahSegmentsEntryProvider _asahSegmentsEntryProvider =
 		new AsahSegmentsEntryProvider();
-	private final GroupLocalService _groupLocalService = Mockito.mock(
-		GroupLocalService.class);
-	private final MessageBus _messageBus = Mockito.mock(MessageBus.class);
-	private final SegmentsEntryRelLocalService _segmentsEntryRelLocalService =
-		Mockito.mock(SegmentsEntryRelLocalService.class);
+
+	@Mock
+	private GroupLocalService _groupLocalService;
+
+	@Mock
+	private MessageBus _messageBus;
+
+	@Mock
+	private SegmentsEntryRelLocalService _segmentsEntryRelLocalService;
 
 }

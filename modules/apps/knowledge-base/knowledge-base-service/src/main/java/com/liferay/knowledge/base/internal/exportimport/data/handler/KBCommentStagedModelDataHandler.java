@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class KBCommentStagedModelDataHandler
 	extends BaseStagedModelDataHandler<KBComment> {
 
@@ -84,6 +84,13 @@ public class KBCommentStagedModelDataHandler
 	@Override
 	public String getDisplayName(KBComment kbComment) {
 		return kbComment.getUuid();
+	}
+
+	@Reference(unbind = "-")
+	public void setKBCommentLocalService(
+		KBCommentLocalService kbCommentLocalService) {
+
+		_kbCommentLocalService = kbCommentLocalService;
 	}
 
 	@Override
@@ -148,7 +155,6 @@ public class KBCommentStagedModelDataHandler
 		portletDataContext.importClassedModel(kbComment, importedKBComment);
 	}
 
-	@Reference
 	private KBCommentLocalService _kbCommentLocalService;
 
 }

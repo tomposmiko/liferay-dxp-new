@@ -12,126 +12,64 @@
  * details.
  */
 
-import ClayForm, {ClayInput} from '@clayui/form';
-import {useIsMounted} from '@liferay/frontend-js-react-web';
-import classNames from 'classnames';
-import {debounce} from 'frontend-js-web';
-import React, {forwardRef, useEffect, useRef, useState} from 'react';
+import {ClayInput} from '@clayui/form';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {
-	getMinQuantity,
-	getProductMaxQuantity,
-} from '../../utilities/quantities';
-import RulesPopover from './RulesPopover';
+import QuantityControls, {UPDATE_AFTER} from './utils/index';
 
-const getErrors = (value, min, max, step) => {
-	const errors = [];
+function InputQuantitySelector({
+	maxQuantity,
+	minQuantity,
+	multipleQuantity,
+	onUpdate,
+	quantity: startingQuantity,
+	...props
+}) {
+	const quantityControls = useMemo(
+		() =>
+			new QuantityControls({
+				maxQuantity,
+				minQuantity,
+				multipleQuantity,
+			}),
+		[maxQuantity, minQuantity, multipleQuantity]
+	);
 
-	if (!value || value < min) {
-		errors.push('min');
-	}
+	const [selectedQuantity, setSelectedQuantity] = useState(
+		Math.max(startingQuantity, quantityControls.min)
+	);
 
-	if (max && value > max) {
-		errors.push('max');
-	}
+	const keypressDebounce = useRef();
 
-	if (step > 1 && value % step) {
-		errors.push('multiple');
-	}
+	useEffect(() => {
+		clearTimeout(keypressDebounce.current);
 
-	return errors;
-};
+		keypressDebounce.current = setTimeout(() => {
+			setSelectedQuantity(() => {
+				const quantity = quantityControls.getLowerBound(
+					selectedQuantity > quantityControls.max
+						? quantityControls.max
+						: selectedQuantity
+				);
 
-const InputQuantitySelector = forwardRef(
-	(
-		{
-			alignment,
-			className,
-			disabled,
-			max,
-			min,
-			name,
-			onUpdate,
-			quantity,
-			step,
-		},
-		inputRef
-	) => {
-		const [showPopover, setShowPopover] = useState(false);
-		const [visibleErrors, setVisibleErrors] = useState(() =>
-			getErrors(quantity, min, max, step)
-		);
-		const isMounted = useIsMounted();
-		const debouncedSetVisibleErrorsRef = useRef(
-			debounce((newErrors) => {
-				if (isMounted()) {
-					setVisibleErrors(newErrors);
-				}
-			}, 500)
-		);
+				onUpdate(quantity);
 
-		useEffect(() => {
-			debouncedSetVisibleErrorsRef.current(() =>
-				getErrors(quantity, min, max, step)
-			);
-		}, [quantity, min, max, step]);
+				return quantity;
+			});
+		}, UPDATE_AFTER);
+	}, [onUpdate, quantityControls, selectedQuantity]);
 
-		const inputMax = getProductMaxQuantity(max, step);
-		const inputMin = getMinQuantity(min, step);
-
-		return (
-			<ClayForm.Group
-				className={classNames({
-					'has-error': visibleErrors.length,
-					'mb-0': true,
-				})}
-			>
-				<ClayInput
-					className={className}
-					disabled={disabled}
-					max={inputMax}
-					min={inputMin}
-					name={name}
-					onBlur={() => {
-						setShowPopover(false);
-					}}
-					onChange={({target}) => {
-						const numValue = Number(target.value);
-
-						const errors = getErrors(numValue, min, max, step);
-
-						onUpdate({
-							errors,
-							value: numValue,
-						});
-					}}
-					onFocus={() => setShowPopover(true)}
-					ref={inputRef}
-					step={step > 1 ? step : ''}
-					type="number"
-					value={String(quantity || '')}
-				/>
-
-				{showPopover &&
-					(step > 1 || min > 1 || visibleErrors.includes('max')) && (
-						<RulesPopover
-							alignment={alignment}
-							errors={visibleErrors}
-							inputRef={inputRef}
-							max={max || ''}
-							min={min}
-							multiple={step}
-						/>
-					)}
-			</ClayForm.Group>
-		);
-	}
-);
-
-InputQuantitySelector.defaultProps = {
-	max: null,
-	min: 1,
-	step: 1,
-};
+	return (
+		<ClayInput
+			{...props}
+			{...quantityControls.getConfiguration()}
+			onChange={({target}) =>
+				setSelectedQuantity(parseInt(target.value, 10))
+			}
+			type="number"
+			value={selectedQuantity.toString()}
+		/>
+	);
+}
 
 export default InputQuantitySelector;

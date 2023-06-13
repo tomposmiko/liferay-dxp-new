@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.kernel.model.UserGroup",
 	service = KeywordQueryContributor.class
 )
@@ -69,16 +70,13 @@ public class UserGroupKeywordQueryContributor
 			String expandoAttributes = (String)params.get("expandoAttributes");
 
 			if (Validator.isNotNull(expandoAttributes)) {
-				_addSearchExpando(
+				addSearchExpando(
 					booleanQuery, searchContext, expandoAttributes);
 			}
 		}
 	}
 
-	@Reference
-	protected QueryHelper queryHelper;
-
-	private Map<String, Query> _addSearchExpando(
+	protected Map<String, Query> addSearchExpando(
 		BooleanQuery searchQuery, SearchContext searchContext,
 		String keywords) {
 
@@ -88,6 +86,9 @@ public class UserGroupKeywordQueryContributor
 
 		return new HashMap<>();
 	}
+
+	@Reference
+	protected QueryHelper queryHelper;
 
 	@Reference
 	private ExpandoQueryContributor _expandoQueryContributor;

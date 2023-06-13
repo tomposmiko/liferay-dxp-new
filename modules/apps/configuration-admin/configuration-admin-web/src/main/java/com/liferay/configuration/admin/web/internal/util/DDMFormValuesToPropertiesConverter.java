@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.settings.LocationVariableProtocol;
 import com.liferay.portal.kernel.settings.LocationVariableResolver;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
@@ -81,8 +80,6 @@ public class DDMFormValuesToPropertiesConverter {
 		_ddmFormFieldsMap = ddmForm.getDDMFormFieldsMap(false);
 
 		_ddmFormFieldValuesMap = ddmFormValues.getDDMFormFieldValuesMap();
-		_ddmFormFieldValuesReferencesMap =
-			ddmFormValues.getDDMFormFieldValuesReferencesMap(false);
 	}
 
 	public Dictionary<String, Object> getProperties() {
@@ -97,19 +94,14 @@ public class DDMFormValuesToPropertiesConverter {
 			List<DDMFormFieldValue> ddmFormFieldValues =
 				_ddmFormFieldValuesMap.get(attributeDefinition.getID());
 
-			if (ddmFormFieldValues == null) {
-				ddmFormFieldValues = _ddmFormFieldValuesReferencesMap.get(
-					attributeDefinition.getID());
-			}
-
 			if (attributeDefinition.getCardinality() == 0) {
-				value = _toSimpleValue(ddmFormFieldValues.get(0));
+				value = toSimpleValue(ddmFormFieldValues.get(0));
 			}
 			else if (attributeDefinition.getCardinality() > 0) {
-				value = _toArrayValue(ddmFormFieldValues);
+				value = toArrayValue(ddmFormFieldValues);
 			}
 			else if (attributeDefinition.getCardinality() < 0) {
-				value = _toVectorValue(ddmFormFieldValues);
+				value = toVectorValue(ddmFormFieldValues);
 			}
 
 			String[] defaultValues = attributeDefinition.getDefaultValue();
@@ -127,19 +119,7 @@ public class DDMFormValuesToPropertiesConverter {
 		return properties;
 	}
 
-	protected String getDDMFormFieldDataType(String fieldName) {
-		DDMFormField ddmFormField = _ddmFormFieldsMap.get(fieldName);
-
-		return ddmFormField.getDataType();
-	}
-
-	protected String getDDMFormFieldType(String fieldName) {
-		DDMFormField ddmFormField = _ddmFormFieldsMap.get(fieldName);
-
-		return ddmFormField.getType();
-	}
-
-	private String _getDataTypeDefaultValue(String dataType) {
+	protected String getDataTypeDefaultValue(String dataType) {
 		if (dataType.equals(FieldConstants.BOOLEAN)) {
 			return "false";
 		}
@@ -158,7 +138,19 @@ public class DDMFormValuesToPropertiesConverter {
 		return StringPool.BLANK;
 	}
 
-	private String _getDDMFormFieldValueString(
+	protected String getDDMFormFieldDataType(String fieldName) {
+		DDMFormField ddmFormField = _ddmFormFieldsMap.get(fieldName);
+
+		return ddmFormField.getDataType();
+	}
+
+	protected String getDDMFormFieldType(String fieldName) {
+		DDMFormField ddmFormField = _ddmFormFieldsMap.get(fieldName);
+
+		return ddmFormField.getType();
+	}
+
+	protected String getDDMFormFieldValueString(
 		DDMFormFieldValue ddmFormFieldValue) {
 
 		Value value = ddmFormFieldValue.getValue();
@@ -187,20 +179,50 @@ public class DDMFormValuesToPropertiesConverter {
 			String dataType = getDDMFormFieldDataType(
 				ddmFormFieldValue.getName());
 
-			valueString = _getDataTypeDefaultValue(dataType);
+			valueString = getDataTypeDefaultValue(dataType);
 		}
 
 		return valueString;
+	}
+
+	protected Serializable toArrayValue(
+		List<DDMFormFieldValue> ddmFormFieldValues) {
+
+		DDMFormFieldValue ddmFormFieldValue = ddmFormFieldValues.get(0);
+
+		String dataType = getDDMFormFieldDataType(ddmFormFieldValue.getName());
+
+		Vector<Serializable> values = toVectorValue(ddmFormFieldValues);
+
+		return FieldConstants.getSerializable(dataType, values);
+	}
+
+	protected Serializable toSimpleValue(DDMFormFieldValue ddmFormFieldValue) {
+		String dataType = getDDMFormFieldDataType(ddmFormFieldValue.getName());
+
+		String valueString = getDDMFormFieldValueString(ddmFormFieldValue);
+
+		return FieldConstants.getSerializable(dataType, valueString);
+	}
+
+	protected Vector<Serializable> toVectorValue(
+		List<DDMFormFieldValue> ddmFormFieldValues) {
+
+		Vector<Serializable> values = new Vector<>();
+
+		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
+			values.add(toSimpleValue(ddmFormFieldValue));
+		}
+
+		return values;
 	}
 
 	private boolean _isDefaultResourceValue(
 		String defaultValue, int type, Object value) {
 
 		if ((_locationVariableResolver == null) ||
-			(!_locationVariableResolver.isLocationVariable(
-				defaultValue, LocationVariableProtocol.LANGUAGE) &&
-			 !_locationVariableResolver.isLocationVariable(
-				 defaultValue, LocationVariableProtocol.RESOURCE))) {
+			!_locationVariableResolver.isLocationVariable(
+				defaultValue, LocationVariableProtocol.RESOURCE)) {
 
 			return false;
 		}
@@ -230,48 +252,11 @@ public class DDMFormValuesToPropertiesConverter {
 				}
 			}
 			catch (JSONException jsonException) {
-				_log.error(jsonException);
+				_log.error(jsonException, jsonException);
 			}
 		}
 
 		return false;
-	}
-
-	private Serializable _toArrayValue(
-		List<DDMFormFieldValue> ddmFormFieldValues) {
-
-		DDMFormFieldValue ddmFormFieldValue = ddmFormFieldValues.get(0);
-
-		String dataType = getDDMFormFieldDataType(ddmFormFieldValue.getName());
-
-		Vector<Serializable> values = _toVectorValue(ddmFormFieldValues);
-
-		return FieldConstants.getSerializable(dataType, values);
-	}
-
-	private Serializable _toSimpleValue(DDMFormFieldValue ddmFormFieldValue) {
-		String dataType = getDDMFormFieldDataType(ddmFormFieldValue.getName());
-
-		String valueString = _getDDMFormFieldValueString(ddmFormFieldValue);
-
-		return FieldConstants.getSerializable(dataType, valueString);
-	}
-
-	private Vector<Serializable> _toVectorValue(
-		List<DDMFormFieldValue> ddmFormFieldValues) {
-
-		Vector<Serializable> values = new Vector<>();
-
-		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-			Serializable simpleDDMFormFieldValue = _toSimpleValue(
-				ddmFormFieldValue);
-
-			if (!Validator.isBlank(simpleDDMFormFieldValue.toString())) {
-				values.add(simpleDDMFormFieldValue);
-			}
-		}
-
-		return values;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -280,8 +265,6 @@ public class DDMFormValuesToPropertiesConverter {
 	private final ConfigurationModel _configurationModel;
 	private final Map<String, DDMFormField> _ddmFormFieldsMap;
 	private final Map<String, List<DDMFormFieldValue>> _ddmFormFieldValuesMap;
-	private final Map<String, List<DDMFormFieldValue>>
-		_ddmFormFieldValuesReferencesMap;
 	private final Locale _defaultLocale;
 	private final JSONFactory _jsonFactory;
 	private final Locale _locale;

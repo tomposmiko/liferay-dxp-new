@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"panel.app.order:Integer=300",
 		"panel.category.key=" + CommercePanelCategoryKeys.COMMERCE_PRODUCT_MANAGEMENT
@@ -36,16 +37,17 @@ import org.osgi.service.component.annotations.Reference;
 public class CPOptionsPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return CPPortletKeys.CP_OPTIONS;
 	}
 
-	@Reference(target = "(javax.portlet.name=" + CPPortletKeys.CP_OPTIONS + ")")
-	private Portlet _portlet;
+	@Override
+	@Reference(
+		target = "(javax.portlet.name=" + CPPortletKeys.CP_OPTIONS + ")",
+		unbind = "-"
+	)
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

@@ -23,6 +23,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Michael C. Han
@@ -68,6 +70,18 @@ public class SearchHitsImpl implements SearchHits, Serializable {
 		_searchHits.add(searchHit);
 	}
 
+	protected void setMaxScore(float maxScore) {
+		_maxScore = maxScore;
+	}
+
+	protected void setSearchTime(long searchTime) {
+		_searchTime = searchTime;
+	}
+
+	protected void setTotalHits(long totalHits) {
+		_totalHits = totalHits;
+	}
+
 	protected static class Builder implements SearchHitsBuilder {
 
 		@Override
@@ -86,6 +100,21 @@ public class SearchHitsImpl implements SearchHits, Serializable {
 			return this;
 		}
 
+		/**
+		 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+		 *             #addSearchHits(Collection)}
+		 */
+		@Deprecated
+		@Override
+		public SearchHitsBuilder addSearchHits(
+			Stream<SearchHit> searchHitStream) {
+
+			_searchHitsImpl.addSearchHits(
+				searchHitStream.collect(Collectors.toList()));
+
+			return this;
+		}
+
 		@Override
 		public SearchHits build() {
 			return new SearchHitsImpl(_searchHitsImpl);
@@ -93,39 +122,27 @@ public class SearchHitsImpl implements SearchHits, Serializable {
 
 		@Override
 		public SearchHitsBuilder maxScore(float maxScore) {
-			_searchHitsImpl._setMaxScore(maxScore);
+			_searchHitsImpl.setMaxScore(maxScore);
 
 			return this;
 		}
 
 		@Override
 		public SearchHitsBuilder searchTime(long searchTime) {
-			_searchHitsImpl._setSearchTime(searchTime);
+			_searchHitsImpl.setSearchTime(searchTime);
 
 			return this;
 		}
 
 		@Override
 		public SearchHitsBuilder totalHits(long totalHits) {
-			_searchHitsImpl._setTotalHits(totalHits);
+			_searchHitsImpl.setTotalHits(totalHits);
 
 			return this;
 		}
 
 		private final SearchHitsImpl _searchHitsImpl = new SearchHitsImpl();
 
-	}
-
-	private void _setMaxScore(float maxScore) {
-		_maxScore = maxScore;
-	}
-
-	private void _setSearchTime(long searchTime) {
-		_searchTime = searchTime;
-	}
-
-	private void _setTotalHits(long totalHits) {
-		_totalHits = totalHits;
 	}
 
 	private float _maxScore;

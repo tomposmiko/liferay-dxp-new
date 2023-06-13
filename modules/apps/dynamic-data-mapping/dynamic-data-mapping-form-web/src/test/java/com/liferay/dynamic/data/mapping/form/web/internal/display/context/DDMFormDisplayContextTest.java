@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.web.internal.display.context;
 
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
@@ -25,15 +25,13 @@ import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
+import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
-import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterRegistry;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -44,17 +42,13 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
-import com.liferay.portal.kernel.service.permission.PortletPermission;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -63,9 +57,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PropsImpl;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderRequest;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderResponse;
@@ -73,7 +65,6 @@ import com.liferay.portletmvc4spring.test.mock.web.portlet.MockRenderResponse;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -82,28 +73,30 @@ import javax.portlet.RenderRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.hamcrest.CoreMatchers;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Adam Brandizzi
  */
-public class DDMFormDisplayContextTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+@PrepareForTest(
+	{LocaleUtil.class, PortletPermissionUtil.class, ResourceBundleUtil.class}
+)
+@RunWith(PowerMockRunner.class)
+public class DDMFormDisplayContextTest extends PowerMockito {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
@@ -111,44 +104,45 @@ public class DDMFormDisplayContextTest {
 	}
 
 	@Before
-	public void setUp() {
+	public void setUp() throws PortalException {
 		_setUpJSONFactoryUtil();
 		_setUpLanguageUtil();
+		_setUpLocaleUtil();
 		_setUpPortalUtil();
 		_setUpResourceBundleUtil();
 	}
 
 	@Test
-	public void testAutosaveWithGuestUser() throws Exception {
+	public void testAutosaveWithDefaultUser() throws Exception {
 		MockRenderRequest mockRenderRequest = _mockRenderRequest();
 
-		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
+		ThemeDisplay themeDisplay = mock(ThemeDisplay.class);
 
 		mockRenderRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 
-		PortletDisplay portletDisplay = Mockito.mock(PortletDisplay.class);
+		PortletDisplay portletDisplay = mock(PortletDisplay.class);
 
-		Mockito.when(
+		when(
 			portletDisplay.getPortletResource()
 		).thenReturn(
 			null
 		);
 
-		Mockito.when(
+		when(
 			themeDisplay.getPortletDisplay()
 		).thenReturn(
 			portletDisplay
 		);
 
-		User user = Mockito.mock(User.class);
+		User user = mock(User.class);
 
-		Mockito.when(
-			user.isGuestUser()
+		when(
+			user.isDefaultUser()
 		).thenReturn(
 			Boolean.TRUE
 		);
 
-		Mockito.when(
+		when(
 			themeDisplay.getUser()
 		).thenReturn(
 			user
@@ -161,13 +155,14 @@ public class DDMFormDisplayContextTest {
 	}
 
 	@Test
-	public void testAutosaveWithNonguestUser1() throws Exception {
-		RenderRequest renderRequest = _mockRenderRequestWithGuestUser(false);
+	public void testAutosaveWithNondefaultUser1() throws Exception {
+		RenderRequest renderRequest =
+			_mockRenderRequestAutosaveWithNondefaultUser();
 
 		DDMFormInstanceSettings ddmFormInstanceSettings =
-			_mockDDMFormInstanceSettingsAutosaveWithNonguestUser();
+			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser();
 
-		Mockito.when(
+		when(
 			ddmFormInstanceSettings.autosaveEnabled()
 		).thenReturn(
 			Boolean.FALSE
@@ -180,19 +175,20 @@ public class DDMFormDisplayContextTest {
 	}
 
 	@Test
-	public void testAutosaveWithNonguestUser2() throws Exception {
-		RenderRequest renderRequest = _mockRenderRequestWithGuestUser(false);
+	public void testAutosaveWithNondefaultUser2() throws Exception {
+		RenderRequest renderRequest =
+			_mockRenderRequestAutosaveWithNondefaultUser();
 
 		DDMFormInstanceSettings ddmFormInstanceSettings =
-			_mockDDMFormInstanceSettingsAutosaveWithNonguestUser();
+			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser();
 
-		Mockito.when(
+		when(
 			ddmFormInstanceSettings.autosaveEnabled()
 		).thenReturn(
 			Boolean.TRUE
 		);
 
-		Mockito.when(
+		when(
 			_ddmFormWebConfiguration.autosaveInterval()
 		).thenReturn(
 			1
@@ -205,19 +201,20 @@ public class DDMFormDisplayContextTest {
 	}
 
 	@Test
-	public void testAutosaveWithNonguestUser3() throws Exception {
-		RenderRequest renderRequest = _mockRenderRequestWithGuestUser(false);
+	public void testAutosaveWithNondefaultUser3() throws Exception {
+		RenderRequest renderRequest =
+			_mockRenderRequestAutosaveWithNondefaultUser();
 
 		DDMFormInstanceSettings ddmFormInstanceSettings =
-			_mockDDMFormInstanceSettingsAutosaveWithNonguestUser();
+			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser();
 
-		Mockito.when(
+		when(
 			ddmFormInstanceSettings.autosaveEnabled()
 		).thenReturn(
 			Boolean.TRUE
 		);
 
-		Mockito.when(
+		when(
 			_ddmFormWebConfiguration.autosaveInterval()
 		).thenReturn(
 			0
@@ -227,37 +224,6 @@ public class DDMFormDisplayContextTest {
 			_createDDMFormDisplayContext(renderRequest);
 
 		Assert.assertFalse(ddmFormDisplayContext.isAutosaveEnabled());
-	}
-
-	@Test
-	public void testCreateDDMFormRenderingContext() throws Exception {
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
-			DDMFormInstanceSettings.class);
-
-		_mockDDMFormInstance(ddmFormInstanceSettings);
-
-		DDMFormDisplayContext ddmFormDisplayContext =
-			_createDDMFormDisplayContext();
-
-		DDMFormRenderingContext ddmFormRenderingContext =
-			ddmFormDisplayContext.createDDMFormRenderingContext(new DDMForm());
-
-		Assert.assertFalse(
-			ddmFormRenderingContext.getProperty(
-				"showPartialResultsToRespondents"));
-
-		Mockito.when(
-			ddmFormInstanceSettings.showPartialResultsToRespondents()
-		).thenReturn(
-			true
-		);
-
-		ddmFormRenderingContext =
-			ddmFormDisplayContext.createDDMFormRenderingContext(new DDMForm());
-
-		Assert.assertTrue(
-			ddmFormRenderingContext.getProperty(
-				"showPartialResultsToRespondents"));
 	}
 
 	@Test
@@ -276,7 +242,7 @@ public class DDMFormDisplayContextTest {
 
 		DDMForm ddmForm = _createDDMForm(availableLocales, defaultLocale);
 
-		_mockHttpServletRequest2.addParameter(
+		_request.addParameter(
 			"languageId", LocaleUtil.toLanguageId(LocaleUtil.SPAIN));
 
 		DDMFormRenderingContext ddmFormRenderingContext =
@@ -288,14 +254,14 @@ public class DDMFormDisplayContextTest {
 
 	@Test
 	public void testGetCustomizedSubmitLabel() throws Exception {
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
 			DDMFormInstanceSettings.class);
 
 		_mockDDMFormInstance(ddmFormInstanceSettings);
 
 		String submitLabel = "Enviar Personalizado";
 
-		Mockito.when(
+		when(
 			ddmFormInstanceSettings.submitLabel()
 		).thenReturn(
 			JSONUtil.put(
@@ -311,80 +277,6 @@ public class DDMFormDisplayContextTest {
 	}
 
 	@Test
-	public void testGetFormInstanceWithMissingSettings() throws Exception {
-		DDMFormDisplayContext ddmFormDisplayContext =
-			_createDDMFormDisplayContext();
-
-		DDMFormInstance ddmFormInstance = Mockito.spy(
-			new DDMFormInstanceImpl());
-
-		String expectedSettings = StringUtil.randomString();
-
-		ddmFormInstance.setSettings(expectedSettings);
-
-		Mockito.when(
-			_ddmFormInstanceService.fetchFormInstance(Mockito.anyLong())
-		).thenReturn(
-			ddmFormInstance
-		);
-
-		Mockito.when(
-			_ddmFormInstanceVersion.getSettings()
-		).thenReturn(
-			StringPool.BLANK
-		);
-
-		ddmFormInstance = ddmFormDisplayContext.getFormInstance();
-
-		Assert.assertThat(
-			ddmFormInstance.getSettings(), CoreMatchers.is(expectedSettings));
-	}
-
-	@Test
-	public void testGetLimitToOneSubmissionPerUserMap() throws Exception {
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
-			DDMFormInstanceSettings.class);
-
-		_mockDDMFormInstance(ddmFormInstanceSettings);
-
-		String limitToOneSubmissionPerUserBody = RandomTestUtil.randomString();
-
-		Mockito.when(
-			ddmFormInstanceSettings.limitToOneSubmissionPerUserBody()
-		).thenReturn(
-			JSONUtil.put(
-				_DEFAULT_LANGUAGE_ID, limitToOneSubmissionPerUserBody
-			).toString()
-		);
-
-		String limitToOneSubmissionPerUserHeader =
-			RandomTestUtil.randomString();
-
-		Mockito.when(
-			ddmFormInstanceSettings.limitToOneSubmissionPerUserHeader()
-		).thenReturn(
-			JSONUtil.put(
-				_DEFAULT_LANGUAGE_ID, limitToOneSubmissionPerUserHeader
-			).toString()
-		);
-
-		DDMFormDisplayContext ddmFormDisplayContext =
-			_createDDMFormDisplayContext(_mockRenderRequest());
-
-		Map<String, String> limitToOneSubmissionPerUserMap =
-			ddmFormDisplayContext.getLimitToOneSubmissionPerUserMap();
-
-		Assert.assertEquals(
-			limitToOneSubmissionPerUserBody,
-			limitToOneSubmissionPerUserMap.get(
-				"limitToOneSubmissionPerUserBody"));
-		Assert.assertEquals(
-			limitToOneSubmissionPerUserHeader,
-			limitToOneSubmissionPerUserMap.get(
-				"limitToOneSubmissionPerUserHeader"));
-	}
-
-	@Test
 	public void testGetLocale() throws PortalException {
 		DDMFormDisplayContext ddmFormDisplayContext =
 			_createDDMFormDisplayContext();
@@ -392,7 +284,7 @@ public class DDMFormDisplayContextTest {
 		HttpServletRequest httpServletRequest = Mockito.mock(
 			HttpServletRequest.class);
 
-		Mockito.when(
+		when(
 			httpServletRequest.getParameter(Mockito.eq("defaultLanguageId"))
 		).thenReturn(
 			"pt_BR"
@@ -412,7 +304,7 @@ public class DDMFormDisplayContextTest {
 
 	@Test
 	public void testGetSubmitLabel() throws Exception {
-		_mockDDMFormInstance(Mockito.mock(DDMFormInstanceSettings.class));
+		_mockDDMFormInstance(mock(DDMFormInstanceSettings.class));
 
 		String submitLabel = "Submit";
 
@@ -429,11 +321,11 @@ public class DDMFormDisplayContextTest {
 
 	@Test
 	public void testGetSubmitLabelWithWorkflow() throws Exception {
-		_mockDDMFormInstance(Mockito.mock(DDMFormInstanceSettings.class));
+		_mockDDMFormInstance(mock(DDMFormInstanceSettings.class));
 
-		String submitLabel = "Submit For Workflow";
+		String submitLabel = "Submit For Publication";
 
-		_mockLanguageGet("submit-for-workflow", submitLabel);
+		_mockLanguageGet("submit-for-publication", submitLabel);
 
 		_mockWorkflowDefinitionLinkLocalService(true);
 
@@ -448,14 +340,14 @@ public class DDMFormDisplayContextTest {
 	public void testIsFormAvailableForGuest() throws Exception {
 		DDMFormInstance ddmFormInstance = _mockDDMFormInstance();
 
-		Mockito.when(
-			_ddmFormInstanceLocalService.fetchFormInstance(Mockito.anyLong())
+		when(
+			_ddmFormInstanceLocalService.fetchFormInstance(Matchers.anyLong())
 		).thenReturn(
 			ddmFormInstance
 		);
 
-		Mockito.when(
-			_ddmFormInstanceService.fetchFormInstance(Mockito.anyLong())
+		when(
+			_ddmFormInstanceService.fetchFormInstance(Matchers.anyLong())
 		).thenReturn(
 			null
 		);
@@ -468,26 +360,16 @@ public class DDMFormDisplayContextTest {
 
 	@Test
 	public void testIsFormAvailableForLoggedUser() throws Exception {
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
-			DDMFormInstanceSettings.class);
+		DDMFormInstance ddmFormInstance = _mockDDMFormInstance();
 
-		Mockito.when(
-			ddmFormInstanceSettings.published()
-		).thenReturn(
-			true
-		);
-
-		DDMFormInstance ddmFormInstance = _mockDDMFormInstance(
-			ddmFormInstanceSettings);
-
-		Mockito.when(
-			_ddmFormInstanceLocalService.fetchFormInstance(Mockito.anyLong())
+		when(
+			_ddmFormInstanceLocalService.fetchFormInstance(Matchers.anyLong())
 		).thenReturn(
 			ddmFormInstance
 		);
 
-		Mockito.when(
-			_ddmFormInstanceService.fetchFormInstance(Mockito.anyLong())
+		when(
+			_ddmFormInstanceService.fetchFormInstance(Matchers.anyLong())
 		).thenReturn(
 			ddmFormInstance
 		);
@@ -531,12 +413,12 @@ public class DDMFormDisplayContextTest {
 
 	@Test
 	public void testIsSharedURL() throws Exception {
-		DDMFormDisplayContext ddmFormDisplayContext = Mockito.spy(
+		DDMFormDisplayContext ddmFormDisplayContext = spy(
 			_createDDMFormDisplayContext());
 
-		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
+		ThemeDisplay themeDisplay = mock(ThemeDisplay.class);
 
-		Mockito.when(
+		when(
 			themeDisplay.getURLCurrent()
 		).thenReturn(
 			"http://localhost:8080/web/forms/shared?form=123"
@@ -553,7 +435,7 @@ public class DDMFormDisplayContextTest {
 
 	@Test
 	public void testIsShowIconInEditMode() throws Exception {
-		_mockHttpServletRequest1.addParameter("p_l_mode", Constants.EDIT);
+		_mockHttpServletRequest.addParameter("p_l_mode", Constants.EDIT);
 
 		DDMFormDisplayContext ddmFormDisplayContext = _createSpy(
 			false, false, false);
@@ -588,35 +470,14 @@ public class DDMFormDisplayContextTest {
 	}
 
 	@Test
-	public void testIsShowPartialResultsToRespondents() throws Exception {
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
-			DDMFormInstanceSettings.class);
-
-		_mockDDMFormInstance(ddmFormInstanceSettings);
-
-		DDMFormDisplayContext ddmFormDisplayContext =
-			_createDDMFormDisplayContext();
-
-		Assert.assertFalse(
-			ddmFormDisplayContext.isShowPartialResultsToRespondents());
-
-		Mockito.when(
-			ddmFormInstanceSettings.showPartialResultsToRespondents()
-		).thenReturn(
-			true
-		);
-
-		Assert.assertTrue(
-			ddmFormDisplayContext.isShowPartialResultsToRespondents());
-	}
-
-	@Test
 	public void testIsShowSuccessPage() throws Exception {
-		_mockDDMFormInstance(Mockito.mock(DDMFormInstanceSettings.class));
+		_mockDDMFormInstance(mock(DDMFormInstanceSettings.class));
 
 		MockRenderRequest mockRenderRequest = _mockRenderRequest();
 
-		SessionMessages.add(mockRenderRequest, "formInstanceRecordAdded");
+		SessionMessages.add(
+			mockRenderRequest,
+			SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE);
 
 		DDMFormDisplayContext ddmFormDisplayContext =
 			_createDDMFormDisplayContext(mockRenderRequest);
@@ -626,10 +487,10 @@ public class DDMFormDisplayContextTest {
 
 	@Test
 	public void testIsShowSuccessPageWithRedirectURL() throws Exception {
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
 			DDMFormInstanceSettings.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceSettings.redirectURL()
 		).thenReturn(
 			"http://localhost:8080/web/forms/shared/-/form/123"
@@ -639,75 +500,14 @@ public class DDMFormDisplayContextTest {
 
 		MockRenderRequest mockRenderRequest = _mockRenderRequest();
 
-		SessionMessages.add(mockRenderRequest, "formInstanceRecordAdded");
+		SessionMessages.add(
+			mockRenderRequest,
+			SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE);
 
 		DDMFormDisplayContext ddmFormDisplayContext =
 			_createDDMFormDisplayContext(mockRenderRequest);
 
 		Assert.assertFalse(ddmFormDisplayContext.isShowSuccessPage());
-	}
-
-	@Test
-	public void testSubmissionLimitReachedDefaultMessage() throws Exception {
-		String limitToOneSubmissionPerUserBody =
-			"You can fill out this form only once. Contact the owner of the " +
-				"form if you think this is a mistake.";
-		String limitToOneSubmissionPerUserHeader =
-			"You have already responded.";
-
-		Mockito.when(
-			_language.get(
-				Mockito.any(HttpServletRequest.class),
-				Mockito.eq(
-					"you-can-fill-out-this-form-only-once.-contact-the-owner-" +
-						"of-the-form-if-you-think-this-is-a-mistake"))
-		).thenReturn(
-			limitToOneSubmissionPerUserBody
-		);
-
-		Mockito.when(
-			_language.get(
-				Mockito.any(HttpServletRequest.class),
-				Mockito.eq("you-have-already-responded"))
-		).thenReturn(
-			limitToOneSubmissionPerUserHeader
-		);
-
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
-			DDMFormInstanceSettings.class);
-
-		_mockDDMFormInstance(ddmFormInstanceSettings);
-
-		Mockito.when(
-			ddmFormInstanceSettings.limitToOneSubmissionPerUserBody()
-		).thenReturn(
-			JSONUtil.put(
-				_DEFAULT_LANGUAGE_ID, StringPool.BLANK
-			).toString()
-		);
-
-		Mockito.when(
-			ddmFormInstanceSettings.limitToOneSubmissionPerUserHeader()
-		).thenReturn(
-			JSONUtil.put(
-				_DEFAULT_LANGUAGE_ID, StringPool.BLANK
-			).toString()
-		);
-
-		DDMFormDisplayContext ddmFormDisplayContext =
-			_createDDMFormDisplayContext(_mockRenderRequest());
-
-		Map<String, String> limitToOneSubmissionPerUserMap =
-			ddmFormDisplayContext.getLimitToOneSubmissionPerUserMap();
-
-		Assert.assertEquals(
-			limitToOneSubmissionPerUserBody,
-			limitToOneSubmissionPerUserMap.get(
-				"limitToOneSubmissionPerUserBody"));
-		Assert.assertEquals(
-			limitToOneSubmissionPerUserHeader,
-			limitToOneSubmissionPerUserMap.get(
-				"limitToOneSubmissionPerUserHeader"));
 	}
 
 	private DDMForm _createDDMForm(
@@ -740,19 +540,17 @@ public class DDMFormDisplayContextTest {
 		throws PortalException {
 
 		return new DDMFormDisplayContext(
-			Mockito.mock(DDMFormFieldTypeServicesRegistry.class),
+			mock(DDMFormFieldTypeServicesTracker.class),
 			_ddmFormInstanceLocalService,
-			Mockito.mock(DDMFormInstanceRecordService.class),
-			Mockito.mock(DDMFormInstanceRecordVersionLocalService.class),
+			mock(DDMFormInstanceRecordLocalService.class),
+			mock(DDMFormInstanceRecordVersionLocalService.class),
 			_ddmFormInstanceService, _mockDDMFormInstanceVersionLocalService(),
-			Mockito.mock(DDMFormRenderer.class),
-			Mockito.mock(DDMFormValuesFactory.class),
-			Mockito.mock(DDMFormValuesMerger.class), _ddmFormWebConfiguration,
-			Mockito.mock(DDMStorageAdapterRegistry.class),
-			Mockito.mock(GroupLocalService.class), new JSONFactoryImpl(), null,
-			null, null, null, Mockito.mock(Portal.class), renderRequest,
-			new MockRenderResponse(), Mockito.mock(RoleLocalService.class),
-			Mockito.mock(UserLocalService.class),
+			mock(DDMFormRenderer.class), mock(DDMFormValuesFactory.class),
+			mock(DDMFormValuesMerger.class), _ddmFormWebConfiguration,
+			mock(DDMStorageAdapterTracker.class), mock(GroupLocalService.class),
+			new JSONFactoryImpl(), null, null, mock(Portal.class),
+			renderRequest, new MockRenderResponse(),
+			mock(RoleLocalService.class), mock(UserLocalService.class),
 			_workflowDefinitionLinkLocalService);
 	}
 
@@ -760,7 +558,7 @@ public class DDMFormDisplayContextTest {
 			boolean formShared, boolean preview, boolean sharedURL)
 		throws Exception {
 
-		DDMFormDisplayContext ddmFormDisplayContext = Mockito.spy(
+		DDMFormDisplayContext ddmFormDisplayContext = spy(
 			_createDDMFormDisplayContext());
 
 		Mockito.doReturn(
@@ -785,12 +583,12 @@ public class DDMFormDisplayContextTest {
 	}
 
 	private DDMFormInstance _mockDDMFormInstance() throws Exception {
-		DDMFormInstance formInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance formInstance = mock(DDMFormInstance.class);
 
-		DDMFormInstanceSettings formInstanceSettings = Mockito.mock(
+		DDMFormInstanceSettings formInstanceSettings = mock(
 			DDMFormInstanceSettings.class);
 
-		Mockito.when(
+		when(
 			formInstance.getSettingsModel()
 		).thenReturn(
 			formInstanceSettings
@@ -799,13 +597,13 @@ public class DDMFormDisplayContextTest {
 		return formInstance;
 	}
 
-	private DDMFormInstance _mockDDMFormInstance(
+	private void _mockDDMFormInstance(
 			DDMFormInstanceSettings ddmFormInstanceSettings)
 		throws Exception {
 
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getSettingsModel()
 		).thenReturn(
 			ddmFormInstanceSettings
@@ -813,38 +611,36 @@ public class DDMFormDisplayContextTest {
 
 		DDMStructure ddmStructure = _mockDDMStructure();
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getStructure()
 		).thenReturn(
 			ddmStructure
 		);
 
-		Mockito.when(
-			_ddmFormInstanceService.fetchFormInstance(Mockito.anyLong())
+		when(
+			_ddmFormInstanceService.fetchFormInstance(Matchers.anyLong())
 		).thenReturn(
 			ddmFormInstance
 		);
-
-		return ddmFormInstance;
 	}
 
 	private DDMFormInstanceSettings
-			_mockDDMFormInstanceSettingsAutosaveWithNonguestUser()
+			_mockDDMFormInstanceSettingsAutosaveWithNondefaultUser()
 		throws Exception {
 
-		DDMFormInstance ddmFormInstance = Mockito.mock(DDMFormInstance.class);
+		DDMFormInstance ddmFormInstance = mock(DDMFormInstance.class);
 
-		DDMFormInstanceSettings ddmFormInstanceSettings = Mockito.mock(
+		DDMFormInstanceSettings ddmFormInstanceSettings = mock(
 			DDMFormInstanceSettings.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstance.getSettingsModel()
 		).thenReturn(
 			ddmFormInstanceSettings
 		);
 
-		Mockito.when(
-			_ddmFormInstanceService.fetchFormInstance(Mockito.anyLong())
+		when(
+			_ddmFormInstanceService.fetchFormInstance(Matchers.anyLong())
 		).thenReturn(
 			ddmFormInstance
 		);
@@ -856,25 +652,31 @@ public class DDMFormDisplayContextTest {
 			_mockDDMFormInstanceVersionLocalService()
 		throws PortalException {
 
-		Mockito.when(
-			_ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
-				Mockito.anyLong(), Mockito.anyInt())
+		DDMFormInstanceVersionLocalService ddmFormInstanceVersionLocalService =
+			mock(DDMFormInstanceVersionLocalService.class);
+
+		DDMFormInstanceVersion ddmFormInstanceVersion = mock(
+			DDMFormInstanceVersion.class);
+
+		when(
+			ddmFormInstanceVersionLocalService.getLatestFormInstanceVersion(
+				Matchers.anyLong(), Matchers.anyInt())
 		).thenReturn(
-			_ddmFormInstanceVersion
+			ddmFormInstanceVersion
 		);
 
-		return _ddmFormInstanceVersionLocalService;
+		return ddmFormInstanceVersionLocalService;
 	}
 
 	private DDMStructure _mockDDMStructure() throws Exception {
-		DDMStructure ddmStructure = Mockito.mock(DDMStructure.class);
+		DDMStructure ddmStructure = mock(DDMStructure.class);
 
 		Locale defaultLocale = LocaleUtil.fromLanguageId(_DEFAULT_LANGUAGE_ID);
 
 		DDMForm ddmForm = _createDDMForm(
 			new HashSet<>(Arrays.asList(defaultLocale)), defaultLocale);
 
-		Mockito.when(
+		when(
 			ddmStructure.getDDMForm()
 		).thenReturn(
 			ddmForm
@@ -884,30 +686,24 @@ public class DDMFormDisplayContextTest {
 	}
 
 	private void _mockLanguageGet(String key, String value) {
-		Mockito.when(
-			_language.get(Mockito.any(ResourceBundle.class), Mockito.eq(key))
+		when(
+			_language.get(Matchers.any(ResourceBundle.class), Matchers.eq(key))
 		).thenReturn(
 			value
 		);
 	}
 
 	private void _mockPortletPermissionUtil() throws Exception {
-		PortletPermissionUtil portletPermissionUtil =
-			new PortletPermissionUtil();
+		mockStatic(PortletPermissionUtil.class);
 
-		PortletPermission portletPermission = Mockito.mock(
-			PortletPermission.class);
-
-		Mockito.when(
-			portletPermission.contains(
-				Mockito.nullable(PermissionChecker.class),
-				Mockito.nullable(Layout.class), Mockito.anyString(),
-				Mockito.anyString())
+		when(
+			PortletPermissionUtil.contains(
+				Matchers.any(PermissionChecker.class),
+				Matchers.any(Layout.class), Matchers.anyString(),
+				Matchers.anyString())
 		).thenReturn(
 			true
 		);
-
-		portletPermissionUtil.setPortletPermission(portletPermission);
 	}
 
 	private MockRenderRequest _mockRenderRequest() throws PortalException {
@@ -915,8 +711,8 @@ public class DDMFormDisplayContextTest {
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		themeDisplay.setCompany(Mockito.mock(Company.class));
-		themeDisplay.setLayout(Mockito.mock(Layout.class));
+		themeDisplay.setCompany(mock(Company.class));
+		themeDisplay.setLayout(mock(Layout.class));
 		themeDisplay.setLocale(LocaleUtil.SPAIN);
 
 		mockRenderRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
@@ -926,38 +722,38 @@ public class DDMFormDisplayContextTest {
 		return mockRenderRequest;
 	}
 
-	private RenderRequest _mockRenderRequestWithGuestUser(boolean guestUser)
+	private RenderRequest _mockRenderRequestAutosaveWithNondefaultUser()
 		throws Exception {
 
 		MockRenderRequest mockRenderRequest = _mockRenderRequest();
 
-		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
+		ThemeDisplay themeDisplay = mock(ThemeDisplay.class);
 
 		mockRenderRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 
-		User user = Mockito.mock(User.class);
+		User user = mock(User.class);
 
-		Mockito.when(
-			user.isGuestUser()
+		when(
+			user.isDefaultUser()
 		).thenReturn(
-			guestUser
+			Boolean.FALSE
 		);
 
-		Mockito.when(
+		when(
 			themeDisplay.getUser()
 		).thenReturn(
 			user
 		);
 
-		PortletDisplay portletDisplay = Mockito.mock(PortletDisplay.class);
+		PortletDisplay portletDisplay = mock(PortletDisplay.class);
 
-		Mockito.when(
+		when(
 			portletDisplay.getPortletResource()
 		).thenReturn(
 			null
 		);
 
-		Mockito.when(
+		when(
 			themeDisplay.getPortletDisplay()
 		).thenReturn(
 			portletDisplay
@@ -969,10 +765,10 @@ public class DDMFormDisplayContextTest {
 	private void _mockWorkflowDefinitionLinkLocalService(
 		boolean hasWorkflowDefinitionLink) {
 
-		Mockito.when(
+		when(
 			_workflowDefinitionLinkLocalService.hasWorkflowDefinitionLink(
-				Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(),
-				Mockito.anyLong())
+				Matchers.anyLong(), Matchers.anyLong(), Matchers.anyString(),
+				Matchers.anyLong())
 		).thenReturn(
 			hasWorkflowDefinitionLink
 		);
@@ -987,100 +783,97 @@ public class DDMFormDisplayContextTest {
 	private void _setUpLanguageUtil() {
 		LanguageUtil languageUtil = new LanguageUtil();
 
-		Mockito.when(
-			_language.getLanguageId(Mockito.any(Locale.class))
+		when(
+			_language.getLanguageId(Matchers.any(Locale.class))
 		).thenReturn(
 			_DEFAULT_LANGUAGE_ID
 		);
 
-		Mockito.when(
-			_language.getLanguageId(Mockito.eq(_mockHttpServletRequest2))
+		when(
+			_language.getLanguageId(Matchers.eq(_request))
 		).thenReturn(
 			_DEFAULT_LANGUAGE_ID
 		);
-
-		_whenLanguageIsAvailableLocale(LocaleUtil.BRAZIL);
-		_whenLanguageIsAvailableLocale(LocaleUtil.SPAIN);
 
 		languageUtil.setLanguage(_language);
+	}
+
+	private void _setUpLocaleUtil() {
+		mockStatic(LocaleUtil.class);
+
+		when(
+			LocaleUtil.fromLanguageId(_DEFAULT_LANGUAGE_ID)
+		).thenReturn(
+			LocaleUtil.SPAIN
+		);
+
+		when(
+			LocaleUtil.fromLanguageId("pt_BR")
+		).thenReturn(
+			LocaleUtil.BRAZIL
+		);
 	}
 
 	private void _setUpPortalUtil() {
 		PortalUtil portalUtil = new PortalUtil();
 
-		Portal portal = Mockito.mock(Portal.class);
+		portalUtil.setPortal(mock(Portal.class));
 
-		portalUtil.setPortal(portal);
-
-		Mockito.when(
-			portal.getHttpServletRequest(Mockito.any(RenderRequest.class))
+		when(
+			PortalUtil.getHttpServletRequest(Matchers.any(RenderRequest.class))
 		).thenReturn(
-			_mockHttpServletRequest2
+			_request
 		);
 
-		Mockito.when(
-			portal.getLiferayPortletRequest(Mockito.any(RenderRequest.class))
+		when(
+			PortalUtil.getLiferayPortletRequest(
+				Matchers.any(RenderRequest.class))
 		).thenReturn(
 			Mockito.mock(LiferayPortletRequest.class)
 		);
 
-		Mockito.when(
-			portal.getOriginalServletRequest(
-				Mockito.any(HttpServletRequest.class))
+		when(
+			PortalUtil.getOriginalServletRequest(
+				Matchers.any(HttpServletRequest.class))
 		).thenReturn(
-			_mockHttpServletRequest1
+			_mockHttpServletRequest
 		);
 	}
 
 	private void _setUpResourceBundleUtil() {
-		ResourceBundleLoader resourceBundleLoader = Mockito.mock(
-			ResourceBundleLoader.class);
+		mockStatic(ResourceBundleUtil.class);
 
-		ResourceBundleLoaderUtil.setPortalResourceBundleLoader(
-			resourceBundleLoader);
-
-		Mockito.when(
-			resourceBundleLoader.loadResourceBundle(Mockito.any(Locale.class))
+		when(
+			ResourceBundleUtil.getBundle(
+				Matchers.anyString(), Matchers.any(Locale.class),
+				Matchers.any(ClassLoader.class))
 		).thenReturn(
 			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
 		);
 	}
 
-	private void _whenLanguageIsAvailableLocale(Locale locale) {
-		Mockito.when(
-			_language.isAvailableLocale(Mockito.eq(locale))
-		).thenReturn(
-			true
-		);
-
-		Mockito.when(
-			_language.isAvailableLocale(
-				Mockito.eq(LocaleUtil.toLanguageId(locale)))
-		).thenReturn(
-			true
-		);
-	}
-
 	private static final String _DEFAULT_LANGUAGE_ID = "es_ES";
 
-	private final DDMFormInstanceLocalService _ddmFormInstanceLocalService =
-		Mockito.mock(DDMFormInstanceLocalService.class);
-	private final DDMFormInstanceService _ddmFormInstanceService = Mockito.mock(
-		DDMFormInstanceService.class);
-	private final DDMFormInstanceVersion _ddmFormInstanceVersion = Mockito.mock(
-		DDMFormInstanceVersion.class);
-	private final DDMFormInstanceVersionLocalService
-		_ddmFormInstanceVersionLocalService = Mockito.mock(
-			DDMFormInstanceVersionLocalService.class);
-	private final DDMFormWebConfiguration _ddmFormWebConfiguration =
-		Mockito.mock(DDMFormWebConfiguration.class);
-	private final Language _language = Mockito.mock(Language.class);
-	private final MockHttpServletRequest _mockHttpServletRequest1 =
+	@Mock
+	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;
+
+	@Mock
+	private DDMFormInstanceService _ddmFormInstanceService;
+
+	@Mock
+	private DDMFormWebConfiguration _ddmFormWebConfiguration;
+
+	@Mock
+	private Language _language;
+
+	private final MockHttpServletRequest _mockHttpServletRequest =
 		new MockHttpServletRequest();
-	private final MockHttpServletRequest _mockHttpServletRequest2 =
-		Mockito.mock(MockHttpServletRequest.class);
-	private final WorkflowDefinitionLinkLocalService
-		_workflowDefinitionLinkLocalService = Mockito.mock(
-			WorkflowDefinitionLinkLocalService.class);
+
+	@Mock
+	private MockHttpServletRequest _request;
+
+	@Mock
+	private WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
 
 }

@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  * @author Rodrigo Paulino
  */
-@Component(service = SubstringFieldQueryBuilder.class)
+@Component(immediate = true, service = SubstringFieldQueryBuilder.class)
 public class SubstringFieldQueryBuilder implements FieldQueryBuilder {
 
 	@Override
@@ -45,16 +45,13 @@ public class SubstringFieldQueryBuilder implements FieldQueryBuilder {
 
 		for (String token : tokens) {
 			booleanQueryImpl.add(
-				_createQuery(field, token), BooleanClauseOccur.SHOULD);
+				createQuery(field, token), BooleanClauseOccur.SHOULD);
 		}
 
 		return booleanQueryImpl;
 	}
 
-	@Reference
-	protected KeywordTokenizer keywordTokenizer;
-
-	private Query _createQuery(String field, String value) {
+	protected Query createQuery(String field, String value) {
 		if (StringUtil.startsWith(value, CharPool.QUOTE)) {
 			value = StringUtil.unquote(value);
 		}
@@ -71,5 +68,8 @@ public class SubstringFieldQueryBuilder implements FieldQueryBuilder {
 
 		return new WildcardQueryImpl(new QueryTermImpl(field, value));
 	}
+
+	@Reference
+	protected KeywordTokenizer keywordTokenizer;
 
 }

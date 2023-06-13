@@ -23,14 +23,19 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Leonardo Barros
  */
-public class SetInvalidFunctionTest {
+@RunWith(MockitoJUnitRunner.class)
+public class SetInvalidFunctionTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -39,8 +44,8 @@ public class SetInvalidFunctionTest {
 
 	@Test
 	public void testApply() {
-		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver =
-			Mockito.spy(new DefaultDDMExpressionObserver());
+		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver = spy(
+			new DefaultDDMExpressionObserver());
 
 		SetInvalidFunction setInvalidFunction = new SetInvalidFunction();
 
@@ -70,7 +75,9 @@ public class SetInvalidFunctionTest {
 		Assert.assertTrue("valid", properties.containsKey("valid"));
 		Assert.assertEquals(
 			"Custom error message",
-			updateFieldPropertyRequest.getProperty("errorMessage"));
+			updateFieldPropertyRequest.getPropertyOptional(
+				"errorMessage"
+			).get());
 
 		Assert.assertFalse((boolean)properties.get("valid"));
 

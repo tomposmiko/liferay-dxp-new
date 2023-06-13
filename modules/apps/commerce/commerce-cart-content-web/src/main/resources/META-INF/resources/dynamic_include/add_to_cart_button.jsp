@@ -22,4 +22,5 @@ CPContentHelper cpContentHelper = (CPContentHelper)request.getAttribute(CPConten
 
 <commerce-ui:add-to-cart
 	CPCatalogEntry="<%= cpContentHelper.getCPCatalogEntry(request) %>"
+	options='<%= "[]" %>'
 />

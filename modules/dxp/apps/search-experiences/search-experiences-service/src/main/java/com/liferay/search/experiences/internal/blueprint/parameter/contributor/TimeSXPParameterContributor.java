@@ -14,15 +14,15 @@
 
 package com.liferay.search.experiences.internal.blueprint.parameter.contributor;
 
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.search.experiences.blueprint.parameter.DateSXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.IntegerSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition;
-import com.liferay.search.experiences.internal.blueprint.parameter.DateSXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.IntegerSXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
-
-import java.beans.ExceptionListener;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -32,7 +32,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -41,10 +40,17 @@ import java.util.TimeZone;
  */
 public class TimeSXPParameterContributor implements SXPParameterContributor {
 
+	public TimeSXPParameterContributor(
+		Language language, UserLocalService userLocalService) {
+
+		_language = language;
+		_userLocalService = userLocalService;
+	}
+
 	@Override
 	public void contribute(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint, Set<SXPParameter> sxpParameters) {
+		SearchContext searchContext, SXPBlueprint sxpBlueprint,
+		Set<SXPParameter> sxpParameters) {
 
 		TimeZone timeZone = searchContext.getTimeZone();
 
@@ -88,7 +94,7 @@ public class TimeSXPParameterContributor implements SXPParameterContributor {
 				_getTimeOfDay(localDateTime.toLocalTime())));
 		sxpParameters.add(
 			new StringSXPParameter(
-				"time.time_zone_name_localized", true,
+				"time.time_zone_locale_name", true,
 				timeZone.getDisplayName(searchContext.getLocale())));
 	}
 
@@ -99,7 +105,7 @@ public class TimeSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public List<SXPParameterContributorDefinition>
-		getSXPParameterContributorDefinitions(long companyId, Locale locale) {
+		getSXPParameterContributorDefinitions(long companyId) {
 
 		return Arrays.asList(
 			new SXPParameterContributorDefinition(
@@ -120,8 +126,8 @@ public class TimeSXPParameterContributor implements SXPParameterContributor {
 			new SXPParameterContributorDefinition(
 				StringSXPParameter.class, "time-of-day", "time.time_of_day"),
 			new SXPParameterContributorDefinition(
-				StringSXPParameter.class, "time-zone-name-localized",
-				"time.time_zone_name_localized"));
+				StringSXPParameter.class, "time-zone-locale-name",
+				"time.time_zone_locale_name"));
 	}
 
 	private String _getTimeOfDay(LocalTime localTime) {
@@ -157,5 +163,8 @@ public class TimeSXPParameterContributor implements SXPParameterContributor {
 	private static final LocalTime _LOCAL_TIME_17 = LocalTime.of(17, 0, 0);
 
 	private static final LocalTime _LOCAL_TIME_20 = LocalTime.of(20, 0, 0);
+
+	private final Language _language;
+	private final UserLocalService _userLocalService;
 
 }

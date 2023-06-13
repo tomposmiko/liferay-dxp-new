@@ -142,10 +142,6 @@ public class CaseInsensitiveDictionaryMap<K, V> extends Dictionary<K, V> impleme
 	 * @return The specified key or a case-insensitive wrapping of the key.
 	 */
 	private Object keyWrap(Object key) {
-		if (_CASE_SENSITIVE) {
-			return key;
-		}
-
 		if (key instanceof String) {
 			return new CaseInsensitiveKey((String) key);
 		}
@@ -598,8 +594,5 @@ public class CaseInsensitiveDictionaryMap<K, V> extends Dictionary<K, V> impleme
 			return entry.toString();
 		}
 	}
-
-	private static final boolean _CASE_SENSITIVE = Boolean.getBoolean(
-		"org.eclipse.osgi.property.key.case.sensitive");
 }
 /* @generated */

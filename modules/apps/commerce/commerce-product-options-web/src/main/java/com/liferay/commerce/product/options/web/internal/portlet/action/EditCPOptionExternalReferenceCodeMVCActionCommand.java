@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_OPTIONS,
 		"mvc.command.name=/cp_options/edit_cp_option_external_reference_code"
@@ -51,7 +52,7 @@ public class EditCPOptionExternalReferenceCodeMVCActionCommand
 		throws Exception {
 
 		try {
-			_updateCPOptionExternalReferenceCode(actionRequest);
+			updateCPOptionExternalReferenceCode(actionRequest);
 		}
 		catch (Exception exception) {
 			if (exception instanceof NoSuchCPOptionException ||
@@ -62,7 +63,7 @@ public class EditCPOptionExternalReferenceCodeMVCActionCommand
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 			}
 			else {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				String redirect = ParamUtil.getString(
 					actionRequest, "redirect");
@@ -72,7 +73,7 @@ public class EditCPOptionExternalReferenceCodeMVCActionCommand
 		}
 	}
 
-	private void _updateCPOptionExternalReferenceCode(
+	protected void updateCPOptionExternalReferenceCode(
 			ActionRequest actionRequest)
 		throws Exception {
 

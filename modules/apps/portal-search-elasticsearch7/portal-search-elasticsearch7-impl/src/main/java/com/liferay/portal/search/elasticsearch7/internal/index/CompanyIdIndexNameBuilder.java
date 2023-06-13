@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = IndexNameBuilder.class)
+@Component(immediate = true, service = IndexNameBuilder.class)
 public class CompanyIdIndexNameBuilder
 	implements ElasticsearchConfigurationObserver, IndexNameBuilder {
 

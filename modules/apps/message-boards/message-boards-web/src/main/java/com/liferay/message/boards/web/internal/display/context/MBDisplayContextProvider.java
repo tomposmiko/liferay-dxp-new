@@ -18,16 +18,18 @@ import com.liferay.message.boards.display.context.MBAdminListDisplayContext;
 import com.liferay.message.boards.display.context.MBDisplayContextFactory;
 import com.liferay.message.boards.display.context.MBHomeDisplayContext;
 import com.liferay.message.boards.display.context.MBListDisplayContext;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
-import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Iván Zaera
@@ -46,7 +48,7 @@ public class MBDisplayContextProvider {
 				httpServletRequest, httpServletResponse, categoryId);
 
 		for (MBDisplayContextFactory mbDisplayContextFactory :
-				_serviceTrackerList) {
+				_mbDisplayContextFactories) {
 
 			mbAdminListDisplayContext =
 				mbDisplayContextFactory.getMBAdminListDisplayContext(
@@ -66,7 +68,7 @@ public class MBDisplayContextProvider {
 				httpServletRequest, httpServletResponse);
 
 		for (MBDisplayContextFactory mbDisplayContextFactory :
-				_serviceTrackerList) {
+				_mbDisplayContextFactories) {
 
 			mbHomeDisplayContext =
 				mbDisplayContextFactory.getMBHomeDisplayContext(
@@ -88,7 +90,7 @@ public class MBDisplayContextProvider {
 				mvcRenderCommandName);
 
 		for (MBDisplayContextFactory mbDisplayContextFactory :
-				_serviceTrackerList) {
+				_mbDisplayContextFactories) {
 
 			mbListDisplayContext =
 				mbDisplayContextFactory.getMBListDisplayContext(
@@ -99,17 +101,25 @@ public class MBDisplayContextProvider {
 		return mbListDisplayContext;
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerList = ServiceTrackerListFactory.open(
-			bundleContext, MBDisplayContextFactory.class);
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.RELUCTANT,
+		service = MBDisplayContextFactory.class
+	)
+	protected void setMBDisplayContextFactory(
+		MBDisplayContextFactory mbDisplayContextFactory) {
+
+		_mbDisplayContextFactories.add(mbDisplayContextFactory);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerList.close();
+	protected void unsetMBDisplayContextFactory(
+		MBDisplayContextFactory mbDisplayContextFactory) {
+
+		_mbDisplayContextFactories.remove(mbDisplayContextFactory);
 	}
 
-	private ServiceTrackerList<MBDisplayContextFactory> _serviceTrackerList;
+	private final List<MBDisplayContextFactory> _mbDisplayContextFactories =
+		new CopyOnWriteArrayList<>();
 
 }

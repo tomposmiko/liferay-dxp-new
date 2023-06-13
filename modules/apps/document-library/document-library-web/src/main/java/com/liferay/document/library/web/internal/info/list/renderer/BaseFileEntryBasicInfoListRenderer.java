@@ -16,7 +16,7 @@ package com.liferay.document.library.web.internal.info.list.renderer;
 
 import com.liferay.document.library.web.internal.info.item.renderer.FileEntryTitleInfoItemRenderer;
 import com.liferay.info.item.renderer.InfoItemRenderer;
-import com.liferay.info.item.renderer.InfoItemRendererRegistry;
+import com.liferay.info.item.renderer.InfoItemRendererTracker;
 import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRendererContext;
 import com.liferay.info.taglib.list.renderer.BasicInfoListRenderer;
@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +42,7 @@ public abstract class BaseFileEntryBasicInfoListRenderer
 
 	@Override
 	public List<InfoItemRenderer<?>> getAvailableInfoItemRenderers() {
-		return infoItemRendererRegistry.getInfoItemRenderers(
+		return infoItemRendererTracker.getInfoItemRenderers(
 			FileEntry.class.getName());
 	}
 
@@ -65,11 +66,14 @@ public abstract class BaseFileEntryBasicInfoListRenderer
 
 		infoListBasicListTag.setInfoListObjects(fileEntries);
 
-		String listItemRendererKey =
-			infoListRendererContext.getListItemRendererKey();
+		Optional<String> infoListItemRendererKeyOptional =
+			infoListRendererContext.getListItemRendererKeyOptional();
 
-		if (Validator.isNotNull(listItemRendererKey)) {
-			infoListBasicListTag.setItemRendererKey(listItemRendererKey);
+		if (infoListItemRendererKeyOptional.isPresent() &&
+			Validator.isNotNull(infoListItemRendererKeyOptional.get())) {
+
+			infoListBasicListTag.setItemRendererKey(
+				infoListItemRendererKeyOptional.get());
 		}
 		else {
 			infoListBasicListTag.setItemRendererKey(
@@ -78,10 +82,13 @@ public abstract class BaseFileEntryBasicInfoListRenderer
 
 		infoListBasicListTag.setListStyleKey(getListStyle());
 
-		String templateKey = infoListRendererContext.getTemplateKey();
+		Optional<String> templateKeyOptional =
+			infoListRendererContext.getTemplateKeyOptional();
 
-		if (Validator.isNotNull(templateKey)) {
-			infoListBasicListTag.setTemplateKey(templateKey);
+		if (templateKeyOptional.isPresent() &&
+			Validator.isNotNull(templateKeyOptional.get())) {
+
+			infoListBasicListTag.setTemplateKey(templateKeyOptional.get());
 		}
 
 		try {
@@ -95,7 +102,7 @@ public abstract class BaseFileEntryBasicInfoListRenderer
 	}
 
 	@Reference
-	protected InfoItemRendererRegistry infoItemRendererRegistry;
+	protected InfoItemRendererTracker infoItemRendererTracker;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseFileEntryBasicInfoListRenderer.class);

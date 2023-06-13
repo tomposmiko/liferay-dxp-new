@@ -16,7 +16,7 @@ package com.liferay.exportimport.internal.background.task;
 
 import com.liferay.exportimport.kernel.exception.ExportImportIOException;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
-import com.liferay.exportimport.kernel.service.ExportImportLocalService;
+import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
@@ -34,17 +34,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Daniel Kocsis
  * @author Akos Thurzo
  */
-@Component(
-	property = "background.task.executor.class.name=com.liferay.exportimport.internal.background.task.LayoutImportBackgroundTaskExecutor",
-	service = BackgroundTaskExecutor.class
-)
 public class LayoutImportBackgroundTaskExecutor
 	extends BaseExportImportBackgroundTaskExecutor {
 
@@ -59,7 +52,16 @@ public class LayoutImportBackgroundTaskExecutor
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return this;
+		LayoutImportBackgroundTaskExecutor layoutImportBackgroundTaskExecutor =
+			new LayoutImportBackgroundTaskExecutor();
+
+		layoutImportBackgroundTaskExecutor.
+			setBackgroundTaskStatusMessageTranslator(
+				getBackgroundTaskStatusMessageTranslator());
+		layoutImportBackgroundTaskExecutor.setIsolationLevel(
+			getIsolationLevel());
+
+		return layoutImportBackgroundTaskExecutor;
 	}
 
 	@Override
@@ -114,10 +116,7 @@ public class LayoutImportBackgroundTaskExecutor
 		return BackgroundTaskResult.SUCCESS;
 	}
 
-	@Reference
-	private ExportImportLocalService _exportImportLocalService;
-
-	private class LayoutImportCallable implements Callable<Void> {
+	private static class LayoutImportCallable implements Callable<Void> {
 
 		public LayoutImportCallable(
 			ExportImportConfiguration exportImportConfiguration, File file) {
@@ -128,10 +127,10 @@ public class LayoutImportBackgroundTaskExecutor
 
 		@Override
 		public Void call() throws PortalException {
-			_exportImportLocalService.importLayoutsDataDeletions(
+			ExportImportLocalServiceUtil.importLayoutsDataDeletions(
 				_exportImportConfiguration, _file);
 
-			_exportImportLocalService.importLayouts(
+			ExportImportLocalServiceUtil.importLayouts(
 				_exportImportConfiguration, _file);
 
 			return null;

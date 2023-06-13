@@ -17,12 +17,13 @@ package com.liferay.headless.delivery.internal.resource.v1_0;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
-import com.liferay.headless.common.spi.odata.entity.EntityFieldsUtil;
 import com.liferay.headless.common.spi.resource.SPIRatingResource;
 import com.liferay.headless.common.spi.service.context.ServiceContextRequestUtil;
 import com.liferay.headless.delivery.dto.v1_0.MessageBoardMessage;
 import com.liferay.headless.delivery.dto.v1_0.Rating;
 import com.liferay.headless.delivery.dto.v1_0.util.CustomFieldsUtil;
+import com.liferay.headless.delivery.internal.dto.v1_0.converter.MessageBoardMessageDTOConverter;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.EntityFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.MessageBoardMessageEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.MessageBoardMessageResource;
@@ -41,7 +42,6 @@ import com.liferay.message.boards.util.comparator.MessageCreateDateComparator;
 import com.liferay.message.boards.util.comparator.MessageModifiedDateComparator;
 import com.liferay.message.boards.util.comparator.MessageSubjectComparator;
 import com.liferay.message.boards.util.comparator.MessageURLSubjectComparator;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
@@ -61,18 +61,18 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.aggregation.Aggregations;
-import com.liferay.portal.search.expando.ExpandoBridgeIndexer;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.portal.vulcan.util.UriInfoUtil;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 
@@ -81,6 +81,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -97,9 +98,8 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/message-board-message.properties",
 	scope = ServiceScope.PROTOTYPE, service = MessageBoardMessageResource.class
 )
-@CTAware
 public class MessageBoardMessageResourceImpl
-	extends BaseMessageBoardMessageResourceImpl {
+	extends BaseMessageBoardMessageResourceImpl implements EntityModelResource {
 
 	@Override
 	public void deleteMessageBoardMessage(Long messageBoardMessageId)
@@ -124,7 +124,7 @@ public class MessageBoardMessageResourceImpl
 
 		MBMessage mbMessage =
 			_mbMessageLocalService.getMBMessageByExternalReferenceCode(
-				externalReferenceCode, siteId);
+				siteId, externalReferenceCode);
 
 		_mbMessageService.deleteMessage(mbMessage.getMessageId());
 	}
@@ -134,8 +134,8 @@ public class MessageBoardMessageResourceImpl
 		return new MessageBoardMessageEntityModel(
 			EntityFieldsUtil.getEntityFields(
 				_portal.getClassNameId(MBMessage.class.getName()),
-				contextCompany.getCompanyId(), _expandoBridgeIndexer,
-				_expandoColumnLocalService, _expandoTableLocalService));
+				contextCompany.getCompanyId(), _expandoColumnLocalService,
+				_expandoTableLocalService));
 	}
 
 	@Override
@@ -176,7 +176,8 @@ public class MessageBoardMessageResourceImpl
 			).build();
 
 		if ((search == null) && (filter == null)) {
-			flatten = GetterUtil.getBoolean(flatten);
+			OrderByComparator<MBMessage> orderByComparator =
+				_getMBMessageOrderByComparator(sorts);
 
 			int status = WorkflowConstants.STATUS_APPROVED;
 
@@ -189,14 +190,16 @@ public class MessageBoardMessageResourceImpl
 				status = WorkflowConstants.STATUS_ANY;
 			}
 
-			OrderByComparator<MBMessage> orderByComparator =
-				_getMBMessageOrderByComparator(sorts);
-
 			return Page.of(
 				actions,
-				transform(
+				TransformUtil.transform(
 					_mbMessageService.getChildMessages(
-						mbMessage.getMessageId(), flatten,
+						mbMessage.getMessageId(),
+						Optional.ofNullable(
+							flatten
+						).orElse(
+							false
+						),
 						new QueryDefinition<>(
 							status, contextUser.getUserId(), true,
 							pagination.getStartPosition(),
@@ -204,7 +207,12 @@ public class MessageBoardMessageResourceImpl
 					this::_toMessageBoardMessage),
 				pagination,
 				_mbMessageService.getChildMessagesCount(
-					mbMessage.getMessageId(), flatten,
+					mbMessage.getMessageId(),
+					Optional.ofNullable(
+						flatten
+					).orElse(
+						false
+					),
 					new QueryDefinition<>(
 						status, contextUser.getUserId(), true,
 						pagination.getStartPosition(),
@@ -244,13 +252,6 @@ public class MessageBoardMessageResourceImpl
 					"postMessageBoardThreadMessageBoardMessage",
 					mbThread.getUserId(), MBConstants.RESOURCE_NAME,
 					mbThread.getGroupId())
-			).<String, Map<String, String>>put(
-				"createBatch",
-				addAction(
-					ActionKeys.ADD_MESSAGE, mbThread.getThreadId(),
-					"postMessageBoardThreadMessageBoardMessageBatch",
-					mbThread.getUserId(), MBConstants.RESOURCE_NAME,
-					mbThread.getGroupId())
 			).put(
 				"get",
 				addAction(
@@ -277,7 +278,7 @@ public class MessageBoardMessageResourceImpl
 
 			return Page.of(
 				actions,
-				transform(
+				TransformUtil.transform(
 					_mbMessageService.getChildMessages(
 						mbThread.getRootMessageId(), false,
 						new QueryDefinition<>(
@@ -307,7 +308,7 @@ public class MessageBoardMessageResourceImpl
 
 		return _toMessageBoardMessage(
 			_mbMessageLocalService.getMBMessageByExternalReferenceCode(
-				externalReferenceCode, siteId));
+				siteId, externalReferenceCode));
 	}
 
 	@Override
@@ -335,20 +336,10 @@ public class MessageBoardMessageResourceImpl
 
 		return _getMessageBoardMessagesPage(
 			HashMapBuilder.put(
-				"deleteBatch",
-				addAction(
-					ActionKeys.DELETE, "deleteMessageBoardMessageBatch",
-					MBConstants.RESOURCE_NAME, null)
-			).put(
 				"get",
 				addAction(
 					ActionKeys.VIEW, "getSiteMessageBoardMessagesPage",
 					MBConstants.RESOURCE_NAME, siteId)
-			).put(
-				"updateBatch",
-				addAction(
-					ActionKeys.UPDATE, "putMessageBoardMessageBatch",
-					MBConstants.RESOURCE_NAME, null)
 			).build(),
 			null, siteId, flatten, search, aggregation, filter, pagination,
 			sorts);
@@ -439,7 +430,7 @@ public class MessageBoardMessageResourceImpl
 
 		MBMessage mbMessage =
 			_mbMessageLocalService.fetchMBMessageByExternalReferenceCode(
-				externalReferenceCode, siteId);
+				siteId, externalReferenceCode);
 
 		if (mbMessage != null) {
 			return _updateMessageBoardMessage(mbMessage, messageBoardMessage);
@@ -748,6 +739,8 @@ public class MessageBoardMessageResourceImpl
 		if ((showAsAnswer != null) && (showAsAnswer != mbMessage.isAnswer())) {
 			_mbMessageService.updateAnswer(
 				mbMessage.getMessageId(), showAsAnswer, false);
+
+			mbMessage.setAnswer(showAsAnswer);
 		}
 	}
 
@@ -794,9 +787,6 @@ public class MessageBoardMessageResourceImpl
 	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
-	private ExpandoBridgeIndexer _expandoBridgeIndexer;
-
-	@Reference
 	private ExpandoColumnLocalService _expandoColumnLocalService;
 
 	@Reference
@@ -811,11 +801,8 @@ public class MessageBoardMessageResourceImpl
 	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.delivery.internal.dto.v1_0.converter.MessageBoardMessageDTOConverter)"
-	)
-	private DTOConverter<MBMessage, MessageBoardMessage>
-		_messageBoardMessageDTOConverter;
+	@Reference
+	private MessageBoardMessageDTOConverter _messageBoardMessageDTOConverter;
 
 	@Reference
 	private Portal _portal;

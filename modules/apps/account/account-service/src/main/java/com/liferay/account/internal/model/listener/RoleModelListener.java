@@ -27,12 +27,11 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.service.ResourceLocalService;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.util.PortalInstances;
 
 import java.util.Objects;
 
@@ -42,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Drew Brokke
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class RoleModelListener extends BaseModelListener<Role> {
 
 	@Override
@@ -69,16 +68,6 @@ public class RoleModelListener extends BaseModelListener<Role> {
 		accountRole.setAccountEntryId(
 			AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT);
 		accountRole.setRoleId(role.getRoleId());
-
-		try {
-			_resourceLocalService.addResources(
-				role.getCompanyId(), 0, role.getUserId(),
-				AccountRole.class.getName(), accountRole.getAccountRoleId(),
-				false, false, false);
-		}
-		catch (PortalException portalException) {
-			throw new ModelListenerException(portalException);
-		}
 
 		_accountRoleLocalService.addAccountRole(accountRole);
 
@@ -108,7 +97,7 @@ public class RoleModelListener extends BaseModelListener<Role> {
 
 	@Override
 	public void onBeforeRemove(Role role) throws ModelListenerException {
-		if (PortalInstances.isCurrentCompanyInDeletionProcess()) {
+		if (CompanyThreadLocal.isDeleteInProcess()) {
 			return;
 		}
 
@@ -150,9 +139,6 @@ public class RoleModelListener extends BaseModelListener<Role> {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private ResourceLocalService _resourceLocalService;
 
 	@Reference
 	private RoleLocalService _roleLocalService;

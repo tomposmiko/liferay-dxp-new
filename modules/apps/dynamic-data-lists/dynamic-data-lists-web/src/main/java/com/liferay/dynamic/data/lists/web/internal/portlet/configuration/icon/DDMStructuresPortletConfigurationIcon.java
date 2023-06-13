@@ -18,7 +18,8 @@ import com.liferay.dynamic.data.lists.constants.DDLActionKeys;
 import com.liferay.dynamic.data.lists.constants.DDLPortletKeys;
 import com.liferay.dynamic.data.lists.web.internal.security.permission.resource.DDLPermission;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletProvider;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS,
 	service = PortletConfigurationIcon.class
 )
@@ -51,8 +52,9 @@ public class DDMStructuresPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(
-			getLocale(portletRequest), "manage-data-definitions");
+		return LanguageUtil.get(
+			getResourceBundle(getLocale(portletRequest)),
+			"manage-data-definitions");
 	}
 
 	@Override
@@ -61,6 +63,11 @@ public class DDMStructuresPortletConfigurationIcon
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		Portlet portlet = _portletLocalService.getPortletById(
+			portletDisplay.getId());
 
 		return PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
@@ -77,16 +84,7 @@ public class DDMStructuresPortletConfigurationIcon
 		).setParameter(
 			"refererPortletName", DDLPortletKeys.DYNAMIC_DATA_LISTS
 		).setParameter(
-			"refererWebDAVToken",
-			() -> {
-				PortletDisplay portletDisplay =
-					themeDisplay.getPortletDisplay();
-
-				Portlet portlet = _portletLocalService.getPortletById(
-					portletDisplay.getId());
-
-				return WebDAVUtil.getStorageToken(portlet);
-			}
+			"refererWebDAVToken", WebDAVUtil.getStorageToken(portlet)
 		).setParameter(
 			"showAncestorScopes", true
 		).buildString();
@@ -104,7 +102,7 @@ public class DDMStructuresPortletConfigurationIcon
 
 		User user = themeDisplay.getUser();
 
-		if (user.isGuestUser()) {
+		if (user.isDefaultUser()) {
 			return false;
 		}
 
@@ -113,10 +111,18 @@ public class DDMStructuresPortletConfigurationIcon
 			DDLActionKeys.ADD_RECORD_SET);
 	}
 
-	@Reference
-	private Language _language;
+	@Override
+	public boolean isToolTip() {
+		return false;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setPortletLocalService(
+		PortletLocalService portletLocalService) {
+
+		_portletLocalService = portletLocalService;
+	}
+
 	private PortletLocalService _portletLocalService;
 
 }

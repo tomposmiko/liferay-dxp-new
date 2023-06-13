@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.SummaryFactory;
 import com.liferay.portal.kernel.search.result.SearchResultContributor;
 import com.liferay.portal.kernel.search.result.SearchResultTranslator;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.internal.result.SearchResultManagerImpl;
@@ -42,44 +41,36 @@ import com.liferay.portal.search.test.util.SearchTestUtil;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
-import org.mockito.MockedStatic;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author André de Oliveira
  */
+@PrepareForTest(AssetRendererFactoryRegistryUtil.class)
+@RunWith(PowerMockRunner.class)
 public class SearchResultUtilDLFileEntryTest
 	extends BaseSearchResultUtilTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@After
-	public void tearDown() {
-		_assetRendererFactoryRegistryUtilMockedStatic.close();
-
-		ReflectionTestUtil.invoke(
-			_searchResultManagerImpl, "deactivate", new Class<?>[0]);
-
-		_serviceRegistration.unregister();
-	}
 
 	@Test
 	public void testDLFileEntry() throws Exception {
@@ -95,7 +86,7 @@ public class SearchResultUtilDLFileEntryTest
 
 		Assert.assertNull(searchResult.getSummary());
 
-		Mockito.verifyNoInteractions(_dlAppLocalService);
+		PowerMockito.verifyZeroInteractions(_dlAppLocalService);
 
 		assertEmptyCommentRelatedSearchResults(searchResult);
 		assertEmptyVersions(searchResult);
@@ -104,35 +95,44 @@ public class SearchResultUtilDLFileEntryTest
 	@Test
 	public void testDLFileEntryAttachment() throws Exception {
 		Mockito.when(
-			_assetRenderer.getSearchSummary(Mockito.any())
+			_assetRenderer.getSearchSummary((Locale)Matchers.any())
 		).thenReturn(
 			SearchTestUtil.SUMMARY_CONTENT
 		);
 
 		Mockito.when(
-			_assetRenderer.getTitle((Locale)Mockito.any())
+			_assetRenderer.getTitle((Locale)Matchers.any())
 		).thenReturn(
 			SearchTestUtil.SUMMARY_TITLE
 		);
 
-		Mockito.when(
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				Mockito.anyString())
-		).thenAnswer(
-			invocation -> {
-				String className = invocation.getArgument(0);
+		PowerMockito.replace(
+			PowerMockito.method(
+				AssetRendererFactoryRegistryUtil.class,
+				"getAssetRendererFactoryByClassName", String.class)
+		).with(
+			new InvocationHandler() {
 
-				if (_CLASS_NAME_DL_FILE_ENTRY.equals(className)) {
-					return null;
+				@Override
+				public AssetRendererFactory<?> invoke(
+						Object proxy, Method method, Object[] args)
+					throws Throwable {
+
+					String className = (String)args[0];
+
+					if (_CLASS_NAME_DL_FILE_ENTRY.equals(className)) {
+						return null;
+					}
+
+					if (SearchTestUtil.ATTACHMENT_OWNER_CLASS_NAME.equals(
+							className)) {
+
+						return _assetRendererFactory;
+					}
+
+					throw new IllegalArgumentException();
 				}
 
-				if (SearchTestUtil.ATTACHMENT_OWNER_CLASS_NAME.equals(
-						className)) {
-
-					return _assetRendererFactory;
-				}
-
-				throw new IllegalArgumentException();
 			}
 		);
 
@@ -184,8 +184,9 @@ public class SearchResultUtilDLFileEntryTest
 		).when(
 			_indexer
 		).getSummary(
-			Mockito.any(), Mockito.anyString(), Mockito.isNull(),
-			Mockito.isNull()
+			(Document)Matchers.any(), Matchers.anyString(),
+			(PortletRequest)Matchers.isNull(),
+			(PortletResponse)Matchers.isNull()
 		);
 
 		SearchResult searchResult = assertOneSearchResult(
@@ -263,15 +264,10 @@ public class SearchResultUtilDLFileEntryTest
 			SearchTestUtil.ATTACHMENT_OWNER_CLASS_NAME
 		);
 
+		PowerMockito.verifyStatic(Mockito.atLeastOnce());
+
 		AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 			SearchTestUtil.ATTACHMENT_OWNER_CLASS_NAME);
-
-		_assetRendererFactoryRegistryUtilMockedStatic.verify(
-			() ->
-				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassName(
-						SearchTestUtil.ATTACHMENT_OWNER_CLASS_NAME),
-			Mockito.atLeastOnce());
 
 		assertEmptyCommentRelatedSearchResults(searchResult);
 		assertEmptyVersions(searchResult);
@@ -290,7 +286,8 @@ public class SearchResultUtilDLFileEntryTest
 		).when(
 			_indexer
 		).getSummary(
-			Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.any()
+			(Document)Matchers.any(), Matchers.anyString(),
+			(PortletRequest)Matchers.any(), (PortletResponse)Matchers.any()
 		);
 
 		Mockito.when(
@@ -358,61 +355,47 @@ public class SearchResultUtilDLFileEntryTest
 		}
 	}
 
+	protected SearchResultContributor createSearchResultContributor() {
+		DLFileEntrySearchResultContributor dlFileEntrySearchResultContributor =
+			new DLFileEntrySearchResultContributor();
+
+		dlFileEntrySearchResultContributor.setClassNameLocalService(
+			classNameLocalService);
+		dlFileEntrySearchResultContributor.setDLAppLocalService(
+			_dlAppLocalService);
+		dlFileEntrySearchResultContributor.setSummaryFactory(
+			createSummaryFactory());
+
+		return dlFileEntrySearchResultContributor;
+	}
+
+	protected SearchResultManager createSearchResultManager() {
+		SearchResultManagerImpl searchResultManagerImpl =
+			new SearchResultManagerImpl();
+
+		searchResultManagerImpl.addSearchResultContributor(
+			createSearchResultContributor());
+		searchResultManagerImpl.setClassNameLocalService(classNameLocalService);
+		searchResultManagerImpl.setSummaryFactory(createSummaryFactory());
+
+		return searchResultManagerImpl;
+	}
+
 	@Override
 	protected SearchResultTranslator createSearchResultTranslator() {
 		SearchResultTranslatorImpl searchResultTranslatorImpl =
 			new SearchResultTranslatorImpl();
 
-		ReflectionTestUtil.setFieldValue(
-			searchResultTranslatorImpl, "_searchResultManager",
-			_createSearchResultManager());
+		searchResultTranslatorImpl.setSearchResultManager(
+			createSearchResultManager());
 
 		return searchResultTranslatorImpl;
 	}
 
-	private SearchResultContributor _createSearchResultContributor() {
-		DLFileEntrySearchResultContributor dlFileEntrySearchResultContributor =
-			new DLFileEntrySearchResultContributor();
-
-		ReflectionTestUtil.setFieldValue(
-			dlFileEntrySearchResultContributor, "_classNameLocalService",
-			classNameLocalService);
-		ReflectionTestUtil.setFieldValue(
-			dlFileEntrySearchResultContributor, "_dlAppLocalService",
-			_dlAppLocalService);
-		ReflectionTestUtil.setFieldValue(
-			dlFileEntrySearchResultContributor, "_summaryFactory",
-			_createSummaryFactory());
-
-		return dlFileEntrySearchResultContributor;
-	}
-
-	private SearchResultManager _createSearchResultManager() {
-		_searchResultManagerImpl = new SearchResultManagerImpl();
-
-		ReflectionTestUtil.setFieldValue(
-			_searchResultManagerImpl, "_classNameLocalService",
-			classNameLocalService);
-		ReflectionTestUtil.setFieldValue(
-			_searchResultManagerImpl, "_summaryFactory",
-			_createSummaryFactory());
-
-		_serviceRegistration = bundleContext.registerService(
-			SearchResultContributor.class, _createSearchResultContributor(),
-			null);
-
-		ReflectionTestUtil.invoke(
-			_searchResultManagerImpl, "activate",
-			new Class<?>[] {BundleContext.class}, bundleContext);
-
-		return _searchResultManagerImpl;
-	}
-
-	private SummaryFactory _createSummaryFactory() {
+	protected SummaryFactory createSummaryFactory() {
 		SummaryFactoryImpl summaryFactoryImpl = new SummaryFactoryImpl();
 
-		ReflectionTestUtil.setFieldValue(
-			summaryFactoryImpl, "_indexerRegistry", _indexerRegistry);
+		summaryFactoryImpl.setIndexerRegistry(_indexerRegistry);
 
 		return summaryFactoryImpl;
 	}
@@ -420,21 +403,23 @@ public class SearchResultUtilDLFileEntryTest
 	private static final String _CLASS_NAME_DL_FILE_ENTRY =
 		DLFileEntry.class.getName();
 
+	@Mock
 	@SuppressWarnings("rawtypes")
-	private AssetRenderer _assetRenderer = Mockito.mock(AssetRenderer.class);
+	private AssetRenderer _assetRenderer;
 
-	private final AssetRendererFactory<?> _assetRendererFactory = Mockito.mock(
-		AssetRendererFactory.class);
-	private final MockedStatic<AssetRendererFactoryRegistryUtil>
-		_assetRendererFactoryRegistryUtilMockedStatic = Mockito.mockStatic(
-			AssetRendererFactoryRegistryUtil.class);
-	private final DLAppLocalService _dlAppLocalService = Mockito.mock(
-		DLAppLocalService.class);
-	private final FileEntry _fileEntry = Mockito.mock(FileEntry.class);
-	private final Indexer<Object> _indexer = Mockito.mock(Indexer.class);
-	private final IndexerRegistry _indexerRegistry = Mockito.mock(
-		IndexerRegistry.class);
-	private SearchResultManagerImpl _searchResultManagerImpl;
-	private ServiceRegistration<SearchResultContributor> _serviceRegistration;
+	@Mock
+	private AssetRendererFactory<?> _assetRendererFactory;
+
+	@Mock
+	private DLAppLocalService _dlAppLocalService;
+
+	@Mock
+	private FileEntry _fileEntry;
+
+	@Mock
+	private Indexer<Object> _indexer;
+
+	@Mock
+	private IndexerRegistry _indexerRegistry;
 
 }

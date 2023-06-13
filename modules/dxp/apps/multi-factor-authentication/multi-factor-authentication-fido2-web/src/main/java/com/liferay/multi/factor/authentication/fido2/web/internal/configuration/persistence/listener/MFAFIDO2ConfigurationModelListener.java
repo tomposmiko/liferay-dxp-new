@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marta Medio
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.multi.factor.authentication.fido2.web.internal.configuration.MFAFIDO2Configuration",
 	service = ConfigurationModelListener.class
 )

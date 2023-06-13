@@ -24,6 +24,14 @@ import java.util.Map;
  */
 public class FallbackKeys {
 
+	public void add(String key, String... fallbackKeysArray) {
+		if (_fallbackKeysMap.containsKey(key)) {
+			throw new IllegalArgumentException("Duplicate key " + key);
+		}
+
+		_fallbackKeysMap.put(key, fallbackKeysArray);
+	}
+
 	public String[] get(String key) {
 		String[] fallbackKeysArray = _fallbackKeysMap.get(key);
 
@@ -32,14 +40,6 @@ public class FallbackKeys {
 		}
 
 		return fallbackKeysArray;
-	}
-
-	protected void add(String key, String... fallbackKeysArray) {
-		if (_fallbackKeysMap.containsKey(key)) {
-			throw new IllegalArgumentException("Duplicate key " + key);
-		}
-
-		_fallbackKeysMap.put(key, fallbackKeysArray);
 	}
 
 	private final Map<String, String[]> _fallbackKeysMap = new HashMap<>();

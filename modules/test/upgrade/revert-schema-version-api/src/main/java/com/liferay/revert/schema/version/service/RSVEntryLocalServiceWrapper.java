@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class RSVEntryLocalServiceWrapper
 	implements RSVEntryLocalService, ServiceWrapper<RSVEntryLocalService> {
 
-	public RSVEntryLocalServiceWrapper() {
-		this(null);
-	}
-
 	public RSVEntryLocalServiceWrapper(
 		RSVEntryLocalService rsvEntryLocalService) {
 

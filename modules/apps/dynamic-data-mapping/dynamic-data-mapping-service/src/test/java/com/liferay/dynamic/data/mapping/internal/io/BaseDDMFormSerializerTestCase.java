@@ -40,33 +40,13 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmForm.setAvailableLocales(
 			DDMFormTestUtil.createAvailableLocales(
 				LocaleUtil.BRAZIL, LocaleUtil.US));
-		ddmForm.setDDMFormFields(_createDDMFormFields());
+		ddmForm.setDDMFormFields(createDDMFormFields());
 		ddmForm.setDefaultLocale(LocaleUtil.US);
 
 		return ddmForm;
 	}
 
-	protected DDMFormField createTextDDMFormField(String name) {
-		DDMFormField ddmFormField = new DDMFormField(name, "text");
-
-		ddmFormField.setDataType("string");
-		ddmFormField.setIndexType("keyword");
-		ddmFormField.setLabel(_createTextDDMFormFieldLabel());
-		ddmFormField.setLocalizable(false);
-		ddmFormField.setPredefinedValue(
-			_createTextDDMFormFieldPredefinedValue());
-		ddmFormField.setReadOnly(false);
-		ddmFormField.setRepeatable(true);
-		ddmFormField.setRequired(false);
-		ddmFormField.setShowLabel(true);
-		ddmFormField.setVisibilityExpression("true");
-
-		_createNotEmptyValidation(ddmFormField);
-
-		return ddmFormField;
-	}
-
-	private DDMFormFieldOptions _createDDMFormFieldOptions() {
+	protected DDMFormFieldOptions createDDMFormFieldOptions() {
 		DDMFormFieldOptions ddmFormFieldOptions = new DDMFormFieldOptions();
 
 		ddmFormFieldOptions.addOption("Value 1");
@@ -86,36 +66,36 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		return ddmFormFieldOptions;
 	}
 
-	private List<DDMFormField> _createDDMFormFields() {
+	protected List<DDMFormField> createDDMFormFields() {
 		return ListUtil.fromArray(
-			_createNestedDDMFormFields("ParentField", "ChildField"),
-			_createRadioDDMFormField("BooleanField"),
-			_createSelectDDMFormField("SelectField"),
+			createNestedDDMFormFields("ParentField", "ChildField"),
+			createRadioDDMFormField("BooleanField"),
+			createSelectDDMFormField("SelectField"),
 			createTextDDMFormField("TextField"),
-			_createHTMLDDMFormField("HTMLField"));
+			createHTMLDDMFormField("HTMLField"));
 	}
 
-	private DDMFormField _createHTMLDDMFormField(String name) {
+	protected DDMFormField createHTMLDDMFormField(String name) {
 		DDMFormField ddmFormField = new DDMFormField(
 			name, DDMFormFieldType.TEXT_HTML);
 
 		ddmFormField.setDataType("html");
 		ddmFormField.setFieldNamespace("ddm");
 		ddmFormField.setIndexType("text");
-		ddmFormField.setLabel(_createHTMLDDMFormFieldLabel());
+		ddmFormField.setLabel(createHTMLDDMFormFieldLabel());
 		ddmFormField.setLocalizable(true);
 		ddmFormField.setPredefinedValue(
-			_createHTMLDDMFormFieldPredefinedValue());
+			createHTMLDDMFormFieldPredefinedValue());
 		ddmFormField.setReadOnly(false);
 		ddmFormField.setRepeatable(false);
 		ddmFormField.setRequired(false);
 		ddmFormField.setShowLabel(true);
-		ddmFormField.setTip(_createHTMLDDMFormFieldTip());
+		ddmFormField.setTip(createHTMLDDMFormFieldTip());
 
 		return ddmFormField;
 	}
 
-	private LocalizedValue _createHTMLDDMFormFieldLabel() {
+	protected LocalizedValue createHTMLDDMFormFieldLabel() {
 		LocalizedValue label = new LocalizedValue();
 
 		label.addString(LocaleUtil.BRAZIL, "HTML");
@@ -124,7 +104,7 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		return label;
 	}
 
-	private LocalizedValue _createHTMLDDMFormFieldPredefinedValue() {
+	protected LocalizedValue createHTMLDDMFormFieldPredefinedValue() {
 		LocalizedValue predefinedValue = new LocalizedValue();
 
 		predefinedValue.addString(LocaleUtil.BRAZIL, "");
@@ -133,7 +113,7 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		return predefinedValue;
 	}
 
-	private LocalizedValue _createHTMLDDMFormFieldTip() {
+	protected LocalizedValue createHTMLDDMFormFieldTip() {
 		LocalizedValue predefinedValue = new LocalizedValue();
 
 		predefinedValue.addString(LocaleUtil.BRAZIL, "Dica");
@@ -142,18 +122,18 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		return predefinedValue;
 	}
 
-	private DDMFormField _createNestedDDMFormFields(
+	protected DDMFormField createNestedDDMFormFields(
 		String parentName, String childName) {
 
 		DDMFormField parentDDMFormField = createTextDDMFormField(parentName);
 
 		parentDDMFormField.setNestedDDMFormFields(
-			ListUtil.fromArray(_createSelectDDMFormField(childName)));
+			ListUtil.fromArray(createSelectDDMFormField(childName)));
 
 		return parentDDMFormField;
 	}
 
-	private void _createNotEmptyValidation(DDMFormField ddmFormField) {
+	protected void createNotEmptyValidation(DDMFormField ddmFormField) {
 		DDMFormFieldValidation ddmFormFieldValidation =
 			new DDMFormFieldValidation();
 
@@ -172,11 +152,11 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmFormField.setDDMFormFieldValidation(ddmFormFieldValidation);
 	}
 
-	private DDMFormField _createRadioDDMFormField(String name) {
+	protected DDMFormField createRadioDDMFormField(String name) {
 		DDMFormField ddmFormField = new DDMFormField(name, "radio");
 
 		ddmFormField.setDataType("string");
-		ddmFormField.setDDMFormFieldOptions(_createDDMFormFieldOptions());
+		ddmFormField.setDDMFormFieldOptions(createDDMFormFieldOptions());
 		ddmFormField.setLocalizable(false);
 		ddmFormField.setReadOnly(false);
 		ddmFormField.setRepeatable(false);
@@ -184,12 +164,12 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmFormField.setShowLabel(false);
 		ddmFormField.setVisibilityExpression("false");
 
-		_createNotEmptyValidation(ddmFormField);
+		createNotEmptyValidation(ddmFormField);
 
 		return ddmFormField;
 	}
 
-	private DDMFormField _createSelectDDMFormField(String name) {
+	protected DDMFormField createSelectDDMFormField(String name) {
 		DDMFormField ddmFormField = new DDMFormField(name, "select");
 
 		ddmFormField.setDataType("string");
@@ -202,14 +182,34 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		ddmFormField.setShowLabel(true);
 		ddmFormField.setVisibilityExpression("true");
 
-		_createNotEmptyValidation(ddmFormField);
+		createNotEmptyValidation(ddmFormField);
 
-		ddmFormField.setDDMFormFieldOptions(_createDDMFormFieldOptions());
+		ddmFormField.setDDMFormFieldOptions(createDDMFormFieldOptions());
 
 		return ddmFormField;
 	}
 
-	private LocalizedValue _createTextDDMFormFieldLabel() {
+	protected DDMFormField createTextDDMFormField(String name) {
+		DDMFormField ddmFormField = new DDMFormField(name, "text");
+
+		ddmFormField.setDataType("string");
+		ddmFormField.setIndexType("keyword");
+		ddmFormField.setLabel(createTextDDMFormFieldLabel());
+		ddmFormField.setLocalizable(false);
+		ddmFormField.setPredefinedValue(
+			createTextDDMFormFieldPredefinedValue());
+		ddmFormField.setReadOnly(false);
+		ddmFormField.setRepeatable(true);
+		ddmFormField.setRequired(false);
+		ddmFormField.setShowLabel(true);
+		ddmFormField.setVisibilityExpression("true");
+
+		createNotEmptyValidation(ddmFormField);
+
+		return ddmFormField;
+	}
+
+	protected LocalizedValue createTextDDMFormFieldLabel() {
 		LocalizedValue label = new LocalizedValue();
 
 		label.addString(LocaleUtil.BRAZIL, "Texto");
@@ -218,7 +218,7 @@ public abstract class BaseDDMFormSerializerTestCase extends BaseDDMTestCase {
 		return label;
 	}
 
-	private LocalizedValue _createTextDDMFormFieldPredefinedValue() {
+	protected LocalizedValue createTextDDMFormFieldPredefinedValue() {
 		LocalizedValue predefinedValue = new LocalizedValue();
 
 		predefinedValue.addString(LocaleUtil.BRAZIL, "Exemplo");

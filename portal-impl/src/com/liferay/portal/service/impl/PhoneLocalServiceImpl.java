@@ -44,7 +44,7 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 	@Override
 	public Phone addPhone(
 			long userId, String className, long classPK, String number,
-			String extension, long listTypeId, boolean primary,
+			String extension, long typeId, boolean primary,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -53,7 +53,7 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 
 		validate(
 			0, user.getCompanyId(), classNameId, classPK, number, extension,
-			listTypeId, primary);
+			typeId, primary);
 
 		long phoneId = counterLocalService.increment();
 
@@ -67,7 +67,7 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 		phone.setClassPK(classPK);
 		phone.setNumber(number);
 		phone.setExtension(extension);
-		phone.setListTypeId(listTypeId);
+		phone.setTypeId(typeId);
 		phone.setPrimary(primary);
 
 		return phonePersistence.update(phone);
@@ -118,17 +118,17 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 
 	@Override
 	public Phone updatePhone(
-			long phoneId, String number, String extension, long listTypeId,
+			long phoneId, String number, String extension, long typeId,
 			boolean primary)
 		throws PortalException {
 
-		validate(phoneId, 0, 0, 0, number, extension, listTypeId, primary);
+		validate(phoneId, 0, 0, 0, number, extension, typeId, primary);
 
 		Phone phone = phonePersistence.findByPrimaryKey(phoneId);
 
 		phone.setNumber(number);
 		phone.setExtension(extension);
-		phone.setListTypeId(listTypeId);
+		phone.setTypeId(typeId);
 		phone.setPrimary(primary);
 
 		return phonePersistence.update(phone);
@@ -157,7 +157,7 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 
 	protected void validate(
 			long phoneId, long companyId, long classNameId, long classPK,
-			String number, String extension, long listTypeId, boolean primary)
+			String number, String extension, long typeId, boolean primary)
 		throws PortalException {
 
 		if (!PhoneNumberFormatUtil.validate(number)) {
@@ -188,7 +188,7 @@ public class PhoneLocalServiceImpl extends PhoneLocalServiceBaseImpl {
 				Organization.class))) {
 
 			_listTypeLocalService.validate(
-				listTypeId, classNameId, ListTypeConstants.PHONE);
+				typeId, classNameId, ListTypeConstants.PHONE);
 		}
 
 		validate(phoneId, companyId, classNameId, classPK, primary);

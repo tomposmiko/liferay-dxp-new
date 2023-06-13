@@ -16,11 +16,11 @@ package com.liferay.portal.events;
 
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.ResourceActionsException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogContextRegistryUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.patcher.PatcherUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
@@ -35,13 +35,11 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.tools.DBUpgrader;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
-import com.liferay.portal.upgrade.log.UpgradeLogContext;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.verify.VerifyException;
 
 import java.sql.Connection;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -72,8 +70,24 @@ public class StartupHelperUtil {
 		return _startupFinished;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static boolean isUpgraded() {
+		return _upgraded;
+	}
+
 	public static boolean isUpgrading() {
 		return _upgrading;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static boolean isVerified() {
+		return true;
 	}
 
 	public static void printPatchLevel() {
@@ -91,8 +105,12 @@ public class StartupHelperUtil {
 		}
 	}
 
-	public static void setDBNew(boolean dbNew) {
+	public static void setDbNew(boolean dbNew) {
 		_dbNew = dbNew;
+	}
+
+	public static void setDropIndexes(boolean dropIndexes) {
+		_dropIndexes = dropIndexes;
 	}
 
 	public static void setStartupFinished(boolean startupFinished) {
@@ -101,49 +119,66 @@ public class StartupHelperUtil {
 
 	public static void setUpgrading(boolean upgrading) {
 		_upgrading = upgrading;
+	}
 
-		if (_upgrading) {
-			if (PropsValues.UPGRADE_LOG_CONTEXT_ENABLED) {
-				LogContextRegistryUtil.registerLogContext(
-					UpgradeLogContext.getInstance());
-			}
+	public static void updateIndexes() {
+		updateIndexes(_dropIndexes);
+	}
 
-			DBUpgrader.startUpgradeLogAppender();
+	public static void updateIndexes(boolean dropIndexes) {
+		DB db = DBManagerUtil.getDB();
+
+		try (Connection connection = DataAccess.getConnection()) {
+			updateIndexes(db, connection, dropIndexes);
 		}
-		else {
-			DBUpgrader.stopUpgradeLogAppender();
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception, exception);
+			}
+		}
+	}
 
-			LogContextRegistryUtil.unregisterLogContext(
-				UpgradeLogContext.getInstance());
+	public static void updateIndexes(
+		DB db, Connection connection, boolean dropIndexes) {
+
+		try {
+			Thread currentThread = Thread.currentThread();
+
+			ClassLoader classLoader = currentThread.getContextClassLoader();
+
+			String tablesSQL = StringUtil.read(
+				classLoader,
+				"com/liferay/portal/tools/sql/dependencies/portal-tables.sql");
+
+			String indexesSQL = StringUtil.read(
+				classLoader,
+				"com/liferay/portal/tools/sql/dependencies/indexes.sql");
+
+			db.updateIndexes(connection, tablesSQL, indexesSQL, dropIndexes);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception, exception);
+			}
 		}
 	}
 
 	public static void upgradeProcess(int buildNumber) throws UpgradeException {
-		List<String> upgradeProcessClassNames = new ArrayList<>();
-
-		if (FeatureFlagManagerUtil.isEnabled("LPS-157670")) {
-			Collections.addAll(
-				upgradeProcessClassNames,
-				"com.liferay.portal.upgrade.UpgradeProcess_6_1_1",
-				"com.liferay.portal.upgrade.UpgradeProcess_6_2_0");
-		}
-
-		Collections.addAll(
-			upgradeProcessClassNames,
-			"com.liferay.portal.upgrade.UpgradeProcess_7_0_0",
-			"com.liferay.portal.upgrade.UpgradeProcess_7_0_1",
-			"com.liferay.portal.upgrade.UpgradeProcess_7_0_3",
-			"com.liferay.portal.upgrade.UpgradeProcess_7_0_5",
-			"com.liferay.portal.upgrade.UpgradeProcess_7_0_6",
-			"com.liferay.portal.upgrade.PortalUpgradeProcess");
-
 		List<UpgradeProcess> upgradeProcesses =
 			UpgradeProcessUtil.initUpgradeProcesses(
 				PortalClassLoaderUtil.getClassLoader(),
-				upgradeProcessClassNames.toArray(new String[0]));
+				_UPGRADE_PROCESS_CLASS_NAMES);
 
 		_upgraded = UpgradeProcessUtil.upgradeProcess(
 			buildNumber, upgradeProcesses);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static void verifyProcess(boolean verified) throws VerifyException {
+		DBUpgrader.verify();
 	}
 
 	public static void verifyRequiredSchemaVersion() throws Exception {
@@ -151,10 +186,8 @@ public class StartupHelperUtil {
 			_log.debug("Check the portal's required schema version");
 		}
 
-		try (Connection connection = DataAccess.getConnection()) {
-			if (PortalUpgradeProcess.isInRequiredSchemaVersion(connection)) {
-				return;
-			}
+		if (!PortalUpgradeProcess.isInRequiredSchemaVersion(
+				DataAccess.getConnection())) {
 
 			Version currentSchemaVersion =
 				PortalUpgradeProcess.getCurrentSchemaVersion(
@@ -182,10 +215,20 @@ public class StartupHelperUtil {
 		}
 	}
 
+	private static final String[] _UPGRADE_PROCESS_CLASS_NAMES = {
+		"com.liferay.portal.upgrade.UpgradeProcess_7_0_0",
+		"com.liferay.portal.upgrade.UpgradeProcess_7_0_1",
+		"com.liferay.portal.upgrade.UpgradeProcess_7_0_3",
+		"com.liferay.portal.upgrade.UpgradeProcess_7_0_5",
+		"com.liferay.portal.upgrade.UpgradeProcess_7_0_6",
+		"com.liferay.portal.upgrade.PortalUpgradeProcess"
+	};
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		StartupHelperUtil.class);
 
-	private static volatile boolean _dbNew;
+	private static boolean _dbNew;
+	private static boolean _dropIndexes;
 	private static boolean _startupFinished;
 	private static boolean _upgraded;
 	private static boolean _upgrading;

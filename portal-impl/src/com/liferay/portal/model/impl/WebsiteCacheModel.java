@@ -100,8 +100,8 @@ public class WebsiteCacheModel
 		sb.append(classPK);
 		sb.append(", url=");
 		sb.append(url);
-		sb.append(", listTypeId=");
-		sb.append(listTypeId);
+		sb.append(", typeId=");
+		sb.append(typeId);
 		sb.append(", primary=");
 		sb.append(primary);
 		sb.append(", lastPublishDate=");
@@ -159,7 +159,7 @@ public class WebsiteCacheModel
 			websiteImpl.setUrl(url);
 		}
 
-		websiteImpl.setListTypeId(listTypeId);
+		websiteImpl.setTypeId(typeId);
 		websiteImpl.setPrimary(primary);
 
 		if (lastPublishDate == Long.MIN_VALUE) {
@@ -193,7 +193,7 @@ public class WebsiteCacheModel
 		classPK = objectInput.readLong();
 		url = objectInput.readUTF();
 
-		listTypeId = objectInput.readLong();
+		typeId = objectInput.readLong();
 
 		primary = objectInput.readBoolean();
 		lastPublishDate = objectInput.readLong();
@@ -237,7 +237,7 @@ public class WebsiteCacheModel
 			objectOutput.writeUTF(url);
 		}
 
-		objectOutput.writeLong(listTypeId);
+		objectOutput.writeLong(typeId);
 
 		objectOutput.writeBoolean(primary);
 		objectOutput.writeLong(lastPublishDate);
@@ -254,7 +254,7 @@ public class WebsiteCacheModel
 	public long classNameId;
 	public long classPK;
 	public String url;
-	public long listTypeId;
+	public long typeId;
 	public boolean primary;
 	public long lastPublishDate;
 

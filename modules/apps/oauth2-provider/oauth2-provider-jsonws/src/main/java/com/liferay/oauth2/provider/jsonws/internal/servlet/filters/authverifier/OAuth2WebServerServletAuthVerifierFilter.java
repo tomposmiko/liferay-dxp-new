@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Deactivate;
  * @author Tomas Polesovsky
  */
 @Component(
+	immediate = true,
 	property = {
 		"before-filter=Auto Login Filter", "dispatcher=FORWARD",
 		"dispatcher=REQUEST", "servlet-context-name=",

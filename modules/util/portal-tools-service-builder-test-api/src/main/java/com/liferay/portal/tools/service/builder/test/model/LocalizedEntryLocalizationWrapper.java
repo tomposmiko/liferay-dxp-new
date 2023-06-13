@@ -243,11 +243,6 @@ public class LocalizedEntryLocalizationWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected LocalizedEntryLocalizationWrapper wrap(
 		LocalizedEntryLocalization localizedEntryLocalization) {
 

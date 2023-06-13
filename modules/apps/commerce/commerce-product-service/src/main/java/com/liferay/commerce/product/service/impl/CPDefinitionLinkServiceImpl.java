@@ -19,33 +19,21 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionLink;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CommerceCatalog;
-import com.liferay.commerce.product.service.CPDefinitionLocalService;
-import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.service.base.CPDefinitionLinkServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Alessio Antonio Rendina
  * @author Marco Leo
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CPDefinitionLink"
-	},
-	service = AopService.class
-)
 public class CPDefinitionLinkServiceImpl
 	extends CPDefinitionLinkServiceBaseImpl {
 
@@ -99,17 +87,6 @@ public class CPDefinitionLinkServiceImpl
 		}
 
 		return cpDefinitionLink;
-	}
-
-	@Override
-	public CPDefinitionLink fetchCPDefinitionLink(
-			long cpDefinitionId, long cProductId, String type)
-		throws PortalException {
-
-		_checkCommerceCatalog(cpDefinitionId, ActionKeys.VIEW);
-
-		return cpDefinitionLinkLocalService.fetchCPDefinitionLink(
-			cpDefinitionId, cProductId, type);
 	}
 
 	@Override
@@ -226,28 +203,14 @@ public class CPDefinitionLinkServiceImpl
 
 		_checkCommerceCatalog(cpDefinitionId, ActionKeys.UPDATE);
 
-		if (cpDefinitionIds2 == null) {
-			return;
-		}
-
-		long[] cProductIds = new long[cpDefinitionIds2.length];
-
-		for (int i = 0; i < cProductIds.length; i++) {
-			CPDefinition cpDefinition =
-				_cpDefinitionLocalService.fetchCPDefinition(
-					cpDefinitionIds2[i]);
-
-			cProductIds[i] = cpDefinition.getCProductId();
-		}
-
-		cpDefinitionLinkLocalService.updateCPDefinitionLinkCProductIds(
-			cpDefinitionId, cProductIds, type, serviceContext);
+		cpDefinitionLinkLocalService.updateCPDefinitionLinks(
+			cpDefinitionId, cpDefinitionIds2, type, serviceContext);
 	}
 
 	private void _checkCommerceCatalog(long cpDefinitionId, String actionId)
 		throws PortalException {
 
-		CPDefinition cpDefinition = _cpDefinitionLocalService.fetchCPDefinition(
+		CPDefinition cpDefinition = cpDefinitionLocalService.fetchCPDefinition(
 			cpDefinitionId);
 
 		if (cpDefinition == null) {
@@ -255,7 +218,7 @@ public class CPDefinitionLinkServiceImpl
 		}
 
 		CommerceCatalog commerceCatalog =
-			_commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
+			commerceCatalogLocalService.fetchCommerceCatalogByGroupId(
 				cpDefinition.getGroupId());
 
 		if (commerceCatalog == null) {
@@ -266,16 +229,11 @@ public class CPDefinitionLinkServiceImpl
 			getPermissionChecker(), commerceCatalog, actionId);
 	}
 
-	@Reference
-	private CommerceCatalogLocalService _commerceCatalogLocalService;
-
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.product.model.CommerceCatalog)"
-	)
-	private ModelResourcePermission<CommerceCatalog>
-		_commerceCatalogModelResourcePermission;
-
-	@Reference
-	private CPDefinitionLocalService _cpDefinitionLocalService;
+	private static volatile ModelResourcePermission<CommerceCatalog>
+		_commerceCatalogModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CPDefinitionLinkServiceImpl.class,
+				"_commerceCatalogModelResourcePermission",
+				CommerceCatalog.class);
 
 }

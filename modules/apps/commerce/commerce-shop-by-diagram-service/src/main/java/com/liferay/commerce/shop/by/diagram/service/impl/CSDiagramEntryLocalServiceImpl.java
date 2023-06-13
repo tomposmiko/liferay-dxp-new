@@ -14,31 +14,21 @@
 
 package com.liferay.commerce.shop.by.diagram.service.impl;
 
-import com.liferay.commerce.product.model.CPInstance;
-import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.shop.by.diagram.exception.DuplicateCSDiagramEntryException;
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry;
-import com.liferay.commerce.shop.by.diagram.model.CSDiagramPin;
-import com.liferay.commerce.shop.by.diagram.service.CSDiagramPinLocalService;
 import com.liferay.commerce.shop.by.diagram.service.base.CSDiagramEntryLocalServiceBaseImpl;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.OrderByComparator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	property = "model.class.name=com.liferay.commerce.shop.by.diagram.model.CSDiagramEntry",
 	service = AopService.class
 )
@@ -61,9 +52,9 @@ public class CSDiagramEntryLocalServiceImpl
 			String sku, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
-		_validate(null, cpDefinitionId, sequence);
+		validate(null, cpDefinitionId, sequence);
 
 		long csDiagramEntryId = counterLocalService.increment();
 
@@ -86,9 +77,7 @@ public class CSDiagramEntryLocalServiceImpl
 	}
 
 	@Override
-	public void deleteCSDiagramEntries(long cpDefinitionId)
-		throws PortalException {
-
+	public void deleteCSDiagramEntries(long cpDefinitionId) {
 		List<CSDiagramEntry> csDiagramEntries =
 			csDiagramEntryPersistence.findByCPDefinitionId(cpDefinitionId);
 
@@ -100,26 +89,8 @@ public class CSDiagramEntryLocalServiceImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
-	public CSDiagramEntry deleteCSDiagramEntry(CSDiagramEntry csDiagramEntry)
-		throws PortalException {
-
+	public CSDiagramEntry deleteCSDiagramEntry(CSDiagramEntry csDiagramEntry) {
 		csDiagramEntry = csDiagramEntryPersistence.remove(csDiagramEntry);
-
-		List<CSDiagramPin> csDiagramPins =
-			_csDiagramPinLocalService.getCSDiagramPins(
-				csDiagramEntry.getCPDefinitionId(), QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
-
-		for (CSDiagramPin csDiagramPin : csDiagramPins) {
-			if ((csDiagramEntry.getCPDefinitionId() ==
-					csDiagramPin.getCPDefinitionId()) &&
-				Objects.equals(
-					csDiagramEntry.getSequence(), csDiagramPin.getSequence())) {
-
-				_csDiagramPinLocalService.deleteCSDiagramPin(
-					csDiagramPin.getCSDiagramPinId());
-			}
-		}
 
 		_expandoRowLocalService.deleteRows(
 			csDiagramEntry.getCSDiagramEntryId());
@@ -133,35 +104,6 @@ public class CSDiagramEntryLocalServiceImpl
 
 		return csDiagramEntryPersistence.fetchByCPDI_S(
 			cpDefinitionId, sequence);
-	}
-
-	@Override
-	public List<CSDiagramEntry> getCPDefinitionRelatedCSDiagramEntries(
-		long cpDefinitionId) {
-
-		Set<CSDiagramEntry> csDiagramEntries = new HashSet<>();
-
-		List<CPInstance> cpInstances =
-			_cpInstanceLocalService.getCPDefinitionApprovedCPInstances(
-				cpDefinitionId);
-
-		for (CPInstance cpInstance : cpInstances) {
-			csDiagramEntries.addAll(
-				csDiagramEntryPersistence.findByCPInstanceId(
-					cpInstance.getCPInstanceId()));
-		}
-
-		return new ArrayList<>(csDiagramEntries);
-	}
-
-	@Override
-	public List<CSDiagramEntry> getCProductCSDiagramEntries(
-			long cProductId, int start, int end,
-			OrderByComparator<CSDiagramEntry> orderByComparator)
-		throws PortalException {
-
-		return csDiagramEntryPersistence.findByCProductId(
-			cProductId, start, end, orderByComparator);
 	}
 
 	@Override
@@ -196,7 +138,7 @@ public class CSDiagramEntryLocalServiceImpl
 		CSDiagramEntry csDiagramEntry =
 			csDiagramEntryLocalService.getCSDiagramEntry(csDiagramEntryId);
 
-		_validate(csDiagramEntry, csDiagramEntry.getCPDefinitionId(), sequence);
+		validate(csDiagramEntry, csDiagramEntry.getCPDefinitionId(), sequence);
 
 		csDiagramEntry.setCPInstanceId(cpInstanceId);
 		csDiagramEntry.setCProductId(cProductId);
@@ -209,7 +151,7 @@ public class CSDiagramEntryLocalServiceImpl
 		return csDiagramEntryPersistence.update(csDiagramEntry);
 	}
 
-	private void _validate(
+	protected void validate(
 			CSDiagramEntry oldCSDiagramEntry, long cpDefinitionId,
 			String sequence)
 		throws PortalException {
@@ -223,15 +165,6 @@ public class CSDiagramEntryLocalServiceImpl
 	}
 
 	@Reference
-	private CPInstanceLocalService _cpInstanceLocalService;
-
-	@Reference
-	private CSDiagramPinLocalService _csDiagramPinLocalService;
-
-	@Reference
 	private ExpandoRowLocalService _expandoRowLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

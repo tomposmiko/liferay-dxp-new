@@ -27,16 +27,28 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Mika Koivisto
  */
-@Component(property = "path=/portal/saml/sso", service = StrutsAction.class)
+@Component(
+	immediate = true, property = "path=/portal/saml/sso",
+	service = StrutsAction.class
+)
 public class WebSsoAction extends BaseSamlStrutsAction {
 
 	@Override
 	public boolean isEnabled() {
-		if (_samlProviderConfigurationHelper.isRoleIdp()) {
-			return _samlProviderConfigurationHelper.isEnabled();
+		if (samlProviderConfigurationHelper.isRoleIdp()) {
+			return super.isEnabled();
 		}
 
 		return false;
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		super.setSamlProviderConfigurationHelper(
+			samlProviderConfigurationHelper);
 	}
 
 	@Override
@@ -50,9 +62,6 @@ public class WebSsoAction extends BaseSamlStrutsAction {
 
 		return null;
 	}
-
-	@Reference
-	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
 
 	@Reference(unbind = "-")
 	private WebSsoProfile _webSsoProfile;

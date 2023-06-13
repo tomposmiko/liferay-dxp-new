@@ -27,10 +27,11 @@ import org.osgi.service.component.annotations.Component;
  * @author Andrea Sbarra
  */
 @Component(
+	enabled = false,
 	property = {
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Account)",
 		"osgi.jaxrs.extension=true",
-		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Account.NoSuchAddressExceptionMapper"
+		"osgi.jaxrs.name=Liferay.Headless.Commerce.Admin.Account.NoSuchAddressException"
 	},
 	service = ExceptionMapper.class
 )
@@ -45,7 +46,7 @@ public class NoSuchAddressExceptionMapper
 
 	@Override
 	public Response.Status getStatus() {
-		return Response.Status.NOT_FOUND;
+		return Response.Status.BAD_REQUEST;
 	}
 
 }

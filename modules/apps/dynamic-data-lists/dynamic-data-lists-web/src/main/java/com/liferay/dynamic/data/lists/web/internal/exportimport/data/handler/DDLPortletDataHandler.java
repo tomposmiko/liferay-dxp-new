@@ -14,7 +14,6 @@
 
 package com.liferay.dynamic.data.lists.web.internal.exportimport.data.handler;
 
-import com.liferay.data.engine.model.DEDataDefinitionFieldLink;
 import com.liferay.dynamic.data.lists.constants.DDLConstants;
 import com.liferay.dynamic.data.lists.constants.DDLPortletKeys;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
@@ -67,11 +66,6 @@ public class DDLPortletDataHandler extends BasePortletDataHandler {
 	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
-	}
-
-	@Override
-	public String getServiceName() {
-		return DDLConstants.SERVICE_NAME;
 	}
 
 	@Activate
@@ -169,28 +163,6 @@ public class DDLPortletDataHandler extends BasePortletDataHandler {
 					portletDataContext, ddmStructureElement);
 			}
 
-			for (Element ddmStructureElement : ddmStructureElements) {
-				List<Element> deDataDefinitionFieldLinkElements =
-					portletDataContext.getReferenceDataElements(
-						ddmStructureElement, DEDataDefinitionFieldLink.class,
-						null);
-
-				for (Element deDataDefinitionFieldLinkElement :
-						deDataDefinitionFieldLinkElements) {
-
-					String path =
-						deDataDefinitionFieldLinkElement.attributeValue("path");
-
-					DEDataDefinitionFieldLink deDataDefinitionFieldLink =
-						(DEDataDefinitionFieldLink)
-							portletDataContext.getZipEntryAsObject(
-								deDataDefinitionFieldLinkElement, path);
-
-					StagedModelDataHandlerUtil.importStagedModel(
-						portletDataContext, deDataDefinitionFieldLink);
-				}
-			}
-
 			Element ddmTemplatesElement =
 				portletDataContext.getImportDataGroupElement(DDMTemplate.class);
 
@@ -250,18 +222,33 @@ public class DDLPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet)"
+		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet)",
+		unbind = "-"
 	)
-	private StagedModelRepository<DDLRecordSet>
-		_ddlRecordSetStagedModelRepository;
+	protected void setDDLRecordSetStagedModelRepository(
+		StagedModelRepository<DDLRecordSet> ddlRecordSetStagedModelRepository) {
+
+		_ddlRecordSetStagedModelRepository = ddlRecordSetStagedModelRepository;
+	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecord)"
+		target = "(model.class.name=com.liferay.dynamic.data.lists.model.DDLRecord)",
+		unbind = "-"
 	)
-	private StagedModelRepository<DDLRecord> _ddlRecordStagedModelRepository;
+	protected void setDDLRecordStagedModelRepository(
+		StagedModelRepository<DDLRecord> ddlRecordStagedModelRepository) {
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
+		_ddlRecordStagedModelRepository = ddlRecordStagedModelRepository;
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	private StagedModelRepository<DDLRecordSet>
+		_ddlRecordSetStagedModelRepository;
+	private StagedModelRepository<DDLRecord> _ddlRecordStagedModelRepository;
 
 	@Reference
 	private Staging _staging;

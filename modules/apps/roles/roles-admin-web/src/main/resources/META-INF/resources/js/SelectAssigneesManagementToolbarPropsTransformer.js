@@ -12,8 +12,6 @@
  * details.
  */
 
-import {COOKIE_TYPES, getTop, sessionStorage} from 'frontend-js-web';
-
 export default function propsTransformer({...otherProps}) {
 	return {
 		...otherProps,
@@ -21,13 +19,9 @@ export default function propsTransformer({...otherProps}) {
 			const data = item?.data;
 
 			if (data?.action === 'addSegmentEntry') {
-				sessionStorage.setItem(
-					data?.sessionKey,
-					'open',
-					COOKIE_TYPES.NECESSARY
-				);
+				window.sessionStorage.setItem(data?.sessionKey, 'open');
 
-				getTop().location.href = data?.addSegmentEntryURL;
+				Liferay.Util.getTop().location.href = data?.addSegmentEntryURL;
 			}
 		},
 	};

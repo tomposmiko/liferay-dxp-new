@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.internal.upgrade.v2_1_0;
 
+import com.liferay.commerce.internal.upgrade.base.BaseCommerceServiceUpgradeProcess;
 import com.liferay.commerce.model.impl.CommerceOrderItemModelImpl;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
@@ -22,9 +23,6 @@ import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.portal.kernel.dao.db.IndexMetadata;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.sql.DatabaseMetaData;
@@ -38,7 +36,8 @@ import java.util.Objects;
 /**
  * @author Alec Sloan
  */
-public class CommerceOrderItemUpgradeProcess extends UpgradeProcess {
+public class CommerceOrderItemUpgradeProcess
+	extends BaseCommerceServiceUpgradeProcess {
 
 	public CommerceOrderItemUpgradeProcess(
 		CPDefinitionLocalService cpDefinitionLocalService,
@@ -50,6 +49,10 @@ public class CommerceOrderItemUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CommerceOrderItemModelImpl.class,
+			CommerceOrderItemModelImpl.TABLE_NAME, "CProductId", "LONG");
+
 		_addIndexes(CommerceOrderItemModelImpl.TABLE_NAME);
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -76,14 +79,6 @@ public class CommerceOrderItemUpgradeProcess extends UpgradeProcess {
 				preparedStatement.execute();
 			}
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommerceOrderItem", "CProductId LONG")
-		};
 	}
 
 	private void _addIndexes(String tableName) throws Exception {

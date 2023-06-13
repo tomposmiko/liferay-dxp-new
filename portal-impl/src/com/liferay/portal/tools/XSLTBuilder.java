@@ -16,19 +16,14 @@ package com.liferay.portal.tools;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.Dom4jUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.Node;
-import com.liferay.portal.kernel.xml.ProcessingInstruction;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.xml.SAXReaderFactory;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,14 +42,19 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.io.DocumentSource;
+import org.dom4j.io.SAXReader;
+
 /**
  * @author Brian Wing Shun Chan
  */
 public class XSLTBuilder {
 
 	public static void main(String[] args) throws IOException {
-		ToolDependencies.wireBasic();
-
 		if (args.length == 2) {
 			String xmls = null;
 
@@ -90,7 +90,7 @@ public class XSLTBuilder {
 			if (xmls.length > 1) {
 				String completeXml = prefix + "-complete.xml";
 
-				String completeContent = document.formattedString();
+				String completeContent = Dom4jUtil.toString(document);
 
 				Files.write(
 					Paths.get(completeXml),
@@ -98,29 +98,29 @@ public class XSLTBuilder {
 			}
 
 			TransformerFactory transformerFactory =
-				SecureXMLFactoryProviderUtil.newTransformerFactory();
+				TransformerFactory.newInstance();
 
 			Transformer transformer = transformerFactory.newTransformer(
 				new StreamSource(xsl));
 
-			String xml = document.formattedString();
-
 			transformer.transform(
-				new StreamSource(new ByteArrayInputStream(xml.getBytes())),
+				new DocumentSource(document),
 				new StreamResult(new FileOutputStream(html)));
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
 	private Document _combineAndSortXMLs(String[] xmls, String xsl)
 		throws Exception {
 
+		SAXReader saxReader = SAXReaderFactory.getSAXReader(null, false, false);
+
 		Map<String, Element> elementMap = new TreeMap<>();
 
 		for (String xml : xmls) {
-			Document document = SAXReaderUtil.read(new File(xml));
+			Document document = saxReader.read(new File(xml));
 
 			List<Node> nodes = document.selectNodes("//file-name");
 
@@ -129,21 +129,18 @@ public class XSLTBuilder {
 			}
 		}
 
-		Document document = SAXReaderUtil.createDocument();
+		Document document = DocumentHelper.createDocument();
 
 		File xslFile = new File(xsl);
 
 		if (xslFile.exists()) {
-			ProcessingInstruction processingInstruction =
-				SAXReaderUtil.createProcessingInstruction(
-					"xml-stylesheet",
-					HashMapBuilder.put(
-						"href", xslFile.getName()
-					).put(
-						"type", "text/xsl"
-					).build());
-
-			document.add(processingInstruction);
+			document.addProcessingInstruction(
+				"xml-stylesheet",
+				HashMapBuilder.put(
+					"href", xslFile.getName()
+				).put(
+					"type", "text/xsl"
+				).build());
 		}
 
 		Element versionsElement = document.addElement("versions");

@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.calendar.model.impl.CalendarNotificationTemplateImpl",
-		"table.name=CalendarNotificationTemplate"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		CalendarNotificationTemplateModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class CalendarNotificationTemplateModelArgumentsResolver
 	implements ArgumentsResolver {

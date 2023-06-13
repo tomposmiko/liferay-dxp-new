@@ -98,8 +98,7 @@ public class RoleResourceImpl extends BaseRoleResourceImpl {
 	}
 
 	@Override
-	public Page<Role> getRolesPage(
-			Integer[] types, String search, Pagination pagination)
+	public Page<Role> getRolesPage(Integer[] types, Pagination pagination)
 		throws Exception {
 
 		if (types == null) {
@@ -117,13 +116,13 @@ public class RoleResourceImpl extends BaseRoleResourceImpl {
 			).build(),
 			transform(
 				_roleService.search(
-					contextCompany.getCompanyId(), search, types, null,
+					contextCompany.getCompanyId(), null, types, null,
 					pagination.getStartPosition(), pagination.getEndPosition(),
 					null),
 				this::_toRole),
 			pagination,
 			_roleService.searchCount(
-				contextCompany.getCompanyId(), search, types, null));
+				contextCompany.getCompanyId(), null, types, null));
 	}
 
 	@Override
@@ -234,7 +233,6 @@ public class RoleResourceImpl extends BaseRoleResourceImpl {
 				description_i18n = LocalizedMapUtil.getI18nMap(
 					contextAcceptLanguage.isAcceptAllLanguages(),
 					role.getDescriptionMap());
-				externalReferenceCode = role.getName();
 				id = role.getRoleId();
 				name = role.getTitle(
 					contextAcceptLanguage.getPreferredLocale());

@@ -14,7 +14,7 @@
 
 import React from 'react';
 
-import {Component} from '../../common/AppContext';
+import {Component} from '../../core/AppContext';
 import MappingSidebar from './components/MappingSidebar';
 
 /**

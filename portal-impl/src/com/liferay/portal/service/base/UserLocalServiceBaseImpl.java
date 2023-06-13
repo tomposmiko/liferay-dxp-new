@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -266,19 +264,46 @@ public abstract class UserLocalServiceBaseImpl
 		return userPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user, or <code>null</code> if a matching user could not be found
+	 */
 	@Override
 	public User fetchUserByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
+		long companyId, String externalReferenceCode) {
 
-		return userPersistence.fetchByERC_C(externalReferenceCode, companyId);
+		return userPersistence.fetchByC_ERC(companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public User fetchUserByReferenceCode(
+		long companyId, String externalReferenceCode) {
+
+		return fetchUserByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user
+	 * @throws PortalException if a matching user could not be found
+	 */
 	@Override
 	public User getUserByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
+			long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return userPersistence.findByERC_C(externalReferenceCode, companyId);
+		return userPersistence.findByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
@@ -413,11 +438,6 @@ public abstract class UserLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement UserLocalServiceImpl#deleteUser(User) to avoid orphaned data");
-		}
 
 		return userLocalService.deleteUser((User)persistedModel);
 	}
@@ -1372,9 +1392,6 @@ public abstract class UserLocalServiceBaseImpl
 
 	@BeanReference(type = UserGroupPersistence.class)
 	protected UserGroupPersistence userGroupPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		UserLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

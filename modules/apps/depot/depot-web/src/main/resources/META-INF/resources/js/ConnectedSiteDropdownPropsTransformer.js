@@ -12,20 +12,19 @@
  * details.
  */
 
-import {navigate, openConfirmModal} from 'frontend-js-web';
+import {navigate} from 'frontend-js-web';
 
 const ACTIONS = {
 	disconnect({url: disconnectSiteActionURL}) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'removing-this-site-connection-will-not-allow-the-site-to-consume-data-from-this-asset-library-directly'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, disconnectSiteActionURL);
-				}
-			},
-		});
+		if (
+			confirm(
+				Liferay.Language.get(
+					'removing-this-site-connection-will-not-allow-the-site-to-consume-data-from-this-asset-library-directly'
+				)
+			)
+		) {
+			submitForm(document.hrefFm, disconnectSiteActionURL);
+		}
 	},
 	shareWebContentStructures({
 		shared,
@@ -39,14 +38,9 @@ const ACTIONS = {
 					'you-will-not-be-able-to-disconnect-this-site-when-structure-and-document-type-sharing-is-enabled.-in-order-to-disconnect-this-site-from-this-asset-library,-you-must-disable-structure-and-document-type-sharing-first'
 			  );
 
-		openConfirmModal({
-			message,
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					navigate(updateDDMStructuresAvailableActionURL);
-				}
-			},
-		});
+		if (confirm(message)) {
+			navigate(updateDDMStructuresAvailableActionURL);
+		}
 	},
 };
 

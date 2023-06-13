@@ -18,12 +18,12 @@ import com.liferay.bookmarks.constants.BookmarksFolderConstants;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.web.internal.portlet.action.ActionUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS_ADMIN,
 		"path=/bookmarks/view_folder"
@@ -54,7 +55,17 @@ public class DeleteFolderPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		return _language.get(getLocale(portletRequest), "delete");
+		String key = "delete";
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		if (isTrashEnabled(themeDisplay.getScopeGroupId())) {
+			key = "move-to-recycle-bin";
+		}
+
+		return LanguageUtil.get(
+			getResourceBundle(themeDisplay.getLocale()), key);
 	}
 
 	@Override
@@ -75,7 +86,7 @@ public class DeleteFolderPortletConfigurationIcon
 
 				String cmd = Constants.DELETE;
 
-				if (_isTrashEnabled(themeDisplay.getScopeGroupId())) {
+				if (isTrashEnabled(themeDisplay.getScopeGroupId())) {
 					cmd = Constants.MOVE_TO_TRASH;
 				}
 
@@ -90,7 +101,7 @@ public class DeleteFolderPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -116,6 +127,7 @@ public class DeleteFolderPortletConfigurationIcon
 		}
 
 		deleteURL.setParameter("redirect", parentFolderURL.toString());
+
 		deleteURL.setParameter(
 			"folderId", String.valueOf(folder.getFolderId()));
 
@@ -149,14 +161,14 @@ public class DeleteFolderPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
 		return false;
 	}
 
-	private boolean _isTrashEnabled(long groupId) {
+	protected boolean isTrashEnabled(long groupId) {
 		try {
 			if (_trashHelper.isTrashEnabled(groupId)) {
 				return true;
@@ -164,7 +176,7 @@ public class DeleteFolderPortletConfigurationIcon
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -179,9 +191,6 @@ public class DeleteFolderPortletConfigurationIcon
 	)
 	private ModelResourcePermission<BookmarksFolder>
 		_bookmarksFolderModelResourcePermission;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

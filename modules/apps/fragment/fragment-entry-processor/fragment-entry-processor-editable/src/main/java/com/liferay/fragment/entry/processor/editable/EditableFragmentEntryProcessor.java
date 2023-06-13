@@ -14,54 +14,106 @@
 
 package com.liferay.fragment.entry.processor.editable;
 
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.entry.processor.editable.mapper.EditableElementMapper;
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
 import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
 import com.liferay.fragment.entry.processor.util.EditableFragmentEntryProcessorUtil;
+import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
+import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.info.item.InfoItemFieldValues;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 /**
  * @author Pavel Savinov
  */
 @Component(
-	property = "fragment.entry.processor.priority:Integer=2",
+	immediate = true, property = "fragment.entry.processor.priority:Integer=2",
 	service = FragmentEntryProcessor.class
 )
 public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 
 	@Override
+	public JSONArray getAvailableTagsJSONArray() {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		for (Map.Entry<String, EditableElementParser> editableElementParser :
+				_editableElementParsers.entrySet()) {
+
+			StringBundler sb = new StringBundler(
+				2 + (5 * _REQUIRED_ATTRIBUTE_NAMES.length));
+
+			sb.append("<lfr-editable");
+
+			for (String attributeName : _REQUIRED_ATTRIBUTE_NAMES) {
+				sb.append(StringPool.SPACE);
+				sb.append(attributeName);
+				sb.append("=\"");
+
+				String value = StringPool.BLANK;
+
+				if (attributeName.equals("type")) {
+					value = editableElementParser.getKey();
+				}
+
+				sb.append(value);
+				sb.append("\"");
+			}
+
+			sb.append("></lfr-editable>");
+
+			jsonArray.put(
+				JSONUtil.put(
+					"content", sb.toString()
+				).put(
+					"name", "lfr-editable:" + editableElementParser.getKey()
+				));
+		}
+
+		return jsonArray;
+	}
+
+	@Override
 	public JSONArray getDataAttributesJSONArray() {
 		JSONArray jsonArray = JSONUtil.put("lfr-editable-id");
 
-		for (String key : _editableElementParserServiceTrackerMap.keySet()) {
-			jsonArray.put("lfr-editable-type:" + key);
+		for (Map.Entry<String, EditableElementParser> editableElementParser :
+				_editableElementParsers.entrySet()) {
+
+			jsonArray.put(
+				"lfr-editable-type:" + editableElementParser.getKey());
 		}
 
 		return jsonArray;
@@ -80,7 +132,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 			FragmentEntryProcessorContext fragmentEntryProcessorContext)
 		throws PortalException {
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			fragmentEntryLink.getEditableValues());
 
 		if (jsonObject.length() == 0) {
@@ -89,7 +141,8 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 			jsonObject.put(
 				clazz.getName(),
 				getDefaultEditableValuesJSONObject(
-					html, fragmentEntryLink.getConfiguration()));
+					fragmentEntryLink.getHtml(),
+					fragmentEntryLink.getConfiguration()));
 		}
 
 		Document document = _getDocument(html);
@@ -127,37 +180,62 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 			String value = StringPool.BLANK;
 
 			JSONObject mappedValueConfigJSONObject =
-				_jsonFactory.createJSONObject();
+				JSONFactoryUtil.createJSONObject();
 
-			if (_fragmentEntryProcessorHelper.isMapped(
-					editableValueJSONObject) ||
-				_fragmentEntryProcessorHelper.isMappedCollection(
-					editableValueJSONObject) ||
-				_fragmentEntryProcessorHelper.isMappedDisplayPage(
-					editableValueJSONObject)) {
+			if (_fragmentEntryProcessorHelper.isAssetDisplayPage(
+					fragmentEntryProcessorContext.getMode()) &&
+				editableValueJSONObject.has("mappedField")) {
 
-				Object fieldValue = _fragmentEntryProcessorHelper.getFieldValue(
-					editableValueJSONObject, infoDisplaysFieldValues,
-					fragmentEntryProcessorContext);
+				value = editableValueJSONObject.getString("mappedField");
+
+				if (Validator.isNotNull(value)) {
+					mappedValueConfigJSONObject =
+						editableElementParser.getFieldTemplateConfigJSONObject(
+							value, fragmentEntryProcessorContext.getLocale(),
+							null);
+
+					if (mappedValueConfigJSONObject.has("alt")) {
+						String alt = mappedValueConfigJSONObject.getString(
+							"alt", StringPool.BLANK);
+
+						alt = _fragmentEntryProcessorHelper.processTemplate(
+							alt, fragmentEntryProcessorContext);
+
+						mappedValueConfigJSONObject.put("alt", alt);
+					}
+
+					if (mappedValueConfigJSONObject.has("fileEntryId")) {
+						String fileEntryId =
+							mappedValueConfigJSONObject.getString(
+								"fileEntryId", StringPool.BLANK);
+
+						fileEntryId = StringUtil.trim(
+							_fragmentEntryProcessorHelper.processTemplate(
+								fileEntryId, fragmentEntryProcessorContext));
+
+						mappedValueConfigJSONObject.put(
+							"fileEntryId", fileEntryId);
+					}
+
+					value = StringUtil.replace(
+						editableElementParser.getFieldTemplate(), "field_name",
+						value);
+
+					value = _fragmentEntryProcessorHelper.processTemplate(
+						value, fragmentEntryProcessorContext);
+				}
+			}
+			else if (_fragmentEntryProcessorHelper.isMapped(
+						editableValueJSONObject)) {
+
+				Object fieldValue =
+					_fragmentEntryProcessorHelper.getMappedInfoItemFieldValue(
+						editableValueJSONObject, infoDisplaysFieldValues,
+						fragmentEntryProcessorContext);
 
 				if (fieldValue != null) {
-					String fieldId = StringPool.BLANK;
-
-					if (_fragmentEntryProcessorHelper.isMappedDisplayPage(
-							editableValueJSONObject)) {
-
-						fieldId = editableValueJSONObject.getString(
-							"mappedField");
-					}
-					else if (_fragmentEntryProcessorHelper.isMapped(
-								editableValueJSONObject)) {
-
-						fieldId = editableValueJSONObject.getString("fieldId");
-					}
-					else {
-						fieldId = editableValueJSONObject.getString(
-							"collectionFieldId");
-					}
+					String fieldId = editableValueJSONObject.getString(
+						"fieldId");
 
 					mappedValueConfigJSONObject =
 						editableElementParser.getFieldTemplateConfigJSONObject(
@@ -165,6 +243,34 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 							fieldValue);
 
 					value = editableElementParser.parseFieldValue(fieldValue);
+
+					value = _fragmentEntryProcessorHelper.processTemplate(
+						value, fragmentEntryProcessorContext);
+				}
+				else {
+					value = editableValueJSONObject.getString("defaultValue");
+				}
+			}
+			else if (_fragmentEntryProcessorHelper.isMappedCollection(
+						editableValueJSONObject)) {
+
+				Object fieldValue =
+					_fragmentEntryProcessorHelper.getMappedCollectionValue(
+						editableValueJSONObject, fragmentEntryProcessorContext);
+
+				if (fieldValue != null) {
+					String fieldId = editableValueJSONObject.getString(
+						"collectionFieldId");
+
+					mappedValueConfigJSONObject =
+						editableElementParser.getFieldTemplateConfigJSONObject(
+							fieldId, fragmentEntryProcessorContext.getLocale(),
+							fieldValue);
+
+					value = editableElementParser.parseFieldValue(fieldValue);
+
+					value = _fragmentEntryProcessorHelper.processTemplate(
+						value, fragmentEntryProcessorContext);
 				}
 				else {
 					value = editableValueJSONObject.getString("defaultValue");
@@ -195,14 +301,16 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			editableElementParser.replace(element, value, configJSONObject);
 
-			if (!fragmentEntryProcessorContext.isEditMode()) {
+			if (!Objects.equals(
+					fragmentEntryProcessorContext.getMode(),
+					FragmentEntryLinkConstants.EDIT)) {
+
 				if (Validator.isNull(mapperType)) {
 					mapperType = element.attr("data-lfr-editable-type");
 				}
 
 				EditableElementMapper editableElementMapper =
-					_editableElementMapperServiceTrackerMap.getService(
-						mapperType);
+					_editableElementMappers.get(mapperType);
 
 				if (editableElementMapper != null) {
 					editableElementMapper.map(
@@ -212,20 +320,17 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 			}
 		}
 
-		if (fragmentEntryProcessorContext.isViewMode()) {
+		if (Objects.equals(
+				fragmentEntryProcessorContext.getMode(),
+				FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE) ||
+			Objects.equals(
+				fragmentEntryProcessorContext.getMode(),
+				FragmentEntryLinkConstants.VIEW)) {
+
 			for (Element element : document.select("lfr-editable")) {
 				element.removeAttr("id");
 				element.removeAttr("type");
-
-				String tagName = element.attr("view-tag-name");
-
-				if (!Objects.equals(tagName, "span")) {
-					tagName = "div";
-				}
-
-				element.tagName(tagName);
-
-				element.removeAttr("view-tag-name");
+				element.tagName("div");
 			}
 		}
 
@@ -246,25 +351,69 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 		return bodyElement.outerHtml();
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_editableElementMapperServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, EditableElementMapper.class, "type");
-		_editableElementParserServiceTrackerMap =
-			ServiceTrackerMapFactory.openSingleValueMap(
-				bundleContext, EditableElementParser.class, "type");
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	public void registerEditableElementMapper(
+		EditableElementMapper editableElementMapper,
+		Map<String, Object> properties) {
+
+		String type = (String)properties.get("type");
+
+		_editableElementMappers.put(type, editableElementMapper);
 	}
 
-	@Deactivate
-	protected void deactivate() {
-		_editableElementParserServiceTrackerMap.close();
-		_editableElementMapperServiceTrackerMap.close();
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	public void registerEditableElementParser(
+		EditableElementParser editableElementParser,
+		Map<String, Object> properties) {
+
+		String editableTagName = (String)properties.get("type");
+
+		_editableElementParsers.put(editableTagName, editableElementParser);
+	}
+
+	public void unregisterEditableElementMapper(
+		EditableElementMapper editableElementMapper,
+		Map<String, Object> properties) {
+
+		String type = (String)properties.get("type");
+
+		_editableElementMappers.remove(type);
+	}
+
+	public void unregisterEditableElementParser(
+		EditableElementParser editableElementParser,
+		Map<String, Object> properties) {
+
+		String editableTagName = (String)properties.get("type");
+
+		_editableElementParsers.remove(editableTagName);
+	}
+
+	@Override
+	public void validateFragmentEntryHTML(String html, String configuration)
+		throws PortalException {
+
+		Document document = _getDocument(html);
+
+		_validateAttributes(document);
+
+		Elements elements = document.select(
+			"lfr-editable,*[data-lfr-editable-id]");
+
+		_validateDuplicatedIds(elements);
+
+		_validateEditableElements(elements);
 	}
 
 	private JSONObject _getDefaultEditableValuesJSONObject(String html) {
 		JSONObject defaultEditableValuesJSONObject =
-			_jsonFactory.createJSONObject();
+			JSONFactoryUtil.createJSONObject();
 
 		Document document = _getDocument(html);
 
@@ -308,18 +457,157 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 		String type = EditableFragmentEntryProcessorUtil.getElementType(
 			element);
 
-		return _editableElementParserServiceTrackerMap.getService(type);
+		return _editableElementParsers.get(type);
 	}
 
-	private ServiceTrackerMap<String, EditableElementMapper>
-		_editableElementMapperServiceTrackerMap;
-	private ServiceTrackerMap<String, EditableElementParser>
-		_editableElementParserServiceTrackerMap;
+	private boolean _hasNestedWidget(Element element) {
+		List<String> portletAliases = _portletRegistry.getPortletAliases();
+
+		for (String portletAlias : portletAliases) {
+			Elements tagElements = element.select(
+				"> lfr-widget-" + portletAlias);
+
+			if (tagElements.size() > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private void _validateAttribute(Element element, String attributeName)
+		throws FragmentEntryContentException {
+
+		if (Validator.isNotNull(element.attr(attributeName))) {
+			return;
+		}
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getClass());
+
+		throw new FragmentEntryContentException(
+			LanguageUtil.format(
+				resourceBundle,
+				"you-must-define-all-required-attributes-x-for-each-editable-" +
+					"element",
+				StringUtil.merge(_REQUIRED_ATTRIBUTE_NAMES)));
+	}
+
+	private void _validateAttributes(Document document)
+		throws FragmentEntryContentException {
+
+		for (Element element : document.getElementsByTag("lfr-editable")) {
+			for (String attributeName : _REQUIRED_ATTRIBUTE_NAMES) {
+				_validateAttribute(element, attributeName);
+			}
+
+			_validateType(element);
+		}
+
+		for (Element element :
+				document.select(
+					"*[data-lfr-editable-id],*[data-lfr-editable-type]")) {
+
+			_validateAttribute(element, "data-lfr-editable-id");
+			_validateAttribute(element, "data-lfr-editable-type");
+
+			_validateType(element);
+		}
+	}
+
+	private void _validateDuplicatedIds(Elements elements)
+		throws FragmentEntryContentException {
+
+		Set<String> ids = new HashSet<>();
+
+		for (Element element : elements) {
+			if (ids.add(
+					EditableFragmentEntryProcessorUtil.getElementId(element))) {
+
+				continue;
+			}
+
+			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+				"content.Language", getClass());
+
+			throw new FragmentEntryContentException(
+				LanguageUtil.get(
+					resourceBundle,
+					"you-must-define-a-unique-id-for-each-editable-element"));
+		}
+	}
+
+	private void _validateEditableElements(Elements elements)
+		throws FragmentEntryContentException {
+
+		for (Element element : elements) {
+			EditableElementParser editableElementParser =
+				_getEditableElementParser(element);
+
+			if (editableElementParser == null) {
+				continue;
+			}
+
+			_validateNestedEditableElements(element);
+
+			editableElementParser.validate(element);
+		}
+	}
+
+	private void _validateNestedEditableElements(Element element)
+		throws FragmentEntryContentException {
+
+		Elements attributeElements = element.getElementsByAttribute(
+			"[data-lfr-editable-id]");
+
+		Elements dropZoneElements = element.select("> lfr-drop-zone");
+
+		Elements tagElements = element.select("> lfr-editable");
+
+		if ((attributeElements.size() > 0) || (dropZoneElements.size() > 0) ||
+			_hasNestedWidget(element) || (tagElements.size() > 0)) {
+
+			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+				"content.Language", getClass());
+
+			throw new FragmentEntryContentException(
+				LanguageUtil.get(
+					resourceBundle,
+					"editable-fields-cannot-include-nested-editables-drop-" +
+						"zones-or-widgets-in-it"));
+		}
+	}
+
+	private void _validateType(Element element)
+		throws FragmentEntryContentException {
+
+		EditableElementParser editableElementParser = _getEditableElementParser(
+			element);
+
+		if (editableElementParser != null) {
+			return;
+		}
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getClass());
+
+		throw new FragmentEntryContentException(
+			LanguageUtil.get(
+				resourceBundle,
+				"you-must-define-a-valid-type-for-each-editable-element"));
+	}
+
+	private static final String[] _REQUIRED_ATTRIBUTE_NAMES = {"id", "type"};
+
+	private final Map<String, EditableElementMapper> _editableElementMappers =
+		new HashMap<>();
+	private final Map<String, EditableElementParser> _editableElementParsers =
+		new HashMap<>();
 
 	@Reference
 	private FragmentEntryProcessorHelper _fragmentEntryProcessorHelper;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private PortletRegistry _portletRegistry;
 
 }

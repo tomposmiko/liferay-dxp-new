@@ -14,8 +14,10 @@
 
 package com.liferay.layout.taglib.servlet.taglib;
 
-import com.liferay.fragment.helper.FragmentEntryLinkHelper;
+import com.liferay.fragment.constants.FragmentActionKeys;
+import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.layout.taglib.internal.servlet.taglib.util.LayoutClassedModelUsagesTaglibUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,11 +31,17 @@ public class LayoutClassedModelUsagesAdminTag extends IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
+		LayoutClassedModelUsagesTaglibUtil.recordLayoutClassedModelUsage(
+			getClassName(), getClassPK());
+
 		HttpServletRequest httpServletRequest = getRequest();
 
 		httpServletRequest.setAttribute(
-			FragmentEntryLinkHelper.class.getName(),
-			ServletContextUtil.getFragmentEntryLinkHelper());
+			ContentPageEditorWebKeys.FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER,
+			ServletContextUtil.getFragmentCollectionContributorTracker());
+		httpServletRequest.setAttribute(
+			FragmentActionKeys.FRAGMENT_RENDERER_TRACKER,
+			ServletContextUtil.getFragmentRendererTracker());
 
 		return super.doStartTag();
 	}

@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"osgi.command.function=createProducts", "osgi.command.scope=commerce"
 	},
@@ -53,7 +53,7 @@ public class CPOSGiCommands {
 
 		Group group = _groupLocalService.getGroup(groupId);
 
-		User user = _userLocalService.getGuestUser(group.getCompanyId());
+		User user = _userLocalService.getDefaultUser(group.getCompanyId());
 
 		List<CommerceCatalog> commerceCatalogs =
 			_commerceCatalogLocalService.getCommerceCatalogs(
@@ -100,7 +100,7 @@ public class CPOSGiCommands {
 				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, 0, 0, 0, 0, 0, true,
 				CPInstanceConstants.DEFAULT_SKU, false, 0, null, null, 0,
-				WorkflowConstants.STATUS_DRAFT, serviceContext);
+				serviceContext);
 		}
 	}
 

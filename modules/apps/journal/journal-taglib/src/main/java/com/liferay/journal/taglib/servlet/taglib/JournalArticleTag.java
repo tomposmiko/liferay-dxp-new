@@ -18,6 +18,7 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -26,13 +27,10 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.taglib.util.IncludeTag;
-
-import java.util.Objects;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -45,15 +43,6 @@ import javax.servlet.jsp.PageContext;
  * @author Eudaldo Alonso
  */
 public class JournalArticleTag extends IncludeTag {
-
-	@Override
-	public int doEndTag() throws JspException {
-		if (!_isShowArticle()) {
-			return SKIP_PAGE;
-		}
-
-		return super.doEndTag();
-	}
 
 	@Override
 	public int doStartTag() throws JspException {
@@ -84,14 +73,16 @@ public class JournalArticleTag extends IncludeTag {
 
 		try {
 			_articleDisplay = JournalArticleLocalServiceUtil.getArticleDisplay(
-				_article, _ddmTemplateKey,
+				_article.getGroupId(), _article.getArticleId(),
+				_article.getVersion(), _ddmTemplateKey,
 				ParamUtil.getString(
 					httpServletRequest, "p_l_mode", Constants.VIEW),
 				getLanguageId(), 1, portletRequestModel, themeDisplay);
 		}
-		catch (Exception exception) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to get journal article display", exception);
+				_log.debug(
+					"Unable to get journal article display", portalException);
 			}
 
 			return SKIP_BODY;
@@ -116,8 +107,8 @@ public class JournalArticleTag extends IncludeTag {
 		return _wrapperCssClass;
 	}
 
-	public boolean isDataAnalyticsTrackingEnabled() {
-		return _dataAnalyticsTrackingEnabled;
+	public boolean isDataAnalyticsTrackEnabled() {
+		return _dataAnalyticsTrackEnabled;
 	}
 
 	public boolean isShowTitle() {
@@ -132,10 +123,10 @@ public class JournalArticleTag extends IncludeTag {
 		_articleId = articleId;
 	}
 
-	public void setDataAnalyticsTrackingEnabled(
-		boolean dataAnalyticsTrackingEnabled) {
+	public void setDataAnalyticsTrackEnabled(
+		boolean dataAnalyticsTrackEnabled) {
 
-		_dataAnalyticsTrackingEnabled = dataAnalyticsTrackingEnabled;
+		_dataAnalyticsTrackEnabled = dataAnalyticsTrackEnabled;
 	}
 
 	public void setDdmTemplateKey(String ddmTemplateKey) {
@@ -172,7 +163,7 @@ public class JournalArticleTag extends IncludeTag {
 		_article = null;
 		_articleDisplay = null;
 		_articleId = null;
-		_dataAnalyticsTrackingEnabled = true;
+		_dataAnalyticsTrackEnabled = true;
 		_ddmTemplateKey = null;
 		_groupId = 0;
 		_languageId = null;
@@ -204,43 +195,16 @@ public class JournalArticleTag extends IncludeTag {
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
 		httpServletRequest.setAttribute(
-			"liferay-journal:journal-article:article", _article);
-		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:articleDisplay", _articleDisplay);
 		httpServletRequest.setAttribute(
-			"liferay-journal:journal-article:dataAnalyticsTrackingEnabled",
-			String.valueOf(_dataAnalyticsTrackingEnabled));
+			"liferay-journal:journal-article:dataAnalyticsTrackEnabled",
+			String.valueOf(_dataAnalyticsTrackEnabled));
 		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:showTitle",
 			String.valueOf(_showTitle));
 		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:wrapperCssClass",
 			_wrapperCssClass);
-	}
-
-	private boolean _isShowArticle() {
-		HttpServletRequest httpServletRequest = getRequest();
-
-		HttpServletRequest originalHttpServletRequest =
-			PortalUtil.getOriginalServletRequest(httpServletRequest);
-
-		String mode = ParamUtil.getString(
-			PortalUtil.getOriginalServletRequest(originalHttpServletRequest),
-			"p_l_mode", Constants.VIEW);
-
-		if (Objects.equals(Constants.EDIT, mode) ||
-			Objects.equals(Constants.PREVIEW, mode)) {
-
-			return true;
-		}
-
-		if ((_article == null) || (_articleDisplay == null) ||
-			_article.isExpired()) {
-
-			return false;
-		}
-
-		return true;
 	}
 
 	private static final String _PAGE = "/journal_article/page.jsp";
@@ -251,7 +215,7 @@ public class JournalArticleTag extends IncludeTag {
 	private JournalArticle _article;
 	private JournalArticleDisplay _articleDisplay;
 	private String _articleId;
-	private boolean _dataAnalyticsTrackingEnabled = true;
+	private boolean _dataAnalyticsTrackEnabled = true;
 	private String _ddmTemplateKey;
 	private long _groupId;
 	private String _languageId;

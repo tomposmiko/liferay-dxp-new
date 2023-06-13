@@ -24,6 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.journal.model.JournalArticle",
 	service = {
 		DDMStructurePermissionSupport.class, DDMTemplatePermissionSupport.class

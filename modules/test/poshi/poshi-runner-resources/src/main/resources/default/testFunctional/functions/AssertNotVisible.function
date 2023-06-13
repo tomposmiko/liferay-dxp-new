@@ -1,10 +1,7 @@
-@default = "assertNotVisible"
-definition {
+<definition default="assertNotVisible">
+	<command name="assertNotVisible">
+		<execute selenium="waitForNotVisible" />
 
-	function assertNotVisible {
-		selenium.waitForNotVisible();
-
-		selenium.assertNotVisible();
-	}
-
-}
+		<execute selenium="assertNotVisible" />
+	</command>
+</definition>

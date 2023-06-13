@@ -27,7 +27,7 @@ import {
 	pagesStructureReducer,
 } from '../../core/reducers/index.es';
 import {parseProps} from '../../utils/parseProps.es';
-import {EVENT_TYPES} from './eventTypes';
+import {EVENT_TYPES} from './eventTypes.es';
 import {
 	formBuilderReducer,
 	objectFieldsReducer,
@@ -40,10 +40,10 @@ import {
  * from layers above changes.
  */
 const StateSync = ({
+	builderPages,
 	defaultLanguageId,
 	editingLanguageId,
 	focusedField,
-	formBuilder,
 	objectFields,
 	pages,
 	rules,
@@ -74,9 +74,16 @@ const StateSync = ({
 	useEffect(() => {
 		dispatch({
 			payload: {objectFields},
-			type: EVENT_TYPES.OBJECT.FIELDS_CHANGE,
+			type: EVENT_TYPES.OBJECT_FIELDS.ADD,
 		});
 	}, [dispatch, objectFields]);
+
+	useEffect(() => {
+		dispatch({
+			payload: {pages: builderPages},
+			type: EVENT_TYPES.FORM_BUILDER.PAGES.UPDATE,
+		});
+	}, [dispatch, builderPages]);
 
 	useEffect(() => {
 		dispatch({
@@ -84,13 +91,6 @@ const StateSync = ({
 			type: EVENT_TYPES.FORM_BUILDER.FOCUSED_FIELD.CHANGE,
 		});
 	}, [dispatch, focusedField]);
-
-	useEffect(() => {
-		dispatch({
-			payload: formBuilder,
-			type: EVENT_TYPES.FORM_BUILDER.PAGES.UPDATE,
-		});
-	}, [dispatch, formBuilder]);
 
 	return null;
 };
@@ -100,7 +100,7 @@ const StateSync = ({
  * properties of a field, a new FormProvider is needed to control
  * the reducers of a Field's settingsContext structure.
  */
-export function FormFieldSettings({children, onAction, ...otherProps}) {
+export const FormFieldSettings = ({children, onAction, ...otherProps}) => {
 	const {config, state} = parseProps(otherProps);
 
 	return (
@@ -128,11 +128,10 @@ export function FormFieldSettings({children, onAction, ...otherProps}) {
 				value={state}
 			>
 				<StateSync {...state} />
-
 				{children}
 			</FormProvider>
 		</ConfigProvider>
 	);
-}
+};
 
 FormFieldSettings.displayName = 'FormFieldSettings';

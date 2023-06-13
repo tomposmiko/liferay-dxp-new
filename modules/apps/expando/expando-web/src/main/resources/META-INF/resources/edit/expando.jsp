@@ -39,29 +39,29 @@ if (expandoColumn != null) {
 
 ExpandoBridge expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(company.getCompanyId(), modelResource);
 
+UnicodeProperties properties = new UnicodeProperties(true);
 Serializable defaultValue = null;
-UnicodeProperties unicodeProperties = new UnicodeProperties(true);
 
 if (expandoColumn != null) {
+	properties = expandoBridge.getAttributeProperties(expandoColumn.getName());
 	defaultValue = expandoBridge.getAttributeDefault(expandoColumn.getName());
-	unicodeProperties = expandoBridge.getAttributeProperties(expandoColumn.getName());
 }
 
-int propertyHeight = GetterUtil.getInteger(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_HEIGHT), ExpandoColumnConstants.PROPERTY_HEIGHT_DEFAULT);
-boolean propertyHidden = GetterUtil.getBoolean(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_HIDDEN));
-int propertyIndexType = GetterUtil.getInteger(unicodeProperties.get(ExpandoColumnConstants.INDEX_TYPE));
-boolean propertyLocalizeFieldName = GetterUtil.getBoolean(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_LOCALIZE_FIELD_NAME), true);
-boolean propertySecret = GetterUtil.getBoolean(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_SECRET));
-boolean propertyVisibleWithUpdatePermission = GetterUtil.getBoolean(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_VISIBLE_WITH_UPDATE_PERMISSION));
-int propertyWidth = GetterUtil.getInteger(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_WIDTH));
+boolean propertyHidden = GetterUtil.getBoolean(properties.get(ExpandoColumnConstants.PROPERTY_HIDDEN));
+boolean propertyLocalizeFieldName = GetterUtil.getBoolean(properties.get(ExpandoColumnConstants.PROPERTY_LOCALIZE_FIELD_NAME), true);
+boolean propertyVisibleWithUpdatePermission = GetterUtil.getBoolean(properties.get(ExpandoColumnConstants.PROPERTY_VISIBLE_WITH_UPDATE_PERMISSION));
+int propertyIndexType = GetterUtil.getInteger(properties.get(ExpandoColumnConstants.INDEX_TYPE));
+boolean propertySecret = GetterUtil.getBoolean(properties.get(ExpandoColumnConstants.PROPERTY_SECRET));
+int propertyHeight = GetterUtil.getInteger(properties.get(ExpandoColumnConstants.PROPERTY_HEIGHT), ExpandoColumnConstants.PROPERTY_HEIGHT_DEFAULT);
+int propertyWidth = GetterUtil.getInteger(properties.get(ExpandoColumnConstants.PROPERTY_WIDTH));
 
 String propertyDisplayType = ParamUtil.getString(request, "displayType", ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_INPUT_FIELD);
 
 if (expandoColumn != null) {
-	propertyDisplayType = GetterUtil.getString(unicodeProperties.get(ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE));
+	propertyDisplayType = GetterUtil.getString(properties.get(ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE));
 
 	if (Validator.isNull(propertyDisplayType)) {
-		propertyDisplayType = ExpandoColumnConstants.getDefaultDisplayTypeProperty(type, unicodeProperties);
+		propertyDisplayType = ExpandoColumnConstants.getDefaultDisplayTypeProperty(type, properties);
 	}
 }
 
@@ -117,9 +117,7 @@ else {
 
 <liferay-ui:error exception="<%= ColumnTypeException.class %>" message="please-select-a-valid-type" />
 <liferay-ui:error exception="<%= DuplicateColumnNameException.class %>" message="please-enter-a-unique-name" />
-<liferay-ui:error exception="<%= ValueDataException.MismatchColumnType.class %>" message="please-enter-a-valid-value" />
-<liferay-ui:error exception="<%= ValueDataException.MustInformDefaultLocale.class %>" message="please-enter-a-value-for-the-default-locale" />
-<liferay-ui:error exception="<%= ValueDataException.UnsupportedColumnType.class %>" message="please-enter-a-valid-value" />
+<liferay-ui:error exception="<%= ValueDataException.class %>" message="please-enter-a-valid-value" />
 
 <portlet:actionURL name='<%= (expandoColumn == null) ? "addExpando" : "updateExpando" %>' var="editExpandoURL">
 	<portlet:param name="mvcPath" value="/edit/expando.jsp" />
@@ -128,8 +126,11 @@ else {
 <clay:container-fluid
 	cssClass="container-view"
 >
-	<liferay-site-navigation:breadcrumb
-		breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, false, false, false, true, true) %>"
+	<liferay-ui:breadcrumb
+		showCurrentGroup="<%= false %>"
+		showGuestGroup="<%= false %>"
+		showLayout="<%= false %>"
+		showPortletBreadcrumb="<%= true %>"
 	/>
 
 	<liferay-frontend:edit-form
@@ -147,32 +148,34 @@ else {
 				<%= LanguageUtil.format(request, expandoColumn != null ? "edit-x" : "new-x", new Object[] {propertyDisplayType}) %>
 			</h2>
 
-			<aui:field-wrapper cssClass="form-group lfr-input-text-container">
-				<c:choose>
-					<c:when test="<%= expandoColumn != null %>">
-						<aui:input name="name" type="hidden" value="<%= expandoColumn.getName() %>" />
+			<liferay-frontend:fieldset-group>
+				<aui:field-wrapper cssClass="form-group lfr-input-text-container">
+					<c:choose>
+						<c:when test="<%= expandoColumn != null %>">
+							<aui:input name="name" type="hidden" value="<%= expandoColumn.getName() %>" />
 
-						<aui:input label="field-name" name="key" type="resource" value="<%= expandoColumn.getName() %>" />
-					</c:when>
-					<c:otherwise>
-						<aui:input label="field-name" maxlength='<%= ModelHintsUtil.getMaxLength(ExpandoColumn.class.getName(), "name") %>' name="name" required="<%= true %>" />
-					</c:otherwise>
-				</c:choose>
+							<aui:input label="field-name" name="key" type="resource" value="<%= expandoColumn.getName() %>" />
+						</c:when>
+						<c:otherwise>
+							<aui:input autoFocus="<%= windowState.equals(WindowState.MAXIMIZED) %>" label="field-name" maxlength='<%= ModelHintsUtil.getMaxLength(ExpandoColumn.class.getName(), "name") %>' name="name" required="<%= true %>" />
+						</c:otherwise>
+					</c:choose>
 
-				<div class="form-text">
-					<liferay-ui:message arguments="&lt;liferay-expando:custom-attribute /&gt;" key="custom-field-key-help" translateArguments="<%= false %>" />
-				</div>
-			</aui:field-wrapper>
+					<div class="form-text">
+						<liferay-ui:message arguments="&lt;liferay-expando:custom-attribute /&gt;" key="custom-field-key-help" translateArguments="<%= false %>" />
+					</div>
+				</aui:field-wrapper>
 
-			<%@ include file="/edit/default_value_input.jspf" %>
+				<%@ include file="/edit/default_value_input.jspf" %>
 
-			<%@ include file="/edit/advanced_properties.jspf" %>
+				<%@ include file="/edit/advanced_properties.jspf" %>
+			</liferay-frontend:fieldset-group>
 		</liferay-frontend:edit-form-body>
 
 		<liferay-frontend:edit-form-footer>
-			<liferay-frontend:edit-form-buttons
-				redirect="<%= redirect %>"
-			/>
+			<aui:button type="submit" />
+
+			<aui:button href="<%= redirect %>" type="cancel" />
 		</liferay-frontend:edit-form-footer>
 	</liferay-frontend:edit-form>
 </clay:container-fluid>

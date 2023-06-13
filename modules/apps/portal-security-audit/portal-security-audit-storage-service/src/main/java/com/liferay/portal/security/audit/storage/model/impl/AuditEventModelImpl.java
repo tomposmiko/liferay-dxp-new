@@ -32,18 +32,22 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.audit.storage.model.AuditEvent;
 import com.liferay.portal.security.audit.storage.model.AuditEventModel;
+import com.liferay.portal.security.audit.storage.model.AuditEventSoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -147,6 +151,62 @@ public class AuditEventModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AuditEvent toModel(AuditEventSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		AuditEvent model = new AuditEventImpl();
+
+		model.setAuditEventId(soapModel.getAuditEventId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setEventType(soapModel.getEventType());
+		model.setClassName(soapModel.getClassName());
+		model.setClassPK(soapModel.getClassPK());
+		model.setMessage(soapModel.getMessage());
+		model.setClientHost(soapModel.getClientHost());
+		model.setClientIP(soapModel.getClientIP());
+		model.setServerName(soapModel.getServerName());
+		model.setServerPort(soapModel.getServerPort());
+		model.setSessionID(soapModel.getSessionID());
+		model.setAdditionalInfo(soapModel.getAdditionalInfo());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<AuditEvent> toModels(AuditEventSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<AuditEvent> models = new ArrayList<AuditEvent>(soapModels.length);
+
+		for (AuditEventSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public AuditEventModelImpl() {
 	}
 
@@ -222,110 +282,118 @@ public class AuditEventModelImpl
 	public Map<String, Function<AuditEvent, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<AuditEvent, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, AuditEvent>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<AuditEvent, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AuditEvent.class.getClassLoader(), AuditEvent.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<AuditEvent, Object>> attributeGetterFunctions =
-				new LinkedHashMap<String, Function<AuditEvent, Object>>();
+		try {
+			Constructor<AuditEvent> constructor =
+				(Constructor<AuditEvent>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"auditEventId", AuditEvent::getAuditEventId);
-			attributeGetterFunctions.put("companyId", AuditEvent::getCompanyId);
-			attributeGetterFunctions.put("userId", AuditEvent::getUserId);
-			attributeGetterFunctions.put("userName", AuditEvent::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", AuditEvent::getCreateDate);
-			attributeGetterFunctions.put("eventType", AuditEvent::getEventType);
-			attributeGetterFunctions.put("className", AuditEvent::getClassName);
-			attributeGetterFunctions.put("classPK", AuditEvent::getClassPK);
-			attributeGetterFunctions.put("message", AuditEvent::getMessage);
-			attributeGetterFunctions.put(
-				"clientHost", AuditEvent::getClientHost);
-			attributeGetterFunctions.put("clientIP", AuditEvent::getClientIP);
-			attributeGetterFunctions.put(
-				"serverName", AuditEvent::getServerName);
-			attributeGetterFunctions.put(
-				"serverPort", AuditEvent::getServerPort);
-			attributeGetterFunctions.put("sessionID", AuditEvent::getSessionID);
-			attributeGetterFunctions.put(
-				"additionalInfo", AuditEvent::getAdditionalInfo);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<AuditEvent, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AuditEvent, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<AuditEvent, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<AuditEvent, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AuditEvent, Object>>();
+		Map<String, BiConsumer<AuditEvent, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AuditEvent, ?>>();
 
-		static {
-			Map<String, BiConsumer<AuditEvent, ?>> attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<AuditEvent, ?>>();
+		attributeGetterFunctions.put(
+			"auditEventId", AuditEvent::getAuditEventId);
+		attributeSetterBiConsumers.put(
+			"auditEventId",
+			(BiConsumer<AuditEvent, Long>)AuditEvent::setAuditEventId);
+		attributeGetterFunctions.put("companyId", AuditEvent::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<AuditEvent, Long>)AuditEvent::setCompanyId);
+		attributeGetterFunctions.put("userId", AuditEvent::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<AuditEvent, Long>)AuditEvent::setUserId);
+		attributeGetterFunctions.put("userName", AuditEvent::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setUserName);
+		attributeGetterFunctions.put("createDate", AuditEvent::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<AuditEvent, Date>)AuditEvent::setCreateDate);
+		attributeGetterFunctions.put("eventType", AuditEvent::getEventType);
+		attributeSetterBiConsumers.put(
+			"eventType",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setEventType);
+		attributeGetterFunctions.put("className", AuditEvent::getClassName);
+		attributeSetterBiConsumers.put(
+			"className",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setClassName);
+		attributeGetterFunctions.put("classPK", AuditEvent::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK", (BiConsumer<AuditEvent, String>)AuditEvent::setClassPK);
+		attributeGetterFunctions.put("message", AuditEvent::getMessage);
+		attributeSetterBiConsumers.put(
+			"message", (BiConsumer<AuditEvent, String>)AuditEvent::setMessage);
+		attributeGetterFunctions.put("clientHost", AuditEvent::getClientHost);
+		attributeSetterBiConsumers.put(
+			"clientHost",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setClientHost);
+		attributeGetterFunctions.put("clientIP", AuditEvent::getClientIP);
+		attributeSetterBiConsumers.put(
+			"clientIP",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setClientIP);
+		attributeGetterFunctions.put("serverName", AuditEvent::getServerName);
+		attributeSetterBiConsumers.put(
+			"serverName",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setServerName);
+		attributeGetterFunctions.put("serverPort", AuditEvent::getServerPort);
+		attributeSetterBiConsumers.put(
+			"serverPort",
+			(BiConsumer<AuditEvent, Integer>)AuditEvent::setServerPort);
+		attributeGetterFunctions.put("sessionID", AuditEvent::getSessionID);
+		attributeSetterBiConsumers.put(
+			"sessionID",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setSessionID);
+		attributeGetterFunctions.put(
+			"additionalInfo", AuditEvent::getAdditionalInfo);
+		attributeSetterBiConsumers.put(
+			"additionalInfo",
+			(BiConsumer<AuditEvent, String>)AuditEvent::setAdditionalInfo);
 
-			attributeSetterBiConsumers.put(
-				"auditEventId",
-				(BiConsumer<AuditEvent, Long>)AuditEvent::setAuditEventId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<AuditEvent, Long>)AuditEvent::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId", (BiConsumer<AuditEvent, Long>)AuditEvent::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<AuditEvent, Date>)AuditEvent::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"eventType",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setEventType);
-			attributeSetterBiConsumers.put(
-				"className",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setClassName);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setClassPK);
-			attributeSetterBiConsumers.put(
-				"message",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setMessage);
-			attributeSetterBiConsumers.put(
-				"clientHost",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setClientHost);
-			attributeSetterBiConsumers.put(
-				"clientIP",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setClientIP);
-			attributeSetterBiConsumers.put(
-				"serverName",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setServerName);
-			attributeSetterBiConsumers.put(
-				"serverPort",
-				(BiConsumer<AuditEvent, Integer>)AuditEvent::setServerPort);
-			attributeSetterBiConsumers.put(
-				"sessionID",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setSessionID);
-			attributeSetterBiConsumers.put(
-				"additionalInfo",
-				(BiConsumer<AuditEvent, String>)AuditEvent::setAdditionalInfo);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -963,12 +1031,41 @@ public class AuditEventModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<AuditEvent, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<AuditEvent, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<AuditEvent, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((AuditEvent)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AuditEvent>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AuditEvent.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -989,9 +1086,8 @@ public class AuditEventModelImpl
 	private String _additionalInfo;
 
 	public <T> T getColumnValue(String columnName) {
-		Function<AuditEvent, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<AuditEvent, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -14,7 +14,7 @@
 
 import {EVENT_TYPES} from '../eventTypes';
 
-export default function rulesReducer(state, action) {
+export default (state, action) => {
 	switch (action.type) {
 		case EVENT_TYPES.RULE.ADD: {
 			const {rules} = state;
@@ -41,4 +41,4 @@ export default function rulesReducer(state, action) {
 		default:
 			return state;
 	}
-}
+};

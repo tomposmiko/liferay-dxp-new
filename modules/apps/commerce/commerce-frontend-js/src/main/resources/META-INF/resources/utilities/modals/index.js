@@ -12,8 +12,6 @@
  * details.
  */
 
-import {openWindow} from 'frontend-js-web';
-
 import {CLOSE_MODAL, IS_LOADING_MODAL} from '../eventsDefinitions';
 import {showErrorNotification} from '../notifications';
 import {CLAY_MODAL_SIZES_MAP, MODAL_HEIGHT_MAP} from './constants';
@@ -39,7 +37,7 @@ export function resolveModalHeight(size) {
 }
 
 export function openPermissionsModal(uri) {
-	openWindow({
+	Liferay.Util.openWindow({
 		dialog: {
 			destroyOnHide: true,
 		},
@@ -77,10 +75,10 @@ export function isSubmitting() {
 }
 
 export function onSubmitFail(reason = {}) {
-	const t_Liferay = window.top.Liferay;
-	const {title = ''} = reason;
-	const errorMessage =
-		title || Liferay.Language.get('an-unexpected-error-occurred');
+	const t_Liferay = window.top.Liferay,
+		{title = ''} = reason,
+		errorMessage =
+			title || Liferay.Language.get('an-unexpected-error-occurred');
 
 	t_Liferay.fire(IS_LOADING_MODAL, {isLoading: false});
 

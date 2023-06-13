@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.web.internal.custom.filter.portlet;
 
+import java.util.Optional;
+
 /**
  * @author Igor Nazar
  * @author Luan Maoski
@@ -49,25 +51,41 @@ public interface CustomFilterPortletPreferences {
 
 	public static final String PREFERENCE_KEY_QUERY_NAME = "queryName";
 
-	public String getBoost();
+	public Optional<String> getBoostOptional();
 
-	public String getCustomHeading();
+	public String getBoostString();
 
-	public String getFederatedSearchKey();
+	public Optional<String> getCustomHeadingOptional();
 
-	public String getFilterField();
+	public String getCustomHeadingString();
+
+	public Optional<String> getFederatedSearchKeyOptional();
+
+	public String getFederatedSearchKeyString();
+
+	public Optional<String> getFilterFieldOptional();
+
+	public String getFilterFieldString();
 
 	public String getFilterQueryType();
 
-	public String getFilterValue();
+	public Optional<String> getFilterValueOptional();
+
+	public String getFilterValueString();
 
 	public String getOccur();
 
-	public String getParameterName();
+	public Optional<String> getParameterNameOptional();
 
-	public String getParentQueryName();
+	public String getParameterNameString();
 
-	public String getQueryName();
+	public Optional<String> getParentQueryNameOptional();
+
+	public String getParentQueryNameString();
+
+	public Optional<String> getQueryNameOptional();
+
+	public String getQueryNameString();
 
 	public boolean isDisabled();
 

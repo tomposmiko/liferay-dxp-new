@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -23,40 +21,35 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8151 | Test Summary: Individual activities list shows accurate activities from today when switched to 24 hour view"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test IndividualActivitiesListShowsAccurateActivitiesWhenSwitchedTo24HourView {
-
-		// AC Bug ticket: LRAC-10734
-
 		var usernameList = "ac,liferay";
+
 		var emailList = "ac@liferay.com,liferay@liferay.com";
 
 		ACUtils.createDMAndAddToPage();
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		for (var name : list ${usernameList}) {
+		for (var name : list "${usernameList}") {
 			JSONUser.addUser(
 				userEmailAddress = "${name}@liferay.com",
-				userFirstName = ${name},
-				userLastName = ${name},
-				userScreenName = ${name});
+				userFirstName = "${name}",
+				userLastName = "${name}",
+				userScreenName = "${name}");
 		}
 
 		ACDXPSettings.syncNewContactData();
@@ -64,7 +57,7 @@ definition {
 		ACUtils.navigateToSitePageWithUser(
 			actionType = "View DM",
 			documentTitleList = "DM AC Title,DM AC Title,DM AC Title,DM AC Title",
-			emailList = ${emailList},
+			emailList = "${emailList}",
 			pageName = "AC Page",
 			siteName = "Site Name");
 
@@ -72,17 +65,16 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = ${propertyName});
+		ACProperties.switchProperty(propertyName = "${propertyName}");
 
-		for (var name : list ${usernameList}) {
+		for (var name : list "${usernameList}") {
 			ACNavigation.goToIndividuals();
 
 			ACIndividualsDashboard.goToKnownIndividualsTab();
 
-			ACUtils.viewNameList(nameList = "${name} ${name}");
-
-			var key_userName = "${name} ${name}";
-			var currentTotalActivities = selenium.getText("ACIndividualsDashboard#TOTAL_ACTIVITIES");
+			ACIndividualsDashboard.viewTotalActivities(
+				activitiesNumber = "12",
+				userName = "${name} ${name}");
 
 			ACNavigation.openItem(itemName = "${name} ${name}");
 
@@ -90,7 +82,7 @@ definition {
 
 			ACTimeFilter.setLast24Hours();
 
-			ACIndividualsDashboard.viewActivitiesNumberInPeriod(activitiesNumber = ${currentTotalActivities});
+			ACIndividualsDashboard.viewActivitiesNumberInPeriod(activitiesNumber = "12");
 		}
 	}
 

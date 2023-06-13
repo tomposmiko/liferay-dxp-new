@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.image;
 
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
-
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -100,8 +98,10 @@ public class ImageMagickUtil {
 		_imageMagick.reset();
 	}
 
-	private static volatile ImageMagick _imageMagick =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			ImageMagick.class, ImageMagickUtil.class, "_imageMagick", true);
+	public void setImageMagick(ImageMagick imageMagick) {
+		_imageMagick = imageMagick;
+	}
+
+	private static ImageMagick _imageMagick;
 
 }

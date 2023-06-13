@@ -28,7 +28,6 @@ import org.osgi.service.component.annotations.Component;
 public class AssetRendererFactoryRegistryImpl
 	implements AssetRendererFactoryRegistry {
 
-	@Override
 	public List<AssetRendererFactory<?>> getAssetRendererFactories(
 		long companyId) {
 

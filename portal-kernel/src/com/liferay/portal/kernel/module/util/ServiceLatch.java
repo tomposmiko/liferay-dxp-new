@@ -14,9 +14,8 @@
 
 package com.liferay.portal.kernel.module.util;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import org.osgi.framework.BundleContext;
@@ -66,8 +65,6 @@ public class ServiceLatch {
 
 		_serviceTrackers.add(serviceTracker);
 
-		_serviceTrackersCount.incrementAndGet();
-
 		return this;
 	}
 
@@ -92,8 +89,6 @@ public class ServiceLatch {
 			capturingServiceTrackerCustomizer.setServiceTracker(serviceTracker);
 
 			_serviceTrackers.add(serviceTracker);
-
-			_serviceTrackersCount.incrementAndGet();
 		}
 		catch (InvalidSyntaxException invalidSyntaxException) {
 			throw new RuntimeException(invalidSyntaxException);
@@ -104,28 +99,28 @@ public class ServiceLatch {
 
 	private final BundleContext _bundleContext;
 	private Runnable _openRunnable;
-	private final Queue<ServiceTracker<?, ?>> _serviceTrackers =
-		new ConcurrentLinkedQueue<>();
-	private final AtomicInteger _serviceTrackersCount = new AtomicInteger();
+	private final List<ServiceTracker<?, ?>> _serviceTrackers =
+		new CopyOnWriteArrayList<>();
 
 	private class CapturingServiceTrackerCustomizer<S>
 		implements ServiceTrackerCustomizer<S, S> {
 
 		@Override
 		public S addingService(ServiceReference<S> serviceReference) {
-			S service = _bundleContext.getService(serviceReference);
+			_serviceConsumer.accept(
+				_bundleContext.getService(serviceReference));
 
-			_serviceConsumer.accept(service);
+			_bundleContext.ungetService(serviceReference);
 
-			if (_serviceTrackersCount.decrementAndGet() == 0) {
+			_serviceTrackers.remove(_serviceTracker);
+
+			_serviceTracker.close();
+
+			if (_serviceTrackers.isEmpty()) {
 				_openRunnable.run();
-
-				for (ServiceTracker<?, ?> serviceTracker : _serviceTrackers) {
-					serviceTracker.close();
-				}
 			}
 
-			return service;
+			return null;
 		}
 
 		@Override
@@ -136,8 +131,6 @@ public class ServiceLatch {
 		@Override
 		public void removedService(
 			ServiceReference<S> serviceReference, S service) {
-
-			_bundleContext.ungetService(serviceReference);
 		}
 
 		public void setServiceTracker(ServiceTracker<S, S> serviceTracker) {

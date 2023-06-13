@@ -331,8 +331,4 @@ public interface BackgroundTaskModel
 	@Override
 	public BackgroundTask cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

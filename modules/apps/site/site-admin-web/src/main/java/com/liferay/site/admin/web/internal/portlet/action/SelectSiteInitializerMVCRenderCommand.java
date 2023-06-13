@@ -17,7 +17,7 @@ package com.liferay.site.admin.web.internal.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.permission.PortalPermission;
+import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -27,12 +27,12 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SiteAdminPortletKeys.SITE_ADMIN,
 		"mvc.command.name=/site_admin/select_site_initializer"
@@ -48,7 +48,7 @@ public class SelectSiteInitializerMVCRenderCommand implements MVCRenderCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		if (_portalPermission.contains(
+		if (PortalPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(),
 				ActionKeys.ADD_COMMUNITY)) {
 
@@ -59,8 +59,5 @@ public class SelectSiteInitializerMVCRenderCommand implements MVCRenderCommand {
 
 		return "/error.jsp";
 	}
-
-	@Reference
-	private PortalPermission _portalPermission;
 
 }

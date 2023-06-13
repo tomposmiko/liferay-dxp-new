@@ -14,11 +14,8 @@
 
 package com.liferay.journal.internal.upgrade.v0_0_6;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.Validator;
@@ -38,25 +35,10 @@ import java.util.List;
  */
 public class ImageTypeContentAttributesUpgradeProcess extends UpgradeProcess {
 
-	@Override
-	protected void doUpgrade() throws Exception {
-		_updateContentImages();
-	}
-
-	private String _addImageContentAttributes(long id, String content)
+	protected String addImageContentAttributes(String content)
 		throws Exception {
 
-		Document document = null;
-
-		try {
-			document = SAXReaderUtil.read(content);
-		}
-		catch (Exception exception) {
-			_log.error(
-				StringBundler.concat("ID: ", id, "\nContent: ", content));
-
-			throw exception;
-		}
+		Document document = SAXReaderUtil.read(content);
 
 		document = document.clone();
 
@@ -71,27 +53,34 @@ public class ImageTypeContentAttributesUpgradeProcess extends UpgradeProcess {
 			List<Element> dynamicContentElements = imageElement.elements(
 				"dynamic-content");
 
-			String articleImageId = null;
+			String id = null;
 
 			for (Element dynamicContentElement : dynamicContentElements) {
-				articleImageId = dynamicContentElement.attributeValue("id");
+				id = dynamicContentElement.attributeValue("id");
 
 				dynamicContentElement.addAttribute("alt", StringPool.BLANK);
-				dynamicContentElement.addAttribute("name", articleImageId);
-				dynamicContentElement.addAttribute("title", articleImageId);
+				dynamicContentElement.addAttribute("name", id);
+				dynamicContentElement.addAttribute("title", id);
 				dynamicContentElement.addAttribute("type", "journal");
 			}
 
-			if (Validator.isNotNull(articleImageId)) {
+			if (Validator.isNotNull(id)) {
 				imageElement.addAttribute(
-					"instance-id", _getImageInstanceId(articleImageId));
+					"instance-id", getImageInstanceId(id));
 			}
 		}
 
 		return document.formattedString();
 	}
 
-	private String _getImageInstanceId(String articleImageId) throws Exception {
+	@Override
+	protected void doUpgrade() throws Exception {
+		updateContentImages();
+	}
+
+	protected String getImageInstanceId(String articleImageId)
+		throws Exception {
+
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select elInstanceId from JournalArticleImage where " +
 					"articleImageId = ?")) {
@@ -108,32 +97,35 @@ public class ImageTypeContentAttributesUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateContentImages() throws Exception {
+	protected void updateContentImages() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement preparedStatement1 = connection.prepareStatement(
-				"select id_, content from JournalArticle where content like " +
-					"'%type=\"image\"%'");
+				"select content, id_ from JournalArticle where content like " +
+					"?")) {
+
+			preparedStatement1.setString(1, "%type=\"image\"%");
+
 			ResultSet resultSet = preparedStatement1.executeQuery();
-			PreparedStatement preparedStatement2 =
-				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
-					connection,
-					"update JournalArticle set content = ? where id_ = ?")) {
 
 			while (resultSet.next()) {
-				long id = resultSet.getLong(1);
+				String content = resultSet.getString(1);
+				long id = resultSet.getLong(2);
 
-				preparedStatement2.setString(
-					1, _addImageContentAttributes(id, resultSet.getString(2)));
-				preparedStatement2.setLong(2, id);
+				String newContent = addImageContentAttributes(content);
 
-				preparedStatement2.addBatch();
+				try (PreparedStatement preparedStatement =
+						AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+							connection,
+							"update JournalArticle set content = ? where id_ " +
+								"= ?")) {
+
+					preparedStatement.setString(1, newContent);
+					preparedStatement.setLong(2, id);
+
+					preparedStatement.executeUpdate();
+				}
 			}
-
-			preparedStatement2.executeBatch();
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ImageTypeContentAttributesUpgradeProcess.class);
 
 }

@@ -19,10 +19,12 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 
 /**
  * @author Calum Ragan
@@ -60,6 +62,13 @@ public class LiferayByUtil {
 		@Override
 		public List<WebElement> findElements(SearchContext searchContext) {
 			if (searchContext instanceof WebDriver) {
+				WrapsDriver wrapsDriver = (WrapsDriver)searchContext;
+
+				WebDriver webDriver = wrapsDriver.getWrappedDriver();
+
+				JavascriptExecutor javascriptExecutor =
+					(JavascriptExecutor)webDriver;
+
 				String[] partialCssSelectors = _cssSelector.split(">>>");
 
 				for (int i = 0; i < (partialCssSelectors.length - 1); i++) {
@@ -69,12 +78,15 @@ public class LiferayByUtil {
 					WebElement webElement = byCssSelector.findElement(
 						searchContext);
 
-					searchContext = webElement.getShadowRoot();
+					searchContext =
+						(WebElement)javascriptExecutor.executeScript(
+							"return arguments[0].shadowRoot", webElement);
 				}
 
-				return searchContext.findElements(
-					By.cssSelector(
-						partialCssSelectors[partialCssSelectors.length - 1]));
+				By.ByCssSelector byCssSelector = new By.ByCssSelector(
+					partialCssSelectors[partialCssSelectors.length - 1]);
+
+				return byCssSelector.findElements(searchContext);
 			}
 
 			throw new WebDriverException(

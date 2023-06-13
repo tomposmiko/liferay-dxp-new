@@ -18,7 +18,7 @@ import com.liferay.analytics.reports.info.item.provider.AnalyticsReportsInfoItem
 import com.liferay.info.exception.NoSuchInfoItemException;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -43,7 +43,7 @@ public class FileEntryAnalyticsReportsInfoItemObjectProvider
 				infoItemReference.getInfoItemIdentifier();
 
 		InfoItemObjectProvider<Object> infoItemObjectProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemObjectProvider.class, getClassName());
 
 		try {
@@ -51,7 +51,7 @@ public class FileEntryAnalyticsReportsInfoItemObjectProvider
 				classPKInfoItemIdentifier);
 		}
 		catch (NoSuchInfoItemException noSuchInfoItemException) {
-			_log.error(noSuchInfoItemException);
+			_log.error(noSuchInfoItemException, noSuchInfoItemException);
 		}
 
 		return null;
@@ -66,6 +66,6 @@ public class FileEntryAnalyticsReportsInfoItemObjectProvider
 		FileEntryAnalyticsReportsInfoItemObjectProvider.class);
 
 	@Reference
-	private InfoItemServiceRegistry _infoItemServiceRegistry;
+	private InfoItemServiceTracker _infoItemServiceTracker;
 
 }

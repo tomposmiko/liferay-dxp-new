@@ -42,8 +42,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.test.log.LogCapture;
-import com.liferay.portal.test.log.LoggerTestUtil;
 
 import java.io.File;
 import java.io.Serializable;
@@ -63,34 +61,25 @@ public abstract class BaseExportImportTestCase {
 	public void importLayouts(Map<String, String[]> parameterMap)
 		throws Exception {
 
-		importLayouts(parameterMap, false);
-	}
+		User user = TestPropsValues.getUser();
 
-	public void importLayouts(
-			Map<String, String[]> parameterMap, boolean expectError)
-		throws Exception {
+		Map<String, Serializable> importLayoutSettingsMap =
+			ExportImportConfigurationSettingsMapFactoryUtil.
+				buildImportLayoutSettingsMap(
+					user, importedGroup.getGroupId(), false, null,
+					parameterMap);
 
-		try (LogCapture logCapture = getLogCapture(expectError)) {
-			User user = TestPropsValues.getUser();
+		ExportImportConfiguration exportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				addExportImportConfiguration(
+					user.getUserId(), importedGroup.getGroupId(),
+					StringPool.BLANK, StringPool.BLANK,
+					ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
+					importLayoutSettingsMap, WorkflowConstants.STATUS_DRAFT,
+					new ServiceContext());
 
-			Map<String, Serializable> importLayoutSettingsMap =
-				ExportImportConfigurationSettingsMapFactoryUtil.
-					buildImportLayoutSettingsMap(
-						user, importedGroup.getGroupId(), false, null,
-						parameterMap);
-
-			ExportImportConfiguration exportImportConfiguration =
-				ExportImportConfigurationLocalServiceUtil.
-					addExportImportConfiguration(
-						user.getUserId(), importedGroup.getGroupId(),
-						StringPool.BLANK, StringPool.BLANK,
-						ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
-						importLayoutSettingsMap, WorkflowConstants.STATUS_DRAFT,
-						new ServiceContext());
-
-			ExportImportServiceUtil.importLayouts(
-				exportImportConfiguration, larFile);
-		}
+		ExportImportServiceUtil.importLayouts(
+			exportImportConfiguration, larFile);
 	}
 
 	@Before
@@ -98,14 +87,14 @@ public abstract class BaseExportImportTestCase {
 		group = GroupTestUtil.addGroup();
 		importedGroup = GroupTestUtil.addGroup();
 
-		layout = LayoutTestUtil.addTypePortletLayout(group);
+		layout = LayoutTestUtil.addLayout(group);
 
 		// Delete and readd to ensure a different layout ID (not ID or UUID).
 		// See LPS-32132.
 
 		LayoutLocalServiceUtil.deleteLayout(layout, new ServiceContext());
 
-		layout = LayoutTestUtil.addTypePortletLayout(group);
+		layout = LayoutTestUtil.addLayout(group);
 	}
 
 	@After
@@ -163,50 +152,31 @@ public abstract class BaseExportImportTestCase {
 			long[] layoutIds, Map<String, String[]> parameterMap)
 		throws Exception {
 
-		exportImportLayouts(layoutIds, parameterMap, false);
-	}
+		exportLayouts(layoutIds, getExportParameterMap());
 
-	protected void exportImportLayouts(
-			long[] layoutIds, Map<String, String[]> parameterMap,
-			boolean expectError)
-		throws Exception {
-
-		exportLayouts(layoutIds, getExportParameterMap(), expectError);
-
-		importLayouts(parameterMap, expectError);
+		importLayouts(parameterMap);
 	}
 
 	protected void exportLayouts(
 			long[] layoutIds, Map<String, String[]> parameterMap)
 		throws Exception {
 
-		exportLayouts(layoutIds, parameterMap, false);
-	}
+		User user = TestPropsValues.getUser();
 
-	protected void exportLayouts(
-			long[] layoutIds, Map<String, String[]> parameterMap,
-			boolean expectError)
-		throws Exception {
+		Map<String, Serializable> exportLayoutSettingsMap =
+			ExportImportConfigurationSettingsMapFactoryUtil.
+				buildExportLayoutSettingsMap(
+					user, group.getGroupId(), false, layoutIds, parameterMap);
 
-		try (LogCapture logCapture = getLogCapture(expectError)) {
-			User user = TestPropsValues.getUser();
+		ExportImportConfiguration exportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				addDraftExportImportConfiguration(
+					user.getUserId(),
+					ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
+					exportLayoutSettingsMap);
 
-			Map<String, Serializable> exportLayoutSettingsMap =
-				ExportImportConfigurationSettingsMapFactoryUtil.
-					buildExportLayoutSettingsMap(
-						user, group.getGroupId(), false, layoutIds,
-						parameterMap);
-
-			ExportImportConfiguration exportImportConfiguration =
-				ExportImportConfigurationLocalServiceUtil.
-					addDraftExportImportConfiguration(
-						user.getUserId(),
-						ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
-						exportLayoutSettingsMap);
-
-			larFile = ExportImportServiceUtil.exportLayoutsAsFile(
-				exportImportConfiguration);
-		}
+		larFile = ExportImportServiceUtil.exportLayoutsAsFile(
+			exportImportConfiguration);
 	}
 
 	protected AssetEntry getAssetEntry(StagedModel stagedModel)
@@ -256,19 +226,6 @@ public abstract class BaseExportImportTestCase {
 			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
 			new String[] {Boolean.TRUE.toString()}
 		).build();
-	}
-
-	protected LogCapture getLogCapture(boolean expectError) {
-		LogCapture logCapture = null;
-
-		if (expectError) {
-			logCapture = LoggerTestUtil.configureLog4JLogger(
-				"com.liferay.exportimport.internal.lifecycle." +
-					"LoggerExportImportLifecycleListener",
-				LoggerTestUtil.ERROR);
-		}
-
-		return logCapture;
 	}
 
 	protected StagedModel getStagedModel(String uuid, long groupId)

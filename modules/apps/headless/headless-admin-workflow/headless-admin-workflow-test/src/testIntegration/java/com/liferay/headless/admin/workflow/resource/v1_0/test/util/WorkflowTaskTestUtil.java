@@ -30,29 +30,21 @@ public class WorkflowTaskTestUtil {
 	public static WorkflowTask getWorkflowTask(long workflowInstanceId)
 		throws Exception {
 
-		List<WorkflowTask> workflowTasks = getWorkflowTasks(workflowInstanceId);
+		WorkflowTaskResource.Builder builder = WorkflowTaskResource.builder();
 
-		return workflowTasks.get(workflowTasks.size() - 1);
-	}
-
-	public static List<WorkflowTask> getWorkflowTasks(long workflowInstanceId)
-		throws Exception {
-
-		WorkflowTaskResource.Builder workflowTaskResourceBuilder =
-			WorkflowTaskResource.builder();
-
-		WorkflowTaskResource workflowTaskResource =
-			workflowTaskResourceBuilder.authentication(
-				"test@liferay.com", "test"
-			).locale(
-				LocaleUtil.getDefault()
-			).build();
+		WorkflowTaskResource workflowTaskResource = builder.authentication(
+			"test@liferay.com", "test"
+		).locale(
+			LocaleUtil.getDefault()
+		).build();
 
 		Page<WorkflowTask> page =
 			workflowTaskResource.getWorkflowInstanceWorkflowTasksPage(
 				workflowInstanceId, false, Pagination.of(-1, -1));
 
-		return (List<WorkflowTask>)page.getItems();
+		List<WorkflowTask> workflowTasks = (List<WorkflowTask>)page.getItems();
+
+		return workflowTasks.get(workflowTasks.size() - 1);
 	}
 
 }

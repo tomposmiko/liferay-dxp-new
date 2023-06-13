@@ -14,24 +14,19 @@
 
 package com.liferay.dynamic.data.mapping.form.field.type.internal.checkbox;
 
+import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.BaseDDMFormFieldTypeSettingsTestCase;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.portlet.PortletURLFactory;
-import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletURL;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Map;
-
-import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,57 +34,31 @@ import org.hamcrest.CoreMatchers;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Marcellus Tavares
  */
+@PrepareForTest(RequestBackedPortletURLFactoryUtil.class)
+@RunWith(PowerMockRunner.class)
 public class CheckboxDDMFormFieldTemplateContextContributorTest
 	extends BaseDDMFormFieldTypeSettingsTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
-		PortletURLFactoryUtil portletURLFactoryUtil =
-			new PortletURLFactoryUtil();
-
-		PortletURLFactory portletURLFactory = Mockito.mock(
-			PortletURLFactory.class);
-
-		LiferayPortletURL liferayPortletURL = new MockLiferayPortletURL();
-
-		Mockito.doReturn(
-			liferayPortletURL
-		).when(
-			portletURLFactory
-		).create(
-			Mockito.any(PortletRequest.class), Mockito.anyString(),
-			Mockito.anyString()
-		);
-
-		Mockito.doReturn(
-			liferayPortletURL
-		).when(
-			portletURLFactory
-		).create(
-			Mockito.any(HttpServletRequest.class), Mockito.anyString(),
-			Mockito.anyLong(), Mockito.anyString()
-		);
-
-		portletURLFactoryUtil.setPortletURLFactory(portletURLFactory);
+		setUpRequestBackedPortletURLFactoryUtil();
 	}
 
 	@Test
@@ -98,7 +67,7 @@ public class CheckboxDDMFormFieldTemplateContextContributorTest
 
 		Map<String, Object> parameters =
 			_checkboxDDMFormFieldTemplateContextContributor.getParameters(
-				ddmFormField, _createDDMFormFieldRenderingContext());
+				ddmFormField, createDDMFormFieldRenderingContext());
 
 		boolean predefinedValue = (boolean)parameters.get("predefinedValue");
 
@@ -110,7 +79,7 @@ public class CheckboxDDMFormFieldTemplateContextContributorTest
 		Map<String, Object> parameters =
 			_checkboxDDMFormFieldTemplateContextContributor.getParameters(
 				new DDMFormField("field", "checkbox"),
-				_createDDMFormFieldRenderingContext());
+				createDDMFormFieldRenderingContext());
 
 		String systemSettingsURL = String.valueOf(
 			parameters.get("systemSettingsURL"));
@@ -126,7 +95,7 @@ public class CheckboxDDMFormFieldTemplateContextContributorTest
 
 		Map<String, Object> parameters =
 			_checkboxDDMFormFieldTemplateContextContributor.getParameters(
-				ddmFormField, _createDDMFormFieldRenderingContext());
+				ddmFormField, createDDMFormFieldRenderingContext());
 
 		boolean showMaximumRepetitionsInfo = (boolean)parameters.get(
 			"showMaximumRepetitionsInfo");
@@ -142,7 +111,7 @@ public class CheckboxDDMFormFieldTemplateContextContributorTest
 
 		Map<String, Object> parameters =
 			_checkboxDDMFormFieldTemplateContextContributor.getParameters(
-				ddmFormField, _createDDMFormFieldRenderingContext());
+				ddmFormField, createDDMFormFieldRenderingContext());
 
 		String systemSettingsURL = String.valueOf(
 			parameters.get("systemSettingsURL"));
@@ -171,7 +140,7 @@ public class CheckboxDDMFormFieldTemplateContextContributorTest
 
 		Map<String, Object> parameters =
 			_checkboxDDMFormFieldTemplateContextContributor.getParameters(
-				ddmFormField, _createDDMFormFieldRenderingContext());
+				ddmFormField, createDDMFormFieldRenderingContext());
 
 		boolean actualPredefinedValue = (boolean)parameters.get(
 			"predefinedValue");
@@ -191,7 +160,7 @@ public class CheckboxDDMFormFieldTemplateContextContributorTest
 
 		Map<String, Object> parameters =
 			_checkboxDDMFormFieldTemplateContextContributor.getParameters(
-				ddmFormField, _createDDMFormFieldRenderingContext());
+				ddmFormField, createDDMFormFieldRenderingContext());
 
 		boolean actualPredefinedValue = (boolean)parameters.get(
 			"predefinedValue");
@@ -199,27 +168,47 @@ public class CheckboxDDMFormFieldTemplateContextContributorTest
 		Assert.assertTrue(actualPredefinedValue);
 	}
 
-	private DDMFormFieldRenderingContext _createDDMFormFieldRenderingContext() {
+	protected DDMFormFieldRenderingContext
+		createDDMFormFieldRenderingContext() {
+
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext =
 			new DDMFormFieldRenderingContext();
 
-		HttpServletRequest httpServletRequest = new MockHttpServletRequest();
-
-		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
-
-		Mockito.doReturn(
-			0L
-		).when(
-			themeDisplay
-		).getPlid();
-
-		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
-
-		ddmFormFieldRenderingContext.setHttpServletRequest(httpServletRequest);
-
+		ddmFormFieldRenderingContext.setHttpServletRequest(
+			new MockHttpServletRequest());
 		ddmFormFieldRenderingContext.setLocale(LocaleUtil.US);
 
 		return ddmFormFieldRenderingContext;
+	}
+
+	protected RequestBackedPortletURLFactory
+		mockRequestBackedPortletURLFactory() {
+
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory = mock(
+			RequestBackedPortletURLFactory.class);
+
+		when(
+			requestBackedPortletURLFactory.createActionURL(
+				ConfigurationAdminPortletKeys.SYSTEM_SETTINGS)
+		).thenReturn(
+			new MockLiferayPortletURL()
+		);
+
+		return requestBackedPortletURLFactory;
+	}
+
+	protected void setUpRequestBackedPortletURLFactoryUtil() {
+		PowerMockito.mockStatic(RequestBackedPortletURLFactoryUtil.class);
+
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
+			mockRequestBackedPortletURLFactory();
+
+		PowerMockito.when(
+			RequestBackedPortletURLFactoryUtil.create(
+				Matchers.any(HttpServletRequest.class))
+		).thenReturn(
+			requestBackedPortletURLFactory
+		);
 	}
 
 	private final CheckboxDDMFormFieldTemplateContextContributor

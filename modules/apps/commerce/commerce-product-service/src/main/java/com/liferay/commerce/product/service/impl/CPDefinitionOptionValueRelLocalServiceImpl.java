@@ -20,7 +20,6 @@ import com.liferay.commerce.product.exception.CPDefinitionOptionValueRelKeyExcep
 import com.liferay.commerce.product.exception.CPDefinitionOptionValueRelPriceException;
 import com.liferay.commerce.product.exception.CPDefinitionOptionValueRelQuantityException;
 import com.liferay.commerce.product.exception.NoSuchCPDefinitionOptionValueRelException;
-import com.liferay.commerce.product.internal.util.CPDefinitionLocalServiceCircularDependencyUtil;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionOptionRel;
 import com.liferay.commerce.product.model.CPDefinitionOptionValueRel;
@@ -28,16 +27,9 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CPInstanceOptionValueRel;
 import com.liferay.commerce.product.model.CPOption;
 import com.liferay.commerce.product.model.CPOptionValue;
-import com.liferay.commerce.product.service.CPDefinitionOptionRelLocalService;
-import com.liferay.commerce.product.service.CPInstanceLocalService;
-import com.liferay.commerce.product.service.CPInstanceOptionValueRelLocalService;
-import com.liferay.commerce.product.service.CPOptionLocalService;
-import com.liferay.commerce.product.service.CPOptionValueLocalService;
 import com.liferay.commerce.product.service.base.CPDefinitionOptionValueRelLocalServiceBaseImpl;
-import com.liferay.commerce.product.service.persistence.CPDefinitionOptionRelPersistence;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
@@ -62,14 +54,14 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.taglib.util.CustomAttributesUtil;
 
 import java.io.Serializable;
@@ -83,17 +75,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @author Igor Beslic
  */
-@Component(
-	property = "model.class.name=com.liferay.commerce.product.model.CPDefinitionOptionValueRel",
-	service = AopService.class
-)
 public class CPDefinitionOptionValueRelLocalServiceImpl
 	extends CPDefinitionOptionValueRelLocalServiceBaseImpl {
 
@@ -119,11 +104,11 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 
 		// Commerce product definition option value rel
 
-		User user = _userLocalService.getUser(serviceContext.getUserId());
+		User user = userLocalService.getUser(serviceContext.getUserId());
 
-		key = _friendlyURLNormalizer.normalize(key);
+		key = FriendlyURLNormalizerUtil.normalize(key);
 
-		_validate(0, cpDefinitionOptionRelId, key);
+		validate(0, cpDefinitionOptionRelId, key);
 
 		long cpDefinitionOptionValueRelId = counterLocalService.increment();
 
@@ -132,18 +117,18 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 				cpDefinitionOptionValueRelId);
 
 		CPDefinitionOptionRel cpDefinitionOptionRel =
-			_cpDefinitionOptionRelLocalService.getCPDefinitionOptionRel(
+			cpDefinitionOptionRelLocalService.getCPDefinitionOptionRel(
 				cpDefinitionOptionRelId);
 
-		if (CPDefinitionLocalServiceCircularDependencyUtil.isVersionable(
+		if (cpDefinitionLocalService.isVersionable(
 				cpDefinitionOptionRel.getCPDefinitionId(),
 				serviceContext.getRequest())) {
 
 			CPDefinition newCPDefinition =
-				CPDefinitionLocalServiceCircularDependencyUtil.copyCPDefinition(
+				cpDefinitionLocalService.copyCPDefinition(
 					cpDefinitionOptionRel.getCPDefinitionId());
 
-			cpDefinitionOptionRel = _cpDefinitionOptionRelPersistence.findByC_C(
+			cpDefinitionOptionRel = cpDefinitionOptionRelPersistence.findByC_C(
 				newCPDefinition.getCPDefinitionId(),
 				cpDefinitionOptionRel.getCPOptionId());
 
@@ -177,7 +162,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 
 		// Commerce product definition
 
-		_reindexCPDefinition(cpDefinitionOptionRel);
+		reindexCPDefinition(cpDefinitionOptionRel);
 
 		return cpDefinitionOptionValueRel;
 	}
@@ -192,14 +177,14 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		CPDefinitionOptionRel cpDefinitionOptionRel =
 			cpDefinitionOptionValueRel.getCPDefinitionOptionRel();
 
-		if (CPDefinitionLocalServiceCircularDependencyUtil.isVersionable(
+		if (cpDefinitionLocalService.isVersionable(
 				cpDefinitionOptionRel.getCPDefinitionId())) {
 
 			CPDefinition newCPDefinition =
-				CPDefinitionLocalServiceCircularDependencyUtil.copyCPDefinition(
+				cpDefinitionLocalService.copyCPDefinition(
 					cpDefinitionOptionRel.getCPDefinitionId());
 
-			cpDefinitionOptionRel = _cpDefinitionOptionRelPersistence.findByC_C(
+			cpDefinitionOptionRel = cpDefinitionOptionRelPersistence.findByC_C(
 				newCPDefinition.getCPDefinitionId(),
 				cpDefinitionOptionRel.getCPOptionId());
 
@@ -219,14 +204,14 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		_expandoRowLocalService.deleteRows(
 			cpDefinitionOptionValueRel.getCPDefinitionOptionValueRelId());
 
-		_cpInstanceLocalService.inactivateCPDefinitionOptionValueRelCPInstances(
+		cpInstanceLocalService.inactivateCPDefinitionOptionValueRelCPInstances(
 			PrincipalThreadLocal.getUserId(),
 			cpDefinitionOptionRel.getCPDefinitionId(),
 			cpDefinitionOptionValueRel.getCPDefinitionOptionValueRelId());
 
 		// Commerce product definition
 
-		_reindexCPDefinition(cpDefinitionOptionRel);
+		reindexCPDefinition(cpDefinitionOptionRel);
 
 		return cpDefinitionOptionValueRel;
 	}
@@ -394,7 +379,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		throws PortalException {
 
 		List<CPInstanceOptionValueRel> cpInstanceCPInstanceOptionValueRels =
-			_cpInstanceOptionValueRelLocalService.
+			cpInstanceOptionValueRelLocalService.
 				getCPInstanceCPInstanceOptionValueRels(
 					cpDefinitionOptionRelId, cpInstanceId);
 
@@ -455,10 +440,10 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		throws PortalException {
 
 		CPDefinitionOptionRel cpDefinitionOptionRel =
-			_cpDefinitionOptionRelLocalService.getCPDefinitionOptionRel(
+			cpDefinitionOptionRelLocalService.getCPDefinitionOptionRel(
 				cpDefinitionOptionRelId);
 
-		CPOption cpOption = _cpOptionLocalService.fetchCPOption(
+		CPOption cpOption = cpOptionLocalService.fetchCPOption(
 			cpDefinitionOptionRel.getCPOptionId());
 
 		if (cpOption == null) {
@@ -466,7 +451,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		}
 
 		List<CPOptionValue> cpOptionValues =
-			_cpOptionValueLocalService.getCPOptionValues(
+			cpOptionValueLocalService.getCPOptionValues(
 				cpOption.getCPOptionId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Map<String, Serializable> expandoBridgeAttributes =
@@ -533,6 +518,34 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		}
 	}
 
+	/**
+	 * @param      companyId
+	 * @param      groupId
+	 * @param      cpDefinitionOptionRelId
+	 * @param      keywords
+	 * @param      start
+	 * @param      end
+	 * @param      sort
+	 * @return
+	 *
+	 * @throws     PortalException
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 * 			   #searchCPDefinitionOptionValueRels(long, long, long, String,
+	 * 			   int, int, Sort[])}
+	 */
+	@Deprecated
+	@Override
+	public BaseModelSearchResult<CPDefinitionOptionValueRel>
+			searchCPDefinitionOptionValueRels(
+				long companyId, long groupId, long cpDefinitionOptionRelId,
+				String keywords, int start, int end, Sort sort)
+		throws PortalException {
+
+		return searchCPDefinitionOptionValueRels(
+			companyId, groupId, cpDefinitionOptionRelId, keywords, start, end,
+			new Sort[] {sort});
+	}
+
 	@Override
 	public BaseModelSearchResult<CPDefinitionOptionValueRel>
 			searchCPDefinitionOptionValueRels(
@@ -540,11 +553,11 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 				String keywords, int start, int end, Sort[] sorts)
 		throws PortalException {
 
-		SearchContext searchContext = _buildSearchContext(
+		SearchContext searchContext = buildSearchContext(
 			companyId, groupId, cpDefinitionOptionRelId, keywords, start, end,
 			sorts);
 
-		return _searchCPOptions(searchContext);
+		return searchCPOptions(searchContext);
 	}
 
 	@Override
@@ -553,11 +566,41 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			String keywords)
 		throws PortalException {
 
-		SearchContext searchContext = _buildSearchContext(
+		SearchContext searchContext = buildSearchContext(
 			companyId, groupId, cpDefinitionOptionRelId, keywords,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
-		return _searchCPOptionsCount(searchContext);
+		return searchCPOptionsCount(searchContext);
+	}
+
+	/**
+	 * @param      cpDefinitionOptionValueRelId
+	 * @param      nameMap
+	 * @param      priority
+	 * @param      key
+	 * @param      cpInstanceId
+	 * @param      quantity
+	 * @param      price
+	 * @param      serviceContext
+	 * @return
+	 *
+	 * @throws     PortalException
+	 * @deprecated As of Athanasius (7.3.x), use {@link
+	 *             #updateCPDefinitionOptionValueRel(long, Map, double, String,
+	 *             long, int, boolean, BigDecimal, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
+			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
+			double priority, String key, long cpInstanceId, int quantity,
+			BigDecimal price, ServiceContext serviceContext)
+		throws PortalException {
+
+		return cpDefinitionOptionValueRelLocalService.
+			updateCPDefinitionOptionValueRel(
+				cpDefinitionOptionValueRelId, nameMap, priority, key,
+				cpInstanceId, quantity, false, price, serviceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -575,24 +618,24 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			cpDefinitionOptionValueRelPersistence.findByPrimaryKey(
 				cpDefinitionOptionValueRelId);
 
-		key = _friendlyURLNormalizer.normalize(key);
+		key = FriendlyURLNormalizerUtil.normalize(key);
 
-		_validate(
+		validate(
 			cpDefinitionOptionValueRel.getCPDefinitionOptionValueRelId(),
 			cpDefinitionOptionValueRel.getCPDefinitionOptionRelId(), key);
 
 		CPDefinitionOptionRel cpDefinitionOptionRel =
 			cpDefinitionOptionValueRel.getCPDefinitionOptionRel();
 
-		if (CPDefinitionLocalServiceCircularDependencyUtil.isVersionable(
+		if (cpDefinitionLocalService.isVersionable(
 				cpDefinitionOptionRel.getCPDefinitionId(),
 				serviceContext.getRequest())) {
 
 			CPDefinition newCPDefinition =
-				CPDefinitionLocalServiceCircularDependencyUtil.copyCPDefinition(
+				cpDefinitionLocalService.copyCPDefinition(
 					cpDefinitionOptionRel.getCPDefinitionId());
 
-			cpDefinitionOptionRel = _cpDefinitionOptionRelPersistence.findByC_C(
+			cpDefinitionOptionRel = cpDefinitionOptionRelPersistence.findByC_C(
 				newCPDefinition.getCPDefinitionId(),
 				cpDefinitionOptionRel.getCPOptionId());
 
@@ -607,9 +650,8 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		cpDefinitionOptionValueRel.setKey(key);
 		cpDefinitionOptionValueRel.setExpandoBridgeAttributes(serviceContext);
 
-		cpDefinitionOptionValueRel =
-			_updateCPDefinitionOptionValueRelCPInstance(
-				cpDefinitionOptionValueRel, cpInstanceId);
+		_updateCPDefinitionOptionValueRelCPInstance(
+			cpDefinitionOptionValueRel, cpInstanceId);
 
 		if (cpDefinitionOptionRel.isPriceTypeStatic()) {
 			cpDefinitionOptionValueRel.setPrice(price);
@@ -627,15 +669,43 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 
 		if (preselected) {
 			cpDefinitionOptionValueRel =
-				_updateCPDefinitionOptionValueRelPreselected(
-					cpDefinitionOptionValueRel, preselected);
+				updateCPDefinitionOptionValueRelPreselected(
+					cpDefinitionOptionValueRel.
+						getCPDefinitionOptionValueRelId(),
+					preselected);
 		}
 
 		// Commerce product definition
 
-		_reindexCPDefinition(cpDefinitionOptionRel);
+		reindexCPDefinition(cpDefinitionOptionRel);
 
 		return cpDefinitionOptionValueRel;
+	}
+
+	/**
+	 * @param      cpDefinitionOptionValueRelId
+	 * @param      nameMap
+	 * @param      priority
+	 * @param      key
+	 * @param      serviceContext
+	 * @return
+	 *
+	 * @throws     PortalException
+	 * @deprecated As of Athanasius (7.3.x), use {@link
+	 *             #updateCPDefinitionOptionValueRel(long, Map, double, String,
+	 *             long, int, boolean, BigDecimal, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public CPDefinitionOptionValueRel updateCPDefinitionOptionValueRel(
+			long cpDefinitionOptionValueRelId, Map<Locale, String> nameMap,
+			double priority, String key, ServiceContext serviceContext)
+		throws PortalException {
+
+		return cpDefinitionOptionValueRelLocalService.
+			updateCPDefinitionOptionValueRel(
+				cpDefinitionOptionValueRelId, nameMap, priority, key, 0, 0,
+				false, null, serviceContext);
 	}
 
 	@Override
@@ -647,34 +717,31 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			cpDefinitionOptionValueRelPersistence.fetchByPrimaryKey(
 				cpDefinitionOptionValueRelId);
 
-		return _updateCPDefinitionOptionValueRelPreselected(
-			cpDefinitionOptionValueRel, preselected);
-	}
+		if (!preselected) {
+			cpDefinitionOptionValueRel.setPreselected(false);
 
-	private void _addCPDefinitionOptionValueRel(
-			long cpDefinitionOptionRelId, List<CPOptionValue> cpOptionValues,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		for (CPOptionValue cpOptionValue : cpOptionValues) {
-			if (_hasCustomAttributes(cpOptionValue)) {
-				ExpandoBridge expandoBridge = cpOptionValue.getExpandoBridge();
-
-				serviceContext.setExpandoBridgeAttributes(
-					expandoBridge.getAttributes());
-			}
-			else {
-				serviceContext.setExpandoBridgeAttributes(
-					Collections.emptyMap());
-			}
-
-			cpDefinitionOptionValueRelLocalService.
-				addCPDefinitionOptionValueRel(
-					cpDefinitionOptionRelId, cpOptionValue, serviceContext);
+			return cpDefinitionOptionValueRelPersistence.update(
+				cpDefinitionOptionValueRel);
 		}
+
+		CPDefinitionOptionValueRel curPreselectedCPDefinitionOptionValueRel =
+			fetchPreselectedCPDefinitionOptionValueRel(
+				cpDefinitionOptionValueRel.getCPDefinitionOptionRelId());
+
+		if (curPreselectedCPDefinitionOptionValueRel != null) {
+			curPreselectedCPDefinitionOptionValueRel.setPreselected(false);
+
+			cpDefinitionOptionValueRelPersistence.update(
+				curPreselectedCPDefinitionOptionValueRel);
+		}
+
+		cpDefinitionOptionValueRel.setPreselected(true);
+
+		return cpDefinitionOptionValueRelPersistence.update(
+			cpDefinitionOptionValueRel);
 	}
 
-	private SearchContext _buildSearchContext(
+	protected SearchContext buildSearchContext(
 		long companyId, long groupId, long cpDefinitionOptionRelId,
 		String keywords, int start, int end, Sort[] sorts) {
 
@@ -697,6 +764,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 					"keywords", keywords
 				).build()
 			).build());
+
 		searchContext.setCompanyId(companyId);
 		searchContext.setEnd(end);
 		searchContext.setGroupIds(new long[] {groupId});
@@ -719,7 +787,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		return searchContext;
 	}
 
-	private List<CPDefinitionOptionValueRel> _getCPDefinitionOptionValueRels(
+	protected List<CPDefinitionOptionValueRel> getCPDefinitionOptionValueRels(
 			Hits hits)
 		throws PortalException {
 
@@ -755,20 +823,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		return cpDefinitionOptionValueRels;
 	}
 
-	private boolean _hasCustomAttributes(CPOptionValue cpOptionValue)
-		throws PortalException {
-
-		try {
-			return CustomAttributesUtil.hasCustomAttributes(
-				cpOptionValue.getCompanyId(), CPOptionValue.class.getName(),
-				cpOptionValue.getCPOptionValueId(), null);
-		}
-		catch (Exception exception) {
-			throw new PortalException(exception);
-		}
-	}
-
-	private void _reindexCPDefinition(
+	protected void reindexCPDefinition(
 			CPDefinitionOptionRel cpDefinitionOptionRel)
 		throws PortalException {
 
@@ -780,7 +835,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			cpDefinitionOptionRel.getCPDefinitionId());
 	}
 
-	private BaseModelSearchResult<CPDefinitionOptionValueRel> _searchCPOptions(
+	protected BaseModelSearchResult<CPDefinitionOptionValueRel> searchCPOptions(
 			SearchContext searchContext)
 		throws PortalException {
 
@@ -792,7 +847,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			Hits hits = indexer.search(searchContext, _SELECTED_FIELD_NAMES);
 
 			List<CPDefinitionOptionValueRel> cpDefinitionOptionValueRels =
-				_getCPDefinitionOptionValueRels(hits);
+				getCPDefinitionOptionValueRels(hits);
 
 			if (cpDefinitionOptionValueRels != null) {
 				return new BaseModelSearchResult<>(
@@ -804,7 +859,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			"Unable to fix the search index after 10 attempts");
 	}
 
-	private int _searchCPOptionsCount(SearchContext searchContext)
+	protected int searchCPOptionsCount(SearchContext searchContext)
 		throws PortalException {
 
 		Indexer<CPDefinitionOptionValueRel> indexer =
@@ -814,62 +869,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		return GetterUtil.getInteger(indexer.searchCount(searchContext));
 	}
 
-	private CPDefinitionOptionValueRel
-			_updateCPDefinitionOptionValueRelCPInstance(
-				CPDefinitionOptionValueRel cpDefinitionOptionValueRel,
-				long cpInstanceId)
-		throws PortalException {
-
-		if (cpInstanceId <= 0) {
-			cpDefinitionOptionValueRel.setCPInstanceUuid(null);
-			cpDefinitionOptionValueRel.setCProductId(0);
-
-			return cpDefinitionOptionValueRel;
-		}
-
-		CPInstance cpInstance = _cpInstanceLocalService.getCPInstance(
-			cpInstanceId);
-
-		cpDefinitionOptionValueRel.setCPInstanceUuid(
-			cpInstance.getCPInstanceUuid());
-
-		CPDefinition cpDefinition = cpInstance.getCPDefinition();
-
-		cpDefinitionOptionValueRel.setCProductId(cpDefinition.getCProductId());
-
-		return cpDefinitionOptionValueRel;
-	}
-
-	private CPDefinitionOptionValueRel
-		_updateCPDefinitionOptionValueRelPreselected(
-			CPDefinitionOptionValueRel cpDefinitionOptionValueRel,
-			boolean preselected) {
-
-		if (!preselected) {
-			cpDefinitionOptionValueRel.setPreselected(false);
-
-			return cpDefinitionOptionValueRelPersistence.update(
-				cpDefinitionOptionValueRel);
-		}
-
-		CPDefinitionOptionValueRel curPreselectedCPDefinitionOptionValueRel =
-			fetchPreselectedCPDefinitionOptionValueRel(
-				cpDefinitionOptionValueRel.getCPDefinitionOptionRelId());
-
-		if (curPreselectedCPDefinitionOptionValueRel != null) {
-			curPreselectedCPDefinitionOptionValueRel.setPreselected(false);
-
-			cpDefinitionOptionValueRelPersistence.update(
-				curPreselectedCPDefinitionOptionValueRel);
-		}
-
-		cpDefinitionOptionValueRel.setPreselected(true);
-
-		return cpDefinitionOptionValueRelPersistence.update(
-			cpDefinitionOptionValueRel);
-	}
-
-	private void _validate(
+	protected void validate(
 			long cpDefinitionOptionValueRelId, long cpDefinitionOptionRelId,
 			String key)
 		throws PortalException {
@@ -884,6 +884,65 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 
 			throw new CPDefinitionOptionValueRelKeyException();
 		}
+	}
+
+	private void _addCPDefinitionOptionValueRel(
+			long cpDefinitionOptionRelId, List<CPOptionValue> cpOptionValues,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		for (CPOptionValue cpOptionValue : cpOptionValues) {
+			if (_hasCustomAttributes(cpOptionValue)) {
+				ExpandoBridge expandoBridge = cpOptionValue.getExpandoBridge();
+
+				serviceContext.setExpandoBridgeAttributes(
+					expandoBridge.getAttributes());
+			}
+			else {
+				serviceContext.setExpandoBridgeAttributes(
+					Collections.emptyMap());
+			}
+
+			cpDefinitionOptionValueRelLocalService.
+				addCPDefinitionOptionValueRel(
+					cpDefinitionOptionRelId, cpOptionValue, serviceContext);
+		}
+	}
+
+	private boolean _hasCustomAttributes(CPOptionValue cpOptionValue)
+		throws PortalException {
+
+		try {
+			return CustomAttributesUtil.hasCustomAttributes(
+				cpOptionValue.getCompanyId(), CPOptionValue.class.getName(),
+				cpOptionValue.getCPOptionValueId(), null);
+		}
+		catch (Exception exception) {
+			throw new PortalException(exception);
+		}
+	}
+
+	private void _updateCPDefinitionOptionValueRelCPInstance(
+			CPDefinitionOptionValueRel cpDefinitionOptionValueRel,
+			long cpInstanceId)
+		throws PortalException {
+
+		if (cpInstanceId <= 0) {
+			cpDefinitionOptionValueRel.setCPInstanceUuid(null);
+			cpDefinitionOptionValueRel.setCProductId(0);
+
+			return;
+		}
+
+		CPInstance cpInstance = cpInstanceLocalService.getCPInstance(
+			cpInstanceId);
+
+		cpDefinitionOptionValueRel.setCPInstanceUuid(
+			cpInstance.getCPInstanceUuid());
+
+		CPDefinition cpDefinition = cpInstance.getCPDefinition();
+
+		cpDefinitionOptionValueRel.setCProductId(cpDefinition.getCProductId());
 	}
 
 	private void _validateLinkedCPDefinitionOptionValueRel(
@@ -952,7 +1011,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			throw new CPDefinitionOptionValueRelPriceException();
 		}
 
-		CPInstance cpInstance = _cpInstanceLocalService.fetchCProductInstance(
+		CPInstance cpInstance = cpInstanceLocalService.fetchCProductInstance(
 			cpDefinitionOptionValueRel.getCProductId(),
 			cpDefinitionOptionValueRel.getCPInstanceUuid());
 
@@ -968,7 +1027,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 			return;
 		}
 
-		if (_cpDefinitionOptionRelLocalService.
+		if (cpDefinitionOptionRelLocalService.
 				hasCPDefinitionRequiredCPDefinitionOptionRels(
 					cpInstance.getCPDefinitionId()) ||
 			(cpInstance.getCPSubscriptionInfo() != null)) {
@@ -991,33 +1050,7 @@ public class CPDefinitionOptionValueRelLocalServiceImpl
 		Field.ENTRY_CLASS_PK, Field.COMPANY_ID, Field.GROUP_ID, Field.UID
 	};
 
-	@Reference
-	private CPDefinitionOptionRelLocalService
-		_cpDefinitionOptionRelLocalService;
-
-	@Reference
-	private CPDefinitionOptionRelPersistence _cpDefinitionOptionRelPersistence;
-
-	@Reference
-	private CPInstanceLocalService _cpInstanceLocalService;
-
-	@Reference
-	private CPInstanceOptionValueRelLocalService
-		_cpInstanceOptionValueRelLocalService;
-
-	@Reference
-	private CPOptionLocalService _cpOptionLocalService;
-
-	@Reference
-	private CPOptionValueLocalService _cpOptionValueLocalService;
-
-	@Reference
+	@ServiceReference(type = ExpandoRowLocalService.class)
 	private ExpandoRowLocalService _expandoRowLocalService;
-
-	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

@@ -77,9 +77,8 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.social.kernel.model.SocialActivityConstants;
 import com.liferay.subscription.service.SubscriptionLocalService;
-import com.liferay.trash.TrashHelper;
-import com.liferay.trash.exception.RestoreEntryException;
-import com.liferay.trash.exception.TrashEntryException;
+import com.liferay.trash.kernel.exception.RestoreEntryException;
+import com.liferay.trash.kernel.exception.TrashEntryException;
 import com.liferay.trash.model.TrashEntry;
 import com.liferay.trash.model.TrashVersion;
 import com.liferay.trash.service.TrashEntryLocalService;
@@ -293,9 +292,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			groupId, categoryId);
 
 		for (MBThread thread : threads) {
-			if (includeTrashedEntries ||
-				!_trashHelper.isInTrashExplicitly(thread)) {
-
+			if (includeTrashedEntries || !thread.isInTrashExplicitly()) {
 				mbThreadLocalService.deleteThread(thread);
 			}
 		}
@@ -660,7 +657,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				RestoreEntryException.INVALID_STATUS);
 		}
 
-		if (_trashHelper.isInTrashExplicitly(thread)) {
+		if (thread.isInTrashExplicitly()) {
 			restoreThreadFromTrash(userId, threadId);
 		}
 		else {
@@ -1022,7 +1019,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Attachments
 
-		_moveAttachmentsFolders(
+		moveAttachmentsFolders(
 			message, oldAttachmentsFolderId, oldThread, thread, serviceContext);
 
 		// Indexer
@@ -1033,7 +1030,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 		// Update children
 
-		_moveChildrenMessages(message, category, oldThread.getThreadId());
+		moveChildrenMessages(message, category, oldThread.getThreadId());
 
 		// Indexer
 
@@ -1137,10 +1134,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 		return thread;
 	}
 
-	@Reference
-	protected ExpandoRowLocalService expandoRowLocalService;
-
-	private void _moveAttachmentsFolders(
+	protected void moveAttachmentsFolders(
 			MBMessage message, long oldAttachmentsFolderId, MBThread oldThread,
 			MBThread newThread, ServiceContext serviceContext)
 		throws PortalException {
@@ -1160,13 +1154,13 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 			oldThread.getThreadId(), message.getMessageId());
 
 		for (MBMessage childMessage : childMessages) {
-			_moveAttachmentsFolders(
+			moveAttachmentsFolders(
 				childMessage, childMessage.getAttachmentsFolderId(), oldThread,
 				newThread, serviceContext);
 		}
 	}
 
-	private void _moveChildrenMessages(
+	protected void moveChildrenMessages(
 			MBMessage parentMessage, MBCategory category, long oldThreadId)
 		throws PortalException {
 
@@ -1183,9 +1177,12 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 			indexer.reindex(_mbMessagePersistence.update(message));
 
-			_moveChildrenMessages(message, category, oldThreadId);
+			moveChildrenMessages(message, category, oldThreadId);
 		}
 	}
+
+	@Reference
+	protected ExpandoRowLocalService expandoRowLocalService;
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
@@ -1219,9 +1216,6 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 	@Reference
 	private TrashEntryLocalService _trashEntryLocalService;
-
-	@Reference
-	private TrashHelper _trashHelper;
 
 	@Reference
 	private TrashVersionLocalService _trashVersionLocalService;

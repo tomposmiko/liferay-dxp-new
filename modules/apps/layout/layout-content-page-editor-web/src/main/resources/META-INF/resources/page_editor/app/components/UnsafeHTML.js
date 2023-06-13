@@ -51,28 +51,16 @@ export default class UnsafeHTML extends React.PureComponent {
 
 		const scriptElements = Array.from(
 			this.state.ref.querySelectorAll('script')
-		).filter(
-			(script) =>
-				!script.type ||
-				script.type === 'module' ||
-				script.type === 'text/javascript'
-		);
+		).filter((script) => !script.type || script.type === 'text/javascript');
 
 		const runNextScript = () => {
 			if (scriptElements.length) {
 				const nextScriptElement = doc.createElement('script');
 				const prevScriptElement = scriptElements.shift();
 
-				nextScriptElement.type = prevScriptElement.type;
-
-				if (prevScriptElement.src) {
-					nextScriptElement.src = prevScriptElement.src;
-				}
-				else {
-					nextScriptElement.appendChild(
-						doc.createTextNode(prevScriptElement.innerHTML)
-					);
-				}
+				nextScriptElement.appendChild(
+					doc.createTextNode(prevScriptElement.innerHTML)
+				);
 
 				prevScriptElement.parentNode.replaceChild(
 					nextScriptElement,
@@ -141,23 +129,11 @@ export default class UnsafeHTML extends React.PureComponent {
 			ref.removeAttribute('id');
 		}
 
-		if (this.props.hideFromAccessibilityTree) {
-			ref.setAttribute('aria-hidden', 'true');
-		}
-		else {
-			ref.removeAttribute('aria-hidden');
-		}
-
 		ref.removeAttribute('style');
 
 		Object.entries(this.props.style).forEach(([key, value]) => {
 			if (!isNullOrUndefined(value)) {
-				if (isCSSVariable(key)) {
-					ref.style.setProperty(key, value);
-				}
-				else {
-					ref.style[key] = value;
-				}
+				ref.style[key] = value;
 			}
 		});
 	}
@@ -216,7 +192,6 @@ UnsafeHTML.defaultProps = {
 		document,
 		window,
 	},
-	hideFromAccessibilityTree: true,
 	id: '',
 	markup: '',
 	onRender: () => {},
@@ -240,7 +215,3 @@ UnsafeHTML.propTypes = {
 	onRender: PropTypes.func,
 	style: PropTypes.object,
 };
-
-function isCSSVariable(styleName) {
-	return styleName.startsWith('--');
-}

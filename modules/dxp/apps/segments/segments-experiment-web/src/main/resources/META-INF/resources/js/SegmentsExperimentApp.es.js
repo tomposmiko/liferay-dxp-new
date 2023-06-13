@@ -9,81 +9,62 @@
  * distribution rights of the Software.
  */
 
-import {useEventListener} from '@liferay/frontend-js-react-web';
-import {setSessionValue} from 'frontend-js-web';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
-import SegmentsExperimentsMain from './components/SegmentsExperimentsMain.es';
+import SegmentsExperimentsSidebar from './components/SegmentsExperimentsSidebar.es';
+import SegmentsExperimentsContext from './context.es';
+import APIService from './util/APIService.es';
 
-import '../css/main.scss';
-
-const SEGMENTS_EXPERIMENT_CLOSED_PANEL_VALUE = 'closed';
-const SEGMENTS_EXPERIMENT_OPEN_PANEL_VALUE = 'open';
-const SEGMENTS_EXPERIMENT_PANEL_ID =
-	'com.liferay.segments.experiment.web_panelState';
-
-export default function SegmentsExperimentApp({context}) {
-	const [eventTriggered, setEventTriggered] = useState(false);
-
-	const {isPanelStateOpen, namespace, segmentExperimentDataURL} = context;
-
-	const segmentsExperimentPanelToggle = document.getElementById(
-		`${namespace}segmentsExperimentPanelToggleId`
-	);
-
-	useEffect(() => {
-		if (segmentsExperimentPanelToggle) {
-			const sidenavInstance = Liferay.SideNavigation.instance(
-				segmentsExperimentPanelToggle
-			);
-
-			sidenavInstance.on('open.lexicon.sidenav', () => {
-				setSessionValue(
-					SEGMENTS_EXPERIMENT_PANEL_ID,
-					SEGMENTS_EXPERIMENT_OPEN_PANEL_VALUE
-				);
-
-				const segmentsExperimentPanel = document.getElementById(
-					`${namespace}segmentsExperimentPanelId`
-				);
-
-				segmentsExperimentPanel.focus();
-			});
-
-			sidenavInstance.on('closed.lexicon.sidenav', () => {
-				setSessionValue(
-					SEGMENTS_EXPERIMENT_PANEL_ID,
-					SEGMENTS_EXPERIMENT_CLOSED_PANEL_VALUE
-				);
-			});
-
-			Liferay.once('screenLoad', () => {
-				Liferay.SideNavigation.destroy(segmentsExperimentPanelToggle);
-			});
-		}
-	}, [namespace, segmentsExperimentPanelToggle]);
-
-	useEventListener(
-		'mouseenter',
-		() => setEventTriggered(true),
-		{once: true},
-		segmentsExperimentPanelToggle
-	);
-
-	useEventListener(
-		'focus',
-		() => setEventTriggered(true),
-		{once: true},
-		segmentsExperimentPanelToggle
-	);
+export default function ({context, props}) {
+	const {endpoints, imagesPath, page} = context;
+	const {
+		calculateSegmentsExperimentEstimatedDurationURL,
+		createSegmentsExperimentURL,
+		createSegmentsVariantURL,
+		deleteSegmentsExperimentURL,
+		deleteSegmentsVariantURL,
+		editSegmentsExperimentStatusURL,
+		editSegmentsExperimentURL,
+		editSegmentsVariantLayoutURL,
+		editSegmentsVariantURL,
+		runSegmentsExperimentURL,
+	} = endpoints;
 
 	return (
-		<div id={`${namespace}-segments-experiment-root`}>
-			<SegmentsExperimentsMain
-				eventTriggered={eventTriggered}
-				fetchDataURL={segmentExperimentDataURL}
-				isPanelStateOpen={isPanelStateOpen}
+		<SegmentsExperimentsContext.Provider
+			value={{
+				APIService: APIService({
+					contentPageEditorNamespace:
+						context.contentPageEditorNamespace,
+					endpoints: {
+						calculateSegmentsExperimentEstimatedDurationURL,
+						createSegmentsExperimentURL,
+						createSegmentsVariantURL,
+						deleteSegmentsExperimentURL,
+						deleteSegmentsVariantURL,
+						editSegmentsExperimentStatusURL,
+						editSegmentsExperimentURL,
+						editSegmentsVariantURL,
+						runSegmentsExperimentURL,
+					},
+					namespace: context.namespace,
+				}),
+				editVariantLayoutURL: editSegmentsVariantLayoutURL,
+				imagesPath,
+				page,
+			}}
+		>
+			<SegmentsExperimentsSidebar
+				initialExperimentHistory={props.historySegmentsExperiments}
+				initialGoals={props.segmentsExperimentGoals}
+				initialSegmentsExperiences={props.segmentsExperiences}
+				initialSegmentsExperiment={props.segmentsExperiment}
+				initialSegmentsVariants={props.initialSegmentsVariants}
+				initialSelectedSegmentsExperienceId={
+					props.selectedSegmentsExperienceId
+				}
+				winnerSegmentsVariantId={props.winnerSegmentsVariantId}
 			/>
-		</div>
+		</SegmentsExperimentsContext.Provider>
 	);
 }

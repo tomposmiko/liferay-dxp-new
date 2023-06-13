@@ -26,8 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
 
 import org.junit.Assert;
@@ -56,17 +54,8 @@ public class RESTBuilderTest {
 
 		Assert.assertTrue(applicationFile.exists());
 
-		_assertBooleanParameterName(filesPath);
-
 		_assertResourceFilesExist(filesPath, "Document");
 		_assertResourceFilesExist(filesPath, "Folder");
-		_assertResourceFilesExist(filesPath, "Test");
-
-		_assertDTOFile(filesPath, "UnreferencedSchemaComponent");
-
-		_assertPropertiesWithHyphens(
-			filesPath, "Test", "property-with-hyphens");
-		_assertPropertiesWithXML(filesPath, "Test", "xmlProperty");
 
 		_assertForcePredictableOperationId(filesPath);
 
@@ -83,80 +72,18 @@ public class RESTBuilderTest {
 		Assert.assertFalse(sampleImplDir.exists());
 	}
 
-	private void _assertBooleanParameterName(String filesPath)
-		throws Exception {
-
-		File file = new File(
-			filesPath.concat(
-				"/sample-impl/src/main/java/com/example/sample/internal" +
-					"/resource/v1_0_0/BaseTestBooleanResourceImpl.java"));
-
-		String text = new String(
-			Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-
-		Assert.assertTrue(text.contains("Boolean booleanValue"));
-	}
-
-	private void _assertDTOFile(String filesPath, String resourceName) {
-		File file = new File(
-			_getResourcePath(
-				filesPath,
-				"/sample-api/src/main/java/com/example/sample/dto/v1_0_0/",
-				resourceName, ".java"));
-
-		Assert.assertTrue(file.exists());
-	}
-
 	private void _assertForcePredictableOperationId(String filesPath)
 		throws Exception {
 
-		File file = new File(
+		File queryJavaFile = new File(
 			filesPath.concat(
 				"/sample-impl/src/main/java/com/example/sample/internal" +
 					"/graphql/query/v1_0_0/Query.java"));
 
 		String text = new String(
-			Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+			Files.readAllBytes(queryJavaFile.toPath()), StandardCharsets.UTF_8);
 
 		Assert.assertFalse(text.contains("ForcePredictableOperationIdTest"));
-	}
-
-	private void _assertPropertiesWithHyphens(
-			String filesPath, String resourceName, String propertyName)
-		throws Exception {
-
-		File file = new File(
-			_getResourcePath(
-				filesPath,
-				"/sample-api/src/main/java/com/example/sample/dto/v1_0_0/",
-				resourceName, ".java"));
-
-		List<String> lines = Files.readAllLines(file.toPath());
-
-		Assert.assertTrue(
-			_matches(
-				lines,
-				"access = JsonProperty.Access.READ_WRITE, value = \"" +
-					propertyName + "\""));
-
-		Assert.assertTrue(
-			_matches(lines, "sb.append(\"\\\"" + propertyName + "\\\": \");"));
-	}
-
-	private void _assertPropertiesWithXML(
-			String filesPath, String resourceName, String xmlPropertyName)
-		throws Exception {
-
-		File file = new File(
-			_getResourcePath(
-				filesPath,
-				"/sample-api/src/main/java/com/example/sample/dto/v1_0_0/",
-				resourceName, ".java"));
-
-		List<String> lines = Files.readAllLines(file.toPath());
-
-		Assert.assertTrue(
-			_matches(lines, "@XmlElement(name = \"" + xmlPropertyName + "\")"));
 	}
 
 	private void _assertResourceFilesExist(
@@ -188,6 +115,14 @@ public class RESTBuilderTest {
 
 		Assert.assertTrue(propertiesFile.exists());
 
+		File dtoFolderFile = new File(
+			_getResourcePath(
+				filesPath,
+				"/sample-api/src/main/java/com/example/sample/dto/v1_0_0/",
+				resourceName, ".java"));
+
+		Assert.assertTrue(dtoFolderFile.exists());
+
 		File resourceFolderFile = new File(
 			_getResourcePath(
 				filesPath,
@@ -195,8 +130,6 @@ public class RESTBuilderTest {
 				resourceName, "Resource.java"));
 
 		Assert.assertTrue(resourceFolderFile.exists());
-
-		_assertDTOFile(filesPath, resourceName);
 	}
 
 	private String _getDependenciesPath() {
@@ -223,16 +156,6 @@ public class RESTBuilderTest {
 
 		return StringBundler.concat(
 			filesPath, resourcePathPrefix, resourceName, resourcePathSuffix);
-	}
-
-	private boolean _matches(List<String> lines, String text) {
-		for (String line : lines) {
-			if (line.contains(text)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 }

@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS,
 	service = PortletDataHandler.class
 )
@@ -182,8 +183,10 @@ public class SegmentsPortletDataHandler extends BasePortletDataHandler {
 		segmentsEntryExportActionableDynamicQuery.performCount();
 	}
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
 
 	@Reference
 	private PortletDataHandlerHelper _portletDataHandlerHelper;

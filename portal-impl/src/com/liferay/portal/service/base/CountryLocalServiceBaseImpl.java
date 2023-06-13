@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.CountryLocalization;
 import com.liferay.portal.kernel.model.PersistedModel;
@@ -400,11 +398,6 @@ public abstract class CountryLocalServiceBaseImpl
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
-
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement CountryLocalServiceImpl#deleteCountry(Country) to avoid orphaned data");
-		}
 
 		return countryLocalService.deleteCountry((Country)persistedModel);
 	}
@@ -783,9 +776,6 @@ public abstract class CountryLocalServiceBaseImpl
 
 	@BeanReference(type = CountryLocalizationPersistence.class)
 	protected CountryLocalizationPersistence countryLocalizationPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CountryLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

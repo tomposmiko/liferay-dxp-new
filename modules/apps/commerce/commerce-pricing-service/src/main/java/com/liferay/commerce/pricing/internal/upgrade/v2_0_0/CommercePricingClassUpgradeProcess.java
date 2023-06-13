@@ -14,15 +14,15 @@
 
 package com.liferay.commerce.pricing.internal.upgrade.v2_0_0;
 
+import com.liferay.commerce.pricing.internal.upgrade.v1_1_0.util.CommercePricingClassTable;
 import com.liferay.commerce.pricing.model.CommercePricingClass;
+import com.liferay.commerce.pricing.model.impl.CommercePricingClassImpl;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -78,13 +78,12 @@ public class CommercePricingClassUpgradeProcess extends UpgradeProcess {
 					commercePricingClassId, modelPermissions);
 			}
 		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns("CommercePricingClass", "groupId")
-		};
+		if (hasColumn(CommercePricingClassImpl.TABLE_NAME, "groupId")) {
+			alter(
+				CommercePricingClassTable.class,
+				new AlterTableDropColumn("groupId"));
+		}
 	}
 
 	private static final String[] _OWNER_PERMISSIONS = {

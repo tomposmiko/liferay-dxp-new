@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.product.exception.DuplicateCPTaxCategoryExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPTaxCategoryException;
 import com.liferay.commerce.product.model.CPTaxCategory;
 import com.liferay.commerce.product.service.CPTaxCategoryLocalServiceUtil;
@@ -125,12 +124,6 @@ public class CPTaxCategoryPersistenceTest {
 
 		CPTaxCategory newCPTaxCategory = _persistence.create(pk);
 
-		newCPTaxCategory.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCPTaxCategory.setCtCollectionId(RandomTestUtil.nextLong());
-
-		newCPTaxCategory.setUuid(RandomTestUtil.randomString());
-
 		newCPTaxCategory.setExternalReferenceCode(
 			RandomTestUtil.randomString());
 
@@ -153,14 +146,6 @@ public class CPTaxCategoryPersistenceTest {
 		CPTaxCategory existingCPTaxCategory = _persistence.findByPrimaryKey(
 			newCPTaxCategory.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCPTaxCategory.getMvccVersion(),
-			newCPTaxCategory.getMvccVersion());
-		Assert.assertEquals(
-			existingCPTaxCategory.getCtCollectionId(),
-			newCPTaxCategory.getCtCollectionId());
-		Assert.assertEquals(
-			existingCPTaxCategory.getUuid(), newCPTaxCategory.getUuid());
 		Assert.assertEquals(
 			existingCPTaxCategory.getExternalReferenceCode(),
 			newCPTaxCategory.getExternalReferenceCode());
@@ -188,44 +173,6 @@ public class CPTaxCategoryPersistenceTest {
 			newCPTaxCategory.getDescription());
 	}
 
-	@Test(expected = DuplicateCPTaxCategoryExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CPTaxCategory cpTaxCategory = addCPTaxCategory();
-
-		CPTaxCategory newCPTaxCategory = addCPTaxCategory();
-
-		newCPTaxCategory.setCompanyId(cpTaxCategory.getCompanyId());
-
-		newCPTaxCategory = _persistence.update(newCPTaxCategory);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCPTaxCategory);
-
-		newCPTaxCategory.setExternalReferenceCode(
-			cpTaxCategory.getExternalReferenceCode());
-
-		_persistence.update(newCPTaxCategory);
-	}
-
-	@Test
-	public void testCountByUuid() throws Exception {
-		_persistence.countByUuid("");
-
-		_persistence.countByUuid("null");
-
-		_persistence.countByUuid((String)null);
-	}
-
-	@Test
-	public void testCountByUuid_C() throws Exception {
-		_persistence.countByUuid_C("", RandomTestUtil.nextLong());
-
-		_persistence.countByUuid_C("null", 0L);
-
-		_persistence.countByUuid_C((String)null, 0L);
-	}
-
 	@Test
 	public void testCountByCompanyId() throws Exception {
 		_persistence.countByCompanyId(RandomTestUtil.nextLong());
@@ -234,12 +181,12 @@ public class CPTaxCategoryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByERC_C() throws Exception {
-		_persistence.countByERC_C("", RandomTestUtil.nextLong());
+	public void testCountByC_ERC() throws Exception {
+		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByERC_C("null", 0L);
+		_persistence.countByC_ERC(0L, "null");
 
-		_persistence.countByERC_C((String)null, 0L);
+		_persistence.countByC_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -267,8 +214,7 @@ public class CPTaxCategoryPersistenceTest {
 
 	protected OrderByComparator<CPTaxCategory> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CPTaxCategory", "mvccVersion", true, "ctCollectionId", true,
-			"uuid", true, "externalReferenceCode", true, "CPTaxCategoryId",
+			"CPTaxCategory", "externalReferenceCode", true, "CPTaxCategoryId",
 			true, "companyId", true, "userId", true, "userName", true,
 			"createDate", true, "modifiedDate", true, "name", true,
 			"description", true);
@@ -539,27 +485,21 @@ public class CPTaxCategoryPersistenceTest {
 
 	private void _assertOriginalValues(CPTaxCategory cpTaxCategory) {
 		Assert.assertEquals(
-			cpTaxCategory.getExternalReferenceCode(),
-			ReflectionTestUtil.invoke(
-				cpTaxCategory, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "externalReferenceCode"));
-		Assert.assertEquals(
 			Long.valueOf(cpTaxCategory.getCompanyId()),
 			ReflectionTestUtil.<Long>invoke(
 				cpTaxCategory, "getColumnOriginalValue",
 				new Class<?>[] {String.class}, "companyId"));
+		Assert.assertEquals(
+			cpTaxCategory.getExternalReferenceCode(),
+			ReflectionTestUtil.invoke(
+				cpTaxCategory, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "externalReferenceCode"));
 	}
 
 	protected CPTaxCategory addCPTaxCategory() throws Exception {
 		long pk = RandomTestUtil.nextLong();
 
 		CPTaxCategory cpTaxCategory = _persistence.create(pk);
-
-		cpTaxCategory.setMvccVersion(RandomTestUtil.nextLong());
-
-		cpTaxCategory.setCtCollectionId(RandomTestUtil.nextLong());
-
-		cpTaxCategory.setUuid(RandomTestUtil.randomString());
 
 		cpTaxCategory.setExternalReferenceCode(RandomTestUtil.randomString());
 

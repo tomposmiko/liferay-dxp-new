@@ -117,8 +117,4 @@ public interface VersionedEntryVersionModel
 	@Override
 	public VersionedEntryVersion cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

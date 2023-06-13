@@ -15,12 +15,13 @@
 package com.liferay.adaptive.media.blogs.web.fragment.internal.content.transformer;
 
 import com.liferay.adaptive.media.content.transformer.ContentTransformerHandler;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 
-import java.util.function.Supplier;
+import java.util.Iterator;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Alejandro Tardín
@@ -28,22 +29,28 @@ import org.osgi.util.tracker.ServiceTracker;
 public class ContentTransformerUtil {
 
 	public static ContentTransformerHandler getContentTransformerHandler() {
-		return _supplier.get();
+		Iterator<ContentTransformerHandler> iterator =
+			_contentTransformerUtil._contentTransformerHandlers.iterator();
+
+		if (iterator.hasNext()) {
+			return iterator.next();
+		}
+
+		return null;
 	}
 
-	private static final Supplier<ContentTransformerHandler> _supplier;
-
-	static {
+	private ContentTransformerUtil() {
 		Bundle bundle = FrameworkUtil.getBundle(ContentTransformerUtil.class);
 
-		ServiceTracker<ContentTransformerHandler, ContentTransformerHandler>
-			serviceTracker = new ServiceTracker<>(
-				bundle.getBundleContext(), ContentTransformerHandler.class,
-				null);
-
-		serviceTracker.open();
-
-		_supplier = serviceTracker::getService;
+		_contentTransformerHandlers = ServiceTrackerListFactory.open(
+			bundle.getBundleContext(), ContentTransformerHandler.class);
 	}
+
+	private static final ContentTransformerUtil _contentTransformerUtil =
+		new ContentTransformerUtil();
+
+	private final ServiceTrackerList
+		<ContentTransformerHandler, ContentTransformerHandler>
+			_contentTransformerHandlers;
 
 }

@@ -17,7 +17,6 @@ package com.liferay.saml.opensaml.integration.internal.servlet.profile;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.saml.opensaml.integration.internal.BaseSamlTestCase;
 
@@ -45,8 +44,7 @@ public class WebSsoProfileTest extends BaseSamlTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		ReflectionTestUtil.setFieldValue(
-			_webSsoProfileImpl, "samlProviderConfigurationHelper",
+		_webSsoProfileImpl.setSamlProviderConfigurationHelper(
 			samlProviderConfigurationHelper);
 	}
 
@@ -72,7 +70,7 @@ public class WebSsoProfileTest extends BaseSamlTestCase {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 	}
@@ -109,7 +107,7 @@ public class WebSsoProfileTest extends BaseSamlTestCase {
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 	}

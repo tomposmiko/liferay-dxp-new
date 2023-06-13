@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -18,31 +16,29 @@ definition {
 		ACUtils.launchDXP();
 
 		ACUtils.addSiteAndPage();
-
-		ACUtils.createBlogsAndAddToPage();
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			JSONGroup.deleteGroupByName(groupName = "Site Name");
+
+			JSONUser.tearDownNonAdminUsers();
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8293 | Test Summary: Assert 180 Day time period filter in Sites"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test Assert180DayTimePeriodFilterInSites {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8775
@@ -50,7 +46,7 @@ definition {
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("Interation with page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
@@ -60,7 +56,7 @@ definition {
 		task ("AC launch") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset 180 Days time period filter") {
@@ -78,9 +74,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8291 | Test Summary: Assert Sites Activities 180 Days Time Period Filter In Page Table"
-	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertSitesActivities180DaysTimePeriodFilterInPageTable {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8773
@@ -88,7 +84,7 @@ definition {
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("Interation with page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
@@ -98,7 +94,7 @@ definition {
 		task ("AC launch") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset last 180 days period filter") {
@@ -113,14 +109,14 @@ definition {
 		}
 	}
 
-	@description = "Bug: LRAC-10257 | Automation ID: LRAC-10257 | Test Summary: Assert total amount of views in all cards"
-	@priority = 5
-	test AssertTotalAmountOfViewsInAllCards {
-		property analytics.cloud.upstream = "false";
+	@description = "Feature ID: Legacy | Automation ID: LRAC-8282 | Test Summary: Anonymous converts to known"
+	@priority = "4"
+	test CanAnonymousIndividualsConvertsToKnownIndividuals {
+		task ("Connect Analytics Cloud to DXP") {
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
+		}
 
-		ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
-
-		task ("Add a new user in DXP") {
+		task ("Create new user") {
 			JSONUser.addUser(
 				userEmailAddress = "ac@liferay.com",
 				userFirstName = "ac",
@@ -128,92 +124,121 @@ definition {
 				userScreenName = "ac");
 		}
 
-		task ("Sync Contact Data") {
-			ACDXPSettings.syncNewContactData();
-		}
-
-		task ("Login new user and view page") {
+		task ("Login with new user and see Site") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "ac@liferay.com",
 				userLoginFullName = "ac ac");
+
+			Navigator.openURL();
 		}
 
-		task ("Interation with page") {
-			ACUtils.navigateToSitePageWithUser(
-				pageName = "AC Page",
-				siteName = "Site Name");
-
-			TestUtils.hardRefresh();
-
+		task ("Close all sessions and switch to new property in AC and go to Individuals") {
 			ACUtils.closeAllSessionsAndWait();
-		}
 
-		task ("AC launch") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToIndividuals();
 		}
 
-		task ("Asset views for 24 hours") {
-			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, " ");
-
-			ACNavigation.goToSites();
-
-			ACNavigation.switchTab(tabName = "Pages");
-
+		task ("Go to Individuals overview") {
 			ACTimeFilter.clickTimeFilterButton();
 
 			ACTimeFilter.setLast24Hours();
-
-			ACNavigation.openItem(itemName = "AC Page - Site Name - ${dataSourceName}");
 		}
 
-		task ("Assert views by location") {
-			var current = ACSites.getCurrentMetric(metricName = "Views");
+		task ("Hover on the Active Individuals graph and assert the elements that are shown on the tooltip") {
+			Click.mouseDownMouseUp(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART");
 
-			ACCards.viewGeomapTableText(
-				cardTitle = "Views by Location",
-				leftText = "Local Network",
-				rightText = "${current} 100%");
+			for (var current : list "Known-1,Anonymous-1,Total-2") {
+				var visitorsType = StringUtil.extractFirst("${current}","-");
+				var valueVisitors = StringUtil.extractLast("${current}","-");
+
+				AssertElementPresent(
+					key_value = "${valueVisitors}",
+					key_visitors = "${visitorsType}",
+					locator1 = "ACSites#TOOLTIP_UNIQUE_VISITORS");
+			}
 		}
 
-		task ("Assert views by devices metric") {
-			ACAssets.viewTechnologyDeviceViewsAndPercentage(
-				actionValue = "${current} Views",
-				cardTitle = "Views by Technology",
-				deviceName = "Desktop",
-				percentageValue = "100%");
+		task ("Open DXP") {
+			ACUtils.launchDXP();
+		}
+
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
+		}
+
+		task ("Login with new user and see Site") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "ac@liferay.com",
+				userLoginFullName = "ac ac");
+
+			Navigator.openURL();
+		}
+
+		task ("Close all sessions and switch to new property in AC and go to Individuals") {
+			ACUtils.closeAllSessionsAndWait();
+
+			ACUtils.launchAC();
+
+			ACProperties.switchProperty(propertyName = "${propertyName}");
+
+			ACNavigation.goToIndividuals();
+		}
+
+		task ("Go to Individuals overview") {
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
+		}
+
+		task ("Hover on the Active Individuals graph and assert the elements that are shown on the tooltip") {
+			Click.mouseDownMouseUp(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART");
+
+			for (var current : list "Known-2,Anonymous-0,Total-2") {
+				var visitorsType = StringUtil.extractFirst("${current}","-");
+				var valueVisitors = StringUtil.extractLast("${current}","-");
+
+				AssertElementPresent(
+					key_value = "${valueVisitors}",
+					key_visitors = "${visitorsType}",
+					locator1 = "ACSites#TOOLTIP_UNIQUE_VISITORS");
+			}
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8275 | Test Summary: Site Activity Card: Can filter graph by day"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CanFilterActivityCardGraphByDay {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the issue is due to data not appearing on time
 		// AC Refactor ticket: LRAC-8770
 
 		task ("Site and blogs creation and connection with AC") {
+			ACUtils.addSiteAndPage();
+
 			ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
 
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Interation with pages") {
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Test 2",
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			ACUtils.closeAllSessionsAndWait();
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
 		}
 
 		task ("AC launch and go to property menu") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset in the Activity card graph by day filter") {
@@ -231,33 +256,35 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8278 | Test Summary: Site Activity Card: Can filter graph by month"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CanFilterActivityCardGraphByMonth {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the issue is due to data not appearing on time
 		// AC Refactor ticket: LRAC-8772
 
 		task ("Site and blogs creation and connection with AC") {
+			ACUtils.addSiteAndPage();
+
 			ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
 
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Interation with pages") {
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Test 2",
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			ACUtils.closeAllSessionsAndWait();
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
 		}
 
 		task ("AC launch and go to property menu") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset in the Activity card graph by month filter") {
@@ -275,33 +302,35 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8276 | Test Summary: Site Activity Card: Can filter graph by week"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CanFilterActivityCardGraphByWeek {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8771
 
 		task ("Site and blogs creation and connection with AC") {
+			ACUtils.addSiteAndPage();
+
 			ACUtils.createBlogsAndAddToPage(entryTitle = "Test 2");
 
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Interation with pages") {
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Test 2",
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 
-			ACUtils.closeAllSessionsAndWait();
+			BlogsNavigator.gotoPG(entryTitle = "Test 2");
+
+			ACUtils.closeAllSessions();
 		}
 
 		task ("AC launch and go to property menu") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset in the Activity card graph by week filter") {
@@ -319,25 +348,25 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8279 | Test Summary: Site Activity Card: Can hover over a point on the graph to get detailed stats"
-	@priority = 5
+	@priority = "5"
 	test CanHoverOverPointOnGraphGetStats {
-		property analytics.cloud.upstream = "false";
-
 		var usernameList = "ac,liferay";
+
 		var emailList = "ac@liferay.com,liferay@liferay.com";
+
 		var nameList = "ac ac,liferay liferay";
 
 		task ("Connect Analytics Cloud to DXP") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Add two new users") {
-			for (var name : list ${usernameList}) {
+			for (var name : list "${usernameList}") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 			}
 
 			ACDXPSettings.syncNewContactData();
@@ -345,9 +374,7 @@ definition {
 
 		task ("Login with the users and open the site") {
 			ACUtils.navigateToSitePageWithUser(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
-				emailList = ${emailList},
+				emailList = "${emailList}",
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -355,11 +382,7 @@ definition {
 		task ("Access the page as a anonymous user") {
 			User.logoutPG();
 
-			ACUtils.clearLocalStorage();
-
-			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -371,20 +394,32 @@ definition {
 		task ("Launch AC and go to Sites overview") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
+
+			ACTimeFilter.clickTimeFilterButton();
+
+			ACTimeFilter.setLast24Hours();
 		}
 
 		task ("Hover on the unique visitors graph and assert the elements that are shown on the tooltip") {
-			ACSites.viewVisitorsOnGraph(
-				valueVisitorsList = "2,1,3",
-				visitorsTypeList = "Known,Anonymous,Total");
+			Click.mouseDownMouseUp(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART");
+
+			for (var current : list "Known-2,Anonymous-1,Total-3") {
+				var visitorsType = StringUtil.extractFirst("${current}","-");
+				var valueVisitors = StringUtil.extractLast("${current}","-");
+
+				AssertElementPresent(
+					key_value = "${valueVisitors}",
+					key_visitors = "${visitorsType}",
+					locator1 = "ACSites#TOOLTIP_UNIQUE_VISITORS");
+			}
 		}
 	}
 
 	@description = "Bug ID: LRAC-7996 | Automation ID: LRAC-8110 | Test Summary: Assert Sites Activity loads activity data properly when the time filter is set to 'Last 24 hours'"
-	@priority = 5
+	@priority = "5"
 	test CanLoadDataProperlyWhenTimeFilterIsLast24Hours {
 		task ("Connect Analytics Cloud to DXP") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -403,7 +438,7 @@ definition {
 		task ("Launch AC and go to Sites overview") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Set time filter to 24h") {
@@ -422,25 +457,14 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8280 | Test Summary: Anon and known visitors legend shown"
-	@priority = 5
+	@priority = "5"
 	test CanShownAnonAndKnownVisitorsLegend {
 		task ("Connect Analytics Cloud to DXP") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
-		task ("Add a new user") {
-			JSONUser.addUser(
-				userEmailAddress = "ac@liferay.com",
-				userFirstName = "ac",
-				userLastName = "ac",
-				userScreenName = "ac");
-
-			ACDXPSettings.syncNewContactData();
-		}
-
 		task ("Visits the site with known user") {
-			ACUtils.navigateToSitePageWithUser(
-				emailList = "ac@liferay.com",
+			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -460,7 +484,7 @@ definition {
 		task ("Switch to new property in AC and go to Sites") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
 		}
@@ -477,17 +501,19 @@ definition {
 					key_visitorLegend = "${visitor} Visitors",
 					locator1 = "ACIndividualsDashboard#VISITORS_LEGEND");
 
-				ACUtils.assertActiveIndividualChart(
-					timeFilter = "Last 24 hours",
-					visitorLegend = "${visitor} Visitors");
+				MouseOver(
+					key_visitorLegend = "${visitor} Visitors",
+					locator1 = "ACIndividualsDashboard#VISITORS_LEGEND");
+
+				AssertElementPresent(locator1 = "ACIndividualsDashboard#ACTIVE_INDIVIDUAL_CHART");
 			}
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8295 | Test Summary: Assert Sites Activity time filter able to use Custom Range"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CanSitesActivityTimeFilterUseCustomRange {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8776
@@ -495,19 +521,17 @@ definition {
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 		task ("Interation with page") {
-			ACUtils.navigateToSitePage(
+			Navigator.gotoSitePage(
 				pageName = "AC Page",
 				siteName = "Site Name");
-		}
 
-		task ("Close all sessions") {
-			ACUtils.closeAllSessionsAndWait();
+			ACUtils.closeAllSessions();
 		}
 
 		task ("AC launch") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Asset Custom Range time period filter") {
@@ -525,26 +549,29 @@ definition {
 			ACNavigation.switchTab(tabName = "Overview");
 
 			ACTimeFilter.setCustomRange(
-				endDay = ${displayDateDay},
-				endMonth = ${displayDateMonth},
-				endYear = ${displayDateYear},
-				startDay = ${previousDay},
-				startMonth = ${previousMonth},
-				startYear = ${previousYear});
+				endDay = "${displayDateDay}",
+				endMonth = "${displayDateMonth}",
+				endYear = "${displayDateYear}",
+				startDay = "${previousDay}",
+				startMonth = "${previousMonth}",
+				startYear = "${previousYear}");
 
 			ACUtils.assertXAxisTimedGraph(parentName = "${propertyName} Activities");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8290 | Test Summary: Unique Visitors label is shown on the tabs of Pages dashboards"
-	@priority = 3
+	@priority = "3"
 	test CanUniqueVisitorsLabelShowPagesDashboards {
-		property analytics.cloud.upstream = "false";
+		property portal.upstream = "quarantine";
+
+		// AC Refactor: the issue is due to data not appearing on time
+		// AC Refactor ticket: LRAC-8827
 
 		task ("Site and blogs creation and connection with AC") {
 			ACUtils.createBlogsAndAddToPage();
 
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Interation with pages") {
@@ -560,10 +587,13 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to Sites Pages") {
+
+			// Unable to perform the declaration because the data does not appear at the time
+
 			ACNavigation.switchTab(tabName = "Pages");
 
 			ACTimeFilter.clickTimeFilterButton();
@@ -572,13 +602,11 @@ definition {
 		}
 
 		task ("Assert the unique visitors label is shown") {
-			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, " ");
-
-			ACNavigation.openItem(itemName = "Blogs AC Title - Site Name - ${dataSourceName}");
+			ACNavigation.openItem(itemName = "Blogs AC Title");
 
 			ACAssets.viewVisitorsBehaviorMetric(
 				metricTitle = "Unique Visitors",
-				metricValue = 1);
+				metricValue = "1");
 
 			AssertElementPresent(
 				key_visitorsLabel = "Unique Visitors",
@@ -587,12 +615,8 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8288 | Test Summary: Unique Visitors label is shown on the tabs of Sites dashboards"
-	@priority = 3
+	@priority = "3"
 	test CanUniqueVisitorsLabelShowSitesDashboards {
-		task ("Create blog and add to page") {
-			ACUtils.createBlogsAndAddToPage();
-		}
-
 		task ("Add a new user") {
 			JSONUser.addUser(
 				userEmailAddress = "ac@liferay.com",
@@ -602,7 +626,7 @@ definition {
 		}
 
 		task ("Connect Analytics Cloud to DXP") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
 		task ("Login with new user") {
@@ -611,10 +635,8 @@ definition {
 				userLoginFullName = "ac ac");
 		}
 
-		task ("Go to site page and view the blog") {
+		task ("Go to site page") {
 			ACUtils.navigateToSitePage(
-				actionType = "View Blog",
-				documentTitleList = "Blogs AC Title",
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -626,7 +648,7 @@ definition {
 		task ("Switch to new property in AC and go to Sites") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
 		}
@@ -640,8 +662,7 @@ definition {
 		task ("Assert the unique visitors label is shown") {
 			ACAssets.viewVisitorsBehaviorMetric(
 				metricTitle = "Unique Visitors",
-				metricValue = 1,
-				timeFilter = "Last 24 hours");
+				metricValue = "1");
 
 			AssertElementPresent(
 				key_visitorsLabel = "Unique Visitors",
@@ -650,9 +671,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8274 | Test Summary: Site Activity Card: Bounce rate and % change is shown"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ShownBounceRateAndPercentageChangeShown {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Timing issues may happen on this test case
 		// AC Refactor: It is not possible to perform the assert because this test needs data from the past
@@ -677,7 +698,7 @@ definition {
 		task ("Go to AC and assert value and percentage of Site Visitors") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACTimeFilter.clickTimeFilterButton();
 
@@ -685,9 +706,10 @@ definition {
 
 			ACAssets.viewVisitorsBehaviorMetric(
 				metricTitle = "Bounce Rate",
-				metricValue = 1);
+				metricValue = "1");
 
 			// Assert the correct variation(%) shown in this field
+
 			// This test needs a data from a past time frame to generate a % diference, this % is a exemple.
 
 			ACSites.viewActivitiesPercentage(
@@ -697,9 +719,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8273 | Test Summary: Site Activity Card: Session duration and % change is shown"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ShownSessionDurationAndPercentageChangeShown {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Timing issues may happen on this test case
 		// AC Refactor ticket: LRAC-8816
@@ -724,7 +746,7 @@ definition {
 		task ("Switch to new property in AC and go to Sites") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACNavigation.goToSites();
 		}
@@ -741,16 +763,16 @@ definition {
 
 			ACSites.viewActivitiesPercentage(
 				entryName = "Session Duration",
-				valueNumber = ${n});
+				valueNumber = "${n}");
 
 			ACSites.viewActivitiesDuration(date = "05-s");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8272 | Test Summary: Site Activity Card: Total Sessions/Visitor and % change is shown"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ShownTotalSessionsVisitorAndPercentageChangeShown {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Timing issues may happen on this test case
 		// AC Refactor: It is not possible to perform the assert because this test needs data from the past
@@ -758,7 +780,6 @@ definition {
 
 		task ("Connect DXP to AC") {
 			ACUtils.createBlogsAndAddToPage();
-
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 
@@ -775,7 +796,7 @@ definition {
 		task ("Go to AC and assert value and percentage of Site Visitors") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACTimeFilter.clickTimeFilterButton();
 
@@ -783,9 +804,10 @@ definition {
 
 			ACAssets.viewVisitorsBehaviorMetric(
 				metricTitle = "Sessions/Visitor",
-				metricValue = 1);
+				metricValue = "1");
 
 			// Assert the correct variation(%) shown in this field
+
 			// This test needs a data from a past time frame to generate a % diference, this % is a exemple.
 
 			ACSites.viewActivitiesPercentage(
@@ -795,9 +817,9 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8271 | Test Summary: Site Activity Card: Total site visitors and % change is shown"
-	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ShownTotalSiteVisitorsAndPercentageChangeShown {
+		property portal.upstream = "quarantine";
 
 		// AC Refactor: Timing issues may happen on this test case
 		// AC Refactor ticket: LRAC-8932
@@ -822,7 +844,7 @@ definition {
 		task ("Go to AC and assert value and percentage of Site Visitors") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 
 			ACTimeFilter.clickTimeFilterButton();
 
@@ -830,7 +852,7 @@ definition {
 
 			ACAssets.viewVisitorsBehaviorMetric(
 				metricTitle = "Unique Visitors",
-				metricValue = 1);
+				metricValue = "1");
 
 			// Assert the correct variation(%) shown in this field
 

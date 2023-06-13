@@ -74,16 +74,14 @@ public class KBArticleLocalServiceUtil {
 			String externalReferenceCode, long userId,
 			long parentResourceClassNameId, long parentResourcePrimKey,
 			String title, String urlTitle, String content, String description,
-			String[] sections, String sourceURL, java.util.Date expirationDate,
-			java.util.Date reviewDate, String[] selectedFileNames,
+			String sourceURL, String[] sections, String[] selectedFileNames,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addKBArticle(
 			externalReferenceCode, userId, parentResourceClassNameId,
 			parentResourcePrimKey, title, urlTitle, content, description,
-			sections, sourceURL, expirationDate, reviewDate, selectedFileNames,
-			serviceContext);
+			sourceURL, sections, selectedFileNames, serviceContext);
 	}
 
 	public static void addKBArticleResources(
@@ -131,10 +129,6 @@ public class KBArticleLocalServiceUtil {
 
 		getService().addTempAttachment(
 			groupId, userId, fileName, tempFolderName, inputStream, mimeType);
-	}
-
-	public static void checkKBArticles(long companyId) throws PortalException {
-		getService().checkKBArticles(companyId);
 	}
 
 	/**
@@ -311,15 +305,6 @@ public class KBArticleLocalServiceUtil {
 		com.liferay.portal.kernel.dao.orm.Projection projection) {
 
 		return getService().dynamicQueryCount(dynamicQuery, projection);
-	}
-
-	public static KBArticle expireKBArticle(
-			long userId, long resourcePrimKey,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().expireKBArticle(
-			userId, resourcePrimKey, serviceContext);
 	}
 
 	public static KBArticle fetchFirstChildKBArticle(
@@ -762,16 +747,14 @@ public class KBArticleLocalServiceUtil {
 
 	public static KBArticle updateKBArticle(
 			long userId, long resourcePrimKey, String title, String content,
-			String description, String[] sections, String sourceURL,
-			java.util.Date expirationDate, java.util.Date reviewDate,
+			String description, String sourceURL, String[] sections,
 			String[] selectedFileNames, long[] removeFileEntryIds,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateKBArticle(
-			userId, resourcePrimKey, title, content, description, sections,
-			sourceURL, expirationDate, reviewDate, selectedFileNames,
-			removeFileEntryIds, serviceContext);
+			userId, resourcePrimKey, title, content, description, sourceURL,
+			sections, selectedFileNames, removeFileEntryIds, serviceContext);
 	}
 
 	public static void updateKBArticleAsset(

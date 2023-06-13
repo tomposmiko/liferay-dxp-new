@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
@@ -29,19 +28,15 @@ import com.liferay.portal.kernel.exception.CountryA2Exception;
 import com.liferay.portal.kernel.exception.CountryA3Exception;
 import com.liferay.portal.kernel.exception.CountryNameException;
 import com.liferay.portal.kernel.exception.CountryNumberException;
-import com.liferay.portal.kernel.exception.CountryTitleException;
 import com.liferay.portal.kernel.exception.DuplicateCountryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Country;
-import com.liferay.portal.kernel.model.CountryLocalization;
 import com.liferay.portal.kernel.model.CountryLocalizationTable;
 import com.liferay.portal.kernel.model.CountryTable;
-import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.AddressLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.RegionLocalService;
@@ -55,7 +50,6 @@ import com.liferay.portal.service.base.CountryLocalServiceBaseImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -71,7 +65,11 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_validate(0, serviceContext.getCompanyId(), a2, a3, name, number);
+		if (fetchCountryByA2(serviceContext.getCompanyId(), a2) != null) {
+			throw new DuplicateCountryException();
+		}
+
+		validate(a2, a3, idd, name, number);
 
 		long countryId = counterLocalService.increment();
 
@@ -83,12 +81,12 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 		country.setUserId(user.getUserId());
 		country.setUserName(user.getFullName());
 
-		country.setDefaultLanguageId(
-			LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
 		country.setA2(a2);
 		country.setA3(a3);
 		country.setActive(active);
 		country.setBillingAllowed(billingAllowed);
+		country.setDefaultLanguageId(
+			LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
 		country.setGroupFilterEnabled(false);
 		country.setIdd(idd);
 		country.setName(name);
@@ -232,22 +230,21 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 			OrderByComparator<Country> orderByComparator)
 		throws PortalException {
 
-		return BaseModelSearchResult.unsafeCreateWithStartAndEnd(
-			startAndEnd -> countryPersistence.dslQuery(
+		return new BaseModelSearchResult<>(
+			countryPersistence.dslQuery(
 				_getGroupByStep(
 					DSLQueryFactoryUtil.selectDistinct(CountryTable.INSTANCE),
 					companyId, active, keywords
 				).orderBy(
 					CountryTable.INSTANCE, orderByComparator
 				).limit(
-					startAndEnd.getStart(), startAndEnd.getEnd()
+					start, end
 				)),
 			countryPersistence.dslQueryCount(
 				_getGroupByStep(
 					DSLQueryFactoryUtil.countDistinct(
 						CountryTable.INSTANCE.countryId),
-					companyId, active, keywords)),
-			start, end);
+					companyId, active, keywords)));
 	}
 
 	@Override
@@ -270,7 +267,7 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 
 		Country country = countryPersistence.findByPrimaryKey(countryId);
 
-		_validate(countryId, country.getCompanyId(), a2, a3, name, number);
+		validate(a2, a3, idd, name, number);
 
 		country.setA2(a2);
 		country.setA3(a3);
@@ -287,16 +284,6 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 	}
 
 	@Override
-	public List<CountryLocalization> updateCountryLocalizations(
-			Country country, Map<String, String> titleMap)
-		throws PortalException {
-
-		_validateCountryLocalizationTitle(titleMap);
-
-		return super.updateCountryLocalizations(country, titleMap);
-	}
-
-	@Override
 	public Country updateGroupFilterEnabled(
 			long countryId, boolean groupFilterEnabled)
 		throws PortalException {
@@ -308,8 +295,29 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 		return countryPersistence.update(country);
 	}
 
+	protected void validate(
+			String a2, String a3, String idd, String name, String number)
+		throws PortalException {
+
+		if (Validator.isNull(a2) || (a2.length() != 2)) {
+			throw new CountryA2Exception();
+		}
+
+		if (Validator.isNull(a3) || (a3.length() != 3)) {
+			throw new CountryA3Exception();
+		}
+
+		if (Validator.isNull(name)) {
+			throw new CountryNameException();
+		}
+
+		if (Validator.isNull(number)) {
+			throw new CountryNumberException();
+		}
+	}
+
 	private GroupByStep _getGroupByStep(
-			FromStep fromStep, long companyId, Boolean active, String keywords)
+			FromStep fromStep, long companyId, boolean active, String keywords)
 		throws PortalException {
 
 		JoinStep joinStep = fromStep.from(
@@ -321,57 +329,51 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 		);
 
 		return joinStep.where(
-			CountryTable.INSTANCE.companyId.eq(
-				companyId
-			).and(
-				() -> {
-					if (active == null) {
-						return null;
-					}
+			() -> {
+				Predicate predicate = CountryTable.INSTANCE.companyId.eq(
+					companyId);
 
-					return CountryTable.INSTANCE.active.eq(active);
-				}
-			).and(
-				() -> {
-					if (Validator.isNull(keywords)) {
-						return null;
-					}
+				predicate = predicate.and(
+					CountryTable.INSTANCE.active.eq(active));
+
+				if (Validator.isNotNull(keywords)) {
+					String[] terms = CustomSQLUtil.keywords(keywords, true);
 
 					Predicate keywordsPredicate = null;
 
-					for (String keyword :
-							CustomSQLUtil.keywords(keywords, true)) {
+					for (String term : terms) {
+						Predicate namePredicate = DSLFunctionFactoryUtil.lower(
+							CountryTable.INSTANCE.name
+						).like(
+							term
+						);
 
-						for (Column<?, String> column :
-								new Column[] {
-									CountryTable.INSTANCE.a2,
-									CountryTable.INSTANCE.a3,
-									CountryTable.INSTANCE.name,
-									CountryTable.INSTANCE.number,
-									CountryLocalizationTable.INSTANCE.title
-								}) {
+						Predicate titlePredicate = DSLFunctionFactoryUtil.lower(
+							CountryLocalizationTable.INSTANCE.title
+						).like(
+							term
+						);
 
-							keywordsPredicate = Predicate.or(
-								keywordsPredicate,
-								DSLFunctionFactoryUtil.lower(
-									column
-								).like(
-									keyword
-								));
+						Predicate termPredicate = namePredicate.or(
+							titlePredicate);
+
+						if (keywordsPredicate == null) {
+							keywordsPredicate = termPredicate;
+						}
+						else {
+							keywordsPredicate = keywordsPredicate.or(
+								termPredicate);
 						}
 					}
 
-					return Predicate.withParentheses(keywordsPredicate);
+					if (keywordsPredicate != null) {
+						predicate = predicate.and(
+							keywordsPredicate.withParentheses());
+					}
 				}
-			));
-	}
 
-	private boolean _isDuplicateCountry(Country country, long countryId) {
-		if ((country != null) && (country.getCountryId() != countryId)) {
-			return true;
-		}
-
-		return false;
+				return predicate;
+			});
 	}
 
 	private void _updateOrganizations(long countryId) throws PortalException {
@@ -394,82 +396,6 @@ public class CountryLocalServiceImpl extends CountryLocalServiceBaseImpl {
 			});
 
 		actionableDynamicQuery.performActions();
-	}
-
-	private void _validate(
-			long countryId, long companyId, String a2, String a3, String name,
-			String number)
-		throws PortalException {
-
-		if (Validator.isNull(a2)) {
-			throw new CountryA2Exception("Missing A2");
-		}
-
-		if (a2.length() != 2) {
-			throw new CountryA2Exception("A2 must be exactly two characters");
-		}
-
-		if (Validator.isNull(a3)) {
-			throw new CountryA3Exception("Missing A3");
-		}
-
-		if (a3.length() != 3) {
-			throw new CountryA3Exception("A3 must be exactly three characters");
-		}
-
-		if (Validator.isNull(name)) {
-			throw new CountryNameException("Missing name");
-		}
-
-		if (Validator.isNull(number)) {
-			throw new CountryNumberException("Missing number");
-		}
-
-		if (CompanyThreadLocal.isInitializingPortalInstance()) {
-			return;
-		}
-
-		if (_isDuplicateCountry(fetchCountryByA2(companyId, a2), countryId)) {
-			throw new DuplicateCountryException(
-				"A2 belongs to another country");
-		}
-
-		if (_isDuplicateCountry(fetchCountryByA3(companyId, a3), countryId)) {
-			throw new DuplicateCountryException(
-				"A3 belongs to another country");
-		}
-
-		if (_isDuplicateCountry(
-				fetchCountryByName(companyId, name), countryId)) {
-
-			throw new DuplicateCountryException(
-				"Name belongs to another country");
-		}
-
-		if (_isDuplicateCountry(
-				fetchCountryByNumber(companyId, number), countryId)) {
-
-			throw new DuplicateCountryException(
-				"Number belongs to another country");
-		}
-	}
-
-	private void _validateCountryLocalizationTitle(Map<String, String> titleMap)
-		throws CountryTitleException.MustNotExceedMaximumLength {
-
-		int titleMaxLength = ModelHintsUtil.getMaxLength(
-			CountryLocalization.class.getName(), "title");
-
-		for (Map.Entry<String, String> entry : titleMap.entrySet()) {
-			String title = entry.getValue();
-
-			if (Validator.isNull(title) || (title.length() <= titleMaxLength)) {
-				continue;
-			}
-
-			throw new CountryTitleException.MustNotExceedMaximumLength(
-				title, titleMaxLength);
-		}
 	}
 
 	@BeanReference(type = AddressLocalService.class)

@@ -14,29 +14,33 @@
 
 package com.liferay.trash.taglib.internal.servlet;
 
-import com.liferay.osgi.util.service.Snapshot;
-import com.liferay.trash.TrashHelper;
-
 import javax.servlet.ServletContext;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael Bradford
  */
+@Component(immediate = true, service = {})
 public class ServletContextUtil {
 
+	public static String getContextPath() {
+		return _servletContext.getContextPath();
+	}
+
 	public static ServletContext getServletContext() {
-		return _servletContextSnapshot.get();
+		return _servletContext;
 	}
 
-	public static TrashHelper getTrashHelper() {
-		return _trashHelperSnapshot.get();
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.trash.taglib)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
 	}
 
-	private static final Snapshot<ServletContext> _servletContextSnapshot =
-		new Snapshot<>(
-			ServletContextUtil.class, ServletContext.class,
-			"(osgi.web.symbolicname=com.liferay.trash.taglib)");
-	private static final Snapshot<TrashHelper> _trashHelperSnapshot =
-		new Snapshot<>(ServletContextUtil.class, TrashHelper.class);
+	private static ServletContext _servletContext;
 
 }

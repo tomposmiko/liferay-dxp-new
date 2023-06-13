@@ -29,20 +29,6 @@ import java.util.stream.Stream;
  */
 public class StringUtil {
 
-	public static String capitalize(String s) {
-		if ((s == null) || s.isEmpty()) {
-			return "";
-		}
-
-		char firstChar = s.charAt(0);
-
-		if (Character.isLowerCase(firstChar)) {
-			s = Character.toUpperCase(firstChar) + s.substring(1);
-		}
-
-		return s;
-	}
-
 	public static String getDockerSafeName(String name) {
 		Matcher matcher = _camelCasePattern.matcher(name);
 
@@ -85,10 +71,6 @@ public class StringUtil {
 		}
 
 		return new String(buffer, 0, offset, "UTF-8");
-	}
-
-	public static String toAlphaNumericLowerCase(String value) {
-		return toLowerCase(value.replaceAll("[^a-zA-Z0-9]", ""));
 	}
 
 	public static String toLowerCase(String s) {

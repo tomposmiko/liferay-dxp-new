@@ -12,23 +12,14 @@
  * details.
  */
 
-import {useQuery} from 'graphql-hooks';
 import React, {createContext, useEffect, useState} from 'react';
 
-import {
-	client,
-	getSectionsQuery,
-	hasListPermissionsQuery,
-} from './utils/client.es';
+import {client, hasListPermissionsQuery} from './utils/client.es';
 
 const AppContext = createContext({});
 
 const AppContextProvider = ({children, ...context}) => {
 	const [canCreateThread, setCanCreateThread] = useState(false);
-	const {data: {messageBoardSections} = {}} = useQuery(getSectionsQuery, {
-		variables: {siteKey: context.siteKey},
-	});
-	const [questionsVisited, setQuestionsVisited] = useState([]);
 
 	useEffect(() => {
 		client
@@ -50,9 +41,6 @@ const AppContextProvider = ({children, ...context}) => {
 			value={{
 				...context,
 				canCreateThread,
-				questionsVisited,
-				sections: messageBoardSections?.items || [],
-				setQuestionsVisited,
 			}}
 		>
 			{children}

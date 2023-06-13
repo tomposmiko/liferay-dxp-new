@@ -15,7 +15,6 @@
 package com.liferay.portlet.documentlibrary.messaging;
 
 import com.liferay.document.library.kernel.util.RawMetadataProcessorUtil;
-import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
@@ -29,10 +28,6 @@ public class RawMetadataProcessorMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		if (StartupHelperUtil.isUpgrading()) {
-			return;
-		}
-
 		FileVersion fileVersion = (FileVersion)message.getPayload();
 
 		try {

@@ -20,8 +20,6 @@ import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.service.base.CommercePriceListServiceBaseImpl;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.service.CommerceCatalogService;
-import com.liferay.petra.function.transform.TransformUtil;
-import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -31,28 +29,21 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.stream.Stream;
 
 /**
  * @author Alessio Antonio Rendina
  * @author Zoltán Takács
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommercePriceList"
-	},
-	service = AopService.class
-)
 public class CommercePriceListServiceImpl
 	extends CommercePriceListServiceBaseImpl {
 
@@ -121,8 +112,8 @@ public class CommercePriceListServiceImpl
 
 		if (Validator.isNotNull(externalReferenceCode)) {
 			CommercePriceList commercePriceList =
-				commercePriceListPersistence.fetchByERC_C(
-					externalReferenceCode, serviceContext.getCompanyId());
+				commercePriceListPersistence.fetchByC_ERC(
+					serviceContext.getCompanyId(), externalReferenceCode);
 
 			if (commercePriceList != null) {
 				return updateCommercePriceList(
@@ -238,7 +229,14 @@ public class CommercePriceListServiceImpl
 			OrderByComparator<CommercePriceList> orderByComparator)
 		throws PortalException {
 
-		long[] groupIds = _getGroupIds(companyId);
+		List<CommerceCatalog> commerceCatalogs = _commerceCatalogService.search(
+			companyId, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		long[] groupIds = stream.mapToLong(
+			CommerceCatalog::getGroupId
+		).toArray();
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return commercePriceListPersistence.filterFindByG_C_NotS(
@@ -251,28 +249,17 @@ public class CommercePriceListServiceImpl
 	}
 
 	@Override
-	public List<CommercePriceList> getCommercePriceLists(
-			long companyId, String type, int status, int start, int end,
-			OrderByComparator<CommercePriceList> orderByComparator)
-		throws PortalException {
-
-		long[] groupIds = _getGroupIds(companyId);
-
-		if (status == WorkflowConstants.STATUS_ANY) {
-			return commercePriceListPersistence.filterFindByG_C_T_NotS(
-				groupIds, companyId, type, WorkflowConstants.STATUS_IN_TRASH,
-				start, end, orderByComparator);
-		}
-
-		return commercePriceListPersistence.filterFindByG_C_T_S(
-			groupIds, companyId, type, status, start, end, orderByComparator);
-	}
-
-	@Override
 	public int getCommercePriceListsCount(long companyId, int status)
 		throws PortalException {
 
-		long[] groupIds = _getGroupIds(companyId);
+		List<CommerceCatalog> commerceCatalogs = _commerceCatalogService.search(
+			companyId, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		long[] groupIds = stream.mapToLong(
+			CommerceCatalog::getGroupId
+		).toArray();
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return commercePriceListPersistence.filterCountByG_C_NotS(
@@ -307,9 +294,17 @@ public class CommercePriceListServiceImpl
 			Sort sort)
 		throws PortalException {
 
+		List<CommerceCatalog> commerceCatalogs = _commerceCatalogService.search(
+			companyId, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		long[] groupIds = stream.mapToLong(
+			CommerceCatalog::getGroupId
+		).toArray();
+
 		return commercePriceListLocalService.searchCommercePriceLists(
-			companyId, _getGroupIds(companyId), keywords, status, start, end,
-			sort);
+			companyId, groupIds, keywords, status, start, end, sort);
 	}
 
 	@Override
@@ -317,8 +312,17 @@ public class CommercePriceListServiceImpl
 			long companyId, String keywords, int status)
 		throws PortalException {
 
+		List<CommerceCatalog> commerceCatalogs = _commerceCatalogService.search(
+			companyId, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Stream<CommerceCatalog> stream = commerceCatalogs.stream();
+
+		long[] groupIds = stream.mapToLong(
+			CommerceCatalog::getGroupId
+		).toArray();
+
 		return commercePriceListLocalService.searchCommercePriceListsCount(
-			companyId, _getGroupIds(companyId), keywords, status);
+			companyId, groupIds, keywords, status);
 	}
 
 	@Override
@@ -404,23 +408,17 @@ public class CommercePriceListServiceImpl
 			getPermissionChecker(), groupId, actionId);
 	}
 
-	private long[] _getGroupIds(long companyId) throws PortalException {
-		return TransformUtil.transformToLongArray(
-			_commerceCatalogService.search(
-				companyId, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null),
-			CommerceCatalog::getGroupId);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommercePriceListServiceImpl.class);
 
-	@Reference
-	private CommerceCatalogService _commerceCatalogService;
+	private static volatile ModelResourcePermission<CommercePriceList>
+		_commercePriceListModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				CommercePriceListServiceImpl.class,
+				"_commercePriceListModelResourcePermission",
+				CommercePriceList.class);
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.price.list.model.CommercePriceList)"
-	)
-	private ModelResourcePermission<CommercePriceList>
-		_commercePriceListModelResourcePermission;
+	@ServiceReference(type = CommerceCatalogService.class)
+	private CommerceCatalogService _commerceCatalogService;
 
 }

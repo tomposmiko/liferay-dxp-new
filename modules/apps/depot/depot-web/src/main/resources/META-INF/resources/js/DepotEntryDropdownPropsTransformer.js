@@ -12,24 +12,17 @@
  * details.
  */
 
-import {openConfirmModal, openWindow} from 'frontend-js-web';
+import confirmDepotEntryDeletion from './confirmDepotEntryDeletion.es';
 
 const ACTIONS = {
 	deleteDepotEntry(itemData) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'removing-an-asset-library-can-affect-sites-that-use-the-contents-stored-in-it.-are-you-sure-you-want-to-continue-removing-this-asset-library'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					submitForm(document.hrefFm, itemData.deleteDepotEntryURL);
-				}
-			},
-		});
+		if (confirmDepotEntryDeletion()) {
+			submitForm(document.hrefFm, itemData.deleteDepotEntryURL);
+		}
 	},
 
 	openWindow(label, url) {
-		openWindow({
+		Liferay.Util.openWindow({
 			dialog: {
 				destroyOnHide: true,
 				modal: true,

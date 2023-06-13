@@ -15,9 +15,9 @@
 AUI.add(
 	'liferay-search-filter',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const SearchImpl = A.Component.create({
+		var SearchImpl = A.Component.create({
 			AUGMENTS: [A.AutoCompleteBase],
 
 			EXTENDS: A.Base,
@@ -32,7 +32,7 @@ AUI.add(
 			},
 		});
 
-		const SearchFilter = A.Component.create({
+		var SearchFilter = A.Component.create({
 			ATTRS: {
 				minQueryLength: {
 					validator: Lang.isNumber,
@@ -73,20 +73,20 @@ AUI.add(
 
 			prototype: {
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const nodeList = instance.get('nodeList');
+					var nodeList = instance.get('nodeList');
 
 					if (nodeList) {
-						const nodeSelector = instance.get('nodeSelector');
+						var nodeSelector = instance.get('nodeSelector');
 
-						const nodes = nodeList.all(nodeSelector);
+						var nodes = nodeList.all(nodeSelector);
 
-						const searchDataLocator = instance.get(
+						var searchDataLocator = instance.get(
 							'searchDataLocator'
 						);
 
-						const searchData = [];
+						var searchData = [];
 
 						nodes.each((item) => {
 							searchData.push({

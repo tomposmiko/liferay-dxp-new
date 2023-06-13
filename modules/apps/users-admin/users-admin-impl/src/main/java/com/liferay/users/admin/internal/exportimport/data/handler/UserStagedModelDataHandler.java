@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(immediate = true, service = StagedModelDataHandler.class)
 public class UserStagedModelDataHandler
 	extends BaseStagedModelDataHandler<User> {
 
@@ -86,10 +86,17 @@ public class UserStagedModelDataHandler
 		PortletDataContext portletDataContext, User user) {
 	}
 
-	@Reference
-	private GroupLocalService _groupLocalService;
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	private GroupLocalService _groupLocalService;
 	private UserLocalService _userLocalService;
 
 }

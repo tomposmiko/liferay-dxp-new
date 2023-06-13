@@ -69,10 +69,8 @@ export default function Sidebar({
 					})}
 				/>
 			</div>
-
 			<div className="ddm_template_editor__App-sidebar-buttons pt-3">
 				<ClayButtonWithIcon
-					aria-label={Liferay.Language.get('elements')}
 					aria-pressed={PANEL_IDS.elements === selectedSidebarPanelId}
 					borderless
 					className={classNames('mb-2', {
@@ -94,7 +92,6 @@ export default function Sidebar({
 				/>
 
 				<ClayButtonWithIcon
-					aria-label={Liferay.Language.get('properties')}
 					aria-pressed={
 						PANEL_IDS.properties === selectedSidebarPanelId
 					}

@@ -41,26 +41,11 @@ public class LayoutScopesItemSelectorViewDisplayContext
 		HttpServletRequest httpServletRequest,
 		AssetPublisherHelper assetPublisherHelper,
 		GroupItemSelectorCriterion groupItemSelectorCriterion,
-		PortletURL portletURL) {
+		String itemSelectedEventName, PortletURL portletURL) {
 
-		super(httpServletRequest, assetPublisherHelper, portletURL);
-
-		_groupItemSelectorCriterion = groupItemSelectorCriterion;
-	}
-
-	@Override
-	public long getGroupId() {
-		long groupId = super.getGroupId();
-
-		if (groupId <= 0) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			return themeDisplay.getScopeGroupId();
-		}
-
-		return groupId;
+		super(
+			httpServletRequest, assetPublisherHelper,
+			groupItemSelectorCriterion, itemSelectedEventName, portletURL);
 	}
 
 	@Override
@@ -71,17 +56,25 @@ public class LayoutScopesItemSelectorViewDisplayContext
 
 		long groupId = getGroupId();
 
-		GroupSearch groupSearch = new GroupSearch(
-			getPortletRequest(), portletURL);
+		if (groupId <= 0) {
+			groupId = themeDisplay.getScopeGroupId();
+		}
 
-		groupSearch.setResultsAndTotal(
-			() -> _filterLayoutGroups(
-				GroupLocalServiceUtil.getGroups(
-					themeDisplay.getCompanyId(), Layout.class.getName(),
-					groupId, groupSearch.getStart(), groupSearch.getEnd()),
-				_isPrivateLayout()),
-			GroupLocalServiceUtil.getGroupsCount(
-				themeDisplay.getCompanyId(), Layout.class.getName(), groupId));
+		GroupSearch groupSearch = new GroupSearch(
+			getPortletRequest(), getPortletURL());
+
+		int total = GroupLocalServiceUtil.getGroupsCount(
+			themeDisplay.getCompanyId(), Layout.class.getName(), groupId);
+
+		groupSearch.setTotal(total);
+
+		List<Group> groups = GroupLocalServiceUtil.getGroups(
+			themeDisplay.getCompanyId(), Layout.class.getName(), groupId,
+			groupSearch.getStart(), groupSearch.getEnd());
+
+		groups = _filterLayoutGroups(groups, _isPrivateLayout());
+
+		groupSearch.setResults(groups);
 
 		return groupSearch;
 	}
@@ -122,12 +115,14 @@ public class LayoutScopesItemSelectorViewDisplayContext
 			return _privateLayout;
 		}
 
-		_privateLayout = _groupItemSelectorCriterion.isPrivateLayout();
+		GroupItemSelectorCriterion groupItemSelectorCriterion =
+			getGroupItemSelectorCriterion();
+
+		_privateLayout = groupItemSelectorCriterion.isPrivateLayout();
 
 		return _privateLayout;
 	}
 
-	private final GroupItemSelectorCriterion _groupItemSelectorCriterion;
 	private Boolean _privateLayout;
 
 }

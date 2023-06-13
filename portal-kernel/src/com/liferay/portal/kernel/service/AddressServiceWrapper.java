@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import com.liferay.portal.kernel.model.Address;
-
 /**
  * Provides a wrapper for {@link AddressService}.
  *
@@ -26,25 +24,22 @@ import com.liferay.portal.kernel.model.Address;
 public class AddressServiceWrapper
 	implements AddressService, ServiceWrapper<AddressService> {
 
-	public AddressServiceWrapper() {
-		this(null);
-	}
-
 	public AddressServiceWrapper(AddressService addressService) {
 		_addressService = addressService;
 	}
 
 	@Override
-	public Address addAddress(
-			String className, long classPK, String street1, String street2,
-			String street3, String city, String zip, long regionId,
-			long countryId, long listTypeId, boolean mailing, boolean primary,
+	public com.liferay.portal.kernel.model.Address addAddress(
+			java.lang.String className, long classPK, java.lang.String street1,
+			java.lang.String street2, java.lang.String street3,
+			java.lang.String city, java.lang.String zip, long regionId,
+			long countryId, long typeId, boolean mailing, boolean primary,
 			ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _addressService.addAddress(
 			className, classPK, street1, street2, street3, city, zip, regionId,
-			countryId, listTypeId, mailing, primary, serviceContext);
+			countryId, typeId, mailing, primary, serviceContext);
 	}
 
 	@Override
@@ -55,14 +50,15 @@ public class AddressServiceWrapper
 	}
 
 	@Override
-	public Address getAddress(long addressId)
+	public com.liferay.portal.kernel.model.Address getAddress(long addressId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _addressService.getAddress(addressId);
 	}
 
 	@Override
-	public java.util.List<Address> getAddresses(String className, long classPK)
+	public java.util.List<com.liferay.portal.kernel.model.Address> getAddresses(
+			java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _addressService.getAddresses(className, classPK);
@@ -74,20 +70,21 @@ public class AddressServiceWrapper
 	 * @return the OSGi service identifier
 	 */
 	@Override
-	public String getOSGiServiceIdentifier() {
+	public java.lang.String getOSGiServiceIdentifier() {
 		return _addressService.getOSGiServiceIdentifier();
 	}
 
 	@Override
-	public Address updateAddress(
-			long addressId, String street1, String street2, String street3,
-			String city, String zip, long regionId, long countryId,
-			long listTypeId, boolean mailing, boolean primary)
+	public com.liferay.portal.kernel.model.Address updateAddress(
+			long addressId, java.lang.String street1, java.lang.String street2,
+			java.lang.String street3, java.lang.String city,
+			java.lang.String zip, long regionId, long countryId, long typeId,
+			boolean mailing, boolean primary)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _addressService.updateAddress(
 			addressId, street1, street2, street3, city, zip, regionId,
-			countryId, listTypeId, mailing, primary);
+			countryId, typeId, mailing, primary);
 	}
 
 	@Override

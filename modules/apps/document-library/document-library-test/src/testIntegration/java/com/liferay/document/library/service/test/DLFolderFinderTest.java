@@ -77,25 +77,27 @@ public class DLFolderFinderTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId(), TestPropsValues.getUserId());
 
+		long classNameId = PortalUtil.getClassNameId(
+			PortletRepository.class.getName());
+
 		RepositoryLocalServiceUtil.addRepository(
-			TestPropsValues.getUserId(), _group.getGroupId(),
-			PortalUtil.getClassNameId(PortletRepository.class.getName()),
+			TestPropsValues.getUserId(), _group.getGroupId(), classNameId,
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test Repository",
 			StringUtil.randomString(), StringUtil.randomString(),
 			new UnicodeProperties(), false, serviceContext);
 
 		_folder = DLAppLocalServiceUtil.addFolder(
-			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			TestPropsValues.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Folder A",
 			StringPool.BLANK, serviceContext);
 
 		DLAppLocalServiceUtil.addFolder(
-			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), "Folder B", StringPool.BLANK,
 			serviceContext);
 
 		Folder folder = DLAppLocalServiceUtil.addFolder(
-			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			TestPropsValues.getUserId(), _group.getGroupId(),
 			_folder.getFolderId(), "Folder C", StringPool.BLANK,
 			serviceContext);
 

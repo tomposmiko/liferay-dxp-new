@@ -47,13 +47,13 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rachael Koestartyo
  */
-@Component(service = AnalyticsUsersManager.class)
+@Component(immediate = true, service = AnalyticsUsersManager.class)
 public class AnalyticsUsersManager {
 
 	public int getCompanyUsersCount(long companyId) {
 		if (!_isIndexerEnabled()) {
 			int activeUsersCount = _userLocalService.getUsersCount(
-				companyId, WorkflowConstants.STATUS_APPROVED);
+				companyId, false, WorkflowConstants.STATUS_APPROVED);
 
 			int analyticsAdministratorsCount = 0;
 
@@ -210,7 +210,7 @@ public class AnalyticsUsersManager {
 			return hits.getLength();
 		}
 		catch (SearchException searchException) {
-			_log.error(searchException);
+			_log.error(searchException, searchException);
 
 			return 0;
 		}

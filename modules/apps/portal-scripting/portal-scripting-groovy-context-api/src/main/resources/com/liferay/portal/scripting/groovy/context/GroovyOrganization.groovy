@@ -83,7 +83,7 @@ class GroovyOrganization {
 		}
 
 		organization = OrganizationLocalServiceUtil.addOrganization(
-			groovyScriptingContext.guestUserId, parentOrganizationId, name,
+			groovyScriptingContext.defaultUserId, parentOrganizationId, name,
 			type, regionId, countryId,
 			ListTypeConstants.ORGANIZATION_STATUS_DEFAULT, comments, site,
 			groovyScriptingContext.getServiceContext());

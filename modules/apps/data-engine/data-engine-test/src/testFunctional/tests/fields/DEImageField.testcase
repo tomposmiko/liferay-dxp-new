@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68645. This test verifies that is possible to delete the field."
-	@priority = 5
+	@priority = "5"
 	test CanBeDeleted {
 		NavItem.gotoStructures();
 
@@ -55,7 +55,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68645. This test verifies that is possible to duplicate the field."
-	@priority = 4
+	@priority = "4"
 	test CanBeDuplicated {
 		NavItem.gotoStructures();
 
@@ -81,7 +81,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-69272. This test verifies that is possible to clear the uploaded image."
-	@priority = 5
+	@priority = "5"
 	test CanClearImage {
 		NavItem.gotoStructures();
 
@@ -127,7 +127,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-69272. This test verifies that upon uploading a new image, preview is updated."
-	@priority = 4
+	@priority = "4"
 	test CanEditImage {
 		NavItem.gotoStructures();
 
@@ -175,7 +175,7 @@ definition {
 
 		DERenderer.assertDataInImageField(
 			fieldLabel = "Image",
-			imageFile = "",
+			imageFile = "Document_2.jpg",
 			imageTitle = "Document Title 2");
 
 		Button.clickPublish();
@@ -184,12 +184,12 @@ definition {
 
 		DERenderer.assertDataInImageField(
 			fieldLabel = "Image",
-			imageFile = "Document_2",
+			imageFile = "Document_2.jpg",
 			imageTitle = "Document Title 2");
 	}
 
 	@description = "This is a test for LRQA-68645. This test verifies that Label and Help text can be edited."
-	@priority = 5
+	@priority = "5"
 	test CanEditLabelAndHelpText {
 		NavItem.gotoStructures();
 
@@ -226,7 +226,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-69272. This test verifies that is not possible to publish the Web Content with a required field blank."
-	@priority = 4
+	@priority = "4"
 	test CanNotPublishBlankRequiredField {
 		NavItem.gotoStructures();
 
@@ -252,7 +252,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-69272. This test verifies is possible to remove a duplicated field (repeatable)."
-	@priority = 4
+	@priority = "4"
 	test CanRemoveDuplicatedField {
 		NavItem.gotoStructures();
 
@@ -286,11 +286,11 @@ definition {
 
 		DEBuilder.assertFieldNotPresent(
 			fieldLabel = "Image",
-			index = 2);
+			index = "2");
 	}
 
 	@description = "This is a test for LRQA-68645. This test verifies that Default Searchable property is Disable when System Setting is left unchecked."
-	@priority = 3
+	@priority = "3"
 	test CanSetDefaultSearchablePropertyToDisable {
 		property test.name.skip.portal.instance = "DEImageField#CanSetDefaultSearchablePropertyToDisable";
 
@@ -324,7 +324,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68645. This test verifies that Default Searchable property is Text when System Setting is checked."
-	@priority = 3
+	@priority = "3"
 	test CanSetDefaultSearchablePropertyToText {
 		property test.name.skip.portal.instance = "DEImageField#CanSetDefaultSearchablePropertyToText";
 
@@ -358,7 +358,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68645. This test verifies that Label and Help text can be set."
-	@priority = 5
+	@priority = "5"
 	test CanSetLabelAndHelpText {
 		NavItem.gotoStructures();
 
@@ -383,7 +383,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-68645. This test verifies that Label can be shown or hidden."
-	@priority = 3
+	@priority = "3"
 	test CanSetLabelToShownOrHidden {
 		NavItem.gotoStructures();
 
@@ -401,7 +401,7 @@ definition {
 
 		DEBuilder.assertFieldNotPresent(fieldLabel = "Image");
 
-		DataEngine.toggleShowLabel(hiddenFieldLabel = "Image");
+		DataEngine.toggleShowLabel();
 
 		WebContentStructures.saveCP();
 
@@ -413,7 +413,7 @@ definition {
 	}
 
 	@description = "This is a test for LRQA-69272. This test verifies that is possible to upload an image."
-	@priority = 5
+	@priority = "5"
 	test CanUploadImage {
 		NavItem.gotoStructures();
 
@@ -445,7 +445,7 @@ definition {
 
 		DERenderer.assertDataInImageField(
 			fieldLabel = "Image",
-			imageFile = "",
+			imageFile = "Document_1.jpg",
 			imageTitle = "Document Title");
 
 		Button.clickPublish();
@@ -454,12 +454,12 @@ definition {
 
 		DERenderer.assertDataInImageField(
 			fieldLabel = "Image",
-			imageFile = "Document_1",
+			imageFile = "Document_1.jpg",
 			imageTitle = "Document Title");
 	}
 
 	@description = "This is a test for LRQA-69272. This test verifies that upon duplicating a repeatable field, inputted data on both fields persists."
-	@priority = 5
+	@priority = "5"
 	test CanUploadImageOnDuplicatedField {
 		NavItem.gotoStructures();
 
@@ -468,6 +468,12 @@ definition {
 			groupName = "Test Site Name",
 			mimeType = "image/jpeg",
 			sourceFileName = "Document_1.jpg");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentTitle = "Document Title 2",
+			groupName = "Test Site Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
 
 		WebContentStructures.addCP(structureName = "WC Structure Title");
 
@@ -495,10 +501,10 @@ definition {
 
 		DERenderer.inputDataInImageField(
 			fieldLabel = "Image",
-			imageFileName = "Document Title 1",
-			index = 2,
+			imageFileName = "Document Title 2",
+			index = "2",
 			navTab = "Documents and Media",
-			webContentImage = "Document Title 1");
+			webContentImage = "Document Title 2");
 
 		Button.clickPublish();
 
@@ -508,68 +514,13 @@ definition {
 			fieldLabel = "Image",
 			imageFile = "Document_1.jpg",
 			imageTitle = "Document Title 1",
-			index = 1);
+			index = "1");
 
 		DERenderer.assertDataInImageField(
 			fieldLabel = "Image",
-			imageFile = "Document_1.jpg",
-			imageTitle = "Document Title 1",
-			index = 2);
-	}
-
-	@description = "Check if Image Field details can be seen."
-	@priority = 4
-	test ViewImageFieldDetails {
-		property portal.acceptance = "true";
-		property portal.upstream = "true";
-
-		NavItem.gotoStructures();
-
-		WebContentStructures.addCP(structureName = "Image Structure");
-
-		DEBuilder.addField(
-			fieldLabel = "Image",
-			fieldName = "Image");
-
-		DEBuilder.openField(
-			fieldLabel = "Image",
-			index = 1);
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "FormViewBuilder#SIDEBAR_ADVANCED_FIELD_REFERENCE");
-
-		DataEngine.viewFieldSearchable(
-			fieldFieldLabel = "Image",
-			searchableType = "Text");
-
-		DataEngine.assertLocalizableField(fieldFieldLabel = "Image");
-
-		DataEngine.assertShowLabelField(fieldFieldLabel = "Image");
-
-		DataEngine.assertRepeatableField(fieldFieldLabel = "Image");
-
-		WebContentStructures.saveCP();
-
-		WebContentNavigator.gotoEditStructure(structureName = "Image Structure");
-
-		DEBuilder.openField(
-			fieldLabel = "Image",
-			index = 1);
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "FormViewBuilder#SIDEBAR_ADVANCED_FIELD_REFERENCE");
-
-		DataEngine.viewFieldSearchable(
-			fieldFieldLabel = "Image",
-			searchableType = "Text");
-
-		DataEngine.assertLocalizableField(fieldFieldLabel = "Image");
-
-		DataEngine.assertShowLabelField(fieldFieldLabel = "Image");
-
-		DataEngine.assertRepeatableField(fieldFieldLabel = "Image");
+			imageFile = "Document_2.jpg",
+			imageTitle = "Document Title 2",
+			index = "2");
 	}
 
 }

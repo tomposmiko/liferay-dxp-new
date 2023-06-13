@@ -17,18 +17,15 @@ package com.liferay.account.internal.roles.admin.role.type.contributor;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.constants.AccountRoleConstants;
 import com.liferay.account.model.AccountRole;
-import com.liferay.account.service.AccountRoleService;
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.roles.admin.role.type.contributor.RoleTypeContributor;
 
-import java.util.Collections;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
@@ -38,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pei-Jung Lan
  */
 @Component(
-	property = "service.ranking:Integer=500",
+	immediate = true, property = "service.ranking:Integer=500",
 	service = RoleTypeContributor.class
 )
 public class AccountRoleTypeContributor implements RoleTypeContributor {
@@ -111,33 +108,21 @@ public class AccountRoleTypeContributor implements RoleTypeContributor {
 		long companyId, String keywords, int start, int end,
 		OrderByComparator<Role> orderByComparator) {
 
-		try {
-			BaseModelSearchResult<AccountRole>
-				accountRoleBaseModelSearchResult =
-					_accountRoleService.searchAccountRoles(
-						companyId,
-						new long[] {AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT},
-						keywords, null, start, end, orderByComparator);
+		BaseModelSearchResult<AccountRole> accountRoleBaseModelSearchResult =
+			_accountRoleLocalService.searchAccountRoles(
+				companyId,
+				new long[] {AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT},
+				keywords, null, start, end, orderByComparator);
 
-			return new BaseModelSearchResult<>(
-				TransformUtil.transform(
-					accountRoleBaseModelSearchResult.getBaseModels(),
-					AccountRole::getRole),
-				accountRoleBaseModelSearchResult.getLength());
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-
-			return new BaseModelSearchResult<>(
-				Collections.<Role>emptyList(), 0);
-		}
+		return new BaseModelSearchResult<>(
+			TransformUtil.transform(
+				accountRoleBaseModelSearchResult.getBaseModels(),
+				AccountRole::getRole),
+			accountRoleBaseModelSearchResult.getLength());
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountRoleTypeContributor.class);
-
 	@Reference
-	private AccountRoleService _accountRoleService;
+	private AccountRoleLocalService _accountRoleLocalService;
 
 	@Reference
 	private Language _language;

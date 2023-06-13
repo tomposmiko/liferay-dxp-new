@@ -15,10 +15,9 @@
 package com.liferay.portal.workflow.kaleo.metrics.integration.internal.model.listener;
 
 import com.liferay.portal.kernel.model.ModelListener;
-import com.liferay.portal.workflow.kaleo.metrics.integration.internal.helper.IndexerHelper;
+import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.model.KaleoTask;
-import com.liferay.portal.workflow.metrics.model.DeleteNodeRequest;
 import com.liferay.portal.workflow.metrics.search.index.NodeWorkflowMetricsIndexer;
 
 import java.util.Objects;
@@ -29,7 +28,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class KaleoTaskModelListener extends BaseKaleoModelListener<KaleoTask> {
 
 	@Override
@@ -42,24 +41,17 @@ public class KaleoTaskModelListener extends BaseKaleoModelListener<KaleoTask> {
 		}
 
 		_nodeWorkflowMetricsIndexer.addNode(
-			_indexerHelper.createAddNodeRequest(
-				kaleoDefinitionVersion, kaleoTask));
+			kaleoTask.getCompanyId(), kaleoTask.getCreateDate(), false,
+			kaleoTask.getModifiedDate(), kaleoTask.getName(),
+			kaleoTask.getKaleoTaskId(), kaleoTask.getKaleoDefinitionId(),
+			kaleoDefinitionVersion.getVersion(), false, NodeType.TASK.name());
 	}
 
 	@Override
 	public void onAfterRemove(KaleoTask kaleoTask) {
-		DeleteNodeRequest.Builder builder = new DeleteNodeRequest.Builder();
-
 		_nodeWorkflowMetricsIndexer.deleteNode(
-			builder.companyId(
-				kaleoTask.getCompanyId()
-			).nodeId(
-				kaleoTask.getKaleoTaskId()
-			).build());
+			kaleoTask.getCompanyId(), kaleoTask.getKaleoTaskId());
 	}
-
-	@Reference
-	private IndexerHelper _indexerHelper;
 
 	@Reference
 	private NodeWorkflowMetricsIndexer _nodeWorkflowMetricsIndexer;

@@ -20,13 +20,12 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * @author David Arques
@@ -109,13 +108,15 @@ public class CountrySearchKeywords {
 			return JSONFactoryUtil.createJSONArray();
 		}
 
-		return JSONUtil.toJSONArray(
-			ListUtil.subList(_searchKeywords, 0, 5),
-			SearchKeyword::toJSONObject, _log);
-	}
+		Stream<SearchKeyword> stream = _searchKeywords.stream();
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CountrySearchKeywords.class.getName());
+		return JSONUtil.putAll(
+			stream.map(
+				SearchKeyword::toJSONObject
+			).limit(
+				5
+			).toArray());
+	}
 
 	private String _countryCode;
 	private List<SearchKeyword> _searchKeywords;

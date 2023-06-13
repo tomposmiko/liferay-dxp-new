@@ -18,10 +18,8 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LocalizedModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedAuditedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 import java.util.Locale;
@@ -42,8 +40,8 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommercePricingClassModel
-	extends BaseModel<CommercePricingClass>, CTModel<CommercePricingClass>,
-			LocalizedModel, MVCCModel, ShardedModel, StagedAuditedModel {
+	extends BaseModel<CommercePricingClass>, LocalizedModel, ShardedModel,
+			StagedAuditedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -56,7 +54,6 @@ public interface CommercePricingClassModel
 	 *
 	 * @return the primary key of this commerce pricing class
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -64,40 +61,7 @@ public interface CommercePricingClassModel
 	 *
 	 * @param primaryKey the primary key of this commerce pricing class
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this commerce pricing class.
-	 *
-	 * @return the mvcc version of this commerce pricing class
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this commerce pricing class.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce pricing class
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this commerce pricing class.
-	 *
-	 * @return the ct collection ID of this commerce pricing class
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this commerce pricing class.
-	 *
-	 * @param ctCollectionId the ct collection ID of this commerce pricing class
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this commerce pricing class.
@@ -471,9 +435,5 @@ public interface CommercePricingClassModel
 
 	@Override
 	public CommercePricingClass cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

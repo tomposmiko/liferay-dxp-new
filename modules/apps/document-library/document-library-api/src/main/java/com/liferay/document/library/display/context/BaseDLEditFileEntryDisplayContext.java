@@ -16,13 +16,12 @@ package com.liferay.document.library.display.context;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 
-import java.util.Locale;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,25 +73,8 @@ public class BaseDLEditFileEntryDisplayContext
 	}
 
 	@Override
-	public DDMFormValues getDDMFormValues(
-			DDMStructure ddmStructure, long fileVersionId)
-		throws PortalException {
-
-		return parentDisplayContext.getDDMFormValues(
-			ddmStructure, fileVersionId);
-	}
-
-	@Override
 	public DDMFormValues getDDMFormValues(long classPK) throws PortalException {
 		return parentDisplayContext.getDDMFormValues(classPK);
-	}
-
-	@Override
-	public String getDLFileEntryTypeLanguageId(
-		DDMStructure ddmStructure, Locale locale) {
-
-		return parentDisplayContext.getDLFileEntryTypeLanguageId(
-			ddmStructure, locale);
 	}
 
 	@Override
@@ -100,11 +82,6 @@ public class BaseDLEditFileEntryDisplayContext
 		throws PortalException {
 
 		return parentDisplayContext.getDLFilePicker(onFilePickCallback);
-	}
-
-	@Override
-	public String getFriendlyURLBase() throws PortalException {
-		return parentDisplayContext.getFriendlyURLBase();
 	}
 
 	@Override

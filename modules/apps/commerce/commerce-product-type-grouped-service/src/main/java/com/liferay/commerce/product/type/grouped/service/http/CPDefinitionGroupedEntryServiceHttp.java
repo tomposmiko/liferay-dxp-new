@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Andrea Di Giorgi
+ * @see CPDefinitionGroupedEntryServiceSoap
  * @generated
  */
 public class CPDefinitionGroupedEntryServiceHttp {
@@ -92,54 +93,6 @@ public class CPDefinitionGroupedEntryServiceHttp {
 
 	public static
 		com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry
-				addCPDefinitionGroupedEntry(
-					HttpPrincipal httpPrincipal, long cpDefinitionId,
-					long entryCProductId, double priority, int quantity,
-					com.liferay.portal.kernel.service.ServiceContext
-						serviceContext)
-			throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				CPDefinitionGroupedEntryServiceUtil.class,
-				"addCPDefinitionGroupedEntry",
-				_addCPDefinitionGroupedEntryParameterTypes1);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, cpDefinitionId, entryCProductId, priority, quantity,
-				serviceContext);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return (com.liferay.commerce.product.type.grouped.model.
-				CPDefinitionGroupedEntry)returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static
-		com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry
 				deleteCPDefinitionGroupedEntry(
 					HttpPrincipal httpPrincipal,
 					long cpDefinitionGroupedEntryId)
@@ -149,7 +102,7 @@ public class CPDefinitionGroupedEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				CPDefinitionGroupedEntryServiceUtil.class,
 				"deleteCPDefinitionGroupedEntry",
-				_deleteCPDefinitionGroupedEntryParameterTypes2);
+				_deleteCPDefinitionGroupedEntryParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpDefinitionGroupedEntryId);
@@ -197,7 +150,7 @@ public class CPDefinitionGroupedEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				CPDefinitionGroupedEntryServiceUtil.class,
 				"getCPDefinitionGroupedEntries",
-				_getCPDefinitionGroupedEntriesParameterTypes3);
+				_getCPDefinitionGroupedEntriesParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpDefinitionId, start, end, orderByComparator);
@@ -240,7 +193,7 @@ public class CPDefinitionGroupedEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				CPDefinitionGroupedEntryServiceUtil.class,
 				"getCPDefinitionGroupedEntriesCount",
-				_getCPDefinitionGroupedEntriesCountParameterTypes4);
+				_getCPDefinitionGroupedEntriesCountParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpDefinitionId);
@@ -284,7 +237,7 @@ public class CPDefinitionGroupedEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				CPDefinitionGroupedEntryServiceUtil.class,
 				"getCPDefinitionGroupedEntry",
-				_getCPDefinitionGroupedEntryParameterTypes5);
+				_getCPDefinitionGroupedEntryParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpDefinitionGroupedEntryId);
@@ -318,97 +271,6 @@ public class CPDefinitionGroupedEntryServiceHttp {
 		}
 	}
 
-	public static java.util.List
-		<com.liferay.commerce.product.type.grouped.model.
-			CPDefinitionGroupedEntry>
-					getEntryCProductCPDefinitionGroupedEntries(
-						HttpPrincipal httpPrincipal, long entryCProductId,
-						int start, int end,
-						com.liferay.portal.kernel.util.OrderByComparator
-							<com.liferay.commerce.product.type.grouped.model.
-								CPDefinitionGroupedEntry> orderByComparator)
-				throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				CPDefinitionGroupedEntryServiceUtil.class,
-				"getEntryCProductCPDefinitionGroupedEntries",
-				_getEntryCProductCPDefinitionGroupedEntriesParameterTypes6);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, entryCProductId, start, end, orderByComparator);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return (java.util.List
-				<com.liferay.commerce.product.type.grouped.model.
-					CPDefinitionGroupedEntry>)returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static int getEntryCProductCPDefinitionGroupedEntriesCount(
-			HttpPrincipal httpPrincipal, long entryCProductId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				CPDefinitionGroupedEntryServiceUtil.class,
-				"getEntryCProductCPDefinitionGroupedEntriesCount",
-				_getEntryCProductCPDefinitionGroupedEntriesCountParameterTypes7);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, entryCProductId);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return ((Integer)returnObj).intValue();
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
 	public static
 		com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry
 				updateCPDefinitionGroupedEntry(
@@ -421,7 +283,7 @@ public class CPDefinitionGroupedEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				CPDefinitionGroupedEntryServiceUtil.class,
 				"updateCPDefinitionGroupedEntry",
-				_updateCPDefinitionGroupedEntryParameterTypes8);
+				_updateCPDefinitionGroupedEntryParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, cpDefinitionGroupedEntryId, priority, quantity);
@@ -464,36 +326,22 @@ public class CPDefinitionGroupedEntryServiceHttp {
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[]
-		_addCPDefinitionGroupedEntryParameterTypes1 = new Class[] {
-			long.class, long.class, double.class, int.class,
-			com.liferay.portal.kernel.service.ServiceContext.class
-		};
-	private static final Class<?>[]
-		_deleteCPDefinitionGroupedEntryParameterTypes2 = new Class[] {
+		_deleteCPDefinitionGroupedEntryParameterTypes1 = new Class[] {
 			long.class
 		};
 	private static final Class<?>[]
-		_getCPDefinitionGroupedEntriesParameterTypes3 = new Class[] {
+		_getCPDefinitionGroupedEntriesParameterTypes2 = new Class[] {
 			long.class, int.class, int.class,
 			com.liferay.portal.kernel.util.OrderByComparator.class
 		};
 	private static final Class<?>[]
-		_getCPDefinitionGroupedEntriesCountParameterTypes4 = new Class[] {
+		_getCPDefinitionGroupedEntriesCountParameterTypes3 = new Class[] {
 			long.class
 		};
 	private static final Class<?>[]
-		_getCPDefinitionGroupedEntryParameterTypes5 = new Class[] {long.class};
+		_getCPDefinitionGroupedEntryParameterTypes4 = new Class[] {long.class};
 	private static final Class<?>[]
-		_getEntryCProductCPDefinitionGroupedEntriesParameterTypes6 =
-			new Class[] {
-				long.class, int.class, int.class,
-				com.liferay.portal.kernel.util.OrderByComparator.class
-			};
-	private static final Class<?>[]
-		_getEntryCProductCPDefinitionGroupedEntriesCountParameterTypes7 =
-			new Class[] {long.class};
-	private static final Class<?>[]
-		_updateCPDefinitionGroupedEntryParameterTypes8 = new Class[] {
+		_updateCPDefinitionGroupedEntryParameterTypes5 = new Class[] {
 			long.class, double.class, int.class
 		};
 

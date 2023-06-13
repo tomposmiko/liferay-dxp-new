@@ -13,7 +13,6 @@
  */
 
 import {ClayPaginationWithBasicItems} from '@clayui/pagination';
-import {sub} from 'frontend-js-web';
 import React, {useState} from 'react';
 
 import {OriginalDocumentTag} from '../original-document-tag/OriginalDocumentTag';
@@ -56,7 +55,7 @@ const DocumentPreview = ({fileEntry}) => {
 
 	return (
 		<UnavailablePreview
-			description={sub(
+			description={Liferay.Util.sub(
 				Liferay.Language.get('the-document-x-does-not-have-a-preview'),
 				fileEntry.title
 			)}
@@ -80,14 +79,14 @@ const DocumentPreviewerWrapper = ({fileEntries = []}) => {
 
 			<div className="align-items-center d-flex flex-column justify-content-center">
 				<ClayPaginationWithBasicItems
-					active={documentPage}
+					activePage={documentPage}
 					ellipsisBuffer={2}
-					onActiveChange={setDocumentPage}
+					onPageChange={setDocumentPage}
 					totalPages={fileEntries.length}
 				/>
 
 				<span>
-					{sub(
+					{Liferay.Util.sub(
 						Liferay.Language.get('document-x-of-x'),
 						documentPage,
 						fileEntries.length

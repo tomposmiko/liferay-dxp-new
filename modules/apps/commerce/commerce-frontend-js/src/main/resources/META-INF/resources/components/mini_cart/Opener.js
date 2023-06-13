@@ -20,9 +20,12 @@ import React, {useContext, useEffect, useState} from 'react';
 import MiniCartContext from './MiniCartContext';
 
 function Opener() {
-	const {cartState, displayTotalItemsQuantity, openCart} = useContext(
-		MiniCartContext
-	);
+	const {
+		cartState,
+		displayTotalItemsQuantity,
+		openCart,
+		spritemap,
+	} = useContext(MiniCartContext);
 
 	const {cartItems = [], summary = {}} = cartState;
 	const {itemsQuantity: initialItemsQuantity} = summary;
@@ -31,6 +34,8 @@ function Opener() {
 
 	useEffect(() => {
 		setNumberOfItems(initialItemsQuantity);
+
+		return () => {};
 	}, [initialItemsQuantity, setNumberOfItems]);
 
 	useEffect(() => {
@@ -50,7 +55,7 @@ function Opener() {
 			data-badge-count={numberOfItems}
 			onClick={openCart}
 		>
-			<ClayIcon symbol="shopping-cart" />
+			<ClayIcon spritemap={spritemap} symbol="shopping-cart" />
 		</button>
 	);
 }

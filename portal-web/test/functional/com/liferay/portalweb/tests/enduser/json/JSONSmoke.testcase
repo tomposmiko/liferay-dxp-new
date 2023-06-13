@@ -3,7 +3,7 @@ definition {
 
 	property portal.release = "true";
 	property portal.upstream = "true";
-	property testray.main.component.name = "Page Administration";
+	property testray.main.component.name = "Site Pages Administration";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -22,22 +22,17 @@ definition {
 		}
 	}
 
-	@priority = 3
+	@priority = "5"
 	test RunAllJSONMacros {
+		property portal.acceptance = "true";
+
 		JSONAssetlistTest.runSmoke(groupName = "Test Site Name");
-
 		JSONCategoryTest.runSmoke(groupName = "Test Site Name");
-
 		JSONFragmentTest.runSmoke(groupName = "Test Site Name");
-
 		JSONGroupTest.runSmoke();
-
 		JSONWebcontentTest.runSmoke(groupName = "Test Site Name");
-
 		JSONLayoutTest.runSmoke(groupName = "Test Site Name");
-
 		JSONOrganizationTest.runSmoke();
-
 		JSONRoleTest.runSmoke();
 	}
 

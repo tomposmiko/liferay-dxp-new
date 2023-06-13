@@ -36,37 +36,30 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 
 import java.math.BigDecimal;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Andrea Sbarra
- * @author Alessio Antonio Rendina
  */
 @RunWith(Arquillian.class)
 public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_serviceContext = ServiceContextTestUtil.getServiceContext(
-			testGroup.getGroupId());
-
-		_user = UserLocalServiceUtil.getUser(_serviceContext.getUserId());
+		_user = UserTestUtil.addUser(testCompany);
 
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(_user));
@@ -92,6 +85,10 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 
 		CPInstanceLocalServiceUtil.updateCPInstance(_cpInstance);
 
+		_serviceContext = ServiceContextTestUtil.getServiceContext(
+			testCompany.getCompanyId(), testGroup.getGroupId(),
+			_user.getUserId());
+
 		_commerceInventoryWarehouse =
 			CommerceInventoryTestUtil.addCommerceInventoryWarehouse(
 				_serviceContext);
@@ -106,39 +103,7 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 
 		_commerceShipment =
 			CommerceShipmentLocalServiceUtil.addCommerceShipment(
-				RandomTestUtil.randomString(), _commerceOrder.getGroupId(),
-				_commerceOrder.getCommerceAccountId(),
-				_commerceOrder.getShippingAddressId(),
-				_commerceOrder.getCommerceShippingMethodId(),
-				_commerceOrder.getShippingOptionName(), _serviceContext);
-	}
-
-	@Override
-	@Test
-	public void testPatchShipmentItemByExternalReferenceCode()
-		throws Exception {
-
-		String externalReferenceCode = RandomTestUtil.randomString();
-
-		ShipmentItem shipmentItem = _addShipmentItem(
-			externalReferenceCode, randomShipmentItem());
-
-		int quantity = shipmentItem.getQuantity() - 1;
-
-		shipmentItem.setQuantity(quantity);
-
-		ShipmentItem newShipmentItem =
-			shipmentItemResource.patchShipmentItemByExternalReferenceCode(
-				externalReferenceCode, shipmentItem);
-
-		Assert.assertEquals(
-			String.valueOf(quantity),
-			String.valueOf(newShipmentItem.getQuantity()));
-	}
-
-	@Override
-	@Test
-	public void testPutShipmentByExternalReferenceCodeItem() throws Exception {
+				_commerceOrder.getCommerceOrderId(), _serviceContext);
 	}
 
 	@Override
@@ -151,16 +116,14 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 		CommerceOrderItem commerceOrderItem =
 			CommerceTestUtil.addCommerceOrderItem(
 				_commerceOrder.getCommerceOrderId(),
-				_cpInstance.getCPInstanceId(), 5);
+				_cpInstance.getCPInstanceId(), 1);
 
 		return new ShipmentItem() {
 			{
 				createDate = RandomTestUtil.nextDate();
-				externalReferenceCode = RandomTestUtil.randomString();
 				modifiedDate = RandomTestUtil.nextDate();
 				orderItemId = commerceOrderItem.getCommerceOrderItemId();
 				quantity = commerceOrderItem.getQuantity();
-				shipmentId = _commerceShipment.getCommerceShipmentId();
 				userName = commerceOrderItem.getUserName();
 				warehouseId =
 					_commerceInventoryWarehouse.
@@ -177,40 +140,6 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 	}
 
 	@Override
-	protected ShipmentItem
-			testDeleteShipmentItemByExternalReferenceCode_addShipmentItem()
-		throws Exception {
-
-		return _addShipmentItem();
-	}
-
-	@Override
-	protected ShipmentItem
-			testGetShipmentByExternalReferenceCodeItem_addShipmentItem()
-		throws Exception {
-
-		return _addShipmentItem();
-	}
-
-	@Override
-	protected ShipmentItem
-			testGetShipmentByExternalReferenceCodeItemsPage_addShipmentItem(
-				String externalReferenceCode, ShipmentItem shipmentItem)
-		throws Exception {
-
-		return _addShipmentItem(
-			shipmentItem.getExternalReferenceCode(), shipmentItem);
-	}
-
-	@Override
-	protected String
-			testGetShipmentByExternalReferenceCodeItemsPage_getExternalReferenceCode()
-		throws Exception {
-
-		return _commerceShipment.getExternalReferenceCode();
-	}
-
-	@Override
 	protected ShipmentItem testGetShipmentItem_addShipmentItem()
 		throws Exception {
 
@@ -222,9 +151,7 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 			Long shipmentId, ShipmentItem shipmentItem)
 		throws Exception {
 
-		return _addShipmentItem(
-			RandomTestUtil.randomString(), shipmentId,
-			shipmentItem.getOrderItemId());
+		return _addShipmentItem(shipmentId, shipmentItem.getOrderItemId());
 	}
 
 	@Override
@@ -251,52 +178,40 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 			ShipmentItem shipmentItem)
 		throws Exception {
 
-		return _addShipmentItem(
-			shipmentItem.getExternalReferenceCode(), shipmentItem);
-	}
-
-	@Override
-	protected ShipmentItem
-			testPutShipmentByExternalReferenceCodeItem_addShipmentItem()
-		throws Exception {
-
-		return _addShipmentItem();
+		return _addShipmentItem(shipmentItem);
 	}
 
 	private ShipmentItem _addShipmentItem() throws Exception {
 		CommerceOrderItem commerceOrderItem =
 			CommerceTestUtil.addCommerceOrderItem(
 				_commerceOrder.getCommerceOrderId(),
-				_cpInstance.getCPInstanceId(), 5);
+				_cpInstance.getCPInstanceId(), 1);
 
 		return _addShipmentItem(
-			RandomTestUtil.randomString(),
 			_commerceShipment.getCommerceShipmentId(),
 			commerceOrderItem.getCommerceOrderItemId());
 	}
 
 	private ShipmentItem _addShipmentItem(
-			String externalReferenceCode, long commerceShipmentId,
-			long commerceOrderItemId)
+			long shipmentId, long commerceOrderItemId)
 		throws Exception {
 
 		_commerceShipmentItem =
 			CommerceShipmentItemLocalServiceUtil.addCommerceShipmentItem(
-				externalReferenceCode, commerceShipmentId, commerceOrderItemId,
+				shipmentId, commerceOrderItemId,
 				_commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				5, true, _serviceContext);
+				1, _serviceContext);
 
 		_commerceShipmentItems.add(_commerceShipmentItem);
 
 		return _toShipmentItem(_commerceShipmentItem);
 	}
 
-	private ShipmentItem _addShipmentItem(
-			String externalReferenceCode, ShipmentItem shipmentItem)
+	private ShipmentItem _addShipmentItem(ShipmentItem shipmentItem)
 		throws Exception {
 
 		return _addShipmentItem(
-			externalReferenceCode, shipmentItem.getShipmentId(),
+			_commerceShipment.getCommerceShipmentId(),
 			shipmentItem.getOrderItemId());
 	}
 
@@ -306,8 +221,6 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 		return new ShipmentItem() {
 			{
 				createDate = commerceShipmentItem.getCreateDate();
-				externalReferenceCode =
-					commerceShipmentItem.getExternalReferenceCode();
 				id = commerceShipmentItem.getCommerceShipmentItemId();
 				modifiedDate = commerceShipmentItem.getModifiedDate();
 				orderItemId = commerceShipmentItem.getCommerceOrderItemId();
@@ -346,6 +259,8 @@ public class ShipmentItemResourceTest extends BaseShipmentItemResourceTestCase {
 	private CPInstance _cpInstance;
 
 	private ServiceContext _serviceContext;
+
+	@DeleteAfterTestRun
 	private User _user;
 
 }

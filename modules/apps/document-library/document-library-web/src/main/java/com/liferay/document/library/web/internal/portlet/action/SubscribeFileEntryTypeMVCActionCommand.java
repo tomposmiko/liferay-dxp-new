@@ -17,6 +17,7 @@ package com.liferay.document.library.web.internal.portlet.action;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryTypeException;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.dynamic.data.mapping.kernel.NoSuchStructureException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -83,7 +84,9 @@ public class SubscribeFileEntryTypeMVCActionCommand
 				}
 			}
 		}
-		catch (NoSuchFileEntryTypeException | PrincipalException exception) {
+		catch (NoSuchFileEntryTypeException | NoSuchStructureException |
+			   PrincipalException exception) {
+
 			SessionErrors.add(actionRequest, exception.getClass());
 
 			actionResponse.setRenderParameter(

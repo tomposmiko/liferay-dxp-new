@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.CompanyInfo;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -325,9 +326,14 @@ public class CompanyInfoUtil {
 	}
 
 	public static CompanyInfoPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (CompanyInfoPersistence)PortalBeanLocatorUtil.locate(
+				CompanyInfoPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile CompanyInfoPersistence _persistence;
+	private static CompanyInfoPersistence _persistence;
 
 }

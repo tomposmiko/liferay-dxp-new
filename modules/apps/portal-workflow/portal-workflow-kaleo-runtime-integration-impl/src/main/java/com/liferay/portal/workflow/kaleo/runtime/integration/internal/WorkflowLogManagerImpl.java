@@ -32,7 +32,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = WorkflowLogManager.class)
+@Component(
+	immediate = true, property = "proxy.bean=false",
+	service = WorkflowLogManager.class
+)
 public class WorkflowLogManagerImpl implements WorkflowLogManager {
 
 	@Override
@@ -78,7 +81,7 @@ public class WorkflowLogManagerImpl implements WorkflowLogManager {
 					KaleoLogOrderByComparator.getOrderByComparator(
 						orderByComparator, _kaleoWorkflowModelConverter));
 
-			return _toWorkflowLogs(kaleoLogs);
+			return toWorkflowLogs(kaleoLogs);
 		}
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
@@ -99,19 +102,21 @@ public class WorkflowLogManagerImpl implements WorkflowLogManager {
 					KaleoLogOrderByComparator.getOrderByComparator(
 						orderByComparator, _kaleoWorkflowModelConverter));
 
-			return _toWorkflowLogs(kaleoLogs);
+			return toWorkflowLogs(kaleoLogs);
 		}
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
 		}
 	}
 
-	private List<WorkflowLog> _toWorkflowLogs(List<KaleoLog> kaleoLogs) {
+	protected List<WorkflowLog> toWorkflowLogs(List<KaleoLog> kaleoLogs) {
 		List<WorkflowLog> workflowLogs = new ArrayList<>(kaleoLogs.size());
 
 		for (KaleoLog kaleoLog : kaleoLogs) {
-			workflowLogs.add(
-				_kaleoWorkflowModelConverter.toWorkflowLog(kaleoLog));
+			WorkflowLog workflowLog =
+				_kaleoWorkflowModelConverter.toWorkflowLog(kaleoLog);
+
+			workflowLogs.add(workflowLog);
 		}
 
 		return workflowLogs;

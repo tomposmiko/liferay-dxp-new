@@ -30,20 +30,17 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Riccardo Alberti
  */
-@Component(service = CommerceDiscountRelFinder.class)
 public class CommerceDiscountRelFinderImpl
 	extends CommerceDiscountRelFinderBaseImpl
 	implements CommerceDiscountRelFinder {
@@ -121,7 +118,8 @@ public class CommerceDiscountRelFinderImpl
 			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
 			queryPos.add(commerceDiscountId);
-			queryPos.add(_portal.getClassNameId(AssetCategory.class.getName()));
+			queryPos.add(
+				PortalUtil.getClassNameId(AssetCategory.class.getName()));
 
 			if (Validator.isNotNull(name)) {
 				queryPos.add(keywords, 2);
@@ -198,7 +196,8 @@ public class CommerceDiscountRelFinderImpl
 
 			queryPos.add(languageId);
 			queryPos.add(commerceDiscountId);
-			queryPos.add(_portal.getClassNameId(CPDefinition.class.getName()));
+			queryPos.add(
+				PortalUtil.getClassNameId(CPDefinition.class.getName()));
 
 			if (Validator.isNotNull(name)) {
 				queryPos.add(keywords, 2);
@@ -274,7 +273,8 @@ public class CommerceDiscountRelFinderImpl
 
 			queryPos.add(commerceDiscountId);
 			queryPos.add(
-				_portal.getClassNameId(CommercePricingClass.class.getName()));
+				PortalUtil.getClassNameId(
+					CommercePricingClass.class.getName()));
 
 			if (Validator.isNotNull(title)) {
 				queryPos.add(keywords, 2);
@@ -352,7 +352,8 @@ public class CommerceDiscountRelFinderImpl
 			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
 			queryPos.add(commerceDiscountId);
-			queryPos.add(_portal.getClassNameId(AssetCategory.class.getName()));
+			queryPos.add(
+				PortalUtil.getClassNameId(AssetCategory.class.getName()));
 
 			if (Validator.isNotNull(name)) {
 				queryPos.add(keywords, 2);
@@ -423,7 +424,8 @@ public class CommerceDiscountRelFinderImpl
 
 			queryPos.add(languageId);
 			queryPos.add(commerceDiscountId);
-			queryPos.add(_portal.getClassNameId(CPDefinition.class.getName()));
+			queryPos.add(
+				PortalUtil.getClassNameId(CPDefinition.class.getName()));
 
 			if (Validator.isNotNull(name)) {
 				queryPos.add(keywords, 2);
@@ -493,7 +495,8 @@ public class CommerceDiscountRelFinderImpl
 
 			queryPos.add(commerceDiscountId);
 			queryPos.add(
-				_portal.getClassNameId(CommercePricingClass.class.getName()));
+				PortalUtil.getClassNameId(
+					CommercePricingClass.class.getName()));
 
 			if (Validator.isNotNull(title)) {
 				queryPos.add(keywords, 2);
@@ -510,10 +513,7 @@ public class CommerceDiscountRelFinderImpl
 		}
 	}
 
-	@Reference
+	@ServiceReference(type = CustomSQL.class)
 	private CustomSQL _customSQL;
-
-	@Reference
-	private Portal _portal;
 
 }

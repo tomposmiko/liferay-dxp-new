@@ -16,7 +16,6 @@ package com.liferay.portal.service.impl;
 
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.bean.BeanReference;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.LayoutBranchNameException;
 import com.liferay.portal.kernel.exception.NoSuchLayoutBranchException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -27,7 +26,6 @@ import com.liferay.portal.kernel.model.LayoutBranchConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutRevisionConstants;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
-import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.RecentLayoutBranchLocalService;
@@ -45,7 +43,6 @@ import java.util.List;
 /**
  * @author Julio Camarero
  */
-@CTAware
 public class LayoutBranchLocalServiceImpl
 	extends LayoutBranchLocalServiceBaseImpl {
 
@@ -140,22 +137,7 @@ public class LayoutBranchLocalServiceImpl
 		_recentLayoutBranchLocalService.deleteRecentLayoutBranches(
 			layoutBranch.getLayoutBranchId());
 
-		_resourceLocalService.deleteResource(
-			layoutBranch.getCompanyId(), LayoutBranch.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			layoutBranch.getLayoutBranchId());
-
 		return deleteLayoutBranch(layoutBranch);
-	}
-
-	@Override
-	public void deleteLayoutBranchesByPlid(long plid) throws PortalException {
-		List<LayoutBranch> layoutBranches = layoutBranchPersistence.findByPlid(
-			plid);
-
-		for (LayoutBranch layoutBranch : layoutBranches) {
-			deleteLayoutBranch(layoutBranch.getLayoutBranchId());
-		}
 	}
 
 	@Override
@@ -260,7 +242,8 @@ public class LayoutBranchLocalServiceImpl
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchLayoutBranchException);
+				_log.debug(
+					noSuchLayoutBranchException, noSuchLayoutBranchException);
 			}
 		}
 	}

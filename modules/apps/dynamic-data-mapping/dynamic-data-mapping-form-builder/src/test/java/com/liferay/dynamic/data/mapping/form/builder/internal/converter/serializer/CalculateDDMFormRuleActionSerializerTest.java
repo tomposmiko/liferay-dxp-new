@@ -20,28 +20,34 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.spi.converter.serializer.SPIDDMFormRuleSerializerContext;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Leonardo Barros
  */
-public class CalculateDDMFormRuleActionSerializerTest {
+@PrepareForTest(ServiceContextThreadLocal.class)
+@RunWith(PowerMockRunner.class)
+public class CalculateDDMFormRuleActionSerializerTest extends PowerMockito {
 
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+	@Before
+	public void setUp() {
+		setUpServiceContextThreadLocal();
+	}
 
 	@Test
 	public void testBuildExpression1() {
@@ -154,13 +160,13 @@ public class CalculateDDMFormRuleActionSerializerTest {
 
 	@Test
 	public void testSerialize() {
-		Mockito.when(
+		when(
 			_calculateDDMFormRuleAction.getExpression()
 		).thenReturn(
 			"(text + text1) * 2"
 		);
 
-		Mockito.when(
+		when(
 			_calculateDDMFormRuleAction.getTarget()
 		).thenReturn(
 			"text2"
@@ -173,7 +179,7 @@ public class CalculateDDMFormRuleActionSerializerTest {
 
 		ddmForm.setDDMFormFields(Arrays.asList(ddmFormField1, ddmFormField2));
 
-		Mockito.when(
+		when(
 			_serviceContext.getAttribute("form")
 		).thenReturn(
 			ddmForm
@@ -184,7 +190,7 @@ public class CalculateDDMFormRuleActionSerializerTest {
 				new CalculateDDMFormRuleActionSerializer(
 					_calculateDDMFormRuleAction);
 
-		Mockito.when(
+		PowerMockito.when(
 			_spiDDMFormRuleSerializerContext.getAttribute("form")
 		).thenReturn(
 			ddmForm
@@ -200,7 +206,7 @@ public class CalculateDDMFormRuleActionSerializerTest {
 
 	@Test
 	public void testSerializeWithEmptyTarget() {
-		Mockito.when(
+		when(
 			_calculateDDMFormRuleAction.getTarget()
 		).thenReturn(
 			StringPool.BLANK
@@ -217,12 +223,23 @@ public class CalculateDDMFormRuleActionSerializerTest {
 		Assert.assertNull(result);
 	}
 
-	private final CalculateDDMFormRuleAction _calculateDDMFormRuleAction =
-		Mockito.mock(CalculateDDMFormRuleAction.class);
-	private final ServiceContext _serviceContext = Mockito.mock(
-		ServiceContext.class);
-	private final SPIDDMFormRuleSerializerContext
-		_spiDDMFormRuleSerializerContext = Mockito.mock(
-			SPIDDMFormRuleSerializerContext.class);
+	protected void setUpServiceContextThreadLocal() {
+		mockStatic(ServiceContextThreadLocal.class);
+
+		when(
+			ServiceContextThreadLocal.getServiceContext()
+		).thenReturn(
+			_serviceContext
+		);
+	}
+
+	@Mock
+	private CalculateDDMFormRuleAction _calculateDDMFormRuleAction;
+
+	@Mock
+	private ServiceContext _serviceContext;
+
+	@Mock
+	private SPIDDMFormRuleSerializerContext _spiDDMFormRuleSerializerContext;
 
 }

@@ -93,7 +93,7 @@ public class RandomLayoutAction extends Action {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			throw new ActionException(exception);
 		}

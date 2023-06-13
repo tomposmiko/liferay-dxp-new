@@ -14,10 +14,7 @@
 
 package com.liferay.portal.workflow.kaleo.service;
 
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
-import com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance;
 
 /**
  * Provides a wrapper for {@link KaleoTaskFormInstanceLocalService}.
@@ -29,10 +26,6 @@ import com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance;
 public class KaleoTaskFormInstanceLocalServiceWrapper
 	implements KaleoTaskFormInstanceLocalService,
 			   ServiceWrapper<KaleoTaskFormInstanceLocalService> {
-
-	public KaleoTaskFormInstanceLocalServiceWrapper() {
-		this(null);
-	}
 
 	public KaleoTaskFormInstanceLocalServiceWrapper(
 		KaleoTaskFormInstanceLocalService kaleoTaskFormInstanceLocalService) {
@@ -51,19 +44,22 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	 * @return the kaleo task form instance that was added
 	 */
 	@Override
-	public KaleoTaskFormInstance addKaleoTaskFormInstance(
-		KaleoTaskFormInstance kaleoTaskFormInstance) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+		addKaleoTaskFormInstance(
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+				kaleoTaskFormInstance) {
 
 		return _kaleoTaskFormInstanceLocalService.addKaleoTaskFormInstance(
 			kaleoTaskFormInstance);
 	}
 
 	@Override
-	public KaleoTaskFormInstance addKaleoTaskFormInstance(
-			long groupId, long kaleoTaskFormId, String formValues,
-			com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
-				kaleoTaskInstanceToken,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+			addKaleoTaskFormInstance(
+				long groupId, long kaleoTaskFormId, String formValues,
+				com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
+					kaleoTaskInstanceToken,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskFormInstanceLocalService.addKaleoTaskFormInstance(
@@ -84,8 +80,8 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	 * @return the new kaleo task form instance
 	 */
 	@Override
-	public KaleoTaskFormInstance createKaleoTaskFormInstance(
-		long kaleoTaskFormInstanceId) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+		createKaleoTaskFormInstance(long kaleoTaskFormInstanceId) {
 
 		return _kaleoTaskFormInstanceLocalService.createKaleoTaskFormInstance(
 			kaleoTaskFormInstanceId);
@@ -137,8 +133,10 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	 * @return the kaleo task form instance that was removed
 	 */
 	@Override
-	public KaleoTaskFormInstance deleteKaleoTaskFormInstance(
-		KaleoTaskFormInstance kaleoTaskFormInstance) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+		deleteKaleoTaskFormInstance(
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+				kaleoTaskFormInstance) {
 
 		return _kaleoTaskFormInstanceLocalService.deleteKaleoTaskFormInstance(
 			kaleoTaskFormInstance);
@@ -156,8 +154,8 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	 * @throws PortalException if a kaleo task form instance with the primary key could not be found
 	 */
 	@Override
-	public KaleoTaskFormInstance deleteKaleoTaskFormInstance(
-			long kaleoTaskFormInstanceId)
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+			deleteKaleoTaskFormInstance(long kaleoTaskFormInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskFormInstanceLocalService.deleteKaleoTaskFormInstance(
@@ -290,16 +288,16 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	}
 
 	@Override
-	public KaleoTaskFormInstance fetchKaleoTaskFormInstance(
-		long kaleoTaskFormInstanceId) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+		fetchKaleoTaskFormInstance(long kaleoTaskFormInstanceId) {
 
 		return _kaleoTaskFormInstanceLocalService.fetchKaleoTaskFormInstance(
 			kaleoTaskFormInstanceId);
 	}
 
 	@Override
-	public KaleoTaskFormInstance fetchKaleoTaskFormKaleoTaskFormInstance(
-		long kaleoTaskFormId) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+		fetchKaleoTaskFormKaleoTaskFormInstance(long kaleoTaskFormId) {
 
 		return _kaleoTaskFormInstanceLocalService.
 			fetchKaleoTaskFormKaleoTaskFormInstance(kaleoTaskFormId);
@@ -328,8 +326,8 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	 * @throws PortalException if a kaleo task form instance with the primary key could not be found
 	 */
 	@Override
-	public KaleoTaskFormInstance getKaleoTaskFormInstance(
-			long kaleoTaskFormInstanceId)
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+			getKaleoTaskFormInstance(long kaleoTaskFormInstanceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskFormInstanceLocalService.getKaleoTaskFormInstance(
@@ -348,8 +346,9 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	 * @return the range of kaleo task form instances
 	 */
 	@Override
-	public java.util.List<KaleoTaskFormInstance> getKaleoTaskFormInstances(
-		int start, int end) {
+	public java.util.List
+		<com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance>
+			getKaleoTaskFormInstances(int start, int end) {
 
 		return _kaleoTaskFormInstanceLocalService.getKaleoTaskFormInstances(
 			start, end);
@@ -367,8 +366,8 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	}
 
 	@Override
-	public KaleoTaskFormInstance getKaleoTaskFormKaleoTaskFormInstance(
-			long kaleoTaskFormId)
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+			getKaleoTaskFormKaleoTaskFormInstance(long kaleoTaskFormId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _kaleoTaskFormInstanceLocalService.
@@ -376,8 +375,9 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<KaleoTaskFormInstance>
-		getKaleoTaskKaleoTaskFormInstances(long kaleoTaskId) {
+	public java.util.List
+		<com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance>
+			getKaleoTaskKaleoTaskFormInstances(long kaleoTaskId) {
 
 		return _kaleoTaskFormInstanceLocalService.
 			getKaleoTaskKaleoTaskFormInstances(kaleoTaskId);
@@ -416,31 +416,13 @@ public class KaleoTaskFormInstanceLocalServiceWrapper
 	 * @return the kaleo task form instance that was updated
 	 */
 	@Override
-	public KaleoTaskFormInstance updateKaleoTaskFormInstance(
-		KaleoTaskFormInstance kaleoTaskFormInstance) {
+	public com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+		updateKaleoTaskFormInstance(
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskFormInstance
+				kaleoTaskFormInstance) {
 
 		return _kaleoTaskFormInstanceLocalService.updateKaleoTaskFormInstance(
 			kaleoTaskFormInstance);
-	}
-
-	@Override
-	public CTPersistence<KaleoTaskFormInstance> getCTPersistence() {
-		return _kaleoTaskFormInstanceLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<KaleoTaskFormInstance> getModelClass() {
-		return _kaleoTaskFormInstanceLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<KaleoTaskFormInstance>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _kaleoTaskFormInstanceLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

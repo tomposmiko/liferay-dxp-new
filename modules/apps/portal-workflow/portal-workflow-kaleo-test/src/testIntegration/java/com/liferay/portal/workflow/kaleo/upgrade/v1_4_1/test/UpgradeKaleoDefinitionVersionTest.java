@@ -243,7 +243,7 @@ public class UpgradeKaleoDefinitionVersionTest {
 	private Timestamp _timestamp;
 
 	@Inject(
-		filter = "component.name=com.liferay.portal.workflow.kaleo.internal.upgrade.registry.KaleoServiceUpgradeStepRegistrator"
+		filter = "component.name=com.liferay.portal.workflow.kaleo.internal.upgrade.KaleoServiceUpgrade"
 	)
 	private UpgradeStepRegistrator _upgradeStepRegistrator;
 

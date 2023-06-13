@@ -452,11 +452,6 @@ public class BatchPlannerMappingWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected BatchPlannerMappingWrapper wrap(
 		BatchPlannerMapping batchPlannerMapping) {
 

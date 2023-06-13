@@ -26,18 +26,16 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		if (_hasResourcePermission("com.liferay.knowledgebase.model.Article")) {
-			_updateKBArticleResourcePermissions();
+		if (hasResourcePermission("com.liferay.knowledgebase.model.Article")) {
+			updateKBArticleResourcePermissions();
 		}
 
-		if (_hasResourcePermission(
-				"com.liferay.knowledgebase.model.Template")) {
-
-			_updateKBTemplateResourcePermissions();
+		if (hasResourcePermission("com.liferay.knowledgebase.model.Template")) {
+			updateKBTemplateResourcePermissions();
 		}
 	}
 
-	private boolean _hasResourcePermission(String name) throws Exception {
+	protected boolean hasResourcePermission(String name) throws Exception {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select count(*) from ResourcePermission where name = ?")) {
 
@@ -57,14 +55,14 @@ public class ResourcePermissionUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private void _updateKBArticleResourcePermissions() throws Exception {
+	protected void updateKBArticleResourcePermissions() throws Exception {
 		runSQL(
 			"update ResourcePermission set name = " +
 				"'com.liferay.knowledgebase.model.KBArticle' where name = " +
 					"'com.liferay.knowledgebase.model.Article'");
 	}
 
-	private void _updateKBTemplateResourcePermissions() throws Exception {
+	protected void updateKBTemplateResourcePermissions() throws Exception {
 		runSQL(
 			"update ResourcePermission set name = " +
 				"'com.liferay.knowledgebase.model.KBTemplate' where name = " +

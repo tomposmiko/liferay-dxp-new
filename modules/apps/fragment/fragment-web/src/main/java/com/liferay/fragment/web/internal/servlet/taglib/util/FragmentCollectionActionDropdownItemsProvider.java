@@ -17,9 +17,9 @@ package com.liferay.fragment.web.internal.servlet.taglib.util;
 import com.liferay.fragment.web.internal.display.context.FragmentDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 
 import java.util.List;
 
@@ -61,7 +61,6 @@ public class FragmentCollectionActionDropdownItemsProvider {
 									_fragmentDisplayContext.
 										getFragmentCollectionId()
 								).buildString());
-							dropdownItem.setIcon("pencil");
 							dropdownItem.setLabel(
 								LanguageUtil.get(_httpServletRequest, "edit"));
 						}
@@ -78,12 +77,6 @@ public class FragmentCollectionActionDropdownItemsProvider {
 									_renderResponse.createResourceURL();
 
 							exportFragmentCompositionsAndFragmentEntriesURL.
-								setParameter(
-									"fragmentCollectionId",
-									String.valueOf(
-										_fragmentDisplayContext.
-											getFragmentCollectionId()));
-							exportFragmentCompositionsAndFragmentEntriesURL.
 								setResourceID(
 									"/fragment/export_fragment_collections");
 
@@ -91,7 +84,6 @@ public class FragmentCollectionActionDropdownItemsProvider {
 								exportFragmentCompositionsAndFragmentEntriesURL.
 									toString());
 
-							dropdownItem.setIcon("upload");
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest, "export"));
@@ -114,7 +106,7 @@ public class FragmentCollectionActionDropdownItemsProvider {
 								).setWindowState(
 									LiferayWindowState.POP_UP
 								).buildString());
-							dropdownItem.setIcon("import");
+
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest, "import"));
@@ -141,7 +133,6 @@ public class FragmentCollectionActionDropdownItemsProvider {
 									_fragmentDisplayContext.
 										getFragmentCollectionId()
 								).buildString());
-							dropdownItem.setIcon("trash");
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest, "delete"));

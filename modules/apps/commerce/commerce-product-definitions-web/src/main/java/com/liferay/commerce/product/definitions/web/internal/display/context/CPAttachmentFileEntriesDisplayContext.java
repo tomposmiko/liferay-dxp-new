@@ -17,7 +17,6 @@ package com.liferay.commerce.product.definitions.web.internal.display.context;
 import com.liferay.commerce.product.configuration.AttachmentsConfiguration;
 import com.liferay.commerce.product.constants.CPAttachmentFileEntryConstants;
 import com.liferay.commerce.product.ddm.DDMHelper;
-import com.liferay.commerce.product.definitions.web.internal.security.permission.resource.CommerceCatalogPermission;
 import com.liferay.commerce.product.display.context.BaseCPDefinitionsDisplayContext;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPDefinition;
@@ -30,20 +29,20 @@ import com.liferay.commerce.product.servlet.taglib.ui.constants.CPDefinitionScre
 import com.liferay.commerce.product.util.CPInstanceHelper;
 import com.liferay.document.library.display.context.DLMimeTypeDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.taglib.util.CustomAttributesUtil;
 
 import java.util.Collections;
@@ -51,9 +50,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
 
 /**
@@ -95,10 +95,11 @@ public class CPAttachmentFileEntriesDisplayContext
 			Collections.<ItemSelectorReturnType>singletonList(
 				new FileEntryItemSelectorReturnType()));
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, "addCPAttachmentFileEntry",
-				fileItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "addCPAttachmentFileEntry",
+			fileItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	public CPAttachmentFileEntry getCPAttachmentFileEntry()
@@ -139,32 +140,24 @@ public class CPAttachmentFileEntriesDisplayContext
 	}
 
 	public CreationMenu getCreationMenu(int type) throws Exception {
-		CreationMenu creationMenu = new CreationMenu();
-
-		if (CommerceCatalogPermission.contains(
-				cpRequestHelper.getPermissionChecker(), getCPDefinition(),
-				ActionKeys.UPDATE)) {
-
-			creationMenu.addDropdownItem(
-				dropdownItem -> {
-					dropdownItem.setHref(
-						PortletURLBuilder.createRenderURL(
-							liferayPortletResponse
-						).setMVCRenderCommandName(
-							"/cp_definitions/edit_cp_attachment_file_entry"
-						).setParameter(
-							"cpDefinitionId", getCPDefinitionId()
-						).setParameter(
-							"type", type
-						).setWindowState(
-							LiferayWindowState.POP_UP
-						).buildString());
-					dropdownItem.setLabel(_getTypeLabel(type));
-					dropdownItem.setTarget("sidePanel");
-				});
-		}
-
-		return creationMenu;
+		return CreationMenuBuilder.addDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref(
+					PortletURLBuilder.createRenderURL(
+						liferayPortletResponse
+					).setMVCRenderCommandName(
+						"/cp_definitions/edit_cp_attachment_file_entry"
+					).setParameter(
+						"cpDefinitionId", getCPDefinitionId()
+					).setParameter(
+						"type", type
+					).setWindowState(
+						LiferayWindowState.POP_UP
+					).buildString());
+				dropdownItem.setLabel(_getTypeLabel(type));
+				dropdownItem.setTarget("sidePanel");
+			}
+		).build();
 	}
 
 	public String getCssClassFileMimeType(FileEntry fileEntry) {
@@ -193,7 +186,7 @@ public class CPAttachmentFileEntriesDisplayContext
 		return _attachmentsConfiguration.imageExtensions();
 	}
 
-	public String getImageItemSelectorURL() {
+	public String getImageItemSelectorUrl() {
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(
 				cpRequestHelper.getRenderRequest());
@@ -205,10 +198,11 @@ public class CPAttachmentFileEntriesDisplayContext
 			Collections.<ItemSelectorReturnType>singletonList(
 				new FileEntryItemSelectorReturnType()));
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, "addCPAttachmentFileEntry",
-				imageItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "addCPAttachmentFileEntry",
+			imageItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	public long getImageMaxSize() {
@@ -266,14 +260,14 @@ public class CPAttachmentFileEntriesDisplayContext
 			return Collections.emptyMap();
 		}
 
-		return _cpInstanceHelper.getCPDefinitionOptionValueRelsMap(
+		return _cpInstanceHelper.getCPDefinitionOptionRelsMap(
 			cpAttachmentFileEntry.getClassPK(),
 			cpAttachmentFileEntry.getJson());
 	}
 
 	public String renderOptions(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, PageContext pageContext)
+			PageContext pageContext, RenderRequest renderRequest,
+			RenderResponse renderResponse)
 		throws PortalException {
 
 		CPAttachmentFileEntry cpAttachmentFileEntry =
@@ -286,9 +280,9 @@ public class CPAttachmentFileEntriesDisplayContext
 		}
 
 		return _ddmHelper.renderCPAttachmentFileEntryOptions(
-			getCPDefinitionId(), json, pageContext, httpServletRequest,
-			httpServletResponse,
-			_cpInstanceHelper.getCPDefinitionOptionValueRelsMap(
+			getCPDefinitionId(), json, pageContext, renderRequest,
+			renderResponse,
+			_cpInstanceHelper.getCPDefinitionOptionRelsMap(
 				getCPDefinitionId(), true, false));
 	}
 

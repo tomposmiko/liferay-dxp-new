@@ -218,13 +218,9 @@ public class MergeCentralGitSubrepositoryUtil {
 
 		JSONObject requestJSONObject = new JSONObject();
 
-		requestJSONObject.put(
-			"context", "liferay/central-pull-request"
-		).put(
-			"description", "Tests are queued on Jenkins."
-		).put(
-			"state", "pending"
-		);
+		requestJSONObject.put("context", "liferay/central-pull-request");
+		requestJSONObject.put("description", "Tests are queued on Jenkins.");
+		requestJSONObject.put("state", "pending");
 
 		StringBuilder sb = new StringBuilder();
 

@@ -531,8 +531,4 @@ public interface DDMStructureLayoutModel
 	@Override
 	public DDMStructureLayout cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

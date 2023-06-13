@@ -17,6 +17,6 @@ package com.liferay.portal.kernel.settings;
 /**
  * @author Iván Zaera
  */
-@Settings.Config
+@Settings.Config(settingsIds = "com.liferay.portal")
 public class PortalSettings {
 }

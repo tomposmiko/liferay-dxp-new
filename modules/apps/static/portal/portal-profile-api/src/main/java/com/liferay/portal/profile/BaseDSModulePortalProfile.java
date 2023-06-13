@@ -14,7 +14,6 @@
 
 package com.liferay.portal.profile;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,8 +40,7 @@ public class BaseDSModulePortalProfile implements PortalProfile {
 
 	protected void init(
 		ComponentContext componentContext,
-		Collection<String> supportedPortalProfileNames,
-		String... componentNames) {
+		Set<String> supportedPortalProfileNames, String... componentNames) {
 
 		_componentContext = componentContext;
 

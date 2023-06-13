@@ -25,10 +25,6 @@ public class UserIdMapperLocalServiceWrapper
 	implements ServiceWrapper<UserIdMapperLocalService>,
 			   UserIdMapperLocalService {
 
-	public UserIdMapperLocalServiceWrapper() {
-		this(null);
-	}
-
 	public UserIdMapperLocalServiceWrapper(
 		UserIdMapperLocalService userIdMapperLocalService) {
 

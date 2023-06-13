@@ -16,15 +16,19 @@ package com.liferay.bookmarks.model.impl;
 
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksEntryModel;
+import com.liferay.bookmarks.model.BookmarksEntrySoap;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ContainerModel;
 import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -33,19 +37,23 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -186,6 +194,70 @@ public class BookmarksEntryModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static BookmarksEntry toModel(BookmarksEntrySoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		BookmarksEntry model = new BookmarksEntryImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setEntryId(soapModel.getEntryId());
+		model.setGroupId(soapModel.getGroupId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setFolderId(soapModel.getFolderId());
+		model.setTreePath(soapModel.getTreePath());
+		model.setName(soapModel.getName());
+		model.setUrl(soapModel.getUrl());
+		model.setDescription(soapModel.getDescription());
+		model.setPriority(soapModel.getPriority());
+		model.setLastPublishDate(soapModel.getLastPublishDate());
+		model.setStatus(soapModel.getStatus());
+		model.setStatusByUserId(soapModel.getStatusByUserId());
+		model.setStatusByUserName(soapModel.getStatusByUserName());
+		model.setStatusDate(soapModel.getStatusDate());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<BookmarksEntry> toModels(
+		BookmarksEntrySoap[] soapModels) {
+
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<BookmarksEntry> models = new ArrayList<BookmarksEntry>(
+			soapModels.length);
+
+		for (BookmarksEntrySoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public BookmarksEntryModelImpl() {
 	}
 
@@ -262,152 +334,149 @@ public class BookmarksEntryModelImpl
 	public Map<String, Function<BookmarksEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<BookmarksEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, BookmarksEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<BookmarksEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			BookmarksEntry.class.getClassLoader(), BookmarksEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<BookmarksEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<BookmarksEntry, Object>>();
+		try {
+			Constructor<BookmarksEntry> constructor =
+				(Constructor<BookmarksEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", BookmarksEntry::getMvccVersion);
-			attributeGetterFunctions.put("uuid", BookmarksEntry::getUuid);
-			attributeGetterFunctions.put("entryId", BookmarksEntry::getEntryId);
-			attributeGetterFunctions.put("groupId", BookmarksEntry::getGroupId);
-			attributeGetterFunctions.put(
-				"companyId", BookmarksEntry::getCompanyId);
-			attributeGetterFunctions.put("userId", BookmarksEntry::getUserId);
-			attributeGetterFunctions.put(
-				"userName", BookmarksEntry::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", BookmarksEntry::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", BookmarksEntry::getModifiedDate);
-			attributeGetterFunctions.put(
-				"folderId", BookmarksEntry::getFolderId);
-			attributeGetterFunctions.put(
-				"treePath", BookmarksEntry::getTreePath);
-			attributeGetterFunctions.put("name", BookmarksEntry::getName);
-			attributeGetterFunctions.put("url", BookmarksEntry::getUrl);
-			attributeGetterFunctions.put(
-				"description", BookmarksEntry::getDescription);
-			attributeGetterFunctions.put(
-				"priority", BookmarksEntry::getPriority);
-			attributeGetterFunctions.put(
-				"lastPublishDate", BookmarksEntry::getLastPublishDate);
-			attributeGetterFunctions.put("status", BookmarksEntry::getStatus);
-			attributeGetterFunctions.put(
-				"statusByUserId", BookmarksEntry::getStatusByUserId);
-			attributeGetterFunctions.put(
-				"statusByUserName", BookmarksEntry::getStatusByUserName);
-			attributeGetterFunctions.put(
-				"statusDate", BookmarksEntry::getStatusDate);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<BookmarksEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<BookmarksEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<BookmarksEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<BookmarksEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<BookmarksEntry, Object>>();
+		Map<String, BiConsumer<BookmarksEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<BookmarksEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<BookmarksEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<BookmarksEntry, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", BookmarksEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", BookmarksEntry::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid",
+			(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setUuid);
+		attributeGetterFunctions.put("entryId", BookmarksEntry::getEntryId);
+		attributeSetterBiConsumers.put(
+			"entryId",
+			(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setEntryId);
+		attributeGetterFunctions.put("groupId", BookmarksEntry::getGroupId);
+		attributeSetterBiConsumers.put(
+			"groupId",
+			(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", BookmarksEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", BookmarksEntry::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId",
+			(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setUserId);
+		attributeGetterFunctions.put("userName", BookmarksEntry::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", BookmarksEntry::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<BookmarksEntry, Date>)BookmarksEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", BookmarksEntry::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<BookmarksEntry, Date>)BookmarksEntry::setModifiedDate);
+		attributeGetterFunctions.put("folderId", BookmarksEntry::getFolderId);
+		attributeSetterBiConsumers.put(
+			"folderId",
+			(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setFolderId);
+		attributeGetterFunctions.put("treePath", BookmarksEntry::getTreePath);
+		attributeSetterBiConsumers.put(
+			"treePath",
+			(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setTreePath);
+		attributeGetterFunctions.put("name", BookmarksEntry::getName);
+		attributeSetterBiConsumers.put(
+			"name",
+			(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setName);
+		attributeGetterFunctions.put("url", BookmarksEntry::getUrl);
+		attributeSetterBiConsumers.put(
+			"url", (BiConsumer<BookmarksEntry, String>)BookmarksEntry::setUrl);
+		attributeGetterFunctions.put(
+			"description", BookmarksEntry::getDescription);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setDescription);
+		attributeGetterFunctions.put("priority", BookmarksEntry::getPriority);
+		attributeSetterBiConsumers.put(
+			"priority",
+			(BiConsumer<BookmarksEntry, Integer>)BookmarksEntry::setPriority);
+		attributeGetterFunctions.put(
+			"lastPublishDate", BookmarksEntry::getLastPublishDate);
+		attributeSetterBiConsumers.put(
+			"lastPublishDate",
+			(BiConsumer<BookmarksEntry, Date>)
+				BookmarksEntry::setLastPublishDate);
+		attributeGetterFunctions.put("status", BookmarksEntry::getStatus);
+		attributeSetterBiConsumers.put(
+			"status",
+			(BiConsumer<BookmarksEntry, Integer>)BookmarksEntry::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", BookmarksEntry::getStatusByUserId);
+		attributeSetterBiConsumers.put(
+			"statusByUserId",
+			(BiConsumer<BookmarksEntry, Long>)
+				BookmarksEntry::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", BookmarksEntry::getStatusByUserName);
+		attributeSetterBiConsumers.put(
+			"statusByUserName",
+			(BiConsumer<BookmarksEntry, String>)
+				BookmarksEntry::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", BookmarksEntry::getStatusDate);
+		attributeSetterBiConsumers.put(
+			"statusDate",
+			(BiConsumer<BookmarksEntry, Date>)BookmarksEntry::setStatusDate);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<BookmarksEntry, Long>)
-					BookmarksEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setUuid);
-			attributeSetterBiConsumers.put(
-				"entryId",
-				(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setEntryId);
-			attributeSetterBiConsumers.put(
-				"groupId",
-				(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setGroupId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<BookmarksEntry, String>)
-					BookmarksEntry::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<BookmarksEntry, Date>)
-					BookmarksEntry::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<BookmarksEntry, Date>)
-					BookmarksEntry::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"folderId",
-				(BiConsumer<BookmarksEntry, Long>)BookmarksEntry::setFolderId);
-			attributeSetterBiConsumers.put(
-				"treePath",
-				(BiConsumer<BookmarksEntry, String>)
-					BookmarksEntry::setTreePath);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setName);
-			attributeSetterBiConsumers.put(
-				"url",
-				(BiConsumer<BookmarksEntry, String>)BookmarksEntry::setUrl);
-			attributeSetterBiConsumers.put(
-				"description",
-				(BiConsumer<BookmarksEntry, String>)
-					BookmarksEntry::setDescription);
-			attributeSetterBiConsumers.put(
-				"priority",
-				(BiConsumer<BookmarksEntry, Integer>)
-					BookmarksEntry::setPriority);
-			attributeSetterBiConsumers.put(
-				"lastPublishDate",
-				(BiConsumer<BookmarksEntry, Date>)
-					BookmarksEntry::setLastPublishDate);
-			attributeSetterBiConsumers.put(
-				"status",
-				(BiConsumer<BookmarksEntry, Integer>)BookmarksEntry::setStatus);
-			attributeSetterBiConsumers.put(
-				"statusByUserId",
-				(BiConsumer<BookmarksEntry, Long>)
-					BookmarksEntry::setStatusByUserId);
-			attributeSetterBiConsumers.put(
-				"statusByUserName",
-				(BiConsumer<BookmarksEntry, String>)
-					BookmarksEntry::setStatusByUserName);
-			attributeSetterBiConsumers.put(
-				"statusDate",
-				(BiConsumer<BookmarksEntry, Date>)
-					BookmarksEntry::setStatusDate);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -847,8 +916,74 @@ public class BookmarksEntryModelImpl
 	}
 
 	@Override
+	public com.liferay.trash.kernel.model.TrashEntry getTrashEntry()
+		throws PortalException {
+
+		if (!isInTrash()) {
+			return null;
+		}
+
+		com.liferay.trash.kernel.model.TrashEntry trashEntry =
+			com.liferay.trash.kernel.service.TrashEntryLocalServiceUtil.
+				fetchEntry(getModelClassName(), getTrashEntryClassPK());
+
+		if (trashEntry != null) {
+			return trashEntry;
+		}
+
+		com.liferay.portal.kernel.trash.TrashHandler trashHandler =
+			getTrashHandler();
+
+		if (Validator.isNotNull(
+				trashHandler.getContainerModelClassName(getPrimaryKey()))) {
+
+			ContainerModel containerModel = null;
+
+			try {
+				containerModel = trashHandler.getParentContainerModel(this);
+			}
+			catch (NoSuchModelException noSuchModelException) {
+				return null;
+			}
+
+			while (containerModel != null) {
+				if (containerModel instanceof TrashedModel) {
+					TrashedModel trashedModel = (TrashedModel)containerModel;
+
+					return trashedModel.getTrashEntry();
+				}
+
+				trashHandler =
+					com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil.
+						getTrashHandler(
+							trashHandler.getContainerModelClassName(
+								containerModel.getContainerModelId()));
+
+				if (trashHandler == null) {
+					return null;
+				}
+
+				containerModel = trashHandler.getContainerModel(
+					containerModel.getParentContainerModelId());
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public long getTrashEntryClassPK() {
 		return getPrimaryKey();
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public com.liferay.portal.kernel.trash.TrashHandler getTrashHandler() {
+		return com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil.
+			getTrashHandler(getModelClassName());
 	}
 
 	@Override
@@ -859,6 +994,70 @@ public class BookmarksEntryModelImpl
 		else {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean isInTrashContainer() {
+		com.liferay.portal.kernel.trash.TrashHandler trashHandler =
+			getTrashHandler();
+
+		if ((trashHandler == null) ||
+			Validator.isNull(
+				trashHandler.getContainerModelClassName(getPrimaryKey()))) {
+
+			return false;
+		}
+
+		try {
+			ContainerModel containerModel =
+				trashHandler.getParentContainerModel(this);
+
+			if (containerModel == null) {
+				return false;
+			}
+
+			if (containerModel instanceof TrashedModel) {
+				return ((TrashedModel)containerModel).isInTrash();
+			}
+		}
+		catch (Exception exception) {
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isInTrashExplicitly() {
+		if (!isInTrash()) {
+			return false;
+		}
+
+		com.liferay.trash.kernel.model.TrashEntry trashEntry =
+			com.liferay.trash.kernel.service.TrashEntryLocalServiceUtil.
+				fetchEntry(getModelClassName(), getTrashEntryClassPK());
+
+		if (trashEntry != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isInTrashImplicitly() {
+		if (!isInTrash()) {
+			return false;
+		}
+
+		com.liferay.trash.kernel.model.TrashEntry trashEntry =
+			com.liferay.trash.kernel.service.TrashEntryLocalServiceUtil.
+				fetchEntry(getModelClassName(), getTrashEntryClassPK());
+
+		if (trashEntry != null) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -1318,12 +1517,41 @@ public class BookmarksEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<BookmarksEntry, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<BookmarksEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<BookmarksEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((BookmarksEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, BookmarksEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					BookmarksEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1353,8 +1581,7 @@ public class BookmarksEntryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<BookmarksEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

@@ -76,15 +76,9 @@ public class JavaClassCall extends BaseJavaExpression {
 
 		if (_genericJavaTypes == null) {
 			if (_parameterValueJavaExpressions.isEmpty()) {
-				if (!_useChainStyle) {
-					append(
-						sb, _className, indent, prefix, "()" + suffix,
-						maxLineLength);
-				}
-				else {
-					indent = append(
-						sb, _className, indent, prefix, "(", maxLineLength);
-				}
+				append(
+					sb, _className, indent, prefix, "()" + suffix,
+					maxLineLength);
 			}
 			else {
 				indent = append(
@@ -129,16 +123,6 @@ public class JavaClassCall extends BaseJavaExpression {
 				append(
 					sb, _parameterValueJavaExpressions, indent, "",
 					")" + suffix, maxLineLength);
-			}
-		}
-		else {
-			if ((_genericJavaTypes == null) && !_statementCondition &&
-				_useChainStyle) {
-
-				sb.append("\n");
-				sb.append(originalIndent);
-				sb.append(")");
-				sb.append(suffix);
 			}
 		}
 

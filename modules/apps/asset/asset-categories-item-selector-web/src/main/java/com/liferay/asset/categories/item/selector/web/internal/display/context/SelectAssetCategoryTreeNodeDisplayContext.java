@@ -20,13 +20,13 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -61,7 +61,7 @@ public class SelectAssetCategoryTreeNodeDisplayContext {
 		_itemSelectedEventName = itemSelectedEventName;
 		_portletURL = portletURL;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -74,8 +74,8 @@ public class SelectAssetCategoryTreeNodeDisplayContext {
 
 		List<AssetCategory> assetCategories = _getAssetCategories();
 
-		searchContainer.setResultsAndTotal(
-			() -> assetCategories, assetCategories.size());
+		searchContainer.setResults(assetCategories);
+		searchContainer.setTotal(assetCategories.size());
 
 		return searchContainer;
 	}

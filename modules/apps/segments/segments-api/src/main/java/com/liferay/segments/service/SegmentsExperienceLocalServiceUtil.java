@@ -45,17 +45,19 @@ public class SegmentsExperienceLocalServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperienceLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static SegmentsExperience addDefaultSegmentsExperience(
-			long userId, long plid,
+	public static SegmentsExperience addSegmentsExperience(
+			long segmentsEntryId, long classNameId, long classPK,
+			Map<java.util.Locale, String> nameMap, boolean active,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
-		return getService().addDefaultSegmentsExperience(
-			userId, plid, serviceContext);
+		return getService().addSegmentsExperience(
+			segmentsEntryId, classNameId, classPK, nameMap, active,
+			serviceContext);
 	}
 
 	public static SegmentsExperience addSegmentsExperience(
-			long userId, long groupId, long segmentsEntryId, long plid,
+			long segmentsEntryId, long classNameId, long classPK,
 			Map<java.util.Locale, String> nameMap, boolean active,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				typeSettingsUnicodeProperties,
@@ -63,36 +65,32 @@ public class SegmentsExperienceLocalServiceUtil {
 		throws PortalException {
 
 		return getService().addSegmentsExperience(
-			userId, groupId, segmentsEntryId, plid, nameMap, active,
+			segmentsEntryId, classNameId, classPK, nameMap, active,
 			typeSettingsUnicodeProperties, serviceContext);
 	}
 
 	public static SegmentsExperience addSegmentsExperience(
-			long userId, long groupId, long segmentsEntryId, long plid,
+			long segmentsEntryId, long classNameId, long classPK,
 			Map<java.util.Locale, String> nameMap, int priority, boolean active,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				typeSettingsUnicodeProperties,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addSegmentsExperience(
-			userId, groupId, segmentsEntryId, plid, nameMap, priority, active,
-			typeSettingsUnicodeProperties, serviceContext);
-	}
-
-	public static SegmentsExperience addSegmentsExperience(
-			long userId, long groupId, long segmentsEntryId,
-			String segmentsExperienceKey, long plid,
-			Map<java.util.Locale, String> nameMap, int priority, boolean active,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				typeSettingsUnicodeProperties,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addSegmentsExperience(
-			userId, groupId, segmentsEntryId, segmentsExperienceKey, plid,
-			nameMap, priority, active, typeSettingsUnicodeProperties,
+			segmentsEntryId, classNameId, classPK, nameMap, priority, active,
 			serviceContext);
+	}
+
+	public static SegmentsExperience addSegmentsExperience(
+			long segmentsEntryId, long classNameId, long classPK,
+			Map<java.util.Locale, String> nameMap, int priority, boolean active,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				typeSettingsUnicodeProperties,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addSegmentsExperience(
+			segmentsEntryId, classNameId, classPK, nameMap, priority, active,
+			typeSettingsUnicodeProperties, serviceContext);
 	}
 
 	/**
@@ -112,18 +110,18 @@ public class SegmentsExperienceLocalServiceUtil {
 	}
 
 	public static SegmentsExperience appendSegmentsExperience(
-			long userId, long groupId, long segmentsEntryId, long plid,
+			long segmentsEntryId, long classNameId, long classPK,
 			Map<java.util.Locale, String> nameMap, boolean active,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().appendSegmentsExperience(
-			userId, groupId, segmentsEntryId, plid, nameMap, active,
+			segmentsEntryId, classNameId, classPK, nameMap, active,
 			serviceContext);
 	}
 
 	public static SegmentsExperience appendSegmentsExperience(
-			long userId, long groupId, long segmentsEntryId, long plid,
+			long segmentsEntryId, long classNameId, long classPK,
 			Map<java.util.Locale, String> nameMap, boolean active,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				typeSettingsUnicodeProperties,
@@ -131,7 +129,7 @@ public class SegmentsExperienceLocalServiceUtil {
 		throws PortalException {
 
 		return getService().appendSegmentsExperience(
-			userId, groupId, segmentsEntryId, plid, nameMap, active,
+			segmentsEntryId, classNameId, classPK, nameMap, active,
 			typeSettingsUnicodeProperties, serviceContext);
 	}
 
@@ -210,10 +208,11 @@ public class SegmentsExperienceLocalServiceUtil {
 		return getService().deleteSegmentsExperience(segmentsExperience);
 	}
 
-	public static void deleteSegmentsExperiences(long groupId, long plid)
+	public static void deleteSegmentsExperiences(
+			long groupId, long classNameId, long classPK)
 		throws PortalException {
 
-		getService().deleteSegmentsExperiences(groupId, plid);
+		getService().deleteSegmentsExperiences(groupId, classNameId, classPK);
 	}
 
 	public static <T> T dslQuery(DSLQuery dslQuery) {
@@ -301,10 +300,6 @@ public class SegmentsExperienceLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
-	public static long fetchDefaultSegmentsExperienceId(long plid) {
-		return getService().fetchDefaultSegmentsExperienceId(plid);
-	}
-
 	public static SegmentsExperience fetchSegmentsExperience(
 		long segmentsExperienceId) {
 
@@ -312,16 +307,17 @@ public class SegmentsExperienceLocalServiceUtil {
 	}
 
 	public static SegmentsExperience fetchSegmentsExperience(
-		long groupId, long plid, int priority) {
+		long groupId, long classNameId, long classPK, int priority) {
 
-		return getService().fetchSegmentsExperience(groupId, plid, priority);
+		return getService().fetchSegmentsExperience(
+			groupId, classNameId, classPK, priority);
 	}
 
 	public static SegmentsExperience fetchSegmentsExperience(
-		long groupId, String segmentsExperienceKey, long plid) {
+		long groupId, String segmentsExperienceKey) {
 
 		return getService().fetchSegmentsExperience(
-			groupId, segmentsExperienceKey, plid);
+			groupId, segmentsExperienceKey);
 	}
 
 	/**
@@ -392,11 +388,11 @@ public class SegmentsExperienceLocalServiceUtil {
 	}
 
 	public static SegmentsExperience getSegmentsExperience(
-			long groupId, String segmentsExperienceKey, long plid)
+			long groupId, String segmentsExperienceKey)
 		throws PortalException {
 
 		return getService().getSegmentsExperience(
-			groupId, segmentsExperienceKey, plid);
+			groupId, segmentsExperienceKey);
 	}
 
 	/**
@@ -433,40 +429,44 @@ public class SegmentsExperienceLocalServiceUtil {
 	}
 
 	public static List<SegmentsExperience> getSegmentsExperiences(
-		long groupId, long plid) {
+		long groupId, long classNameId, long classPK) {
 
-		return getService().getSegmentsExperiences(groupId, plid);
+		return getService().getSegmentsExperiences(
+			groupId, classNameId, classPK);
 	}
 
 	public static List<SegmentsExperience> getSegmentsExperiences(
-			long groupId, long plid, boolean active)
+			long groupId, long classNameId, long classPK, boolean active)
 		throws PortalException {
 
-		return getService().getSegmentsExperiences(groupId, plid, active);
+		return getService().getSegmentsExperiences(
+			groupId, classNameId, classPK, active);
 	}
 
 	public static List<SegmentsExperience> getSegmentsExperiences(
-		long groupId, long plid, boolean active, int start, int end,
+		long groupId, long classNameId, long classPK, boolean active, int start,
+		int end, OrderByComparator<SegmentsExperience> orderByComparator) {
+
+		return getService().getSegmentsExperiences(
+			groupId, classNameId, classPK, active, start, end,
+			orderByComparator);
+	}
+
+	public static List<SegmentsExperience> getSegmentsExperiences(
+		long groupId, long[] segmentsEntryIds, long classNameId, long classPK,
+		boolean active) {
+
+		return getService().getSegmentsExperiences(
+			groupId, segmentsEntryIds, classNameId, classPK, active);
+	}
+
+	public static List<SegmentsExperience> getSegmentsExperiences(
+		long groupId, long[] segmentsEntryIds, long classNameId, long classPK,
+		boolean active, int start, int end,
 		OrderByComparator<SegmentsExperience> orderByComparator) {
 
 		return getService().getSegmentsExperiences(
-			groupId, plid, active, start, end, orderByComparator);
-	}
-
-	public static List<SegmentsExperience> getSegmentsExperiences(
-		long groupId, long[] segmentsEntryIds, long plid, boolean active) {
-
-		return getService().getSegmentsExperiences(
-			groupId, segmentsEntryIds, plid, active);
-	}
-
-	public static List<SegmentsExperience> getSegmentsExperiences(
-		long groupId, long[] segmentsEntryIds, long plid, boolean active,
-		int start, int end,
-		OrderByComparator<SegmentsExperience> orderByComparator) {
-
-		return getService().getSegmentsExperiences(
-			groupId, segmentsEntryIds, plid, active, start, end,
+			groupId, segmentsEntryIds, classNameId, classPK, active, start, end,
 			orderByComparator);
 	}
 
@@ -512,14 +512,18 @@ public class SegmentsExperienceLocalServiceUtil {
 		return getService().getSegmentsExperiencesCount();
 	}
 
-	public static int getSegmentsExperiencesCount(long groupId, long plid) {
-		return getService().getSegmentsExperiencesCount(groupId, plid);
+	public static int getSegmentsExperiencesCount(
+		long groupId, long classNameId, long classPK) {
+
+		return getService().getSegmentsExperiencesCount(
+			groupId, classNameId, classPK);
 	}
 
 	public static int getSegmentsExperiencesCount(
-		long groupId, long plid, boolean active) {
+		long groupId, long classNameId, long classPK, boolean active) {
 
-		return getService().getSegmentsExperiencesCount(groupId, plid, active);
+		return getService().getSegmentsExperiencesCount(
+			groupId, classNameId, classPK, active);
 	}
 
 	public static SegmentsExperience updateSegmentsExperience(

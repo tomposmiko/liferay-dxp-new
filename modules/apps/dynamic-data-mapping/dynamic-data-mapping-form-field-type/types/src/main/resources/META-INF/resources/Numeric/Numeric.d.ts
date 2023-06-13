@@ -15,7 +15,6 @@
 import React, {FocusEventHandler} from 'react';
 import {ISymbols} from '../NumericInputMask/NumericInputMask';
 import './Numeric.scss';
-import type {FieldChangeEventHandler, Locale, LocalizedValue} from '../types';
 declare const Numeric: React.FC<IProps>;
 export {Numeric};
 declare const _default: any;
@@ -24,27 +23,19 @@ interface IProps {
 	append: string;
 	appendType: 'prefix' | 'suffix';
 	dataType: NumericDataType;
-	decimalPlaces: number;
 	defaultLanguageId: Locale;
-	errorMessage?: string;
-	focused: boolean;
 	id: string;
 	inputMask?: boolean;
 	inputMaskFormat?: string;
-	localizedSymbols?: LocalizedValue<ISymbols>;
 	localizedValue?: LocalizedValue<string>;
 	name: string;
 	onBlur: FocusEventHandler<HTMLInputElement>;
-	onChange: FieldChangeEventHandler<string>;
+	onChange: FieldChangeEventHandler<String>;
 	onFocus: FocusEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	predefinedValue?: string;
 	readOnly: boolean;
-	required?: boolean;
-	settingsContext?: any;
 	symbols: ISymbols;
-	tip?: string;
-	valid?: boolean;
 	value?: string;
 }
 declare type NumericDataType = 'integer' | 'double';

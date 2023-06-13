@@ -18,7 +18,7 @@ import React from 'react';
 import {dateToBriefInternationalHuman} from '../utils/utils.es';
 import UserIcon from './UserIcon.es';
 
-export default function UserPopover({creator, statistics}) {
+export default ({creator, statistics}) => {
 	return (
 		<ClayPopover
 			alignPosition="bottom"
@@ -48,28 +48,20 @@ export default function UserPopover({creator, statistics}) {
 			}
 		>
 			<div className="text-secondary">
+				<p className="c-mb-0">Posts: {statistics?.postsNumber}</p>
 				<p className="c-mb-0">
-					{Liferay.Language.get('posts')}: {statistics?.postsNumber}
+					Join Date:{' '}
+					{statistics
+						? dateToBriefInternationalHuman(statistics.joinDate)
+						: ''}
 				</p>
-
 				<p className="c-mb-0">
-					{`${Liferay.Language.get('join-date')}: ${
-						statistics
-							? dateToBriefInternationalHuman(statistics.joinDate)
-							: ''
-					}`}
-				</p>
-
-				<p className="c-mb-0">
-					{`${Liferay.Language.get('last-post-date')}: ${
-						statistics
-							? dateToBriefInternationalHuman(
-									statistics.lastPostDate
-							  )
-							: ''
-					}`}
+					Last Post Date:{' '}
+					{statistics
+						? dateToBriefInternationalHuman(statistics.lastPostDate)
+						: ''}
 				</p>
 			</div>
 		</ClayPopover>
 	);
-}
+};

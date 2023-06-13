@@ -27,25 +27,24 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jamie Sammons
  */
 @Component(
-	enabled = false,
+	enabled = false, immediate = true,
 	property = "panel.category.key=" + PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT,
 	service = PanelApp.class
 )
 public class ModerationPanelApp extends BasePanelApp {
 
 	@Override
-	public Portlet getPortlet() {
-		return _portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return ModerationPortletKeys.MODERATION;
 	}
 
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + ModerationPortletKeys.MODERATION + ")"
+		target = "(javax.portlet.name=" + ModerationPortletKeys.MODERATION + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
 
 }

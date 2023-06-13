@@ -18,7 +18,7 @@
 AUI.add(
 	'liferay-tree-view-icons',
 	(A) => {
-		const ICON_DEPRECATED_CLASSES = [
+		var ICON_DEPRECATED_CLASSES = [
 			'glyphicon',
 			'glyphicon-check',
 			'glyphicon-file',
@@ -32,23 +32,23 @@ AUI.add(
 			'icon-plus',
 		];
 
-		const clearIconClasses = function (element) {
+		var clearIconClasses = function (element) {
 			ICON_DEPRECATED_CLASSES.forEach((className) =>
 				element.removeClass(className)
 			);
 		};
 
-		const originalSyncIconUIFn = A.TreeNode.prototype._syncIconUI;
+		var originalSyncIconUIFn = A.TreeNode.prototype._syncIconUI;
 
 		A.TreeNode.prototype._syncIconUI = function (args) {
 			originalSyncIconUIFn.call(this, args);
 
-			const hasChildren = !this.get('leaf');
-			const expanded = this.get('expanded');
-			const hitAreaEl = this.get('hitAreaEl');
-			const iconEl = this.get('iconEl');
+			var hasChildren = !this.get('leaf');
+			var expanded = this.get('expanded');
+			var hitAreaEl = this.get('hitAreaEl');
+			var iconEl = this.get('iconEl');
 
-			const hitAreaContent = hasChildren
+			var hitAreaContent = hasChildren
 				? Liferay.Util.getLexiconIconTpl(expanded ? 'hr' : 'plus')
 				: '<span class="tree-hitarea"></span>';
 
@@ -56,22 +56,22 @@ AUI.add(
 
 			clearIconClasses(hitAreaEl);
 
-			const expandedIcon = expanded ? 'move-folder' : 'folder';
-			const icon = hasChildren ? expandedIcon : 'page';
+			var expandedIcon = expanded ? 'move-folder' : 'folder';
+			var icon = hasChildren ? expandedIcon : 'page';
 
 			iconEl.setHTML(Liferay.Util.getLexiconIconTpl(icon));
 
 			clearIconClasses(iconEl);
 		};
 
-		const originalSyncIconCheckUIFn =
+		var originalSyncIconCheckUIFn =
 			A.TreeNodeCheck.prototype._syncIconCheckUI;
 
 		A.TreeNodeCheck.prototype._syncIconCheckUI = function (args) {
 			originalSyncIconCheckUIFn.call(this, args);
 
-			const checked = this.isChecked();
-			const checkContainerEl = this.get('checkContainerEl');
+			var checked = this.isChecked();
+			var checkContainerEl = this.get('checkContainerEl');
 
 			checkContainerEl.setHTML(
 				Liferay.Util.getLexiconIconTpl(

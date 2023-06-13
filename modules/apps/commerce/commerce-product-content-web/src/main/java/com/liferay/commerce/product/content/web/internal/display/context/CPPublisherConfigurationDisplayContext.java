@@ -20,20 +20,16 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
-import com.liferay.commerce.constants.CommerceWebKeys;
-import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPSku;
 import com.liferay.commerce.product.content.render.list.CPContentListRendererRegistry;
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
-import com.liferay.commerce.product.content.web.internal.helper.CPPublisherWebHelper;
+import com.liferay.commerce.product.content.web.internal.util.CPPublisherWebHelper;
 import com.liferay.commerce.product.data.source.CPDataSource;
 import com.liferay.commerce.product.data.source.CPDataSourceRegistry;
 import com.liferay.commerce.product.item.selector.criterion.CPDefinitionItemSelectorCriterion;
-import com.liferay.commerce.product.type.CPTypeRegistry;
-import com.liferay.commerce.product.util.CPDefinitionHelper;
+import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPInstanceHelper;
-import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
@@ -72,7 +68,6 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Marco Leo
- * @author Alessio Antonio Rendina
  */
 public class CPPublisherConfigurationDisplayContext
 	extends BaseCPPublisherDisplayContext {
@@ -83,21 +78,19 @@ public class CPPublisherConfigurationDisplayContext
 			CPContentListEntryRendererRegistry contentListEntryRendererRegistry,
 			CPContentListRendererRegistry cpContentListRendererRegistry,
 			CPDataSourceRegistry cpDataSourceRegistry,
-			CPDefinitionHelper cpDefinitionHelper,
 			CPInstanceHelper cpInstanceHelper,
 			CPPublisherWebHelper cpPublisherWebHelper,
-			CPTypeRegistry cpTypeRegistry,
+			CPTypeServicesTracker cpTypeServicesTracker,
 			HttpServletRequest httpServletRequest, ItemSelector itemSelector)
 		throws PortalException {
 
 		super(
 			contentListEntryRendererRegistry, cpContentListRendererRegistry,
-			cpPublisherWebHelper, cpTypeRegistry, httpServletRequest);
+			cpPublisherWebHelper, cpTypeServicesTracker, httpServletRequest);
 
 		_assetCategoryLocalService = assetCategoryLocalService;
 		_assetTagLocalService = assetTagLocalService;
 		_cpDataSourceRegistry = cpDataSourceRegistry;
-		_cpDefinitionHelper = cpDefinitionHelper;
 		_cpInstanceHelper = cpInstanceHelper;
 		_itemSelector = itemSelector;
 	}
@@ -244,13 +237,14 @@ public class CPPublisherConfigurationDisplayContext
 				"selectedCategories", "{selectedCategories}");
 			portletURL.setParameter("singleSelect", "{singleSelect}");
 			portletURL.setParameter("vocabularyIds", "{vocabularyIds}");
+
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 			return portletURL.toString();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -267,20 +261,7 @@ public class CPPublisherConfigurationDisplayContext
 		return _cpInstanceHelper.getDefaultCPSku(cpCatalogEntry);
 	}
 
-	public String getDefaultImageFileURL(CPCatalogEntry cpCatalogEntry)
-		throws PortalException {
-
-		HttpServletRequest httpServletRequest =
-			cpContentRequestHelper.getRequest();
-
-		return _cpDefinitionHelper.getDefaultImageFileURL(
-			CommerceUtil.getCommerceAccountId(
-				(CommerceContext)httpServletRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT)),
-			cpCatalogEntry.getCPDefinitionId());
-	}
-
-	public String getItemSelectorUrl() {
+	public String getItemSelectorUrl() throws Exception {
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(
 				cpContentRequestHelper.getRenderRequest());
@@ -292,10 +273,11 @@ public class CPPublisherConfigurationDisplayContext
 			Collections.<ItemSelectorReturnType>singletonList(
 				new UUIDItemSelectorReturnType()));
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, "productDefinitionsSelectItem",
-				cpDefinitionItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "productDefinitionsSelectItem",
+			cpDefinitionItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	public String getOrderByColumn1() {
@@ -379,7 +361,7 @@ public class CPPublisherConfigurationDisplayContext
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -427,7 +409,6 @@ public class CPPublisherConfigurationDisplayContext
 	private final AssetCategoryLocalService _assetCategoryLocalService;
 	private final AssetTagLocalService _assetTagLocalService;
 	private final CPDataSourceRegistry _cpDataSourceRegistry;
-	private final CPDefinitionHelper _cpDefinitionHelper;
 	private final CPInstanceHelper _cpInstanceHelper;
 	private final ItemSelector _itemSelector;
 	private String _orderByColumn1;

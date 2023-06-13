@@ -141,13 +141,7 @@ public class ThreadLocalScopeContextScopeChecker
 
 	@Override
 	public void setBundle(Bundle bundle) {
-		String symbolicName = null;
-
-		if (bundle != null) {
-			symbolicName = bundle.getSymbolicName();
-		}
-
-		_bundleSymbolicNameThreadLocal.set(symbolicName);
+		_bundleSymbolicNameThreadLocal.set(bundle.getSymbolicName());
 	}
 
 	@Override

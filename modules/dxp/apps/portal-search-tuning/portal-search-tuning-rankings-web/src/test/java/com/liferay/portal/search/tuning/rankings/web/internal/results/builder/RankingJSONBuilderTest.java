@@ -35,6 +35,8 @@ public class RankingJSONBuilderTest extends BaseRankingResultsBuilderTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		setUpResourceRequest();
 
 		_rankingJSONBuilder = new RankingJSONBuilder(
@@ -77,7 +79,7 @@ public class RankingJSONBuilderTest extends BaseRankingResultsBuilderTestCase {
 			"pinned", false
 		).put(
 			"title", "theTitle"
-		).toString();
+		).toJSONString();
 	}
 
 	private RankingJSONBuilder _rankingJSONBuilder;

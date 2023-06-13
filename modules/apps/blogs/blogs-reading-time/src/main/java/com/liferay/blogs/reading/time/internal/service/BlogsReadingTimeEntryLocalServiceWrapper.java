@@ -31,9 +31,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = ServiceWrapper.class)
+@Component(immediate = true, service = ServiceWrapper.class)
 public class BlogsReadingTimeEntryLocalServiceWrapper
 	extends BlogsEntryLocalServiceWrapper {
+
+	public BlogsReadingTimeEntryLocalServiceWrapper() {
+		super(null);
+	}
+
+	public BlogsReadingTimeEntryLocalServiceWrapper(
+		BlogsEntryLocalService blogsEntryLocalService) {
+
+		super(blogsEntryLocalService);
+	}
 
 	@Override
 	public BlogsEntry addEntry(

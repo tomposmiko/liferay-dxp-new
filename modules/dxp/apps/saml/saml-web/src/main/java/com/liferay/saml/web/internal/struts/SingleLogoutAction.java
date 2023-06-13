@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  */
 @Component(
+	immediate = true,
 	property = {
 		"path=/portal/saml/slo", "path=/portal/saml/slo_logout",
 		"path=/portal/saml/slo_soap"
@@ -37,8 +38,12 @@ import org.osgi.service.component.annotations.Reference;
 public class SingleLogoutAction extends BaseSamlStrutsAction {
 
 	@Override
-	public boolean isEnabled() {
-		return _samlProviderConfigurationHelper.isEnabled();
+	@Reference(unbind = "-")
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		super.setSamlProviderConfigurationHelper(
+			samlProviderConfigurationHelper);
 	}
 
 	@Override
@@ -49,7 +54,7 @@ public class SingleLogoutAction extends BaseSamlStrutsAction {
 
 		String requestURI = httpServletRequest.getRequestURI();
 
-		if (_samlProviderConfigurationHelper.isRoleIdp() &&
+		if (samlProviderConfigurationHelper.isRoleIdp() &&
 			requestURI.endsWith("/slo_logout")) {
 
 			_singleLogoutProfile.processIdpLogout(
@@ -62,9 +67,6 @@ public class SingleLogoutAction extends BaseSamlStrutsAction {
 
 		return null;
 	}
-
-	@Reference
-	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
 
 	@Reference
 	private SingleLogoutProfile _singleLogoutProfile;

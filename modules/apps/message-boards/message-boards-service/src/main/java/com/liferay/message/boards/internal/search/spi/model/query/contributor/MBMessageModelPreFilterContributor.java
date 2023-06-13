@@ -20,22 +20,15 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseRelatedEntryIndexer;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.RelatedEntryIndexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
-import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
@@ -46,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.message.boards.model.MBMessage",
 	service = ModelPreFilterContributor.class
 )
@@ -64,67 +58,8 @@ public class MBMessageModelPreFilterContributor
 		BooleanFilter booleanFilter, ModelSearchSettings modelSearchSettings,
 		SearchContext searchContext) {
 
-		booleanFilter.add(
-			new BooleanFilter() {
-				{
-					add(
-						new BooleanFilter() {
-							{
-								addWorkflowStatusFilter(
-									this, modelSearchSettings, searchContext);
-							}
-						},
-						BooleanClauseOccur.SHOULD);
-
-					PermissionChecker permissionChecker =
-						PermissionThreadLocal.getPermissionChecker();
-
-					User user = permissionChecker.getUser();
-
-					long groupId = GroupConstants.DEFAULT_LIVE_GROUP_ID;
-
-					if (user.getGroup() != null) {
-						groupId = user.getGroupId();
-					}
-
-					if (permissionChecker.isContentReviewer(
-							CompanyThreadLocal.getCompanyId(), groupId)) {
-
-						add(
-							new BooleanFilter() {
-								{
-									add(
-										new TermFilter(
-											"status",
-											String.valueOf(
-												WorkflowConstants.
-													STATUS_PENDING)),
-										BooleanClauseOccur.MUST);
-								}
-							},
-							BooleanClauseOccur.SHOULD);
-					}
-
-					add(
-						new BooleanFilter() {
-							{
-								add(
-									new TermFilter(
-										"status",
-										String.valueOf(
-											WorkflowConstants.STATUS_PENDING)),
-									BooleanClauseOccur.MUST);
-								add(
-									new TermFilter(
-										"userId",
-										String.valueOf(user.getUserId())),
-									BooleanClauseOccur.MUST);
-							}
-						},
-						BooleanClauseOccur.SHOULD);
-				}
-			},
-			BooleanClauseOccur.MUST);
+		addWorkflowStatusFilter(
+			booleanFilter, modelSearchSettings, searchContext);
 
 		boolean discussion = GetterUtil.getBoolean(
 			searchContext.getAttribute("discussion"));

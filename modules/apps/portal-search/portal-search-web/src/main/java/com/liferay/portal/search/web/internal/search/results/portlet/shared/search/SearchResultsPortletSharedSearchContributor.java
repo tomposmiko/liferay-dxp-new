@@ -16,7 +16,7 @@ package com.liferay.portal.search.web.internal.search.results.portlet.shared.sea
 
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.web.constants.SearchResultsPortletKeys;
+import com.liferay.portal.search.web.internal.search.results.constants.SearchResultsPortletKeys;
 import com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletPreferences;
 import com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletPreferencesImpl;
 import com.liferay.portal.search.web.internal.util.SearchOptionalUtil;
@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SearchResultsPortletKeys.SEARCH_RESULTS,
 	service = PortletSharedSearchContributor.class
 )
@@ -49,9 +50,10 @@ public class SearchResultsPortletSharedSearchContributor
 
 		SearchRequestBuilder searchRequestBuilder =
 			portletSharedSearchSettings.getFederatedSearchRequestBuilder(
-				searchResultsPortletPreferences.getFederatedSearchKey());
+				searchResultsPortletPreferences.
+					getFederatedSearchKeyOptional());
 
-		_paginate(
+		paginate(
 			searchResultsPortletPreferences, portletSharedSearchSettings,
 			searchRequestBuilder);
 
@@ -59,16 +61,13 @@ public class SearchResultsPortletSharedSearchContributor
 			searchRequestBuilder.highlightEnabled(true);
 
 			String[] fieldsToDisplay = SearchStringUtil.splitAndUnquote(
-				searchResultsPortletPreferences.getFieldsToDisplay());
+				searchResultsPortletPreferences.getFieldsToDisplayOptional());
 
 			searchRequestBuilder.highlightFields(fieldsToDisplay);
 		}
 	}
 
-	@Reference
-	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
-
-	private void _paginate(
+	protected void paginate(
 		SearchResultsPortletPreferences searchResultsPortletPreferences,
 		PortletSharedSearchSettings portletSharedSearchSettings,
 		SearchRequestBuilder searchRequestBuilder) {
@@ -110,5 +109,8 @@ public class SearchResultsPortletSharedSearchContributor
 						paginationDelta),
 			searchRequestBuilder::from);
 	}
+
+	@Reference
+	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
 
 }

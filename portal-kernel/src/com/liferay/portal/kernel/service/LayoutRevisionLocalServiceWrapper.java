@@ -25,10 +25,6 @@ public class LayoutRevisionLocalServiceWrapper
 	implements LayoutRevisionLocalService,
 			   ServiceWrapper<LayoutRevisionLocalService> {
 
-	public LayoutRevisionLocalServiceWrapper() {
-		this(null);
-	}
-
 	public LayoutRevisionLocalServiceWrapper(
 		LayoutRevisionLocalService layoutRevisionLocalService) {
 
@@ -505,11 +501,6 @@ public class LayoutRevisionLocalServiceWrapper
 	@Override
 	public int getLayoutRevisionsCount() {
 		return _layoutRevisionLocalService.getLayoutRevisionsCount();
-	}
-
-	@Override
-	public int getLayoutRevisionsCount(long plid) {
-		return _layoutRevisionLocalService.getLayoutRevisionsCount(plid);
 	}
 
 	@Override

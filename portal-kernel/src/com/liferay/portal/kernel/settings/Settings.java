@@ -37,6 +37,9 @@ public interface Settings {
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	public @interface Config {
+
+		public String[] settingsIds();
+
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)

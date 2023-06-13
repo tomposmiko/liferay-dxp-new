@@ -15,13 +15,13 @@
 AUI.add(
 	'liferay-workflow-tasks',
 	(A) => {
-		const WorkflowTasks = {
+		var WorkflowTasks = {
 			_comments: {},
 			_content: {},
 			_forms: {},
 
 			_showPopup(form, height, title) {
-				const dialog = Liferay.Util.Window.getWindow({
+				var dialog = Liferay.Util.Window.getWindow({
 					dialog: {
 						bodyContent: form,
 						destroyOnHide: true,
@@ -52,14 +52,14 @@ AUI.add(
 									on: {
 										click() {
 											if (form) {
-												let hasErrors = false;
+												var hasErrors = false;
 
-												const liferayForm = Liferay.Form.get(
+												var liferayForm = Liferay.Form.get(
 													form.attr('id')
 												);
 
 												if (liferayForm) {
-													const validator =
+													var validator =
 														liferayForm.formValidator;
 
 													if (validator) {
@@ -94,7 +94,6 @@ AUI.add(
 											dialog.destroy();
 										},
 									},
-									title: Liferay.Language.get('close'),
 								},
 							],
 						},
@@ -105,18 +104,18 @@ AUI.add(
 			},
 
 			onTaskClick(event, randomId) {
-				const instance = this;
+				var instance = this;
 
 				event.preventDefault();
 
-				const icon = event.currentTarget;
+				var icon = event.currentTarget;
 
-				const form = A.Node.create('<form />');
+				var form = A.Node.create('<form />');
 
 				form.setAttribute('action', icon.attr('href'));
 				form.setAttribute('method', 'POST');
 
-				let comments = A.one('#' + randomId + 'updateComments');
+				var comments = A.one('#' + randomId + 'updateComments');
 
 				if (comments && !instance._comments[randomId]) {
 					instance._comments[randomId] = comments;

@@ -19,18 +19,14 @@ import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.account.service.AccountEntryUserRelService;
 import com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService;
-import com.liferay.captcha.util.CaptchaUtil;
 import com.liferay.headless.admin.user.dto.v1_0.Account;
 import com.liferay.headless.admin.user.dto.v1_0.AccountBrief;
-import com.liferay.headless.admin.user.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.dto.v1_0.OrganizationBrief;
-import com.liferay.headless.admin.user.dto.v1_0.Phone;
-import com.liferay.headless.admin.user.dto.v1_0.PostalAddress;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccountContactInformation;
-import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.internal.dto.v1_0.converter.AccountResourceDTOConverter;
 import com.liferay.headless.admin.user.internal.dto.v1_0.converter.OrganizationResourceDTOConverter;
+import com.liferay.headless.admin.user.internal.dto.v1_0.converter.UserAccountResourceDTOConverter;
 import com.liferay.headless.admin.user.internal.dto.v1_0.converter.UserResourceDTOConverter;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.ServiceBuilderAddressUtil;
@@ -45,17 +41,12 @@ import com.liferay.headless.common.spi.service.context.ServiceContextRequestUtil
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.captcha.CaptchaSettings;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
-import com.liferay.portal.kernel.exception.UserLockoutException;
-import com.liferay.portal.kernel.exception.UserPasswordException;
 import com.liferay.portal.kernel.model.Address;
-import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.EmailAddress;
 import com.liferay.portal.kernel.model.ListTypeConstants;
 import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.model.PasswordPolicy;
+import com.liferay.portal.kernel.model.Phone;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.Website;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -65,27 +56,20 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
-import com.liferay.portal.kernel.security.auth.Authenticator;
-import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManager;
-import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManagerUtil;
-import com.liferay.portal.kernel.security.ldap.LDAPSettingsUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ContactLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
@@ -96,30 +80,26 @@ import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
-import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
-import com.liferay.users.admin.kernel.util.UsersAdmin;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.component.annotations.ServiceScope;
 
 /**
@@ -137,11 +117,11 @@ public class UserAccountResourceImpl
 	public void
 			deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
 				String accountExternalReferenceCode,
-				String externalReferenceCode)
+				String userAccountExternalReferenceCode)
 		throws Exception {
 
 		User user = _userLocalService.getUserByExternalReferenceCode(
-			externalReferenceCode, contextCompany.getCompanyId());
+			contextCompany.getCompanyId(), userAccountExternalReferenceCode);
 
 		_accountEntryUserRelService.deleteAccountEntryUserRelByEmailAddress(
 			_accountResourceDTOConverter.getAccountEntryId(
@@ -201,7 +181,7 @@ public class UserAccountResourceImpl
 		throws Exception {
 
 		User user = _userLocalService.getUserByExternalReferenceCode(
-			externalReferenceCode, contextCompany.getCompanyId());
+			contextCompany.getCompanyId(), externalReferenceCode);
 
 		deleteUserAccount(user.getUserId());
 	}
@@ -238,7 +218,6 @@ public class UserAccountResourceImpl
 							"EmailAddress",
 						"getAccountUserAccountsByExternalReferenceCodePage",
 						"getAccountUserAccountsPage", "postAccountUserAccount",
-						"postAccountUserAccountBatch",
 						"postAccountUserAccountByEmailAddress",
 						"postAccountUserAccountByExternalReferenceCode",
 						"postAccountUserAccountByExternalReferenceCodeBy" +
@@ -358,6 +337,13 @@ public class UserAccountResourceImpl
 			String search, Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception {
 
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (!permissionChecker.isCompanyAdmin(contextCompany.getCompanyId())) {
+			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
+		}
+
 		return _getUserAccountsPage(
 			HashMapBuilder.<String, Map<String, String>>putAll(
 				_getCompanyScopeActions(
@@ -387,11 +373,11 @@ public class UserAccountResourceImpl
 	public void
 			postAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
 				String accountExternalReferenceCode,
-				String externalReferenceCode)
+				String userAccountExternalReferenceCode)
 		throws Exception {
 
 		User user = _userLocalService.getUserByExternalReferenceCode(
-			externalReferenceCode, contextCompany.getCompanyId());
+			contextCompany.getCompanyId(), userAccountExternalReferenceCode);
 
 		_accountEntryUserRelService.addAccountEntryUserRelByEmailAddress(
 			_accountResourceDTOConverter.getAccountEntryId(
@@ -419,21 +405,23 @@ public class UserAccountResourceImpl
 				contextAcceptLanguage.getPreferredLocale(),
 				userAccount.getGivenName(), userAccount.getAdditionalName(),
 				userAccount.getFamilyName(), _getPrefixId(userAccount),
-				_getSuffixId(userAccount), userAccount.getJobTitle(),
-				ServiceContextFactory.getInstance(contextHttpServletRequest));
+				_getSuffixId(userAccount));
 
 		User user = accountEntryUserRel.getUser();
 
-		_usersAdmin.updateAddresses(
+		user = _userLocalService.updateJobTitle(
+			user.getUserId(), userAccount.getJobTitle());
+
+		UsersAdminUtil.updateAddresses(
 			Contact.class.getName(), user.getContactId(),
 			_getAddresses(userAccount));
-		_usersAdmin.updateEmailAddresses(
+		UsersAdminUtil.updateEmailAddresses(
 			Contact.class.getName(), user.getContactId(),
 			_getServiceBuilderEmailAddresses(userAccount));
-		_usersAdmin.updatePhones(
+		UsersAdminUtil.updatePhones(
 			Contact.class.getName(), user.getContactId(),
 			_getServiceBuilderPhones(userAccount));
-		_usersAdmin.updateWebsites(
+		UsersAdminUtil.updateWebsites(
 			Contact.class.getName(), user.getContactId(),
 			_getWebsites(userAccount));
 
@@ -463,8 +451,8 @@ public class UserAccountResourceImpl
 				user.getScreenName(), user.getEmailAddress(), false, null,
 				user.getLanguageId(), user.getTimeZoneId(), user.getGreeting(),
 				user.getComments(), user.getFirstName(), user.getMiddleName(),
-				user.getLastName(), contact.getPrefixListTypeId(),
-				contact.getSuffixListTypeId(), user.isMale(),
+				user.getLastName(), contact.getPrefixId(),
+				contact.getSuffixId(), user.isMale(),
 				_getBirthdayMonth(userAccount), _getBirthdayDay(userAccount),
 				_getBirthdayYear(userAccount), sms, facebook, jabber, skype,
 				twitter, user.getJobTitle(), user.getGroupIds(),
@@ -572,74 +560,25 @@ public class UserAccountResourceImpl
 	public UserAccount postUserAccount(UserAccount userAccount)
 		throws Exception {
 
-		User user = null;
-
-		boolean autoPassword = false;
-		String password = userAccount.getPassword();
-
-		if (Validator.isNull(password)) {
-			autoPassword = true;
-		}
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			contextHttpServletRequest);
-
-		serviceContext.setExpandoBridgeAttributes(
-			CustomFieldsUtil.toMap(
-				User.class.getName(), contextCompany.getCompanyId(),
-				userAccount.getCustomFields(),
-				contextAcceptLanguage.getPreferredLocale()));
-
-		if (contextUser.isGuestUser()) {
-			if (_captchaSettings.isCreateAccountCaptchaEnabled()) {
-				CaptchaUtil.check(contextHttpServletRequest);
-			}
-
-			user = _userService.addUser(
-				contextCompany.getCompanyId(), autoPassword, password, password,
-				false, userAccount.getAlternateName(),
-				userAccount.getEmailAddress(),
-				contextAcceptLanguage.getPreferredLocale(),
-				userAccount.getGivenName(), userAccount.getAdditionalName(),
-				userAccount.getFamilyName(), _getPrefixId(userAccount),
-				_getSuffixId(userAccount), true, _getBirthdayMonth(userAccount),
-				_getBirthdayDay(userAccount), _getBirthdayYear(userAccount),
-				userAccount.getJobTitle(), new long[0], new long[0],
-				new long[0], new long[0], true, serviceContext);
-
-			PermissionThreadLocal.setPermissionChecker(
-				_permissionCheckerFactory.create(user));
-
-			_usersAdmin.updateAddresses(
-				Contact.class.getName(), user.getContactId(),
-				_getAddresses(userAccount));
-			_usersAdmin.updateEmailAddresses(
-				Contact.class.getName(), user.getContactId(),
-				_getServiceBuilderEmailAddresses(userAccount));
-			_usersAdmin.updatePhones(
-				Contact.class.getName(), user.getContactId(),
-				_getServiceBuilderPhones(userAccount));
-			_usersAdmin.updateWebsites(
-				Contact.class.getName(), user.getContactId(),
-				_getWebsites(userAccount));
-		}
-		else {
-			user = _userService.addUser(
-				contextCompany.getCompanyId(), autoPassword, password, password,
-				false, userAccount.getAlternateName(),
-				userAccount.getEmailAddress(),
-				contextAcceptLanguage.getPreferredLocale(),
-				userAccount.getGivenName(), userAccount.getAdditionalName(),
-				userAccount.getFamilyName(), _getPrefixId(userAccount),
-				_getSuffixId(userAccount), true, _getBirthdayMonth(userAccount),
-				_getBirthdayDay(userAccount), _getBirthdayYear(userAccount),
-				userAccount.getJobTitle(), new long[0], new long[0],
-				new long[0], new long[0], _getAddresses(userAccount),
-				_getServiceBuilderEmailAddresses(userAccount),
-				_getServiceBuilderPhones(userAccount),
-				_getWebsites(userAccount), Collections.emptyList(), true,
-				serviceContext);
-		}
+		User user = _userService.addUser(
+			contextCompany.getCompanyId(), true, null, null, false,
+			userAccount.getAlternateName(), userAccount.getEmailAddress(),
+			contextAcceptLanguage.getPreferredLocale(),
+			userAccount.getGivenName(), userAccount.getAdditionalName(),
+			userAccount.getFamilyName(), _getPrefixId(userAccount),
+			_getSuffixId(userAccount), true, _getBirthdayMonth(userAccount),
+			_getBirthdayDay(userAccount), _getBirthdayYear(userAccount),
+			userAccount.getJobTitle(), new long[0], new long[0], new long[0],
+			new long[0], _getAddresses(userAccount),
+			_getServiceBuilderEmailAddresses(userAccount),
+			_getServiceBuilderPhones(userAccount), _getWebsites(userAccount),
+			Collections.emptyList(), false,
+			ServiceContextRequestUtil.createServiceContext(
+				CustomFieldsUtil.toMap(
+					User.class.getName(), contextCompany.getCompanyId(),
+					userAccount.getCustomFields(),
+					contextAcceptLanguage.getPreferredLocale()),
+				contextCompany.getGroupId(), contextHttpServletRequest, null));
 
 		UserAccountContactInformation userAccountContactInformation =
 			userAccount.getUserAccountContactInformation();
@@ -659,19 +598,6 @@ public class UserAccountResourceImpl
 		}
 
 		return _toUserAccount(user);
-	}
-
-	@Override
-	public Response postUserAccountImage(
-			Long userAccountId, MultipartBody multipartBody)
-		throws Exception {
-
-		_userService.updatePortrait(
-			userAccountId, multipartBody.getBinaryFileAsBytes("image"));
-
-		Response.ResponseBuilder responseBuilder = Response.noContent();
-
-		return responseBuilder.build();
 	}
 
 	@Override
@@ -716,21 +642,19 @@ public class UserAccountResourceImpl
 			userAccount.getOrganizationBriefs();
 
 		if (organizationBriefs != null) {
-			Long[] ids = transform(
-				organizationBriefs,
-				organizationBrief -> organizationBrief.getId(), Long.class);
+			Stream<OrganizationBrief> stream = Arrays.stream(
+				organizationBriefs);
 
-			organizationIds = ArrayUtil.toArray(ids);
+			LongStream longStream = stream.mapToLong(OrganizationBrief::getId);
+
+			organizationIds = longStream.toArray();
 		}
-
-		_updatePassword(
-			user, userAccount.getCurrentPassword(), userAccount.getPassword());
 
 		return _toUserAccount(
 			_userService.updateUser(
 				userAccountId, null, null, null, false, null, null,
 				userAccount.getAlternateName(), userAccount.getEmailAddress(),
-				true, null, user.getLanguageId(), user.getTimeZoneId(),
+				false, null, user.getLanguageId(), user.getTimeZoneId(),
 				user.getGreeting(), user.getComments(),
 				userAccount.getGivenName(), userAccount.getAdditionalName(),
 				userAccount.getFamilyName(), _getPrefixId(userAccount),
@@ -760,23 +684,10 @@ public class UserAccountResourceImpl
 			String externalReferenceCode, UserAccount userAccount)
 		throws Exception {
 
-		boolean autoPassword = true;
-		String password = userAccount.getPassword();
-
-		if (Validator.isNotNull(password)) {
-			autoPassword = false;
-
-			_checkCurrentPassword(
-				_userLocalService.fetchUserByExternalReferenceCode(
-					externalReferenceCode, contextCompany.getCompanyId()),
-				userAccount.getCurrentPassword());
-		}
-
 		User user = _userService.addOrUpdateUser(
 			externalReferenceCode, contextUser.getUserId(),
-			contextCompany.getCompanyId(), autoPassword, password, password,
-			false, userAccount.getAlternateName(),
-			userAccount.getEmailAddress(),
+			contextCompany.getCompanyId(), true, null, null, false,
+			userAccount.getAlternateName(), userAccount.getEmailAddress(),
 			contextAcceptLanguage.getPreferredLocale(),
 			userAccount.getGivenName(), userAccount.getAdditionalName(),
 			userAccount.getFamilyName(), _getPrefixId(userAccount),
@@ -838,99 +749,59 @@ public class UserAccountResourceImpl
 				existingUserAccountContactInformation =
 					existingUserAccount.getUserAccountContactInformation();
 
-			EmailAddress[] emailAddresses =
-				userAccountContactInformation.getEmailAddresses();
-
-			if (emailAddresses != null) {
-				existingUserAccountContactInformation.setEmailAddresses(
-					emailAddresses);
-			}
-
-			String facebook = userAccountContactInformation.getFacebook();
-
-			if (facebook != null) {
-				existingUserAccountContactInformation.setFacebook(facebook);
-			}
-
-			String jabber = userAccountContactInformation.getJabber();
-
-			if (jabber != null) {
-				existingUserAccountContactInformation.setJabber(jabber);
-			}
-
-			PostalAddress[] postalAddresses =
-				userAccountContactInformation.getPostalAddresses();
-
-			if (postalAddresses != null) {
-				existingUserAccountContactInformation.setPostalAddresses(
-					postalAddresses);
-			}
-
-			String skype = userAccountContactInformation.getSkype();
-
-			if (skype != null) {
-				existingUserAccountContactInformation.setSkype(skype);
-			}
-
-			String sms = userAccountContactInformation.getSms();
-
-			if (sms != null) {
-				existingUserAccountContactInformation.setSms(sms);
-			}
-
-			Phone[] telephones = userAccountContactInformation.getTelephones();
-
-			if (telephones != null) {
-				existingUserAccountContactInformation.setTelephones(telephones);
-			}
-
-			String twitter = userAccountContactInformation.getTwitter();
-
-			if (twitter != null) {
-				existingUserAccountContactInformation.setTwitter(twitter);
-			}
-
-			WebUrl[] webUrls = userAccountContactInformation.getWebUrls();
-
-			if (webUrls != null) {
-				existingUserAccountContactInformation.setWebUrls(webUrls);
-			}
-		}
-	}
-
-	private void _checkCurrentPassword(User user, String currentPassword)
-		throws Exception {
-
-		if ((user == null) || (contextUser.getUserId() != user.getUserId())) {
-			return;
+			Optional.ofNullable(
+				userAccountContactInformation.getEmailAddresses()
+			).ifPresent(
+				existingUserAccountContactInformation::setEmailAddresses
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getFacebook()
+			).ifPresent(
+				existingUserAccountContactInformation::setFacebook
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getJabber()
+			).ifPresent(
+				existingUserAccountContactInformation::setJabber
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getPostalAddresses()
+			).ifPresent(
+				existingUserAccountContactInformation::setPostalAddresses
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getSkype()
+			).ifPresent(
+				existingUserAccountContactInformation::setSkype
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getSms()
+			).ifPresent(
+				existingUserAccountContactInformation::setSms
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getTelephones()
+			).ifPresent(
+				existingUserAccountContactInformation::setTelephones
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getTwitter()
+			).ifPresent(
+				existingUserAccountContactInformation::setTwitter
+			);
+			Optional.ofNullable(
+				userAccountContactInformation.getWebUrls()
+			).ifPresent(
+				existingUserAccountContactInformation::setWebUrls
+			);
 		}
 
-		if (Validator.isNull(currentPassword)) {
-			throw new UserPasswordException.MustMatchCurrentPassword(
-				user.getUserId());
-		}
-
-		int authResult = _userLocalService.authenticateByUserId(
-			contextCompany.getCompanyId(), user.getUserId(), currentPassword,
-			new HashMap<>(), new HashMap<>(), new HashMap<>());
-
-		if (authResult == Authenticator.FAILURE) {
-			if (user.isLockout()) {
-				HttpServletRequest originalHttpServletRequest =
-					_portal.getOriginalServletRequest(
-						contextHttpServletRequest);
-				HttpServletResponse httpServletResponse =
-					contextHttpServletResponse;
-
-				AuthenticatedSessionManagerUtil.logout(
-					originalHttpServletRequest, httpServletResponse);
-
-				throw new UserLockoutException.PasswordPolicyLockout(
-					user, user.getPasswordPolicy());
-			}
-
-			throw new UserPasswordException.MustMatchCurrentPassword(
-				user.getUserId());
+		if (userAccount.getCustomFields() != null) {
+			Optional.ofNullable(
+				userAccount.getCustomFields()
+			).ifPresent(
+				existingUserAccount::setCustomFields
+			);
 		}
 	}
 
@@ -939,28 +810,22 @@ public class UserAccountResourceImpl
 	}
 
 	private List<Address> _getAddresses(UserAccount userAccount) {
-		UserAccountContactInformation userAccountContactInformation =
-			userAccount.getUserAccountContactInformation();
-
-		if (userAccountContactInformation == null) {
-			return Collections.emptyList();
-		}
-
-		PostalAddress[] postalAddresses =
-			userAccountContactInformation.getPostalAddresses();
-
-		if (postalAddresses == null) {
-			return Collections.emptyList();
-		}
-
-		return ListUtil.filter(
-			transformToList(
-				postalAddresses,
-				_postalAddress ->
-					ServiceBuilderAddressUtil.toServiceBuilderAddress(
-						contextCompany.getCompanyId(), _postalAddress,
-						ListTypeConstants.CONTACT_ADDRESS)),
-			Objects::nonNull);
+		return Optional.ofNullable(
+			userAccount.getUserAccountContactInformation()
+		).map(
+			UserAccountContactInformation::getPostalAddresses
+		).map(
+			postalAddresses -> ListUtil.filter(
+				transformToList(
+					postalAddresses,
+					_postalAddress ->
+						ServiceBuilderAddressUtil.toServiceBuilderAddress(
+							contextCompany.getCompanyId(), _postalAddress,
+							ListTypeConstants.CONTACT_ADDRESS)),
+				Objects::nonNull)
+		).orElse(
+			Collections.emptyList()
+		);
 	}
 
 	private int _getBirthdayDay(UserAccount userAccount) {
@@ -979,17 +844,19 @@ public class UserAccountResourceImpl
 	private int _getCalendarFieldValue(
 		UserAccount userAccount, int calendarField, int defaultValue) {
 
-		Date date = userAccount.getBirthDate();
+		return Optional.ofNullable(
+			userAccount.getBirthDate()
+		).map(
+			date -> {
+				Calendar calendar = CalendarFactoryUtil.getCalendar();
 
-		if (date == null) {
-			return defaultValue;
-		}
+				calendar.setTime(date);
 
-		Calendar calendar = CalendarFactoryUtil.getCalendar();
-
-		calendar.setTime(date);
-
-		return calendar.get(calendarField);
+				return calendar.get(calendarField);
+			}
+		).orElse(
+			defaultValue
+		);
 	}
 
 	private Map<String, Map<String, String>> _getCompanyScopeActions(
@@ -1056,75 +923,64 @@ public class UserAccountResourceImpl
 	}
 
 	private long _getPrefixId(UserAccount userAccount) {
-		String prefix = userAccount.getHonorificPrefix();
-
-		if (prefix == null) {
-			return 0;
-		}
-
-		return ServiceBuilderListTypeUtil.getServiceBuilderListTypeId(
-			ListTypeConstants.CONTACT_PREFIX, prefix);
+		return Optional.ofNullable(
+			userAccount.getHonorificPrefix()
+		).map(
+			prefix -> ServiceBuilderListTypeUtil.getServiceBuilderListTypeId(
+				ListTypeConstants.CONTACT_PREFIX, prefix)
+		).orElse(
+			0L
+		);
 	}
 
-	private List<com.liferay.portal.kernel.model.EmailAddress>
-		_getServiceBuilderEmailAddresses(UserAccount userAccount) {
+	private List<EmailAddress> _getServiceBuilderEmailAddresses(
+		UserAccount userAccount) {
 
-		UserAccountContactInformation userAccountContactInformation =
-			userAccount.getUserAccountContactInformation();
-
-		if (userAccountContactInformation == null) {
-			return Collections.emptyList();
-		}
-
-		EmailAddress[] emailAddresses =
-			userAccountContactInformation.getEmailAddresses();
-
-		if (emailAddresses == null) {
-			return Collections.emptyList();
-		}
-
-		return ListUtil.filter(
-			transformToList(
-				emailAddresses,
-				emailAddress ->
-					ServiceBuilderEmailAddressUtil.toServiceBuilderEmailAddress(
-						emailAddress, ListTypeConstants.CONTACT_EMAIL_ADDRESS)),
-			Objects::nonNull);
+		return Optional.ofNullable(
+			userAccount.getUserAccountContactInformation()
+		).map(
+			UserAccountContactInformation::getEmailAddresses
+		).map(
+			emailAddresses -> ListUtil.filter(
+				transformToList(
+					emailAddresses,
+					emailAddress ->
+						ServiceBuilderEmailAddressUtil.
+							toServiceBuilderEmailAddress(
+								emailAddress,
+								ListTypeConstants.CONTACT_EMAIL_ADDRESS)),
+				Objects::nonNull)
+		).orElse(
+			Collections.emptyList()
+		);
 	}
 
-	private List<com.liferay.portal.kernel.model.Phone>
-		_getServiceBuilderPhones(UserAccount userAccount) {
-
-		UserAccountContactInformation userAccountContactInformation =
-			userAccount.getUserAccountContactInformation();
-
-		if (userAccountContactInformation == null) {
-			return Collections.emptyList();
-		}
-
-		Phone[] phones = userAccountContactInformation.getTelephones();
-
-		if (phones == null) {
-			return Collections.emptyList();
-		}
-
-		return ListUtil.filter(
-			transformToList(
-				phones,
-				telephone -> ServiceBuilderPhoneUtil.toServiceBuilderPhone(
-					telephone, ListTypeConstants.CONTACT_PHONE)),
-			Objects::nonNull);
+	private List<Phone> _getServiceBuilderPhones(UserAccount userAccount) {
+		return Optional.ofNullable(
+			userAccount.getUserAccountContactInformation()
+		).map(
+			UserAccountContactInformation::getTelephones
+		).map(
+			telephones -> ListUtil.filter(
+				transformToList(
+					telephones,
+					telephone -> ServiceBuilderPhoneUtil.toServiceBuilderPhone(
+						telephone, ListTypeConstants.CONTACT_PHONE)),
+				Objects::nonNull)
+		).orElse(
+			Collections.emptyList()
+		);
 	}
 
 	private long _getSuffixId(UserAccount userAccount) {
-		String honorificSuffix = userAccount.getHonorificSuffix();
-
-		if (honorificSuffix == null) {
-			return 0;
-		}
-
-		return ServiceBuilderListTypeUtil.getServiceBuilderListTypeId(
-			ListTypeConstants.CONTACT_SUFFIX, honorificSuffix);
+		return Optional.ofNullable(
+			userAccount.getHonorificSuffix()
+		).map(
+			prefix -> ServiceBuilderListTypeUtil.getServiceBuilderListTypeId(
+				ListTypeConstants.CONTACT_SUFFIX, prefix)
+		).orElse(
+			0L
+		);
 	}
 
 	private Page<UserAccount> _getUserAccountsPage(
@@ -1147,42 +1003,20 @@ public class UserAccountResourceImpl
 	}
 
 	private List<Website> _getWebsites(UserAccount userAccount) {
-		UserAccountContactInformation userAccountContactInformation =
-			userAccount.getUserAccountContactInformation();
-
-		if (userAccountContactInformation == null) {
-			return Collections.emptyList();
-		}
-
-		WebUrl[] webUrls = userAccountContactInformation.getWebUrls();
-
-		if (webUrls == null) {
-			return Collections.emptyList();
-		}
-
-		return ListUtil.filter(
-			transformToList(
-				webUrls,
-				webUrl -> ServiceBuilderWebsiteUtil.toServiceBuilderWebsite(
-					ListTypeConstants.CONTACT_WEBSITE, webUrl)),
-			Objects::nonNull);
-	}
-
-	private boolean _isPasswordResetRequired(User user) throws Exception {
-		PasswordPolicy passwordPolicy = user.getPasswordPolicy();
-
-		boolean ldapPasswordPolicyEnabled =
-			LDAPSettingsUtil.isPasswordPolicyEnabled(user.getCompanyId());
-
-		if ((user.getLastLoginDate() == null) &&
-			(((passwordPolicy == null) && !ldapPasswordPolicyEnabled) ||
-			 ((passwordPolicy != null) && passwordPolicy.isChangeable() &&
-			  passwordPolicy.isChangeRequired()))) {
-
-			return true;
-		}
-
-		return false;
+		return Optional.ofNullable(
+			userAccount.getUserAccountContactInformation()
+		).map(
+			UserAccountContactInformation::getWebUrls
+		).map(
+			webUrls -> ListUtil.filter(
+				transformToList(
+					webUrls,
+					webUrl -> ServiceBuilderWebsiteUtil.toServiceBuilderWebsite(
+						ListTypeConstants.CONTACT_WEBSITE, webUrl)),
+				Objects::nonNull)
+		).orElse(
+			Collections.emptyList()
+		);
 	}
 
 	private UserAccount _toUserAccount(
@@ -1202,53 +1036,13 @@ public class UserAccountResourceImpl
 			_getDTOConverterContext(user.getUserId()), user);
 	}
 
-	private void _updatePassword(
-			User user, String currentPassword, String password)
-		throws Exception {
-
-		if ((user == null) || Validator.isNull(password)) {
-			return;
-		}
-
-		_checkCurrentPassword(user, currentPassword);
-
-		_userService.updatePassword(
-			user.getUserId(), password, password,
-			_isPasswordResetRequired(user));
-
-		String cookie = CookiesManagerUtil.getCookieValue(
-			CookiesConstants.NAME_JSESSIONID, contextHttpServletRequest, false);
-
-		if ((contextUser.getUserId() == user.getUserId()) && (cookie != null)) {
-			String login = null;
-
-			String authType = contextCompany.getAuthType();
-
-			if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
-				login = user.getEmailAddress();
-			}
-			else if (authType.equals(CompanyConstants.AUTH_TYPE_SN)) {
-				login = user.getScreenName();
-			}
-			else if (authType.equals(CompanyConstants.AUTH_TYPE_ID)) {
-				login = String.valueOf(user.getUserId());
-			}
-
-			_authenticatedSessionManager.login(
-				contextHttpServletRequest, contextHttpServletResponse, login,
-				password, false, null);
-		}
-	}
-
 	private static final EntityModel _entityModel =
 		new UserAccountEntityModel();
 
 	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(model.class.name=com.liferay.account.model.AccountEntry)"
 	)
-	private volatile ModelResourcePermission<AccountEntry>
+	private ModelResourcePermission<AccountEntry>
 		_accountEntryModelResourcePermission;
 
 	@Reference
@@ -1268,12 +1062,6 @@ public class UserAccountResourceImpl
 		_announcementsDeliveryLocalService;
 
 	@Reference
-	private AuthenticatedSessionManager _authenticatedSessionManager;
-
-	@Reference
-	private CaptchaSettings _captchaSettings;
-
-	@Reference
 	private ContactLocalService _contactLocalService;
 
 	@Reference
@@ -1289,10 +1077,7 @@ public class UserAccountResourceImpl
 	private OrganizationResourceDTOConverter _organizationResourceDTOConverter;
 
 	@Reference
-	private PermissionCheckerFactory _permissionCheckerFactory;
-
-	@Reference
-	private Portal _portal;
+	private UserAccountResourceDTOConverter _userAccountResourceDTOConverter;
 
 	@Reference
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
@@ -1307,9 +1092,6 @@ public class UserAccountResourceImpl
 
 	@Reference
 	private UserResourceDTOConverter _userResourceDTOConverter;
-
-	@Reference
-	private UsersAdmin _usersAdmin;
 
 	@Reference
 	private UserService _userService;

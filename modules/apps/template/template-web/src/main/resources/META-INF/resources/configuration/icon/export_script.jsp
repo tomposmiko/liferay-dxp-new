@@ -16,11 +16,16 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:script>
-	Liferay.Util.setPortletConfigurationIconAction(
-		'<portlet:namespace />templateExportScript',
-		() => {
-			Liferay.fire('<portlet:namespace />exportScript');
-		}
-	);
-</aui:script>
+<liferay-ui:icon
+	cssClass="ddm-template-editor-portlet-icon"
+	icon="download"
+	id="exportScript"
+	markupView="lexicon"
+	message="export-script"
+	url="javascript:;"
+/>
+
+<liferay-frontend:component
+	componentId="exportScript"
+	module="js/configuration/icon/ExportScript"
+/>

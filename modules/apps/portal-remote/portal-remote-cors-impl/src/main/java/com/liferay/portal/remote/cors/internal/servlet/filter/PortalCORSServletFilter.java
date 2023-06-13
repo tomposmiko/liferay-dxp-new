@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -70,6 +70,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Sierra Andrés
  */
 @Component(
+	immediate = true,
 	property = {
 		Constants.SERVICE_PID + "=com.liferay.portal.remote.cors.configuration.PortalCORSConfiguration",
 		"before-filter=Upload Servlet Request Filter", "dispatcher=FORWARD",
@@ -246,7 +247,7 @@ public class PortalCORSServletFilter
 			uri = uri.substring(_contextPath.length());
 		}
 
-		return HttpComponentsUtil.normalizePath(uri);
+		return _http.normalizePath(uri);
 	}
 
 	private URLPatternMapper<CORSSupport> _getURLPatternMapper(long companyId) {
@@ -276,7 +277,7 @@ public class PortalCORSServletFilter
 
 		User user = permissionChecker.getUser();
 
-		return user.isGuestUser();
+		return user.isDefaultUser();
 	}
 
 	private void _mergeCORSConfiguration(
@@ -365,6 +366,9 @@ public class PortalCORSServletFilter
 		_configurationPidsProperties = Collections.synchronizedMap(
 			new LinkedHashMap<>());
 	private String _contextPath;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private Portal _portal;

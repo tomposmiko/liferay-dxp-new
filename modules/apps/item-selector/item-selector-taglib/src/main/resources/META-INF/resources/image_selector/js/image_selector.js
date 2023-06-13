@@ -18,46 +18,46 @@
 AUI.add(
 	'liferay-image-selector',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const CHANGE_IMAGE_CONTROLS_DELAY = 5000;
+		var CHANGE_IMAGE_CONTROLS_DELAY = 5000;
 
-		const CSS_CHECK_ACTIVE = 'check-active';
+		var CSS_CHECK_ACTIVE = 'check-active';
 
-		const CSS_DROP_ACTIVE = 'drop-active';
+		var CSS_DROP_ACTIVE = 'drop-active';
 
-		const CSS_PROGRESS_ACTIVE = 'progress-active';
+		var CSS_PROGRESS_ACTIVE = 'progress-active';
 
-		const PROGRESS_HEIGHT = '6';
+		var PROGRESS_HEIGHT = '6';
 
-		const STATUS_CODE = Liferay.STATUS_CODE;
+		var STATUS_CODE = Liferay.STATUS_CODE;
 
-		const STR_CLICK = 'click';
+		var STR_CLICK = 'click';
 
-		const STR_DOT = '.';
+		var STR_DOT = '.';
 
-		const STR_DRAG_START = 'dragstart';
+		var STR_DRAG_START = 'dragstart';
 
-		const STR_ERROR_MESSAGE = 'errorMessage';
+		var STR_ERROR_MESSAGE = 'errorMessage';
 
-		const STR_IMAGE_DATA = 'imageData';
+		var STR_IMAGE_DATA = 'imageData';
 
-		const STR_IMAGE_DELETED = 'coverImageDeleted';
+		var STR_IMAGE_DELETED = 'coverImageDeleted';
 
-		const STR_IMAGE_SELECTED = 'coverImageSelected';
+		var STR_IMAGE_SELECTED = 'coverImageSelected';
 
-		const STR_IMAGE_UPLOADED = 'coverImageUploaded';
+		var STR_IMAGE_UPLOADED = 'coverImageUploaded';
 
-		const STR_SPACE = ' ';
+		var STR_SPACE = ' ';
 
-		const STR_VALUE = 'value';
+		var STR_VALUE = 'value';
 
-		const TPL_FILE_NAME = '<strong>{name}</strong>.{extension}';
+		var TPL_FILE_NAME = '<strong>{name}</strong>.{extension}';
 
-		const TPL_PROGRESS_DATA =
+		var TPL_PROGRESS_DATA =
 			'<strong>{loaded}</strong> {loadedUnit} of <strong>{total}</strong> {totalUnit}';
 
-		const ImageSelector = A.Component.create({
+		var ImageSelector = A.Component.create({
 			ATTRS: {
 				errorNode: {
 					validator: Lang.isString,
@@ -113,7 +113,7 @@ AUI.add(
 
 			prototype: {
 				_bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._updateImageDataFn = A.bind(
 						'_updateImageData',
@@ -162,7 +162,7 @@ AUI.add(
 				},
 
 				_cancelTimer() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._timer) {
 						instance._timer.cancel();
@@ -172,7 +172,7 @@ AUI.add(
 				},
 
 				_cancelUpload() {
-					const instance = this;
+					var instance = this;
 
 					instance._uploader.queue.cancelUpload();
 
@@ -180,9 +180,9 @@ AUI.add(
 				},
 
 				_createProgressBar() {
-					const instance = this;
+					var instance = this;
 
-					const progressBar = new A.ProgressBar({
+					var progressBar = new A.ProgressBar({
 						boundingBox: instance.one('.progressbar'),
 						height: PROGRESS_HEIGHT,
 					}).render();
@@ -191,34 +191,34 @@ AUI.add(
 				},
 
 				_defImageDataFn(event) {
-					const instance = this;
+					var instance = this;
 
-					const fileEntryId = event.imageData.fileEntryId;
-					const fileEntryUrl = event.imageData.url;
+					var fileEntryId = event.imageData.fileEntryId;
+					var fileEntryUrl = event.imageData.url;
 
-					const rootNode = instance.rootNode;
+					var rootNode = instance.rootNode;
 
-					const fileEntryIdNode = rootNode.one(
+					var fileEntryIdNode = rootNode.one(
 						'#' + instance.get('paramName') + 'Id'
 					);
 
 					fileEntryIdNode.val(fileEntryId);
 
-					const fileEntryImageNode = instance._fileEntryImageNode;
+					var fileEntryImageNode = instance._fileEntryImageNode;
 
 					fileEntryImageNode.attr('src', fileEntryUrl);
 
 					instance._fileEntryId = fileEntryId;
 
-					const showImageControls =
+					var showImageControls =
 						fileEntryId !== 0 && fileEntryUrl !== '';
 
 					fileEntryImageNode.toggle(showImageControls);
 
-					const browseImageControls = instance.one(
+					var browseImageControls = instance.one(
 						'.browse-image-controls'
 					);
-					const changeImageControls = instance.one(
+					var changeImageControls = instance.one(
 						'.change-image-controls'
 					);
 
@@ -232,7 +232,7 @@ AUI.add(
 				},
 
 				_onBrowseClick() {
-					const instance = this;
+					var instance = this;
 
 					Liferay.Util.openSelectionModal({
 						onSelect: (selectedItem) => {
@@ -257,7 +257,7 @@ AUI.add(
 				},
 
 				_onDeleteClick(event) {
-					const instance = this;
+					var instance = this;
 
 					Liferay.fire(STR_IMAGE_DELETED, {
 						imageData: null,
@@ -267,20 +267,20 @@ AUI.add(
 				},
 
 				_onFileSelect(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._cancelTimer();
 
 					instance.rootNode.removeClass(CSS_DROP_ACTIVE);
 
-					const file = event.fileList[0];
+					var file = event.fileList[0];
 
-					const fileNameNode = instance._fileNameNode;
+					var fileNameNode = instance._fileNameNode;
 
 					if (fileNameNode) {
-						const filename = file.get('name');
+						var filename = file.get('name');
 
-						const fileDataTemplate = A.Lang.sub(TPL_FILE_NAME, {
+						var fileDataTemplate = A.Lang.sub(TPL_FILE_NAME, {
 							extension: filename.substring(
 								filename.indexOf(STR_DOT) + 1
 							),
@@ -295,7 +295,7 @@ AUI.add(
 
 					instance._showImagePreview(file.get('file'));
 
-					const queue = instance._uploader.queue;
+					var queue = instance._uploader.queue;
 
 					if (
 						queue &&
@@ -308,15 +308,15 @@ AUI.add(
 				},
 
 				_onImageLoaded(event) {
-					const instance = this;
+					var instance = this;
 
 					event.preventDefault();
 
-					const changeImageControls = instance.one(
+					var changeImageControls = instance.one(
 						'.change-image-controls'
 					);
 
-					const rootNode = instance.rootNode;
+					var rootNode = instance.rootNode;
 
 					rootNode.addClass(CSS_CHECK_ACTIVE);
 
@@ -336,19 +336,19 @@ AUI.add(
 				},
 
 				_onUploadComplete(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._uploadCompleted = true;
 
 					instance._stopProgress(event);
 
-					const data = JSON.parse(event.data);
+					var data = JSON.parse(event.data);
 
-					const image = data.file;
-					const success = data.success;
+					var image = data.file;
+					var success = data.success;
 
-					let fireEvent = STR_IMAGE_DELETED;
-					let imageData = null;
+					var fireEvent = STR_IMAGE_DELETED;
+					var imageData = null;
 
 					if (success) {
 						fireEvent = STR_IMAGE_UPLOADED;
@@ -370,34 +370,34 @@ AUI.add(
 				},
 
 				_onUploadProgress(event) {
-					const instance = this;
+					var instance = this;
 
-					const progressBar = instance._progressBar;
+					var progressBar = instance._progressBar;
 
 					if (progressBar) {
-						const percentLoaded = Math.round(event.percentLoaded);
+						var percentLoaded = Math.round(event.percentLoaded);
 
 						progressBar.set(STR_VALUE, Math.ceil(percentLoaded));
 					}
 
-					const progressDataNode = instance._progressDataNode;
+					var progressDataNode = instance._progressDataNode;
 
 					if (progressDataNode) {
-						const bytesLoaded = Liferay.Util.formatStorage(
+						var bytesLoaded = Liferay.Util.formatStorage(
 							event.bytesLoaded
 						);
-						const bytesTotal = Liferay.Util.formatStorage(
+						var bytesTotal = Liferay.Util.formatStorage(
 							event.bytesTotal
 						);
 
-						const bytesLoadedSpaceIndex = bytesLoaded.indexOf(
+						var bytesLoadedSpaceIndex = bytesLoaded.indexOf(
 							STR_SPACE
 						);
-						const bytesTotalSpaceIndex = bytesTotal.indexOf(
+						var bytesTotalSpaceIndex = bytesTotal.indexOf(
 							STR_SPACE
 						);
 
-						const progressDataTemplate = A.Lang.sub(
+						var progressDataTemplate = A.Lang.sub(
 							TPL_PROGRESS_DATA,
 							{
 								loaded: bytesLoaded.substring(
@@ -422,7 +422,7 @@ AUI.add(
 				},
 
 				_onUploadStart() {
-					const instance = this;
+					var instance = this;
 
 					instance.rootNode.addClass(CSS_PROGRESS_ACTIVE);
 
@@ -432,7 +432,7 @@ AUI.add(
 				},
 
 				_renderUploader() {
-					const instance = this;
+					var instance = this;
 
 					instance._uploader = new A.Uploader({
 						boundingBox: instance.rootNode,
@@ -467,15 +467,15 @@ AUI.add(
 				},
 
 				_showErrorMessage(event) {
-					const instance = this;
+					var instance = this;
 
 					instance._cancelTimer();
 
-					const error = event.error;
+					var error = event.error;
 
-					const errorType = error.errorType;
+					var errorType = error.errorType;
 
-					let message = Liferay.Language.get(
+					var message = Liferay.Language.get(
 						'an-unexpected-error-occurred-while-uploading-your-file'
 					);
 
@@ -529,7 +529,7 @@ AUI.add(
 						errorType ===
 						STATUS_CODE.SC_UPLOAD_REQUEST_SIZE_EXCEPTION
 					) {
-						const maxUploadRequestSize =
+						var maxUploadRequestSize =
 							Liferay.PropsValues
 								.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE;
 
@@ -541,11 +541,11 @@ AUI.add(
 						);
 					}
 
-					const rootNode = instance.rootNode;
+					var rootNode = instance.rootNode;
 
-					const errorWrapper = rootNode.one('.error-wrapper');
+					var errorWrapper = rootNode.one('.error-wrapper');
 
-					const errorMessage = errorWrapper.one('.error-message');
+					var errorMessage = errorWrapper.one('.error-message');
 
 					errorMessage.html(message);
 
@@ -553,11 +553,11 @@ AUI.add(
 
 					rootNode.removeClass(CSS_CHECK_ACTIVE);
 
-					const errorNodeAlert = instance._errorNodeAlert;
+					var errorNodeAlert = instance._errorNodeAlert;
 
 					errorNodeAlert.show();
 
-					const browseImageControls = instance.one(
+					var browseImageControls = instance.one(
 						'.browse-image-controls'
 					);
 
@@ -571,10 +571,10 @@ AUI.add(
 				},
 
 				_showImagePreview(file) {
-					const instance = this;
+					var instance = this;
 
 					if (A.config.win.FileReader) {
-						const reader = new FileReader();
+						var reader = new FileReader();
 
 						reader.addEventListener('loadend', () => {
 							if (!instance._uploadCompleted) {
@@ -590,7 +590,7 @@ AUI.add(
 				},
 
 				_stopProgress(event) {
-					const instance = this;
+					var instance = this;
 
 					instance.rootNode.removeClass(CSS_PROGRESS_ACTIVE);
 
@@ -602,7 +602,7 @@ AUI.add(
 				},
 
 				_updateImageData(imageData) {
-					const instance = this;
+					var instance = this;
 
 					instance._errorNodeAlert.hide();
 
@@ -615,7 +615,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					instance._uploader.destroy();
 
@@ -623,11 +623,11 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._fileEntryImageNode = instance.one('#image');
 
-					const rootNode = instance.rootNode;
+					var rootNode = instance.rootNode;
 
 					instance._fileNameNode = rootNode.one(
 						instance.get('fileNameNode')
@@ -636,7 +636,7 @@ AUI.add(
 						instance.get('progressDataNode')
 					);
 
-					const errorNode = rootNode.one(instance.get('errorNode'));
+					var errorNode = rootNode.one(instance.get('errorNode'));
 
 					instance._errorNodeAlert = A.Widget.getByNode(errorNode);
 

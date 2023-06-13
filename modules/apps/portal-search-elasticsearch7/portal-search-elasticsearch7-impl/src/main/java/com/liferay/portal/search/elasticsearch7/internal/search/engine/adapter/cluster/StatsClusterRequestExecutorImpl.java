@@ -16,7 +16,7 @@ package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Dylan Rebelak
  */
-@Component(service = StatsClusterRequestExecutor.class)
+@Component(immediate = true, service = StatsClusterRequestExecutor.class)
 public class StatsClusterRequestExecutorImpl
 	implements StatsClusterRequestExecutor {
 
@@ -70,7 +70,7 @@ public class StatsClusterRequestExecutorImpl
 
 			String responseBody = EntityUtils.toString(response.getEntity());
 
-			JSONObject responseJSONObject = _jsonFactory.createJSONObject(
+			JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(
 				responseBody);
 
 			String status = GetterUtil.getString(
@@ -90,13 +90,21 @@ public class StatsClusterRequestExecutorImpl
 		}
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setClusterHealthStatusTranslator(
+		ClusterHealthStatusTranslator clusterHealthStatusTranslator) {
+
+		_clusterHealthStatusTranslator = clusterHealthStatusTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private ClusterHealthStatusTranslator _clusterHealthStatusTranslator;
-
-	@Reference
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

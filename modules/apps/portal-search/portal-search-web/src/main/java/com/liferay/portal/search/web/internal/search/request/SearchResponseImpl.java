@@ -14,16 +14,17 @@
 
 package com.liferay.portal.search.web.internal.search.request;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.web.internal.util.SearchStringUtil;
 import com.liferay.portal.search.web.search.request.SearchSettings;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Rodrigo Paulino
@@ -36,13 +37,14 @@ public class SearchResponseImpl {
 	}
 
 	public SearchResponse getFederatedSearchResponse(
-		String federatedSearchKey) {
+		Optional<String> federatedSearchKeyOptional) {
 
-		return _searchResponse.getFederatedSearchResponse(federatedSearchKey);
+		return _searchResponse.getFederatedSearchResponse(
+			federatedSearchKeyOptional.orElse(StringPool.BLANK));
 	}
 
-	public String getKeywords() {
-		return _keywords;
+	public Optional<String> getKeywordsOptional() {
+		return Optional.ofNullable(_keywords);
 	}
 
 	public int getPaginationDelta() {
@@ -73,15 +75,8 @@ public class SearchResponseImpl {
 		return _searchSettings;
 	}
 
-	public String getSpellCheckSuggestion() {
-		String collatedSpellCheckResult = StringUtil.trim(
-			_hits.getCollatedSpellCheckResult());
-
-		if (Validator.isBlank(collatedSpellCheckResult)) {
-			return null;
-		}
-
-		return collatedSpellCheckResult;
+	public Optional<String> getSpellCheckSuggestionOptional() {
+		return SearchStringUtil.maybe(_hits.getCollatedSpellCheckResult());
 	}
 
 	public int getTotalHits() {

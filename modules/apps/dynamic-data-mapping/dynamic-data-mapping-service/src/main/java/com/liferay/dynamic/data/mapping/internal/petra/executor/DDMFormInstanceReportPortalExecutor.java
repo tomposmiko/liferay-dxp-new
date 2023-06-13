@@ -39,7 +39,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcos Martins
  */
-@Component(service = DDMFormInstanceReportPortalExecutor.class)
+@Component(
+	immediate = true, service = DDMFormInstanceReportPortalExecutor.class
+)
 public class DDMFormInstanceReportPortalExecutor {
 
 	public <T extends Throwable> void execute(

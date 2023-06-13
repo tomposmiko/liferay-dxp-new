@@ -19,7 +19,7 @@ import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.admin.constants.LayoutScreenNavigationEntryConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
@@ -109,8 +109,7 @@ public abstract class BaseLayoutScreenNavigationEntry
 		httpServletRequest.setAttribute(
 			LayoutSEOWebKeys.LAYOUT_PAGE_LAYOUT_SEO_DISPLAY_CONTEXT,
 			new LayoutsSEODisplayContext(
-				dlAppService, dlurlHelper, infoItemServiceRegistry,
-				itemSelector, layoutLocalService,
+				dlAppService, dlurlHelper, infoItemServiceTracker, itemSelector,
 				layoutPageTemplateEntryLocalService,
 				layoutSEOCanonicalURLProvider, layoutSEOLinkManager,
 				layoutSEOSiteLocalService,
@@ -123,8 +122,16 @@ public abstract class BaseLayoutScreenNavigationEntry
 				storageEngine));
 
 		jspRenderer.renderJSP(
-			servletContext, httpServletRequest, httpServletResponse,
+			_servletContext, httpServletRequest, httpServletResponse,
 			getJspPath());
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.seo.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
 	}
 
 	protected abstract String getJspPath();
@@ -136,7 +143,7 @@ public abstract class BaseLayoutScreenNavigationEntry
 	protected DLURLHelper dlurlHelper;
 
 	@Reference
-	protected InfoItemServiceRegistry infoItemServiceRegistry;
+	protected InfoItemServiceTracker infoItemServiceTracker;
 
 	@Reference
 	protected ItemSelector itemSelector;
@@ -163,9 +170,6 @@ public abstract class BaseLayoutScreenNavigationEntry
 	@Reference
 	protected Portal portal;
 
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.layout.seo.web)")
-	protected ServletContext servletContext;
-
 	@Reference
 	protected StorageEngine storageEngine;
 
@@ -176,5 +180,7 @@ public abstract class BaseLayoutScreenNavigationEntry
 		return new AggregateResourceBundle(
 			resourceBundle, portal.getResourceBundle(locale));
 	}
+
+	private ServletContext _servletContext;
 
 }

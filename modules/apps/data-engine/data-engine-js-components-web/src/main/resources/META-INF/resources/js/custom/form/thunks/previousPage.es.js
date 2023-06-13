@@ -24,8 +24,6 @@ export default function previousPage({
 	pages,
 	portletNamespace,
 	rules,
-	selectedPage,
-	title,
 	viewMode,
 }) {
 	return (dispatch) => {
@@ -44,16 +42,11 @@ export default function previousPage({
 		}).then((evaluatedPages) => {
 			let previousActivePageIndex = activePage;
 
-			if (typeof selectedPage === 'number') {
-				previousActivePageIndex = selectedPage;
-			}
-			else {
-				for (let i = activePage - 1; i > -1; i--) {
-					if (evaluatedPages[i].enabled) {
-						previousActivePageIndex = i;
+			for (let i = activePage - 1; i > -1; i--) {
+				if (evaluatedPages[i].enabled) {
+					previousActivePageIndex = i;
 
-						break;
-					}
+					break;
 				}
 			}
 
@@ -71,16 +64,9 @@ export default function previousPage({
 
 			Liferay.fire('ddmFormPageShow', {
 				formId,
-				formPageTitle: pages[activePageUpdated].title,
 				page: activePageUpdated,
-				title,
+				title: pages[activePageUpdated].title,
 			});
-
-			const formPagination = document.getElementsByClassName(
-				'ddm-form-pagination'
-			)[0];
-
-			formPagination.scrollIntoView();
 		});
 	};
 }

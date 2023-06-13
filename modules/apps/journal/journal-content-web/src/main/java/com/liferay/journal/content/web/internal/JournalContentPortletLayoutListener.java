@@ -20,6 +20,7 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.petra.string.StringBundler;
@@ -45,6 +46,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.layoutconfiguration.util.xml.PortletLogic;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -59,6 +61,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + JournalContentPortletKeys.JOURNAL_CONTENT,
 	service = PortletLayoutListener.class
 )
@@ -84,6 +87,10 @@ public class JournalContentPortletLayoutListener
 			}
 
 			_addLayoutClassedModelUsage(layout, portletId, article);
+
+			_journalContentSearchLocalService.updateContentSearch(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), portletId, article.getArticleId(), true);
 		}
 		catch (Exception exception) {
 			throw new PortletLayoutListenerException(exception);
@@ -122,7 +129,11 @@ public class JournalContentPortletLayoutListener
 			_layoutClassedModelUsageLocalService.deleteLayoutClassedModelUsages(
 				portletId, _portal.getClassNameId(Portlet.class), plid);
 
-			String[] runtimePortletIds = _getRuntimePortletIds(
+			_journalContentSearchLocalService.deleteArticleContentSearch(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), portletId, article.getArticleId());
+
+			String[] runtimePortletIds = getRuntimePortletIds(
 				layout.getCompanyId(), layout.getGroupId(),
 				article.getArticleId());
 
@@ -152,10 +163,19 @@ public class JournalContentPortletLayoutListener
 			_layoutClassedModelUsageLocalService.deleteLayoutClassedModelUsages(
 				portletId, _portal.getClassNameId(Portlet.class), plid);
 
+			_journalContentSearchLocalService.deleteArticleContentSearch(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), portletId);
+
 			JournalArticle article = _getArticle(layout, portletId);
 
 			if (article != null) {
 				_addLayoutClassedModelUsage(layout, portletId, article);
+
+				_journalContentSearchLocalService.updateContentSearch(
+					layout.getGroupId(), layout.isPrivateLayout(),
+					layout.getLayoutId(), portletId, article.getArticleId(),
+					true);
 			}
 		}
 		catch (Exception exception) {
@@ -167,6 +187,93 @@ public class JournalContentPortletLayoutListener
 	public void updatePropertiesOnRemoveFromLayout(
 			String portletId, UnicodeProperties typeSettingsUnicodeProperties)
 		throws PortletLayoutListenerException {
+	}
+
+	protected String getRuntimePortletId(String xml) throws Exception {
+		Document document = SAXReaderUtil.read(xml);
+
+		Element rootElement = document.getRootElement();
+
+		String portletName = rootElement.attributeValue("name");
+		String instanceId = rootElement.attributeValue("instance");
+
+		return PortletIdCodec.encode(portletName, 0, instanceId);
+	}
+
+	protected String[] getRuntimePortletIds(
+			long companyId, long scopeGroupId, String articleId)
+		throws Exception {
+
+		JournalArticle article =
+			_journalArticleLocalService.fetchDisplayArticle(
+				scopeGroupId, articleId);
+
+		if (article == null) {
+			Group group = _groupLocalService.fetchGroup(companyId);
+
+			if (group == null) {
+				return new String[0];
+			}
+
+			article = _journalArticleLocalService.fetchDisplayArticle(
+				group.getGroupId(), articleId);
+
+			if (article == null) {
+				return new String[0];
+			}
+		}
+
+		Set<String> portletIds = getRuntimePortletIds(article.getContent());
+
+		if (Validator.isNotNull(article.getDDMTemplateKey())) {
+			DDMTemplate ddmTemplate = _ddmTemplateLocalService.fetchTemplate(
+				scopeGroupId, _portal.getClassNameId(DDMStructure.class),
+				article.getDDMTemplateKey(), true);
+
+			if (ddmTemplate != null) {
+				portletIds.addAll(
+					getRuntimePortletIds(ddmTemplate.getScript()));
+			}
+		}
+
+		return portletIds.toArray(new String[0]);
+	}
+
+	protected Set<String> getRuntimePortletIds(String content)
+		throws Exception {
+
+		Set<String> portletIds = new LinkedHashSet<>();
+
+		for (int index = 0;;) {
+			index = content.indexOf(PortletLogic.OPEN_TAG, index);
+
+			if (index == -1) {
+				break;
+			}
+
+			int close1 = content.indexOf(PortletLogic.CLOSE_1_TAG, index);
+			int close2 = content.indexOf(PortletLogic.CLOSE_2_TAG, index);
+
+			int closeIndex = -1;
+
+			if ((close2 == -1) || ((close1 != -1) && (close1 < close2))) {
+				closeIndex = close1 + PortletLogic.CLOSE_1_TAG.length();
+			}
+			else {
+				closeIndex = close2 + PortletLogic.CLOSE_2_TAG.length();
+			}
+
+			if (closeIndex == -1) {
+				break;
+			}
+
+			portletIds.add(
+				getRuntimePortletId(content.substring(index, closeIndex)));
+
+			index = closeIndex;
+		}
+
+		return portletIds;
 	}
 
 	private void _addLayoutClassedModelUsage(
@@ -215,97 +322,6 @@ public class JournalContentPortletLayoutListener
 		return _journalArticleLocalService.fetchArticle(groupId, articleId);
 	}
 
-	private String _getRuntimePortletId(String xml) throws Exception {
-		Document document = SAXReaderUtil.read(xml);
-
-		Element rootElement = document.getRootElement();
-
-		String portletName = rootElement.attributeValue("name");
-		String instanceId = rootElement.attributeValue("instance");
-
-		return PortletIdCodec.encode(portletName, 0, instanceId);
-	}
-
-	private String[] _getRuntimePortletIds(
-			long companyId, long scopeGroupId, String articleId)
-		throws Exception {
-
-		JournalArticle article =
-			_journalArticleLocalService.fetchDisplayArticle(
-				scopeGroupId, articleId);
-
-		if (article == null) {
-			Group group = _groupLocalService.fetchGroup(companyId);
-
-			if (group == null) {
-				return new String[0];
-			}
-
-			article = _journalArticleLocalService.fetchDisplayArticle(
-				group.getGroupId(), articleId);
-
-			if (article == null) {
-				return new String[0];
-			}
-		}
-
-		Set<String> portletIds = _getRuntimePortletIds(article.getContent());
-
-		if (Validator.isNotNull(article.getDDMTemplateKey())) {
-			DDMTemplate ddmTemplate = _ddmTemplateLocalService.fetchTemplate(
-				scopeGroupId, _portal.getClassNameId(DDMStructure.class),
-				article.getDDMTemplateKey(), true);
-
-			if (ddmTemplate != null) {
-				portletIds.addAll(
-					_getRuntimePortletIds(ddmTemplate.getScript()));
-			}
-		}
-
-		return portletIds.toArray(new String[0]);
-	}
-
-	private Set<String> _getRuntimePortletIds(String content) throws Exception {
-		Set<String> portletIds = new LinkedHashSet<>();
-
-		for (int index = 0;;) {
-			index = content.indexOf(_OPEN_TAG, index);
-
-			if (index == -1) {
-				break;
-			}
-
-			int close1 = content.indexOf(_CLOSE_1_TAG, index);
-			int close2 = content.indexOf(_CLOSE_2_TAG, index);
-
-			int closeIndex = -1;
-
-			if ((close2 == -1) || ((close1 != -1) && (close1 < close2))) {
-				closeIndex = close1 + _CLOSE_1_TAG.length();
-			}
-			else {
-				closeIndex = close2 + _CLOSE_2_TAG.length();
-			}
-
-			if (closeIndex == -1) {
-				break;
-			}
-
-			portletIds.add(
-				_getRuntimePortletId(content.substring(index, closeIndex)));
-
-			index = closeIndex;
-		}
-
-		return portletIds;
-	}
-
-	private static final String _CLOSE_1_TAG = "</runtime-portlet>";
-
-	private static final String _CLOSE_2_TAG = "/>";
-
-	private static final String _OPEN_TAG = "<runtime-portlet";
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalContentPortletLayoutListener.class);
 
@@ -317,6 +333,9 @@ public class JournalContentPortletLayoutListener
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
+	private JournalContentSearchLocalService _journalContentSearchLocalService;
 
 	@Reference
 	private LayoutClassedModelUsageLocalService

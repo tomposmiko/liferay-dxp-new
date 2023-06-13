@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.util.JavaConstants;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
 
 import javax.portlet.PortletConfig;
 
@@ -32,11 +31,8 @@ import javax.portlet.PortletConfig;
  */
 public class PortletPanelAppAdapter extends BasePanelApp {
 
-	public PortletPanelAppAdapter(
-		String portletId, Supplier<Portlet> supplier) {
-
+	public PortletPanelAppAdapter(String portletId) {
 		_portletId = portletId;
-		_supplier = supplier;
 	}
 
 	@Override
@@ -79,25 +75,10 @@ public class PortletPanelAppAdapter extends BasePanelApp {
 	}
 
 	@Override
-	public Portlet getPortlet() {
-		Portlet portlet = _portlet;
-
-		if (portlet == null) {
-			portlet = _supplier.get();
-
-			_portlet = portlet;
-		}
-
-		return portlet;
-	}
-
-	@Override
 	public String getPortletId() {
 		return _portletId;
 	}
 
-	private volatile Portlet _portlet;
 	private final String _portletId;
-	private final Supplier<Portlet> _supplier;
 
 }

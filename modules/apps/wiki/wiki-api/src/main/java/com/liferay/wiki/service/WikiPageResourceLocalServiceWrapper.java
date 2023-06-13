@@ -14,10 +14,7 @@
 
 package com.liferay.wiki.service;
 
-import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.service.ServiceWrapper;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
-import com.liferay.wiki.model.WikiPageResource;
 
 /**
  * Provides a wrapper for {@link WikiPageResourceLocalService}.
@@ -30,10 +27,6 @@ public class WikiPageResourceLocalServiceWrapper
 	implements ServiceWrapper<WikiPageResourceLocalService>,
 			   WikiPageResourceLocalService {
 
-	public WikiPageResourceLocalServiceWrapper() {
-		this(null);
-	}
-
 	public WikiPageResourceLocalServiceWrapper(
 		WikiPageResourceLocalService wikiPageResourceLocalService) {
 
@@ -41,7 +34,7 @@ public class WikiPageResourceLocalServiceWrapper
 	}
 
 	@Override
-	public WikiPageResource addPageResource(
+	public com.liferay.wiki.model.WikiPageResource addPageResource(
 		long groupId, long nodeId, String title) {
 
 		return _wikiPageResourceLocalService.addPageResource(
@@ -59,8 +52,8 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the wiki page resource that was added
 	 */
 	@Override
-	public WikiPageResource addWikiPageResource(
-		WikiPageResource wikiPageResource) {
+	public com.liferay.wiki.model.WikiPageResource addWikiPageResource(
+		com.liferay.wiki.model.WikiPageResource wikiPageResource) {
 
 		return _wikiPageResourceLocalService.addWikiPageResource(
 			wikiPageResource);
@@ -85,7 +78,9 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the new wiki page resource
 	 */
 	@Override
-	public WikiPageResource createWikiPageResource(long resourcePrimKey) {
+	public com.liferay.wiki.model.WikiPageResource createWikiPageResource(
+		long resourcePrimKey) {
+
 		return _wikiPageResourceLocalService.createWikiPageResource(
 			resourcePrimKey);
 	}
@@ -121,7 +116,8 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @throws PortalException if a wiki page resource with the primary key could not be found
 	 */
 	@Override
-	public WikiPageResource deleteWikiPageResource(long resourcePrimKey)
+	public com.liferay.wiki.model.WikiPageResource deleteWikiPageResource(
+			long resourcePrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiPageResourceLocalService.deleteWikiPageResource(
@@ -139,8 +135,8 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the wiki page resource that was removed
 	 */
 	@Override
-	public WikiPageResource deleteWikiPageResource(
-		WikiPageResource wikiPageResource) {
+	public com.liferay.wiki.model.WikiPageResource deleteWikiPageResource(
+		com.liferay.wiki.model.WikiPageResource wikiPageResource) {
 
 		return _wikiPageResourceLocalService.deleteWikiPageResource(
 			wikiPageResource);
@@ -250,17 +246,23 @@ public class WikiPageResourceLocalServiceWrapper
 	}
 
 	@Override
-	public WikiPageResource fetchPageResource(long nodeId, String title) {
+	public com.liferay.wiki.model.WikiPageResource fetchPageResource(
+		long nodeId, String title) {
+
 		return _wikiPageResourceLocalService.fetchPageResource(nodeId, title);
 	}
 
 	@Override
-	public WikiPageResource fetchPageResource(String uuid) {
+	public com.liferay.wiki.model.WikiPageResource fetchPageResource(
+		String uuid) {
+
 		return _wikiPageResourceLocalService.fetchPageResource(uuid);
 	}
 
 	@Override
-	public WikiPageResource fetchWikiPageResource(long resourcePrimKey) {
+	public com.liferay.wiki.model.WikiPageResource fetchWikiPageResource(
+		long resourcePrimKey) {
+
 		return _wikiPageResourceLocalService.fetchWikiPageResource(
 			resourcePrimKey);
 	}
@@ -273,8 +275,8 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the matching wiki page resource, or <code>null</code> if a matching wiki page resource could not be found
 	 */
 	@Override
-	public WikiPageResource fetchWikiPageResourceByUuidAndGroupId(
-		String uuid, long groupId) {
+	public com.liferay.wiki.model.WikiPageResource
+		fetchWikiPageResourceByUuidAndGroupId(String uuid, long groupId) {
 
 		return _wikiPageResourceLocalService.
 			fetchWikiPageResourceByUuidAndGroupId(uuid, groupId);
@@ -306,7 +308,8 @@ public class WikiPageResourceLocalServiceWrapper
 	}
 
 	@Override
-	public WikiPageResource getPageResource(long pageResourcePrimKey)
+	public com.liferay.wiki.model.WikiPageResource getPageResource(
+			long pageResourcePrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiPageResourceLocalService.getPageResource(
@@ -314,7 +317,8 @@ public class WikiPageResourceLocalServiceWrapper
 	}
 
 	@Override
-	public WikiPageResource getPageResource(long nodeId, String title)
+	public com.liferay.wiki.model.WikiPageResource getPageResource(
+			long nodeId, String title)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiPageResourceLocalService.getPageResource(nodeId, title);
@@ -347,7 +351,8 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @throws PortalException if a wiki page resource with the primary key could not be found
 	 */
 	@Override
-	public WikiPageResource getWikiPageResource(long resourcePrimKey)
+	public com.liferay.wiki.model.WikiPageResource getWikiPageResource(
+			long resourcePrimKey)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiPageResourceLocalService.getWikiPageResource(
@@ -363,8 +368,8 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @throws PortalException if a matching wiki page resource could not be found
 	 */
 	@Override
-	public WikiPageResource getWikiPageResourceByUuidAndGroupId(
-			String uuid, long groupId)
+	public com.liferay.wiki.model.WikiPageResource
+			getWikiPageResourceByUuidAndGroupId(String uuid, long groupId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _wikiPageResourceLocalService.
@@ -383,8 +388,8 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the range of wiki page resources
 	 */
 	@Override
-	public java.util.List<WikiPageResource> getWikiPageResources(
-		int start, int end) {
+	public java.util.List<com.liferay.wiki.model.WikiPageResource>
+		getWikiPageResources(int start, int end) {
 
 		return _wikiPageResourceLocalService.getWikiPageResources(start, end);
 	}
@@ -397,7 +402,7 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the matching wiki page resources, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<WikiPageResource>
+	public java.util.List<com.liferay.wiki.model.WikiPageResource>
 		getWikiPageResourcesByUuidAndCompanyId(String uuid, long companyId) {
 
 		return _wikiPageResourceLocalService.
@@ -415,11 +420,11 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the range of matching wiki page resources, or an empty list if no matches were found
 	 */
 	@Override
-	public java.util.List<WikiPageResource>
+	public java.util.List<com.liferay.wiki.model.WikiPageResource>
 		getWikiPageResourcesByUuidAndCompanyId(
 			String uuid, long companyId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator<WikiPageResource>
-				orderByComparator) {
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.wiki.model.WikiPageResource> orderByComparator) {
 
 		return _wikiPageResourceLocalService.
 			getWikiPageResourcesByUuidAndCompanyId(
@@ -447,31 +452,11 @@ public class WikiPageResourceLocalServiceWrapper
 	 * @return the wiki page resource that was updated
 	 */
 	@Override
-	public WikiPageResource updateWikiPageResource(
-		WikiPageResource wikiPageResource) {
+	public com.liferay.wiki.model.WikiPageResource updateWikiPageResource(
+		com.liferay.wiki.model.WikiPageResource wikiPageResource) {
 
 		return _wikiPageResourceLocalService.updateWikiPageResource(
 			wikiPageResource);
-	}
-
-	@Override
-	public CTPersistence<WikiPageResource> getCTPersistence() {
-		return _wikiPageResourceLocalService.getCTPersistence();
-	}
-
-	@Override
-	public Class<WikiPageResource> getModelClass() {
-		return _wikiPageResourceLocalService.getModelClass();
-	}
-
-	@Override
-	public <R, E extends Throwable> R updateWithUnsafeFunction(
-			UnsafeFunction<CTPersistence<WikiPageResource>, R, E>
-				updateUnsafeFunction)
-		throws E {
-
-		return _wikiPageResourceLocalService.updateWithUnsafeFunction(
-			updateUnsafeFunction);
 	}
 
 	@Override

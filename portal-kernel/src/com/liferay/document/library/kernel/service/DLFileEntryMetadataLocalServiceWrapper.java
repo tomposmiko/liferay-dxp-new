@@ -30,10 +30,6 @@ public class DLFileEntryMetadataLocalServiceWrapper
 	implements DLFileEntryMetadataLocalService,
 			   ServiceWrapper<DLFileEntryMetadataLocalService> {
 
-	public DLFileEntryMetadataLocalServiceWrapper() {
-		this(null);
-	}
-
 	public DLFileEntryMetadataLocalServiceWrapper(
 		DLFileEntryMetadataLocalService dlFileEntryMetadataLocalService) {
 

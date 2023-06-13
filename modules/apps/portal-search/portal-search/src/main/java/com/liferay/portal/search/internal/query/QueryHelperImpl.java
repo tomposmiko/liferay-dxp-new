@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.query.QueryHelper;
@@ -32,12 +33,11 @@ import java.io.Serializable;
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
  */
-@Component(service = QueryHelper.class)
+@Component(immediate = true, service = QueryHelper.class)
 public class QueryHelperImpl implements QueryHelper {
 
 	@Override
@@ -47,7 +47,7 @@ public class QueryHelperImpl implements QueryHelper {
 
 		addSearchTerm(
 			searchQuery, searchContext,
-			_getLocalizedName(field, searchContext.getLocale()), like);
+			getLocalizedName(field, searchContext.getLocale()), like);
 	}
 
 	@Override
@@ -105,12 +105,24 @@ public class QueryHelperImpl implements QueryHelper {
 		return query;
 	}
 
-	private String _getLocalizedName(String name, Locale locale) {
-		return _localization.getLocalizedName(
+	protected Localization getLocalization() {
+
+		// See LPS-72507
+
+		if (localization != null) {
+			return localization;
+		}
+
+		return LocalizationUtil.getLocalization();
+	}
+
+	protected String getLocalizedName(String name, Locale locale) {
+		Localization localization = getLocalization();
+
+		return localization.getLocalizedName(
 			name, LocaleUtil.toLanguageId(locale));
 	}
 
-	@Reference
-	private Localization _localization;
+	protected Localization localization;
 
 }

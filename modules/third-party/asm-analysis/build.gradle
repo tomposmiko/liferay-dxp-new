@@ -1,4 +1,3 @@
-task jarManifest
 task jarPatched(type: Zip)
 
 dependencies {
@@ -9,13 +8,6 @@ jar {
 	setActions([])
 
 	dependsOn jarPatched
-	finalizedBy jarManifest
-}
-
-jarManifest {
-	doLast {
-		ant.jar(destfile: jar.archivePath, update: true)
-	}
 }
 
 jarPatched {

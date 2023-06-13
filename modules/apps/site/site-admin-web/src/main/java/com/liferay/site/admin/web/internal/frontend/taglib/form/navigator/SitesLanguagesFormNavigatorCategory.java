@@ -16,12 +16,11 @@ package com.liferay.site.admin.web.internal.frontend.taglib.form.navigator;
 
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorCategory;
 import com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstants;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Sergio González
@@ -45,10 +44,7 @@ public class SitesLanguagesFormNavigatorCategory
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "languages");
+		return LanguageUtil.get(locale, "languages");
 	}
-
-	@Reference
-	private Language _language;
 
 }

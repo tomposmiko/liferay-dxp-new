@@ -15,6 +15,7 @@
 package com.liferay.blogs.internal.upgrade.v1_1_2;
 
 import com.liferay.blogs.constants.BlogsConstants;
+import com.liferay.blogs.internal.upgrade.v1_1_1.util.BlogsEntryTable;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.petra.string.StringBundler;
@@ -30,8 +31,6 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -57,6 +56,13 @@ public class BlogsImagesUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		if (!hasColumnType("BlogsEntry", "smallImageId", "LONG null")) {
+			alter(
+				BlogsEntryTable.class,
+				new UpgradeProcess.AlterColumnType(
+					"smallImageId", "LONG null"));
+		}
+
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
 				SQLTransformer.transform(
 					"select entryId, groupId, companyId, userId, " +
@@ -64,9 +70,9 @@ public class BlogsImagesUpgradeProcess extends UpgradeProcess {
 							"[$TRUE$] and smallImageId != 0"));
 			PreparedStatement preparedStatement2 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update BlogsEntry set smallImageFileEntryId = ?, " +
-						"smallImageId = 0 where entryId = ?");
+					connection.prepareStatement(
+						"update BlogsEntry set smallImageFileEntryId = ?, " +
+							"smallImageId = 0 where entryId = ?"));
 			ResultSet resultSet = preparedStatement1.executeQuery()) {
 
 			while (resultSet.next()) {
@@ -121,14 +127,6 @@ public class BlogsImagesUpgradeProcess extends UpgradeProcess {
 
 			preparedStatement2.executeBatch();
 		}
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.alterColumnType(
-				"BlogsEntry", "smallImageId", "LONG null")
-		};
 	}
 
 	private Folder _addFolder(long userId, long groupId, String folderName)

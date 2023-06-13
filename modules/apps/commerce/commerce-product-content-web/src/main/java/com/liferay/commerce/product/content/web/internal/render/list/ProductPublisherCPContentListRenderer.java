@@ -19,7 +19,7 @@ import com.liferay.commerce.product.content.constants.CPContentWebKeys;
 import com.liferay.commerce.product.content.render.list.CPContentListRenderer;
 import com.liferay.commerce.product.content.util.CPContentHelper;
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
@@ -38,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Ivica Cardic
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.product.content.list.renderer.key=" + ProductPublisherCPContentListRenderer.KEY,
 		"commerce.product.content.list.renderer.order=" + Integer.MIN_VALUE,
@@ -61,7 +62,7 @@ public class ProductPublisherCPContentListRenderer
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "default");
+		return LanguageUtil.get(resourceBundle, "default");
 	}
 
 	@Override
@@ -83,9 +84,6 @@ public class ProductPublisherCPContentListRenderer
 
 	@Reference
 	private JSPRenderer _jspRenderer;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)"

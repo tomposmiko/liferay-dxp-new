@@ -14,28 +14,30 @@
 
 package com.liferay.commerce.address.content.web.internal.display.context;
 
-import com.liferay.account.model.AccountEntry;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
-import com.liferay.commerce.address.content.web.internal.portlet.action.helper.ActionHelper;
+import com.liferay.commerce.address.content.web.internal.portlet.action.ActionHelper;
 import com.liferay.commerce.address.content.web.internal.portlet.configuration.CommerceAddressContentPortletInstanceConfiguration;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.model.CommerceAddress;
-import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.service.CommerceAddressService;
 import com.liferay.commerce.util.CommerceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.RegionService;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -72,7 +74,7 @@ public class CommerceAddressDisplayContext {
 		_liferayPortletResponse = _cpRequestHelper.getLiferayPortletResponse();
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
+			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
@@ -80,11 +82,6 @@ public class CommerceAddressDisplayContext {
 		_commerceAddressContentPortletInstanceConfiguration =
 			portletDisplay.getPortletInstanceConfiguration(
 				CommerceAddressContentPortletInstanceConfiguration.class);
-	}
-
-	public AccountEntry getAccountEntry() throws PortalException {
-		return _commerceAccountHelper.getCurrentAccountEntry(
-			_cpRequestHelper.getCommerceChannelGroupId(), _httpServletRequest);
 	}
 
 	public String getAddCommerceAddressURL() {
@@ -101,6 +98,11 @@ public class CommerceAddressDisplayContext {
 				return themeDisplay.getURLCurrent();
 			}
 		).buildString();
+	}
+
+	public CommerceAccount getCommerceAccount() throws PortalException {
+		return _commerceAccountHelper.getCurrentCommerceAccount(
+			_cpRequestHelper.getCommerceChannelGroupId(), _httpServletRequest);
 	}
 
 	public CommerceAddress getCommerceAddress() throws PortalException {
@@ -258,22 +260,28 @@ public class CommerceAddressDisplayContext {
 		}
 
 		_searchContainer = new SearchContainer<>(
-			_liferayPortletRequest, getPortletURL(), null,
-			"there-are-no-addresses");
+			_liferayPortletRequest, getPortletURL(), null, null);
+
+		_searchContainer.setEmptyResultsMessage("there-are-no-addresses");
+
+		OrderByComparator<CommerceAddress> orderByComparator =
+			CommerceUtil.getCommerceAddressOrderByComparator(
+				"create-date", "desc");
 
 		_searchContainer.setOrderByCol("create-date");
-		_searchContainer.setOrderByComparator(
-			CommerceUtil.getCommerceAddressOrderByComparator(
-				"create-date", "desc"));
+		_searchContainer.setOrderByComparator(orderByComparator);
 		_searchContainer.setOrderByType("desc");
 
-		AccountEntry accountEntry = getAccountEntry();
+		CommerceAccount commerceAccount = getCommerceAccount();
 
-		_searchContainer.setResultsAndTotal(
+		BaseModelSearchResult<CommerceAddress> baseModelSearchResult =
 			_commerceAddressService.searchCommerceAddresses(
-				accountEntry.getCompanyId(), AccountEntry.class.getName(),
-				accountEntry.getAccountEntryId(), null,
-				_searchContainer.getStart(), _searchContainer.getEnd(), null));
+				commerceAccount.getCompanyId(), CommerceAccount.class.getName(),
+				commerceAccount.getCommerceAccountId(), null,
+				_searchContainer.getStart(), _searchContainer.getEnd(), null);
+
+		_searchContainer.setTotal(baseModelSearchResult.getLength());
+		_searchContainer.setResults(baseModelSearchResult.getBaseModels());
 
 		return _searchContainer;
 	}

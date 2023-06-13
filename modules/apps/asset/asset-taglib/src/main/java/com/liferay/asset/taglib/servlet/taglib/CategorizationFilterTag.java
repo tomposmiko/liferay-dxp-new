@@ -31,20 +31,12 @@ public class CategorizationFilterTag extends IncludeTag {
 		return _assetType;
 	}
 
-	public long[] getGroupIds() {
-		return _groupIds;
-	}
-
 	public PortletURL getPortletURL() {
 		return _portletURL;
 	}
 
 	public void setAssetType(String assetType) {
 		_assetType = assetType;
-	}
-
-	public void setGroupIds(long[] groupIds) {
-		_groupIds = groupIds;
 	}
 
 	@Override
@@ -63,7 +55,6 @@ public class CategorizationFilterTag extends IncludeTag {
 		super.cleanUp();
 
 		_assetType = null;
-		_groupIds = null;
 		_portletURL = null;
 	}
 
@@ -77,15 +68,12 @@ public class CategorizationFilterTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			"liferay-asset:categorization-filter:assetType", _assetType);
 		httpServletRequest.setAttribute(
-			"liferay-asset:categorization-filter:groupIds", _groupIds);
-		httpServletRequest.setAttribute(
 			"liferay-asset:categorization-filter:portletURL", _portletURL);
 	}
 
 	private static final String _PAGE = "/categorization_filter/page.jsp";
 
 	private String _assetType;
-	private long[] _groupIds;
 	private PortletURL _portletURL;
 
 }

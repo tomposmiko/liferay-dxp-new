@@ -47,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Eudaldo Alonso
  */
-@Component(service = Indexer.class)
+@Component(immediate = true, service = Indexer.class)
 public class WikiNodeIndexer extends BaseIndexer<WikiNode> {
 
 	public static final String CLASS_NAME = WikiNode.class.getName();
@@ -119,7 +119,7 @@ public class WikiNodeIndexer extends BaseIndexer<WikiNode> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexEntries(companyId);
+		reindexEntries(companyId);
 	}
 
 	@Override
@@ -132,19 +132,12 @@ public class WikiNodeIndexer extends BaseIndexer<WikiNode> {
 			return;
 		}
 
-		_indexWriterHelper.updateDocument(wikiNode.getCompanyId(), document);
-	}
-
-	@Reference
-	protected UIDFactory uidFactory;
-
-	private void _deleteDocument(WikiNode wikiNode) throws Exception {
-		_indexWriterHelper.deleteDocument(
-			wikiNode.getCompanyId(), uidFactory.getUID(wikiNode),
+		_indexWriterHelper.updateDocument(
+			getSearchEngineId(), wikiNode.getCompanyId(), document,
 			isCommitImmediately());
 	}
 
-	private void _reindexEntries(long companyId) throws Exception {
+	protected void reindexEntries(long companyId) throws PortalException {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_wikiNodeLocalService.getIndexableActionableDynamicQuery();
 
@@ -170,8 +163,25 @@ public class WikiNodeIndexer extends BaseIndexer<WikiNode> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
+	}
+
+	@Reference(unbind = "-")
+	protected void setWikiNodeLocalService(
+		WikiNodeLocalService wikiNodeLocalService) {
+
+		_wikiNodeLocalService = wikiNodeLocalService;
+	}
+
+	@Reference
+	protected UIDFactory uidFactory;
+
+	private void _deleteDocument(WikiNode wikiNode) throws Exception {
+		_indexWriterHelper.deleteDocument(
+			getSearchEngineId(), wikiNode.getCompanyId(),
+			uidFactory.getUID(wikiNode), isCommitImmediately());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -183,7 +193,6 @@ public class WikiNodeIndexer extends BaseIndexer<WikiNode> {
 	@Reference
 	private TrashHelper _trashHelper;
 
-	@Reference
 	private WikiNodeLocalService _wikiNodeLocalService;
 
 	@Reference(target = "(model.class.name=com.liferay.wiki.model.WikiNode)")

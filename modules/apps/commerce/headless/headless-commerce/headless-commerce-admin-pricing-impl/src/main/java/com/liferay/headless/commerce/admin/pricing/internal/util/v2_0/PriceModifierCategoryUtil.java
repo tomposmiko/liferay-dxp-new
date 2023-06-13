@@ -23,6 +23,7 @@ import com.liferay.commerce.pricing.service.CommercePriceModifierRelService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceModifierCategory;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
 
 /**
@@ -31,12 +32,15 @@ import com.liferay.portal.kernel.util.Validator;
 public class PriceModifierCategoryUtil {
 
 	public static CommercePriceModifierRel addCommercePriceModifierRel(
-			long groupId, AssetCategoryLocalService assetCategoryLocalService,
+			AssetCategoryLocalService assetCategoryLocalService,
 			CommercePriceModifierRelService commercePriceModifierRelService,
 			PriceModifierCategory priceModifierCategory,
 			CommercePriceModifier commercePriceModifier,
 			ServiceContextHelper serviceContextHelper)
 		throws PortalException {
+
+		ServiceContext serviceContext =
+			serviceContextHelper.getServiceContext();
 
 		AssetCategory assetCategory;
 
@@ -48,11 +52,9 @@ public class PriceModifierCategoryUtil {
 		}
 		else {
 			assetCategory =
-				assetCategoryLocalService.
-					fetchAssetCategoryByExternalReferenceCode(
-						priceModifierCategory.
-							getCategoryExternalReferenceCode(),
-						groupId);
+				assetCategoryLocalService.fetchAssetCategoryByReferenceCode(
+					serviceContext.getCompanyId(),
+					priceModifierCategory.getCategoryExternalReferenceCode());
 
 			if (assetCategory == null) {
 				String categoryExternalReferenceCode =
@@ -67,7 +69,7 @@ public class PriceModifierCategoryUtil {
 		return commercePriceModifierRelService.addCommercePriceModifierRel(
 			commercePriceModifier.getCommercePriceModifierId(),
 			AssetCategory.class.getName(), assetCategory.getCategoryId(),
-			serviceContextHelper.getServiceContext());
+			serviceContext);
 	}
 
 }

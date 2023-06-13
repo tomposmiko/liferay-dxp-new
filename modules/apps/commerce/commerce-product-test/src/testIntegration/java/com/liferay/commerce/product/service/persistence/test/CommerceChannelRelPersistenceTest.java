@@ -125,10 +125,6 @@ public class CommerceChannelRelPersistenceTest {
 
 		CommerceChannelRel newCommerceChannelRel = _persistence.create(pk);
 
-		newCommerceChannelRel.setMvccVersion(RandomTestUtil.nextLong());
-
-		newCommerceChannelRel.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newCommerceChannelRel.setCompanyId(RandomTestUtil.nextLong());
 
 		newCommerceChannelRel.setUserId(RandomTestUtil.nextLong());
@@ -151,12 +147,6 @@ public class CommerceChannelRelPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommerceChannelRel.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommerceChannelRel.getMvccVersion(),
-			newCommerceChannelRel.getMvccVersion());
-		Assert.assertEquals(
-			existingCommerceChannelRel.getCtCollectionId(),
-			newCommerceChannelRel.getCtCollectionId());
 		Assert.assertEquals(
 			existingCommerceChannelRel.getCommerceChannelRelId(),
 			newCommerceChannelRel.getCommerceChannelRelId());
@@ -237,10 +227,10 @@ public class CommerceChannelRelPersistenceTest {
 
 	protected OrderByComparator<CommerceChannelRel> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceChannelRel", "mvccVersion", true, "ctCollectionId", true,
-			"commerceChannelRelId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"classNameId", true, "classPK", true, "commerceChannelId", true);
+			"CommerceChannelRel", "commerceChannelRelId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "classNameId", true, "classPK", true,
+			"commerceChannelId", true);
 	}
 
 	@Test
@@ -540,10 +530,6 @@ public class CommerceChannelRelPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceChannelRel commerceChannelRel = _persistence.create(pk);
-
-		commerceChannelRel.setMvccVersion(RandomTestUtil.nextLong());
-
-		commerceChannelRel.setCtCollectionId(RandomTestUtil.nextLong());
 
 		commerceChannelRel.setCompanyId(RandomTestUtil.nextLong());
 

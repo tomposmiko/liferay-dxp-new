@@ -98,7 +98,7 @@ public class UserNotificationDefinition {
 		}
 		catch (MissingResourceException missingResourceException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(missingResourceException);
+				_log.debug(missingResourceException, missingResourceException);
 			}
 
 			return ResourceBundleUtil.getBundle(

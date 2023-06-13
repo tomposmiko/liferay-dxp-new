@@ -77,14 +77,14 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 				_liferayOAuthDataProvider.getAccessToken(tokenId);
 
 			if (serverAccessToken != null) {
-				return _handleAccessToken(client, serverAccessToken);
+				return handleAccessToken(client, serverAccessToken);
 			}
 
 			RefreshToken refreshToken =
 				_liferayOAuthDataProvider.getRefreshToken(tokenId);
 
 			if (refreshToken != null) {
-				return _handleRefreshToken(client, refreshToken);
+				return handleRefreshToken(client, refreshToken);
 			}
 		}
 		else if (OAuthConstants.ACCESS_TOKEN.equals(tokenTypeHint)) {
@@ -92,7 +92,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 				_liferayOAuthDataProvider.getAccessToken(tokenId);
 
 			if (serverAccessToken != null) {
-				return _handleAccessToken(client, serverAccessToken);
+				return handleAccessToken(client, serverAccessToken);
 			}
 		}
 		else if (OAuthConstants.REFRESH_TOKEN.equals(tokenTypeHint)) {
@@ -100,7 +100,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 				_liferayOAuthDataProvider.getRefreshToken(tokenId);
 
 			if (refreshToken != null) {
-				return _handleRefreshToken(client, refreshToken);
+				return handleRefreshToken(client, refreshToken);
 			}
 		}
 		else {
@@ -132,7 +132,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return super.authenticateClientIfNeeded(params);
 	}
 
-	private boolean _clientsMatch(Client client1, Client client2) {
+	protected boolean clientsMatch(Client client1, Client client2) {
 		if (!Objects.equals(client1.getClientId(), client2.getClientId())) {
 			return false;
 		}
@@ -151,7 +151,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return false;
 	}
 
-	private TokenIntrospection _createTokenIntrospection(
+	protected TokenIntrospection createTokenIntrospection(
 		ServerAccessToken serverAccessToken) {
 
 		TokenIntrospection tokenIntrospection = new TokenIntrospection(true);
@@ -205,15 +205,15 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return tokenIntrospection;
 	}
 
-	private Response _handleAccessToken(
+	protected Response handleAccessToken(
 		Client client, ServerAccessToken serverAccessToken) {
 
-		if (!_verifyClient(client, serverAccessToken)) {
+		if (!verifyClient(client, serverAccessToken)) {
 			return createErrorResponseFromErrorCode(
 				OAuthConstants.UNAUTHORIZED_CLIENT);
 		}
 
-		if (!_verifyServerAccessToken(serverAccessToken)) {
+		if (!verifyServerAccessToken(serverAccessToken)) {
 			return Response.ok(
 				new TokenIntrospection(false)
 			).build();
@@ -237,19 +237,19 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		}
 
 		return Response.ok(
-			_createTokenIntrospection(serverAccessToken)
+			createTokenIntrospection(serverAccessToken)
 		).build();
 	}
 
-	private Response _handleRefreshToken(
+	protected Response handleRefreshToken(
 		Client client, RefreshToken refreshToken) {
 
-		if (!_verifyClient(client, refreshToken)) {
+		if (!verifyClient(client, refreshToken)) {
 			return createErrorResponseFromErrorCode(
 				OAuthConstants.UNAUTHORIZED_CLIENT);
 		}
 
-		if (!_verifyServerAccessToken(refreshToken)) {
+		if (!verifyServerAccessToken(refreshToken)) {
 			return Response.ok(
 				new TokenIntrospection(false)
 			).build();
@@ -275,14 +275,14 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return Response.status(
 			Response.Status.OK
 		).entity(
-			_createTokenIntrospection(refreshToken)
+			createTokenIntrospection(refreshToken)
 		).build();
 	}
 
-	private boolean _verifyClient(
+	protected boolean verifyClient(
 		Client client, ServerAccessToken serverAccessToken) {
 
-		if (!_clientsMatch(client, serverAccessToken.getClient())) {
+		if (!clientsMatch(client, serverAccessToken.getClient())) {
 			return false;
 		}
 
@@ -300,7 +300,7 @@ public class LiferayTokenIntrospectionService extends AbstractTokenService {
 		return true;
 	}
 
-	private boolean _verifyServerAccessToken(
+	protected boolean verifyServerAccessToken(
 		ServerAccessToken serverAccessToken) {
 
 		if (OAuthUtils.isExpired(

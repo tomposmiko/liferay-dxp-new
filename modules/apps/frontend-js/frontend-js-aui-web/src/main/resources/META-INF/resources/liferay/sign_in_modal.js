@@ -20,11 +20,11 @@
 AUI.add(
 	'liferay-sign-in-modal',
 	(A) => {
-		const NAME = 'signinmodal';
+		var NAME = 'signinmodal';
 
-		const WIN = A.config.win;
+		var WIN = A.config.win;
 
-		const SignInModal = A.Component.create({
+		var SignInModal = A.Component.create({
 			ATTRS: {
 				resetFormValidator: {
 					value: true,
@@ -45,11 +45,11 @@ AUI.add(
 
 			prototype: {
 				_bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._host.on('click', A.bind('_load', instance));
 
-					const destroyModal = function () {
+					var destroyModal = function () {
 						instance.destroy();
 
 						Liferay.detach('screenLoad', destroyModal);
@@ -59,7 +59,7 @@ AUI.add(
 				},
 
 				_load(event) {
-					const instance = this;
+					var instance = this;
 
 					event.preventDefault();
 
@@ -75,9 +75,9 @@ AUI.add(
 				},
 
 				_loadDOM() {
-					const instance = this;
+					var instance = this;
 
-					const signInPortletBody = instance._signInPortletBody;
+					var signInPortletBody = instance._signInPortletBody;
 
 					if (!instance._originalParentNode) {
 						instance._originalParentNode = signInPortletBody.ancestor();
@@ -91,9 +91,9 @@ AUI.add(
 				},
 
 				_loadIO() {
-					const instance = this;
+					var instance = this;
 
-					const modalSignInURL = Liferay.Util.addParams(
+					var modalSignInURL = Liferay.Util.addParams(
 						'windowState=exclusive',
 						instance._signInURL
 					);
@@ -112,15 +112,15 @@ AUI.add(
 				},
 
 				_redirectPage() {
-					const instance = this;
+					var instance = this;
 
 					WIN.location.href = instance._signInURL;
 				},
 
 				_setModalContent(content) {
-					const instance = this;
+					var instance = this;
 
-					const dialog = Liferay.Util.getWindow(NAME);
+					var dialog = Liferay.Util.getWindow(NAME);
 
 					if (!dialog) {
 						Liferay.Util.openWindow(
@@ -128,10 +128,10 @@ AUI.add(
 								dialog: {
 									after: {
 										visibleChange(event) {
-											const signInPortletBody =
+											var signInPortletBody =
 												instance._signInPortletBody;
 
-											const formValidator =
+											var formValidator =
 												instance._formValidator;
 
 											if (
@@ -147,7 +147,7 @@ AUI.add(
 												!event.newVal &&
 												signInPortletBody
 											) {
-												const originalParentNode =
+												var originalParentNode =
 													instance._originalParentNode;
 
 												if (originalParentNode) {
@@ -165,7 +165,7 @@ AUI.add(
 								title: Liferay.Language.get('sign-in'),
 							},
 							(dialogWindow) => {
-								const bodyNode = dialogWindow.bodyNode;
+								var bodyNode = dialogWindow.bodyNode;
 
 								bodyNode.plug(A.Plugin.ParseContent);
 
@@ -181,7 +181,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const dialog = Liferay.Util.getWindow(NAME);
+					var dialog = Liferay.Util.getWindow(NAME);
 
 					if (dialog) {
 						dialog.destroy();
@@ -189,9 +189,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const signInPortlet = instance.get('signInPortlet');
+					var signInPortlet = instance.get('signInPortlet');
 
 					if (signInPortlet) {
 						instance._signInPortletBody = signInPortlet.one(
@@ -199,7 +199,7 @@ AUI.add(
 						);
 					}
 
-					const host = instance.get('host');
+					var host = instance.get('host');
 
 					instance._host = host;
 					instance._signInPortlet = signInPortlet;
@@ -207,10 +207,10 @@ AUI.add(
 					instance._signInURL = host.attr('href');
 
 					if (signInPortlet) {
-						const formNode = signInPortlet.one('form');
+						var formNode = signInPortlet.one('form');
 
 						if (formNode) {
-							const form = Liferay.Form.get(formNode.attr('id'));
+							var form = Liferay.Form.get(formNode.attr('id'));
 
 							instance._formValidator = '';
 

@@ -37,7 +37,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = Object.class)
+@Component(immediate = true, service = Object.class)
 public class PortletPanelAppAdapterRegistry {
 
 	@Activate
@@ -59,7 +59,7 @@ public class PortletPanelAppAdapterRegistry {
 				serviceRegistration.unregister();
 			}
 			catch (IllegalStateException illegalStateException) {
-				_log.error(illegalStateException);
+				_log.error(illegalStateException, illegalStateException);
 			}
 		}
 

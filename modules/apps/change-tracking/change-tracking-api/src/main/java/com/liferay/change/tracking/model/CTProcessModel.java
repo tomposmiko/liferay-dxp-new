@@ -173,25 +173,7 @@ public interface CTProcessModel
 	 */
 	public void setBackgroundTaskId(long backgroundTaskId);
 
-	/**
-	 * Returns the type of this ct process.
-	 *
-	 * @return the type of this ct process
-	 */
-	public int getType();
-
-	/**
-	 * Sets the type of this ct process.
-	 *
-	 * @param type the type of this ct process
-	 */
-	public void setType(int type);
-
 	@Override
 	public CTProcess cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

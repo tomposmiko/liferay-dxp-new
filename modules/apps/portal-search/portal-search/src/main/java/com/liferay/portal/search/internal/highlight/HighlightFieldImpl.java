@@ -20,6 +20,8 @@ import com.liferay.portal.search.highlight.HighlightFieldBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Michael C. Han
@@ -60,8 +62,9 @@ public class HighlightFieldImpl implements HighlightField {
 		}
 
 		@Override
-		public HighlightFieldBuilder fragments(List<String> fragments) {
-			_highlightFieldImpl._fragments = fragments;
+		public HighlightFieldBuilder fragments(Stream<String> fragmentStream) {
+			_highlightFieldImpl._fragments = fragmentStream.collect(
+				Collectors.toList());
 
 			return this;
 		}

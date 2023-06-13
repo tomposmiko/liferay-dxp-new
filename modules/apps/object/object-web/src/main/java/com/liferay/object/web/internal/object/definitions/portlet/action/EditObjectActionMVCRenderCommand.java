@@ -14,16 +14,15 @@
 
 package com.liferay.object.web.internal.object.definitions.portlet.action;
 
-import com.liferay.notification.service.NotificationTemplateLocalService;
+import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.action.trigger.ObjectActionTriggerRegistry;
 import com.liferay.object.constants.ObjectPortletKeys;
-import com.liferay.object.constants.ObjectWebKeys;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionService;
-import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectDefinitionService;
+import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsActionsDisplayContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -72,11 +71,10 @@ public class EditObjectActionMVCRenderCommand implements MVCRenderCommand {
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
 				new ObjectDefinitionsActionsDisplayContext(
-					_portal.getHttpServletRequest(renderRequest), _jsonFactory,
-					_notificationTemplateLocalService,
+					_ddmFormRenderer,
+					_portal.getHttpServletRequest(renderRequest),
 					_objectActionExecutorRegistry, _objectActionTriggerRegistry,
-					_objectDefinitionLocalService,
-					_objectDefinitionModelResourcePermission));
+					_objectDefinitionModelResourcePermission, _jsonFactory));
 		}
 		catch (PortalException portalException) {
 			SessionErrors.add(renderRequest, portalException.getClass());
@@ -86,10 +84,10 @@ public class EditObjectActionMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private DDMFormRenderer _ddmFormRenderer;
 
 	@Reference
-	private NotificationTemplateLocalService _notificationTemplateLocalService;
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private ObjectActionExecutorRegistry _objectActionExecutorRegistry;
@@ -99,9 +97,6 @@ public class EditObjectActionMVCRenderCommand implements MVCRenderCommand {
 
 	@Reference
 	private ObjectActionTriggerRegistry _objectActionTriggerRegistry;
-
-	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"

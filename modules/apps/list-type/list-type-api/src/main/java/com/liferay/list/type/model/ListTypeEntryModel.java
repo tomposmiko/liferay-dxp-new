@@ -98,21 +98,6 @@ public interface ListTypeEntryModel
 	public void setUuid(String uuid);
 
 	/**
-	 * Returns the external reference code of this list type entry.
-	 *
-	 * @return the external reference code of this list type entry
-	 */
-	@AutoEscape
-	public String getExternalReferenceCode();
-
-	/**
-	 * Sets the external reference code of this list type entry.
-	 *
-	 * @param externalReferenceCode the external reference code of this list type entry
-	 */
-	public void setExternalReferenceCode(String externalReferenceCode);
-
-	/**
 	 * Returns the list type entry ID of this list type entry.
 	 *
 	 * @return the list type entry ID of this list type entry
@@ -381,9 +366,5 @@ public interface ListTypeEntryModel
 
 	@Override
 	public ListTypeEntry cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ContributedFragmentManagementToolbarDisplayContext contributedFragmentManagementToolbarDisplayContext = new ContributedFragmentManagementToolbarDisplayContext(fragmentDisplayContext, request, liferayPortletRequest, liferayPortletResponse);
+ContributedFragmentManagementToolbarDisplayContext contributedFragmentManagementToolbarDisplayContext = new ContributedFragmentManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, fragmentDisplayContext);
 %>
 
 <clay:management-toolbar
@@ -38,15 +38,11 @@ ContributedFragmentManagementToolbarDisplayContext contributedFragmentManagement
 				<c:choose>
 					<c:when test="<%= object instanceof FragmentComposition %>">
 						<clay:vertical-card
-							additionalProps="<%= fragmentDisplayContext.getAdditionalProps() %>"
-							propsTransformer="js/ContributedFragmentEntryDropdownPropsTransformer"
 							verticalCard="<%= new ContributedFragmentCompositionVerticalCard((FragmentComposition)object, renderRequest, renderResponse, searchContainer.getRowChecker()) %>"
 						/>
 					</c:when>
 					<c:otherwise>
 						<clay:vertical-card
-							additionalProps="<%= fragmentDisplayContext.getAdditionalProps() %>"
-							propsTransformer="js/ContributedFragmentEntryDropdownPropsTransformer"
 							verticalCard="<%= new ContributedFragmentEntryVerticalCard((FragmentEntry)object, renderRequest, renderResponse, searchContainer.getRowChecker()) %>"
 						/>
 					</c:otherwise>
@@ -65,3 +61,8 @@ ContributedFragmentManagementToolbarDisplayContext contributedFragmentManagement
 	<aui:input name="contributedEntryKeys" type="hidden" />
 	<aui:input name="fragmentCollectionId" type="hidden" />
 </aui:form>
+
+<liferay-frontend:component
+	componentId="<%= FragmentWebKeys.FRAGMENT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+	module="js/FragmentEntryDropdownDefaultEventHandler.es"
+/>

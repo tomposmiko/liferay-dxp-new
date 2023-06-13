@@ -14,9 +14,7 @@
 
 package com.liferay.commerce.account.internal.util;
 
-import com.liferay.account.constants.AccountActionKeys;
 import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountRole;
 import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.commerce.account.constants.CommerceAccountActionKeys;
@@ -44,7 +42,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceAccountRoleHelper.class)
+@Component(
+	enabled = false, immediate = true, service = CommerceAccountRoleHelper.class
+)
 public class CommerceAccountRoleHelperImpl
 	implements CommerceAccountRoleHelper {
 
@@ -76,20 +76,14 @@ public class CommerceAccountRoleHelperImpl
 				Collections.emptyMap());
 
 			role = accountRole.getRole();
-
-			_setRolePermissions(role, serviceContext);
 		}
 
-		if (CommerceAccountConstants.ROLE_NAME_ACCOUNT_ADMINISTRATOR.equals(
-				name)) {
-
-			_setRolePermissions(role, serviceContext);
-		}
+		_setRolePermissions(role, serviceContext);
 	}
 
 	private void _setRolePermissions(
-			long companyId, String primaryKey,
-			Map<String, String[]> resourceActionIds, Role role, int scope)
+			Role role, Map<String, String[]> resourceActionIds,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		for (Map.Entry<String, String[]> entry : resourceActionIds.entrySet()) {
@@ -98,7 +92,9 @@ public class CommerceAccountRoleHelperImpl
 
 			for (String actionId : entry.getValue()) {
 				_resourcePermissionLocalService.addResourcePermission(
-					companyId, entry.getKey(), scope, primaryKey,
+					serviceContext.getCompanyId(), entry.getKey(),
+					ResourceConstants.SCOPE_GROUP_TEMPLATE,
+					String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
 					role.getRoleId(), actionId);
 			}
 		}
@@ -107,27 +103,14 @@ public class CommerceAccountRoleHelperImpl
 	private void _setRolePermissions(Role role, ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<String, String[]> companyResourceActionIds = new HashMap<>();
-		Map<String, String[]> groupResourceActionIds = new HashMap<>();
+		Map<String, String[]> resourceActionIds = new HashMap<>();
 
 		String name = role.getName();
 
 		if (name.equals(
 				CommerceAccountConstants.ROLE_NAME_ACCOUNT_ADMINISTRATOR)) {
 
-			companyResourceActionIds.put(
-				"com.liferay.commerce.model.CommerceOrderType",
-				new String[] {ActionKeys.VIEW});
-
-			groupResourceActionIds.put(
-				AccountEntry.class.getName(),
-				new String[] {
-					AccountActionKeys.MANAGE_ADDRESSES,
-					AccountActionKeys.ASSIGN_USERS, ActionKeys.UPDATE,
-					ActionKeys.VIEW, AccountActionKeys.VIEW_ADDRESSES,
-					AccountActionKeys.VIEW_USERS
-				});
-			groupResourceActionIds.put(
+			resourceActionIds.put(
 				"com.liferay.commerce.account.model.CommerceAccount",
 				new String[] {
 					CommerceAccountActionKeys.MANAGE_ADDRESSES,
@@ -135,74 +118,40 @@ public class CommerceAccountRoleHelperImpl
 					ActionKeys.VIEW, CommerceAccountActionKeys.VIEW_ADDRESSES,
 					CommerceAccountActionKeys.VIEW_MEMBERS
 				});
-			groupResourceActionIds.put(
+
+			resourceActionIds.put(
 				"com.liferay.commerce.order",
 				new String[] {
 					"ADD_COMMERCE_ORDER", "APPROVE_OPEN_COMMERCE_ORDERS",
 					"CHECKOUT_OPEN_COMMERCE_ORDERS", "DELETE_COMMERCE_ORDERS",
-					"MANAGE_COMMERCE_ORDER_DELIVERY_TERMS",
-					"MANAGE_COMMERCE_ORDER_PAYMENT_METHODS",
-					"MANAGE_COMMERCE_ORDER_PAYMENT_TERMS",
-					"MANAGE_COMMERCE_ORDER_SHIPPING_OPTIONS",
-					"MANAGE_COMMERCE_ORDERS", "VIEW_BILLING_ADDRESS",
-					"VIEW_COMMERCE_ORDERS", "VIEW_OPEN_COMMERCE_ORDERS"
+					"MANAGE_COMMERCE_ORDERS", "VIEW_COMMERCE_ORDERS",
+					"VIEW_OPEN_COMMERCE_ORDERS"
 				});
 		}
 		else if (name.equals(
 					CommerceAccountConstants.ROLE_NAME_ACCOUNT_BUYER)) {
 
-			companyResourceActionIds.put(
-				"com.liferay.commerce.model.CommerceOrderType",
-				new String[] {ActionKeys.VIEW});
-
-			groupResourceActionIds.put(
-				AccountEntry.class.getName(),
-				new String[] {
-					AccountActionKeys.MANAGE_ADDRESSES,
-					AccountActionKeys.VIEW_ADDRESSES
-				});
-			groupResourceActionIds.put(
+			resourceActionIds.put(
 				"com.liferay.commerce.order",
 				new String[] {
 					"ADD_COMMERCE_ORDER", "CHECKOUT_OPEN_COMMERCE_ORDERS",
-					"MANAGE_COMMERCE_ORDER_DELIVERY_TERMS",
-					"MANAGE_COMMERCE_ORDER_PAYMENT_METHODS",
-					"MANAGE_COMMERCE_ORDER_PAYMENT_TERMS",
-					"MANAGE_COMMERCE_ORDER_SHIPPING_OPTIONS",
-					"VIEW_BILLING_ADDRESS", "VIEW_COMMERCE_ORDERS",
-					"VIEW_OPEN_COMMERCE_ORDERS"
+					"VIEW_COMMERCE_ORDERS", "VIEW_OPEN_COMMERCE_ORDERS"
 				});
 		}
 		else if (name.equals(
 					CommerceAccountConstants.ROLE_NAME_ACCOUNT_ORDER_MANAGER)) {
 
-			companyResourceActionIds.put(
-				"com.liferay.commerce.model.CommerceOrderType",
-				new String[] {ActionKeys.VIEW});
-
-			groupResourceActionIds.put(
+			resourceActionIds.put(
 				"com.liferay.commerce.order",
 				new String[] {
 					"ADD_COMMERCE_ORDER", "APPROVE_OPEN_COMMERCE_ORDERS",
 					"CHECKOUT_OPEN_COMMERCE_ORDERS", "DELETE_COMMERCE_ORDERS",
-					"MANAGE_COMMERCE_ORDER_DELIVERY_TERMS",
-					"MANAGE_COMMERCE_ORDER_PAYMENT_METHODS",
-					"MANAGE_COMMERCE_ORDER_PAYMENT_TERMS",
-					"MANAGE_COMMERCE_ORDER_SHIPPING_OPTIONS",
-					"MANAGE_COMMERCE_ORDERS", "VIEW_BILLING_ADDRESS",
-					"VIEW_COMMERCE_ORDERS", "VIEW_OPEN_COMMERCE_ORDERS"
+					"MANAGE_COMMERCE_ORDERS", "VIEW_COMMERCE_ORDERS",
+					"VIEW_OPEN_COMMERCE_ORDERS"
 				});
 		}
 
-		_setRolePermissions(
-			serviceContext.getCompanyId(),
-			String.valueOf(serviceContext.getCompanyId()),
-			companyResourceActionIds, role, ResourceConstants.SCOPE_COMPANY);
-		_setRolePermissions(
-			serviceContext.getCompanyId(),
-			String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
-			groupResourceActionIds, role,
-			ResourceConstants.SCOPE_GROUP_TEMPLATE);
+		_setRolePermissions(role, resourceActionIds, serviceContext);
 	}
 
 	@Reference

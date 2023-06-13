@@ -1,12 +1,10 @@
 Bundle-Name: Liferay Dynamic Data Lists Service
 Bundle-SymbolicName: com.liferay.dynamic.data.lists.service
-Bundle-Version: 5.0.52
+Bundle-Version: 5.0.14
 Import-Package:\
-	!com.graphbuilder.*,\
-	\
-	!org.apache.tools.ant.*,\
-	\
 	com.github.*;resolution:=optional,\
+	\
+	com.graphbuilder.*;resolution:=optional,\
 	\
 	com.microsoft.schemas.office.powerpoint.*;resolution:=optional,\
 	com.microsoft.schemas.office.word.*;resolution:=optional,\
@@ -34,3 +32,4 @@ Import-Package:\
 Liferay-Require-SchemaVersion: 2.3.0
 Liferay-Service: true
 -dsannotations-options: inherit
+-includeresource: @poi-[0-9.]*.jar

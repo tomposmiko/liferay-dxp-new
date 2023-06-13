@@ -31,13 +31,13 @@ import com.liferay.journal.article.dynamic.data.mapping.form.field.type.constant
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
 import com.liferay.layout.dynamic.data.mapping.form.field.type.constants.LayoutDDMFormFieldTypeConstants;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -57,7 +58,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.BadRequestException;
 
@@ -184,10 +189,6 @@ public class DDMValueUtil {
 								JSONFactoryUtil.createJSONArray(collect));
 						}
 						catch (JSONException jsonException) {
-							if (_log.isDebugEnabled()) {
-								_log.debug(jsonException);
-							}
-
 							return null;
 						}
 					},
@@ -231,12 +232,14 @@ public class DDMValueUtil {
 					).toString(),
 					preferredLocale);
 			}
-
-			return _toLocalizedValue(
-				contentFieldValue, localizedContentFieldValues,
-				(localizedContentFieldValue, locale) -> GetterUtil.getString(
-					localizedContentFieldValue.getData()),
-				preferredLocale);
+			else {
+				return _toLocalizedValue(
+					contentFieldValue, localizedContentFieldValues,
+					(localizedContentFieldValue, locale) ->
+						GetterUtil.getString(
+							localizedContentFieldValue.getData()),
+					preferredLocale);
+			}
 		}
 
 		return new UnlocalizedValue(
@@ -270,6 +273,43 @@ public class DDMValueUtil {
 		}
 
 		return layout;
+	}
+
+	private static String _getLayoutBreadcrumb(Layout layout, Locale locale) {
+		try {
+			List<Layout> ancestors = layout.getAncestors();
+
+			StringBundler sb = new StringBundler((4 * ancestors.size()) + 5);
+
+			if (layout.isPrivateLayout()) {
+				sb.append(LanguageUtil.get(locale, "private-pages"));
+			}
+			else {
+				sb.append(LanguageUtil.get(locale, "public-pages"));
+			}
+
+			sb.append(StringPool.SPACE);
+			sb.append(StringPool.GREATER_THAN);
+			sb.append(StringPool.SPACE);
+
+			Collections.reverse(ancestors);
+
+			for (Layout ancestor : ancestors) {
+				sb.append(HtmlUtil.escape(ancestor.getName(locale)));
+				sb.append(StringPool.SPACE);
+				sb.append(StringPool.GREATER_THAN);
+				sb.append(StringPool.SPACE);
+			}
+
+			sb.append(HtmlUtil.escape(layout.getName(locale)));
+
+			return sb.toString();
+		}
+		catch (PortalException portalException) {
+			throw new BadRequestException(
+				"No page found with friendly URL " + layout.getName(),
+				portalException);
+		}
 	}
 
 	private static String _toJSON(
@@ -414,19 +454,7 @@ public class DDMValueUtil {
 			).put(
 				"layoutId", layout.getLayoutId()
 			).put(
-				"name",
-				() -> {
-					try {
-						return layout.getBreadcrumb(locale);
-					}
-					catch (Exception exception) {
-						if (_log.isDebugEnabled()) {
-							_log.debug(exception);
-						}
-
-						return StringPool.BLANK;
-					}
-				}
+				"name", _getLayoutBreadcrumb(layout, locale)
 			).put(
 				"privateLayout", layout.isPrivateLayout()
 			).toString();
@@ -447,22 +475,23 @@ public class DDMValueUtil {
 			preferredLocale,
 			localizedValueBiFunction.apply(contentFieldValue, preferredLocale));
 
-		if (localizedContentFieldValues == null) {
-			localizedContentFieldValues = Collections.emptyMap();
-		}
+		Optional.ofNullable(
+			localizedContentFieldValues
+		).orElse(
+			Collections.emptyMap()
+		).forEach(
+			(languageId, localizedContentFieldValue) -> {
+				Locale locale = LocaleUtil.fromLanguageId(
+					languageId, true, false);
 
-		for (Map.Entry<String, ContentFieldValue> entry :
-				localizedContentFieldValues.entrySet()) {
-
-			Locale locale = LocaleUtil.fromLanguageId(
-				entry.getKey(), true, false);
-
-			if (locale != null) {
-				localizedValue.addString(
-					locale,
-					localizedValueBiFunction.apply(entry.getValue(), locale));
+				if (locale != null) {
+					localizedValue.addString(
+						locale,
+						localizedValueBiFunction.apply(
+							localizedContentFieldValue, locale));
+				}
 			}
-		}
+		);
 
 		return localizedValue;
 	}
@@ -470,32 +499,38 @@ public class DDMValueUtil {
 	private static List<String> _transformValuesToKeys(
 		DDMFormField ddmFormField, Locale locale, List<String> values) {
 
-		List<String> keys = new ArrayList<>();
+		Stream<String> stream = values.stream();
 
-		DDMFormFieldOptions ddmFormFieldOptions =
-			ddmFormField.getDDMFormFieldOptions();
+		return stream.map(
+			value -> {
+				DDMFormFieldOptions ddmFormFieldOptions =
+					ddmFormField.getDDMFormFieldOptions();
 
-		Map<String, LocalizedValue> options = ddmFormFieldOptions.getOptions();
+				Map<String, LocalizedValue> options =
+					ddmFormFieldOptions.getOptions();
 
-		for (String value : values) {
-			String key = StringPool.BLANK;
+				Set<Map.Entry<String, LocalizedValue>> set = options.entrySet();
 
-			for (Map.Entry<String, LocalizedValue> entry : options.entrySet()) {
-				LocalizedValue localizedValue = entry.getValue();
+				Stream<Map.Entry<String, LocalizedValue>> setStream =
+					set.stream();
 
-				if (Objects.equals(localizedValue.getString(locale), value)) {
-					key = entry.getKey();
+				return setStream.filter(
+					entry -> {
+						LocalizedValue localizedValue = entry.getValue();
 
-					break;
-				}
+						return Objects.equals(
+							localizedValue.getString(locale), value);
+					}
+				).map(
+					Map.Entry::getKey
+				).findFirst(
+				).orElse(
+					""
+				);
 			}
-
-			keys.add(key);
-		}
-
-		return keys;
+		).collect(
+			Collectors.toList()
+		);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(DDMValueUtil.class);
 
 }

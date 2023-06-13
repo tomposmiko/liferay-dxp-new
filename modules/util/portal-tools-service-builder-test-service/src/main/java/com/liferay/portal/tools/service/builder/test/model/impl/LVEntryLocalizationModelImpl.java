@@ -31,6 +31,7 @@ import com.liferay.portal.tools.service.builder.test.model.LVEntryLocalizationVe
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -238,99 +239,109 @@ public class LVEntryLocalizationModelImpl
 	public Map<String, Function<LVEntryLocalization, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<LVEntryLocalization, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, LVEntryLocalization>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<LVEntryLocalization, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LVEntryLocalization.class.getClassLoader(),
+			LVEntryLocalization.class, ModelWrapper.class);
 
-		static {
-			Map<String, Function<LVEntryLocalization, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<LVEntryLocalization, Object>>();
+		try {
+			Constructor<LVEntryLocalization> constructor =
+				(Constructor<LVEntryLocalization>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", LVEntryLocalization::getMvccVersion);
-			attributeGetterFunctions.put(
-				"headId", LVEntryLocalization::getHeadId);
-			attributeGetterFunctions.put(
-				"lvEntryLocalizationId",
-				LVEntryLocalization::getLvEntryLocalizationId);
-			attributeGetterFunctions.put(
-				"companyId", LVEntryLocalization::getCompanyId);
-			attributeGetterFunctions.put(
-				"lvEntryId", LVEntryLocalization::getLvEntryId);
-			attributeGetterFunctions.put(
-				"languageId", LVEntryLocalization::getLanguageId);
-			attributeGetterFunctions.put(
-				"title", LVEntryLocalization::getTitle);
-			attributeGetterFunctions.put(
-				"content", LVEntryLocalization::getContent);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<LVEntryLocalization, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<LVEntryLocalization, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map
-			<String, BiConsumer<LVEntryLocalization, Object>>
-				_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<LVEntryLocalization, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap
+					<String, Function<LVEntryLocalization, Object>>();
+		Map<String, BiConsumer<LVEntryLocalization, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<LVEntryLocalization, ?>>();
 
-		static {
-			Map<String, BiConsumer<LVEntryLocalization, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<LVEntryLocalization, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", LVEntryLocalization::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<LVEntryLocalization, Long>)
+				LVEntryLocalization::setMvccVersion);
+		attributeGetterFunctions.put("headId", LVEntryLocalization::getHeadId);
+		attributeSetterBiConsumers.put(
+			"headId",
+			(BiConsumer<LVEntryLocalization, Long>)
+				LVEntryLocalization::setHeadId);
+		attributeGetterFunctions.put(
+			"lvEntryLocalizationId",
+			LVEntryLocalization::getLvEntryLocalizationId);
+		attributeSetterBiConsumers.put(
+			"lvEntryLocalizationId",
+			(BiConsumer<LVEntryLocalization, Long>)
+				LVEntryLocalization::setLvEntryLocalizationId);
+		attributeGetterFunctions.put(
+			"companyId", LVEntryLocalization::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<LVEntryLocalization, Long>)
+				LVEntryLocalization::setCompanyId);
+		attributeGetterFunctions.put(
+			"lvEntryId", LVEntryLocalization::getLvEntryId);
+		attributeSetterBiConsumers.put(
+			"lvEntryId",
+			(BiConsumer<LVEntryLocalization, Long>)
+				LVEntryLocalization::setLvEntryId);
+		attributeGetterFunctions.put(
+			"languageId", LVEntryLocalization::getLanguageId);
+		attributeSetterBiConsumers.put(
+			"languageId",
+			(BiConsumer<LVEntryLocalization, String>)
+				LVEntryLocalization::setLanguageId);
+		attributeGetterFunctions.put("title", LVEntryLocalization::getTitle);
+		attributeSetterBiConsumers.put(
+			"title",
+			(BiConsumer<LVEntryLocalization, String>)
+				LVEntryLocalization::setTitle);
+		attributeGetterFunctions.put(
+			"content", LVEntryLocalization::getContent);
+		attributeSetterBiConsumers.put(
+			"content",
+			(BiConsumer<LVEntryLocalization, String>)
+				LVEntryLocalization::setContent);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<LVEntryLocalization, Long>)
-					LVEntryLocalization::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"headId",
-				(BiConsumer<LVEntryLocalization, Long>)
-					LVEntryLocalization::setHeadId);
-			attributeSetterBiConsumers.put(
-				"lvEntryLocalizationId",
-				(BiConsumer<LVEntryLocalization, Long>)
-					LVEntryLocalization::setLvEntryLocalizationId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<LVEntryLocalization, Long>)
-					LVEntryLocalization::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"lvEntryId",
-				(BiConsumer<LVEntryLocalization, Long>)
-					LVEntryLocalization::setLvEntryId);
-			attributeSetterBiConsumers.put(
-				"languageId",
-				(BiConsumer<LVEntryLocalization, String>)
-					LVEntryLocalization::setLanguageId);
-			attributeSetterBiConsumers.put(
-				"title",
-				(BiConsumer<LVEntryLocalization, String>)
-					LVEntryLocalization::setTitle);
-			attributeSetterBiConsumers.put(
-				"content",
-				(BiConsumer<LVEntryLocalization, String>)
-					LVEntryLocalization::setContent);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -793,12 +804,41 @@ public class LVEntryLocalizationModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<LVEntryLocalization, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<LVEntryLocalization, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<LVEntryLocalization, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((LVEntryLocalization)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, LVEntryLocalization>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					LVEntryLocalization.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -818,8 +858,7 @@ public class LVEntryLocalizationModelImpl
 		}
 
 		Function<LVEntryLocalization, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

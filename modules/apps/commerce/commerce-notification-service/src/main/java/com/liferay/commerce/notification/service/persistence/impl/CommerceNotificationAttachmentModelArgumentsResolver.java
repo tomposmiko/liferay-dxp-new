@@ -24,21 +24,12 @@ import com.liferay.portal.kernel.model.BaseModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * The arguments resolver class for retrieving value from CommerceNotificationAttachment.
  *
  * @author Alessio Antonio Rendina
  * @generated
  */
-@Component(
-	property = {
-		"class.name=com.liferay.commerce.notification.model.impl.CommerceNotificationAttachmentImpl",
-		"table.name=CNotificationAttachment"
-	},
-	service = ArgumentsResolver.class
-)
 public class CommerceNotificationAttachmentModelArgumentsResolver
 	implements ArgumentsResolver {
 

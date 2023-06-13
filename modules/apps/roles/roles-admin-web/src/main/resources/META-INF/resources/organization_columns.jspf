@@ -31,7 +31,7 @@
 			</h6>
 
 			<h6 class="text-default">
-				<span><liferay-ui:message key="<%= organization.getType() %>" /></span>
+				<span><%= LanguageUtil.get(request, organization.getType()) %></span>
 			</h6>
 
 			<h6 class="text-default">
@@ -42,9 +42,19 @@
 		</liferay-ui:search-container-column-text>
 	</c:when>
 	<c:when test='<%= displayStyle.equals("icon") %>'>
+
+		<%
+		row.setCssClass("card-page-item card-page-item-asset selectable");
+		%>
+
 		<liferay-ui:search-container-column-text>
-			<clay:vertical-card
-				verticalCard="<%= new OrganizationVerticalCard(organization, renderRequest, organizationSearchContainer.getRowChecker()) %>"
+			<liferay-frontend:icon-vertical-card
+				actionJspServletContext="<%= application %>"
+				icon="users"
+				resultRow="<%= row %>"
+				rowChecker="<%= organizationSearchContainer.getRowChecker() %>"
+				subtitle="<%= LanguageUtil.get(request, organization.getType()) %>"
+				title="<%= organization.getName() %>"
 			/>
 		</liferay-ui:search-container-column-text>
 	</c:when>

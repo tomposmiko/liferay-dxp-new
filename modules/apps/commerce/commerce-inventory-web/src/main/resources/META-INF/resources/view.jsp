@@ -20,10 +20,13 @@
 CommerceInventoryDisplayContext commerceInventoryDisplayContext = (CommerceInventoryDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
-<frontend-data-set:classic-display
+<clay:data-set-display
 	creationMenu="<%= commerceInventoryDisplayContext.getInventoryItemCreationMenu() %>"
-	dataProviderKey="<%= CommerceInventoryFDSNames.INVENTORY_ITEMS %>"
-	id="<%= CommerceInventoryFDSNames.INVENTORY_ITEMS %>"
+	dataProviderKey="<%= CommerceInventoryDataSetConstants.COMMERCE_DATA_SET_KEY_INVENTORY_ITEMS %>"
+	id="<%= CommerceInventoryDataSetConstants.COMMERCE_DATA_SET_KEY_INVENTORY_ITEMS %>"
 	itemsPerPage="<%= 10 %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+	pageNumber="<%= 1 %>"
+	portletURL="<%= commerceInventoryDisplayContext.getPortletURL() %>"
 	style="fluid"
 />

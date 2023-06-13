@@ -41,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/export_fragment_collections"
@@ -74,9 +75,11 @@ public class ExportFragmentCollectionsMVCResourceCommand
 			for (long exportFragmentCollectionId :
 					exportFragmentCollectionIds) {
 
-				fragmentCollections.add(
+				FragmentCollection fragmentCollection =
 					_fragmentCollectionService.fetchFragmentCollection(
-						exportFragmentCollectionId));
+						exportFragmentCollectionId);
+
+				fragmentCollections.add(fragmentCollection);
 			}
 
 			File file = _exportHelper.exportFragmentCollections(

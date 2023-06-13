@@ -19,25 +19,24 @@ import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowInstance;
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowInstanceSubmit;
 import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.ObjectReviewedUtil;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowInstanceResource;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
-import com.liferay.portal.kernel.workflow.WorkflowNode;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.io.Serializable;
 
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -50,7 +49,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v1_0/workflow-instance.properties",
 	scope = ServiceScope.PROTOTYPE, service = WorkflowInstanceResource.class
 )
-@CTAware
 public class WorkflowInstanceResourceImpl
 	extends BaseWorkflowInstanceResourceImpl {
 
@@ -89,12 +87,6 @@ public class WorkflowInstanceResourceImpl
 		throws Exception {
 
 		return Page.of(
-			HashMapBuilder.put(
-				"get",
-				addAction(
-					ActionKeys.VIEW, "getWorkflowInstancesPage",
-					WorkflowConstants.RESOURCE_NAME, null)
-			).build(),
 			transform(
 				_workflowInstanceManager.getWorkflowInstances(
 					contextCompany.getCompanyId(), contextUser.getUserId(),
@@ -144,15 +136,16 @@ public class WorkflowInstanceResourceImpl
 			Map<String, ?> context, long siteId)
 		throws Exception {
 
-		Map<String, Serializable> workflowContext = new HashMap<>();
-
-		for (Map.Entry<String, ?> entry : context.entrySet()) {
-			Object value = entry.getValue();
-
-			if (value instanceof Serializable) {
-				workflowContext.put(entry.getKey(), (Serializable)value);
-			}
-		}
+		Map<String, Serializable> workflowContext = Stream.of(
+			context.entrySet()
+		).flatMap(
+			Collection::parallelStream
+		).filter(
+			entry -> entry.getValue() instanceof Serializable
+		).collect(
+			Collectors.toMap(
+				Map.Entry::getKey, entry -> (Serializable)entry.getValue())
+		);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			contextHttpServletRequest);
@@ -173,9 +166,13 @@ public class WorkflowInstanceResourceImpl
 		return new WorkflowInstance() {
 			{
 				completed = workflowInstance.isComplete();
-				currentNodeNames = transformToArray(
-					workflowInstance.getCurrentWorkflowNodes(),
-					WorkflowNode::getName, String.class);
+				currentNodeNames = Stream.of(
+					workflowInstance.getCurrentNodeNames()
+				).flatMap(
+					List::stream
+				).toArray(
+					String[]::new
+				);
 				dateCompletion = workflowInstance.getEndDate();
 				dateCreated = workflowInstance.getStartDate();
 				id = workflowInstance.getWorkflowInstanceId();
@@ -186,33 +183,14 @@ public class WorkflowInstanceResourceImpl
 					workflowInstance.getWorkflowDefinitionName();
 				workflowDefinitionVersion = String.valueOf(
 					workflowInstance.getWorkflowDefinitionVersion());
-
-				setActions(
-					() -> HashMapBuilder.put(
-						"changeTransition",
-						addAction(
-							ActionKeys.UPDATE,
-							workflowInstance.getWorkflowInstanceId(),
-							"postWorkflowInstanceChangeTransition",
-							_workflowInstanceModelResourcePermission)
-					).put(
-						"delete",
-						addAction(
-							ActionKeys.DELETE,
-							workflowInstance.getWorkflowInstanceId(),
-							"deleteWorkflowInstance",
-							_workflowInstanceModelResourcePermission)
-					).build());
 			}
 		};
 	}
 
 	@Reference
-	private WorkflowInstanceManager _workflowInstanceManager;
+	private Language _language;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.portal.kernel.workflow.WorkflowInstance)"
-	)
-	private ModelResourcePermission<?> _workflowInstanceModelResourcePermission;
+	@Reference
+	private WorkflowInstanceManager _workflowInstanceManager;
 
 }

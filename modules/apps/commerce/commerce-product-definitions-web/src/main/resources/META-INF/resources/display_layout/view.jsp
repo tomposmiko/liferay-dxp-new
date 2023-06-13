@@ -24,7 +24,7 @@ String layoutBreadcrumb = StringPool.BLANK;
 Layout selLayout = cpDefinitionDisplayLayoutDisplayContext.getDefaultProductLayout();
 
 if (selLayout != null) {
-	layoutBreadcrumb = selLayout.getBreadcrumb(locale);
+	layoutBreadcrumb = cpDefinitionDisplayLayoutDisplayContext.getLayoutBreadcrumb(selLayout);
 }
 %>
 
@@ -68,14 +68,14 @@ if (selLayout != null) {
 			</p>
 		</aui:field-wrapper>
 
-		<aui:button name="chooseLayout" value="choose" />
+		<aui:button name="chooseDisplayPage" value="choose" />
 	</aui:form>
 </commerce-ui:panel>
 
 <liferay-frontend:component
 	context='<%=
 		HashMapBuilder.<String, Object>put(
-			"layoutItemSelectorUrl", cpDefinitionDisplayLayoutDisplayContext.getLayoutItemSelectorUrl()
+			"displayPageItemSelectorUrl", cpDefinitionDisplayLayoutDisplayContext.getDisplayPageItemSelectorUrl()
 		).put(
 			"portletNamespace", liferayPortletResponse.getNamespace()
 		).put(
@@ -89,15 +89,18 @@ if (selLayout != null) {
 	bodyClasses="p-0"
 	title='<%= LanguageUtil.get(request, "override-default-product-display-page") %>'
 >
-	<frontend-data-set:classic-display
+	<clay:data-set-display
 		contextParams='<%=
 			HashMapBuilder.<String, String>put(
 				"commerceChannelId", String.valueOf(cpDefinitionDisplayLayoutDisplayContext.getCommerceChannelId())
 			).build()
 		%>'
 		creationMenu="<%= cpDefinitionDisplayLayoutDisplayContext.getCreationMenu() %>"
-		dataProviderKey="<%= CommerceProductFDSNames.PRODUCT_DISPLAY_PAGES %>"
-		id="<%= CommerceProductFDSNames.PRODUCT_DISPLAY_PAGES %>"
+		dataProviderKey="<%= CommerceProductDisplayPageClayTable.NAME %>"
+		id="<%= CommerceProductDisplayPageClayTable.NAME %>"
 		itemsPerPage="<%= 10 %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= currentURLObj %>"
 	/>
 </commerce-ui:panel>

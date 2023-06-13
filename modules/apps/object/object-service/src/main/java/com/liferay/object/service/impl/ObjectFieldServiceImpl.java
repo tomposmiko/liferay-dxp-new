@@ -18,7 +18,6 @@ import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectFieldSetting;
 import com.liferay.object.service.base.ObjectFieldServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.portal.aop.AopService;
@@ -27,7 +26,6 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -48,18 +46,16 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 
 	@Override
 	public ObjectField addCustomObjectField(
-			String externalReferenceCode, long listTypeDefinitionId,
-			long objectDefinitionId, String businessType, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, boolean localized, String name,
-			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings)
+			long listTypeDefinitionId, long objectDefinitionId, boolean indexed,
+			boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required,
+			String type)
 		throws PortalException {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		if (objectDefinition.isUnmodifiableSystemObject()) {
+		if (objectDefinition.isSystem()) {
 			_portletResourcePermission.check(
 				getPermissionChecker(), null,
 				ObjectActionKeys.EXTEND_SYSTEM_OBJECT_DEFINITION);
@@ -71,10 +67,9 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 		}
 
 		return objectFieldLocalService.addCustomObjectField(
-			externalReferenceCode, getUserId(), listTypeDefinitionId,
-			objectDefinitionId, businessType, dbType, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, localized, name, required, state,
-			objectFieldSettings);
+			getUserId(), listTypeDefinitionId, objectDefinitionId, indexed,
+			indexedAsKeyword, indexedLanguageId, labelMap, name, required,
+			type);
 	}
 
 	@Override
@@ -104,13 +99,11 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 	}
 
 	@Override
-	public ObjectField updateObjectField(
-			String externalReferenceCode, long objectFieldId,
-			long listTypeDefinitionId, String businessType, String dbType,
-			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
-			Map<Locale, String> labelMap, boolean localized, String name,
-			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings)
+	public ObjectField updateCustomObjectField(
+			long objectFieldId, long listTypeDefinitionId, boolean indexed,
+			boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required,
+			String type)
 		throws PortalException {
 
 		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
@@ -120,13 +113,9 @@ public class ObjectFieldServiceImpl extends ObjectFieldServiceBaseImpl {
 			getPermissionChecker(), objectField.getObjectDefinitionId(),
 			ActionKeys.UPDATE);
 
-		return objectFieldLocalService.updateObjectField(
-			externalReferenceCode, objectFieldId, getUserId(),
-			listTypeDefinitionId, objectField.getObjectDefinitionId(),
-			businessType, objectField.getDBColumnName(),
-			objectField.getDBTableName(), dbType, indexed, indexedAsKeyword,
-			indexedLanguageId, labelMap, localized, name, required, state,
-			objectField.isSystem(), objectFieldSettings);
+		return objectFieldLocalService.updateCustomObjectField(
+			objectFieldId, listTypeDefinitionId, indexed, indexedAsKeyword,
+			indexedLanguageId, labelMap, name, required, type);
 	}
 
 	@Reference(

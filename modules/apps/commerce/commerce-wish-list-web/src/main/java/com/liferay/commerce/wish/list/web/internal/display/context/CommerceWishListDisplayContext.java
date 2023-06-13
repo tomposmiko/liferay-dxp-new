@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.wish.list.web.internal.display.context;
 
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
@@ -23,7 +24,6 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.product.util.CPInstanceHelper;
-import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.commerce.wish.list.constants.CommerceWishListActionKeys;
 import com.liferay.commerce.wish.list.constants.CommerceWishListPortletKeys;
 import com.liferay.commerce.wish.list.model.CommerceWishList;
@@ -32,8 +32,9 @@ import com.liferay.commerce.wish.list.service.CommerceWishListItemService;
 import com.liferay.commerce.wish.list.service.CommerceWishListService;
 import com.liferay.commerce.wish.list.util.CommerceWishListHttpHelper;
 import com.liferay.commerce.wish.list.util.comparator.CommerceWishListNameComparator;
-import com.liferay.commerce.wish.list.web.internal.display.context.helper.CommerceWishListRequestHelper;
+import com.liferay.commerce.wish.list.web.internal.display.context.util.CommerceWishListRequestHelper;
 import com.liferay.commerce.wish.list.web.internal.util.CommerceWishListPortletUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -43,11 +44,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
@@ -90,8 +90,12 @@ public class CommerceWishListDisplayContext {
 	}
 
 	public long getCommerceAccountId() throws PortalException {
-		return CommerceUtil.getCommerceAccountId(
-			_commerceWishListRequestHelper.getCommerceContext());
+		CommerceContext commerceContext =
+			_commerceWishListRequestHelper.getCommerceContext();
+
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+
+		return commerceAccount.getCommerceAccountId();
 	}
 
 	public long getCommerceChannelId() throws PortalException {
@@ -134,7 +138,7 @@ public class CommerceWishListDisplayContext {
 
 		long commerceWishListId = ParamUtil.getLong(
 			httpServletRequest, "commerceWishListId",
-			_getDefaultCommerceWishListId());
+			getDefaultCommerceWishListId());
 
 		if (commerceWishListId > 0) {
 			try {
@@ -144,11 +148,11 @@ public class CommerceWishListDisplayContext {
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}
-		else if (_isContentPortlet()) {
+		else if (isContentPortlet()) {
 			_commerceWishList =
 				_commerceWishListHttpHelper.getCurrentCommerceWishList(
 					httpServletRequest,
@@ -228,15 +232,18 @@ public class CommerceWishListDisplayContext {
 			_commerceWishListRequestHelper.getLiferayPortletRequest(),
 			getPortletURL(), null, "the-wish-list-is-empty");
 
-		_commerceWishListItemsSearchContainer.setOrderByCol(
-			_getOrderByCol("item", "create-date"));
-		_commerceWishListItemsSearchContainer.setOrderByComparator(
+		setOrderByColAndType(
+			CommerceWishListItem.class, _commerceWishListItemsSearchContainer,
+			"create-date", "desc");
+
+		OrderByComparator<CommerceWishListItem> orderByComparator =
 			CommerceWishListPortletUtil.
 				getCommerceWishListItemOrderByComparator(
-					_getOrderByCol("item", "create-date"),
-					_getOrderByType("item", "desc")));
-		_commerceWishListItemsSearchContainer.setOrderByType(
-			_getOrderByType("item", "desc"));
+					_commerceWishListItemsSearchContainer.getOrderByCol(),
+					_commerceWishListItemsSearchContainer.getOrderByType());
+
+		_commerceWishListItemsSearchContainer.setOrderByComparator(
+			orderByComparator);
 
 		CommerceWishList commerceWishList = getCommerceWishList();
 
@@ -244,14 +251,19 @@ public class CommerceWishListDisplayContext {
 			return _commerceWishListItemsSearchContainer;
 		}
 
-		_commerceWishListItemsSearchContainer.setResultsAndTotal(
-			() -> _commerceWishListItemService.getCommerceWishListItems(
+		int total = _commerceWishListItemService.getCommerceWishListItemsCount(
+			commerceWishList.getCommerceWishListId());
+
+		_commerceWishListItemsSearchContainer.setTotal(total);
+
+		List<CommerceWishListItem> results =
+			_commerceWishListItemService.getCommerceWishListItems(
 				commerceWishList.getCommerceWishListId(),
 				_commerceWishListItemsSearchContainer.getStart(),
 				_commerceWishListItemsSearchContainer.getEnd(),
-				_commerceWishListItemsSearchContainer.getOrderByComparator()),
-			_commerceWishListItemService.getCommerceWishListItemsCount(
-				commerceWishList.getCommerceWishListId()));
+				orderByComparator);
+
+		_commerceWishListItemsSearchContainer.setResults(results);
 
 		return _commerceWishListItemsSearchContainer;
 	}
@@ -299,21 +311,29 @@ public class CommerceWishListDisplayContext {
 			_commerceWishListRequestHelper.getLiferayPortletRequest(),
 			getPortletURL(), null, "no-wish-lists-were-found");
 
-		_searchContainer.setOrderByCol(_getOrderByCol("wish", "name"));
-		_searchContainer.setOrderByComparator(
+		setOrderByColAndType(
+			CommerceWishList.class, _searchContainer, "name", "asc");
+
+		OrderByComparator<CommerceWishList> orderByComparator =
 			CommerceWishListPortletUtil.getCommerceWishListOrderByComparator(
-				_getOrderByCol("wish", "name"),
-				_getOrderByType("wish", "asc")));
-		_searchContainer.setOrderByType(_getOrderByType("wish", "asc"));
-		_searchContainer.setResultsAndTotal(
-			() -> _commerceWishListService.getCommerceWishLists(
+				_searchContainer.getOrderByCol(),
+				_searchContainer.getOrderByType());
+
+		_searchContainer.setOrderByComparator(orderByComparator);
+
+		int total = _commerceWishListService.getCommerceWishListsCount(
+			_commerceWishListRequestHelper.getScopeGroupId(),
+			_commerceWishListRequestHelper.getUserId());
+
+		List<CommerceWishList> results =
+			_commerceWishListService.getCommerceWishLists(
 				_commerceWishListRequestHelper.getScopeGroupId(),
 				_commerceWishListRequestHelper.getUserId(),
 				_searchContainer.getStart(), _searchContainer.getEnd(),
-				_searchContainer.getOrderByComparator()),
-			_commerceWishListService.getCommerceWishListsCount(
-				_commerceWishListRequestHelper.getScopeGroupId(),
-				_commerceWishListRequestHelper.getUserId()));
+				orderByComparator);
+
+		_searchContainer.setTotal(total);
+		_searchContainer.setResults(results);
 
 		return _searchContainer;
 	}
@@ -325,7 +345,7 @@ public class CommerceWishListDisplayContext {
 			CommerceWishListActionKeys.MANAGE_COMMERCE_WISH_LISTS);
 	}
 
-	private long _getDefaultCommerceWishListId() throws PortalException {
+	protected long getDefaultCommerceWishListId() throws PortalException {
 		long defaultCommerceWishListId = 0;
 
 		CommerceWishList commerceWishList =
@@ -342,39 +362,7 @@ public class CommerceWishListDisplayContext {
 		return defaultCommerceWishListId;
 	}
 
-	private String _getOrderByCol(String prefix, String defaultOrderByCol) {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
-		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_commerceWishListRequestHelper.getRequest(),
-			_commerceWishListRequestHelper.getPortletId(),
-			StringBundler.concat(
-				_CLASS_NAME_COMMERCE_WISH_LIST, StringPool.DASH, prefix,
-				"-order-by-col"),
-			defaultOrderByCol);
-
-		return _orderByCol;
-	}
-
-	private String _getOrderByType(String prefix, String defaultOrderByType) {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
-		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_commerceWishListRequestHelper.getRequest(),
-			_commerceWishListRequestHelper.getPortletId(),
-			StringBundler.concat(
-				_CLASS_NAME_COMMERCE_WISH_LIST, StringPool.DASH, prefix,
-				"-order-by-type"),
-			defaultOrderByType);
-
-		return _orderByType;
-	}
-
-	private boolean _isContentPortlet() {
+	protected boolean isContentPortlet() {
 		if (CommerceWishListPortletKeys.COMMERCE_WISH_LIST_CONTENT.equals(
 				_commerceWishListRequestHelper.getPortletId())) {
 
@@ -384,9 +372,40 @@ public class CommerceWishListDisplayContext {
 		return false;
 	}
 
-	private static final String _CLASS_NAME_COMMERCE_WISH_LIST =
-		TextFormatter.format(
-			CommerceWishList.class.getSimpleName(), TextFormatter.K);
+	protected <T> void setOrderByColAndType(
+		Class<T> clazz, SearchContainer<T> searchContainer,
+		String defaultOrderByCol, String defaultOrderByType) {
+
+		HttpServletRequest httpServletRequest =
+			_commerceWishListRequestHelper.getRequest();
+
+		String orderByCol = ParamUtil.getString(
+			httpServletRequest, searchContainer.getOrderByColParam());
+		String orderByType = ParamUtil.getString(
+			httpServletRequest, searchContainer.getOrderByTypeParam());
+
+		String namespace = _commerceWishListRequestHelper.getPortletId();
+		String prefix = TextFormatter.format(
+			clazz.getSimpleName(), TextFormatter.K);
+
+		if (Validator.isNotNull(orderByCol) &&
+			Validator.isNotNull(orderByType)) {
+
+			_portalPreferences.setValue(
+				namespace, prefix + "-order-by-col", orderByCol);
+			_portalPreferences.setValue(
+				namespace, prefix + "-order-by-type", orderByType);
+		}
+		else {
+			orderByCol = _portalPreferences.getValue(
+				namespace, prefix + "-order-by-col", defaultOrderByCol);
+			orderByType = _portalPreferences.getValue(
+				namespace, prefix + "-order-by-type", defaultOrderByType);
+		}
+
+		searchContainer.setOrderByCol(orderByCol);
+		searchContainer.setOrderByType(orderByType);
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceWishListDisplayContext.class);
@@ -402,8 +421,6 @@ public class CommerceWishListDisplayContext {
 	private final CommerceWishListService _commerceWishListService;
 	private final CPDefinitionHelper _cpDefinitionHelper;
 	private final CPInstanceHelper _cpInstanceHelper;
-	private String _orderByCol;
-	private String _orderByType;
 	private final PortalPreferences _portalPreferences;
 	private final PortletResourcePermission _portletResourcePermission;
 	private SearchContainer<CommerceWishList> _searchContainer;

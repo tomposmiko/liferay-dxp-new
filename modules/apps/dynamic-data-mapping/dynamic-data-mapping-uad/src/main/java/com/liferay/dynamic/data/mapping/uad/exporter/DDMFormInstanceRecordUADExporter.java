@@ -23,7 +23,7 @@ import com.liferay.dynamic.data.mapping.uad.util.DDMUADUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -40,7 +40,7 @@ import org.w3c.dom.NodeList;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = UADExporter.class)
+@Component(immediate = true, service = UADExporter.class)
 public class DDMFormInstanceRecordUADExporter
 	extends BaseDDMFormInstanceRecordUADExporter {
 
@@ -74,7 +74,7 @@ public class DDMFormInstanceRecordUADExporter
 								ddmFormInstanceRecord.getDDMFormValues()
 							).build());
 
-			JSONObject dataJSONObject = _jsonFactory.createJSONObject(
+			JSONObject dataJSONObject = JSONFactoryUtil.createJSONObject(
 				ddmFormValuesSerializerSerializeResponse.getContent());
 
 			JSONArray fieldValuesJSONArray = dataJSONObject.getJSONArray(
@@ -140,8 +140,5 @@ public class DDMFormInstanceRecordUADExporter
 
 	@Reference(target = "(ddm.form.values.serializer.type=json)")
 	private DDMFormValuesSerializer _ddmFormValuesSerializer;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

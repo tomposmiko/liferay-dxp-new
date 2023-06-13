@@ -18,7 +18,6 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.analytics.settings.web.internal.user.AnalyticsUsersManager;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
@@ -58,15 +57,6 @@ public abstract class BaseAnalyticsConfigurationScreen
 	}
 
 	@Override
-	public boolean isVisible() {
-		if (FeatureFlagManagerUtil.isEnabled("LRAC-10757")) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
 	public void render(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
@@ -78,7 +68,7 @@ public abstract class BaseAnalyticsConfigurationScreen
 			RequestDispatcher requestDispatcher =
 				servletContext.getRequestDispatcher(getJspPath());
 
-			_setHttpServletRequestAttributes(httpServletRequest);
+			setHttpServletRequestAttributes(httpServletRequest);
 
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}
@@ -92,18 +82,7 @@ public abstract class BaseAnalyticsConfigurationScreen
 
 	protected abstract ServletContext getServletContext();
 
-	@Reference
-	protected AnalyticsUsersManager analyticsUsersManager;
-
-	@Reference
-	protected ConfigurationProvider configurationProvider;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.analytics.settings.web)(release.schema.version>=1.0.1))"
-	)
-	protected Release release;
-
-	private void _setHttpServletRequestAttributes(
+	protected void setHttpServletRequestAttributes(
 			HttpServletRequest httpServletRequest)
 		throws Exception {
 
@@ -120,5 +99,18 @@ public abstract class BaseAnalyticsConfigurationScreen
 			AnalyticsSettingsWebKeys.ANALYTICS_USERS_MANAGER,
 			analyticsUsersManager);
 	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.analytics.settings.web)(release.schema.version>=1.0.1))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
+	@Reference
+	protected AnalyticsUsersManager analyticsUsersManager;
+
+	@Reference
+	protected ConfigurationProvider configurationProvider;
 
 }

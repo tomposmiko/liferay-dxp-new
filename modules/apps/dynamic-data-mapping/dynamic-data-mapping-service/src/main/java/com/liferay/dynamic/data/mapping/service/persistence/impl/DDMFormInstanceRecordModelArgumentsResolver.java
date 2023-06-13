@@ -33,11 +33,11 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceRecordImpl",
-		"table.name=DDMFormInstanceRecord"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		DDMFormInstanceRecordModelArgumentsResolver.class,
+		ArgumentsResolver.class
+	}
 )
 public class DDMFormInstanceRecordModelArgumentsResolver
 	implements ArgumentsResolver {

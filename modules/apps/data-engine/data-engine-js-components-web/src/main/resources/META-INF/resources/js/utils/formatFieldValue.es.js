@@ -14,12 +14,12 @@
 
 import {formatDate, parseDate} from './date.es';
 
-export default function formatFieldValue(
+export default (
 	{dataType, symbols, value},
 	preserveValue,
 	nextEditingLanguageId,
 	prevEditingLanguageId
-) {
+) => {
 	if (dataType === 'double') {
 		return String(value).replace(symbols.decimalSymbol, '.');
 	}
@@ -37,4 +37,4 @@ export default function formatFieldValue(
 	}
 
 	return value;
-}
+};

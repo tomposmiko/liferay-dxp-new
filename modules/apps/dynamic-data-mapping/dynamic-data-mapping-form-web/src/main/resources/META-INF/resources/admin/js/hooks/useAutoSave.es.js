@@ -23,7 +23,6 @@ import {
 } from 'data-engine-js-components-web';
 import objectHash from 'object-hash';
 import React, {useCallback, useContext, useEffect, useRef} from 'react';
-import {withRouter} from 'react-router-dom';
 
 import {useStateSync} from './useStateSync.es';
 import {useValidateFormWithObjects} from './useValidateFormWithObjects';
@@ -86,7 +85,7 @@ const MILLISECONDS_TO_MINUTE = 60000;
  *
  * Each time the rules are changed, the form is saved.
  */
-export function AutoSaveProvider({children, interval, location, url}) {
+export const AutoSaveProvider = ({children, interval, url}) => {
 	const {portletNamespace} = useConfig();
 	const {
 		availableLanguageIds,
@@ -137,15 +136,14 @@ export function AutoSaveProvider({children, interval, location, url}) {
 		]
 	);
 
-	const doSave = useCallback(() => {
+	const doSave = useCallback(async () => {
 		const lastKnownHash = getCurrentStateHash();
 
 		doSyncInput();
 
-		const isFormBuilderOrRuleBuilder =
-			location.pathname === '/' || location.pathname === '/rules';
+		const isValidToSaveForm = await validateFormWithObjects();
 
-		if (isFormBuilderOrRuleBuilder && validateFormWithObjects()) {
+		if (isValidToSaveForm) {
 			pendingRequestRef.current = makeFetch({
 				body: getFormData({
 					name: localizedName,
@@ -180,7 +178,6 @@ export function AutoSaveProvider({children, interval, location, url}) {
 		getCurrentStateHash,
 		lastKnownHashRef,
 		localizedName,
-		location,
 		pendingRequestRef,
 		portletNamespace,
 		url,
@@ -192,7 +189,7 @@ export function AutoSaveProvider({children, interval, location, url}) {
 	}, [lastKnownHashRef, getCurrentStateHash]);
 
 	const performSave = useCallback(() => {
-		if (isMounted()) {
+		if (isMounted) {
 			if (pendingRequestRef.current) {
 				pendingRequestRef.current
 					.then(() => performSave())
@@ -243,10 +240,8 @@ export function AutoSaveProvider({children, interval, location, url}) {
 			{children}
 		</AutoSaveContext.Provider>
 	);
-}
+};
 
-export default withRouter(AutoSaveProvider);
-
-export function useAutoSave() {
+export const useAutoSave = () => {
 	return useContext(AutoSaveContext);
-}
+};

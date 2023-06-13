@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = XStreamConfigurator.class)
+@Component(immediate = true, service = XStreamConfigurator.class)
 public class FriendlyURLEntryXStreamConfigurator
 	implements XStreamConfigurator {
 

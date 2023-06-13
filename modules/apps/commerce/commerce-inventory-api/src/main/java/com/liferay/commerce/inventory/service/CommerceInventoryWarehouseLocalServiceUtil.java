@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.Serializable;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Provides the local service utility for CommerceInventoryWarehouse. This utility wraps
@@ -63,19 +62,40 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 			commerceInventoryWarehouse);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addCommerceInventoryWarehouse(String,
+	 String, String, String, boolean, String, String, String,
+	 String, String, String, String, double, double,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	public static CommerceInventoryWarehouse addCommerceInventoryWarehouse(
-			String externalReferenceCode, Map<java.util.Locale, String> nameMap,
-			Map<java.util.Locale, String> descriptionMap, boolean active,
-			String street1, String street2, String street3, String city,
-			String zip, String commerceRegionCode, String commerceCountryCode,
-			double latitude, double longitude,
+			String name, String description, boolean active, String street1,
+			String street2, String street3, String city, String zip,
+			String commerceRegionCode, String commerceCountryCode,
+			double latitude, double longitude, String externalReferenceCode,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceInventoryWarehouse(
-			externalReferenceCode, nameMap, descriptionMap, active, street1,
-			street2, street3, city, zip, commerceRegionCode,
-			commerceCountryCode, latitude, longitude, serviceContext);
+			name, description, active, street1, street2, street3, city, zip,
+			commerceRegionCode, commerceCountryCode, latitude, longitude,
+			externalReferenceCode, serviceContext);
+	}
+
+	public static CommerceInventoryWarehouse addCommerceInventoryWarehouse(
+			String externalReferenceCode, String name, String description,
+			boolean active, String street1, String street2, String street3,
+			String city, String zip, String commerceRegionCode,
+			String commerceCountryCode, double latitude, double longitude,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addCommerceInventoryWarehouse(
+			externalReferenceCode, name, description, active, street1, street2,
+			street3, city, zip, commerceRegionCode, commerceCountryCode,
+			latitude, longitude, serviceContext);
 	}
 
 	/**
@@ -241,13 +261,32 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 			commerceInventoryWarehouseId);
 	}
 
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
+	 */
 	public static CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
+			long companyId, String externalReferenceCode) {
 
 		return getService().
 			fetchCommerceInventoryWarehouseByExternalReferenceCode(
-				externalReferenceCode, companyId);
+				companyId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	public static CommerceInventoryWarehouse
+		fetchCommerceInventoryWarehouseByReferenceCode(
+			long companyId, String externalReferenceCode) {
+
+		return getService().fetchCommerceInventoryWarehouseByReferenceCode(
+			companyId, externalReferenceCode);
 	}
 
 	public static CommerceInventoryWarehouse
@@ -256,21 +295,6 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 
 		return getService().fetchCommerceInventoryWarehouseByReferenceCode(
 			externalReferenceCode, companyId);
-	}
-
-	/**
-	 * Returns the commerce inventory warehouse with the matching UUID and company.
-	 *
-	 * @param uuid the commerce inventory warehouse's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
-	 */
-	public static CommerceInventoryWarehouse
-		fetchCommerceInventoryWarehouseByUuidAndCompanyId(
-			String uuid, long companyId) {
-
-		return getService().fetchCommerceInventoryWarehouseByUuidAndCompanyId(
-			uuid, companyId);
 	}
 
 	public static CommerceInventoryWarehouse
@@ -304,31 +328,22 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 			commerceInventoryWarehouseId);
 	}
 
-	public static CommerceInventoryWarehouse
-			getCommerceInventoryWarehouseByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().
-			getCommerceInventoryWarehouseByExternalReferenceCode(
-				externalReferenceCode, companyId);
-	}
-
 	/**
-	 * Returns the commerce inventory warehouse with the matching UUID and company.
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
 	 *
-	 * @param uuid the commerce inventory warehouse's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
 	 * @return the matching commerce inventory warehouse
 	 * @throws PortalException if a matching commerce inventory warehouse could not be found
 	 */
 	public static CommerceInventoryWarehouse
-			getCommerceInventoryWarehouseByUuidAndCompanyId(
-				String uuid, long companyId)
+			getCommerceInventoryWarehouseByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
 		throws PortalException {
 
-		return getService().getCommerceInventoryWarehouseByUuidAndCompanyId(
-			uuid, companyId);
+		return getService().
+			getCommerceInventoryWarehouseByExternalReferenceCode(
+				companyId, externalReferenceCode);
 	}
 
 	/**
@@ -424,14 +439,6 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 			companyId, active, commerceCountryCode);
 	}
 
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionableDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return getService().getExportActionableDynamicQuery(portletDataContext);
-	}
-
 	public static
 		com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery
 			getIndexableActionableDynamicQuery() {
@@ -501,30 +508,19 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 	}
 
 	public static CommerceInventoryWarehouse updateCommerceInventoryWarehouse(
-			long commerceInventoryWarehouseId,
-			Map<java.util.Locale, String> nameMap,
-			Map<java.util.Locale, String> descriptionMap, boolean active,
-			String street1, String street2, String street3, String city,
-			String zip, String commerceRegionCode, String commerceCountryCode,
-			double latitude, double longitude, long mvccVersion,
+			long commerceInventoryWarehouseId, String name, String description,
+			boolean active, String street1, String street2, String street3,
+			String city, String zip, String commerceRegionCode,
+			String commerceCountryCode, double latitude, double longitude,
+			long mvccVersion,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateCommerceInventoryWarehouse(
-			commerceInventoryWarehouseId, nameMap, descriptionMap, active,
-			street1, street2, street3, city, zip, commerceRegionCode,
+			commerceInventoryWarehouseId, name, description, active, street1,
+			street2, street3, city, zip, commerceRegionCode,
 			commerceCountryCode, latitude, longitude, mvccVersion,
 			serviceContext);
-	}
-
-	public static CommerceInventoryWarehouse
-			updateCommerceInventoryWarehouseExternalReferenceCode(
-				String externalReferenceCode, long commerceInventoryWarehouseId)
-		throws PortalException {
-
-		return getService().
-			updateCommerceInventoryWarehouseExternalReferenceCode(
-				externalReferenceCode, commerceInventoryWarehouseId);
 	}
 
 	public static CommerceInventoryWarehouseLocalService getService() {

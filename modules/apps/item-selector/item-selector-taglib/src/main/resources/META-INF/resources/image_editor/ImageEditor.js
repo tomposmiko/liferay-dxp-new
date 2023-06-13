@@ -17,7 +17,6 @@ import {ClayInput, ClaySelectWithOption} from '@clayui/form';
 import ClayToolbar from '@clayui/toolbar';
 import Cropper from 'cropperjs';
 import {fetch} from 'frontend-js-web';
-import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
 
 import '../css/image_editor.scss';
@@ -54,14 +53,14 @@ const zoomSteps = [12.5, 25, 50, 100, 150, 200];
 
 const noop = () => {};
 
-function ImageEditor({
+export default ({
 	imageId,
 	imageSrc,
 	itemReturnType,
 	onCancel = noop,
 	onSave = noop,
 	saveURL,
-}) {
+}) => {
 	const ref = useRef();
 
 	const [currentZoom, setCurrentZoom] = useState(100);
@@ -275,15 +274,4 @@ function ImageEditor({
 			</ClayToolbar>
 		</div>
 	);
-}
-
-ImageEditor.propTypes = {
-	imageId: PropTypes.string.isRequired,
-	imageSrc: PropTypes.string.isRequired,
-	itemReturnType: PropTypes.string,
-	onCancel: PropTypes.func,
-	onSave: PropTypes.func,
-	saveURL: PropTypes.string.isRequired,
 };
-
-export default ImageEditor;

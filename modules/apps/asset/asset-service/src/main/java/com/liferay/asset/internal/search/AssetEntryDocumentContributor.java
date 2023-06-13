@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.search.DocumentContributor;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
 
 import java.text.ParseException;
@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Michael C. Han
  */
-@Component(service = DocumentContributor.class)
+@Component(immediate = true, service = DocumentContributor.class)
 public class AssetEntryDocumentContributor
 	implements DocumentContributor<AssetEntry> {
 
@@ -117,7 +117,7 @@ public class AssetEntryDocumentContributor
 
 		document.addLocalizedKeyword(
 			"localized_title",
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				assetEntry.getTitleMap(), assetEntry.getDefaultLanguageId(),
 				assetEntry.getGroupId()),
 			true, true);
@@ -141,9 +141,6 @@ public class AssetEntryDocumentContributor
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
-	private Localization _localization;
 
 	@Reference
 	private ViewCountEntryLocalService _viewCountEntryLocalService;

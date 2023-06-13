@@ -14,6 +14,7 @@
 
 package com.liferay.portal.security.sso.facebook.connect.internal.auto.login;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.facebook.FacebookConnect;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auto.login.AutoLogin;
@@ -45,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Wilson Man
  */
-@Component(service = AutoLogin.class)
+@Component(immediate = true, service = AutoLogin.class)
 public class FacebookConnectAutoLogin extends BaseAutoLogin {
 
 	@Override
@@ -60,7 +61,7 @@ public class FacebookConnectAutoLogin extends BaseAutoLogin {
 			return null;
 		}
 
-		User user = _getUser(httpServletRequest, companyId);
+		User user = getUser(httpServletRequest, companyId);
 
 		if (user == null) {
 			return null;
@@ -75,8 +76,9 @@ public class FacebookConnectAutoLogin extends BaseAutoLogin {
 		return credentials;
 	}
 
-	private User _getUser(HttpServletRequest httpServletRequest, long companyId)
-		throws Exception {
+	protected User getUser(
+			HttpServletRequest httpServletRequest, long companyId)
+		throws PortalException {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
@@ -101,13 +103,21 @@ public class FacebookConnectAutoLogin extends BaseAutoLogin {
 		return null;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setFacebookConnect(FacebookConnect facebookConnect) {
+		_facebookConnect = facebookConnect;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private FacebookConnect _facebookConnect;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

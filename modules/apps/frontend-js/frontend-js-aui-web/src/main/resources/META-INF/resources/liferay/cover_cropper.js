@@ -15,19 +15,19 @@
 AUI.add(
 	'liferay-cover-cropper',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const STR_BOTH = 'both';
+		var STR_BOTH = 'both';
 
-		const STR_DIRECTION = 'direction';
+		var STR_DIRECTION = 'direction';
 
-		const STR_HORIZONTAL = 'horizontal';
+		var STR_HORIZONTAL = 'horizontal';
 
-		const STR_HOST = 'host';
+		var STR_HOST = 'host';
 
-		const STR_VERTICAL = 'vertical';
+		var STR_VERTICAL = 'vertical';
 
-		const CoverCropper = A.Component.create({
+		var CoverCropper = A.Component.create({
 			ATTRS: {
 				direction: {
 					validator: Lang.isString,
@@ -50,7 +50,7 @@ AUI.add(
 
 			prototype: {
 				_bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = [
 						instance._image.on(
@@ -62,26 +62,26 @@ AUI.add(
 				},
 
 				_constrainDrag(event) {
-					const instance = this;
+					var instance = this;
 
-					const direction = instance.get(STR_DIRECTION);
+					var direction = instance.get(STR_DIRECTION);
 
-					const image = instance._image;
+					var image = instance._image;
 
-					const imageContainer = instance._imageContainer;
+					var imageContainer = instance._imageContainer;
 
-					const containerPos = imageContainer.getXY();
+					var containerPos = imageContainer.getXY();
 
 					if (
 						direction === STR_HORIZONTAL ||
 						direction === STR_BOTH
 					) {
-						const left = containerPos[0];
+						var left = containerPos[0];
 
-						const right =
+						var right =
 							left + imageContainer.width() - image.width();
 
-						const pageX = event.pageX;
+						var pageX = event.pageX;
 
 						if (pageX >= left || pageX <= right) {
 							event.preventDefault();
@@ -89,12 +89,12 @@ AUI.add(
 					}
 
 					if (direction === STR_VERTICAL || direction === STR_BOTH) {
-						const top = containerPos[1];
+						var top = containerPos[1];
 
-						const bottom =
+						var bottom =
 							top + imageContainer.height() - image.height();
 
-						const pageY = event.pageY;
+						var pageY = event.pageY;
 
 						if (pageY >= top || pageY <= bottom) {
 							event.preventDefault();
@@ -103,18 +103,18 @@ AUI.add(
 				},
 
 				_getConstrain() {
-					const instance = this;
+					var instance = this;
 
-					let constrain = {};
+					var constrain = {};
 
-					const direction = instance.get(STR_DIRECTION);
+					var direction = instance.get(STR_DIRECTION);
 
-					const imageContainer = instance._imageContainer;
+					var imageContainer = instance._imageContainer;
 
-					const containerPos = imageContainer.getXY();
+					var containerPos = imageContainer.getXY();
 
 					if (direction === STR_VERTICAL) {
-						const containerX = containerPos[0];
+						var containerX = containerPos[0];
 
 						constrain = {
 							left: containerX,
@@ -122,7 +122,7 @@ AUI.add(
 						};
 					}
 					else if (direction === STR_HORIZONTAL) {
-						const containerY = containerPos[1];
+						var containerY = containerPos[1];
 
 						constrain = {
 							bottom: containerY + imageContainer.height(),
@@ -134,25 +134,25 @@ AUI.add(
 				},
 
 				_onImageUpdated() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
-					const imageContainer = instance._imageContainer;
+					var imageContainer = instance._imageContainer;
 
-					const containerPos = imageContainer.getXY();
+					var containerPos = imageContainer.getXY();
 
-					const image = instance._image;
+					var image = instance._image;
 
-					const imagePos = image.getXY();
+					var imagePos = image.getXY();
 
-					const cropRegion = Liferay.Util.getCropRegion(image._node, {
+					var cropRegion = Liferay.Util.getCropRegion(image._node, {
 						height: imageContainer.height(),
 						x: containerPos[0] - imagePos[0],
 						y: containerPos[1] - imagePos[1],
 					});
 
-					const cropRegionNode = host.rootNode.one(
+					var cropRegionNode = host.rootNode.one(
 						'#' + host.get('paramName') + 'CropRegion'
 					);
 
@@ -160,7 +160,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					instance._dd.destroy();
 
@@ -168,16 +168,16 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
 					instance._image = host.one(instance.get('imageSelector'));
 					instance._imageContainer = host.one(
 						instance.get('imageContainerSelector')
 					);
 
-					const dd = new A.DD.Drag({
+					var dd = new A.DD.Drag({
 						node: instance._image,
 						on: {
 							'drag:drag': A.bind('_constrainDrag', instance),

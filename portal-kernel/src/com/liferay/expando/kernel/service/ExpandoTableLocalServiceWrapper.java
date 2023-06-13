@@ -30,10 +30,6 @@ public class ExpandoTableLocalServiceWrapper
 	implements ExpandoTableLocalService,
 			   ServiceWrapper<ExpandoTableLocalService> {
 
-	public ExpandoTableLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ExpandoTableLocalServiceWrapper(
 		ExpandoTableLocalService expandoTableLocalService) {
 
@@ -115,12 +111,9 @@ public class ExpandoTableLocalServiceWrapper
 	 *
 	 * @param expandoTable the expando table
 	 * @return the expando table that was removed
-	 * @throws PortalException
 	 */
 	@Override
-	public ExpandoTable deleteExpandoTable(ExpandoTable expandoTable)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public ExpandoTable deleteExpandoTable(ExpandoTable expandoTable) {
 		return _expandoTableLocalService.deleteExpandoTable(expandoTable);
 	}
 
@@ -154,9 +147,7 @@ public class ExpandoTableLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteTable(ExpandoTable table)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public void deleteTable(ExpandoTable table) {
 		_expandoTableLocalService.deleteTable(table);
 	}
 
@@ -182,16 +173,12 @@ public class ExpandoTableLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteTables(long companyId, long classNameId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public void deleteTables(long companyId, long classNameId) {
 		_expandoTableLocalService.deleteTables(companyId, classNameId);
 	}
 
 	@Override
-	public void deleteTables(long companyId, String className)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public void deleteTables(long companyId, String className) {
 		_expandoTableLocalService.deleteTables(companyId, className);
 	}
 

@@ -14,12 +14,14 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.Ranking;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,6 +44,8 @@ public class RankingGetHiddenResultsBuilderTest
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_rankingGetHiddenResultsBuilder = new RankingGetHiddenResultsBuilder(
 			dlAppLocalService, fastDateFormatFactory, queries, rankingIndexName,
 			rankingIndexReader, resourceActions, resourceRequest,
@@ -58,7 +62,7 @@ public class RankingGetHiddenResultsBuilderTest
 	public void testBuild() throws Exception {
 		setUpDLAppLocalService();
 		setUpFastDateFormatFactory();
-		setUpPortalUtil();
+		setUpRankingResultUtil();
 		setUpResourceRequest();
 
 		Ranking ranking = Mockito.mock(Ranking.class);
@@ -69,7 +73,7 @@ public class RankingGetHiddenResultsBuilderTest
 			ranking
 		).getHiddenDocumentIds();
 
-		setUpRankingIndexReader(ranking);
+		setUpRankingIndexReader(Optional.of(ranking));
 
 		setUpSearchEngineAdapter(
 			setUpGetDocumentResponseGetDocument(
@@ -83,8 +87,8 @@ public class RankingGetHiddenResultsBuilderTest
 	}
 
 	@Test
-	public void testBuildWithRankingNotPresent() {
-		setUpRankingIndexReader(null);
+	public void testBuildWithOptionalRankingNotPresent() {
+		setUpRankingIndexReader(Optional.empty());
 
 		Assert.assertEquals(
 			JSONUtil.put(
@@ -97,9 +101,11 @@ public class RankingGetHiddenResultsBuilderTest
 	}
 
 	private String _getExpectedDocumentsString() {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
 		return JSONUtil.put(
 			"documents",
-			JSONUtil.putAll(
+			jsonArray.put(
 				JSONUtil.put(
 					"author", "theAuthor"
 				).put(
@@ -122,7 +128,8 @@ public class RankingGetHiddenResultsBuilderTest
 					"title", "theTitle"
 				).put(
 					"viewURL", ""
-				),
+				)
+			).put(
 				JSONUtil.put(
 					"author", "theAuthor"
 				).put(
@@ -145,10 +152,11 @@ public class RankingGetHiddenResultsBuilderTest
 					"title", "theTitle"
 				).put(
 					"viewURL", ""
-				))
+				)
+			)
 		).put(
 			"total", 2
-		).toString();
+		).toJSONString();
 	}
 
 	private RankingGetHiddenResultsBuilder _rankingGetHiddenResultsBuilder;

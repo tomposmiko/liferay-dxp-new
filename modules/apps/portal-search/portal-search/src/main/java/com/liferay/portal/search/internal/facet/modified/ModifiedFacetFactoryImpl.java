@@ -17,6 +17,7 @@ package com.liferay.portal.search.internal.facet.modified;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.search.facet.Facet;
+import com.liferay.portal.search.facet.FacetFactory;
 import com.liferay.portal.search.facet.modified.ModifiedFacetFactory;
 import com.liferay.portal.search.filter.FilterBuilders;
 import com.liferay.portal.search.internal.facet.ModifiedFacetImpl;
@@ -27,7 +28,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Bryan Engler
  */
-@Component(service = ModifiedFacetFactory.class)
+@Component(
+	immediate = true, service = {FacetFactory.class, ModifiedFacetFactory.class}
+)
 public class ModifiedFacetFactoryImpl implements ModifiedFacetFactory {
 
 	@Override

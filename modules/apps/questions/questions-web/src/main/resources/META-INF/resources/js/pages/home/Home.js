@@ -17,7 +17,6 @@ import ClayCard from '@clayui/card';
 import ClayEmptyState from '@clayui/empty-state';
 import ClayIcon from '@clayui/icon';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
-import classNames from 'classnames';
 import {useManualQuery} from 'graphql-hooks';
 import React, {useContext, useEffect, useState} from 'react';
 import {Helmet} from 'react-helmet';
@@ -37,7 +36,7 @@ import {
 	historyPushWithSlug,
 } from '../../utils/utils.es';
 
-export default withRouter(({history, isHomePath}) => {
+export default withRouter(({history}) => {
 	const context = useContext(AppContext);
 	const historyPushParser = historyPushWithSlug(history.push);
 	const [topicModalVisibility, setTopicModalVisibility] = useState(false);
@@ -106,20 +105,6 @@ export default withRouter(({history, isHomePath}) => {
 				<Redirect to={'/questions/' + context.rootTopicId} />
 			)}
 
-			<div className="d-flex justify-content-end pb-3">
-				<ClayButton
-					className={classNames('font-weight-bold', {
-						'text-white': isHomePath,
-					})}
-					displayType="unstyled"
-					onClick={() => history.push('/questions/all')}
-				>
-					{Liferay.Language.get('all-questions')}
-
-					<ClayIcon symbol="caret-right" />
-				</ClayButton>
-			</div>
-
 			<div className="questions-container row">
 				{!loading && (
 					<>
@@ -127,7 +112,7 @@ export default withRouter(({history, isHomePath}) => {
 							sections.actions &&
 							!!sections.actions.create &&
 							sections.items &&
-							!!sections.items.length && (
+							sections.items.length > 0 && (
 								<div className="c-mb-4 col-lg-4 col-md-6 col-xl-3">
 									<div className="questions-card text-decoration-none text-secondary">
 										<ClayCard
@@ -146,7 +131,6 @@ export default withRouter(({history, isHomePath}) => {
 													title=""
 												>
 													<ClayIcon symbol="plus" />
-
 													<span className="c-ml-3 text-truncate">
 														{Liferay.Language.get(
 															'new-topic'
@@ -160,7 +144,7 @@ export default withRouter(({history, isHomePath}) => {
 							)}
 
 						{(sections.items &&
-							!!sections.items.length &&
+							sections.items.length > 0 &&
 							sections.items.map((section) => (
 								<div
 									className="c-mb-4 col-lg-4 col-md-6 col-xl-3"
@@ -208,7 +192,6 @@ export default withRouter(({history, isHomePath}) => {
 															]
 														)}
 													</span>
-
 													<button className="btn btn-link btn-sm d-xl-none float-right font-weight-bold p-0">
 														View Topic
 													</button>
@@ -258,7 +241,6 @@ export default withRouter(({history, isHomePath}) => {
 					visible={topicModalVisibility}
 				/>
 			</div>
-
 			{loading && <ClayLoadingIndicator />}
 
 			<Alert info={error} />
@@ -266,7 +248,6 @@ export default withRouter(({history, isHomePath}) => {
 			{context.historyRouterBasePath && (
 				<Helmet>
 					<title>Questions</title>
-
 					<link
 						href={getBasePathWithHistoryRouter(
 							context.historyRouterBasePath

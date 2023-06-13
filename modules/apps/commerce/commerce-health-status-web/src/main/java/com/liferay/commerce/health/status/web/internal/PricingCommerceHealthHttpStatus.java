@@ -32,7 +32,7 @@ import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
@@ -63,6 +63,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.health.status.display.order:Integer=130",
 		"commerce.health.status.key=" + CommerceHealthStatusConstants.PRICING_COMMERCE_HEALTH_STATUS_KEY
@@ -96,7 +97,7 @@ public class PricingCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.
 				PRICING_COMMERCE_HEALTH_STATUS_DESCRIPTION);
@@ -112,7 +113,7 @@ public class PricingCommerceHealthHttpStatus
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle,
 			CommerceHealthStatusConstants.PRICING_COMMERCE_HEALTH_STATUS_KEY);
 	}
@@ -254,9 +255,6 @@ public class PricingCommerceHealthHttpStatus
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
 
-	@Reference
-	private Language _language;
-
 	private class PricingCallable implements Callable<Object> {
 
 		@Override
@@ -280,7 +278,7 @@ public class PricingCommerceHealthHttpStatus
 					_addCatalogBaseCommercePriceList(
 						commerceCatalog,
 						CommercePriceListConstants.TYPE_PRICE_LIST,
-						_language.format(
+						LanguageUtil.format(
 							LocaleUtil.fromLanguageId(
 								commerceCatalog.getCatalogDefaultLanguageId()),
 							"x-base-price-list", commerceCatalog.getName(),
@@ -289,7 +287,7 @@ public class PricingCommerceHealthHttpStatus
 					_addCatalogBaseCommercePriceList(
 						commerceCatalog,
 						CommercePriceListConstants.TYPE_PROMOTION,
-						_language.format(
+						LanguageUtil.format(
 							LocaleUtil.fromLanguageId(
 								commerceCatalog.getCatalogDefaultLanguageId()),
 							"x-base-promotion", commerceCatalog.getName(),

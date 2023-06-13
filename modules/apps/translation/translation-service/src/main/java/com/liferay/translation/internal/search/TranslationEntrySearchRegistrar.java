@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class TranslationEntrySearchRegistrar {
 
 	@Activate

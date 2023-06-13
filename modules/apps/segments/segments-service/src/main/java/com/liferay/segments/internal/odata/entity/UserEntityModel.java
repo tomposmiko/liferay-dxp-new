@@ -14,8 +14,8 @@
 
 package com.liferay.segments.internal.odata.entity;
 
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.DateEntityField;
 import com.liferay.portal.odata.entity.DateTimeEntityField;
 import com.liferay.portal.odata.entity.EntityField;
@@ -23,29 +23,21 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.entity.IdEntityField;
 import com.liferay.portal.odata.entity.StringEntityField;
 
-import org.osgi.service.component.annotations.Component;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the entity data model from the User.
  *
  * @author David Arques
  */
-@Component(
-	property = "entity.model.name=" + UserEntityModel.NAME,
-	service = EntityModel.class
-)
-public class UserEntityModel extends BaseExpandoEntityModel {
+public class UserEntityModel implements EntityModel {
 
 	public static final String NAME = "User";
 
-	@Override
-	public String getName() {
-		return NAME;
-	}
-
-	@Override
-	protected EntityField[] getEntityFields() {
-		return new EntityField[] {
+	public UserEntityModel(List<EntityField> customEntityFields) {
+		_entityFieldsMap = EntityModel.toEntityFieldsMap(
+			new ComplexEntityField("customField", customEntityFields),
 			new DateEntityField(
 				"birthDate", locale -> Field.getSortableFieldName("birthDate"),
 				locale -> "birthDate"),
@@ -93,13 +85,19 @@ public class UserEntityModel extends BaseExpandoEntityModel {
 			new StringEntityField(
 				"screenName",
 				locale -> Field.getSortableFieldName("screenName")),
-			new StringEntityField("userName", locale -> Field.USER_NAME)
-		};
+			new StringEntityField("userName", locale -> Field.USER_NAME));
 	}
 
 	@Override
-	protected String getModelClassName() {
-		return User.class.getName();
+	public Map<String, EntityField> getEntityFieldsMap() {
+		return _entityFieldsMap;
 	}
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+	private final Map<String, EntityField> _entityFieldsMap;
 
 }

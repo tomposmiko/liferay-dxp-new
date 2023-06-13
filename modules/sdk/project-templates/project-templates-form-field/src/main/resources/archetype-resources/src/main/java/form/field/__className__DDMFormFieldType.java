@@ -16,6 +16,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author ${author}
  */
 @Component(
+	immediate = true,
 	property = {
 #if (${liferayVersion.startsWith("7.0")})
 		"ddm.form.field.type.display.order:Integer=9",

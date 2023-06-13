@@ -18,7 +18,6 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author Alessio Antonio Rendina
@@ -31,7 +30,5 @@ public interface CommerceLowStockActivity {
 	public String getKey();
 
 	public String getLabel(Locale locale);
-
-	public Map<Locale, String> getLabelMap();
 
 }

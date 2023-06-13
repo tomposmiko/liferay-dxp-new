@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.util.Validator;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Optional;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -39,33 +41,33 @@ import org.osgi.service.component.annotations.Reference;
 public class ContentVersioningPolicy implements VersioningPolicy {
 
 	@Override
-	public DLVersionNumberIncrease computeDLVersionNumberIncrease(
+	public Optional<DLVersionNumberIncrease> computeDLVersionNumberIncrease(
 		DLFileVersion previousDLFileVersion, DLFileVersion nextDLFileVersion) {
 
 		long previousSize = previousDLFileVersion.getSize();
 		long nextSize = nextDLFileVersion.getSize();
 
 		if ((previousSize == 0) && (nextSize >= 0)) {
-			return null;
+			return Optional.empty();
 		}
 
 		if (previousSize != nextSize) {
-			return DLVersionNumberIncrease.MAJOR;
+			return Optional.of(DLVersionNumberIncrease.MAJOR);
 		}
 
 		String previousChecksum = _computeChecksum(previousDLFileVersion);
 
 		if (previousChecksum == null) {
-			return null;
+			return Optional.empty();
 		}
 
 		String nextChecksum = _computeChecksum(nextDLFileVersion);
 
 		if ((nextChecksum == null) || previousChecksum.equals(nextChecksum)) {
-			return null;
+			return Optional.empty();
 		}
 
-		return DLVersionNumberIncrease.MAJOR;
+		return Optional.of(DLVersionNumberIncrease.MAJOR);
 	}
 
 	private String _computeChecksum(DLFileVersion dlFileVersion) {
@@ -82,7 +84,7 @@ public class ContentVersioningPolicy implements VersioningPolicy {
 		}
 		catch (IOException | PortalException exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return null;

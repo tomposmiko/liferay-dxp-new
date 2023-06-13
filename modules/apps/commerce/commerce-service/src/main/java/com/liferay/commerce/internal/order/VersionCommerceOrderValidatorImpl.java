@@ -23,7 +23,7 @@ import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.order.validator.key=" + VersionCommerceOrderValidatorImpl.KEY,
 		"commerce.order.validator.priority:Integer=30"
@@ -121,7 +122,7 @@ public class VersionCommerceOrderValidatorImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, key);
+		return LanguageUtil.get(resourceBundle, key);
 	}
 
 	private boolean _updateInstance(
@@ -148,8 +149,5 @@ public class VersionCommerceOrderValidatorImpl
 
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;
-
-	@Reference
-	private Language _language;
 
 }

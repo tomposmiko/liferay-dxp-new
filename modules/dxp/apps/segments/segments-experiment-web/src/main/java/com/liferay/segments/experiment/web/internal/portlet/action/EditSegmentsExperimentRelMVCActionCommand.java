@@ -17,7 +17,7 @@ package com.liferay.segments.experiment.web.internal.portlet.action;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author David Arques
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
 		"mvc.command.name=/segments_experiment/edit_segments_experiment_rel"
@@ -77,7 +78,7 @@ public class EditSegmentsExperimentRelMVCActionCommand
 					themeDisplay.getLocale(), segmentsExperimentRel));
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			HttpServletResponse httpServletResponse =
 				_portal.getHttpServletResponse(actionResponse);
@@ -86,7 +87,7 @@ public class EditSegmentsExperimentRelMVCActionCommand
 
 			jsonObject = JSONUtil.put(
 				"error",
-				_language.get(
+				LanguageUtil.get(
 					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
 		}
 
@@ -98,9 +99,6 @@ public class EditSegmentsExperimentRelMVCActionCommand
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditSegmentsExperimentRelMVCActionCommand.class);
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

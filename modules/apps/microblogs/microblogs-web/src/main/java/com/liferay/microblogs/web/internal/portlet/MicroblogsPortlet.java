@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Adolfo Pérez
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=microblogs-portlet",
@@ -57,8 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.portlet-info.short-title=Microblogs",
 		"javax.portlet.portlet-info.title=Microblogs",
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator,guest,power-user,user"
 	},
 	service = Portlet.class
 )
@@ -88,7 +88,7 @@ public class MicroblogsPortlet extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			MicroblogsEntry.class.getName(), actionRequest);
 
-		serviceContext.setAssetTagNames(_getAssetTagNames(content));
+		serviceContext.setAssetTagNames(getAssetTagNames(content));
 
 		if (microblogsEntryId > 0) {
 			microblogsEntryService.updateMicroblogsEntry(
@@ -127,21 +127,7 @@ public class MicroblogsPortlet extends MVCPortlet {
 			microblogsEntryId, 1);
 	}
 
-	@Reference
-	protected AssetEntryLocalService assetEntryLocalService;
-
-	@Reference
-	protected MicroblogsEntryLocalService microblogsEntryLocalService;
-
-	@Reference
-	protected MicroblogsEntryService microblogsEntryService;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.microblogs.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
-	)
-	protected Release release;
-
-	private String[] _getAssetTagNames(String content) {
+	protected String[] getAssetTagNames(String content) {
 		List<String> assetTagNames = new ArrayList<>();
 
 		assetTagNames.addAll(MicroblogsWebUtil.getHashtags(content));
@@ -150,5 +136,37 @@ public class MicroblogsPortlet extends MVCPortlet {
 
 		return assetTagNames.toArray(new String[0]);
 	}
+
+	@Reference(unbind = "-")
+	protected void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+
+		this.assetEntryLocalService = assetEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMicroblogsEntryLocalService(
+		MicroblogsEntryLocalService microblogsEntryLocalService) {
+
+		this.microblogsEntryLocalService = microblogsEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setMicroblogsEntryService(
+		MicroblogsEntryService microblogsEntryService) {
+
+		this.microblogsEntryService = microblogsEntryService;
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.microblogs.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
+	protected AssetEntryLocalService assetEntryLocalService;
+	protected MicroblogsEntryLocalService microblogsEntryLocalService;
+	protected MicroblogsEntryService microblogsEntryService;
 
 }

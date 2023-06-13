@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.COMMERCE_SUBSCRIPTION_ENTRY,
 		"mvc.command.name=/commerce_subscription_entry/edit_commerce_subscription_entry"
@@ -55,6 +56,32 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditCommerceSubscriptionEntryMVCActionCommand
 	extends BaseMVCActionCommand {
+
+	protected void deleteCommerceSubscriptionEntries(
+			long commerceSubscriptionEntryId, ActionRequest actionRequest)
+		throws Exception {
+
+		long[] deleteCommerceSubscriptionEntryIds = null;
+
+		if (commerceSubscriptionEntryId > 0) {
+			deleteCommerceSubscriptionEntryIds = new long[] {
+				commerceSubscriptionEntryId
+			};
+		}
+		else {
+			deleteCommerceSubscriptionEntryIds = StringUtil.split(
+				ParamUtil.getString(
+					actionRequest, "deleteCommerceSubscriptionEntryIds"),
+				0L);
+		}
+
+		for (long deleteCommerceSubscriptionEntryId :
+				deleteCommerceSubscriptionEntryIds) {
+
+			_commerceSubscriptionEntryService.deleteCommerceSubscriptionEntry(
+				deleteCommerceSubscriptionEntryId);
+		}
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -68,11 +95,11 @@ public class EditCommerceSubscriptionEntryMVCActionCommand
 
 		try {
 			if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceSubscriptionEntries(
+				deleteCommerceSubscriptionEntries(
 					commerceSubscriptionEntryId, actionRequest);
 			}
 			else if (cmd.equals(Constants.UPDATE)) {
-				_updateCommerceSubscriptionEntry(
+				updateCommerceSubscriptionEntry(
 					commerceSubscriptionEntryId, actionRequest);
 			}
 		}
@@ -105,30 +132,92 @@ public class EditCommerceSubscriptionEntryMVCActionCommand
 		}
 	}
 
-	private void _deleteCommerceSubscriptionEntries(
+	protected CommerceSubscriptionEntry updateCommerceSubscriptionEntry(
 			long commerceSubscriptionEntryId, ActionRequest actionRequest)
 		throws Exception {
 
-		long[] deleteCommerceSubscriptionEntryIds = null;
+		int subscriptionLength = ParamUtil.getInteger(
+			actionRequest, "subscriptionLength");
+		String subscriptionType = ParamUtil.getString(
+			actionRequest, "subscriptionType");
+		UnicodeProperties subscriptionTypeSettingsUnicodeProperties =
+			PropertiesParamUtil.getProperties(
+				actionRequest, "subscriptionTypeSettings--");
+		long maxSubscriptionCycles = ParamUtil.getLong(
+			actionRequest, "maxSubscriptionCycles");
+		int subscriptionStatus = ParamUtil.getInteger(
+			actionRequest, "subscriptionStatus");
 
-		if (commerceSubscriptionEntryId > 0) {
-			deleteCommerceSubscriptionEntryIds = new long[] {
-				commerceSubscriptionEntryId
-			};
-		}
-		else {
-			deleteCommerceSubscriptionEntryIds = StringUtil.split(
-				ParamUtil.getString(
-					actionRequest, "deleteCommerceSubscriptionEntryIds"),
-				0L);
+		int nextIterationDateMonth = ParamUtil.getInteger(
+			actionRequest, "nextIterationDateMonth");
+		int nextIterationDateDay = ParamUtil.getInteger(
+			actionRequest, "nextIterationDateDay");
+		int nextIterationDateYear = ParamUtil.getInteger(
+			actionRequest, "nextIterationDateYear");
+		int nextIterationDateHour = ParamUtil.getInteger(
+			actionRequest, "nextIterationDateHour");
+		int nextIterationDateMinute = ParamUtil.getInteger(
+			actionRequest, "nextIterationDateMinute");
+		int nextIterationDateAmPm = ParamUtil.getInteger(
+			actionRequest, "nextIterationDateAmPm");
+
+		if (nextIterationDateAmPm == Calendar.PM) {
+			nextIterationDateHour += 12;
 		}
 
-		for (long deleteCommerceSubscriptionEntryId :
-				deleteCommerceSubscriptionEntryIds) {
+		int deliverySubscriptionLength = ParamUtil.getInteger(
+			actionRequest, "deliverySubscriptionLength");
+		String deliverySubscriptionType = ParamUtil.getString(
+			actionRequest, "deliverySubscriptionType");
+		UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties =
+			PropertiesParamUtil.getProperties(
+				actionRequest, "deliverySubscriptionTypeSettings--");
+		long deliveryMaxSubscriptionCycles = ParamUtil.getLong(
+			actionRequest, "deliveryMaxSubscriptionCycles");
+		int deliverySubscriptionStatus = ParamUtil.getInteger(
+			actionRequest, "deliverySubscriptionStatus");
 
-			_commerceSubscriptionEntryService.deleteCommerceSubscriptionEntry(
-				deleteCommerceSubscriptionEntryId);
+		int deliveryNextIterationDateMonth = ParamUtil.getInteger(
+			actionRequest, "deliveryNextIterationDateMonth");
+		int deliveryNextIterationDateDay = ParamUtil.getInteger(
+			actionRequest, "deliveryNextIterationDateDay");
+		int deliveryNextIterationDateYear = ParamUtil.getInteger(
+			actionRequest, "deliveryNextIterationDateYear");
+		int deliveryNextIterationDateHour = ParamUtil.getInteger(
+			actionRequest, "deliveryNextIterationDateHour");
+		int deliveryNextIterationDateMinute = ParamUtil.getInteger(
+			actionRequest, "deliveryNextIterationDateMinute");
+		int deliveryNextIterationDateAmPm = ParamUtil.getInteger(
+			actionRequest, "deliveryNextIterationDateAmPm");
+
+		if (deliveryNextIterationDateAmPm == Calendar.PM) {
+			deliveryNextIterationDateHour += 12;
 		}
+
+		CommerceSubscriptionEntry commerceSubscriptionEntry =
+			_commerceSubscriptionEntryService.fetchCommerceSubscriptionEntry(
+				commerceSubscriptionEntryId);
+
+		_transitionPaymentSubscription(
+			commerceSubscriptionEntry, subscriptionStatus);
+
+		_transitionDeliverySubscription(
+			commerceSubscriptionEntry, deliverySubscriptionStatus);
+
+		return _commerceSubscriptionEntryService.
+			updateCommerceSubscriptionEntry(
+				commerceSubscriptionEntryId, subscriptionLength,
+				subscriptionType, subscriptionTypeSettingsUnicodeProperties,
+				maxSubscriptionCycles, subscriptionStatus,
+				nextIterationDateMonth, nextIterationDateDay,
+				nextIterationDateYear, nextIterationDateHour,
+				nextIterationDateMinute, deliverySubscriptionLength,
+				deliverySubscriptionType,
+				deliverySubscriptionTypeSettingsUnicodeProperties,
+				deliveryMaxSubscriptionCycles, deliverySubscriptionStatus,
+				deliveryNextIterationDateMonth, deliveryNextIterationDateDay,
+				deliveryNextIterationDateYear, deliveryNextIterationDateHour,
+				deliveryNextIterationDateMinute);
 	}
 
 	private void _transitionDeliverySubscription(
@@ -243,94 +332,6 @@ public class EditCommerceSubscriptionEntryMVCActionCommand
 			throw new CommerceSubscriptionEntrySubscriptionStatusException(
 				exception);
 		}
-	}
-
-	private CommerceSubscriptionEntry _updateCommerceSubscriptionEntry(
-			long commerceSubscriptionEntryId, ActionRequest actionRequest)
-		throws Exception {
-
-		int subscriptionLength = ParamUtil.getInteger(
-			actionRequest, "subscriptionLength");
-		String subscriptionType = ParamUtil.getString(
-			actionRequest, "subscriptionType");
-		UnicodeProperties subscriptionTypeSettingsUnicodeProperties =
-			PropertiesParamUtil.getProperties(
-				actionRequest, "subscriptionTypeSettings--");
-		long maxSubscriptionCycles = ParamUtil.getLong(
-			actionRequest, "maxSubscriptionCycles");
-		int subscriptionStatus = ParamUtil.getInteger(
-			actionRequest, "subscriptionStatus");
-
-		int nextIterationDateMonth = ParamUtil.getInteger(
-			actionRequest, "nextIterationDateMonth");
-		int nextIterationDateDay = ParamUtil.getInteger(
-			actionRequest, "nextIterationDateDay");
-		int nextIterationDateYear = ParamUtil.getInteger(
-			actionRequest, "nextIterationDateYear");
-		int nextIterationDateHour = ParamUtil.getInteger(
-			actionRequest, "nextIterationDateHour");
-		int nextIterationDateMinute = ParamUtil.getInteger(
-			actionRequest, "nextIterationDateMinute");
-		int nextIterationDateAmPm = ParamUtil.getInteger(
-			actionRequest, "nextIterationDateAmPm");
-
-		if (nextIterationDateAmPm == Calendar.PM) {
-			nextIterationDateHour += 12;
-		}
-
-		int deliverySubscriptionLength = ParamUtil.getInteger(
-			actionRequest, "deliverySubscriptionLength");
-		String deliverySubscriptionType = ParamUtil.getString(
-			actionRequest, "deliverySubscriptionType");
-		UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties =
-			PropertiesParamUtil.getProperties(
-				actionRequest, "deliverySubscriptionTypeSettings--");
-		long deliveryMaxSubscriptionCycles = ParamUtil.getLong(
-			actionRequest, "deliveryMaxSubscriptionCycles");
-		int deliverySubscriptionStatus = ParamUtil.getInteger(
-			actionRequest, "deliverySubscriptionStatus");
-
-		int deliveryNextIterationDateMonth = ParamUtil.getInteger(
-			actionRequest, "deliveryNextIterationDateMonth");
-		int deliveryNextIterationDateDay = ParamUtil.getInteger(
-			actionRequest, "deliveryNextIterationDateDay");
-		int deliveryNextIterationDateYear = ParamUtil.getInteger(
-			actionRequest, "deliveryNextIterationDateYear");
-		int deliveryNextIterationDateHour = ParamUtil.getInteger(
-			actionRequest, "deliveryNextIterationDateHour");
-		int deliveryNextIterationDateMinute = ParamUtil.getInteger(
-			actionRequest, "deliveryNextIterationDateMinute");
-		int deliveryNextIterationDateAmPm = ParamUtil.getInteger(
-			actionRequest, "deliveryNextIterationDateAmPm");
-
-		if (deliveryNextIterationDateAmPm == Calendar.PM) {
-			deliveryNextIterationDateHour += 12;
-		}
-
-		CommerceSubscriptionEntry commerceSubscriptionEntry =
-			_commerceSubscriptionEntryService.fetchCommerceSubscriptionEntry(
-				commerceSubscriptionEntryId);
-
-		_transitionPaymentSubscription(
-			commerceSubscriptionEntry, subscriptionStatus);
-
-		_transitionDeliverySubscription(
-			commerceSubscriptionEntry, deliverySubscriptionStatus);
-
-		return _commerceSubscriptionEntryService.
-			updateCommerceSubscriptionEntry(
-				commerceSubscriptionEntryId, subscriptionLength,
-				subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-				maxSubscriptionCycles, subscriptionStatus,
-				nextIterationDateMonth, nextIterationDateDay,
-				nextIterationDateYear, nextIterationDateHour,
-				nextIterationDateMinute, deliverySubscriptionLength,
-				deliverySubscriptionType,
-				deliverySubscriptionTypeSettingsUnicodeProperties,
-				deliveryMaxSubscriptionCycles, deliverySubscriptionStatus,
-				deliveryNextIterationDateMonth, deliveryNextIterationDateDay,
-				deliveryNextIterationDateYear, deliveryNextIterationDateHour,
-				deliveryNextIterationDateMinute);
 	}
 
 	@Reference

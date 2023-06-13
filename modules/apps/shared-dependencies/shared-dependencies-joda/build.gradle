@@ -1,4 +1,0 @@
-dependencies {
-	compileInclude group: "joda-time", name: "joda-time", version: "2.12.1"
-	compileInclude group: "org.joda", name: "joda-convert", version: "2.2.1"
-}

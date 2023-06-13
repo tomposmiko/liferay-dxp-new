@@ -20,7 +20,7 @@ import com.liferay.commerce.wish.list.exception.NoSuchWishListException;
 import com.liferay.commerce.wish.list.model.CommerceWishList;
 import com.liferay.commerce.wish.list.service.CommerceWishListService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CommerceWishListPortletKeys.COMMERCE_WISH_LIST_CONTENT,
 		"javax.portlet.name=" + CommerceWishListPortletKeys.MY_COMMERCE_WISH_LISTS,
@@ -53,6 +54,29 @@ import org.osgi.service.component.annotations.Reference;
 	service = MVCActionCommand.class
 )
 public class EditCommerceWishListMVCActionCommand extends BaseMVCActionCommand {
+
+	protected void deleteCommerceWishLists(ActionRequest actionRequest)
+		throws PortalException {
+
+		long[] deleteCommerceWishListIds = null;
+
+		long commerceWishListId = ParamUtil.getLong(
+			actionRequest, "commerceWishListId");
+
+		if (commerceWishListId > 0) {
+			deleteCommerceWishListIds = new long[] {commerceWishListId};
+		}
+		else {
+			deleteCommerceWishListIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "deleteCommerceWishListIds"),
+				0L);
+		}
+
+		for (long deleteCommerceWishListId : deleteCommerceWishListIds) {
+			_commerceWishListService.deleteCommerceWishList(
+				deleteCommerceWishListId);
+		}
+	}
 
 	@Override
 	protected void doProcessAction(
@@ -63,13 +87,13 @@ public class EditCommerceWishListMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (cmd.equals(Constants.ADD) || cmd.equals(Constants.UPDATE)) {
-				_updateCommerceWishList(actionRequest);
+				updateCommerceWishList(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCommerceWishLists(actionRequest);
+				deleteCommerceWishLists(actionRequest);
 			}
 			else if (cmd.equals(Constants.SAVE)) {
-				_saveCommerceWishList(actionRequest, actionResponse);
+				saveCommerceWishList(actionRequest, actionResponse);
 
 				hideDefaultSuccessMessage(actionRequest);
 			}
@@ -96,37 +120,14 @@ public class EditCommerceWishListMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private void _deleteCommerceWishLists(ActionRequest actionRequest)
-		throws PortalException {
-
-		long[] deleteCommerceWishListIds = null;
-
-		long commerceWishListId = ParamUtil.getLong(
-			actionRequest, "commerceWishListId");
-
-		if (commerceWishListId > 0) {
-			deleteCommerceWishListIds = new long[] {commerceWishListId};
-		}
-		else {
-			deleteCommerceWishListIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "deleteCommerceWishListIds"),
-				0L);
-		}
-
-		for (long deleteCommerceWishListId : deleteCommerceWishListIds) {
-			_commerceWishListService.deleteCommerceWishList(
-				deleteCommerceWishListId);
-		}
-	}
-
-	private void _saveCommerceWishList(
+	protected void saveCommerceWishList(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws PortalException {
 
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", _portal.getLocale(actionRequest), getClass());
 
-		String name = _language.get(resourceBundle, "new-wish-list");
+		String name = LanguageUtil.get(resourceBundle, "new-wish-list");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			CommerceWishList.class.getName(), actionRequest);
@@ -140,7 +141,7 @@ public class EditCommerceWishListMVCActionCommand extends BaseMVCActionCommand {
 			String.valueOf(commerceWishList.getCommerceWishListId()));
 	}
 
-	private void _updateCommerceWishList(ActionRequest actionRequest)
+	protected void updateCommerceWishList(ActionRequest actionRequest)
 		throws PortalException {
 
 		long commerceWishListId = ParamUtil.getLong(
@@ -165,9 +166,6 @@ public class EditCommerceWishListMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CommerceWishListService _commerceWishListService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

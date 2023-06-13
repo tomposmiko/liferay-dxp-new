@@ -45,24 +45,24 @@ public class Trackback {
 			Function<String, ServiceContext> serviceContextFunction)
 		throws PortalException {
 
-		long userId = _userLocalService.getGuestUserId(
+		long userId = _userLocalService.getDefaultUserId(
 			themeDisplay.getCompanyId());
 		long groupId = entry.getGroupId();
 		String className = BlogsEntry.class.getName();
 		long classPK = entry.getEntryId();
 
-		String body = _buildBody(themeDisplay, excerpt, url);
+		String body = buildBody(themeDisplay, excerpt, url);
 
 		long commentId = _commentManager.addComment(
-			null, userId, groupId, className, classPK, blogName, title, body,
+			userId, groupId, className, classPK, blogName, title, body,
 			serviceContextFunction);
 
-		String entryURL = _buildEntryURL(entry, themeDisplay);
+		String entryURL = buildEntryURL(entry, themeDisplay);
 
 		_linkbackConsumer.addNewTrackback(commentId, url, entryURL);
 	}
 
-	private String _buildBBCodeBody(
+	protected String buildBBCodeBody(
 		ThemeDisplay themeDisplay, String excerpt, String url) {
 
 		url = StringUtil.replace(
@@ -74,17 +74,17 @@ public class Trackback {
 			themeDisplay.translate("read-more"), "[/url]");
 	}
 
-	private String _buildBody(
+	protected String buildBody(
 		ThemeDisplay themeDisplay, String excerpt, String url) {
 
 		if (PropsValues.DISCUSSION_COMMENTS_FORMAT.equals("bbcode")) {
-			return _buildBBCodeBody(themeDisplay, excerpt, url);
+			return buildBBCodeBody(themeDisplay, excerpt, url);
 		}
 
-		return _buildHTMLBody(themeDisplay, excerpt, url);
+		return buildHTMLBody(themeDisplay, excerpt, url);
 	}
 
-	private String _buildEntryURL(BlogsEntry entry, ThemeDisplay themeDisplay)
+	protected String buildEntryURL(BlogsEntry entry, ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		return StringBundler.concat(
@@ -92,7 +92,7 @@ public class Trackback {
 			Portal.FRIENDLY_URL_SEPARATOR, "blogs/", entry.getUrlTitle());
 	}
 
-	private String _buildHTMLBody(
+	protected String buildHTMLBody(
 		ThemeDisplay themeDisplay, String excerpt, String url) {
 
 		return StringBundler.concat(

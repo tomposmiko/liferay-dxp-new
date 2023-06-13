@@ -14,12 +14,21 @@
 
 package com.liferay.object.web.internal.list.type.display.context;
 
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.list.type.model.ListTypeDefinition;
-import com.liferay.object.constants.ObjectWebKeys;
-import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
+import com.liferay.object.web.internal.constants.ObjectWebKeys;
+import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,12 +48,57 @@ public class ViewListTypeEntriesDisplayContext {
 		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 	}
 
-	public boolean hasUpdateListTypeDefinitionPermission()
-		throws PortalException {
+	public String getAPIURL() {
+		return "/o/headless-admin-list-type/v1.0/list-type-definitions/" +
+			_getListTypeDefinitionId() + "/list-type-entries";
+	}
 
-		return _listTypeDefinitionModelResourcePermission.contains(
-			_objectRequestHelper.getPermissionChecker(),
-			_getListTypeDefinitionId(), ActionKeys.UPDATE);
+	public List<ClayDataSetActionDropdownItem>
+			getClayDataSetActionDropdownItems()
+		throws Exception {
+
+		return Arrays.asList(
+			new ClayDataSetActionDropdownItem(
+				PortletURLBuilder.create(
+					PortletURLUtil.clone(
+						PortletURLUtil.getCurrent(
+							_objectRequestHelper.getLiferayPortletRequest(),
+							_objectRequestHelper.getLiferayPortletResponse()),
+						_objectRequestHelper.getLiferayPortletResponse())
+				).setMVCRenderCommandName(
+					"/list_type_definitions/edit_list_type_entry"
+				).setParameter(
+					"listTypeEntryId", "{id}"
+				).setWindowState(
+					LiferayWindowState.POP_UP
+				).buildString(),
+				"view", "view",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
+				"get", null, "modal"),
+			new ClayDataSetActionDropdownItem(
+				"/o/headless-admin-list-type/v1.0/list-type-entries/{id}",
+				"trash", "delete",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
+				"delete", "delete", "async"));
+	}
+
+	public CreationMenu getCreationMenu() throws PortalException {
+		CreationMenu creationMenu = new CreationMenu();
+
+		if (!_hasAddListTypeEntryPermission()) {
+			return creationMenu;
+		}
+
+		creationMenu.addDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref("addListTypeEntry");
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						_objectRequestHelper.getRequest(), "add-item"));
+				dropdownItem.setTarget("event");
+			});
+
+		return creationMenu;
 	}
 
 	private long _getListTypeDefinitionId() {
@@ -56,6 +110,12 @@ public class ViewListTypeEntriesDisplayContext {
 				ObjectWebKeys.LIST_TYPE_DEFINITION);
 
 		return listTypeDefinition.getListTypeDefinitionId();
+	}
+
+	private boolean _hasAddListTypeEntryPermission() throws PortalException {
+		return _listTypeDefinitionModelResourcePermission.contains(
+			_objectRequestHelper.getPermissionChecker(),
+			_getListTypeDefinitionId(), ActionKeys.UPDATE);
 	}
 
 	private final ModelResourcePermission<ListTypeDefinition>

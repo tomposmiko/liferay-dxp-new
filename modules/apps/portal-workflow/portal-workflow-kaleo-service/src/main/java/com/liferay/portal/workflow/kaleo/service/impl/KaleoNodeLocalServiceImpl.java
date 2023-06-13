@@ -18,7 +18,6 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.workflow.kaleo.definition.Action;
 import com.liferay.portal.workflow.kaleo.definition.Node;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
@@ -55,8 +54,7 @@ public class KaleoNodeLocalServiceImpl extends KaleoNodeLocalServiceBaseImpl {
 
 		// Kaleo node
 
-		User user = _userLocalService.getUser(
-			serviceContext.getGuestOrUserId());
+		User user = userLocalService.getUser(serviceContext.getGuestOrUserId());
 		Date date = new Date();
 
 		long kaleoNodeId = counterLocalService.increment();
@@ -71,7 +69,6 @@ public class KaleoNodeLocalServiceImpl extends KaleoNodeLocalServiceBaseImpl {
 		kaleoNode.setKaleoDefinitionId(kaleoDefinitionId);
 		kaleoNode.setKaleoDefinitionVersionId(kaleoDefinitionVersionId);
 		kaleoNode.setName(node.getName());
-		kaleoNode.setLabelMap(node.getLabelMap());
 		kaleoNode.setMetadata(node.getMetadata());
 		kaleoNode.setDescription(node.getDescription());
 
@@ -183,8 +180,5 @@ public class KaleoNodeLocalServiceImpl extends KaleoNodeLocalServiceBaseImpl {
 
 	@Reference
 	private KaleoTimerLocalService _kaleoTimerLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

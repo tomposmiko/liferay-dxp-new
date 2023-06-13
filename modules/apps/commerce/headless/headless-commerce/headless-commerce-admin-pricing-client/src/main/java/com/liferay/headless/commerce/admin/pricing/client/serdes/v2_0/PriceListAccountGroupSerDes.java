@@ -270,8 +270,7 @@ public class PriceListAccountGroupSerDes {
 			if (Objects.equals(jsonParserFieldName, "accountGroup")) {
 				if (jsonParserFieldValue != null) {
 					priceListAccountGroup.setAccountGroup(
-						PricingAccountGroupSerDes.toDTO(
-							(String)jsonParserFieldValue));
+						AccountGroupSerDes.toDTO((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(

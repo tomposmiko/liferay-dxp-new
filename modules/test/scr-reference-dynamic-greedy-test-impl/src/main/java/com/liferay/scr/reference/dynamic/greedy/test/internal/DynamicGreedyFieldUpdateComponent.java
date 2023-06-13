@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Preston Crary
  */
 @Component(
-	enabled = false, property = "field.option=update",
+	enabled = false, immediate = true, property = "field.option=update",
 	service = DynamicGreedyComponent.class
 )
 public class DynamicGreedyFieldUpdateComponent

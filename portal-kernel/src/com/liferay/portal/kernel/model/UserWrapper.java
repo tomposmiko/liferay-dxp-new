@@ -51,6 +51,7 @@ public class UserWrapper
 		attributes.put("companyId", getCompanyId());
 		attributes.put("createDate", getCreateDate());
 		attributes.put("modifiedDate", getModifiedDate());
+		attributes.put("defaultUser", isDefaultUser());
 		attributes.put("contactId", getContactId());
 		attributes.put("password", getPassword());
 		attributes.put("passwordEncrypted", isPasswordEncrypted());
@@ -85,7 +86,6 @@ public class UserWrapper
 		attributes.put("lockoutDate", getLockoutDate());
 		attributes.put("agreedToTermsOfUse", isAgreedToTermsOfUse());
 		attributes.put("emailAddressVerified", isEmailAddressVerified());
-		attributes.put("type", getType());
 		attributes.put("status", getStatus());
 
 		return attributes;
@@ -140,6 +140,12 @@ public class UserWrapper
 
 		if (modifiedDate != null) {
 			setModifiedDate(modifiedDate);
+		}
+
+		Boolean defaultUser = (Boolean)attributes.get("defaultUser");
+
+		if (defaultUser != null) {
+			setDefaultUser(defaultUser);
 		}
 
 		Long contactId = (Long)attributes.get("contactId");
@@ -353,12 +359,6 @@ public class UserWrapper
 			setEmailAddressVerified(emailAddressVerified);
 		}
 
-		Integer type = (Integer)attributes.get("type");
-
-		if (type != null) {
-			setType(type);
-		}
-
 		Integer status = (Integer)attributes.get("status");
 
 		if (status != null) {
@@ -498,6 +498,16 @@ public class UserWrapper
 	}
 
 	/**
+	 * Returns the default user of this user.
+	 *
+	 * @return the default user of this user
+	 */
+	@Override
+	public boolean getDefaultUser() {
+		return model.getDefaultUser();
+	}
+
+	/**
 	 * Returns the digest of this user.
 	 *
 	 * @return the digest of this user
@@ -510,9 +520,9 @@ public class UserWrapper
 	/**
 	 * Returns a digest for the user, incorporating the password.
 	 *
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 * @param password a password to incorporate with the digest
 	 * @return a digest for the user, incorporating the password
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1206,16 +1216,6 @@ public class UserWrapper
 		return model.getTimeZoneId();
 	}
 
-	/**
-	 * Returns the type of this user.
-	 *
-	 * @return the type of this user
-	 */
-	@Override
-	public int getType() {
-		return model.getType();
-	}
-
 	@Override
 	public Date getUnlockDate()
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1334,9 +1334,10 @@ public class UserWrapper
 	}
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #isGuestUser}
+	 * Returns <code>true</code> if this user is default user.
+	 *
+	 * @return <code>true</code> if this user is default user; <code>false</code> otherwise
 	 */
-	@Deprecated
 	@Override
 	public boolean isDefaultUser() {
 		return model.isDefaultUser();
@@ -1367,11 +1368,6 @@ public class UserWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return model.isFemale();
-	}
-
-	@Override
-	public boolean isGuestUser() {
-		return model.isGuestUser();
 	}
 
 	/**
@@ -1419,11 +1415,6 @@ public class UserWrapper
 	@Override
 	public boolean isReminderQueryComplete() {
 		return model.isReminderQueryComplete();
-	}
-
-	@Override
-	public boolean isServiceAccountUser() {
-		return model.isServiceAccountUser();
 	}
 
 	@Override
@@ -1504,6 +1495,16 @@ public class UserWrapper
 	@Override
 	public void setCtCollectionId(long ctCollectionId) {
 		model.setCtCollectionId(ctCollectionId);
+	}
+
+	/**
+	 * Sets whether this user is default user.
+	 *
+	 * @param defaultUser the default user of this user
+	 */
+	@Override
+	public void setDefaultUser(boolean defaultUser) {
+		model.setDefaultUser(defaultUser);
 	}
 
 	/**
@@ -1877,16 +1878,6 @@ public class UserWrapper
 	}
 
 	/**
-	 * Sets the type of this user.
-	 *
-	 * @param type the type of this user
-	 */
-	@Override
-	public void setType(int type) {
-		model.setType(type);
-	}
-
-	/**
 	 * Sets the user ID of this user.
 	 *
 	 * @param userId the user ID of this user
@@ -1914,11 +1905,6 @@ public class UserWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
 	}
 
 	@Override

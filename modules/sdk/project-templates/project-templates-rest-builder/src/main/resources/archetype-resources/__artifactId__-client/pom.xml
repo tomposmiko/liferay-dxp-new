@@ -15,9 +15,8 @@
 	</parent>
 	<dependencies>
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
+			<groupId>com.liferay</groupId>
+			<artifactId>javax.xml.bind</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

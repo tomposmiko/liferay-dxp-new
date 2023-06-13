@@ -20,12 +20,10 @@
 
 <aui:script require="commerce-frontend-js/components/compare_checkbox/entry as compareCheckbox">
 	compareCheckbox.default('<%= rootId %>', '<%= rootId %>', {
-		commerceChannelGroupId: <%= commerceChannelGroupId %>,
 		disabled: <%= disabled %>,
 		inCompare: <%= inCompare %>,
 		itemId: '<%= cpCatalogEntry.getCPDefinitionId() %>',
 		label: '<%= label %>',
 		pictureUrl: '<%= pictureUrl %>',
-		refreshOnRemove: <%= refreshOnRemove %>,
 	});
 </aui:script>

@@ -15,7 +15,6 @@
 package com.liferay.style.book.web.internal.portlet.action;
 
 import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
-import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.site.util.GroupURLProvider;
 import com.liferay.style.book.constants.StyleBookPortletKeys;
@@ -30,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StyleBookPortletKeys.STYLE_BOOK,
 		"mvc.command.name=/style_book/edit_style_book_entry"
@@ -45,7 +45,6 @@ public class EditStyleBookEntryMVCRenderCommand implements MVCRenderCommand {
 		renderRequest.setAttribute(
 			FrontendTokenDefinitionRegistry.class.getName(),
 			_frontendTokenDefinitionRegistry);
-		renderRequest.setAttribute(ItemSelector.class.getName(), _itemSelector);
 		renderRequest.setAttribute(
 			GroupURLProvider.class.getName(), _groupURLProvider);
 
@@ -57,8 +56,5 @@ public class EditStyleBookEntryMVCRenderCommand implements MVCRenderCommand {
 
 	@Reference
 	private GroupURLProvider _groupURLProvider;
-
-	@Reference
-	private ItemSelector _itemSelector;
 
 }

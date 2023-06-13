@@ -15,7 +15,6 @@
 package com.liferay.commerce.shop.by.diagram.service;
 
 import com.liferay.commerce.shop.by.diagram.model.CSDiagramPin;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -39,7 +38,6 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @AccessControlled
-@CTAware
 @JSONWebService
 @ProviderType
 @Transactional(
@@ -58,8 +56,7 @@ public interface CSDiagramPinService extends BaseService {
 			String sequence)
 		throws PortalException;
 
-	public void deleteCSDiagramPin(CSDiagramPin csDiagramPin)
-		throws PortalException;
+	public void deleteCSDiagramPin(long csDiagramPinId) throws PortalException;
 
 	public void deleteCSDiagramPins(long cpDefinitionId) throws PortalException;
 

@@ -14,36 +14,19 @@
 
 package com.liferay.redirect.internal.configuration;
 
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.redirect.configuration.RedirectConfiguration;
 
-import java.util.Map;
-
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Alejandro Tardín
  */
-@Component(
-	configurationPid = "com.liferay.redirect.internal.configuration.RedirectConfiguration",
-	service = com.liferay.redirect.configuration.RedirectConfiguration.class
-)
-public class RedirectConfigurationImpl
-	implements com.liferay.redirect.configuration.RedirectConfiguration {
+@Component(service = RedirectConfiguration.class)
+public class RedirectConfigurationImpl implements RedirectConfiguration {
 
 	@Override
-	public boolean isRedirectNotFoundEnabled() {
-		return _redirectConfiguration.enabled();
+	public boolean isEnabled() {
+		return true;
 	}
-
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_redirectConfiguration = ConfigurableUtil.createConfigurable(
-			RedirectConfiguration.class, properties);
-	}
-
-	private volatile RedirectConfiguration _redirectConfiguration;
 
 }

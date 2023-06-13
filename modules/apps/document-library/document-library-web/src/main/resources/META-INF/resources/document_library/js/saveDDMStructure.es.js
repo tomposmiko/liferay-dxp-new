@@ -12,9 +12,7 @@
  * details.
  */
 
-import {postForm} from 'frontend-js-web';
-
-export function getInputLocalizedValues(namespace, fieldName) {
+export const getInputLocalizedValues = (namespace, fieldName) => {
 	const inputLocalized = Liferay.component(`${namespace}${fieldName}`);
 	const localizedValues = {};
 
@@ -29,9 +27,9 @@ export function getInputLocalizedValues(namespace, fieldName) {
 	}
 
 	return localizedValues;
-}
+};
 
-export function getDataEngineStructure({dataLayoutBuilder, namespace}) {
+export const getDataEngineStructure = ({dataLayoutBuilder, namespace}) => {
 	const {dataDefinition, dataLayout} = dataLayoutBuilder.current.state;
 
 	const name = getInputLocalizedValues(namespace, 'name');
@@ -49,7 +47,7 @@ export function getDataEngineStructure({dataLayoutBuilder, namespace}) {
 			name,
 		}),
 	};
-}
+};
 
 export default function saveDDMStructure({namespace}) {
 	const form = document[`${namespace}fm`];
@@ -61,7 +59,7 @@ export default function saveDDMStructure({namespace}) {
 			`${namespace}dataLayoutBuilder`
 		);
 
-		postForm(form, {
+		Liferay.Util.postForm(form, {
 			data: getDataEngineStructure({dataLayoutBuilder, namespace}),
 		});
 	};

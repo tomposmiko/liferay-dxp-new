@@ -131,11 +131,12 @@ public class JSONStorageEntryLocalServiceImpl
 	public int getClassPKsCount(
 		long companyId, long classNameId, Object[] pathParts, Object value) {
 
-		return jsonStorageEntryPersistence.dslQueryCount(
-			_getOrderByStep(
-				DSLQueryFactoryUtil.countDistinct(
-					JSONStorageEntryTable.INSTANCE.classPK),
-				companyId, classNameId, pathParts, value));
+		OrderByStep orderByStep = _getOrderByStep(
+			DSLQueryFactoryUtil.countDistinct(
+				JSONStorageEntryTable.INSTANCE.classPK),
+			companyId, classNameId, pathParts, value);
+
+		return jsonStorageEntryPersistence.dslQueryCount(orderByStep);
 	}
 
 	@Override

@@ -1,8 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property analytics.cloud.release = "true";
-	property analytics.cloud.upstream = "true";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -21,20 +19,18 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		// It is not possible to delete properties and data source after LRAC-13389. This functionality should return after LRAC-8040
-
-		//ACUtils.tearDownAC();
-
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
+
+		ACUtils.tearDownAC();
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8694 | Test Summary: Account segment list has pagination"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AccountSegmentListHasPagination {
 
 		// TODO LRAC-8694 AccountSegmentListHasPagination pending implementation
@@ -43,7 +39,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8693 | Test Summary: Account overview associated segment show segment"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertAccountOverviewAssociatedSegments {
 
 		// TODO LRAC-8693 AssertAccountOverviewAssociatedSegments pending implementation
@@ -52,7 +48,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8696 | Test Summary: Selecting a Segment in Accounts"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertAccountSegmentSelected {
 
 		// TODO LRAC-8696 AssertAccountSegmentSelected pending implementation
@@ -61,7 +57,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8697 | Test Summary: Total number of associated segments are displayed"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertAccountSegmentsTotal {
 
 		// TODO LRAC-8697 AssertAccountSegmentsTotal pending implementation
@@ -70,7 +66,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8698 | Test Summary: Total Membership of segments is shown"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test AssertAccountSegmentsTotalMembership {
 
 		// TODO LRAC-8698 AssertAccountSegmentsTotalMembership pending implementation
@@ -79,7 +75,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8695 | Test Summary: Assert an Account's Associated Segments"
 	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test CanAssertAccountAssociatedSegments {
 
 		// TODO LRAC-8695 CanAssertAccountAssociatedSegments pending implementation
@@ -88,7 +84,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8700 | Test Summary: Search an Account's Associated Segments"
 	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test CanSearchAccountsAssociatedSegments {
 
 		// TODO LRAC-8700 CanSearchAccountsAssociatedSegments pending implementation
@@ -97,7 +93,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8699 | Test Summary: Order an Account's Associated Segments"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test OrderAccountAssociatedSegments {
 
 		// TODO LRAC-8699 OrderAccountAssociatedSegments pending implementation

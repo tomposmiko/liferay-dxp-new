@@ -58,10 +58,6 @@ public class PanelCategoryBodyTag extends BasePanelTag {
 	}
 
 	protected List<PanelApp> getPanelApps() {
-		if (_panelApps != null) {
-			return _panelApps;
-		}
-
 		HttpServletRequest httpServletRequest = getRequest();
 
 		PanelAppRegistry panelAppRegistry =
@@ -86,9 +82,16 @@ public class PanelCategoryBodyTag extends BasePanelTag {
 		httpServletRequest.setAttribute(
 			"liferay-application-list:panel-category-body:id", id);
 
+		List<PanelApp> panelApps = _panelApps;
+
+		if (panelApps == null) {
+			panelApps = getPanelApps();
+		}
+
 		httpServletRequest.setAttribute(
 			"liferay-application-list:panel-category-body:panelApps",
-			getPanelApps());
+			panelApps);
+
 		httpServletRequest.setAttribute(
 			"liferay-application-list:panel-category-body:panelCategory",
 			_panelCategory);

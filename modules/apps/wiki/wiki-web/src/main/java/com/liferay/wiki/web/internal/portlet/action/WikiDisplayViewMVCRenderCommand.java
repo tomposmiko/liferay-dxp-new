@@ -49,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + WikiPortletKeys.WIKI_DISPLAY,
 		"mvc.command.name=/", "mvc.command.name=/wiki_display/view"
@@ -107,14 +108,14 @@ public class WikiDisplayViewMVCRenderCommand implements MVCRenderCommand {
 		}
 		catch (NoSuchNodeException noSuchNodeException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchNodeException);
+				_log.debug(noSuchNodeException, noSuchNodeException);
 			}
 
 			return "/wiki_display/portlet_not_setup.jsp";
 		}
 		catch (NoSuchPageException noSuchPageException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(noSuchPageException);
+				_log.debug(noSuchPageException, noSuchPageException);
 			}
 
 			return "/wiki_display/portlet_not_setup.jsp";

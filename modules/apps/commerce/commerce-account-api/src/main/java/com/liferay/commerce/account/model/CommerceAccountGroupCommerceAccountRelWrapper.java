@@ -358,11 +358,6 @@ public class CommerceAccountGroupCommerceAccountRelWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CommerceAccountGroupCommerceAccountRelWrapper wrap(
 		CommerceAccountGroupCommerceAccountRel
 			commerceAccountGroupCommerceAccountRel) {

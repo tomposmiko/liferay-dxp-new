@@ -13,17 +13,16 @@
  */
 
 (function () {
-	const A = AUI();
+	var A = AUI();
 
-	const entities = {
-		...Liferay.Util.MAP_HTML_CHARS_ESCAPED,
+	var entities = A.merge(Liferay.Util.MAP_HTML_CHARS_ESCAPED, {
 		'(': '&#40;',
 		')': '&#41;',
 		'[': '&#91;',
 		']': '&#93;',
-	};
+	});
 
-	const BBCodeUtil = Liferay.namespace('BBCodeUtil');
+	var BBCodeUtil = Liferay.namespace('BBCodeUtil');
 
 	BBCodeUtil.escape = A.rbind('escapeHTML', Liferay.Util, true, entities);
 	BBCodeUtil.unescape = A.rbind('unescapeHTML', Liferay.Util, entities);

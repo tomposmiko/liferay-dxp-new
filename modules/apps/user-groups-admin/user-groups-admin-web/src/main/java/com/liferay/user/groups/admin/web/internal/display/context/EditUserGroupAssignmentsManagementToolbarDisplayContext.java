@@ -20,6 +20,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -27,8 +28,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.UserGroupServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -44,7 +43,6 @@ import com.liferay.portlet.usergroupsadmin.search.SetUserUserGroupChecker;
 import com.liferay.portlet.usergroupsadmin.search.UnsetUserUserGroupChecker;
 import com.liferay.portlet.usersadmin.search.UserSearch;
 import com.liferay.portlet.usersadmin.search.UserSearchTerms;
-import com.liferay.user.groups.admin.constants.UserGroupsAdminPortletKeys;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,8 +71,9 @@ public class EditUserGroupAssignmentsManagementToolbarDisplayContext {
 		_displayStyle = displayStyle;
 		_mvcPath = mvcPath;
 
-		_userGroup = UserGroupServiceUtil.fetchUserGroup(
-			ParamUtil.getLong(httpServletRequest, "userGroupId"));
+		long userGroupId = ParamUtil.getLong(httpServletRequest, "userGroupId");
+
+		_userGroup = UserGroupServiceUtil.fetchUserGroup(userGroupId);
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {
@@ -112,7 +111,12 @@ public class EditUserGroupAssignmentsManagementToolbarDisplayContext {
 				LiferayWindowState.POP_UP
 			).buildString()
 		).put(
-			"userGroupName", () -> HtmlUtil.escape(_userGroup.getName())
+			"userGroupName",
+			() -> {
+				String userGroupName = _userGroup.getName();
+
+				return HtmlUtil.escape(userGroupName);
+			}
 		).build();
 	}
 
@@ -161,25 +165,19 @@ public class EditUserGroupAssignmentsManagementToolbarDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (Validator.isNotNull(_orderByCol)) {
-			return _orderByCol;
+		if (Validator.isNull(_orderByCol)) {
+			_orderByCol = ParamUtil.getString(
+				_httpServletRequest, "orderByCol", "first-name");
 		}
-
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, UserGroupsAdminPortletKeys.USER_GROUPS_ADMIN,
-			"edit-user-groups-order-by-col", "first-name");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (Validator.isNotNull(_orderByType)) {
-			return _orderByType;
+		if (Validator.isNull(_orderByType)) {
+			_orderByType = ParamUtil.getString(
+				_httpServletRequest, "orderByType", "asc");
 		}
-
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, UserGroupsAdminPortletKeys.USER_GROUPS_ADMIN,
-			"edit-user-groups-order-by-type", "asc");
 
 		return _orderByType;
 	}
@@ -239,22 +237,6 @@ public class EditUserGroupAssignmentsManagementToolbarDisplayContext {
 
 		UserSearch userSearch = new UserSearch(_renderRequest, getPortletURL());
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		UserSearchTerms searchTerms =
-			(UserSearchTerms)userSearch.getSearchTerms();
-
-		userSearch.setResultsAndTotal(
-			() -> UserLocalServiceUtil.search(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), userParams, userSearch.getStart(),
-				userSearch.getEnd(), userSearch.getOrderByComparator()),
-			UserLocalServiceUtil.searchCount(
-				themeDisplay.getCompanyId(), searchTerms.getKeywords(),
-				searchTerms.getStatus(), userParams));
-
 		if (_mvcPath.equals("/edit_user_group_assignments.jsp")) {
 			userSearch.setRowChecker(
 				new UnsetUserUserGroupChecker(_renderResponse, _userGroup));
@@ -263,6 +245,25 @@ public class EditUserGroupAssignmentsManagementToolbarDisplayContext {
 			userSearch.setRowChecker(
 				new SetUserUserGroupChecker(_renderResponse, _userGroup));
 		}
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		UserSearchTerms searchTerms =
+			(UserSearchTerms)userSearch.getSearchTerms();
+
+		List<User> results = UserLocalServiceUtil.search(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), userParams, userSearch.getStart(),
+			userSearch.getEnd(), userSearch.getOrderByComparator());
+
+		int total = UserLocalServiceUtil.searchCount(
+			themeDisplay.getCompanyId(), searchTerms.getKeywords(),
+			searchTerms.getStatus(), userParams);
+
+		userSearch.setResults(results);
+		userSearch.setTotal(total);
 
 		_userSearch = userSearch;
 

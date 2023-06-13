@@ -1,6 +1,5 @@
 apiDir: "../object-rest-api/src/main/java"
 apiPackagePath: "com.liferay.object.rest"
 author: "Javier Gamarra"
-compatibilityVersion: 2
 forcePredictableOperationId: true
 generateOpenAPI: false

@@ -53,11 +53,6 @@ public class SelectionStyleFormNavigatorEntry
 	}
 
 	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	public boolean isVisible(User user, Object object) {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -85,6 +80,15 @@ public class SelectionStyleFormNavigatorEntry
 	}
 
 	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
+	@Override
 	protected String getJspPath() {
 		return "/configuration/selection_style.jsp";
 	}
@@ -94,10 +98,5 @@ public class SelectionStyleFormNavigatorEntry
 
 	@Reference
 	private PortletLocalService _portletLocalService;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.asset.publisher.web)"
-	)
-	private ServletContext _servletContext;
 
 }

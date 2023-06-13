@@ -19,7 +19,7 @@ import com.liferay.digital.signature.web.internal.constants.DigitalSignatureWebK
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Keven Leone
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -60,8 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/collect_digital_signature/view.jsp",
 		"javax.portlet.name=" + DigitalSignaturePortletKeys.COLLECT_DIGITAL_SIGNATURE,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )
@@ -116,7 +116,7 @@ public class CollectDigitalSignaturePortlet extends MVCPortlet {
 					fileEntryIds.length - 1));
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		super.render(renderRequest, renderResponse);
@@ -127,7 +127,7 @@ public class CollectDigitalSignaturePortlet extends MVCPortlet {
 			return fileEntryTitle;
 		}
 
-		return _language.format(
+		return LanguageUtil.format(
 			ResourceBundleUtil.getBundle("content.Language", getClass()),
 			(count == 1) ? "x-and-x-other-file" : "x-and-x-other-files",
 			new String[] {fileEntryTitle, String.valueOf(count)}, false);
@@ -138,8 +138,5 @@ public class CollectDigitalSignaturePortlet extends MVCPortlet {
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
-
-	@Reference
-	private Language _language;
 
 }

@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Marta Medio
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.portal.security.antisamy.configuration.AntiSamyClassNameConfiguration",
 	service = ConfigurationModelListener.class
 )

@@ -12,6 +12,8 @@
  * details.
  */
 
+'use strict';
+
 import formatXML from '../../../src/main/resources/META-INF/resources/liferay/util/format_xml.es';
 
 describe('Liferay.Util.formatXML', () => {

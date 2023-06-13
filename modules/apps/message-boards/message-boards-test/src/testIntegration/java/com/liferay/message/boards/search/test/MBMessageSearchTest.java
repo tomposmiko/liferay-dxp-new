@@ -36,12 +36,15 @@ import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.test.util.BaseSearchTestCase;
-import com.liferay.portal.test.log.LogCapture;
-import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+
+import java.io.InputStream;
+
+import java.util.List;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -117,19 +120,18 @@ public class MBMessageSearchTest extends BaseSearchTestCase {
 	protected void addAttachment(ClassedModel classedModel) throws Exception {
 		MBMessage message = (MBMessage)classedModel;
 
-		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
-				"org.apache.xmlbeans.impl.common.SAXHelper",
-				LoggerTestUtil.WARN)) {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				message.getGroupId(), TestPropsValues.getUserId());
 
-			MBMessageLocalServiceUtil.updateMessage(
-				TestPropsValues.getUserId(), message.getMessageId(),
-				getSearchKeywords(), getSearchKeywords(),
-				MBTestUtil.getInputStreamOVPs(
-					"OSX_Test.docx", getClass(), getSearchKeywords()),
-				0, false,
-				ServiceContextTestUtil.getServiceContext(
-					message.getGroupId(), TestPropsValues.getUserId()));
-		}
+		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
+			MBTestUtil.getInputStreamOVPs(
+				"OSX_Test.docx", getClass(), getSearchKeywords());
+
+		MBMessageLocalServiceUtil.updateMessage(
+			TestPropsValues.getUserId(), message.getMessageId(),
+			getSearchKeywords(), getSearchKeywords(), inputStreamOVPs, 0, false,
+			serviceContext);
 	}
 
 	@Override

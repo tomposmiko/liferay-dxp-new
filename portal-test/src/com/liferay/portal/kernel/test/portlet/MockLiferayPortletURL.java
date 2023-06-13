@@ -31,7 +31,6 @@ import javax.portlet.MutableResourceParameters;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletModeException;
 import javax.portlet.PortletSecurityException;
-import javax.portlet.RenderURL;
 import javax.portlet.WindowState;
 import javax.portlet.WindowStateException;
 import javax.portlet.annotations.PortletSerializable;
@@ -39,7 +38,7 @@ import javax.portlet.annotations.PortletSerializable;
 /**
  * @author Cristina González
  */
-public class MockLiferayPortletURL implements LiferayPortletURL, RenderURL {
+public class MockLiferayPortletURL implements LiferayPortletURL {
 
 	@Override
 	public void addParameterIncludedInPath(String name) {
@@ -63,11 +62,6 @@ public class MockLiferayPortletURL implements LiferayPortletURL, RenderURL {
 
 	@Override
 	public String getCacheability() {
-		return null;
-	}
-
-	@Override
-	public String getFragmentIdentifier() {
 		return null;
 	}
 
@@ -209,10 +203,6 @@ public class MockLiferayPortletURL implements LiferayPortletURL, RenderURL {
 	}
 
 	@Override
-	public void setFragmentIdentifier(String fragment) {
-	}
-
-	@Override
 	public void setLifecycle(String lifecycle) {
 	}
 
@@ -305,24 +295,12 @@ public class MockLiferayPortletURL implements LiferayPortletURL, RenderURL {
 		sb.append("//localhost/test?");
 
 		for (Map.Entry<String, String[]> entry : entries) {
-			String[] values = entry.getValue();
-
-			if (ArrayUtil.isEmpty(values)) {
-				continue;
-			}
-
-			for (String value : values) {
-				if (value == null) {
-					continue;
-				}
-
-				sb.append(_portletId);
-				sb.append("_");
-				sb.append(entry.getKey());
-				sb.append("=");
-				sb.append(value);
-				sb.append(";");
-			}
+			sb.append(_portletId);
+			sb.append("_");
+			sb.append(entry.getKey());
+			sb.append("=");
+			sb.append(entry.getValue()[0]);
+			sb.append(";");
 		}
 
 		if (!entries.isEmpty()) {

@@ -39,6 +39,8 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import java.util.Collections;
 import java.util.List;
 
+import javax.portlet.PortletURL;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -92,7 +94,9 @@ public class CSDiagramSettingDisplayContext
 					noSuchCPAttachmentFileEntryException) {
 
 			if (_log.isInfoEnabled()) {
-				_log.info(noSuchCPAttachmentFileEntryException);
+				_log.info(
+					noSuchCPAttachmentFileEntryException,
+					noSuchCPAttachmentFileEntryException);
 			}
 
 			return null;
@@ -118,7 +122,7 @@ public class CSDiagramSettingDisplayContext
 		return _csDiagramSettingImageConfiguration.imageExtensions();
 	}
 
-	public String getImageItemSelectorURL() {
+	public String getImageItemSelectorUrl() {
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(
 				cpRequestHelper.getRenderRequest());
@@ -130,10 +134,11 @@ public class CSDiagramSettingDisplayContext
 			Collections.<ItemSelectorReturnType>singletonList(
 				new FileEntryItemSelectorReturnType()));
 
-		return String.valueOf(
-			_itemSelector.getItemSelectorURL(
-				requestBackedPortletURLFactory, "addFileEntry",
-				imageItemSelectorCriterion));
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			requestBackedPortletURLFactory, "addFileEntry",
+			imageItemSelectorCriterion);
+
+		return itemSelectorURL.toString();
 	}
 
 	public long getImageMaxSize() {
@@ -152,7 +157,7 @@ public class CSDiagramSettingDisplayContext
 			cpType = getCPType();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		if (cpType != null) {

@@ -28,11 +28,9 @@ import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.localized.InfoLocalizedValue;
-import com.liferay.info.localized.bundle.ModelResourceLocalizedValue;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.info.pagination.Pagination;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -41,6 +39,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
+import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -59,6 +58,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -67,6 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = "item.class.name=com.liferay.asset.kernel.model.AssetCategory",
 	service = RelatedInfoItemCollectionProvider.class
 )
@@ -78,20 +79,22 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 	public InfoPage<AssetEntry> getCollectionInfoPage(
 		CollectionQuery collectionQuery) {
 
-		Object relatedItem = collectionQuery.getRelatedItem();
+		Optional<Object> relatedItemOptional =
+			collectionQuery.getRelatedItemObjectOptional();
+
+		Object relatedItem = relatedItemOptional.orElse(null);
 
 		if (!(relatedItem instanceof AssetCategory)) {
 			return InfoPage.of(
 				Collections.emptyList(), collectionQuery.getPagination(), 0);
 		}
 
-		AssetCategory assetCategory = (AssetCategory)relatedItem;
-
-		AssetEntryQuery assetEntryQuery = _getAssetEntryQuery(
-			assetCategory, collectionQuery);
+		AssetEntryQuery assetEntryQuery = _getAssetEntryQuery(collectionQuery);
 
 		try {
-			SearchContext searchContext = _getSearchContext();
+			AssetCategory assetCategory = (AssetCategory)relatedItem;
+
+			SearchContext searchContext = _getSearchContext(assetCategory);
 
 			Hits hits = _assetHelper.search(
 				searchContext, assetEntryQuery, assetEntryQuery.getStart(),
@@ -127,7 +130,7 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "items-with-this-category");
+		return LanguageUtil.get(locale, "items-with-this-category");
 	}
 
 	@Override
@@ -136,12 +139,12 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 	}
 
 	private AssetEntryQuery _getAssetEntryQuery(
-		AssetCategory assetCategory, CollectionQuery collectionQuery) {
+		CollectionQuery collectionQuery) {
 
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
-		assetEntryQuery.setAllCategoryIds(
-			new long[] {assetCategory.getCategoryId()});
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
 		assetEntryQuery.setClassNameIds(_getClassNameIds(collectionQuery));
 		assetEntryQuery.setEnablePermissions(true);
@@ -152,12 +155,8 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 			assetEntryQuery.setEnd(pagination.getEnd());
 		}
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
 		assetEntryQuery.setGroupIds(
 			new long[] {serviceContext.getScopeGroupId()});
-
 		assetEntryQuery.setOrderByCol1(Field.MODIFIED_DATE);
 		assetEntryQuery.setOrderByType1("DESC");
 
@@ -169,8 +168,11 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 	}
 
 	private long[] _getClassNameIds(CollectionQuery collectionQuery) {
-		Map<String, String[]> configuration =
-			collectionQuery.getConfiguration();
+		Optional<Map<String, String[]>> configurationOptional =
+			collectionQuery.getConfigurationOptional();
+
+		Map<String, String[]> configuration = configurationOptional.orElse(
+			null);
 
 		if (MapUtil.isNotEmpty(configuration) &&
 			ArrayUtil.isNotEmpty(configuration.get("item_types"))) {
@@ -193,8 +195,21 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		return AssetRendererFactoryRegistryUtil.getIndexableClassNameIds(
+		long[] classNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(
 			serviceContext.getCompanyId(), true);
+
+		return ArrayUtil.filter(
+			classNameIds,
+			classNameId -> {
+				Indexer<?> indexer = IndexerRegistryUtil.getIndexer(
+					_portal.getClassName(classNameId));
+
+				if (indexer == null) {
+					return false;
+				}
+
+				return true;
+			});
 	}
 
 	private InfoField _getItemTypesInfoField() {
@@ -212,7 +227,8 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 				}
 
 				Indexer<?> indexer = IndexerRegistryUtil.getIndexer(
-					assetRendererFactory.getClassName());
+					_portal.getClassName(
+						assetRendererFactory.getClassNameId()));
 
 				if (indexer == null) {
 					return false;
@@ -231,16 +247,14 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 
 			options.add(
 				new SelectInfoFieldType.Option(
-					new ModelResourceLocalizedValue(
-						assetRendererFactory.getClassName()),
+					ResourceActionsUtil.getModelResource(
+						locale, assetRendererFactory.getClassName()),
 					assetRendererFactory.getClassName()));
 		}
 
 		InfoField.FinalStep finalStep = InfoField.builder(
 		).infoFieldType(
 			SelectInfoFieldType.INSTANCE
-		).namespace(
-			StringPool.BLANK
 		).name(
 			"item_types"
 		).attribute(
@@ -256,18 +270,20 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 		return finalStep.build();
 	}
 
-	private SearchContext _getSearchContext() {
+	private SearchContext _getSearchContext(AssetCategory assetCategory) {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
 		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
 
 		return SearchContextFactory.getInstance(
-			new long[0], new String[0],
+			new long[] {assetCategory.getCategoryId()}, new String[0],
 			HashMapBuilder.<String, Serializable>put(
 				Field.STATUS, WorkflowConstants.STATUS_APPROVED
 			).put(
 				"head", true
+			).put(
+				"latest", true
 			).build(),
 			serviceContext.getCompanyId(), null, themeDisplay.getLayout(), null,
 			serviceContext.getScopeGroupId(), null, serviceContext.getUserId());
@@ -279,9 +295,6 @@ public class AssetEntriesWithSameAssetCategoryRelatedInfoItemCollectionProvider
 
 	@Reference
 	private AssetHelper _assetHelper;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

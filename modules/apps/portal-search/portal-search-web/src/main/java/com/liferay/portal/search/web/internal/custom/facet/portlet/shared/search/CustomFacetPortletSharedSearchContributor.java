@@ -17,11 +17,11 @@ package com.liferay.portal.search.web.internal.custom.facet.portlet.shared.searc
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.facet.custom.CustomFacetSearchContributor;
 import com.liferay.portal.search.facet.nested.NestedFacetSearchContributor;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.web.internal.custom.facet.constants.CustomFacetPortletKeys;
 import com.liferay.portal.search.web.internal.custom.facet.portlet.CustomFacetPortletPreferences;
 import com.liferay.portal.search.web.internal.custom.facet.portlet.CustomFacetPortletPreferencesImpl;
@@ -29,6 +29,8 @@ import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchCo
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
 
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Wade Cao
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + CustomFacetPortletKeys.CUSTOM_FACET,
 	service = PortletSharedSearchContributor.class
 )
@@ -51,37 +54,104 @@ public class CustomFacetPortletSharedSearchContributor
 			new CustomFacetPortletPreferencesImpl(
 				portletSharedSearchSettings.getPortletPreferencesOptional());
 
-		String aggregationField =
-			customFacetPortletPreferences.getAggregationField();
+		Optional<String> fieldToAggregateOptional =
+			customFacetPortletPreferences.getAggregationFieldOptional();
 
-		if (Validator.isNull(aggregationField)) {
+		if (!fieldToAggregateOptional.isPresent()) {
 			return;
 		}
 
+		SearchRequestBuilder searchRequestBuilder =
+			portletSharedSearchSettings.getFederatedSearchRequestBuilder(
+				customFacetPortletPreferences.getFederatedSearchKeyOptional());
+
+		String fieldToAggregate = fieldToAggregateOptional.get();
+
 		if (!ddmIndexer.isLegacyDDMIndexFieldsEnabled() &&
-			aggregationField.startsWith(DDMIndexer.DDM_FIELD_ARRAY)) {
+			fieldToAggregate.startsWith(DDMIndexer.DDM_FIELD_PREFIX)) {
 
-			_contributeWithDDMFieldArray(
-				customFacetPortletPreferences, aggregationField,
-				portletSharedSearchSettings);
-		}
-		else if (!ddmIndexer.isLegacyDDMIndexFieldsEnabled() &&
-				 aggregationField.startsWith(DDMIndexer.DDM_FIELD_PREFIX)) {
-
-			_contributeWithDDMField(
-				customFacetPortletPreferences, aggregationField,
-				portletSharedSearchSettings);
-		}
-		else if (aggregationField.startsWith("nestedFieldArray")) {
-			_contributeWithNestedFieldArray(
-				customFacetPortletPreferences, aggregationField,
-				portletSharedSearchSettings);
+			contributeWithNestedFacet(
+				fieldToAggregate, searchRequestBuilder,
+				portletSharedSearchSettings, customFacetPortletPreferences);
 		}
 		else {
-			_contributeWithCustomFacet(
-				customFacetPortletPreferences, aggregationField,
-				portletSharedSearchSettings);
+			contributeWithCustomFacet(
+				fieldToAggregate, searchRequestBuilder,
+				portletSharedSearchSettings, customFacetPortletPreferences);
 		}
+	}
+
+	protected void contributeWithCustomFacet(
+		String fieldToAggregate, SearchRequestBuilder searchRequestBuilder,
+		PortletSharedSearchSettings portletSharedSearchSettings,
+		CustomFacetPortletPreferences customFacetPortletPreferences) {
+
+		customFacetSearchContributor.contribute(
+			searchRequestBuilder,
+			customFacetBuilder -> customFacetBuilder.aggregationName(
+				portletSharedSearchSettings.getPortletId()
+			).fieldToAggregate(
+				fieldToAggregate
+			).frequencyThreshold(
+				customFacetPortletPreferences.getFrequencyThreshold()
+			).maxTerms(
+				customFacetPortletPreferences.getMaxTerms()
+			).selectedValues(
+				portletSharedSearchSettings.getParameterValues(
+					getParameterName(customFacetPortletPreferences))
+			));
+	}
+
+	protected void contributeWithNestedFacet(
+		String fieldToAggregate, SearchRequestBuilder searchRequestBuilder,
+		PortletSharedSearchSettings portletSharedSearchSettings,
+		CustomFacetPortletPreferences customFacetPortletPreferences) {
+
+		String[] ddmStructureParts = StringUtil.split(
+			fieldToAggregate, DDMIndexer.DDM_FIELD_SEPARATOR);
+
+		String nestedFieldToAggregate = ddmIndexer.getValueFieldName(
+			ddmStructureParts[1], _getSuffixLocale(ddmStructureParts[3]));
+
+		nestedFacetSearchContributor.contribute(
+			searchRequestBuilder,
+			nestedFacetBuilder -> nestedFacetBuilder.aggregationName(
+				portletSharedSearchSettings.getPortletId()
+			).fieldToAggregate(
+				StringBundler.concat(
+					DDMIndexer.DDM_FIELD_ARRAY, StringPool.PERIOD,
+					nestedFieldToAggregate)
+			).filterField(
+				StringBundler.concat(
+					DDMIndexer.DDM_FIELD_ARRAY, StringPool.PERIOD,
+					DDMIndexer.DDM_FIELD_NAME)
+			).filterValue(
+				fieldToAggregate
+			).frequencyThreshold(
+				customFacetPortletPreferences.getFrequencyThreshold()
+			).maxTerms(
+				customFacetPortletPreferences.getMaxTerms()
+			).path(
+				DDMIndexer.DDM_FIELD_ARRAY
+			).selectedValues(
+				portletSharedSearchSettings.getParameterValues(
+					getParameterName(customFacetPortletPreferences))
+			));
+	}
+
+	protected String getParameterName(
+		CustomFacetPortletPreferences customFacetPortletPreferences) {
+
+		Optional<String> optional = Stream.of(
+			customFacetPortletPreferences.getParameterNameOptional(),
+			customFacetPortletPreferences.getAggregationFieldOptional()
+		).filter(
+			Optional::isPresent
+		).map(
+			Optional::get
+		).findFirst();
+
+		return optional.orElse("customfield");
 	}
 
 	@Reference
@@ -93,134 +163,9 @@ public class CustomFacetPortletSharedSearchContributor
 	@Reference
 	protected NestedFacetSearchContributor nestedFacetSearchContributor;
 
-	private void _contributeWithCustomFacet(
-		CustomFacetPortletPreferences customFacetPortletPreferences,
-		String fieldToAggregate,
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		customFacetSearchContributor.contribute(
-			portletSharedSearchSettings.getFederatedSearchRequestBuilder(
-				customFacetPortletPreferences.getFederatedSearchKey()),
-			customFacetBuilder -> customFacetBuilder.aggregationName(
-				portletSharedSearchSettings.getPortletId()
-			).fieldToAggregate(
-				fieldToAggregate
-			).frequencyThreshold(
-				customFacetPortletPreferences.getFrequencyThreshold()
-			).maxTerms(
-				customFacetPortletPreferences.getMaxTerms()
-			).selectedValues(
-				portletSharedSearchSettings.getParameterValues(
-					_getParameterName(customFacetPortletPreferences))
-			));
-	}
-
-	private void _contributeWithDDMField(
-		CustomFacetPortletPreferences customFacetPortletPreferences,
-		String fieldToAggregate,
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		String[] ddmFieldParts = StringUtil.split(
-			fieldToAggregate, DDMIndexer.DDM_FIELD_SEPARATOR);
-
-		if (ddmFieldParts.length != 4) {
-			return;
-		}
-
-		_contributeWithNestedFieldFacet(
-			customFacetPortletPreferences,
-			ddmIndexer.getValueFieldName(
-				ddmFieldParts[1], _getSuffixLocale(ddmFieldParts[3])),
-			DDMIndexer.DDM_FIELD_NAME, fieldToAggregate,
-			DDMIndexer.DDM_FIELD_ARRAY, portletSharedSearchSettings);
-	}
-
-	private void _contributeWithDDMFieldArray(
-		CustomFacetPortletPreferences customFacetPortletPreferences,
-		String fieldToAggregate,
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		String[] ddmFieldArrayParts = StringUtil.split(
-			fieldToAggregate, StringPool.PERIOD);
-
-		if (ddmFieldArrayParts.length != 3) {
-			return;
-		}
-
-		_contributeWithNestedFieldFacet(
-			customFacetPortletPreferences, ddmFieldArrayParts[2],
-			DDMIndexer.DDM_FIELD_NAME, ddmFieldArrayParts[1],
-			DDMIndexer.DDM_FIELD_ARRAY, portletSharedSearchSettings);
-	}
-
-	private void _contributeWithNestedFieldArray(
-		CustomFacetPortletPreferences customFacetPortletPreferences,
-		String fieldToAggregate,
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		String[] fieldToAggregrateParts = StringUtil.split(
-			fieldToAggregate, StringPool.PERIOD);
-
-		if (fieldToAggregrateParts.length != 3) {
-			return;
-		}
-
-		_contributeWithNestedFieldFacet(
-			customFacetPortletPreferences, fieldToAggregrateParts[2],
-			"fieldName", fieldToAggregrateParts[1], "nestedFieldArray",
-			portletSharedSearchSettings);
-	}
-
-	private void _contributeWithNestedFieldFacet(
-		CustomFacetPortletPreferences customFacetPortletPreferences,
-		String fieldToAggregate, String filterField, String filterValue,
-		String path, PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		nestedFacetSearchContributor.contribute(
-			portletSharedSearchSettings.getFederatedSearchRequestBuilder(
-				customFacetPortletPreferences.getFederatedSearchKey()),
-			nestedFacetBuilder -> nestedFacetBuilder.aggregationName(
-				portletSharedSearchSettings.getPortletId()
-			).fieldToAggregate(
-				StringBundler.concat(path, StringPool.PERIOD, fieldToAggregate)
-			).filterField(
-				StringBundler.concat(path, StringPool.PERIOD, filterField)
-			).filterValue(
-				filterValue
-			).frequencyThreshold(
-				customFacetPortletPreferences.getFrequencyThreshold()
-			).maxTerms(
-				customFacetPortletPreferences.getMaxTerms()
-			).path(
-				path
-			).selectedValues(
-				portletSharedSearchSettings.getParameterValues(
-					_getParameterName(customFacetPortletPreferences))
-			));
-	}
-
-	private String _getParameterName(
-		CustomFacetPortletPreferences customFacetPortletPreferences) {
-
-		String parameterName = customFacetPortletPreferences.getParameterName();
-
-		if (Validator.isNotNull(parameterName)) {
-			return parameterName;
-		}
-
-		String aggregationField =
-			customFacetPortletPreferences.getAggregationField();
-
-		if (Validator.isNotNull(aggregationField)) {
-			return aggregationField;
-		}
-
-		return "customfield";
-	}
-
 	private Locale _getSuffixLocale(String string) {
-		for (Locale availableLocale : _language.getAvailableLocales()) {
-			String availableLanguageId = _language.getLanguageId(
+		for (Locale availableLocale : LanguageUtil.getAvailableLocales()) {
+			String availableLanguageId = LanguageUtil.getLanguageId(
 				availableLocale);
 
 			if (string.endsWith(availableLanguageId)) {
@@ -230,8 +175,5 @@ public class CustomFacetPortletSharedSearchContributor
 
 		return null;
 	}
-
-	@Reference
-	private Language _language;
 
 }

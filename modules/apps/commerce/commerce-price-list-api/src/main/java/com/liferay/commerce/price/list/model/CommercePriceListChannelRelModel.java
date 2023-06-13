@@ -16,10 +16,8 @@ package com.liferay.commerce.price.list.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedAuditedModel;
-import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import java.util.Date;
 
@@ -38,8 +36,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface CommercePriceListChannelRelModel
-	extends BaseModel<CommercePriceListChannelRel>,
-			CTModel<CommercePriceListChannelRel>, MVCCModel, ShardedModel,
+	extends BaseModel<CommercePriceListChannelRel>, ShardedModel,
 			StagedAuditedModel {
 
 	/*
@@ -53,7 +50,6 @@ public interface CommercePriceListChannelRelModel
 	 *
 	 * @return the primary key of this commerce price list channel rel
 	 */
-	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -61,40 +57,7 @@ public interface CommercePriceListChannelRelModel
 	 *
 	 * @param primaryKey the primary key of this commerce price list channel rel
 	 */
-	@Override
 	public void setPrimaryKey(long primaryKey);
-
-	/**
-	 * Returns the mvcc version of this commerce price list channel rel.
-	 *
-	 * @return the mvcc version of this commerce price list channel rel
-	 */
-	@Override
-	public long getMvccVersion();
-
-	/**
-	 * Sets the mvcc version of this commerce price list channel rel.
-	 *
-	 * @param mvccVersion the mvcc version of this commerce price list channel rel
-	 */
-	@Override
-	public void setMvccVersion(long mvccVersion);
-
-	/**
-	 * Returns the ct collection ID of this commerce price list channel rel.
-	 *
-	 * @return the ct collection ID of this commerce price list channel rel
-	 */
-	@Override
-	public long getCtCollectionId();
-
-	/**
-	 * Sets the ct collection ID of this commerce price list channel rel.
-	 *
-	 * @param ctCollectionId the ct collection ID of this commerce price list channel rel
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the uuid of this commerce price list channel rel.
@@ -283,9 +246,5 @@ public interface CommercePriceListChannelRelModel
 
 	@Override
 	public CommercePriceListChannelRel cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

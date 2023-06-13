@@ -23,7 +23,6 @@
 </portlet:renderURL>
 
 <liferay-ui:icon
-	cssClass="text-4"
 	message="openid-connect"
 	url="<%= openIdConnectURL %>"
 />

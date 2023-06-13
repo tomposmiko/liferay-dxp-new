@@ -127,8 +127,6 @@ public class KaleoTaskAssignmentPersistenceTest {
 
 		newKaleoTaskAssignment.setMvccVersion(RandomTestUtil.nextLong());
 
-		newKaleoTaskAssignment.setCtCollectionId(RandomTestUtil.nextLong());
-
 		newKaleoTaskAssignment.setGroupId(RandomTestUtil.nextLong());
 
 		newKaleoTaskAssignment.setCompanyId(RandomTestUtil.nextLong());
@@ -177,9 +175,6 @@ public class KaleoTaskAssignmentPersistenceTest {
 		Assert.assertEquals(
 			existingKaleoTaskAssignment.getMvccVersion(),
 			newKaleoTaskAssignment.getMvccVersion());
-		Assert.assertEquals(
-			existingKaleoTaskAssignment.getCtCollectionId(),
-			newKaleoTaskAssignment.getCtCollectionId());
 		Assert.assertEquals(
 			existingKaleoTaskAssignment.getKaleoTaskAssignmentId(),
 			newKaleoTaskAssignment.getKaleoTaskAssignmentId());
@@ -296,13 +291,13 @@ public class KaleoTaskAssignmentPersistenceTest {
 
 	protected OrderByComparator<KaleoTaskAssignment> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"KaleoTaskAssignment", "mvccVersion", true, "ctCollectionId", true,
-			"kaleoTaskAssignmentId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "kaleoClassName", true, "kaleoClassPK", true,
-			"kaleoDefinitionId", true, "kaleoDefinitionVersionId", true,
-			"kaleoNodeId", true, "assigneeClassName", true, "assigneeClassPK",
-			true, "assigneeActionId", true, "assigneeScriptLanguage", true,
+			"KaleoTaskAssignment", "mvccVersion", true, "kaleoTaskAssignmentId",
+			true, "groupId", true, "companyId", true, "userId", true,
+			"userName", true, "createDate", true, "modifiedDate", true,
+			"kaleoClassName", true, "kaleoClassPK", true, "kaleoDefinitionId",
+			true, "kaleoDefinitionVersionId", true, "kaleoNodeId", true,
+			"assigneeClassName", true, "assigneeClassPK", true,
+			"assigneeActionId", true, "assigneeScriptLanguage", true,
 			"assigneeScriptRequiredContexts", true);
 	}
 
@@ -537,8 +532,6 @@ public class KaleoTaskAssignmentPersistenceTest {
 		KaleoTaskAssignment kaleoTaskAssignment = _persistence.create(pk);
 
 		kaleoTaskAssignment.setMvccVersion(RandomTestUtil.nextLong());
-
-		kaleoTaskAssignment.setCtCollectionId(RandomTestUtil.nextLong());
 
 		kaleoTaskAssignment.setGroupId(RandomTestUtil.nextLong());
 

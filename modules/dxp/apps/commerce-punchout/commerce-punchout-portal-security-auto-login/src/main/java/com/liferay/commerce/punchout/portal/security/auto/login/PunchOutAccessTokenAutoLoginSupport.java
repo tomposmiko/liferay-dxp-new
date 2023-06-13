@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jaclyn Ong
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {"private.auto.login=true", "type=punchout.access.token"},
 	service = AutoLogin.class
 )
@@ -112,19 +113,27 @@ public class PunchOutAccessTokenAutoLoginSupport extends BaseAutoLogin {
 		return credentials;
 	}
 
+	@Reference(unbind = "-")
+	protected void setPortal(Portal portal) {
+		_portal = portal;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final String _PUNCH_OUT_ACCESS_TOKEN_PARAM =
 		"punchOutAccessToken";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		PunchOutAccessTokenAutoLoginSupport.class);
 
-	@Reference
 	private Portal _portal;
 
 	@Reference
 	private PunchOutAccessTokenProvider _punchOutAccessTokenProvider;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

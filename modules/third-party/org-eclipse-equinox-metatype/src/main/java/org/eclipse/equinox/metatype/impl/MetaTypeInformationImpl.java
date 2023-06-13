@@ -13,7 +13,6 @@ package org.eclipse.equinox.metatype.impl;
 import org.eclipse.equinox.metatype.EquinoxMetaTypeInformation;
 
 import java.util.Set;
-import java.util.function.Supplier;
 import javax.xml.parsers.SAXParser;
 import org.osgi.framework.Bundle;
 import org.osgi.service.log.LogService;
@@ -33,8 +32,8 @@ public class MetaTypeInformationImpl extends MetaTypeProviderImpl implements Equ
 	/**
 	 * Constructor of class MetaTypeInformationImpl.
 	 */
-	MetaTypeInformationImpl(Bundle bundle, Supplier<SAXParser> parserSupplier, LogService logger) {
-		super(bundle, parserSupplier, logger);
+	MetaTypeInformationImpl(Bundle bundle, SAXParser parser, LogService logger) {
+		super(bundle, parser, logger);
 	}
 
 	/*

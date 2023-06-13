@@ -24,12 +24,14 @@ import com.liferay.portal.kernel.security.ldap.LDAPSettings;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.security.ldap.SafeLdapFilterStringUtil;
 import com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration;
 import com.liferay.portal.security.ldap.configuration.ConfigurationProvider;
 import com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration;
 import com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration;
 import com.liferay.portal.security.ldap.exportimport.configuration.LDAPExportConfiguration;
 import com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration;
+import com.liferay.portal.security.ldap.validator.LDAPFilterValidator;
 
 import java.util.Properties;
 
@@ -41,8 +43,49 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  */
-@Component(service = LDAPSettings.class)
+@Component(immediate = true, service = LDAPSettings.class)
 public class DefaultLDAPSettings implements LDAPSettings {
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public String getAuthSearchFilter(
+			long ldapServerId, long companyId, String emailAddress,
+			String screenName, String userId)
+		throws Exception {
+
+		LDAPServerConfiguration ldapServerConfiguration =
+			_ldapServerConfigurationProvider.getConfiguration(
+				companyId, ldapServerId);
+
+		String filter = ldapServerConfiguration.authSearchFilter();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Search filter before transformation " + filter);
+		}
+
+		filter = StringUtil.replace(
+			filter,
+			new String[] {
+				"@company_id@", "@email_address@", "@screen_name@", "@user_id@"
+			},
+			new String[] {
+				String.valueOf(companyId),
+				SafeLdapFilterStringUtil.rfc2254Escape(emailAddress),
+				SafeLdapFilterStringUtil.rfc2254Escape(screenName),
+				SafeLdapFilterStringUtil.rfc2254Escape(userId)
+			});
+
+		_ldapFilterValidator.validate(filter);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Search filter after transformation " + filter);
+		}
+
+		return filter;
+	}
 
 	@Override
 	public Properties getContactExpandoMappings(
@@ -53,7 +96,7 @@ public class DefaultLDAPSettings implements LDAPSettings {
 			_ldapServerConfigurationProvider.getConfiguration(
 				companyId, ldapServerId);
 
-		Properties contactExpandoMappings = _getProperties(
+		Properties contactExpandoMappings = getProperties(
 			ldapServerConfiguration.contactCustomMappings());
 
 		LogUtil.debug(_log, contactExpandoMappings);
@@ -69,7 +112,7 @@ public class DefaultLDAPSettings implements LDAPSettings {
 			_ldapServerConfigurationProvider.getConfiguration(
 				companyId, ldapServerId);
 
-		Properties contactMappings = _getProperties(
+		Properties contactMappings = getProperties(
 			ldapServerConfiguration.contactMappings());
 
 		LogUtil.debug(_log, contactMappings);
@@ -93,7 +136,7 @@ public class DefaultLDAPSettings implements LDAPSettings {
 			_ldapServerConfigurationProvider.getConfiguration(
 				companyId, ldapServerId);
 
-		Properties groupMappings = _getProperties(
+		Properties groupMappings = getProperties(
 			ldapServerConfiguration.groupMappings());
 
 		LogUtil.debug(_log, groupMappings);
@@ -126,7 +169,7 @@ public class DefaultLDAPSettings implements LDAPSettings {
 			_ldapServerConfigurationProvider.getConfiguration(
 				companyId, ldapServerId);
 
-		Properties contactExpandoMappings = _getProperties(
+		Properties contactExpandoMappings = getProperties(
 			ldapServerConfiguration.userCustomMappings());
 
 		LogUtil.debug(_log, contactExpandoMappings);
@@ -142,7 +185,7 @@ public class DefaultLDAPSettings implements LDAPSettings {
 			_ldapServerConfigurationProvider.getConfiguration(
 				companyId, ldapServerId);
 
-		Properties userMappings = _getProperties(
+		Properties userMappings = getProperties(
 			ldapServerConfiguration.userMappings());
 
 		LogUtil.debug(_log, userMappings);
@@ -202,7 +245,7 @@ public class DefaultLDAPSettings implements LDAPSettings {
 		return ldapAuthConfiguration.passwordPolicyEnabled();
 	}
 
-	private Properties _getProperties(String[] keyValuePairs) {
+	protected Properties getProperties(String[] keyValuePairs) {
 		Properties properties = new Properties();
 
 		for (String keyValuePair : keyValuePairs) {
@@ -224,40 +267,83 @@ public class DefaultLDAPSettings implements LDAPSettings {
 		return properties;
 	}
 
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPAuthConfigurationProvider(
+		ConfigurationProvider<LDAPAuthConfiguration>
+			ldapAuthConfigurationProvider) {
+
+		_ldapAuthConfigurationProvider = ldapAuthConfigurationProvider;
+	}
+
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.exportimport.configuration.LDAPExportConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPExportConfigurationProvider(
+		ConfigurationProvider<LDAPExportConfiguration>
+			ldapExportConfigurationProvider) {
+
+		_ldapExportConfigurationProvider = ldapExportConfigurationProvider;
+	}
+
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPImportConfigurationProvider(
+		ConfigurationProvider<LDAPImportConfiguration>
+			ldapImportConfigurationProvider) {
+
+		_ldapImportConfigurationProvider = ldapImportConfigurationProvider;
+	}
+
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)",
+		unbind = "-"
+	)
+	protected void setLDAPServerConfigurationProvider(
+		ConfigurationProvider<LDAPServerConfiguration>
+			ldapServerConfigurationProvider) {
+
+		_ldapServerConfigurationProvider = ldapServerConfigurationProvider;
+	}
+
+	@Reference(
+		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration)",
+		unbind = "-"
+	)
+	protected void setSystemLDAPConfigurationProvider(
+		ConfigurationProvider<SystemLDAPConfiguration>
+			systemLDAPConfigurationProvider) {
+
+		_systemLDAPConfigurationProvider = systemLDAPConfigurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DefaultLDAPSettings.class);
 
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.authenticator.configuration.LDAPAuthConfiguration)"
-	)
 	private ConfigurationProvider<LDAPAuthConfiguration>
 		_ldapAuthConfigurationProvider;
-
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.exportimport.configuration.LDAPExportConfiguration)"
-	)
 	private ConfigurationProvider<LDAPExportConfiguration>
 		_ldapExportConfigurationProvider;
 
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration)"
-	)
+	@Reference
+	private LDAPFilterValidator _ldapFilterValidator;
+
 	private ConfigurationProvider<LDAPImportConfiguration>
 		_ldapImportConfigurationProvider;
-
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.LDAPServerConfiguration)"
-	)
 	private ConfigurationProvider<LDAPServerConfiguration>
 		_ldapServerConfigurationProvider;
-
-	@Reference(
-		target = "(factoryPid=com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration)"
-	)
 	private ConfigurationProvider<SystemLDAPConfiguration>
 		_systemLDAPConfigurationProvider;
-
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

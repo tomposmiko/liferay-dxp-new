@@ -43,13 +43,13 @@ KaleoTaskFormPair kaleoTaskFormPair = (KaleoTaskFormPair)row.getObject();
 
 	String mode = initialStateName.equals(kaleoTaskFormPair.getWorkflowTaskName()) ? DDMTemplateConstants.TEMPLATE_MODE_CREATE : DDMTemplateConstants.TEMPLATE_MODE_EDIT;
 
-	String workflowTaskName = HtmlUtil.escapeJS(kaleoTaskFormPair.getWorkflowTaskName());
+	String paramName = HtmlUtil.escapeJS(liferayPortletResponse.getNamespace() + ddmStructureId + workflowDefinition + kaleoTaskFormPair.getWorkflowTaskName());
 	%>
 
 	<liferay-ui:icon
 		message="assign-form"
-		onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "selectFormTemplate(" + ddmStructureId + ", '" + mode + "', '" + HtmlUtil.escapeJS(workflowDefinition) + "', '" + workflowTaskName + "');" %>'
-		url="javascript:void(0);"
+		onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "selectFormTemplate(" + ddmStructureId + ",'" + mode + "', '" + paramName + "');" %>'
+		url="javascript:;"
 	/>
 
 	<%
@@ -70,8 +70,8 @@ KaleoTaskFormPair kaleoTaskFormPair = (KaleoTaskFormPair)row.getObject();
 
 		<liferay-ui:icon
 			message="unassign-form"
-			onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "unassignForm({ddmStructureId: '" + ddmStructureId + "', workflowDefinition: '" + HtmlUtil.escapeJS(workflowDefinition) + "', workflowTaskName: '" + workflowTaskName + "', node: this});" %>'
-			url="javascript:void(0);"
+			onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "unassignForm({taskFormPairsParamName: '" + paramName + "', node: this});" %>'
+			url="javascript:;"
 		/>
 
 		<liferay-portlet:renderURL portletName="<%= PortletProviderUtil.getPortletId(DDMTemplate.class.getName(), PortletProvider.Action.EDIT) %>" var="editFormTemplateURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
@@ -91,7 +91,7 @@ KaleoTaskFormPair kaleoTaskFormPair = (KaleoTaskFormPair)row.getObject();
 		<liferay-ui:icon
 			message="edit-form"
 			onClick='<%= "javascript:" + liferayPortletResponse.getNamespace() + "editFormTemplate('" + editFormTemplateURL + "');" %>'
-			url="javascript:void(0);"
+			url="javascript:;"
 		/>
 	</c:if>
 </liferay-ui:icon-menu>

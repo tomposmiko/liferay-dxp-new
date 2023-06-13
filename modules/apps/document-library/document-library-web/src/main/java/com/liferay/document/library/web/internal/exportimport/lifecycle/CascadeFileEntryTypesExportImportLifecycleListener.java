@@ -21,6 +21,7 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lifecycle.EventAwareExportImportLifecycleListener;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleListener;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.util.MapUtil;
 
@@ -67,17 +68,17 @@ public class CascadeFileEntryTypesExportImportLifecycleListener
 			PortletDataContext portletDataContext)
 		throws Exception {
 
-		_importedDLFolderIds =
+		_importedFolderIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				DLFolder.class);
 
-		if (MapUtil.isEmpty(_importedDLFolderIds)) {
+		if (MapUtil.isEmpty(_importedFolderIds)) {
 			return;
 		}
 
-		_processedDLFolderIds = new HashSet<>();
+		_processedFolderIds = new HashSet<>();
 
-		_processDLFolderIds(_importedDLFolderIds.values());
+		processFolderIds(_importedFolderIds.values());
 	}
 
 	@Override
@@ -144,17 +145,17 @@ public class CascadeFileEntryTypesExportImportLifecycleListener
 			PortletDataContext portletDataContext)
 		throws Exception {
 
-		_importedDLFolderIds =
+		_importedFolderIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				DLFolder.class);
 
-		if (MapUtil.isEmpty(_importedDLFolderIds)) {
+		if (MapUtil.isEmpty(_importedFolderIds)) {
 			return;
 		}
 
-		_processedDLFolderIds = new HashSet<>();
+		_processedFolderIds = new HashSet<>();
 
-		_processDLFolderIds(_importedDLFolderIds.values());
+		processFolderIds(_importedFolderIds.values());
 	}
 
 	@Override
@@ -214,38 +215,39 @@ public class CascadeFileEntryTypesExportImportLifecycleListener
 		PortletDataContext portletDataContext, StagedModel stagedModel) {
 	}
 
-	private DLFolder _getProcessableRootDLFolder(DLFolder dlFolder)
-		throws Exception {
+	protected DLFolder getProcessableRootFolder(DLFolder dlFolder)
+		throws PortalException {
 
 		long dlFolderId = dlFolder.getFolderId();
 
-		if (_processedDLFolderIds.contains(dlFolderId)) {
+		if (_processedFolderIds.contains(dlFolderId)) {
 			return null;
 		}
 
-		_processedDLFolderIds.add(dlFolderId);
+		_processedFolderIds.add(dlFolderId);
 
-		DLFolder parentDLFolder = dlFolder.getParentFolder();
+		DLFolder parentFolder = dlFolder.getParentFolder();
 
-		if ((parentDLFolder == null) ||
-			!_importedDLFolderIds.containsValue(parentDLFolder.getFolderId())) {
+		if ((parentFolder == null) ||
+			!_importedFolderIds.containsValue(parentFolder.getFolderId())) {
 
 			return dlFolder;
 		}
 
-		return _getProcessableRootDLFolder(parentDLFolder);
+		return getProcessableRootFolder(parentFolder);
 	}
 
-	private void _processDLFolderIds(Collection<Long> dlFolderIds)
-		throws Exception {
+	protected void processFolderIds(Collection<Long> folderIds)
+		throws PortalException {
 
-		for (Long dlFolderId : dlFolderIds) {
-			DLFolder rootDLFolder = _getProcessableRootDLFolder(
-				_dlFolderLocalService.fetchDLFolder(dlFolderId));
+		for (Long folderId : folderIds) {
+			DLFolder dlFolder = _dlFolderLocalService.fetchDLFolder(folderId);
 
-			if (rootDLFolder != null) {
+			DLFolder rootFolder = getProcessableRootFolder(dlFolder);
+
+			if (rootFolder != null) {
 				_dlFileEntryTypeLocalService.cascadeFileEntryTypes(
-					rootDLFolder.getUserId(), rootDLFolder);
+					rootFolder.getUserId(), rootFolder);
 			}
 		}
 	}
@@ -256,7 +258,7 @@ public class CascadeFileEntryTypesExportImportLifecycleListener
 	@Reference
 	private DLFolderLocalService _dlFolderLocalService;
 
-	private Map<Long, Long> _importedDLFolderIds;
-	private Set<Long> _processedDLFolderIds;
+	private Map<Long, Long> _importedFolderIds;
+	private Set<Long> _processedFolderIds;
 
 }

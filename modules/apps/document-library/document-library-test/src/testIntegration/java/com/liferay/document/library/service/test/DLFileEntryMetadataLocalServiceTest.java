@@ -23,7 +23,6 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
-import com.liferay.document.library.util.DLFileEntryTypeUtil;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
@@ -97,10 +96,14 @@ public class DLFileEntryMetadataLocalServiceTest {
 			RandomTestUtil.randomString(), StringPool.BLANK, new long[0],
 			serviceContext);
 
-		List<DDMStructure> ddmStructures = DLFileEntryTypeUtil.getDDMStructures(
-			_dlFileEntryType);
+		List<com.liferay.dynamic.data.mapping.kernel.DDMStructure>
+			ddmStructures = _dlFileEntryType.getDDMStructures();
 
-		_ddmStructure = ddmStructures.get(0);
+		com.liferay.dynamic.data.mapping.kernel.DDMStructure ddmStructure =
+			ddmStructures.get(0);
+
+		_ddmStructure = _ddmStructureLocalService.getStructure(
+			ddmStructure.getStructureId());
 
 		Map<String, DDMFormValues> ddmFormValuesMap = setUpDDMFormValuesMap(
 			_ddmStructure.getStructureKey(), user.getLocale());
@@ -109,9 +112,8 @@ public class DLFileEntryMetadataLocalServiceTest {
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), null, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), null, null,
-			_dlFileEntryType.getFileEntryTypeId(), ddmFormValuesMap, null,
-			new ByteArrayInputStream(TestDataConstants.TEST_BYTE_ARRAY),
+			null, null, _dlFileEntryType.getFileEntryTypeId(), ddmFormValuesMap,
+			null, new ByteArrayInputStream(TestDataConstants.TEST_BYTE_ARRAY),
 			TestDataConstants.TEST_BYTE_ARRAY.length, null, null,
 			serviceContext);
 	}
@@ -130,17 +132,20 @@ public class DLFileEntryMetadataLocalServiceTest {
 				RandomTestUtil.randomString(), StringPool.BLANK, new long[0],
 				serviceContext);
 
-		List<DDMStructure> ddmStructures = DLFileEntryTypeUtil.getDDMStructures(
-			dlFileEntryType);
+		List<com.liferay.dynamic.data.mapping.kernel.DDMStructure>
+			ddmStructures = dlFileEntryType.getDDMStructures();
 
-		DDMStructure ddmStructure = ddmStructures.get(0);
+		com.liferay.dynamic.data.mapping.kernel.DDMStructure
+			kernelDDMStructure = ddmStructures.get(0);
+
+		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
+			kernelDDMStructure.getStructureId());
 
 		DLFileEntry dlFileEntry = _dlFileEntryLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), group.getGroupId(),
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), null, RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), null, null,
-			dlFileEntryType.getFileEntryTypeId(),
+			null, null, dlFileEntryType.getFileEntryTypeId(),
 			setUpDDMFormValuesMap(
 				ddmStructure.getStructureKey(), user.getLocale()),
 			null, new ByteArrayInputStream(TestDataConstants.TEST_BYTE_ARRAY),

@@ -75,8 +75,8 @@ public class DLFileEntrySharingTest extends BaseSharingTestCase<DLFileEntry> {
 			null, user.getUserId(), group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString(), "text/plain", StringUtil.randomString(),
-			StringUtil.randomString(), StringUtil.randomString(),
-			StringPool.BLANK, "test".getBytes(), null, null, serviceContext);
+			StringUtil.randomString(), StringPool.BLANK, "test".getBytes(),
+			null, null, serviceContext);
 
 		return (DLFileEntry)fileEntry.getModel();
 	}
@@ -106,7 +106,7 @@ public class DLFileEntrySharingTest extends BaseSharingTestCase<DLFileEntry> {
 		serviceContext.setAddGuestPermissions(false);
 
 		Folder folder = _dlAppLocalService.addFolder(
-			null, user.getUserId(), group.getGroupId(),
+			user.getUserId(), group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
@@ -128,8 +128,8 @@ public class DLFileEntrySharingTest extends BaseSharingTestCase<DLFileEntry> {
 			null, user.getUserId(), group.getGroupId(), folder.getFolderId(),
 			RandomTestUtil.randomString(), "text",
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), StringPool.BLANK,
-			StringPool.SPACE.getBytes(), null, null, serviceContext);
+			StringPool.BLANK, StringPool.SPACE.getBytes(), null, null,
+			serviceContext);
 
 		FileVersion fileVersion = fileEntry.getFileVersion();
 

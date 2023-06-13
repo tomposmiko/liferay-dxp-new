@@ -15,8 +15,9 @@
 package com.liferay.trash.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.TabsItemListBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -28,8 +29,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
-import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
@@ -104,7 +104,7 @@ public class TrashDisplayContext {
 		breadcrumbEntries.add(breadcrumbEntry);
 
 		breadcrumbEntries.addAll(
-			_getBreadcrumbEntries(
+			getBreadcrumbEntries(
 				getClassName(), getClassPK(), "classPK",
 				PortletURLBuilder.createRenderURL(
 					_liferayPortletResponse
@@ -203,7 +203,7 @@ public class TrashDisplayContext {
 		breadcrumbEntries.add(breadcrumbEntry);
 
 		breadcrumbEntries.addAll(
-			_getBreadcrumbEntries(
+			getBreadcrumbEntries(
 				className, classPK, "containerModelId", containerModelURL,
 				false));
 
@@ -243,10 +243,22 @@ public class TrashDisplayContext {
 
 		entrySearch.setOrderByComparator(
 			new EntryCreateDateComparator(orderByAsc));
+
 		entrySearch.setOrderByType(getOrderByType());
+
+		EmptyOnClickRowChecker emptyOnClickRowChecker =
+			new EmptyOnClickRowChecker(_liferayPortletResponse);
+
+		emptyOnClickRowChecker.setRememberCheckBoxStateURLRegex(
+			"^(?!.*" + _liferayPortletResponse.getNamespace() +
+				"redirect).*^(?!.*/entry/)");
+
+		entrySearch.setRowChecker(emptyOnClickRowChecker);
 
 		EntrySearchTerms searchTerms =
 			(EntrySearchTerms)entrySearch.getSearchTerms();
+
+		List<TrashEntry> trashEntries = null;
 
 		if (isSearch()) {
 			Sort sort = new Sort();
@@ -263,11 +275,15 @@ public class TrashDisplayContext {
 				!StringUtil.equalsIgnoreCase(
 					entrySearch.getOrderByType(), "asc"));
 
-			entrySearch.setResultsAndTotal(
+			BaseModelSearchResult<TrashEntry> baseModelSearchResult =
 				TrashEntryLocalServiceUtil.searchTrashEntries(
 					themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
 					themeDisplay.getUserId(), searchTerms.getKeywords(),
-					entrySearch.getStart(), entrySearch.getEnd(), sort));
+					entrySearch.getStart(), entrySearch.getEnd(), sort);
+
+			entrySearch.setTotal(baseModelSearchResult.getLength());
+
+			trashEntries = baseModelSearchResult.getBaseModels();
 		}
 		else {
 			TrashEntryList trashEntryList = null;
@@ -284,12 +300,14 @@ public class TrashDisplayContext {
 					entrySearch.getOrderByComparator());
 			}
 
-			entrySearch.setResultsAndTotal(
-				trashEntryList::getOriginalTrashEntries,
-				trashEntryList.getCount());
+			entrySearch.setTotal(trashEntryList.getCount());
+
+			trashEntries = trashEntryList.getOriginalTrashEntries();
 
 			_approximate = trashEntryList.isApproximate();
 		}
+
+		entrySearch.setResults(trashEntries);
 
 		if ((entrySearch.getTotal() == 0) &&
 			Validator.isNotNull(searchTerms.getKeywords())) {
@@ -303,18 +321,19 @@ public class TrashDisplayContext {
 					false));
 		}
 
-		EmptyOnClickRowChecker emptyOnClickRowChecker =
-			new EmptyOnClickRowChecker(_liferayPortletResponse);
-
-		emptyOnClickRowChecker.setRememberCheckBoxStateURLRegex(
-			"^(?!.*" + _liferayPortletResponse.getNamespace() +
-				"redirect).*^(?!.*/entry/)");
-
-		entrySearch.setRowChecker(emptyOnClickRowChecker);
-
 		_entrySearch = entrySearch;
 
 		return _entrySearch;
+	}
+
+	public List<NavigationItem> getInfoPanelNavigationItems() {
+		return NavigationItemListBuilder.add(
+			navigationItem -> {
+				navigationItem.setActive(true);
+				navigationItem.setLabel(
+					LanguageUtil.get(_httpServletRequest, "details"));
+			}
+		).build();
 	}
 
 	public String getKeywords() {
@@ -343,8 +362,8 @@ public class TrashDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = SearchOrderByUtil.getOrderByCol(
-			_httpServletRequest, TrashPortletKeys.TRASH,
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol",
 			isSearch() ? "relevance" : "removed-date");
 
 		return _orderByCol;
@@ -355,8 +374,8 @@ public class TrashDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = SearchOrderByUtil.getOrderByType(
-			_httpServletRequest, TrashPortletKeys.TRASH, "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -408,16 +427,6 @@ public class TrashDisplayContext {
 		return portletURL;
 	}
 
-	public List<TabsItem> getTabsItems() {
-		return TabsItemListBuilder.add(
-			tabsItem -> {
-				tabsItem.setActive(true);
-				tabsItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "details"));
-			}
-		).build();
-	}
-
 	public SearchContainer<TrashedModel> getTrashContainerSearchContainer()
 		throws PortalException {
 
@@ -428,6 +437,12 @@ public class TrashDisplayContext {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
+
+		String emptyResultsMessage = LanguageUtil.format(
+			_httpServletRequest, "this-x-does-not-contain-an-entry",
+			ResourceActionsUtil.getModelResource(
+				themeDisplay.getLocale(), getClassName()),
+			false);
 
 		PortletURL iteratorURL = PortletURLBuilder.createRenderURL(
 			_liferayPortletResponse
@@ -440,27 +455,31 @@ public class TrashDisplayContext {
 		).buildPortletURL();
 
 		SearchContainer<TrashedModel> searchContainer = new SearchContainer(
-			_liferayPortletRequest, iteratorURL, null,
-			LanguageUtil.format(
-				_httpServletRequest, "this-x-does-not-contain-an-entry",
-				ResourceActionsUtil.getModelResource(
-					themeDisplay.getLocale(), getClassName()),
-				false));
+			_liferayPortletRequest, iteratorURL, null, emptyResultsMessage);
 
 		searchContainer.setDeltaConfigurable(false);
 
 		TrashHandler trashHandler = getTrashHandler();
 
-		searchContainer.setResultsAndTotal(
-			() -> trashHandler.getTrashModelTrashedModels(
-				getClassPK(), searchContainer.getStart(),
-				searchContainer.getEnd(),
-				searchContainer.getOrderByComparator()),
+		List<TrashedModel> results = trashHandler.getTrashModelTrashedModels(
+			getClassPK(), searchContainer.getStart(), searchContainer.getEnd(),
+			searchContainer.getOrderByComparator());
+
+		searchContainer.setResults(results);
+
+		searchContainer.setTotal(
 			trashHandler.getTrashModelsCount(getClassPK()));
 
 		_trashContainerSearchContainer = searchContainer;
 
 		return _trashContainerSearchContainer;
+	}
+
+	public int getTrashContainerTotalItems() throws PortalException {
+		SearchContainer<TrashedModel> searchContainer =
+			getTrashContainerSearchContainer();
+
+		return searchContainer.getTotal();
 	}
 
 	public TrashEntry getTrashEntry() {
@@ -557,32 +576,33 @@ public class TrashDisplayContext {
 	public String getViewContentRedirectURL() throws PortalException {
 		String redirect = ParamUtil.getString(_httpServletRequest, "redirect");
 
-		if (Validator.isNotNull(redirect)) {
-			return redirect;
+		if (Validator.isNull(redirect)) {
+			TrashHandler trashHandler = getTrashHandler();
+
+			ContainerModel parentContainerModel =
+				trashHandler.getParentContainerModel(getClassPK());
+
+			PortletURL redirectURL = _liferayPortletResponse.createRenderURL();
+
+			if ((parentContainerModel != null) && (getClassNameId() > 0)) {
+				String parentContainerModelClassName =
+					parentContainerModel.getModelClassName();
+
+				redirectURL.setParameter("mvcPath", "/view_content.jsp");
+				redirectURL.setParameter(
+					"classNameId",
+					String.valueOf(
+						PortalUtil.getClassNameId(
+							parentContainerModelClassName)));
+				redirectURL.setParameter(
+					"classPK",
+					String.valueOf(parentContainerModel.getContainerModelId()));
+			}
+
+			redirect = redirectURL.toString();
 		}
 
-		TrashHandler trashHandler = getTrashHandler();
-
-		ContainerModel parentContainerModel =
-			trashHandler.getParentContainerModel(getClassPK());
-
-		PortletURL redirectURL = _liferayPortletResponse.createRenderURL();
-
-		if ((parentContainerModel != null) && (getClassNameId() > 0)) {
-			String parentContainerModelClassName =
-				parentContainerModel.getModelClassName();
-
-			redirectURL.setParameter("mvcPath", "/view_content.jsp");
-			redirectURL.setParameter(
-				"classNameId",
-				String.valueOf(
-					PortalUtil.getClassNameId(parentContainerModelClassName)));
-			redirectURL.setParameter(
-				"classPK",
-				String.valueOf(parentContainerModel.getContainerModelId()));
-		}
-
-		return redirectURL.toString();
+		return redirect;
 	}
 
 	public boolean isApproximate() {
@@ -621,7 +641,7 @@ public class TrashDisplayContext {
 		return false;
 	}
 
-	private List<BreadcrumbEntry> _getBreadcrumbEntries(
+	protected List<BreadcrumbEntry> getBreadcrumbEntries(
 			String className, long classPK, String paramName,
 			PortletURL containerModelURL, boolean checkInTrashContainers)
 		throws Exception {

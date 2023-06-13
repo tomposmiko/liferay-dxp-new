@@ -21,8 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
-
 /**
  * @author Michael Hashimoto
  */
@@ -68,15 +66,9 @@ public class PluginsSegmentTestClassGroup extends SegmentTestClassGroup {
 	}
 
 	protected PluginsSegmentTestClassGroup(
-		BatchTestClassGroup batchTestClassGroup) {
+		PluginsBatchTestClassGroup parentPluginsBatchTestClassGroup) {
 
-		super(batchTestClassGroup);
-	}
-
-	protected PluginsSegmentTestClassGroup(
-		BatchTestClassGroup batchTestClassGroup, JSONObject jsonObject) {
-
-		super(batchTestClassGroup, jsonObject);
+		super(parentPluginsBatchTestClassGroup);
 	}
 
 }

@@ -17,11 +17,11 @@
 <%@ include file="/image_selector/init.jsp" %>
 
 <%
-boolean draggable = GetterUtil.getBoolean(request.getAttribute("liferay-ui:image-selector:draggable"));
 long fileEntryId = GetterUtil.getLong(request.getAttribute("liferay-ui:image-selector:fileEntryId"));
 String imageCropDirection = GetterUtil.getString((String)request.getAttribute("liferay-ui:image-selector:imageCropDirection"), "none");
 String imageCropRegion = GetterUtil.getString((String)request.getAttribute("liferay-ui:image-selector:imageCropRegion"));
 String imageURL = GetterUtil.getString((String)request.getAttribute("liferay-ui:image-selector:imageURL"));
+boolean isDraggable = GetterUtil.getBoolean(request.getAttribute("liferay-ui:image-selector:isDraggable"));
 String itemSelectorEventName = GetterUtil.getString((String)request.getAttribute("liferay-ui:image-selector:itemSelectorEventName"));
 String itemSelectorURL = GetterUtil.getString((String)request.getAttribute("liferay-ui:image-selector:itemSelectorURL"));
 long maxFileSize = GetterUtil.getLong(request.getAttribute("liferay-ui:image-selector:maxFileSize"));
@@ -35,14 +35,10 @@ if (fileEntryId == 0) {
 	cssClass += " drop-enabled";
 }
 
-if (draggable) {
+if (isDraggable) {
 	cssClass += " draggable-image " + imageCropDirection;
 }
 %>
-
-<liferay-util:html-top>
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/image_selector.css") %>" rel="stylesheet" type="text/css" />
-</liferay-util:html-top>
 
 <div>
 	<react:component
@@ -57,7 +53,7 @@ if (draggable) {
 			).put(
 				"imageURL", imageURL
 			).put(
-				"isDraggable", draggable
+				"isDraggable", isDraggable
 			).put(
 				"itemSelectorEventName", itemSelectorEventName
 			).put(
@@ -107,7 +103,7 @@ if (draggable) {
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<liferay-ui:message key="drag-and-drop-to-upload" />
+							<%= LanguageUtil.get(resourceBundle, "drag-and-drop-to-upload") %>
 						</c:otherwise>
 					</c:choose>
 				</div>

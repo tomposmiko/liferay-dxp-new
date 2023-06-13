@@ -33,11 +33,10 @@ import org.osgi.service.component.annotations.Component;
  * @generated
  */
 @Component(
-	property = {
-		"class.name=com.liferay.saml.persistence.model.impl.SamlSpAuthRequestImpl",
-		"table.name=SamlSpAuthRequest"
-	},
-	service = ArgumentsResolver.class
+	immediate = true,
+	service = {
+		SamlSpAuthRequestModelArgumentsResolver.class, ArgumentsResolver.class
+	}
 )
 public class SamlSpAuthRequestModelArgumentsResolver
 	implements ArgumentsResolver {

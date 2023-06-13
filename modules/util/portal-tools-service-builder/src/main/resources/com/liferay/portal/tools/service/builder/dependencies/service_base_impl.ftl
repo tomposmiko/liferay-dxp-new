@@ -40,8 +40,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -167,8 +165,6 @@ import org.osgi.service.component.annotations.Reference;
 	public abstract class ${entity.name}LocalServiceBaseImpl extends BaseLocalServiceImpl implements ${entity.name}LocalService,
 	<#if dependencyInjectorDS>
 		AopService,
-	<#elseif osgiModule && entity.isChangeTrackingEnabled()>
-		CTService<${entity.name}>,
 	</#if>
 
 	IdentifiableOSGiService
@@ -508,35 +504,42 @@ import org.osgi.service.component.annotations.Reference;
 		</#if>
 
 		<#if entity.hasExternalReferenceCode() && !entity.versionEntity??>
-			<#if serviceBuilder.isVersionGTE_7_4_0()>
-				@Override
-				public ${entity.name} fetch${entity.name}ByExternalReferenceCode(String externalReferenceCode, long ${entity.externalReferenceCode}Id) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					return ${entity.variableName}Persistence.fetchByERC_${entity.externalReferenceCode?cap_first[0..0]}(externalReferenceCode, ${entity.externalReferenceCode}Id);
-				}
+			/**
+			 * Returns the ${entity.humanName} with the matching external reference code and ${entity.externalReferenceCode}.
+			 *
+			 * @param ${entity.externalReferenceCode}Id the primary key of the ${entity.externalReferenceCode}
+			 * @param externalReferenceCode the ${entity.humanName}'s external reference code
+			 * @return the matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
+			<#list serviceBaseExceptions as exception>
+			 * @throws ${exception}
+			</#list>
+			 */
+			@Override
+			public ${entity.name} fetch${entity.name}ByExternalReferenceCode(long ${entity.externalReferenceCode}Id, String externalReferenceCode) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
+				return ${entity.variableName}Persistence.fetchBy${entity.externalReferenceCode?cap_first[0..0]}_ERC(${entity.externalReferenceCode}Id, externalReferenceCode);
+			}
 
-				@Override
-				public ${entity.name} get${entity.name}ByExternalReferenceCode(String externalReferenceCode, long ${entity.externalReferenceCode}Id) throws PortalException {
-					return ${entity.variableName}Persistence.findByERC_${entity.externalReferenceCode?cap_first[0..0]}(externalReferenceCode, ${entity.externalReferenceCode}Id);
-				}
-			<#else>
-				@Deprecated
-				@Override
-				public ${entity.name} fetch${entity.name}ByExternalReferenceCode(long ${entity.externalReferenceCode}Id, String externalReferenceCode) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					return ${entity.variableName}Persistence.fetchBy${entity.externalReferenceCode?cap_first[0..0]}_ERC(${entity.externalReferenceCode}Id, externalReferenceCode);
-				}
+			/**
+			 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetch${entity.name}ByExternalReferenceCode(long, String)}
+			 */
+			@Deprecated
+			@Override
+			public ${entity.name} fetch${entity.name}ByReferenceCode(long ${entity.externalReferenceCode}Id, String externalReferenceCode) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
+				return fetch${entity.name}ByExternalReferenceCode(${entity.externalReferenceCode}Id, externalReferenceCode);
+			}
 
-				@Deprecated
-				@Override
-				public ${entity.name} fetch${entity.name}ByReferenceCode(long ${entity.externalReferenceCode}Id, String externalReferenceCode) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					return fetch${entity.name}ByExternalReferenceCode(${entity.externalReferenceCode}Id, externalReferenceCode);
-				}
-
-				@Deprecated
-				@Override
-				public ${entity.name} get${entity.name}ByExternalReferenceCode(long ${entity.externalReferenceCode}Id, String externalReferenceCode) throws PortalException {
-					return ${entity.variableName}Persistence.findBy${entity.externalReferenceCode?cap_first[0..0]}_ERC(${entity.externalReferenceCode}Id, externalReferenceCode);
-				}
-			</#if>
+			/**
+			 * Returns the ${entity.humanName} with the matching external reference code and ${entity.externalReferenceCode}.
+			 *
+			 * @param ${entity.externalReferenceCode}Id the primary key of the ${entity.externalReferenceCode}
+			 * @param externalReferenceCode the ${entity.humanName}'s external reference code
+			 * @return the matching ${entity.humanName}
+			 * @throws PortalException if a matching ${entity.humanName} could not be found
+			 */
+			@Override
+			public ${entity.name} get${entity.name}ByExternalReferenceCode(long ${entity.externalReferenceCode}Id, String externalReferenceCode) throws PortalException {
+				return ${entity.variableName}Persistence.findBy${entity.externalReferenceCode?cap_first[0..0]}_ERC(${entity.externalReferenceCode}Id, externalReferenceCode);
+			}
 		</#if>
 
 		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "get" + entity.name, [entity.PKClassName], ["PortalException"]) />
@@ -800,12 +803,6 @@ import org.osgi.service.component.annotations.Reference;
 		 */
 		@Override
 		public PersistedModel deletePersistedModel(PersistedModel persistedModel) throws PortalException {
-			<#if serviceBuilder.isVersionGTE_7_4_0()>
-				if (_log.isWarnEnabled()) {
-					_log.warn("Implement ${entity.name}LocalServiceImpl#delete${entity.name}(${entity.name}) to avoid orphaned data");
-				}
-			</#if>
-
 			return ${entity.variableName}LocalService.delete${entity.name}((${entity.name})persistedModel);
 		}
 
@@ -959,11 +956,7 @@ import org.osgi.service.component.annotations.Reference;
 		 * <strong>Important:</strong> Inspect ${entity.name}LocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 		 * </p>
 		 *
-		<#if entity.versionEntity??>
-		 	* @param draft${entity.name} the ${entity.humanName}
-		<#else>
-			* @param ${entity.variableName} the ${entity.humanName}
-		</#if>
+		 * @param ${entity.variableName} the ${entity.humanName}
 		 * @return the ${entity.humanName} that was updated
 		<#list serviceBaseExceptions as exception>
 		 * @throws ${exception}
@@ -2144,8 +2137,6 @@ import org.osgi.service.component.annotations.Reference;
 			</#if>
 		</#if>
 	</#list>
-
-	private static final Log _log = LogFactoryUtil.getLog(${entity.name}${sessionTypeName}ServiceBaseImpl.class);
 
 	<#if lazyBlobExists>
 		<#if dependencyInjectorDS>

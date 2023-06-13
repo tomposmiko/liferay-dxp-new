@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Shuyang Zhou
+ * @see BatchEngineImportTaskServiceSoap
  * @generated
  */
 public class BatchEngineImportTaskServiceHttp {

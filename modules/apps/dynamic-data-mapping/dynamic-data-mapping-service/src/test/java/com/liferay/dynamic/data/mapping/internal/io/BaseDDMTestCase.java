@@ -20,10 +20,9 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -38,20 +37,33 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Marcellus Tavares
  */
-public abstract class BaseDDMTestCase {
+@PrepareForTest(
+	{LocaleUtil.class, PortalClassLoaderUtil.class, ResourceBundleUtil.class}
+)
+@RunWith(PowerMockRunner.class)
+public abstract class BaseDDMTestCase extends PowerMockito {
 
 	@Before
 	public void setUp() throws Exception {
-		_setUpJSONFactoryUtil();
-		_setUpLanguageUtil();
-		_setUpPortalClassLoaderUtil();
-		_setUpResourceBundleUtil();
+		setUpJSONFactoryUtil();
+		setUpLanguageUtil();
+		setUpLocaleUtil();
+		setUpPortalClassLoaderUtil();
+		setUpResourceBundleUtil();
 	}
 
 	protected DDMFormLayoutColumn createDDMFormLayoutColumn(
@@ -99,79 +111,150 @@ public abstract class BaseDDMTestCase {
 		return StringUtil.read(inputStream);
 	}
 
-	protected Language language = Mockito.mock(Language.class);
-
-	private void _setUpJSONFactoryUtil() {
+	protected void setUpJSONFactoryUtil() {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
-	private void _setUpLanguageUtil() {
+	protected void setUpLanguageUtil() {
 		Set<Locale> availableLocales = SetUtil.fromArray(
-			LocaleUtil.BRAZIL, LocaleUtil.US);
+			new Locale[] {LocaleUtil.BRAZIL, LocaleUtil.US});
 
-		_whenLanguageGetAvailableLocalesThen(availableLocales);
+		whenLanguageGetAvailableLocalesThen(availableLocales);
 
-		_whenLanguageIsAvailableLocale(LocaleUtil.BRAZIL);
-		_whenLanguageIsAvailableLocale(LocaleUtil.US);
+		whenLanguageIsAvailableLocale("en_US");
+		whenLanguageIsAvailableLocale("pt_BR");
 
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(language);
 	}
 
-	private void _setUpPortalClassLoaderUtil() {
-		PortalClassLoaderUtil.setClassLoader(_classLoader);
+	protected void setUpLocaleUtil() {
+		mockStatic(LocaleUtil.class);
+
+		when(
+			LocaleUtil.fromLanguageId("en_US")
+		).thenReturn(
+			LocaleUtil.US
+		);
+
+		when(
+			LocaleUtil.fromLanguageId("pt_BR")
+		).thenReturn(
+			LocaleUtil.BRAZIL
+		);
+
+		when(
+			LocaleUtil.fromLanguageId("en_US", true, false)
+		).thenReturn(
+			LocaleUtil.US
+		);
+
+		when(
+			LocaleUtil.fromLanguageId("pt_BR", true, false)
+		).thenReturn(
+			LocaleUtil.BRAZIL
+		);
+
+		when(
+			LocaleUtil.getDefault()
+		).thenReturn(
+			LocaleUtil.US
+		);
+
+		when(
+			LocaleUtil.toLanguageId(LocaleUtil.US)
+		).thenReturn(
+			"en_US"
+		);
+
+		when(
+			LocaleUtil.toLanguageId(LocaleUtil.BRAZIL)
+		).thenReturn(
+			"pt_BR"
+		);
+
+		when(
+			LocaleUtil.toLanguageIds((Locale[])Matchers.any())
+		).then(
+			new Answer<String[]>() {
+
+				@Override
+				public String[] answer(InvocationOnMock invocationOnMock)
+					throws Throwable {
+
+					Object[] args = invocationOnMock.getArguments();
+
+					Locale[] locales = (Locale[])args[0];
+
+					String[] languageIds = new String[locales.length];
+
+					for (int i = 0; i < locales.length; i++) {
+						languageIds[i] = LocaleUtil.toLanguageId(locales[i]);
+					}
+
+					return languageIds;
+				}
+
+			}
+		);
 	}
 
-	private void _setUpResourceBundleUtil() {
-		ResourceBundleLoader resourceBundleLoader = Mockito.mock(
-			ResourceBundleLoader.class);
+	protected void setUpPortalClassLoaderUtil() {
+		mockStatic(PortalClassLoaderUtil.class);
 
-		ResourceBundleLoaderUtil.setPortalResourceBundleLoader(
-			resourceBundleLoader);
+		when(
+			PortalClassLoaderUtil.getClassLoader()
+		).thenReturn(
+			_classLoader
+		);
+	}
 
-		Mockito.when(
-			resourceBundleLoader.loadResourceBundle(LocaleUtil.BRAZIL)
+	protected void setUpResourceBundleUtil() {
+		mockStatic(ResourceBundleUtil.class);
+
+		when(
+			ResourceBundleUtil.getBundle(
+				"content.Language", LocaleUtil.BRAZIL, _classLoader)
 		).thenReturn(
 			_resourceBundle
 		);
 
-		Mockito.when(
-			resourceBundleLoader.loadResourceBundle(LocaleUtil.US)
+		when(
+			ResourceBundleUtil.getBundle(
+				"content.Language", LocaleUtil.US, _classLoader)
 		).thenReturn(
 			_resourceBundle
 		);
 	}
 
-	private void _whenLanguageGetAvailableLocalesThen(
+	protected void whenLanguageGetAvailableLocalesThen(
 		Set<Locale> availableLocales) {
 
-		Mockito.when(
+		when(
 			language.getAvailableLocales()
 		).thenReturn(
 			availableLocales
 		);
 	}
 
-	private void _whenLanguageIsAvailableLocale(Locale locale) {
-		Mockito.when(
-			language.isAvailableLocale(
-				Mockito.eq(LocaleUtil.toLanguageId(locale)))
-		).thenReturn(
-			true
-		);
-
-		Mockito.when(
-			language.isAvailableLocale(Mockito.eq(locale))
+	protected void whenLanguageIsAvailableLocale(String languageId) {
+		when(
+			language.isAvailableLocale(Matchers.eq(languageId))
 		).thenReturn(
 			true
 		);
 	}
 
-	private final ClassLoader _classLoader = Mockito.mock(ClassLoader.class);
-	private final ResourceBundle _resourceBundle = Mockito.mock(
-		ResourceBundle.class);
+	@Mock
+	protected Language language;
+
+	@Mock
+	private ClassLoader _classLoader;
+
+	@Mock
+	private ResourceBundle _resourceBundle;
 
 }

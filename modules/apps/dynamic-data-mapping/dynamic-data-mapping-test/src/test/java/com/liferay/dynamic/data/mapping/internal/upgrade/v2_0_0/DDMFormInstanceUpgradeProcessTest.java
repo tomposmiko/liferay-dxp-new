@@ -14,48 +14,40 @@
 
 package com.liferay.dynamic.data.mapping.internal.upgrade.v2_0_0;
 
-import com.liferay.dynamic.data.mapping.BaseDDMTestCase;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.impl.ResourceActionImpl;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Pedro Queiroz
  */
-public class DDMFormInstanceUpgradeProcessTest extends BaseDDMTestCase {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
+@RunWith(PowerMockRunner.class)
+public class DDMFormInstanceUpgradeProcessTest extends PowerMockito {
 
 	@Before
-	@Override
 	public void setUp() throws Exception {
-		setUpPropsUtil();
-
-		_setUpDDMFormInstanceUpgradeProcess();
+		setUpDDMFormInstanceUpgradeProcess();
 	}
 
 	@Test
-	public void testGetNewActionIds1() {
-		_mockResourceActionLocalService(
-			"RecordSet", this::_createRecorSetResourceActionList,
-			"FormInstance", this::_createFormInstanceResourceActionList);
+	public void testGetNewActionIds1() throws Exception {
+		mockResourceActionLocalService(
+			"RecordSet", this::createRecorSetResourceActionList, "FormInstance",
+			this::createFormInstanceResourceActionList);
 
 		// VIEW, ADD_RECORD
 
@@ -68,10 +60,10 @@ public class DDMFormInstanceUpgradeProcessTest extends BaseDDMTestCase {
 	}
 
 	@Test
-	public void testGetNewActionIds2() {
-		_mockResourceActionLocalService(
-			"RecordSet", this::_createRecorSetResourceActionList,
-			"FormInstance", this::_createFormInstanceResourceActionList);
+	public void testGetNewActionIds2() throws Exception {
+		mockResourceActionLocalService(
+			"RecordSet", this::createRecorSetResourceActionList, "FormInstance",
+			this::createFormInstanceResourceActionList);
 
 		// VIEW, UPDATE, ADD_RECORD
 
@@ -83,25 +75,23 @@ public class DDMFormInstanceUpgradeProcessTest extends BaseDDMTestCase {
 				"RecordSet", "FormInstance", 0, currentNewActionIds));
 	}
 
-	private List<ResourceAction> _createFormInstanceResourceActionList() {
+	protected List<ResourceAction> createFormInstanceResourceActionList() {
 		return ListUtil.fromArray(
-			_createResourceAction("VIEW", 1),
-			_createResourceAction("DELETE", 2),
-			_createResourceAction("PERMISSIONS", 4),
-			_createResourceAction("UPDATE", 8),
-			_createResourceAction("ADD_FORM_INSTANCE_RECORD", 16));
+			createResourceAction("VIEW", 1), createResourceAction("DELETE", 2),
+			createResourceAction("PERMISSIONS", 4),
+			createResourceAction("UPDATE", 8),
+			createResourceAction("ADD_FORM_INSTANCE_RECORD", 16));
 	}
 
-	private List<ResourceAction> _createRecorSetResourceActionList() {
+	protected List<ResourceAction> createRecorSetResourceActionList() {
 		return ListUtil.fromArray(
-			_createResourceAction("VIEW", 1),
-			_createResourceAction("DELETE", 2),
-			_createResourceAction("PERMISSIONS", 4),
-			_createResourceAction("ADD_RECORD", 8),
-			_createResourceAction("UPDATE", 16));
+			createResourceAction("VIEW", 1), createResourceAction("DELETE", 2),
+			createResourceAction("PERMISSIONS", 4),
+			createResourceAction("ADD_RECORD", 8),
+			createResourceAction("UPDATE", 16));
 	}
 
-	private ResourceAction _createResourceAction(
+	protected ResourceAction createResourceAction(
 		String actionId, long bitwiseValue) {
 
 		ResourceAction resourceAction = new ResourceActionImpl();
@@ -112,33 +102,36 @@ public class DDMFormInstanceUpgradeProcessTest extends BaseDDMTestCase {
 		return resourceAction;
 	}
 
-	private void _mockResourceActionLocalService(
-		String oldName,
-		Supplier<List<ResourceAction>> oldResourceActionListSupplier,
-		String newName,
-		Supplier<List<ResourceAction>> newResourceActionListSupplier) {
+	protected void mockResourceActionLocalService(
+			String oldName,
+			Supplier<List<ResourceAction>> oldResourceActionListSupplier,
+			String newName,
+			Supplier<List<ResourceAction>> newResourceActionListSupplier)
+		throws Exception {
 
-		ResourceActionLocalService resourceActionLocalService = Mockito.mock(
+		ResourceActionLocalService resourceActionLocalService = mock(
 			ResourceActionLocalService.class);
 
-		Mockito.when(
-			resourceActionLocalService.getResourceActions(Mockito.eq(oldName))
+		when(
+			resourceActionLocalService.getResourceActions(Matchers.eq(oldName))
 		).thenReturn(
 			oldResourceActionListSupplier.get()
 		);
 
-		Mockito.when(
-			resourceActionLocalService.getResourceActions(Mockito.eq(newName))
+		when(
+			resourceActionLocalService.getResourceActions(Matchers.eq(newName))
 		).thenReturn(
 			newResourceActionListSupplier.get()
 		);
 
-		ReflectionTestUtil.setFieldValue(
-			_ddmFormInstanceUpgradeProcess, "_resourceActionLocalService",
-			resourceActionLocalService);
+		field(
+			DDMFormInstanceUpgradeProcess.class, "_resourceActionLocalService"
+		).set(
+			_ddmFormInstanceUpgradeProcess, resourceActionLocalService
+		);
 	}
 
-	private void _setUpDDMFormInstanceUpgradeProcess() {
+	protected void setUpDDMFormInstanceUpgradeProcess() throws Exception {
 		_ddmFormInstanceUpgradeProcess = new DDMFormInstanceUpgradeProcess(
 			null, null, null, null, null);
 	}

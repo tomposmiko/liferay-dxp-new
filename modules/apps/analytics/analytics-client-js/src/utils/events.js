@@ -30,25 +30,6 @@ const onReady = (fn) => {
 	return () => document.removeEventListener('DOMContentLoaded', fn);
 };
 
-/**
- * Creates an event listener for all event types in events array.
- *
- * @param {Array.string} events Array of event type.
- * @param {Function} fn The event listener callback.
- * @returns {Function} The function to remove all the event listers that were added from events param.
- */
-const onEvents = (events, fn) => {
-	if (events) {
-		events.forEach((eventName) => document.addEventListener(eventName, fn));
-
-		return () => {
-			events.forEach((eventName) => {
-				document.removeEventListener(eventName, fn);
-			});
-		};
-	}
-};
-
 const clickEvent = ({
 	analytics,
 	applicationId,
@@ -99,12 +80,12 @@ const clickEvent = ({
  * @protected
  * @returns {Object}
  */
-export function normalizeEvent(
+export const normalizeEvent = (
 	eventId,
 	applicationId,
 	properties,
 	contextHash
-) {
+) => {
 	const date = new Date();
 	const eventDate = date.toISOString();
 	const eventLocalDate = convertUTCDateToLocalDate(date).toISOString();
@@ -117,7 +98,7 @@ export function normalizeEvent(
 		eventLocalDate,
 		properties,
 	};
-}
+};
 
 /**
  * Sort comparator for ISO 8601 eventDates in ascending order.
@@ -138,22 +119,4 @@ const sortByEventDate = (a, b) => {
 	return 0;
 };
 
-const removeDups = (results, items) => {
-	const events = results.flatMap(({value}) => value.events);
-
-	return items.filter(
-		({contextHash, eventDate, eventId}) =>
-			!events.some(
-				({
-					contextHash: resultContextHash,
-					eventDate: resultEventDate,
-					eventId: resultEventId,
-				}) =>
-					contextHash === resultContextHash &&
-					eventId === resultEventId &&
-					eventDate === resultEventDate
-			)
-	);
-};
-
-export {clickEvent, onEvents, onReady, removeDups, sortByEventDate};
+export {clickEvent, onReady, sortByEventDate};

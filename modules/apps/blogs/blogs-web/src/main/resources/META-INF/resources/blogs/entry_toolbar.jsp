@@ -32,7 +32,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 	floatElements="end"
 	verticalAlign="center"
 >
-	<c:if test="<%= !layout.isTypeAssetDisplay() && blogsPortletInstanceConfiguration.enableComments() %>">
+	<c:if test="<%= blogsPortletInstanceConfiguration.enableComments() %>">
 		<clay:content-col>
 
 			<%
@@ -79,7 +79,6 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 			<liferay-ratings:ratings
 				className="<%= BlogsEntry.class.getName() %>"
 				classPK="<%= entry.getEntryId() %>"
-				contentTitle="<%= BlogsEntryUtil.getDisplayTitle(resourceBundle, entry) %>"
 				inTrash="<%= entry.isInTrash() %>"
 				ratingsEntry="<%= ratingsEntry %>"
 				ratingsStats="<%= ratingsStats %>"

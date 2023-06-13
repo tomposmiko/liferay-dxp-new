@@ -34,6 +34,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -50,7 +51,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = CertificateTool.class)
+@Component(immediate = true, service = CertificateTool.class)
 public class CertificateToolImpl implements CertificateTool {
 
 	@Override
@@ -70,9 +71,8 @@ public class CertificateToolImpl implements CertificateTool {
 			ASN1InputStream asn1InputStream = new ASN1InputStream(
 				byteArrayInputStream)) {
 
-			X500Name issuerX500Name = _createX500Name(
-				issuerCertificateEntityId);
-			X500Name subjectX500Name = _createX500Name(
+			X500Name issuerX500Name = createX500Name(issuerCertificateEntityId);
+			X500Name subjectX500Name = createX500Name(
 				subjectCertificateEntityId);
 
 			X509v1CertificateBuilder x509v1CertificateBuilder =
@@ -149,21 +149,21 @@ public class CertificateToolImpl implements CertificateTool {
 	}
 
 	@Override
-	public String getSubjectName(X509Certificate x509Certificate) {
+	public Optional<String> getSubjectName(X509Certificate x509Certificate) {
 		if (x509Certificate == null) {
-			return null;
+			return Optional.empty();
 		}
 
 		Principal principal = x509Certificate.getSubjectDN();
 
 		if (principal != null) {
-			return principal.getName();
+			return Optional.of(principal.getName());
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
-	private X500Name _createX500Name(CertificateEntityId certificateEntityId) {
+	protected X500Name createX500Name(CertificateEntityId certificateEntityId) {
 		X500NameBuilder x500NameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
 
 		if (Validator.isNotNull(certificateEntityId.getCommonName())) {

@@ -17,7 +17,7 @@ package com.liferay.fragment.web.internal.portlet.action;
 import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.importer.FragmentsImporter;
 import com.liferay.fragment.importer.FragmentsImporterResultEntry;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
 		"mvc.command.name=/fragment/import"
@@ -55,7 +56,7 @@ public class ImportMVCActionCommand extends BaseMVCActionCommand {
 	protected void addSuccessMessage(
 		ActionRequest actionRequest, ActionResponse actionResponse) {
 
-		String successMessage = _language.get(
+		String successMessage = LanguageUtil.get(
 			_portal.getHttpServletRequest(actionRequest),
 			"the-files-were-imported-correctly");
 
@@ -104,9 +105,6 @@ public class ImportMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private FragmentsImporter _fragmentsImporter;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

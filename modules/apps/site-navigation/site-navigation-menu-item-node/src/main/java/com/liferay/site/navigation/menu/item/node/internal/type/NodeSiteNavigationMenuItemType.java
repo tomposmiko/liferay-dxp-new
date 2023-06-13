@@ -15,7 +15,7 @@
 package com.liferay.site.navigation.menu.item.node.internal.type;
 
 import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = {
 		"service.ranking:Integer=100",
 		"site.navigation.menu.item.type=" + SiteNavigationMenuItemTypeConstants.NODE
@@ -56,7 +57,7 @@ public class NodeSiteNavigationMenuItemType
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "submenu");
+		return LanguageUtil.get(locale, "submenu");
 	}
 
 	@Override
@@ -115,9 +116,6 @@ public class NodeSiteNavigationMenuItemType
 
 	@Reference
 	private JSPRenderer _jspRenderer;
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.site.navigation.menu.item.node)",

@@ -87,10 +87,11 @@ public class JSModuleConfigGeneratorDefaultsPlugin implements Plugin<Project> {
 		Project project,
 		JSModuleConfigGeneratorExtension jsModuleConfigGeneratorExtension) {
 
-		jsModuleConfigGeneratorExtension.setVersion(
-			GradleUtil.getProperty(
-				project, "nodejs.liferay.module.config.generator.version",
-				_VERSION));
+		String version = GradleUtil.getProperty(
+			project, "nodejs.liferay.module.config.generator.version",
+			_VERSION);
+
+		jsModuleConfigGeneratorExtension.setVersion(version);
 	}
 
 	private void _configureTaskConfigJSModulesProvider(

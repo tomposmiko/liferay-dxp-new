@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
@@ -56,10 +55,13 @@ import com.liferay.portletmvc4spring.test.mock.web.portlet.MockPortletSession;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletConfig;
@@ -103,6 +105,20 @@ public class EditFileEntryMVCActionCommandTest {
 			TempFileEntryUtil.getTempFileName("image.jpg"), _getInputStream(),
 			ContentTypes.IMAGE_JPEG);
 
+		long folderId = tempFileEntry.getFolderId();
+
+		Map<String, String[]> parameters = Stream.of(
+			new AbstractMap.SimpleEntry<>(
+				Constants.CMD, new String[] {Constants.ADD_MULTIPLE}),
+			new AbstractMap.SimpleEntry<>(
+				"folderId", new String[] {String.valueOf(folderId)}),
+			new AbstractMap.SimpleEntry<>(
+				"repositoryId",
+				new String[] {String.valueOf(tempFileEntry.getRepositoryId())})
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
+
 		ReflectionTestUtil.invoke(
 			_editFileEntryMVCActionCommand, "_addMultipleFileEntries",
 			new Class<?>[] {
@@ -111,13 +127,12 @@ public class EditFileEntryMVCActionCommandTest {
 				ServiceContext.class
 			},
 			_getLiferayPortletConfig(),
-			_getMockLiferayPortletActionRequest(
-				_getParameters(tempFileEntry, Constants.ADD_MULTIPLE)),
+			_getMockLiferayPortletActionRequest(parameters),
 			tempFileEntry.getFileName(), new ArrayList<>(), new ArrayList<>(),
 			null, null, ServiceContextTestUtil.getServiceContext());
 
 		FileEntry fileName = _dlAppLocalService.getFileEntryByFileName(
-			_group.getGroupId(), tempFileEntry.getFolderId(), "image.jpg");
+			_group.getGroupId(), folderId, "image.jpg");
 
 		Assert.assertEquals("image.jpg", fileName.getFileName());
 		Assert.assertEquals("image", fileName.getTitle());
@@ -147,8 +162,19 @@ public class EditFileEntryMVCActionCommandTest {
 
 		selectedFileNames.add(tempFileEntry.getFileName());
 
-		Map<String, String[]> parameters = _getParameters(
-			tempFileEntry, Constants.ADD_MULTIPLE);
+		long folderId = tempFileEntry.getFolderId();
+
+		Map<String, String[]> parameters = Stream.of(
+			new AbstractMap.SimpleEntry<>(
+				Constants.CMD, new String[] {Constants.ADD_MULTIPLE}),
+			new AbstractMap.SimpleEntry<>(
+				"folderId", new String[] {String.valueOf(folderId)}),
+			new AbstractMap.SimpleEntry<>(
+				"repositoryId",
+				new String[] {String.valueOf(tempFileEntry.getRepositoryId())})
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
 
 		for (String selectedFileName : selectedFileNames) {
 			ReflectionTestUtil.invoke(
@@ -163,8 +189,6 @@ public class EditFileEntryMVCActionCommandTest {
 				selectedFileName, new ArrayList<>(), new ArrayList<>(), null,
 				null, ServiceContextTestUtil.getServiceContext());
 		}
-
-		long folderId = tempFileEntry.getFolderId();
 
 		FileEntry fileEntry = _dlAppLocalService.getFileEntryByFileName(
 			_group.getGroupId(), folderId, "test.jpg");
@@ -180,63 +204,7 @@ public class EditFileEntryMVCActionCommandTest {
 	}
 
 	@Test
-	public void testAddMultipleFileEntriesSeveralFilesSameTitleDifferentExtension()
-		throws PortalException {
-
-		String tempFolderName =
-			"com.liferay.document.library.web.internal.portlet.action." +
-				"EditFileEntryMVCActionCommand";
-
-		List<String> selectedFileNames = new ArrayList<>();
-
-		FileEntry tempFileEntry = TempFileEntryUtil.addTempFileEntry(
-			_group.getGroupId(), TestPropsValues.getUserId(), tempFolderName,
-			TempFileEntryUtil.getTempFileName("test.jpg"), _getInputStream(),
-			ContentTypes.IMAGE_JPEG);
-
-		selectedFileNames.add(tempFileEntry.getFileName());
-
-		tempFileEntry = TempFileEntryUtil.addTempFileEntry(
-			_group.getGroupId(), TestPropsValues.getUserId(), tempFolderName,
-			TempFileEntryUtil.getTempFileName("test.gif"), _getInputStream(),
-			ContentTypes.IMAGE_GIF);
-
-		selectedFileNames.add(tempFileEntry.getFileName());
-
-		Map<String, String[]> parameters = _getParameters(
-			tempFileEntry, Constants.ADD_MULTIPLE);
-
-		for (String selectedFileName : selectedFileNames) {
-			ReflectionTestUtil.invoke(
-				_editFileEntryMVCActionCommand, "_addMultipleFileEntries",
-				new Class<?>[] {
-					PortletConfig.class, ActionRequest.class, String.class,
-					List.class, List.class, Date.class, Date.class,
-					ServiceContext.class
-				},
-				_getLiferayPortletConfig(),
-				_getMockLiferayPortletActionRequest(parameters),
-				selectedFileName, new ArrayList<>(), new ArrayList<>(), null,
-				null, ServiceContextTestUtil.getServiceContext());
-		}
-
-		long folderId = tempFileEntry.getFolderId();
-
-		FileEntry fileEntry = _dlAppLocalService.getFileEntryByFileName(
-			_group.getGroupId(), folderId, "test.jpg");
-
-		Assert.assertEquals("test.jpg", fileEntry.getFileName());
-		Assert.assertEquals("test", fileEntry.getTitle());
-
-		FileEntry actualFileEntry = _dlAppLocalService.getFileEntryByFileName(
-			_group.getGroupId(), folderId, "test.gif");
-
-		Assert.assertEquals("test.gif", actualFileEntry.getFileName());
-		Assert.assertEquals("test (1)", actualFileEntry.getTitle());
-	}
-
-	@Test
-	public void testAddMultipleFileEntriesSeveralFilesWithSameTitleAndExtension()
+	public void testAddMultipleFileEntriesSeveralFilesWithSameTitle()
 		throws PortalException {
 
 		String tempFolderName =
@@ -259,8 +227,19 @@ public class EditFileEntryMVCActionCommandTest {
 
 		selectedFileNames.add(tempFileEntry.getFileName());
 
-		Map<String, String[]> parameters = _getParameters(
-			tempFileEntry, Constants.ADD_MULTIPLE);
+		long folderId = tempFileEntry.getFolderId();
+
+		Map<String, String[]> parameters = Stream.of(
+			new AbstractMap.SimpleEntry<>(
+				Constants.CMD, new String[] {Constants.ADD_MULTIPLE}),
+			new AbstractMap.SimpleEntry<>(
+				"folderId", new String[] {String.valueOf(folderId)}),
+			new AbstractMap.SimpleEntry<>(
+				"repositoryId",
+				new String[] {String.valueOf(tempFileEntry.getRepositoryId())})
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
 
 		for (String selectedFileName : selectedFileNames) {
 			ReflectionTestUtil.invoke(
@@ -275,8 +254,6 @@ public class EditFileEntryMVCActionCommandTest {
 				selectedFileName, new ArrayList<>(), new ArrayList<>(), null,
 				null, ServiceContextTestUtil.getServiceContext());
 		}
-
-		long folderId = tempFileEntry.getFolderId();
 
 		FileEntry fileEntry = _dlAppLocalService.getFileEntryByFileName(
 			_group.getGroupId(), folderId, "image.jpg");
@@ -303,21 +280,33 @@ public class EditFileEntryMVCActionCommandTest {
 			initialFileEntry.getFileEntryId(),
 			ServiceContextTestUtil.getServiceContext());
 
+		Map<String, String[]> parameters = Stream.of(
+			new AbstractMap.SimpleEntry<>(
+				"changeLog", new String[] {"New Version"}),
+			new AbstractMap.SimpleEntry<>(
+				Constants.CMD, new String[] {Constants.CHECKIN}),
+			new AbstractMap.SimpleEntry<>(
+				"folderId",
+				new String[] {String.valueOf(initialFileEntry.getFolderId())}),
+			new AbstractMap.SimpleEntry<>(
+				"repositoryId",
+				new String[] {
+					String.valueOf(initialFileEntry.getRepositoryId())
+				}),
+			new AbstractMap.SimpleEntry<>(
+				"rowIdsFileEntry",
+				new String[] {
+					String.valueOf(initialFileEntry.getFileEntryId())
+				}),
+			new AbstractMap.SimpleEntry<>(
+				"versionIncrease",
+				new String[] {String.valueOf(DLVersionNumberIncrease.MAJOR)})
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
+
 		_editFileEntryMVCActionCommand.processAction(
-			_getMockLiferayPortletActionRequest(
-				HashMapBuilder.putAll(
-					_getParameters(initialFileEntry, Constants.CHECKIN)
-				).put(
-					"changeLog", new String[] {"New Version"}
-				).put(
-					"rowIdsFileEntry",
-					new String[] {
-						String.valueOf(initialFileEntry.getFileEntryId())
-					}
-				).put(
-					"versionIncrease",
-					new String[] {String.valueOf(DLVersionNumberIncrease.MAJOR)}
-				).build()),
+			_getMockLiferayPortletActionRequest(parameters),
 			new MockLiferayPortletActionResponse());
 
 		FileEntry actualFileEntry = _dlAppLocalService.getFileEntry(
@@ -336,16 +325,28 @@ public class EditFileEntryMVCActionCommandTest {
 			RandomTestUtil.randomString(), ContentTypes.TEXT_PLAIN, null, null,
 			null, ServiceContextTestUtil.getServiceContext());
 
+		Map<String, String[]> parameters = Stream.of(
+			new AbstractMap.SimpleEntry<>(
+				Constants.CMD, new String[] {Constants.CHECKOUT}),
+			new AbstractMap.SimpleEntry<>(
+				"folderId",
+				new String[] {String.valueOf(initialFileEntry.getFolderId())}),
+			new AbstractMap.SimpleEntry<>(
+				"repositoryId",
+				new String[] {
+					String.valueOf(initialFileEntry.getRepositoryId())
+				}),
+			new AbstractMap.SimpleEntry<>(
+				"rowIdsFileEntry",
+				new String[] {
+					String.valueOf(initialFileEntry.getFileEntryId())
+				})
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
+
 		_editFileEntryMVCActionCommand.processAction(
-			_getMockLiferayPortletActionRequest(
-				HashMapBuilder.putAll(
-					_getParameters(initialFileEntry, Constants.CHECKOUT)
-				).put(
-					"rowIdsFileEntry",
-					new String[] {
-						String.valueOf(initialFileEntry.getFileEntryId())
-					}
-				).build()),
+			_getMockLiferayPortletActionRequest(parameters),
 			new MockLiferayPortletActionResponse());
 
 		FileEntry actualFileEntry = _dlAppLocalService.getFileEntry(
@@ -383,20 +384,6 @@ public class EditFileEntryMVCActionCommandTest {
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
 
 		return mockLiferayPortletActionRequest;
-	}
-
-	private Map<String, String[]> _getParameters(
-		FileEntry tempFileEntry, String cmd) {
-
-		return HashMapBuilder.put(
-			Constants.CMD, new String[] {cmd}
-		).put(
-			"folderId",
-			new String[] {String.valueOf(tempFileEntry.getFolderId())}
-		).put(
-			"repositoryId",
-			new String[] {String.valueOf(tempFileEntry.getRepositoryId())}
-		).build();
 	}
 
 	private ThemeDisplay _getThemeDisplay() throws PortalException {

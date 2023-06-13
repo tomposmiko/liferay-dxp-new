@@ -151,7 +151,7 @@ public class AnnotationsExtendedObjectClassDefinition
 		}
 		catch (ClassNotFoundException classNotFoundException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(classNotFoundException);
+				_log.debug(classNotFoundException, classNotFoundException);
 			}
 		}
 	}
@@ -218,9 +218,6 @@ public class AnnotationsExtendedObjectClassDefinition
 		).put(
 			"strictScope",
 			Boolean.toString(extendedObjectClassDefinition.strictScope())
-		).put(
-			"visibilityControllerKey",
-			extendedObjectClassDefinition.visibilityControllerKey()
 		).build();
 
 		ExtendedObjectClassDefinition.Scope scope =

@@ -82,9 +82,11 @@ public class AMImageContentTransformerTest {
 
 	@Test
 	public void testTransformASingleImage() throws Exception {
-		FileEntry fileEntry = _addImageFileEntry(
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, TestPropsValues.getUserId()));
+				_group, TestPropsValues.getUserId());
+
+		FileEntry fileEntry = _addImageFileEntry(serviceContext);
 
 		String rawHTML = String.format(
 			"<img data-fileentryid=\"%s\" src=\"%s\" />",
@@ -113,8 +115,7 @@ public class AMImageContentTransformerTest {
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), ContentTypes.IMAGE_JPEG,
-			FileUtil.getBytes(
-				AMImageContentTransformerTest.class, "dependencies/image.jpg"),
+			FileUtil.getBytes(AMImageContentTransformerTest.class, "image.jpg"),
 			null, null, serviceContext);
 	}
 

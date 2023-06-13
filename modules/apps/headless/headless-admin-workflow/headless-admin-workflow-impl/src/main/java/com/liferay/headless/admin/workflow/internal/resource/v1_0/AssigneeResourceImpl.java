@@ -45,7 +45,7 @@ public class AssigneeResourceImpl extends BaseAssigneeResourceImpl {
 		throws Exception {
 
 		List<User> assignableUsers = _workflowTaskManager.getAssignableUsers(
-			workflowTaskId);
+			contextCompany.getCompanyId(), workflowTaskId);
 
 		return Page.of(
 			transform(

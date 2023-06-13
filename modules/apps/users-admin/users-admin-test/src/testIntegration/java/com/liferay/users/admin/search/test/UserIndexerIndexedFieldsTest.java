@@ -22,15 +22,12 @@ import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Region;
-import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
-import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.UserGroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -139,26 +136,6 @@ public class UserIndexerIndexedFieldsTest {
 	}
 
 	@Test
-	public void testLastLoginDate() throws Exception {
-		User user1 = addUser();
-
-		User user2 = userLocalService.updateLastLogin(user1.getUserId(), null);
-
-		String searchTerm = user2.getFirstName();
-
-		Document document = indexerFixture.searchOnlyOne(searchTerm);
-
-		indexedFieldsFixture.postProcessDocument(document);
-
-		Map<String, String> map = _getExpectedFieldValues(user2);
-
-		indexedFieldsFixture.populateDate(
-			"lastLoginDate", user2.getLastLoginDate(), map);
-
-		FieldValuesAssert.assertFieldValues(map, document, searchTerm);
-	}
-
-	@Test
 	public void testOrganizationIds() throws Exception {
 		Organization organization = addOrganization();
 
@@ -222,8 +199,7 @@ public class UserIndexerIndexedFieldsTest {
 
 	protected void setUpIndexedFieldsFixture() {
 		indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper, uidFactory,
-			documentBuilderFactory);
+			resourcePermissionLocalService, uidFactory, documentBuilderFactory);
 	}
 
 	protected void setUpIndexerFixture() {
@@ -274,12 +250,6 @@ public class UserIndexerIndexedFieldsTest {
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 
 	@Inject
-	protected RoleLocalService roleLocalService;
-
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
-	@Inject
 	protected UIDFactory uidFactory;
 
 	@Inject
@@ -314,8 +284,6 @@ public class UserIndexerIndexedFieldsTest {
 		).put(
 			Field.STATUS, String.valueOf(user.getStatus())
 		).put(
-			Field.TYPE, String.valueOf(user.getType())
-		).put(
 			Field.USER_ID, String.valueOf(user.getUserId())
 		).put(
 			Field.USER_NAME, StringUtil.toLowerCase(user.getFullName())
@@ -346,17 +314,6 @@ public class UserIndexerIndexedFieldsTest {
 			}
 		).put(
 			"roleIds", _getStringValue(user.getRoleIds())
-		).put(
-			"roleNames",
-			() -> {
-				List<String> roleNames = new ArrayList<>();
-
-				for (Role role : roleLocalService.getRoles(user.getRoleIds())) {
-					roleNames.add(StringUtil.toLowerCase(role.getName()));
-				}
-
-				return _getStringValue(roleNames);
-			}
 		).put(
 			"screenName", user.getScreenName()
 		).put(

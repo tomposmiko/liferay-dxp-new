@@ -16,13 +16,15 @@ package com.liferay.document.library.web.internal.util;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,11 +44,28 @@ public class IGUtil {
 			RenderResponse renderResponse)
 		throws Exception {
 
-		PortletURL portletURL = PortletURLBuilder.createRenderURL(
-			PortalUtil.getLiferayPortletResponse(renderResponse)
-		).setMVCRenderCommandName(
-			"/image_gallery_display/view"
-		).buildRenderURL();
+		String mvcRenderCommandName = ParamUtil.getString(
+			httpServletRequest, "mvcRenderCommandName");
+
+		PortletURL portletURL = renderResponse.createRenderURL();
+
+		if (mvcRenderCommandName.equals("/document_library/select_folder")) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			portletURL.setParameter(
+				"mvcRenderCommandName", mvcRenderCommandName);
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+			PortalUtil.addPortletBreadcrumbEntry(
+				httpServletRequest, themeDisplay.translate("home"),
+				portletURL.toString());
+		}
+		else {
+			portletURL.setParameter(
+				"mvcRenderCommandName", "/image_gallery_display/view");
+		}
 
 		long rootFolderId = getRootFolderId(httpServletRequest);
 
@@ -70,13 +89,9 @@ public class IGUtil {
 			}
 		}
 
-		Collections.reverse(new ArrayList<>(ancestorFolders));
-
-		long repositoryId = getRepositoryId(folder, httpServletRequest);
+		Collections.reverse(ancestorFolders);
 
 		for (Folder ancestorFolder : ancestorFolders) {
-			portletURL.setParameter(
-				"repositoryId", String.valueOf(repositoryId));
 			portletURL.setParameter(
 				"folderId", String.valueOf(ancestorFolder.getFolderId()));
 
@@ -85,15 +100,8 @@ public class IGUtil {
 				portletURL.toString());
 		}
 
-		portletURL.setParameter("repositoryId", String.valueOf(repositoryId));
-
-		long folderId = DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
-
-		if (folder != null) {
-			folderId = folder.getFolderId();
-		}
-
-		portletURL.setParameter("folderId", String.valueOf(folderId));
+		portletURL.setParameter(
+			"folderId", String.valueOf(folder.getFolderId()));
 
 		PortalUtil.addPortletBreadcrumbEntry(
 			httpServletRequest, folder.getName(), portletURL.toString());
@@ -111,20 +119,6 @@ public class IGUtil {
 		addPortletBreadcrumbEntries(
 			DLAppLocalServiceUtil.getFolder(folderId), httpServletRequest,
 			renderResponse);
-	}
-
-	protected static long getRepositoryId(
-			Folder folder, HttpServletRequest httpServletRequest)
-		throws Exception {
-
-		PortletPreferences portletPreferences =
-			PortletPreferencesFactoryUtil.getPortletPreferences(
-				httpServletRequest,
-				PortalUtil.getPortletId(httpServletRequest));
-
-		return GetterUtil.getLong(
-			portletPreferences.getValue(
-				"repositoryId", String.valueOf(folder.getRepositoryId())));
 	}
 
 	protected static long getRootFolderId(HttpServletRequest httpServletRequest)

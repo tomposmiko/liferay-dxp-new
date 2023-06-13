@@ -25,7 +25,6 @@ import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetService;
 import com.liferay.dynamic.data.lists.web.internal.configuration.DDLWebConfigurationKeys;
 import com.liferay.dynamic.data.lists.web.internal.configuration.DDLWebConfigurationUtil;
-import com.liferay.dynamic.data.lists.web.internal.template.helper.DDLDisplayTemplateHelper;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
@@ -34,7 +33,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.template.BaseDDMTemplateHandler;
 import com.liferay.dynamic.data.mapping.template.DDMTemplateVariableCodeHandler;
 import com.liferay.portal.kernel.configuration.Filter;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableCodeHandler;
@@ -57,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY,
 	service = TemplateHandler.class
 )
@@ -82,7 +82,7 @@ public class DDLDisplayTemplateHandler extends BaseDDMTemplateHandler {
 			ResourceBundleUtil.getBundle(
 				"content.Language", locale, getClass()));
 
-		return _language.format(locale, "x-template", portletTitle, false);
+		return LanguageUtil.format(locale, "x-template", portletTitle, false);
 	}
 
 	@Override
@@ -111,9 +111,9 @@ public class DDLDisplayTemplateHandler extends BaseDDMTemplateHandler {
 
 		addTemplateVariableGroup(
 			templateVariableGroups,
-			_getDDLUtilVariablesTemplateVariableGroups());
+			getDDLUtilVariablesTemplateVariableGroups());
 		addTemplateVariableGroup(
-			templateVariableGroups, _getDDLVariablesTemplateVariableGroups());
+			templateVariableGroups, getDDLVariablesTemplateVariableGroups());
 		addTemplateVariableGroup(
 			templateVariableGroups, getGeneralVariablesTemplateVariableGroup());
 
@@ -148,17 +148,9 @@ public class DDLDisplayTemplateHandler extends BaseDDMTemplateHandler {
 		return templateVariableGroups;
 	}
 
-	@Override
-	protected Class<?> getFieldVariableClass() {
-		return DDMFormFieldValue.class;
-	}
+	protected TemplateVariableGroup
+		getDDLUtilVariablesTemplateVariableGroups() {
 
-	@Override
-	protected TemplateVariableCodeHandler getTemplateVariableCodeHandler() {
-		return _templateVariableCodeHandler;
-	}
-
-	private TemplateVariableGroup _getDDLUtilVariablesTemplateVariableGroups() {
 		TemplateVariableGroup ddlUtilTemplateVariableGroup =
 			new TemplateVariableGroup("data-list-util");
 
@@ -169,7 +161,7 @@ public class DDLDisplayTemplateHandler extends BaseDDMTemplateHandler {
 		return ddlUtilTemplateVariableGroup;
 	}
 
-	private TemplateVariableGroup _getDDLVariablesTemplateVariableGroups() {
+	protected TemplateVariableGroup getDDLVariablesTemplateVariableGroups() {
 		TemplateVariableGroup templateVariableGroup = new TemplateVariableGroup(
 			"data-list-variables");
 
@@ -192,11 +184,18 @@ public class DDLDisplayTemplateHandler extends BaseDDMTemplateHandler {
 		return templateVariableGroup;
 	}
 
-	@Reference
-	private DLURLHelper _dlURLHelper;
+	@Override
+	protected Class<?> getFieldVariableClass() {
+		return DDMFormFieldValue.class;
+	}
+
+	@Override
+	protected TemplateVariableCodeHandler getTemplateVariableCodeHandler() {
+		return _templateVariableCodeHandler;
+	}
 
 	@Reference
-	private Language _language;
+	private DLURLHelper _dlURLHelper;
 
 	@Reference
 	private Portal _portal;
@@ -211,6 +210,7 @@ public class DDLDisplayTemplateHandler extends BaseDDMTemplateHandler {
 			DDLDisplayTemplateHandler.class.getClassLoader(),
 			"com/liferay/dynamic/data/lists/web/internal/template" +
 				"/dependencies/",
-			SetUtil.fromArray("document-library", "html", "link-to-page"));
+			SetUtil.fromArray(
+				new String[] {"document-library", "html", "link-to-page"}));
 
 }

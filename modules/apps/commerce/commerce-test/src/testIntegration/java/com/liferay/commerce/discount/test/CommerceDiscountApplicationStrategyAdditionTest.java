@@ -16,6 +16,7 @@ package com.liferay.commerce.discount.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.commerce.discount.application.strategy.CommerceDiscountApplicationStrategy;
+import com.liferay.commerce.pricing.constants.CommercePricingConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -89,7 +90,7 @@ public class CommerceDiscountApplicationStrategyAdditionTest {
 	private static final BigDecimal _ONE_HUNDRED = BigDecimal.valueOf(100);
 
 	@Inject(
-		filter = "component.name=com.liferay.commerce.discount.internal.application.strategy.AdditionCommerceDiscountApplicationStrategyImpl"
+		filter = "commerce.discount.application.strategy.key=" + CommercePricingConstants.DISCOUNT_ADDITION_METHOD
 	)
 	private CommerceDiscountApplicationStrategy
 		_commerceDiscountApplicationStrategy;

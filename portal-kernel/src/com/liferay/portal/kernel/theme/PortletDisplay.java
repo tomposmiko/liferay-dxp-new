@@ -19,7 +19,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIconMenu;
@@ -27,7 +26,7 @@ import com.liferay.portal.kernel.portlet.toolbar.PortletToolbar;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -313,10 +312,6 @@ public class PortletDisplay implements Cloneable, Serializable {
 		return _urlBack;
 	}
 
-	public String getURLBackTitle() {
-		return _urlBackTitle;
-	}
-
 	public String getURLClose() {
 		return _urlClose;
 	}
@@ -487,15 +482,7 @@ public class PortletDisplay implements Cloneable, Serializable {
 
 		Layout layout = _themeDisplay.getLayout();
 
-		LayoutTypePortlet layoutTypePortlet =
-			_themeDisplay.getLayoutTypePortlet();
-
-		HttpServletRequest httpServletRequest = _themeDisplay.getRequest();
-
-		String ppid = ParamUtil.getString(httpServletRequest, "p_p_id");
-
-		if ((!layoutTypePortlet.hasStateMax() || Validator.isNull(ppid)) &&
-			Validator.isNull(portletSetupPortletDecoratorId) &&
+		if (Validator.isNull(portletSetupPortletDecoratorId) &&
 			(layout.isTypeAssetDisplay() || layout.isTypeContent())) {
 
 			return false;
@@ -856,16 +843,12 @@ public class PortletDisplay implements Cloneable, Serializable {
 			_urlBack = StringPool.BLANK;
 		}
 		else if (_urlBack.length() > Http.URL_MAXIMUM_LENGTH) {
-			_urlBack = HttpComponentsUtil.shortenURL(_urlBack);
+			_urlBack = HttpUtil.shortenURL(_urlBack);
 
 			if (_urlBack.length() > Http.URL_MAXIMUM_LENGTH) {
 				_urlBack = StringPool.BLANK;
 			}
 		}
-	}
-
-	public void setURLBackTitle(String urlBackTitle) {
-		_urlBackTitle = urlBackTitle;
 	}
 
 	public void setURLClose(String urlClose) {
@@ -993,7 +976,6 @@ public class PortletDisplay implements Cloneable, Serializable {
 	private ThemeDisplay _themeDisplay;
 	private String _title = StringPool.BLANK;
 	private String _urlBack = StringPool.BLANK;
-	private String _urlBackTitle = StringPool.BLANK;
 	private String _urlClose = StringPool.BLANK;
 	private String _urlConfiguration = StringPool.BLANK;
 	private String _urlConfigurationJS = StringPool.BLANK;

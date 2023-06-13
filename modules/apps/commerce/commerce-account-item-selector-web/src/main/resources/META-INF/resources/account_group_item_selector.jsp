@@ -19,31 +19,62 @@
 <%
 CommerceAccountGroupItemSelectorViewDisplayContext commerceAccountGroupItemSelectorViewDisplayContext = (CommerceAccountGroupItemSelectorViewDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
-SearchContainer<AccountGroup> commerceAccountGroupSearchContainer = commerceAccountGroupItemSelectorViewDisplayContext.getSearchContainer();
+SearchContainer<CommerceAccountGroup> commerceAccountGroupSearchContainer = commerceAccountGroupItemSelectorViewDisplayContext.getSearchContainer();
+PortletURL portletURL = commerceAccountGroupItemSelectorViewDisplayContext.getPortletURL();
 %>
 
-<clay:management-toolbar
-	managementToolbarDisplayContext="<%= new CommerceAccountGroupItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, commerceAccountGroupSearchContainer) %>"
-/>
+<liferay-frontend:management-bar
+	includeCheckBox="<%= true %>"
+	searchContainerId="commerceAccountGroups"
+>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= portletURL %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= commerceAccountGroupItemSelectorViewDisplayContext.getOrderByCol() %>"
+			orderByType="<%= commerceAccountGroupItemSelectorViewDisplayContext.getOrderByType() %>"
+			orderColumns="<%= new String[0] %>"
+			portletURL="<%= portletURL %>"
+		/>
+
+		<li>
+			<liferay-commerce:search-input
+				actionURL="<%= portletURL %>"
+				formName="searchFm"
+			/>
+		</li>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />commerceAccountGroupSelectorWrapper">
 	<liferay-ui:search-container
-		id="accountGroups"
+		id="commerceAccountGroups"
 		searchContainer="<%= commerceAccountGroupSearchContainer %>"
 	>
 		<liferay-ui:search-container-row
-			className="com.liferay.account.model.AccountGroup"
+			className="com.liferay.commerce.account.model.CommerceAccountGroup"
 			cssClass="commerce-account-row"
-			keyProperty="accountGroupId"
-			modelVar="accountGroup"
+			keyProperty="commerceAccountGroupId"
+			modelVar="commerceAccountGroup"
 		>
 
 			<%
 			row.setData(
 				HashMapBuilder.<String, Object>put(
-					"commerce-account-group-id", accountGroup.getAccountGroupId()
+					"commerce-account-group-id", commerceAccountGroup.getCommerceAccountGroupId()
 				).put(
-					"name", accountGroup.getName()
+					"name", commerceAccountGroup.getName()
 				).build());
 			%>
 

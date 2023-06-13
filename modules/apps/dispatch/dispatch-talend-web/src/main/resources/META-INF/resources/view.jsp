@@ -17,11 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-String backURL = ParamUtil.getString(request, "backURL", redirect);
-
 DispatchTrigger dispatchTrigger = (DispatchTrigger)request.getAttribute(DispatchWebKeys.DISPATCH_TRIGGER);
+String fileEntryName = (String)request.getAttribute(DispatchWebKeys.FILE_ENTRY_NAME);
 %>
 
 <liferay-portlet:actionURL name="/dispatch_talend/edit_dispatch_talend_job_archive" portletName="<%= DispatchPortletKeys.DISPATCH %>" var="editDispatchTalendJobArchiveActionURL" />
@@ -38,14 +35,8 @@ DispatchTrigger dispatchTrigger = (DispatchTrigger)request.getAttribute(Dispatch
 				<liferay-ui:message key="the-file-must-be-a-valid-talend-job-archive" />
 			</liferay-ui:error>
 
-			<%
-			TalendDispatchDisplayContext talendDispatchDisplayContext = (TalendDispatchDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-
-			String talendArchiveFileName = talendDispatchDisplayContext.getTalendArchiveFileName();
-			%>
-
-			<p class="<%= Objects.equals(talendArchiveFileName, StringPool.BLANK) ? "hide" : StringPool.BLANK %> text-default" id="<portlet:namespace />talendArchiveFileName">
-				<span id="<portlet:namespace />removeIconId">
+			<p class="<%= Objects.equals(fileEntryName, StringPool.BLANK) ? "hide" : StringPool.BLANK %> text-default" id="<portlet:namespace />fileEntryName">
+				<span id="<portlet:namespace />fileEntryRemove">
 					<liferay-ui:icon
 						icon="times"
 						markupView="lexicon"
@@ -53,12 +44,12 @@ DispatchTrigger dispatchTrigger = (DispatchTrigger)request.getAttribute(Dispatch
 					/>
 				</span>
 				<span>
-					<%= talendArchiveFileName %>
+					<%= fileEntryName %>
 				</span>
 			</p>
 
 			<c:if test="<%= (dispatchTrigger == null) || !dispatchTrigger.isSystem() %>">
-				<div class="<%= Objects.equals(talendArchiveFileName, StringPool.BLANK) ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />talendArchiveFile">
+				<div class="<%= Objects.equals(fileEntryName, StringPool.BLANK) ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />fileEntry">
 					<aui:input label="upload-your-talend-job-file" name="jobArchive" required="<%= true %>" type="file" />
 				</div>
 			</c:if>
@@ -66,7 +57,7 @@ DispatchTrigger dispatchTrigger = (DispatchTrigger)request.getAttribute(Dispatch
 			<div class="sheet-footer">
 				<aui:button type="submit" value="save" />
 
-				<aui:button href="<%= backURL %>" type="cancel" value="back" />
+				<aui:button href="<%= currentURL %>" type="cancel" />
 			<div>
 		</aui:form>
 	</div>
@@ -74,12 +65,12 @@ DispatchTrigger dispatchTrigger = (DispatchTrigger)request.getAttribute(Dispatch
 
 <aui:script>
 	AUI().ready((A) => {
-		A.one('#<portlet:namespace />removeIconId').on('click', (event) => {
+		A.one('#<portlet:namespace />fileEntryRemove').on('click', (event) => {
 			event.preventDefault();
 
-			A.one('#<portlet:namespace />talendArchiveFile').removeClass('hide');
+			A.one('#<portlet:namespace />fileEntry').removeClass('hide');
 
-			A.one('#<portlet:namespace />talendArchiveFileName').addClass('hide');
+			A.one('#<portlet:namespace />fileEntryName').addClass('hide');
 		});
 	});
 </aui:script>

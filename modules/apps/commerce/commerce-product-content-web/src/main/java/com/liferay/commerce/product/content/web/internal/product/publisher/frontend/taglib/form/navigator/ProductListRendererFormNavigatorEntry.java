@@ -17,7 +17,7 @@ package com.liferay.commerce.product.content.web.internal.product.publisher.fron
 import com.liferay.commerce.product.content.web.internal.constants.CPPublisherConstants;
 import com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "form.navigator.entry.order:Integer=650",
+	enabled = false, property = "form.navigator.entry.order:Integer=650",
 	service = FormNavigatorEntry.class
 )
 public class ProductListRendererFormNavigatorEntry
@@ -66,17 +66,21 @@ public class ProductListRendererFormNavigatorEntry
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, getKey());
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+		return LanguageUtil.get(resourceBundle, getKey());
 	}
 
 	@Override
 	public boolean isVisible(User user, Void object) {
 		return _isSelectionStyleCustomRenderer();
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
@@ -105,13 +109,5 @@ public class ProductListRendererFormNavigatorEntry
 
 		return false;
 	}
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.commerce.product.content.web)"
-	)
-	private ServletContext _servletContext;
 
 }

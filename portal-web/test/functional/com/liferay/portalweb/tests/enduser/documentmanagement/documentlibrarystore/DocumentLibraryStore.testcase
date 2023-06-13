@@ -1,7 +1,6 @@
 @component-name = "portal-document-library-store"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property test.assert.warning.exceptions = "true";
@@ -11,36 +10,85 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
-
-		HeadlessSite.addSite(siteName = "Test Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+			User.firstLoginPG();
 
-			User.logoutPG();
+			DMDocument.tearDownCP();
+
+			DMFolder.tearDownCP();
+
+			DMDocumentType.tearDownCP();
+
+			DMMetadataSet.tearDownCP();
+
+			Page.tearDownPG();
+
+			JSONUser.tearDownNonAdminUsers();
+
+			Site.tearDownCP();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test AdvancedFileSystemStoreSmoke {
 		property custom.properties = "dl.store.impl=com.liferay.portal.store.file.system.AdvancedFileSystemStore";
 		property osgi.module.configuration.file.names = "com.liferay.portal.store.file.system.configuration.AdvancedFileSystemStoreConfiguration.config";
-		property osgi.module.configurations = "rootDir=\"data/document_library1\"";
+		property osgi.module.configurations = "rootDir=&quot;data/document_library1&quot;";
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_1.jpg");
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Recycle Bin",
+			portlet = "Recycle Bin");
+
+		RecycleBin.emptyCP();
+	}
+
+	@priority = "5"
+	test AWSS3StoreSmoke {
+		property aws.store.enabled = "true";
+		property test.name.skip.portal.instance = "DocumentLibraryStore#AWSS3StoreSmoke";
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		var bucketID = PropsUtil.get("aws.bucket.id");
+		var companyId = JSONCompany.getCompanyId();
+		var groupId = JSONGroupAPI._getGroupIdByName(groupName = "Test Site Name", site = "true");
+
+		AntCommand(
+			locator1 = "build-test-aws-s3.xml",
+			value1 = "assert-no-document-in-bucket -Daws.bucket.id=${bucketID} -DcompanyId=${companyId} -DgroupId=${groupId}");
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
 			groupName = "Test Site Name",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_1.jpg");
+			mimeType = "text/plain",
+			sourceFileName = "Document_1.txt");
+
+		AntCommand(
+			locator1 = "build-test-aws-s3.xml",
+			value1 = "assert-document-in-bucket -Daws.bucket.id=${bucketID} -DcompanyId=${companyId} -DgroupId=${groupId}");
 
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
 
@@ -48,10 +96,18 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "test-site-name");
 
+		ProductMenu.gotoPortlet(
+			category = "Recycle Bin",
+			portlet = "Recycle Bin");
+
 		RecycleBin.emptyCP();
+
+		AntCommand(
+			locator1 = "build-test-aws-s3.xml",
+			value1 = "assert-no-document-in-bucket -Daws.bucket.id=${bucketID} -DcompanyId=${companyId} -DgroupId=${groupId}");
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test DBStoreSmoke {
 		property custom.properties = "dl.store.impl=com.liferay.portal.store.db.DBStore";
@@ -63,70 +119,48 @@ definition {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			groupName = "Test Site Name",
+			groupName = "Guest",
 			mimeType = "image/jpeg",
 			sourceFileName = "Document_1.jpg");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
 
-		RecycleBin.openRecycleBinAdmin(siteURLKey = "test-site-name");
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Recycle Bin",
+			portlet = "Recycle Bin");
 
 		RecycleBin.emptyCP();
 	}
 
-	@priority = 5
+	@priority = "5"
 	@refactorneeded
 	test FileSystemStoreSmoke {
 		property custom.properties = "dl.store.impl=com.liferay.portal.store.file.system.FileSystemStore";
 		property osgi.module.configuration.file.names = "com.liferay.portal.store.file.system.configuration.FileSystemStoreConfiguration.config";
-		property osgi.module.configurations = "rootDir=\"data/document_library1\"";
+		property osgi.module.configurations = "rootDir=&quot;data/document_library1&quot;";
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
-			groupName = "Test Site Name",
+			groupName = "Guest",
 			mimeType = "image/jpeg",
 			sourceFileName = "Document_1.jpg");
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.deleteCP(dmDocumentTitle = "DM Document Title");
 
-		RecycleBin.openRecycleBinAdmin(siteURLKey = "test-site-name");
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Recycle Bin",
+			portlet = "Recycle Bin");
 
 		RecycleBin.emptyCP();
-	}
-
-	@priority = 3
-	@refactorneeded
-	test ImportDocumentWithDBStore {
-		property custom.properties = "dl.store.impl=com.liferay.portal.store.db.DBStore";
-		property test.assert.warning.exceptions = "false";
-
-		HeadlessSite.addSite(siteName = "Test Site Name 1");
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "DM Document Title",
-			groupName = "Test Site Name",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_1.jpg");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
-
-		LAR.exportPortlet(larFileName = "DM_Test_DB_Store.lar");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name-1");
-
-		LAR.importPortlet(larFileName = "DM_Test_DB_Store.lar");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name-1");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
-
-		DMDocument.viewCP(dmDocumentTitle = "DM Document Title");
 	}
 
 }

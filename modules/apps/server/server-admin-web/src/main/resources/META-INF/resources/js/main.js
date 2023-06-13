@@ -15,19 +15,19 @@
 AUI.add(
 	'liferay-admin',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const MAP_DATA_PARAMS = {
+		var MAP_DATA_PARAMS = {
 			classname: 'className',
 		};
 
-		const STR_CLICK = 'click';
+		var STR_CLICK = 'click';
 
-		const STR_FORM = 'form';
+		var STR_FORM = 'form';
 
-		const STR_URL = 'url';
+		var STR_URL = 'url';
 
-		const Admin = A.Component.create({
+		var Admin = A.Component.create({
 			ATTRS: {
 				form: {
 					setter: A.one,
@@ -57,15 +57,14 @@ AUI.add(
 
 			prototype: {
 				_addInputsFromData(data) {
-					const instance = this;
+					var instance = this;
 
-					const form = instance.get(STR_FORM);
+					var form = instance.get(STR_FORM);
 
-					// eslint-disable-next-line @liferay/aui/no-object
-					const inputsArray = A.Object.map(data, (value, key) => {
+					var inputsArray = A.Object.map(data, (value, key) => {
 						key = MAP_DATA_PARAMS[key] || key;
 
-						const nsKey = instance.ns(key);
+						var nsKey = instance.ns(key);
 
 						return (
 							'<input id="' +
@@ -81,13 +80,47 @@ AUI.add(
 					form.append(inputsArray.join(''));
 				},
 
+				_installXuggler() {
+					var instance = this;
+
+					var form = instance.get(STR_FORM);
+
+					var data = A.IO.stringify(form.getDOM());
+
+					data = A.QueryString.parse(data);
+
+					var redirectKey = instance.ns('redirect');
+
+					var url = Liferay.Util.addParams(
+						'p_p_isolated=1',
+						instance.get(STR_URL)
+					);
+
+					data[redirectKey] = Liferay.Util.addParams(
+						'p_p_isolated=1',
+						data[redirectKey]
+					);
+
+					A.one('#adminXugglerPanelContent').load(url, {
+						data,
+						loadingMask: {
+							'strings.loading': Liferay.Language.get(
+								'xuggler-library-is-installing'
+							),
+						},
+						selector: '#adminXugglerPanelContent',
+						where: 'outer',
+					});
+				},
+
 				_onSubmit(event) {
-					const instance = this;
+					var instance = this;
 
-					const data = event.currentTarget.getData();
-					const form = instance.get(STR_FORM);
+					var data = event.currentTarget.getData();
+					var form = instance.get(STR_FORM);
 
-					const redirect = instance.one('#redirect', form);
+					var cmd = data.cmd;
+					var redirect = instance.one('#redirect', form);
 
 					if (redirect) {
 						redirect.val(instance.get('redirectURL'));
@@ -95,11 +128,24 @@ AUI.add(
 
 					instance._addInputsFromData(data);
 
-					submitForm(form, instance.get(STR_URL));
+					if (cmd === 'installXuggler') {
+						var cmdNode = instance.one('#cmd');
+
+						instance._installXuggler();
+
+						if (cmdNode) {
+							cmdNode.remove();
+						}
+
+						instance._installXuggler();
+					}
+					else {
+						submitForm(form, instance.get(STR_URL));
+					}
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles.push(
 						instance
@@ -113,7 +159,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					A.Array.invoke(instance._eventHandles, 'detach');
 
@@ -123,7 +169,7 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
 					instance._eventHandles = [];
 

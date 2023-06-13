@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.lists.model.DDLRecordTable;
 import com.liferay.dynamic.data.lists.model.impl.DDLRecordImpl;
 import com.liferay.dynamic.data.lists.model.impl.DDLRecordModelImpl;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordPersistence;
-import com.liferay.dynamic.data.lists.service.persistence.DDLRecordUtil;
 import com.liferay.dynamic.data.lists.service.persistence.impl.constants.DDLPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DDLRecordPersistence.class)
+@Component(service = {DDLRecordPersistence.class, BasePersistence.class})
 public class DDLRecordPersistenceImpl
 	extends BasePersistenceImpl<DDLRecord> implements DDLRecordPersistence {
 
@@ -202,7 +201,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDLRecord ddlRecord : list) {
@@ -591,7 +590,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -727,7 +726,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof DDLRecord) {
@@ -847,7 +846,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1019,7 +1018,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDLRecord ddlRecord : list) {
@@ -1440,7 +1439,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1603,7 +1602,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDLRecord ddlRecord : list) {
@@ -1970,7 +1969,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2115,7 +2114,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDLRecord ddlRecord : list) {
@@ -2482,7 +2481,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {recordSetId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2631,7 +2630,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDLRecord ddlRecord : list) {
@@ -3028,7 +3027,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {recordSetId, userId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3189,7 +3188,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDLRecord ddlRecord : list) {
@@ -3614,7 +3613,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {recordSetId, recordSetVersion};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3786,7 +3785,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DDLRecord ddlRecord : list) {
@@ -4209,7 +4208,7 @@ public class DDLRecordPersistenceImpl
 
 			finderArgs = new Object[] {className, classPK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4404,7 +4403,7 @@ public class DDLRecordPersistenceImpl
 		ddlRecord.setNew(true);
 		ddlRecord.setPrimaryKey(recordId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		ddlRecord.setUuid(uuid);
 
@@ -4521,7 +4520,7 @@ public class DDLRecordPersistenceImpl
 		DDLRecordModelImpl ddlRecordModelImpl = (DDLRecordModelImpl)ddlRecord;
 
 		if (Validator.isNull(ddlRecord.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			ddlRecord.setUuid(uuid);
 		}
@@ -4644,7 +4643,7 @@ public class DDLRecordPersistenceImpl
 	 */
 	@Override
 	public DDLRecord fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(DDLRecord.class, primaryKey)) {
+		if (ctPersistenceHelper.isProductionMode(DDLRecord.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -4859,7 +4858,7 @@ public class DDLRecordPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<DDLRecord>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4935,7 +4934,7 @@ public class DDLRecordPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -5216,30 +5215,11 @@ public class DDLRecordPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"className", "classPK"}, false);
-
-		_setDDLRecordUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setDDLRecordUtilPersistence(null);
-
 		entityCache.removeCache(DDLRecordImpl.class.getName());
-	}
-
-	private void _setDDLRecordUtilPersistence(
-		DDLRecordPersistence ddlRecordPersistence) {
-
-		try {
-			Field field = DDLRecordUtil.class.getDeclaredField("_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, ddlRecordPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -5309,6 +5289,6 @@ public class DDLRecordPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private DDLRecordModelArgumentsResolver _ddlRecordModelArgumentsResolver;
 
 }

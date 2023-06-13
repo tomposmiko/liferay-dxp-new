@@ -20,13 +20,13 @@ import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetCategoryServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
-import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -53,28 +53,44 @@ import javax.servlet.http.HttpServletRequest;
 public class SelectAssetCategoryInfoItemDisplayContext {
 
 	public SelectAssetCategoryInfoItemDisplayContext(
-		HttpServletRequest httpServletRequest,
-		InfoItemItemSelectorCriterion infoItemItemSelectorCriterion,
-		String itemSelectedEventName, RenderResponse renderResponse) {
+		HttpServletRequest httpServletRequest, String itemSelectedEventName,
+		RenderResponse renderResponse) {
 
 		_httpServletRequest = httpServletRequest;
-		_infoItemItemSelectorCriterion = infoItemItemSelectorCriterion;
 		_itemSelectedEventName = itemSelectedEventName;
 		_renderResponse = renderResponse;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+	}
+
+	public JSONArray getCategoriesJSONArray() throws Exception {
+		return JSONUtil.put(
+			JSONUtil.put(
+				"children", _getVocabulariesJSONArray()
+			).put(
+				"disabled", true
+			).put(
+				"expanded", true
+			).put(
+				"icon", "folder"
+			).put(
+				"id", "0"
+			).put(
+				"name",
+				LanguageUtil.get(_themeDisplay.getLocale(), "vocabularies")
+			).put(
+				"vocabulary", true
+			));
 	}
 
 	public Map<String, Object> getData() throws Exception {
 		return HashMapBuilder.<String, Object>put(
 			"itemSelectedEventName", _itemSelectedEventName
 		).put(
-			"multiSelection", _infoItemItemSelectorCriterion.isMultiSelection()
-		).put(
 			"namespace", _renderResponse.getNamespace()
 		).put(
-			"nodes", _getVocabulariesJSONArray()
+			"nodes", getCategoriesJSONArray()
 		).build();
 	}
 
@@ -149,34 +165,31 @@ public class SelectAssetCategoryInfoItemDisplayContext {
 				null);
 
 		for (AssetCategory category : categories) {
-			jsonArray.put(
-				JSONUtil.put(
-					"children",
-					() -> {
-						JSONArray childrenJSONArray = _getCategoriesJSONArray(
-							vocabularyId, category.getCategoryId());
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-						if (childrenJSONArray.length() > 0) {
-							return childrenJSONArray;
-						}
+			JSONArray childrenJSONArray = _getCategoriesJSONArray(
+				vocabularyId, category.getCategoryId());
 
-						return null;
-					}
-				).put(
-					"className", AssetCategory.class.getName()
-				).put(
-					"classNameId",
-					PortalUtil.getClassNameId(AssetCategory.class.getName())
-				).put(
-					"icon", "categories"
-				).put(
-					"id", category.getCategoryId()
-				).put(
-					"name", category.getTitle(_themeDisplay.getLocale())
-				).put(
-					"nodePath",
-					category.getPath(_themeDisplay.getLocale(), true)
-				));
+			if (childrenJSONArray.length() > 0) {
+				jsonObject.put("children", childrenJSONArray);
+			}
+
+			jsonObject.put(
+				"className", AssetCategory.class.getName()
+			).put(
+				"classNameId",
+				PortalUtil.getClassNameId(AssetCategory.class.getName())
+			).put(
+				"icon", "categories"
+			).put(
+				"id", category.getCategoryId()
+			).put(
+				"name", category.getTitle(_themeDisplay.getLocale())
+			).put(
+				"nodePath", category.getPath(_themeDisplay.getLocale(), true)
+			);
+
+			jsonArray.put(jsonObject);
 		}
 
 		return jsonArray;
@@ -206,7 +219,6 @@ public class SelectAssetCategoryInfoItemDisplayContext {
 	}
 
 	private final HttpServletRequest _httpServletRequest;
-	private final InfoItemItemSelectorCriterion _infoItemItemSelectorCriterion;
 	private final String _itemSelectedEventName;
 	private final RenderResponse _renderResponse;
 	private final ThemeDisplay _themeDisplay;

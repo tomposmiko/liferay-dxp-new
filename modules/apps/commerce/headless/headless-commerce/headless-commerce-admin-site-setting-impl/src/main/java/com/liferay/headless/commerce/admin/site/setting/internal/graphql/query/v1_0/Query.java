@@ -126,90 +126,29 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {measurementUnits(filter: ___, page: ___, pageSize: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {commerceAdminSettingGroupMeasurementUnit(groupId: ___, page: ___, pageSize: ___, type: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
-	public MeasurementUnitPage measurementUnits(
-			@GraphQLName("filter") String filterString,
+	public MeasurementUnitPage commerceAdminSettingGroupMeasurementUnit(
+			@GraphQLName("groupId") Long groupId,
+			@GraphQLName("type") Integer type,
 			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page,
-			@GraphQLName("sort") String sortsString)
+			@GraphQLName("page") int page)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
 			_measurementUnitResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			measurementUnitResource -> new MeasurementUnitPage(
-				measurementUnitResource.getMeasurementUnitsPage(
-					_filterBiFunction.apply(
-						measurementUnitResource, filterString),
-					Pagination.of(page, pageSize),
-					_sortsBiFunction.apply(
-						measurementUnitResource, sortsString))));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {measurementUnitByExternalReferenceCode(externalReferenceCode: ___){companyId, externalReferenceCode, id, key, name, primary, priority, rate, type}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public MeasurementUnit measurementUnitByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_measurementUnitResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			measurementUnitResource ->
 				measurementUnitResource.
-					getMeasurementUnitByExternalReferenceCode(
-						externalReferenceCode));
+					getCommerceAdminSiteSettingGroupMeasurementUnitPage(
+						groupId, type, Pagination.of(page, pageSize))));
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {measurementUnitByKey(key: ___){companyId, externalReferenceCode, id, key, name, primary, priority, rate, type}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public MeasurementUnit measurementUnitByKey(@GraphQLName("key") String key)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_measurementUnitResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			measurementUnitResource ->
-				measurementUnitResource.getMeasurementUnitByKey(key));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {measurementUnitsByType(measurementUnitType: ___, page: ___, pageSize: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public MeasurementUnitPage measurementUnitsByType(
-			@GraphQLName("measurementUnitType") String measurementUnitType,
-			@GraphQLName("pageSize") int pageSize,
-			@GraphQLName("page") int page,
-			@GraphQLName("sort") String sortsString)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_measurementUnitResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			measurementUnitResource -> new MeasurementUnitPage(
-				measurementUnitResource.getMeasurementUnitsByType(
-					measurementUnitType, Pagination.of(page, pageSize),
-					_sortsBiFunction.apply(
-						measurementUnitResource, sortsString))));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {measurementUnit(id: ___){companyId, externalReferenceCode, id, key, name, primary, priority, rate, type}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {measurementUnit(id: ___){groupId, id, key, name, primary, priority, rate, type}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public MeasurementUnit measurementUnit(@GraphQLName("id") Long id)
@@ -306,7 +245,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<AvailabilityEstimate> items;
@@ -339,7 +278,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<MeasurementUnit> items;
@@ -372,7 +311,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<TaxCategory> items;
@@ -405,7 +344,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Warehouse> items;

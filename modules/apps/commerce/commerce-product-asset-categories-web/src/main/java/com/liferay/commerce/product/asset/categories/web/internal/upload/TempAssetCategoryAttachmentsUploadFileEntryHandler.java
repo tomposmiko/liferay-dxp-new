@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.asset.categories.web.internal.upload;
 
+import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryService;
 import com.liferay.commerce.product.configuration.AttachmentsConfiguration;
 import com.liferay.commerce.product.exception.CPAttachmentFileEntryNameException;
@@ -26,7 +27,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.File;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.upload.UniqueFileNameProvider;
@@ -39,6 +41,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -46,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.product.configuration.AttachmentsConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
 	service = TempAssetCategoryAttachmentsUploadFileEntryHandler.class
 )
 public class TempAssetCategoryAttachmentsUploadFileEntryHandler
@@ -59,6 +63,11 @@ public class TempAssetCategoryAttachmentsUploadFileEntryHandler
 			(ThemeDisplay)uploadPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		long categoryId = ParamUtil.getLong(uploadPortletRequest, "categoryId");
+
+		AssetCategory assetCategory = assetCategoryService.fetchCategory(
+			categoryId);
+
 		String fileName = uploadPortletRequest.getFileName(_PARAMETER_NAME);
 
 		_validateFile(fileName, uploadPortletRequest.getSize(_PARAMETER_NAME));
@@ -69,8 +78,9 @@ public class TempAssetCategoryAttachmentsUploadFileEntryHandler
 		try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
 				_PARAMETER_NAME)) {
 
-			return _addFileEntry(
-				fileName, contentType, inputStream, themeDisplay);
+			return addFileEntry(
+				assetCategory.getCategoryId(), fileName, contentType,
+				inputStream, themeDisplay);
 		}
 	}
 
@@ -80,12 +90,9 @@ public class TempAssetCategoryAttachmentsUploadFileEntryHandler
 			AttachmentsConfiguration.class, properties);
 	}
 
-	@Reference
-	protected AssetCategoryService assetCategoryService;
-
-	private FileEntry _addFileEntry(
-			String fileName, String contentType, InputStream inputStream,
-			ThemeDisplay themeDisplay)
+	protected FileEntry addFileEntry(
+			long categoryId, String fileName, String contentType,
+			InputStream inputStream, ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		String uniqueFileName = _uniqueFileNameProvider.provide(
@@ -95,6 +102,9 @@ public class TempAssetCategoryAttachmentsUploadFileEntryHandler
 			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
 			_TEMP_FOLDER_NAME, uniqueFileName, inputStream, contentType);
 	}
+
+	@Reference
+	protected AssetCategoryService assetCategoryService;
 
 	private boolean _exists(ThemeDisplay themeDisplay, String curFileName) {
 		try {
@@ -110,7 +120,7 @@ public class TempAssetCategoryAttachmentsUploadFileEntryHandler
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;
@@ -126,7 +136,7 @@ public class TempAssetCategoryAttachmentsUploadFileEntryHandler
 			throw new CPAttachmentFileEntrySizeException();
 		}
 
-		String extension = _file.getExtension(fileName);
+		String extension = FileUtil.getExtension(fileName);
 
 		String[] imageExtensions = _attachmentsConfiguration.imageExtensions();
 
@@ -151,9 +161,6 @@ public class TempAssetCategoryAttachmentsUploadFileEntryHandler
 		TempAssetCategoryAttachmentsUploadFileEntryHandler.class);
 
 	private volatile AttachmentsConfiguration _attachmentsConfiguration;
-
-	@Reference
-	private File _file;
 
 	@Reference
 	private UniqueFileNameProvider _uniqueFileNameProvider;

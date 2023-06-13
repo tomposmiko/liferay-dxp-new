@@ -21,6 +21,8 @@ public interface DestinationNames {
 
 	public static final String ASYNC_SERVICE = "liferay/async_service";
 
+	public static final String AUDIT = "liferay/audit";
+
 	public static final String BACKGROUND_TASK = "liferay/background_task";
 
 	public static final String BACKGROUND_TASK_STATUS =
@@ -99,18 +101,34 @@ public interface DestinationNames {
 	public static final String MESSAGE_BOARDS_MAILING_LIST =
 		"liferay/message_boards_mailing_list";
 
+	public static final String MESSAGE_BUS_DEFAULT_RESPONSE =
+		"liferay/message_bus/default_response";
+
+	public static final String MESSAGE_BUS_MESSAGE_STATUS =
+		"liferay/message_bus/message_status";
+
 	public static final String MONITORING = "liferay/monitoring";
 
-	public static final String OBJECT_ENTRY_ATTACHMENT_DOWNLOAD =
-		"liferay/object_entry_attachment_download";
+	public static final String POLLER = "liferay/poller";
+
+	public static final String POLLER_COMET_RESPONSE =
+		"liferay/poller_comet_response";
+
+	public static final String POLLER_RESPONSE = "liferay/poller_response";
 
 	public static final String SCHEDULER_DISPATCH =
 		"liferay/scheduler_dispatch";
+
+	public static final String SCHEDULER_ENGINE = "liferay/scheduler_engine";
 
 	public static final String SCHEDULER_SCRIPTING =
 		"liferay/scheduler_scripting";
 
 	public static final String SCRIPTING = "liferay/scripting";
+
+	public static final String SEARCH_READER = "liferay/search_reader";
+
+	public static final String SEARCH_WRITER = "liferay/search_writer";
 
 	public static final String SUBSCRIPTION_CLEAN_UP =
 		"liferay/subscription_clean_up";
@@ -119,5 +137,19 @@ public interface DestinationNames {
 		"liferay/subscription_sender";
 
 	public static final String TEST_TRANSACTION = "liferay/test_transaction";
+
+	public static final String WORKFLOW_COMPARATOR =
+		"liferay/workflow_comparator";
+
+	public static final String WORKFLOW_DEFINITION =
+		"liferay/workflow_definition";
+
+	public static final String WORKFLOW_ENGINE = "liferay/workflow_engine";
+
+	public static final String WORKFLOW_INSTANCE = "liferay/workflow_instance";
+
+	public static final String WORKFLOW_LOG = "liferay/workflow_log";
+
+	public static final String WORKFLOW_TASK = "liferay/workflow_task";
 
 }

@@ -33,8 +33,6 @@ DLFilePicker dlFilePicker = dlEditFileEntryDisplayContext.getDLFilePicker(lifera
 					HashMapBuilder.<String, Object>put(
 						"maxFileSize", dlEditFileEntryDisplayContext.getMaximumUploadSize()
 					).put(
-						"maxMimeTypeSize", dlEditFileEntryDisplayContext.getAllMimeTypeSizeLimit()
-					).put(
 						"namespace", liferayPortletResponse.getNamespace()
 					).put(
 						"validExtensions", StringUtil.merge(dlConfiguration.fileExtensions())
@@ -116,19 +114,6 @@ DLFilePicker dlFilePicker = dlEditFileEntryDisplayContext.getDLFilePicker(lifera
 				var ddmFieldWrappers = document.querySelectorAll(
 					'#<portlet:namespace />fm .lfr-ddm-form-container .ddm-field'
 				);
-
-				var urlTitleElement = document.getElementById(
-					'<portlet:namespace />urlTitle'
-				);
-
-				if (
-					titleElement &&
-					titleElement.value &&
-					urlTitleElement &&
-					!urlTitleElement.value
-				) {
-					urlTitleElement.value = titleElement.value.replace(/\.[^.]*$/, '');
-				}
 
 				Array.prototype.forEach.call(ddmFieldWrappers, (ddmFieldWrapper) => {
 					var fieldName = ddmFieldWrapper.dataset.fieldName;

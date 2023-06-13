@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.collection.filter.date.display.context;
 
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
@@ -21,6 +22,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Víctor Galán
@@ -34,9 +36,10 @@ public class FragmentCollectionFilterDateDisplayContext {
 
 		_configuration = configuration;
 		_fragmentEntryConfigurationParser = fragmentEntryConfigurationParser;
+
 		_fragmentRendererContext = fragmentRendererContext;
 
-		_fragmentEntryLink = fragmentRendererContext.getFragmentEntryLink();
+		_fragmentEntryLink = _fragmentRendererContext.getFragmentEntryLink();
 	}
 
 	public String getLabel() {
@@ -55,7 +58,9 @@ public class FragmentCollectionFilterDateDisplayContext {
 	}
 
 	public boolean isDisabled() {
-		return !_fragmentRendererContext.isViewMode();
+		return !Objects.equals(
+			_fragmentRendererContext.getMode(),
+			FragmentEntryLinkConstants.VIEW);
 	}
 
 	public boolean isShowLabel() {

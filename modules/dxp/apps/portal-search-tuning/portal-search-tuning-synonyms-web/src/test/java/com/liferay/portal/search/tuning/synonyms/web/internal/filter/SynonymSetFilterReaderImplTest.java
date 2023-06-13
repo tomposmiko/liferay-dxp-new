@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -42,6 +43,8 @@ public class SynonymSetFilterReaderImplTest extends BaseSynonymsWebTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		super.setUp();
+
 		_synonymSetFilterReaderImpl = new SynonymSetFilterReaderImpl();
 
 		ReflectionTestUtil.setFieldValue(
@@ -62,7 +65,7 @@ public class SynonymSetFilterReaderImplTest extends BaseSynonymsWebTestCase {
 		).when(
 			jsonObject
 		).getJSONArray(
-			Mockito.nullable(String.class)
+			Mockito.anyString()
 		);
 
 		Mockito.doReturn(
@@ -70,7 +73,7 @@ public class SynonymSetFilterReaderImplTest extends BaseSynonymsWebTestCase {
 		).when(
 			_jsonFactory
 		).createJSONObject(
-			Mockito.nullable(String.class)
+			Mockito.anyString()
 		);
 
 		Assert.assertArrayEquals(
@@ -100,7 +103,9 @@ public class SynonymSetFilterReaderImplTest extends BaseSynonymsWebTestCase {
 		return Mockito.mock(GetIndexIndexResponse.class);
 	}
 
-	private final JSONFactory _jsonFactory = Mockito.mock(JSONFactory.class);
+	@Mock
+	private JSONFactory _jsonFactory;
+
 	private SynonymSetFilterReaderImpl _synonymSetFilterReaderImpl;
 
 }

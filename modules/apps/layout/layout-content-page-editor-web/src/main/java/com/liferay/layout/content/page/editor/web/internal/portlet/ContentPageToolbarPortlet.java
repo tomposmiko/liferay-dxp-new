@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.preferences-owned-by-group=true",
@@ -50,8 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view_toolbar.jsp",
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_TOOLBAR_PORTLET,
-		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.version=3.0"
+		"javax.portlet.resource-bundle=content.Language"
 	},
 	service = Portlet.class
 )

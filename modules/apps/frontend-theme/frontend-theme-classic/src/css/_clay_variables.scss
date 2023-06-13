@@ -246,10 +246,10 @@ $grid-gutter-width: 24px !default;
 $grid-row-columns: 6 !default;
 
 $container-max-widths: (
-	sm: var(--container-max-sm, 540px),
-	md: var(--container-max-md, 720px),
-	lg: var(--container-max-lg, 960px),
-	xl: var(--container-max-xl, 1248px),
+	sm: 540px,
+	md: 720px,
+	lg: 960px,
+	xl: 1248px,
 ) !default;
 
 $container-form-lg: () !default;
@@ -322,7 +322,7 @@ $headings-color: null !default;
 $headings-font-family: null !default;
 $headings-font-weight: $font-weight-bold !default;
 $headings-line-height: 1.2 !default;
-$headings-margin-bottom: $spacer * 0.5 !default;
+$headings-margin-bottom: $spacer / 2 !default;
 
 // Body
 

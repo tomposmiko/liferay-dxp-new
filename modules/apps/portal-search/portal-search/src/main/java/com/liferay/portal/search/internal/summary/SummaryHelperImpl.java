@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = SummaryHelper.class)
+@Component(immediate = true, service = SummaryHelper.class)
 public class SummaryHelperImpl implements SummaryHelper {
 
 	@Override

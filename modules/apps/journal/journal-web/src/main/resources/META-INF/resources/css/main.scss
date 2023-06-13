@@ -1,5 +1,6 @@
 @import 'atlas-variables';
 
+@import '../ddm_template_editor/components/PortletIcon';
 @import '../ddm_template_editor/components/PropertiesPanel';
 
 $toolbarDesktopHeight: 4rem;
@@ -118,7 +119,8 @@ $productMenuWidth: 320px;
 					}
 
 					> .tbar-item:first-child {
-						border-bottom: solid thin #e7e7ed;
+						border-top: solid thin #e7e7ed;
+						order: 1;
 						width: 100%;
 					}
 
@@ -164,7 +166,8 @@ $productMenuWidth: 320px;
 
 				> .container-fluid > .tbar-nav {
 					> .tbar-item:first-child {
-						border-bottom: none;
+						border-top: none;
+						order: 0;
 						width: auto;
 					}
 
@@ -186,8 +189,18 @@ $productMenuWidth: 320px;
 				margin-top: $toolbarDesktopHeight;
 			}
 
-			@include media-breakpoint-down(md) {
-				> .container-fluid {
+			> .container-fluid {
+				max-height: calc(
+					100vh - #{$controlMenuHeight + $portletLayoutMargin} - #{$toolbarHeight}
+				);
+
+				@include media-breakpoint-up(lg) {
+					max-height: calc(
+						100vh - #{$controlMenuHeight + $portletLayoutMargin} - #{$toolbarDesktopHeight}
+					);
+				}
+
+				@include media-breakpoint-down(md) {
 					margin: 0 auto;
 					padding: 0;
 
@@ -220,7 +233,6 @@ $productMenuWidth: 320px;
 			box-shadow: none;
 			margin-top: $toolbarHeight;
 			max-width: 90vw;
-			outline: 0;
 			overflow-y: scroll;
 			padding-top: 0;
 			position: fixed;
@@ -260,19 +272,6 @@ $productMenuWidth: 320px;
 		}
 
 		.sidebar-body {
-			.collapse-icon {
-				border-bottom: 1px solid $light;
-				color: $secondary;
-
-				&:hover {
-					color: $dark;
-				}
-
-				.collapse-icon-open {
-					color: $dark;
-				}
-			}
-
 			.panel {
 				margin-bottom: 0;
 			}
@@ -292,11 +291,5 @@ $productMenuWidth: 320px;
 		.green {
 			color: #008000;
 		}
-	}
-
-	.entry-thumbnail .label {
-		border-bottom-left-radius: 0;
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
 	}
 }

@@ -12,9 +12,9 @@
  * details.
  */
 
-import {createPortletURL, fetch, getOpener, openToast} from 'frontend-js-web';
+import {fetch, openToast} from 'frontend-js-web';
 
-export default function ({namespace, order, parentSiteNavigationMenuItemId}) {
+export default function ({namespace, selPortletId, selPortletIsAjaxable}) {
 	const addButton = document.getElementById(`${namespace}addButton`);
 
 	if (addButton) {
@@ -31,24 +31,17 @@ export default function ({namespace, order, parentSiteNavigationMenuItemId}) {
 			const form = document.getElementById(`${namespace}fm`);
 			const formData = new FormData(form);
 
-			const url = createPortletURL(form.action, {
-				order,
-				parentSiteNavigationMenuItemId,
-			});
-
-			fetch(url, {
+			fetch(form.action, {
 				body: formData,
 				method: 'POST',
 			})
 				.then((response) => response.json())
 				.then((response) => {
 					if (response.siteNavigationMenuItemId) {
-						getOpener().Liferay.fire(
-							'reloadSiteNavigationMenuEditor'
-						);
-
-						getOpener().Liferay.fire('closeModal', {
-							id: `${namespace}addMenuItem`,
+						Liferay.fire('closeWindow', {
+							id: `_${selPortletId}_addMenuItem`,
+							portletAjaxable: selPortletIsAjaxable,
+							refresh: selPortletId,
 						});
 					}
 					else {

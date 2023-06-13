@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = RangeTermFilterTranslator.class)
+@Component(immediate = true, service = RangeTermFilterTranslator.class)
 public class RangeTermFilterTranslatorImpl
 	implements RangeTermFilterTranslator {
 

@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -63,7 +64,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	configurationPid = "com.liferay.portal.security.sso.token.configuration.TokenConfiguration",
+	configurationPid = "com.liferay.portal.security.sso.token.internal.configuration.TokenConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "key=logout.events.post", service = LifecycleAction.class
 )
 public class TokenLogoutAction extends Action {
@@ -74,23 +76,23 @@ public class TokenLogoutAction extends Action {
 		HttpServletResponse httpServletResponse) {
 
 		try {
-			TokenConfiguration tokenConfiguration =
+			TokenConfiguration tokenCompanyServiceSettings =
 				_configurationProvider.getConfiguration(
 					TokenConfiguration.class,
 					new CompanyServiceSettingsLocator(
 						_portal.getCompanyId(httpServletRequest),
 						TokenConstants.SERVICE_NAME));
 
-			if (!tokenConfiguration.enabled()) {
+			if (!tokenCompanyServiceSettings.enabled()) {
 				return;
 			}
 
 			String[] authenticationCookies =
-				tokenConfiguration.authenticationCookies();
+				tokenCompanyServiceSettings.authenticationCookies();
 
 			if (ArrayUtil.isNotEmpty(authenticationCookies)) {
 				LogoutProcessor cookieLogoutProcessor =
-					_serviceTrackerMap.getService(LogoutProcessorType.COOKIE);
+					_logoutProcessors.getService(LogoutProcessorType.COOKIE);
 
 				if (cookieLogoutProcessor != null) {
 					cookieLogoutProcessor.logout(
@@ -99,11 +101,12 @@ public class TokenLogoutAction extends Action {
 				}
 			}
 
-			String logoutRedirectURL = tokenConfiguration.logoutRedirectURL();
+			String logoutRedirectURL =
+				tokenCompanyServiceSettings.logoutRedirectURL();
 
 			if (Validator.isNotNull(logoutRedirectURL)) {
 				LogoutProcessor redirectLogoutProcessor =
-					_serviceTrackerMap.getService(LogoutProcessorType.REDIRECT);
+					_logoutProcessors.getService(LogoutProcessorType.REDIRECT);
 
 				if (redirectLogoutProcessor != null) {
 					redirectLogoutProcessor.logout(
@@ -113,30 +116,35 @@ public class TokenLogoutAction extends Action {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+		_logoutProcessors = ServiceTrackerMapFactory.openSingleValueMap(
 			bundleContext, LogoutProcessor.class, "logout.processor.type");
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_logoutProcessors.close();
+	}
+
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		TokenLogoutAction.class);
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
+	private ServiceTrackerMap<String, LogoutProcessor> _logoutProcessors;
 
 	@Reference
 	private Portal _portal;
-
-	private ServiceTrackerMap<String, LogoutProcessor> _serviceTrackerMap;
 
 }

@@ -20,6 +20,7 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -76,7 +78,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 		User user = UserTestUtil.addUser(_group.getGroupId());
 
 		try {
-			Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+			Layout layout = _layoutLocalService.addLayout(
+				user.getUserId(), _group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+				StringPool.BLANK,
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 			Assert.assertNull(_analyticsReportsInfoItem.getAuthorName(layout));
 		}
@@ -90,7 +98,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 		User user = UserTestUtil.addUser(_group.getGroupId());
 
 		try {
-			Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+			Layout layout = _layoutLocalService.addLayout(
+				user.getUserId(), _group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+				StringPool.BLANK,
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 			Assert.assertEquals(
 				0L, _analyticsReportsInfoItem.getAuthorUserId(layout));
@@ -104,7 +118,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 	public void testGetAuthorUserIdWithDeletedUser() throws Exception {
 		User user = UserTestUtil.addUser(_group.getGroupId());
 
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		Layout layout = _layoutLocalService.addLayout(
+			user.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		_userLocalService.deleteUser(user);
 
@@ -114,7 +134,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 
 	@Test
 	public void testGetAvailableLocales() throws Exception {
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		Layout layout = _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		GroupTestUtil.updateDisplaySettings(
 			_group.getGroupId(),
@@ -146,7 +172,12 @@ public class LayoutAnalyticsReportsInfoItemTest {
 				_companyLocalService.fetchCompany(
 					TestPropsValues.getCompanyId()));
 
-			Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+			Layout layout = _layoutLocalService.addLayout(
+				user.getUserId(), _group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+				StringPool.BLANK, serviceContext);
 
 			themeDisplay.setLayoutSet(layout.getLayoutSet());
 
@@ -177,7 +208,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 		User user = UserTestUtil.addUser(_group.getGroupId());
 
 		try {
-			Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+			Layout layout = _layoutLocalService.addLayout(
+				user.getUserId(), _group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+				StringPool.BLANK,
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 			Assert.assertEquals(
 				StringPool.BLANK,
@@ -191,7 +228,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 
 	@Test
 	public void testGetDefaultLocale() throws Exception {
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		Layout layout = _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		GroupTestUtil.updateDisplaySettings(
 			_group.getGroupId(),
@@ -205,7 +248,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 
 	@Test
 	public void testGetPublishDate() throws Exception {
-		Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+		Layout layout = _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK,
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		Assert.assertEquals(
 			layout.getPublishDate(),
@@ -219,8 +268,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 		try {
 			LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.SPAIN);
 
-			Layout layout = LayoutTestUtil.addTypeContentLayout(
-				_group, "título", "título");
+			Layout layout = _layoutLocalService.addLayout(
+				TestPropsValues.getUserId(), _group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+				StringPool.BLANK,
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 			Assert.assertEquals(
 				layout.getTitle(LocaleUtil.SPAIN),
@@ -238,7 +292,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 		try {
 			LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.SPAIN);
 
-			Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+			Layout layout = _layoutLocalService.addLayout(
+				TestPropsValues.getUserId(), _group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+				RandomTestUtil.randomString(), StringPool.BLANK,
+				StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+				StringPool.BLANK,
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 			Assert.assertEquals(
 				layout.getName(LocaleUtil.SPAIN),
@@ -254,7 +314,13 @@ public class LayoutAnalyticsReportsInfoItemTest {
 		User user = UserTestUtil.addUser(_group.getGroupId());
 
 		try {
-			Layout layout = LayoutTestUtil.addTypeContentLayout(_group);
+			Layout layout = _layoutLocalService.addLayout(
+				user.getUserId(), _group.getGroupId(), false,
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+				StringPool.BLANK,
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 			ServiceContext serviceContext =
 				ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -287,8 +353,7 @@ public class LayoutAnalyticsReportsInfoItemTest {
 		User user = UserTestUtil.addUser(_group.getGroupId());
 
 		try {
-			Layout layout = LayoutTestUtil.addTypePortletLayout(
-				_group.getGroupId());
+			Layout layout = LayoutTestUtil.addLayout(_group.getGroupId());
 
 			ServiceContext serviceContext =
 				ServiceContextTestUtil.getServiceContext(_group.getGroupId());

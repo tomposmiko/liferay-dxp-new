@@ -28,7 +28,6 @@ import com.liferay.document.library.sync.constants.DLSyncConstants;
 import com.liferay.document.library.test.util.BaseDLAppTestCase;
 import com.liferay.document.library.workflow.WorkflowHandlerInvocationCounter;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -74,7 +73,7 @@ public class DLAppServiceWhenCheckingInAFileEntryTest
 			Assert.assertEquals(
 				1,
 				workflowHandlerInvocationCounter.getCount(
-					"updateStatus", Object.class, int.class, Map.class));
+					"updateStatus", int.class, Map.class));
 
 			ServiceContext serviceContext =
 				ServiceContextTestUtil.getServiceContext(group.getGroupId());
@@ -85,7 +84,7 @@ public class DLAppServiceWhenCheckingInAFileEntryTest
 			Assert.assertEquals(
 				1,
 				workflowHandlerInvocationCounter.getCount(
-					"updateStatus", Object.class, int.class, Map.class));
+					"updateStatus", int.class, Map.class));
 
 			DLAppServiceTestUtil.updateFileEntry(
 				group.getGroupId(), fileEntry.getFileEntryId(),
@@ -94,7 +93,7 @@ public class DLAppServiceWhenCheckingInAFileEntryTest
 			Assert.assertEquals(
 				1,
 				workflowHandlerInvocationCounter.getCount(
-					"updateStatus", Object.class, int.class, Map.class));
+					"updateStatus", int.class, Map.class));
 
 			DLAppServiceUtil.checkInFileEntry(
 				fileEntry.getFileEntryId(), DLVersionNumberIncrease.MINOR,
@@ -103,7 +102,7 @@ public class DLAppServiceWhenCheckingInAFileEntryTest
 			Assert.assertEquals(
 				2,
 				workflowHandlerInvocationCounter.getCount(
-					"updateStatus", Object.class, int.class, Map.class));
+					"updateStatus", int.class, Map.class));
 		}
 	}
 
@@ -142,8 +141,7 @@ public class DLAppServiceWhenCheckingInAFileEntryTest
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString(), ContentTypes.APPLICATION_OCTET_STREAM,
 			StringUtil.randomString(), StringUtil.randomString(),
-			StringUtil.randomString(), StringUtil.randomString(), null, 0, null,
-			null, serviceContext);
+			StringUtil.randomString(), null, 0, null, null, serviceContext);
 
 		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
 
@@ -169,9 +167,8 @@ public class DLAppServiceWhenCheckingInAFileEntryTest
 			checkedOutFileEntry.getFileEntryId(),
 			checkedOutFileEntry.getFileName(),
 			checkedOutFileEntry.getMimeType(), checkedOutFileEntry.getTitle(),
-			StringPool.BLANK, checkedOutFileEntry.getDescription(),
-			StringUtil.randomString(), DLVersionNumberIncrease.NONE, null, 0,
-			null, null, serviceContext);
+			checkedOutFileEntry.getDescription(), StringUtil.randomString(),
+			DLVersionNumberIncrease.NONE, null, 0, null, null, serviceContext);
 
 		DLAppServiceUtil.checkInFileEntry(
 			updatedFileEntry.getFileEntryId(), DLVersionNumberIncrease.NONE,
@@ -226,9 +223,8 @@ public class DLAppServiceWhenCheckingInAFileEntryTest
 			checkedOutFileEntry.getFileEntryId(),
 			checkedOutFileEntry.getFileName(),
 			checkedOutFileEntry.getMimeType(), checkedOutFileEntry.getTitle(),
-			StringPool.BLANK, checkedOutFileEntry.getDescription(),
-			StringUtil.randomString(), DLVersionNumberIncrease.NONE, null, 0,
-			null, null, serviceContext);
+			checkedOutFileEntry.getDescription(), StringUtil.randomString(),
+			DLVersionNumberIncrease.NONE, null, 0, null, null, serviceContext);
 
 		DLAppServiceUtil.checkInFileEntry(
 			updatedFileEntry.getFileEntryId(), DLVersionNumberIncrease.NONE,

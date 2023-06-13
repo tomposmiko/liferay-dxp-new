@@ -16,7 +16,6 @@ package com.liferay.portal.template.freemarker.internal;
 
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateException;
@@ -24,7 +23,7 @@ import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceCache;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.template.engine.TemplateContextHelper;
+import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -52,7 +51,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -86,8 +84,7 @@ public class FreeMarkerTemplateTest {
 			_freeMarkerTemplateResourceLoader,
 			"_freeMarkerTemplateResourceCache", _templateResourceCache);
 
-		_freeMarkerTemplateResourceLoader.activate(
-			SystemBundleUtil.getBundleContext(), Collections.emptyMap());
+		_freeMarkerTemplateResourceLoader.activate(Collections.emptyMap());
 
 		_freeMarkerManager = new FreeMarkerManager();
 
@@ -95,13 +92,6 @@ public class FreeMarkerTemplateTest {
 			_freeMarkerManager, "_freeMarkerEngineConfiguration",
 			ConfigurableUtil.createConfigurable(
 				FreeMarkerEngineConfiguration.class, Collections.emptyMap()));
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		if (_freeMarkerTemplateResourceLoader != null) {
-			_freeMarkerTemplateResourceLoader.deactivate();
-		}
 	}
 
 	@Before
@@ -463,7 +453,9 @@ public class FreeMarkerTemplateTest {
 		extends TemplateContextHelper {
 
 		@Override
-		public Map<String, Object> getHelperUtilities(boolean restricted) {
+		public Map<String, Object> getHelperUtilities(
+			ClassLoader classLoader, boolean restricted) {
+
 			return Collections.emptyMap();
 		}
 

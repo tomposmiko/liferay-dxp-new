@@ -38,11 +38,11 @@ public class ReportDefinitionUpgradeProcess extends UpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 		if (hasTable("Reports_Definition")) {
-			_updateReportDefinitions();
+			updateReportDefinitions();
 		}
 	}
 
-	private void _updateReportDefinitions() throws Exception {
+	protected void updateReportDefinitions() throws Exception {
 		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
 				"select companyId, definitionId, reportParameters from " +
 					"Reports_Definition")) {
@@ -58,7 +58,7 @@ public class ReportDefinitionUpgradeProcess extends UpgradeProcess {
 					String reportParameters = resultSet.getString(
 						"reportParameters");
 
-					String updatedReportParameters = _updateReportParameters(
+					String updatedReportParameters = updateReportParameters(
 						reportParameters);
 
 					if (Validator.isNotNull(reportParameters) &&
@@ -83,7 +83,7 @@ public class ReportDefinitionUpgradeProcess extends UpgradeProcess {
 		}
 	}
 
-	private String _updateReportParameters(String reportParameters) {
+	protected String updateReportParameters(String reportParameters) {
 		Matcher matcher = _pattern.matcher(reportParameters);
 
 		if (!matcher.find()) {

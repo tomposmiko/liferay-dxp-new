@@ -34,7 +34,7 @@ ApplicationsMenuInstanceConfiguration applicationsMenuInstanceConfiguration = Co
 				>
 					<a href="<%= PortalUtil.addPreservedParameters(themeDisplay, themeDisplay.getURLPortal(), false, true) %>">
 						<span class="company-details text-truncate">
-							<img alt="" class="company-logo" src="<%= themeDisplay.getPathImage() %>/company_logo?img_id=<%= company.getLogoId() %>&t=<%= WebServerServletTokenUtil.getToken(company.getLogoId()) %>" />
+							<img alt="" class="company-logo" src="<%= themeDisplay.getPathImage() + "/company_logo?img_id=" + company.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(company.getLogoId()) %>" />
 
 							<span class="company-name"><%= HtmlUtil.escape(company.getName()) %></span>
 						</span>
@@ -42,11 +42,7 @@ ApplicationsMenuInstanceConfiguration applicationsMenuInstanceConfiguration = Co
 				</clay:content-col>
 
 				<clay:content-col>
-					<clay:button
-						cssClass="d-md-none sidenav-close text-white"
-						displayType="unstyled"
-						icon="times"
-					/>
+					<aui:icon cssClass="d-inline-block d-md-none icon-monospaced sidenav-close" image="times" markupView="lexicon" url="javascript:;" />
 				</clay:content-col>
 			</clay:content-row>
 		</div>

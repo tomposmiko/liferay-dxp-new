@@ -24,9 +24,8 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
  */
 public class CommerceSubscriptionTypeUtil {
 
-	public static UnicodeProperties
-		getSubscriptionTypeSettingsUnicodeProperties(
-			Object object, boolean payment) {
+	public static UnicodeProperties getSubscriptionTypeSettingsProperties(
+		Object object, boolean payment) {
 
 		if (object == null) {
 			return null;
@@ -41,12 +40,12 @@ public class CommerceSubscriptionTypeUtil {
 			if (payment) {
 				subscriptionTypeSettingsUnicodeProperties =
 					commerceSubscriptionEntry.
-						getSubscriptionTypeSettingsUnicodeProperties();
+						getSubscriptionTypeSettingsProperties();
 			}
 			else {
 				subscriptionTypeSettingsUnicodeProperties =
 					commerceSubscriptionEntry.
-						getDeliverySubscriptionTypeSettingsUnicodeProperties();
+						getDeliverySubscriptionTypeSettingsProperties();
 			}
 		}
 		else if (object instanceof CPDefinition) {
@@ -54,12 +53,12 @@ public class CommerceSubscriptionTypeUtil {
 
 			if (payment) {
 				subscriptionTypeSettingsUnicodeProperties =
-					cpDefinition.getSubscriptionTypeSettingsUnicodeProperties();
+					cpDefinition.getSubscriptionTypeSettingsProperties();
 			}
 			else {
 				subscriptionTypeSettingsUnicodeProperties =
 					cpDefinition.
-						getDeliverySubscriptionTypeSettingsUnicodeProperties();
+						getDeliverySubscriptionTypeSettingsProperties();
 			}
 		}
 		else if (object instanceof CPInstance) {
@@ -67,12 +66,11 @@ public class CommerceSubscriptionTypeUtil {
 
 			if (payment) {
 				subscriptionTypeSettingsUnicodeProperties =
-					cpInstance.getSubscriptionTypeSettingsUnicodeProperties();
+					cpInstance.getSubscriptionTypeSettingsProperties();
 			}
 			else {
 				subscriptionTypeSettingsUnicodeProperties =
-					cpInstance.
-						getDeliverySubscriptionTypeSettingsUnicodeProperties();
+					cpInstance.getDeliverySubscriptionTypeSettingsProperties();
 			}
 		}
 

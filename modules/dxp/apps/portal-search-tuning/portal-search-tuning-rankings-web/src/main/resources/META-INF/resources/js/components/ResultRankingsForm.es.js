@@ -11,7 +11,6 @@
 
 import ClayLayout from '@clayui/layout';
 import ClayTabs from '@clayui/tabs';
-import {openToast} from 'frontend-js-web';
 import {PropTypes} from 'prop-types';
 import React, {Component} from 'react';
 
@@ -488,7 +487,7 @@ class ResultRankingsForm extends Component {
 		}).then((response) => {
 			if (response.errors.length) {
 				response.errors.forEach((message) => {
-					openToast({
+					Liferay.Util.openToast({
 						message,
 						type: 'danger',
 					});

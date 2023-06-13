@@ -27,10 +27,6 @@ public class ExportImportLocalServiceWrapper
 	implements ExportImportLocalService,
 			   ServiceWrapper<ExportImportLocalService> {
 
-	public ExportImportLocalServiceWrapper() {
-		this(null);
-	}
-
 	public ExportImportLocalServiceWrapper(
 		ExportImportLocalService exportImportLocalService) {
 
@@ -269,17 +265,6 @@ public class ExportImportLocalServiceWrapper
 
 		return _exportImportLocalService.importPortletInfoInBackground(
 			userId, exportImportConfigurationId, inputStream);
-	}
-
-	@Override
-	public long mergeLayoutSetPrototypeInBackground(
-			long userId, long groupId,
-			com.liferay.exportimport.kernel.model.ExportImportConfiguration
-				exportImportConfiguration)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _exportImportLocalService.mergeLayoutSetPrototypeInBackground(
-			userId, groupId, exportImportConfiguration);
 	}
 
 	@Override

@@ -16,6 +16,7 @@ package com.liferay.segments.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.exception.LocaleException;
+import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LocalizedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
@@ -42,8 +43,9 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface SegmentsExperienceModel
-	extends BaseModel<SegmentsExperience>, CTModel<SegmentsExperience>,
-			LocalizedModel, MVCCModel, ShardedModel, StagedGroupedModel {
+	extends AttachedModel, BaseModel<SegmentsExperience>,
+			CTModel<SegmentsExperience>, LocalizedModel, MVCCModel,
+			ShardedModel, StagedGroupedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -273,18 +275,46 @@ public interface SegmentsExperienceModel
 	public void setSegmentsExperienceKey(String segmentsExperienceKey);
 
 	/**
-	 * Returns the plid of this segments experience.
+	 * Returns the fully qualified class name of this segments experience.
 	 *
-	 * @return the plid of this segments experience
+	 * @return the fully qualified class name of this segments experience
 	 */
-	public long getPlid();
+	@Override
+	public String getClassName();
+
+	public void setClassName(String className);
 
 	/**
-	 * Sets the plid of this segments experience.
+	 * Returns the class name ID of this segments experience.
 	 *
-	 * @param plid the plid of this segments experience
+	 * @return the class name ID of this segments experience
 	 */
-	public void setPlid(long plid);
+	@Override
+	public long getClassNameId();
+
+	/**
+	 * Sets the class name ID of this segments experience.
+	 *
+	 * @param classNameId the class name ID of this segments experience
+	 */
+	@Override
+	public void setClassNameId(long classNameId);
+
+	/**
+	 * Returns the class pk of this segments experience.
+	 *
+	 * @return the class pk of this segments experience
+	 */
+	@Override
+	public long getClassPK();
+
+	/**
+	 * Sets the class pk of this segments experience.
+	 *
+	 * @param classPK the class pk of this segments experience
+	 */
+	@Override
+	public void setClassPK(long classPK);
 
 	/**
 	 * Returns the name of this segments experience.
@@ -466,9 +496,5 @@ public interface SegmentsExperienceModel
 
 	@Override
 	public SegmentsExperience cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

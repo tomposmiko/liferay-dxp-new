@@ -34,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pavel Savinov
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.fragment.model.FragmentCollection",
 	service = StagedModelRepository.class
 )

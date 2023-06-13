@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.portlet.PortletURL;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
@@ -64,8 +65,12 @@ public class SearchContainerColumnImageTag<R> extends SearchContainerColumnTag {
 			imageSearchEntry.setResponse(
 				(HttpServletResponse)pageContext.getResponse());
 			imageSearchEntry.setToggleRowChecker(isToggleRowChecker());
-			imageSearchEntry.setServletContext(
-				ServletContextPool.get(PortalUtil.getServletContextName()));
+
+			ServletContext servletContext = ServletContextPool.get(
+				PortalUtil.getServletContextName());
+
+			imageSearchEntry.setServletContext(servletContext);
+
 			imageSearchEntry.setSrc(_src);
 			imageSearchEntry.setValign(getValign());
 

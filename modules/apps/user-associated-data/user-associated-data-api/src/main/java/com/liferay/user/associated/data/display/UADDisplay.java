@@ -127,12 +127,6 @@ public interface UADDisplay<T> extends UADComponent<T> {
 		throw new UnsupportedOperationException();
 	}
 
-	public default String getParentContainerTypeKey() {
-		Class<?> parentContainerClass = getParentContainerClass();
-
-		return parentContainerClass.getName();
-	}
-
 	/**
 	 * Returns the primary key of the type {@code T} entity.
 	 *
@@ -219,18 +213,6 @@ public interface UADDisplay<T> extends UADComponent<T> {
 	 *         <code>false</code> otherwise
 	 */
 	public default boolean isSiteScoped() {
-		return false;
-	}
-
-	public default boolean isTypeEntity(Object object) {
-		Class<T> typeClass = getTypeClass();
-
-		if (typeClass.isInstance(object) ||
-			typeClass.isAssignableFrom(object.getClass())) {
-
-			return true;
-		}
-
 		return false;
 	}
 

@@ -79,6 +79,7 @@ import com.liferay.portal.vulcan.util.EntityExtensionUtil;
 import com.liferay.portal.vulcan.util.LocalDateTimeUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
+import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
@@ -249,9 +250,13 @@ public class StructuredContentResourceImpl
 
 		return Page.of(
 			transform(
-				_journalArticleService.getArticlesByArticleId(
-					journalArticle.getGroupId(), journalArticle.getArticleId(),
-					WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
+				_journalArticleService.search(
+					journalArticle.getCompanyId(), journalArticle.getGroupId(),
+					Collections.singletonList(journalArticle.getFolderId()),
+					journalArticle.getClassNameId(),
+					journalArticle.getArticleId(), null, null, null, null,
+					(String)null, null, null, null, null,
+					WorkflowConstants.STATUS_APPROVED, true, QueryUtil.ALL_POS,
 					QueryUtil.ALL_POS, null),
 				this::_toExtensionStructuredContent));
 	}
@@ -300,12 +305,6 @@ public class StructuredContentResourceImpl
 				contextHttpServletRequest,
 				structuredContent.getViewableByAsString());
 
-		Double priority = structuredContent.getPriority();
-
-		if (priority != null) {
-			serviceContext.setAssetPriority(priority);
-		}
-
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		return _toExtensionStructuredContent(
@@ -315,15 +314,16 @@ public class StructuredContentResourceImpl
 				StructuredContentUtil.getJournalArticleContent(
 					_ddm,
 					DDMFormValuesUtil.toDDMFormValues(
-						titleMap.keySet(), structuredContent.getContentFields(),
+						structuredContent.getContentFields(),
 						ddmStructure.getDDMForm(), _dlAppService, siteId,
 						_journalArticleService, _layoutLocalService,
 						contextAcceptLanguage.getPreferredLocale(),
 						_getRootDDMFormFields(ddmStructure)),
 					_jsonDDMFormValuesSerializer, _ddmFormValuesValidator,
 					ddmStructure, _journalConverter),
-				ddmStructure.getStructureId(), _getDDMTemplateKey(ddmStructure),
-				null, localDateTime.getMonthValue() - 1,
+				ddmStructure.getStructureKey(),
+				_getDDMTemplateKey(ddmStructure), null,
+				localDateTime.getMonthValue() - 1,
 				localDateTime.getDayOfMonth(), localDateTime.getYear(),
 				localDateTime.getHour(), localDateTime.getMinute(), 0, 0, 0, 0,
 				0, true, 0, 0, 0, 0, 0, true, true, false, null, null, null,
@@ -354,7 +354,7 @@ public class StructuredContentResourceImpl
 	private List<DDMFormField> _getRootDDMFormFields(
 		DDMStructure ddmStructure) {
 
-		return transform(
+		return TransformUtil.transform(
 			ddmStructure.getRootFieldNames(),
 			fieldName -> DDMFormFieldUtil.getDDMFormField(
 				_ddmStructureService, ddmStructure, fieldName));

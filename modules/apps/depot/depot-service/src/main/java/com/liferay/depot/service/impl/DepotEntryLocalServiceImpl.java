@@ -23,17 +23,16 @@ import com.liferay.depot.model.DepotEntryGroupRel;
 import com.liferay.depot.service.DepotAppCustomizationLocalService;
 import com.liferay.depot.service.base.DepotEntryLocalServiceBaseImpl;
 import com.liferay.depot.service.persistence.DepotEntryGroupRelPersistence;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.GroupKeyException;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
-import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -55,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -127,7 +127,7 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 
 		User user = _userLocalService.getUser(serviceContext.getUserId());
 
-		if (!user.isGuestUser()) {
+		if (!user.isDefaultUser()) {
 			Role role = _roleLocalService.getRole(
 				group.getCompanyId(), DepotRolesConstants.ASSET_LIBRARY_OWNER);
 
@@ -140,6 +140,7 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 		}
 
 		depotEntry.setGroupId(group.getGroupId());
+
 		depotEntry.setCompanyId(serviceContext.getCompanyId());
 		depotEntry.setUserId(serviceContext.getUserId());
 
@@ -154,27 +155,15 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 	}
 
 	@Override
-	public DepotEntry deleteDepotEntry(DepotEntry depotEntry)
-		throws PortalException {
-
-		if (_isStaged(depotEntry)) {
-			throw new DepotEntryStagedException(
-				"Unstage depot entry " + depotEntry.getDepotEntryId() +
-					" before deleting it");
-		}
-
-		_resourceLocalService.deleteResource(
-			depotEntry, ResourceConstants.SCOPE_INDIVIDUAL);
-
-		return super.deleteDepotEntry(depotEntry);
-	}
-
-	@Override
 	public DepotEntry deleteDepotEntry(long depotEntryId)
 		throws PortalException {
 
-		return deleteDepotEntry(
-			depotEntryPersistence.fetchByPrimaryKey(depotEntryId));
+		if (_isStaged(depotEntryPersistence.fetchByPrimaryKey(depotEntryId))) {
+			throw new DepotEntryStagedException(
+				"Unstage depot entry " + depotEntryId + " before deleting it");
+		}
+
+		return super.deleteDepotEntry(depotEntryId);
 	}
 
 	@Override
@@ -205,9 +194,10 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 				ddmStructuresAvailable, groupId, start, end);
 
 		for (DepotEntryGroupRel depotEntryGroupRel : depotEntryGroupRels) {
-			depotEntries.add(
-				depotEntryLocalService.getDepotEntry(
-					depotEntryGroupRel.getDepotEntryId()));
+			DepotEntry depotEntry = depotEntryLocalService.getDepotEntry(
+				depotEntryGroupRel.getDepotEntryId());
+
+			depotEntries.add(depotEntry);
 		}
 
 		return depotEntries;
@@ -218,10 +208,19 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 			long groupId, int start, int end)
 		throws PortalException {
 
-		return TransformUtil.transform(
-			_depotEntryGroupRelPersistence.findByToGroupId(groupId, start, end),
-			depotEntryGroupRel -> depotEntryLocalService.getDepotEntry(
-				depotEntryGroupRel.getDepotEntryId()));
+		List<DepotEntry> depotEntries = new ArrayList<>();
+
+		List<DepotEntryGroupRel> depotEntryGroupRels =
+			_depotEntryGroupRelPersistence.findByToGroupId(groupId, start, end);
+
+		for (DepotEntryGroupRel depotEntryGroupRel : depotEntryGroupRels) {
+			DepotEntry depotEntry = depotEntryLocalService.getDepotEntry(
+				depotEntryGroupRel.getDepotEntryId());
+
+			depotEntries.add(depotEntry);
+		}
+
+		return depotEntries;
 	}
 
 	@Override
@@ -280,7 +279,8 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 			typeSettingsUnicodeProperties.setProperty(
 				PropsKeys.LOCALES,
 				StringUtil.merge(
-					LocaleUtil.toLanguageIds(_language.getAvailableLocales())));
+					LocaleUtil.toLanguageIds(
+						LanguageUtil.getAvailableLocales())));
 		}
 
 		currentTypeSettingsUnicodeProperties.putAll(
@@ -289,11 +289,11 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 		Locale locale = LocaleUtil.fromLanguageId(
 			currentTypeSettingsUnicodeProperties.getProperty("languageId"));
 
-		String defaultName = _getDefaultName(nameMap, locale);
+		Optional<String> defaultNameOptional = _getDefaultNameOptional(
+			nameMap, locale);
 
-		if (defaultName != null) {
-			nameMap.put(locale, defaultName);
-		}
+		defaultNameOptional.ifPresent(
+			defaultName -> nameMap.put(locale, defaultName));
 
 		group = _groupLocalService.updateGroup(
 			depotEntry.getGroupId(), group.getParentGroupId(), nameMap,
@@ -308,14 +308,15 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 		return depotEntry;
 	}
 
-	private String _getDefaultName(
+	private Optional<String> _getDefaultNameOptional(
 		Map<Locale, String> nameMap, Locale defaultLocale) {
 
 		if (Validator.isNotNull(nameMap.get(defaultLocale))) {
-			return null;
+			return Optional.empty();
 		}
 
-		return _language.get(defaultLocale, "unnamed-asset-library");
+		return Optional.of(
+			_language.get(defaultLocale, "unnamed-asset-library"));
 	}
 
 	private boolean _isStaged(DepotEntry depotEntry) throws PortalException {
@@ -323,11 +324,7 @@ public class DepotEntryLocalServiceImpl extends DepotEntryLocalServiceBaseImpl {
 			return false;
 		}
 
-		Group group = _groupLocalService.fetchGroup(depotEntry.getGroupId());
-
-		if (group == null) {
-			return false;
-		}
+		Group group = depotEntry.getGroup();
 
 		if (group.isStaged()) {
 			return true;

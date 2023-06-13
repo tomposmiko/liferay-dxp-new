@@ -24,10 +24,6 @@ package com.liferay.portal.kernel.service;
 public class PortletServiceWrapper
 	implements PortletService, ServiceWrapper<PortletService> {
 
-	public PortletServiceWrapper() {
-		this(null);
-	}
-
 	public PortletServiceWrapper(PortletService portletService) {
 		_portletService = portletService;
 	}

@@ -16,11 +16,11 @@ package com.liferay.portal.model.relationship.document.library.internal;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -30,7 +30,9 @@ import com.liferay.portal.relationship.Relationship;
 import com.liferay.portal.relationship.RelationshipResource;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Máté Thurzó
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.document.library.kernel.model.DLFileEntryType",
 	service = RelationshipResource.class
 )
@@ -60,47 +63,60 @@ public class DLFileEntryTypeDLRelationshipResource
 	}
 
 	private FileEntry _getFileEntry(DLFileEntryType fileEntryType) {
-		for (DLFileEntry dlFileEntry :
-				_dlFileEntryLocalService.getFileEntries(-1, -1)) {
+		List<DLFileEntry> dlFileEntries =
+			_dlFileEntryLocalService.getFileEntries(-1, -1);
 
-			if (dlFileEntry.getFileEntryTypeId() !=
-					fileEntryType.getFileEntryTypeId()) {
+		Stream<DLFileEntry> stream = dlFileEntries.parallelStream();
 
-				continue;
-			}
-
-			try {
-				return _dlAppLocalService.getFileEntry(
-					dlFileEntry.getFileEntryId());
-			}
-			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+		return stream.filter(
+			dlFileEntry ->
+				dlFileEntry.getFileEntryTypeId() ==
+					fileEntryType.getFileEntryTypeId()
+		).findFirst(
+		).map(
+			dlFileEntry -> {
+				try {
+					return _dlAppLocalService.getFileEntry(
+						dlFileEntry.getFileEntryId());
 				}
+				catch (PortalException portalException) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							portalException.getMessage(), portalException);
+					}
 
-				throw new NoSuchElementException();
+					return null;
+				}
 			}
-		}
-
-		throw new NoSuchElementException();
+		).get();
 	}
 
 	private List<Folder> _getFolders(DLFileEntryType fileEntryType) {
-		return TransformUtil.transform(
+		List<DLFolder> dlFolders =
 			_dlFolderLocalService.getDLFileEntryTypeDLFolders(
-				fileEntryType.getFileEntryTypeId()),
+				fileEntryType.getFileEntryTypeId());
+
+		Stream<DLFolder> stream = dlFolders.stream();
+
+		return stream.map(
 			dlFolder -> {
 				try {
 					return _dlAppLocalService.getFolder(dlFolder.getFolderId());
 				}
 				catch (PortalException portalException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(portalException);
+						_log.warn(
+							portalException.getMessage(), portalException);
 					}
 
 					return null;
 				}
-			});
+			}
+		).filter(
+			Objects::nonNull
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

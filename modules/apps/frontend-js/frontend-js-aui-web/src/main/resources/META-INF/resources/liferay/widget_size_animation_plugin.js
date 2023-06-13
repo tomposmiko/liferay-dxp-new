@@ -15,19 +15,19 @@
 AUI.add(
 	'liferay-widget-size-animation-plugin',
 	(A) => {
-		const Lang = A.Lang;
+		var Lang = A.Lang;
 
-		const NAME = 'sizeanim';
+		var NAME = 'sizeanim';
 
-		const STR_END = 'end';
+		var STR_END = 'end';
 
-		const STR_HOST = 'host';
+		var STR_HOST = 'host';
 
-		const STR_SIZE = 'size';
+		var STR_SIZE = 'size';
 
-		const STR_START = 'start';
+		var STR_START = 'start';
 
-		const SizeAnim = A.Component.create({
+		var SizeAnim = A.Component.create({
 			ATTRS: {
 				align: {
 					validator: Lang.isBoolean,
@@ -53,7 +53,7 @@ AUI.add(
 
 			prototype: {
 				_alignWidget() {
-					const instance = this;
+					var instance = this;
 
 					if (instance.get('align')) {
 						instance.get(STR_HOST).align();
@@ -61,13 +61,13 @@ AUI.add(
 				},
 
 				_animWidgetSize(size) {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
 					instance._anim.stop();
 
-					const attrs = {
+					var attrs = {
 						height: size.height,
 						width: size.width,
 					};
@@ -89,7 +89,7 @@ AUI.add(
 				},
 
 				destructor() {
-					const instance = this;
+					var instance = this;
 
 					instance.get(STR_HOST).removeAttr(STR_SIZE);
 
@@ -97,9 +97,9 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const host = instance.get(STR_HOST);
+					var host = instance.get(STR_HOST);
 
 					host.addAttr(STR_SIZE, {
 						setter: A.bind('_animWidgetSize', instance),
@@ -111,7 +111,7 @@ AUI.add(
 						node: host,
 					});
 
-					const eventHandles = [
+					var eventHandles = [
 						instance._anim.after(
 							STR_END,
 							A.bind('fire', instance, STR_END)

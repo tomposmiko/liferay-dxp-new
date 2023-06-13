@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = {})
+@Component(immediate = true, service = {})
 public class AddressSearchRegistrar {
 
 	@Activate
@@ -41,6 +41,7 @@ public class AddressSearchRegistrar {
 					Field.COMPANY_ID, Field.ENTRY_CLASS_NAME,
 					Field.ENTRY_CLASS_PK, Field.MODIFIED_DATE, Field.NAME,
 					Field.TYPE, Field.UID);
+
 				modelSearchDefinition.setModelIndexWriteContributor(
 					modelIndexWriterContributor);
 				modelSearchDefinition.setSearchResultPermissionFilterSuppressed(

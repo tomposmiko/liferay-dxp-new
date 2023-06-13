@@ -23,20 +23,13 @@ long dispatchTriggerId = 0;
 
 DispatchTrigger dispatchTrigger = dispatchTriggerDisplayContext.getDispatchTrigger();
 
-String cssClass = StringPool.BLANK;
 String dispatchTaskExecutorType = ParamUtil.getString(request, "dispatchTaskExecutorType");
 String dispatchTaskSettings = StringPool.BLANK;
-String readonly = StringPool.FALSE;
 
 if (dispatchTrigger != null) {
 	dispatchTriggerId = dispatchTrigger.getDispatchTriggerId();
 	dispatchTaskExecutorType = dispatchTrigger.getDispatchTaskExecutorType();
 	dispatchTaskSettings = dispatchTrigger.getDispatchTaskSettings();
-
-	if (dispatchTrigger.isSystem()) {
-		cssClass = "disabled";
-		readonly = StringPool.TRUE;
-	}
 }
 %>
 
@@ -54,7 +47,7 @@ if (dispatchTrigger != null) {
 
 		<aui:form action="<%= editDispatchTriggerActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-			<aui:input name="redirect" type="hidden" value="<%= (dispatchTrigger == null) ? redirect : currentURL %>" />
+			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="dispatchTriggerId" type="hidden" value="<%= String.valueOf(dispatchTriggerId) %>" />
 			<aui:input name="dispatchTaskExecutorType" type="hidden" value="<%= dispatchTaskExecutorType %>" />
 			<aui:input name="dispatchTaskSettings" type="hidden" />
@@ -63,7 +56,7 @@ if (dispatchTrigger != null) {
 				<aui:model-context bean="<%= dispatchTrigger %>" model="<%= DispatchTrigger.class %>" />
 
 				<aui:fieldset>
-					<aui:input cssClass="<%= cssClass %>" name="name" readonly="<%= readonly %>" required="<%= true %>" type="text" />
+					<aui:input disabled="<%= (dispatchTrigger != null) && dispatchTrigger.isSystem() %>" name="name" required="<%= true %>" />
 				</aui:fieldset>
 
 				<div id="<portlet:namespace />dispatchTaskSettingsEditor"></div>
@@ -118,7 +111,9 @@ if (dispatchTrigger != null) {
 	var xmlFormatter = new Liferay.XMLFormatter();
 
 	var content = xmlFormatter.format(
-		'<%= HtmlUtil.escapeJS(dispatchTaskSettings) %>'
+		'<%=
+			HtmlUtil.escapeJS(dispatchTaskSettings)
+		%>'
 	);
 
 	if (content) {

@@ -15,7 +15,6 @@
 package com.liferay.questions.web.internal.portlet;
 
 import com.liferay.asset.kernel.model.AssetTag;
-import com.liferay.flags.taglib.servlet.taglib.util.FlagsTagUtil;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
@@ -23,13 +22,9 @@ import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
 import com.liferay.message.boards.moderation.configuration.MBModerationGroupConfiguration;
 import com.liferay.message.boards.service.MBStatsUserLocalService;
-import com.liferay.petra.string.CharPool;
-import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -39,11 +34,7 @@ import com.liferay.portal.kernel.portlet.PortletURLWrapper;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.questions.web.internal.configuration.QuestionsConfiguration;
 import com.liferay.questions.web.internal.constants.QuestionsPortletKeys;
@@ -51,12 +42,10 @@ import com.liferay.questions.web.internal.constants.QuestionsWebKeys;
 
 import java.io.IOException;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.stream.Stream;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
@@ -76,6 +65,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.questions.web.internal.configuration.QuestionsConfiguration",
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-questions",
 		"com.liferay.portlet.display-category=category.collaboration",
@@ -93,8 +83,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + QuestionsPortletKeys.QUESTIONS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=administrator,guest,power-user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=administrator,guest,power-user"
 	},
 	service = Portlet.class
 )
@@ -111,39 +100,6 @@ public class QuestionsPortlet extends MVCPortlet {
 		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			renderRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		Company company = themeDisplay.getCompany();
-
-		renderRequest.setAttribute(
-			QuestionsWebKeys.COMPANY_NAME, company.getName());
-
-		Properties properties = _portal.getPortalProperties();
-
-		String ranks = properties.getProperty("message.boards.user.ranks");
-
-		if (ranks == null) {
-			throw new IllegalArgumentException(
-				"No value found for property \"message.boards.user.ranks\"");
-		}
-
-		String min = Collections.min(
-			StringUtil.split(ranks),
-			Comparator.comparing(
-				rank -> {
-					List<String> rankParts = StringUtil.split(
-						rank, CharPool.EQUAL);
-
-					return rankParts.get(1);
-				}));
-
-		List<String> minParts = StringUtil.split(min, CharPool.EQUAL);
-
-		String lowestRank = minParts.get(0);
-
-		renderRequest.setAttribute(QuestionsWebKeys.DEFAULT_RANK, lowestRank);
-
 		ItemSelectorCriterion itemSelectorCriterion =
 			new ImageItemSelectorCriterion();
 
@@ -158,37 +114,24 @@ public class QuestionsPortlet extends MVCPortlet {
 		renderRequest.setAttribute(
 			QuestionsWebKeys.IMAGE_BROWSE_URL, portletURL.toString());
 
-		renderRequest.setAttribute(
-			QuestionsWebKeys.FLAGS_PROPERTIES,
-			HashMapBuilder.<String, Object>put(
-				"context",
-				HashMapBuilder.<String, Object>put(
-					"namespace", _portal.getPortletNamespace(PortletKeys.FLAGS)
-				).build()
-			).put(
-				"props",
-				() -> HashMapBuilder.<String, Object>put(
-					"captchaURI", FlagsTagUtil.getCaptchaURI(httpServletRequest)
-				).put(
-					"isFlagEnabled", FlagsTagUtil.isFlagsEnabled(themeDisplay)
-				).put(
-					"pathTermsOfUse",
-					_portal.getPathMain() + "/portal/terms_of_use"
-				).put(
-					"reasons",
-					FlagsTagUtil.getReasons(
-						themeDisplay.getCompanyId(), httpServletRequest)
-				).put(
-					"uri", FlagsTagUtil.getURI(httpServletRequest)
-				).put(
-					"viewMode",
-					Objects.equals(
-						Constants.VIEW,
-						ParamUtil.getString(
-							themeDisplay.getRequest(), "p_l_mode",
-							Constants.VIEW))
-				).build()
-			).build());
+		String lowestRank = Stream.of(
+			_portal.getPortalProperties()
+		).map(
+			properties -> properties.getProperty("message.boards.user.ranks")
+		).map(
+			s -> s.split(",")
+		).flatMap(
+			Arrays::stream
+		).min(
+			Comparator.comparing(rank -> rank.split("=")[1])
+		).map(
+			rank -> rank.split("=")[0]
+		).orElse(
+			"Youngling"
+		);
+
+		renderRequest.setAttribute(QuestionsWebKeys.DEFAULT_RANK, lowestRank);
+
 		renderRequest.setAttribute(
 			QuestionsWebKeys.TAG_SELECTOR_URL,
 			_getTagSelectorURL(renderRequest, renderResponse));
@@ -203,6 +146,11 @@ public class QuestionsPortlet extends MVCPortlet {
 	protected void activate(Map<String, Object> properties) {
 		_questionsConfiguration = ConfigurableUtil.createConfigurable(
 			QuestionsConfiguration.class, properties);
+	}
+
+	@Reference(unbind = "-")
+	protected void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
 	}
 
 	private String _getTagSelectorURL(
@@ -230,7 +178,7 @@ public class QuestionsPortlet extends MVCPortlet {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;
@@ -266,7 +214,7 @@ public class QuestionsPortlet extends MVCPortlet {
 		}
 		catch (ConfigurationException configurationException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(configurationException);
+				_log.debug(configurationException, configurationException);
 			}
 		}
 
@@ -276,15 +224,9 @@ public class QuestionsPortlet extends MVCPortlet {
 	private static final Log _log = LogFactoryUtil.getLog(
 		QuestionsPortlet.class);
 
-	@Reference(
-		target = "(model.class.name=com.liferay.questions.web.internal.configuration.QuestionsConfiguration)"
-	)
-	private ConfigurationModelListener _configurationModelListener;
-
 	@Reference
 	private ConfigurationProvider _configurationProvider;
 
-	@Reference
 	private ItemSelector _itemSelector;
 
 	@Reference

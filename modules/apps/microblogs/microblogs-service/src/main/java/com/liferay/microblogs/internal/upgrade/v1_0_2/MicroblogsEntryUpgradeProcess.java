@@ -14,6 +14,7 @@
 
 package com.liferay.microblogs.internal.upgrade.v1_0_2;
 
+import com.liferay.microblogs.internal.upgrade.v1_0_2.util.MicroblogsEntryTable;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
 
@@ -24,31 +25,39 @@ public class MicroblogsEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_removeReceiverUserId();
-		_renameReceiverMicroblogsEntryId();
+		removeReceiverUserId();
+		renameReceiverMicroblogsEntryId();
 	}
 
-	private void _removeReceiverUserId() throws Exception {
+	protected void removeReceiverUserId() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			alterTableDropColumn("MicroblogsEntry", "receiverUserId");
+			if (!hasColumn("MicroblogsEntry", "receiverUserId")) {
+				return;
+			}
+
+			alter(
+				MicroblogsEntryTable.class,
+				new AlterTableDropColumn("receiverUserId"));
 		}
 	}
 
-	private void _renameReceiverMicroblogsEntryId() throws Exception {
+	protected void renameReceiverMicroblogsEntryId() throws Exception {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			if (!hasColumn("MicroblogsEntry", "receiverMicroblogsEntryId")) {
 				return;
 			}
 
-			alterTableAddColumn(
-				"MicroblogsEntry", "parentMicroblogsEntryId", "LONG");
+			alter(
+				MicroblogsEntryTable.class,
+				new AlterTableAddColumn("parentMicroblogsEntryId", "LONG"));
 
 			runSQL(
 				"update MicroblogsEntry set parentMicroblogsEntryId = " +
 					"receiverMicroblogsEntryId");
 
-			alterTableDropColumn(
-				"MicroblogsEntry", "receiverMicroblogsEntryId");
+			alter(
+				MicroblogsEntryTable.class,
+				new AlterTableDropColumn("receiverMicroblogsEntryId"));
 		}
 	}
 

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -2576,73 +2577,73 @@ public class OrganizationUtil {
 	}
 
 	/**
-	 * Returns the organization where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchOrganizationException</code> if it could not be found.
+	 * Returns the organization where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchOrganizationException</code> if it could not be found.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching organization
 	 * @throws NoSuchOrganizationException if a matching organization could not be found
 	 */
-	public static Organization findByERC_C(
-			String externalReferenceCode, long companyId)
+	public static Organization findByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.NoSuchOrganizationException {
 
-		return getPersistence().findByERC_C(externalReferenceCode, companyId);
+		return getPersistence().findByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the organization where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the organization where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the matching organization, or <code>null</code> if a matching organization could not be found
 	 */
-	public static Organization fetchByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static Organization fetchByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().fetchByERC_C(externalReferenceCode, companyId);
+		return getPersistence().fetchByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the organization where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the organization where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching organization, or <code>null</code> if a matching organization could not be found
 	 */
-	public static Organization fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
+	public static Organization fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
 
-		return getPersistence().fetchByERC_C(
-			externalReferenceCode, companyId, useFinderCache);
+		return getPersistence().fetchByC_ERC(
+			companyId, externalReferenceCode, useFinderCache);
 	}
 
 	/**
-	 * Removes the organization where externalReferenceCode = &#63; and companyId = &#63; from the database.
+	 * Removes the organization where companyId = &#63; and externalReferenceCode = &#63; from the database.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the organization that was removed
 	 */
-	public static Organization removeByERC_C(
-			String externalReferenceCode, long companyId)
+	public static Organization removeByC_ERC(
+			long companyId, String externalReferenceCode)
 		throws com.liferay.portal.kernel.exception.NoSuchOrganizationException {
 
-		return getPersistence().removeByERC_C(externalReferenceCode, companyId);
+		return getPersistence().removeByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
-	 * Returns the number of organizations where externalReferenceCode = &#63; and companyId = &#63;.
+	 * Returns the number of organizations where companyId = &#63; and externalReferenceCode = &#63;.
 	 *
-	 * @param externalReferenceCode the external reference code
 	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
 	 * @return the number of matching organizations
 	 */
-	public static int countByERC_C(
-		String externalReferenceCode, long companyId) {
+	public static int countByC_ERC(
+		long companyId, String externalReferenceCode) {
 
-		return getPersistence().countByERC_C(externalReferenceCode, companyId);
+		return getPersistence().countByC_ERC(companyId, externalReferenceCode);
 	}
 
 	/**
@@ -3213,9 +3214,15 @@ public class OrganizationUtil {
 	}
 
 	public static OrganizationPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence =
+				(OrganizationPersistence)PortalBeanLocatorUtil.locate(
+					OrganizationPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile OrganizationPersistence _persistence;
+	private static OrganizationPersistence _persistence;
 
 }

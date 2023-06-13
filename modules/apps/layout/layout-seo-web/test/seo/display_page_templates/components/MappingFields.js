@@ -68,13 +68,8 @@ describe('MappingFields', () => {
 				baseProps.inputs[1].label
 			);
 
-			hiddenImageWithDefaulInput = result.container.querySelector(
-				`input[name="${baseProps.inputs[0].name}"]`
-			);
-
-			hiddenImageInput = result.container.querySelector(
-				`input[name="${baseProps.inputs[1].name}"]`
-			);
+			hiddenImageWithDefaulInput = result.getAllByRole('textbox')[1];
+			hiddenImageInput = result.getAllByRole('textbox')[3];
 		});
 
 		it('has two read only inputs for user feedback with the selected field names', () => {

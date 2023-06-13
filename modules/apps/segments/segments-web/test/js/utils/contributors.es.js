@@ -12,7 +12,7 @@
  * details.
  */
 
-import {applyConjunctionChangeToContributor} from '../../../src/main/resources/META-INF/resources/js/utils/contributors';
+import {applyConjunctionChangeToContributor} from '../../../src/main/resources/META-INF/resources/js/utils/contributors.es';
 
 describe('applyConjunctionChangeToContributor', () => {
 	it('changes contributors to selected conjunction', () => {

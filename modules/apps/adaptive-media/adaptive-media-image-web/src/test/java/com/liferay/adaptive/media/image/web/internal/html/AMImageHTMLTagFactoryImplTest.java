@@ -33,12 +33,16 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Alejandro Tardín
  */
+@RunWith(MockitoJUnitRunner.class)
 public class AMImageHTMLTagFactoryImplTest {
 
 	@ClassRule
@@ -203,8 +207,11 @@ public class AMImageHTMLTagFactoryImplTest {
 
 	private final AMImageHTMLTagFactoryImpl _amImageHTMLTagFactoryImpl =
 		new AMImageHTMLTagFactoryImpl();
-	private final FileEntry _fileEntry = Mockito.mock(FileEntry.class);
-	private final MediaQueryProvider _mediaQueryProvider = Mockito.mock(
-		MediaQueryProvider.class);
+
+	@Mock
+	private FileEntry _fileEntry;
+
+	@Mock
+	private MediaQueryProvider _mediaQueryProvider;
 
 }

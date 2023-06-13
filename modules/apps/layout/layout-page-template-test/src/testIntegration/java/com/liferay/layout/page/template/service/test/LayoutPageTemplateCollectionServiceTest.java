@@ -85,13 +85,15 @@ public class LayoutPageTemplateCollectionServiceTest {
 
 	@Test
 	public void testAddLayoutPageTemplateCollection() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		LayoutPageTemplateCollection layoutPageTemplateCollection =
 			_layoutPageTemplateCollectionService.
 				addLayoutPageTemplateCollection(
 					_group.getGroupId(), "Layout Page Template Collection",
-					null,
-					ServiceContextTestUtil.getServiceContext(
-						_group.getGroupId(), TestPropsValues.getUserId()));
+					null, serviceContext);
 
 		Assert.assertEquals(
 			"Layout Page Template Collection",
@@ -102,20 +104,24 @@ public class LayoutPageTemplateCollectionServiceTest {
 	public void testAddLayoutPageTemplateCollectionWithEmptyName()
 		throws Exception {
 
-		_layoutPageTemplateCollectionService.addLayoutPageTemplateCollection(
-			_group.getGroupId(), StringPool.BLANK, null,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		_layoutPageTemplateCollectionService.addLayoutPageTemplateCollection(
+			_group.getGroupId(), StringPool.BLANK, null, serviceContext);
 	}
 
 	@Test(expected = LayoutPageTemplateCollectionNameException.class)
 	public void testAddLayoutPageTemplateCollectionWithNullName()
 		throws Exception {
 
-		_layoutPageTemplateCollectionService.addLayoutPageTemplateCollection(
-			_group.getGroupId(), null, null,
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		_layoutPageTemplateCollectionService.addLayoutPageTemplateCollection(
+			_group.getGroupId(), null, null, serviceContext);
 	}
 
 	@Test
@@ -149,13 +155,15 @@ public class LayoutPageTemplateCollectionServiceTest {
 
 	@Test
 	public void testDeleteLayoutPageTemplateCollection() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		LayoutPageTemplateCollection layoutPageTemplateCollection =
 			_layoutPageTemplateCollectionService.
 				addLayoutPageTemplateCollection(
 					_group.getGroupId(), "Layout Page Template Collection",
-					null,
-					ServiceContextTestUtil.getServiceContext(
-						_group.getGroupId(), TestPropsValues.getUserId()));
+					null, serviceContext);
 
 		_layoutPageTemplateCollectionService.deleteLayoutPageTemplateCollection(
 			layoutPageTemplateCollection.getLayoutPageTemplateCollectionId());
@@ -453,7 +461,7 @@ public class LayoutPageTemplateCollectionServiceTest {
 			_group.getGroupId(),
 			layoutPageTemplateCollection.getLayoutPageTemplateCollectionId(),
 			"Layout Page Template Entry",
-			LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE, 0,
+			LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE,
 			WorkflowConstants.STATUS_DRAFT, serviceContext);
 
 		_layoutPageTemplateCollectionService.deleteLayoutPageTemplateCollection(
@@ -470,13 +478,15 @@ public class LayoutPageTemplateCollectionServiceTest {
 	public void testUpdateLayoutPageTemplateCollection()
 		throws PortalException {
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		LayoutPageTemplateCollection layoutPageTemplateCollection =
 			_layoutPageTemplateCollectionService.
 				addLayoutPageTemplateCollection(
 					_group.getGroupId(), "Layout Page Template Collection",
-					null,
-					ServiceContextTestUtil.getServiceContext(
-						_group.getGroupId(), TestPropsValues.getUserId()));
+					null, serviceContext);
 
 		layoutPageTemplateCollection =
 			_layoutPageTemplateCollectionService.
@@ -486,11 +496,9 @@ public class LayoutPageTemplateCollectionServiceTest {
 					"Layout Page Template Collection New", "Description New");
 
 		Assert.assertEquals(
-			"layout-page-template-collection-new",
-			layoutPageTemplateCollection.getLayoutPageTemplateCollectionKey());
-		Assert.assertEquals(
 			"Layout Page Template Collection New",
 			layoutPageTemplateCollection.getName());
+
 		Assert.assertEquals(
 			"Description New", layoutPageTemplateCollection.getDescription());
 	}

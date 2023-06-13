@@ -16,7 +16,6 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
 import classNames from 'classnames';
 import domAlign from 'dom-align';
-import {sub} from 'frontend-js-web';
 import React, {
 	createContext,
 	forwardRef,
@@ -30,12 +29,8 @@ import React, {
 
 import {useConfig} from '../../core/hooks/useConfig.es';
 import {EVENT_TYPES} from '../actions/eventTypes.es';
-import {useSetSourceItem as useSetKeyboardDNDSourceItem} from '../components/KeyboardDNDContext';
-import {useForm, useFormState} from '../hooks/useForm.es';
+import {useForm} from '../hooks/useForm.es';
 import {useResizeObserver} from '../hooks/useResizeObserver.es';
-import {getFieldChildren} from '../utils/getFieldChildren';
-
-import './Actions.scss';
 
 const ActionsContext = createContext({});
 
@@ -69,7 +64,7 @@ const reducer = (state, action) => {
 /**
  * ActionsContext is responsible for store which field is being hovered or active
  */
-export function ActionsProvider({actions, children, focusedFieldId}) {
+export const ActionsProvider = ({actions, children, focusedFieldId}) => {
 	const [state, dispatch] = useReducer(reducer, ACTIONS_INITAL_REDUCER);
 	const dispatchForm = useForm();
 
@@ -113,23 +108,23 @@ export function ActionsProvider({actions, children, focusedFieldId}) {
 			{children}
 		</ActionsContext.Provider>
 	);
-}
+};
 
-export function useActions() {
+export const useActions = () => {
 	return useContext(ActionsContext);
-}
+};
 
 ActionsContext.displayName = 'ActionsContext';
 
 const ACTIONS_CONTAINER_OFFSET = [0, 1];
 
-export function ActionsControls({
+export const ActionsControls = ({
 	actionsRef,
 	activePage,
 	children,
 	columnRef,
 	field,
-}) {
+}) => {
 	const {
 		dispatch,
 		state: {activeId, hoveredId},
@@ -190,27 +185,15 @@ export function ActionsControls({
 		onMouseLeave: handleFieldInteractions,
 		onMouseOver: handleFieldInteractions,
 	});
-}
+};
 
 export const Actions = forwardRef(
 	(
-		{
-			activePage,
-			field,
-			fieldId,
-			fieldType,
-			isFieldSelected,
-			isFieldSet,
-			itemPath,
-			parentFieldName,
-		},
+		{activePage, fieldId, fieldType, isFieldSet, parentFieldName},
 		actionsRef
 	) => {
 		const {fieldTypes} = useConfig();
-		const formState = useFormState();
-		const {actions, dispatch} = useActions();
-
-		const setKeyboardDNDSourceItem = useSetKeyboardDNDSourceItem();
+		const {actions} = useActions();
 
 		const label = useMemo(() => {
 			if (isFieldSet) {
@@ -220,93 +203,13 @@ export const Actions = forwardRef(
 			return fieldTypes.find(({name}) => name === fieldType).label;
 		}, [fieldType, isFieldSet, fieldTypes]);
 
-		const handleEditButtonClick = () => {
-			dispatch({
-				payload: {activePage, field},
-				type: ACTIONS_TYPES.ACTIVE,
-			});
-		};
-
-		const handleDragButtonClick = () => {
-			let parentField;
-			let pageIndex;
-
-			const hasFieldId = (itemWithRows) =>
-				itemWithRows.rows?.some((row) =>
-					row.columns?.some((column) =>
-						column.fields?.some(
-							(field) =>
-								field.fieldName === fieldId ||
-								hasFieldId({
-									...field,
-									rows: getFieldChildren(field),
-								})
-						)
-					)
-				);
-
-			formState.pages.forEach((page, index) => {
-				if (typeof pageIndex === 'number') {
-					return;
-				}
-
-				if (hasFieldId(page)) {
-					pageIndex = index;
-					parentField = {};
-
-					page.rows.forEach((row) => {
-						row.columns.forEach((column) => {
-							column.fields.forEach((field) => {
-								if (hasFieldId(field)) {
-									parentField = field;
-								}
-							});
-						});
-					});
-				}
-			});
-
-			setKeyboardDNDSourceItem({
-				dragType: 'move',
-				fieldName: fieldId,
-				itemPath,
-				pageIndex,
-				parentField,
-			});
-		};
-
 		return (
 			<div
 				className={classNames('ddm-field-actions-container', {
-					'ddm-field-actions-container--selected': isFieldSelected,
 					'ddm-fieldset': isFieldSet,
 				})}
 				ref={actionsRef}
 			>
-				<div className="ddm-field-action-buttons">
-					<ClayButtonWithIcon
-						aria-label={sub(Liferay.Language.get('move-x'), [
-							label,
-						])}
-						className="ddm-field-action-button mr-2 sr-only sr-only-focusable"
-						displayType="primary"
-						onClick={handleDragButtonClick}
-						role="application"
-						symbol="drag"
-					/>
-
-					<ClayButtonWithIcon
-						aria-label={sub(Liferay.Language.get('edit-x'), [
-							label,
-						])}
-						className="ddm-field-action-button mr-2 sr-only sr-only-focusable"
-						displayType="primary"
-						onClick={handleEditButtonClick}
-						role="application"
-						symbol="cog"
-					/>
-				</div>
-
 				<span className="actions-label">{label}</span>
 
 				<ClayDropDownWithItems

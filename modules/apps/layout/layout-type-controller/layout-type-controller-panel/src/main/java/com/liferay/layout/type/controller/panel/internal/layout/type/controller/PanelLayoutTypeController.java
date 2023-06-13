@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	property = "layout.type=" + LayoutConstants.TYPE_PANEL,
+	immediate = true, property = "layout.type=" + LayoutConstants.TYPE_PANEL,
 	service = LayoutTypeController.class
 )
 public class PanelLayoutTypeController extends BaseLayoutTypeControllerImpl {
@@ -76,6 +76,22 @@ public class PanelLayoutTypeController extends BaseLayoutTypeControllerImpl {
 		return true;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #createServletResponse(HttpServletResponse,
+	 *             UnsyncStringWriter)}
+	 */
+	@Deprecated
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		com.liferay.portal.kernel.io.unsync.UnsyncStringWriter
+			unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
+	}
+
 	@Override
 	protected ServletResponse createServletResponse(
 		HttpServletResponse httpServletResponse,
@@ -91,13 +107,16 @@ public class PanelLayoutTypeController extends BaseLayoutTypeControllerImpl {
 	}
 
 	@Override
-	protected ServletContext getServletContext() {
-		return _servletContext;
-	}
-
-	@Override
 	protected String getViewPage() {
 		return _VIEW_PAGE;
+	}
+
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.panel)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
 	}
 
 	private static final String _EDIT_PAGE = "/layout/edit/panel.jsp";
@@ -107,10 +126,5 @@ public class PanelLayoutTypeController extends BaseLayoutTypeControllerImpl {
 			"&p_v_l_s_g_id=${liferay:pvlsgid}";
 
 	private static final String _VIEW_PAGE = "/layout/view/panel.jsp";
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.layout.type.controller.panel)"
-	)
-	private ServletContext _servletContext;
 
 }

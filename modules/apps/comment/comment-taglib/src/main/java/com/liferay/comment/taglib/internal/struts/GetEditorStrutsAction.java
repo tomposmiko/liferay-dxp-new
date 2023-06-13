@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
-	property = "path=/portal/comment/discussion/get_editor",
+	immediate = true, property = "path=/portal/comment/discussion/get_editor",
 	service = StrutsAction.class
 )
 public class GetEditorStrutsAction implements StrutsAction {
@@ -70,7 +70,7 @@ public class GetEditorStrutsAction implements StrutsAction {
 			"liferay-comment:editor:onChangeMethod", onChangeMethod);
 
 		String portletId = ParamUtil.getString(
-			namespacedHttpServletRequest, "p_p_id");
+			namespacedHttpServletRequest, "portletId");
 
 		namespacedHttpServletRequest.setAttribute(
 			WebKeys.PORTLET_ID, portletId);

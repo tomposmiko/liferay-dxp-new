@@ -15,13 +15,13 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
+import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
-import com.liferay.portal.kernel.encryptor.EncryptorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -40,10 +40,10 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -54,6 +54,8 @@ import java.security.Key;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.TreeMap;
+
+import javax.portlet.PortletPreferences;
 
 /**
  * @author Brian Wing Shun Chan
@@ -117,13 +119,9 @@ public class CompanyImpl extends CompanyBaseImpl {
 		return _companySecurityBag;
 	}
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #getGuestUser}
-	 */
-	@Deprecated
 	@Override
 	public User getDefaultUser() throws PortalException {
-		return getGuestUser();
+		return UserLocalServiceUtil.getDefaultUser(getCompanyId());
 	}
 
 	@Override
@@ -171,11 +169,6 @@ public class CompanyImpl extends CompanyBaseImpl {
 	}
 
 	@Override
-	public User getGuestUser() throws PortalException {
-		return UserLocalServiceUtil.getGuestUser(getCompanyId());
-	}
-
-	@Override
 	public String getKey() {
 		CompanyInfo companyInfo = getCompanyInfo();
 
@@ -188,7 +181,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 			String key = getKey();
 
 			if (Validator.isNotNull(key)) {
-				_keyObj = EncryptorUtil.deserializeKey(key);
+				_keyObj = Encryptor.deserializeKey(key);
 			}
 		}
 
@@ -197,7 +190,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	@Override
 	public Locale getLocale() throws PortalException {
-		return getGuestUser().getLocale();
+		return getDefaultUser().getLocale();
 	}
 
 	@AutoEscape
@@ -281,16 +274,12 @@ public class CompanyImpl extends CompanyBaseImpl {
 
 	@Override
 	public TimeZone getTimeZone() throws PortalException {
-		return getGuestUser().getTimeZone();
+		return getDefaultUser().getTimeZone();
 	}
 
 	@Override
 	public String getVirtualHostname() {
-
-		// Call Validator.isNotNull on _virtualHostname because of the field is
-		// an especially annotated CacheField. See LCD-14360.
-
-		if (Validator.isNotNull(_virtualHostname)) {
+		if (_virtualHostname != null) {
 			return _virtualHostname;
 		}
 
@@ -302,7 +291,7 @@ public class CompanyImpl extends CompanyBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -349,6 +338,15 @@ public class CompanyImpl extends CompanyBaseImpl {
 		CompanySecurityBag companySecurityBag = getCompanySecurityBag();
 
 		return companySecurityBag._autoLogin;
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public boolean isSendPassword() {
+		return false;
 	}
 
 	@Override
@@ -419,26 +417,32 @@ public class CompanyImpl extends CompanyBaseImpl {
 	public static class CompanySecurityBag implements Serializable {
 
 		private CompanySecurityBag(Company company) {
+			PortletPreferences preferences = PrefsPropsUtil.getPreferences(
+				company.getCompanyId(), true);
+
 			_authType = _getPrefsPropsString(
-				company, PropsKeys.COMPANY_SECURITY_AUTH_TYPE,
+				preferences, company, PropsKeys.COMPANY_SECURITY_AUTH_TYPE,
 				PropsValues.COMPANY_SECURITY_AUTH_TYPE);
 			_autoLogin = _getPrefsPropsBoolean(
-				company, PropsKeys.COMPANY_SECURITY_AUTO_LOGIN,
+				preferences, company, PropsKeys.COMPANY_SECURITY_AUTO_LOGIN,
 				PropsValues.COMPANY_SECURITY_AUTO_LOGIN);
 			_siteLogo = _getPrefsPropsBoolean(
-				company, PropsKeys.COMPANY_SECURITY_SITE_LOGO,
+				preferences, company, PropsKeys.COMPANY_SECURITY_SITE_LOGO,
 				PropsValues.COMPANY_SECURITY_SITE_LOGO);
 			_strangers = _getPrefsPropsBoolean(
-				company, PropsKeys.COMPANY_SECURITY_STRANGERS,
+				preferences, company, PropsKeys.COMPANY_SECURITY_STRANGERS,
 				PropsValues.COMPANY_SECURITY_STRANGERS);
 			_strangersVerify = _getPrefsPropsBoolean(
-				company, PropsKeys.COMPANY_SECURITY_STRANGERS_VERIFY,
+				preferences, company,
+				PropsKeys.COMPANY_SECURITY_STRANGERS_VERIFY,
 				PropsValues.COMPANY_SECURITY_STRANGERS_VERIFY);
 			_strangersWithMx = _getPrefsPropsBoolean(
-				company, PropsKeys.COMPANY_SECURITY_STRANGERS_WITH_MX,
+				preferences, company,
+				PropsKeys.COMPANY_SECURITY_STRANGERS_WITH_MX,
 				PropsValues.COMPANY_SECURITY_STRANGERS_WITH_MX);
 			_updatePasswordRequired = _getPrefsPropsBoolean(
-				company, PropsKeys.COMPANY_SECURITY_UPDATE_PASSWORD_REQUIRED,
+				preferences, company,
+				PropsKeys.COMPANY_SECURITY_UPDATE_PASSWORD_REQUIRED,
 				PropsValues.COMPANY_SECURITY_UPDATE_PASSWORD_REQUIRED);
 		}
 
@@ -453,10 +457,11 @@ public class CompanyImpl extends CompanyBaseImpl {
 	}
 
 	private static boolean _getPrefsPropsBoolean(
-		Company company, String name, boolean defaultValue) {
+		PortletPreferences portletPreferences, Company company, String name,
+		boolean defaultValue) {
 
-		String value = PrefsPropsUtil.getString(
-			company.getCompanyId(), name, PropsUtil.get(company, name));
+		String value = portletPreferences.getValue(
+			name, PropsUtil.get(company, name));
 
 		if (value != null) {
 			return GetterUtil.getBoolean(value);
@@ -466,10 +471,11 @@ public class CompanyImpl extends CompanyBaseImpl {
 	}
 
 	private static String _getPrefsPropsString(
-		Company company, String name, String defaultValue) {
+		PortletPreferences portletPreferences, Company company, String name,
+		String defaultValue) {
 
-		String value = PrefsPropsUtil.getString(
-			company.getCompanyId(), name, PropsUtil.get(company, name));
+		String value = portletPreferences.getValue(
+			name, PropsUtil.get(company, name));
 
 		if (value != null) {
 			return value;

@@ -23,19 +23,19 @@ public class UpgradeLastPublishDate extends BaseLastPublishDateUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterTableAddColumn("KBArticle", "lastPublishDate", "DATE null");
+		runSQL("alter table KBArticle add lastPublishDate DATE null");
 
 		updateLastPublishDates("1_WAR_knowledgebaseportlet", "KBArticle");
 
-		alterTableAddColumn("KBComment", "lastPublishDate", "DATE null");
+		runSQL("alter table KBComment add lastPublishDate DATE null");
 
 		updateLastPublishDates("1_WAR_knowledgebaseportlet", "KBComment");
 
-		alterTableAddColumn("KBFolder", "lastPublishDate", "DATE null");
+		runSQL("alter table KBFolder add lastPublishDate DATE null");
 
 		updateLastPublishDates("1_WAR_knowledgebaseportlet", "KBFolder");
 
-		alterTableAddColumn("KBTemplate", "lastPublishDate", "DATE null");
+		runSQL("alter table KBTemplate add lastPublishDate DATE null");
 
 		updateLastPublishDates("1_WAR_knowledgebaseportlet", "KBTemplate");
 	}

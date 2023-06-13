@@ -15,14 +15,12 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.fragment.collection.filter.FragmentCollectionFilter;
-import com.liferay.fragment.collection.filter.FragmentCollectionFilterRegistry;
+import com.liferay.fragment.collection.filter.FragmentCollectionFilterTracker;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
@@ -39,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pablo Molina
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
 		"mvc.command.name=/layout_content_page_editor/get_collection_filters"
@@ -57,10 +56,10 @@ public class GetCollectionFiltersMVCResourceCommand
 			WebKeys.THEME_DISPLAY);
 
 		JSONObject fragmentCollectionFiltersJSONObject =
-			_jsonFactory.createJSONObject();
+			JSONFactoryUtil.createJSONObject();
 
 		for (FragmentCollectionFilter fragmentCollectionFilter :
-				_fragmentCollectionFilterRegistry.
+				_fragmentCollectionFilterTracker.
 					getFragmentCollectionFilters()) {
 
 			fragmentCollectionFiltersJSONObject.put(
@@ -84,24 +83,14 @@ public class GetCollectionFiltersMVCResourceCommand
 
 	private JSONObject _getConfigurationJSONObject(String configuration) {
 		try {
-			return _jsonFactory.createJSONObject(configuration);
+			return JSONFactoryUtil.createJSONObject(configuration);
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
-			return _jsonFactory.createJSONObject();
+			return JSONFactoryUtil.createJSONObject();
 		}
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		GetCollectionFiltersMVCResourceCommand.class);
-
 	@Reference
-	private FragmentCollectionFilterRegistry _fragmentCollectionFilterRegistry;
-
-	@Reference
-	private JSONFactory _jsonFactory;
+	private FragmentCollectionFilterTracker _fragmentCollectionFilterTracker;
 
 }

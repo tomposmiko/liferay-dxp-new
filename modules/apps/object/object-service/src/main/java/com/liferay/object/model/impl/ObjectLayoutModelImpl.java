@@ -19,6 +19,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.object.model.ObjectLayout;
 import com.liferay.object.model.ObjectLayoutModel;
+import com.liferay.object.model.ObjectLayoutSoap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.LocaleException;
@@ -40,15 +41,18 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -167,6 +171,59 @@ public class ObjectLayoutModelImpl
 	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
 	}
 
+	/**
+	 * Converts the soap model instance into a normal model instance.
+	 *
+	 * @param soapModel the soap model instance to convert
+	 * @return the normal model instance
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static ObjectLayout toModel(ObjectLayoutSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
+		ObjectLayout model = new ObjectLayoutImpl();
+
+		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setUuid(soapModel.getUuid());
+		model.setObjectLayoutId(soapModel.getObjectLayoutId());
+		model.setCompanyId(soapModel.getCompanyId());
+		model.setUserId(soapModel.getUserId());
+		model.setUserName(soapModel.getUserName());
+		model.setCreateDate(soapModel.getCreateDate());
+		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setObjectDefinitionId(soapModel.getObjectDefinitionId());
+		model.setDefaultObjectLayout(soapModel.isDefaultObjectLayout());
+		model.setName(soapModel.getName());
+
+		return model;
+	}
+
+	/**
+	 * Converts the soap model instances into normal model instances.
+	 *
+	 * @param soapModels the soap model instances to convert
+	 * @return the normal model instances
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static List<ObjectLayout> toModels(ObjectLayoutSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
+		List<ObjectLayout> models = new ArrayList<ObjectLayout>(
+			soapModels.length);
+
+		for (ObjectLayoutSoap soapModel : soapModels) {
+			models.add(toModel(soapModel));
+		}
+
+		return models;
+	}
+
 	public ObjectLayoutModelImpl() {
 	}
 
@@ -243,101 +300,107 @@ public class ObjectLayoutModelImpl
 	public Map<String, Function<ObjectLayout, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<ObjectLayout, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, ObjectLayout>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<ObjectLayout, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ObjectLayout.class.getClassLoader(), ObjectLayout.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<ObjectLayout, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap<String, Function<ObjectLayout, Object>>();
+		try {
+			Constructor<ObjectLayout> constructor =
+				(Constructor<ObjectLayout>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", ObjectLayout::getMvccVersion);
-			attributeGetterFunctions.put("uuid", ObjectLayout::getUuid);
-			attributeGetterFunctions.put(
-				"objectLayoutId", ObjectLayout::getObjectLayoutId);
-			attributeGetterFunctions.put(
-				"companyId", ObjectLayout::getCompanyId);
-			attributeGetterFunctions.put("userId", ObjectLayout::getUserId);
-			attributeGetterFunctions.put("userName", ObjectLayout::getUserName);
-			attributeGetterFunctions.put(
-				"createDate", ObjectLayout::getCreateDate);
-			attributeGetterFunctions.put(
-				"modifiedDate", ObjectLayout::getModifiedDate);
-			attributeGetterFunctions.put(
-				"objectDefinitionId", ObjectLayout::getObjectDefinitionId);
-			attributeGetterFunctions.put(
-				"defaultObjectLayout", ObjectLayout::getDefaultObjectLayout);
-			attributeGetterFunctions.put("name", ObjectLayout::getName);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<ObjectLayout, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ObjectLayout, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<ObjectLayout, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<ObjectLayout, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ObjectLayout, Object>>();
+		Map<String, BiConsumer<ObjectLayout, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<ObjectLayout, ?>>();
 
-		static {
-			Map<String, BiConsumer<ObjectLayout, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap<String, BiConsumer<ObjectLayout, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", ObjectLayout::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<ObjectLayout, Long>)ObjectLayout::setMvccVersion);
+		attributeGetterFunctions.put("uuid", ObjectLayout::getUuid);
+		attributeSetterBiConsumers.put(
+			"uuid", (BiConsumer<ObjectLayout, String>)ObjectLayout::setUuid);
+		attributeGetterFunctions.put(
+			"objectLayoutId", ObjectLayout::getObjectLayoutId);
+		attributeSetterBiConsumers.put(
+			"objectLayoutId",
+			(BiConsumer<ObjectLayout, Long>)ObjectLayout::setObjectLayoutId);
+		attributeGetterFunctions.put("companyId", ObjectLayout::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<ObjectLayout, Long>)ObjectLayout::setCompanyId);
+		attributeGetterFunctions.put("userId", ObjectLayout::getUserId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<ObjectLayout, Long>)ObjectLayout::setUserId);
+		attributeGetterFunctions.put("userName", ObjectLayout::getUserName);
+		attributeSetterBiConsumers.put(
+			"userName",
+			(BiConsumer<ObjectLayout, String>)ObjectLayout::setUserName);
+		attributeGetterFunctions.put("createDate", ObjectLayout::getCreateDate);
+		attributeSetterBiConsumers.put(
+			"createDate",
+			(BiConsumer<ObjectLayout, Date>)ObjectLayout::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", ObjectLayout::getModifiedDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<ObjectLayout, Date>)ObjectLayout::setModifiedDate);
+		attributeGetterFunctions.put(
+			"objectDefinitionId", ObjectLayout::getObjectDefinitionId);
+		attributeSetterBiConsumers.put(
+			"objectDefinitionId",
+			(BiConsumer<ObjectLayout, Long>)
+				ObjectLayout::setObjectDefinitionId);
+		attributeGetterFunctions.put(
+			"defaultObjectLayout", ObjectLayout::getDefaultObjectLayout);
+		attributeSetterBiConsumers.put(
+			"defaultObjectLayout",
+			(BiConsumer<ObjectLayout, Boolean>)
+				ObjectLayout::setDefaultObjectLayout);
+		attributeGetterFunctions.put("name", ObjectLayout::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<ObjectLayout, String>)ObjectLayout::setName);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<ObjectLayout, Long>)ObjectLayout::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"uuid",
-				(BiConsumer<ObjectLayout, String>)ObjectLayout::setUuid);
-			attributeSetterBiConsumers.put(
-				"objectLayoutId",
-				(BiConsumer<ObjectLayout, Long>)
-					ObjectLayout::setObjectLayoutId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<ObjectLayout, Long>)ObjectLayout::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"userId",
-				(BiConsumer<ObjectLayout, Long>)ObjectLayout::setUserId);
-			attributeSetterBiConsumers.put(
-				"userName",
-				(BiConsumer<ObjectLayout, String>)ObjectLayout::setUserName);
-			attributeSetterBiConsumers.put(
-				"createDate",
-				(BiConsumer<ObjectLayout, Date>)ObjectLayout::setCreateDate);
-			attributeSetterBiConsumers.put(
-				"modifiedDate",
-				(BiConsumer<ObjectLayout, Date>)ObjectLayout::setModifiedDate);
-			attributeSetterBiConsumers.put(
-				"objectDefinitionId",
-				(BiConsumer<ObjectLayout, Long>)
-					ObjectLayout::setObjectDefinitionId);
-			attributeSetterBiConsumers.put(
-				"defaultObjectLayout",
-				(BiConsumer<ObjectLayout, Boolean>)
-					ObjectLayout::setDefaultObjectLayout);
-			attributeSetterBiConsumers.put(
-				"name",
-				(BiConsumer<ObjectLayout, String>)ObjectLayout::setName);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@JSON
@@ -1026,12 +1089,41 @@ public class ObjectLayoutModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<ObjectLayout, Object>> attributeGetterFunctions =
+			getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<ObjectLayout, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<ObjectLayout, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((ObjectLayout)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ObjectLayout>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ObjectLayout.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1052,9 +1144,8 @@ public class ObjectLayoutModelImpl
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
-		Function<ObjectLayout, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+		Function<ObjectLayout, Object> function = _attributeGetterFunctions.get(
+			columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

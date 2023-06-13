@@ -18,10 +18,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.layout.page.template.admin.web.internal.security.permission.resource.LayoutPageTemplateCollectionPermission;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -75,7 +75,6 @@ public class LayoutPageTemplateCollectionActionDropdownItem {
 									layoutPageTemplateCollection.
 										getLayoutPageTemplateCollectionId()
 								).buildString());
-							dropdownItem.setIcon("pencil");
 							dropdownItem.setLabel(
 								LanguageUtil.get(_httpServletRequest, "edit"));
 						}
@@ -107,7 +106,6 @@ public class LayoutPageTemplateCollectionActionDropdownItem {
 											getLayoutPageTemplateCollectionId()),
 									LiferayWindowState.POP_UP.toString(), null,
 									_httpServletRequest));
-							dropdownItem.setIcon("password-policies");
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest, "permissions"));
@@ -143,7 +141,6 @@ public class LayoutPageTemplateCollectionActionDropdownItem {
 									layoutPageTemplateCollection.
 										getLayoutPageTemplateCollectionId()
 								).buildString());
-							dropdownItem.setIcon("trash");
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest, "delete"));

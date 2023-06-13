@@ -33,7 +33,7 @@ import com.liferay.headless.form.dto.v1_0.FormRecord;
 import com.liferay.headless.form.dto.v1_0.util.FormRecordUtil;
 import com.liferay.headless.form.internal.dto.v1_0.util.DDMFormValuesUtil;
 import com.liferay.headless.form.resource.v1_0.FormRecordResource;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -47,7 +47,10 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.BadRequestException;
 
@@ -187,29 +190,43 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 	private void _linkFileEntries(
 		DDMForm ddmForm, DDMFormValues ddmFormValues) {
 
-		for (DDMFormField ddmFormField : ddmForm.getDDMFormFields()) {
-			if (!Objects.equals(ddmFormField.getType(), "document_library")) {
-				continue;
+		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
+
+		Stream<DDMFormField> ddmFormFieldsStream = ddmFormFields.stream();
+
+		ddmFormFieldsStream.filter(
+			ddmFormField -> Objects.equals(
+				ddmFormField.getType(), "document_library")
+		).map(
+			field -> {
+				List<DDMFormFieldValue> ddmFormFieldValues =
+					ddmFormValues.getDDMFormFieldValues();
+
+				Stream<DDMFormFieldValue> ddmFormFieldValuesStream =
+					ddmFormFieldValues.stream();
+
+				return ddmFormFieldValuesStream.filter(
+					value -> Objects.equals(field.getName(), value.getName())
+				).collect(
+					Collectors.toList()
+				);
 			}
-
-			try {
-				for (DDMFormFieldValue ddmFormFieldValue :
-						ddmFormValues.getDDMFormFieldValues()) {
-
-					if (Objects.equals(
-							ddmFormField.getName(),
-							ddmFormFieldValue.getName())) {
+		).forEach(
+			ddmFormFieldValues -> {
+				try {
+					for (DDMFormFieldValue ddmFormFieldValue :
+							ddmFormFieldValues) {
 
 						_setValue(ddmFormFieldValue);
 					}
 				}
-			}
-			catch (Exception exception) {
-				_log.error(exception);
+				catch (Exception exception) {
+					_log.error(exception, exception);
 
-				throw new BadRequestException(exception);
+					throw new BadRequestException(exception);
+				}
 			}
-		}
+		);
 	}
 
 	private void _setValue(DDMFormFieldValue ddmFormFieldValue)
@@ -217,7 +234,7 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 
 		Value value = ddmFormFieldValue.getValue();
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			value.getString(contextAcceptLanguage.getPreferredLocale()));
 
 		long fileEntryId = jsonObject.getLong("fileEntryId");
@@ -273,9 +290,6 @@ public class FormRecordResourceImpl extends BaseFormRecordResourceImpl {
 
 	@Reference
 	private DLURLHelper _dlurlHelper;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Portal _portal;

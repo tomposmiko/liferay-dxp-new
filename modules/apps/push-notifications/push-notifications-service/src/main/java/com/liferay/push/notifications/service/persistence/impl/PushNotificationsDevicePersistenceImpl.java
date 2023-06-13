@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -43,12 +44,10 @@ import com.liferay.push.notifications.model.PushNotificationsDeviceTable;
 import com.liferay.push.notifications.model.impl.PushNotificationsDeviceImpl;
 import com.liferay.push.notifications.model.impl.PushNotificationsDeviceModelImpl;
 import com.liferay.push.notifications.service.persistence.PushNotificationsDevicePersistence;
-import com.liferay.push.notifications.service.persistence.PushNotificationsDeviceUtil;
 import com.liferay.push.notifications.service.persistence.impl.constants.PushNotificationsPersistenceConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -74,7 +73,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Farache
  * @generated
  */
-@Component(service = PushNotificationsDevicePersistence.class)
+@Component(
+	service = {PushNotificationsDevicePersistence.class, BasePersistence.class}
+)
 public class PushNotificationsDevicePersistenceImpl
 	extends BasePersistenceImpl<PushNotificationsDevice>
 	implements PushNotificationsDevicePersistence {
@@ -165,8 +166,7 @@ public class PushNotificationsDevicePersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByToken, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByToken, finderArgs);
 		}
 
 		if (result instanceof PushNotificationsDevice) {
@@ -271,7 +271,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		Object[] finderArgs = new Object[] {token};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -432,7 +432,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PushNotificationsDevice pushNotificationsDevice : list) {
@@ -889,7 +889,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
-	 * @param userIds the user IDs
+	 * @param userId the user ID
 	 * @param platform the platform
 	 * @param start the lower bound of the range of push notifications devices
 	 * @param end the upper bound of the range of push notifications devices (not inclusive)
@@ -937,7 +937,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
-				_finderPathWithPaginationFindByU_P, finderArgs, this);
+				_finderPathWithPaginationFindByU_P, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PushNotificationsDevice pushNotificationsDevice : list) {
@@ -1063,7 +1063,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId, platform};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1138,7 +1138,7 @@ public class PushNotificationsDevicePersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByU_P, finderArgs, this);
+			_finderPathWithPaginationCountByU_P, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -1660,7 +1660,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1731,7 +1731,7 @@ public class PushNotificationsDevicePersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1831,31 +1831,11 @@ public class PushNotificationsDevicePersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByU_P",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "platform"}, false);
-
-		_setPushNotificationsDeviceUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setPushNotificationsDeviceUtilPersistence(null);
-
 		entityCache.removeCache(PushNotificationsDeviceImpl.class.getName());
-	}
-
-	private void _setPushNotificationsDeviceUtilPersistence(
-		PushNotificationsDevicePersistence pushNotificationsDevicePersistence) {
-
-		try {
-			Field field = PushNotificationsDeviceUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, pushNotificationsDevicePersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -1918,5 +1898,9 @@ public class PushNotificationsDevicePersistenceImpl
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
+
+	@Reference
+	private PushNotificationsDeviceModelArgumentsResolver
+		_pushNotificationsDeviceModelArgumentsResolver;
 
 }

@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -46,6 +44,12 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.segments.model.SegmentsExperimentRel;
 import com.liferay.segments.service.SegmentsExperimentRelLocalService;
 import com.liferay.segments.service.SegmentsExperimentRelLocalServiceUtil;
+import com.liferay.segments.service.persistence.SegmentsEntryPersistence;
+import com.liferay.segments.service.persistence.SegmentsEntryRelPersistence;
+import com.liferay.segments.service.persistence.SegmentsEntryRolePersistence;
+import com.liferay.segments.service.persistence.SegmentsExperiencePersistence;
+import com.liferay.segments.service.persistence.SegmentsExperimentFinder;
+import com.liferay.segments.service.persistence.SegmentsExperimentPersistence;
 import com.liferay.segments.service.persistence.SegmentsExperimentRelPersistence;
 
 import java.io.Serializable;
@@ -345,11 +349,6 @@ public abstract class SegmentsExperimentRelLocalServiceBaseImpl
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException {
 
-		if (_log.isWarnEnabled()) {
-			_log.warn(
-				"Implement SegmentsExperimentRelLocalServiceImpl#deleteSegmentsExperimentRel(SegmentsExperimentRel) to avoid orphaned data");
-		}
-
 		return segmentsExperimentRelLocalService.deleteSegmentsExperimentRel(
 			(SegmentsExperimentRel)persistedModel);
 	}
@@ -512,6 +511,24 @@ public abstract class SegmentsExperimentRelLocalServiceBaseImpl
 		}
 	}
 
+	@Reference
+	protected SegmentsEntryPersistence segmentsEntryPersistence;
+
+	@Reference
+	protected SegmentsEntryRelPersistence segmentsEntryRelPersistence;
+
+	@Reference
+	protected SegmentsEntryRolePersistence segmentsEntryRolePersistence;
+
+	@Reference
+	protected SegmentsExperiencePersistence segmentsExperiencePersistence;
+
+	@Reference
+	protected SegmentsExperimentPersistence segmentsExperimentPersistence;
+
+	@Reference
+	protected SegmentsExperimentFinder segmentsExperimentFinder;
+
 	protected SegmentsExperimentRelLocalService
 		segmentsExperimentRelLocalService;
 
@@ -522,7 +539,16 @@ public abstract class SegmentsExperimentRelLocalServiceBaseImpl
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		SegmentsExperimentRelLocalServiceBaseImpl.class);
+	@Reference
+	protected com.liferay.portal.kernel.service.ClassNameLocalService
+		classNameLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.ResourceLocalService
+		resourceLocalService;
+
+	@Reference
+	protected com.liferay.portal.kernel.service.UserLocalService
+		userLocalService;
 
 }

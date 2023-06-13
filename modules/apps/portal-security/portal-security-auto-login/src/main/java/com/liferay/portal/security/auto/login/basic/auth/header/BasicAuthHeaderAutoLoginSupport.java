@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Shuyang Zhou
  */
 @Component(
+	immediate = true,
 	property = {"private.auto.login=true", "type=basic.auth.header"},
 	service = AutoLogin.class
 )

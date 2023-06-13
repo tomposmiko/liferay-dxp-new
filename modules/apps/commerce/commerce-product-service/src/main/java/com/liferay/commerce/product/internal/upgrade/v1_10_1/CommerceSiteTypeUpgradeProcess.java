@@ -104,11 +104,11 @@ public class CommerceSiteTypeUpgradeProcess extends UpgradeProcess {
 			}
 		}
 
+		long classNameId = _classNameLocalService.getClassNameId(
+			CommerceChannel.class.getName());
+
 		Group group = _groupLocalService.fetchGroup(
-			companyId,
-			_classNameLocalService.getClassNameId(
-				CommerceChannel.class.getName()),
-			commerceChannelId);
+			companyId, classNameId, commerceChannelId);
 
 		if (group != null) {
 			return group.getGroupId();

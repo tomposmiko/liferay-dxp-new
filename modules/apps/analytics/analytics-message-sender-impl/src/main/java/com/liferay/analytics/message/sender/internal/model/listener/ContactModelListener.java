@@ -31,13 +31,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rachael Koestartyo
  */
-@Component(service = {EntityModelListener.class, ModelListener.class})
+@Component(
+	immediate = true, service = {EntityModelListener.class, ModelListener.class}
+)
 public class ContactModelListener extends BaseEntityModelListener<Contact> {
 
 	@Override
 	public List<String> getAttributeNames(long companyId) {
 		AnalyticsConfiguration analyticsConfiguration =
-			analyticsConfigurationRegistry.getAnalyticsConfiguration(companyId);
+			analyticsConfigurationTracker.getAnalyticsConfiguration(companyId);
 
 		if (ArrayUtil.isEmpty(
 				analyticsConfiguration.syncedContactFieldNames())) {
@@ -64,12 +66,12 @@ public class ContactModelListener extends BaseEntityModelListener<Contact> {
 	}
 
 	private static final List<String> _attributeNames = Arrays.asList(
-		"birthday", "classNameId", "classPK", "companyId", "createDate",
-		"emailAddress", "employeeNumber", "employeeStatusId", "facebookSn",
-		"firstName", "hoursOfOperation", "jabberSn", "jobClass", "jobTitle",
-		"lastName", "male", "middleName", "modifiedDate", "parentContactId",
-		"prefixListTypeId", "skypeSn", "smsSn", "suffixListTypeId", "twitterSn",
-		"userId", "userName");
+		"accountId", "birthday", "classNameId", "classPK", "companyId",
+		"createDate", "emailAddress", "employeeNumber", "employeeStatusId",
+		"facebookSn", "firstName", "hoursOfOperation", "jabberSn", "jobClass",
+		"jobTitle", "lastName", "male", "middleName", "modifiedDate",
+		"parentContactId", "prefixId", "skypeSn", "smsSn", "suffixId",
+		"twitterSn", "userId", "userName");
 
 	@Reference
 	private ContactLocalService _contactLocalService;

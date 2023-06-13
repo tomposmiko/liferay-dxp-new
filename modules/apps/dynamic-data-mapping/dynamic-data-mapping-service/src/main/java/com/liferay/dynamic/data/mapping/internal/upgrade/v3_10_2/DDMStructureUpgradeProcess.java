@@ -37,7 +37,6 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.util.DDMFormDeserializeUtil;
 import com.liferay.dynamic.data.mapping.util.DDMFormLayoutDeserializeUtil;
 import com.liferay.dynamic.data.mapping.util.DDMFormSerializeUtil;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -57,6 +56,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Carolina Barbosa
@@ -117,6 +118,20 @@ public class DDMStructureUpgradeProcess extends UpgradeProcess {
 		}
 
 		return DDMFormSerializeUtil.serialize(ddmForm, _ddmFormSerializer);
+	}
+
+	private List<String> _getNormalizedDDMFormFieldNames(
+		List<String> ddmFormFieldNames) {
+
+		Stream<String> stream = ddmFormFieldNames.stream();
+
+		return stream.map(
+			ddmFormFieldName ->
+				DDMFormFieldUpgradeProcessUtil.getNormalizedName(
+					ddmFormFieldName)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private String _getNormalizedDDMFormRuleExpression(
@@ -323,11 +338,7 @@ public class DDMStructureUpgradeProcess extends UpgradeProcess {
 					}
 
 					ddmFormLayoutColumn.setDDMFormFieldNames(
-						TransformUtil.transform(
-							ddmFormFieldNames,
-							ddmFormFieldName ->
-								DDMFormFieldUpgradeProcessUtil.
-									getNormalizedName(ddmFormFieldName)));
+						_getNormalizedDDMFormFieldNames(ddmFormFieldNames));
 				}
 			}
 		}

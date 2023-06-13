@@ -28,7 +28,6 @@ import com.liferay.document.library.repository.external.ExtRepositoryObject;
 import com.liferay.document.library.repository.external.ExtRepositoryObjectType;
 import com.liferay.document.library.repository.external.ExtRepositorySearchResult;
 import com.liferay.document.library.repository.external.search.ExtRepositoryQueryMapper;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -52,10 +51,10 @@ import com.liferay.sharepoint.rest.repository.internal.configuration.SharepointS
 import com.liferay.sharepoint.rest.repository.internal.document.library.repository.external.model.SharepointFileEntry;
 import com.liferay.sharepoint.rest.repository.internal.document.library.repository.external.model.SharepointModel;
 import com.liferay.sharepoint.rest.repository.internal.document.library.repository.external.model.SharepointRootFolder;
-import com.liferay.sharepoint.rest.repository.internal.helper.SharepointURLHelper;
 import com.liferay.sharepoint.rest.repository.internal.search.kql.KQLQuery;
 import com.liferay.sharepoint.rest.repository.internal.search.kql.KQLQueryVisitor;
 import com.liferay.sharepoint.rest.repository.internal.util.SharepointServerResponseConverter;
+import com.liferay.sharepoint.rest.repository.internal.util.SharepointURLHelper;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -68,6 +67,8 @@ import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Adolfo Pérez
@@ -500,10 +501,18 @@ public class SharepointExtRepository implements ExtRepository {
 		throws PortalException {
 
 		if (!recurse) {
-			return TransformUtil.transform(
+			List<ExtRepositoryFolder> extRepositoryObjects =
 				getExtRepositoryObjects(
-					ExtRepositoryObjectType.FOLDER, extRepositoryFolderKey),
-				ExtRepositoryModel::getExtRepositoryModelKey);
+					ExtRepositoryObjectType.FOLDER, extRepositoryFolderKey);
+
+			Stream<ExtRepositoryFolder> extRepositoryFolderStream =
+				extRepositoryObjects.stream();
+
+			return extRepositoryFolderStream.map(
+				ExtRepositoryModel::getExtRepositoryModelKey
+			).collect(
+				Collectors.toList()
+			);
 		}
 
 		List<String> subfolderKeys = new ArrayList<>();
@@ -852,7 +861,7 @@ public class SharepointExtRepository implements ExtRepository {
 			"Authorization", "Bearer " + _getAccessToken());
 		httpRequestWithBody.header(
 			"Content-Type", "application/json; odata=verbose");
-		httpRequestWithBody.body(jsonObject.toString());
+		httpRequestWithBody.body(jsonObject.toJSONString());
 
 		HttpResponse<String> httpResponse = httpRequestWithBody.asString();
 

@@ -132,12 +132,6 @@ public class CommercePricingClassCPDefinitionRelPersistenceTest {
 		CommercePricingClassCPDefinitionRel
 			newCommercePricingClassCPDefinitionRel = _persistence.create(pk);
 
-		newCommercePricingClassCPDefinitionRel.setMvccVersion(
-			RandomTestUtil.nextLong());
-
-		newCommercePricingClassCPDefinitionRel.setCtCollectionId(
-			RandomTestUtil.nextLong());
-
 		newCommercePricingClassCPDefinitionRel.setCompanyId(
 			RandomTestUtil.nextLong());
 
@@ -167,12 +161,6 @@ public class CommercePricingClassCPDefinitionRelPersistenceTest {
 				_persistence.findByPrimaryKey(
 					newCommercePricingClassCPDefinitionRel.getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommercePricingClassCPDefinitionRel.getMvccVersion(),
-			newCommercePricingClassCPDefinitionRel.getMvccVersion());
-		Assert.assertEquals(
-			existingCommercePricingClassCPDefinitionRel.getCtCollectionId(),
-			newCommercePricingClassCPDefinitionRel.getCtCollectionId());
 		Assert.assertEquals(
 			existingCommercePricingClassCPDefinitionRel.
 				getCommercePricingClassCPDefinitionRelId(),
@@ -261,11 +249,11 @@ public class CommercePricingClassCPDefinitionRelPersistenceTest {
 		getOrderByComparator() {
 
 		return OrderByComparatorFactoryUtil.create(
-			"CPricingClassCPDefinitionRel", "mvccVersion", true,
-			"ctCollectionId", true, "CommercePricingClassCPDefinitionRelId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "commercePricingClassId",
-			true, "CPDefinitionId", true);
+			"CPricingClassCPDefinitionRel",
+			"CommercePricingClassCPDefinitionRelId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "commercePricingClassId", true,
+			"CPDefinitionId", true);
 	}
 
 	@Test
@@ -620,12 +608,6 @@ public class CommercePricingClassCPDefinitionRelPersistenceTest {
 
 		CommercePricingClassCPDefinitionRel
 			commercePricingClassCPDefinitionRel = _persistence.create(pk);
-
-		commercePricingClassCPDefinitionRel.setMvccVersion(
-			RandomTestUtil.nextLong());
-
-		commercePricingClassCPDefinitionRel.setCtCollectionId(
-			RandomTestUtil.nextLong());
 
 		commercePricingClassCPDefinitionRel.setCompanyId(
 			RandomTestUtil.nextLong());

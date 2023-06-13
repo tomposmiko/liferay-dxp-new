@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the message boards thread flag service. This utility wraps <code>com.liferay.message.boards.service.persistence.impl.MBThreadFlagPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1075,9 +1079,25 @@ public class MBThreadFlagUtil {
 	}
 
 	public static MBThreadFlagPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile MBThreadFlagPersistence _persistence;
+	private static ServiceTracker
+		<MBThreadFlagPersistence, MBThreadFlagPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(MBThreadFlagPersistence.class);
+
+		ServiceTracker<MBThreadFlagPersistence, MBThreadFlagPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<MBThreadFlagPersistence, MBThreadFlagPersistence>(
+						bundle.getBundleContext(),
+						MBThreadFlagPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

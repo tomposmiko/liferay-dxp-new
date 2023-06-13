@@ -15,18 +15,18 @@
 package com.liferay.dynamic.data.mapping.form.evaluator.internal.validation;
 
 import com.liferay.dynamic.data.mapping.form.validation.DDMValidation;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marcela Cunha
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.validation.data.type=numeric", "ddm.validation.ranking:Float=2"
 	},
@@ -36,7 +36,7 @@ public class IsGreaterThanOrEqualToDDMValidation implements DDMValidation {
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			ResourceBundleUtil.getModuleAndPortalResourceBundle(
 				locale, getClass()),
 			"is-greater-than-or-equal-to");
@@ -49,7 +49,7 @@ public class IsGreaterThanOrEqualToDDMValidation implements DDMValidation {
 
 	@Override
 	public String getParameterMessage(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			ResourceBundleUtil.getModuleAndPortalResourceBundle(
 				locale, getClass()),
 			"number-placeholder");
@@ -59,8 +59,5 @@ public class IsGreaterThanOrEqualToDDMValidation implements DDMValidation {
 	public String getTemplate() {
 		return "{name} >= {parameter}";
 	}
-
-	@Reference
-	private Language _language;
 
 }

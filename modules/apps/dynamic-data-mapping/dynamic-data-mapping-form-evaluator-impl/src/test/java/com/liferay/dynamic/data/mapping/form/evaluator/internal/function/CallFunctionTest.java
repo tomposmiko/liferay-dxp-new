@@ -46,14 +46,20 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-import org.mockito.Mockito;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Leonardo Barros
  */
-public class CallFunctionTest {
+@RunWith(MockitoJUnitRunner.class)
+public class CallFunctionTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -71,7 +77,7 @@ public class CallFunctionTest {
 
 		jsonArray.put("test");
 
-		_mockDDMExpressionFieldAccessor(jsonArray);
+		mockDDMExpressionFieldAccessor(jsonArray);
 
 		Assert.assertEquals(
 			"test", _callFunction.getDDMFormFieldValue("field0"));
@@ -79,14 +85,14 @@ public class CallFunctionTest {
 
 	@Test
 	public void testGetFieldValueFromString() {
-		_mockDDMExpressionFieldAccessor("test");
+		mockDDMExpressionFieldAccessor("test");
 
 		Assert.assertEquals(
 			"test", _callFunction.getDDMFormFieldValue("field0"));
 	}
 
 	@Test
-	public void testNotAutoSelectOption() {
+	public void testNotAutoSelectOption() throws Exception {
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm("field0");
 
 		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
@@ -97,7 +103,7 @@ public class CallFunctionTest {
 				"1", "field0", new UnlocalizedValue("a")));
 
 		MockDDMExpressionObserver mockDDMExpressionObserver =
-			_mockDDMExpressionObserver(ddmFormValues);
+			mockDDMExpressionObserver(ddmFormValues);
 
 		List<KeyValuePair> keyValuePairs = new ArrayList<>();
 
@@ -126,7 +132,7 @@ public class CallFunctionTest {
 				"2", "field0", new UnlocalizedValue("b")));
 
 		MockDDMExpressionObserver mockDDMExpressionObserver =
-			_mockDDMExpressionObserver(ddmFormValues);
+			mockDDMExpressionObserver(ddmFormValues);
 
 		List<KeyValuePair> keyValuePairs = new ArrayList<>();
 
@@ -157,7 +163,7 @@ public class CallFunctionTest {
 				"1", "fieldName0", new UnlocalizedValue("10")));
 
 		MockDDMExpressionObserver mockDDMExpressionObserver =
-			_mockDDMExpressionObserver(ddmFormValues);
+			mockDDMExpressionObserver(ddmFormValues);
 
 		DDMDataProviderResponse.Builder builder =
 			DDMDataProviderResponse.Builder.newBuilder();
@@ -209,20 +215,28 @@ public class CallFunctionTest {
 
 	}
 
-	private void _mockDDMExpressionFieldAccessor(Object... values) {
+	protected void mockDDMExpressionFieldAccessor(Object... values) {
 		DDMFormEvaluatorExpressionFieldAccessor
-			ddmFormEvaluatorExpressionFieldAccessor = Mockito.mock(
+			ddmFormEvaluatorExpressionFieldAccessor = mock(
 				DDMFormEvaluatorExpressionFieldAccessor.class);
 
-		Mockito.when(
+		when(
 			ddmFormEvaluatorExpressionFieldAccessor.getFieldProperty(
-				Mockito.any(GetFieldPropertyRequest.class))
+				Matchers.any(GetFieldPropertyRequest.class))
 		).then(
-			(Answer<GetFieldPropertyResponse>)invocation -> {
-				GetFieldPropertyResponse.Builder builder =
-					GetFieldPropertyResponse.Builder.newBuilder(values);
+			new Answer<GetFieldPropertyResponse>() {
 
-				return builder.build();
+				@Override
+				public GetFieldPropertyResponse answer(
+						InvocationOnMock invocation)
+					throws Throwable {
+
+					GetFieldPropertyResponse.Builder builder =
+						GetFieldPropertyResponse.Builder.newBuilder(values);
+
+					return builder.build();
+				}
+
 			}
 		);
 
@@ -230,7 +244,7 @@ public class CallFunctionTest {
 			ddmFormEvaluatorExpressionFieldAccessor);
 	}
 
-	private MockDDMExpressionObserver _mockDDMExpressionObserver(
+	protected MockDDMExpressionObserver mockDDMExpressionObserver(
 		DDMFormValues ddmFormValues) {
 
 		MockDDMExpressionObserver mockDDMExpressionObserver =

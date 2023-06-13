@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SharingPortletKeys.SHARING,
 		"mvc.command.name=/sharing/collaborators"
@@ -73,14 +74,14 @@ public class CollaboratorsMVCResourceCommand extends BaseMVCResourceCommand {
 				themeDisplay.getUserId());
 		}
 
+		long classNameId = _classNameLocalService.getClassNameId(
+			ParamUtil.getString(httpServletRequest, "className"));
 		long classPK = ParamUtil.getLong(httpServletRequest, "classPK");
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse,
 			CollaboratorsUtil.getCollaboratorsJSONObject(
-				_classNameLocalService.getClassNameId(
-					ParamUtil.getString(httpServletRequest, "className")),
-				classPK, themeDisplay));
+				classNameId, classPK, themeDisplay));
 	}
 
 	@Reference

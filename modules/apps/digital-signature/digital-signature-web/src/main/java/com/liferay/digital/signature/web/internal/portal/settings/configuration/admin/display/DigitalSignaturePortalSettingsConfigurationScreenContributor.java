@@ -16,7 +16,7 @@ package com.liferay.digital.signature.web.internal.portal.settings.configuration
 
 import com.liferay.digital.signature.configuration.DigitalSignatureConfiguration;
 import com.liferay.digital.signature.configuration.DigitalSignatureConfigurationUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.settings.configuration.admin.display.PortalSettingsConfigurationScreenContributor;
@@ -54,7 +54,7 @@ public class DigitalSignaturePortalSettingsConfigurationScreenContributor
 
 	@Override
 	public String getName(Locale locale) {
-		return _language.get(locale, "digital-signature-configuration-name");
+		return LanguageUtil.get(locale, "digital-signature-configuration-name");
 	}
 
 	@Override
@@ -76,14 +76,14 @@ public class DigitalSignaturePortalSettingsConfigurationScreenContributor
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		DigitalSignatureConfiguration digitalSignatureConfiguration =
+			DigitalSignatureConfigurationUtil.getDigitalSignatureConfiguration(
+				themeDisplay.getCompanyId(), themeDisplay.getSiteGroupId());
+
 		httpServletRequest.setAttribute(
 			DigitalSignatureConfiguration.class.getName(),
-			DigitalSignatureConfigurationUtil.getDigitalSignatureConfiguration(
-				themeDisplay.getCompanyId(), themeDisplay.getSiteGroupId()));
+			digitalSignatureConfiguration);
 	}
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.digital.signature.web)",

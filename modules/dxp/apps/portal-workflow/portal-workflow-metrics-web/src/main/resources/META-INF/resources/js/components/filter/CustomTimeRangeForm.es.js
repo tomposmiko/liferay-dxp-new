@@ -128,9 +128,7 @@ export default function CustomTimeRangeForm({
 					</FormGroupItem>
 				</ClayForm.Group>
 			</ClayForm>
-
 			<div className="dropdown-divider" />
-
 			<div className="custom-range-footer">
 				<ClayButton displayType="secondary" onMouseDown={onCancel}>
 					{Liferay.Language.get('cancel')}

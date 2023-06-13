@@ -85,8 +85,7 @@ public class ThemeBuilder {
 
 	public ThemeBuilder(
 		File diffsDir, String name, File outputDir, File parentDir,
-		String parentName, String templateExtension, Integer thumbnailHeight,
-		Integer thumbnailWidth, File unstyledDir) {
+		String parentName, String templateExtension, File unstyledDir) {
 
 		if (Validator.isNull(name)) {
 			name = ThemeBuilderArgs.DEFAULT_NAME;
@@ -128,22 +127,12 @@ public class ThemeBuilder {
 			templateExtension = templateExtension.toLowerCase();
 		}
 
-		if (thumbnailHeight == null) {
-			thumbnailHeight = ThemeBuilderArgs.DEFAULT_THUMBNAIL_HEIGHT;
-		}
-
-		if (thumbnailWidth == null) {
-			thumbnailWidth = ThemeBuilderArgs.DEFAULT_THUMBNAIL_WIDTH;
-		}
-
 		_diffsDir = diffsDir;
 		_name = name;
 		_outputDir = outputDir;
 		_parentDir = parentDir;
 		_parentName = parentName;
 		_templateExtension = templateExtension;
-		_thumbnailHeight = thumbnailHeight;
-		_thumbnailWidth = thumbnailWidth;
 		_unstyledDir = unstyledDir;
 
 		System.setProperty("java.awt.headless", "true");
@@ -155,8 +144,6 @@ public class ThemeBuilder {
 			themeBuilderArgs.getOutputDir(), themeBuilderArgs.getParentDir(),
 			themeBuilderArgs.getParentName(),
 			themeBuilderArgs.getTemplateExtension(),
-			themeBuilderArgs.getThumbnailHeight(),
-			themeBuilderArgs.getThumbnailWidth(),
 			themeBuilderArgs.getUnstyledDir());
 	}
 
@@ -175,7 +162,7 @@ public class ThemeBuilder {
 			_copyTheme(_diffsDir.toPath());
 		}
 
-		_writeScreenshotThumbnail(_thumbnailHeight, _thumbnailWidth);
+		_writeScreenshotThumbnail();
 	}
 
 	private static void _printHelp(JCommander jCommander) throws Exception {
@@ -291,10 +278,7 @@ public class ThemeBuilder {
 		Files.write(path, content.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private void _writeScreenshotThumbnail(
-			int thumbnailHeight, int thumbnailWidth)
-		throws Exception {
-
+	private void _writeScreenshotThumbnail() throws Exception {
 		File file = new File(_outputDir, "images/screenshot.png");
 
 		if (!file.exists()) {
@@ -304,7 +288,7 @@ public class ThemeBuilder {
 		Thumbnails.Builder<File> thumbnailBuilder = Thumbnails.of(file);
 
 		thumbnailBuilder.outputFormat("png");
-		thumbnailBuilder.size(thumbnailWidth, thumbnailHeight);
+		thumbnailBuilder.size(160, 120);
 
 		thumbnailBuilder.toFile(new File(_outputDir, "images/thumbnail.png"));
 	}
@@ -315,8 +299,6 @@ public class ThemeBuilder {
 	private final File _parentDir;
 	private final String _parentName;
 	private final String _templateExtension;
-	private final int _thumbnailHeight;
-	private final int _thumbnailWidth;
 	private final File _unstyledDir;
 
 }

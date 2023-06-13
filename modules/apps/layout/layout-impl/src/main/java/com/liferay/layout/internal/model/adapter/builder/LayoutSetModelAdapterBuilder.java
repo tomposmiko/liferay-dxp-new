@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Daniel Kocsis
  */
-@Component(service = ModelAdapterBuilder.class)
+@Component(immediate = true, service = ModelAdapterBuilder.class)
 public class LayoutSetModelAdapterBuilder
 	implements ModelAdapterBuilder<StagedLayoutSet, LayoutSet> {
 
@@ -45,7 +45,7 @@ public class LayoutSetModelAdapterBuilder
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return null;

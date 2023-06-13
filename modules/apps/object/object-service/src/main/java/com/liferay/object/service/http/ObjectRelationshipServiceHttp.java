@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Marco Leo
+ * @see ObjectRelationshipServiceSoap
  * @generated
  */
 public class ObjectRelationshipServiceHttp {
@@ -53,8 +54,7 @@ public class ObjectRelationshipServiceHttp {
 	public static com.liferay.object.model.ObjectRelationship
 			addObjectRelationship(
 				HttpPrincipal httpPrincipal, long objectDefinitionId1,
-				long objectDefinitionId2, long parameterObjectFieldId,
-				String deletionType,
+				long objectDefinitionId2,
 				java.util.Map<java.util.Locale, String> labelMap, String name,
 				String type)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -65,8 +65,8 @@ public class ObjectRelationshipServiceHttp {
 				_addObjectRelationshipParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectDefinitionId1, objectDefinitionId2,
-				parameterObjectFieldId, deletionType, labelMap, name, type);
+				methodKey, objectDefinitionId1, objectDefinitionId2, labelMap,
+				name, type);
 
 			Object returnObj = null;
 
@@ -86,46 +86,6 @@ public class ObjectRelationshipServiceHttp {
 			}
 
 			return (com.liferay.object.model.ObjectRelationship)returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static void addObjectRelationshipMappingTableValues(
-			HttpPrincipal httpPrincipal, long objectRelationshipId,
-			long primaryKey1, long primaryKey2,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				ObjectRelationshipServiceUtil.class,
-				"addObjectRelationshipMappingTableValues",
-				_addObjectRelationshipMappingTableValuesParameterTypes1);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectRelationshipId, primaryKey1, primaryKey2,
-				serviceContext);
-
-			try {
-				TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException
 					systemException) {
@@ -144,7 +104,7 @@ public class ObjectRelationshipServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "deleteObjectRelationship",
-				_deleteObjectRelationshipParameterTypes2);
+				_deleteObjectRelationshipParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectRelationshipId);
@@ -185,52 +145,10 @@ public class ObjectRelationshipServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "getObjectRelationship",
-				_getObjectRelationshipParameterTypes3);
+				_getObjectRelationshipParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectRelationshipId);
-
-			Object returnObj = null;
-
-			try {
-				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-
-			return (com.liferay.object.model.ObjectRelationship)returnObj;
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
-	public static com.liferay.object.model.ObjectRelationship
-			getObjectRelationship(
-				HttpPrincipal httpPrincipal, long objectDefinitionId1,
-				String name)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				ObjectRelationshipServiceUtil.class, "getObjectRelationship",
-				_getObjectRelationshipParameterTypes4);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectDefinitionId1, name);
 
 			Object returnObj = null;
 
@@ -269,7 +187,7 @@ public class ObjectRelationshipServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "getObjectRelationships",
-				_getObjectRelationshipsParameterTypes5);
+				_getObjectRelationshipsParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, objectDefinitionId1, start, end);
@@ -306,18 +224,17 @@ public class ObjectRelationshipServiceHttp {
 	public static com.liferay.object.model.ObjectRelationship
 			updateObjectRelationship(
 				HttpPrincipal httpPrincipal, long objectRelationshipId,
-				long parameterObjectFieldId, String deletionType,
+				String deletionType,
 				java.util.Map<java.util.Locale, String> labelMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
 			MethodKey methodKey = new MethodKey(
 				ObjectRelationshipServiceUtil.class, "updateObjectRelationship",
-				_updateObjectRelationshipParameterTypes6);
+				_updateObjectRelationshipParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, objectRelationshipId, parameterObjectFieldId,
-				deletionType, labelMap);
+				methodKey, objectRelationshipId, deletionType, labelMap);
 
 			Object returnObj = null;
 
@@ -352,23 +269,16 @@ public class ObjectRelationshipServiceHttp {
 
 	private static final Class<?>[] _addObjectRelationshipParameterTypes0 =
 		new Class[] {
-			long.class, long.class, long.class, String.class,
-			java.util.Map.class, String.class, String.class
+			long.class, long.class, java.util.Map.class, String.class,
+			String.class
 		};
-	private static final Class<?>[]
-		_addObjectRelationshipMappingTableValuesParameterTypes1 = new Class[] {
-			long.class, long.class, long.class,
-			com.liferay.portal.kernel.service.ServiceContext.class
-		};
-	private static final Class<?>[] _deleteObjectRelationshipParameterTypes2 =
+	private static final Class<?>[] _deleteObjectRelationshipParameterTypes1 =
 		new Class[] {long.class};
-	private static final Class<?>[] _getObjectRelationshipParameterTypes3 =
+	private static final Class<?>[] _getObjectRelationshipParameterTypes2 =
 		new Class[] {long.class};
-	private static final Class<?>[] _getObjectRelationshipParameterTypes4 =
-		new Class[] {long.class, String.class};
-	private static final Class<?>[] _getObjectRelationshipsParameterTypes5 =
+	private static final Class<?>[] _getObjectRelationshipsParameterTypes3 =
 		new Class[] {long.class, int.class, int.class};
-	private static final Class<?>[] _updateObjectRelationshipParameterTypes6 =
-		new Class[] {long.class, long.class, String.class, java.util.Map.class};
+	private static final Class<?>[] _updateObjectRelationshipParameterTypes4 =
+		new Class[] {long.class, String.class, java.util.Map.class};
 
 }

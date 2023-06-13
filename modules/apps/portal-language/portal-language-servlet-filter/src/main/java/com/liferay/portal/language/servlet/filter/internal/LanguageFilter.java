@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.servlet.BufferCacheServletResponse;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 
@@ -67,20 +67,19 @@ public class LanguageFilter extends BasePortalFilter {
 			bufferCacheServletResponse, filterChain);
 
 		if (_log.isDebugEnabled()) {
-			String completeURL = HttpComponentsUtil.getCompleteURL(
-				httpServletRequest);
+			String completeURL = HttpUtil.getCompleteURL(httpServletRequest);
 
 			_log.debug("Translating response " + completeURL);
 		}
 
 		String content = bufferCacheServletResponse.getString();
 
-		content = _translateResponse(languageId, content);
+		content = translateResponse(languageId, content);
 
 		ServletResponseUtil.write(httpServletResponse, content);
 	}
 
-	private String _translateResponse(String languageId, String content) {
+	protected String translateResponse(String languageId, String content) {
 		Locale locale = LocaleUtil.fromLanguageId(languageId);
 
 		return LanguageUtil.process(

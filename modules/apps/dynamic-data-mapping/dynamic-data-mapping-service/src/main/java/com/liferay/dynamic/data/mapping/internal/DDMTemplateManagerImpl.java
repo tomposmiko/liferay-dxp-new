@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(service = DDMTemplateManager.class)
+@Component(immediate = true, service = DDMTemplateManager.class)
 public class DDMTemplateManagerImpl implements DDMTemplateManager {
 
 	@Override
@@ -95,7 +95,13 @@ public class DDMTemplateManagerImpl implements DDMTemplateManager {
 		return new DDMTemplateImpl(ddmTemplate);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
+	}
+
 	private DDMTemplateLocalService _ddmTemplateLocalService;
 
 }

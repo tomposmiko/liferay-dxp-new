@@ -19,6 +19,9 @@ import com.liferay.info.pagination.Pagination;
 import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.Map;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Eudaldo Alonso
@@ -26,45 +29,78 @@ import java.util.Map;
 public class DefaultLayoutListRetrieverContext
 	implements LayoutListRetrieverContext {
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
-	public Map<String, String[]> getConfiguration() {
-		return _configuration;
+	public Optional<long[][]> getAssetCategoryIdsOptional() {
+		return Optional.ofNullable(_assetCategoryIds);
 	}
 
 	@Override
-	public Object getContextObject() {
-		return _contextObject;
+	public Optional<Map<String, String[]>> getConfigurationOptional() {
+		return Optional.ofNullable(_configuration);
 	}
 
 	@Override
-	public <T> T getInfoFilter(Class<? extends InfoFilter> clazz) {
+	public Optional<Object> getContextObjectOptional() {
+		return Optional.ofNullable(_contextObject);
+	}
+
+	@Override
+	public Optional<HttpServletRequest> getHttpServletRequestOptional() {
+		return Optional.ofNullable(_httpServletRequest);
+	}
+
+	@Override
+	public <T> Optional<T> getInfoFilterOptional(
+		Class<? extends InfoFilter> clazz) {
+
 		if (MapUtil.isEmpty(_infoFilters)) {
-			return null;
+			return Optional.empty();
 		}
 
 		InfoFilter infoFilter = _infoFilters.getOrDefault(
 			clazz.getName(), null);
 
 		if (infoFilter != null) {
-			return (T)infoFilter;
+			return Optional.of((T)infoFilter);
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	@Override
-	public Map<String, InfoFilter> getInfoFilters() {
-		return _infoFilters;
+	public Optional<Map<String, InfoFilter>> getInfoFiltersOptional() {
+		return Optional.ofNullable(_infoFilters);
 	}
 
 	@Override
-	public Pagination getPagination() {
-		return _pagination;
+	public Optional<Pagination> getPaginationOptional() {
+		return Optional.ofNullable(_pagination);
 	}
 
 	@Override
-	public long[] getSegmentsEntryIds() {
-		return _segmentsEntryIds;
+	public Optional<long[]> getSegmentsEntryIdsOptional() {
+		return Optional.ofNullable(_segmentsEntryIds);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public Optional<long[]> getSegmentsExperienceIdsOptional() {
+		return Optional.ofNullable(_segmentsExperienceIds);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public void setAssetCategoryIds(long[][] assetCategoryIds) {
+		_assetCategoryIds = assetCategoryIds;
 	}
 
 	public void setConfiguration(Map<String, String[]> configuration) {
@@ -73,6 +109,10 @@ public class DefaultLayoutListRetrieverContext
 
 	public void setContextObject(Object contextObject) {
 		_contextObject = contextObject;
+	}
+
+	public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
+		_httpServletRequest = httpServletRequest;
 	}
 
 	public void setInfoFilters(Map<String, InfoFilter> infoFilters) {
@@ -87,10 +127,30 @@ public class DefaultLayoutListRetrieverContext
 		_segmentsEntryIds = segmentsEntryIds;
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public void setSegmentsExperienceIds(long[] segmentsExperienceIds) {
+		_segmentsExperienceIds = segmentsExperienceIds;
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #setSegmentsExperienceIds(long[])}
+	 */
+	@Deprecated
+	public void setSegmentsExperienceIdsOptional(long[] segmentsExperienceIds) {
+		_segmentsExperienceIds = segmentsExperienceIds;
+	}
+
+	private long[][] _assetCategoryIds;
 	private Map<String, String[]> _configuration;
 	private Object _contextObject;
+	private HttpServletRequest _httpServletRequest;
 	private Map<String, InfoFilter> _infoFilters;
 	private Pagination _pagination;
 	private long[] _segmentsEntryIds;
+	private long[] _segmentsExperienceIds;
 
 }

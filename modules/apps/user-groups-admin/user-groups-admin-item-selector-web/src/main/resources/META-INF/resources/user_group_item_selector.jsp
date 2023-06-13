@@ -19,19 +19,48 @@
 <%
 UserGroupItemSelectorViewDisplayContext userGroupItemSelectorViewDisplayContext = (UserGroupItemSelectorViewDisplayContext)request.getAttribute(UserGroupItemSelectorWebKeys.USER_GROUP_ITEM_SELECTOR_DISPLAY_CONTEXT);
 
-SearchContainer<UserGroup> userGroupSearchContainer = userGroupItemSelectorViewDisplayContext.getSearchContainer();
+String itemSelectedEventName = userGroupItemSelectorViewDisplayContext.getItemSelectedEventName();
+
+PortletURL portletURL = userGroupItemSelectorViewDisplayContext.getPortletURL();
 %>
 
-<clay:management-toolbar
-	managementToolbarDisplayContext="<%= new UserGroupItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, userGroupSearchContainer) %>"
-/>
+<liferay-frontend:management-bar
+	includeCheckBox="<%= true %>"
+	searchContainerId="userGroups"
+>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= portletURL %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= userGroupItemSelectorViewDisplayContext.getOrderByCol() %>"
+			orderByType="<%= userGroupItemSelectorViewDisplayContext.getOrderByType() %>"
+			orderColumns='<%= new String[] {"name"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<li>
+			<liferay-item-selector:search />
+		</li>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <clay:container-fluid
 	id='<%= liferayPortletResponse.getNamespace() + "userGroupSelectorWrapper" %>'
 >
 	<liferay-ui:search-container
 		id="userGroups"
-		searchContainer="<%= userGroupSearchContainer %>"
+		searchContainer="<%= userGroupItemSelectorViewDisplayContext.getSearchContainer() %>"
 	>
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.kernel.model.UserGroup"
@@ -63,13 +92,14 @@ SearchContainer<UserGroup> userGroupSearchContainer = userGroupItemSelectorViewD
 		<liferay-ui:search-iterator
 			displayStyle="list"
 			markupView="lexicon"
+			searchContainer="<%= userGroupItemSelectorViewDisplayContext.getSearchContainer() %>"
 		/>
 	</liferay-ui:search-container>
 </clay:container-fluid>
 
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get(
-		'<portlet:namespace />userGroupsSearchContainer'
+		'<portlet:namespace />userGroups'
 	);
 
 	searchContainer.on('rowToggled', (event) => {
@@ -85,7 +115,7 @@ SearchContainer<UserGroup> userGroupSearchContainer = userGroupItemSelectorViewD
 		});
 
 		Liferay.Util.getOpener().Liferay.fire(
-			'<%= HtmlUtil.escapeJS(userGroupItemSelectorViewDisplayContext.getItemSelectedEventName()) %>',
+			'<%= HtmlUtil.escapeJS(itemSelectedEventName) %>',
 			{
 				data: arr,
 			}

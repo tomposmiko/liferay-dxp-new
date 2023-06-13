@@ -17,10 +17,6 @@ package com.liferay.poshi.core.elements;
 import com.liferay.poshi.core.script.PoshiScriptParserException;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringEscapeUtils;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -63,20 +59,7 @@ public class DescriptionPoshiElement extends PoshiElement {
 	public void parsePoshiScript(String poshiScript)
 		throws PoshiScriptParserException {
 
-		if (!poshiScript.endsWith("\"")) {
-			throw new PoshiScriptParserException(
-				"The description message must be a single line and enclosed " +
-					"by double quotes (\")",
-				poshiScript, (PoshiElement)getParent());
-		}
-
 		String message = getDoubleQuotedContent(poshiScript);
-
-		Matcher matcher = _messagePattern.matcher(message);
-
-		if (matcher.find()) {
-			message = StringEscapeUtils.escapeXml(message);
-		}
 
 		addAttribute("message", message);
 	}
@@ -88,14 +71,7 @@ public class DescriptionPoshiElement extends PoshiElement {
 		sb.append("@");
 		sb.append(_ELEMENT_NAME);
 		sb.append(" = \"");
-
-		String message = attributeValue("message");
-
-		if (message.contains("&lt;") || message.contains("&gt;")) {
-			message = StringEscapeUtils.unescapeXml(message);
-		}
-
-		sb.append(message);
+		sb.append(attributeValue("message"));
 		sb.append("\"");
 
 		return sb.toString();
@@ -140,7 +116,5 @@ public class DescriptionPoshiElement extends PoshiElement {
 	}
 
 	private static final String _ELEMENT_NAME = "description";
-
-	private static final Pattern _messagePattern = Pattern.compile("<.*>");
 
 }

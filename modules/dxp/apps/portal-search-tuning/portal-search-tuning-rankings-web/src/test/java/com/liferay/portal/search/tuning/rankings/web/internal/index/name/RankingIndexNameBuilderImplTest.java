@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.index.name;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -35,19 +34,18 @@ public class RankingIndexNameBuilderImplTest {
 
 	@Test
 	public void testMultiTenancy() {
-		_assertIndexName(
+		assertIndexName(
 			2021, companyId -> "liferay-" + companyId,
 			"liferay-2021-search-tuning-rankings");
 	}
 
-	private void _assertIndexName(
+	protected void assertIndexName(
 		long companyId, IndexNameBuilder indexNameBuilder, String expected) {
 
 		RankingIndexNameBuilderImpl rankingIndexNameBuilderImpl =
 			new RankingIndexNameBuilderImpl();
 
-		ReflectionTestUtil.setFieldValue(
-			rankingIndexNameBuilderImpl, "_indexNameBuilder", indexNameBuilder);
+		rankingIndexNameBuilderImpl.setIndexNameBuilder(indexNameBuilder);
 
 		RankingIndexName rankingIndexName =
 			rankingIndexNameBuilderImpl.getRankingIndexName(companyId);

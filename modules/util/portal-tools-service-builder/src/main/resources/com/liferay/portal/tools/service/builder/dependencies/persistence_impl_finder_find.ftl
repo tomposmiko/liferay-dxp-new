@@ -253,7 +253,11 @@ that may or may not be enforced with a unique index at the database level. Case
 		List<${entity.name}> list = null;
 
 		if (${useCache}) {
-			list = (List<${entity.name}>)${finderCache}.getResult(finderPath, finderArgs, this);
+			list = (List<${entity.name}>)${finderCache}.getResult(finderPath, finderArgs
+				<#if serviceBuilder.isVersionLTE_7_3_0()>
+					, this
+				</#if>
+				);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (${entity.name} ${entity.variableName} : list) {
@@ -1505,11 +1509,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * </p>
 	 *
 	<#list entityColumns as entityColumn>
-		<#if entityColumn.hasArrayableOperator()>
-			* @param ${entityColumn.pluralName} the ${entityColumn.pluralHumanName}
-		<#else>
-			* @param ${entityColumn.name} the ${entityColumn.humanName}
-		</#if>
+	 * @param ${entityColumn.name} the ${entityColumn.humanName}
 	</#list>
 	 * @param start the lower bound of the range of ${entity.pluralHumanName}
 	 * @param end the upper bound of the range of ${entity.pluralHumanName} (not inclusive)
@@ -1659,7 +1659,11 @@ that may or may not be enforced with a unique index at the database level. Case
 		List<${entity.name}> list = null;
 
 		if (${useCache}) {
-			list = (List<${entity.name}>)${finderCache}.getResult(_finderPathWithPaginationFindBy${entityFinder.name}, finderArgs, this);
+			list = (List<${entity.name}>)${finderCache}.getResult(_finderPathWithPaginationFindBy${entityFinder.name}, finderArgs
+				<#if serviceBuilder.isVersionLTE_7_3_0()>
+					, this
+				</#if>
+				);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (${entity.name} ${entity.variableName} : list) {
@@ -1871,11 +1875,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * </p>
 	 *
 	<#list entityColumns as entityColumn>
-		<#if entityColumn.hasArrayableOperator()>
-			* @param ${entityColumn.pluralName} the ${entityColumn.pluralHumanName}
-		<#else>
-			* @param ${entityColumn.name} the ${entityColumn.humanName}
-		</#if>
+	 * @param ${entityColumn.name} the ${entityColumn.humanName}
 	</#list>
 	 * @param start the lower bound of the range of ${entity.pluralHumanName}
 	 * @param end the upper bound of the range of ${entity.pluralHumanName} (not inclusive)
@@ -2017,7 +2017,11 @@ that may or may not be enforced with a unique index at the database level. Case
 		List<${entity.name}> list = null;
 
 		if (${useCache}) {
-			list = (List<${entity.name}>)${finderCache}.getResult(_finderPathWithPaginationFindBy${entityFinder.name}, finderArgs, this);
+			list = (List<${entity.name}>)${finderCache}.getResult(_finderPathWithPaginationFindBy${entityFinder.name}, finderArgs
+				<#if serviceBuilder.isVersionLTE_7_3_0()>
+					, this
+				</#if>
+				);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (${entity.name} ${entity.variableName} : list) {
@@ -2302,7 +2306,11 @@ that may or may not be enforced with a unique index at the database level. Case
 		Object result = null;
 
 		if (${useCache}) {
-			result = ${finderCache}.getResult(_finderPathFetchBy${entityFinder.name}, finderArgs, this);
+			result = ${finderCache}.getResult(_finderPathFetchBy${entityFinder.name}, finderArgs
+				<#if serviceBuilder.isVersionLTE_7_3_0()>
+					, this
+				</#if>
+				);
 		}
 
 		if (result instanceof ${entity.name}) {

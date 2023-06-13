@@ -18,10 +18,10 @@ import {
 	TObjectLayoutColumn,
 	TObjectLayoutRow,
 	TObjectLayoutTab,
-} from '../components/Layout/types';
+} from '../components/layout/types';
 
 class TabsVisitor {
-	private _layout: TObjectLayout | null = null;
+	private _layout: any;
 
 	constructor(layout: TObjectLayout) {
 		this.setLayout(layout);
@@ -36,7 +36,7 @@ class TabsVisitor {
 	}
 
 	mapFields(mapper: (field: TObjectLayoutColumn) => void) {
-		return this._layout?.objectLayoutTabs.map(
+		return this._layout.objectLayoutTabs.map(
 			({objectLayoutBoxes}: TObjectLayoutTab) => {
 				return objectLayoutBoxes.map(({objectLayoutRows}) => {
 					return objectLayoutRows.map(({objectLayoutColumns}) => {
@@ -51,7 +51,7 @@ class TabsVisitor {
 }
 
 class BoxesVisitor {
-	private _tab: TObjectLayoutTab | null = null;
+	private _tab: any;
 
 	constructor(tab: TObjectLayoutTab) {
 		this.setTab(tab);
@@ -66,7 +66,7 @@ class BoxesVisitor {
 	}
 
 	mapFields(mapper: (field: TObjectLayoutColumn) => void) {
-		return this._tab?.objectLayoutBoxes.map(
+		return this._tab.objectLayoutBoxes.map(
 			({objectLayoutRows}: TObjectLayoutBox) => {
 				return objectLayoutRows.map(({objectLayoutColumns}) => {
 					return objectLayoutColumns.map((field) => {
@@ -79,7 +79,7 @@ class BoxesVisitor {
 }
 
 class RowsVisitor {
-	private _box: TObjectLayoutBox | null = null;
+	private _box: any;
 
 	constructor(box: TObjectLayoutBox) {
 		this.setBox(box);
@@ -94,7 +94,7 @@ class RowsVisitor {
 	}
 
 	mapFields(mapper: (field: TObjectLayoutColumn) => void) {
-		return this._box?.objectLayoutRows.map(
+		return this._box.objectLayoutRows.map(
 			({objectLayoutColumns}: TObjectLayoutRow) => {
 				return objectLayoutColumns.map((field) => {
 					return field && mapper(field);

@@ -19,7 +19,6 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.blogs.test.util.search.BlogsEntryBlueprint.BlogsEntryBlueprintBuilder;
 import com.liferay.blogs.test.util.search.BlogsEntrySearchFixture;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.search.JournalArticleBlueprintBuilder;
@@ -34,6 +33,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
@@ -85,8 +84,7 @@ public class IndexerClauseContributorsTest {
 		GroupSearchFixture groupSearchFixture = new GroupSearchFixture();
 
 		JournalArticleSearchFixture journalArticleSearchFixture =
-			new JournalArticleSearchFixture(
-				ddmStructureLocalService, journalArticleLocalService, portal);
+			new JournalArticleSearchFixture(journalArticleLocalService);
 
 		_blogsEntries = blogsEntrySearchFixture.getBlogsEntries();
 		_blogsEntrySearchFixture = blogsEntrySearchFixture;
@@ -224,41 +222,12 @@ public class IndexerClauseContributorsTest {
 			"com.liferay.blogs.internal.search.spi.model.query.contributor." +
 				"BlogsEntryKeywordQueryContributor";
 		String titleMultilangContributorId2 =
-			"com.liferay.journal.internal.search.spi.model.query.contributor." +
-				"JournalArticleKeywordQueryContributor";
-		String titleMultilangContributorId3 =
 			"com.liferay.message.boards.internal.search.spi.model.query." +
 				"contributor.MBMessageKeywordQueryContributor";
 
 		assertSearch(
 			"[Gamma Article, Gamma Blog, Gamma Message]",
 			withIncludes(
-				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
-			consumer);
-
-		assertSearch(
-			"[Gamma Article, Gamma Blog, Gamma Message]",
-			withIncludes(
-				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
-			withExcludes(titleContributorId), consumer);
-
-		assertSearch(
-			"[Gamma Article, Gamma Blog, Gamma Message]",
-			withIncludes(
-				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
-			withExcludes(
-				titleMultilangContributorId1, titleMultilangContributorId2),
-			consumer);
-
-		assertSearch(
-			"[Gamma Article, Gamma Blog, Gamma Message]",
-			withIncludes(
-				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
-			withExcludes(
 				titleContributorId, titleMultilangContributorId1,
 				titleMultilangContributorId2),
 			consumer);
@@ -267,46 +236,32 @@ public class IndexerClauseContributorsTest {
 			"[Gamma Article, Gamma Blog, Gamma Message]",
 			withIncludes(
 				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
+				titleMultilangContributorId2),
+			withExcludes(titleContributorId), consumer);
+
+		assertSearch(
+			"[Gamma Article, Gamma Blog, Gamma Message]",
+			withIncludes(
+				titleContributorId, titleMultilangContributorId1,
+				titleMultilangContributorId2),
 			withExcludes(
-				titleMultilangContributorId1, titleMultilangContributorId3),
+				titleMultilangContributorId1, titleMultilangContributorId2),
 			consumer);
 
 		assertSearch(
 			"[Gamma Article, Gamma Blog, Gamma Message]",
 			withIncludes(
 				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
+				titleMultilangContributorId2),
 			withExcludes(
 				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId3),
-			consumer);
-
-		assertSearch(
-			"[Gamma Article, Gamma Blog, Gamma Message]",
-			withIncludes(
-				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
-			withExcludes(
-				titleMultilangContributorId2, titleMultilangContributorId3),
-			consumer);
-
-		assertSearch(
-			"[Gamma Article, Gamma Blog, Gamma Message]",
-			withIncludes(
-				titleContributorId, titleMultilangContributorId1,
-				titleMultilangContributorId2, titleMultilangContributorId3),
-			withExcludes(
-				titleContributorId, titleMultilangContributorId2,
-				titleMultilangContributorId3),
+				titleMultilangContributorId2),
 			consumer);
 	}
 
 	@Test
 	public void testJournalArticleForcesTitleMultilang() throws Exception {
-		Assert.assertEquals(
-			"class com.liferay.portal.search.internal.indexer.DefaultIndexer",
-			String.valueOf(journalArticleIndexer.getClass()));
+		Assert.assertTrue(journalArticleIndexer instanceof BaseIndexer);
 
 		addJournalArticle("Gamma Article");
 		addJournalArticle("Omega Article");
@@ -318,22 +273,14 @@ public class IndexerClauseContributorsTest {
 				"gamma"
 			);
 
-		String titleContributorId =
+		String id =
 			"com.liferay.portal.search.internal.spi.model.query.contributor." +
 				"AlwaysPresentFieldsKeywordQueryContributor";
-		String titleMultilangContributorId =
-			"com.liferay.journal.internal.search.spi.model.query.contributor." +
-				"JournalArticleKeywordQueryContributor";
+
+		assertSearch("[Gamma Article]", withIncludes(id), consumer);
 
 		assertSearch(
-			"[Gamma Article]",
-			withIncludes(titleContributorId, titleMultilangContributorId),
-			consumer);
-
-		assertSearch(
-			"[Gamma Article]",
-			withIncludes(titleContributorId, titleMultilangContributorId),
-			withExcludes(titleContributorId), consumer);
+			"[Gamma Article]", withIncludes(id), withExcludes(id), consumer);
 	}
 
 	@Rule
@@ -403,8 +350,8 @@ public class IndexerClauseContributorsTest {
 			).build());
 
 		DocumentsAssert.assertValuesIgnoreRelevance(
-			searchResponse.getRequestString(), searchResponse.getDocuments(),
-			_TITLE_EN_US, expected);
+			searchResponse.getRequestString(),
+			searchResponse.getDocumentsStream(), _TITLE_EN_US, expected);
 	}
 
 	protected Consumer<SearchRequestBuilder> withExcludes(String... excludes) {
@@ -427,21 +374,13 @@ public class IndexerClauseContributorsTest {
 				"search.full.query.suppress.indexer.provided.clauses", true));
 	}
 
-	@Inject
-	protected static DDMStructureLocalService ddmStructureLocalService;
-
-	@Inject
-	protected static Portal portal;
-
 	@Inject(filter = "indexer.class.name=com.liferay.blogs.model.BlogsEntry")
 	protected Indexer<BlogsEntry> blogsEntryIndexer;
 
 	@Inject
 	protected BlogsEntryLocalService blogsEntryLocalService;
 
-	@Inject(
-		filter = "indexer.class.name=com.liferay.journal.model.JournalArticle"
-	)
+	@Inject(filter = "component.name=*.JournalArticleIndexer")
 	protected Indexer<JournalArticle> journalArticleIndexer;
 
 	@Inject

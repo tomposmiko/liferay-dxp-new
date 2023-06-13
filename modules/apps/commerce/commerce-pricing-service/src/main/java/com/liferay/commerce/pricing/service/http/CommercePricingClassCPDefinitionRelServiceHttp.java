@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Riccardo Alberti
+ * @see CommercePricingClassCPDefinitionRelServiceSoap
  * @generated
  */
 public class CommercePricingClassCPDefinitionRelServiceHttp {

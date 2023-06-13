@@ -23,14 +23,14 @@ taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.petra.string.StringPool" %><%@
+<%@ page import="com.liferay.petra.portlet.url.builder.PortletURLBuilder" %><%@
+page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.BackgroundTask" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplay" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplayFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.model.CompanyConstants" %><%@
-page import="com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder" %><%@
 page import="com.liferay.portal.kernel.search.Indexer" %><%@
 page import="com.liferay.portal.kernel.search.IndexerClassNameComparator" %><%@
 page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
@@ -98,7 +98,7 @@ page import="java.util.Map" %>
 				size="4"
 			>
 				<react:component
-					module="js/execution_options/index"
+					module="js/ExecutionScope.es"
 					props="<%= indexActionsDisplayContext.getData() %>"
 				/>
 			</clay:col>
@@ -154,7 +154,7 @@ page import="java.util.Map" %>
 							</div>
 
 							<div class="autofit-col">
-								<aui:button cssClass="save-server-button" data-cmd="reindexDictionaries" data-concurrent-disabled="" value="execute" />
+								<aui:button cssClass="save-server-button" data-cmd="reindexDictionaries" value="execute" />
 							</div>
 						</li>
 
@@ -177,7 +177,7 @@ page import="java.util.Map" %>
 								<div class="autofit-col index-action-wrapper" data-type="<%= indexer.getClassName() %>">
 									<c:choose>
 										<c:when test="<%= (backgroundTaskDisplay == null) || !backgroundTaskDisplay.hasPercentage() %>">
-											<aui:button cssClass="save-server-button" data-classname="<%= indexer.getClassName() %>" data-cmd="reindex" data-concurrent-disabled="" disabled="<%= !indexer.isIndexerEnabled() %>" value="execute" />
+											<aui:button cssClass="save-server-button" data-classname="<%= indexer.getClassName() %>" data-cmd="reindex" disabled="<%= !indexer.isIndexerEnabled() %>" value="execute" />
 										</c:when>
 										<c:otherwise>
 											<%= backgroundTaskDisplay.renderDisplayTemplate() %>
@@ -204,7 +204,7 @@ page import="java.util.Map" %>
 								</div>
 
 								<div class="autofit-col index-action-wrapper" data-type="<%= indexReindexerClassName %>">
-									<aui:button cssClass="save-server-button" data-classname="<%= indexReindexerClassName %>" data-cmd="reindexIndexReindexer" data-concurrent-disabled="" value="execute" />
+									<aui:button cssClass="save-server-button" data-classname="<%= indexReindexerClassName %>" data-cmd="reindexIndexReindexer" value="execute" />
 								</div>
 							</li>
 

@@ -45,6 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @AccessControlled
 @Component(
+	immediate = true,
 	property = {
 		"json.web.service.context.name=comment",
 		"json.web.service.context.path=Comment"
@@ -61,14 +62,14 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 		DiscussionPermission discussionPermission =
 			_commentManager.getDiscussionPermission(getPermissionChecker());
 
-		long companyId = _getCompanyId(groupId);
+		long companyId = getCompanyId(groupId);
 
 		discussionPermission.checkAddPermission(
 			companyId, groupId, className, classPK);
 
 		return _commentManager.addComment(
 			getUserId(), groupId, className, classPK, body,
-			_createServiceContextFunction(companyId));
+			createServiceContextFunction(companyId));
 	}
 
 	public void deleteComment(long commentId) throws PortalException {
@@ -90,7 +91,7 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 			_commentManager.getDiscussionPermission(getPermissionChecker());
 
 		discussionPermission.checkViewPermission(
-			_getCompanyId(discussionComment.getGroupId()),
+			getCompanyId(discussionComment.getGroupId()),
 			discussionComment.getGroupId(), discussionComment.getClassName(),
 			discussionComment.getClassPK());
 
@@ -105,11 +106,11 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 			_commentManager.getDiscussionPermission(getPermissionChecker());
 
 		discussionPermission.checkViewPermission(
-			_getCompanyId(groupId), groupId, className, classPK);
+			getCompanyId(groupId), groupId, className, classPK);
 
 		Discussion discussion = _commentManager.getDiscussion(
 			getUserId(), groupId, className, classPK,
-			_createServiceContextFunction());
+			createServiceContextFunction());
 
 		return getComments(discussion.getRootDiscussionComment(), start, end);
 	}
@@ -121,7 +122,7 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 			_commentManager.getDiscussionPermission(getPermissionChecker());
 
 		discussionPermission.checkViewPermission(
-			_getCompanyId(groupId), groupId, className, classPK);
+			getCompanyId(groupId), groupId, className, classPK);
 
 		return _commentManager.getCommentsCount(className, classPK);
 	}
@@ -144,7 +145,7 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 			_commentManager.getDiscussionPermission(getPermissionChecker());
 
 		discussionPermission.checkSubscribePermission(
-			_getCompanyId(groupId), groupId, className, classPK);
+			getCompanyId(groupId), groupId, className, classPK);
 
 		_commentManager.subscribeDiscussion(
 			getUserId(), groupId, className, classPK);
@@ -158,7 +159,7 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 			_commentManager.getDiscussionPermission(getPermissionChecker());
 
 		discussionPermission.checkSubscribePermission(
-			_getCompanyId(groupId), groupId, className, classPK);
+			getCompanyId(groupId), groupId, className, classPK);
 
 		_commentManager.unsubscribeDiscussion(getUserId(), className, classPK);
 	}
@@ -175,7 +176,67 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 
 		return _commentManager.updateComment(
 			getUserId(), className, classPK, commentId, subject, body,
-			_createServiceContextFunction(WorkflowConstants.ACTION_PUBLISH));
+			createServiceContextFunction(WorkflowConstants.ACTION_PUBLISH));
+	}
+
+	protected Function<String, ServiceContext> createServiceContextFunction() {
+		return new Function<String, ServiceContext>() {
+
+			@Override
+			public ServiceContext apply(String className) {
+				return new ServiceContext();
+			}
+
+		};
+	}
+
+	protected Function<String, ServiceContext> createServiceContextFunction(
+		final int workflowAction) {
+
+		return new Function<String, ServiceContext>() {
+
+			@Override
+			public ServiceContext apply(String className) {
+				ServiceContext serviceContext = new ServiceContext();
+
+				serviceContext.setWorkflowAction(workflowAction);
+
+				return serviceContext;
+			}
+
+		};
+	}
+
+	protected Function<String, ServiceContext> createServiceContextFunction(
+		final long companyId) {
+
+		return new Function<String, ServiceContext>() {
+
+			@Override
+			public ServiceContext apply(String className) {
+				ServiceContext serviceContext = new ServiceContext();
+
+				serviceContext.setCompanyId(companyId);
+
+				return serviceContext;
+			}
+
+		};
+	}
+
+	protected List<CommentJSONWS> getAllComments(
+		DiscussionCommentIterator threadDiscussionCommentIterator) {
+
+		List<CommentJSONWS> commentJSONWSs = new ArrayList<>();
+
+		while (threadDiscussionCommentIterator.hasNext()) {
+			CommentJSONWS commentJSONWS = new CommentJSONWS(
+				threadDiscussionCommentIterator.next());
+
+			commentJSONWSs.add(commentJSONWS);
+		}
+
+		return commentJSONWSs;
 	}
 
 	protected List<CommentJSONWS> getComments(
@@ -189,7 +250,7 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 			discussionComment.getThreadDiscussionCommentIterator(start);
 
 		if (end == QueryUtil.ALL_POS) {
-			return _getAllComments(threadDiscussionCommentIterator);
+			return getAllComments(threadDiscussionCommentIterator);
 		}
 
 		int commentsCount = end - start;
@@ -214,76 +275,16 @@ public class CommentManagerJSONWS extends BaseServiceImpl {
 		return commentJSONWSs;
 	}
 
+	protected long getCompanyId(long groupId) throws PortalException {
+		Group group = _groupLocalService.getGroup(groupId);
+
+		return group.getCompanyId();
+	}
+
 	protected String getUserName() throws PortalException {
 		User user = getUser();
 
 		return user.getFullName();
-	}
-
-	private Function<String, ServiceContext> _createServiceContextFunction() {
-		return new Function<String, ServiceContext>() {
-
-			@Override
-			public ServiceContext apply(String className) {
-				return new ServiceContext();
-			}
-
-		};
-	}
-
-	private Function<String, ServiceContext> _createServiceContextFunction(
-		final int workflowAction) {
-
-		return new Function<String, ServiceContext>() {
-
-			@Override
-			public ServiceContext apply(String className) {
-				ServiceContext serviceContext = new ServiceContext();
-
-				serviceContext.setWorkflowAction(workflowAction);
-
-				return serviceContext;
-			}
-
-		};
-	}
-
-	private Function<String, ServiceContext> _createServiceContextFunction(
-		final long companyId) {
-
-		return new Function<String, ServiceContext>() {
-
-			@Override
-			public ServiceContext apply(String className) {
-				ServiceContext serviceContext = new ServiceContext();
-
-				serviceContext.setCompanyId(companyId);
-
-				return serviceContext;
-			}
-
-		};
-	}
-
-	private List<CommentJSONWS> _getAllComments(
-		DiscussionCommentIterator threadDiscussionCommentIterator) {
-
-		List<CommentJSONWS> commentJSONWSs = new ArrayList<>();
-
-		while (threadDiscussionCommentIterator.hasNext()) {
-			CommentJSONWS commentJSONWS = new CommentJSONWS(
-				threadDiscussionCommentIterator.next());
-
-			commentJSONWSs.add(commentJSONWS);
-		}
-
-		return commentJSONWSs;
-	}
-
-	private long _getCompanyId(long groupId) throws PortalException {
-		Group group = _groupLocalService.getGroup(groupId);
-
-		return group.getCompanyId();
 	}
 
 	@Reference

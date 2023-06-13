@@ -14,9 +14,9 @@
 
 package com.liferay.wiki.uad.display;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.user.associated.data.display.UADDisplay;
 import com.liferay.wiki.constants.WikiPortletKeys;
@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(service = UADDisplay.class)
+@Component(immediate = true, service = UADDisplay.class)
 public class WikiPageUADDisplay extends BaseWikiPageUADDisplay {
 
 	@Override

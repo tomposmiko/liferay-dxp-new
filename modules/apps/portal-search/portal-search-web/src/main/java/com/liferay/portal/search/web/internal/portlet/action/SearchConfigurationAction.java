@@ -15,7 +15,7 @@
 package com.liferay.portal.search.web.internal.portlet.action;
 
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
@@ -23,12 +23,13 @@ import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.search.web.constants.SearchPortletKeys;
 import com.liferay.portal.search.web.facet.SearchFacet;
-import com.liferay.portal.search.web.internal.facet.SearchFacetRegistry;
+import com.liferay.portal.search.web.internal.facet.SearchFacetTracker;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -38,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alexander Chow
  */
 @Component(
+	immediate = true,
 	property = "javax.portlet.name=" + SearchPortletKeys.SEARCH,
 	service = ConfigurationAction.class
 )
@@ -54,9 +56,9 @@ public class SearchConfigurationAction extends DefaultConfigurationAction {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		JSONArray facetsJSONArray = _jsonFactory.createJSONArray();
+		JSONArray facetsJSONArray = JSONFactoryUtil.createJSONArray();
 
-		for (SearchFacet searchFacet : searchFacetRegistry.getSearchFacets()) {
+		for (SearchFacet searchFacet : searchFacetTracker.getSearchFacets()) {
 			JSONObject facetJSONObject = JSONUtil.put(
 				"className", searchFacet.getFacetClassName()
 			).put(
@@ -92,10 +94,16 @@ public class SearchConfigurationAction extends DefaultConfigurationAction {
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
-	@Reference
-	protected SearchFacetRegistry searchFacetRegistry;
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.portal.search.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	protected SearchFacetTracker searchFacetTracker;
 
 }

@@ -31,9 +31,12 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -82,14 +85,13 @@ public class UpdateMembershipsMVCActionCommand extends BaseMVCActionCommand {
 				user.getEmailAddress(), user.getLanguageId(),
 				user.getTimeZoneId(), user.getGreeting(), user.getComments(),
 				user.getFirstName(), user.getMiddleName(), user.getLastName(),
-				contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-				user.isMale(), birthdayCal.get(Calendar.MONTH),
-				birthdayCal.get(Calendar.DATE), birthdayCal.get(Calendar.YEAR),
-				contact.getSmsSn(), contact.getFacebookSn(),
-				contact.getJabberSn(), contact.getSkypeSn(),
-				contact.getTwitterSn(), user.getJobTitle(), groupIds,
-				user.getOrganizationIds(), null, null, user.getUserGroupIds(),
-				serviceContext);
+				contact.getPrefixId(), contact.getSuffixId(), user.isMale(),
+				birthdayCal.get(Calendar.MONTH), birthdayCal.get(Calendar.DATE),
+				birthdayCal.get(Calendar.YEAR), contact.getSmsSn(),
+				contact.getFacebookSn(), contact.getJabberSn(),
+				contact.getSkypeSn(), contact.getTwitterSn(),
+				user.getJobTitle(), groupIds, user.getOrganizationIds(), null,
+				null, user.getUserGroupIds(), serviceContext);
 		}
 		catch (NoSuchUserException | PrincipalException exception) {
 			SessionErrors.add(actionRequest, exception.getClass());
@@ -99,11 +101,16 @@ public class UpdateMembershipsMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private long[] _getGroupIds(PortletRequest portletRequest, User user) {
-		Set<Long> groupIds = new HashSet<>();
-
-		for (long groupId : user.getGroupIds()) {
-			groupIds.add(groupId);
-		}
+		Set<Long> groupIds = Optional.of(
+			user.getGroupIds()
+		).map(
+			Arrays::stream
+		).orElseGet(
+			LongStream::empty
+		).boxed(
+		).collect(
+			Collectors.toSet()
+		);
 
 		long[] addDepotGroupIds = StringUtil.split(
 			ParamUtil.getString(portletRequest, "addDepotGroupIds"), 0L);

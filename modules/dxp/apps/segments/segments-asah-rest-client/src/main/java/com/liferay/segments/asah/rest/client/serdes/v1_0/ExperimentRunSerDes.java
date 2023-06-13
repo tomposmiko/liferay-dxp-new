@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -178,20 +179,15 @@ public class ExperimentRunSerDes {
 						jsonParserFieldName, "experimentVariants")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ExperimentVariant[] experimentVariantsArray =
-						new ExperimentVariant[jsonParserFieldValues.length];
-
-					for (int i = 0; i < experimentVariantsArray.length; i++) {
-						experimentVariantsArray[i] =
-							ExperimentVariantSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					experimentRun.setExperimentVariants(
-						experimentVariantsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ExperimentVariantSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new ExperimentVariant[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "status")) {

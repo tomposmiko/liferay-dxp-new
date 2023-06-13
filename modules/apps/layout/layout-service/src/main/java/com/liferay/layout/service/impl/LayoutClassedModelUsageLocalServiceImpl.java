@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
+import java.util.Date;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
@@ -78,6 +79,8 @@ public class LayoutClassedModelUsageLocalServiceImpl
 
 		layoutClassedModelUsage.setCompanyId(companyId);
 
+		layoutClassedModelUsage.setCreateDate(new Date());
+		layoutClassedModelUsage.setModifiedDate(new Date());
 		layoutClassedModelUsage.setClassNameId(classNameId);
 		layoutClassedModelUsage.setClassPK(classPK);
 		layoutClassedModelUsage.setContainerKey(containerKey);
@@ -91,7 +94,7 @@ public class LayoutClassedModelUsageLocalServiceImpl
 
 	@Override
 	public void deleteLayoutClassedModelUsages(long classNameId, long classPK) {
-		layoutClassedModelUsagePersistence.removeByCN_CPK(classNameId, classPK);
+		layoutClassedModelUsagePersistence.removeByC_C(classNameId, classPK);
 	}
 
 	@Override
@@ -112,7 +115,7 @@ public class LayoutClassedModelUsageLocalServiceImpl
 		long classNameId, long classPK, String containerKey, long containerType,
 		long plid) {
 
-		return layoutClassedModelUsagePersistence.fetchByCN_CPK_CK_CT_P(
+		return layoutClassedModelUsagePersistence.fetchByC_C_CK_CT_P(
 			classNameId, classPK, containerKey, containerType, plid);
 	}
 
@@ -120,7 +123,7 @@ public class LayoutClassedModelUsageLocalServiceImpl
 	public List<LayoutClassedModelUsage> getLayoutClassedModelUsages(
 		long classNameId, long classPK) {
 
-		return layoutClassedModelUsagePersistence.findByCN_CPK(
+		return layoutClassedModelUsagePersistence.findByC_C(
 			classNameId, classPK);
 	}
 
@@ -129,7 +132,7 @@ public class LayoutClassedModelUsageLocalServiceImpl
 		long classNameId, long classPK, int type, int start, int end,
 		OrderByComparator<LayoutClassedModelUsage> orderByComparator) {
 
-		return layoutClassedModelUsagePersistence.findByCN_CPK_T(
+		return layoutClassedModelUsagePersistence.findByC_C_T(
 			classNameId, classPK, type, start, end, orderByComparator);
 	}
 
@@ -138,16 +141,8 @@ public class LayoutClassedModelUsageLocalServiceImpl
 		long classNameId, long classPK, int start, int end,
 		OrderByComparator<LayoutClassedModelUsage> orderByComparator) {
 
-		return layoutClassedModelUsagePersistence.findByCN_CPK(
+		return layoutClassedModelUsagePersistence.findByC_C(
 			classNameId, classPK, start, end, orderByComparator);
-	}
-
-	@Override
-	public List<LayoutClassedModelUsage> getLayoutClassedModelUsages(
-		long companyId, long classNameId, long containerType) {
-
-		return layoutClassedModelUsagePersistence.findByC_CN_CT(
-			companyId, classNameId, containerType);
 	}
 
 	@Override
@@ -161,7 +156,7 @@ public class LayoutClassedModelUsageLocalServiceImpl
 	public int getLayoutClassedModelUsagesCount(
 		long classNameId, long classPK) {
 
-		return layoutClassedModelUsagePersistence.countByCN_CPK(
+		return layoutClassedModelUsagePersistence.countByC_C(
 			classNameId, classPK);
 	}
 
@@ -169,7 +164,7 @@ public class LayoutClassedModelUsageLocalServiceImpl
 	public int getLayoutClassedModelUsagesCount(
 		long classNameId, long classPK, int type) {
 
-		return layoutClassedModelUsagePersistence.countByCN_CPK_T(
+		return layoutClassedModelUsagePersistence.countByC_C_T(
 			classNameId, classPK, type);
 	}
 

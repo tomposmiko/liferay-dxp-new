@@ -17,6 +17,7 @@ package com.liferay.configuration.admin.web.internal.portlet.action;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.configuration.admin.display.ConfigurationScreen;
 import com.liferay.configuration.admin.web.internal.constants.ConfigurationAdminWebKeys;
+import com.liferay.configuration.admin.web.internal.display.ConfigurationCategoryMenuDisplay;
 import com.liferay.configuration.admin.web.internal.display.ConfigurationEntry;
 import com.liferay.configuration.admin.web.internal.display.ConfigurationScreenConfigurationEntry;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
@@ -40,6 +41,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jorge Ferrer
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
@@ -70,13 +72,16 @@ public class ViewConfigurationScreenMVCRenderCommand
 		ConfigurationScopeDisplayContext configurationScopeDisplayContext =
 			ConfigurationScopeDisplayContextFactory.create(renderRequest);
 
-		renderRequest.setAttribute(
-			ConfigurationAdminWebKeys.CONFIGURATION_CATEGORY_MENU_DISPLAY,
+		ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay =
 			_configurationEntryRetriever.getConfigurationCategoryMenuDisplay(
 				configurationScreen.getCategoryKey(),
 				themeDisplay.getLanguageId(),
 				configurationScopeDisplayContext.getScope(),
-				configurationScopeDisplayContext.getScopePK()));
+				configurationScopeDisplayContext.getScopePK());
+
+		renderRequest.setAttribute(
+			ConfigurationAdminWebKeys.CONFIGURATION_CATEGORY_MENU_DISPLAY,
+			configurationCategoryMenuDisplay);
 
 		renderRequest.setAttribute(
 			ConfigurationAdminWebKeys.CONFIGURATION_SCREEN,

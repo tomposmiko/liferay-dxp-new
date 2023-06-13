@@ -21,8 +21,8 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
-import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -104,11 +104,11 @@ public class VirtualCPTypeTestUtil {
 			PortalUtil.getClassNameId(JournalArticle.class));
 
 		return JournalArticleLocalServiceUtil.addArticle(
-			null, serviceContext.getUserId(), groupId,
+			serviceContext.getUserId(), groupId,
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomLocaleStringMap(),
 			RandomTestUtil.randomLocaleStringMap(), content,
-			ddmStructure.getStructureId(), ddmTemplate.getTemplateKey(),
+			ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
 			serviceContext);
 	}
 

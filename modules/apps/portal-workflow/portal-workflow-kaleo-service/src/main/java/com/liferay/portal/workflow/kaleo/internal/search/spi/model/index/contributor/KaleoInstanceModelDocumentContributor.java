@@ -14,31 +14,33 @@
 
 package com.liferay.portal.workflow.kaleo.internal.search.spi.model.index.contributor;
 
-import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
-import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
-import com.liferay.portal.workflow.kaleo.model.KaleoNode;
-import com.liferay.portal.workflow.kaleo.service.KaleoInstanceTokenLocalService;
-import com.liferay.portal.workflow.kaleo.service.KaleoNodeLocalService;
+import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
+import com.liferay.portal.workflow.kaleo.runtime.util.WorkflowContextUtil;
 
-import java.util.Objects;
+import java.io.Serializable;
+
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Inácio Nery
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.workflow.kaleo.model.KaleoInstance",
 	service = ModelDocumentContributor.class
 )
 public class KaleoInstanceModelDocumentContributor
-	extends BaseKaleoModelDocumentContributor
 	implements ModelDocumentContributor<KaleoInstance> {
 
 	@Override
@@ -47,34 +49,32 @@ public class KaleoInstanceModelDocumentContributor
 			Field.CREATE_DATE, kaleoInstance.getCreateDate());
 		document.addDateSortable(
 			Field.MODIFIED_DATE, kaleoInstance.getModifiedDate());
-		document.addKeyword("active", kaleoInstance.isActive());
 		document.addKeyword("className", kaleoInstance.getClassName());
-		document.addKeyword(
-			Field.CLASS_NAME_ID,
-			_portal.getClassNameId(kaleoInstance.getClassName()));
 		document.addKeyword("classPK", kaleoInstance.getClassPK());
 		document.addKeywordSortable("completed", kaleoInstance.isCompleted());
 		document.addDateSortable(
 			"completionDate", kaleoInstance.getCompletionDate());
-		document.addKeywordSortable(
-			"currentKaleoNodeName",
-			(String[])TransformUtil.transformToArray(
-				_kaleoInstanceTokenLocalService.getKaleoInstanceTokens(
-					kaleoInstance.getKaleoInstanceId()),
-				kaleoInstanceToken -> {
-					KaleoNode kaleoNode = _kaleoNodeLocalService.fetchKaleoNode(
-						kaleoInstanceToken.getCurrentKaleoNodeId());
 
-					if ((kaleoNode == null) ||
-						Objects.equals(
-							NodeType.FORK.name(), kaleoNode.getType())) {
+		try {
+			Map<String, Serializable> workflowContext =
+				WorkflowContextUtil.convert(kaleoInstance.getWorkflowContext());
 
-						return null;
-					}
+			ServiceContext serviceContext = (ServiceContext)workflowContext.get(
+				WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
 
-					return kaleoNode.getName();
-				},
-				String.class));
+			KaleoInstanceToken rootKaleoInstanceToken =
+				kaleoInstance.getRootKaleoInstanceToken(serviceContext);
+
+			document.addKeywordSortable(
+				"currentKaleoNodeName",
+				rootKaleoInstanceToken.getCurrentKaleoNodeName());
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException, portalException);
+			}
+		}
+
 		document.addKeyword(
 			"kaleoDefinitionName", kaleoInstance.getKaleoDefinitionName());
 		document.addKeyword(
@@ -88,19 +88,9 @@ public class KaleoInstanceModelDocumentContributor
 		document.addKeyword(
 			"rootKaleoInstanceTokenId",
 			kaleoInstance.getRootKaleoInstanceTokenId());
-
-		addAssetEntryAttributes(
-			kaleoInstance.getClassName(), kaleoInstance.getClassPK(), document,
-			kaleoInstance.getGroupId());
 	}
 
-	@Reference
-	private KaleoInstanceTokenLocalService _kaleoInstanceTokenLocalService;
-
-	@Reference
-	private KaleoNodeLocalService _kaleoNodeLocalService;
-
-	@Reference
-	private Portal _portal;
+	private static final Log _log = LogFactoryUtil.getLog(
+		KaleoInstanceModelDocumentContributor.class);
 
 }

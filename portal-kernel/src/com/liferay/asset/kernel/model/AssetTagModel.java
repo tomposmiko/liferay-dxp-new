@@ -287,8 +287,4 @@ public interface AssetTagModel
 	@Override
 	public AssetTag cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

@@ -58,12 +58,6 @@ public class BatchPlannerMappingServiceUtil {
 			batchPlannerPlanId, externalFieldName, internalFieldName);
 	}
 
-	public static void deleteBatchPlannerMappings(long batchPlannerPlanId)
-		throws PortalException {
-
-		getService().deleteBatchPlannerMappings(batchPlannerPlanId);
-	}
-
 	public static List<BatchPlannerMapping> getBatchPlannerMappings(
 			long batchPlannerPlanId)
 		throws PortalException {

@@ -152,25 +152,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {cartPaymentURL(callbackURL: ___, cartId: ___){}}"}' -u 'test@liferay.com:test'
-	 */
-	@GraphQLField
-	public String cartPaymentURL(
-			@GraphQLName("cartId") Long cartId,
-			@GraphQLName("callbackURL") String callbackURL)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_cartResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			cartResource -> cartResource.getCartPaymentURL(
-				cartId, callbackURL));
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {channelCarts(accountId: ___, channelId: ___, page: ___, pageSize: ___, search: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {channelCarts(accountId: ___, channelId: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(
 		description = "Retrieves carts for specific account in the given channel."
@@ -178,7 +160,6 @@ public class Query {
 	public CartPage channelCarts(
 			@GraphQLName("accountId") Long accountId,
 			@GraphQLName("channelId") Long channelId,
-			@GraphQLName("search") String search,
 			@GraphQLName("pageSize") int pageSize,
 			@GraphQLName("page") int page)
 		throws Exception {
@@ -188,8 +169,7 @@ public class Query {
 			this::_populateResourceContext,
 			cartResource -> new CartPage(
 				cartResource.getChannelCartsPage(
-					accountId, channelId, search,
-					Pagination.of(page, pageSize))));
+					accountId, channelId, Pagination.of(page, pageSize))));
 	}
 
 	/**
@@ -232,7 +212,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {cartItem(cartItemId: ___){adaptiveMediaImageHTMLTag, cartItems, customFields, errorMessages, id, name, options, parentCartItemId, price, productId, productURLs, quantity, replacedSku, replacedSkuId, settings, sku, skuId, subscription, thumbnail, valid}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {cartItem(cartItemId: ___){adaptiveMediaImageHTMLTag, cartItems, customFields, errorMessages, id, name, options, parentCartItemId, price, productId, productURLs, quantity, settings, sku, skuId, subscription, thumbnail, valid}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Retrive information of the given Cart")
 	public CartItem cartItem(@GraphQLName("cartItemId") Long cartItemId)
@@ -247,12 +227,11 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {cartItems(cartId: ___, page: ___, pageSize: ___, skuId: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {cartItems(cartId: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField(description = "Retrive cart items of a Cart.")
 	public CartItemPage cartItems(
 			@GraphQLName("cartId") Long cartId,
-			@GraphQLName("skuId") Long skuId,
 			@GraphQLName("pageSize") int pageSize,
 			@GraphQLName("page") int page)
 		throws Exception {
@@ -262,7 +241,7 @@ public class Query {
 			this::_populateResourceContext,
 			cartItemResource -> new CartItemPage(
 				cartItemResource.getCartItemsPage(
-					cartId, skuId, Pagination.of(page, pageSize))));
+					cartId, Pagination.of(page, pageSize))));
 	}
 
 	/**
@@ -395,28 +374,6 @@ public class Query {
 	}
 
 	@GraphQLTypeExtension(Cart.class)
-	public class GetCartPaymentURLTypeExtension {
-
-		public GetCartPaymentURLTypeExtension(Cart cart) {
-			_cart = cart;
-		}
-
-		@GraphQLField
-		public String paymentURL(@GraphQLName("callbackURL") String callbackURL)
-			throws Exception {
-
-			return _applyComponentServiceObjects(
-				_cartResourceComponentServiceObjects,
-				Query.this::_populateResourceContext,
-				cartResource -> cartResource.getCartPaymentURL(
-					_cart.getId(), callbackURL));
-		}
-
-		private Cart _cart;
-
-	}
-
-	@GraphQLTypeExtension(Cart.class)
 	public class GetCartItemsPageTypeExtension {
 
 		public GetCartItemsPageTypeExtension(Cart cart) {
@@ -425,7 +382,6 @@ public class Query {
 
 		@GraphQLField(description = "Retrive cart items of a Cart.")
 		public CartItemPage items(
-				@GraphQLName("skuId") Long skuId,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 			throws Exception {
@@ -435,7 +391,7 @@ public class Query {
 				Query.this::_populateResourceContext,
 				cartItemResource -> new CartItemPage(
 					cartItemResource.getCartItemsPage(
-						_cart.getId(), skuId, Pagination.of(page, pageSize))));
+						_cart.getId(), Pagination.of(page, pageSize))));
 		}
 
 		private Cart _cart;
@@ -476,7 +432,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Address> items;
@@ -509,7 +465,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<Cart> items;
@@ -542,7 +498,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<CartComment> items;
@@ -575,7 +531,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<CartItem> items;
@@ -608,7 +564,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<PaymentMethod> items;
@@ -641,7 +597,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<ShippingMethod> items;

@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class AssetCategoryServiceWrapper
 	implements AssetCategoryService, ServiceWrapper<AssetCategoryService> {
 
-	public AssetCategoryServiceWrapper() {
-		this(null);
-	}
-
 	public AssetCategoryServiceWrapper(
 		AssetCategoryService assetCategoryService) {
 
@@ -62,20 +58,6 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public AssetCategory addCategory(
-			String externalReferenceCode, long groupId, long parentCategoryId,
-			java.util.Map<java.util.Locale, String> titleMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			long vocabularyId, String[] categoryProperties,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _assetCategoryService.addCategory(
-			externalReferenceCode, groupId, parentCategoryId, titleMap,
-			descriptionMap, vocabularyId, categoryProperties, serviceContext);
-	}
-
-	@Override
 	public void deleteCategories(long[] categoryIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -94,15 +76,6 @@ public class AssetCategoryServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.fetchCategory(categoryId);
-	}
-
-	@Override
-	public AssetCategory getAssetCategoryByExternalReferenceCode(
-			long groupId, String externalReferenceCode)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _assetCategoryService.getAssetCategoryByExternalReferenceCode(
-			groupId, externalReferenceCode);
 	}
 
 	/**

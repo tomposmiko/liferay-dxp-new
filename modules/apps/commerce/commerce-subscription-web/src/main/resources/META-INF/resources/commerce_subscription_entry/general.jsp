@@ -178,7 +178,7 @@ if (deliveryMaxSubscriptionCycles > 0) {
 				</div>
 
 				<div class="col-6">
-					<label for="<portlet:namespace />nextIterationDate"><liferay-ui:message key="next-iteration-date" /></label>
+					<label for="<portlet:namespace />nextIterationDate"><%= LanguageUtil.get(request, "next-iteration-date") %></label>
 
 					<%
 					Date nextIterationDate = commerceSubscriptionEntry.getNextIterationDate();
@@ -303,7 +303,7 @@ if (deliveryMaxSubscriptionCycles > 0) {
 				</div>
 
 				<div class="col-6">
-					<label for="<portlet:namespace />deliveryNextIterationDate"><liferay-ui:message key="next-iteration-date" /></label>
+					<label for="<portlet:namespace />deliveryNextIterationDate"><%= LanguageUtil.get(request, "next-iteration-date") %></label>
 
 					<%
 					Date deliveryNextIterationDate = commerceSubscriptionEntry.getDeliveryNextIterationDate();
@@ -382,11 +382,14 @@ if (deliveryMaxSubscriptionCycles > 0) {
 	bodyClasses="p-0"
 	title='<%= LanguageUtil.get(request, "items") %>'
 >
-<frontend-data-set:classic-display
+<clay:data-set-display
 	contextParams="<%= contextParams %>"
-	dataProviderKey="<%= CommerceSubscriptionFDSNames.SUBSCRIPTION_ORDER_ITEMS %>"
-	id="<%= CommerceSubscriptionFDSNames.SUBSCRIPTION_ORDER_ITEMS %>"
+	dataProviderKey="<%= CommerceSubscriptionDataSetConstants.COMMERCE_DATA_SET_KEY_SUBSCRIPTION_ORDER_ITEMS %>"
+	id="<%= CommerceSubscriptionDataSetConstants.COMMERCE_DATA_SET_KEY_SUBSCRIPTION_ORDER_ITEMS %>"
 	itemsPerPage="<%= 10 %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+	pageNumber="<%= 1 %>"
+	portletURL="<%= commerceSubscriptionEntryDisplayContext.getPortletURL() %>"
 	style="stacked"
 />
 </commerce-ui:panel>

@@ -65,10 +65,10 @@ public class DDMStructureLinkDLFileEntryTypeUpgradeProcess
 						"structureId = ?");
 			PreparedStatement preparedStatement4 =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"insert into DDMStructureLink (structureLinkId, " +
-						"companyId, classNameId, classPK, structureId) " +
-							"values (?, ?, ?, ?, ?)");
+					connection.prepareStatement(
+						"insert into DDMStructureLink (structureLinkId, " +
+							"companyId, classNameId, classPK, structureId) " +
+								"values (?, ?, ?, ?, ?)"));
 			ResultSet resultSet1 = preparedStatement1.executeQuery()) {
 
 			while (resultSet1.next()) {

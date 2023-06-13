@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord",
 	service = ModelDocumentContributor.class
 )
@@ -77,24 +78,18 @@ public class DDMFormInstanceRecordModelDocumentContributor
 			DDMFormValues ddmFormValues =
 				ddmFormInstanceRecordVersion.getDDMFormValues();
 
-			_addContent(ddmFormInstanceRecordVersion, ddmFormValues, document);
+			addContent(ddmFormInstanceRecordVersion, ddmFormValues, document);
 
 			ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 	}
 
-	@Reference
-	protected ClassNameLocalService classNameLocalService;
-
-	@Reference
-	protected DDMIndexer ddmIndexer;
-
-	private void _addContent(
+	protected void addContent(
 			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion,
 			DDMFormValues ddmFormValues, Document document)
 		throws Exception {
@@ -104,11 +99,11 @@ public class DDMFormInstanceRecordModelDocumentContributor
 		for (Locale locale : locales) {
 			document.addText(
 				"ddmContent_" + LocaleUtil.toLanguageId(locale),
-				_extractContent(ddmFormInstanceRecordVersion, locale));
+				extractContent(ddmFormInstanceRecordVersion, locale));
 		}
 	}
 
-	private String _extractContent(
+	protected String extractContent(
 			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion,
 			Locale locale)
 		throws Exception {
@@ -126,6 +121,12 @@ public class DDMFormInstanceRecordModelDocumentContributor
 		return ddmIndexer.extractIndexableAttributes(
 			ddmFormInstance.getStructure(), ddmFormValues, locale);
 	}
+
+	@Reference
+	protected ClassNameLocalService classNameLocalService;
+
+	@Reference
+	protected DDMIndexer ddmIndexer;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceRecordModelDocumentContributor.class);

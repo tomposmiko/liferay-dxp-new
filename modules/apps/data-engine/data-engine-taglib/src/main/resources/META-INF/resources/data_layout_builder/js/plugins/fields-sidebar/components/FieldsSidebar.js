@@ -20,7 +20,7 @@ import Sidebar from '../../../components/sidebar/Sidebar.es';
 import FieldsSidebarBody from './FieldsSidebarBody';
 import SidebarFieldSettings from './SidebarFieldSettings';
 
-export function FieldsSidebar({title}) {
+export const FieldsSidebar = ({title}) => {
 	const {focusedField} = useFormState();
 
 	return Object.keys(focusedField).length ? (
@@ -28,38 +28,26 @@ export function FieldsSidebar({title}) {
 	) : (
 		<FieldListSidebar title={title} />
 	);
-}
+};
 
 const FieldListSidebar = ({title}) => {
 	const [searchTerm, setSearchTerm] = useState('');
-	const [searchClicked, setSearchClicked] = useState(null);
 
 	return (
 		<Sidebar>
 			<Sidebar.Header>
 				<Sidebar.Title className="mb-3" title={title} />
-
-				<div
-					aria-live="polite"
-					className="sr-only"
-					id="screenReaderSearchResult"
-				></div>
-
 				<ClayForm onSubmit={(event) => event.preventDefault()}>
 					<Sidebar.SearchInput
 						onSearch={(keywords) => setSearchTerm(keywords)}
 						searchText={searchTerm}
-						setSearchClicked={setSearchClicked}
 					/>
 				</ClayForm>
 			</Sidebar.Header>
-
 			<Sidebar.Body>
 				<FieldsSidebarBody
 					keywords={searchTerm}
-					searchClicked={searchClicked}
 					setKeywords={setSearchTerm}
-					setSearchClicked={setSearchClicked}
 				/>
 			</Sidebar.Body>
 		</Sidebar>

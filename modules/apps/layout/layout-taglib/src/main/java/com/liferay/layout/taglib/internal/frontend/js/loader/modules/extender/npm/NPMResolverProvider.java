@@ -15,18 +15,35 @@
 package com.liferay.layout.taglib.internal.frontend.js.loader.modules.extender.npm;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
-import com.liferay.osgi.util.service.Snapshot;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Chema Balsas
  */
+@Component(immediate = true, service = {})
 public class NPMResolverProvider {
 
 	public static NPMResolver getNPMResolver() {
-		return _npmResolverSnapshot.get();
+		if (_npmResolverProvider == null) {
+			return null;
+		}
+
+		return _npmResolverProvider._npmResolver;
 	}
 
-	private static final Snapshot<NPMResolver> _npmResolverSnapshot =
-		new Snapshot<>(NPMResolverProvider.class, NPMResolver.class);
+	public NPMResolverProvider() {
+		_npmResolverProvider = this;
+	}
+
+	@Reference(unbind = "-")
+	protected void setNPMResolver(NPMResolver npmResolver) {
+		_npmResolver = npmResolver;
+	}
+
+	private static NPMResolverProvider _npmResolverProvider;
+
+	private NPMResolver _npmResolver;
 
 }

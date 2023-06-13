@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -249,118 +250,124 @@ public class JSONStorageEntryModelImpl
 	public Map<String, Function<JSONStorageEntry, Object>>
 		getAttributeGetterFunctions() {
 
-		return AttributeGetterFunctionsHolder._attributeGetterFunctions;
+		return _attributeGetterFunctions;
 	}
 
 	public Map<String, BiConsumer<JSONStorageEntry, Object>>
 		getAttributeSetterBiConsumers() {
 
-		return AttributeSetterBiConsumersHolder._attributeSetterBiConsumers;
+		return _attributeSetterBiConsumers;
 	}
 
-	private static class AttributeGetterFunctionsHolder {
+	private static Function<InvocationHandler, JSONStorageEntry>
+		_getProxyProviderFunction() {
 
-		private static final Map<String, Function<JSONStorageEntry, Object>>
-			_attributeGetterFunctions;
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			JSONStorageEntry.class.getClassLoader(), JSONStorageEntry.class,
+			ModelWrapper.class);
 
-		static {
-			Map<String, Function<JSONStorageEntry, Object>>
-				attributeGetterFunctions =
-					new LinkedHashMap
-						<String, Function<JSONStorageEntry, Object>>();
+		try {
+			Constructor<JSONStorageEntry> constructor =
+				(Constructor<JSONStorageEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-			attributeGetterFunctions.put(
-				"mvccVersion", JSONStorageEntry::getMvccVersion);
-			attributeGetterFunctions.put(
-				"ctCollectionId", JSONStorageEntry::getCtCollectionId);
-			attributeGetterFunctions.put(
-				"jsonStorageEntryId", JSONStorageEntry::getJsonStorageEntryId);
-			attributeGetterFunctions.put(
-				"companyId", JSONStorageEntry::getCompanyId);
-			attributeGetterFunctions.put(
-				"classNameId", JSONStorageEntry::getClassNameId);
-			attributeGetterFunctions.put(
-				"classPK", JSONStorageEntry::getClassPK);
-			attributeGetterFunctions.put(
-				"parentJSONStorageEntryId",
-				JSONStorageEntry::getParentJSONStorageEntryId);
-			attributeGetterFunctions.put("index", JSONStorageEntry::getIndex);
-			attributeGetterFunctions.put("key", JSONStorageEntry::getKey);
-			attributeGetterFunctions.put("type", JSONStorageEntry::getType);
-			attributeGetterFunctions.put(
-				"valueLong", JSONStorageEntry::getValueLong);
-			attributeGetterFunctions.put(
-				"valueString", JSONStorageEntry::getValueString);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
 
-			_attributeGetterFunctions = Collections.unmodifiableMap(
-				attributeGetterFunctions);
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
 		}
-
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
-	private static class AttributeSetterBiConsumersHolder {
+	private static final Map<String, Function<JSONStorageEntry, Object>>
+		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<JSONStorageEntry, Object>>
+		_attributeSetterBiConsumers;
 
-		private static final Map<String, BiConsumer<JSONStorageEntry, Object>>
-			_attributeSetterBiConsumers;
+	static {
+		Map<String, Function<JSONStorageEntry, Object>>
+			attributeGetterFunctions =
+				new LinkedHashMap<String, Function<JSONStorageEntry, Object>>();
+		Map<String, BiConsumer<JSONStorageEntry, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<JSONStorageEntry, ?>>();
 
-		static {
-			Map<String, BiConsumer<JSONStorageEntry, ?>>
-				attributeSetterBiConsumers =
-					new LinkedHashMap
-						<String, BiConsumer<JSONStorageEntry, ?>>();
+		attributeGetterFunctions.put(
+			"mvccVersion", JSONStorageEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<JSONStorageEntry, Long>)
+				JSONStorageEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", JSONStorageEntry::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<JSONStorageEntry, Long>)
+				JSONStorageEntry::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"jsonStorageEntryId", JSONStorageEntry::getJsonStorageEntryId);
+		attributeSetterBiConsumers.put(
+			"jsonStorageEntryId",
+			(BiConsumer<JSONStorageEntry, Long>)
+				JSONStorageEntry::setJsonStorageEntryId);
+		attributeGetterFunctions.put(
+			"companyId", JSONStorageEntry::getCompanyId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<JSONStorageEntry, Long>)JSONStorageEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"classNameId", JSONStorageEntry::getClassNameId);
+		attributeSetterBiConsumers.put(
+			"classNameId",
+			(BiConsumer<JSONStorageEntry, Long>)
+				JSONStorageEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", JSONStorageEntry::getClassPK);
+		attributeSetterBiConsumers.put(
+			"classPK",
+			(BiConsumer<JSONStorageEntry, Long>)JSONStorageEntry::setClassPK);
+		attributeGetterFunctions.put(
+			"parentJSONStorageEntryId",
+			JSONStorageEntry::getParentJSONStorageEntryId);
+		attributeSetterBiConsumers.put(
+			"parentJSONStorageEntryId",
+			(BiConsumer<JSONStorageEntry, Long>)
+				JSONStorageEntry::setParentJSONStorageEntryId);
+		attributeGetterFunctions.put("index", JSONStorageEntry::getIndex);
+		attributeSetterBiConsumers.put(
+			"index",
+			(BiConsumer<JSONStorageEntry, Integer>)JSONStorageEntry::setIndex);
+		attributeGetterFunctions.put("key", JSONStorageEntry::getKey);
+		attributeSetterBiConsumers.put(
+			"key",
+			(BiConsumer<JSONStorageEntry, String>)JSONStorageEntry::setKey);
+		attributeGetterFunctions.put("type", JSONStorageEntry::getType);
+		attributeSetterBiConsumers.put(
+			"type",
+			(BiConsumer<JSONStorageEntry, Integer>)JSONStorageEntry::setType);
+		attributeGetterFunctions.put(
+			"valueLong", JSONStorageEntry::getValueLong);
+		attributeSetterBiConsumers.put(
+			"valueLong",
+			(BiConsumer<JSONStorageEntry, Long>)JSONStorageEntry::setValueLong);
+		attributeGetterFunctions.put(
+			"valueString", JSONStorageEntry::getValueString);
+		attributeSetterBiConsumers.put(
+			"valueString",
+			(BiConsumer<JSONStorageEntry, String>)
+				JSONStorageEntry::setValueString);
 
-			attributeSetterBiConsumers.put(
-				"mvccVersion",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setMvccVersion);
-			attributeSetterBiConsumers.put(
-				"ctCollectionId",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setCtCollectionId);
-			attributeSetterBiConsumers.put(
-				"jsonStorageEntryId",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setJsonStorageEntryId);
-			attributeSetterBiConsumers.put(
-				"companyId",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setCompanyId);
-			attributeSetterBiConsumers.put(
-				"classNameId",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setClassNameId);
-			attributeSetterBiConsumers.put(
-				"classPK",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setClassPK);
-			attributeSetterBiConsumers.put(
-				"parentJSONStorageEntryId",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setParentJSONStorageEntryId);
-			attributeSetterBiConsumers.put(
-				"index",
-				(BiConsumer<JSONStorageEntry, Integer>)
-					JSONStorageEntry::setIndex);
-			attributeSetterBiConsumers.put(
-				"key",
-				(BiConsumer<JSONStorageEntry, String>)JSONStorageEntry::setKey);
-			attributeSetterBiConsumers.put(
-				"type",
-				(BiConsumer<JSONStorageEntry, Integer>)
-					JSONStorageEntry::setType);
-			attributeSetterBiConsumers.put(
-				"valueLong",
-				(BiConsumer<JSONStorageEntry, Long>)
-					JSONStorageEntry::setValueLong);
-			attributeSetterBiConsumers.put(
-				"valueString",
-				(BiConsumer<JSONStorageEntry, String>)
-					JSONStorageEntry::setValueString);
-
-			_attributeSetterBiConsumers = Collections.unmodifiableMap(
-				(Map)attributeSetterBiConsumers);
-		}
-
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+		_attributeSetterBiConsumers = Collections.unmodifiableMap(
+			(Map)attributeSetterBiConsumers);
 	}
 
 	@Override
@@ -914,12 +921,41 @@ public class JSONStorageEntryModelImpl
 		return sb.toString();
 	}
 
+	@Override
+	public String toXmlString() {
+		Map<String, Function<JSONStorageEntry, Object>>
+			attributeGetterFunctions = getAttributeGetterFunctions();
+
+		StringBundler sb = new StringBundler(
+			(5 * attributeGetterFunctions.size()) + 4);
+
+		sb.append("<model><model-name>");
+		sb.append(getModelClassName());
+		sb.append("</model-name>");
+
+		for (Map.Entry<String, Function<JSONStorageEntry, Object>> entry :
+				attributeGetterFunctions.entrySet()) {
+
+			String attributeName = entry.getKey();
+			Function<JSONStorageEntry, Object> attributeGetterFunction =
+				entry.getValue();
+
+			sb.append("<column><column-name>");
+			sb.append(attributeName);
+			sb.append("</column-name><column-value><![CDATA[");
+			sb.append(attributeGetterFunction.apply((JSONStorageEntry)this));
+			sb.append("]]></column-value></column>");
+		}
+
+		sb.append("</model>");
+
+		return sb.toString();
+	}
+
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, JSONStorageEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					JSONStorageEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -940,8 +976,7 @@ public class JSONStorageEntryModelImpl
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
 
 		Function<JSONStorageEntry, Object> function =
-			AttributeGetterFunctionsHolder._attributeGetterFunctions.get(
-				columnName);
+			_attributeGetterFunctions.get(columnName);
 
 		if (function == null) {
 			throw new IllegalArgumentException(

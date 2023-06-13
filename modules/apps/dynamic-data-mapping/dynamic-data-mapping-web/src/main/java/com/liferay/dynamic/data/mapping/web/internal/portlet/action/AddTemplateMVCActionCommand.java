@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Leonardo Barros
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + DDMPortletKeys.DYNAMIC_DATA_MAPPING,
 		"javax.portlet.name=" + PortletKeys.PORTLET_DISPLAY_TEMPLATE,
@@ -56,42 +57,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class AddTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		DDMTemplate template = _addTemplate(actionRequest);
-
-		updatePortletPreferences(actionRequest, template);
-
-		addSuccessMessage(actionRequest, actionResponse);
-
-		setRedirectAttribute(actionRequest, template);
-	}
-
-	protected String getScript(UploadPortletRequest uploadPortletRequest)
-		throws Exception {
-
-		String fileScriptContent = _getFileScriptContent(uploadPortletRequest);
-
-		if (Validator.isNotNull(fileScriptContent)) {
-			return fileScriptContent;
-		}
-
-		return ParamUtil.getString(uploadPortletRequest, "scriptContent");
-	}
-
-	@Reference
-	protected DDMTemplateService ddmTemplateService;
-
-	@Reference
-	protected Localization localization;
-
-	@Reference
-	protected Portal portal;
-
-	private DDMTemplate _addTemplate(ActionRequest actionRequest)
+	protected DDMTemplate addTemplate(ActionRequest actionRequest)
 		throws Exception {
 
 		UploadPortletRequest uploadPortletRequest =
@@ -105,10 +71,11 @@ public class AddTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 			uploadPortletRequest, "resourceClassNameId");
 		String templateKey = ParamUtil.getString(
 			uploadPortletRequest, "templateKey");
-		Map<Locale, String> nameMap = localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			uploadPortletRequest, "name");
-		Map<Locale, String> descriptionMap = localization.getLocalizationMap(
-			uploadPortletRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(
+				uploadPortletRequest, "description");
 		String type = ParamUtil.getString(uploadPortletRequest, "type");
 		String mode = ParamUtil.getString(uploadPortletRequest, "mode");
 		String language = ParamUtil.getString(
@@ -133,7 +100,21 @@ public class AddTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 			smallImage, smallImageURL, smallImageFile, serviceContext);
 	}
 
-	private String _getFileScriptContent(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		DDMTemplate template = addTemplate(actionRequest);
+
+		updatePortletPreferences(actionRequest, template);
+
+		addSuccessMessage(actionRequest, actionResponse);
+
+		setRedirectAttribute(actionRequest, template);
+	}
+
+	protected String getFileScriptContent(
 			UploadPortletRequest uploadPortletRequest)
 		throws Exception {
 
@@ -148,7 +129,7 @@ public class AddTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 		String contentType = MimeTypesUtil.getContentType(file);
 
 		if (Validator.isNotNull(fileScriptContent) &&
-			!_isValidContentType(contentType)) {
+			!isValidContentType(contentType)) {
 
 			throw new TemplateScriptException(
 				"Invalid contentType " + contentType);
@@ -157,7 +138,19 @@ public class AddTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 		return fileScriptContent;
 	}
 
-	private boolean _isValidContentType(String contentType) {
+	protected String getScript(UploadPortletRequest uploadPortletRequest)
+		throws Exception {
+
+		String fileScriptContent = getFileScriptContent(uploadPortletRequest);
+
+		if (Validator.isNotNull(fileScriptContent)) {
+			return fileScriptContent;
+		}
+
+		return ParamUtil.getString(uploadPortletRequest, "scriptContent");
+	}
+
+	protected boolean isValidContentType(String contentType) {
 		if (contentType.equals(ContentTypes.APPLICATION_XSLT_XML) ||
 			contentType.startsWith(ContentTypes.TEXT)) {
 
@@ -166,5 +159,17 @@ public class AddTemplateMVCActionCommand extends BaseDDMMVCActionCommand {
 
 		return false;
 	}
+
+	@Reference(unbind = "-")
+	protected void setDDMTemplateService(
+		DDMTemplateService ddmTemplateService) {
+
+		this.ddmTemplateService = ddmTemplateService;
+	}
+
+	protected DDMTemplateService ddmTemplateService;
+
+	@Reference
+	protected Portal portal;
 
 }

@@ -14,19 +14,12 @@
 
 package com.liferay.portal.upgrade.internal.registry;
 
-import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-
-import org.osgi.framework.Version;
 
 /**
  * @author Preston Crary
@@ -37,27 +30,7 @@ public class UpgradeStepRegistry implements UpgradeStepRegistrator.Registry {
 		_buildNumber = buildNumber;
 	}
 
-	public List<UpgradeStep> getReleaseCreationUpgradeSteps() {
-		return _releaseCreationUpgradeSteps;
-	}
-
-	public List<UpgradeInfo> getUpgradeInfos(boolean portalUpgraded) {
-		if (_initialization && portalUpgraded) {
-			if (_upgradeInfos.isEmpty()) {
-				return Arrays.asList(
-					new UpgradeInfo(
-						"0.0.0", "1.0.0", _buildNumber,
-						new DummyUpgradeStep()));
-			}
-
-			return ListUtil.concat(
-				Arrays.asList(
-					new UpgradeInfo(
-						"0.0.0", _getFinalSchemaVersion(_upgradeInfos),
-						_buildNumber, new DummyUpgradeStep())),
-				_upgradeInfos);
-		}
-
+	public List<UpgradeInfo> getUpgradeInfos() {
 		return _upgradeInfos;
 	}
 
@@ -71,18 +44,6 @@ public class UpgradeStepRegistry implements UpgradeStepRegistrator.Registry {
 			upgradeSteps);
 	}
 
-	@Override
-	public void registerInitialization() {
-		_initialization = true;
-	}
-
-	@Override
-	public void registerReleaseCreationUpgradeSteps(
-		UpgradeStep... upgradeSteps) {
-
-		Collections.addAll(_releaseCreationUpgradeSteps, upgradeSteps);
-	}
-
 	private void _createUpgradeInfos(
 		String fromSchemaVersionString, String toSchemaVersionString,
 		int buildNumber, UpgradeStep... upgradeSteps) {
@@ -91,67 +52,32 @@ public class UpgradeStepRegistry implements UpgradeStepRegistrator.Registry {
 			return;
 		}
 
-		List<UpgradeStep> upgradeStepsList = new ArrayList<>();
+		String upgradeInfoFromSchemaVersionString = fromSchemaVersionString;
 
-		for (UpgradeStep upgradeStep : upgradeSteps) {
-			if (upgradeStep instanceof UpgradeProcess) {
-				UpgradeProcess upgradeProcess = (UpgradeProcess)upgradeStep;
+		for (int i = 0; i < (upgradeSteps.length - 1); i++) {
+			UpgradeStep upgradeStep = upgradeSteps[i];
 
-				for (UpgradeStep innerUpgradeStep :
-						upgradeProcess.getUpgradeSteps()) {
+			String upgradeInfoToSchemaVersionString =
+				toSchemaVersionString + ".step" + (i - upgradeSteps.length + 1);
 
-					upgradeStepsList.add(innerUpgradeStep);
-				}
-			}
-			else {
-				upgradeStepsList.add(upgradeStep);
-			}
+			UpgradeInfo upgradeInfo = new UpgradeInfo(
+				upgradeInfoFromSchemaVersionString,
+				upgradeInfoToSchemaVersionString, buildNumber, upgradeStep);
+
+			_upgradeInfos.add(upgradeInfo);
+
+			upgradeInfoFromSchemaVersionString =
+				upgradeInfoToSchemaVersionString;
 		}
 
-		if (upgradeStepsList.size() == 1) {
-			_upgradeInfos.add(
-				new UpgradeInfo(
-					fromSchemaVersionString, toSchemaVersionString, buildNumber,
-					upgradeStepsList.get(0)));
-		}
-		else {
-			_upgradeInfos.add(
-				new UpgradeInfo(
-					fromSchemaVersionString, toSchemaVersionString, buildNumber,
-					() -> {
-						for (UpgradeStep upgradeStep : upgradeStepsList) {
-							upgradeStep.upgrade();
-						}
-					}));
-		}
-	}
+		UpgradeInfo upgradeInfo = new UpgradeInfo(
+			upgradeInfoFromSchemaVersionString, toSchemaVersionString,
+			buildNumber, upgradeSteps[upgradeSteps.length - 1]);
 
-	private String _getFinalSchemaVersion(List<UpgradeInfo> upgradeInfos) {
-		Version finalSchemaVersion = null;
-
-		for (UpgradeInfo upgradeInfo : upgradeInfos) {
-			String toSchemaVersion = upgradeInfo.getToSchemaVersionString();
-
-			Version schemaVersion = Version.parseVersion(
-				toSchemaVersion.substring(0, 5));
-
-			if (finalSchemaVersion == null) {
-				finalSchemaVersion = schemaVersion;
-			}
-			else {
-				finalSchemaVersion =
-					(finalSchemaVersion.compareTo(schemaVersion) >= 0) ?
-						finalSchemaVersion : schemaVersion;
-			}
-		}
-
-		return finalSchemaVersion.toString();
+		_upgradeInfos.add(upgradeInfo);
 	}
 
 	private final int _buildNumber;
-	private boolean _initialization;
-	private final List<UpgradeStep> _releaseCreationUpgradeSteps =
-		new ArrayList<>();
 	private final List<UpgradeInfo> _upgradeInfos = new ArrayList<>();
 
 }

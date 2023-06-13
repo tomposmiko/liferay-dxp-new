@@ -17,7 +17,6 @@ package com.liferay.portal.model.impl;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.exportimport.kernel.staging.constants.StagingConstants;
-import com.liferay.layout.admin.kernel.visibility.LayoutVisibilityManager;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -61,7 +60,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -72,7 +70,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -189,7 +186,10 @@ public class GroupImpl extends GroupBaseImpl {
 		String name = getName(locale);
 
 		if (Validator.isNull(name)) {
-			name = getName(PortalUtil.getSiteDefaultLocale(getGroupId()));
+			Locale siteDefaultLocale = PortalUtil.getSiteDefaultLocale(
+				getGroupId());
+
+			name = getName(siteDefaultLocale);
 		}
 
 		if (isCompany() && !isCompanyStagingGroup()) {
@@ -263,19 +263,6 @@ public class GroupImpl extends GroupBaseImpl {
 	}
 
 	@Override
-	public Map<Locale, String> getDescriptiveNameMap() throws PortalException {
-		Map<Locale, String> descriptiveNameMap = new HashMap<>();
-
-		for (Locale locale :
-				LanguageUtil.getCompanyAvailableLocales(getCompanyId())) {
-
-			descriptiveNameMap.put(locale, getDescriptiveName(locale));
-		}
-
-		return descriptiveNameMap;
-	}
-
-	@Override
 	public String getDisplayURL(ThemeDisplay themeDisplay) {
 		return getDisplayURL(themeDisplay, false);
 	}
@@ -314,7 +301,7 @@ public class GroupImpl extends GroupBaseImpl {
 			}
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return StringPool.BLANK;
@@ -368,24 +355,25 @@ public class GroupImpl extends GroupBaseImpl {
 
 	@Override
 	public String getLayoutRootNodeName(boolean privateLayout, Locale locale) {
-		String pagesName = "pages";
+		String pagesName = null;
 
-		if (!isLayoutPrototype() && !isLayoutSetPrototype()) {
-			if (privateLayout) {
-				if (isUser() || isUserGroup()) {
-					pagesName = "my-dashboard";
-				}
-				else if (isPrivateLayoutsEnabled()) {
-					pagesName = "private-pages";
-				}
+		if (isLayoutPrototype() || isLayoutSetPrototype()) {
+			pagesName = "pages";
+		}
+		else if (privateLayout) {
+			if (isUser() || isUserGroup()) {
+				pagesName = "my-dashboard";
 			}
 			else {
-				if (isUser() || isUserGroup()) {
-					pagesName = "my-profile";
-				}
-				else if (isPrivateLayoutsEnabled()) {
-					pagesName = "public-pages";
-				}
+				pagesName = "private-pages";
+			}
+		}
+		else {
+			if (isUser() || isUserGroup()) {
+				pagesName = "my-profile";
+			}
+			else {
+				pagesName = "public-pages";
 			}
 		}
 
@@ -522,7 +510,7 @@ public class GroupImpl extends GroupBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -553,7 +541,7 @@ public class GroupImpl extends GroupBaseImpl {
 				getGroupId(), true);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return layoutSet;
@@ -565,7 +553,7 @@ public class GroupImpl extends GroupBaseImpl {
 			return LayoutLocalServiceUtil.getLayoutsCount(this, true);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return 0;
@@ -580,7 +568,7 @@ public class GroupImpl extends GroupBaseImpl {
 				getGroupId(), false);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return layoutSet;
@@ -592,7 +580,7 @@ public class GroupImpl extends GroupBaseImpl {
 			return LayoutLocalServiceUtil.getLayoutsCount(this, false);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return 0;
@@ -753,7 +741,7 @@ public class GroupImpl extends GroupBaseImpl {
 				_typeSettingsUnicodeProperties.load(super.getTypeSettings());
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 
@@ -776,7 +764,7 @@ public class GroupImpl extends GroupBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return name;
@@ -977,11 +965,6 @@ public class GroupImpl extends GroupBaseImpl {
 	}
 
 	@Override
-	public boolean isPrivateLayoutsEnabled() {
-		return _layoutVisibilityManager.isPrivateLayoutsEnabled(getGroupId());
-	}
-
-	@Override
 	public boolean isRegularSite() {
 		if (getClassNameId() == ClassNameIds._GROUP_CLASS_NAME_ID) {
 			return true;
@@ -1153,7 +1136,7 @@ public class GroupImpl extends GroupBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -1232,7 +1215,7 @@ public class GroupImpl extends GroupBaseImpl {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception.getMessage());
 			}
 		}
 
@@ -1242,11 +1225,6 @@ public class GroupImpl extends GroupBaseImpl {
 	private static final Group _NULL_STAGING_GROUP = new GroupImpl();
 
 	private static final Log _log = LogFactoryUtil.getLog(GroupImpl.class);
-
-	private static volatile LayoutVisibilityManager _layoutVisibilityManager =
-		ServiceProxyFactory.newServiceTrackedInstance(
-			LayoutVisibilityManager.class, GroupImpl.class,
-			"_layoutVisibilityManager", false, true);
 
 	private Group _liveGroup;
 	private Group _stagingGroup;

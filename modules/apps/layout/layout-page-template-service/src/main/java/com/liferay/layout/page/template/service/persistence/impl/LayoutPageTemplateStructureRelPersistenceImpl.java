@@ -20,7 +20,6 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRelTabl
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelImpl;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelModelImpl;
 import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructureRelPersistence;
-import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructureRelUtil;
 import com.liferay.layout.page.template.service.persistence.impl.constants.LayoutPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -38,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -47,11 +47,10 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
@@ -83,7 +82,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = LayoutPageTemplateStructureRelPersistence.class)
+@Component(
+	service = {
+		LayoutPageTemplateStructureRelPersistence.class, BasePersistence.class
+	}
+)
 public class LayoutPageTemplateStructureRelPersistenceImpl
 	extends BasePersistenceImpl<LayoutPageTemplateStructureRel>
 	implements LayoutPageTemplateStructureRelPersistence {
@@ -205,7 +208,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructureRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateStructureRel
@@ -614,7 +617,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -754,7 +757,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof LayoutPageTemplateStructureRel) {
@@ -879,7 +882,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1053,7 +1056,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructureRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateStructureRel
@@ -1487,7 +1490,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1666,7 +1669,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructureRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateStructureRel
@@ -2076,7 +2079,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 			finderArgs = new Object[] {layoutPageTemplateStructureId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2227,7 +2230,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructureRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (LayoutPageTemplateStructureRel
@@ -2620,7 +2623,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 			finderArgs = new Object[] {segmentsExperienceId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2749,8 +2752,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByL_S, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByL_S, finderArgs);
 		}
 
 		if (result instanceof LayoutPageTemplateStructureRel) {
@@ -2868,7 +2870,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 				layoutPageTemplateStructureId, segmentsExperienceId
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3104,7 +3106,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		layoutPageTemplateStructureRel.setPrimaryKey(
 			layoutPageTemplateStructureRelId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		layoutPageTemplateStructureRel.setUuid(uuid);
 
@@ -3240,7 +3242,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 					layoutPageTemplateStructureRel;
 
 		if (Validator.isNull(layoutPageTemplateStructureRel.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			layoutPageTemplateStructureRel.setUuid(uuid);
 		}
@@ -3375,7 +3377,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		Serializable primaryKey) {
 
 		if (ctPersistenceHelper.isProductionMode(
-				LayoutPageTemplateStructureRel.class, primaryKey)) {
+				LayoutPageTemplateStructureRel.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -3605,7 +3607,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<LayoutPageTemplateStructureRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3684,7 +3686,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -3788,11 +3790,6 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		ctStrictColumnNames.add("layoutPageTemplateStructureId");
 		ctStrictColumnNames.add("segmentsExperienceId");
 		ctMergeColumnNames.add("data_");
-		ctStrictColumnNames.add("lastPublishDate");
-		ctStrictColumnNames.add("status");
-		ctStrictColumnNames.add("statusByUserId");
-		ctStrictColumnNames.add("statusByUserName");
-		ctStrictColumnNames.add("statusDate");
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
@@ -3937,34 +3934,12 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 				"layoutPageTemplateStructureId", "segmentsExperienceId"
 			},
 			false);
-
-		_setLayoutPageTemplateStructureRelUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setLayoutPageTemplateStructureRelUtilPersistence(null);
-
 		entityCache.removeCache(
 			LayoutPageTemplateStructureRelImpl.class.getName());
-	}
-
-	private void _setLayoutPageTemplateStructureRelUtilPersistence(
-		LayoutPageTemplateStructureRelPersistence
-			layoutPageTemplateStructureRelPersistence) {
-
-		try {
-			Field field =
-				LayoutPageTemplateStructureRelUtil.class.getDeclaredField(
-					"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, layoutPageTemplateStructureRelPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -4037,6 +4012,7 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private LayoutPageTemplateStructureRelModelArgumentsResolver
+		_layoutPageTemplateStructureRelModelArgumentsResolver;
 
 }

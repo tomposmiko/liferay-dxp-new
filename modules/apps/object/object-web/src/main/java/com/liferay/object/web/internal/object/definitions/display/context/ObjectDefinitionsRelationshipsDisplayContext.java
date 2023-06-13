@@ -14,72 +14,53 @@
 
 package com.liferay.object.web.internal.object.definitions.display.context;
 
-import com.liferay.frontend.data.set.model.FDSActionDropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.model.ObjectField;
-import com.liferay.object.model.ObjectRelationship;
-import com.liferay.object.service.ObjectDefinitionService;
-import com.liferay.object.service.ObjectFieldService;
-import com.liferay.object.system.JaxRsApplicationDescriptor;
-import com.liferay.object.system.SystemObjectDefinitionManager;
-import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
-import com.liferay.object.web.internal.configuration.activator.FFOneToOneRelationshipConfigurationActivator;
-import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
-import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.object.web.internal.constants.ObjectWebKeys;
+import com.liferay.object.web.internal.display.context.util.ObjectRequestHelper;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
 import java.util.List;
+
+import javax.portlet.PortletException;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Marco Leo
  */
-public class ObjectDefinitionsRelationshipsDisplayContext
-	extends BaseObjectDefinitionsDisplayContext {
+public class ObjectDefinitionsRelationshipsDisplayContext {
 
 	public ObjectDefinitionsRelationshipsDisplayContext(
-		FFOneToOneRelationshipConfigurationActivator
-			ffOneToOneRelationshipConfigurationActivator,
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
-			objectDefinitionModelResourcePermission,
-		ObjectDefinitionService objectDefinitionService,
-		ObjectFieldService objectFieldService,
-		SystemObjectDefinitionManagerRegistry
-			systemObjectDefinitionManagerRegistry) {
+			objectDefinitionModelResourcePermission) {
 
-		super(httpServletRequest, objectDefinitionModelResourcePermission);
-
-		_ffOneToOneRelationshipConfigurationActivator =
-			ffOneToOneRelationshipConfigurationActivator;
 		_objectDefinitionModelResourcePermission =
 			objectDefinitionModelResourcePermission;
-		_objectDefinitionService = objectDefinitionService;
-		_objectFieldService = objectFieldService;
-		_systemObjectDefinitionManagerRegistry =
-			systemObjectDefinitionManagerRegistry;
 
 		_objectRequestHelper = new ObjectRequestHelper(httpServletRequest);
 	}
 
-	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
+	public String getAPIURL() {
+		return "/o/object-admin/v1.0/object-definitions/" +
+			getObjectDefinitionId() + "/object-relationships";
+	}
+
+	public List<ClayDataSetActionDropdownItem>
+			getClayDataSetActionDropdownItems()
 		throws Exception {
 
 		return Arrays.asList(
-			new FDSActionDropdownItem(
+			new ClayDataSetActionDropdownItem(
 				PortletURLBuilder.create(
 					getPortletURL()
 				).setMVCRenderCommandName(
@@ -90,164 +71,62 @@ public class ObjectDefinitionsRelationshipsDisplayContext
 					LiferayWindowState.POP_UP
 				).buildString(),
 				"view", "view",
-				LanguageUtil.get(objectRequestHelper.getRequest(), "view"),
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
-			new FDSActionDropdownItem(
-				null, "trash", "deleteObjectRelationship",
-				LanguageUtil.get(objectRequestHelper.getRequest(), "delete"),
-				"delete", "delete", null));
+			new ClayDataSetActionDropdownItem(
+				"/o/object-admin/v1.0/object-relationships/{id}", "trash",
+				"delete",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
+				"delete", "delete", "async"));
 	}
 
-	public JSONArray getObjectRelationshipDeletionTypesJSONArray() {
-		return JSONUtil.putAll(
-			JSONUtil.put(
-				"label",
-				LanguageUtil.get(
-					_objectRequestHelper.getRequest(),
-					ObjectRelationshipConstants.DELETION_TYPE_CASCADE)
-			).put(
-				"value", ObjectRelationshipConstants.DELETION_TYPE_CASCADE
-			)
-		).put(
-			JSONUtil.put(
-				"label",
-				LanguageUtil.get(
-					_objectRequestHelper.getRequest(),
-					ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE)
-			).put(
-				"value", ObjectRelationshipConstants.DELETION_TYPE_DISASSOCIATE
-			)
-		).put(
-			JSONUtil.put(
-				"label",
-				LanguageUtil.get(
-					_objectRequestHelper.getRequest(),
-					ObjectRelationshipConstants.DELETION_TYPE_PREVENT)
-			).put(
-				"value", ObjectRelationshipConstants.DELETION_TYPE_PREVENT
-			)
-		);
-	}
+	public CreationMenu getCreationMenu() throws Exception {
+		CreationMenu creationMenu = new CreationMenu();
 
-	public JSONObject getObjectRelationshipJSONObject(
-			ObjectRelationship objectRelationship)
-		throws PortalException {
-
-		ObjectDefinition objectDefinition1 =
-			_objectDefinitionService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId1());
-		ObjectDefinition objectDefinition2 =
-			_objectDefinitionService.getObjectDefinition(
-				objectRelationship.getObjectDefinitionId2());
-
-		return JSONUtil.put(
-			"deletionType", objectRelationship.getDeletionType()
-		).put(
-			"label", objectRelationship.getLabelMap()
-		).put(
-			"name", objectRelationship.getName()
-		).put(
-			"objectDefinitionExternalReferenceCode1",
-			objectDefinition1.getExternalReferenceCode()
-		).put(
-			"objectDefinitionExternalReferenceCode2",
-			objectDefinition2.getExternalReferenceCode()
-		).put(
-			"objectDefinitionId1",
-			Long.valueOf(objectRelationship.getObjectDefinitionId1())
-		).put(
-			"objectDefinitionId2",
-			Long.valueOf(objectRelationship.getObjectDefinitionId2())
-		).put(
-			"objectDefinitionName2", objectDefinition2.getShortName()
-		).put(
-			"objectRelationshipId",
-			Long.valueOf(objectRelationship.getObjectRelationshipId())
-		).put(
-			"parameterObjectFieldId",
-			objectRelationship.getParameterObjectFieldId()
-		).put(
-			"parameterObjectFieldName",
-			() -> {
-				if (Validator.isNotNull(
-						objectRelationship.getParameterObjectFieldId())) {
-
-					ObjectField objectField =
-						_objectFieldService.getObjectField(
-							objectRelationship.getParameterObjectFieldId());
-
-					return objectField.getName();
-				}
-
-				return StringPool.BLANK;
-			}
-		).put(
-			"reverse", objectRelationship.isReverse()
-		).put(
-			"type", objectRelationship.getType()
-		);
-	}
-
-	public String getRESTContextPath(ObjectDefinition objectDefinition) {
-		if (!objectDefinition.isUnmodifiableSystemObject()) {
-			return objectDefinition.getRESTContextPath();
+		if (!_hasAddObjectRelationshipPermission()) {
+			return creationMenu;
 		}
 
-		SystemObjectDefinitionManager systemObjectDefinitionManager =
-			_systemObjectDefinitionManagerRegistry.
-				getSystemObjectDefinitionManager(objectDefinition.getName());
+		creationMenu.addDropdownItem(
+			dropdownItem -> {
+				dropdownItem.setHref("addObjectRelationship");
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						_objectRequestHelper.getRequest(),
+						"add-object-relationship"));
+				dropdownItem.setTarget("event");
+			});
 
-		if (systemObjectDefinitionManager == null) {
-			return StringPool.BLANK;
-		}
-
-		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
-			systemObjectDefinitionManager.getJaxRsApplicationDescriptor();
-
-		return jaxRsApplicationDescriptor.getRESTContextPath();
+		return creationMenu;
 	}
 
-	public boolean isFFOneToOneRelationshipConfigurationEnabled() {
-		return _ffOneToOneRelationshipConfigurationActivator.enabled();
+	public long getObjectDefinitionId() {
+		HttpServletRequest httpServletRequest =
+			_objectRequestHelper.getRequest();
+
+		ObjectDefinition objectDefinition =
+			(ObjectDefinition)httpServletRequest.getAttribute(
+				ObjectWebKeys.OBJECT_DEFINITION);
+
+		return objectDefinition.getObjectDefinitionId();
 	}
 
-	public boolean isParameterRequired(ObjectDefinition objectDefinition) {
-		String restContextPath = getRESTContextPath(objectDefinition);
-
-		if (restContextPath.matches(".*/\\{\\w+}/.*")) {
-			return true;
-		}
-
-		return false;
+	public PortletURL getPortletURL() throws PortletException {
+		return PortletURLUtil.clone(
+			PortletURLUtil.getCurrent(
+				_objectRequestHelper.getLiferayPortletRequest(),
+				_objectRequestHelper.getLiferayPortletResponse()),
+			_objectRequestHelper.getLiferayPortletResponse());
 	}
 
-	@Override
-	protected String getAPIURI() {
-		return "/object-relationships";
+	private boolean _hasAddObjectRelationshipPermission() throws Exception {
+		return _objectDefinitionModelResourcePermission.contains(
+			_objectRequestHelper.getPermissionChecker(),
+			getObjectDefinitionId(), ActionKeys.UPDATE);
 	}
 
-	@Override
-	protected UnsafeConsumer<DropdownItem, Exception>
-		getCreationMenuDropdownItemUnsafeConsumer() {
-
-		return dropdownItem -> {
-			dropdownItem.setHref("addObjectRelationship");
-			dropdownItem.setLabel(
-				LanguageUtil.get(
-					objectRequestHelper.getRequest(),
-					"add-object-relationship"));
-			dropdownItem.setTarget("event");
-		};
-	}
-
-	private final FFOneToOneRelationshipConfigurationActivator
-		_ffOneToOneRelationshipConfigurationActivator;
 	private final ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
-	private final ObjectDefinitionService _objectDefinitionService;
-	private final ObjectFieldService _objectFieldService;
 	private final ObjectRequestHelper _objectRequestHelper;
-	private final SystemObjectDefinitionManagerRegistry
-		_systemObjectDefinitionManagerRegistry;
 
 }

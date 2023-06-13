@@ -52,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.akismet.internal.configuration.AkismetServiceConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE,
+	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
 	service = AkismetClient.class
 )
 public class AkismetClientImpl implements AkismetClient {
@@ -287,7 +287,7 @@ public class AkismetClientImpl implements AkismetClient {
 			return _http.URLtoString(options);
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			_log.error(ioException, ioException);
 		}
 
 		return StringPool.BLANK;

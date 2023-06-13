@@ -39,7 +39,10 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceChannelHealthStatusRegistry.class)
+@Component(
+	enabled = false, immediate = true,
+	service = CommerceChannelHealthStatusRegistry.class
+)
 public class CommerceChannelHealthStatusRegistryImpl
 	implements CommerceChannelHealthStatusRegistry {
 
@@ -53,7 +56,7 @@ public class CommerceChannelHealthStatusRegistryImpl
 
 		ServiceWrapper<CommerceChannelHealthStatus>
 			commerceChannelHealthStatusServiceWrapper =
-				_serviceTrackerMap.getService(key);
+				_commerceChannelHealthStatusRegistryMap.getService(key);
 
 		if (commerceChannelHealthStatusServiceWrapper == null) {
 			if (_log.isDebugEnabled()) {
@@ -76,7 +79,8 @@ public class CommerceChannelHealthStatusRegistryImpl
 
 		List<ServiceWrapper<CommerceChannelHealthStatus>>
 			commerceChannelHealthStatusServiceWrappers =
-				ListUtil.fromCollection(_serviceTrackerMap.values());
+				ListUtil.fromCollection(
+					_commerceChannelHealthStatusRegistryMap.values());
 
 		Collections.sort(
 			commerceChannelHealthStatusServiceWrappers,
@@ -95,16 +99,17 @@ public class CommerceChannelHealthStatusRegistryImpl
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, CommerceChannelHealthStatus.class,
-			"commerce.channel.health.status.key",
-			ServiceTrackerCustomizerFactory.
-				<CommerceChannelHealthStatus>serviceWrapper(bundleContext));
+		_commerceChannelHealthStatusRegistryMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundleContext, CommerceChannelHealthStatus.class,
+				"commerce.channel.health.status.key",
+				ServiceTrackerCustomizerFactory.
+					<CommerceChannelHealthStatus>serviceWrapper(bundleContext));
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_serviceTrackerMap.close();
+		_commerceChannelHealthStatusRegistryMap.close();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -116,6 +121,6 @@ public class CommerceChannelHealthStatusRegistryImpl
 
 	private ServiceTrackerMap
 		<String, ServiceWrapper<CommerceChannelHealthStatus>>
-			_serviceTrackerMap;
+			_commerceChannelHealthStatusRegistryMap;
 
 }

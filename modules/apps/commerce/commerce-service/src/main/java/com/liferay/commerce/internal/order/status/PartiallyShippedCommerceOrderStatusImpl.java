@@ -16,12 +16,11 @@ package com.liferay.commerce.internal.order.status;
 
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.model.CommerceOrder;
-import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.order.status.CommerceOrderStatus;
 import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
@@ -34,6 +33,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Alec Sloan
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.order.status.key=" + PartiallyShippedCommerceOrderStatusImpl.KEY,
 		"commerce.order.status.priority:Integer=" + PartiallyShippedCommerceOrderStatusImpl.PRIORITY
@@ -64,36 +64,13 @@ public class PartiallyShippedCommerceOrderStatusImpl
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			locale, CommerceOrderConstants.getOrderStatusLabel(KEY));
 	}
 
 	@Override
 	public int getPriority() {
 		return PRIORITY;
-	}
-
-	public boolean isTransitionCriteriaMet(CommerceOrder commerceOrder)
-		throws PortalException {
-
-		boolean allOrderItemsShipped = true;
-
-		for (CommerceOrderItem shippedCommerceOrderItem :
-				commerceOrder.getCommerceOrderItems()) {
-
-			if ((shippedCommerceOrderItem.getShippedQuantity() <
-					shippedCommerceOrderItem.getQuantity()) &&
-				shippedCommerceOrderItem.isShippable()) {
-
-				allOrderItemsShipped = false;
-			}
-		}
-
-		if (!allOrderItemsShipped) {
-			return true;
-		}
-
-		return false;
 	}
 
 	@Override
@@ -115,8 +92,5 @@ public class PartiallyShippedCommerceOrderStatusImpl
 
 	@Reference
 	private CommerceShippingHelper _commerceShippingHelper;
-
-	@Reference
-	private Language _language;
 
 }

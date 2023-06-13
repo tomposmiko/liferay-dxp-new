@@ -25,7 +25,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = QueryConfigContributor.class)
+@Component(immediate = true, service = QueryConfigContributor.class)
 public class DefaultHighlightFieldNamesQueryConfigContributor
 	implements QueryConfigContributor {
 

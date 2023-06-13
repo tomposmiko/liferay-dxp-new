@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + StyleBookPortletKeys.STYLE_BOOK,
 		"mvc.command.name=/style_book/update_style_book_entry_preview"
@@ -95,7 +96,7 @@ public class UpdateStyleBookEntryPreviewMVCActionCommand
 		}
 
 		fileEntry = PortletFileRepositoryUtil.addPortletFileEntry(
-			null, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
 			StyleBookEntry.class.getName(), styleBookEntryId,
 			StyleBookPortletKeys.STYLE_BOOK, repository.getDlFolderId(),
 			fileEntry.getContentStream(), fileName, fileEntry.getMimeType(),

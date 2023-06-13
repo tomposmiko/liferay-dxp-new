@@ -15,6 +15,4 @@
 import launcher from '../../utilities/launcher';
 import AccountSelector from './AccountSelector';
 
-export default function entry(...data) {
-	return launcher(AccountSelector, ...data);
-}
+export default (...data) => launcher(AccountSelector, ...data);

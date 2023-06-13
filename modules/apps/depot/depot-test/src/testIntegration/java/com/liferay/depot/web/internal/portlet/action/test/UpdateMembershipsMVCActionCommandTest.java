@@ -18,7 +18,6 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.depot.constants.DepotRolesConstants;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryLocalService;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Contact;
 import com.liferay.portal.kernel.model.Group;
@@ -55,7 +54,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -103,19 +105,13 @@ public class UpdateMembershipsMVCActionCommandTest {
 				_user, new long[] {_depotEntry.getGroupId()}, null),
 			null);
 
-		boolean found = false;
+		long[] groupIds = _userLocalService.getGroupPrimaryKeys(
+			_user.getUserId());
 
-		for (long groupId :
-				_userLocalService.getGroupPrimaryKeys(_user.getUserId())) {
+		LongStream longStream = Arrays.stream(groupIds);
 
-			if (groupId == _depotEntry.getGroupId()) {
-				found = true;
-
-				break;
-			}
-		}
-
-		Assert.assertTrue(found);
+		Assert.assertTrue(
+			longStream.anyMatch(value -> value == _depotEntry.getGroupId()));
 	}
 
 	@Test
@@ -137,10 +133,10 @@ public class UpdateMembershipsMVCActionCommandTest {
 			_user.getEmailAddress(), true, null, _user.getLanguageId(),
 			_user.getTimeZoneId(), _user.getGreeting(), _user.getComments(),
 			_user.getFirstName(), _user.getMiddleName(), _user.getLastName(),
-			contact.getPrefixListTypeId(), contact.getSuffixListTypeId(),
-			_user.isMale(), birthdayCal.get(Calendar.MONTH),
-			birthdayCal.get(Calendar.DATE), birthdayCal.get(Calendar.YEAR),
-			contact.getSmsSn(), contact.getFacebookSn(), contact.getJabberSn(),
+			contact.getPrefixId(), contact.getSuffixId(), _user.isMale(),
+			birthdayCal.get(Calendar.MONTH), birthdayCal.get(Calendar.DATE),
+			birthdayCal.get(Calendar.YEAR), contact.getSmsSn(),
+			contact.getFacebookSn(), contact.getJabberSn(),
 			contact.getSkypeSn(), contact.getTwitterSn(), _user.getJobTitle(),
 			ArrayUtil.toLongArray(groupIds), _user.getOrganizationIds(), null,
 			null, _user.getUserGroupIds(),
@@ -161,19 +157,13 @@ public class UpdateMembershipsMVCActionCommandTest {
 				_user, null, new long[] {_depotEntry.getGroupId()}),
 			null);
 
-		boolean found = false;
+		long[] finalGroupIds = _userLocalService.getGroupPrimaryKeys(
+			_user.getUserId());
 
-		for (long groupId :
-				_userLocalService.getGroupPrimaryKeys(_user.getUserId())) {
+		LongStream longStream = Arrays.stream(finalGroupIds);
 
-			if (groupId == _depotEntry.getGroupId()) {
-				found = true;
-
-				break;
-			}
-		}
-
-		Assert.assertFalse(found);
+		Assert.assertFalse(
+			longStream.anyMatch(value -> value == _depotEntry.getGroupId()));
 
 		Assert.assertEquals(
 			0,
@@ -240,41 +230,47 @@ public class UpdateMembershipsMVCActionCommandTest {
 
 			_company = company;
 			_group = group;
+
 			_user = user;
 
 			_parameters = HashMapBuilder.put(
 				"addDepotGroupIds",
 				() -> {
-					if (addDepotGroupIds == null) {
-						return new String[] {""};
-					}
+					LongStream addDepotGroupIdLongStream = Arrays.stream(
+						Optional.ofNullable(
+							addDepotGroupIds
+						).orElse(
+							new long[0]
+						));
 
-					StringBundler sb = new StringBundler(
-						addDepotGroupIds.length);
-
-					for (long addDepotGroupId : addDepotGroupIds) {
-						sb.append(String.valueOf(addDepotGroupId));
-					}
-
-					return new String[] {sb.toString()};
+					return new String[] {
+						addDepotGroupIdLongStream.mapToObj(
+							String::valueOf
+						).collect(
+							Collectors.joining()
+						)
+					};
 				}
 			).put(
 				"deleteDepotGroupIds",
 				() -> {
-					if (deleteGroupIds == null) {
-						return new String[] {""};
-					}
+					LongStream deleteDepotGroupIdLongStream = Arrays.stream(
+						Optional.ofNullable(
+							deleteGroupIds
+						).orElse(
+							new long[0]
+						));
 
-					StringBundler sb = new StringBundler(deleteGroupIds.length);
-
-					for (long deleteGroupId : deleteGroupIds) {
-						sb.append(String.valueOf(deleteGroupId));
-					}
-
-					return new String[] {sb.toString()};
+					return new String[] {
+						deleteDepotGroupIdLongStream.mapToObj(
+							String::valueOf
+						).collect(
+							Collectors.joining()
+						)
+					};
 				}
 			).put(
-				"p_u_i_d", new String[] {String.valueOf(user.getUserId())}
+				"p_u_i_d", new String[] {String.valueOf(_user.getUserId())}
 			).build();
 		}
 
@@ -304,13 +300,13 @@ public class UpdateMembershipsMVCActionCommandTest {
 
 		@Override
 		public String getParameter(String name) {
-			String[] parameter = _parameters.get(name);
-
-			if (parameter == null) {
-				return null;
-			}
-
-			return parameter[0];
+			return Optional.ofNullable(
+				_parameters.get(name)
+			).map(
+				parameter -> parameter[0]
+			).orElse(
+				null
+			);
 		}
 
 		@Override
@@ -322,10 +318,13 @@ public class UpdateMembershipsMVCActionCommandTest {
 			ThemeDisplay themeDisplay = new ThemeDisplay();
 
 			themeDisplay.setCompany(_company);
+
+			themeDisplay.setUser(_user);
+
+			themeDisplay.setScopeGroupId(_group.getGroupId());
+
 			themeDisplay.setPermissionChecker(
 				PermissionCheckerFactoryUtil.create(TestPropsValues.getUser()));
-			themeDisplay.setScopeGroupId(_group.getGroupId());
-			themeDisplay.setUser(_user);
 
 			return themeDisplay;
 		}

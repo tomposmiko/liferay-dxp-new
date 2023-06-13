@@ -54,15 +54,16 @@ public class ProductMenuDisplayContext {
 		_portletRequest = portletRequest;
 		_portletResponse = portletResponse;
 
-		_httpServletRequest = PortalUtil.getHttpServletRequest(portletRequest);
-		_panelAppRegistry = (PanelAppRegistry)portletRequest.getAttribute(
+		_httpServletRequest = PortalUtil.getHttpServletRequest(_portletRequest);
+		_panelAppRegistry = (PanelAppRegistry)_portletRequest.getAttribute(
 			ApplicationListWebKeys.PANEL_APP_REGISTRY);
-		_panelCategoryHelper = (PanelCategoryHelper)portletRequest.getAttribute(
-			ApplicationListWebKeys.PANEL_CATEGORY_HELPER);
+		_panelCategoryHelper =
+			(PanelCategoryHelper)_portletRequest.getAttribute(
+				ApplicationListWebKeys.PANEL_CATEGORY_HELPER);
 		_panelCategoryRegistry =
-			(PanelCategoryRegistry)portletRequest.getAttribute(
+			(PanelCategoryRegistry)_portletRequest.getAttribute(
 				ApplicationListWebKeys.PANEL_CATEGORY_REGISTRY);
-		_themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -175,9 +176,7 @@ public class ProductMenuDisplayContext {
 		HttpServletRequest originalHttpServletRequest =
 			PortalUtil.getOriginalServletRequest(_httpServletRequest);
 
-		String ppid = ParamUtil.getString(
-			_httpServletRequest, "selPpid",
-			ParamUtil.getString(originalHttpServletRequest, "p_p_id"));
+		String ppid = ParamUtil.getString(originalHttpServletRequest, "p_p_id");
 		String mvcRenderCommandName = ParamUtil.getString(
 			originalHttpServletRequest,
 			PortalUtil.getPortletNamespace(_PORTLET_NAME) +

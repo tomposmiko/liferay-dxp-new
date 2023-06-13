@@ -25,16 +25,16 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -104,52 +104,11 @@ public class ViewAccountUsersManagementToolbarDisplayContext
 
 	@Override
 	public CreationMenu getCreationMenu() {
-		return CreationMenuBuilder.addDropdownItem(
+		return CreationMenuBuilder.addPrimaryDropdownItem(
 			dropdownItem -> {
 				dropdownItem.putData("action", "selectAccountUsers");
-				dropdownItem.putData(
-					"assignAccountUsersURL",
-					PortletURLBuilder.createActionURL(
-						liferayPortletResponse
-					).setActionName(
-						"/account_admin/assign_account_users"
-					).buildString());
-				dropdownItem.putData(
-					"selectAccountUsersURL",
-					PortletURLBuilder.createRenderURL(
-						liferayPortletResponse
-					).setMVCPath(
-						"/account_entries_admin/select_account_users.jsp"
-					).setRedirect(
-						currentURLObj
-					).setParameter(
-						"accountEntryId", _getAccountEntryId()
-					).setParameter(
-						"showCreateButton", Boolean.TRUE
-					).setWindowState(
-						LiferayWindowState.POP_UP
-					).buildString());
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "assign-users"));
-			}
-		).addDropdownItem(
-			dropdownItem -> {
-				dropdownItem.putData("action", "inviteAccountUsers");
-				dropdownItem.putData(
-					"requestInvitationsURL",
-					PortletURLBuilder.createRenderURL(
-						liferayPortletResponse
-					).setMVCPath(
-						"/account_entries_admin/invite_account_users.jsp"
-					).setRedirect(
-						currentURLObj
-					).setParameter(
-						"accountEntryId", _getAccountEntryId()
-					).setWindowState(
-						LiferayWindowState.POP_UP
-					).buildString());
-				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "invite-users"));
 			}
 		).build();
 	}
@@ -166,12 +125,14 @@ public class ViewAccountUsersManagementToolbarDisplayContext
 					).setNavigation(
 						(String)null
 					).buildString());
+
 				labelItem.setCloseable(true);
-				labelItem.setLabel(
-					String.format(
-						"%s: %s",
-						LanguageUtil.get(httpServletRequest, "status"),
-						LanguageUtil.get(httpServletRequest, getNavigation())));
+
+				String label = String.format(
+					"%s: %s", LanguageUtil.get(httpServletRequest, "status"),
+					LanguageUtil.get(httpServletRequest, getNavigation()));
+
+				labelItem.setLabel(label);
 			}
 		).build();
 	}
@@ -188,11 +149,18 @@ public class ViewAccountUsersManagementToolbarDisplayContext
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(exception);
+				_log.warn(exception, exception);
 			}
 
 			return liferayPortletResponse.createRenderURL();
 		}
+	}
+
+	@Override
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
+
+		return searchActionURL.toString();
 	}
 
 	@Override
@@ -250,9 +218,21 @@ public class ViewAccountUsersManagementToolbarDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return AccountEntryPermission.contains(
-			themeDisplay.getPermissionChecker(), _getAccountEntryId(),
-			ActionKeys.MANAGE_USERS);
+		try {
+			if (AccountEntryPermission.contains(
+					themeDisplay.getPermissionChecker(), _getAccountEntryId(),
+					ActionKeys.MANAGE_USERS)) {
+
+				return true;
+			}
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -12,15 +12,15 @@
  * details.
  */
 
-import {FrontendDataSet} from '@liferay/frontend-data-set-web';
-import {render} from '@liferay/frontend-js-react-web';
 import React from 'react';
+
+import datasetDisplayLauncher from '../../../../frontend-taglib/frontend-taglib-clay/src/main/resources/META-INF/resources/data_set_display/entry';
 
 import '../../src/main/resources/META-INF/resources/styles/main.scss';
 
-const datasetDisplayLauncher = (...data) => render(FrontendDataSet, ...data);
+import '../../../../frontend-taglib/frontend-taglib-clay/src/main/resources/META-INF/resources/data_set_display/styles/main.scss';
 
-const fluidDataSetProps = {
+const fluidDataSetDisplayProps = {
 	activeViewSettings: {},
 	apiURL: '/dataset-display-nested-items',
 	appURL: '/o/frontend-taglib-clay/app',
@@ -106,6 +106,7 @@ const fluidDataSetProps = {
 		initialTotalItems: 40,
 	},
 	showPagination: true,
+	spritemap: './assets/clay/icons.svg',
 	style: 'fluid',
 	views: [
 		{
@@ -151,6 +152,39 @@ const fluidDataSetProps = {
 						label: 'Select',
 					},
 					{
+						contentRenderer: 'tooltipSummary',
+						details: {
+							rowsDefinitions: [
+								{
+									label: 'Name',
+									valueFieldKey: 'name',
+								},
+								{
+									label: 'NestedItem',
+									valueFieldKey: ['testLink', 'href'],
+								},
+								{
+									contentRenderer: 'image',
+									label: 'Thumbnail',
+									valueFieldKey: 'img',
+								},
+								{
+									divider: true,
+									label: 'Price',
+									valueFieldKey: 'price',
+								},
+								{
+									divider: true,
+									highlighted: true,
+									label: 'Price Copy',
+									valueFieldKey: 'price',
+								},
+							],
+						},
+						fieldName: 'price',
+						label: 'Price',
+					},
+					{
 						contentRenderer: 'quantitySelector',
 						fieldName: 'testQuantity',
 						label: 'Qt. Selector',
@@ -180,14 +214,12 @@ const fluidDataSetProps = {
 						<h4 className="bg-dark mb-0 p-3 text-center text-white">
 							Hey, I&apos;m a custom template from the outside
 						</h4>
-
 						{props.items.map((item) => (
 							<div
 								className="bg-white p-3 text-center"
 								key={item.skuId}
 							>
 								<strong className="mr-3">{item.skuId}</strong>
-
 								{item.name}
 							</div>
 						))}
@@ -202,7 +234,7 @@ const fluidDataSetProps = {
 	],
 };
 
-const emailsDataSetProps = {
+const emailsDataSetDisplayProps = {
 	activeViewSettings: {},
 	apiURL: '/dataset-display-email-data',
 	creationMenuItems: [
@@ -244,6 +276,7 @@ const emailsDataSetProps = {
 		initialDelta: 10,
 	},
 	showPagination: true,
+	spritemap: './assets/clay/icons.svg',
 	style: 'stacked',
 	views: [
 		{
@@ -287,6 +320,7 @@ const selectableTableProps = {
 	},
 	selectedItemsKey: 'countryId',
 	showPagination: true,
+	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'selectableTable',
@@ -302,7 +336,7 @@ const selectableTableProps = {
 
 const today = new Date();
 
-const ordersDataSetProps = {
+const ordersDataSetDisplayProps = {
 	activeViewSettings: {
 		name: 'table',
 	},
@@ -332,25 +366,23 @@ const ordersDataSetProps = {
 	filters: [
 		{
 			apiURL: '/o/headless-commerce-admin-account/v1.0/accounts',
-			autocompleteEnabled: true,
 			id: 'accountId',
 			inputPlaceholder: 'Search for account',
 			itemKey: 'id',
 			itemLabel: 'name',
 			label: 'Account',
-			multiple: false,
-			type: 'selection',
+			selectionType: 'single',
+			type: 'autocomplete',
 		},
 		{
 			apiURL: '/o/headless-commerce-admin-channel/v1.0/channels',
-			autocompleteEnabled: true,
 			id: 'channelId',
 			inputPlaceholder: 'Search for Channel',
 			itemKey: 'id',
 			itemLabel: 'name',
 			label: 'Channel',
-			multiple: false,
-			type: 'selection',
+			selectionType: 'single',
+			type: 'autocomplete',
 		},
 		{
 			id: 'createDate',
@@ -438,6 +470,7 @@ const ordersDataSetProps = {
 			key: 'createDate',
 		},
 	],
+	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'table',
@@ -492,7 +525,7 @@ const ordersDataSetProps = {
 	],
 };
 
-const productsDataSetProps = {
+const productsDataSetDisplayProps = {
 	activeViewSettings: {},
 	apiURL:
 		'/o/headless-commerce-admin-catalog/v1.0/products/?nestedFields=skus%2Ccatalog',
@@ -642,6 +675,7 @@ const productsDataSetProps = {
 			key: 'modifiedDate',
 		},
 	],
+	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'table',
@@ -713,7 +747,7 @@ const productsDataSetProps = {
 	],
 };
 
-const priceListsDataSetProps = {
+const priceListsDataSetDisplayProps = {
 	activeViewSettings: {},
 	apiURL: '/o/headless-commerce-admin-pricing/v2.0/price-lists',
 	enableInlineEditMode: false,
@@ -775,6 +809,7 @@ const priceListsDataSetProps = {
 	},
 	selectedItemsKey: 'id',
 	showPagination: true,
+	spritemap: './assets/clay/icons.svg',
 	views: [
 		{
 			contentRenderer: 'table',
@@ -830,22 +865,22 @@ const priceListsDataSetProps = {
 };
 
 datasetDisplayLauncher(
-	ordersDataSetProps,
+	ordersDataSetDisplayProps,
 	document.getElementById('orders-dataset-display-root')
 );
 
 datasetDisplayLauncher(
-	productsDataSetProps,
+	productsDataSetDisplayProps,
 	document.getElementById('products-dataset-display-root')
 );
 
 datasetDisplayLauncher(
-	priceListsDataSetProps,
+	priceListsDataSetDisplayProps,
 	document.getElementById('price-list-dataset-display-root')
 );
 
 datasetDisplayLauncher(
-	fluidDataSetProps,
+	fluidDataSetDisplayProps,
 	document.getElementById('fluid-dataset-display-root')
 );
 
@@ -855,6 +890,6 @@ datasetDisplayLauncher(
 );
 
 datasetDisplayLauncher(
-	emailsDataSetProps,
+	emailsDataSetDisplayProps,
 	document.getElementById('emails-dataset-display-root')
 );

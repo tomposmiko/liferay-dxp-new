@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.security.auth.session.AuthenticatedSessionManag
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.Base64;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -163,8 +163,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 
 			return getDigestUserId(httpServletRequest, httpAuthorizationHeader);
 		}
-
-		throw new UnsupportedOperationException("Scheme " + scheme);
+		else {
+			throw new UnsupportedOperationException("Scheme " + scheme);
+		}
 	}
 
 	@Override
@@ -204,8 +205,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 			return parseDigest(
 				httpServletRequest, authorization, authorizationParts);
 		}
-
-		throw new UnsupportedOperationException("Scheme " + scheme);
+		else {
+			throw new UnsupportedOperationException("Scheme " + scheme);
+		}
 	}
 
 	protected void generateBasicChallenge(
@@ -274,7 +276,7 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(authException);
+				_log.debug(authException, authException);
 			}
 		}
 
@@ -340,7 +342,7 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 		if (index > -1) {
 			login = credentials.substring(0, index);
 
-			login = HttpComponentsUtil.decodeURL(login.trim());
+			login = HttpUtil.decodeURL(login.trim());
 
 			password = credentials.substring(index + 1);
 

@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -61,22 +62,25 @@ public class AssetVocabularyUtilTest {
 			_LOCALE, _TITLE
 		).build();
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
 		_vocabulary = AssetVocabularyLocalServiceUtil.addVocabulary(
 			TestPropsValues.getUserId(), _group.getGroupId(), _TITLE, titleMap,
-			null, null,
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+			null, null, serviceContext);
 
 		Company company = CompanyLocalServiceUtil.getCompany(
 			_group.getCompanyId());
 
 		_companyGroup = company.getGroup();
 
+		serviceContext = ServiceContextTestUtil.getServiceContext(
+			_companyGroup.getGroupId(), TestPropsValues.getUserId());
+
 		_companyVocabulary = AssetVocabularyLocalServiceUtil.addVocabulary(
 			TestPropsValues.getUserId(), _companyGroup.getGroupId(), _TITLE,
-			titleMap, null, null,
-			ServiceContextTestUtil.getServiceContext(
-				_companyGroup.getGroupId(), TestPropsValues.getUserId()));
+			titleMap, null, null, serviceContext);
 	}
 
 	@Test

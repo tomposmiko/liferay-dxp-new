@@ -19,8 +19,7 @@ import com.liferay.account.configuration.AccountEntryEmailDomainsConfiguration;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -30,14 +29,11 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,14 +47,11 @@ public class SelectAccountUsersManagementToolbarDisplayContext
 		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		SearchContainer<AccountUserDisplay> searchContainer,
-		SelectAccountUsersDisplayContext selectAccountUsersDisplayContext) {
+		SearchContainer<AccountUserDisplay> searchContainer) {
 
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			searchContainer);
-
-		_selectAccountUsersDisplayContext = selectAccountUsersDisplayContext;
 	}
 
 	@Override
@@ -74,7 +67,7 @@ public class SelectAccountUsersManagementToolbarDisplayContext
 
 	@Override
 	public CreationMenu getCreationMenu() {
-		if (!_selectAccountUsersDisplayContext.isShowCreateButton()) {
+		if (!isShowCreateButton()) {
 			return null;
 		}
 
@@ -88,39 +81,6 @@ public class SelectAccountUsersManagementToolbarDisplayContext
 	}
 
 	@Override
-	public List<LabelItem> getFilterLabelItems() {
-		return LabelItemListBuilder.add(
-			() -> {
-				String navigation = getNavigation();
-
-				if (navigation.equals("account-users") ||
-					navigation.equals("no-assigned-account")) {
-
-					return true;
-				}
-
-				return false;
-			},
-			labelItem -> {
-				labelItem.putData(
-					"removeLabelURL",
-					PortletURLBuilder.create(
-						getPortletURL()
-					).setNavigation(
-						(String)null
-					).buildString());
-
-				labelItem.setCloseable(true);
-				labelItem.setLabel(
-					String.format(
-						"%s: %s",
-						LanguageUtil.get(httpServletRequest, "filter-by"),
-						LanguageUtil.get(httpServletRequest, getNavigation())));
-			}
-		).build();
-	}
-
-	@Override
 	public String getNavigation() {
 		return ParamUtil.getString(
 			liferayPortletRequest, getNavigationParam(),
@@ -129,18 +89,43 @@ public class SelectAccountUsersManagementToolbarDisplayContext
 	}
 
 	@Override
+	public String getSearchActionURL() {
+		PortletURL searchActionURL = getPortletURL();
+
+		return searchActionURL.toString();
+	}
+
+	@Override
+	public Boolean isDisabled() {
+		return false;
+	}
+
+	public boolean isOpenModalOnRedirect() {
+		return ParamUtil.getBoolean(httpServletRequest, "openModalOnRedirect");
+	}
+
+	@Override
 	public Boolean isSelectable() {
-		return !_selectAccountUsersDisplayContext.isSingleSelect();
+		return !isSingleSelect();
+	}
+
+	public boolean isShowCreateButton() {
+		return ParamUtil.getBoolean(liferayPortletRequest, "showCreateButton");
+	}
+
+	public boolean isShowFilter() {
+		return ParamUtil.getBoolean(liferayPortletRequest, "showFilter", true);
+	}
+
+	public boolean isSingleSelect() {
+		return ParamUtil.getBoolean(liferayPortletRequest, "singleSelect");
 	}
 
 	@Override
 	protected String[] getNavigationKeys() {
-		if (!_selectAccountUsersDisplayContext.isShowFilter()) {
+		if (!isShowFilter()) {
 			return new String[0];
 		}
-
-		List<String> navigationKeys = new ArrayList<>(
-			Arrays.asList("all-users", "account-users", "no-assigned-account"));
 
 		try {
 			AccountEntryEmailDomainsConfiguration
@@ -152,16 +137,16 @@ public class SelectAccountUsersManagementToolbarDisplayContext
 			if (accountEntryEmailDomainsConfiguration.
 					enableEmailDomainValidation()) {
 
-				navigationKeys.add(0, "valid-domain-users");
+				return new String[] {"valid-domain-users", "all-users"};
 			}
 		}
 		catch (ConfigurationException configurationException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(configurationException);
+				_log.debug(configurationException, configurationException);
 			}
 		}
 
-		return ArrayUtil.toStringArray(navigationKeys);
+		return new String[] {"all-users"};
 	}
 
 	@Override
@@ -177,8 +162,5 @@ public class SelectAccountUsersManagementToolbarDisplayContext
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SelectAccountUsersManagementToolbarDisplayContext.class);
-
-	private final SelectAccountUsersDisplayContext
-		_selectAccountUsersDisplayContext;
 
 }

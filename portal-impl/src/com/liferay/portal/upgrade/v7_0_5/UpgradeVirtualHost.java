@@ -15,6 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_5;
 
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.upgrade.v7_0_5.util.VirtualHostTable;
 
 /**
  * @author Jose A. Jimenez Campoy
@@ -23,7 +24,9 @@ public class UpgradeVirtualHost extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		alterColumnType("VirtualHost", "hostname", "VARCHAR(200) null");
+		alter(
+			VirtualHostTable.class,
+			new AlterColumnType("hostname", "VARCHAR(200) null"));
 	}
 
 }

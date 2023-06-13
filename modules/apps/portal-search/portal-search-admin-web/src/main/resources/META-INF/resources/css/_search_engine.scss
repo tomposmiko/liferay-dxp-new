@@ -14,7 +14,7 @@
 
 			.data-item {
 				.key {
-					color: #6b6c7e;
+					color: #a7a9bc;
 					font-size: 10px;
 					font-weight: 600;
 					text-transform: uppercase;
@@ -85,11 +85,8 @@
 			margin-bottom: 16px;
 		}
 
-		.connection-info-node-list {
-			.container-view,
-			.panel-body {
-				padding: 0;
-			}
+		.connection-info-node-list .panel-body {
+			padding: 0;
 		}
 
 		&.connection-info-item-header {

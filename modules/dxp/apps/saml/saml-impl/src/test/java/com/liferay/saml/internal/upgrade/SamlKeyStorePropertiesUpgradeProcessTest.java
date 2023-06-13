@@ -17,47 +17,37 @@ package com.liferay.saml.internal.upgrade;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.PrefsProps;
-import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 import com.liferay.saml.internal.upgrade.v1_0_0.SamlKeyStorePropertiesUpgradeProcess;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 /**
  * @author Carlos Sierra
  */
-public class SamlKeyStorePropertiesUpgradeProcessTest {
-
-	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
-		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		PropsUtil.setProps(new PropsImpl());
-	}
+@RunWith(PowerMockRunner.class)
+public class SamlKeyStorePropertiesUpgradeProcessTest extends PowerMockito {
 
 	@Test
 	public void testUpgradeWithEmptyProperty() throws Exception {
-		ConfigurationAdmin configurationAdmin = Mockito.mock(
-			ConfigurationAdmin.class);
+		ConfigurationAdmin configurationAdmin = spy(
+			mock(ConfigurationAdmin.class));
 
-		PrefsProps prefsProps = Mockito.mock(PrefsProps.class);
+		PrefsProps prefsProps = mock(PrefsProps.class);
 
-		Mockito.when(
+		when(
 			prefsProps.getString("saml.keystore.manager.impl")
 		).thenReturn(
 			""
@@ -70,17 +60,17 @@ public class SamlKeyStorePropertiesUpgradeProcessTest {
 
 		samlKeyStorePropertiesUpgradeProcess.doUpgrade();
 
-		Mockito.verifyNoInteractions(configurationAdmin);
+		verifyZeroInteractions(configurationAdmin);
 	}
 
 	@Test
 	public void testUpgradeWithNullProperty() throws Exception {
-		ConfigurationAdmin configurationAdmin = Mockito.mock(
-			ConfigurationAdmin.class);
+		ConfigurationAdmin configurationAdmin = spy(
+			mock(ConfigurationAdmin.class));
 
-		PrefsProps prefsProps = Mockito.mock(PrefsProps.class);
+		PrefsProps prefsProps = mock(PrefsProps.class);
 
-		Mockito.when(
+		when(
 			prefsProps.getString("saml.keystore.manager.impl")
 		).thenReturn(
 			null
@@ -93,28 +83,28 @@ public class SamlKeyStorePropertiesUpgradeProcessTest {
 
 		samlKeyStorePropertiesUpgradeProcess.doUpgrade();
 
-		Mockito.verifyNoInteractions(configurationAdmin);
+		verifyZeroInteractions(configurationAdmin);
 	}
 
 	@Test
 	public void testUpgradeWithProperty() throws Exception {
-		ConfigurationAdmin configurationAdmin = Mockito.mock(
-			ConfigurationAdmin.class);
+		ConfigurationAdmin configurationAdmin = spy(
+			mock(ConfigurationAdmin.class));
 
-		Configuration configuration = Mockito.mock(Configuration.class);
+		Configuration configuration = spy(mock(Configuration.class));
 
-		Mockito.when(
+		when(
 			configurationAdmin.getConfiguration(
-				Mockito.anyString(), Mockito.eq(StringPool.QUESTION))
+				Mockito.anyString(), Matchers.eq(StringPool.QUESTION))
 		).thenReturn(
 			configuration
 		);
 
-		PrefsProps prefsProps = Mockito.mock(PrefsProps.class);
+		PrefsProps prefsProps = mock(PrefsProps.class);
 
 		String samlKeyStoreManagerImpl = RandomTestUtil.randomString();
 
-		Mockito.when(
+		when(
 			prefsProps.getString("saml.keystore.manager.impl")
 		).thenReturn(
 			samlKeyStoreManagerImpl
@@ -131,10 +121,10 @@ public class SamlKeyStorePropertiesUpgradeProcessTest {
 			configurationAdmin, Mockito.times(1));
 
 		verifyConfigurationAdmin.getConfiguration(
-			Mockito.eq(
+			Matchers.eq(
 				"com.liferay.saml.runtime.configuration." +
 					"SamlKeyStoreManagerConfiguration"),
-			Mockito.eq(StringPool.QUESTION));
+			Matchers.eq(StringPool.QUESTION));
 
 		Dictionary<String, Object> properties = new Hashtable<>();
 
@@ -145,7 +135,7 @@ public class SamlKeyStorePropertiesUpgradeProcessTest {
 		Configuration verifyConfiguration = Mockito.verify(
 			configuration, Mockito.times(1));
 
-		verifyConfiguration.update(Mockito.eq(properties));
+		verifyConfiguration.update(Matchers.eq(properties));
 	}
 
 }

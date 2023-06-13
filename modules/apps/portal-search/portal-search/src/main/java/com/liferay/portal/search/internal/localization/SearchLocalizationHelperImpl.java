@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adam Brandizzi
  */
-@Component(service = SearchLocalizationHelper.class)
+@Component(immediate = true, service = SearchLocalizationHelper.class)
 public class SearchLocalizationHelperImpl implements SearchLocalizationHelper {
 
 	@Override

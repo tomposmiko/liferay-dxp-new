@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rodrigo Paulino
  */
 @Component(
+	immediate = true,
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SEARCH_LOCATION,
 	service = DDMFormFieldValueAccessor.class
 )
@@ -71,31 +73,29 @@ public class SearchLocationDDMFormFieldValueAccessor
 
 		String placeValue = jsonObject.getString("place");
 
-		if (Validator.isNull(placeValue.trim())) {
-			return true;
-		}
-
 		DDMFormField ddmFormField = ddmFormFieldValue.getDDMFormField();
 
 		LocalizedValue visibleFields = (LocalizedValue)ddmFormField.getProperty(
 			"visibleFields");
 
-		for (String visibleField :
-				StringUtil.split(
-					StringUtil.removeChars(
-						GetterUtil.getString(visibleFields.getString(locale)),
-						CharPool.CLOSE_BRACKET, CharPool.OPEN_BRACKET,
-						CharPool.QUOTE))) {
+		return Validator.isNull(placeValue.trim()) ||
+			   !Stream.of(
+				   StringUtil.split(
+					   StringUtil.removeChars(
+						   GetterUtil.getString(
+							   visibleFields.getString(locale)),
+						   CharPool.CLOSE_BRACKET, CharPool.OPEN_BRACKET,
+						   CharPool.QUOTE))
+			   ).map(
+				   String::trim
+			   ).allMatch(
+				   visibleField -> {
+					String visibleFieldValue = jsonObject.getString(
+						visibleField);
 
-			String visibleFieldValue = jsonObject.getString(
-				visibleField.trim());
-
-			if (Validator.isNull(visibleFieldValue.trim())) {
-				return true;
-			}
-		}
-
-		return false;
+					return Validator.isNotNull(visibleFieldValue.trim());
+				   }
+			   );
 	}
 
 	private JSONObject _getJSONObject(String value) {
@@ -104,7 +104,7 @@ public class SearchLocationDDMFormFieldValueAccessor
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

@@ -12,18 +12,16 @@
  * details.
  */
 
-export function createReducer(reducers, config) {
-	return (state, action) =>
-		reducers.reduce((prevState, reducer) => {
-			const nextProperties = reducer(prevState, action, config);
+export const createReducer = (reducers, config) => (state, action) =>
+	reducers.reduce((prevState, reducer) => {
+		const nextProperties = reducer(prevState, action, config);
 
-			if (prevState === nextProperties) {
-				return nextProperties;
-			}
+		if (prevState === nextProperties) {
+			return nextProperties;
+		}
 
-			return {
-				...prevState,
-				...nextProperties,
-			};
-		}, state);
-}
+		return {
+			...prevState,
+			...nextProperties,
+		};
+	}, state);

@@ -19,7 +19,7 @@ import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.item.selector.url.web.internal.display.context.ItemSelectorURLViewDisplayContext;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class ItemSelectorURLView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "url");
+		return LanguageUtil.get(locale, "url");
 	}
 
 	@Override
@@ -90,16 +90,18 @@ public class ItemSelectorURLView
 		requestDispatcher.include(servletRequest, servletResponse);
 	}
 
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.item.selector.url.web)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
+	}
+
 	private static final List<ItemSelectorReturnType>
 		_supportedItemSelectorReturnTypes = Collections.unmodifiableList(
 			ListUtil.fromArray(new URLItemSelectorReturnType()));
 
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.item.selector.url.web)"
-	)
 	private ServletContext _servletContext;
 
 }

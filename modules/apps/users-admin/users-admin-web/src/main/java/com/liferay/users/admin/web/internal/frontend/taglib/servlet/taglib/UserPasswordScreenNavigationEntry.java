@@ -15,10 +15,6 @@
 package com.liferay.users.admin.web.internal.frontend.taglib.servlet.taglib;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.PasswordPolicy;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.users.admin.constants.UserScreenNavigationEntryConstants;
 
@@ -56,23 +52,11 @@ public class UserPasswordScreenNavigationEntry
 
 	@Override
 	public boolean isVisible(User user, User selUser) {
-		if ((selUser == null) || selUser.isServiceAccountUser()) {
+		if (selUser == null) {
 			return false;
 		}
 
-		try {
-			PasswordPolicy passwordPolicy = selUser.getPasswordPolicy();
-
-			return passwordPolicy.isChangeable();
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
-
-			return false;
-		}
+		return true;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		UserPasswordScreenNavigationEntry.class);
 
 }

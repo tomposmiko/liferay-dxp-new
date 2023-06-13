@@ -14,54 +14,49 @@
 
 package com.liferay.portal.servlet.filters.aggregate;
 
-import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.module.util.SystemBundleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ProxyFactory;
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
-import org.osgi.framework.BundleContext;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Cleydyr de Albuquerque
  */
-public class AggregateFilterTest {
+@PrepareForTest({PortalUtil.class, ServiceProxyFactory.class})
+@RunWith(PowerMockRunner.class)
+public class AggregateFilterTest extends PowerMockito {
 
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+
+		_setUpPortalUtil();
+		_setUpServiceProxyFactory();
+	}
+
 	@Test
 	public void testAggregateWithImports() throws Exception {
-		PortalUtil portalUtil = new PortalUtil();
-
-		Portal portal = Mockito.mock(Portal.class);
-
-		portalUtil.setPortal(portal);
-
-		Mockito.when(
-			portal.getPathModule()
-		).thenReturn(
-			StringPool.BLANK
-		);
-
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		bundleContext.registerService(
-			PortalExecutorManager.class,
-			ProxyFactory.newDummyInstance(PortalExecutorManager.class), null);
-
 		String fileName = "./my-styles.css";
 		String css = "body {color: black;}";
 
@@ -79,47 +74,69 @@ public class AggregateFilterTest {
 	}
 
 	private ServletPaths _createMockServletPaths(String fileName, String css) {
-		ServletPaths servletPaths = Mockito.mock(ServletPaths.class);
+		ServletPaths servletPaths = mock(ServletPaths.class);
 
-		Mockito.when(
+		when(
 			servletPaths.down(Mockito.anyString())
 		).thenReturn(
 			servletPaths
 		);
 
-		ServletPaths cssServletPaths = Mockito.mock(ServletPaths.class);
+		ServletPaths cssServletPaths = mock(ServletPaths.class);
 
-		Mockito.when(
+		when(
 			cssServletPaths.getContent()
 		).thenReturn(
 			css
 		);
 
-		Mockito.when(
+		when(
 			cssServletPaths.getResourcePath()
 		).thenReturn(
 			StringPool.BLANK
 		);
 
-		Mockito.when(
+		when(
 			servletPaths.down(StringPool.QUOTE + fileName + StringPool.QUOTE)
 		).thenReturn(
 			cssServletPaths
 		);
 
-		Mockito.when(
+		when(
 			servletPaths.getContent()
 		).thenReturn(
 			null
 		);
 
-		Mockito.when(
+		when(
 			servletPaths.getResourcePath()
 		).thenReturn(
 			StringPool.BLANK
 		);
 
 		return servletPaths;
+	}
+
+	private void _setUpPortalUtil() {
+		mockStatic(PortalUtil.class);
+
+		PowerMockito.when(
+			PortalUtil.getPathModule()
+		).thenReturn(
+			StringPool.BLANK
+		);
+	}
+
+	private void _setUpServiceProxyFactory() {
+		mockStatic(ServiceProxyFactory.class);
+
+		when(
+			ServiceProxyFactory.newServiceTrackedInstance(
+				Matchers.any(), Matchers.any(), Matchers.anyString(),
+				Matchers.anyBoolean())
+		).thenReturn(
+			null
+		);
 	}
 
 	private void _testAggregateWithImports(

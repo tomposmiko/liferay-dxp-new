@@ -22,14 +22,15 @@ import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
 import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.io.IOException;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
@@ -78,7 +79,10 @@ public class AssetCategoryInfoItemItemSelectorView
 
 	@Override
 	public String getTitle(Locale locale) {
-		return _language.get(locale, "categories");
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			locale, AssetCategoryInfoItemItemSelectorView.class);
+
+		return ResourceBundleUtil.getString(resourceBundle, "categories");
 	}
 
 	@Override
@@ -94,8 +98,7 @@ public class AssetCategoryInfoItemItemSelectorView
 			AssetCategoryItemSelectorWebKeys.
 				SELECT_ASSET_CATEGORY_INFO_ITEM_ITEM_SELECTOR_DISPLAY_CONTEXT,
 			new SelectAssetCategoryInfoItemDisplayContext(
-				(HttpServletRequest)servletRequest,
-				infoItemItemSelectorCriterion, itemSelectedEventName,
+				(HttpServletRequest)servletRequest, itemSelectedEventName,
 				(RenderResponse)servletRequest.getAttribute(
 					JavaConstants.JAVAX_PORTLET_RESPONSE)));
 
@@ -109,9 +112,6 @@ public class AssetCategoryInfoItemItemSelectorView
 	private static final List<ItemSelectorReturnType>
 		_supportedItemSelectorReturnTypes = Collections.singletonList(
 			new InfoItemItemSelectorReturnType());
-
-	@Reference
-	private Language _language;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.asset.categories.item.selector.web)"

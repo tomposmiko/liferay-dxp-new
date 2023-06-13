@@ -22,10 +22,10 @@ import com.liferay.commerce.discount.service.CommerceDiscountService;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.service.CProductLocalService;
 import com.liferay.headless.commerce.admin.pricing.dto.v1_0.DiscountProduct;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v1_0.converter.DiscountProductDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v1_0.DiscountProductUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v1_0.DiscountProductResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/discount-product.properties",
 	scope = ServiceScope.PROTOTYPE, service = DiscountProductResource.class
 )
@@ -181,11 +182,8 @@ public class DiscountProductResourceImpl
 	@Reference
 	private CProductLocalService _cProductLocalService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v1_0.converter.DiscountProductDTOConverter)"
-	)
-	private DTOConverter<CommerceDiscountRel, DiscountProduct>
-		_discountProductDTOConverter;
+	@Reference
+	private DiscountProductDTOConverter _discountProductDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

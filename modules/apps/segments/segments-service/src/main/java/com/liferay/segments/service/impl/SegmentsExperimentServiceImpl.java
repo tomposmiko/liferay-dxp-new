@@ -20,18 +20,21 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.segments.service.base.SegmentsExperimentServiceBaseImpl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -100,8 +103,8 @@ public class SegmentsExperimentServiceImpl
 			int[] statuses)
 		throws PortalException {
 
-		LayoutPermissionUtil.checkLayoutRestrictedUpdatePermission(
-			getPermissionChecker(), classPK);
+		LayoutPermissionUtil.check(
+			getPermissionChecker(), classPK, ActionKeys.UPDATE);
 
 		return segmentsExperimentLocalService.fetchSegmentsExperiment(
 			segmentsExperienceId, classNameId, classPK, statuses);
@@ -132,8 +135,8 @@ public class SegmentsExperimentServiceImpl
 			int[] statuses, int start, int end)
 		throws PortalException {
 
-		LayoutPermissionUtil.checkLayoutRestrictedUpdatePermission(
-			getPermissionChecker(), classPK);
+		LayoutPermissionUtil.check(
+			getPermissionChecker(), classPK, ActionKeys.UPDATE);
 
 		return segmentsExperimentLocalService.
 			getSegmentsExperienceSegmentsExperiments(
@@ -218,17 +221,18 @@ public class SegmentsExperimentServiceImpl
 
 		_checkPermissions(segmentsExperiment, ActionKeys.UPDATE);
 
-		Map<Long, Double> segmentsExperienceIdSplitMap = new HashMap<>();
+		Set<Map.Entry<String, Double>> segmentsExperienceKeySplits =
+			segmentsExperienceKeySplitMap.entrySet();
 
-		for (Map.Entry<String, Double> entry :
-				segmentsExperienceKeySplitMap.entrySet()) {
+		Stream<Map.Entry<String, Double>> segmentsExperienceKeySplitsStream =
+			segmentsExperienceKeySplits.stream();
 
-			segmentsExperienceIdSplitMap.put(
-				_getSegmentsExperienceId(
-					segmentsExperiment.getGroupId(), entry.getKey(),
-					segmentsExperiment.getClassPK()),
-				entry.getValue());
-		}
+		Map<Long, Double> segmentsExperienceIdSplitMap =
+			segmentsExperienceKeySplitsStream.collect(
+				Collectors.toMap(
+					entry -> _getSegmentsExperienceId(
+						segmentsExperiment.getGroupId(), entry.getKey()),
+					Map.Entry::getValue));
 
 		return segmentsExperimentLocalService.runSegmentsExperiment(
 			segmentsExperiment.getSegmentsExperimentId(), confidenceLevel,
@@ -313,8 +317,7 @@ public class SegmentsExperimentServiceImpl
 		return segmentsExperimentLocalService.updateSegmentsExperimentStatus(
 			segmentsExperiment.getSegmentsExperimentId(),
 			_getSegmentsExperienceId(
-				segmentsExperiment.getGroupId(), winnerSegmentsExperienceKey,
-				segmentsExperiment.getClassPK()),
+				segmentsExperiment.getGroupId(), winnerSegmentsExperienceKey),
 			status);
 	}
 
@@ -322,7 +325,7 @@ public class SegmentsExperimentServiceImpl
 			SegmentsExperiment segmentsExperiment, String actionId)
 		throws PortalException {
 
-		if (_userLocalService.hasRoleUser(
+		if (userLocalService.hasRoleUser(
 				segmentsExperiment.getCompanyId(),
 				RoleConstants.ANALYTICS_ADMINISTRATOR, getUserId(), true)) {
 
@@ -334,12 +337,19 @@ public class SegmentsExperimentServiceImpl
 	}
 
 	private long _getSegmentsExperienceId(
-		long groupId, String segmentsExperienceKey, long classPK) {
+		long groupId, String segmentsExperienceKey) {
+
+		if (Objects.equals(
+				segmentsExperienceKey,
+				SegmentsExperienceConstants.KEY_DEFAULT)) {
+
+			return SegmentsExperienceConstants.ID_DEFAULT;
+		}
 
 		if (Validator.isNotNull(segmentsExperienceKey)) {
 			SegmentsExperience segmentsExperience =
 				_segmentsExperienceLocalService.fetchSegmentsExperience(
-					groupId, segmentsExperienceKey, classPK);
+					groupId, segmentsExperienceKey);
 
 			if (segmentsExperience != null) {
 				return segmentsExperience.getSegmentsExperienceId();
@@ -357,8 +367,5 @@ public class SegmentsExperimentServiceImpl
 	)
 	private ModelResourcePermission<SegmentsExperiment>
 		_segmentsExperimentResourcePermission;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 }

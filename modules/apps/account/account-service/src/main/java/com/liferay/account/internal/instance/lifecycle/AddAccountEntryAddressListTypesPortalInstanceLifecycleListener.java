@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pei-Jung Lan
  */
-@Component(service = PortalInstanceLifecycleListener.class)
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
 public class AddAccountEntryAddressListTypesPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 

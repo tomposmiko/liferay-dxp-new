@@ -20,7 +20,9 @@ import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.item.selector.taglib.ItemSelectorRepositoryEntryBrowserReturnTypeUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -28,7 +30,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -137,57 +138,51 @@ public class ItemSelectorRepositoryEntryBrowserUtil {
 		throws PortalException {
 
 		FileVersion latestFileVersion = fileEntry.getLatestFileVersion();
+		Date modifiedDate = fileEntry.getModifiedDate();
 
-		return JSONUtil.put(
-			"groups",
-			JSONUtil.putAll(
-				JSONUtil.put(
-					"data",
-					() -> {
-						Date modifiedDate = fileEntry.getModifiedDate();
+		JSONArray firstTabDataJSONArray = JSONUtil.putAll(
+			_createJSONObject(
+				LanguageUtil.get(locale, "format"),
+				HtmlUtil.escape(latestFileVersion.getExtension())),
+			_createJSONObject(
+				LanguageUtil.get(locale, "size"),
+				LanguageUtil.formatStorageSize(fileEntry.getSize(), locale)),
+			_createJSONObject(
+				LanguageUtil.get(locale, "name"),
+				HtmlUtil.escape(DLUtil.getTitleWithExtension(fileEntry))),
+			_createJSONObject(
+				LanguageUtil.get(locale, "modified"),
+				LanguageUtil.format(
+					locale, "x-ago-by-x",
+					new Object[] {
+						LanguageUtil.getTimeDescription(
+							locale,
+							System.currentTimeMillis() - modifiedDate.getTime(),
+							true),
+						HtmlUtil.escape(fileEntry.getUserName())
+					})));
 
-						return JSONUtil.putAll(
-							_createJSONObject(
-								LanguageUtil.get(locale, "format"),
-								HtmlUtil.escape(
-									latestFileVersion.getExtension())),
-							_createJSONObject(
-								LanguageUtil.get(locale, "size"),
-								LanguageUtil.formatStorageSize(
-									fileEntry.getSize(), locale)),
-							_createJSONObject(
-								LanguageUtil.get(locale, "name"),
-								HtmlUtil.escape(
-									DLUtil.getTitleWithExtension(fileEntry))),
-							_createJSONObject(
-								LanguageUtil.get(locale, "modified"),
-								LanguageUtil.format(
-									locale, "x-ago-by-x",
-									new Object[] {
-										LanguageUtil.getTimeDescription(
-											locale,
-											System.currentTimeMillis() -
-												modifiedDate.getTime(),
-											true),
-										HtmlUtil.escape(fileEntry.getUserName())
-									})));
-					}
-				).put(
-					"title", LanguageUtil.get(locale, "file-info")
-				),
-				JSONUtil.put(
-					"data",
-					JSONUtil.putAll(
-						_createJSONObject(
-							LanguageUtil.get(locale, "version"),
-							HtmlUtil.escape(latestFileVersion.getVersion())),
-						_createJSONObject(
-							LanguageUtil.get(locale, "status"),
-							WorkflowConstants.getStatusLabel(
-								latestFileVersion.getStatus())))
-				).put(
-					"title", LanguageUtil.get(locale, "version")
-				)));
+		JSONArray groupsJSONArray = JSONUtil.putAll(
+			JSONUtil.put(
+				"data", firstTabDataJSONArray
+			).put(
+				"title", LanguageUtil.get(locale, "file-info")
+			),
+			JSONUtil.put(
+				"data",
+				JSONUtil.putAll(
+					_createJSONObject(
+						LanguageUtil.get(locale, "version"),
+						HtmlUtil.escape(latestFileVersion.getVersion())),
+					_createJSONObject(
+						LanguageUtil.get(locale, "status"),
+						WorkflowConstants.getStatusLabel(
+							latestFileVersion.getStatus())))
+			).put(
+				"title", LanguageUtil.get(locale, "version")
+			));
+
+		return JSONUtil.put("groups", groupsJSONArray);
 	}
 
 	public static String getItemSelectorReturnTypeClassName(

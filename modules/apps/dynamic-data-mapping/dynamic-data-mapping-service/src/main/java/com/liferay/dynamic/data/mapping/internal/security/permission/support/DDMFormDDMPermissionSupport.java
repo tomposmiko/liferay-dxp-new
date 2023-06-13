@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = {
 		"default.model.resource.name=true",
 		"model.class.name=com.liferay.dynamic.data.mapping.model.DDMFormInstance"

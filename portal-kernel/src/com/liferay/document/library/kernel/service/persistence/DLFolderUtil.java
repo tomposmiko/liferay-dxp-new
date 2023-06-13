@@ -15,6 +15,7 @@
 package com.liferay.document.library.kernel.service.persistence;
 
 import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -4481,76 +4482,6 @@ public class DLFolderUtil {
 	}
 
 	/**
-	 * Returns the document library folder where externalReferenceCode = &#63; and groupId = &#63; or throws a <code>NoSuchFolderException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching document library folder
-	 * @throws NoSuchFolderException if a matching document library folder could not be found
-	 */
-	public static DLFolder findByERC_G(
-			String externalReferenceCode, long groupId)
-		throws com.liferay.document.library.kernel.exception.
-			NoSuchFolderException {
-
-		return getPersistence().findByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
-	 * Returns the document library folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the matching document library folder, or <code>null</code> if a matching document library folder could not be found
-	 */
-	public static DLFolder fetchByERC_G(
-		String externalReferenceCode, long groupId) {
-
-		return getPersistence().fetchByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
-	 * Returns the document library folder where externalReferenceCode = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching document library folder, or <code>null</code> if a matching document library folder could not be found
-	 */
-	public static DLFolder fetchByERC_G(
-		String externalReferenceCode, long groupId, boolean useFinderCache) {
-
-		return getPersistence().fetchByERC_G(
-			externalReferenceCode, groupId, useFinderCache);
-	}
-
-	/**
-	 * Removes the document library folder where externalReferenceCode = &#63; and groupId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the document library folder that was removed
-	 */
-	public static DLFolder removeByERC_G(
-			String externalReferenceCode, long groupId)
-		throws com.liferay.document.library.kernel.exception.
-			NoSuchFolderException {
-
-		return getPersistence().removeByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
-	 * Returns the number of document library folders where externalReferenceCode = &#63; and groupId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param groupId the group ID
-	 * @return the number of matching document library folders
-	 */
-	public static int countByERC_G(String externalReferenceCode, long groupId) {
-		return getPersistence().countByERC_G(externalReferenceCode, groupId);
-	}
-
-	/**
 	 * Caches the document library folder in the entity cache if it is enabled.
 	 *
 	 * @param dlFolder the document library folder
@@ -4931,9 +4862,14 @@ public class DLFolderUtil {
 	}
 
 	public static DLFolderPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (DLFolderPersistence)PortalBeanLocatorUtil.locate(
+				DLFolderPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile DLFolderPersistence _persistence;
+	private static DLFolderPersistence _persistence;
 
 }

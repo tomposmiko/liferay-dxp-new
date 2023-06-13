@@ -16,6 +16,7 @@ package com.liferay.knowledge.base.internal.upgrade.v1_1_0;
 
 import com.liferay.knowledge.base.internal.upgrade.v1_1_0.util.KBCommentTable;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
@@ -90,15 +91,33 @@ public class KBCommentUpgradeProcess extends UpgradeProcess {
 
 		String dataTypeUpperCase = StringUtil.toUpperCase(dataType);
 
+		StringBundler sb = new StringBundler(6);
+
+		sb.append("alter table ");
+		sb.append(tableName);
+		sb.append(" add ");
+		sb.append(columnName);
+		sb.append(StringPool.SPACE);
+		sb.append(dataTypeUpperCase);
+
+		String sql = sb.toString();
+
 		if (dataTypeUpperCase.equals("DATE") || dataType.equals("STRING")) {
-			dataTypeUpperCase = dataTypeUpperCase.concat(" null");
+			sql = sql.concat(" null");
 		}
 
-		alterTableAddColumn(tableName, columnName, dataTypeUpperCase);
+		runSQL(sql);
 
-		runSQL(
-			StringBundler.concat(
-				"update ", tableName, " set ", columnName, " = ", data));
+		sb.setIndex(0);
+
+		sb.append("update ");
+		sb.append(tableName);
+		sb.append(" set ");
+		sb.append(columnName);
+		sb.append(" = ");
+		sb.append(data);
+
+		runSQL(sb.toString());
 	}
 
 	protected void updateSchema(
@@ -111,7 +130,9 @@ public class KBCommentUpgradeProcess extends UpgradeProcess {
 
 		updateColumn(oldTableName, "kbCommentId", "LONG", "commentId");
 
-		alterTableDropColumn(oldTableName, "commentId");
+		if (hasColumn(oldTableName, "commentId")) {
+			runSQL("alter table " + oldTableName + " drop column commentId");
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

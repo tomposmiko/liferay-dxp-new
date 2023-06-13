@@ -18,7 +18,6 @@ import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.osgi.util.configuration.ConfigurationPersistenceUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
@@ -34,6 +33,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -41,15 +41,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.journal.configuration.JournalServiceConfiguration",
-	service = PortalInstanceLifecycleListener.class
+	immediate = true, service = PortalInstanceLifecycleListener.class
 )
 public class AddDefaultJournalStructuresPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
-
-	@Override
-	public long getLastModifiedTime() {
-		return _lastModifiedTime;
-	}
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
@@ -67,15 +62,15 @@ public class AddDefaultJournalStructuresPortalInstanceLifecycleListener
 
 		serviceContext.setScopeGroupId(group.getGroupId());
 
-		long guestUserId = _userLocalService.getGuestUserId(
+		long defaultUserId = _userLocalService.getDefaultUserId(
 			company.getCompanyId());
 
-		serviceContext.setUserId(guestUserId);
+		serviceContext.setUserId(defaultUserId);
 
 		Class<?> clazz = getClass();
 
 		_defaultDDMStructureHelper.addDDMStructures(
-			guestUserId, group.getGroupId(),
+			defaultUserId, group.getGroupId(),
 			_portal.getClassNameId(JournalArticle.class),
 			clazz.getClassLoader(),
 			"com/liferay/journal/internal/upgrade/v1_0_0/dependencies" +
@@ -84,33 +79,46 @@ public class AddDefaultJournalStructuresPortalInstanceLifecycleListener
 	}
 
 	@Activate
-	protected void activate(Map<String, Object> properties) throws Exception {
-		_lastModifiedTime = ConfigurationPersistenceUtil.update(
-			this, properties);
-
+	@Modified
+	protected void activate(Map<String, Object> properties) {
 		_journalServiceConfiguration = ConfigurableUtil.createConfigurable(
 			JournalServiceConfiguration.class, properties);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
+	protected void setDefaultDDMStructureHelper(
+		DefaultDDMStructureHelper defaultDDMStructureHelper) {
+
+		_defaultDDMStructureHelper = defaultDDMStructureHelper;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJournalArticleLocalService(
+		JournalArticleLocalService journalArticleLocalService) {
+	}
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	protected void setModuleServiceLifecycle(
+		ModuleServiceLifecycle moduleServiceLifecycle) {
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
 	private DefaultDDMStructureHelper _defaultDDMStructureHelper;
-
-	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private JournalArticleLocalService _journalArticleLocalService;
-
 	private volatile JournalServiceConfiguration _journalServiceConfiguration;
-	private long _lastModifiedTime;
-
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
-	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private UserLocalService _userLocalService;
 
 }

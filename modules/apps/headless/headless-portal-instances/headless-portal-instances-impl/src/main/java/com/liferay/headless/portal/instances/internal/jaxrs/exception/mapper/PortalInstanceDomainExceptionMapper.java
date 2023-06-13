@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.exception.CompanyMxException;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.osgi.service.component.annotations.Component;
@@ -40,7 +41,8 @@ public class PortalInstanceDomainExceptionMapper
 
 	@Override
 	protected Problem getProblem(CompanyMxException companyMxException) {
-		return new Problem(companyMxException);
+		return new Problem(
+			Response.Status.BAD_REQUEST, companyMxException.getMessage());
 	}
 
 }

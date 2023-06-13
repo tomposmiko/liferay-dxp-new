@@ -25,6 +25,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Carlos Lancha
  */
 @Component(
+	immediate = true,
 	property = {
 		"ddm.form.field.type.data.domain=fieldset",
 		"ddm.form.field.type.description=fieldset-field-type-description",

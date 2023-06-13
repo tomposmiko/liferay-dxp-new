@@ -3,9 +3,7 @@ html#{$cadmin-selector} {
 		.cadmin {
 			&.affix,
 			&.control-menu-container {
-				@media (prefers-reduced-motion: no-preference) {
-					@include transition($control-menu-css-transition);
-				}
+				@include transition($control-menu-css-transition);
 			}
 		}
 	}
@@ -18,24 +16,27 @@ html#{$cadmin-selector} {
 			z-index: $control-menu-zindex;
 		}
 
-		.control-menu-icon,
-		.control-menu-icon .dropdown-toggle {
-			border-radius: 4px;
+		.control-menu-icon {
 			display: inline-block;
 			height: 32px;
 			line-height: 32px;
 			text-align: center;
-			transition: box-shadow 0.15s ease-in-out;
 			width: 32px;
-
-			&:focus {
-				box-shadow: $control-menu-focus-box-shadow;
-				outline: 0;
-			}
 
 			.portlet-options {
 				display: flex;
 				height: 32px;
+			}
+		}
+
+		a.control-menu-icon,
+		.control-menu-icon .dropdown-toggle {
+			border-radius: 4px;
+			transition: box-shadow 0.15s ease-in-out;
+
+			&:focus {
+				box-shadow: $control-menu-focus-box-shadow;
+				outline: 0;
 			}
 		}
 
@@ -128,13 +129,15 @@ html#{$cadmin-selector} {
 		.control-menu-level-1-nav {
 			display: flex;
 			flex-wrap: wrap;
+			justify-content: space-between;
 
-			> div,
-			> li {
-				> .control-menu-nav > .control-menu-nav-item {
-					margin-left: 4px;
-					margin-right: 4px;
-				}
+			@include media-breakpoint-up(sm, $cadmin-grid-breakpoints) {
+				flex-wrap: nowrap;
+			}
+
+			> li > .control-menu-nav > .control-menu-nav-item {
+				margin-left: 4px;
+				margin-right: 4px;
 			}
 
 			> .control-menu-nav-item {
@@ -234,7 +237,7 @@ html#{$cadmin-selector} {
 			display: inline-flex;
 		}
 
-		.control-menu-nav-item-content:last-child:not(:first-child) {
+		.control-menu-nav-item-content:last-child {
 			display: flex;
 			flex-basis: 0;
 			flex-grow: 1;
@@ -270,9 +273,16 @@ html#{$cadmin-selector} {
 		}
 
 		.tools-control-group {
+			flex: 1;
+			flex-wrap: wrap;
+
 			> .control-menu-nav {
 				flex-wrap: nowrap;
-				justify-content: flex-start;
+				justify-content: center;
+
+				@include media-breakpoint-up(md, $cadmin-grid-breakpoints) {
+					flex-wrap: wrap;
+				}
 			}
 
 			.taglib-icon-help {
@@ -283,12 +293,6 @@ html#{$cadmin-selector} {
 		}
 
 		.user-control-group {
-			flex-grow: 1;
-
-			.control-menu-nav {
-				justify-content: end;
-			}
-
 			.portlet-options {
 				margin-right: -1px;
 			}

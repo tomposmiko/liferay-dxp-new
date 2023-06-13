@@ -39,17 +39,17 @@ public class ResourcePermissionsUpgradeProcess extends UpgradeProcess {
 		String modelResource = _resourceActions.getCompositeModelName(
 			DDMStructure.class.getName(), JournalArticle.class.getName());
 
-		_updateResourcePermissions(
+		updateResourcePermissions(
 			"com.liferay.journal.model.JournalStructure", modelResource);
 
 		modelResource = _resourceActions.getCompositeModelName(
 			DDMTemplate.class.getName(), JournalArticle.class.getName());
 
-		_updateResourcePermissions(
+		updateResourcePermissions(
 			"com.liferay.journal.model.JournalTemplate", modelResource);
 	}
 
-	private void _updateResourcePermissions(
+	protected void updateResourcePermissions(
 		String oldClassName, String newClassName) {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -62,7 +62,7 @@ public class ResourcePermissionsUpgradeProcess extends UpgradeProcess {
 		}
 		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(sqlException);
+				_log.warn(sqlException, sqlException);
 			}
 		}
 	}

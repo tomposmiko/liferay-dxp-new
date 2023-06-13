@@ -25,7 +25,6 @@ import com.liferay.info.field.InfoFieldSet;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -58,9 +57,6 @@ public class DDMStructureInfoItemFieldSetProviderImpl
 			if (fieldSetNameInfoLocalizedValue == null) {
 				fieldSetNameInfoLocalizedValue =
 					InfoLocalizedValue.<String>builder(
-					).defaultLocale(
-						LocaleUtil.fromLanguageId(
-							ddmStructure.getDefaultLanguageId())
 					).values(
 						ddmStructure.getNameMap()
 					).build();
@@ -100,10 +96,8 @@ public class DDMStructureInfoItemFieldSetProviderImpl
 	private static final String[] _SELECTABLE_DDM_STRUCTURE_FIELDS = {
 		DDMFormFieldTypeConstants.CHECKBOX,
 		DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE,
-		DDMFormFieldTypeConstants.DATE, DDMFormFieldTypeConstants.DATE_TIME,
-		DDMFormFieldTypeConstants.LINK_TO_LAYOUT,
-		DDMFormFieldTypeConstants.NUMERIC, DDMFormFieldTypeConstants.IMAGE,
-		DDMFormFieldTypeConstants.TEXT, DDMFormFieldTypeConstants.RADIO,
+		DDMFormFieldTypeConstants.DATE, DDMFormFieldTypeConstants.NUMERIC,
+		DDMFormFieldTypeConstants.IMAGE, DDMFormFieldTypeConstants.TEXT,
 		DDMFormFieldTypeConstants.RICH_TEXT, DDMFormFieldTypeConstants.SELECT
 	};
 

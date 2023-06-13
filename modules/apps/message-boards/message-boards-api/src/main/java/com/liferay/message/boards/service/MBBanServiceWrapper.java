@@ -27,10 +27,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class MBBanServiceWrapper
 	implements MBBanService, ServiceWrapper<MBBanService> {
 
-	public MBBanServiceWrapper() {
-		this(null);
-	}
-
 	public MBBanServiceWrapper(MBBanService mbBanService) {
 		_mbBanService = mbBanService;
 	}

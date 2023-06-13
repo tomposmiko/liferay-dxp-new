@@ -39,9 +39,6 @@ import com.liferay.item.selector.ItemSelectorReturnType;
  * <li>
  * <code>title</code>: The title of the selected info item
  * </li>
- * <li>
- * <code>type</code>: The type of the selected info item
- * </li>
  * </ul>
  *
  * @author Eudaldo Alonso

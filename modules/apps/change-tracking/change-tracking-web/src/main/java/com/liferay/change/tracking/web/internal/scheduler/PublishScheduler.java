@@ -15,15 +15,17 @@
 package com.liferay.change.tracking.web.internal.scheduler;
 
 import com.liferay.change.tracking.constants.CTActionKeys;
-import com.liferay.change.tracking.constants.CTDestinationNames;
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
+import com.liferay.change.tracking.web.internal.constants.CTDestinationNames;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
@@ -116,7 +118,8 @@ public class PublishScheduler {
 		throws PortalException {
 
 		try (SafeCloseable safeCloseable =
-				CTCollectionThreadLocal.setProductionModeWithSafeCloseable()) {
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
+					CTConstants.CT_COLLECTION_ID_PRODUCTION)) {
 
 			TransactionInvokerUtil.invoke(
 				_transactionConfig,
@@ -161,9 +164,13 @@ public class PublishScheduler {
 
 		_ctCollectionLocalService.updateCTCollection(ctCollection);
 
-		_schedulerEngineHelper.delete(
-			jobName, CTDestinationNames.CT_COLLECTION_SCHEDULED_PUBLISH,
-			StorageType.PERSISTED);
+		try (SafeCloseable safeCloseable =
+				ProxyModeThreadLocal.setWithSafeCloseable(true)) {
+
+			_schedulerEngineHelper.delete(
+				jobName, CTDestinationNames.CT_COLLECTION_SCHEDULED_PUBLISH,
+				StorageType.PERSISTED);
+		}
 	}
 
 	private Void _schedulePublish(
@@ -194,7 +201,7 @@ public class PublishScheduler {
 				CTDestinationNames.CT_COLLECTION_SCHEDULED_PUBLISH, startDate,
 				null, 0, null),
 			StorageType.PERSISTED, String.valueOf(ctCollectionId),
-			CTDestinationNames.CT_COLLECTION_SCHEDULED_PUBLISH, message);
+			CTDestinationNames.CT_COLLECTION_SCHEDULED_PUBLISH, message, 0);
 
 		return null;
 	}

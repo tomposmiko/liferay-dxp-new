@@ -68,7 +68,7 @@ public class StrutsUtil {
 			}
 			catch (IOException ioException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(ioException);
+					_log.warn(ioException, ioException);
 				}
 			}
 			catch (ServletException servletException1) {
@@ -87,7 +87,7 @@ public class StrutsUtil {
 				}
 				catch (IOException ioException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(ioException);
+						_log.warn(ioException, ioException);
 					}
 				}
 				catch (ServletException servletException2) {

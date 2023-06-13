@@ -15,15 +15,14 @@
 package com.liferay.portal.kernel.security.auth;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.petra.lang.SafeClosable;
 import com.liferay.petra.lang.SafeCloseable;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.TimeZoneThreadLocal;
@@ -44,10 +43,14 @@ public class CompanyThreadLocal {
 		Long companyId = _companyId.get();
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Get company ID " + companyId);
+			_log.debug("getCompanyId " + companyId);
 		}
 
 		return companyId;
+	}
+
+	public static boolean isDeleteInProcess() {
+		return _deleteInProcess.get();
 	}
 
 	public static boolean isInitializingPortalInstance() {
@@ -59,22 +62,7 @@ public class CompanyThreadLocal {
 	}
 
 	public static SafeCloseable lock(long companyId) {
-		if (isLocked()) {
-			Long currentCompanyId = _companyId.get();
-
-			if (companyId == currentCompanyId.longValue()) {
-				return () -> {
-				};
-			}
-
-			throw new UnsupportedOperationException(
-				StringBundler.concat(
-					"Company ID ", companyId, " and company ID ",
-					currentCompanyId.longValue(), " are different"));
-		}
-
-		SafeCloseable safeCloseable = _companyId.setWithSafeCloseable(
-			companyId);
+		SafeCloseable safeCloseable = setWithSafeCloseable(companyId);
 
 		_locked.set(true);
 
@@ -89,6 +77,23 @@ public class CompanyThreadLocal {
 		if (_setCompanyId(companyId)) {
 			CTCollectionThreadLocal.removeCTCollectionId();
 		}
+	}
+
+	public static void setDeleteInProcess(boolean deleteInProcess) {
+		_deleteInProcess.set(deleteInProcess);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #setInitializingCompanyIdWithSafeCloseable(long)}
+	 */
+	@Deprecated
+	public static SafeClosable setInitializingCompanyId(long companyId) {
+		if (companyId > 0) {
+			return _companyId.setWithSafeClosable(companyId);
+		}
+
+		return _companyId.setWithSafeClosable(CompanyConstants.SYSTEM);
 	}
 
 	public static SafeCloseable setInitializingCompanyIdWithSafeCloseable(
@@ -108,14 +113,31 @@ public class CompanyThreadLocal {
 			initializingPortalInstance);
 	}
 
-	public static SafeCloseable setWithSafeCloseable(Long companyId) {
-		return setWithSafeCloseable(
-			companyId, CTCollectionThreadLocal.CT_COLLECTION_ID_PRODUCTION);
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #setWithSafeCloseable(Long)}
+	 */
+	@Deprecated
+	public static SafeClosable setWithSafeClosable(Long companyId) {
+		long currentCompanyId = _companyId.get();
+		Locale defaultLocale = LocaleThreadLocal.getDefaultLocale();
+		TimeZone defaultTimeZone = TimeZoneThreadLocal.getDefaultTimeZone();
+
+		_setCompanyId(companyId);
+
+		SafeClosable ctCollectionSafeClosable =
+			CTCollectionThreadLocal.setCTCollectionId(0);
+
+		return () -> {
+			_companyId.set(currentCompanyId);
+			LocaleThreadLocal.setDefaultLocale(defaultLocale);
+			TimeZoneThreadLocal.setDefaultTimeZone(defaultTimeZone);
+
+			ctCollectionSafeClosable.close();
+		};
 	}
 
-	public static SafeCloseable setWithSafeCloseable(
-		Long companyId, Long ctCollectionId) {
-
+	public static SafeCloseable setWithSafeCloseable(Long companyId) {
 		long currentCompanyId = _companyId.get();
 		Locale defaultLocale = LocaleThreadLocal.getDefaultLocale();
 		TimeZone defaultTimeZone = TimeZoneThreadLocal.getDefaultTimeZone();
@@ -123,8 +145,7 @@ public class CompanyThreadLocal {
 		_setCompanyId(companyId);
 
 		SafeCloseable ctCollectionSafeCloseable =
-			CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
-				ctCollectionId);
+			CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(0);
 
 		return () -> {
 			_companyId.set(currentCompanyId);
@@ -135,58 +156,52 @@ public class CompanyThreadLocal {
 		};
 	}
 
-	private static User _fetchGuestUser(long companyId) throws Exception {
-		User guestUser = null;
+	private static User _fetchDefaultUser(long companyId) throws Exception {
+		User defaultUser = null;
 
 		try {
-			guestUser = UserLocalServiceUtil.fetchGuestUser(companyId);
+			defaultUser = UserLocalServiceUtil.fetchDefaultUser(companyId);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
-		if (guestUser != null) {
-			return guestUser;
+		if (defaultUser != null) {
+			return defaultUser;
 		}
 
-		try (Connection connection = DataAccess.getConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement(
-				"select userId, languageId, timeZoneId from User_ where " +
-					"companyId = ? and type_ = ?")) {
+		try (Connection connection = DataAccess.getConnection()) {
+			try (PreparedStatement preparedStatement =
+					connection.prepareStatement(
+						"select userId, languageId, timeZoneId from User_ " +
+							"where companyId = ? and defaultUser = ?")) {
 
-			preparedStatement.setLong(1, companyId);
-			preparedStatement.setInt(2, UserConstants.TYPE_GUEST);
+				preparedStatement.setLong(1, companyId);
+				preparedStatement.setBoolean(2, true);
 
-			try (ResultSet resultSet = preparedStatement.executeQuery()) {
-				if (!resultSet.next()) {
-					return null;
+				try (ResultSet resultSet = preparedStatement.executeQuery()) {
+					if (!resultSet.next()) {
+						return null;
+					}
+
+					defaultUser = UserLocalServiceUtil.createUser(
+						resultSet.getLong("userId"));
+
+					defaultUser.setLanguageId(
+						resultSet.getString("languageId"));
+					defaultUser.setTimeZoneId(
+						resultSet.getString("timeZoneId"));
 				}
-
-				guestUser = UserLocalServiceUtil.createUser(
-					resultSet.getLong("userId"));
-
-				guestUser.setLanguageId(resultSet.getString("languageId"));
-				guestUser.setTimeZoneId(resultSet.getString("timeZoneId"));
 			}
 		}
 
-		return guestUser;
+		return defaultUser;
 	}
 
 	private static boolean _setCompanyId(Long companyId) {
 		if (companyId.equals(_companyId.get())) {
-			if (!isLocked()) {
-				return false;
-			}
-
-			if ((LocaleThreadLocal.getDefaultLocale() == null) ||
-				(TimeZoneThreadLocal.getDefaultTimeZone() == null)) {
-
-				_setUserThreadLocals(companyId);
-			}
-
 			return false;
 		}
 
@@ -202,42 +217,34 @@ public class CompanyThreadLocal {
 		if (companyId > 0) {
 			_companyId.set(companyId);
 
-			_setUserThreadLocals(companyId);
+			try {
+				User defaultUser = _fetchDefaultUser(companyId);
+
+				if (defaultUser == null) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"No default user was found for company " +
+								companyId);
+					}
+				}
+				else {
+					LocaleThreadLocal.setDefaultLocale(defaultUser.getLocale());
+					TimeZoneThreadLocal.setDefaultTimeZone(
+						defaultUser.getTimeZone());
+				}
+			}
+			catch (Exception exception) {
+				_log.error(exception, exception);
+			}
 		}
 		else {
 			_companyId.set(CompanyConstants.SYSTEM);
 
-			_setUserThreadLocals(null);
+			LocaleThreadLocal.setDefaultLocale(null);
+			TimeZoneThreadLocal.setDefaultTimeZone(null);
 		}
 
 		return true;
-	}
-
-	private static void _setUserThreadLocals(Long companyId) {
-		if (companyId == null) {
-			LocaleThreadLocal.setDefaultLocale(null);
-			TimeZoneThreadLocal.setDefaultTimeZone(null);
-
-			return;
-		}
-
-		try {
-			User guestUser = _fetchGuestUser(companyId);
-
-			if (guestUser == null) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"No guest user was found for company " + companyId);
-				}
-			}
-			else {
-				LocaleThreadLocal.setDefaultLocale(guestUser.getLocale());
-				TimeZoneThreadLocal.setDefaultTimeZone(guestUser.getTimeZone());
-			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -247,6 +254,10 @@ public class CompanyThreadLocal {
 		new CentralizedThreadLocal<>(
 			CompanyThreadLocal.class + "._companyId",
 			() -> CompanyConstants.SYSTEM);
+	private static final ThreadLocal<Boolean> _deleteInProcess =
+		new CentralizedThreadLocal<>(
+			CompanyThreadLocal.class + "._deleteInProcess",
+			() -> Boolean.FALSE);
 	private static final CentralizedThreadLocal<Boolean>
 		_initializingPortalInstance = new CentralizedThreadLocal<>(
 			CompanyThreadLocal.class + "._initializingPortalInstance",

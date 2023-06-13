@@ -36,7 +36,9 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Lourdes Fernández Besada
@@ -50,6 +52,8 @@ public class JournalEditArticleDisplayContextTest {
 
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+
 		Mockito.when(
 			_httpServletRequest.getAttribute(WebKeys.THEME_DISPLAY)
 		).thenReturn(
@@ -123,7 +127,7 @@ public class JournalEditArticleDisplayContextTest {
 			_httpServletRequest, "home"
 		);
 
-		Mockito.verifyNoInteractions(_journalFolderLocalService);
+		Mockito.verifyZeroInteractions(_journalFolderLocalService);
 	}
 
 	@Test
@@ -170,7 +174,7 @@ public class JournalEditArticleDisplayContextTest {
 			folderId
 		);
 
-		Mockito.verifyNoInteractions(_language);
+		Mockito.verifyZeroInteractions(_language);
 	}
 
 	@Test
@@ -325,18 +329,27 @@ public class JournalEditArticleDisplayContextTest {
 	private static final String _UNEXPECTED_FOLDER_NAME_MESSAGE =
 		"Unexpected folder name";
 
-	private final BeanProperties _beanProperties = Mockito.mock(
-		BeanProperties.class);
-	private final HttpServletRequest _httpServletRequest = Mockito.mock(
-		HttpServletRequest.class);
-	private final JournalArticle _journalArticle = Mockito.mock(
-		JournalArticle.class);
+	@Mock
+	private BeanProperties _beanProperties;
+
+	@Mock
+	private HttpServletRequest _httpServletRequest;
+
+	@Mock
+	private JournalArticle _journalArticle;
+
 	private JournalEditArticleDisplayContext _journalEditArticleDisplayContext;
-	private final JournalFolderLocalService _journalFolderLocalService =
-		Mockito.mock(JournalFolderLocalService.class);
-	private final Language _language = Mockito.mock(Language.class);
-	private final LiferayPortletResponse _liferayPortletResponse = Mockito.mock(
-		LiferayPortletResponse.class);
-	private final ThemeDisplay _themeDisplay = Mockito.mock(ThemeDisplay.class);
+
+	@Mock
+	private JournalFolderLocalService _journalFolderLocalService;
+
+	@Mock
+	private Language _language;
+
+	@Mock
+	private LiferayPortletResponse _liferayPortletResponse;
+
+	@Mock
+	private ThemeDisplay _themeDisplay;
 
 }

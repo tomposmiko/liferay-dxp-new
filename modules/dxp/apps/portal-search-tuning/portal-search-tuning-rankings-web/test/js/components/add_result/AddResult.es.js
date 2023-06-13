@@ -9,7 +9,7 @@
  * distribution rights of the Software.
  */
 
-import {fireEvent, render} from '@testing-library/react';
+import {fireEvent, render, wait} from '@testing-library/react';
 import React from 'react';
 
 import AddResult from '../../../../src/main/resources/META-INF/resources/js/components/add_result/AddResult.es';
@@ -35,11 +35,13 @@ describe('AddResult', () => {
 			/>
 		);
 
-		expect(getByText('add-result')).toBeInTheDocument();
+		await wait(() => {
+			expect(getByText('add-result')).toBeInTheDocument();
+		});
 	});
 
 	it('shows a modal when the add a result button gets clicked', async () => {
-		const {findByTestId, getByText} = render(
+		const {getByText, queryByTestId} = render(
 			<AddResult
 				fetchDocumentsSearchUrl={FETCH_SEARCH_DOCUMENTS_URL}
 				onAddResultSubmit={jest.fn()}
@@ -48,8 +50,8 @@ describe('AddResult', () => {
 
 		fireEvent.click(getByText('add-result'));
 
-		const modal = await findByTestId(MODAL_ID);
-
-		expect(modal).toBeInTheDocument();
+		await wait(() => {
+			expect(queryByTestId(MODAL_ID)).toBeInTheDocument();
+		});
 	});
 });

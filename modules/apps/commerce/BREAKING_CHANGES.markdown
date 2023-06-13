@@ -1,4 +1,4 @@
-# What are the Breaking Changes for Liferay Commerce 4.0?
+# What are the Breaking Changes for Liferay Commerce 3.0?
 
 This document presents a chronological list of changes that break existing
 functionality, APIs, or contracts with third party Liferay Commerce developers or users.
@@ -72,6 +72,62 @@ The remaining content of this document consists of the breaking changes listed
 in ascending chronological order.
 
 ## Breaking Changes List
+
+### Concurrency Management for Inventory
+- **Date:** 2020-Sep-3
+- **JIRA Ticket:** [COMMERCE-4565](https://issues.liferay.com/browse/COMMERCE-4565)
+
+#### What changed?
+
+Moved Commerce to the same level as Applications and Control Panel in the
+Applications Menu. Also dropped the commerce-admin-api and commerce-admin-web
+modules.
+
+#### Who is affected?
+
+Developers: It's not possible anymore to add items to Commerce->Settings section
+by implementing CommerceAdminModule.
+
+End Users: The Commerce sections are now at the same level as the Control Panel.
+
+#### Why was this change made?
+
+This change was made in order not to lose the navigation scope in the header
+bar while remaining compliant with DXP 7.3 standards.
+
+---------------------------------------
+
+### Files Moved
+- **Date:** 2020-Aug-20
+- **JIRA Ticket:** [COMMERCE-4052](https://issues.liferay.com/browse/COMMERCE-4052)
+
+#### What changed?
+
+Files listed below have moved:
+
+- `com.liferay.commerce.pricing.web.servlet.taglib.ui.
+CommerceDiscountScreenNavigationConstants;`
+- `com.liferay.commerce.pricing.web.servlet.taglib.ui.
+CommercePricingClassScreenNavigationConstants;`
+
+#### Who is affected?
+
+Anyone who references or uses these files.
+
+#### How should I update my code?
+Replace old references with the new package path.
+
+New package paths:
+- `com.liferay.commerce.pricing.web.internal.constants.
+CommerceDiscountScreenNavigationConstants;`
+- `com.liferay.commerce.pricing.web.internal.constants.
+CommercePricingClassScreenNavigationConstants;`
+
+#### Why was this change made?
+
+This was moved to follow Liferay coding pattern.
+
+---------------------------------------
 
 ### Destination Names Changed
 - **Date:** 2020-Sep-10
@@ -186,51 +242,6 @@ Developers relying or extending the the old `MiniCartTag`.
 #### Why was this change made?
 
 Alignment with Liferay DXP standards to support component extensibility.
-
----------------------------------------
-
-### CommerceCountry and CommerceRegion Removed
-- **Date:** 2021-Mar-02
-- **JIRA Ticket:** [LPS-125991](https://issues.liferay.com/browse/LPS-125991)
-
-#### What changed?
-
-* The `CommerceCountry` and `CommerceRegion` tables have been removed from
-the database.
-* Service and persistence classes for `CommerceCountry` and `CommerceRegion`
-have been removed.
-* Rerences to `com.liferay.commerce.model.CommerceCountry` and
-`com.liferay.commerce.model.CommerceRegion` have been replaced by
-`com.liferay.portal.kernel.model.Country` and
-`com.liferay.portal.kernel.model.Region`.
-* Foreign keys that references `CommerceCountry` and `CommerceRegion` have
-been renamed from `commerceCountryId` and `commerceRegionId` to `countryId` and
-`regionId` respectively. Tables that have columns that were updated are:
-  - `CommerceAddress`
-  - `CommerceAddressRestriction`
-  - `CommerceShippingFixedOptionRel`
-  - `CommerceTaxFixedRateAddressRel`
-* `com.liferay.commerce.country.CommerceCountryManager` is added for
-retrieving commerce-specific countries. Available methods are:
-  - `getBillingCountries`
-  - `getBillingCountriesByChannelId`
-  - `getShippingCountries`
-  - `getShippingCountriesByChannelId`
-  - `getWarehouseCountries`
-
-#### Who is affected?
-
-Anyone who references or uses these models and services.
-
-#### How should I update my code?
-
-Update any explicit reference to `CommerceCountry` and/or `CommerceRegion` with
-the new corresponding models and services.
-
-#### Why was this change made?
-
-This change was introduced to remove duplicate models and services in Liferay
-portal.
 
 ---------------------------------------
 
@@ -383,105 +394,5 @@ not need to create products with the Diagram product type.
 
 This change was introduced to fix BOM issues and to better fullfill spare parts
 use cases.
-
----------------------------------------
-
-### Remove the Accounts widget so it is no longer a module in Liferay Commerce
-- **Date:** 2021-Nov-21
-- **JIRA Ticket:** [COMMERCE-7288](https://issues.liferay.com/browse/COMMERCE-7288)
-
-#### What changed?
-
-Commerce Account widget is replaced by Account widget.
-All instances on a previously running system are updated.
-
-#### Who is affected?
-
-Developers who have customized the Commerce Account widget and/or used it with
-site initializers.
-
-End users (Account managers) that will use a different widget to manage accounts.
-
-#### Why was this change made?
-
-This change was introduced to be compliant with Commerce Account migration to
-Account.
-
----------------------------------------
-
-### Refactor CommerceOrderLocalServiceImpl
-- **Date:** 2022-Feb-16
-- **JIRA Ticket:** [COMMERCE-8440](https://issues.liferay.com/browse/COMMERCE-8440)
-
-#### What changed?
-
-* The method `updateCommerceOrder` has been reduced down from 4 methods to 3.
-* The method `updateCustomFields` has been removed.
-* The method `updateOrderStatus` has been removed.
-* The method `updateTransactionId` has been removed.
-* The method `updateUser` has been removed.
-
-#### Who is affected?
-
-Developers who are calling any of these methods in their code.
-
-#### How should I update my code?
-
-* Use the remaining 3 `updateCommerceOrder` methods as a direct replacement.
-* Use `updateCommerceOrder(CommerceOrder commerceOrder)` method after setting
-`expandoBridgeAttributes` with
-`commerceOrder.setExpandoBridgeAttributes(ServiceContext serviceContext)` to
-update the `customFields`.
-* Use `updateCommerceOrder(CommerceOrder commerceOrder)` method after setting
-the `orderStatus` with `commerceOrder.setOrderStatus(int orderStatus)` to update
-the `orderStatus`.
-* Use `updateCommerceOrder(CommerceOrder commerceOrder)` method after setting
-`transactionId` with `commerceOrder.setTransactionId(String transactionId)` to
-update the `transactionId`.
-* Use `updateCommerceOrder(CommerceOrder commerceOrder)` method after setting
-the `userId` and `userName` with `commerceOrder.setUserId(long userId)` and
-`commerceOrder.setUserName(String userName)` to update the user information.
-
-#### Why was this change made?
-
-This change was introduced to clean up the class
-`CommerceOrderLocalServiceImpl`.
-
----------------------------------------
-
-### Refine CommerceOrder in commerce-service service.xml
-- **Date:** 2022-Apr-13
-- **JIRA Ticket:** [COMMERCE-8408](https://issues.liferay.com/browse/COMMERCE-8408)
-
-#### What changed?
-
-* The method `addCommerceOrder` in `CommerceOrderLocalService` and
-`CommerceOrderService` have parameters that have been rearranged.
-* The method `addOrUpdateCommerceOrder` in `CommerceOrderLocalService` and
-`CommerceOrderService` have parameters that have been rearranged.
-* The method `updateCommerceOrder`  in `CommerceOrderLocalService` and
-`CommerceOrderService` have parameters that have been rearranged.
-* The method `updateCommerceOrderPrices` in `CommerceOrderLocalService` and
-`CommerceOrderService` have parameters that have been rearranged.
-
-#### Who is affected?
-
-Developers who are calling any of these methods in their code.
-
-#### How should I update my code?
-
-* Verify that parameters are correctly aligned with new `addCommerceOrder`
-method(s).
-* Verify that parameters are correctly aligned with new
-`addOrUpdateCommerceOrder` method(s).
-* Verify that parameters are correctly aligned with new `updateCommerceOrder`
-method(s).
-* Verify that parameters are correctly aligned with new
-`updateCommerceOrderPrices` method(s).
-
-#### Why was this change made?
-
-This change was introduced to clean up the entity `CommerceOrder` in
-`commerce-service` `service.xml`.
 
 ---------------------------------------

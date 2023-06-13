@@ -27,10 +27,6 @@ public class OAuth2AuthorizationLocalServiceWrapper
 	implements OAuth2AuthorizationLocalService,
 			   ServiceWrapper<OAuth2AuthorizationLocalService> {
 
-	public OAuth2AuthorizationLocalServiceWrapper() {
-		this(null);
-	}
-
 	public OAuth2AuthorizationLocalServiceWrapper(
 		OAuth2AuthorizationLocalService oAuth2AuthorizationLocalService) {
 
@@ -173,9 +169,7 @@ public class OAuth2AuthorizationLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteExpiredOAuth2Authorizations()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public void deleteExpiredOAuth2Authorizations() {
 		_oAuth2AuthorizationLocalService.deleteExpiredOAuth2Authorizations();
 	}
 

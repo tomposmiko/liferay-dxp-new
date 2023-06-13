@@ -62,6 +62,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Marcellus Tavares
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-dynamic-data-lists",
@@ -85,8 +86,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + DDLPortletKeys.DYNAMIC_DATA_LISTS,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )
@@ -99,7 +99,7 @@ public class DDLPortlet extends MVCPortlet {
 
 		super.processAction(actionRequest, actionResponse);
 
-		_setCloseRedirect(actionRequest);
+		setCloseRedirect(actionRequest);
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class DDLPortlet extends MVCPortlet {
 			// key for a new record set that does not yet exist
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 		catch (PortalException portalException) {
@@ -135,6 +135,54 @@ public class DDLPortlet extends MVCPortlet {
 		}
 
 		super.render(renderRequest, renderResponse);
+	}
+
+	@Reference(unbind = "-")
+	public void setDDL(DDL ddl) {
+		_ddl = ddl;
+	}
+
+	@Reference(unbind = "-")
+	public void setDDLRecordService(DDLRecordService ddlRecordService) {
+		_ddlRecordService = ddlRecordService;
+	}
+
+	@Reference(unbind = "-")
+	public void setDDLRecordSetLocalService(
+		DDLRecordSetLocalService ddlRecordSetLocalService) {
+
+		_ddlRecordSetLocalService = ddlRecordSetLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setDDLRecordSetService(
+		DDLRecordSetService ddlRecordSetService) {
+
+		_ddlRecordSetService = ddlRecordSetService;
+	}
+
+	@Reference(unbind = "-")
+	public void setDDMDisplayRegistry(DDMDisplayRegistry ddmDisplayRegistry) {
+		_ddmDisplayRegistry = ddmDisplayRegistry;
+	}
+
+	@Reference(unbind = "-")
+	public void setDDMPermissionSupport(
+		DDMPermissionSupport ddmPermissionSupport) {
+
+		_ddmPermissionSupport = ddmPermissionSupport;
+	}
+
+	@Reference(unbind = "-")
+	public void setDDMTemplateLocalService(
+		DDMTemplateLocalService ddmTemplateLocalService) {
+
+		_ddmTemplateLocalService = ddmTemplateLocalService;
+	}
+
+	@Reference(unbind = "-")
+	public void setStorageEngine(StorageEngine storageEngine) {
+		_storageEngine = storageEngine;
 	}
 
 	@Override
@@ -157,6 +205,21 @@ public class DDLPortlet extends MVCPortlet {
 		else {
 			super.doDispatch(renderRequest, renderResponse);
 		}
+	}
+
+	protected void setCloseRedirect(ActionRequest actionRequest) {
+		String closeRedirect = ParamUtil.getString(
+			actionRequest, "closeRedirect");
+
+		if (Validator.isNull(closeRedirect)) {
+			return;
+		}
+
+		SessionMessages.add(
+			actionRequest,
+			_portal.getPortletId(actionRequest) +
+				SessionMessages.KEY_SUFFIX_CLOSE_REDIRECT,
+			closeRedirect);
 	}
 
 	protected void setDDLRecordRequestAttribute(RenderRequest renderRequest)
@@ -202,33 +265,11 @@ public class DDLPortlet extends MVCPortlet {
 		_ddlWebConfigurationActivator = null;
 	}
 
-	private void _setCloseRedirect(ActionRequest actionRequest) {
-		String closeRedirect = ParamUtil.getString(
-			actionRequest, "closeRedirect");
-
-		if (Validator.isNull(closeRedirect)) {
-			return;
-		}
-
-		SessionMessages.add(
-			actionRequest,
-			_portal.getPortletId(actionRequest) +
-				SessionMessages.KEY_SUFFIX_CLOSE_REDIRECT,
-			closeRedirect);
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(DDLPortlet.class);
 
-	@Reference
 	private DDL _ddl;
-
-	@Reference
 	private DDLRecordService _ddlRecordService;
-
-	@Reference
 	private DDLRecordSetLocalService _ddlRecordSetLocalService;
-
-	@Reference
 	private DDLRecordSetService _ddlRecordSetService;
 
 	@Reference(
@@ -239,19 +280,13 @@ public class DDLPortlet extends MVCPortlet {
 	)
 	private volatile DDLWebConfigurationActivator _ddlWebConfigurationActivator;
 
-	@Reference
 	private DDMDisplayRegistry _ddmDisplayRegistry;
-
-	@Reference
 	private DDMPermissionSupport _ddmPermissionSupport;
-
-	@Reference
 	private DDMTemplateLocalService _ddmTemplateLocalService;
 
 	@Reference
 	private Portal _portal;
 
-	@Reference
 	private StorageEngine _storageEngine;
 
 }

@@ -19,7 +19,6 @@ import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.model.AssetLinkConstants;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetLinkLocalService;
-import com.liferay.diff.DiffHtml;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.service.ExpandoRowLocalService;
@@ -28,44 +27,34 @@ import com.liferay.knowledge.base.constants.AdminActivityKeys;
 import com.liferay.knowledge.base.constants.KBArticleConstants;
 import com.liferay.knowledge.base.constants.KBConstants;
 import com.liferay.knowledge.base.constants.KBFolderConstants;
-import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.exception.DuplicateKBArticleExternalReferenceCodeException;
 import com.liferay.knowledge.base.exception.KBArticleContentException;
-import com.liferay.knowledge.base.exception.KBArticleExpirationDateException;
 import com.liferay.knowledge.base.exception.KBArticleParentException;
 import com.liferay.knowledge.base.exception.KBArticlePriorityException;
-import com.liferay.knowledge.base.exception.KBArticleReviewDateException;
 import com.liferay.knowledge.base.exception.KBArticleSourceURLException;
 import com.liferay.knowledge.base.exception.KBArticleStatusException;
 import com.liferay.knowledge.base.exception.KBArticleTitleException;
 import com.liferay.knowledge.base.exception.KBArticleUrlTitleException;
 import com.liferay.knowledge.base.exception.NoSuchArticleException;
-import com.liferay.knowledge.base.internal.configuration.KBServiceConfiguration;
-import com.liferay.knowledge.base.internal.helper.KBArticleLocalSiblingNavigationHelper;
 import com.liferay.knowledge.base.internal.importer.KBArchiveFactory;
 import com.liferay.knowledge.base.internal.importer.KBArticleImporter;
 import com.liferay.knowledge.base.internal.util.AdminSubscriptionSenderFactory;
 import com.liferay.knowledge.base.internal.util.KBArticleDiffUtil;
+import com.liferay.knowledge.base.internal.util.KBArticleLocalSiblingNavigationHelper;
 import com.liferay.knowledge.base.internal.util.KBCommentUtil;
 import com.liferay.knowledge.base.internal.util.KBSectionEscapeUtil;
 import com.liferay.knowledge.base.internal.util.constants.KnowledgeBaseConstants;
-import com.liferay.knowledge.base.markdown.converter.factory.MarkdownConverterFactory;
 import com.liferay.knowledge.base.model.KBArticle;
-import com.liferay.knowledge.base.model.KBArticleTable;
 import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.base.KBArticleLocalServiceBaseImpl;
-import com.liferay.knowledge.base.service.persistence.KBCommentPersistence;
-import com.liferay.knowledge.base.service.persistence.KBFolderPersistence;
 import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
 import com.liferay.knowledge.base.util.comparator.KBArticlePriorityComparator;
 import com.liferay.knowledge.base.util.comparator.KBArticleVersionComparator;
-import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.bean.BeanProperties;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
@@ -81,27 +70,21 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
-import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
@@ -111,18 +94,14 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.HtmlParser;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
-import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.view.count.ViewCountManager;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -142,11 +121,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -156,7 +131,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Edward Han
  */
 @Component(
-	configurationPid = "com.liferay.knowledge.base.internal.configuration.KBServiceConfiguration",
 	property = "model.class.name=com.liferay.knowledge.base.model.KBArticle",
 	service = AopService.class
 )
@@ -172,7 +146,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			resourcePrimKey, WorkflowConstants.STATUS_ANY);
 
 		return _portletFileRepository.addPortletFileEntry(
-			null, kbArticle.getGroupId(), userId, KBArticle.class.getName(),
+			kbArticle.getGroupId(), userId, KBArticle.class.getName(),
 			kbArticle.getClassPK(), KBConstants.SERVICE_NAME,
 			kbArticle.getAttachmentsFolderId(), inputStream, fileName, mimeType,
 			false);
@@ -183,36 +157,39 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			String externalReferenceCode, long userId,
 			long parentResourceClassNameId, long parentResourcePrimKey,
 			String title, String urlTitle, String content, String description,
-			String[] sections, String sourceURL, Date expirationDate,
-			Date reviewDate, String[] selectedFileNames,
+			String sourceURL, String[] sections, String[] selectedFileNames,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		// KB article
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
 		long groupId = serviceContext.getScopeGroupId();
-		urlTitle = _normalizeUrlTitle(urlTitle);
-		double priority = _getPriority(groupId, parentResourcePrimKey);
+		urlTitle = normalizeUrlTitle(urlTitle);
+		double priority = getPriority(groupId, parentResourcePrimKey);
 
 		long kbArticleId = counterLocalService.increment();
 
+		if (Validator.isNull(externalReferenceCode)) {
+			externalReferenceCode = String.valueOf(kbArticleId);
+		}
+
 		_validateExternalReferenceCode(externalReferenceCode, groupId);
 
-		_validate(expirationDate, content, reviewDate, sourceURL, title);
-		_validateParent(parentResourceClassNameId, parentResourcePrimKey);
+		validate(title, content, sourceURL);
+		validateParent(parentResourceClassNameId, parentResourcePrimKey);
 
 		long kbFolderId = KnowledgeBaseUtil.getKBFolderId(
 			parentResourceClassNameId, parentResourcePrimKey);
 
 		urlTitle = StringUtil.toLowerCase(urlTitle);
 
-		_validateUrlTitle(groupId, kbFolderId, urlTitle);
+		validateUrlTitle(groupId, kbFolderId, urlTitle);
 
 		long resourcePrimKey = counterLocalService.increment();
 
-		long rootResourcePrimKey = _getRootResourcePrimKey(
+		long rootResourcePrimKey = getRootResourcePrimKey(
 			resourcePrimKey, parentResourceClassNameId, parentResourcePrimKey);
 
 		KBArticle kbArticle = kbArticlePersistence.create(kbArticleId);
@@ -231,7 +208,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setVersion(KBArticleConstants.DEFAULT_VERSION);
 		kbArticle.setTitle(title);
 		kbArticle.setUrlTitle(
-			_getUniqueUrlTitle(
+			getUniqueUrlTitle(
 				groupId, kbFolderId, kbArticleId, title, urlTitle));
 		kbArticle.setContent(content);
 		kbArticle.setDescription(description);
@@ -241,8 +218,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setLatest(true);
 		kbArticle.setMain(false);
 		kbArticle.setSourceURL(sourceURL);
-		kbArticle.setExpirationDate(expirationDate);
-		kbArticle.setReviewDate(reviewDate);
 		kbArticle.setStatus(WorkflowConstants.STATUS_DRAFT);
 		kbArticle.setExpandoBridgeAttributes(serviceContext);
 
@@ -271,13 +246,13 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Attachments
 
-		_addKBArticleAttachments(userId, kbArticle, selectedFileNames);
+		addKBArticleAttachments(userId, kbArticle, selectedFileNames);
 
 		// Workflow
 
-		_startWorkflowInstance(userId, kbArticle, serviceContext);
-
-		return kbArticle;
+		return WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			user.getCompanyId(), groupId, userId, KBArticle.class.getName(),
+			resourcePrimKey, kbArticle, serviceContext, Collections.emptyMap());
 	}
 
 	@Override
@@ -286,7 +261,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			boolean addGuestPermissions)
 		throws PortalException {
 
-		_resourceLocalService.addResources(
+		resourceLocalService.addResources(
 			kbArticle.getCompanyId(), kbArticle.getGroupId(),
 			kbArticle.getUserId(), KBArticle.class.getName(),
 			kbArticle.getResourcePrimKey(), false, addGroupPermissions,
@@ -298,7 +273,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			KBArticle kbArticle, ModelPermissions modelPermissions)
 		throws PortalException {
 
-		_resourceLocalService.addModelResources(
+		resourceLocalService.addModelResources(
 			kbArticle.getCompanyId(), kbArticle.getGroupId(),
 			kbArticle.getUserId(), KBArticle.class.getName(),
 			kbArticle.getResourcePrimKey(), modelPermissions);
@@ -330,8 +305,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			WorkflowThreadLocal.setEnabled(false);
 
 			KBArticleImporter kbArticleImporter = new KBArticleImporter(
-				_markdownConverterFactory.create(), _kbArchiveFactory, this,
-				_portal, _dlURLHelper);
+				_kbArchiveFactory, this, _portal, _dlURLHelper);
 
 			return kbArticleImporter.processZipFile(
 				userId, groupId, parentKbFolderId, prioritizeByNumericalPrefix,
@@ -350,22 +324,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		TempFileEntryUtil.addTempFileEntry(
 			groupId, userId, tempFolderName, fileName, inputStream, mimeType);
-	}
-
-	@Override
-	public void checkKBArticles(long companyId) throws PortalException {
-		Date date = new Date();
-
-		_checkKBArticlesByExpirationDate(companyId, date);
-
-		_dates.computeIfAbsent(
-			companyId,
-			key -> new Date(
-				date.getTime() - (_getKBArticleCheckInterval() * Time.MINUTE)));
-
-		_checkKBArticlesByReviewDate(companyId, date);
-
-		_dates.put(companyId, date);
 	}
 
 	@Override
@@ -403,7 +361,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Resources
 
-		_resourceLocalService.deleteResource(
+		resourceLocalService.deleteResource(
 			kbArticle.getCompanyId(), KBArticle.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL, kbArticle.getResourcePrimKey());
 
@@ -416,11 +374,11 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		KBCommentUtil.deleteKBComments(
 			KBArticle.class.getName(), _classNameLocalService,
-			kbArticle.getResourcePrimKey(), _kbCommentPersistence);
+			kbArticle.getResourcePrimKey(), kbCommentPersistence);
 
 		// Asset
 
-		_deleteAssets(kbArticle);
+		deleteAssets(kbArticle);
 
 		// Expando
 
@@ -450,7 +408,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Subscriptions
 
-		_deleteSubscriptions(kbArticle);
+		deleteSubscriptions(kbArticle);
 
 		// View count
 
@@ -510,27 +468,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		TempFileEntryUtil.deleteTempFileEntry(
 			groupId, userId, tempFolderName, fileName);
-	}
-
-	@Override
-	public KBArticle expireKBArticle(
-			long userId, long resourcePrimKey, ServiceContext serviceContext)
-		throws PortalException {
-
-		KBArticle kbArticle = getLatestKBArticle(
-			resourcePrimKey, WorkflowConstants.STATUS_ANY);
-
-		if (kbArticle.isDraft()) {
-			return kbArticle;
-		}
-
-		kbArticle.setExpirationDate(new Date());
-
-		kbArticleLocalService.updateKBArticle(kbArticle);
-
-		return updateStatus(
-			userId, resourcePrimKey, WorkflowConstants.STATUS_EXPIRED,
-			serviceContext);
 	}
 
 	@Override
@@ -644,7 +581,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		long resourcePrimKey, int status,
 		OrderByComparator<KBArticle> orderByComparator) {
 
-		return _getAllDescendantKBArticles(
+		return getAllDescendantKBArticles(
 			resourcePrimKey, status, orderByComparator, false);
 	}
 
@@ -720,7 +657,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		long resourcePrimKey, int status,
 		OrderByComparator<KBArticle> orderByComparator) {
 
-		return _getAllDescendantKBArticles(
+		return getAllDescendantKBArticles(
 			resourcePrimKey, status, orderByComparator, true);
 	}
 
@@ -1033,15 +970,15 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			return;
 		}
 
-		_validateParent(
+		validateParent(
 			kbArticle, parentResourceClassNameId, parentResourcePrimKey);
-		_validateParentStatus(
+		validateParentStatus(
 			parentResourceClassNameId, parentResourcePrimKey,
 			kbArticle.getStatus());
 
-		_validate(priority);
+		validate(priority);
 
-		_updatePermissionFields(
+		updatePermissionFields(
 			resourcePrimKey, parentResourceClassNameId, parentResourcePrimKey);
 
 		long kbFolderClassNameId = _classNameLocalService.getClassNameId(
@@ -1073,7 +1010,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 			curKBArticle = kbArticlePersistence.update(curKBArticle);
 
-			_indexKBArticle(curKBArticle);
+			indexKBArticle(curKBArticle);
 		}
 
 		if (kbArticle.getKbFolderId() != kbFolderId) {
@@ -1092,7 +1029,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 					kbArticleVersion = kbArticlePersistence.update(
 						kbArticleVersion);
 
-					_indexKBArticle(kbArticleVersion);
+					indexKBArticle(kbArticleVersion);
 				}
 			}
 		}
@@ -1110,7 +1047,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				extraDataJSONObject.toString(), 0);
 		}
 
-		_indexKBArticle(latestKBArticle);
+		indexKBArticle(latestKBArticle);
 	}
 
 	@Override
@@ -1130,9 +1067,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return updateKBArticle(
 			userId, resourcePrimKey, kbArticle.getTitle(),
 			kbArticle.getContent(), kbArticle.getDescription(),
-			StringUtil.split(kbArticle.getSections()), kbArticle.getSourceURL(),
-			kbArticle.getExpirationDate(), kbArticle.getReviewDate(), null,
-			null, serviceContext);
+			kbArticle.getSourceURL(), StringUtil.split(kbArticle.getSections()),
+			null, null, serviceContext);
 	}
 
 	@Override
@@ -1141,7 +1077,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		Date endDate, boolean andOperator, int start, int end,
 		OrderByComparator<KBArticle> orderByComparator) {
 
-		DynamicQuery dynamicQuery = _buildDynamicQuery(
+		DynamicQuery dynamicQuery = buildDynamicQuery(
 			groupId, title, content, status, startDate, endDate, andOperator);
 
 		return dynamicQuery(dynamicQuery, start, end, orderByComparator);
@@ -1183,16 +1119,16 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	@Override
 	public KBArticle updateKBArticle(
 			long userId, long resourcePrimKey, String title, String content,
-			String description, String[] sections, String sourceURL,
-			Date expirationDate, Date reviewDate, String[] selectedFileNames,
-			long[] removeFileEntryIds, ServiceContext serviceContext)
+			String description, String sourceURL, String[] sections,
+			String[] selectedFileNames, long[] removeFileEntryIds,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		// KB article
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 
-		_validate(expirationDate, content, reviewDate, sourceURL, title);
+		validate(title, content, sourceURL);
 
 		KBArticle oldKBArticle = getLatestKBArticle(
 			resourcePrimKey, WorkflowConstants.STATUS_ANY);
@@ -1201,7 +1137,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		KBArticle kbArticle = null;
 
-		if (oldKBArticle.isApproved() || oldKBArticle.isExpired()) {
+		if (oldKBArticle.isApproved()) {
 			long kbArticleId = counterLocalService.increment();
 
 			kbArticle = kbArticlePersistence.create(kbArticleId);
@@ -1230,13 +1166,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				kbArticle.getCompanyId(),
 				_classNameLocalService.getClassNameId(KBArticle.class),
 				kbArticle.getPrimaryKey(), (int)oldKBArticle.getViewCount());
-
-			// Indexer
-
-			Indexer<KBArticle> indexer = _indexerRegistry.getIndexer(
-				KBArticle.class);
-
-			indexer.delete(oldKBArticle);
 		}
 		else {
 			kbArticle = oldKBArticle;
@@ -1257,13 +1186,11 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		kbArticle.setLatest(true);
 		kbArticle.setMain(false);
 		kbArticle.setSourceURL(sourceURL);
-		kbArticle.setExpirationDate(expirationDate);
-		kbArticle.setReviewDate(reviewDate);
 		kbArticle.setExpandoBridgeAttributes(serviceContext);
 
 		kbArticle = kbArticlePersistence.update(kbArticle);
 
-		if (oldKBArticle.isApproved() || oldKBArticle.isExpired()) {
+		if (oldKBArticle.isApproved()) {
 			oldKBArticle.setModifiedDate(oldKBArticle.getModifiedDate());
 			oldKBArticle.setLatest(false);
 
@@ -1279,17 +1206,16 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Attachments
 
-		_addKBArticleAttachments(userId, kbArticle, selectedFileNames);
+		addKBArticleAttachments(userId, kbArticle, selectedFileNames);
 
-		_removeKBArticleAttachments(removeFileEntryIds);
-
-		// Indexer
-
-		_indexKBArticle(kbArticle);
+		removeKBArticleAttachments(removeFileEntryIds);
 
 		// Workflow
 
-		_startWorkflowInstance(userId, kbArticle, serviceContext);
+		WorkflowHandlerRegistryUtil.startWorkflowInstance(
+			user.getCompanyId(), kbArticle.getGroupId(), userId,
+			KBArticle.class.getName(), resourcePrimKey, kbArticle,
+			serviceContext);
 
 		return kbArticle;
 	}
@@ -1300,9 +1226,26 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			String[] assetTagNames, long[] assetLinkEntryIds)
 		throws PortalException {
 
-		_updateKBArticleAsset(
-			userId, kbArticle, assetCategoryIds, assetTagNames,
-			assetLinkEntryIds, WorkflowConstants.STATUS_ANY);
+		boolean visible = false;
+
+		if (kbArticle.isApproved()) {
+			visible = true;
+		}
+
+		String summary = HtmlUtil.extractText(
+			StringUtil.shorten(kbArticle.getContent(), 500));
+
+		AssetEntry assetEntry = _assetEntryLocalService.updateEntry(
+			userId, kbArticle.getGroupId(), kbArticle.getCreateDate(),
+			kbArticle.getModifiedDate(), KBArticle.class.getName(),
+			kbArticle.getClassPK(), kbArticle.getUuid(), 0, assetCategoryIds,
+			assetTagNames, true, visible, null, null, null, null,
+			ContentTypes.TEXT_HTML, kbArticle.getTitle(),
+			kbArticle.getDescription(), summary, null, null, 0, 0, null);
+
+		_assetLinkLocalService.updateLinks(
+			userId, assetEntry.getEntryId(), assetLinkEntryIds,
+			AssetLinkConstants.TYPE_RELATED);
 	}
 
 	@Override
@@ -1311,7 +1254,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			String[] guestPermissions)
 		throws PortalException {
 
-		_resourceLocalService.updateResources(
+		resourceLocalService.updateResources(
 			kbArticle.getCompanyId(), kbArticle.getGroupId(),
 			KBArticle.class.getName(), kbArticle.getResourcePrimKey(),
 			groupPermissions, guestPermissions);
@@ -1323,7 +1266,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		throws PortalException {
 
 		for (double priority : resourcePrimKeyToPriorityMap.values()) {
-			_validate(priority);
+			validate(priority);
 		}
 
 		long[] resourcePrimKeys = StringUtil.split(
@@ -1361,7 +1304,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// KB article
 
-		User user = _userLocalService.getUser(userId);
+		User user = userLocalService.getUser(userId);
 		boolean main = false;
 		Date date = new Date();
 
@@ -1372,7 +1315,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		KBArticle kbArticle = getLatestKBArticle(
 			resourcePrimKey, WorkflowConstants.STATUS_ANY);
 
-		_validateParentStatus(
+		validateParentStatus(
 			kbArticle.getParentResourceClassNameId(),
 			kbArticle.getParentResourcePrimKey(), status);
 
@@ -1384,9 +1327,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		kbArticle = kbArticlePersistence.update(kbArticle);
 
-		if ((status != WorkflowConstants.STATUS_APPROVED) &&
-			(status != WorkflowConstants.STATUS_EXPIRED)) {
-
+		if (status != WorkflowConstants.STATUS_APPROVED) {
 			return kbArticle;
 		}
 
@@ -1397,25 +1338,13 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			oldKBArticle.setModifiedDate(oldKBArticle.getModifiedDate());
 			oldKBArticle.setMain(false);
 
-			oldKBArticle = kbArticlePersistence.update(oldKBArticle);
-
-			// Indexer
-
-			Indexer<KBArticle> indexer = _indexerRegistry.getIndexer(
-				KBArticle.class);
-
-			indexer.delete(oldKBArticle);
+			kbArticlePersistence.update(oldKBArticle);
 		}
 
 		// Asset
 
-		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
-			KBArticle.class.getName(), kbArticle.getResourcePrimKey());
-
-		if (status == WorkflowConstants.STATUS_APPROVED) {
-			assetEntry = _assetEntryLocalService.getEntry(
-				KBArticle.class.getName(), kbArticle.getKbArticleId());
-		}
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			KBArticle.class.getName(), kbArticle.getKbArticleId());
 
 		List<AssetLink> assetLinks = _assetLinkLocalService.getDirectLinks(
 			assetEntry.getEntryId(), AssetLinkConstants.TYPE_RELATED);
@@ -1423,9 +1352,9 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		long[] assetLinkEntryIds = StringUtil.split(
 			ListUtil.toString(assetLinks, AssetLink.ENTRY_ID2_ACCESSOR), 0L);
 
-		_updateKBArticleAsset(
+		updateKBArticleAsset(
 			userId, kbArticle, assetEntry.getCategoryIds(),
-			assetEntry.getTagNames(), assetLinkEntryIds, status);
+			assetEntry.getTagNames(), assetLinkEntryIds);
 
 		SystemEventHierarchyEntryThreadLocal.push(KBArticle.class);
 
@@ -1437,14 +1366,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			SystemEventHierarchyEntryThreadLocal.pop(KBArticle.class);
 		}
 
-		boolean visible = false;
-
-		if (kbArticle.isApproved()) {
-			visible = true;
-		}
-
 		_assetEntryLocalService.updateVisible(
-			KBArticle.class.getName(), kbArticle.getResourcePrimKey(), visible);
+			KBArticle.class.getName(), kbArticle.getResourcePrimKey(), true);
 
 		// Social
 
@@ -1466,31 +1389,19 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 		// Indexer
 
-		_indexKBArticle(kbArticle);
+		Indexer<KBArticle> indexer = _indexerRegistry.getIndexer(
+			KBArticle.class);
+
+		indexer.reindex(kbArticle);
 
 		// Subscriptions
 
-		Set<String> receivers = SetUtil.fromArray(
-			_NOTIFICATION_RECEIVER_SUBSCRIBER);
-
-		if (status == WorkflowConstants.STATUS_EXPIRED) {
-			receivers.add(_NOTIFICATION_RECEIVER_OWNER);
-		}
-
-		_notify(
-			receivers, userId, kbArticle, _getAction(kbArticle, status),
-			serviceContext);
+		notifySubscribers(userId, kbArticle, serviceContext);
 
 		return kbArticle;
 	}
 
-	@Activate
-	protected void activate(Map<String, Object> properties) {
-		_kbServiceConfiguration = ConfigurableUtil.createConfigurable(
-			KBServiceConfiguration.class, properties);
-	}
-
-	private void _addKBArticleAttachment(
+	protected void addKBArticleAttachment(
 			long userId, long groupId, long resourcePrimKey,
 			String selectedFileName)
 		throws PortalException {
@@ -1511,7 +1422,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private void _addKBArticleAttachments(
+	protected void addKBArticleAttachments(
 			long userId, KBArticle kbArticle, String[] selectedFileNames)
 		throws PortalException {
 
@@ -1520,13 +1431,13 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 
 		for (String selectedFileName : selectedFileNames) {
-			_addKBArticleAttachment(
+			addKBArticleAttachment(
 				userId, kbArticle.getGroupId(), kbArticle.getResourcePrimKey(),
 				selectedFileName);
 		}
 	}
 
-	private DynamicQuery _buildDynamicQuery(
+	protected DynamicQuery buildDynamicQuery(
 		long groupId, String title, String content, int status, Date startDate,
 		Date endDate, boolean andOperator) {
 
@@ -1613,54 +1524,17 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return dynamicQuery.add(junction);
 	}
 
-	private void _checkKBArticlesByExpirationDate(
-			long companyId, Date expirationDate)
-		throws PortalException {
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				StringBundler.concat(
-					"Expiring file entries with expiration date previous to ",
-					expirationDate, " for company ", companyId));
-		}
-
-		_expireKBArticlesByCompany(
-			_companyLocalService.getCompany(companyId), expirationDate);
-	}
-
-	private void _checkKBArticlesByReviewDate(long companyId, Date reviewDate)
-		throws PortalException {
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				StringBundler.concat(
-					"Sending review notification for articles with review ",
-					"date between ", _dates.get(companyId), " and ", reviewDate,
-					" for company ", companyId));
-		}
-
-		_notifyReviewKBArticlesByCompany(
-			_companyLocalService.getCompany(companyId), reviewDate);
-	}
-
-	private void _deleteAssets(KBArticle kbArticle) throws PortalException {
+	protected void deleteAssets(KBArticle kbArticle) throws PortalException {
 		_assetEntryLocalService.deleteEntry(
 			KBArticle.class.getName(), kbArticle.getClassPK());
 
-		if (!kbArticle.isApproved()) {
-			int kbArticleVersionsCount =
-				kbArticleLocalService.getKBArticleVersionsCount(
-					kbArticle.getResourcePrimKey(),
-					WorkflowConstants.STATUS_ANY);
-
-			if ((kbArticleVersionsCount == 0) || !kbArticle.isFirstVersion()) {
-				_assetEntryLocalService.deleteEntry(
-					KBArticle.class.getName(), kbArticle.getResourcePrimKey());
-			}
+		if (!kbArticle.isApproved() && !kbArticle.isFirstVersion()) {
+			_assetEntryLocalService.deleteEntry(
+				KBArticle.class.getName(), kbArticle.getResourcePrimKey());
 		}
 	}
 
-	private void _deleteSubscriptions(KBArticle kbArticle)
+	protected void deleteSubscriptions(KBArticle kbArticle)
 		throws PortalException {
 
 		List<Subscription> subscriptions =
@@ -1674,44 +1548,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private void _expireKBArticlesByCompany(
-			Company company, Date expirationDate)
-		throws PortalException {
-
-		long userId = _userLocalService.getGuestUserId(company.getCompanyId());
-
-		List<KBArticle> kbArticles = _getKBArticlesByCompanyIdAndExpirationDate(
-			company.getCompanyId(), expirationDate);
-
-		for (KBArticle kbArticle : kbArticles) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					StringBundler.concat(
-						"Expiring KB Article ", kbArticle.getKbArticleId(),
-						" with expiration date ",
-						kbArticle.getExpirationDate()));
-			}
-
-			updateStatus(
-				userId, kbArticle.getResourcePrimKey(),
-				WorkflowConstants.STATUS_EXPIRED,
-				_getServiceContext(company, kbArticle));
-		}
-	}
-
-	private String _getAction(KBArticle kbArticle, int status) {
-		if (status == WorkflowConstants.STATUS_EXPIRED) {
-			return Constants.EXPIRE;
-		}
-
-		if (kbArticle.isFirstVersion()) {
-			return Constants.ADD;
-		}
-
-		return Constants.UPDATE;
-	}
-
-	private void _getAllDescendantKBArticles(
+	protected void getAllDescendantKBArticles(
 		List<KBArticle> kbArticles, long resourcePrimKey, int status,
 		OrderByComparator<KBArticle> orderByComparator) {
 
@@ -1736,13 +1573,13 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		for (KBArticle curKBArticle : curKBArticles) {
 			kbArticles.add(curKBArticle);
 
-			_getAllDescendantKBArticles(
+			getAllDescendantKBArticles(
 				kbArticles, curKBArticle.getResourcePrimKey(), status,
 				orderByComparator);
 		}
 	}
 
-	private List<KBArticle> _getAllDescendantKBArticles(
+	protected List<KBArticle> getAllDescendantKBArticles(
 		long resourcePrimKey, int status,
 		OrderByComparator<KBArticle> orderByComparator,
 		boolean includeParentArticle) {
@@ -1759,46 +1596,26 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			kbArticles = new ArrayList<>();
 		}
 
-		_getAllDescendantKBArticles(
+		getAllDescendantKBArticles(
 			kbArticles, resourcePrimKey, status, orderByComparator);
 
 		return Collections.unmodifiableList(kbArticles);
 	}
 
-	private String _getBody(
-		String action,
-		KBGroupServiceConfiguration kbGroupServiceConfiguration) {
-
-		if (Objects.equals(action, Constants.ADD)) {
-			return kbGroupServiceConfiguration.emailKBArticleAddedBody();
-		}
-
-		if (Objects.equals(action, Constants.EXPIRE)) {
-			return kbGroupServiceConfiguration.emailKBArticleExpiredBody();
-		}
-
-		if (Objects.equals(action, _NOTIFICATION_ACTION_REVIEW)) {
-			return kbGroupServiceConfiguration.emailKBArticleReviewBody();
-		}
-
-		return kbGroupServiceConfiguration.emailKBArticleUpdatedBody();
-	}
-
-	private Map<String, String> _getEmailKBArticleDiffs(KBArticle kbArticle) {
+	protected Map<String, String> getEmailKBArticleDiffs(KBArticle kbArticle) {
 		Map<String, String> emailKBArticleDiffs = new HashMap<>();
 
 		for (String param : new String[] {"content", "title"}) {
-			String value = _beanProperties.getString(kbArticle, param);
+			String value = BeanPropertiesUtil.getString(kbArticle, param);
 
 			try {
 				value = KBArticleDiffUtil.getKBArticleDiff(
 					version -> getKBArticle(
 						kbArticle.getResourcePrimKey(), version),
-					kbArticle.getVersion() - 1, kbArticle.getVersion(), param,
-					_diffHtml);
+					kbArticle.getVersion() - 1, kbArticle.getVersion(), param);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 
 			emailKBArticleDiffs.put(param, value);
@@ -1807,87 +1624,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return emailKBArticleDiffs;
 	}
 
-	private long _getKBArticleCheckInterval() {
-		return _kbServiceConfiguration.checkInterval();
-	}
-
-	private List<KBArticle> _getKBArticlesByCompanyIdAndExpirationDate(
-		long companyId, Date expirationDate) {
-
-		return kbArticlePersistence.dslQuery(
-			DSLQueryFactoryUtil.select(
-				KBArticleTable.INSTANCE
-			).from(
-				KBArticleTable.INSTANCE
-			).where(
-				KBArticleTable.INSTANCE.companyId.eq(
-					companyId
-				).and(
-					KBArticleTable.INSTANCE.expirationDate.lte(expirationDate)
-				).and(
-					KBArticleTable.INSTANCE.latest.eq(Boolean.TRUE)
-				).and(
-					KBArticleTable.INSTANCE.status.neq(
-						WorkflowConstants.STATUS_DRAFT)
-				).and(
-					KBArticleTable.INSTANCE.status.neq(
-						WorkflowConstants.STATUS_EXPIRED)
-				)
-			));
-	}
-
-	private List<KBArticle> _getKBArticlesByCompanyIdAndReviewDate(
-		long companyId, Date reviewDateGT, Date reviewDateLTE) {
-
-		return kbArticlePersistence.dslQuery(
-			DSLQueryFactoryUtil.select(
-				KBArticleTable.INSTANCE
-			).from(
-				KBArticleTable.INSTANCE
-			).where(
-				KBArticleTable.INSTANCE.companyId.eq(
-					companyId
-				).and(
-					KBArticleTable.INSTANCE.latest.eq(Boolean.TRUE)
-				).and(
-					KBArticleTable.INSTANCE.reviewDate.gt(reviewDateGT)
-				).and(
-					KBArticleTable.INSTANCE.reviewDate.lte(reviewDateLTE)
-				)
-			));
-	}
-
-	private String _getKBArticleURL(KBArticle kbArticle)
-		throws PortalException {
-
-		String controlPanelFullURL = _portal.getControlPanelFullURL(
-			kbArticle.getGroupId(), KBPortletKeys.KNOWLEDGE_BASE_ADMIN, null);
-		String namespace = _portal.getPortletNamespace(
-			KBPortletKeys.KNOWLEDGE_BASE_ADMIN);
-
-		String kbArticleURL = HttpComponentsUtil.addParameter(
-			controlPanelFullURL, namespace + "mvcRenderCommandName",
-			"/knowledge_base/view_kb_article");
-
-		kbArticleURL = HttpComponentsUtil.addParameter(
-			kbArticleURL, namespace + "redirect",
-			HttpComponentsUtil.addParameter(
-				controlPanelFullURL, namespace + "mvcRenderCommandName",
-				"/knowledge_base/view"));
-		kbArticleURL = HttpComponentsUtil.addParameter(
-			kbArticleURL, namespace + "resourceClassNameId",
-			kbArticle.getClassNameId());
-		kbArticleURL = HttpComponentsUtil.addParameter(
-			kbArticleURL, namespace + "resourcePrimKey",
-			kbArticle.getResourcePrimKey());
-		kbArticleURL = HttpComponentsUtil.addParameter(
-			kbArticleURL, namespace + "selectedItemId",
-			kbArticle.getResourcePrimKey());
-
-		return kbArticleURL;
-	}
-
-	private KBGroupServiceConfiguration _getKBGroupServiceConfiguration(
+	protected KBGroupServiceConfiguration getKBGroupServiceConfiguration(
 			long groupId)
 		throws ConfigurationException {
 
@@ -1896,27 +1633,11 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			new GroupServiceSettingsLocator(groupId, KBConstants.SERVICE_NAME));
 	}
 
-	private int _getNotificationType(String action) {
-		if (Objects.equals(action, Constants.ADD)) {
-			return UserNotificationDefinition.NOTIFICATION_TYPE_ADD_ENTRY;
-		}
-
-		if (Objects.equals(action, Constants.EXPIRE)) {
-			return UserNotificationDefinition.NOTIFICATION_TYPE_EXPIRED_ENTRY;
-		}
-
-		if (Objects.equals(action, _NOTIFICATION_ACTION_REVIEW)) {
-			return UserNotificationDefinition.NOTIFICATION_TYPE_REVIEW_ENTRY;
-		}
-
-		return UserNotificationDefinition.NOTIFICATION_TYPE_UPDATE_ENTRY;
-	}
-
-	private double _getPriority(long groupId, long parentResourcePrimKey)
+	protected double getPriority(long groupId, long parentResourcePrimKey)
 		throws PortalException {
 
 		KBGroupServiceConfiguration kbGroupServiceConfiguration =
-			_getKBGroupServiceConfiguration(groupId);
+			getKBGroupServiceConfiguration(groupId);
 
 		if (!kbGroupServiceConfiguration.articleIncrementPriorityEnabled()) {
 			return KBArticleConstants.DEFAULT_VERSION;
@@ -1935,7 +1656,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return Math.floor(kbArticle.getPriority()) + 1;
 	}
 
-	private long _getRootResourcePrimKey(
+	protected long getRootResourcePrimKey(
 			long resourcePrimKey, long parentResourceClassNameId,
 			long parentResourcePrimKey)
 		throws PortalException {
@@ -1959,41 +1680,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return resourcePrimKey;
 	}
 
-	private ServiceContext _getServiceContext(
-			Company company, KBArticle kbArticle)
-		throws PortalException {
-
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setPlid(LayoutConstants.DEFAULT_PLID);
-		serviceContext.setPortalURL(
-			company.getPortalURL(kbArticle.getGroupId()));
-		serviceContext.setPortletId(KBPortletKeys.KNOWLEDGE_BASE_ADMIN);
-		serviceContext.setScopeGroupId(kbArticle.getGroupId());
-
-		return serviceContext;
-	}
-
-	private String _getSubject(
-		String action,
-		KBGroupServiceConfiguration kbGroupServiceConfiguration) {
-
-		if (Objects.equals(action, Constants.ADD)) {
-			return kbGroupServiceConfiguration.emailKBArticleAddedSubject();
-		}
-
-		if (Objects.equals(action, Constants.EXPIRE)) {
-			return kbGroupServiceConfiguration.emailKBArticleExpiredSubject();
-		}
-
-		if (Objects.equals(action, _NOTIFICATION_ACTION_REVIEW)) {
-			return kbGroupServiceConfiguration.emailKBArticleReviewSubject();
-		}
-
-		return kbGroupServiceConfiguration.emailKBArticleUpdatedSubject();
-	}
-
-	private String _getUniqueUrlTitle(
+	protected String getUniqueUrlTitle(
 			long groupId, long kbFolderId, long kbArticleId, String title)
 		throws PortalException {
 
@@ -2006,7 +1693,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				groupId, kbFolderId, uniqueUrlTitle, _STATUSES);
 
 			for (int i = 1; kbArticlesCount > 0; i++) {
-				uniqueUrlTitle = _getUniqueUrlTitle(urlTitle, i);
+				uniqueUrlTitle = getUniqueUrlTitle(urlTitle, i);
 
 				kbArticlesCount = kbArticlePersistence.countByG_KBFI_UT_ST(
 					groupId, kbFolderId, uniqueUrlTitle, _STATUSES);
@@ -2015,13 +1702,13 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			return uniqueUrlTitle;
 		}
 
-		KBFolder kbFolder = _kbFolderPersistence.findByPrimaryKey(kbFolderId);
+		KBFolder kbFolder = kbFolderPersistence.findByPrimaryKey(kbFolderId);
 
 		int kbArticlesCount = kbArticleFinder.countByUrlTitle(
 			groupId, kbFolder.getUrlTitle(), uniqueUrlTitle, _STATUSES);
 
 		for (int i = 1; kbArticlesCount > 0; i++) {
-			uniqueUrlTitle = _getUniqueUrlTitle(urlTitle, i);
+			uniqueUrlTitle = getUniqueUrlTitle(urlTitle, i);
 
 			kbArticlesCount = kbArticleFinder.countByUrlTitle(
 				groupId, kbFolder.getUrlTitle(), uniqueUrlTitle, _STATUSES);
@@ -2030,28 +1717,29 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return uniqueUrlTitle;
 	}
 
-	private String _getUniqueUrlTitle(
+	protected String getUniqueUrlTitle(
 			long groupId, long kbFolderId, long kbArticleId, String title,
 			String urlTitle)
 		throws PortalException {
 
 		if (Validator.isNull(urlTitle)) {
-			return _getUniqueUrlTitle(groupId, kbFolderId, kbArticleId, title);
+			return getUniqueUrlTitle(groupId, kbFolderId, kbArticleId, title);
 		}
 
 		return urlTitle.substring(1);
 	}
 
-	private String _getUniqueUrlTitle(String urlTitle, int suffix) {
+	protected String getUniqueUrlTitle(String urlTitle, int suffix) {
 		String uniqueUrlTitle = urlTitle + StringPool.DASH + suffix;
 
+		int maxLength = ModelHintsUtil.getMaxLength(
+			KBArticle.class.getName(), "urlTitle");
+
 		return StringUtil.shorten(
-			uniqueUrlTitle,
-			ModelHintsUtil.getMaxLength(KBArticle.class.getName(), "urlTitle"),
-			StringPool.DASH + suffix);
+			uniqueUrlTitle, maxLength, StringPool.DASH + suffix);
 	}
 
-	private void _indexKBArticle(KBArticle kbArticle) {
+	protected void indexKBArticle(KBArticle kbArticle) {
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
 				Indexer<KBArticle> indexer = _indexerRegistry.getIndexer(
@@ -2063,7 +1751,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			});
 	}
 
-	private String _normalizeUrlTitle(String urlTitle) {
+	protected String normalizeUrlTitle(String urlTitle) {
 		if (Validator.isNull(urlTitle)) {
 			return null;
 		}
@@ -2075,42 +1763,30 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		return StringPool.SLASH + urlTitle;
 	}
 
-	private void _notify(
-			Set<String> receivers, long userId, KBArticle kbArticle,
-			String action, ServiceContext serviceContext)
+	protected void notifySubscribers(
+			long userId, KBArticle kbArticle, ServiceContext serviceContext)
 		throws PortalException {
 
-		if (receivers.isEmpty()) {
+		if (Validator.isNull(serviceContext.getLayoutFullURL())) {
 			return;
 		}
 
 		KBGroupServiceConfiguration kbGroupServiceConfiguration =
-			_getKBGroupServiceConfiguration(kbArticle.getGroupId());
+			getKBGroupServiceConfiguration(kbArticle.getGroupId());
 
-		if (Objects.equals(action, Constants.ADD) &&
+		if (serviceContext.isCommandAdd() &&
 			!kbGroupServiceConfiguration.emailKBArticleAddedEnabled()) {
 
 			return;
 		}
 
-		if (Objects.equals(action, Constants.EXPIRE) &&
-			!kbGroupServiceConfiguration.emailKBArticleExpiredEnabled()) {
-
-			return;
-		}
-
-		if (Objects.equals(action, Constants.UPDATE) &&
+		if (serviceContext.isCommandUpdate() &&
 			!kbGroupServiceConfiguration.emailKBArticleUpdatedEnabled()) {
 
 			return;
 		}
 
-		if (Objects.equals(action, _NOTIFICATION_ACTION_REVIEW) &&
-			!kbGroupServiceConfiguration.emailKBArticleReviewEnabled()) {
-
-			return;
-		}
-
+		String fromName = kbGroupServiceConfiguration.emailFromName();
 		String fromAddress = kbGroupServiceConfiguration.emailFromAddress();
 
 		String kbArticleContent = StringUtil.replace(
@@ -2120,7 +1796,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				"src=\"" + serviceContext.getPortalURL() + "/"
 			});
 
-		Map<String, String> kbArticleDiffs = _getEmailKBArticleDiffs(kbArticle);
+		Map<String, String> kbArticleDiffs = getEmailKBArticleDiffs(kbArticle);
 
 		for (Map.Entry<String, String> entry : kbArticleDiffs.entrySet()) {
 			String value = StringUtil.replace(
@@ -2133,99 +1809,67 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			kbArticleDiffs.put(entry.getKey(), value);
 		}
 
+		String subject = null;
+		String body = null;
+
+		if (serviceContext.isCommandAdd()) {
+			subject = kbGroupServiceConfiguration.emailKBArticleAddedSubject();
+			body = kbGroupServiceConfiguration.emailKBArticleAddedBody();
+		}
+		else {
+			subject =
+				kbGroupServiceConfiguration.emailKBArticleUpdatedSubject();
+			body = kbGroupServiceConfiguration.emailKBArticleUpdatedBody();
+		}
+
 		SubscriptionSender subscriptionSender =
 			AdminSubscriptionSenderFactory.createSubscriptionSender(
 				kbArticle, serviceContext);
 
-		subscriptionSender.setBody(
-			_getBody(action, kbGroupServiceConfiguration));
-		subscriptionSender.setClassName(kbArticle.getModelClassName());
-		subscriptionSender.setClassPK(kbArticle.getClassPK());
+		subscriptionSender.setBody(body);
 		subscriptionSender.setCompanyId(kbArticle.getCompanyId());
 		subscriptionSender.setContextAttribute(
 			"[$ARTICLE_CONTENT$]", kbArticleContent, false);
 		subscriptionSender.setContextAttribute(
 			"[$ARTICLE_CONTENT_DIFF$]", kbArticleDiffs.get("content"), false);
 		subscriptionSender.setContextAttribute(
+			"[$ARTICLE_TITLE$]", kbArticle.getTitle(), false);
+		subscriptionSender.setContextAttribute(
 			"[$ARTICLE_TITLE_DIFF$]", kbArticleDiffs.get("title"), false);
 		subscriptionSender.setContextCreatorUserPrefix("ARTICLE");
 		subscriptionSender.setCreatorUserId(kbArticle.getUserId());
 		subscriptionSender.setCurrentUserId(userId);
-		subscriptionSender.setEntryTitle(kbArticle.getTitle());
-		subscriptionSender.setEntryURL(_getKBArticleURL(kbArticle));
-		subscriptionSender.setFrom(
-			fromAddress, kbGroupServiceConfiguration.emailFromName());
+		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
 		subscriptionSender.setMailId("kb_article", kbArticle.getKbArticleId());
-		subscriptionSender.setNotificationType(_getNotificationType(action));
 		subscriptionSender.setPortletId(serviceContext.getPortletId());
 		subscriptionSender.setReplyToAddress(fromAddress);
 		subscriptionSender.setScopeGroupId(kbArticle.getGroupId());
-		subscriptionSender.setSubject(
-			_getSubject(action, kbGroupServiceConfiguration));
+		subscriptionSender.setSubject(subject);
 
-		if (receivers.contains(_NOTIFICATION_RECEIVER_SUBSCRIBER)) {
-			subscriptionSender.addAssetEntryPersistedSubscribers(
-				KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+		subscriptionSender.addAssetEntryPersistedSubscribers(
+			KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+		subscriptionSender.addPersistedSubscribers(
+			KBArticle.class.getName(), kbArticle.getGroupId());
+		subscriptionSender.addPersistedSubscribers(
+			KBArticle.class.getName(), kbArticle.getResourcePrimKey());
+
+		while (!kbArticle.isRoot() &&
+			   (kbArticle.getClassNameId() ==
+				   kbArticle.getParentResourceClassNameId())) {
+
+			kbArticle = getLatestKBArticle(
+				kbArticle.getParentResourcePrimKey(),
+				WorkflowConstants.STATUS_APPROVED);
+
 			subscriptionSender.addPersistedSubscribers(
-				KBArticle.class.getName(), kbArticle.getGroupId());
-			subscriptionSender.addPersistedSubscribers(
 				KBArticle.class.getName(), kbArticle.getResourcePrimKey());
-
-			KBArticle parentKBArticle = kbArticle.getParentKBArticle();
-
-			while (parentKBArticle != null) {
-				subscriptionSender.addPersistedSubscribers(
-					KBArticle.class.getName(),
-					parentKBArticle.getResourcePrimKey());
-
-				parentKBArticle = parentKBArticle.getParentKBArticle();
-			}
-		}
-
-		if (receivers.contains(_NOTIFICATION_RECEIVER_OWNER)) {
-			User user = _userLocalService.fetchUser(kbArticle.getUserId());
-
-			if ((user == null) || !user.isActive()) {
-				user = _userLocalService.fetchUser(userId);
-			}
-
-			subscriptionSender.addRuntimeSubscribers(
-				user.getEmailAddress(), user.getFullName());
 		}
 
 		subscriptionSender.flushNotificationsAsync();
 	}
 
-	private void _notifyReviewKBArticlesByCompany(
-			Company company, Date reviewDate)
-		throws PortalException {
-
-		long userId = _userLocalService.getGuestUserId(company.getCompanyId());
-
-		List<KBArticle> kbArticles = _getKBArticlesByCompanyIdAndReviewDate(
-			company.getCompanyId(), _dates.get(company.getCompanyId()),
-			reviewDate);
-
-		for (KBArticle kbArticle : kbArticles) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					StringBundler.concat(
-						"Sending review notification for article ",
-						kbArticle.getKbArticleId(), " with reviewDate ",
-						kbArticle.getReviewDate()));
-			}
-
-			_notify(
-				SetUtil.fromArray(
-					_NOTIFICATION_RECEIVER_OWNER,
-					_NOTIFICATION_RECEIVER_SUBSCRIBER),
-				userId, kbArticle, _NOTIFICATION_ACTION_REVIEW,
-				_getServiceContext(company, kbArticle));
-		}
-	}
-
-	private void _removeKBArticleAttachments(long[] removeFileEntryIds)
+	protected void removeKBArticleAttachments(long[] removeFileEntryIds)
 		throws PortalException {
 
 		if (ArrayUtil.isEmpty(removeFileEntryIds)) {
@@ -2237,50 +1881,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private void _startWorkflowInstance(
-			long userId, KBArticle kbArticle, ServiceContext serviceContext)
-		throws PortalException {
-
-		WorkflowHandlerRegistryUtil.startWorkflowInstance(
-			kbArticle.getCompanyId(), kbArticle.getGroupId(), userId,
-			KBArticle.class.getName(), kbArticle.getResourcePrimKey(),
-			kbArticle, serviceContext, Collections.emptyMap());
-	}
-
-	private void _updateKBArticleAsset(
-			long userId, KBArticle kbArticle, long[] assetCategoryIds,
-			String[] assetTagNames, long[] assetLinkEntryIds, int status)
-		throws PortalException {
-
-		boolean visible = false;
-
-		if (kbArticle.isApproved()) {
-			visible = true;
-		}
-
-		String summary = _htmlParser.extractText(
-			StringUtil.shorten(kbArticle.getContent(), 500));
-
-		long classPK = kbArticle.getClassPK();
-
-		if (status == WorkflowConstants.STATUS_EXPIRED) {
-			classPK = kbArticle.getResourcePrimKey();
-		}
-
-		AssetEntry assetEntry = _assetEntryLocalService.updateEntry(
-			userId, kbArticle.getGroupId(), kbArticle.getCreateDate(),
-			kbArticle.getModifiedDate(), KBArticle.class.getName(), classPK,
-			kbArticle.getUuid(), 0, assetCategoryIds, assetTagNames, true,
-			visible, null, null, null, kbArticle.getExpirationDate(),
-			ContentTypes.TEXT_HTML, kbArticle.getTitle(),
-			kbArticle.getDescription(), summary, null, null, 0, 0, null);
-
-		_assetLinkLocalService.updateLinks(
-			userId, assetEntry.getEntryId(), assetLinkEntryIds,
-			AssetLinkConstants.TYPE_RELATED);
-	}
-
-	private void _updatePermissionFields(
+	protected void updatePermissionFields(
 			long resourcePrimKey, long parentResourceClassNameId,
 			long parentResourcePrimKey)
 		throws PortalException {
@@ -2292,7 +1893,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			return;
 		}
 
-		long rootResourcePrimKey = _getRootResourcePrimKey(
+		long rootResourcePrimKey = getRootResourcePrimKey(
 			resourcePrimKey, parentResourceClassNameId, parentResourcePrimKey);
 
 		if (kbArticle.getRootResourcePrimKey() == rootResourcePrimKey) {
@@ -2323,9 +1924,14 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			KBArticle.class.getName(), String.valueOf(resourcePrimKey));
 	}
 
-	private void _validate(
-			Date expirationDate, String content, Date reviewDate,
-			String sourceURL, String title)
+	protected void validate(double priority) throws PortalException {
+		if (priority <= 0) {
+			throw new KBArticlePriorityException(
+				"Invalid priority " + priority);
+		}
+	}
+
+	protected void validate(String title, String content, String sourceURL)
 		throws PortalException {
 
 		if (Validator.isNull(title)) {
@@ -2336,59 +1942,15 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 			throw new KBArticleContentException("Content is null");
 		}
 
-		_validateExpirationReviewDate(expirationDate, reviewDate);
-		_validateSourceURL(sourceURL);
+		validateSourceURL(sourceURL);
 	}
 
-	private void _validate(double priority) throws PortalException {
-		if (priority <= 0) {
-			throw new KBArticlePriorityException(
-				"Invalid priority " + priority);
-		}
-	}
-
-	private void _validateExpirationReviewDate(
-			Date expirationDate, Date reviewDate)
-		throws PortalException {
-
-		Date now = new Date();
-
-		if ((expirationDate != null) && expirationDate.before(now)) {
-			throw new KBArticleExpirationDateException(
-				"Expiration date " + expirationDate + " is in the past");
-		}
-
-		if ((reviewDate != null) && reviewDate.before(now)) {
-			throw new KBArticleReviewDateException(
-				"Review date is " + reviewDate + " in the past");
-		}
-	}
-
-	private void _validateExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		if (Validator.isNull(externalReferenceCode)) {
-			return;
-		}
-
-		KBArticle kbArticle = fetchLatestKBArticleByExternalReferenceCode(
-			groupId, externalReferenceCode);
-
-		if (kbArticle != null) {
-			throw new DuplicateKBArticleExternalReferenceCodeException(
-				StringBundler.concat(
-					"Duplicate knowledge base article external reference code ",
-					externalReferenceCode, " in group ", groupId));
-		}
-	}
-
-	private void _validateParent(
+	protected void validateParent(
 			KBArticle kbArticle, long parentResourceClassNameId,
 			long parentResourcePrimKey)
 		throws PortalException {
 
-		_validateParent(parentResourceClassNameId, parentResourcePrimKey);
+		validateParent(parentResourceClassNameId, parentResourcePrimKey);
 
 		long kbArticleClassNameId = _classNameLocalService.getClassNameId(
 			KBArticleConstants.getClassName());
@@ -2413,7 +1975,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private void _validateParent(long resourceClassNameId, long resourcePrimKey)
+	protected void validateParent(
+			long resourceClassNameId, long resourcePrimKey)
 		throws PortalException {
 
 		long kbArticleClassNameId = _classNameLocalService.getClassNameId(
@@ -2432,7 +1995,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private void _validateParentStatus(
+	protected void validateParentStatus(
 			long parentResourceClassNameId, long parentResourcePrimKey,
 			int status)
 		throws PortalException {
@@ -2454,7 +2017,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private void _validateSourceURL(String sourceURL) throws PortalException {
+	protected void validateSourceURL(String sourceURL) throws PortalException {
 		if (Validator.isNull(sourceURL)) {
 			return;
 		}
@@ -2464,7 +2027,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private void _validateUrlTitle(
+	protected void validateUrlTitle(
 			long groupId, long kbFolderId, String urlTitle)
 		throws PortalException {
 
@@ -2493,12 +2056,20 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		}
 	}
 
-	private static final String _NOTIFICATION_ACTION_REVIEW = "review";
+	private void _validateExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
 
-	private static final String _NOTIFICATION_RECEIVER_OWNER = "owner";
+		KBArticle kbArticle = fetchLatestKBArticleByExternalReferenceCode(
+			groupId, externalReferenceCode);
 
-	private static final String _NOTIFICATION_RECEIVER_SUBSCRIBER =
-		"subscriber";
+		if (kbArticle != null) {
+			throw new DuplicateKBArticleExternalReferenceCodeException(
+				StringBundler.concat(
+					"Duplicate knowledge base article external reference code ",
+					externalReferenceCode, " in group ", groupId));
+		}
+	}
 
 	private static final int[] _STATUSES = {
 		WorkflowConstants.STATUS_APPROVED, WorkflowConstants.STATUS_PENDING
@@ -2514,21 +2085,10 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	private AssetLinkLocalService _assetLinkLocalService;
 
 	@Reference
-	private BeanProperties _beanProperties;
-
-	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
-	private CompanyLocalService _companyLocalService;
-
-	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	private final Map<Long, Date> _dates = new ConcurrentHashMap<>();
-
-	@Reference
-	private DiffHtml _diffHtml;
 
 	@Reference
 	private DLURLHelper _dlURLHelper;
@@ -2540,9 +2100,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private HtmlParser _htmlParser;
-
-	@Reference
 	private IndexerRegistry _indexerRegistry;
 
 	@Reference
@@ -2550,17 +2107,6 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 
 	@Reference
 	private KBArchiveFactory _kbArchiveFactory;
-
-	@Reference
-	private KBCommentPersistence _kbCommentPersistence;
-
-	@Reference
-	private KBFolderPersistence _kbFolderPersistence;
-
-	private KBServiceConfiguration _kbServiceConfiguration;
-
-	@Reference
-	private MarkdownConverterFactory _markdownConverterFactory;
 
 	@Reference
 	private Portal _portal;
@@ -2572,16 +2118,10 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	private RatingsStatsLocalService _ratingsStatsLocalService;
 
 	@Reference
-	private ResourceLocalService _resourceLocalService;
-
-	@Reference
 	private SocialActivityLocalService _socialActivityLocalService;
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
 
 	@Reference
 	private ViewCountManager _viewCountManager;

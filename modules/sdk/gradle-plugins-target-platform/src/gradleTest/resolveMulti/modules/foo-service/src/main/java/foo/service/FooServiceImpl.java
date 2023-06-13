@@ -21,7 +21,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Liferay
  */
-@Component(service = FooService.class)
+@Component(immediate = true, service = FooService.class)
 public class FooServiceImpl implements FooService {
 
 	@Override

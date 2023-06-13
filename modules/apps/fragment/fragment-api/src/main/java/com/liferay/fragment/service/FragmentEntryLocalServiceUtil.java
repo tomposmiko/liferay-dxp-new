@@ -61,16 +61,42 @@ public class FragmentEntryLocalServiceUtil {
 
 	public static FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
+			String fragmentEntryKey, String name, long previewFileEntryId,
+			int type, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addFragmentEntry(
+			userId, groupId, fragmentCollectionId, fragmentEntryKey, name,
+			previewFileEntryId, type, status, serviceContext);
+	}
+
+	public static FragmentEntry addFragmentEntry(
+			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
-			String js, boolean cacheable, String configuration, String icon,
-			long previewFileEntryId, int type, String typeOptions, int status,
+			String js, boolean cacheable, String configuration,
+			long previewFileEntryId, int type, int status,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addFragmentEntry(
 			userId, groupId, fragmentCollectionId, fragmentEntryKey, name, css,
-			html, js, cacheable, configuration, icon, previewFileEntryId, type,
-			typeOptions, status, serviceContext);
+			html, js, cacheable, configuration, previewFileEntryId, type,
+			status, serviceContext);
+	}
+
+	public static FragmentEntry addFragmentEntry(
+			long userId, long groupId, long fragmentCollectionId,
+			String fragmentEntryKey, String name, String css, String html,
+			String js, String configuration, long previewFileEntryId, int type,
+			int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addFragmentEntry(
+			userId, groupId, fragmentCollectionId, fragmentEntryKey, name, css,
+			html, js, configuration, previewFileEntryId, type, status,
+			serviceContext);
 	}
 
 	public static FragmentEntry checkout(
@@ -81,13 +107,13 @@ public class FragmentEntryLocalServiceUtil {
 	}
 
 	public static FragmentEntry copyFragmentEntry(
-			long userId, long groupId, long sourceFragmentEntryId,
+			long userId, long groupId, long fragmentEntryId,
 			long fragmentCollectionId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyFragmentEntry(
-			userId, groupId, sourceFragmentEntryId, fragmentCollectionId,
+			userId, groupId, fragmentEntryId, fragmentCollectionId,
 			serviceContext);
 	}
 
@@ -518,7 +544,7 @@ public class FragmentEntryLocalServiceUtil {
 	 * <strong>Important:</strong> Inspect FragmentEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftFragmentEntry the fragment entry
+	 * @param fragmentEntry the fragment entry
 	 * @return the fragment entry that was updated
 	 * @throws PortalException
 	 */
@@ -527,13 +553,6 @@ public class FragmentEntryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().updateFragmentEntry(draftFragmentEntry);
-	}
-
-	public static FragmentEntry updateFragmentEntry(
-			long fragmentEntryId, boolean cacheable)
-		throws PortalException {
-
-		return getService().updateFragmentEntry(fragmentEntryId, cacheable);
 	}
 
 	public static FragmentEntry updateFragmentEntry(
@@ -547,26 +566,49 @@ public class FragmentEntryLocalServiceUtil {
 	public static FragmentEntry updateFragmentEntry(
 			long userId, long fragmentEntryId, long fragmentCollectionId,
 			String name, String css, String html, String js, boolean cacheable,
-			String configuration, String icon, long previewFileEntryId,
-			int status)
+			String configuration, long previewFileEntryId, int status)
 		throws PortalException {
 
 		return getService().updateFragmentEntry(
 			userId, fragmentEntryId, fragmentCollectionId, name, css, html, js,
-			cacheable, configuration, icon, previewFileEntryId, status);
+			cacheable, configuration, previewFileEntryId, status);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateFragmentEntry(long, long, long, String, String, String, String, boolean, String, long, int)}
+	 */
+	@Deprecated
+	public static FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, boolean cacheable, String configuration,
+			long previewFileEntryId, int status)
+		throws PortalException {
+
+		return getService().updateFragmentEntry(
+			userId, fragmentEntryId, name, css, html, js, cacheable,
+			configuration, previewFileEntryId, status);
 	}
 
 	public static FragmentEntry updateFragmentEntry(
-			long userId, long fragmentEntryId, long fragmentCollectionId,
-			String name, String css, String html, String js, boolean cacheable,
-			String configuration, String icon, long previewFileEntryId,
-			String typeOptions, int status)
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, String configuration, int status)
 		throws PortalException {
 
 		return getService().updateFragmentEntry(
-			userId, fragmentEntryId, fragmentCollectionId, name, css, html, js,
-			cacheable, configuration, icon, previewFileEntryId, typeOptions,
+			userId, fragmentEntryId, name, css, html, js, configuration,
 			status);
+	}
+
+	public static FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, String name, String css,
+			String html, String js, String configuration,
+			long previewFileEntryId, int status)
+		throws PortalException {
+
+		return getService().updateFragmentEntry(
+			userId, fragmentEntryId, name, css, html, js, configuration,
+			previewFileEntryId, status);
 	}
 
 	public static FragmentEntry updateFragmentEntry(

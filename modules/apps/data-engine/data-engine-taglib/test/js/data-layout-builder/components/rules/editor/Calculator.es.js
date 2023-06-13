@@ -175,7 +175,7 @@ describe('Calculator', () => {
 	});
 
 	describe('clicking the Sum function', () => {
-		it("don't disable functions, numbers and operators", () => {
+		it('disables functions, numbers and operators', () => {
 			const {getByText} = render(
 				<Calculator
 					{...defaultProps()}
@@ -190,25 +190,20 @@ describe('Calculator', () => {
 			const symbolsArray = SIGNALS.concat(PARENTHESIS).concat(DOT);
 
 			for (let i = 0; i < 1; i++) {
-				expect(getByText(i.toString()).disabled).toBe(false);
+				expect(getByText(i.toString()).disabled).toBe(true);
 			}
 
 			symbolsArray.forEach((symbol) => {
-				if (symbol === DOT.toString()) {
-					expect(getByText(symbol).disabled).toBe(true);
-				}
-				else {
-					expect(getByText(symbol).disabled).toBe(false);
-				}
+				expect(getByText(symbol).disabled).toBe(true);
 			});
 
 			expect(
 				document.querySelector('.calculator-add-operator-button-area')
 					.disabled
-			).toBe(false);
+			).toBe(true);
 		});
 
-		it("don't disable the add field button when there are repeatable fields ", () => {
+		it('enables the add field button when there are repeatable fields ', () => {
 			const {getByText} = render(
 				<Calculator
 					{...defaultProps()}
@@ -222,7 +217,7 @@ describe('Calculator', () => {
 			expect(getByText('add-field').disabled).toBe(false);
 		});
 
-		it("don't disable the add field button when there are no repeatable fields ", () => {
+		it('disables the add field button when there are no repeatable fields ', () => {
 			const {getByText} = render(
 				<Calculator
 					{...defaultProps(fieldsNonRepeatable)}
@@ -233,7 +228,7 @@ describe('Calculator', () => {
 			);
 
 			fireEvent.click(getByText('sum'));
-			expect(getByText('add-field').disabled).toBe(false);
+			expect(getByText('add-field').disabled).toBe(true);
 		});
 	});
 

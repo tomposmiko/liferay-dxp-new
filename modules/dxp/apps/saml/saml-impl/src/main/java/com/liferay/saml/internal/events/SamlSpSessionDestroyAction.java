@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  */
 @Component(
+	immediate = true,
 	property = "key=" + PropsKeys.SERVLET_SESSION_DESTROY_EVENTS,
 	service = LifecycleAction.class
 )
@@ -56,7 +57,7 @@ public class SamlSpSessionDestroyAction extends SessionAction {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -69,14 +70,14 @@ public class SamlSpSessionDestroyAction extends SessionAction {
 		CompanyThreadLocal.setCompanyId(userCompanyId);
 
 		try {
-			_run(httpSession);
+			doRun(httpSession);
 		}
 		finally {
 			CompanyThreadLocal.setCompanyId(companyId);
 		}
 	}
 
-	private void _run(HttpSession httpSession) throws ActionException {
+	protected void doRun(HttpSession httpSession) throws ActionException {
 		if (!_samlProviderConfigurationHelper.isEnabled() ||
 			!_samlProviderConfigurationHelper.isRoleSp()) {
 
@@ -103,7 +104,7 @@ public class SamlSpSessionDestroyAction extends SessionAction {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 	}

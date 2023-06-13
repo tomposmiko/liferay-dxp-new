@@ -27,6 +27,4 @@ public interface ActionExecutorManager {
 			KaleoAction kaleoAction, ExecutionContext executionContext)
 		throws PortalException;
 
-	public String[] getFunctionActionExecutorKeys();
-
 }

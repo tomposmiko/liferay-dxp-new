@@ -19,7 +19,13 @@ package com.liferay.commerce.avalara.connector.constants;
  */
 public class CommerceAvalaraConstants {
 
-	public static final String CP_TAX_CATEGORY_ERC_TANGIBLE_PERSONAL_PROPERTY =
-		"P0000000";
+	public static final String APP_MACHINE = "LiferayCommerceAvalaraConnector";
+
+	public static final String APP_VERSION = "1.0";
+
+	public static final String MACHINE_NAME = "Liferay";
+
+	public static final String SERVICE_NAME =
+		"com.liferay.commerce.avalara.connector";
 
 }

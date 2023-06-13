@@ -80,15 +80,15 @@ public class DeleteStyleBookEntryPreviewMVCActionCommandTest {
 		styleBookEntry = _styleBookEntryLocalService.updatePreviewFileEntryId(
 			styleBookEntry.getStyleBookEntryId(), fileEntry.getFileEntryId());
 
-		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+		MockLiferayPortletActionRequest actionRequest =
 			new MockLiferayPortletActionRequest();
 
-		mockLiferayPortletActionRequest.addParameter(
+		actionRequest.addParameter(
 			"styleBookEntryId",
 			String.valueOf(styleBookEntry.getStyleBookEntryId()));
 
 		_deleteStyleBookEntryPreviewMVCActionCommandTest.processAction(
-			mockLiferayPortletActionRequest, new MockActionResponse());
+			actionRequest, new MockActionResponse());
 
 		PortletFileRepositoryUtil.getPortletFileEntry(
 			styleBookEntry.getPreviewFileEntryId());
@@ -107,7 +107,7 @@ public class DeleteStyleBookEntryPreviewMVCActionCommandTest {
 		Class<?> clazz = getClass();
 
 		return PortletFileRepositoryUtil.addPortletFileEntry(
-			null, _group.getGroupId(), TestPropsValues.getUserId(),
+			_group.getGroupId(), TestPropsValues.getUserId(),
 			StyleBookEntry.class.getName(),
 			styleBookEntry.getStyleBookEntryId(), RandomTestUtil.randomString(),
 			repository.getDlFolderId(),

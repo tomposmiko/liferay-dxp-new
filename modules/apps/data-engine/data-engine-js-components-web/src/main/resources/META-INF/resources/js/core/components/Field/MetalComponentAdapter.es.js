@@ -15,7 +15,6 @@
 import React, {useEffect, useRef} from 'react';
 
 import {EVENT_TYPES} from '../../actions/eventTypes.es';
-import {useConfig} from '../../hooks/useConfig.es';
 import {useForm} from '../../hooks/useForm.es';
 import {usePage} from '../../hooks/usePage.es';
 import MetalFieldAdapter from './MetalFieldAdapter.es';
@@ -32,23 +31,22 @@ class NoRender extends React.Component {
 	}
 }
 
-export function MetalComponentAdapter({
+export const MetalComponentAdapter = ({
 	onBlur,
 	onChange,
 	onFocus,
 	type,
 	...field
-}) {
-	const {activePage, editable, pageIndex} = usePage();
+}) => {
+	const {activePage, editable, pageIndex, spritemap} = usePage();
 	const dispatch = useForm();
-	const {spritemap} = useConfig();
 
-	const componentRef = useRef(null);
-	const containerRef = useRef(null);
+	const component = useRef(null);
+	const container = useRef(null);
 
 	useEffect(() => {
-		if (!componentRef.current && containerRef.current) {
-			componentRef.current = new MetalFieldAdapter(
+		if (!component.current && container.current) {
+			component.current = new MetalFieldAdapter(
 				{
 					activePage,
 					editable,
@@ -70,21 +68,21 @@ export function MetalComponentAdapter({
 					spritemap,
 					type,
 				},
-				containerRef.current
+				container.current
 			);
 		}
 
 		return () => {
-			if (componentRef.current) {
-				componentRef.current.dispose();
+			if (component.current) {
+				component.current.dispose();
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
-		if (componentRef.current) {
-			componentRef.current.setState({
+		if (component.current) {
+			component.current.setState({
 				activePage,
 				editable,
 				field,
@@ -95,5 +93,5 @@ export function MetalComponentAdapter({
 		}
 	}, [activePage, editable, onChange, pageIndex, spritemap, field]);
 
-	return <NoRender forwardRef={containerRef} />;
-}
+	return <NoRender forwardRef={container} />;
+};

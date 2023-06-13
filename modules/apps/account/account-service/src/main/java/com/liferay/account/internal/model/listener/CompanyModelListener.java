@@ -17,6 +17,7 @@ package com.liferay.account.internal.model.listener;
 import com.liferay.account.model.AccountGroup;
 import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountGroupLocalService;
+import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -31,11 +32,14 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Drew Brokke
  */
-@Component(service = ModelListener.class)
+@Component(immediate = true, service = ModelListener.class)
 public class CompanyModelListener extends BaseModelListener<Company> {
 
 	@Override
 	public void onAfterRemove(Company company) throws ModelListenerException {
+		_accountRoleLocalService.deleteAccountRolesByCompanyId(
+			company.getCompanyId());
+
 		try {
 			_deleteAccountGroups(company);
 		}
@@ -70,5 +74,8 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 
 	@Reference
 	private AccountGroupLocalService _accountGroupLocalService;
+
+	@Reference
+	private AccountRoleLocalService _accountRoleLocalService;
 
 }

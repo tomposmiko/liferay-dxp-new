@@ -27,30 +27,28 @@ import com.liferay.dynamic.data.mapping.util.DDMFormValuesToMapConverter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Leonardo Barros
  */
-@Component(service = DDMFormValuesToMapConverter.class)
+@Component(immediate = true, service = DDMFormValuesToMapConverter.class)
 public class DDMFormValuesToMapConverterImpl
 	implements DDMFormValuesToMapConverter {
 
@@ -76,13 +74,16 @@ public class DDMFormValuesToMapConverterImpl
 		Map<String, Object> values = new LinkedHashMap<>(
 			ddmFormFieldsMap.size());
 
-		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
-			if (!ddmFormFieldsMap.containsKey(ddmFormFieldValue.getName())) {
-				continue;
-			}
+		Stream<DDMFormFieldValue> ddmFormFieldValuesStream =
+			ddmFormFieldValues.stream();
 
-			_addValues(ddmFormFieldsMap, ddmFormFieldValue, values);
-		}
+		ddmFormFieldValuesStream.filter(
+			ddmFormFieldValue -> ddmFormFieldsMap.containsKey(
+				ddmFormFieldValue.getName())
+		).forEach(
+			ddmFormFieldValue -> _addValues(
+				ddmFormFieldsMap, ddmFormFieldValue, values)
+		);
 
 		return values;
 	}
@@ -104,8 +105,7 @@ public class DDMFormValuesToMapConverterImpl
 		if (ddmFormField.isLocalizable()) {
 			values.put(
 				"value",
-				_toLocalizedMap(
-					ddmFormField.getType(), _getLocalizedValue(value)));
+				_toLocalizedMap(ddmFormField.getType(), (LocalizedValue)value));
 		}
 		else {
 			values.put("value", value.getString(value.getDefaultLocale()));
@@ -116,17 +116,17 @@ public class DDMFormValuesToMapConverterImpl
 		Map<String, DDMFormField> ddmFormFieldsMap,
 		DDMFormFieldValue ddmFormFieldValue, Map<String, Object> values) {
 
+		Map<String, Object> fieldInstanceValue =
+			(Map<String, Object>)values.computeIfAbsent(
+				_getDDMFormFieldValueInstanceKey(ddmFormFieldValue),
+				k -> new LinkedHashMap<>());
+
 		DDMFormField ddmFormField = ddmFormFieldsMap.get(
 			ddmFormFieldValue.getName());
 
 		if (ddmFormField == null) {
 			return;
 		}
-
-		Map<String, Object> fieldInstanceValue =
-			(Map<String, Object>)values.computeIfAbsent(
-				_getDDMFormFieldValueInstanceKey(ddmFormFieldValue),
-				k -> new LinkedHashMap<>());
 
 		if (!Objects.equals(ddmFormField.getType(), "fieldset")) {
 			_addValue(ddmFormField, ddmFormFieldValue, fieldInstanceValue);
@@ -157,45 +157,27 @@ public class DDMFormValuesToMapConverterImpl
 			ddmFormFieldValue.getInstanceId());
 	}
 
-	private LocalizedValue _getLocalizedValue(Value value) {
-		if (value == null) {
-			return null;
-		}
-
-		if (value.isLocalized()) {
-			return (LocalizedValue)value;
-		}
-
-		LocalizedValue localizedValue = new LocalizedValue(
-			value.getDefaultLocale());
-
-		Map<Locale, String> values = localizedValue.getValues();
-
-		values.putAll(value.getValues());
-
-		return localizedValue;
-	}
-
 	private Map<String, Object> _toLocalizedMap(
 		String fieldType, LocalizedValue localizedValue) {
 
-		Map<String, Object> localizedMap = new HashMap<>();
+		Set<Locale> availableLocales = localizedValue.getAvailableLocales();
 
-		Function<Locale, Object> function = locale -> GetterUtil.getString(
-			localizedValue.getString(locale));
+		Stream<Locale> stream = availableLocales.stream();
 
 		if (fieldType.equals(DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE) ||
 			fieldType.equals(DDMFormFieldTypeConstants.SELECT)) {
 
-			function = locale -> _toStringList(locale, localizedValue);
+			return stream.collect(
+				Collectors.toMap(
+					LanguageUtil::getLanguageId,
+					locale -> _toStringList(locale, localizedValue)));
 		}
 
-		for (Locale locale : localizedValue.getAvailableLocales()) {
-			localizedMap.put(
-				_language.getLanguageId(locale), function.apply(locale));
-		}
-
-		return localizedMap;
+		return stream.collect(
+			Collectors.toMap(
+				LanguageUtil::getLanguageId,
+				locale -> GetterUtil.getString(
+					localizedValue.getString(locale))));
 	}
 
 	private List<String> _toStringList(
@@ -203,24 +185,12 @@ public class DDMFormValuesToMapConverterImpl
 
 		try {
 			return JSONUtil.toStringList(
-				_jsonFactory.createJSONArray(localizedValue.getString(locale)));
+				JSONFactoryUtil.createJSONArray(
+					localizedValue.getString(locale)));
 		}
 		catch (JSONException jsonException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(jsonException);
-			}
-
 			return Collections.emptyList();
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMFormValuesToMapConverterImpl.class);
-
-	@Reference
-	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 }

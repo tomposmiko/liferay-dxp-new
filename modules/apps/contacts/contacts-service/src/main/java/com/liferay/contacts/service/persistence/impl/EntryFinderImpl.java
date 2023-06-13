@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.comparator.UserLastNameComparator;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,8 +66,7 @@ public class EntryFinderImpl
 			return count;
 		}
 
-		int count = _userLocalService.getUsersCount(
-			companyId, WorkflowConstants.STATUS_APPROVED);
+		int count = _userLocalService.getUsersCount(companyId, false, 0);
 
 		count += EntryUtil.countByUserId(userId);
 
@@ -119,12 +117,12 @@ public class EntryFinderImpl
 		else {
 			models.addAll(
 				_userLocalService.getUsers(
-					companyId, WorkflowConstants.STATUS_APPROVED, start, end,
+					companyId, false, 0, start, end,
 					new UserLastNameComparator(true)));
 
 			if (models.size() < (end - start)) {
 				int count = _userLocalService.getUsersCount(
-					companyId, WorkflowConstants.STATUS_APPROVED);
+					companyId, false, 0);
 
 				start -= count;
 				end -= count;

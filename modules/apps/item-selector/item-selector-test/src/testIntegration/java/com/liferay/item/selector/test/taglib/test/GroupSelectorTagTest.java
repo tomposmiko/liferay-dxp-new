@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -30,6 +29,7 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -180,13 +180,20 @@ public class GroupSelectorTagTest {
 		try {
 			groupSelectorTag.doEndTag();
 
-			Assert.assertTrue(
-				"Group " + group.getGroupId() + " was not found",
-				ListUtil.exists(
-					(List<Group>)mockHttpServletRequest.getAttribute(
-						"liferay-item-selector:group-selector:groups"),
-					currentGroup -> Objects.equals(
-						group.getGroupId(), currentGroup.getGroupId())));
+			List<Group> groups =
+				(List<Group>)mockHttpServletRequest.getAttribute(
+					"liferay-item-selector:group-selector:groups");
+
+			Stream<Group> stream = groups.stream();
+
+			stream.filter(
+				currentGroup -> Objects.equals(
+					currentGroup.getGroupId(), group.getGroupId())
+			).findAny(
+			).orElseThrow(
+				() -> new AssertionError(
+					"Group " + group.getGroupId() + " was not found")
+			);
 		}
 		finally {
 			GroupTestUtil.deleteGroup(group);

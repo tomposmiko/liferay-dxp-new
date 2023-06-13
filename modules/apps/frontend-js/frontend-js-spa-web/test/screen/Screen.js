@@ -73,12 +73,12 @@ describe('Screen', () => {
 	});
 
 	it('waits to flip all surfaces', (done) => {
-		const surfaces = {
+		var surfaces = {
 			surface1: new Surface('surface1'),
 			surface2: new Surface('surface2'),
 		};
-		const stub1 = jest.fn();
-		const stub2 = jest.fn();
+		var stub1 = jest.fn();
+		var stub2 = jest.fn();
 
 		surfaces.surface1.show = () => {
 			stub1();
@@ -99,14 +99,14 @@ describe('Screen', () => {
 	});
 
 	it('gets screen id', () => {
-		const screen = new Screen();
+		var screen = new Screen();
 		expect(screen.getId()).toBeTruthy();
 		screen.setId('otherId');
 		expect(screen.getId()).toBe('otherId');
 	});
 
 	it('gets screen title', () => {
-		const screen = new Screen();
+		var screen = new Screen();
 		expect(screen.getTitle()).toBeNull();
 		screen.setTitle('other');
 		expect(screen.getTitle()).toBe('other');
@@ -121,8 +121,8 @@ describe('Screen', () => {
 			'surfaceId',
 			'<script>window.sentinel=true;</script>'
 		);
-		const surface = new Surface('surfaceId');
-		const screen = new Screen();
+		var surface = new Surface('surfaceId');
+		var screen = new Screen();
 		expect(window.sentinel).toBeFalsy();
 		screen
 			.evaluateScripts({
@@ -141,8 +141,8 @@ describe('Screen', () => {
 			'surfaceId',
 			'<style>body{background-color:rgb(0, 255, 0);}</style>'
 		);
-		const surface = new Surface('surfaceId');
-		const screen = new Screen();
+		var surface = new Surface('surfaceId');
+		var screen = new Screen();
 		screen
 			.evaluateStyles({
 				surfaceId: surface,

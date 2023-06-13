@@ -15,18 +15,16 @@
 package com.liferay.template.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.info.item.InfoItemClassDetails;
-import com.liferay.info.item.InfoItemFormVariation;
-import com.liferay.info.item.InfoItemServiceRegistry;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -37,6 +35,7 @@ import com.liferay.template.web.internal.security.permissions.resource.TemplateE
 import com.liferay.template.web.internal.util.TemplateEntryActionDropdownItemsProvider;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Eudaldo Alonso
@@ -51,9 +50,9 @@ public class InformationTemplatesTemplateDisplayContext
 
 		super(liferayPortletRequest, liferayPortletResponse);
 
-		_infoItemServiceRegistry =
-			(InfoItemServiceRegistry)liferayPortletRequest.getAttribute(
-				InfoItemServiceRegistry.class.getName());
+		_infoItemServiceTracker =
+			(InfoItemServiceTracker)liferayPortletRequest.getAttribute(
+				InfoItemServiceTracker.class.getName());
 	}
 
 	public List<DropdownItem> getTemplateEntryActionDropdownItems(
@@ -107,16 +106,19 @@ public class InformationTemplatesTemplateDisplayContext
 				"there-are-no-templates");
 
 		templateEntrySearchContainer.setOrderByCol(getOrderByCol());
+		templateEntrySearchContainer.setOrderByComparator(null);
 		templateEntrySearchContainer.setOrderByType(getOrderByType());
-		templateEntrySearchContainer.setResultsAndTotal(
-			() -> TemplateEntryLocalServiceUtil.getTemplateEntries(
-				themeDisplay.getScopeGroupId(),
-				templateEntrySearchContainer.getStart(),
-				templateEntrySearchContainer.getEnd(), null),
-			TemplateEntryLocalServiceUtil.getTemplateEntriesCount(
-				themeDisplay.getScopeGroupId()));
 		templateEntrySearchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(liferayPortletResponse));
+		templateEntrySearchContainer.setResults(
+			TemplateEntryLocalServiceUtil.getTemplateEntries(
+				themeDisplay.getScopeGroupId(),
+				templateEntrySearchContainer.getStart(),
+				templateEntrySearchContainer.getEnd(),
+				templateEntrySearchContainer.getOrderByComparator()));
+		templateEntrySearchContainer.setTotal(
+			TemplateEntryLocalServiceUtil.getTemplateEntriesCount(
+				themeDisplay.getScopeGroupId()));
 
 		_templateEntrySearchContainer = templateEntrySearchContainer;
 
@@ -128,63 +130,40 @@ public class InformationTemplatesTemplateDisplayContext
 			return StringPool.BLANK;
 		}
 
-		InfoItemFormVariationsProvider infoItemFormVariationsProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+		return Optional.ofNullable(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFormVariationsProvider.class,
-				templateEntry.getInfoItemClassName());
-
-		if (infoItemFormVariationsProvider == null) {
-			return StringPool.BLANK;
-		}
-
-		InfoItemFormVariation infoItemFormVariation =
-			infoItemFormVariationsProvider.getInfoItemFormVariation(
-				themeDisplay.getScopeGroupId(),
-				templateEntry.getInfoItemFormVariationKey());
-
-		if (infoItemFormVariation == null) {
-			return StringPool.BLANK;
-		}
-
-		String label = infoItemFormVariation.getLabel(themeDisplay.getLocale());
-
-		if (label == null) {
-			return StringPool.BLANK;
-		}
-
-		return label;
+				templateEntry.getInfoItemClassName())
+		).map(
+			infoItemFormVariationsProvider ->
+				infoItemFormVariationsProvider.getInfoItemFormVariation(
+					themeDisplay.getScopeGroupId(),
+					templateEntry.getInfoItemFormVariationKey())
+		).map(
+			infoItemFormVariation -> infoItemFormVariation.getLabel(
+				themeDisplay.getLocale())
+		).orElse(
+			StringPool.BLANK
+		);
 	}
 
 	public String getTemplateTypeLabel(TemplateEntry templateEntry) {
-		String defaultValue = ResourceActionsUtil.getModelResource(
-			themeDisplay.getLocale(), templateEntry.getInfoItemClassName());
-
-		InfoItemDetailsProvider infoItemDetailsProvider =
-			_infoItemServiceRegistry.getFirstInfoItemService(
+		return Optional.ofNullable(
+			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemDetailsProvider.class,
-				templateEntry.getInfoItemClassName());
-
-		if (infoItemDetailsProvider == null) {
-			return defaultValue;
-		}
-
-		InfoItemClassDetails infoItemClassDetails =
-			infoItemDetailsProvider.getInfoItemClassDetails();
-
-		if (infoItemClassDetails == null) {
-			return defaultValue;
-		}
-
-		String label = infoItemClassDetails.getLabel(themeDisplay.getLocale());
-
-		if (label == null) {
-			return defaultValue;
-		}
-
-		return label;
+				templateEntry.getInfoItemClassName())
+		).map(
+			InfoItemDetailsProvider::getInfoItemClassDetails
+		).map(
+			infoItemDetails -> infoItemDetails.getLabel(
+				themeDisplay.getLocale())
+		).orElse(
+			ResourceActionsUtil.getModelResource(
+				themeDisplay.getLocale(), templateEntry.getInfoItemClassName())
+		);
 	}
 
-	private final InfoItemServiceRegistry _infoItemServiceRegistry;
+	private final InfoItemServiceTracker _infoItemServiceTracker;
 	private SearchContainer<TemplateEntry> _templateEntrySearchContainer;
 
 }

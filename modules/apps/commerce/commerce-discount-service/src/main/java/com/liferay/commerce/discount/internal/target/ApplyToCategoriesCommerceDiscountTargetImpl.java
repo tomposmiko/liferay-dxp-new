@@ -16,6 +16,7 @@ package com.liferay.commerce.discount.internal.target;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.commerce.discount.constants.CommerceDiscountConstants;
 import com.liferay.commerce.discount.model.CommerceDiscount;
@@ -24,9 +25,8 @@ import com.liferay.commerce.discount.service.CommerceDiscountRelLocalService;
 import com.liferay.commerce.discount.target.CommerceDiscountProductTarget;
 import com.liferay.commerce.discount.target.CommerceDiscountTarget;
 import com.liferay.commerce.product.model.CPDefinition;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -39,9 +39,12 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -51,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"commerce.discount.target.key=" + CommerceDiscountConstants.TARGET_CATEGORIES,
 		"commerce.discount.target.order:Integer=10"
@@ -66,13 +70,20 @@ public class ApplyToCategoriesCommerceDiscountTargetImpl
 	public void contributeDocument(
 		Document document, CommerceDiscount commerceDiscount) {
 
+		List<CommerceDiscountRel> commerceDiscountRels =
+			_commerceDiscountRelLocalService.getCommerceDiscountRels(
+				commerceDiscount.getCommerceDiscountId(),
+				AssetCategory.class.getName());
+
+		Stream<CommerceDiscountRel> stream = commerceDiscountRels.stream();
+
+		LongStream longStream = stream.mapToLong(
+			CommerceDiscountRel::getClassPK);
+
+		long[] assetCategoryIds = longStream.toArray();
+
 		document.addKeyword(
-			"commerce_discount_target_asset_category_ids",
-			TransformUtil.transformToLongArray(
-				_commerceDiscountRelLocalService.getCommerceDiscountRels(
-					commerceDiscount.getCommerceDiscountId(),
-					AssetCategory.class.getName()),
-				CommerceDiscountRel::getClassPK));
+			"commerce_discount_target_asset_category_ids", assetCategoryIds);
 	}
 
 	@Override
@@ -85,7 +96,7 @@ public class ApplyToCategoriesCommerceDiscountTargetImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(
+		return LanguageUtil.get(
 			resourceBundle, CommerceDiscountConstants.TARGET_CATEGORIES);
 	}
 
@@ -132,11 +143,15 @@ public class ApplyToCategoriesCommerceDiscountTargetImpl
 				assetCategories.addAll(assetCategory.getAncestors());
 			}
 
-			return TransformUtil.transformToLongArray(
-				assetCategories, AssetCategory::getCategoryId);
+			Stream<AssetCategory> stream = assetCategories.stream();
+
+			LongStream longStream = stream.mapToLong(
+				AssetCategory::getCategoryId);
+
+			return longStream.toArray();
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return new long[0];
@@ -146,12 +161,12 @@ public class ApplyToCategoriesCommerceDiscountTargetImpl
 		ApplyToCategoriesCommerceDiscountTargetImpl.class);
 
 	@Reference
+	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private CommerceDiscountRelLocalService _commerceDiscountRelLocalService;
-
-	@Reference
-	private Language _language;
 
 }

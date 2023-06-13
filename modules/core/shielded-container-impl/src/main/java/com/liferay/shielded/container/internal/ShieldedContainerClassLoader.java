@@ -82,8 +82,4 @@ public class ShieldedContainerClassLoader extends URLClassLoader {
 
 	private final ClassLoader _fallbackClassLoader;
 
-	static {
-		ClassLoader.registerAsParallelCapable();
-	}
-
 }

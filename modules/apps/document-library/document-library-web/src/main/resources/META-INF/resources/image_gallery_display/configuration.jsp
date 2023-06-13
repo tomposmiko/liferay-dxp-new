@@ -17,7 +17,7 @@
 <%@ include file="/image_gallery_display/init.jsp" %>
 
 <%
-IGConfigurationDisplayContext igConfigurationDisplayContext = (IGConfigurationDisplayContext)request.getAttribute(IGConfigurationDisplayContext.class.getName());
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(igRequestHelper);
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
@@ -33,73 +33,76 @@ IGConfigurationDisplayContext igConfigurationDisplayContext = (IGConfigurationDi
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 	<aui:input name="preferences--mimeTypes--" type="hidden" />
-	<aui:input name="preferences--selectedRepositoryId--" type="hidden" value="<%= igConfigurationDisplayContext.getSelectedRepositoryId() %>" />
-	<aui:input name="preferences--rootFolderId--" type="hidden" value="<%= igConfigurationDisplayContext.getRootFolderId() %>" />
+	<aui:input name="preferences--rootFolderId--" type="hidden" value="<%= rootFolderId %>" />
 
 	<liferay-frontend:edit-form-body>
 		<liferay-ui:error key="rootFolderIdInvalid" message="please-enter-a-valid-root-folder" />
 
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			id="imageGalleryDisplayDisplay"
-			label="display-settings"
-		>
-			<aui:input label="show-actions" name="preferences--showActions--" type="checkbox" value="<%= igConfigurationDisplayContext.isShowActions() %>" />
+		<liferay-frontend:fieldset-group>
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				id="imageGalleryDisplayDisplay"
+				label="display-settings"
+			>
+				<aui:input label="show-actions" name="preferences--showActions--" type="checkbox" value="<%= dlPortletInstanceSettings.isShowActions() %>" />
 
-			<aui:field-wrapper label="show-media-type">
-				<liferay-ui:input-move-boxes
-					leftBoxName="currentMimeTypes"
-					leftList="<%= igConfigurationDisplayContext.getCurrentMimeTypes() %>"
-					leftReorder="<%= Boolean.TRUE.toString() %>"
-					leftTitle="current"
-					rightBoxName="availableMimeTypes"
-					rightList="<%= igConfigurationDisplayContext.getAvailableMimeTypes() %>"
-					rightTitle="available"
-				/>
-			</aui:field-wrapper>
+				<aui:field-wrapper label="show-media-type">
+					<liferay-ui:input-move-boxes
+						leftBoxName="currentMimeTypes"
+						leftList="<%= dlPortletInstanceSettingsHelper.getCurrentMimeTypes() %>"
+						leftReorder="<%= Boolean.TRUE.toString() %>"
+						leftTitle="current"
+						rightBoxName="availableMimeTypes"
+						rightList="<%= dlPortletInstanceSettingsHelper.getAvailableMimeTypes() %>"
+						rightTitle="available"
+					/>
+				</aui:field-wrapper>
 
-			<div class="display-template">
-				<liferay-template:template-selector
-					className="<%= FileEntry.class.getName() %>"
-					displayStyle="<%= igConfigurationDisplayContext.getDisplayStyle() %>"
-					displayStyleGroupId="<%= igConfigurationDisplayContext.getDisplayStyleGroupId() %>"
-					refreshURL="<%= configurationRenderURL %>"
-					showEmptyOption="<%= true %>"
-				/>
-			</div>
-		</liferay-frontend:fieldset>
-
-		<liferay-frontend:fieldset
-			collapsible="<%= true %>"
-			id="imageGalleryDisplayFoldersListingPanel"
-			label="folders-listing"
-		>
-			<aui:field-wrapper>
-				<div class="form-group">
-					<aui:input label="root-folder" name="rootFolderName" type="resource" value="<%= igConfigurationDisplayContext.getRootFolderName() %>" />
-
-					<div class="alert alert-warning <%= igConfigurationDisplayContext.isRootFolderInTrash() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />rootFolderInTrash">
-						<liferay-ui:message key="the-selected-root-folder-is-in-the-recycle-bin-please-remove-it-or-select-another-one" />
-					</div>
-
-					<div class="alert alert-warning <%= igConfigurationDisplayContext.isRootFolderNotFound() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />rootFolderNotFound">
-						<liferay-ui:message key="the-selected-root-folder-cannot-be-found-please-select-another-one" />
-					</div>
-
-					<aui:button name="openFolderSelectorButton" value="select" />
-
-					<%
-					String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + liferayPortletResponse.getNamespace() + "'); Liferay.Util.removeEntitySelection('selectedRepositoryId', '', this, '" + liferayPortletResponse.getNamespace() + "');";
-					%>
-
-					<aui:button disabled="<%= (igConfigurationDisplayContext.getRootFolderId() == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) && (igConfigurationDisplayContext.getSelectedRepositoryId() == scopeGroupId) %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
+				<div class="display-template">
+					<liferay-template:template-selector
+						className="<%= FileEntry.class.getName() %>"
+						displayStyle="<%= displayStyle %>"
+						displayStyleGroupId="<%= displayStyleGroupId %>"
+						refreshURL="<%= configurationRenderURL %>"
+						showEmptyOption="<%= true %>"
+					/>
 				</div>
-			</aui:field-wrapper>
-		</liferay-frontend:fieldset>
+			</liferay-frontend:fieldset>
+
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				id="imageGalleryDisplayFoldersListingPanel"
+				label="folders-listing"
+			>
+				<aui:field-wrapper>
+					<div class="form-group">
+						<aui:input label="root-folder" name="rootFolderName" type="resource" value="<%= rootFolderName %>" />
+
+						<div class="alert alert-warning <%= rootFolderInTrash ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />rootFolderInTrash">
+							<liferay-ui:message key="the-selected-root-folder-is-in-the-recycle-bin-please-remove-it-or-select-another-one" />
+						</div>
+
+						<div class="alert alert-warning <%= rootFolderNotFound ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />rootFolderNotFound">
+							<liferay-ui:message key="the-selected-root-folder-cannot-be-found-please-select-another-one" />
+						</div>
+
+						<aui:button name="openFolderSelectorButton" value="select" />
+
+						<%
+						String taglibRemoveFolder = "Liferay.Util.removeEntitySelection('rootFolderId', 'rootFolderName', this, '" + liferayPortletResponse.getNamespace() + "');";
+						%>
+
+						<aui:button disabled="<%= rootFolderId <= 0 %>" name="removeFolderButton" onClick="<%= taglibRemoveFolder %>" value="remove" />
+					</div>
+				</aui:field-wrapper>
+			</liferay-frontend:fieldset>
+		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<liferay-frontend:edit-form-buttons />
+		<aui:button type="submit" />
+
+		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
@@ -110,15 +113,10 @@ IGConfigurationDisplayContext igConfigurationDisplayContext = (IGConfigurationDi
 
 	if (openFolderSelectorButton) {
 		openFolderSelectorButton.addEventListener('click', (event) => {
-			Liferay.Util.openSelectionModal({
-				selectEventName:
-					'<%= igConfigurationDisplayContext.getItemSelectedEventName() %>',
-				multiple: false,
+			Liferay.Util.getOpener().Liferay.Util.openSelectionModal({
+				id:
+					'_<%= HtmlUtil.escapeJS(igRequestHelper.getPortletResource()) %>_selectFolder',
 				onSelect: function (selectedItem) {
-					if (!selectedItem) {
-						return;
-					}
-
 					var folderData = {
 						idString: 'rootFolderId',
 						idValue: selectedItem.folderid,
@@ -127,14 +125,6 @@ IGConfigurationDisplayContext igConfigurationDisplayContext = (IGConfigurationDi
 					};
 
 					Liferay.Util.selectFolder(folderData, '<portlet:namespace />');
-
-					var repositoryIdElement = document.querySelector(
-						'#<portlet:namespace />selectedRepositoryId'
-					);
-
-					if (repositoryIdElement != null) {
-						repositoryIdElement.value = selectedItem.repositoryid;
-					}
 
 					var rootFolderInTrashWarning = document.querySelector(
 						'#<portlet:namespace />rootFolderInTrash'
@@ -148,9 +138,18 @@ IGConfigurationDisplayContext igConfigurationDisplayContext = (IGConfigurationDi
 
 					rootFolderNotFoundWarning.classList.add('hide');
 				},
+				selectEventName:
+					'_<%= HtmlUtil.escapeJS(igRequestHelper.getPortletResource()) %>_selectFolder',
 				title: '<liferay-ui:message arguments="folder" key="select-x" />',
-				url:
-					'<%= HtmlUtil.escapeJS(String.valueOf(igConfigurationDisplayContext.getSelectFolderURL())) %>',
+
+				<liferay-portlet:renderURL portletName="<%= igRequestHelper.getPortletResource() %>" var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+					<portlet:param name="mvcRenderCommandName" value="/document_library/select_folder" />
+					<portlet:param name="folderId" value="<%= (rootFolderInTrash || rootFolderNotFound) ? String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID): String.valueOf(rootFolderId) %>" />
+					<portlet:param name="ignoreRootFolder" value="<%= Boolean.TRUE.toString() %>" />
+					<portlet:param name="selectedFolderId" value="<%= String.valueOf(rootFolderId) %>" />
+				</liferay-portlet:renderURL>
+
+				url: '<%= HtmlUtil.escapeJS(selectFolderURL.toString()) %>',
 			});
 		});
 	}
@@ -160,7 +159,7 @@ IGConfigurationDisplayContext igConfigurationDisplayContext = (IGConfigurationDi
 
 		Liferay.Util.postForm(form, {
 			data: {
-				mimeTypes: Liferay.Util.getSelectedOptionValues(
+				mimeTypes: Liferay.Util.listSelect(
 					Liferay.Util.getFormElement(form, 'currentMimeTypes')
 				),
 			},

@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-AccountEntry accountEntry = commerceOrderContentDisplayContext.getAccountEntry();
+CommerceAccount commerceAccount = commerceOrderContentDisplayContext.getCommerceAccount();
 %>
 
 <liferay-ui:error exception="<%= CommerceOrderAccountLimitException.class %>" message="unable-to-create-a-new-order-as-the-open-order-limit-has-been-reached" />
@@ -33,17 +33,20 @@ AccountEntry accountEntry = commerceOrderContentDisplayContext.getAccountEntry()
 	displayStyleGroupId="<%= commerceOrderContentDisplayContext.getDisplayStyleGroupId(CommercePortletKeys.COMMERCE_OPEN_ORDER_CONTENT) %>"
 	entries="<%= commerceOrderSearchContainer.getResults() %>"
 >
-	<frontend-data-set:classic-display
-		dataProviderKey="<%= CommerceOrderFDSNames.PENDING_ORDERS %>"
-		id="<%= CommerceOrderFDSNames.PENDING_ORDERS %>"
+	<clay:data-set-display
+		dataProviderKey="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PENDING_ORDERS %>"
+		id="<%= CommerceOrderDataSetConstants.COMMERCE_DATA_SET_KEY_PENDING_ORDERS %>"
 		itemsPerPage="<%= 10 %>"
+		namespace="<%= liferayPortletResponse.getNamespace() %>"
+		pageNumber="<%= 1 %>"
+		portletURL="<%= commerceOrderContentDisplayContext.getPortletURL() %>"
 		style="stacked"
 	/>
 
 	<portlet:actionURL name="/commerce_open_order_content/edit_commerce_order" var="editCommerceOrderURL" />
 
 	<div class="commerce-cta is-visible">
-		<c:if test="<%= commerceOrderContentDisplayContext.hasPermission(accountEntry, CommerceOrderActionKeys.ADD_COMMERCE_ORDER) %>">
+		<c:if test="<%= commerceOrderContentDisplayContext.hasPermission(CommerceOrderActionKeys.ADD_COMMERCE_ORDER) %>">
 			<aui:form action="<%= editCommerceOrderURL %>" method="post" name="fm">
 				<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
 				<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -51,7 +54,7 @@ AccountEntry accountEntry = commerceOrderContentDisplayContext.getAccountEntry()
 
 				<clay:button
 					cssClass="btn-fixed btn-lg btn-primary"
-					disabled="<%= accountEntry == null %>"
+					disabled="<%= commerceAccount == null %>"
 					displayType="primary"
 					id="add-order"
 					label='<%= LanguageUtil.get(request, "add-order") %>'

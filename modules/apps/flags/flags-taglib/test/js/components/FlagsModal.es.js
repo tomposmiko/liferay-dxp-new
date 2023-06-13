@@ -12,7 +12,7 @@
  * details.
  */
 
-import {render} from '@testing-library/react';
+import {cleanup, render, waitForElement} from '@testing-library/react';
 import React from 'react';
 
 import FlagsModal from '../../../src/main/resources/META-INF/resources/flags/js/components/FlagsModal.es';
@@ -63,38 +63,42 @@ function _renderFlagsModalComponent({
 }
 
 describe('FlagsModal', () => {
-	it('renders', async () => {
-		const {findByRole, findByText} = _renderFlagsModalComponent();
+	afterEach(cleanup);
 
-		await findByText('report-inappropriate-content');
-		await findByRole('form');
+	it('renders', async () => {
+		const {getByRole, getByText} = _renderFlagsModalComponent();
+
+		await waitForElement(() => getByText('report-inappropriate-content'));
+		await waitForElement(() => getByRole('form'));
 	});
 
 	it('renders as guess and render email field', async () => {
-		const {findByLabelText} = _renderFlagsModalComponent({
+		const {getByLabelText} = _renderFlagsModalComponent({
 			signedIn: false,
 		});
 
-		await findByLabelText('email', {exact: false});
+		await waitForElement(() => getByLabelText('email', {exact: false}));
 	});
 
 	it('renders error', async () => {
-		const {findByText} = _renderFlagsModalComponent({status: STATUS_ERROR});
+		const {getByText} = _renderFlagsModalComponent({status: STATUS_ERROR});
 
-		await findByText('an-error-occurred', {exact: false});
+		await waitForElement(() =>
+			getByText('an-error-occurred', {exact: false})
+		);
 	});
 
 	it('renders login', async () => {
-		const {findByText} = _renderFlagsModalComponent({status: STATUS_LOGIN});
+		const {getByText} = _renderFlagsModalComponent({status: STATUS_LOGIN});
 
-		await findByText('please-sign-in', {exact: false});
+		await waitForElement(() => getByText('please-sign-in', {exact: false}));
 	});
 
 	it('renders success', async () => {
-		const {findByText} = _renderFlagsModalComponent({
+		const {getByText} = _renderFlagsModalComponent({
 			status: STATUS_SUCCESS,
 		});
 
-		await findByText('thank-you', {exact: false});
+		await waitForElement(() => getByText('thank-you', {exact: false}));
 	});
 });

@@ -17,7 +17,7 @@ package com.liferay.commerce.shipping.engine.fixed.web.internal;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
-import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
+import com.liferay.commerce.currency.service.CommerceCurrencyService;
 import com.liferay.commerce.exception.CommerceShippingEngineException;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
@@ -25,25 +25,20 @@ import com.liferay.commerce.model.CommerceShippingEngine;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.model.CommerceShippingOption;
 import com.liferay.commerce.product.model.CommerceChannel;
-import com.liferay.commerce.product.service.CommerceChannelLocalService;
+import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.service.CommerceAddressRestrictionLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption;
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOptionRel;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionLocalService;
-import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionQualifierLocalService;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionRelLocalService;
-import com.liferay.commerce.shipping.engine.fixed.util.comparator.CommerceShippingFixedOptionPriorityComparator;
-import com.liferay.commerce.shipping.engine.fixed.web.internal.util.CommerceShippingFixedOptionEngineUtil;
 import com.liferay.commerce.util.CommerceShippingHelper;
-import com.liferay.commerce.util.comparator.CommerceShippingOptionPriorityComparator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.math.BigDecimal;
@@ -62,6 +57,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.shipping.engine.key=" + ByWeightCommerceShippingEngine.KEY,
 	service = CommerceShippingEngine.class
 )
@@ -85,11 +81,11 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 
 		try {
 			commerceShippingOptions = _getCommerceShippingOptions(
-				false, commerceOrder, locale);
+				commerceOrder, locale);
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -98,35 +94,13 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 
 	@Override
 	public String getDescription(Locale locale) {
-		return _language.get(
+		return LanguageUtil.get(
 			_getResourceBundle(locale), "by-weight-description");
 	}
 
 	@Override
-	public List<CommerceShippingOption> getEnabledCommerceShippingOptions(
-			CommerceContext commerceContext, CommerceOrder commerceOrder,
-			Locale locale)
-		throws CommerceShippingEngineException {
-
-		List<CommerceShippingOption> commerceShippingOptions =
-			new ArrayList<>();
-
-		try {
-			commerceShippingOptions = _getCommerceShippingOptions(
-				true, commerceOrder, locale);
-		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
-			}
-		}
-
-		return commerceShippingOptions;
-	}
-
-	@Override
 	public String getName(Locale locale) {
-		return _language.get(_getResourceBundle(locale), "variable-rate");
+		return LanguageUtil.get(_getResourceBundle(locale), "variable-rate");
 	}
 
 	private List<CommerceShippingFixedOption> _getCommerceShippingFixedOptions(
@@ -143,8 +117,7 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 		return _commerceShippingFixedOptionLocalService.
 			getCommerceShippingFixedOptions(
 				commerceShippingMethod.getCommerceShippingMethodId(),
-				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new CommerceShippingFixedOptionPriorityComparator());
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 	}
 
 	private CommerceShippingOption _getCommerceShippingOption(
@@ -177,13 +150,10 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 			return null;
 		}
 
-		String key = commerceShippingFixedOption.getKey();
 		String name = commerceShippingFixedOption.getName(locale);
-		double priority = commerceShippingFixedOption.getPriority();
 
 		if (_commerceShippingHelper.isFreeShipping(commerceOrder)) {
-			return new CommerceShippingOption(
-				BigDecimal.ZERO, KEY, key, name, priority);
+			return new CommerceShippingOption(name, name, BigDecimal.ZERO);
 		}
 
 		BigDecimal amount = commerceShippingFixedOptionRel.getFixedPrice();
@@ -207,7 +177,7 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 			ratePercentage.multiply(orderPrice.divide(new BigDecimal(100))));
 
 		CommerceChannel commerceChannel =
-			_commerceChannelLocalService.getCommerceChannelByOrderGroupId(
+			_commerceChannelService.getCommerceChannelByOrderGroupId(
 				commerceOrder.getGroupId());
 
 		CommerceCurrency commerceCurrency = commerceOrder.getCommerceCurrency();
@@ -218,7 +188,7 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 				commerceChannel.getCommerceCurrencyCode())) {
 
 			CommerceCurrency commerceChannelCommerceCurrency =
-				_commerceCurrencyLocalService.getCommerceCurrency(
+				_commerceCurrencyService.getCommerceCurrency(
 					commerceOrder.getCompanyId(),
 					commerceChannel.getCommerceCurrencyCode());
 
@@ -230,12 +200,11 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 			amount = amount.multiply(commerceCurrency.getRate());
 		}
 
-		return new CommerceShippingOption(amount, KEY, key, name, priority);
+		return new CommerceShippingOption(name, name, amount);
 	}
 
 	private List<CommerceShippingOption> _getCommerceShippingOptions(
-			boolean checkEligibility, CommerceOrder commerceOrder,
-			Locale locale)
+			CommerceOrder commerceOrder, Locale locale)
 		throws PortalException {
 
 		List<CommerceShippingOption> commerceShippingOptions =
@@ -249,21 +218,8 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 			commerceCountryId = commerceAddress.getCountryId();
 		}
 
-		List<CommerceShippingFixedOption> commerceShippingFixedOptions = null;
-
-		if (checkEligibility) {
-			commerceShippingFixedOptions =
-				CommerceShippingFixedOptionEngineUtil.
-					getEligibleCommerceShippingFixedOptions(
-						commerceOrder.getCommerceOrderTypeId(),
-						_commerceShippingFixedOptionQualifierLocalService,
-						_getCommerceShippingFixedOptions(
-							commerceOrder.getGroupId()));
-		}
-		else {
-			commerceShippingFixedOptions = _getCommerceShippingFixedOptions(
-				commerceOrder.getGroupId());
-		}
+		List<CommerceShippingFixedOption> commerceShippingFixedOptions =
+			_getCommerceShippingFixedOptions(commerceOrder.getGroupId());
 
 		for (CommerceShippingFixedOption commerceShippingFixedOption :
 				commerceShippingFixedOptions) {
@@ -289,9 +245,7 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 			}
 		}
 
-		return ListUtil.sort(
-			commerceShippingOptions,
-			new CommerceShippingOptionPriorityComparator());
+		return commerceShippingOptions;
 	}
 
 	private ResourceBundle _getResourceBundle(Locale locale) {
@@ -307,18 +261,14 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 		_commerceAddressRestrictionLocalService;
 
 	@Reference
-	private CommerceChannelLocalService _commerceChannelLocalService;
+	private CommerceChannelService _commerceChannelService;
 
 	@Reference
-	private CommerceCurrencyLocalService _commerceCurrencyLocalService;
+	private CommerceCurrencyService _commerceCurrencyService;
 
 	@Reference
 	private CommerceShippingFixedOptionLocalService
 		_commerceShippingFixedOptionLocalService;
-
-	@Reference
-	private CommerceShippingFixedOptionQualifierLocalService
-		_commerceShippingFixedOptionQualifierLocalService;
 
 	@Reference
 	private CommerceShippingFixedOptionRelLocalService
@@ -330,8 +280,5 @@ public class ByWeightCommerceShippingEngine implements CommerceShippingEngine {
 	@Reference
 	private CommerceShippingMethodLocalService
 		_commerceShippingMethodLocalService;
-
-	@Reference
-	private Language _language;
 
 }

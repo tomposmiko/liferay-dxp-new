@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.service.persistence;
 
+import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.model.UserTracker;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -770,9 +771,14 @@ public class UserTrackerUtil {
 	}
 
 	public static UserTrackerPersistence getPersistence() {
+		if (_persistence == null) {
+			_persistence = (UserTrackerPersistence)PortalBeanLocatorUtil.locate(
+				UserTrackerPersistence.class.getName());
+		}
+
 		return _persistence;
 	}
 
-	private static volatile UserTrackerPersistence _persistence;
+	private static UserTrackerPersistence _persistence;
 
 }

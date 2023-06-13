@@ -38,22 +38,63 @@ public class DDMFormTemplateContext {
 		}
 
 		public Map<String, Object> build() throws PortalException {
-			if (_paginationMode == null) {
-				return _ddmFormTemplateContextFactory.create(
-					DDMFormTestUtil.createDDMForm(), _ddmFormRenderingContext);
+			DDMFormRenderingContext ddmFormRenderingContext =
+				new DDMFormRenderingContext();
+
+			if (_containerId != null) {
+				ddmFormRenderingContext.setContainerId(_containerId);
 			}
 
-			DDMFormLayout ddmFormLayout = new DDMFormLayout();
+			if (_httpServletRequest != null) {
+				ddmFormRenderingContext.setHttpServletRequest(
+					_httpServletRequest);
+			}
 
-			ddmFormLayout.setPaginationMode(_paginationMode);
+			if (_locale != null) {
+				ddmFormRenderingContext.setLocale(_locale);
+			}
+
+			if (_portletNamespace != null) {
+				ddmFormRenderingContext.setPortletNamespace(_portletNamespace);
+			}
+
+			if (_readOnly != null) {
+				ddmFormRenderingContext.setReadOnly(_readOnly);
+			}
+
+			if (_showRequiredFieldsWarning != null) {
+				ddmFormRenderingContext.setShowRequiredFieldsWarning(
+					_showRequiredFieldsWarning);
+			}
+
+			if (_showSubmitButton != null) {
+				ddmFormRenderingContext.setShowSubmitButton(_showSubmitButton);
+			}
+
+			if (_submitLabel != null) {
+				ddmFormRenderingContext.setSubmitLabel(_submitLabel);
+			}
+
+			if (_viewMode != null) {
+				ddmFormRenderingContext.setViewMode(_viewMode);
+			}
+
+			if (_paginationMode != null) {
+				DDMFormLayout ddmFormLayout = new DDMFormLayout();
+
+				ddmFormLayout.setPaginationMode(_paginationMode);
+
+				return _ddmFormTemplateContextFactory.create(
+					DDMFormTestUtil.createDDMForm(), ddmFormLayout,
+					ddmFormRenderingContext);
+			}
 
 			return _ddmFormTemplateContextFactory.create(
-				DDMFormTestUtil.createDDMForm(), ddmFormLayout,
-				_ddmFormRenderingContext);
+				DDMFormTestUtil.createDDMForm(), ddmFormRenderingContext);
 		}
 
 		public Builder withContainerId(String containerId) {
-			_ddmFormRenderingContext.setContainerId(containerId);
+			_containerId = containerId;
 
 			return this;
 		}
@@ -61,13 +102,13 @@ public class DDMFormTemplateContext {
 		public Builder withHttpServletRequest(
 			HttpServletRequest httpServletRequest) {
 
-			_ddmFormRenderingContext.setHttpServletRequest(httpServletRequest);
+			_httpServletRequest = httpServletRequest;
 
 			return this;
 		}
 
 		public Builder withLocale(Locale locale) {
-			_ddmFormRenderingContext.setLocale(locale);
+			_locale = locale;
 
 			return this;
 		}
@@ -79,19 +120,13 @@ public class DDMFormTemplateContext {
 		}
 
 		public Builder withPortletNamespace(String portletNamespace) {
-			_ddmFormRenderingContext.setPortletNamespace(portletNamespace);
-
-			return this;
-		}
-
-		public Builder withProperty(String name, Object value) {
-			_ddmFormRenderingContext.addProperty(name, value);
+			_portletNamespace = portletNamespace;
 
 			return this;
 		}
 
 		public Builder withReadOnly(boolean readOnly) {
-			_ddmFormRenderingContext.setReadOnly(readOnly);
+			_readOnly = readOnly;
 
 			return this;
 		}
@@ -99,26 +134,25 @@ public class DDMFormTemplateContext {
 		public Builder withShowRequiredFieldsWarning(
 			boolean showRequiredFieldsWarning) {
 
-			_ddmFormRenderingContext.setShowRequiredFieldsWarning(
-				showRequiredFieldsWarning);
+			_showRequiredFieldsWarning = showRequiredFieldsWarning;
 
 			return this;
 		}
 
 		public Builder withShowSubmitButton(boolean showSubmitButton) {
-			_ddmFormRenderingContext.setShowSubmitButton(showSubmitButton);
+			_showSubmitButton = showSubmitButton;
 
 			return this;
 		}
 
 		public Builder withSubmitLabel(String submitLabel) {
-			_ddmFormRenderingContext.setSubmitLabel(submitLabel);
+			_submitLabel = submitLabel;
 
 			return this;
 		}
 
 		public Builder withViewMode(boolean viewMode) {
-			_ddmFormRenderingContext.setViewMode(viewMode);
+			_viewMode = viewMode;
 
 			return this;
 		}
@@ -129,11 +163,18 @@ public class DDMFormTemplateContext {
 			_ddmFormTemplateContextFactory = ddmFormTemplateContextFactory;
 		}
 
-		private final DDMFormRenderingContext _ddmFormRenderingContext =
-			new DDMFormRenderingContext();
+		private String _containerId;
 		private final DDMFormTemplateContextFactory
 			_ddmFormTemplateContextFactory;
+		private HttpServletRequest _httpServletRequest;
+		private Locale _locale;
 		private String _paginationMode;
+		private String _portletNamespace;
+		private Boolean _readOnly;
+		private Boolean _showRequiredFieldsWarning;
+		private Boolean _showSubmitButton;
+		private String _submitLabel;
+		private Boolean _viewMode;
 
 	}
 

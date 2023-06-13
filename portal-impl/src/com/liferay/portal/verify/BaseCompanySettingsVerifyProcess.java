@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsException;
 import com.liferay.portal.kernel.settings.SettingsFactory;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -73,8 +72,6 @@ public abstract class BaseCompanySettingsVerifyProcess extends VerifyProcess {
 
 	protected abstract String getSettingsId();
 
-	protected abstract SettingsLocatorHelper getSettingsLocatorHelper();
-
 	protected void storeSettings(
 			long companyId, String settingsId,
 			Dictionary<String, String> dictionary)
@@ -88,11 +85,8 @@ public abstract class BaseCompanySettingsVerifyProcess extends VerifyProcess {
 		ModifiableSettings modifiableSettings =
 			settings.getModifiableSettings();
 
-		SettingsLocatorHelper settingsLocatorHelper =
-			getSettingsLocatorHelper();
-
 		SettingsDescriptor settingsDescriptor =
-			settingsLocatorHelper.getSettingsDescriptor(settingsId);
+			settingsFactory.getSettingsDescriptor(settingsId);
 
 		for (String name : settingsDescriptor.getAllKeys()) {
 			String value = dictionary.get(name);

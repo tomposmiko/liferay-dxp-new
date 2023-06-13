@@ -22,6 +22,7 @@ import com.liferay.commerce.discount.service.CommerceDiscountService;
 import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Discount;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountOrderType;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountOrderTypeDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v2_0.DiscountOrderTypeUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountOrderTypeResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
@@ -30,7 +31,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -48,6 +48,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Zoltán Takács
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/discount-order-type.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = {DiscountOrderTypeResource.class, NestedFieldSupport.class}
@@ -205,11 +206,8 @@ public class DiscountOrderTypeResourceImpl
 	@Reference
 	private CommerceOrderTypeService _commerceOrderTypeService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.DiscountOrderTypeDTOConverter)"
-	)
-	private DTOConverter<CommerceDiscountOrderTypeRel, DiscountOrderType>
-		_discountOrderTypeDTOConverter;
+	@Reference
+	private DiscountOrderTypeDTOConverter _discountOrderTypeDTOConverter;
 
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;

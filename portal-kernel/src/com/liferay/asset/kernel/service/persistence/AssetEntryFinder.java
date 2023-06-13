@@ -28,4 +28,6 @@ public interface AssetEntryFinder {
 	public java.util.List<com.liferay.asset.kernel.model.AssetEntry>
 		findEntries(AssetEntryQuery entryQuery);
 
+	public double findPriorityByC_C(long classNameId, long classPK);
+
 }

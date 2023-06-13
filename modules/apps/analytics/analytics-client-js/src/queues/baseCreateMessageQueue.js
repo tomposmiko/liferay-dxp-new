@@ -12,11 +12,9 @@
  * details.
  */
 
-import {v4 as uuidv4} from 'uuid';
+import uuidv4 from 'uuid/v4';
 
 import {getContexts} from '../utils/contexts';
-import {removeDups} from '../utils/events';
-import {setItem} from '../utils/storage';
 import BaseQueue from './baseQueue';
 
 class BaseCreateMessageQueue extends BaseQueue {
@@ -51,15 +49,7 @@ class BaseCreateMessageQueue extends BaseQueue {
 		return promisesArr;
 	}
 
-	onFlushSuccess(results) {
-		const items = this.getItems();
-		const filteredResults = results.filter(
-			(message) => message && message.value && message.value.events
-		);
-		const updatedItems = removeDups(filteredResults, items);
-
-		setItem(this.name, updatedItems);
-
+	onFlushSuccess() {
 		this.analyticsInstance.resetContext();
 		this.reset();
 	}
@@ -75,16 +65,12 @@ class BaseCreateMessageQueue extends BaseQueue {
 
 		delete context.channelId;
 
-		const {
-			dataSourceId,
-			identity: {emailAddressHashed},
-		} = this.analyticsInstance.config;
+		const {dataSourceId} = this.analyticsInstance.config;
 
 		return {
 			channelId,
 			context,
 			dataSourceId,
-			emailAddressHashed,
 			events,
 			id: uuidv4(),
 			userId,

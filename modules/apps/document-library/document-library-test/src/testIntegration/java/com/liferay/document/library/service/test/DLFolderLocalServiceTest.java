@@ -69,13 +69,12 @@ public class DLFolderLocalServiceTest {
 				_group.getGroupId(), TestPropsValues.getUserId());
 
 		Folder parentFolder = _dlAppService.addFolder(
-			null, _group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 
 		_dlAppService.addFolder(
-			null, _group.getGroupId(), parentFolder.getFolderId(),
+			_group.getGroupId(), parentFolder.getFolderId(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 
@@ -94,12 +93,14 @@ public class DLFolderLocalServiceTest {
 
 	@Test
 	public void testGetNoAssetEntries() throws Exception {
-		Folder folder = _dlAppService.addFolder(
-			null, _group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId()));
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		Folder folder = _dlAppService.addFolder(
+			_group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			serviceContext);
 
 		DLFolder dlFolder = _dlFolderLocalService.getDLFolder(
 			folder.getFolderId());

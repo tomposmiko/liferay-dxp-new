@@ -27,10 +27,6 @@ public class CommerceAccountOrganizationRelServiceWrapper
 	implements CommerceAccountOrganizationRelService,
 			   ServiceWrapper<CommerceAccountOrganizationRelService> {
 
-	public CommerceAccountOrganizationRelServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceAccountOrganizationRelServiceWrapper(
 		CommerceAccountOrganizationRelService
 			commerceAccountOrganizationRelService) {

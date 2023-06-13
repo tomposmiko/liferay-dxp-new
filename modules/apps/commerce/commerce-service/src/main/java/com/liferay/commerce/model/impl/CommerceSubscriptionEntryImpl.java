@@ -79,9 +79,7 @@ public class CommerceSubscriptionEntryImpl
 	}
 
 	@Override
-	public UnicodeProperties
-		getDeliverySubscriptionTypeSettingsUnicodeProperties() {
-
+	public UnicodeProperties getDeliverySubscriptionTypeSettingsProperties() {
 		if (_deliverySubscriptionTypeSettingsUnicodeProperties == null) {
 			_deliverySubscriptionTypeSettingsUnicodeProperties =
 				UnicodePropertiesBuilder.create(
@@ -95,7 +93,7 @@ public class CommerceSubscriptionEntryImpl
 	}
 
 	@Override
-	public UnicodeProperties getSubscriptionTypeSettingsUnicodeProperties() {
+	public UnicodeProperties getSubscriptionTypeSettingsProperties() {
 		if (_subscriptionTypeSettingsUnicodeProperties == null) {
 			_subscriptionTypeSettingsUnicodeProperties =
 				UnicodePropertiesBuilder.create(
@@ -109,7 +107,7 @@ public class CommerceSubscriptionEntryImpl
 	}
 
 	@Override
-	public void setDeliverySubscriptionTypeSettingsUnicodeProperties(
+	public void setDeliverySubscriptionTypeSettingsProperties(
 		UnicodeProperties deliverySubscriptionTypeSettingsUnicodeProperties) {
 
 		_deliverySubscriptionTypeSettingsUnicodeProperties =
@@ -132,7 +130,7 @@ public class CommerceSubscriptionEntryImpl
 	}
 
 	@Override
-	public void setSubscriptionTypeSettingsUnicodeProperties(
+	public void setSubscriptionTypeSettingsProperties(
 		UnicodeProperties subscriptionTypeSettingsUnicodeProperties) {
 
 		_subscriptionTypeSettingsUnicodeProperties =

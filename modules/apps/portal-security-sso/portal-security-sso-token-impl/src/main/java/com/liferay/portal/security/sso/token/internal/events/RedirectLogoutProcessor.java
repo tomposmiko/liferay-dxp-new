@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  */
 @Component(
+	immediate = true,
 	property = "logout.processor.type=" + LogoutProcessorType.REDIRECT,
 	service = LogoutProcessor.class
 )

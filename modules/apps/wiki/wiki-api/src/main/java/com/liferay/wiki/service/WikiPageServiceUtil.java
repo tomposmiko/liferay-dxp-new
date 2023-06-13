@@ -52,8 +52,8 @@ public class WikiPageServiceUtil {
 	}
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addPage(String,
-	 long, String, String, String, boolean, String, String,
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addPage(String, long, String, String, String, boolean, String, String,
 	 String, ServiceContext)}
 	 */
 	@Deprecated
@@ -67,20 +67,6 @@ public class WikiPageServiceUtil {
 		return getService().addPage(
 			nodeId, title, content, summary, minorEdit, format, parentTitle,
 			redirectTitle, serviceContext);
-	}
-
-	public static WikiPage addPage(
-			String externalReferenceCode, long nodeId, String title,
-			double version, String content, String summary, boolean minorEdit,
-			String format, boolean head, String parentTitle,
-			String redirectTitle,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().addPage(
-			externalReferenceCode, nodeId, title, version, content, summary,
-			minorEdit, format, head, parentTitle, redirectTitle,
-			serviceContext);
 	}
 
 	public static WikiPage addPage(
@@ -304,10 +290,6 @@ public class WikiPageServiceUtil {
 		throws PortalException {
 
 		return getService().getPage(nodeId, title, version);
-	}
-
-	public static WikiPage getPageByPageId(long pageId) throws PortalException {
-		return getService().getPageByPageId(pageId);
 	}
 
 	public static List<WikiPage> getPages(

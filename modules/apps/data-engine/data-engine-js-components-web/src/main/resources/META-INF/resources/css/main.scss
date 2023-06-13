@@ -69,15 +69,14 @@ body .ddm-user-view-content {
 			margin-right: 16px;
 		}
 
-		.custom-control-inline {
+		.custom-control-inline + .custom-control-inline {
 			margin-left: 16px;
 		}
 	}
-}
 
-.form-control {
-	@extend %text-ellipsis;
-	white-space: normal;
+	.multi-step-icon {
+		cursor: default;
+	}
 }
 
 .portlet-forms .ddm-form-basic-info .ddm-form-name {
@@ -192,10 +191,6 @@ body .ddm-user-view-content {
 		button {
 			margin-bottom: 20px;
 		}
-
-		.lfr-ddm-form-pagination-prev {
-			margin-right: 16px;
-		}
 	}
 
 	.row {
@@ -224,14 +219,6 @@ body .ddm-user-view-content {
 		&:hover {
 			text-decoration: none;
 		}
-	}
-}
-
-.lfr-de__partial-results--background {
-	.ddm-form-builder-app {
-		margin-top: 0;
-		padding-bottom: 25px;
-		padding-top: 28px;
 	}
 }
 
@@ -446,12 +433,10 @@ body .ddm-user-view-content {
 		display: flex;
 		flex-flow: row;
 		flex-wrap: wrap;
-		justify-content: flex-start;
 		list-style: none;
 		margin: 0;
 		padding-right: 20px;
 		width: auto;
-		word-break: break-all;
 
 		li {
 			overflow: hidden;

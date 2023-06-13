@@ -24,10 +24,9 @@ import com.liferay.asset.kernel.model.AssetEntryTable;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.search.InfoSearchClassMapperRegistry;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
@@ -41,6 +40,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -92,8 +93,11 @@ public class AssetDisplayPageEntryLocalServiceImpl
 		assetDisplayPageEntry.setLayoutPageTemplateEntryId(
 			layoutPageTemplateEntryId);
 		assetDisplayPageEntry.setType(type);
-		assetDisplayPageEntry.setPlid(
-			_getPlid(groupId, classNameId, classPK, layoutPageTemplateEntryId));
+
+		long plid = _getPlid(
+			groupId, classNameId, classPK, layoutPageTemplateEntryId);
+
+		assetDisplayPageEntry.setPlid(plid);
 
 		assetDisplayPageEntry = assetDisplayPageEntryPersistence.update(
 			assetDisplayPageEntry);
@@ -262,7 +266,7 @@ public class AssetDisplayPageEntryLocalServiceImpl
 		String className = _portal.getClassName(classNameId);
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			_layoutDisplayPageProviderRegistry.
+			_layoutDisplayPageProviderTracker.
 				getLayoutDisplayPageProviderByClassName(className);
 
 		if (layoutDisplayPageProvider == null) {
@@ -277,36 +281,36 @@ public class AssetDisplayPageEntryLocalServiceImpl
 			return LayoutConstants.DEFAULT_PLID;
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				layoutPageTemplateEntryId);
+		long classTypeId = layoutDisplayPageObjectProvider.getClassTypeId();
 
-		if (layoutPageTemplateEntry == null) {
-			layoutPageTemplateEntry =
+		LayoutPageTemplateEntry layoutPageTemplateEntry = Optional.ofNullable(
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				layoutPageTemplateEntryId)
+		).orElseGet(
+			() ->
 				_layoutPageTemplateEntryLocalService.
 					fetchDefaultLayoutPageTemplateEntry(
-						groupId, classNameId,
-						layoutDisplayPageObjectProvider.getClassTypeId());
-		}
+						groupId, classNameId, classTypeId)
+		);
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry.getPlid();
 		}
 
 		AssetRendererFactory<?> assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				className);
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(classNameId);
 
 		AssetEntry assetEntry = null;
 
 		if (assetRendererFactory != null) {
 			try {
 				assetEntry = assetRendererFactory.getAssetEntry(
-					className, classPK);
+					_portal.getClassName(classNameId), classPK);
 			}
 			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(portalException);
+					_log.warn(portalException, portalException);
 				}
 			}
 		}
@@ -344,12 +348,16 @@ public class AssetDisplayPageEntryLocalServiceImpl
 			classNameId
 		).and(
 			() -> {
-				String searchClassName =
-					_infoSearchClassMapperRegistry.getSearchClassName(
-						_portal.getClassName(classNameId));
+				if (classNameId == _portal.getClassNameId(
+						FileEntry.class.getName())) {
 
-				return AssetEntryTable.INSTANCE.classNameId.eq(
-					_portal.getClassNameId(searchClassName));
+					return AssetEntryTable.INSTANCE.classNameId.eq(
+						_portal.getClassNameId(
+							"com.liferay.document.library.kernel.model." +
+								"DLFileEntry"));
+				}
+
+				return AssetEntryTable.INSTANCE.classNameId.eq(classNameId);
 			}
 		).and(
 			AssetDisplayPageEntryTable.INSTANCE.layoutPageTemplateEntryId.eq(
@@ -386,11 +394,7 @@ public class AssetDisplayPageEntryLocalServiceImpl
 	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
-	private InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
-
-	@Reference
-	private LayoutDisplayPageProviderRegistry
-		_layoutDisplayPageProviderRegistry;
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

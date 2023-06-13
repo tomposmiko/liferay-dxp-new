@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -747,7 +747,7 @@ public class PortletRequestModel implements Serializable {
 		}
 		catch (IllegalStateException illegalStateException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(illegalStateException);
+				_log.warn(illegalStateException.getMessage());
 			}
 		}
 	}
@@ -765,7 +765,7 @@ public class PortletRequestModel implements Serializable {
 			}
 			catch (IllegalStateException illegalStateException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(illegalStateException);
+					_log.warn(illegalStateException.getMessage());
 				}
 			}
 
@@ -781,7 +781,7 @@ public class PortletRequestModel implements Serializable {
 				}
 				catch (WindowStateException windowStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(windowStateException);
+						_log.debug(windowStateException, windowStateException);
 					}
 				}
 
@@ -792,7 +792,7 @@ public class PortletRequestModel implements Serializable {
 				}
 				catch (WindowStateException windowStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(windowStateException);
+						_log.debug(windowStateException, windowStateException);
 					}
 				}
 
@@ -803,7 +803,7 @@ public class PortletRequestModel implements Serializable {
 				}
 				catch (WindowStateException windowStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(windowStateException);
+						_log.debug(windowStateException, windowStateException);
 					}
 				}
 
@@ -814,7 +814,7 @@ public class PortletRequestModel implements Serializable {
 				}
 				catch (WindowStateException windowStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(windowStateException);
+						_log.debug(windowStateException, windowStateException);
 					}
 				}
 
@@ -825,22 +825,22 @@ public class PortletRequestModel implements Serializable {
 				}
 				catch (WindowStateException windowStateException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(windowStateException);
+						_log.debug(windowStateException, windowStateException);
 					}
 				}
 			}
 			catch (IllegalStateException illegalStateException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(illegalStateException);
+					_log.warn(illegalStateException.getMessage());
 				}
 			}
 
 			ResourceURL resourceURL = mimeResponse.createResourceURL();
 
-			String resourceURLString = HttpComponentsUtil.removeParameter(
+			String resourceURLString = HttpUtil.removeParameter(
 				resourceURL.toString(), _portletNamespace + "struts_action");
 
-			resourceURLString = HttpComponentsUtil.removeParameter(
+			resourceURLString = HttpUtil.removeParameter(
 				resourceURLString, _portletNamespace + "redirect");
 
 			_resourceURL = resourceURLString;
@@ -876,21 +876,22 @@ public class PortletRequestModel implements Serializable {
 
 			return !map.isEmpty();
 		}
+		else {
+			String objString = String.valueOf(object);
 
-		String objString = String.valueOf(object);
+			if (Validator.isNull(objString)) {
+				return false;
+			}
 
-		if (Validator.isNull(objString)) {
-			return false;
+			String hashCode = StringPool.AT.concat(
+				StringUtil.toHexString(object.hashCode()));
+
+			if (objString.endsWith(hashCode)) {
+				return false;
+			}
+
+			return true;
 		}
-
-		String hashCode = StringPool.AT.concat(
-			StringUtil.toHexString(object.hashCode()));
-
-		if (objString.endsWith(hashCode)) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

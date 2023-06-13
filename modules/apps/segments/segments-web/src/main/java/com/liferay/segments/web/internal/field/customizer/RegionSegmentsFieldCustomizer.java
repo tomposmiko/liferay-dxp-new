@@ -14,7 +14,6 @@
 
 package com.liferay.segments.web.internal.field.customizer;
 
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.Country;
@@ -28,6 +27,8 @@ import com.liferay.segments.field.customizer.SegmentsFieldCustomizer;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -36,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  */
 @Component(
+	immediate = true,
 	property = {
 		"segments.field.customizer.entity.name=Organization",
 		"segments.field.customizer.key=" + RegionSegmentsFieldCustomizer.KEY,
@@ -59,20 +61,23 @@ public class RegionSegmentsFieldCustomizer extends BaseSegmentsFieldCustomizer {
 
 	@Override
 	public List<Field.Option> getOptions(Locale locale) {
-		List<Field.Option> options = TransformUtil.transform(
-			_regionService.getRegions(),
+		List<Region> regions = _regionService.getRegions();
+
+		Stream<Region> stream = regions.stream();
+
+		return stream.map(
 			region -> new Field.Option(
 				_getRegionLabel(region, locale),
-				StringUtil.toLowerCase(region.getName())));
-
-		options.sort(
+				StringUtil.toLowerCase(region.getName()))
+		).sorted(
 			(a, b) -> {
 				String aLabel = a.getLabel();
 
 				return aLabel.compareTo(b.getLabel());
-			});
-
-		return options;
+			}
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	private String _getRegionLabel(Region region, Locale locale) {

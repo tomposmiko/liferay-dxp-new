@@ -40,22 +40,15 @@ function SelectTasksStep({setErrorToast, withoutUnassigned}) {
 
 	const paginationState = {
 		...pagination,
-		totalCount: data?.totalCount,
+		totalCount: data.totalCount,
 	};
 
 	useEffect(() => {
 		if (page !== 1) {
 			pagination.setPage(1);
 		}
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [bulkAssigneeIds, bulkTaskNames]);
-
-	useEffect(() => {
-		fetchTasks();
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [page, pageSize, bulkAssigneeIds, bulkTaskNames]);
 
 	const [retry, setRetry] = useState(0);
 
@@ -70,9 +63,8 @@ function SelectTasksStep({setErrorToast, withoutUnassigned}) {
 				return Promise.reject(error);
 			}),
 		];
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [retry]);
+	}, [fetchTasks, retry]);
 
 	return (
 		<div className="fixed-height modal-metrics-content">

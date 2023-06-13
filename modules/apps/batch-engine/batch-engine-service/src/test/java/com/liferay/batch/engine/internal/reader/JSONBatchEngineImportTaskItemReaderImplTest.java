@@ -323,7 +323,7 @@ public class JSONBatchEngineImportTaskItemReaderImplTest
 		}
 	}
 
-	private byte[] _getContent(String[] columnNames, Object[][] rowValues) {
+	private byte[] _getContent(String[] cellNames, Object[][] rowValues) {
 		StringBundler sb = new StringBundler();
 
 		sb.append("[");
@@ -334,7 +334,7 @@ public class JSONBatchEngineImportTaskItemReaderImplTest
 			for (int j = 0; j < singleRowValues.length; j++) {
 				if (singleRowValues[j] != null) {
 					sb.append("\"");
-					sb.append(columnNames[j]);
+					sb.append(cellNames[j]);
 					sb.append("\": ");
 					sb.append(singleRowValues[j]);
 					sb.append(",");
@@ -355,12 +355,11 @@ public class JSONBatchEngineImportTaskItemReaderImplTest
 
 	private JSONBatchEngineImportTaskItemReaderImpl
 			_getJSONBatchEngineImportTaskItemReader(
-				String[] columnNames, Object[][] rowValues)
+				String[] cellNames, Object[][] rowValues)
 		throws IOException {
 
 		return new JSONBatchEngineImportTaskItemReaderImpl(
-			Collections.emptyList(),
-			new ByteArrayInputStream(_getContent(columnNames, rowValues)));
+			new ByteArrayInputStream(_getContent(cellNames, rowValues)));
 	}
 
 	private static final String[] _FIELD_NAMES = {

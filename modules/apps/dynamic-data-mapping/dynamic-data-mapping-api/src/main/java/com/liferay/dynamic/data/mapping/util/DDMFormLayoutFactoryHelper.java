@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -104,8 +105,10 @@ public class DDMFormLayoutFactoryHelper {
 			ddmFormLayoutPage =
 				new com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage();
 
-		ddmFormLayoutPage.setTitle(
-			createDDMFormLayoutPageTitle(ddmFormLayoutPageAnnotation.title()));
+		LocalizedValue title = createDDMFormLayoutPageTitle(
+			ddmFormLayoutPageAnnotation.title());
+
+		ddmFormLayoutPage.setTitle(title);
 
 		for (DDMFormLayoutRow ddmFormLayoutRow :
 				ddmFormLayoutPageAnnotation.value()) {
@@ -209,21 +212,15 @@ public class DDMFormLayoutFactoryHelper {
 	}
 
 	protected void setDefaultLocale() {
-		Locale defaultLocale = LocaleThreadLocal.getThemeDisplayLocale();
-
-		if (defaultLocale == null) {
-			Locale siteDefaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
-
-			if (siteDefaultLocale == null) {
-				_defaultLocale = LocaleUtil.getDefault();
-			}
-			else {
-				_defaultLocale = siteDefaultLocale;
-			}
-		}
-		else {
-			_defaultLocale = defaultLocale;
-		}
+		_defaultLocale = Optional.ofNullable(
+			LocaleThreadLocal.getThemeDisplayLocale()
+		).orElse(
+			Optional.ofNullable(
+				LocaleThreadLocal.getSiteDefaultLocale()
+			).orElse(
+				LocaleUtil.getDefault()
+			)
+		);
 	}
 
 	private final Class<?> _clazz;

@@ -539,8 +539,4 @@ public interface MBMailingListModel
 	@Override
 	public MBMailingList cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

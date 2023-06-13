@@ -23,14 +23,14 @@ import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.change.tracking.spi.display.BaseCTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Cheryl Tang
  */
-@Component(service = CTDisplayRenderer.class)
+@Component(immediate = true, service = CTDisplayRenderer.class)
 public class AssetVocabularyCTDisplayRenderer
 	extends BaseCTDisplayRenderer<AssetVocabulary> {
 
@@ -86,7 +86,7 @@ public class AssetVocabularyCTDisplayRenderer
 				AssetCategoriesAdminPortletKeys.ASSET_CATEGORIES_ADMIN, 0, 0,
 				PortletRequest.RENDER_PHASE)
 		).setMVCPath(
-			"/edit_asset_vocabulary.jsp"
+			"/edit_vocabulary.jsp"
 		).setRedirect(
 			_portal.getCurrentURL(httpServletRequest)
 		).setParameter(
@@ -142,7 +142,7 @@ public class AssetVocabularyCTDisplayRenderer
 			String name = null;
 
 			if (classNameId == AssetCategoryConstants.ALL_CLASS_NAME_ID) {
-				name = _language.get(
+				name = LanguageUtil.get(
 					displayBuilder.getLocale(), "all-asset-types");
 			}
 			else if (classTypePK == AssetCategoryConstants.ALL_CLASS_TYPE_PK) {
@@ -166,7 +166,7 @@ public class AssetVocabularyCTDisplayRenderer
 				}
 				catch (PortalException portalException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(portalException);
+						_log.debug(portalException, portalException);
 					}
 
 					continue;
@@ -195,9 +195,6 @@ public class AssetVocabularyCTDisplayRenderer
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private Portal _portal;

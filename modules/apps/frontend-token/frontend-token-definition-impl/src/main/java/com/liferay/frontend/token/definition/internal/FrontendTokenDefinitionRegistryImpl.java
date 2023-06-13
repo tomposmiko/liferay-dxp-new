@@ -88,7 +88,7 @@ public class FrontendTokenDefinitionRegistryImpl
 	protected FrontendTokenDefinitionImpl getFrontendTokenDefinitionImpl(
 		Bundle bundle) {
 
-		String json = _getFrontendTokenDefinitionJSON(bundle);
+		String json = getFrontendTokenDefinitionJSON(bundle);
 
 		if (json == null) {
 			return null;
@@ -119,6 +119,23 @@ public class FrontendTokenDefinitionRegistryImpl
 		}
 
 		return null;
+	}
+
+	protected String getFrontendTokenDefinitionJSON(Bundle bundle) {
+		URL url = bundle.getEntry("WEB-INF/frontend-token-definition.json");
+
+		if (url == null) {
+			return null;
+		}
+
+		try (InputStream inputStream = url.openStream()) {
+			return StringUtil.read(inputStream);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(
+				"Unable to read WEB-INF/frontend-token-definition.json",
+				ioException);
+		}
 	}
 
 	protected String getServletContextName(Bundle bundle) {
@@ -188,23 +205,6 @@ public class FrontendTokenDefinitionRegistryImpl
 	protected Map<String, FrontendTokenDefinitionImpl>
 		themeIdFrontendTokenDefinitionImpls = new ConcurrentHashMap<>();
 
-	private String _getFrontendTokenDefinitionJSON(Bundle bundle) {
-		URL url = bundle.getEntry("WEB-INF/frontend-token-definition.json");
-
-		if (url == null) {
-			return null;
-		}
-
-		try (InputStream inputStream = url.openStream()) {
-			return StringUtil.read(inputStream);
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(
-				"Unable to read WEB-INF/frontend-token-definition.json",
-				ioException);
-		}
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		FrontendTokenDefinitionRegistryImpl.class);
 
@@ -240,6 +240,10 @@ public class FrontendTokenDefinitionRegistryImpl
 			@Override
 			public void modifiedBundle(
 				Bundle bundle1, BundleEvent bundleEvent, Bundle bundle2) {
+
+				removedBundle(bundle1, bundleEvent, null);
+
+				addingBundle(bundle1, bundleEvent);
 			}
 
 			@Override

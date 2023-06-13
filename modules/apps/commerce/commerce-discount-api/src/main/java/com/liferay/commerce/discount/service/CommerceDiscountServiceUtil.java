@@ -247,14 +247,6 @@ public class CommerceDiscountServiceUtil {
 		return getService().getCommerceDiscounts(companyId, couponCode);
 	}
 
-	public static List<CommerceDiscount> getCommerceDiscounts(
-			long companyId, String level, boolean active, int status)
-		throws PortalException {
-
-		return getService().getCommerceDiscounts(
-			companyId, level, active, status);
-	}
-
 	/**
 	 * @deprecated As of Athanasius (7.3.x)
 	 */

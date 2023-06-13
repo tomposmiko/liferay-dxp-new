@@ -17,20 +17,45 @@
 <%@ include file="/admin/init.jsp" %>
 
 <%
-KaleoFormsTaskTemplateSearchDisplayContext kaleoFormsTaskTemplateSearchDisplayContext = new KaleoFormsTaskTemplateSearchDisplayContext(request, liferayPortletRequest, liferayPortletResponse, renderRequest);
+String backURL = ParamUtil.getString(request, "backURL");
+
+KaleoProcess kaleoProcess = (KaleoProcess)request.getAttribute(KaleoFormsWebKeys.KALEO_PROCESS);
+
+long kaleoProcessId = BeanParamUtil.getLong(kaleoProcess, request, "kaleoProcessId");
+
+long ddmStructureId = KaleoFormsUtil.getKaleoProcessDDMStructureId(kaleoProcessId, portletSession);
+
+String workflowDefinition = ParamUtil.getString(request, "workflowDefinition");
+
+KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialStateKaleoTaskFormPair(kaleoProcessId, ddmStructureId, workflowDefinition, KaleoFormsUtil.getInitialStateName(company.getCompanyId(), workflowDefinition), portletSession);
 %>
 
 <div id="<portlet:namespace />formsSearchContainer">
+	<liferay-portlet:renderURL varImpl="portletURL" />
+
 	<liferay-ui:search-container
-		searchContainer="<%= kaleoFormsTaskTemplateSearchDisplayContext.getSearchContainer() %>"
+		searchContainer='<%= new SearchContainer<Object>(renderRequest, portletURL, null, "no-tasks-were-found") %>'
 	>
+		<liferay-ui:search-container-results>
+
+			<%
+			KaleoTaskFormPairs kaleoTaskFormPairs = KaleoFormsUtil.getKaleoTaskFormPairs(company.getCompanyId(), kaleoProcessId, ddmStructureId, workflowDefinition, portletSession);
+
+			kaleoTaskFormPairs.add(0, initialStateKaleoTaskFormPair);
+
+			searchContainer.setResults(kaleoTaskFormPairs.list());
+			searchContainer.setTotal(kaleoTaskFormPairs.size());
+			%>
+
+		</liferay-ui:search-container-results>
+
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.workflow.kaleo.forms.model.KaleoTaskFormPair"
 			modelVar="taskFormsPair"
 		>
 			<liferay-ui:search-container-row-parameter
 				name="backURL"
-				value="<%= kaleoFormsTaskTemplateSearchDisplayContext.getBackURL() %>"
+				value="<%= backURL %>"
 			/>
 
 			<liferay-ui:search-container-column-text
@@ -57,7 +82,7 @@ KaleoFormsTaskTemplateSearchDisplayContext kaleoFormsTaskTemplateSearchDisplayCo
 			<liferay-util:buffer
 				var="taskInputBuffer"
 			>
-				<c:if test="<%= taskFormsPair.equals(kaleoFormsTaskTemplateSearchDisplayContext.getInitialStateKaleoTaskFormPair()) %>">
+				<c:if test="<%= taskFormsPair.equals(initialStateKaleoTaskFormPair) %>">
 					<aui:input name="ddmTemplateId" type="hidden" value="<%= Validator.isNull(formName) ? StringPool.BLANK : String.valueOf(ddmTemplateId) %>">
 						<aui:validator name="required" />
 					</aui:input>
@@ -87,7 +112,7 @@ KaleoFormsTaskTemplateSearchDisplayContext kaleoFormsTaskTemplateSearchDisplayCo
 <liferay-frontend:component
 	context='<%=
 		HashMapBuilder.<String, Object>put(
-			"backURL", HtmlUtil.escapeURL(kaleoFormsTaskTemplateSearchDisplayContext.getBackURL())
+			"backURL", HtmlUtil.escapeURL(backURL)
 		).put(
 			"itemSelectorURL",
 			PortletURLBuilder.create(
@@ -134,9 +159,6 @@ KaleoFormsTaskTemplateSearchDisplayContext kaleoFormsTaskTemplateSearchDisplayCo
 			var WIN = A.config.win;
 
 			Liferay.Util.openWindow({
-				dialog: {
-					destroyOnHide: true,
-				},
 				id: A.guid(),
 				refreshWindow: WIN,
 				title: '<liferay-ui:message key="forms" />',
@@ -152,21 +174,17 @@ KaleoFormsTaskTemplateSearchDisplayContext kaleoFormsTaskTemplateSearchDisplayCo
 		(event) => {
 			var A = AUI();
 
+			var taskFormPairsParamName = event.taskFormPairsParamName;
+
 			var data = {};
 
-			data['<portlet:namespace />kaleoProcessLinkDDMStructureId'] =
-				event.ddmStructureId;
-			data['<portlet:namespace />kaleoProcessLinkDDMTemplateId'] = 0;
-			data['<portlet:namespace />kaleoProcessLinkWorkflowDefinition'] =
-				event.workflowDefinition;
-			data['<portlet:namespace />kaleoProcessLinkWorkflowTaskName'] =
-				event.workflowTaskName;
+			data[taskFormPairsParamName] = 0;
 
 			A.io.request('<portlet:resourceURL id="saveInPortletSession" />', {
 				after: {
 					success: function () {
 						window.location = decodeURIComponent(
-							'<%= HtmlUtil.escapeURL(kaleoFormsTaskTemplateSearchDisplayContext.getBackURL()) %>'
+							'<%= HtmlUtil.escapeURL(backURL) %>'
 						);
 					},
 				},

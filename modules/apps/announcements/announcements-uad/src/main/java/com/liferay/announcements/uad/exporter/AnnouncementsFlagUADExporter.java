@@ -21,7 +21,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Noah Sherrill
  */
-@Component(service = UADExporter.class)
+@Component(immediate = true, service = UADExporter.class)
 public class AnnouncementsFlagUADExporter
 	extends BaseAnnouncementsFlagUADExporter {
 }

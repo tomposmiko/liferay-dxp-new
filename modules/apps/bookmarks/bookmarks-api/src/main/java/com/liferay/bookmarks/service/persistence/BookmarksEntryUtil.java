@@ -25,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
+
 /**
  * The persistence utility for the bookmarks entry service. This utility wraps <code>com.liferay.bookmarks.service.persistence.impl.BookmarksEntryPersistenceImpl</code> and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
  *
@@ -1057,7 +1061,7 @@ public class BookmarksEntryUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2813,7 +2817,7 @@ public class BookmarksEntryUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -3277,7 +3281,7 @@ public class BookmarksEntryUtil {
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -3774,7 +3778,7 @@ public class BookmarksEntryUtil {
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -4019,9 +4023,26 @@ public class BookmarksEntryUtil {
 	}
 
 	public static BookmarksEntryPersistence getPersistence() {
-		return _persistence;
+		return _serviceTracker.getService();
 	}
 
-	private static volatile BookmarksEntryPersistence _persistence;
+	private static ServiceTracker
+		<BookmarksEntryPersistence, BookmarksEntryPersistence> _serviceTracker;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			BookmarksEntryPersistence.class);
+
+		ServiceTracker<BookmarksEntryPersistence, BookmarksEntryPersistence>
+			serviceTracker =
+				new ServiceTracker
+					<BookmarksEntryPersistence, BookmarksEntryPersistence>(
+						bundle.getBundleContext(),
+						BookmarksEntryPersistence.class, null);
+
+		serviceTracker.open();
+
+		_serviceTracker = serviceTracker;
+	}
 
 }

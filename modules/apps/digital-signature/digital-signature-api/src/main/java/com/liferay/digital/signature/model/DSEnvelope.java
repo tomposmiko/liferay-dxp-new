@@ -107,7 +107,17 @@ public class DSEnvelope {
 		).put(
 			"documents",
 			JSONUtil.toJSONArray(
-				getDSDocuments(), dsDocument -> dsDocument.toJSONObject(), _log)
+				getDSDocuments(),
+				dsDocument -> JSONUtil.put(
+					"documentBase64", dsDocument.getData()
+				).put(
+					"documentId", dsDocument.getDSDocumentId()
+				).put(
+					"fileExtension", dsDocument.getFileExtension()
+				).put(
+					"name", dsDocument.getName()
+				),
+				_log)
 		).put(
 			"emailBlurb", getEmailBlurb()
 		).put(
@@ -122,7 +132,16 @@ public class DSEnvelope {
 				"signers",
 				JSONUtil.toJSONArray(
 					getDSRecipients(),
-					dsRecipient -> dsRecipient.toJSONObject(), _log))
+					dsRecipient -> JSONUtil.put(
+						"email", dsRecipient.getEmailAddress()
+					).put(
+						"name", dsRecipient.getName()
+					).put(
+						"recipientId", dsRecipient.getDSRecipientId()
+					).put(
+						"status", dsRecipient.getStatus()
+					),
+					_log))
 		).put(
 			"senderEmailAddress", getSenderEmailAddress()
 		).put(
@@ -132,7 +151,7 @@ public class DSEnvelope {
 
 	@Override
 	public String toString() {
-		return toJSONObject().toString();
+		return toJSONObject().toJSONString();
 	}
 
 	protected LocalDateTime createdLocalDateTime;

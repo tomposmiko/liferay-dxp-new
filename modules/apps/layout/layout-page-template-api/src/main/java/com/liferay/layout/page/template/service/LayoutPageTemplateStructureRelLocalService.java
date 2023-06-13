@@ -380,12 +380,6 @@ public interface LayoutPageTemplateStructureRelLocalService
 			String data)
 		throws PortalException;
 
-	public LayoutPageTemplateStructureRel updateStatus(
-			long userId, long layoutPageTemplateStructureId,
-			long segmentsExperienceId, int status,
-			ServiceContext serviceContext)
-		throws PortalException;
-
 	@Override
 	@Transactional(enabled = false)
 	public CTPersistence<LayoutPageTemplateStructureRel> getCTPersistence();

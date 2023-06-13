@@ -16,13 +16,12 @@ package com.liferay.staging.bar.web.internal.portlet;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
-import com.liferay.asset.util.LinkedAssetEntryIdsUtil;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.StagingURLHelper;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.bean.BeanProperties;
+import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.LayoutBranchNameException;
@@ -44,6 +43,8 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalService;
+import com.liferay.portal.kernel.service.LayoutSetBranchService;
+import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
@@ -80,6 +81,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Levente Hudák
  */
 @Component(
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-staging-bar",
@@ -100,8 +102,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + StagingBarPortletKeys.STAGING_BAR,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
 	service = Portlet.class
 )
@@ -131,7 +132,7 @@ public class StagingBarPortlet extends MVCPortlet {
 				layoutRevision.getParentLayoutRevisionId());
 		}
 
-		_addLayoutRevisionSessionMessages(actionRequest, actionResponse);
+		addLayoutRevisionSessionMessages(actionRequest, actionResponse);
 	}
 
 	@Override
@@ -175,15 +176,7 @@ public class StagingBarPortlet extends MVCPortlet {
 		LayoutSetBranch layoutSetBranch = null;
 
 		if (layout != null) {
-			Layout layoutRevisionLayout = layout;
-
-			if (layout.isDraftLayout()) {
-				layoutRevisionLayout = _layoutLocalService.fetchLayout(
-					layout.getClassPK());
-			}
-
-			layoutRevision = LayoutStagingUtil.getLayoutRevision(
-				layoutRevisionLayout);
+			layoutRevision = LayoutStagingUtil.getLayoutRevision(layout);
 
 			if (layoutRevision != null) {
 				branchingEnabled = true;
@@ -282,13 +275,6 @@ public class StagingBarPortlet extends MVCPortlet {
 			httpServletRequest.setAttribute(
 				WebKeys.LAYOUT_ASSET_ENTRY, originalAssetEntry);
 
-			if (originalAssetEntry instanceof AssetEntry) {
-				AssetEntry assetEntry = (AssetEntry)originalAssetEntry;
-
-				LinkedAssetEntryIdsUtil.addLinkedAssetEntryId(
-					httpServletRequest, assetEntry.getEntryId());
-			}
-
 			themeDisplay.setScopeGroupId(originalScopeGroupId);
 
 			if (group.isStagingGroup() || group.isStagedRemotely()) {
@@ -318,7 +304,7 @@ public class StagingBarPortlet extends MVCPortlet {
 						group, layout.isPrivateLayout());
 				}
 				catch (AuthException authException) {
-					_log.error(authException);
+					_log.error(authException.getMessage());
 
 					SessionErrors.add(renderRequest, AuthException.class);
 				}
@@ -339,7 +325,7 @@ public class StagingBarPortlet extends MVCPortlet {
 						renderRequest, RemoteExportException.class);
 				}
 				catch (Exception exception) {
-					_log.error(exception);
+					_log.error(exception, exception);
 
 					SessionErrors.add(renderRequest, Exception.class);
 				}
@@ -394,7 +380,7 @@ public class StagingBarPortlet extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
-		_updateParentLayoutsRevisions(layoutRevision, serviceContext);
+		updateParentLayoutsRevisions(layoutRevision, serviceContext);
 
 		LayoutRevision enableLayoutRevision =
 			_layoutRevisionLocalService.updateLayoutRevision(
@@ -412,7 +398,7 @@ public class StagingBarPortlet extends MVCPortlet {
 				themeDisplay.getUser(), layoutRevision.getLayoutSetBranchId(),
 				layoutRevision.getPlid(), layoutRevision.getLayoutRevisionId());
 
-			_addLayoutRevisionSessionMessages(actionRequest, actionResponse);
+			addLayoutRevisionSessionMessages(actionRequest, actionResponse);
 
 			return;
 		}
@@ -449,7 +435,18 @@ public class StagingBarPortlet extends MVCPortlet {
 				newLayoutRevision.getLayoutRevisionId());
 		}
 
-		_addLayoutRevisionSessionMessages(actionRequest, actionResponse);
+		addLayoutRevisionSessionMessages(actionRequest, actionResponse);
+	}
+
+	protected void addLayoutRevisionSessionMessages(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException {
+
+		MultiSessionMessages.add(
+			actionRequest,
+			_portal.getPortletId(actionRequest) + "requestProcessed");
+
+		sendRedirect(actionRequest, actionResponse);
 	}
 
 	@Override
@@ -483,87 +480,79 @@ public class StagingBarPortlet extends MVCPortlet {
 		return false;
 	}
 
-	private void _addLayoutRevisionSessionMessages(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
+	@Reference
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
 
-		MultiSessionMessages.add(
-			actionRequest,
-			_portal.getPortletId(actionRequest) + "requestProcessed");
-
-		sendRedirect(actionRequest, actionResponse);
+		_layoutLocalService = layoutLocalService;
 	}
 
-	private void _deleteUnusedLayoutIconImage(LayoutRevision layoutRevision)
-		throws Exception {
+	@Reference
+	protected void setLayoutRevisionLocalService(
+		LayoutRevisionLocalService layoutRevisionLocalService) {
 
-		Layout layout = _layoutLocalService.fetchLayout(
-			layoutRevision.getPlid());
-
-		if (layout == null) {
-			return;
-		}
-
-		long layoutRevisionIconImageId = _beanProperties.getLong(
-			layoutRevision, "iconImageId");
-
-		if (layoutRevisionIconImageId == GetterUtil.DEFAULT_LONG) {
-			layoutRevisionIconImageId = _beanProperties.getLong(
-				layout, "iconImageId");
-		}
-
-		DynamicQuery layoutRevisionDynamicQuery =
-			_layoutRevisionLocalService.dynamicQuery();
-
-		layoutRevisionDynamicQuery.add(
-			RestrictionsFactoryUtil.eq(
-				"iconImageId", layoutRevisionIconImageId));
-
-		long sameImageCount = _layoutRevisionLocalService.dynamicQueryCount(
-			layoutRevisionDynamicQuery);
-
-		DynamicQuery layoutDynamicQuery = _layoutLocalService.dynamicQuery();
-
-		layoutDynamicQuery.add(
-			RestrictionsFactoryUtil.eq(
-				"iconImageId", layoutRevisionIconImageId));
-		layoutDynamicQuery.add(
-			RestrictionsFactoryUtil.ne("plid", layout.getPlid()));
-
-		sameImageCount += _layoutLocalService.dynamicQueryCount(
-			layoutDynamicQuery);
-
-		if ((layoutRevisionIconImageId > 0) && (sameImageCount < 1)) {
-			layout.setIconImageId(layoutRevisionIconImageId);
-
-			_portal.updateImageId(layout, false, null, "iconImageId", 0, 0, 0);
-		}
+		_layoutRevisionLocalService = layoutRevisionLocalService;
 	}
 
-	private void _setScopedAssetEntry(
-		HttpServletRequest httpServletRequest, long groupId) {
+	@Reference
+	protected void setLayoutSetBranchLocalService(
+		LayoutSetBranchLocalService layoutSetBranchLocalService) {
 
-		Object object = httpServletRequest.getAttribute(
-			WebKeys.LAYOUT_ASSET_ENTRY);
-
-		if ((object != null) && (object instanceof AssetEntry)) {
-			AssetEntry assetEntry = (AssetEntry)object;
-
-			AssetEntry scopedAssetEntry = _assetEntryLocalService.fetchEntry(
-				groupId, assetEntry.getClassUuid());
-
-			httpServletRequest.setAttribute(
-				WebKeys.LAYOUT_ASSET_ENTRY, scopedAssetEntry);
-
-			if (scopedAssetEntry != null) {
-				LinkedAssetEntryIdsUtil.replaceLinkedAssetEntryId(
-					httpServletRequest, assetEntry.getEntryId(),
-					scopedAssetEntry.getEntryId());
-			}
-		}
+		_layoutSetBranchLocalService = layoutSetBranchLocalService;
 	}
 
-	private void _updateParentLayoutsRevisions(
+	@Reference
+	protected void setLayoutSetBranchService(
+		LayoutSetBranchService layoutSetBranchService) {
+
+		_layoutSetBranchService = layoutSetBranchService;
+	}
+
+	@Reference
+	protected void setLayoutSetLocalService(
+		LayoutSetLocalService layoutSetLocalService) {
+
+		_layoutSetLocalService = layoutSetLocalService;
+	}
+
+	@Reference(
+		target = "(&(release.bundle.symbolic.name=com.liferay.staging.bar.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))",
+		unbind = "-"
+	)
+	protected void setRelease(Release release) {
+	}
+
+	protected void unsetLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = null;
+	}
+
+	protected void unsetLayoutRevisionLocalService(
+		LayoutRevisionLocalService layoutRevisionLocalService) {
+
+		_layoutRevisionLocalService = null;
+	}
+
+	protected void unsetLayoutSetBranchLocalService(
+		LayoutSetBranchLocalService layoutSetBranchLocalService) {
+
+		_layoutSetBranchLocalService = null;
+	}
+
+	protected void unsetLayoutSetBranchService(
+		LayoutSetBranchService layoutSetBranchService) {
+
+		_layoutSetBranchService = null;
+	}
+
+	protected void unsetLayoutSetLocalService(
+		LayoutSetLocalService layoutSetLocalService) {
+
+		_layoutSetLocalService = null;
+	}
+
+	protected void updateParentLayoutsRevisions(
 			LayoutRevision layoutRevision, ServiceContext serviceContext)
 		throws Exception {
 
@@ -619,31 +608,83 @@ public class StagingBarPortlet extends MVCPortlet {
 		}
 	}
 
+	private void _deleteUnusedLayoutIconImage(LayoutRevision layoutRevision)
+		throws Exception {
+
+		Layout layout = _layoutLocalService.fetchLayout(
+			layoutRevision.getPlid());
+
+		if (layout == null) {
+			return;
+		}
+
+		long layoutRevisionIconImageId = BeanPropertiesUtil.getLong(
+			layoutRevision, "iconImageId");
+
+		if (layoutRevisionIconImageId == GetterUtil.DEFAULT_LONG) {
+			layoutRevisionIconImageId = BeanPropertiesUtil.getLong(
+				layout, "iconImageId");
+		}
+
+		DynamicQuery layoutRevisionDynamicQuery =
+			_layoutRevisionLocalService.dynamicQuery();
+
+		layoutRevisionDynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"iconImageId", layoutRevisionIconImageId));
+
+		long sameImageCount = _layoutRevisionLocalService.dynamicQueryCount(
+			layoutRevisionDynamicQuery);
+
+		DynamicQuery layoutDynamicQuery = _layoutLocalService.dynamicQuery();
+
+		layoutDynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"iconImageId", layoutRevisionIconImageId));
+		layoutDynamicQuery.add(
+			RestrictionsFactoryUtil.ne("plid", layout.getPlid()));
+
+		sameImageCount += _layoutLocalService.dynamicQueryCount(
+			layoutDynamicQuery);
+
+		if ((layoutRevisionIconImageId > 0) && (sameImageCount < 1)) {
+			layout.setIconImageId(layoutRevisionIconImageId);
+
+			_portal.updateImageId(layout, false, null, "iconImageId", 0, 0, 0);
+		}
+	}
+
+	private void _setScopedAssetEntry(
+		HttpServletRequest httpServletRequest, long groupId) {
+
+		Object object = httpServletRequest.getAttribute(
+			WebKeys.LAYOUT_ASSET_ENTRY);
+
+		if ((object != null) && (object instanceof AssetEntry)) {
+			AssetEntry assetEntry = (AssetEntry)object;
+
+			AssetEntry scopedAssetEntry = _assetEntryLocalService.fetchEntry(
+				groupId, assetEntry.getClassUuid());
+
+			httpServletRequest.setAttribute(
+				WebKeys.LAYOUT_ASSET_ENTRY, scopedAssetEntry);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingBarPortlet.class);
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
 
-	@Reference
-	private BeanProperties _beanProperties;
-
-	@Reference
 	private LayoutLocalService _layoutLocalService;
-
-	@Reference
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
-
-	@Reference
 	private LayoutSetBranchLocalService _layoutSetBranchLocalService;
+	private LayoutSetBranchService _layoutSetBranchService;
+	private LayoutSetLocalService _layoutSetLocalService;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.staging.bar.web)(&(release.schema.version>=1.0.0)(!(release.schema.version>=2.0.0))))"
-	)
-	private Release _release;
 
 	@Reference
 	private Staging _staging;

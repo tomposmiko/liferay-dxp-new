@@ -37,7 +37,7 @@
 				{
 					doc: document,
 					win: window,
-					windowName: window.name
+					windowName: Liferay.Util.getWindowName()
 				}
 			);
 		</c:when>
@@ -72,8 +72,8 @@
 	}
 </aui:script>
 
-<aui:script require="frontend-js-web/index as frontendJsWeb">
-	var {delegate} = frontendJsWeb;
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+	var delegate = delegateModule.default;
 
 	delegate(
 		document,
@@ -92,6 +92,12 @@
 			event.delegateTarget.closest('.portlet').classList.remove('open');
 		}
 	);
+</aui:script>
+
+<aui:script use="aui-base">
+	if (A.UA.mobile) {
+		Liferay.Util.addInputCancel();
+	}
 </aui:script>
 
 <%
@@ -215,31 +221,31 @@ if (layout != null) {
 	<%-- User Inputted Layout and LayoutSet JavaScript --%>
 
 	<%
-	UnicodeProperties masterLayoutTypeSettingsUnicodeProperties = new UnicodeProperties();
+	LayoutSet layoutSet = themeDisplay.getLayoutSet();
+
+	UnicodeProperties layoutSetSettings = layoutSet.getSettingsProperties();
+
+	UnicodeProperties masterLayoutTypeSettings = new UnicodeProperties();
 
 	if (layout.getMasterLayoutPlid() > 0) {
 		Layout masterLayout = LayoutLocalServiceUtil.fetchLayout(layout.getMasterLayoutPlid());
 
 		if (masterLayout != null) {
-			masterLayoutTypeSettingsUnicodeProperties = masterLayout.getTypeSettingsProperties();
+			masterLayoutTypeSettings = masterLayout.getTypeSettingsProperties();
 		}
 	}
 
-	LayoutSet layoutSet = themeDisplay.getLayoutSet();
-
-	UnicodeProperties layoutSetSettingsUnicodeProperties = layoutSet.getSettingsProperties();
-
-	UnicodeProperties layoutTypeSettingsUnicodeProperties = layout.getTypeSettingsProperties();
+	UnicodeProperties layoutTypeSettings = layout.getTypeSettingsProperties();
 	%>
 
 	<script type="text/javascript">
 		// <![CDATA[
 			<c:if test="<%= !layout.isTypeControlPanel() %>">
-				<%= GetterUtil.getString(layoutSetSettingsUnicodeProperties.getProperty("javascript")) %>
+				<%= GetterUtil.getString(layoutSetSettings.getProperty("javascript")) %>
 
-				<%= GetterUtil.getString(masterLayoutTypeSettingsUnicodeProperties.getProperty("javascript")) %>
+				<%= GetterUtil.getString(masterLayoutTypeSettings.getProperty("javascript")) %>
 
-				<%= GetterUtil.getString(layoutTypeSettingsUnicodeProperties.getProperty("javascript")) %>
+				<%= GetterUtil.getString(layoutTypeSettings.getProperty("javascript")) %>
 			</c:if>
 		// ]]>
 	</script>

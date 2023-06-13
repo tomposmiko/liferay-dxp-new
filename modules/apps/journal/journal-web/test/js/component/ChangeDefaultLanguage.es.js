@@ -13,7 +13,12 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {fireEvent, render} from '@testing-library/react';
+import {
+	cleanup,
+	fireEvent,
+	render,
+	waitForElement,
+} from '@testing-library/react';
 import React from 'react';
 
 import ChangeDefaultLanguage from '../../../src/main/resources/META-INF/resources/js/ChangeDefaultLanguage.es';
@@ -49,13 +54,14 @@ function _renderChangeDefaultLanguageComponent({
 
 describe('ChangeDefaultLanguage', () => {
 	afterEach(() => {
+		cleanup();
 		jest.clearAllMocks();
 	});
 
 	it('render', () => {
 		const {getByText} = _renderChangeDefaultLanguageComponent();
 
-		expect(getByText('change')).toBeTruthy();
+		expect(getByText('change'));
 	});
 
 	it('render the default language', () => {
@@ -63,21 +69,17 @@ describe('ChangeDefaultLanguage', () => {
 			defaultLanguage: 'es_ES',
 		});
 
-		expect(getByText('Spanish (ES)')).toBeTruthy();
+		expect(getByText('Spanish (ES)'));
 	});
 
 	it('change default language', async () => {
-		const {
-			findByText,
-			getByText,
-			getByTitle,
-		} = _renderChangeDefaultLanguageComponent();
+		const {getByText, getByTitle} = _renderChangeDefaultLanguageComponent();
 
 		fireEvent.click(getByTitle('es_ES'));
 
-		await findByText('Spanish (ES)');
+		await waitForElement(() => getByText('Spanish (ES)'));
 
-		expect(getByText('Spanish (ES)')).toBeTruthy();
+		expect(getByText('Spanish (ES)'));
 	});
 
 	it('to fire default locale changed event', () => {

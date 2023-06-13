@@ -52,7 +52,7 @@ public abstract class BaseSubscriptionLocalizedContentTestCase
 		super.setUp();
 
 		defaultLocale = LocaleThreadLocal.getDefaultLocale();
-		layout = LayoutTestUtil.addTypePortletLayout(group);
+		layout = LayoutTestUtil.addLayout(group);
 	}
 
 	@After

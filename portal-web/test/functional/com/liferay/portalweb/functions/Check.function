@@ -12,7 +12,9 @@ definition {
 			selenium.clickAt();
 		}
 
-		selenium.assertChecked("xpath=( //div[@class='checkbox']//input[@title='Select All'])[2]");
+		selenium.assertChecked(
+			"xpath=( //div[@class='checkbox']//input[@title='Select All'])[2]"
+		);
 
 		selenium.assertJavaScriptErrors();
 
@@ -42,14 +44,10 @@ definition {
 
 		selenium.waitForElementPresent();
 
-		selenium.waitForEditable();
-
 		selenium.mouseOver();
 
 		if (selenium.isNotChecked()) {
 			selenium.clickAt();
-
-			selenium.pause(1000);
 		}
 
 		selenium.assertChecked();
@@ -57,18 +55,6 @@ definition {
 		selenium.assertJavaScriptErrors();
 
 		selenium.assertLiferayErrors();
-	}
-
-	function checkNotVisibleNoErrors {
-		WaitForSPARefresh();
-
-		selenium.waitForElementPresent();
-
-		selenium.mouseOver();
-
-		if (selenium.isNotChecked()) {
-			selenium.clickAt();
-		}
 	}
 
 	function checkToggleSwitch {
@@ -98,7 +84,7 @@ definition {
 			selenium.clickAt();
 		}
 
-		selenium.pause(1000);
+		selenium.pause("1000");
 
 		AssertChecked.assertCheckedNotVisible();
 
@@ -111,8 +97,6 @@ definition {
 		WaitForSPARefresh();
 
 		selenium.waitForVisible();
-
-		selenium.waitForEditable();
 
 		selenium.mouseOver();
 

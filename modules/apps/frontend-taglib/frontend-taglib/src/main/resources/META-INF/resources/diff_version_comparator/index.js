@@ -100,14 +100,16 @@ function Comparator({
 		[selectableVersions]
 	);
 
-	const diffCacheRef = useRef({[diffURL]: diff});
+	const diffCache = useRef({[diffURL]: diff});
 	const formRef = useRef();
 
 	const handleTargetChange = useCallback(
 		(event) => {
 			const target = event.target.closest('[data-version]');
 
-			const currentTargetVersion = target ? target.dataset.version : null;
+			const currentTargetVersion = target
+				? target.getAttribute('data-version')
+				: null;
 
 			const selectedVersion = selectableVersions.find((version) => {
 				return version.version === currentTargetVersion;
@@ -120,7 +122,7 @@ function Comparator({
 	);
 
 	useEffect(() => {
-		const cached = diffCacheRef.current[diffURL];
+		const cached = diffCache.current[diffURL];
 
 		if (cached) {
 			setDiff(cached);
@@ -129,16 +131,16 @@ function Comparator({
 			fetch(diffURL)
 				.then((res) => res.text())
 				.then((text) => {
-					diffCacheRef.current[diffURL] = text;
+					diffCache.current[diffURL] = text;
 				})
 				.catch(() => {
-					diffCacheRef.current[diffURL] = Liferay.Language.get(
+					diffCache.current[diffURL] = Liferay.Language.get(
 						'an-error-occurred-while-processing-the-requested-resource'
 					);
 				})
 				.finally(() => {
 					if (isMounted()) {
-						setDiff(diffCacheRef.current[diffURL]);
+						setDiff(diffCache.current[diffURL]);
 					}
 				});
 		}

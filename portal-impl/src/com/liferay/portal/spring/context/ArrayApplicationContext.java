@@ -59,7 +59,7 @@ public class ArrayApplicationContext extends ClassPathXmlApplicationContext {
 					}
 				}
 				else {
-					_log.error(exception);
+					_log.error(exception, exception);
 				}
 			}
 		}

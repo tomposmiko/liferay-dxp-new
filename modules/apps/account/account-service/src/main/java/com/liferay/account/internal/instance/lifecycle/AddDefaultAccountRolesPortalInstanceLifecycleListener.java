@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Drew Brokke
  */
 @Component(
-	property = "service.ranking:Integer=200",
+	immediate = true, property = "service.ranking:Integer=200",
 	service = PortalInstanceLifecycleListener.class
 )
 public class AddDefaultAccountRolesPortalInstanceLifecycleListener
@@ -53,18 +53,18 @@ public class AddDefaultAccountRolesPortalInstanceLifecycleListener
 
 		_checkResourcePermissions(
 			company.getCompanyId(),
-			AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_ADMINISTRATOR,
-			_accountAdministratorResourceActionsMap,
+			AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_MEMBER,
 			_accountMemberResourceActionsMap);
+		_checkResourcePermissions(
+			company.getCompanyId(),
+			AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_ADMINISTRATOR,
+			_accountMemberResourceActionsMap,
+			_accountAdministratorResourceActionsMap);
 		_checkResourcePermissions(
 			company.getCompanyId(),
 			AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_MANAGER,
-			_accountManagerResourceActionsMap,
-			_accountMemberResourceActionsMap);
-		_checkResourcePermissions(
-			company.getCompanyId(),
-			AccountRoleConstants.REQUIRED_ROLE_NAME_ACCOUNT_MEMBER,
-			_accountMemberResourceActionsMap);
+			_accountMemberResourceActionsMap,
+			_accountManagerResourceActionsMap);
 	}
 
 	private void _checkResourcePermissions(
@@ -105,10 +105,6 @@ public class AddDefaultAccountRolesPortalInstanceLifecycleListener
 			AccountEntry.class.getName(),
 			new String[] {
 				ActionKeys.UPDATE, ActionKeys.MANAGE_USERS,
-				AccountActionKeys.MANAGE_ADDRESSES,
-				AccountActionKeys.VIEW_ADDRESSES,
-				AccountActionKeys.VIEW_ACCOUNT_ROLES,
-				AccountActionKeys.VIEW_ORGANIZATIONS,
 				AccountActionKeys.VIEW_USERS
 			}
 		).build();
@@ -116,9 +112,7 @@ public class AddDefaultAccountRolesPortalInstanceLifecycleListener
 		_accountManagerResourceActionsMap = HashMapBuilder.put(
 			AccountEntry.class.getName(),
 			new String[] {
-				AccountActionKeys.MANAGE_ADDRESSES,
-				AccountActionKeys.VIEW_ACCOUNT_ROLES,
-				AccountActionKeys.VIEW_ADDRESSES,
+				AccountActionKeys.MANAGE_ORGANIZATIONS,
 				AccountActionKeys.VIEW_ORGANIZATIONS,
 				AccountActionKeys.VIEW_USERS, ActionKeys.MANAGE_USERS,
 				ActionKeys.UPDATE

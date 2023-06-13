@@ -26,8 +26,8 @@
 </portlet:actionURL>
 
 <aui:form action="<%= deleteTagURL %>" cssClass="container-fluid container-fluid-max-xl" name="fm">
-	<liferay-site-navigation:breadcrumb
-		breadcrumbEntries="<%= BreadcrumbEntriesUtil.getBreadcrumbEntries(request, true, false, false, true, true) %>"
+	<liferay-ui:breadcrumb
+		showLayout="<%= false %>"
 	/>
 
 	<liferay-ui:search-container
@@ -65,7 +65,6 @@
 
 					<liferay-ui:search-container-column-text>
 						<clay:dropdown-actions
-							aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 							dropdownItems="<%= assetTagsDisplayContext.getAssetTagActionDropdownItems(tag) %>"
 							propsTransformer="js/AssetTagActionDropdownPropsTransformer"
 						/>
@@ -86,7 +85,6 @@
 
 					<liferay-ui:search-container-column-text>
 						<clay:dropdown-actions
-							aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 							dropdownItems="<%= assetTagsDisplayContext.getAssetTagActionDropdownItems(tag) %>"
 							propsTransformer="js/AssetTagActionDropdownPropsTransformer"
 						/>

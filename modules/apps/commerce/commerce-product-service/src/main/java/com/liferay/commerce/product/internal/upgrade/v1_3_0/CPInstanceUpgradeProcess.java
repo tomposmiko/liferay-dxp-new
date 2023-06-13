@@ -14,27 +14,23 @@
 
 package com.liferay.commerce.product.internal.upgrade.v1_3_0;
 
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
+import com.liferay.commerce.product.internal.upgrade.base.BaseCommerceProductServiceUpgradeProcess;
+import com.liferay.commerce.product.model.impl.CPInstanceModelImpl;
 
 /**
  * @author Ethan Bustad
  * @author Alessio Antonio Rendina
  */
-public class CPInstanceUpgradeProcess extends UpgradeProcess {
+public class CPInstanceUpgradeProcess
+	extends BaseCommerceProductServiceUpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		runSQL("update CPInstance set CPInstanceUuid = uuid_");
-	}
+		addColumn(
+			CPInstanceModelImpl.class, CPInstanceModelImpl.TABLE_NAME,
+			"CPInstanceUuid", "VARCHAR(75)");
 
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CPInstance", "CPInstanceUuid VARCHAR(75)")
-		};
+		runSQL("update CPInstance set CPInstanceUuid = uuid_");
 	}
 
 }

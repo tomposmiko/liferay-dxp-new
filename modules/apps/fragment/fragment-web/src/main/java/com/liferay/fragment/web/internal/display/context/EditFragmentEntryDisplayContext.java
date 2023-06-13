@@ -16,7 +16,7 @@ package com.liferay.fragment.web.internal.display.context;
 
 import com.liferay.fragment.configuration.FragmentServiceConfiguration;
 import com.liferay.fragment.constants.FragmentPortletKeys;
-import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
@@ -24,32 +24,12 @@ import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
-import com.liferay.fragment.web.internal.info.field.type.CaptchaInfoFieldType;
-import com.liferay.info.field.type.BooleanInfoFieldType;
-import com.liferay.info.field.type.DateInfoFieldType;
-import com.liferay.info.field.type.FileInfoFieldType;
-import com.liferay.info.field.type.HTMLInfoFieldType;
-import com.liferay.info.field.type.InfoFieldType;
-import com.liferay.info.field.type.LongTextInfoFieldType;
-import com.liferay.info.field.type.MultiselectInfoFieldType;
-import com.liferay.info.field.type.NumberInfoFieldType;
-import com.liferay.info.field.type.RelationshipInfoFieldType;
-import com.liferay.info.field.type.SelectInfoFieldType;
-import com.liferay.info.field.type.TextInfoFieldType;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
@@ -89,14 +69,14 @@ public class EditFragmentEntryDisplayContext {
 		_httpServletRequest = httpServletRequest;
 		_renderResponse = renderResponse;
 
-		_fragmentCollectionContributorRegistry =
-			(FragmentCollectionContributorRegistry)
-				httpServletRequest.getAttribute(
+		_fragmentCollectionContributorTracker =
+			(FragmentCollectionContributorTracker)
+				_httpServletRequest.getAttribute(
 					FragmentWebKeys.FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER);
 		_fragmentEntryProcessorRegistry =
-			(FragmentEntryProcessorRegistry)httpServletRequest.getAttribute(
+			(FragmentEntryProcessorRegistry)_httpServletRequest.getAttribute(
 				FragmentWebKeys.FRAGMENT_ENTRY_PROCESSOR_REGISTRY);
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		_setViewAttributes();
@@ -157,7 +137,7 @@ public class EditFragmentEntryDisplayContext {
 
 		if (fragmentEntry == null) {
 			fragmentEntry =
-				_fragmentCollectionContributorRegistry.getFragmentEntry(
+				_fragmentCollectionContributorTracker.getFragmentEntry(
 					getFragmentEntryKey());
 		}
 
@@ -233,6 +213,8 @@ public class EditFragmentEntryDisplayContext {
 
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
+		).setMVCRenderCommandName(
+			"/fragment/view"
 		).setParameter(
 			"fragmentCollectionId",
 			() -> {
@@ -282,27 +264,6 @@ public class EditFragmentEntryDisplayContext {
 		return _cssContent;
 	}
 
-	private JSONArray _getFieldTypesJSONArray() {
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-		FragmentEntry fragmentEntry = getFragmentEntry();
-
-		if ((fragmentEntry == null) || !fragmentEntry.isTypeInput()) {
-			return jsonArray;
-		}
-
-		for (InfoFieldType infoFieldType : _INFO_FIELD_TYPES) {
-			jsonArray.put(
-				JSONUtil.put(
-					"key", infoFieldType.getName()
-				).put(
-					"label", infoFieldType.getLabel(_themeDisplay.getLocale())
-				));
-		}
-
-		return jsonArray;
-	}
-
 	private String _getFragmentEntryRenderURL(String mvcRenderCommandName)
 		throws Exception {
 
@@ -335,47 +296,6 @@ public class EditFragmentEntryDisplayContext {
 		}
 
 		return _htmlContent;
-	}
-
-	private JSONArray _getInitialFieldTypesJSONArray() {
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-		FragmentEntry fragmentEntry = getFragmentEntry();
-
-		if ((fragmentEntry == null) || !fragmentEntry.isTypeInput()) {
-			return jsonArray;
-		}
-
-		JSONArray fieldTypesJSONArray = JSONFactoryUtil.createJSONArray();
-
-		try {
-			JSONObject typeOptionsJSONObject = JSONFactoryUtil.createJSONObject(
-				fragmentEntry.getTypeOptions());
-
-			fieldTypesJSONArray = typeOptionsJSONObject.getJSONArray(
-				"fieldTypes");
-		}
-		catch (JSONException jsonException) {
-			_log.error(jsonException);
-		}
-
-		if ((fieldTypesJSONArray == null) ||
-			(fieldTypesJSONArray.length() <= 0)) {
-
-			return jsonArray;
-		}
-
-		for (InfoFieldType infoFieldType : _INFO_FIELD_TYPES) {
-			if (!JSONUtil.hasValue(
-					fieldTypesJSONArray, infoFieldType.getName())) {
-
-				continue;
-			}
-
-			jsonArray.put(infoFieldType.getName());
-		}
-
-		return jsonArray;
 	}
 
 	private String _getJsContent() {
@@ -420,15 +340,18 @@ public class EditFragmentEntryDisplayContext {
 		List<String> freeMarkerVariables = new ArrayList<>(template.keySet());
 
 		freeMarkerVariables.add("configuration");
-		freeMarkerVariables.add("fragmentElementId");
-		freeMarkerVariables.add("fragmentEntryLinkNamespace");
-		freeMarkerVariables.add("layoutMode");
 
 		FragmentCollection fragmentCollection =
 			FragmentCollectionServiceUtil.fetchFragmentCollection(
 				getFragmentCollectionId());
 
-		List<String> resources = _getResources(fragmentCollection);
+		List<String> resources = new ArrayList<>();
+
+		if (fragmentCollection != null) {
+			for (FileEntry fileEntry : fragmentCollection.getResources()) {
+				resources.add(fileEntry.getFileName());
+			}
+		}
 
 		return HashMapBuilder.<String, Object>put(
 			"allowedStatus",
@@ -441,10 +364,10 @@ public class EditFragmentEntryDisplayContext {
 			"autocompleteTags",
 			_fragmentEntryProcessorRegistry.getAvailableTagsJSONArray()
 		).put(
+			"cacheable", _fragmentEntry.isCacheable()
+		).put(
 			"dataAttributes",
 			_fragmentEntryProcessorRegistry.getDataAttributesJSONArray()
-		).put(
-			"fieldTypes", _getFieldTypesJSONArray()
 		).put(
 			"fragmentCollectionId", getFragmentCollectionId()
 		).put(
@@ -482,8 +405,6 @@ public class EditFragmentEntryDisplayContext {
 		).put(
 			"initialCSS", _getCssContent()
 		).put(
-			"initialFieldTypes", _getInitialFieldTypesJSONArray()
-		).put(
 			"initialHTML", _getHtmlContent()
 		).put(
 			"initialJS", _getJsContent()
@@ -506,9 +427,7 @@ public class EditFragmentEntryDisplayContext {
 		).put(
 			"resources", resources
 		).put(
-			"showFieldTypes", _showFieldTypes()
-		).put(
-			"spritemap", _themeDisplay.getPathThemeSpritemap()
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"status",
 			() -> {
@@ -536,25 +455,7 @@ public class EditFragmentEntryDisplayContext {
 				"redirect", getRedirect()
 			).put(
 				"render",
-				() -> {
-					FragmentEntry fragmentEntry = getFragmentEntry();
-
-					LiferayPortletURL renderFragmentEntryURL =
-						(LiferayPortletURL)_renderResponse.createResourceURL();
-
-					renderFragmentEntryURL.setResourceID(
-						"/fragment/render_fragment_entry");
-					renderFragmentEntryURL.setParameter(
-						"fragmentEntryId",
-						String.valueOf(fragmentEntry.getFragmentEntryId()));
-					renderFragmentEntryURL.setParameter(
-						"fragmentEntryKey",
-						fragmentEntry.getFragmentEntryKey());
-					renderFragmentEntryURL.setWindowState(
-						LiferayWindowState.POP_UP);
-
-					return renderFragmentEntryURL.toString();
-				}
+				_getFragmentEntryRenderURL("/fragment/render_fragment_entry")
 			).build()
 		).build();
 	}
@@ -569,19 +470,6 @@ public class EditFragmentEntryDisplayContext {
 		).setParameter(
 			"fragmentEntryId", getFragmentEntryId()
 		).buildString();
-	}
-
-	private List<String> _getResources(FragmentCollection fragmentCollection)
-		throws Exception {
-
-		if (fragmentCollection == null) {
-			return new ArrayList<>();
-		}
-
-		Map<String, FileEntry> resourcesMap =
-			fragmentCollection.getResourcesMap();
-
-		return new ArrayList<>(resourcesMap.keySet());
 	}
 
 	private boolean _isReadOnlyFragmentEntry() {
@@ -639,32 +527,10 @@ public class EditFragmentEntryDisplayContext {
 				")"));
 	}
 
-	private boolean _showFieldTypes() {
-		FragmentEntry fragmentEntry = getFragmentEntry();
-
-		if ((fragmentEntry == null) || !fragmentEntry.isTypeInput()) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private static final InfoFieldType[] _INFO_FIELD_TYPES = {
-		BooleanInfoFieldType.INSTANCE, CaptchaInfoFieldType.INSTANCE,
-		DateInfoFieldType.INSTANCE, FileInfoFieldType.INSTANCE,
-		HTMLInfoFieldType.INSTANCE, LongTextInfoFieldType.INSTANCE,
-		MultiselectInfoFieldType.INSTANCE, NumberInfoFieldType.INSTANCE,
-		RelationshipInfoFieldType.INSTANCE, SelectInfoFieldType.INSTANCE,
-		TextInfoFieldType.INSTANCE
-	};
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		EditFragmentEntryDisplayContext.class);
-
 	private String _configurationContent;
 	private String _cssContent;
-	private final FragmentCollectionContributorRegistry
-		_fragmentCollectionContributorRegistry;
+	private final FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 	private Long _fragmentCollectionId;
 	private FragmentEntry _fragmentEntry;
 	private Long _fragmentEntryId;

@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marco Leo
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_definition_option_rel"
@@ -49,43 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 public class EditCPDefinitionOptionRelMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	@Override
-	protected void doProcessAction(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
-
-		long cpDefinitionOptionRelId = ParamUtil.getLong(
-			actionRequest, "cpDefinitionOptionRelId");
-
-		try {
-			if (cmd.equals(Constants.ADD) ||
-				cmd.equals(Constants.ADD_MULTIPLE)) {
-
-				_addCPDefinitionOptionRels(actionRequest);
-			}
-			else if (cmd.equals(Constants.DELETE)) {
-				_deleteCPDefinitionOptionRels(
-					cpDefinitionOptionRelId, actionRequest);
-			}
-			else if (cmd.equals(Constants.UPDATE)) {
-				_updateCPDefinitionOptionRel(
-					cpDefinitionOptionRelId, actionRequest);
-			}
-		}
-		catch (Exception exception) {
-			hideDefaultErrorMessage(actionRequest);
-
-			SessionErrors.add(actionRequest, exception.getClass(), exception);
-
-			String redirect = ParamUtil.getString(actionRequest, "redirect");
-
-			sendRedirect(actionRequest, actionResponse, redirect);
-		}
-	}
-
-	private void _addCPDefinitionOptionRels(ActionRequest actionRequest)
+	protected void addCPDefinitionOptionRels(ActionRequest actionRequest)
 		throws Exception {
 
 		long[] addCPOptionIds = null;
@@ -112,7 +77,7 @@ public class EditCPDefinitionOptionRelMVCActionCommand
 		}
 	}
 
-	private void _deleteCPDefinitionOptionRels(
+	protected void deleteCPDefinitionOptionRels(
 			long cpDefinitionOptionRelId, ActionRequest actionRequest)
 		throws Exception {
 
@@ -138,15 +103,51 @@ public class EditCPDefinitionOptionRelMVCActionCommand
 		}
 	}
 
-	private CPDefinitionOptionRel _updateCPDefinitionOptionRel(
+	@Override
+	protected void doProcessAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		long cpDefinitionOptionRelId = ParamUtil.getLong(
+			actionRequest, "cpDefinitionOptionRelId");
+
+		try {
+			if (cmd.equals(Constants.ADD) ||
+				cmd.equals(Constants.ADD_MULTIPLE)) {
+
+				addCPDefinitionOptionRels(actionRequest);
+			}
+			else if (cmd.equals(Constants.DELETE)) {
+				deleteCPDefinitionOptionRels(
+					cpDefinitionOptionRelId, actionRequest);
+			}
+			else if (cmd.equals(Constants.UPDATE)) {
+				updateCPDefinitionOptionRel(
+					cpDefinitionOptionRelId, actionRequest);
+			}
+		}
+		catch (Exception exception) {
+			hideDefaultErrorMessage(actionRequest);
+
+			SessionErrors.add(actionRequest, exception.getClass(), exception);
+
+			String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+			sendRedirect(actionRequest, actionResponse, redirect);
+		}
+	}
+
+	protected CPDefinitionOptionRel updateCPDefinitionOptionRel(
 			long cpDefinitionOptionRelId, ActionRequest actionRequest)
 		throws Exception {
 
 		long cpOptionId = ParamUtil.getLong(actionRequest, "cpOptionId");
-		Map<Locale, String> nameMap = _localization.getLocalizationMap(
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "name");
-		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
-			actionRequest, "description");
+		Map<Locale, String> descriptionMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "description");
 		String ddmFormFieldTypeName = ParamUtil.getString(
 			actionRequest, "DDMFormFieldTypeName");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
@@ -167,8 +168,5 @@ public class EditCPDefinitionOptionRelMVCActionCommand
 
 	@Reference
 	private CPDefinitionOptionRelService _cpDefinitionOptionRelService;
-
-	@Reference
-	private Localization _localization;
 
 }

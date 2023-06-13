@@ -339,9 +339,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			Portlet portlet, String actionId)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, groupId,
-			LayoutLocalServiceUtil.fetchLayout(plid), portlet, actionId,
+			permissionChecker, groupId, layout, portlet, actionId,
 			_STRICT_DEFAULT);
 	}
 
@@ -351,10 +352,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			Portlet portlet, String actionId, boolean strict)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, groupId,
-			LayoutLocalServiceUtil.fetchLayout(plid), portlet, actionId,
-			strict);
+			permissionChecker, groupId, layout, portlet, actionId, strict);
 	}
 
 	public boolean contains(
@@ -362,9 +363,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			String portletId, String actionId)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, groupId,
-			LayoutLocalServiceUtil.fetchLayout(plid), portletId, actionId,
+			permissionChecker, groupId, layout, portletId, actionId,
 			_STRICT_DEFAULT);
 	}
 
@@ -374,10 +376,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			String portletId, String actionId, boolean strict)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, groupId,
-			LayoutLocalServiceUtil.fetchLayout(plid), portletId, actionId,
-			strict);
+			permissionChecker, groupId, layout, portletId, actionId, strict);
 	}
 
 	@Override
@@ -386,9 +388,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			String actionId)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, LayoutLocalServiceUtil.fetchLayout(plid),
-			portlet, actionId, _STRICT_DEFAULT);
+			permissionChecker, layout, portlet, actionId, _STRICT_DEFAULT);
 	}
 
 	@Override
@@ -397,9 +400,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			String actionId, boolean strict)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, 0, LayoutLocalServiceUtil.fetchLayout(plid),
-			portlet, actionId, strict);
+			permissionChecker, 0, layout, portlet, actionId, strict);
 	}
 
 	@Override
@@ -408,9 +412,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			String actionId)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, LayoutLocalServiceUtil.fetchLayout(plid),
-			portletId, actionId, _STRICT_DEFAULT);
+			permissionChecker, layout, portletId, actionId, _STRICT_DEFAULT);
 	}
 
 	@Override
@@ -419,9 +424,10 @@ public class PortletPermissionImpl implements PortletPermission {
 			String actionId, boolean strict)
 		throws PortalException {
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
 		return contains(
-			permissionChecker, 0, LayoutLocalServiceUtil.fetchLayout(plid),
-			portletId, actionId, strict);
+			permissionChecker, 0, layout, portletId, actionId, strict);
 	}
 
 	@Override
@@ -564,7 +570,7 @@ public class PortletPermissionImpl implements PortletPermission {
 			return layoutManagerActions.contains(actionId);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return false;
 		}

@@ -68,8 +68,8 @@ const updateUsedCategoryPortlet = ({category, item, used}) => {
 		: category;
 };
 
-export function updateUsedWidget({item, used = true, widgets}) {
-	return widgets.map((collection) => {
+export const updateUsedWidget = ({item, used = true, widgets}) =>
+	widgets.map((collection) => {
 		updateUsedCategoryPortlet({category: collection, item, used});
 
 		return {
@@ -81,7 +81,6 @@ export function updateUsedWidget({item, used = true, widgets}) {
 			}),
 		};
 	});
-}
 
 const normalizeWidget = (widget) => {
 	return {
@@ -118,7 +117,7 @@ const normalizeCollections = (collection) => {
 	return normalizedElement;
 };
 
-export function normalizeContent(content) {
+export const normalizeContent = (content) => {
 	return {
 		category: content.type,
 		data: {
@@ -134,7 +133,7 @@ export function normalizeContent(content) {
 		label: content.title,
 		type: LAYOUT_DATA_ITEM_TYPES.content,
 	};
-}
+};
 
 const AddPanel = ({
 	addContentsURLs,
@@ -199,7 +198,11 @@ const AddPanel = ({
 	);
 
 	return (
-		<div className={classNames('sidebar-body__add-panel p-0', {rtl})}>
+		<div
+			className={classNames('sidebar-body__add-panel', {
+				rtl,
+			})}
+		>
 			<AddPanelContextProvider
 				value={{
 					addContentsURLs,
@@ -216,9 +219,7 @@ const AddPanel = ({
 			>
 				<DndProvider backend={HTML5Backend}>
 					<DragPreview rtl={rtl} />
-
 					<DragAndDrop />
-
 					<TabsPanel tabs={tabs} />
 				</DndProvider>
 			</AddPanelContextProvider>

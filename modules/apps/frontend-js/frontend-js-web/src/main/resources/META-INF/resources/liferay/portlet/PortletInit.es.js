@@ -12,7 +12,7 @@
  * details.
  */
 
-import {v4 as uuidv4} from 'uuid';
+import uuidv1 from 'uuid/v1';
 
 import fetch from './../util/fetch.es';
 import isObject from './../util/is_object';
@@ -448,7 +448,7 @@ class PortletInit {
 
 	_updatePortletStates(updatedIds) {
 		return new Promise((resolve) => {
-			if (!updatedIds.length) {
+			if (updatedIds.length === 0) {
 				busy = false;
 			}
 			else {
@@ -522,11 +522,11 @@ class PortletInit {
 			}
 		});
 
-		if (eventListenersQueue.length) {
+		if (eventListenersQueue.length > 0) {
 			setTimeout(() => {
 				busy = true;
 
-				while (eventListenersQueue.length) {
+				while (eventListenersQueue.length > 0) {
 					const eventData = eventListenersQueue.shift();
 					const handler = eventData.handler;
 					const id = eventData.id;
@@ -655,7 +655,7 @@ class PortletInit {
 			}
 		}
 
-		const handle = uuidv4();
+		const handle = uuidv1();
 
 		const listener = {
 			handle,

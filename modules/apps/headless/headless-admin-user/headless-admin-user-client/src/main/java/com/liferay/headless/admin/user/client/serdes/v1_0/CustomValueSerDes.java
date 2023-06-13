@@ -62,14 +62,11 @@ public class CustomValueSerDes {
 
 			sb.append("\"data\": ");
 
-			if (customValue.getData() instanceof String) {
-				sb.append("\"");
-				sb.append((String)customValue.getData());
-				sb.append("\"");
-			}
-			else {
-				sb.append(customValue.getData());
-			}
+			sb.append("\"");
+
+			sb.append(_escape(customValue.getData()));
+
+			sb.append("\"");
 		}
 
 		if (customValue.getData_i18n() != null) {

@@ -37,9 +37,9 @@ CommerceMLForecastAlertEntryListDisplayContext commerceMLForecastAlertEntryListD
 				>
 
 					<%
-					AccountEntry accountEntry = commerceMLForecastAlertEntryListDisplayContext.getAccountEntry(commerceMLForecastAlertEntry.getCommerceAccountId());
+					CommerceAccount commerceAccount = commerceMLForecastAlertEntryListDisplayContext.getCommerceAccount(commerceMLForecastAlertEntry.getCommerceAccountId());
 
-					long logoId = accountEntry.getLogoId();
+					long logoId = commerceAccount.getLogoId();
 					%>
 
 					<liferay-ui:search-container-column-image
@@ -49,9 +49,9 @@ CommerceMLForecastAlertEntryListDisplayContext commerceMLForecastAlertEntryListD
 					/>
 
 					<liferay-ui:search-container-column-text
-						cssClass="font-weight-bold important table-cell-expand"
+						cssClass="important table-cell-expand"
 						name="name"
-						value="<%= HtmlUtil.escape(accountEntry.getName()) %>"
+						value="<%= HtmlUtil.escape(commerceAccount.getName()) %>"
 					/>
 
 					<liferay-ui:search-container-column-text

@@ -36,13 +36,13 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Mika Koivisto
  */
-@Component(service = ServiceAccessPolicyManager.class)
+@Component(immediate = true, service = ServiceAccessPolicyManager.class)
 public class ServiceAccessPolicyManagerImpl
 	implements ServiceAccessPolicyManager {
 
 	@Override
 	public String getDefaultApplicationServiceAccessPolicyName(long companyId) {
-		SAPConfiguration sapConfiguration = _getSAPConfiguration(companyId);
+		SAPConfiguration sapConfiguration = getSAPConfiguration(companyId);
 
 		if (sapConfiguration != null) {
 			return sapConfiguration.systemDefaultSAPEntryName();
@@ -53,7 +53,7 @@ public class ServiceAccessPolicyManagerImpl
 
 	@Override
 	public String getDefaultUserServiceAccessPolicyName(long companyId) {
-		SAPConfiguration sapConfiguration = _getSAPConfiguration(companyId);
+		SAPConfiguration sapConfiguration = getSAPConfiguration(companyId);
 
 		if (sapConfiguration != null) {
 			return sapConfiguration.systemUserPasswordSAPEntryName();
@@ -66,7 +66,7 @@ public class ServiceAccessPolicyManagerImpl
 	public List<ServiceAccessPolicy> getServiceAccessPolicies(
 		long companyId, int start, int end) {
 
-		return _toServiceAccessPolicies(
+		return toServiceAccessPolicies(
 			_sapEntryService.getCompanySAPEntries(companyId, start, end));
 	}
 
@@ -80,7 +80,7 @@ public class ServiceAccessPolicyManagerImpl
 		long companyId, String name) {
 
 		try {
-			return _toServiceAccessPolicy(
+			return toServiceAccessPolicy(
 				_sapEntryService.getSAPEntry(companyId, name));
 		}
 		catch (PortalException portalException) {
@@ -88,14 +88,14 @@ public class ServiceAccessPolicyManagerImpl
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 
 			return null;
 		}
 	}
 
-	private SAPConfiguration _getSAPConfiguration(long companyId) {
+	protected SAPConfiguration getSAPConfiguration(long companyId) {
 		try {
 			return _configurationProvider.getConfiguration(
 				SAPConfiguration.class,
@@ -112,7 +112,19 @@ public class ServiceAccessPolicyManagerImpl
 		}
 	}
 
-	private List<ServiceAccessPolicy> _toServiceAccessPolicies(
+	@Reference(unbind = "-")
+	protected void setConfigurationProvider(
+		ConfigurationProvider configurationProvider) {
+
+		_configurationProvider = configurationProvider;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSAPEntryService(SAPEntryService sapEntryService) {
+		_sapEntryService = sapEntryService;
+	}
+
+	protected List<ServiceAccessPolicy> toServiceAccessPolicies(
 		List<SAPEntry> sapEntries) {
 
 		if (sapEntries == null) {
@@ -123,7 +135,7 @@ public class ServiceAccessPolicyManagerImpl
 			sapEntries.size());
 
 		for (SAPEntry sapEntry : sapEntries) {
-			ServiceAccessPolicy serviceAccessPolicy = _toServiceAccessPolicy(
+			ServiceAccessPolicy serviceAccessPolicy = toServiceAccessPolicy(
 				sapEntry);
 
 			serviceAccessPolicies.add(serviceAccessPolicy);
@@ -132,7 +144,7 @@ public class ServiceAccessPolicyManagerImpl
 		return serviceAccessPolicies;
 	}
 
-	private ServiceAccessPolicy _toServiceAccessPolicy(SAPEntry sapEntry) {
+	protected ServiceAccessPolicy toServiceAccessPolicy(SAPEntry sapEntry) {
 		if (sapEntry != null) {
 			return new ServiceAccessPolicyImpl(sapEntry);
 		}
@@ -143,10 +155,7 @@ public class ServiceAccessPolicyManagerImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		ServiceAccessPolicyManagerImpl.class);
 
-	@Reference
 	private ConfigurationProvider _configurationProvider;
-
-	@Reference
 	private SAPEntryService _sapEntryService;
 
 }

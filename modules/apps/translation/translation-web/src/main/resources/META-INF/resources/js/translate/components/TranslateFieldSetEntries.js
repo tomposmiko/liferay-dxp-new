@@ -19,8 +19,7 @@ import ClayLayout from '@clayui/layout';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import classNames from 'classnames';
 import {ClassicEditor} from 'frontend-editor-ckeditor-web';
-import {sub} from 'frontend-js-web';
-import React, {useEffect, useRef, useState} from 'react';
+import React from 'react';
 
 import {FETCH_STATUS} from '../constants';
 
@@ -39,16 +38,19 @@ const TranslateAutoTranslateRow = ({
 	}
 
 	const isLoading = fieldStatus.status === FETCH_STATUS.LOADING;
-	const text = sub(Liferay.Language.get('auto-translate-x-field'), label);
+	const text = Liferay.Util.sub(
+		Liferay.Language.get('auto-translate-x-field'),
+		label
+	);
 
 	return (
 		<ClayLayout.Row>
 			<ClayLayout.ContentCol className="col-autotranslate-content" expand>
 				{children}
 			</ClayLayout.ContentCol>
-
 			<ClayLayout.ContentCol className="align-self-top col-autotranslate-button">
 				<ClayButton
+					className="lfr-portal-tooltip"
 					disabled={isLoading || !sourceContent}
 					displayType="secondary"
 					monospaced
@@ -60,7 +62,6 @@ const TranslateAutoTranslateRow = ({
 					) : (
 						<ClayIcon symbol="automatic-translate" />
 					)}
-
 					<span className="sr-only">{text}</span>
 				</ClayButton>
 			</ClayLayout.ContentCol>
@@ -86,7 +87,6 @@ const TranslateFieldFeedback = ({message = '', status = ''}) =>
 						}
 					/>
 				</span>
-
 				{message}
 			</div>
 		</div>
@@ -97,85 +97,54 @@ const TranslateFieldEditor = ({
 	fieldStatus,
 	id,
 	label,
-	name,
 	sourceContent,
 	sourceContentDir,
 	targetContent,
 	targetContentDir,
 	onChange = noop,
-}) => {
-	const [content, setContent] = useState(targetContent);
-
-	const editorRef = useRef();
-	const internalUpdateRef = useRef(true);
-
-	useEffect(() => {
-		if (editorRef.current.editor && !internalUpdateRef.current) {
-			editorRef.current.editor.setData(targetContent);
-			setContent(targetContent);
-		}
-		internalUpdateRef.current = false;
-	}, [targetContent]);
-
-	return (
-		<ClayLayout.Row>
-			<ClayLayout.Col md={6}>
-				<ClayForm.Group>
-					<label className="control-label">{label}</label>
-
-					<div
-						className="translation-editor-preview"
-						dangerouslySetInnerHTML={{__html: sourceContent}}
-						dir={sourceContentDir}
-					/>
-				</ClayForm.Group>
-			</ClayLayout.Col>
-
-			<ClayLayout.Col md={6}>
-				<ClayForm.Group>
-					<label className="control-label">{label}</label>
-
-					<ClassicEditor
-						editorConfig={{
-							...editorConfiguration.editorConfig,
-							contentsLangDirection: targetContentDir,
-						}}
-						name={id}
-						onChange={(data) => {
-							setContent(data);
+}) => (
+	<ClayLayout.Row>
+		<ClayLayout.Col md={6}>
+			<ClayForm.Group>
+				<label className="control-label">{label}</label>
+				<div
+					className="translation-editor-preview"
+					dangerouslySetInnerHTML={{__html: sourceContent}}
+					dir={sourceContentDir}
+				/>
+			</ClayForm.Group>
+		</ClayLayout.Col>
+		<ClayLayout.Col md={6}>
+			<ClayForm.Group>
+				<label className="control-label">{label}</label>
+				<ClassicEditor
+					data={targetContent}
+					editorConfig={{
+						...editorConfiguration.editorConfig,
+						contentsLangDirection: targetContentDir,
+					}}
+					name={id}
+					onChange={(data) => {
+						if (targetContent !== data.trim()) {
 							onChange(data);
-							internalUpdateRef.current = true;
-						}}
-						onInstanceReady={({editor}) => {
-
-							// LPS-139363
-
-							editor?.setData?.(content, {
-								interal: true,
-								noSnapshot: true,
-							});
-						}}
-						ref={editorRef}
-					/>
-
-					<input defaultValue={content} name={name} type="hidden" />
-
-					<TranslateFieldFeedback
-						message={fieldStatus.message}
-						status={fieldStatus.status}
-					/>
-				</ClayForm.Group>
-			</ClayLayout.Col>
-		</ClayLayout.Row>
-	);
-};
+						}
+					}}
+				/>
+				<input defaultValue={targetContent} name={id} type="hidden" />
+				<TranslateFieldFeedback
+					message={fieldStatus.message}
+					status={fieldStatus.status}
+				/>
+			</ClayForm.Group>
+		</ClayLayout.Col>
+	</ClayLayout.Row>
+);
 
 const TranslateFieldInput = ({
 	fieldStatus,
 	id,
 	label,
 	multiline,
-	name,
 	onChange = noop,
 	sourceContent,
 	sourceContentDir,
@@ -186,7 +155,6 @@ const TranslateFieldInput = ({
 		<ClayLayout.Col md={6}>
 			<ClayForm.Group>
 				<label className="control-label">{label}</label>
-
 				<ClayInput
 					component={multiline ? 'textarea' : undefined}
 					defaultValue={sourceContent}
@@ -196,7 +164,6 @@ const TranslateFieldInput = ({
 				/>
 			</ClayForm.Group>
 		</ClayLayout.Col>
-
 		<ClayLayout.Col md={6}>
 			<ClayForm.Group>
 				<ClayLayout.Row>
@@ -206,12 +173,11 @@ const TranslateFieldInput = ({
 						</label>
 					</ClayLayout.ContentCol>
 				</ClayLayout.Row>
-
 				<ClayInput
 					component={multiline ? 'textarea' : undefined}
 					dir={targetContentDir}
 					id={id}
-					name={name}
+					name={id}
 					onChange={(event) => {
 						const data = event.target.value;
 						onChange(data);
@@ -219,7 +185,6 @@ const TranslateFieldInput = ({
 					type="text"
 					value={targetContent}
 				/>
-
 				<TranslateFieldFeedback
 					message={fieldStatus.message}
 					status={fieldStatus.status}
@@ -237,7 +202,7 @@ const TranslateFieldSetEntries = ({
 	portletNamespace,
 	targetFieldsContent,
 }) =>
-	infoFieldSetEntries.map(({fields: fieldsSets, legend}) => (
+	infoFieldSetEntries.map(({fields, legend}) => (
 		<React.Fragment key={legend}>
 			<ClayLayout.Row
 				className={classNames({
@@ -247,50 +212,43 @@ const TranslateFieldSetEntries = ({
 				<ClayLayout.Col md={6}>
 					<div className="fieldset-title">{legend}</div>
 				</ClayLayout.Col>
-
 				<ClayLayout.Col md={6}>
 					<div className="fieldset-title">{legend}</div>
 				</ClayLayout.Col>
 			</ClayLayout.Row>
+			{fields.map((field) => {
+				const fieldProps = {
+					...field,
+					fieldStatus: {
+						message: targetFieldsContent[field.id].message,
+						status: targetFieldsContent[field.id].status,
+					},
+					id: `${portletNamespace}${field.id}`,
+					onChange: (content) => {
+						onChange({content, id: field.id});
+					},
+					targetContent: targetFieldsContent[field.id].content,
+				};
 
-			{fieldsSets.map((fieldSet) =>
-				fieldSet.sourceContent.map((sourceContent, index) => {
-					const id = `${fieldSet.id}${index}`;
-					const fieldProps = {
-						...fieldSet,
-						fieldStatus: {
-							message: targetFieldsContent[id].message,
-							status: targetFieldsContent[id].status,
-						},
-						id: `${portletNamespace}${id}`,
-						name: `${portletNamespace}${fieldSet.id}`,
-						onChange: (content) => {
-							onChange({content, id});
-						},
-						sourceContent,
-						targetContent: targetFieldsContent[id].content,
-					};
-
-					return (
-						<TranslateAutoTranslateRow
-							autoTranslateEnabled={autoTranslateEnabled}
-							fieldStatus={fieldProps.fieldStatus}
-							handleAutoTranslateClick={() =>
-								fetchAutoTranslateField(id)
-							}
-							key={id}
-							label={fieldProps.label}
-							sourceContent={fieldProps.sourceContent}
-						>
-							{fieldSet.html ? (
-								<TranslateFieldEditor {...fieldProps} />
-							) : (
-								<TranslateFieldInput {...fieldProps} />
-							)}
-						</TranslateAutoTranslateRow>
-					);
-				})
-			)}
+				return (
+					<TranslateAutoTranslateRow
+						autoTranslateEnabled={autoTranslateEnabled}
+						fieldStatus={fieldProps.fieldStatus}
+						handleAutoTranslateClick={() =>
+							fetchAutoTranslateField(field.id)
+						}
+						key={field.id}
+						label={fieldProps.label}
+						sourceContent={fieldProps.sourceContent}
+					>
+						{field.html ? (
+							<TranslateFieldEditor {...fieldProps} />
+						) : (
+							<TranslateFieldInput {...fieldProps} />
+						)}
+					</TranslateAutoTranslateRow>
+				);
+			})}
 		</React.Fragment>
 	));
 

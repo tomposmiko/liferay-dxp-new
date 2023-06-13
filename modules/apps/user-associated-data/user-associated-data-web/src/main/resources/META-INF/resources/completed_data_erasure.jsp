@@ -29,8 +29,8 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 <clay:container-fluid
 	cssClass="container-form-lg"
 >
-	<liferay-frontend:empty-result-message
-		title='<%= LanguageUtil.get(resourceBundle, "you-have-successfully-anonymized-all-remaining-data") %>'
+	<liferay-ui:empty-result-message
+		message="you-have-successfully-anonymized-all-remaining-data"
 	/>
 </clay:container-fluid>
 
@@ -39,13 +39,11 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 </portlet:actionURL>
 
 <aui:script>
-	Liferay.Util.openConfirmModal({
-		message:
-			'<%= UnicodeLanguageUtil.get(request, "all-personal-data-associated-with-this-users-applications-has-been-deleted-or-anonymized") %>',
-		onConfirm: (isConfirmed) => {
-			if (isConfirmed) {
-				Liferay.Util.navigate('<%= deleteUserURL.toString() %>');
-			}
-		},
-	});
+	if (
+		confirm(
+			'<%= UnicodeLanguageUtil.get(request, "all-personal-data-associated-with-this-users-applications-has-been-deleted-or-anonymized") %>'
+		)
+	) {
+		Liferay.Util.navigate('<%= deleteUserURL.toString() %>');
+	}
 </aui:script>

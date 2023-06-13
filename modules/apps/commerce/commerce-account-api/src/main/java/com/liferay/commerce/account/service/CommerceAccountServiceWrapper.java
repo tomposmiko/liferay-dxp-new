@@ -21,17 +21,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
  *
  * @author Marco Leo
  * @see CommerceAccountService
- * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
- com.liferay.account.service.AccountEntryService}
  * @generated
  */
-@Deprecated
 public class CommerceAccountServiceWrapper
 	implements CommerceAccountService, ServiceWrapper<CommerceAccountService> {
-
-	public CommerceAccountServiceWrapper() {
-		this(null);
-	}
 
 	public CommerceAccountServiceWrapper(
 		CommerceAccountService commerceAccountService) {

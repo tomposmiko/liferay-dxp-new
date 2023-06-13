@@ -107,10 +107,16 @@ public abstract class BaseControlPanelEntry implements ControlPanelEntry {
 			return true;
 		}
 
-		long groupId = 0L;
+		long groupId = group.getGroupId();
 
-		if (category.startsWith(PortletCategoryKeys.SITE_ADMINISTRATION)) {
-			groupId = group.getGroupId();
+		if (category.equals(PortletCategoryKeys.CONTROL_PANEL_APPS) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_CONFIGURATION) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_SITES) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_SYSTEM) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_USERS) ||
+			category.equals(PortletCategoryKeys.CONTROL_PANEL_WORKFLOW)) {
+
+			groupId = 0;
 		}
 
 		List<String> resourceActions = ResourceActionsUtil.getResourceActions(

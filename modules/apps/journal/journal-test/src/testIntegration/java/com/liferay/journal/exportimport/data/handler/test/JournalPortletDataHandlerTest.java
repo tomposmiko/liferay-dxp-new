@@ -147,7 +147,7 @@ public class JournalPortletDataHandlerTest
 
 	@Override
 	protected void addStagedModels() throws Exception {
-		Layout layout = LayoutTestUtil.addTypePortletLayout(stagingGroup);
+		Layout layout = LayoutTestUtil.addLayout(stagingGroup);
 
 		JournalFolder folder = JournalTestUtil.addFolder(
 			stagingGroup.getGroupId(), RandomTestUtil.randomString());
@@ -174,7 +174,7 @@ public class JournalPortletDataHandlerTest
 
 		JournalTestUtil.addFeed(
 			stagingGroup.getGroupId(), layout.getPlid(),
-			RandomTestUtil.randomString(), ddmStructure.getStructureId(),
+			RandomTestUtil.randomString(), ddmStructure.getStructureKey(),
 			ddmTemplate.getTemplateKey(), rendererDDMTemplate.getTemplateKey());
 	}
 

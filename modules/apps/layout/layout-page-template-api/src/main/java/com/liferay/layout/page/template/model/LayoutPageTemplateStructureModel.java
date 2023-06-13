@@ -15,6 +15,7 @@
 package com.liferay.layout.page.template.model;
 
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
@@ -39,7 +40,7 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface LayoutPageTemplateStructureModel
-	extends BaseModel<LayoutPageTemplateStructure>,
+	extends AttachedModel, BaseModel<LayoutPageTemplateStructure>,
 			CTModel<LayoutPageTemplateStructure>, GroupedModel, MVCCModel,
 			ShardedModel, StagedAuditedModel {
 
@@ -243,24 +244,48 @@ public interface LayoutPageTemplateStructureModel
 	public void setModifiedDate(Date modifiedDate);
 
 	/**
-	 * Returns the plid of this layout page template structure.
+	 * Returns the fully qualified class name of this layout page template structure.
 	 *
-	 * @return the plid of this layout page template structure
+	 * @return the fully qualified class name of this layout page template structure
 	 */
-	public long getPlid();
+	@Override
+	public String getClassName();
+
+	public void setClassName(String className);
 
 	/**
-	 * Sets the plid of this layout page template structure.
+	 * Returns the class name ID of this layout page template structure.
 	 *
-	 * @param plid the plid of this layout page template structure
+	 * @return the class name ID of this layout page template structure
 	 */
-	public void setPlid(long plid);
+	@Override
+	public long getClassNameId();
+
+	/**
+	 * Sets the class name ID of this layout page template structure.
+	 *
+	 * @param classNameId the class name ID of this layout page template structure
+	 */
+	@Override
+	public void setClassNameId(long classNameId);
+
+	/**
+	 * Returns the class pk of this layout page template structure.
+	 *
+	 * @return the class pk of this layout page template structure
+	 */
+	@Override
+	public long getClassPK();
+
+	/**
+	 * Sets the class pk of this layout page template structure.
+	 *
+	 * @param classPK the class pk of this layout page template structure
+	 */
+	@Override
+	public void setClassPK(long classPK);
 
 	@Override
 	public LayoutPageTemplateStructure cloneWithOriginalValues();
-
-	public default String toXmlString() {
-		return null;
-	}
 
 }

@@ -21,10 +21,55 @@ CommerceRegionsDisplayContext commerceRegionsDisplayContext = (CommerceRegionsDi
 %>
 
 <c:if test="<%= commerceRegionsDisplayContext.hasPermission(ActionKeys.MANAGE_COUNTRIES) %>">
-	<clay:management-toolbar
-		managementToolbarDisplayContext="<%= new CommerceRegionsManagementToolbarDisplayContext(commerceRegionsDisplayContext, request, liferayPortletRequest, liferayPortletResponse) %>"
-		propsTransformer="js/CommerceRegionsManagementToolbarPropsTransformer"
-	/>
+	<liferay-frontend:management-bar
+		includeCheckBox="<%= true %>"
+		searchContainerId="commerceRegions"
+	>
+		<liferay-frontend:management-bar-filters>
+			<liferay-frontend:management-bar-navigation
+				navigationKeys='<%= new String[] {"all", "active", "inactive"} %>'
+				portletURL="<%= commerceRegionsDisplayContext.getPortletURL() %>"
+			/>
+
+			<liferay-frontend:management-bar-sort
+				orderByCol="<%= commerceRegionsDisplayContext.getOrderByCol() %>"
+				orderByType="<%= commerceRegionsDisplayContext.getOrderByType() %>"
+				orderColumns='<%= new String[] {"name", "priority"} %>'
+				portletURL="<%= commerceRegionsDisplayContext.getPortletURL() %>"
+			/>
+		</liferay-frontend:management-bar-filters>
+
+		<liferay-frontend:management-bar-buttons>
+			<liferay-frontend:management-bar-display-buttons
+				displayViews='<%= new String[] {"list"} %>'
+				portletURL="<%= commerceRegionsDisplayContext.getPortletURL() %>"
+				selectedDisplayStyle="list"
+			/>
+
+			<portlet:renderURL var="addCommerceRegionURL">
+				<portlet:param name="mvcRenderCommandName" value="/commerce_country/edit_commerce_region" />
+				<portlet:param name="redirect" value="<%= currentURL %>" />
+				<portlet:param name="countryId" value="<%= String.valueOf(commerceRegionsDisplayContext.getCountryId()) %>" />
+			</portlet:renderURL>
+
+			<liferay-frontend:add-menu
+				inline="<%= true %>"
+			>
+				<liferay-frontend:add-menu-item
+					title='<%= LanguageUtil.get(request, "add-region") %>'
+					url="<%= addCommerceRegionURL.toString() %>"
+				/>
+			</liferay-frontend:add-menu>
+		</liferay-frontend:management-bar-buttons>
+
+		<liferay-frontend:management-bar-action-buttons>
+			<liferay-frontend:management-bar-button
+				href='<%= "javascript:" + liferayPortletResponse.getNamespace() + "deleteRegions();" %>'
+				icon="times"
+				label="delete"
+			/>
+		</liferay-frontend:management-bar-action-buttons>
+	</liferay-frontend:management-bar>
 
 	<div class="container-fluid container-fluid-max-xl">
 		<portlet:actionURL name="/commerce_country/edit_commerce_region" var="editCommerceRegionActionURL" />
@@ -44,7 +89,7 @@ CommerceRegionsDisplayContext commerceRegionsDisplayContext = (CommerceRegionsDi
 					modelVar="region"
 				>
 					<liferay-ui:search-container-column-text
-						cssClass="font-weight-bold important table-cell-expand"
+						cssClass="important table-cell-expand"
 						href='<%=
 							PortletURLBuilder.createRenderURL(
 								renderResponse
@@ -109,24 +154,22 @@ CommerceRegionsDisplayContext commerceRegionsDisplayContext = (CommerceRegionsDi
 
 	<aui:script>
 		function <portlet:namespace />deleteCommerceRegions() {
-			Liferay.Util.openConfirmModal({
-				message:
-					'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-regions" />',
-				onConfirm: (isConfirmed) => {
-					if (isConfirmed) {
-						var form = window.document['<portlet:namespace />fm'];
+			if (
+				confirm(
+					'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-regions" />'
+				)
+			) {
+				var form = window.document['<portlet:namespace />fm'];
 
-						form[
-							'<portlet:namespace />deleteRegionIds'
-						].value = Liferay.Util.getCheckedCheckboxes(
-							form,
-							'<portlet:namespace />allRowIds'
-						);
+				form[
+					'<portlet:namespace />deleteRegionIds'
+				].value = Liferay.Util.listCheckedExcept(
+					form,
+					'<portlet:namespace />allRowIds'
+				);
 
-						submitForm(form);
-					}
-				},
-			});
+				submitForm(form);
+			}
 		}
 	</aui:script>
 </c:if>

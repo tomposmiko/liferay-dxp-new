@@ -60,11 +60,7 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 					</h5>
 
 					<h6 class="text-default">
-						<liferay-portal-workflow:status
-							showStatusLabel="<%= false %>"
-							status="<%= articleVersion.getStatus() %>"
-							version="<%= String.valueOf(articleVersion.getVersion()) %>"
-						/>
+						<aui:workflow-status markupView="lexicon" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= articleVersion.getStatus() %>" version="<%= String.valueOf(articleVersion.getVersion()) %>" />
 					</h6>
 				</liferay-ui:search-container-column-text>
 
@@ -75,7 +71,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 								"trashEnabled", componentContext.get("trashEnabled")
 							).build()
 						%>'
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 						dropdownItems="<%= journalDisplayContext.getArticleVersionActionDropdownItems(articleVersion) %>"
 						propsTransformer="js/ElementsDefaultPropsTransformer"
 					/>
@@ -135,7 +130,6 @@ Map<String, Object> componentContext = journalDisplayContext.getComponentContext
 								"trashEnabled", componentContext.get("trashEnabled")
 							).build()
 						%>'
-						aria-label='<%= LanguageUtil.get(request, "show-actions") %>'
 						dropdownItems="<%= journalDisplayContext.getArticleVersionActionDropdownItems(articleVersion) %>"
 						propsTransformer="js/ElementsDefaultPropsTransformer"
 					/>

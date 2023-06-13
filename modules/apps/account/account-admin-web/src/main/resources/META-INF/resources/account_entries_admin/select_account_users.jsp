@@ -17,34 +17,41 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SelectAccountUsersDisplayContext selectAccountUsersDisplayContext = new SelectAccountUsersDisplayContext(liferayPortletRequest, liferayPortletResponse);
+long accountEntryId = ParamUtil.getLong(request, "accountEntryId");
 
-SearchContainer<AccountUserDisplay> userSearchContainer = AssignableAccountUserDisplaySearchContainerFactory.create(selectAccountUsersDisplayContext.getAccountEntryId(), liferayPortletRequest, liferayPortletResponse, selectAccountUsersDisplayContext.getRowChecker());
+SearchContainer<AccountUserDisplay> userSearchContainer = AssignableAccountUserDisplaySearchContainerFactory.create(accountEntryId, liferayPortletRequest, liferayPortletResponse);
 
-SelectAccountUsersManagementToolbarDisplayContext selectAccountUsersManagementToolbarDisplayContext = new SelectAccountUsersManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, userSearchContainer, selectAccountUsersDisplayContext);
+SelectAccountUsersManagementToolbarDisplayContext selectAccountUsersManagementToolbarDisplayContext = new SelectAccountUsersManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, userSearchContainer);
+
+if (selectAccountUsersManagementToolbarDisplayContext.isSingleSelect()) {
+	userSearchContainer.setRowChecker(null);
+}
 %>
 
 <portlet:renderURL var="addAccountEntryUserURL">
 	<portlet:param name="mvcRenderCommandName" value="/account_admin/add_account_user" />
 	<portlet:param name="redirect" value='<%= ParamUtil.getString(request, "redirect") %>' />
-	<portlet:param name="accountEntryId" value="<%= String.valueOf(selectAccountUsersDisplayContext.getAccountEntryId()) %>" />
+	<portlet:param name="backURL" value='<%= ParamUtil.getString(request, "redirect") %>' />
+	<portlet:param name="accountEntryId" value='<%= ParamUtil.getString(request, "accountEntryId") %>' />
 </portlet:renderURL>
 
 <clay:management-toolbar
 	additionalProps='<%=
 		HashMapBuilder.<String, Object>put(
 			"addAccountEntryUserURL", addAccountEntryUserURL.toString()
+		).put(
+			"openModalOnRedirect", selectAccountUsersManagementToolbarDisplayContext.isOpenModalOnRedirect()
 		).build()
 	%>'
 	managementToolbarDisplayContext="<%= selectAccountUsersManagementToolbarDisplayContext %>"
 	propsTransformer="account_entries_admin/js/SelectAccountUsersManagementToolbarPropsTransformer"
-	showCreationMenu="<%= selectAccountUsersDisplayContext.isShowCreateButton() %>"
+	showCreationMenu="<%= selectAccountUsersManagementToolbarDisplayContext.isShowCreateButton() %>"
 />
 
 <clay:container-fluid
 	id='<%= liferayPortletResponse.getNamespace() + "selectAccountUser" %>'
 >
-	<c:if test='<%= Objects.equals(selectAccountUsersManagementToolbarDisplayContext.getNavigation(), "valid-domain-users") %>'>
+	<c:if test='<%= !Objects.equals(selectAccountUsersManagementToolbarDisplayContext.getNavigation(), "all-users") %>'>
 		<clay:alert
 			message="showing-users-with-valid-domains-only"
 		/>
@@ -61,7 +68,7 @@ SelectAccountUsersManagementToolbarDisplayContext selectAccountUsersManagementTo
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-expand-small table-cell-minw-150"
 				name="name"
-				value="<%= HtmlUtil.escape(accountUserDisplay.getName()) %>"
+				property="name"
 			/>
 
 			<liferay-ui:search-container-column-text
@@ -73,16 +80,16 @@ SelectAccountUsersManagementToolbarDisplayContext selectAccountUsersManagementTo
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-expand-small table-cell-minw-150"
 				name="job-title"
-				value="<%= HtmlUtil.escape(accountUserDisplay.getJobTitle()) %>"
+				property="jobTitle"
 			/>
 
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-expand-small table-cell-minw-150"
 				name="account-roles"
-				value="<%= HtmlUtil.escape(accountUserDisplay.getAccountRoleNamesString(selectAccountUsersDisplayContext.getAccountEntryId(), locale)) %>"
+				value="<%= accountUserDisplay.getAccountRoleNamesString(accountEntryId, locale) %>"
 			/>
 
-			<c:if test="<%= selectAccountUsersDisplayContext.isSingleSelect() %>">
+			<c:if test="<%= selectAccountUsersManagementToolbarDisplayContext.isSingleSelect() %>">
 				<liferay-ui:search-container-column-text>
 					<aui:button
 						cssClass="choose-user selector-button"

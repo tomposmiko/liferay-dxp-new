@@ -44,9 +44,10 @@ import com.liferay.portal.workflow.metrics.service.WorkflowMetricsSLADefinitionL
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,7 +55,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Rafael Praxedes
  */
-@Component(service = WorkflowMetricsSLADefinitionTransformer.class)
+@Component(
+	immediate = true, service = WorkflowMetricsSLADefinitionTransformer.class
+)
 public class WorkflowMetricsSLADefinitionTransformer {
 
 	public void transform(
@@ -72,6 +75,33 @@ public class WorkflowMetricsSLADefinitionTransformer {
 
 			_transform(latestProcessVersion, workflowMetricsSLADefinition);
 		}
+	}
+
+	protected String getNodeId(
+		String processVersion,
+		TermsAggregationResult versionTermsAggregationResult) {
+
+		Bucket processVersionBucket = versionTermsAggregationResult.getBucket(
+			processVersion);
+
+		TopHitsAggregationResult topHitsAggregationResult =
+			(TopHitsAggregationResult)
+				processVersionBucket.getChildAggregationResult("topHits");
+
+		return Stream.of(
+			topHitsAggregationResult.getSearchHits()
+		).map(
+			SearchHits::getSearchHits
+		).flatMap(
+			List::parallelStream
+		).map(
+			SearchHit::getSourcesMap
+		).findFirst(
+		).map(
+			sourceMap -> MapUtil.getString(sourceMap, "nodeId")
+		).orElseGet(
+			() -> StringPool.BLANK
+		);
 	}
 
 	private BooleanQuery _createNodeBooleanQuery(
@@ -92,31 +122,9 @@ public class WorkflowMetricsSLADefinitionTransformer {
 			termsQuery);
 	}
 
-	private String _getNodeId(
-		String processVersion,
-		TermsAggregationResult versionTermsAggregationResult) {
-
-		Bucket processVersionBucket = versionTermsAggregationResult.getBucket(
-			processVersion);
-
-		TopHitsAggregationResult topHitsAggregationResult =
-			(TopHitsAggregationResult)
-				processVersionBucket.getChildAggregationResult("topHits");
-
-		SearchHits searchHits = topHitsAggregationResult.getSearchHits();
-
-		for (SearchHit searchHit : searchHits.getSearchHits()) {
-			return MapUtil.getString(searchHit.getSourcesMap(), "nodeId");
-		}
-
-		return StringPool.BLANK;
-	}
-
 	private Map<String, String> _getNodeIdMap(
 		String currentProcessVersion, String latestProcessVersion,
 		WorkflowMetricsSLADefinition workflowMetricsSLADefinition) {
-
-		Map<String, String> nodeIds = new HashMap<>();
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
@@ -159,26 +167,27 @@ public class WorkflowMetricsSLADefinitionTransformer {
 		TermsAggregationResult nameTermsAggregationResult =
 			(TermsAggregationResult)aggregationResultsMap.get("name");
 
-		for (Bucket bucket : nameTermsAggregationResult.getBuckets()) {
-			TermsAggregationResult versionTermsAggregationResult =
-				(TermsAggregationResult)bucket.getChildAggregationResult(
-					"version");
+		return Stream.of(
+			nameTermsAggregationResult.getBuckets()
+		).flatMap(
+			Collection::parallelStream
+		).map(
+			bucket -> (TermsAggregationResult)bucket.getChildAggregationResult(
+				"version")
+		).filter(
+			versionTermsAggregationResult -> {
+				Collection<Bucket> versionBuckets =
+					versionTermsAggregationResult.getBuckets();
 
-			Collection<Bucket> versionBuckets =
-				versionTermsAggregationResult.getBuckets();
-
-			if (versionBuckets.size() != 2) {
-				continue;
+				return versionBuckets.size() == 2;
 			}
-
-			nodeIds.put(
-				_getNodeId(
+		).collect(
+			Collectors.toMap(
+				versionTermsAggregationResult -> getNodeId(
 					currentProcessVersion, versionTermsAggregationResult),
-				_getNodeId(
-					latestProcessVersion, versionTermsAggregationResult));
-		}
-
-		return nodeIds;
+				versionTermsAggregationResult -> getNodeId(
+					latestProcessVersion, versionTermsAggregationResult))
+		);
 	}
 
 	private void _transform(

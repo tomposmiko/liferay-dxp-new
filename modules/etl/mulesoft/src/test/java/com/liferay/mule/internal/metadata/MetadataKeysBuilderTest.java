@@ -21,13 +21,15 @@ import com.liferay.mule.internal.oas.constants.OASConstants;
 
 import java.io.InputStream;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -60,7 +62,7 @@ public class MetadataKeysBuilderTest {
 		).when(
 			metadataKeysBuilder
 		).getOASJsonNode(
-			Mockito.any()
+			Matchers.anyObject()
 		);
 	}
 
@@ -149,13 +151,13 @@ public class MetadataKeysBuilderTest {
 	}
 
 	private Set<String> toMetadataKeyIdSet(Set<MetadataKey> metadataKeys) {
-		Set<String> metadataKeyIds = new HashSet<>();
+		Stream<MetadataKey> stream = metadataKeys.stream();
 
-		for (MetadataKey metadataKey : metadataKeys) {
-			metadataKeyIds.add(metadataKey.getId());
-		}
-
-		return metadataKeyIds;
+		return stream.map(
+			MetadataKey::getId
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
 	private static final String OPERATION_HEAD = "head";

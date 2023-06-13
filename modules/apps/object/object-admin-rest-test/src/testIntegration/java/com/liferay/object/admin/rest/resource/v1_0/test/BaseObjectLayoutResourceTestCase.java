@@ -28,7 +28,6 @@ import com.liferay.object.admin.rest.client.pagination.Page;
 import com.liferay.object.admin.rest.client.pagination.Pagination;
 import com.liferay.object.admin.rest.client.resource.v1_0.ObjectLayoutResource;
 import com.liferay.object.admin.rest.client.serdes.v1_0.ObjectLayoutSerDes;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -44,32 +43,30 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -182,193 +179,11 @@ public abstract class BaseObjectLayoutResourceTestCase {
 
 		ObjectLayout objectLayout = randomObjectLayout();
 
-		objectLayout.setObjectDefinitionExternalReferenceCode(regex);
-
 		String json = ObjectLayoutSerDes.toJSON(objectLayout);
 
 		Assert.assertFalse(json.contains(regex));
 
 		objectLayout = ObjectLayoutSerDes.toDTO(json);
-
-		Assert.assertEquals(
-			regex, objectLayout.getObjectDefinitionExternalReferenceCode());
-	}
-
-	@Test
-	public void testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage()
-		throws Exception {
-
-		String externalReferenceCode =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getExternalReferenceCode();
-		String irrelevantExternalReferenceCode =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getIrrelevantExternalReferenceCode();
-
-		Page<ObjectLayout> page =
-			objectLayoutResource.
-				getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-					externalReferenceCode, null, Pagination.of(1, 10));
-
-		Assert.assertEquals(0, page.getTotalCount());
-
-		if (irrelevantExternalReferenceCode != null) {
-			ObjectLayout irrelevantObjectLayout =
-				testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-					irrelevantExternalReferenceCode,
-					randomIrrelevantObjectLayout());
-
-			page =
-				objectLayoutResource.
-					getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-						irrelevantExternalReferenceCode, null,
-						Pagination.of(1, 2));
-
-			Assert.assertEquals(1, page.getTotalCount());
-
-			assertEquals(
-				Arrays.asList(irrelevantObjectLayout),
-				(List<ObjectLayout>)page.getItems());
-			assertValid(
-				page,
-				testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
-		}
-
-		ObjectLayout objectLayout1 =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-				externalReferenceCode, randomObjectLayout());
-
-		ObjectLayout objectLayout2 =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-				externalReferenceCode, randomObjectLayout());
-
-		page =
-			objectLayoutResource.
-				getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-					externalReferenceCode, null, Pagination.of(1, 10));
-
-		Assert.assertEquals(2, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(objectLayout1, objectLayout2),
-			(List<ObjectLayout>)page.getItems());
-		assertValid(
-			page,
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getExpectedActions(
-				externalReferenceCode));
-
-		objectLayoutResource.deleteObjectLayout(objectLayout1.getId());
-
-		objectLayoutResource.deleteObjectLayout(objectLayout2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
-	@Test
-	public void testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPageWithPagination()
-		throws Exception {
-
-		String externalReferenceCode =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getExternalReferenceCode();
-
-		ObjectLayout objectLayout1 =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-				externalReferenceCode, randomObjectLayout());
-
-		ObjectLayout objectLayout2 =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-				externalReferenceCode, randomObjectLayout());
-
-		ObjectLayout objectLayout3 =
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-				externalReferenceCode, randomObjectLayout());
-
-		Page<ObjectLayout> page1 =
-			objectLayoutResource.
-				getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-					externalReferenceCode, null, Pagination.of(1, 2));
-
-		List<ObjectLayout> objectLayouts1 =
-			(List<ObjectLayout>)page1.getItems();
-
-		Assert.assertEquals(
-			objectLayouts1.toString(), 2, objectLayouts1.size());
-
-		Page<ObjectLayout> page2 =
-			objectLayoutResource.
-				getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-					externalReferenceCode, null, Pagination.of(2, 2));
-
-		Assert.assertEquals(3, page2.getTotalCount());
-
-		List<ObjectLayout> objectLayouts2 =
-			(List<ObjectLayout>)page2.getItems();
-
-		Assert.assertEquals(
-			objectLayouts2.toString(), 1, objectLayouts2.size());
-
-		Page<ObjectLayout> page3 =
-			objectLayoutResource.
-				getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage(
-					externalReferenceCode, null, Pagination.of(1, 3));
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(objectLayout1, objectLayout2, objectLayout3),
-			(List<ObjectLayout>)page3.getItems());
-	}
-
-	protected ObjectLayout
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_addObjectLayout(
-				String externalReferenceCode, ObjectLayout objectLayout)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getExternalReferenceCode()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected String
-			testGetObjectDefinitionByExternalReferenceCodeObjectLayoutsPage_getIrrelevantExternalReferenceCode()
-		throws Exception {
-
-		return null;
-	}
-
-	@Test
-	public void testPostObjectDefinitionByExternalReferenceCodeObjectLayout()
-		throws Exception {
-
-		ObjectLayout randomObjectLayout = randomObjectLayout();
-
-		ObjectLayout postObjectLayout =
-			testPostObjectDefinitionByExternalReferenceCodeObjectLayout_addObjectLayout(
-				randomObjectLayout);
-
-		assertEquals(randomObjectLayout, postObjectLayout);
-		assertValid(postObjectLayout);
-	}
-
-	protected ObjectLayout
-			testPostObjectDefinitionByExternalReferenceCodeObjectLayout_addObjectLayout(
-				ObjectLayout objectLayout)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -398,10 +213,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantObjectLayout),
 				(List<ObjectLayout>)page.getItems());
-			assertValid(
-				page,
-				testGetObjectDefinitionObjectLayoutsPage_getExpectedActions(
-					irrelevantObjectDefinitionId));
+			assertValid(page);
 		}
 
 		ObjectLayout objectLayout1 =
@@ -420,35 +232,11 @@ public abstract class BaseObjectLayoutResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(objectLayout1, objectLayout2),
 			(List<ObjectLayout>)page.getItems());
-		assertValid(
-			page,
-			testGetObjectDefinitionObjectLayoutsPage_getExpectedActions(
-				objectDefinitionId));
+		assertValid(page);
 
 		objectLayoutResource.deleteObjectLayout(objectLayout1.getId());
 
 		objectLayoutResource.deleteObjectLayout(objectLayout2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetObjectDefinitionObjectLayoutsPage_getExpectedActions(
-				Long objectDefinitionId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-layouts/batch".
-				replace(
-					"{objectDefinitionId}",
-					String.valueOf(objectDefinitionId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -574,8 +362,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteObjectLayout() throws Exception {
-		ObjectLayout objectLayout =
-			testGraphQLDeleteObjectLayout_addObjectLayout();
+		ObjectLayout objectLayout = testGraphQLObjectLayout_addObjectLayout();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -588,6 +375,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteObjectLayout"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -601,12 +389,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected ObjectLayout testGraphQLDeleteObjectLayout_addObjectLayout()
-		throws Exception {
-
-		return testGraphQLObjectLayout_addObjectLayout();
 	}
 
 	@Test
@@ -629,8 +411,7 @@ public abstract class BaseObjectLayoutResourceTestCase {
 
 	@Test
 	public void testGraphQLGetObjectLayout() throws Exception {
-		ObjectLayout objectLayout =
-			testGraphQLGetObjectLayout_addObjectLayout();
+		ObjectLayout objectLayout = testGraphQLObjectLayout_addObjectLayout();
 
 		Assert.assertTrue(
 			equals(
@@ -669,12 +450,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected ObjectLayout testGraphQLGetObjectLayout_addObjectLayout()
-		throws Exception {
-
-		return testGraphQLObjectLayout_addObjectLayout();
 	}
 
 	@Test
@@ -823,19 +598,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 			}
 
 			if (Objects.equals(
-					"objectDefinitionExternalReferenceCode",
-					additionalAssertFieldName)) {
-
-				if (objectLayout.getObjectDefinitionExternalReferenceCode() ==
-						null) {
-
-					valid = false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
 					"objectDefinitionId", additionalAssertFieldName)) {
 
 				if (objectLayout.getObjectDefinitionId() == null) {
@@ -862,13 +624,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	}
 
 	protected void assertValid(Page<ObjectLayout> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<ObjectLayout> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<ObjectLayout> objectLayouts = page.getItems();
@@ -883,20 +638,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1035,22 +776,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 			}
 
 			if (Objects.equals(
-					"objectDefinitionExternalReferenceCode",
-					additionalAssertFieldName)) {
-
-				if (!Objects.deepEquals(
-						objectLayout1.
-							getObjectDefinitionExternalReferenceCode(),
-						objectLayout2.
-							getObjectDefinitionExternalReferenceCode())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals(
 					"objectDefinitionId", additionalAssertFieldName)) {
 
 				if (!Objects.deepEquals(
@@ -1111,16 +836,14 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1137,10 +860,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1150,18 +869,18 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1263,16 +982,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
-		if (entityFieldName.equals("objectDefinitionExternalReferenceCode")) {
-			sb.append("'");
-			sb.append(
-				String.valueOf(
-					objectLayout.getObjectDefinitionExternalReferenceCode()));
-			sb.append("'");
-
-			return sb.toString();
-		}
-
 		if (entityFieldName.equals("objectDefinitionId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1331,8 +1040,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 				dateModified = RandomTestUtil.nextDate();
 				defaultObjectLayout = RandomTestUtil.randomBoolean();
 				id = RandomTestUtil.randomLong();
-				objectDefinitionExternalReferenceCode = StringUtil.toLowerCase(
-					RandomTestUtil.randomString());
 				objectDefinitionId = RandomTestUtil.randomLong();
 			}
 		};
@@ -1352,115 +1059,6 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1536,6 +1134,18 @@ public abstract class BaseObjectLayoutResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseObjectLayoutResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

@@ -56,8 +56,9 @@ public class AssetAutoTaggerEntryLocalServiceImpl
 		AssetAutoTaggerEntry assetAutoTaggerEntry =
 			assetAutoTaggerEntryPersistence.create(assetAutoTaggerEntryId);
 
-		assetAutoTaggerEntry.setGroupId(assetEntry.getGroupId());
 		assetAutoTaggerEntry.setCompanyId(assetEntry.getCompanyId());
+
+		assetAutoTaggerEntry.setGroupId(assetEntry.getGroupId());
 		assetAutoTaggerEntry.setAssetEntryId(assetEntry.getEntryId());
 		assetAutoTaggerEntry.setAssetTagId(assetTag.getTagId());
 

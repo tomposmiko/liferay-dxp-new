@@ -27,10 +27,6 @@ public class CommercePaymentMethodGroupRelServiceWrapper
 	implements CommercePaymentMethodGroupRelService,
 			   ServiceWrapper<CommercePaymentMethodGroupRelService> {
 
-	public CommercePaymentMethodGroupRelServiceWrapper() {
-		this(null);
-	}
-
 	public CommercePaymentMethodGroupRelServiceWrapper(
 		CommercePaymentMethodGroupRelService
 			commercePaymentMethodGroupRelService) {
@@ -105,16 +101,6 @@ public class CommercePaymentMethodGroupRelServiceWrapper
 		_commercePaymentMethodGroupRelService.
 			deleteCommercePaymentMethodGroupRel(
 				commercePaymentMethodGroupRelId);
-	}
-
-	@Override
-	public com.liferay.commerce.payment.model.CommercePaymentMethodGroupRel
-			fetchCommercePaymentMethodGroupRel(
-				long commercePaymentMethodGroupRelId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commercePaymentMethodGroupRelService.
-			fetchCommercePaymentMethodGroupRel(commercePaymentMethodGroupRelId);
 	}
 
 	@Override

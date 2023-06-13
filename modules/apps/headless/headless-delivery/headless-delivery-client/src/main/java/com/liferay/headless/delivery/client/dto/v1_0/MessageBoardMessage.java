@@ -291,27 +291,6 @@ public class MessageBoardMessage implements Cloneable, Serializable {
 
 	protected String friendlyUrlPath;
 
-	public Boolean getHasCompanyMx() {
-		return hasCompanyMx;
-	}
-
-	public void setHasCompanyMx(Boolean hasCompanyMx) {
-		this.hasCompanyMx = hasCompanyMx;
-	}
-
-	public void setHasCompanyMx(
-		UnsafeSupplier<Boolean, Exception> hasCompanyMxUnsafeSupplier) {
-
-		try {
-			hasCompanyMx = hasCompanyMxUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Boolean hasCompanyMx;
-
 	public String getHeadline() {
 		return headline;
 	}
@@ -414,27 +393,6 @@ public class MessageBoardMessage implements Cloneable, Serializable {
 	}
 
 	protected Long messageBoardThreadId;
-
-	public Boolean getModified() {
-		return modified;
-	}
-
-	public void setModified(Boolean modified) {
-		this.modified = modified;
-	}
-
-	public void setModified(
-		UnsafeSupplier<Boolean, Exception> modifiedUnsafeSupplier) {
-
-		try {
-			modified = modifiedUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Boolean modified;
 
 	public Integer getNumberOfMessageBoardAttachments() {
 		return numberOfMessageBoardAttachments;

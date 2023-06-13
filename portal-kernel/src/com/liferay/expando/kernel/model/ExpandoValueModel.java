@@ -225,8 +225,4 @@ public interface ExpandoValueModel
 	@Override
 	public ExpandoValue cloneWithOriginalValues();
 
-	public default String toXmlString() {
-		return null;
-	}
-
 }

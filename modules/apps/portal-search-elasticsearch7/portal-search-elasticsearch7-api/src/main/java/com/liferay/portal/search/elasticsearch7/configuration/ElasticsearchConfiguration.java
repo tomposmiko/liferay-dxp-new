@@ -147,12 +147,6 @@ public interface ElasticsearchConfiguration {
 	public boolean logExceptionsOnly();
 
 	@Meta.AD(
-		deflt = "0.0.0", description = "minimum-required-node-version-help",
-		name = "minimum-required-node-version", required = false
-	)
-	public String minimumRequiredNodeVersion();
-
-	@Meta.AD(
 		deflt = "ERROR", description = "rest-client-logger-level-help",
 		name = "rest-client-logger-level", required = false
 	)
@@ -258,18 +252,6 @@ public interface ElasticsearchConfiguration {
 		name = "http-cors-configurations", required = false
 	)
 	public String httpCORSConfigurations();
-
-	@Meta.AD(
-		deflt = "75", description = "max-connections-help",
-		name = "max-connections", required = false
-	)
-	public int maxConnections();
-
-	@Meta.AD(
-		deflt = "75", description = "max-connections-per-route-help",
-		name = "max-connections-per-route", required = false
-	)
-	public int maxConnectionsPerRoute();
 
 	@Meta.AD(
 		deflt = "false", description = "sidecar-debug-help",

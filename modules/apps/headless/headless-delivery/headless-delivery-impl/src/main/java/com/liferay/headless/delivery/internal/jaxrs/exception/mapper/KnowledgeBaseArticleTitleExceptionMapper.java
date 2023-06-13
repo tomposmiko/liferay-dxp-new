@@ -18,6 +18,7 @@ import com.liferay.knowledge.base.exception.KBArticleTitleException;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.BaseExceptionMapper;
 import com.liferay.portal.vulcan.jaxrs.exception.mapper.Problem;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import org.osgi.service.component.annotations.Component;
@@ -42,7 +43,8 @@ public class KnowledgeBaseArticleTitleExceptionMapper
 	protected Problem getProblem(
 		KBArticleTitleException kbArticleTitleException) {
 
-		return new Problem(kbArticleTitleException);
+		return new Problem(
+			Response.Status.BAD_REQUEST, kbArticleTitleException.getMessage());
 	}
 
 }

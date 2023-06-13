@@ -24,6 +24,10 @@ import com.liferay.portal.kernel.json.JSONObject;
  */
 public interface FragmentEntryProcessor {
 
+	public default void deleteFragmentEntryLinkData(
+		FragmentEntryLink fragmentEntryLink) {
+	}
+
 	public default JSONArray getAvailableTagsJSONArray() {
 		return null;
 	}
@@ -54,9 +58,7 @@ public interface FragmentEntryProcessor {
 		return html;
 	}
 
-	public default void validateFragmentEntryHTML(
-			String html, String configuration)
-		throws PortalException {
-	}
+	public void validateFragmentEntryHTML(String html, String configuration)
+		throws PortalException;
 
 }

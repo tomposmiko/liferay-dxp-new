@@ -14,7 +14,7 @@
 
 package com.liferay.document.library.uad.display;
 
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.user.associated.data.display.UADDisplay;
 import com.liferay.user.associated.data.display.UADHierarchyDeclaration;
 
@@ -36,7 +36,7 @@ public class DLUADHierarchyDeclaration implements UADHierarchyDeclaration {
 
 	@Override
 	public String getEntitiesTypeLabel(Locale locale) {
-		return _language.get(locale, "folders-and-files");
+		return LanguageUtil.get(locale, "folders-and-files");
 	}
 
 	@Override
@@ -49,17 +49,10 @@ public class DLUADHierarchyDeclaration implements UADHierarchyDeclaration {
 		return new UADDisplay<?>[] {_dlFileEntryUADDisplay};
 	}
 
-	@Reference(
-		target = "(component.name=com.liferay.document.library.uad.display.DLFileEntryUADDisplay)"
-	)
-	private UADDisplay<?> _dlFileEntryUADDisplay;
-
-	@Reference(
-		target = "(component.name=com.liferay.document.library.uad.display.DLFolderUADDisplay)"
-	)
-	private UADDisplay<?> _dlFolderUADDisplay;
+	@Reference
+	private DLFileEntryUADDisplay _dlFileEntryUADDisplay;
 
 	@Reference
-	private Language _language;
+	private DLFolderUADDisplay _dlFolderUADDisplay;
 
 }

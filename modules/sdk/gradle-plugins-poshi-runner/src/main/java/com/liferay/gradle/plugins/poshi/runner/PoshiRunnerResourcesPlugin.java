@@ -30,7 +30,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
-import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.file.CopySpec;
 import org.gradle.api.plugins.BasePlugin;
@@ -57,7 +56,7 @@ public class PoshiRunnerResourcesPlugin implements Plugin<Project> {
 				project, PLUGIN_NAME, PoshiRunnerResourcesExtension.class);
 
 		Configuration configuration = _addConfigurationPoshiRunnerResources(
-			project, poshiRunnerResourcesExtension);
+			project);
 
 		_addTaskUploadPoshiRunnerResources(project, configuration);
 
@@ -131,8 +130,7 @@ public class PoshiRunnerResourcesPlugin implements Plugin<Project> {
 	}
 
 	private Configuration _addConfigurationPoshiRunnerResources(
-		final Project project,
-		final PoshiRunnerResourcesExtension poshiRunnerResourcesExtension) {
+		Project project) {
 
 		ConfigurationContainer configurationContainer =
 			project.getConfigurations();
@@ -140,32 +138,11 @@ public class PoshiRunnerResourcesPlugin implements Plugin<Project> {
 		Configuration configuration = configurationContainer.maybeCreate(
 			POSHI_RUNNER_RESOURCES_CONFIGURATION_NAME);
 
-		configuration.defaultDependencies(
-			new Action<DependencySet>() {
-
-				@Override
-				public void execute(DependencySet dependencySet) {
-					_addDependenciesPoshiRunnerResources(
-						project, poshiRunnerResourcesExtension);
-				}
-
-			});
-
 		configuration.setDescription(
 			"Configures the Poshi Runner resources artifacts.");
 		configuration.setVisible(false);
 
 		return configuration;
-	}
-
-	private void _addDependenciesPoshiRunnerResources(
-		Project project,
-		PoshiRunnerResourcesExtension poshiRunnerResourcesExtension) {
-
-		GradleUtil.addDependency(
-			project, POSHI_RUNNER_RESOURCES_CONFIGURATION_NAME, "com.liferay",
-			"com.liferay.poshi.runner.resources",
-			poshiRunnerResourcesExtension.getVersion());
 	}
 
 	private Upload _addTaskUploadPoshiRunnerResources(

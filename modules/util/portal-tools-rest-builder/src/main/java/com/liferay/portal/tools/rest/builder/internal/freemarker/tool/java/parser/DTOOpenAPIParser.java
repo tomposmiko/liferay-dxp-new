@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -64,8 +63,7 @@ public class DTOOpenAPIParser {
 	}
 
 	public static Map<String, String> getProperties(
-		ConfigYAML configYAML, boolean excludeReadOnly, OpenAPIYAML openAPIYAML,
-		Schema schema) {
+		ConfigYAML configYAML, OpenAPIYAML openAPIYAML, Schema schema) {
 
 		Map<String, String> javaDataTypeMap =
 			OpenAPIParserUtil.getJavaDataTypeMap(configYAML, openAPIYAML);
@@ -74,28 +72,19 @@ public class DTOOpenAPIParser {
 		Map<String, Schema> propertySchemas = _getPropertySchemas(schema);
 
 		for (Map.Entry<String, Schema> entry : propertySchemas.entrySet()) {
+			String propertySchemaName = entry.getKey();
 			Schema propertySchema = entry.getValue();
 
-			if (excludeReadOnly && propertySchema.isReadOnly()) {
-				continue;
-			}
+			String propertyName = _getPropertyName(
+				propertySchema, propertySchemaName);
+			String propertyType = _getPropertyType(
+				javaDataTypeMap, openAPIYAML, propertySchema,
+				propertySchemaName);
 
-			String propertySchemaName = entry.getKey();
-
-			properties.put(
-				_getPropertyName(propertySchema, propertySchemaName),
-				_getPropertyType(
-					javaDataTypeMap, openAPIYAML, propertySchema,
-					propertySchemaName));
+			properties.put(propertyName, propertyType);
 		}
 
 		return properties;
-	}
-
-	public static Map<String, String> getProperties(
-		ConfigYAML configYAML, OpenAPIYAML openAPIYAML, Schema schema) {
-
-		return getProperties(configYAML, false, openAPIYAML, schema);
 	}
 
 	public static Map<String, String> getProperties(
@@ -205,15 +194,6 @@ public class DTOOpenAPIParser {
 			return Collections.emptyMap();
 		}
 
-		Set<Map.Entry<String, Schema>> entries = propertySchemas.entrySet();
-
-		entries.forEach(
-			entry -> {
-				Schema propertySchema = entry.getValue();
-
-				propertySchema.setName(entry.getKey());
-			});
-
 		return propertySchemas;
 	}
 
@@ -307,7 +287,7 @@ public class DTOOpenAPIParser {
 	}
 
 	private static boolean _isObject(Schema schema, String type) {
-		if (Objects.equals(type, "object") &&
+		if (Objects.equals("object", type) &&
 			(schema.getAdditionalPropertySchema() == null)) {
 
 			return true;

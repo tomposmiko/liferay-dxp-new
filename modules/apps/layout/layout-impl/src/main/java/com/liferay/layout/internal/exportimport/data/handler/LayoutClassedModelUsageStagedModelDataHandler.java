@@ -48,7 +48,13 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(
+	immediate = true,
+	service = {
+		LayoutClassedModelUsageStagedModelDataHandler.class,
+		StagedModelDataHandler.class
+	}
+)
 public class LayoutClassedModelUsageStagedModelDataHandler
 	extends BaseStagedModelDataHandler<LayoutClassedModelUsage> {
 
@@ -88,6 +94,9 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 			layoutClassedModelUsage);
 
 		element.addAttribute(
+			"layout-classed-model-class-name",
+			_portal.getClassName(layoutClassedModelUsage.getClassNameId()));
+		element.addAttribute(
 			"layout-classed-model-container-class-name",
 			_portal.getClassName(layoutClassedModelUsage.getContainerType()));
 
@@ -112,7 +121,7 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 			}
 			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(portalException);
+					_log.debug(portalException, portalException);
 				}
 			}
 
@@ -120,19 +129,11 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 				(assetRenderer.getStatus() ==
 					WorkflowConstants.STATUS_APPROVED)) {
 
-				if (ExportImportThreadLocal.isStagingInProcess()) {
-					portletDataContext.addReferenceElement(
-						layoutClassedModelUsage, element,
-						(StagedModel)assetRenderer.getAssetObject(),
-						PortletDataContext.REFERENCE_TYPE_WEAK, true);
-				}
-				else {
-					StagedModelDataHandlerUtil.exportReferenceStagedModel(
-						portletDataContext, layoutClassedModelUsage,
-						(StagedModel)assetRenderer.getAssetObject(),
-						PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
-						assetRendererFactory.getPortletId());
-				}
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, layoutClassedModelUsage,
+					(StagedModel)assetRenderer.getAssetObject(),
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
+					assetRendererFactory.getPortletId());
 			}
 		}
 
@@ -187,6 +188,9 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 
 		importedLayoutClassedModelUsage.setPlid(plid);
 
+		importedLayoutClassedModelUsage.setClassNameId(
+			_portal.getClassNameId(layoutClassedModelUsage.getClassName()));
+
 		Map<Long, Long> classPKs =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				layoutClassedModelUsage.getClassName());
@@ -204,9 +208,6 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 			element.attributeValue(
 				"layout-classed-model-container-class-name"));
 
-		importedLayoutClassedModelUsage.setContainerType(
-			containerTypeClassNameId);
-
 		if (containerTypeClassNameId == _portal.getClassNameId(
 				FragmentEntryLink.class)) {
 
@@ -223,13 +224,17 @@ public class LayoutClassedModelUsageStagedModelDataHandler
 
 				importedLayoutClassedModelUsage.setContainerKey(
 					String.valueOf(containerKey));
+
+				importedLayoutClassedModelUsage.setContainerType(
+					_portal.getClassNameId(FragmentEntryLink.class));
 			}
 		}
 
 		LayoutClassedModelUsage existingLayoutClassedModelUsage =
 			_layoutClassedModelUsageLocalService.fetchLayoutClassedModelUsage(
-				importedLayoutClassedModelUsage.getClassNameId(), classPK,
-				importedLayoutClassedModelUsage.getContainerKey(),
+				_portal.getClassNameId(
+					element.attributeValue("layout-classed-model-class-name")),
+				classPK, importedLayoutClassedModelUsage.getContainerKey(),
 				containerTypeClassNameId, plid);
 
 		if (existingLayoutClassedModelUsage == null) {

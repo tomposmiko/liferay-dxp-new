@@ -1,9 +1,0 @@
-{
-	"cssPath": "index.css",
-	"fragmentEntryKey": "input",
-	"htmlPath": "index.html",
-	"jsPath": "index.js",
-	"name": "Input",
-	"thumbnailPath": "thumbnail.png",
-	"type": "input"
-}

@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS,
 		"mvc.command.name=/segments/get_segments_entry_class_pks_count"
@@ -67,7 +68,7 @@ public class GetSegmentsEntryClassPKsCountMVCResourceCommand
 		try {
 			PrintWriter printWriter = resourceResponse.getWriter();
 
-			printWriter.write(_getText(resourceRequest));
+			printWriter.write(getText(resourceRequest, resourceResponse));
 
 			return false;
 		}
@@ -89,7 +90,7 @@ public class GetSegmentsEntryClassPKsCountMVCResourceCommand
 		_serviceTrackerMap.close();
 	}
 
-	private int _getSegmentsEntryClassPKsCount(
+	protected int getSegmentsEntryClassPKsCount(
 		long companyId, Criteria criteria, String type, Locale locale) {
 
 		ODataRetriever<?> oDataRetriever = _serviceTrackerMap.getService(type);
@@ -113,7 +114,9 @@ public class GetSegmentsEntryClassPKsCountMVCResourceCommand
 		}
 	}
 
-	private String _getText(ResourceRequest resourceRequest) {
+	protected String getText(
+		ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
+
 		HttpServletRequest httpServletRequest =
 			_portal.getOriginalServletRequest(
 				_portal.getHttpServletRequest(resourceRequest));
@@ -127,15 +130,15 @@ public class GetSegmentsEntryClassPKsCountMVCResourceCommand
 			_segmentsCriteriaContributorRegistry.
 				getSegmentsCriteriaContributors(type));
 
-		_saveCriteriaInSession(resourceRequest, criteria);
+		saveCriteriaInSession(resourceRequest, criteria);
 
-		int count = _getSegmentsEntryClassPKsCount(
+		int count = getSegmentsEntryClassPKsCount(
 			companyId, criteria, type, _portal.getLocale(resourceRequest));
 
 		return String.valueOf(count);
 	}
 
-	private void _saveCriteriaInSession(
+	protected void saveCriteriaInSession(
 		ResourceRequest resourceRequest, Criteria criteria) {
 
 		PortletSession portletSession = resourceRequest.getPortletSession();

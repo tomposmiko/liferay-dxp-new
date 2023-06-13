@@ -17,12 +17,17 @@ package com.liferay.adaptive.media.image.internal.configuration.test;
 import com.liferay.adaptive.media.image.configuration.AMImageConfigurationEntry;
 import com.liferay.adaptive.media.image.configuration.AMImageConfigurationHelper;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -65,17 +70,19 @@ public class AMImageDisableConfigurationTest
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), "2");
 
-		AMImageConfigurationEntry firstAMImageConfigurationEntry =
-			_amImageConfigurationHelper.getAMImageConfigurationEntry(
-				TestPropsValues.getCompanyId(), "1");
+		Optional<AMImageConfigurationEntry>
+			firstAMImageConfigurationEntryOptional =
+				_amImageConfigurationHelper.getAMImageConfigurationEntry(
+					TestPropsValues.getCompanyId(), "1");
 
-		assertDisabled(firstAMImageConfigurationEntry);
+		assertDisabled(firstAMImageConfigurationEntryOptional);
 
-		AMImageConfigurationEntry secondAMImageConfigurationEntry =
-			_amImageConfigurationHelper.getAMImageConfigurationEntry(
-				TestPropsValues.getCompanyId(), "2");
+		Optional<AMImageConfigurationEntry>
+			secondAMImageConfigurationEntryOptional =
+				_amImageConfigurationHelper.getAMImageConfigurationEntry(
+					TestPropsValues.getCompanyId(), "2");
 
-		assertDisabled(secondAMImageConfigurationEntry);
+		assertDisabled(secondAMImageConfigurationEntryOptional);
 	}
 
 	@Test
@@ -104,17 +111,17 @@ public class AMImageDisableConfigurationTest
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), "2");
 
-		AMImageConfigurationEntry amImageConfigurationEntry =
+		Optional<AMImageConfigurationEntry> amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				TestPropsValues.getCompanyId(), "1");
 
-		assertDisabled(amImageConfigurationEntry);
+		assertDisabled(amImageConfigurationEntryOptional);
 
-		amImageConfigurationEntry =
+		amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				TestPropsValues.getCompanyId(), "2");
 
-		assertDisabled(amImageConfigurationEntry);
+		assertDisabled(amImageConfigurationEntryOptional);
 	}
 
 	@Test
@@ -130,20 +137,20 @@ public class AMImageDisableConfigurationTest
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), "1");
 
-		AMImageConfigurationEntry amImageConfigurationEntry =
+		Optional<AMImageConfigurationEntry> amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				TestPropsValues.getCompanyId(), "1");
 
-		assertDisabled(amImageConfigurationEntry);
+		assertDisabled(amImageConfigurationEntryOptional);
 
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), "1");
 
-		amImageConfigurationEntry =
+		amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				TestPropsValues.getCompanyId(), "1");
 
-		assertDisabled(amImageConfigurationEntry);
+		assertDisabled(amImageConfigurationEntryOptional);
 	}
 
 	@Test
@@ -167,17 +174,19 @@ public class AMImageDisableConfigurationTest
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), "1");
 
-		AMImageConfigurationEntry firstAMImageConfigurationEntry =
-			_amImageConfigurationHelper.getAMImageConfigurationEntry(
-				TestPropsValues.getCompanyId(), "1");
+		Optional<AMImageConfigurationEntry>
+			firstAMImageConfigurationEntryOptional =
+				_amImageConfigurationHelper.getAMImageConfigurationEntry(
+					TestPropsValues.getCompanyId(), "1");
 
-		assertDisabled(firstAMImageConfigurationEntry);
+		assertDisabled(firstAMImageConfigurationEntryOptional);
 
-		AMImageConfigurationEntry secondAMImageConfigurationEntry =
-			_amImageConfigurationHelper.getAMImageConfigurationEntry(
-				TestPropsValues.getCompanyId(), "2");
+		Optional<AMImageConfigurationEntry>
+			secondAMImageConfigurationEntryOptional =
+				_amImageConfigurationHelper.getAMImageConfigurationEntry(
+					TestPropsValues.getCompanyId(), "2");
 
-		assertEnabled(secondAMImageConfigurationEntry);
+		assertEnabled(secondAMImageConfigurationEntryOptional);
 	}
 
 	@Test
@@ -187,9 +196,11 @@ public class AMImageDisableConfigurationTest
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), uuid);
 
-		Assert.assertNull(
+		Optional<AMImageConfigurationEntry> amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
-				TestPropsValues.getCompanyId(), uuid));
+				TestPropsValues.getCompanyId(), uuid);
+
+		Assert.assertFalse(amImageConfigurationEntryOptional.isPresent());
 	}
 
 	@Test
@@ -213,17 +224,19 @@ public class AMImageDisableConfigurationTest
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), "2");
 
-		AMImageConfigurationEntry firstAMImageConfigurationEntry =
-			_amImageConfigurationHelper.getAMImageConfigurationEntry(
-				TestPropsValues.getCompanyId(), "1");
+		Optional<AMImageConfigurationEntry>
+			firstAMImageConfigurationEntryOptional =
+				_amImageConfigurationHelper.getAMImageConfigurationEntry(
+					TestPropsValues.getCompanyId(), "1");
 
-		assertEnabled(firstAMImageConfigurationEntry);
+		assertEnabled(firstAMImageConfigurationEntryOptional);
 
-		AMImageConfigurationEntry secondAMImageConfigurationEntry =
-			_amImageConfigurationHelper.getAMImageConfigurationEntry(
-				TestPropsValues.getCompanyId(), "2");
+		Optional<AMImageConfigurationEntry>
+			secondAMImageConfigurationEntryOptional =
+				_amImageConfigurationHelper.getAMImageConfigurationEntry(
+					TestPropsValues.getCompanyId(), "2");
 
-		assertDisabled(secondAMImageConfigurationEntry);
+		assertDisabled(secondAMImageConfigurationEntryOptional);
 	}
 
 	@Test
@@ -236,20 +249,50 @@ public class AMImageDisableConfigurationTest
 				"max-width", "100"
 			).build());
 
-		AMImageConfigurationEntry amImageConfigurationEntry =
+		Optional<AMImageConfigurationEntry> amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				TestPropsValues.getCompanyId(), "1");
 
-		assertEnabled(amImageConfigurationEntry);
+		assertEnabled(amImageConfigurationEntryOptional);
 
 		_amImageConfigurationHelper.disableAMImageConfigurationEntry(
 			TestPropsValues.getCompanyId(), "1");
 
-		amImageConfigurationEntry =
+		amImageConfigurationEntryOptional =
 			_amImageConfigurationHelper.getAMImageConfigurationEntry(
 				TestPropsValues.getCompanyId(), "1");
 
-		assertDisabled(amImageConfigurationEntry);
+		assertDisabled(amImageConfigurationEntryOptional);
+	}
+
+	@Test
+	public void testSendsAMessageToTheMessageBus() throws Exception {
+		Map<String, String> properties = HashMapBuilder.put(
+			"max-height", "100"
+		).put(
+			"max-width", "100"
+		).build();
+
+		_amImageConfigurationHelper.addAMImageConfigurationEntry(
+			TestPropsValues.getCompanyId(), "one", "onedesc", "1", properties);
+
+		List<Message> messages = collectConfigurationMessages(
+			() -> _amImageConfigurationHelper.disableAMImageConfigurationEntry(
+				TestPropsValues.getCompanyId(), "1"));
+
+		Assert.assertEquals(messages.toString(), 1, messages.size());
+
+		Message message = messages.get(0);
+
+		AMImageConfigurationEntry amImageConfigurationEntry =
+			(AMImageConfigurationEntry)message.getPayload();
+
+		Assert.assertEquals("one", amImageConfigurationEntry.getName());
+		Assert.assertEquals(
+			"onedesc", amImageConfigurationEntry.getDescription());
+		Assert.assertEquals("1", amImageConfigurationEntry.getUUID());
+		Assert.assertEquals(
+			properties, amImageConfigurationEntry.getProperties());
 	}
 
 	@Override

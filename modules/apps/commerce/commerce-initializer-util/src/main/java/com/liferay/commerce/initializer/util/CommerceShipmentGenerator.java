@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alessio Antonio Rendina
  */
-@Component(service = CommerceShipmentGenerator.class)
+@Component(enabled = false, service = CommerceShipmentGenerator.class)
 public class CommerceShipmentGenerator {
 
 	public void generate(long groupId, int shipmentsCount) {
@@ -130,21 +130,18 @@ public class CommerceShipmentGenerator {
 
 		_commerceShipmentLocalService.updateCommerceShipment(
 			commerceShipment.getCommerceShipmentId(),
-			commerceShipment.getCommerceShippingMethodId(),
-			commerceShipment.getCarrier(),
-			expectedDateCalendar.get(Calendar.MONTH),
-			expectedDateCalendar.get(Calendar.DAY_OF_MONTH),
-			expectedDateCalendar.get(Calendar.YEAR),
-			expectedDateCalendar.get(Calendar.HOUR),
-			expectedDateCalendar.get(Calendar.MINUTE),
+			commerceShipment.getCarrier(), commerceShipment.getTrackingNumber(),
+			_getRandomCommerceShipmentStatus(),
 			shippingDateCalendar.get(Calendar.MONTH),
 			shippingDateCalendar.get(Calendar.DAY_OF_MONTH),
 			shippingDateCalendar.get(Calendar.YEAR),
 			shippingDateCalendar.get(Calendar.HOUR),
 			shippingDateCalendar.get(Calendar.MINUTE),
-			commerceShipment.getTrackingNumber(),
-			commerceShipment.getTrackingURL(),
-			_getRandomCommerceShipmentStatus(), serviceContext);
+			expectedDateCalendar.get(Calendar.MONTH),
+			expectedDateCalendar.get(Calendar.DAY_OF_MONTH),
+			expectedDateCalendar.get(Calendar.YEAR),
+			expectedDateCalendar.get(Calendar.HOUR),
+			expectedDateCalendar.get(Calendar.MINUTE));
 	}
 
 	private void _generateCommerceShipmentItems(
@@ -171,10 +168,9 @@ public class CommerceShipmentGenerator {
 			}
 
 			_commerceShipmentItemLocalService.addCommerceShipmentItem(
-				null, commerceShipmentId,
-				commerceOrderItem.getCommerceOrderItemId(),
+				commerceShipmentId, commerceOrderItem.getCommerceOrderItemId(),
 				commerceInventoryWarehouse.getCommerceInventoryWarehouseId(),
-				commerceInventoryWarehouseItemQuantity, true, serviceContext);
+				commerceInventoryWarehouseItemQuantity, serviceContext);
 		}
 	}
 

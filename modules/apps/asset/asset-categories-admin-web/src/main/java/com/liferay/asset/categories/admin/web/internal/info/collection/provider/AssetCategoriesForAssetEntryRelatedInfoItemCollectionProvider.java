@@ -24,13 +24,14 @@ import com.liferay.info.collection.provider.RelatedInfoItemCollectionProvider;
 import com.liferay.info.pagination.InfoPage;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.info.sort.Sort;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Jürgen Kappler
  */
-@Component(service = RelatedInfoItemCollectionProvider.class)
+@Component(immediate = true, service = RelatedInfoItemCollectionProvider.class)
 public class AssetCategoriesForAssetEntryRelatedInfoItemCollectionProvider
 	implements RelatedInfoItemCollectionProvider<AssetEntry, AssetCategory> {
 
@@ -46,7 +47,10 @@ public class AssetCategoriesForAssetEntryRelatedInfoItemCollectionProvider
 	public InfoPage<AssetCategory> getCollectionInfoPage(
 		CollectionQuery collectionQuery) {
 
-		Object relatedItem = collectionQuery.getRelatedItem();
+		Optional<Object> relatedItemOptional =
+			collectionQuery.getRelatedItemObjectOptional();
+
+		Object relatedItem = relatedItemOptional.orElse(null);
 
 		if (!(relatedItem instanceof AssetEntry)) {
 			return InfoPage.of(
@@ -91,11 +95,14 @@ public class AssetCategoriesForAssetEntryRelatedInfoItemCollectionProvider
 
 						@Override
 						public boolean isAscending() {
-							Sort sort = collectionQuery.getSort();
+							Optional<Sort> sortOptional =
+								collectionQuery.getSortOptional();
 
-							if (sort == null) {
+							if (!sortOptional.isPresent()) {
 								return true;
 							}
+
+							Sort sort = sortOptional.get();
 
 							if (sort.isReverse()) {
 								return false;
@@ -129,7 +136,7 @@ public class AssetCategoriesForAssetEntryRelatedInfoItemCollectionProvider
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "categories-for-this-item");
+		return LanguageUtil.get(locale, "categories-for-this-item");
 	}
 
 	@Reference
@@ -138,8 +145,5 @@ public class AssetCategoriesForAssetEntryRelatedInfoItemCollectionProvider
 	@Reference
 	private AssetEntryAssetCategoryRelLocalService
 		_assetEntryAssetCategoryRelLocalService;
-
-	@Reference
-	private Language _language;
 
 }

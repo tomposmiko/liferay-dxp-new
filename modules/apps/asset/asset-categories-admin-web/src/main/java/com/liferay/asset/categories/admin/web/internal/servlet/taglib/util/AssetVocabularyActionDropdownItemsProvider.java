@@ -19,10 +19,10 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.exportimport.kernel.staging.permission.StagingPermissionUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -46,7 +46,7 @@ public class AssetVocabularyActionDropdownItemsProvider {
 		_httpServletRequest = httpServletRequest;
 		_renderResponse = renderResponse;
 
-		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -63,11 +63,10 @@ public class AssetVocabularyActionDropdownItemsProvider {
 								PortletURLBuilder.createRenderURL(
 									_renderResponse
 								).setMVCPath(
-									"/edit_asset_vocabulary.jsp"
+									"/edit_vocabulary.jsp"
 								).setParameter(
 									"vocabularyId", vocabulary.getVocabularyId()
 								).buildString());
-							dropdownItem.setIcon("pencil");
 							dropdownItem.setLabel(
 								LanguageUtil.get(_httpServletRequest, "edit"));
 						}
@@ -95,7 +94,6 @@ public class AssetVocabularyActionDropdownItemsProvider {
 										vocabulary.getVocabularyId()),
 									LiferayWindowState.POP_UP.toString(), null,
 									_httpServletRequest));
-							dropdownItem.setIcon("password-policies");
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest, "permissions"));
@@ -115,14 +113,12 @@ public class AssetVocabularyActionDropdownItemsProvider {
 								PortletURLBuilder.createActionURL(
 									_renderResponse
 								).setActionName(
-									"/asset_categories_admin" +
-										"/delete_asset_vocabulary"
+									"deleteVocabulary"
 								).setRedirect(
 									_getDefaultRedirect()
 								).setParameter(
 									"vocabularyId", vocabulary.getVocabularyId()
 								).buildString());
-							dropdownItem.setIcon("trash");
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									_httpServletRequest, "delete"));

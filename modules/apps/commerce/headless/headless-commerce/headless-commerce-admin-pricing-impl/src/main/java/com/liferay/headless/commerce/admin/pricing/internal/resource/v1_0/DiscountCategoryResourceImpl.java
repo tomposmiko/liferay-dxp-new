@@ -22,10 +22,10 @@ import com.liferay.commerce.discount.model.CommerceDiscountRel;
 import com.liferay.commerce.discount.service.CommerceDiscountRelService;
 import com.liferay.commerce.discount.service.CommerceDiscountService;
 import com.liferay.headless.commerce.admin.pricing.dto.v1_0.DiscountCategory;
+import com.liferay.headless.commerce.admin.pricing.internal.dto.v1_0.converter.DiscountCategoryDTOConverter;
 import com.liferay.headless.commerce.admin.pricing.internal.util.v1_0.DiscountCategoryUtil;
 import com.liferay.headless.commerce.admin.pricing.resource.v1_0.DiscountCategoryResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/discount-category.properties",
 	scope = ServiceScope.PROTOTYPE, service = DiscountCategoryResource.class
 )
@@ -127,8 +128,8 @@ public class DiscountCategoryResourceImpl
 
 		CommerceDiscountRel commerceDiscountRel =
 			DiscountCategoryUtil.addCommerceDiscountRel(
-				contextCompany.getGroupId(), _assetCategoryLocalService,
-				_commerceDiscountRelService, discountCategory, commerceDiscount,
+				_assetCategoryLocalService, _commerceDiscountRelService,
+				discountCategory, commerceDiscount,
 				_serviceContextHelper.getServiceContext());
 
 		return _toDiscountCategory(
@@ -142,8 +143,8 @@ public class DiscountCategoryResourceImpl
 
 		CommerceDiscountRel commerceDiscountRel =
 			DiscountCategoryUtil.addCommerceDiscountRel(
-				contextCompany.getGroupId(), _assetCategoryLocalService,
-				_commerceDiscountRelService, discountCategory,
+				_assetCategoryLocalService, _commerceDiscountRelService,
+				discountCategory,
 				_commerceDiscountService.getCommerceDiscount(id),
 				_serviceContextHelper.getServiceContext());
 
@@ -184,11 +185,8 @@ public class DiscountCategoryResourceImpl
 	@Reference
 	private CommerceDiscountService _commerceDiscountService;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v1_0.converter.DiscountCategoryDTOConverter)"
-	)
-	private DTOConverter<CommerceDiscountRel, DiscountCategory>
-		_discountCategoryDTOConverter;
+	@Reference
+	private DiscountCategoryDTOConverter _discountCategoryDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

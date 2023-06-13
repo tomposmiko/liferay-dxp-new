@@ -14,6 +14,7 @@
 
 package com.liferay.asset.display.page.internal.upgrade.v2_1_0;
 
+import com.liferay.asset.display.page.internal.upgrade.v2_1_0.util.AssetDisplayPageEntryTable;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
@@ -37,6 +38,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * @author Pavel Savinov
@@ -67,17 +69,16 @@ public class AssetDisplayLayoutUpgradeProcess extends UpgradeProcess {
 			long layoutPageTemplateEntryId, ServiceContext serviceContext)
 		throws PortalException {
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
+		LayoutPageTemplateEntry layoutPageTemplateEntry = Optional.ofNullable(
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				layoutPageTemplateEntryId);
-
-		if (layoutPageTemplateEntry == null) {
-			layoutPageTemplateEntry =
+				layoutPageTemplateEntryId)
+		).orElseGet(
+			() ->
 				_layoutPageTemplateEntryService.
 					fetchDefaultLayoutPageTemplateEntry(
 						groupId, assetEntry.getClassNameId(),
-						assetEntry.getClassTypeId());
-		}
+						assetEntry.getClassTypeId())
+		);
 
 		if (layoutPageTemplateEntry == null) {
 			return 0;
@@ -123,7 +124,9 @@ public class AssetDisplayLayoutUpgradeProcess extends UpgradeProcess {
 	}
 
 	private void _upgradeSchema() throws Exception {
-		alterTableAddColumn("AssetDisplayPageEntry", "plid", "LONG");
+		alter(
+			AssetDisplayPageEntryTable.class,
+			new AlterTableAddColumn("plid", "LONG"));
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -136,9 +139,9 @@ public class AssetDisplayLayoutUpgradeProcess extends UpgradeProcess {
 					"AssetDisplayPageEntry where plid is null or plid = 0"));
 			PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update AssetDisplayPageEntry set plid = ? where " +
-						"assetDisplayPageEntryId = ?")) {
+					connection.prepareStatement(
+						"update AssetDisplayPageEntry set plid = ? where " +
+							"assetDisplayPageEntryId = ?"))) {
 
 			while (resultSet.next()) {
 				long classNameId = resultSet.getLong("classNameId");

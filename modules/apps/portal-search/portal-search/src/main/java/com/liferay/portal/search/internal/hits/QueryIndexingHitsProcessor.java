@@ -31,7 +31,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  * @author Josef Sustacek
  */
-@Component(property = "sort.order=2", service = HitsProcessor.class)
+@Component(
+	immediate = true, property = "sort.order=2", service = HitsProcessor.class
+)
 public class QueryIndexingHitsProcessor implements HitsProcessor {
 
 	@Override
@@ -45,7 +47,7 @@ public class QueryIndexingHitsProcessor implements HitsProcessor {
 		}
 
 		if (hits.getLength() >= queryConfig.getQueryIndexingThreshold()) {
-			_addDocument(
+			addDocument(
 				searchContext.getCompanyId(), searchContext.getKeywords(),
 				searchContext.getLocale());
 		}
@@ -53,15 +55,15 @@ public class QueryIndexingHitsProcessor implements HitsProcessor {
 		return true;
 	}
 
-	@Reference
-	protected IndexWriterHelper indexWriterHelper;
-
-	private void _addDocument(long companyId, String keywords, Locale locale)
+	protected void addDocument(long companyId, String keywords, Locale locale)
 		throws SearchException {
 
 		indexWriterHelper.indexKeyword(
 			companyId, keywords, 0, SuggestionConstants.TYPE_QUERY_SUGGESTION,
 			locale);
 	}
+
+	@Reference
+	protected IndexWriterHelper indexWriterHelper;
 
 }

@@ -31,7 +31,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.LinkedHashMap;
@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marco Leo
  */
-@Component(service = Indexer.class)
+@Component(enabled = false, immediate = true, service = Indexer.class)
 public class CPOptionIndexer extends BaseIndexer<CPOption> {
 
 	public static final String CLASS_NAME = CPOption.class.getName();
@@ -70,14 +70,14 @@ public class CPOptionIndexer extends BaseIndexer<CPOption> {
 			SearchContext searchContext)
 		throws Exception {
 
+		addSearchLocalizedTerm(
+			searchQuery, searchContext, Field.DESCRIPTION, false);
+		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		addSearchTerm(searchQuery, searchContext, CPField.KEY, false);
 		addSearchTerm(
 			searchQuery, searchContext, CPField.OPTION_VALUE_NAME, false);
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, CPField.OPTION_VALUE_NAME, false);
-		addSearchLocalizedTerm(
-			searchQuery, searchContext, Field.DESCRIPTION, false);
-		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
 		addSearchTerm(searchQuery, searchContext, Field.NAME, false);
 		addSearchLocalizedTerm(searchQuery, searchContext, Field.NAME, false);
 		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
@@ -107,10 +107,10 @@ public class CPOptionIndexer extends BaseIndexer<CPOption> {
 
 		Document document = getBaseModelDocument(CLASS_NAME, cpOption);
 
-		String cpOptionDefaultLanguageId = _localization.getDefaultLanguageId(
-			cpOption.getName());
+		String cpOptionDefaultLanguageId =
+			LocalizationUtil.getDefaultLanguageId(cpOption.getName());
 
-		String[] languageIds = _localization.getAvailableLanguageIds(
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
 			cpOption.getName());
 
 		for (String languageId : languageIds) {
@@ -124,15 +124,19 @@ public class CPOptionIndexer extends BaseIndexer<CPOption> {
 			}
 
 			document.addText(
-				CPField.DDM_FORM_FIELD_TYPE_NAME,
-				cpOption.getDDMFormFieldTypeName());
+				LocalizationUtil.getLocalizedName(Field.NAME, languageId),
+				name);
+			document.addText(
+				LocalizationUtil.getLocalizedName(
+					Field.DESCRIPTION, languageId),
+				description);
+
 			document.addText(CPField.KEY, cpOption.getKey());
 			document.addText(Field.CONTENT, name);
+
 			document.addText(
-				_localization.getLocalizedName(Field.DESCRIPTION, languageId),
-				description);
-			document.addText(
-				_localization.getLocalizedName(Field.NAME, languageId), name);
+				CPField.DDM_FORM_FIELD_TYPE_NAME,
+				cpOption.getDDMFormFieldTypeName());
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -158,7 +162,8 @@ public class CPOptionIndexer extends BaseIndexer<CPOption> {
 	@Override
 	protected void doReindex(CPOption cpOption) throws Exception {
 		_indexWriterHelper.updateDocument(
-			cpOption.getCompanyId(), getDocument(cpOption));
+			getSearchEngineId(), cpOption.getCompanyId(), getDocument(cpOption),
+			isCommitImmediately());
 	}
 
 	@Override
@@ -170,10 +175,10 @@ public class CPOptionIndexer extends BaseIndexer<CPOption> {
 	protected void doReindex(String[] ids) throws Exception {
 		long companyId = GetterUtil.getLong(ids[0]);
 
-		_reindexCPOptions(companyId);
+		reindexCPOptions(companyId);
 	}
 
-	private void _reindexCPOptions(long companyId) throws Exception {
+	protected void reindexCPOptions(long companyId) throws PortalException {
 		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpOptionLocalService.getIndexableActionableDynamicQuery();
 
@@ -193,6 +198,7 @@ public class CPOptionIndexer extends BaseIndexer<CPOption> {
 					}
 				}
 			});
+		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 
 		indexableActionableDynamicQuery.performActions();
 	}
@@ -205,8 +211,5 @@ public class CPOptionIndexer extends BaseIndexer<CPOption> {
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
-
-	@Reference
-	private Localization _localization;
 
 }

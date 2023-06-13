@@ -19,24 +19,16 @@ import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.service.CTEntryLocalService;
-import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
-import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
-import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
-import com.liferay.learn.LearnMessage;
-import com.liferay.learn.LearnMessageUtil;
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.change.tracking.sql.CTSQLModeThreadLocal;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -44,12 +36,14 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.time.Instant;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceURL;
@@ -66,25 +60,22 @@ public class ViewConflictsDisplayContext {
 		Map<Long, List<ConflictInfo>> conflictInfoMap,
 		CTCollection ctCollection,
 		CTDisplayRendererRegistry ctDisplayRendererRegistry,
-		CTEntryLocalService ctEntryLocalService,
-		CTSettingsConfigurationHelper ctSettingsConfigurationHelper,
-		boolean hasUnapprovedChanges, Language language, Portal portal,
-		RenderRequest renderRequest, RenderResponse renderResponse) {
+		CTEntryLocalService ctEntryLocalService, Language language,
+		Portal portal, RenderRequest renderRequest,
+		RenderResponse renderResponse) {
 
 		_activeCtCollectionId = activeCtCollectionId;
 		_conflictInfoMap = conflictInfoMap;
 		_ctCollection = ctCollection;
 		_ctDisplayRendererRegistry = ctDisplayRendererRegistry;
 		_ctEntryLocalService = ctEntryLocalService;
-		_ctSettingsConfigurationHelper = ctSettingsConfigurationHelper;
-		_hasUnapprovedChanges = hasUnapprovedChanges;
 		_language = language;
 		_portal = portal;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 
-		_httpServletRequest = portal.getHttpServletRequest(renderRequest);
-		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+		_httpServletRequest = _portal.getHttpServletRequest(_renderRequest);
+		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -98,40 +89,23 @@ public class ViewConflictsDisplayContext {
 		JSONArray unresolvedConflictsJSONArray =
 			JSONFactoryUtil.createJSONArray();
 
-		if (_conflictInfoMap != null) {
-			for (Map.Entry<Long, List<ConflictInfo>> entry :
-					_conflictInfoMap.entrySet()) {
+		for (Map.Entry<Long, List<ConflictInfo>> entry :
+				_conflictInfoMap.entrySet()) {
 
-				for (ConflictInfo conflictInfo : entry.getValue()) {
-					JSONObject jsonObject = _getConflictJSONObject(
-						conflictInfo, entry.getKey());
+			for (ConflictInfo conflictInfo : entry.getValue()) {
+				JSONObject jsonObject = _getConflictJSONObject(
+					conflictInfo, entry.getKey());
 
-					if (conflictInfo.isResolved()) {
-						resolvedConflictsJSONArray.put(jsonObject);
-					}
-					else {
-						unresolvedConflictsJSONArray.put(jsonObject);
-					}
+				if (conflictInfo.isResolved()) {
+					resolvedConflictsJSONArray.put(jsonObject);
+				}
+				else {
+					unresolvedConflictsJSONArray.put(jsonObject);
 				}
 			}
 		}
 
 		return HashMapBuilder.<String, Object>put(
-			"hasUnapprovedChanges", _hasUnapprovedChanges
-		).put(
-			"learnLink",
-			() -> {
-				LearnMessage learnMessage = LearnMessageUtil.getLearnMessage(
-					"manually-resolving-conflicts",
-					_themeDisplay.getLanguageId(), "change-tracking-web");
-
-				return JSONUtil.put(
-					"message", learnMessage.getMessage()
-				).put(
-					"url", learnMessage.getURL()
-				);
-			}
-		).put(
 			"publishURL",
 			() -> PortletURLBuilder.createActionURL(
 				_renderResponse
@@ -160,62 +134,21 @@ public class ViewConflictsDisplayContext {
 				"ctCollectionId", _ctCollection.getCtCollectionId()
 			).buildString()
 		).put(
-			"showPageOverwriteWarning",
-			() -> {
-				if (_conflictInfoMap != null) {
-					List<ConflictInfo> layoutConflictInfos =
-						_conflictInfoMap.get(
-							_portal.getClassNameId(Layout.class));
-					List<ConflictInfo>
-						layoutPageTemplateStructureRelConflictInfos =
-							_conflictInfoMap.get(
-								_portal.getClassNameId(
-									LayoutPageTemplateStructureRel.class));
-
-					if ((layoutConflictInfos == null) ||
-						(layoutPageTemplateStructureRelConflictInfos == null)) {
-
-						return false;
-					}
-
-					boolean hasResolvedLayoutConflict = false;
-
-					for (ConflictInfo conflictInfo : layoutConflictInfos) {
-						if (conflictInfo.isResolved()) {
-							hasResolvedLayoutConflict = true;
-
-							break;
-						}
-					}
-
-					if (!hasResolvedLayoutConflict) {
-						return false;
-					}
-
-					for (ConflictInfo conflictInfo :
-							layoutPageTemplateStructureRelConflictInfos) {
-
-						if (conflictInfo.isResolved()) {
-							return true;
-						}
-					}
-				}
-
-				return false;
-			}
-		).put(
-			"spritemap", _themeDisplay.getPathThemeSpritemap()
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"timeZone",
 			() -> {
 				TimeZone timeZone = _themeDisplay.getTimeZone();
 
-				return timeZone.getID();
+				if (Objects.equals(timeZone.getID(), StringPool.UTC)) {
+					return "GMT";
+				}
+
+				Instant instant = Instant.now();
+
+				return "GMT" +
+					String.format("%tz", instant.atZone(timeZone.toZoneId()));
 			}
-		).put(
-			"unapprovedChangesAllowed",
-			_ctSettingsConfigurationHelper.isUnapprovedChangesAllowed(
-				_themeDisplay.getCompanyId())
 		).put(
 			"unresolvedConflicts", unresolvedConflictsJSONArray
 		).build();
@@ -237,31 +170,6 @@ public class ViewConflictsDisplayContext {
 		).buildString();
 	}
 
-	private JSONObject _createEditActionJSONObject(
-		String confirmationMessage, long ctCollectionId, String editURL,
-		String label) {
-
-		JSONObject editActionJSONObject = JSONUtil.put(
-			"label", label
-		).put(
-			"symbol", "pencil"
-		);
-
-		if (_activeCtCollectionId != ctCollectionId) {
-			editActionJSONObject.put(
-				"confirmationMessage", confirmationMessage);
-
-			editURL = PublicationsPortletURLUtil.getHref(
-				_renderResponse.createActionURL(), ActionRequest.ACTION_NAME,
-				"/change_tracking/checkout_ct_collection", "redirect", editURL,
-				"ctCollectionId", String.valueOf(ctCollectionId));
-		}
-
-		editActionJSONObject.put("href", editURL);
-
-		return editActionJSONObject;
-	}
-
 	private <T extends BaseModel<T>> JSONObject _getConflictJSONObject(
 		ConflictInfo conflictInfo, long modelClassNameId) {
 
@@ -276,14 +184,12 @@ public class ViewConflictsDisplayContext {
 		).put(
 			"conflictResolution",
 			conflictInfo.getResolutionDescription(resourceBundle)
-		).put(
-			"dismissURL",
-			() -> {
-				if (!conflictInfo.isResolved()) {
-					return null;
-				}
+		);
 
-				return PortletURLBuilder.createActionURL(
+		if (conflictInfo.isResolved()) {
+			jsonObject.put(
+				"dismissURL",
+				PortletURLBuilder.createActionURL(
 					_renderResponse
 				).setActionName(
 					"/change_tracking/delete_ct_auto_resolution_info"
@@ -292,9 +198,8 @@ public class ViewConflictsDisplayContext {
 				).setParameter(
 					"ctAutoResolutionInfoId",
 					conflictInfo.getCTAutoResolutionInfoId()
-				).buildString();
-			}
-		);
+				).buildString());
+		}
 
 		ResourceURL dataURL = _renderResponse.createResourceURL();
 
@@ -322,44 +227,22 @@ public class ViewConflictsDisplayContext {
 			if (!conflictInfo.isResolved()) {
 				JSONArray actionsJSONArray = JSONFactoryUtil.createJSONArray();
 
-				String editURL = _ctDisplayRendererRegistry.getEditURL(
-					_httpServletRequest, ctEntry);
+				if (_ctCollection.getCtCollectionId() ==
+						_activeCtCollectionId) {
 
-				if (Validator.isNotNull(editURL)) {
-					actionsJSONArray.put(
-						_createEditActionJSONObject(
-							_language.format(
-								_httpServletRequest,
-								"you-are-currently-working-on-production.-" +
-									"work-on-x",
-								new Object[] {_ctCollection.getName()}, false),
-							_ctCollection.getCtCollectionId(), editURL,
-							_language.format(
-								_httpServletRequest, "edit-in-x",
-								new Object[] {_ctCollection.getName()},
-								false)));
+					String editURL = _ctDisplayRendererRegistry.getEditURL(
+						_httpServletRequest, ctEntry);
 
-					T productionModel = _ctDisplayRendererRegistry.fetchCTModel(
-						modelClassNameId, conflictInfo.getTargetPrimaryKey());
-
-					if (productionModel != null) {
+					if (Validator.isNotNull(editURL)) {
 						actionsJSONArray.put(
-							_createEditActionJSONObject(
-								_language.format(
-									_httpServletRequest,
-									"you-are-currently-working-on-x.-work-on-" +
-										"production",
-									new Object[] {_ctCollection.getName()},
-									false),
-								CTConstants.CT_COLLECTION_ID_PRODUCTION,
-								_ctDisplayRendererRegistry.getEditURL(
-									CTConstants.CT_COLLECTION_ID_PRODUCTION,
-									CTSQLModeThreadLocal.CTSQLMode.DEFAULT,
-									_httpServletRequest, productionModel,
-									modelClassNameId),
-								_language.get(
-									_httpServletRequest,
-									"edit-in-production")));
+							JSONUtil.put(
+								"href", editURL
+							).put(
+								"label",
+								_language.get(_httpServletRequest, "edit-item")
+							).put(
+								"symbol", "pencil"
+							));
 					}
 				}
 
@@ -387,17 +270,6 @@ public class ViewConflictsDisplayContext {
 					));
 
 				jsonObject.put("actions", actionsJSONArray);
-
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Unresolved conflict with change tracking entry ",
-							"ID, ", ctEntry.getCtEntryId(),
-							", model class name ID ",
-							ctEntry.getModelClassNameId(),
-							", and model class PK ", ctEntry.getModelClassPK(),
-							": ", jsonObject));
-				}
 			}
 		}
 		else {
@@ -437,16 +309,11 @@ public class ViewConflictsDisplayContext {
 		return jsonObject;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		ViewConflictsDisplayContext.class);
-
 	private final long _activeCtCollectionId;
 	private final Map<Long, List<ConflictInfo>> _conflictInfoMap;
 	private final CTCollection _ctCollection;
 	private final CTDisplayRendererRegistry _ctDisplayRendererRegistry;
 	private final CTEntryLocalService _ctEntryLocalService;
-	private final CTSettingsConfigurationHelper _ctSettingsConfigurationHelper;
-	private final boolean _hasUnapprovedChanges;
 	private final HttpServletRequest _httpServletRequest;
 	private final Language _language;
 	private final Portal _portal;

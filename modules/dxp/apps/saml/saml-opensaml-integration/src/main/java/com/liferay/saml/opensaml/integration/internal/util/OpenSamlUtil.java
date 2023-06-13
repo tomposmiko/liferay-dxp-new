@@ -37,6 +37,7 @@ import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
@@ -863,8 +864,7 @@ public class OpenSamlUtil {
 			signableObject.setSignature(signature);
 
 			XMLObjectProviderRegistry xmlObjectProviderRegistry =
-				ConfigurationServiceBootstrapUtil.get(
-					XMLObjectProviderRegistry.class);
+				ConfigurationService.get(XMLObjectProviderRegistry.class);
 
 			MarshallerFactory marshallerFactory =
 				xmlObjectProviderRegistry.getMarshallerFactory();
@@ -885,8 +885,7 @@ public class OpenSamlUtil {
 		throws UnmarshallingException, XMLParserException {
 
 		XMLObjectProviderRegistry xmlObjectProviderRegistry =
-			ConfigurationServiceBootstrapUtil.get(
-				XMLObjectProviderRegistry.class);
+			ConfigurationService.get(XMLObjectProviderRegistry.class);
 
 		return XMLObjectSupport.unmarshallFromInputStream(
 			xmlObjectProviderRegistry.getParserPool(),
@@ -913,12 +912,11 @@ public class OpenSamlUtil {
 		if (globalSignatureSigningConfiguration instanceof
 				BasicSignatureSigningConfiguration) {
 
-			BasicSignatureSigningConfiguration
-				basicSignatureSigningConfiguration =
-					(BasicSignatureSigningConfiguration)
-						globalSignatureSigningConfiguration;
+			BasicSignatureSigningConfiguration signatureSigningConfiguration =
+				(BasicSignatureSigningConfiguration)
+					globalSignatureSigningConfiguration;
 
-			basicSignatureSigningConfiguration.setSigningCredentials(
+			signatureSigningConfiguration.setSigningCredentials(
 				Collections.singletonList(credential));
 		}
 
@@ -942,8 +940,7 @@ public class OpenSamlUtil {
 
 	static {
 		XMLObjectProviderRegistry xmlObjectProviderRegistry =
-			ConfigurationServiceBootstrapUtil.get(
-				XMLObjectProviderRegistry.class);
+			ConfigurationService.get(XMLObjectProviderRegistry.class);
 
 		_xmlObjectBuilderFactory =
 			xmlObjectProviderRegistry.getBuilderFactory();

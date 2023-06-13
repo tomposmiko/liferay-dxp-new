@@ -331,27 +331,6 @@ public class MessageBoardThread implements Cloneable, Serializable {
 
 	protected String[] keywords;
 
-	public Date getLastPostDate() {
-		return lastPostDate;
-	}
-
-	public void setLastPostDate(Date lastPostDate) {
-		this.lastPostDate = lastPostDate;
-	}
-
-	public void setLastPostDate(
-		UnsafeSupplier<Date, Exception> lastPostDateUnsafeSupplier) {
-
-		try {
-			lastPostDate = lastPostDateUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Date lastPostDate;
-
 	public Boolean getLocked() {
 		return locked;
 	}
@@ -372,29 +351,6 @@ public class MessageBoardThread implements Cloneable, Serializable {
 	}
 
 	protected Boolean locked;
-
-	public Long getMessageBoardRootMessageId() {
-		return messageBoardRootMessageId;
-	}
-
-	public void setMessageBoardRootMessageId(Long messageBoardRootMessageId) {
-		this.messageBoardRootMessageId = messageBoardRootMessageId;
-	}
-
-	public void setMessageBoardRootMessageId(
-		UnsafeSupplier<Long, Exception>
-			messageBoardRootMessageIdUnsafeSupplier) {
-
-		try {
-			messageBoardRootMessageId =
-				messageBoardRootMessageIdUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Long messageBoardRootMessageId;
 
 	public Long getMessageBoardSectionId() {
 		return messageBoardSectionId;

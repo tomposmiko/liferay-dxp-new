@@ -17,11 +17,11 @@ package com.liferay.layout.reports.web.internal.product.navigation.control.menu;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
-import com.liferay.frontend.taglib.clay.servlet.taglib.ButtonTag;
-import com.liferay.frontend.taglib.clay.servlet.taglib.IconTag;
+import com.liferay.journal.constants.JournalConstants;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.layout.reports.web.internal.configuration.provider.LayoutReportsGooglePageSpeedConfigurationProvider;
-import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.layout.reports.web.internal.constants.LayoutReportsPortletKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -29,19 +29,25 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.portlet.PortalPreferences;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Html;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -51,6 +57,7 @@ import com.liferay.portal.template.react.renderer.ReactRenderer;
 import com.liferay.product.navigation.control.menu.BaseProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
+import com.liferay.taglib.aui.IconTag;
 import com.liferay.taglib.util.BodyBottomTag;
 
 import java.io.IOException;
@@ -60,7 +67,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
+
+import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,6 +78,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -75,6 +86,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sarai Díaz
  */
 @Component(
+	immediate = true,
 	property = {
 		"product.navigation.control.menu.category.key=" + ProductNavigationControlMenuCategoryKeys.USER,
 		"product.navigation.control.menu.entry.order:Integer=550"
@@ -110,7 +122,19 @@ public class LayoutReportsProductNavigationControlMenuEntry
 		try {
 			bodyBottomTag.doBodyTag(
 				httpServletRequest, httpServletResponse,
-				this::_processBodyBottomTagBody);
+				pageContext -> {
+					try {
+						_processBodyBottomTagBody(pageContext);
+					}
+					catch (Exception exception) {
+						throw new ProcessBodyBottomTagBodyException(exception);
+					}
+				});
+		}
+		catch (ProcessBodyBottomTagBodyException
+					processBodyBottomTagBodyException) {
+
+			throw new IOException(processBodyBottomTagBodyException);
 		}
 		catch (JspException jspException) {
 			throw new IOException(jspException);
@@ -137,12 +161,14 @@ public class LayoutReportsProductNavigationControlMenuEntry
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			_portal.getLocale(httpServletRequest), getClass());
 
-		values.put("title", _language.get(resourceBundle, "page-audit"));
+		values.put(
+			"title", _html.escape(_language.get(resourceBundle, "page-audit")));
 
 		IconTag iconTag = new IconTag();
 
 		iconTag.setCssClass("icon-monospaced");
-		iconTag.setSymbol("info-circle");
+		iconTag.setImage("info-circle");
+		iconTag.setMarkupView("lexicon");
 
 		try {
 			values.put(
@@ -152,6 +178,8 @@ public class LayoutReportsProductNavigationControlMenuEntry
 		catch (JspException jspException) {
 			throw new IOException(jspException);
 		}
+
+		values.put("portletNamespace", _portletNamespace);
 
 		Writer writer = httpServletResponse.getWriter();
 
@@ -201,25 +229,48 @@ public class LayoutReportsProductNavigationControlMenuEntry
 		SessionClicks.put(httpServletRequest, _SESSION_CLICKS_KEY, panelState);
 	}
 
+	public static class ProcessBodyBottomTagBodyException
+		extends RuntimeException {
+
+		public ProcessBodyBottomTagBodyException(Throwable throwable) {
+			super(throwable);
+		}
+
+	}
+
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_portletNamespace = _portal.getPortletNamespace(
+			LayoutReportsPortletKeys.LAYOUT_REPORTS);
+	}
+
 	private String _getLayoutReportsDataURL(
 		HttpServletRequest httpServletRequest) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		return PortletURLBuilder.create(
+			_portletURLFactory.create(
+				httpServletRequest, LayoutReportsPortletKeys.LAYOUT_REPORTS,
+				PortletRequest.RESOURCE_PHASE)
+		).setParameter(
+			"p_p_resource_id", "/layout_reports/data"
+		).setParameter(
+			"plid",
+			() -> {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
-		return HttpComponentsUtil.addParameters(
-			themeDisplay.getPortalURL() + themeDisplay.getPathMain() +
-				"/layout_reports/get_layout_reports_data",
-			"plid", themeDisplay.getPlid());
+				return themeDisplay.getPlid();
+			}
+		).buildString();
 	}
 
 	private boolean _hasEditPermission(
 			Layout layout, PermissionChecker permissionChecker)
 		throws PortalException {
 
-		if (!LayoutPermissionUtil.containsLayoutRestrictedUpdatePermission(
-				permissionChecker, layout)) {
+		if (!LayoutPermissionUtil.contains(
+				permissionChecker, layout, ActionKeys.UPDATE)) {
 
 			return false;
 		}
@@ -227,48 +278,65 @@ public class LayoutReportsProductNavigationControlMenuEntry
 		return true;
 	}
 
-	private boolean _isShow(ThemeDisplay themeDisplay) {
-		Layout layout = _layoutLocalService.fetchLayout(themeDisplay.getPlid());
-
-		if (layout == null) {
+	private boolean _isEmbeddedPersonalApplicationLayout(Layout layout) {
+		if (layout.isTypeControlPanel()) {
 			return false;
 		}
 
-		if ((layout.isTypeAssetDisplay() || layout.isTypeContent() ||
-			 layout.isTypePortlet()) &&
-			!layout.isEmbeddedPersonalApplication()) {
+		String layoutFriendlyURL = layout.getFriendlyURL();
 
-			PermissionChecker permissionChecker =
-				themeDisplay.getPermissionChecker();
+		if (layout.isSystem() &&
+			layoutFriendlyURL.equals(
+				PropsUtil.get(PropsKeys.CONTROL_PANEL_LAYOUT_FRIENDLY_URL))) {
 
-			try {
-				if (permissionChecker.hasPermission(
-						themeDisplay.getScopeGroup(),
-						BlogsEntry.class.getName(), BlogsEntry.class.getName(),
-						ActionKeys.UPDATE) ||
-					permissionChecker.hasPermission(
-						themeDisplay.getScopeGroup(),
-						DLFileEntry.class.getName(),
-						DLFileEntry.class.getName(), ActionKeys.UPDATE) ||
-					permissionChecker.hasPermission(
-						themeDisplay.getScopeGroup(),
-						JournalArticle.class.getName(),
-						JournalArticle.class.getName(), ActionKeys.UPDATE)) {
-
-					return true;
-				}
-
-				return _hasEditPermission(
-					layout, PermissionThreadLocal.getPermissionChecker());
-			}
-			catch (PortalException portalException) {
-				_log.error(portalException);
-
-				return false;
-			}
+			return true;
 		}
 
 		return false;
+	}
+
+	private boolean _isShow(ThemeDisplay themeDisplay) {
+		PermissionChecker permissionChecker =
+			themeDisplay.getPermissionChecker();
+
+		return Optional.ofNullable(
+			_layoutLocalService.fetchLayout(themeDisplay.getPlid())
+		).filter(
+			layout ->
+				layout.isTypeAssetDisplay() || layout.isTypeContent() ||
+				layout.isTypePortlet()
+		).filter(
+			layout -> !_isEmbeddedPersonalApplicationLayout(layout)
+		).filter(
+			layout -> {
+				try {
+					if (permissionChecker.hasPermission(
+							themeDisplay.getScopeGroup(),
+							BlogsEntry.class.getName(),
+							BlogsEntry.class.getName(), ActionKeys.UPDATE) ||
+						permissionChecker.hasPermission(
+							themeDisplay.getScopeGroup(),
+							DLFileEntry.class.getName(),
+							DLFileEntry.class.getName(), ActionKeys.UPDATE) ||
+						permissionChecker.hasPermission(
+							themeDisplay.getScopeGroup(),
+							JournalArticle.class.getName(),
+							JournalArticle.class.getName(),
+							ActionKeys.UPDATE)) {
+
+						return true;
+					}
+
+					return _hasEditPermission(
+						layout, PermissionThreadLocal.getPermissionChecker());
+				}
+				catch (PortalException portalException) {
+					_log.error(portalException, portalException);
+
+					return false;
+				}
+			}
+		).isPresent();
 	}
 
 	private boolean _isShowPanel(HttpServletRequest httpServletRequest) {
@@ -279,8 +347,13 @@ public class LayoutReportsProductNavigationControlMenuEntry
 			return false;
 		}
 
-		boolean hidePanel = ParamUtil.getBoolean(
-			httpServletRequest, "hide-panel");
+		PortalPreferences portalPreferences =
+			PortletPreferencesFactoryUtil.getPortalPreferences(
+				httpServletRequest);
+
+		boolean hidePanel = GetterUtil.getBoolean(
+			portalPreferences.getValue(
+				LayoutReportsPortletKeys.LAYOUT_REPORTS, "hide-panel"));
 
 		if (hidePanel) {
 			return false;
@@ -289,63 +362,58 @@ public class LayoutReportsProductNavigationControlMenuEntry
 		return true;
 	}
 
-	private void _processBodyBottomTagBody(PageContext pageContext) {
+	private void _processBodyBottomTagBody(PageContext pageContext)
+		throws IOException, JspException {
+
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest)pageContext.getRequest();
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			_portal.getLocale(httpServletRequest), getClass());
+
+		pageContext.setAttribute("resourceBundle", resourceBundle);
+
+		JspWriter jspWriter = pageContext.getOut();
+
+		StringBundler sb = new StringBundler(20);
+
+		sb.append("<div class=\"");
+
+		if (isPanelStateOpen(httpServletRequest)) {
+			sb.append("lfr-has-layout-reports-panel open-admin-panel ");
+		}
+
+		sb.append("cadmin d-print-none lfr-admin-panel ");
+		sb.append("lfr-product-menu-panel lfr-layout-reports-panel ");
+		sb.append("sidenav-fixed sidenav-menu-slider sidenav-right\" id=\"");
+		sb.append(_portletNamespace);
+		sb.append("layoutReportsPanelId\"><div class=\"sidebar sidebar-light ");
+		sb.append("sidenav-menu sidebar-sm\"><div class=\"sidebar-header\">");
+		sb.append("<div class=\"autofit-row autofit-row-center\"><div ");
+		sb.append("class=\"autofit-col autofit-col-expand\">");
+		sb.append("<h1 class=\"sr-only\">");
+		sb.append(_html.escape(_language.get(resourceBundle, "page-audit")));
+		sb.append("</h1><span>");
+		sb.append(_html.escape(_language.get(resourceBundle, "page-audit")));
+		sb.append("</span></div>");
+		sb.append("<div class=\"autofit-col\">");
+
+		IconTag iconTag = new IconTag();
+
+		iconTag.setCssClass("icon-monospaced sidenav-close");
+		iconTag.setImage("times");
+		iconTag.setMarkupView("lexicon");
+		iconTag.setUrl("javascript:;");
+
+		sb.append(iconTag.doTagAsString(pageContext));
+
+		sb.append("</div></div></div><div class=\"sidebar-body\"><span ");
+		sb.append("aria-hidden=\"true\" class=\"loading-animation ");
+		sb.append("loading-animation-sm\"></span></div>");
+
+		jspWriter.write(sb.toString());
+
 		try {
-			HttpServletRequest httpServletRequest =
-				(HttpServletRequest)pageContext.getRequest();
-
-			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-				_portal.getLocale(httpServletRequest), getClass());
-
-			pageContext.setAttribute("resourceBundle", resourceBundle);
-
-			JspWriter jspWriter = pageContext.getOut();
-
-			StringBundler sb = new StringBundler(24);
-
-			sb.append("<div aria-label=\"");
-			sb.append(_language.get(resourceBundle, "page-audit"));
-			sb.append("\" class=\"");
-
-			if (isPanelStateOpen(httpServletRequest)) {
-				sb.append("lfr-has-layout-reports-panel open-admin-panel ");
-			}
-
-			sb.append("cadmin d-print-none lfr-admin-panel ");
-			sb.append("lfr-product-menu-panel lfr-layout-reports-panel ");
-			sb.append("sidenav-fixed sidenav-menu-slider sidenav-right\" ");
-			sb.append("id=\"");
-			sb.append("layoutReportsPanelId\" tabindex=\"0\">");
-			sb.append("<div class=\"sidebar sidebar-light ");
-			sb.append("sidenav-menu sidebar-sm\">");
-			sb.append("<div class=\"sidebar-header\">");
-			sb.append("<div class=\"autofit-row autofit-row-center\"><div ");
-			sb.append("class=\"autofit-col autofit-col-expand\">");
-			sb.append("<h1 class=\"sr-only\">");
-			sb.append(_language.get(resourceBundle, "page-audit"));
-			sb.append("</h1><span>");
-			sb.append(_language.get(resourceBundle, "page-audit"));
-			sb.append("</span></div>");
-			sb.append("<div class=\"autofit-col\">");
-
-			ButtonTag buttonTag = new ButtonTag();
-
-			buttonTag.setCssClass("close sidenav-close");
-			buttonTag.setDisplayType("unstyled");
-			buttonTag.setDynamicAttribute(
-				StringPool.BLANK, "aria-label",
-				_language.get(
-					(HttpServletRequest)pageContext.getRequest(), "close"));
-			buttonTag.setIcon("times");
-
-			sb.append(buttonTag.doTagAsString(pageContext));
-
-			sb.append("</div></div></div><div class=\"sidebar-body\"><span ");
-			sb.append("aria-hidden=\"true\" class=\"loading-animation ");
-			sb.append("loading-animation-sm\"></span></div>");
-
-			jspWriter.write(sb.toString());
-
 			_reactRenderer.renderReact(
 				new ComponentDescriptor(
 					_npmResolver.resolveModuleName("layout-reports-web") +
@@ -355,14 +423,16 @@ public class LayoutReportsProductNavigationControlMenuEntry
 				).put(
 					"layoutReportsDataURL",
 					_getLayoutReportsDataURL(httpServletRequest)
+				).put(
+					"portletNamespace", _portletNamespace
 				).build(),
 				httpServletRequest, jspWriter);
-
-			jspWriter.write("</div></div>");
 		}
 		catch (Exception exception) {
-			ReflectionUtil.throwException(exception);
+			throw new IOException(exception);
 		}
+
+		jspWriter.write("</div></div>");
 	}
 
 	private static final String _ICON_TMPL_CONTENT = StringUtil.read(
@@ -395,6 +465,16 @@ public class LayoutReportsProductNavigationControlMenuEntry
 
 	@Reference
 	private Portal _portal;
+
+	private String _portletNamespace;
+
+	@Reference(
+		target = "(resource.name=" + JournalConstants.RESOURCE_NAME + ")"
+	)
+	private PortletResourcePermission _portletResourcePermission;
+
+	@Reference
+	private PortletURLFactory _portletURLFactory;
 
 	@Reference
 	private ReactRenderer _reactRenderer;

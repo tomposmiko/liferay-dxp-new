@@ -20,30 +20,61 @@
 CommerceAccountGroupAccountItemSelectorViewDisplayContext commerceAccountGroupAccountItemSelectorViewDisplayContext = (CommerceAccountGroupAccountItemSelectorViewDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 String itemSelectedEventName = commerceAccountGroupAccountItemSelectorViewDisplayContext.getItemSelectedEventName();
+PortletURL portletURL = commerceAccountGroupAccountItemSelectorViewDisplayContext.getPortletURL();
 %>
 
-<clay:management-toolbar
-	managementToolbarDisplayContext="<%= new CommerceAccountGroupAccountItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, commerceAccountGroupAccountItemSelectorViewDisplayContext.getSearchContainer()) %>"
-/>
+<liferay-frontend:management-bar
+	includeCheckBox="<%= true %>"
+	searchContainerId="commerceAccounts"
+>
+	<liferay-frontend:management-bar-buttons>
+		<liferay-frontend:management-bar-display-buttons
+			displayViews='<%= new String[] {"list"} %>'
+			portletURL="<%= portletURL %>"
+			selectedDisplayStyle="list"
+		/>
+	</liferay-frontend:management-bar-buttons>
+
+	<liferay-frontend:management-bar-filters>
+		<liferay-frontend:management-bar-navigation
+			navigationKeys='<%= new String[] {"all"} %>'
+			portletURL="<%= portletURL %>"
+		/>
+
+		<liferay-frontend:management-bar-sort
+			orderByCol="<%= commerceAccountGroupAccountItemSelectorViewDisplayContext.getOrderByCol() %>"
+			orderByType="<%= commerceAccountGroupAccountItemSelectorViewDisplayContext.getOrderByType() %>"
+			orderColumns="<%= new String[0] %>"
+			portletURL="<%= portletURL %>"
+		/>
+
+		<li>
+			<liferay-commerce:search-input
+				actionURL="<%= portletURL %>"
+				formName="searchFm"
+			/>
+		</li>
+	</liferay-frontend:management-bar-filters>
+</liferay-frontend:management-bar>
 
 <div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />commerceAccountSelectorWrapper">
 	<liferay-ui:search-container
-		id="accountEntry"
+		id="commerceAccounts"
 		searchContainer="<%= commerceAccountGroupAccountItemSelectorViewDisplayContext.getSearchContainer() %>"
 	>
 		<liferay-ui:search-container-row
-			className="com.liferay.account.model.AccountEntry"
+			className="com.liferay.commerce.account.model.CommerceAccount"
 			cssClass="commerce-account-row"
-			keyProperty="accountEntryId"
-			modelVar="accountEntry"
+			keyProperty="commerceAccountId"
+			modelVar="commerceAccount"
 		>
 
 			<%
 			row.setData(
 				HashMapBuilder.<String, Object>put(
-					"commerce-account-id", accountEntry.getAccountEntryId()
+					"commerce-account-id", commerceAccount.getCommerceAccountId()
 				).put(
-					"name", accountEntry.getName()
+					"name", commerceAccount.getName()
 				).build());
 			%>
 
@@ -66,7 +97,7 @@ String itemSelectedEventName = commerceAccountGroupAccountItemSelectorViewDispla
 
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get(
-		'<portlet:namespace />accountEntries'
+		'<portlet:namespace />commerceAccounts'
 	);
 
 	searchContainer.on('rowToggled', (event) => {
@@ -78,7 +109,7 @@ String itemSelectedEventName = commerceAccountGroupAccountItemSelectorViewDispla
 
 			var data = row.getDOM().dataset;
 
-			arr.push({accountEntryId: data.accountEntryId, name: data.name});
+			arr.push({commerceAccountId: data.commerceAccountId, name: data.name});
 		});
 
 		Liferay.Util.getOpener().Liferay.fire(

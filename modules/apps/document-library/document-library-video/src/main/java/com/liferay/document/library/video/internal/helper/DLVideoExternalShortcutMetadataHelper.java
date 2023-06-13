@@ -20,9 +20,8 @@ import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalService;
-import com.liferay.document.library.util.DLFileEntryTypeUtil;
 import com.liferay.document.library.video.internal.constants.DLVideoConstants;
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Field;
@@ -53,8 +52,7 @@ public class DLVideoExternalShortcutMetadataHelper {
 			return null;
 		}
 
-		List<DDMStructure> ddmStructures = DLFileEntryTypeUtil.getDDMStructures(
-			dlFileEntryType);
+		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
 
 		for (DDMStructure ddmStructure : ddmStructures) {
 			String structureKey = ddmStructure.getStructureKey();
@@ -188,10 +186,11 @@ public class DLVideoExternalShortcutMetadataHelper {
 
 			DDMFormValues ddmFormValues = _toDDMFormValues(fields);
 
-			_dlFileEntryMetadata.setDDMStorageId(
-				_storageEngine.create(
-					_dlFileVersion.getCompanyId(), ddmStructureId,
-					ddmFormValues, serviceContext));
+			long ddmStorageId = _storageEngine.create(
+				_dlFileVersion.getCompanyId(), ddmStructureId, ddmFormValues,
+				serviceContext);
+
+			_dlFileEntryMetadata.setDDMStorageId(ddmStorageId);
 
 			_dlFileEntryMetadata.setDDMStructureId(ddmStructureId);
 			_dlFileEntryMetadata.setFileEntryId(dlFileEntry.getFileEntryId());
@@ -233,11 +232,13 @@ public class DLVideoExternalShortcutMetadataHelper {
 		}
 
 		try {
+			DDMFormValues ddmFormValues = _storageEngine.getDDMFormValues(
+				_dlFileEntryMetadata.getDDMStorageId());
+
 			_fields = _ddmFormValuesToFieldsConverter.convert(
 				_ddmStructureLocalService.getDDMStructure(
 					_ddmStructure.getStructureId()),
-				_storageEngine.getDDMFormValues(
-					_dlFileEntryMetadata.getDDMStorageId()));
+				ddmFormValues);
 
 			for (Field field : _fields) {
 				_fieldsMap.put(field.getName(), field);

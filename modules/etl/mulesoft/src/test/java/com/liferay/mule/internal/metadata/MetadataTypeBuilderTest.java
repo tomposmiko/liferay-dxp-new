@@ -31,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -77,7 +78,7 @@ public class MetadataTypeBuilderTest {
 		).when(
 			metadataTypeBuilder
 		).getObjectTypeBuilder(
-			Mockito.any(), Mockito.anyString()
+			Matchers.anyObject(), Matchers.anyString()
 		);
 
 		Mockito.doReturn(
@@ -85,7 +86,7 @@ public class MetadataTypeBuilderTest {
 		).when(
 			metadataTypeBuilder
 		).getArrayTypeBuilder(
-			Mockito.any(), Mockito.anyString()
+			Matchers.anyObject(), Matchers.anyString()
 		);
 
 		Mockito.doReturn(
@@ -93,7 +94,7 @@ public class MetadataTypeBuilderTest {
 		).when(
 			metadataTypeBuilder
 		).getOASJsonNode(
-			Mockito.any()
+			Matchers.anyObject()
 		);
 
 		Mockito.doReturn(
@@ -101,7 +102,7 @@ public class MetadataTypeBuilderTest {
 		).when(
 			metadataTypeBuilder
 		).resolveAnyMetadataType(
-			Mockito.any()
+			Matchers.anyObject()
 		);
 	}
 
@@ -312,8 +313,11 @@ public class MetadataTypeBuilderTest {
 		MetadataType arrayItemMetadataType = defaultArrayType.getType();
 
 		Assert.assertTrue(arrayItemMetadataType instanceof ObjectType);
-		Assert.assertEquals(
-			getEntityMetadataType("/entities/{id}"), arrayItemMetadataType);
+
+		MetadataType entityMetadataType = getEntityMetadataType(
+			"/entities/{id}");
+
+		Assert.assertEquals(entityMetadataType, arrayItemMetadataType);
 	}
 
 	@Test
@@ -347,11 +351,13 @@ public class MetadataTypeBuilderTest {
 
 	@Test
 	public void testBuildMetadataType_StringField() throws Exception {
-		Assert.assertTrue(
-			getFieldMetadataType(
-				getEntityMetadataType(
-					"/entities/{id}", OASConstants.OPERATION_GET),
-				"stringField") instanceof StringType);
+		MetadataType entityMetadataType = getEntityMetadataType(
+			"/entities/{id}", OASConstants.OPERATION_GET);
+
+		MetadataType fieldMetadataType = getFieldMetadataType(
+			entityMetadataType, "stringField");
+
+		Assert.assertTrue(fieldMetadataType instanceof StringType);
 	}
 
 	@Test
@@ -364,7 +370,7 @@ public class MetadataTypeBuilderTest {
 		Mockito.verify(
 			metadataTypeBuilder, Mockito.times(1)
 		).resolveAnyMetadataType(
-			Mockito.anyObject()
+			Matchers.anyObject()
 		);
 	}
 

@@ -287,8 +287,7 @@ public class BlogsAMImageOptimizerTest {
 	}
 
 	private byte[] _getImageBytes() throws Exception {
-		return FileUtil.getBytes(
-			BlogsAMImageOptimizerTest.class, "dependencies/image.jpg");
+		return FileUtil.getBytes(BlogsAMImageOptimizerTest.class, "image.jpg");
 	}
 
 	@Inject

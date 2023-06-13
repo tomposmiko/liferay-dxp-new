@@ -126,6 +126,10 @@ public interface ServiceComponentLocalService
 	public ServiceComponent deleteServiceComponent(
 		ServiceComponent serviceComponent);
 
+	public void destroyServiceComponent(
+		ServiceComponentConfiguration serviceComponentConfiguration,
+		ClassLoader classLoader);
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> T dslQuery(DSLQuery dslQuery);
 
@@ -283,5 +287,7 @@ public interface ServiceComponentLocalService
 			ServiceComponent previousServiceComponent, String tablesSQL,
 			String sequencesSQL, String indexesSQL)
 		throws Exception;
+
+	public void verifyDB();
 
 }

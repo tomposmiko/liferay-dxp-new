@@ -21,10 +21,17 @@ import com.liferay.portal.kernel.util.ServiceProxyFactory;
  */
 public class IndexAdminHelperUtil {
 
-	public static String backup(long companyId, String backupName)
+	public static void backup(long companyId, String backupName)
 		throws SearchException {
 
-		return _indexAdminHelper.backup(companyId, backupName);
+		_indexAdminHelper.backup(companyId, backupName);
+	}
+
+	public static String backup(
+			long companyId, String searchEngineId, String backupName)
+		throws SearchException {
+
+		return _indexAdminHelper.backup(companyId, searchEngineId, backupName);
 	}
 
 	public static void backup(String backupName) throws SearchException {

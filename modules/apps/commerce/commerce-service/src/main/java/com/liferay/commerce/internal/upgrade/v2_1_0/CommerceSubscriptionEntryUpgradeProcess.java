@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.internal.upgrade.v2_1_0;
 
+import com.liferay.commerce.internal.upgrade.base.BaseCommerceServiceUpgradeProcess;
 import com.liferay.commerce.model.impl.CommerceSubscriptionEntryModelImpl;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
@@ -22,9 +23,6 @@ import com.liferay.commerce.product.service.CPInstanceLocalService;
 import com.liferay.portal.kernel.dao.db.IndexMetadata;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
-import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
 import java.sql.DatabaseMetaData;
@@ -38,7 +36,8 @@ import java.util.Objects;
 /**
  * @author Ethan Bustad
  */
-public class CommerceSubscriptionEntryUpgradeProcess extends UpgradeProcess {
+public class CommerceSubscriptionEntryUpgradeProcess
+	extends BaseCommerceServiceUpgradeProcess {
 
 	public CommerceSubscriptionEntryUpgradeProcess(
 		CPDefinitionLocalService cpDefinitionLocalService,
@@ -50,6 +49,15 @@ public class CommerceSubscriptionEntryUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		addColumn(
+			CommerceSubscriptionEntryModelImpl.class,
+			CommerceSubscriptionEntryModelImpl.TABLE_NAME, "CPInstanceUUID",
+			"VARCHAR(75)");
+		addColumn(
+			CommerceSubscriptionEntryModelImpl.class,
+			CommerceSubscriptionEntryModelImpl.TABLE_NAME, "CProductId",
+			"LONG");
+
 		_addIndexes(CommerceSubscriptionEntryModelImpl.TABLE_NAME);
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -73,28 +81,15 @@ public class CommerceSubscriptionEntryUpgradeProcess extends UpgradeProcess {
 				preparedStatement.setLong(1, cpDefinition.getCProductId());
 
 				preparedStatement.setString(2, cpInstance.getCPInstanceUuid());
+
 				preparedStatement.setLong(3, cpInstanceId);
 
 				preparedStatement.execute();
 			}
 		}
-	}
 
-	@Override
-	protected UpgradeStep[] getPostUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.dropColumns(
-				"CommerceSubscriptionEntry", "CPInstanceId")
-		};
-	}
-
-	@Override
-	protected UpgradeStep[] getPreUpgradeSteps() {
-		return new UpgradeStep[] {
-			UpgradeProcessFactory.addColumns(
-				"CommerceSubscriptionEntry", "CPInstanceUUID VARCHAR(75)",
-				"CProductId LONG")
-		};
+		runSQL(
+			"alter table CommerceSubscriptionEntry drop column CPInstanceId");
 	}
 
 	private void _addIndexes(String tableName) throws Exception {

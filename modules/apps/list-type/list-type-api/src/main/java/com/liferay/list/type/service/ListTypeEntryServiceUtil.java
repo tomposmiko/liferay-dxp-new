@@ -40,12 +40,12 @@ public class ListTypeEntryServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.list.type.service.impl.ListTypeEntryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static ListTypeEntry addListTypeEntry(
-			String externalReferenceCode, long listTypeDefinitionId, String key,
+			long listTypeDefinitionId, String key,
 			Map<java.util.Locale, String> nameMap)
 		throws PortalException {
 
 		return getService().addListTypeEntry(
-			externalReferenceCode, listTypeDefinitionId, key, nameMap);
+			listTypeDefinitionId, key, nameMap);
 	}
 
 	public static ListTypeEntry deleteListTypeEntry(long listTypeEntryId)
@@ -74,15 +74,6 @@ public class ListTypeEntryServiceUtil {
 		return getService().getListTypeEntry(listTypeEntryId);
 	}
 
-	public static ListTypeEntry getListTypeEntryByExternalReferenceCode(
-			String externalReferenceCode, long companyId,
-			long listTypeDefinitionId)
-		throws PortalException {
-
-		return getService().getListTypeEntryByExternalReferenceCode(
-			externalReferenceCode, companyId, listTypeDefinitionId);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -93,12 +84,10 @@ public class ListTypeEntryServiceUtil {
 	}
 
 	public static ListTypeEntry updateListTypeEntry(
-			String externalReferenceCode, long listTypeEntryId,
-			Map<java.util.Locale, String> nameMap)
+			long listTypeEntryId, Map<java.util.Locale, String> nameMap)
 		throws PortalException {
 
-		return getService().updateListTypeEntry(
-			externalReferenceCode, listTypeEntryId, nameMap);
+		return getService().updateListTypeEntry(listTypeEntryId, nameMap);
 	}
 
 	public static ListTypeEntryService getService() {

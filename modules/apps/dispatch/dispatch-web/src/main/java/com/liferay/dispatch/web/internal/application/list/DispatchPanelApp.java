@@ -18,7 +18,7 @@ import com.liferay.application.list.BasePanelApp;
 import com.liferay.application.list.PanelApp;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.dispatch.constants.DispatchPortletKeys;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
@@ -51,12 +51,7 @@ public class DispatchPanelApp extends BasePanelApp {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, _KEY);
-	}
-
-	@Override
-	public Portlet getPortlet() {
-		return _portlet;
+		return LanguageUtil.get(resourceBundle, _KEY);
 	}
 
 	@Override
@@ -64,14 +59,15 @@ public class DispatchPanelApp extends BasePanelApp {
 		return DispatchPortletKeys.DISPATCH;
 	}
 
-	private static final String _KEY = "dispatch";
-
-	@Reference
-	private Language _language;
-
+	@Override
 	@Reference(
-		target = "(javax.portlet.name=" + DispatchPortletKeys.DISPATCH + ")"
+		target = "(javax.portlet.name=" + DispatchPortletKeys.DISPATCH + ")",
+		unbind = "-"
 	)
-	private Portlet _portlet;
+	public void setPortlet(Portlet portlet) {
+		super.setPortlet(portlet);
+	}
+
+	private static final String _KEY = "dispatch";
 
 }

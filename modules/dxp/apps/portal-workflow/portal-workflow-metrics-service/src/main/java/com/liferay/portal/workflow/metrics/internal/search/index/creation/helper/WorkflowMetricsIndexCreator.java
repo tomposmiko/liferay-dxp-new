@@ -14,41 +14,40 @@
 
 package com.liferay.portal.workflow.metrics.internal.search.index.creation.helper;
 
+import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
-import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.search.capabilities.SearchCapabilities;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
-import com.liferay.portal.search.engine.adapter.search.CountSearchRequest;
-import com.liferay.portal.search.engine.adapter.search.CountSearchResponse;
-import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.workflow.metrics.internal.background.task.WorkflowMetricsReindexBackgroundTaskExecutor;
 import com.liferay.portal.workflow.metrics.internal.search.index.WorkflowMetricsIndex;
 
 import java.io.Serializable;
 
+import java.util.Objects;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Inácio Nery
  */
-@Component(service = WorkflowMetricsIndexCreator.class)
+@Component(immediate = true, service = WorkflowMetricsIndexCreator.class)
 public class WorkflowMetricsIndexCreator {
 
 	public void createIndex(Company company) throws PortalException {
-		boolean indexCreated = _instanceWorkflowMetricsIndex.createIndex(
-			company.getCompanyId());
-
-		if (!indexCreated) {
+		if (Objects.isNull(_searchEngineAdapter)) {
 			return;
 		}
 
+		_instanceWorkflowMetricsIndex.createIndex(company.getCompanyId());
 		_nodeWorkflowMetricsIndex.createIndex(company.getCompanyId());
 		_processWorkflowMetricsIndex.createIndex(company.getCompanyId());
 		_slaInstanceResultWorkflowMetricsIndex.createIndex(
@@ -56,33 +55,21 @@ public class WorkflowMetricsIndexCreator {
 		_slaTaskResultWorkflowMetricsIndex.createIndex(company.getCompanyId());
 		_taskWorkflowMetricsIndex.createIndex(company.getCompanyId());
 		_transitionWorkflowMetricsIndex.createIndex(company.getCompanyId());
-	}
-
-	public void reindex(Company company) {
-		if (!_searchCapabilities.isWorkflowMetricsSupported()) {
-			return;
-		}
 
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
-				CountSearchRequest countSearchRequest =
-					new CountSearchRequest();
+				int count = _backgroundTaskLocalService.getBackgroundTasksCount(
+					company.getGroupId(),
+					WorkflowMetricsIndexCreator.class.getSimpleName(),
+					WorkflowMetricsReindexBackgroundTaskExecutor.class.
+						getName(),
+					false);
 
-				countSearchRequest.setIndexNames(
-					_processWorkflowMetricsIndex.getIndexName(
-						company.getCompanyId()));
-				countSearchRequest.setQuery(_queries.booleanQuery());
-				countSearchRequest.setTypes(
-					_processWorkflowMetricsIndex.getIndexType());
-
-				CountSearchResponse countSearchResponse =
-					_searchEngineAdapter.execute(countSearchRequest);
-
-				if (countSearchResponse.getCount() > 0) {
+				if (count > 0) {
 					return null;
 				}
 
-				User user = company.getGuestUser();
+				User user = company.getDefaultUser();
 
 				_backgroundTaskLocalService.addBackgroundTask(
 					user.getUserId(), company.getGroupId(),
@@ -107,13 +94,11 @@ public class WorkflowMetricsIndexCreator {
 	}
 
 	public void removeIndex(Company company) throws PortalException {
-		boolean indexRemoved = _instanceWorkflowMetricsIndex.removeIndex(
-			company.getCompanyId());
-
-		if (!indexRemoved) {
+		if (Objects.isNull(_searchEngineAdapter)) {
 			return;
 		}
 
+		_instanceWorkflowMetricsIndex.removeIndex(company.getCompanyId());
 		_nodeWorkflowMetricsIndex.removeIndex(company.getCompanyId());
 		_processWorkflowMetricsIndex.removeIndex(company.getCompanyId());
 		_slaInstanceResultWorkflowMetricsIndex.removeIndex(
@@ -135,14 +120,13 @@ public class WorkflowMetricsIndexCreator {
 	@Reference(target = "(workflow.metrics.index.entity.name=process)")
 	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
 
-	@Reference
-	private Queries _queries;
-
-	@Reference
-	private SearchCapabilities _searchCapabilities;
-
-	@Reference
-	private SearchEngineAdapter _searchEngineAdapter;
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(search.engine.impl=Elasticsearch)"
+	)
+	private volatile SearchEngineAdapter _searchEngineAdapter;
 
 	@Reference(
 		target = "(workflow.metrics.index.entity.name=sla-instance-result)"

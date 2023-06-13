@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.journal.model.JournalFolder",
-	service = DTOConverter.class
+	service = {DTOConverter.class, StructuredContentFolderDTOConverter.class}
 )
 public class StructuredContentFolderDTOConverter
 	implements DTOConverter<DLFolder, StructuredContentFolder> {
@@ -65,7 +65,7 @@ public class StructuredContentFolderDTOConverter
 				actions = dtoConverterContext.getActions();
 				assetLibraryKey = GroupUtil.getAssetLibraryKey(group);
 				creator = CreatorUtil.toCreator(
-					_portal, dtoConverterContext.getUriInfo(),
+					_portal, dtoConverterContext.getUriInfoOptional(),
 					_userLocalService.fetchUser(journalFolder.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
 					dtoConverterContext.isAcceptAllLanguages(),
@@ -75,8 +75,6 @@ public class StructuredContentFolderDTOConverter
 				dateCreated = journalFolder.getCreateDate();
 				dateModified = journalFolder.getModifiedDate();
 				description = journalFolder.getDescription();
-				externalReferenceCode =
-					journalFolder.getExternalReferenceCode();
 				id = journalFolder.getFolderId();
 				name = journalFolder.getName();
 				numberOfStructuredContentFolders =

@@ -14,6 +14,7 @@
 
 package com.liferay.frontend.taglib.clay.servlet.taglib;
 
+import com.liferay.frontend.taglib.clay.servlet.taglib.soy.NavigationCard;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -168,7 +169,7 @@ public class NavigationCardTag extends BaseCardTag {
 
 	@Override
 	protected String getHydratedModuleName() {
-		return "{NavigationCard} from frontend-taglib-clay";
+		return "frontend-taglib-clay/cards/NavigationCard";
 	}
 
 	@Override

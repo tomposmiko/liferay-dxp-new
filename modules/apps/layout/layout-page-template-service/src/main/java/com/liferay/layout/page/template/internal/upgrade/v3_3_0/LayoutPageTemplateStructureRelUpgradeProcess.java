@@ -30,9 +30,9 @@ import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,6 +41,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Eudaldo Alonso
@@ -69,19 +71,21 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 		List<PortletPreferences> portletPreferencesList =
 			_portletPreferencesLocalService.getPortletPreferencesByPlid(plid);
 
-		_portletPreferencesMap.put(
-			plid,
-			ListUtil.filter(
-				portletPreferencesList,
-				portletPreferences -> {
-					String portletId = portletPreferences.getPortletId();
+		Stream<PortletPreferences> stream = portletPreferencesList.stream();
 
-					return portletId.contains(_INSTANCE_SEPARATOR) &&
-						   (portletId.contains(
-							   _SEGMENTS_EXPERIENCE_SEPARATOR_1) ||
-							portletId.contains(
-								_SEGMENTS_EXPERIENCE_SEPARATOR_2));
-				}));
+		portletPreferencesList = stream.filter(
+			portletPreferences -> {
+				String portletId = portletPreferences.getPortletId();
+
+				return portletId.contains(_INSTANCE_SEPARATOR) &&
+					   (portletId.contains(_SEGMENTS_EXPERIENCE_SEPARATOR_1) ||
+						portletId.contains(_SEGMENTS_EXPERIENCE_SEPARATOR_2));
+			}
+		).collect(
+			Collectors.toList()
+		);
+
+		_portletPreferencesMap.put(plid, portletPreferencesList);
 
 		return _portletPreferencesMap.get(plid);
 	}
@@ -90,9 +94,10 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 		String newNamespace, String oldNamespace, long plid,
 		long segmentsExperienceId) {
 
-		for (PortletPreferences portletPreferences :
-				_getPortletPreferencesByPlid(plid)) {
+		List<PortletPreferences> portletPreferencesList =
+			_getPortletPreferencesByPlid(plid);
 
+		for (PortletPreferences portletPreferences : portletPreferencesList) {
 			String portletId = portletPreferences.getPortletId();
 
 			if (!portletId.contains(oldNamespace) ||
@@ -105,17 +110,18 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 				continue;
 			}
 
-			portletPreferences.setPortletId(
-				StringUtil.replace(
-					portletId,
-					new String[] {
-						oldNamespace,
-						_SEGMENTS_EXPERIENCE_SEPARATOR_1 + segmentsExperienceId,
-						_SEGMENTS_EXPERIENCE_SEPARATOR_2 + segmentsExperienceId
-					},
-					new String[] {
-						newNamespace, StringPool.BLANK, StringPool.BLANK
-					}));
+			String newPortletId = StringUtil.replace(
+				portletId,
+				new String[] {
+					oldNamespace,
+					_SEGMENTS_EXPERIENCE_SEPARATOR_1 + segmentsExperienceId,
+					_SEGMENTS_EXPERIENCE_SEPARATOR_2 + segmentsExperienceId
+				},
+				new String[] {
+					newNamespace, StringPool.BLANK, StringPool.BLANK
+				});
+
+			portletPreferences.setPortletId(newPortletId);
 
 			_portletPreferencesLocalService.updatePortletPreferences(
 				portletPreferences);
@@ -150,14 +156,15 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 				continue;
 			}
 
-			if (segmentsExperienceId == _SEGMENTS_EXPERIENCE_ID_DEFAULT) {
-				fragmentEntryLink.setEditableValues(
-					EditableValuesTransformerUtil.getEditableValues(
-						fragmentEntryLink.getEditableValues(),
-						segmentsExperienceId));
+			if (segmentsExperienceId ==
+					SegmentsExperienceConstants.ID_DEFAULT) {
 
 				_fragmentEntryLinkLocalService.updateFragmentEntryLink(
-					fragmentEntryLink);
+					fragmentStyledLayoutStructureItem.getFragmentEntryLinkId(),
+					EditableValuesTransformerUtil.getEditableValues(
+						fragmentEntryLink.getEditableValues(),
+						segmentsExperienceId),
+					false);
 
 				continue;
 			}
@@ -201,8 +208,7 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 						editableValuesJSONObject.toString(),
 						segmentsExperienceId),
 					newNamespace, fragmentEntryLink.getPosition(),
-					fragmentEntryLink.getRendererKey(),
-					fragmentEntryLink.getType(), new ServiceContext());
+					fragmentEntryLink.getRendererKey(), new ServiceContext());
 
 			fragmentStyledLayoutStructureItem.setFragmentEntryLinkId(
 				newFragmentEntryLink.getFragmentEntryLinkId());
@@ -210,7 +216,7 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 
 		JSONObject layoutDataJSONObject = layoutStructure.toJSONObject();
 
-		return layoutDataJSONObject.toString();
+		return layoutDataJSONObject.toJSONString();
 	}
 
 	private void _upgradeLayoutPageTemplateStructureRel() throws Exception {
@@ -221,9 +227,9 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 						"segmentsExperienceId desc");
 			PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
-					connection,
-					"update LayoutPageTemplateStructureRel set data_ = ? " +
-						"where lPageTemplateStructureRelId = ?")) {
+					connection.prepareStatement(
+						"update LayoutPageTemplateStructureRel set data_ = ? " +
+							"where lPageTemplateStructureRelId = ?"))) {
 
 			while (resultSet.next()) {
 				long layoutPageTemplateStructureRelId = resultSet.getLong(
@@ -247,8 +253,6 @@ public class LayoutPageTemplateStructureRelUpgradeProcess
 	}
 
 	private static final String _INSTANCE_SEPARATOR = "_INSTANCE_";
-
-	private static final long _SEGMENTS_EXPERIENCE_ID_DEFAULT = 0;
 
 	private static final String _SEGMENTS_EXPERIENCE_SEPARATOR_1 =
 		"_SEGMENTS_EXPERIENCE_";

@@ -19,14 +19,12 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.io.Serializable;
-
 import java.util.Objects;
 
 /**
  * @author Preston Crary
  */
-public class PortalPreferenceKey implements Serializable {
+public class PortalPreferenceKey {
 
 	public PortalPreferenceKey(String namespace, String key) {
 		if (key == null) {

@@ -15,17 +15,17 @@
 package com.liferay.commerce.internal.starter;
 
 import com.liferay.commerce.starter.CommerceRegionsStarter;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 
 import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Riccardo Alberti
  */
 @Component(
+	enabled = false, immediate = true,
 	property = "commerce.region.starter.key=" + UnitedKingdomCommerceRegionsStarter.UNITED_KINGDOM_NUMERIC_ISO_CODE,
 	service = CommerceRegionsStarter.class
 )
@@ -36,7 +36,7 @@ public class UnitedKingdomCommerceRegionsStarter
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "country.united-kingdom");
+		return LanguageUtil.get(locale, "country.united-kingdom");
 	}
 
 	@Override
@@ -51,8 +51,5 @@ public class UnitedKingdomCommerceRegionsStarter
 
 	private static final String _FILEPATH =
 		"com/liferay/commerce/internal/united-kingdom.json";
-
-	@Reference
-	private Language _language;
 
 }

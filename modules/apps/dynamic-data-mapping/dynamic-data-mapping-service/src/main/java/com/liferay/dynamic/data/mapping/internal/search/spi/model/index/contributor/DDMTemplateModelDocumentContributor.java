@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.util.Localization;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 
 import org.osgi.service.component.annotations.Component;
@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.dynamic.data.mapping.model.DDMTemplate",
 	service = ModelDocumentContributor.class
 )
@@ -58,7 +59,7 @@ public class DDMTemplateModelDocumentContributor
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -70,19 +71,19 @@ public class DDMTemplateModelDocumentContributor
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(portalException, portalException);
 			}
 		}
 
 		document.addKeyword("type", ddmTemplate.getType());
 		document.addLocalizedText(
 			Field.DESCRIPTION,
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				ddmTemplate.getDescriptionMap(),
 				ddmTemplate.getDefaultLanguageId(), ddmTemplate.getGroupId()));
 		document.addLocalizedText(
 			Field.NAME,
-			_localization.populateLocalizationMap(
+			LocalizationUtil.populateLocalizationMap(
 				ddmTemplate.getNameMap(), ddmTemplate.getDefaultLanguageId(),
 				ddmTemplate.getGroupId()));
 	}
@@ -90,7 +91,8 @@ public class DDMTemplateModelDocumentContributor
 	protected String[] getLanguageIds(
 		String defaultLanguageId, String content) {
 
-		String[] languageIds = _localization.getAvailableLanguageIds(content);
+		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
+			content);
 
 		if (languageIds.length == 0) {
 			languageIds = new String[] {defaultLanguageId};
@@ -107,8 +109,5 @@ public class DDMTemplateModelDocumentContributor
 
 	@Reference
 	private DDMPermissionSupport _ddmPermissionSupport;
-
-	@Reference
-	private Localization _localization;
 
 }

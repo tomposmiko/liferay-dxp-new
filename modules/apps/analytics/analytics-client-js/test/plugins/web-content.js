@@ -16,7 +16,6 @@ import userEvent from '@testing-library/user-event';
 import fetchMock from 'fetch-mock';
 
 import AnalyticsClient from '../../src/analytics';
-import {wait} from '../helpers';
 
 const applicationId = 'WebContent';
 
@@ -61,26 +60,12 @@ describe('WebContent Plugin', () => {
 	});
 
 	describe('webContentViewed event', () => {
-		it('is fired when web-content is in viewport', async () => {
+		it('is fired for every webContent on the page', () => {
 			const webContentElement = createWebContentElement();
-
-			jest.spyOn(
-				webContentElement,
-				'getBoundingClientRect'
-			).mockImplementation(() => ({
-				bottom: 500,
-				height: 500,
-				left: 0,
-				right: 500,
-				top: 0,
-				width: 500,
-			}));
 
 			const domContentLoaded = new Event('DOMContentLoaded');
 
-			await document.dispatchEvent(domContentLoaded);
-
-			await wait(250);
+			document.dispatchEvent(domContentLoaded);
 
 			const events = Analytics.getEvents().filter(
 				({eventId}) => eventId === 'webContentViewed'
@@ -100,40 +85,10 @@ describe('WebContent Plugin', () => {
 
 			document.body.removeChild(webContentElement);
 		});
-
-		it('is not fired when web-content is not in viewport', async () => {
-			const webContentElement = createWebContentElement();
-
-			jest.spyOn(
-				webContentElement,
-				'getBoundingClientRect'
-			).mockImplementation(() => ({
-				bottom: 1500,
-				height: 500,
-				left: 0,
-				right: 500,
-				top: 1000,
-				width: 500,
-			}));
-
-			const domContentLoaded = new Event('DOMContentLoaded');
-
-			await document.dispatchEvent(domContentLoaded);
-
-			await wait(250);
-
-			const events = Analytics.getEvents().filter(
-				({eventId}) => eventId === 'webContentViewed'
-			);
-
-			expect(events.length).toBeGreaterThanOrEqual(0);
-
-			document.body.removeChild(webContentElement);
-		});
 	});
 
 	describe('webContentClicked event', () => {
-		it('is fired when clicking an image inside a webContent', async () => {
+		it('is fired when clicking an image inside a webContent', () => {
 			const webContentElement = createWebContentElement();
 
 			const imageInsideWebContent = document.createElement('img');
@@ -142,7 +97,7 @@ describe('WebContent Plugin', () => {
 
 			webContentElement.appendChild(imageInsideWebContent);
 
-			await userEvent.click(imageInsideWebContent);
+			userEvent.click(imageInsideWebContent);
 
 			expect(Analytics.getEvents()).toEqual([
 				expect.objectContaining({
@@ -159,7 +114,7 @@ describe('WebContent Plugin', () => {
 			document.body.removeChild(webContentElement);
 		});
 
-		it('is fired when clicking a link inside a webContent', async () => {
+		it('is fired when clicking a link inside a webContent', () => {
 			const webContentElement = createWebContentElement();
 
 			const text = 'Link inside a WebContent';
@@ -172,7 +127,7 @@ describe('WebContent Plugin', () => {
 
 			webContentElement.appendChild(linkInsideWebContent);
 
-			await userEvent.click(linkInsideWebContent);
+			userEvent.click(linkInsideWebContent);
 
 			expect(Analytics.getEvents()).toEqual([
 				expect.objectContaining({
@@ -190,7 +145,7 @@ describe('WebContent Plugin', () => {
 			document.body.removeChild(webContentElement);
 		});
 
-		it('is fired when clicking any other element inside a webContent', async () => {
+		it('is fired when clicking any other element inside a webContent', () => {
 			const webContentElement = createWebContentElement();
 
 			const paragraphInsideWebContent = document.createElement('p');
@@ -204,7 +159,7 @@ describe('WebContent Plugin', () => {
 
 			webContentElement.appendChild(paragraphInsideWebContent);
 
-			await userEvent.click(paragraphInsideWebContent);
+			userEvent.click(paragraphInsideWebContent);
 
 			expect(Analytics.getEvents()).toEqual([
 				expect.objectContaining({

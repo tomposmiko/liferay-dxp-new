@@ -13,7 +13,6 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayEmptyState from '@clayui/empty-state';
 import {
 	DRAG_TYPES,
 	EVENT_TYPES,
@@ -22,8 +21,9 @@ import {
 } from 'data-engine-js-components-web';
 import React, {useState} from 'react';
 
-import {getLocalizedValue, getPluralMessage, sub} from '../../utils/lang.es';
+import {getLocalizedValue, getPluralMessage} from '../../utils/lang.es';
 import {getSearchRegex} from '../../utils/search.es';
+import EmptyState from '../empty-state/EmptyState.es';
 import FieldType from '../field-types/FieldType.es';
 import FieldSetModal from './FieldSetModal';
 import useDeleteFieldSet from './actions/useDeleteFieldSet.es';
@@ -156,32 +156,20 @@ export default function FieldSetList({searchTerm}) {
 				</>
 			) : (
 				<div className="mt-2">
-					{searchTerm ? (
-						<ClayEmptyState
-							description={sub(
-								Liferay.Language.get(
-									'there-are-no-results-for-x'
-								),
-								[searchTerm]
-							)}
-							imgSrc={`${themeDisplay.getPathThemeImages()}/states/search_state.gif`}
-							small
-							title={Liferay.Language.get('no-results-found')}
-						/>
-					) : (
-						<ClayEmptyState
-							description={Liferay.Language.get(
+					<EmptyState
+						emptyState={{
+							button: CreateNewFieldsetButton,
+
+							description: Liferay.Language.get(
 								'there-are-no-fieldsets-description'
-							)}
-							imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
-							small
-							title={Liferay.Language.get(
+							),
+							title: Liferay.Language.get(
 								'there-are-no-fieldsets'
-							)}
-						>
-							<CreateNewFieldsetButton />
-						</ClayEmptyState>
-					)}
+							),
+						}}
+						keywords={searchTerm}
+						small
+					/>
 				</div>
 			)}
 			{modalState.isVisible && (

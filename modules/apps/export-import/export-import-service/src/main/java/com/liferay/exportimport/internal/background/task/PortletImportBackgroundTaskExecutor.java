@@ -17,7 +17,7 @@ package com.liferay.exportimport.internal.background.task;
 import com.liferay.exportimport.internal.background.task.display.PortletExportImportBackgroundTaskDisplay;
 import com.liferay.exportimport.kernel.exception.ExportImportIOException;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
-import com.liferay.exportimport.kernel.service.ExportImportLocalService;
+import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
@@ -36,17 +36,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Daniel Kocsis
  * @author Akos Thurzo
  */
-@Component(
-	property = "background.task.executor.class.name=com.liferay.exportimport.internal.background.task.PortletImportBackgroundTaskExecutor",
-	service = BackgroundTaskExecutor.class
-)
 public class PortletImportBackgroundTaskExecutor
 	extends BaseExportImportBackgroundTaskExecutor {
 
@@ -61,7 +54,17 @@ public class PortletImportBackgroundTaskExecutor
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return this;
+		PortletImportBackgroundTaskExecutor
+			portletImportBackgroundTaskExecutor =
+				new PortletImportBackgroundTaskExecutor();
+
+		portletImportBackgroundTaskExecutor.
+			setBackgroundTaskStatusMessageTranslator(
+				getBackgroundTaskStatusMessageTranslator());
+		portletImportBackgroundTaskExecutor.setIsolationLevel(
+			getIsolationLevel());
+
+		return portletImportBackgroundTaskExecutor;
 	}
 
 	@Override
@@ -123,10 +126,7 @@ public class PortletImportBackgroundTaskExecutor
 		return new PortletExportImportBackgroundTaskDisplay(backgroundTask);
 	}
 
-	@Reference
-	private ExportImportLocalService _exportImportLocalService;
-
-	private class PortletImportCallable implements Callable<Void> {
+	private static class PortletImportCallable implements Callable<Void> {
 
 		public PortletImportCallable(
 			ExportImportConfiguration exportImportConfiguration, File file) {
@@ -137,10 +137,10 @@ public class PortletImportBackgroundTaskExecutor
 
 		@Override
 		public Void call() throws PortalException {
-			_exportImportLocalService.importPortletDataDeletions(
+			ExportImportLocalServiceUtil.importPortletDataDeletions(
 				_exportImportConfiguration, _file);
 
-			_exportImportLocalService.importPortletInfo(
+			ExportImportLocalServiceUtil.importPortletInfo(
 				_exportImportConfiguration, _file);
 
 			return null;

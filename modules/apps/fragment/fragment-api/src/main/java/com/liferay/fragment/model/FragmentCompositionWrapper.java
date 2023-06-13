@@ -810,11 +810,6 @@ public class FragmentCompositionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	public Map<String, Function<FragmentComposition, Object>>
 		getAttributeGetterFunctions() {
 

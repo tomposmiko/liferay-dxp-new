@@ -23,7 +23,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -40,8 +40,12 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -84,15 +88,15 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 		}
 
 		GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration
-			gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration =
+			gCloudNaturalLanguageAssetAutoTagProviderCompanyConfiguration =
 				_configurationProvider.getCompanyConfiguration(
 					GCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration.
 						class,
 					companyId);
 
-		if (!gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration.
+		if (!gCloudNaturalLanguageAssetAutoTagProviderCompanyConfiguration.
 				classificationEndpointEnabled() &&
-			!gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration.
+			!gCloudNaturalLanguageAssetAutoTagProviderCompanyConfiguration.
 				entityEndpointEnabled()) {
 
 			return Collections.emptySet();
@@ -102,19 +106,18 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 			textSupplier.get(), mimeType);
 
 		Collection<String> classificationTagNames = _getClassificationTagNames(
-			gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration,
+			gCloudNaturalLanguageAssetAutoTagProviderCompanyConfiguration,
 			documentPayload, locale);
 
 		Collection<String> entitiesTagNames = _getEntitiesTagNames(
-			gCloudNaturalLanguageAssetAutoTaggerCompanyConfiguration,
+			gCloudNaturalLanguageAssetAutoTagProviderCompanyConfiguration,
 			documentPayload, locale);
 
-		Set<String> tagNames = new HashSet<>();
-
-		tagNames.addAll(classificationTagNames);
-		tagNames.addAll(entitiesTagNames);
-
-		return tagNames;
+		return Stream.concat(
+			classificationTagNames.stream(), entitiesTagNames.stream()
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
 	private Collection<String> _getClassificationTagNames(
@@ -195,6 +198,10 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 			apiKey);
 	}
 
+	private <T> Predicate<T> _negate(Predicate<T> predicate) {
+		return predicate.negate();
+	}
+
 	private JSONObject _post(String serviceURL, String body) throws Exception {
 		Http.Options options = new Http.Options();
 
@@ -205,7 +212,7 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 
 		String responseJSON = _http.URLtoString(options);
 
-		JSONObject jsonObject = _jsonFactory.createJSONObject(responseJSON);
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(responseJSON);
 
 		Http.Response response = options.getResponse();
 
@@ -235,36 +242,30 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 			return Collections.emptySet();
 		}
 
-		Set<String> tagNames = new HashSet<>();
+		Stream<JSONObject> stream = StreamSupport.stream(
+			(Spliterator<JSONObject>)jsonArray.spliterator(), false);
 
-		for (Object object : jsonArray) {
-			JSONObject jsonObject = (JSONObject)object;
-
-			if (!predicate.test(jsonObject)) {
-				continue;
-			}
-
-			String[] tagNameParts1 = StringUtil.split(
-				StringUtil.removeChars(
-					jsonObject.getString("name"), CharPool.APOSTROPHE,
-					CharPool.DASH),
-				CharPool.AMPERSAND);
-
-			for (String tagNamePart1 : tagNameParts1) {
-				String[] tagNameParts2 = StringUtil.split(
-					tagNamePart1, CharPool.FORWARD_SLASH);
-
-				for (String tagNamePart2 : tagNameParts2) {
-					tagNamePart2 = tagNamePart2.trim();
-
-					if (!tagNamePart2.isEmpty()) {
-						tagNames.add(tagNamePart2);
-					}
-				}
-			}
-		}
-
-		return tagNames;
+		return stream.filter(
+			predicate
+		).map(
+			jsonObject -> StringUtil.removeChars(
+				jsonObject.getString("name"), CharPool.APOSTROPHE,
+				CharPool.DASH)
+		).map(
+			tagName -> StringUtil.split(tagName, CharPool.AMPERSAND)
+		).flatMap(
+			Stream::of
+		).map(
+			tagNamePart -> StringUtil.split(tagNamePart, CharPool.FORWARD_SLASH)
+		).flatMap(
+			Stream::of
+		).map(
+			String::trim
+		).filter(
+			_negate(String::isEmpty)
+		).collect(
+			Collectors.toSet()
+		);
 	}
 
 	private static final int _MINIMUM_PAYLOAD_SIZE;
@@ -299,8 +300,5 @@ public class GCloudNaturalLanguageDocumentAssetAutoTaggerImpl
 
 	@Reference
 	private Http _http;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

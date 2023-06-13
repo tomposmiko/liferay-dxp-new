@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.saml.constants.SamlWebKeys;
+import com.liferay.saml.persistence.service.SamlSpIdpConnectionLocalService;
 import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
 import com.liferay.saml.runtime.exception.AuthnAgeException;
 import com.liferay.saml.runtime.exception.EntityInteractionException;
@@ -43,16 +44,28 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Mika Koivisto
  */
-@Component(property = "path=/portal/saml/acs", service = StrutsAction.class)
+@Component(
+	immediate = true, property = "path=/portal/saml/acs",
+	service = StrutsAction.class
+)
 public class AssertionConsumerServiceAction extends BaseSamlStrutsAction {
 
 	@Override
 	public boolean isEnabled() {
-		if (_samlProviderConfigurationHelper.isRoleSp()) {
-			return _samlProviderConfigurationHelper.isEnabled();
+		if (samlProviderConfigurationHelper.isRoleSp()) {
+			return super.isEnabled();
 		}
 
 		return false;
+	}
+
+	@Override
+	@Reference(unbind = "-")
+	public void setSamlProviderConfigurationHelper(
+		SamlProviderConfigurationHelper samlProviderConfigurationHelper) {
+
+		super.setSamlProviderConfigurationHelper(
+			samlProviderConfigurationHelper);
 	}
 
 	@Override
@@ -137,7 +150,7 @@ public class AssertionConsumerServiceAction extends BaseSamlStrutsAction {
 	private Portal _portal;
 
 	@Reference
-	private SamlProviderConfigurationHelper _samlProviderConfigurationHelper;
+	private SamlSpIdpConnectionLocalService _samlSpIdpConnectionLocalService;
 
 	@Reference
 	private WebSsoProfile _webSsoProfile;

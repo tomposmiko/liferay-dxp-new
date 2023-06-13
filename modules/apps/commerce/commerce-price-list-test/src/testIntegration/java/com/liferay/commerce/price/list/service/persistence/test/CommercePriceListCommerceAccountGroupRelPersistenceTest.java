@@ -136,12 +136,6 @@ public class CommercePriceListCommerceAccountGroupRelPersistenceTest {
 			newCommercePriceListCommerceAccountGroupRel = _persistence.create(
 				pk);
 
-		newCommercePriceListCommerceAccountGroupRel.setMvccVersion(
-			RandomTestUtil.nextLong());
-
-		newCommercePriceListCommerceAccountGroupRel.setCtCollectionId(
-			RandomTestUtil.nextLong());
-
 		newCommercePriceListCommerceAccountGroupRel.setUuid(
 			RandomTestUtil.randomString());
 
@@ -181,13 +175,6 @@ public class CommercePriceListCommerceAccountGroupRelPersistenceTest {
 					newCommercePriceListCommerceAccountGroupRel.
 						getPrimaryKey());
 
-		Assert.assertEquals(
-			existingCommercePriceListCommerceAccountGroupRel.getMvccVersion(),
-			newCommercePriceListCommerceAccountGroupRel.getMvccVersion());
-		Assert.assertEquals(
-			existingCommercePriceListCommerceAccountGroupRel.
-				getCtCollectionId(),
-			newCommercePriceListCommerceAccountGroupRel.getCtCollectionId());
 		Assert.assertEquals(
 			existingCommercePriceListCommerceAccountGroupRel.getUuid(),
 			newCommercePriceListCommerceAccountGroupRel.getUuid());
@@ -306,12 +293,12 @@ public class CommercePriceListCommerceAccountGroupRelPersistenceTest {
 		getOrderByComparator() {
 
 		return OrderByComparatorFactoryUtil.create(
-			"CPLCommerceGroupAccountRel", "mvccVersion", true, "ctCollectionId",
-			true, "uuid", true, "commercePriceListCommerceAccountGroupRelId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "commercePriceListId",
-			true, "commerceAccountGroupId", true, "order", true,
-			"lastPublishDate", true);
+			"CPLCommerceGroupAccountRel", "uuid", true,
+			"commercePriceListCommerceAccountGroupRelId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "commercePriceListId", true,
+			"commerceAccountGroupId", true, "order", true, "lastPublishDate",
+			true);
 	}
 
 	@Test
@@ -677,12 +664,6 @@ public class CommercePriceListCommerceAccountGroupRelPersistenceTest {
 
 		CommercePriceListCommerceAccountGroupRel
 			commercePriceListCommerceAccountGroupRel = _persistence.create(pk);
-
-		commercePriceListCommerceAccountGroupRel.setMvccVersion(
-			RandomTestUtil.nextLong());
-
-		commercePriceListCommerceAccountGroupRel.setCtCollectionId(
-			RandomTestUtil.nextLong());
 
 		commercePriceListCommerceAccountGroupRel.setUuid(
 			RandomTestUtil.randomString());

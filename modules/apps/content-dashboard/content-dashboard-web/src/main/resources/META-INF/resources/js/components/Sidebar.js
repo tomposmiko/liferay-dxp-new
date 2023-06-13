@@ -28,42 +28,33 @@ const SidebarBody = ({children, className}) => {
 	);
 };
 
-const SidebarHeader = ({actionsSlot, children, title}) => {
+const SidebarHeader = ({title}) => {
 	const {onClose} = useContext(SidebarContext);
 
 	return (
-		<section className="is-sticky sidebar-header">
+		<section className="sidebar-header">
 			<ClayLayout.ContentRow className="sidebar-section">
-				<ClayLayout.ContentCol
-					className="justify-content-center"
-					expand
-				>
-					<p className="font-weight-bold mb-0 pr-2">{title}</p>
+				<ClayLayout.ContentCol expand>
+					<h2 className="font-weight-bold mb-0 pr-2 small">
+						{title}
+					</h2>
 				</ClayLayout.ContentCol>
-
-				{actionsSlot && (
-					<ClayLayout.ContentCol>{actionsSlot}</ClayLayout.ContentCol>
-				)}
 
 				<ClayLayout.ContentCol>
 					<ClayButtonWithIcon
-						aria-label={Liferay.Language.get('close')}
-						className="component-action text-secondary"
-						data-tooltip-align="bottom"
+						aria-label="Close"
+						className="mt-n2 text-secondary"
 						displayType="unstyled"
 						onClick={onClose}
 						symbol="times"
-						title={Liferay.Language.get('close')}
 					/>
 				</ClayLayout.ContentCol>
 			</ClayLayout.ContentRow>
-
-			{children}
 		</section>
 	);
 };
 
-const Sidebar = ({children, fetchData, onClose = noop, open = true}) => {
+const Sidebar = ({children, onClose = noop, open = true}) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const delay = useTimeout();
@@ -89,17 +80,10 @@ const Sidebar = ({children, fetchData, onClose = noop, open = true}) => {
 	}, [isOpen]);
 
 	return (
-		<div className="cadmin">
-			<div className="content-dashboard sidebar sidebar-light sidebar-sm">
-				<SidebarContext.Provider
-					value={{
-						fetchData,
-						onClose,
-					}}
-				>
-					{children}
-				</SidebarContext.Provider>
-			</div>
+		<div className="content-dashboard sidebar sidebar-light sidebar-sm">
+			<SidebarContext.Provider value={{onClose}}>
+				{children}
+			</SidebarContext.Provider>
 		</div>
 	);
 };

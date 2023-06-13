@@ -23,8 +23,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 /**
  * <p>
@@ -48,7 +46,6 @@ public class KaleoInstanceWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
-		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("kaleoInstanceId", getKaleoInstanceId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -63,7 +60,6 @@ public class KaleoInstanceWrapper
 		attributes.put("kaleoDefinitionVersion", getKaleoDefinitionVersion());
 		attributes.put(
 			"rootKaleoInstanceTokenId", getRootKaleoInstanceTokenId());
-		attributes.put("active", isActive());
 		attributes.put("className", getClassName());
 		attributes.put("classPK", getClassPK());
 		attributes.put("completed", isCompleted());
@@ -79,12 +75,6 @@ public class KaleoInstanceWrapper
 
 		if (mvccVersion != null) {
 			setMvccVersion(mvccVersion);
-		}
-
-		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
-
-		if (ctCollectionId != null) {
-			setCtCollectionId(ctCollectionId);
 		}
 
 		Long kaleoInstanceId = (Long)attributes.get("kaleoInstanceId");
@@ -163,12 +153,6 @@ public class KaleoInstanceWrapper
 			setRootKaleoInstanceTokenId(rootKaleoInstanceTokenId);
 		}
 
-		Boolean active = (Boolean)attributes.get("active");
-
-		if (active != null) {
-			setActive(active);
-		}
-
 		String className = (String)attributes.get("className");
 
 		if (className != null) {
@@ -203,16 +187,6 @@ public class KaleoInstanceWrapper
 	@Override
 	public KaleoInstance cloneWithOriginalValues() {
 		return wrap(model.cloneWithOriginalValues());
-	}
-
-	/**
-	 * Returns the active of this kaleo instance.
-	 *
-	 * @return the active of this kaleo instance
-	 */
-	@Override
-	public boolean getActive() {
-		return model.getActive();
 	}
 
 	/**
@@ -273,16 +247,6 @@ public class KaleoInstanceWrapper
 	@Override
 	public Date getCreateDate() {
 		return model.getCreateDate();
-	}
-
-	/**
-	 * Returns the ct collection ID of this kaleo instance.
-	 *
-	 * @return the ct collection ID of this kaleo instance
-	 */
-	@Override
-	public long getCtCollectionId() {
-		return model.getCtCollectionId();
 	}
 
 	/**
@@ -443,16 +407,6 @@ public class KaleoInstanceWrapper
 	}
 
 	/**
-	 * Returns <code>true</code> if this kaleo instance is active.
-	 *
-	 * @return <code>true</code> if this kaleo instance is active; <code>false</code> otherwise
-	 */
-	@Override
-	public boolean isActive() {
-		return model.isActive();
-	}
-
-	/**
 	 * Returns <code>true</code> if this kaleo instance is completed.
 	 *
 	 * @return <code>true</code> if this kaleo instance is completed; <code>false</code> otherwise
@@ -465,16 +419,6 @@ public class KaleoInstanceWrapper
 	@Override
 	public void persist() {
 		model.persist();
-	}
-
-	/**
-	 * Sets whether this kaleo instance is active.
-	 *
-	 * @param active the active of this kaleo instance
-	 */
-	@Override
-	public void setActive(boolean active) {
-		model.setActive(active);
 	}
 
 	/**
@@ -535,16 +479,6 @@ public class KaleoInstanceWrapper
 	@Override
 	public void setCreateDate(Date createDate) {
 		model.setCreateDate(createDate);
-	}
-
-	/**
-	 * Sets the ct collection ID of this kaleo instance.
-	 *
-	 * @param ctCollectionId the ct collection ID of this kaleo instance
-	 */
-	@Override
-	public void setCtCollectionId(long ctCollectionId) {
-		model.setCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -685,25 +619,6 @@ public class KaleoInstanceWrapper
 	@Override
 	public void setWorkflowContext(String workflowContext) {
 		model.setWorkflowContext(workflowContext);
-	}
-
-	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
-	public Map<String, Function<KaleoInstance, Object>>
-		getAttributeGetterFunctions() {
-
-		return model.getAttributeGetterFunctions();
-	}
-
-	@Override
-	public Map<String, BiConsumer<KaleoInstance, Object>>
-		getAttributeSetterBiConsumers() {
-
-		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

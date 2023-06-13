@@ -36,7 +36,7 @@ import {
 } from './util.es';
 
 const Option = React.forwardRef(
-	({children, className, disabled, style}, ref) => (
+	({children, className, disabled, onClick, showCloseButton, style}, ref) => (
 		<div
 			className={classNames('ddm-field-options', className)}
 			style={style}
@@ -50,7 +50,19 @@ const Option = React.forwardRef(
 				<ClayIcon symbol="drag" />
 			</span>
 
-			<div className="ddm-option-entry">{children}</div>
+			<div className="ddm-option-entry">
+				{children}
+
+				{showCloseButton && (
+					<button
+						className="close close-modal"
+						onClick={onClick}
+						type="button"
+					>
+						<ClayIcon symbol="times" />
+					</button>
+				)}
+			</div>
 		</div>
 	)
 );
@@ -76,7 +88,6 @@ const getInitialOption = (generateOptionValueUsingOptionLabel) => {
 };
 
 const refreshFields = (
-	allowSpecialCharacters,
 	defaultLanguageId,
 	editingLanguageId,
 	generateOptionValueUsingOptionLabel,
@@ -105,24 +116,21 @@ const refreshFields = (
 			generateKeyword: generateOptionValueUsingOptionLabel,
 			...initialOption,
 		},
-	].filter((field) => field && !!Object.keys(field).length);
+	].filter((field) => field && Object.keys(field).length > 0);
 
 	return normalizeFields(
-		allowSpecialCharacters,
 		refreshedFields,
 		generateOptionValueUsingOptionLabel
 	);
 };
 
 const Options = ({
-	allowSpecialCharacters,
 	children,
 	defaultLanguageId,
 	disabled,
 	editingLanguageId,
 	generateOptionValueUsingOptionLabel,
 	onChange,
-	tabPressed,
 	value = {},
 }) => {
 	const {builderRules} = useFormState();
@@ -142,7 +150,6 @@ const Options = ({
 			}
 
 			formattedValue[languageId] = normalizeFields(
-				allowSpecialCharacters,
 				formattedValue[languageId].map((option) => {
 					let newOption = {
 						id: random(),
@@ -184,7 +191,6 @@ const Options = ({
 			[];
 
 		return refreshFields(
-			allowSpecialCharacters,
 			defaultLanguageId,
 			editingLanguageId,
 			generateOptionValueUsingOptionLabel,
@@ -207,7 +213,6 @@ const Options = ({
 
 			availableLanguageIds.forEach((languageId) => {
 				normalizedValue[languageId] = normalizeFields(
-					allowSpecialCharacters,
 					value[languageId].map((option) => {
 						if (option.edited) {
 							return {
@@ -235,7 +240,6 @@ const Options = ({
 
 			setFields(
 				refreshFields(
-					allowSpecialCharacters,
 					defaultLanguageId,
 					editingLanguageId,
 					generateOptionValueUsingOptionLabel,
@@ -245,7 +249,6 @@ const Options = ({
 			);
 		}
 	}, [
-		allowSpecialCharacters,
 		defaultLanguageId,
 		editingLanguageId,
 		generateOptionValueUsingOptionLabel,
@@ -346,10 +349,6 @@ const Options = ({
 	const dedup = (fields, index, property, value) => {
 		const {generateKeyword, id} = fields[index];
 
-		if (index === fields.length - 1 && tabPressed) {
-			return [fields];
-		}
-
 		if (property === 'value' && generateKeyword) {
 			value = dedupValue(
 				fields,
@@ -358,7 +357,7 @@ const Options = ({
 				generateOptionValueUsingOptionLabel
 			);
 		}
-		else if (property === 'reference') {
+		else if (property == 'reference') {
 			setFieldError(
 				checkValidReference(fields, value, fields[index].value)
 			);
@@ -368,26 +367,9 @@ const Options = ({
 	};
 
 	const set = (fields) => {
-		const set = new Set();
-		const normalizedField = fields.map((option) => {
-			if (set.has(option.reference)) {
-				return {
-					...option,
-					reference: option.value,
-				};
-			}
-			else {
-				set.add(option.reference);
-
-				return option;
-			}
-		});
-
 		setFields(fields);
 
-		const synchronizedNormalizedValue = getSynchronizedValue(
-			normalizedField
-		);
+		const synchronizedNormalizedValue = getSynchronizedValue(fields);
 
 		onChange(synchronizedNormalizedValue);
 	};
@@ -461,13 +443,7 @@ const Options = ({
 			index
 		);
 
-		return [
-			normalizeFields(
-				allowSpecialCharacters,
-				fields,
-				generateOptionValueUsingOptionLabel
-			),
-		];
+		return [normalizeFields(fields, generateOptionValueUsingOptionLabel)];
 	};
 
 	const composedAdd = compose(clone, dedup, add, set);
@@ -512,7 +488,6 @@ const Options = ({
 	return (
 		<div className="ddm-field-options-container">
 			<DragPreview component={Option}>{children}</DragPreview>
-
 			{fields.map((option, index) => (
 				<DnD
 					index={index}
@@ -520,7 +495,13 @@ const Options = ({
 					onDragEnd={composedMove}
 					option={option}
 				>
-					<Option disabled={disabled}>
+					<Option
+						disabled={disabled}
+						onClick={() => handleConfirmDelete(index, option.value)}
+						showCloseButton={
+							!(fields.length - 1 === index) && !disabled
+						}
+					>
 						{children({
 							defaultOptionRef,
 							fieldError,
@@ -529,11 +510,7 @@ const Options = ({
 								? composedChange.bind(this, index)
 								: composedAdd.bind(this, index),
 							index,
-							onClick: () =>
-								handleConfirmDelete(index, option.value),
 							option,
-							showCloseButton:
-								!(fields.length - 1 === index) && !disabled,
 						})}
 					</Option>
 				</DnD>
@@ -543,7 +520,6 @@ const Options = ({
 };
 
 const Main = ({
-	allowSpecialCharacters,
 	defaultLanguageId = themeDisplay.getDefaultLanguageId(),
 	editingLanguageId = themeDisplay.getDefaultLanguageId(),
 	generateOptionValueUsingOptionLabel = false,
@@ -556,93 +532,74 @@ const Main = ({
 	value = {},
 	visible,
 	...otherProps
-}) => {
-	const [tabPressed, setTabPressed] = useState(false);
-
-	return (
-		<DndProvider backend={HTML5Backend} context={window}>
-			<FieldBase {...otherProps} readOnly={readOnly} visible={visible}>
-				<Options
-					allowSpecialCharacters={allowSpecialCharacters}
-					defaultLanguageId={defaultLanguageId}
-					disabled={readOnly}
-					editingLanguageId={editingLanguageId}
-					generateOptionValueUsingOptionLabel={
-						generateOptionValueUsingOptionLabel
-					}
-					onChange={(value) => onChange({}, value)}
-					tabPressed={tabPressed}
-					value={value}
-				>
-					{({
-						defaultOptionRef,
-						fieldError,
-						handleBlur,
-						handleField,
-						index,
-						onClick,
-						option,
-						showCloseButton,
-					}) =>
-						option && (
-							<KeyValue
-								allowSpecialCharacters={allowSpecialCharacters}
-								displayErrors={
-									fieldError && fieldError === option.value
+}) => (
+	<DndProvider backend={HTML5Backend} context={window}>
+		<FieldBase {...otherProps} readOnly={readOnly} visible={visible}>
+			<Options
+				defaultLanguageId={defaultLanguageId}
+				disabled={readOnly}
+				editingLanguageId={editingLanguageId}
+				generateOptionValueUsingOptionLabel={
+					generateOptionValueUsingOptionLabel
+				}
+				onChange={(value) => onChange({}, value)}
+				value={value}
+			>
+				{({
+					defaultOptionRef,
+					fieldError,
+					handleBlur,
+					handleField,
+					index,
+					option,
+				}) =>
+					option && (
+						<KeyValue
+							displayErrors={
+								fieldError && fieldError === option.value
+							}
+							editingLanguageId={editingLanguageId}
+							errorMessage={Liferay.Language.get(
+								'this-reference-is-already-being-used'
+							)}
+							generateKeyword={option.generateKeyword}
+							keyword={option.value}
+							keywordReadOnly={keywordReadOnly}
+							name={`option${index}`}
+							onBlur={handleBlur}
+							onChange={(event) =>
+								handleField('label', event.target.value)
+							}
+							onFocus={() => {
+								if (defaultOptionRef.current) {
+									handleField('label', '');
+									defaultOptionRef.current = false;
 								}
-								editingLanguageId={editingLanguageId}
-								errorMessage={Liferay.Language.get(
-									'this-reference-is-already-being-used'
-								)}
-								generateKeyword={option.generateKeyword}
-								keyword={option.value}
-								keywordReadOnly={keywordReadOnly}
-								name={`option${index}`}
-								onBlur={handleBlur}
-								onChange={(value) =>
-									handleField('label', value)
-								}
-								onClick={onClick}
-								onFocus={() => {
-									if (defaultOptionRef.current) {
-										handleField('label', '');
-										defaultOptionRef.current = false;
-									}
-								}}
-								onKeyDown={(event) => {
-									if (event.key === 'Tab') {
-										setTabPressed(true);
-									}
-									else {
-										setTabPressed(false);
-									}
-								}}
-								onKeywordBlur={handleBlur}
-								onKeywordChange={(value, generate) => {
-									handleField('generateKeyword', generate);
-									handleField('value', value);
-								}}
-								onReferenceBlur={handleBlur}
-								onReferenceChange={(value) =>
-									handleField('reference', value)
-								}
-								placeholder={placeholder}
-								readOnly={option.disabled}
-								reference={option.reference}
-								required={required}
-								showCloseButton={showCloseButton}
-								showKeyword={showKeyword}
-								showLabel={false}
-								value={option.label}
-								visible={visible}
-							/>
-						)
-					}
-				</Options>
-			</FieldBase>
-		</DndProvider>
-	);
-};
+							}}
+							onKeywordBlur={handleBlur}
+							onKeywordChange={(event, value, generate) => {
+								handleField('generateKeyword', generate);
+								handleField('value', value);
+							}}
+							onReferenceBlur={handleBlur}
+							onReferenceChange={(event) => {
+								handleField('reference', event.target.value);
+							}}
+							placeholder={placeholder}
+							readOnly={option.disabled}
+							reference={option.reference}
+							required={required}
+							showKeyword={showKeyword}
+							showLabel={false}
+							value={option.label}
+							visible={visible}
+						/>
+					)
+				}
+			</Options>
+		</FieldBase>
+	</DndProvider>
+);
 
 Main.displayName = 'Options';
 

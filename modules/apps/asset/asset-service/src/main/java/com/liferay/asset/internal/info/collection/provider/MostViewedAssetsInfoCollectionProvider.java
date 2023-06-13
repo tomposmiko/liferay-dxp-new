@@ -20,12 +20,9 @@ import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.pagination.InfoPage;
-import com.liferay.info.sort.Sort;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -36,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Pavel Savinov
  */
-@Component(service = InfoCollectionProvider.class)
+@Component(immediate = true, service = InfoCollectionProvider.class)
 public class MostViewedAssetsInfoCollectionProvider
 	extends BaseAssetsInfoCollectionProvider
 	implements InfoCollectionProvider<AssetEntry> {
@@ -45,13 +42,8 @@ public class MostViewedAssetsInfoCollectionProvider
 	public InfoPage<AssetEntry> getCollectionInfoPage(
 		CollectionQuery collectionQuery) {
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
 		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
-			serviceContext.getCompanyId(), serviceContext.getScopeGroupId(),
-			collectionQuery.getPagination(), new Sort("viewCount", true),
-			new Sort("title", true));
+			"viewCount", "DESC", collectionQuery.getPagination());
 
 		try {
 			return InfoPage.of(
@@ -69,7 +61,7 @@ public class MostViewedAssetsInfoCollectionProvider
 
 	@Override
 	public String getLabel(Locale locale) {
-		return _language.get(locale, "most-viewed-assets");
+		return LanguageUtil.get(locale, "most-viewed-assets");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -77,8 +69,5 @@ public class MostViewedAssetsInfoCollectionProvider
 
 	@Reference
 	private AssetEntryService _assetEntryService;
-
-	@Reference
-	private Language _language;
 
 }

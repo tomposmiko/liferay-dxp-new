@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.batch.BatchIndexingActionable;
-import com.liferay.portal.search.batch.BatchIndexingHelper;
 import com.liferay.portal.search.index.IndexStatusManager;
 import com.liferay.portal.search.index.UpdateDocumentIndexWriter;
 import com.liferay.portal.search.indexer.BaseModelRetriever;
@@ -43,6 +42,7 @@ import com.liferay.portal.search.spi.model.index.contributor.helper.IndexerWrite
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * @author Michael C. Han
@@ -53,7 +53,6 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 	public IndexerWriterImpl(
 		ModelSearchSettings modelSearchSettings,
 		BaseModelRetriever baseModelRetriever,
-		BatchIndexingHelper batchIndexingHelper,
 		ModelIndexerWriterContributor<T> modelIndexerWriterContributor,
 		IndexerDocumentBuilder indexerDocumentBuilder,
 		SearchPermissionIndexWriter searchPermissionIndexWriter,
@@ -63,7 +62,6 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 
 		_modelSearchSettings = modelSearchSettings;
 		_baseModelRetriever = baseModelRetriever;
-		_batchIndexingHelper = batchIndexingHelper;
 		_modelIndexerWriterContributor = modelIndexerWriterContributor;
 		_indexerDocumentBuilder = indexerDocumentBuilder;
 		_searchPermissionIndexWriter = searchPermissionIndexWriter;
@@ -81,7 +79,8 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 
 		try {
 			_indexWriterHelper.deleteDocument(
-				companyId, uid, _modelSearchSettings.isCommitImmediately());
+				_modelSearchSettings.getSearchEngineId(), companyId, uid,
+				_modelSearchSettings.isCommitImmediately());
 		}
 		catch (SearchException searchException) {
 			throw new RuntimeException(searchException);
@@ -99,8 +98,6 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 		String uid = _indexerDocumentBuilder.getDocumentUID(baseModel);
 
 		delete(companyId, uid);
-
-		_modelIndexerWriterContributor.modelDeleted(baseModel);
 	}
 
 	@Override
@@ -108,9 +105,8 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 		BatchIndexingActionable batchIndexingActionable =
 			_modelIndexerWriterContributor.getBatchIndexingActionable();
 
-		batchIndexingActionable.setInterval(
-			_batchIndexingHelper.getBulkSize(
-				_modelSearchSettings.getClassName()));
+		batchIndexingActionable.setSearchEngineId(
+			_modelSearchSettings.getSearchEngineId());
 
 		return batchIndexingActionable;
 	}
@@ -155,14 +151,11 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 			return;
 		}
 
-		BaseModel<?> baseModel = _baseModelRetriever.fetchBaseModel(
-			_modelSearchSettings.getClassName(), classPK);
+		Optional<BaseModel<?>> baseModelOptional =
+			_baseModelRetriever.fetchBaseModel(
+				_modelSearchSettings.getClassName(), classPK);
 
-		if (baseModel == null) {
-			return;
-		}
-
-		reindex((T)baseModel);
+		baseModelOptional.ifPresent(baseModel -> reindex((T)baseModel));
 	}
 
 	@Override
@@ -212,11 +205,6 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 
 	@Override
 	public void reindex(T baseModel) {
-		reindex(baseModel, true);
-	}
-
-	@Override
-	public void reindex(T baseModel, boolean notify) {
 		if (!isEnabled() || (baseModel == null)) {
 			return;
 		}
@@ -229,15 +217,12 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 			Document document = _indexerDocumentBuilder.getDocument(baseModel);
 
 			_updateDocumentIndexWriter.updateDocument(
+				_modelSearchSettings.getSearchEngineId(),
 				_modelIndexerWriterContributor.getCompanyId(baseModel),
-				document);
+				document, _modelSearchSettings.isCommitImmediately());
 		}
 		else if (indexerWriterMode == IndexerWriterMode.DELETE) {
-			long companyId = _modelIndexerWriterContributor.getCompanyId(
-				baseModel);
-			String uid = _indexerDocumentBuilder.getDocumentUID(baseModel);
-
-			delete(companyId, uid);
+			delete(baseModel);
 		}
 		else if (indexerWriterMode == IndexerWriterMode.SKIP) {
 			if (_log.isDebugEnabled()) {
@@ -245,9 +230,7 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 			}
 		}
 
-		if (notify) {
-			_modelIndexerWriterContributor.modelIndexed(baseModel);
-		}
+		_modelIndexerWriterContributor.modelIndexed(baseModel);
 	}
 
 	@Override
@@ -259,6 +242,7 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 	public void updatePermissionFields(T baseModel) {
 		_searchPermissionIndexWriter.updatePermissionFields(
 			baseModel, _modelIndexerWriterContributor.getCompanyId(baseModel),
+			_modelSearchSettings.getSearchEngineId(),
 			_modelSearchSettings.isCommitImmediately());
 	}
 
@@ -288,7 +272,6 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 		IndexerWriterImpl.class);
 
 	private final BaseModelRetriever _baseModelRetriever;
-	private final BatchIndexingHelper _batchIndexingHelper;
 	private final IndexerDocumentBuilder _indexerDocumentBuilder;
 	private Boolean _indexerEnabled;
 	private final IndexStatusManager _indexStatusManager;

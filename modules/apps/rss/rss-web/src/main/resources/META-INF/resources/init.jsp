@@ -41,16 +41,15 @@ page import="com.liferay.rss.web.internal.display.context.RSSDisplayContext" %><
 page import="com.liferay.rss.web.internal.util.RSSFeed" %><%@
 page import="com.liferay.rss.web.internal.util.RSSFeedEntry" %>
 
-<%@ page import="com.rometools.rome.feed.synd.SyndEntry" %><%@
-page import="com.rometools.rome.feed.synd.SyndFeed" %><%@
-page import="com.rometools.rome.feed.synd.SyndImage" %>
+<%@ page import="com.sun.syndication.feed.synd.SyndEntry" %><%@
+page import="com.sun.syndication.feed.synd.SyndFeed" %><%@
+page import="com.sun.syndication.feed.synd.SyndImage" %>
 
 <%@ page import="java.text.Format" %>
 
 <%@ page import="java.util.Enumeration" %><%@
 page import="java.util.List" %><%@
-page import="java.util.Map" %><%@
-page import="java.util.Objects" %>
+page import="java.util.Map" %>
 
 <%@ page import="javax.portlet.ValidatorException" %>
 

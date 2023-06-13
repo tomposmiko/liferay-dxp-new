@@ -14,7 +14,6 @@
 
 package com.liferay.object.model.impl;
 
-import com.liferay.object.entry.util.ObjectEntryValuesUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -25,8 +24,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.cache.CacheField;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.io.Serializable;
 
@@ -50,7 +49,8 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 
 	@Override
 	public String getModelClassName() {
-		return ObjectDefinition.class.getName() + "#" + getObjectDefinitionId();
+		return "com.liferay.object.model.ObjectDefinition#" +
+			getObjectDefinitionId();
 	}
 
 	@Override
@@ -85,13 +85,9 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 					objectDefinition.getTitleObjectFieldId());
 
 			if (objectField != null) {
-				return ObjectEntryValuesUtil.getValueString(
-					objectField,
-					HashMapBuilder.create(
-						getValues()
-					).putAll(
-						ObjectEntryLocalServiceUtil.getSystemValues(this)
-					).build());
+				Map<String, Serializable> values = getValues();
+
+				return String.valueOf(values.get(objectField.getName()));
 			}
 		}
 
@@ -109,7 +105,7 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 				_values = ObjectEntryLocalServiceUtil.getValues(this);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 
 				return new HashMap<>();
 			}
@@ -136,6 +132,8 @@ public class ObjectEntryImpl extends ObjectEntryBaseImpl {
 		ObjectEntryImpl.class);
 
 	private Map<String, Serializable> _transientValues;
+
+	@CacheField(propagateToInterface = true)
 	private Map<String, Serializable> _values;
 
 }

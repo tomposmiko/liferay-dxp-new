@@ -1,7 +1,6 @@
 @component-name = "portal-test-plugins"
 definition {
 
-	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property portlet.plugins.includes = "test-user-attributes-portlet";
@@ -12,16 +11,16 @@ definition {
 	}
 
 	tearDown {
-		PagesAdmin.tearDownCP();
+		Page.tearDownCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewUserAttributes {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		PagesAdmin.addPage(pageName = "Test User Attributes Page");
+		SitePages.addPublicPage(pageName = "Test User Attributes Page");
 
 		Navigator.gotoPage(pageName = "Test User Attributes Page");
 

@@ -27,14 +27,9 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Alejandro Tardín
  */
-@Component(service = DynamicInclude.class)
+@Component(immediate = true, service = DynamicInclude.class)
 public class CommentAnalyticsTopHeadJSPDynamicInclude
 	extends BaseJSPDynamicInclude {
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
-	}
 
 	@Override
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
@@ -52,10 +47,16 @@ public class CommentAnalyticsTopHeadJSPDynamicInclude
 		return _log;
 	}
 
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.comment.analytics)",
+		unbind = "-"
+	)
+	protected void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommentAnalyticsTopHeadJSPDynamicInclude.class);
-
-	@Reference(target = "(osgi.web.symbolicname=com.liferay.comment.analytics)")
-	private ServletContext _servletContext;
 
 }

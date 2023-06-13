@@ -190,11 +190,6 @@ public class CTSchemaVersionWrapper
 	}
 
 	@Override
-	public String toXmlString() {
-		return model.toXmlString();
-	}
-
-	@Override
 	protected CTSchemaVersionWrapper wrap(CTSchemaVersion ctSchemaVersion) {
 		return new CTSchemaVersionWrapper(ctSchemaVersion);
 	}

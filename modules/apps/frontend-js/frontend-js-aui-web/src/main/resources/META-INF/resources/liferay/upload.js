@@ -15,18 +15,18 @@
 AUI.add(
 	'liferay-upload',
 	(A) => {
-		const AArray = A.Array;
-		const Lang = A.Lang;
-		const UploaderQueue = A.Uploader.Queue;
+		var AArray = A.Array;
+		var Lang = A.Lang;
+		var UploaderQueue = A.Uploader.Queue;
 
-		const STATUS_CODE = Liferay.STATUS_CODE;
-		const STRINGS = 'strings';
+		var STATUS_CODE = Liferay.STATUS_CODE;
+		var STRINGS = 'strings';
 
-		const STR_PARAM_FALLBACK = 'uploader=fallback';
+		var STR_PARAM_FALLBACK = 'uploader=fallback';
 
-		const TPL_ERROR_MESSAGE = '<div class="alert alert-danger">{0}</div>';
+		var TPL_ERROR_MESSAGE = '<div class="alert alert-danger">{0}</div>';
 
-		const TPL_FILE_LIST = [
+		var TPL_FILE_LIST = [
 			'<tpl for=".">',
 			'<tpl if="!values.error">',
 			'<li class="upload-file {[ values.temp ? "upload-complete pending-file selectable" : "" ]} {[ values.selected ? "selected" : "" ]}" data-fileId="{id}" data-fileName="{[ LString.escapeHTML(values.name) ]}" data-title="{[ LString.escapeHTML(values.title ? values.title : values.name) ]}" id="{id}">',
@@ -54,12 +54,12 @@ AUI.add(
 			'</span>',
 			'</div>',
 			'<div class="autofit-col delete-button-col">',
-			'<a class="delete-button lfr-button" href="javascript:void(0);" id="{id}deleteButton" title="{[ this.strings.deleteFileText ]}">',
+			'<a class="delete-button lfr-button" href="javascript:;" id="{id}deleteButton" title="{[ this.strings.deleteFileText ]}">',
 			Liferay.Util.getLexiconIconTpl('times'),
 			'</a>',
 			'</div>',
 
-			'<a class="cancel-button lfr-button" href="javascript:void(0);" id="{id}cancelButton">',
+			'<a class="cancel-button lfr-button" href="javascript:;" id="{id}cancelButton">',
 			Liferay.Util.getLexiconIconTpl('times'),
 			'<span class="cancel-button-text">{[ this.strings.cancelFileText ]}</span>',
 			'</a>',
@@ -130,11 +130,11 @@ AUI.add(
 			'</tpl>',
 		];
 
-		const TPL_UPLOAD = [
+		var TPL_UPLOAD = [
 			'<div class="upload-target" id="{$ns}uploader">',
 			'<div class="drag-drop-area" id="{$ns}uploaderContent">',
 			'<tpl if="this.uploaderType == \'html5\'">',
-			'<span class="drop-file-text">{[ this.dropFileText ]}<span class="small">{[ this.strings.orText ]}</span></span>',
+			'<h4 class="drop-file-text">{[ this.dropFileText ]}<span class="or-text">{[ this.strings.orText ]}</span></h4>',
 			'</tpl>',
 
 			'<span class="select-files-container" id="{$ns}selectFilesButton">',
@@ -154,16 +154,19 @@ AUI.add(
 			'<strong class="lead">{[ this.strings.warningTitle ]}</strong>{[ this.strings.pendingFileText ]}',
 			'</div>',
 
-			'<div class="clearfix hide manage-upload-target" id="{$ns}manageUploadTarget">',
+			'<div class="hide manage-upload-target" id="{$ns}manageUploadTarget">',
 			'<tpl if="multipleFiles">',
-			'<div class="form-check select-files">',
-			'<input class="form-check-input select-all-files" id="{$ns}allRowIds" name="{$ns}allRowIds" type="checkbox" />',
-			'<label class="form-check-label" for="{$ns}allRowIds"> {[ this.strings.selectAllText ]}</label>',
-			'</div>',
+			'<span class="field field-choice select-files">',
+			'<span class="field-content">',
+			'<span class="field-element">',
+			'<input class="select-all-files" id="{$ns}allRowIds" name="{$ns}allRowIds" type="checkbox" />',
+			'</span>',
+			'</span>',
+			'</span>',
 			'</tpl>',
 
-			'<a class="cancel-uploads hide lfr-button" href="javascript:void(0);">{[ this.cancelUploadsText ]}</a>',
-			'<a class="clear-uploads hide lfr-button" href="javascript:void(0);">{[ this.strings.clearRecentUploadsText ]}</a>',
+			'<a class="cancel-uploads hide lfr-button" href="javascript:;">{[ this.cancelUploadsText ]}</a>',
+			'<a class="clear-uploads hide lfr-button" href="javascript:;">{[ this.strings.clearRecentUploadsText ]}</a>',
 			'</div>',
 
 			'<div class="upload-list" id="{$ns}fileList">',
@@ -171,7 +174,7 @@ AUI.add(
 			'</div>',
 		];
 
-		const UPLOADER_TYPE = A.Uploader.TYPE || 'none';
+		var UPLOADER_TYPE = A.Uploader.TYPE || 'none';
 
 		/**
 		 * OPTIONS
@@ -190,7 +193,7 @@ AUI.add(
 		 * namespace {string}: A unique string so that the global callback methods don't collide.
 		 */
 
-		const Upload = A.Component.create({
+		var Upload = A.Component.create({
 			ATTRS: {
 				deleteFile: {
 					value: '',
@@ -288,7 +291,6 @@ AUI.add(
 						pendingFileText: Liferay.Language.get(
 							'these-files-have-been-previously-uploaded-but-not-actually-saved.-please-save-or-delete-them-before-they-are-removed'
 						),
-						selectAllText: Liferay.Language.get('select-all'),
 						selectFileText: Liferay.Language.get('select-file'),
 						selectFilesText: Liferay.Language.get('select-files'),
 						unexpectedErrorOnDeleteText: Liferay.Language.get(
@@ -343,25 +345,25 @@ AUI.add(
 
 			prototype: {
 				_afterFilesSaved() {
-					const instance = this;
+					var instance = this;
 
 					instance._updateMetadataContainer();
 					instance._updateManageUploadDisplay();
 				},
 
 				_cancelAllFiles() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const uploader = instance._uploader;
+					var uploader = instance._uploader;
 
-					const queue = uploader.queue;
+					var queue = uploader.queue;
 
 					queue.pauseUpload();
 
 					queue.queuedFiles.forEach((item) => {
-						const li = A.one('#' + item.id);
+						var li = A.one('#' + item.id);
 
 						if (li && !li.hasClass('upload-complete')) {
 							li.remove(true);
@@ -378,7 +380,7 @@ AUI.add(
 
 					instance._filesTotal = 0;
 
-					const cancelText = instance.get('multipleFiles')
+					var cancelText = instance.get('multipleFiles')
 						? strings.cancelUploadsText
 						: strings.cancelFileText;
 
@@ -386,7 +388,7 @@ AUI.add(
 				},
 
 				_clearUploads() {
-					const instance = this;
+					var instance = this;
 
 					instance._fileListContent
 						.all('.file-saved,.upload-error')
@@ -398,39 +400,37 @@ AUI.add(
 				_filesTotal: 0,
 
 				_formatTempFiles(fileNames) {
-					const instance = this;
+					var instance = this;
 
 					if (Array.isArray(fileNames) && fileNames.length) {
-						const fileListContent = instance._fileListContent;
+						var fileListContent = instance._fileListContent;
 
 						instance._pendingFileInfo.show();
 						instance._manageUploadTarget.show();
 
-						const metadataExplanationContainer =
+						var metadataExplanationContainer =
 							instance._metadataExplanationContainer;
 
 						if (metadataExplanationContainer) {
 							metadataExplanationContainer.show();
 						}
 
-						const files = fileNames.map((item) => {
-							const title = item;
+						var files = fileNames.map((item) => {
+							var title = item;
 
-							let tempTitle = title;
+							var tempTitle = title;
 
-							const tempRandomSuffix = instance.get(
+							var tempRandomSuffix = instance.get(
 								'tempRandomSuffix'
 							);
 
 							if (tempRandomSuffix) {
-								const lastIndexOfPeriod = title.lastIndexOf(
-									'.'
-								);
-								const posTempRandomSuffix = title.indexOf(
+								var lastIndexOfPeriod = title.lastIndexOf('.');
+								var posTempRandomSuffix = title.indexOf(
 									tempRandomSuffix
 								);
 
-								if (posTempRandomSuffix !== -1) {
+								if (posTempRandomSuffix != -1) {
 									tempTitle = title.substr(
 										0,
 										posTempRandomSuffix
@@ -460,22 +460,22 @@ AUI.add(
 				},
 
 				_getValidFiles(data) {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const maxFileSize = instance.get('maxFileSize');
-					const maxUploadRequestSize =
+					var maxFileSize = instance.get('maxFileSize');
+					var maxUploadRequestSize =
 						Liferay.PropsValues
 							.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE;
 
 					return data.filter((item) => {
-						const id = item.get('id') || A.guid();
-						const name = item.get('name');
-						const size = item.get('size') || 0;
+						var id = item.get('id') || A.guid();
+						var name = item.get('name');
+						var size = item.get('size') || 0;
 
-						let error;
-						let file;
+						var error;
+						var file;
 
 						if (size === 0) {
 							error = strings.zeroByteSizeText;
@@ -511,10 +511,10 @@ AUI.add(
 				},
 
 				_handleDeleteResponse(json, li) {
-					const instance = this;
+					var instance = this;
 
 					if (!json.deleted) {
-						const errorHTML = instance._fileListTPL.parse([
+						var errorHTML = instance._fileListTPL.parse([
 							{
 								error: json.errorMessage,
 								id: li.attr('data-fileId'),
@@ -538,19 +538,19 @@ AUI.add(
 				},
 
 				_handleDrop(event) {
-					const instance = this;
+					var instance = this;
 
 					event.halt();
 
-					const uploaderBoundingBox = instance._uploaderBoundingBox;
+					var uploaderBoundingBox = instance._uploaderBoundingBox;
 
-					const target = event.target;
+					var target = event.target;
 
-					const uploader = instance._uploader;
+					var uploader = instance._uploader;
 
-					const dataTransfer = event._event.dataTransfer;
+					var dataTransfer = event._event.dataTransfer;
 
-					const dragDropFiles =
+					var dragDropFiles =
 						dataTransfer && AArray(dataTransfer.files);
 
 					if (
@@ -567,9 +567,9 @@ AUI.add(
 				},
 
 				_handleFileClick(event) {
-					const instance = this;
+					var instance = this;
 
-					const currentTarget = event.currentTarget;
+					var currentTarget = event.currentTarget;
 
 					if (currentTarget.hasClass('select-file')) {
 						instance._onSelectFileClick(currentTarget);
@@ -583,28 +583,27 @@ AUI.add(
 				},
 
 				_isUploading() {
-					const instance = this;
+					var instance = this;
 
-					const queue = instance._uploader.queue;
+					var queue = instance._uploader.queue;
 
 					return !!(
 						queue &&
-						(!!queue.queuedFiles.length ||
+						(queue.queuedFiles.length > 0 ||
 							queue.numberOfUploads > 0 ||
-							// eslint-disable-next-line @liferay/aui/no-object
 							!A.Object.isEmpty(queue.currentFiles)) &&
 						queue._currentState === UploaderQueue.UPLOADING
 					);
 				},
 
 				_markSelected(node) {
-					const fileItem = node.ancestor('.upload-file.selectable');
+					var fileItem = node.ancestor('.upload-file.selectable');
 
 					fileItem.toggleClass('selected');
 				},
 
 				_onAllRowIdsClick() {
-					const instance = this;
+					var instance = this;
 
 					Liferay.Util.checkAll(
 						instance._fileListSelector,
@@ -612,7 +611,7 @@ AUI.add(
 						instance._allRowIdsCheckboxSelector
 					);
 
-					const uploadedFiles = instance._fileListContent.all(
+					var uploadedFiles = instance._fileListContent.all(
 						'.upload-file.upload-complete'
 					);
 
@@ -625,11 +624,11 @@ AUI.add(
 				},
 
 				_onAllUploadsComplete() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const uploader = instance._uploader;
+					var uploader = instance._uploader;
 
 					instance._filesTotal = 0;
 
@@ -647,7 +646,7 @@ AUI.add(
 						);
 					}
 
-					let uploadsCompleteText;
+					var uploadsCompleteText;
 
 					if (
 						instance._fileListContent.one(
@@ -660,7 +659,7 @@ AUI.add(
 
 					instance._updateList(0, uploadsCompleteText);
 
-					const removeOnComplete = instance.get('removeOnComplete');
+					var removeOnComplete = instance.get('removeOnComplete');
 
 					if (removeOnComplete) {
 						instance._listInfo.one('h4').hide();
@@ -672,7 +671,7 @@ AUI.add(
 				},
 
 				_onBeforeUnload(event) {
-					const instance = this;
+					var instance = this;
 
 					if (instance._isUploading()) {
 						event.preventDefault();
@@ -680,21 +679,21 @@ AUI.add(
 				},
 
 				_onCancelFileClick(currentTarget) {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const uploader = instance._uploader;
+					var uploader = instance._uploader;
 
-					const queue = uploader.queue;
+					var queue = uploader.queue;
 
-					const li = currentTarget.ancestor('li');
+					var li = currentTarget.ancestor('li');
 
 					if (li) {
 						if (queue) {
-							const fileId = li.attr('data-fileId');
+							var fileId = li.attr('data-fileId');
 
-							const file =
+							var file =
 								queue.currentFiles[fileId] ||
 								AArray.find(queue.queuedFiles, (item) => {
 									return item.id === fileId;
@@ -707,7 +706,7 @@ AUI.add(
 							}
 
 							if (
-								!queue.queuedFiles.length &&
+								queue.queuedFiles.length === 0 &&
 								queue.numberOfUploads <= 0
 							) {
 								uploader.queue = null;
@@ -723,22 +722,22 @@ AUI.add(
 				},
 
 				_onDeleteFileClick(currentTarget) {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const li = currentTarget.ancestor('li');
+					var li = currentTarget.ancestor('li');
 
 					li.hide();
 
-					const failureResponse = {
+					var failureResponse = {
 						errorMessage: strings.unexpectedErrorOnDeleteText,
 					};
 
-					const deleteFile = instance.get('deleteFile');
+					var deleteFile = instance.get('deleteFile');
 
 					if (deleteFile) {
-						const data = {
+						var data = {
 							fileName: li.attr('data-fileName'),
 						};
 
@@ -767,16 +766,16 @@ AUI.add(
 				},
 
 				_onFileSelect(event) {
-					const instance = this;
+					var instance = this;
 
-					const fileList = event.fileList;
+					var fileList = event.fileList;
 
-					const validFiles = instance._getValidFiles(fileList);
+					var validFiles = instance._getValidFiles(fileList);
 
-					const validFilesLength = validFiles.length;
+					var validFilesLength = validFiles.length;
 
 					if (validFilesLength) {
-						const uploader = instance._uploader;
+						var uploader = instance._uploader;
 
 						uploader.set('fileList', validFiles);
 
@@ -785,7 +784,7 @@ AUI.add(
 						instance._cancelButton.show();
 
 						if (instance._isUploading()) {
-							const uploadQueue = uploader.queue;
+							var uploadQueue = uploader.queue;
 
 							validFiles.forEach(
 								uploadQueue.addToQueueBottom,
@@ -801,7 +800,7 @@ AUI.add(
 				},
 
 				_onSelectFileClick(currentTarget) {
-					const instance = this;
+					var instance = this;
 
 					if (instance.get('multipleFiles')) {
 						Liferay.Util.checkAllBox(
@@ -817,21 +816,21 @@ AUI.add(
 				},
 
 				_onUploadComplete(event) {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const file = event.file;
+					var file = event.file;
 
-					const fileId = file.id;
+					var fileId = file.id;
 
-					const li = A.one('#' + fileId);
+					var li = A.one('#' + fileId);
 
-					let data = event.data;
+					var data = event.data;
 
-					let input;
+					var input;
 
-					let newLiNode;
+					var newLiNode;
 
 					try {
 						data = JSON.parse(data);
@@ -918,7 +917,7 @@ AUI.add(
 						instance._updateMetadataContainer();
 					}
 
-					const removeOnComplete = instance.get('removeOnComplete');
+					var removeOnComplete = instance.get('removeOnComplete');
 
 					if (removeOnComplete) {
 						li.remove(true);
@@ -928,10 +927,10 @@ AUI.add(
 				},
 
 				_onUploadProgress(event) {
-					const progress = A.one('#' + event.file.id + 'progress');
+					var progress = A.one('#' + event.file.id + 'progress');
 
 					if (progress) {
-						const percentLoaded = Math.min(
+						var percentLoaded = Math.min(
 							Math.ceil(event.percentLoaded / 3) * 3,
 							100
 						);
@@ -942,21 +941,21 @@ AUI.add(
 				},
 
 				_onUploadStart(event) {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const uploader = instance._uploader;
+					var uploader = instance._uploader;
 
-					const queue = uploader.queue;
+					var queue = uploader.queue;
 
-					const filesQueued = queue ? queue.queuedFiles.length : 0;
+					var filesQueued = queue ? queue.queuedFiles.length : 0;
 
-					const filesTotal = instance._filesTotal;
+					var filesTotal = instance._filesTotal;
 
-					const position = filesTotal - filesQueued;
+					var position = filesTotal - filesQueued;
 
-					let currentListText;
+					var currentListText;
 
 					if (instance.get('multipleFiles')) {
 						currentListText = Lang.sub(
@@ -972,7 +971,7 @@ AUI.add(
 							.remove(true);
 					}
 
-					const fileIdSelector = '#' + event.file.id;
+					var fileIdSelector = '#' + event.file.id;
 
 					A.on(
 						'available',
@@ -988,7 +987,7 @@ AUI.add(
 				},
 
 				_queueFile(file) {
-					const instance = this;
+					var instance = this;
 
 					instance._fileListBuffer.push(file);
 
@@ -996,12 +995,12 @@ AUI.add(
 				},
 
 				_renderControls() {
-					const instance = this;
+					var instance = this;
 
-					const multipleFiles = instance.get('multipleFiles');
-					const strings = instance.get(STRINGS);
+					var multipleFiles = instance.get('multipleFiles');
+					var strings = instance.get(STRINGS);
 
-					const templateConfig = {
+					var templateConfig = {
 						$ns: instance.NS,
 						cancelUploadsText: multipleFiles
 							? strings.cancelUploadsText
@@ -1028,11 +1027,11 @@ AUI.add(
 						instance._fileListTPL.tpls = instance._fileListTPL.tpls.map(
 							(tpl) => {
 								if (tpl.tplFn) {
-									const tplBodyRegex = /function anonymous\(values,parent\s*\) \{\s*(.*)\s*\}/;
-									const tplFn = tpl.tplFn.toString();
+									var tplBodyRegex = /function anonymous\(values,parent\s*\) \{\s*(.*)\s*\}/;
+									var tplFn = tpl.tplFn.toString();
 
 									if (tplBodyRegex.test(tplFn)) {
-										const tplBody = tplBodyRegex
+										var tplBody = tplBodyRegex
 											.exec(tplFn)[1]
 											.replace(/values/g, 'parts');
 
@@ -1052,12 +1051,12 @@ AUI.add(
 						'selectUploadedFile'
 					);
 
-					const idNS = '#' + instance.NS;
+					var idNS = '#' + instance.NS;
 
 					instance._allRowIdsCheckboxSelector = idNS + 'allRowIds';
 					instance._fileListSelector = idNS + 'fileList';
 
-					const uploadFragment = new A.Template(
+					var uploadFragment = new A.Template(
 						TPL_UPLOAD,
 						templateConfig
 					).render({
@@ -1096,7 +1095,7 @@ AUI.add(
 						idNS + 'uploaderContent'
 					);
 
-					const tempFileURL = instance.get('tempFileURL');
+					var tempFileURL = instance.get('tempFileURL');
 
 					if (tempFileURL && instance.get('restoreState')) {
 						if (Lang.isString(tempFileURL)) {
@@ -1120,16 +1119,16 @@ AUI.add(
 				},
 
 				_renderFileList() {
-					const instance = this;
+					var instance = this;
 
-					const fileListBuffer = instance._fileListBuffer;
-					const fileListContent = instance._fileListContent;
+					var fileListBuffer = instance._fileListBuffer;
+					var fileListContent = instance._fileListContent;
 
-					const fileListHTML = instance._fileListTPL.parse(
+					var fileListHTML = instance._fileListTPL.parse(
 						fileListBuffer
 					);
 
-					const firstLi = fileListContent.one('li.upload-complete');
+					var firstLi = fileListContent.one('li.upload-complete');
 
 					if (firstLi) {
 						firstLi.placeBefore(fileListHTML);
@@ -1142,11 +1141,11 @@ AUI.add(
 				},
 
 				_renderUploader() {
-					const instance = this;
+					var instance = this;
 
-					const timestampParam = '_LFR_UPLOADER_TS=' + Date.now();
+					var timestampParam = '_LFR_UPLOADER_TS=' + Date.now();
 
-					const uploader = new A.Uploader({
+					var uploader = new A.Uploader({
 						boundingBox: instance._uploaderBoundingBox,
 						contentBox: instance._uploaderContentBox,
 						fileFieldName: 'file',
@@ -1172,17 +1171,17 @@ AUI.add(
 				},
 
 				_updateList(listLength, message) {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const infoTitle = instance._listInfo.one('h4');
+					var infoTitle = instance._listInfo.one('h4');
 
 					if (!instance.get('multipleFiles')) {
 						infoTitle.html('');
 					}
 					else if (infoTitle) {
-						const listText =
+						var listText =
 							message ||
 							Lang.sub(strings.xFilesReadyText, [listLength]);
 
@@ -1191,14 +1190,14 @@ AUI.add(
 				},
 
 				_updateManageUploadDisplay() {
-					const instance = this;
+					var instance = this;
 
-					const fileListContent = instance._fileListContent;
+					var fileListContent = instance._fileListContent;
 
-					const hasSavedFiles = !!fileListContent.one(
+					var hasSavedFiles = !!fileListContent.one(
 						'.file-saved,.upload-error'
 					);
-					const hasUploadedFiles = !!fileListContent.one(
+					var hasUploadedFiles = !!fileListContent.one(
 						'.upload-complete'
 					);
 
@@ -1216,37 +1215,37 @@ AUI.add(
 				},
 
 				_updateMetadataContainer() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const metadataContainer = instance._metadataContainer;
-					const metadataExplanationContainer =
+					var metadataContainer = instance._metadataContainer;
+					var metadataExplanationContainer =
 						instance._metadataExplanationContainer;
 
 					if (metadataContainer && metadataExplanationContainer) {
-						const totalFiles = instance._fileList.all(
+						var totalFiles = instance._fileList.all(
 							'li input[name=' +
 								instance._selectUploadedFileCheckboxId +
 								']'
 						);
 
-						const totalFilesCount = totalFiles.size();
+						var totalFilesCount = totalFiles.size();
 
-						const selectedFiles = totalFiles.filter(':checked');
+						var selectedFiles = totalFiles.filter(':checked');
 
-						const selectedFilesCount = selectedFiles.size();
+						var selectedFilesCount = selectedFiles.size();
 
-						const hasSelectedFiles = selectedFilesCount > 0;
+						var hasSelectedFiles = selectedFilesCount > 0;
 
 						if (metadataContainer) {
 							metadataContainer.toggle(hasSelectedFiles);
 
-							let selectedFilesText = strings.noFilesSelectedText;
+							var selectedFilesText = strings.noFilesSelectedText;
 
 							if (hasSelectedFiles) {
 								if (selectedFilesCount === 1) {
-									const titleNode = selectedFiles
+									var titleNode = selectedFiles
 										.item(0)
 										.ancestor('[data-title]');
 
@@ -1270,7 +1269,7 @@ AUI.add(
 								}
 							}
 
-							const selectedFilesCountContainer = metadataContainer.one(
+							var selectedFilesCountContainer = metadataContainer.one(
 								'.selected-files-count'
 							);
 
@@ -1295,9 +1294,9 @@ AUI.add(
 				},
 
 				_updatePendingInfoContainer() {
-					const instance = this;
+					var instance = this;
 
-					const totalFiles = instance._fileList.all(
+					var totalFiles = instance._fileList.all(
 						'li input[name=' +
 							instance._selectUploadedFileCheckboxId +
 							']'
@@ -1309,15 +1308,15 @@ AUI.add(
 				},
 
 				_updateWarningContainer() {
-					const instance = this;
+					var instance = this;
 
-					const totalFiles = instance._fileList.all(
+					var totalFiles = instance._fileList.all(
 						'li input[name=' +
 							instance._selectUploadedFileCheckboxId +
 							']'
 					);
 
-					const warningContainer = instance._fileList.one(
+					var warningContainer = instance._fileList.one(
 						'.upload-error'
 					);
 
@@ -1327,7 +1326,7 @@ AUI.add(
 				},
 
 				bindUI() {
-					const instance = this;
+					var instance = this;
 
 					if (instance._allRowIdsCheckbox) {
 						instance._allRowIdsCheckbox.on(
@@ -1367,7 +1366,7 @@ AUI.add(
 						instance
 					);
 
-					const uploader = instance._uploader;
+					var uploader = instance._uploader;
 
 					uploader.after(
 						'fileselect',
@@ -1396,25 +1395,25 @@ AUI.add(
 						instance
 					);
 
-					const rootElement = instance.get('rootElement');
+					var rootElement = instance.get('rootElement');
 
-					const docElement = rootElement
+					var docElement = rootElement
 						? rootElement
 						: A.getDoc().get('documentElement');
 
 					docElement.on('drop', instance._handleDrop, instance);
 
-					const uploaderBoundingBox = instance._uploaderBoundingBox;
+					var uploaderBoundingBox = instance._uploaderBoundingBox;
 
-					const removeCssClassTask = A.debounce(() => {
+					var removeCssClassTask = A.debounce(() => {
 						docElement.removeClass('upload-drop-intent');
 						docElement.removeClass('upload-drop-active');
 					}, 500);
 
 					docElement.on('dragover', (event) => {
-						const originalEvent = event._event;
+						var originalEvent = event._event;
 
-						const dataTransfer = originalEvent.dataTransfer;
+						var dataTransfer = originalEvent.dataTransfer;
 
 						if (
 							dataTransfer &&
@@ -1424,13 +1423,13 @@ AUI.add(
 
 							docElement.addClass('upload-drop-intent');
 
-							const target = event.target;
+							var target = event.target;
 
-							const inDropArea =
+							var inDropArea =
 								target.compareTo(uploaderBoundingBox) ||
 								uploaderBoundingBox.contains(target);
 
-							let dropEffect = 'none';
+							var dropEffect = 'none';
 
 							if (inDropArea) {
 								dropEffect = 'copy';
@@ -1449,20 +1448,20 @@ AUI.add(
 				},
 
 				initializer() {
-					const instance = this;
+					var instance = this;
 
-					const strings = instance.get(STRINGS);
+					var strings = instance.get(STRINGS);
 
-					const fallback = instance.get('fallback');
+					var fallback = instance.get('fallback');
 
-					const useFallback =
+					var useFallback =
 						location.hash.indexOf(STR_PARAM_FALLBACK) > -1 &&
 						fallback;
 
 					if (
 						useFallback ||
-						UPLOADER_TYPE === 'none' ||
-						UPLOADER_TYPE === 'flash'
+						UPLOADER_TYPE == 'none' ||
+						UPLOADER_TYPE == 'flash'
 					) {
 						if (fallback) {
 							fallback.show();
@@ -1485,11 +1484,11 @@ AUI.add(
 						);
 					}
 					else {
-						const maxFileSize = Liferay.Util.formatStorage(
+						var maxFileSize = Liferay.Util.formatStorage(
 							instance.get('maxFileSize')
 						);
 
-						const maxUploadRequestSize = Liferay.Util.formatStorage(
+						var maxUploadRequestSize = Liferay.Util.formatStorage(
 							Liferay.PropsValues
 								.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE
 						);
@@ -1522,7 +1521,7 @@ AUI.add(
 				},
 
 				renderUI() {
-					const instance = this;
+					var instance = this;
 
 					instance._renderControls();
 					instance._renderUploader();

@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.MethodKey;
  * </p>
  *
  * @author Igor Beslic
+ * @see BatchPlannerMappingServiceSoap
  * @generated
  */
 public class BatchPlannerMappingServiceHttp {
@@ -142,43 +143,6 @@ public class BatchPlannerMappingServiceHttp {
 		}
 	}
 
-	public static void deleteBatchPlannerMappings(
-			HttpPrincipal httpPrincipal, long batchPlannerPlanId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		try {
-			MethodKey methodKey = new MethodKey(
-				BatchPlannerMappingServiceUtil.class,
-				"deleteBatchPlannerMappings",
-				_deleteBatchPlannerMappingsParameterTypes2);
-
-			MethodHandler methodHandler = new MethodHandler(
-				methodKey, batchPlannerPlanId);
-
-			try {
-				TunnelUtil.invoke(httpPrincipal, methodHandler);
-			}
-			catch (Exception exception) {
-				if (exception instanceof
-						com.liferay.portal.kernel.exception.PortalException) {
-
-					throw (com.liferay.portal.kernel.exception.PortalException)
-						exception;
-				}
-
-				throw new com.liferay.portal.kernel.exception.SystemException(
-					exception);
-			}
-		}
-		catch (com.liferay.portal.kernel.exception.SystemException
-					systemException) {
-
-			_log.error(systemException, systemException);
-
-			throw systemException;
-		}
-	}
-
 	public static java.util.List
 		<com.liferay.batch.planner.model.BatchPlannerMapping>
 				getBatchPlannerMappings(
@@ -188,7 +152,7 @@ public class BatchPlannerMappingServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				BatchPlannerMappingServiceUtil.class, "getBatchPlannerMappings",
-				_getBatchPlannerMappingsParameterTypes3);
+				_getBatchPlannerMappingsParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, batchPlannerPlanId);
@@ -233,7 +197,7 @@ public class BatchPlannerMappingServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				BatchPlannerMappingServiceUtil.class,
 				"updateBatchPlannerMapping",
-				_updateBatchPlannerMappingParameterTypes4);
+				_updateBatchPlannerMappingParameterTypes3);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, batchPlannerMappingId, externalFieldName,
@@ -278,11 +242,9 @@ public class BatchPlannerMappingServiceHttp {
 		};
 	private static final Class<?>[] _deleteBatchPlannerMappingParameterTypes1 =
 		new Class[] {long.class, String.class, String.class};
-	private static final Class<?>[] _deleteBatchPlannerMappingsParameterTypes2 =
+	private static final Class<?>[] _getBatchPlannerMappingsParameterTypes2 =
 		new Class[] {long.class};
-	private static final Class<?>[] _getBatchPlannerMappingsParameterTypes3 =
-		new Class[] {long.class};
-	private static final Class<?>[] _updateBatchPlannerMappingParameterTypes4 =
+	private static final Class<?>[] _updateBatchPlannerMappingParameterTypes3 =
 		new Class[] {long.class, String.class, String.class, String.class};
 
 }

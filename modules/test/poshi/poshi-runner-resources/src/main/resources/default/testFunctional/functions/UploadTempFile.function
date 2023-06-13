@@ -1,18 +1,9 @@
-@default = "uploadTempFile"
-definition {
+<definition default="uploadTempFile">
+	<command name="uploadTempFile">
+		<execute selenium="waitForVisible" />
 
-	function uploadTempFile {
-		selenium.waitForVisible();
+		<execute selenium="mouseOver" />
 
-		selenium.mouseOver();
-
-		selenium.uploadTempFile();
-	}
-
-	function uploadTempFileHiddenNoMouseOver {
-		selenium.waitForElementPresent();
-
-		selenium.uploadTempFile();
-	}
-
-}
+		<execute selenium="uploadTempFile" />
+	</command>
+</definition>

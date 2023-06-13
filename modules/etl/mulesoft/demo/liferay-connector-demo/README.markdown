@@ -8,21 +8,20 @@ flows which demonstrate the basic usage of Liferay Connector.
 * Running Liferay instance with initialized Commerce site
 
 ## How to Run
-
 1. Import demo project into the Anypoint studio
 	* In Anypoint studio navigate to File > Import > Anypoint Studio >
 	Anypoint Studio project from File System
 	* For project root select **liferay-connector-demo** folder,
 	check **Copy project into workspace** checkbox and click **Finish**
 
-1. Run the application, make sure Liferay instance with Commerce Minium
+2. Run the application, make sure Liferay instance with Commerce Minium
 accelerator is running too
 
-1. Configure demo project, fill out
+3. Configure demo project, fill out
 ${app.home}/src/main/mule/automation-credentials.properties with parameters from
 your Liferay instance
 
-1. There are 8 flows you can trigger to observe basic functionality of the
+4. There are 8 flows you can trigger to observe basic functionality of the
 	Liferay connector
 
 	* batch-delete-flow: trigger with **curl 0.0.0.0:8081/batch-delete** to

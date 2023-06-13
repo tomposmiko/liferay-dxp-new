@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo García
  */
 @Component(
+	immediate = true,
 	property = {
 		"segments.entry.provider.order:Integer=200",
 		"segments.entry.provider.source=" + SegmentsEntryConstants.SOURCE_REFERRED
@@ -107,7 +108,7 @@ public class ReferredSegmentsEntryProvider
 				referredFilterString, segmentsEntryMap);
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 		}
 
 		return member;

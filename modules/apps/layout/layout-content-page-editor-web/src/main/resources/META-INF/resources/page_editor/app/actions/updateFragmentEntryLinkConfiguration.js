@@ -18,13 +18,11 @@ export default function updateFragmentEntryLinkConfiguration({
 	fragmentEntryLink,
 	fragmentEntryLinkId,
 	layoutData,
-	pageContents,
 }) {
 	return {
 		fragmentEntryLink,
 		fragmentEntryLinkId,
 		layoutData,
-		pageContents,
 		type: UPDATE_FRAGMENT_ENTRY_LINK_CONFIGURATION,
 	};
 }

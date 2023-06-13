@@ -31,13 +31,7 @@ export default function BulkUpdateDueDateModal() {
 		updateDueDate: {comment, dueDate},
 		visibleModal,
 	} = useContext(ModalContext);
-	const {clearFilters, fetchTasks} = useFetchTasks({
-		callback: ({items}) => {
-			setCurrentStep('selectDueDate');
-			setFetching(false);
-			setSelectTasks({selectAll, tasks: items});
-		},
-	});
+	const {clearFilters, fetchTasks} = useFetchTasks();
 	const [currentStep, setCurrentStep] = useState('selectTasks');
 	const [errorToast, setErrorToast] = useState(null);
 	const [fetching, setFetching] = useState(false);
@@ -75,58 +69,62 @@ export default function BulkUpdateDueDateModal() {
 	const {patchData} = usePatch({
 		admin: true,
 		body,
-		callback: () => {
-			setUpdating(false);
-
-			toaster.success(
-				tasks.length > 1
-					? Liferay.Language.get(
-							'the-due-dates-for-these-tasks-have-been-updated'
-					  )
-					: Liferay.Language.get(
-							'the-due-date-for-this-task-has-been-updated'
-					  )
-			);
-
-			onCloseModal(true);
-			setSelectedItems([]);
-			setSelectAll(false);
-		},
 		url: '/workflow-tasks/update-due-date',
 	});
 
 	const handleDone = useCallback(() => {
 		setUpdating(true);
 
-		patchData().catch((dataError) => {
-			const errorMessage = `${Liferay.Language.get(
-				'your-request-has-failed'
-			)} ${Liferay.Language.get('select-done-to-retry')}`;
+		patchData()
+			.then(() => {
+				setUpdating(false);
 
-			setErrorToast(dataError.title ?? errorMessage);
-			setUpdating(false);
-		});
+				toaster.success(
+					tasks.length > 1
+						? Liferay.Language.get(
+								'the-due-dates-for-these-tasks-have-been-updated'
+						  )
+						: Liferay.Language.get(
+								'the-due-date-for-this-task-has-been-updated'
+						  )
+				);
 
+				onCloseModal(true);
+				setSelectedItems([]);
+				setSelectAll(false);
+			})
+			.catch(({response}) => {
+				const errorMessage = `${Liferay.Language.get(
+					'your-request-has-failed'
+				)} ${Liferay.Language.get('select-done-to-retry')}`;
+
+				setErrorToast(response?.data.title ?? errorMessage);
+				setUpdating(false);
+			});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dueDate, tasks]);
+	}, [patchData, tasks]);
 
 	const handleNext = useCallback(() => {
 		if (selectAll) {
 			setFetching(true);
 
-			fetchTasks().catch(() => {
-				setErrorToast(
-					`${Liferay.Language.get('your-request-has-failed')}`
-				);
-				setFetching(false);
-			});
+			fetchTasks()
+				.then(({items}) => {
+					setCurrentStep('selectDueDate');
+					setFetching(false);
+					setSelectTasks({selectAll, tasks: items});
+				})
+				.catch(() => {
+					setErrorToast(
+						`${Liferay.Language.get('your-request-has-failed')}`
+					);
+					setFetching(false);
+				});
 		}
 		else {
 			setCurrentStep('selectDueDate');
 		}
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectAll]);
+	}, [fetchTasks, selectAll, setSelectTasks]);
 
 	const handlePrevious = useCallback(() => {
 		clearContext();
@@ -164,7 +162,7 @@ export default function BulkUpdateDueDateModal() {
 			},
 			component: SelectTasksStep,
 			nextBtn: {
-				disabled: !tasks.length || fetching,
+				disabled: tasks.length === 0 || fetching,
 				handle: handleNext,
 				text: Liferay.Language.get('next'),
 			},

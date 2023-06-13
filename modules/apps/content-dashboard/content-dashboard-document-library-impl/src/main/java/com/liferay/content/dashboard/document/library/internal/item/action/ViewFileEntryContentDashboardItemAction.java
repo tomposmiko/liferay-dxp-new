@@ -23,12 +23,13 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,12 +41,13 @@ public class ViewFileEntryContentDashboardItemAction
 
 	public ViewFileEntryContentDashboardItemAction(
 		AssetDisplayPageFriendlyURLProvider assetDisplayPageFriendlyURLProvider,
-		FileEntry fileEntry, HttpServletRequest httpServletRequest,
+		FileEntry fileEntry, Http http, HttpServletRequest httpServletRequest,
 		Language language) {
 
 		_assetDisplayPageFriendlyURLProvider =
 			assetDisplayPageFriendlyURLProvider;
 		_fileEntry = fileEntry;
+		_http = http;
 		_httpServletRequest = httpServletRequest;
 		_language = language;
 	}
@@ -95,28 +97,28 @@ public class ViewFileEntryContentDashboardItemAction
 
 			clonedThemeDisplay.setScopeGroupId(_fileEntry.getGroupId());
 
-			String friendlyURL =
+			return Optional.ofNullable(
 				_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
 					FileEntry.class.getName(), _fileEntry.getFileEntryId(),
-					locale, clonedThemeDisplay);
+					locale, clonedThemeDisplay)
+			).map(
+				url -> {
+					String backURL = ParamUtil.getString(
+						_httpServletRequest, "backURL");
 
-			if (friendlyURL == null) {
-				return StringPool.BLANK;
-			}
+					if (Validator.isNotNull(backURL)) {
+						return _http.setParameter(url, "p_l_back_url", backURL);
+					}
 
-			String backURL = ParamUtil.getString(
-				_httpServletRequest, "backURL");
-
-			if (Validator.isNotNull(backURL)) {
-				return HttpComponentsUtil.setParameter(
-					friendlyURL, "p_l_back_url", backURL);
-			}
-
-			return HttpComponentsUtil.setParameter(
-				friendlyURL, "p_l_back_url", themeDisplay.getURLCurrent());
+					return _http.setParameter(
+						url, "p_l_back_url", themeDisplay.getURLCurrent());
+				}
+			).orElse(
+				StringPool.BLANK
+			);
 		}
 		catch (CloneNotSupportedException | PortalException exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return StringPool.BLANK;
 		}
@@ -128,6 +130,7 @@ public class ViewFileEntryContentDashboardItemAction
 	private final AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
 	private final FileEntry _fileEntry;
+	private final Http _http;
 	private final HttpServletRequest _httpServletRequest;
 	private final Language _language;
 

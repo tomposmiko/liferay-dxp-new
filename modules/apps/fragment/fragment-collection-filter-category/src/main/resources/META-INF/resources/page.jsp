@@ -16,18 +16,21 @@
 
 <%@ include file="/init.jsp" %>
 
-<div class="form-group form-group-sm">
-	<label class="control-label <%= fragmentCollectionFilterCategoryDisplayContext.isShowLabel() ? "" : "sr-only" %>">
-		<%= fragmentCollectionFilterCategoryDisplayContext.getLabel() %>
-	</label>
+<p class="font-weight-semi-bold mb-1 <%= fragmentCollectionFilterCategoryDisplayContext.isShowLabel() ? "" : "sr-only" %>">
+	<%= fragmentCollectionFilterCategoryDisplayContext.getLabel() %>
+</p>
 
-	<div>
-		<button
-		class="dropdown-toggle form-control form-control-select form-control-sm text-left w-100" disabled="disabled"><liferay-ui:message key="select" /></button
-	>
-		<react:component
-			module="js/SelectCategory.es"
-			props="<%= fragmentCollectionFilterCategoryDisplayContext.getProps() %>"
-		/>
-	</div>
+<div>
+	<clay:button
+		cssClass="bg-light dropdown-toggle font-weight-normal form-control-select form-control-sm text-left w-100"
+		disabled="<%= true %>"
+		displayType="secondary"
+		label='<%= LanguageUtil.get(request, "select") %>'
+		small="<%= true %>"
+	/>
+
+	<react:component
+		module="js/SelectCategory.es"
+		props="<%= fragmentCollectionFilterCategoryDisplayContext.getProps() %>"
+	/>
 </div>

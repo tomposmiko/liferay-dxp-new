@@ -15,14 +15,14 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import ClayModal, {useModal} from '@clayui/modal';
-import {ClayTooltipProvider} from '@clayui/tooltip';
 import WorkflowInstanceTracker from '@liferay/portal-workflow-instance-tracker-web/js/components/WorkflowInstanceTracker';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 
 import ContentView from '../../../../shared/components/content-view/ContentView.es';
 import RetryButton from '../../../../shared/components/list/RetryButton.es';
 import {remainingTimeFormat} from '../../../../shared/util/duration.es';
 import moment from '../../../../shared/util/moment.es';
+import {AppContext} from '../../../AppContext.es';
 
 function Body({
 	assetTitle,
@@ -37,6 +37,7 @@ function Body({
 	slaResults = [],
 	taskNames = [],
 }) {
+	const {workflowInstanceTrackerEnabled} = useContext(AppContext);
 	const SLAs = {notStarted: [], open: [], resolved: []};
 
 	slaResults.forEach((result) => {
@@ -90,7 +91,7 @@ function Body({
 						{Liferay.Language.get('due-date-by-sla')}
 					</Body.SectionTitle>
 
-					{!slaResults.length && (
+					{slaResults.length === 0 && (
 						<p>
 							<span className="font-weight-medium text-muted">
 								{Liferay.Language.get(
@@ -100,7 +101,7 @@ function Body({
 						</p>
 					)}
 
-					{!!SLAs.open.length && (
+					{SLAs.open.length > 0 && (
 						<Body.SectionSubTitle>
 							{`${Liferay.Language.get('open').toUpperCase()} (${
 								SLAs.open.length
@@ -112,7 +113,7 @@ function Body({
 						<Body.SLAResultItem key={item.id} {...item} />
 					))}
 
-					{!!SLAs.resolved.length && (
+					{SLAs.resolved.length > 0 && (
 						<Body.SectionSubTitle>
 							{`${Liferay.Language.get(
 								'resolved'
@@ -124,7 +125,7 @@ function Body({
 						<Body.SLAResultItem key={item.id} {...item} />
 					))}
 
-					{!!SLAs.notStarted.length && (
+					{SLAs.notStarted.length > 0 && (
 						<Body.SectionSubTitle>
 							{`${Liferay.Language.get(
 								'not-started'
@@ -148,22 +149,18 @@ function Body({
 									? Liferay.Language.get('completed')
 									: Liferay.Language.get('pending')}
 
-								<ClayTooltipProvider>
+								{workflowInstanceTrackerEnabled && (
 									<ClayLink
-										className="ml-1 tracker-tooltip"
-										data-tooltip-align="top"
+										className="ml-1"
 										onClick={() =>
 											setShowInstanceTrackerModal(true)
 										}
-										title={Liferay.Language.get(
-											'click-and-see'
-										)}
 									>
 										(
 										{Liferay.Language.get('track-workflow')}
 										)
 									</ClayLink>
-								</ClayTooltipProvider>
+								)}
 							</>
 						}
 					/>
@@ -213,7 +210,9 @@ function Body({
 							description={Liferay.Language.get(
 								'current-assignee'
 							)}
-							detail={assignees[0].name}
+							detail={assignees
+								.map((user) => user.name)
+								.join(', ')}
 						/>
 					)}
 
@@ -339,7 +338,7 @@ function SLAResultItem({dateOverdue, name, onTime, remainingTime, status}) {
 			</span>
 
 			<span className="font-weight-medium small text-secondary">
-				{`${name}` + ' '}
+				{`${name}`}{' '}
 			</span>
 
 			<span className="small">{getStatusText(status)}</span>

@@ -27,10 +27,13 @@ import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionResource;
 import com.liferay.data.engine.rest.resource.v2_0.DataLayoutResource;
 import com.liferay.data.engine.rest.resource.v2_0.DataRecordResource;
 import com.liferay.data.engine.taglib.servlet.taglib.definition.DataLayoutBuilderDefinition;
+import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormBuilderContextFactory;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
-import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesRegistry;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
+import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializerDeserializeRequest;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializerDeserializeResponse;
@@ -40,9 +43,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
-import com.liferay.dynamic.data.mapping.model.DDMFormLayoutColumn;
-import com.liferay.dynamic.data.mapping.model.DDMFormLayoutPage;
-import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -57,19 +57,17 @@ import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.dynamic.data.mapping.util.DDMFormLayoutFactory;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.petra.function.UnsafeConsumer;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -82,13 +80,17 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -105,7 +107,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Gabriel Albuquerque
  * @author Leonardo Barros
  */
-@Component(service = {})
+@Component(immediate = true, service = DataLayoutTaglibUtil.class)
 public class DataLayoutTaglibUtil {
 
 	public static Set<Locale> getAvailableLocales(
@@ -148,7 +150,12 @@ public class DataLayoutTaglibUtil {
 		String contentType, Locale locale) {
 
 		DataLayoutBuilderDefinition dataLayoutBuilderDefinition =
-			_getDataLayoutBuilderDefinition(contentType);
+			_dataLayoutBuilderDefinitions.get(contentType);
+
+		if (dataLayoutBuilderDefinition == null) {
+			dataLayoutBuilderDefinition = _dataLayoutBuilderDefinitions.get(
+				"default");
+		}
 
 		JSONObject dataLayoutConfigJSONObject = JSONUtil.put(
 			"allowFieldSets", dataLayoutBuilderDefinition.allowFieldSets()
@@ -191,7 +198,7 @@ public class DataLayoutTaglibUtil {
 					));
 			}
 			catch (JSONException jsonException) {
-				_log.error(jsonException);
+				_log.error(jsonException, jsonException);
 			}
 		}
 
@@ -203,12 +210,12 @@ public class DataLayoutTaglibUtil {
 	}
 
 	public static JSONObject getDataLayoutJSONObject(
-		Set<Locale> availableLocales, String contentType, Long dataDefinitionId,
-		Long dataLayoutId, HttpServletRequest httpServletRequest,
+		Set<Locale> availableLocales, Long dataDefinitionId, Long dataLayoutId,
+		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
 		return _dataLayoutTaglibUtil._getDataLayoutJSONObject(
-			availableLocales, contentType, dataDefinitionId, dataLayoutId,
+			availableLocales, dataDefinitionId, dataLayoutId,
 			httpServletRequest, httpServletResponse);
 	}
 
@@ -331,19 +338,6 @@ public class DataLayoutTaglibUtil {
 		_dataLayoutBuilderDefinitions.remove(contentType);
 	}
 
-	private static DataLayoutBuilderDefinition _getDataLayoutBuilderDefinition(
-		String contentType) {
-
-		DataLayoutBuilderDefinition dataLayoutBuilderDefinition =
-			_dataLayoutBuilderDefinitions.get(contentType);
-
-		if (dataLayoutBuilderDefinition == null) {
-			return _dataLayoutBuilderDefinitions.get("default");
-		}
-
-		return dataLayoutBuilderDefinition;
-	}
-
 	private Set<Locale> _getAvailableLocales(
 		Long dataDefinitionId, Long dataLayoutId,
 		HttpServletRequest httpServletRequest) {
@@ -351,12 +345,11 @@ public class DataLayoutTaglibUtil {
 		if (Validator.isNull(dataDefinitionId) &&
 			Validator.isNull(dataLayoutId)) {
 
-			return SetUtil.fromArray(LocaleThreadLocal.getSiteDefaultLocale());
+			return SetUtil.fromArray(
+				new Locale[] {LocaleThreadLocal.getSiteDefaultLocale()});
 		}
 
 		try {
-			Set<Locale> availableLocales = new HashSet<>();
-
 			DataDefinition dataDefinition = null;
 
 			if (Validator.isNotNull(dataDefinitionId)) {
@@ -371,19 +364,22 @@ public class DataLayoutTaglibUtil {
 					dataLayout.getDataDefinitionId(), httpServletRequest);
 			}
 
-			for (String languageId : dataDefinition.getAvailableLanguageIds()) {
-				availableLocales.add(LocaleUtil.fromLanguageId(languageId));
-			}
-
-			return availableLocales;
+			return Stream.of(
+				dataDefinition.getAvailableLanguageIds()
+			).map(
+				LocaleUtil::fromLanguageId
+			).collect(
+				Collectors.toSet()
+			);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 
-		return SetUtil.fromArray(LocaleThreadLocal.getSiteDefaultLocale());
+		return SetUtil.fromArray(
+			new Locale[] {LocaleThreadLocal.getSiteDefaultLocale()});
 	}
 
 	private DataDefinition _getDataDefinition(
@@ -421,8 +417,8 @@ public class DataLayoutTaglibUtil {
 	}
 
 	private JSONObject _getDataLayoutJSONObject(
-		Set<Locale> availableLocales, String contentType, Long dataDefinitionId,
-		Long dataLayoutId, HttpServletRequest httpServletRequest,
+		Set<Locale> availableLocales, Long dataDefinitionId, Long dataLayoutId,
+		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
 		try {
@@ -432,9 +428,8 @@ public class DataLayoutTaglibUtil {
 			if (Validator.isNotNull(dataLayoutString)) {
 				DataLayoutDDMFormAdapter dataLayoutDDMFormAdapter =
 					new DataLayoutDDMFormAdapter(
-						availableLocales, contentType,
-						DataLayout.toDTO(dataLayoutString), httpServletRequest,
-						httpServletResponse);
+						availableLocales, DataLayout.toDTO(dataLayoutString),
+						httpServletRequest, httpServletResponse);
 
 				return dataLayoutDDMFormAdapter.toJSONObject();
 			}
@@ -453,14 +448,14 @@ public class DataLayoutTaglibUtil {
 
 			DataLayoutDDMFormAdapter dataLayoutDDMFormAdapter =
 				new DataLayoutDDMFormAdapter(
-					availableLocales, contentType, dataLayout,
-					httpServletRequest, httpServletResponse);
+					availableLocales, dataLayout, httpServletRequest,
+					httpServletResponse);
 
 			return dataLayoutDDMFormAdapter.toJSONObject();
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return _jsonFactory.createJSONObject();
@@ -544,11 +539,16 @@ public class DataLayoutTaglibUtil {
 			}
 
 			for (JSONObject jsonObject : (Iterable<JSONObject>)jsonArray) {
-				if (ListUtil.exists(
-						Arrays.asList(
-							StringUtil.split(jsonObject.getString("scope"))),
-						scopes::contains)) {
+				String[] fieldTypeScopes = StringUtil.split(
+					jsonObject.getString("scope"));
 
+				boolean anyMatch = Stream.of(
+					fieldTypeScopes
+				).anyMatch(
+					scope -> scopes.contains(scope)
+				);
+
+				if (anyMatch) {
 					fieldTypesJSONArray.put(jsonObject);
 
 					if (searchableFieldsDisabled) {
@@ -562,7 +562,7 @@ public class DataLayoutTaglibUtil {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return fieldTypesJSONArray;
@@ -572,7 +572,7 @@ public class DataLayoutTaglibUtil {
 	private JSONObject _getFunctionsMetadataJSONObject(Locale locale)
 		throws JSONException {
 
-		return _jsonFactory.createJSONObject(
+		return JSONFactoryUtil.createJSONObject(
 			_ddmFormBuilderSettingsRetrieverHelper.
 				getSerializedDDMExpressionFunctionsMetadata(locale));
 	}
@@ -583,28 +583,29 @@ public class DataLayoutTaglibUtil {
 
 	private boolean _hasJavascriptModule(String name) {
 		DDMFormFieldType ddmFormFieldType =
-			_ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(name);
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name);
 
 		return Validator.isNotNull(ddmFormFieldType.getModuleName());
 	}
 
 	private String _resolveFieldTypeModule(String name) {
 		return _resolveModuleName(
-			_ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(name));
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name));
 	}
 
 	private String _resolveFieldTypesModules() {
-		return StringUtil.merge(
-			TransformUtil.transform(
-				_ddmFormFieldTypeServicesRegistry.getDDMFormFieldTypeNames(),
-				name -> {
-					if (!_dataLayoutTaglibUtil._hasJavascriptModule(name)) {
-						return null;
-					}
+		Set<String> ddmFormFieldTypeNames =
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeNames();
 
-					return _dataLayoutTaglibUtil._resolveFieldTypeModule(name);
-				}),
-			StringPool.COMMA);
+		Stream<String> stream = ddmFormFieldTypeNames.stream();
+
+		return stream.filter(
+			_dataLayoutTaglibUtil::_hasJavascriptModule
+		).map(
+			_dataLayoutTaglibUtil::_resolveFieldTypeModule
+		).collect(
+			Collectors.joining(StringPool.COMMA)
+		);
 	}
 
 	private String _resolveModuleName(DDMFormFieldType ddmFormFieldType) {
@@ -620,32 +621,39 @@ public class DataLayoutTaglibUtil {
 	}
 
 	private void _setFieldIndexTypeNone(JSONObject jsonObject) {
-		for (JSONObject pageJSONObject :
-				(Iterable<JSONObject>)jsonObject.getJSONArray("pages")) {
+		_stream(
+			"rows",
+			rowJSONObject -> _stream(
+				"fields", null, _stream(rowJSONObject.getJSONArray("columns"))),
+			_stream(jsonObject.getJSONArray("pages"))
+		).filter(
+			fieldJSONObject -> Objects.equals(
+				fieldJSONObject.getString("fieldName"), "indexType")
+		).findFirst(
+		).ifPresent(
+			fieldJSONObject -> fieldJSONObject.put("value", "none")
+		);
+	}
 
-			for (JSONObject rowJSONObject :
-					(Iterable<JSONObject>)pageJSONObject.getJSONArray("rows")) {
+	private Stream<JSONObject> _stream(JSONArray jsonArray) {
+		return StreamSupport.stream(jsonArray.spliterator(), true);
+	}
 
-				for (JSONObject columnJSONObject :
-						(Iterable<JSONObject>)rowJSONObject.getJSONArray(
-							"columns")) {
+	private Stream<JSONObject> _stream(
+		String key, Function<JSONObject, Stream<JSONObject>> function,
+		Stream<JSONObject> stream) {
 
-					for (JSONObject fieldJSONObject :
-							(Iterable<JSONObject>)columnJSONObject.getJSONArray(
-								"fields")) {
+		return stream.flatMap(
+			jsonObject -> {
+				Stream<JSONObject> nestedStream = _stream(
+					jsonObject.getJSONArray(key));
 
-						if (Objects.equals(
-								fieldJSONObject.getString("fieldName"),
-								"indexType")) {
-
-							fieldJSONObject.put("value", "none");
-
-							return;
-						}
-					}
+				if (function == null) {
+					return nestedStream;
 				}
-			}
-		}
+
+				return nestedStream.flatMap(function);
+			});
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -670,14 +678,20 @@ public class DataLayoutTaglibUtil {
 	private DataRecordResource.Factory _dataRecordResourceFactory;
 
 	@Reference
+	private DDMFormBuilderContextFactory _ddmFormBuilderContextFactory;
+
+	@Reference
 	private DDMFormBuilderSettingsRetrieverHelper
 		_ddmFormBuilderSettingsRetrieverHelper;
 
 	@Reference
-	private DDMFormFieldTypeServicesRegistry _ddmFormFieldTypeServicesRegistry;
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	private DDMFormTemplateContextFactory _ddmFormTemplateContextFactory;
+
+	@Reference
+	private DDMFormValuesFactory _ddmFormValuesFactory;
 
 	@Reference
 	private DDMStructureLayoutLocalService _ddmStructureLayoutLocalService;
@@ -685,14 +699,14 @@ public class DataLayoutTaglibUtil {
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
 
+	@Reference(target = "(ddm.form.deserializer.type=json)")
+	private DDMFormDeserializer _jsonDDMFormDeserializer;
+
 	@Reference(target = "(ddm.form.layout.deserializer.type=json)")
 	private DDMFormLayoutDeserializer _jsonDDMFormLayoutDeserializer;
 
 	@Reference
 	private JSONFactory _jsonFactory;
-
-	@Reference
-	private Language _language;
 
 	@Reference
 	private NPMResolver _npmResolver;
@@ -703,12 +717,11 @@ public class DataLayoutTaglibUtil {
 	private class DataLayoutDDMFormAdapter {
 
 		public DataLayoutDDMFormAdapter(
-			Set<Locale> availableLocales, String contentType,
-			DataLayout dataLayout, HttpServletRequest httpServletRequest,
+			Set<Locale> availableLocales, DataLayout dataLayout,
+			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse) {
 
 			_availableLocales = availableLocales;
-			_contentType = contentType;
 			_dataLayout = dataLayout;
 			_httpServletRequest = httpServletRequest;
 			_httpServletResponse = httpServletResponse;
@@ -722,7 +735,7 @@ public class DataLayoutTaglibUtil {
 					_httpServletRequest.getParameter("dataDefinition"));
 
 				ddmForm = DataDefinitionDDMFormUtil.toDDMForm(
-					dataDefinition, _ddmFormFieldTypeServicesRegistry);
+					dataDefinition, _ddmFormFieldTypeServicesTracker);
 			}
 			else {
 				ddmForm = _getDDMForm();
@@ -757,19 +770,16 @@ public class DataLayoutTaglibUtil {
 			throws Exception {
 
 			DDMFormFieldType ddmFormFieldType =
-				_ddmFormFieldTypeServicesRegistry.getDDMFormFieldType(
+				_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(
 					ddmFormField.getType());
 
 			DDMForm ddmForm = DDMFormFactory.create(
 				ddmFormFieldType.getDDMFormFieldTypeSettings());
 
-			DDMFormLayout ddmFormLayout = DDMFormLayoutFactory.create(
-				ddmFormFieldType.getDDMFormFieldTypeSettings());
-
-			_removeDisabledProperties(ddmForm, ddmFormLayout);
-
 			return _ddmFormTemplateContextFactory.create(
-				ddmForm, ddmFormLayout,
+				ddmForm,
+				DDMFormLayoutFactory.create(
+					ddmFormFieldType.getDDMFormFieldTypeSettings()),
 				new DDMFormRenderingContext() {
 					{
 						setContainerId("settings");
@@ -861,12 +871,13 @@ public class DataLayoutTaglibUtil {
 			if (Objects.equals(
 					ddmFormFieldTypeSetting.getDataType(), "ddm-options")) {
 
-				if (propertyValue == null) {
-					propertyValue = new DDMFormFieldOptions();
-				}
-
 				return _createDDMFormFieldValue(
-					availableLocales, (DDMFormFieldOptions)propertyValue);
+					availableLocales,
+					Optional.ofNullable(
+						(DDMFormFieldOptions)propertyValue
+					).orElse(
+						new DDMFormFieldOptions()
+					));
 			}
 
 			if (Objects.equals(
@@ -984,16 +995,17 @@ public class DataLayoutTaglibUtil {
 				StringUtil.replace(
 					dataDefinitionJSON, "defaultValue", "predefinedValue"));
 
-			ddmStructure.setDefinition(
-				jsonObject.put(
-					"availableLanguageIds",
-					JSONUtil.toJSONArray(
-						_availableLocales,
-						availableLocale -> _language.getLanguageId(
-							availableLocale))
-				).put(
-					"defaultLanguageId", ddmStructure.getDefaultLanguageId()
-				).toString());
+			jsonObject = jsonObject.put(
+				"availableLanguageIds",
+				JSONUtil.toJSONArray(
+					_availableLocales,
+					availableLocale -> LanguageUtil.getLanguageId(
+						availableLocale))
+			).put(
+				"defaultLanguageId", ddmStructure.getDefaultLanguageId()
+			);
+
+			ddmStructure.setDefinition(jsonObject.toJSONString());
 
 			return ddmStructure.getDDMForm();
 		}
@@ -1021,28 +1033,37 @@ public class DataLayoutTaglibUtil {
 					},
 					new String[] {"size", "columns", "pages", "rows"}));
 
-			return _deserializeDDMFormLayout(jsonObject.toString());
+			return _deserializeDDMFormLayout(jsonObject.toJSONString());
 		}
 
 		private List<Map<String, Object>> _getNestedFields(
 			Map<String, Object> field) {
 
-			List<Map<String, Object>> nestedFields = new ArrayList<>();
-
-			List<Map<String, Object>> fieldNestedFields =
+			List<Map<String, Object>> nestedFields =
 				(List<Map<String, Object>>)field.get("nestedFields");
 
-			if (fieldNestedFields == null) {
-				return nestedFields;
+			if (nestedFields != null) {
+				Stream<Map<String, Object>> stream = nestedFields.stream();
+
+				return stream.flatMap(
+					this::_getNestedFieldsStream
+				).collect(
+					Collectors.toList()
+				);
 			}
 
-			for (Map<String, Object> nestedField : fieldNestedFields) {
-				nestedFields.add(nestedField);
+			return new ArrayList<>();
+		}
 
-				nestedFields.addAll(_getNestedFields(nestedField));
-			}
+		private Stream<Map<String, Object>> _getNestedFieldsStream(
+			Map<String, Object> field) {
 
-			return nestedFields;
+			List<Map<String, Object>> nestedFieldsList = new ArrayList<>(
+				Arrays.asList(field));
+
+			nestedFieldsList.addAll(_getNestedFields(field));
+
+			return nestedFieldsList.stream();
 		}
 
 		private boolean _isFieldSet(Map<String, Object> field) {
@@ -1106,48 +1127,7 @@ public class DataLayoutTaglibUtil {
 			}
 		}
 
-		private void _removeDisabledProperties(
-			DDMForm ddmForm, DDMFormLayout ddmFormLayout) {
-
-			DataLayoutBuilderDefinition dataLayoutBuilderDefinition =
-				_getDataLayoutBuilderDefinition(_contentType);
-
-			String[] disabledProperties =
-				dataLayoutBuilderDefinition.getDisabledProperties();
-
-			if (ArrayUtil.isEmpty(disabledProperties)) {
-				return;
-			}
-
-			for (String disabledProperty : disabledProperties) {
-				Map<String, DDMFormField> ddmFormFieldsMap =
-					ddmForm.getDDMFormFieldsMap(true);
-
-				List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
-
-				ddmFormFields.remove(ddmFormFieldsMap.get(disabledProperty));
-
-				for (DDMFormLayoutPage ddmFormLayoutPage :
-						ddmFormLayout.getDDMFormLayoutPages()) {
-
-					for (DDMFormLayoutRow ddmFormLayoutRow :
-							ddmFormLayoutPage.getDDMFormLayoutRows()) {
-
-						for (DDMFormLayoutColumn ddmFormLayoutColumn :
-								ddmFormLayoutRow.getDDMFormLayoutColumns()) {
-
-							List<String> ddmFormFieldNames =
-								ddmFormLayoutColumn.getDDMFormFieldNames();
-
-							ddmFormFieldNames.remove(disabledProperty);
-						}
-					}
-				}
-			}
-		}
-
 		private final Set<Locale> _availableLocales;
-		private final String _contentType;
 		private final DataLayout _dataLayout;
 		private final HttpServletRequest _httpServletRequest;
 		private final HttpServletResponse _httpServletResponse;

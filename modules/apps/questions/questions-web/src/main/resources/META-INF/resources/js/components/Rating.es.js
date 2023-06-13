@@ -23,13 +23,13 @@ import {
 } from '../utils/client.es';
 import {normalize, normalizeRating} from '../utils/utils.es';
 
-export default function Rating({
+export default ({
 	aggregateRating,
 	disabled = false,
 	entityId,
 	myRating,
 	type,
-}) {
+}) => {
 	const [userRating, setUserRating] = useState(0);
 	const [rating, setRating] = useState(0);
 
@@ -98,4 +98,4 @@ export default function Rating({
 			</ClayButton>
 		</div>
 	);
-}
+};

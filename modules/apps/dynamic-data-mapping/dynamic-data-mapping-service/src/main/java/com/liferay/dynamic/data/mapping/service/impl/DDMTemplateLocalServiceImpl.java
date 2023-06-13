@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.service.impl;
 
 import com.liferay.depot.group.provider.SiteConnectedGroupGroupProvider;
+import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.dynamic.data.mapping.configuration.DDMGroupServiceConfiguration;
 import com.liferay.dynamic.data.mapping.configuration.DDMWebConfiguration;
 import com.liferay.dynamic.data.mapping.constants.DDMConstants;
@@ -29,7 +30,7 @@ import com.liferay.dynamic.data.mapping.exception.TemplateScriptException;
 import com.liferay.dynamic.data.mapping.exception.TemplateSmallImageContentException;
 import com.liferay.dynamic.data.mapping.exception.TemplateSmallImageNameException;
 import com.liferay.dynamic.data.mapping.exception.TemplateSmallImageSizeException;
-import com.liferay.dynamic.data.mapping.internal.search.helper.DDMSearchHelper;
+import com.liferay.dynamic.data.mapping.internal.search.util.DDMSearchHelper;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
 import com.liferay.dynamic.data.mapping.security.permission.DDMPermissionSupport;
@@ -37,8 +38,10 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalService;
 import com.liferay.dynamic.data.mapping.service.base.DDMTemplateLocalServiceBaseImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMTemplateLinkPersistence;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMTemplateVersionPersistence;
+import com.liferay.dynamic.data.mapping.util.DDMXML;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.xml.XMLUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -53,9 +56,8 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -63,6 +65,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -72,7 +75,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.util.PortalInstances;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,7 +89,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -220,6 +221,8 @@ public class DDMTemplateLocalServiceImpl
 			templateKey = StringUtil.toUpperCase(templateKey.trim());
 		}
 
+		script = formatScript(type, language, script);
+
 		byte[] smallImageBytes = null;
 
 		if (smallImage) {
@@ -228,7 +231,7 @@ public class DDMTemplateLocalServiceImpl
 			}
 			catch (IOException ioException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(ioException);
+					_log.debug(ioException, ioException);
 				}
 			}
 
@@ -237,12 +240,12 @@ public class DDMTemplateLocalServiceImpl
 			}
 		}
 
-		_validate(
+		validate(
 			groupId, classNameId, templateKey, LocaleUtil.getSiteDefault(),
 			nameMap, script, smallImage, smallImageURL, smallImageFile,
 			smallImageBytes);
 
-		DDMTemplate template = _addTemplate(
+		DDMTemplate template = addTemplate(
 			user, groupId, classNameId, classPK, resourceClassNameId,
 			templateKey, nameMap, descriptionMap, type, mode, language, script,
 			cacheable, smallImage, smallImageURL, serviceContext);
@@ -263,13 +266,13 @@ public class DDMTemplateLocalServiceImpl
 
 		// Small image
 
-		_saveImages(
+		saveImages(
 			template.getCompanyId(), smallImage, template.getSmallImageId(),
 			smallImageFile, smallImageBytes);
 
 		// Template version
 
-		_addTemplateVersion(
+		addTemplateVersion(
 			user, template, DDMTemplateConstants.VERSION_DEFAULT,
 			serviceContext);
 
@@ -328,7 +331,7 @@ public class DDMTemplateLocalServiceImpl
 	 * and description.
 	 *
 	 * @param  userId the primary key of the template's creator/owner
-	 * @param  sourceTemplateId the primary key of the template to be copied
+	 * @param  templateId the primary key of the template to be copied
 	 * @param  nameMap the new template's locales and localized names
 	 * @param  descriptionMap the new template's locales and localized
 	 *         descriptions
@@ -341,31 +344,30 @@ public class DDMTemplateLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMTemplate copyTemplate(
-			long userId, long sourceTemplateId, Map<Locale, String> nameMap,
+			long userId, long templateId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMTemplate sourceTemplate = ddmTemplatePersistence.findByPrimaryKey(
-			sourceTemplateId);
+		DDMTemplate template = ddmTemplatePersistence.findByPrimaryKey(
+			templateId);
 
-		return _copyTemplate(
-			userId, sourceTemplate, sourceTemplate.getClassPK(), nameMap,
-			descriptionMap, serviceContext);
+		return copyTemplate(
+			userId, template, template.getClassPK(), nameMap, descriptionMap,
+			serviceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DDMTemplate copyTemplate(
-			long userId, long sourceTemplateId, ServiceContext serviceContext)
+			long userId, long templateId, ServiceContext serviceContext)
 		throws PortalException {
 
-		DDMTemplate sourceTemplate = ddmTemplatePersistence.findByPrimaryKey(
-			sourceTemplateId);
+		DDMTemplate template = ddmTemplatePersistence.findByPrimaryKey(
+			templateId);
 
-		return _copyTemplate(
-			userId, sourceTemplate, sourceTemplate.getClassPK(),
-			sourceTemplate.getNameMap(), sourceTemplate.getDescriptionMap(),
-			serviceContext);
+		return copyTemplate(
+			userId, template, template.getClassPK(), template.getNameMap(),
+			template.getDescriptionMap(), serviceContext);
 	}
 
 	/**
@@ -376,8 +378,8 @@ public class DDMTemplateLocalServiceImpl
 	 * @param  userId the primary key of the template's creator/owner
 	 * @param  classNameId the primary key of the class name for the template's
 	 *         related model
-	 * @param  sourceClassPK the primary key of the old template's related entity
-	 * @param  targetClassPK the primary key of the new template's related entity
+	 * @param  oldClassPK the primary key of the old template's related entity
+	 * @param  newClassPK the primary key of the new template's related entity
 	 * @param  type the template's type. For more information, see
 	 *         DDMTemplateConstants in the dynamic-data-mapping-api module.
 	 * @param  serviceContext the service context to be applied. Can set the
@@ -389,30 +391,24 @@ public class DDMTemplateLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public List<DDMTemplate> copyTemplates(
-			long userId, long classNameId, long sourceClassPK,
-			long targetClassPK, String type, ServiceContext serviceContext)
+			long userId, long classNameId, long oldClassPK, long newClassPK,
+			String type, ServiceContext serviceContext)
 		throws PortalException {
 
-		List<DDMTemplate> targetTemplates = new ArrayList<>();
+		List<DDMTemplate> newTemplates = new ArrayList<>();
 
-		List<DDMTemplate> sourceTemplates = ddmTemplatePersistence.findByC_C_T(
-			classNameId, sourceClassPK, type);
+		List<DDMTemplate> oldTemplates = ddmTemplatePersistence.findByC_C_T(
+			classNameId, oldClassPK, type);
 
-		for (DDMTemplate sourceTemplate : sourceTemplates) {
-			DDMTemplate targetTemplate = _copyTemplate(
-				userId, sourceTemplate, targetClassPK,
-				sourceTemplate.getNameMap(), sourceTemplate.getDescriptionMap(),
-				serviceContext);
+		for (DDMTemplate oldTemplate : oldTemplates) {
+			DDMTemplate newTemplate = copyTemplate(
+				userId, oldTemplate, newClassPK, oldTemplate.getNameMap(),
+				oldTemplate.getDescriptionMap(), serviceContext);
 
-			targetTemplates.add(targetTemplate);
+			newTemplates.add(newTemplate);
 		}
 
-		Indexer<DDMTemplate> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-			DDMTemplate.class);
-
-		indexer.reindex(targetTemplates);
-
-		return targetTemplates;
+		return newTemplates;
 	}
 
 	/**
@@ -429,7 +425,7 @@ public class DDMTemplateLocalServiceImpl
 
 		// Template
 
-		if (!PortalInstances.isCurrentCompanyInDeletionProcess()) {
+		if (!CompanyThreadLocal.isDeleteInProcess()) {
 			int count = _ddmTemplateLinkPersistence.countByTemplateId(
 				template.getTemplateId());
 
@@ -1454,6 +1450,8 @@ public class DDMTemplateLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
+		script = formatScript(type, language, script);
+
 		byte[] smallImageBytes = null;
 
 		DDMTemplate template = ddmTemplateLocalService.getDDMTemplate(
@@ -1465,7 +1463,7 @@ public class DDMTemplateLocalServiceImpl
 			}
 			catch (IOException ioException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(ioException);
+					_log.debug(ioException, ioException);
 				}
 			}
 
@@ -1476,7 +1474,7 @@ public class DDMTemplateLocalServiceImpl
 			}
 		}
 
-		_validate(
+		validate(
 			template.getGroupId(),
 			LocaleUtil.fromLanguageId(template.getDefaultLanguageId()), nameMap,
 			script, smallImage, smallImageURL, smallImageFile, smallImageBytes);
@@ -1498,7 +1496,7 @@ public class DDMTemplateLocalServiceImpl
 		boolean majorVersion = GetterUtil.getBoolean(
 			serviceContext.getAttribute("majorVersion"));
 
-		String version = _getNextVersion(
+		String version = getNextVersion(
 			latestTemplateVersion.getVersion(), majorVersion);
 
 		template.setVersion(version);
@@ -1519,13 +1517,13 @@ public class DDMTemplateLocalServiceImpl
 
 		// Small image
 
-		_saveImages(
+		saveImages(
 			template.getCompanyId(), smallImage, template.getSmallImageId(),
 			smallImageFile, smallImageBytes);
 
 		// Template version
 
-		DDMTemplateVersion ddmTemplateVersion = _addTemplateVersion(
+		DDMTemplateVersion ddmTemplateVersion = addTemplateVersion(
 			user, template, version, serviceContext);
 
 		if (ddmTemplateVersion.isApproved()) {
@@ -1568,7 +1566,7 @@ public class DDMTemplateLocalServiceImpl
 		DDMTemplate template = ddmTemplateLocalService.getDDMTemplate(
 			templateId);
 
-		File smallImageFile = _getSmallImageFile(template);
+		File smallImageFile = getSmallImageFile(template);
 
 		return updateTemplate(
 			userId, templateId, classPK, nameMap, descriptionMap, type, mode,
@@ -1583,9 +1581,7 @@ public class DDMTemplateLocalServiceImpl
 			DDMWebConfiguration.class, properties);
 	}
 
-	protected volatile DDMWebConfiguration ddmWebConfiguration;
-
-	private DDMTemplate _addTemplate(
+	protected DDMTemplate addTemplate(
 			User user, long groupId, long classNameId, long classPK,
 			long resourceClassNameId, String templateKey,
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
@@ -1624,7 +1620,7 @@ public class DDMTemplateLocalServiceImpl
 		return ddmTemplatePersistence.update(template);
 	}
 
-	private DDMTemplateVersion _addTemplateVersion(
+	protected DDMTemplateVersion addTemplateVersion(
 		User user, DDMTemplate template, String version,
 		ServiceContext serviceContext) {
 
@@ -1646,10 +1642,13 @@ public class DDMTemplateLocalServiceImpl
 		templateVersion.setDescription(template.getDescription());
 		templateVersion.setLanguage(template.getLanguage());
 		templateVersion.setScript(template.getScript());
-		templateVersion.setStatus(
-			GetterUtil.getInteger(
-				serviceContext.getAttribute("status"),
-				WorkflowConstants.STATUS_APPROVED));
+
+		int status = GetterUtil.getInteger(
+			serviceContext.getAttribute("status"),
+			WorkflowConstants.STATUS_APPROVED);
+
+		templateVersion.setStatus(status);
+
 		templateVersion.setStatusByUserId(user.getUserId());
 		templateVersion.setStatusByUserName(user.getFullName());
 		templateVersion.setStatusDate(template.getModifiedDate());
@@ -1657,8 +1656,8 @@ public class DDMTemplateLocalServiceImpl
 		return _ddmTemplateVersionPersistence.update(templateVersion);
 	}
 
-	private DDMTemplate _copyTemplate(
-			long userId, DDMTemplate sourceTemplate, long classPK,
+	protected DDMTemplate copyTemplate(
+			long userId, DDMTemplate template, long classPK,
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -1672,88 +1671,86 @@ public class DDMTemplateLocalServiceImpl
 		User user = _userLocalService.getUser(userId);
 		String templateKey = String.valueOf(counterLocalService.increment());
 
-		boolean smallImage = sourceTemplate.isSmallImage();
+		boolean smallImage = template.isSmallImage();
 
-		File smallImageFile = _getSmallImageFile(sourceTemplate);
+		File smallImageFile = getSmallImageFile(template);
 
 		byte[] smallImageBytes = null;
 
-		if (sourceTemplate.isSmallImage()) {
+		if (template.isSmallImage()) {
 			try {
 				smallImageBytes = FileUtil.getBytes(smallImageFile);
 			}
 			catch (IOException ioException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(ioException);
+					_log.debug(ioException, ioException);
 				}
 			}
 
 			if ((smallImageBytes == null) &&
-				!Validator.isUrl(sourceTemplate.getSmallImageURL())) {
+				!Validator.isUrl(template.getSmallImageURL())) {
 
 				smallImage = false;
 			}
 		}
 
-		_validate(
-			sourceTemplate.getGroupId(), sourceTemplate.getClassNameId(),
-			templateKey, LocaleUtil.getSiteDefault(), nameMap,
-			sourceTemplate.getScript(), smallImage,
-			sourceTemplate.getSmallImageURL(), smallImageFile, smallImageBytes);
+		validate(
+			template.getGroupId(), template.getClassNameId(), templateKey,
+			LocaleUtil.getSiteDefault(), nameMap, template.getScript(),
+			smallImage, template.getSmallImageURL(), smallImageFile,
+			smallImageBytes);
 
-		DDMTemplate targetTemplate = _addTemplate(
-			user, sourceTemplate.getGroupId(), sourceTemplate.getClassNameId(),
-			classPK, sourceTemplate.getResourceClassNameId(), templateKey,
-			nameMap, descriptionMap, sourceTemplate.getType(),
-			sourceTemplate.getMode(), sourceTemplate.getLanguage(),
-			sourceTemplate.getScript(), sourceTemplate.isCacheable(),
-			smallImage, sourceTemplate.getSmallImageURL(), serviceContext);
+		DDMTemplate newTemplate = addTemplate(
+			user, template.getGroupId(), template.getClassNameId(), classPK,
+			template.getResourceClassNameId(), templateKey, nameMap,
+			descriptionMap, template.getType(), template.getMode(),
+			template.getLanguage(), template.getScript(),
+			template.isCacheable(), smallImage, template.getSmallImageURL(),
+			serviceContext);
 
 		// Resources
 
 		String resourceName =
 			_ddmPermissionSupport.getTemplateModelResourceName(
-				sourceTemplate.getResourceClassName());
+				template.getResourceClassName());
 
 		_resourceLocalService.copyModelResources(
-			sourceTemplate.getCompanyId(), resourceName,
-			sourceTemplate.getPrimaryKey(), targetTemplate.getPrimaryKey());
+			template.getCompanyId(), resourceName, template.getPrimaryKey(),
+			newTemplate.getPrimaryKey());
 
 		// Small image
 
-		_saveImages(
-			targetTemplate.getCompanyId(), smallImage,
-			targetTemplate.getSmallImageId(), smallImageFile, smallImageBytes);
+		saveImages(
+			newTemplate.getCompanyId(), smallImage,
+			newTemplate.getSmallImageId(), smallImageFile, smallImageBytes);
 
 		// Template version
 
-		_addTemplateVersion(
-			user, targetTemplate, DDMTemplateConstants.VERSION_DEFAULT,
+		addTemplateVersion(
+			user, newTemplate, DDMTemplateConstants.VERSION_DEFAULT,
 			serviceContext);
 
-		return targetTemplate;
+		return newTemplate;
 	}
 
-	private long[] _getAncestorSiteAndDepotGroupIds(long groupId) {
-		try {
-			SiteConnectedGroupGroupProvider siteConnectedGroupGroupProvider =
-				_siteConnectedGroupGroupProvider;
+	protected String formatScript(String type, String language, String script)
+		throws PortalException {
 
-			if (siteConnectedGroupGroupProvider == null) {
-				return _portal.getAncestorSiteGroupIds(groupId);
+		if (language.equals(TemplateConstants.LANG_TYPE_XSL)) {
+			try {
+				script = _ddmXML.validateXML(script);
+			}
+			catch (PortalException portalException) {
+				throw new TemplateScriptException(portalException);
 			}
 
-			return siteConnectedGroupGroupProvider.
-				getAncestorSiteAndDepotGroupIds(groupId, true);
+			script = XMLUtil.formatXML(script);
 		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
 
-			return new long[0];
-		}
+		return script;
 	}
 
-	private DDMGroupServiceConfiguration _getDDMGroupServiceConfiguration(
+	protected DDMGroupServiceConfiguration getDDMGroupServiceConfiguration(
 			long groupId)
 		throws ConfigurationException {
 
@@ -1763,7 +1760,7 @@ public class DDMTemplateLocalServiceImpl
 				groupId, DDMConstants.SERVICE_NAME));
 	}
 
-	private String _getNextVersion(String version, boolean majorVersion) {
+	protected String getNextVersion(String version, boolean majorVersion) {
 		int[] versionParts = StringUtil.split(version, StringPool.PERIOD, 0);
 
 		if (majorVersion) {
@@ -1777,7 +1774,7 @@ public class DDMTemplateLocalServiceImpl
 		return versionParts[0] + StringPool.PERIOD + versionParts[1];
 	}
 
-	private File _getSmallImageFile(DDMTemplate template) {
+	protected File getSmallImageFile(DDMTemplate template) {
 		File smallImageFile = null;
 
 		if (template.isSmallImage() &&
@@ -1793,7 +1790,7 @@ public class DDMTemplateLocalServiceImpl
 					FileUtil.write(smallImageFile, smallImage.getTextObj());
 				}
 				catch (IOException ioException) {
-					_log.error(ioException);
+					_log.error(ioException, ioException);
 				}
 			}
 		}
@@ -1801,7 +1798,7 @@ public class DDMTemplateLocalServiceImpl
 		return smallImageFile;
 	}
 
-	private void _saveImages(
+	protected void saveImages(
 			long companyId, boolean smallImage, long smallImageId,
 			File smallImageFile, byte[] smallImageBytes)
 		throws PortalException {
@@ -1822,24 +1819,25 @@ public class DDMTemplateLocalServiceImpl
 		}
 	}
 
-	private void _validate(
-			Locale locale, Map<Locale, String> nameMap, String script)
+	protected void validate(
+			long groupId, Locale locale, Map<Locale, String> nameMap,
+			String script)
 		throws PortalException {
 
-		_validateName(locale, nameMap);
+		validateName(groupId, locale, nameMap);
 
 		if (Validator.isNull(script)) {
 			throw new TemplateScriptException("Script is null");
 		}
 	}
 
-	private void _validate(
+	protected void validate(
 			long groupId, Locale locale, Map<Locale, String> nameMap,
 			String script, boolean smallImage, String smallImageURL,
 			File smallImageFile, byte[] smallImageBytes)
 		throws PortalException {
 
-		_validate(locale, nameMap, script);
+		validate(groupId, locale, nameMap, script);
 
 		if (!smallImage || Validator.isNotNull(smallImageURL) ||
 			(smallImageFile == null) || (smallImageBytes == null)) {
@@ -1852,7 +1850,7 @@ public class DDMTemplateLocalServiceImpl
 		boolean validSmallImageExtension = false;
 
 		DDMGroupServiceConfiguration ddmGroupServiceConfiguration =
-			_getDDMGroupServiceConfiguration(groupId);
+			getDDMGroupServiceConfiguration(groupId);
 
 		for (String smallImageExtension :
 				ddmGroupServiceConfiguration.smallImageExtensions()) {
@@ -1884,7 +1882,7 @@ public class DDMTemplateLocalServiceImpl
 		}
 	}
 
-	private void _validate(
+	protected void validate(
 			long groupId, long classNameId, String templateKey, Locale locale,
 			Map<Locale, String> nameMap, String script, boolean smallImage,
 			String smallImageURL, File smallImageFile, byte[] smallImageBytes)
@@ -1900,12 +1898,13 @@ public class DDMTemplateLocalServiceImpl
 				"Template already exists with template key " + templateKey);
 		}
 
-		_validate(
+		validate(
 			groupId, locale, nameMap, script, smallImage, smallImageURL,
 			smallImageFile, smallImageBytes);
 	}
 
-	private void _validateName(Locale locale, Map<Locale, String> nameMap)
+	protected void validateName(
+			long groupId, Locale locale, Map<Locale, String> nameMap)
 		throws PortalException {
 
 		String name = nameMap.get(locale);
@@ -1916,6 +1915,27 @@ public class DDMTemplateLocalServiceImpl
 
 		if (Validator.isNull(name)) {
 			throw new TemplateNameException("Name is null");
+		}
+	}
+
+	protected volatile DDMWebConfiguration ddmWebConfiguration;
+
+	private long[] _getAncestorSiteAndDepotGroupIds(long groupId) {
+		try {
+			SiteConnectedGroupGroupProvider siteConnectedGroupGroupProvider =
+				_siteConnectedGroupGroupProvider;
+
+			if (siteConnectedGroupGroupProvider == null) {
+				return _portal.getAncestorSiteGroupIds(groupId);
+			}
+
+			return siteConnectedGroupGroupProvider.
+				getAncestorSiteAndDepotGroupIds(groupId, true);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+
+			return new long[0];
 		}
 	}
 
@@ -1941,6 +1961,15 @@ public class DDMTemplateLocalServiceImpl
 	private DDMTemplateVersionPersistence _ddmTemplateVersionPersistence;
 
 	@Reference
+	private DDMXML _ddmXML;
+
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile DepotEntryLocalService _depotEntryLocalService;
+
+	@Reference
 	private ImageLocalService _imageLocalService;
 
 	@Reference
@@ -1951,11 +1980,9 @@ public class DDMTemplateLocalServiceImpl
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
-	private volatile SiteConnectedGroupGroupProvider
-		_siteConnectedGroupGroupProvider;
+	private SiteConnectedGroupGroupProvider _siteConnectedGroupGroupProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

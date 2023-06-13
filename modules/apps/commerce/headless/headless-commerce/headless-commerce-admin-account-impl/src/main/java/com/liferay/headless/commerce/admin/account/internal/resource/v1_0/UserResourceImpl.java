@@ -14,11 +14,12 @@
 
 package com.liferay.headless.commerce.admin.account.internal.resource.v1_0;
 
-import com.liferay.account.exception.NoSuchEntryException;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryService;
-import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.account.exception.NoSuchAccountException;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.account.service.CommerceAccountService;
+import com.liferay.commerce.account.service.CommerceAccountUserRelService;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.User;
+import com.liferay.headless.commerce.admin.account.internal.dto.v1_0.converter.UserDTOConverter;
 import com.liferay.headless.commerce.admin.account.resource.v1_0.UserResource;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
 import com.liferay.portal.kernel.model.Role;
@@ -31,7 +32,6 @@ import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 
 import java.util.Calendar;
@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	properties = "OSGI-INF/liferay/rest/v1_0/user.properties",
+	enabled = false, properties = "OSGI-INF/liferay/rest/v1_0/user.properties",
 	scope = ServiceScope.PROTOTYPE, service = UserResource.class
 )
 public class UserResourceImpl extends BaseUserResourceImpl {
@@ -55,18 +55,18 @@ public class UserResourceImpl extends BaseUserResourceImpl {
 			String externalReferenceCode, User user)
 		throws Exception {
 
-		AccountEntry accountEntry =
-			_accountEntryService.fetchAccountEntryByExternalReferenceCode(
+		CommerceAccount commerceAccount =
+			_commerceAccountService.fetchByExternalReferenceCode(
 				contextCompany.getCompanyId(), externalReferenceCode);
 
-		if (accountEntry == null) {
-			throw new NoSuchEntryException(
+		if (commerceAccount == null) {
+			throw new NoSuchAccountException(
 				"Unable to find account with external reference code " +
 					externalReferenceCode);
 		}
 
 		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
-			accountEntry.getAccountEntryGroupId());
+			commerceAccount.getCommerceAccountGroupId());
 
 		com.liferay.portal.kernel.model.User invitedUser = null;
 
@@ -75,7 +75,7 @@ public class UserResourceImpl extends BaseUserResourceImpl {
 		}
 		else if (Validator.isNotNull(user.getExternalReferenceCode())) {
 			invitedUser = _userLocalService.fetchUserByExternalReferenceCode(
-				user.getExternalReferenceCode(), contextCompany.getCompanyId());
+				contextCompany.getCompanyId(), user.getExternalReferenceCode());
 		}
 
 		if (invitedUser == null) {
@@ -85,8 +85,8 @@ public class UserResourceImpl extends BaseUserResourceImpl {
 				user.getFirstName(), user.getMiddleName(), user.getLastName(),
 				0L, 0L, GetterUtil.getBoolean(user.getMale(), true), 1, 1, 1970,
 				user.getJobTitle(),
-				new long[] {accountEntry.getAccountEntryGroupId()}, null, null,
-				null, false, serviceContext);
+				new long[] {commerceAccount.getCommerceAccountGroupId()}, null,
+				null, null, false, serviceContext);
 		}
 		else {
 			Date birthday = invitedUser.getBirthday();
@@ -142,9 +142,9 @@ public class UserResourceImpl extends BaseUserResourceImpl {
 			}
 		}
 
-		_commerceAccountHelper.addAccountEntryUserRel(
-			accountEntry.getAccountEntryId(), invitedUser.getUserId(), roleIds,
-			serviceContext);
+		_commerceAccountUserRelService.addCommerceAccountUserRel(
+			commerceAccount.getCommerceAccountId(), invitedUser.getUserId(),
+			roleIds, serviceContext);
 
 		return _userDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
@@ -153,10 +153,10 @@ public class UserResourceImpl extends BaseUserResourceImpl {
 	}
 
 	@Reference
-	private AccountEntryService _accountEntryService;
+	private CommerceAccountService _commerceAccountService;
 
 	@Reference
-	private CommerceAccountHelper _commerceAccountHelper;
+	private CommerceAccountUserRelService _commerceAccountUserRelService;
 
 	@Reference
 	private RoleLocalService _roleLocalService;
@@ -164,11 +164,8 @@ public class UserResourceImpl extends BaseUserResourceImpl {
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.admin.account.internal.dto.v1_0.converter.UserDTOConverter)"
-	)
-	private DTOConverter<com.liferay.portal.kernel.model.User, User>
-		_userDTOConverter;
+	@Reference
+	private UserDTOConverter _userDTOConverter;
 
 	@Reference
 	private UserLocalService _userLocalService;

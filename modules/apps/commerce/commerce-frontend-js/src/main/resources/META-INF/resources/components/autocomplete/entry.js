@@ -15,6 +15,4 @@
 import launcher from '../../utilities/launcher';
 import Autocomplete from './Autocomplete';
 
-export default function entry(...data) {
-	return launcher(Autocomplete, ...data);
-}
+export default (...data) => launcher(Autocomplete, ...data);

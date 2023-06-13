@@ -16,13 +16,11 @@ package com.liferay.fragment.renderer;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
-import com.liferay.info.form.InfoForm;
-import com.liferay.info.item.InfoItemReference;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Jorge Ferrer
@@ -31,28 +29,21 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 
 	public DefaultFragmentRendererContext(FragmentEntryLink fragmentEntryLink) {
 		_fragmentEntryLink = fragmentEntryLink;
-
-		_fragmentEntryElementId = "fragment-" + PortalUUIDUtil.generate();
 	}
 
 	@Override
-	public InfoItemReference getContextInfoItemReference() {
-		return _infoItemReference;
+	public Optional<Object> getDisplayObjectOptional() {
+		return Optional.ofNullable(_displayObject);
 	}
 
 	@Override
-	public String getFragmentElementId() {
-		return _fragmentEntryElementId;
+	public Optional<Map<String, Object>> getFieldValuesOptional() {
+		return Optional.ofNullable(_fieldValues);
 	}
 
 	@Override
 	public FragmentEntryLink getFragmentEntryLink() {
 		return _fragmentEntryLink;
-	}
-
-	@Override
-	public InfoForm getInfoForm() {
-		return _infoForm;
 	}
 
 	@Override
@@ -86,26 +77,8 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 	}
 
 	@Override
-	public long[] getSegmentsEntryIds() {
-		return _segmentsSegmentsEntryIds;
-	}
-
-	@Override
-	public boolean isEditMode() {
-		if (Objects.equals(getMode(), FragmentEntryLinkConstants.EDIT)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean isIndexMode() {
-		if (Objects.equals(getMode(), FragmentEntryLinkConstants.INDEX)) {
-			return true;
-		}
-
-		return false;
+	public long[] getSegmentsExperienceIds() {
+		return _segmentsExperienceIds;
 	}
 
 	@Override
@@ -113,23 +86,12 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 		return _useCachedContent;
 	}
 
-	@Override
-	public boolean isViewMode() {
-		if (Objects.equals(getMode(), FragmentEntryLinkConstants.VIEW)) {
-			return true;
-		}
-
-		return false;
+	public void setDisplayObject(Object object) {
+		_displayObject = object;
 	}
 
-	public void setContextInfoItemReference(
-		InfoItemReference infoItemReference) {
-
-		_infoItemReference = infoItemReference;
-	}
-
-	public void setInfoForm(InfoForm infoForm) {
-		_infoForm = infoForm;
+	public void setFieldValues(Map<String, Object> fieldValues) {
+		_fieldValues = fieldValues;
 	}
 
 	public void setLocale(Locale locale) {
@@ -156,25 +118,24 @@ public class DefaultFragmentRendererContext implements FragmentRendererContext {
 		_previewVersion = previewVersion;
 	}
 
-	public void setSegmentsEntryIds(long[] segmentsSegmentsEntryIds) {
-		_segmentsSegmentsEntryIds = segmentsSegmentsEntryIds;
+	public void setSegmentsExperienceIds(long[] segmentsExperienceIds) {
+		_segmentsExperienceIds = segmentsExperienceIds;
 	}
 
 	public void setUseCachedContent(boolean useCachedContent) {
 		_useCachedContent = useCachedContent;
 	}
 
-	private final String _fragmentEntryElementId;
+	private Object _displayObject;
+	private Map<String, Object> _fieldValues;
 	private final FragmentEntryLink _fragmentEntryLink;
-	private InfoForm _infoForm;
-	private InfoItemReference _infoItemReference;
 	private Locale _locale = LocaleUtil.getMostRelevantLocale();
 	private String _mode = FragmentEntryLinkConstants.VIEW;
 	private long _previewClassNameId;
 	private long _previewClassPK;
 	private int _previewType;
 	private String _previewVersion;
-	private long[] _segmentsSegmentsEntryIds = new long[0];
+	private long[] _segmentsExperienceIds = new long[0];
 	private boolean _useCachedContent = true;
 
 }

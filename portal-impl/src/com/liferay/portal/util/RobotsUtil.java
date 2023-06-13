@@ -14,6 +14,7 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.petra.content.ContentUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -24,8 +25,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.io.IOException;
-
 import java.util.TreeMap;
 
 /**
@@ -34,21 +33,40 @@ import java.util.TreeMap;
  */
 public class RobotsUtil {
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static String getDefaultRobots() {
+		return getDefaultRobots(
+			null, false, PortalUtil.getPortalServerPort(false));
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static String getDefaultRobots(
+		String virtualHostname, boolean secure, int port) {
+
+		if (Validator.isNotNull(virtualHostname)) {
+			return ContentUtil.get(
+				RobotsUtil.class.getClassLoader(),
+				PropsValues.ROBOTS_TXT_WITH_SITEMAP);
+		}
+
+		return ContentUtil.get(
+			RobotsUtil.class.getClassLoader(),
+			PropsValues.ROBOTS_TXT_WITHOUT_SITEMAP);
+	}
+
 	public static String getRobots(LayoutSet layoutSet, boolean secure)
 		throws PortalException {
 
 		if (layoutSet == null) {
-			try {
-				return com.liferay.petra.string.StringUtil.read(
-					RobotsUtil.class.getClassLoader(),
-					PropsValues.ROBOTS_TXT_WITHOUT_SITEMAP);
-			}
-			catch (IOException ioException) {
-				_log.error(
-					"Unable to read the content for " +
-						PropsValues.ROBOTS_TXT_WITHOUT_SITEMAP,
-					ioException);
-			}
+			return ContentUtil.get(
+				RobotsUtil.class.getClassLoader(),
+				PropsValues.ROBOTS_TXT_WITHOUT_SITEMAP);
 		}
 
 		int portalServerPort = PortalUtil.getPortalServerPort(secure);
@@ -62,22 +80,12 @@ public class RobotsUtil {
 			virtualHostname = virtualHostnames.firstKey();
 		}
 
-		String robotsTxt = null;
-
-		try {
-			robotsTxt = GetterUtil.getString(
-				layoutSet.getSettingsProperty(
-					layoutSet.isPrivateLayout() + "-robots.txt"),
-				StringUtil.read(
-					RobotsUtil.class.getClassLoader(),
-					PropsValues.ROBOTS_TXT_WITH_SITEMAP));
-		}
-		catch (IOException ioException) {
-			_log.error(
-				"Unable to read the content for " +
-					PropsValues.ROBOTS_TXT_WITH_SITEMAP,
-				ioException);
-		}
+		String robotsTxt = GetterUtil.getString(
+			layoutSet.getSettingsProperty(
+				layoutSet.isPrivateLayout() + "-robots.txt"),
+			ContentUtil.get(
+				RobotsUtil.class.getClassLoader(),
+				PropsValues.ROBOTS_TXT_WITH_SITEMAP));
 
 		return _replaceWildcards(
 			robotsTxt, virtualHostname, secure, portalServerPort);

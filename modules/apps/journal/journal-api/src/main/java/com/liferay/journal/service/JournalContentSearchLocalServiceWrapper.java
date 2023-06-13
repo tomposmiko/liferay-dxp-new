@@ -30,10 +30,6 @@ public class JournalContentSearchLocalServiceWrapper
 	implements JournalContentSearchLocalService,
 			   ServiceWrapper<JournalContentSearchLocalService> {
 
-	public JournalContentSearchLocalServiceWrapper() {
-		this(null);
-	}
-
 	public JournalContentSearchLocalServiceWrapper(
 		JournalContentSearchLocalService journalContentSearchLocalService) {
 

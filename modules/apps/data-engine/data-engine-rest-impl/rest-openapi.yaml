@@ -329,7 +329,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.data.engine.rest.client', and version '3.0.21'."
+        'com.liferay.data.engine.rest.client', and version '3.0.8'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -505,29 +505,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/DataDefinition"
             tags: ["DataDefinition"]
-    "/data-definitions/{dataDefinitionId}/copy":
-        post:
-            operationId: postDataDefinitionCopy
-            parameters:
-                - in: path
-                  name: dataDefinitionId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            responses:
-                200:
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/DataDefinition"
-                        application/xml:
-                            schema:
-                                $ref: "#/components/schemas/DataDefinition"
-            tags: ["DataDefinition"]
     "/data-definitions/{dataDefinitionId}/data-definition-field-links":
         get:
-            operationId: getDataDefinitionDataDefinitionFieldLinksPage
+            operationId: getDataDefinitionDataDefinitionFieldLinkPage
             parameters:
                 - in: path
                   name: dataDefinitionId
@@ -555,7 +535,7 @@ paths:
             tags: ["DataDefinitionFieldLink"]
     "/data-definitions/{dataDefinitionId}/data-layouts":
         delete:
-            operationId: deleteDataDefinitionDataLayout
+            operationId: deleteDataLayoutsDataDefinition
             parameters:
                 - in: path
                   name: dataDefinitionId
@@ -638,7 +618,7 @@ paths:
             tags: ["DataLayout"]
     "/data-definitions/{dataDefinitionId}/data-list-views":
         delete:
-            operationId: deleteDataDefinitionDataListView
+            operationId: deleteDataListViewsDataDefinition
             parameters:
                 - in: path
                   name: dataDefinitionId
@@ -897,7 +877,7 @@ paths:
                         application/xml: {}
             tags: ["DataDefinition"]
         put:
-            operationId: putDataDefinitionPermissionsPage
+            operationId: putDataDefinitionPermission
             parameters:
                 - in: path
                   name: dataDefinitionId
@@ -1252,7 +1232,7 @@ paths:
                         application/xml: {}
             tags: ["DataRecordCollection"]
         put:
-            operationId: putDataRecordCollectionPermissionsPage
+            operationId: putDataRecordCollectionPermission
             parameters:
                 - in: path
                   name: dataRecordCollectionId

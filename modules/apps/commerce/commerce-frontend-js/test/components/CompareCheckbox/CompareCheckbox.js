@@ -13,7 +13,7 @@
  */
 
 import '@testing-library/jest-dom/extend-expect';
-import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import {act, cleanup, fireEvent, render, wait} from '@testing-library/react';
 import React from 'react';
 
 import CompareCheckbox from '../../../src/main/resources/META-INF/resources/components/compare_checkbox/CompareCheckbox';
@@ -55,6 +55,8 @@ describe('CompareCheckbox', () => {
 	});
 
 	afterEach(() => {
+		cleanup();
+
 		jest.resetAllMocks();
 	});
 
@@ -115,7 +117,7 @@ describe('CompareCheckbox', () => {
 				fireEvent.click(ComponentElement);
 			});
 
-			await waitFor(() => {
+			await wait(() => {
 				expect(window.Liferay.fire).toHaveBeenCalledTimes(1);
 				expect(window.Liferay.fire).toHaveBeenCalledWith(
 					TOGGLE_ITEM_IN_PRODUCT_COMPARISON,
@@ -145,7 +147,7 @@ describe('CompareCheckbox', () => {
 					removeFromCompareTrigger({id: PROPS.itemId});
 				});
 
-				await waitFor(() => {
+				await wait(() => {
 					expect(ComponentElement).not.toBeChecked();
 					expect(PROPS.onUpdate).toHaveBeenCalledWith({
 						disabled: false,
@@ -171,7 +173,7 @@ describe('CompareCheckbox', () => {
 					removeFromCompareTrigger({id: FAILING_ITEM_ID});
 				});
 
-				await waitFor(() => {
+				await wait(() => {
 					expect(ComponentElement).toBeChecked();
 					expect(PROPS.onUpdate).not.toHaveBeenCalled();
 				});
@@ -193,7 +195,7 @@ describe('CompareCheckbox', () => {
 					toggleCompareTrigger({disabled: false});
 				});
 
-				await waitFor(() => {
+				await wait(() => {
 					expect(ComponentElement).not.toBeDisabled();
 					expect(PROPS.onUpdate).toHaveBeenCalledWith({
 						disabled: false,
@@ -216,7 +218,7 @@ describe('CompareCheckbox', () => {
 					toggleCompareTrigger({disabled: true});
 				});
 
-				await waitFor(() => {
+				await wait(() => {
 					expect(ComponentElement).toBeDisabled();
 					expect(PROPS.onUpdate).toHaveBeenCalledWith({
 						disabled: true,
@@ -239,7 +241,7 @@ describe('CompareCheckbox', () => {
 					toggleCompareTrigger({});
 				});
 
-				await waitFor(() => {
+				await wait(() => {
 					expect(ComponentElement).toBeDisabled();
 					expect(PROPS.onUpdate).toHaveBeenCalledWith({
 						disabled: true,

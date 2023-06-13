@@ -18,7 +18,6 @@ import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CacheModel;
-import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -34,7 +33,7 @@ import java.util.Date;
  * @generated
  */
 public class CommerceChannelCacheModel
-	implements CacheModel<CommerceChannel>, Externalizable, MVCCModel {
+	implements CacheModel<CommerceChannel>, Externalizable {
 
 	@Override
 	public boolean equals(Object object) {
@@ -49,10 +48,7 @@ public class CommerceChannelCacheModel
 		CommerceChannelCacheModel commerceChannelCacheModel =
 			(CommerceChannelCacheModel)object;
 
-		if ((commerceChannelId ==
-				commerceChannelCacheModel.commerceChannelId) &&
-			(mvccVersion == commerceChannelCacheModel.mvccVersion)) {
-
+		if (commerceChannelId == commerceChannelCacheModel.commerceChannelId) {
 			return true;
 		}
 
@@ -61,32 +57,14 @@ public class CommerceChannelCacheModel
 
 	@Override
 	public int hashCode() {
-		int hashCode = HashUtil.hash(0, commerceChannelId);
-
-		return HashUtil.hash(hashCode, mvccVersion);
-	}
-
-	@Override
-	public long getMvccVersion() {
-		return mvccVersion;
-	}
-
-	@Override
-	public void setMvccVersion(long mvccVersion) {
-		this.mvccVersion = mvccVersion;
+		return HashUtil.hash(0, commerceChannelId);
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(35);
+		StringBundler sb = new StringBundler(29);
 
-		sb.append("{mvccVersion=");
-		sb.append(mvccVersion);
-		sb.append(", ctCollectionId=");
-		sb.append(ctCollectionId);
-		sb.append(", uuid=");
-		sb.append(uuid);
-		sb.append(", externalReferenceCode=");
+		sb.append("{externalReferenceCode=");
 		sb.append(externalReferenceCode);
 		sb.append(", commerceChannelId=");
 		sb.append(commerceChannelId);
@@ -122,16 +100,6 @@ public class CommerceChannelCacheModel
 	@Override
 	public CommerceChannel toEntityModel() {
 		CommerceChannelImpl commerceChannelImpl = new CommerceChannelImpl();
-
-		commerceChannelImpl.setMvccVersion(mvccVersion);
-		commerceChannelImpl.setCtCollectionId(ctCollectionId);
-
-		if (uuid == null) {
-			commerceChannelImpl.setUuid("");
-		}
-		else {
-			commerceChannelImpl.setUuid(uuid);
-		}
 
 		if (externalReferenceCode == null) {
 			commerceChannelImpl.setExternalReferenceCode("");
@@ -211,10 +179,6 @@ public class CommerceChannelCacheModel
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
-		mvccVersion = objectInput.readLong();
-
-		ctCollectionId = objectInput.readLong();
-		uuid = objectInput.readUTF();
 		externalReferenceCode = objectInput.readUTF();
 
 		commerceChannelId = objectInput.readLong();
@@ -238,17 +202,6 @@ public class CommerceChannelCacheModel
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
-		objectOutput.writeLong(mvccVersion);
-
-		objectOutput.writeLong(ctCollectionId);
-
-		if (uuid == null) {
-			objectOutput.writeUTF("");
-		}
-		else {
-			objectOutput.writeUTF(uuid);
-		}
-
 		if (externalReferenceCode == null) {
 			objectOutput.writeUTF("");
 		}
@@ -312,9 +265,6 @@ public class CommerceChannelCacheModel
 		objectOutput.writeBoolean(discountsTargetNetPrice);
 	}
 
-	public long mvccVersion;
-	public long ctCollectionId;
-	public String uuid;
 	public String externalReferenceCode;
 	public long commerceChannelId;
 	public long companyId;

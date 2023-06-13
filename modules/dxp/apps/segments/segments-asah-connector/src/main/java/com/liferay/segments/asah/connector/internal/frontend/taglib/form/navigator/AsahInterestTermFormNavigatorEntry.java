@@ -14,7 +14,6 @@
 
 package com.liferay.segments.asah.connector.internal.frontend.taglib.form.navigator;
 
-import com.liferay.analytics.settings.rest.manager.AnalyticsSettingsManager;
 import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.constants.AssetListFormConstants;
 import com.liferay.asset.list.model.AssetListEntry;
@@ -22,7 +21,7 @@ import com.liferay.asset.list.service.AssetListEntryService;
 import com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry;
 import com.liferay.frontend.taglib.form.navigator.FormNavigatorEntry;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -31,6 +30,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.segments.asah.connector.internal.util.AsahUtil;
 import com.liferay.segments.constants.SegmentsEntryConstants;
 
 import java.io.IOException;
@@ -75,12 +75,7 @@ public class AsahInterestTermFormNavigatorEntry
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "content-recommendation");
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		return _servletContext;
+		return LanguageUtil.get(resourceBundle, "content-recommendation");
 	}
 
 	@Override
@@ -124,22 +119,24 @@ public class AsahInterestTermFormNavigatorEntry
 
 	@Override
 	public boolean isVisible(User user, AssetListEntry assetListEntry) {
-		try {
-			if (!_analyticsSettingsManager.isSiteIdSynced(
-					user.getCompanyId(), assetListEntry.getGroupId()) ||
-				(assetListEntry.getType() !=
-					AssetListEntryTypeConstants.TYPE_DYNAMIC)) {
-
-				return false;
-			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
+		if (!AsahUtil.isAnalyticsEnabled(
+				user.getCompanyId(), assetListEntry.getGroupId()) ||
+			(assetListEntry.getType() !=
+				AssetListEntryTypeConstants.TYPE_DYNAMIC)) {
 
 			return false;
 		}
 
 		return true;
+	}
+
+	@Override
+	@Reference(
+		target = "(osgi.web.symbolicname=com.liferay.segments.asah.connector)",
+		unbind = "-"
+	)
+	public void setServletContext(ServletContext servletContext) {
+		super.setServletContext(servletContext);
 	}
 
 	@Override
@@ -151,17 +148,6 @@ public class AsahInterestTermFormNavigatorEntry
 		AsahInterestTermFormNavigatorEntry.class);
 
 	@Reference
-	private AnalyticsSettingsManager _analyticsSettingsManager;
-
-	@Reference
 	private AssetListEntryService _assetListEntryService;
-
-	@Reference
-	private Language _language;
-
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.segments.asah.connector)"
-	)
-	private ServletContext _servletContext;
 
 }

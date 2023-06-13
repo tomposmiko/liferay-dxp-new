@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetCategoryService;
 import com.liferay.asset.kernel.service.AssetVocabularyService;
+import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.media.CommerceMediaResolver;
@@ -27,7 +28,6 @@ import com.liferay.commerce.product.constants.CPAttachmentFileEntryConstants;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.service.CPAttachmentFileEntryService;
 import com.liferay.commerce.product.url.CPFriendlyURL;
-import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.petra.string.StringBundler;
@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -46,7 +45,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 
 import java.util.Collections;
 import java.util.List;
@@ -94,7 +92,7 @@ public class CPAssetCategoriesNavigationDisplayContext {
 			return _assetCategories;
 		}
 
-		AssetCategory assetCategory = _getParentCategory();
+		AssetCategory assetCategory = getParentCategory();
 
 		if (assetCategory != null) {
 			_assetCategories = _assetCategoryService.getVocabularyCategories(
@@ -143,22 +141,12 @@ public class CPAssetCategoriesNavigationDisplayContext {
 			return _assetVocabulary;
 		}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		long assetVocabularyId = GetterUtil.getLong(
 			_cpAssetCategoriesNavigationPortletInstanceConfiguration.
 				assetVocabularyId());
 
-		if ((assetVocabularyId > 0) &&
-			AssetVocabularyPermission.contains(
-				themeDisplay.getPermissionChecker(), assetVocabularyId,
-				ActionKeys.VIEW)) {
-
-			_assetVocabulary = _assetVocabularyService.fetchVocabulary(
-				assetVocabularyId);
-		}
+		_assetVocabulary = _assetVocabularyService.fetchVocabulary(
+			assetVocabularyId);
 
 		return _assetVocabulary;
 	}
@@ -175,7 +163,9 @@ public class CPAssetCategoriesNavigationDisplayContext {
 		return _cpAssetCategoriesNavigationPortletInstanceConfiguration;
 	}
 
-	public String getDefaultImageSrc(long categoryId) throws Exception {
+	public String getDefaultImageSrc(long categoryId, ThemeDisplay themeDisplay)
+		throws Exception {
+
 		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
 			_cpAttachmentFileEntryService.getCPAttachmentFileEntries(
 				_portal.getClassNameId(AssetCategory.class), categoryId,
@@ -193,10 +183,20 @@ public class CPAssetCategoriesNavigationDisplayContext {
 			return null;
 		}
 
+		CommerceContext commerceContext =
+			(CommerceContext)_httpServletRequest.getAttribute(
+				CommerceWebKeys.COMMERCE_CONTEXT);
+
+		long commerceAccountId = 0;
+
+		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+
+		if (commerceAccount != null) {
+			commerceAccountId = commerceAccount.getCommerceAccountId();
+		}
+
 		return _commerceMediaResolver.getURL(
-			CommerceUtil.getCommerceAccountId(
-				(CommerceContext)_httpServletRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT)),
+			commerceAccountId,
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 	}
 
@@ -246,7 +246,7 @@ public class CPAssetCategoriesNavigationDisplayContext {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return StringPool.BLANK;
@@ -276,7 +276,7 @@ public class CPAssetCategoriesNavigationDisplayContext {
 
 		long categoryId = 0;
 
-		AssetCategory assetCategory = _getParentCategory();
+		AssetCategory assetCategory = getParentCategory();
 
 		if (assetCategory == null) {
 			assetCategory = (AssetCategory)_httpServletRequest.getAttribute(
@@ -298,7 +298,7 @@ public class CPAssetCategoriesNavigationDisplayContext {
 		sb.append("<div class=\"lfr-asset-category-list-container\">");
 		sb.append("<ul class=\"lfr-asset-category-list\">");
 
-		_buildCategoriesNavigation(categories, categoryId, themeDisplay, sb);
+		buildCategoriesNavigation(categories, categoryId, themeDisplay, sb);
 
 		sb.append("</ul></div>");
 
@@ -315,7 +315,7 @@ public class CPAssetCategoriesNavigationDisplayContext {
 			useRootCategory();
 	}
 
-	private void _buildCategoriesNavigation(
+	protected void buildCategoriesNavigation(
 			List<AssetCategory> categories, long categoryId,
 			ThemeDisplay themeDisplay, StringBundler sb)
 		throws Exception {
@@ -351,7 +351,7 @@ public class CPAssetCategoriesNavigationDisplayContext {
 			if (!childAssetCategories.isEmpty()) {
 				sb.append("<ul>");
 
-				_buildCategoriesNavigation(
+				buildCategoriesNavigation(
 					childAssetCategories, categoryId, themeDisplay, sb);
 
 				sb.append("</ul>");
@@ -361,7 +361,7 @@ public class CPAssetCategoriesNavigationDisplayContext {
 		}
 	}
 
-	private AssetCategory _getParentCategory() throws PortalException {
+	protected AssetCategory getParentCategory() throws PortalException {
 		AssetCategory assetCategory = null;
 
 		if (useRootCategory()) {

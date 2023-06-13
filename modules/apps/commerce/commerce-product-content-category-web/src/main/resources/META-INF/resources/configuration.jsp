@@ -38,31 +38,29 @@ if (assetCategory != null) {
 
 	<div class="portlet-configuration-body-content">
 		<div class="container-fluid container-fluid-max-xl">
-			<div class="sheet">
-				<div class="panel-group panel-group-flush">
-					<aui:fieldset>
-						<div class="display-template">
-							<liferay-template:template-selector
-								className="<%= CPCategoryContentPortlet.class.getName() %>"
-								displayStyle="<%= cpCategoryContentDisplayContext.getDisplayStyle() %>"
-								displayStyleGroupId="<%= cpCategoryContentDisplayContext.getDisplayStyleGroupId() %>"
-								refreshURL="<%= PortalUtil.getCurrentURL(request) %>"
-								showEmptyOption="<%= true %>"
-							/>
+			<aui:fieldset-group markupView="lexicon">
+				<aui:fieldset>
+					<div class="display-template">
+						<liferay-template:template-selector
+							className="<%= CPCategoryContentPortlet.class.getName() %>"
+							displayStyle="<%= cpCategoryContentDisplayContext.getDisplayStyle() %>"
+							displayStyleGroupId="<%= cpCategoryContentDisplayContext.getDisplayStyleGroupId() %>"
+							refreshURL="<%= PortalUtil.getCurrentURL(request) %>"
+							showEmptyOption="<%= true %>"
+						/>
+					</div>
+
+					<div id="<portlet:namespace />assetCategoryContainer">
+						<div class="lfr-use-asset-category-header">
+							<aui:input checked="<%= cpCategoryContentDisplayContext.useAssetCategory() %>" id="useAssetCategory" label="use-asset-category" name="preferences--useAssetCategory--" type="checkbox" />
 						</div>
 
-						<div id="<portlet:namespace />assetCategoryContainer">
-							<div class="lfr-use-asset-category-header">
-								<aui:input checked="<%= cpCategoryContentDisplayContext.useAssetCategory() %>" id="useAssetCategory" label="use-asset-category" name="preferences--useAssetCategory--" type="checkbox" />
-							</div>
-
-							<div class="lfr-use-asset-category-content toggler-content-collapsed">
-								<aui:input id="preferencesAssetCategoryId" name="preferences--assetCategoryId--" type="number" value="<%= assetCategoryId %>" />
-							</div>
+						<div class="lfr-use-asset-category-content toggler-content-collapsed">
+							<aui:input id="preferencesAssetCategoryId" name="preferences--assetCategoryId--" type="number" value="<%= assetCategoryId %>" />
 						</div>
-					</aui:fieldset>
-				</div>
-			</div>
+					</div>
+				</aui:fieldset>
+			</aui:fieldset-group>
 		</div>
 	</div>
 

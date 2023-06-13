@@ -23,9 +23,9 @@ import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ModuleFrameworkPropsValues;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.lpkg.deployer.LPKGDeployer;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 import java.io.InputStream;
@@ -59,7 +59,7 @@ import org.osgi.service.url.URLStreamHandlerService;
 /**
  * @author Shuyang Zhou
  */
-@Component(service = FileInstaller.class)
+@Component(immediate = true, service = FileInstaller.class)
 public class LPKGArtifactInstaller implements FileInstaller {
 
 	@Override
@@ -83,7 +83,8 @@ public class LPKGArtifactInstaller implements FileInstaller {
 
 		Properties properties = new Properties();
 
-		List<File> lpkgFiles = ContainerLPKGUtil.deploy(file, properties);
+		List<File> lpkgFiles = ContainerLPKGUtil.deploy(
+			file, _bundleContext, properties);
 
 		if (lpkgFiles == null) {
 			_install(file, properties);
@@ -154,15 +155,14 @@ public class LPKGArtifactInstaller implements FileInstaller {
 					if (header == null) {
 						BundleStartLevelUtil.setStartLevelAndStart(
 							bundle,
-							ModuleFrameworkPropsValues.
+							PropsValues.
 								MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
 							_bundleContext);
 					}
 					else {
 						BundleStartLevelUtil.setStartLevelAndStart(
 							bundle,
-							ModuleFrameworkPropsValues.
-								MODULE_FRAMEWORK_WEB_START_LEVEL,
+							PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL,
 							_bundleContext);
 					}
 				}

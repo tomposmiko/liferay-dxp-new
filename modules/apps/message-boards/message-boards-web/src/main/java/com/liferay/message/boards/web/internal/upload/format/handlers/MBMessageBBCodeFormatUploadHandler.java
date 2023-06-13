@@ -60,6 +60,13 @@ public class MBMessageBBCodeFormatUploadHandler
 		return content;
 	}
 
+	@Reference(unbind = "-")
+	protected void setPortletFileRepository(
+		PortletFileRepository portletFileRepository) {
+
+		_portletFileRepository = portletFileRepository;
+	}
+
 	private String _getMBAttachmentFileEntryBBCodeImgTag(
 		FileEntry mbAttachmentFileEntry) {
 
@@ -76,7 +83,6 @@ public class MBMessageBBCodeFormatUploadHandler
 				"=\"", tempFileId, "\"[^\\]]*\\][^\\[]+\\[/img\\]"));
 	}
 
-	@Reference
 	private PortletFileRepository _portletFileRepository;
 
 }

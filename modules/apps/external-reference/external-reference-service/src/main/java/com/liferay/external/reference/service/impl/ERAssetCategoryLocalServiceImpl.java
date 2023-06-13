@@ -50,15 +50,13 @@ public class ERAssetCategoryLocalServiceImpl
 		User user = _userLocalService.getUser(userId);
 
 		AssetCategory assetCategory =
-			_assetCategoryLocalService.
-				fetchAssetCategoryByExternalReferenceCode(
-					externalReferenceCode, user.getCompanyId());
+			_assetCategoryLocalService.fetchAssetCategoryByReferenceCode(
+				user.getCompanyId(), externalReferenceCode);
 
 		if (assetCategory == null) {
 			assetCategory = _assetCategoryLocalService.addCategory(
-				null, userId, groupId, parentCategoryId, titleMap,
-				descriptionMap, vocabularyId, categoryProperties,
-				serviceContext);
+				userId, groupId, parentCategoryId, titleMap, descriptionMap,
+				vocabularyId, categoryProperties, serviceContext);
 
 			assetCategory.setExternalReferenceCode(externalReferenceCode);
 

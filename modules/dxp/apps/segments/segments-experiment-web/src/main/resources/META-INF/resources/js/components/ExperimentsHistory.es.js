@@ -11,7 +11,6 @@
 
 import ClayLabel from '@clayui/label';
 import ClayList from '@clayui/list';
-import {openConfirmModal} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -27,7 +26,7 @@ function ExperimentsHistory({experimentHistory, onDeleteSegmentsExperiment}) {
 
 	const noHistoryIllustration = `${imagesPath}${NO_EXPERIMENT_ILLUSTRATION_FILE_NAME}`;
 
-	return !experimentHistory.length ? (
+	return experimentHistory.length === 0 ? (
 		<div className="text-center">
 			<img
 				alt=""
@@ -61,11 +60,9 @@ function ExperimentsHistory({experimentHistory, onDeleteSegmentsExperiment}) {
 							<ClayList.ItemTitle>
 								{experiment.name}
 							</ClayList.ItemTitle>
-
 							<ClayList.ItemText className="text-secondary">
 								{experiment.description}
 							</ClayList.ItemText>
-
 							<ClayList.ItemText>
 								<ClayLabel
 									displayType={statusToLabelDisplayType(
@@ -76,7 +73,6 @@ function ExperimentsHistory({experimentHistory, onDeleteSegmentsExperiment}) {
 								</ClayLabel>
 							</ClayList.ItemText>
 						</ClayList.ItemField>
-
 						<ClayList.ItemField>
 							<ClayList.QuickActionMenu>
 								<ClayList.QuickActionMenu.Item
@@ -96,16 +92,13 @@ function ExperimentsHistory({experimentHistory, onDeleteSegmentsExperiment}) {
 	);
 
 	function _handleDeleteExperiment(experimentId) {
-		openConfirmModal({
-			message: Liferay.Language.get(
-				'are-you-sure-you-want-to-delete-this'
-			),
-			onConfirm: (isConfirmed) => {
-				if (isConfirmed) {
-					return onDeleteSegmentsExperiment(experimentId);
-				}
-			},
-		});
+		const confirmed = confirm(
+			Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+		);
+
+		if (confirmed) {
+			return onDeleteSegmentsExperiment(experimentId);
+		}
 	}
 }
 

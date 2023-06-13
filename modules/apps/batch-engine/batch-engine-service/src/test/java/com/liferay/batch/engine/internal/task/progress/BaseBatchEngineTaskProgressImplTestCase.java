@@ -14,7 +14,6 @@
 
 package com.liferay.batch.engine.internal.task.progress;
 
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -31,7 +30,7 @@ import java.util.zip.ZipOutputStream;
  */
 public abstract class BaseBatchEngineTaskProgressImplTestCase {
 
-	protected InputStream compress(byte[] bytes, String contentType)
+	protected InputStream compress(String content, String contentType)
 		throws Exception {
 
 		try (ByteArrayOutputStream byteArrayOutputStream =
@@ -45,6 +44,8 @@ public abstract class BaseBatchEngineTaskProgressImplTestCase {
 
 				zipOutputStream.putNextEntry(zipEntry);
 
+				byte[] bytes = content.getBytes();
+
 				zipOutputStream.write(bytes, 0, bytes.length);
 			}
 
@@ -55,7 +56,7 @@ public abstract class BaseBatchEngineTaskProgressImplTestCase {
 
 	protected static final int PRODUCTS_COUNT = 10;
 
-	protected final JSONObject productJSONObject = JSONUtil.put(
+	protected final String productJSON = JSONUtil.put(
 		"active", true
 	).put(
 		"catalogId", 111
@@ -67,6 +68,6 @@ public abstract class BaseBatchEngineTaskProgressImplTestCase {
 		"tags", new String[0]
 	).put(
 		"workflowStatusInfo", MapUtil.singletonDictionary("code", 0)
-	);
+	).toString();
 
 }

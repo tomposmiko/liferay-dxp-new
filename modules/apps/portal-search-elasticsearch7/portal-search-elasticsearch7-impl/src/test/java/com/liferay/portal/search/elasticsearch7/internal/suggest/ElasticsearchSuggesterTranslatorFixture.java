@@ -14,23 +14,25 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.suggest;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
-
 /**
  * @author Michael C. Han
  */
 public class ElasticsearchSuggesterTranslatorFixture {
 
 	public ElasticsearchSuggesterTranslatorFixture() {
-		ReflectionTestUtil.setFieldValue(
-			_elasticsearchSuggesterTranslator, "_completionSuggesterTranslator",
-			new CompletionSuggesterTranslatorImpl());
-		ReflectionTestUtil.setFieldValue(
-			_elasticsearchSuggesterTranslator, "_phraseSuggesterTranslator",
-			new PhraseSuggesterTranslatorImpl());
-		ReflectionTestUtil.setFieldValue(
-			_elasticsearchSuggesterTranslator, "_termSuggesterTranslator",
-			new TermSuggesterTranslatorImpl());
+		_elasticsearchSuggesterTranslator =
+			new ElasticsearchSuggesterTranslator() {
+				{
+					setCompletionSuggesterTranslator(
+						new CompletionSuggesterTranslatorImpl());
+
+					setPhraseSuggesterTranslator(
+						new PhraseSuggesterTranslatorImpl());
+
+					setTermSuggesterTranslator(
+						new TermSuggesterTranslatorImpl());
+				}
+			};
 	}
 
 	public ElasticsearchSuggesterTranslator
@@ -40,7 +42,6 @@ public class ElasticsearchSuggesterTranslatorFixture {
 	}
 
 	private final ElasticsearchSuggesterTranslator
-		_elasticsearchSuggesterTranslator =
-			new ElasticsearchSuggesterTranslator();
+		_elasticsearchSuggesterTranslator;
 
 }

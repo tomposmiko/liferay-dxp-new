@@ -15,7 +15,7 @@
 package com.liferay.account.admin.web.internal.portlet.action;
 
 import com.liferay.account.admin.web.internal.constants.AccountWebKeys;
-import com.liferay.account.admin.web.internal.display.AccountEntryDisplayFactoryUtil;
+import com.liferay.account.admin.web.internal.display.AccountEntryDisplay;
 import com.liferay.account.constants.AccountPortletKeys;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pei-Jung Lan
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_MANAGEMENT,
@@ -50,8 +51,7 @@ public class EditAccountEntryAddressMVCRenderCommand
 
 		renderRequest.setAttribute(
 			AccountWebKeys.ACCOUNT_ENTRY_DISPLAY,
-			AccountEntryDisplayFactoryUtil.create(
-				accountEntryId, renderRequest));
+			AccountEntryDisplay.of(accountEntryId));
 
 		return "/account_entries_admin/edit_account_entry_address.jsp";
 	}

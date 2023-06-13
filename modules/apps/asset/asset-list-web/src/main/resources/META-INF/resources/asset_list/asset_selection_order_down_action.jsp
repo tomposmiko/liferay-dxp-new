@@ -29,7 +29,7 @@ boolean last = position == (searchContainer.getTotal() - 1);
 %>
 
 <c:choose>
-	<c:when test="<%= ((position > 0) && !last) || ((position == 0) && (searchContainer.getTotal() > 1)) %>">
+	<c:when test="<%= (position > 0) && !last %>">
 		<portlet:actionURL name="/asset_list/move_asset_entry_selection" var="moveAssetEntrySelectionDownURL">
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="assetListEntryId" value="<%= String.valueOf(assetListEntryAssetEntryRel.getAssetListEntryId()) %>" />
@@ -38,12 +38,27 @@ boolean last = position == (searchContainer.getTotal() - 1);
 			<portlet:param name="newPosition" value="<%= String.valueOf(position + 1) %>" />
 		</portlet:actionURL>
 
-		<clay:link
-			aria-label='<%= LanguageUtil.get(request, "down") %>'
-			cssClass="lfr-portal-tooltip"
-			href="<%= moveAssetEntrySelectionDownURL %>"
+		<liferay-ui:icon
 			icon="angle-down"
-			title='<%= LanguageUtil.get(request, "down") %>'
+			markupView="lexicon"
+			message="down"
+			url="<%= moveAssetEntrySelectionDownURL %>"
+		/>
+	</c:when>
+	<c:when test="<%= (position == 0) && (searchContainer.getTotal() > 1) %>">
+		<portlet:actionURL name="/asset_list/move_asset_entry_selection" var="moveAssetEntrySelectionDownURL">
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+			<portlet:param name="assetListEntryId" value="<%= String.valueOf(assetListEntryAssetEntryRel.getAssetListEntryId()) %>" />
+			<portlet:param name="segmentsEntryId" value="<%= String.valueOf(assetListEntryAssetEntryRel.getSegmentsEntryId()) %>" />
+			<portlet:param name="position" value="<%= String.valueOf(position) %>" />
+			<portlet:param name="newPosition" value="<%= String.valueOf(position + 1) %>" />
+		</portlet:actionURL>
+
+		<liferay-ui:icon
+			icon="angle-down"
+			markupView="lexicon"
+			message="down"
+			url="<%= moveAssetEntrySelectionDownURL %>"
 		/>
 	</c:when>
 	<c:when test="<%= last && (searchContainer.getTotal() > 1) %>">
@@ -55,12 +70,11 @@ boolean last = position == (searchContainer.getTotal() - 1);
 			<portlet:param name="newPosition" value="<%= String.valueOf(position - 1) %>" />
 		</portlet:actionURL>
 
-		<clay:link
-			aria-label='<%= LanguageUtil.get(request, "up") %>'
-			cssClass="lfr-portal-tooltip"
-			href="<%= moveAssetEntrySelectionUpURL %>"
+		<liferay-ui:icon
 			icon="angle-up"
-			title='<%= LanguageUtil.get(request, "down") %>'
+			markupView="lexicon"
+			message="up"
+			url="<%= moveAssetEntrySelectionUpURL %>"
 		/>
 	</c:when>
 </c:choose>

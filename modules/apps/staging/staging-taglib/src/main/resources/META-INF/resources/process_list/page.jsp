@@ -20,11 +20,7 @@
 	<portlet:param name="redirect" value="<%= currentURL.toString() %>" />
 </portlet:actionURL>
 
-<%
-ProcessListDisplayContext processListDisplayContext = new ProcessListDisplayContext(groupId, request, liferayPortletResponse, liveGroup);
-%>
-
-<aui:form action="<%= deleteBackgroundTasksURL %>" cssClass="<%= processListDisplayContext.getProcessListListViewCss() %>" method="get" name="fm">
+<aui:form action="<%= deleteBackgroundTasksURL %>" cssClass="<%= processListListViewCss %>" method="get" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= currentURL.toString() %>" />
 	<aui:input name="deleteBackgroundTaskIds" type="hidden" />
@@ -36,16 +32,60 @@ ProcessListDisplayContext processListDisplayContext = new ProcessListDisplayCont
 	/>
 
 	<liferay-ui:search-container
-		id='<%= ParamUtil.getString(request, "searchContainerId") %>'
-		searchContainer="<%= processListDisplayContext.getSearchContainer() %>"
+		emptyResultsMessage="no-publish-processes-were-found"
+		id="<%= searchContainerId %>"
+		iteratorURL="<%= renderURL %>"
+		orderByCol="<%= orderByCol %>"
+		orderByComparator="<%= orderByComparator %>"
+		orderByType="<%= orderByType %>"
+		rowChecker="<%= new EmptyOnClickRowChecker(liferayPortletResponse) %>"
 	>
+		<liferay-ui:search-container-results>
+
+			<%
+			int backgroundTasksCount = 0;
+			List<BackgroundTask> backgroundTasks = null;
+
+			if (navigation.equals("all")) {
+				backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(new long[] {groupId, liveGroupId}, taskExecutorClassName);
+
+				if (orderByCol.equals("duration")) {
+					backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasksByDuration(new long[] {groupId, liveGroupId}, new String[] {taskExecutorClassName}, searchContainer.getStart(), searchContainer.getEnd(), StringUtil.equalsIgnoreCase("asc", orderByType));
+				}
+				else {
+					backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(new long[] {groupId, liveGroupId}, taskExecutorClassName, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+				}
+			}
+			else {
+				boolean completed = false;
+
+				if (navigation.equals("completed")) {
+					completed = true;
+				}
+
+				backgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(new long[] {groupId, liveGroupId}, taskExecutorClassName, completed);
+
+				if (orderByCol.equals("duration")) {
+					backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasksByDuration(new long[] {groupId, liveGroupId}, new String[] {taskExecutorClassName}, completed, searchContainer.getStart(), searchContainer.getEnd(), StringUtil.equalsIgnoreCase("asc", orderByType));
+				}
+				else {
+					backgroundTasks = BackgroundTaskManagerUtil.getBackgroundTasks(new long[] {groupId, liveGroupId}, taskExecutorClassName, completed, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+				}
+			}
+
+			searchContainer.setResults(backgroundTasks);
+			searchContainer.setTotal(backgroundTasksCount);
+			%>
+
+		</liferay-ui:search-container-results>
+
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.kernel.backgroundtask.BackgroundTask"
 			keyProperty="backgroundTaskId"
 			modelVar="backgroundTask"
 		>
 			<c:choose>
-				<c:when test='<%= Objects.equals(processListDisplayContext.getDisplayStyle(), "descriptive") %>'>
+				<c:when test='<%= displayStyle.equals("descriptive") %>'>
 					<liferay-ui:search-container-column-text
 						valign="top"
 					>
@@ -68,7 +108,7 @@ ProcessListDisplayContext processListDisplayContext = new ProcessListDisplayCont
 						/>
 					</liferay-ui:search-container-column-text>
 				</c:when>
-				<c:when test='<%= Objects.equals(processListDisplayContext.getDisplayStyle(), "list") %>'>
+				<c:when test='<%= displayStyle.equals("list") %>'>
 					<liferay-ui:search-container-column-text
 						cssClass="table-cell-expand table-cell-minw-200 table-title"
 						name="title"
@@ -122,7 +162,7 @@ ProcessListDisplayContext processListDisplayContext = new ProcessListDisplayCont
 				<liferay-staging:process-list-menu
 					backgroundTask="<%= backgroundTask %>"
 					deleteMenu="<%= deleteMenu %>"
-					localPublishing="<%= processListDisplayContext.isLocalPublishing() %>"
+					localPublishing="<%= localPublishing %>"
 					relaunchMenu="<%= relaunchMenu %>"
 					summaryMenu="<%= summaryMenu && !(backgroundTask.getStatus() == BackgroundTaskConstants.STATUS_FAILED) %>"
 				/>
@@ -130,7 +170,7 @@ ProcessListDisplayContext processListDisplayContext = new ProcessListDisplayCont
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator
-			displayStyle="<%= processListDisplayContext.getDisplayStyle() %>"
+			displayStyle="<%= displayStyle %>"
 			markupView="lexicon"
 			resultRowSplitter="<%= resultRowSplitter %>"
 		/>
@@ -138,5 +178,5 @@ ProcessListDisplayContext processListDisplayContext = new ProcessListDisplayCont
 </aui:form>
 
 <liferay-staging:incomplete-process-message
-	localPublishing="<%= processListDisplayContext.isLocalPublishing() %>"
+	localPublishing="<%= localPublishing %>"
 />

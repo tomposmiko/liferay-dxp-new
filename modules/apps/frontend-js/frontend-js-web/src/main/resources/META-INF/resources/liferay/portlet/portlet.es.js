@@ -58,7 +58,11 @@ export function minimizePortlet(portletSelector, trigger, options) {
 				trigger.setAttribute('alt', title);
 				trigger.setAttribute('title', title);
 
-				trigger.innerHTML = title;
+				const triggerText = trigger.querySelector('.taglib-text-icon');
+
+				if (triggerText) {
+					triggerText.innerHTML = title;
+				}
 
 				const icon = trigger.querySelector('i');
 

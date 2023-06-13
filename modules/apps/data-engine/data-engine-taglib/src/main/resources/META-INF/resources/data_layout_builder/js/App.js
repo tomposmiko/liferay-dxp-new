@@ -16,10 +16,10 @@ import {ClayModalProvider} from '@clayui/modal';
 import {
 	ConfigProvider,
 	FormProvider,
-	KeyboardDNDContextProvider,
 	parseProps,
 } from 'data-engine-js-components-web';
 import {
+	dataDefinitionReducer,
 	dataLayoutReducer,
 	dragAndDropReducer,
 	fieldEditableReducer,
@@ -33,7 +33,6 @@ import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import {DataEngineTaglibCompatibilityLayer} from './DataEngineTaglibCompatibilityLayer';
 import {FormBuilder} from './FormBuilder';
-import KeyboardDNDText from './KeyboardDNDText';
 import INITIAL_CONFIG from './config/initialConfig';
 import INITIAL_STATE from './config/initialState';
 import {useData} from './hooks/useData';
@@ -64,6 +63,7 @@ const App = (props) => {
 					<FormProvider
 						initialState={INITIAL_STATE}
 						reducers={[
+							dataDefinitionReducer,
 							dataLayoutReducer,
 							dragAndDropReducer,
 							fieldEditableReducer,
@@ -76,13 +76,8 @@ const App = (props) => {
 						]}
 						value={{...state, ...dataDefinition, dataLayout}}
 					>
-						<KeyboardDNDContextProvider>
-							<DataEngineTaglibCompatibilityLayer />
-
-							<FormBuilder />
-
-							<KeyboardDNDText />
-						</KeyboardDNDContextProvider>
+						<DataEngineTaglibCompatibilityLayer />
+						<FormBuilder />
 					</FormProvider>
 				</ConfigProvider>
 			</ClayModalProvider>

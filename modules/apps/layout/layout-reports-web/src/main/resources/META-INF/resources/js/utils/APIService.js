@@ -15,9 +15,9 @@
 import {fetch} from 'frontend-js-web';
 
 export default {
-	getLayoutReportsIssues(layoutReportsIssuesURL, refreshCache) {
+	getLayoutReportsIssues(layoutReportsIssuesURL, namespace, refreshCache) {
 		return fetchWithError(layoutReportsIssuesURL, {
-			body: getFormDataRequest({refreshCache}),
+			body: getFormDataRequest({refreshCache}, namespace),
 			method: 'POST',
 		});
 	},
@@ -31,9 +31,9 @@ export default {
  * @param {FormData} [formData=new FormData()]
  * @returns {FormData}
  */
-function getFormDataRequest(body, formData = new FormData()) {
+function getFormDataRequest(body, prefix, formData = new FormData()) {
 	Object.entries(body).forEach(([key, value]) => {
-		formData.append(`${key}`, value);
+		formData.append(`${prefix}${key}`, value);
 	});
 
 	return formData;

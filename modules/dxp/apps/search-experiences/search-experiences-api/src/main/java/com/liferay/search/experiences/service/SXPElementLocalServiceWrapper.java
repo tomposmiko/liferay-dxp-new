@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class SXPElementLocalServiceWrapper
 	implements ServiceWrapper<SXPElementLocalService>, SXPElementLocalService {
 
-	public SXPElementLocalServiceWrapper() {
-		this(null);
-	}
-
 	public SXPElementLocalServiceWrapper(
 		SXPElementLocalService sxpElementLocalService) {
 
@@ -38,18 +34,15 @@ public class SXPElementLocalServiceWrapper
 
 	@Override
 	public com.liferay.search.experiences.model.SXPElement addSXPElement(
-			String externalReferenceCode, long userId,
-			java.util.Map<java.util.Locale, String> descriptionMap,
+			long userId, java.util.Map<java.util.Locale, String> descriptionMap,
 			String elementDefinitionJSON, boolean readOnly,
-			String schemaVersion,
 			java.util.Map<java.util.Locale, String> titleMap, int type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _sxpElementLocalService.addSXPElement(
-			externalReferenceCode, userId, descriptionMap,
-			elementDefinitionJSON, readOnly, schemaVersion, titleMap, type,
-			serviceContext);
+			userId, descriptionMap, elementDefinitionJSON, readOnly, titleMap,
+			type, serviceContext);
 	}
 
 	/**
@@ -91,13 +84,6 @@ public class SXPElementLocalServiceWrapper
 		long sxpElementId) {
 
 		return _sxpElementLocalService.createSXPElement(sxpElementId);
-	}
-
-	@Override
-	public void deleteCompanySXPElements(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_sxpElementLocalService.deleteCompanySXPElements(companyId);
 	}
 
 	/**
@@ -258,15 +244,6 @@ public class SXPElementLocalServiceWrapper
 		return _sxpElementLocalService.fetchSXPElement(sxpElementId);
 	}
 
-	@Override
-	public com.liferay.search.experiences.model.SXPElement
-		fetchSXPElementByExternalReferenceCode(
-			String externalReferenceCode, long companyId) {
-
-		return _sxpElementLocalService.fetchSXPElementByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -342,16 +319,6 @@ public class SXPElementLocalServiceWrapper
 		return _sxpElementLocalService.getSXPElement(sxpElementId);
 	}
 
-	@Override
-	public com.liferay.search.experiences.model.SXPElement
-			getSXPElementByExternalReferenceCode(
-				String externalReferenceCode, long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _sxpElementLocalService.getSXPElementByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -387,13 +354,6 @@ public class SXPElementLocalServiceWrapper
 		return _sxpElementLocalService.getSXPElements(start, end);
 	}
 
-	@Override
-	public java.util.List<com.liferay.search.experiences.model.SXPElement>
-		getSXPElements(long companyId, boolean readOnly) {
-
-		return _sxpElementLocalService.getSXPElements(companyId, readOnly);
-	}
-
 	/**
 	 * Returns the number of sxp elements.
 	 *
@@ -417,14 +377,14 @@ public class SXPElementLocalServiceWrapper
 	public com.liferay.search.experiences.model.SXPElement updateSXPElement(
 			long userId, long sxpElementId,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String elementDefinitionJSON, boolean hidden, String schemaVersion,
+			String elementDefinitionJSON, boolean hidden,
 			java.util.Map<java.util.Locale, String> titleMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _sxpElementLocalService.updateSXPElement(
 			userId, sxpElementId, descriptionMap, elementDefinitionJSON, hidden,
-			schemaVersion, titleMap, serviceContext);
+			titleMap, serviceContext);
 	}
 
 	/**

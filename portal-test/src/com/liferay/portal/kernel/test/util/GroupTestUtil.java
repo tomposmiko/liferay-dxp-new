@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
@@ -121,39 +120,6 @@ public class GroupTestUtil {
 	}
 
 	public static Group addGroup(
-			long companyId, long userId, long parentGroupId, String groupKey)
-		throws Exception {
-
-		Group group = GroupLocalServiceUtil.fetchGroup(companyId, groupKey);
-
-		if (group != null) {
-			return group;
-		}
-
-		Map<Locale, String> nameMap = HashMapBuilder.put(
-			LocaleUtil.getDefault(), groupKey
-		).build();
-
-		int type = GroupConstants.TYPE_SITE_OPEN;
-		String friendlyURL =
-			StringPool.SLASH + FriendlyURLNormalizerUtil.normalize(groupKey);
-		boolean site = true;
-		boolean active = true;
-		boolean manualMembership = true;
-		int membershipRestriction =
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION;
-
-		return GroupLocalServiceUtil.addGroup(
-			userId, parentGroupId, null, 0,
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap,
-			HashMapBuilder.put(
-				LocaleUtil.getDefault(), RandomTestUtil.randomString()
-			).build(),
-			type, manualMembership, membershipRestriction, friendlyURL, site,
-			active, ServiceContextTestUtil.getServiceContext());
-	}
-
-	public static Group addGroup(
 			long parentGroupId, ServiceContext serviceContext)
 		throws Exception {
 
@@ -199,19 +165,6 @@ public class GroupTestUtil {
 			).build(),
 			type, manualMembership, membershipRestriction, friendlyURL, site,
 			active, serviceContext);
-	}
-
-	public static Group addGroupToCompany(long companyId) throws Exception {
-		return addGroupToCompany(
-			companyId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
-	}
-
-	public static Group addGroupToCompany(long companyId, long parentGroupId)
-		throws Exception {
-
-		User user = UserTestUtil.getAdminUser(companyId);
-
-		return addGroup(companyId, user.getUserId(), parentGroupId);
 	}
 
 	public static void addLayoutSetVirtualHost(

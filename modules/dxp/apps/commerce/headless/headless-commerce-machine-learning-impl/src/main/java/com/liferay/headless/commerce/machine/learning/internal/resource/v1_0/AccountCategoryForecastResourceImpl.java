@@ -18,11 +18,11 @@ import com.liferay.commerce.machine.learning.forecast.AssetCategoryCommerceMLFor
 import com.liferay.commerce.machine.learning.forecast.AssetCategoryCommerceMLForecastManager;
 import com.liferay.headless.commerce.machine.learning.dto.v1_0.AccountCategoryForecast;
 import com.liferay.headless.commerce.machine.learning.internal.constants.CommerceMLForecastConstants;
+import com.liferay.headless.commerce.machine.learning.internal.dto.v1_0.converter.AccountCategoryForecastDTOConverter;
 import com.liferay.headless.commerce.machine.learning.internal.dto.v1_0.converter.CommerceMLForecastCompositeResourcePrimaryKey;
-import com.liferay.headless.commerce.machine.learning.internal.helper.v1_0.CommerceAccountPermissionHelper;
+import com.liferay.headless.commerce.machine.learning.internal.util.v1_0.CommerceAccountPermissionHelper;
 import com.liferay.headless.commerce.machine.learning.resource.v1_0.AccountCategoryForecastResource;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -44,6 +44,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @author Riccardo Ferrari
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v1_0/account-category-forecast.properties",
 	scope = ServiceScope.PROTOTYPE,
 	service = AccountCategoryForecastResource.class
@@ -57,40 +58,39 @@ public class AccountCategoryForecastResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		contextBatchUnsafeConsumer.accept(
-			accountCategoryForecasts,
-			accountCategoryForecast -> {
-				AssetCategoryCommerceMLForecast
-					assetCategoryCommerceMLForecast =
-						_assetCategoryCommerceMLForecastManager.create();
+		for (AccountCategoryForecast accountCategoryForecast :
+				accountCategoryForecasts) {
 
-				if (accountCategoryForecast.getActual() != null) {
-					assetCategoryCommerceMLForecast.setActual(
-						accountCategoryForecast.getActual());
-				}
+			AssetCategoryCommerceMLForecast assetCategoryCommerceMLForecast =
+				_assetCategoryCommerceMLForecastManager.create();
 
-				assetCategoryCommerceMLForecast.setAssetCategoryId(
-					accountCategoryForecast.getCategory());
-				assetCategoryCommerceMLForecast.setCommerceAccountId(
-					accountCategoryForecast.getAccount());
-				assetCategoryCommerceMLForecast.setCompanyId(
-					contextCompany.getCompanyId());
-				assetCategoryCommerceMLForecast.setForecast(
-					accountCategoryForecast.getForecast());
-				assetCategoryCommerceMLForecast.setForecastLowerBound(
-					accountCategoryForecast.getForecastLowerBound());
-				assetCategoryCommerceMLForecast.setForecastUpperBound(
-					accountCategoryForecast.getForecastUpperBound());
-				assetCategoryCommerceMLForecast.setPeriod("month");
-				assetCategoryCommerceMLForecast.setScope("asset-category");
-				assetCategoryCommerceMLForecast.setTarget("revenue");
-				assetCategoryCommerceMLForecast.setTimestamp(
-					accountCategoryForecast.getTimestamp());
+			if (accountCategoryForecast.getActual() != null) {
+				assetCategoryCommerceMLForecast.setActual(
+					accountCategoryForecast.getActual());
+			}
 
-				_assetCategoryCommerceMLForecastManager.
-					addAssetCategoryCommerceMLForecast(
-						assetCategoryCommerceMLForecast);
-			});
+			assetCategoryCommerceMLForecast.setAssetCategoryId(
+				accountCategoryForecast.getCategory());
+			assetCategoryCommerceMLForecast.setCommerceAccountId(
+				accountCategoryForecast.getAccount());
+			assetCategoryCommerceMLForecast.setCompanyId(
+				contextCompany.getCompanyId());
+			assetCategoryCommerceMLForecast.setForecast(
+				accountCategoryForecast.getForecast());
+			assetCategoryCommerceMLForecast.setForecastLowerBound(
+				accountCategoryForecast.getForecastLowerBound());
+			assetCategoryCommerceMLForecast.setForecastUpperBound(
+				accountCategoryForecast.getForecastUpperBound());
+			assetCategoryCommerceMLForecast.setPeriod("month");
+			assetCategoryCommerceMLForecast.setScope("asset-category");
+			assetCategoryCommerceMLForecast.setTarget("revenue");
+			assetCategoryCommerceMLForecast.setTimestamp(
+				accountCategoryForecast.getTimestamp());
+
+			_assetCategoryCommerceMLForecastManager.
+				addAssetCategoryCommerceMLForecast(
+					assetCategoryCommerceMLForecast);
+		}
 	}
 
 	@Override
@@ -151,12 +151,9 @@ public class AccountCategoryForecastResourceImpl
 					historyLength, forecastLength));
 	}
 
-	@Reference(
-		target = "(component.name=com.liferay.headless.commerce.machine.learning.internal.dto.v1_0.converter.AccountCategoryForecastDTOConverter)"
-	)
-	private DTOConverter
-		<AssetCategoryCommerceMLForecast, AccountCategoryForecast>
-			_accountCategoryForecastDTOConverter;
+	@Reference
+	private AccountCategoryForecastDTOConverter
+		_accountCategoryForecastDTOConverter;
 
 	@Reference
 	private AssetCategoryCommerceMLForecastManager

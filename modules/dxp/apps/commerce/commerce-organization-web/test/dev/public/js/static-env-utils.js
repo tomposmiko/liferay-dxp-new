@@ -27,9 +27,7 @@ const Liferay = {
 		getBCP47LanguageId: () => 'en-US',
 		getCanonicalURL: () => '/',
 		getDefaultLanguageId: () => 'en_US',
-		getDoAsUserIdEncoded: () => '',
 		getLanguageId: () => 'it_IT',
-		getPathContext: () => '',
 		getPathThemeImages: () => '/assets',
 		getPortalURL: () => window.location.origin,
 		getScopeGroupId: () => '123',
@@ -47,7 +45,7 @@ const Liferay = {
 		window.removeEventListener(name, fn);
 	},
 	fire: (name, payload) => {
-		const event = document.createEvent('CustomEvent');
+		var event = document.createEvent('CustomEvent');
 		event.initCustomEvent(name);
 
 		if (payload) {
@@ -70,8 +68,8 @@ window.defaultFetch = fetch;
 
 window.fetch = (resource, {headers, ...init} = {}) => {
 	headers = new Headers({
-		'Accept': 'application/json',
-		'Authorization': `Basic ${window.btoa('test@liferay.com:test')}`,
+		Accept: 'application/json',
+		Authorization: `Basic ${window.btoa('test@liferay.com:test')}`,
 		'Content-Type': 'application/json',
 	});
 

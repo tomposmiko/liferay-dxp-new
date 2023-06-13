@@ -27,26 +27,25 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Riccardo Alberti
  */
-@Component(service = CommercePriceListDiscovery.class)
+@Component(
+	enabled = false,
+	property = "commerce.price.list.discovery.key=" + CommercePricingConstants.ORDER_BY_LOWEST_ENTRY,
+	service = CommercePriceListDiscovery.class
+)
 public class CommercePriceListLowestDiscoveryImpl
 	implements CommercePriceListDiscovery {
 
 	@Override
 	public CommercePriceList getCommercePriceList(
 			long groupId, long commerceAccountId, long commerceChannelId,
-			long commerceOrderTypeId, String cpInstanceUuid, String type)
+			long commerceOrderTypeId, String cPInstanceUuid, String type)
 		throws PortalException {
 
 		return _commercePriceListLocalService.getCommercePriceListByLowestPrice(
 			groupId, commerceAccountId,
 			_commerceAccountHelper.getCommerceAccountGroupIds(
 				commerceAccountId),
-			commerceChannelId, commerceOrderTypeId, cpInstanceUuid, type);
-	}
-
-	@Override
-	public String getCommercePriceListDiscoveryKey() {
-		return CommercePricingConstants.ORDER_BY_LOWEST_ENTRY;
+			commerceChannelId, commerceOrderTypeId, cPInstanceUuid, type);
 	}
 
 	@Reference

@@ -24,6 +24,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -34,7 +35,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
@@ -42,9 +42,7 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.security.PermissionsURLTag;
 import com.liferay.trash.TrashHelper;
@@ -141,7 +139,7 @@ public class BlogsEntryActionDropdownItemsProvider {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -183,7 +181,7 @@ public class BlogsEntryActionDropdownItemsProvider {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 
 			return false;
@@ -240,6 +238,7 @@ public class BlogsEntryActionDropdownItemsProvider {
 				"mvcRenderCommandName", "/blogs/edit_entry", "redirect",
 				_getRedirectURL(), "portletResource", portletResource,
 				"entryId", blogsEntry.getEntryId());
+
 			dropdownItem.setIcon("edit");
 			dropdownItem.setLabel(LanguageUtil.get(_resourceBundle, "edit"));
 		};
@@ -264,7 +263,7 @@ public class BlogsEntryActionDropdownItemsProvider {
 					"entryId", blogsEntry.getEntryId()
 				).buildString());
 			dropdownItem.setLabel(
-				LanguageUtil.get(_httpServletRequest, "delete"));
+				LanguageUtil.get(_httpServletRequest, "move-to-recycle-bin"));
 		};
 	}
 
@@ -316,12 +315,6 @@ public class BlogsEntryActionDropdownItemsProvider {
 	}
 
 	private String _getRedirectURL() {
-		String redirect = ParamUtil.getString(_httpServletRequest, "redirect");
-
-		if (Validator.isNotNull(redirect)) {
-			return redirect;
-		}
-
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(

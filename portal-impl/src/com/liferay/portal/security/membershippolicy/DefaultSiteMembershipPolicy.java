@@ -66,7 +66,7 @@ public class DefaultSiteMembershipPolicy extends BaseSiteMembershipPolicy {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 
 		return true;

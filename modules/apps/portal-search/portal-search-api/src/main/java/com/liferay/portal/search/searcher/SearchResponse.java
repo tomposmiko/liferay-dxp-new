@@ -22,11 +22,11 @@ import com.liferay.portal.search.groupby.GroupByResponse;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.stats.StatsResponse;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -46,15 +46,15 @@ public interface SearchResponse {
 
 	public long getCount();
 
-	public List<Document> getDocuments();
-
 	public List<com.liferay.portal.kernel.search.Document> getDocuments71();
+
+	public Stream<Document> getDocumentsStream();
 
 	public String getFederatedSearchKey();
 
 	public SearchResponse getFederatedSearchResponse(String key);
 
-	public Collection<SearchResponse> getFederatedSearchResponses();
+	public Stream<SearchResponse> getFederatedSearchResponsesStream();
 
 	/**
 	 * Returns the map containing the top hits aggregations for each field.

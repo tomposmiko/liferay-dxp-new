@@ -15,14 +15,17 @@
 package com.liferay.dynamic.data.mapping.form.web.internal.security.permission.resource;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.osgi.util.service.Snapshot;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Rafael Praxedes
  */
+@Component(immediate = true, service = {})
 public class DDMStructurePermission {
 
 	public static boolean contains(
@@ -30,10 +33,7 @@ public class DDMStructurePermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DDMStructure> modelResourcePermission =
-			_ddmStructureModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ddmStructureModelResourcePermission.contains(
 			permissionChecker, structure, actionId);
 	}
 
@@ -42,18 +42,21 @@ public class DDMStructurePermission {
 			String actionId)
 		throws PortalException {
 
-		ModelResourcePermission<DDMStructure> modelResourcePermission =
-			_ddmStructureModelResourcePermissionSnapshot.get();
-
-		return modelResourcePermission.contains(
+		return _ddmStructureModelResourcePermission.contains(
 			permissionChecker, structureId, actionId);
 	}
 
-	private static final Snapshot<ModelResourcePermission<DDMStructure>>
-		_ddmStructureModelResourcePermissionSnapshot = new Snapshot<>(
-			DDMStructurePermission.class,
-			Snapshot.cast(ModelResourcePermission.class),
-			"(model.class.name=com.liferay.dynamic.data.mapping.model." +
-				"DDMStructure)");
+	@Reference(
+		target = "(model.class.name=com.liferay.dynamic.data.mapping.model.DDMStructure)",
+		unbind = "-"
+	)
+	protected void setModelResourcePermission(
+		ModelResourcePermission<DDMStructure> modelResourcePermission) {
+
+		_ddmStructureModelResourcePermission = modelResourcePermission;
+	}
+
+	private static ModelResourcePermission<DDMStructure>
+		_ddmStructureModelResourcePermission;
 
 }

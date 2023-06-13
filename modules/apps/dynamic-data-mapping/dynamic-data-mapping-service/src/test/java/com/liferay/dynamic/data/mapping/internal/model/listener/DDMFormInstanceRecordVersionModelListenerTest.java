@@ -25,13 +25,20 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import org.powermock.api.mockito.PowerMockito;
 
 /**
  * @author Marcos Martins
  */
-public class DDMFormInstanceRecordVersionModelListenerTest {
+@RunWith(MockitoJUnitRunner.class)
+public class DDMFormInstanceRecordVersionModelListenerTest
+	extends PowerMockito {
 
 	@ClassRule
 	@Rule
@@ -49,23 +56,23 @@ public class DDMFormInstanceRecordVersionModelListenerTest {
 
 	@Test
 	public void testOnAfterUpdate() throws PortalException {
-		Mockito.when(
+		when(
 			_ddmFormInstanceReportLocalService.
 				getFormInstanceReportByFormInstanceId(Mockito.anyLong())
 		).thenThrow(
 			new NoSuchFormInstanceReportException()
 		);
 
-		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
-			Mockito.mock(DDMFormInstanceRecordVersion.class);
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = mock(
+			DDMFormInstanceRecordVersion.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecordVersion.getFormInstanceId()
 		).thenReturn(
 			0L
 		);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecordVersion.getStatus()
 		).thenReturn(
 			WorkflowConstants.STATUS_APPROVED
@@ -77,23 +84,23 @@ public class DDMFormInstanceRecordVersionModelListenerTest {
 
 	@Test
 	public void testOnBeforeUpdate() throws PortalException {
-		Mockito.when(
+		when(
 			_ddmFormInstanceReportLocalService.
 				getFormInstanceReportByFormInstanceId(Mockito.anyLong())
 		).thenThrow(
 			new NoSuchFormInstanceReportException()
 		);
 
-		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
-			Mockito.mock(DDMFormInstanceRecordVersion.class);
+		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = mock(
+			DDMFormInstanceRecordVersion.class);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecordVersion.getFormInstanceId()
 		).thenReturn(
 			0L
 		);
 
-		Mockito.when(
+		when(
 			ddmFormInstanceRecordVersion.getStatus()
 		).thenReturn(
 			WorkflowConstants.STATUS_APPROVED
@@ -110,8 +117,9 @@ public class DDMFormInstanceRecordVersionModelListenerTest {
 
 	private DDMFormInstanceRecordVersionModelListener
 		_ddmFormInstanceRecordVersionModelListener;
-	private final DDMFormInstanceReportLocalService
-		_ddmFormInstanceReportLocalService = Mockito.mock(
-			DDMFormInstanceReportLocalService.class);
+
+	@Mock
+	private DDMFormInstanceReportLocalService
+		_ddmFormInstanceReportLocalService;
 
 }

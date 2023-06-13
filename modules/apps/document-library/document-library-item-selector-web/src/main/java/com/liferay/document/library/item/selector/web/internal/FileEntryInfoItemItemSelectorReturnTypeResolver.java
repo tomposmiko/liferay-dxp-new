@@ -26,8 +26,6 @@ import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.item.selector.criteria.InfoItemItemSelectorReturnType;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -89,8 +87,9 @@ public class FileEntryInfoItemItemSelectorReturnTypeResolver
 
 	private ClassType _getClassType(FileEntry fileEntry, Locale locale) {
 		AssetRendererFactory<?> assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
-				DLFileEntry.class);
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(
+					_portal.getClassNameId(DLFileEntry.class));
 
 		if (assetRendererFactory == null) {
 			return null;
@@ -112,16 +111,9 @@ public class FileEntryInfoItemItemSelectorReturnTypeResolver
 				assetEntry.getClassTypeId(), locale);
 		}
 		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-
 			return null;
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FileEntryInfoItemItemSelectorReturnTypeResolver.class);
 
 	@Reference
 	private Portal _portal;

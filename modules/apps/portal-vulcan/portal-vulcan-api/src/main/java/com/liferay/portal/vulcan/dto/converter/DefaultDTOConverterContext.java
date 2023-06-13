@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -146,8 +147,8 @@ public class DefaultDTOConverterContext implements DTOConverterContext {
 	}
 
 	@Override
-	public UriInfo getUriInfo() {
-		return _uriInfo;
+	public Optional<UriInfo> getUriInfoOptional() {
+		return Optional.ofNullable(_uriInfo);
 	}
 
 	@Override

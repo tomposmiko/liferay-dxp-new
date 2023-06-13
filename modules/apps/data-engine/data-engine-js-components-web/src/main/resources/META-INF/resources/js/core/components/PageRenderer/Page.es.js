@@ -27,10 +27,8 @@ import * as DefaultVariant from './DefaultVariant.es';
 import {Layout} from './Layout.es';
 import * as Tabbed from './TabbedVariant.es';
 import {VariantsProvider} from './VariantsContext.es';
-import * as WebContentVariant from './WebContentVariant.es';
 
 const LAYOUT_TYPES = {
-	JOURNAL: 'journal',
 	MULTI_PAGES: 'multi-pages',
 	PAGINATED: 'paginated',
 	SINGLE_PAGE: 'single-page',
@@ -40,7 +38,6 @@ const LAYOUT_TYPES = {
 };
 
 const LAYOUT_COMPONENTS_TYPES = {
-	[LAYOUT_TYPES.JOURNAL]: WebContentVariant,
 	[LAYOUT_TYPES.MULTI_PAGES]: MultiPages,
 	[LAYOUT_TYPES.PAGINATED]: Paginated,
 	[LAYOUT_TYPES.SINGLE_PAGE]: {
@@ -179,7 +176,11 @@ const Page = ({
 	if (pages?.[activePage]) {
 		const visitor = new PagesVisitor([pages[activePage]]);
 
-		hasFieldRequired = !!visitor.findField((field) => field.required);
+		visitor.mapFields((field) => {
+			if (field.required) {
+				hasFieldRequired = true;
+			}
+		});
 	}
 
 	const isDDMFormPortletNamespace = portletNamespace.includes(
@@ -217,15 +218,12 @@ const Page = ({
 							<span className="c-mr-1 reference-mark">
 								<ClayIcon symbol="asterisk" />
 							</span>
-
 							{Liferay.Language.get('indicates-required-fields')}
 						</p>
 					)}
-
 					<Layout
 						components={Components}
 						editable={editable}
-						itemPath={[pageIndex]}
 						rows={page.rows}
 						viewMode={viewMode}
 					/>

@@ -18,4 +18,5 @@ import '../../src/main/resources/META-INF/resources/styles/main.scss';
 
 launcher('add-to-wish-list', 'add-to-wish-list', {
 	iconOnly: false,
+	spritemap: './assets/clay/icons.svg',
 });

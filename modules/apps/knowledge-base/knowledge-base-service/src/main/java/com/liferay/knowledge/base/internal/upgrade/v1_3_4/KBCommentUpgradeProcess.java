@@ -25,29 +25,28 @@ public class KBCommentUpgradeProcess extends UpgradeProcess {
 
 	@Override
 	protected void doUpgrade() throws Exception {
-		_upgradeSchema();
-		_upgradeKBComments();
+		upgradeSchema();
+		upgradeKBComments();
 	}
 
-	private void _upgradeKBComments() throws Exception {
+	protected void upgradeKBComments() throws Exception {
 		if (!hasColumn("KBComment", "helpful")) {
 			return;
 		}
 
 		runSQL(
 			"update KBComment set userRating = " +
-				KBCommentConstants.USER_RATING_LIKE +
-					" where helpful = [$TRUE$]");
+				KBCommentConstants.USER_RATING_LIKE + " where helpful = TRUE");
 
 		runSQL(
 			"update KBComment set userRating = " +
 				KBCommentConstants.USER_RATING_DISLIKE +
-					" where helpful = [$FALSE$]");
+					" where helpful = FALSE");
 
-		alterTableDropColumn("KBComment", "helpful");
+		runSQL("alter table KBComment drop column helpful");
 	}
 
-	private void _upgradeSchema() throws Exception {
+	protected void upgradeSchema() throws Exception {
 		String template = StringUtil.read(
 			KBCommentUpgradeProcess.class.getResourceAsStream(
 				"dependencies/update.sql"));

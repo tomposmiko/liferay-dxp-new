@@ -20,13 +20,14 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
+import java.util.function.IntFunction;
 
 /**
  * @author Marcellus Tavares
  */
 public interface DDMFormFieldValueAccessor<T> {
 
-	public default T[] getArrayGenericType() {
+	public default IntFunction<T[]> getArrayGeneratorIntFunction() {
 		throw new UnsupportedOperationException(
 			"Cannot create an array of a generic type");
 	}

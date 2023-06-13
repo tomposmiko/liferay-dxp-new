@@ -66,20 +66,13 @@ public class PageCollectionItemDefinitionSerDes {
 
 			sb.append("\"collectionItemConfig\": ");
 
-			if (
-					pageCollectionItemDefinition.
-						getCollectionItemConfig() instanceof String) {
+			sb.append("\"");
 
-				sb.append("\"");
-				sb.append(
-					(String)
-						pageCollectionItemDefinition.getCollectionItemConfig());
-				sb.append("\"");
-			}
-			else {
-				sb.append(
-					pageCollectionItemDefinition.getCollectionItemConfig());
-			}
+			sb.append(
+				_escape(
+					pageCollectionItemDefinition.getCollectionItemConfig()));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");

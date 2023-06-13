@@ -20,9 +20,6 @@
 taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 
-<%@ page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.JSPNavigationItemList" %><%@
-page import="com.liferay.portal.kernel.language.LanguageUtil" %>
-
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />

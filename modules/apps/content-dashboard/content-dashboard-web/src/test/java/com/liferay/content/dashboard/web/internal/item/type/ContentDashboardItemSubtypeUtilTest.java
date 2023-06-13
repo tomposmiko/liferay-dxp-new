@@ -14,19 +14,20 @@
 
 package com.liferay.content.dashboard.web.internal.item.type;
 
-import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
-import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactory;
-import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactoryRegistry;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -46,7 +47,7 @@ public class ContentDashboardItemSubtypeUtilTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
-	public void testToContentDashboardItemSubtypeByClassNameAndClassPK()
+	public void testToContentDashboardItemSubtypeOptionalByClassNameAndClassPK()
 		throws PortalException {
 
 		ContentDashboardItemSubtype contentDashboardItemSubtype =
@@ -55,29 +56,90 @@ public class ContentDashboardItemSubtypeUtilTest {
 		ContentDashboardItemSubtypeFactory contentDashboardItemSubtypeFactory =
 			_getContentDashboardItemSubtypeFactory(contentDashboardItemSubtype);
 
+		ContentDashboardItemSubtypeFactoryTracker
+			contentDashboardItemSubtypeFactoryTracker =
+				_getContentDashboardItemSubtypeFactoryTracker(
+					contentDashboardItemSubtype,
+					contentDashboardItemSubtypeFactory);
+
+		Optional<ContentDashboardItemSubtype>
+			contentDashboardItemSubtypeOptional =
+				ContentDashboardItemSubtypeUtil.
+					toContentDashboardItemSubtypeOptional(
+						contentDashboardItemSubtypeFactoryTracker,
+						contentDashboardItemSubtype.getInfoItemReference());
+
 		Assert.assertEquals(
 			contentDashboardItemSubtype,
-			ContentDashboardItemSubtypeUtil.toContentDashboardItemSubtype(
-				_getContentDashboardItemSubtypeFactoryRegistry(
-					contentDashboardItemSubtype,
-					contentDashboardItemSubtypeFactory),
-				contentDashboardItemSubtype.getInfoItemReference()));
+			contentDashboardItemSubtypeOptional.get());
 	}
 
 	@Test
-	public void testToContentDashboardItemSubtypeByClassNameAndClassPKWithoutContentDashboardItemSubtypeFactory() {
+	public void testToContentDashboardItemSubtypeOptionalByClassNameAndClassPKWithoutContentDashboardItemSubtypeFactory() {
 		ContentDashboardItemSubtype contentDashboardItemSubtype =
 			_getContentDashboardItemSubtype();
 
-		Assert.assertNull(
-			ContentDashboardItemSubtypeUtil.toContentDashboardItemSubtype(
-				_getContentDashboardItemSubtypeFactoryRegistry(
-					contentDashboardItemSubtype, null),
-				contentDashboardItemSubtype.getInfoItemReference()));
+		ContentDashboardItemSubtypeFactoryTracker
+			contentDashboardItemSubtypeFactoryTracker =
+				_getContentDashboardItemSubtypeFactoryTracker(
+					contentDashboardItemSubtype, null);
+
+		Optional<ContentDashboardItemSubtype>
+			contentDashboardItemSubtypeOptional =
+				ContentDashboardItemSubtypeUtil.
+					toContentDashboardItemSubtypeOptional(
+						contentDashboardItemSubtypeFactoryTracker,
+						contentDashboardItemSubtype.getInfoItemReference());
+
+		Assert.assertFalse(contentDashboardItemSubtypeOptional.isPresent());
 	}
 
 	@Test
-	public void testToContentDashboardItemSubtypeByJSONObject()
+	public void testToContentDashboardItemSubtypeOptionalByDocument()
+		throws PortalException {
+
+		ContentDashboardItemSubtype contentDashboardItemSubtype =
+			_getContentDashboardItemSubtype();
+
+		InfoItemReference infoItemReference =
+			contentDashboardItemSubtype.getInfoItemReference();
+
+		Document document = Mockito.mock(Document.class);
+
+		Mockito.when(
+			document.get(Field.ENTRY_CLASS_NAME)
+		).thenReturn(
+			infoItemReference.getClassName()
+		);
+
+		Mockito.when(
+			document.get(Field.ENTRY_CLASS_PK)
+		).thenReturn(
+			String.valueOf(infoItemReference.getClassPK())
+		);
+
+		ContentDashboardItemSubtypeFactory contentDashboardItemSubtypeFactory =
+			_getContentDashboardItemSubtypeFactory(contentDashboardItemSubtype);
+
+		ContentDashboardItemSubtypeFactoryTracker
+			contentDashboardItemSubtypeFactoryTracker =
+				_getContentDashboardItemSubtypeFactoryTracker(
+					contentDashboardItemSubtype,
+					contentDashboardItemSubtypeFactory);
+
+		Optional<ContentDashboardItemSubtype>
+			contentDashboardItemSubtypeOptional =
+				ContentDashboardItemSubtypeUtil.
+					toContentDashboardItemSubtypeOptional(
+						contentDashboardItemSubtypeFactoryTracker, document);
+
+		Assert.assertEquals(
+			contentDashboardItemSubtype,
+			contentDashboardItemSubtypeOptional.get());
+	}
+
+	@Test
+	public void testToContentDashboardItemSubtypeOptionalByJSONObject()
 		throws PortalException {
 
 		ContentDashboardItemSubtype contentDashboardItemSubtype =
@@ -86,41 +148,71 @@ public class ContentDashboardItemSubtypeUtilTest {
 		ContentDashboardItemSubtypeFactory contentDashboardItemSubtypeFactory =
 			_getContentDashboardItemSubtypeFactory(contentDashboardItemSubtype);
 
+		ContentDashboardItemSubtypeFactoryTracker
+			contentDashboardItemSubtypeFactoryTracker =
+				_getContentDashboardItemSubtypeFactoryTracker(
+					contentDashboardItemSubtype,
+					contentDashboardItemSubtypeFactory);
+
+		Optional<? extends ContentDashboardItemSubtype>
+			contentDashboardItemSubtypeOptional =
+				ContentDashboardItemSubtypeUtil.
+					toContentDashboardItemSubtypeOptional(
+						contentDashboardItemSubtypeFactoryTracker,
+						JSONFactoryUtil.createJSONObject(
+							contentDashboardItemSubtype.toJSONString(
+								LocaleUtil.US)));
+
 		Assert.assertEquals(
 			contentDashboardItemSubtype,
-			ContentDashboardItemSubtypeUtil.toContentDashboardItemSubtype(
-				_getContentDashboardItemSubtypeFactoryRegistry(
-					contentDashboardItemSubtype,
-					contentDashboardItemSubtypeFactory),
-				JSONFactoryUtil.createJSONObject(
-					contentDashboardItemSubtype.toJSONString(LocaleUtil.US))));
+			contentDashboardItemSubtypeOptional.get());
 	}
 
 	@Test
-	public void testToContentDashboardItemSubtypeByJSONObjectWithoutContentDashboardItemSubtypeFactory()
+	public void testToContentDashboardItemSubtypeOptionalByJSONObjectWithoutContentDashboardItemSubtypeFactory()
 		throws JSONException {
 
 		ContentDashboardItemSubtype contentDashboardItemSubtype =
 			_getContentDashboardItemSubtype();
 
-		Assert.assertNull(
-			ContentDashboardItemSubtypeUtil.toContentDashboardItemSubtype(
-				_getContentDashboardItemSubtypeFactoryRegistry(
-					contentDashboardItemSubtype, null),
-				JSONFactoryUtil.createJSONObject(
-					contentDashboardItemSubtype.toJSONString(LocaleUtil.US))));
+		ContentDashboardItemSubtypeFactoryTracker
+			contentDashboardItemSubtypeFactoryTracker =
+				_getContentDashboardItemSubtypeFactoryTracker(
+					contentDashboardItemSubtype, null);
+
+		Optional<ContentDashboardItemSubtype>
+			contentDashboardItemSubtypeOptional =
+				ContentDashboardItemSubtypeUtil.
+					toContentDashboardItemSubtypeOptional(
+						contentDashboardItemSubtypeFactoryTracker,
+						JSONFactoryUtil.createJSONObject(
+							contentDashboardItemSubtype.toJSONString(
+								LocaleUtil.US)));
+
+		Assert.assertFalse(contentDashboardItemSubtypeOptional.isPresent());
 	}
 
 	@Test
-	public void testToContentDashboardItemSubtypeByStringWithoutContentDashboardItemSubtypeFactory() {
+	public void testToContentDashboardItemSubtypeOptionalByStringWithoutContentDashboardItemSubtypeFactory()
+		throws JSONException {
+
 		ContentDashboardItemSubtype contentDashboardItemSubtype =
 			_getContentDashboardItemSubtype();
 
-		Assert.assertNull(
-			ContentDashboardItemSubtypeUtil.toContentDashboardItemSubtype(
-				_getContentDashboardItemSubtypeFactoryRegistry(
-					contentDashboardItemSubtype, null),
-				contentDashboardItemSubtype.toJSONString(LocaleUtil.US)));
+		ContentDashboardItemSubtypeFactoryTracker
+			contentDashboardItemSubtypeFactoryTracker =
+				_getContentDashboardItemSubtypeFactoryTracker(
+					contentDashboardItemSubtype, null);
+
+		Optional<ContentDashboardItemSubtype>
+			contentDashboardItemSubtypeOptional =
+				ContentDashboardItemSubtypeUtil.
+					toContentDashboardItemSubtypeOptional(
+						contentDashboardItemSubtypeFactoryTracker,
+						contentDashboardItemSubtype.toJSONString(
+							LocaleUtil.US));
+
+		Assert.assertFalse(contentDashboardItemSubtypeOptional.isPresent());
 	}
 
 	private ContentDashboardItemSubtype _getContentDashboardItemSubtype() {
@@ -145,12 +237,22 @@ public class ContentDashboardItemSubtypeUtilTest {
 			}
 
 			@Override
+			public Date getModifiedDate() {
+				return new Date();
+			}
+
+			@Override
+			public long getUserId() {
+				return 0;
+			}
+
+			@Override
 			public String toJSONString(Locale locale) {
 				return JSONUtil.put(
 					"className", className
 				).put(
 					"classPK", classPK
-				).toString();
+				).toJSONString();
 			}
 
 		};
@@ -177,28 +279,28 @@ public class ContentDashboardItemSubtypeUtilTest {
 		return contentDashboardItemSubtypeFactory;
 	}
 
-	private ContentDashboardItemSubtypeFactoryRegistry
-		_getContentDashboardItemSubtypeFactoryRegistry(
+	private ContentDashboardItemSubtypeFactoryTracker
+		_getContentDashboardItemSubtypeFactoryTracker(
 			ContentDashboardItemSubtype contentDashboardItemSubtype,
 			ContentDashboardItemSubtypeFactory
 				contentDashboardItemSubtypeFactory) {
 
-		ContentDashboardItemSubtypeFactoryRegistry
-			contentDashboardItemSubtypeFactoryRegistry = Mockito.mock(
-				ContentDashboardItemSubtypeFactoryRegistry.class);
+		ContentDashboardItemSubtypeFactoryTracker
+			contentDashboardItemSubtypeFactoryTracker = Mockito.mock(
+				ContentDashboardItemSubtypeFactoryTracker.class);
 
 		InfoItemReference infoItemReference =
 			contentDashboardItemSubtype.getInfoItemReference();
 
 		Mockito.when(
-			contentDashboardItemSubtypeFactoryRegistry.
-				getContentDashboardItemSubtypeFactory(
+			contentDashboardItemSubtypeFactoryTracker.
+				getContentDashboardItemSubtypeFactoryOptional(
 					infoItemReference.getClassName())
 		).thenReturn(
-			contentDashboardItemSubtypeFactory
+			Optional.ofNullable(contentDashboardItemSubtypeFactory)
 		);
 
-		return contentDashboardItemSubtypeFactoryRegistry;
+		return contentDashboardItemSubtypeFactoryTracker;
 	}
 
 }

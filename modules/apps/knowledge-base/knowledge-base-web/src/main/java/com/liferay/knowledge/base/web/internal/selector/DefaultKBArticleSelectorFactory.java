@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Adolfo Pérez
  */
-@Component(service = KBArticleSelectorFactory.class)
+@Component(immediate = true, service = KBArticleSelectorFactory.class)
 public class DefaultKBArticleSelectorFactory
 	implements KBArticleSelectorFactory {
 

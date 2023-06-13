@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -45,20 +46,17 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
-import com.liferay.search.experiences.exception.DuplicateSXPBlueprintExternalReferenceCodeException;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.search.experiences.exception.NoSuchSXPBlueprintException;
 import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.model.SXPBlueprintTable;
 import com.liferay.search.experiences.model.impl.SXPBlueprintImpl;
 import com.liferay.search.experiences.model.impl.SXPBlueprintModelImpl;
 import com.liferay.search.experiences.service.persistence.SXPBlueprintPersistence;
-import com.liferay.search.experiences.service.persistence.SXPBlueprintUtil;
 import com.liferay.search.experiences.service.persistence.impl.constants.SXPPersistenceConstants;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
@@ -85,7 +83,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = SXPBlueprintPersistence.class)
+@Component(service = {SXPBlueprintPersistence.class, BasePersistence.class})
 public class SXPBlueprintPersistenceImpl
 	extends BasePersistenceImpl<SXPBlueprint>
 	implements SXPBlueprintPersistence {
@@ -202,7 +200,7 @@ public class SXPBlueprintPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SXPBlueprint>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SXPBlueprint sxpBlueprint : list) {
@@ -938,7 +936,7 @@ public class SXPBlueprintPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1164,7 +1162,7 @@ public class SXPBlueprintPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SXPBlueprint>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SXPBlueprint sxpBlueprint : list) {
@@ -1948,7 +1946,7 @@ public class SXPBlueprintPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2179,7 +2177,7 @@ public class SXPBlueprintPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SXPBlueprint>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SXPBlueprint sxpBlueprint : list) {
@@ -2867,7 +2865,7 @@ public class SXPBlueprintPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2955,262 +2953,6 @@ public class SXPBlueprintPersistenceImpl
 	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
 		"sxpBlueprint.companyId = ?";
 
-	private FinderPath _finderPathFetchByERC_C;
-	private FinderPath _finderPathCountByERC_C;
-
-	/**
-	 * Returns the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; or throws a <code>NoSuchSXPBlueprintException</code> if it could not be found.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching sxp blueprint
-	 * @throws NoSuchSXPBlueprintException if a matching sxp blueprint could not be found
-	 */
-	@Override
-	public SXPBlueprint findByERC_C(
-			String externalReferenceCode, long companyId)
-		throws NoSuchSXPBlueprintException {
-
-		SXPBlueprint sxpBlueprint = fetchByERC_C(
-			externalReferenceCode, companyId);
-
-		if (sxpBlueprint == null) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			sb.append("externalReferenceCode=");
-			sb.append(externalReferenceCode);
-
-			sb.append(", companyId=");
-			sb.append(companyId);
-
-			sb.append("}");
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(sb.toString());
-			}
-
-			throw new NoSuchSXPBlueprintException(sb.toString());
-		}
-
-		return sxpBlueprint;
-	}
-
-	/**
-	 * Returns the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
-	 */
-	@Override
-	public SXPBlueprint fetchByERC_C(
-		String externalReferenceCode, long companyId) {
-
-		return fetchByERC_C(externalReferenceCode, companyId, true);
-	}
-
-	/**
-	 * Returns the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
-	 */
-	@Override
-	public SXPBlueprint fetchByERC_C(
-		String externalReferenceCode, long companyId, boolean useFinderCache) {
-
-		externalReferenceCode = Objects.toString(externalReferenceCode, "");
-
-		Object[] finderArgs = null;
-
-		if (useFinderCache) {
-			finderArgs = new Object[] {externalReferenceCode, companyId};
-		}
-
-		Object result = null;
-
-		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByERC_C, finderArgs, this);
-		}
-
-		if (result instanceof SXPBlueprint) {
-			SXPBlueprint sxpBlueprint = (SXPBlueprint)result;
-
-			if (!Objects.equals(
-					externalReferenceCode,
-					sxpBlueprint.getExternalReferenceCode()) ||
-				(companyId != sxpBlueprint.getCompanyId())) {
-
-				result = null;
-			}
-		}
-
-		if (result == null) {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(_SQL_SELECT_SXPBLUEPRINT_WHERE);
-
-			boolean bindExternalReferenceCode = false;
-
-			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
-			}
-			else {
-				bindExternalReferenceCode = true;
-
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
-			}
-
-			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindExternalReferenceCode) {
-					queryPos.add(externalReferenceCode);
-				}
-
-				queryPos.add(companyId);
-
-				List<SXPBlueprint> list = query.list();
-
-				if (list.isEmpty()) {
-					if (useFinderCache) {
-						finderCache.putResult(
-							_finderPathFetchByERC_C, finderArgs, list);
-					}
-				}
-				else {
-					SXPBlueprint sxpBlueprint = list.get(0);
-
-					result = sxpBlueprint;
-
-					cacheResult(sxpBlueprint);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		if (result instanceof List<?>) {
-			return null;
-		}
-		else {
-			return (SXPBlueprint)result;
-		}
-	}
-
-	/**
-	 * Removes the sxp blueprint where externalReferenceCode = &#63; and companyId = &#63; from the database.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the sxp blueprint that was removed
-	 */
-	@Override
-	public SXPBlueprint removeByERC_C(
-			String externalReferenceCode, long companyId)
-		throws NoSuchSXPBlueprintException {
-
-		SXPBlueprint sxpBlueprint = findByERC_C(
-			externalReferenceCode, companyId);
-
-		return remove(sxpBlueprint);
-	}
-
-	/**
-	 * Returns the number of sxp blueprints where externalReferenceCode = &#63; and companyId = &#63;.
-	 *
-	 * @param externalReferenceCode the external reference code
-	 * @param companyId the company ID
-	 * @return the number of matching sxp blueprints
-	 */
-	@Override
-	public int countByERC_C(String externalReferenceCode, long companyId) {
-		externalReferenceCode = Objects.toString(externalReferenceCode, "");
-
-		FinderPath finderPath = _finderPathCountByERC_C;
-
-		Object[] finderArgs = new Object[] {externalReferenceCode, companyId};
-
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append(_SQL_COUNT_SXPBLUEPRINT_WHERE);
-
-			boolean bindExternalReferenceCode = false;
-
-			if (externalReferenceCode.isEmpty()) {
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3);
-			}
-			else {
-				bindExternalReferenceCode = true;
-
-				sb.append(_FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2);
-			}
-
-			sb.append(_FINDER_COLUMN_ERC_C_COMPANYID_2);
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				if (bindExternalReferenceCode) {
-					queryPos.add(externalReferenceCode);
-				}
-
-				queryPos.add(companyId);
-
-				count = (Long)query.uniqueResult();
-
-				finderCache.putResult(finderPath, finderArgs, count);
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_2 =
-		"sxpBlueprint.externalReferenceCode = ? AND ";
-
-	private static final String _FINDER_COLUMN_ERC_C_EXTERNALREFERENCECODE_3 =
-		"(sxpBlueprint.externalReferenceCode IS NULL OR sxpBlueprint.externalReferenceCode = '') AND ";
-
-	private static final String _FINDER_COLUMN_ERC_C_COMPANYID_2 =
-		"sxpBlueprint.companyId = ?";
-
 	public SXPBlueprintPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -3235,14 +2977,6 @@ public class SXPBlueprintPersistenceImpl
 	public void cacheResult(SXPBlueprint sxpBlueprint) {
 		entityCache.putResult(
 			SXPBlueprintImpl.class, sxpBlueprint.getPrimaryKey(), sxpBlueprint);
-
-		finderCache.putResult(
-			_finderPathFetchByERC_C,
-			new Object[] {
-				sxpBlueprint.getExternalReferenceCode(),
-				sxpBlueprint.getCompanyId()
-			},
-			sxpBlueprint);
 	}
 
 	private int _valueObjectFinderCacheListThreshold;
@@ -3313,19 +3047,6 @@ public class SXPBlueprintPersistenceImpl
 		}
 	}
 
-	protected void cacheUniqueFindersCache(
-		SXPBlueprintModelImpl sxpBlueprintModelImpl) {
-
-		Object[] args = new Object[] {
-			sxpBlueprintModelImpl.getExternalReferenceCode(),
-			sxpBlueprintModelImpl.getCompanyId()
-		};
-
-		finderCache.putResult(_finderPathCountByERC_C, args, Long.valueOf(1));
-		finderCache.putResult(
-			_finderPathFetchByERC_C, args, sxpBlueprintModelImpl);
-	}
-
 	/**
 	 * Creates a new sxp blueprint with the primary key. Does not add the sxp blueprint to the database.
 	 *
@@ -3339,7 +3060,7 @@ public class SXPBlueprintPersistenceImpl
 		sxpBlueprint.setNew(true);
 		sxpBlueprint.setPrimaryKey(sxpBlueprintId);
 
-		String uuid = _portalUUID.generate();
+		String uuid = PortalUUIDUtil.generate();
 
 		sxpBlueprint.setUuid(uuid);
 
@@ -3458,38 +3179,9 @@ public class SXPBlueprintPersistenceImpl
 			(SXPBlueprintModelImpl)sxpBlueprint;
 
 		if (Validator.isNull(sxpBlueprint.getUuid())) {
-			String uuid = _portalUUID.generate();
+			String uuid = PortalUUIDUtil.generate();
 
 			sxpBlueprint.setUuid(uuid);
-		}
-
-		if (Validator.isNull(sxpBlueprint.getExternalReferenceCode())) {
-			sxpBlueprint.setExternalReferenceCode(sxpBlueprint.getUuid());
-		}
-		else {
-			SXPBlueprint ercSXPBlueprint = fetchByERC_C(
-				sxpBlueprint.getExternalReferenceCode(),
-				sxpBlueprint.getCompanyId());
-
-			if (isNew) {
-				if (ercSXPBlueprint != null) {
-					throw new DuplicateSXPBlueprintExternalReferenceCodeException(
-						"Duplicate sxp blueprint with external reference code " +
-							sxpBlueprint.getExternalReferenceCode() +
-								" and company " + sxpBlueprint.getCompanyId());
-				}
-			}
-			else {
-				if ((ercSXPBlueprint != null) &&
-					(sxpBlueprint.getSXPBlueprintId() !=
-						ercSXPBlueprint.getSXPBlueprintId())) {
-
-					throw new DuplicateSXPBlueprintExternalReferenceCodeException(
-						"Duplicate sxp blueprint with external reference code " +
-							sxpBlueprint.getExternalReferenceCode() +
-								" and company " + sxpBlueprint.getCompanyId());
-				}
-			}
 		}
 
 		ServiceContext serviceContext =
@@ -3563,8 +3255,6 @@ public class SXPBlueprintPersistenceImpl
 
 		entityCache.putResult(
 			SXPBlueprintImpl.class, sxpBlueprintModelImpl, false, true);
-
-		cacheUniqueFindersCache(sxpBlueprintModelImpl);
 
 		if (isNew) {
 			sxpBlueprint.setNew(false);
@@ -3708,7 +3398,7 @@ public class SXPBlueprintPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SXPBlueprint>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3778,7 +3468,7 @@ public class SXPBlueprintPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3903,41 +3593,11 @@ public class SXPBlueprintPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
-
-		_finderPathFetchByERC_C = new FinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByERC_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "companyId"}, true);
-
-		_finderPathCountByERC_C = new FinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByERC_C",
-			new String[] {String.class.getName(), Long.class.getName()},
-			new String[] {"externalReferenceCode", "companyId"}, false);
-
-		_setSXPBlueprintUtilPersistence(this);
 	}
 
 	@Deactivate
 	public void deactivate() {
-		_setSXPBlueprintUtilPersistence(null);
-
 		entityCache.removeCache(SXPBlueprintImpl.class.getName());
-	}
-
-	private void _setSXPBlueprintUtilPersistence(
-		SXPBlueprintPersistence sxpBlueprintPersistence) {
-
-		try {
-			Field field = SXPBlueprintUtil.class.getDeclaredField(
-				"_persistence");
-
-			field.setAccessible(true);
-
-			field.set(null, sxpBlueprintPersistence);
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			throw new RuntimeException(reflectiveOperationException);
-		}
 	}
 
 	@Override
@@ -4027,6 +3687,7 @@ public class SXPBlueprintPersistenceImpl
 	}
 
 	@Reference
-	private PortalUUID _portalUUID;
+	private SXPBlueprintModelArgumentsResolver
+		_sxpBlueprintModelArgumentsResolver;
 
 }

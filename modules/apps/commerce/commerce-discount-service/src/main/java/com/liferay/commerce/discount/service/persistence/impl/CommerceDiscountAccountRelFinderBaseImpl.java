@@ -16,9 +16,7 @@ package com.liferay.commerce.discount.service.persistence.impl;
 
 import com.liferay.commerce.discount.model.CommerceDiscountAccountRel;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountAccountRelPersistence;
-import com.liferay.commerce.discount.service.persistence.impl.constants.CommercePersistenceConstants;
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -27,15 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Marco Leo
  * @generated
  */
-public abstract class CommerceDiscountAccountRelFinderBaseImpl
+public class CommerceDiscountAccountRelFinderBaseImpl
 	extends BasePersistenceImpl<CommerceDiscountAccountRel> {
 
 	public CommerceDiscountAccountRelFinderBaseImpl() {
@@ -51,36 +45,34 @@ public abstract class CommerceDiscountAccountRelFinderBaseImpl
 
 	@Override
 	public Set<String> getBadColumnNames() {
-		return commerceDiscountAccountRelPersistence.getBadColumnNames();
+		return getCommerceDiscountAccountRelPersistence().getBadColumnNames();
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.SERVICE_CONFIGURATION_FILTER,
-		unbind = "-"
-	)
-	public void setConfiguration(Configuration configuration) {
+	/**
+	 * Returns the commerce discount account rel persistence.
+	 *
+	 * @return the commerce discount account rel persistence
+	 */
+	public CommerceDiscountAccountRelPersistence
+		getCommerceDiscountAccountRelPersistence() {
+
+		return commerceDiscountAccountRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setDataSource(DataSource dataSource) {
-		super.setDataSource(dataSource);
+	/**
+	 * Sets the commerce discount account rel persistence.
+	 *
+	 * @param commerceDiscountAccountRelPersistence the commerce discount account rel persistence
+	 */
+	public void setCommerceDiscountAccountRelPersistence(
+		CommerceDiscountAccountRelPersistence
+			commerceDiscountAccountRelPersistence) {
+
+		this.commerceDiscountAccountRelPersistence =
+			commerceDiscountAccountRelPersistence;
 	}
 
-	@Override
-	@Reference(
-		target = CommercePersistenceConstants.ORIGIN_BUNDLE_SYMBOLIC_NAME_FILTER,
-		unbind = "-"
-	)
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		super.setSessionFactory(sessionFactory);
-	}
-
-	@Reference
+	@BeanReference(type = CommerceDiscountAccountRelPersistence.class)
 	protected CommerceDiscountAccountRelPersistence
 		commerceDiscountAccountRelPersistence;
 

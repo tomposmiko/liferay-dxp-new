@@ -16,7 +16,6 @@ package com.liferay.portal.kernel.service.persistence;
 
 import com.liferay.portal.kernel.exception.NoSuchPhoneException;
 import com.liferay.portal.kernel.model.Phone;
-import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -32,8 +31,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-public interface PhonePersistence
-	extends BasePersistence<Phone>, CTPersistence<Phone> {
+public interface PhonePersistence extends BasePersistence<Phone> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:

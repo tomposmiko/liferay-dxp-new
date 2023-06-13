@@ -27,10 +27,6 @@ public class CPInstanceOptionValueRelServiceWrapper
 	implements CPInstanceOptionValueRelService,
 			   ServiceWrapper<CPInstanceOptionValueRelService> {
 
-	public CPInstanceOptionValueRelServiceWrapper() {
-		this(null);
-	}
-
 	public CPInstanceOptionValueRelServiceWrapper(
 		CPInstanceOptionValueRelService cpInstanceOptionValueRelService) {
 

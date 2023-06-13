@@ -25,7 +25,10 @@ import org.osgi.service.component.annotations.Component;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  */
-@Component(property = "reportFormat=csv", service = ReportFormatExporter.class)
+@Component(
+	immediate = true, property = "reportFormat=csv",
+	service = ReportFormatExporter.class
+)
 public class CsvReportFormatExporter extends BaseReportFormatExporter {
 
 	@Override

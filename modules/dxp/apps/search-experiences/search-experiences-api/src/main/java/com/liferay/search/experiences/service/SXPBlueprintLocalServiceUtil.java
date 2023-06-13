@@ -46,16 +46,15 @@ public class SXPBlueprintLocalServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.search.experiences.service.impl.SXPBlueprintLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static SXPBlueprint addSXPBlueprint(
-			String externalReferenceCode, long userId, String configurationJSON,
+			long userId, String configurationJSON,
 			Map<java.util.Locale, String> descriptionMap,
-			String elementInstancesJSON, String schemaVersion,
-			Map<java.util.Locale, String> titleMap,
+			String elementInstancesJSON, Map<java.util.Locale, String> titleMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addSXPBlueprint(
-			externalReferenceCode, userId, configurationJSON, descriptionMap,
-			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+			userId, configurationJSON, descriptionMap, elementInstancesJSON,
+			titleMap, serviceContext);
 	}
 
 	/**
@@ -90,12 +89,6 @@ public class SXPBlueprintLocalServiceUtil {
 	 */
 	public static SXPBlueprint createSXPBlueprint(long sxpBlueprintId) {
 		return getService().createSXPBlueprint(sxpBlueprintId);
-	}
-
-	public static void deleteCompanySXPBlueprints(long companyId)
-		throws PortalException {
-
-		getService().deleteCompanySXPBlueprints(companyId);
 	}
 
 	/**
@@ -231,13 +224,6 @@ public class SXPBlueprintLocalServiceUtil {
 		return getService().fetchSXPBlueprint(sxpBlueprintId);
 	}
 
-	public static SXPBlueprint fetchSXPBlueprintByExternalReferenceCode(
-		String externalReferenceCode, long companyId) {
-
-		return getService().fetchSXPBlueprintByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *
@@ -304,14 +290,6 @@ public class SXPBlueprintLocalServiceUtil {
 		return getService().getSXPBlueprint(sxpBlueprintId);
 	}
 
-	public static SXPBlueprint getSXPBlueprintByExternalReferenceCode(
-			String externalReferenceCode, long companyId)
-		throws PortalException {
-
-		return getService().getSXPBlueprintByExternalReferenceCode(
-			externalReferenceCode, companyId);
-	}
-
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *
@@ -367,14 +345,13 @@ public class SXPBlueprintLocalServiceUtil {
 	public static SXPBlueprint updateSXPBlueprint(
 			long userId, long sxpBlueprintId, String configurationJSON,
 			Map<java.util.Locale, String> descriptionMap,
-			String elementInstancesJSON, String schemaVersion,
-			Map<java.util.Locale, String> titleMap,
+			String elementInstancesJSON, Map<java.util.Locale, String> titleMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateSXPBlueprint(
 			userId, sxpBlueprintId, configurationJSON, descriptionMap,
-			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+			elementInstancesJSON, titleMap, serviceContext);
 	}
 
 	/**

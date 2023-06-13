@@ -26,10 +26,6 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class ListTypeEntryServiceWrapper
 	implements ListTypeEntryService, ServiceWrapper<ListTypeEntryService> {
 
-	public ListTypeEntryServiceWrapper() {
-		this(null);
-	}
-
 	public ListTypeEntryServiceWrapper(
 		ListTypeEntryService listTypeEntryService) {
 
@@ -38,12 +34,12 @@ public class ListTypeEntryServiceWrapper
 
 	@Override
 	public com.liferay.list.type.model.ListTypeEntry addListTypeEntry(
-			String externalReferenceCode, long listTypeDefinitionId, String key,
+			long listTypeDefinitionId, String key,
 			java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeEntryService.addListTypeEntry(
-			externalReferenceCode, listTypeDefinitionId, key, nameMap);
+			listTypeDefinitionId, key, nameMap);
 	}
 
 	@Override
@@ -79,17 +75,6 @@ public class ListTypeEntryServiceWrapper
 		return _listTypeEntryService.getListTypeEntry(listTypeEntryId);
 	}
 
-	@Override
-	public com.liferay.list.type.model.ListTypeEntry
-			getListTypeEntryByExternalReferenceCode(
-				String externalReferenceCode, long companyId,
-				long listTypeDefinitionId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _listTypeEntryService.getListTypeEntryByExternalReferenceCode(
-			externalReferenceCode, companyId, listTypeDefinitionId);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -102,12 +87,12 @@ public class ListTypeEntryServiceWrapper
 
 	@Override
 	public com.liferay.list.type.model.ListTypeEntry updateListTypeEntry(
-			String externalReferenceCode, long listTypeEntryId,
+			long listTypeEntryId,
 			java.util.Map<java.util.Locale, String> nameMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _listTypeEntryService.updateListTypeEntry(
-			externalReferenceCode, listTypeEntryId, nameMap);
+			listTypeEntryId, nameMap);
 	}
 
 	@Override

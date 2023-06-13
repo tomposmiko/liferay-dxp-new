@@ -114,11 +114,11 @@ public class WabBundleProcessor {
 		try {
 			currentThread.setContextClassLoader(_bundleClassLoader);
 
-			_destroyServlets();
+			destroyServlets();
 
-			_destroyFilters();
+			destroyFilters();
 
-			_destroyListeners();
+			destroyListeners();
 
 			_bundleContext.ungetService(
 				_servletContextHelperRegistrationServiceReference);
@@ -137,7 +137,7 @@ public class WabBundleProcessor {
 			currentThread.setContextClassLoader(_bundleClassLoader);
 
 			ServletContextHelperRegistration servletContextHelperRegistration =
-				_initContext();
+				initContext();
 
 			boolean wabShapedBundle =
 				servletContextHelperRegistration.isWabShapedBundle();
@@ -167,7 +167,7 @@ public class WabBundleProcessor {
 			Set<Class<?>> annotatedClasses =
 				servletContextHelperRegistration.getAnnotatedClasses();
 
-			_initServletContainerInitializers(
+			initServletContainerInitializers(
 				_bundle, servletContext, allClasses, annotatedClasses);
 
 			if (!allClasses.equals(annotatedClasses)) {
@@ -219,7 +219,7 @@ public class WabBundleProcessor {
 					(ModifiableServletContext)servletContext;
 			}
 
-			_scanTLDsForListeners(webXMLDefinition, servletContext);
+			scanTLDsForListeners(webXMLDefinition, servletContext);
 
 			Set<ListenerDefinition> listenerDefinitions = new LinkedHashSet<>();
 
@@ -228,15 +228,15 @@ public class WabBundleProcessor {
 			listenerDefinitions.addAll(
 				webXMLDefinition.getListenerDefinitions());
 
-			_initListeners(listenerDefinitions, servletContext);
+			initListeners(listenerDefinitions, servletContext);
 
 			modifiableServletContext.registerFilters();
 
-			_initFilters(webXMLDefinition.getFilterDefinitions());
+			initFilters(webXMLDefinition.getFilterDefinitions());
 
 			modifiableServletContext.registerServlets();
 
-			_initServlets(
+			initServlets(
 				webXMLDefinition.getServletDefinitions(),
 				modifiableServletContext);
 		}
@@ -255,7 +255,7 @@ public class WabBundleProcessor {
 		}
 	}
 
-	private void _collectAnnotatedClasses(
+	protected void collectAnnotatedClasses(
 		Class<?> annotatedClass, Class<?>[] handlesTypesClasses,
 		Set<Class<?>> annotationHandlesTypesClasses,
 		Set<Class<?>> annotatedClasses) {
@@ -372,7 +372,7 @@ public class WabBundleProcessor {
 		}
 	}
 
-	private void _destroyFilters() {
+	protected void destroyFilters() {
 		for (ServiceRegistration<?> serviceRegistration :
 				_filterServiceRegistrations) {
 
@@ -380,14 +380,14 @@ public class WabBundleProcessor {
 				serviceRegistration.unregister();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
 		_filterServiceRegistrations.clear();
 	}
 
-	private void _destroyListeners() {
+	protected void destroyListeners() {
 		for (ServiceRegistration<?> serviceRegistration :
 				_listenerServiceRegistrations) {
 
@@ -395,14 +395,14 @@ public class WabBundleProcessor {
 				serviceRegistration.unregister();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
 		_listenerServiceRegistrations.clear();
 	}
 
-	private void _destroyServlets() {
+	protected void destroyServlets() {
 		for (ServiceRegistration<?> serviceRegistration :
 				_servletServiceRegistrations) {
 
@@ -410,14 +410,14 @@ public class WabBundleProcessor {
 				serviceRegistration.unregister();
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				_log.error(exception, exception);
 			}
 		}
 
 		_servletServiceRegistrations.clear();
 	}
 
-	private String[] _getClassNames(EventListener eventListener) {
+	protected String[] getClassNames(EventListener eventListener) {
 		List<String> classNamesList = new ArrayList<>();
 
 		if (HttpSessionAttributeListener.class.isInstance(eventListener)) {
@@ -450,7 +450,7 @@ public class WabBundleProcessor {
 		return classNamesList.toArray(new String[0]);
 	}
 
-	private ServletContextHelperRegistration _initContext() {
+	protected ServletContextHelperRegistration initContext() {
 		_servletContextHelperRegistrationServiceReference =
 			_bundleContext.getServiceReference(
 				ServletContextHelperRegistration.class);
@@ -475,7 +475,7 @@ public class WabBundleProcessor {
 		return servletContextHelperRegistration;
 	}
 
-	private void _initFilters(Map<String, FilterDefinition> filterDefinitions)
+	protected void initFilters(Map<String, FilterDefinition> filterDefinitions)
 		throws Exception {
 
 		for (Map.Entry<String, FilterDefinition> entry :
@@ -539,7 +539,7 @@ public class WabBundleProcessor {
 		}
 	}
 
-	private void _initListeners(
+	protected void initListeners(
 			Collection<ListenerDefinition> listenerDefinitions,
 			ServletContext servletContext)
 		throws Exception {
@@ -556,7 +556,7 @@ public class WabBundleProcessor {
 				HttpWhiteboardConstants.HTTP_WHITEBOARD_LISTENER,
 				Boolean.TRUE.toString());
 
-			String[] classNames = _getClassNames(
+			String[] classNames = getClassNames(
 				listenerDefinition.getEventListener());
 
 			if (classNames.length > 0) {
@@ -639,7 +639,7 @@ public class WabBundleProcessor {
 		}
 	}
 
-	private void _initServletContainerInitializers(
+	protected void initServletContainerInitializers(
 			Bundle bundle, ServletContext servletContext, Set<Class<?>> classes,
 			Set<Class<?>> annotatedClasses)
 		throws IOException {
@@ -650,6 +650,8 @@ public class WabBundleProcessor {
 		if (enumeration == null) {
 			return;
 		}
+
+		BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
 
 		while (enumeration.hasMoreElements()) {
 			URL url = enumeration.nextElement();
@@ -673,19 +675,19 @@ public class WabBundleProcessor {
 					fqcn = fqcn.trim();
 
 					if (Validator.isNotNull(fqcn)) {
-						_processServletContainerInitializerClass(
-							fqcn, bundle, servletContext, classes,
+						processServletContainerInitializerClass(
+							fqcn, bundle, bundleWiring, servletContext, classes,
 							annotatedClasses);
 					}
 				}
 			}
 			catch (IOException ioException) {
-				_log.error(ioException);
+				_log.error(ioException, ioException);
 			}
 		}
 	}
 
-	private void _initServlets(
+	protected void initServlets(
 			Map<String, ServletDefinition> servletDefinitions,
 			ModifiableServletContext modifiableServletContext)
 		throws Exception {
@@ -757,9 +759,10 @@ public class WabBundleProcessor {
 		}
 	}
 
-	private void _processServletContainerInitializerClass(
-		String fqcn, Bundle bundle, ServletContext servletContext,
-		Set<Class<?>> classes, Set<Class<?>> annotatedClasses) {
+	protected void processServletContainerInitializerClass(
+		String fqcn, Bundle bundle, BundleWiring bundleWiring,
+		ServletContext servletContext, Set<Class<?>> classes,
+		Set<Class<?>> annotatedClasses) {
 
 		Class<? extends ServletContainerInitializer> initializerClass = null;
 
@@ -774,7 +777,7 @@ public class WabBundleProcessor {
 				ServletContainerInitializer.class);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 
 			return;
 		}
@@ -803,7 +806,7 @@ public class WabBundleProcessor {
 				localAnnotatedClasses = new HashSet<>();
 
 				for (Class<?> clazz : classes) {
-					_collectAnnotatedClasses(
+					collectAnnotatedClasses(
 						clazz, handlesTypesClasses,
 						annotationHandlesTypesClasses, localAnnotatedClasses);
 				}
@@ -826,6 +829,38 @@ public class WabBundleProcessor {
 		}
 		catch (Throwable throwable) {
 			_log.error(throwable, throwable);
+		}
+	}
+
+	protected void scanTLDsForListeners(
+		WebXMLDefinition webXMLDefinition, ServletContext servletContext) {
+
+		List<String> listenerClassNames = new ArrayList<>();
+
+		_jspTaglibHelper.scanTLDs(_bundle, servletContext, listenerClassNames);
+
+		for (String listenerClassName : listenerClassNames) {
+			try {
+				Class<?> clazz = _bundle.loadClass(listenerClassName);
+
+				Class<? extends EventListener> eventListenerClass =
+					clazz.asSubclass(EventListener.class);
+
+				EventListener eventListener = eventListenerClass.newInstance();
+
+				ListenerDefinition listenerDefinition =
+					new ListenerDefinition();
+
+				listenerDefinition.setEventListener(eventListener);
+
+				webXMLDefinition.addListenerDefinition(listenerDefinition);
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Bundle " + _bundle + " is unable to load listener " +
+						listenerClassName,
+					exception);
+			}
 		}
 	}
 
@@ -859,39 +894,7 @@ public class WabBundleProcessor {
 		}
 		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioException);
-			}
-		}
-	}
-
-	private void _scanTLDsForListeners(
-		WebXMLDefinition webXMLDefinition, ServletContext servletContext) {
-
-		List<String> listenerClassNames = new ArrayList<>();
-
-		_jspTaglibHelper.scanTLDs(_bundle, servletContext, listenerClassNames);
-
-		for (String listenerClassName : listenerClassNames) {
-			try {
-				Class<?> clazz = _bundle.loadClass(listenerClassName);
-
-				Class<? extends EventListener> eventListenerClass =
-					clazz.asSubclass(EventListener.class);
-
-				EventListener eventListener = eventListenerClass.newInstance();
-
-				ListenerDefinition listenerDefinition =
-					new ListenerDefinition();
-
-				listenerDefinition.setEventListener(eventListener);
-
-				webXMLDefinition.addListenerDefinition(listenerDefinition);
-			}
-			catch (Exception exception) {
-				_log.error(
-					"Bundle " + _bundle + " is unable to load listener " +
-						listenerClassName,
-					exception);
+				_log.debug(ioException, ioException);
 			}
 		}
 	}

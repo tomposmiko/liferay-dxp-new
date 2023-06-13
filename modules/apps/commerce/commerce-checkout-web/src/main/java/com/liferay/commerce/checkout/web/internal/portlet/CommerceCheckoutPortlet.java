@@ -14,7 +14,7 @@
 
 package com.liferay.commerce.checkout.web.internal.portlet;
 
-import com.liferay.account.constants.AccountConstants;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.checkout.web.internal.display.context.CheckoutDisplayContext;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
 import com.liferay.commerce.constants.CommerceOrderConstants;
@@ -24,16 +24,16 @@ import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
-import com.liferay.commerce.util.CommerceCheckoutStepRegistry;
+import com.liferay.commerce.util.CommerceCheckoutStepServicesTracker;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
-import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
+import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -64,12 +64,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
+	enabled = false, immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-commerce-checkout",
 		"com.liferay.portlet.display-category=commerce",
 		"com.liferay.portlet.layout-cacheable=true",
 		"com.liferay.portlet.preferences-owned-by-group=true",
+		"com.liferay.portlet.preferences-unique-per-layout=false",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
@@ -79,10 +81,9 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + CommercePortletKeys.COMMERCE_CHECKOUT,
 		"javax.portlet.resource-bundle=content.Language",
-		"javax.portlet.security-role-ref=power-user,user",
-		"javax.portlet.version=3.0"
+		"javax.portlet.security-role-ref=power-user,user"
 	},
-	service = Portlet.class
+	service = {CommerceCheckoutPortlet.class, Portlet.class}
 )
 public class CommerceCheckoutPortlet extends MVCPortlet {
 
@@ -94,7 +95,7 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 		try {
 			actionRequest.setAttribute(
 				CommerceCheckoutWebKeys.COMMERCE_ORDER,
-				_getCommerceOrder(actionRequest));
+				getCommerceOrder(actionRequest));
 		}
 		catch (Exception exception) {
 			throw new PortletException(exception);
@@ -109,56 +110,56 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		try {
-			CommerceOrder commerceOrder = _getCommerceOrder(renderRequest);
+			CommerceOrder commerceOrder = getCommerceOrder(renderRequest);
 
 			if (commerceOrder != null) {
-				renderRequest.setAttribute(
-					CommerceCheckoutWebKeys.COMMERCE_ORDER, commerceOrder);
-
 				HttpServletRequest httpServletRequest =
 					_portal.getHttpServletRequest(renderRequest);
 				HttpServletResponse httpServletResponse =
 					_portal.getHttpServletResponse(renderResponse);
 
 				boolean continueAsGuest = GetterUtil.getBoolean(
-					CookiesManagerUtil.getCookieValue(
-						CookiesConstants.NAME_COMMERCE_CONTINUE_AS_GUEST,
-						httpServletRequest));
+					CookieKeys.getCookie(
+						_portal.getHttpServletRequest(renderRequest),
+						"continueAsGuest"));
 
 				if ((commerceOrder.getCommerceAccountId() ==
-						AccountConstants.ACCOUNT_ENTRY_ID_GUEST) &&
+						CommerceAccountConstants.ACCOUNT_ID_GUEST) &&
 					!continueAsGuest) {
 
 					httpServletResponse.sendRedirect(
-						_getCheckoutURL(renderRequest));
+						getCheckoutURL(renderRequest));
 				}
 				else if ((commerceOrder.isOpen() &&
-						  !_isOrderApproved(commerceOrder)) ||
+						  !isOrderApproved(commerceOrder)) ||
 						 !_commerceOrderValidatorRegistry.isValid(
 							 LocaleUtil.getSiteDefault(), commerceOrder)) {
 
 					httpServletResponse.sendRedirect(
-						_getOrderDetailsURL(renderRequest, commerceOrder));
+						getOrderDetailsURL(renderRequest));
 				}
 				else if (!commerceOrder.isOpen() &&
 						 (continueAsGuest || commerceOrder.isGuestOrder())) {
 
-					CookiesManagerUtil.deleteCookies(
-						CookiesManagerUtil.getDomain(httpServletRequest),
+					CookieKeys.deleteCookies(
 						httpServletRequest, httpServletResponse,
+						CookieKeys.getDomain(httpServletRequest),
 						CommerceOrder.class.getName() + StringPool.POUND +
 							commerceOrder.getGroupId());
 
-					CookiesManagerUtil.deleteCookies(
-						CookiesManagerUtil.getDomain(httpServletRequest),
+					CookieKeys.deleteCookies(
 						httpServletRequest, httpServletResponse,
-						CookiesConstants.NAME_COMMERCE_CONTINUE_AS_GUEST);
+						CookieKeys.getDomain(httpServletRequest),
+						"continueAsGuest");
 				}
+
+				renderRequest.setAttribute(
+					CommerceCheckoutWebKeys.COMMERCE_ORDER, commerceOrder);
 			}
 
 			CheckoutDisplayContext checkoutDisplayContext =
 				new CheckoutDisplayContext(
-					_commerceCheckoutStepRegistry,
+					_commerceCheckoutStepServicesTracker,
 					_portal.getLiferayPortletRequest(renderRequest),
 					_portal.getLiferayPortletResponse(renderResponse), _portal);
 
@@ -172,7 +173,7 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 		}
 	}
 
-	private String _getCheckoutURL(PortletRequest portletRequest)
+	protected String getCheckoutURL(PortletRequest portletRequest)
 		throws PortalException {
 
 		PortletURL portletURL =
@@ -186,7 +187,7 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 		return portletURL.toString();
 	}
 
-	private CommerceOrder _getCommerceOrder(PortletRequest portletRequest)
+	protected CommerceOrder getCommerceOrder(PortletRequest portletRequest)
 		throws PortalException {
 
 		String commerceOrderUuid = ParamUtil.getString(
@@ -206,13 +207,13 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 			_portal.getHttpServletRequest(portletRequest));
 	}
 
-	private String _getOrderDetailsURL(
-			PortletRequest portletRequest, CommerceOrder commerceOrder)
+	protected String getOrderDetailsURL(PortletRequest portletRequest)
 		throws PortalException {
 
 		PortletURL portletURL =
 			_commerceOrderHttpHelper.getCommerceCartPortletURL(
-				_portal.getHttpServletRequest(portletRequest), commerceOrder);
+				_portal.getHttpServletRequest(portletRequest),
+				getCommerceOrder(portletRequest));
 
 		if (portletURL == null) {
 			return StringPool.BLANK;
@@ -221,7 +222,7 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 		return portletURL.toString();
 	}
 
-	private boolean _isOrderApproved(CommerceOrder commerceOrder)
+	protected boolean isOrderApproved(CommerceOrder commerceOrder)
 		throws PortalException {
 
 		WorkflowInstanceLink workflowInstanceLink =
@@ -255,7 +256,8 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	@Reference
-	private CommerceCheckoutStepRegistry _commerceCheckoutStepRegistry;
+	private CommerceCheckoutStepServicesTracker
+		_commerceCheckoutStepServicesTracker;
 
 	@Reference
 	private CommerceOrderHttpHelper _commerceOrderHttpHelper;
@@ -265,6 +267,9 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 
 	@Reference
 	private CommerceOrderValidatorRegistry _commerceOrderValidatorRegistry;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private Portal _portal;

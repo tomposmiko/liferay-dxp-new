@@ -15,7 +15,6 @@
 package com.liferay.poshi.core.prose;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +87,7 @@ public class PoshiProseMatcher {
 	}
 
 	protected static final Map<String, PoshiProseMatcher> poshiProseMatcherMap =
-		Collections.synchronizedMap(new HashMap<>());
+		new HashMap<>();
 
 	private static List<String> _getPossibleAlternateStrings(
 		String proseString) {

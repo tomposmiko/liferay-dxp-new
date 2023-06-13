@@ -107,8 +107,7 @@ public class FileShortcutStagedModelDataHandlerTest
 				group.getGroupId(), TestPropsValues.getUserId());
 
 		Folder folder = DLAppServiceUtil.addFolder(
-			null, group.getGroupId(),
-			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			serviceContext);
 
@@ -143,11 +142,13 @@ public class FileShortcutStagedModelDataHandlerTest
 
 		FileEntry fileEntry = (FileEntry)fileEntryDependentStagedModels.get(0);
 
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				group.getGroupId(), TestPropsValues.getUserId());
+
 		return DLAppLocalServiceUtil.addFileShortcut(
 			TestPropsValues.getUserId(), group.getGroupId(),
-			folder.getFolderId(), fileEntry.getFileEntryId(),
-			ServiceContextTestUtil.getServiceContext(
-				group.getGroupId(), TestPropsValues.getUserId()));
+			folder.getFolderId(), fileEntry.getFileEntryId(), serviceContext);
 	}
 
 	@Override

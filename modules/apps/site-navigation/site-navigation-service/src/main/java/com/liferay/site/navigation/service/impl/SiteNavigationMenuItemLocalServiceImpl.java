@@ -76,7 +76,7 @@ public class SiteNavigationMenuItemLocalServiceImpl
 
 		String name = siteNavigationMenuItemType.getName(typeSettings);
 
-		_validateName(name);
+		validateName(name);
 
 		User user = _userLocalService.getUser(userId);
 
@@ -97,7 +97,6 @@ public class SiteNavigationMenuItemLocalServiceImpl
 		siteNavigationMenuItem.setType(type);
 		siteNavigationMenuItem.setTypeSettings(typeSettings);
 		siteNavigationMenuItem.setOrder(order);
-		siteNavigationMenuItem.setExpandoBridgeAttributes(serviceContext);
 
 		return siteNavigationMenuItemPersistence.update(siteNavigationMenuItem);
 	}
@@ -124,15 +123,6 @@ public class SiteNavigationMenuItemLocalServiceImpl
 			long siteNavigationMenuItemId)
 		throws PortalException {
 
-		return siteNavigationMenuItemLocalService.deleteSiteNavigationMenuItem(
-			siteNavigationMenuItemId, false);
-	}
-
-	@Override
-	public SiteNavigationMenuItem deleteSiteNavigationMenuItem(
-			long siteNavigationMenuItemId, boolean deleteChildren)
-		throws PortalException {
-
 		SiteNavigationMenuItem siteNavigationMenuItem =
 			getSiteNavigationMenuItem(siteNavigationMenuItemId);
 
@@ -146,12 +136,6 @@ public class SiteNavigationMenuItemLocalServiceImpl
 				siteNavigationMenuItem.getSiteNavigationMenuId(),
 				siteNavigationMenuItem.getParentSiteNavigationMenuItemId());
 
-		int siblingOrderOffset = siteNavigationMenuItems.size();
-
-		if (deleteChildren) {
-			siblingOrderOffset = 0;
-		}
-
 		for (SiteNavigationMenuItem siblingSiteNavigationMenuItem :
 				siblingsSiteNavigationMenuItems) {
 
@@ -162,8 +146,8 @@ public class SiteNavigationMenuItemLocalServiceImpl
 			}
 
 			siblingSiteNavigationMenuItem.setOrder(
-				siblingOrderOffset + siblingSiteNavigationMenuItem.getOrder() -
-					1);
+				siteNavigationMenuItems.size() +
+					siblingSiteNavigationMenuItem.getOrder() - 1);
 
 			siteNavigationMenuItemPersistence.update(
 				siblingSiteNavigationMenuItem);
@@ -172,14 +156,6 @@ public class SiteNavigationMenuItemLocalServiceImpl
 		for (int i = 0; i < siteNavigationMenuItems.size(); i++) {
 			SiteNavigationMenuItem childSiteNavigationMenuItem =
 				siteNavigationMenuItems.get(i);
-
-			if (deleteChildren) {
-				siteNavigationMenuItemLocalService.deleteSiteNavigationMenuItem(
-					childSiteNavigationMenuItem.getSiteNavigationMenuItemId(),
-					true);
-
-				continue;
-			}
 
 			childSiteNavigationMenuItem.setParentSiteNavigationMenuItemId(
 				siteNavigationMenuItem.getParentSiteNavigationMenuItemId());
@@ -276,7 +252,7 @@ public class SiteNavigationMenuItemLocalServiceImpl
 			siteNavigationMenuItemPersistence.fetchByPrimaryKey(
 				siteNavigationMenuItemId);
 
-		_validate(
+		validate(
 			siteNavigationMenuItem.getSiteNavigationMenuId(),
 			siteNavigationMenuItemId, parentSiteNavigationMenuItemId);
 
@@ -383,9 +359,9 @@ public class SiteNavigationMenuItemLocalServiceImpl
 
 		String name = siteNavigationMenuItemType.getName(typeSettings);
 
-		_validateName(name);
+		validateName(name);
 
-		_validateLayout(typeSettings);
+		validateLayout(typeSettings);
 
 		siteNavigationMenuItem.setUserId(userId);
 		siteNavigationMenuItem.setUserName(user.getFullName());
@@ -398,7 +374,7 @@ public class SiteNavigationMenuItemLocalServiceImpl
 		return siteNavigationMenuItemPersistence.update(siteNavigationMenuItem);
 	}
 
-	private void _validate(
+	protected void validate(
 			long siteNavigationMenuId, long siteNavigationMenuItemId,
 			long parentSiteNavigationMenuItemId)
 		throws PortalException {
@@ -417,13 +393,13 @@ public class SiteNavigationMenuItemLocalServiceImpl
 				throw new InvalidSiteNavigationMenuItemOrderException();
 			}
 
-			_validate(
+			validate(
 				siteNavigationMenuId, siteNavigationMenuItemId,
 				parentSiteNavigationMenuItemId);
 		}
 	}
 
-	private void _validateLayout(String typeSettings) throws PortalException {
+	protected void validateLayout(String typeSettings) throws PortalException {
 		UnicodeProperties typeSettingsUnicodeProperties =
 			UnicodePropertiesBuilder.create(
 				true
@@ -447,7 +423,7 @@ public class SiteNavigationMenuItemLocalServiceImpl
 			layoutUuid, groupId, privateLayout);
 	}
 
-	private void _validateName(String name) throws PortalException {
+	protected void validateName(String name) throws PortalException {
 		if (name == null) {
 			return;
 		}

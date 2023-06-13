@@ -27,10 +27,6 @@ public class CommerceSubscriptionEntryServiceWrapper
 	implements CommerceSubscriptionEntryService,
 			   ServiceWrapper<CommerceSubscriptionEntryService> {
 
-	public CommerceSubscriptionEntryServiceWrapper() {
-		this(null);
-	}
-
 	public CommerceSubscriptionEntryServiceWrapper(
 		CommerceSubscriptionEntryService commerceSubscriptionEntryService) {
 

@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Michael C. Han
  */
-@Component(service = GeoDistanceRangeFilterTranslator.class)
+@Component(immediate = true, service = GeoDistanceRangeFilterTranslator.class)
 public class GeoDistanceRangeFilterTranslatorImpl
 	implements GeoDistanceRangeFilterTranslator {
 

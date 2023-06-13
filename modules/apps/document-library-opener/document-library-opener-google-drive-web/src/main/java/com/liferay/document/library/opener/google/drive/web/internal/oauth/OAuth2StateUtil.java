@@ -18,8 +18,9 @@ import com.liferay.document.library.opener.google.drive.web.internal.constants.D
 import com.liferay.document.library.opener.oauth.OAuth2State;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
+
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -36,17 +37,18 @@ public class OAuth2StateUtil {
 			_SESSION_ATTRIBUTE_NAME_GOOGLE_OAUTH2_STATE);
 	}
 
-	public static OAuth2State getOAuth2State(
+	public static Optional<OAuth2State> getOAuth2StateOptional(
 		HttpServletRequest httpServletRequest) {
 
 		HttpSession httpSession = httpServletRequest.getSession();
 
-		return (OAuth2State)httpSession.getAttribute(
-			_SESSION_ATTRIBUTE_NAME_GOOGLE_OAUTH2_STATE);
+		return Optional.ofNullable(
+			(OAuth2State)httpSession.getAttribute(
+				_SESSION_ATTRIBUTE_NAME_GOOGLE_OAUTH2_STATE));
 	}
 
 	public static String getRedirectURI(String portalURL) {
-		return portalURL + PortalUtil.getPathContext() + Portal.PATH_MODULE +
+		return portalURL + Portal.PATH_MODULE +
 			DLOpenerGoogleDriveWebConstants.GOOGLE_DRIVE_SERVLET_PATH;
 	}
 

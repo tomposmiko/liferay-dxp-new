@@ -30,14 +30,12 @@ const ErrorAlertExtendedInfo = ({error = {}}) => {
 					<dd>{statusCode}</dd>
 				</>
 			)}
-
 			{message && (
 				<>
 					<dt>{Liferay.Language.get('error-message')}</dt>{' '}
 					<dd>{message}</dd>
 				</>
 			)}
-
 			{status && (
 				<>
 					<dt>{Liferay.Language.get('error-status')}</dt>{' '}

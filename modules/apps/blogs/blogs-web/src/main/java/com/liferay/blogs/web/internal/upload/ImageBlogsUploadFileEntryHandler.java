@@ -41,6 +41,7 @@ import java.io.InputStream;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -105,7 +106,7 @@ public class ImageBlogsUploadFileEntryHandler
 			themeDisplay.getScopeGroupId(), folder.getFolderId(), fileName);
 
 		return portletFileRepository.addPortletFileEntry(
-			null, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+			themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
 			BlogsEntry.class.getName(), 0, BlogsConstants.SERVICE_NAME,
 			folder.getFolderId(), inputStream, uniqueFileName, contentType,
 			true);
@@ -165,18 +166,18 @@ public class ImageBlogsUploadFileEntryHandler
 
 		Set<String> extensions = MimeTypesUtil.getExtensions(contentType);
 
-		for (String extension :
-				_blogsFileUploadsConfiguration.imageExtensions()) {
+		boolean validContentType = Stream.of(
+			_blogsFileUploadsConfiguration.imageExtensions()
+		).anyMatch(
+			extension ->
+				extension.equals(StringPool.STAR) ||
+				extensions.contains(extension)
+		);
 
-			if (extension.equals(StringPool.STAR) ||
-				extensions.contains(extension)) {
-
-				return;
-			}
+		if (!validContentType) {
+			throw new EntryImageNameException(
+				"Invalid image for file name " + fileName);
 		}
-
-		throw new EntryImageNameException(
-			"Invalid image for file name " + fileName);
 	}
 
 	private volatile BlogsFileUploadsConfiguration

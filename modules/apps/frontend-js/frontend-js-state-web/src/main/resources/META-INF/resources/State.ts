@@ -505,6 +505,8 @@ function isAtom(value: unknown): value is Atom<any> {
 
 window.Liferay = window.Liferay || {};
 
+window.Liferay.State = State;
+
 /**
  * Boilerplate to satisfy TypeScript and prevent: "TS2669: Augmentations
  * for the global scope can only be directly nested in external modules or
@@ -512,3 +514,11 @@ window.Liferay = window.Liferay || {};
  */
 
 export default State;
+
+declare global {
+	interface Window {
+		Liferay: {
+			State: typeof State;
+		};
+	}
+}

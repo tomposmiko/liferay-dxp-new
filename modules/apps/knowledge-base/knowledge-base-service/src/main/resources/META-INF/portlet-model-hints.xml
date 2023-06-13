@@ -3,7 +3,6 @@
 <model-hints>
 	<model name="com.liferay.knowledge.base.model.KBArticle">
 		<field name="mvccVersion" type="long" />
-		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="kbArticleId" type="long" />
 		<field name="resourcePrimKey" type="long" />
@@ -39,12 +38,6 @@
 		<field name="sourceURL" type="String">
 			<hint name="max-length">4000</hint>
 		</field>
-		<field name="expirationDate" type="Date">
-			<hint name="default-year-delta">1</hint>
-		</field>
-		<field name="reviewDate" type="Date">
-			<hint name="default-month-delta">9</hint>
-		</field>
 		<field name="lastPublishDate" type="Date" />
 		<field name="status" type="int" />
 		<field name="statusByUserId" type="long" />
@@ -53,7 +46,6 @@
 	</model>
 	<model name="com.liferay.knowledge.base.model.KBComment">
 		<field name="mvccVersion" type="long" />
-		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="kbCommentId" type="long" />
 		<field name="groupId" type="long" />
@@ -73,7 +65,6 @@
 	</model>
 	<model name="com.liferay.knowledge.base.model.KBFolder">
 		<field name="mvccVersion" type="long" />
-		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="externalReferenceCode" type="String" />
 		<field name="kbFolderId" type="long" />
@@ -95,7 +86,6 @@
 	</model>
 	<model name="com.liferay.knowledge.base.model.KBTemplate">
 		<field name="mvccVersion" type="long" />
-		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="kbTemplateId" type="long" />
 		<field name="groupId" type="long" />

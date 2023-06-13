@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.util.List;
 
@@ -35,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Jürgen Kappler
  */
 @Component(
+	immediate = true,
 	property = "model.class.name=com.liferay.layout.page.template.model.LayoutPageTemplateStructure",
 	service = StagedModelRepository.class
 )
@@ -60,11 +60,7 @@ public class LayoutPageTemplateStructureStagedModelRepository
 		return _layoutPageTemplateStructureLocalService.
 			addLayoutPageTemplateStructure(
 				userId, serviceContext.getScopeGroupId(),
-				layoutPageTemplateStructure.getPlid(),
-				_segmentsExperienceLocalService.
-					fetchDefaultSegmentsExperienceId(
-						layoutPageTemplateStructure.getPlid()),
-				null, serviceContext);
+				layoutPageTemplateStructure.getPlid(), null, serviceContext);
 	}
 
 	@Override
@@ -159,9 +155,6 @@ public class LayoutPageTemplateStructureStagedModelRepository
 	@Reference
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
-
-	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@Reference
 	private StagedModelRepositoryHelper _stagedModelRepositoryHelper;

@@ -21,7 +21,7 @@ import com.liferay.commerce.search.facet.SerializableFacet;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONObjectImpl;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.search.facet.RangeFacet;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
@@ -39,16 +38,15 @@ import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSe
 
 import java.util.Optional;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Shuyang Zhou
  */
 @Component(
+	enabled = false,
 	property = "javax.portlet.name=" + CPPortletKeys.CP_PRICE_RANGE_FACETS,
 	service = PortletSharedSearchContributor.class
 )
@@ -66,32 +64,30 @@ public class CPPriceRangeFacetsPortletSharedSearchContributor
 			SearchContext searchContext =
 				portletSharedSearchSettings.getSearchContext();
 
-			Facet facet = _getFacet(
-				portletSharedSearchSettings, renderRequest, searchContext);
+			Facet facet = getFacet(renderRequest, searchContext);
 
-			String[] parameterValues =
-				portletSharedSearchSettings.getParameterValues(
+			Optional<String[]> parameterValuesOptional =
+				portletSharedSearchSettings.getParameterValues71(
 					facet.getFieldName());
 
 			SerializableFacet serializableFacet = new SerializableFacet(
 				facet.getFieldName(), searchContext);
 
-			if (ArrayUtil.isNotEmpty(parameterValues)) {
-				serializableFacet.select(parameterValues);
+			if (parameterValuesOptional.isPresent()) {
+				serializableFacet.select(parameterValuesOptional.get());
 
 				searchContext.setAttribute(
-					facet.getFieldName(), parameterValues);
+					facet.getFieldName(), parameterValuesOptional.get());
 			}
 
 			portletSharedSearchSettings.addFacet(facet);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			_log.error(exception, exception);
 		}
 	}
 
-	private Facet _getFacet(
-			PortletSharedSearchSettings portletSharedSearchSettings,
+	protected Facet getFacet(
 			RenderRequest renderRequest, SearchContext searchContext)
 		throws PortalException {
 
@@ -115,23 +111,12 @@ public class CPPriceRangeFacetsPortletSharedSearchContributor
 			cpPriceRangeFacetsPortletInstanceConfiguration.
 				rangesJSONArrayString();
 
-		Optional<PortletPreferences> portletPreferencesOptional =
-			portletSharedSearchSettings.getPortletPreferencesOptional();
-
-		if (portletPreferencesOptional.isPresent()) {
-			PortletPreferences portletPreferences =
-				portletPreferencesOptional.get();
-
-			rangesJSONArrayString = portletPreferences.getValue(
-				"rangesJSONArrayString", rangesJSONArrayString);
-		}
-
 		rangesJSONArrayString = StringUtil.replace(
 			rangesJSONArrayString, new String[] {"\\,", StringPool.STAR},
 			new String[] {StringPool.COMMA, String.valueOf(Double.MAX_VALUE)});
 
 		jsonObject.put(
-			"ranges", _jsonFactory.createJSONArray(rangesJSONArrayString));
+			"ranges", JSONFactoryUtil.createJSONArray(rangesJSONArrayString));
 
 		facetConfiguration.setDataJSONObject(jsonObject);
 
@@ -144,8 +129,5 @@ public class CPPriceRangeFacetsPortletSharedSearchContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CPPriceRangeFacetsPortletSharedSearchContributor.class);
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 }

@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
+	immediate = true,
 	property = "ddm.data.provider.instance.id=getDataProviderInstances",
 	service = DDMDataProvider.class
 )
@@ -68,7 +69,7 @@ public class DDMDataProviderInstancesDataProvider implements DDMDataProvider {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(exception, exception);
 			}
 		}
 

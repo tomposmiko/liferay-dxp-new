@@ -81,7 +81,7 @@ public class ViewInPanelJournalArticleContentDashboardItemActionProvider
 						journalArticle.getResourcePrimKey()));
 		}
 		catch (PortalException portalException) {
-			_log.error(portalException);
+			_log.error(portalException, portalException);
 
 			return false;
 		}

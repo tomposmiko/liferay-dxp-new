@@ -14,20 +14,19 @@
 
 import {openSimpleInputModal} from 'frontend-js-web';
 
-import openDeletePageTemplateModal from '../modal/openDeletePageTemplateModal';
-
 export default function propsTransformer({portletNamespace, ...otherProps}) {
 	const deleteLayoutPageTemplateEntries = () => {
-		openDeletePageTemplateModal({
-			onDelete: () => {
-				const form = document.getElementById(`${portletNamespace}fm`);
+		if (
+			confirm(
+				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
+			)
+		) {
+			const form = document.getElementById(`${portletNamespace}fm`);
 
-				if (form) {
-					submitForm(form);
-				}
-			},
-			title: Liferay.Language.get('page-template-sets'),
-		});
+			if (form) {
+				submitForm(form);
+			}
+		}
 	};
 
 	const exportLayoutPageTemplateEntries = (itemData) => {

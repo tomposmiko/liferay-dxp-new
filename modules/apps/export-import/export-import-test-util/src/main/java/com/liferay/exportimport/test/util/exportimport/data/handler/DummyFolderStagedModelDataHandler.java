@@ -33,7 +33,12 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Akos Thurzo
  */
-@Component(service = StagedModelDataHandler.class)
+@Component(
+	immediate = true,
+	service = {
+		DummyFolderStagedModelDataHandler.class, StagedModelDataHandler.class
+	}
+)
 public class DummyFolderStagedModelDataHandler
 	extends BaseStagedModelDataHandler<DummyFolder> {
 
@@ -103,14 +108,27 @@ public class DummyFolderStagedModelDataHandler
 	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.exportimport.test.util.model.DummyFolder)"
+		target = "(model.class.name=com.liferay.exportimport.test.util.model.DummyFolder)",
+		unbind = "-"
 	)
-	private StagedModelRepository<DummyFolder>
-		_dummyFolderStagedModelRepository;
+	protected void setDummyFolderStagedModelRepository(
+		StagedModelRepository<DummyFolder> dummyFolderStagedModelRepository) {
+
+		_dummyFolderStagedModelRepository = dummyFolderStagedModelRepository;
+	}
 
 	@Reference(
-		target = "(model.class.name=com.liferay.exportimport.test.util.model.Dummy)"
+		target = "(model.class.name=com.liferay.exportimport.test.util.model.Dummy)",
+		unbind = "-"
 	)
+	protected void setDummyStagedModelRepository(
+		StagedModelRepository<Dummy> dummyStagedModelRepository) {
+
+		_dummyStagedModelRepository = dummyStagedModelRepository;
+	}
+
+	private StagedModelRepository<DummyFolder>
+		_dummyFolderStagedModelRepository;
 	private StagedModelRepository<Dummy> _dummyStagedModelRepository;
 
 }

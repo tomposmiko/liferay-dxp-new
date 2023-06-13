@@ -66,7 +66,7 @@ public class MBAttachmentHTMLEditorConfigContributor
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			requestBackedPortletURLFactory, namespace + name + "selectItem",
-			_getImageItemSelectorCriterion(), _getURLItemSelectorCriterion());
+			getImageItemSelectorCriterion(), getURLItemSelectorCriterion());
 
 		jsonObject.put(
 			"filebrowserImageBrowseLinkUrl", itemSelectorURL.toString()
@@ -75,11 +75,11 @@ public class MBAttachmentHTMLEditorConfigContributor
 		).put(
 			"toolbar", "mb"
 		).put(
-			"toolbar_mb", _getToolbarMBJSONArray(inputEditorTaglibAttributes)
+			"toolbar_mb", getToolbarMBJSONArray(inputEditorTaglibAttributes)
 		);
 	}
 
-	private ItemSelectorCriterion _getImageItemSelectorCriterion() {
+	protected ItemSelectorCriterion getImageItemSelectorCriterion() {
 		ItemSelectorCriterion itemSelectorCriterion =
 			new ImageItemSelectorCriterion();
 
@@ -90,29 +90,26 @@ public class MBAttachmentHTMLEditorConfigContributor
 		return itemSelectorCriterion;
 	}
 
-	private JSONArray _getToolbarMBJSONArray(
+	protected JSONArray getToolbarMBJSONArray(
 		Map<String, Object> inputEditorTaglibAttributes) {
 
-		return JSONUtil.putAll(
+		JSONArray jsonArray = JSONUtil.putAll(
 			super.toJSONArray("['Bold', 'Italic', 'Underline']"),
 			super.toJSONArray("['NumberedList', 'BulletedList']"),
 			super.toJSONArray("['Styles']"),
 			super.toJSONArray("['Link', 'Unlink']"),
-			super.toJSONArray("['Blockquote', 'ImageSelector']")
-		).put(
-			() -> {
-				if (_isShowSource(inputEditorTaglibAttributes)) {
-					return toJSONArray("['Source']");
-				}
+			super.toJSONArray("['Blockquote', 'ImageSelector']"));
 
-				return null;
-			}
-		).put(
-			toJSONArray("['A11YBtn']")
-		);
+		if (_isShowSource(inputEditorTaglibAttributes)) {
+			jsonArray.put(toJSONArray("['Source']"));
+		}
+
+		jsonArray.put(toJSONArray("['A11YBtn']"));
+
+		return jsonArray;
 	}
 
-	private ItemSelectorCriterion _getURLItemSelectorCriterion() {
+	protected ItemSelectorCriterion getURLItemSelectorCriterion() {
 		ItemSelectorCriterion itemSelectorCriterion =
 			new URLItemSelectorCriterion();
 
@@ -120,6 +117,11 @@ public class MBAttachmentHTMLEditorConfigContributor
 			new URLItemSelectorReturnType());
 
 		return itemSelectorCriterion;
+	}
+
+	@Reference(unbind = "-")
+	protected void setItemSelector(ItemSelector itemSelector) {
+		_itemSelector = itemSelector;
 	}
 
 	private boolean _isShowSource(
@@ -130,7 +132,6 @@ public class MBAttachmentHTMLEditorConfigContributor
 				"liferay-ui:input-editor:showSource"));
 	}
 
-	@Reference
 	private ItemSelector _itemSelector;
 
 }

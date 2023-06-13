@@ -21,6 +21,7 @@ export default function ({
 	orderRuleExternalReferenceCode,
 	orderRuleId,
 	rootPortletId,
+	spritemap,
 }) {
 	const orderRuleOrderTypesResource = ServiceProvider.AdminOrderAPI('v1');
 
@@ -58,6 +59,7 @@ export default function ({
 				fieldName: ['name', 'LANG'],
 			},
 		],
+		spritemap,
 		titleLabel: Liferay.Language.get('add-existing-order-type'),
 	});
 }

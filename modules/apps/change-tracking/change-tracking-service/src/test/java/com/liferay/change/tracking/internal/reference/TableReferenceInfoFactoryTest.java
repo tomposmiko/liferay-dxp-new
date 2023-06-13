@@ -731,38 +731,6 @@ public class TableReferenceInfoFactoryTest {
 					try {
 						childTableReferenceInfoBuilder.referenceInnerJoin(
 							fromStep -> {
-								fromStep.as("test", Collections.emptyList());
-
-								return null;
-							});
-
-						Assert.fail();
-					}
-					catch (Exception exception) {
-						Assert.assertSame(
-							UnsupportedOperationException.class,
-							exception.getClass());
-					}
-
-					try {
-						childTableReferenceInfoBuilder.referenceInnerJoin(
-							fromStep -> {
-								fromStep.as("test", MainExampleTable.INSTANCE);
-
-								return null;
-							});
-
-						Assert.fail();
-					}
-					catch (Exception exception) {
-						Assert.assertSame(
-							UnsupportedOperationException.class,
-							exception.getClass());
-					}
-
-					try {
-						childTableReferenceInfoBuilder.referenceInnerJoin(
-							fromStep -> {
 								fromStep.union(null);
 
 								return null;

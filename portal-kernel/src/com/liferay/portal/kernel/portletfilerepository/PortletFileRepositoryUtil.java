@@ -60,28 +60,25 @@ public class PortletFileRepositoryUtil {
 	}
 
 	public static FileEntry addPortletFileEntry(
-			String externalReferenceCode, long groupId, long userId,
-			String className, long classPK, String portletId, long folderId,
-			File file, String fileName, String mimeType,
-			boolean indexingEnabled)
+			long groupId, long userId, String className, long classPK,
+			String portletId, long folderId, File file, String fileName,
+			String mimeType, boolean indexingEnabled)
 		throws PortalException {
 
 		return _portletFileRepository.addPortletFileEntry(
-			externalReferenceCode, groupId, userId, className, classPK,
-			portletId, folderId, file, fileName, mimeType, indexingEnabled);
+			groupId, userId, className, classPK, portletId, folderId, file,
+			fileName, mimeType, indexingEnabled);
 	}
 
 	public static FileEntry addPortletFileEntry(
-			String externalReferenceCode, long groupId, long userId,
-			String className, long classPK, String portletId, long folderId,
-			InputStream inputStream, String fileName, String mimeType,
-			boolean indexingEnabled)
+			long groupId, long userId, String className, long classPK,
+			String portletId, long folderId, InputStream inputStream,
+			String fileName, String mimeType, boolean indexingEnabled)
 		throws PortalException {
 
 		return _portletFileRepository.addPortletFileEntry(
-			externalReferenceCode, groupId, userId, className, classPK,
-			portletId, folderId, inputStream, fileName, mimeType,
-			indexingEnabled);
+			groupId, userId, className, classPK, portletId, folderId,
+			inputStream, fileName, mimeType, indexingEnabled);
 	}
 
 	public static Folder addPortletFolder(
@@ -266,15 +263,6 @@ public class PortletFileRepositoryUtil {
 		return _portletFileRepository.getPortletFileEntry(uuid, groupId);
 	}
 
-	public static FileEntry getPortletFileEntryByExternalReferenceCode(
-			String externalReferenceCode, long groupId)
-		throws PortalException {
-
-		return _portletFileRepository.
-			getPortletFileEntryByExternalReferenceCode(
-				externalReferenceCode, groupId);
-	}
-
 	public static String getPortletFileEntryURL(
 		ThemeDisplay themeDisplay, FileEntry fileEntry, String queryString) {
 
@@ -369,6 +357,16 @@ public class PortletFileRepositoryUtil {
 
 		return _portletFileRepository.searchPortletFileEntries(
 			repositoryId, searchContext);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), with no direct replacement
+	 */
+	@Deprecated
+	public void setPortletFileRepository(
+		PortletFileRepository portletFileRepository) {
+
+		_portletFileRepository = portletFileRepository;
 	}
 
 	private static volatile PortletFileRepository _portletFileRepository =

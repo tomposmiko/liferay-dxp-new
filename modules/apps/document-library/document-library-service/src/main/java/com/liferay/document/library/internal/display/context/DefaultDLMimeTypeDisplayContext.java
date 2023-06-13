@@ -15,15 +15,16 @@
 package com.liferay.document.library.internal.display.context;
 
 import com.liferay.document.library.configuration.DLConfiguration;
+import com.liferay.document.library.constants.DLContentTypes;
 import com.liferay.document.library.display.context.DLMimeTypeDisplayContext;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.util.ContentTypes;
 
 import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 
 /**
@@ -31,6 +32,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.document.library.configuration.DLConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = DLMimeTypeDisplayContext.class
 )
 public class DefaultDLMimeTypeDisplayContext
@@ -141,10 +143,7 @@ public class DefaultDLMimeTypeDisplayContext
 	}
 
 	private boolean _isMultimediaFileMimeType(String mimeType) {
-		if (Objects.equals(
-				mimeType,
-				ContentTypes.
-					APPLICATION_VND_LIFERAY_VIDEO_EXTERNAL_SHORTCUT_HTML) ||
+		if (Objects.equals(mimeType, DLContentTypes.VIDEO_EXTERNAL_SHORTCUT) ||
 			_containsMimeType(
 				_dlConfiguration.multimediaFileMimeTypes(), mimeType)) {
 

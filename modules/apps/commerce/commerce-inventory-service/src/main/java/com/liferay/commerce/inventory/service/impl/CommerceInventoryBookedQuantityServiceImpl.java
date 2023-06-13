@@ -18,27 +18,16 @@ import com.liferay.commerce.inventory.constants.CommerceInventoryActionKeys;
 import com.liferay.commerce.inventory.constants.CommerceInventoryConstants;
 import com.liferay.commerce.inventory.model.CommerceInventoryBookedQuantity;
 import com.liferay.commerce.inventory.service.base.CommerceInventoryBookedQuantityServiceBaseImpl;
-import com.liferay.portal.aop.AopService;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 
 import java.util.List;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Luca Pellizzon
  * @author Alessio Antonio Rendina
  */
-@Component(
-	property = {
-		"json.web.service.context.name=commerce",
-		"json.web.service.context.path=CommerceInventoryBookedQuantity"
-	},
-	service = AopService.class
-)
 public class CommerceInventoryBookedQuantityServiceImpl
 	extends CommerceInventoryBookedQuantityServiceBaseImpl {
 
@@ -57,21 +46,6 @@ public class CommerceInventoryBookedQuantityServiceImpl
 	}
 
 	@Override
-	public List<CommerceInventoryBookedQuantity>
-			getCommerceInventoryBookedQuantities(
-				long companyId, String keywords, String sku, int start, int end)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), null,
-			CommerceInventoryActionKeys.MANAGE_INVENTORY);
-
-		return commerceInventoryBookedQuantityLocalService.
-			getCommerceInventoryBookedQuantities(
-				companyId, keywords, sku, start, end);
-	}
-
-	@Override
 	public int getCommerceInventoryBookedQuantitiesCount(
 			long companyId, String sku)
 		throws PrincipalException {
@@ -84,22 +58,11 @@ public class CommerceInventoryBookedQuantityServiceImpl
 			getCommerceInventoryBookedQuantitiesCount(companyId, sku);
 	}
 
-	@Override
-	public int getCommerceInventoryBookedQuantitiesCount(
-			long companyId, String keywords, String sku)
-		throws PortalException {
-
-		_portletResourcePermission.check(
-			getPermissionChecker(), null,
-			CommerceInventoryActionKeys.MANAGE_INVENTORY);
-
-		return commerceInventoryBookedQuantityLocalService.
-			getCommerceInventoryBookedQuantitiesCount(companyId, keywords, sku);
-	}
-
-	@Reference(
-		target = "(resource.name=" + CommerceInventoryConstants.RESOURCE_NAME + ")"
-	)
-	private PortletResourcePermission _portletResourcePermission;
+	private static volatile PortletResourcePermission
+		_portletResourcePermission =
+			PortletResourcePermissionFactory.getInstance(
+				CommerceInventoryBookedQuantityServiceImpl.class,
+				"_portletResourcePermission",
+				CommerceInventoryConstants.RESOURCE_NAME);
 
 }

@@ -37,15 +37,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(service = VerifyProcess.class)
+@Component(
+	immediate = true,
+	property = "verify.process.name=com.liferay.portal.workflow.kaleo.designer.web",
+	service = VerifyProcess.class
+)
 public class KaleoDesignerWebVerifyProcess extends VerifyProcess {
 
 	@Override
 	protected void doVerify() throws Exception {
-		_verifyKaleoDefinitionVersions();
+		verifyKaleoDefinitionVersions();
 	}
 
-	private ServiceContext _getServiceContext() {
+	protected ServiceContext getServiceContext() {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -59,7 +63,7 @@ public class KaleoDesignerWebVerifyProcess extends VerifyProcess {
 		return serviceContext;
 	}
 
-	private void _verifyKaleoDefinitionVersions() throws PortalException {
+	protected void verifyKaleoDefinitionVersions() throws PortalException {
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			ActionableDynamicQuery actionableDynamicQuery =
 				_kaleoDefinitionVersionLocalService.getActionableDynamicQuery();
@@ -69,14 +73,14 @@ public class KaleoDesignerWebVerifyProcess extends VerifyProcess {
 					KaleoDefinitionVersion kaleoDefinitionVersion =
 						(KaleoDefinitionVersion)object;
 
-					_verifyKaleoDefinitionVersions(kaleoDefinitionVersion);
+					verifyKaleoDefinitionVersions(kaleoDefinitionVersion);
 				});
 
 			actionableDynamicQuery.performActions();
 		}
 	}
 
-	private void _verifyKaleoDefinitionVersions(
+	protected void verifyKaleoDefinitionVersions(
 			KaleoDefinitionVersion kaleoDefinitionVersion)
 		throws PortalException {
 
@@ -94,7 +98,7 @@ public class KaleoDesignerWebVerifyProcess extends VerifyProcess {
 
 		if (resourcePermission == null) {
 			_resourceLocalService.addModelResources(
-				kaleoDefinitionVersion, _getServiceContext());
+				kaleoDefinitionVersion, getServiceContext());
 		}
 	}
 

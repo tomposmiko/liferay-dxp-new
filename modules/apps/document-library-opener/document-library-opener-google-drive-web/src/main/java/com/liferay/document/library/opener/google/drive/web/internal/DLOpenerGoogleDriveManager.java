@@ -16,7 +16,6 @@ package com.liferay.document.library.opener.google.drive.web.internal;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -31,12 +30,10 @@ import com.liferay.document.library.opener.model.DLOpenerFileEntryReference;
 import com.liferay.document.library.opener.service.DLOpenerFileEntryReferenceLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
-import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskContextMapConstants;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -60,6 +57,7 @@ import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.osgi.service.component.annotations.Activate;
@@ -146,18 +144,6 @@ public class DLOpenerGoogleDriveManager
 					DLOpenerGoogleDriveConstants.GOOGLE_DRIVE_REFERENCE_TYPE,
 					fileEntry);
 		}
-		catch (GoogleJsonResponseException googleJsonResponseException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"The Google Drive file does not exist",
-					googleJsonResponseException);
-			}
-
-			_dlOpenerFileEntryReferenceLocalService.
-				deleteDLOpenerFileEntryReference(
-					DLOpenerGoogleDriveConstants.GOOGLE_DRIVE_REFERENCE_TYPE,
-					fileEntry);
-		}
 		catch (IOException ioException) {
 			throw new PortalException(ioException);
 		}
@@ -170,51 +156,6 @@ public class DLOpenerGoogleDriveManager
 
 		return _oAuth2Manager.getAuthorizationURL(
 			companyId, state, redirectUri);
-	}
-
-	public DLOpenerGoogleDriveFileReference getDLOpenerGoogleDriveFileReference(
-			long userId, FileEntry fileEntry)
-		throws PortalException {
-
-		if (Validator.isNull(_getGoogleDriveFileId(fileEntry))) {
-			throw new IllegalArgumentException(
-				StringBundler.concat(
-					"File entry ", fileEntry.getFileEntryId(),
-					" is not a Google Drive file"));
-		}
-
-		_checkCredential(fileEntry.getCompanyId(), userId);
-
-		return new DLOpenerGoogleDriveFileReference(
-			fileEntry.getFileEntryId(),
-			new CachingSupplier<>(
-				() -> _getGoogleDriveFileTitle(userId, fileEntry)),
-			() -> _getContentFile(userId, fileEntry), 0);
-	}
-
-	public boolean hasGoogleDriveFile(long userId, FileEntry fileEntry) {
-		try {
-			Drive drive = new Drive.Builder(
-				_netHttpTransport, _jsonFactory,
-				_getCredential(fileEntry.getCompanyId(), userId)
-			).build();
-
-			Drive.Files driveFiles = drive.files();
-
-			Drive.Files.Get driveFilesGet = driveFiles.get(
-				_getGoogleDriveFileId(fileEntry));
-
-			driveFilesGet.execute();
-		}
-		catch (IOException | PortalException exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("The Google Drive file does not exist", exception);
-			}
-
-			return false;
-		}
-
-		return true;
 	}
 
 	@Override
@@ -240,17 +181,16 @@ public class DLOpenerGoogleDriveManager
 
 	@Override
 	public boolean isGoogleDriveFile(FileEntry fileEntry) {
-		DLOpenerFileEntryReference dlOpenerFileEntryReference =
+		return Optional.ofNullable(
 			_dlOpenerFileEntryReferenceLocalService.
 				fetchDLOpenerFileEntryReference(
 					DLOpenerGoogleDriveConstants.GOOGLE_DRIVE_REFERENCE_TYPE,
-					fileEntry);
-
-		if (dlOpenerFileEntryReference != null) {
-			return true;
-		}
-
-		return false;
+					fileEntry)
+		).map(
+			dlOpenerFileEntryReference -> true
+		).orElse(
+			false
+		);
 	}
 
 	@Override
@@ -267,16 +207,20 @@ public class DLOpenerGoogleDriveManager
 			long userId, FileEntry fileEntry)
 		throws PortalException {
 
-		if (hasGoogleDriveFile(userId, fileEntry)) {
-			return getDLOpenerGoogleDriveFileReference(userId, fileEntry);
+		if (Validator.isNull(_getGoogleDriveFileId(fileEntry))) {
+			throw new IllegalArgumentException(
+				StringBundler.concat(
+					"File entry ", fileEntry.getFileEntryId(),
+					" is not a Google Drive file"));
 		}
 
-		_dlOpenerFileEntryReferenceLocalService.
-			deleteDLOpenerFileEntryReference(
-				DLOpenerGoogleDriveConstants.GOOGLE_DRIVE_REFERENCE_TYPE,
-				fileEntry);
+		_checkCredential(fileEntry.getCompanyId(), userId);
 
-		return checkOut(userId, fileEntry);
+		return new DLOpenerGoogleDriveFileReference(
+			fileEntry.getFileEntryId(),
+			new CachingSupplier<>(
+				() -> _getGoogleDriveFileTitle(userId, fileEntry)),
+			() -> _getContentFile(userId, fileEntry), 0);
 	}
 
 	@Override
@@ -370,15 +314,6 @@ public class DLOpenerGoogleDriveManager
 				return FileUtil.createTempFile(inputStream);
 			}
 		}
-		catch (GoogleJsonResponseException googleJsonResponseException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"The Google Drive file does not exist",
-					googleJsonResponseException);
-			}
-
-			return null;
-		}
 		catch (IOException | PortalException exception) {
 			throw new RuntimeException(exception);
 		}
@@ -432,9 +367,6 @@ public class DLOpenerGoogleDriveManager
 			throw new RuntimeException(exception);
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DLOpenerGoogleDriveManager.class);
 
 	@Reference
 	private BackgroundTaskManager _backgroundTaskManager;

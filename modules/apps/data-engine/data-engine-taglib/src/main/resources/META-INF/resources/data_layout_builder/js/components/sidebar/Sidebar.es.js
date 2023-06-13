@@ -14,7 +14,6 @@
 
 import './Sidebar.scss';
 
-import {ClayButtonWithIcon} from '@clayui/button';
 import ClayLayout from '@clayui/layout';
 import classNames from 'classnames';
 import React, {useState} from 'react';
@@ -50,19 +49,13 @@ const SidebarHeader = ({children, className}) => {
 	);
 };
 
-const SidebarSearchInput = ({
-	children,
-	onSearch,
-	searchText,
-	setSearchClicked,
-}) => (
+const SidebarSearchInput = ({children, onSearch, searchText}) => (
 	<ClayLayout.ContentRow className="sidebar-section">
 		<ClayLayout.ContentCol expand>
 			{onSearch && (
 				<SearchInput
 					onChange={(searchText) => onSearch(searchText)}
 					searchText={searchText}
-					setSearchClicked={setSearchClicked}
 				/>
 			)}
 		</ClayLayout.ContentCol>
@@ -101,7 +94,7 @@ const SidebarTab = ({onTabClick, selectedTab, tabs}) => {
 	return (
 		<nav className="component-tbar tbar">
 			<ClayLayout.ContainerFluid>
-				<ul className="nav nav-tabs" role="tablist">
+				<ul className="nav nav-underline" role="tablist">
 					{tabs.map(({label}, index) => (
 						<li className="nav-item" key={index}>
 							<button
@@ -142,45 +135,13 @@ const SidebarTitle = ({className, title}) => (
 	<ClayLayout.ContentRow className={classNames('sidebar-section', className)}>
 		<ClayLayout.ContentCol expand>
 			<div className="component-title">
-				<h2 className="text-truncate-inline">{title}</h2>
+				<span className="text-truncate-inline">{title}</span>
 			</div>
 		</ClayLayout.ContentCol>
-
-		<ClayButtonWithIcon
-			aria-label={Liferay.Language.get('close-builder-panel')}
-			displayType="unstyled"
-			onClick={() => {
-				const builder = document.querySelector(
-					'.ddm-form-builder--sidebar-open'
-				);
-				const sidebar = document.querySelector(
-					'.multi-panel-sidebar-content-open'
-				);
-
-				builder.classList.remove('ddm-form-builder--sidebar-open');
-				sidebar.classList.remove('multi-panel-sidebar-content-open');
-			}}
-			size="sm"
-			symbol="times"
-			tabIndex={0}
-			title={Liferay.Language.get('close')}
-		/>
 	</ClayLayout.ContentRow>
 );
 
-const SidebarDescription = ({description}) => (
-	<p>
-		<span
-			aria-label={description}
-			className="de__sidebar-content-description"
-		>
-			{description}
-		</span>
-	</p>
-);
-
 Sidebar.Body = SidebarBody;
-Sidebar.Description = SidebarDescription;
 Sidebar.Footer = SidebarFooter;
 Sidebar.Header = SidebarHeader;
 Sidebar.SearchInput = SidebarSearchInput;
@@ -191,7 +152,6 @@ Sidebar.Title = SidebarTitle;
 
 export {
 	SidebarBody,
-	SidebarDescription,
 	SidebarFooter,
 	SidebarHeader,
 	SidebarSearchInput,

@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Luan Maoski
  */
 @Component(
+	immediate = true,
 	property = "indexer.class.name=com.liferay.message.boards.model.MBMessage",
 	service = KeywordQueryContributor.class
 )
@@ -51,9 +52,11 @@ public class MBMessageKeywordQueryContributor
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 
-		queryConfig.addHighlightFieldNames(
+		String[] localizedFieldNames =
 			searchLocalizationHelper.getLocalizedFieldNames(
-				new String[] {Field.CONTENT, Field.TITLE}, searchContext));
+				new String[] {Field.CONTENT, Field.TITLE}, searchContext);
+
+		queryConfig.addHighlightFieldNames(localizedFieldNames);
 	}
 
 	@Reference

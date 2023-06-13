@@ -20,9 +20,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--API_EXECUTE-->
-
 <tr>
 	<td>API_EXECUTE_USER_ID_FIELD</td>
 	<td>//textarea[@name='userId']</td>
@@ -60,12 +58,12 @@
 </tr>
 <tr>
 	<td>API_EXECUTE_PREFIX_ID_FIELD</td>
-	<td>//textarea[@name='prefixListTypeId']</td>
+	<td>//textarea[@name='prefixId']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>API_EXECUTE_SUFFIX_ID_FIELD</td>
-	<td>//textarea[@name='suffixListTypeId']</td>
+	<td>//textarea[@name='suffixId']</td>
 	<td></td>
 </tr>
 <tr>
